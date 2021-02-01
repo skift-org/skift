@@ -1,12 +1,11 @@
 #pragma once
 #include <libsystem/Common.h>
-#include <libsystem/io/Stream.h>
-#include <libutils/Vector.h>
+#include <libsystem/io/Writer.h>
 
 class BitWriter
 {
 public:
-    BitWriter(Vector<uint8_t> &data) : _data(data)
+    BitWriter(Writer &writer) : _writer(writer)
     {
     }
 
@@ -23,13 +22,13 @@ public:
 
     inline void put_data(uint8_t *data, size_t len)
     {
-        _data.push_back_data(data, len);
+        _writer.write(data, len);
     }
 
     inline void put_uint16(uint16_t v)
     {
-        _data.push_back(v & 0xFF);
-        _data.push_back(v >> 8);
+        _writer.write_byte(v & 0xFF);
+        _writer.write_byte(v >> 8);
     }
 
     inline void align()
@@ -43,7 +42,7 @@ public:
         // Flush one byte at a time
         while (_bit_count >= 8)
         {
-            _data.push_back(_bit_buffer);
+            _writer.write_byte(_bit_buffer);
             _bit_count -= 8;
             _bit_buffer >>= 8;
         }
@@ -52,6 +51,5 @@ public:
 private:
     uint_fast32_t _bit_buffer;
     uint8_t _bit_count;
-    size_t _index;
-    Vector<uint8_t> &_data;
+    Writer &_writer;
 };

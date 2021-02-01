@@ -8,6 +8,7 @@
 #include <libsystem/io/FileWriter.h>
 #include <libsystem/io/MemoryReader.h>
 #include <libsystem/io/MemoryWriter.h>
+#include <libsystem/io/ScopedReader.h>
 #include <libutils/Endian.h>
 
 // Central header
@@ -231,20 +232,14 @@ void ZipArchive::read_archive()
     _valid = true;
 }
 
-void ZipArchive::get_compressed_data(const Entry &entry, Vector<uint8_t> &compressed_data)
+void ZipArchive::write_entry(const Entry &entry, BinaryWriter &writer, Reader &compressed)
 {
-    // Read the compressed data from the file
-    compressed_data.resize(entry.compressed_size);
-    FileReader file_reader(_path);
-    file_reader.seek(entry.archive_offset, WHENCE_START);
-    assert(file_reader.read(compressed_data.raw_storage(), compressed_data.count()) == entry.compressed_size);
-}
+    Vector<uint8_t> compressed_data(compressed.length());
+    assert(compressed.read(compressed_data.raw_storage(), compressed_data.count()) == compressed_data.count());
 
-void ZipArchive::write_entry(const Entry &entry, BinaryWriter &writer, const Vector<uint8_t> &compressed_data)
-{
     LocalHeader header;
     header.flags = EF_NONE;
-    header.compressed_size = compressed_data.count();
+    header.compressed_size = compressed.length();
     header.compression = CM_DEFLATED;
     header.uncompressed_size = entry.uncompressed_size;
     header.len_filename = entry.name.length();
@@ -297,22 +292,17 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
         return Result::ERR_FUNCTION_NOT_IMPLEMENTED;
     }
 
-    Vector<uint8_t> compressed_data;
-    get_compressed_data(entry, compressed_data);
-
-    Vector<uint8_t> uncompressed_data(entry.uncompressed_size);
-
     Inflate inf;
 
-    // Pre-Allocate the uncompressed output buffer
-    auto result = inf.perform(compressed_data, uncompressed_data);
-    if (result != Result::SUCCESS)
-    {
-        return result;
-    }
+    // Get a reader to the uncompressed data
+    FileReader file_reader(_path);
+    file_reader.seek(entry.archive_offset, WHENCE_START);
+    ScopedReader scoped_reader(file_reader, entry.uncompressed_size);
 
-    File dest_file(dest_path);
-    return dest_file.write_all(uncompressed_data.raw_storage(), uncompressed_data.count());
+    // Get a writer to the output
+    FileWriter file_writer(dest_path);
+
+    return inf.perform(scoped_reader, file_writer);
 }
 
 Result ZipArchive::insert(const char *entry_name, const char *src_path)
@@ -331,21 +321,20 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     // Write local headers
     for (const auto &entry : _entries)
     {
-        Vector<uint8_t> entry_compressed_data;
-        get_compressed_data(entry, entry_compressed_data);
+        FileReader file_reader(_path);
+        file_reader.seek(entry.archive_offset, WHENCE_START);
+        ScopedReader scoped_reader(file_reader, entry.uncompressed_size);
 
-        write_entry(entry, binary_Writer, entry_compressed_data);
+        write_entry(entry, binary_Writer, scoped_reader);
     }
 
-    // Read the uncompressed data from the file
-    MemoryWriter uncompressed_Writer;
+    // Get a reader to the original file
     FileReader src_reader(src_path);
-    src_reader.copy_to(uncompressed_Writer);
+    MemoryWriter compressed_writer;
 
     // Perform deflate on the data
     Deflate def(5);
-    Vector<uint8_t> new_compressed_data;
-    auto def_result = def.perform(uncompressed_Writer.data(), new_compressed_data);
+    auto def_result = def.perform(src_reader, compressed_writer);
     if (def_result != Result::SUCCESS)
     {
         return def_result;
@@ -354,12 +343,13 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     // Write our new entry
     auto &new_entry = _entries.emplace_back();
     new_entry.name = String(entry_name);
-    new_entry.compressed_size = new_compressed_data.count();
+    new_entry.compressed_size = compressed_writer.length();
     new_entry.compression = CM_DEFLATED;
-    new_entry.uncompressed_size = uncompressed_Writer.data().count();
+    new_entry.uncompressed_size = src_reader.length();
     new_entry.archive_offset = memory_writer.length() + sizeof(LocalHeader) + new_entry.name.length();
 
-    write_entry(new_entry, binary_Writer, new_compressed_data);
+    MemoryReader compressed_reader(compressed_writer.data());
+    write_entry(new_entry, binary_Writer, compressed_reader);
 
     // Write central directory
     write_central_directory(binary_Writer);

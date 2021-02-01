@@ -2,7 +2,9 @@
 #include <libsystem/compression/Common.h>
 #include <libsystem/compression/Huffman.h>
 #include <libsystem/compression/Inflate.h>
-#include <libsystem/io/Stream.h>
+#include <libsystem/io/MemoryWriter.h>
+#include <libsystem/io/Reader.h>
+#include <libsystem/io/Writer.h>
 
 static constexpr uint8_t BASE_LENGTH_EXTRA_BITS[] = {
     0, 0, 0, 0, 0, 0, 0, 0, //257 - 264
@@ -233,10 +235,11 @@ Result Inflate::build_dynamic_huffman_alphabet(BitReader &input)
     return Result::SUCCESS;
 }
 
-Result Inflate::perform(const Vector<uint8_t> &compressed, Vector<uint8_t> &uncompressed)
+Result Inflate::perform(Reader &compressed, Writer &uncompressed)
 {
-    assert(compressed.count() > 0);
+    assert(compressed.length() > 0);
     BitReader input(compressed);
+    Vector<uint8_t> block_buffer;
 
     uint8_t bfinal;
     do
@@ -256,12 +259,14 @@ Result Inflate::perform(const Vector<uint8_t> &compressed, Vector<uint8_t> &unco
 
             for (int i = 0; i != len; i++)
             {
-                uncompressed.push_back(input.grab_bits(8));
+                uncompressed.write_byte(input.grab_bits(8));
             }
         }
         else if (btype == BT_FIXED_HUFFMAN ||
                  btype == BT_DYNAMIC_HUFFMAN)
         {
+            block_buffer.clear();
+
             // Use a fixed huffman alphabet
             if (btype == BT_FIXED_HUFFMAN)
             {
@@ -288,7 +293,7 @@ Result Inflate::perform(const Vector<uint8_t> &compressed, Vector<uint8_t> &unco
                 unsigned int decoded_symbol = symbol_decoder.decode(input);
                 if (decoded_symbol <= 255)
                 {
-                    uncompressed.push_back((unsigned char)decoded_symbol);
+                    block_buffer.push_back((unsigned char)decoded_symbol);
                 }
                 else if (decoded_symbol == 256)
                 {
@@ -301,14 +306,17 @@ Result Inflate::perform(const Vector<uint8_t> &compressed, Vector<uint8_t> &unco
                     unsigned int dist_code = dist_decoder.decode(input);
 
                     unsigned int total_dist = BASE_DISTANCE[dist_code] + input.grab_bits(BASE_DISTANCE_EXTRA_BITS[dist_code]);
-                    unsigned char *pos = &uncompressed[uncompressed.count() - total_dist];
+                    uint8_t *pos = (uint8_t *)&block_buffer[block_buffer.count() - total_dist];
                     for (unsigned int i = 0; i != total_length; i++)
                     {
-                        uncompressed.push_back(*pos);
-                        pos = &uncompressed[uncompressed.count() - total_dist];
+                        block_buffer.push_back(*pos);
+                        pos = (uint8_t *)&block_buffer[block_buffer.count() - total_dist];
                     }
                 }
             }
+
+            // Copy our temporary block buffer to output
+            uncompressed.write(block_buffer.raw_storage(), block_buffer.count());
         }
         else
         {

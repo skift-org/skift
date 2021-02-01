@@ -41,7 +41,7 @@ size_t MemoryReader::seek(size_t position, Whence whence)
 
 size_t MemoryReader::read(void *buffer, size_t size)
 {
-    size_t remaining = MIN(_size - _position, size);
+    size_t remaining = MIN(length() - position(), size);
 
     memcpy(buffer, _data + _position, remaining);
     _position += remaining;

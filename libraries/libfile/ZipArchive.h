@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libfile/Archive.h>
-#include <libsystem/io/BinaryWriter.h>
 #include <libsystem/io/BinaryReader.h>
+#include <libsystem/io/BinaryWriter.h>
 
 class ZipArchive : public Archive
 {

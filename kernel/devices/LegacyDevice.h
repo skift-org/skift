@@ -30,6 +30,14 @@ public:
         case LEGACY_COM3:
             return 4;
 
+        case LEGACY_ATA0:
+        case LEGACY_ATA1:
+            return 5;
+
+        case LEGACY_ATA2:
+        case LEGACY_ATA3:
+            return 6;
+
         case LEGACY_MOUSE:
             return 12;
 

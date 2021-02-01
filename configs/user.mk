@@ -1,1 +1,1 @@
-# Overide configs from configs.mk here.
+# Override configs from configs.mk here.

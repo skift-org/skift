@@ -36,8 +36,6 @@ public:
 
     void write(const json::Value &value)
     {
-        _value = value;
-        _callback(value);
         settings::write(_path, value);
     }
 

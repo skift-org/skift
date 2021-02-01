@@ -100,6 +100,8 @@ public:
 
     void acrylic(Recti rectangle);
 
+    void sepia(Recti rectangle, float value);
+
 private:
     Recti clip() const
     {

@@ -680,7 +680,7 @@ __flatten void Painter::saturation(Recti rectangle, float value)
 
 __flatten void Painter::noise(Recti rectangle, float opacity)
 {
-    Random rand;
+    Random rand{0x12341234};
 
     for (int y = 0; y < rectangle.height(); y++)
     {
@@ -688,6 +688,27 @@ __flatten void Painter::noise(Recti rectangle, float opacity)
         {
             double noise = rand.next_double();
             plot({rectangle.x() + x, rectangle.y() + y}, Color::from_rgba(noise, noise, noise, opacity));
+        }
+    }
+}
+
+__flatten void Painter::sepia(Recti rectangle, float value)
+{
+    rectangle = apply(rectangle);
+
+    for (int y = 0; y < rectangle.height(); y++)
+    {
+        for (int x = 0; x < rectangle.width(); x++)
+        {
+            Color color = _bitmap->get_pixel({rectangle.x() + x, rectangle.y() + y});
+
+            uint32_t red = (color.red() * 0.393) + (color.green() * 0.769) + (color.blue() * 0.189);
+            uint32_t green = (color.red() * 0.349) + (color.green() * 0.686) + (color.blue() * 0.168);
+            uint32_t blue = (color.red() * 0.272) + (color.green() * 0.534) + (color.blue() * 0.131);
+
+            Color sepia_color = Color::from_byte(MIN(255, red), MIN(255, green), MIN(blue, 255));
+
+            _bitmap->set_pixel({rectangle.x() + x, rectangle.y() + y}, Color::lerp(color, sepia_color, value));
         }
     }
 }

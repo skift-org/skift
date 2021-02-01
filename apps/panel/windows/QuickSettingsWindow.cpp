@@ -1,5 +1,6 @@
 #include <libwidget/Screen.h>
 
+#include "panel/widgets/SettingToggle.h"
 #include "panel/windows/PanelWindow.h"
 #include "panel/windows/QuickSettingsWindow.h"
 
@@ -18,7 +19,11 @@ QuickSettingsWindow::QuickSettingsWindow()
         bound(Screen::bound().take_right(WIDTH).shrinked({PanelWindow::HEIGHT, 0, 0, 0}).with_height(HEIGHT));
     });
 
-    root()->layout(HFLOW(0));
+    root()->layout(VFLOW(4));
+    root()->insets(6);
+
+    new Label(root(), "Quick settings");
+    new SettingToggle(root(), "Show Wireframe", Icon::get("duck"), "appearance:widgets.wireframe");
 }
 
 } // namespace panel

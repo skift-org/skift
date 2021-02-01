@@ -14,7 +14,6 @@ ApplicationListing::ApplicationListing(Widget *parent) : VScroll(parent)
 {
     layout(VFLOW(4));
     flags(Widget::FILL);
-    insets(Insetsi(4));
 
     render();
 }

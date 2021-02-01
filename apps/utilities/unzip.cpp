@@ -47,7 +47,7 @@ int main(int argc, char const *argv[])
             auto result = archive->extract(i, entry.name.cstring());
             if (result != Result::SUCCESS)
             {
-                stream_format(err_stream, "%s: Failed to extract entry '%s' with error '%i'", argv[0], entry.name.cstring(), result);
+                stream_format(err_stream, "%s: Failed to extract entry '%s' with error '%s'", argv[0], entry.name.cstring(), get_result_description(result));
                 process_exit(PROCESS_FAILURE);
             }
             i++;

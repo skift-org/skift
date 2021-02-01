@@ -77,7 +77,7 @@ Button::Button(Widget *parent, Style style)
       _style(style)
 {
     layout(HFLOW(0));
-    insets(Insetsi(0, 16));
+    insets(Insetsi(0, 6));
     min_height(32);
     flags(Widget::GREEDY);
 }
@@ -102,7 +102,7 @@ Button::Button(Widget *parent, Style style, String text)
     : Button(parent, style)
 {
     layout(STACK());
-    insets(Insetsi(0, 0, 6, 6));
+    insets(Insetsi(0, 6));
     min_width(64);
 
     auto label = new Label(this, text, Anchor::CENTER);

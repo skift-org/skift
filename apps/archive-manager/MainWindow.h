@@ -2,6 +2,7 @@
 
 #include <libfile/Archive.h>
 #include <libwidget/Container.h>
+#include <libwidget/Panel.h>
 #include <libwidget/TitleBar.h>
 #include <libwidget/Window.h>
 
@@ -60,7 +61,16 @@ public:
         }
         else
         {
-            browser->layout(VFLOW(1));
+            browser->layout(VFLOW(0));
+
+            auto toolbar = new Panel(browser);
+            toolbar->layout(HFLOW(4));
+            toolbar->insets(Insetsi(4, 4));
+            toolbar->max_height(38);
+            toolbar->min_height(38);
+
+            new Button(toolbar, Button::TEXT, Icon::get("archive-arrow-up"), "Extract All");
+
             new filepicker::ArchiveBrowser(browser, _navigation, _archive);
         }
     }

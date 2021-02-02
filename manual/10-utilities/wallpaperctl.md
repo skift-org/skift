@@ -6,4 +6,4 @@ wallpaperctl [IMAGE]
 
 ## Description
 
-Sets the desktop background.
+Sets the desktop wallpaper.

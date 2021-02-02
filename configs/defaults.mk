@@ -22,6 +22,9 @@ CONFIGS = \
 
 CONFIG                ?=develop
 
+include configs/user.mk
+include configs/$(CONFIG).mk
+
 # Set the target architecture.
 # Possible values: x86_32/x86_64
 CONFIG_ARCH           ?=x86_32
@@ -71,9 +74,6 @@ CONFIG_OPTIMISATIONS  ?=-O2
 
 # The version number (usualy year.week).
 CONFIG_VERSION        ?=${shell date +'%y.%W'}
-
-include configs/$(CONFIG).mk
-include configs/user.mk
 
 define BUILD_CONFIG_TEMPLATE =
 -D__$(1)__=\""$($(1))"\"

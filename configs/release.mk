@@ -1,5 +1,5 @@
-CONFIG_NOREBOOT       ?=false
-CONFIG_NOSHUTDOWN     ?=false
-CONFIG_OPTIMISATIONS  ?=-O3
-CONFIG_LTO            ?=true
-CONFIG_STRIP		  ?=true
+CONFIG_NOREBOOT      ?=false
+CONFIG_NOSHUTDOWN    ?=false
+CONFIG_OPTIMISATIONS ?=-O3
+CONFIG_LTO           ?=true
+CONFIG_STRIP		 ?=true

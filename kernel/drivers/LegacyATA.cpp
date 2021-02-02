@@ -25,6 +25,8 @@
 #define ATA_IDENT_SECTORS 12
 #define ATA_IDENT_SERIAL 20
 #define ATA_IDENT_MODEL 54
+#define ATA_IDENT_NUM_BLOCKS0 60
+#define ATA_IDENT_NUM_BLOCKS1 61
 #define ATA_IDENT_LBA 83
 #define ATA_IDENT_CAPABILITIES 98
 #define ATA_IDENT_FIELDVALID 106
@@ -109,6 +111,11 @@ void LegacyATA::select()
     out8(io_port + ATA_REG_HDDEVSEL, _drive == ATA_MASTER ? 0xA0 : 0xB0);
 }
 
+size_t LegacyATA::size(FsHandle &handle)
+{
+    return _num_blocks * ATA_SECTOR_SIZE;
+}
+
 void LegacyATA::identify()
 {
     select();
@@ -155,7 +162,7 @@ void LegacyATA::identify()
 
         _exists = true;
 
-        // TODO: write things into information
+        // Parse some infos from the identify buffer
         char *model_buf = (char *)malloc(40);
         for (int i = 0; i < 20; i += 1)
         {
@@ -166,7 +173,9 @@ void LegacyATA::identify()
         _model = String(model_buf, 40);
         _supports_48lba = (_ide_buffer[ATA_IDENT_LBA] >> 10) & 0x1;
 
-        logger_info("IDENITY: Modelname: %s LBA48: %i", _model.cstring(), _supports_48lba);
+        _num_blocks = _ide_buffer[ATA_IDENT_NUM_BLOCKS1] << 16 | _ide_buffer[ATA_IDENT_NUM_BLOCKS0];
+
+        logger_info("IDENITY: Modelname: %s LBA48: %i NB: %i", _model.cstring(), _supports_48lba, _num_blocks);
     }
     else
     {

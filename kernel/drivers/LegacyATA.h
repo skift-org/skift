@@ -21,17 +21,13 @@ private:
     uint8_t read_block(uint8_t *buf, uint32_t lba, size_t size);
     uint8_t write_block(uint8_t *buf, uint32_t lba, size_t size);
 
-    virtual bool did_fail() override
-    {
-        return !_exists;
-    }
-
     int _bus;
     int _drive;
     uint16_t _ide_buffer[256];
     bool _exists = false;
     String _model;
     bool _supports_48lba;
+    size_t _num_blocks;
 
 public:
     LegacyATA(DeviceAddress address);
@@ -41,4 +37,11 @@ public:
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
 
     ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override;
+
+    size_t size(FsHandle &handle) override;
+
+    virtual bool did_fail() override
+    {
+        return !_exists;
+    }
 };

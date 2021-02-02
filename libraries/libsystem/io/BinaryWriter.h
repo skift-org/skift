@@ -3,33 +3,45 @@
 #include <libsystem/io/Writer.h>
 #include <libutils/String.h>
 
-class BinaryWriter
+class BinaryWriter : public Writer
 {
 public:
     BinaryWriter(Writer &writer) : _writer(writer)
     {
     }
 
+    // Put functions
     template <typename T>
     inline void put(const T &data)
     {
         uint8_t *bytes = (uint8_t *)&data;
-        put_data(bytes, sizeof(T));
-    }
-
-    inline void put_data(uint8_t *data, size_t len)
-    {
-        _writer.write(data, len);
+        write(bytes, sizeof(T));
     }
 
     inline void put_fixed_len_string(const String &str)
     {
-        put_data((uint8_t *)str.cstring(), str.length());
+        write((uint8_t *)str.cstring(), str.length());
     }
 
-    inline size_t position()
+    // Inherited from Writer
+    inline size_t position() override
+    {
+        return _writer.position();
+    }
+
+    inline size_t length() override
     {
         return _writer.length();
+    }
+
+    inline void flush() override
+    {
+        _writer.flush();
+    }
+    
+    inline void write(const void *buffer, size_t size) override
+    {
+        _writer.write(buffer, size);
     }
 
 private:

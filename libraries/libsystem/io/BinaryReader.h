@@ -3,13 +3,14 @@
 #include <libutils/Slice.h>
 #include <libutils/String.h>
 
-class BinaryReader
+class BinaryReader : public SeekableReader
 {
 public:
     BinaryReader(SeekableReader &reader) : _reader(reader)
     {
     }
 
+    // Peek & Get functons
     template <typename T>
     inline T peek()
     {
@@ -38,21 +39,16 @@ public:
         _reader.seek(num_bytes, WHENCE_HERE);
     }
 
-    inline size_t length()
-    {
-        return _reader.length();
-    }
-
-    inline size_t position()
-    {
-        return _reader.position();
-    }
-
-    inline bool good()
+    inline bool good() 
     {
         return _reader.position() < _reader.length();
     }
 
+    // Inherited from SeekableReader
+    virtual size_t length() override;
+    virtual size_t position() override;
+    virtual size_t seek(size_t pos, Whence whence) override;
+    virtual size_t read(void *buffer, size_t size) override;
 private:
     SeekableReader &_reader;
 };

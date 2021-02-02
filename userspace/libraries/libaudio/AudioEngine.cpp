@@ -1,4 +1,3 @@
-#include "mixer/Protocol.h"
 #include <libaudio/AudioEngine.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
@@ -92,4 +91,46 @@ AudioEngine::AudioEngine()
 
         do_message(message);
     });
+}
+
+AudioBuffer *AudioEngine::create_buffer(int samplerate, int channels)
+{
+    auto &buffer = _buffers.emplace_back(own<AudioBuffer>(this, samplerate, channels));
+
+    assert(buffer->id() >= 0);
+
+    MixerMessage message = {
+        .type = MIXER_MESSAGE_CREATE_BUFFER,
+        .create_buffer = {
+            .id = buffer->id(),
+            .channels = channels,
+            .samplerate = samplerate,
+        },
+    };
+
+    send_message(message);
+
+    return buffer.naked();
+}
+
+void AudioEngine::update_buffer(AudioBuffer *buffer, uint8_t *data, size_t size)
+{
+    assert(buffer->id() >= 0);
+    assert(size <= AUDIO_DATA_MESSAGE_SIZE);
+
+    MixerMessage message = {
+        .type = MIXER_MESSAGE_UPDATE_BUFFER,
+        .update_buffer = {
+            .id = buffer->id(),
+            .size = (int)size,
+            .audiodata = { 0 }
+        },
+    };
+
+    for (size_t i = 0; i < size; i++)
+    {
+        message.update_buffer.audiodata[i] = data[i];
+    }
+
+    send_message(message);
 }

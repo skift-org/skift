@@ -32,6 +32,7 @@ struct MixerCreateBuffer
 struct MixerUpdateBuffer
 {
     int id;
+    int size;
     char audiodata[AUDIO_DATA_MESSAGE_SIZE];
 };
 

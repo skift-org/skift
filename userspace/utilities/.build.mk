@@ -1,4 +1,5 @@
 UTILITIES = \
+	APLAY \
 	BASENAME \
 	CAT \
 	CLEAR \
@@ -41,6 +42,9 @@ UTILITIES = \
 	UPTIME \
 	YES \
 	ZIP
+
+APLAY_LIBS = audio
+APLAY_NAME = aplay
 
 BASENAME_LIBS = system io
 BASENAME_NAME = basename

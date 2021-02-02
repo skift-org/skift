@@ -18,6 +18,20 @@
 #define ATA_SR_IDX 0x02
 #define ATA_SR_ERR 0x01
 
+// Identify
+#define ATA_IDENT_DEVICETYPE 0
+#define ATA_IDENT_CYLINDERS 2
+#define ATA_IDENT_HEADS 6
+#define ATA_IDENT_SECTORS 12
+#define ATA_IDENT_SERIAL 20
+#define ATA_IDENT_MODEL 54
+#define ATA_IDENT_LBA 83
+#define ATA_IDENT_CAPABILITIES 98
+#define ATA_IDENT_FIELDVALID 106
+#define ATA_IDENT_MAX_LBA 120
+#define ATA_IDENT_COMMANDSETS 164
+#define ATA_IDENT_MAX_LBA_EXT 200
+
 // Commands
 #define ATA_CMD_READ_PIO 0x20
 #define ATA_CMD_READ_PIO_EXT 0x24
@@ -55,6 +69,11 @@
 // IO Ports
 #define ATA_PRIMARY_IO 0x1F0
 #define ATA_SECONDARY_IO 0x170
+
+// LBA modes
+#define ATA_28LBA_MAX 0x0FFFFFFF
+#define ATA_48LBA_MAX 0xFFFFFFFFFFFF
+#define ATA_SECTOR_SIZE 512
 
 LegacyATA::LegacyATA(DeviceAddress address) : LegacyDevice(address, DeviceClass::DISK)
 {
@@ -135,6 +154,19 @@ void LegacyATA::identify()
         }
 
         _exists = true;
+
+        // TODO: write things into information
+        char *model_buf = (char *)malloc(40);
+        for (int i = 0; i < 20; i += 1)
+        {
+            model_buf[i * 2] = _ide_buffer[ATA_IDENT_MODEL + i] >> 8;
+            model_buf[i * 2 + 1] = _ide_buffer[ATA_IDENT_MODEL + i] & 0xFF;
+        }
+
+        _model = String(model_buf, 40);
+        _supports_48lba = (_ide_buffer[ATA_IDENT_LBA] >> 10) & 0x1;
+
+        logger_info("IDENITY: Modelname: %s LBA48: %i", _model.cstring(), _supports_48lba);
     }
     else
     {
@@ -151,23 +183,134 @@ bool LegacyATA::can_read(FsHandle &handle)
     return _exists;
 }
 
+void LegacyATA::delay(uint16_t io_port)
+{
+    // exactly 400ns
+    for (int i = 0; i < 4; i++)
+        in8(io_port + ATA_REG_ALTSTATUS);
+}
+
+void LegacyATA::poll(uint16_t io_port)
+{
+    delay(io_port);
+
+    /* Now, poll untill BSY is clear. */
+    while ((in8(io_port + ATA_REG_STATUS) & ATA_SR_BSY) != 0)
+        ;
+
+    uint8_t status = 0;
+
+    do
+    {
+        status = in8(io_port + ATA_REG_STATUS);
+
+        if (status & ATA_SR_ERR)
+        {
+            logger_error("%s%s has ERR set. Disabled.", _bus == ATA_PRIMARY ? "Primary" : "Secondary",
+                         _drive == ATA_PRIMARY ? " master" : " slave");
+
+            return;
+        }
+    } while (!(status & ATA_SR_DRQ));
+    return;
+}
+
+void LegacyATA::write_lba(uint16_t io_port, uint32_t lba)
+{
+    const uint8_t cmd = (_drive == ATA_MASTER ? 0xE0 : 0xF0);
+
+    // Write LBA address
+    out8(io_port + 1, 0x00);                                                 // Null byte to first port
+    out8(io_port + ATA_REG_LBA0, (uint8_t)(lba));                            // First byte of LBA
+    out8(io_port + ATA_REG_LBA1, (uint8_t)(lba));                            // Second byte of LBA
+    out8(io_port + ATA_REG_LBA2, (uint8_t)(lba));                            // Third byte of LBA
+    out8(io_port + ATA_REG_HDDEVSEL, (cmd | (uint8_t)((lba >> 24 & 0x0F)))); // High 4-bits of LBA
+}
+
+uint8_t LegacyATA::read_block(uint8_t *buf, uint32_t lba, size_t size)
+{
+    assert(size <= ATA_SECTOR_SIZE);
+    const uint16_t io_port = _bus == ATA_PRIMARY ? ATA_PRIMARY_IO : ATA_SECONDARY_IO;
+    write_lba(io_port, lba);
+
+    // Issue Read command
+    out8(io_port + ATA_REG_COMMAND, ATA_CMD_READ_PIO);
+
+    // Poll
+    poll(io_port);
+
+    for (unsigned int i = 0; i < (size / 2); i++)
+    {
+        uint16_t data = in16(io_port + ATA_REG_DATA);
+        *(uint16_t *)(buf + i * 2) = data;
+    }
+
+    delay(io_port);
+
+    return 1;
+}
+
+uint8_t LegacyATA::write_block(uint8_t *buf, uint32_t lba, size_t size)
+{
+    assert(size <= ATA_SECTOR_SIZE);
+    const uint16_t io_port = _bus == ATA_PRIMARY ? ATA_PRIMARY_IO : ATA_SECONDARY_IO;
+    write_lba(io_port, lba);
+
+    // Issue Write command
+    out8(io_port + ATA_REG_COMMAND, ATA_CMD_WRITE_PIO);
+
+    // Poll
+    poll(io_port);
+
+    for (unsigned int i = 0; i < (size / 2); i++)
+    {
+        uint16_t tmp = (buf[i * 2 + 1] << 8) | buf[i * 2];
+        out16(io_port, tmp);
+    }
+
+    delay(io_port);
+
+    return 1;
+}
+
 ResultOr<size_t> LegacyATA::read(FsHandle &handle, void *buffer, size_t size)
 {
-    __unused(handle);
-    __unused(buffer);
-    __unused(size);
-
     LockHolder holder(_buffer_lock);
 
-    return 0;
+    uint32_t start_lba = handle.offset() / ATA_SECTOR_SIZE;
+    uint32_t num_blocks = (size / ATA_SECTOR_SIZE) + 1;
+    uint8_t *byte_buffer = (uint8_t *)buffer;
+    size_t rem_size = size;
+
+    // Read *size* at maximum
+    for (unsigned int i = 0; i < num_blocks; i++)
+    {
+        size_t read_size = MIN(ATA_SECTOR_SIZE, rem_size);
+        read_block(byte_buffer, start_lba + i, read_size);
+        byte_buffer += ATA_SECTOR_SIZE;
+        rem_size -= read_size;
+    }
+
+    return size;
 }
 
 ResultOr<size_t> LegacyATA::write(FsHandle &handle, const void *buffer, size_t size)
 {
-    __unused(handle);
-    __unused(buffer);
-    __unused(size);
-
     LockHolder holder(_buffer_lock);
-    return 0;
+
+    uint32_t start_lba = handle.offset() / ATA_SECTOR_SIZE;
+    uint32_t num_blocks = (size / ATA_SECTOR_SIZE) + 1;
+    uint8_t *byte_buffer = (uint8_t *)buffer;
+    size_t rem_size = size;
+
+    // Write *size* at maximum
+    for (unsigned int i = 0; i < num_blocks; i++)
+    {
+        size_t write_size = MIN(ATA_SECTOR_SIZE, rem_size);
+        write_block(byte_buffer, start_lba + i, write_size);
+        byte_buffer += ATA_SECTOR_SIZE;
+        rem_size -= write_size;
+    }
+
+    return size;
 }

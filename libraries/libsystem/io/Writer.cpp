@@ -15,6 +15,8 @@ void Writer::copy_from(Reader &reader)
     {
         write(copy_chunk, chunk_size);
     }
+
+    flush();
 }
 
 void Writer::copy_from(SeekableReader &reader)
@@ -28,4 +30,6 @@ void Writer::copy_from(SeekableReader &reader)
     {
         write(copy_chunk, chunk_size);
     }
+
+    flush();
 }

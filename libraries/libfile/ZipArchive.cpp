@@ -243,14 +243,10 @@ void ZipArchive::write_entry(const Entry &entry, BinaryWriter &writer, Reader &c
     header.len_extrafield = 0;
     header.signature = ZIP_LOCAL_DIR_HEADER_SIG;
 
+    // Write data
     writer.put(header);
     writer.put_fixed_len_string(entry.name);
-
-    uint8_t *data_buffer = nullptr;
-    size_t data_size = 0;
-    compressed.read_all((void **)&data_buffer, &data_size);
-    writer.put_data(data_buffer, data_size);
-    delete[] data_buffer;
+    writer.copy_from(compressed);
 }
 
 void ZipArchive::write_central_directory(BinaryWriter &writer)
@@ -281,6 +277,7 @@ void ZipArchive::write_central_directory(BinaryWriter &writer)
     end_record.total_entries = _entries.count();
     end_record.len_comment = 0;
     writer.put(end_record);
+    writer.flush();
 }
 
 Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)

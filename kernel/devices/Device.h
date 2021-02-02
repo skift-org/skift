@@ -72,6 +72,10 @@ public:
 
     virtual void handle_interrupt() {}
 
+    virtual bool did_fail() {
+        return false;
+    }
+
     virtual bool can_read(FsHandle &handle)
     {
         __unused(handle);

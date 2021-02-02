@@ -122,7 +122,11 @@ void device_initialize()
 
         logger_info("Found a driver: %s", driver->name());
 
-        _devices->push_back(driver->instance(address));
+        auto device = driver->instance(address);
+        if (!device->did_fail())
+        {
+            _devices->push_back(device);
+        }
 
         return Iteration::CONTINUE;
     });

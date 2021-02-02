@@ -113,6 +113,7 @@ void LegacyATA::select()
 
 size_t LegacyATA::size(FsHandle &handle)
 {
+    __unused(handle);
     return _num_blocks * ATA_SECTOR_SIZE;
 }
 

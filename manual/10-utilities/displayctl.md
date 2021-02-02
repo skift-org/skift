@@ -6,4 +6,4 @@ displayctl [OPTION...] [RESOLUTION]
 
 ## Description
 
-Get or Set the screen resolutions.
+Get or set the screen resolutions.

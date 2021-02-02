@@ -2,33 +2,36 @@
 
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/io/Connection.h>
-#include <libutils/Vector.h>
 
-#include "mixer/MixerProtocol.h"
+#include "mixer/Protocol.h"
 
-class Client
+class Manager;
+struct Client
 {
-public:
-    static char mixed_buffer[AUDIO_DATA_MESSAGE_SIZE];
+    OwnPtr<Notifier> _notifier = nullptr;
+    Connection *_connection = nullptr;
+    Manager *_manager = nullptr;
+    bool _disconnected = false;
 
-    static int connected_clients;
+    static void connect(Connection *connection, Manager *manager);
 
-    Notifier *notifier = nullptr;
-    Connection *connection = nullptr;
-    bool disconnected = false;
-
-    // binary semaphore
-    bool mixed;
-    // counting semaphore
-    int signals_waiting;
-
-    Client(Connection *connection);
+    Client(Connection *connection, Manager *manager);
 
     ~Client();
-    void receive_message();
+
     Result send_message(MixerMessage message);
+
+    void handle(const MixerCreateBuffer &create_buffer);
+
+    void handle(const MixerUpdateBuffer &update_buffer);
+
+    void handle(const MixerDeleteBuffer &delete_buffer);
+
+    void handle_goodbye();
+
+    void handle_request();
 };
 
-// void client_broadcast(MixerMessage message);
+void client_broadcast(MixerMessage message);
 
-// void client_destroy_disconnected();
+void client_destroy_disconnected();

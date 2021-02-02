@@ -125,6 +125,7 @@ void ZipArchive::read_local_headers(BinaryReader &reader)
         // Check if this is a local header
         if (local_header.signature() != ZIP_LOCAL_DIR_HEADER_SIG)
         {
+            logger_trace("Invalid signature: %u", local_header.signature());
             break;
         }
 
@@ -138,6 +139,7 @@ void ZipArchive::read_local_headers(BinaryReader &reader)
 
         // Read the filename of this entry
         entry.name = reader.get_fixed_len_string(local_header.len_filename());
+        logger_trace("Found local header: '%s'", entry.name.cstring());
 
         // Read extra fields
         auto end_position = reader.position() + local_header.len_extrafield();
@@ -179,7 +181,10 @@ Result ZipArchive::read_central_directory(BinaryReader &reader)
 
         // Read the central directory entry
         reader.skip(sizeof(CentralDirectoryFileHeader));
-        reader.skip(cd_file_header.len_filename());
+
+        String name = reader.get_fixed_len_string(cd_file_header.len_filename());
+        logger_trace("Found central directory header: '%s'", name.cstring());
+
         reader.skip(cd_file_header.len_extrafield());
         reader.skip(cd_file_header.len_comment());
     }
@@ -254,6 +259,7 @@ void ZipArchive::write_central_directory(BinaryWriter &writer)
     auto start = writer.position();
     for (const auto &entry : _entries)
     {
+        logger_trace("Write central directory header: '%s'", entry.name.cstring());
         CentralDirectoryFileHeader header;
         header.flags = EF_NONE;
         header.compressed_size = entry.compressed_size;
@@ -315,16 +321,16 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
 
     // TODO: create a new entry and write it to the output file
     MemoryWriter memory_writer;
-    BinaryWriter binary_Writer(memory_writer);
+    BinaryWriter binary_writer(memory_writer);
 
     // Write local headers
     for (const auto &entry : _entries)
     {
         FileReader file_reader(_path);
         file_reader.seek(entry.archive_offset, WHENCE_START);
-        ScopedReader scoped_reader(file_reader, entry.uncompressed_size);
-
-        write_entry(entry, binary_Writer, scoped_reader);
+        ScopedReader scoped_reader(file_reader, entry.compressed_size);
+        logger_trace("Write existing local header: '%s'", entry.name.cstring());
+        write_entry(entry, binary_writer, scoped_reader);
     }
 
     // Get a reader to the original file
@@ -340,6 +346,8 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     }
 
     // Write our new entry
+    logger_trace("Write new local header: '%s'", entry_name);
+
     auto &new_entry = _entries.emplace_back();
     new_entry.name = String(entry_name);
     new_entry.compressed_size = compressed_writer.length();
@@ -348,10 +356,10 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     new_entry.archive_offset = memory_writer.length() + sizeof(LocalHeader) + new_entry.name.length();
 
     MemoryReader compressed_reader(compressed_writer.data());
-    write_entry(new_entry, binary_Writer, compressed_reader);
+    write_entry(new_entry, binary_writer, compressed_reader);
 
     // Write central directory
-    write_central_directory(binary_Writer);
+    write_central_directory(binary_writer);
 
     // Do this properly...
     FileWriter file_writer(_path);

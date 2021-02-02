@@ -32,8 +32,6 @@ private:
 public:
     LegacyATA(DeviceAddress address);
 
-    bool can_read(FsHandle &handle) override;
-
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
 
     ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override;

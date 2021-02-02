@@ -1,4 +1,6 @@
 #include "kernel/drivers/LegacyATA.h"
+#include "kernel/scheduling/Scheduler.h"
+#include "kernel/tasking/Task.h"
 
 // Bus
 #define ATA_PRIMARY 0x00
@@ -164,7 +166,7 @@ void LegacyATA::identify()
         _exists = true;
 
         // Parse some infos from the identify buffer
-        char *model_buf = (char *)malloc(40);
+        char model_buf[40];
         for (int i = 0; i < 20; i += 1)
         {
             model_buf[i * 2] = _ide_buffer[ATA_IDENT_MODEL + i] >> 8;
@@ -185,14 +187,6 @@ void LegacyATA::identify()
     }
 }
 
-bool LegacyATA::can_read(FsHandle &handle)
-{
-    __unused(handle);
-
-    // FIXME: make this atomic or something...
-    return _exists;
-}
-
 void LegacyATA::delay(uint16_t io_port)
 {
     // exactly 400ns
@@ -206,7 +200,7 @@ void LegacyATA::poll(uint16_t io_port)
 
     /* Now, poll untill BSY is clear. */
     while ((in8(io_port + ATA_REG_STATUS) & ATA_SR_BSY) != 0)
-        ;
+        task_sleep(scheduler_running(), 10);
 
     uint8_t status = 0;
 

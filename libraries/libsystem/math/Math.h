@@ -51,4 +51,8 @@ float floorf(float x);
 float fmodf(float x, float y);
 float sinf(float x);
 
+#define HUGE_VAL (__builtin_huge_val())
+#define isinf(x) __builtin_isinf_sign(x)
+#define isfinite(x)  (__builtin_isfinite(x))
+
 __END_HEADER

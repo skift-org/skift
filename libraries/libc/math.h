@@ -34,5 +34,7 @@ double tanh(double x);
 double atan(double x);
 double modf(double x, double *iptr);
 double hypot(double x, double y);
+#define isinf(x) __builtin_isinf_sign(x)
+#define isinf(x) __builtin_isinf_sign(x)
 
 __END_HEADER

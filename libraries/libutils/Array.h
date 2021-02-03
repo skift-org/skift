@@ -17,8 +17,8 @@ private:
 public:
     constexpr size_t count() const { return N; }
 
-    // This should keep const, but many places rely on it being non-const
-    T *raw_storage() const { return (T*)_storage; }
+    constexpr T* raw_storage() { return _storage; } 
+    constexpr const T *raw_storage() const { return _storage; }
 
     T &at(size_t index)
     {
@@ -53,7 +53,7 @@ public:
         return _storage[index];
     }
 
-    const T &operator[](size_t index) const
+    constexpr T &operator[](size_t index) const
     {
         assert(index < N);
 
@@ -77,6 +77,6 @@ public:
         T *_ptr;
     };
 
-    iterator begin() const { return iterator(_storage); }
-    iterator end() const { return iterator(_storage + N); }
+    constexpr iterator begin() const { return iterator(_storage); }
+    constexpr iterator end() const { return iterator(_storage + N); }
 };

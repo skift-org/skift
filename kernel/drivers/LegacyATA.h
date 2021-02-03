@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libsystem/thread/Lock.h>
+#include <libutils/Array.h>
 
 #include "kernel/devices/LegacyDevice.h"
 
@@ -23,7 +24,7 @@ private:
 
     int _bus;
     int _drive;
-    uint16_t _ide_buffer[256];
+    Array<uint16_t, 256> _ide_buffer;
     bool _exists = false;
     String _model;
     bool _supports_48lba;

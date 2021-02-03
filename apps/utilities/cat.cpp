@@ -1,6 +1,7 @@
 
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
+#include <libutils/Array.h>
 
 Result cat(const char *path)
 {
@@ -15,16 +16,16 @@ Result cat(const char *path)
     stream_stat(stream, &stat);
 
     size_t read;
-    char buffer[1024];
+    Array<char, 1024> buffer;
 
-    while ((read = stream_read(stream, &buffer, 1024)) != 0)
+    while ((read = stream_read(stream, buffer.raw_storage(), buffer.count())) != 0)
     {
         if (handle_has_error(stream))
         {
             return handle_get_error(stream);
         }
 
-        stream_write(out_stream, buffer, read);
+        stream_write(out_stream, buffer.raw_storage(), read);
 
         if (handle_has_error(out_stream))
         {

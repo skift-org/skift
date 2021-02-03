@@ -158,7 +158,7 @@ void LegacyATA::identify()
         logger_info("%s%s is online.", _bus == ATA_PRIMARY ? "Primary" : "Secondary", _drive == ATA_PRIMARY ? " master" : " slave");
 
         // Read back the data
-        for (int i = 0; i < 256; i++)
+        for (size_t i = 0; i < _ide_buffer.count(); i++)
         {
             _ide_buffer[i] = in16(io_port + ATA_REG_DATA);
         }
@@ -166,14 +166,14 @@ void LegacyATA::identify()
         _exists = true;
 
         // Parse some infos from the identify buffer
-        char model_buf[40];
+        Array<char, 40> model_buf;
         for (int i = 0; i < 20; i += 1)
         {
             model_buf[i * 2] = _ide_buffer[ATA_IDENT_MODEL + i] >> 8;
             model_buf[i * 2 + 1] = _ide_buffer[ATA_IDENT_MODEL + i] & 0xFF;
         }
 
-        _model = String(model_buf, 40);
+        _model = String(model_buf.raw_storage(), model_buf.count());
         _supports_48lba = (_ide_buffer[ATA_IDENT_LBA] >> 10) & 0x1;
 
         _num_blocks = _ide_buffer[ATA_IDENT_NUM_BLOCKS1] << 16 | _ide_buffer[ATA_IDENT_NUM_BLOCKS0];

@@ -1,39 +1,61 @@
 #include <libsystem/io/FileReader.h>
 
-FileReader::FileReader(const char *path) : _file(stream_open(path, OPEN_READ))
+FileReader::FileReader(const char *path) : _handle{path, OPEN_READ | OPEN_STREAM}
 {
-    assert(_file);
 }
 
-FileReader::FileReader(Path &path) : _file(stream_open(path.string().cstring(), OPEN_READ))
+FileReader::FileReader(Path &path) : _handle{path.string(), OPEN_READ | OPEN_STREAM}
 {
-    assert(_file);
 }
 
-FileReader::~FileReader()
+FileReader::FileReader(system::Handle &&handle) : _handle{move(handle)}
 {
-    stream_close(_file);
 }
 
 size_t FileReader::seek(size_t pos, Whence whence)
 {
-    stream_seek(_file, pos, whence);
+    _handle.seek(pos, whence);
     return pos;
 }
 
 size_t FileReader::read(void *buffer, size_t size)
 {
-    return stream_read(_file, buffer, size);
+    auto result_or_read = _handle.read(buffer, size);
+
+    if (result_or_read)
+    {
+        return *result_or_read;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 size_t FileReader::length()
 {
-    FileState stat;
-    stream_stat(_file, &stat);
-    return stat.size;
+    auto result_or_stat = _handle.stat();
+
+    if (result_or_stat)
+    {
+        return result_or_stat->size;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 size_t FileReader::position()
 {
-    return stream_tell(_file, WHENCE_START);
+    auto result_or_tell = _handle.tell(WHENCE_START);
+
+    if (result_or_tell)
+    {
+        return *result_or_tell;
+    }
+    else
+    {
+        return 0;
+    }
 }

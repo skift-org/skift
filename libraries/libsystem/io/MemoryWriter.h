@@ -12,7 +12,7 @@ public:
     virtual size_t position() override;
 
     virtual void flush() override;
-    virtual void write(const void *buffer, size_t size) override;
+    virtual size_t write(const void *buffer, size_t size) override;
 
     void clear();
     void pop_front(size_t size);

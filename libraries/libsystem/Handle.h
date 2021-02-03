@@ -37,6 +37,8 @@ public:
     {
         swap(_handle, other._handle);
         swap(_result, other._result);
+
+        return *this;
     }
 
     ~Handle()

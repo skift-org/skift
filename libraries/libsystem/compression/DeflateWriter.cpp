@@ -30,12 +30,14 @@ void DeflateWriter::flush()
     _mem_buffer.clear();
 }
 
-void DeflateWriter::write(const void *buffer, size_t size)
+size_t DeflateWriter::write(const void *buffer, size_t size)
 {
-    _mem_buffer.write(buffer, size);
+    size_t written = _mem_buffer.write(buffer, size);
 
     if (_mem_buffer.length() > MAX_BLOCK_SIZE)
     {
         flush();
     }
+
+    return written;
 }

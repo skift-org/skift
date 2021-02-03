@@ -5,6 +5,9 @@
 
 class BinaryWriter : public Writer
 {
+private:
+    Writer &_writer;
+
 public:
     BinaryWriter(Writer &writer) : _writer(writer)
     {
@@ -38,12 +41,9 @@ public:
     {
         _writer.flush();
     }
-    
-    inline void write(const void *buffer, size_t size) override
-    {
-        _writer.write(buffer, size);
-    }
 
-private:
-    Writer &_writer;
+    inline size_t write(const void *buffer, size_t size) override
+    {
+        return _writer.write(buffer, size);
+    }
 };

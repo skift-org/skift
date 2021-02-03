@@ -1,38 +1,57 @@
 #include <libsystem/io/FileWriter.h>
 
-FileWriter::FileWriter(const char *path) : _file(stream_open(path, OPEN_WRITE | OPEN_CREATE))
+FileWriter::FileWriter(const char *path) : _handle(path, OPEN_WRITE | OPEN_CREATE | OPEN_STREAM)
 {
-    assert(_file);
 }
 
-FileWriter::FileWriter(Path &path) : _file(stream_open(path.string().cstring(), OPEN_WRITE | OPEN_CREATE))
+FileWriter::FileWriter(Path &path) : _handle(path.string(), OPEN_WRITE | OPEN_CREATE | OPEN_STREAM)
 {
-    assert(_file);
 }
 
-FileWriter::~FileWriter()
+FileWriter::FileWriter(system::Handle &&handle) : _handle{move(handle)}
 {
-    stream_close(_file);
 }
 
-void FileWriter::flush()
-{
-    stream_flush(_file);
-}
+void FileWriter::flush() {}
 
-void FileWriter::write(const void *buffer, size_t size)
+size_t FileWriter::write(const void *buffer, size_t size)
 {
-    stream_write(_file, buffer, size);
+    auto result_or_write = _handle.write(buffer, size);
+
+    if (result_or_write)
+    {
+        return *result_or_write;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 size_t FileWriter::length()
 {
-    FileState stat;
-    stream_stat(_file, &stat);
-    return stat.size;
+    auto result_or_stat = _handle.stat();
+
+    if (result_or_stat)
+    {
+        return result_or_stat->size;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 size_t FileWriter::position()
 {
-    return stream_tell(_file, WHENCE_START);
+    auto result_or_tell = _handle.tell(WHENCE_START);
+
+    if (result_or_tell)
+    {
+        return *result_or_tell;
+    }
+    else
+    {
+        return 0;
+    }
 }

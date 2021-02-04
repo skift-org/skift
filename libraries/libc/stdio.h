@@ -86,6 +86,7 @@ int rename(const char *oldpath, const char *newpath);
 #define _IOFBF 2
 
 char *tmpnam(char *s);
+char *tempnam(const char* dir, const char *s);
 #define L_tmpnam 256
 
 int vsscanf(const char *str, const char *format, va_list ap);

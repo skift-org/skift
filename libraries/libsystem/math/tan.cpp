@@ -1,3 +1,5 @@
+#include <libsystem/math/Math.h>
+
 double tan(double x)
 {
     float out;
@@ -12,4 +14,9 @@ double tan(double x)
         : "m"(_x));
 
     return out;
+}
+
+float tanf(float x)
+{
+    return tan(x);
 }

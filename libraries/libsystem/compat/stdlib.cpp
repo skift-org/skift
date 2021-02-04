@@ -29,3 +29,10 @@ long long int strtoll(const char *nptr, char **endptr, int base)
     parse_int({base}, nptr, (uintptr_t)endptr - (uintptr_t)nptr, &value);
     return value;
 }
+
+char* getenv(const char* name)
+{
+    __unused(name);
+    // Pretend the environment variable doesn't exist
+    return NULL;
+}

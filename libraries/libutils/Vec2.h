@@ -2,8 +2,8 @@
 
 #include <libsystem/Assert.h>
 #include <libsystem/math/Dimension.h>
-#include <libsystem/math/Math.h>
 #include <libsystem/math/MinMax.h>
+#include <math.h>
 
 template <typename Scalar>
 class Vec2

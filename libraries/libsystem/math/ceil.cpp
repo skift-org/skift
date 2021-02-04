@@ -1,4 +1,5 @@
-#include <libsystem/math/Math.h>
+#include <math.h>
+#include <stdint.h>
 
 double ceil(double x)
 {

@@ -3,7 +3,7 @@
 #include <libutils/Vec2.h>
 
 #include <libsystem/core/CString.h>
-#include <libsystem/math/Math.h>
+#include <math.h>
 
 template <typename Scalar>
 class Trans2

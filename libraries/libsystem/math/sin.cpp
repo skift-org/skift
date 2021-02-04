@@ -1,5 +1,5 @@
 #include <libsystem/bits/pi.h>
-#include <libsystem/math/Math.h>
+#include <math.h>
 
 #include "sin_data.h"
 

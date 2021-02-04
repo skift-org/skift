@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef __KERNEL__
-#    include <libsystem/math/Math.h>
+#    include <math.h>
 #endif
 
 #include <libutils/Scanner.h>

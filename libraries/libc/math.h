@@ -44,10 +44,13 @@ float cosf(float x);
 double acos(double x);
 float acosf(float x);
 double cosh(double x);
+float coshf(float x);
 double tan(double x);
 float tanf(float x);
 double atan(double x);
+float atanf(float x);
 double atan2(double y, double x);
+float atan2f(float x, float y);
 double tanh(double x);
 float tanhf(float x);
 double hypot(double x, double y); 
@@ -63,10 +66,12 @@ float floorf(float x);
 double log(double x);
 float logf(float x);
 double log10(double x);
+float log10f(float x);
 double log2(double x);
 double ldexp(double a, int exp);
 double frexp(double x, int *exp);
 double exp(double x);
+float expf(float x);
 
 // Misc
 double erf(double x);

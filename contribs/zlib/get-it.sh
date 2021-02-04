@@ -1,3 +1,5 @@
 #!/bin/sh
+VERSION = 1.2.9
 
-git clone https://github.com/madler/zlib sources
+echo "Getting ZLIB version: $VERSION"
+git clone --depth 1 --branch v$VERSION https://github.com/madler/zlib sources

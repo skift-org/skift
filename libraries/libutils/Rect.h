@@ -6,8 +6,8 @@
 #include <libutils/Vec2.h>
 
 #include <libsystem/Logger.h>
-#include <libsystem/math/Math.h>
 #include <libsystem/math/MinMax.h>
+#include <math.h>
 
 enum Border : int
 {

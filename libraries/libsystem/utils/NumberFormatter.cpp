@@ -1,6 +1,6 @@
 #include <libsystem/core/CString.h>
 #ifndef __KERNEL__
-#    include <libsystem/math/Math.h>
+#    include <math.h>
 #endif
 #include <libsystem/utils/NumberFormatter.h>
 

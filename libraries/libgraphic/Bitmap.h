@@ -1,7 +1,6 @@
 #pragma once
 
 #include <libsystem/Result.h>
-#include <libsystem/math/Math.h>
 #include <libutils/Rect.h>
 #include <libutils/RefPtr.h>
 #include <libutils/ResultOr.h>

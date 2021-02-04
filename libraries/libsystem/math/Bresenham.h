@@ -1,7 +1,7 @@
 #include <libutils/Vec2.h>
 #include <libutils/Vector.h>
 
-#include <libsystem/math/Math.h>
+#include <math.h>
 
 template <typename TCallback>
 void bresenhamLow(int x0, int y0, int x1, int y1, int size, TCallback callback)

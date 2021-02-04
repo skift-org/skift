@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/math/Math.h>
+#include <math.h>
 #include <libutils/Observable.h>
 
 enum class Operation

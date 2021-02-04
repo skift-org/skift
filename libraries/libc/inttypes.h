@@ -1,5 +1,12 @@
 #pragma once
 
+#include <__libc__.h>
+
+#include <stddef.h>
+#include <stdint.h>
+
+__BEGIN_HEADER
+
 #define PRId8  "hhd"
 #define PRId16 "hd"
 #define PRId32 "d"
@@ -190,3 +197,5 @@
 #define SCNoPTR PRIoPTR
 #define SCNuPTR PRIuPTR
 #define SCNxPTR PRIxPTR
+
+__END_HEADER

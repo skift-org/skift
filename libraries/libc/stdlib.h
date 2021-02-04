@@ -9,7 +9,6 @@
 __BEGIN_HEADER
 
 void exit(int status);
-char *getenv(const char *name);
 
 void *malloc(size_t size);
 void free(void *ptr);
@@ -55,8 +54,8 @@ void *bsearch(
     size_t size,
     int (*compar)(const void *, const void *));
 
-char *mktemp(char *);
-int mkstemp(char *);
+// char *mktemp(char *);
+// int mkstemp(char *);
 
 size_t mbstowcs(wchar_t *dest, const char *src, size_t n);
 size_t wcstombs(char *dest, const wchar_t *src, size_t n);

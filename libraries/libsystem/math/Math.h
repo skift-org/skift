@@ -44,6 +44,8 @@ static inline float tanf(float x) { return (float)tan((double)x); }
 
 double tanh(double x);
 
+double hypot(double x, double y);
+
 float atan2f(float y, float x);
 float ceilf(float x);
 float cosf(float x);

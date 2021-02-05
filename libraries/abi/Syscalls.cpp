@@ -1,4 +1,5 @@
 #include <abi/Syscalls.h>
+#include <libsystem/Logger.h>
 
 static int _pid_cache = -1;
 
@@ -156,11 +157,13 @@ Result hj_create_term(int *server_handle, int *client_handle)
 
 Result hj_handle_open(int *handle, const char *raw_path, size_t size, OpenFlag flags)
 {
+    logger_info("hj_handle_open: %s",raw_path);
     return __syscall(HJ_HANDLE_OPEN, (uintptr_t)handle, (uintptr_t)raw_path, (uintptr_t)size, (uintptr_t)flags);
 }
 
 Result hj_handle_close(int handle)
 {
+    logger_info("hj_handle_close: %i",handle);
     return __syscall(HJ_HANDLE_CLOSE, (uintptr_t)handle);
 }
 

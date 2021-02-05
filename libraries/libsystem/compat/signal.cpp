@@ -14,6 +14,8 @@ __sighandler signal(int sig, __sighandler handler)
 
 int raise(int sig)
 {
+    logger_warn("Raise: %i", sig);
+
     switch (sig)
     {
     case SIGTERM:

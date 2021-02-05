@@ -1,27 +1,33 @@
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 
 #include <libsystem/Logger.h>
 #include <libsystem/io/Filesystem.h>
-#include <libsystem/io/Stream.h>
+
+#include <abi/Syscalls.h>
 
 #undef printf
 #undef puts
 
+FILE _stdin{0};
+FILE _stdout{1};
+FILE _stderr{2};
+
 FILE *__stdio_get_stdin()
 {
-    return in_stream;
+    return &_stdin;
 }
 
 FILE *__stdio_get_stdout()
 {
-    return out_stream;
+    return &_stdout;
 }
 
 FILE *__stdio_get_stderr()
 {
-    return err_stream;
+    return &_stderr;
 }
 
 OpenFlag stdio_parse_mode(const char *mode)
@@ -59,107 +65,143 @@ OpenFlag stdio_parse_mode(const char *mode)
 
 FILE *fdopen(int fd, const char *mode)
 {
-    Stream *stream = stream_open_handle(fd, stdio_parse_mode(mode));
+    logger_trace("fdopen: %i", fd);
 
-    if (handle_has_error(stream))
-    {
-        stream_close(stream);
+    FILE *result = (FILE *)malloc(sizeof(FILE));
+    result->handle = fd;
 
-        return nullptr;
-    }
-
-    return stream;
+    return result;
 }
 
 FILE *fopen(const char *path, const char *mode)
 {
-    Stream *stream = stream_open(path, stdio_parse_mode(mode));
+    logger_trace("fopen: %s", path);
+    OpenFlag flags = stdio_parse_mode(mode);
 
-    if (handle_has_error(stream))
+    int handle = 0;
+    Result result = hj_handle_open(&handle, path, strlen(path), flags);
+
+    if (result != Result::SUCCESS)
     {
-        stream_close(stream);
-
-        return nullptr;
+        // TODO: set errno
+        logger_error("Failed to open handle: %s", path);
+        return NULL;
     }
 
-    return stream;
+    FILE *result = (FILE *)malloc(sizeof(FILE));
+    result->handle = handle;
+
+    return result;
 }
 
-int fclose(FILE *stream)
+int fclose(FILE *file)
 {
-    stream_close((Stream *)stream);
+    logger_trace("fclose");
+    Result result = hj_handle_close(file->handle);
+    free(file);
 
-    return 0;
+    return result == Result::SUCCESS ? 0 : -1;
 }
 
 int fflush(FILE *stream)
 {
-    stream_flush((Stream *)stream);
+    logger_trace("fflush");
+    // No flushing here
 
     return 0;
 }
 
-size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
+size_t fread(void *ptr, size_t size, size_t count, FILE *file)
 {
-    size_t r = stream_read((Stream *)stream, ptr, size * nmemb);
+    size_t total = 0;
+    Result result;
+    uint8_t *dst_ptr = ptr;
 
-    return r;
+    for (size_t i = 0; i < count; i++)
+    {
+        size_t read = 0;
+        result = hj_handle_read(file->handle, dst_ptr, size, &read);
+        total += read;
+        dst_ptr += read;
+        if (result != Result::SUCCESS)
+        {
+            // TODO: set errno
+            return total;
+        }
+    }
+
+    return total;
 }
 
-size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
+size_t fwrite(const void *ptr, size_t size, size_t count, FILE *file)
 {
-    size_t r = stream_write((Stream *)stream, ptr, size * nmemb);
+    size_t total = 0;
+    Result result;
+    uint8_t *dst_ptr = ptr;
 
-    return r;
+    for (size_t i = 0; i < count; i++)
+    {
+        size_t written = 0;
+        result = hj_handle_write(file->handle, dst_ptr, size, &written);
+        total += written;
+        dst_ptr += written;
+        if (result != Result::SUCCESS)
+        {
+            // TODO: set errno
+            return total;
+        }
+    }
+
+    return total;
 }
 
-int fseek(FILE *stream, long offset, int whence)
+int fseek(FILE *file, long offset, int whence)
 {
-
-    int r = -1;
+    Result r = Result::ERR_FUNCTION_NOT_IMPLEMENTED;
 
     if (whence == SEEK_SET)
     {
-        r = stream_seek((Stream *)stream, offset, WHENCE_START);
+        r = hj_handle_seek(file->handle, offset, WHENCE_START);
     }
     else if (whence == SEEK_CUR)
     {
-        r = stream_seek((Stream *)stream, offset, WHENCE_HERE);
+        r = stream_seek(file->handle, offset, WHENCE_HERE);
     }
     else if (whence == SEEK_END)
     {
-        r = stream_seek((Stream *)stream, offset, WHENCE_END);
+        r = stream_seek(file->handle, offset, WHENCE_END);
     }
 
-    return r;
+    return r == Result::SUCCESS ? 0 : -1;
 }
 
 long ftell(FILE *stream)
 {
+    long offset = 0;
+    Result r = hj_handle_tell(stream->handle, WHENCE_START, &offset);
 
-    long r = stream_tell((Stream *)stream, WHENCE_START);
+    // TODO: check error
 
-    return r;
+    return offset;
 }
 
 int puts(const char *s)
 {
-
     size_t length = 0;
 
     for (length = 0; s[length]; length++)
     {
     }
 
-    int r = stream_write(out_stream, s, length);
-    r += stream_write(out_stream, "\n", 1);
+    int r = fwrite(__stdio_get_stdout(), s, length);
+    r += fwrite(__stdio_get_stdout(), "\n", 1);
 
     return r;
 }
 
 int putchar(int c)
 {
-    int r = stream_putchar(out_stream, c);
+    int r = puts((const char *)&c);
 
     return r;
 }

@@ -1,9 +1,11 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#include <unistd.h>
+
+#include <abi/Syscalls.h>
 
 #include <libsystem/Logger.h>
-#include <libsystem/io/Filesystem.h>
-#include <libsystem/io/Stream.h>
 
 int file_type_to_stat(FileType type)
 {
@@ -27,28 +29,27 @@ void file_state_to_stat(FileState *in, struct stat *out)
 
 int stat(const char *path, struct stat *buf)
 {
-    Stream* stream = stream_open(path, OPEN_READ);
+    int handle = open(path, OPEN_READ);
 
-    FileState stat;
-    stream_stat((Stream *)stream, &stat);
-    file_state_to_stat(&stat, buf);
+    if (handle == -1)
+        return -1;
 
-    stream_close(stream);
+    int result = fstat(handle, buf);
+
+    if (result == -1)
+        return -1;
+
+    close(handle);
 
     return 0;
 }
 
 int fstat(int fd, struct stat *buf)
 {
-    Stream* stream = stream_open_handle(fd, OPEN_READ);
-
-    FileState stat;
-    stream_stat(stream, &stat);
-    file_state_to_stat(&stat, buf);
-
-    stream_close(stream);
-
-    return 0;
+    FileState state;
+    Result result = hj_handle_stat(fd, &state);
+    file_state_to_stat(&state, buf);
+    return result == Result::SUCCESS ? -1 : 0;
 }
 
 int mkdir(const char *pathname, mode_t mode)

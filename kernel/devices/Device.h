@@ -72,7 +72,8 @@ public:
 
     virtual void handle_interrupt() {}
 
-    virtual bool did_fail() {
+    virtual bool did_fail()
+    {
         return false;
     }
 

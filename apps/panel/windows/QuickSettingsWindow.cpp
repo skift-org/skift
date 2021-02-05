@@ -23,7 +23,7 @@ QuickSettingsWindow::QuickSettingsWindow()
     root()->insets(6);
 
     new Label(root(), "Quick settings");
-    
+
     new SettingToggle(root(), "Show Wireframe", Icon::get("duck"), "appearance:widgets.wireframe");
     new SettingToggle(root(), "Night Light", Icon::get("moon-waning-crescent"), "appearance:night-light.enable");
 }

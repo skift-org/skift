@@ -1,22 +1,38 @@
-#include <math.h>
-#include <stdlib.h>
 #include <ctype.h>
 #include <limits.h>
+#include <math.h>
+#include <stdlib.h>
+
+#include <abi/Syscalls.h>
 
 #include <libsystem/core/CString.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/utils/NumberParser.h>
 
-void abort()
+void abort(void)
 {
-    process_abort();
+    hj_process_exit(PROCESS_FAILURE);
+    __builtin_unreachable();
 }
 
-int atoi(const char *nptr)
+int atoi(const char *str)
 {
-    int value;
-    parse_int(PARSER_DECIMAL, nptr, strlen(nptr), &value);
-    return value;
+    int n = 0, neg = 0;
+    while (isspace(*str))
+        str++;
+    switch (*str)
+    {
+    case '-':
+        neg = 1;
+        break;
+    case '+':
+        str++;
+        break;
+    }
+    /* Compute n as a negative number to avoid overflow on INT_MIN */
+    while (isdigit(*str))
+        n = 10 * n - (*str++ - '0');
+    return neg ? n : -n;
 }
 
 long int strtol(const char *nptr, char **endptr, int base)
@@ -40,9 +56,10 @@ char *getenv(const char *name)
     return NULL;
 }
 
-void __no_return exit(int status)
+void exit(int status)
 {
-    process_exit(status);
+    hj_process_exit(status);
+    __builtin_unreachable();
 }
 
 int system(const char *command)
@@ -174,7 +191,7 @@ void *bsearch(
     while (i < j)
     {
         size_t k = (j - i) / 2;
-        auto element = reinterpret_cast<const char *>(base) + (i + k) * size;
+        const auto *element = reinterpret_cast<const char *>(base) + (i + k) * size;
         auto res = compare(key, element);
         if (res < 0)
         {
@@ -205,7 +222,9 @@ void qsort(void *base, size_t count, size_t size,
         {
             void *v = (void *)((uintptr_t)base + j * size);
             if (compare(u, v) <= 0)
+            {
                 continue;
+            }
 
             // swap u and v
             char *u_bytes = (char *)u;
@@ -239,7 +258,9 @@ unsigned long strtoul(const char *__restrict nptr, char **__restrict endptr, int
         c = *s++;
     }
     else if (c == '+')
+    {
         c = *s++;
+    }
     if ((base == 0 || base == 16) &&
         c == '0' && (*s == 'x' || *s == 'X'))
     {
@@ -248,21 +269,33 @@ unsigned long strtoul(const char *__restrict nptr, char **__restrict endptr, int
         base = 16;
     }
     if (base == 0)
+    {
         base = c == '0' ? 8 : 10;
+    }
     cutoff = (unsigned long)ULONG_MAX / (unsigned long)base;
     cutlim = (unsigned long)ULONG_MAX % (unsigned long)base;
     for (acc = 0, any = 0;; c = *s++)
     {
         if (isdigit(c))
+        {
             c -= '0';
+        }
         else if (isalpha(c))
+        {
             c -= isupper(c) ? 'A' - 10 : 'a' - 10;
+        }
         else
+        {
             break;
+        }
         if (c >= base)
+        {
             break;
+        }
         if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+        {
             any = -1;
+        }
         else
         {
             any = 1;
@@ -275,8 +308,12 @@ unsigned long strtoul(const char *__restrict nptr, char **__restrict endptr, int
         acc = (unsigned long)ULONG_MAX;
     }
     else if (neg)
+    {
         acc = -acc;
+    }
     if (endptr != 0)
+    {
         *endptr = (char *)(any ? (char *)s - 1 : nptr);
+    }
     return (acc);
 }

@@ -1,7 +1,6 @@
 #include <libsystem/Common.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/core/Printf.h>
-#include <libsystem/io/Stream.h>
 #include <libsystem/math/MinMax.h>
 
 /* --- snprintf ------------------------------------------------------------- */

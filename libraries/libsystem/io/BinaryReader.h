@@ -39,7 +39,7 @@ public:
         _reader.seek(num_bytes, WHENCE_HERE);
     }
 
-    inline bool good() 
+    inline bool good()
     {
         return _reader.position() < _reader.length();
     }
@@ -49,6 +49,7 @@ public:
     virtual size_t position() override;
     virtual size_t seek(size_t pos, Whence whence) override;
     virtual size_t read(void *buffer, size_t size) override;
+
 private:
     SeekableReader &_reader;
 };

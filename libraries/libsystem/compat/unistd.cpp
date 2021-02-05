@@ -56,11 +56,13 @@ int rmdir(const char *dirname)
 
 int close(int fd)
 {
+    logger_trace("close", fd);
     return hj_handle_close(fd) == Result::SUCCESS ? 0 : -1;
 }
 
 off_t lseek(int fd, off_t offset, int whence)
 {
+    logger_trace("lseek", fd);
     Result result = hj_handle_seek(fd, offset, (Whence)whence);
     if (result != Result::SUCCESS)
     {

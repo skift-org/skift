@@ -7,7 +7,10 @@
 
 __BEGIN_HEADER
 
-typedef void FILE;
+typedef struct 
+{
+  int handle
+} FILE;
 #define __DEFINED_FILE
 
 #define BUFSIZ 8192

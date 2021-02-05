@@ -1,3 +1,4 @@
+#include <libsystem/bits/abs.h>
 #define __abs(x) ((x) < 0 ? -(x) : (x))
 
 int abs(int x)

@@ -1,6 +1,6 @@
 #include <math.h>
 
-double scalbn(double x, long int exp)
+double scalbn(double x, int exp)
 {
 #if __has_builtin(__builtin_scalbn)
     return __builtin_scalbn(x, exp);
@@ -9,7 +9,7 @@ double scalbn(double x, long int exp)
 #endif
 }
 
-float scalbnf(float x, long int exp)
+float scalbnf(float x, int exp)
 {
 #if __has_builtin(__builtin_scalbnf)
     return __builtin_scalbnf(x, exp);

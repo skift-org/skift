@@ -27,7 +27,7 @@ void file_state_to_stat(FileState *in, struct stat *out)
 
 int stat(const char *path, struct stat *buf)
 {
-    auto stream = stream_open(path, OPEN_READ);
+    Stream* stream = stream_open(path, OPEN_READ);
 
     FileState stat;
     stream_stat((Stream *)stream, &stat);
@@ -38,11 +38,15 @@ int stat(const char *path, struct stat *buf)
     return 0;
 }
 
-int fstat(FILE *stream, struct stat *buf)
+int fstat(int fd, struct stat *buf)
 {
+    Stream* stream = stream_open_handle(fd, OPEN_READ);
+
     FileState stat;
-    stream_stat((Stream *)stream, &stat);
+    stream_stat(stream, &stat);
     file_state_to_stat(&stat, buf);
+
+    stream_close(stream);
 
     return 0;
 }

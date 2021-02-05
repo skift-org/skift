@@ -56,6 +56,20 @@ OpenFlag stdio_parse_mode(const char *mode)
     return flags;
 }
 
+FILE *fdopen(int fd, const char *mode)
+{
+    Stream *stream = stream_open_handle(fd, stdio_parse_mode(mode));
+
+    if (handle_has_error(stream))
+    {
+        stream_close(stream);
+
+        return nullptr;
+    }
+
+    return stream;
+}
+
 FILE *fopen(const char *path, const char *mode)
 {
     Stream *stream = stream_open(path, stdio_parse_mode(mode));
@@ -242,4 +256,29 @@ int fgetc(FILE *stream)
 int fputc(int c, FILE *stream)
 {
     return stream_putchar((Stream *)stream, (char)c);
+}
+
+int getchar(void)
+{
+    return fgetc(__stdio_get_stdin());
+}
+
+int fscanf(FILE *stream, const char *format, ...)
+{
+    __unused(stream);
+    __unused(format);
+
+    logger_trace("fscanf(\"%s\", ...)", format);
+
+    return 0;
+}
+
+int sscanf(const char *str, const char *format, ...)
+{
+    __unused(str);
+    __unused(format);
+
+    logger_trace("sscanf(\"%s\", ...)", format);
+
+    return 0;
 }

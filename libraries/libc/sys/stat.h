@@ -1,7 +1,11 @@
 #pragma once
 
+#include <__libc__.h>
+
 #include <stddef.h>
 #include <stdint.h>
+
+__BEGIN_HEADER
 
 typedef int mode_t;
 
@@ -74,8 +78,10 @@ struct stat
 #define S_ISLNK(m) (((m)&_IFMT) == _IFLNK)
 #define S_ISSOCK(m) (((m)&_IFMT) == _IFSOCK)
 
-extern int stat(const char *file, struct stat *st);
-extern int lstat(const char *path, struct stat *st);
-extern int fstat(int fd, struct stat *st);
-extern int mkdir(const char *pathname, mode_t mode);
-extern mode_t umask(mode_t mask);
+int stat(const char *file, struct stat *st);
+int lstat(const char *path, struct stat *st);
+int fstat(int fd, struct stat *st);
+int mkdir(const char *pathname, mode_t mode);
+mode_t umask(mode_t mask);
+
+__END_HEADER

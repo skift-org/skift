@@ -45,7 +45,7 @@ struct flock
 
 #define FD_CLOEXEC (1 << 0)
 
-extern int open(const char *, int, ...);
+int open(const char *, int, ...);
 extern int chmod(const char *path, mode_t mode);
 extern int fcntl(int fd, int cmd, ...);
 

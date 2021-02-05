@@ -27,6 +27,7 @@ float fmaxf(float x, float y);
 
 // Arithmetic
 double modf(double x, double *iptr);
+float modff(float x, float *iptr);
 double fmod(double x, double y);
 float fmodf(float x, float y);
 double sqrt(double x);
@@ -70,6 +71,7 @@ double log10(double x);
 float log10f(float x);
 double log2(double x);
 double ldexp(double a, int exp);
+float ldexpf(float a, int exp);
 double frexp(double x, int *exp);
 float frexpf(float x, int *exp);
 double exp(double x);

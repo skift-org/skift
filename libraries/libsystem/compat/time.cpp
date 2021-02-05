@@ -46,3 +46,9 @@ size_t strftime(char *s, size_t n, const char *format, const struct tm *tptr)
 
     return 0;
 }
+
+time_t mktime(struct tm *ptr)
+{
+    __unused(ptr);
+    __builtin_unreachable();
+}

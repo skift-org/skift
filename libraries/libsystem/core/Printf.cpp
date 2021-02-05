@@ -1,8 +1,8 @@
 
 // printf.c : printf and snprintf internals
+#include <ctype.h>
 
 #include <libsystem/core/CString.h>
-#include <libsystem/core/CType.h>
 #include <libsystem/core/Printf.h>
 #include <libsystem/utils/NumberFormatter.h>
 

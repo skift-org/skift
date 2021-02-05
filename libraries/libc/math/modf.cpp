@@ -15,8 +15,10 @@ double modf(double x, double *iptr)
     if (e >= 52)
     {
         *iptr = x;
-        if (e == 0x400 && u.i << 12 != 0) /* nan */
+        if (e == 0x400 && u.i << 12 != 0)
+        { /* nan */
             return x;
+        }
         u.i &= 1ULL << 63;
         return u.f;
     }

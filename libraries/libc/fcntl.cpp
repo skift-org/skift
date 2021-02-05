@@ -3,8 +3,6 @@
 
 #include <abi/Syscalls.h>
 
-#include <libsystem/Logger.h>
-
 OpenFlag fcntl_parse_mode(int mode)
 {
     OpenFlag flags = OPEN_STREAM;
@@ -21,7 +19,6 @@ OpenFlag fcntl_parse_mode(int mode)
 
 int open(const char *path, int mode, ...)
 {
-    logger_trace("open", path);
     int flags = fcntl_parse_mode(mode);
     int handle = 0;
     Result result = hj_handle_open(&handle, path, strlen(path), flags);
@@ -29,7 +26,6 @@ int open(const char *path, int mode, ...)
     if (result != Result::SUCCESS)
     {
         // TODO: set errno
-        logger_error("Failed to open handle: %s", path);
         return -1;
     }
 

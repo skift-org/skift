@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <abi/Syscalls.h>
 
@@ -56,5 +57,5 @@ int mkdir(const char *pathname, mode_t mode)
 {
     __unused(mode);
 
-    return filesystem_mkdir(pathname);
+    return hj_filesystem_mkdir(pathname, strlen(pathname)) == Result::SUCCESS ? 0 : -1;
 }

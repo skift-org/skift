@@ -2,18 +2,16 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-
-#include <libsystem/Logger.h>
-#include <libsystem/io/Filesystem.h>
+#include <unistd.h>
 
 #include <abi/Syscalls.h>
 
 #undef printf
 #undef puts
 
-FILE _stdin{0};
-FILE _stdout{1};
-FILE _stderr{2};
+FILE _stdin{0, 0, 0};
+FILE _stdout{1, 0, 0};
+FILE _stderr{2, 0, 0};
 
 FILE *__stdio_get_stdin()
 {
@@ -65,9 +63,11 @@ OpenFlag stdio_parse_mode(const char *mode)
 
 FILE *fdopen(int fd, const char *mode)
 {
-    logger_trace("fdopen: %i", fd);
+    __unused(mode);
 
     FILE *result = (FILE *)malloc(sizeof(FILE));
+    result->error = 0;
+    result->is_eof = 0;
     result->handle = fd;
 
     return result;
@@ -75,7 +75,6 @@ FILE *fdopen(int fd, const char *mode)
 
 FILE *fopen(const char *path, const char *mode)
 {
-    logger_trace("fopen: %s", path);
     OpenFlag flags = stdio_parse_mode(mode);
 
     int handle = 0;
@@ -84,29 +83,28 @@ FILE *fopen(const char *path, const char *mode)
     if (result != Result::SUCCESS)
     {
         // TODO: set errno
-        logger_error("Failed to open handle: %s", path);
         return NULL;
     }
 
-    FILE *result = (FILE *)malloc(sizeof(FILE));
-    result->handle = handle;
+    FILE *file = (FILE *)malloc(sizeof(FILE));
+    file->error = 0;
+    file->is_eof = 0;
+    file->handle = handle;
 
-    return result;
+    return file;
 }
 
 int fclose(FILE *file)
 {
-    logger_trace("fclose");
     Result result = hj_handle_close(file->handle);
     free(file);
 
     return result == Result::SUCCESS ? 0 : -1;
 }
 
-int fflush(FILE *stream)
+int fflush(FILE *file)
 {
-    logger_trace("fflush");
-    // No flushing here
+    __unused(file);
 
     return 0;
 }
@@ -115,7 +113,7 @@ size_t fread(void *ptr, size_t size, size_t count, FILE *file)
 {
     size_t total = 0;
     Result result;
-    uint8_t *dst_ptr = ptr;
+    uint8_t *dst_ptr = (uint8_t *)ptr;
 
     for (size_t i = 0; i < count; i++)
     {
@@ -130,6 +128,11 @@ size_t fread(void *ptr, size_t size, size_t count, FILE *file)
         }
     }
 
+    if (total == 0)
+    {
+        file->is_eof = 1;
+    }
+
     return total;
 }
 
@@ -137,7 +140,7 @@ size_t fwrite(const void *ptr, size_t size, size_t count, FILE *file)
 {
     size_t total = 0;
     Result result;
-    uint8_t *dst_ptr = ptr;
+    const uint8_t *dst_ptr = (const uint8_t *)ptr;
 
     for (size_t i = 0; i < count; i++)
     {
@@ -165,11 +168,11 @@ int fseek(FILE *file, long offset, int whence)
     }
     else if (whence == SEEK_CUR)
     {
-        r = stream_seek(file->handle, offset, WHENCE_HERE);
+        r = hj_handle_seek(file->handle, offset, WHENCE_HERE);
     }
     else if (whence == SEEK_END)
     {
-        r = stream_seek(file->handle, offset, WHENCE_END);
+        r = hj_handle_seek(file->handle, offset, WHENCE_END);
     }
 
     return r == Result::SUCCESS ? 0 : -1;
@@ -177,12 +180,15 @@ int fseek(FILE *file, long offset, int whence)
 
 long ftell(FILE *stream)
 {
-    long offset = 0;
+    int offset = 0;
     Result r = hj_handle_tell(stream->handle, WHENCE_START, &offset);
 
-    // TODO: check error
+    if (r != Result::SUCCESS)
+    {
+        // TODO: check error
+    }
 
-    return offset;
+    return (long)offset;
 }
 
 int puts(const char *s)
@@ -193,8 +199,8 @@ int puts(const char *s)
     {
     }
 
-    int r = fwrite(__stdio_get_stdout(), s, length);
-    r += fwrite(__stdio_get_stdout(), "\n", 1);
+    int r = fwrite(s, length, 1, __stdio_get_stdout());
+    r += fwrite("\n", 1, 1, __stdio_get_stdout());
 
     return r;
 }
@@ -208,97 +214,74 @@ int putchar(int c)
 
 int printf(const char *fmt, ...)
 {
-
-    va_list va;
-    va_start(va, fmt);
-
-    int result = stream_vprintf(out_stream, fmt, va);
-
-    va_end(va);
+    int result;
+    va_list ap;
+    va_start(ap, fmt);
+    result = fprintf(__stdio_get_stdout(), fmt, ap);
+    va_end(ap);
 
     return result;
 }
 
-int fprintf(FILE *stream, const char *fmt, ...)
+int fprintf(FILE *file, const char *fmt, ...)
 {
-    va_list va;
-    va_start(va, fmt);
-
-    int result = stream_vprintf((Stream *)stream, fmt, va);
-
-    va_end(va);
+    int result;
+    va_list ap;
+    va_start(ap, fmt);
+    result = vfprintf(file, fmt, ap);
+    va_end(ap);
 
     return result;
-}
-
-int vfprintf(FILE *stream, const char *fmt, va_list va)
-{
-    int r = stream_vprintf((Stream *)stream, fmt, va);
-
-    return r;
 }
 
 int remove(const char *pathname)
 {
-
-    int r = filesystem_unlink(pathname);
-
-    return r;
+    return unlink(pathname);
 }
 
 int rename(const char *oldpath, const char *newpath)
 {
-    int r = filesystem_rename(oldpath, newpath);
+    Result r = hj_filesystem_rename(oldpath, strlen(oldpath), newpath, strlen(newpath));
 
-    return r;
+    return r == Result::SUCCESS ? 0 : -1;
 }
 
 int fputs(const char *string, FILE *stream)
 {
-    return stream_write((Stream *)stream, string, strlen(string));
+    return fwrite(string, strlen(string), 1, stream);
 }
 
 void clearerr(FILE *stream)
 {
-    handle_clear_error((Stream *)stream);
+    stream->error = 0;
 }
 
 int feof(FILE *stream)
 {
-    return stream_is_end_file((Stream *)stream);
+    return stream->is_eof;
 }
 
 int ferror(FILE *stream)
 {
-    return handle_has_error((Stream *)stream);
+    return stream->error;
 }
 
-char *fgets(char *s, int size, FILE *stream)
+char *fgets(char *s, int size, FILE *file)
 {
-    Stream *native_stream = (Stream *)stream;
+    fread(s, size, 1, file);
 
-    for (int i = 0; i < size; i++)
-    {
-        s[i] = stream_getchar(native_stream);
-
-        if (handle_has_error(native_stream) ||
-            stream_is_end_file(native_stream))
-        {
-            return s;
-        }
-    }
-
+    // TODO: error handking
     return s;
 }
 
-int fgetc(FILE *stream)
+int fgetc(FILE *file)
 {
-    return stream_getchar((Stream *)stream);
+    return getc(file);
 }
 
-int fputc(int c, FILE *stream)
+int fputc(int c, FILE *file)
 {
-    return stream_putchar((Stream *)stream, (char)c);
+    return putc(c, file);
 }
 
 int getchar(void)
@@ -311,7 +294,7 @@ int fscanf(FILE *stream, const char *format, ...)
     __unused(stream);
     __unused(format);
 
-    logger_trace("fscanf(\"%s\", ...)", format);
+    __builtin_unreachable();
 
     return 0;
 }
@@ -321,7 +304,7 @@ int sscanf(const char *str, const char *format, ...)
     __unused(str);
     __unused(format);
 
-    logger_trace("sscanf(\"%s\", ...)", format);
+    __builtin_unreachable();
 
     return 0;
 }
@@ -408,5 +391,8 @@ int setvbuf(FILE *stream, char *buf, int mode, size_t size)
     __unused(mode);
     __unused(size);
     // TODO: implement this
+
+    __builtin_unreachable();
+
     return -1;
 }

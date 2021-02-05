@@ -55,7 +55,7 @@ double atan2(double y, double x);
 float atan2f(float x, float y);
 double tanh(double x);
 float tanhf(float x);
-double hypot(double x, double y); 
+double hypot(double x, double y);
 float hypotf(float x, float y);
 
 // Rounding

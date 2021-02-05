@@ -1,8 +1,8 @@
 #pragma once
 
-#include <math.h>
 #include <libutils/StringBuilder.h>
 #include <libutils/Strings.h>
+#include <math.h>
 
 struct NumberFormat
 {

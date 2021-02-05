@@ -23,7 +23,7 @@ struct ELFLoader
         {
             return SUCCESS;
         }
-        
+
         if (program_header->vaddr <= 0x100000)
         {
             logger_error("ELF program no in user memory (0x%08x)!", program_header->vaddr);

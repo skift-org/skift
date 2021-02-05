@@ -21,7 +21,9 @@ double frexp(double x, int *exp)
             *exp -= 64;
         }
         else
+        {
             *exp = 0;
+        }
         return x;
     }
     else if (ee == 0x7ff)
@@ -56,7 +58,9 @@ float frexpf(float x, int *exp)
             *exp -= 64;
         }
         else
+        {
             *exp = 0;
+        }
         return x;
     }
     else if (ee == 0xff)

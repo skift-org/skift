@@ -1,7 +1,7 @@
 #pragma once
 
-#include <math.h>
 #include <libutils/Observable.h>
+#include <math.h>
 
 enum class Operation
 {

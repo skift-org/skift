@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -281,4 +282,89 @@ int sscanf(const char *str, const char *format, ...)
     logger_trace("sscanf(\"%s\", ...)", format);
 
     return 0;
+}
+
+char *strerror(int e)
+{
+    const char *s;
+    switch (e)
+    {
+    case EAGAIN:
+        s = "Operation would block (EAGAIN)";
+        break;
+    case EACCES:
+        s = "Access denied (EACCESS)";
+        break;
+    case EBADF:
+        s = "Bad file descriptor (EBADF)";
+        break;
+    case EEXIST:
+        s = "File exists already (EEXIST)";
+        break;
+    case EFAULT:
+        s = "Access violation (EFAULT)";
+        break;
+    case EINTR:
+        s = "Operation interrupted (EINTR)";
+        break;
+    case EINVAL:
+        s = "Invalid argument (EINVAL)";
+        break;
+    case EIO:
+        s = "I/O error (EIO)";
+        break;
+    case EISDIR:
+        s = "Resource is directory (EISDIR)";
+        break;
+    case ENOENT:
+        s = "No such file or directory (ENOENT)";
+        break;
+    case ENOMEM:
+        s = "Out of memory (ENOMEM)";
+        break;
+    case ENOTDIR:
+        s = "Expected directory instead of file (ENOTDIR)";
+        break;
+    case ENOSYS:
+        s = "Operation not implemented (ENOSYS)";
+        break;
+    case EPERM:
+        s = "Operation not permitted (EPERM)";
+        break;
+    case EPIPE:
+        s = "Broken pipe (EPIPE)";
+        break;
+    case ESPIPE:
+        s = "Seek not possible (ESPIPE)";
+        break;
+    case ENXIO:
+        s = "No such device or address (ENXIO)";
+        break;
+    case ENOEXEC:
+        s = "Exec format error (ENOEXEC)";
+        break;
+    default:
+        s = "Unknown error code (?)";
+    }
+    return const_cast<char *>(s);
+}
+
+void perror(const char *string)
+{
+    int error = errno;
+    if (string && *string)
+    {
+        fprintf(stderr, "%s: ", string);
+    }
+    fprintf(stderr, "%s\n", strerror(error));
+}
+
+int setvbuf(FILE *stream, char *buf, int mode, size_t size)
+{
+    __unused(stream);
+    __unused(buf);
+    __unused(mode);
+    __unused(size);
+    // TODO: implement this
+    return -1;
 }

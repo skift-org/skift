@@ -1,8 +1,7 @@
 #pragma once
+#include <ctype.h>
 
 #include <libsystem/Logger.h>
-
-#include <libsystem/core/CType.h>
 #include <libutils/String.h>
 
 class FuzzyMatcher

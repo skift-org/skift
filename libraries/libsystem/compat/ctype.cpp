@@ -1,24 +1,70 @@
+
 #include <ctype.h>
 
-extern "C"
+int isprint(int c)
 {
-    int isprint(int c)
+    return (c >= 0x20 && c <= 0x7e) ? 1 : 0;
+}
+
+int islower(int c)
+{
+    if (c >= 'a' && c <= 'z')
     {
-        return (c >= 0x20 && c <= 0x7e) ? 1 : 0;
+        return 1;
     }
 
-    int isalpha(int c)
+    return 0;
+}
+
+int isupper(int c)
+{
+    if (c >= 'A' && c <= 'Z')
     {
-        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ? 1 : 0;
+        return 1;
     }
 
-    int isdigit(int c)
+    return 0;
+}
+
+int isalpha(int c)
+{
+    if (islower(c) || isupper(c))
     {
-        return (c >= '0' && c <= '9' ? 1 : 0);
+        return 1;
     }
 
-    int isalnum(int c)
+    return 0;
+}
+
+int isdigit(int c)
+{
+    if (c >= '0' && c <= '9')
     {
-        return isalpha(c) || isdigit(c);
+        return 1;
     }
+
+    return 0;
+}
+
+int toupper(int c)
+{
+    if (c >= 'a' && c <= 'z')
+    {
+        return c - 'a' + 'A';
+    }
+    return c;
+}
+
+int tolower(int c)
+{
+    if (c >= 'A' && c <= 'Z')
+    {
+        return c - 'A' + 'a';
+    }
+    return c;
+}
+
+int isspace(int c)
+{
+    return (c == '\f' || c == '\n' || c == '\r' || c == '\t' || c == '\v' || c == ' ');
 }

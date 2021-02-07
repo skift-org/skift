@@ -1,5 +1,5 @@
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/Socket.h>

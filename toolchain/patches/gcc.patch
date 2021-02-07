@@ -72,7 +72,7 @@ index 000000000..e9fb8ab0d
 +/* Default arguments you want when running your
 +   i686-skift-gcc/x86_64-skift-gcc toolchain */
 +#undef LIB_SPEC
-+#define LIB_SPEC "-lsystem" /* link against system library */
++#define LIB_SPEC "-lc" /* link against c library */
 +
 +/* Files that are linked before user code.
 +   The %s tells GCC to look for these files in the library directory. */

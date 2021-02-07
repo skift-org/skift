@@ -1,5 +1,5 @@
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 

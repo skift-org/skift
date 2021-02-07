@@ -2,7 +2,8 @@
 /* tar.c: read in memory tar archive                                          */
 
 #include <libfile/TARArchive.h>
-#include <libsystem/core/CString.h>
+#include <stdio.h>
+#include <string.h>
 
 struct __packed TARRawBlock
 {

@@ -1,8 +1,8 @@
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/json/Json.h>
 #include <libsystem/utils/NumberParser.h>
 #include <libwidget/Theme.h>
+#include <string.h>
 
 static bool _theme_is_dark = true;
 

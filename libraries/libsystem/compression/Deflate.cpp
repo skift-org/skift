@@ -1,4 +1,4 @@
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/compression/Common.h>
 #include <libsystem/compression/Deflate.h>
 #include <libsystem/compression/Huffman.h>

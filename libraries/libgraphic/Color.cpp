@@ -1,9 +1,9 @@
 
 #include <libgraphic/Color.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/utils/NumberParser.h>
 #include <libutils/Scanner.h>
 #include <libutils/ScannerUtils.h>
+#include <string.h>
 
 struct ColorName
 {

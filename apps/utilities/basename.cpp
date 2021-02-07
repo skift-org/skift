@@ -1,7 +1,7 @@
-#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 #include <libutils/Path.h>
+#include <stdio.h>
 
 int main(int argc, char **argv)
 {

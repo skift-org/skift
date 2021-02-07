@@ -1,6 +1,6 @@
 #include <abi/Syscalls.h>
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/process/Launchpad.h>

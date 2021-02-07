@@ -8,7 +8,7 @@ FileWriter::FileWriter(Path &path) : _handle(path.string(), OPEN_WRITE | OPEN_CR
 {
 }
 
-FileWriter::FileWriter(system::Handle &&handle) : _handle{move(handle)}
+FileWriter::FileWriter(sk::system::Handle &&handle) : _handle{move(handle)}
 {
 }
 

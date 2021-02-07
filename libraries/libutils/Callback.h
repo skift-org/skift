@@ -4,7 +4,7 @@
 #include <libutils/OwnPtr.h>
 #include <libutils/Traits.h>
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 
 template <typename>
 class Callback;

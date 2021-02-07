@@ -63,7 +63,3 @@ bool stream_is_end_file(Stream *stream);
 int stream_format(Stream *stream, const char *fmt, ...);
 
 int stream_vprintf(Stream *stream, const char *fmt, va_list va);
-
-#define printf(__args...) stream_format(out_stream, __args)
-
-#define vprintf(__fmt, __va) stream_vprintf(out_stream, __fmt, __va)

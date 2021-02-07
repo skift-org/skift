@@ -1,7 +1,7 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/core/CString.h>
 #include <libwidget/Label.h>
 #include <libwidget/Window.h>
+#include <string.h>
 
 Label::Label(Widget *parent, String text)
     : Label(parent, text, Anchor::LEFT)

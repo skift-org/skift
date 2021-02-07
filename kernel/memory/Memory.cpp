@@ -1,5 +1,5 @@
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>

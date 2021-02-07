@@ -1,5 +1,5 @@
+#include <assert.h>
 #include <libfile/ELF.h>
-#include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 

@@ -1,7 +1,8 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/core/CString.h>
 #include <libwidget/Placeholder.h>
 #include <libwidget/Window.h>
+#include <stdio.h>
+#include <string.h>
 
 Placeholder::Placeholder(Widget *parent, String text)
     : Widget(parent), _alert_icon(Icon::get("alert"))

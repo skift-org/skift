@@ -1,12 +1,12 @@
 
 /* cmdline.c: skiftOS command line application utils                          */
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/cmdline/CMDLine.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/utils/NumberParser.h>
+#include <stdio.h>
 
 /* --- Private functions ---------------------------------------------------- */
 

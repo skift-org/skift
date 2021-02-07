@@ -1,9 +1,9 @@
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/system/Memory.h>
+#include <string.h>
 
 #include <libwidget/Application.h>
 #include <libwidget/Container.h>

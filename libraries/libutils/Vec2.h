@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/math/Dimension.h>
 #include <libsystem/math/MinMax.h>
 #include <math.h>

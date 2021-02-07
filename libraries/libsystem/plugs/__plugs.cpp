@@ -1,7 +1,6 @@
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
@@ -10,7 +9,6 @@
 
 #include <libsystem/cxx/cxx.h>
 
-static Lock _memory_lock{"memory_lock"};
 static Lock _logger_lock{"logger_lock"};
 
 Stream *in_stream;
@@ -90,27 +88,4 @@ void __no_return __plug_logger_fatal()
 {
     stream_format(err_stream, "Fatal error occurred (see logs)!\n");
     process_abort();
-}
-
-void __plug_memory_lock()
-{
-    _memory_lock.acquire(SOURCE_LOCATION);
-}
-
-void __plug_memory_unlock()
-{
-    _memory_lock.release(SOURCE_LOCATION);
-}
-
-void *__plug_memory_alloc(size_t size)
-{
-    uintptr_t address = 0;
-    assert(memory_alloc(size, &address) == SUCCESS);
-    return (void *)address;
-}
-
-void __plug_memory_free(void *address, size_t size)
-{
-    __unused(size);
-    memory_free((uintptr_t)address);
 }

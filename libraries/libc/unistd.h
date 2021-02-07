@@ -8,7 +8,7 @@
 
 __BEGIN_HEADER
 
-extern char **environ;
+char **environ;
 
 pid_t getpid(void);
 pid_t getppid(void);
@@ -58,8 +58,8 @@ int access(const char *pathname, int mode);
 
 int getopt(int argc, char *const argv[], const char *optstring);
 
-extern char *optarg;
-extern int optind, opterr, optopt;
+char *optarg;
+int optind, opterr, optopt;
 
 int unlink(const char *pathname);
 

@@ -205,6 +205,19 @@ int puts(const char *s)
     return r;
 }
 
+int getc(FILE *file)
+{
+    uint8_t c;
+    fread(&c, 1, 1, file);
+    return (int)c;
+}
+
+int putc(int c, FILE *file)
+{
+    fwrite(&c, 1, 1, file);
+    return c;
+}
+
 int putchar(int c)
 {
     int r = puts((const char *)&c);

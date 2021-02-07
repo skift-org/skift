@@ -7,7 +7,7 @@
 
 #include <abi/Syscalls.h>
 
-void abort(void)
+void abort()
 {
     hj_process_exit(PROCESS_FAILURE);
     __builtin_unreachable();

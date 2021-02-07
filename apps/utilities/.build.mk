@@ -191,7 +191,7 @@ OBJECTS += $$($(1)_OBJECT)
 $$($(1)_BINARY): $$($(1)_OBJECT) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a, $$($(1)_LIBS) system) $(CRTS)
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [LD] $($(1)_NAME)
-	@$(CXX) $(LDFLAGS) -o $$@ $$($(1)_OBJECT) $$(patsubst %, -l%, $$($(1)_LIBS))
+	@$(CXX) $(LDFLAGS) -o $$@ $$($(1)_OBJECT) -lsystem $$(patsubst %, -l%, $$($(1)_LIBS))
 	@if $(CONFIG_STRIP); then \
 		echo [$(1)] [STRIP] $($(1)_NAME); \
 		$(STRIP) $$@; \

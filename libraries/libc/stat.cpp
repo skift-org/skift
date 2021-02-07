@@ -17,7 +17,7 @@ int file_type_to_stat(FileType type)
     case FILE_TYPE_DIRECTORY:
         return _IFDIR;
     default:
-        logger_error("[STAT] Unhandled filetype: %u", type);
+        // Log this
         return 0;
     }
 }

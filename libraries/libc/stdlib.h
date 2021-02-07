@@ -44,7 +44,7 @@ void _handle_atexit(void);
 
 #define RAND_MAX 0x7FFFFFFF
 
-void abort(void);
+void abort();
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1

@@ -3,7 +3,12 @@
 
 int isprint(int c)
 {
-    return (c >= 0x20 && c <= 0x7e) ? 1 : 0;
+    if (c >= 0x20 && c <= 0x7e)
+    {
+        return 1;
+    }
+
+    return 0;
 }
 
 int islower(int c)

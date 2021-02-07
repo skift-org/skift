@@ -1,6 +1,5 @@
 #include <assert.h>
-#include <libsystem/Logger.h>
-#include <libsystem/cxx/cxx.h>
+#include <libc/cxx/cxx.h>
 
 void *__attribute__((weak)) operator new(size_t size)
 {
@@ -38,6 +37,6 @@ void __attribute__((weak)) operator delete[](void *ptr, size_t size)
 
 extern "C" void __attribute__((weak)) __cxa_pure_virtual()
 {
-    logger_fatal("Attempt at calling a pure virtual function!");
+    // logger_fatal("Attempt at calling a pure virtual function!");
     ASSERT_NOT_REACHED();
 }

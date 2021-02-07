@@ -8,11 +8,17 @@ OpenFlag fcntl_parse_mode(int mode)
     OpenFlag flags = OPEN_STREAM;
 
     if (mode & O_CREAT)
+    {
         flags |= OPEN_CREATE;
+    }
     if (mode & O_APPEND)
+    {
         flags |= OPEN_APPEND;
+    }
     if (mode & O_DIRECTORY)
+    {
         flags |= OPEN_DIRECTORY;
+    }
 
     return flags;
 }

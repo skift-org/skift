@@ -2,6 +2,7 @@
 
 #include <ctype.h>
 #include <libsystem/io/Stream.h>
+#include <stdio.h>
 
 static inline void hexdump(const void *ptr, int buflen)
 {

@@ -145,21 +145,23 @@ bool check_minor_magic(MinorBlock *min, void *ptr, void *caller)
         ((min->magic & 0xFFFF) == (LIBALLOC_MAGIC & 0xFFFF)) ||
         ((min->magic & 0xFF) == (LIBALLOC_MAGIC & 0xFF)))
     {
-        logger_error("Possible 1-3 byte overrun for magic 0x%x != 0x%x from 0x%x.",
-                     min->magic,
-                     LIBALLOC_MAGIC,
-                     caller);
+        __unused(caller);
+        __unused(ptr);
+        // logger_error("Possible 1-3 byte overrun for magic 0x%x != 0x%x from 0x%x.",
+        //              min->magic,
+        //              LIBALLOC_MAGIC,
+        //              caller);
     }
 
     if (min->magic == LIBALLOC_DEAD)
     {
-        logger_error("Multiple free(0x%x) attempt from 0x%x.",
-                     ptr,
-                     caller);
+        // logger_error("Multiple free(0x%x) attempt from 0x%x.",
+        //              ptr,
+        //              caller);
     }
     else
     {
-        logger_error("Bad free(0x%x) from 0x%x", ptr, caller);
+        // logger_error("Bad free(0x%x) from 0x%x", ptr, caller);
     }
 
     memory_unlock();
@@ -178,7 +180,7 @@ void *malloc(size_t req_size)
 
     if (size == 0)
     {
-        logger_warn("alloc(0) called from 0x%x", __builtin_return_address(0));
+        // logger_warn("alloc(0) called from 0x%x", __builtin_return_address(0));
         memory_unlock();
 
         return malloc(1);
@@ -420,7 +422,7 @@ void *malloc(size_t req_size)
 
     memory_unlock();
 
-    logger_warn("All cases exhausted. No memory available.");
+    // logger_warn("All cases exhausted. No memory available.");
 
     return nullptr;
 }
@@ -429,7 +431,7 @@ void free(void *ptr)
 {
     if (ptr == nullptr)
     {
-        logger_warn("free( nullptr ) called from 0x%x", __builtin_return_address(0));
+        // logger_warn("free( nullptr ) called from 0x%x", __builtin_return_address(0));
         return;
     }
 

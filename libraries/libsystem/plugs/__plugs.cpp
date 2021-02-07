@@ -7,8 +7,6 @@
 #include <libsystem/system/Memory.h>
 #include <libsystem/thread/Lock.h>
 
-#include <libsystem/cxx/cxx.h>
-
 static Lock _logger_lock{"logger_lock"};
 
 Stream *in_stream;
@@ -43,7 +41,6 @@ void __plug_initialize()
 void __plug_uninitialize(int exit_code)
 {
     _fini();
-    __cxa_finalize(nullptr);
 
     if (in_stream)
     {

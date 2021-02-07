@@ -16,6 +16,16 @@ int kill(int pid)
 
 int killall(String name)
 {
+    if (name == "neko")
+    {
+        stream_format(err_stream, "Don't kill nekos, your are a bad persone!\n");
+    }
+
+    if (name == "cat")
+    {
+        stream_format(err_stream, "Don't kill cats, you monster!\n");
+    }
+
     auto processes = json::parse_file("/System/processes");
 
     for (size_t i = 0; i < processes.length(); i++)
@@ -28,7 +38,7 @@ int killall(String name)
         }
     }
 
-    return SUCCESS;
+    return PROCESS_SUCCESS;
 }
 
 int main(int argc, char const *argv[])

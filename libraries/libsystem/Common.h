@@ -3,10 +3,10 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include <abi/Process.h>
 #include <libsystem/Macros.h>
-#include <libsystem/core/Allocator.h>
 
 struct __SOURCE_LOCATION__
 {

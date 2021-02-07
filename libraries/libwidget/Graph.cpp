@@ -1,5 +1,5 @@
+#include <assert.h>
 #include <libgraphic/Painter.h>
-#include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libwidget/Graph.h>
 

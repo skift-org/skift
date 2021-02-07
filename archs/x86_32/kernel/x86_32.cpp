@@ -1,4 +1,4 @@
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/core/Plugs.h>
 
 #include "archs/VirtualMemory.h"

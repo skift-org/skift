@@ -6,7 +6,7 @@
 #undef LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
 #undef LODEPNG_NO_COMPILE_DISK
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/File.h>

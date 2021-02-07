@@ -1,8 +1,8 @@
 #include <libmarkup/Markup.h>
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/utils/NumberParser.h>
 #include <libutils/Scanner.h>
+#include <string.h>
 
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>

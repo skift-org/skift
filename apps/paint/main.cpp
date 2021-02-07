@@ -1,4 +1,4 @@
-#include <libsystem/Assert.h>
+#include <assert.h>
 
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>

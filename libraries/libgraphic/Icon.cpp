@@ -1,9 +1,10 @@
+#include <assert.h>
 #include <libgraphic/Icon.h>
-#include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
 #include <libutils/HashMap.h>
 #include <libutils/Path.h>
+#include <stdio.h>
+#include <string.h>
 
 static HashMap<String, RefPtr<Icon>> _icons{};
 

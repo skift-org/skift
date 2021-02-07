@@ -26,16 +26,6 @@ void __plug_logger_unlock();
 
 void __no_return __plug_logger_fatal();
 
-/* --- Memory allocator ----------------------------------------------------- */
-
-void __plug_memory_lock();
-
-void __plug_memory_unlock();
-
-void *__plug_memory_alloc(size_t size);
-
-void __plug_memory_free(void *address, size_t size);
-
 /* --- File system ---------------------------------------------------------- */
 
 Result __plug_filesystem_link(const char *oldpath, const char *newpath);

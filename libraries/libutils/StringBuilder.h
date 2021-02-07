@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/Common.h>
 #include <libsystem/math/MinMax.h>
 #include <libsystem/unicode/Codepoint.h>

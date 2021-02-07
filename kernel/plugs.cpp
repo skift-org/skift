@@ -1,6 +1,6 @@
 #include <libsystem/core/Plugs.h>
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>

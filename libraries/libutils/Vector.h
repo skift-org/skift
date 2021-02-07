@@ -3,7 +3,8 @@
 #include <initializer_list>
 #include <type_traits>
 
-#include <libsystem/core/CString.h>
+#include <string.h>
+
 #include <libsystem/math/MinMax.h>
 
 #include <libutils/Iteration.h>

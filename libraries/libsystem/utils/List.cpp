@@ -1,6 +1,6 @@
 
-#include <libsystem/core/CString.h>
 #include <libsystem/utils/List.h>
+#include <string.h>
 
 List *list_create()
 {

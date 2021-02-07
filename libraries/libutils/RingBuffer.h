@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
+#include <assert.h>
+#include <string.h>
 
 #include <libutils/Move.h>
 

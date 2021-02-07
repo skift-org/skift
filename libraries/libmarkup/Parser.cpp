@@ -1,12 +1,12 @@
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/unicode/Codepoint.h>
 #include <libsystem/utils/NumberParser.h>
 #include <libutils/Scanner.h>
 #include <libutils/ScannerUtils.h>
 #include <libutils/StringBuilder.h>
 #include <libutils/Strings.h>
+#include <string.h>
 
 #include <libmarkup/Markup.h>
 

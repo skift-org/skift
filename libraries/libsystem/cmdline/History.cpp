@@ -1,4 +1,4 @@
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/cmdline/History.h>
 #include <libsystem/utils/List.h>
 

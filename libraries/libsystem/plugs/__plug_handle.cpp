@@ -1,6 +1,5 @@
 #include <abi/Syscalls.h>
 
-#include <libsystem/core/CString.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/Filesystem.h>

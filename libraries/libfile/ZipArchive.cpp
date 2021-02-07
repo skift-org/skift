@@ -1,5 +1,5 @@
+#include <assert.h>
 #include <libfile/ZipArchive.h>
-#include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/compression/Deflate.h>
 #include <libsystem/compression/Inflate.h>
@@ -10,6 +10,7 @@
 #include <libsystem/io/MemoryWriter.h>
 #include <libsystem/io/ScopedReader.h>
 #include <libutils/Endian.h>
+#include <stdio.h>
 
 // Central header
 #define ZIP_END_OF_CENTRAL_DIR_HEADER_SIG 0x06054b50
@@ -220,7 +221,7 @@ void ZipArchive::read_archive()
     // A valid zip must atleast contain a "CentralDirectoryEndRecord"
     if (file_reader.length() < sizeof(CentralDirectoryEndRecord))
     {
-        printf("Archive is too small to be a valid .zip: %s %u", _path.string().cstring(), file_reader.length());
+        printf("Archive is too small to be a valid .zip: %s %u", _path.string().cstring(), (unsigned int)file_reader.length());
         return;
     }
 

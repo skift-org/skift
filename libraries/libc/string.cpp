@@ -1,21 +1,11 @@
 #include <libsystem/Common.h>
-#include <libsystem/core/CString.h>
-#include <libsystem/core/Printf.h>
-#include <libsystem/math/MinMax.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MIN(__x, __y) ((__x) < (__y) ? (__x) : (__y))
 
 /* --- snprintf ------------------------------------------------------------- */
-
-void string_printf_append(printf_info_t *info, char c)
-{
-    if (info->allocated == -1)
-    {
-        strapd((char *)info->output, c);
-    }
-    else
-    {
-        strnapd((char *)info->output, c, info->allocated);
-    }
-}
 
 int snprintf(char *s, size_t n, const char *fmt, ...)
 {
@@ -31,22 +21,14 @@ int snprintf(char *s, size_t n, const char *fmt, ...)
 
 int vsnprintf(char *s, size_t n, const char *fmt, va_list va)
 {
+    // TODO: implemt
+    __unused(s);
+    __unused(n);
+    __unused(fmt);
+    __unused(va);
 
-    if (n == 0)
-    {
-        return 0;
-    }
-
-    printf_info_t info = {};
-
-    info.format = fmt;
-    info.append = string_printf_append;
-    info.output = (char *)s;
-    info.allocated = n;
-
-    // We need it to start with a 0 because we use strapd.
-    s[0] = '\0';
-    return __printf(&info, va);
+    __builtin_unreachable();
+    return 0;
 }
 
 // mem* functions ----------------------------------------------------------- //
@@ -313,12 +295,6 @@ size_t strcspn(const char *string, const char *chars)
     return s - string;
 }
 
-const char *strerror(int errnum)
-{
-    __unused(errnum);
-    return "Error";
-}
-
 size_t strlen(const char *str)
 {
     size_t length = 0;
@@ -351,7 +327,6 @@ char *strpbrk(const char *s, const char *accept)
 
 char *strrchr(const char *s, int c)
 {
-
     char *rtnval = 0;
 
     do

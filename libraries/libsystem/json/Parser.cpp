@@ -1,5 +1,4 @@
-#include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
+#include <assert.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/json/Json.h>
 #include <libsystem/unicode/Codepoint.h>
@@ -8,6 +7,7 @@
 #include <libutils/ScannerUtils.h>
 #include <libutils/StringBuilder.h>
 #include <libutils/Strings.h>
+#include <string.h>
 
 namespace json
 {

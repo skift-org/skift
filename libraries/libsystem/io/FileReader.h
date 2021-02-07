@@ -8,12 +8,12 @@
 class FileReader final : public SeekableReader
 {
 private:
-    system::Handle _handle;
+    sk::system::Handle _handle;
 
 public:
     FileReader(const char *path);
     FileReader(Path &path);
-    FileReader(system::Handle &&handle);
+    FileReader(sk::system::Handle &&handle);
 
     virtual size_t length() override;
     virtual size_t position() override;

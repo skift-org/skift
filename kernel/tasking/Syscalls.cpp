@@ -1,4 +1,4 @@
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/BuildInfo.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>

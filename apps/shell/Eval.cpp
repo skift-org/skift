@@ -1,4 +1,4 @@
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/File.h>

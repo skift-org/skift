@@ -1,11 +1,11 @@
 
-#include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
+#include <assert.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/process/Environment.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 #include <libutils/Path.h>
+#include <string.h>
 
 Launchpad *launchpad_create(const char *name, const char *executable)
 {

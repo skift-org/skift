@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 
 struct Slice
 {

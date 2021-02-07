@@ -1,9 +1,9 @@
 
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
 #include <libsystem/unicode/UnicodeString.h>
 #include <libsystem/utils/BufferBuilder.h>
+#include <string.h>
 
 static void unicode_string_ensure_capacity(UnicodeString *string, size_t size)
 {

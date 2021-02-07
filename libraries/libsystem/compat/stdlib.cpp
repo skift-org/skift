@@ -1,13 +1,11 @@
+#include <assert.h>
 #include <ctype.h>
 #include <limits.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <abi/Syscalls.h>
-
-#include <libsystem/core/CString.h>
-#include <libsystem/process/Process.h>
-#include <libsystem/utils/NumberParser.h>
 
 void abort(void)
 {
@@ -35,18 +33,35 @@ int atoi(const char *str)
     return neg ? n : -n;
 }
 
-long int strtol(const char *nptr, char **endptr, int base)
+long int strtol(const char *str, char **end, int base)
 {
-    int value;
-    parse_int({base}, nptr, (uintptr_t)endptr - (uintptr_t)nptr, &value);
-    return value;
+    // skip leading space
+    while (*str)
+    {
+        if (*str == '+')
+            str++;
+        if (!isspace(*str))
+            break;
+        str++;
+    }
+
+    bool negative = false;
+    if (*str == '-')
+    {
+        negative = true;
+        str++;
+    }
+
+    unsigned long number = strtoul(str, end, base);
+    if (negative)
+        return static_cast<long>((~number) + 1);
+    return number;
 }
 
-long long int strtoll(const char *nptr, char **endptr, int base)
+long long int strtoll(const char *str, char **end, int base)
 {
-    int value;
-    parse_int({base}, nptr, (uintptr_t)endptr - (uintptr_t)nptr, &value);
-    return value;
+    // TODO: implement this properly
+    return (long long)strtol(str, end, base);
 }
 
 char *getenv(const char *name)
@@ -64,23 +79,9 @@ void exit(int status)
 
 int system(const char *command)
 {
-    int pid = -1;
-    auto result = process_run(command, &pid);
-
-    if (result != SUCCESS)
-    {
-        return -1;
-    }
-
-    int exit_value = -1;
-    result = process_wait(pid, &exit_value);
-
-    if (result != SUCCESS)
-    {
-        return -1;
-    }
-
-    return exit_value;
+    __unused(command);
+    // TODO: implement this
+    return -1;
 }
 
 double strtod(const char *nptr, char **endptr)

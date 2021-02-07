@@ -1,8 +1,7 @@
 
 #include <abi/Syscalls.h>
 
-#include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
+#include <assert.h>
 #include <libsystem/core/Plugs.h>
 #include <libutils/Path.h>
 

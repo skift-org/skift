@@ -1,6 +1,7 @@
-#include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
+#include <assert.h>
 #include <libwidget/utils/Variant.h>
+#include <stdio.h>
+#include <string.h>
 
 Variant::Variant(int value) : _type(VarianType::INT)
 {

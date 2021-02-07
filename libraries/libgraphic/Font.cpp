@@ -1,11 +1,11 @@
+#include <assert.h>
 #include <libgraphic/Font.h>
-#include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/io/File.h>
 #include <libutils/HashMap.h>
 #include <libutils/Path.h>
+#include <stdio.h>
 
 static HashMap<String, RefPtr<Font>> _fonts;
 

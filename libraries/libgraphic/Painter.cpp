@@ -1,7 +1,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 
 #include <libutils/Random.h>
 

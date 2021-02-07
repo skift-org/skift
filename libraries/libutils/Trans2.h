@@ -2,8 +2,8 @@
 
 #include <libutils/Vec2.h>
 
-#include <libsystem/core/CString.h>
 #include <math.h>
+#include <string.h>
 
 template <typename Scalar>
 class Trans2

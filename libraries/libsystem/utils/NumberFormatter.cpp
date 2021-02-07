@@ -1,8 +1,8 @@
-#include <libsystem/core/CString.h>
 #ifndef __KERNEL__
 #    include <math.h>
 #endif
 #include <libsystem/utils/NumberFormatter.h>
+#include <string.h>
 
 static const char *digits = "0123456789abcdefghijklmnopqrstuvwxyz";
 static const char *digits_capitalized = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";

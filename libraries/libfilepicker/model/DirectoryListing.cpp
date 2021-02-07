@@ -1,8 +1,9 @@
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/json/Json.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <libfilepicker/model/DirectoryListing.h>
 

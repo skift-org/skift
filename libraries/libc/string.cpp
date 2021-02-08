@@ -5,32 +5,6 @@
 
 #define MIN(__x, __y) ((__x) < (__y) ? (__x) : (__y))
 
-/* --- snprintf ------------------------------------------------------------- */
-
-int snprintf(char *s, size_t n, const char *fmt, ...)
-{
-    va_list va;
-    va_start(va, fmt);
-
-    int result = vsnprintf(s, n, fmt, va);
-
-    va_end(va);
-
-    return result;
-}
-
-int vsnprintf(char *s, size_t n, const char *fmt, va_list va)
-{
-    // TODO: implemt
-    __unused(s);
-    __unused(n);
-    __unused(fmt);
-    __unused(va);
-
-    __builtin_unreachable();
-    return 0;
-}
-
 // mem* functions ----------------------------------------------------------- //
 
 void *memchr(const void *str, int c, size_t n)

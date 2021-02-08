@@ -7,6 +7,8 @@
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 
+#include <stdio.h>
+
 int main(int argc, char **argv)
 {
     __unused(argc);

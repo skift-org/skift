@@ -1,5 +1,7 @@
 #include <libsystem/io/Stream.h>
 
+#include <stdio.h>
+
 int main(int argc, char **argv)
 {
     if (argc == 1)
@@ -22,7 +24,7 @@ int main(int argc, char **argv)
 
     while ((read = stream_read(stream, buffer, 16)) != 0)
     {
-        printf("%08x ", offset * 16);
+        printf("%08x ", (unsigned int)offset * 16);
         for (unsigned char i : buffer)
         {
             printf("%02x ", i);

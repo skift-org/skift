@@ -3,6 +3,7 @@
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/io/Stream.h>
 #include <libutils/Path.h>
+#include <stdio.h>
 
 static bool ignore_fail_on_non_empty = false,
             remove_parents = false,

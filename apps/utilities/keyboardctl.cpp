@@ -4,11 +4,12 @@
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/cmdline/CMDLine.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
+
+#include <stdio.h>
 
 bool option_get;
 bool option_list;

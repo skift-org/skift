@@ -4,7 +4,7 @@
 
 #include <abi/Syscalls.h>
 
-#include <libsystem/thread/Lock.h>
+#include <libc/skift/Lock.h>
 
 static Lock _memory_lock{"memory_lock"};
 

@@ -1,9 +1,9 @@
 #include <libsystem/cmdline/CMDLine.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/Filesystem.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 
 static bool parent = false;
 static bool verbose = false;

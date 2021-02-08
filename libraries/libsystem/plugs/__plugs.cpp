@@ -5,7 +5,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/system/Memory.h>
-#include <libsystem/thread/Lock.h>
+#include <libc/skift/Lock.h>
 
 static Lock _logger_lock{"logger_lock"};
 

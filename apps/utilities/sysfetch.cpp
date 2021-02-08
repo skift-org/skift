@@ -1,6 +1,7 @@
 #include <abi/Syscalls.h>
 
 #include <libsystem/io/Stream.h>
+#include <stdio.h>
 
 int main(int argc, char **argv)
 {
@@ -61,7 +62,7 @@ int main(int argc, char **argv)
     printf("\e[16C SHELL: /Applications/shell\n");
     printf("\e[16C TERMINAL: /Applications/terminal\n");
     printf("\e[16C COMPOSITOR: /Applications/compositor\n");
-    printf("\e[16C MEMORY: \e[m%dMib / %dMib\n", status.used_ram / (1024 * 1024), status.total_ram / (1024 * 1024));
+    printf("\e[16C MEMORY: \e[m%dMib / %dMib\n", (int)(status.used_ram / (1024 * 1024)), (int)(status.total_ram / (1024 * 1024)));
 
     printf("\n");
     printf("\e[16C \e[40m  \e[41m  \e[42m  \e[43m  \e[44m  \e[45m  \e[46m  \e[47m  \e[m\n");

@@ -2,9 +2,10 @@
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/cmdline/CMDLine.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/Stream.h>
+
+#include <stdio.h>
 
 static bool option_all = false;
 static bool option_list = false;
@@ -46,7 +47,7 @@ void ls_print_entry(DirectoryEntry *entry)
 
     if (option_list)
     {
-        printf("%srwxrwxrwx %5d ", file_type_name[stat->type], stat->size);
+        printf("%srwxrwxrwx %5d ", file_type_name[stat->type], (int)stat->size);
     }
 
     if (option_all || entry->name[0] != '.')

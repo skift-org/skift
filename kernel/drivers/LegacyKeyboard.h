@@ -1,7 +1,7 @@
 #pragma once
 
 #include <abi/Keyboard.h>
-#include <libsystem/thread/Lock.h>
+#include <libc/skift/Lock.h>
 #include <libutils/RingBuffer.h>
 
 #include "kernel/devices/LegacyDevice.h"

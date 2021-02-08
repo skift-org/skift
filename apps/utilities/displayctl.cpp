@@ -2,11 +2,13 @@
 
 #include <libsystem/Result.h>
 #include <libsystem/cmdline/CMDLine.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Socket.h>
 #include <libsystem/io/Stream.h>
+
+#include <stdio.h>
+#include <string.h>
 
 #include "compositor/Protocol.h"
 

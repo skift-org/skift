@@ -1,7 +1,7 @@
 #ifndef __KERNEL__
 #    include <math.h>
 #endif
-#include <libsystem/utils/NumberFormatter.h>
+#include <libc/skift/NumberFormatter.h>
 #include <string.h>
 
 static const char *digits = "0123456789abcdefghijklmnopqrstuvwxyz";

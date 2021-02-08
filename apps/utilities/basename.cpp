@@ -1,18 +1,15 @@
-#include <libsystem/io/Stream.h>
-#include <libsystem/process/Process.h>
+#include <libsystem/io_new/Streams.h>
 #include <libutils/Path.h>
-#include <stdio.h>
 
 int main(int argc, char **argv)
 {
     if (argc == 1)
     {
-        stream_format(err_stream, "usage: %s path\n", argv[0]);
+        System::errln("usage: %s path", argv[0]);
         return PROCESS_FAILURE;
     }
 
-    auto path = Path::parse(argv[1]);
-    printf("%s\n", path.basename().cstring());
+    System::outln("{}", Path::parse(argv[1]).basename());
 
     return PROCESS_SUCCESS;
 }

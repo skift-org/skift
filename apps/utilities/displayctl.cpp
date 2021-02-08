@@ -6,9 +6,7 @@
 #include <libsystem/io/File.h>
 #include <libsystem/io/Socket.h>
 #include <libsystem/io/Stream.h>
-
-#include <stdio.h>
-#include <string.h>
+#include <libsystem/io_new/Streams.h>
 
 #include "compositor/Protocol.h"
 
@@ -42,37 +40,32 @@ static CommandLine cmdline = CMDLINE(
 
 /* --- gfxmode logic -------------------------------------------------------- */
 
-struct SupportedMode
-{
-    const char *name;
-    IOCallDisplayModeArgs info;
+static const IOCallDisplayModeArgs GFX_MODES[] = {
+    {640, 360},
+    {800, 600},
+    {1024, 768},
+    {1280, 720},
+    {1280, 800},
+    {1280, 1024},
+    {1360, 768},
+    {1366, 768},
+    {1920, 1080},
+    {3840, 2160},
 };
 
-SupportedMode gfxmodes[] = {
-    {"640x360", {640, 360}},
-    {"800x600", {800, 600}},
-    {"1024x768", {1024, 768}},
-    {"1280x720", {1280, 720}},
-    {"1280x800", {1280, 800}},
-    {"1280x1024", {1280, 1024}},
-    {"1360x768", {1360, 768}},
-    {"1366x768", {1366, 768}},
-    {"1920x1080", {1920, 1080}},
-    {"3840x2160", {3840, 2160}},
-    {nullptr, {0, 0}},
-};
-
-IOCallDisplayModeArgs *gfxmode_by_name(const char *name)
+Optional<IOCallDisplayModeArgs> gfxmode_by_name(String name)
 {
-    for (int i = 0; gfxmodes[i].name; i++)
+    for (size_t i = 0; i < __array_length(GFX_MODES); i++)
     {
-        if (strcmp(gfxmodes[i].name, name) == 0)
+        auto &gfx_mode = GFX_MODES[i];
+
+        if (String::format("{}x{}", gfx_mode.width, gfx_mode.height) == name)
         {
-            return &gfxmodes[i].info;
+            return gfx_mode;
         }
     }
 
-    return nullptr;
+    return {};
 }
 
 int gfxmode_get(Stream *framebuffer_device)
@@ -82,90 +75,88 @@ int gfxmode_get(Stream *framebuffer_device)
     if (stream_call(framebuffer_device, IOCALL_DISPLAY_GET_MODE, &framebuffer_info) < 0)
     {
         handle_printf_error(framebuffer_device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
-        return -1;
+        return PROCESS_FAILURE;
     }
 
     printf("Height: %d\nWidth: %d\n",
            framebuffer_info.width,
            framebuffer_info.height);
 
-    return 0;
+    return PROCESS_SUCCESS;
 }
 
-int gfxmode_set_compositor(IOCallDisplayModeArgs *mode)
+int gfxmode_set_compositor(IOCallDisplayModeArgs mode)
 {
     Connection *compositor_connection = socket_connect("/Session/compositor.ipc");
 
     if (handle_has_error(compositor_connection))
     {
         handle_printf_error(compositor_connection, "Failed to connect to the compositor (Failling back on iocall)");
-        return -1;
+        return PROCESS_FAILURE;
     }
 
     CompositorMessage message = (CompositorMessage){
         .type = COMPOSITOR_MESSAGE_SET_RESOLUTION,
         .set_resolution = {
-            mode->width,
-            mode->height,
+            mode.width,
+            mode.height,
         },
     };
 
     connection_send(compositor_connection, &message, sizeof(message));
 
-    return 0;
+    return PROCESS_SUCCESS;
 }
 
-int gfxmode_set_iocall(Stream *device, IOCallDisplayModeArgs *mode)
+int gfxmode_set_iocall(Stream *device, IOCallDisplayModeArgs mode)
 {
-    if (stream_call(device, IOCALL_DISPLAY_SET_MODE, mode) != SUCCESS)
+    if (stream_call(device, IOCALL_DISPLAY_SET_MODE, &mode) != SUCCESS)
     {
         handle_printf_error(device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
-        return -1;
+        return PROCESS_FAILURE;
     }
 
-    return 0;
+    return PROCESS_SUCCESS;
 }
 
-int gfxmode_set(Stream *device, const char *mode_name)
+int gfxmode_set(Stream *device, String mode_name)
 {
-    IOCallDisplayModeArgs *mode = gfxmode_by_name(mode_name);
+    auto mode = gfxmode_by_name(mode_name);
 
     if (!mode)
     {
-        printf("Error: unknow graphic mode: %s\n", mode_name);
-        return -1;
+        System::errln("Error: unknow graphic mode: {}", mode_name);
+        return PROCESS_FAILURE;
     }
 
-    int result = gfxmode_set_compositor(mode);
+    int result = gfxmode_set_compositor(*mode);
 
     if (result != 0)
     {
-        result = gfxmode_set_iocall(device, mode);
+        result = gfxmode_set_iocall(device, *mode);
     }
 
     if (result == 0)
     {
-        printf("Graphic mode set to: %s\n", mode_name);
-        return 0;
+        System::outln("Graphic mode set to: {}", mode_name);
+        return PROCESS_SUCCESS;
     }
     else
     {
-        return -1;
+        return PROCESS_FAILURE;
     }
 }
 
-int gfxmode_list(Stream *framebuffer_device)
+int gfxmode_list()
 {
-    // FIXME: check if the framebuffer device support the followings graphics modes.
-
-    __unused(framebuffer_device);
-
-    for (int i = 0; gfxmodes[i].name; i++)
+    for (size_t i = 0; i < __array_length(GFX_MODES); i++)
     {
-        printf("%s\n", gfxmodes[i].name);
+        auto &gfx_mode = GFX_MODES[i];
+
+        System::outln("- {}x{}", gfx_mode.width, gfx_mode.height);
     }
 
-    return 0;
+    return PROCESS_SUCCESS;
 }
 
 /* --- Entry point ---------------------------------------------------------- */
@@ -179,7 +170,7 @@ int main(int argc, char **argv)
     if (handle_has_error(HANDLE(framebuffer_device)))
     {
         handle_printf_error(framebuffer_device, "displayctl: Failed to open " FRAMEBUFFER_DEVICE_PATH);
-        return -1;
+        return PROCESS_FAILURE;
     }
 
     if (option_get)
@@ -188,7 +179,7 @@ int main(int argc, char **argv)
     }
     else if (option_list)
     {
-        return gfxmode_list(framebuffer_device);
+        return gfxmode_list();
     }
     else if (option_set != nullptr)
     {

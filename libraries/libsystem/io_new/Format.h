@@ -12,19 +12,80 @@ namespace System
 
 struct Formating
 {
+    enum Align
+    {
+        LEFT,
+        CENTER,
+        RIGHT,
+    };
+
+    enum Type
+    {
+        DEFAULT,
+        STRING,
+        CHARACTER,
+        BINARY,
+        DECIMAL,
+        OCTAL,
+        HEXADECIMAL,
+    };
+
     bool prefix;
-    int base;
+    Type type = DEFAULT;
 
     static Formating parse(Scanner &scanner)
     {
+        Formating format;
+
+        scanner.skip('{');
+
+        auto parse_type = [&]() {
+            switch (scanner.current())
+            {
+            case 's':
+                format.type = STRING;
+                break;
+
+            case 'c':
+                format.type = CHARACTER;
+                break;
+
+            case 'b':
+                format.type = BINARY;
+                break;
+
+            case 'd':
+                format.type = DECIMAL;
+                break;
+
+            case 'o':
+                format.type = OCTAL;
+                break;
+
+            case 'x':
+                format.type = HEXADECIMAL;
+                break;
+
+            default:
+                break;
+            }
+        };
+
+        if (scanner.current_is("scbdox"))
+        {
+            parse_type();
+            scanner.foreward();
+        }
+
         while (!scanner.ended() && scanner.current() != '}')
         {
+
             scanner.foreward();
         }
 
         scanner.skip('}');
 
-        return {};
+        return format;
     }
 };
 

@@ -7,9 +7,7 @@
 Placeholder::Placeholder(Widget *parent, String text)
     : Widget(parent), _alert_icon(Icon::get("alert"))
 {
-    char buffer[256];
-    snprintf(buffer, 256, "Cannot create an instance of \"%s\".", text.cstring());
-    _text = buffer;
+    _text = String::format("Cannot create an instance of \"{}\".", text);
 }
 
 void Placeholder::paint(Painter &painter, const Recti &)

@@ -3,9 +3,7 @@
 #include <stdio.h>
 
 constexpr auto PROLOGUE = "Output each NAME with its last non - slash component and trailing slashes removed.";
-
 constexpr auto OPTION_ZERO_DESCRIPTION = "End each output line with NUL, not newline.";
-
 constexpr auto EPILOGE = "If NAME contains no /'s, output '.' (meaning the current directory).";
 
 int main(int argc, char const *argv[])
@@ -32,7 +30,7 @@ int main(int argc, char const *argv[])
     {
         auto path = Path::parse(args.argv()[i]);
 
-        printf("%s%c", path.dirname().cstring(), terminator);
+        System::out("{}{c}", path.dirname(), terminator);
     }
 
     return PROCESS_SUCCESS;

@@ -1,13 +1,14 @@
 
-#include <libsystem/io/Stream.h>
-#include <stdio.h>
+#include <libsystem/io_new/Streams.h>
 
-int main(int argc, char **argv)
+int main(int, const char *[])
 {
-    __unused(argc);
-    __unused(argv);
-
-    printf("\e[H\e[2J");
-
-    return PROCESS_SUCCESS;
+    if (System::out("\e[H\e[2J").success())
+    {
+        return PROCESS_SUCCESS;
+    }
+    else
+    {
+        return PROCESS_FAILURE;
+    }
 }

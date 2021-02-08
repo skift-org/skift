@@ -3,6 +3,7 @@
 #include <libgraphic/ColorsNames.h>
 #include <libsystem/Common.h>
 #include <libsystem/math/Lerp.h>
+#include <libutils/String.h>
 
 struct Color
 {
@@ -138,8 +139,7 @@ public:
         };
     }
 
-    static Color parse(const char *name);
-    static Color parse(const char *name, size_t size);
+    static Color parse(String string);
 
     static constexpr Color blend(Color fg, Color gb)
     {

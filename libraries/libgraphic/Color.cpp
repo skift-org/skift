@@ -1,9 +1,9 @@
+#include <string.h>
 
 #include <libgraphic/Color.h>
 #include <libutils/NumberParser.h>
 #include <libutils/Scanner.h>
 #include <libutils/ScannerUtils.h>
-#include <string.h>
 
 struct ColorName
 {
@@ -28,14 +28,9 @@ static double number(Scanner &scan)
     return scan_float(scan);
 }
 
-Color Color::parse(const char *name)
+Color Color::parse(String string)
 {
-    return parse(name, strlen(name));
-}
-
-Color Color::parse(const char *name, size_t size)
-{
-    StringScanner scan{name, size};
+    StringScanner scan{string.cstring(), string.length()};
 
     auto parse_component = [&](StringScanner &scan) {
         whitespace(scan);
@@ -220,7 +215,7 @@ Color Color::parse(const char *name, size_t size)
     {
         for (const auto &_color_name : _color_names)
         {
-            if (strcmp(name, _color_name.name) == 0)
+            if (string == _color_name.name)
             {
                 return _color_name.color;
             }

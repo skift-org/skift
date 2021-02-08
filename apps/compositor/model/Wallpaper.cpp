@@ -28,7 +28,7 @@ Wallpaper::Wallpaper(Vec2i resolution)
     _setting_color = own<settings::Setting>("appearance:wallpaper.color", [this](auto &value) {
         if (value.is(json::STRING))
         {
-            _background = Color::parse(value.as_string().cstring());
+            _background = Color::parse(value.as_string());
         }
         else
         {

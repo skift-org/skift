@@ -38,6 +38,20 @@ static inline ResultOr<String> inln()
 }
 
 template <Formatable... Args>
+static ResultOr<size_t> print(Writer &writer, const char *fmt, Args... args)
+{
+    StringScanner scan{fmt, strlen(fmt)};
+    auto format_result = format(writer, scan, forward<Args>(args)...);
+
+    if (!format_result)
+    {
+        return format_result.result();
+    }
+
+    return *format_result;
+}
+
+template <Formatable... Args>
 static ResultOr<size_t> println(Writer &writer, const char *fmt, Args... args)
 {
     StringScanner scan{fmt, strlen(fmt)};
@@ -59,15 +73,33 @@ static ResultOr<size_t> println(Writer &writer, const char *fmt, Args... args)
 }
 
 template <Formatable... Args>
+static ResultOr<size_t> out(const char *fmt, Args... args)
+{
+    return print(out(), fmt, forward<Args>(args)...);
+}
+
+template <Formatable... Args>
 static ResultOr<size_t> outln(const char *fmt, Args... args)
 {
     return println(out(), fmt, forward<Args>(args)...);
 }
 
 template <Formatable... Args>
+static ResultOr<size_t> err(const char *fmt, Args... args)
+{
+    return print(err(), fmt, forward<Args>(args)...);
+}
+
+template <Formatable... Args>
 static ResultOr<size_t> errln(const char *fmt, Args... args)
 {
     return println(err(), fmt, forward<Args>(args)...);
+}
+
+template <Formatable... Args>
+static ResultOr<size_t> log(const char *fmt, Args... args)
+{
+    return print(log(), fmt, forward<Args>(args)...);
 }
 
 template <Formatable... Args>

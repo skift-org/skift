@@ -70,7 +70,7 @@ public:
         return make<SliceStorage>(SliceStorage::ADOPT, (void *)result, size);
     }
 
-    Result write(uint8_t v) override
+    ResultOr<size_t> write(uint8_t v) override
     {
         if (_size == 0)
         {
@@ -94,7 +94,7 @@ public:
         _buffer[_used] = v;
         _used++;
 
-        return SUCCESS;
+        return 1;
     }
 
     ResultOr<size_t> write(const void *buffer, size_t size) override

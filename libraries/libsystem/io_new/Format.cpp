@@ -11,14 +11,28 @@ ResultOr<size_t> Format::format(Writer &writer)
     return System::format(writer, "Object({#x})", reinterpret_cast<uintptr_t>(this));
 }
 
-ResultOr<size_t> format(Writer &writer, const Formating &, char value)
+ResultOr<size_t> format(Writer &writer, const Formating &formating, char value)
 {
-    return NumberFormat::decimal().format(writer, (int64_t)value);
+    if (formating.type == Formating::CHARACTER)
+    {
+        return writer.write(value);
+    }
+    else
+    {
+        return NumberFormat::decimal().format(writer, (int64_t)value);
+    }
 }
 
-ResultOr<size_t> format(Writer &writer, const Formating &, unsigned char value)
+ResultOr<size_t> format(Writer &writer, const Formating &formating, unsigned char value)
 {
-    return NumberFormat::decimal().format(writer, (uint64_t)value);
+    if (formating.type == Formating::CHARACTER)
+    {
+        return writer.write(value);
+    }
+    else
+    {
+        return NumberFormat::decimal().format(writer, (uint64_t)value);
+    }
 }
 
 ResultOr<size_t> format(Writer &writer, const Formating &, short int value)

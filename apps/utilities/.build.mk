@@ -1,7 +1,4 @@
 UTILITIES = \
-	__TESTEXEC \
-	__TESTIO \
-	__TESTTERM \
 	BASENAME \
 	CAT \
 	CLEAR \
@@ -44,15 +41,6 @@ UTILITIES = \
 	UPTIME \
 	YES \
 	ZIP
-
-__TESTEXEC_LIBS =
-__TESTEXEC_NAME = __testexec
-
-__TESTIO_LIBS =
-__TESTIO_NAME = __testio
-
-__TESTTERM_LIBS =
-__TESTTERM_NAME = __testterm
 
 BASENAME_LIBS =
 BASENAME_NAME = basename

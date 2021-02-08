@@ -1,12 +1,8 @@
+#include <libsystem/io_new/Streams.h>
 #include <skift/Environment.h>
-#include <stdio.h>
 
-#include <libsystem/io/Stream.h>
-
-int main(int argc, char const *argv[])
+int main(int, char const *[])
 {
-    __unused(argc);
-    __unused(argv);
-    printf("%s", environment_copy().cstring());
+    System::outln("{}", environment_copy());
     return PROCESS_SUCCESS;
 }

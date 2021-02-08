@@ -6,12 +6,12 @@
  *                          http://nyancat.dakko.us
  */
 
-#include "nyancat/animation.h"
-#include <libsystem/io/Stream.h>
+#include <stdio.h>
+
 #include <libsystem/process/Process.h>
 #include <libsystem/system/System.h>
 
-#include <stdio.h>
+#include "nyancat/animation.h"
 
 /*
  * Color palette to use for final output
@@ -83,7 +83,7 @@ char using_automatic_height = 0;
  */
 void finish()
 {
-    printf("\033[0m\n");
+    System::out("\033[0m\n");
     process_exit(PROCESS_SUCCESS);
 }
 
@@ -91,7 +91,7 @@ void newline(int n)
 {
     for (int i = 0; i < n; ++i)
     {
-        printf("\n");
+        System::out("\n");
     }
 }
 
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
     colors['*'] = "\033[100m"; /* Gray cat face */
     colors['%'] = "\033[105m"; /* Pink cheeks */
 
-    printf("\033[H\033[2J");
+    System::out("\033[H\033[2J");
 
     size_t i = 0;  /* Current frame # */
     char last = 0; /* Last color index rendered */
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
         }
 
         /* Reset cursor */
-        printf("\033[H");
+        System::out("\033[H");
 
         /* Render the frame */
         for (y = min_row; y < max_row; ++y)
@@ -197,12 +197,12 @@ int main(int argc, char **argv)
                 {
                     /* Normal Mode, send escape (because the color changed) */
                     last = color;
-                    printf("%s%s", colors[(int)color], output);
+                    System::out("{}{}", colors[(int)color], output);
                 }
                 else
                 {
                     /* Same color, just send the output characters */
-                    printf("%s", output);
+                    System::out(output);
                 }
             }
 
@@ -213,11 +213,11 @@ int main(int argc, char **argv)
 
         while (width > 0)
         {
-            printf(" ");
+            System::out(" ");
             width--;
         }
 
-        printf("\033[1;37mYou have nyaned for %d seconds!\033[J\033[0m", (system_get_ticks() - start_time) / 1000);
+        System::out("\033[1;37mYou have nyaned for {} seconds!\033[J\033[0m", (system_get_ticks() - start_time) / 1000);
 
         last = 0;
 

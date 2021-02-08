@@ -136,7 +136,7 @@ void theme_load(const char *path)
 
         if (color.is(json::STRING))
         {
-            _theme_colors[i] = Color::parse(color.as_string().cstring());
+            _theme_colors[i] = Color::parse(color.as_string());
         }
     }
 }

@@ -14,10 +14,7 @@ DateAndTime::DateAndTime(Widget *parent) : Button(parent, Button::TEXT)
         TimeStamp timestamp = timestamp_now();
         DateTime datetime = timestamp_to_datetime(timestamp);
 
-        char buffer[256];
-        snprintf(buffer, 256, "%02d:%02d:%02d ", datetime.hour, datetime.minute, datetime.second);
-
-        label->text(buffer);
+        label->text(String::format("{02d}:{02d}:{02d}", datetime.hour, datetime.minute, datetime.second));
     });
 
     _timer->start();

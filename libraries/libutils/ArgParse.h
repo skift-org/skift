@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libsystem/io_new/Streams.h>
 #include <libsystem/process/Process.h>
 
 #include <libutils/Callback.h>
@@ -168,20 +169,19 @@ public:
     {
         if (!_prologue.null_or_empty())
         {
-            printf("%s\n", _prologue.cstring());
-            printf("\n");
+            System::outln("{}\n", _prologue);
         }
 
         if (_usages.any())
         {
-            printf("\e[1mUsages:\e[0m\n");
+            System::outln("\e[1mUsages:\e[0m");
 
             for (size_t i = 0; i < _usages.count(); i++)
             {
-                printf("    %s %s\n", _name.cstring(), _usages[i].cstring());
+                System::outln("    {} {}", _name, _usages[i]);
             }
 
-            printf("\n");
+            System::outln("");
         }
 
         if (_option.any())
@@ -202,35 +202,35 @@ public:
 
             auto padding = compute_padding(_option);
 
-            printf("\e[1mOptions:\e[0m\n");
+            System::outln("\e[1mOptions:\e[0m");
 
             for (size_t i = 0; i < _option.count(); i++)
             {
                 auto &opt = _option[i];
 
-                printf("    ");
+                System::out().write("    ");
 
                 if (opt.shortname != '\0')
                 {
-                    printf("-%c", opt.shortname);
+                    System::format(System::out(), "-{c}", opt.shortname);
                 }
                 else
                 {
-                    printf("  ");
+                    System::out().write("  ");
                 }
 
                 if (opt.shortname && !opt.longname.null_or_empty())
                 {
-                    printf(", ");
+                    System::out().write(", ");
                 }
                 else
                 {
-                    printf("  ");
+                    System::out().write("  ");
                 }
 
                 if (!opt.longname.null_or_empty())
                 {
-                    printf("--%s", opt.longname.cstring());
+                    System::format(System::out(), "--{}", opt.longname);
 
                     if (padding > opt.longname.length())
                     {
@@ -238,7 +238,7 @@ public:
 
                         for (size_t i = 0; i < computed_padding; i++)
                         {
-                            printf(" ");
+                            System::out().write(" ");
                         }
                     }
                 }
@@ -246,31 +246,30 @@ public:
                 {
                     for (size_t i = 0; i < padding; i++)
                     {
-                        printf(" ");
+                        System::out().write(" ");
                     }
                 }
 
                 if (!opt.description.null_or_empty())
                 {
-                    printf(" ");
-                    printf("%s", opt.description.cstring());
+                    System::format(System::out(), " {}", opt.description);
                 }
 
-                printf("\n");
+                System::out().write("\n");
             }
 
-            printf("\n");
+            System::out().write("\n");
         }
 
         if (!_epiloge.null_or_empty())
         {
-            printf("%s\n", _epiloge.cstring());
+            System::outln("{}", _epiloge);
         }
     }
 
     void fail()
     {
-        stream_format(err_stream, "Try '%s --help' for more information.\n", _name.cstring());
+        System::errln("Try '{} --help' for more information.\n", _name);
 
         if (_should_abort_on_failure)
         {
@@ -280,13 +279,13 @@ public:
 
     void usage()
     {
-        stream_format(err_stream, "%s: missing operand.\n", _name.cstring());
+        System::errln("{}: missing operand.", _name.cstring());
         fail();
     }
 
     void invalid_option(String option)
     {
-        stream_format(err_stream, "%s: invalide option '%s'!\n", _name.cstring(), option.cstring());
+        System::errln("{}: invalide option '{}'!", _name.cstring(), option.cstring());
         fail();
     }
 

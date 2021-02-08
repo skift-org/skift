@@ -16,14 +16,14 @@ public:
 
     virtual ResultOr<size_t> write(const void *buffer, size_t size) = 0;
 
-    virtual Result write(char v)
+    virtual ResultOr<size_t> write(char v)
     {
-        return write(&v, 1).result();
+        return write(&v, 1);
     }
 
-    virtual Result write(uint8_t v)
+    virtual ResultOr<size_t> write(uint8_t v)
     {
-        return write(&v, 1).result();
+        return write(&v, 1);
     }
 
     ResultOr<size_t> write(const char *buffer)

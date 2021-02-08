@@ -90,6 +90,8 @@ int loadkey_get_keymap(System::Handle &keyboard_device)
 int main(int argc, const char *argv[])
 {
     ArgParse args{};
+    args.should_abort_on_failure();
+    args.show_help_if_no_option_given();
 
     args.prologue("Get or set the current keyboard keymap");
 

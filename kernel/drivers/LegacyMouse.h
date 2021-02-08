@@ -1,7 +1,7 @@
 #pragma once
 
 #include <abi/Mouse.h>
-#include <libsystem/thread/Lock.h>
+#include <libc/skift/Lock.h>
 #include <libutils/RingBuffer.h>
 #include <libutils/Array.h>
 

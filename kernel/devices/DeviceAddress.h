@@ -1,8 +1,8 @@
 #pragma once
 
 #include <assert.h>
-#include <libsystem/core/CString.h>
 #include <libutils/Iteration.h>
+#include <stdio.h>
 
 #include "kernel/bus/LegacyAddress.h"
 #include "kernel/bus/PCIAddress.h"

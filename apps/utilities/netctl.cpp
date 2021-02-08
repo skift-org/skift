@@ -1,5 +1,6 @@
-#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
+#include <stdio.h>
+#include <string.h>
 
 int main(int argc, char **argv)
 {

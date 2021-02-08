@@ -1,4 +1,4 @@
-#include <libsystem/core/CString.h>
+#include <string.h>
 #include <libsystem/io/Stream.h>
 
 int matchstar(int c, char *re, char *text);

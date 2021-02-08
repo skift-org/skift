@@ -1,6 +1,6 @@
 #include <libsystem/json/Json.h>
-#include <libsystem/utils/NumberFormatter.h>
 #include <libutils/StringBuilder.h>
+#include <libc/skift/NumberFormatter.h>
 
 namespace json
 {

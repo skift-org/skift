@@ -1,9 +1,10 @@
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/json/Json.h>
 #include <libsystem/process/Launchpad.h>
 #include <libutils/Path.h>
+
+#include <stdio.h>
 
 #define FILE_EXTENSIONS_DATABASE_PATH "/Configs/open/file-extensions.json"
 #define FILE_TYPES_DATABASE_PATH "/Configs/open/file-types.json"

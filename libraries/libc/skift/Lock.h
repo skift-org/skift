@@ -1,7 +1,8 @@
 #pragma once
 
-#include <libsystem/Logger.h>
-#include <libsystem/process/Process.h>
+#include <abi/Syscalls.h>
+
+#include <assert.h>
 
 class Lock
 {
@@ -17,11 +18,8 @@ private:
 
     void ensure_failed(const char *raison, __SOURCE_LOCATION__ location)
     {
-        logger_error("Ensuring lock{%s} at %s:%s() ln%d failled due of '%s'", name(), location.file, location.function, location.line, raison);
-        logger_info("- acquired at %s:%s() ln%d", acquire_location().file, acquire_location().function, acquire_location().line);
-        logger_info("- release at %s:%s() ln%d", acquire_location().file, acquire_location().function, acquire_location().line);
-        logger_fatal("Aborting now!");
-
+        __unused(raison);
+        __unused(location);
         ASSERT_NOT_REACHED();
     }
 
@@ -51,6 +49,13 @@ public:
 
     constexpr Lock(const char *name) : _name{name}
     {
+    }
+
+    int process_this()
+    {
+        int pid = 0;
+        hj_process_this(&pid);
+        return pid;
     }
 
     void acquire(__SOURCE_LOCATION__ location)

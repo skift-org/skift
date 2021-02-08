@@ -51,5 +51,6 @@ size_t strxfrm(char *dest, const char *src, size_t n);
 // Skift extensions, will be removed
 void strrvs(char *str);
 void strnapd(char *str, char c, size_t n);
+void strapd(char *str, char c);
 
 __END_HEADER

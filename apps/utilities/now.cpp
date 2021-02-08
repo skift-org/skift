@@ -2,6 +2,8 @@
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Stream.h>
 
+#include <stdio.h>
+
 static bool option_time = false;
 static bool option_date = false;
 static bool option_epoch = false;

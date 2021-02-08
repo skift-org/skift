@@ -1,5 +1,6 @@
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Stream.h>
+#include <stdio.h>
 
 #define BUFFER_SIZE 1024
 

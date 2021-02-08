@@ -9,6 +9,8 @@
 #include <libutils/Traits.h>
 #include <libutils/Vector.h>
 
+#include <stdio.h>
+
 class ArgParseContext
 {
 private:

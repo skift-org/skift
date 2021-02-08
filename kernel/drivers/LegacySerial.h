@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/thread/Lock.h>
+#include <libc/skift/Lock.h>
 #include <libutils/RingBuffer.h>
 
 #include "archs/x86/kernel/COM.h"

@@ -2,7 +2,7 @@
 #include <libfile/ZipArchive.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Filesystem.h>
-#include <libsystem/io/Stream.h>
+#include <libsystem/io_new/Streams.h>
 #include <libutils/ArgParse.h>
 #include <libutils/Path.h>
 
@@ -20,12 +20,12 @@ int main(int argc, char const *argv[])
 
     // Unzip all archives that were passed as arguments
     args.argv().foreach ([&](auto &path) {
-        stream_format(err_stream, "%s: Unzip '%s'\n", argv[0], path.cstring());
+        System::errln("{}: Unzip '{}'", argv[0], path);
 
         File file{path};
         if (!file.exist())
         {
-            stream_format(err_stream, "%s: File does not exist '%s'", argv[0], path.cstring());
+            System::errln("{}: File does not exist '{}'", argv[0], path);
             process_exit(PROCESS_FAILURE);
             return Iteration::STOP;
         }
@@ -34,7 +34,7 @@ int main(int argc, char const *argv[])
 
         if (!archive->valid())
         {
-            stream_format(err_stream, "%s: Failed to read zip archive '%s'", argv[0], path.cstring());
+            System::errln("{}: Failed to read zip archive '{}'", argv[0], path);
             process_exit(PROCESS_FAILURE);
             return Iteration::STOP;
         }
@@ -42,12 +42,12 @@ int main(int argc, char const *argv[])
         unsigned int i = 0;
         for (const auto &entry : archive->entries())
         {
-            stream_format(err_stream, "%s: Entry: %s is being extracted...\n", argv[0], entry.name.cstring());
+            System::outln("{}: Entry: {} is being extracted...", argv[0], entry.name);
 
             auto result = archive->extract(i, entry.name.cstring());
             if (result != Result::SUCCESS)
             {
-                stream_format(err_stream, "%s: Failed to extract entry '%s' with error '%s'", argv[0], entry.name.cstring(), get_result_description(result));
+                System::errln("{}: Failed to extract entry '{}' with error '{}'", argv[0], entry.name, get_result_description(result));
                 process_exit(PROCESS_FAILURE);
             }
             i++;

@@ -80,7 +80,7 @@ ResultOr<size_t> format(Writer &writer, const Formating &, const char *cstring)
     return writer.write(cstring);
 }
 
-ResultOr<size_t> format(Writer &writer, const Formating &, String string)
+ResultOr<size_t> format(Writer &writer, const Formating &, const String string)
 {
     return writer.write(string.cstring());
 }

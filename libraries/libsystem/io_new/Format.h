@@ -123,7 +123,7 @@ ResultOr<size_t> format(Writer &, const Formating &, double);
 
 ResultOr<size_t> format(Writer &, const Formating &, const char *);
 
-ResultOr<size_t> format(Writer &, const Formating &, String);
+ResultOr<size_t> format(Writer &, const Formating &, const String);
 
 static inline ResultOr<size_t> format(Writer &writer, Scanner &scanner)
 {

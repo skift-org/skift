@@ -21,8 +21,9 @@ private:
 public:
     const Optional<Path> &path() { return _path; }
 
-    File(const char *path);
-    File(Path &path);
+    File(const char *path, OpenFlag flags);
+    File(String path, OpenFlag flags);
+    File(Path &path, OpenFlag flags);
     File(System::Handle &&handle);
 
     ResultOr<size_t> read(void *buffer, size_t size) override;

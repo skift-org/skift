@@ -218,3 +218,26 @@ ResultOr<size_t> LegacyKeyboard::read(FsHandle &handle, void *buffer, size_t siz
 
     return _events.read((char *)buffer, (size / sizeof(KeyboardPacket)) * sizeof(KeyboardPacket));
 }
+
+Result LegacyKeyboard::call(FsHandle &, IOCall request, void *args)
+{
+    if (request == IOCALL_KEYBOARD_GET_KEYMAP)
+    {
+        memcpy(args, _keymap, sizeof(KeyMap));
+        return SUCCESS;
+    }
+    else if (request == IOCALL_KEYBOARD_SET_KEYMAP)
+    {
+        auto set_keymap = (IOCallKeyboardSetKeymapArgs *)args;
+
+        free(_keymap);
+        _keymap = (KeyMap *)malloc(set_keymap->size);
+        memcpy(_keymap, set_keymap->keymap, set_keymap->size);
+
+        return SUCCESS;
+    }
+    else
+    {
+        return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
+    }
+}

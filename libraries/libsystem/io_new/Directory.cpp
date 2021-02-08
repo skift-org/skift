@@ -13,6 +13,10 @@ void Directory::read_entries()
         _entries.push_back({entry.name, entry.stat});
         read_result = _handle.read(&entry, sizeof(entry));
     }
+
+    _entries.sort([](auto &left, auto &right) {
+        return strcmp(left.name.cstring(), right.name.cstring());
+    });
 }
 
 Directory::Directory(const char *path)

@@ -3,14 +3,20 @@
 namespace System
 {
 
-File::File(const char *path)
-    : _handle(path, OPEN_WRITE | OPEN_READ | OPEN_CREATE | OPEN_STREAM),
+File::File(const char *path, OpenFlag flags)
+    : _handle(path, flags | OPEN_STREAM),
       _path{Path::parse(path)}
 {
 }
 
-File::File(Path &path)
-    : _handle{path.string(), OPEN_WRITE | OPEN_READ | OPEN_CREATE | OPEN_STREAM},
+File::File(String path, OpenFlag flags)
+    : _handle(path, flags | OPEN_STREAM),
+      _path{Path::parse(path)}
+{
+}
+
+File::File(Path &path, OpenFlag flags)
+    : _handle{path.string(), flags | OPEN_STREAM},
       _path{path}
 {
 }

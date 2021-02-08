@@ -4,6 +4,7 @@
 #include <libutils/Rect.h>
 #include <libutils/RefPtr.h>
 #include <libutils/ResultOr.h>
+#include <libutils/String.h>
 
 #include <libgraphic/Color.h>
 
@@ -71,11 +72,11 @@ public:
 
     static RefPtr<Bitmap> create_static(int width, int height, Color *pixels);
 
-    static ResultOr<RefPtr<Bitmap>> load_from(const char *path);
+    static ResultOr<RefPtr<Bitmap>> load_from(String path);
 
-    static RefPtr<Bitmap> load_from_or_placeholder(const char *path);
+    static RefPtr<Bitmap> load_from_or_placeholder(String path);
 
-    Result save_to(const char *path);
+    Result save_to(String path);
 
     void set_pixel(Vec2i position, Color color)
     {

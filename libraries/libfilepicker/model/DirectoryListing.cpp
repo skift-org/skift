@@ -1,22 +1,20 @@
 #include <assert.h>
-#include <libsystem/Logger.h>
-#include <libsystem/io/Directory.h>
-#include <libutils/json/Json.h>
-#include <stdio.h>
 #include <string.h>
+
+#include <libsystem/Logger.h>
+#include <libsystem/io_new/Directory.h>
+#include <libutils/json/Json.h>
 
 #include <libfilepicker/model/DirectoryListing.h>
 
 namespace filepicker
 {
 
-static auto get_icon_for_node(String current_directory, DirectoryEntry *entry)
+static auto get_icon_for_node(String current_directory, System::Directory::Entry &entry)
 {
-    if (entry->stat.type == FILE_TYPE_DIRECTORY)
+    if (entry.stat.type == FILE_TYPE_DIRECTORY)
     {
-        char manifest_path[PATH_LENGTH];
-
-        snprintf(manifest_path, PATH_LENGTH, "%s/%s/manifest.json", current_directory.cstring(), entry->name);
+        auto manifest_path = String::format("{}/{}/manifest.json", current_directory, entry.name);
 
         auto root = json::parse_file(manifest_path);
 
@@ -32,13 +30,13 @@ static auto get_icon_for_node(String current_directory, DirectoryEntry *entry)
 
         return Icon::get("folder");
     }
-    else if (entry->stat.type == FILE_TYPE_PIPE ||
-             entry->stat.type == FILE_TYPE_DEVICE ||
-             entry->stat.type == FILE_TYPE_SOCKET)
+    else if (entry.stat.type == FILE_TYPE_PIPE ||
+             entry.stat.type == FILE_TYPE_DEVICE ||
+             entry.stat.type == FILE_TYPE_SOCKET)
     {
         return Icon::get("pipe");
     }
-    else if (entry->stat.type == FILE_TYPE_TERMINAL)
+    else if (entry.stat.type == FILE_TYPE_TERMINAL)
     {
         return Icon::get("console-network");
     }
@@ -132,28 +130,24 @@ void DirectoryListing::update()
 {
     _files.clear();
 
-    auto *directory = directory_open(_navigation->current().string().cstring(), OPEN_READ);
+    System::Directory directory{_navigation->current()};
 
-    if (handle_has_error(directory))
+    if (!directory.exist())
     {
-        directory_close(directory);
         return;
     }
 
-    DirectoryEntry entry;
-    while (directory_read(directory, &entry) > 0)
+    for (auto entry : directory.entries())
     {
         FileInfo node{
-            .name = {entry.name, FILE_NAME_LENGTH},
+            .name = entry.name,
             .type = entry.stat.type,
-            .icon = get_icon_for_node(_navigation->current().string(), &entry),
+            .icon = get_icon_for_node(_navigation->current().string(), entry),
             .size = entry.stat.size,
         };
 
         _files.push_back(node);
     }
-
-    directory_close(directory);
 
     did_update();
 }

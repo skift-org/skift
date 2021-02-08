@@ -2,10 +2,9 @@
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/cmdline/CMDLine.h>
-#include <libsystem/io/Directory.h>
 #include <libsystem/io/Stream.h>
-
-#include <stdio.h>
+#include <libsystem/io_new/Directory.h>
+#include <libsystem/io_new/Streams.h>
 
 static bool option_all = false;
 static bool option_list = false;
@@ -41,34 +40,33 @@ const char *file_type_name[] = {
     "p", // Pipe
 };
 
-void ls_print_entry(DirectoryEntry *entry)
+void ls_print_entry(System::Directory::Entry &entry)
 {
-    FileState *stat = &entry->stat;
+    FileState stat = entry.stat;
 
     if (option_list)
     {
-        printf("%srwxrwxrwx %5d ", file_type_name[stat->type], (int)stat->size);
+        System::format(System::out(), "{}rwxrwxrwx {5} ", file_type_name[stat.type], stat.size);
     }
 
-    if (option_all || entry->name[0] != '.')
+    if (option_all || entry.name[0] != '.')
     {
-        printf((stat->type == FILE_TYPE_DIRECTORY && option_color) ? "\e[1;34m%s\e[0m/ " : "%s  ", entry->name);
+        System::format(System::out(), (stat.type == FILE_TYPE_DIRECTORY && option_color) ? "\e[1;34m{}\e[0m/ " : "{}  ", entry.name);
     }
 
     if (option_list)
     {
-        printf("\n");
+        System::out().write("\n");
     }
 }
 
 Result ls(const char *target_path, bool with_prefix)
 {
-    Directory *directory = directory_open(target_path, OPEN_READ);
+    System::Directory directory{target_path};
 
-    if (handle_has_error(directory))
+    if (!directory.exist())
     {
-        directory_close(directory);
-        return handle_get_error(directory);
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
     if (with_prefix)
@@ -76,19 +74,15 @@ Result ls(const char *target_path, bool with_prefix)
         printf("%s:\n", target_path);
     }
 
-    DirectoryEntry entry;
-
-    while (directory_read(directory, &entry) > 0)
+    for (auto entry : directory.entries())
     {
-        ls_print_entry(&entry);
+        ls_print_entry(entry);
     }
 
     if (!option_list)
     {
         printf("\n");
     }
-
-    directory_close(directory);
 
     return SUCCESS;
 }

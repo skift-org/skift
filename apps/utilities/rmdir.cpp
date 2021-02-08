@@ -1,13 +1,13 @@
 #include <libsystem/cmdline/CMDLine.h>
-#include <libsystem/io/Directory.h>
 #include <libsystem/io/Filesystem.h>
-#include <libsystem/io/Stream.h>
+#include <libsystem/io_new/Directory.h>
+#include <libsystem/io_new/Streams.h>
 #include <libutils/Path.h>
 #include <stdio.h>
 
-static bool ignore_fail_on_non_empty = false,
-            remove_parents = false,
-            verbose = false;
+static bool force = false;
+static bool remove_parents = false;
+static bool verbose = false;
 
 static const char *usages[] = {
     "DIRECTORIES..."
@@ -18,8 +18,8 @@ static const char *usages[] = {
 static CommandLineOption options[] = {
     COMMANDLINE_OPT_HELP,
 
-    COMMANDLINE_OPT_BOOL("ignore-fail-on-non-empty", 'i', ignore_fail_on_non_empty,
-                         "ignore each failure that is solely because a directory is non-empty",
+    COMMANDLINE_OPT_BOOL("force", 'f', force,
+                         "ignore non-existent files and arguments",
                          COMMANDLINE_NO_CALLBACK),
     COMMANDLINE_OPT_BOOL("parents", 'p', remove_parents,
                          "remove DIRECTORY and its ancestors; e.g., 'rmdir -p a/b/c' is similar to 'rmdir a/b/c a/b a'",
@@ -36,43 +36,27 @@ static CommandLine cmdline = CMDLINE(
     "Remove the DIRECTORY(ies), if they are empty.",
     "Options can be combined.");
 
-Result rmdir(const char *path)
+Result rmdir(String path)
 {
-    if (!directory_exist(path))
-    {
-        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
-    }
+    System::Directory directory{path};
 
-    Directory *directory = directory_open(path, OPEN_READ);
-
-    if (handle_has_error(directory))
+    if (!force && directory.entries().any())
     {
-        directory_close(directory);
-        return ERR_NOT_READABLE;
-    }
-
-    DirectoryEntry entry;
-    if (directory_read(directory, &entry) > 0 && !ignore_fail_on_non_empty)
-    {
-        directory_close(directory);
         return ERR_DIRECTORY_NOT_EMPTY;
     }
 
-    directory_close(directory);
-    Result r = filesystem_unlink(path);
+    Result unlink_result = filesystem_unlink(path.cstring());
 
-    if (verbose)
+    if (unlink_result != SUCCESS)
     {
-        if (result_is_error(r))
-        {
-            printf("rmdir: failed to remove '%s': %s\n", path, get_result_description(r));
-        }
-        else
-        {
-            printf("rmdir: successfully removed '%s': %s\n", path, get_result_description(r));
-        }
+        System::errln("rmdir: successfully removed '{}': {}", path, get_result_description(unlink_result));
     }
-    return r;
+    else if (verbose)
+    {
+        System::errln("rmdir: successfully removed '{}': {}", path, get_result_description(unlink_result));
+    }
+
+    return unlink_result;
 }
 
 int main(int argc, char **argv)
@@ -89,11 +73,9 @@ int main(int argc, char **argv)
     {
         if (!remove_parents)
         {
-            auto result = rmdir(argv[i]);
-
-            if (result_is_error(result))
+            if (rmdir(argv[i]) != SUCCESS)
             {
-                printf("rmdir: failed to remove '%s': %s\n", argv[i], get_result_description(result));
+                return PROCESS_FAILURE;
             }
         }
         else
@@ -104,9 +86,9 @@ int main(int argc, char **argv)
             {
                 auto result = rmdir(path.string().cstring());
 
-                if (result_is_error(result))
+                if (result != SUCCESS)
                 {
-                    printf("rmdir: failed to remove '%s': %s\n", argv[i], get_result_description(result));
+                    return PROCESS_FAILURE;
                 }
 
                 path = path.dirpath();

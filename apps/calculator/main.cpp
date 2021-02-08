@@ -20,17 +20,13 @@ int main(int argc, char **argv)
 
     auto calculator_observer = calculator.observe([&](Calculator &calculator) {
         window->with_widget<Label>("screen", [&](Label *label) {
-            StringBuilder builder{};
-            NumberFormat::decimal().format(builder, calculator.screen());
-            label->text(builder.finalize());
+            label->text(String::format("{}", calculator.screen()));
         });
     });
 
     for (int i = 0; i < 10; i++)
     {
-        char button_name[10];
-        snprintf(button_name, 10, "button_%d", i);
-
+        auto button_name = String::format("button_{}", i);
         window->with_widget<Button>(button_name, [&](auto button) {
             button->on(Event::ACTION, [&, i](auto) { calculator.enter_number(i); });
         });

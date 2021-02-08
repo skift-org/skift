@@ -1,5 +1,6 @@
 UTILITIES = \
 	__TESTEXEC \
+	__TESTIO \
 	__TESTTERM \
 	BASENAME \
 	CAT \
@@ -46,6 +47,9 @@ UTILITIES = \
 
 __TESTEXEC_LIBS =
 __TESTEXEC_NAME = __testexec
+
+__TESTIO_LIBS =
+__TESTIO_NAME = __testio
 
 __TESTTERM_LIBS =
 __TESTTERM_NAME = __testterm

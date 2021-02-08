@@ -5,13 +5,30 @@
 #include <libutils/RefPtr.h>
 #include <libutils/StringStorage.h>
 
+#include <libsystem/io_new/Format.h>
+#include <libsystem/io_new/MemoryWriter.h>
+
 class String
 {
 private:
     RefPtr<StringStorage> _buffer;
 
 public:
-    size_t length() const { return _buffer->length(); }
+    template <System::Formatable... Args>
+    static String format(const char *fmt, Args... args)
+    {
+        StringScanner scan{fmt, strlen(fmt)};
+        System::MemoryWriter memory;
+
+        System::format(memory, scan, forward<Args>(args)...);
+
+        return memory.string();
+    }
+
+    size_t length() const
+    {
+        return _buffer->length();
+    }
 
     const char *cstring() const
     {

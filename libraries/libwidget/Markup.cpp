@@ -213,24 +213,24 @@ Anchor anchor_parse(const char *string)
     return Anchor::LEFT;
 }
 
-static BitmapScaling scaling_parse(const char *string)
+static BitmapScaling scaling_parse(String string)
 {
-    if (strcmp(string, "center") == 0)
+    if (string == "center")
     {
         return BitmapScaling::CENTER;
     }
 
-    if (strcmp(string, "cover") == 0)
+    if (string == "cover")
     {
         return BitmapScaling::COVER;
     }
 
-    if (strcmp(string, "fit") == 0)
+    if (string == "fit")
     {
         return BitmapScaling::FIT;
     }
 
-    if (strcmp(string, "stretch") == 0)
+    if (string == "stretch")
     {
         return BitmapScaling::STRETCH;
     }
@@ -336,9 +336,9 @@ Widget *widget_create_from_markup(Widget *parent, markup::Node &node)
 
     if (node.is("Image"))
     {
-        auto bitmap = Bitmap::load_from_or_placeholder(node.get_attribute_or_default("path", "null").cstring());
+        auto bitmap = Bitmap::load_from_or_placeholder(node.get_attribute_or_default("path", "null"));
 
-        widget = new Image(parent, bitmap, scaling_parse(node.get_attribute_or_default("scaling", "center").cstring()));
+        widget = new Image(parent, bitmap, scaling_parse(node.get_attribute_or_default("scaling", "center")));
     }
 
     if (node.is("Slider"))
@@ -419,7 +419,7 @@ Window *window_create_from_markup(markup::Node &node)
     return window;
 }
 
-Window *window_create_from_file(const char *path)
+Window *window_create_from_file(String path)
 {
     auto root = markup::parse_file(path);
 
@@ -431,7 +431,7 @@ Window *window_create_from_file(const char *path)
     return window;
 }
 
-Widget *widget_create_from_file(Widget *parent, const char *path)
+Widget *widget_create_from_file(Widget *parent, String path)
 {
     auto root = markup::parse_file(path);
 

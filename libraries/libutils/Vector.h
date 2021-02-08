@@ -59,7 +59,7 @@ public:
     bool any() const { return !empty(); }
 
     constexpr T *raw_storage() { return _storage; }
-    constexpr const T* raw_storage() const { return _storage; }
+    constexpr const T *raw_storage() const { return _storage; }
 
     T &at(size_t index)
     {
@@ -474,7 +474,7 @@ public:
     }
 
     template <typename... Args>
-    T &emplace(Args &&... args)
+    T &emplace(Args &&...args)
     {
         grow();
 
@@ -499,7 +499,7 @@ public:
     }
 
     template <typename... Args>
-    T &emplace_back(Args &&... args)
+    T &emplace_back(Args &&...args)
     {
         grow();
 
@@ -515,7 +515,7 @@ public:
         }
     }
 
-    void push_back_data(const T *data, size_t size)
+    void push_back_many(const T *data, size_t size)
     {
         for (size_t i = 0; i < size; i++)
         {

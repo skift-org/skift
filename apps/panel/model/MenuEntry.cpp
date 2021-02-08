@@ -1,6 +1,5 @@
-#include <libsystem/io/Directory.h>
 #include <libsystem/io/File.h>
-#include <stdio.h>
+#include <libsystem/io_new/Directory.h>
 
 #include "panel/model/MenuEntry.h"
 
@@ -37,35 +36,32 @@ Vector<MenuEntry> MenuEntry::load()
 
     entries = Vector<MenuEntry>{};
 
-    Directory *directory = directory_open("/Applications", OPEN_READ);
+    System::Directory directory{"/Applications"};
 
-    if (handle_has_error(directory))
+    if (!directory.exist())
     {
-        directory_close(directory);
         return *entries;
     }
 
-    DirectoryEntry entry = {};
-    while (directory_read(directory, &entry) > 0)
+    for (auto &entry : directory.entries())
     {
-        if (entry.stat.type == FILE_TYPE_DIRECTORY)
+        if (entry.stat.type != FILE_TYPE_DIRECTORY)
         {
-            char path[PATH_LENGTH];
-            snprintf(path, PATH_LENGTH, "/Applications/%s/manifest.json", entry.name);
+            continue;
+        }
 
-            File manifest_file{path};
-            if (manifest_file.exist())
-            {
-                entries->emplace_back(json::parse_file(path));
-            }
+        auto path = String::format("/Applications/{}/manifest.json", entry.name);
+
+        File manifest_file{path};
+        if (manifest_file.exist())
+        {
+            entries->emplace_back(json::parse_file(path));
         }
     }
 
     entries->sort([](auto &a, auto &b) {
         return strcmp(a.name.cstring(), b.name.cstring());
     });
-
-    directory_close(directory);
 
     return *entries;
 }

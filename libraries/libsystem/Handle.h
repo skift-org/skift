@@ -136,6 +136,11 @@ public:
             return Handle{connection_handle};
         }
     }
+
+    bool valid()
+    {
+        return _handle != HANDLE_INVALID_ID;
+    }
 };
 
 } // namespace System

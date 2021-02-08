@@ -15,7 +15,7 @@ Wallpaper::Wallpaper(Vec2i resolution)
     _setting_image = own<settings::Setting>("appearance:wallpaper.image", [this](auto &value) {
         if (value.is(json::STRING))
         {
-            _orginal = Bitmap::load_from_or_placeholder(value.as_string().cstring());
+            _orginal = Bitmap::load_from_or_placeholder(value.as_string());
         }
         else
         {

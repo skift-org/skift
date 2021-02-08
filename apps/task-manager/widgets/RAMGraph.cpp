@@ -48,17 +48,13 @@ RAMGraph::RAMGraph(Widget *parent, RefPtr<TaskModel> model)
         hj_system_status(&status);
 
         unsigned usage = status.used_ram / 1024 / 1024;
-        char buffer_usage[50];
-        snprintf(buffer_usage, 50, "Usage: %u Mio", usage);
-        _label_usage->text(buffer_usage);
+        _label_usage->text(String::format("Usage: {} Mio", usage));
 
         unsigned available = status.total_ram / 1024 / 1024;
-        char buffer_available[50];
-        snprintf(buffer_available, 50, "Available: %u Mio", available);
-        _label_available->text(buffer_available);
+        _label_available->text(String::format("Available: {} Mio", available));
 
         auto greedy = _model->ram_greedy();
-        _label_greedy->text(StringBuilder().append("Most greedy: ").append(greedy).finalize());
+        _label_greedy->text(String::format("Most greedy: {}", greedy));
     });
 
     _text_timer->start();

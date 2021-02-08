@@ -118,7 +118,7 @@ public:
 
 Node parse(Scanner &scan);
 
-Node parse_file(const char *path);
+Node parse_file(String path);
 
 void prettify(Prettifier &pretty, Node &node);
 

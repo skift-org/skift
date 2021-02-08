@@ -1,8 +1,9 @@
 #pragma once
 
-#include <libutils/StringBuilder.h>
-#include <libutils/Strings.h>
 #include <math.h>
+
+#include <libsystem/io_new/Writer.h>
+#include <libutils/Strings.h>
 
 struct NumberFormat
 {
@@ -37,12 +38,40 @@ struct NumberFormat
         return copy;
     }
 
-    void format(StringBuilder &builder, unsigned int value)
+    ResultOr<size_t> format(System::Writer &writer, int64_t value)
+    {
+        bool is_negative = value < 0;
+
+        if (is_negative)
+        {
+            writer.write('-');
+            value = -value;
+        }
+
+        auto format_result = format(writer, (uint64_t)value);
+
+        if (format_result)
+        {
+            return *format_result + is_negative ? 1 : 0;
+        }
+        else
+        {
+            return format_result;
+        }
+    }
+
+    ResultOr<size_t> format(System::Writer &writer, uint64_t value)
     {
         if (value == 0)
         {
-            builder.append('0');
-            return;
+            auto zero_result = writer.write('0');
+
+            if (zero_result == SUCCESS)
+            {
+                return 1;
+            }
+
+            return zero_result;
         }
 
         size_t i = 0;
@@ -65,38 +94,52 @@ struct NumberFormat
 
         strrvs(buffer);
 
-        builder.append(buffer, i);
+        return writer.write(buffer, i);
     }
 
-    void format(StringBuilder &builder, int value)
+    ResultOr<size_t> format(System::Writer &writer, float value)
     {
-        if (value < 0)
+        return format(writer, (double)value);
+    }
+
+    ResultOr<size_t> format(System::Writer &writer, double value)
+    {
+        size_t written = 0;
+
+        int64_t ipart = (int64_t)value;
+        double fpart = value - (double)ipart;
+
+        auto ipart_result = format(writer, ipart);
+
+        if (!ipart_result)
         {
-            builder.append('-');
-            value = -value;
+            return ipart_result;
         }
 
-        format(builder, (unsigned int)value);
-    }
-
-    void format(StringBuilder &builder, float value)
-    {
-        format(builder, (double)value);
-    }
-
-    void format(StringBuilder &builder, double value)
-    {
-        int ipart = (int)value;
-        float fpart = value - (float)ipart;
-
-        format(builder, ipart);
+        written += *ipart_result;
 
         if (_precision > 0)
         {
-            builder.append('.');
+            auto dot_result = writer.write('.');
 
-            int ifpart = fpart * pow(_base, _precision);
-            format(builder, ifpart);
+            if (dot_result != SUCCESS)
+            {
+                return dot_result;
+            }
+
+            written += 1;
+
+            int64_t ifpart = fpart * pow(_base, _precision);
+            auto ifpart_result = format(writer, ifpart);
+
+            if (!ifpart_result)
+            {
+                return ifpart_result;
+            }
+
+            written += *ipart_result;
         }
+
+        return written;
     }
 };

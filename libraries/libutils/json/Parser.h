@@ -1,4 +1,5 @@
 #pragma once
+
 #include <libutils/NumberParser.h>
 #include <libutils/Scanner.h>
 #include <libutils/ScannerUtils.h>
@@ -185,9 +186,9 @@ inline Value parse(const String &str)
     return parse(scan);
 };
 
-inline Value parse_file(const char *path)
+Value parse_file(String path)
 {
-    __cleanup(stream_cleanup) Stream *json_file = stream_open(path, OPEN_READ | OPEN_BUFFERED);
+    __cleanup(stream_cleanup) Stream *json_file = stream_open(path.cstring(), OPEN_READ | OPEN_BUFFERED);
 
     if (handle_has_error(json_file))
     {
@@ -198,4 +199,5 @@ inline Value parse_file(const char *path)
     scan_skip_utf8bom(scan);
     return value(scan);
 }
+
 } // namespace json

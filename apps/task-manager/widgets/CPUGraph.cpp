@@ -51,11 +51,8 @@ CPUGraph::CPUGraph(Widget *parent, RefPtr<TaskModel> model)
 
         auto greedy = _model->cpu_greedy();
 
-        char buffer_average[50];
-        snprintf(buffer_average, 200, "Average: %i%%", (int)(average() * 100.0));
-        _label_average->text(buffer_average);
-
-        _label_greedy->text(StringBuilder().append("Most greedy: ").append(greedy).finalize());
+        _label_average->text(String::format("Average: {}%", (int)(average() * 100.0)));
+        _label_greedy->text(String::format("Most greedy: {}", greedy));
 
         ElapsedTime seconds = status.uptime;
         int days = seconds / 86400;
@@ -65,9 +62,7 @@ CPUGraph::CPUGraph(Widget *parent, RefPtr<TaskModel> model)
         int minutes = seconds / 60;
         seconds %= 60;
 
-        char buffer_uptime[50];
-        snprintf(buffer_uptime, 50, "Uptime: %3d:%02d:%02d:%02d", days, hours, minutes, seconds);
-        _label_uptime->text(buffer_uptime);
+        _label_uptime->text(String::format("Uptime: {03}:{02}:{02}:{02}", days, hours, minutes, seconds));
     });
 
     _text_timer->start();

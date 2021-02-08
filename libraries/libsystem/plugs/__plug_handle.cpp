@@ -2,8 +2,8 @@
 #include <skift/Environment.h>
 
 #include <libsystem/core/Plugs.h>
-#include <libsystem/io/Directory.h>
 #include <libsystem/io/Filesystem.h>
+#include <libsystem/io_new/Directory.h>
 #include <libsystem/process/Process.h>
 #include <libutils/Path.h>
 
@@ -14,11 +14,13 @@ Result __plug_process_get_directory(char *buffer, size_t size)
     return SUCCESS;
 }
 
-Result __plug_process_set_directory(const char *directory)
+Result __plug_process_set_directory(const char *path)
 {
-    auto new_path = process_resolve(directory);
+    auto new_path = process_resolve(path);
 
-    if (!directory_exist(new_path.cstring()))
+    System::Directory directory(new_path);
+
+    if (!directory.exist())
     {
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }

@@ -25,6 +25,6 @@ void MemoryWriter::clear()
 
 size_t MemoryWriter::write(const void *buffer, size_t size)
 {
-    _data.push_back_data((const uint8_t *)buffer, size);
+    _data.push_back_many((const uint8_t *)buffer, size);
     return size;
 }

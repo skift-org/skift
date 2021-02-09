@@ -1,9 +1,8 @@
 
 #include <assert.h>
 #include <libsystem/Logger.h>
-#include <string.h>
-#include <stdio.h>
 #include <libsystem/io/Stream.h>
+#include <string.h>
 
 #include "archs/VirtualMemory.h"
 
@@ -78,9 +77,9 @@ void memory_initialize(Handover *handover)
 
 void memory_dump()
 {
-    printf("\n\tMemory status:");
-    printf("\n\t - Used  physical Memory: %12dkib", USED_MEMORY / 1024);
-    printf("\n\t - Total physical Memory: %12dkib", TOTAL_MEMORY / 1024);
+    stream_format(out_stream, "\n\tMemory status:");
+    stream_format(out_stream, "\n\t - Used  physical Memory: %12dkib", USED_MEMORY / 1024);
+    stream_format(out_stream, "\n\t - Total physical Memory: %12dkib", TOTAL_MEMORY / 1024);
 }
 
 size_t memory_get_used()

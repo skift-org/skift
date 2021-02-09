@@ -194,7 +194,7 @@ Result ZipArchive::read_central_directory(BinaryReader &reader)
     le_uint32_t central_dir_end_sig(reader.get<uint32_t>());
     if (central_dir_end_sig() != ZIP_END_OF_CENTRAL_DIR_HEADER_SIG)
     {
-        printf("Missing 'central directory end record' signature!\n");
+        logger_error("Missing 'central directory end record' signature!");
         return Result::ERR_INVALID_DATA;
     }
 
@@ -210,7 +210,7 @@ void ZipArchive::read_archive()
     // Archive does not exist
     if (!archive_file.exist())
     {
-        printf("Archive does not exist: %s", _path.string().cstring());
+        logger_error("Archive does not exist: %s", _path.string().cstring());
         return;
     }
 
@@ -221,7 +221,7 @@ void ZipArchive::read_archive()
     // A valid zip must atleast contain a "CentralDirectoryEndRecord"
     if (file_reader.length() < sizeof(CentralDirectoryEndRecord))
     {
-        printf("Archive is too small to be a valid .zip: %s %u", _path.string().cstring(), (unsigned int)file_reader.length());
+        logger_error("Archive is too small to be a valid .zip: %s %u", _path.string().cstring(), (unsigned int)file_reader.length());
         return;
     }
 
@@ -294,7 +294,7 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
 
     if (entry.compression != CM_DEFLATED)
     {
-        printf("ZipArchive: Unsupported compression: %u\n", entry.compression);
+        logger_error("ZipArchive: Unsupported compression: %u\n", entry.compression);
         return Result::ERR_FUNCTION_NOT_IMPLEMENTED;
     }
 

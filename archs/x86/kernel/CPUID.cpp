@@ -1,7 +1,5 @@
-
 #include <libsystem/io/Stream.h>
 #include <string.h>
-#include <stdio.h>
 
 #include "archs/x86/kernel/CPUID.h"
 
@@ -29,287 +27,287 @@ void cpuid_dump()
 {
     CPUID cid = cpuid();
 
-    printf("\n\n\tCPUID dump:\n\t - Vendorid: %s\n\t - Features:", cid.vendorid);
+    stream_format(out_stream, "\n\n\tCPUID dump:\n\t - Vendorid: %s\n\t - Features:", cid.vendorid);
 
     if (cid.PCLMUL)
     {
-        printf(" PCLMUL");
+        stream_format(out_stream, " PCLMUL");
     }
 
     if (cid.DTES64)
     {
-        printf(" DTES64");
+        stream_format(out_stream, " DTES64");
     }
 
     if (cid.MONITOR)
     {
-        printf(" MONITOR");
+        stream_format(out_stream, " MONITOR");
     }
 
     if (cid.DS_CPL)
     {
-        printf(" DS_CPL");
+        stream_format(out_stream, " DS_CPL");
     }
 
     if (cid.VMX)
     {
-        printf(" VMX");
+        stream_format(out_stream, " VMX");
     }
 
     if (cid.SMX)
     {
-        printf(" SMX");
+        stream_format(out_stream, " SMX");
     }
 
     if (cid.EST)
     {
-        printf(" EST");
+        stream_format(out_stream, " EST");
     }
 
     if (cid.TM2)
     {
-        printf(" TM2");
+        stream_format(out_stream, " TM2");
     }
 
     if (cid.SSSE3)
     {
-        printf(" SSSE3");
+        stream_format(out_stream, " SSSE3");
     }
 
     if (cid.CID)
     {
-        printf(" CID");
+        stream_format(out_stream, " CID");
     }
 
     if (cid.FMA)
     {
-        printf(" FMA");
+        stream_format(out_stream, " FMA");
     }
 
     if (cid.CX16)
     {
-        printf(" CX16");
+        stream_format(out_stream, " CX16");
     }
 
     if (cid.ETPRD)
     {
-        printf(" ETPRD");
+        stream_format(out_stream, " ETPRD");
     }
 
     if (cid.PDCM)
     {
-        printf(" PDCM");
+        stream_format(out_stream, " PDCM");
     }
 
     if (cid.PCIDE)
     {
-        printf(" PCIDE");
+        stream_format(out_stream, " PCIDE");
     }
 
     if (cid.DCA)
     {
-        printf(" DCA");
+        stream_format(out_stream, " DCA");
     }
 
     if (cid.SSE4_1)
     {
-        printf(" SSE4_1");
+        stream_format(out_stream, " SSE4_1");
     }
 
     if (cid.SSE4_2)
     {
-        printf(" SSE4_2");
+        stream_format(out_stream, " SSE4_2");
     }
 
     if (cid.x2APIC)
     {
-        printf(" x2APIC");
+        stream_format(out_stream, " x2APIC");
     }
 
     if (cid.MOVBE)
     {
-        printf(" MOVBE");
+        stream_format(out_stream, " MOVBE");
     }
 
     if (cid.POPCNT)
     {
-        printf(" POPCNT");
+        stream_format(out_stream, " POPCNT");
     }
 
     if (cid.AES)
     {
-        printf(" AES");
+        stream_format(out_stream, " AES");
     }
 
     if (cid.XSAVE)
     {
-        printf(" XSAVE");
+        stream_format(out_stream, " XSAVE");
     }
 
     if (cid.OSXSAVE)
     {
-        printf(" OSXSAVE");
+        stream_format(out_stream, " OSXSAVE");
     }
 
     if (cid.AVX)
     {
-        printf(" AVX");
+        stream_format(out_stream, " AVX");
     }
 
     if (cid.FPU)
     {
-        printf(" FPU");
+        stream_format(out_stream, " FPU");
     }
 
     if (cid.VME)
     {
-        printf(" VME");
+        stream_format(out_stream, " VME");
     }
 
     if (cid.DE)
     {
-        printf(" DE");
+        stream_format(out_stream, " DE");
     }
 
     if (cid.PSE)
     {
-        printf(" PSE");
+        stream_format(out_stream, " PSE");
     }
 
     if (cid.TSC)
     {
-        printf(" TSC");
+        stream_format(out_stream, " TSC");
     }
 
     if (cid.MSR)
     {
-        printf(" MSR");
+        stream_format(out_stream, " MSR");
     }
 
     if (cid.PAE)
     {
-        printf(" PAE");
+        stream_format(out_stream, " PAE");
     }
 
     if (cid.MCE)
     {
-        printf(" MCE");
+        stream_format(out_stream, " MCE");
     }
 
     if (cid.CX8)
     {
-        printf(" CX8");
+        stream_format(out_stream, " CX8");
     }
 
     if (cid.APIC)
     {
-        printf(" APIC");
+        stream_format(out_stream, " APIC");
     }
 
     if (cid.SEP)
     {
-        printf(" SEP");
+        stream_format(out_stream, " SEP");
     }
 
     if (cid.MTRR)
     {
-        printf(" MTRR");
+        stream_format(out_stream, " MTRR");
     }
 
     if (cid.PGE)
     {
-        printf(" PGE");
+        stream_format(out_stream, " PGE");
     }
 
     if (cid.MCA)
     {
-        printf(" MCA");
+        stream_format(out_stream, " MCA");
     }
 
     if (cid.CMOV)
     {
-        printf(" CMOV");
+        stream_format(out_stream, " CMOV");
     }
 
     if (cid.PAT)
     {
-        printf(" PAT");
+        stream_format(out_stream, " PAT");
     }
 
     if (cid.PSE36)
     {
-        printf(" PSE36");
+        stream_format(out_stream, " PSE36");
     }
 
     if (cid.PSN)
     {
-        printf(" PSN");
+        stream_format(out_stream, " PSN");
     }
 
     if (cid.CLF)
     {
-        printf(" CLF");
+        stream_format(out_stream, " CLF");
     }
 
     if (cid.DTES)
     {
-        printf(" DTES");
+        stream_format(out_stream, " DTES");
     }
 
     if (cid.ACPI)
     {
-        printf(" ACPI");
+        stream_format(out_stream, " ACPI");
     }
 
     if (cid.MMX)
     {
-        printf(" MMX");
+        stream_format(out_stream, " MMX");
     }
 
     if (cid.FXSR)
     {
-        printf(" FXSR");
+        stream_format(out_stream, " FXSR");
     }
 
     if (cid.SSE)
     {
-        printf(" SSE");
+        stream_format(out_stream, " SSE");
     }
 
     if (cid.SSE2)
     {
-        printf(" SSE2");
+        stream_format(out_stream, " SSE2");
     }
 
     if (cid.SSE3)
     {
-        printf(" SSE3");
+        stream_format(out_stream, " SSE3");
     }
 
     if (cid.SS)
     {
-        printf(" SS");
+        stream_format(out_stream, " SS");
     }
 
     if (cid.HTT)
     {
-        printf(" HTT");
+        stream_format(out_stream, " HTT");
     }
 
     if (cid.TM1)
     {
-        printf(" TM1");
+        stream_format(out_stream, " TM1");
     }
 
     if (cid.IA64)
     {
-        printf(" IA64");
+        stream_format(out_stream, " IA64");
     }
 
     if (cid.PBE)
     {
-        printf(" PBE");
+        stream_format(out_stream, " PBE");
     }
 
-    printf("\n");
+    stream_format(out_stream, "\n");
 }

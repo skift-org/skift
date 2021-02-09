@@ -3,8 +3,8 @@ ABI_HEADERS = \
 	$(wildcard libraries/abi/*/*.h)
 
 LIBUTILS_HEADERS = \
-	$(wildcard libraries/abi/*.h) \
-	$(wildcard libraries/abi/*/*.h)
+	$(wildcard libraries/libutils/*.h) \
+	$(wildcard libraries/libutils/*/*.h)
 
 HEADERS += $(patsubst libraries/%, $(BUILD_DIRECTORY_INCLUDE)/%, $(ABI_HEADERS) $(LIBUTILS_HEADERS))
 

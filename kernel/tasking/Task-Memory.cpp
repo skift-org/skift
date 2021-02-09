@@ -1,4 +1,4 @@
-#include <libsystem/core/CString.h>
+#include <string.h>
 
 #include "archs/VirtualMemory.h"
 

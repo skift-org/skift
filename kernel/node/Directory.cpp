@@ -1,7 +1,7 @@
 
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <libsystem/core/CString.h>
+#include <string.h>
 
 #include "kernel/node/Directory.h"
 #include "kernel/node/Handle.h"

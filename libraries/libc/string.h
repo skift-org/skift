@@ -52,5 +52,6 @@ size_t strxfrm(char *dest, const char *src, size_t n);
 void strrvs(char *str);
 void strnapd(char *str, char c, size_t n);
 void strapd(char *str, char c);
+size_t strlcpy(char *dst, const char *src, size_t maxlen);
 
 __END_HEADER

@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <libfile/ELF.h>
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
+#include <string.h>
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"

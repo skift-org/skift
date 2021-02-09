@@ -1,6 +1,8 @@
 #include <libsystem/io/Stream.h>
 #include <libutils/StringBuilder.h>
 
+#include <stdio.h>
+
 String concat(int argc, char **argv)
 {
     int i;

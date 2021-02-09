@@ -21,4 +21,5 @@ void assert_failed(const char *expr, const char *file, const char *function, int
     }
 
     abort();
+    __builtin_unreachable();
 }

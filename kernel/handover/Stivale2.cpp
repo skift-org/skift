@@ -1,5 +1,5 @@
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
+#include <string.h>
 
 #include <thirdparty/limine/stivale/stivale2.h>
 

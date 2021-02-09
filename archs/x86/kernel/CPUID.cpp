@@ -1,6 +1,7 @@
 
-#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "archs/x86/kernel/CPUID.h"
 

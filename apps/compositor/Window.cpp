@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
 
 #include "compositor/Client.h"
 #include "compositor/Manager.h"

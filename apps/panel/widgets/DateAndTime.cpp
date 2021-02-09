@@ -1,4 +1,5 @@
 #include <libwidget/Label.h>
+#include <stdio.h>
 
 #include "panel/widgets/DateAndTime.h"
 

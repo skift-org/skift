@@ -7,6 +7,8 @@
 #include <libwidget/Container.h>
 #include <libwidget/IconPanel.h>
 
+#include <stdio.h>
+
 #include "task-manager/widgets/RAMGraph.h"
 
 namespace task_manager

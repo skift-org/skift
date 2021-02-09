@@ -2,7 +2,7 @@
 /* modules.c : kernel modules/ramdisk loader                                  */
 
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
+#include <string.h>
 
 #include "kernel/modules/Modules.h"
 

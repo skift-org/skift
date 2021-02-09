@@ -6,6 +6,8 @@
 #include <libwidget/Label.h>
 #include <libwidget/Markup.h>
 
+#include <stdio.h>
+
 #include "calculator/Calculator.h"
 
 int main(int argc, char **argv)

@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <libsystem/Result.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/io/Pipe.h>
@@ -9,6 +8,9 @@
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 #include <libutils/Path.h>
+#include <stdio.h>
+#undef stdin
+#undef stdout
 
 #include "shell/Shell.h"
 

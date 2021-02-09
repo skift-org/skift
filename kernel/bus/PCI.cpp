@@ -1,6 +1,6 @@
 
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
+#include <string.h>
 #include <libutils/Vector.h>
 
 #include "archs/x86_32/kernel/x86_32.h"

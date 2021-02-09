@@ -11,6 +11,8 @@
 #include <libsystem/process/Process.h>
 #include <libsystem/system/System.h>
 
+#include <stdio.h>
+
 /*
  * Color palette to use for final output
  * Specifically, this should be either control sequences

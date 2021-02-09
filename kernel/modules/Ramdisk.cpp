@@ -2,7 +2,6 @@
 #include <libfile/TARArchive.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <libsystem/core/CString.h>
 
 #include "archs/VirtualMemory.h"
 

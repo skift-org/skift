@@ -9,6 +9,8 @@
 #include <libwidget/IconPanel.h>
 #include <libwidget/Label.h>
 
+#include <stdio.h>
+
 #include "task-manager/widgets/CPUGraph.h"
 
 namespace task_manager

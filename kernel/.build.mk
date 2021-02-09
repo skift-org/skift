@@ -12,6 +12,7 @@ KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libc/math/*.cpp) \
 	$(wildcard libraries/libc/skift/NumberFormatter.cpp) \
 	$(wildcard libraries/libc/skift/Printf.cpp) \
+	$(wildcard libraries/libc/stdlib/*.cpp) \
 	$(wildcard libraries/libc/stdio/*.cpp) \
 	$(wildcard libraries/libc/cxx/new-delete.cpp) \
 	$(wildcard libraries/libfile/*.cpp) \

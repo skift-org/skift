@@ -1,6 +1,6 @@
 #include <libsettings/Protocol.h>
 
-namespace settings
+namespace Settings
 {
 
 struct MessageHeader
@@ -112,4 +112,4 @@ ResultOr<Message> Protocol::decode_message(Connection *connection)
     return message;
 }
 
-} // namespace settings
+} // namespace Settings

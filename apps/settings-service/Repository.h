@@ -7,7 +7,7 @@
 
 #include "settings-service/Domain.h"
 
-namespace settings
+namespace Settings
 {
 
 struct Repository
@@ -72,4 +72,4 @@ struct Repository
     }
 };
 
-} // namespace settings
+} // namespace Settings

@@ -4,7 +4,7 @@
 
 #include <libsettings/Path.h>
 
-namespace settings
+namespace Settings
 {
 
 struct Bundle
@@ -62,4 +62,4 @@ struct Bundle
     }
 };
 
-} // namespace settings
+} // namespace Settings

@@ -3,7 +3,7 @@
 #include <libipc/Peer.h>
 #include <libsettings/Protocol.h>
 
-namespace settings
+namespace Settings
 {
 
 class ServerConnection : public ipc::Peer<Protocol>
@@ -34,4 +34,4 @@ public:
     }
 };
 
-} // namespace settings
+} // namespace Settings

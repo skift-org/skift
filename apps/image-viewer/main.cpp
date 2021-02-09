@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     auto set_has_wallaper = new Button(toolbar, Button::TEXT, Icon::get("wallpaper"), "Set As Wallpaper");
 
     set_has_wallaper->on(Event::ACTION, [&](auto) {
-        settings::write(settings::Path::parse("appearance:wallpaper.image"), process_resolve(argv[1]));
+        Settings::write(Settings::Path::parse("appearance:wallpaper.image"), process_resolve(argv[1]));
     });
 
     auto image = new Image(window->root(), bitmap);

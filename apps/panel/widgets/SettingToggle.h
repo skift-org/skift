@@ -13,7 +13,7 @@ class SettingToggle : public Button
 private:
     String _name;
     RefPtr<Icon> _icon;
-    OwnPtr<settings::Setting> _setting;
+    OwnPtr<Settings::Setting> _setting;
     bool _enabled;
 
 public:
@@ -22,7 +22,7 @@ public:
           _name(name),
           _icon(icon)
     {
-        _setting = own<settings::Setting>(setting, [this](auto &value) {
+        _setting = own<Settings::Setting>(setting, [this](auto &value) {
             _enabled = value.as_bool();
             render();
         });

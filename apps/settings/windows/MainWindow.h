@@ -2,7 +2,7 @@
 
 #include <libwidget/Window.h>
 
-namespace settings
+namespace Settings
 {
 
 class MainWindow : public Window
@@ -11,4 +11,4 @@ public:
     MainWindow();
 };
 
-} // namespace settings
+} // namespace Settings

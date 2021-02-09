@@ -5,7 +5,7 @@
 #include "settings/pages/Home.h"
 #include "settings/windows/MainWindow.h"
 
-namespace settings
+namespace Settings
 {
 
 MainWindow::MainWindow() : Window(WINDOW_RESIZABLE)
@@ -31,4 +31,4 @@ MainWindow::MainWindow() : Window(WINDOW_RESIZABLE)
     new HomePage(root());
 }
 
-} // namespace settings
+} // namespace Settings

@@ -7,7 +7,7 @@
 #include "settings-service/Client.h"
 #include "settings-service/Repository.h"
 
-namespace settings
+namespace Settings
 {
 
 class Server
@@ -117,4 +117,4 @@ public:
     }
 };
 
-} // namespace settings
+} // namespace Settings

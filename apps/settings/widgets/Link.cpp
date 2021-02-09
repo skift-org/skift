@@ -3,7 +3,7 @@
 
 #include "settings/widgets/Link.h"
 
-namespace settings
+namespace Settings
 {
 
 Link::Link(Widget *parent, RefPtr<Icon> icon, String name)
@@ -18,4 +18,4 @@ Link::Link(Widget *parent, RefPtr<Icon> icon, String name)
     new Label(this, name, Anchor::CENTER);
 }
 
-} // namespace settings
+} // namespace Settings

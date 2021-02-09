@@ -2,7 +2,7 @@
 
 #include <libsettings/Path.h>
 
-namespace settings
+namespace Settings
 {
 
 Path Path::parse(Scanner &scan)
@@ -75,4 +75,4 @@ bool Path::operator==(const Path &other)
            key == other.key;
 }
 
-} // namespace settings
+} // namespace Settings

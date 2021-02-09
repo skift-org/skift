@@ -2,7 +2,7 @@
 
 #include <libsettings/Watcher.h>
 
-namespace settings
+namespace Settings
 {
 
 class Setting
@@ -12,7 +12,7 @@ private:
     __nonmovable(Setting);
 
     OwnPtr<Watcher> _watcher;
-    settings::Path _path;
+    Settings::Path _path;
     WatcherCallback _callback;
     Optional<json::Value> _value;
 
@@ -36,18 +36,18 @@ public:
 
     void write(const json::Value &value)
     {
-        settings::write(_path, value);
+        Settings::write(_path, value);
     }
 
     json::Value read()
     {
         if (!_value)
         {
-            _value = settings::read(_path);
+            _value = Settings::read(_path);
         }
 
         return *_value;
     }
 };
 
-} // namespace settings
+} // namespace Settings

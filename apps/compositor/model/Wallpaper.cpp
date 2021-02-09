@@ -12,7 +12,7 @@ Wallpaper::Wallpaper(Vec2i resolution)
         render();
     });
 
-    _setting_image = own<settings::Setting>("appearance:wallpaper.image", [this](auto &value) {
+    _setting_image = own<Settings::Setting>("appearance:wallpaper.image", [this](auto &value) {
         if (value.is(json::STRING))
         {
             _orginal = Bitmap::load_from_or_placeholder(value.as_string());
@@ -25,7 +25,7 @@ Wallpaper::Wallpaper(Vec2i resolution)
         _render_invoker->invoke_later();
     });
 
-    _setting_color = own<settings::Setting>("appearance:wallpaper.color", [this](auto &value) {
+    _setting_color = own<Settings::Setting>("appearance:wallpaper.color", [this](auto &value) {
         if (value.is(json::STRING))
         {
             _background = Color::parse(value.as_string());
@@ -38,7 +38,7 @@ Wallpaper::Wallpaper(Vec2i resolution)
         _render_invoker->invoke_later();
     });
 
-    _setting_scaling = own<settings::Setting>("appearance:wallpaper.scaling", [this](auto &value) {
+    _setting_scaling = own<Settings::Setting>("appearance:wallpaper.scaling", [this](auto &value) {
         auto scaling_name = value.as_string();
 
         if (scaling_name == "center")

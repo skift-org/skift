@@ -2,7 +2,7 @@
 
 #include "settings-service/Bundle.h"
 
-namespace settings
+namespace Settings
 {
 
 struct Domain
@@ -71,4 +71,4 @@ struct Domain
     }
 };
 
-} // namespace settings
+} // namespace Settings

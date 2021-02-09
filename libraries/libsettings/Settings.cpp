@@ -4,7 +4,7 @@
 #include <libsettings/Settings.h>
 #include <libsettings/Watcher.h>
 
-namespace settings
+namespace Settings
 {
 
 static Vector<Watcher *> _watchers;
@@ -111,4 +111,4 @@ bool write(const Path path, json::Value value)
     return result.success();
 }
 
-} // namespace settings
+} // namespace Settings

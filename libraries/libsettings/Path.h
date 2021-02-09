@@ -3,7 +3,7 @@
 #include <libutils/Prettifier.h>
 #include <libutils/ScannerUtils.h>
 
-namespace settings
+namespace Settings
 {
 
 struct Path
@@ -23,4 +23,4 @@ struct Path
     bool operator==(const Path &other);
 };
 
-} // namespace settings
+} // namespace Settings

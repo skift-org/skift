@@ -19,7 +19,7 @@ int main(int argc, const char **argv)
     args.usage("--watch SETTINGS...");
 
     args.option_string('r', "read", "Read settings from the settings storage.", [&](auto &key_name) {
-        auto maybe_settings = settings::read(settings::Path::parse(key_name));
+        auto maybe_settings = Settings::read(Settings::Path::parse(key_name));
 
         if (!maybe_settings)
         {
@@ -48,10 +48,10 @@ int main(int argc, const char **argv)
             args.usage();
         }
 
-        settings::write(settings::Path::parse(*maybe_key_name), json::parse(*maybe_value));
+        Settings::write(Settings::Path::parse(*maybe_key_name), json::parse(*maybe_value));
     });
 
-    OwnPtr<settings::Watcher> watcher = nullptr;
+    OwnPtr<Settings::Watcher> watcher = nullptr;
 
     args.option(0, "watch", "Watch settings for changes.", [&](ArgParseContext &context) {
         auto maybe_key_name = context.pop_operand();
@@ -63,7 +63,7 @@ int main(int argc, const char **argv)
 
         EventLoop::initialize();
 
-        watcher = own<settings::Watcher>(settings::Path::parse(*maybe_key_name), [&](auto &value) {
+        watcher = own<Settings::Watcher>(Settings::Path::parse(*maybe_key_name), [&](auto &value) {
             Prettifier pretty;
             json::prettify(pretty, value);
 

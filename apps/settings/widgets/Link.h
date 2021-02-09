@@ -2,7 +2,7 @@
 
 #include <libwidget/Button.h>
 
-namespace settings
+namespace Settings
 {
 
 class Link : public Button
@@ -12,4 +12,4 @@ public:
     Link(Widget *parent, RefPtr<Icon> icon, String name);
 };
 
-} // namespace settings
+} // namespace Settings

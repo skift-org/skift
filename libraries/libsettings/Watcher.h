@@ -5,7 +5,7 @@
 #include <libsettings/Path.h>
 #include <libsettings/Settings.h>
 
-namespace settings
+namespace Settings
 {
 
 using WatcherCallback = Callback<void(const json::Value &)>;
@@ -39,4 +39,4 @@ public:
     }
 };
 
-} // namespace settings
+} // namespace Settings

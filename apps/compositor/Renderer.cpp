@@ -13,10 +13,10 @@ static OwnPtr<compositor::Wallpaper> _wallpaper;
 
 static Vector<Recti> _dirty_regions;
 
-static OwnPtr<settings::Setting> _night_light_enable_setting;
+static OwnPtr<Settings::Setting> _night_light_enable_setting;
 bool _night_light_enable = false;
 
-static OwnPtr<settings::Setting> _night_light_stenght_setting;
+static OwnPtr<Settings::Setting> _night_light_stenght_setting;
 double _night_light_strenght = 0.5;
 
 void renderer_initialize()
@@ -25,12 +25,12 @@ void renderer_initialize()
     _wallpaper = own<compositor::Wallpaper>(_framebuffer->resolution().size());
     _wallpaper->on_change = []() { renderer_region_dirty(renderer_bound()); };
 
-    _night_light_enable_setting = own<settings::Setting>("appearance:night-light.enable", [](auto &value) {
+    _night_light_enable_setting = own<Settings::Setting>("appearance:night-light.enable", [](auto &value) {
         _night_light_enable = value.as_bool();
         renderer_region_dirty(renderer_bound());
     });
 
-    _night_light_stenght_setting = own<settings::Setting>("appearance:night-light.stenght", [](auto &value) {
+    _night_light_stenght_setting = own<Settings::Setting>("appearance:night-light.stenght", [](auto &value) {
         _night_light_strenght = value.as_double();
         renderer_region_dirty(renderer_bound());
     });

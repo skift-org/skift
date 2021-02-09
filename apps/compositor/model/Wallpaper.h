@@ -19,9 +19,9 @@ private:
     RefPtr<Bitmap> _scaled = nullptr;
     RefPtr<Bitmap> _acrylic = nullptr;
 
-    OwnPtr<settings::Setting> _setting_image;
-    OwnPtr<settings::Setting> _setting_color;
-    OwnPtr<settings::Setting> _setting_scaling;
+    OwnPtr<Settings::Setting> _setting_image;
+    OwnPtr<Settings::Setting> _setting_color;
+    OwnPtr<Settings::Setting> _setting_scaling;
 
     OwnPtr<Invoker> _render_invoker;
 

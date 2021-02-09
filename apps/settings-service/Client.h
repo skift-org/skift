@@ -4,7 +4,7 @@
 #include <libsettings/Protocol.h>
 #include <libutils/Vector.h>
 
-namespace settings
+namespace Settings
 {
 
 class Client : public ipc::Peer<Protocol>
@@ -30,17 +30,17 @@ public:
         on_disconnect();
     }
 
-    void subscribe(const settings::Path &path)
+    void subscribe(const Settings::Path &path)
     {
         _subscriptions.push_back(path);
     }
 
-    void unsubscribe(const settings::Path &path)
+    void unsubscribe(const Settings::Path &path)
     {
         _subscriptions.remove_all_value(path);
     }
 
-    bool is_subscribe(const settings::Path &path)
+    bool is_subscribe(const Settings::Path &path)
     {
         for (size_t i = 0; i < _subscriptions.count(); i++)
         {
@@ -54,4 +54,4 @@ public:
     }
 };
 
-} // namespace settings
+} // namespace Settings

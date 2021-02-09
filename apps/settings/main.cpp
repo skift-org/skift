@@ -6,7 +6,7 @@ int main(int argc, char **argv)
 {
     Application::initialize(argc, argv);
 
-    auto window = new settings::MainWindow();
+    auto window = new Settings::MainWindow();
     window->show();
 
     return Application::run();

@@ -1,7 +1,7 @@
 #include "settings/pages/Home.h"
 #include "settings/widgets/Link.h"
 
-namespace settings
+namespace Settings
 {
 
 HomePage::HomePage(Widget *parent)
@@ -25,4 +25,4 @@ HomePage::HomePage(Widget *parent)
     new Link(links, Icon::get("home"), "test");
 }
 
-} // namespace settings
+} // namespace Settings

@@ -13,9 +13,9 @@ int main(int argc, const char **argv)
 
     EventLoop::initialize();
 
-    auto repository = settings::Repository::load();
+    auto repository = Settings::Repository::load();
 
-    settings::Server server{repository};
+    Settings::Server server{repository};
 
     return EventLoop::run();
 }

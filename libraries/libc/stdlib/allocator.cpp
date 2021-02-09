@@ -4,26 +4,7 @@
 
 #include <abi/Syscalls.h>
 
-#include <libc/skift/Lock.h>
-
-static Lock _memory_lock{"memory_lock"};
-
-void memory_lock()
-{
-    _memory_lock.acquire(SOURCE_LOCATION);
-}
-
-void memory_unlock()
-{
-    _memory_lock.release(SOURCE_LOCATION);
-}
-
-uintptr_t memory_alloc(size_t size)
-{
-    uintptr_t address = 0;
-    assert(hj_memory_alloc(size, &address) == Result::SUCCESS);
-    return address;
-}
+#include <libc/skift/Plugs.h>
 
 #define LIBALLOC_MAGIC 0xc001c0de
 #define LIBALLOC_DEAD 0xdeaddead
@@ -116,7 +97,7 @@ static MajorBlock *heap_major_block_create(size_t size)
     // Make sure it's >= the minimum size.
     st = MAX(st, _page_count);
 
-    MajorBlock *maj = (MajorBlock *)memory_alloc(st * _page_size);
+    MajorBlock *maj = (MajorBlock *)__plug_memory_alloc(st * _page_size);
 
     if (maj == nullptr)
     {
@@ -164,7 +145,7 @@ bool check_minor_magic(MinorBlock *min, void *ptr, void *caller)
         // logger_error("Bad free(0x%x) from 0x%x", ptr, caller);
     }
 
-    memory_unlock();
+    __plug_memory_unlock();
 
     return false;
 }
@@ -176,12 +157,12 @@ void *malloc(size_t req_size)
     unsigned long long bestSize = 0;
     unsigned long size = req_size;
 
-    memory_lock();
+    __plug_memory_lock();
 
     if (size == 0)
     {
         // logger_warn("alloc(0) called from 0x%x", __builtin_return_address(0));
-        memory_unlock();
+        __plug_memory_unlock();
 
         return malloc(1);
     }
@@ -193,7 +174,7 @@ void *malloc(size_t req_size)
 
         if (_heap_root == nullptr)
         {
-            memory_unlock();
+            __plug_memory_unlock();
             return nullptr;
         }
     }
@@ -280,7 +261,7 @@ void *malloc(size_t req_size)
 
             void *p = (void *)((uintptr_t)(maj->first) + MINOR_BLOCK_HEADER_SIZE);
 
-            memory_unlock();
+            __plug_memory_unlock();
             return p;
         }
 
@@ -308,7 +289,7 @@ void *malloc(size_t req_size)
                 maj->usage += size + MINOR_BLOCK_HEADER_SIZE;
 
                 void *p = (void *)((uintptr_t)(maj->first) + MINOR_BLOCK_HEADER_SIZE);
-                memory_unlock(); // release the lock
+                __plug_memory_unlock(); // release the lock
                 return p;
             }
         }
@@ -346,7 +327,7 @@ void *malloc(size_t req_size)
                     maj->usage += size + MINOR_BLOCK_HEADER_SIZE;
 
                     void *p = (void *)((uintptr_t)min + MINOR_BLOCK_HEADER_SIZE);
-                    memory_unlock(); // release the lock
+                    __plug_memory_unlock(); // release the lock
                     return p;
                 }
             }
@@ -377,7 +358,7 @@ void *malloc(size_t req_size)
 
                     void *p = (void *)((uintptr_t)new_min + MINOR_BLOCK_HEADER_SIZE);
 
-                    memory_unlock();
+                    __plug_memory_unlock();
 
                     return p;
                 }
@@ -420,7 +401,7 @@ void *malloc(size_t req_size)
         maj = maj->next;
     } // while (maj != nullptr)
 
-    memory_unlock();
+    __plug_memory_unlock();
 
     // logger_warn("All cases exhausted. No memory available.");
 
@@ -435,7 +416,7 @@ void free(void *ptr)
         return;
     }
 
-    memory_lock();
+    __plug_memory_lock();
 
     MinorBlock *min = (MinorBlock *)((uintptr_t)ptr - MINOR_BLOCK_HEADER_SIZE);
 
@@ -486,7 +467,7 @@ void free(void *ptr)
             maj->next->prev = maj->prev;
         }
 
-        hj_memory_free((uintptr_t)maj);
+        __plug_memory_free(maj, maj->pages * _page_size);
     }
     else
     {
@@ -502,7 +483,7 @@ void free(void *ptr)
         }
     }
 
-    memory_unlock();
+    __plug_memory_unlock();
 }
 
 void malloc_cleanup(void *buffer)
@@ -542,24 +523,24 @@ void *realloc(void *ptr, size_t size)
         return malloc(size);
     }
 
-    memory_lock();
+    __plug_memory_lock();
 
     MinorBlock *min = (MinorBlock *)((uintptr_t)ptr - MINOR_BLOCK_HEADER_SIZE);
 
     if (!check_minor_magic(min, ptr, __builtin_return_address(0)))
     {
-        memory_unlock();
+        __plug_memory_unlock();
         return nullptr;
     }
 
     if (min->size >= size)
     {
         min->req_size = size;
-        memory_unlock();
+        __plug_memory_unlock();
         return ptr;
     }
 
-    memory_unlock();
+    __plug_memory_unlock();
 
     void *new_ptr = malloc(size);
     memcpy(new_ptr, ptr, min->req_size);

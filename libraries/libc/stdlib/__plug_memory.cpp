@@ -1,0 +1,31 @@
+#include <assert.h>
+
+#include <abi/Syscalls.h>
+
+#include <libc/skift/Lock.h>
+#include <libc/skift/Plugs.h>
+
+static Lock _memory_lock{"memory_lock"};
+
+void __plug_memory_lock()
+{
+    _memory_lock.acquire(SOURCE_LOCATION);
+}
+
+void __plug_memory_unlock()
+{
+    _memory_lock.release(SOURCE_LOCATION);
+}
+
+void *__plug_memory_alloc(size_t size)
+{
+    uintptr_t address = 0;
+    assert(hj_memory_alloc(size, &address) == Result::SUCCESS);
+    return (void *)address;
+}
+
+void __plug_memory_free(void *address, size_t size)
+{
+    __unused(size);
+    hj_memory_free((uintptr_t)address);
+}

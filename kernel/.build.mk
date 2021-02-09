@@ -8,19 +8,23 @@ KERNEL_ASSEMBLY_SOURCES += \
 	$(wildcard kernel/*/*.s)
 
 KERNEL_LIBRARIES_SOURCES = \
+	$(wildcard libraries/libc/*.cpp) \
+	$(wildcard libraries/libc/math/*.cpp) \
+	$(wildcard libraries/libc/skift/NumberFormatter.cpp) \
+	$(wildcard libraries/libc/skift/Printf.cpp) \
+	$(wildcard libraries/libc/stdio/*.cpp) \
+	$(wildcard libraries/libc/cxx/new-delete.cpp) \
 	$(wildcard libraries/libfile/*.cpp) \
 	$(wildcard libraries/libsystem/json/*.cpp) \
 	$(wildcard libraries/libsystem/*.cpp) \
 	$(wildcard libraries/libsystem/compression/*.cpp) \
 	$(wildcard libraries/libsystem/io/*.cpp) \
-	$(wildcard libraries/libsystem/compat/ctype.cpp) \
 	$(wildcard libraries/libsystem/unicode/*.cpp) \
 	$(wildcard libraries/libsystem/process/*.cpp) \
 	$(wildcard libraries/libsystem/utils/*.cpp) \
 	$(wildcard libraries/libsystem/core/*.cpp) \
 	$(wildcard libraries/libsystem/thread/*.cpp) \
 	$(wildcard libraries/libsystem/system/*.cpp) \
-	$(wildcard libraries/libsystem/cxx/new-delete.cpp)
 
 KERNEL_BINARY = $(CONFIG_BUILD_DIRECTORY)/kernel.bin
 

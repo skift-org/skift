@@ -1,6 +1,6 @@
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
+#include <string.h>
 
 #include "archs/VirtualMemory.h"
 #include "archs/x86_32/kernel/Paging.h"

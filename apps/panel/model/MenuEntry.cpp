@@ -1,5 +1,6 @@
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/File.h>
+#include <stdio.h>
 
 #include "panel/model/MenuEntry.h"
 

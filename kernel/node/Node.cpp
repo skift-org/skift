@@ -1,6 +1,6 @@
 
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
+#include <string.h>
 
 #include "kernel/filesystem/Filesystem.h"
 

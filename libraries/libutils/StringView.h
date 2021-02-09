@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/core/CString.h>
+#include <string.h>
 
 #include <libutils/RefPtr.h>
 #include <libutils/StringStorage.h>

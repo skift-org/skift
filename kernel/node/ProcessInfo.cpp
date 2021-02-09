@@ -1,7 +1,7 @@
 
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <libsystem/core/CString.h>
+#include <string.h>
 #include <libsystem/json/Json.h>
 #include <libsystem/math/MinMax.h>
 

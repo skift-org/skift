@@ -1,7 +1,7 @@
 #pragma once
+#include <string.h>
 
 #include <libsystem/Common.h>
-#include <libsystem/core/CString.h>
 #include <libutils/Iteration.h>
 
 /* --- RSDP ----------------------------------------------------------------- */

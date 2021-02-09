@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "archs/Architectures.h"
 #include "archs/VirtualMemory.h"

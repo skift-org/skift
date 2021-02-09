@@ -72,3 +72,8 @@ int vfprintf(FILE *file, const char *fmt, va_list va)
     __printf(&info, va);
     return fwrite(s, strlen(s), 1, file);
 }
+
+int vprintf(const char *fmt, va_list va)
+{
+    return vfprintf(stdout, fmt, va);
+}

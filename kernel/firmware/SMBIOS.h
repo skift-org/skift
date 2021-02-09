@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/core/CString.h>
+#include <string.h>
 
 #include "kernel/memory/MemoryRange.h"
 

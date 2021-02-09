@@ -1,7 +1,8 @@
 
 #include <assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
+#include <string.h>
+#include <stdio.h>
 #include <libsystem/io/Stream.h>
 
 #include "archs/VirtualMemory.h"

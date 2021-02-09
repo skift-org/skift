@@ -1,5 +1,7 @@
 #include "archs/Architectures.h"
 
+#include <stdio.h>
+
 #include "kernel/graphics/EarlyConsole.h"
 #include "kernel/graphics/Font.h"
 #include "kernel/interrupts/Interupts.h"

@@ -2,7 +2,7 @@
 #include <libsystem/BuildInfo.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <libsystem/core/CString.h>
+#include <string.h>
 
 #include "archs/Architectures.h"
 

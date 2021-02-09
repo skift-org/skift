@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
+#include <string.h>
 
 #include <thirdparty/multiboot/Multiboot2.h>
 

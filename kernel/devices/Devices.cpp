@@ -1,6 +1,6 @@
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
-#include <libsystem/utils/NumberFormatter.h>
+#include <string.h>
+#include <libc/skift/NumberFormatter.h>
 #include <libutils/StringBuilder.h>
 #include <libutils/Vector.h>
 

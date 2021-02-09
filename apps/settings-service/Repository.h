@@ -3,6 +3,7 @@
 #include <libsettings/Path.h>
 #include <libsystem/io/Directory.h>
 #include <libutils/Path.h>
+#include <stdio.h>
 
 #include "settings-service/Domain.h"
 

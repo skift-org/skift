@@ -7,6 +7,7 @@
 #include <libwidget/Panel.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Spacer.h>
+#include <stdio.h>
 
 int main(int argc, char **argv)
 {

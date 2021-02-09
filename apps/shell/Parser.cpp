@@ -1,5 +1,4 @@
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/utils/BufferBuilder.h>
 
 #include <libutils/Scanner.h>

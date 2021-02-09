@@ -3,7 +3,7 @@
 #include <initializer_list>
 #include <type_traits>
 
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/Common.h>
 
 template <typename T, size_t N>

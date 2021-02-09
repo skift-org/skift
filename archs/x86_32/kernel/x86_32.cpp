@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <stdio.h>
 #include <libsystem/core/Plugs.h>
 
 #include "archs/VirtualMemory.h"
@@ -188,14 +187,14 @@ void arch_dump_stack_frame(void *sf)
 {
     auto stackframe = reinterpret_cast<InterruptStackFrame *>(sf);
 
-    printf("\tCS=%04x DS=%04x ES=%04x FS=%04x GS=%04x\n", stackframe->cs, stackframe->ds, stackframe->es, stackframe->fs, stackframe->gs);
-    printf("\tEAX=%08x EBX=%08x ECX=%08x EDX=%08x\n", stackframe->eax, stackframe->ebx, stackframe->ecx, stackframe->edx);
-    printf("\tEDI=%08x ESI=%08x EBP=%08x ESP=%08x\n", stackframe->edi, stackframe->esi, stackframe->ebp, stackframe->esp);
-    printf("\tINT=%08x ERR=%08x EIP=%08x FLG=%08x\n", stackframe->intno, stackframe->err, stackframe->eip, stackframe->eflags);
+    stream_format(out_stream, "\tCS=%04x DS=%04x ES=%04x FS=%04x GS=%04x\n", stackframe->cs, stackframe->ds, stackframe->es, stackframe->fs, stackframe->gs);
+    stream_format(out_stream, "\tEAX=%08x EBX=%08x ECX=%08x EDX=%08x\n", stackframe->eax, stackframe->ebx, stackframe->ecx, stackframe->edx);
+    stream_format(out_stream, "\tEDI=%08x ESI=%08x EBP=%08x ESP=%08x\n", stackframe->edi, stackframe->esi, stackframe->ebp, stackframe->esp);
+    stream_format(out_stream, "\tINT=%08x ERR=%08x EIP=%08x FLG=%08x\n", stackframe->intno, stackframe->err, stackframe->eip, stackframe->eflags);
 
-    printf("\tCR0=%08x CR2=%08x CR3=%08x CR4=%08x\n", CR0(), CR2(), CR3(), CR4());
+    stream_format(out_stream, "\tCR0=%08x CR2=%08x CR3=%08x CR4=%08x\n", CR0(), CR2(), CR3(), CR4());
 
-    printf("\n\tBacktrace:\n");
+    stream_format(out_stream, "\n\tBacktrace:\n");
     backtrace_internal(stackframe->ebp);
 }
 

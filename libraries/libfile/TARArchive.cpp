@@ -147,7 +147,7 @@ void TARArchive::read_archive()
     // Archive does not exist
     if (!archive_file.exist())
     {
-        printf("Archive does not exist: %s", _path.string().cstring());
+        logger_error("Archive does not exist: %s", _path.string().cstring());
         return;
     }
 

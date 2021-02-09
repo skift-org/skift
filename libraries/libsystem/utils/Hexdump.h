@@ -2,28 +2,27 @@
 
 #include <ctype.h>
 #include <libsystem/io/Stream.h>
-#include <stdio.h>
 
 static inline void hexdump(const void *ptr, int buflen)
 {
     unsigned char *buf = (unsigned char *)ptr;
     for (int i = 0; i < buflen; i += 16)
     {
-        printf("%06x: ", i);
+        stream_format(out_stream, "%06x: ", i);
 
         for (int j = 0; j < 16; j++)
         {
             if (i + j < buflen)
             {
-                printf("%02x ", buf[i + j]);
+                stream_format(out_stream, "%02x ", buf[i + j]);
             }
             else
             {
-                printf("   ");
+                stream_format(out_stream, "   ");
             }
         }
 
-        printf(" ");
+        stream_format(out_stream, " ");
 
         for (int j = 0; j < 16; j++)
         {
@@ -31,10 +30,10 @@ static inline void hexdump(const void *ptr, int buflen)
             {
                 char c = isprint(buf[i + j]) ? buf[i + j] : '.';
 
-                printf("%c", c);
+                stream_format(out_stream, "%c", c);
             }
         }
 
-        printf("\n");
+        stream_format(out_stream, "\n");
     }
 }

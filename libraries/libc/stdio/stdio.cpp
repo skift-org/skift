@@ -9,6 +9,8 @@
 #undef printf
 #undef puts
 
+#ifndef __KERNEL__
+
 FILE _stdin{0, 0, 0};
 FILE _stdout{1, 0, 0};
 FILE _stderr{2, 0, 0};
@@ -409,3 +411,5 @@ int setvbuf(FILE *stream, char *buf, int mode, size_t size)
 
     return -1;
 }
+
+#endif

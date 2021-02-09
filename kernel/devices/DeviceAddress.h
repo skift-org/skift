@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <libsystem/io/Stream.h>
 #include <libutils/Iteration.h>
 #include <stdio.h>
 

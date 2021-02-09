@@ -1,7 +1,6 @@
 #pragma once
 
 #include <libsystem/Common.h>
-#include <stdio.h>
 #include <string.h>
 #include <libsystem/math/MinMax.h>
 #include <libutils/RefCounted.h>

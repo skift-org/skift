@@ -1,7 +1,5 @@
 #include "archs/Architectures.h"
 
-#include <stdio.h>
-
 #include "kernel/graphics/EarlyConsole.h"
 #include "kernel/graphics/Font.h"
 #include "kernel/interrupts/Interupts.h"
@@ -71,40 +69,40 @@ void system_panic_internal(__SOURCE_LOCATION__ location, void *stackframe, const
     if (!has_panic)
     {
         has_panic = true;
-        printf("\n\e[0;33m--- \e[0;31m!!!\e[0;33m ------------------------------------------------------------------------\e[0m\n");
-        printf("\n\tKERNEL");
-        printf(" PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[system_get_tick() % __array_length(witty_comments)]);
+        stream_format(out_stream, "\n\e[0;33m--- \e[0;31m!!!\e[0;33m ------------------------------------------------------------------------\e[0m\n");
+        stream_format(out_stream, "\n\tKERNEL");
+        stream_format(out_stream, " PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[system_get_tick() % __array_length(witty_comments)]);
     }
     else
     {
         nested_panic = true;
-        printf("\n\n\e[0;33m- - \e[0;31mNESTED\e[0;33m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\e[0m\n");
-        printf("\n\tNESTED");
-        printf(" PANIC\n\t// %s\n\n\t\e[0;31m", YO_DAWG);
+        stream_format(out_stream, "\n\n\e[0;33m- - \e[0;31mNESTED\e[0;33m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\e[0m\n");
+        stream_format(out_stream, "\n\tNESTED");
+        stream_format(out_stream, " PANIC\n\t// %s\n\n\t\e[0;31m", YO_DAWG);
     }
 
-    vprintf(message, va);
-    printf("\e[0m\n\tthrow by %s %s() ln%d", location.file, location.function, location.line);
+    stream_vprintf(out_stream, message, va);
+    stream_format(out_stream, "\e[0m\n\tthrow by %s %s() ln%d", location.file, location.function, location.line);
 
-    printf("\n");
-    printf("\n\tDiagnostic:");
-    printf("\n\tThe system was running for %d tick.", system_get_tick());
+    stream_format(out_stream, "\n");
+    stream_format(out_stream, "\n\tDiagnostic:");
+    stream_format(out_stream, "\n\tThe system was running for %d tick.", system_get_tick());
 
     if (scheduler_running_id() != -1)
     {
-        printf("\n\tThe running process is %d: %s", scheduler_running_id(), scheduler_running()->name);
+        stream_format(out_stream, "\n\tThe running process is %d: %s", scheduler_running_id(), scheduler_running()->name);
     }
 
     if (scheduler_is_context_switch())
     {
-        printf("\n\tWe are context switching\n", system_get_tick());
+        stream_format(out_stream, "\n\tWe are context switching\n", system_get_tick());
     }
     else
     {
-        printf("\n");
+        stream_format(out_stream, "\n");
     }
 
-    printf("\n\tStackframe:\n");
+    stream_format(out_stream, "\n\tStackframe:\n");
     if (stackframe)
     {
         arch_dump_stack_frame(stackframe);
@@ -113,11 +111,11 @@ void system_panic_internal(__SOURCE_LOCATION__ location, void *stackframe, const
     {
         arch_backtrace();
     }
-    printf("\n");
+    stream_format(out_stream, "\n");
 
     memory_dump();
 
-    printf("\n");
+    stream_format(out_stream, "\n");
 
     if (!nested_panic)
     {
@@ -125,11 +123,11 @@ void system_panic_internal(__SOURCE_LOCATION__ location, void *stackframe, const
         arch_panic_dump();
     }
 
-    printf("\n");
+    stream_format(out_stream, "\n");
 
-    printf("\n\tSystem halted!\n");
+    stream_format(out_stream, "\n\tSystem halted!\n");
 
-    printf("\n\e[0;33m--------------------------------------------------------------------------------\n\n");
+    stream_format(out_stream, "\n\e[0;33m--------------------------------------------------------------------------------\n\n");
 
     system_stop();
 }

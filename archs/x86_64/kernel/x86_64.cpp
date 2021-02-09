@@ -165,48 +165,48 @@ void arch_dump_stack_frame(void *sfptr)
 {
     auto stackframe = reinterpret_cast<InterruptStackFrame *>(sfptr);
 
-    printf("\tRAX=%016x RBX=%016x RCX=%016x \n",
-           stackframe->rax,
-           stackframe->rbx,
-           stackframe->rcx);
+    stream_format(out_stream, "\tRAX=%016x RBX=%016x RCX=%016x \n",
+                  stackframe->rax,
+                  stackframe->rbx,
+                  stackframe->rcx);
 
-    printf("\tRDX=%016x RSI=%016x RDI=%016x\n",
-           stackframe->rdx,
-           stackframe->rsi,
-           stackframe->rdi);
+    stream_format(out_stream, "\tRDX=%016x RSI=%016x RDI=%016x\n",
+                  stackframe->rdx,
+                  stackframe->rsi,
+                  stackframe->rdi);
 
-    printf("\tR08=%016x R09=%016x R10=%016x\n",
-           stackframe->r8,
-           stackframe->r9,
-           stackframe->r10);
+    stream_format(out_stream, "\tR08=%016x R09=%016x R10=%016x\n",
+                  stackframe->r8,
+                  stackframe->r9,
+                  stackframe->r10);
 
-    printf("\tR11=%016x R12=%016x R13=%016x\n",
-           stackframe->r11,
-           stackframe->r12,
-           stackframe->r13);
+    stream_format(out_stream, "\tR11=%016x R12=%016x R13=%016x\n",
+                  stackframe->r11,
+                  stackframe->r12,
+                  stackframe->r13);
 
-    printf("\tR14=%016x R15=%016x RBP=%016x\n",
-           stackframe->r14,
-           stackframe->r15,
-           stackframe->rbp);
+    stream_format(out_stream, "\tR14=%016x R15=%016x RBP=%016x\n",
+                  stackframe->r14,
+                  stackframe->r15,
+                  stackframe->rbp);
 
-    printf("\n");
+    stream_format(out_stream, "\n");
 
-    printf("\tINT=%08x ERR=%08x\n", stackframe->intno, stackframe->err);
+    stream_format(out_stream, "\tINT=%08x ERR=%08x\n", stackframe->intno, stackframe->err);
 
-    printf("\n");
+    stream_format(out_stream, "\n");
 
-    printf("\tRIP=%016x  CS=%016x FLG=%016x\n"
-           "\tRSP=%016x  SS=%016x",
-           stackframe->rip,
-           stackframe->cs,
-           stackframe->rflags,
-           stackframe->rsp,
-           stackframe->ss);
+    stream_format(out_stream, "\tRIP=%016x  CS=%016x FLG=%016x\n"
+                              "\tRSP=%016x  SS=%016x",
+                  stackframe->rip,
+                  stackframe->cs,
+                  stackframe->rflags,
+                  stackframe->rsp,
+                  stackframe->ss);
 
-    printf(" CR0=%016x\n\tCR2=%016x CR3=%016x CR4=%016x\n", CR0(), CR2(), CR3(), CR4());
+    stream_format(out_stream, " CR0=%016x\n\tCR2=%016x CR3=%016x CR4=%016x\n", CR0(), CR2(), CR3(), CR4());
 
-    printf("\n\tBacktrace:\n");
+    stream_format(out_stream, "\n\tBacktrace:\n");
     backtrace_internal(stackframe->rbp);
 }
 

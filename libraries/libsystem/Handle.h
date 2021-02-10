@@ -6,7 +6,7 @@
 #include <libutils/ResultOr.h>
 #include <libutils/String.h>
 
-namespace sk::system
+namespace System
 {
 
 class Handle
@@ -138,4 +138,4 @@ public:
     }
 };
 
-} // namespace sk::system
+} // namespace System

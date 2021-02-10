@@ -8,7 +8,7 @@ FileReader::FileReader(Path &path) : _handle{path.string(), OPEN_READ | OPEN_STR
 {
 }
 
-FileReader::FileReader(sk::system::Handle &&handle) : _handle{move(handle)}
+FileReader::FileReader(System::Handle &&handle) : _handle{move(handle)}
 {
 }
 

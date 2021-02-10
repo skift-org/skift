@@ -201,13 +201,7 @@ long ftell(FILE *stream)
 
 int puts(const char *s)
 {
-    size_t length = 0;
-
-    for (length = 0; s[length]; length++)
-    {
-    }
-
-    int r = fwrite(s, length, 1, __stdio_get_stdout());
+    int r = fwrite(s, strlen(s), 1, __stdio_get_stdout());
     r += fwrite("\n", 1, 1, __stdio_get_stdout());
 
     return r;
@@ -238,7 +232,7 @@ int printf(const char *fmt, ...)
     int result;
     va_list ap;
     va_start(ap, fmt);
-    result = fprintf(__stdio_get_stdout(), fmt, ap);
+    result = vfprintf(__stdio_get_stdout(), fmt, ap);
     va_end(ap);
 
     return result;

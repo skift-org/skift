@@ -14,7 +14,7 @@ int vfprintf(FILE *file, const char *fmt, va_list va)
     info.format = fmt;
     info.append = file_append;
     info.output = file;
-    info.allocated = 1024;
+    info.allocated = -1;
 
     // We need it to start with a 0 because we use strapd.
     return __printf(&info, va);

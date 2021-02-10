@@ -1,7 +1,7 @@
 
 #include <assert.h>
 #include <libsystem/core/Plugs.h>
-#include <libsystem/process/Environment.h>
+#include <libc/skift/Environment.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 #include <libutils/Path.h>

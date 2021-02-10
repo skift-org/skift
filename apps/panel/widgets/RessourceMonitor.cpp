@@ -1,7 +1,7 @@
 #include <abi/Syscalls.h>
 
 #include <libsystem/eventloop/Timer.h>
-#include <libsystem/process/Environment.h>
+#include <libc/skift/Environment.h>
 
 #include <libwidget/Graph.h>
 #include <libwidget/Label.h>

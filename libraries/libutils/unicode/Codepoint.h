@@ -1,19 +1,21 @@
+#pragma once
 
-#include <libsystem/Logger.h>
-#include <libsystem/unicode/Codepoint.h>
+#include <libsystem/Common.h>
 
-bool codepoint_is_digit(Codepoint codepoint)
+typedef uint32_t Codepoint;
+
+inline bool codepoint_is_digit(Codepoint codepoint)
 {
     return (codepoint >= U'0' && codepoint <= U'9');
 }
 
-bool codepoint_is_alpha(Codepoint codepoint)
+inline bool codepoint_is_alpha(Codepoint codepoint)
 {
     return (codepoint >= U'a' && codepoint <= U'z') ||
            (codepoint >= U'A' && codepoint <= U'Z');
 }
 
-int codepoint_numeric_value(Codepoint codepoint)
+inline int codepoint_numeric_value(Codepoint codepoint)
 {
     if (codepoint_is_digit(codepoint))
     {
@@ -25,7 +27,7 @@ int codepoint_numeric_value(Codepoint codepoint)
     }
 }
 
-int utf8_to_codepoint(const uint8_t *buffer, Codepoint *codepoint)
+inline int utf8_to_codepoint(const uint8_t *buffer, Codepoint *codepoint)
 {
     if ((buffer[0] & 0xf8) == 0xf0)
     {
@@ -61,7 +63,7 @@ int utf8_to_codepoint(const uint8_t *buffer, Codepoint *codepoint)
     return 0;
 }
 
-int codepoint_to_utf8(Codepoint codepoint, uint8_t *buffer)
+inline int codepoint_to_utf8(Codepoint codepoint, uint8_t *buffer)
 {
     if (codepoint <= 0x7F)
     {
@@ -108,7 +110,7 @@ int codepoint_to_utf8(Codepoint codepoint, uint8_t *buffer)
     }
 }
 
-char codepoint_to_cp437(Codepoint codepoint)
+inline char codepoint_to_cp437(Codepoint codepoint)
 {
     if (codepoint >= U'\x20' && codepoint < U'\x7f')
     {
@@ -438,5 +440,22 @@ char codepoint_to_cp437(Codepoint codepoint)
 
     default:
         return '?';
+    }
+}
+
+template <typename T>
+inline void codepoint_foreach(const uint8_t *buffer, T callback)
+{
+    Codepoint codepoint = 0;
+
+    size_t size = utf8_to_codepoint(buffer, &codepoint);
+    buffer += size;
+
+    while (size && codepoint != 0)
+    {
+        callback(codepoint);
+
+        size = utf8_to_codepoint(buffer, &codepoint);
+        buffer += size;
     }
 }

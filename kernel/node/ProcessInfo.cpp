@@ -2,7 +2,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <string.h>
-#include <libsystem/json/Json.h>
+#include <libutils/json/Json.h>
 #include <libsystem/math/MinMax.h>
 
 #include "kernel/filesystem/Filesystem.h"
@@ -16,12 +16,12 @@ FsProcessInfo::FsProcessInfo() : FsNode(FILE_TYPE_DEVICE)
 {
 }
 
-static Iteration serialize_task(json::Array *list, Task *task)
+static Iteration serialize_task(json::Value::Array *list, Task *task)
 {
     if (task->id == 0)
         return Iteration::CONTINUE;
 
-    json::Object task_object{};
+    json::Value::Object task_object{};
 
     task_object["id"] = task->id;
     task_object["name"] = task->name;
@@ -38,7 +38,7 @@ static Iteration serialize_task(json::Array *list, Task *task)
 
 Result FsProcessInfo::open(FsHandle *handle)
 {
-    json::Array list{};
+    json::Value::Array list{};
 
     task_iterate(&list, (TaskIterateCallback)serialize_task);
 

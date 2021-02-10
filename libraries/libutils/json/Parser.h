@@ -1,25 +1,21 @@
-#include <assert.h>
-#include <libsystem/io/Stream.h>
-#include <libsystem/json/Json.h>
-#include <libsystem/unicode/Codepoint.h>
-#include <libsystem/utils/NumberParser.h>
+#pragma once
+#include <libutils/NumberParser.h>
 #include <libutils/Scanner.h>
 #include <libutils/ScannerUtils.h>
 #include <libutils/StringBuilder.h>
 #include <libutils/Strings.h>
-#include <string.h>
+#include <libutils/json/Value.h>
 
 namespace json
 {
+Value value(Scanner &scan);
 
-static Value value(Scanner &scan);
-
-static void whitespace(Scanner &scan)
+inline void whitespace(Scanner &scan)
 {
     scan.eat(Strings::WHITESPACE);
 }
 
-static Value number(Scanner &scan)
+inline Value number(Scanner &scan)
 {
 #ifdef __KERNEL__
     return Value{scan_int(scan, 10)};
@@ -28,7 +24,7 @@ static Value number(Scanner &scan)
 #endif
 }
 
-static String string(Scanner &scan)
+inline String string(Scanner &scan)
 {
     StringBuilder builder{};
 
@@ -52,11 +48,11 @@ static String string(Scanner &scan)
     return builder.finalize();
 }
 
-static Value array(Scanner &scan)
+inline Value array(Scanner &scan)
 {
     scan.skip('[');
 
-    Array array{};
+    Value::Array array{};
 
     whitespace(scan);
 
@@ -79,11 +75,11 @@ static Value array(Scanner &scan)
     return move(array);
 }
 
-static Value object(Scanner &scan)
+inline Value object(Scanner &scan)
 {
     scan.skip('{');
 
-    Object object{};
+    Value::Object object{};
 
     whitespace(scan);
 
@@ -111,7 +107,7 @@ static Value object(Scanner &scan)
     return object;
 }
 
-static Value keyword(Scanner &scan)
+inline Value keyword(Scanner &scan)
 {
     StringBuilder builder{};
 
@@ -138,7 +134,7 @@ static Value keyword(Scanner &scan)
     }
 }
 
-static Value value(Scanner &scan)
+inline Value value(Scanner &scan)
 {
     whitespace(scan);
 
@@ -171,25 +167,25 @@ static Value value(Scanner &scan)
     return value;
 }
 
-Value parse(Scanner &scan)
+inline Value parse(Scanner &scan)
 {
     scan_skip_utf8bom(scan);
     return value(scan);
 }
 
-Value parse(const char *str, size_t size)
+inline Value parse(const char *str, size_t size)
 {
     StringScanner scan{str, size};
     return parse(scan);
 };
 
-Value parse(const String &str)
+inline Value parse(const String &str)
 {
     StringScanner scan{str.cstring(), str.length()};
     return parse(scan);
 };
 
-Value parse_file(const char *path)
+inline Value parse_file(const char *path)
 {
     __cleanup(stream_cleanup) Stream *json_file = stream_open(path, OPEN_READ | OPEN_BUFFERED);
 
@@ -202,5 +198,4 @@ Value parse_file(const char *path)
     scan_skip_utf8bom(scan);
     return value(scan);
 }
-
 } // namespace json

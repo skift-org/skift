@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
-#include <libsystem/unicode/Codepoint.h>
+#include <libutils/unicode/Codepoint.h>
 #include <libutils/String.h>
 #include <libutils/Vector.h>
 

@@ -1,7 +1,7 @@
 #include <libsystem/io/Stream.h>
-#include <libsystem/json/Json.h>
+#include <libutils/json/Json.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/utils/NumberParser.h>
+#include <libutils/NumberParser.h>
 #include <libutils/ArgParse.h>
 
 int kill(int pid)

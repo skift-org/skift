@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <libsystem/Common.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/unicode/Codepoint.h>
+#include <libutils/unicode/Codepoint.h>
 #include <libutils/String.h>
 #include <libutils/Vector.h>
 

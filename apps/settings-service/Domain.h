@@ -23,7 +23,7 @@ struct Domain
     {
         if (path.domain == "*")
         {
-            json::Object obj;
+            json::Value::Object obj;
 
             bundles.foreach ([&](auto &key, auto &value) {
                 obj[key] = value.read(path);

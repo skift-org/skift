@@ -2,7 +2,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <string.h>
-#include <libsystem/json/Json.h>
+#include <libutils/json/Json.h>
 #include <libsystem/math/MinMax.h>
 
 #include "kernel/devices/Devices.h"
@@ -17,10 +17,10 @@ FsDeviceInfo::FsDeviceInfo() : FsNode(FILE_TYPE_DEVICE)
 
 Result FsDeviceInfo::open(FsHandle *handle)
 {
-    json::Array root{};
+    json::Value::Array root{};
 
     device_iterate([&](RefPtr<Device> device) {
-        json::Object device_object{};
+        json::Value::Object device_object{};
 
         auto *driver = driver_for(device->address());
 

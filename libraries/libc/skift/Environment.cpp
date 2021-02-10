@@ -1,5 +1,5 @@
-#include <libsystem/json/Json.h>
-#include <libsystem/process/Environment.h>
+#include <libutils/json/Json.h>
+#include <libc/skift/Environment.h>
 
 static json::Value *_root = nullptr;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/unicode/Codepoint.h>
+#include <libutils/unicode/Codepoint.h>
 #include <libterminal/Attributes.h>
 
 namespace terminal

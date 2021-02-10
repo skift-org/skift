@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/unicode/Codepoint.h>
+#include <libutils/unicode/Codepoint.h>
 
 #define KEY_LIST(__ENTRY)                              \
     __ENTRY(KEYBOARD_KEY_INVALID, 0x0)                 \

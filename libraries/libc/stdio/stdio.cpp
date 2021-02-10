@@ -6,9 +6,6 @@
 
 #include <abi/Syscalls.h>
 
-#undef printf
-#undef puts
-
 #ifndef __KERNEL__
 
 FILE _stdin{0, 0, 0};

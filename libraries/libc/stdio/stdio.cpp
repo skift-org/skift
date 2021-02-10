@@ -201,8 +201,8 @@ long ftell(FILE *stream)
 
 int puts(const char *s)
 {
-    int r = fwrite(s, strlen(s), 1, __stdio_get_stdout());
-    r += fwrite("\n", 1, 1, __stdio_get_stdout());
+    int r = fwrite(s, strlen(s), 1, stdout);
+    r += fwrite("\n", 1, 1, stdout);
 
     return r;
 }
@@ -216,7 +216,8 @@ int getc(FILE *file)
 
 int putc(int c, FILE *file)
 {
-    fwrite(&c, 1, 1, file);
+    uint8_t b = c;
+    fwrite(&b, 1, 1, file);
     return c;
 }
 
@@ -232,7 +233,7 @@ int printf(const char *fmt, ...)
     int result;
     va_list ap;
     va_start(ap, fmt);
-    result = vfprintf(__stdio_get_stdout(), fmt, ap);
+    result = vfprintf(stdout, fmt, ap);
     va_end(ap);
 
     return result;
@@ -285,7 +286,7 @@ char *fgets(char *s, int size, FILE *file)
 {
     fread(s, size, 1, file);
 
-    // TODO: error handking
+    // TODO: error handling
     return s;
 }
 
@@ -301,7 +302,7 @@ int fputc(int c, FILE *file)
 
 int getchar(void)
 {
-    return fgetc(__stdio_get_stdin());
+    return fgetc(stdin);
 }
 
 int fscanf(FILE *stream, const char *format, ...)

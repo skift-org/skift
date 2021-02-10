@@ -2,8 +2,8 @@
 // printf.c : printf and snprintf internals
 #include <ctype.h>
 
-#include <libc/skift/Printf.h>
 #include <libc/skift/NumberFormatter.h>
+#include <libc/skift/Printf.h>
 #include <string.h>
 
 int __printf_formate_binary(printf_info_t *info, va_list *va)
@@ -125,7 +125,6 @@ int __printf_formate_char(printf_info_t *info, va_list *va)
 {
     char v = va_arg(*va, int);
 
-    // FIXME: support unicode
     char buffer[2] = {v, 0};
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
@@ -240,6 +239,11 @@ int __printf(printf_info_t *info, va_list va)
             if (info->c == '0')
             {
                 info->padding = '0';
+                PRINTF_PEEK();
+            }
+            if (info->c == 'l')
+            {
+                // FIXME: ignore long prefix
                 PRINTF_PEEK();
             }
             else if (info->c == '-')

@@ -2,8 +2,8 @@
 // printf.c : printf and snprintf internals
 #include <ctype.h>
 
-#include <libc/skift/NumberFormatter.h>
-#include <libc/skift/Printf.h>
+#include <skift/NumberFormatter.h>
+#include <skift/Printf.h>
 #include <string.h>
 
 int __printf_formate_binary(printf_info_t *info, va_list *va)

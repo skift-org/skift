@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libc/skift/Lock.h>
 #include <libutils/RingBuffer.h>
+#include <skift/Lock.h>
 
 #include "archs/x86/kernel/COM.h"
 

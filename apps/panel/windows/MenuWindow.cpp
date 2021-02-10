@@ -1,4 +1,3 @@
-#include <libc/skift/Environment.h>
 #include <libsystem/process/Process.h>
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
@@ -6,6 +5,7 @@
 #include <libwidget/Screen.h>
 #include <libwidget/Separator.h>
 #include <libwidget/Spacer.h>
+#include <skift/Environment.h>
 
 #include "panel/model/MenuEntry.h"
 #include "panel/widgets/ApplicationListing.h"

@@ -84,6 +84,8 @@ int system(const char *command)
     return -1;
 }
 
+#ifndef __KERNEL__
+
 double strtod(const char *nptr, char **endptr)
 {
     int sign = 1;
@@ -177,6 +179,8 @@ double atof(const char *nptr)
 {
     return strtod(nptr, nullptr);
 }
+
+#endif
 
 void *bsearch(
     const void *key,

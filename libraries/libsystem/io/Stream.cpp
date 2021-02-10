@@ -1,8 +1,8 @@
 
+#include <assert.h>
+#include <skift/Printf.h>
 #include <string.h>
 
-#include <assert.h>
-#include <libc/skift/Printf.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/io/Stream_internal.h>

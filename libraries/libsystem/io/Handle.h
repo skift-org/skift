@@ -1,8 +1,7 @@
 #pragma once
 
 #include <abi/Handle.h>
-
-#include <libc/skift/Time.h>
+#include <skift/Time.h>
 
 #define handle_printf_error(__handle, __args...) __handle_printf_error(HANDLE(__handle), __args)
 

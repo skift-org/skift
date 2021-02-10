@@ -1,5 +1,5 @@
 #include <libc/cxx/cxx.h>
-#include <libc/skift/Environment.h>
+#include <skift/Environment.h>
 #include <stdint.h>
 #include <stdlib.h>
 

@@ -2,8 +2,8 @@
 
 #include <abi/Syscalls.h>
 
-#include <libc/skift/Lock.h>
-#include <libc/skift/Plugs.h>
+#include <skift/Lock.h>
+#include <skift/Plugs.h>
 
 static Lock _memory_lock{"memory_lock"};
 

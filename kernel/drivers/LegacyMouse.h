@@ -1,9 +1,9 @@
 #pragma once
 
 #include <abi/Mouse.h>
-#include <libc/skift/Lock.h>
-#include <libutils/RingBuffer.h>
 #include <libutils/Array.h>
+#include <libutils/RingBuffer.h>
+#include <skift/Lock.h>
 
 #include "kernel/devices/LegacyDevice.h"
 

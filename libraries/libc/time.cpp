@@ -1,6 +1,6 @@
 #include <time.h>
 
-#include <libc/skift/Time.h>
+#include <skift/Time.h>
 
 time_t time(time_t *timer)
 {

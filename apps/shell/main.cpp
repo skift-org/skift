@@ -3,15 +3,15 @@
 #include <libsystem/Logger.h>
 #include <libsystem/cmdline/ReadLine.h>
 #include <libsystem/io/Stream.h>
-#include <libc/skift/Environment.h>
 #include <libsystem/process/Process.h>
+#include <skift/Environment.h>
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "shell/Shell.h"
 
-const char8_t* PROMPT = u8"\e[;1;94m µ \e[m";
+const char8_t *PROMPT = u8"\e[;1;94m µ \e[m";
 
 void shell_prompt(int last_command_exit_value)
 {
@@ -33,7 +33,7 @@ void shell_prompt(int last_command_exit_value)
     printf("%s", buffer);
 
     // FIXME: We should use char8_t
-    printf((const char*)PROMPT);
+    printf((const char *)PROMPT);
 }
 
 int main(int argc, char **argv)

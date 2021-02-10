@@ -25,15 +25,15 @@ Date timestamp_to_date(TimeStamp timestamp)
     date.year = EPOCH_YEAR;
     while (days - DAYS_PER_YEAR[IS_LEAP_YEAR(date.year)] > 0)
     {
-        date.year++;
         days -= DAYS_PER_YEAR[IS_LEAP_YEAR(date.year)];
+        date.year++;
     }
 
     date.month = 0;
     while (days - DAYS_PER_MONTH[IS_LEAP_YEAR(date.year)][date.month] > 0)
-    {
-        date.month++;
+    {  
         days -= DAYS_PER_MONTH[IS_LEAP_YEAR(date.year)][date.month];
+        date.month++;
     }
 
     date.month++;

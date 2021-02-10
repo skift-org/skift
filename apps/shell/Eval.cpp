@@ -9,8 +9,6 @@
 #include <libsystem/process/Process.h>
 #include <libutils/Path.h>
 #include <stdio.h>
-#undef stdin
-#undef stdout
 
 #include "shell/Shell.h"
 
@@ -51,7 +49,7 @@ bool find_command_path(char *buffer, const char *command)
     return false;
 }
 
-Result shell_exec(ShellCommand *command, Stream *stdin, Stream *stdout, int *pid)
+Result shell_exec(ShellCommand *command, Stream *instream, Stream *outstream, int *pid)
 {
     char executable[PATH_LENGTH];
     if (!find_command_path(executable, command->command))
@@ -67,13 +65,13 @@ Result shell_exec(ShellCommand *command, Stream *stdin, Stream *stdout, int *pid
         launchpad_argument(launchpad, arg);
     }
 
-    launchpad_handle(launchpad, HANDLE(stdin), 0);
-    launchpad_handle(launchpad, HANDLE(stdout), 1);
+    launchpad_handle(launchpad, HANDLE(instream), 0);
+    launchpad_handle(launchpad, HANDLE(outstream), 1);
 
     return launchpad_launch(launchpad, pid);
 }
 
-int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
+int shell_eval(ShellNode *node, Stream *instream, Stream *outstream)
 {
     switch (node->type)
     {
@@ -103,7 +101,7 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
         }
 
         int pid;
-        Result result = shell_exec(command, stdin, stdout, &pid);
+        Result result = shell_exec(command, instream, outstream, &pid);
         auto path = Path::parse(command->command, Path::PARENT_SHORTHAND);
 
         if (result == SUCCESS)
@@ -145,8 +143,8 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
             list_peekat(pipeline->commands, i, (void **)&command);
             assert(command);
 
-            Stream *command_stdin = stdin;
-            Stream *command_stdout = stdout;
+            Stream *command_stdin = instream;
+            Stream *command_stdout = outstream;
 
             if (i > 0)
             {
@@ -192,7 +190,7 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
             return PROCESS_FAILURE;
         }
 
-        return shell_eval(redirect->command, stdin, stream);
+        return shell_eval(redirect->command, instream, stream);
     }
     break;
 

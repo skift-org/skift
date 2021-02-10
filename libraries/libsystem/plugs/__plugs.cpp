@@ -19,12 +19,6 @@ void __plug_uninitialize(int exit_code)
     __unused(exit_code);
 }
 
-void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
-{
-    logger_fatal("Assert failed: %s in %s:%s() ln%d!", expr, file, function, line);
-    process_abort();
-}
-
 void __plug_logger_lock()
 {
     _logger_lock.acquire(SOURCE_LOCATION);

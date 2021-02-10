@@ -9,60 +9,14 @@
 
 static Lock _logger_lock{"logger_lock"};
 
-Stream *in_stream;
-Stream *out_stream;
-Stream *err_stream;
-Stream *log_stream;
-
-extern "C" void _init();
-extern "C" void _fini();
-
 void __plug_initialize()
 {
-    // Open io stream
-    in_stream = stream_open_handle(0, OPEN_READ);
-    out_stream = stream_open_handle(1, OPEN_WRITE | OPEN_BUFFERED);
-    err_stream = stream_open_handle(2, OPEN_WRITE | OPEN_BUFFERED);
-    log_stream = stream_open_handle(3, OPEN_WRITE | OPEN_BUFFERED);
 
-    _init();
-
-    extern void (*__init_array_start[])(int, char **, char **) __attribute__((visibility("hidden")));
-    extern void (*__init_array_end[])(int, char **, char **) __attribute__((visibility("hidden")));
-
-    const size_t size = __init_array_end - __init_array_start;
-    for (size_t i = 0; i < size; i++)
-    {
-
-        (*__init_array_start[i])(0, nullptr, nullptr);
-    }
 }
 
 void __plug_uninitialize(int exit_code)
 {
-    _fini();
-
-    if (in_stream)
-    {
-        stream_flush(in_stream);
-    }
-
-    if (out_stream)
-    {
-        stream_flush(out_stream);
-    }
-
-    if (err_stream)
-    {
-        stream_flush(err_stream);
-    }
-
-    if (log_stream)
-    {
-        stream_flush(log_stream);
-    }
-
-    __plug_process_exit(exit_code);
+    __unused(exit_code);
 }
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)

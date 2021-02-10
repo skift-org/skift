@@ -8,6 +8,51 @@
 #include <libsystem/io/Stream_internal.h>
 #include <libsystem/math/MinMax.h>
 
+Stream *_in_stream = nullptr;
+Stream *_out_stream = nullptr;
+Stream *_err_stream = nullptr;
+Stream *_log_stream = nullptr;
+
+Stream *__stream_get_in_stream()
+{
+    if (_in_stream == nullptr)
+    {
+        _in_stream = stream_open_handle(0, OPEN_READ);
+    }
+
+    return _in_stream;
+}
+
+Stream *__stream_get_out_stream()
+{
+    if (_out_stream == nullptr)
+    {
+        _out_stream = stream_open_handle(1, OPEN_WRITE | OPEN_BUFFERED);
+    }
+
+    return _out_stream;
+}
+
+Stream *__stream_get_err_stream()
+{
+    if (_err_stream == nullptr)
+    {
+        _err_stream = stream_open_handle(2, OPEN_WRITE | OPEN_BUFFERED);
+    }
+
+    return _err_stream;
+}
+
+Stream *__stream_get_log_stream()
+{
+    if (_log_stream == nullptr)
+    {
+        _log_stream = stream_open_handle(3, OPEN_WRITE | OPEN_BUFFERED);
+    }
+
+    return _log_stream;
+}
+
 static void stream_initialize(Stream *stream)
 {
     if (handle_has_flags(stream, OPEN_BUFFERED | OPEN_WRITE))

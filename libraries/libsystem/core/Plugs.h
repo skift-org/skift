@@ -6,7 +6,7 @@
 #include <abi/Launchpad.h>
 #include <abi/System.h>
 
-#include <libsystem/Time.h>
+#include <libc/skift/Time.h>
 #include <libutils/String.h>
 
 extern "C" void __plug_initialize();

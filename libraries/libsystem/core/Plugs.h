@@ -13,8 +13,6 @@ extern "C" void __plug_initialize();
 
 extern "C" void __plug_uninitialize(int exit_code);
 
-void __no_return __plug_assert_failed(const char *expr, const char *file, const char *function, int line);
-
 class Lock;
 __no_return void __plug_lock_ensure_failed(Lock &, const char *raison, __SOURCE_LOCATION__ location);
 

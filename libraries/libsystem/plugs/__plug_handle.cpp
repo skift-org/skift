@@ -1,9 +1,9 @@
 #include <abi/Syscalls.h>
+#include <skift/Environment.h>
 
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/Filesystem.h>
-#include <libc/skift/Environment.h>
 #include <libsystem/process/Process.h>
 #include <libutils/Path.h>
 

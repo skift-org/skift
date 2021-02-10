@@ -1,4 +1,4 @@
-#include <libc/skift/Printf.h>
+#include <skift/Printf.h>
 #include <stdio.h>
 #include <string.h>
 

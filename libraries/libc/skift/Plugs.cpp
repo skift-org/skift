@@ -1,5 +1,5 @@
 #include <abi/Syscalls.h>
-#include <libc/skift/Plugs.h>
+#include <skift/Plugs.h>
 #include <stdio.h>
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)

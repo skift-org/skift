@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include <libc/skift/Plugs.h>
+#include <skift/Plugs.h>
 
 static bool _nested = false;
 

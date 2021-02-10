@@ -1,6 +1,6 @@
 
-#include <libc/skift/Time.h>
 #include <libsystem/core/Plugs.h>
+#include <skift/Time.h>
 
 TimeStamp timestamp_now()
 {
@@ -31,7 +31,7 @@ Date timestamp_to_date(TimeStamp timestamp)
 
     date.month = 0;
     while (days - DAYS_PER_MONTH[IS_LEAP_YEAR(date.year)][date.month] > 0)
-    {  
+    {
         days -= DAYS_PER_MONTH[IS_LEAP_YEAR(date.year)][date.month];
         date.month++;
     }

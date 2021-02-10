@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libsystem/Common.h>
-#include <libc/skift/Time.h>
+#include <skift/Time.h>
 
 #define SYSTEM_INFO_FIELD_SIZE 65
 

@@ -1,11 +1,12 @@
 
 #include <assert.h>
-#include <libc/skift/Environment.h>
+#include <skift/Environment.h>
+#include <string.h>
+
 #include <libsystem/core/Plugs.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 #include <libutils/Path.h>
-#include <string.h>
 
 Launchpad *launchpad_create(const char *name, const char *executable)
 {

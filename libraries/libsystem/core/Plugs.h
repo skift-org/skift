@@ -5,8 +5,8 @@
 #include <abi/IOCall.h>
 #include <abi/Launchpad.h>
 #include <abi/System.h>
+#include <skift/Time.h>
 
-#include <libc/skift/Time.h>
 #include <libutils/String.h>
 
 extern "C" void __plug_initialize();

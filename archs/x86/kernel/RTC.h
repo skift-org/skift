@@ -1,5 +1,5 @@
 #pragma once
 
-#include <libc/skift/Time.h>
+#include <skift/Time.h>
 
 TimeStamp rtc_now();

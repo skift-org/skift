@@ -1,17 +1,17 @@
 
 #include <assert.h>
+#include <skift/Lock.h>
+
 #include <libsystem/Logger.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/system/Memory.h>
-#include <libc/skift/Lock.h>
 
 static Lock _logger_lock{"logger_lock"};
 
 void __plug_initialize()
 {
-
 }
 
 void __plug_uninitialize(int exit_code)

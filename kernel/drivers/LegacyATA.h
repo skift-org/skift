@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libutils/Array.h>
-#include <libc/skift/Lock.h>
+#include <skift/Lock.h>
 
 #include "kernel/devices/LegacyDevice.h"
 

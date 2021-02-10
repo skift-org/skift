@@ -1,6 +1,7 @@
-#include <libsystem/io/Stream.h>
-#include <libc/skift/Environment.h>
+#include <skift/Environment.h>
 #include <stdio.h>
+
+#include <libsystem/io/Stream.h>
 
 int main(int argc, char const *argv[])
 {

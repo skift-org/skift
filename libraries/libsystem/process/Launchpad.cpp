@@ -1,7 +1,7 @@
 
 #include <assert.h>
-#include <libsystem/core/Plugs.h>
 #include <libc/skift/Environment.h>
+#include <libsystem/core/Plugs.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 #include <libutils/Path.h>
@@ -27,8 +27,10 @@ Launchpad *launchpad_create(const char *name, const char *executable)
     auto executable_path = Path::parse(executable);
     launchpad_argument(launchpad, executable_path.basename().cstring());
 
+#ifndef __KERNEL__
     auto env_copy = environment_copy();
     launchpad_environment(launchpad, strdup(env_copy.cstring()));
+#endif
 
     return launchpad;
 }

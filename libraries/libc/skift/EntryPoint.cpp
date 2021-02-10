@@ -8,7 +8,7 @@ extern "C" int main(int argc, char **argv);
 extern "C" void _init();
 extern "C" void _fini();
 
-void initialize()
+static void __initialize()
 {
     _init();
 
@@ -23,7 +23,7 @@ void initialize()
     }
 }
 
-void uninitialize(int exit_code)
+static void __uninitialize(int exit_code)
 {
     _fini();
     __cxa_finalize(nullptr);
@@ -33,12 +33,11 @@ void uninitialize(int exit_code)
 
 extern "C" void __entry_point(int argc, char **argv, char *env)
 {
-    initialize();
+    __initialize();
 
-    __unused(env);
     environment_load(env);
 
     int exit_value = main(argc, argv);
 
-    uninitialize(exit_value);
+    __uninitialize(exit_value);
 }

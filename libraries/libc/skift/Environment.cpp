@@ -1,5 +1,4 @@
 #include <libutils/json/Json.h>
-#include <libc/skift/Environment.h>
 
 static json::Value *_root = nullptr;
 
@@ -9,7 +8,6 @@ void environment_load(const char *buffer)
     {
         delete _root;
     }
-
     _root = new json::Value(move(json::parse(buffer, strlen(buffer))));
 }
 

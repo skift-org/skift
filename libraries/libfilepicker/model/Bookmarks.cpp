@@ -61,7 +61,7 @@ RefPtr<Bookmarks> Bookmarks::load()
 
 void Bookmarks::save()
 {
-    json::Array array;
+    json::Value::Array array;
 
     for (size_t i = 0; i < _bookmarks.count(); i++)
     {

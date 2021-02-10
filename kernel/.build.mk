@@ -10,6 +10,7 @@ KERNEL_ASSEMBLY_SOURCES += \
 KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libc/*.cpp) \
 	$(wildcard libraries/libc/math/*.cpp) \
+	$(wildcard libraries/libc/skift/Environment.cpp) \
 	$(wildcard libraries/libc/skift/NumberFormatter.cpp) \
 	$(wildcard libraries/libc/skift/Printf.cpp) \
 	$(wildcard libraries/libc/stdlib/allocator.cpp) \

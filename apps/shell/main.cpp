@@ -3,7 +3,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/cmdline/ReadLine.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/process/Environment.h>
+#include <libc/skift/Environment.h>
 #include <libsystem/process/Process.h>
 
 #include <string.h>

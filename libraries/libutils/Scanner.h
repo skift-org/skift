@@ -3,8 +3,8 @@
 #include <assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/unicode/Codepoint.h>
-#include <libsystem/utils/NumberParser.h>
+#include <libutils/unicode/Codepoint.h>
+#include <libutils/NumberParser.h>
 #include <libutils/RingBuffer.h>
 #include <string.h>
 

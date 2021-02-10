@@ -1,4 +1,4 @@
-#include <libsystem/json/Json.h>
+#include <libutils/json/Json.h>
 #include <libutils/ArgParse.h>
 
 constexpr auto PROLOGUE = "Reformats JSON to make it easier to read.";

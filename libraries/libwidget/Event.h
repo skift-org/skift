@@ -4,7 +4,7 @@
 
 #include <libutils/Rect.h>
 
-#include <libsystem/unicode/Codepoint.h>
+#include <libutils/unicode/Codepoint.h>
 #include <libutils/Callback.h>
 
 #define MOUSE_NO_BUTTON (0)

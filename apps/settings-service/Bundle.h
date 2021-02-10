@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/json/Json.h>
+#include <libutils/json/Json.h>
 
 #include <libsettings/Path.h>
 
@@ -20,7 +20,7 @@ struct Bundle
     {
         if (path.key == "*")
         {
-            json::Object obj;
+            json::Value::Object obj;
 
             keys.foreach ([&](auto &key, auto &value) {
                 obj[key] = value;

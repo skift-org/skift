@@ -1,11 +1,16 @@
-#include <libsystem/json/Json.h>
-#include <libutils/StringBuilder.h>
+#pragma once
+
+#include <libutils/Scanner.h>
+#include <libutils/String.h>
+
+#include <libutils/Prettifier.h>
+#include <libutils/json/Value.h>
+
 #include <libc/skift/NumberFormatter.h>
 
 namespace json
 {
-
-void prettify(Prettifier &pretty, const Value &value)
+inline void prettify(Prettifier &pretty, const Value &value)
 {
     if (value.is(STRING))
     {

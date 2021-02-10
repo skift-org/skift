@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libgraphic/Icon.h>
-#include <libsystem/json/Json.h>
+#include <libutils/json/Json.h>
 #include <libutils/Path.h>
 #include <libutils/RefPtr.h>
 
@@ -63,7 +63,7 @@ public:
 
     json::Value serialize()
     {
-        json::Object obj{};
+        json::Value::Object obj{};
 
         obj["name"] = _name;
         obj["icon"] = _icon->name();

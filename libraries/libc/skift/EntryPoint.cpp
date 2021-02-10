@@ -1,4 +1,5 @@
 #include <libc/cxx/cxx.h>
+#include <libc/skift/Environment.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -35,7 +36,7 @@ extern "C" void __entry_point(int argc, char **argv, char *env)
     initialize();
 
     __unused(env);
-    // environment_load(env);
+    environment_load(env);
 
     int exit_value = main(argc, argv);
 

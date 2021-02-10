@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/unicode/Codepoint.h>
-#include <libsystem/utils/NumberParser.h>
+#include <libutils/unicode/Codepoint.h>
+#include <libutils/NumberParser.h>
 #include <libutils/Scanner.h>
 #include <libutils/ScannerUtils.h>
 #include <libutils/StringBuilder.h>

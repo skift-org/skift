@@ -2,6 +2,7 @@
 
 #include <libutils/String.h>
 
+#include <libsystem/Handle.h>
 #include <libsystem/io_new/Format.h>
 #include <libsystem/io_new/MemoryWriter.h>
 #include <libsystem/io_new/Reader.h>
@@ -11,13 +12,70 @@
 namespace System
 {
 
-Reader &in();
+class InStream :
+    public Reader,
+    public RawHandle
+{
+private:
+    Handle _handle{0};
 
-Writer &out();
+public:
+    using Reader::read;
 
-Writer &err();
+    ResultOr<size_t> read(void *buffer, size_t size) override { return _handle.read(buffer, size); }
+    Handle &handle() override { return _handle; }
+};
 
-Writer &log();
+class OutStream :
+    public Writer,
+    public RawHandle
+{
+private:
+    Handle _handle{1};
+
+public:
+    using Writer::write;
+
+    ResultOr<size_t> write(const void *buffer, size_t size) override { return _handle.write(buffer, size); }
+    Handle &handle() override { return _handle; }
+};
+
+class ErrStream :
+    public Writer,
+    public RawHandle
+
+{
+private:
+    Handle _handle{2};
+
+public:
+    using Writer::write;
+
+    ResultOr<size_t> write(const void *buffer, size_t size) override { return _handle.write(buffer, size); }
+    Handle &handle() override { return _handle; }
+};
+
+class LogStream :
+    public Writer,
+    public RawHandle
+{
+private:
+    Handle _handle{3};
+
+public:
+    using Writer::write;
+
+    ResultOr<size_t> write(const void *buffer, size_t size) override { return _handle.write(buffer, size); }
+    Handle &handle() override { return _handle; }
+};
+
+InStream &in();
+
+OutStream &out();
+
+ErrStream &err();
+
+LogStream &log();
 
 static inline ResultOr<String> inln()
 {
@@ -73,39 +131,22 @@ static ResultOr<size_t> println(Writer &writer, const char *fmt, Args... args)
 }
 
 template <Formatable... Args>
-static ResultOr<size_t> out(const char *fmt, Args... args)
-{
-    return print(out(), fmt, forward<Args>(args)...);
-}
+static ResultOr<size_t> out(const char *fmt, Args... args) { return print(out(), fmt, forward<Args>(args)...); }
 
 template <Formatable... Args>
-static ResultOr<size_t> outln(const char *fmt, Args... args)
-{
-    return println(out(), fmt, forward<Args>(args)...);
-}
+static ResultOr<size_t> outln(const char *fmt, Args... args) { return println(out(), fmt, forward<Args>(args)...); }
 
 template <Formatable... Args>
-static ResultOr<size_t> err(const char *fmt, Args... args)
-{
-    return print(err(), fmt, forward<Args>(args)...);
-}
+static ResultOr<size_t> err(const char *fmt, Args... args) { return print(err(), fmt, forward<Args>(args)...); }
 
 template <Formatable... Args>
-static ResultOr<size_t> errln(const char *fmt, Args... args)
-{
-    return println(err(), fmt, forward<Args>(args)...);
-}
+static ResultOr<size_t> errln(const char *fmt, Args... args) { return println(err(), fmt, forward<Args>(args)...); }
 
 template <Formatable... Args>
-static ResultOr<size_t> log(const char *fmt, Args... args)
-{
-    return print(log(), fmt, forward<Args>(args)...);
-}
+static ResultOr<size_t> log(const char *fmt, Args... args) { return print(log(), fmt, forward<Args>(args)...); }
 
 template <Formatable... Args>
-static ResultOr<size_t> logln(const char *fmt, Args... args)
-{
-    return println(log(), fmt, forward<Args>(args)...);
-}
+static ResultOr<size_t> logln(const char *fmt, Args... args) { return println(log(), fmt, forward<Args>(args)...); }
 
 } // namespace System
+

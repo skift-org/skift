@@ -1,20 +1,19 @@
-#include <libsystem/io_new/File.h>
 #include <libsystem/io_new/Streams.h>
 
 namespace System
 {
 
-File _in{Handle{0}};
-File _out{Handle{1}};
-File _err{Handle{2}};
-File _log{Handle{3}};
+static InStream _in{};
+static OutStream _out{};
+static ErrStream _err{};
+static LogStream _log{};
 
-Reader &in() { return _in; }
+InStream &in() { return _in; }
 
-Writer &out() { return _out; }
+OutStream &out() { return _out; }
 
-Writer &err() { return _err; }
+ErrStream &err() { return _err; }
 
-Writer &log() { return _log; }
+LogStream &log() { return _log; }
 
 } // namespace System

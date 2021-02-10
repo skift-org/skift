@@ -16,20 +16,13 @@ public:
 
     virtual ResultOr<size_t> write(const void *buffer, size_t size) = 0;
 
-    virtual ResultOr<size_t> write(char v)
-    {
-        return write(&v, 1);
-    }
+    virtual ResultOr<size_t> write(char v) { return write(&v, 1); }
 
-    virtual ResultOr<size_t> write(uint8_t v)
-    {
-        return write(&v, 1);
-    }
+    virtual ResultOr<size_t> write(uint8_t v) { return write(&v, 1); }
 
-    ResultOr<size_t> write(const char *buffer)
-    {
-        return write(buffer, strlen(buffer));
-    }
+    ResultOr<size_t> write(const char *buffer) { return write(buffer, strlen(buffer)); }
+
+    virtual Result flush() { return SUCCESS; }
 
     ResultOr<size_t> write(Codepoint cp)
     {
@@ -37,8 +30,6 @@ public:
         codepoint_to_utf8(cp, (uint8_t *)buffer);
         return write(buffer);
     }
-
-    virtual Result flush() { return SUCCESS; }
 };
 
 template <typename T>

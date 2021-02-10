@@ -143,4 +143,10 @@ public:
     }
 };
 
+class RawHandle
+{
+public:
+    virtual Handle &handle() = 0;
+};
+
 } // namespace System

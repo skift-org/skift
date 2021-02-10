@@ -20,10 +20,12 @@ typedef struct
 FILE *__stdio_get_stdin(void);
 FILE *__stdio_get_stdout(void);
 FILE *__stdio_get_stderr(void);
+FILE *__stdio_get_stdlog(void);
 
 #define stdin (__stdio_get_stdin())
 #define stdout (__stdio_get_stdout())
 #define stderr (__stdio_get_stderr())
+#define stdlog (__stdio_get_stdlog())
 
 #define EOF (-1)
 

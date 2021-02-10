@@ -14,6 +14,7 @@
 FILE _stdin{0, 0, 0};
 FILE _stdout{1, 0, 0};
 FILE _stderr{2, 0, 0};
+FILE _stdlog{3, 0, 0};
 
 FILE *__stdio_get_stdin()
 {
@@ -28,6 +29,11 @@ FILE *__stdio_get_stdout()
 FILE *__stdio_get_stderr()
 {
     return &_stderr;
+}
+
+FILE *__stdio_get_stdlog()
+{
+    return &_stdlog;
 }
 
 OpenFlag stdio_parse_mode(const char *mode)

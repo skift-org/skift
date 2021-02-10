@@ -2,7 +2,6 @@
 #include <libsystem/Logger.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/process/Process.h>
 
 static bool logger_log_level = LOGGER_TRACE;
 
@@ -30,16 +29,18 @@ void logger_log(LogLevel level, const char *file, int line, const char *fmt, ...
         stream_format(log_stream, "\e[1m");
 #endif
 
-        if (process_this() >= 0)
+        int process_id = __plug_process_this();
+
+        if (process_id >= 0)
         {
-            stream_format(log_stream, "%3d: ", process_this());
+            stream_format(log_stream, "%3d: ", process_id);
         }
         else
         {
-            stream_format(log_stream, "     ", process_this());
+            stream_format(log_stream, "     ", process_id);
         }
 
-        stream_format(log_stream, "%s: ", process_name());
+        stream_format(log_stream, "%s: ", __plug_process_name());
 
 #ifndef __KERNEL__
         stream_format(log_stream, "\e[m");

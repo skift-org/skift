@@ -230,10 +230,9 @@ int putchar(int c)
 
 int printf(const char *fmt, ...)
 {
-    int result;
     va_list ap;
     va_start(ap, fmt);
-    result = vfprintf(stdout, fmt, ap);
+    int result = vfprintf(__stdio_get_stdout(), fmt, ap);
     va_end(ap);
 
     return result;
@@ -241,10 +240,9 @@ int printf(const char *fmt, ...)
 
 int fprintf(FILE *file, const char *fmt, ...)
 {
-    int result;
     va_list ap;
     va_start(ap, fmt);
-    result = vfprintf(file, fmt, ap);
+    int result = vfprintf(file, fmt, ap);
     va_end(ap);
 
     return result;

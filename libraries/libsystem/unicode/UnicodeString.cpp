@@ -127,9 +127,7 @@ char *unicode_string_as_cstring(UnicodeString *string)
         buffer_builder_append_str_size(builder, (const char *)utf8, size);
     }
 
-    char *str = buffer_builder_finalize(builder);
-
-    return str;
+    return buffer_builder_finalize(builder);
 }
 
 void unicode_string_clear(UnicodeString *string)

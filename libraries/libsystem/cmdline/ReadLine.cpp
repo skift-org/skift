@@ -34,15 +34,15 @@ static void readline_recale_history(ReadLine *readline)
 
 static void readline_repaint(ReadLine *readline)
 {
-    printf("\e[%zuD\e[J", readline->old_cursor);
+    printf("\e[%luD\e[J", readline->old_cursor);
 
     __cleanup_malloc char *cstring_buffer = readline_cstring(readline);
 
     stream_write(out_stream, cstring_buffer, strlen(cstring_buffer));
 
-    printf("\e[%zuD", unicode_string_length(readline_string(readline)));
+    printf("\e[%luD", unicode_string_length(readline_string(readline)));
 
-    printf("\e[%zuC", readline->cursor);
+    printf("\e[%luC", readline->cursor);
 
     readline->old_cursor = readline->cursor;
 }

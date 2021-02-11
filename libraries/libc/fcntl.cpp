@@ -7,6 +7,21 @@ OpenFlag fcntl_parse_mode(int mode)
 {
     OpenFlag flags = OPEN_STREAM;
 
+    // Open Mode
+    if (mode == O_RDONLY)
+    {
+        flags |= OPEN_READ;
+    }
+    else if (mode == O_WRONLY)
+    {
+        flags |= OPEN_WRITE;
+    }
+    else if (mode == O_RDWR)
+    {
+        flags |= OPEN_READ | OPEN_WRITE;
+    }
+
+    // Flags
     if (mode & O_CREAT)
     {
         flags |= OPEN_CREATE;

@@ -22,12 +22,12 @@ int main(int argc, char const *argv[])
 
     // Play all files that were passed
     args.argv().foreach ([&](auto &path) {
-        stream_format(err_stream, "%s: Play '%s'\n", argv[0], path.cstring());
+        stream_format(out_stream, "%s: Play '%s'\n", argv[0], path.cstring());
 
         File file{path};
         if (!file.exist())
         {
-            stream_format(err_stream, "%s: File does not exist '%s'", argv[0], path.cstring());
+            stream_format(err_stream, "%s: File does not exist '%s'\n", argv[0], path.cstring());
             process_exit(PROCESS_FAILURE);
             return Iteration::STOP;
         }

@@ -1,6 +1,6 @@
 #include <libaudio/AudioEngine.h>
 #include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
+#include <string.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/Socket.h>
 #include <libsystem/utils/Hexdump.h>

@@ -1,4 +1,4 @@
-#include <libsystem/Assert.h>
+#include <assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
 #include <libsystem/utils/Hexdump.h>

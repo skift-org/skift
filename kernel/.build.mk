@@ -8,8 +8,9 @@ KERNEL_ASSEMBLY_SOURCES += \
 	$(wildcard kernel/*/*.s)
 
 KERNEL_LIBRARIES_SOURCES = \
-	$(wildcard libraries/libc/*.cpp) \
-	$(wildcard libraries/libc/math/*.cpp) \
+	$(wildcard libraries/libc/string.cpp) \
+	$(wildcard libraries/libc/assert.cpp) \
+	$(wildcard libraries/libc/ctype.cpp) \
 	$(wildcard libraries/libc/skift/NumberFormatter.cpp) \
 	$(wildcard libraries/libc/skift/Printf.cpp) \
 	$(wildcard libraries/libc/skift/Time.cpp) \

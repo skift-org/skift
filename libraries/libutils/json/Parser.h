@@ -186,7 +186,7 @@ inline Value parse(const String &str)
     return parse(scan);
 };
 
-Value parse_file(String path)
+inline Value parse_file(String path)
 {
     __cleanup(stream_cleanup) Stream *json_file = stream_open(path.cstring(), OPEN_READ | OPEN_BUFFERED);
 

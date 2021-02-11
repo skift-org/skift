@@ -71,7 +71,7 @@ Result ls(const char *target_path, bool with_prefix)
 
     if (with_prefix)
     {
-        printf("%s:\n", target_path);
+        System::outln("{}:", target_path);
     }
 
     for (auto entry : directory.entries())
@@ -81,7 +81,7 @@ Result ls(const char *target_path, bool with_prefix)
 
     if (!option_list)
     {
-        printf("\n");
+        System::out("\n");
     }
 
     return SUCCESS;

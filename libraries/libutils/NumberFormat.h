@@ -1,6 +1,7 @@
 #pragma once
 
 #include <math.h>
+#include <string.h>
 
 #include <libsystem/io_new/Writer.h>
 #include <libutils/Strings.h>

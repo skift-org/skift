@@ -6,8 +6,7 @@
  *                          http://nyancat.dakko.us
  */
 
-#include <stdio.h>
-
+#include <libsystem/io_new/Streams.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/system/System.h>
 

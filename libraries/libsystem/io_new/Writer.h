@@ -1,10 +1,9 @@
 #pragma once
 
 #include <libutils/ResultOr.h>
+#include <libutils/unicode/Codepoint.h>
 
-#include <libsystem/core/CString.h>
 #include <libsystem/io_new/Seek.h>
-#include <libsystem/unicode/Codepoint.h>
 
 namespace System
 {

@@ -5,7 +5,6 @@
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Socket.h>
-#include <libsystem/io/Stream.h>
 #include <libsystem/io_new/Streams.h>
 
 #include "compositor/Protocol.h"
@@ -78,7 +77,7 @@ int gfxmode_get(Stream *framebuffer_device)
         return PROCESS_FAILURE;
     }
 
-    printf("Height: %d\nWidth: %d\n",
+    System::outln("Height: {}\nWidth: {}\n",
            framebuffer_info.width,
            framebuffer_info.height);
 

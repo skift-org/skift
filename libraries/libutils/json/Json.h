@@ -10,6 +10,6 @@
 namespace json
 {
 
-Value parse_file(const char *path);
+Value parse_file(String path);
 
 } // namespace json

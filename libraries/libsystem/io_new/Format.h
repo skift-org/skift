@@ -2,7 +2,6 @@
 
 #include <libutils/Scanner.h>
 
-#include <libsystem/core/CString.h>
 #include <libsystem/io_new/Writer.h>
 
 class String;

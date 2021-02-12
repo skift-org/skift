@@ -4,54 +4,53 @@
 #include <stdio.h>
 #include <string.h>
 
-namespace
+enum class ScanfType
 {
-enum
-{
-    SCANF_TYPE_CHAR,
-    SCANF_TYPE_SHORT,
-    SCANF_TYPE_INTMAX,
-    SCANF_TYPE_L,
-    SCANF_TYPE_LL,
-    SCANF_TYPE_PTRDIFF,
-    SCANF_TYPE_SIZE_T,
-    SCANF_TYPE_INT
+    CHAR,
+    SHORT,
+    INTMAX,
+    L,
+    LL,
+    PTRDIFF,
+    SIZE_T,
+    INT
 };
-}
 
-static void store_int(void *dest, unsigned int size, unsigned long long i)
+static void store_int(void *dest, ScanfType size, unsigned long long i)
 {
     switch (size)
     {
-    case SCANF_TYPE_CHAR:
+    case ScanfType::CHAR:
         *(char *)dest = i;
         break;
-    case SCANF_TYPE_SHORT:
+    case ScanfType::SHORT:
         *(short *)dest = i;
         break;
-    case SCANF_TYPE_INTMAX:
+    case ScanfType::INTMAX:
         *(intmax_t *)dest = i;
         break;
-    case SCANF_TYPE_L:
+    case ScanfType::L:
         *(long *)dest = i;
         break;
-    case SCANF_TYPE_LL:
+    case ScanfType::LL:
         *(long long *)dest = i;
         break;
-    case SCANF_TYPE_PTRDIFF:
+    case ScanfType::PTRDIFF:
         *(ptrdiff_t *)dest = i;
         break;
-    case SCANF_TYPE_SIZE_T:
+    case ScanfType::SIZE_T:
         *(size_t *)dest = i;
         break;
     /* fallthrough */
-    case SCANF_TYPE_INT:
+    case ScanfType::INT:
     default:
         *(int *)dest = i;
         break;
     }
 }
 
+// Taken from mlibc. See https://github.com/managarm/mlibc/blob/684702ec25178671fde182319e932f6684c09f51/options/ansi/generic/stdio-stubs.cpp#L350
+// Credits to original author Geert Custers
 template <typename H>
 static int do_scanf(H &handler, Scanner &scan, va_list args)
 {
@@ -119,7 +118,7 @@ static int do_scanf(H &handler, Scanner &scan, va_list args)
         }
 
         /* type modifiers */
-        unsigned int type = SCANF_TYPE_INT;
+        ScanfType type = ScanfType::INT;
         unsigned int base = 10;
         switch (scan.current())
         {
@@ -127,17 +126,17 @@ static int do_scanf(H &handler, Scanner &scan, va_list args)
         {
             if (scan.peek(1) == 'h')
             {
-                type = SCANF_TYPE_CHAR;
+                type = ScanfType::CHAR;
                 scan.foreward(2);
                 break;
             }
-            type = SCANF_TYPE_SHORT;
+            type = ScanfType::SHORT;
             scan.foreward();
             break;
         }
         case 'j':
         {
-            type = SCANF_TYPE_INTMAX;
+            type = ScanfType::INTMAX;
             scan.foreward();
             break;
         }
@@ -145,35 +144,35 @@ static int do_scanf(H &handler, Scanner &scan, va_list args)
         {
             if (scan.peek(1) == 'l')
             {
-                type = SCANF_TYPE_LL;
+                type = ScanfType::LL;
                 scan.foreward(2);
                 break;
             }
-            type = SCANF_TYPE_L;
+            type = ScanfType::L;
             scan.foreward();
             break;
         }
         case 'L':
         {
-            type = SCANF_TYPE_LL;
+            type = ScanfType::LL;
             scan.foreward();
             break;
         }
         case 'q':
         {
-            type = SCANF_TYPE_LL;
+            type = ScanfType::LL;
             scan.foreward();
             break;
         }
         case 't':
         {
-            type = SCANF_TYPE_PTRDIFF;
+            type = ScanfType::PTRDIFF;
             scan.foreward();
             break;
         }
         case 'z':
         {
-            type = SCANF_TYPE_SIZE_T;
+            type = ScanfType::SIZE_T;
             scan.foreward();
             break;
         }

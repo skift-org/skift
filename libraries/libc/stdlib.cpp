@@ -10,7 +10,7 @@
 void abort()
 {
     hj_process_exit(PROCESS_FAILURE);
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 }
 
 int atoi(const char *str)

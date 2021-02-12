@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -305,7 +306,7 @@ int fscanf(FILE *stream, const char *format, ...)
     __unused(stream);
     __unused(format);
 
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 
     return 0;
 }
@@ -315,7 +316,7 @@ int sscanf(const char *str, const char *format, ...)
     __unused(str);
     __unused(format);
 
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 
     return 0;
 }
@@ -403,7 +404,7 @@ int setvbuf(FILE *stream, char *buf, int mode, size_t size)
     __unused(size);
     // TODO: implement this
 
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 
     return -1;
 }

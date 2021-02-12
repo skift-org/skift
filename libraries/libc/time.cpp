@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <time.h>
 
 #include <skift/Time.h>
@@ -51,5 +52,5 @@ size_t strftime(char *s, size_t n, const char *format, const struct tm *tptr)
 time_t mktime(struct tm *ptr)
 {
     __unused(ptr);
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 }

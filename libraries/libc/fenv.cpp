@@ -3,66 +3,54 @@
 
 int feclearexcept(int)
 {
-    assert(!"Not implemented");
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 }
 
 int fegetenv(fenv_t *)
 {
-    assert(!"Not implemented");
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 }
 
 int fegetexceptflag(fexcept_t *, int)
 {
-    assert(!"Not implemented");
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 }
 
 int fegetround(void)
 {
-    assert(!"Not implemented");
-    __builtin_unreachable();
-}
+    ASSERT_NOT_REACHED();}
 
 int feholdexcept(fenv_t *)
 {
-    assert(!"Not implemented");
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 }
 
 int feraiseexcept(int)
 {
-    assert(!"Not implemented");
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 }
 
 int fesetenv(const fenv_t *)
 {
-    assert(!"Not implemented");
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 }
 
 int fesetexceptflag(const fexcept_t *, int)
 {
-    assert(!"Not implemented");
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 }
 
 int fesetround(int)
 {
-    assert(!"Not implemented");
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 }
 
 int fetestexcept(int)
 {
-    assert(!"Not implemented");
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 }
 
 int feupdateenv(const fenv_t *)
 {
-    assert(!"Not implemented");
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 }

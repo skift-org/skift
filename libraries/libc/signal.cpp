@@ -1,4 +1,5 @@
 #include <abi/Syscalls.h>
+#include <assert.h>
 #include <signal.h>
 
 __sighandler signal(int sig, __sighandler handler)
@@ -7,7 +8,7 @@ __sighandler signal(int sig, __sighandler handler)
     __unused(sig);
     __unused(handler);
 
-    __builtin_unreachable();
+    ASSERT_NOT_REACHED();
 
     return NULL;
 }

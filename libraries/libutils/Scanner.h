@@ -226,7 +226,7 @@ public:
     }
 };
 
-class StringScanner : public Scanner
+class StringScanner final : public Scanner
 {
 private:
     const char *_string = nullptr;

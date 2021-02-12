@@ -51,6 +51,13 @@ size_t strftime(char *s, size_t n, const char *format, const struct tm *tptr)
 
 time_t mktime(struct tm *ptr)
 {
-    __unused(ptr);
-    ASSERT_NOT_REACHED();
+    DateTime dt;
+    dt.year = ptr->tm_year;
+    dt.month = ptr->tm_mon;
+    dt.day = ptr->tm_mday;
+    dt.hour = ptr->tm_hour;
+    dt.minute = ptr->tm_min;
+    dt.second = ptr->tm_sec;
+
+    return (time_t)datetime_to_timestamp(dt);
 }

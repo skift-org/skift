@@ -301,26 +301,6 @@ int getchar(void)
     return fgetc(stdin);
 }
 
-int fscanf(FILE *stream, const char *format, ...)
-{
-    __unused(stream);
-    __unused(format);
-
-    ASSERT_NOT_REACHED();
-
-    return 0;
-}
-
-int sscanf(const char *str, const char *format, ...)
-{
-    __unused(str);
-    __unused(format);
-
-    ASSERT_NOT_REACHED();
-
-    return 0;
-}
-
 char *strerror(int e)
 {
     const char *s;

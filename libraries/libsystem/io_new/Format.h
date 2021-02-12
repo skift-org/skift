@@ -34,7 +34,7 @@ struct Formating
 
     static Formating parse(Scanner &scanner)
     {
-        Formating format;
+        Formating format{};
 
         scanner.skip('{');
 

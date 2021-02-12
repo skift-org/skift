@@ -50,7 +50,8 @@ int fstat(int fd, struct stat *buf)
     FileState state;
     Result result = hj_handle_stat(fd, &state);
     file_state_to_stat(&state, buf);
-    return result == Result::SUCCESS ? -1 : 0;
+    //TODO: set errrno in case of error
+    return result == Result::SUCCESS ? 0 : -1;
 }
 
 int mkdir(const char *pathname, mode_t mode)

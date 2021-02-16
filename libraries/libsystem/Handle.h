@@ -2,6 +2,8 @@
 
 #include <abi/Syscalls.h>
 
+#include <libsystem/process/Process.h>
+
 #include <libutils/Optional.h>
 #include <libutils/ResultOr.h>
 #include <libutils/String.h>
@@ -24,7 +26,8 @@ public:
 
     Handle(const String path, OpenFlag flags)
     {
-        _result = hj_handle_open(&_handle, path.cstring(), path.length(), flags);
+        auto resolved_path = process_resolve(path);
+        _result = hj_handle_open(&_handle, resolved_path.cstring(), resolved_path.length(), flags);
     }
 
     Handle(Handle &&other)

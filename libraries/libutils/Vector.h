@@ -237,7 +237,7 @@ public:
     template <typename Comparator>
     void sort(Comparator comparator)
     {
-        for (size_t i = 0; i < _count - 1; i++)
+        for (size_t i = 0; i + 1 < _count; i++)
         {
             for (size_t j = i + 1; j < _count; j++)
             {
@@ -474,7 +474,7 @@ public:
     }
 
     template <typename... Args>
-    T &emplace(Args &&...args)
+    T &emplace(Args &&... args)
     {
         grow();
 
@@ -499,7 +499,7 @@ public:
     }
 
     template <typename... Args>
-    T &emplace_back(Args &&...args)
+    T &emplace_back(Args &&... args)
     {
         grow();
 

@@ -132,7 +132,6 @@ void Painter::blit_fast(Bitmap &bitmap, Recti source, Recti destination)
             Vec2i position(x, y);
 
             Color sample = bitmap.get_pixel(result.source.position() + position);
-
             _bitmap->blend_pixel(result.destination.position() + position, sample);
         }
     }
@@ -319,12 +318,67 @@ static void fill_circle_helper(Painter &painter, Recti bound, Vec2i center, int 
     {
         for (int x = 0; x < bound.width(); x++)
         {
+            Vec2i position = Vec2i(x, y);
+
             float distance = circle_distance(center, radius - 0.5, Vec2i(x, y));
             float alpha = color.alphaf() * distance;
 
-            painter.plot(Vec2i(bound.x() + x, bound.y() + y), color.with_alpha(alpha));
+            painter.plot(bound.position() + position, color.with_alpha(alpha));
         }
     }
+}
+
+static void blit_circle_helper(Painter &painter, Bitmap &bitmap, Recti source, Recti destination, Vec2i center, int radius)
+{
+    if (!painter.clip().colide_with(destination))
+    {
+        return;
+    }
+
+    auto circle_distance = [](Vec2i center, float radius, Vec2i position) {
+        float distance = center.distance_to(position) - radius;
+        return clamp(0.5 - distance, 0, 1);
+    };
+
+    for (int y = 0; y < destination.height(); y++)
+    {
+        for (int x = 0; x < destination.width(); x++)
+        {
+            Vec2i position = Vec2i(x, y);
+
+            float distance = circle_distance(center, radius - 0.5, Vec2i(x, y));
+
+            float xx = x / (float)destination.width();
+            float yy = y / (float)destination.height();
+
+            Color color = bitmap.sample(source, {xx, yy});
+            double alpha = color.alphaf() * distance;
+
+            painter.plot(destination.position() + position, color.with_alpha(alpha));
+        }
+    }
+}
+
+__flatten void Painter::blit_rounded(Bitmap &bitmap, Recti source, Recti destination, int radius)
+{
+    radius = MIN(radius, destination.height() / 2);
+    radius = MIN(radius, destination.width() / 2);
+
+    Recti left_ear_source = source.take_left(radius);
+    Recti right_ear_source = source.take_right(radius);
+
+    Recti left_ear_destination = destination.take_left(radius);
+    Recti right_ear_destination = destination.take_right(radius);
+
+    blit_circle_helper(*this, bitmap, source.take_top_left(radius), destination.take_top_left(radius), Vec2i(radius - 1, radius - 1), radius);
+    blit_circle_helper(*this, bitmap, source.take_bottom_left(radius), destination.take_bottom_left(radius), Vec2i(radius - 1, 0), radius);
+    blit_no_alpha(bitmap, left_ear_source.cutoff_top_and_botton(radius, radius), left_ear_destination.cutoff_top_and_botton(radius, radius));
+
+    blit_circle_helper(*this, bitmap, source.take_top_right(radius), destination.take_top_right(radius), Vec2i(0, radius - 1), radius);
+    blit_circle_helper(*this, bitmap, source.take_bottom_right(radius), destination.take_bottom_right(radius), Vec2i::zero(), radius);
+    blit_no_alpha(bitmap, right_ear_source.cutoff_top_and_botton(radius, radius), right_ear_destination.cutoff_top_and_botton(radius, radius));
+
+    blit(bitmap, source.cutoff_left_and_right(radius, radius), destination.cutoff_left_and_right(radius, radius));
 }
 
 __flatten void Painter::fill_rectangle_rounded(Recti bound, int radius, Color color)

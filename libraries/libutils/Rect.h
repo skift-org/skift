@@ -237,9 +237,29 @@ public:
         return Rect(x(), y(), width(), size);
     }
 
+    Rect take_top_left(int size) const
+    {
+        return take_top(size).take_left(size);
+    }
+
+    Rect take_top_right(int size) const
+    {
+        return take_top(size).take_right(size);
+    }
+
     Rect take_bottom(int size) const
     {
         return Rect(x(), y() + height() - size, width(), size);
+    }
+
+    Rect take_bottom_left(int size) const
+    {
+        return take_bottom(size).take_left(size);
+    }
+
+    Rect take_bottom_right(int size) const
+    {
+        return take_bottom(size).take_right(size);
     }
 
     Rect take_left(int size) const

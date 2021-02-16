@@ -96,7 +96,7 @@ void Window::repaint(Painter &painter, Recti rectangle)
     {
         if (!(_flags & WINDOW_BORDERLESS))
         {
-            painter.draw_rectangle(bound(), color(THEME_ACCENT));
+            painter.draw_rectangle_rounded(bound(), 8, 1, color(THEME_ACCENT));
         }
     }
 

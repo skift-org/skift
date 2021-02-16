@@ -146,7 +146,18 @@ void renderer_region(Recti region)
             }
             else
             {
-                _framebuffer->painter().blit_no_alpha(window->frontbuffer(), source, destination);
+                int radius = 8;
+
+                _framebuffer->painter().push();
+                _framebuffer->painter().clip(destination);
+
+                renderer_composite_region(window->bound().take_top_left(radius), window);
+                renderer_composite_region(window->bound().take_top_right(radius), window);
+                renderer_composite_region(window->bound().take_bottom_left(radius), window);
+                renderer_composite_region(window->bound().take_bottom_right(radius), window);
+
+                _framebuffer->painter().blit_rounded(window->frontbuffer(), window->bound().size(), window->bound(), radius);
+                _framebuffer->painter().pop();
             }
 
             if (_night_light_enable)

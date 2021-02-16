@@ -394,6 +394,10 @@ WindowFlag window_flags_from_markup(markup::Node &node)
     {
         flags |= WINDOW_TRANSPARENT;
     }
+    if (!node.has_attribute("not-rounded"))
+    {
+        flags |= WINDOW_ROUNDED;
+    }
 
     return flags;
 }

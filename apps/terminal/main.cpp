@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 
     theme_set_color(THEME_BACKGROUND, theme_get_color(THEME_ANSI_BACKGROUND));
 
-    Window *window = new Window(WINDOW_RESIZABLE | WINDOW_ACRYLIC);
+    Window *window = new Window(WINDOW_RESIZABLE | WINDOW_ACRYLIC | WINDOW_ROUNDED);
 
     window->icon(Icon::get("console-line"));
     window->title("Terminal");

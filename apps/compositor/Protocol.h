@@ -33,6 +33,7 @@ enum CompositorMessageType
 #define WINDOW_ACRYLIC (1 << 5)
 #define WINDOW_NO_FOCUS (1 << 6)
 #define WINDOW_AUTO_CLOSE (1 << 7)
+#define WINDOW_ROUNDED (1 << 8)
 
 typedef unsigned int WindowFlag;
 

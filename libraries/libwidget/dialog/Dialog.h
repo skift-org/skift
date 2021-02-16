@@ -54,7 +54,7 @@ public:
     {
         assert(_window == nullptr);
 
-        _window = new Window(WINDOW_NONE);
+        _window = new Window(WINDOW_NONE | WINDOW_ROUNDED);
 
         _window->type(WINDOW_TYPE_POPOVER);
         _window->title(_title);

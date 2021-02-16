@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 {
     Application::initialize(argc, argv);
 
-    Window *window = new Window(WINDOW_RESIZABLE);
+    Window *window = new Window(WINDOW_RESIZABLE | WINDOW_ROUNDED);
 
     window->icon(Icon::get("text-box"));
 

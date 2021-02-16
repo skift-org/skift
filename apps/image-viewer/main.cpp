@@ -16,7 +16,7 @@ int main(int argc, char **argv)
     if (Application::initialize(argc, argv) != SUCCESS)
         return -1;
 
-    Window *window = new Window(WINDOW_RESIZABLE);
+    Window *window = new Window(WINDOW_RESIZABLE | WINDOW_ROUNDED);
 
     window->icon(Icon::get("image"));
     window->title("Image Viewer");

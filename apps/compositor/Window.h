@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
+#include <libgraphic/Painter.h>
 #include <libutils/Rect.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
@@ -22,6 +23,8 @@ private:
 
     RefPtr<Bitmap> _frontbuffer;
     RefPtr<Bitmap> _backbuffer;
+    RefPtr<Bitmap> _render_mask;
+    Painter _render_mask_painter;
 
 public:
     int id() { return _id; }
@@ -39,6 +42,26 @@ public:
         assert(_frontbuffer);
         return *_frontbuffer;
     }
+
+    Bitmap &render_mask()
+    {
+        assert(_render_mask);
+        return *_render_mask;
+    }
+    
+    Recti no_mask_bound()
+    {
+        Recti result = _bound.shrinked(6);
+        return result.centered_within(_bound);
+    }
+    
+    bool collide_with_corner(Recti target)
+    {
+
+        return !no_mask_bound().contains(target);
+    }
+
+    void update_mask(bool force);
 
     Window(
         int id,

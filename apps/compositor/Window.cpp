@@ -21,9 +21,13 @@ Window::Window(
       _client(client),
       _bound(bound),
       _frontbuffer(frontbuffer),
-      _backbuffer(backbuffer)
+      _backbuffer(backbuffer),
+      _render_mask(
+          Bitmap::create_shared(bound.width(), bound.height()).take_value()),
+      _render_mask_painter(_render_mask)
 {
     manager_register_window(this);
+    update_mask(true);
 }
 
 Window::~Window()
@@ -53,7 +57,7 @@ void Window::move(Vec2i new_position)
     renderer_region_dirty(bound());
 
     _bound = _bound.moved(new_position);
-
+    update_mask(false);
     renderer_region_dirty(bound());
 }
 
@@ -64,7 +68,25 @@ void Window::resize(Recti new_bound)
     {
         renderer_region_dirty(bound());
         _bound = new_bound;
+        update_mask(false);
         renderer_region_dirty(bound());
+    }
+}
+
+void Window::update_mask(bool force)
+{
+    if (_bound.moved({0, 0}) != _render_mask->bound().moved({0, 0}) || force)
+    {
+
+        auto result = Bitmap::create_shared(_bound.width(), _bound.height());
+        if (!result.success())
+        {
+            return;
+        }
+        _render_mask = result.take_value();
+        _render_mask_painter = Painter(_render_mask);
+        _render_mask_painter.clear(Color().with_alpha(0));
+        _render_mask_painter.fill_rectangle_rounded(_bound.moved({0, 0}), 30, Color::from_rgba(1, 1, 1, 1));
     }
 }
 

@@ -58,7 +58,11 @@ public:
 
     void blit(Bitmap &bitmap, BitmapScaling scaling, Recti destionation);
 
+    void blit_mask(Bitmap &bitmap, Bitmap &mask, Recti source, Recti destination);
+
     void blit_no_alpha(Bitmap &bitmap, Recti source, Recti destination);
+
+    void blit_no_alpha_mask(Bitmap &bitmap, Bitmap &mask, Recti source, Recti destination);
 
     void blit(Icon &icon, IconSize size, Recti destination, Color color);
 

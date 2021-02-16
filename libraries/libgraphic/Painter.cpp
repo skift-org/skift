@@ -137,6 +137,28 @@ void Painter::blit_fast(Bitmap &bitmap, Recti source, Recti destination)
         }
     }
 }
+void Painter::blit_mask(Bitmap &bitmap, Bitmap &mask, Recti source, Recti destination)
+{
+    auto result = apply(source, destination);
+
+    if (result.is_empty())
+    {
+        return;
+    }
+
+    for (int y = 0; y < result.destination.height(); y++)
+    {
+        for (int x = 0; x < result.destination.width(); x++)
+        {
+            Vec2i position(x, y);
+
+            Color sample = bitmap.get_pixel(result.source.position() + position);
+            Color mask_sample = mask.get_pixel(result.source.position() + position);
+            Color color_result = sample.with_alpha(sample.alphaf() * mask_sample.alphaf());
+            _bitmap->blend_pixel(result.destination.position() + position, color_result);
+        }
+    }
+}
 
 void Painter::blit_scaled(Bitmap &bitmap, Recti source, Recti destination)
 {
@@ -155,7 +177,7 @@ void Painter::blit_scaled(Bitmap &bitmap, Recti source, Recti destination)
             float yy = y / (float)result.destination.height();
 
             Color sample = bitmap.sample(result.source, Vec2f(xx, yy));
-            _bitmap->blend_pixel(result.destination.position() + Vec2i(x, y), sample);
+            _bitmap->set_pixel_no_check(result.destination.position() + Vec2i(x, y), sample);
         }
     }
 }
@@ -252,7 +274,27 @@ __flatten void Painter::blit_no_alpha(Bitmap &bitmap, Recti source, Recti destin
         blit_scaled_no_alpha(bitmap, source, destination);
     }
 }
+__flatten void Painter::blit_no_alpha_mask(Bitmap &bitmap, Bitmap &mask, Recti source, Recti destination)
+{
+    auto result = apply(source, destination);
 
+    if (result.is_empty())
+    {
+        return;
+    }
+
+    for (int y = 0; y < result.destination.height(); y++)
+    {
+        for (int x = 0; x < result.destination.width(); x++)
+        {
+            Vec2i position(x, y);
+            Color sample = bitmap.get_pixel(result.source.position() + position);
+            Color mask_sample = mask.get_pixel(result.source.position() + position);
+            Color color_result = sample.with_alpha(mask_sample.alphaf());
+            _bitmap->blend_pixel(result.destination.position() + position, color_result);
+        }
+    }
+}
 __flatten void Painter::clear(Color color)
 {
     clear(_bitmap->bound(), color);

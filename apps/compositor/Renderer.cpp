@@ -104,10 +104,26 @@ void renderer_composite_region(Recti region, Window *window_transparent)
 
             if (window->flags() & WINDOW_ACRYLIC)
             {
-                _framebuffer->painter().blit_no_alpha(_wallpaper->acrylic(), destination, destination);
-            }
+                if (window->collide_with_corner(source))
+                {
 
-            _framebuffer->painter().blit(window->frontbuffer(), source, destination);
+                    _framebuffer->painter().blit_no_alpha_mask(_wallpaper->acrylic(), window->render_mask(), destination, destination);
+                }
+                else
+                {
+
+                    _framebuffer->painter().blit_no_alpha(_wallpaper->acrylic(), destination, destination);
+                }
+            }
+            if (window->collide_with_corner(source))
+            {
+
+                _framebuffer->painter().blit_mask(window->frontbuffer(), window->render_mask(), source, destination);
+            }
+            else
+            {
+                _framebuffer->painter().blit(window->frontbuffer(), source, destination);
+            }
         }
 
         return Iteration::CONTINUE;
@@ -137,23 +153,46 @@ void renderer_region(Recti region)
             if (window->flags() & WINDOW_TRANSPARENT)
             {
                 renderer_composite_region(destination, window);
-                _framebuffer->painter().blit(window->frontbuffer(), source, destination);
+                if (window->collide_with_corner(source))
+                {
+                    _framebuffer->painter().blit_mask(window->frontbuffer(), window->render_mask(), source, destination);
+                }
+                else
+                {
+                    _framebuffer->painter().blit(window->frontbuffer(), source, destination);
+                }
             }
             else if (window->flags() & WINDOW_ACRYLIC)
             {
-                _framebuffer->painter().blit_no_alpha(_wallpaper->acrylic(), region, region);
-                _framebuffer->painter().blit(window->frontbuffer(), source, destination);
+                if (window->collide_with_corner(source))
+                {
+
+                    _framebuffer->painter().blit_no_alpha_mask(_wallpaper->acrylic(), window->render_mask(), region, region);
+                    _framebuffer->painter().blit_mask(window->frontbuffer(), window->render_mask(), source, destination);
+                }
+                else
+                {
+                    _framebuffer->painter().blit_no_alpha(_wallpaper->acrylic(), region, region);
+                    _framebuffer->painter().blit(window->frontbuffer(), source, destination);
+                }
             }
             else
             {
-                _framebuffer->painter().blit_no_alpha(window->frontbuffer(), source, destination);
+                if (window->collide_with_corner(source))
+                {
+                    _framebuffer->painter().blit_no_alpha_mask(window->frontbuffer(), window->render_mask(), source, destination);
+                }
+
+                else
+                {
+                    _framebuffer->painter().blit_no_alpha(window->frontbuffer(), source, destination);
+                }
             }
 
             if (_night_light_enable)
             {
                 _framebuffer->painter().sepia(destination, _night_light_strenght);
             }
-
             _framebuffer->mark_dirty(destination);
 
             Recti top;

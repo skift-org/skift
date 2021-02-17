@@ -12,7 +12,6 @@
 #include "compositor/Protocol.h"
 
 #define WINDOW_RESIZE_AREA 16
-#define WINDOW_CONTENT_PADDING 1
 
 class Window
 {
@@ -97,18 +96,6 @@ public:
     void bound(Recti bound);
 
     Recti bound_on_screen() { return _bound; }
-
-    Recti content_bound()
-    {
-        if (_flags & WINDOW_BORDERLESS)
-        {
-            return bound();
-        }
-        else
-        {
-            return bound().shrinked(WINDOW_CONTENT_PADDING);
-        }
-    }
 
     void opacity(float value) { _opacity = value; }
 

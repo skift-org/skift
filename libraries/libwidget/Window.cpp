@@ -92,12 +92,9 @@ void Window::repaint(Painter &painter, Recti rectangle)
         root()->repaint(painter, rectangle);
     }
 
-    if (!content_bound().contains(rectangle))
+    if (!(_flags & WINDOW_BORDERLESS))
     {
-        if (!(_flags & WINDOW_BORDERLESS))
-        {
-            painter.draw_rectangle_rounded(bound(), 8, 1, color(THEME_ACCENT));
-        }
+        painter.draw_rectangle_rounded(bound(), 6, 1, color(THEME_BORDER));
     }
 
     painter.pop();
@@ -142,7 +139,7 @@ void Window::repaint_dirty()
 
 void Window::relayout()
 {
-    root()->container(content_bound());
+    root()->container(bound());
     root()->relayout();
 
     _dirty_layout = false;
@@ -293,8 +290,8 @@ void Window::do_resize(Vec2i mouse_position)
 
     Vec2i content_size = root()->compute_size();
 
-    new_bound = new_bound.with_width(MAX(new_bound.width(), content_size.x() + WINDOW_CONTENT_PADDING * 2));
-    new_bound = new_bound.with_height(MAX(new_bound.height(), content_size.y() + WINDOW_CONTENT_PADDING));
+    new_bound = new_bound.with_width(MAX(new_bound.width(), content_size.x()));
+    new_bound = new_bound.with_height(MAX(new_bound.height(), content_size.y()));
 
     bound(new_bound);
 

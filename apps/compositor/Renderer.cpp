@@ -134,6 +134,8 @@ void renderer_region(Recti region)
                 destination.position() - window->bound().position(),
                 destination.size());
 
+            int radius = 6;
+
             if (window->flags() & WINDOW_TRANSPARENT)
             {
                 renderer_composite_region(destination, window);
@@ -143,20 +145,30 @@ void renderer_region(Recti region)
             {
                 _framebuffer->painter().blit_no_alpha(_wallpaper->acrylic(), region, region);
                 _framebuffer->painter().blit(window->frontbuffer(), source, destination);
-            }
-            else
-            {
-                int radius = 8;
 
                 _framebuffer->painter().push();
                 _framebuffer->painter().clip(destination);
 
-                renderer_composite_region(window->bound().take_top_left(radius), window);
-                renderer_composite_region(window->bound().take_top_right(radius), window);
-                renderer_composite_region(window->bound().take_bottom_left(radius), window);
-                renderer_composite_region(window->bound().take_bottom_right(radius), window);
+                renderer_composite_region(window->bound().take_top_left(radius).clipped_with(region), window);
+                renderer_composite_region(window->bound().take_top_right(radius).clipped_with(region), window);
+                renderer_composite_region(window->bound().take_bottom_left(radius).clipped_with(region), window);
+                renderer_composite_region(window->bound().take_bottom_right(radius).clipped_with(region), window);
 
+                _framebuffer->painter().blit_rounded_no_alpha(_wallpaper->acrylic(), window->bound(), window->bound(), radius);
                 _framebuffer->painter().blit_rounded(window->frontbuffer(), window->bound().size(), window->bound(), radius);
+                _framebuffer->painter().pop();
+            }
+            else
+            {
+                _framebuffer->painter().push();
+                _framebuffer->painter().clip(destination);
+
+                renderer_composite_region(window->bound().take_top_left(radius).clipped_with(region), window);
+                renderer_composite_region(window->bound().take_top_right(radius).clipped_with(region), window);
+                renderer_composite_region(window->bound().take_bottom_left(radius).clipped_with(region), window);
+                renderer_composite_region(window->bound().take_bottom_right(radius).clipped_with(region), window);
+
+                _framebuffer->painter().blit_rounded_no_alpha(window->frontbuffer(), window->bound().size(), window->bound(), radius);
                 _framebuffer->painter().pop();
             }
 

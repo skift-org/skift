@@ -372,13 +372,35 @@ __flatten void Painter::blit_rounded(Bitmap &bitmap, Recti source, Recti destina
 
     blit_circle_helper(*this, bitmap, source.take_top_left(radius), destination.take_top_left(radius), Vec2i(radius - 1, radius - 1), radius);
     blit_circle_helper(*this, bitmap, source.take_bottom_left(radius), destination.take_bottom_left(radius), Vec2i(radius - 1, 0), radius);
+    blit(bitmap, left_ear_source.cutoff_top_and_botton(radius, radius), left_ear_destination.cutoff_top_and_botton(radius, radius));
+
+    blit_circle_helper(*this, bitmap, source.take_top_right(radius), destination.take_top_right(radius), Vec2i(0, radius - 1), radius);
+    blit_circle_helper(*this, bitmap, source.take_bottom_right(radius), destination.take_bottom_right(radius), Vec2i::zero(), radius);
+    blit(bitmap, right_ear_source.cutoff_top_and_botton(radius, radius), right_ear_destination.cutoff_top_and_botton(radius, radius));
+
+    blit(bitmap, source.cutoff_left_and_right(radius, radius), destination.cutoff_left_and_right(radius, radius));
+}
+
+__flatten void Painter::blit_rounded_no_alpha(Bitmap &bitmap, Recti source, Recti destination, int radius)
+{
+    radius = MIN(radius, destination.height() / 2);
+    radius = MIN(radius, destination.width() / 2);
+
+    Recti left_ear_source = source.take_left(radius);
+    Recti right_ear_source = source.take_right(radius);
+
+    Recti left_ear_destination = destination.take_left(radius);
+    Recti right_ear_destination = destination.take_right(radius);
+
+    blit_circle_helper(*this, bitmap, source.take_top_left(radius), destination.take_top_left(radius), Vec2i(radius - 1, radius - 1), radius);
+    blit_circle_helper(*this, bitmap, source.take_bottom_left(radius), destination.take_bottom_left(radius), Vec2i(radius - 1, 0), radius);
     blit_no_alpha(bitmap, left_ear_source.cutoff_top_and_botton(radius, radius), left_ear_destination.cutoff_top_and_botton(radius, radius));
 
     blit_circle_helper(*this, bitmap, source.take_top_right(radius), destination.take_top_right(radius), Vec2i(0, radius - 1), radius);
     blit_circle_helper(*this, bitmap, source.take_bottom_right(radius), destination.take_bottom_right(radius), Vec2i::zero(), radius);
     blit_no_alpha(bitmap, right_ear_source.cutoff_top_and_botton(radius, radius), right_ear_destination.cutoff_top_and_botton(radius, radius));
 
-    blit(bitmap, source.cutoff_left_and_right(radius, radius), destination.cutoff_left_and_right(radius, radius));
+    blit_no_alpha(bitmap, source.cutoff_left_and_right(radius, radius), destination.cutoff_left_and_right(radius, radius));
 }
 
 __flatten void Painter::fill_rectangle_rounded(Recti bound, int radius, Color color)

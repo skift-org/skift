@@ -73,7 +73,7 @@ void arch_save_context(Task *task)
 void arch_load_context(Task *task)
 {
     fpu_load_context(task);
-    set_kernel_stack((uint64_t)task->kernel_stack);
+    set_kernel_stack((uint64_t)task->kernel_stack + PROCESS_STACK_SIZE);
 }
 
 void arch_task_go(Task *task)

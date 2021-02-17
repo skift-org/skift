@@ -143,33 +143,45 @@ void renderer_region(Recti region)
             }
             else if (window->flags() & WINDOW_ACRYLIC)
             {
-                _framebuffer->painter().blit_no_alpha(_wallpaper->acrylic(), region, region);
-                _framebuffer->painter().blit(window->frontbuffer(), source, destination);
+                if (window->flags() & WINDOW_NO_ROUNDED_CORNERS)
+                {
+                    _framebuffer->painter().blit_no_alpha(_wallpaper->acrylic(), region, region);
+                    _framebuffer->painter().blit(window->frontbuffer(), source, destination);
+                }
+                else
+                {
+                    _framebuffer->painter().push();
+                    _framebuffer->painter().clip(destination);
 
-                _framebuffer->painter().push();
-                _framebuffer->painter().clip(destination);
+                    renderer_composite_region(window->bound().take_top_left(radius).clipped_with(region), window);
+                    renderer_composite_region(window->bound().take_top_right(radius).clipped_with(region), window);
+                    renderer_composite_region(window->bound().take_bottom_left(radius).clipped_with(region), window);
+                    renderer_composite_region(window->bound().take_bottom_right(radius).clipped_with(region), window);
 
-                renderer_composite_region(window->bound().take_top_left(radius).clipped_with(region), window);
-                renderer_composite_region(window->bound().take_top_right(radius).clipped_with(region), window);
-                renderer_composite_region(window->bound().take_bottom_left(radius).clipped_with(region), window);
-                renderer_composite_region(window->bound().take_bottom_right(radius).clipped_with(region), window);
-
-                _framebuffer->painter().blit_rounded_no_alpha(_wallpaper->acrylic(), window->bound(), window->bound(), radius);
-                _framebuffer->painter().blit_rounded(window->frontbuffer(), window->bound().size(), window->bound(), radius);
-                _framebuffer->painter().pop();
+                    _framebuffer->painter().blit_rounded_no_alpha(_wallpaper->acrylic(), window->bound(), window->bound(), radius);
+                    _framebuffer->painter().blit_rounded(window->frontbuffer(), window->bound().size(), window->bound(), radius);
+                    _framebuffer->painter().pop();
+                }
             }
             else
             {
-                _framebuffer->painter().push();
-                _framebuffer->painter().clip(destination);
+                if (window->flags() & WINDOW_NO_ROUNDED_CORNERS)
+                {
+                    _framebuffer->painter().blit_no_alpha(window->frontbuffer(), source, destination);
+                }
+                else
+                {
+                    _framebuffer->painter().push();
+                    _framebuffer->painter().clip(destination);
 
-                renderer_composite_region(window->bound().take_top_left(radius).clipped_with(region), window);
-                renderer_composite_region(window->bound().take_top_right(radius).clipped_with(region), window);
-                renderer_composite_region(window->bound().take_bottom_left(radius).clipped_with(region), window);
-                renderer_composite_region(window->bound().take_bottom_right(radius).clipped_with(region), window);
+                    renderer_composite_region(window->bound().take_top_left(radius).clipped_with(region), window);
+                    renderer_composite_region(window->bound().take_top_right(radius).clipped_with(region), window);
+                    renderer_composite_region(window->bound().take_bottom_left(radius).clipped_with(region), window);
+                    renderer_composite_region(window->bound().take_bottom_right(radius).clipped_with(region), window);
 
-                _framebuffer->painter().blit_rounded_no_alpha(window->frontbuffer(), window->bound().size(), window->bound(), radius);
-                _framebuffer->painter().pop();
+                    _framebuffer->painter().blit_rounded_no_alpha(window->frontbuffer(), window->bound().size(), window->bound(), radius);
+                    _framebuffer->painter().pop();
+                }
             }
 
             if (_night_light_enable)

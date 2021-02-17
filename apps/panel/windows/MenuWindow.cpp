@@ -17,7 +17,7 @@ namespace panel
 {
 
 MenuWindow::MenuWindow()
-    : Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_AUTO_CLOSE | WINDOW_ACRYLIC)
+    : Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_AUTO_CLOSE | WINDOW_ACRYLIC | WINDOW_NO_ROUNDED_CORNERS)
 {
     title("Panel");
     bound(Screen::bound().with_width(WIDTH).shrinked({PanelWindow::HEIGHT, 0, 0, 0}));

@@ -14,7 +14,7 @@ namespace panel
 {
 
 PanelWindow::PanelWindow()
-    : Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC)
+    : Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC | WINDOW_NO_ROUNDED_CORNERS)
 {
     title("Panel");
     type(WINDOW_TYPE_PANEL);

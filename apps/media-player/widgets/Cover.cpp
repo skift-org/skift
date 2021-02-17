@@ -25,8 +25,8 @@ void Cover::paint(Painter &painter, const Recti &)
 
     auto cover_bound = Recti{0, 0, 256, 256}.centered_within(bound());
 
-    painter.blit_no_alpha(*_cover, _cover->bound(), cover_bound);
-    painter.draw_rectangle(cover_bound, Colors::WHITE.with_alpha(0.25));
+    painter.blit_rounded_no_alpha(*_cover, _cover->bound(), cover_bound, 12);
+    painter.draw_rectangle_rounded(cover_bound, 12, 1, Colors::WHITE.with_alpha(0.25));
 }
 
 } // namespace media_player

@@ -82,11 +82,11 @@ void arch_task_go(Task *task)
     {
         InterruptStackFrame stackframe = {};
 
-        stackframe.rsp = task->user_stack_pointer;
+        stackframe.rsp = (uintptr_t)task->user_stack_pointer;
 
         stackframe.rflags = 0x202;
         stackframe.rip = (uintptr_t)task->entry_point;
-        stackframe.rbp = (uintptr_t)task->user_stack;
+        stackframe.rbp = (uintptr_t)stackframe.rsp;
 
         stackframe.cs = 0x1b;
         stackframe.ss = 0x23;
@@ -101,7 +101,7 @@ void arch_task_go(Task *task)
 
         stackframe.rflags = 0x202;
         stackframe.rip = (uintptr_t)task->entry_point;
-        stackframe.rbp = (uintptr_t)task->kernel_stack;
+        stackframe.rbp = (uintptr_t)stackframe.rsp;
 
         stackframe.cs = 0x08;
         stackframe.ss = 0x10;

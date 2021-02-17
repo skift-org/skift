@@ -68,7 +68,7 @@ public:
 
     uint64_t read64(size_t offset)
     {
-        return *((volatile uint64_t *)offset);
+        return *(volatile uint64_t *)(_virtual_range.base() + offset);
     }
 
     size_t write(size_t offset, const void *buffer, size_t size)

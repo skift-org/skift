@@ -184,11 +184,6 @@ void renderer_region(Recti region)
                 }
             }
 
-            if (_night_light_enable)
-            {
-                _framebuffer->painter().sepia(destination, _night_light_strenght);
-            }
-
             _framebuffer->mark_dirty(destination);
 
             Recti top;
@@ -214,11 +209,6 @@ void renderer_region(Recti region)
     if (should_paint_wallpaper)
     {
         renderer_composite_wallpaper(region);
-
-        if (_night_light_enable)
-        {
-            _framebuffer->painter().sepia(region, _night_light_strenght);
-        }
     }
 }
 
@@ -231,6 +221,11 @@ void renderer_repaint_dirty()
 {
     _dirty_regions.foreach ([](Recti region) {
         renderer_region(region);
+
+        if (_night_light_enable)
+        {
+            _framebuffer->painter().tint(region, Color::from_rgb(1, 0.9, 0.8));
+        }
 
         if (region.colide_with(cursor_bound()))
         {

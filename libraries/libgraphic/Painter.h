@@ -106,6 +106,8 @@ public:
 
     void sepia(Recti rectangle, float value);
 
+    void tint(Recti rectangle, Color color);
+
     Recti clip() const
     {
         return _state_stack[_state_stack_top].clip;

@@ -789,6 +789,26 @@ __flatten void Painter::sepia(Recti rectangle, float value)
     }
 }
 
+__flatten void Painter::tint(Recti rectangle, Color color)
+{
+    rectangle = apply(rectangle);
+
+    for (int y = 0; y < rectangle.height(); y++)
+    {
+        for (int x = 0; x < rectangle.width(); x++)
+        {
+            Color sample = _bitmap->get_pixel({rectangle.x() + x, rectangle.y() + y});
+
+            uint32_t red = (sample.red() * color.redf());
+            uint32_t green = (sample.green() * color.greenf());
+            uint32_t blue = (sample.blue() * color.bluef());
+
+            Color sepia_color = Color::from_byte(MIN(255, red), MIN(255, green), MIN(blue, 255));
+            _bitmap->set_pixel({rectangle.x() + x, rectangle.y() + y}, sepia_color);
+        }
+    }
+}
+
 void Painter::acrylic(Recti rectangle)
 {
     saturation(rectangle, 0.25);

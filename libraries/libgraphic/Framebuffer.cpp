@@ -115,6 +115,7 @@ void Framebuffer::blit()
     {
         return;
     }
+
     _dirty_bounds.foreach ([&](auto &bound) {
         IOCallDisplayBlitArgs args;
 

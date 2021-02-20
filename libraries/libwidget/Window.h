@@ -16,7 +16,7 @@
 class Window
 {
 private:
-    int _handle;
+    int _handle = -1;
 
     String _title = "Window";
     RefPtr<Icon> _icon;
@@ -73,29 +73,21 @@ public:
 
     Vec2i backbuffer_size() const { return backbuffer->size(); }
 
-    void title(String title);
+    void title(String title) { _title = title; }
+
     String title() { return _title; }
 
     WindowFlag flags() { return _flags; }
 
-    void icon(RefPtr<Icon> icon);
+    void icon(RefPtr<Icon> icon)
+    {
+        if (icon)
+        {
+            _icon = icon;
+        }
+    }
+
     RefPtr<Icon> icon() { return _icon; }
-
-    int x() { return position().x(); }
-    int y() { return position().y(); }
-    int width() { return size().x(); }
-    int height() { return size().y(); }
-
-    Vec2i position() { return bound_on_screen().position(); }
-    void position(Vec2i position) { bound(bound_on_screen().moved(position)); }
-
-    Vec2i size() { return bound().size(); }
-    void size(Vec2i size);
-
-    Recti bound() { return _bound.moved({0, 0}); }
-    void bound(Recti bound);
-
-    Recti bound_on_screen() { return _bound; }
 
     void opacity(float value) { _opacity = value; }
 
@@ -108,10 +100,7 @@ public:
         return (_flags & WINDOW_ALWAYS_FOCUSED) || _focused;
     }
 
-    bool maximised()
-    {
-        return _is_maximised;
-    }
+    bool maximised() { return _is_maximised; }
 
     void toggle_maximise();
 
@@ -121,8 +110,6 @@ public:
 
     Color color(ThemeColorRole role);
 
-    Widget *root() { return _root; }
-
     Window(WindowFlag flags);
 
     virtual ~Window();
@@ -130,6 +117,46 @@ public:
     void show();
 
     void hide();
+
+    void cursor(CursorState state);
+
+    /* --- Geometry --------------------------------------------------------- */
+
+    Vec2i position() { return bound_on_screen().position(); }
+
+    void position(Vec2i position) { bound(bound_on_screen().moved(position)); }
+
+    Vec2i size() { return bound().size(); }
+
+    void size(Vec2i size) { bound(bound_on_screen().resized(size)); }
+
+    Recti bound() { return _bound.moved({0, 0}); }
+
+    void bound(Recti bound);
+
+    Recti bound_on_screen() { return _bound; }
+
+    void change_framebuffer_if_needed();
+
+    Border resize_bound_containe(Vec2i position);
+
+    void begin_resize(Vec2i mouse_position);
+
+    void do_resize(Vec2i mouse_position);
+
+    void end_resize();
+
+    /* --- Childs ----------------------------------------------------------- */
+
+    Widget *root() { return _root; }
+
+    void focus_widget(Widget *widget);
+
+    void widget_removed(Widget *widget);
+
+    void register_widget_by_id(String id, Widget *widget);
+
+    Widget *child_at(Vec2i position);
 
     template <typename WidgetType, typename CallbackType>
     void with_widget(String name, CallbackType callback)
@@ -144,26 +171,6 @@ public:
             }
         }
     }
-
-    void cursor(CursorState state);
-
-    void focus_widget(Widget *widget);
-
-    void widget_removed(Widget *widget);
-
-    void register_widget_by_id(String id, Widget *widget);
-
-    void change_framebuffer_if_needed();
-
-    Border resize_bound_containe(Vec2i position);
-
-    void begin_resize(Vec2i mouse_position);
-
-    void do_resize(Vec2i mouse_position);
-
-    void end_resize();
-
-    Widget *child_at(Vec2i position);
 
     /* --- Focus ------------------------------------------------------------ */
 
@@ -188,4 +195,28 @@ public:
     void on(EventType event, EventHandler handler);
 
     void dispatch_event(Event *event);
+
+    void handle_event(Event *Event);
+
+    void handle_got_focus(Event *event);
+
+    void handle_lost_focus(Event *event);
+
+    void handle_window_closing(Event *event);
+
+    void handle_mouse_move(Event *event);
+
+    void handle_mouse_scroll(Event *event);
+
+    void handle_mouse_button_press(Event *event);
+
+    void handle_mouse_button_release(Event *event);
+
+    void handle_mouse_double_click(Event *event);
+
+    void handle_keyboard_key_typed(Event *event);
+
+    void handle_keyboard_key_press(Event *event);
+
+    void handle_keyboard_key_release(Event *event);
 };

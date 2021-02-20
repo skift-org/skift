@@ -18,6 +18,8 @@ UTILITIES = \
 	KILL \
 	LINK  \
 	LS \
+	L \
+	dir \
 	MARKUP \
 	MKDIR \
 	MV \
@@ -92,6 +94,12 @@ LINK_NAME = link
 
 LS_LIBS =
 LS_NAME = ls
+
+L_LIBS =
+L_NAME = l
+
+DIR_LIBS =
+DIR_NAME = dir
 
 MARKUP_LIBS = markup
 MARKUP_NAME = markup

@@ -19,7 +19,7 @@ UTILITIES = \
 	LINK  \
 	LS \
 	L \
-	dir \
+	DIR \
 	MARKUP \
 	MKDIR \
 	MV \

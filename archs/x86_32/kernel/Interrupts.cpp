@@ -108,7 +108,9 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
     {
         sti();
 
-        if (stackframe.eax == HJ_PROCESS_CLONE)
+        Syscall syscall = (Syscall)stackframe.eax;
+
+        if (syscall == HJ_PROCESS_CLONE)
         {
             InterruptsRetainer retainer;
 
@@ -125,6 +127,15 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
         else
         {
             stackframe.eax = task_do_syscall((Syscall)stackframe.eax, stackframe.ebx, stackframe.ecx, stackframe.edx, stackframe.esi, stackframe.edi);
+        }
+
+        if (stackframe.eax == SUCCESS && syscall == HJ_PROCESS_EXEC)
+        {
+            Task *running_task = scheduler_running();
+
+            auto usf = ((UserInterruptStackFrame *)&stackframe);
+            usf->user_esp = running_task->user_stack_pointer;
+            usf->eip = (uintptr_t)running_task->entry_point;
         }
 
         cli();

@@ -15,6 +15,7 @@
     __ENTRY(HJ_PROCESS_NAME)      \
     __ENTRY(HJ_PROCESS_LAUNCH)    \
     __ENTRY(HJ_PROCESS_CLONE)     \
+    __ENTRY(HJ_PROCESS_EXEC)      \
     __ENTRY(HJ_PROCESS_EXIT)      \
     __ENTRY(HJ_PROCESS_CANCEL)    \
     __ENTRY(HJ_PROCESS_SLEEP)     \
@@ -63,6 +64,7 @@ static Result __syscall(Syscall syscall, uintptr_t p1, uintptr_t p2, uintptr_t p
     Result __ret = ERR_FUNCTION_NOT_IMPLEMENTED;
 
 #if defined(__x86_64__)
+
     asm volatile("push %%rbx; movq %2,%%rbx; int $0x80; pop %%rbx"
                  : "=a"(__ret)
                  : "a"(syscall), "r"(p1), "c"(p2), "d"(p3), "S"(p4), "D"(p5)
@@ -114,6 +116,7 @@ Result hj_process_this(int *pid);
 Result hj_process_name(char *name, size_t size);
 Result hj_process_launch(Launchpad *launchpad, int *pid);
 Result hj_process_clone(int *pid);
+Result hj_process_exec(Launchpad *launchpad);
 Result hj_process_exit(int exit_code);
 Result hj_process_cancel(int pid);
 Result hj_process_sleep(int time);

@@ -17,7 +17,7 @@
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Task-Handles.h"
-#include "kernel/tasking/Task-Lanchpad.h"
+#include "kernel/tasking/Task-Launchpad.h"
 #include "kernel/tasking/Task-Memory.h"
 
 /* --- Framework initialization --------------------------------------------- */

@@ -183,7 +183,23 @@ void task_destroy(Task *task)
         arch_address_space_destroy(task->address_space);
     }
 
-    free(task);
+    delete task;
+}
+
+void task_clear_userspace(Task *task)
+{
+    MemoryMapping *mapping = nullptr;
+
+    while ((mapping = (MemoryMapping *)list_peek(task->memory_mapping)))
+    {
+        task_memory_mapping_destroy(task, mapping);
+    }
+
+    void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
+    task_memory_map(task, 0xff000000, PROCESS_STACK_SIZE, MEMORY_CLEAR | MEMORY_USER);
+    task->user_stack_pointer = 0xff000000 + PROCESS_STACK_SIZE;
+    task->user_stack = (void *)0xff000000;
+    task_switch_address_space(scheduler_running(), parent_address_space);
 }
 
 void task_iterate(void *target, TaskIterateCallback callback)

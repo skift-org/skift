@@ -5,7 +5,7 @@
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
-#include "kernel/tasking/Task-Lanchpad.h"
+#include "kernel/tasking/Task-Launchpad.h"
 #include "kernel/tasking/Task-Memory.h"
 #include "kernel/tasking/Task.h"
 
@@ -170,6 +170,37 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
     *pid = task->id;
 
     task_go(task);
+
+    return SUCCESS;
+}
+
+Result task_exec(Task *task, Launchpad *launchpad)
+{
+    assert(task == scheduler_running());
+
+    __cleanup(stream_cleanup) Stream *elf_file = stream_open(launchpad->executable, OPEN_READ);
+
+    if (handle_has_error(elf_file))
+    {
+        logger_error("Failed to open ELF file %s: %s!", launchpad->executable, handle_error_string(elf_file));
+        return handle_get_error(elf_file);
+    }
+
+    task_clear_userspace(task);
+
+#ifdef __x86_64__
+    Result result = ELFLoader<ELF64>::load(task, elf_file);
+#else
+    Result result = ELFLoader<ELF32>::load(task, elf_file);
+#endif
+
+    if (result != SUCCESS)
+    {
+        task->cancel(-1); // FIXME: handle errors gracefully.
+        return result;
+    }
+
+    task_pass_argc_argv_env(task, launchpad);
 
     return SUCCESS;
 }

@@ -50,6 +50,8 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip);
 
 void task_destroy(Task *task);
 
+void task_clear_userspace(Task *task);
+
 typedef Iteration (*TaskIterateCallback)(void *target, Task *task);
 void task_iterate(void *target, TaskIterateCallback callback);
 

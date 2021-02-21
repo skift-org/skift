@@ -31,6 +31,11 @@ Result hj_process_clone(int *pid)
     return __syscall(HJ_PROCESS_CLONE, (uintptr_t)pid);
 }
 
+Result hj_process_exec(Launchpad *launchpad)
+{
+    return __syscall(HJ_PROCESS_EXEC, (uintptr_t)launchpad);
+}
+
 Result hj_process_exit(int exit_code)
 {
     return __syscall(HJ_PROCESS_EXIT, (uintptr_t)exit_code);

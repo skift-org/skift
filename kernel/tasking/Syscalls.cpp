@@ -12,7 +12,7 @@
 #include "kernel/system/System.h"
 #include "kernel/tasking/Syscalls.h"
 #include "kernel/tasking/Task-Handles.h"
-#include "kernel/tasking/Task-Lanchpad.h"
+#include "kernel/tasking/Task-Launchpad.h"
 #include "kernel/tasking/Task-Memory.h"
 
 typedef Result (*SyscallHandler)(uintptr_t, uintptr_t, uintptr_t, uintptr_t, uintptr_t);
@@ -65,16 +65,15 @@ static bool validate_launchpad_arguments(Launchpad *launchpad)
     return true;
 }
 
-Result hj_process_launch(Launchpad *launchpad, int *pid)
+static bool valid_launchpad(Launchpad *launchpad)
 {
-    if (!syscall_validate_ptr((uintptr_t)launchpad, sizeof(Launchpad)) ||
-        !syscall_validate_ptr((uintptr_t)pid, sizeof(int)) ||
-        !validate_launchpad_arguments(launchpad) ||
-        !syscall_validate_ptr((uintptr_t)launchpad->env, launchpad->env_size))
-    {
-        return ERR_BAD_ADDRESS;
-    }
+    return syscall_validate_ptr((uintptr_t)launchpad, sizeof(Launchpad)) &&
+           validate_launchpad_arguments(launchpad) &&
+           syscall_validate_ptr((uintptr_t)launchpad->env, launchpad->env_size);
+}
 
+static Launchpad copy_launchpad(Launchpad *launchpad)
+{
     Launchpad launchpad_copy = *launchpad;
 
     for (int i = 0; i < launchpad->argc; i++)
@@ -86,14 +85,32 @@ Result hj_process_launch(Launchpad *launchpad, int *pid)
     launchpad_copy.env = strdup(launchpad->env);
     launchpad_copy.env_size = launchpad->env_size;
 
-    Result result = task_launch(scheduler_running(), &launchpad_copy, pid);
+    return launchpad_copy;
+}
 
-    free(launchpad_copy.env);
+static void free_launchpad(Launchpad *launchpad)
+{
+    free(launchpad->env);
 
     for (int i = 0; i < launchpad->argc; i++)
     {
-        free(launchpad_copy.argv[i].buffer);
+        free(launchpad->argv[i].buffer);
     }
+}
+
+Result hj_process_launch(Launchpad *launchpad, int *pid)
+{
+    if (!valid_launchpad(launchpad) ||
+        !syscall_validate_ptr((uintptr_t)pid, sizeof(int)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    auto launchpad_copy = copy_launchpad(launchpad);
+
+    Result result = task_launch(scheduler_running(), &launchpad_copy, pid);
+
+    free_launchpad(&launchpad_copy);
 
     return result;
 }
@@ -103,6 +120,22 @@ Result hj_process_clone(int *pid)
     // Implemented in archs/x86_32/kernel/Interrupts.cpp
     __unused(pid);
     ASSERT_NOT_REACHED();
+}
+
+Result hj_process_exec(Launchpad *launchpad)
+{
+    if (!valid_launchpad(launchpad))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    auto launchpad_copy = copy_launchpad(launchpad);
+
+    Result result = task_exec(scheduler_running(), &launchpad_copy);
+
+    free_launchpad(&launchpad_copy);
+
+    return result;
 }
 
 Result hj_process_exit(int exit_code)
@@ -602,6 +635,7 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [HJ_PROCESS_NAME] = reinterpret_cast<SyscallHandler>(hj_process_name),
     [HJ_PROCESS_LAUNCH] = reinterpret_cast<SyscallHandler>(hj_process_launch),
     [HJ_PROCESS_CLONE] = reinterpret_cast<SyscallHandler>(hj_process_clone),
+    [HJ_PROCESS_EXEC] = reinterpret_cast<SyscallHandler>(hj_process_exec),
     [HJ_PROCESS_EXIT] = reinterpret_cast<SyscallHandler>(hj_process_exit),
     [HJ_PROCESS_CANCEL] = reinterpret_cast<SyscallHandler>(hj_process_cancel),
     [HJ_PROCESS_SLEEP] = reinterpret_cast<SyscallHandler>(hj_process_sleep),

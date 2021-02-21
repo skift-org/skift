@@ -297,14 +297,14 @@ void Window::do_resize(Vec2i mouse_position)
     if (!_resize_horizontal)
     {
         new_bound = new_bound
-                        .moved({bound().x(), new_bound.y()})
+                        .moved({position().x(), new_bound.y()})
                         .with_width(bound().width());
     }
 
     if (!_resize_vertical)
     {
         new_bound = new_bound
-                        .moved({new_bound.x(), bound().y()})
+                        .moved({new_bound.x(), position().y()})
                         .with_height(bound().height());
     }
 

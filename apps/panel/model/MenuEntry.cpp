@@ -6,7 +6,7 @@
 namespace panel
 {
 
-MenuEntry::MenuEntry(const json::Value &value)
+MenuEntry::MenuEntry(String id, const json::Value &value)
 {
     value.with("name", [this](auto &v) {
         name = v.as_string();
@@ -23,6 +23,15 @@ MenuEntry::MenuEntry(const json::Value &value)
     value.with("command", [this](auto &v) {
         command = v.as_string();
     });
+
+    auto bitmap = Bitmap::load_from(String::format("/Applications/{}/{}.png", id, id));
+
+    if (bitmap != SUCCESS)
+    {
+        bitmap = Bitmap::load_from("/Files/missing.png");
+    }
+
+    image = *bitmap;
 }
 
 Vector<MenuEntry> MenuEntry::load()
@@ -55,7 +64,7 @@ Vector<MenuEntry> MenuEntry::load()
         File manifest_file{path};
         if (manifest_file.exist())
         {
-            entries->emplace_back(json::parse_file(path));
+            entries->emplace_back(entry.name, json::parse_file(path));
         }
     }
 

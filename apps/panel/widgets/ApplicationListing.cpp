@@ -47,9 +47,7 @@ void ApplicationListing::render()
 
         find_any = true;
 
-        auto item = new Button(host(), Button::TEXT, entry.icon, entry.name);
-
-        item->insets(Insetsi(8));
+        auto item = new Button(host(), Button::TEXT, entry.image, entry.name);
 
         item->on(Event::ACTION, [this, entry](auto) {
             process_run(entry.command.cstring(), nullptr);

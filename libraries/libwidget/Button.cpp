@@ -2,6 +2,7 @@
 
 #include <libwidget/Button.h>
 #include <libwidget/IconPanel.h>
+#include <libwidget/Image.h>
 #include <libwidget/Label.h>
 
 void Button::paint(Painter &painter, const Recti &rectangle)
@@ -127,5 +128,24 @@ Button::Button(Widget *parent, Style style, RefPtr<Icon> icon, String text)
     {
         label->color(THEME_FOREGROUND, Colors::WHITE);
         icon_panel->color(THEME_FOREGROUND, Colors::WHITE);
+    }
+}
+
+Button::Button(Widget *parent, Style style, RefPtr<Bitmap> image, String text)
+    : Button(parent, style)
+{
+    insets(Insetsi(4, 4, 6, 10));
+    min_width(64);
+
+    auto image_panel = new Image(this, image, BitmapScaling::FIT);
+    image_panel->outsets(Insetsi(0, 0, 0, 8));
+    image_panel->min_width(36);
+    image_panel->min_height(36);
+
+    auto label = new Label(this, text);
+
+    if (style == FILLED)
+    {
+        label->color(THEME_FOREGROUND, Colors::WHITE);
     }
 }

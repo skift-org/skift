@@ -28,6 +28,8 @@ public:
 
     Button(Widget *parent, Style style, RefPtr<Icon> icon, String text);
 
+    Button(Widget *parent, Style style, RefPtr<Bitmap> image, String text);
+
     void paint(Painter &painter, const Recti &rectangle) override;
 
     void event(Event *event) override;

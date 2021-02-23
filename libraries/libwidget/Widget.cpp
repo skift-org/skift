@@ -674,8 +674,6 @@ Vec2i Widget::compute_size()
 
     width += _insets.left() + _insets.right();
     height += _insets.top() + _insets.bottom();
-    width += _outsets.left() + _outsets.right();
-    height += _outsets.top() + _outsets.bottom();
 
     if (_max_width)
     {
@@ -696,6 +694,9 @@ Vec2i Widget::compute_size()
     {
         height = MAX(height, _min_height);
     }
+
+    width += _outsets.left() + _outsets.right();
+    height += _outsets.top() + _outsets.bottom();
 
     return Vec2i(width, height);
 }

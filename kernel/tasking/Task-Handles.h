@@ -18,9 +18,7 @@ ResultOr<size_t> task_fshandle_read(Task *task, int handle_index, void *buffer, 
 
 ResultOr<size_t> task_fshandle_write(Task *task, int handle_index, const void *buffer, size_t size);
 
-Result task_fshandle_seek(Task *task, int handle_index, int offset, Whence whence);
-
-ResultOr<int> task_fshandle_tell(Task *task, int handle_index, Whence whence);
+ResultOr<int> task_fshandle_seek(Task *task, int handle_index, int offset, Whence whence);
 
 Result task_fshandle_call(Task *task, int handle_index, IOCall request, void *args);
 

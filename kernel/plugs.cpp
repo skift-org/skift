@@ -230,16 +230,16 @@ int __plug_handle_seek(Handle *handle, int offset, Whence whence)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->result = task_fshandle_seek(scheduler_running(), handle->id, offset, whence);
+    handle->result = task_fshandle_seek(scheduler_running(), handle->id, offset, whence).result();
 
     return 0;
 }
 
-int __plug_handle_tell(Handle *handle, Whence whence)
+int __plug_handle_tell(Handle *handle)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    auto result_or_offset = task_fshandle_tell(scheduler_running(), handle->id, whence);
+    auto result_or_offset = task_fshandle_seek(scheduler_running(), handle->id, 0, WHENCE_HERE);
 
     handle->result = result_or_offset.result();
 

@@ -48,7 +48,7 @@ size_t FileReader::length()
 
 size_t FileReader::position()
 {
-    auto result_or_tell = _handle.tell(WHENCE_START);
+    auto result_or_tell = _handle.tell();
 
     if (result_or_tell)
     {

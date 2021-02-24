@@ -89,16 +89,11 @@ public:
         return _result;
     }
 
-    Result seek(int offset, Whence whence)
+    ResultOr<int> seek(int offset, Whence whence)
     {
-        _result = hj_handle_seek(_handle, offset, whence);
-        return _result;
-    }
+        int result_offset = 0;
 
-    ResultOr<int> tell(Whence whence)
-    {
-        int offset = 0;
-        _result = hj_handle_tell(_handle, whence, &offset);
+        _result = hj_handle_seek(_handle, offset, whence, &result_offset);
 
         if (_result != SUCCESS)
         {
@@ -106,7 +101,23 @@ public:
         }
         else
         {
-            return offset;
+            return result_offset;
+        }
+    }
+
+    ResultOr<int> tell()
+    {
+        int result_offset = 0;
+
+        _result = hj_handle_seek(_handle, 0, WHENCE_HERE, &result_offset);
+
+        if (_result != SUCCESS)
+        {
+            return _result;
+        }
+        else
+        {
+            return result_offset;
         }
     }
 

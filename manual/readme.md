@@ -45,7 +45,6 @@
  - [`hj_handle_reopen()`](20-syscalls/hj_handle_reopen.md)
  - [`hj_handle_seek()`](20-syscalls/hj_handle_seek.md)
  - [`hj_handle_stat()`](20-syscalls/hj_handle_stat.md)
- - [`hj_handle_tell()`](20-syscalls/hj_handle_tell.md)
  - [`hj_handle_write()`](20-syscalls/hj_handle_write.md)
  - [`hj_memory_alloc()`](20-syscalls/hj_memory_alloc.md)
  - [`hj_memory_free()`](20-syscalls/hj_memory_free.md)

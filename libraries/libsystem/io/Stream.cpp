@@ -353,9 +353,9 @@ int stream_seek(Stream *stream, int offset, Whence whence)
     return __plug_handle_seek(HANDLE(stream), offset, whence);
 }
 
-int stream_tell(Stream *stream, Whence whence)
+int stream_tell(Stream *stream)
 {
-    return __plug_handle_tell(HANDLE(stream), whence);
+    return __plug_handle_tell(HANDLE(stream));
 }
 
 void stream_stat(Stream *stream, FileState *stat)

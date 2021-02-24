@@ -285,7 +285,7 @@ ResultOr<size_t> task_fshandle_write(Task *task, int handle_index, const void *b
     return result_or_written;
 }
 
-Result task_fshandle_seek(Task *task, int handle_index, int offset, Whence whence)
+ResultOr<int> task_fshandle_seek(Task *task, int handle_index, int offset, Whence whence)
 {
     auto handle = task_fshandle_acquire(task, handle_index);
 
@@ -294,27 +294,11 @@ Result task_fshandle_seek(Task *task, int handle_index, int offset, Whence whenc
         return ERR_BAD_HANDLE;
     }
 
-    auto result = handle->seek(offset, whence);
+    auto seek_result = handle->seek(offset, whence);
 
     task_fshandle_release(task, handle_index);
 
-    return result;
-}
-
-ResultOr<int> task_fshandle_tell(Task *task, int handle_index, Whence whence)
-{
-    auto handle = task_fshandle_acquire(task, handle_index);
-
-    if (handle == nullptr)
-    {
-        return ERR_BAD_HANDLE;
-    }
-
-    auto result_or_offset = handle->tell(whence);
-
-    task_fshandle_release(task, handle_index);
-
-    return result_or_offset;
+    return seek_result;
 }
 
 Result task_fshandle_call(Task *task, int handle_index, IOCall request, void *args)

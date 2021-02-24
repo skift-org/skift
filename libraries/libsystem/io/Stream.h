@@ -60,7 +60,7 @@ Result stream_call(Stream *stream, IOCall request, void *arg);
 
 int stream_seek(Stream *stream, int offset, Whence whence);
 
-int stream_tell(Stream *stream, Whence whence);
+int stream_tell(Stream *stream);
 
 void stream_stat(Stream *stream, FileState *stat);
 

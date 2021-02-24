@@ -44,7 +44,7 @@ size_t FileWriter::length()
 
 size_t FileWriter::position()
 {
-    auto result_or_tell = _handle.tell(WHENCE_START);
+    auto result_or_tell = _handle.tell();
 
     if (result_or_tell)
     {

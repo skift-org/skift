@@ -50,14 +50,14 @@ int close(int fd)
 
 off_t lseek(int fd, off_t offset, int whence)
 {
-    Result result = hj_handle_seek(fd, offset, (Whence)whence);
+    int offset_beg;
+
+    Result result = hj_handle_seek(fd, offset, (Whence)whence, &offset_beg);
     if (result != Result::SUCCESS)
     {
         // TODO: set errno
         return (off_t)-1;
     }
 
-    int offset_beg;
-    hj_handle_tell(fd, WHENCE_START, &offset_beg);
     return offset_beg;
 }

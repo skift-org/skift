@@ -2,8 +2,8 @@
 #include <assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <string.h>
 #include <libsystem/math/MinMax.h>
+#include <string.h>
 
 #include "kernel/node/Connection.h"
 #include "kernel/node/Handle.h"
@@ -161,7 +161,7 @@ ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
     return written;
 }
 
-Result FsHandle::seek(int offset, Whence whence)
+ResultOr<int> FsHandle::seek(int offset, Whence whence)
 {
     _node->acquire(scheduler_running_id());
     size_t size = _node->size();
@@ -195,33 +195,12 @@ Result FsHandle::seek(int offset, Whence whence)
         }
 
         break;
+
     default:
-        logger_error("Invalid whence %d", whence);
-        ASSERT_NOT_REACHED();
+        return ERR_INVALID_ARGUMENT;
     }
 
-    return SUCCESS;
-}
-
-ResultOr<int> FsHandle::tell(Whence whence)
-{
-    _node->acquire(scheduler_running_id());
-    size_t size = _node->size();
-    _node->release(scheduler_running_id());
-
-    if (whence == WHENCE_START ||
-        whence == WHENCE_HERE)
-    {
-        return _offset;
-    }
-    else if (whence == WHENCE_END)
-    {
-        return _offset - size;
-    }
-    else
-    {
-        ASSERT_NOT_REACHED();
-    }
+    return _offset;
 }
 
 Result FsHandle::call(IOCall request, void *args)

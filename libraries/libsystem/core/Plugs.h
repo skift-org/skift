@@ -80,7 +80,7 @@ Result __plug_handle_call(Handle *handle, IOCall request, void *args);
 
 int __plug_handle_seek(Handle *handle, int offset, Whence whence);
 
-int __plug_handle_tell(Handle *handle, Whence whence);
+int __plug_handle_tell(Handle *handle);
 
 int __plug_handle_stat(Handle *handle, FileState *stat);
 

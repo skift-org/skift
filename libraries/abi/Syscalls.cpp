@@ -199,14 +199,9 @@ Result hj_handle_call(int handle, IOCall request, void *args)
     return __syscall(HJ_HANDLE_CALL, (uintptr_t)handle, (uintptr_t)request, (uintptr_t)args);
 }
 
-Result hj_handle_seek(int handle, int offset, Whence whence)
+Result hj_handle_seek(int handle, int offset, Whence whence, int *result_offset)
 {
-    return __syscall(HJ_HANDLE_SEEK, (uintptr_t)handle, (uintptr_t)offset, (uintptr_t)whence);
-}
-
-Result hj_handle_tell(int handle, Whence whence, int *offset)
-{
-    return __syscall(HJ_HANDLE_TELL, (uintptr_t)handle, (uintptr_t)whence, (uintptr_t)offset);
+    return __syscall(HJ_HANDLE_SEEK, (uintptr_t)handle, (uintptr_t)offset, (uintptr_t)whence, (uintptr_t)result_offset);
 }
 
 Result hj_handle_stat(int handle, FileState *state)

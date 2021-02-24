@@ -38,15 +38,22 @@ ResultOr<size_t> File::write(const void *buffer, size_t size)
 
 ResultOr<size_t> File::seek(size_t pos, Whence whence)
 {
-    // FIXME: hj_handle_seek should return the current position.
-    _handle.seek(pos, whence);
-    return pos;
+    auto seek_result = _handle.seek(pos, whence);
+
+    if (seek_result)
+    {
+        return (size_t)*seek_result;
+    }
+    else
+    {
+        return seek_result.result();
+    }
 }
 
 ResultOr<size_t> File::tell()
 {
     // FIXME: sketchy cast
-    return (size_t)_handle.tell(WHENCE_START).value();
+    return (size_t)_handle.tell().value();
 }
 
 ResultOr<size_t> File::length()

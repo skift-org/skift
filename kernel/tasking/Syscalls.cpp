@@ -551,30 +551,29 @@ Result hj_handle_call(int handle, IOCall request, void *args)
     return task_fshandle_call(scheduler_running(), handle, request, args);
 }
 
-Result hj_handle_seek(int handle, int offset, Whence whence)
+Result hj_handle_seek(int handle, int offset, Whence whence, int *result_offset)
 {
-    return task_fshandle_seek(scheduler_running(), handle, offset, whence);
-}
-
-Result hj_handle_tell(int handle, Whence whence, int *offset)
-{
-    if (!syscall_validate_ptr((uintptr_t)offset, sizeof(int)))
+    if (result_offset != nullptr &&
+        !syscall_validate_ptr((uintptr_t)result_offset, sizeof(int)))
     {
         return ERR_BAD_ADDRESS;
     }
 
-    auto result_of_offset = task_fshandle_tell(scheduler_running(), handle, whence);
+    auto seek_result = task_fshandle_seek(scheduler_running(), handle, offset, whence);
 
-    if (result_of_offset.success())
+    if (result_offset != nullptr)
     {
-        *offset = result_of_offset.take_value();
-        return SUCCESS;
+        if (seek_result)
+        {
+            *result_offset = *seek_result;
+        }
+        else
+        {
+            *result_offset = 0;
+        }
     }
-    else
-    {
-        *offset = 0;
-        return result_of_offset.result();
-    }
+
+    return seek_result.result();
 }
 
 Result hj_handle_stat(int handle, FileState *state)
@@ -665,7 +664,6 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [HJ_HANDLE_WRITE] = reinterpret_cast<SyscallHandler>(hj_handle_write),
     [HJ_HANDLE_CALL] = reinterpret_cast<SyscallHandler>(hj_handle_call),
     [HJ_HANDLE_SEEK] = reinterpret_cast<SyscallHandler>(hj_handle_seek),
-    [HJ_HANDLE_TELL] = reinterpret_cast<SyscallHandler>(hj_handle_tell),
     [HJ_HANDLE_STAT] = reinterpret_cast<SyscallHandler>(hj_handle_stat),
     [HJ_HANDLE_CONNECT] = reinterpret_cast<SyscallHandler>(hj_handle_connect),
     [HJ_HANDLE_ACCEPT] = reinterpret_cast<SyscallHandler>(hj_handle_accept),

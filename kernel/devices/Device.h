@@ -66,6 +66,8 @@ public:
 
     virtual ~Device(){};
 
+    OwnPtr<FsHandle> open(OpenFlag flags);
+
     virtual int interrupt() { return -1; }
 
     virtual void acknowledge_interrupt() {}

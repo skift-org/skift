@@ -18,6 +18,7 @@
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/ProcessInfo.h"
 #include "kernel/scheduling/Scheduler.h"
+#include "kernel/storage/Partitions.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Tasking.h"
 #include "kernel/tasking/Userspace.h"
@@ -49,6 +50,7 @@ void system_main(Handover *handover)
     modules_initialize(handover);
     driver_initialize();
     device_initialize();
+    partitions_initialize();
     process_info_initialize();
     device_info_initialize();
     devices_filesystem_initialize();

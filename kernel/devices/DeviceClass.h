@@ -9,6 +9,7 @@
     __ENTRY(MOUSE, mouse)             \
     __ENTRY(SERIAL, serial)           \
     __ENTRY(DISK, disk)               \
+    __ENTRY(PARTITION, part)          \
     __ENTRY(RANDOM, random)           \
     __ENTRY(NETWORK, network)         \
     __ENTRY(NULL_, null)              \

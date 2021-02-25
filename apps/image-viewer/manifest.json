@@ -1,0 +1,6 @@
+{
+    "name": "Image Viewer",
+    "comment": "View and edit images.",
+    "icon": "image",
+    "command": "image-viewer"
+}

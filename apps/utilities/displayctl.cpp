@@ -1,43 +1,14 @@
 #include <abi/Paths.h>
 
+#include <libutils/ArgParse.h>
+
 #include <libsystem/Result.h>
-#include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Socket.h>
 #include <libsystem/io_new/Streams.h>
 
 #include "compositor/Protocol.h"
-
-static bool option_list = false;
-static bool option_get = false;
-static char *option_set = nullptr;
-
-/* --- Command line application initialization -------------------------------*/
-
-static const char *usages[] = {
-    "",
-    "OPTION...",
-    nullptr,
-};
-
-static CommandLineOption options[] = {
-    COMMANDLINE_OPT_HELP,
-
-    COMMANDLINE_OPT_BOOL("list", 'l', option_list, "List all available graphics modes.", COMMANDLINE_NO_CALLBACK),
-    COMMANDLINE_OPT_BOOL("get", 'g', option_get, "Get the current graphic mode.", COMMANDLINE_NO_CALLBACK),
-    COMMANDLINE_OPT_STRING("set", 's', option_set, "Set graphic mode.", COMMANDLINE_NO_CALLBACK),
-
-    COMMANDLINE_OPT_END,
-};
-
-static CommandLine cmdline = CMDLINE(
-    usages,
-    options,
-    "Get or set graphics modes.",
-    "Options can be combined.");
-
-/* --- gfxmode logic -------------------------------------------------------- */
 
 static const IOCallDisplayModeArgs GFX_MODES[] = {
     {640, 360},
@@ -52,7 +23,7 @@ static const IOCallDisplayModeArgs GFX_MODES[] = {
     {3840, 2160},
 };
 
-Optional<IOCallDisplayModeArgs> gfxmode_by_name(String name)
+Optional<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
 {
     for (size_t i = 0; i < __array_length(GFX_MODES); i++)
     {
@@ -67,6 +38,18 @@ Optional<IOCallDisplayModeArgs> gfxmode_by_name(String name)
     return {};
 }
 
+int gfxmode_list()
+{
+    for (size_t i = 0; i < __array_length(GFX_MODES); i++)
+    {
+        auto &gfx_mode = GFX_MODES[i];
+
+        System::outln("- {}x{}", gfx_mode.width, gfx_mode.height);
+    }
+
+    return PROCESS_SUCCESS;
+}
+
 int gfxmode_get(Stream *framebuffer_device)
 {
     IOCallDisplayModeArgs framebuffer_info;
@@ -78,8 +61,8 @@ int gfxmode_get(Stream *framebuffer_device)
     }
 
     System::outln("Height: {}\nWidth: {}\n",
-           framebuffer_info.width,
-           framebuffer_info.height);
+                  framebuffer_info.width,
+                  framebuffer_info.height);
 
     return PROCESS_SUCCESS;
 }
@@ -118,7 +101,7 @@ int gfxmode_set_iocall(Stream *device, IOCallDisplayModeArgs mode)
     return PROCESS_SUCCESS;
 }
 
-int gfxmode_set(Stream *device, String mode_name)
+int gfxmode_set(String &mode_name)
 {
     auto mode = gfxmode_by_name(mode_name);
 
@@ -132,6 +115,7 @@ int gfxmode_set(Stream *device, String mode_name)
 
     if (result != 0)
     {
+        __cleanup(stream_cleanup) Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
         result = gfxmode_set_iocall(device, *mode);
     }
 
@@ -146,46 +130,32 @@ int gfxmode_set(Stream *device, String mode_name)
     }
 }
 
-int gfxmode_list()
+int main(int argc, const char *argv[])
 {
-    for (size_t i = 0; i < __array_length(GFX_MODES); i++)
-    {
-        auto &gfx_mode = GFX_MODES[i];
 
-        System::outln("- {}x{}", gfx_mode.width, gfx_mode.height);
-    }
+    ArgParse args{};
 
-    return PROCESS_SUCCESS;
-}
+    args.show_help_if_no_option_given();
+    args.should_abort_on_failure();
 
-/* --- Entry point ---------------------------------------------------------- */
+    args.usage("");
+    args.usage("OPTION...");
 
-int main(int argc, char **argv)
-{
-    argc = cmdline_parse(&cmdline, argc, argv);
+    args.prologue("Get or set graphics modes.");
 
-    __cleanup(stream_cleanup) Stream *framebuffer_device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
-
-    if (handle_has_error(HANDLE(framebuffer_device)))
-    {
-        handle_printf_error(framebuffer_device, "displayctl: Failed to open " FRAMEBUFFER_DEVICE_PATH);
-        return PROCESS_FAILURE;
-    }
-
-    if (option_get)
-    {
-        return gfxmode_get(framebuffer_device);
-    }
-    else if (option_list)
-    {
+    args.option('l', "list", "List all available graphics modes.", [](auto &) {
         return gfxmode_list();
-    }
-    else if (option_set != nullptr)
-    {
-        return gfxmode_set(framebuffer_device, option_set);
-    }
-    else
-    {
-        return gfxmode_get(framebuffer_device);
-    }
+    });
+
+    args.option('g', "get", "Get the current graphic mode.", [](auto &) {
+        return gfxmode_list();
+    });
+
+    args.option_string('s', "set", "Set graphic mode.", [&](String &mode) {
+        return gfxmode_set(mode);
+    });
+
+    args.epiloge("Options can be combined.");
+
+    return args.eval(argc, argv);
 }

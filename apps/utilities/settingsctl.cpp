@@ -31,6 +31,8 @@ int main(int argc, const char **argv)
         json::prettify(pretty, *maybe_settings);
 
         stream_format(out_stream, "%s", pretty.finalize().cstring());
+
+        return PROCESS_SUCCESS;
     });
 
     args.option('w', "write", "Write a setting to the settings storage.", [&](ArgParseContext &context) {
@@ -49,6 +51,8 @@ int main(int argc, const char **argv)
         }
 
         Settings::write(Settings::Path::parse(*maybe_key_name), json::parse(*maybe_value));
+
+        return PROCESS_SUCCESS;
     });
 
     OwnPtr<Settings::Watcher> watcher = nullptr;
@@ -70,7 +74,7 @@ int main(int argc, const char **argv)
             stream_format(out_stream, "%s\n", pretty.finalize().cstring());
         });
 
-        process_exit(EventLoop::run());
+        return EventLoop::run();
     });
 
     args.epiloge("Option cannot be combined.");

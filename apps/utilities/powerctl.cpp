@@ -13,10 +13,12 @@ int main(int argc, char const *argv[])
 
     args.option('r', "reboot", "Reboot the system.", [&](auto &) {
         hj_system_reboot();
+        return PROCESS_SUCCESS;
     });
 
     args.option('s', "shutdown", "Shutdown the system.", [&](auto &) {
         hj_system_shutdown();
+        return PROCESS_SUCCESS;
     });
 
     return args.eval(argc, argv);

@@ -24,10 +24,12 @@ int main(int argc, char const *argv[])
 
     args.option('c', "color", OPTION_COLOR_DESCRIPTION, [&](auto &) {
         options |= Prettifier::COLORS;
+        return PROCESS_SUCCESS;
     });
 
     args.option('i', "indent", OPTION_IDENT_DESCRIPTION, [&](auto &) {
         options |= Prettifier::INDENTS;
+        return PROCESS_SUCCESS;
     });
 
     args.epiloge(EPILOGUE);

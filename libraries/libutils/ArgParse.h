@@ -66,7 +66,7 @@ public:
     }
 };
 
-using ArgParseOptionCallback = Callback<void(ArgParseContext &)>;
+using ArgParseOptionCallback = Callback<int(ArgParseContext &)>;
 
 struct ArgParseOption
 {
@@ -111,18 +111,28 @@ public:
 
     ArgParse()
     {
-        _option.push_back({'h', "help", "Show this help message and exit.", [&](auto &) {
-                               help();
-                               process_exit(PROCESS_SUCCESS);
-                           }});
+        _option.push_back(
+            {
+                'h',
+                "help",
+                "Show this help message and exit.",
+                [&](auto &) {
+                    return help();
+                },
+            });
     }
 
     void option(char shortname, String longname, String description, ArgParseOptionCallback callback)
     {
-        _option.push_back({shortname, longname, description, callback});
+        _option.push_back({
+            shortname,
+            longname,
+            description,
+            callback,
+        });
     }
 
-    void option_string(char shortname, String longname, String description, Callback<void(String &)> callback)
+    void option_string(char shortname, String longname, String description, Callback<int(String &)> callback)
     {
         _option.push_back({
             shortname,
@@ -134,11 +144,11 @@ public:
 
                 if (maybe_strings)
                 {
-                    callback(*maybe_strings);
+                    return callback(*maybe_strings);
                 }
                 else
                 {
-                    usage();
+                    return usage();
                 }
             },
         });
@@ -148,6 +158,7 @@ public:
     {
         option(shortname, longname, description, [&](auto &) {
             value = true;
+            return PROCESS_SUCCESS;
         });
     }
 
@@ -157,15 +168,16 @@ public:
             if (ctx.any())
             {
                 value = ctx.pop();
+                return PROCESS_SUCCESS;
             }
             else
             {
-                usage();
+                return usage();
             }
         });
     }
 
-    void help()
+    int help()
     {
         if (!_prologue.null_or_empty())
         {
@@ -265,28 +277,26 @@ public:
         {
             System::outln("{}", _epiloge);
         }
+
+        return PROCESS_SUCCESS;
     }
 
-    void fail()
+    int fail()
     {
         System::errln("Try '{} --help' for more information.\n", _name);
-
-        if (_should_abort_on_failure)
-        {
-            process_exit(PROCESS_FAILURE);
-        }
+        return PROCESS_FAILURE;
     }
 
-    void usage()
+    int usage()
     {
         System::errln("{}: missing operand.", _name.cstring());
-        fail();
+        return fail();
     }
 
-    void invalid_option(String option)
+    int invalid_option(String option)
     {
         System::errln("{}: invalide option '{}'!", _name.cstring(), option.cstring());
-        fail();
+        return fail();
     }
 
     int eval(int argc, char const *argv[])
@@ -312,7 +322,18 @@ public:
                 {
                     if (_option[i].longname == argument)
                     {
-                        _option[i].callback(context);
+                        int result = _option[i].callback(context);
+
+                        if (result != PROCESS_SUCCESS)
+                        {
+                            if (_should_abort_on_failure)
+                            {
+                                process_exit(PROCESS_FAILURE);
+                            }
+
+                            return result;
+                        }
+
                         has_run_option = true;
                         found_valid_option = true;
                     }
@@ -320,8 +341,7 @@ public:
 
                 if (!found_valid_option)
                 {
-                    invalid_option(current);
-                    return PROCESS_FAILURE;
+                    return invalid_option(current);
                 }
             }
             else if (scan.skip('-'))
@@ -334,7 +354,17 @@ public:
                     {
                         if (_option[i].shortname == scan.current())
                         {
-                            _option[i].callback(context);
+                            int result = _option[i].callback(context);
+
+                            if (result != PROCESS_SUCCESS)
+                            {
+                                if (_should_abort_on_failure)
+                                {
+                                    process_exit(PROCESS_FAILURE);
+                                }
+
+                                return result;
+                            }
 
                             has_run_option = true;
                             found_valid_option = true;
@@ -343,8 +373,7 @@ public:
 
                     if (!found_valid_option)
                     {
-                        invalid_option(scan.current());
-                        return PROCESS_FAILURE;
+                        return invalid_option(scan.current());
                     }
 
                     scan.foreward();
@@ -358,14 +387,12 @@ public:
 
         if (!this->argv().any() && _show_help_if_no_operand_given)
         {
-            usage();
-            return PROCESS_FAILURE;
+            return usage();
         }
 
         if (!has_run_option && _show_help_if_no_option_given)
         {
-            usage();
-            return PROCESS_FAILURE;
+            return usage();
         }
 
         return PROCESS_SUCCESS;

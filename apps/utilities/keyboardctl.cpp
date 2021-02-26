@@ -110,16 +110,16 @@ int main(int argc, const char *argv[])
     }
 
     args.option('l', "list", "List all installed keymap on this system.", [&](auto &) {
-        loadkey_list_keymap();
+        return loadkey_list_keymap();
     });
 
     args.option('g', "get", "Get the current keyboard keymap.", [&](auto &) {
-        loadkey_get_keymap(keyboard_handle);
+        return loadkey_get_keymap(keyboard_handle);
     });
 
     args.option_string('s', "set", "Set the current keyboard keymap.", [&](auto &keymap_name) {
         auto kaymap_path = String::format("/Files/Keyboards/{}.kmap", keymap_name);
-        loadkey_set_keymap(keyboard_handle, kaymap_path);
+        return loadkey_set_keymap(keyboard_handle, kaymap_path);
     });
 
     return args.eval(argc, argv);

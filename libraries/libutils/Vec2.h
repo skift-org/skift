@@ -1,7 +1,6 @@
 #pragma once
 
 #include <assert.h>
-#include <libsystem/math/Dimension.h>
 #include <libsystem/math/MinMax.h>
 #include <math.h>
 
@@ -140,28 +139,6 @@ public:
     Vec2 vector_to(Vec2 destination)
     {
         return (destination - *this).normalized();
-    }
-
-    Scalar component(Dimension dim)
-    {
-        if (dim == Dimension::X)
-            return x();
-
-        if (dim == Dimension::Y)
-            return y();
-
-        ASSERT_NOT_REACHED();
-    }
-
-    Scalar with_component(Dimension dim, Scalar value)
-    {
-        if (dim == Dimension::X)
-            return Vec2i(value, y());
-
-        if (dim == Dimension::Y)
-            return Vec2i(x(), value);
-
-        ASSERT_NOT_REACHED();
     }
 
     Scalar angle_with(Vec2 other)

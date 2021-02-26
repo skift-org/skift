@@ -205,21 +205,19 @@ void LegacyKeyboard::handle_interrupt()
     }
 }
 
-bool LegacyKeyboard::can_read(FsHandle &handle)
+bool LegacyKeyboard::can_read()
 {
-    __unused(handle);
-
     return !_events.empty();
 }
 
-ResultOr<size_t> LegacyKeyboard::read(FsHandle &handle, void *buffer, size_t size)
+ResultOr<size_t> LegacyKeyboard::read(size64_t offset, void *buffer, size_t size)
 {
-    __unused(handle);
+    __unused(offset);
 
     return _events.read((char *)buffer, (size / sizeof(KeyboardPacket)) * sizeof(KeyboardPacket));
 }
 
-Result LegacyKeyboard::call(FsHandle &, IOCall request, void *args)
+Result LegacyKeyboard::call(IOCall request, void *args)
 {
     if (request == IOCALL_KEYBOARD_GET_KEYMAP)
     {

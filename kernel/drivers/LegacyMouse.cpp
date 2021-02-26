@@ -185,16 +185,14 @@ void LegacyMouse::handle_interrupt()
     }
 }
 
-bool LegacyMouse::can_read(FsHandle &handle)
+bool LegacyMouse::can_read()
 {
-    __unused(handle);
-
     return !_events.empty();
 }
 
-ResultOr<size_t> LegacyMouse::read(FsHandle &handle, void *buffer, size_t size)
+ResultOr<size_t> LegacyMouse::read(size64_t offset, void *buffer, size_t size)
 {
-    __unused(handle);
+    __unused(offset);
 
     return _events.read((char *)buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
 }

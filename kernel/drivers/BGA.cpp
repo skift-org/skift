@@ -63,27 +63,23 @@ BGA::BGA(DeviceAddress address) : PCIDevice(address, DeviceClass::FRAMEBUFFER)
     graphic_did_find_framebuffer(_framebuffer->base(), handover()->framebuffer_width, handover()->framebuffer_height);
 }
 
-size_t BGA::size(FsHandle &handle)
+size_t BGA::size()
 {
-    __unused(handle);
-
     return _framebuffer->size();
 }
 
-ResultOr<size_t> BGA::read(FsHandle &handle, void *buffer, size_t size)
+ResultOr<size_t> BGA::read(size64_t offset, void *buffer, size_t size)
 {
-    return _framebuffer->read(handle.offset(), buffer, size);
+    return _framebuffer->read(offset, buffer, size);
 }
 
-ResultOr<size_t> BGA::write(FsHandle &handle, const void *buffer, size_t size)
+ResultOr<size_t> BGA::write(size64_t offset, const void *buffer, size_t size)
 {
-    return _framebuffer->write(handle.offset(), buffer, size);
+    return _framebuffer->write(offset, buffer, size);
 }
 
-Result BGA::call(FsHandle &handle, IOCall request, void *args)
+Result BGA::call(IOCall request, void *args)
 {
-    __unused(handle);
-
     if (request == IOCALL_DISPLAY_GET_MODE)
     {
         IOCallDisplayModeArgs *mode = (IOCallDisplayModeArgs *)args;

@@ -9,7 +9,6 @@
 
 #include "kernel/devices/DeviceAddress.h"
 #include "kernel/devices/DeviceClass.h"
-#include "kernel/node/Handle.h"
 
 class Device : public RefCounted<Device>
 {
@@ -26,7 +25,7 @@ public:
         return _klass;
     }
 
-    String name()
+    virtual String name()
     {
         return _name;
     }
@@ -66,8 +65,6 @@ public:
 
     virtual ~Device(){};
 
-    OwnPtr<FsHandle> open(OpenFlag flags);
-
     virtual int interrupt() { return -1; }
 
     virtual void acknowledge_interrupt() {}
@@ -79,48 +76,41 @@ public:
         return false;
     }
 
-    virtual bool can_read(FsHandle &handle)
+    virtual bool can_read()
     {
-        __unused(handle);
-
         return true;
     }
 
-    virtual bool can_write(FsHandle &handle)
+    virtual bool can_write()
     {
-        __unused(handle);
-
         return true;
     }
 
-    virtual size_t size(FsHandle &handle)
+    virtual size_t size()
     {
-        __unused(handle);
-
         return 0;
     }
 
-    virtual ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
+    virtual ResultOr<size_t> read(size64_t offset, void *buffer, size_t size)
     {
-        __unused(handle);
+        __unused(offset);
         __unused(buffer);
         __unused(size);
 
         return ERR_NOT_READABLE;
     }
 
-    virtual ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size)
+    virtual ResultOr<size_t> write(size64_t offset, const void *buffer, size_t size)
     {
-        __unused(handle);
+        __unused(offset);
         __unused(buffer);
         __unused(size);
 
         return ERR_NOT_WRITABLE;
     }
 
-    virtual Result call(FsHandle &handle, IOCall request, void *args)
+    virtual Result call(IOCall request, void *args)
     {
-        __unused(handle);
         __unused(request);
         __unused(args);
 

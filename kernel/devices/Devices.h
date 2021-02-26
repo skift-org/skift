@@ -18,3 +18,5 @@ void device_initialize();
 void devices_acknowledge_interrupt(int interrupt);
 
 void devices_handle_interrupt(int interrupt);
+
+void device_mount(RefPtr<Device> device);

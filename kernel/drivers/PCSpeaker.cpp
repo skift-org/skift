@@ -37,9 +37,9 @@ void PCSpeaker::note(int length, int freq)
     }
 }
 
-ResultOr<size_t> PCSpeaker::write(FsHandle &handle, const void *buffer, size_t size)
+ResultOr<size_t> PCSpeaker::write(size64_t offset, const void *buffer, size_t size)
 {
-    __unused(handle);
+    __unused(offset);
     if (!size % (sizeof(struct Speaker)))
     {
         return 0;

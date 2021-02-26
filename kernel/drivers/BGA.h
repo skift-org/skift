@@ -31,8 +31,8 @@ private:
 public:
     BGA(DeviceAddress address);
 
-    size_t size(FsHandle &handle) override;
-    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
-    ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override;
-    Result call(FsHandle &handle, IOCall request, void *args) override;
+    size_t size() override;
+    ResultOr<size_t> read(size64_t offset, void *buffer, size_t size) override;
+    ResultOr<size_t> write(size64_t offset, const void *buffer, size_t size) override;
+    Result call(IOCall request, void *args) override;
 };

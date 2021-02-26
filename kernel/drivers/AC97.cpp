@@ -123,23 +123,20 @@ void AC97::handle_interrupt()
     }
 }
 
-bool AC97::can_write(FsHandle &handle)
+bool AC97::can_write()
 {
-    __unused(handle);
-
     return !_buffer.full();
 }
 
-ResultOr<size_t> AC97::write(FsHandle &handle, const void *buffer, size_t size)
+ResultOr<size_t> AC97::write(size64_t offset, const void *buffer, size_t size)
 {
-    __unused(handle);
+    __unused(offset);
 
     return _buffer.write((char *)buffer, size);
 }
 
-Result AC97::call(FsHandle &handle, IOCall request, void *args)
+Result AC97::call(IOCall request, void *args)
 {
-    __unused(handle);
     __unused(request);
     __unused(args);
 

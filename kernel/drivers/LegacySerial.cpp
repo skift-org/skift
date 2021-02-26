@@ -18,26 +18,23 @@ void LegacySerial::handle_interrupt()
     }
 }
 
-bool LegacySerial::can_read(FsHandle &handle)
+bool LegacySerial::can_read()
 {
-    __unused(handle);
-
-    // FIXME: make this atomic or something...
     return !_buffer.empty();
 }
 
-ResultOr<size_t> LegacySerial::read(FsHandle &handle, void *buffer, size_t size)
+ResultOr<size_t> LegacySerial::read(size64_t offset, void *buffer, size_t size)
 {
-    __unused(handle);
+    __unused(offset);
 
     LockHolder holder(_buffer_lock);
 
     return _buffer.read((char *)buffer, size);
 }
 
-ResultOr<size_t> LegacySerial::write(FsHandle &handle, const void *buffer, size_t size)
+ResultOr<size_t> LegacySerial::write(size64_t offset, const void *buffer, size_t size)
 {
-    __unused(handle);
+    __unused(offset);
 
     LockHolder holder(_buffer_lock);
 

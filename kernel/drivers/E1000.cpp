@@ -224,23 +224,19 @@ void E1000::handle_interrupt()
     }
 }
 
-bool E1000::can_write(FsHandle &handle)
+bool E1000::can_write()
 {
-    __unused(handle);
-
     return (_tx_descriptors[_current_tx_descriptors].status & 1);
 }
 
-bool E1000::can_read(FsHandle &handle)
+bool E1000::can_read()
 {
-    __unused(handle);
-
     return _rx_descriptors[_current_rx_descriptors].status & 0x1;
 }
 
-ResultOr<size_t> E1000::read(FsHandle &handle, void *buffer, size_t size)
+ResultOr<size_t> E1000::read(size64_t offset, void *buffer, size_t size)
 {
-    __unused(handle);
+    __unused(offset);
 
     size_t packet_size = receive_packet(buffer, size);
     logger_trace("Packet receive (size=%u)", packet_size);
@@ -249,9 +245,9 @@ ResultOr<size_t> E1000::read(FsHandle &handle, void *buffer, size_t size)
     return packet_size;
 }
 
-ResultOr<size_t> E1000::write(FsHandle &handle, const void *buffer, size_t size)
+ResultOr<size_t> E1000::write(size64_t offset, const void *buffer, size_t size)
 {
-    __unused(handle);
+    __unused(offset);
 
     size_t packet_size = send_packet(buffer, size);
     logger_trace("Packet send (size=%u)", packet_size);
@@ -260,10 +256,8 @@ ResultOr<size_t> E1000::write(FsHandle &handle, const void *buffer, size_t size)
     return packet_size;
 }
 
-Result E1000::call(FsHandle &handle, IOCall request, void *args)
+Result E1000::call(IOCall request, void *args)
 {
-    __unused(handle);
-
     if (request == IOCALL_NETWORK_GET_STATE)
     {
         IOCallNetworkSateAgs *state = (IOCallNetworkSateAgs *)args;

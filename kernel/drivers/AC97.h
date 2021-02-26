@@ -105,9 +105,9 @@ public:
 
     void handle_interrupt() override;
 
-    bool can_write(FsHandle &handle) override;
+    bool can_write() override;
 
-    ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override;
+    ResultOr<size_t> write(size64_t offset, const void *buffer, size_t size) override;
 
-    Result call(FsHandle &handle, IOCall request, void *args) override;
+    Result call(IOCall request, void *args) override;
 };

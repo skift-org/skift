@@ -19,28 +19,33 @@ public:
     {
     }
 
-    bool can_read(FsHandle *handle) override
+    size_t size() override
     {
-        return _device->can_read(*handle);
+        return _device->size();
     }
 
-    bool can_write(FsHandle *handle) override
+    bool can_read(FsHandle *) override
     {
-        return _device->can_write(*handle);
+        return _device->can_read();
+    }
+
+    bool can_write(FsHandle *) override
+    {
+        return _device->can_write();
     }
 
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override
     {
-        return _device->read(handle, buffer, size);
+        return _device->read(handle.offset(), buffer, size);
     }
 
     ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override
     {
-        return _device->write(handle, buffer, size);
+        return _device->write(handle.offset(), buffer, size);
     }
 
-    Result call(FsHandle &handle, IOCall request, void *args) override
+    Result call(FsHandle &, IOCall request, void *args) override
     {
-        return _device->call(handle, request, args);
+        return _device->call(request, args);
     }
 };

@@ -30,9 +30,9 @@ public:
 
     void handle_interrupt() override;
 
-    bool can_read(FsHandle &handle) override;
+    bool can_read() override;
 
-    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
+    ResultOr<size_t> read(size64_t offset, void *buffer, size_t size) override;
 
-    Result call(FsHandle &handle, IOCall request, void *args) override;
+    Result call(IOCall request, void *args) override;
 };

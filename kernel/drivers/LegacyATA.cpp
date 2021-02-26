@@ -113,9 +113,8 @@ void LegacyATA::select()
     out8(io_port + ATA_REG_HDDEVSEL, _drive == ATA_MASTER ? 0xA0 : 0xB0);
 }
 
-size_t LegacyATA::size(FsHandle &handle)
+size_t LegacyATA::size()
 {
-    __unused(handle);
     return _num_blocks * ATA_SECTOR_SIZE;
 }
 
@@ -277,11 +276,11 @@ uint8_t LegacyATA::write_block(uint8_t *buf, uint32_t lba, size_t size)
     return 1;
 }
 
-ResultOr<size_t> LegacyATA::read(FsHandle &handle, void *buffer, size_t size)
+ResultOr<size_t> LegacyATA::read(size64_t offset, void *buffer, size_t size)
 {
     LockHolder holder(_buffer_lock);
 
-    uint32_t start_lba = handle.offset() / ATA_SECTOR_SIZE;
+    uint32_t start_lba = offset / ATA_SECTOR_SIZE;
     uint32_t num_blocks = (size / ATA_SECTOR_SIZE) + 1;
     uint8_t *byte_buffer = (uint8_t *)buffer;
     size_t rem_size = size;
@@ -298,11 +297,11 @@ ResultOr<size_t> LegacyATA::read(FsHandle &handle, void *buffer, size_t size)
     return size;
 }
 
-ResultOr<size_t> LegacyATA::write(FsHandle &handle, const void *buffer, size_t size)
+ResultOr<size_t> LegacyATA::write(size64_t offset, const void *buffer, size_t size)
 {
     LockHolder holder(_buffer_lock);
 
-    uint32_t start_lba = handle.offset() / ATA_SECTOR_SIZE;
+    uint32_t start_lba = offset / ATA_SECTOR_SIZE;
     uint32_t num_blocks = (size / ATA_SECTOR_SIZE) + 1;
     uint8_t *byte_buffer = (uint8_t *)buffer;
     size_t rem_size = size;

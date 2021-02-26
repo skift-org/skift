@@ -12,18 +12,18 @@ public:
     {
     }
 
-    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override
+    ResultOr<size_t> read(size64_t offset, void *buffer, size_t size) override
     {
-        __unused(handle);
+        __unused(offset);
 
         memset(buffer, 0, size);
 
         return size;
     }
 
-    ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override
+    ResultOr<size_t> write(size64_t offset, const void *buffer, size_t size) override
     {
-        __unused(handle);
+        __unused(offset);
         __unused(buffer);
 
         return size;

@@ -41,6 +41,9 @@ enum FileType
 
 typedef unsigned int OpenFlag;
 
+typedef uint64_t size64_t;
+typedef int64_t ssize64_t;
+
 struct FileState
 {
     size_t size;

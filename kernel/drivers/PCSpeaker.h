@@ -19,6 +19,8 @@ private:
 
 public:
     PCSpeaker(DeviceAddress address);
+
     ~PCSpeaker();
-    ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override;
+
+    ResultOr<size_t> write(size64_t offset, const void *buffer, size_t size) override;
 };

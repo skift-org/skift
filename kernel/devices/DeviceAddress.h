@@ -56,6 +56,11 @@ public:
         return _unix;
     };
 
+    DeviceAddress()
+        : _bus(BUS_NONE)
+    {
+    }
+
     DeviceAddress(LegacyAddress address)
         : _bus(BUS_LEGACY),
           _legacy(address)

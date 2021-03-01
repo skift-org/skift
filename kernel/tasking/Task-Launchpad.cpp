@@ -115,20 +115,14 @@ void task_pass_argc_argv_env(Task *task, Launchpad *launchpad)
 
 void task_pass_handles(Task *parent_task, Task *child_task, Launchpad *launchpad)
 {
-    LockHolder holder(parent_task->handles_lock);
-
     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
         int child_handle_id = i;
         int parent_handle_id = launchpad->handles[i];
 
-        if (parent_handle_id >= 0 &&
-            parent_handle_id < PROCESS_HANDLE_COUNT &&
-            parent_task->handles[parent_handle_id] != nullptr)
+        if (parent_handle_id >= 0 && parent_handle_id < PROCESS_HANDLE_COUNT)
         {
-            parent_task->handles[parent_handle_id]->acquire(scheduler_running_id());
-            child_task->handles[child_handle_id] = new FsHandle(*parent_task->handles[parent_handle_id]);
-            parent_task->handles[parent_handle_id]->release(scheduler_running_id());
+            assert(parent_task->handles().pass(child_task->handles(), parent_handle_id, child_handle_id) == SUCCESS);
         }
     }
 }

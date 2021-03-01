@@ -1,9 +1,10 @@
 
 #include <assert.h>
+#include <string.h>
+
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/math/MinMax.h>
-#include <string.h>
 
 #include "kernel/node/Connection.h"
 #include "kernel/node/Handle.h"
@@ -96,7 +97,8 @@ ResultOr<size_t> FsHandle::read(void *buffer, size_t size)
         return ERR_WRITE_ONLY_STREAM;
     }
 
-    task_block(scheduler_running(), new BlockerRead(this), -1);
+    BlockerRead blocker{this};
+    task_block(scheduler_running(), &blocker, -1);
 
     auto result_or_read = _node->read(*this, buffer, size);
 
@@ -222,9 +224,10 @@ Result FsHandle::stat(FileState *stat)
     return SUCCESS;
 }
 
-ResultOr<FsHandle *> FsHandle::accept()
+ResultOr<RefPtr<FsHandle>> FsHandle::accept()
 {
-    task_block(scheduler_running(), new BlockerAccept(_node), -1);
+    BlockerAccept blocker{_node};
+    task_block(scheduler_running(), &blocker, -1);
 
     auto connection_or_result = _node->accept();
 
@@ -239,7 +242,7 @@ ResultOr<FsHandle *> FsHandle::accept()
 
     auto connection = connection_or_result.take_value();
 
-    auto connection_handle = new FsHandle(connection, OPEN_SERVER);
+    auto connection_handle = make<FsHandle>(connection, OPEN_SERVER);
 
     _node->release(scheduler_running_id());
 

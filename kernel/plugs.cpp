@@ -1,9 +1,9 @@
 #include <assert.h>
-#include <libsystem/core/Plugs.h>
 #include <skift/Plugs.h>
 
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
+#include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/io/Stream_internal.h>
 #include <libsystem/system/System.h>
@@ -16,7 +16,7 @@
 #include "kernel/memory/Memory.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
-#include "kernel/tasking/Task-Handles.h"
+#include "kernel/tasking/Handles.h"
 #include "kernel/tasking/Task-Launchpad.h"
 #include "kernel/tasking/Task-Memory.h"
 
@@ -144,7 +144,9 @@ void __plug_handle_open(Handle *handle, const char *raw_path, OpenFlag flags)
 {
     auto path = Path::parse(raw_path);
 
-    auto result_or_handle_index = task_fshandle_open(scheduler_running(), path, flags);
+    auto &handles = scheduler_running()->handles();
+
+    auto result_or_handle_index = handles.open(path, flags);
 
     handle->result = result_or_handle_index.result();
 
@@ -158,7 +160,9 @@ void __plug_handle_close(Handle *handle)
 {
     if (handle->id != HANDLE_INVALID_ID)
     {
-        task_fshandle_close(scheduler_running(), handle->id);
+        auto &handles = scheduler_running()->handles();
+
+        handles.close(handle->id);
     }
 }
 
@@ -168,14 +172,21 @@ Result __plug_handle_poll(
     PollEvent *selected_events,
     Timeout timeout)
 {
-    return task_fshandle_poll(scheduler_running(), handles, selected, selected_events, timeout);
+    __unused(handles);
+    __unused(selected);
+    __unused(selected_events);
+    __unused(timeout);
+
+    ASSERT_NOT_REACHED();
 }
 
 size_t __plug_handle_read(Handle *handle, void *buffer, size_t size)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    auto result_or_read = task_fshandle_read(scheduler_running(), handle->id, buffer, size);
+    auto &handles = scheduler_running()->handles();
+
+    auto result_or_read = handles.read(handle->id, buffer, size);
 
     handle->result = result_or_read.result();
 
@@ -202,7 +213,9 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
     }
     else
     {
-        auto result_or_write = task_fshandle_write(scheduler_running(), handle->id, buffer, size);
+        auto &handles = scheduler_running()->handles();
+
+        auto result_or_write = handles.write(handle->id, buffer, size);
 
         handle->result = result_or_write.result();
 
@@ -219,18 +232,20 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
 
 Result __plug_handle_call(Handle *handle, IOCall request, void *args)
 {
-    assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
+    __unused(handle);
+    __unused(request);
+    __unused(args);
 
-    handle->result = task_fshandle_call(scheduler_running(), handle->id, request, args);
-
-    return handle->result;
+    ASSERT_NOT_REACHED();
 }
 
 int __plug_handle_seek(Handle *handle, int offset, Whence whence)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->result = task_fshandle_seek(scheduler_running(), handle->id, offset, whence).result();
+    auto &handles = scheduler_running()->handles();
+
+    handle->result = handles.seek(handle->id, offset, whence).result();
 
     return 0;
 }
@@ -239,7 +254,9 @@ int __plug_handle_tell(Handle *handle)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    auto result_or_offset = task_fshandle_seek(scheduler_running(), handle->id, 0, WHENCE_HERE);
+    auto &handles = scheduler_running()->handles();
+
+    auto result_or_offset = handles.seek(handle->id, 0, WHENCE_HERE);
 
     handle->result = result_or_offset.result();
 
@@ -256,7 +273,11 @@ int __plug_handle_tell(Handle *handle)
 int __plug_handle_stat(Handle *handle, FileState *stat)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
-    handle->result = task_fshandle_stat(scheduler_running(), handle->id, stat);
+
+    auto &handles = scheduler_running()->handles();
+
+    handle->result = handles.stat(handle->id, stat);
+
     return 0;
 }
 

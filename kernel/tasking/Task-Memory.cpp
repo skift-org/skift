@@ -3,7 +3,6 @@
 #include "archs/VirtualMemory.h"
 
 #include "kernel/interrupts/Interupts.h"
-#include "kernel/tasking/Task-Handles.h"
 #include "kernel/tasking/Task-Memory.h"
 
 static bool will_i_be_kill_if_i_allocate_that(Task *task, size_t size)
@@ -24,7 +23,7 @@ static void kill_me_if_too_greedy(Task *task, size_t size)
 {
     if (will_i_be_kill_if_i_allocate_that(task, size))
     {
-        task_fshandle_write(task, 2, "(ulimit reached)\n", 17);
+        task->handles().write(2, "(ulimit reached)\n", 17);
         task->cancel(PROCESS_FAILURE);
     }
 }

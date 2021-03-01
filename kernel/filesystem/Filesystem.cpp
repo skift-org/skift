@@ -50,7 +50,7 @@ RefPtr<FsNode> filesystem_find(Path path)
     return current;
 }
 
-ResultOr<FsHandle *> filesystem_open(Path path, OpenFlag flags)
+ResultOr<RefPtr<FsHandle>> filesystem_open(Path path, OpenFlag flags)
 {
     bool should_create_if_not_present = (flags & OPEN_CREATE) == OPEN_CREATE;
 
@@ -102,10 +102,10 @@ ResultOr<FsHandle *> filesystem_open(Path path, OpenFlag flags)
         return ERR_NOT_A_STREAM;
     }
 
-    return new FsHandle(node, flags);
+    return make<FsHandle>(node, flags);
 }
 
-ResultOr<FsHandle *> filesystem_connect(Path path)
+ResultOr<RefPtr<FsHandle>> filesystem_connect(Path path)
 {
     auto node = filesystem_find(path);
 
@@ -129,9 +129,10 @@ ResultOr<FsHandle *> filesystem_connect(Path path)
     }
 
     auto connection = connection_or_result.take_value();
-    auto connection_handle = new FsHandle(connection, OPEN_CLIENT);
+    auto connection_handle = make<FsHandle>(connection, OPEN_CLIENT);
 
-    task_block(scheduler_running(), new BlockerConnect(connection), -1);
+    BlockerConnect blocker{connection};
+    task_block(scheduler_running(), &blocker, -1);
 
     return connection_handle;
 }

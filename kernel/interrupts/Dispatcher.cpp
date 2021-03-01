@@ -64,7 +64,8 @@ void dispatcher_service()
 {
     while (true)
     {
-        task_block(scheduler_running(), new BlockerDispatcher(), -1);
+        BlockerDispatcher blocker{};
+        task_block(scheduler_running(), &blocker, -1);
 
         while (dispatcher_has_interrupt())
         {

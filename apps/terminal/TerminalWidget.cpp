@@ -13,7 +13,7 @@ TerminalWidget::TerminalWidget(Widget *parent) : Widget(parent)
 {
     _terminal = own<terminal::Terminal>(80, 24);
 
-    stream_create_term(&_server_stream, &_client_stream);
+    assert(stream_create_term(&_server_stream, &_client_stream) == SUCCESS);
 
     _server_notifier = own<Notifier>(HANDLE(_server_stream), POLL_READ, [this]() {
         handle_read();
@@ -214,7 +214,7 @@ void TerminalWidget::do_layout()
         _terminal->resize(width, height);
 
         IOCallTerminalSizeArgs args = {width, height};
-        stream_call(_server_stream, IOCALL_TERMINAL_SET_SIZE, &args);
+        assert(stream_call(_server_stream, IOCALL_TERMINAL_SET_SIZE, &args) == SUCCESS);
     }
 }
 

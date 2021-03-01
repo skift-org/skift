@@ -10,9 +10,9 @@ void filesystem_initialize();
 
 RefPtr<FsNode> filesystem_find(Path path);
 
-ResultOr<FsHandle *> filesystem_open(Path path, OpenFlag flags);
+ResultOr<RefPtr<FsHandle>> filesystem_open(Path path, OpenFlag flags);
 
-ResultOr<FsHandle *> filesystem_connect(Path path);
+ResultOr<RefPtr<FsHandle>> filesystem_connect(Path path);
 
 Result filesystem_mkdir(Path path);
 

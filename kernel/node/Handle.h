@@ -4,7 +4,7 @@
 
 #include "kernel/node/Node.h"
 
-class FsHandle
+class FsHandle : public RefCounted<FsHandle>
 {
 private:
     Lock _lock{"fshandle"};
@@ -48,5 +48,5 @@ public:
 
     Result stat(FileState *stat);
 
-    ResultOr<FsHandle *> accept();
+    ResultOr<RefPtr<FsHandle>> accept();
 };

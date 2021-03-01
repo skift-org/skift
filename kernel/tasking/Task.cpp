@@ -8,7 +8,6 @@
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
-#include "kernel/tasking/Task-Handles.h"
 #include "kernel/tasking/Task-Memory.h"
 #include "kernel/tasking/Task.h"
 
@@ -69,12 +68,6 @@ Task *task_create(Task *parent, const char *name, bool user)
     // Setup shms
     task->memory_mapping = list_create();
 
-    // Setup fildes
-    for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
-    {
-        task->handles[i] = nullptr;
-    }
-
     memory_alloc(task->address_space, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
     task->kernel_stack_pointer = ((uintptr_t)task->kernel_stack + PROCESS_STACK_SIZE);
 
@@ -117,10 +110,7 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip)
     // Setup fildes
     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
-        if (parent->handles[i])
-        {
-            task->handles[i] = new FsHandle(*parent->handles[i]);
-        }
+        parent->handles().pass(task->handles(), i, i);
     }
 
     memory_alloc(task->address_space, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
@@ -173,8 +163,6 @@ void task_destroy(Task *task)
     }
 
     list_destroy(task->memory_mapping);
-
-    task_fshandle_close_all(task);
 
     memory_free(task->address_space, MemoryRange{(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
 
@@ -291,7 +279,8 @@ void task_go(Task *task)
 
 Result task_sleep(Task *task, int timeout)
 {
-    task_block(task, new BlockerTime(system_get_tick() + timeout), -1);
+    BlockerTime blocker{system_get_tick() + timeout};
+    task_block(task, &blocker, -1);
 
     return TIMEOUT;
 }
@@ -307,7 +296,8 @@ Result task_wait(int task_id, int *exit_value)
         return ERR_NO_SUCH_TASK;
     }
 
-    task_block(scheduler_running(), new BlockerWait(task, exit_value), -1);
+    BlockerWait blocker{task, exit_value};
+    task_block(scheduler_running(), &blocker, -1);
 
     return SUCCESS;
 }
@@ -325,7 +315,6 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
         interrupts_release();
 
         task->blocker = nullptr;
-        delete blocker;
 
         return BLOCKER_UNBLOCKED;
     }
@@ -347,7 +336,6 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
     BlockerResult result = blocker->_result;
 
     task->blocker = nullptr;
-    delete blocker;
 
     return result;
 }

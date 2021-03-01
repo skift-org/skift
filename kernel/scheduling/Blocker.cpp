@@ -43,9 +43,11 @@ bool BlockerSelect::can_unblock(Task *task)
 {
     __unused(task);
 
-    for (size_t i = 0; i < _count; i++)
+    for (size_t i = 0; i < _handles.count(); i++)
     {
-        if (_handles[i]->poll(_events[i]) != 0)
+        auto &selected = _handles[i];
+
+        if (selected.handle->poll(selected.events) != 0)
         {
             return true;
         }
@@ -58,15 +60,16 @@ void BlockerSelect::on_unblock(Task *task)
 {
     __unused(task);
 
-    for (size_t i = 0; i < _count; i++)
+    for (size_t i = 0; i < _handles.count(); i++)
     {
-        PollEvent events = _handles[i]->poll(_events[i]);
+        auto &el = _handles[i];
+
+        PollEvent events = el.handle->poll(el.events);
 
         if (events != 0)
         {
-            *_selected = _handles[i];
-            *_selected_events = events;
-
+            _selected = el;
+            _selected->events = events;
             return;
         }
     }

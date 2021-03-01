@@ -1,8 +1,9 @@
 #include <assert.h>
+#include <string.h>
+
 #include <libsystem/BuildInfo.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <string.h>
 
 #include "archs/Architectures.h"
 
@@ -11,7 +12,6 @@
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Syscalls.h"
-#include "kernel/tasking/Task-Handles.h"
 #include "kernel/tasking/Task-Launchpad.h"
 #include "kernel/tasking/Task-Memory.h"
 
@@ -19,9 +19,7 @@ typedef Result (*SyscallHandler)(uintptr_t, uintptr_t, uintptr_t, uintptr_t, uin
 
 bool syscall_validate_ptr(uintptr_t ptr, size_t size)
 {
-    return ptr >= 0x100000 &&
-           ptr + size >= 0x100000 &&
-           ptr + size >= ptr;
+    return ptr >= 0x100000 && ptr + size >= 0x100000 && ptr + size >= ptr;
 }
 
 /* --- Process -------------------------------------------------------------- */
@@ -385,7 +383,7 @@ Result hj_create_pipe(int *reader_handle, int *writer_handle)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_create_pipe(scheduler_running(), reader_handle, writer_handle);
+    return scheduler_running()->handles().pipe(reader_handle, writer_handle);
 }
 
 Result hj_create_term(int *server_handle, int *client_handle)
@@ -396,7 +394,9 @@ Result hj_create_term(int *server_handle, int *client_handle)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_create_term(scheduler_running(), server_handle, client_handle);
+    auto &handles = scheduler_running()->handles();
+
+    return handles.term(server_handle, client_handle);
 }
 
 /* --- Handles -------------------------------------------------------------- */
@@ -413,7 +413,9 @@ Result hj_handle_open(int *handle,
 
     auto path = Path::parse(raw_path, size).normalized();
 
-    auto result_or_handle_index = task_fshandle_open(scheduler_running(), path, flags);
+    auto &handles = scheduler_running()->handles();
+
+    auto result_or_handle_index = handles.open(path, flags);
 
     if (result_or_handle_index.success())
     {
@@ -429,7 +431,9 @@ Result hj_handle_open(int *handle,
 
 Result hj_handle_close(int handle)
 {
-    return task_fshandle_close(scheduler_running(), handle);
+    auto &handles = scheduler_running()->handles();
+
+    return handles.close(handle);
 }
 
 Result hj_handle_reopen(int handle, int *reopened)
@@ -439,12 +443,16 @@ Result hj_handle_reopen(int handle, int *reopened)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_reopen(scheduler_running(), handle, reopened);
+    auto &handles = scheduler_running()->handles();
+
+    return handles.reopen(handle, reopened);
 }
 
 Result hj_handle_copy(int source, int destination)
 {
-    return task_fshandle_copy(scheduler_running(), source, destination);
+    auto &handles = scheduler_running()->handles();
+
+    return handles.copy(source, destination);
 }
 
 Result hj_handle_poll(
@@ -489,8 +497,9 @@ Result hj_handle_poll(
 
     HandleSet handle_set = (HandleSet){handles_copy, events_copy, handles_set->count};
 
-    Result result = task_fshandle_poll(
-        scheduler_running(),
+    auto &handles = scheduler_running()->handles();
+
+    Result result = handles.poll(
         &handle_set,
         &selected_copy,
         &selected_event_copy,
@@ -510,7 +519,9 @@ Result hj_handle_read(int handle, void *buffer, size_t size, size_t *read)
         return ERR_BAD_ADDRESS;
     }
 
-    auto result_or_read = task_fshandle_read(scheduler_running(), handle, buffer, size);
+    auto &handles = scheduler_running()->handles();
+
+    auto result_or_read = handles.read(handle, buffer, size);
 
     if (result_or_read.success())
     {
@@ -532,7 +543,9 @@ Result hj_handle_write(int handle, const void *buffer, size_t size, size_t *writ
         return ERR_BAD_ADDRESS;
     }
 
-    auto result_or_written = task_fshandle_write(scheduler_running(), handle, buffer, size);
+    auto &handles = scheduler_running()->handles();
+
+    auto result_or_written = handles.write(handle, buffer, size);
 
     if (result_or_written.success())
     {
@@ -548,7 +561,9 @@ Result hj_handle_write(int handle, const void *buffer, size_t size, size_t *writ
 
 Result hj_handle_call(int handle, IOCall request, void *args)
 {
-    return task_fshandle_call(scheduler_running(), handle, request, args);
+    auto &handles = scheduler_running()->handles();
+
+    return handles.call(handle, request, args);
 }
 
 Result hj_handle_seek(int handle, int offset, Whence whence, int *result_offset)
@@ -559,7 +574,9 @@ Result hj_handle_seek(int handle, int offset, Whence whence, int *result_offset)
         return ERR_BAD_ADDRESS;
     }
 
-    auto seek_result = task_fshandle_seek(scheduler_running(), handle, offset, whence);
+    auto &handles = scheduler_running()->handles();
+
+    auto seek_result = handles.seek(handle, offset, whence);
 
     if (result_offset != nullptr)
     {
@@ -583,7 +600,9 @@ Result hj_handle_stat(int handle, FileState *state)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_stat(scheduler_running(), handle, state);
+    auto &handles = scheduler_running()->handles();
+
+    return handles.stat(handle, state);
 }
 
 Result hj_handle_connect(int *handle, const char *raw_path, size_t size)
@@ -596,7 +615,9 @@ Result hj_handle_connect(int *handle, const char *raw_path, size_t size)
 
     auto path = Path::parse(raw_path, size).normalized();
 
-    auto result_or_handle_index = task_fshandle_connect(scheduler_running(), path);
+    auto &handles = scheduler_running()->handles();
+
+    auto result_or_handle_index = handles.connect(path);
 
     if (result_or_handle_index.success())
     {
@@ -612,7 +633,14 @@ Result hj_handle_connect(int *handle, const char *raw_path, size_t size)
 
 Result hj_handle_accept(int handle, int *connection_handle)
 {
-    auto result_or_handle_index = task_fshandle_accept(scheduler_running(), handle);
+    if (!syscall_validate_ptr((uintptr_t)connection_handle, sizeof(int)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    auto &handles = scheduler_running()->handles();
+
+    auto result_or_handle_index = handles.accept(handle);
 
     if (result_or_handle_index.success())
     {
@@ -703,14 +731,20 @@ uintptr_t task_do_syscall(Syscall syscall, uintptr_t arg0, uintptr_t arg1, uintp
     if (handler == nullptr)
     {
         logger_error("Invalid syscall: %d", syscall);
-        return ERR_FUNCTION_NOT_IMPLEMENTED;
+        return ERR_INVALID_ARGUMENT;
     }
 
     result = handler(arg0, arg1, arg2, arg3, arg4);
 
-    if (result != SUCCESS && result != TIMEOUT && result != ERR_STREAM_CLOSED)
+    if (result != SUCCESS &&
+        result != TIMEOUT &&
+        result != ERR_STREAM_CLOSED)
     {
-        logger_trace("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string((Result)result));
+        logger_trace(
+            "%s(%08x, %08x, %08x, %08x, %08x) returned %s",
+            syscall_names[syscall],
+            arg0, arg1, arg2, arg3, arg4,
+            result_to_string((Result)result));
     }
 
     return result;

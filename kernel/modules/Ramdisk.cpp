@@ -43,8 +43,6 @@ void ramdisk_load(Module *module)
             {
                 logger_error("Failed to write file: %s", result_to_string(result_or_written.result()));
             }
-
-            delete handle;
         }
     }
 

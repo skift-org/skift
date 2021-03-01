@@ -7,7 +7,6 @@
 
 #include "archs/Architectures.h"
 
-#include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
@@ -248,7 +247,9 @@ Result hj_filesystem_mkdir(const char *raw_path, size_t size)
 
     auto path = Path::parse(raw_path, size).normalized();
 
-    return filesystem_mkdir(path);
+    auto &domain = scheduler_running()->domain();
+
+    return domain.mkdir(path);
 }
 
 Result hj_filesystem_mkpipe(const char *raw_path, size_t size)
@@ -260,7 +261,9 @@ Result hj_filesystem_mkpipe(const char *raw_path, size_t size)
 
     auto path = Path::parse(raw_path, size).normalized();
 
-    return filesystem_mkpipe(path);
+    auto &domain = scheduler_running()->domain();
+
+    return domain.mkpipe(path);
 }
 
 Result hj_filesystem_link(const char *raw_old_path, size_t old_size,
@@ -276,7 +279,9 @@ Result hj_filesystem_link(const char *raw_old_path, size_t old_size,
 
     Path new_path = Path::parse(raw_new_path, new_size).normalized();
 
-    Result result = filesystem_mklink(old_path, new_path);
+    auto &domain = scheduler_running()->domain();
+
+    Result result = domain.mklink(old_path, new_path);
 
     return result;
 }
@@ -290,7 +295,9 @@ Result hj_filesystem_unlink(const char *raw_path, size_t size)
 
     auto path = Path::parse(raw_path, size).normalized();
 
-    return filesystem_unlink(path);
+    auto &domain = scheduler_running()->domain();
+
+    return domain.unlink(path);
 }
 
 Result hj_filesystem_rename(const char *raw_old_path, size_t old_size,
@@ -306,7 +313,9 @@ Result hj_filesystem_rename(const char *raw_old_path, size_t old_size,
 
     Path new_path = Path::parse(raw_new_path, new_size).normalized();
 
-    return filesystem_rename(old_path, new_path);
+    auto &domain = scheduler_running()->domain();
+
+    return domain.rename(old_path, new_path);
 }
 
 /* --- System info getter --------------------------------------------------- */
@@ -415,7 +424,9 @@ Result hj_handle_open(int *handle,
 
     auto &handles = scheduler_running()->handles();
 
-    auto result_or_handle_index = handles.open(path, flags);
+    auto &domain = scheduler_running()->domain();
+
+    auto result_or_handle_index = handles.open(domain, path, flags);
 
     if (result_or_handle_index.success())
     {
@@ -617,7 +628,9 @@ Result hj_handle_connect(int *handle, const char *raw_path, size_t size)
 
     auto &handles = scheduler_running()->handles();
 
-    auto result_or_handle_index = handles.connect(path);
+    auto &domain = scheduler_running()->domain();
+
+    auto result_or_handle_index = handles.connect(domain, path);
 
     if (result_or_handle_index.success())
     {

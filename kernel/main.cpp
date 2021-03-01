@@ -11,7 +11,6 @@
 #include "kernel/devices/Devices.h"
 #include "kernel/devices/Driver.h"
 #include "kernel/filesystem/DevicesFileSystem.h"
-#include "kernel/filesystem/Filesystem.h"
 #include "kernel/graphics/Graphics.h"
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/modules/Modules.h"
@@ -46,7 +45,6 @@ void system_main(Handover *handover)
     scheduler_initialize();
     tasking_initialize();
     interrupts_initialize();
-    filesystem_initialize();
     modules_initialize(handover);
     driver_initialize();
     device_initialize();

@@ -4,17 +4,18 @@
 #include "kernel/devices/Device.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/filesystem/DevicesFileSystem.h"
-#include "kernel/filesystem/Filesystem.h"
 #include "kernel/node/Device.h"
+#include "kernel/scheduling/Scheduler.h"
 
 void devices_filesystem_initialize()
 {
-    filesystem_mkdir(Path::parse(DEVICE_PATH));
+    auto &domain = scheduler_running()->domain();
+    domain.mkdir(Path::parse(DEVICE_PATH));
 
-    device_iterate([](auto device) {
+    device_iterate([&](auto device) {
         String path = device->path();
         logger_info("Mounting %s to %s", device->address().as_static_cstring(), path.cstring());
-        filesystem_link(Path::parse(path), make<FsDevice>(device));
+        domain.link(Path::parse(path), make<FsDevice>(device));
 
         return Iteration::CONTINUE;
     });

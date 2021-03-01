@@ -7,9 +7,9 @@
 
 FsTerminal::FsTerminal() : FsNode(FILE_TYPE_TERMINAL) {}
 
-bool FsTerminal::can_read(FsHandle *handle)
+bool FsTerminal::can_read(FsHandle &handle)
 {
-    if (handle->has_flag(OPEN_SERVER))
+    if (handle.has_flag(OPEN_SERVER))
     {
         return !client_to_server_buffer.empty() || !writers();
     }
@@ -19,9 +19,9 @@ bool FsTerminal::can_read(FsHandle *handle)
     }
 }
 
-bool FsTerminal::can_write(FsHandle *handle)
+bool FsTerminal::can_write(FsHandle &handle)
 {
-    if (handle->has_flag(OPEN_SERVER))
+    if (handle.has_flag(OPEN_SERVER))
     {
         return !server_to_client_buffer.full() || !readers();
     }

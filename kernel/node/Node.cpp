@@ -1,8 +1,8 @@
-
 #include <libsystem/Logger.h>
 #include <string.h>
 
-#include "kernel/filesystem/Filesystem.h"
+#include "kernel/node/Handle.h"
+#include "kernel/node/Node.h"
 
 FsNode::FsNode(FileType type)
 {

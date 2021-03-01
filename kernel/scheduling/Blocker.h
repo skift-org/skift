@@ -71,11 +71,11 @@ public:
 class BlockerRead : public Blocker
 {
 private:
-    FsHandle *_handle;
+    FsHandle &_handle;
 
 public:
-    BlockerRead(FsHandle *handle)
-        : _handle(handle)
+    BlockerRead(FsHandle &handle)
+        : _handle{handle}
     {
     }
 
@@ -144,11 +144,11 @@ public:
 class BlockerWrite : public Blocker
 {
 private:
-    FsHandle *_handle;
+    FsHandle &_handle;
 
 public:
-    BlockerWrite(FsHandle *handle)
-        : _handle(handle)
+    BlockerWrite(FsHandle &handle)
+        : _handle{handle}
     {
     }
 

@@ -29,12 +29,12 @@ bool BlockerRead::can_unblock(Task *task)
 {
     __unused(task);
 
-    return !_handle->node()->is_acquire() && _handle->node()->can_read(_handle);
+    return !_handle.node()->is_acquire() && _handle.node()->can_read(_handle);
 }
 
 void BlockerRead::on_unblock(Task *task)
 {
-    _handle->node()->acquire(task->id);
+    _handle.node()->acquire(task->id);
 }
 
 /* --- BlockerSelect -------------------------------------------------------- */
@@ -106,11 +106,11 @@ bool BlockerWrite::can_unblock(Task *task)
 {
     __unused(task);
 
-    return !_handle->node()->is_acquire() &&
-           _handle->node()->can_write(_handle);
+    return !_handle.node()->is_acquire() &&
+           _handle.node()->can_write(_handle);
 }
 
 void BlockerWrite::on_unblock(Task *task)
 {
-    _handle->node()->acquire(task->id);
+    _handle.node()->acquire(task->id);
 }

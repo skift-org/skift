@@ -44,21 +44,11 @@ public:
 
     void deref_handle(FsHandle &handle);
 
-    virtual Result open(FsHandle *handle)
-    {
-        __unused(handle);
-        return SUCCESS;
-    }
+    virtual Result open(FsHandle &) { return SUCCESS; }
 
-    virtual void close(FsHandle *handle)
-    {
-        __unused(handle);
-    }
+    virtual void close(FsHandle &) {}
 
-    virtual size_t size()
-    {
-        return 0;
-    }
+    virtual size_t size() { return 0; }
 
     virtual Result call(FsHandle &handle, IOCall request, void *args)
     {
@@ -69,19 +59,9 @@ public:
         return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
 
-    virtual bool can_read(FsHandle *handle)
-    {
-        __unused(handle);
+    virtual bool can_read(FsHandle &) { return true; }
 
-        return true;
-    }
-
-    virtual bool can_write(FsHandle *handle)
-    {
-        __unused(handle);
-
-        return true;
-    }
+    virtual bool can_write(FsHandle &) { return true; }
 
     virtual ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
     {

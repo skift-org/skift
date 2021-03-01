@@ -10,7 +10,7 @@ FsDirectory::FsDirectory() : FsNode(FILE_TYPE_DIRECTORY)
 {
 }
 
-Result FsDirectory::open(FsHandle *handle)
+Result FsDirectory::open(FsHandle &handle)
 {
     DirectoryListing *listing = (DirectoryListing *)malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * _childs.count());
 
@@ -32,14 +32,14 @@ Result FsDirectory::open(FsHandle *handle)
         return Iteration::CONTINUE;
     });
 
-    handle->attached = listing;
+    handle.attached = listing;
 
     return SUCCESS;
 }
 
-void FsDirectory::close(FsHandle *handle)
+void FsDirectory::close(FsHandle &handle)
 {
-    free(handle->attached);
+    free(handle.attached);
 }
 
 ResultOr<size_t> FsDirectory::read(FsHandle &handle, void *buffer, size_t size)

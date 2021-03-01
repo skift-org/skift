@@ -28,7 +28,9 @@ public:
 
     ~Handles() { close_all(); }
 
-    ResultOr<int> open(Path &path, OpenFlag flags);
+    ResultOr<int> open(Domain &domain, Path &path, OpenFlag flags);
+
+    ResultOr<int> connect(Domain &domain, Path &socket_path);
 
     Result close(int handle_index);
 
@@ -49,8 +51,6 @@ public:
     Result call(int handle_index, IOCall request, void *args);
 
     Result stat(int handle_index, FileState *stat);
-
-    ResultOr<int> connect(Path &socket_path);
 
     ResultOr<int> accept(int handle_index);
 

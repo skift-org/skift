@@ -8,6 +8,8 @@
 
 #include "kernel/memory/Memory.h"
 #include "kernel/scheduling/Blocker.h"
+
+#include "kernel/tasking/Domain.h"
 #include "kernel/tasking/Handles.h"
 
 typedef void (*TaskEntryPoint)();
@@ -36,8 +38,10 @@ struct Task
     int exit_value = 0;
 
     Handles _handles;
+    Domain _domain;
 
     Handles &handles() { return _handles; }
+    Domain &domain() { return _domain; }
 
     TaskState state();
 

@@ -5,9 +5,9 @@
 
 #include "archs/VirtualMemory.h"
 
-#include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/modules/Modules.h"
+#include "kernel/scheduling/Scheduler.h"
 
 void ramdisk_load(Module *module)
 {
@@ -18,7 +18,7 @@ void ramdisk_load(Module *module)
 
         if (block.name[strlen(block.name) - 1] == '/')
         {
-            Result result = filesystem_mkdir(file_path);
+            Result result = scheduler_running()->domain().mkdir(file_path);
 
             if (result != SUCCESS)
             {
@@ -27,7 +27,7 @@ void ramdisk_load(Module *module)
         }
         else if ((block.typeflag & 8) == 0 || (block.typeflag & 8) == 5)
         {
-            auto result_or_handle = filesystem_open(file_path, OPEN_WRITE | OPEN_CREATE);
+            auto result_or_handle = scheduler_running()->domain().open(file_path, OPEN_WRITE | OPEN_CREATE);
 
             if (!result_or_handle.success())
             {

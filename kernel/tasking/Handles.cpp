@@ -1,7 +1,6 @@
 
 #include <libsystem/Logger.h>
 
-#include "kernel/filesystem/Filesystem.h"
 #include "kernel/node/Pipe.h"
 #include "kernel/node/Terminal.h"
 #include "kernel/scheduling/Blocker.h"
@@ -86,9 +85,9 @@ Result Handles::release(int handle_index)
     return SUCCESS;
 }
 
-ResultOr<int> Handles::open(Path &path, OpenFlag flags)
+ResultOr<int> Handles::open(Domain &domain, Path &path, OpenFlag flags)
 {
-    auto open_result = filesystem_open(path, flags);
+    auto open_result = domain.open(path, flags);
 
     if (!open_result)
     {
@@ -96,6 +95,18 @@ ResultOr<int> Handles::open(Path &path, OpenFlag flags)
     }
 
     return add(*open_result);
+}
+
+ResultOr<int> Handles::connect(Domain &domain, Path &path)
+{
+    auto connect_result = domain.connect(path);
+
+    if (!connect_result)
+    {
+        return connect_result.result();
+    }
+
+    return add(*connect_result);
 }
 
 Result Handles::close(int handle_index)
@@ -277,18 +288,6 @@ Result Handles::stat(int handle_index, FileState *stat)
     release(handle_index);
 
     return result;
-}
-
-ResultOr<int> Handles::connect(Path &path)
-{
-    auto connect_result = filesystem_connect(path);
-
-    if (!connect_result)
-    {
-        return connect_result.result();
-    }
-
-    return add(*connect_result);
 }
 
 ResultOr<int> Handles::accept(int socket_handle_index)

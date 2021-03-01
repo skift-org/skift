@@ -19,9 +19,9 @@ FsFile::~FsFile()
     free(_buffer);
 }
 
-Result FsFile::open(FsHandle *handle)
+Result FsFile::open(FsHandle &handle)
 {
-    if (handle->has_flag(OPEN_TRUNC))
+    if (handle.has_flag(OPEN_TRUNC))
     {
         free(_buffer);
         _buffer = (char *)malloc(512);

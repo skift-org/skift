@@ -65,6 +65,9 @@ Task *task_create(Task *parent, const char *name, bool user)
         task->address_space = arch_kernel_address_space();
     }
 
+    if (parent)
+        task->_domain = parent->_domain;
+
     // Setup shms
     task->memory_mapping = list_create();
 
@@ -106,6 +109,9 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip)
 
     // Setup shms
     task->memory_mapping = list_create();
+
+    if (parent)
+        task->_domain = parent->_domain;
 
     // Setup fildes
     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)

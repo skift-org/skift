@@ -6,16 +6,16 @@
 #include <string.h>
 
 #include "kernel/devices/Devices.h"
-#include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/Handle.h"
+#include "kernel/scheduling/Scheduler.h"
 
 FsDeviceInfo::FsDeviceInfo() : FsNode(FILE_TYPE_DEVICE)
 {
 }
 
-Result FsDeviceInfo::open(FsHandle *handle)
+Result FsDeviceInfo::open(FsHandle &handle)
 {
     json::Value::Array root{};
 
@@ -44,15 +44,15 @@ Result FsDeviceInfo::open(FsHandle *handle)
     Prettifier pretty{};
     json::prettify(pretty, root);
 
-    handle->attached = pretty.finalize().underlying_storage().give_ref();
-    handle->attached_size = reinterpret_cast<StringStorage *>(handle->attached)->length();
+    handle.attached = pretty.finalize().underlying_storage().give_ref();
+    handle.attached_size = reinterpret_cast<StringStorage *>(handle.attached)->length();
 
     return SUCCESS;
 }
 
-void FsDeviceInfo::close(FsHandle *handle)
+void FsDeviceInfo::close(FsHandle &handle)
 {
-    deref_if_not_null(reinterpret_cast<StringStorage *>(handle->attached));
+    deref_if_not_null(reinterpret_cast<StringStorage *>(handle.attached));
 }
 
 ResultOr<size_t> FsDeviceInfo::read(FsHandle &handle, void *buffer, size_t size)
@@ -70,5 +70,7 @@ ResultOr<size_t> FsDeviceInfo::read(FsHandle &handle, void *buffer, size_t size)
 
 void device_info_initialize()
 {
-    filesystem_link(Path::parse("/System/devices"), make<FsDeviceInfo>());
+    scheduler_running()
+        ->domain()
+        .link(Path::parse("/System/devices"), make<FsDeviceInfo>());
 }

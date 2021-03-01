@@ -1,11 +1,10 @@
 
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <string.h>
-#include <libutils/json/Json.h>
 #include <libsystem/math/MinMax.h>
+#include <libutils/json/Json.h>
+#include <string.h>
 
-#include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/node/Handle.h"
 #include "kernel/node/ProcessInfo.h"
@@ -36,7 +35,7 @@ static Iteration serialize_task(json::Value::Array *list, Task *task)
     return Iteration::CONTINUE;
 }
 
-Result FsProcessInfo::open(FsHandle *handle)
+Result FsProcessInfo::open(FsHandle &handle)
 {
     json::Value::Array list{};
 
@@ -45,15 +44,15 @@ Result FsProcessInfo::open(FsHandle *handle)
     Prettifier pretty{};
     json::prettify(pretty, list);
 
-    handle->attached = pretty.finalize().underlying_storage().give_ref();
-    handle->attached_size = reinterpret_cast<StringStorage *>(handle->attached)->length();
+    handle.attached = pretty.finalize().underlying_storage().give_ref();
+    handle.attached_size = reinterpret_cast<StringStorage *>(handle.attached)->length();
 
     return SUCCESS;
 }
 
-void FsProcessInfo::close(FsHandle *handle)
+void FsProcessInfo::close(FsHandle &handle)
 {
-    deref_if_not_null(reinterpret_cast<StringStorage *>(handle->attached));
+    deref_if_not_null(reinterpret_cast<StringStorage *>(handle.attached));
 }
 
 ResultOr<size_t> FsProcessInfo::read(FsHandle &handle, void *buffer, size_t size)
@@ -71,5 +70,5 @@ ResultOr<size_t> FsProcessInfo::read(FsHandle &handle, void *buffer, size_t size
 
 void process_info_initialize()
 {
-    filesystem_link(Path::parse("/System/processes"), make<FsProcessInfo>());
+    scheduler_running()->domain().link(Path::parse("/System/processes"), make<FsProcessInfo>());
 }

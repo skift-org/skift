@@ -5,9 +5,10 @@
 
 #include "archs/VirtualMemory.h"
 
-#include "kernel/filesystem/Filesystem.h"
 #include "kernel/graphics/Graphics.h"
 #include "kernel/interrupts/Interupts.h"
+#include "kernel/node/Node.h"
+#include "kernel/scheduling/Scheduler.h"
 
 static uintptr_t _framebuffer_physical = 0;
 static uintptr_t _framebuffer_virtual = 0;
@@ -104,5 +105,5 @@ void framebuffer_initialize(Handover *handover)
 
     graphic_did_find_framebuffer(_framebuffer_virtual, _framebuffer_width, _framebuffer_height);
 
-    filesystem_link(Path::parse(FRAMEBUFFER_DEVICE_PATH), make<Framebuffer>());
+    scheduler_running()->domain().link(Path::parse(FRAMEBUFFER_DEVICE_PATH), make<Framebuffer>());
 }

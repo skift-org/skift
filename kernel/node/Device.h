@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kernel/devices/Device.h"
+#include "kernel/node/Handle.h"
 #include "kernel/node/Node.h"
 
 class FsDevice : public FsNode
@@ -24,12 +25,12 @@ public:
         return _device->size();
     }
 
-    bool can_read(FsHandle *) override
+    bool can_read(FsHandle &) override
     {
         return _device->can_read();
     }
 
-    bool can_write(FsHandle *) override
+    bool can_write(FsHandle &) override
     {
         return _device->can_write();
     }

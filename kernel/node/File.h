@@ -14,7 +14,7 @@ public:
 
     ~FsFile() override;
 
-    Result open(FsHandle *handle) override;
+    Result open(FsHandle &handle) override;
 
     size_t size() override;
 

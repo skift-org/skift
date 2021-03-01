@@ -1,33 +1,39 @@
 #include <libsystem/Logger.h>
 
-#include "kernel/filesystem/Filesystem.h"
 #include "kernel/node/Directory.h"
 #include "kernel/node/File.h"
 #include "kernel/node/Pipe.h"
 #include "kernel/node/Socket.h"
 #include "kernel/scheduling/Scheduler.h"
+#include "kernel/tasking/Domain.h"
 
-static FsNode *_filesystem_root = nullptr;
-
-static RefPtr<FsNode> filesystem_root()
+Domain::Domain()
 {
-    assert(_filesystem_root);
-    return {*_filesystem_root};
+    _root = make<FsDirectory>();
 }
 
-void filesystem_initialize()
+Domain::Domain(const Domain &parent)
 {
-    logger_info("Initializing filesystem...");
-
-    _filesystem_root = new FsDirectory();
-    _filesystem_root->ref();
-
-    logger_info("File system root at 0x%x", _filesystem_root);
+    _root = parent._root;
 }
 
-RefPtr<FsNode> filesystem_find(Path path)
+Domain::~Domain()
 {
-    auto current = filesystem_root();
+}
+
+Domain &Domain::operator=(const Domain &other)
+{
+    if (this != &other)
+    {
+        _root = other._root;
+    }
+
+    return *this;
+}
+
+RefPtr<FsNode> Domain::find(Path path)
+{
+    auto current = root();
 
     for (size_t i = 0; i < path.length(); i++)
     {
@@ -50,15 +56,15 @@ RefPtr<FsNode> filesystem_find(Path path)
     return current;
 }
 
-ResultOr<RefPtr<FsHandle>> filesystem_open(Path path, OpenFlag flags)
+ResultOr<RefPtr<FsHandle>> Domain::open(Path path, OpenFlag flags)
 {
     bool should_create_if_not_present = (flags & OPEN_CREATE) == OPEN_CREATE;
 
-    auto node = filesystem_find(path);
+    auto node = find(path);
 
     if (!node && should_create_if_not_present)
     {
-        auto parent = filesystem_find(path.dirpath());
+        auto parent = find(path.dirpath());
 
         if (parent)
         {
@@ -105,9 +111,9 @@ ResultOr<RefPtr<FsHandle>> filesystem_open(Path path, OpenFlag flags)
     return make<FsHandle>(node, flags);
 }
 
-ResultOr<RefPtr<FsHandle>> filesystem_connect(Path path)
+ResultOr<RefPtr<FsHandle>> Domain::connect(Path path)
 {
-    auto node = filesystem_find(path);
+    auto node = find(path);
 
     if (!node)
     {
@@ -137,7 +143,7 @@ ResultOr<RefPtr<FsHandle>> filesystem_connect(Path path)
     return connection_handle;
 }
 
-Result filesystem_mkdir(Path path)
+Result Domain::mkdir(Path path)
 {
     if (path.length() == 0)
     {
@@ -145,17 +151,17 @@ Result filesystem_mkdir(Path path)
         return ERR_FILE_EXISTS;
     }
 
-    return filesystem_link(path, make<FsDirectory>());
+    return link(path, make<FsDirectory>());
 }
 
-Result filesystem_mkpipe(Path path)
+Result Domain::mkpipe(Path path)
 {
-    return filesystem_link(path, make<FsPipe>());
+    return link(path, make<FsPipe>());
 }
 
-Result filesystem_mklink(Path old_path, Path new_path)
+Result Domain::mklink(Path old_path, Path new_path)
 {
-    auto destination = filesystem_find(old_path);
+    auto destination = find(old_path);
 
     if (!destination)
     {
@@ -167,12 +173,12 @@ Result filesystem_mklink(Path old_path, Path new_path)
         return ERR_IS_A_DIRECTORY;
     }
 
-    return filesystem_link(new_path, destination);
+    return link(new_path, destination);
 }
 
-Result filesystem_link(Path path, RefPtr<FsNode> node)
+Result Domain::link(Path path, RefPtr<FsNode> node)
 {
-    auto parent = filesystem_find(path.dirpath());
+    auto parent = find(path.dirpath());
 
     if (!parent)
     {
@@ -191,9 +197,9 @@ Result filesystem_link(Path path, RefPtr<FsNode> node)
     return result;
 }
 
-Result filesystem_unlink(Path path)
+Result Domain::unlink(Path path)
 {
-    auto parent = filesystem_find(path.dirpath());
+    auto parent = find(path.dirpath());
 
     if (!parent || path.length() == 0)
     {
@@ -213,10 +219,10 @@ Result filesystem_unlink(Path path)
 }
 
 // FIXME: check for loops when renaming directory
-Result filesystem_rename(Path old_path, Path new_path)
+Result Domain::rename(Path old_path, Path new_path)
 {
-    auto old_parent = filesystem_find(old_path.dirpath());
-    auto new_parent = filesystem_find(new_path.dirpath());
+    auto old_parent = find(old_path.dirpath());
+    auto new_parent = find(new_path.dirpath());
 
     if (!old_parent || !new_parent)
     {

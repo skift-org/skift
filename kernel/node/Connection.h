@@ -22,9 +22,9 @@ public:
 
     bool is_accepted() override;
 
-    bool can_read(FsHandle *handle) override;
+    bool can_read(FsHandle &handle) override;
 
-    bool can_write(FsHandle *handle) override;
+    bool can_write(FsHandle &handle) override;
 
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
 

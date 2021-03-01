@@ -8,18 +8,14 @@ FsPipe::FsPipe() : FsNode(FILE_TYPE_PIPE)
 {
 }
 
-bool FsPipe::can_read(FsHandle *handle)
+bool FsPipe::can_read(FsHandle &)
 {
-    __unused(handle);
-
     // FIXME: make this atomic or something...
     return !_buffer.empty() || !writers();
 }
 
-bool FsPipe::can_write(FsHandle *handle)
+bool FsPipe::can_write(FsHandle &)
 {
-    __unused(handle);
-
     // FIXME: make this atomic or something...
     return !_buffer.full() || !readers();
 }

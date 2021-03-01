@@ -18,9 +18,9 @@ bool FsConnection::is_accepted()
     return _accepted;
 }
 
-bool FsConnection::can_read(FsHandle *handle)
+bool FsConnection::can_read(FsHandle &handle)
 {
-    if (handle->has_flag(OPEN_CLIENT))
+    if (handle.has_flag(OPEN_CLIENT))
     {
         return !_data_to_client.empty() || !server();
     }
@@ -30,9 +30,9 @@ bool FsConnection::can_read(FsHandle *handle)
     }
 }
 
-bool FsConnection::can_write(FsHandle *handle)
+bool FsConnection::can_write(FsHandle &handle)
 {
-    if (handle->has_flag(OPEN_CLIENT))
+    if (handle.has_flag(OPEN_CLIENT))
     {
         return !_data_to_server.full() || !server();
     }

@@ -91,8 +91,6 @@ Widget::~Widget()
     }
 }
 
-void Widget::event(Event *) {}
-
 void Widget::do_layout()
 {
     switch (_layout.type)

@@ -130,11 +130,23 @@ public:
     void max_height(int value) { _max_height = value; }
     int max_height() { return _max_height; }
 
+    void pin_height(int value)
+    {
+        _min_height = value;
+        _max_height = value;
+    }
+
     void min_width(int value) { _min_width = value; }
     int min_width() { return _min_width; }
 
     void max_width(int value) { _max_width = value; }
     int max_width() { return _max_width; }
+
+    void pin_width(int value)
+    {
+        _min_width = value;
+        _max_width = value;
+    }
 
     CursorState cursor();
 
@@ -148,7 +160,7 @@ public:
 
     virtual void paint(Painter &, const Recti &) {}
 
-    virtual void event(Event *event);
+    virtual void event(Event *) {}
 
     virtual void do_layout();
 

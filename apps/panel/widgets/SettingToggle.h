@@ -4,6 +4,7 @@
 #include <libwidget/Button.h>
 #include <libwidget/IconPanel.h>
 #include <libwidget/Label.h>
+#include <libwidget/Switch.h>
 
 namespace panel
 {
@@ -38,16 +39,16 @@ public:
     {
         clear_children();
 
+        insets({12, 12, 12, 12});
+
         auto icon = new IconPanel(this, _icon);
         icon->insets(Insetsi(0, 0, 0, 4));
 
         auto label = new Label(this, _name);
+        label->flags(Widget::FILL);
 
-        if (_enabled)
-        {
-            icon->color(THEME_FOREGROUND, icon->color(THEME_ACCENT));
-            label->color(THEME_FOREGROUND, icon->color(THEME_ACCENT));
-        }
+        auto sw = new Switch(this);
+        sw->state(_enabled);
     }
 
     void event(Event *event) override

@@ -29,9 +29,6 @@ int main(int argc, char **argv)
     {
         panel_hflow->layout(HFLOW(8));
 
-        auto p0 = new Panel(panel_hflow);
-        p0->flags(Widget::FILL);
-
         auto p1 = new Panel(panel_hflow);
         p1->flags(Widget::FILL);
 
@@ -41,8 +38,6 @@ int main(int argc, char **argv)
         auto p2 = new Container(panel_hflow);
         p2->layout(STACK());
         p2->flags(Widget::FILL);
-
-        new Switch(p2);
 
         auto p3 = new Panel(panel_hflow);
         p3->flags(Widget::FILL);

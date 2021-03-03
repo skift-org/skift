@@ -1,6 +1,8 @@
 #pragma once
 
 #include <libgraphic/Painter.h>
+#include <libwidget/Container.h>
+#include <libwidget/Label.h>
 #include <libwidget/Widget.h>
 
 class Switch : public Widget
@@ -9,10 +11,24 @@ private:
     bool _state;
 
 public:
+    static constexpr auto WIDTH = 36;
+    static constexpr auto HEIGHT = 18;
+
+    bool state()
+    {
+        return _state;
+    }
+
+    void state(bool state)
+    {
+        _state = state;
+        should_repaint();
+    }
+
     Switch(Widget *parent) : Widget(parent)
     {
-        pin_width(36);
-        pin_height(18);
+        pin_width(WIDTH);
+        pin_height(HEIGHT);
     }
 
     ~Switch()
@@ -23,9 +39,11 @@ public:
     {
         auto c = _state ? color(THEME_ACCENT) : color(THEME_FOREGROUND_DISABLED);
 
-        painter.draw_rectangle_rounded(bound(), 99, 2, c);
+        auto control = Rect{WIDTH, HEIGHT}.centered_within(bound());
 
-        auto content = bound().shrinked(4);
+        painter.draw_rectangle_rounded(control, 99, 2, c);
+
+        auto content = control.shrinked(4);
         if (_state)
         {
             painter.fill_rectangle_rounded(content.take_right(content.height()), 99, c);

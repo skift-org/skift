@@ -9,34 +9,50 @@
 
 struct Task;
 
-enum BlockerResult
+class Blocker
 {
-    BLOCKER_UNBLOCKED,
-    BLOCKER_TIMEOUT,
-};
+public:
+private:
+    Result _result = SUCCESS;
+    TimeStamp _timeout = -1;
 
-struct Blocker
-{
-    BlockerResult _result;
-    TimeStamp _timeout;
+public:
+    Result result() { return _result; }
+
+    void timeout(TimeStamp ts) { _timeout = ts; }
 
     virtual ~Blocker() {}
 
-    virtual bool can_unblock(struct Task *task)
+    void unblock(Task &task)
     {
-        __unused(task);
-        return true;
+        _result = SUCCESS;
+        on_unblock(task);
     }
 
-    virtual void on_unblock(struct Task *task)
+    void timeout(Task &task)
     {
-        __unused(task);
+        _result = TIMEOUT;
+        on_timeout(task);
     }
 
-    virtual void on_timeout(struct Task *task)
+    void interrupt(Task &task, Result result)
     {
-        __unused(task);
+        _result = result;
+        on_interrupt(task);
     }
+
+    bool has_timeout()
+    {
+        return _timeout != (Timeout)-1 && _timeout <= system_get_tick();
+    }
+
+    virtual bool can_unblock(Task &) { return true; }
+
+    virtual void on_unblock(Task &) {}
+
+    virtual void on_timeout(Task &) {}
+
+    virtual void on_interrupt(Task &) {}
 };
 
 class BlockerAccept : public Blocker
@@ -49,9 +65,9 @@ public:
     {
     }
 
-    bool can_unblock(struct Task *task);
+    bool can_unblock(Task &task) override;
 
-    void on_unblock(struct Task *task);
+    void on_unblock(Task &task) override;
 };
 
 class BlockerConnect : public Blocker
@@ -65,7 +81,7 @@ public:
     {
     }
 
-    bool can_unblock(struct Task *task);
+    bool can_unblock(Task &task) override;
 };
 
 class BlockerRead : public Blocker
@@ -79,9 +95,9 @@ public:
     {
     }
 
-    bool can_unblock(Task *task);
+    bool can_unblock(Task &task) override;
 
-    void on_unblock(Task *task);
+    void on_unblock(Task &task) override;
 };
 
 struct Selected
@@ -105,9 +121,9 @@ public:
     {
     }
 
-    bool can_unblock(Task *task);
+    bool can_unblock(Task &task) override;
 
-    void on_unblock(Task *task);
+    void on_unblock(Task &task) override;
 };
 
 class BlockerTime : public Blocker
@@ -121,7 +137,7 @@ public:
     {
     }
 
-    bool can_unblock(Task *task);
+    bool can_unblock(Task &task) override;
 };
 
 class BlockerWait : public Blocker
@@ -136,9 +152,9 @@ public:
     {
     }
 
-    bool can_unblock(Task *task);
+    bool can_unblock(Task &task) override;
 
-    void on_unblock(Task *task);
+    void on_unblock(Task &task) override;
 };
 
 class BlockerWrite : public Blocker
@@ -152,7 +168,7 @@ public:
     {
     }
 
-    bool can_unblock(Task *task);
+    bool can_unblock(Task &task) override;
 
-    void on_unblock(Task *task);
+    void on_unblock(Task &task) override;
 };

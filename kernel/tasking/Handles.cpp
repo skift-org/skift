@@ -167,8 +167,14 @@ Result Handles::poll(
     PollEvent *selected_events,
     Timeout timeout)
 {
-    Result result = SUCCESS;
     Vector<Selected> selected;
+
+    auto release_handles = [&]() {
+        for (size_t i = 0; i < selected.count(); i++)
+        {
+            release(selected[i].handle_index);
+        }
+    };
 
     for (size_t i = 0; i < handles_set->count; i++)
     {
@@ -176,9 +182,8 @@ Result Handles::poll(
 
         if (!handle)
         {
-            result = ERR_BAD_HANDLE;
-
-            goto cleanup_and_return;
+            release_handles();
+            return ERR_BAD_HANDLE;
         }
 
         selected.push_back({handles_set->handles[i], handle, handles_set->events[i]});
@@ -186,12 +191,12 @@ Result Handles::poll(
 
     {
         BlockerSelect blocker{selected};
+        Result result = task_block(scheduler_running(), blocker, timeout);
 
-        BlockerResult blocker_result = task_block(scheduler_running(), &blocker, timeout);
-
-        if (blocker_result == BLOCKER_TIMEOUT)
+        if (result != SUCCESS)
         {
-            result = TIMEOUT;
+            release_handles();
+            return result;
         }
 
         if (blocker.selected())
@@ -201,13 +206,9 @@ Result Handles::poll(
         }
     }
 
-cleanup_and_return:
-    for (size_t i = 0; i < selected.count(); i++)
-    {
-        release(selected[i].handle_index);
-    }
+    release_handles();
 
-    return result;
+    return SUCCESS;
 }
 
 ResultOr<size_t> Handles::read(int handle_index, void *buffer, size_t size)

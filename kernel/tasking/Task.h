@@ -21,7 +21,7 @@ struct Task
     char name[PROCESS_NAME_SIZE];
 
     TaskState _state;
-    Blocker *blocker;
+    Blocker *_blocker;
 
     uintptr_t user_stack_pointer;
     void *user_stack;
@@ -48,6 +48,20 @@ struct Task
     void state(TaskState state);
 
     void cancel(int exit_value);
+
+    void try_unblock()
+    {
+        if (_blocker->can_unblock(*this))
+        {
+            _blocker->unblock(*this);
+            state(TASK_STATE_RUNNING);
+        }
+        else if (_blocker->has_timeout())
+        {
+            _blocker->timeout(*this);
+            state(TASK_STATE_RUNNING);
+        }
+    }
 };
 
 Task *task_create(Task *parent, const char *name, bool user);
@@ -85,6 +99,6 @@ Result task_sleep(Task *task, int timeout);
 
 Result task_wait(int task_id, int *exit_value);
 
-BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout);
+Result task_block(Task *task, Blocker &blocker, Timeout timeout);
 
 void task_dump(Task *task);

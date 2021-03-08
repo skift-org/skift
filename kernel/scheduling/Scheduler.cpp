@@ -101,25 +101,9 @@ int scheduler_get_usage(int task_id)
     return (count * 100) / SCHEDULER_RECORD_COUNT;
 }
 
-static Iteration wakeup_task_if_unblocked(void *target, Task *task)
+static Iteration wakeup_task_if_unblocked(void *, Task *task)
 {
-    __unused(target);
-
-    Blocker *blocker = task->blocker;
-
-    if (blocker->can_unblock(task))
-    {
-        blocker->on_unblock(task);
-        blocker->_result = BLOCKER_UNBLOCKED;
-        task->state(TASK_STATE_RUNNING);
-    }
-    else if (blocker->_timeout != (Timeout)-1 &&
-             blocker->_timeout <= system_get_tick())
-    {
-        blocker->on_timeout(task);
-        blocker->_result = BLOCKER_TIMEOUT;
-        task->state(TASK_STATE_RUNNING);
-    }
+    task->try_unblock();
 
     return Iteration::CONTINUE;
 }

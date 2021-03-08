@@ -286,7 +286,7 @@ void task_go(Task *task)
 Result task_sleep(Task *task, int timeout)
 {
     BlockerTime blocker{system_get_tick() + timeout};
-    task_block(task, &blocker, -1);
+    task_block(task, blocker, -1);
 
     return TIMEOUT;
 }
@@ -303,47 +303,35 @@ Result task_wait(int task_id, int *exit_value)
     }
 
     BlockerWait blocker{task, exit_value};
-    task_block(scheduler_running(), &blocker, -1);
+    task_block(scheduler_running(), blocker, -1);
 
     return SUCCESS;
 }
 
-BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
+Result task_block(Task *task, Blocker &blocker, Timeout timeout)
 {
-    assert(!task->blocker);
+    assert(!task->_blocker);
 
     interrupts_retain();
-    task->blocker = blocker;
-    if (blocker->can_unblock(task))
+    if (blocker.can_unblock(*task))
     {
-        blocker->on_unblock(task);
-
+        blocker.unblock(*task);
         interrupts_release();
 
-        task->blocker = nullptr;
-
-        return BLOCKER_UNBLOCKED;
+        return blocker.result();
     }
 
-    if (timeout == (Timeout)-1)
-    {
-        blocker->_timeout = (Timeout)-1;
-    }
-    else
-    {
-        blocker->_timeout = system_get_tick() + timeout;
-    }
+    blocker.timeout(timeout == (Timeout)-1 ? -1 : system_get_tick() + timeout);
 
+    task->_blocker = &blocker;
     task->state(TASK_STATE_BLOCKED);
-    interrupts_release();
 
+    interrupts_release();
     scheduler_yield();
 
-    BlockerResult result = blocker->_result;
+    task->_blocker = nullptr;
 
-    task->blocker = nullptr;
-
-    return result;
+    return blocker.result();
 }
 
 void task_dump(Task *task)

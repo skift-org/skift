@@ -48,14 +48,9 @@ static void dispatcher_snapshot(bool *destination)
 
 class BlockerDispatcher : public Blocker
 {
-private:
 public:
-    BlockerDispatcher() {}
-
-    bool can_unblock(struct Task *task)
+    bool can_unblock(Task &) override
     {
-        __unused(task);
-
         return dispatcher_has_interrupt();
     }
 };
@@ -65,7 +60,7 @@ void dispatcher_service()
     while (true)
     {
         BlockerDispatcher blocker{};
-        task_block(scheduler_running(), &blocker, -1);
+        task_block(scheduler_running(), blocker, -1);
 
         while (dispatcher_has_interrupt())
         {

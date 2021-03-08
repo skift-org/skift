@@ -3,46 +3,39 @@
 
 /* --- BlockerAccept -------------------------------------------------------- */
 
-bool BlockerAccept::can_unblock(struct Task *task)
+bool BlockerAccept::can_unblock(Task &)
 {
-    __unused(task);
-
     return !_node->is_acquire() && _node->can_accept();
 }
 
-void BlockerAccept::on_unblock(struct Task *task)
+void BlockerAccept::on_unblock(Task &task)
 {
-    _node->acquire(task->id);
+    _node->acquire(task.id);
 }
 
 /* --- BlockerConnect ------------------------------------------------------- */
 
-bool BlockerConnect::can_unblock(struct Task *task)
+bool BlockerConnect::can_unblock(Task &)
 {
-    __unused(task);
     return _connection->is_accepted();
 }
 
 /* --- BlockerRead ---------------------------------------------------------- */
 
-bool BlockerRead::can_unblock(Task *task)
+bool BlockerRead::can_unblock(Task &)
 {
-    __unused(task);
-
     return !_handle.node()->is_acquire() && _handle.node()->can_read(_handle);
 }
 
-void BlockerRead::on_unblock(Task *task)
+void BlockerRead::on_unblock(Task &task)
 {
-    _handle.node()->acquire(task->id);
+    _handle.node()->acquire(task.id);
 }
 
 /* --- BlockerSelect -------------------------------------------------------- */
 
-bool BlockerSelect::can_unblock(Task *task)
+bool BlockerSelect::can_unblock(Task &)
 {
-    __unused(task);
-
     for (size_t i = 0; i < _handles.count(); i++)
     {
         auto &selected = _handles[i];
@@ -56,10 +49,8 @@ bool BlockerSelect::can_unblock(Task *task)
     return false;
 }
 
-void BlockerSelect::on_unblock(Task *task)
+void BlockerSelect::on_unblock(Task &)
 {
-    __unused(task);
-
     for (size_t i = 0; i < _handles.count(); i++)
     {
         auto &el = _handles[i];
@@ -77,40 +68,32 @@ void BlockerSelect::on_unblock(Task *task)
 
 /* --- BlockerTime ---------------------------------------------------------- */
 
-bool BlockerTime::can_unblock(Task *task)
+bool BlockerTime::can_unblock(Task &)
 {
-    __unused(task);
-
     return system_get_tick() >= _wakeup_tick;
 }
 
 /* --- BlockerWait ---------------------------------------------------------- */
 
-bool BlockerWait::can_unblock(Task *task)
+bool BlockerWait::can_unblock(Task &)
 {
-    __unused(task);
-
     return _task->state() == TASK_STATE_CANCELED;
 }
 
-void BlockerWait::on_unblock(Task *task)
+void BlockerWait::on_unblock(Task &)
 {
-    __unused(task);
-
     *_exit_value = _task->exit_value;
 }
 
 /* --- BlockerWrite ---------------------------------------------------------- */
 
-bool BlockerWrite::can_unblock(Task *task)
+bool BlockerWrite::can_unblock(Task &)
 {
-    __unused(task);
-
     return !_handle.node()->is_acquire() &&
            _handle.node()->can_write(_handle);
 }
 
-void BlockerWrite::on_unblock(Task *task)
+void BlockerWrite::on_unblock(Task &task)
 {
-    _handle.node()->acquire(task->id);
+    _handle.node()->acquire(task.id);
 }

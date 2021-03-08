@@ -33,7 +33,6 @@
     __ENTRY(ERR_TOO_MANY_HANDLE, "Too many files open")                           \
     __ENTRY(ERR_WRITE_ONLY_STREAM, "Write only stream")                           \
     __ENTRY(ERR_DIRECTORY_NOT_EMPTY, "Directory not empty")                       \
-    __ENTRY(ERR_WRITE_STDOUT, "Failed to write to stdout")                        \
     __ENTRY(ERR_EXTENSION, "Unrecognized file extension")                         \
     __ENTRY(ERR_ACCESS_DENIED, "Acces denied")
 

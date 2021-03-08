@@ -137,7 +137,7 @@ Result head(Stream *const input_stream, char *const stream_name)
         stream_format(out_stream, "==> %s <==\n", stream_name);
         if (handle_has_error(out_stream))
         {
-            return ERR_WRITE_STDOUT;
+            return handle_get_error(out_stream);
         }
     }
 
@@ -158,7 +158,7 @@ Result head(Stream *const input_stream, char *const stream_name)
             stream_write(out_stream, buffer, bytes_read);
             if (handle_has_error(out_stream))
             {
-                return ERR_WRITE_STDOUT;
+                return handle_get_error(out_stream);
             }
 
             counter++;
@@ -170,7 +170,7 @@ Result head(Stream *const input_stream, char *const stream_name)
             stream_write(out_stream, buffer, bytes_read);
             if (handle_has_error(out_stream))
             {
-                return ERR_WRITE_STDOUT;
+                return handle_get_error(out_stream);
             }
         }
     }
@@ -201,7 +201,7 @@ Result head(Stream *const input_stream, char *const stream_name)
             stream_write(out_stream, buffer, buffer_iterator);
             if (handle_has_error(out_stream))
             {
-                return ERR_WRITE_STDOUT;
+                return handle_get_error(out_stream);
             }
         }
     }

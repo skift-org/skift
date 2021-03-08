@@ -29,7 +29,7 @@ Result cat(const char *path)
 
         if (handle_has_error(out_stream))
         {
-            return ERR_WRITE_STDOUT;
+            return handle_get_error(out_stream);
         }
     }
 

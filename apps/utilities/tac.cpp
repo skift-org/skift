@@ -120,7 +120,7 @@ Result tac(Stream *const input_stream)
         stream_write(out_stream, lines[i - 1].cstring(), lines[i - 1].length());
         if (handle_has_error(out_stream))
         {
-            return ERR_WRITE_STDOUT;
+            return handle_get_error(out_stream);
         }
     }
 

@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <signal.h>
 
-__sighandler signal(int sig, __sighandler handler)
+sighandler_t signal(int sig, sighandler_t handler)
 {
     //TODO: connect this handler
     __unused(sig);

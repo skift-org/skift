@@ -191,12 +191,12 @@ Result Handles::poll(
 
     {
         BlockerSelect blocker{selected};
-        Result result = task_block(scheduler_running(), blocker, timeout);
+        Result block_result = task_block(scheduler_running(), blocker, timeout);
 
-        if (result != SUCCESS)
+        if (block_result != SUCCESS)
         {
             release_handles();
-            return result;
+            return block_result;
         }
 
         if (blocker.selected())

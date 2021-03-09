@@ -143,8 +143,7 @@ Result hj_process_exit(int exit_code)
         arch_backtrace();
     }
 
-    scheduler_running()->cancel(exit_code);
-    ASSERT_NOT_REACHED();
+    return scheduler_running()->cancel(exit_code);
 }
 
 Result hj_process_cancel(int pid)
@@ -163,8 +162,7 @@ Result hj_process_cancel(int pid)
     }
     else
     {
-        task->cancel(PROCESS_FAILURE);
-        return SUCCESS;
+        return task->cancel(PROCESS_FAILURE);
     }
 }
 
@@ -747,11 +745,11 @@ uintptr_t task_do_syscall(Syscall syscall, uintptr_t arg0, uintptr_t arg1, uintp
         return ERR_INVALID_ARGUMENT;
     }
 
+    scheduler_running()->begin_syscall(syscall);
     result = handler(arg0, arg1, arg2, arg3, arg4);
+    scheduler_running()->end_syscall();
 
-    if (result != SUCCESS &&
-        result != TIMEOUT &&
-        result != ERR_STREAM_CLOSED)
+    if (result != SUCCESS && result != TIMEOUT)
     {
         logger_trace(
             "%s(%08x, %08x, %08x, %08x, %08x) returned %s",
@@ -759,6 +757,8 @@ uintptr_t task_do_syscall(Syscall syscall, uintptr_t arg0, uintptr_t arg1, uintp
             arg0, arg1, arg2, arg3, arg4,
             result_to_string((Result)result));
     }
+
+    scheduler_running()->kill_me_if_you_dare();
 
     return result;
 }

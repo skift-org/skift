@@ -20,6 +20,11 @@ struct Task
     bool user;
     char name[PROCESS_NAME_SIZE];
 
+    Syscall _current_syscall;
+    bool _is_doing_syscall = false;
+    bool _is_canceled = false;
+    bool _is_interrupted = false;
+
     TaskState _state;
     Blocker *_blocker;
 
@@ -47,7 +52,7 @@ struct Task
 
     void state(TaskState state);
 
-    void cancel(int exit_value);
+    Result cancel(int exit_value);
 
     void try_unblock()
     {
@@ -61,7 +66,27 @@ struct Task
             _blocker->timeout(*this);
             state(TASK_STATE_RUNNING);
         }
+        else if (_blocker->is_interrupted())
+        {
+            state(TASK_STATE_RUNNING);
+        }
     }
+
+    void begin_syscall(Syscall current)
+    {
+        _is_doing_syscall = true;
+        _current_syscall = current;
+    }
+
+    void end_syscall()
+    {
+        _current_syscall = (Syscall)-1;
+        _is_doing_syscall = false;
+    }
+
+    void interrupt();
+
+    void kill_me_if_you_dare();
 };
 
 Task *task_create(Task *parent, const char *name, bool user);

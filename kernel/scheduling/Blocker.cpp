@@ -66,13 +66,6 @@ void BlockerSelect::on_unblock(Task &)
     }
 }
 
-/* --- BlockerTime ---------------------------------------------------------- */
-
-bool BlockerTime::can_unblock(Task &)
-{
-    return system_get_tick() >= _wakeup_tick;
-}
-
 /* --- BlockerWait ---------------------------------------------------------- */
 
 bool BlockerWait::can_unblock(Task &)

@@ -60,7 +60,7 @@ void dispatcher_service()
     while (true)
     {
         BlockerDispatcher blocker{};
-        task_block(scheduler_running(), blocker, -1);
+        assert(task_block(scheduler_running(), blocker, -1) == SUCCESS);
 
         while (dispatcher_has_interrupt())
         {

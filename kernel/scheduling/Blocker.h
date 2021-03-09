@@ -15,6 +15,7 @@ public:
 private:
     Result _result = SUCCESS;
     TimeStamp _timeout = -1;
+    bool _interrupted = false;
 
 public:
     Result result() { return _result; }
@@ -37,6 +38,7 @@ public:
 
     void interrupt(Task &task, Result result)
     {
+        _interrupted = true;
         _result = result;
         on_interrupt(task);
     }
@@ -44,6 +46,11 @@ public:
     bool has_timeout()
     {
         return _timeout != (Timeout)-1 && _timeout <= system_get_tick();
+    }
+
+    bool is_interrupted()
+    {
+        return _interrupted;
     }
 
     virtual bool can_unblock(Task &) { return true; }
@@ -128,16 +135,10 @@ public:
 
 class BlockerTime : public Blocker
 {
-private:
-    Tick _wakeup_tick;
-
 public:
-    BlockerTime(Tick wakeup_tick)
-        : _wakeup_tick(wakeup_tick)
-    {
-    }
+    BlockerTime() {}
 
-    bool can_unblock(Task &task) override;
+    bool can_unblock(Task &) override { return false; }
 };
 
 class BlockerWait : public Blocker

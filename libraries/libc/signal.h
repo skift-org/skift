@@ -4,9 +4,9 @@
 
 __BEGIN_HEADER
 
-#define SIG_ERR ((__sighandler)(void *)(-1))
-#define SIG_DFL ((__sighandler)(void *)(-2))
-#define SIG_IGN ((__sighandler)(void *)(-3))
+#define SIG_ERR ((sighandler_t)(void *)(-1))
+#define SIG_DFL ((sighandler_t)(void *)(-2))
+#define SIG_IGN ((sighandler_t)(void *)(-3))
 
 #define SIGABRT 1
 #define SIGFPE 2
@@ -44,8 +44,8 @@ __BEGIN_HEADER
 
 typedef int sig_atomic_t;
 
-typedef void (*__sighandler)(int);
-__sighandler signal(int sig, __sighandler handler);
+typedef void (*sighandler_t)(int);
+sighandler_t signal(int sig, sighandler_t handler);
 
 int raise(int sig);
 

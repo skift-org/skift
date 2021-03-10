@@ -3,6 +3,7 @@
 #include <libutils/StringBuilder.h>
 
 #include <libsystem/eventloop/Timer.h>
+#include <libsystem/io_new/Format.h>
 #include <libsystem/system/System.h>
 
 #include <libwidget/Container.h>
@@ -51,8 +52,8 @@ CPUGraph::CPUGraph(Widget *parent, RefPtr<TaskModel> model)
 
         auto greedy = _model->cpu_greedy();
 
-        _label_average->text(String::format("Average: {}%", (int)(average() * 100.0)));
-        _label_greedy->text(String::format("Most greedy: {}", greedy));
+        _label_average->text(System::format("Average: {}%", (int)(average() * 100.0)));
+        _label_greedy->text(System::format("Most greedy: {}", greedy));
 
         ElapsedTime seconds = status.uptime;
         int days = seconds / 86400;
@@ -62,7 +63,7 @@ CPUGraph::CPUGraph(Widget *parent, RefPtr<TaskModel> model)
         int minutes = seconds / 60;
         seconds %= 60;
 
-        _label_uptime->text(String::format("Uptime: {03}:{02}:{02}:{02}", days, hours, minutes, seconds));
+        _label_uptime->text(System::format("Uptime: {03}:{02}:{02}:{02}", days, hours, minutes, seconds));
     });
 
     _text_timer->start();

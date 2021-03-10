@@ -1,7 +1,9 @@
 #pragma once
 
 #include <libutils/Scanner.h>
+#include <libutils/String.h>
 
+#include <libsystem/io_new/MemoryWriter.h>
 #include <libsystem/io_new/Writer.h>
 
 class String;
@@ -222,6 +224,15 @@ static inline ResultOr<size_t> format(Writer &writer, const char *fmt, Args... a
 static inline ResultOr<size_t> format(Writer &writer, const char *fmt)
 {
     return writer.write(fmt);
+}
+
+template <Formatable... Args>
+static inline String format(const char *fmt, Args... args)
+{
+    MemoryWriter memory{};
+    format(memory, fmt, forward<Args>(args)...);
+
+    return memory.string();
 }
 
 } // namespace System

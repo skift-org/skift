@@ -3,9 +3,9 @@
 #include <assert.h>
 #include <libsystem/Common.h>
 #include <libsystem/math/MinMax.h>
-#include <libutils/unicode/Codepoint.h>
 #include <libutils/String.h>
 #include <libutils/Vector.h>
+#include <libutils/unicode/Codepoint.h>
 
 class StringBuilder
 {
@@ -57,12 +57,12 @@ public:
         _used = 0;
         _size = 0;
 
-        return String(make<StringStorage>(AdoptTag::ADOPT, result, size));
+        return String(make<StringStorage>(ADOPT, result, size));
     }
 
     String intermediate()
     {
-        return String(make<StringStorage>(_buffer, _used));
+        return String(make<StringStorage>(COPY, _buffer, _used));
     }
 
     StringBuilder &append(String string)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libsystem/io_new/Format.h>
+
 #include "settings-service/Bundle.h"
 
 namespace Settings
@@ -21,7 +23,7 @@ struct Domain
                 continue;
             }
 
-            auto bundle_path = String::format("{}/{}", path, entry.name);
+            auto bundle_path = System::format("{}/{}", path, entry.name);
 
             auto bundle = Bundle::Load(bundle_path);
 

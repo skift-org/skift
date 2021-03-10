@@ -3,85 +3,83 @@
 #include <libutils/Hash.h>
 #include <libutils/Move.h>
 #include <libutils/RefPtr.h>
+#include <libutils/Slice.h>
 #include <libutils/StringStorage.h>
 
-#include <libsystem/io_new/Format.h>
-#include <libsystem/io_new/MemoryWriter.h>
-
-class String
+class String :
+    public RawStorage
 {
 private:
-    RefPtr<StringStorage> _buffer;
+    RefPtr<StringStorage> _storage;
 
 public:
-    template <System::Formatable... Args>
-    static String format(const char *fmt, Args... args)
-    {
-        StringScanner scan{fmt, strlen(fmt)};
-        System::MemoryWriter memory;
-
-        System::format(memory, scan, forward<Args>(args)...);
-
-        return memory.string();
-    }
-
     size_t length() const
     {
-        return _buffer->length();
+        return _storage->size();
     }
 
     const char *cstring() const
     {
-        return _buffer->cstring();
+        if (!_storage)
+        {
+            return "";
+        }
+
+        return _storage->cstring();
     }
 
     const char &at(int index) const
     {
-        return _buffer->cstring()[index];
+        return _storage->cstring()[index];
     }
 
     bool null_or_empty() const
     {
-        return _buffer == nullptr || _buffer->length() == 0;
+        return _storage == nullptr || _storage->size() == 0;
     }
 
-    String sub_string(size_t start, size_t length)
+    Slice slice() const
+    {
+        return Slice{_storage};
+    }
+
+    Slice slice(size_t start, size_t length) const
     {
         assert(start < this->length());
         assert(start + length <= this->length());
 
-        return make<StringStorage>(&at(start), length);
+        return Slice{_storage, start, length};
     }
 
     String(const char *cstring = "")
     {
-        _buffer = make<StringStorage>(cstring);
+        _storage = make<StringStorage>(COPY, cstring);
     }
 
     String(const char *cstring, size_t length)
     {
-        _buffer = make<StringStorage>(cstring, length);
+        _storage = make<StringStorage>(COPY, cstring, length);
     }
 
     String(char c)
     {
         char cstr[2];
         cstr[0] = c;
-        _buffer = make<StringStorage>(cstr, 1);
+        _storage = make<StringStorage>(COPY, cstr, 1);
     }
 
     String(RefPtr<StringStorage> storage)
-        : _buffer(storage)
+        : _storage(storage)
     {
     }
 
     String(const String &other)
-        : _buffer(const_cast<String &>(other)._buffer)
+        : _storage(const_cast<String &>(other)._storage)
     {
     }
 
     String(String &&other)
-        : _buffer(move(other._buffer))
+        : _storage(move(other._storage))
     {
     }
 
@@ -89,7 +87,7 @@ public:
     {
         if (this != &other)
         {
-            _buffer = const_cast<String &>(other)._buffer;
+            _storage = const_cast<String &>(other)._storage;
         }
 
         return *this;
@@ -99,15 +97,8 @@ public:
     {
         if (this != &other)
         {
-            swap(_buffer, other._buffer);
+            swap(_storage, other._storage);
         }
-
-        return *this;
-    }
-
-    String &operator+=(String &other)
-    {
-        _buffer = make<StringStorage>(*_buffer, *other._buffer);
 
         return *this;
     }
@@ -119,7 +110,7 @@ public:
 
     bool operator==(const String &other) const
     {
-        if (_buffer == other._buffer)
+        if (_storage == other._storage)
         {
             return true;
         }
@@ -163,9 +154,14 @@ public:
         return at(index);
     }
 
-    RefPtr<StringStorage> underlying_storage()
+    RefPtr<Storage> storage() override
     {
-        return _buffer;
+        return _storage;
+    }
+
+    RefPtr<StringStorage> string_storage()
+    {
+        return _storage;
     }
 };
 

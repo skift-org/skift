@@ -44,8 +44,8 @@ Result FsProcessInfo::open(FsHandle &handle)
     Prettifier pretty{};
     json::prettify(pretty, list);
 
-    handle.attached = pretty.finalize().underlying_storage().give_ref();
-    handle.attached_size = reinterpret_cast<StringStorage *>(handle.attached)->length();
+    handle.attached = pretty.finalize().storage().give_ref();
+    handle.attached_size = reinterpret_cast<StringStorage *>(handle.attached)->size();
 
     return SUCCESS;
 }

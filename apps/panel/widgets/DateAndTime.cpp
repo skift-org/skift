@@ -1,5 +1,7 @@
-#include <libwidget/Label.h>
 #include <stdio.h>
+
+#include <libsystem/io_new/Format.h>
+#include <libwidget/Label.h>
 
 #include "panel/widgets/DateAndTime.h"
 
@@ -14,7 +16,7 @@ DateAndTime::DateAndTime(Widget *parent) : Button(parent, Button::TEXT)
         TimeStamp timestamp = timestamp_now();
         DateTime datetime = timestamp_to_datetime(timestamp);
 
-        label->text(String::format("{02d}:{02d}:{02d}", datetime.hour, datetime.minute, datetime.second));
+        label->text(System::format("{02d}:{02d}:{02d}", datetime.hour, datetime.minute, datetime.second));
     });
 
     _timer->start();

@@ -41,7 +41,7 @@ ResultOr<Slice> File::read_all()
 
     if (res == SUCCESS)
     {
-        return Slice{make<SliceStorage>(SliceStorage::ADOPT, buff, size)};
+        return Slice{make<SliceStorage>(ADOPT, buff, size)};
     }
     else
     {

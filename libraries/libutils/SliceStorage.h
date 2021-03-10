@@ -1,9 +1,12 @@
 #pragma once
 
-#include <libutils/RefCounted.h>
 #include <string.h>
 
-class SliceStorage : public RefCounted<SliceStorage>
+#include <libutils/Storage.h>
+#include <libutils/Tags.h>
+
+class SliceStorage final :
+    public Storage
 {
 private:
     void *_data = nullptr;
@@ -11,37 +14,9 @@ private:
     bool _owned = false;
 
 public:
-    void *start()
-    {
-        return _data;
-    }
+    void *start() override { return _data; }
 
-    void *end()
-    {
-        return reinterpret_cast<char *>(_data) + _size;
-    }
-
-    const void *start() const
-    {
-        return _data;
-    }
-
-    const void *end() const
-    {
-        return reinterpret_cast<const char *>(_data) + _size;
-    }
-
-    size_t size()
-    {
-        return _size;
-    }
-
-    enum Mode
-    {
-        ADOPT,
-        WRAP,
-        COPY,
-    };
+    void *end() override { return reinterpret_cast<char *>(start()) + _size; }
 
     SliceStorage(size_t size)
     {
@@ -50,30 +25,29 @@ public:
         _size = size;
     }
 
-    SliceStorage(Mode mode, void *data, size_t size)
+    SliceStorage(AdoptTag, void *data, size_t size)
     {
-        if (mode == ADOPT)
-        {
-            _data = data;
-            _size = size;
-            _owned = true;
-        }
-        else if (mode == WRAP)
-        {
-            _data = data;
-            _size = size;
-            _owned = false;
-        }
-        else if (mode == COPY)
-        {
-            _data = malloc(size);
-            memcpy(_data, data, size);
-            _size = size;
-            _owned = false;
-        }
+        _data = data;
+        _size = size;
+        _owned = true;
     }
 
-    ~SliceStorage()
+    SliceStorage(WrapTag, void *data, size_t size)
+    {
+        _data = data;
+        _size = size;
+        _owned = false;
+    }
+
+    SliceStorage(CopyTag, void *data, size_t size)
+    {
+        _data = malloc(size);
+        memcpy(_data, data, size);
+        _size = size;
+        _owned = false;
+    }
+
+    ~SliceStorage() override
     {
         if (!_data)
         {

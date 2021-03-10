@@ -1,13 +1,15 @@
+#include <stdio.h>
+#include <string.h>
+
+#include <libsystem/io_new/Format.h>
 #include <libgraphic/Painter.h>
 #include <libwidget/Placeholder.h>
 #include <libwidget/Window.h>
-#include <stdio.h>
-#include <string.h>
 
 Placeholder::Placeholder(Widget *parent, String text)
     : Widget(parent), _alert_icon(Icon::get("alert"))
 {
-    _text = String::format("Cannot create an instance of \"{}\".", text);
+    _text = System::format("Cannot create an instance of \"{}\".", text);
 }
 
 void Placeholder::paint(Painter &painter, const Recti &)

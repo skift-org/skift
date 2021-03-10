@@ -6,6 +6,7 @@
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Socket.h>
+#include <libsystem/io_new/Format.h>
 #include <libsystem/io_new/Streams.h>
 
 #include "compositor/Protocol.h"
@@ -29,7 +30,7 @@ Optional<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
     {
         auto &gfx_mode = GFX_MODES[i];
 
-        if (String::format("{}x{}", gfx_mode.width, gfx_mode.height) == name)
+        if (System::format("{}x{}", gfx_mode.width, gfx_mode.height) == name)
         {
             return gfx_mode;
         }

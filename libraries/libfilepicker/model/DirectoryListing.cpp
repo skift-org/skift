@@ -3,6 +3,7 @@
 
 #include <libsystem/Logger.h>
 #include <libsystem/io_new/Directory.h>
+#include <libsystem/io_new/Format.h>
 #include <libutils/json/Json.h>
 
 #include <libfilepicker/model/DirectoryListing.h>
@@ -14,7 +15,7 @@ static auto get_icon_for_node(String current_directory, System::Directory::Entry
 {
     if (entry.stat.type == FILE_TYPE_DIRECTORY)
     {
-        auto manifest_path = String::format("{}/{}/manifest.json", current_directory, entry.name);
+        auto manifest_path = System::format("{}/{}/manifest.json", current_directory, entry.name);
 
         auto root = json::parse_file(manifest_path);
 

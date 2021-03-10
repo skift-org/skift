@@ -118,7 +118,7 @@ int main(int argc, const char *argv[])
     });
 
     args.option_string('s', "set", "Set the current keyboard keymap.", [&](auto &keymap_name) {
-        auto kaymap_path = String::format("/Files/Keyboards/{}.kmap", keymap_name);
+        auto kaymap_path = System::format("/Files/Keyboards/{}.kmap", keymap_name);
         return loadkey_set_keymap(keyboard_handle, kaymap_path);
     });
 

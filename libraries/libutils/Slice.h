@@ -6,10 +6,12 @@
 #include <libutils/RefPtr.h>
 #include <libutils/SliceStorage.h>
 
-class Slice
+class Slice :
+    public RawStorage
 {
 private:
-    SliceStorage *_storage = nullptr;
+    RefPtr<Storage> _storage;
+
     const void *_start = nullptr;
     size_t _size = 0;
 
@@ -32,74 +34,47 @@ public:
     {
     }
 
-    Slice(SliceStorage &storage, size_t offset, size_t size) : _storage(&storage)
+    Slice(RefPtr<Storage> storage)
     {
-        ref_if_not_null(_storage);
+        _storage = storage;
+        _start = _storage->start();
+        _size = _storage->size();
+    }
 
+    Slice(RefPtr<Storage> storage, size_t offset, size_t size)
+    {
+        _storage = storage;
         _start = _storage->start();
         _start = static_cast<const void *>(static_cast<const char *>(_start) + offset);
         _size = size;
     }
 
-    Slice(RefPtr<SliceStorage> &&storage) : _storage(storage.give_ref())
+    Slice(const char *start)
     {
-        _start = _storage->start();
-        _size = _storage->size();
+        _storage = nullptr;
+        _start = start;
+        _size = strlen(start);
     }
 
     Slice(const void *start, size_t size)
     {
+        _storage = nullptr;
         _start = start;
         _size = size;
     }
 
-    Slice(const Slice &other) : _storage(other._storage)
+    Slice(RawStorage &obj)
     {
-        ref_if_not_null(_storage);
-
-        _start = other.start();
-        _size = other.size();
-    }
-
-    Slice(Slice &&other) : _storage(other.give_storage())
-    {
-        _start = other.start();
-        _size = other.size();
-    }
-
-    ~Slice()
-    {
-        deref_if_not_null(_storage);
-    }
-
-    Slice &operator=(const Slice &other)
-    {
-        if (_storage != other.naked_storage())
-        {
-            deref_if_not_null(_storage);
-            _storage = other.naked_storage();
-            ref_if_not_null(_storage);
-        }
-
-        return *this;
-    }
-
-    Slice &operator=(Slice &&other)
-    {
-        if (this != &other)
-        {
-            deref_if_not_null(_storage);
-            _storage = other.give_storage();
-        }
-
-        return *this;
+        _storage = obj.storage();
+        _start = _storage->start();
+        _size = _storage->size();
     }
 
     Slice slice(size_t offset, size_t size) const
     {
         if (_storage != nullptr)
         {
-            return {*_storage, offset, size};
+            return {_storage, offset, size};
         }
         else
         {
@@ -108,14 +83,7 @@ public:
         }
     }
 
-    [[nodiscard]] SliceStorage *give_storage()
-    {
-        SliceStorage *storage = _storage;
-        _storage = nullptr;
-        return storage;
-    }
-
-    SliceStorage *naked_storage() const
+    RefPtr<Storage> storage() override
     {
         return _storage;
     }

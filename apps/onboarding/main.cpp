@@ -1,3 +1,6 @@
+#include <stdio.h>
+
+#include <libsystem/io_new/Format.h>
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
@@ -7,7 +10,6 @@
 #include <libwidget/Panel.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Spacer.h>
-#include <stdio.h>
 
 int main(int argc, char **argv)
 {
@@ -87,8 +89,8 @@ int main(int argc, char **argv)
         back_button->enable_if(current_page > 0);
         dots->index(index);
 
-        auto image_path = String::format("/Applications/onboarding/illustration{}.png", index);
-        auto content_path = String::format("/Applications/onboarding/content{}.markup", index);
+        auto image_path = System::format("/Applications/onboarding/illustration{}.png", index);
+        auto content_path = System::format("/Applications/onboarding/content{}.markup", index);
 
         content->clear_children();
         image->change_bitmap(*Bitmap::load_from(image_path));

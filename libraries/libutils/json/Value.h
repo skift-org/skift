@@ -42,8 +42,7 @@ public:
 private:
     Type _type;
 
-    union
-    {
+    union {
         StringStorage *_string;
         int _integer;
 #ifndef __KERNEL__
@@ -204,19 +203,19 @@ public:
     inline Value(String &value)
     {
         _type = STRING;
-        _string = ref_if_not_null(value.underlying_storage().naked());
+        _string = ref_if_not_null(value.string_storage().naked());
     }
 
     inline Value(String &&value)
     {
         _type = STRING;
-        _string = ref_if_not_null(value.underlying_storage().naked());
+        _string = ref_if_not_null(value.string_storage().naked());
     }
 
     inline Value(const char *cstring)
     {
         _type = STRING;
-        _string = new StringStorage(cstring);
+        _string = new StringStorage(COPY, cstring);
     }
 
     inline Value(int value)

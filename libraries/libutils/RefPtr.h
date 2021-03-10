@@ -2,11 +2,7 @@
 
 #include <libsystem/Common.h>
 #include <libutils/RefCounted.h>
-
-enum AdoptTag
-{
-    ADOPT
-};
+#include <libutils/Tags.h>
 
 template <typename T>
 class RefPtr
@@ -36,7 +32,7 @@ public:
     RefPtr(RefPtr &&other) : _ptr(other.give_ref()) {}
 
     template <typename U>
-    RefPtr(RefPtr<U> &other) : _ptr(static_cast<T *>(other.naked()))
+    RefPtr(const RefPtr<U> &other) : _ptr(static_cast<T *>(other.naked()))
     {
         ref_if_not_null(_ptr);
     }
@@ -176,7 +172,7 @@ public:
 template <typename T>
 inline RefPtr<T> adopt(T &object)
 {
-    return RefPtr<T>(AdoptTag::ADOPT, object);
+    return RefPtr<T>(ADOPT, object);
 }
 
 template <typename Type, typename... Args>

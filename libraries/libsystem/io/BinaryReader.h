@@ -31,7 +31,7 @@ public:
     {
         char *cstr = new char[len];
         assert(_reader.read(cstr, len) == len);
-        return String(make<StringStorage>(cstr, len));
+        return String(make<StringStorage>(ADOPT, cstr, len));
     }
 
     inline void skip(size_t num_bytes)

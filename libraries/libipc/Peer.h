@@ -82,23 +82,17 @@ public:
     template <typename TPredicate>
     ResultOr<typename Protocol::Message> send_and_wait_for(Protocol::Message message, TPredicate predicate)
     {
-        auto send_result = send(message);
+        TRY(send(message));
 
-        if (send_result != SUCCESS)
+        auto response = TRY(receive());
+
+        while (!predicate(response))
         {
-            return send_result;
+            handle_message(message);
+            response = TRY(receive());
         }
 
-        auto result_or_message = receive();
-
-        while (result_or_message && !predicate(*result_or_message))
-        {
-            handle_message(*result_or_message);
-
-            auto result_or_message = receive();
-        }
-
-        return result_or_message;
+        return response;
     }
 
     void close()

@@ -15,18 +15,8 @@ public:
     virtual ResultOr<uint8_t> read_byte()
     {
         uint8_t byte = 0xfe;
-        auto result = read(&byte, 1).result();
-
-        if (result != SUCCESS)
-        {
-            return result;
-        }
-        else
-        {
-            return byte;
-        }
-
-        return result;
+        TRY(read(&byte, 1));
+        return byte;
     };
 };
 

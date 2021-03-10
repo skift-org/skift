@@ -107,35 +107,15 @@ template <Formatable... Args>
 static ResultOr<size_t> print(Writer &writer, const char *fmt, Args... args)
 {
     StringScanner scan{fmt, strlen(fmt)};
-    auto format_result = format(writer, scan, forward<Args>(args)...);
-
-    if (!format_result)
-    {
-        return format_result.result();
-    }
-
-    return *format_result;
+    return format(writer, scan, forward<Args>(args)...);
 }
 
 template <Formatable... Args>
 static ResultOr<size_t> println(Writer &writer, const char *fmt, Args... args)
 {
     StringScanner scan{fmt, strlen(fmt)};
-    auto format_result = format(writer, scan, forward<Args>(args)...);
-
-    if (!format_result)
-    {
-        return format_result.result();
-    }
-
-    auto endline_result = writer.write('\n');
-
-    if (endline_result != SUCCESS)
-    {
-        return endline_result;
-    }
-
-    return *format_result + 1;
+    size_t written = TRY(format(writer, scan, forward<Args>(args)...));
+    return written + TRY(writer.write('\n'));
 }
 
 template <Formatable... Args>

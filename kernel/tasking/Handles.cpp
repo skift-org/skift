@@ -87,26 +87,14 @@ Result Handles::release(int handle_index)
 
 ResultOr<int> Handles::open(Domain &domain, Path &path, OpenFlag flags)
 {
-    auto open_result = domain.open(path, flags);
-
-    if (!open_result)
-    {
-        return open_result.result();
-    }
-
-    return add(*open_result);
+    auto handle = TRY(domain.open(path, flags));
+    return add(handle);
 }
 
 ResultOr<int> Handles::connect(Domain &domain, Path &path)
 {
-    auto connect_result = domain.connect(path);
-
-    if (!connect_result)
-    {
-        return connect_result.result();
-    }
-
-    return add(*connect_result);
+    auto handle = TRY(domain.connect(path));
+    return add(handle);
 }
 
 Result Handles::close(int handle_index)
@@ -135,14 +123,7 @@ Result Handles::reopen(int handle, int *reopened)
 
     auto reopened_handle = make<FsHandle>(*original_handle);
 
-    auto result_or_handle_index = add(reopened_handle);
-
-    if (!result_or_handle_index.success())
-    {
-        return result_or_handle_index.result();
-    }
-
-    *reopened = result_or_handle_index.take_value();
+    *reopened = TRY(add(reopened_handle));
 
     return SUCCESS;
 }

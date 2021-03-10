@@ -77,12 +77,7 @@ struct ELFLoader
                 return ERR_EXEC_FORMAT_ERROR;
             }
 
-            Result result = load_program(task, elf_file, &elf_program_header);
-
-            if (result != SUCCESS)
-            {
-                return result;
-            }
+            TRY(load_program(task, elf_file, &elf_program_header));
         }
 
         return SUCCESS;

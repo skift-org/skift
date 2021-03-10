@@ -24,12 +24,7 @@ static Color _placeholder_buffer[] = {
 ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(int width, int height)
 {
     Color *pixels = nullptr;
-    Result result = memory_alloc(width * height * sizeof(Color), reinterpret_cast<uintptr_t *>(&pixels));
-
-    if (result != SUCCESS)
-    {
-        return result;
-    }
+    TRY(memory_alloc(width * height * sizeof(Color), reinterpret_cast<uintptr_t *>(&pixels)));
 
     int handle = -1;
     memory_get_handle(reinterpret_cast<uintptr_t>(pixels), &handle);
@@ -44,12 +39,8 @@ ResultOr<RefPtr<Bitmap>> Bitmap::create_shared_from_handle(int handle, Vec2i wid
 {
     Color *pixels = nullptr;
     size_t size = 0;
-    Result result = memory_include(handle, reinterpret_cast<uintptr_t *>(&pixels), &size);
 
-    if (result != SUCCESS)
-    {
-        return result;
-    }
+    TRY(memory_include(handle, reinterpret_cast<uintptr_t *>(&pixels), &size));
 
     if (size < width_and_height.x() * width_and_height.y() * sizeof(Color))
     {

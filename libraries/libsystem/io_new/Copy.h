@@ -18,28 +18,17 @@ Result copy(Reader &from, Writer &to)
     {
         Array<uint8_t, COPY_CHUNK_SIZE> copy_chunk;
 
-        auto result_or_read = from.read(copy_chunk.raw_storage(), copy_chunk.count());
+        auto read = TRY(from.read(copy_chunk.raw_storage(), copy_chunk.count()));
 
-        if (!result_or_read)
-        {
-            return result_or_read.result();
-        }
-
-        if (*result_or_read == 0)
+        if (read == 0)
         {
             to.flush();
             return SUCCESS;
         }
 
-        size_t chunk_size = *result_or_read;
-        auto result_or_written = to.write(copy_chunk.raw_storage(), chunk_size);
+        auto written = TRY(to.write(copy_chunk.raw_storage(), read));
 
-        if (!result_or_written)
-        {
-            return result_or_written.result();
-        }
-
-        if (*result_or_written == 0)
+        if (written == 0)
         {
             to.flush();
             return SUCCESS;
@@ -51,12 +40,7 @@ ResultOr<Slice> read_all(Reader &reader)
 {
     MemoryWriter memory;
 
-    auto copy_result = copy(reader, memory);
-
-    if (copy_result != SUCCESS)
-    {
-        return copy_result;
-    }
+    TRY(copy(reader, memory));
 
     return Slice{memory.slice()};
 }

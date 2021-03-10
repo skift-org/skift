@@ -49,12 +49,7 @@ Framebuffer::~Framebuffer()
 
 Result Framebuffer::set_resolution(Vec2i size)
 {
-    auto bitmap_or_result = Bitmap::create_shared(size.x(), size.y());
-
-    if (!bitmap_or_result.success())
-    {
-        return bitmap_or_result.result();
-    }
+    auto bitmap = TRY(Bitmap::create_shared(size.x(), size.y()));
 
     IOCallDisplayModeArgs mode_info = (IOCallDisplayModeArgs){size.x(), size.y()};
 
@@ -65,7 +60,7 @@ Result Framebuffer::set_resolution(Vec2i size)
         return handle_get_error(&_handle);
     }
 
-    _bitmap = bitmap_or_result.take_value();
+    _bitmap = bitmap;
     _painter = Painter(_bitmap);
 
     return SUCCESS;

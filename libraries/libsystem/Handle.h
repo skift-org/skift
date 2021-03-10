@@ -56,31 +56,15 @@ public:
     ResultOr<size_t> read(void *buffer, size_t size)
     {
         size_t data_read = 0;
-        _result = hj_handle_read(_handle, buffer, size, &data_read);
-
-        if (_result != SUCCESS)
-        {
-            return _result;
-        }
-        else
-        {
-            return data_read;
-        }
+        _result = TRY(hj_handle_read(_handle, buffer, size, &data_read));
+        return data_read;
     }
 
     ResultOr<size_t> write(const void *buffer, size_t size)
     {
         size_t data_written = 0;
-        _result = hj_handle_write(_handle, buffer, size, &data_written);
-
-        if (_result != SUCCESS)
-        {
-            return _result;
-        }
-        else
-        {
-            return data_written;
-        }
+        _result = TRY(hj_handle_write(_handle, buffer, size, &data_written));
+        return data_written;
     }
 
     Result call(IOCall request, void *args)
@@ -92,63 +76,29 @@ public:
     ResultOr<int> seek(int offset, Whence whence)
     {
         int result_offset = 0;
-
-        _result = hj_handle_seek(_handle, offset, whence, &result_offset);
-
-        if (_result != SUCCESS)
-        {
-            return _result;
-        }
-        else
-        {
-            return result_offset;
-        }
+        _result = TRY(hj_handle_seek(_handle, offset, whence, &result_offset));
+        return result_offset;
     }
 
     ResultOr<int> tell()
     {
         int result_offset = 0;
-
-        _result = hj_handle_seek(_handle, 0, WHENCE_HERE, &result_offset);
-
-        if (_result != SUCCESS)
-        {
-            return _result;
-        }
-        else
-        {
-            return result_offset;
-        }
+        _result = TRY(hj_handle_seek(_handle, 0, WHENCE_HERE, &result_offset));
+        return result_offset;
     }
 
     ResultOr<FileState> stat()
     {
         FileState stat{};
-        _result = hj_handle_stat(_handle, &stat);
-
-        if (_result != SUCCESS)
-        {
-            return _result;
-        }
-        else
-        {
-            return stat;
-        }
+        _result = TRY(hj_handle_stat(_handle, &stat));
+        return stat;
     }
 
     ResultOr<Handle> accept()
     {
         int connection_handle;
-        _result = hj_handle_accept(_handle, &connection_handle);
-
-        if (_result != SUCCESS)
-        {
-            return _result;
-        }
-        else
-        {
-            return Handle{connection_handle};
-        }
+        _result = TRY(hj_handle_accept(_handle, &connection_handle));
+        return Handle{connection_handle};
     }
 
     bool valid()

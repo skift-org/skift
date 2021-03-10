@@ -98,23 +98,16 @@ ResultOr<size_t> FsHandle::read(void *buffer, size_t size)
     }
 
     BlockerRead blocker{*this};
-    auto block_result = task_block(scheduler_running(), blocker, -1);
 
-    if (block_result != SUCCESS)
-    {
-        return block_result;
-    }
+    TRY(task_block(scheduler_running(), blocker, -1));
 
-    auto result_or_read = _node->read(*this, buffer, size);
+    size_t read_amount = TRY(_node->read(*this, buffer, size));
 
-    if (result_or_read)
-    {
-        _offset += *result_or_read;
-    }
+    _offset += read_amount;
 
     _node->release(scheduler_running_id());
 
-    return result_or_read;
+    return read_amount;
 }
 
 ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
@@ -126,30 +119,23 @@ ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
         return ERR_READ_ONLY_STREAM;
     }
 
-    auto attempt_a_write = [&](const void *buffer, size_t size) {
+    auto attempt_a_write = [&](const void *buffer, size_t size) -> ResultOr<size_t> {
         BlockerWrite blocker{*this};
-        auto block_result = task_block(scheduler_running(), blocker, -1);
 
-        if (block_result != SUCCESS)
-        {
-            return ResultOr<size_t>{block_result};
-        }
+        TRY(task_block(scheduler_running(), blocker, -1));
 
         if (has_flag(OPEN_APPEND))
         {
             _offset = _node->size();
         }
 
-        auto result_or_written = _node->write(*this, buffer, size);
+        auto written_amount = TRY(_node->write(*this, buffer, size));
 
-        if (result_or_written)
-        {
-            _offset += *result_or_written;
-        }
+        _offset += written_amount;
 
         _node->release(scheduler_running_id());
 
-        return result_or_written;
+        return written_amount;
     };
 
     size_t written = 0;
@@ -159,16 +145,7 @@ ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
         auto remaining = size - written;
         auto remaining_buffer = reinterpret_cast<const char *>((reinterpret_cast<uintptr_t>(buffer)) + written);
 
-        auto result_or_written = attempt_a_write(remaining_buffer, remaining);
-
-        if (result_or_written)
-        {
-            written += *result_or_written;
-        }
-        else
-        {
-            return result_or_written;
-        }
+        written += TRY(attempt_a_write(remaining_buffer, remaining));
     } while (written < size);
 
     return written;
@@ -238,12 +215,7 @@ Result FsHandle::stat(FileState *stat)
 ResultOr<RefPtr<FsHandle>> FsHandle::accept()
 {
     BlockerAccept blocker{_node};
-    auto block_result = task_block(scheduler_running(), blocker, -1);
-
-    if (block_result != SUCCESS)
-    {
-        return block_result;
-    }
+    TRY(task_block(scheduler_running(), blocker, -1));
 
     auto connection_or_result = _node->accept();
 

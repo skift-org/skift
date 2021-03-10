@@ -340,11 +340,7 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
 
     // Perform deflate on the data
     Deflate def(5);
-    auto def_result = def.perform(src_reader, compressed_writer);
-    if (def_result != Result::SUCCESS)
-    {
-        return def_result;
-    }
+    TRY(def.perform(src_reader, compressed_writer));
 
     // Write our new entry
     logger_trace("Write new local header: '%s'", entry_name);

@@ -138,12 +138,7 @@ ResultOr<RefPtr<FsHandle>> Domain::connect(Path path)
     auto connection_handle = make<FsHandle>(connection, OPEN_CLIENT);
 
     BlockerConnect blocker{connection};
-    auto block_result = task_block(scheduler_running(), blocker, -1);
-
-    if (block_result != SUCCESS)
-    {
-        return block_result;
-    }
+    TRY(task_block(scheduler_running(), blocker, -1));
 
     return connection_handle;
 }

@@ -1,6 +1,8 @@
+#include <string.h>
+
 #include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
-#include <string.h>
+#include <libutils/ResultOr.h>
 
 #include "archs/VirtualMemory.h"
 #include "archs/x86_32/kernel/Paging.h"
@@ -101,12 +103,7 @@ Result arch_virtual_map(void *address_space, MemoryRange physical_range, uintptr
 
         if (!page_directory_entry.Present)
         {
-            Result alloc_result = memory_alloc_identity(page_directory, MEMORY_CLEAR, (uintptr_t *)&page_table);
-
-            if (alloc_result != SUCCESS)
-            {
-                return alloc_result;
-            }
+            TRY(memory_alloc_identity(page_directory, MEMORY_CLEAR, (uintptr_t *)&page_table));
 
             page_directory_entry.Present = 1;
             page_directory_entry.Write = 1;

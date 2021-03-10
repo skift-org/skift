@@ -68,3 +68,28 @@ public:
 
     const T *operator->() const { return &value(); }
 };
+
+static inline Result __extract_result(Result r) { return r; }
+
+template <typename T>
+static inline Result __extract_result(ResultOr<T> r) { return r.result(); };
+
+static inline Result __extract_value(Result r) { return r; }
+
+template <typename T>
+static inline T __extract_value(ResultOr<T> r) { return r.value(); };
+
+// This macro works like the try!() macro from rust.
+// If __stuff evaluate to an error it will short-circuit the function returning the error.
+// Else __stuff is SUCCESS then propagate the value.
+#define TRY(__stuff)                               \
+    ({                                             \
+        auto __eval__ = __stuff;                   \
+                                                   \
+        if (__extract_result(__eval__) != SUCCESS) \
+        {                                          \
+            return __extract_result(__eval__);     \
+        }                                          \
+                                                   \
+        __extract_value(__eval__);                 \
+    })

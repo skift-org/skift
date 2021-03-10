@@ -132,14 +132,7 @@ static inline ResultOr<size_t> format(Writer &writer, Scanner &scanner)
 
     while (!scanner.ended())
     {
-        auto result = writer.write(scanner.current());
-
-        if (result != SUCCESS)
-        {
-            return result;
-        }
-
-        written += 1;
+        written += TRY(writer.write(scanner.current()));
         scanner.foreward();
     }
 
@@ -153,14 +146,7 @@ static inline ResultOr<size_t> format(Writer &writer, Scanner &scanner, First fi
 
     while (!(scanner.ended() || scanner.current() == '{'))
     {
-        auto result = writer.write(scanner.current());
-
-        if (result != SUCCESS)
-        {
-            return result;
-        }
-
-        written += 1;
+        written += TRY(writer.write(scanner.current()));
         scanner.foreward();
     }
 
@@ -185,30 +171,12 @@ static inline ResultOr<size_t> format(Writer &writer, Scanner &scanner, First fi
             }
         };
 
-        auto format_result = format_proxy();
-
-        if (format_result)
-        {
-            written += *format_result;
-        }
-        else
-        {
-            return format_result.result();
-        }
+        written += TRY(format_proxy());
     }
 
     if (!scanner.ended())
     {
-        auto format_result = format(writer, scanner, forward<Args>(args)...);
-
-        if (format_result)
-        {
-            return written + *format_result;
-        }
-        else
-        {
-            return format_result.result();
-        }
+        written += TRY(format(writer, scanner, forward<Args>(args)...));
     }
 
     return written;

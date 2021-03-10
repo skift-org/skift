@@ -11,7 +11,7 @@
 namespace System
 {
 
-class Handle
+class Handle : public RefCounted<Handle>
 {
 private:
     int _handle = HANDLE_INVALID_ID;
@@ -160,7 +160,7 @@ public:
 class RawHandle
 {
 public:
-    virtual Handle &handle() = 0;
+    virtual RefPtr<Handle> handle() = 0;
 };
 
 } // namespace System

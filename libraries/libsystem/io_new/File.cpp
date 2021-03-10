@@ -4,41 +4,41 @@ namespace System
 {
 
 File::File(const char *path, OpenFlag flags)
-    : _handle(path, flags | OPEN_STREAM),
+    : _handle{make<Handle>(path, flags | OPEN_STREAM)},
       _path{Path::parse(path)}
 {
 }
 
 File::File(String path, OpenFlag flags)
-    : _handle(path, flags | OPEN_STREAM),
+    : _handle{make<Handle>(path, flags | OPEN_STREAM)},
       _path{Path::parse(path)}
 {
 }
 
 File::File(Path &path, OpenFlag flags)
-    : _handle{path.string(), flags | OPEN_STREAM},
+    : _handle{make<Handle>(path.string(), flags | OPEN_STREAM)},
       _path{path}
 {
 }
 
-File::File(System::Handle &&handle)
-    : _handle{move(handle)}
+File::File(RefPtr<System::Handle> handle)
+    : _handle{handle}
 {
 }
 
 ResultOr<size_t> File::read(void *buffer, size_t size)
 {
-    return _handle.read(buffer, size);
+    return _handle->read(buffer, size);
 }
 
 ResultOr<size_t> File::write(const void *buffer, size_t size)
 {
-    return _handle.write(buffer, size);
+    return _handle->write(buffer, size);
 }
 
 ResultOr<size_t> File::seek(size_t pos, Whence whence)
 {
-    auto seek_result = _handle.seek(pos, whence);
+    auto seek_result = _handle->seek(pos, whence);
 
     if (seek_result)
     {
@@ -53,12 +53,12 @@ ResultOr<size_t> File::seek(size_t pos, Whence whence)
 ResultOr<size_t> File::tell()
 {
     // FIXME: sketchy cast
-    return (size_t)_handle.tell().value();
+    return (size_t)_handle->tell().value();
 }
 
 ResultOr<size_t> File::length()
 {
-    auto result_or_stat = _handle.stat();
+    auto result_or_stat = _handle->stat();
 
     if (result_or_stat)
     {
@@ -72,7 +72,7 @@ ResultOr<size_t> File::length()
 
 bool File::exist()
 {
-    return _handle.valid();
+    return _handle->valid();
 }
 
 } // namespace System

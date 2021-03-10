@@ -7,11 +7,11 @@ void Directory::read_entries()
 {
     DirectoryEntry entry;
 
-    auto read_result = _handle.read(&entry, sizeof(entry));
+    auto read_result = _handle->read(&entry, sizeof(entry));
     while (read_result.success() && *read_result > 0)
     {
         _entries.push_back({entry.name, entry.stat});
-        read_result = _handle.read(&entry, sizeof(entry));
+        read_result = _handle->read(&entry, sizeof(entry));
     }
 
     _entries.sort([](auto &left, auto &right) {
@@ -20,35 +20,35 @@ void Directory::read_entries()
 }
 
 Directory::Directory(const char *path)
-    : _handle(path, OPEN_READ | OPEN_DIRECTORY),
+    : _handle{make<Handle>(path, OPEN_READ | OPEN_DIRECTORY)},
       _path{Path::parse(path)}
 {
     read_entries();
 }
 
 Directory::Directory(String path)
-    : _handle(path, OPEN_READ | OPEN_DIRECTORY),
+    : _handle{make<Handle>(path, OPEN_READ | OPEN_DIRECTORY)},
       _path{Path::parse(path)}
 {
     read_entries();
 }
 
 Directory::Directory(const Path &path)
-    : _handle(path.string(), OPEN_READ | OPEN_DIRECTORY),
+    : _handle{make<Handle>(path.string(), OPEN_READ | OPEN_DIRECTORY)},
       _path{path}
 {
     read_entries();
 }
 
-Directory::Directory(System::Handle &&handle)
-    : _handle{move(handle)}
+Directory::Directory(RefPtr<System::Handle> handle)
+    : _handle{handle}
 {
     read_entries();
 }
 
 bool Directory::exist()
 {
-    return _handle.valid();
+    return _handle->valid();
 }
 
 } // namespace System

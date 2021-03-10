@@ -6,7 +6,8 @@
 namespace System
 {
 
-class Directory
+class Directory :
+    public RawHandle
 {
 public:
     struct Entry
@@ -16,7 +17,7 @@ public:
     };
 
 private:
-    System::Handle _handle;
+    RefPtr<System::Handle> _handle;
     Optional<Path> _path;
     Vector<Entry> _entries;
 
@@ -29,7 +30,9 @@ public:
     Directory(const char *path);
     Directory(String path);
     Directory(const Path &path);
-    Directory(System::Handle &&handle);
+    Directory(RefPtr<System::Handle> handle);
+
+    RefPtr<Handle> handle() override { return _handle; }
 
     bool exist();
 };

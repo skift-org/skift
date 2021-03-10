@@ -12,10 +12,11 @@ namespace System
 class File final :
     public Reader,
     public Writer,
-    public Seek
+    public Seek,
+    public RawHandle
 {
 private:
-    System::Handle _handle;
+    RefPtr<System::Handle> _handle;
     Optional<Path> _path;
 
 public:
@@ -24,7 +25,7 @@ public:
     File(const char *path, OpenFlag flags);
     File(String path, OpenFlag flags);
     File(Path &path, OpenFlag flags);
-    File(System::Handle &&handle);
+    File(RefPtr<System::Handle> handle);
 
     ResultOr<size_t> read(void *buffer, size_t size) override;
     ResultOr<size_t> write(const void *buffer, size_t size) override;
@@ -33,6 +34,8 @@ public:
     ResultOr<size_t> tell() override;
 
     ResultOr<size_t> length() override;
+
+    virtual RefPtr<Handle> handle() override { return _handle; }
 
     bool exist();
 };

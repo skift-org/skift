@@ -7,11 +7,11 @@
 #define PATH_DEPTH (16)
 #define PATH_SEPARATOR '/'
 
-enum Whence
+enum HjWhence
 {
-    WHENCE_START,
-    WHENCE_HERE,
-    WHENCE_END,
+    HJ_WHENCE_START,
+    HJ_WHENCE_CURRENT,
+    HJ_WHENCE_END,
 };
 
 enum FileType

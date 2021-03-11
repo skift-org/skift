@@ -7,6 +7,7 @@
 #include <abi/Paths.h>
 
 #include <libsystem/io/Handle.h>
+#include <libsystem/io_new/Seek.h>
 
 enum StreamBufferMode
 {
@@ -58,7 +59,7 @@ void stream_flush(Stream *stream);
 
 Result stream_call(Stream *stream, IOCall request, void *arg);
 
-int stream_seek(Stream *stream, int offset, Whence whence);
+int stream_seek(Stream *stream, System::SeekFrom from);
 
 int stream_tell(Stream *stream);
 

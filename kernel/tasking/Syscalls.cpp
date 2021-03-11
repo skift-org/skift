@@ -575,9 +575,10 @@ Result hj_handle_call(int handle, IOCall request, void *args)
     return handles.call(handle, request, args);
 }
 
-Result hj_handle_seek(int handle, int offset, Whence whence, int *result_offset)
+Result hj_handle_seek(int handle, ssize64_t *offset, HjWhence whence, ssize64_t *result_offset)
 {
     if (result_offset != nullptr &&
+        !syscall_validate_ptr((uintptr_t)offset, sizeof(int)) &&
         !syscall_validate_ptr((uintptr_t)result_offset, sizeof(int)))
     {
         return ERR_BAD_ADDRESS;
@@ -585,7 +586,7 @@ Result hj_handle_seek(int handle, int offset, Whence whence, int *result_offset)
 
     auto &handles = scheduler_running()->handles();
 
-    auto seek_result = handles.seek(handle, offset, whence);
+    auto seek_result = handles.seek(handle, {(System::Whence)whence, *offset});
 
     if (result_offset != nullptr)
     {

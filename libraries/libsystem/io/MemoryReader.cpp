@@ -18,18 +18,18 @@ size_t MemoryReader::position()
     return _position;
 }
 
-size_t MemoryReader::seek(size_t position, Whence whence)
+size_t MemoryReader::seek(System::SeekFrom from)
 {
-    switch (whence)
+    switch (from.whence)
     {
-    case WHENCE_START:
-        _position = position;
+    case System::Whence::START:
+        _position = from.position;
         break;
-    case WHENCE_HERE:
-        _position += position;
+    case System::Whence::CURRENT:
+        _position += from.position;
         break;
-    case WHENCE_END:
-        _position = _size + position;
+    case System::Whence::END:
+        _position = _size + from.position;
         break;
     default:
         ASSERT_NOT_REACHED();

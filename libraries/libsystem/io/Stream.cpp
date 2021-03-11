@@ -348,9 +348,9 @@ Result stream_call(Stream *stream, IOCall request, void *arg)
     return __plug_handle_call(HANDLE(stream), request, arg);
 }
 
-int stream_seek(Stream *stream, int offset, Whence whence)
+int stream_seek(Stream *stream, System::SeekFrom from)
 {
-    return __plug_handle_seek(HANDLE(stream), offset, whence);
+    return __plug_handle_seek(HANDLE(stream), from);
 }
 
 int stream_tell(Stream *stream)

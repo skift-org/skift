@@ -12,10 +12,9 @@ FileReader::FileReader(System::Handle &&handle) : _handle{move(handle)}
 {
 }
 
-size_t FileReader::seek(size_t pos, Whence whence)
+size_t FileReader::seek(System::SeekFrom from)
 {
-    _handle.seek(pos, whence);
-    return pos;
+    return _handle.seek(from).value();
 }
 
 size_t FileReader::read(void *buffer, size_t size)

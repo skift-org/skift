@@ -239,13 +239,13 @@ Result __plug_handle_call(Handle *handle, IOCall request, void *args)
     ASSERT_NOT_REACHED();
 }
 
-int __plug_handle_seek(Handle *handle, int offset, Whence whence)
+int __plug_handle_seek(Handle *handle, System::SeekFrom from)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
     auto &handles = scheduler_running()->handles();
 
-    handle->result = handles.seek(handle->id, offset, whence).result();
+    handle->result = handles.seek(handle->id, from).result();
 
     return 0;
 }
@@ -256,7 +256,7 @@ int __plug_handle_tell(Handle *handle)
 
     auto &handles = scheduler_running()->handles();
 
-    auto result_or_offset = handles.seek(handle->id, 0, WHENCE_HERE);
+    auto result_or_offset = handles.seek(handle->id, System::SeekFrom::current(0));
 
     handle->result = result_or_offset.result();
 

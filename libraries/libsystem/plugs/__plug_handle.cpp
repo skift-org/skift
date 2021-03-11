@@ -146,18 +146,19 @@ Result __plug_handle_call(Handle *handle, IOCall request, void *args)
     return handle->result;
 }
 
-int __plug_handle_seek(Handle *handle, int offset, Whence whence)
+int __plug_handle_seek(Handle *handle, System::SeekFrom from)
 {
-    handle->result = hj_handle_seek(handle->id, offset, whence, NULL);
+    handle->result = hj_handle_seek(handle->id, &from.position, (HjWhence)from.whence, NULL);
 
     return 0;
 }
 
 int __plug_handle_tell(Handle *handle)
 {
-    int offset = 0;
-    handle->result = hj_handle_seek(handle->id, 0, WHENCE_HERE, &offset);
-    return offset;
+    ssize64_t offset = 0;
+    ssize64_t result = 0;
+    handle->result = hj_handle_seek(handle->id, &offset, HJ_WHENCE_CURRENT, &result);
+    return result;
 }
 
 int __plug_handle_stat(Handle *handle, FileState *stat)

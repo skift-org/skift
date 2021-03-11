@@ -36,9 +36,9 @@ ResultOr<size_t> File::write(const void *buffer, size_t size)
     return _handle->write(buffer, size);
 }
 
-ResultOr<size_t> File::seek(size_t pos, Whence whence)
+ResultOr<size_t> File::seek(SeekFrom from)
 {
-    auto seek_result = _handle->seek(pos, whence);
+    auto seek_result = _handle->seek(from);
 
     if (seek_result)
     {

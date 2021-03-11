@@ -46,7 +46,7 @@ public:
 
     ResultOr<size_t> write(int handle_index, const void *buffer, size_t size);
 
-    ResultOr<int> seek(int handle_index, int offset, Whence whence);
+    ResultOr<ssize64_t> seek(int handle_index, System::SeekFrom from);
 
     Result call(int handle_index, IOCall request, void *args);
 

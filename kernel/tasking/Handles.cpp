@@ -224,7 +224,7 @@ ResultOr<size_t> Handles::write(int handle_index, const void *buffer, size_t siz
     return result_or_written;
 }
 
-ResultOr<int> Handles::seek(int handle_index, int offset, Whence whence)
+ResultOr<ssize64_t> Handles::seek(int handle_index, System::SeekFrom from)
 {
     auto handle = acquire(handle_index);
 
@@ -233,7 +233,7 @@ ResultOr<int> Handles::seek(int handle_index, int offset, Whence whence)
         return ERR_BAD_HANDLE;
     }
 
-    auto seek_result = handle->seek(offset, whence);
+    auto seek_result = handle->seek(from);
 
     release(handle_index);
 

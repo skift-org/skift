@@ -11,9 +11,9 @@ size_t BinaryReader::position()
     return _reader.position();
 }
 
-size_t BinaryReader::seek(size_t pos, Whence whence)
+size_t BinaryReader::seek(System::SeekFrom from)
 {
-    return _reader.seek(pos, whence);
+    return _reader.seek(from);
 }
 
 size_t BinaryReader::read(void *buffer, size_t size)

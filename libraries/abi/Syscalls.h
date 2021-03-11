@@ -151,7 +151,7 @@ Result hj_handle_poll(HandleSet *handles_set, int *selected, PollEvent *selected
 Result hj_handle_read(int handle, void *buffer, size_t size, size_t *read);
 Result hj_handle_write(int handle, const void *buffer, size_t size, size_t *written);
 Result hj_handle_call(int handle, IOCall request, void *args);
-Result hj_handle_seek(int handle, int offset, Whence whence, int *result);
+Result hj_handle_seek(int handle, ssize64_t *offset, HjWhence whence, ssize64_t *result);
 Result hj_handle_stat(int handle, FileState *state);
 Result hj_handle_connect(int *handle, const char *raw_path, size_t size);
 Result hj_handle_accept(int handle, int *connection_handle);

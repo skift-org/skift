@@ -22,7 +22,7 @@ void Writer::copy_from(Reader &reader)
 
 void Writer::copy_from(SeekableReader &reader)
 {
-    reader.seek(0, WHENCE_START);
+    reader.seek(System::SeekFrom::start());
 
     Array<uint8_t, COPY_CHUNK_SIZE> copy_chunk;
     size_t chunk_size = 0;

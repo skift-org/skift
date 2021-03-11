@@ -199,7 +199,7 @@ Result hj_handle_call(int handle, IOCall request, void *args)
     return __syscall(HJ_HANDLE_CALL, (uintptr_t)handle, (uintptr_t)request, (uintptr_t)args);
 }
 
-Result hj_handle_seek(int handle, int offset, Whence whence, int *result_offset)
+Result hj_handle_seek(int handle, ssize64_t *offset, HjWhence whence, ssize64_t *result_offset)
 {
     return __syscall(HJ_HANDLE_SEEK, (uintptr_t)handle, (uintptr_t)offset, (uintptr_t)whence, (uintptr_t)result_offset);
 }

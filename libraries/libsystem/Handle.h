@@ -2,11 +2,12 @@
 
 #include <abi/Syscalls.h>
 
-#include <libsystem/process/Process.h>
-
 #include <libutils/Optional.h>
 #include <libutils/ResultOr.h>
 #include <libutils/String.h>
+
+#include <libsystem/io_new/Seek.h>
+#include <libsystem/process/Process.h>
 
 namespace System
 {
@@ -73,17 +74,18 @@ public:
         return _result;
     }
 
-    ResultOr<int> seek(int offset, Whence whence)
+    ResultOr<ssize64_t> seek(SeekFrom from)
     {
-        int result_offset = 0;
-        _result = TRY(hj_handle_seek(_handle, offset, whence, &result_offset));
+        ssize64_t result_offset = 0;
+        _result = TRY(hj_handle_seek(_handle, &from.position, (HjWhence)from.whence, &result_offset));
         return result_offset;
     }
 
-    ResultOr<int> tell()
+    ResultOr<ssize64_t> tell()
     {
-        int result_offset = 0;
-        _result = TRY(hj_handle_seek(_handle, 0, WHENCE_HERE, &result_offset));
+        ssize64_t position = 0;
+        ssize64_t result_offset = 0;
+        _result = TRY(hj_handle_seek(_handle, &position, HJ_WHENCE_CURRENT, &result_offset));
         return result_offset;
     }
 

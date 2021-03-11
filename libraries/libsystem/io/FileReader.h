@@ -19,5 +19,5 @@ public:
     virtual size_t position() override;
 
     virtual size_t read(void *buffer, size_t size) override;
-    virtual size_t seek(size_t pos, Whence whence) override;
+    virtual size_t seek(System::SeekFrom from) override;
 };

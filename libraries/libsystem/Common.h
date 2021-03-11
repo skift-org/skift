@@ -8,6 +8,9 @@
 #include <abi/Process.h>
 #include <libsystem/Macros.h>
 
+typedef uint64_t size64_t;
+typedef int64_t ssize64_t;
+
 struct __SOURCE_LOCATION__
 {
     const char *file;

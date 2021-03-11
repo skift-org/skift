@@ -168,17 +168,19 @@ int fseek(FILE *file, long offset, int whence)
 {
     Result r = Result::ERR_FUNCTION_NOT_IMPLEMENTED;
 
+    ssize64_t offset64 = offset;
+
     if (whence == SEEK_SET)
     {
-        r = hj_handle_seek(file->handle, offset, WHENCE_START, NULL);
+        r = hj_handle_seek(file->handle, &offset64, HJ_WHENCE_START, NULL);
     }
     else if (whence == SEEK_CUR)
     {
-        r = hj_handle_seek(file->handle, offset, WHENCE_HERE, NULL);
+        r = hj_handle_seek(file->handle, &offset64, HJ_WHENCE_CURRENT, NULL);
     }
     else if (whence == SEEK_END)
     {
-        r = hj_handle_seek(file->handle, offset, WHENCE_END, NULL);
+        r = hj_handle_seek(file->handle, &offset64, HJ_WHENCE_END, NULL);
     }
 
     return r == Result::SUCCESS ? 0 : -1;
@@ -186,8 +188,8 @@ int fseek(FILE *file, long offset, int whence)
 
 long ftell(FILE *stream)
 {
-    int offset = 0;
-    Result r = hj_handle_seek(stream->handle, 0, WHENCE_HERE, &offset);
+    ssize64_t offset = 0;
+    Result r = hj_handle_seek(stream->handle, 0, HJ_WHENCE_CURRENT, &offset);
 
     if (r != Result::SUCCESS)
     {

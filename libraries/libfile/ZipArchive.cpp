@@ -1,4 +1,8 @@
 #include <assert.h>
+#include <stdio.h>
+
+#include <libio/File.h>
+
 #include <libfile/ZipArchive.h>
 #include <libsystem/Logger.h>
 #include <libsystem/compression/Deflate.h>
@@ -10,7 +14,6 @@
 #include <libsystem/io/MemoryWriter.h>
 #include <libsystem/io/ScopedReader.h>
 #include <libutils/Endian.h>
-#include <stdio.h>
 
 // Central header
 #define ZIP_END_OF_CENTRAL_DIR_HEADER_SIG 0x06054b50
@@ -205,7 +208,7 @@ void ZipArchive::read_archive()
 {
     _valid = false;
 
-    File archive_file = File(_path);
+    IO::File archive_file{_path};
 
     // Archive does not exist
     if (!archive_file.exist())
@@ -313,7 +316,7 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
 
 Result ZipArchive::insert(const char *entry_name, const char *src_path)
 {
-    File src_file(src_path);
+    IO::File src_file{src_path};
 
     if (!src_file.exist())
     {

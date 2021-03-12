@@ -1,7 +1,7 @@
 
 #include <libfile/ZipArchive.h>
+#include <libio/File.h>
 #include <libio/Streams.h>
-#include <libsystem/io/File.h>
 #include <libsystem/io/Filesystem.h>
 #include <libutils/ArgParse.h>
 #include <libutils/Path.h>
@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
     args.argv().foreach ([&](auto &path) {
         IO::errln("{}: Unzip '{}'", argv[0], path);
 
-        File file{path};
+        IO::File file{path};
         if (!file.exist())
         {
             IO::errln("{}: File does not exist '{}'", argv[0], path);
@@ -50,6 +50,7 @@ int main(int argc, char const *argv[])
                 IO::errln("{}: Failed to extract entry '{}' with error '{}'", argv[0], entry.name, get_result_description(result));
                 process_exit(PROCESS_FAILURE);
             }
+
             i++;
         }
         return Iteration::CONTINUE;

@@ -6,7 +6,6 @@
 #include <libio/Streams.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/Connection.h>
-#include <libsystem/io/File.h>
 #include <libsystem/io/Socket.h>
 
 #include "compositor/Protocol.h"

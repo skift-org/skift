@@ -1,9 +1,5 @@
-
-/* tar.c: read in memory tar archive                                          */
-
 #include <libfile/TARArchive.h>
-#include <stdio.h>
-#include <string.h>
+#include <libio/File.h>
 
 struct __packed TARRawBlock
 {
@@ -41,41 +37,6 @@ struct __packed TARRawBlock
     }
 };
 
-size_t get_file_size(TARRawBlock *header)
-{
-    unsigned int size = 0;
-    unsigned int count = 1;
-
-    for (size_t j = 11; j > 0; j--, count *= 8)
-    {
-        size += ((header->size[j - 1] - '0') * count);
-    }
-
-    return size;
-}
-
-size_t tar_count(void *tarfile)
-{
-    TARRawBlock *header = (TARRawBlock *)tarfile;
-    size_t count = 0;
-
-    while (header->name[0] != '\0')
-    {
-        count++;
-
-        size_t size = get_file_size(header);
-
-        header = (TARRawBlock *)((char *)header + ((size / 512) + 1) * 512);
-
-        if (size % 512)
-        {
-            header = (TARRawBlock *)((char *)header + 512);
-        }
-    }
-
-    return count;
-}
-
 bool tar_read(void *tarfile, TARBlock *block, size_t index)
 {
     TARRawBlock *header = (TARRawBlock *)tarfile;
@@ -87,7 +48,7 @@ bool tar_read(void *tarfile, TARBlock *block, size_t index)
             return false;
         }
 
-        size_t size = get_file_size(header);
+        size_t size = header->file_size();
 
         header = (TARRawBlock *)((char *)header + ((size / 512) + 1) * 512);
 
@@ -103,7 +64,7 @@ bool tar_read(void *tarfile, TARBlock *block, size_t index)
     }
 
     memcpy(block->name, header->name, 100);
-    block->size = get_file_size(header);
+    block->size = header->file_size();
     block->typeflag = header->typeflag;
     memcpy(block->linkname, header->linkname, 100);
     block->data = (char *)header + 512;
@@ -111,8 +72,10 @@ bool tar_read(void *tarfile, TARBlock *block, size_t index)
     return true;
 }
 
-#include <libfile/TARArchive.h>
-#include <libsystem/io/FileReader.h>
+#ifndef __KERNEL__
+
+#    include <libfile/TARArchive.h>
+#    include <libsystem/io/FileReader.h>
 
 TARArchive::TARArchive(Path path, bool read) : Archive(path)
 {
@@ -138,40 +101,42 @@ Result TARArchive::insert(const char *entry_name, const char *src_path)
     return ERR_FUNCTION_NOT_IMPLEMENTED;
 }
 
-void TARArchive::read_archive()
+Result TARArchive::read_archive()
 {
     _valid = false;
 
-    File archive_file = File(_path);
+    IO::File archive_file{_path};
 
     // Archive does not exist
     if (!archive_file.exist())
     {
         logger_error("Archive does not exist: %s", _path.string().cstring());
-        return;
+        return SUCCESS;
     }
 
     logger_trace("Opening file: '%s'", _path.string().cstring());
 
-    FileReader file_reader(_path);
-
     TARRawBlock block;
-    while (file_reader.read(&block, sizeof(TARRawBlock)) == sizeof(TARRawBlock))
+    while (TRY(archive_file.read(&block, sizeof(TARRawBlock))) == sizeof(TARRawBlock))
     {
         if (block.name[0] == '\0')
         {
             _valid = true;
-            return;
+            return SUCCESS;
         }
 
         _entries.push_back({
             String{block.name},
             block.file_size(),
             block.file_size(),
-            file_reader.position(),
+            TRY(archive_file.tell()),
             0,
         });
 
-        file_reader.seek(IO::SeekFrom::current(__align_up(block.file_size(), 512)));
+        TRY(archive_file.seek(IO::SeekFrom::current(__align_up(block.file_size(), 512))));
     }
+
+    return SUCCESS;
 }
+
+#endif

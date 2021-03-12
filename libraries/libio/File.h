@@ -22,11 +22,11 @@ private:
 public:
     const Optional<Path> &path() { return _path; }
 
-    File(const char *path, OpenFlag flags);
+    File(const char *path, OpenFlag flags = 0);
 
-    File(String path, OpenFlag flags);
+    File(String path, OpenFlag flags = 0);
 
-    File(Path &path, OpenFlag flags);
+    File(Path &path, OpenFlag flags = 0);
 
     File(RefPtr<Handle> handle);
 

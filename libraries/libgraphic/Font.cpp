@@ -2,10 +2,10 @@
 #include <stdio.h>
 
 #include <libgraphic/Font.h>
+#include <libio/File.h>
 #include <libio/Format.h>
+#include <libio/Read.h>
 #include <libsystem/Logger.h>
-#include <libsystem/Result.h>
-#include <libsystem/io/File.h>
 #include <libutils/HashMap.h>
 #include <libutils/Path.h>
 
@@ -14,21 +14,19 @@ static HashMap<String, RefPtr<Font>>
 
 static ResultOr<Vector<Glyph>> font_load_glyph(String name)
 {
-    char glyph_path[PATH_LENGTH];
-    snprintf(glyph_path, PATH_LENGTH, "/Files/Fonts/%s.glyph", name.cstring());
+    auto path = IO::format("/Files/Fonts/{}.glyph", name);
+    IO::File glyph_file{path, OPEN_READ};
 
-    Glyph *glyph_buffer = nullptr;
-    size_t glyph_size = 0;
-    File glyph_file{glyph_path};
-    Result result = glyph_file.read_all((void **)&glyph_buffer, &glyph_size);
-
-    if (result != SUCCESS)
+    if (!glyph_file.exist())
     {
-        logger_error("Failed to load glyph from %s: %s", glyph_path, handle_error_string(result));
-        return result;
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    return Vector(ADOPT, glyph_buffer, glyph_size / sizeof(Glyph));
+    Vector<Glyph> glyphs;
+
+    TRY(IO::read(glyph_file, glyphs));
+
+    return glyphs;
 }
 
 static ResultOr<RefPtr<Bitmap>> font_load_bitmap(String name)

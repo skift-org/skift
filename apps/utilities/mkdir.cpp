@@ -1,110 +1,69 @@
-#include <libsystem/cmdline/CMDLine.h>
-#include <libsystem/io/Directory.h>
+#include <libio/Directory.h>
+#include <libio/Streams.h>
+#include <libutils/ArgParse.h>
+
 #include <libsystem/io/Filesystem.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
 
-static bool parent = false;
-static bool verbose = false;
-
-static CommandLineOption options[] = {
-    COMMANDLINE_OPT_HELP,
-    COMMANDLINE_OPT_BOOL("parents", 'p', parent, "Make parent directories as needed.", COMMANDLINE_NO_CALLBACK),
-    COMMANDLINE_OPT_BOOL("verbose", 'v', verbose, "Print a message for each created directory.", COMMANDLINE_NO_CALLBACK),
-    COMMANDLINE_OPT_END};
-
-static const char *usages[] = {
-    "[OPTION]... DIRECTORY...",
-    nullptr,
-};
-
-static CommandLine cmdline = CMDLINE(
-    usages,
-    options,
-    "Create the DIRECTORY(ies), if they do not already exist.",
-    "Options can be combined.");
-
-void print_path(const char *path)
+Result mkdir(Path path)
 {
-    if (verbose)
+    IO::Directory parent{path};
+
+    if (!parent.exist())
     {
-        printf("mkdir: created directory %s\n", path);
+        IO::errln("mkdir: created directory {}", path.string());
+        return filesystem_mkdir(path.string().cstring());
     }
+
+    return SUCCESS;
 }
 
-void mkdir_parent_dirs(const char *path)
+Result mkdir_parent(Path path)
 {
-    if (directory_exist(path))
+    for (size_t i = 0; i < path.length(); i++)
     {
-        return;
+        TRY(mkdir(path.parent(i)));
     }
 
-    const char *iter = path;
-    size_t path_len = strlen(path);
-    char *construct_parent_dirs = (char *)calloc(path_len + 1, sizeof(char));
-    char *iter_recursively = construct_parent_dirs;
+    return SUCCESS;
+}
 
-    if (!path_len)
+int main(int argc, const char *argv[])
+{
+    ArgParse args;
+
+    args.prologue("Create the DIRECTORY(ies), if they do not already exist.");
+    args.usage("[OPTION]... DIRECTORY...");
+
+    bool parent;
+    args.option(parent, 'p', "parents", "Make parent directories as needed.");
+
+    bool verbose;
+    args.option(verbose, 'v', "verbose", "Print a message for each created directory.");
+
+    args.epiloge("Options can be combined.");
+
+    if (args.eval(argc, argv) != PROCESS_SUCCESS)
     {
-        free(construct_parent_dirs);
-        return;
+        return PROCESS_FAILURE;
     }
 
-    while (*iter != '\0')
+    for (auto directory: args.argv())
     {
-        *iter_recursively = *iter;
-
-        if (*iter == '/')
+        if (parent)
         {
-            if (!directory_exist(construct_parent_dirs))
+            if (mkdir_parent(Path::parse(directory)) != SUCCESS)
             {
-                filesystem_mkdir(construct_parent_dirs);
-                print_path(construct_parent_dirs);
+                return PROCESS_FAILURE;
             }
         }
-
-        ++iter_recursively;
-        ++iter;
-    }
-
-    --iter;
-    if (*iter != '/')
-    {
-        if (!directory_exist(construct_parent_dirs))
+        else
         {
-            filesystem_mkdir(construct_parent_dirs);
-            print_path(construct_parent_dirs);
+            if (mkdir(Path::parse(directory)) != SUCCESS)
+            {
+                return PROCESS_FAILURE;
+            }
         }
     }
 
-    free(construct_parent_dirs);
-}
-
-int main(int argc, char **argv)
-{
-    cmdline_parse(&cmdline, argc, argv);
-
-    if (parent)
-    {
-        for (int i = 1; i < argc; ++i)
-        {
-            mkdir_parent_dirs(argv[i]);
-        }
-
-        return PROCESS_SUCCESS;
-    }
-
-    else
-    {
-        int result = 0;
-
-        for (int i = 1; i < argc; i++)
-        {
-            result |= filesystem_mkdir(argv[i]);
-            print_path(argv[i]);
-        }
-
-        return result;
-    }
+    return PROCESS_SUCCESS;
 }

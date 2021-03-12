@@ -2,8 +2,8 @@
 #include <skift/Environment.h>
 #include <stdio.h>
 
+#include <libio/File.h>
 #include <libsystem/Result.h>
-#include <libsystem/io/File.h>
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/io/Pipe.h>
 #include <libsystem/io/Stream.h>
@@ -20,14 +20,14 @@ bool find_command_path(char *buffer, const char *command)
     {
         snprintf(buffer, PATH_LENGTH, "%s", command);
 
-        File file{buffer};
+        IO::File file{buffer};
         return file.exist();
     }
     else
     {
         snprintf(buffer, PATH_LENGTH, "/Applications/%s/%s", command, command);
 
-        File file{buffer};
+        IO::File file{buffer};
         if (file.exist())
         {
             return true;
@@ -39,7 +39,7 @@ bool find_command_path(char *buffer, const char *command)
         {
             snprintf(buffer, PATH_LENGTH, "%s/%s", path.get(i).as_string().cstring(), command);
 
-            File file{buffer};
+            IO::File{buffer};
             if (file.exist())
             {
                 return true;

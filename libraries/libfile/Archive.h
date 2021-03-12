@@ -1,8 +1,7 @@
 #pragma once
 
-#include <libsystem/Common.h>
 #include <libsystem/Result.h>
-#include <libsystem/io/File.h>
+#include <libutils/Path.h>
 
 class Archive : public RefCounted<Archive>
 {
@@ -16,6 +15,12 @@ public:
         unsigned int compression;
     };
 
+protected:
+    Vector<Entry> _entries;
+    Path _path;
+    bool _valid = true;
+
+public:
     static RefPtr<Archive> open(Path path, bool read = true);
 
     Archive(Path path) : _path(path)
@@ -39,9 +44,4 @@ public:
     {
         return _valid;
     }
-
-protected:
-    Vector<Entry> _entries;
-    Path _path;
-    bool _valid = true;
 };

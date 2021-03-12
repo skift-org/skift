@@ -7,12 +7,12 @@
 #undef LODEPNG_NO_COMPILE_DISK
 
 #include <assert.h>
-#include <libsystem/Logger.h>
-#include <libsystem/Result.h>
-#include <libsystem/io/File.h>
-#include <libsystem/system/Memory.h>
 
 #include <libgraphic/Bitmap.h>
+#include <libio/Copy.h>
+#include <libio/File.h>
+#include <libsystem/Logger.h>
+#include <libsystem/system/Memory.h>
 
 static Color _placeholder_buffer[] = {
     Colors::MAGENTA,
@@ -65,15 +65,14 @@ RefPtr<Bitmap> Bitmap::placeholder()
 
 ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path)
 {
-    File file{path};
-    auto result_or_read = file.read_all();
+    IO::File file{path, OPEN_READ};
 
-    if (!result_or_read.success())
+    if (!file.exist())
     {
-        return result_or_read.result();
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    auto raw_data = result_or_read.take_value();
+    auto png_data = TRY(IO::read_all(file));
 
     unsigned int decoded_width = 0;
     unsigned int decoded_height = 0;
@@ -83,8 +82,8 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path)
         (unsigned char **)&decoded_data,
         &decoded_width,
         &decoded_height,
-        (const unsigned char *)raw_data.start(),
-        raw_data.size());
+        (const unsigned char *)png_data.start(),
+        png_data.size());
 
     if (decode_result != 0)
     {
@@ -138,8 +137,14 @@ Result Bitmap::save_to(String path)
         return ERR_BAD_IMAGE_FILE_FORMAT;
     }
 
-    File file{path};
-    return file.write_all(outbuffer, outbuffer_size);
+    IO::File file{path, OPEN_READ};
+
+    if (!file.exist())
+    {
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
+    }
+
+    return IO::write_all(file, {outbuffer, outbuffer_size});
 }
 
 Bitmap::~Bitmap()

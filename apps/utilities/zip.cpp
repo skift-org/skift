@@ -1,7 +1,7 @@
 
 #include <libfile/ZipArchive.h>
+#include <libio/File.h>
 #include <libio/Streams.h>
-#include <libsystem/io/File.h>
 #include <libutils/ArgParse.h>
 
 int main(int argc, char const *argv[])
@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
         args.fail();
     }
 
-    File file{args.argv()[0]};
+    IO::File file{args.argv()[0]};
     if (file.exist())
     {
         IO::errln("{}: Destination archive already exists '{}'", argv[0], args.argv()[0]);

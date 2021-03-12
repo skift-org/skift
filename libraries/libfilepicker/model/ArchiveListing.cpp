@@ -1,8 +1,8 @@
 #include <assert.h>
-#include <libsystem/Logger.h>
-#include <libsystem/io/Directory.h>
-#include <libutils/json/Json.h>
 #include <string.h>
+
+#include <libsystem/Logger.h>
+#include <libutils/json/Json.h>
 
 #include <libfilepicker/model/ArchiveListing.h>
 

@@ -16,7 +16,7 @@ bool tar_read(void *tarfile, TARBlock *block, size_t index);
 class TARArchive : public Archive
 {
 private:
-    void read_archive();
+    Result read_archive();
 
 public:
     TARArchive(Path path, bool read = true);

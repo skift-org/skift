@@ -1,7 +1,7 @@
+#include <libio/Directory.h>
+#include <libio/Streams.h>
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Filesystem.h>
-#include <libsystem/io_new/Directory.h>
-#include <libsystem/io_new/Streams.h>
 #include <libutils/Path.h>
 #include <stdio.h>
 
@@ -38,7 +38,7 @@ static CommandLine cmdline = CMDLINE(
 
 Result rmdir(String path)
 {
-    System::Directory directory{path};
+    IO::Directory directory{path};
 
     if (!force && directory.entries().any())
     {
@@ -49,11 +49,11 @@ Result rmdir(String path)
 
     if (unlink_result != SUCCESS)
     {
-        System::errln("rmdir: successfully removed '{}': {}", path, get_result_description(unlink_result));
+        IO::errln("rmdir: successfully removed '{}': {}", path, get_result_description(unlink_result));
     }
     else if (verbose)
     {
-        System::errln("rmdir: successfully removed '{}': {}", path, get_result_description(unlink_result));
+        IO::errln("rmdir: successfully removed '{}': {}", path, get_result_description(unlink_result));
     }
 
     return unlink_result;

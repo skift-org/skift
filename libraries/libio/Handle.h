@@ -1,18 +1,15 @@
 #pragma once
 
 #include <abi/Syscalls.h>
-
-#include <libutils/Optional.h>
-#include <libutils/ResultOr.h>
+#include <libio/Seek.h>
+#include <libsystem/process/Process.h>
 #include <libutils/String.h>
 
-#include <libsystem/io_new/Seek.h>
-#include <libsystem/process/Process.h>
-
-namespace System
+namespace IO
 {
 
-class Handle : public RefCounted<Handle>
+class Handle :
+    public RefCounted<Handle>
 {
 private:
     int _handle = HANDLE_INVALID_ID;
@@ -74,7 +71,7 @@ public:
         return _result;
     }
 
-    ResultOr<ssize64_t> seek(SeekFrom from)
+    ResultOr<ssize64_t> seek(IO::SeekFrom from)
     {
         ssize64_t result_offset = 0;
         _result = TRY(hj_handle_seek(_handle, &from.position, (HjWhence)from.whence, &result_offset));
@@ -109,10 +106,9 @@ public:
     }
 };
 
-class RawHandle
+struct RawHandle
 {
-public:
     virtual RefPtr<Handle> handle() = 0;
 };
 
-} // namespace System
+} // namespace IO

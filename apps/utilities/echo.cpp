@@ -1,14 +1,14 @@
 
-#include <libsystem/io_new/Streams.h>
+#include <libio/Streams.h>
 
 int main(int argc, const char *argv[])
 {
     for (int i = 1; i < argc; i++)
     {
-        System::out("{} ", argv[i]);
+        IO::out("{} ", argv[i]);
     }
 
-    System::out("\n");
+    IO::out("\n");
 
     return PROCESS_SUCCESS;
 }

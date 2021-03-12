@@ -2,7 +2,7 @@
 
 #include <libutils/StringBuilder.h>
 
-#include <libsystem/io_new/Format.h>
+#include <libio/Format.h>
 #include <libsystem/system/System.h>
 
 #include <libwidget/Container.h>
@@ -49,13 +49,13 @@ RAMGraph::RAMGraph(Widget *parent, RefPtr<TaskModel> model)
         hj_system_status(&status);
 
         unsigned usage = status.used_ram / 1024 / 1024;
-        _label_usage->text(System::format("Usage: {} Mio", usage));
+        _label_usage->text(IO::format("Usage: {} Mio", usage));
 
         unsigned available = status.total_ram / 1024 / 1024;
-        _label_available->text(System::format("Available: {} Mio", available));
+        _label_available->text(IO::format("Available: {} Mio", available));
 
         auto greedy = _model->ram_greedy();
-        _label_greedy->text(System::format("Most greedy: {}", greedy));
+        _label_greedy->text(IO::format("Most greedy: {}", greedy));
     });
 
     _text_timer->start();

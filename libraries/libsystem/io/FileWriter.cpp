@@ -1,14 +1,17 @@
 #include <libsystem/io/FileWriter.h>
 
-FileWriter::FileWriter(const char *path) : _handle(path, OPEN_WRITE | OPEN_CREATE | OPEN_STREAM)
+FileWriter::FileWriter(const char *path)
+    : _handle{make<IO::Handle>(path, OPEN_WRITE | OPEN_CREATE | OPEN_STREAM)}
 {
 }
 
-FileWriter::FileWriter(Path &path) : _handle(path.string(), OPEN_WRITE | OPEN_CREATE | OPEN_STREAM)
+FileWriter::FileWriter(Path &path)
+    : _handle{make<IO::Handle>(path.string(), OPEN_WRITE | OPEN_CREATE | OPEN_STREAM)}
 {
 }
 
-FileWriter::FileWriter(System::Handle &&handle) : _handle{move(handle)}
+FileWriter::FileWriter(RefPtr<IO::Handle> handle)
+    : _handle{handle}
 {
 }
 
@@ -16,7 +19,7 @@ void FileWriter::flush() {}
 
 size_t FileWriter::write(const void *buffer, size_t size)
 {
-    auto result_or_write = _handle.write(buffer, size);
+    auto result_or_write = _handle->write(buffer, size);
 
     if (result_or_write)
     {
@@ -30,7 +33,7 @@ size_t FileWriter::write(const void *buffer, size_t size)
 
 size_t FileWriter::length()
 {
-    auto result_or_stat = _handle.stat();
+    auto result_or_stat = _handle->stat();
 
     if (result_or_stat)
     {
@@ -44,7 +47,7 @@ size_t FileWriter::length()
 
 size_t FileWriter::position()
 {
-    auto result_or_tell = _handle.tell();
+    auto result_or_tell = _handle->tell();
 
     if (result_or_tell)
     {

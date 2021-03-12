@@ -1,37 +1,37 @@
 #pragma once
 
+#include <libio/Reader.h>
 #include <libutils/InlineRingBuffer.h>
+#include <libutils/unicode/Codepoint.h>
 
-#include <libsystem/io_new/Reader.h>
-
-namespace System
+namespace IO
 {
 
-template <typename TReader>
 class Scanner final
 {
 private:
-    static constexpr int PEEK_SIZE = 16;
+    static constexpr int PEEK_SIZE = 64;
 
-    TReader _reader;
-    utils::InlineRingBuffer<uint8_t, 16> _peek{};
+    Reader &_reader;
+    utils::InlineRingBuffer<uint8_t, PEEK_SIZE> _peek{};
     bool _is_end_of_file = false;
 
     void refill()
     {
         auto read_result = _reader.read_byte();
 
-        if (!read_result)
+        if (!read_result.success())
         {
             _is_end_of_file = true;
             return;
         }
 
-        _peek.put(*read_result);
+        _peek.put(read_result.value());
     }
 
 public:
-    Scanner(TReader reader) : _reader(reader)
+    Scanner(Reader &reader)
+        : _reader{reader}
     {
     }
 
@@ -45,7 +45,7 @@ public:
         return _is_end_of_file;
     }
 
-    void foreward()
+    void forward()
     {
         if (_peek.empty())
         {
@@ -78,31 +78,31 @@ public:
         return !ended();
     }
 
-    void foreward(size_t n)
+    void forward(size_t n)
     {
         for (size_t i = 0; i < n; i++)
         {
-            foreward();
+            forward();
         }
     }
 
-    void foreward_codepoint()
+    void forward_codepoint()
     {
         if ((current() & 0xf8) == 0xf0)
         {
-            foreward(4);
+            forward(4);
         }
         else if ((current() & 0xf0) == 0xe0)
         {
-            foreward(3);
+            forward(3);
         }
         else if ((current() & 0xe0) == 0xc0)
         {
-            foreward(2);
+            forward(2);
         }
         else
         {
-            foreward(1);
+            forward(1);
         }
     }
 
@@ -173,10 +173,9 @@ public:
 
     void eat(const char *what)
     {
-        while (current_is(what) &&
-               do_continue())
+        while (current_is(what) && do_continue())
         {
-            foreward();
+            forward();
         }
     }
 
@@ -184,7 +183,7 @@ public:
     {
         if (current() == chr)
         {
-            foreward();
+            forward();
 
             return true;
         }
@@ -196,7 +195,7 @@ public:
     {
         if (current_is(chr))
         {
-            foreward();
+            forward();
 
             return true;
         }
@@ -210,7 +209,7 @@ public:
         {
             for (size_t i = 0; i < strlen(word); i++)
             {
-                foreward();
+                forward();
             }
 
             return true;
@@ -218,6 +217,11 @@ public:
 
         return false;
     }
+
+    void skip_utf8bom()
+    {
+        skip_word("\xEF\xBB\xBF");
+    }
 };
 
-} // namespace System
+} // namespace IO

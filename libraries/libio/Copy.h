@@ -3,11 +3,12 @@
 #include <libutils/Array.h>
 #include <libutils/Slice.h>
 
-#include <libsystem/io_new/MemoryWriter.h>
-#include <libsystem/io_new/Reader.h>
-#include <libsystem/io_new/Writer.h>
+#include <libio/MemoryReader.h>
+#include <libio/MemoryWriter.h>
+#include <libio/Reader.h>
+#include <libio/Writer.h>
 
-namespace System
+namespace IO
 {
 
 Result copy(Reader &from, Writer &to)
@@ -44,9 +45,11 @@ ResultOr<Slice> read_all(Reader &reader)
 
     return Slice{memory.slice()};
 }
-//
-// Result write_all(Writer &writer, Slice data)
-// {
-// }
 
-} // namespace System
+Result write_all(Writer &writer, Slice data)
+{
+    MemoryReader memory{data};
+    return copy(memory, writer);
+}
+
+} // namespace IO

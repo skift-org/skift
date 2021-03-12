@@ -18,17 +18,17 @@ size_t MemoryReader::position()
     return _position;
 }
 
-size_t MemoryReader::seek(System::SeekFrom from)
+size_t MemoryReader::seek(IO::SeekFrom from)
 {
     switch (from.whence)
     {
-    case System::Whence::START:
+    case IO::Whence::START:
         _position = from.position;
         break;
-    case System::Whence::CURRENT:
+    case IO::Whence::CURRENT:
         _position += from.position;
         break;
-    case System::Whence::END:
+    case IO::Whence::END:
         _position = _size + from.position;
         break;
     default:

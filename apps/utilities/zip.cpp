@@ -1,7 +1,7 @@
 
 #include <libfile/ZipArchive.h>
+#include <libio/Streams.h>
 #include <libsystem/io/File.h>
-#include <libsystem/io_new/Streams.h>
 #include <libutils/ArgParse.h>
 
 int main(int argc, char const *argv[])
@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
     File file{args.argv()[0]};
     if (file.exist())
     {
-        System::errln("{}: Destination archive already exists '{}'", argv[0], args.argv()[0]);
+        IO::errln("{}: Destination archive already exists '{}'", argv[0], args.argv()[0]);
         return PROCESS_FAILURE;
     }
 
@@ -34,13 +34,13 @@ int main(int argc, char const *argv[])
     // Pack all files that were passed as arguments
     for (unsigned int i = 1; i < args.argc(); i++)
     {
-        System::outln("{}: Entry: {} is being inserted...", argv[0], args.argv()[i]);
+        IO::outln("{}: Entry: {} is being inserted...", argv[0], args.argv()[i]);
 
         auto result = archive->insert(args.argv()[i].cstring(), args.argv()[i].cstring());
 
         if (result != Result::SUCCESS)
         {
-            System::errln("{}: Failed to insert entry '{}' with error '{}'", argv[0], args.argv()[i], get_result_description(result));
+            IO::errln("{}: Failed to insert entry '{}' with error '{}'", argv[0], args.argv()[i], get_result_description(result));
             return PROCESS_FAILURE;
         }
     }

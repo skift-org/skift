@@ -1,14 +1,12 @@
 #pragma once
 
-#include <libutils/Scanner.h>
+#include <libio/MemoryReader.h>
+#include <libio/MemoryWriter.h>
+#include <libio/Scanner.h>
+#include <libio/Writer.h>
 #include <libutils/String.h>
 
-#include <libsystem/io_new/MemoryWriter.h>
-#include <libsystem/io_new/Writer.h>
-
-class String;
-
-namespace System
+namespace IO
 {
 
 struct Formating
@@ -75,13 +73,13 @@ struct Formating
         if (scanner.current_is("scbdox"))
         {
             parse_type();
-            scanner.foreward();
+            scanner.forward();
         }
 
         while (!scanner.ended() && scanner.current() != '}')
         {
 
-            scanner.foreward();
+            scanner.forward();
         }
 
         scanner.skip('}');
@@ -93,47 +91,47 @@ struct Formating
 class Format
 {
 public:
-    virtual ResultOr<size_t> format(Writer &writer);
+    virtual ResultOr<size_t> format(IO::Writer &writer);
 };
 
 template <typename T>
-concept Formatable = IsBaseOf<Format, T>::value || requires(Writer &writer, const Formating &formating, const T &t)
+concept Formatable = IsBaseOf<Format, T>::value || requires(IO::Writer &writer, const Formating &formating, const T &t)
 {
     format(writer, formating, t);
 };
 
-ResultOr<size_t> format(Writer &, const Formating &, char);
+ResultOr<size_t> format(IO::Writer &, const Formating &, char);
 
-ResultOr<size_t> format(Writer &, const Formating &, unsigned char);
+ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned char);
 
-ResultOr<size_t> format(Writer &, const Formating &, short int);
+ResultOr<size_t> format(IO::Writer &, const Formating &, short int);
 
-ResultOr<size_t> format(Writer &, const Formating &, unsigned short int);
+ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned short int);
 
-ResultOr<size_t> format(Writer &, const Formating &, int);
+ResultOr<size_t> format(IO::Writer &, const Formating &, int);
 
-ResultOr<size_t> format(Writer &, const Formating &, unsigned int);
+ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned int);
 
-ResultOr<size_t> format(Writer &, const Formating &, long int);
+ResultOr<size_t> format(IO::Writer &, const Formating &, long int);
 
-ResultOr<size_t> format(Writer &, const Formating &, unsigned long int);
+ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned long int);
 
-ResultOr<size_t> format(Writer &, const Formating &, float);
+ResultOr<size_t> format(IO::Writer &, const Formating &, float);
 
-ResultOr<size_t> format(Writer &, const Formating &, double);
+ResultOr<size_t> format(IO::Writer &, const Formating &, double);
 
-ResultOr<size_t> format(Writer &, const Formating &, const char *);
+ResultOr<size_t> format(IO::Writer &, const Formating &, const char *);
 
-ResultOr<size_t> format(Writer &, const Formating &, const String);
+ResultOr<size_t> format(IO::Writer &, const Formating &, const String);
 
-static inline ResultOr<size_t> format(Writer &writer, Scanner &scanner)
+static inline ResultOr<size_t> format(IO::Writer &writer, Scanner &scanner)
 {
     size_t written = 0;
 
     while (!scanner.ended())
     {
         written += TRY(writer.write(scanner.current()));
-        scanner.foreward();
+        scanner.forward();
     }
 
     return written;
@@ -147,7 +145,7 @@ static inline ResultOr<size_t> format(Writer &writer, Scanner &scanner, First fi
     while (!(scanner.ended() || scanner.current() == '{'))
     {
         written += TRY(writer.write(scanner.current()));
-        scanner.foreward();
+        scanner.forward();
     }
 
     if (scanner.current() == '{')
@@ -185,7 +183,8 @@ static inline ResultOr<size_t> format(Writer &writer, Scanner &scanner, First fi
 template <Formatable... Args>
 static inline ResultOr<size_t> format(Writer &writer, const char *fmt, Args... args)
 {
-    StringScanner scan{fmt, strlen(fmt)};
+    MemoryReader memory{fmt};
+    Scanner scan{memory};
     return format(writer, scan, forward<Args>(args)...);
 }
 
@@ -199,8 +198,7 @@ static inline String format(const char *fmt, Args... args)
 {
     MemoryWriter memory{};
     format(memory, fmt, forward<Args>(args)...);
-
     return memory.string();
 }
 
-} // namespace System
+} // namespace IO

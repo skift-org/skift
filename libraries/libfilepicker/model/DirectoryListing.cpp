@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <string.h>
 
+#include <libio/Directory.h>
+#include <libio/Format.h>
 #include <libsystem/Logger.h>
-#include <libsystem/io_new/Directory.h>
-#include <libsystem/io_new/Format.h>
 #include <libutils/json/Json.h>
 
 #include <libfilepicker/model/DirectoryListing.h>
@@ -11,11 +11,11 @@
 namespace filepicker
 {
 
-static auto get_icon_for_node(String current_directory, System::Directory::Entry &entry)
+static auto get_icon_for_node(String current_directory, IO::Directory::Entry &entry)
 {
     if (entry.stat.type == FILE_TYPE_DIRECTORY)
     {
-        auto manifest_path = System::format("{}/{}/manifest.json", current_directory, entry.name);
+        auto manifest_path = IO::format("{}/{}/manifest.json", current_directory, entry.name);
 
         auto root = json::parse_file(manifest_path);
 
@@ -131,7 +131,7 @@ void DirectoryListing::update()
 {
     _files.clear();
 
-    System::Directory directory{_navigation->current()};
+    IO::Directory directory{_navigation->current()};
 
     if (!directory.exist())
     {

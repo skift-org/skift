@@ -1,7 +1,7 @@
 #pragma once
 
 #include <abi/Handle.h>
-#include <libsystem/io_new/Seek.h>
+#include <libio/Seek.h>
 
 #include "kernel/node/Node.h"
 
@@ -43,7 +43,7 @@ public:
 
     ResultOr<size_t> write(const void *buffer, size_t size);
 
-    ResultOr<ssize64_t> seek(System::SeekFrom from);
+    ResultOr<ssize64_t> seek(IO::SeekFrom from);
 
     Result call(IOCall request, void *args);
 

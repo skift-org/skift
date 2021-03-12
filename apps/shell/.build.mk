@@ -1,4 +1,4 @@
 APPS += SHELL
 
 SHELL_NAME = shell
-SHELL_LIBS =
+SHELL_LIBS = io

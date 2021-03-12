@@ -1,6 +1,6 @@
+#include <libio/Directory.h>
+#include <libio/Format.h>
 #include <libsystem/io/File.h>
-#include <libsystem/io_new/Directory.h>
-#include <libsystem/io_new/Format.h>
 
 #include "panel/model/MenuEntry.h"
 
@@ -25,7 +25,7 @@ MenuEntry::MenuEntry(String id, const json::Value &value)
         command = v.as_string();
     });
 
-    auto bitmap = Bitmap::load_from(System::format("/Applications/{}/{}.png", id, id));
+    auto bitmap = Bitmap::load_from(IO::format("/Applications/{}/{}.png", id, id));
 
     if (bitmap != SUCCESS)
     {
@@ -46,7 +46,7 @@ Vector<MenuEntry> MenuEntry::load()
 
     entries = Vector<MenuEntry>{};
 
-    System::Directory directory{"/Applications"};
+    IO::Directory directory{"/Applications"};
 
     if (!directory.exist())
     {
@@ -60,7 +60,7 @@ Vector<MenuEntry> MenuEntry::load()
             continue;
         }
 
-        auto path = System::format("/Applications/{}/manifest.json", entry.name);
+        auto path = IO::format("/Applications/{}/manifest.json", entry.name);
 
         File manifest_file{path};
         if (manifest_file.exist())

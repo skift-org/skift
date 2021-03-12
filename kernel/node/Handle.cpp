@@ -151,7 +151,7 @@ ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
     return written;
 }
 
-ResultOr<ssize64_t> FsHandle::seek(System::SeekFrom from)
+ResultOr<ssize64_t> FsHandle::seek(IO::SeekFrom from)
 {
     _node->acquire(scheduler_running_id());
     size_t size = _node->size();
@@ -159,15 +159,15 @@ ResultOr<ssize64_t> FsHandle::seek(System::SeekFrom from)
 
     switch (from.whence)
     {
-    case System::Whence::START:
+    case IO::Whence::START:
         _offset = MAX(0, from.position);
         break;
 
-    case System::Whence::CURRENT:
+    case IO::Whence::CURRENT:
         _offset = _offset + from.position;
         break;
 
-    case System::Whence::END:
+    case IO::Whence::END:
         if (from.position < 0)
         {
             if ((size_t)-from.position <= size)

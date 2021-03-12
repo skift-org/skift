@@ -1,8 +1,8 @@
 
 #include <libfile/ZipArchive.h>
+#include <libio/Streams.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Filesystem.h>
-#include <libsystem/io_new/Streams.h>
 #include <libutils/ArgParse.h>
 #include <libutils/Path.h>
 
@@ -20,12 +20,12 @@ int main(int argc, char const *argv[])
 
     // Unzip all archives that were passed as arguments
     args.argv().foreach ([&](auto &path) {
-        System::errln("{}: Unzip '{}'", argv[0], path);
+        IO::errln("{}: Unzip '{}'", argv[0], path);
 
         File file{path};
         if (!file.exist())
         {
-            System::errln("{}: File does not exist '{}'", argv[0], path);
+            IO::errln("{}: File does not exist '{}'", argv[0], path);
             process_exit(PROCESS_FAILURE);
             return Iteration::STOP;
         }
@@ -34,7 +34,7 @@ int main(int argc, char const *argv[])
 
         if (!archive->valid())
         {
-            System::errln("{}: Failed to read zip archive '{}'", argv[0], path);
+            IO::errln("{}: Failed to read zip archive '{}'", argv[0], path);
             process_exit(PROCESS_FAILURE);
             return Iteration::STOP;
         }
@@ -42,12 +42,12 @@ int main(int argc, char const *argv[])
         unsigned int i = 0;
         for (const auto &entry : archive->entries())
         {
-            System::outln("{}: Entry: {} is being extracted...", argv[0], entry.name);
+            IO::outln("{}: Entry: {} is being extracted...", argv[0], entry.name);
 
             auto result = archive->extract(i, entry.name.cstring());
             if (result != Result::SUCCESS)
             {
-                System::errln("{}: Failed to extract entry '{}' with error '{}'", argv[0], entry.name, get_result_description(result));
+                IO::errln("{}: Failed to extract entry '{}' with error '{}'", argv[0], entry.name, get_result_description(result));
                 process_exit(PROCESS_FAILURE);
             }
             i++;

@@ -3,7 +3,7 @@
 #include <abi/Handle.h>
 #include <libutils/ResultOr.h>
 
-namespace System
+namespace IO
 {
 
 enum class Whence : uint8_t
@@ -34,9 +34,8 @@ struct SeekFrom
     }
 };
 
-class Seek
+struct Seek
 {
-public:
     virtual ResultOr<size_t> seek(SeekFrom from) = 0;
     virtual ResultOr<size_t> tell() = 0;
 
@@ -52,4 +51,4 @@ public:
     }
 };
 
-} // namespace System
+} // namespace IO

@@ -2,11 +2,11 @@
 
 #include <libutils/Path.h>
 
-#include <libsystem/Handle.h>
-#include <libsystem/io_new/Reader.h>
-#include <libsystem/io_new/Writer.h>
+#include <libio/Handle.h>
+#include <libio/Reader.h>
+#include <libio/Writer.h>
 
-namespace System
+namespace IO
 {
 
 class File final :
@@ -16,21 +16,26 @@ class File final :
     public RawHandle
 {
 private:
-    RefPtr<System::Handle> _handle;
+    RefPtr<Handle> _handle;
     Optional<Path> _path;
 
 public:
     const Optional<Path> &path() { return _path; }
 
     File(const char *path, OpenFlag flags);
+
     File(String path, OpenFlag flags);
+
     File(Path &path, OpenFlag flags);
-    File(RefPtr<System::Handle> handle);
+
+    File(RefPtr<Handle> handle);
 
     ResultOr<size_t> read(void *buffer, size_t size) override;
+
     ResultOr<size_t> write(const void *buffer, size_t size) override;
 
     ResultOr<size_t> seek(SeekFrom from) override;
+
     ResultOr<size_t> tell() override;
 
     ResultOr<size_t> length() override;
@@ -40,4 +45,4 @@ public:
     bool exist();
 };
 
-} // namespace System
+} // namespace IO

@@ -1,15 +1,11 @@
 #pragma once
 
-#include <string.h>
-
-#include <libutils/RefPtr.h>
+#include <libio/Writer.h>
+#include <libsystem/math/MinMax.h>
 #include <libutils/SliceStorage.h>
 #include <libutils/StringStorage.h>
 
-#include <libsystem/io_new/Writer.h>
-#include <libsystem/math/MinMax.h>
-
-namespace System
+namespace IO
 {
 
 class MemoryWriter :
@@ -110,4 +106,4 @@ public:
     }
 };
 
-} // namespace System
+} // namespace IO

@@ -13,7 +13,7 @@ public:
     virtual size_t position() override;
 
     virtual size_t read(void *buffer, size_t size) override;
-    virtual size_t seek(System::SeekFrom from) override;
+    virtual size_t seek(IO::SeekFrom from) override;
 
 private:
     const uint8_t *_data;

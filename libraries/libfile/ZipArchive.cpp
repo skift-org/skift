@@ -302,7 +302,7 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
 
     // Get a reader to the uncompressed data
     FileReader file_reader(_path);
-    file_reader.seek(System::SeekFrom::start(entry.archive_offset));
+    file_reader.seek(IO::SeekFrom::start(entry.archive_offset));
     ScopedReader scoped_reader(file_reader, entry.uncompressed_size);
 
     // Get a writer to the output
@@ -328,7 +328,7 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     for (const auto &entry : _entries)
     {
         FileReader file_reader(_path);
-        file_reader.seek(System::SeekFrom::start(entry.archive_offset));
+        file_reader.seek(IO::SeekFrom::start(entry.archive_offset));
 
         ScopedReader scoped_reader(file_reader, entry.compressed_size);
         logger_trace("Write existing local header: '%s'", entry.name.cstring());

@@ -586,7 +586,7 @@ Result hj_handle_seek(int handle, ssize64_t *offset, HjWhence whence, ssize64_t 
 
     auto &handles = scheduler_running()->handles();
 
-    auto seek_result = handles.seek(handle, {(System::Whence)whence, *offset});
+    auto seek_result = handles.seek(handle, {(IO::Whence)whence, *offset});
 
     if (result_offset != nullptr)
     {

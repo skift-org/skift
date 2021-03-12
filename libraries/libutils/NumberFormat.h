@@ -3,7 +3,7 @@
 #include <math.h>
 #include <string.h>
 
-#include <libsystem/io_new/Writer.h>
+#include <libio/Writer.h>
 #include <libutils/Strings.h>
 
 struct NumberFormat
@@ -39,7 +39,7 @@ struct NumberFormat
         return copy;
     }
 
-    ResultOr<size_t> format(System::Writer &writer, int64_t value)
+    ResultOr<size_t> format(IO::Writer &writer, int64_t value)
     {
         size_t written = 0;
 
@@ -52,7 +52,7 @@ struct NumberFormat
         return written + TRY(format(writer, (uint64_t)value));
     }
 
-    ResultOr<size_t> format(System::Writer &writer, uint64_t value)
+    ResultOr<size_t> format(IO::Writer &writer, uint64_t value)
     {
         if (value == 0)
         {
@@ -82,12 +82,12 @@ struct NumberFormat
         return writer.write(buffer, i);
     }
 
-    ResultOr<size_t> format(System::Writer &writer, float value)
+    ResultOr<size_t> format(IO::Writer &writer, float value)
     {
         return format(writer, (double)value);
     }
 
-    ResultOr<size_t> format(System::Writer &writer, double value)
+    ResultOr<size_t> format(IO::Writer &writer, double value)
     {
         size_t written = 0;
 

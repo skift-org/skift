@@ -1,6 +1,6 @@
-#include <libsystem/io_new/Directory.h>
+#include <libio/Directory.h>
 
-namespace System
+namespace IO
 {
 
 void Directory::read_entries()
@@ -40,7 +40,7 @@ Directory::Directory(const Path &path)
     read_entries();
 }
 
-Directory::Directory(RefPtr<System::Handle> handle)
+Directory::Directory(RefPtr<Handle> handle)
     : _handle{handle}
 {
     read_entries();
@@ -51,4 +51,4 @@ bool Directory::exist()
     return _handle->valid();
 }
 
-} // namespace System
+} // namespace IO

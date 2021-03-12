@@ -3,12 +3,13 @@
 #include <string.h>
 
 #include <libgraphic/Icon.h>
+#include <libio/Format.h>
 #include <libsystem/Logger.h>
-#include <libsystem/io_new/Format.h>
 #include <libutils/HashMap.h>
 #include <libutils/Path.h>
 
-static HashMap<String, RefPtr<Icon>> _icons{};
+static HashMap<String, RefPtr<Icon>>
+    _icons{};
 
 #define ICON_SIZE_NAME_ENTRY(__size) #__size,
 const char *_icon_size_names[] = {ICON_SIZE_LIST(ICON_SIZE_NAME_ENTRY)};
@@ -22,7 +23,7 @@ static RefPtr<Icon> icon_load(String name)
 
     for (size_t i = 0; i < __ICON_SIZE_COUNT; i++)
     {
-        auto path = System::format("/Files/Icons/{}@{}px.png", name, _icon_size_names[i]);
+        auto path = IO::format("/Files/Icons/{}@{}px.png", name, _icon_size_names[i]);
         auto bitmap_or_result = Bitmap::load_from(path);
 
         if (bitmap_or_result.success())

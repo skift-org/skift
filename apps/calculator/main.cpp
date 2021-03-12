@@ -1,6 +1,6 @@
+#include <libio/Format.h>
 #include <libutils/NumberFormat.h>
 #include <libutils/StringBuilder.h>
-#include <libsystem/io_new/Format.h>
 
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
@@ -21,13 +21,13 @@ int main(int argc, char **argv)
 
     auto calculator_observer = calculator.observe([&](Calculator &calculator) {
         window->with_widget<Label>("screen", [&](Label *label) {
-            label->text(System::format("{}", calculator.screen()));
+            label->text(IO::format("{}", calculator.screen()));
         });
     });
 
     for (int i = 0; i < 10; i++)
     {
-        auto button_name = System::format("button_{}", i);
+        auto button_name = IO::format("button_{}", i);
         window->with_widget<Button>(button_name, [&](auto button) {
             button->on(Event::ACTION, [&, i](auto) { calculator.enter_number(i); });
         });

@@ -1,10 +1,10 @@
 
+#include <libio/Directory.h>
+#include <libio/Streams.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/io_new/Directory.h>
-#include <libsystem/io_new/Streams.h>
 
 static bool option_all = false;
 static bool option_list = false;
@@ -40,29 +40,29 @@ const char *file_type_name[] = {
     "p", // Pipe
 };
 
-void ls_print_entry(System::Directory::Entry &entry)
+void ls_print_entry(IO::Directory::Entry &entry)
 {
     FileState stat = entry.stat;
 
     if (option_list)
     {
-        System::format(System::out(), "{}rwxrwxrwx {5} ", file_type_name[stat.type], stat.size);
+        IO::format(IO::out(), "{}rwxrwxrwx {5} ", file_type_name[stat.type], stat.size);
     }
 
     if (option_all || entry.name[0] != '.')
     {
-        System::format(System::out(), (stat.type == FILE_TYPE_DIRECTORY && option_color) ? "\e[1;34m{}\e[0m/ " : "{}  ", entry.name);
+        IO::format(IO::out(), (stat.type == FILE_TYPE_DIRECTORY && option_color) ? "\e[1;34m{}\e[0m/ " : "{}  ", entry.name);
     }
 
     if (option_list)
     {
-        System::out().write("\n");
+        IO::out().write("\n");
     }
 }
 
 Result ls(const char *target_path, bool with_prefix)
 {
-    System::Directory directory{target_path};
+    IO::Directory directory{target_path};
 
     if (!directory.exist())
     {
@@ -71,7 +71,7 @@ Result ls(const char *target_path, bool with_prefix)
 
     if (with_prefix)
     {
-        System::outln("{}:", target_path);
+        IO::outln("{}:", target_path);
     }
 
     for (auto entry : directory.entries())
@@ -81,7 +81,7 @@ Result ls(const char *target_path, bool with_prefix)
 
     if (!option_list)
     {
-        System::out("\n");
+        IO::out("\n");
     }
 
     return SUCCESS;

@@ -42,133 +42,133 @@ UTILITIES = \
 	YES \
 	ZIP
 
-BASENAME_LIBS =
+BASENAME_LIBS = io
 BASENAME_NAME = basename
 
-CAT_LIBS =
+CAT_LIBS = io
 CAT_NAME = cat
 
-CLEAR_LIBS =
+CLEAR_LIBS = io
 CLEAR_NAME = clear
 
-CP_LIBS =
+CP_LIBS = io
 CP_NAME = cp
 
-PLAY_LIBS =
+PLAY_LIBS = io
 PLAY_NAME = play
 
-DSTART_LIBS =
+DSTART_LIBS = io
 DSTART_NAME = dstart
 
-DIRNAME_LIBS =
+DIRNAME_LIBS = io
 DIRNAME_NAME = dirname
 
-ECHO_LIBS =
+ECHO_LIBS = io
 ECHO_NAME = echo
 
-ENV_LIBS =
+ENV_LIBS = io
 ENV_NAME = env
 
-GREP_LIBS =
+GREP_LIBS = io
 GREP_NAME = grep
 
-HEAD_LIBS =
+HEAD_LIBS = io
 HEAD_NAME = head
 
-HEXDUMP_LIBS =
+HEXDUMP_LIBS = io
 HEXDUMP_NAME = hexdump
 
-INIT_LIBS =
+INIT_LIBS = io
 INIT_NAME = init
 
-JSON_LIBS =
+JSON_LIBS = io
 JSON_NAME = json
 
-KILL_LIBS =
+KILL_LIBS = io
 KILL_NAME = kill
 
-LINK_LIBS =
+LINK_LIBS = io
 LINK_NAME = link
 
-LS_LIBS =
+LS_LIBS = io
 LS_NAME = ls
 
-MARKUP_LIBS = markup
+MARKUP_LIBS = markup io
 MARKUP_NAME = markup
 
-MKDIR_LIBS =
+MKDIR_LIBS = io
 MKDIR_NAME = mkdir
 
-MV_LIBS =
+MV_LIBS = io
 MV_NAME = mv
 
-NOW_LIBS =
+NOW_LIBS = io
 NOW_NAME = now
 
-OPEN_LIBS =
+OPEN_LIBS = io
 OPEN_NAME = open
 
-PANIC_LIBS =
+PANIC_LIBS = io
 PANIC_NAME = panic
 
-RMDIR_LIBS =
+RMDIR_LIBS = io
 RMDIR_NAME = rmdir
 
-SYSFETCH_LIBS =
+SYSFETCH_LIBS = io
 SYSFETCH_NAME = sysfetch
 
-TAC_LIBS =
+TAC_LIBS = io
 TAC_NAME = tac
 
-TOUCH_LIBS =
+TOUCH_LIBS = io
 TOUCH_NAME = touch
 
-UNLINK_LIBS =
+UNLINK_LIBS = io
 UNLINK_NAME = unlink
 
-UPTIME_LIBS =
+UPTIME_LIBS = io
 UPTIME_NAME = uptime
 
-UNAME_LIBS =
+UNAME_LIBS = io
 UNAME_NAME = uname
 
-TRUE_LIBS =
+TRUE_LIBS = io
 TRUE_NAME = true
 
-FALSE_LIBS =
+FALSE_LIBS = io
 FALSE_NAME = false
 
-YES_LIBS =
+YES_LIBS = io
 YES_NAME = yes
 
-PWD_LIBS =
+PWD_LIBS = io
 PWD_NAME = pwd
 
-PIANO_LIBS = 
+PIANO_LIBS = io
 PIANO_NAME = piano
 
-DISPLAYCTL_LIBS =
+DISPLAYCTL_LIBS = io
 DISPLAYCTL_NAME = displayctl
 
-KEYBOARDCTL_LIBS =
+KEYBOARDCTL_LIBS = io
 KEYBOARDCTL_NAME = keyboardctl
 
-NETCTL_LIBS =
+NETCTL_LIBS = io
 NETCTL_NAME = netctl
 
-POWERCTL_LIBS =
+POWERCTL_LIBS = io
 POWERCTL_NAME = powerctl
 
-SETTINGSCTL_LIBS = settings
+SETTINGSCTL_LIBS = settings io
 SETTINGSCTL_NAME = settingsctl
 
-WALLPAPERCTL_LIBS = graphic
+WALLPAPERCTL_LIBS = graphic io
 WALLPAPERCTL_NAME = wallpaperctl
 
-ZIP_LIBS = file
+ZIP_LIBS = file io
 ZIP_NAME = zip
 
-UNZIP_LIBS = file
+UNZIP_LIBS = file io
 UNZIP_NAME = unzip
 
 define UTIL_TEMPLATE =

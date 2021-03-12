@@ -1,9 +1,9 @@
 
-#include <libsystem/io_new/Streams.h>
+#include <libio/Streams.h>
 
 int main(int, const char *[])
 {
-    if (System::out("\e[H\e[2J").success())
+    if (IO::out("\e[H\e[2J").success())
     {
         return PROCESS_SUCCESS;
     }

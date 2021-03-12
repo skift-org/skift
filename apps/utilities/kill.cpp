@@ -17,12 +17,12 @@ int killall(String name)
 {
     if (name == "neko")
     {
-        System::errln("Don't kill nekos, your are a bad persone!");
+        IO::errln("Don't kill nekos, your are a bad persone!");
     }
 
     if (name == "cat")
     {
-        System::errln("Don't kill cats, you monster!");
+        IO::errln("Don't kill cats, you monster!");
     }
 
     auto processes = json::parse_file("/System/processes");

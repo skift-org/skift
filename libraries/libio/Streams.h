@@ -1,15 +1,9 @@
 #pragma once
 
-#include <libutils/String.h>
+#include <libio/Format.h>
+#include <libio/Handle.h>
 
-#include <libsystem/Handle.h>
-#include <libsystem/io_new/Format.h>
-#include <libsystem/io_new/MemoryWriter.h>
-#include <libsystem/io_new/Reader.h>
-#include <libsystem/io_new/Scanner.h>
-#include <libsystem/io_new/Writer.h>
-
-namespace System
+namespace IO
 {
 
 class InStream :
@@ -87,14 +81,14 @@ LogStream &log();
 
 static inline ResultOr<String> inln()
 {
-    Scanner<Reader &> scan{in()};
+    Scanner scan{in()};
     MemoryWriter writer{};
 
     while (!(scan.ended() || scan.current() == '\n'))
     {
         writer.write(scan.current());
         out().write(scan.current());
-        scan.foreward();
+        scan.forward();
     }
 
     out().write('\n');
@@ -106,14 +100,16 @@ static inline ResultOr<String> inln()
 template <Formatable... Args>
 static ResultOr<size_t> print(Writer &writer, const char *fmt, Args... args)
 {
-    StringScanner scan{fmt, strlen(fmt)};
+    MemoryReader memory{fmt};
+    Scanner scan{memory};
     return format(writer, scan, forward<Args>(args)...);
 }
 
 template <Formatable... Args>
 static ResultOr<size_t> println(Writer &writer, const char *fmt, Args... args)
 {
-    StringScanner scan{fmt, strlen(fmt)};
+    MemoryReader memory{fmt};
+    Scanner scan{memory};
     size_t written = TRY(format(writer, scan, forward<Args>(args)...));
     return written + TRY(writer.write('\n'));
 }
@@ -136,4 +132,4 @@ static ResultOr<size_t> log(const char *fmt, Args... args) { return print(log(),
 template <Formatable... Args>
 static ResultOr<size_t> logln(const char *fmt, Args... args) { return println(log(), fmt, forward<Args>(args)...); }
 
-} // namespace System
+} // namespace IO

@@ -1,9 +1,9 @@
 #include <abi/Syscalls.h>
 #include <skift/Environment.h>
 
+#include <libio/Directory.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Filesystem.h>
-#include <libsystem/io_new/Directory.h>
 #include <libsystem/process/Process.h>
 #include <libutils/Path.h>
 
@@ -18,12 +18,10 @@ Result __plug_process_set_directory(const char *path)
 {
     auto new_path = process_resolve(path);
 
-    System::Directory directory(new_path);
+    int handle;
 
-    if (!directory.exist())
-    {
-        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
-    }
+    TRY(hj_handle_open(&handle, path, strlen(path), OPEN_DIRECTORY));
+    TRY(hj_handle_close(handle));
 
     environment().get("POSIX").put("PWD", new_path);
 
@@ -146,7 +144,7 @@ Result __plug_handle_call(Handle *handle, IOCall request, void *args)
     return handle->result;
 }
 
-int __plug_handle_seek(Handle *handle, System::SeekFrom from)
+int __plug_handle_seek(Handle *handle, IO::SeekFrom from)
 {
     handle->result = hj_handle_seek(handle->id, &from.position, (HjWhence)from.whence, NULL);
 

@@ -2,9 +2,9 @@
 
 #include <libutils/ResultOr.h>
 
-#include <libsystem/io_new/Seek.h>
+#include <libio/Seek.h>
 
-namespace System
+namespace IO
 {
 
 class Reader
@@ -23,4 +23,4 @@ public:
 template <typename T>
 concept SeekableReader = IsBaseOf<Reader, T>::value &&IsBaseOf<Seek, T>::value;
 
-} // namespace System
+} // namespace IO

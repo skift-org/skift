@@ -37,7 +37,7 @@ struct ELFLoader
 
         task_memory_map(task, range.base(), range.size(), MEMORY_CLEAR);
 
-        stream_seek(elf_file, System::SeekFrom::start(program_header->offset));
+        stream_seek(elf_file, IO::SeekFrom::start(program_header->offset));
         size_t read = stream_read(elf_file, (void *)program_header->vaddr, program_header->filesz);
 
         if (read != program_header->filesz)
@@ -71,7 +71,7 @@ struct ELFLoader
         for (int i = 0; i < elf_header.phnum; i++)
         {
             Program elf_program_header;
-            stream_seek(elf_file, System::SeekFrom::start(elf_header.phoff + elf_header.phentsize * i));
+            stream_seek(elf_file, IO::SeekFrom::start(elf_header.phoff + elf_header.phentsize * i));
 
             if (stream_read(elf_file, &elf_program_header, sizeof(Program)) != sizeof(Program))
             {

@@ -30,7 +30,7 @@ int main(int argc, char const *argv[])
     {
         auto path = Path::parse(args.argv()[i]);
 
-        System::out("{}{c}", path.dirname(), terminator);
+        IO::out("{}{c}", path.dirname(), terminator);
     }
 
     return PROCESS_SUCCESS;

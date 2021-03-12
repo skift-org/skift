@@ -224,7 +224,7 @@ ResultOr<size_t> Handles::write(int handle_index, const void *buffer, size_t siz
     return result_or_written;
 }
 
-ResultOr<ssize64_t> Handles::seek(int handle_index, System::SeekFrom from)
+ResultOr<ssize64_t> Handles::seek(int handle_index, IO::SeekFrom from)
 {
     auto handle = acquire(handle_index);
 

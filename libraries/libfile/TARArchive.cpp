@@ -172,6 +172,6 @@ void TARArchive::read_archive()
             0,
         });
 
-        file_reader.seek(System::SeekFrom::current(__align_up(block.file_size(), 512)));
+        file_reader.seek(IO::SeekFrom::current(__align_up(block.file_size(), 512)));
     }
 }

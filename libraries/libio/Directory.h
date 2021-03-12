@@ -1,9 +1,9 @@
 #pragma once
 
-#include <libsystem/Handle.h>
+#include <libio/Handle.h>
 #include <libutils/Path.h>
 
-namespace System
+namespace IO
 {
 
 class Directory :
@@ -17,7 +17,7 @@ public:
     };
 
 private:
-    RefPtr<System::Handle> _handle;
+    RefPtr<Handle> _handle;
     Optional<Path> _path;
     Vector<Entry> _entries;
 
@@ -30,11 +30,11 @@ public:
     Directory(const char *path);
     Directory(String path);
     Directory(const Path &path);
-    Directory(RefPtr<System::Handle> handle);
+    Directory(RefPtr<Handle> handle);
 
     RefPtr<Handle> handle() override { return _handle; }
 
     bool exist();
 };
 
-} // namespace System
+} // namespace IO

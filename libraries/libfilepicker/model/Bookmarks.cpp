@@ -1,4 +1,4 @@
-#include <libsystem/io_new/File.h>
+#include <libio/File.h>
 #include <libutils/json/Json.h>
 
 #include <libfilepicker/model/Bookmarks.h>
@@ -76,7 +76,7 @@ void Bookmarks::save()
 
     auto data = pretty.finalize();
 
-    System::File file{"/Configs/file-manager/booksmark.json", OPEN_WRITE | OPEN_CREATE};
+    IO::File file{"/Configs/file-manager/booksmark.json", OPEN_WRITE | OPEN_CREATE};
     file.write(data.cstring(), data.length());
 }
 

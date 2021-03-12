@@ -5,7 +5,7 @@
 
 void SeekableReader::copy_to(Writer &writer)
 {
-    seek(System::SeekFrom::start(0));
+    seek(IO::SeekFrom::start(0));
 
     uint8_t copy_chunk[COPY_CHUNK_SIZE];
     size_t chunk_size = 0;

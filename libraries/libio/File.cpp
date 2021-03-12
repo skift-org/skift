@@ -1,6 +1,6 @@
-#include <libsystem/io_new/File.h>
+#include <libio/File.h>
 
-namespace System
+namespace IO
 {
 
 File::File(const char *path, OpenFlag flags)
@@ -21,7 +21,7 @@ File::File(Path &path, OpenFlag flags)
 {
 }
 
-File::File(RefPtr<System::Handle> handle)
+File::File(RefPtr<Handle> handle)
     : _handle{handle}
 {
 }
@@ -75,4 +75,4 @@ bool File::exist()
     return _handle->valid();
 }
 
-} // namespace System
+} // namespace IO

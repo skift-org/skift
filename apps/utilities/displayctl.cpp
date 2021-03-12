@@ -2,12 +2,12 @@
 
 #include <libutils/ArgParse.h>
 
+#include <libio/Format.h>
+#include <libio/Streams.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Socket.h>
-#include <libsystem/io_new/Format.h>
-#include <libsystem/io_new/Streams.h>
 
 #include "compositor/Protocol.h"
 
@@ -30,7 +30,7 @@ Optional<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
     {
         auto &gfx_mode = GFX_MODES[i];
 
-        if (System::format("{}x{}", gfx_mode.width, gfx_mode.height) == name)
+        if (IO::format("{}x{}", gfx_mode.width, gfx_mode.height) == name)
         {
             return gfx_mode;
         }
@@ -45,7 +45,7 @@ int gfxmode_list()
     {
         auto &gfx_mode = GFX_MODES[i];
 
-        System::outln("- {}x{}", gfx_mode.width, gfx_mode.height);
+        IO::outln("- {}x{}", gfx_mode.width, gfx_mode.height);
     }
 
     return PROCESS_SUCCESS;
@@ -61,9 +61,9 @@ int gfxmode_get(Stream *framebuffer_device)
         return PROCESS_FAILURE;
     }
 
-    System::outln("Height: {}\nWidth: {}\n",
-                  framebuffer_info.width,
-                  framebuffer_info.height);
+    IO::outln("Height: {}\nWidth: {}\n",
+              framebuffer_info.width,
+              framebuffer_info.height);
 
     return PROCESS_SUCCESS;
 }
@@ -108,7 +108,7 @@ int gfxmode_set(String &mode_name)
 
     if (!mode)
     {
-        System::errln("Error: unknow graphic mode: {}", mode_name);
+        IO::errln("Error: unknow graphic mode: {}", mode_name);
         return PROCESS_FAILURE;
     }
 
@@ -122,7 +122,7 @@ int gfxmode_set(String &mode_name)
 
     if (result == 0)
     {
-        System::outln("Graphic mode set to: {}", mode_name);
+        IO::outln("Graphic mode set to: {}", mode_name);
         return PROCESS_SUCCESS;
     }
     else

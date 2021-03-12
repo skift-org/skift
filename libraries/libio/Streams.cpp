@@ -1,6 +1,6 @@
-#include <libsystem/io_new/Streams.h>
+#include <libio/Streams.h>
 
-namespace System
+namespace IO
 {
 
 static InStream _in{};
@@ -16,4 +16,4 @@ ErrStream &err() { return _err; }
 
 LogStream &log() { return _log; }
 
-} // namespace System
+} // namespace IO

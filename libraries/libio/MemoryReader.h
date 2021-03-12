@@ -1,12 +1,10 @@
 #pragma once
 
-#include <assert.h>
-
-#include <libsystem/io_new/Reader.h>
+#include <libio/Reader.h>
 #include <libsystem/math/MinMax.h>
 #include <libutils/Slice.h>
 
-namespace System
+namespace IO
 {
 
 class MemoryReader final :
@@ -70,4 +68,4 @@ public:
     }
 };
 
-} // namespace System
+} // namespace IO

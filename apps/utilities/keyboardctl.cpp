@@ -3,38 +3,38 @@
 
 #include <libutils/ArgParse.h>
 
-#include <libsystem/io_new/Copy.h>
-#include <libsystem/io_new/Directory.h>
-#include <libsystem/io_new/File.h>
-#include <libsystem/io_new/Streams.h>
+#include <libio/Copy.h>
+#include <libio/Directory.h>
+#include <libio/File.h>
+#include <libio/Streams.h>
 
 int loadkey_list_keymap()
 {
-    System::Directory keymap_directory{"/Files/Keyboards"};
+    IO::Directory keymap_directory{"/Files/Keyboards"};
 
     if (!keymap_directory.exist())
     {
-        System::errln("keyboardctl: Failed to query keymaps from /Files/Keyboards");
+        IO::errln("keyboardctl: Failed to query keymaps from /Files/Keyboards");
         return PROCESS_FAILURE;
     }
 
     for (auto entry : keymap_directory.entries())
     {
         Path keymap_path = Path::parse(entry.name);
-        System::outln("- {}", keymap_path.basename_without_extension());
+        IO::outln("- {}", keymap_path.basename_without_extension());
     }
 
     return PROCESS_SUCCESS;
 }
 
-int loadkey_set_keymap(System::Handle &keyboard_device, String keymap_path)
+int loadkey_set_keymap(RefPtr<IO::Handle> keyboard_device, String keymap_path)
 {
-    System::File file{keymap_path, OPEN_READ};
-    auto read_all_result = System::read_all(file);
+    IO::File file{keymap_path, OPEN_READ};
+    auto read_all_result = IO::read_all(file);
 
     if (!read_all_result.success())
     {
-        System::errln("keyboardctl: Failed to open the keymap file: {}", read_all_result.description());
+        IO::errln("keyboardctl: Failed to open the keymap file: {}", read_all_result.description());
 
         return PROCESS_FAILURE;
     }
@@ -48,7 +48,7 @@ int loadkey_set_keymap(System::Handle &keyboard_device, String keymap_path)
         keymap->magic[2] != 'a' ||
         keymap->magic[3] != 'p')
     {
-        System::errln("keyboardctl: Invalid keymap file format!");
+        IO::errln("keyboardctl: Invalid keymap file format!");
 
         return PROCESS_FAILURE;
     }
@@ -58,31 +58,31 @@ int loadkey_set_keymap(System::Handle &keyboard_device, String keymap_path)
         .size = keymap_size,
     };
 
-    auto call_result = keyboard_device.call(IOCALL_KEYBOARD_SET_KEYMAP, &args);
+    auto call_result = keyboard_device->call(IOCALL_KEYBOARD_SET_KEYMAP, &args);
 
     if (call_result != SUCCESS)
     {
-        System::errln("keyboardctl: Failed to open the keymap file: {}", get_result_description(call_result));
+        IO::errln("keyboardctl: Failed to open the keymap file: {}", get_result_description(call_result));
 
         return PROCESS_FAILURE;
     }
 
-    System::outln("Keymap set to {}({})", keymap->language, keymap->region);
+    IO::outln("Keymap set to {}({})", keymap->language, keymap->region);
 
     return PROCESS_SUCCESS;
 }
 
-int loadkey_get_keymap(System::Handle &keyboard_device)
+int loadkey_get_keymap(RefPtr<IO::Handle> keyboard_device)
 {
     KeyMap keymap;
 
-    if (keyboard_device.call(IOCALL_KEYBOARD_GET_KEYMAP, &keymap) != SUCCESS)
+    if (keyboard_device->call(IOCALL_KEYBOARD_GET_KEYMAP, &keymap) != SUCCESS)
     {
-        System::errln("keyboardctl: Failed to retrived the current keymap");
+        IO::errln("keyboardctl: Failed to retrived the current keymap");
         return PROCESS_FAILURE;
     }
 
-    System::outln("Current keymap is {}({})", keymap.language, keymap.region);
+    IO::outln("Current keymap is {}({})", keymap.language, keymap.region);
 
     return PROCESS_SUCCESS;
 }
@@ -100,11 +100,11 @@ int main(int argc, const char *argv[])
 
     args.epiloge("Options can be combined.");
 
-    System::Handle keyboard_handle{KEYBOARD_DEVICE_PATH, OPEN_READ};
+    auto keyboard_handle = make<IO::Handle>(KEYBOARD_DEVICE_PATH, OPEN_READ);
 
-    if (!keyboard_handle.valid())
+    if (!keyboard_handle->valid())
     {
-        System::errln("keyboardctl: Failed to open the keyboard device");
+        IO::errln("keyboardctl: Failed to open the keyboard device");
 
         return PROCESS_FAILURE;
     }
@@ -118,7 +118,7 @@ int main(int argc, const char *argv[])
     });
 
     args.option_string('s', "set", "Set the current keyboard keymap.", [&](auto &keymap_name) {
-        auto kaymap_path = System::format("/Files/Keyboards/{}.kmap", keymap_name);
+        auto kaymap_path = IO::format("/Files/Keyboards/{}.kmap", keymap_name);
         return loadkey_set_keymap(keyboard_handle, kaymap_path);
     });
 

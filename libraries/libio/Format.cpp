@@ -1,14 +1,12 @@
+#include <libio/Format.h>
 #include <libutils/NumberFormat.h>
-#include <libutils/String.h>
 
-#include <libsystem/io_new/Format.h>
-
-namespace System
+namespace IO
 {
 
 ResultOr<size_t> Format::format(Writer &writer)
 {
-    return System::format(writer, "Object({#x})", reinterpret_cast<uintptr_t>(this));
+    return IO::format(writer, "Object({#x})", reinterpret_cast<uintptr_t>(this));
 }
 
 ResultOr<size_t> format(Writer &writer, const Formating &formating, char value)
@@ -85,4 +83,4 @@ ResultOr<size_t> format(Writer &writer, const Formating &, const String string)
     return writer.write(string.cstring());
 }
 
-} // namespace System
+} // namespace IO

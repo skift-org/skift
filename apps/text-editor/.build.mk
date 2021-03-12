@@ -1,5 +1,5 @@
 APPS += TEXT_EDITOR
 
 TEXT_EDITOR_NAME = text-editor
-TEXT_EDITOR_LIBS = widget settings graphic
+TEXT_EDITOR_LIBS = widget settings graphic io
 

@@ -3,7 +3,7 @@
 #include <libsettings/Path.h>
 #include <stdio.h>
 
-#include <libsystem/io_new/Directory.h>
+#include <libio/Directory.h>
 #include <libutils/Path.h>
 
 #include "settings-service/Domain.h"
@@ -18,7 +18,7 @@ struct Repository
     static Repository load()
     {
         Repository repository;
-        System::Directory dir_repository{"/Configs"};
+        IO::Directory dir_repository{"/Configs"};
 
         for (auto entry : dir_repository.entries())
         {
@@ -27,8 +27,8 @@ struct Repository
                 continue;
             }
 
-            auto domain_path = System::format("/Configs/{}", entry.name);
-            System::Directory dir_domain{domain_path};
+            auto domain_path = IO::format("/Configs/{}", entry.name);
+            IO::Directory dir_domain{domain_path};
 
             auto domain = Domain::load(domain_path);
 

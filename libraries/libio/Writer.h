@@ -1,16 +1,15 @@
 #pragma once
 
-#include <libutils/ResultOr.h>
+#include <string.h>
+
+#include <libio/Seek.h>
 #include <libutils/unicode/Codepoint.h>
 
-#include <libsystem/io_new/Seek.h>
-
-namespace System
+namespace IO
 {
 
-class Writer
+struct Writer
 {
-public:
     virtual ~Writer() { flush(); }
 
     virtual ResultOr<size_t> write(const void *buffer, size_t size) = 0;
@@ -34,4 +33,4 @@ public:
 template <typename T>
 concept SeekableWriter = IsBaseOf<Writer, T>::value &&IsBaseOf<Seek, T>::value;
 
-} // namespace System
+} // namespace IO

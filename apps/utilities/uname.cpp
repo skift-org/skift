@@ -1,7 +1,7 @@
 #include <abi/Syscalls.h>
 
+#include <libio/Streams.h>
 #include <libsystem/BuildInfo.h>
-#include <libsystem/io_new/Streams.h>
 #include <libsystem/system/System.h>
 #include <libutils/ArgParse.h>
 
@@ -58,35 +58,35 @@ int main(int argc, char const *argv[])
 
     if (argc == 1 || option_kernel_name || option_all)
     {
-        System::out("{} ", info.kernel_name);
+        IO::out("{} ", info.kernel_name);
     }
 
     if (option_nodename || option_all)
     {
-        System::out("{} ", info.machine);
+        IO::out("{} ", info.machine);
     }
 
     if (option_kernel_release || option_all)
     {
-        System::out("{} ", info.kernel_release);
+        IO::out("{} ", info.kernel_release);
     }
 
     if (option_kernel_version || option_all)
     {
-        System::out("{} ", info.kernel_build);
+        IO::out("{} ", info.kernel_build);
     }
 
     if (option_machine || option_all)
     {
-        System::out("{} ", __BUILD_TARGET__);
+        IO::out("{} ", __BUILD_TARGET__);
     }
 
     if (option_operating_system || option_all)
     {
-        System::out("{} ", info.system_name);
+        IO::out("{} ", info.system_name);
     }
 
-    System::out("\n");
+    IO::out("\n");
 
     return PROCESS_SUCCESS;
 }

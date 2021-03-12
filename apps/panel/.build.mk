@@ -1,4 +1,4 @@
 APPS += PANEL
 
 PANEL_NAME = panel
-PANEL_LIBS = widget settings graphic c
+PANEL_LIBS = widget settings graphic io

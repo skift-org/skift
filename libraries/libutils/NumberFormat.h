@@ -45,7 +45,7 @@ struct NumberFormat
 
         if (value < 0)
         {
-            written += TRY(writer.write('-'));
+            written += TRY(IO::write(writer, '-'));
             value = -value;
         }
 
@@ -56,7 +56,7 @@ struct NumberFormat
     {
         if (value == 0)
         {
-            return writer.write('0');
+            return IO::write(writer, '0');
         }
 
         size_t i = 0;
@@ -98,7 +98,7 @@ struct NumberFormat
 
         if (_precision > 0)
         {
-            written += TRY(writer.write('.'));
+            written += TRY(IO::write(writer, '.'));
 
             int64_t ifpart = fpart * pow(_base, _precision);
 

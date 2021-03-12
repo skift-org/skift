@@ -220,7 +220,7 @@ public:
             {
                 auto &opt = _option[i];
 
-                IO::out().write("    ");
+                IO::write(IO::out(), "    ");
 
                 if (opt.shortname != '\0')
                 {
@@ -228,16 +228,16 @@ public:
                 }
                 else
                 {
-                    IO::out().write("  ");
+                    IO::write(IO::out(), "  ");
                 }
 
                 if (opt.shortname && !opt.longname.null_or_empty())
                 {
-                    IO::out().write(", ");
+                    IO::write(IO::out(), ", ");
                 }
                 else
                 {
-                    IO::out().write("  ");
+                    IO::write(IO::out(), "  ");
                 }
 
                 if (!opt.longname.null_or_empty())
@@ -250,7 +250,7 @@ public:
 
                         for (size_t i = 0; i < computed_padding; i++)
                         {
-                            IO::out().write(" ");
+                            IO::write(IO::out(), " ");
                         }
                     }
                 }
@@ -258,7 +258,7 @@ public:
                 {
                     for (size_t i = 0; i < padding; i++)
                     {
-                        IO::out().write(" ");
+                        IO::write(IO::out(), " ");
                     }
                 }
 
@@ -267,10 +267,10 @@ public:
                     IO::format(IO::out(), " {}", opt.description);
                 }
 
-                IO::out().write("\n");
+                IO::write(IO::out(), "\n");
             }
 
-            IO::out().write("\n");
+            IO::write(IO::out(), "\n");
         }
 
         if (!_epiloge.null_or_empty())

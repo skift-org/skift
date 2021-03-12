@@ -56,7 +56,7 @@ void ls_print_entry(IO::Directory::Entry &entry)
 
     if (option_list)
     {
-        IO::out().write("\n");
+        IO::write(IO::out(), "\n");
     }
 }
 

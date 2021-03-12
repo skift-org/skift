@@ -3,7 +3,7 @@
 #include <libio/MemoryReader.h>
 #include <libio/MemoryWriter.h>
 #include <libio/Scanner.h>
-#include <libio/Writer.h>
+#include <libio/Write.h>
 #include <libutils/String.h>
 
 namespace IO
@@ -128,7 +128,7 @@ static inline ResultOr<size_t> format(IO::Writer &writer, Scanner &scan)
 
     while (!scan.ended())
     {
-        written += TRY(writer.write(scan.current()));
+        written += TRY(IO::write(writer, scan.current()));
         scan.forward();
     }
 
@@ -142,7 +142,7 @@ static inline ResultOr<size_t> format(Writer &writer, Scanner &scan, First first
 
     while (!scan.ended() && scan.current() != '{')
     {
-        written += TRY(writer.write(scan.current()));
+        written += TRY(IO::write(writer, scan.current()));
         scan.forward();
     }
 
@@ -188,7 +188,7 @@ static inline ResultOr<size_t> format(Writer &writer, const char *fmt, Args... a
 
 static inline ResultOr<size_t> format(Writer &writer, const char *fmt)
 {
-    return writer.write(fmt);
+    return IO::write(writer, fmt);
 }
 
 template <Formatable... Args>

@@ -1,33 +1,15 @@
 #pragma once
 
-#include <string.h>
-
 #include <libio/Seek.h>
-#include <libutils/unicode/Codepoint.h>
 
 namespace IO
 {
 
 struct Writer
 {
-    virtual ~Writer() { flush(); }
-
     virtual ResultOr<size_t> write(const void *buffer, size_t size) = 0;
 
-    virtual ResultOr<size_t> write(char v) { return write(&v, 1); }
-
-    virtual ResultOr<size_t> write(uint8_t v) { return write(&v, 1); }
-
-    ResultOr<size_t> write(const char *buffer) { return write(buffer, strlen(buffer)); }
-
     virtual Result flush() { return SUCCESS; }
-
-    ResultOr<size_t> write(Codepoint cp)
-    {
-        char buffer[5];
-        codepoint_to_utf8(cp, (uint8_t *)buffer);
-        return write(buffer);
-    }
 };
 
 template <typename T>

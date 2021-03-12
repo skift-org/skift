@@ -13,7 +13,7 @@ ResultOr<size_t> format(Writer &writer, const Formating &formating, char value)
 {
     if (formating.type == Formating::CHARACTER)
     {
-        return writer.write(value);
+        return IO::write(writer, value);
     }
     else
     {
@@ -25,7 +25,7 @@ ResultOr<size_t> format(Writer &writer, const Formating &formating, unsigned cha
 {
     if (formating.type == Formating::CHARACTER)
     {
-        return writer.write(value);
+        return IO::write(writer, value);
     }
     else
     {
@@ -75,12 +75,12 @@ ResultOr<size_t> format(Writer &writer, const Formating &, double value)
 
 ResultOr<size_t> format(Writer &writer, const Formating &, const char *cstring)
 {
-    return writer.write(cstring);
+    return IO::write(writer, cstring);
 }
 
 ResultOr<size_t> format(Writer &writer, const Formating &, const String string)
 {
-    return writer.write(string.cstring());
+    return IO::write(writer, string.cstring());
 }
 
 } // namespace IO

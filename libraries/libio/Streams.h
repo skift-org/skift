@@ -87,11 +87,11 @@ static inline ResultOr<String> inln()
     while (!(scan.ended() || scan.current() == '\n'))
     {
         writer.write(scan.current());
-        out().write(scan.current());
+        IO::write(out(), scan.current());
         scan.forward();
     }
 
-    out().write('\n');
+    IO::write(out(), '\n');
     scan.skip('\n');
 
     return String{writer.string()};
@@ -111,7 +111,7 @@ static ResultOr<size_t> println(Writer &writer, const char *fmt, Args... args)
     MemoryReader memory{fmt};
     Scanner scan{memory};
     size_t written = TRY(format(writer, scan, forward<Args>(args)...));
-    return written + TRY(writer.write('\n'));
+    return written + TRY(IO::write(writer, '\n'));
 }
 
 template <Formatable... Args>

@@ -1,4 +1,5 @@
 #include <libsystem/Logger.h>
+#include <libutils/ResultOr.h>
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/memory/Memory.h"

@@ -21,7 +21,7 @@ private:
     Optional<Path> _path;
     Vector<Entry> _entries;
 
-    void read_entries();
+    Result read_entries();
 
 public:
     const Optional<Path> &path() { return _path; }

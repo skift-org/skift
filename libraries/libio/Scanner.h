@@ -18,15 +18,17 @@ private:
 
     void refill()
     {
-        auto read_result = _reader.read_byte();
+        char c = 0x69;
+        auto read_result = _reader.read(&c, 1);
 
-        if (!read_result.success())
+        if (!read_result.success() ||
+            read_result.value() == 0)
         {
             _is_end_of_file = true;
             return;
         }
 
-        _peek.put(read_result.value());
+        _peek.put(c);
     }
 
 public:

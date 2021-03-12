@@ -3,20 +3,23 @@
 namespace IO
 {
 
-void Directory::read_entries()
+Result Directory::read_entries()
 {
     DirectoryEntry entry;
 
-    auto read_result = _handle->read(&entry, sizeof(entry));
-    while (read_result.success() && *read_result > 0)
+    auto read = TRY(_handle->read(&entry, sizeof(entry)));
+
+    while (read > 0)
     {
         _entries.push_back({entry.name, entry.stat});
-        read_result = _handle->read(&entry, sizeof(entry));
+        read = TRY(_handle->read(&entry, sizeof(entry)));
     }
 
     _entries.sort([](auto &left, auto &right) {
         return strcmp(left.name.cstring(), right.name.cstring());
     });
+
+    return SUCCESS;
 }
 
 Directory::Directory(const char *path)

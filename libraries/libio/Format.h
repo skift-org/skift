@@ -32,14 +32,14 @@ struct Formating
     bool prefix;
     Type type = DEFAULT;
 
-    static Formating parse(Scanner &scanner)
+    static Formating parse(Scanner &scan)
     {
         Formating format{};
 
-        scanner.skip('{');
+        scan.skip('{');
 
         auto parse_type = [&]() {
-            switch (scanner.current())
+            switch (scan.current())
             {
             case 's':
                 format.type = STRING;
@@ -70,27 +70,25 @@ struct Formating
             }
         };
 
-        if (scanner.current_is("scbdox"))
+        if (scan.current_is("scbdox"))
         {
             parse_type();
-            scanner.forward();
+            scan.forward();
         }
 
-        while (!scanner.ended() && scanner.current() != '}')
+        while (!scan.ended() && scan.current() != '}')
         {
-
-            scanner.forward();
+            scan.forward();
         }
 
-        scanner.skip('}');
+        scan.skip('}');
 
         return format;
     }
 };
 
-class Format
+struct Format
 {
-public:
     virtual ResultOr<size_t> format(IO::Writer &writer);
 };
 
@@ -124,33 +122,33 @@ ResultOr<size_t> format(IO::Writer &, const Formating &, const char *);
 
 ResultOr<size_t> format(IO::Writer &, const Formating &, const String);
 
-static inline ResultOr<size_t> format(IO::Writer &writer, Scanner &scanner)
+static inline ResultOr<size_t> format(IO::Writer &writer, Scanner &scan)
 {
     size_t written = 0;
 
-    while (!scanner.ended())
+    while (!scan.ended())
     {
-        written += TRY(writer.write(scanner.current()));
-        scanner.forward();
+        written += TRY(writer.write(scan.current()));
+        scan.forward();
     }
 
     return written;
 }
 
 template <Formatable First, Formatable... Args>
-static inline ResultOr<size_t> format(Writer &writer, Scanner &scanner, First first, Args... args)
+static inline ResultOr<size_t> format(Writer &writer, Scanner &scan, First first, Args... args)
 {
     size_t written = 0;
 
-    while (!(scanner.ended() || scanner.current() == '{'))
+    while (!scan.ended() && scan.current() != '{')
     {
-        written += TRY(writer.write(scanner.current()));
-        scanner.forward();
+        written += TRY(writer.write(scan.current()));
+        scan.forward();
     }
 
-    if (scanner.current() == '{')
+    if (scan.current() == '{')
     {
-        auto formating = Formating::parse(scanner);
+        auto formating = Formating::parse(scan);
 
         auto format_proxy = [&]() {
             if constexpr (IsBaseOf<Format, First>::value)
@@ -172,9 +170,9 @@ static inline ResultOr<size_t> format(Writer &writer, Scanner &scanner, First fi
         written += TRY(format_proxy());
     }
 
-    if (!scanner.ended())
+    if (!scan.ended())
     {
-        written += TRY(format(writer, scanner, forward<Args>(args)...));
+        written += TRY(format(writer, scan, forward<Args>(args)...));
     }
 
     return written;

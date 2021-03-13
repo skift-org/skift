@@ -1,40 +1,11 @@
 #include <libio/Directory.h>
 #include <libio/Streams.h>
-#include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Filesystem.h>
-#include <libutils/Path.h>
-#include <stdio.h>
+#include <libutils/ArgParse.h>
 
 static bool force = false;
 static bool remove_parents = false;
 static bool verbose = false;
-
-static const char *usages[] = {
-    "DIRECTORIES..."
-    "OPTIONS... DIRECTORIES...",
-    nullptr,
-};
-
-static CommandLineOption options[] = {
-    COMMANDLINE_OPT_HELP,
-
-    COMMANDLINE_OPT_BOOL("force", 'f', force,
-                         "ignore non-existent files and arguments",
-                         COMMANDLINE_NO_CALLBACK),
-    COMMANDLINE_OPT_BOOL("parents", 'p', remove_parents,
-                         "remove DIRECTORY and its ancestors; e.g., 'rmdir -p a/b/c' is similar to 'rmdir a/b/c a/b a'",
-                         COMMANDLINE_NO_CALLBACK),
-    COMMANDLINE_OPT_BOOL("verbose", 'v', verbose,
-                         "output a diagnostic for every directory processed",
-                         COMMANDLINE_NO_CALLBACK),
-    COMMANDLINE_OPT_END,
-};
-
-static CommandLine cmdline = CMDLINE(
-    usages,
-    options,
-    "Remove the DIRECTORY(ies), if they are empty.",
-    "Options can be combined.");
 
 Result rmdir(String path)
 {
@@ -49,38 +20,50 @@ Result rmdir(String path)
 
     if (unlink_result != SUCCESS)
     {
-        IO::errln("rmdir: successfully removed '{}': {}", path, get_result_description(unlink_result));
+        IO::errln("rmdir: could not remove '{}': {}", path, get_result_description(unlink_result));
     }
     else if (verbose)
     {
-        IO::errln("rmdir: successfully removed '{}': {}", path, get_result_description(unlink_result));
+        IO::errln("rmdir: successfully removed '{}'", path);
     }
 
     return unlink_result;
 }
 
-int main(int argc, char **argv)
+int main(int argc, const char *argv[])
 {
-    argc = cmdline_parse(&cmdline, argc, argv);
+    ArgParse args;
 
-    if (argc == 1)
+    args.show_help_if_no_operand_given();
+
+    args.usage("DIRECTORIES...");
+    args.usage("OPTIONS... DIRECTORIES...");
+
+    args.prologue("Delete the DIRECTORY or DIRECTORIES, if they are empty.");
+
+    args.option(force, 'f', "force", "ignore non-existent files and arguments");
+    args.option(remove_parents, 'p', "parents", "remove DIRECTORY and its ancestors; e.g., 'rmdir -p a/b/c' is similar to 'rmdir a/b/c a/b a'");
+    args.option(verbose, 'v', "verbose", "output a diagnostic for every directory processed");
+
+    args.epiloge("Options can be combined.");
+
+    if (args.eval(argc, argv) != PROCESS_SUCCESS)
     {
-        printf("rmdir: missing operand\nTry 'rmdir --help' for more information.\n");
         return PROCESS_FAILURE;
     }
 
-    for (int i = 1; i < argc; i++)
+    for (auto directory : args.argv())
     {
         if (!remove_parents)
         {
-            if (rmdir(argv[i]) != SUCCESS)
+            if (rmdir(directory) != SUCCESS)
             {
                 return PROCESS_FAILURE;
             }
         }
         else
         {
-            auto path = Path::parse(argv[i]);
+            auto path = Path::parse(directory);
 
             while (path.length() > 0)
             {

@@ -1,39 +1,33 @@
-#include <libsystem/cmdline/CMDLine.h>
-#include <libsystem/io/Stream.h>
 #include <skift/Time.h>
 
-#include <stdio.h>
+#include <libio/Streams.h>
+#include <libutils/ArgParse.h>
 
-static bool option_time = false;
-static bool option_date = false;
-static bool option_epoch = false;
-
-static const char *usages[] = {
-    "",
-    "OPTION...",
-    nullptr};
-
-static CommandLineOption options[] = {
-    COMMANDLINE_OPT_HELP,
-
-    COMMANDLINE_OPT_BOOL("time", 't', option_time, "Display the time of the day.", COMMANDLINE_NO_CALLBACK),
-    COMMANDLINE_OPT_BOOL("date", 'd', option_date, "Display today date.", COMMANDLINE_NO_CALLBACK),
-    COMMANDLINE_OPT_BOOL("epoch", 'e', option_epoch, "Display the current epoch.", COMMANDLINE_NO_CALLBACK),
-
-    COMMANDLINE_OPT_END,
-};
-
-static CommandLine cmdline = CMDLINE(
-    usages,
-    options,
-    "Get the time of the day.",
-    "Options can be combined.");
-
-int main(int argc, char **argv)
+int main(int argc, const char *argv[])
 {
-    argc = cmdline_parse(&cmdline, argc, argv);
+    ArgParse args;
 
-    if (!(option_time || option_date || option_epoch))
+    args.prologue("Get the time of the day.");
+    args.usage("");
+    args.usage("OPTION...");
+
+    bool option_time = false;
+    args.option(option_time, 't', "time", "Display the time of the day.");
+
+    bool option_date = false;
+    args.option(option_date, 'd', "date", "Display today date.");
+
+    bool option_epoch = false;
+    args.option(option_epoch, 'e', "epoch", "Display the current epoch.");
+
+    args.epiloge("Options can be combined.");
+
+    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    {
+        return PROCESS_FAILURE;
+    }
+
+    if (!option_time && !option_date && !option_epoch)
     {
         option_time = true;
         option_date = true;
@@ -45,20 +39,20 @@ int main(int argc, char **argv)
 
     if (option_time)
     {
-        printf("%d:%d:%d ", datetime.hour, datetime.minute, datetime.second);
+        IO::out("{}:{}:{} ", datetime.hour, datetime.minute, datetime.second);
     }
 
     if (option_date)
     {
-        printf("%d/%d/%d ", datetime.day, datetime.month, datetime.year);
+        IO::out("{}/{}/{} ", datetime.day, datetime.month, datetime.year);
     }
 
     if (option_epoch)
     {
-        printf("%d", timestamp);
+        IO::out("{}", timestamp);
     }
 
-    printf("\n");
+    IO::out("\n");
 
     return PROCESS_SUCCESS;
 }

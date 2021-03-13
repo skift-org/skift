@@ -7,6 +7,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/Socket.h>
+#include <libsystem/io/Stream.h>
 
 #include "compositor/Protocol.h"
 

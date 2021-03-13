@@ -1,3 +1,4 @@
+#include <libio/Streams.h>
 #include <libutils/ArgParse.h>
 #include <libutils/json/Json.h>
 
@@ -42,7 +43,7 @@ int main(int argc, char const *argv[])
 
         Prettifier pretty{options};
         json::prettify(pretty, root);
-        printf("%s", pretty.finalize().cstring());
+        IO::write(IO::out(), pretty.finalize());
     }
     else
     {
@@ -51,7 +52,7 @@ int main(int argc, char const *argv[])
 
             Prettifier pretty{options};
             json::prettify(pretty, root);
-            printf("%s", pretty.finalize().cstring());
+            IO::write(IO::out(), pretty.finalize());
 
             return Iteration::CONTINUE;
         });

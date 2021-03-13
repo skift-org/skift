@@ -43,19 +43,18 @@ int main(int argc, char const *argv[])
 
         Prettifier pretty{options};
         markup::prettify(pretty, root);
-        printf("%s", pretty.finalize().cstring());
+        IO::write(IO::out(), pretty.finalize());
     }
     else
     {
-        args.argv().foreach ([&](auto &path) {
+        for (auto path : args.argv())
+        {
             auto root = markup::parse_file(path.cstring());
 
             Prettifier pretty{options};
             markup::prettify(pretty, root);
-            printf("%s", pretty.finalize().cstring());
-
-            return Iteration::CONTINUE;
-        });
+            IO::write(IO::out(), pretty.finalize());
+        }
     }
 
     return PROCESS_SUCCESS;

@@ -1,16 +1,17 @@
 #pragma once
 
+#include <libio/MemoryReader.h>
+#include <libio/NumberScanner.h>
+#include <libio/Scanner.h>
 #include <libio/Streams.h>
+
 #include <libsystem/process/Process.h>
 
 #include <libutils/Callback.h>
 #include <libutils/Optional.h>
-#include <libutils/Scanner.h>
 #include <libutils/String.h>
 #include <libutils/Traits.h>
 #include <libutils/Vector.h>
-
-#include <stdio.h>
 
 class ArgParseContext
 {
@@ -154,10 +155,66 @@ public:
         });
     }
 
+    void option_int(char shortname, String longname, String description, Callback<int(int)> callback)
+    {
+        _option.push_back({
+            shortname,
+            longname,
+            description,
+
+            [this, callback](ArgParseContext &ctx) {
+                auto maybe_string = ctx.pop_operand();
+
+                if (!maybe_string)
+                {
+                    return usage();
+                }
+
+                IO::MemoryReader memory{*maybe_string};
+                IO::Scanner scan{memory};
+
+                auto maybe_value = IO::NumberScanner::decimal().scan_int(scan);
+
+                if (!maybe_value)
+                {
+                    return usage();
+                }
+
+                return callback(*maybe_value);
+            },
+        });
+    }
+
+    void option_bool(char shortname, String longname, String description, Callback<int(bool)> callback)
+    {
+        option(shortname, longname, description, [this, callback](ArgParseContext &ctx) {
+            bool value = true;
+
+            if (ctx.any())
+            {
+                if (ctx.current() == "true" ||
+                    ctx.current() == "yes")
+                {
+                    value = true;
+                    ctx.pop();
+                }
+
+                if (ctx.current() == "false" ||
+                    ctx.current() == "no")
+                {
+                    value = false;
+                    ctx.pop();
+                }
+            }
+
+            return callback(value);
+        });
+    }
+
     void option(bool &value, char shortname, String longname, String description)
     {
-        option(shortname, longname, description, [&](auto &) {
-            value = true;
+        option_bool(shortname, longname, description, [&](bool v) {
+            value = v;
             return PROCESS_SUCCESS;
         });
     }
@@ -310,7 +367,9 @@ public:
         while (context.any())
         {
             auto current = context.pop();
-            StringScanner scan{current.cstring(), current.length()};
+
+            IO::MemoryReader memory{current};
+            IO::Scanner scan{memory};
 
             if (scan.skip_word("--"))
             {
@@ -376,7 +435,7 @@ public:
                         return invalid_option(scan.current());
                     }
 
-                    scan.foreward();
+                    scan.forward();
                 }
             }
             else

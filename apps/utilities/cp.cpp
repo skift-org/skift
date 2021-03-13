@@ -17,13 +17,13 @@ int main(int argc, char **argv)
     }
 
     IO::File source{argv[1], OPEN_READ};
-    IO::File destination{argv[2], OPEN_WRITE};
+    IO::File destination{argv[2], OPEN_WRITE | OPEN_CREATE};
 
     Result result = IO::copy(source, destination);
 
     if (result != SUCCESS)
     {
-        IO::errln("{}: Failed to copy '{}' to '{}': {}", argv[1], argv[2], get_result_description(result));
+        IO::errln("{}: Failed to copy '{}' to '{}': {}", argv[0], argv[1], argv[2], get_result_description(result));
         return PROCESS_FAILURE;
     }
 

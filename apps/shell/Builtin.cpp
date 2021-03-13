@@ -1,9 +1,10 @@
 #include <assert.h>
-#include <libsystem/io/Stream.h>
+#include <stdio.h>
+
+#include <libio/Streams.h>
+
 #include <libsystem/process/Process.h>
 #include <libutils/NumberParser.h>
-#include <assert.h>
-#include <stdio.h>
 
 #include "shell/Shell.h"
 
@@ -20,11 +21,11 @@ int shell_builtin_cd(int argc, const char **argv)
 
     if (result != SUCCESS)
     {
-        stream_format(err_stream, "cd: Cannot access '%s': %s\n", new_directory, result_to_string(result));
-        return -1;
+        IO::errln("cd: Cannot access '{}': {}", new_directory, result_to_string(result));
+        return PROCESS_FAILURE;
     }
 
-    return 0;
+    return PROCESS_SUCCESS;
 }
 
 int shell_builtin_exit(int argc, const char **argv)
@@ -45,18 +46,19 @@ int shell_which(int argc, const char **argv)
 {
     for (int i = 1; i < argc; i++)
     {
-        char path[PATH_LENGTH];
-        if (find_command_path(path, argv[i]))
+        auto executable = find_command_path(argv[i]);
+
+        if (executable)
         {
-            printf("%s\n", path);
+            IO::outln("{}", *executable);
         }
         else
         {
-            stream_format(err_stream, "%s: not in POSIX.PATH", argv[i]);
+            IO::errln("{}: not in POSIX.PATH", argv[i]);
         }
     }
 
-    return 0;
+    return PROCESS_SUCCESS;
 }
 
 static ShellBuiltin _shell_builtins[] = {

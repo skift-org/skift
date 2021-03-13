@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include <libio/File.h>
+#include <libio/Format.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/io/Pipe.h>
@@ -13,53 +14,50 @@
 
 #include "shell/Shell.h"
 
-bool find_command_path(char *buffer, const char *command)
+Optional<String> find_command_path(String command)
 {
-    if (command[0] == '/' ||
-        command[0] == '.')
+    if (command[0] == '/' || command[0] == '.')
     {
-        snprintf(buffer, PATH_LENGTH, "%s", command);
-
-        IO::File file{buffer};
-        return file.exist();
+        IO::File file{command};
+        return file.exist() ? command : Optional<String>{};
     }
     else
     {
-        snprintf(buffer, PATH_LENGTH, "/Applications/%s/%s", command, command);
+        auto application_path = IO::format("/Applications/{}/{}", command, command);
 
-        IO::File file{buffer};
-        if (file.exist())
+        IO::File application_file{application_path};
+        if (application_file.exist())
         {
-            return true;
+            return application_path;
         }
 
         auto &path = environment().get("POSIX").get("PATH");
 
         for (size_t i = 0; i < path.length(); i++)
         {
-            snprintf(buffer, PATH_LENGTH, "%s/%s", path.get(i).as_string().cstring(), command);
+            auto utility_path = IO::format("{}/{}", path.get(i).as_string(), command);
 
-            IO::File{buffer};
-            if (file.exist())
+            IO::File utility_file{utility_path};
+            if (utility_file.exist())
             {
-                return true;
+                return utility_path;
             }
         }
     }
 
-    return false;
+    return {};
 }
 
 Result shell_exec(ShellCommand *command, Stream *instream, Stream *outstream, int *pid)
 {
-    char executable[PATH_LENGTH];
-    if (!find_command_path(executable, command->command))
+    auto executable = find_command_path(command->command);
+    if (!executable)
     {
         *pid = -1;
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    Launchpad *launchpad = launchpad_create(command->command, executable);
+    Launchpad *launchpad = launchpad_create(command->command, executable->cstring());
 
     list_foreach(char, arg, command->arguments)
     {

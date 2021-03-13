@@ -2,7 +2,7 @@
 
 #include "shell/Nodes.h"
 
-bool find_command_path(char *buffer, const char *command);
+Optional<String> find_command_path(String command);
 
 typedef int (*ShellBuiltinCallback)(int argc, const char **argv);
 

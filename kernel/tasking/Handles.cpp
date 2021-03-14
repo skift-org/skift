@@ -374,6 +374,15 @@ Result Handles::pipe(int *reader, int *writer)
 
 Result Handles::pass(Handles &handles, int source, int destination)
 {
+    {
+        LockHolder holder(_lock);
+
+        if (!is_valid_handle(source))
+        {
+            return ERR_BAD_HANDLE;
+        }
+    }
+
     auto handle = acquire(source);
 
     if (!handle)

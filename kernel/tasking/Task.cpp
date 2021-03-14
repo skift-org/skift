@@ -185,6 +185,8 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip)
     task->entry_point = (TaskEntryPoint)ip;
     task->user = true;
 
+    list_pushback(_tasks, task);
+
     task_go(task);
 
     return task;
@@ -251,7 +253,9 @@ Task *task_by_id(int id)
     list_foreach(Task, task, _tasks)
     {
         if (task->id == id)
+        {
             return task;
+        }
     }
 
     return nullptr;

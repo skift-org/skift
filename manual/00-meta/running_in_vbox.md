@@ -1,4 +1,3 @@
-![Banner](./header.png)
 # How to run skiftOS on Virtual Box
 
 ## Preparing the host OS
@@ -17,14 +16,14 @@
 7. Allocate a minimum of **128MB RAM** _(512MB recommended)_ and click on next.
 8. Choose **Do not add a virtual hard disk**, click on _Create_ and ignore the warning message and press **Continue**.
 
-  ![Steps 5-8 gif](running_in_vbox_step1.gif)
+![Steps 5-8 gif](running_in_vbox_step1.gif)
 
 9. Click on **Settings**, go to **Display** and increase **Video Memory** to 32MB.
 10. Next, click on **Storage** and under storage devices, click on the icon that looks like a _hard disk_ (located next to the CD icon) and in the window that appears,click on **Add**.
 11. Navigate to the `.hdd` file created in Step 3 and **choose** the file.
 12. You're all set to run skiftOS! Click on start to see it boot up.
 
-  ![Steps 9-12 gif](running_in_vbox_step2.gif)
+![Steps 9-12 gif](running_in_vbox_step2.gif)
 
 ## Increasing display resolution (optional)
 13. Click on **applications** and search for **terminal**.

@@ -1,9 +1,6 @@
-#include <stdio.h>
-
-#include <libsystem/Assert.h>
 #include <libutils/Path.h>
 
-#define TEST(__func) void __func()
+#include "tests/Driver.h"
 
 TEST(absolute_path_are_absolute)
 {
@@ -63,25 +60,10 @@ TEST(path_is_equal_to_its_normalized_counter_part)
     assert(p.string() == "/home/user/local");
 }
 
-TEST(joined_path_is_equal_to_its_normalized_counter_part)
+TEST(joined_path_are_equals)
 {
     auto p1 = Path::parse("/home/");
     auto p2 = Path::join(p1, "user/local");
 
     assert(p2.string() == "/home/user/local");
-}
-
-int main(int, char const *[])
-{
-    absolute_path_are_absolute();
-    absolute_path_are_no_relative();
-    relative_path_are_not_absolute();
-    relative_path_are_relative();
-    same_path_are_equals();
-    different_path_are_not_equals();
-    a_path_and_its_string_representation_are_equals();
-    path_is_equal_to_its_normalized_counter_part();
-    joined_path_is_equal_to_its_normalized_counter_part();
-
-    return 0;
 }

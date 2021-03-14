@@ -1,22 +1,27 @@
-#include <stdio.h>
-
-#include <libsystem/Assert.h>
 #include <libutils/String.h>
 
-int main(int, char const *[])
+#include "tests/Driver.h"
+
+TEST(string_with_content)
 {
     String hello_world = "Hello, world!";
 
     assert(hello_world == "Hello, world!");
     assert(hello_world != "Something else blablabla!");
     assert(!hello_world.null_or_empty());
+}
 
+TEST(empty_strings)
+{
     String empty = "";
 
     assert(empty == "");
     assert(empty != "Something else blablabla!");
     assert(empty.null_or_empty());
+}
 
+TEST(string_move_operator)
+{
     String first = "first";
     String second = "second";
 
@@ -24,6 +29,4 @@ int main(int, char const *[])
 
     assert(first == "second");
     assert(second == "first");
-
-    return 0;
 }

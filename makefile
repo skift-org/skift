@@ -92,6 +92,7 @@ include libraries/.build.mk
 include apps/.build.mk
 include icons/.build.mk
 include distros/.build.mk
+include tests/.build.mk
 
 # --- Ramdisk -------------------------------------------- #
 

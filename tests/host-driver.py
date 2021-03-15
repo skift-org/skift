@@ -11,7 +11,6 @@ qemu_command = [
     "-nographic",
     "-rtc", "base=localtime",
     "-no-reboot",
-    "-enable-kvm",
     "-m", "1G"]
 
 qemu_proc = subprocess.Popen(
@@ -26,7 +25,7 @@ while True:
     if qemu_proc.poll() != None:
         sys.exit(-1)
 
-    message = qemu_stdout.readline().decode().strip()
+    message = qemu_stdout.readline().decode(errors='replace').strip()
 
     if message == 'test: PASSED':
         qemu_proc.kill()

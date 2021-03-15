@@ -1,4 +1,4 @@
-name: Check
+name: Test
 
 on:
   push:
@@ -49,7 +49,7 @@ jobs:
 
       - name: Run all tests (x86_32)
         run: |
-          python python ./tests/host-driver.py ./disks/bootdisk-limine-x86_32.img
+          python ./tests/host-driver.py ./disks/bootdisk-limine-x86_32.img
 
       - name: Building skiftOS (x86_64)
         run: |

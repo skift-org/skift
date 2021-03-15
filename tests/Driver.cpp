@@ -65,7 +65,7 @@ int run_all_testes()
 {
     assert(_tests);
 
-    IO::errln("Running {} tests\n", _tests->count());
+    IO::errln("test: Running {} tests\n", _tests->count());
 
     int passed = 0;
     int failed = 0;
@@ -75,7 +75,7 @@ int run_all_testes()
 
     for (auto &test : *_tests)
     {
-        IO::err("test {} - {}... ", test.location.file, test.name);
+        IO::err("test: {}: \e[1m{}\e[m... ", test.location.file, test.name);
 
         int child_pid = -1;
         hj_process_clone(&child_pid);
@@ -96,7 +96,7 @@ int run_all_testes()
         }
         else
         {
-            IO::errln("\e[1;31mfailled\e[m");
+            IO::errln("\e[1;31mfailed\e[m");
             failed++;
         }
     }
@@ -116,9 +116,18 @@ int run_all_testes()
     }
 
     IO::errln("");
-    IO::errln("Took \e[1m{}ms\e[m", end_tick - start_tick);
-    IO::errln("Passed \e[1;32m{}\e[m", passed);
-    IO::errln("Failled \e[1;31m{}\e[m", failed);
+    IO::errln("test: Took \e[1m{}ms\e[m", end_tick - start_tick);
+    IO::errln("test: Passed \e[1;32m{}\e[m", passed);
+    IO::errln("test: Failled \e[1;31m{}\e[m", failed);
+
+    if (failed == 0)
+    {
+        IO::logln("test: PASSED");
+    }
+    else
+    {
+        IO::logln("test: FAILED");
+    }
 
     return 0;
 }

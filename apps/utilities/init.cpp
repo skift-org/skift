@@ -1,4 +1,5 @@
 #include <abi/Paths.h>
+#include <abi/Syscalls.h>
 
 #include <libsystem/Logger.h>
 #include <libsystem/io/Filesystem.h>
@@ -19,6 +20,15 @@ int main(int argc, char **argv)
     logger_info("Loading environement variables...");
 
     environment() = json::parse_file("/Configs/environment.json");
+
+    if (String{__CONFIG_TEST__} == "true")
+    {
+        int test_pid;
+        process_run("tests", &test_pid);
+        int test_result;
+        process_wait(test_pid, &test_result);
+        hj_system_shutdown();
+    }
 
     if (filesystem_exist(FRAMEBUFFER_DEVICE_PATH, FILE_TYPE_DEVICE))
     {

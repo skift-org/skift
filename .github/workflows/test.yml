@@ -45,12 +45,16 @@ jobs:
       - name: Building skiftOS (x86_32)
         run: |
           make clean
-          make all CONFIG=release CONFIG_ARCH=x86_32 CONFIG_LOADER=limine
+          make all CONFIG=test CONFIG_LOADER=limine CONFIG_ARCH=x86_32
+
+      - name: Run all tests (x86_32)
+        run: |
+          python python ./tests/host-driver.py ./disks/bootdisk-limine-x86_32.img
 
       - name: Building skiftOS (x86_64)
         run: |
           make clean
-          make all CONFIG=release CONFIG_ARCH=x86_64 CONFIG_LOADER=limine
+          make all CONFIG=test CONFIG_LOADER=limine CONFIG_ARCH=x86_64
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2

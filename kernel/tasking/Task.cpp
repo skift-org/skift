@@ -29,8 +29,6 @@ void Task::interrupt()
 {
     InterruptsRetainer retainer;
 
-    logger_trace("Interrupting syscall %d!", _current_syscall);
-
     _is_interrupted = true;
 
     if (_blocker)
@@ -49,7 +47,7 @@ Result Task::cancel(int exit_value)
     }
 
     _is_canceled = true;
-    exit_value = exit_value;
+    this->exit_value = exit_value;
 
     if (_is_doing_syscall)
     {

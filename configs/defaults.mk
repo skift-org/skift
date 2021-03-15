@@ -18,7 +18,8 @@ CONFIGS = \
 	CONFIG_MEMORY \
 	CONFIG_NAME \
 	CONFIG_OPTIMISATIONS \
-	CONFIG_VERSION
+	CONFIG_VERSION \
+	CONFIG_TEST
 
 CONFIG                ?=develop
 
@@ -71,6 +72,9 @@ CONFIG_NAME           ?=skift
 
 # The optimisation level used by the compiler.
 CONFIG_OPTIMISATIONS  ?=-O2
+
+# Should unit tests be run when the system start
+CONFIG_TEST           ?=false
 
 # The version number (usualy year.week).
 CONFIG_VERSION        ?=${shell date +'%y.%W'}

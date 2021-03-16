@@ -16,6 +16,9 @@ private:
     __SOURCE_LOCATION__ _last_acquire_location = INVALID_SOURCE_LOCATION;
     __SOURCE_LOCATION__ _last_release_location = INVALID_SOURCE_LOCATION;
 
+    __nonmovable(Lock);
+    __noncopyable(Lock);
+
     void ensure_failed(const char *raison, __SOURCE_LOCATION__ location)
     {
         __unused(raison);

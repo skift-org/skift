@@ -37,7 +37,7 @@ int vsnprintf(char *s, size_t n, const char *fmt, va_list va)
 
     info.format = fmt;
     info.append = string_printf_append;
-    info.output = (char *)s;
+    info.output = s;
     info.allocated = n;
 
     // We need it to start with a 0 because we use strapd.

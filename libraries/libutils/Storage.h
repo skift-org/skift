@@ -17,5 +17,7 @@ struct Storage : public RefCounted<Storage>
 
 struct RawStorage
 {
+    virtual ~RawStorage() {}
+
     virtual RefPtr<Storage> storage() = 0;
 };

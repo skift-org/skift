@@ -82,13 +82,13 @@ public:
     {
         if (bound().contains(position))
         {
-            _pixels[(int)(position.x() + position.y() * width())] = color;
+            _pixels[position.x() + position.y() * width()] = color;
         }
     }
 
     void set_pixel_no_check(Vec2i position, Color color)
     {
-        _pixels[(int)(position.x() + position.y() * width())] = color;
+        _pixels[position.x() + position.y() * width()] = color;
     }
 
     void blend_pixel(Vec2i position, Color color)

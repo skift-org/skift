@@ -20,6 +20,8 @@ public:
     {
     }
 
+    virtual ~DeviceMatcher() {}
+
     virtual bool match(DeviceAddress address) = 0;
 
     virtual RefPtr<Device> instance(DeviceAddress address) = 0;

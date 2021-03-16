@@ -277,8 +277,8 @@ unsigned long strtoul(const char *__restrict nptr, char **__restrict endptr, int
     {
         base = c == '0' ? 8 : 10;
     }
-    cutoff = (unsigned long)ULONG_MAX / (unsigned long)base;
-    cutlim = (unsigned long)ULONG_MAX % (unsigned long)base;
+    cutoff = ULONG_MAX / (unsigned long)base;
+    cutlim = ULONG_MAX % (unsigned long)base;
     for (acc = 0, any = 0;; c = *s++)
     {
         if (isdigit(c))
@@ -310,7 +310,7 @@ unsigned long strtoul(const char *__restrict nptr, char **__restrict endptr, int
     }
     if (any < 0)
     {
-        acc = (unsigned long)ULONG_MAX;
+        acc = ULONG_MAX;
     }
     else if (neg)
     {

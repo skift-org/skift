@@ -7,6 +7,8 @@ namespace IO
 
 struct Reader
 {
+    virtual ~Reader() {}
+
     virtual ResultOr<size_t> read(void *buffer, size_t size) = 0;
 };
 

@@ -7,6 +7,8 @@ namespace IO
 
 struct Writer
 {
+    virtual ~Writer() {}
+
     virtual ResultOr<size_t> write(const void *buffer, size_t size) = 0;
 
     virtual Result flush() { return SUCCESS; }

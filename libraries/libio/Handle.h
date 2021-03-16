@@ -108,6 +108,8 @@ public:
 
 struct RawHandle
 {
+    virtual ~RawHandle() {}
+
     virtual RefPtr<Handle> handle() = 0;
 };
 

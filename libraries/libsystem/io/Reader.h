@@ -27,4 +27,6 @@ public:
     }
 
     virtual void copy_to(Writer &writer);
+
+    virtual ~Reader() {}
 };

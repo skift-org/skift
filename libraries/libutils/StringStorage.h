@@ -14,6 +14,9 @@ private:
     size_t _length;
 
 public:
+    using Storage::end;
+    using Storage::start;
+
     const char *cstring() { return _buffer; }
 
     void *start() override { return _buffer; }

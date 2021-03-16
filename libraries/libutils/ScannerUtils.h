@@ -56,7 +56,7 @@ static inline const char *scan_json_escape_sequence(Scanner &scan)
             }
 
             uint32_t value = 0;
-            parse_uint(PARSER_HEXADECIMAL, buffer, 5, (unsigned int *)&value);
+            parse_uint(PARSER_HEXADECIMAL, buffer, 5, &value);
             return value;
         };
 
@@ -72,7 +72,7 @@ static inline const char *scan_json_escape_sequence(Scanner &scan)
         {
             // Not an UTF16 surrogate pair.
             static uint8_t utf8[5] = {};
-            codepoint_to_utf8((Codepoint)first_surrogate, utf8);
+            codepoint_to_utf8(first_surrogate, utf8);
             return (char *)utf8;
         }
 
@@ -94,7 +94,7 @@ static inline const char *scan_json_escape_sequence(Scanner &scan)
         Codepoint codepoint = 0x10000 + (((first_surrogate & 0x3FF) << 10) | (second_surrogate & 0x3FF));
 
         static uint8_t utf8[5] = {};
-        codepoint_to_utf8((Codepoint)codepoint, utf8);
+        codepoint_to_utf8(codepoint, utf8);
         return (char *)utf8;
     }
 

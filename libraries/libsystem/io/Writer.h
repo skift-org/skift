@@ -8,6 +8,8 @@ class SeekableReader;
 class Writer
 {
 public:
+    virtual ~Writer() {}
+
     virtual size_t length() = 0;
     virtual size_t position() = 0;
 

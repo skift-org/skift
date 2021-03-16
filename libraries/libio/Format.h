@@ -89,6 +89,7 @@ struct Formating
 
 struct Format
 {
+    virtual ~Format() {}
     virtual ResultOr<size_t> format(IO::Writer &writer);
 };
 

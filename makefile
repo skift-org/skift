@@ -35,7 +35,11 @@ BUILD_DIRECTORY_UTILITIES=$(SYSROOT)/System/Utilities
 BUILD_WARNING:= \
 	-Wall \
 	-Wextra  \
-	-Werror \
+	-Werror
+
+CXX_WARNINGS := \
+	-Wnon-virtual-dtor \
+	-Woverloaded-virtual
 
 BUILD_INCLUDE:= \
 	-I. \
@@ -69,6 +73,7 @@ CXXFLAGS:= \
 	-MD \
 	$(CONFIG_OPTIMISATIONS) \
 	$(BUILD_WARNING) \
+	$(CXX_WARNINGS) \
 	$(BUILD_INCLUDE) \
 	$(BUILD_DEFINES) \
 	$(BUILD_CONFIGS)

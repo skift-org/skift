@@ -24,7 +24,7 @@ ResultOr<size_t> FsPipe::read(FsHandle &handle, void *buffer, size_t size)
 {
     __unused(handle);
 
-    if (!writers())
+    if (!writers() && _buffer.empty())
     {
         return ERR_STREAM_CLOSED;
     }

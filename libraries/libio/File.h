@@ -19,6 +19,8 @@ private:
     RefPtr<Handle> _handle;
     Optional<Path> _path;
 
+    __nonmovable(File);
+
 public:
     const Optional<Path> &path() { return _path; }
 

@@ -93,11 +93,11 @@ public:
         return stat;
     }
 
-    ResultOr<Handle> accept()
+    ResultOr<RefPtr<Handle>> accept()
     {
         int connection_handle;
         _result = TRY(hj_handle_accept(_handle, &connection_handle));
-        return Handle{connection_handle};
+        return make<Handle>(connection_handle);
     }
 
     bool valid()

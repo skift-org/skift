@@ -18,6 +18,8 @@ private:
     __noncopyable(Handle);
 
 public:
+    int id() const { return _handle; }
+
     Handle(int handle) : _handle(handle), _result(handle != HANDLE_INVALID_ID ? SUCCESS : ERR_BAD_HANDLE)
     {
     }

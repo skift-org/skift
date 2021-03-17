@@ -27,6 +27,7 @@ public:
     const Optional<Path> &path() { return _path; }
     const Vector<Entry> &entries() { return _entries; }
 
+    Directory() {}
     Directory(const char *path);
     Directory(String path);
     Directory(const Path &path);

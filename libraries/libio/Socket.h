@@ -12,24 +12,26 @@ class Socket :
 private:
     RefPtr<Handle> _handle;
 
-    __nonmovable(Socket);
-
 public:
     RefPtr<Handle> handle() { return _handle; }
 
-    Socket(String &path, OpenFlag flags)
+    Socket()
+    {
+    }
+
+    Socket(String path, OpenFlag flags)
         : _handle{make<Handle>(path, flags)}
     {
     }
 
-    static ResultOr<Connection> Socket::connect(String path)
+    static ResultOr<Connection> connect(String path)
     {
         int hnd;
         TRY(hj_handle_connect(&hnd, path.cstring(), path.length()));
         return Connection{make<Handle>(hnd)};
     }
 
-    ResultOr<Connection> Socket::accept()
+    ResultOr<Connection> accept()
     {
         auto accept_result = _handle->accept();
         TRY(accept_result);

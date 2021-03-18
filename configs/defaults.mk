@@ -87,7 +87,7 @@ CONFIG_OPTIMISATIONS  ?=-O2
 CONFIG_VERSION        ?=${shell date +'%y.%W'}
 
 # Should unit tests be run when the system start
-CONFIG_IS_TEST           ?=false
+CONFIG_IS_TEST        ?=false
 
 # Is it a release
 CONFIG_IS_RELEASE     ?=false

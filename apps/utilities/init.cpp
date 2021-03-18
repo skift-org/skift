@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
     environment() = json::parse_file("/Configs/environment.json");
 
-    if (__CONFIG_IS_TEST__)
+    if constexpr(__CONFIG_IS_TEST__)
     {
         int test_pid;
         process_run("tests", &test_pid);

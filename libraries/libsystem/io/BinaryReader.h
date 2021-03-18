@@ -4,6 +4,7 @@
 #include <libsystem/io/SeekableReader.h>
 #include <libutils/Slice.h>
 #include <libutils/String.h>
+#include <libtest/AssertEqual.h>
 
 class BinaryReader : public SeekableReader
 {
@@ -25,14 +26,14 @@ public:
     inline T get()
     {
         T result;
-        assert(_reader.read(&result, sizeof(T)) == sizeof(T));
+        assert_equal(_reader.read(&result, sizeof(T)), sizeof(T));
         return result;
     }
 
     inline String get_fixed_len_string(size_t len)
     {
         char *cstr = new char[len];
-        assert(_reader.read(cstr, len) == len);
+        assert_equal(_reader.read(cstr, len), len);
         return String(make<StringStorage>(ADOPT, cstr, len));
     }
 

@@ -1,7 +1,7 @@
-#include <assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
 #include <libsystem/utils/Hexdump.h>
+#include <libtest/AssertFalse.h>
 
 #include "compositor/Client.h"
 #include "compositor/Cursor.h"
@@ -137,7 +137,7 @@ void Client::handle_goodbye()
 
 void Client::handle_request()
 {
-    assert(!_disconnected);
+    assert_false(_disconnected);
 
     CompositorMessage message = {};
     size_t message_size = connection_receive(_connection, &message, sizeof(CompositorMessage));

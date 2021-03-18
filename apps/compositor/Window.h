@@ -4,6 +4,7 @@
 #include <libutils/Rect.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
+#include <libtest/AssertTrue.h>
 
 #include "compositor/Protocol.h"
 
@@ -36,7 +37,7 @@ public:
 
     Bitmap &frontbuffer()
     {
-        assert(_frontbuffer);
+        assert_true(_frontbuffer);
         return *_frontbuffer;
     }
 

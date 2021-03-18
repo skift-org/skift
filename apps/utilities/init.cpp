@@ -10,6 +10,9 @@
 
 #include <stdio.h>
 
+#include <libtest/AssertFalse.h>
+#include <libtest/AssertTrue.h>
+
 int main(int argc, char **argv)
 {
     __unused(argc);

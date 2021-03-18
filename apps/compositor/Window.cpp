@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <libsystem/Logger.h>
 
 #include "compositor/Client.h"

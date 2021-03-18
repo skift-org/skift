@@ -7,7 +7,7 @@ namespace Test
 template <class A, class B>
 inline void _assert_equal(const A a, const B b, const char *file, const char *function, int line)
 {
-    if constexpr (!( __CONFIG_IS_RELEASE__ ))
+    if constexpr (!(__CONFIG_IS_RELEASE__))
     {
         if (a != b)
         {

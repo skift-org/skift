@@ -1,6 +1,4 @@
 
-#include <assert.h>
-
 #include "demo/Demos.h"
 
 static RefPtr<Bitmap> _test_image = nullptr;

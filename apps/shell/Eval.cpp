@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <skift/Environment.h>
 #include <stdio.h>
 
@@ -10,6 +9,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
+#include <libtest/AssertTrue.h>
 #include <libutils/Path.h>
 
 #include "shell/Shell.h"
@@ -140,7 +140,7 @@ int shell_eval(ShellNode *node, Stream *instream, Stream *outstream)
         {
             ShellCommand *command = nullptr;
             list_peekat(pipeline->commands, i, (void **)&command);
-            assert(command);
+            assert_true(command);
 
             Stream *command_stdin = instream;
             Stream *command_stdout = outstream;
@@ -148,14 +148,14 @@ int shell_eval(ShellNode *node, Stream *instream, Stream *outstream)
             if (i > 0)
             {
                 Pipe *input_pipe;
-                assert(list_peekat(pipes, i - 1, (void **)&input_pipe));
+                assert_true(list_peekat(pipes, i - 1, (void **)&input_pipe));
                 command_stdin = input_pipe->out;
             }
 
             if (i < pipeline->commands->count() - 1)
             {
                 Pipe *output_pipe;
-                assert(list_peekat(pipes, i, (void **)&output_pipe));
+                assert_true(list_peekat(pipes, i, (void **)&output_pipe));
                 command_stdout = output_pipe->in;
             }
 

@@ -19,7 +19,16 @@ CONFIGS = \
 	CONFIG_NAME \
 	CONFIG_OPTIMISATIONS \
 	CONFIG_VERSION \
-	CONFIG_TEST \
+	CONFIG_IS_TEST \
+	CONFIG_IS_RELEASE
+
+CONFIGS_PASS_TO_COMPILER = \
+	CONFIG \
+	CONFIG_ARCH \
+	CONFIG_KEYBOARD_LAYOUT \
+	CONFIG_NAME \
+	CONFIG_VERSION \
+	CONFIG_IS_TEST \
 	CONFIG_IS_RELEASE
 
 CONFIG                ?=develop
@@ -74,20 +83,20 @@ CONFIG_NAME           ?=skift
 # The optimisation level used by the compiler.
 CONFIG_OPTIMISATIONS  ?=-O2
 
-# Should unit tests be run when the system start
-CONFIG_TEST           ?=false
-
 # The version number (usualy year.week).
 CONFIG_VERSION        ?=${shell date +'%y.%W'}
+
+# Should unit tests be run when the system start
+CONFIG_IS_TEST           ?=false
 
 # Is it a release
 CONFIG_IS_RELEASE     ?=false
 
 define BUILD_CONFIG_TEMPLATE =
--D__$(1)__=\""$($(1))"\"
+-D__$(1)__=$(if $(filter $($(1)),true),1,$(if $(filter false, $($(1))),0,\""$($(1))"\"))
 endef
 
-BUILD_CONFIGS := $(foreach cfg, $(CONFIGS), $(call BUILD_CONFIG_TEMPLATE,$(cfg)))
+BUILD_CONFIGS := $(foreach cfg, $(CONFIGS_PASS_TO_COMPILER), $(call BUILD_CONFIG_TEMPLATE,$(cfg)))
 
 print-config:
 	@echo $(BUILD_CONFIGS)

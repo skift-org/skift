@@ -140,13 +140,13 @@ int main(int argc, char const *argv[])
 
     process_run("panel", nullptr);
 
-    if (strcmp(__CONFIG__, "develop") == 0)
+    if (__CONFIG_IS_RELEASE__)
     {
-        process_run("terminal", nullptr);
+        process_run("onboarding", nullptr);
     }
     else
     {
-        process_run("onboarding", nullptr);
+        process_run("terminal", nullptr);
     }
 
     return EventLoop::run();

@@ -83,4 +83,9 @@ ResultOr<size_t> format(Writer &writer, const Formating &, const String string)
     return IO::write(writer, string.cstring());
 }
 
+ResultOr<size_t> format(Writer &writer, const Formating &, const Path path)
+{
+    return IO::write(writer, path.string());
+}
+
 } // namespace IO

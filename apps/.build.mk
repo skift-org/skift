@@ -20,10 +20,10 @@ $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/%: apps/$($(1)_NAME)/%
 	$$(DIRECTORY_GUARD)
 	cp $$< $$@
 
-$$($(1)_BINARY): $$($(1)_OBJECTS) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a, $$($(1)_LIBS) system c) $(CRTS)
+$$($(1)_BINARY): $$($(1)_OBJECTS) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a, $$($(1)_LIBS) c) $(CRTS)
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [LD] $($(1)_NAME)
-	@$(CXX) $(LDFLAGS) -o $$@ $$($(1)_OBJECTS) $$(patsubst %, -l%, $$($(1)_LIBS)) -lsystem
+	@$(CXX) $(LDFLAGS) -o $$@ $$($(1)_OBJECTS) $$(patsubst %, -l%, $$($(1)_LIBS))
 	@if $(CONFIG_STRIP); then \
 		echo [$(1)] [STRIP] $($(1)_NAME); \
 		$(STRIP) $$@; \

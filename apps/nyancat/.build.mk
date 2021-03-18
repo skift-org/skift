@@ -1,4 +1,4 @@
 APPS += NYANCAT
 
 NYANCAT_NAME = nyancat
-NYANCAT_LIBS = io
+NYANCAT_LIBS = system io

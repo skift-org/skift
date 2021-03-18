@@ -42,133 +42,133 @@ UTILITIES = \
 	YES \
 	ZIP
 
-BASENAME_LIBS = io
+BASENAME_LIBS = system io
 BASENAME_NAME = basename
 
-CAT_LIBS = io
+CAT_LIBS = system io
 CAT_NAME = cat
 
-CLEAR_LIBS = io
+CLEAR_LIBS = system io
 CLEAR_NAME = clear
 
-CP_LIBS = io
+CP_LIBS = system io
 CP_NAME = cp
 
-PLAY_LIBS = io
+PLAY_LIBS = system io
 PLAY_NAME = play
 
-DSTART_LIBS = io
+DSTART_LIBS = system io
 DSTART_NAME = dstart
 
-DIRNAME_LIBS = io
+DIRNAME_LIBS = system io
 DIRNAME_NAME = dirname
 
-ECHO_LIBS = io
+ECHO_LIBS = system io
 ECHO_NAME = echo
 
-ENV_LIBS = io
+ENV_LIBS = system io
 ENV_NAME = env
 
-GREP_LIBS = io
+GREP_LIBS = system io
 GREP_NAME = grep
 
-HEAD_LIBS = io
+HEAD_LIBS = system io
 HEAD_NAME = head
 
-HEXDUMP_LIBS = io
+HEXDUMP_LIBS = system io
 HEXDUMP_NAME = hexdump
 
-INIT_LIBS = io
+INIT_LIBS = system io
 INIT_NAME = init
 
-JSON_LIBS = io
+JSON_LIBS = system io
 JSON_NAME = json
 
-KILL_LIBS = io
+KILL_LIBS = system io
 KILL_NAME = kill
 
-LINK_LIBS = io
+LINK_LIBS = system io
 LINK_NAME = link
 
-LS_LIBS = io
+LS_LIBS = system io
 LS_NAME = ls
 
-MARKUP_LIBS = markup io
+MARKUP_LIBS = markup system io
 MARKUP_NAME = markup
 
-MKDIR_LIBS = io
+MKDIR_LIBS = system io
 MKDIR_NAME = mkdir
 
-MV_LIBS = io
+MV_LIBS = system io
 MV_NAME = mv
 
-NOW_LIBS = io
+NOW_LIBS = system io
 NOW_NAME = now
 
-OPEN_LIBS = io
+OPEN_LIBS = system io
 OPEN_NAME = open
 
-PANIC_LIBS = io
+PANIC_LIBS = system io
 PANIC_NAME = panic
 
-RMDIR_LIBS = io
+RMDIR_LIBS = system io
 RMDIR_NAME = rmdir
 
-SYSFETCH_LIBS = io
+SYSFETCH_LIBS = system io
 SYSFETCH_NAME = sysfetch
 
-TAC_LIBS = io
+TAC_LIBS = system io
 TAC_NAME = tac
 
-TOUCH_LIBS = io
+TOUCH_LIBS = system io
 TOUCH_NAME = touch
 
-UNLINK_LIBS = io
+UNLINK_LIBS = system io
 UNLINK_NAME = unlink
 
-UPTIME_LIBS = io
+UPTIME_LIBS = system io
 UPTIME_NAME = uptime
 
-UNAME_LIBS = io
+UNAME_LIBS = system io
 UNAME_NAME = uname
 
-TRUE_LIBS = io
+TRUE_LIBS = system io
 TRUE_NAME = true
 
-FALSE_LIBS = io
+FALSE_LIBS = system io
 FALSE_NAME = false
 
-YES_LIBS = io
+YES_LIBS = system io
 YES_NAME = yes
 
-PWD_LIBS = io
+PWD_LIBS = system io
 PWD_NAME = pwd
 
-PIANO_LIBS = io
+PIANO_LIBS = system io
 PIANO_NAME = piano
 
-DISPLAYCTL_LIBS = io
+DISPLAYCTL_LIBS = system io
 DISPLAYCTL_NAME = displayctl
 
-KEYBOARDCTL_LIBS = io
+KEYBOARDCTL_LIBS = system io
 KEYBOARDCTL_NAME = keyboardctl
 
-NETCTL_LIBS = io
+NETCTL_LIBS = system io
 NETCTL_NAME = netctl
 
-POWERCTL_LIBS = io
+POWERCTL_LIBS = system io
 POWERCTL_NAME = powerctl
 
-SETTINGSCTL_LIBS = settings io
+SETTINGSCTL_LIBS = settings system io
 SETTINGSCTL_NAME = settingsctl
 
-WALLPAPERCTL_LIBS = graphic io
+WALLPAPERCTL_LIBS = graphic system io
 WALLPAPERCTL_NAME = wallpaperctl
 
-ZIP_LIBS = file io
+ZIP_LIBS = file system io
 ZIP_NAME = zip
 
-UNZIP_LIBS = file io
+UNZIP_LIBS = file system io
 UNZIP_NAME = unzip
 
 define UTIL_TEMPLATE =

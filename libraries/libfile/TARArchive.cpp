@@ -105,7 +105,7 @@ Result TARArchive::read_archive()
 {
     _valid = false;
 
-    IO::File archive_file{_path};
+    IO::File archive_file{_path, OPEN_READ};
 
     // Archive does not exist
     if (!archive_file.exist())

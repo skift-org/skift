@@ -9,7 +9,7 @@ inline void _assert_not_equal(const A a, const B b, const char *file, const char
 {
     if constexpr (!(__CONFIG_IS_RELEASE__))
     {
-        if (a != b)
+        if (a == b)
         {
             assert_failed(IO::format("{} equals {}", a, b).cstring(), file, function, line);
         }
@@ -19,5 +19,5 @@ inline void _assert_not_equal(const A a, const B b, const char *file, const char
 } // namespace Test
 
 #ifndef assert_not_equal
-#    define assert_not_equal(_a, _b) _assert_not_equal(_a, _b, __FILE__, __FUNCTION__, __LINE__)
+#    define assert_not_equal(_a, _b) Test::_assert_not_equal(_a, _b, __FILE__, __FUNCTION__, __LINE__)
 #endif

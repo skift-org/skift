@@ -19,7 +19,8 @@ CONFIGS = \
 	CONFIG_NAME \
 	CONFIG_OPTIMISATIONS \
 	CONFIG_VERSION \
-	CONFIG_TEST
+	CONFIG_TEST \
+	CONFIG_IS_RELEASE
 
 CONFIG                ?=develop
 
@@ -78,6 +79,9 @@ CONFIG_TEST           ?=false
 
 # The version number (usualy year.week).
 CONFIG_VERSION        ?=${shell date +'%y.%W'}
+
+# Is it a release
+CONFIG_IS_RELEASE     ?=false
 
 define BUILD_CONFIG_TEMPLATE =
 -D__$(1)__=\""$($(1))"\"

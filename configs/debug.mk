@@ -3,3 +3,4 @@ CONFIG_NOSHUTDOWN    ?=true
 CONFIG_OPTIMISATIONS ?=-g
 CONFIG_LTO           ?=false
 CONFIG_STRIP		 ?=false
+CONFIG_IS_RELEASE    ?=false

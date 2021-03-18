@@ -4,3 +4,5 @@ CONFIG_OPTIMISATIONS ?=-g -O2
 CONFIG_LTO           ?=false
 CONFIG_STRIP		 ?=false
 CONFIG_TEST 		 ?=true
+CONFIG_IS_RELEASE    ?=false
+

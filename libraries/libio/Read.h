@@ -24,6 +24,13 @@ ResultOr<size_t> read(Reader &reader, Vector<T> &vector)
     return read;
 }
 
+inline String read_string(Reader &reader, size_t len)
+{
+    char *cstr = new char[len];
+    assert_equal(_reader.read(cstr, len), len);
+    return String(make<StringStorage>(ADOPT, cstr, len));
+}
+
 // Peek & Get functons
 template <typename T, typename R>
 requires SeekableReader<R> inline T peek(R &reader)

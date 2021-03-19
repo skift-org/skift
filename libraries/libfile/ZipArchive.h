@@ -14,8 +14,5 @@ public:
 
 private:
     void read_archive();
-    Result read_central_directory(IO::Reader &reader);
-
     void write_archive();
-    void write_entry(const Entry &entry, IO::Writer &writer, IO::Reader &compressed_data);
 };

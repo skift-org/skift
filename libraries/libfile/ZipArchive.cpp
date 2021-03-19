@@ -145,7 +145,7 @@ requires IO::SeekableReader<SR> void read_local_headers(SR &reader)
         entry.compression = local_header.compression();
 
         // Read the filename of this entry
-        entry.name = reader.get_fixed_len_string(local_header.len_filename());
+        entry.name = IO::read_string(reader, local_header.len_filename());
         logger_trace("Found local header: '%s'", entry.name.cstring());
 
         // Read extra fields
@@ -172,13 +172,15 @@ requires IO::SeekableReader<SR> void read_local_headers(SR &reader)
     }
 }
 
-Result ZipArchive::read_central_directory(IO::Reader &reader)
+template <typename SR>
+requires IO::SeekableReader<SR>
+Result ZipArchive::read_central_directory(SR &reader)
 {
     // Central directory starts here
-    while (reader.position() < (reader.length() - sizeof(CentralDirectoryFileHeader)))
+    while (reader.tell() < (reader.length() - sizeof(CentralDirectoryFileHeader)))
     {
         logger_trace("Read central directory header: '%s'", _path.string().cstring());
-        auto cd_file_header = reader.peek<CentralDirectoryFileHeader>();
+        auto cd_file_header = IO::peek<CentralDirectoryFileHeader>(reader);
 
         // Check if this is a central directory file header
         if (cd_file_header.signature() != ZIP_CENTRAL_DIR_HEADER_SIG)
@@ -187,9 +189,9 @@ Result ZipArchive::read_central_directory(IO::Reader &reader)
         }
 
         // Read the central directory entry
-        reader.skip(sizeof(CentralDirectoryFileHeader));
+        IO::skip(reader, sizeof(CentralDirectoryFileHeader));
 
-        String name = reader.get_fixed_len_string(cd_file_header.len_filename());
+        String name = IO::read_string(reader, cd_file_header.len_filename());
         logger_trace("Found central directory header: '%s'", name.cstring());
 
         IO::skip(reader, cd_file_header.len_extrafield());
@@ -227,7 +229,7 @@ void ZipArchive::read_archive()
     // A valid zip must atleast contain a "CentralDirectoryEndRecord"
     if (file.length() < sizeof(CentralDirectoryEndRecord))
     {
-        logger_error("Archive is too small to be a valid .zip: %s %u", _path.string().cstring(), file_reader.length());
+        logger_error("Archive is too small to be a valid .zip: %s %u", _path.string().cstring(), file.length());
         return;
     }
 
@@ -242,11 +244,12 @@ void ZipArchive::read_archive()
     _valid = true;
 }
 
-void ZipArchive::write_entry(const Entry &entry, IO::Writer &writer, IO::Reader &compressed)
+template <typename SR>
+requires IO::SeekableReader<SR> void write_entry(const Archive::Entry &entry, IO::Writer &writer, SR &compressed)
 {
     LocalHeader header;
     header.flags = EF_NONE;
-    header.compressed_size = compressed.length();
+    header.compressed_size = compressed.length().value();
     header.compression = CM_DEFLATED;
     header.uncompressed_size = entry.uncompressed_size;
     header.len_filename = entry.name.length();
@@ -254,8 +257,8 @@ void ZipArchive::write_entry(const Entry &entry, IO::Writer &writer, IO::Reader 
     header.signature = ZIP_LOCAL_DIR_HEADER_SIG;
 
     // Write data
-    writer.put(header);
-    writer.put_fixed_len_string(entry.name);
+    IO::write(writer, header);
+    IO::write(writer, entry.name);
     IO::copy(compressed, writer);
 }
 
@@ -277,7 +280,7 @@ requires IO::SeekableWriter<SW> void write_central_directory(SW &writer, Vector<
         header.len_comment = 0;
         header.signature = ZIP_CENTRAL_DIR_HEADER_SIG;
         IO::write(writer, header);
-        writer.put_fixed_len_string(entry.name);
+        IO::write(writer, entry.name);
     }
     auto end = writer.tell();
 

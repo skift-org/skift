@@ -6,8 +6,6 @@
 #undef LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
 #undef LODEPNG_NO_COMPILE_DISK
 
-#include <assert.h>
-
 #include <libgraphic/Bitmap.h>
 #include <libio/Copy.h>
 #include <libio/File.h>

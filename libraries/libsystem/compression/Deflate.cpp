@@ -4,6 +4,7 @@
 #include <libsystem/compression/Huffman.h>
 #include <libsystem/io/Reader.h>
 #include <libsystem/io/Writer.h>
+#include <libtest/AssertEqual.h>
 
 Deflate::Deflate(unsigned int compression_level) : _compression_level(compression_level)
 {
@@ -30,7 +31,7 @@ void Deflate::write_block_header(BitWriter &out_writer, BlockType block_type, bo
 void Deflate::write_uncompressed_block(Reader &in_data, uint16_t data_len, BitWriter &out_writer, bool final)
 {
     Vector<uint8_t> data(data_len);
-    assert(in_data.read(data.raw_storage(), data_len) == data_len);
+    assert_equal(in_data.read(data.raw_storage(), data_len), data_len);
 
     // Write the data
     write_block_header(out_writer, BlockType::BT_UNCOMPRESSED, final);

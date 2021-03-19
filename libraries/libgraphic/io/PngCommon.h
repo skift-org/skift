@@ -1,6 +1,13 @@
 #pragma once
 #include <libutils/Endian.h>
 
+enum CompressionMethod : uint8_t
+{
+  CM_Inflate = 0
+};
+
+using be_cm = LittleEndian<CompressionMethod>;
+
 struct __packed ImageHeader
 {
     // iHDR
@@ -9,7 +16,7 @@ struct __packed ImageHeader
     be_uint32_t height;
     be_uint8_t bit_depth;
     be_uint8_t colour_type;
-    be_uint8_t compression_method;
+    be_cm compression_method;
     be_uint8_t filter_method;
     be_uint8_t interlace_method;
 };

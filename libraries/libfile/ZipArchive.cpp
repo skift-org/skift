@@ -3,16 +3,18 @@
 
 #include <libio/File.h>
 
+#include <libcompression/Deflate.h>
+#include <libcompression/Inflate.h>
 #include <libfile/ZipArchive.h>
+#include <libio/Copy.h>
+#include <libio/File.h>
+#include <libio/MemoryReader.h>
+#include <libio/MemoryWriter.h>
+#include <libio/Read.h>
+#include <libio/ScopedReader.h>
+#include <libio/Skip.h>
+#include <libio/Write.h>
 #include <libsystem/Logger.h>
-#include <libsystem/compression/Deflate.h>
-#include <libsystem/compression/Inflate.h>
-#include <libsystem/io/BinaryReader.h>
-#include <libsystem/io/FileReader.h>
-#include <libsystem/io/FileWriter.h>
-#include <libsystem/io/MemoryReader.h>
-#include <libsystem/io/MemoryWriter.h>
-#include <libsystem/io/ScopedReader.h>
 #include <libutils/Endian.h>
 
 // Central header
@@ -118,13 +120,14 @@ ZipArchive::ZipArchive(Path path, bool read) : Archive(path)
     }
 }
 
-void ZipArchive::read_local_headers(BinaryReader &reader)
+template <typename SR>
+requires IO::SeekableReader<SR> void read_local_headers(SR &reader)
 {
     // Read all local file headers and data descriptors
-    while (reader.position() < (reader.length() - sizeof(LocalHeader)))
+    while (reader.tell() < (reader.length() - sizeof(LocalHeader)))
     {
-        logger_trace("Read local header: '%s'", _path.string().cstring());
-        auto local_header = reader.peek<LocalHeader>();
+        logger_trace("Read local header");
+        auto local_header = IO::peek<LocalHeader>(reader);
 
         // Check if this is a local header
         if (local_header.signature() != ZIP_LOCAL_DIR_HEADER_SIG)
@@ -134,7 +137,7 @@ void ZipArchive::read_local_headers(BinaryReader &reader)
         }
 
         auto &entry = _entries.emplace_back();
-        reader.skip(sizeof(LocalHeader));
+        IO::skip(reader, sizeof(LocalHeader));
 
         // Get the uncompressed & compressed sizes
         entry.uncompressed_size = local_header.uncompressed_size();
@@ -146,30 +149,30 @@ void ZipArchive::read_local_headers(BinaryReader &reader)
         logger_trace("Found local header: '%s'", entry.name.cstring());
 
         // Read extra fields
-        auto end_position = reader.position() + local_header.len_extrafield();
-        while (reader.position() < end_position)
+        auto end_position = reader.tell() + local_header.len_extrafield();
+        while (reader.tell() < end_position)
         {
-            le_eft extra_field_type(reader.get<ExtraFieldType>());
-            le_uint16_t extra_field_size(reader.get<uint16_t>());
+            le_eft extra_field_type(IO::read<ExtraFieldType>(reader));
+            le_uint16_t extra_field_size(IO::read<uint16_t>(reader));
 
             // TODO: parse the known extra field types
-            reader.skip(extra_field_size());
+            IO::skip(reader, extra_field_size());
         }
 
         // Skip the compressed data for now
-        entry.archive_offset = reader.position();
-        reader.skip(entry.compressed_size);
+        entry.archive_offset = reader.tell();
+        IO::skip(reader, entry.compressed_size);
 
         if (local_header.flags() & EF_DATA_DESCRIPTOR)
         {
-            auto data_descriptor = reader.get<DataDescriptor>();
+            auto data_descriptor = IO::read<DataDescriptor>(reader);
             entry.uncompressed_size = data_descriptor.uncompressed_size();
             entry.compressed_size = data_descriptor.compressed_size();
         }
     }
 }
 
-Result ZipArchive::read_central_directory(BinaryReader &reader)
+Result ZipArchive::read_central_directory(IO::Reader &reader)
 {
     // Central directory starts here
     while (reader.position() < (reader.length() - sizeof(CentralDirectoryFileHeader)))
@@ -189,12 +192,12 @@ Result ZipArchive::read_central_directory(BinaryReader &reader)
         String name = reader.get_fixed_len_string(cd_file_header.len_filename());
         logger_trace("Found central directory header: '%s'", name.cstring());
 
-        reader.skip(cd_file_header.len_extrafield());
-        reader.skip(cd_file_header.len_comment());
+        IO::skip(reader, cd_file_header.len_extrafield());
+        IO::skip(reader, cd_file_header.len_comment());
     }
 
     // End of file
-    le_uint32_t central_dir_end_sig(reader.get<uint32_t>());
+    le_uint32_t central_dir_end_sig(IO::read<uint32_t>(reader));
     if (central_dir_end_sig() != ZIP_END_OF_CENTRAL_DIR_HEADER_SIG)
     {
         logger_error("Missing 'central directory end record' signature!");
@@ -219,19 +222,17 @@ void ZipArchive::read_archive()
 
     logger_trace("Opening file: '%s'", _path.string().cstring());
 
-    FileReader file_reader(_path);
+    IO::File file(_path);
 
     // A valid zip must atleast contain a "CentralDirectoryEndRecord"
-    if (file_reader.length() < sizeof(CentralDirectoryEndRecord))
+    if (file.length() < sizeof(CentralDirectoryEndRecord))
     {
-        logger_error("Archive is too small to be a valid .zip: %s %u", _path.string().cstring(), (unsigned int)file_reader.length());
+        logger_error("Archive is too small to be a valid .zip: %s %u", _path.string().cstring(), file_reader.length());
         return;
     }
 
-    BinaryReader binary_reader(file_reader);
-
-    read_local_headers(binary_reader);
-    Result result = read_central_directory(binary_reader);
+    read_local_headers(file);
+    Result result = read_central_directory(file);
 
     if (result != Result::SUCCESS)
     {
@@ -241,7 +242,7 @@ void ZipArchive::read_archive()
     _valid = true;
 }
 
-void ZipArchive::write_entry(const Entry &entry, BinaryWriter &writer, Reader &compressed)
+void ZipArchive::write_entry(const Entry &entry, IO::Writer &writer, IO::Reader &compressed)
 {
     LocalHeader header;
     header.flags = EF_NONE;
@@ -255,13 +256,14 @@ void ZipArchive::write_entry(const Entry &entry, BinaryWriter &writer, Reader &c
     // Write data
     writer.put(header);
     writer.put_fixed_len_string(entry.name);
-    writer.copy_from(compressed);
+    IO::copy(compressed, writer);
 }
 
-void ZipArchive::write_central_directory(BinaryWriter &writer)
+template <typename SW>
+requires IO::SeekableWriter<SW> void write_central_directory(SW &writer, Vector<Archive::Entry> &entries)
 {
-    auto start = writer.position();
-    for (const auto &entry : _entries)
+    auto start = writer.tell();
+    for (const auto &entry : entries)
     {
         logger_trace("Write central directory header: '%s'", entry.name.cstring());
         CentralDirectoryFileHeader header;
@@ -274,20 +276,19 @@ void ZipArchive::write_central_directory(BinaryWriter &writer)
         header.len_extrafield = 0;
         header.len_comment = 0;
         header.signature = ZIP_CENTRAL_DIR_HEADER_SIG;
-        writer.put(header);
+        IO::write(writer, header);
         writer.put_fixed_len_string(entry.name);
     }
-    auto end = writer.position();
+    auto end = writer.tell();
 
     CentralDirectoryEndRecord end_record;
     end_record.signature = ZIP_END_OF_CENTRAL_DIR_HEADER_SIG;
     end_record.central_dir_size = end - start;
-    end_record.central_dir_offset = start;
-    end_record.disk_entries = _entries.count();
-    end_record.total_entries = _entries.count();
+    end_record.central_dir_offset = start.value();
+    end_record.disk_entries = entries.count();
+    end_record.total_entries = entries.count();
     end_record.len_comment = 0;
-    writer.put(end_record);
-    writer.flush();
+    IO::write(writer, end_record);
 }
 
 Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
@@ -304,12 +305,12 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
     Inflate inf;
 
     // Get a reader to the uncompressed data
-    FileReader file_reader(_path);
+    IO::File file_reader(_path);
     file_reader.seek(IO::SeekFrom::start(entry.archive_offset));
-    ScopedReader scoped_reader(file_reader, entry.uncompressed_size);
+    IO::ScopedReader scoped_reader(file_reader, entry.uncompressed_size);
 
     // Get a writer to the output
-    FileWriter file_writer(dest_path);
+    IO::File file_writer(dest_path);
 
     return inf.perform(scoped_reader, file_writer);
 }
@@ -324,23 +325,22 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     }
 
     // TODO: create a new entry and write it to the output file
-    MemoryWriter memory_writer;
-    BinaryWriter binary_writer(memory_writer);
+    IO::MemoryWriter memory_writer;
 
     // Write local headers
     for (const auto &entry : _entries)
     {
-        FileReader file_reader(_path);
+        IO::File file_reader(_path);
         file_reader.seek(IO::SeekFrom::start(entry.archive_offset));
 
-        ScopedReader scoped_reader(file_reader, entry.compressed_size);
+        IO::ScopedReader scoped_reader(file_reader, entry.compressed_size);
         logger_trace("Write existing local header: '%s'", entry.name.cstring());
-        write_entry(entry, binary_writer, scoped_reader);
+        write_entry(entry, memory_writer, scoped_reader);
     }
 
     // Get a reader to the original file
-    FileReader src_reader(src_path);
-    MemoryWriter compressed_writer;
+    IO::File src_reader(src_path);
+    IO::MemoryWriter compressed_writer;
 
     // Perform deflate on the data
     Deflate def(5);
@@ -356,16 +356,16 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     new_entry.uncompressed_size = src_reader.length();
     new_entry.archive_offset = memory_writer.length() + sizeof(LocalHeader) + new_entry.name.length();
 
-    MemoryReader compressed_reader(compressed_writer.data());
-    write_entry(new_entry, binary_writer, compressed_reader);
+    auto compressed_data = compressed_writer.slice();
+    IO::MemoryReader compressed_reader(compressed_data->start(), compressed_data->size());
+    write_entry(new_entry, memory_writer, compressed_reader);
 
     // Write central directory
-    write_central_directory(binary_writer);
+    write_central_directory(memory_writer, _entries);
 
     // Do this properly...
-    FileWriter file_writer(_path);
-    MemoryReader memory_reader(memory_writer.data());
-    file_writer.copy_from(memory_reader);
+    IO::File file_writer(_path);
+    IO::write_all(file_writer, Slice(memory_writer.slice()));
 
     return Result::SUCCESS;
 }

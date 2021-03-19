@@ -1,4 +1,4 @@
-#include <libsystem/compression/DeflateWriter.h>
+#include <libcompression/DeflateWriter.h>
 #include <libsystem/io/MemoryReader.h>
 #include <libsystem/io/MemoryWriter.h>
 

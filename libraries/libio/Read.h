@@ -28,13 +28,13 @@ ResultOr<size_t> read(Reader &reader, Vector<T> &vector)
 template <typename T, typename R>
 requires SeekableReader<R> inline T peek(R &reader)
 {
-    T result = get<T>(reader);
+    T result = read<T>(reader);
     reader.seek(IO::SeekFrom::current(-sizeof(T)));
     return result;
 }
 
 template <typename T>
-inline T get(Reader &reader)
+inline T read(Reader &reader)
 {
     T result;
     assert(reader.read(&result, sizeof(T)) == sizeof(T));

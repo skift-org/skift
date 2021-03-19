@@ -9,11 +9,13 @@ namespace IO
 {
 
 class MemoryWriter :
-    public Writer
+    public Writer,
+    public Seek
 {
 private:
     size_t _used = 0;
     size_t _size = 0;
+    size_t _position = 0;
     uint8_t *_buffer = nullptr;
 
 public:
@@ -31,6 +33,7 @@ public:
         _buffer[0] = '\0';
         _size = preallocated;
         _used = 0;
+        _position = 0;
     }
 
     ~MemoryWriter()
@@ -38,6 +41,37 @@ public:
         if (_buffer)
         {
             delete[] _buffer;
+        }
+    }
+
+    ResultOr<size_t> length()
+    {
+        return _size;
+    }
+
+    ResultOr<size_t> tell()
+    {
+        return _position;
+    }
+
+    ResultOr<size_t> seek(SeekFrom from) override
+    {
+        switch (from.whence)
+        {
+        case Whence::START:
+            assert(from.position <= _used);
+            return _position = from.position;
+
+        case Whence::CURRENT:
+            assert(_position + from.position <= _used);
+            return _position += from.position;
+
+        case Whence::END:
+            assert(_used + from.position <= _used);
+            return _position = _used + from.position;
+
+        default:
+            ASSERT_NOT_REACHED();
         }
     }
 
@@ -52,6 +86,7 @@ public:
         _buffer = nullptr;
         _used = 0;
         _size = 0;
+        _position = 0;
 
         return make<StringStorage>(ADOPT, (char *)result, size - 1);
     }
@@ -64,6 +99,7 @@ public:
         _buffer = nullptr;
         _used = 0;
         _size = 0;
+        _position = 0;
 
         return make<SliceStorage>(ADOPT, (void *)result, size);
     }
@@ -76,6 +112,7 @@ public:
             _buffer[0] = '\0';
             _size = 16;
             _used = 0;
+            _position = 0;
         }
 
         if (_used == _size)
@@ -89,8 +126,13 @@ public:
             _buffer = new_buffer;
         }
 
-        _buffer[_used] = v;
-        _used++;
+        _buffer[_position] = v;
+        _position++;
+
+        if (_position > _used)
+        {
+            _used = _position;
+        }
 
         return 1;
     }

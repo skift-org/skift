@@ -1,5 +1,5 @@
 #pragma once
-#include <libsystem/compression/Inflate.h>
+#include <libcompression/Inflate.h>
 #include <libsystem/io/MemoryWriter.h>
 #include <libsystem/io/Reader.h>
 #include <libutils/Vector.h>

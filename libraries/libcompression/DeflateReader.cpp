@@ -1,4 +1,4 @@
-#include <libsystem/compression/DeflateReader.h>
+#include <libcompression/DeflateReader.h>
 #include <libsystem/io/MemoryReader.h>
 #include <libsystem/io/MemoryWriter.h>
 #include <libsystem/io/ScopedReader.h>

@@ -1,5 +1,5 @@
 #pragma once
-#include <libsystem/compression/Deflate.h>
+#include <libcompression/Deflate.h>
 #include <libsystem/io/MemoryWriter.h>
 #include <libsystem/io/Writer.h>
 

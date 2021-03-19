@@ -16,11 +16,11 @@
 #include <libutils/Endian.h>
 
 // Central header
-#define ZIP_END_OF_CENTRAL_DIR_HEADER_SIG 0x06054b50
-#define ZIP_CENTRAL_DIR_HEADER_SIG 0x02014b50
+constexpr uint32_t ZIP_END_OF_CENTRAL_DIR_HEADER_SIG = 0x06054b50;
+constexpr uint32_t ZIP_CENTRAL_DIR_HEADER_SIG = 0x02014b50;
 
 // Local header
-#define ZIP_LOCAL_DIR_HEADER_SIG 0x04034b50
+constexpr uint32_t ZIP_LOCAL_DIR_HEADER_SIG = 0x04034b50;
 
 enum ExtraFieldType : uint16_t
 {

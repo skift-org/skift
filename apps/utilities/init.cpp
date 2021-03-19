@@ -1,14 +1,9 @@
-#include <abi/Paths.h>
 #include <abi/Syscalls.h>
 #include <skift/Environment.h>
 
 #include <libsystem/Logger.h>
 #include <libsystem/io/Filesystem.h>
-#include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
-
-#include <libtest/AssertFalse.h>
-#include <libtest/AssertTrue.h>
 
 void start_service(const char *command, const char *socket)
 {

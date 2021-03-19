@@ -137,16 +137,5 @@ int main(int argc, char const *argv[])
     cursor_initialize();
     renderer_initialize();
 
-    process_run("panel", nullptr);
-
-    if constexpr (__CONFIG_IS_RELEASE__)
-    {
-        process_run("onboarding", nullptr);
-    }
-    else
-    {
-        process_run("terminal", nullptr);
-    }
-
     return EventLoop::run();
 }

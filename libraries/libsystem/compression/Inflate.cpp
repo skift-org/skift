@@ -1,10 +1,10 @@
-#include <assert.h>
 #include <libsystem/compression/Common.h>
 #include <libsystem/compression/Huffman.h>
 #include <libsystem/compression/Inflate.h>
 #include <libsystem/io/MemoryWriter.h>
 #include <libsystem/io/Reader.h>
 #include <libsystem/io/Writer.h>
+#include <libtest/AssertGreaterThan.h>
 
 static constexpr uint8_t BASE_LENGTH_EXTRA_BITS[] = {
     0, 0, 0, 0, 0, 0, 0, 0, //257 - 264
@@ -237,7 +237,7 @@ Result Inflate::build_dynamic_huffman_alphabet(BitReader &input)
 
 Result Inflate::perform(Reader &compressed, Writer &uncompressed)
 {
-    assert(compressed.length() > 0);
+    assert_greater_than(compressed.length(), 0);
     BitReader input(compressed);
     Vector<uint8_t> block_buffer;
 

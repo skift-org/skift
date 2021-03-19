@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <libsystem/Logger.h>
 #include <libutils/unicode/Codepoint.h>
 #include <libutils/NumberParser.h>

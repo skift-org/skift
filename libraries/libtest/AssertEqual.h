@@ -9,7 +9,7 @@ inline void _assert_equal(const A a, const B b, const char *file, const char *fu
 {
     if constexpr (!(__CONFIG_IS_RELEASE__))
     {
-        if (a != b)
+        if (a != static_cast<A>(b))
         {
             assert_failed(IO::format("{} not equal {}", a, b).cstring(), file, function, line);
         }

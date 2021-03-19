@@ -1,6 +1,6 @@
-#include <assert.h>
 #include <libsystem/cmdline/History.h>
 #include <libsystem/utils/List.h>
+#include <libtest/AssertLowerThan.h>
 
 static List *history = nullptr;
 
@@ -37,7 +37,7 @@ UnicodeString *history_peek(size_t index)
 {
     initialize_history_if_not_already();
 
-    assert(index < history_length());
+    assert_lower_than(index, history_length());
 
     UnicodeString *str = nullptr;
     list_peekat(history, index, (void **)&str);

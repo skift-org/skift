@@ -1,7 +1,6 @@
 
 /* cmdline.c: skiftOS command line application utils                          */
 
-#include <assert.h>
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>

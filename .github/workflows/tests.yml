@@ -48,6 +48,8 @@ jobs:
           make all CONFIG=test CONFIG_LOADER=grub CONFIG_ARCH=x86_32
 
       - name: Run all tests (x86_32)
+        timeout-minutes: 10
+        continue-on-error: true
         run: |
           python ./tests/host-driver.py ./disks/bootdisk-grub-x86_32.img
 

@@ -1,20 +1,24 @@
 #pragma once
 #include <libsystem/Common.h>
 #include <libsystem/Result.h>
-#include <libsystem/io/BitReader.h>
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
 
+namespace IO
+{
 class Reader;
 class Writer;
+class BitReader;
+} // namespace IO
+
 class Inflate
 {
 public:
-    Result perform(Reader &compressed, Writer &uncompressed);
+    Result perform(IO::Reader &compressed, IO::Writer &uncompressed);
 
 private:
     void build_fixed_huffman_alphabet();
-    Result build_dynamic_huffman_alphabet(BitReader &input);
+    Result build_dynamic_huffman_alphabet(IO::BitReader &input);
     void build_huffman_alphabet(Vector<unsigned int> &alphabet, const Vector<unsigned int> &code_bit_lengths);
 
     void get_bit_length_count(HashMap<unsigned int, unsigned int> &bit_length_count, const Vector<unsigned int> &code_bit_lengths);

@@ -2,6 +2,7 @@
 #include <libgraphic/io/PngReader.h>
 #include <libio/Read.h>
 #include <libsystem/Logger.h>
+#include <libcompression/Inflate.h>
 #include <libutils/Array.h>
 
 graphic::PngReader::PngReader(IO::Reader &reader) : _reader(reader)
@@ -30,6 +31,7 @@ graphic::PngReader::PngReader(IO::Reader &reader) : _reader(reader)
             auto image_header = IO::get<ImageHeader>(_reader);
             _width = image_header.width();
             _height = image_header.height();
+            logger_trace("Compression method: %u", image_header.compression_method);
         }
         break;
 
@@ -60,6 +62,8 @@ graphic::PngReader::PngReader(IO::Reader &reader) : _reader(reader)
 
         case ImageData::SIG:
         {
+            Inflate inflate;
+
             Vector<uint8_t> data(chunk_length());
             _reader.read(data.raw_storage(), chunk_length());
         }

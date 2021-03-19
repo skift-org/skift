@@ -1,9 +1,10 @@
 #include <assert.h>
-#include <libsystem/compression/Common.h>
-#include <libsystem/compression/Deflate.h>
-#include <libsystem/compression/Huffman.h>
-#include <libsystem/io/Reader.h>
-#include <libsystem/io/Writer.h>
+#include <libcompression/Common.h>
+#include <libcompression/Deflate.h>
+#include <libcompression/Huffman.h>
+#include <libio/BitWriter.h>
+#include <libio/Reader.h>
+#include <libio/Writer.h>
 #include <libtest/AssertEqual.h>
 
 Deflate::Deflate(unsigned int compression_level) : _compression_level(compression_level)
@@ -22,7 +23,7 @@ Deflate::Deflate(unsigned int compression_level) : _compression_level(compressio
     }
 }
 
-void Deflate::write_block_header(BitWriter &out_writer, BlockType block_type, bool final)
+void Deflate::write_block_header(IO::BitWriter &out_writer, BlockType block_type, bool final)
 {
     out_writer.put_bits(final ? 1 : 0, 1);
     out_writer.put_bits(block_type, 2);
@@ -41,7 +42,7 @@ void Deflate::write_uncompressed_block(Reader &in_data, uint16_t data_len, BitWr
     out_writer.put_data(data.raw_storage(), data_len);
 }
 
-void Deflate::write_uncompressed_blocks(Reader &in_data, BitWriter &out_writer, bool final)
+void Deflate::write_uncompressed_blocks(Reader &in_data, IO::BitWriter &out_writer, bool final)
 {
     auto data_length = in_data.length();
 
@@ -56,7 +57,7 @@ void Deflate::write_uncompressed_blocks(Reader &in_data, BitWriter &out_writer, 
 
 Result Deflate::compress_none(Reader &uncompressed, Writer &compressed)
 {
-    BitWriter bit_writer(compressed);
+    IO::BitWriter bit_writer(compressed);
     write_uncompressed_blocks(uncompressed, bit_writer, true);
 
     return Result::SUCCESS;

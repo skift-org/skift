@@ -23,4 +23,11 @@ static inline ResultOr<size_t> write(Writer &writer, String string)
     return writer.write(string.cstring(), string.length());
 }
 
+template <typename T>
+static inline void write(Writer &writer, const T &data)
+{
+    uint8_t *bytes = (uint8_t *)&data;
+    writer.write(bytes, sizeof(T));
+}
+
 } // namespace IO

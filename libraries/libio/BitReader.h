@@ -1,9 +1,12 @@
 #pragma once
+#include <libio/Reader.h>
 #include <libsystem/Common.h>
-#include <libsystem/io/Reader.h>
 #include <libutils/Vector.h>
 
-class BitReader
+namespace IO
+{
+template <typename R>
+requires SeekableReader<R> class BitReader
 {
 public:
     inline BitReader(const Vector<uint8_t> &data) : _data(data.raw_storage()), _size(data.count())
@@ -14,7 +17,7 @@ public:
     {
     }
 
-    inline BitReader(Reader &reader) : _data(new uint8_t[reader.length()]), _size(reader.length())
+    inline BitReader(R &reader) : _data(new uint8_t[reader.length()]), _size(reader.length())
     {
         reader.read((uint8_t *)_data, reader.length());
     }
@@ -79,3 +82,4 @@ private:
     const size_t _size;
     size_t _index = 0;
 };
+} // namespace IO

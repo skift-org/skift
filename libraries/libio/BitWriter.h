@@ -1,7 +1,9 @@
 #pragma once
+#include <libio/Write.h>
 #include <libsystem/Common.h>
-#include <libsystem/io/Writer.h>
 
+namespace IO
+{
 class BitWriter
 {
 public:
@@ -27,8 +29,7 @@ public:
 
     inline void put_uint16(uint16_t v)
     {
-        _writer.write_byte(v & 0xFF);
-        _writer.write_byte(v >> 8);
+        IO::write(v);
     }
 
     inline void align()
@@ -42,7 +43,7 @@ public:
         // Flush one byte at a time
         while (_bit_count >= 8)
         {
-            _writer.write_byte(_bit_buffer);
+            IO::write(_writer, (uint8_t)_bit_buffer);
             _bit_count -= 8;
             _bit_buffer >>= 8;
         }
@@ -53,3 +54,4 @@ private:
     uint8_t _bit_count;
     Writer &_writer;
 };
+} // namespace IO

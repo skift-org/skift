@@ -9,8 +9,10 @@
 #include <libgraphic/Bitmap.h>
 #include <libio/Copy.h>
 #include <libio/File.h>
+#include <libio/MemoryReader.h>
 #include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
+#include <libgraphic/io/PngReader.h>
 
 static Color _placeholder_buffer[] = {
     Colors::MAGENTA,
@@ -71,6 +73,9 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path)
     }
 
     auto png_data = TRY(IO::read_all(file));
+
+    IO::MemoryReader mem_reader{png_data.start(), png_data.size()};
+    graphic::PngReader png_reader(mem_reader);
 
     unsigned int decoded_width = 0;
     unsigned int decoded_height = 0;

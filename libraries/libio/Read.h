@@ -24,4 +24,21 @@ ResultOr<size_t> read(Reader &reader, Vector<T> &vector)
     return read;
 }
 
+// Peek & Get functons
+template <typename T, typename R>
+requires SeekableReader<R> inline T peek(R &reader)
+{
+    T result = get<T>(reader);
+    reader.seek(IO::SeekFrom::current(-sizeof(T)));
+    return result;
+}
+
+template <typename T>
+inline T get(Reader &reader)
+{
+    T result;
+    assert(reader.read(&result, sizeof(T)) == sizeof(T));
+    return result;
+}
+
 } // namespace IO

@@ -17,7 +17,7 @@ private:
 public:
     constexpr size_t count() const { return N; }
 
-    constexpr T* raw_storage() { return _storage; } 
+    constexpr T *raw_storage() { return _storage; }
     constexpr const T *raw_storage() const { return _storage; }
 
     T &at(size_t index)
@@ -38,11 +38,11 @@ public:
 
     constexpr Array(std::initializer_list<T> data)
     {
-        static_assert(data.size() == N, "Must initialize all values of array");
+        assert(data.size() == N);
 
         for (size_t i = 0; i < N; i++)
         {
-            _storage[i] = data[i];
+            _storage[i] = *(data.begin() + i);
         }
     }
 
@@ -58,6 +58,34 @@ public:
         assert(index < N);
 
         return _storage[index];
+    }
+
+    bool operator!=(const Array &other) const
+    {
+        return !(*this == other);
+    }
+
+    bool operator==(const Array<T, N> &other) const
+    {
+        if (this == &other)
+        {
+            return true;
+        }
+
+        if (count() != other.count())
+        {
+            return false;
+        }
+
+        for (size_t i = 0; i < count(); i++)
+        {
+            if (_storage[i] != other._storage[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // Array iteration

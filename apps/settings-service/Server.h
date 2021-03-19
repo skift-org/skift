@@ -1,8 +1,8 @@
 #pragma once
 
+#include <libio/Socket.h>
 #include <libsystem/eventloop/Invoker.h>
 #include <libsystem/eventloop/Notifier.h>
-#include <libsystem/io/Socket.h>
 
 #include "settings-service/Client.h"
 #include "settings-service/Repository.h"
@@ -13,7 +13,7 @@ namespace Settings
 class Server
 {
 private:
-    Socket *_socket;
+    IO::Socket _socket;
     OwnPtr<Notifier> _notifier;
     OwnPtr<Invoker> _invoker;
 
@@ -23,10 +23,10 @@ private:
 public:
     Server(Repository &repository) : _repository(repository)
     {
-        _socket = socket_open("/Session/settings.ipc", OPEN_CREATE);
+        _socket = IO::Socket{"/Session/settings.ipc", OPEN_CREATE};
 
-        _notifier = own<Notifier>(HANDLE(_socket), POLL_ACCEPT, [this]() {
-            auto connection = socket_accept(_socket);
+        _notifier = own<Notifier>(_socket, POLL_ACCEPT, [this]() {
+            auto connection = _socket.accept().value();
 
             auto client = own<Client>(connection);
 
@@ -109,11 +109,6 @@ public:
     void handle_client_disconnected()
     {
         _invoker->invoke_later();
-    }
-
-    ~Server()
-    {
-        socket_close(_socket);
     }
 };
 

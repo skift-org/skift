@@ -1,12 +1,13 @@
 #include <abi/Paths.h>
-
 #include <assert.h>
+
+#include <libio/Connection.h>
+#include <libio/File.h>
+#include <libio/Socket.h>
 #include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/eventloop/Timer.h>
-#include <libsystem/io/Socket.h>
-#include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/unicode/UTF8Decoder.h>
@@ -66,14 +67,14 @@ int main(int argc, char const *argv[])
 
     EventLoop::initialize();
 
-    Stream *keyboard_stream = stream_open(KEYBOARD_DEVICE_PATH, OPEN_READ);
-    Stream *mouse_stream = stream_open(MOUSE_DEVICE_PATH, OPEN_READ);
+    IO::File keyboard_stream{KEYBOARD_DEVICE_PATH, OPEN_READ};
+    IO::File mouse_stream{MOUSE_DEVICE_PATH, OPEN_READ};
 
-    Socket *socket = socket_open("/Session/compositor.ipc", OPEN_CREATE);
+    IO::Socket socket{"/Session/compositor.ipc", OPEN_CREATE};
 
-    auto keyboard_notifier = own<Notifier>(HANDLE(keyboard_stream), POLL_READ, [&]() {
+    auto keyboard_notifier = own<Notifier>(keyboard_stream, POLL_READ, [&]() {
         KeyboardPacket packet;
-        size_t size = stream_read(keyboard_stream, &packet, sizeof(KeyboardPacket));
+        size_t size = keyboard_stream.read(&packet, sizeof(KeyboardPacket)).value();
 
         if (size == sizeof(KeyboardPacket))
         {
@@ -103,9 +104,9 @@ int main(int argc, char const *argv[])
         client_destroy_disconnected();
     });
 
-    auto mouse_notifier = own<Notifier>(HANDLE(mouse_stream), POLL_READ, [&]() {
+    auto mouse_notifier = own<Notifier>(mouse_stream, POLL_READ, [&]() {
         MousePacket packet;
-        size_t size = stream_read(mouse_stream, &packet, sizeof(MousePacket));
+        size_t size = mouse_stream.read(&packet, sizeof(MousePacket)).value();
 
         if (size == sizeof(MousePacket))
         {
@@ -119,11 +120,9 @@ int main(int argc, char const *argv[])
         client_destroy_disconnected();
     });
 
-    auto socker_notifier = own<Notifier>(HANDLE(socket), POLL_ACCEPT, [&]() {
-        Connection *incoming_connection = socket_accept(socket);
-
+    auto socker_notifier = own<Notifier>(socket, POLL_ACCEPT, [&]() {
+        IO::Connection incoming_connection = socket.accept().value();
         Client::connect(incoming_connection);
-
         client_destroy_disconnected();
     });
 

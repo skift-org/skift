@@ -40,7 +40,7 @@ public:
 
     Result copy(int source, int destination);
 
-    Result poll(HandleSet *handles_set, int *selected_index, PollEvent *selected_events, Timeout timeout);
+    Result poll(HandlePoll *handles, size_t count, Timeout timeout);
 
     ResultOr<size_t> read(int handle_index, void *buffer, size_t size);
 

@@ -1,15 +1,15 @@
 #include <assert.h>
-#include <libsystem/Logger.h>
-#include <libsystem/eventloop/EventLoop.h>
-#include <libsystem/eventloop/Notifier.h>
-#include <libsystem/io/Connection.h>
-#include <libsystem/io/Socket.h>
-#include <libsystem/process/Process.h>
-#include <libsystem/utils/Hexdump.h>
 #include <stdio.h>
 #include <string.h>
 
+#include <libio/Connection.h>
+#include <libio/Socket.h>
 #include <libsettings/Setting.h>
+#include <libsystem/Logger.h>
+#include <libsystem/eventloop/EventLoop.h>
+#include <libsystem/eventloop/Notifier.h>
+#include <libsystem/process/Process.h>
+#include <libsystem/utils/Hexdump.h>
 
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
@@ -30,7 +30,7 @@ enum class State
 
 Vector<Window *> _windows;
 State _state = State::UNINITIALIZED;
-Connection *_connection;
+IO::Connection _connection;
 OwnPtr<Notifier> _connection_notifier;
 bool _wireframe = false;
 
@@ -38,7 +38,7 @@ bool _wireframe = false;
 
 void send_message(CompositorMessage message)
 {
-    connection_send(_connection, &message, sizeof(CompositorMessage));
+    _connection.write(&message, sizeof(message));
 }
 
 void do_message(const CompositorMessage &message)
@@ -82,26 +82,21 @@ ResultOr<CompositorMessage> wait_for_message(CompositorMessageType expected_mess
     Vector<CompositorMessage> pendings;
 
     CompositorMessage message{};
-    connection_receive(_connection, &message, sizeof(CompositorMessage));
-
-    if (handle_has_error(_connection))
-    {
-        return handle_get_error(_connection);
-    }
+    TRY(_connection.read(&message, sizeof(message)));
 
     while (message.type != expected_message)
     {
         pendings.push_back(move(message));
-        connection_receive(_connection, &message, sizeof(CompositorMessage));
+        auto result = _connection.read(&message, sizeof(CompositorMessage));
 
-        if (handle_has_error(_connection))
+        if (result != SUCCESS)
         {
             pendings.foreach ([&](auto &message) {
                 do_message(message);
                 return Iteration::CONTINUE;
             });
 
-            return handle_get_error(_connection);
+            return result.result();
         }
     }
 
@@ -355,31 +350,21 @@ Result initialize(int argc, char **argv)
         }
     }
 
-    _connection = socket_connect("/Session/compositor.ipc");
-
-    if (handle_has_error(_connection))
-    {
-        logger_error("Failed to connect to the compositor: %s", handle_error_string(_connection));
-
-        Result result = handle_get_error(_connection);
-        connection_close(_connection);
-        _connection = nullptr;
-
-        return result;
-    }
+    _connection = TRY(IO::Socket::connect("/Session/compositor.ipc"));
 
     EventLoop::initialize();
 
-    _connection_notifier = own<Notifier>(HANDLE(_connection), POLL_READ, []() {
+    _connection_notifier = own<Notifier>(_connection, POLL_READ, []() {
         CompositorMessage message = {};
-        memset((void *)&message, 0xff, sizeof(CompositorMessage));
-        size_t message_size = connection_receive(_connection, &message, sizeof(CompositorMessage));
+        auto read_result = _connection.read(&message, sizeof(CompositorMessage));
 
-        if (handle_has_error(_connection))
+        if (!read_result)
         {
-            logger_error("Connection to the compositor closed %s!", handle_error_string(_connection));
+            logger_error("Connection to the compositor closed %s!", read_result.description());
             Application::exit(PROCESS_FAILURE);
         }
+
+        size_t message_size = read_result.value();
 
         if (message_size != sizeof(CompositorMessage))
         {
@@ -450,7 +435,7 @@ void exit(int exit_value)
     goodbye();
 
     _connection_notifier = nullptr;
-    connection_close(_connection);
+    _connection.close();
 
     EventLoop::exit(exit_value);
 }

@@ -6,23 +6,27 @@
 namespace Settings
 {
 
-class ServerConnection : public ipc::Peer<Protocol>
+class ServerConnection : public IPC::Peer<Protocol>
 {
 public:
     Callback<void(const Path &path, const json::Value &value)> on_notify;
 
     static OwnPtr<ServerConnection> open()
     {
-        return own<ServerConnection>(socket_connect("/Session/settings.ipc"));
+        auto connection = IO::Socket::connect("/Session/settings.ipc");
+        return own<ServerConnection>(connection.value());
     }
 
-    ServerConnection(Connection *connection) : Peer(connection)
+    ServerConnection(IO::Connection connection) : Peer{move(connection)}
     {
+        // sdjfmlsd
     }
 
     ResultOr<Message> request(Message message, Message::Type expected)
     {
-        return send_and_wait_for(message, [&](const Message &incoming) { return incoming.type == expected; });
+        return send_and_wait_for(message, [&](const Message &incoming) {
+            return incoming.type == expected;
+        });
     }
 
     void handle_message(const Message &message) override

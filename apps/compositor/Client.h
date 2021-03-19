@@ -1,19 +1,19 @@
 #pragma once
 
+#include <libio/Connection.h>
 #include <libsystem/eventloop/Notifier.h>
-#include <libsystem/io/Connection.h>
 
 #include "compositor/Protocol.h"
 
 struct Client
 {
     OwnPtr<Notifier> _notifier = nullptr;
-    Connection *_connection = nullptr;
+    IO::Connection _connection;
     bool _disconnected = false;
 
-    static void connect(Connection *connection);
+    static void connect(IO::Connection connection);
 
-    Client(Connection *connection);
+    Client(IO::Connection connection);
 
     ~Client();
 

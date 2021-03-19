@@ -31,9 +31,9 @@ struct Protocol
 {
     using Message = Settings::Message;
 
-    static Result encode_message(Connection *connection, const Message &message);
+    static Result encode_message(IO::Connection &connection, const Message &message);
 
-    static ResultOr<Message> decode_message(Connection *connection);
+    static ResultOr<Message> decode_message(IO::Connection &connection);
 };
 
 } // namespace Settings

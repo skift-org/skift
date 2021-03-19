@@ -15,21 +15,21 @@ namespace EventLoop
 
 /* --- Notifiers ------------------------------------------------------------ */
 
-static size_t _handles_count;
-static Handle *_handles[PROCESS_HANDLE_COUNT];
-static PollEvent _events[PROCESS_HANDLE_COUNT];
-
 static Vector<Notifier *> _notifiers;
+static Vector<HandlePoll> _polls;
 
 void update_notifier()
 {
-    for (size_t i = 0; i < _notifiers.count(); i++)
-    {
-        _handles[i] = _notifiers[i]->handle();
-        _events[i] = _notifiers[i]->events();
-    }
+    _polls.clear();
 
-    _handles_count = _notifiers.count();
+    for (Notifier *notifier : _notifiers)
+    {
+        _polls.push_back({
+            notifier->handle()->id(),
+            notifier->events(),
+            0,
+        });
+    }
 }
 
 void register_notifier(Notifier *notifier)
@@ -47,11 +47,11 @@ void unregister_notifier(Notifier *notifier)
     update_notifier();
 }
 
-void update_notifier(Handle *handle, PollEvent event)
+void update_notifier(int id, PollEvent event)
 {
     for (size_t i = 0; i < _notifiers.count(); i++)
     {
-        if (_notifiers[i]->handle() == handle &&
+        if (_notifiers[i]->handle()->id() == id &&
             _notifiers[i]->events() & event)
         {
             _notifiers[i]->invoke();
@@ -195,26 +195,19 @@ void pump(bool pool)
         timeout = get_timeout();
     }
 
-    Handle *selected = nullptr;
-    PollEvent selected_events = 0;
-
-    Result result = handle_poll(
-        &_handles[0],
-        &_events[0],
-        _handles_count,
-        &selected,
-        &selected_events,
-        timeout);
+    Result result = hj_handle_poll(_polls.raw_storage(), _polls.count(), timeout);
 
     if (result_is_error(result))
     {
-        logger_error("Failed to select : %s", result_to_string(result));
         exit(PROCESS_FAILURE);
     }
 
-    update_timers();
+    for (const HandlePoll &poll : _polls)
+    {
+        update_notifier(poll.handle, poll.result);
+    }
 
-    update_notifier(selected, selected_events);
+    update_timers();
 
     update_invoker();
 }

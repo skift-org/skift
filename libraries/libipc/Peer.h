@@ -1,32 +1,27 @@
 #pragma once
 
+#include <libio/Connection.h>
+#include <libio/Socket.h>
 #include <libsystem/eventloop/Notifier.h>
-#include <libsystem/io/Connection.h>
-#include <libsystem/io/Socket.h>
-
 #include <libutils/Callback.h>
 #include <libutils/ResultOr.h>
 
-namespace ipc
+namespace IPC
 {
 
 template <typename Protocol>
 class Peer
 {
 private:
-    Connection *_connection = nullptr;
-    OwnPtr<Notifier> _notifier = nullptr;
+    IO::Connection _connection;
+    OwnPtr<Notifier> _notifier;
 
 public:
-    bool connected()
-    {
-        return _connection != nullptr;
-    }
+    bool connected() { return !_connection.closed(); }
 
-    Peer(Connection *connection)
+    Peer(IO::Connection connection) : _connection{connection}
     {
-        _connection = connection;
-        _notifier = own<Notifier>(HANDLE(_connection), POLL_READ, [this]() {
+        _notifier = own<Notifier>(_connection, POLL_READ, [this]() {
             auto result_or_message = Protocol::decode_message(_connection);
 
             if (result_or_message)
@@ -47,11 +42,6 @@ public:
 
     Result send(const Protocol::Message &message)
     {
-        if (!_connection)
-        {
-            return ERR_STREAM_CLOSED;
-        }
-
         auto result = Protocol::encode_message(_connection, message);
 
         if (result != SUCCESS)
@@ -64,11 +54,6 @@ public:
 
     ResultOr<typename Protocol::Message> receive()
     {
-        if (!_connection)
-        {
-            return ERR_STREAM_CLOSED;
-        }
-
         auto result_or_message = Protocol::decode_message(_connection);
 
         if (!result_or_message.success())
@@ -97,19 +82,17 @@ public:
 
     void close()
     {
-        if (_connection)
-        {
-            handle_disconnect();
+        if (_connection.closed())
+            return;
 
-            _notifier = nullptr;
+        handle_disconnect();
 
-            connection_close(_connection);
-            _connection = nullptr;
-        }
+        _notifier = nullptr;
+        _connection.close();
     }
 
     virtual void handle_message(const Protocol::Message &) {}
     virtual void handle_disconnect() {}
 };
 
-} // namespace ipc
+} // namespace IPC

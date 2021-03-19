@@ -7,7 +7,7 @@
 namespace Settings
 {
 
-class Client : public ipc::Peer<Protocol>
+class Client : public IPC::Peer<Protocol>
 {
 private:
     Vector<Path> _subscriptions;
@@ -16,7 +16,7 @@ public:
     Callback<void(Client &, const Message &message)> on_message;
     Callback<void()> on_disconnect;
 
-    Client(Connection *connection) : Peer(connection)
+    Client(IO::Connection connection) : Peer{move(connection)}
     {
     }
 

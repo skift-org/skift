@@ -26,7 +26,6 @@ static ServerConnection &server()
     if (!_server)
     {
         _server = ServerConnection::open();
-
         _server->on_notify = notify_watchers;
     }
 

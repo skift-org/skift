@@ -14,9 +14,9 @@ TerminalWidget::TerminalWidget(Widget *parent) : Widget(parent)
 {
     _terminal = own<terminal::Terminal>(80, 24);
 
-    assert_equal(stream_create_term(&_server_stream, &_client_stream), SUCCESS);
+    _terminal_device = IO::Terminal::create().value();
 
-    _server_notifier = own<Notifier>(HANDLE(_server_stream), POLL_READ, [this]() {
+    _server_notifier = own<Notifier>(_terminal_device.server, POLL_READ, [this]() {
         handle_read();
     });
 
@@ -32,16 +32,10 @@ TerminalWidget::TerminalWidget(Widget *parent) : Widget(parent)
     _cursor_blink_timer->start();
 
     Launchpad *shell_launchpad = launchpad_create("shell", "/Applications/shell/shell");
-    launchpad_handle(shell_launchpad, HANDLE(_client_stream), 0);
-    launchpad_handle(shell_launchpad, HANDLE(_client_stream), 1);
-    launchpad_handle(shell_launchpad, HANDLE(_client_stream), 2);
+    launchpad_handle(shell_launchpad, _terminal_device.client, 0);
+    launchpad_handle(shell_launchpad, _terminal_device.client, 1);
+    launchpad_handle(shell_launchpad, _terminal_device.client, 2);
     launchpad_launch(shell_launchpad, nullptr);
-}
-
-TerminalWidget::~TerminalWidget()
-{
-    stream_close(_server_stream);
-    stream_close(_client_stream);
 }
 
 void TerminalWidget::paint(Painter &painter, const Recti &dirty)
@@ -92,7 +86,7 @@ void TerminalWidget::paint(Painter &painter, const Recti &dirty)
 void TerminalWidget::event(Event *event)
 {
     auto send_sequence = [&](auto sequence) {
-        stream_write(_server_stream, sequence, strlen(sequence));
+        _terminal_device.server.write(sequence, strlen(sequence));
         event->accepted = true;
     };
 
@@ -193,7 +187,7 @@ void TerminalWidget::event(Event *event)
             {
                 uint8_t buffer[5];
                 int size = codepoint_to_utf8(event->keyboard.codepoint, buffer);
-                stream_write(_server_stream, buffer, size);
+                _terminal_device.server.write(buffer, size);
                 event->accepted = true;
             }
             break;
@@ -209,27 +203,26 @@ void TerminalWidget::do_layout()
     width = MAX(width, 8);
     height = MAX(height, 8);
 
-    if (_terminal->width() != width ||
-        _terminal->height() != height)
+    if (_terminal->width() != width || _terminal->height() != height)
     {
         _terminal->resize(width, height);
 
         IOCallTerminalSizeArgs args = {width, height};
-        assert_equal(stream_call(_server_stream, IOCALL_TERMINAL_SET_SIZE, &args), SUCCESS);
+        _terminal_device.server.handle()->call(IOCALL_TERMINAL_SET_SIZE, &args);
     }
 }
 
 void TerminalWidget::handle_read()
 {
     char buffer[TERMINAL_IO_BUFFER_SIZE];
-    size_t size = stream_read(_server_stream, buffer, TERMINAL_IO_BUFFER_SIZE);
+    auto read_result = _terminal_device.server.read(buffer, TERMINAL_IO_BUFFER_SIZE);
 
-    if (handle_has_error(_server_stream))
+    if (!read_result.success())
     {
-        handle_printf_error(_server_stream, "Terminal: read from server failed");
+        logger_error("Terminal: read from server failed: %s", read_result.description());
         return;
     }
 
-    _terminal->write(buffer, size);
+    _terminal->write(buffer, read_result.value());
     should_repaint();
 }

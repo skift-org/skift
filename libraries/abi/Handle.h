@@ -18,11 +18,11 @@ struct Handle
     Result result;
 };
 
-struct HandleSet
+struct HandlePoll
 {
-    int *handles;
-    PollEvent *events;
-    size_t count;
+    int handle;
+    PollEvent events;
+    PollEvent result;
 };
 
 #define HANDLE_INVALID_ID (-1)

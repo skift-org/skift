@@ -36,34 +36,21 @@ void BlockerRead::on_unblock(Task &task)
 
 bool BlockerSelect::can_unblock(Task &)
 {
+    bool should_be_unblock = false;
+
     for (size_t i = 0; i < _handles.count(); i++)
     {
         auto &selected = _handles[i];
 
-        if (selected.handle->poll(selected.events) != 0)
+        selected.result = selected.handle->poll(selected.events);
+
+        if (selected.result != 0)
         {
-            return true;
+            should_be_unblock = true;
         }
     }
 
-    return false;
-}
-
-void BlockerSelect::on_unblock(Task &)
-{
-    for (size_t i = 0; i < _handles.count(); i++)
-    {
-        auto &el = _handles[i];
-
-        PollEvent events = el.handle->poll(el.events);
-
-        if (events != 0)
-        {
-            _selected = el;
-            _selected->events = events;
-            return;
-        }
-    }
+    return should_be_unblock;
 }
 
 /* --- BlockerWait ---------------------------------------------------------- */

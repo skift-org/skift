@@ -1,7 +1,7 @@
+#include <libtest/AssertFalse.h>
 #include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
 #include <libsystem/utils/Hexdump.h>
-#include <libtest/AssertFalse.h>
 
 #include "compositor/Client.h"
 #include "compositor/Cursor.h"
@@ -34,13 +34,14 @@ void Client::handle(const CompositorCreateWindow &create_window)
         return;
     }
 
-    new Window(create_window.id,
-               create_window.flags,
-               create_window.type,
-               this,
-               create_window.bound,
-               frontbuffer.take_value(),
-               backbuffer.take_value());
+    new Window(
+        create_window.id,
+        create_window.flags,
+        create_window.type,
+        this,
+        create_window.bound,
+        frontbuffer.take_value(),
+        backbuffer.take_value());
 }
 
 void Client::handle(const CompositorDestroyWindow &destroy_window)
@@ -140,16 +141,18 @@ void Client::handle_request()
     assert_false(_disconnected);
 
     CompositorMessage message = {};
-    size_t message_size = connection_receive(_connection, &message, sizeof(CompositorMessage));
+    auto read_result = _connection.read(&message, sizeof(CompositorMessage));
 
-    if (handle_has_error(_connection))
+    if (!read_result)
     {
-        logger_error("Client handle has error: %s!", handle_error_string(_connection));
+        logger_error("Client handle has error: %s!", read_result.description());
 
         _disconnected = true;
         client_destroy_disconnected();
         return;
     }
+
+    size_t message_size = read_result.value();
 
     if (message_size != sizeof(CompositorMessage))
     {
@@ -206,16 +209,16 @@ void Client::handle_request()
     }
 }
 
-void Client::connect(Connection *connection)
+void Client::connect(IO::Connection connection)
 {
     _clients.push_back(own<Client>(connection));
 }
 
-Client::Client(Connection *connection)
+Client::Client(IO::Connection connection)
 {
     _connection = connection;
 
-    _notifier = own<Notifier>(HANDLE(connection), POLL_READ, [this]() {
+    _notifier = own<Notifier>(connection, POLL_READ, [this]() {
         this->handle_request();
     });
 
@@ -249,7 +252,6 @@ Client::~Client()
     logger_info("Disconnecting client %08x", this);
 
     client_close_all_windows(this);
-    connection_close(_connection);
 }
 
 void client_broadcast(CompositorMessage message)
@@ -267,13 +269,13 @@ Result Client::send_message(CompositorMessage message)
         return ERR_STREAM_CLOSED;
     }
 
-    connection_send(_connection, &message, sizeof(CompositorMessage));
+    auto write_result = _connection.write(&message, sizeof(CompositorMessage));
 
-    if (handle_has_error(_connection))
+    if (!write_result.success())
     {
-        logger_error("Failed to send message to %08x: %s", this, handle_error_string(_connection));
+        logger_error("Failed to send message to %08x: %s", this, write_result.description());
         _disconnected = true;
-        return handle_get_error(_connection);
+        return write_result.result();
     }
 
     return SUCCESS;

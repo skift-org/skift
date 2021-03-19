@@ -22,6 +22,8 @@ private:
 public:
     const Optional<Path> &path() { return _path; }
 
+    File() {}
+
     File(const char *path, OpenFlag flags = 0);
 
     File(String path, OpenFlag flags = 0);

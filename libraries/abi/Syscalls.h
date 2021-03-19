@@ -147,7 +147,7 @@ Result hj_handle_open(int *handle, const char *raw_path, size_t size, OpenFlag f
 Result hj_handle_close(int handle);
 Result hj_handle_reopen(int handle, int *reopened);
 Result hj_handle_copy(int source, int destination);
-Result hj_handle_poll(HandleSet *handles_set, int *selected, PollEvent *selected_events, Timeout timeout);
+Result hj_handle_poll(HandlePoll *handles, size_t count, Timeout timeout);
 Result hj_handle_read(int handle, void *buffer, size_t size, size_t *read);
 Result hj_handle_write(int handle, const void *buffer, size_t size, size_t *written);
 Result hj_handle_call(int handle, IOCall request, void *args);

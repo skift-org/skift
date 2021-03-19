@@ -166,19 +166,6 @@ void __plug_handle_close(Handle *handle)
     }
 }
 
-Result __plug_handle_poll(
-    HandleSet *handles,
-    int *selected,
-    PollEvent *selected_events,
-    Timeout timeout)
-{
-    __unused(handles);
-    __unused(selected);
-    __unused(selected_events);
-    __unused(timeout);
-
-    ASSERT_NOT_REACHED();
-}
 
 size_t __plug_handle_read(Handle *handle, void *buffer, size_t size)
 {

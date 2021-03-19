@@ -11,7 +11,6 @@ struct Task;
 
 class Blocker
 {
-public:
 private:
     Result _result = SUCCESS;
     TimeStamp _timeout = -1;
@@ -112,25 +111,21 @@ struct Selected
     int handle_index;
     RefPtr<FsHandle> handle;
     PollEvent events;
+    PollEvent result;
 };
 
 class BlockerSelect : public Blocker
 {
 private:
     Vector<Selected> &_handles;
-    Optional<Selected> _selected;
 
 public:
-    Optional<Selected> selected() { return _selected; }
-
     BlockerSelect(Vector<Selected> &handles)
         : _handles{handles}
     {
     }
 
     bool can_unblock(Task &task) override;
-
-    void on_unblock(Task &task) override;
 };
 
 class BlockerTime : public Blocker

@@ -179,9 +179,9 @@ Result hj_handle_copy(int source, int destination)
     return __syscall(HJ_HANDLE_COPY, (uintptr_t)source, (uintptr_t)destination);
 }
 
-Result hj_handle_poll(HandleSet *handles_set, int *selected, PollEvent *selected_events, Timeout timeout)
+Result hj_handle_poll(HandlePoll *handles, size_t count, Timeout timeout)
 {
-    return __syscall(HJ_HANDLE_POLL, (uintptr_t)handles_set, (uintptr_t)selected, (uintptr_t)selected_events, timeout);
+    return __syscall(HJ_HANDLE_POLL, (uintptr_t)handles, (uintptr_t)count, timeout);
 }
 
 Result hj_handle_read(int handle, void *buffer, size_t size, size_t *read)

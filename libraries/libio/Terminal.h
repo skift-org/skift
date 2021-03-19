@@ -8,8 +8,8 @@ namespace IO
 
 struct Terminal
 {
-    File client = nullptr;
-    File server = nullptr;
+    File client{};
+    File server{};
 
     static ResultOr<Terminal> create()
     {

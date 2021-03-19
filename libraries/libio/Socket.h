@@ -20,7 +20,7 @@ public:
     }
 
     Socket(String path, OpenFlag flags)
-        : _handle{make<Handle>(path, flags)}
+        : _handle{make<Handle>(path, flags | OPEN_SOCKET)}
     {
     }
 

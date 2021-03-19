@@ -8,8 +8,6 @@ void graphic_initialize(Handover *handover);
 
 void framebuffer_initialize(Handover *handover);
 
-void textmode_initialize();
-
 bool graphic_has_framebuffer();
 
 void graphic_did_find_framebuffer(uintptr_t address, int width, int height);

@@ -67,12 +67,6 @@ void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags);
 
 void __plug_handle_close(Handle *handle);
 
-Result __plug_handle_poll(
-    HandleSet *handles,
-    int *selected,
-    PollEvent *selected_events,
-    Timeout timeout);
-
 size_t __plug_handle_read(Handle *handle, void *buffer, size_t size);
 
 size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size);

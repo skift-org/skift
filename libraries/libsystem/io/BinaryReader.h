@@ -2,9 +2,9 @@
 
 #include <libio/Seek.h>
 #include <libsystem/io/SeekableReader.h>
+#include <libtest/AssertEqual.h>
 #include <libutils/Slice.h>
 #include <libutils/String.h>
-#include <libtest/AssertEqual.h>
 
 class BinaryReader : public SeekableReader
 {

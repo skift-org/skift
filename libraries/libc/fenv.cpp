@@ -18,7 +18,8 @@ int fegetexceptflag(fexcept_t *, int)
 
 int fegetround(void)
 {
-    ASSERT_NOT_REACHED();}
+    ASSERT_NOT_REACHED();
+}
 
 int feholdexcept(fenv_t *)
 {

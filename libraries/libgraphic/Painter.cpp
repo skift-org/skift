@@ -7,8 +7,8 @@
 #include <libgraphic/Painter.h>
 #include <libgraphic/StackBlur.h>
 
-#include <libtest/AssertLowerThan.h>
 #include <libtest/AssertGreaterThan.h>
+#include <libtest/AssertLowerThan.h>
 
 Painter::Painter(RefPtr<Bitmap> bitmap)
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libutils/unicode/Codepoint.h>
 #include <libutils/Callback.h>
+#include <libutils/unicode/Codepoint.h>
 
 class UTF8Decoder
 {

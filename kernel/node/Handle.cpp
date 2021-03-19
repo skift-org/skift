@@ -103,14 +103,13 @@ ResultOr<size_t> FsHandle::read(void *buffer, size_t size)
 
     auto read_result = _node->read(*this, buffer, size);
 
-    if (read_result != SUCCESS)
+    if (!read_result.success())
     {
         _node->release(scheduler_running_id());
         return read_result;
     }
 
     _offset += read_result.value();
-
     _node->release(scheduler_running_id());
 
     return read_result;

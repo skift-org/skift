@@ -27,12 +27,12 @@ MenuEntry::MenuEntry(String id, const json::Value &value)
 
     auto bitmap = Bitmap::load_from(IO::format("/Applications/{}/{}.png", id, id));
 
-    if (bitmap != SUCCESS)
+    if (!bitmap.success())
     {
         bitmap = Bitmap::load_from("/Files/missing.png");
     }
 
-    image = *bitmap;
+    image = bitmap.value();
 }
 
 Vector<MenuEntry> MenuEntry::load()

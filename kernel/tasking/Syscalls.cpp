@@ -561,14 +561,7 @@ Result hj_handle_seek(int handle, ssize64_t *offset, HjWhence whence, ssize64_t 
 
     if (result_offset != nullptr)
     {
-        if (seek_result)
-        {
-            *result_offset = *seek_result;
-        }
-        else
-        {
-            *result_offset = 0;
-        }
+        *result_offset = seek_result.value_or_default(0);
     }
 
     return seek_result.result();

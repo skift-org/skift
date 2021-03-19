@@ -93,7 +93,7 @@ int main(int argc, char **argv)
         auto content_path = IO::format("/Applications/onboarding/content{}.markup", index);
 
         content->clear_children();
-        image->change_bitmap(*Bitmap::load_from(image_path));
+        image->change_bitmap(Bitmap::load_from(image_path).value());
         widget_create_from_file(content, content_path);
     };
 

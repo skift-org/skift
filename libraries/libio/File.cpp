@@ -40,9 +40,9 @@ ResultOr<size_t> File::seek(SeekFrom from)
 {
     auto seek_result = _handle->seek(from);
 
-    if (seek_result)
+    if (seek_result.success())
     {
-        return (size_t)*seek_result;
+        return (size_t)seek_result.value();
     }
     else
     {
@@ -60,9 +60,9 @@ ResultOr<size_t> File::length()
 {
     auto result_or_stat = _handle->stat();
 
-    if (result_or_stat)
+    if (result_or_stat.success())
     {
-        return result_or_stat->size;
+        return result_or_stat.value().size;
     }
     else
     {

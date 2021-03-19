@@ -152,7 +152,7 @@ void __plug_handle_open(Handle *handle, const char *raw_path, OpenFlag flags)
 
     if (result_or_handle_index.success())
     {
-        handle->id = *result_or_handle_index;
+        handle->id = result_or_handle_index.value();
     }
 }
 
@@ -165,7 +165,6 @@ void __plug_handle_close(Handle *handle)
         handles.close(handle->id);
     }
 }
-
 
 size_t __plug_handle_read(Handle *handle, void *buffer, size_t size)
 {

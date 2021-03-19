@@ -19,25 +19,16 @@ void FileWriter::flush() {}
 
 size_t FileWriter::write(const void *buffer, size_t size)
 {
-    auto result_or_write = _handle->write(buffer, size);
-
-    if (result_or_write)
-    {
-        return *result_or_write;
-    }
-    else
-    {
-        return 0;
-    }
+    return _handle->write(buffer, size).value_or_default(0);
 }
 
 size_t FileWriter::length()
 {
     auto result_or_stat = _handle->stat();
 
-    if (result_or_stat)
+    if (result_or_stat.success())
     {
-        return result_or_stat->size;
+        return result_or_stat.value().size;
     }
     else
     {
@@ -47,14 +38,5 @@ size_t FileWriter::length()
 
 size_t FileWriter::position()
 {
-    auto result_or_tell = _handle->tell();
-
-    if (result_or_tell)
-    {
-        return *result_or_tell;
-    }
-    else
-    {
-        return 0;
-    }
+    return _handle->tell().value_or_default(0);
 }

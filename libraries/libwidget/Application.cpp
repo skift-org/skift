@@ -89,7 +89,7 @@ ResultOr<CompositorMessage> wait_for_message(CompositorMessageType expected_mess
         pendings.push_back(move(message));
         auto result = _connection.read(&message, sizeof(CompositorMessage));
 
-        if (result != SUCCESS)
+        if (!result.success())
         {
             pendings.foreach ([&](auto &message) {
                 do_message(message);
@@ -219,9 +219,9 @@ Vec2i mouse_position()
 
     auto result_or_mouse_position = wait_for_message(COMPOSITOR_MESSAGE_MOUSE_POSITION);
 
-    if (result_or_mouse_position)
+    if (result_or_mouse_position.success())
     {
-        auto mouse_position = *result_or_mouse_position;
+        auto mouse_position = result_or_mouse_position.value();
 
         return mouse_position.mouse_position.position;
     }
@@ -358,7 +358,7 @@ Result initialize(int argc, char **argv)
         CompositorMessage message = {};
         auto read_result = _connection.read(&message, sizeof(CompositorMessage));
 
-        if (!read_result)
+        if (!read_result.success())
         {
             logger_error("Connection to the compositor closed %s!", read_result.description());
             Application::exit(PROCESS_FAILURE);

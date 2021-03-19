@@ -19,25 +19,16 @@ size_t FileReader::seek(IO::SeekFrom from)
 
 size_t FileReader::read(void *buffer, size_t size)
 {
-    auto result_or_read = _handle->read(buffer, size);
-
-    if (result_or_read)
-    {
-        return *result_or_read;
-    }
-    else
-    {
-        return 0;
-    }
+    return _handle->read(buffer, size).value_or_default(0);
 }
 
 size_t FileReader::length()
 {
     auto result_or_stat = _handle->stat();
 
-    if (result_or_stat)
+    if (result_or_stat.success())
     {
-        return result_or_stat->size;
+        return result_or_stat.value().size;
     }
     else
     {
@@ -47,14 +38,5 @@ size_t FileReader::length()
 
 size_t FileReader::position()
 {
-    auto result_or_tell = _handle->tell();
-
-    if (result_or_tell)
-    {
-        return *result_or_tell;
-    }
-    else
-    {
-        return 0;
-    }
+    return _handle->tell().value_or_default(0);
 }

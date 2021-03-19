@@ -24,9 +24,9 @@ public:
         _notifier = own<Notifier>(_connection, POLL_READ, [this]() {
             auto result_or_message = Protocol::decode_message(_connection);
 
-            if (result_or_message)
+            if (result_or_message.success())
             {
-                handle_message(*result_or_message);
+                handle_message(result_or_message.value());
             }
             else
             {

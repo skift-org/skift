@@ -1,7 +1,7 @@
-#include <libtest/AssertFalse.h>
 #include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
 #include <libsystem/utils/Hexdump.h>
+#include <libtest/AssertFalse.h>
 
 #include "compositor/Client.h"
 #include "compositor/Cursor.h"
@@ -143,7 +143,7 @@ void Client::handle_request()
     CompositorMessage message = {};
     auto read_result = _connection.read(&message, sizeof(CompositorMessage));
 
-    if (!read_result)
+    if (!read_result.success())
     {
         logger_error("Client handle has error: %s!", read_result.description());
 

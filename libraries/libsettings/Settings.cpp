@@ -84,12 +84,12 @@ Optional<json::Value> read(const Path path)
 
     auto result_or_response = server().request(message, Message::SERVER_VALUE);
 
-    if (!result_or_response)
+    if (!result_or_response.success())
     {
         return {};
     }
 
-    return result_or_response->payload;
+    return result_or_response.value().payload;
 }
 
 bool write(const Path path, json::Value value)
@@ -102,7 +102,7 @@ bool write(const Path path, json::Value value)
 
     auto result = server().request(message, Message::SERVER_ACK);
 
-    if (result)
+    if (result.success())
     {
         notify_watchers(path, value);
     }

@@ -30,6 +30,18 @@ public:
         return *_value;
     }
 
+    T value_or_default(T default_)
+    {
+        if (success())
+        {
+            return _value.value();
+        }
+        else
+        {
+            return default_;
+        }
+    }
+
     T take_value()
     {
         assert(success());
@@ -47,26 +59,6 @@ public:
     ResultOr(Result result) : _result{result}, _value{} {}
 
     ResultOr(T value) : _result{SUCCESS}, _value{move(value)} {}
-
-    bool operator==(Result result) const
-    {
-        return _result == result;
-    }
-
-    bool operator==(const T &other) const
-    {
-        return _value == other;
-    }
-
-    operator bool() const { return _result == SUCCESS; }
-
-    T &operator*() { return value(); }
-
-    const T &operator*() const { return value(); }
-
-    T *operator->() { return &value(); }
-
-    const T *operator->() const { return &value(); }
 };
 
 static inline Result __extract_result(Result r) { return r; }

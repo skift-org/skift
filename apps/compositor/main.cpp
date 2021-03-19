@@ -140,7 +140,7 @@ int main(int argc, char const *argv[])
 
     process_run("panel", nullptr);
 
-    if constexpr(__CONFIG_IS_RELEASE__)
+    if constexpr (__CONFIG_IS_RELEASE__)
     {
         process_run("onboarding", nullptr);
     }

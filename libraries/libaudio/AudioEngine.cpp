@@ -1,12 +1,12 @@
 #include <libaudio/AudioEngine.h>
 #include <libsystem/Logger.h>
-#include <string.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/Socket.h>
 #include <libsystem/utils/Hexdump.h>
-#include <libutils/Vector.h>
-#include <libtest/AssertLowerEqual.h>
 #include <libtest/AssertGreaterEqual.h>
+#include <libtest/AssertLowerEqual.h>
+#include <libutils/Vector.h>
+#include <string.h>
 
 /* --- IPC ------------------------------------------------------------------ */
 
@@ -127,8 +127,7 @@ void AudioEngine::update_buffer(AudioBuffer *buffer, uint8_t *data, size_t size)
         .update_buffer = {
             .id = buffer->id(),
             .size = (int)size,
-            .audiodata = { 0 }
-        },
+            .audiodata = {0}},
     };
 
     for (size_t i = 0; i < size; i++)

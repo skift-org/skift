@@ -1,10 +1,10 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
+#include <libtest/AssertTrue.h>
 #include <libutils/Rect.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
-#include <libtest/AssertTrue.h>
 
 #include "compositor/Protocol.h"
 

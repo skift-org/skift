@@ -6,9 +6,9 @@
 #include <libsystem/math/MinMax.h>
 #include <libsystem/system/System.h>
 #include <libsystem/utils/List.h>
-#include <libutils/Vector.h>
 #include <libtest/AssertFalse.h>
 #include <libtest/AssertTrue.h>
+#include <libutils/Vector.h>
 
 namespace EventLoop
 {

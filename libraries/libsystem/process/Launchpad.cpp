@@ -86,6 +86,13 @@ void launchpad_handle(Launchpad *launchpad, IO::RawHandle &handle_to_pass, int d
     launchpad->handles[destination] = handle_to_pass.handle()->id();
 }
 
+void launchpad_handle(Launchpad *launchpad, IO::Handle &handle, int destination)
+{
+    assert(destination >= 0 && destination < PROCESS_ARG_COUNT);
+
+    launchpad->handles[destination] = handle.id();
+}
+
 void launchpad_handle(Launchpad *launchpad, Handle *handle_to_pass, int destination)
 {
     assert(destination >= 0 && destination < PROCESS_ARG_COUNT);

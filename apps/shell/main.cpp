@@ -1,5 +1,6 @@
 #include <abi/Syscalls.h>
 
+#include <libio/Streams.h>
 #include <libsystem/Logger.h>
 #include <libsystem/cmdline/ReadLine.h>
 #include <libsystem/io/Stream.h>
@@ -43,7 +44,7 @@ int main(int argc, char **argv)
         if (strcpy(argv[1], "-c"))
         {
             ShellNode *node = shell_parse(argv[2]);
-            int command_exit_value = shell_eval(node, in_stream, out_stream);
+            int command_exit_value = shell_eval(node, IO::in().handle(), IO::out().handle());
 
             shell_node_destroy(node);
             return command_exit_value;
@@ -72,7 +73,7 @@ int main(int argc, char **argv)
             free(command);
         }
 
-        command_exit_value = shell_eval(node, in_stream, out_stream);
+        command_exit_value = shell_eval(node, IO::in().handle(), IO::out().handle());
 
         shell_node_destroy(node);
     }

@@ -8,8 +8,8 @@ namespace IO
 
 struct Pipe
 {
-    File reader = nullptr;
-    File writer = nullptr;
+    RefPtr<Handle> reader;
+    RefPtr<Handle> writer;
 
     static ResultOr<Pipe> create()
     {
@@ -18,7 +18,10 @@ struct Pipe
 
         TRY(hj_create_pipe(&reader_handle, &writer_handle));
 
-        return Pipe{make<Handle>(reader_handle), make<Handle>(writer_handle)};
+        return Pipe{
+            make<Handle>(reader_handle),
+            make<Handle>(writer_handle),
+        };
     }
 };
 

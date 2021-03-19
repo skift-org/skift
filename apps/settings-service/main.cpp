@@ -1,6 +1,4 @@
 #include <libsystem/Logger.h>
-#include <libsystem/io/Socket.h>
-
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
 

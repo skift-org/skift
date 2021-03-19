@@ -19,6 +19,8 @@ void launchpad_environment(Launchpad *launchpad, const char *buffer);
 
 void launchpad_handle(Launchpad *launchpad, IO::RawHandle &handle_to_pass, int destination);
 
+void launchpad_handle(Launchpad *launchpad, IO::Handle &handle, int destination);
+
 void launchpad_handle(Launchpad *launchpad, Handle *handle_to_pass, int destination);
 
 Result launchpad_launch(Launchpad *launchpad, int *pid);

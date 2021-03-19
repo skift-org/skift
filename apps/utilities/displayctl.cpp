@@ -3,10 +3,9 @@
 #include <libutils/ArgParse.h>
 
 #include <libio/Format.h>
+#include <libio/Socket.h>
 #include <libio/Streams.h>
 #include <libsystem/Result.h>
-#include <libsystem/io/Connection.h>
-#include <libsystem/io/Socket.h>
 #include <libsystem/io/Stream.h>
 
 #include "compositor/Protocol.h"
@@ -70,13 +69,14 @@ int gfxmode_get(Stream *framebuffer_device)
 
 int gfxmode_set_compositor(IOCallDisplayModeArgs mode)
 {
-    Connection *compositor_connection = socket_connect("/Session/compositor.ipc");
+    auto connect_result = IO::Socket::connect("/Session/compositor.ipc");
 
-    if (handle_has_error(compositor_connection))
+    if (!connect_result.success())
     {
-        handle_printf_error(compositor_connection, "Failed to connect to the compositor (Failling back on iocall)");
         return PROCESS_FAILURE;
     }
+
+    auto connection = connect_result.take_value();
 
     CompositorMessage message = (CompositorMessage){
         .type = COMPOSITOR_MESSAGE_SET_RESOLUTION,
@@ -86,7 +86,7 @@ int gfxmode_set_compositor(IOCallDisplayModeArgs mode)
         },
     };
 
-    connection_send(compositor_connection, &message, sizeof(message));
+    connection.write(&message, sizeof(message));
 
     return PROCESS_SUCCESS;
 }

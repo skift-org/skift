@@ -1,7 +1,5 @@
 #include <libaudio/AudioEngine.h>
 #include <libsystem/Logger.h>
-#include <libsystem/io/Connection.h>
-#include <libsystem/io/Socket.h>
 #include <libsystem/utils/Hexdump.h>
 #include <libtest/AssertGreaterEqual.h>
 #include <libtest/AssertLowerEqual.h>

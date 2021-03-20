@@ -474,7 +474,7 @@ public:
     }
 
     template <typename... Args>
-    T &emplace(Args &&... args)
+    T &emplace(Args &&...args)
     {
         grow();
 
@@ -499,7 +499,7 @@ public:
     }
 
     template <typename... Args>
-    T &emplace_back(Args &&... args)
+    T &emplace_back(Args &&...args)
     {
         grow();
 
@@ -587,4 +587,23 @@ public:
 
     iterator begin() const { return iterator(_storage); }
     iterator end() const { return iterator(_storage + _count); }
+};
+
+template <typename T>
+struct IsVector : public FalseType
+{
+};
+
+template <typename T>
+struct IsVector<Vector<T>> : public TrueType
+{
+};
+
+template <typename T>
+struct TrimVector;
+
+template <typename T>
+struct TrimVector<Vector<T>>
+{
+    typedef T type;
 };

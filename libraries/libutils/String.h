@@ -18,6 +18,11 @@ public:
         return _storage->size();
     }
 
+    bool empty() const
+    {
+        return length() == 0;
+    }
+
     const char *cstring() const
     {
         if (!_storage)

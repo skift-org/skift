@@ -3,6 +3,7 @@
 #include <libsystem/Common.h>
 #include <libutils/RefCounted.h>
 #include <libutils/Tags.h>
+#include <libutils/Traits.h>
 
 template <typename T>
 class RefPtr
@@ -163,7 +164,7 @@ class CallableRefPtr : public RefPtr<T>
 {
 public:
     template <typename... TArgs>
-    auto operator()(TArgs &&... args)
+    auto operator()(TArgs &&...args)
     {
         return (*this->naked())(forward<TArgs>(args)...);
     }
@@ -176,13 +177,32 @@ inline RefPtr<T> adopt(T &object)
 }
 
 template <typename Type, typename... Args>
-inline RefPtr<Type> make(Args &&... args)
+inline RefPtr<Type> make(Args &&...args)
 {
     return RefPtr<Type>(adopt(*new Type(forward<Args>(args)...)));
 }
 
 template <typename Type, typename... Args>
-inline CallableRefPtr<Type> make_callable(Args &&... args)
+inline CallableRefPtr<Type> make_callable(Args &&...args)
 {
     return CallableRefPtr<Type>(adopt(*new Type(forward<Args>(args)...)));
 }
+
+template <typename T>
+struct TrimRefPtr;
+
+template <typename T>
+struct TrimRefPtr<RefPtr<T>>
+{
+    typedef T type;
+};
+
+template <typename T>
+struct IsRefPtr : public FalseType
+{
+};
+
+template <typename T>
+struct IsRefPtr<RefPtr<T>> : public TrueType
+{
+};

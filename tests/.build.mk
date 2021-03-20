@@ -6,7 +6,7 @@ TESTS_SOURCES = $(wildcard tests/*.cpp) \
 
 TESTS_OBJECTS = $(patsubst %.cpp, $(CONFIG_BUILD_DIRECTORY)/%.o, $(TESTS_SOURCES))
 
-TESTS_LIBS = system io c
+TESTS_LIBS = system ioc io c
 
 TARGETS += $(TESTS_BINARY)
 OBJECTS += $(TESTS_OBJECTS)

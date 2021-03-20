@@ -1,0 +1,1 @@
+void __ioc_dummy() {}

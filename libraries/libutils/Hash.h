@@ -32,3 +32,9 @@ inline uint32_t hash<uint32_t>(const uint32_t &value)
 {
     return hash(&value, sizeof(value));
 }
+
+template <>
+inline uint32_t hash<uint64_t>(const uint64_t &value)
+{
+    return hash(&value, sizeof(value));
+}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libtest/Assets.h>
+
 #include <libutils/Callback.h>
 #include <libutils/HashMap.h>
 #include <libutils/RefPtr.h>
@@ -12,8 +13,41 @@
 namespace IOC
 {
 
+struct Container;
+
 struct Context
 {
+private:
+    Vector<TypeId> _stack;
+    Container &_container;
+
+public:
+    Container &container() const { return _container; }
+
+    Context(Container &container)
+        : _container{container}
+    {
+    }
+
+    template <typename T>
+    void push_type()
+    {
+        _stack.push_back(GetTypeId<T>());
+    }
+
+    void ensure_no_cycle()
+    {
+        for (size_t i = 0; i < _stack.count() - 1; ++i)
+        {
+            assert_not_equal(_stack[i], _stack.peek_back());
+        }
+    }
+
+    template <typename T>
+    void pop_type()
+    {
+        assert_equal(_stack.pop_back(), GetTypeId<T>());
+    }
 };
 
 struct AnyRef : public RefCounted<AnyRef>
@@ -61,40 +95,56 @@ public:
 };
 
 template <typename TInstance, typename TFactory>
-struct TransientInstance : public RefCounted<TransientInstance<TInstance, TFactory>>
+struct TransientLifeTime : public RefCounted<TransientLifeTime<TInstance, TFactory>>
 {
 private:
     TFactory _factorie;
 
 public:
-    TransientInstance(TFactory factorie) : _factorie{factorie}
+    TransientLifeTime(TFactory factorie)
+        : _factorie{factorie}
     {
     }
 
     virtual RefPtr<TInstance> instance(Context &context)
     {
-        return _factorie.instance(context);
+        context.push_type<TInstance>();
+
+        context.ensure_no_cycle();
+
+        auto instance = _factorie.instance(context);
+
+        context.pop_type<TInstance>();
+
+        return instance;
     }
 };
 
 template <typename TInstance, typename TFactory>
-struct SingletonInstance : public RefCounted<SingletonInstance<TInstance, TFactory>>
+struct SingletonLifeTime : public RefCounted<SingletonLifeTime<TInstance, TFactory>>
 {
 private:
     TFactory _factorie;
     RefPtr<TInstance> _instance;
 
 public:
-    SingletonInstance(TFactory factorie) : _factorie{factorie}
+    SingletonLifeTime(TFactory factorie)
+        : _factorie{factorie}
     {
     }
 
     virtual RefPtr<TInstance> instance(Context &context)
     {
+        context.push_type<TInstance>();
+
+        context.ensure_no_cycle();
+
         if (_instance == nullptr)
         {
             _instance = _factorie.instance(context);
         }
+
+        context.pop_type<TInstance>();
 
         return _instance;
     }
@@ -138,11 +188,11 @@ public:
     {
         ConstructorFactory<TInstance> factory;
 
-        using InstanceType = SingletonInstance<TInstance, ConstructorFactory<TInstance>>;
+        using LifetimeType = SingletonLifeTime<TInstance, ConstructorFactory<TInstance>>;
 
-        auto instance = make<InstanceType>(factory);
+        auto instance = make<LifetimeType>(factory);
 
-        auto cast = make<CastRetriever<TInterface, InstanceType>>(instance);
+        auto cast = make<CastRetriever<TInterface, LifetimeType>>(instance);
 
         _retrievers[GetTypeId<TInterface>()].push_back(cast);
 
@@ -167,8 +217,8 @@ public:
 
         RefPtr<AnyRef> retriever = _retrievers[id].peek();
 
-        Context ctx;
-        return static_cast<RefPtr<Retriever<TInterface>>>(retriever)->instance(ctx);
+        Context context{*this};
+        return static_cast<RefPtr<Retriever<TInterface>>>(retriever)->instance(context);
     }
 
     template <typename TInterface>
@@ -185,8 +235,8 @@ public:
 
         for (size_t i = 0; i < retrievers.count(); i++)
         {
-            Context ctx;
-            instances.push_back(static_cast<RefPtr<Retriever<TInterface>>>(retrievers[i])->instance(ctx));
+            Context context{*this};
+            instances.push_back(static_cast<RefPtr<Retriever<TInterface>>>(retrievers[i])->instance(context));
         }
     }
 };

@@ -33,6 +33,16 @@ TEST(ioc_container_fetch_simple_type)
     assert_equal(instance->func(), 42);
 }
 
+TEST(ioc_container_fetch_simple)
+{
+    IOC::Container container;
+
+    container.add_singleton<Type42>();
+    auto instance = container.get<Type42>();
+
+    assert_equal(instance->func(), 42);
+}
+
 TEST(ioc_container_fetch_type_behind_interface)
 {
     IOC::Container container;

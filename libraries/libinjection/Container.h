@@ -10,7 +10,7 @@
 #include <libutils/TypeId.h>
 #include <libutils/Vector.h>
 
-namespace IOC
+namespace Injection
 {
 
 struct Container;
@@ -264,4 +264,4 @@ public:
     }
 };
 
-} // namespace IOC
+} // namespace Injection

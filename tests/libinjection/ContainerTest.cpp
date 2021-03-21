@@ -76,8 +76,7 @@ TEST(injection_container_fetch_multiple_types)
     container.add_singleton<Type42, NumericType>();
     container.add_singleton<Type52, NumericType>();
 
-    Vector<RefPtr<NumericType>> numeric_types;
-    container.get(numeric_types);
+    auto numeric_types = container.get_all<NumericType>();
 
     assert_equal(numeric_types.count(), 2);
     assert_equal(numeric_types[0]->func(), 42);
@@ -109,8 +108,7 @@ TEST(injection_container_fetch_transient)
     container.add_transient<Type42>();
     container.add_transient<Type42>();
 
-    Vector<RefPtr<Type42>> types;
-    container.get(types);
+    auto types = container.get_all<Type42>();
 
     assert_equal(types.count(), 2);
     assert_equal(types[0]->func(), 42);

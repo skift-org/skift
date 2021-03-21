@@ -78,7 +78,7 @@ int gfxmode_set_compositor(IOCallDisplayModeArgs mode)
 
     auto connection = connect_result.take_value();
 
-    CompositorMessage message = (CompositorMessage){
+    CompositorMessage message{
         .type = COMPOSITOR_MESSAGE_SET_RESOLUTION,
         .set_resolution = {
             mode.width,
@@ -87,6 +87,15 @@ int gfxmode_set_compositor(IOCallDisplayModeArgs mode)
     };
 
     connection.write(&message, sizeof(message));
+
+    process_sleep(1000);
+
+    CompositorMessage goodbye_message{
+        .type = COMPOSITOR_MESSAGE_GOODBYE,
+        .greetings = {},
+    };
+
+    connection.write(&goodbye_message, sizeof(goodbye_message));
 
     return PROCESS_SUCCESS;
 }

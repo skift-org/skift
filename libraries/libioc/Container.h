@@ -15,6 +15,10 @@ namespace IOC
 
 struct Container;
 
+struct Entity : public AnyRef
+{
+};
+
 struct Context
 {
 private:
@@ -48,11 +52,6 @@ public:
     {
         assert_equal(_stack.pop_back(), GetTypeId<T>());
     }
-};
-
-struct AnyRef : public RefCounted<AnyRef>
-{
-    virtual ~AnyRef() = default;
 };
 
 template <typename T>
@@ -183,18 +182,30 @@ public:
 
     ~Container() {}
 
-    template <typename TInterface, typename TInstance>
-    Container &add_singleton()
+    template <typename TLifetime, typename... TInterfaces>
+    requires(sizeof...(TInterfaces) == 0) void register_interfaces(RefPtr<TLifetime>)
+    {
+    }
+
+    template <typename TLifetime, typename TInterface, typename... TInterfaces>
+    void register_interfaces(RefPtr<TLifetime> lifetime)
+    {
+        auto cast = make<CastRetriever<TInterface, TLifetime>>(lifetime);
+        _retrievers[GetTypeId<TInterface>()].push_back(cast);
+
+        register_interfaces<TLifetime, TInterfaces...>(lifetime);
+    }
+
+    template <typename TInstance, typename... TInterfaces>
+    requires(sizeof...(TInterfaces) > 0) Container &add_singleton()
     {
         ConstructorFactory<TInstance> factory;
 
         using LifetimeType = SingletonLifeTime<TInstance, ConstructorFactory<TInstance>>;
 
-        auto instance = make<LifetimeType>(factory);
+        auto lifetime = make<LifetimeType>(factory);
 
-        auto cast = make<CastRetriever<TInterface, LifetimeType>>(instance);
-
-        _retrievers[GetTypeId<TInterface>()].push_back(cast);
+        register_interfaces<LifetimeType, TInterfaces...>(lifetime);
 
         return *this;
     }

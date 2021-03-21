@@ -53,6 +53,11 @@ public:
     }
 };
 
+struct AnyRef : public RefCounted<AnyRef>
+{
+    virtual ~AnyRef() = default;
+};
+
 template <typename T>
 T *ref_if_not_null(T *ptr)
 {
@@ -74,3 +79,4 @@ T *deref_if_not_null(T *ptr)
 
     return ptr;
 }
+

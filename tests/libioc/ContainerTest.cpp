@@ -3,6 +3,14 @@
 
 #include "tests/Driver.h"
 
+#define assert_same_entity(__a, __b)                                    \
+    assert_equal((uintptr_t) static_cast<IOC::Entity *>((__a).naked()), \
+                 (uintptr_t) static_cast<IOC::Entity *>((__b).naked()))
+
+#define assert_not_same_entity(__a, __b)                                    \
+    assert_not_equal((uintptr_t) static_cast<IOC::Entity *>((__a).naked()), \
+                     (uintptr_t) static_cast<IOC::Entity *>((__b).naked()))
+
 struct NumericType :
     public virtual IOC::Entity
 {
@@ -51,16 +59,6 @@ TEST(ioc_container_fetch_simple_type)
     assert_equal(instance->func(), 42);
 }
 
-TEST(ioc_container_fetch_simple)
-{
-    IOC::Container container;
-
-    container.add_singleton<Type42>();
-    auto instance = container.get<Type42>();
-
-    assert_equal(instance->func(), 42);
-}
-
 TEST(ioc_container_fetch_type_behind_interface)
 {
     IOC::Container container;
@@ -98,9 +96,25 @@ TEST(ioc_container_fetch_type_behind_multiple_interfaces)
     assert_not_null(string_type);
 
     // Is it the same undelying IOC::Entity ?
-    assert_equal((uintptr_t) static_cast<IOC::Entity *>(numeric_type.naked()),
-                 (uintptr_t) static_cast<IOC::Entity *>(string_type.naked()));
+    assert_same_entity(numeric_type, string_type);
 
     assert_equal(numeric_type->func(), 5);
     assert_equal(string_type->string(), "apple");
+}
+
+TEST(ioc_container_fetch_transient)
+{
+    IOC::Container container;
+
+    container.add_transient<Type42>();
+    container.add_transient<Type42>();
+
+    Vector<RefPtr<Type42>> types;
+    container.get(types);
+
+    assert_equal(types.count(), 2);
+    assert_equal(types[0]->func(), 42);
+    assert_equal(types[1]->func(), 42);
+
+    assert_not_same_entity(types[0], types[1]);
 }

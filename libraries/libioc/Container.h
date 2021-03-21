@@ -183,9 +183,7 @@ public:
     ~Container() {}
 
     template <typename TLifetime, typename... TInterfaces>
-    requires(sizeof...(TInterfaces) == 0) void register_interfaces(RefPtr<TLifetime>)
-    {
-    }
+    requires(sizeof...(TInterfaces) == 0) void register_interfaces(RefPtr<TLifetime>) {}
 
     template <typename TLifetime, typename TInterface, typename... TInterfaces>
     void register_interfaces(RefPtr<TLifetime> lifetime)
@@ -195,6 +193,9 @@ public:
 
         register_interfaces<TLifetime, TInterfaces...>(lifetime);
     }
+
+    template <typename TInstance>
+    Container &add_singleton() { return add_singleton<TInstance, TInstance>(); }
 
     template <typename TInstance, typename... TInterfaces>
     requires(sizeof...(TInterfaces) > 0) Container &add_singleton()
@@ -211,9 +212,20 @@ public:
     }
 
     template <typename TInstance>
-    Container &add_singleton()
+    Container &add_transient() { return add_transient<TInstance, TInstance>(); }
+
+    template <typename TInstance, typename... TInterfaces>
+    requires(sizeof...(TInterfaces) > 0) Container &add_transient()
     {
-        return add_singleton<TInstance, TInstance>();
+        ConstructorFactory<TInstance> factory;
+
+        using LifetimeType = TransientLifeTime<TInstance, ConstructorFactory<TInstance>>;
+
+        auto lifetime = make<LifetimeType>(factory);
+
+        register_interfaces<LifetimeType, TInterfaces...>(lifetime);
+
+        return *this;
     }
 
     template <typename TInterface>

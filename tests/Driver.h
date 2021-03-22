@@ -1,6 +1,6 @@
 #pragma once
 
-#include <assert.h>
+#include <libtest/Assets.h>
 
 namespace Test
 {

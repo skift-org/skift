@@ -1,8 +1,4 @@
 #include <libutils/Path.h>
-#include <libtest/AssertEqual.h>
-#include <libtest/AssertNotEqual.h>
-#include <libtest/AssertFalse.h>
-#include <libtest/AssertTrue.h>
 
 #include "tests/Driver.h"
 

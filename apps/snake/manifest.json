@@ -1,0 +1,6 @@
+{
+    "name": "Snake",
+    "comment": "A snake game.",
+    "icon": "cog",
+    "command": "snake"
+}

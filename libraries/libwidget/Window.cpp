@@ -320,6 +320,12 @@ void Window::do_resize(Vec2i mouse_position)
     dispatch_event(&resize_event);
 }
 
+void Window::resize_to_content()
+{
+    Vec2i content_size = root()->compute_size();
+    bound({position(), content_size});
+}
+
 void Window::end_resize()
 {
     _is_resizing = false;

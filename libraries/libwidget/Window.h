@@ -130,6 +130,8 @@ public:
 
     void size(Vec2i size) { bound(bound_on_screen().resized(size)); }
 
+    void resize_to_content();
+
     Recti bound() { return _bound.moved({0, 0}); }
 
     void bound(Recti bound);

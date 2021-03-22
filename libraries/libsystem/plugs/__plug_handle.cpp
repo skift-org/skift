@@ -20,7 +20,7 @@ Result __plug_process_set_directory(const char *path)
 
     int handle;
 
-    TRY(hj_handle_open(&handle, path, strlen(path), OPEN_DIRECTORY));
+    TRY(hj_handle_open(&handle, new_path.cstring(), new_path.length(), OPEN_DIRECTORY));
     TRY(hj_handle_close(handle));
 
     environment().get("POSIX").put("PWD", new_path);

@@ -1,4 +1,4 @@
-#include <libinjection/Container.h>
+#include <libinjection/Inject.h>
 #include <libtest/Assets.h>
 
 #include "tests/Driver.h"
@@ -49,11 +49,64 @@ struct Type5Apple :
     String string() { return "apple"; }
 };
 
+struct Engine : public Injection::Entity
+{
+    int vroom()
+    {
+        return 42;
+    }
+};
+
+struct Car : public Injection::Entity
+{
+    RefPtr<Engine> _engine;
+
+    INJECTOR(Car(RefPtr<Engine> engine))
+        : _engine{engine}
+    {
+    }
+
+    int vroom()
+    {
+        return _engine->vroom();
+    }
+};
+
+struct Animal : public Injection::Entity
+{
+    virtual String speak() = 0;
+};
+
+struct Lion : public Animal
+{
+    virtual String speak() { return "Rhaaaa"; }
+};
+
+struct Cat : public Animal
+{
+    virtual String speak() { return "Maiou"; }
+};
+
+struct Dog : public Animal
+{
+    virtual String speak() { return "Bark"; }
+};
+
+struct Zoo : public Injection::Entity
+{
+    Vector<RefPtr<Animal>> _animals;
+
+    INJECTOR(Zoo(Vector<RefPtr<Animal>> animal))
+        : _animals{animal}
+    {
+    }
+};
+
 TEST(injection_container_fetch_simple_type)
 {
     Injection::Container container;
+    Injection::inject_singleton<Type42>(container);
 
-    container.add_singleton<Type42>();
     auto instance = container.get<Type42>();
 
     assert_equal(instance->func(), 42);
@@ -62,8 +115,8 @@ TEST(injection_container_fetch_simple_type)
 TEST(injection_container_fetch_type_behind_interface)
 {
     Injection::Container container;
+    Injection::inject_singleton<Type42, NumericType>(container);
 
-    container.add_singleton<Type42, NumericType>();
     auto instance = container.get<NumericType>();
 
     assert_equal(instance->func(), 42);
@@ -72,9 +125,8 @@ TEST(injection_container_fetch_type_behind_interface)
 TEST(injection_container_fetch_multiple_types)
 {
     Injection::Container container;
-
-    container.add_singleton<Type42, NumericType>();
-    container.add_singleton<Type52, NumericType>();
+    Injection::inject_singleton<Type42, NumericType>(container);
+    Injection::inject_singleton<Type52, NumericType>(container);
 
     auto numeric_types = container.get_all<NumericType>();
 
@@ -86,7 +138,7 @@ TEST(injection_container_fetch_multiple_types)
 TEST(injection_container_fetch_type_behind_multiple_interfaces)
 {
     Injection::Container container;
-    container.add_singleton<Type5Apple, NumericType, StringType>();
+    Injection::inject_singleton<Type5Apple, NumericType, StringType>(container);
 
     auto numeric_type = container.get<NumericType>();
     auto string_type = container.get<StringType>();
@@ -104,9 +156,8 @@ TEST(injection_container_fetch_type_behind_multiple_interfaces)
 TEST(injection_container_fetch_transient)
 {
     Injection::Container container;
-
-    container.add_transient<Type42>();
-    container.add_transient<Type42>();
+    Injection::inject_transient<Type42>(container);
+    Injection::inject_transient<Type42>(container);
 
     auto types = container.get_all<Type42>();
 
@@ -115,4 +166,20 @@ TEST(injection_container_fetch_transient)
     assert_equal(types[1]->func(), 42);
 
     assert_not_same_entity(types[0], types[1]);
+}
+
+TEST(injection_constructor_injection)
+{
+    Injection::Container container;
+    Injection::inject_singleton<Car>(container);
+    Injection::inject_singleton<Engine>(container);
+
+    auto car = container.get<Car>();
+    auto engine = container.get<Engine>();
+
+    assert_not_null(car);
+    assert_not_null(engine);
+
+    assert_equal(car->vroom(), 42);
+    assert_same_entity(car->_engine, engine);
 }

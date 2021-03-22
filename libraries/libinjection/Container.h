@@ -7,7 +7,6 @@
 #include <libutils/Vector.h>
 
 #include <libinjection/Entity.h>
-#include <libinjection/Factories.h>
 #include <libinjection/Lifetimes.h>
 #include <libinjection/Retriever.h>
 
@@ -32,32 +31,14 @@ public:
         register_interfaces<TLifetime, TInterfaces...>(lifetime);
     }
 
-    template <typename TInstance>
-    Container &add_singleton() { return add_singleton<TInstance, TInstance>(); }
-
-    template <typename TInstance, typename... TInterfaces>
-    requires(sizeof...(TInterfaces) > 0) Container &add_singleton()
+    template <
+        template <typename> typename TFactory,
+        template <typename, typename> typename TLifetime,
+        typename TInstance,
+        typename... TInterfaces>
+    Container &add(TFactory<TInstance> factory)
     {
-        ConstructorFactory<TInstance> factory;
-
-        using LifetimeType = SingletonLifeTime<TInstance, ConstructorFactory<TInstance>>;
-
-        auto lifetime = make<LifetimeType>(factory);
-
-        register_interfaces<LifetimeType, TInterfaces...>(lifetime);
-
-        return *this;
-    }
-
-    template <typename TInstance>
-    Container &add_transient() { return add_transient<TInstance, TInstance>(); }
-
-    template <typename TInstance, typename... TInterfaces>
-    requires(sizeof...(TInterfaces) > 0) Container &add_transient()
-    {
-        ConstructorFactory<TInstance> factory;
-
-        using LifetimeType = TransientLifeTime<TInstance, ConstructorFactory<TInstance>>;
+        using LifetimeType = TLifetime<TInstance, TFactory<TInstance>>;
 
         auto lifetime = make<LifetimeType>(factory);
 
@@ -67,7 +48,7 @@ public:
     }
 
     template <typename TInterface>
-    requires(!IsVector<TInterface>::value) RefPtr<TInterface> get()
+    RefPtr<TInterface> get(Context &context)
     {
         TypeId id = GetTypeId<TInterface>();
 
@@ -78,12 +59,18 @@ public:
 
         RefPtr<AnyRef> retriever = _retrievers[id].peek();
 
-        Context context{*this};
         return static_cast<RefPtr<Retriever<TInterface>>>(retriever)->instance(context);
     }
 
     template <typename TInterface>
-    Vector<RefPtr<TInterface>> get_all()
+    RefPtr<TInterface> get()
+    {
+        Context context{*this};
+        return get<TInterface>(context);
+    }
+
+    template <typename TInterface>
+    Vector<RefPtr<TInterface>> get_all(Context &context)
     {
         Vector<RefPtr<TInterface>> instances;
 
@@ -98,11 +85,31 @@ public:
 
         for (size_t i = 0; i < retrievers.count(); i++)
         {
-            Context context{*this};
             instances.push_back(static_cast<RefPtr<Retriever<TInterface>>>(retrievers[i])->instance(context));
         }
 
         return instances;
+    }
+
+    template <typename TInterface>
+    Vector<RefPtr<TInterface>> get_all()
+    {
+        Context context{*this};
+        return get_all<TInterface>(context);
+    }
+
+    template <typename TQuery>
+    requires(!IsVector<TQuery>::value) TQuery query(Context &context)
+    {
+        using TInterface = typename TrimRefPtr<TQuery>::type;
+        return get<TInterface>(context);
+    }
+
+    template <typename TQuery>
+    requires(IsVector<TQuery>::value) TQuery query(Context &context)
+    {
+        using TInterface = typename TrimRefPtr<typename TrimVector<TQuery>::type>::type;
+        return get_all<TInterface>(context);
     }
 };
 

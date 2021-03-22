@@ -3,18 +3,23 @@
 #include <libsystem/Result.h>
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
+#include <libio/BitReader.h>
+#include <libtest/AssertGreaterThan.h>
 
 namespace IO
 {
-class Reader;
 class Writer;
-class BitReader;
 } // namespace IO
 
 class Inflate
 {
 public:
-    Result perform(IO::Reader &compressed, IO::Writer &uncompressed);
+    Result perform(IO::SeekableReader auto& compressed, IO::Writer &uncompressed)
+    {
+        assert_greater_than(compressed.length().value(), 0);
+        IO::BitReader input(compressed);
+        return read_blocks(input, uncompressed);
+    }
 
 private:
     void build_fixed_huffman_alphabet();
@@ -24,6 +29,8 @@ private:
     void get_bit_length_count(HashMap<unsigned int, unsigned int> &bit_length_count, const Vector<unsigned int> &code_bit_lengths);
     void get_first_code(HashMap<unsigned int, unsigned int> &firstCodes, HashMap<unsigned int, unsigned int> &bit_length_count);
     void assign_huffman_codes(Vector<unsigned int> &assigned_codes, const Vector<unsigned int> &code_bit_lengths, HashMap<unsigned int, unsigned int> &first_codes);
+
+    Result read_blocks(IO::BitReader &input, IO::Writer &uncompressed);
 
     // Fixed huffmann
     Vector<unsigned int> _fixed_alphabet;

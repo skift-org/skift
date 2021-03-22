@@ -1,6 +1,5 @@
 #pragma once
-#include <libsystem/io/BitReader.h>
-#include <libsystem/io/Stream.h>
+#include <libio/BitReader.h>
 
 class HuffmanDecoder
 {
@@ -9,7 +8,7 @@ public:
     {
     }
 
-    unsigned int decode(BitReader &input)
+    unsigned int decode(IO::BitReader &input)
     {
         for (unsigned int i = 0; i < (unsigned int)_code_bit_lengths.count(); i++)
         {

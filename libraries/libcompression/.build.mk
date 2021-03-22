@@ -1,0 +1,3 @@
+LIBS += COMPRESSION
+
+COMPRESSION_NAME = compression

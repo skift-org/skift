@@ -24,10 +24,10 @@ static inline ResultOr<size_t> write(Writer &writer, String string)
 }
 
 template <typename T>
-static inline void write(Writer &writer, const T &data)
+static inline ResultOr<size_t> write(Writer &writer, const T &data)
 {
     uint8_t *bytes = (uint8_t *)&data;
-    writer.write(bytes, sizeof(T));
+    return writer.write(bytes, sizeof(T));
 }
 
 } // namespace IO

@@ -25,12 +25,12 @@ struct SeekFrom
 
     static SeekFrom end(ssize64_t position = 0)
     {
-        return {Whence::CURRENT, position};
+        return {Whence::END, position};
     }
 
     static SeekFrom current(ssize64_t position = 0)
     {
-        return {Whence::END, position};
+        return {Whence::CURRENT, position};
     }
 };
 

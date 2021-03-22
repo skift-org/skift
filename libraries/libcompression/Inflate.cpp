@@ -1,11 +1,10 @@
 #include <libcompression/Common.h>
 #include <libcompression/Huffman.h>
 #include <libcompression/Inflate.h>
-#include <libio/MemoryWriter.h>
 #include <libio/BitReader.h>
+#include <libio/MemoryWriter.h>
 #include <libio/Reader.h>
 #include <libio/Writer.h>
-#include <libtest/AssertGreaterThan.h>
 
 static constexpr uint8_t BASE_LENGTH_EXTRA_BITS[] = {
     0, 0, 0, 0, 0, 0, 0, 0, //257 - 264
@@ -236,10 +235,8 @@ Result Inflate::build_dynamic_huffman_alphabet(IO::BitReader &input)
     return Result::SUCCESS;
 }
 
-Result Inflate::perform(IO::Reader &compressed, IO::Writer &uncompressed)
+Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
 {
-    assert_greater_than(compressed.length(), 0);
-    IO::BitReader input(compressed);
     Vector<uint8_t> block_buffer;
 
     uint8_t bfinal;
@@ -260,7 +257,7 @@ Result Inflate::perform(IO::Reader &compressed, IO::Writer &uncompressed)
 
             for (int i = 0; i != len; i++)
             {
-                uncompressed.write_byte(input.grab_bits(8));
+                IO::write(uncompressed, (uint8_t)input.grab_bits(8));
             }
         }
         else if (btype == BT_FIXED_HUFFMAN ||

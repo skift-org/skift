@@ -1,13 +1,15 @@
 #pragma once
 
+#include <libio/Copy.h>
 #include <libio/Reader.h>
+#include <libtest/AssertEqual.h>
 #include <libutils/Vector.h>
 
 namespace IO
 {
 
 template <typename T>
-ResultOr<size_t> read(Reader &reader, Vector<T> &vector)
+ResultOr<size_t> read_vector(Reader &reader, Vector<T> &vector)
 {
     size_t read = 0;
 
@@ -24,27 +26,28 @@ ResultOr<size_t> read(Reader &reader, Vector<T> &vector)
     return read;
 }
 
-inline String read_string(Reader &reader, size_t len)
+inline ResultOr<String> read_string(Reader &reader, size_t len)
 {
-    char *cstr = new char[len];
-    assert_equal(_reader.read(cstr, len), len);
-    return String(make<StringStorage>(ADOPT, cstr, len));
+    IO::MemoryWriter memory;
+    TRY(IO::copy(reader, memory, len));
+    return String{memory.string()};
 }
 
 // Peek & Get functons
-template <typename T, typename R>
-requires SeekableReader<R> inline T peek(R &reader)
+template <typename T>
+inline ResultOr<T> peek(SeekableReader auto &reader)
 {
-    T result = read<T>(reader);
+    auto result = TRY(read<T>(reader));
     reader.seek(IO::SeekFrom::current(-sizeof(T)));
     return result;
 }
 
 template <typename T>
-inline T read(Reader &reader)
+inline ResultOr<T> read(Reader &reader)
 {
     T result;
-    assert(reader.read(&result, sizeof(T)) == sizeof(T));
+    size_t read = TRY(reader.read(&result, sizeof(T)));
+    assert_equal(read, sizeof(T));
     return result;
 }
 

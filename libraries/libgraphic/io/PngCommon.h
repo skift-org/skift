@@ -1,9 +1,12 @@
 #pragma once
 #include <libutils/Endian.h>
 
+namespace Png
+{
+
 enum CompressionMethod : uint8_t
 {
-  CM_Inflate = 0
+    CM_Inflate = 0
 };
 
 using be_cm = LittleEndian<CompressionMethod>;
@@ -77,3 +80,4 @@ struct __packed ImageEnd
     // iEND
     static constexpr uint32_t SIG = 0x49454E44;
 };
+} // namespace Png

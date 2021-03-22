@@ -5,8 +5,7 @@
 
 namespace IO
 {
-template <typename R>
-requires SeekableReader<R> class BitReader
+class BitReader
 {
 public:
     inline BitReader(const Vector<uint8_t> &data) : _data(data.raw_storage()), _size(data.count())
@@ -17,9 +16,9 @@ public:
     {
     }
 
-    inline BitReader(R &reader) : _data(new uint8_t[reader.length()]), _size(reader.length())
+    inline BitReader(SeekableReader auto &reader) : _data(new uint8_t[reader.length().value()]), _size(reader.length().value())
     {
-        reader.read((uint8_t *)_data, reader.length());
+        reader.read((uint8_t *)_data, reader.length().value());
     }
 
     inline void skip_bits(size_t num_bits)

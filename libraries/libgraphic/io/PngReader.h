@@ -14,6 +14,8 @@ public:
     }
 
 private:
+    Result read();
+
     bool _valid = false;
     uint32_t _width = 0;
     uint32_t _height = 0;

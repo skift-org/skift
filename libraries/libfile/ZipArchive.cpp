@@ -120,14 +120,13 @@ ZipArchive::ZipArchive(Path path, bool read) : Archive(path)
     }
 }
 
-template <typename SR>
-requires IO::SeekableReader<SR> void read_local_headers(SR &reader)
+Result read_local_headers(IO::SeekableReader auto &reader, Vector<Archive::Entry> &entries)
 {
     // Read all local file headers and data descriptors
-    while (reader.tell() < (reader.length() - sizeof(LocalHeader)))
+    while (reader.tell().value() < (reader.length().value() - sizeof(LocalHeader)))
     {
         logger_trace("Read local header");
-        auto local_header = IO::peek<LocalHeader>(reader);
+        auto local_header = TRY(IO::peek<LocalHeader>(reader));
 
         // Check if this is a local header
         if (local_header.signature() != ZIP_LOCAL_DIR_HEADER_SIG)
@@ -136,8 +135,8 @@ requires IO::SeekableReader<SR> void read_local_headers(SR &reader)
             break;
         }
 
-        auto &entry = _entries.emplace_back();
-        IO::skip(reader, sizeof(LocalHeader));
+        auto &entry = entries.emplace_back();
+        assert_equal(IO::skip(reader, sizeof(LocalHeader)), SUCCESS);
 
         // Get the uncompressed & compressed sizes
         entry.uncompressed_size = local_header.uncompressed_size();
@@ -145,42 +144,42 @@ requires IO::SeekableReader<SR> void read_local_headers(SR &reader)
         entry.compression = local_header.compression();
 
         // Read the filename of this entry
-        entry.name = IO::read_string(reader, local_header.len_filename());
+        entry.name = TRY(IO::read_string(reader, local_header.len_filename()));
         logger_trace("Found local header: '%s'", entry.name.cstring());
 
         // Read extra fields
-        auto end_position = reader.tell() + local_header.len_extrafield();
-        while (reader.tell() < end_position)
+        auto end_position = reader.tell().value() + local_header.len_extrafield();
+        while (reader.tell().value() < end_position)
         {
-            le_eft extra_field_type(IO::read<ExtraFieldType>(reader));
-            le_uint16_t extra_field_size(IO::read<uint16_t>(reader));
+            le_eft extra_field_type(IO::read<ExtraFieldType>(reader).value());
+            le_uint16_t extra_field_size(IO::read<uint16_t>(reader).value());
 
             // TODO: parse the known extra field types
             IO::skip(reader, extra_field_size());
         }
 
         // Skip the compressed data for now
-        entry.archive_offset = reader.tell();
+        entry.archive_offset = reader.tell().value();
         IO::skip(reader, entry.compressed_size);
 
         if (local_header.flags() & EF_DATA_DESCRIPTOR)
         {
-            auto data_descriptor = IO::read<DataDescriptor>(reader);
+            auto data_descriptor = TRY(IO::read<DataDescriptor>(reader));
             entry.uncompressed_size = data_descriptor.uncompressed_size();
             entry.compressed_size = data_descriptor.compressed_size();
         }
     }
+
+    return Result::SUCCESS;
 }
 
-template <typename SR>
-requires IO::SeekableReader<SR>
-Result ZipArchive::read_central_directory(SR &reader)
+Result read_central_directory(IO::SeekableReader auto &reader)
 {
     // Central directory starts here
-    while (reader.tell() < (reader.length() - sizeof(CentralDirectoryFileHeader)))
+    while (reader.tell().value() < (reader.length().value() - sizeof(CentralDirectoryFileHeader)))
     {
-        logger_trace("Read central directory header: '%s'", _path.string().cstring());
-        auto cd_file_header = IO::peek<CentralDirectoryFileHeader>(reader);
+        logger_trace("Read central directory header");
+        auto cd_file_header = TRY(IO::peek<CentralDirectoryFileHeader>(reader));
 
         // Check if this is a central directory file header
         if (cd_file_header.signature() != ZIP_CENTRAL_DIR_HEADER_SIG)
@@ -191,7 +190,7 @@ Result ZipArchive::read_central_directory(SR &reader)
         // Read the central directory entry
         IO::skip(reader, sizeof(CentralDirectoryFileHeader));
 
-        String name = IO::read_string(reader, cd_file_header.len_filename());
+        String name = IO::read_string(reader, cd_file_header.len_filename()).value();
         logger_trace("Found central directory header: '%s'", name.cstring());
 
         IO::skip(reader, cd_file_header.len_extrafield());
@@ -199,7 +198,7 @@ Result ZipArchive::read_central_directory(SR &reader)
     }
 
     // End of file
-    le_uint32_t central_dir_end_sig(IO::read<uint32_t>(reader));
+    le_uint32_t central_dir_end_sig(IO::read<uint32_t>(reader).value());
     if (central_dir_end_sig() != ZIP_END_OF_CENTRAL_DIR_HEADER_SIG)
     {
         logger_error("Missing 'central directory end record' signature!");
@@ -209,43 +208,35 @@ Result ZipArchive::read_central_directory(SR &reader)
     return Result::SUCCESS;
 }
 
-void ZipArchive::read_archive()
+Result ZipArchive::read_archive()
 {
     _valid = false;
 
-    IO::File archive_file{_path};
+    IO::File archive_file(_path, OPEN_READ);
 
     // Archive does not exist
     if (!archive_file.exist())
     {
         logger_error("Archive does not exist: %s", _path.string().cstring());
-        return;
+        return Result::ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
     logger_trace("Opening file: '%s'", _path.string().cstring());
 
-    IO::File file(_path);
-
     // A valid zip must atleast contain a "CentralDirectoryEndRecord"
-    if (file.length() < sizeof(CentralDirectoryEndRecord))
+    if (archive_file.length().value() < sizeof(CentralDirectoryEndRecord))
     {
-        logger_error("Archive is too small to be a valid .zip: %s %u", _path.string().cstring(), file.length());
-        return;
+        logger_error("Archive is too small to be a valid .zip: %s %u", _path.string().cstring(), archive_file.length());
+        return Result::ERR_INVALID_DATA;
     }
 
-    read_local_headers(file);
-    Result result = read_central_directory(file);
+    TRY(read_local_headers(archive_file, _entries));
+    TRY(read_central_directory(archive_file));
 
-    if (result != Result::SUCCESS)
-    {
-        return;
-    }
-
-    _valid = true;
+    return Result::SUCCESS;
 }
 
-template <typename SR>
-requires IO::SeekableReader<SR> void write_entry(const Archive::Entry &entry, IO::Writer &writer, SR &compressed)
+void write_entry(const Archive::Entry &entry, IO::Writer &writer, IO::SeekableReader auto &compressed)
 {
     LocalHeader header;
     header.flags = EF_NONE;
@@ -262,8 +253,7 @@ requires IO::SeekableReader<SR> void write_entry(const Archive::Entry &entry, IO
     IO::copy(compressed, writer);
 }
 
-template <typename SW>
-requires IO::SeekableWriter<SW> void write_central_directory(SW &writer, Vector<Archive::Entry> &entries)
+void write_central_directory(IO::SeekableWriter auto &writer, Vector<Archive::Entry> &entries)
 {
     auto start = writer.tell();
     for (const auto &entry : entries)
@@ -286,7 +276,7 @@ requires IO::SeekableWriter<SW> void write_central_directory(SW &writer, Vector<
 
     CentralDirectoryEndRecord end_record;
     end_record.signature = ZIP_END_OF_CENTRAL_DIR_HEADER_SIG;
-    end_record.central_dir_size = end - start;
+    end_record.central_dir_size = end.value() - start.value();
     end_record.central_dir_offset = start.value();
     end_record.disk_entries = entries.count();
     end_record.total_entries = entries.count();
@@ -354,10 +344,10 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
 
     auto &new_entry = _entries.emplace_back();
     new_entry.name = String(entry_name);
-    new_entry.compressed_size = compressed_writer.length();
+    new_entry.compressed_size = compressed_writer.length().value();
     new_entry.compression = CM_DEFLATED;
-    new_entry.uncompressed_size = src_reader.length();
-    new_entry.archive_offset = memory_writer.length() + sizeof(LocalHeader) + new_entry.name.length();
+    new_entry.uncompressed_size = src_reader.length().value();
+    new_entry.archive_offset = memory_writer.length().value() + sizeof(LocalHeader) + new_entry.name.length();
 
     auto compressed_data = compressed_writer.slice();
     IO::MemoryReader compressed_reader(compressed_data->start(), compressed_data->size());

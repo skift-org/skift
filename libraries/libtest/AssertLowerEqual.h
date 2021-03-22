@@ -11,7 +11,7 @@ inline void _assert_lower_equal(const A a, const B b, const char *file, const ch
     {
         if (!(a <= static_cast<A>(b)))
         {
-            assert_failed(IO::format("{} not greater-equal than {}", a, b).cstring(), file, function, line);
+            assert_failed(IO::format("{} not lower-equal than {}", a, b).cstring(), file, function, line);
         }
     }
 }

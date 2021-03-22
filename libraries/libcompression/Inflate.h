@@ -17,9 +17,7 @@ class Inflate
 public:
     Result perform(IO::Reader &compressed, IO::Writer &uncompressed)
     {
-        Vector<uint8_t> bitdata;
-        TRY(IO::read_vector(compressed, bitdata));
-        IO::BitReader input(bitdata);
+        IO::BitReader input(compressed);
         return read_blocks(input, uncompressed);
     }
 

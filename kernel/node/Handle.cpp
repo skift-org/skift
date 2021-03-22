@@ -176,7 +176,21 @@ ResultOr<ssize64_t> FsHandle::seek(IO::SeekFrom from)
         break;
 
     case IO::Whence::CURRENT:
-        _offset = _offset + from.position;
+        if (from.position < 0)
+        {
+            if ((size_t)-from.position <= _offset)
+            {
+                _offset = _offset + from.position;
+            }
+            else
+            {
+                _offset = 0;
+            }
+        }
+        else
+        {
+            _offset = _offset + from.position;
+        }
         break;
 
     case IO::Whence::END:

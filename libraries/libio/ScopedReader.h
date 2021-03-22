@@ -6,14 +6,15 @@ namespace IO
 {
 
 template <typename R>
-requires IO::SeekableReader<R> class ScopedReader final : public Reader, public Seek
+requires IO::SeekableReader<R> 
+class ScopedReader final : public Reader, public Seek
 {
 public:
     inline ScopedReader(R &reader, size_t size) : _reader(reader)
     {
-        assert((size_t)(reader.length() - reader.tell()) > size);
-        _start_pos = reader.tell();
-        size_t rem_size = reader.length() - _start_pos;
+        assert((size_t)(reader.length().value() - reader.tell().value()) > size);
+        _start_pos = reader.tell().value();
+        size_t rem_size = reader.length().value() - _start_pos;
         _size = MIN(rem_size, size);
     }
 
@@ -24,12 +25,12 @@ public:
 
     inline ResultOr<size_t> tell() override
     {
-        return _reader.tell() - _start_pos;
+        return _reader.tell().value() - _start_pos;
     }
 
     inline ResultOr<size_t> read(void *buffer, size_t size) override
     {
-        size_t rem_size = length() - tell();
+        size_t rem_size = length().value() - tell().value();
         return _reader.read(buffer, MIN(rem_size, size));
     }
 
@@ -49,7 +50,7 @@ public:
 
         case Whence::CURRENT:
         {
-            auto offset = *_reader.tell() + from.position;
+            auto offset = _reader.tell().value() + from.position;
 
             offset = MAX(_start_pos, offset);
             offset = MIN(_start_pos + _size, offset);
@@ -59,7 +60,7 @@ public:
 
         case Whence::END:
         {
-            auto offset = *_reader.length() + from.position;
+            auto offset = _reader.length().value() + from.position;
 
             offset = MAX(_start_pos, offset);
             offset = MIN(_start_pos + _size, offset);

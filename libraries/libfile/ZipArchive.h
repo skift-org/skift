@@ -13,6 +13,6 @@ public:
     Result insert(const char *entry_name, const char *src_path) override;
 
 private:
-    void read_archive();
+    Result read_archive();
     void write_archive();
 };

@@ -29,7 +29,7 @@ public:
 
     inline void put_uint16(uint16_t v)
     {
-        IO::write(v);
+        IO::write(_writer, v);
     }
 
     inline void align()

@@ -165,10 +165,10 @@ SETTINGSCTL_NAME = settingsctl
 WALLPAPERCTL_LIBS = graphic system io
 WALLPAPERCTL_NAME = wallpaperctl
 
-ZIP_LIBS = file system io
+ZIP_LIBS = file system io compression
 ZIP_NAME = zip
 
-UNZIP_LIBS = file system io
+UNZIP_LIBS = file system io compression
 UNZIP_NAME = unzip
 
 define UTIL_TEMPLATE =

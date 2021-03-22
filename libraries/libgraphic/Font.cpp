@@ -23,7 +23,7 @@ static ResultOr<Vector<Glyph>> font_load_glyph(String name)
 
     Vector<Glyph> glyphs;
 
-    TRY(IO::read(glyph_file, glyphs));
+    TRY(IO::read_vector(glyph_file, glyphs));
 
     return glyphs;
 }

@@ -116,7 +116,7 @@ ZipArchive::ZipArchive(Path path, bool read) : Archive(path)
 {
     if (read)
     {
-        read_archive();
+        logger_trace("Did read archive, result: %u ", read_archive());
     }
 }
 
@@ -188,17 +188,17 @@ Result read_central_directory(IO::SeekableReader auto &reader)
         }
 
         // Read the central directory entry
-        IO::skip(reader, sizeof(CentralDirectoryFileHeader));
+        TRY(IO::skip(reader, sizeof(CentralDirectoryFileHeader)));
 
         String name = IO::read_string(reader, cd_file_header.len_filename()).value();
         logger_trace("Found central directory header: '%s'", name.cstring());
 
-        IO::skip(reader, cd_file_header.len_extrafield());
-        IO::skip(reader, cd_file_header.len_comment());
+        TRY(IO::skip(reader, cd_file_header.len_extrafield()));
+        TRY(IO::skip(reader, cd_file_header.len_comment()));
     }
 
     // End of file
-    le_uint32_t central_dir_end_sig(IO::read<uint32_t>(reader).value());
+    le_uint32_t central_dir_end_sig = TRY(IO::read<uint32_t>(reader));
     if (central_dir_end_sig() != ZIP_END_OF_CENTRAL_DIR_HEADER_SIG)
     {
         logger_error("Missing 'central directory end record' signature!");
@@ -233,6 +233,7 @@ Result ZipArchive::read_archive()
     TRY(read_local_headers(archive_file, _entries));
     TRY(read_central_directory(archive_file));
 
+    _valid = true;
     return Result::SUCCESS;
 }
 
@@ -298,12 +299,12 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
     Inflate inf;
 
     // Get a reader to the uncompressed data
-    IO::File file_reader(_path);
+    IO::File file_reader(_path, OPEN_READ);
     file_reader.seek(IO::SeekFrom::start(entry.archive_offset));
     IO::ScopedReader scoped_reader(file_reader, entry.uncompressed_size);
 
     // Get a writer to the output
-    IO::File file_writer(dest_path);
+    IO::File file_writer(dest_path, OPEN_WRITE);
 
     return inf.perform(scoped_reader, file_writer);
 }

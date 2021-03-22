@@ -75,7 +75,6 @@ bool tar_read(void *tarfile, TARBlock *block, size_t index)
 #ifndef __KERNEL__
 
 #    include <libfile/TARArchive.h>
-#    include <libsystem/io/FileReader.h>
 
 TARArchive::TARArchive(Path path, bool read) : Archive(path)
 {

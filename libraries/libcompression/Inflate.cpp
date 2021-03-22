@@ -245,6 +245,8 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
         bfinal = input.grab_bits(1);
         uint8_t btype = input.grab_bits(2);
 
+        logger_trace("Read block: %u %u",bfinal, btype );
+
         // Uncompressed block
         if (btype == BT_UNCOMPRESSED)
         {

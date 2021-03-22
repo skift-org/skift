@@ -23,7 +23,7 @@ public:
     }
 
     MemoryReader(const void *ptr, size_t size)
-        : _memory{ptr, size},
+        : _memory(ptr, size),
           _position{0}
     {
     }
@@ -60,6 +60,11 @@ public:
         default:
             ASSERT_NOT_REACHED();
         }
+    }
+
+    ResultOr<size_t> length() override
+    {
+        return _memory.size();
     }
 
     ResultOr<size_t> tell() override

@@ -2,8 +2,10 @@
 #include <libgraphic/io/PngCommon.h>
 #include <libgraphic/io/PngReader.h>
 #include <libio/Read.h>
+#include <libio/Skip.h>
 #include <libsystem/Logger.h>
 #include <libutils/Array.h>
+#include <libtest/AssertLowerEqual.h>
 
 graphic::PngReader::PngReader(IO::Reader &reader) : _reader(reader)
 {
@@ -69,18 +71,23 @@ Result graphic::PngReader::read()
         {
             Inflate inflate;
 
-            Vector<uint8_t> data(chunk_length());
-            data.resize(chunk_length());
-            logger_trace("resized vector: %u %u", data.count(), chunk_length());
+            // Two bytes before the actual deflate data, see https://www.w3.org/TR/2003/REC-PNG-20031110/#10Compression
+            auto cm_cinfo = TRY(IO::read<uint8_t>(_reader));
+            // ZLib compression mode should be DEFLATE
+            assert_equal(cm_cinfo & 15, 8);
+            // Sliding window should be 32k at max
+            assert_lower_equal((cm_cinfo >> 4) & 15, 7);
+            auto flags = TRY(IO::read<uint8_t>(_reader));
+            __unused(flags);
 
-            TRY(_reader.read(data.raw_storage(), chunk_length()));
-            IO::MemoryReader mem_reader(data.raw_storage(), data.count());
             IO::MemoryWriter mem_writer;
-            logger_trace("Uncompressing PNG data: CS: %u", mem_reader.length().value());
 
-            TRY(inflate.perform(mem_reader, mem_writer));
+            TRY(inflate.perform(_reader, mem_writer));
 
-            logger_trace("Uncompressed PNG data: CS: %u US: %u", mem_reader.length().value(), mem_writer.length());
+            logger_trace("Uncompressed PNG data: US: %u", mem_writer.length().value());
+
+            // Skip CRC32
+            IO::skip(_reader, 4);
         }
         break;
 

@@ -5,8 +5,7 @@
 namespace IO
 {
 
-template <typename R>
-requires IO::SeekableReader<R> 
+template <IO::SeekableReader R>
 class ScopedReader final : public Reader, public Seek
 {
 public:

@@ -15,9 +15,8 @@ class Writer;
 class Inflate
 {
 public:
-    Result perform(IO::SeekableReader auto& compressed, IO::Writer &uncompressed)
+    Result perform(IO::Reader &compressed, IO::Writer &uncompressed)
     {
-        assert_greater_than(compressed.length().value(), 0);
         Vector<uint8_t> bitdata;
         TRY(IO::read_vector(compressed, bitdata));
         IO::BitReader input(bitdata);

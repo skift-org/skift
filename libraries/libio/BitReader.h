@@ -3,6 +3,7 @@
 #include <libsystem/Common.h>
 #include <libutils/Vector.h>
 #include <libtest/AssertEqual.h>
+#include <libtest/AssertGreaterThan.h>
 
 namespace IO
 {
@@ -24,6 +25,7 @@ public:
 
     inline uint16_t grab_uint16()
     {
+        assert_greater_than(_size * 8, _index + 16);
         uint16_t result = _data[_index / 8] + (_data[(_index / 8) + 1] << 8);
         _index += 16;
         return result;
@@ -31,6 +33,7 @@ public:
 
     inline uint8_t peek_bit()
     {
+        assert_greater_than(_size * 8, _index );
         return (_data[_index / 8] & (1 << (_index % 8))) ? 1 : 0;
     }
 

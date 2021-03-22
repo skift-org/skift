@@ -70,7 +70,17 @@ Result graphic::PngReader::read()
             Inflate inflate;
 
             Vector<uint8_t> data(chunk_length());
+            data.resize(chunk_length());
+            logger_trace("resized vector: %u %u", data.count(), chunk_length());
+
             TRY(_reader.read(data.raw_storage(), chunk_length()));
+            IO::MemoryReader mem_reader(data.raw_storage(), data.count());
+            IO::MemoryWriter mem_writer;
+            logger_trace("Uncompressing PNG data: CS: %u", mem_reader.length().value());
+
+            TRY(inflate.perform(mem_reader, mem_writer));
+
+            logger_trace("Uncompressed PNG data: CS: %u US: %u", mem_reader.length().value(), mem_writer.length());
         }
         break;
 

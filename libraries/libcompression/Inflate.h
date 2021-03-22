@@ -4,6 +4,7 @@
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
 #include <libio/BitReader.h>
+#include <libio/Read.h>
 #include <libtest/AssertGreaterThan.h>
 
 namespace IO
@@ -17,7 +18,9 @@ public:
     Result perform(IO::SeekableReader auto& compressed, IO::Writer &uncompressed)
     {
         assert_greater_than(compressed.length().value(), 0);
-        IO::BitReader input(compressed);
+        Vector<uint8_t> bitdata;
+        TRY(IO::read_vector(compressed, bitdata));
+        IO::BitReader input(bitdata);
         return read_blocks(input, uncompressed);
     }
 

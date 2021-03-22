@@ -2,6 +2,7 @@
 #include <libio/Reader.h>
 #include <libsystem/Common.h>
 #include <libutils/Vector.h>
+#include <libtest/AssertEqual.h>
 
 namespace IO
 {
@@ -14,11 +15,6 @@ public:
 
     inline BitReader(uint8_t *data, size_t size) : _data(data), _size(size)
     {
-    }
-
-    inline BitReader(SeekableReader auto &reader) : _data(new uint8_t[reader.length().value()]), _size(reader.length().value())
-    {
-        reader.read((uint8_t *)_data, reader.length().value());
     }
 
     inline void skip_bits(size_t num_bits)

@@ -82,15 +82,15 @@ Result Graphic::PngReader::read()
             Compression::Inflate inflate;
             IO::MemoryWriter memory;
             size_t compressed_size = TRY(inflate.perform(_reader, memory));
+            logger_trace("Uncompressed PNG data: CS: %u US: %u", compressed_size, memory.length().value());
 
             // TODO: fix this
             // Use the CRC to do this ugly hack. Missing should be 4, but for some reason it's 3 sometimes for us
-            auto missing = chunk_length() - (compressed_size + 2);
+            int64_t missing = ((int64_t)chunk_length()) - (compressed_size + 2);
             assert_equal(missing, 4);
             // Skip CRC32
             TRY(IO::skip(_reader, missing));
 
-            logger_trace("Uncompressed PNG data: US: %u", memory.length().value());
         }
         break;
 

@@ -21,10 +21,11 @@ public:
         pop_cache();
     }
 
-    inline uint16_t grab_uint16()
+    template<class T>
+    inline T grab_aligned()
     {
         assert_equal(_bit_index, 0);
-        return IO::read<uint16_t>(_reader).value();
+        return IO::read<T>(_reader).value();
     }
 
     inline unsigned int grab_bits(unsigned int num_bits)

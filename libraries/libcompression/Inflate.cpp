@@ -5,6 +5,7 @@
 #include <libio/MemoryWriter.h>
 #include <libio/Reader.h>
 #include <libio/Writer.h>
+#include <libutils/InlineRingBuffer.h>
 
 static constexpr uint8_t BASE_LENGTH_EXTRA_BITS[] = {
     0, 0, 0, 0, 0, 0, 0, 0, //257 - 264
@@ -237,13 +238,16 @@ Result Inflate::build_dynamic_huffman_alphabet(IO::BitReader &input)
 
 Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
 {
-    Vector<uint8_t> sliding_window_buffer;
+    // Size might vary
+    RingBuffer sliding_window_buffer(32768);
 
     uint8_t bfinal;
     do
     {
         bfinal = input.grab_bits(1);
         uint8_t btype = input.grab_bits(2);
+
+        logger_trace("Read Inflate block: BF %u BT %u", bfinal, btype);
 
         // Uncompressed block
         if (btype == BT_UNCOMPRESSED)
@@ -286,17 +290,11 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
                                         btype == BT_FIXED_HUFFMAN ? _fixed_dist_code_bit_lengths : _dist_code_bit_length);
             while (true)
             {
-                // Bigger than our sliding window
-                if (sliding_window_buffer.count() > 32768)
-                {
-                    sliding_window_buffer.pop();
-                }
-
                 unsigned int decoded_symbol = symbol_decoder.decode(input);
                 if (decoded_symbol <= 255)
                 {
                     IO::write<uint8_t>(uncompressed, decoded_symbol);
-                    sliding_window_buffer.push_back((uint8_t)decoded_symbol);
+                    sliding_window_buffer.put((uint8_t)decoded_symbol);
                 }
                 else if (decoded_symbol == 256)
                 {
@@ -311,12 +309,12 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
                     assert_lower_than(dist_code, 30);
 
                     unsigned int total_dist = BASE_DISTANCE[dist_code] + input.grab_bits(BASE_DISTANCE_EXTRA_BITS[dist_code]);
-                    uint8_t *pos = (uint8_t *)&sliding_window_buffer[sliding_window_buffer.count() - total_dist];
+                    uint8_t val = sliding_window_buffer.peek(sliding_window_buffer.used() - total_dist);
                     for (unsigned int i = 0; i != total_length; i++)
                     {
-                        IO::write<uint8_t>(uncompressed, *pos);
-                        sliding_window_buffer.push_back(*pos);
-                        pos = (uint8_t *)&sliding_window_buffer[sliding_window_buffer.count() - total_dist];
+                        IO::write<uint8_t>(uncompressed, val);
+                        sliding_window_buffer.put(val);
+                        val = sliding_window_buffer.peek(sliding_window_buffer.used() - total_dist);
                     }
                 }
                 else

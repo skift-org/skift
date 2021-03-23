@@ -31,8 +31,11 @@ public:
             {
                 _end_of_file = true;
             }
+            else
+            {
+                _consumed += sizeof(byte);
+            }
 
-            _consumed += sizeof(byte);
             _buffer.put(byte);
         }
 
@@ -172,7 +175,7 @@ public:
         for (size_t i = 0; i < num_bits; i++)
         {
             uint8_t bit = grab_bit();
-            result |= bit << ((num_bits -1) - i);
+            result |= bit << ((num_bits - 1) - i);
         }
 
         return result;

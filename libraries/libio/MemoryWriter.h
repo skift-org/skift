@@ -46,7 +46,7 @@ public:
 
     ResultOr<size_t> length()
     {
-        return _size;
+        return _used;
     }
 
     ResultOr<size_t> tell()

@@ -38,6 +38,13 @@ public:
         other._buffer = nullptr;
     }
 
+    void flush()
+    {
+        _head = 0;
+        _tail = 0;
+        _used = 0;
+    }
+
     InlineRingBuffer &operator=(const InlineRingBuffer &other)
     {
         return *this = InlineRingBuffer(other);

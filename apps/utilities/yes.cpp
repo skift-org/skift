@@ -1,22 +1,17 @@
-#include <libsystem/io/Stream.h>
-#include <libutils/StringBuilder.h>
-
-#include <stdio.h>
+#include <libio/MemoryWriter.h>
+#include <libio/Streams.h>
 
 String concat(int argc, char **argv)
 {
-    int i;
-    StringBuilder builder;
+    IO::MemoryWriter memory;
 
-    for (i = 1; i < argc - 1; i++)
+    for (int i = 1; i < argc - 1; i++)
     {
-        builder.append(argv[i]);
-        builder.append(" ");
+        IO::write(memory, argv[i]);
+        IO::write(memory, ' ');
     }
 
-    builder.append(argv[i]);
-
-    return builder.finalize();
+    return memory.string();
 }
 
 int main(int argc, char **argv)
@@ -30,11 +25,11 @@ int main(int argc, char **argv)
 
     while (1)
     {
-        printf("%s\n", output.cstring());
+        auto result = IO::write(IO::out(), output);
 
-        if (handle_has_error(out_stream))
+        if (!result.success())
         {
-            handle_printf_error(out_stream, "Couldn't write to stdout\n");
+            IO::outln("Couldn't write to stdout: {}", result.description());
             return PROCESS_FAILURE;
         }
     }

@@ -1,12 +1,10 @@
-
-#include <libsystem/io/Stream.h>
+#include <libio/File.h>
 
 int main(int argc, char **argv)
 {
     for (int i = 1; i < argc; i++)
     {
-        Stream *stream = stream_open(argv[i], OPEN_CREATE);
-        stream_close(stream);
+        IO::File file{argv[i], OPEN_CREATE};
     }
 
     return PROCESS_SUCCESS;

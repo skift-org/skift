@@ -140,7 +140,7 @@ case mitzvah:
 *Example:*
 
 ```C++
-#include <libsystem/io/Stream.h>
+#include <libio/Streams.h>
 
 #include "foo.h"
 ```

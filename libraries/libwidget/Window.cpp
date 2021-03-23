@@ -2,7 +2,6 @@
 
 #include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
-#include <libsystem/io/Stream.h>
 #include <libsystem/system/Memory.h>
 
 #include <libwidget/Application.h>

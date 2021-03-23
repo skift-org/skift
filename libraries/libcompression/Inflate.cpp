@@ -252,7 +252,7 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
         {
             // Align to byte bounadries
             input.skip_bits(5);
-            auto len = input.grab_uint16();
+            auto len = input.grab_aligned<uint16_t>();
 
             logger_trace("Read uncompressed block: len %u", len);
 

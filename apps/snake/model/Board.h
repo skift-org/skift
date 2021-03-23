@@ -78,6 +78,11 @@ public:
             reset();
         }
 
+        if (!Recti{_width, _height}.contains(_snake.head))
+        {
+            reset();
+        }
+
         int old_fruit_count = _fruits.count();
         _fruits.remove_all_match([&](Fruit &fruit) { return _snake.colide_with(fruit.position); });
         int new_fruit_count = _fruits.count();

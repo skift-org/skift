@@ -15,7 +15,7 @@ public:
     MainWindow()
         : Window{WINDOW_NONE}
     {
-        title("snake");
+        title("Snake");
 
         root()->layout(VFLOW(0));
         new TitleBar(root());

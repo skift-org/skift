@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <libsystem/Logger.h>
-#include <libutils/RingBuffer.h>
 
 #include "kernel/devices/Devices.h"
 #include "kernel/interrupts/Dispatcher.h"

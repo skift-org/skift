@@ -5,6 +5,7 @@
 
 #include <libutils/Move.h>
 
+template <typename T>
 class RingBuffer
 {
 private:
@@ -13,13 +14,13 @@ private:
     size_t _size = 0;
     size_t _used = 0;
 
-    char *_buffer = nullptr;
+    T *_buffer = nullptr;
 
 public:
     RingBuffer(size_t size)
     {
         _size = size;
-        _buffer = new char[size];
+        _buffer = new T[size];
     }
 
     RingBuffer(const RingBuffer &other) : _head(other._head),
@@ -27,7 +28,7 @@ public:
                                           _size(other._size),
                                           _used(other._used)
     {
-        _buffer = new char[other._size];
+        _buffer = new T[other._size];
         memcpy(_buffer, other._buffer, other._size);
     }
 
@@ -82,7 +83,7 @@ public:
         return _used;
     }
 
-    void put(char c)
+    void put(T c)
     {
         assert(!full());
 
@@ -91,7 +92,7 @@ public:
         _used++;
     }
 
-    char get()
+    T get()
     {
         assert(!empty());
 
@@ -102,14 +103,14 @@ public:
         return c;
     }
 
-    char peek(size_t peek)
+    T peek(size_t peek)
     {
         int offset = (_tail + peek) % (_size);
 
         return _buffer[offset];
     }
 
-    size_t read(char *buffer, size_t size)
+    size_t read(T *buffer, size_t size)
     {
         size_t read = 0;
 
@@ -122,7 +123,7 @@ public:
         return read;
     }
 
-    size_t write(const char *buffer, size_t size)
+    size_t write(const T *buffer, size_t size)
     {
         size_t written = 0;
 

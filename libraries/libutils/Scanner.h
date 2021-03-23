@@ -3,9 +3,9 @@
 #include <assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
-#include <libutils/unicode/Codepoint.h>
 #include <libutils/NumberParser.h>
 #include <libutils/RingBuffer.h>
+#include <libutils/unicode/Codepoint.h>
 #include <string.h>
 
 class Scanner
@@ -171,7 +171,7 @@ class StreamScanner : public Scanner
 private:
     static constexpr int PEEK_SIZE = 16;
 
-    RingBuffer _peek{PEEK_SIZE};
+    RingBuffer<char> _peek{PEEK_SIZE};
     Stream *_stream = nullptr;
 
     void refill()

@@ -11,9 +11,8 @@ private:
 
     bool _accepted = false;
 
-    RingBuffer _data_to_server{BUFFER_SIZE};
-
-    RingBuffer _data_to_client{BUFFER_SIZE};
+    RingBuffer<char> _data_to_server{BUFFER_SIZE};
+    RingBuffer<char> _data_to_client{BUFFER_SIZE};
 
 public:
     FsConnection();

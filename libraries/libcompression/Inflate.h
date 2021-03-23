@@ -15,10 +15,11 @@ class Writer;
 class Inflate
 {
 public:
-    Result perform(IO::Reader &compressed, IO::Writer &uncompressed)
+    ResultOr<size_t> perform(IO::Reader &compressed, IO::Writer &uncompressed)
     {
         IO::BitReader input(compressed);
-        return read_blocks(input, uncompressed);
+        TRY(read_blocks(input, uncompressed));
+        return input.consumed();
     }
 
 private:

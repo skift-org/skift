@@ -20,7 +20,7 @@ public:
         root()->layout(VFLOW(0));
         new TitleBar(root());
         auto board = new BoardWidget(root());
-        board->outsets({2});
+        board->outsets({32});
         board->focus();
 
         resize_to_content();

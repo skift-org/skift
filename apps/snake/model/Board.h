@@ -28,27 +28,63 @@ public:
 
     Board(int width, int height)
         : _width{width},
-          _height{height},
-          _snake{},
-          _fruits{}
+          _height{height}
     {
-        _snake.head = {_width / 2, _height / 2};
-        for (int i = 0; i < 4; i++)
-        {
-            _snake.tail.push_back({_width / 2 + 1 + i, _height / 2});
-        }
+        reset();
+    }
 
-        _snake.facing = Facing::LEFT;
+    void reset()
+    {
+        _snake = Snake{Vec2i{_width, _height} / 2};
 
-        for (size_t i = 0; i < 5; i++)
+        _fruits.clear();
+        spawn();
+    }
+
+    void spawn()
+    {
+        for (size_t i = _fruits.count(); i < 5; i++)
         {
-            _fruits.push_back(Fruit{.position{_random.next_u8() % _width, _random.next_u8() % _height}});
+            Vec2i position{_random.next_u8() % _width, _random.next_u8() % _height};
+
+            bool obstructed = false;
+
+            if (_snake.colide_with(position))
+            {
+                obstructed = true;
+            }
+
+            for (auto &fruit : _fruits)
+            {
+                if (fruit.position == position)
+                {
+                    obstructed = true;
+                }
+            }
+
+            if (!obstructed)
+            {
+                _fruits.push_back(Fruit{.position = position});
+            }
         }
     }
 
     void update()
     {
         _snake.move();
+
+        if (_snake.colide_with_body(_snake.head))
+        {
+            reset();
+        }
+
+        int old_fruit_count = _fruits.count();
+        _fruits.remove_all_match([&](Fruit &fruit) { return _snake.colide_with(fruit.position); });
+        int new_fruit_count = _fruits.count();
+
+        _snake.score += old_fruit_count - new_fruit_count;
+
+        spawn();
     }
 };
 

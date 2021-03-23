@@ -21,7 +21,7 @@ struct BoardWidget : public Widget
     {
         board = make<Board>(15, 15);
 
-        _timer = own<Timer>(500, [this]() {
+        _timer = own<Timer>(300, [this]() {
             board->update();
             should_repaint();
         });
@@ -72,22 +72,22 @@ struct BoardWidget : public Widget
 
             if (keyboard_event.key == KEYBOARD_KEY_UP)
             {
-                board->snake().facing = Facing::UP;
+                board->snake().face_to(Facing::UP);
             }
 
             if (keyboard_event.key == KEYBOARD_KEY_DOWN)
             {
-                board->snake().facing = Facing::DOWN;
+                board->snake().face_to(Facing::DOWN);
             }
 
             if (keyboard_event.key == KEYBOARD_KEY_LEFT)
             {
-                board->snake().facing = Facing::LEFT;
+                board->snake().face_to(Facing::LEFT);
             }
 
             if (keyboard_event.key == KEYBOARD_KEY_RIGHT)
             {
-                board->snake().facing = Facing::RIGHT;
+                board->snake().face_to(Facing::RIGHT);
             }
 
             event->accepted = true;

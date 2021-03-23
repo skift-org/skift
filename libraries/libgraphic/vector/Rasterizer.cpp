@@ -1,7 +1,7 @@
 #include <libgraphic/Painter.h>
 #include <libgraphic/vector/Rasterizer.h>
 
-namespace graphic
+namespace Graphic
 {
 
 void Rasterizer::tessellate_cubic_bezier(BezierCurve &curve, int depth)
@@ -78,4 +78,4 @@ void Rasterizer::stroke(Painter &painter, Path &path, Vec2f position, Trans2f tr
         }
     }
 }
-} // namespace graphic
+} // namespace Graphic

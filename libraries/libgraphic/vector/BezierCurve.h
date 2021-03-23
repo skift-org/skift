@@ -2,7 +2,7 @@
 
 #include <libutils/Vec2.h>
 
-namespace graphic
+namespace Graphic
 {
 
 struct BezierCurve
@@ -13,4 +13,4 @@ struct BezierCurve
     Vec2f end;
 };
 
-} // namespace graphic
+} // namespace Graphic

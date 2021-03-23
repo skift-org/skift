@@ -5,7 +5,7 @@
 #include <libgraphic/vector/Arc.h>
 #include <libgraphic/vector/BezierCurve.h>
 
-namespace graphic
+namespace Graphic
 {
 
 class SubPath
@@ -76,4 +76,4 @@ public:
     void arc_to_relative(float rx, float ry, float angle, int flags, Vec2f point);
 };
 
-} // namespace graphic
+} // namespace Graphic

@@ -7,7 +7,7 @@
 
 class Painter;
 
-namespace graphic
+namespace Graphic
 {
 
 class Rasterizer
@@ -34,4 +34,4 @@ public:
     void stroke(Painter &painter, Path &path, Vec2f position, Trans2f transform, Color color);
 };
 
-} // namespace graphic
+} // namespace Graphic

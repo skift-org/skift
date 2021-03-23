@@ -7,13 +7,13 @@
 #include <libtest/AssertLowerEqual.h>
 #include <libutils/Array.h>
 
-graphic::PngReader::PngReader(IO::Reader &reader) : _reader(reader)
+Graphic::PngReader::PngReader(IO::Reader &reader) : _reader(reader)
 {
     read();
     logger_trace("Image dims: %u %u", _width, _height);
 }
 
-Result graphic::PngReader::read()
+Result Graphic::PngReader::read()
 {
     Array<uint8_t, 8> signature;
     _reader.read(signature.raw_storage(), sizeof(signature));

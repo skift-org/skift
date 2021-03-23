@@ -1,7 +1,7 @@
 #include <libgraphic/vector/Path.h>
 #include <libutils/ScannerUtils.h>
 
-namespace graphic
+namespace Graphic
 {
 static constexpr auto WHITESPACE = "\n\r\t ";
 static constexpr auto OPERATIONS = "MmZzLlHhVvCcSsQqTtAa";
@@ -258,4 +258,4 @@ Path Path::parse(Scanner &scan)
     return path;
 }
 
-} // namespace graphic
+} // namespace Graphic

@@ -63,6 +63,16 @@ ResultOr<size_t> format(Writer &writer, const Formating &, unsigned long int val
     return NumberFormat::decimal().format(writer, (uint64_t)value);
 }
 
+ResultOr<size_t> format(IO::Writer &writer, const Formating &, long long int value)
+{
+    return NumberFormat::decimal().format(writer, (int64_t)value);
+}
+
+ResultOr<size_t> format(IO::Writer &writer, const Formating &, unsigned long long int value)
+{
+    return NumberFormat::decimal().format(writer, (uint64_t)value);
+}
+
 ResultOr<size_t> format(Writer &writer, const Formating &, float value)
 {
     return NumberFormat::decimal().format(writer, value);

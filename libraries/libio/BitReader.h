@@ -13,7 +13,6 @@ private:
     IO::Reader &_reader;
     utils::InlineRingBuffer<uint8_t, 16> _buffer;
     size_t _head = 0;
-    size_t _consumed = 0;
     bool _end_of_file;
 
 public:
@@ -31,20 +30,11 @@ public:
             {
                 _end_of_file = true;
             }
-            else
-            {
-                _consumed += sizeof(byte);
-            }
 
             _buffer.put(byte);
         }
 
         return SUCCESS;
-    }
-
-    inline size_t consumed()
-    {
-        return _consumed;
     }
 
     inline void flush()

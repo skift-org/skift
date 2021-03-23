@@ -1,5 +1,5 @@
 #include <libgraphic/Painter.h>
-#include <libgraphic/vector/Rasterizer.h>
+#include <libgraphic/svg/Rasterizer.h>
 
 namespace Graphic
 {

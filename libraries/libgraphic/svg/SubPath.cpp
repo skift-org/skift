@@ -1,6 +1,6 @@
 #include <libutils/Trans2.h>
 
-#include <libgraphic/vector/SubPath.h>
+#include <libgraphic/svg/SubPath.h>
 #include <libtest/AssertLowerThan.h>
 
 namespace Graphic

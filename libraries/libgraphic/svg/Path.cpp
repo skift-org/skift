@@ -1,4 +1,4 @@
-#include <libgraphic/vector/Path.h>
+#include <libgraphic/svg/Path.h>
 #include <libutils/ScannerUtils.h>
 
 namespace Graphic

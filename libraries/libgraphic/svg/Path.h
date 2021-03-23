@@ -4,8 +4,8 @@
 #include <libutils/Scanner.h>
 #include <libutils/Vector.h>
 
-#include <libgraphic/vector/Arc.h>
-#include <libgraphic/vector/SubPath.h>
+#include <libgraphic/svg/Arc.h>
+#include <libgraphic/svg/SubPath.h>
 
 namespace Graphic
 {

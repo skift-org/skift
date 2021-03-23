@@ -7,7 +7,7 @@
 #include <libgraphic/vector/Arc.h>
 #include <libgraphic/vector/SubPath.h>
 
-namespace graphic
+namespace Graphic
 {
 
 class Path
@@ -205,4 +205,4 @@ public:
     }
 };
 
-} // namespace graphic
+} // namespace Graphic

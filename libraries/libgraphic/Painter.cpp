@@ -572,7 +572,7 @@ __flatten void Painter::draw_triangle(Vec2i p0, Vec2i p1, Vec2i p2, Color color)
     draw_line(p2, p0, color);
 }
 
-void Painter::draw_path(const graphic::Path &path, Vec2f pos, Trans2f transform, Color color)
+void Painter::draw_path(const Graphic::Path &path, Vec2f pos, Trans2f transform, Color color)
 {
     for (size_t i = 0; i < path.subpath_count(); i++)
     {

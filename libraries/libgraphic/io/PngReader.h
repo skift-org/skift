@@ -1,7 +1,7 @@
 #pragma once
 #include <libio/Reader.h>
 
-namespace graphic
+namespace Graphic
 {
 class PngReader
 {
@@ -21,4 +21,4 @@ private:
     uint32_t _height = 0;
     IO::Reader &_reader;
 };
-} // namespace graphic
+} // namespace Graphic

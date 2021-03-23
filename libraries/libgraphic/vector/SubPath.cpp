@@ -3,7 +3,7 @@
 #include <libgraphic/vector/SubPath.h>
 #include <libtest/AssertLowerThan.h>
 
-namespace graphic
+namespace Graphic
 {
 
 size_t SubPath::length() const
@@ -336,4 +336,4 @@ void SubPath::arc_to_relative(float rx, float ry, float angle, int flags, Vec2f 
     arc_to(rx, ry, angle, flags, last_point() + point);
 }
 
-} // namespace graphic
+} // namespace Graphic

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace graphic
+namespace Graphic
 {
 
 enum Arc
@@ -9,4 +9,4 @@ enum Arc
     SWEEP = 1 << 1,
 };
 
-} // namespace graphic
+} // namespace Graphic

@@ -9,7 +9,7 @@ class FsPipe : public FsNode
 private:
     static constexpr int BUFFER_SIZE = 4096;
 
-    RingBuffer _buffer{BUFFER_SIZE};
+    RingBuffer<char> _buffer{BUFFER_SIZE};
 
 public:
     FsPipe();

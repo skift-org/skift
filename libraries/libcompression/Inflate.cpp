@@ -240,7 +240,7 @@ Result Inflate::build_dynamic_huffman_alphabet(IO::BitReader &input)
 Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
 {
     // Size might vary
-    RingBuffer sliding_window_buffer(32768);
+    RingBuffer<char> sliding_window_buffer{32768};
 
     uint8_t bfinal;
     do

@@ -10,7 +10,7 @@
 class LegacySerial : public LegacyDevice
 {
 private:
-    RingBuffer _buffer{4096};
+    RingBuffer<char> _buffer{4096};
     Lock _buffer_lock{"legacy-serial"};
 
     COMPort port() { return (COMPort)legacy_address(); }

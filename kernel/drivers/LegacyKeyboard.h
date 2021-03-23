@@ -12,7 +12,7 @@ class LegacyKeyboard : public LegacyDevice
 {
 private:
     Lock _events_lock{"legacy-keyboard-event"};
-    RingBuffer _events{sizeof(KeyboardPacket) * 1024};
+    RingBuffer<char> _events{sizeof(KeyboardPacket) * 1024};
     bool _escaped = false;
     KeyMap *_keymap = nullptr;
     KeyMotion _keystate[__KEY_COUNT] = {};

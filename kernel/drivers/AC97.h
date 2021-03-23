@@ -78,7 +78,7 @@ private:
     uint8_t _last_valid_index;
 
     // device ring buffer
-    RingBuffer _buffer{AC97_RINGBUFFER_LEN};
+    RingBuffer<char> _buffer{AC97_RINGBUFFER_LEN};
 
     // buffer descriptors range
     RefPtr<MMIORange> buffer_descriptors_range{};

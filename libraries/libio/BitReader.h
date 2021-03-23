@@ -11,7 +11,7 @@ class BitReader
 {
 private:
     IO::Reader &_reader;
-    utils::InlineRingBuffer<uint8_t, 16> _buffer;
+    Utils::InlineRingBuffer<uint8_t, 16> _buffer;
     size_t _head = 0;
     bool _end_of_file;
 

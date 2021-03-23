@@ -13,7 +13,7 @@ private:
     static constexpr int PEEK_SIZE = 64;
 
     Reader &_reader;
-    utils::InlineRingBuffer<uint8_t, PEEK_SIZE> _peek{};
+    Utils::InlineRingBuffer<uint8_t, PEEK_SIZE> _peek{};
     bool _is_end_of_file = false;
 
     void refill()

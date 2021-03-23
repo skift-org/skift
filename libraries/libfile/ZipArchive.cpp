@@ -301,19 +301,19 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
     // Get a reader to the uncompressed data
     IO::File file_reader(_path, OPEN_READ);
     file_reader.seek(IO::SeekFrom::start(entry.archive_offset));
-    IO::ScopedReader scoped_reader(file_reader, entry.uncompressed_size);
+    IO::ScopedReader scoped_reader(file_reader, entry.compressed_size);
 
     // Get a writer to the output
-    IO::File file_writer(dest_path, OPEN_WRITE);
+    IO::File file_writer(dest_path, OPEN_WRITE | OPEN_CREATE);
 
     return inf.perform(scoped_reader, file_writer);
 }
 
 Result ZipArchive::insert(const char *entry_name, const char *src_path)
 {
-    IO::File src_file{src_path};
+    IO::File src_reader{src_path, OPEN_READ};
 
-    if (!src_file.exist())
+    if (!src_reader.exist())
     {
         return Result::ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
@@ -324,7 +324,7 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     // Write local headers
     for (const auto &entry : _entries)
     {
-        IO::File file_reader(_path);
+        IO::File file_reader(_path, OPEN_READ);
         file_reader.seek(IO::SeekFrom::start(entry.archive_offset));
 
         IO::ScopedReader scoped_reader(file_reader, entry.compressed_size);
@@ -333,7 +333,6 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     }
 
     // Get a reader to the original file
-    IO::File src_reader(src_path);
     IO::MemoryWriter compressed_writer;
 
     // Perform deflate on the data
@@ -357,9 +356,6 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     // Write central directory
     write_central_directory(memory_writer, _entries);
 
-    // Do this properly...
-    IO::File file_writer(_path);
-    IO::write_all(file_writer, Slice(memory_writer.slice()));
-
-    return Result::SUCCESS;
+    IO::File file_writer(_path, OPEN_WRITE | OPEN_CREATE);
+    return IO::write_all(file_writer, Slice(memory_writer.slice()));
 }

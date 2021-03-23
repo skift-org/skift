@@ -113,7 +113,7 @@ $ make all
 
 This command will build all the components of the operating system and generate an ISO bootable in QEMU or VirtualBox.
 
-> The compatibility with virtual box is not guaranteed, as we use QEMU primarly for debuging and testing the system.
+> The compatibility with virtual box is not guaranteed, as we use QEMU primarly for debugging and testing the system.
 
 ### 4. Running in a virtual machine
 

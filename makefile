@@ -23,7 +23,8 @@ DISKS_DIRECTORY=$(shell pwd)/disks
 
 SYSROOT=$(CONFIG_BUILD_DIRECTORY)/sysroot
 BOOTROOT=$(CONFIG_BUILD_DIRECTORY)/bootroot-$(CONFIG_LOADER)-$(CONFIG_ARCH)
-BOOTDISK=$(DISKS_DIRECTORY)/bootdisk-$(CONFIG_LOADER)-$(CONFIG_ARCH).img
+BOOTDISK=$(DISKS_DIRECTORY)/bootdisk-$(CONFIG_LOADER)-$(CONFIG_ARCH).gz
+BOOTDISK_GZIP=$(BOOTDISK).gzip
 
 RAMDISK=$(CONFIG_BUILD_DIRECTORY)/ramdisk.tar
 
@@ -136,10 +137,16 @@ $(RAMDISK): $(CRTS) $(TARGETS) $(HEADERS) $(SYSROOT_CONTENT)
 
 	@cd $(SYSROOT); tar -cf $@ *
 
+$(BOOTDISK_GZIP): $(BOOTDISK)
+	@gzip -c $(BOOTDISK) > $(BOOTDISK_GZIP)
+
 # --- Phony ---------------------------------------------- #
 
 .PHONY: all
 all: $(BOOTDISK)
+
+.PHONY: distro
+distro: $(BOOTDISK_GZIP)
 
 .PHONY: run
 include vms/$(CONFIG_VMACHINE).mk

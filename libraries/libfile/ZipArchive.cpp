@@ -306,7 +306,7 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
     // Get a writer to the output
     IO::File file_writer(dest_path, OPEN_WRITE | OPEN_CREATE);
 
-    return inf.perform(scoped_reader, file_writer);
+    return inf.perform(scoped_reader, file_writer).result();
 }
 
 Result ZipArchive::insert(const char *entry_name, const char *src_path)

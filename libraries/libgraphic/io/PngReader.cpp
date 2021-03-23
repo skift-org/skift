@@ -4,8 +4,8 @@
 #include <libio/Read.h>
 #include <libio/Skip.h>
 #include <libsystem/Logger.h>
-#include <libutils/Array.h>
 #include <libtest/AssertLowerEqual.h>
+#include <libutils/Array.h>
 
 graphic::PngReader::PngReader(IO::Reader &reader) : _reader(reader)
 {
@@ -82,7 +82,8 @@ Result graphic::PngReader::read()
 
             IO::MemoryWriter mem_writer;
 
-            TRY(inflate.perform(_reader, mem_writer));
+            size_t compressed_size = TRY(inflate.perform(_reader, mem_writer));
+            assert_equal(compressed_size + 6, chunk_length());
 
             logger_trace("Uncompressed PNG data: US: %u", mem_writer.length().value());
 

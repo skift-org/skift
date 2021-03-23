@@ -237,15 +237,13 @@ Result Inflate::build_dynamic_huffman_alphabet(IO::BitReader &input)
 
 Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
 {
-    Vector<uint8_t> block_buffer;
+    Vector<uint8_t> sliding_window_buffer;
 
     uint8_t bfinal;
     do
     {
         bfinal = input.grab_bits(1);
         uint8_t btype = input.grab_bits(2);
-
-        logger_trace("Read block: %u %u", bfinal, btype);
 
         // Uncompressed block
         if (btype == BT_UNCOMPRESSED)
@@ -254,21 +252,17 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
             input.skip_bits(5);
             auto len = input.grab_aligned<uint16_t>();
 
-            logger_trace("Read uncompressed block: len %u", len);
-
             // Skip complement of LEN
             input.skip_bits(16);
 
             for (int i = 0; i != len; i++)
             {
-                IO::write(uncompressed, (uint8_t)input.grab_bits(8));
+                IO::write<uint8_t>(uncompressed, input.grab_bits(8));
             }
         }
         else if (btype == BT_FIXED_HUFFMAN ||
                  btype == BT_DYNAMIC_HUFFMAN)
         {
-            block_buffer.clear();
-
             // Use a fixed huffman alphabet
             if (btype == BT_FIXED_HUFFMAN)
             {
@@ -292,33 +286,45 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
                                         btype == BT_FIXED_HUFFMAN ? _fixed_dist_code_bit_lengths : _dist_code_bit_length);
             while (true)
             {
+                // Bigger than our sliding window
+                if (sliding_window_buffer.count() > 32768)
+                {
+                    sliding_window_buffer.pop();
+                }
+
                 unsigned int decoded_symbol = symbol_decoder.decode(input);
                 if (decoded_symbol <= 255)
                 {
-                    block_buffer.push_back((unsigned char)decoded_symbol);
+                    IO::write<uint8_t>(uncompressed, decoded_symbol);
+                    sliding_window_buffer.push_back((uint8_t)decoded_symbol);
                 }
                 else if (decoded_symbol == 256)
                 {
                     break;
                 }
-                else
+                else if (decoded_symbol >= 257 && decoded_symbol <= 285)
                 {
                     unsigned int length_index = decoded_symbol - 257;
                     unsigned int total_length = BASE_LENGTHS[length_index] + input.grab_bits(BASE_LENGTH_EXTRA_BITS[length_index]);
                     unsigned int dist_code = dist_decoder.decode(input);
 
+                    assert_lower_than(dist_code, 30);
+
                     unsigned int total_dist = BASE_DISTANCE[dist_code] + input.grab_bits(BASE_DISTANCE_EXTRA_BITS[dist_code]);
-                    uint8_t *pos = (uint8_t *)&block_buffer[block_buffer.count() - total_dist];
+                    uint8_t *pos = (uint8_t *)&sliding_window_buffer[sliding_window_buffer.count() - total_dist];
                     for (unsigned int i = 0; i != total_length; i++)
                     {
-                        block_buffer.push_back(*pos);
-                        pos = (uint8_t *)&block_buffer[block_buffer.count() - total_dist];
+                        IO::write<uint8_t>(uncompressed, *pos);
+                        sliding_window_buffer.push_back(*pos);
+                        pos = (uint8_t *)&sliding_window_buffer[sliding_window_buffer.count() - total_dist];
                     }
                 }
+                else
+                {
+                    logger_error("Invalid decoded symbol: %u", decoded_symbol);
+                    return Result::ERR_INVALID_DATA;
+                }
             }
-
-            // Copy our temporary block buffer to output
-            uncompressed.write(block_buffer.raw_storage(), block_buffer.count());
         }
         else
         {

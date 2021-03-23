@@ -6,30 +6,15 @@
 #include <libsystem/Result.h>
 #include <libutils/Callback.h>
 
+namespace Compression
+{
+
 class Deflate
 {
-public:
-    Deflate(unsigned int compression_level);
-
-    Result perform(IO::SeekableReader auto &uncompressed, IO::Writer &compressed)
-    {
-        // If the data amount is too small it's not worth compressing it.
-        // Depends on the compression level
-        if (uncompressed.length().value() < _min_size_to_compress)
-            [[unlikely]]
-        {
-            return compress_none(uncompressed, compressed);
-        }
-
-        switch (_compression_level)
-        {
-        // TODO: set the compression method according to the level
-        default:
-            return compress_none(uncompressed, compressed);
-        }
-    }
-
 private:
+    unsigned int _compression_level;
+    unsigned int _min_size_to_compress;
+
     // Compression modes
     static Result compress_none(IO::SeekableReader auto &uncompressed, IO::Writer &compressed)
     {
@@ -56,6 +41,26 @@ private:
     static void write_block_header(IO::BitWriter &out_writer, BlockType block_type, bool final);
     static void write_uncompressed_block(IO::Reader &in_data, uint16_t block_len, IO::BitWriter &out_writer, bool final);
 
-    unsigned int _compression_level;
-    unsigned int _min_size_to_compress;
+public:
+    Deflate(unsigned int compression_level);
+
+    Result perform(IO::SeekableReader auto &uncompressed, IO::Writer &compressed)
+    {
+        // If the data amount is too small it's not worth compressing it.
+        // Depends on the compression level
+        if (uncompressed.length().value() < _min_size_to_compress)
+            [[unlikely]]
+        {
+            return compress_none(uncompressed, compressed);
+        }
+
+        switch (_compression_level)
+        {
+        // TODO: set the compression method according to the level
+        default:
+            return compress_none(uncompressed, compressed);
+        }
+    }
 };
+
+} // namespace Compression

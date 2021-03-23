@@ -69,7 +69,6 @@ Result Graphic::PngReader::read()
 
         case Png::ImageData::SIG:
         {
-            Inflate inflate;
 
             // Two bytes before the actual deflate data, see https://www.w3.org/TR/2003/REC-PNG-20031110/#10Compression
             auto cm_cinfo = TRY(IO::read<uint8_t>(_reader));
@@ -80,9 +79,9 @@ Result Graphic::PngReader::read()
             auto flags = TRY(IO::read<uint8_t>(_reader));
             __unused(flags);
 
-            IO::MemoryWriter mem_writer;
-
-            size_t compressed_size = TRY(inflate.perform(_reader, mem_writer));
+            Compression::Inflate inflate;
+            IO::MemoryWriter memory;
+            size_t compressed_size = TRY(inflate.perform(_reader, memory));
 
             // TODO: fix this
             // Use the CRC to do this ugly hack. Missing should be 4, but for some reason it's 3 sometimes for us
@@ -90,7 +89,7 @@ Result Graphic::PngReader::read()
             // Skip CRC32
             TRY(IO::skip(_reader, missing));
 
-            logger_trace("Uncompressed PNG data: US: %u", mem_writer.length().value());
+            logger_trace("Uncompressed PNG data: US: %u", memory.length().value());
         }
         break;
 

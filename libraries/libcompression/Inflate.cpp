@@ -3,9 +3,10 @@
 #include <libcompression/Inflate.h>
 #include <libio/BitReader.h>
 #include <libio/MemoryWriter.h>
-#include <libio/Reader.h>
-#include <libio/Writer.h>
 #include <libutils/InlineRingBuffer.h>
+
+namespace Compression
+{
 
 static constexpr uint8_t BASE_LENGTH_EXTRA_BITS[] = {
     0, 0, 0, 0, 0, 0, 0, 0, //257 - 264
@@ -332,3 +333,5 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
 
     return Result::SUCCESS;
 }
+
+} // namespace Compression

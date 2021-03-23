@@ -1,8 +1,16 @@
 #pragma once
+
 #include <libio/BitReader.h>
+
+namespace Compression
+{
 
 class HuffmanDecoder
 {
+private:
+    const Vector<unsigned int> &_alphabet;
+    const Vector<unsigned int> &_code_bit_lengths;
+
 public:
     inline HuffmanDecoder(Vector<unsigned int> &alphabet, Vector<unsigned int> &code_bit_lengths) : _alphabet(alphabet), _code_bit_lengths(code_bit_lengths)
     {
@@ -29,8 +37,6 @@ public:
 
         return 0;
     }
-
-private:
-    const Vector<unsigned int> &_alphabet;
-    const Vector<unsigned int> &_code_bit_lengths;
 };
+
+} // namespace Compression

@@ -2,7 +2,7 @@
 
 #include <libutils/Move.h>
 
-namespace utils
+namespace Utils
 {
 
 template <typename T, size_t N>
@@ -120,4 +120,4 @@ public:
     }
 };
 
-} // namespace utils
+} // namespace Utils

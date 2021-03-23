@@ -2,7 +2,7 @@
 
 #include <libio/Read.h>
 #include <libsystem/Logger.h>
-#include <libtest/Assets.h>
+#include <libtest/Asserts.h>
 #include <libutils/InlineRingBuffer.h>
 
 namespace IO

@@ -7,7 +7,7 @@
 
 Result cat(const char *path)
 {
-    IO::File file{path};
+    IO::File file{path, OPEN_READ};
 
     TRY(file.result());
 

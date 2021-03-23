@@ -13,7 +13,7 @@ private:
     size_t _tail = 0;
     size_t _used = 0;
 
-    T _buffer[N];
+    T _buffer[N] = {};
 
 public:
     InlineRingBuffer() {}

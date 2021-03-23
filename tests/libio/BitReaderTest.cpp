@@ -1,8 +1,7 @@
 #include <libio/BitReader.h>
-#include <libtest/AssertEqual.h>
-#include <libtest/AssertFalse.h>
-#include <libtest/AssertNotEqual.h>
-#include <libtest/AssertTrue.h>
+#include <libio/ReadCounter.h>
+#include <libio/Repeat.h>
+#include <libtest/Asserts.h>
 
 #include "tests/Driver.h"
 
@@ -58,4 +57,49 @@ TEST(bitreader_peek_bits_reverse)
     // Grab 101
     assert_equal(bit_reader.peek_bits_reverse(3), 5);
     assert_equal(bit_reader.grab_bits_reverse(3), 5);
+}
+
+#define assert_count_and_reset(__count)     \
+    assert_equal(counter.count(), __count); \
+    counter.reset();                        \
+    reader.flush();
+
+TEST(bitreader_should_only_fetch_what_it_need)
+{
+    IO::Repeat repeat{0xfc};
+    IO::ReadCounter counter{repeat};
+    IO::BitReader reader{counter};
+
+    assert_equal(counter.count(), 0);
+
+    // hint function
+    reader.hint(0);
+    assert_count_and_reset(0);
+
+    reader.hint(5);
+    assert_count_and_reset(1);
+
+    reader.hint(8);
+    assert_count_and_reset(1);
+
+    reader.hint(16);
+    assert_count_and_reset(2);
+
+    // skip function
+    reader.skip_bits(0);
+    assert_count_and_reset(0);
+
+    reader.skip_bits(5);
+    assert_count_and_reset(1);
+
+    reader.skip_bits(8);
+    assert_count_and_reset(1);
+
+    reader.skip_bits(16);
+    assert_count_and_reset(2);
+
+    // grab_aligned
+    reader.grab_bits(5);
+    reader.grab<uint16_t>();
+    assert_count_and_reset(3);
 }

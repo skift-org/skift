@@ -1,11 +1,13 @@
 #pragma once
-#include <libsystem/Common.h>
-#include <libsystem/Result.h>
-#include <libutils/HashMap.h>
-#include <libutils/Vector.h>
+
 #include <libio/BitReader.h>
 #include <libio/Read.h>
+#include <libio/ReadCounter.h>
+#include <libsystem/Common.h>
+#include <libsystem/Result.h>
 #include <libtest/AssertGreaterThan.h>
+#include <libutils/HashMap.h>
+#include <libutils/Vector.h>
 
 namespace IO
 {
@@ -17,9 +19,10 @@ class Inflate
 public:
     ResultOr<size_t> perform(IO::Reader &compressed, IO::Writer &uncompressed)
     {
-        IO::BitReader input(compressed);
+        IO::ReadCounter counter{compressed};
+        IO::BitReader input(counter);
         TRY(read_blocks(input, uncompressed));
-        return input.consumed();
+        return counter.count();
     }
 
 private:

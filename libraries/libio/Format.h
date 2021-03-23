@@ -116,6 +116,10 @@ ResultOr<size_t> format(IO::Writer &, const Formating &, long int);
 
 ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned long int);
 
+ResultOr<size_t> format(IO::Writer &, const Formating &, long long int);
+
+ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned long long int);
+
 ResultOr<size_t> format(IO::Writer &, const Formating &, float);
 
 ResultOr<size_t> format(IO::Writer &, const Formating &, double);

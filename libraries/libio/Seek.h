@@ -23,14 +23,14 @@ struct SeekFrom
         return {Whence::START, position};
     }
 
-    static SeekFrom end(ssize64_t position = 0)
-    {
-        return {Whence::END, position};
-    }
-
     static SeekFrom current(ssize64_t position = 0)
     {
         return {Whence::CURRENT, position};
+    }
+
+    static SeekFrom end(ssize64_t position = 0)
+    {
+        return {Whence::END, position};
     }
 };
 

@@ -59,7 +59,7 @@ public:
         switch (from.whence)
         {
         case Whence::START:
-            assert(from.position <= _used);
+            assert((size64_t)from.position <= _used);
             return _position = from.position;
 
         case Whence::CURRENT:

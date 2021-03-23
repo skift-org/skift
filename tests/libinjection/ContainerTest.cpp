@@ -1,5 +1,5 @@
 #include <libinjection/Inject.h>
-#include <libtest/Assets.h>
+#include <libtest/Asserts.h>
 
 #include "tests/Driver.h"
 #include "tests/libinjection/Asserts.h"

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libinjection/Entity.h>
-#include <libtest/Assets.h>
+#include <libtest/Asserts.h>
 
 #define assert_same_entity(__a, __b)                                          \
     assert_equal((uintptr_t) static_cast<Injection::Entity *>((__a).naked()), \

@@ -3,7 +3,7 @@
 #include <libutils/Trans2.h>
 
 #include <libgraphic/Bitmap.h>
-#include <libgraphic/vector/Path.h>
+#include <libgraphic/svg/Path.h>
 
 class Painter;
 

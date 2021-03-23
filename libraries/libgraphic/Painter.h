@@ -5,7 +5,7 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Font.h>
 #include <libgraphic/Icon.h>
-#include <libgraphic/vector/Path.h>
+#include <libgraphic/svg/Path.h>
 
 #define STATESTACK_SIZE 32
 

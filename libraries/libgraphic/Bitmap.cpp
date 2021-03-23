@@ -7,7 +7,7 @@
 #undef LODEPNG_NO_COMPILE_DISK
 
 #include <libgraphic/Bitmap.h>
-#include <libgraphic/io/PngReader.h>
+#include <libgraphic/png/PngReader.h>
 #include <libio/Copy.h>
 #include <libio/File.h>
 #include <libio/MemoryReader.h>

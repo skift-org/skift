@@ -1,6 +1,6 @@
 #include <libcompression/Inflate.h>
-#include <libgraphic/io/PngCommon.h>
-#include <libgraphic/io/PngReader.h>
+#include <libgraphic/png/PngCommon.h>
+#include <libgraphic/png/PngReader.h>
 #include <libio/Read.h>
 #include <libio/Skip.h>
 #include <libsystem/Logger.h>
@@ -86,6 +86,7 @@ Result Graphic::PngReader::read()
             // TODO: fix this
             // Use the CRC to do this ugly hack. Missing should be 4, but for some reason it's 3 sometimes for us
             auto missing = chunk_length() - (compressed_size + 2);
+            assert_equal(missing, 4);
             // Skip CRC32
             TRY(IO::skip(_reader, missing));
 

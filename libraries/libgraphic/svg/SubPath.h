@@ -2,8 +2,8 @@
 
 #include <libutils/Vector.h>
 
-#include <libgraphic/vector/Arc.h>
-#include <libgraphic/vector/BezierCurve.h>
+#include <libgraphic/svg/Arc.h>
+#include <libgraphic/svg/BezierCurve.h>
 
 namespace Graphic
 {

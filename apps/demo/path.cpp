@@ -1,5 +1,5 @@
 #include "demo/Demos.h"
-#include "libgraphic/vector/Rasterizer.h"
+#include "libgraphic/svg/Rasterizer.h"
 
 void path_draw(Painter &painter, Recti, float)
 {

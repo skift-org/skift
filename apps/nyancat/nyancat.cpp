@@ -7,7 +7,6 @@
  */
 
 #include <libio/Streams.h>
-#include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/system/System.h>
 

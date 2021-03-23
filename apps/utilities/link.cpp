@@ -1,13 +1,12 @@
 
-#include <libraries/libsystem/io/Filesystem.h>
-#include <libsystem/Result.h>
-#include <libsystem/io/Stream.h>
+#include <libio/Streams.h>
+#include <libsystem/io/Filesystem.h>
 
 int main(int argc, char **argv)
 {
     if (argc == 1)
     {
-        stream_format(err_stream, "%s: no eough arguments\n", argv[0]);
+        IO::errln("{}: no eough arguments\n", argv[0]);
         return PROCESS_FAILURE;
     }
 

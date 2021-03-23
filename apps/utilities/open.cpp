@@ -1,10 +1,8 @@
+#include <libio/Streams.h>
 #include <libsystem/Logger.h>
-#include <libsystem/io/Stream.h>
-#include <libutils/json/Json.h>
 #include <libsystem/process/Launchpad.h>
 #include <libutils/Path.h>
-
-#include <stdio.h>
+#include <libutils/json/Json.h>
 
 #define FILE_EXTENSIONS_DATABASE_PATH "/Configs/open/file-extensions.json"
 #define FILE_TYPES_DATABASE_PATH "/Configs/open/file-types.json"
@@ -24,7 +22,7 @@ Result open(const char *raw_path)
 
     if (!file_extensions.is(json::OBJECT))
     {
-        stream_format(err_stream, "The file extensions database is not found (" FILE_EXTENSIONS_DATABASE_PATH ").\n");
+        IO::errln("The file extensions database is not found (" FILE_EXTENSIONS_DATABASE_PATH ").");
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
@@ -39,7 +37,7 @@ Result open(const char *raw_path)
 
     if (!file_types.is(json::OBJECT))
     {
-        stream_format(err_stream, "The file types database is not found (" FILE_TYPES_DATABASE_PATH ").\n");
+        IO::errln("The file types database is not found (" FILE_TYPES_DATABASE_PATH ").");
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
@@ -58,11 +56,10 @@ Result open(const char *raw_path)
     }
 
     auto app_name = file_type_open_with.as_string();
-    char app_path[PATH_LENGTH] = {};
 
-    snprintf(app_path, PATH_LENGTH, "/Applications/%s/%s", app_name.cstring(), app_name.cstring());
+    auto app_path = IO::format("/Applications/{}/{}", app_name, app_name);
 
-    auto *launchpad = launchpad_create(app_name.cstring(), app_path);
+    auto *launchpad = launchpad_create(app_name.cstring(), app_path.cstring());
     launchpad_argument(launchpad, path.string().cstring());
     return launchpad_launch(launchpad, nullptr);
 }
@@ -71,14 +68,14 @@ int main(int argc, char const *argv[])
 {
     if (argc == 1)
     {
-        stream_format(err_stream, "Usage: open FILENAME\n");
+        IO::errln("Usage: open FILENAME");
         return PROCESS_FAILURE;
     }
 
     Result result = open(argv[1]);
     if (result != SUCCESS)
     {
-        stream_format(err_stream, "%s: %s: %s\n", argv[0], argv[1], get_result_description(result));
+        IO::errln("{}: {}: {}", argv[0], argv[1], get_result_description(result));
         return PROCESS_FAILURE;
     }
 

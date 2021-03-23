@@ -1,14 +1,13 @@
+#include <libio/Streams.h>
+#include <libsystem/process/Launchpad.h>
 
 /* dstart.c: start a process as a daemon                                      */
-
-#include <libsystem/io/Stream.h>
-#include <libsystem/process/Launchpad.h>
 
 int main(int argc, char const *argv[])
 {
     if (argc == 1)
     {
-        stream_format(err_stream, "dstart: No executable specified!\n");
+        IO::errln("dstart: No executable specified!");
         return PROCESS_FAILURE;
     }
 
@@ -24,7 +23,7 @@ int main(int argc, char const *argv[])
 
     if (result < 0)
     {
-        stream_format(err_stream, "dstart: Failed to start %s: %s\n", argv[1], get_result_description(result));
+        IO::errln("dstart: Failed to start {}: {}", argv[1], get_result_description(result));
         return PROCESS_FAILURE;
     }
 

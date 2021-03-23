@@ -106,6 +106,11 @@ public:
     {
         return _handle != HANDLE_INVALID_ID;
     }
+
+    Result result()
+    {
+        return _result;
+    }
 };
 
 struct RawHandle

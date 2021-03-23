@@ -45,6 +45,16 @@ public:
     virtual RefPtr<Handle> handle() override { return _handle; }
 
     bool exist();
+
+    Result result()
+    {
+        if (!_handle)
+        {
+            return ERR_BAD_HANDLE;
+        }
+
+        return _handle->result();
+    }
 };
 
 } // namespace IO

@@ -1,18 +1,17 @@
-
+#include <libio/Streams.h>
 #include <libsystem/io/Filesystem.h>
-#include <libsystem/io/Stream.h>
 
 int main(int argc, char **argv)
 {
     if (argc == 1)
     {
-        stream_format(err_stream, "%s: missing file operand\n", argv[0]);
+        IO::errln("{}: missing file operand.", argv[0]);
         return PROCESS_FAILURE;
     }
 
     if (argc == 2)
     {
-        stream_format(err_stream, "%s: missing destination file operand after '%s'", argv[0], argv[1]);
+        IO::errln("{}: missing destination file operand after '{}'.", argv[0], argv[1]);
         return PROCESS_FAILURE;
     }
 
@@ -20,7 +19,7 @@ int main(int argc, char **argv)
 
     if (result != SUCCESS)
     {
-        stream_format(err_stream, "Failed to move file: %s", get_result_description(result));
+        IO::errln("{}: Failed to move file: {}.", argv[0], get_result_description(result));
         return PROCESS_FAILURE;
     }
 

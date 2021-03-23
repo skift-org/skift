@@ -1,8 +1,10 @@
-#include <assert.h>
 #include <libcompression/Common.h>
 #include <libcompression/Deflate.h>
 #include <libcompression/Huffman.h>
-#include <libtest/AssertEqual.h>
+#include <libtest/Asserts.h>
+
+namespace Compression
+{
 
 Deflate::Deflate(unsigned int compression_level) : _compression_level(compression_level)
 {
@@ -31,3 +33,5 @@ void Deflate::write_uncompressed_block(IO::Reader &in_data, uint16_t data_len, I
     out_writer.put_uint16(~data_len);
     out_writer.put_data(data.raw_storage(), data_len);
 }
+
+} // namespace Compression

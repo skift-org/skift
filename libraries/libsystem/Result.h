@@ -12,7 +12,7 @@
     __ENTRY(ERR_CONNECTION_REFUSED, "Connection refused")                         \
     __ENTRY(ERR_EXEC_FORMAT_ERROR, "Exec format error")                           \
     __ENTRY(ERR_FILE_EXISTS, "File exists")                                       \
-    __ENTRY(ERR_FUNCTION_NOT_IMPLEMENTED, "Function not implemented")             \
+    __ENTRY(ERR_NOT_IMPLEMENTED, "Function not implemented")                      \
     __ENTRY(ERR_INAPPROPRIATE_CALL_FOR_DEVICE, "Inappropriate call for device")   \
     __ENTRY(ERR_INVALID_ARGUMENT, "Invalid argument")                             \
     __ENTRY(ERR_INVALID_DATA, "Invalid data")                                     \

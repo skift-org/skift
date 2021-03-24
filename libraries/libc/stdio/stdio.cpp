@@ -166,7 +166,7 @@ size_t fwrite(const void *ptr, size_t size, size_t count, FILE *file)
 
 int fseek(FILE *file, long offset, int whence)
 {
-    Result r = Result::ERR_FUNCTION_NOT_IMPLEMENTED;
+    Result r = Result::ERR_NOT_IMPLEMENTED;
 
     ssize64_t offset64 = offset;
 

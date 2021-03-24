@@ -60,7 +60,7 @@ enum Syscall
 
 static Result __syscall(Syscall syscall, uintptr_t p1, uintptr_t p2, uintptr_t p3, uintptr_t p4, uintptr_t p5)
 {
-    Result __ret = ERR_FUNCTION_NOT_IMPLEMENTED;
+    Result __ret = ERR_NOT_IMPLEMENTED;
 
 #if defined(__x86_64__)
 

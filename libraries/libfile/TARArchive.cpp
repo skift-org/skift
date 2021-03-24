@@ -89,7 +89,7 @@ Result TARArchive::extract(unsigned int entry_index, const char *dest_path)
     __unused(entry_index);
     __unused(dest_path);
 
-    return ERR_FUNCTION_NOT_IMPLEMENTED;
+    return ERR_NOT_IMPLEMENTED;
 }
 
 Result TARArchive::insert(const char *entry_name, const char *src_path)
@@ -97,7 +97,7 @@ Result TARArchive::insert(const char *entry_name, const char *src_path)
     __unused(entry_name);
     __unused(src_path);
 
-    return ERR_FUNCTION_NOT_IMPLEMENTED;
+    return ERR_NOT_IMPLEMENTED;
 }
 
 Result TARArchive::read_archive()

@@ -4,7 +4,7 @@ QEMU_DISK?=-cdrom $(BOOTDISK)
 
 QEMU_FLAGS= \
 	-m $(CONFIG_MEMORY)M \
-	-serial stdio \
+	-serial mon:stdio \
 	-rtc base=localtime \
 	$(QEMU_DISK)
 

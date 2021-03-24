@@ -293,7 +293,7 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
     if (entry.compression != CM_DEFLATED)
     {
         logger_error("ZipArchive: Unsupported compression: %u\n", entry.compression);
-        return Result::ERR_FUNCTION_NOT_IMPLEMENTED;
+        return Result::ERR_NOT_IMPLEMENTED;
     }
 
     // Get a reader to the uncompressed data

@@ -2,14 +2,14 @@
 
 #include <libgraphic/Color.h>
 
-#define THEME_DEFAULT_BORDER Color::from_byte(255, 255, 255, 31)
+#define THEME_DEFAULT_BORDER Color::from_rgba_byte(255, 255, 255, 31)
 #define THEME_DEFAULT_BACKGROUND Color::from_hex(0x333333)
 #define THEME_DEFAULT_MIDDLEGROUND Color::from_hex(0x444444)
 #define THEME_DEFAULT_FOREGROUND Color::from_hex(0xFFFFFF)
 #define THEME_DEFAULT_FOREGROUND_INACTIVE Color::from_hex(0x888888)
 #define THEME_DEFAULT_FOREGROUND_DISABLED Color::from_hex(0x888888)
-#define THEME_DEFAULT_SELECTION Color::from_byte(0, 102, 255, 127)
-#define THEME_DEFAULT_SELECTION_INACTIVE Color::from_byte(136, 136, 136, 63)
+#define THEME_DEFAULT_SELECTION Color::from_rgba_byte(0, 102, 255, 127)
+#define THEME_DEFAULT_SELECTION_INACTIVE Color::from_rgba_byte(136, 136, 136, 63)
 #define THEME_DEFAULT_ACCENT Color::from_hex(0x0066FF)
 #define THEME_DEFAULT_ACCENT_INACTIVE Color::from_hex(0x444444)
 #define THEME_DEFAULT_ANSI_CURSOR Color::from_hex(0xFFB454)

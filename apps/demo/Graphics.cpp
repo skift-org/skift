@@ -19,7 +19,7 @@ void graphics_draw(Painter &painter, Recti screen, float time)
         {
             uint8_t pixel = x ^ y;
 
-            painter.plot(screen.position() + Vec2i(x, y), Color::from_byte(pixel, pixel, pixel));
+            painter.plot(screen.position() + Vec2i(x, y), Color::from_rgb_byte(pixel, pixel, pixel));
         }
     }
 

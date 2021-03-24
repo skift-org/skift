@@ -26,7 +26,7 @@ public:
 
     ResultOr<size_t> read(void *buffer, size_t size) override
     {
-        size_t to_read = MAX((int64_t)(_count + size) - _length, 0);
+        size_t to_read = MIN(_length - _count, size);
         auto result = TRY(_reader.read(buffer, to_read));
         _count += result;
         return result;

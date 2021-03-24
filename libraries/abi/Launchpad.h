@@ -2,6 +2,7 @@
 
 #include <abi/Filesystem.h>
 #include <abi/Process.h>
+#include <abi/Task.h>
 
 struct LaunchpadArgument
 {
@@ -11,6 +12,8 @@ struct LaunchpadArgument
 
 struct Launchpad
 {
+    TaskFlags flags;
+
     char name[PROCESS_NAME_SIZE];
     char executable[PATH_LENGTH];
 

@@ -66,7 +66,7 @@ struct ELFLoader
             return ERR_EXEC_FORMAT_ERROR;
         }
 
-        task_set_entry(task, reinterpret_cast<TaskEntryPoint>(elf_header.entry), true);
+        task_set_entry(task, reinterpret_cast<TaskEntryPoint>(elf_header.entry));
 
         for (int i = 0; i < elf_header.phnum; i++)
         {
@@ -138,7 +138,7 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
     }
 
     interrupts_retain();
-    Task *task = task_create(parent_task, launchpad->name, true);
+    Task *task = task_create(parent_task, launchpad->name, launchpad->flags);
     interrupts_release();
 
 #ifdef __x86_64__

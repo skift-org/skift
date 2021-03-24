@@ -21,6 +21,7 @@
     __ENTRY(ERR_NO_SUCH_DEVICE, "No such device")                                 \
     __ENTRY(ERR_NO_SUCH_FILE_OR_DIRECTORY, "No such file or directory")           \
     __ENTRY(ERR_NO_SUCH_TASK, "No such task")                                     \
+    __ENTRY(ERR_TASK_NOT_WAITABLE, "Task not waitable")                           \
     __ENTRY(ERR_NOT_A_DIRECTORY, "File is not a directory")                       \
     __ENTRY(ERR_NOT_A_SOCKET, "Not a socket")                                     \
     __ENTRY(ERR_NOT_A_STREAM, "Not a stream")                                     \

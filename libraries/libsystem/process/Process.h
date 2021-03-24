@@ -1,8 +1,8 @@
 #pragma once
 
 #include <abi/Process.h>
+#include <abi/Task.h>
 
-#include <libsystem/Common.h>
 #include <libsystem/Result.h>
 #include <libutils/String.h>
 
@@ -10,9 +10,7 @@ int process_this();
 
 const char *process_name();
 
-Result process_run(const char *command, int *pid);
-
-int process_clone();
+Result process_run(const char *command, int *pid, TaskFlags flags);
 
 void __no_return process_abort();
 

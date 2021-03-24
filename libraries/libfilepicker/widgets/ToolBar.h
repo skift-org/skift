@@ -83,7 +83,7 @@ public:
             Widget *terminal_button = new Button(this, Button::TEXT, Icon::get("console"));
 
             terminal_button->on(Event::ACTION, [](auto) {
-                process_run("terminal", NULL);
+                process_run("terminal", NULL, TASK_NONE);
             });
         }
 

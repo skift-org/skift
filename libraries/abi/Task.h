@@ -9,6 +9,7 @@
     __ENTRY(EMBRYO)              \
     __ENTRY(RUNNING)             \
     __ENTRY(BLOCKED)             \
+    __ENTRY(CANCELING)           \
     __ENTRY(CANCELED)
 
 enum TaskState
@@ -17,6 +18,12 @@ enum TaskState
     TASK_STATE_LIST(TASK_STATE_ENUM_ENTRY)
         __TASK_STATE_COUNT
 };
+
+#define TASK_NONE (0)
+#define TASK_WAITABLE (1 << 0)
+#define TASK_USER (1 << 1)
+
+typedef unsigned int TaskFlags;
 
 static inline const char *task_state_string(TaskState state)
 {

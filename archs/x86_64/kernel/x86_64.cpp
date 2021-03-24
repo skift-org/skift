@@ -78,7 +78,7 @@ void arch_load_context(Task *task)
 
 void arch_task_go(Task *task)
 {
-    if (task->user)
+    if (task->_flags & TASK_USER)
     {
         InterruptStackFrame stackframe = {};
 

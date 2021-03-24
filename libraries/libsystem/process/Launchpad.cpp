@@ -51,6 +51,11 @@ void launchpad_destroy(Launchpad *launchpad)
     free(launchpad);
 }
 
+void launchpad_flags(Launchpad *launchpad, TaskFlags flags)
+{
+    launchpad->flags = flags;
+}
+
 void launchpad_argument(Launchpad *launchpad, const char *argument)
 {
     assert(launchpad->argc < PROCESS_ARG_COUNT);

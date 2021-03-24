@@ -57,11 +57,12 @@ bool BlockerSelect::can_unblock(Task &)
 
 bool BlockerWait::can_unblock(Task &)
 {
-    return _task->state() == TASK_STATE_CANCELED;
+    return _task->state() == TASK_STATE_CANCELING;
 }
 
 void BlockerWait::on_unblock(Task &)
 {
+    _task->state(TASK_STATE_CANCELED);
     *_exit_value = _task->exit_value;
 }
 

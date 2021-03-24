@@ -65,7 +65,14 @@ void Task::kill_me_if_you_dare()
 
     if (_is_canceled)
     {
-        state(TASK_STATE_CANCELED);
+        if (_flags & TASK_WAITABLE)
+        {
+            state(TASK_STATE_CANCELING);
+        }
+        else
+        {
+            state(TASK_STATE_CANCELED);
+        }
 
         if (this == scheduler_running())
         {
@@ -75,7 +82,7 @@ void Task::kill_me_if_you_dare()
     }
 }
 
-Task *task_create(Task *parent, const char *name, bool user)
+Task *task_create(Task *parent, const char *name, TaskFlags flags)
 {
     __unused(parent);
 
@@ -91,8 +98,9 @@ Task *task_create(Task *parent, const char *name, bool user)
     task->id = _task_ids++;
     strlcpy(task->name, name, PROCESS_NAME_SIZE);
     task->_state = TASK_STATE_NONE;
+    task->_flags = flags;
 
-    if (user)
+    if (task->_flags & TASK_USER)
     {
         task->address_space = arch_address_space_create();
     }
@@ -110,7 +118,7 @@ Task *task_create(Task *parent, const char *name, bool user)
     memory_alloc(task->address_space, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
     task->kernel_stack_pointer = ((uintptr_t)task->kernel_stack + PROCESS_STACK_SIZE);
 
-    if (user)
+    if (task->_flags & TASK_USER)
     {
         void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
         task_memory_map(task, 0xff000000, PROCESS_STACK_SIZE, MEMORY_CLEAR | MEMORY_USER);
@@ -126,7 +134,7 @@ Task *task_create(Task *parent, const char *name, bool user)
     return task;
 }
 
-Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip)
+Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip, TaskFlags flags)
 {
     ASSERT_INTERRUPTS_RETAINED();
 
@@ -138,6 +146,7 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip)
     Task *task = new Task{};
 
     task->id = _task_ids++;
+    task->_flags = flags;
     strlcpy(task->name, parent->name, PROCESS_NAME_SIZE);
     task->_state = TASK_STATE_NONE;
 
@@ -181,7 +190,6 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip)
 
     task->user_stack_pointer = sp;
     task->entry_point = (TaskEntryPoint)ip;
-    task->user = true;
 
     list_pushback(_tasks, task);
 
@@ -271,22 +279,20 @@ int task_count()
     return _tasks->count();
 }
 
-Task *task_spawn(Task *parent, const char *name, TaskEntryPoint entry, void *arg, bool user)
+Task *task_spawn(Task *parent, const char *name, TaskEntryPoint entry, void *arg, TaskFlags flags)
 {
     ASSERT_INTERRUPTS_RETAINED();
 
-    Task *task = task_create(parent, name, user);
-
-    task_set_entry(task, entry, user);
+    Task *task = task_create(parent, name, flags);
+    task_set_entry(task, entry);
     task_kernel_stack_push(task, &arg, sizeof(arg));
 
     return task;
 }
 
-void task_set_entry(Task *task, TaskEntryPoint entry, bool user)
+void task_set_entry(Task *task, TaskEntryPoint entry)
 {
     task->entry_point = entry;
-    task->user = user;
 }
 
 uintptr_t task_kernel_stack_push(Task *task, const void *value, size_t size)
@@ -338,6 +344,11 @@ Result task_wait(int task_id, int *exit_value)
     if (!task)
     {
         return ERR_NO_SUCH_TASK;
+    }
+
+    if (!(task->_flags & TASK_USER))
+    {
+        return ERR_TASK_NOT_WAITABLE;
     }
 
     BlockerWait blocker{task, exit_value};

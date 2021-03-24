@@ -13,6 +13,7 @@ void userspace_initialize()
     logger_info("Starting the userspace...");
 
     Launchpad *init_lauchpad = launchpad_create("init", "/System/Utilities/init");
+    launchpad_flags(init_lauchpad, TASK_WAITABLE | TASK_USER);
 
     Stream *serial_device = stream_open("/Devices/serial", OPEN_WRITE | OPEN_READ);
 

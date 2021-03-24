@@ -28,7 +28,7 @@ static Iteration serialize_task(json::Value::Array *list, Task *task)
     task_object["directory"] = "";
     task_object["cpu"] = scheduler_get_usage(task->id);
     task_object["ram"] = (int)task_memory_usage(task);
-    task_object["user"] = task->user;
+    task_object["user"] = (task->_flags & TASK_USER) == TASK_USER;
 
     list->push_back(move(task_object));
 

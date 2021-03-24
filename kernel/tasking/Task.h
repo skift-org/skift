@@ -17,8 +17,8 @@ typedef void (*TaskEntryPoint)();
 struct Task
 {
     int id;
-    bool user;
     char name[PROCESS_NAME_SIZE];
+    TaskFlags _flags;
 
     Syscall _current_syscall;
     bool _is_doing_syscall = false;
@@ -89,9 +89,9 @@ struct Task
     void kill_me_if_you_dare();
 };
 
-Task *task_create(Task *parent, const char *name, bool user);
+Task *task_create(Task *parent, const char *name, TaskFlags flags);
 
-Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip);
+Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip, TaskFlags flags);
 
 void task_destroy(Task *task);
 
@@ -104,9 +104,9 @@ Task *task_by_id(int id);
 
 int task_count();
 
-Task *task_spawn(Task *parent, const char *name, TaskEntryPoint entry, void *arg, bool user);
+Task *task_spawn(Task *parent, const char *name, TaskEntryPoint entry, void *arg, TaskFlags flags);
 
-void task_set_entry(Task *task, TaskEntryPoint entry, bool user);
+void task_set_entry(Task *task, TaskEntryPoint entry);
 
 void task_pass_argc_argv_env(Task *task, const char **argv, const char *env);
 

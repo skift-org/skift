@@ -105,6 +105,8 @@ Result hj_process_launch(Launchpad *launchpad, int *pid)
 
     auto launchpad_copy = copy_launchpad(launchpad);
 
+    launchpad_copy.flags |= TASK_USER;
+
     Result result = task_launch(scheduler_running(), &launchpad_copy, pid);
 
     free_launchpad(&launchpad_copy);
@@ -112,10 +114,12 @@ Result hj_process_launch(Launchpad *launchpad, int *pid)
     return result;
 }
 
-Result hj_process_clone(int *pid)
+Result hj_process_clone(int *pid, TaskFlags flags)
 {
     // Implemented in archs/x86_32/kernel/Interrupts.cpp
     __unused(pid);
+    __unused(flags);
+
     ASSERT_NOT_REACHED();
 }
 
@@ -156,7 +160,7 @@ Result hj_process_cancel(int pid)
     {
         return ERR_NO_SUCH_TASK;
     }
-    else if (!task->user)
+    else if (!(task->_flags & TASK_USER))
     {
         return ERR_ACCESS_DENIED;
     }

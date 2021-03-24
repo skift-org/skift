@@ -114,7 +114,7 @@ __BEGIN_HEADER
 Result hj_process_this(int *pid);
 Result hj_process_name(char *name, size_t size);
 Result hj_process_launch(Launchpad *launchpad, int *pid);
-Result hj_process_clone(int *pid);
+Result hj_process_clone(int *pid, TaskFlags flags);
 Result hj_process_exec(Launchpad *launchpad);
 Result hj_process_exit(int exit_code);
 Result hj_process_cancel(int pid);

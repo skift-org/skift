@@ -11,8 +11,8 @@ static bool _pending_interrupts[256] = {};
 
 void dispatcher_initialize()
 {
-    Task *interrupts_dispatcher_task = task_spawn(nullptr, "interrupts-dispatcher", dispatcher_service, nullptr, false);
-    task_go(interrupts_dispatcher_task);
+    Task *task = task_spawn(nullptr, "interrupts-dispatcher", dispatcher_service, nullptr, false);
+    task_go(task);
 }
 
 void dispatcher_dispatch(int interrupt)

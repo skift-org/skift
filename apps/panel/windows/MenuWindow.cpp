@@ -57,18 +57,18 @@ MenuWindow::MenuWindow()
     auto folder_button = new Button(account_container, Button::TEXT, Icon::get("folder"));
 
     folder_button->on(EventType::ACTION, [&](auto) {
-        process_run("file-manager", nullptr);
+        process_run("file-manager", nullptr, 0);
     });
 
     auto setting_button = new Button(account_container, Button::TEXT, Icon::get("cog"));
 
     setting_button->on(EventType::ACTION, [&](auto) {
-        process_run("settings", nullptr);
+        process_run("settings", nullptr, 0);
     });
 
     auto logout_button = new Button(account_container, Button::TEXT, Icon::get("power-standby"));
     logout_button->on(EventType::ACTION, [&](auto) {
-        process_run("logout", nullptr);
+        process_run("logout", nullptr, 0);
     });
 
     on(Event::KEYBOARD_KEY_PRESS, [this](Event *event) {

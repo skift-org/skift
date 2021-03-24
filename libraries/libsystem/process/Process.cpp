@@ -1,7 +1,6 @@
 #include <abi/Syscalls.h>
 
 #include <assert.h>
-#include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/process/Launchpad.h>
 
@@ -15,21 +14,15 @@ const char *process_name()
     return __plug_process_name();
 }
 
-Result process_run(const char *command, int *pid)
+Result process_run(const char *command, int *pid, TaskFlags flags)
 {
     Launchpad *launchpad = launchpad_create("shell", "/Applications/shell/shell");
 
+    launchpad_flags(launchpad, flags);
     launchpad_argument(launchpad, "-c");
     launchpad_argument(launchpad, command);
 
     return launchpad_launch(launchpad, pid);
-}
-
-int process_clone()
-{
-    int pid = -1;
-    hj_process_clone(&pid);
-    return pid;
 }
 
 void __no_return process_exit(int code)

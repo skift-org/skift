@@ -60,6 +60,7 @@ Result shell_exec(
     }
 
     Launchpad *launchpad = launchpad_create(command->command, executable->cstring());
+    launchpad_flags(launchpad, TASK_WAITABLE);
 
     list_foreach(char, arg, command->arguments)
     {

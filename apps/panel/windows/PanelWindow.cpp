@@ -58,7 +58,7 @@ PanelWindow::PanelWindow()
     auto ressource_monitor = new RessourceMonitor(container);
 
     ressource_monitor->on(Event::ACTION, [](auto) {
-        process_run("task-manager", nullptr);
+        process_run("task-manager", nullptr, 0);
     });
 
     auto dots = new Button(container, Button::TEXT, Icon::get("dots"));

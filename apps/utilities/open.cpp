@@ -1,5 +1,4 @@
 #include <libio/Streams.h>
-#include <libsystem/Logger.h>
 #include <libsystem/process/Launchpad.h>
 #include <libutils/Path.h>
 #include <libutils/json/Json.h>

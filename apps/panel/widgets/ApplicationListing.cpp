@@ -50,7 +50,7 @@ void ApplicationListing::render()
         auto item = new Button(host(), Button::TEXT, entry.image, entry.name);
 
         item->on(Event::ACTION, [this, entry](auto) {
-            process_run(entry.command.cstring(), nullptr);
+            process_run(entry.command.cstring(), nullptr, 0);
             window()->hide();
         });
 

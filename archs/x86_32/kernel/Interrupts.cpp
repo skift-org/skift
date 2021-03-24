@@ -118,7 +118,7 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
 
             *((int *)stackframe.ebx) = 0;
 
-            auto child = task_clone(scheduler_running(), usf->user_esp, usf->eip);
+            auto child = task_clone(scheduler_running(), usf->user_esp, usf->eip, usf->ecx | TASK_USER);
 
             *((int *)stackframe.ebx) = child->id;
 

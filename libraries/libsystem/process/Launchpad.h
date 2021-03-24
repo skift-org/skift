@@ -11,6 +11,8 @@ Launchpad *launchpad_create(const char *name, const char *executable);
 
 void launchpad_destroy(Launchpad *launchpad);
 
+void launchpad_flags(Launchpad *launchpad, TaskFlags flags);
+
 void launchpad_argument(Launchpad *launchpad, const char *argument);
 
 void launchpad_arguments(Launchpad *launchpad, const Vector<String> &arguments);

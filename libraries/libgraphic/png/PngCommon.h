@@ -92,6 +92,15 @@ struct __packed ImageEnd
     static constexpr uint32_t SIG = 0x49454E44;
 };
 
+struct __packed PhysicalDimensions
+{
+    // pHYs
+    static constexpr uint32_t SIG = 0x70485973;
+    be_uint32_t pixels_per_x;
+    be_uint32_t pixels_per_y;
+    uint8_t unit_specifier;
+};
+
 enum FilterType : uint8_t
 {
     FT_None = 0,

@@ -144,6 +144,10 @@ Result Graphic::PngReader::read_chunks()
         }
         break;
 
+        case Png::PhysicalDimensions::SIG:
+            TRY(IO::read<Png::PhysicalDimensions>(_reader));
+            break;
+
         case Png::ImageEnd::SIG:
         {
             end = true;

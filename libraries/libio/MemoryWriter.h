@@ -75,7 +75,7 @@ public:
         }
     }
 
-    inline uint8_t* buffer()
+    inline uint8_t *buffer()
     {
         return _buffer;
     }

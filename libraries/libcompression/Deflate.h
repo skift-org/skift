@@ -50,9 +50,9 @@ public:
         // Depends on the compression level
         if (uncompressed.length().value() < _min_size_to_compress)
             [[unlikely]]
-        {
-            return compress_none(uncompressed, compressed);
-        }
+            {
+                return compress_none(uncompressed, compressed);
+            }
 
         switch (_compression_level)
         {

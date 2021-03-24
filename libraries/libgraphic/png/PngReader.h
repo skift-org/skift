@@ -4,6 +4,7 @@
 #include <libio/MemoryWriter.h>
 #include <libio/Reader.h>
 #include <libutils/Vector.h>
+#include <skift/Time.h>
 
 namespace Graphic
 {
@@ -30,6 +31,11 @@ public:
     inline const Vector<Color> &pixels()
     {
         return _pixels;
+    }
+
+    inline const DateTime &modified()
+    {
+        return _modified;
     }
 
 private:
@@ -76,6 +82,7 @@ private:
     uint32_t _height = 0;
     uint8_t _bit_depth = 0;
     Vector<Color> _pixels;
+    DateTime _modified;
     Png::ColourType _colour_type;
     IO::Reader &_reader;
     IO::MemoryWriter _idat_writer;

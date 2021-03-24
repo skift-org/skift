@@ -62,11 +62,13 @@ Result Graphic::PngReader::read_chunks()
             // We don't support ADAM7 yet
             if (image_header.interlace_method() != 0)
             {
+                logger_error("Unsupported interlace method: %u", image_header.interlace_method());
                 return Result::ERR_OPERATION_NOT_SUPPORTED;
             }
             // Same for bit depth
             if (image_header.bit_depth() != 8)
             {
+                logger_error("Unsupported bitdepth: %u", image_header.bit_depth());
                 return Result::ERR_OPERATION_NOT_SUPPORTED;
             }
             _bit_depth = image_header.bit_depth();
@@ -95,7 +97,13 @@ Result Graphic::PngReader::read_chunks()
 
         case Png::Time::SIG:
         {
-            TRY(IO::read<Png::Time>(_reader));
+            auto modified_date = TRY(IO::read<Png::Time>(_reader));
+            _modified.year = modified_date.year();
+            _modified.month = modified_date.month();
+            _modified.day = modified_date.day();
+            _modified.hour = modified_date.hour();
+            _modified.minute = modified_date.minute();
+            _modified.second = modified_date.second();
         }
         break;
 
@@ -191,7 +199,7 @@ Result Graphic::PngReader::unfilter(uint8_t *out, uint8_t *in)
 
 /*
 Path predictor, used by PNG filter type 4
-The parameters are of type short, but should come from unsigned chars, the shorts
+The parameters are of type short, but should come from unsigned charunsigned chars, the shorts
 are only needed to make the paeth calculation correct.
 */
 static uint8_t paethPredictor(int16_t a, int16_t b, int16_t c)
@@ -269,46 +277,15 @@ Result Graphic::PngReader::unfilterScanline(uint8_t *recon, const uint8_t *scanl
                 recon[i] = (scanline[i] + precon[i]); /*paethPredictor(0, precon[i], 0) is always precon[i]*/
             }
 
-            /* Unroll independent paths of the paeth predictor. A 6x and 8x version would also be possible but that
-        adds too much code. Whether this actually speeds anything up at all depends on compiler and settings. */
-            if (bytewidth >= 4)
-            {
-                for (; i + 3 < length; i += 4)
-                {
-                    size_t j = i - bytewidth;
-                    unsigned char s0 = scanline[i + 0], s1 = scanline[i + 1], s2 = scanline[i + 2], s3 = scanline[i + 3];
-                    unsigned char r0 = recon[j + 0], r1 = recon[j + 1], r2 = recon[j + 2], r3 = recon[j + 3];
-                    unsigned char p0 = precon[i + 0], p1 = precon[i + 1], p2 = precon[i + 2], p3 = precon[i + 3];
-                    unsigned char q0 = precon[j + 0], q1 = precon[j + 1], q2 = precon[j + 2], q3 = precon[j + 3];
-                    recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
-                    recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
-                    recon[i + 2] = s2 + paethPredictor(r2, p2, q2);
-                    recon[i + 3] = s3 + paethPredictor(r3, p3, q3);
-                }
-            }
-            else if (bytewidth >= 3)
-            {
-                for (; i + 2 < length; i += 3)
-                {
-                    size_t j = i - bytewidth;
-                    unsigned char s0 = scanline[i + 0], s1 = scanline[i + 1], s2 = scanline[i + 2];
-                    unsigned char r0 = recon[j + 0], r1 = recon[j + 1], r2 = recon[j + 2];
-                    unsigned char p0 = precon[i + 0], p1 = precon[i + 1], p2 = precon[i + 2];
-                    unsigned char q0 = precon[j + 0], q1 = precon[j + 1], q2 = precon[j + 2];
-                    recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
-                    recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
-                    recon[i + 2] = s2 + paethPredictor(r2, p2, q2);
-                }
-            }
-            else if (bytewidth >= 2)
+            if (bytewidth >= 2)
             {
                 for (; i + 1 < length; i += 2)
                 {
                     size_t j = i - bytewidth;
-                    unsigned char s0 = scanline[i + 0], s1 = scanline[i + 1];
-                    unsigned char r0 = recon[j + 0], r1 = recon[j + 1];
-                    unsigned char p0 = precon[i + 0], p1 = precon[i + 1];
-                    unsigned char q0 = precon[j + 0], q1 = precon[j + 1];
+                    uint8_t s0 = scanline[i + 0], s1 = scanline[i + 1];
+                    uint8_t r0 = recon[j + 0], r1 = recon[j + 1];
+                    uint8_t p0 = precon[i + 0], p1 = precon[i + 1];
+                    uint8_t q0 = precon[j + 0], q1 = precon[j + 1];
                     recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
                     recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
                 }

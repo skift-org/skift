@@ -1,11 +1,3 @@
-#define LODEPNG_NO_COMPILE_DISK
-#define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
-#define LODEPNG_NO_COMPILE_CPP
-#include <thirdparty/lodepng/lodepng.cpp>
-#undef LODEPNG_NO_COMPILE_CPP
-#undef LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
-#undef LODEPNG_NO_COMPILE_DISK
-
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/png/PngReader.h>
 #include <libio/Copy.h>
@@ -114,31 +106,19 @@ RefPtr<Bitmap> Bitmap::load_from_or_placeholder(String path)
 
 Result Bitmap::save_to(String path)
 {
-    void *outbuffer __cleanup_malloc = nullptr;
+    __unused(path);
+    return Result::ERR_OPERATION_NOT_SUPPORTED;
 
-    size_t outbuffer_size = 0;
+    // void *outbuffer __cleanup_malloc = nullptr;
 
-    int err = lodepng_encode_memory(
-        (unsigned char **)&outbuffer,
-        &outbuffer_size,
-        (const unsigned char *)_pixels,
-        _width,
-        _height,
-        LCT_RGBA, 8);
+    // IO::File file{path, OPEN_READ};
 
-    if (err != 0)
-    {
-        return ERR_BAD_IMAGE_FILE_FORMAT;
-    }
+    // if (!file.exist())
+    // {
+    //     return ERR_NO_SUCH_FILE_OR_DIRECTORY;
+    // }
 
-    IO::File file{path, OPEN_READ};
-
-    if (!file.exist())
-    {
-        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
-    }
-
-    return IO::write_all(file, {outbuffer, outbuffer_size});
+    // return IO::write_all(file, {outbuffer, outbuffer_size});
 }
 
 Bitmap::~Bitmap()

@@ -24,9 +24,28 @@ Result Graphic::PngReader::read()
         return Result::ERR_INVALID_DATA;
     }
 
+    TRY(read_chunks());
+
+    // Uncompress the scanlines
+    IO::MemoryWriter uncompressed_writer;
+    TRY(uncompress(uncompressed_writer));
+    uint8_t *scanlines = uncompressed_writer.buffer();
+    // Unfilter the scanlines
+    size_t out_size = _width * _height * num_channels() * bytes_per_pixel();
+    uint8_t *raw_buffer = new uint8_t[out_size];
+    memset(raw_buffer, 0, out_size);
+    TRY(unfilter(raw_buffer, scanlines));
+    // Convert to our target format
+    TRY(convert(raw_buffer));
+    delete[] raw_buffer;
+
+    return Result::SUCCESS;
+}
+
+Result Graphic::PngReader::read_chunks()
+{
     size_t idat_counter = 0;
     bool end = false;
-    Png::ColourType colourType = Png::CT_RGB;
     uint32_t prev_signature = 0;
     while (!end)
     {
@@ -40,10 +59,18 @@ Result Graphic::PngReader::read()
             auto image_header = TRY(IO::read<Png::ImageHeader>(_reader));
             _width = image_header.width();
             _height = image_header.height();
-            logger_trace("FM: %u", image_header.filter_method());
-            logger_trace("IM: %u", image_header.interlace_method());
-            assert_equal(image_header.bit_depth(), 8);
-            colourType = image_header.colour_type();
+            // We don't support ADAM7 yet
+            if (image_header.interlace_method() != 0)
+            {
+                return Result::ERR_OPERATION_NOT_SUPPORTED;
+            }
+            // Same for bit depth
+            if (image_header.bit_depth() != 8)
+            {
+                return Result::ERR_OPERATION_NOT_SUPPORTED;
+            }
+            _bit_depth = image_header.bit_depth();
+            _colour_type = image_header.colour_type();
         }
         break;
 
@@ -117,7 +144,7 @@ Result Graphic::PngReader::read()
 
         default:
         {
-            logger_error("Invalid PNG chunk: %u", chunk_signature());
+            logger_error("Unknown PNG chunk: %u", chunk_signature());
             Vector<uint8_t> data(chunk_length());
             TRY(_reader.read(data.raw_storage(), chunk_length()));
         }
@@ -129,10 +156,186 @@ Result Graphic::PngReader::read()
         prev_signature = chunk_signature();
     }
 
-    IO::MemoryWriter uncompressed_writer;
-    TRY(uncompress(uncompressed_writer));
-    TRY(convert(colourType, uncompressed_writer.buffer()));
+    return Result::SUCCESS;
+}
 
+// Copyright (c) 2005-2020 Lode Vandevenne
+Result Graphic::PngReader::unfilter(uint8_t *out, uint8_t *in)
+{
+    /*
+  For PNG filter method 0
+  this function unfilters a single image (e.g. without interlacing this is called once, with Adam7 seven times)
+  out must have enough bytes allocated already, in must have the scanlines + 1 filtertype byte per scanline
+  w and h are image dimensions or dimensions of reduced image, bpp is bits per pixel
+  in and out are allowed to be the same memory address (but aren't the same size since in has the extra filter bytes)
+  */
+    uint8_t *prevline = 0;
+
+    /*bytewidth is used for filtering, is 1 when bpp < 8, number of bytes per pixel otherwise*/
+    size_t bytewidth = (bits_per_pixel() + 7u) / 8u;
+    size_t linebytes = (_width * bits_per_pixel() + 7u) / 8u;
+
+    for (uint32_t y = 0; y < _height; ++y)
+    {
+        size_t outindex = linebytes * y;
+        size_t inindex = (1 + linebytes) * y; /*the extra filterbyte added to each row*/
+        Png::FilterType filterType = (Png::FilterType)in[inindex];
+
+        TRY(unfilterScanline(&out[outindex], &in[inindex + 1], prevline, bytewidth, filterType, linebytes));
+
+        prevline = &out[outindex];
+    }
+
+    return Result::SUCCESS;
+}
+
+/*
+Path predictor, used by PNG filter type 4
+The parameters are of type short, but should come from unsigned chars, the shorts
+are only needed to make the paeth calculation correct.
+*/
+static uint8_t paethPredictor(int16_t a, int16_t b, int16_t c)
+{
+    int16_t pa = abs(b - c);
+    int16_t pb = abs(a - c);
+    int16_t pc = abs(a + b - c - c);
+    /* return input value associated with smallest of pa, pb, pc (with certain priority if equal) */
+    if (pb < pa)
+    {
+        a = b;
+        pa = pb;
+    }
+    return (pc < pa) ? c : a;
+}
+
+// Copyright (c) 2005-2020 Lode Vandevenne
+Result Graphic::PngReader::unfilterScanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
+                                            size_t bytewidth, Png::FilterType filterType, size_t length)
+{
+    /*
+  For PNG filter method 0
+  unfilter a PNG image scanline by scanline. when the pixels are smaller than 1 byte,
+  the filter works byte per byte (bytewidth = 1)
+  precon is the previous unfiltered scanline, recon the result, scanline the current one
+  the incoming scanlines do NOT include the filtertype byte, that one is given in the parameter filterType instead
+  recon and scanline MAY be the same memory address! precon must be disjoint.
+  */
+    size_t i;
+    switch (filterType)
+    {
+    case Png::FT_None:
+        for (i = 0; i != length; ++i)
+            recon[i] = scanline[i];
+        break;
+    case Png::FT_Sub:
+        for (i = 0; i != bytewidth; ++i)
+            recon[i] = scanline[i];
+        for (i = bytewidth; i < length; ++i)
+            recon[i] = scanline[i] + recon[i - bytewidth];
+        break;
+    case Png::FT_Up:
+        if (precon)
+        {
+            for (i = 0; i != length; ++i)
+                recon[i] = scanline[i] + precon[i];
+        }
+        else
+        {
+            for (i = 0; i != length; ++i)
+                recon[i] = scanline[i];
+        }
+        break;
+    case Png::FT_Average:
+        if (precon)
+        {
+            for (i = 0; i != bytewidth; ++i)
+                recon[i] = scanline[i] + (precon[i] >> 1u);
+            for (i = bytewidth; i < length; ++i)
+                recon[i] = scanline[i] + ((recon[i - bytewidth] + precon[i]) >> 1u);
+        }
+        else
+        {
+            for (i = 0; i != bytewidth; ++i)
+                recon[i] = scanline[i];
+            for (i = bytewidth; i < length; ++i)
+                recon[i] = scanline[i] + (recon[i - bytewidth] >> 1u);
+        }
+        break;
+    case Png::FT_Paeth:
+        if (precon)
+        {
+            for (i = 0; i != bytewidth; ++i)
+            {
+                recon[i] = (scanline[i] + precon[i]); /*paethPredictor(0, precon[i], 0) is always precon[i]*/
+            }
+
+            /* Unroll independent paths of the paeth predictor. A 6x and 8x version would also be possible but that
+        adds too much code. Whether this actually speeds anything up at all depends on compiler and settings. */
+            if (bytewidth >= 4)
+            {
+                for (; i + 3 < length; i += 4)
+                {
+                    size_t j = i - bytewidth;
+                    unsigned char s0 = scanline[i + 0], s1 = scanline[i + 1], s2 = scanline[i + 2], s3 = scanline[i + 3];
+                    unsigned char r0 = recon[j + 0], r1 = recon[j + 1], r2 = recon[j + 2], r3 = recon[j + 3];
+                    unsigned char p0 = precon[i + 0], p1 = precon[i + 1], p2 = precon[i + 2], p3 = precon[i + 3];
+                    unsigned char q0 = precon[j + 0], q1 = precon[j + 1], q2 = precon[j + 2], q3 = precon[j + 3];
+                    recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
+                    recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
+                    recon[i + 2] = s2 + paethPredictor(r2, p2, q2);
+                    recon[i + 3] = s3 + paethPredictor(r3, p3, q3);
+                }
+            }
+            else if (bytewidth >= 3)
+            {
+                for (; i + 2 < length; i += 3)
+                {
+                    size_t j = i - bytewidth;
+                    unsigned char s0 = scanline[i + 0], s1 = scanline[i + 1], s2 = scanline[i + 2];
+                    unsigned char r0 = recon[j + 0], r1 = recon[j + 1], r2 = recon[j + 2];
+                    unsigned char p0 = precon[i + 0], p1 = precon[i + 1], p2 = precon[i + 2];
+                    unsigned char q0 = precon[j + 0], q1 = precon[j + 1], q2 = precon[j + 2];
+                    recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
+                    recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
+                    recon[i + 2] = s2 + paethPredictor(r2, p2, q2);
+                }
+            }
+            else if (bytewidth >= 2)
+            {
+                for (; i + 1 < length; i += 2)
+                {
+                    size_t j = i - bytewidth;
+                    unsigned char s0 = scanline[i + 0], s1 = scanline[i + 1];
+                    unsigned char r0 = recon[j + 0], r1 = recon[j + 1];
+                    unsigned char p0 = precon[i + 0], p1 = precon[i + 1];
+                    unsigned char q0 = precon[j + 0], q1 = precon[j + 1];
+                    recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
+                    recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
+                }
+            }
+
+            for (; i != length; ++i)
+            {
+                recon[i] = (scanline[i] + paethPredictor(recon[i - bytewidth], precon[i], precon[i - bytewidth]));
+            }
+        }
+        else
+        {
+            for (i = 0; i != bytewidth; ++i)
+            {
+                recon[i] = scanline[i];
+            }
+            for (i = bytewidth; i < length; ++i)
+            {
+                /*paethPredictor(recon[i - bytewidth], 0, 0) is always recon[i - bytewidth]*/
+                recon[i] = (scanline[i] + recon[i - bytewidth]);
+            }
+        }
+        break;
+    default:
+        logger_error("Invalid filter type: %u", filterType);
+        return Result::ERR_INVALID_DATA; /*error: nonexistent filter type given*/
+    }
     return Result::SUCCESS;
 }
 
@@ -144,11 +347,11 @@ Result Graphic::PngReader::uncompress(IO::MemoryWriter &uncompressed_writer)
     return inflate.perform(compressed_reader, uncompressed_writer).result();
 }
 
-Result Graphic::PngReader::convert(Png::ColourType type, uint8_t *buffer)
+Result Graphic::PngReader::convert(uint8_t *buffer)
 {
     _pixels.resize(_width * _height);
 
-    if (type == Png::CT_RGBA)
+    if (_colour_type == Png::CT_RGBA)
     {
         auto rgba_data = buffer;
 
@@ -161,7 +364,7 @@ Result Graphic::PngReader::convert(Png::ColourType type, uint8_t *buffer)
         }
     }
     // It's RGB data convert it to RGBA
-    else if (type == Png::CT_RGB)
+    else if (_colour_type == Png::CT_RGB)
     {
         auto rgb_data = buffer;
 
@@ -173,7 +376,7 @@ Result Graphic::PngReader::convert(Png::ColourType type, uint8_t *buffer)
         }
     }
     // It's grayscale
-    else if (type == Png::CT_GREY)
+    else if (_colour_type == Png::CT_GREY)
     {
         auto monochrome_data = buffer;
 
@@ -182,7 +385,7 @@ Result Graphic::PngReader::convert(Png::ColourType type, uint8_t *buffer)
             _pixels[i] = Color::from_monochrome_byte(monochrome_data[i]);
         }
     }
-    else if (type == Png::CT_GREY_ALPHA)
+    else if (_colour_type == Png::CT_GREY_ALPHA)
     {
         auto monochrome_alpha_data = buffer;
 
@@ -194,7 +397,7 @@ Result Graphic::PngReader::convert(Png::ColourType type, uint8_t *buffer)
     }
     else
     {
-        logger_error("Unsupported PNG colour type: %u", type);
+        logger_error("Unsupported PNG colour type: %u", _colour_type);
         return Result::ERR_OPERATION_NOT_SUPPORTED;
     }
 

@@ -91,4 +91,14 @@ struct __packed ImageEnd
     // iEND
     static constexpr uint32_t SIG = 0x49454E44;
 };
+
+enum FilterType : uint8_t
+{
+    FT_None = 0,
+    FT_Sub = 1,
+    FT_Up = 2,
+    FT_Average = 3,
+    FT_Paeth = 4
+};
+
 } // namespace Png

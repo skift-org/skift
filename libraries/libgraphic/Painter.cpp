@@ -747,7 +747,7 @@ __flatten void Painter::saturation(Recti rectangle, float value)
             uint8_t green = (uint8_t)clamp(-gray * value + color.green() * (1 + value), 0, 255);
             uint8_t blue = (uint8_t)clamp(-gray * value + color.blue() * (1 + value), 0, 255);
 
-            color = Color::from_byte(red, green, blue);
+            color = Color::from_rgb_byte(red, green, blue);
 
             _bitmap->set_pixel({rectangle.x() + x, rectangle.y() + y}, color);
         }
@@ -782,7 +782,7 @@ __flatten void Painter::sepia(Recti rectangle, float value)
             uint32_t green = (color.red() * 0.349) + (color.green() * 0.686) + (color.blue() * 0.168);
             uint32_t blue = (color.red() * 0.272) + (color.green() * 0.534) + (color.blue() * 0.131);
 
-            Color sepia_color = Color::from_byte(MIN(255, red), MIN(255, green), MIN(blue, 255));
+            Color sepia_color = Color::from_rgb_byte(MIN(255, red), MIN(255, green), MIN(blue, 255));
 
             _bitmap->set_pixel({rectangle.x() + x, rectangle.y() + y}, Color::lerp(color, sepia_color, value));
         }
@@ -803,7 +803,7 @@ __flatten void Painter::tint(Recti rectangle, Color color)
             uint32_t green = (sample.green() * color.greenf());
             uint32_t blue = (sample.blue() * color.bluef());
 
-            Color sepia_color = Color::from_byte(MIN(255, red), MIN(255, green), MIN(blue, 255));
+            Color sepia_color = Color::from_rgb_byte(MIN(255, red), MIN(255, green), MIN(blue, 255));
             _bitmap->set_pixel({rectangle.x() + x, rectangle.y() + y}, sepia_color);
         }
     }

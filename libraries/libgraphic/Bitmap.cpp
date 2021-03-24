@@ -70,27 +70,21 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path)
     {
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
+    logger_trace("Loading bitmap: %s", path.cstring());
 
     auto png_data = TRY(IO::read_all(file));
 
-    // IO::MemoryReader mem_reader{png_data.start(), png_data.size()};
-    // Graphic::PngReader png_reader(mem_reader);
+    IO::MemoryReader mem_reader{png_data.start(), png_data.size()};
+    Graphic::PngReader png_reader(mem_reader);
 
-    unsigned int decoded_width = 0;
-    unsigned int decoded_height = 0;
-    void *decoded_data = nullptr;
-
-    int decode_result = lodepng_decode32(
-        (unsigned char **)&decoded_data,
-        &decoded_width,
-        &decoded_height,
-        (const unsigned char *)png_data.start(),
-        png_data.size());
-
-    if (decode_result != 0)
+    if (!png_reader.valid())
     {
         return ERR_BAD_IMAGE_FILE_FORMAT;
     }
+
+    unsigned int decoded_width = png_reader.width();
+    unsigned int decoded_height = png_reader.height();
+    const Color *decoded_data = png_reader.pixels().raw_storage();
 
     auto bitmap_or_result = Bitmap::create_shared(decoded_width, decoded_height);
 
@@ -98,12 +92,10 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path)
     {
         auto bitmap = bitmap_or_result.take_value();
         memcpy(bitmap->pixels(), decoded_data, sizeof(Color) * decoded_width * decoded_height);
-        free(decoded_data);
         return bitmap;
     }
     else
     {
-        free(decoded_data);
         return bitmap_or_result;
     }
 }

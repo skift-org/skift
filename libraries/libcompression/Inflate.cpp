@@ -44,7 +44,6 @@ static constexpr uint16_t BASE_DISTANCE[] = {
     4097, 6145,   //24-25
     8193, 12289,  //26-27
     16385, 24577, //28-29
-    0, 0          //30-31, error, shouldn't occur
 };
 
 static constexpr uint8_t BASE_DISTANCE_EXTRA_BITS[] = {
@@ -62,7 +61,6 @@ static constexpr uint8_t BASE_DISTANCE_EXTRA_BITS[] = {
     11, 11,     //24-25
     12, 12,     //26-27
     13, 13,     //28-29
-    0, 0        //30-31 error, they shouldn't occur
 };
 
 void Inflate::get_bit_length_count(HashMap<unsigned int, unsigned int> &bit_length_count, const Vector<unsigned int> &code_bit_lengths)
@@ -242,6 +240,9 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
 {
     // Size might vary
     Vector<uint8_t> sliding_window_buffer;
+    // We use this as our sliding window. We should write directly into "uncompressed in the future"
+    // And limit the amount of data we keep in our sliding window (Dequeue would be nice)
+    IO::MemoryWriter dest_writer;
 
     uint8_t bfinal;
     do
@@ -261,19 +262,12 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
 
             for (int i = 0; i != len; i++)
             {
-                IO::write<uint8_t>(uncompressed, input.grab_bits(8));
+                IO::write<uint8_t>(dest_writer, input.grab_bits(8));
             }
         }
         else if (btype == BT_FIXED_HUFFMAN ||
                  btype == BT_DYNAMIC_HUFFMAN)
         {
-            // if (sliding_window_buffer.count() > 32768 + 1000)
-            // {
-            //     logger_trace("Free 1000 bytes from SW");
-            //     for (int i = 0; i < 1000; i++)
-            //         sliding_window_buffer.pop();
-            // }
-
             // Use a fixed huffman alphabet
             if (btype == BT_FIXED_HUFFMAN)
             {
@@ -298,15 +292,12 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
             while (true)
             {
                 unsigned int decoded_symbol = symbol_decoder.decode(input);
+                // Literal symbol
                 if (decoded_symbol <= 255)
                 {
-                    IO::write<uint8_t>(uncompressed, decoded_symbol);
-                    sliding_window_buffer.push_back((uint8_t)decoded_symbol);
+                    IO::write<uint8_t>(dest_writer, decoded_symbol);
                 }
-                else if (decoded_symbol == 256)
-                {
-                    break;
-                }
+                // Length code
                 else if (decoded_symbol >= 257 && decoded_symbol <= 285)
                 {
                     unsigned int length_index = decoded_symbol - 257;
@@ -316,26 +307,34 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
                     assert_lower_than(dist_code, 30);
 
                     unsigned int total_dist = BASE_DISTANCE[dist_code] + input.grab_bits(BASE_DISTANCE_EXTRA_BITS[dist_code]);
-                    uint8_t val = sliding_window_buffer[sliding_window_buffer.count() - total_dist];
+                    uint8_t val = dest_writer.buffer()[dest_writer.length().value() - total_dist];
                     for (unsigned int i = 0; i != total_length; i++)
                     {
-                        IO::write<uint8_t>(uncompressed, val);
-
-                        sliding_window_buffer.push_back(val);
-                        val = sliding_window_buffer[sliding_window_buffer.count() - total_dist];
+                        IO::write<uint8_t>(dest_writer, val);
+                        val = dest_writer.buffer()[dest_writer.length().value() - total_dist];
                     }
+                }
+                // End code
+                else if (decoded_symbol == 256)
+                {
+                    break;
                 }
                 else
                 {
+                    logger_error("Invalid decoded symbol: %u", decoded_symbol);
                     return Result::ERR_INVALID_DATA;
                 }
             }
         }
         else
         {
+            logger_error("Invalid block type: %u", btype);
             return Result::ERR_INVALID_DATA;
         }
     } while (!bfinal);
+
+    auto reader = IO::MemoryReader(Slice(dest_writer.slice()));
+    IO::copy(reader, uncompressed);
 
     return Result::SUCCESS;
 }

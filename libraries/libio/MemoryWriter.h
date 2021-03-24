@@ -75,6 +75,11 @@ public:
         }
     }
 
+    inline uint8_t* buffer()
+    {
+        return _buffer;
+    }
+
     // Create a string and flush the buffer!;
     RefPtr<StringStorage> string()
     {

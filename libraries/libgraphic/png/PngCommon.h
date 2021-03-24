@@ -11,6 +11,17 @@ enum CompressionMethod : uint8_t
 
 using be_cm = LittleEndian<CompressionMethod>;
 
+enum ColourType : uint8_t
+{
+    CT_GREY = 0,       /*grayscale: 1,2,4,8,16 bit*/
+    CT_RGB = 2,        /*RGB: 8,16 bit*/
+    CT_PALETTE = 3,    /*palette: 1,2,4,8 bit*/
+    CT_GREY_ALPHA = 4, /*grayscale with alpha: 8,16 bit*/
+    CT_RGBA = 6
+};
+
+using be_ct = LittleEndian<ColourType>;
+
 struct __packed ImageHeader
 {
     // iHDR
@@ -18,7 +29,7 @@ struct __packed ImageHeader
     be_uint32_t width;
     be_uint32_t height;
     be_uint8_t bit_depth;
-    be_uint8_t colour_type;
+    be_ct colour_type;
     be_cm compression_method;
     be_uint8_t filter_method;
     be_uint8_t interlace_method;

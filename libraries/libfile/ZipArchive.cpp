@@ -237,11 +237,11 @@ Result ZipArchive::read_archive()
     return Result::SUCCESS;
 }
 
-void write_entry(const Archive::Entry &entry, IO::Writer &writer, IO::SeekableReader auto &compressed)
+void write_entry(const Archive::Entry &entry, IO::Writer &writer, IO::Reader &compressed, size_t compressed_size)
 {
     LocalHeader header;
     header.flags = EF_NONE;
-    header.compressed_size = compressed.length().value();
+    header.compressed_size = compressed_size;
     header.compression = CM_DEFLATED;
     header.uncompressed_size = entry.uncompressed_size;
     header.len_filename = entry.name.length();
@@ -328,7 +328,7 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
 
         IO::ScopedReader scoped_reader(file_reader, entry.compressed_size);
         logger_trace("Write existing local header: '%s'", entry.name.cstring());
-        write_entry(entry, memory_writer, scoped_reader);
+        write_entry(entry, memory_writer, scoped_reader, entry.compressed_size);
     }
 
     // Get a reader to the original file
@@ -350,7 +350,7 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
 
     auto compressed_data = compressed_writer.slice();
     IO::MemoryReader compressed_reader(compressed_data->start(), compressed_data->size());
-    write_entry(new_entry, memory_writer, compressed_reader);
+    write_entry(new_entry, memory_writer, compressed_reader, compressed_data->size());
 
     // Write central directory
     write_central_directory(memory_writer, _entries);

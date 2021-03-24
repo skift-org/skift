@@ -3,6 +3,7 @@
 #include <libgraphic/png/PngReader.h>
 #include <libio/Read.h>
 #include <libio/Skip.h>
+#include <libio/ScopedReader.h>
 #include <libsystem/Logger.h>
 #include <libtest/AssertLowerEqual.h>
 #include <libutils/Array.h>
@@ -81,7 +82,8 @@ Result Graphic::PngReader::read()
 
             Compression::Inflate inflate;
             IO::MemoryWriter memory;
-            size_t compressed_size = TRY(inflate.perform(_reader, memory));
+            IO::ScopedReader data_reader(_reader, chunk_length() - 6);
+            size_t compressed_size = TRY(inflate.perform(data_reader, memory));
             logger_trace("Uncompressed PNG data: CS: %u US: %u", compressed_size, memory.length().value());
 
             // TODO: fix this

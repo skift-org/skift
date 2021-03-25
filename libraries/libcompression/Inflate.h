@@ -36,16 +36,10 @@ private:
     void get_first_code(HashMap<unsigned int, unsigned int> &firstCodes, HashMap<unsigned int, unsigned int> &bit_length_count);
     void assign_huffman_codes(Vector<unsigned int> &assigned_codes, const Vector<unsigned int> &code_bit_lengths, HashMap<unsigned int, unsigned int> &first_codes);
 
-    Result read_blocks(IO::BitReader &input, IO::Writer &uncompressed);
+    Result read_blocks(IO::Reader &reader, IO::Writer &uncompressed);
 
 public:
-    ResultOr<size_t> perform(IO::Reader &compressed, IO::Writer &uncompressed)
-    {
-        IO::ReadCounter counter{compressed};
-        IO::BitReader input(counter);
-        TRY(read_blocks(input, uncompressed));
-        return counter.count();
-    }
+    ResultOr<size_t> perform(IO::Reader &compressed, IO::Writer &uncompressed);
 };
 
 } // namespace Compression

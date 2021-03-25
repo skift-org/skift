@@ -96,7 +96,7 @@ $ sudo pacman -S base-devel bison flex mpc mpfr texinfo
 
 ```sh
 # On Arch or Arch-based distributions
-$ sudo dnf install bison flex mpc mpfr texinfo
+$ sudo dnf install bison flex mpc mpfr texinfo patch
 ```
 
 Then for building the toolchain run the `build-it.sh` script

@@ -62,7 +62,6 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path)
     {
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
-    logger_trace("Loading bitmap: %s", path.cstring());
 
     Graphic::PngReader png_reader(file);
 

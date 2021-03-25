@@ -82,19 +82,21 @@ public:
         return value;
     }
 
-    inline void skip_bits(size_t num_bits)
+    inline Result skip_bits(size_t num_bits)
     {
         if (num_bits == 0)
         {
-            return;
+            return SUCCESS;
         }
 
-        hint(num_bits);
+        TRY(hint(num_bits));
 
         for (size_t i = 0; i < num_bits; i++)
         {
             grab_bit();
         }
+
+        return SUCCESS;
     }
 
     inline uint8_t grab_bit()

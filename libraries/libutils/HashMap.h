@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libsystem/Logger.h>
 #include <libutils/Hash.h>
 #include <libutils/Vector.h>
 

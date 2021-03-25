@@ -1,12 +1,12 @@
 #pragma once
 
 #include <assert.h>
-#include <libsystem/Logger.h>
+#include <string.h>
+
 #include <libsystem/io/Stream.h>
 #include <libutils/NumberParser.h>
 #include <libutils/RingBuffer.h>
 #include <libutils/unicode/Codepoint.h>
-#include <string.h>
 
 class Scanner
 {

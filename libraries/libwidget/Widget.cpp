@@ -1,7 +1,7 @@
 #include <assert.h>
+
 #include <libgraphic/Font.h>
 #include <libgraphic/Painter.h>
-#include <libsystem/Logger.h>
 #include <libsystem/math/MinMax.h>
 #include <libwidget/Application.h>
 #include <libwidget/Event.h>

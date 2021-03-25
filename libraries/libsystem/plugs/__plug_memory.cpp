@@ -1,7 +1,5 @@
-
 #include <abi/Syscalls.h>
 
-#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/system/Memory.h>
 

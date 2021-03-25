@@ -1,4 +1,3 @@
-#include <libsystem/Logger.h>
 #include <libsystem/utils/List.h>
 
 #include "kernel/interrupts/Interupts.h"

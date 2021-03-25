@@ -1,4 +1,3 @@
-#include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Invoker.h>
 #include <libsystem/eventloop/Notifier.h>

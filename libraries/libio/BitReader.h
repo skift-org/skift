@@ -1,7 +1,6 @@
 #pragma once
 
 #include <libio/Read.h>
-#include <libsystem/Logger.h>
 #include <libtest/Asserts.h>
 #include <libutils/InlineRingBuffer.h>
 

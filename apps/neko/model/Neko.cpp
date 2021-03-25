@@ -1,3 +1,5 @@
+#include <libsystem/Logger.h>
+
 #include "neko/model/Neko.h"
 #include "neko/states/ChaseMouse.h"
 

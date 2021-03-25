@@ -1,5 +1,3 @@
-#include <libsystem/Logger.h>
-
 #include "compositor/Manager.h"
 #include "compositor/Renderer.h"
 #include "compositor/Window.h"

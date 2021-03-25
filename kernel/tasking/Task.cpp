@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <libsystem/Logger.h>
 #include <string.h>
 
 #include "archs/Architectures.h"

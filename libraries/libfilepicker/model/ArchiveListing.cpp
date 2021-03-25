@@ -1,9 +1,7 @@
 #include <string.h>
 
-#include <libsystem/Logger.h>
-#include <libutils/json/Json.h>
-
 #include <libfilepicker/model/ArchiveListing.h>
+#include <libutils/json/Json.h>
 
 namespace filepicker
 {

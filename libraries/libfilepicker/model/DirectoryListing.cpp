@@ -2,7 +2,6 @@
 
 #include <libio/Directory.h>
 #include <libio/Format.h>
-#include <libsystem/Logger.h>
 #include <libutils/json/Json.h>
 
 #include <libfilepicker/model/DirectoryListing.h>

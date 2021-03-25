@@ -1,9 +1,6 @@
 #pragma once
 
-#include <libsystem/Logger.h>
-
 #include <libgraphic/Icon.h>
-
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
 

@@ -1,3 +1,4 @@
+#include <libsystem/Logger.h>
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
 #include <libwidget/Panel.h>

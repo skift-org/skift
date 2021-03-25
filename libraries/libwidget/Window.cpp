@@ -1,9 +1,7 @@
 #include <assert.h>
 
-#include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/system/Memory.h>
-
 #include <libwidget/Application.h>
 #include <libwidget/Container.h>
 #include <libwidget/Event.h>

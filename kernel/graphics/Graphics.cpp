@@ -1,5 +1,3 @@
-#include <libsystem/Logger.h>
-
 #include "kernel/graphics/Graphics.h"
 #include "kernel/interrupts/Interupts.h"
 

@@ -1,3 +1,5 @@
+#include <libsystem/Logger.h>
+
 #include "kernel/drivers/LegacyATA.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/tasking/Task.h"

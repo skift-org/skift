@@ -1,5 +1,3 @@
-
-#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>

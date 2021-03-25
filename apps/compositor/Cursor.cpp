@@ -1,5 +1,4 @@
 #include <libgraphic/Bitmap.h>
-#include <libsystem/Logger.h>
 #include <libsystem/system/System.h>
 #include <libutils/Path.h>
 

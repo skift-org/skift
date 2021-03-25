@@ -1,9 +1,9 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/Logger.h>
 #include <libsystem/process/Launchpad.h>
 #include <libtest/AssertEqual.h>
 #include <libwidget/Event.h>
 #include <libwidget/Window.h>
+#include <libsystem/Logger.h>
 
 #include "terminal/Common.h"
 #include "terminal/TerminalWidget.h"

@@ -1,8 +1,8 @@
-#include <libsystem/Logger.h>
+#include <stdio.h>
+
 #include <libsystem/cmdline/History.h>
 #include <libsystem/cmdline/ReadLine.h>
 #include <libsystem/io/Stream.h>
-#include <stdio.h>
 
 #define READLINE_ALLOCATED 128
 

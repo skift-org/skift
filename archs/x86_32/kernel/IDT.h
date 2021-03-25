@@ -1,7 +1,6 @@
 #pragma once
 
 #include <libsystem/Common.h>
-#include <libsystem/Logger.h>
 
 #define INTGATE 0x8e
 #define TRAPGATE 0xeF

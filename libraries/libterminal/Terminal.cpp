@@ -1,5 +1,5 @@
-
 #include <assert.h>
+
 #include <libsystem/Logger.h>
 #include <libsystem/math/MinMax.h>
 #include <libterminal/Terminal.h>

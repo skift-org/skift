@@ -1,3 +1,5 @@
+#include <libsystem/Logger.h>
+
 #include "kernel/tasking/Tasking.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"

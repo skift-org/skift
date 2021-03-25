@@ -1,4 +1,3 @@
-#include <libsystem/Logger.h>
 #include <string.h>
 
 #include "kernel/node/Handle.h"

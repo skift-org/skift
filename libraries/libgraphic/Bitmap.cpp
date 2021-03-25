@@ -11,7 +11,6 @@
 #include <libio/Copy.h>
 #include <libio/File.h>
 #include <libio/MemoryReader.h>
-#include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
 
 static Color _placeholder_buffer[] = {

@@ -1,5 +1,6 @@
 #include <libfile/TARArchive.h>
 #include <libio/File.h>
+#include <libsystem/Logger.h>
 
 struct __packed TARRawBlock
 {

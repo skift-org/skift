@@ -3,7 +3,6 @@
 #include <abi/Paths.h>
 
 #include <libgraphic/Framebuffer.h>
-#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
 

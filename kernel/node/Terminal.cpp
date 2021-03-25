@@ -1,6 +1,4 @@
-
 #include <assert.h>
-#include <libsystem/Logger.h>
 
 #include "kernel/node/Handle.h"
 #include "kernel/node/Terminal.h"

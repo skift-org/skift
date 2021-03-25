@@ -1,9 +1,8 @@
+#include <string.h>
 
-#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/math/MinMax.h>
 #include <libutils/json/Json.h>
-#include <string.h>
 
 #include "kernel/devices/Devices.h"
 #include "kernel/interrupts/Interupts.h"

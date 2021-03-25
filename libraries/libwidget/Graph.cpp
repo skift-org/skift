@@ -1,6 +1,6 @@
 #include <assert.h>
+
 #include <libgraphic/Painter.h>
-#include <libsystem/Logger.h>
 #include <libwidget/Graph.h>
 
 Graph::Graph(Widget *parent, size_t data_size, Color data_color)

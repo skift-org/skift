@@ -1,7 +1,5 @@
-
 #include <libio/Directory.h>
 #include <libio/Streams.h>
-#include <libsystem/Logger.h>
 #include <libutils/ArgParse.h>
 
 static bool option_all = false;

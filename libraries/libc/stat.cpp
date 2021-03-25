@@ -6,8 +6,6 @@
 
 #include <abi/Syscalls.h>
 
-#include <libsystem/Logger.h>
-
 int file_type_to_stat(FileType type)
 {
     switch (type)

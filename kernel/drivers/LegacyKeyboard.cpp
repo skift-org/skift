@@ -1,3 +1,4 @@
+#include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
 
 #include "kernel/Configs.h"

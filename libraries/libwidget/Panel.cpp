@@ -1,5 +1,4 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/Logger.h>
 #include <libwidget/Panel.h>
 
 Panel::Panel(Widget *parent)

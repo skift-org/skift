@@ -1,5 +1,3 @@
-
-#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <string.h>
 #include <libsystem/math/MinMax.h>

@@ -1,3 +1,5 @@
+#include <libsystem/Logger.h>
+
 #include "kernel/storage/Partitions.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/storage/MBR.h"

@@ -1,9 +1,8 @@
-#include <libmarkup/Markup.h>
-#include <libsystem/Logger.h>
-#include <libutils/NumberParser.h>
-#include <libutils/Scanner.h>
 #include <string.h>
 
+#include <libmarkup/Markup.h>
+#include <libutils/NumberParser.h>
+#include <libutils/Scanner.h>
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Image.h>

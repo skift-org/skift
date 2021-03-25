@@ -6,7 +6,6 @@
 /*                                                                            */
 
 #include <assert.h>
-#include <libsystem/Logger.h>
 
 #include "kernel/devices/Devices.h"
 #include "kernel/devices/Driver.h"

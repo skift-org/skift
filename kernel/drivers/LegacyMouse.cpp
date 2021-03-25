@@ -1,3 +1,5 @@
+#include <libsystem/Logger.h>
+
 #include "kernel/drivers/LegacyMouse.h"
 
 void LegacyMouse::wait(int type)

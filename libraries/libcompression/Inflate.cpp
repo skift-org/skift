@@ -3,6 +3,7 @@
 #include <libcompression/Inflate.h>
 #include <libio/BitReader.h>
 #include <libio/MemoryWriter.h>
+#include <libsystem/Logger.h>
 #include <libutils/InlineRingBuffer.h>
 
 namespace Compression

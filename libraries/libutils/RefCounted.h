@@ -1,7 +1,6 @@
 #pragma once
 
 #include <assert.h>
-#include <libsystem/Logger.h>
 
 template <typename T>
 class RefCounted

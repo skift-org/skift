@@ -1,3 +1,5 @@
+#include <libsystem/Logger.h>
+
 #include "archs/Architectures.h"
 
 #include "kernel/interrupts/Dispatcher.h"

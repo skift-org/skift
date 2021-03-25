@@ -1,7 +1,6 @@
 #include <abi/Syscalls.h>
 
 #include <libio/Streams.h>
-#include <libsystem/Logger.h>
 #include <libsystem/cmdline/ReadLine.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>

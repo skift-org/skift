@@ -1,3 +1,4 @@
+#include <libsystem/Logger.h>
 #include <libutils/Vector.h>
 
 #include "kernel/devices/LegacyDevice.h"

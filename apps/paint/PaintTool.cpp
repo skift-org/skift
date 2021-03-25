@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <libsystem/Logger.h>
 #include <libutils/Vector.h>
 
 #include <libsystem/math/Bresenham.h>

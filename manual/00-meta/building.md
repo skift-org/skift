@@ -42,7 +42,7 @@ $ sudo pacman -S nasm gcc make binutils grub qemu libisoburn mtools imagemagick 
 
 ```sh
 # On Red Hat or Red Hat-based distributions
-$ sudo dnf install nasm gcc make binutils xorriso mtools ImageMagick git qemu qemu-kvm
+$ sudo dnf install nasm gcc gcc-g++ make binutils xorriso mtools ImageMagick git qemu qemu-kvm
 ```
 
 ### About WSL
@@ -96,7 +96,7 @@ $ sudo pacman -S base-devel bison flex mpc mpfr texinfo
 
 ```sh
 # On Arch or Arch-based distributions
-$ sudo dnf install bison flex mpc mpfr texinfo patch
+$ sudo dnf install bison flex mpc mpfr texinfo patch gmp-devel
 ```
 
 Then for building the toolchain run the `build-it.sh` script

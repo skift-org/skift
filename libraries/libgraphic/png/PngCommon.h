@@ -98,7 +98,26 @@ struct __packed PhysicalDimensions
     static constexpr uint32_t SIG = 0x70485973;
     be_uint32_t pixels_per_x;
     be_uint32_t pixels_per_y;
-    uint8_t unit_specifier;
+    be_uint8_t unit_specifier;
+};
+
+struct __packed sRGB
+{
+    // sRGB
+    static constexpr uint32_t SIG = 0x73524742;
+    be_uint8_t rendering_intent;
+};
+
+struct __packed Palette
+{
+    // PLTE
+    static constexpr uint32_t SIG = 0x504C5445;
+};
+
+struct Transparency
+{
+    // tRNS
+    static constexpr uint32_t SIG = 0x74524E53;
 };
 
 enum FilterType : uint8_t

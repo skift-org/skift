@@ -107,6 +107,50 @@ Result Graphic::PngReader::read_chunks()
         }
         break;
 
+        case Png::sRGB::SIG:
+        {
+            TRY(IO::read<Png::sRGB>(_reader));
+        }
+        break;
+
+        case Png::Palette::SIG:
+        {
+            auto num_entries = chunk_length() / 3;
+            for (size_t i = 0; i < num_entries; i++)
+            {
+                uint8_t red = TRY(IO::read<uint8_t>(_reader));
+                uint8_t green = TRY(IO::read<uint8_t>(_reader));
+                uint8_t blue = TRY(IO::read<uint8_t>(_reader));
+                _palette.push_back(Color::from_rgb_byte(red, green, blue));
+            }
+        }
+        break;
+
+        case Png::Transparency::SIG:
+        {
+            // TODO: can this chunk appear before the palette chunk?
+            if (_colour_type == Png::CT_PALETTE)
+            {
+                auto num_entries = chunk_length();
+                for (size_t i = 0; i < num_entries; i++)
+                {
+                    uint8_t alpha = TRY(IO::read<uint8_t>(_reader));
+                    _palette[i] = _palette[i].with_alpha_byte(alpha);
+                }
+            }
+            else if (_colour_type == Png::CT_GREY || _colour_type == Png::CT_RGB)
+            {
+                logger_error("Transparency chunk not implemented for current colour type");
+                return Result::ERR_NOT_IMPLEMENTED;
+            }
+            else
+            {
+                logger_error("Transparency chunk not allowed for current colour type");
+                return Result::ERR_INVALID_DATA;
+            }
+        }
+        break;
+
         case Png::ImageData::SIG:
         {
             size_t data_size = chunk_length();
@@ -376,10 +420,25 @@ Result Graphic::PngReader::convert(uint8_t *buffer)
                                                            monochrome_alpha_data[i * 2 + 1]);
         }
     }
+    else if (_colour_type == Png::CT_PALETTE)
+    {
+        if (_palette.empty())
+        {
+            logger_error("Palette colour type requires a palett data");
+            return Result::ERR_INVALID_DATA;
+        }
+
+        auto palette_data = buffer;
+
+        for (size_t i = 0; i < _width * _height; i++)
+        {
+            _pixels[i] = _palette[palette_data[i]];
+        }
+    }
     else
     {
         logger_error("Unsupported PNG colour type: %u", _colour_type);
-        return Result::ERR_OPERATION_NOT_SUPPORTED;
+        return Result::ERR_NOT_IMPLEMENTED;
     }
 
     return Result::SUCCESS;

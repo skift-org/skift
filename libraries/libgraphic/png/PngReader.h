@@ -16,6 +16,7 @@ private:
     uint32_t _height = 0;
     uint8_t _bit_depth = 0;
     Vector<Color> _pixels;
+    Vector<Color> _palette;
     DateTime _modified;
     Png::ColourType _colour_type;
     IO::Reader &_reader;

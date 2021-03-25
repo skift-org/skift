@@ -186,6 +186,16 @@ public:
         };
     }
 
+    constexpr Color with_alpha_byte(uint8_t alpha) const
+    {
+        return {
+            red(),
+            green(),
+            blue(),
+            alpha,
+        };
+    }
+
     constexpr bool operator==(const Color &other) const
     {
         return red() == other.red() &&

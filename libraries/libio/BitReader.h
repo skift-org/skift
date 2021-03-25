@@ -27,7 +27,6 @@ public:
 
             if (TRY(_reader.read(&byte, sizeof(byte))) == 0)
             {
-                logger_trace("BitStream EOF");
                 _end_of_file = true;
                 return SUCCESS;
             }

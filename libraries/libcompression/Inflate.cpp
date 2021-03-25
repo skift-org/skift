@@ -2,7 +2,10 @@
 #include <libcompression/Huffman.h>
 #include <libcompression/Inflate.h>
 #include <libio/BitReader.h>
+#include <libio/BufReader.h>
+#include <libio/Copy.h>
 #include <libio/MemoryWriter.h>
+#include <libio/Skip.h>
 #include <libsystem/Logger.h>
 #include <libutils/InlineRingBuffer.h>
 
@@ -236,37 +239,34 @@ Result Inflate::build_dynamic_huffman_alphabet(IO::BitReader &input)
     return Result::SUCCESS;
 }
 
-Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
+__flatten Result Inflate::read_blocks(IO::Reader &reader, IO::Writer &uncompressed)
 {
-    // Size might vary
-    Vector<uint8_t> sliding_window_buffer;
     // We use this as our sliding window. We should write directly into "uncompressed in the future"
     // And limit the amount of data we keep in our sliding window (Dequeue would be nice)
-    IO::MemoryWriter dest_writer;
+    IO::MemoryWriter dest_writer{32768};
 
     uint8_t bfinal;
+    IO::BitReader bits{reader};
     do
     {
-        bfinal = input.grab_bits(1);
-        uint8_t btype = input.grab_bits(2);
+        bfinal = bits.grab_bits(1);
+        uint8_t btype = bits.grab_bits(2);
 
         // Uncompressed block
         if (btype == BT_UNCOMPRESSED)
         {
             // Align to byte bounadries
-            input.skip_bits(5);
-            auto len = input.grab_aligned<uint16_t>();
+            bits.skip_bits(5);
+
+            uint16_t len = TRY(IO::read<uint16_t>(reader));
 
             // Skip complement of LEN
-            input.skip_bits(16);
+            TRY(IO::skip(reader, 2));
 
-            for (int i = 0; i != len; i++)
-            {
-                IO::write<uint8_t>(dest_writer, input.grab_bits(8));
-            }
+            // copy the uncompressed data
+            TRY(IO::copy(reader, dest_writer, len));
         }
-        else if (btype == BT_FIXED_HUFFMAN ||
-                 btype == BT_DYNAMIC_HUFFMAN)
+        else if (btype == BT_FIXED_HUFFMAN || btype == BT_DYNAMIC_HUFFMAN)
         {
             // Use a fixed huffman alphabet
             if (btype == BT_FIXED_HUFFMAN)
@@ -276,11 +276,7 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
             // Use a dynamic huffman alphabet
             else
             {
-                auto result = build_dynamic_huffman_alphabet(input);
-                if (result != Result::SUCCESS)
-                {
-                    return result;
-                }
+                TRY(build_dynamic_huffman_alphabet(bits));
             }
 
             // Do the actual huffman decoding
@@ -289,34 +285,36 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
 
             HuffmanDecoder dist_decoder(btype == BT_FIXED_HUFFMAN ? _fixed_dist_alphabet : _dist_alphabet,
                                         btype == BT_FIXED_HUFFMAN ? _fixed_dist_code_bit_lengths : _dist_code_bit_length);
+
             while (true)
             {
-                unsigned int decoded_symbol = symbol_decoder.decode(input);
-                // Literal symbol
+                unsigned int decoded_symbol = symbol_decoder.decode(bits);
                 if (decoded_symbol <= 255)
                 {
+                    // Literal symbol
                     IO::write<uint8_t>(dest_writer, decoded_symbol);
                 }
-                // Length code
                 else if (decoded_symbol >= 257 && decoded_symbol <= 285)
                 {
+                    // Length code
                     unsigned int length_index = decoded_symbol - 257;
-                    unsigned int total_length = BASE_LENGTHS[length_index] + input.grab_bits(BASE_LENGTH_EXTRA_BITS[length_index]);
-                    unsigned int dist_code = dist_decoder.decode(input);
+                    unsigned int total_length = BASE_LENGTHS[length_index] + bits.grab_bits(BASE_LENGTH_EXTRA_BITS[length_index]);
+                    unsigned int dist_code = dist_decoder.decode(bits);
 
                     assert_lower_than(dist_code, 30);
 
-                    unsigned int total_dist = BASE_DISTANCE[dist_code] + input.grab_bits(BASE_DISTANCE_EXTRA_BITS[dist_code]);
-                    uint8_t val = dest_writer.buffer()[dest_writer.length().value() - total_dist];
+                    unsigned int total_dist = BASE_DISTANCE[dist_code] + bits.grab_bits(BASE_DISTANCE_EXTRA_BITS[dist_code]);
+
                     for (unsigned int i = 0; i != total_length; i++)
                     {
+                        size_t offset = TRY(dest_writer.length()) - total_dist;
+                        uint8_t val = dest_writer.buffer()[offset];
                         IO::write<uint8_t>(dest_writer, val);
-                        val = dest_writer.buffer()[dest_writer.length().value() - total_dist];
                     }
                 }
-                // End code
                 else if (decoded_symbol == 256)
                 {
+                    // End code
                     break;
                 }
                 else
@@ -333,10 +331,15 @@ Result Inflate::read_blocks(IO::BitReader &input, IO::Writer &uncompressed)
         }
     } while (!bfinal);
 
-    auto reader = IO::MemoryReader(Slice(dest_writer.slice()));
-    IO::copy(reader, uncompressed);
+    auto final_reader = IO::MemoryReader(Slice(dest_writer.slice()));
+    return IO::copy(final_reader, uncompressed);
+}
 
-    return Result::SUCCESS;
+__flatten ResultOr<size_t> Inflate::perform(IO::Reader &compressed, IO::Writer &uncompressed)
+{
+    IO::ReadCounter counter{compressed};
+    TRY(read_blocks(counter, uncompressed));
+    return counter.count();
 }
 
 } // namespace Compression

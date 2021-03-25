@@ -22,39 +22,10 @@ private:
     IO::Reader &_reader;
     IO::MemoryWriter _idat_writer;
 
-public:
-    PngReader(IO::Reader &reader);
-
-    inline bool valid()
-    {
-        return _valid;
-    }
-
-    inline uint32_t width()
-    {
-        return _width;
-    }
-
-    inline uint32_t height()
-    {
-        return _height;
-    }
-
-    inline const Vector<Color> &pixels()
-    {
-        return _pixels;
-    }
-
-    inline const DateTime &modified()
-    {
-        return _modified;
-    }
-
-private:
     Result uncompress(IO::MemoryWriter &uncompressed_writer);
     Result unfilter(uint8_t *in, uint8_t *out);
-    Result unfilterScanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
-                            size_t bytewidth, Png::FilterType filterType, size_t length);
+    Result unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
+                             size_t bytewidth, Png::FilterType filterType, size_t length);
     Result convert(uint8_t *data);
     Result read_chunks();
 
@@ -88,5 +59,15 @@ private:
     {
         return (num_channels() * _bit_depth);
     }
+
+public:
+    inline bool valid() const { return _valid; }
+    inline uint32_t width() const { return _width; }
+    inline uint32_t height() const { return _height; }
+    inline const Vector<Color> &pixels() const { return _pixels; }
+    inline const DateTime &modified() const { return _modified; }
+
+    PngReader(IO::Reader &reader);
 };
+
 } // namespace Graphic

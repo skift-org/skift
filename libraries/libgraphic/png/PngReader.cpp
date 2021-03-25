@@ -6,13 +6,17 @@
 #include <libsystem/Logger.h>
 #include <libtest/Asserts.h>
 #include <libutils/Array.h>
+#include <libutils/Chrono.h>
 
-Graphic::PngReader::PngReader(IO::Reader &reader) : _reader(reader)
+namespace Graphic
+{
+
+PngReader::PngReader(IO::Reader &reader) : _reader(reader)
 {
     _valid = read() == Result::SUCCESS;
 }
 
-Result Graphic::PngReader::read()
+Result PngReader::read()
 {
     Array<uint8_t, 8> signature;
     _reader.read(signature.raw_storage(), sizeof(signature));
@@ -26,23 +30,24 @@ Result Graphic::PngReader::read()
 
     TRY(read_chunks());
 
-    // Uncompress the scanlines
     IO::MemoryWriter uncompressed_writer;
     TRY(uncompress(uncompressed_writer));
+
     uint8_t *scanlines = uncompressed_writer.buffer();
+
     // Unfilter the scanlines
     size_t out_size = _width * _height * num_channels() * bytes_per_pixel();
     uint8_t *raw_buffer = new uint8_t[out_size];
     memset(raw_buffer, 0, out_size);
     TRY(unfilter(raw_buffer, scanlines));
-    // Convert to our target format
+
     TRY(convert(raw_buffer));
     delete[] raw_buffer;
 
     return Result::SUCCESS;
 }
 
-Result Graphic::PngReader::read_chunks()
+Result PngReader::read_chunks()
 {
     size_t idat_counter = 0;
     bool end = false;
@@ -59,18 +64,21 @@ Result Graphic::PngReader::read_chunks()
             auto image_header = TRY(IO::read<Png::ImageHeader>(_reader));
             _width = image_header.width();
             _height = image_header.height();
+
             // We don't support ADAM7 yet
             if (image_header.interlace_method() != 0)
             {
                 logger_error("Unsupported interlace method: %u", image_header.interlace_method());
                 return Result::ERR_NOT_IMPLEMENTED;
             }
+
             // Same for bit depth
             if (image_header.bit_depth() != 8)
             {
                 logger_error("Unsupported bitdepth: %u", image_header.bit_depth());
                 return Result::ERR_NOT_IMPLEMENTED;
             }
+
             _bit_depth = image_header.bit_depth();
             _colour_type = image_header.colour_type();
         }
@@ -121,6 +129,7 @@ Result Graphic::PngReader::read_chunks()
                 uint8_t red = TRY(IO::read<uint8_t>(_reader));
                 uint8_t green = TRY(IO::read<uint8_t>(_reader));
                 uint8_t blue = TRY(IO::read<uint8_t>(_reader));
+
                 _palette.push_back(Color::from_rgb_byte(red, green, blue));
             }
         }
@@ -133,7 +142,7 @@ Result Graphic::PngReader::read_chunks()
             if (_colour_type == Png::CT_PALETTE)
             {
                 auto num_entries = chunk_length();
-                if(num_entries > _palette.count())
+                if (num_entries > _palette.count())
                 {
                     logger_error("Transparency chunk has more entries than current palette");
                     return Result::ERR_INVALID_DATA;
@@ -169,8 +178,10 @@ Result Graphic::PngReader::read_chunks()
                 // Two bytes before the actual deflate data
                 // See https://www.w3.org/TR/2003/REC-PNG-20031110/#10Compression
                 auto cm_cinfo = TRY(IO::read<uint8_t>(_reader));
+
                 // ZLib compression mode should be DEFLATE
                 assert_equal(cm_cinfo & 15, 8);
+
                 // Sliding window should be 32k at max
                 assert_lower_equal((cm_cinfo >> 4) & 15, 7);
                 auto flags = TRY(IO::read<uint8_t>(_reader));
@@ -224,15 +235,13 @@ Result Graphic::PngReader::read_chunks()
 }
 
 // Copyright (c) 2005-2020 Lode Vandevenne
-Result Graphic::PngReader::unfilter(uint8_t *out, uint8_t *in)
+Result PngReader::unfilter(uint8_t *out, uint8_t *in)
 {
-    /*
-  For PNG filter method 0
-  this function unfilters a single image (e.g. without interlacing this is called once, with Adam7 seven times)
-  out must have enough bytes allocated already, in must have the scanlines + 1 filtertype byte per scanline
-  w and h are image dimensions or dimensions of reduced image, bpp is bits per pixel
-  in and out are allowed to be the same memory address (but aren't the same size since in has the extra filter bytes)
-  */
+    // For PNG filter method 0
+    // this function unfilters a single image (e.g. without interlacing this is called once, with Adam7 seven times)
+    // out must have enough bytes allocated already, in must have the scanlines + 1 filtertype byte per scanline
+    // w and h are image dimensions or dimensions of reduced image, bpp is bits per pixel
+    // in and out are allowed to be the same memory address (but aren't the same size since in has the extra filter bytes)
     uint8_t *prevline = 0;
 
     /*bytewidth is used for filtering, is 1 when bpp < 8, number of bytes per pixel otherwise*/
@@ -245,7 +254,7 @@ Result Graphic::PngReader::unfilter(uint8_t *out, uint8_t *in)
         size_t inindex = (1 + linebytes) * y; /*the extra filterbyte added to each row*/
         Png::FilterType filterType = (Png::FilterType)in[inindex];
 
-        TRY(unfilterScanline(&out[outindex], &in[inindex + 1], prevline, bytewidth, filterType, linebytes));
+        TRY(unfilter_scanline(&out[outindex], &in[inindex + 1], prevline, bytewidth, filterType, linebytes));
 
         prevline = &out[outindex];
     }
@@ -258,33 +267,34 @@ Path predictor, used by PNG filter type 4
 The parameters are of type short, but should come from unsigned charunsigned chars, the shorts
 are only needed to make the paeth calculation correct.
 */
-static uint8_t paethPredictor(int16_t a, int16_t b, int16_t c)
+static uint8_t paeth_predictor(int16_t a, int16_t b, int16_t c)
 {
     int16_t pa = abs(b - c);
     int16_t pb = abs(a - c);
     int16_t pc = abs(a + b - c - c);
+
     /* return input value associated with smallest of pa, pb, pc (with certain priority if equal) */
     if (pb < pa)
     {
         a = b;
         pa = pb;
     }
+
     return (pc < pa) ? c : a;
 }
 
 // Copyright (c) 2005-2020 Lode Vandevenne
-Result Graphic::PngReader::unfilterScanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
-                                            size_t bytewidth, Png::FilterType filterType, size_t length)
+Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
+                                    size_t bytewidth, Png::FilterType filterType, size_t length)
 {
-    /*
-  For PNG filter method 0
-  unfilter a PNG image scanline by scanline. when the pixels are smaller than 1 byte,
-  the filter works byte per byte (bytewidth = 1)
-  precon is the previous unfiltered scanline, recon the result, scanline the current one
-  the incoming scanlines do NOT include the filtertype byte, that one is given in the parameter filterType instead
-  recon and scanline MAY be the same memory address! precon must be disjoint.
-  */
+    // For PNG filter method 0
+    // unfilter a PNG image scanline by scanline. when the pixels are smaller than 1 byte,
+    // the filter works byte per byte (bytewidth = 1)
+    // precon is the previous unfiltered scanline, recon the result, scanline the current one
+    // the incoming scanlines do NOT include the filtertype byte, that one is given in the parameter filterType instead
+    // recon and scanline MAY be the same memory address! precon must be disjoint.
     size_t i;
+
     switch (filterType)
     {
     case Png::FT_None:
@@ -314,6 +324,7 @@ Result Graphic::PngReader::unfilterScanline(uint8_t *recon, const uint8_t *scanl
         {
             for (i = 0; i != bytewidth; ++i)
                 recon[i] = scanline[i] + (precon[i] >> 1u);
+
             for (i = bytewidth; i < length; ++i)
                 recon[i] = scanline[i] + ((recon[i - bytewidth] + precon[i]) >> 1u);
         }
@@ -321,6 +332,7 @@ Result Graphic::PngReader::unfilterScanline(uint8_t *recon, const uint8_t *scanl
         {
             for (i = 0; i != bytewidth; ++i)
                 recon[i] = scanline[i];
+
             for (i = bytewidth; i < length; ++i)
                 recon[i] = scanline[i] + (recon[i - bytewidth] >> 1u);
         }
@@ -330,7 +342,7 @@ Result Graphic::PngReader::unfilterScanline(uint8_t *recon, const uint8_t *scanl
         {
             for (i = 0; i != bytewidth; ++i)
             {
-                recon[i] = (scanline[i] + precon[i]); /*paethPredictor(0, precon[i], 0) is always precon[i]*/
+                recon[i] = (scanline[i] + precon[i]); /*paeth_predictor(0, precon[i], 0) is always precon[i]*/
             }
 
             if (bytewidth >= 2)
@@ -342,14 +354,14 @@ Result Graphic::PngReader::unfilterScanline(uint8_t *recon, const uint8_t *scanl
                     uint8_t r0 = recon[j + 0], r1 = recon[j + 1];
                     uint8_t p0 = precon[i + 0], p1 = precon[i + 1];
                     uint8_t q0 = precon[j + 0], q1 = precon[j + 1];
-                    recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
-                    recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
+                    recon[i + 0] = s0 + paeth_predictor(r0, p0, q0);
+                    recon[i + 1] = s1 + paeth_predictor(r1, p1, q1);
                 }
             }
 
             for (; i != length; ++i)
             {
-                recon[i] = (scanline[i] + paethPredictor(recon[i - bytewidth], precon[i], precon[i - bytewidth]));
+                recon[i] = (scanline[i] + paeth_predictor(recon[i - bytewidth], precon[i], precon[i - bytewidth]));
             }
         }
         else
@@ -360,7 +372,7 @@ Result Graphic::PngReader::unfilterScanline(uint8_t *recon, const uint8_t *scanl
             }
             for (i = bytewidth; i < length; ++i)
             {
-                /*paethPredictor(recon[i - bytewidth], 0, 0) is always recon[i - bytewidth]*/
+                /*paeth_predictor(recon[i - bytewidth], 0, 0) is always recon[i - bytewidth]*/
                 recon[i] = (scanline[i] + recon[i - bytewidth]);
             }
         }
@@ -372,7 +384,7 @@ Result Graphic::PngReader::unfilterScanline(uint8_t *recon, const uint8_t *scanl
     return Result::SUCCESS;
 }
 
-Result Graphic::PngReader::uncompress(IO::MemoryWriter &uncompressed_writer)
+Result PngReader::uncompress(IO::MemoryWriter &uncompressed_writer)
 {
     // Decode our compressed image data
     Compression::Inflate inflate;
@@ -380,7 +392,7 @@ Result Graphic::PngReader::uncompress(IO::MemoryWriter &uncompressed_writer)
     return inflate.perform(compressed_reader, uncompressed_writer).result();
 }
 
-Result Graphic::PngReader::convert(uint8_t *buffer)
+Result PngReader::convert(uint8_t *buffer)
 {
     _pixels.resize(_width * _height);
 
@@ -408,6 +420,7 @@ Result Graphic::PngReader::convert(uint8_t *buffer)
                                               rgb_data[i * 3 + 2]);
         }
     }
+
     // It's grayscale
     else if (_colour_type == Png::CT_GREY)
     {
@@ -451,3 +464,5 @@ Result Graphic::PngReader::convert(uint8_t *buffer)
 
     return Result::SUCCESS;
 }
+
+} // namespace Graphic

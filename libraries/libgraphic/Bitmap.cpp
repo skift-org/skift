@@ -63,7 +63,7 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    Graphic::PngReader png_reader(file);
+    Graphic::PngReader png_reader{file};
 
     if (!png_reader.valid())
     {

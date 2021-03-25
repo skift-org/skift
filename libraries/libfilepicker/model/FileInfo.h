@@ -1,3 +1,5 @@
+#pragma once
+
 #include <abi/Filesystem.h>
 
 #include <libgraphic/Icon.h>

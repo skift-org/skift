@@ -7,14 +7,8 @@
 #include <abi/Paths.h>
 
 #include <libio/Seek.h>
+#include <libsystem/io/BufferMode.h>
 #include <libsystem/io/Handle.h>
-
-enum StreamBufferMode
-{
-    STREAM_BUFFERED_NONE,
-    STREAM_BUFFERED_LINE,
-    STREAM_BUFFERED_BLOCK,
-};
 
 #define STREAM_BUFFER_SIZE 512
 

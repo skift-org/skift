@@ -1,6 +1,7 @@
 #pragma once
 
 #include <abi/Handle.h>
+#include <libsystem/io/BufferMode.h>
 
 struct Stream
 {

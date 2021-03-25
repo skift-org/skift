@@ -4,6 +4,8 @@
 
 #define ASSERT_INTERRUPTS_RETAINED() assert(interrupts_retained())
 
+#define ASSERT_INTERRUPTS_NOT_RETAINED() assert(!interrupts_retained())
+
 void interrupts_initialize();
 
 bool interrupts_retained();

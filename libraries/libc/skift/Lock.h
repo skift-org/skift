@@ -4,6 +4,10 @@
 
 #include <assert.h>
 
+#ifdef __KERNEL__
+#    include "kernel/interrupts/Interupts.h"
+#endif
+
 class Lock
 {
 private:
@@ -70,6 +74,11 @@ public:
     {
         while (!__sync_bool_compare_and_swap(&_locked, 0, 1))
         {
+
+#ifdef __KERNEL__
+            ASSERT_INTERRUPTS_NOT_RETAINED();
+#endif
+
             asm("pause");
         }
 

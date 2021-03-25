@@ -64,10 +64,7 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path)
     }
     logger_trace("Loading bitmap: %s", path.cstring());
 
-    auto png_data = TRY(IO::read_all(file));
-
-    IO::MemoryReader mem_reader{png_data.start(), png_data.size()};
-    Graphic::PngReader png_reader(mem_reader);
+    Graphic::PngReader png_reader(file);
 
     if (!png_reader.valid())
     {

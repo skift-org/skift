@@ -10,6 +10,17 @@ namespace Graphic
 {
 class PngReader
 {
+private:
+    bool _valid = false;
+    uint32_t _width = 0;
+    uint32_t _height = 0;
+    uint8_t _bit_depth = 0;
+    Vector<Color> _pixels;
+    DateTime _modified;
+    Png::ColourType _colour_type;
+    IO::Reader &_reader;
+    IO::MemoryWriter _idat_writer;
+
 public:
     PngReader(IO::Reader &reader);
 
@@ -76,15 +87,5 @@ private:
     {
         return (num_channels() * _bit_depth);
     }
-
-    bool _valid = false;
-    uint32_t _width = 0;
-    uint32_t _height = 0;
-    uint8_t _bit_depth = 0;
-    Vector<Color> _pixels;
-    DateTime _modified;
-    Png::ColourType _colour_type;
-    IO::Reader &_reader;
-    IO::MemoryWriter _idat_writer;
 };
 } // namespace Graphic

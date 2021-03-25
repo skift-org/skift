@@ -63,13 +63,13 @@ Result Graphic::PngReader::read_chunks()
             if (image_header.interlace_method() != 0)
             {
                 logger_error("Unsupported interlace method: %u", image_header.interlace_method());
-                return Result::ERR_OPERATION_NOT_SUPPORTED;
+                return Result::ERR_NOT_IMPLEMENTED;
             }
             // Same for bit depth
             if (image_header.bit_depth() != 8)
             {
                 logger_error("Unsupported bitdepth: %u", image_header.bit_depth());
-                return Result::ERR_OPERATION_NOT_SUPPORTED;
+                return Result::ERR_NOT_IMPLEMENTED;
             }
             _bit_depth = image_header.bit_depth();
             _colour_type = image_header.colour_type();

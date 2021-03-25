@@ -128,10 +128,17 @@ Result Graphic::PngReader::read_chunks()
 
         case Png::Transparency::SIG:
         {
-            // TODO: can this chunk appear before the palette chunk?
+            // Must appear after palette chunk according to specification
+            // See: https://www.w3.org/TR/2003/REC-PNG-20031110/#5ChunkOrdering
             if (_colour_type == Png::CT_PALETTE)
             {
                 auto num_entries = chunk_length();
+                if(num_entries > _palette.count())
+                {
+                    logger_error("Transparency chunk has more entries than current palette");
+                    return Result::ERR_INVALID_DATA;
+                }
+
                 for (size_t i = 0; i < num_entries; i++)
                 {
                     uint8_t alpha = TRY(IO::read<uint8_t>(_reader));
@@ -159,7 +166,8 @@ Result Graphic::PngReader::read_chunks()
             if (idat_counter == 0)
             {
                 data_size -= 2;
-                // Two bytes before the actual deflate data, see https://www.w3.org/TR/2003/REC-PNG-20031110/#10Compression
+                // Two bytes before the actual deflate data
+                // See https://www.w3.org/TR/2003/REC-PNG-20031110/#10Compression
                 auto cm_cinfo = TRY(IO::read<uint8_t>(_reader));
                 // ZLib compression mode should be DEFLATE
                 assert_equal(cm_cinfo & 15, 8);

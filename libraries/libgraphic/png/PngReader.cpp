@@ -1,5 +1,6 @@
 #include <libcompression/Inflate.h>
 #include <libgraphic/png/PngReader.h>
+#include <libio/CRCReader.h>
 #include <libio/Read.h>
 #include <libio/ScopedReader.h>
 #include <libio/Skip.h>
@@ -55,14 +56,17 @@ Result PngReader::read_chunks()
     while (!end)
     {
         auto chunk_length = TRY(IO::read<be_uint32_t>(_reader));
-        auto chunk_signature = TRY(IO::read<be_uint32_t>(_reader));
-        IO::ScopedReader chunk_reader(_reader, chunk_length());
+        // CRC checksum includes the chunk signature and chunk data
+        // See https://www.w3.org/TR/2003/REC-PNG-20031110/#5Introduction
+        IO::CRCReader crc_reader(_reader);
+        auto chunk_signature = TRY(IO::read<be_uint32_t>(crc_reader));
+        IO::ScopedReader scoped_reader(crc_reader, chunk_length());
 
         switch (chunk_signature())
         {
         case Png::ImageHeader::SIG:
         {
-            auto image_header = TRY(IO::read<Png::ImageHeader>(chunk_reader));
+            auto image_header = TRY(IO::read<Png::ImageHeader>(scoped_reader));
             _width = image_header.width();
             _height = image_header.height();
 
@@ -87,26 +91,26 @@ Result PngReader::read_chunks()
 
         case Png::Gamma::SIG:
         {
-            TRY(IO::read<Png::Gamma>(chunk_reader));
+            TRY(IO::read<Png::Gamma>(scoped_reader));
         }
         break;
 
         case Png::Chroma::SIG:
         {
-            TRY(IO::read<Png::Chroma>(chunk_reader));
+            TRY(IO::read<Png::Chroma>(scoped_reader));
         }
         break;
 
         case Png::BackgroundColor::SIG:
         {
             Vector<uint8_t> data;
-            TRY(IO::read_vector(chunk_reader, data));
+            TRY(IO::read_vector(scoped_reader, data));
         }
         break;
 
         case Png::Time::SIG:
         {
-            auto modified_date = TRY(IO::read<Png::Time>(chunk_reader));
+            auto modified_date = TRY(IO::read<Png::Time>(scoped_reader));
             _modified.year = modified_date.year();
             _modified.month = modified_date.month();
             _modified.day = modified_date.day();
@@ -118,7 +122,7 @@ Result PngReader::read_chunks()
 
         case Png::sRGB::SIG:
         {
-            TRY(IO::read<Png::sRGB>(chunk_reader));
+            TRY(IO::read<Png::sRGB>(scoped_reader));
         }
         break;
 
@@ -127,9 +131,9 @@ Result PngReader::read_chunks()
             auto num_entries = chunk_length() / 3;
             for (size_t i = 0; i < num_entries; i++)
             {
-                uint8_t red = TRY(IO::read<uint8_t>(_reader));
-                uint8_t green = TRY(IO::read<uint8_t>(_reader));
-                uint8_t blue = TRY(IO::read<uint8_t>(_reader));
+                uint8_t red = TRY(IO::read<uint8_t>(scoped_reader));
+                uint8_t green = TRY(IO::read<uint8_t>(scoped_reader));
+                uint8_t blue = TRY(IO::read<uint8_t>(scoped_reader));
 
                 _palette.push_back(Color::from_rgb_byte(red, green, blue));
             }
@@ -151,7 +155,7 @@ Result PngReader::read_chunks()
 
                 for (size_t i = 0; i < num_entries; i++)
                 {
-                    uint8_t alpha = TRY(IO::read<uint8_t>(chunk_reader));
+                    uint8_t alpha = TRY(IO::read<uint8_t>(scoped_reader));
                     _palette[i] = _palette[i].with_alpha_byte(alpha);
                 }
             }
@@ -178,7 +182,7 @@ Result PngReader::read_chunks()
             }
 
             // Read the data for this chunk into our concatenated compressed data
-            TRY(IO::copy(chunk_reader, _idat_writer));
+            TRY(IO::copy(scoped_reader, _idat_writer));
             idat_counter++;
         }
         break;
@@ -186,12 +190,12 @@ Result PngReader::read_chunks()
         case Png::TextualData::SIG:
         {
             Vector<uint8_t> data;
-            TRY(IO::read_vector(chunk_reader, data));
+            TRY(IO::read_vector(scoped_reader, data));
         }
         break;
 
         case Png::PhysicalDimensions::SIG:
-            TRY(IO::read<Png::PhysicalDimensions>(chunk_reader));
+            TRY(IO::read<Png::PhysicalDimensions>(scoped_reader));
             break;
 
         case Png::ImageEnd::SIG:
@@ -204,13 +208,17 @@ Result PngReader::read_chunks()
         {
             logger_error("Unknown PNG chunk: %u", chunk_signature());
             Vector<uint8_t> data;
-            TRY(IO::read_vector(chunk_reader, data));
+            TRY(IO::read_vector(scoped_reader, data));
         }
         break;
         }
 
         auto crc = TRY(IO::read<be_uint32_t>(_reader));
-        __unused(crc);
+        if (crc() != crc_reader.checksum())
+        {
+            logger_error("Chunk checksum validation failed");
+            return Result::ERR_INVALID_DATA;
+        }
         prev_signature = chunk_signature();
     }
 

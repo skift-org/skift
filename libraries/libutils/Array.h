@@ -53,7 +53,7 @@ public:
         return _storage[index];
     }
 
-    constexpr T &operator[](size_t index) const
+    const T &operator[](size_t index) const
     {
         assert(index < N);
 

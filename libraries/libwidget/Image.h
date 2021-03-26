@@ -18,4 +18,6 @@ public:
     void scaling(BitmapScaling scaling);
 
     void paint(Painter &, const Recti &) override;
+
+    virtual Vec2i size() override;
 };

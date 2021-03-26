@@ -1,7 +1,0 @@
-<Container layout="vflow(4)">
-    <Label text="All Done!" anchor="center" />
-
-    <Container padding="insets(8, 0)" layout="stack()" fill>
-        <Label text="Thanks for choosing skiftOS!" anchor="center"/>
-    </Container>
-</Container>

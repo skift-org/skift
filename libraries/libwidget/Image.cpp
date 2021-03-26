@@ -38,3 +38,13 @@ void Image::paint(Painter &painter, const Recti &)
 
     painter.blit(*_bitmap, _scaling, bound());
 }
+
+Vec2i Image::size()
+{
+    if (_scaling == BitmapScaling::CENTER)
+    {
+        return _bitmap->bound().size();
+    }
+
+    return {};
+}

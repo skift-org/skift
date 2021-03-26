@@ -5,8 +5,7 @@ $(1)_BINARY  = $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/$($(1)_NAME)
 $(1)_SOURCES = $$(wildcard apps/$($(1)_NAME)/*.cpp) \
 			   $$(wildcard apps/$($(1)_NAME)/*/*.cpp)
 
-$(1)_ASSETS := $$(wildcard apps/$($(1)_NAME)/*.markup) \
-			   $$(wildcard apps/$($(1)_NAME)/*.json) \
+$(1)_ASSETS := $$(wildcard apps/$($(1)_NAME)/*.json) \
 			   $$(wildcard apps/$($(1)_NAME)/*.png)
 
 $(1)_ASSETS := $$(patsubst apps/$($(1)_NAME)/%, $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/%, $$($(1)_ASSETS))

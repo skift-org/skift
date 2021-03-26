@@ -78,6 +78,9 @@ private:
 
     Vector<Widget *> _childs = {};
 
+    __noncopyable(Widget);
+    __nonmovable(Widget);
+
 public:
     static constexpr auto FILL = (1 << 0);
     static constexpr auto GREEDY = (1 << 1);

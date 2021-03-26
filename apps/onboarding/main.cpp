@@ -5,11 +5,77 @@
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Image.h>
-#include <libwidget/Markup.h>
+#include <libwidget/Label.h>
 #include <libwidget/PaginationDots.h>
 #include <libwidget/Panel.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Spacer.h>
+
+struct Page
+{
+    String header;
+    Vector<String> lines;
+    String footer;
+};
+
+static const Vector<Page> PAGES = {
+    {
+        "Welcome to skiftOS!",
+        {
+            "skiftOS is a simple, handmade operating system for the x86 platform,",
+            "aiming for clean and pretty APIs while keeping the spirit of UNIX.",
+        },
+        "You can skip at any time and start using skiftOS.",
+    },
+    {
+        "Getting Started!",
+        {
+            "Click on the top left of the screen to bring up the application menu.",
+            "Try out the terminal with familiar unix utilities.",
+        },
+        "Explore, experiment and enjoy.",
+    },
+    {
+        "Join The Community.",
+        {
+            "The community is full of great people, join us on:",
+            "Github, Discord, and Twitter #skiftOS.",
+        },
+        "https://skiftos.org/community",
+    },
+    {
+        "Contribute to the project",
+        {
+            "Do you like skiftOS and want it to become even better?",
+            "Then there are many way to contribute to the project:",
+            "contributing code, reporting issues, donations, and sponsorship",
+        },
+        "https://skiftos.org/contributing",
+    },
+    {
+        "All Done!",
+        {
+            "Thanks for choosing skiftOS!",
+        },
+        "<3",
+    },
+};
+
+void pages(Widget *host, const Page &page)
+{
+    new Label(host, page.header, Anchor::CENTER);
+
+    auto content = new Container(host);
+    content->insets({8, 0});
+    content->layout(VFLOW(2));
+
+    for (auto &lines : page.lines)
+    {
+        new Label(content, lines, Anchor::CENTER);
+    }
+
+    new Label(host, page.footer, Anchor::CENTER);
+}
 
 int main(int argc, char **argv)
 {
@@ -39,7 +105,6 @@ int main(int argc, char **argv)
     dialog->border_radius(6);
 
     auto illustration = new Panel(dialog);
-
     illustration->min_height(160);
     illustration->border_radius(6);
     illustration->color(THEME_MIDDLEGROUND, Colors::WHITE);
@@ -51,6 +116,7 @@ int main(int argc, char **argv)
     auto content = new Container(dialog);
     content->flags(Widget::FILL);
     content->insets(16);
+    content->layout(VFLOW(4));
 
     auto dots_container = new Container(dialog);
     dots_container->insets(16);
@@ -90,11 +156,10 @@ int main(int argc, char **argv)
         dots->index(index);
 
         auto image_path = IO::format("/Applications/onboarding/illustration{}.png", index);
-        auto content_path = IO::format("/Applications/onboarding/content{}.markup", index);
+        image->change_bitmap(Bitmap::load_from(image_path).value());
 
         content->clear_children();
-        image->change_bitmap(Bitmap::load_from(image_path).value());
-        widget_create_from_file(content, content_path);
+        pages(content, PAGES[index]);
     };
 
     set_current_page(0);

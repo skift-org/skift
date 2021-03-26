@@ -1,5 +1,5 @@
 APPS += CALCULATOR
 
 CALCULATOR_NAME = calculator
-CALCULATOR_LIBS = widget settings markup graphic system io compression
+CALCULATOR_LIBS = widget settings graphic system io compression
 

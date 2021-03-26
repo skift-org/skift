@@ -18,7 +18,6 @@ UTILITIES = \
 	KILL \
 	LINK  \
 	LS \
-	MARKUP \
 	MKDIR \
 	MV \
 	NETCTL\
@@ -92,9 +91,6 @@ LINK_NAME = link
 
 LS_LIBS = system io
 LS_NAME = ls
-
-MARKUP_LIBS = markup system io
-MARKUP_NAME = markup
 
 MKDIR_LIBS = system io
 MKDIR_NAME = mkdir

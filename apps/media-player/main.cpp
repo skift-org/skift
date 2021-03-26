@@ -1,5 +1,4 @@
 #include <libwidget/Application.h>
-#include <libwidget/Markup.h>
 
 #include "media-player/windows/Main.h"
 

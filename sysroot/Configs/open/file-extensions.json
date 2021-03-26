@@ -4,7 +4,6 @@
     ".jpeg": "image",
     ".jpg": "image",
     ".json": "text",
-    ".markup": "text",
     ".png": "image",
     ".text": "text",
     ".txt": "text",

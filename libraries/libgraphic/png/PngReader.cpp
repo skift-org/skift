@@ -406,68 +406,52 @@ Result PngReader::convert(uint8_t *buffer)
 {
     _pixels.resize(_width * _height);
 
-    if (_colour_type == Png::CT_RGBA)
+    switch (_colour_type)
     {
-        auto rgba_data = buffer;
-
+    case Png::CT_RGBA:
         for (size_t i = 0; i < _width * _height; i++)
         {
-            _pixels[i] = Color::from_rgba_byte(rgba_data[i * 4],
-                                               rgba_data[i * 4 + 1],
-                                               rgba_data[i * 4 + 2],
-                                               rgba_data[i * 4 + 3]);
+            _pixels[i] = Color::from_rgba_byte(buffer[i * 4],
+                                               buffer[i * 4 + 1],
+                                               buffer[i * 4 + 2],
+                                               buffer[i * 4 + 3]);
         }
-    }
-    // It's RGB data convert it to RGBA
-    else if (_colour_type == Png::CT_RGB)
-    {
-        auto rgb_data = buffer;
-
+        break;
+    case Png::CT_RGB:
         for (size_t i = 0; i < _width * _height; i++)
         {
-            _pixels[i] = Color::from_rgb_byte(rgb_data[i * 3],
-                                              rgb_data[i * 3 + 1],
-                                              rgb_data[i * 3 + 2]);
+            _pixels[i] = Color::from_rgb_byte(buffer[i * 3],
+                                              buffer[i * 3 + 1],
+                                              buffer[i * 3 + 2]);
         }
-    }
+        break;
 
-    // It's grayscale
-    else if (_colour_type == Png::CT_GREY)
-    {
-        auto monochrome_data = buffer;
-
+    case Png::CT_GREY:
         for (size_t i = 0; i < _width * _height; i++)
         {
-            _pixels[i] = Color::from_monochrome_byte(monochrome_data[i]);
+            _pixels[i] = Color::from_monochrome_byte(buffer[i]);
         }
-    }
-    else if (_colour_type == Png::CT_GREY_ALPHA)
-    {
-        auto monochrome_alpha_data = buffer;
-
+        break;
+    case Png::CT_GREY_ALPHA:
         for (size_t i = 0; i < _width * _height; i++)
         {
-            _pixels[i] = Color::from_monochrome_alpha_byte(monochrome_alpha_data[i * 2],
-                                                           monochrome_alpha_data[i * 2 + 1]);
+            _pixels[i] = Color::from_monochrome_alpha_byte(buffer[i * 2],
+                                                           buffer[i * 2 + 1]);
         }
-    }
-    else if (_colour_type == Png::CT_PALETTE)
-    {
+        break;
+    case Png::CT_PALETTE:
         if (_palette.empty())
         {
             logger_error("Palette colour type requires a palett data");
             return Result::ERR_INVALID_DATA;
         }
 
-        auto palette_data = buffer;
-
         for (size_t i = 0; i < _width * _height; i++)
         {
-            _pixels[i] = _palette[palette_data[i]];
+            _pixels[i] = _palette[buffer[i]];
         }
-    }
-    else
-    {
+        break;
+    default:
         logger_error("Unsupported PNG colour type: %u", _colour_type);
         return Result::ERR_NOT_IMPLEMENTED;
     }

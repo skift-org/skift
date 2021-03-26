@@ -3,6 +3,7 @@ UTILITIES = \
 	CAT \
 	CLEAR \
 	CP \
+	CRC32 \
 	DIRNAME \
 	DISPLAYCTL \
 	DSTART \
@@ -53,6 +54,9 @@ CLEAR_NAME = clear
 
 CP_LIBS = system io
 CP_NAME = cp
+
+CRC32_LIBS = system io compression
+CRC32_NAME = crc32
 
 PLAY_LIBS = system io
 PLAY_NAME = play

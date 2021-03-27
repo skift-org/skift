@@ -5,6 +5,9 @@
 #include <libwidget/ScrollBar.h>
 #include <libwidget/model/TableModel.h>
 
+namespace Widget
+{
+
 class Table : public Component
 {
 private:
@@ -79,3 +82,5 @@ public:
 
     void do_layout() override;
 };
+
+} // namespace Widget

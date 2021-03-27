@@ -10,7 +10,7 @@
 namespace FilePicker
 {
 
-class DirectoryListing : public TableModel
+class DirectoryListing : public Widget::TableModel
 {
 private:
     RefPtr<Navigation> _navigation;
@@ -26,7 +26,7 @@ public:
 
     String header(int column) override;
 
-    Variant data(int row, int column) override;
+    Widget::Variant data(int row, int column) override;
 
     void update() override;
 

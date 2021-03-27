@@ -5,6 +5,9 @@
 #include <libwidget/Component.h>
 #include <libwidget/Window.h>
 
+namespace Widget
+{
+
 class Slider : public Component
 {
 private:
@@ -32,3 +35,5 @@ public:
 
     void paint(Graphic::Painter &painter, const Recti &) override;
 };
+
+} // namespace Widget

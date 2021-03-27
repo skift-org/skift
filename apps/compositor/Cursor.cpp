@@ -8,12 +8,12 @@
 #include "compositor/Window.h"
 
 static Vec2i _mouse_position;
-static MouseButton _mouse_buttons;
+static Widget::MouseButton _mouse_buttons;
 
 static Vec2i _mouse_old_position;
-static MouseButton _mouse_old_buttons;
+static Widget::MouseButton _mouse_old_buttons;
 
-static RefPtr<Graphic::Bitmap> _cursor_bitmaps[__CURSOR_COUNT] = {};
+static RefPtr<Graphic::Bitmap> _cursor_bitmaps[Widget::__CURSOR_COUNT] = {};
 
 static Tick _last_click = 0;
 
@@ -31,15 +31,15 @@ void cursor_initialize()
         "/Files/Cursors/resizevh.png",
     };
 
-    for (size_t i = 0; i < __CURSOR_COUNT; i++)
+    for (size_t i = 0; i < Widget::__CURSOR_COUNT; i++)
     {
         _cursor_bitmaps[i] = Graphic::Bitmap::load_from_or_placeholder(cursor_paths[i]);
     }
 }
 
-MouseButton cursor_pack_mouse_buttons(MousePacket packet)
+Widget::MouseButton cursor_pack_mouse_buttons(MousePacket packet)
 {
-    MouseButton buttons = MOUSE_NO_BUTTON;
+    Widget::MouseButton buttons = MOUSE_NO_BUTTON;
 
     if (packet.left)
         buttons |= MOUSE_BUTTON_LEFT;
@@ -121,7 +121,7 @@ void cursor_handle_packet(MousePacket packet)
     }
 }
 
-CursorState cursor_get_state()
+Widget::CursorState cursor_get_state()
 {
     Window *window = manager_focus_window();
 
@@ -131,7 +131,7 @@ CursorState cursor_get_state()
     }
     else
     {
-        return CURSOR_DEFAULT;
+        return Widget::CURSOR_DEFAULT;
     }
 }
 
@@ -144,15 +144,15 @@ void cursor_render(Graphic::Painter &painter)
 
 Recti cursor_bound_from_position(Vec2i position)
 {
-    CursorState state = cursor_get_state();
+    Widget::CursorState state = cursor_get_state();
 
     Recti bound(position, Vec2i(28, 28));
 
-    if (state == CURSOR_MOVE ||
-        state == CURSOR_RESIZEH ||
-        state == CURSOR_RESIZEV ||
-        state == CURSOR_RESIZEHV ||
-        state == CURSOR_RESIZEVH)
+    if (state == Widget::CURSOR_MOVE ||
+        state == Widget::CURSOR_RESIZEH ||
+        state == Widget::CURSOR_RESIZEV ||
+        state == Widget::CURSOR_RESIZEHV ||
+        state == Widget::CURSOR_RESIZEVH)
     {
         bound = bound.offset({-14, -14});
     }

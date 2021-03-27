@@ -16,17 +16,17 @@ MainWindow::MainWindow() : Window(WINDOW_RESIZABLE)
 
     root()->layout(VFLOW(0));
 
-    new TitleBar(root());
+    new Widget::TitleBar(root());
 
-    auto navigation_bar = new Panel(root());
+    auto navigation_bar = new Widget::Panel(root());
     navigation_bar->layout(HFLOW(4));
     navigation_bar->insets(4);
     navigation_bar->max_height(38);
     navigation_bar->min_height(38);
 
-    new Button(navigation_bar, Button::TEXT, Graphic::Icon::get("arrow-left"));
-    new Button(navigation_bar, Button::TEXT, Graphic::Icon::get("arrow-right"));
-    new Button(navigation_bar, Button::TEXT, Graphic::Icon::get("home"));
+    new Widget::Button(navigation_bar, Widget::Button::TEXT, Graphic::Icon::get("arrow-left"));
+    new Widget::Button(navigation_bar, Widget::Button::TEXT, Graphic::Icon::get("arrow-right"));
+    new Widget::Button(navigation_bar, Widget::Button::TEXT, Graphic::Icon::get("home"));
 
     new HomePage(root());
 }

@@ -14,25 +14,25 @@ RefPtr<Graphic::Font> font()
     return font;
 }
 
-static ThemeColorRole _color_to_role[Terminal::_COLOR_COUNT] = {
-    [Terminal::BLACK] = THEME_ANSI_BLACK,
-    [Terminal::RED] = THEME_ANSI_RED,
-    [Terminal::GREEN] = THEME_ANSI_GREEN,
-    [Terminal::YELLOW] = THEME_ANSI_YELLOW,
-    [Terminal::BLUE] = THEME_ANSI_BLUE,
-    [Terminal::MAGENTA] = THEME_ANSI_MAGENTA,
-    [Terminal::CYAN] = THEME_ANSI_CYAN,
-    [Terminal::GREY] = THEME_ANSI_WHITE,
-    [Terminal::BRIGHT_BLACK] = THEME_ANSI_BRIGHT_BLACK,
-    [Terminal::BRIGHT_RED] = THEME_ANSI_BRIGHT_RED,
-    [Terminal::BRIGHT_GREEN] = THEME_ANSI_BRIGHT_GREEN,
-    [Terminal::BRIGHT_YELLOW] = THEME_ANSI_BRIGHT_YELLOW,
-    [Terminal::BRIGHT_BLUE] = THEME_ANSI_BRIGHT_BLUE,
-    [Terminal::BRIGHT_MAGENTA] = THEME_ANSI_BRIGHT_MAGENTA,
-    [Terminal::BRIGHT_CYAN] = THEME_ANSI_BRIGHT_CYAN,
-    [Terminal::BRIGHT_GREY] = THEME_ANSI_BRIGHT_WHITE,
-    [Terminal::FOREGROUND] = THEME_ANSI_FOREGROUND,
-    [Terminal::BACKGROUND] = THEME_ANSI_BACKGROUND,
+static Widget::ThemeColorRole _color_to_role[Terminal::_COLOR_COUNT] = {
+    [Terminal::BLACK] = Widget::THEME_ANSI_BLACK,
+    [Terminal::RED] = Widget::THEME_ANSI_RED,
+    [Terminal::GREEN] = Widget::THEME_ANSI_GREEN,
+    [Terminal::YELLOW] = Widget::THEME_ANSI_YELLOW,
+    [Terminal::BLUE] = Widget::THEME_ANSI_BLUE,
+    [Terminal::MAGENTA] = Widget::THEME_ANSI_MAGENTA,
+    [Terminal::CYAN] = Widget::THEME_ANSI_CYAN,
+    [Terminal::GREY] = Widget::THEME_ANSI_WHITE,
+    [Terminal::BRIGHT_BLACK] = Widget::THEME_ANSI_BRIGHT_BLACK,
+    [Terminal::BRIGHT_RED] = Widget::THEME_ANSI_BRIGHT_RED,
+    [Terminal::BRIGHT_GREEN] = Widget::THEME_ANSI_BRIGHT_GREEN,
+    [Terminal::BRIGHT_YELLOW] = Widget::THEME_ANSI_BRIGHT_YELLOW,
+    [Terminal::BRIGHT_BLUE] = Widget::THEME_ANSI_BRIGHT_BLUE,
+    [Terminal::BRIGHT_MAGENTA] = Widget::THEME_ANSI_BRIGHT_MAGENTA,
+    [Terminal::BRIGHT_CYAN] = Widget::THEME_ANSI_BRIGHT_CYAN,
+    [Terminal::BRIGHT_GREY] = Widget::THEME_ANSI_BRIGHT_WHITE,
+    [Terminal::FOREGROUND] = Widget::THEME_ANSI_FOREGROUND,
+    [Terminal::BACKGROUND] = Widget::THEME_ANSI_BACKGROUND,
 };
 
 Graphic::Color color(Terminal::Color terminal_color)

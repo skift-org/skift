@@ -10,12 +10,12 @@
 #include <libfilepicker/widgets/ToolBar.h>
 
 class MainWindow :
-    public Window
+    public Widget::Window
 {
 private:
 public:
     MainWindow(RefPtr<FilePicker::Navigation> navigation, RefPtr<FilePicker::Bookmarks> bookmarks)
-        : Window(WINDOW_RESIZABLE)
+        : Widget::Window(WINDOW_RESIZABLE)
     {
         icon(Graphic::Icon::get("folder"));
         title("File Manager");
@@ -23,13 +23,13 @@ public:
 
         root()->layout(VFLOW(0));
 
-        new TitleBar(root());
+        new Widget::TitleBar(root());
 
         new FilePicker::ToolBar(root(), navigation, bookmarks);
 
-        auto bookmarks_and_browser = new Container(root());
+        auto bookmarks_and_browser = new Widget::Container(root());
 
-        bookmarks_and_browser->flags(Component::FILL);
+        bookmarks_and_browser->flags(Widget::Component::FILL);
         bookmarks_and_browser->layout(HFLOW(1));
 
         auto jump_list = new FilePicker::JumpList(bookmarks_and_browser, navigation, bookmarks);

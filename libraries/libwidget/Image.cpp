@@ -1,6 +1,9 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Image.h>
 
+namespace Widget
+{
+
 Image::Image(Component *parent, RefPtr<Graphic::Bitmap> bitmap)
     : Component(parent), _bitmap(bitmap)
 {
@@ -48,3 +51,5 @@ Vec2i Image::size()
 
     return {};
 }
+
+} // namespace Widget

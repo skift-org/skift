@@ -2,6 +2,9 @@
 #include <libwidget/Event.h>
 #include <libwidget/ScrollBar.h>
 
+namespace Widget
+{
+
 ScrollBar::ScrollBar(Component *parent) : Component(parent)
 {
     _track = 1024;
@@ -123,3 +126,5 @@ void ScrollBar::event(Event *event)
         }
     }
 }
+
+} // namespace Widget

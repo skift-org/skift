@@ -1,8 +1,10 @@
 #pragma once
 
-#include <libwidget/Component.h>
 #include <libwidget/Container.h>
 #include <libwidget/ScrollBar.h>
+
+namespace Widget
+{
 
 class HScroll : public Component
 {
@@ -49,3 +51,5 @@ public:
         return {0, _host->size().y()};
     }
 };
+
+} // namespace Widget

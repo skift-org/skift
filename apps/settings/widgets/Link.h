@@ -5,7 +5,7 @@
 namespace Settings
 {
 
-class Link : public Button
+class Link : public Widget::Button
 {
 public:
     Link(Component *parent, RefPtr<Graphic::Icon> icon, String name);

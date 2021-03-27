@@ -7,10 +7,10 @@
 namespace panel
 {
 
-class MenuWindow : public Window
+class MenuWindow : public Widget::Window
 {
 private:
-    OwnPtr<Observer<TextModel>> _search_query_observer;
+    OwnPtr<Observer<Widget::TextModel>> _search_query_observer;
 
 public:
     static constexpr int WIDTH = 320;

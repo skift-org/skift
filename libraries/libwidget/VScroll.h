@@ -4,6 +4,9 @@
 #include <libwidget/Container.h>
 #include <libwidget/ScrollBar.h>
 
+namespace Widget
+{
+
 class VScroll : public Component
 {
 private:
@@ -53,3 +56,5 @@ public:
         return {_host->size().x(), 0};
     }
 };
+
+} // namespace Widget

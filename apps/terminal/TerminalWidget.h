@@ -6,7 +6,8 @@
 #include <libsystem/eventloop/Timer.h>
 #include <libterminal/Terminal.h>
 #include <libwidget/Component.h>
-class TerminalWidget : public Component
+
+class TerminalWidget : public Widget::Component
 {
 private:
     OwnPtr<Terminal::Terminal> _terminal;
@@ -26,7 +27,7 @@ public:
 
     void paint(Graphic::Painter &, const Recti &) override;
 
-    void event(Event *event) override;
+    void event(Widget::Event *event) override;
 
     void do_layout() override;
 };

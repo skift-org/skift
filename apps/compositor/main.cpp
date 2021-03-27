@@ -18,21 +18,21 @@
 #include "compositor/Renderer.h"
 #include "compositor/Window.h"
 
-static EventType key_motion_to_event_type(KeyMotion motion)
+static Widget::EventType key_motion_to_event_type(KeyMotion motion)
 {
     if (motion == KEY_MOTION_DOWN)
     {
-        return Event::KEYBOARD_KEY_PRESS;
+        return Widget::Event::KEYBOARD_KEY_PRESS;
     }
 
     if (motion == KEY_MOTION_UP)
     {
-        return Event::KEYBOARD_KEY_RELEASE;
+        return Widget::Event::KEYBOARD_KEY_RELEASE;
     }
 
     if (motion == KEY_MOTION_TYPED)
     {
-        return Event::KEYBOARD_KEY_TYPED;
+        return Widget::Event::KEYBOARD_KEY_TYPED;
     }
 
     ASSERT_NOT_REACHED();
@@ -82,7 +82,7 @@ int main(int argc, char const *argv[])
 
             if (window)
             {
-                Event event = {
+                Widget::Event event = {
                     .type = key_motion_to_event_type(packet.motion),
                     .accepted = false,
                     .mouse = {},

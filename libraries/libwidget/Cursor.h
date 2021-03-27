@@ -1,5 +1,8 @@
 #pragma once
 
+namespace Widget
+{
+
 enum CursorState
 {
     CURSOR_DEFAULT,
@@ -14,3 +17,5 @@ enum CursorState
 
     __CURSOR_COUNT
 };
+
+} // namespace Widget

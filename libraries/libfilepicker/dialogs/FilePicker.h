@@ -7,7 +7,7 @@
 namespace FilePicker
 {
 
-class Dialog : public ::Dialog
+class Dialog : public ::Widget::Dialog
 {
 private:
     RefPtr<Navigation> _navigation = nullptr;
@@ -20,7 +20,7 @@ public:
 
     Optional<String> selected_file() const { return _selected_file; }
 
-    virtual void render(Window *window);
+    virtual void render(Widget::Window *window);
 };
 
 } // namespace FilePicker

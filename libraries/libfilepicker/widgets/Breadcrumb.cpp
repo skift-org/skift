@@ -10,8 +10,8 @@
 namespace FilePicker
 {
 
-Breadcrumb::Breadcrumb(Component *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
-    : Component(parent),
+Breadcrumb::Breadcrumb(Widget::Component *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
+    : Widget::Component(parent),
       _navigation(navigation),
       _bookmarks(bookmarks)
 {
@@ -42,41 +42,41 @@ void Breadcrumb::render()
 
     auto &path = _navigation->current();
 
-    auto computer_button = new Button(this, Button::TEXT, _icon_computer);
+    auto computer_button = new Widget::Button(this, Widget::Button::TEXT, _icon_computer);
 
-    computer_button->on(Event::ACTION, [this](auto) {
+    computer_button->on(Widget::Event::ACTION, [this](auto) {
         _navigation->navigate("/");
     });
 
     for (size_t i = 0; i < path.length(); i++)
     {
-        new IconPanel(this, _icon_expand);
+        new Widget::IconPanel(this, _icon_expand);
 
-        auto button = new Button(this, Button::TEXT, path[i]);
+        auto button = new Widget::Button(this, Widget::Button::TEXT, path[i]);
         button->min_width(0);
 
-        button->on(Event::ACTION, [this, i](auto) {
+        button->on(Widget::Event::ACTION, [this, i](auto) {
             _navigation->navigate(_navigation->current().parent(i), Navigation::BACKWARD);
         });
     }
 
-    new Spacer(this);
+    new Widget::Spacer(this);
 
     if (_bookmarks)
     {
         if (_bookmarks->has(_navigation->current()))
         {
-            auto remove_bookmark = new Button(this, Button::TEXT, _icon_bookmark);
+            auto remove_bookmark = new Widget::Button(this, Widget::Button::TEXT, _icon_bookmark);
 
-            remove_bookmark->on(Event::ACTION, [this](auto) {
+            remove_bookmark->on(Widget::Event::ACTION, [this](auto) {
                 _bookmarks->remove(_navigation->current());
             });
         }
         else
         {
-            auto add_bookmark = new Button(this, Button::TEXT, _icon_bookmark_outline);
+            auto add_bookmark = new Widget::Button(this, Widget::Button::TEXT, _icon_bookmark_outline);
 
-            add_bookmark->on(Event::ACTION, [this](auto) {
+            add_bookmark->on(Widget::Event::ACTION, [this](auto) {
                 Bookmark bookmark{
                     _navigation->current().basename(),
                     Graphic::Icon::get("folder"),

@@ -1,6 +1,6 @@
 #include <libwidget/Screen.h>
 
-namespace Screen
+namespace Widget::Screen
 {
 
 static Recti _bound;
@@ -15,4 +15,4 @@ void bound(Recti bound)
     _bound = bound;
 }
 
-} // namespace Screen
+} // namespace Widget::Screen

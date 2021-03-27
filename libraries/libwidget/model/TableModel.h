@@ -2,8 +2,10 @@
 
 #include <libgraphic/Color.h>
 #include <libutils/Observable.h>
-
 #include <libwidget/utils/Variant.h>
+
+namespace Widget
+{
 
 class TableModel :
     public RefCounted<TableModel>,
@@ -44,3 +46,5 @@ public:
         ASSERT_NOT_REACHED();
     }
 };
+
+} // namespace Widget

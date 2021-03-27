@@ -3,6 +3,9 @@
 #include <libgraphic/Icon.h>
 #include <libwidget/Component.h>
 
+namespace Widget
+{
+
 class IconPanel : public Component
 {
 private:
@@ -18,3 +21,5 @@ public:
 
     Vec2i size() override;
 };
+
+} // namespace Widget

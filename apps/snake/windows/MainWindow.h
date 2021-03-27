@@ -8,7 +8,7 @@
 namespace Snake
 {
 
-class MainWindow : public Window
+class MainWindow : public Widget::Window
 {
 private:
 public:
@@ -18,7 +18,7 @@ public:
         title("Snake");
 
         root()->layout(VFLOW(0));
-        new TitleBar(root());
+        new Widget::TitleBar(root());
         auto board = new BoardWidget(root());
         board->outsets({32});
         board->focus();

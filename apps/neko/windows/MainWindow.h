@@ -9,7 +9,7 @@
 namespace neko
 {
 
-class MainWindow : public Window
+class MainWindow : public Widget::Window
 {
 private:
     Neko _neko;
@@ -19,7 +19,7 @@ private:
 public:
     MainWindow()
         : Window(WINDOW_BORDERLESS | WINDOW_TRANSPARENT | WINDOW_NO_FOCUS),
-          _neko{Screen::bound().center()}
+          _neko{Widget::Screen::bound().center()}
     {
         type(WINDOW_TYPE_PANEL);
         size({Neko::SIZE, Neko::SIZE});

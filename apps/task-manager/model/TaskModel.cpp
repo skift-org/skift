@@ -50,7 +50,7 @@ String TaskModel::header(int column)
     }
 }
 
-Variant TaskModel::data(int row, int column)
+Widget::Variant TaskModel::data(int row, int column)
 {
     auto &task = _data.get((size_t)row);
 
@@ -58,7 +58,7 @@ Variant TaskModel::data(int row, int column)
     {
     case COLUMN_ID:
     {
-        Variant value = task.get("id").as_integer();
+        Widget::Variant value = task.get("id").as_integer();
 
         if (task.get("user").is(Json::TRUE))
         {
@@ -77,10 +77,10 @@ Variant TaskModel::data(int row, int column)
         return task.get("state").as_string();
 
     case COLUMN_CPU:
-        return Variant("%2d%%", task.get("cpu").as_integer());
+        return Widget::Variant("%2d%%", task.get("cpu").as_integer());
 
     case COLUMN_RAM:
-        return Variant("%5d Kio", task.get("ram").as_integer() / 1024);
+        return Widget::Variant("%5d Kio", task.get("ram").as_integer() / 1024);
 
     default:
         ASSERT_NOT_REACHED();

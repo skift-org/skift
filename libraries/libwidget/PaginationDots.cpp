@@ -2,6 +2,9 @@
 
 #include <libgraphic/Painter.h>
 
+namespace Widget
+{
+
 PaginationDots::PaginationDots(Component *parent, int count)
     : Component(parent),
       _count(count)
@@ -35,3 +38,5 @@ Vec2i PaginationDots::size()
 {
     return {DOTSIZE * _count + DOTSPACING * (_count - 1), DOTSIZE};
 }
+
+} // namespace Widget

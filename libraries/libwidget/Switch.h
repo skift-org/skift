@@ -5,6 +5,9 @@
 #include <libwidget/Container.h>
 #include <libwidget/Label.h>
 
+namespace Widget
+{
+
 class Switch : public Component
 {
 private:
@@ -68,3 +71,5 @@ public:
         }
     }
 };
+
+} // namespace Widget

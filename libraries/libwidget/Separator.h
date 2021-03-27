@@ -2,6 +2,9 @@
 
 #include <libwidget/Component.h>
 
+namespace Widget
+{
+
 struct Separator : public Component
 {
     Separator(Component *parent);
@@ -10,3 +13,5 @@ struct Separator : public Component
 
     Vec2i size() override;
 };
+
+} // namespace Widget

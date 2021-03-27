@@ -11,6 +11,8 @@
 
 int main(int argc, char **argv)
 {
+    using namespace Widget;
+
     Application::initialize(argc, argv);
 
     auto window = new Window(WINDOW_NONE);

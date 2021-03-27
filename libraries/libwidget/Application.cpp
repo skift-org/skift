@@ -1,8 +1,7 @@
 #include <assert.h>
-#include <stdio.h>
-#include <string.h>
 
 #include <libio/Connection.h>
+#include <libio/Format.h>
 #include <libio/Socket.h>
 #include <libsettings/Setting.h>
 #include <libsystem/Logger.h>
@@ -10,11 +9,13 @@
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/utils/Hexdump.h>
-
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
 
 #include "compositor/Protocol.h"
+
+namespace Widget
+{
 
 namespace Application
 {
@@ -322,9 +323,7 @@ Result initialize(int argc, char **argv)
         [](const Json::Value &value) {
             auto new_theme = value.as_string();
 
-            char buffer[256];
-            snprintf(buffer, 256, "/Files/Themes/%s.json", new_theme.cstring());
-            theme_load(buffer);
+            theme_load(IO::format("/Files/Themes/{}.json", value.as_string()));
 
             for (size_t i = 0; i < _windows.count(); i++)
             {
@@ -447,3 +446,5 @@ void exit_nested(int exit_value)
 }
 
 } // namespace Application
+
+} // namespace Widget

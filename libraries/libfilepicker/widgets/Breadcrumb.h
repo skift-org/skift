@@ -8,7 +8,7 @@
 namespace FilePicker
 {
 
-struct Breadcrumb : public Component
+struct Breadcrumb : public Widget::Component
 {
 private:
     RefPtr<Navigation> _navigation;
@@ -23,7 +23,7 @@ private:
     RefPtr<Graphic::Icon> _icon_bookmark_outline;
 
 public:
-    Breadcrumb(Component *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks);
+    Breadcrumb(Widget::Component *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks);
 
     void render();
 };

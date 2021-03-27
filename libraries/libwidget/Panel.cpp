@@ -1,6 +1,9 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Panel.h>
 
+namespace Widget
+{
+
 Panel::Panel(Component *parent)
     : Component(parent)
 {
@@ -17,3 +20,5 @@ void Panel::paint(Graphic::Painter &painter, const Recti &)
         painter.clear(bound(), color(THEME_MIDDLEGROUND));
     }
 }
+
+} // namespace Widget

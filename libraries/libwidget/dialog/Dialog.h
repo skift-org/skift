@@ -4,6 +4,9 @@
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
 
+namespace Widget
+{
+
 enum DialogButton
 {
     YES = (1 << 0),
@@ -120,3 +123,5 @@ public:
         }
     }
 };
+
+} // namespace Widget

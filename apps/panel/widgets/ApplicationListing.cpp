@@ -47,9 +47,9 @@ void ApplicationListing::render()
 
         find_any = true;
 
-        auto item = new Button(host(), Button::TEXT, entry.image, entry.name);
+        auto item = new Widget::Button(host(), Widget::Button::TEXT, entry.image, entry.name);
 
-        item->on(Event::ACTION, [this, entry](auto) {
+        item->on(Widget::Event::ACTION, [this, entry](auto) {
             process_run(entry.command.cstring(), nullptr, 0);
             window()->hide();
         });
@@ -59,7 +59,7 @@ void ApplicationListing::render()
 
     if (!find_any)
     {
-        new Label(host(), "No application found!", Anchor::CENTER);
+        new Widget::Label(host(), "No application found!", Anchor::CENTER);
     }
 }
 

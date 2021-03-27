@@ -2,10 +2,12 @@
 
 #include <abi/Keyboard.h>
 
-#include <libutils/Rect.h>
-
-#include <libutils/unicode/Codepoint.h>
 #include <libutils/Callback.h>
+#include <libutils/Rect.h>
+#include <libutils/unicode/Codepoint.h>
+
+namespace Widget
+{
 
 #define MOUSE_NO_BUTTON (0)
 #define MOUSE_BUTTON_LEFT (1 << 1)
@@ -80,10 +82,12 @@ using EventType = Event::Type;
 using EventHandler = Callback<void(Event *)>;
 
 #define is_mouse_event(__event)                                   \
-    (((Event *)(__event))->type == Event::MOUSE_MOVE ||           \
-     ((Event *)(__event))->type == Event::MOUSE_SCROLL ||         \
-     ((Event *)(__event))->type == Event::MOUSE_ENTER ||          \
-     ((Event *)(__event))->type == Event::MOUSE_LEAVE ||          \
-     ((Event *)(__event))->type == Event::MOUSE_BUTTON_PRESS ||   \
-     ((Event *)(__event))->type == Event::MOUSE_BUTTON_RELEASE || \
-     ((Event *)(__event))->type == Event::MOUSE_DOUBLE_CLICK)
+    (((::Widget::Event *)(__event))->type == ::Widget::Event::MOUSE_MOVE ||           \
+     ((::Widget::Event *)(__event))->type == ::Widget::Event::MOUSE_SCROLL ||         \
+     ((::Widget::Event *)(__event))->type == ::Widget::Event::MOUSE_ENTER ||          \
+     ((::Widget::Event *)(__event))->type == ::Widget::Event::MOUSE_LEAVE ||          \
+     ((::Widget::Event *)(__event))->type == ::Widget::Event::MOUSE_BUTTON_PRESS ||   \
+     ((::Widget::Event *)(__event))->type == ::Widget::Event::MOUSE_BUTTON_RELEASE || \
+     ((::Widget::Event *)(__event))->type == ::Widget::Event::MOUSE_DOUBLE_CLICK)
+
+} // namespace Widget

@@ -3,6 +3,9 @@
 #include <libwidget/Component.h>
 #include <libwidget/model/TextModel.h>
 
+namespace Widget
+{
+
 class TextField : public Component
 {
 private:
@@ -25,3 +28,5 @@ public:
 
     void event(Event *event) override;
 };
+
+} // namespace Widget

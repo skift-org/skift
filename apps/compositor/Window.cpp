@@ -67,7 +67,7 @@ void Window::resize(Recti new_bound)
     }
 }
 
-void Window::send_event(Event event)
+void Window::send_event(Widget::Event event)
 {
     CompositorMessage message = {
         .type = COMPOSITOR_MESSAGE_EVENT_WINDOW,
@@ -80,10 +80,10 @@ void Window::send_event(Event event)
     _client->send_message(message);
 }
 
-void Window::handle_mouse_move(Vec2i old_position, Vec2i position, MouseButton buttons)
+void Window::handle_mouse_move(Vec2i old_position, Vec2i position, Widget::MouseButton buttons)
 {
-    Event event = {
-        .type = Event::MOUSE_MOVE,
+    Widget::Event event = {
+        .type = Widget::Event::MOUSE_MOVE,
         .accepted = false,
         .mouse = {
             .scroll = 0,
@@ -101,15 +101,15 @@ void Window::handle_mouse_move(Vec2i old_position, Vec2i position, MouseButton b
     send_event(event);
 }
 
-static void handle_mouse_button(Window &window, MouseButton button, MouseButton old_buttons, MouseButton buttons, Vec2i position)
+static void handle_mouse_button(Window &window, Widget::MouseButton button, Widget::MouseButton old_buttons, Widget::MouseButton buttons, Vec2i position)
 {
     bool was_button_pressed = old_buttons & button;
     bool is_button_pressed = buttons & button;
 
     if (is_button_pressed && !was_button_pressed)
     {
-        Event event = {
-            .type = Event::MOUSE_BUTTON_PRESS,
+        Widget::Event event = {
+            .type = Widget::Event::MOUSE_BUTTON_PRESS,
             .accepted = false,
             .mouse = {
                 .scroll = 0,
@@ -129,8 +129,8 @@ static void handle_mouse_button(Window &window, MouseButton button, MouseButton 
 
     if (was_button_pressed && !is_button_pressed)
     {
-        Event event = {
-            .type = Event::MOUSE_BUTTON_RELEASE,
+        Widget::Event event = {
+            .type = Widget::Event::MOUSE_BUTTON_RELEASE,
             .accepted = false,
             .mouse = {
                 .scroll = 0,
@@ -149,7 +149,7 @@ static void handle_mouse_button(Window &window, MouseButton button, MouseButton 
     }
 }
 
-void Window::handle_mouse_buttons(MouseButton old_buttons, MouseButton buttons, Vec2i position)
+void Window::handle_mouse_buttons(Widget::MouseButton old_buttons, Widget::MouseButton buttons, Vec2i position)
 {
     handle_mouse_button(*this, MOUSE_BUTTON_LEFT, old_buttons, buttons, position);
     handle_mouse_button(*this, MOUSE_BUTTON_RIGHT, old_buttons, buttons, position);
@@ -158,8 +158,8 @@ void Window::handle_mouse_buttons(MouseButton old_buttons, MouseButton buttons, 
 
 void Window::handle_double_click(Vec2i position)
 {
-    Event event = {
-        .type = Event::MOUSE_DOUBLE_CLICK,
+    Widget::Event event = {
+        .type = Widget::Event::MOUSE_DOUBLE_CLICK,
         .accepted = false,
         .mouse = {
             .scroll = 0,
@@ -179,8 +179,8 @@ void Window::handle_double_click(Vec2i position)
 
 void Window::handle_mouse_scroll(Vec2i position, int scroll)
 {
-    Event event = {
-        .type = Event::MOUSE_SCROLL,
+    Widget::Event event = {
+        .type = Widget::Event::MOUSE_SCROLL,
         .accepted = false,
         .mouse = {
             .scroll = scroll,
@@ -202,8 +202,8 @@ void Window::get_focus()
 {
     renderer_region_dirty(bound());
 
-    Event event = {};
-    event.type = Event::GOT_FOCUS;
+    Widget::Event event = {};
+    event.type = Widget::Event::GOT_FOCUS;
     send_event(event);
 }
 
@@ -211,8 +211,8 @@ void Window::lost_focus()
 {
     renderer_region_dirty(bound());
 
-    Event event = {};
-    event.type = Event::LOST_FOCUS;
+    Widget::Event event = {};
+    event.type = Widget::Event::LOST_FOCUS;
     send_event(event);
 }
 

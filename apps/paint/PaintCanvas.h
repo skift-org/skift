@@ -5,7 +5,7 @@
 #include "paint/PaintDocument.h"
 #include "paint/PaintTool.h"
 
-class PaintCanvas : public Component
+class PaintCanvas : public Widget::Component
 {
 private:
     RefPtr<PaintDocument> _document;
@@ -19,9 +19,9 @@ public:
         return _document->bound().centered_within(bound());
     }
 
-    PaintCanvas(Component *parent, RefPtr<PaintDocument> document);
+    PaintCanvas(Widget::Component *parent, RefPtr<PaintDocument> document);
 
     void paint(Graphic::Painter &painter, const Recti &dirty) override;
 
-    void event(Event *event) override;
+    void event(Widget::Event *event) override;
 };

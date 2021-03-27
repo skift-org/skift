@@ -1,8 +1,10 @@
 #include <libwidget/Container.h>
 #include <libwidget/Label.h>
 #include <libwidget/Spacer.h>
-
 #include <libwidget/dialog/MessageBox.h>
+
+namespace Widget
+{
 
 DialogResult MessageBox::create_and_show(String title, String message)
 {
@@ -45,3 +47,5 @@ void MessageBox::render(Window *window)
 
     create_buttons(container);
 }
+
+} // namespace Widget

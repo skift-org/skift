@@ -7,9 +7,9 @@
 
 int main(int argc, char **argv)
 {
-    Application::initialize(argc, argv);
+    Widget::Application::initialize(argc, argv);
 
-    Window *window = new Window(WINDOW_RESIZABLE);
+    Widget::Window *window = new Widget::Window(WINDOW_RESIZABLE);
 
     window->icon(Graphic::Icon::get("text-box"));
 
@@ -26,34 +26,34 @@ int main(int argc, char **argv)
 
     window->root()->layout(VFLOW(0));
 
-    new TitleBar(window->root());
+    new Widget::TitleBar(window->root());
 
-    auto toolbar = new Panel(window->root());
+    auto toolbar = new Widget::Panel(window->root());
 
     toolbar->layout(HFLOW(4));
     toolbar->insets(Insetsi(4, 4));
     toolbar->max_height(38);
     toolbar->min_height(38);
 
-    new Button(toolbar, Button::TEXT, Graphic::Icon::get("folder-open"));
-    new Button(toolbar, Button::TEXT, Graphic::Icon::get("content-save"));
-    new Button(toolbar, Button::TEXT, Graphic::Icon::get("file-plus"));
+    new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
+    new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("content-save"));
+    new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("file-plus"));
 
-    auto model = TextModel::empty();
+    auto model = Widget::TextModel::empty();
 
     if (argc == 2)
     {
         logger_info("Opening text document from '%s'", argv[1]);
-        model = TextModel::from_file(argv[1]);
+        model = Widget::TextModel::from_file(argv[1]);
     }
 
-    auto field = new TextEditor(window->root(), model);
-    field->flags(Component::FILL);
+    auto field = new Widget::TextEditor(window->root(), model);
+    field->flags(Widget::Component::FILL);
     field->overscroll(true);
     field->insets({4});
     field->focus();
 
     window->show();
 
-    return Application::run();
+    return Widget::Application::run();
 }

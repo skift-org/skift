@@ -5,6 +5,9 @@
 #include <libwidget/TitleBar.h>
 #include <libwidget/Window.h>
 
+namespace Widget
+{
+
 TitleBar::TitleBar(Component *parent) : Component(parent)
 {
     max_height(36);
@@ -82,3 +85,5 @@ void TitleBar::event(Event *event)
         }
     }
 }
+
+} // namespace Widget

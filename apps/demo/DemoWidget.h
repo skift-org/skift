@@ -4,7 +4,7 @@
 
 #include "demo/Demos.h"
 
-class DemoWidget : public Component
+class DemoWidget : public Widget::Component
 {
 private:
     double _time{};

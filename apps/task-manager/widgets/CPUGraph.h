@@ -10,14 +10,14 @@
 namespace task_manager
 {
 
-class CPUGraph : public Graph
+class CPUGraph : public Widget::Graph
 {
 private:
     RefPtr<TaskModel> _model;
 
-    Label *_label_average;
-    Label *_label_greedy;
-    Label *_label_uptime;
+    Widget::Label *_label_average;
+    Widget::Label *_label_greedy;
+    Widget::Label *_label_uptime;
 
     OwnPtr<Timer> _graph_timer{};
     OwnPtr<Timer> _text_timer{};

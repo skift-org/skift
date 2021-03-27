@@ -1,10 +1,9 @@
-#include <stdio.h>
-#include <string.h>
-
 #include <libgraphic/Painter.h>
 #include <libio/Format.h>
 #include <libwidget/Placeholder.h>
-#include <libwidget/Window.h>
+
+namespace Widget
+{
 
 Placeholder::Placeholder(Component *parent, String text)
     : Component(parent),
@@ -25,3 +24,5 @@ void Placeholder::paint(Graphic::Painter &painter, const Recti &)
 
     painter.draw_string(*font(), _text.cstring(), {32, 20}, color(THEME_FOREGROUND));
 }
+
+} // namespace Widget

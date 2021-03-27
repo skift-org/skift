@@ -3,6 +3,9 @@
 #include <libutils/String.h>
 #include <libwidget/Component.h>
 
+namespace Widget
+{
+
 class Label : public Component
 {
 private:
@@ -25,3 +28,5 @@ public:
 
     Vec2i size() override;
 };
+
+} // namespace Widget

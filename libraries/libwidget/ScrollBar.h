@@ -2,6 +2,9 @@
 
 #include <libwidget/Component.h>
 
+namespace Widget
+{
+
 class ScrollBar : public Component
 {
 private:
@@ -88,3 +91,5 @@ public:
         return {SIZE, SIZE};
     }
 };
+
+} // namespace Widget

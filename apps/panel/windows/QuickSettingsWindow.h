@@ -5,7 +5,7 @@
 namespace panel
 {
 
-class QuickSettingsWindow : public Window
+class QuickSettingsWindow : public Widget::Window
 {
 public:
     static constexpr int WIDTH = 320;

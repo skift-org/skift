@@ -13,6 +13,9 @@ namespace Graphic
 class Painter;
 } // namespace Graphic
 
+namespace Widget
+{
+
 struct Window;
 
 struct Layout
@@ -34,23 +37,53 @@ struct Layout
     Vec2i spacing;
 };
 
-#define STACK() \
-    (Layout{Layout::STACK, 0, 0, Vec2i::zero()})
+#define STACK()                  \
+    (::Widget::Layout{           \
+        ::Widget::Layout::STACK, \
+        0,                       \
+        0,                       \
+        Vec2i::zero(),           \
+    })
 
 #define GRID(_hcell, _vcell, _hspacing, _vspacing) \
-    (Layout{Layout::GRID, (_hcell), (_vcell), Vec2i((_hspacing), (_vspacing))})
+    (::Widget::Layout{                             \
+        ::Widget::Layout::GRID,                    \
+        (_hcell),                                  \
+        (_vcell),                                  \
+        Vec2i((_hspacing), (_vspacing)),           \
+    })
 
-#define VGRID(_vspacing) \
-    (Layout{Layout::VGRID, 0, 0, Vec2i(0, (_vspacing))})
+#define VGRID(_vspacing)         \
+    (::Widget::Layout{           \
+        ::Widget::Layout::VGRID, \
+        0,                       \
+        0,                       \
+        Vec2i(0, (_vspacing)),   \
+    })
 
-#define HGRID(_hspacing) \
-    (Layout{Layout::HGRID, 0, 0, Vec2i((_hspacing), 0)})
+#define HGRID(_hspacing)         \
+    (::Widget::Layout{           \
+        ::Widget::Layout::HGRID, \
+        0,                       \
+        0,                       \
+        Vec2i((_hspacing), 0),   \
+    })
 
-#define VFLOW(_vspacing) \
-    (Layout{Layout::VFLOW, 0, 0, Vec2i(0, (_vspacing))})
+#define VFLOW(_vspacing)         \
+    (::Widget::Layout{           \
+        ::Widget::Layout::VFLOW, \
+        0,                       \
+        0,                       \
+        Vec2i(0, (_vspacing)),   \
+    })
 
-#define HFLOW(_hspacing) \
-    (Layout{Layout::HFLOW, 0, 0, Vec2i((_hspacing), 0)})
+#define HFLOW(_hspacing)         \
+    (::Widget::Layout{           \
+        ::Widget::Layout::HFLOW, \
+        0,                       \
+        0,                       \
+        Vec2i((_hspacing), 0),   \
+    })
 
 class Component
 {
@@ -291,3 +324,5 @@ public:
 
     void dispatch_event(Event *event);
 };
+
+} // namespace Widget

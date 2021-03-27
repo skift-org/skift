@@ -12,10 +12,10 @@ Link::Link(Component *parent, RefPtr<Graphic::Icon> icon, String name)
     layout(VFLOW(4));
     insets({8, 24});
 
-    auto icon_container = new IconPanel(this, icon);
+    auto icon_container = new Widget::IconPanel(this, icon);
     icon_container->icon_size(Graphic::ICON_36PX);
     icon_container->flags(Component::FILL);
-    new Label(this, name, Anchor::CENTER);
+    new Widget::Label(this, name, Anchor::CENTER);
 }
 
 } // namespace Settings

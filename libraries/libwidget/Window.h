@@ -13,6 +13,9 @@
 
 #define WINDOW_RESIZE_AREA 16
 
+namespace Widget
+{
+
 class Window
 {
 private:
@@ -222,3 +225,5 @@ public:
 
     void handle_keyboard_key_release(Event *event);
 };
+
+} // namespace Widget

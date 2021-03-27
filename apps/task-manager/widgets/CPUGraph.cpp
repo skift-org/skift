@@ -25,17 +25,17 @@ CPUGraph::CPUGraph(Component *parent, RefPtr<TaskModel> model)
     insets(Insetsi(8));
     flags(Component::FILL);
 
-    auto icon_and_text = new Container(this);
+    auto icon_and_text = new Widget::Container(this);
     icon_and_text->layout(HFLOW(4));
-    new IconPanel(icon_and_text, Graphic::Icon::get("memory"));
-    new Label(icon_and_text, "Processor");
+    new Widget::IconPanel(icon_and_text, Graphic::Icon::get("memory"));
+    new Widget::Label(icon_and_text, "Processor");
 
-    auto cpu_filler = new Container(this);
+    auto cpu_filler = new Widget::Container(this);
     cpu_filler->flags(Component::FILL);
 
-    _label_average = new Label(this, "Average: nil%", Anchor::RIGHT);
-    _label_greedy = new Label(this, "Most greedy: nil", Anchor::RIGHT);
-    _label_uptime = new Label(this, "Uptime: nil", Anchor::RIGHT);
+    _label_average = new Widget::Label(this, "Average: nil%", Anchor::RIGHT);
+    _label_greedy = new Widget::Label(this, "Most greedy: nil", Anchor::RIGHT);
+    _label_uptime = new Widget::Label(this, "Uptime: nil", Anchor::RIGHT);
 
     _graph_timer = own<Timer>(100, [&]() {
         SystemStatus status{};

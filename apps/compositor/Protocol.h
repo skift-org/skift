@@ -52,7 +52,7 @@ struct CompositorGreetings
 
 struct CompositorEvent
 {
-    Event event;
+    Widget::Event event;
 };
 
 struct CompositorCreateWindow
@@ -98,14 +98,14 @@ struct CompositorEventWindow
 {
     int id;
 
-    Event event;
+    Widget::Event event;
 };
 
 struct CompositorCursorWindow
 {
     int id;
 
-    CursorState state;
+    Widget::CursorState state;
 };
 
 struct CompositorSetResolution

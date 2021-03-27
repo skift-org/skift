@@ -11,7 +11,7 @@ private:
 public:
     virtual ~PaintTool() {}
 
-    virtual void event(PaintDocument &document, Event &event, Graphic::Color &color)
+    virtual void event(PaintDocument &document, Widget::Event &event, Graphic::Color &color)
     {
         __unused(document);
         __unused(event);
@@ -23,35 +23,35 @@ class PencilTool : public PaintTool
 {
 private:
 public:
-    void event(PaintDocument &document, Event &event, Graphic::Color &color);
+    void event(PaintDocument &document, Widget::Event &event, Graphic::Color &color);
 };
 
 class BrushTool : public PaintTool
 {
 private:
 public:
-    void event(PaintDocument &document, Event &event, Graphic::Color &color);
+    void event(PaintDocument &document, Widget::Event &event, Graphic::Color &color);
 };
 
 class EraserTool : public PaintTool
 {
 private:
 public:
-    void event(PaintDocument &document, Event &event, Graphic::Color &color);
+    void event(PaintDocument &document, Widget::Event &event, Graphic::Color &color);
 };
 
 class FillTool : public PaintTool
 {
 private:
 public:
-    void event(PaintDocument &document, Event &event, Graphic::Color &color);
+    void event(PaintDocument &document, Widget::Event &event, Graphic::Color &color);
 };
 
 class PickerTool : public PaintTool
 {
 private:
 public:
-    void event(PaintDocument &document, Event &event, Graphic::Color &color);
+    void event(PaintDocument &document, Widget::Event &event, Graphic::Color &color);
 };
 
 PaintTool *pencil_tool_create();

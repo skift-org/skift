@@ -9,7 +9,7 @@
 namespace panel
 {
 
-class PanelWindow : public Window
+class PanelWindow : public Widget::Window
 {
 private:
     OwnPtr<MenuWindow> _menu;

@@ -1,9 +1,11 @@
 #include <libgraphic/Painter.h>
-
 #include <libwidget/Button.h>
 #include <libwidget/IconPanel.h>
 #include <libwidget/Image.h>
 #include <libwidget/Label.h>
+
+namespace Widget
+{
 
 void Button::paint(Graphic::Painter &painter, const Recti &rectangle)
 {
@@ -149,3 +151,5 @@ Button::Button(Component *parent, Style style, RefPtr<Graphic::Bitmap> image, St
         label->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
     }
 }
+
+} // namespace Widget

@@ -2,6 +2,9 @@
 
 #include <libwidget/Window.h>
 
+namespace Widget
+{
+
 namespace Application
 {
 
@@ -42,3 +45,5 @@ void exit_nested(int exit_value);
 bool show_wireframe();
 
 } // namespace Application
+
+} // namespace Widget

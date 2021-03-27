@@ -2,6 +2,9 @@
 #include <libwidget/TextEditor.h>
 #include <libwidget/Window.h>
 
+namespace Widget
+{
+
 TextEditor::TextEditor(Component *parent, RefPtr<TextModel> model)
     : Component(parent),
       _model(model)
@@ -274,3 +277,5 @@ void TextEditor::scroll_to_cursor()
 
     update_scrollbar();
 }
+
+} // namespace Widget

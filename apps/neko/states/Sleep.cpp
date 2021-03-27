@@ -11,12 +11,12 @@ namespace neko
 
 Sleep::Sleep()
 {
-    _last_mouse_position = Application::mouse_position();
+    _last_mouse_position = Widget::Application::mouse_position();
 }
 
 void Sleep::update(Neko &neko)
 {
-    auto new_mouse_position = Application::mouse_position();
+    auto new_mouse_position = Widget::Application::mouse_position();
 
     if (_last_mouse_position.distance_to(new_mouse_position) > 16)
     {

@@ -1,6 +1,9 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/IconPanel.h>
 
+namespace Widget
+{
+
 IconPanel::IconPanel(Component *parent, RefPtr<Graphic::Icon> icon)
     : Component(parent), _icon(icon)
 {
@@ -33,3 +36,5 @@ Vec2i IconPanel::size()
         return bound().size();
     }
 }
+
+} // namespace Widget

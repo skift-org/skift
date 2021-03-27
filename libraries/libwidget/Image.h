@@ -2,6 +2,9 @@
 
 #include <libwidget/Component.h>
 
+namespace Widget
+{
+
 class Image : public Component
 {
 private:
@@ -21,3 +24,5 @@ public:
 
     virtual Vec2i size() override;
 };
+
+} // namespace Widget

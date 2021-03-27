@@ -9,12 +9,12 @@
 namespace task_manager
 {
 
-class MainWinow : public Window
+class MainWinow : public Widget::Window
 {
 private:
     RAMGraph *_ram_graph;
     CPUGraph *_cpu_graph;
-    Table *_table;
+    Widget::Table *_table;
     RefPtr<TaskModel> _table_model;
     OwnPtr<Timer> _table_timer;
 

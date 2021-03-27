@@ -17,27 +17,27 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
 
     root()->layout(VFLOW(0));
 
-    new TitleBar(root());
+    new Widget::TitleBar(root());
 
     /// --- Toolbar --- ///
-    auto toolbar = new Panel(root());
+    auto toolbar = new Widget::Panel(root());
 
     toolbar->layout(HFLOW(4));
     toolbar->insets(Insetsi(4, 4));
     toolbar->max_height(38);
     toolbar->min_height(38);
 
-    new Button(toolbar, Button::FILLED, Graphic::Icon::get("plus"), "New task");
+    new Widget::Button(toolbar, Widget::Button::FILLED, Graphic::Icon::get("plus"), "New task");
 
-    auto cancel_task_button = new Button(toolbar, Button::TEXT, Graphic::Icon::get("close"), "Cancel task");
-    cancel_task_button->on(Event::ACTION, [&](auto) {
-        auto result = MessageBox::create_and_show(
+    auto cancel_task_button = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("close"), "Cancel task");
+    cancel_task_button->on(Widget::Event::ACTION, [&](auto) {
+        auto result = Widget::MessageBox::create_and_show(
             "Cancel task",
             "Are you sure about that ?",
             Graphic::Icon::get("close"),
-            DialogButton::YES | DialogButton::NO);
+            Widget::DialogButton::YES | Widget::DialogButton::NO);
 
-        if (result == DialogResult::YES)
+        if (result == Widget::DialogResult::YES)
         {
             _table_model->kill_task(_table->selected());
         };
@@ -46,8 +46,8 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
     /// --- Table view --- //
     _table_model = make<TaskModel>();
 
-    _table = new Table(root(), _table_model);
-    _table->flags(Component::FILL);
+    _table = new Widget::Table(root(), _table_model);
+    _table->flags(Widget::Component::FILL);
 
     _table_timer = own<Timer>(1000, [&]() {
         _table_model->update();
@@ -56,13 +56,13 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
     _table_timer->start();
 
     /// --- Graphs --- ///
-    auto graphs_container = new Panel(root());
+    auto graphs_container = new Widget::Panel(root());
     graphs_container->layout(HFLOW(0));
     graphs_container->max_height(96);
 
     _cpu_graph = new CPUGraph(graphs_container, _table_model);
 
-    new Separator(graphs_container);
+    new Widget::Separator(graphs_container);
 
     _ram_graph = new RAMGraph(graphs_container, _table_model);
 }

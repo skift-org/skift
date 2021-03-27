@@ -2,6 +2,9 @@
 
 #include <libgraphic/Icon.h>
 
+namespace Widget
+{
+
 #define VARIANT_STRING_SIZE 128
 
 enum VarianType
@@ -53,3 +56,5 @@ public:
 };
 
 int variant_cmp(Variant left, Variant right);
+
+} // namespace Widget

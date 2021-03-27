@@ -5,7 +5,7 @@
 namespace Settings
 {
 
-class HomePage : public Container
+class HomePage : public Widget::Container
 {
 public:
     HomePage(Component *parent);

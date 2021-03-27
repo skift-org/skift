@@ -2,6 +2,9 @@
 
 #include <libwidget/dialog/Dialog.h>
 
+namespace Widget
+{
+
 class MessageBox : public Dialog
 {
 private:
@@ -21,3 +24,5 @@ public:
 
     void render(Window *window) override;
 };
+
+} // namespace Widget

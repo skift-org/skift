@@ -16,11 +16,11 @@ RessourceMonitor::RessourceMonitor(Component *parent)
     layout(VGRID(1));
     insets(0);
 
-    auto ram_graph = new Graph(this, 50, Graphic::Colors::ROYALBLUE);
-    new Label(ram_graph, "RAM", Anchor::CENTER);
+    auto ram_graph = new Widget::Graph(this, 50, Graphic::Colors::ROYALBLUE);
+    new Widget::Label(ram_graph, "RAM", Anchor::CENTER);
 
-    auto cpu_graph = new Graph(this, 50, Graphic::Colors::SEAGREEN);
-    new Label(cpu_graph, "CPU", Anchor::CENTER);
+    auto cpu_graph = new Widget::Graph(this, 50, Graphic::Colors::SEAGREEN);
+    new Widget::Label(cpu_graph, "CPU", Anchor::CENTER);
 
     _ram_timer = own<Timer>(500, [ram_graph]() {
         SystemStatus status{};

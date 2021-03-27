@@ -4,6 +4,10 @@
 #include <libwidget/Theme.h>
 #include <libwidget/Window.h>
 
+namespace Widget
+{
+
+
 Recti Table::header_bound() const
 {
     return bound().take_top(TABLE_ROW_HEIGHT);
@@ -233,3 +237,5 @@ void Table::do_layout()
     _scrollbar->container(scrollbar_bound());
     _scrollbar->update(TABLE_ROW_HEIGHT * _model->rows(), list_bound().height(), _scroll_offset);
 }
+
+} // namespace Widget

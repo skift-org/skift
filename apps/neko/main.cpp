@@ -4,10 +4,10 @@
 
 int main(int argc, char **argv)
 {
-    Application::initialize(argc, argv);
+    Widget::Application::initialize(argc, argv);
 
     auto window = new neko::MainWindow();
     window->show();
 
-    return Application::run();
+    return Widget::Application::run();
 }

@@ -1,7 +1,9 @@
 #include <libutils/Scanner.h>
 #include <libutils/StringBuilder.h>
-
 #include <libwidget/model/TextModel.h>
+
+namespace Widget
+{
 
 RefPtr<TextModel> TextModel::empty()
 {
@@ -170,3 +172,5 @@ void TextModel::move_line_down_at(TextCursor &cursor)
         did_update();
     }
 }
+
+} // namespace Widget

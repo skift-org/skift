@@ -21,21 +21,21 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
     auto cover = new Cover(root(), Graphic::Bitmap::load_from_or_placeholder("/Applications/media-player/cover.png"));
 
     cover->layout(VFLOW(0));
-    cover->flags(Component::FILL);
+    cover->flags(Widget::Component::FILL);
 
-    new TitleBar(cover);
-    new Spacer(cover);
+    new Widget::TitleBar(cover);
+    new Widget::Spacer(cover);
 
-    auto control_bar = new Container(cover);
+    auto control_bar = new Widget::Container(cover);
 
     control_bar->insets(12);
     control_bar->layout(HFLOW(4));
 
-    new Button(control_bar, Button::FILLED, Graphic::Icon::get("play"));
-    new Button(control_bar, Button::OUTLINE, Graphic::Icon::get("stop"));
-    new Button(control_bar, Button::OUTLINE, Graphic::Icon::get("volume-high"));
+    new Widget::Button(control_bar, Widget::Button::FILLED, Graphic::Icon::get("play"));
+    new Widget::Button(control_bar, Widget::Button::OUTLINE, Graphic::Icon::get("stop"));
+    new Widget::Button(control_bar, Widget::Button::OUTLINE, Graphic::Icon::get("volume-high"));
 
-    new Slider(control_bar);
+    new Widget::Slider(control_bar);
 }
 
 } // namespace MediaPlayer

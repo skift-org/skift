@@ -32,6 +32,9 @@
 #define THEME_DEFAULT_ANSI_BRIGHT_CYAN Graphic::Color::from_hex(0x95E6CB)
 #define THEME_DEFAULT_ANSI_BRIGHT_WHITE Graphic::Color::from_hex(0xFFFFFF)
 
+namespace Widget
+{
+
 enum ThemeColorRole
 {
     THEME_BORDER,
@@ -72,8 +75,10 @@ enum ThemeColorRole
 
 bool theme_is_dark();
 
-void theme_load(const char *path);
+void theme_load(String path);
 
 Graphic::Color theme_get_color(ThemeColorRole role);
 
 void theme_set_color(ThemeColorRole role, Graphic::Color color);
+
+} // namespace Widget

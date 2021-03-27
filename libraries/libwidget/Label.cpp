@@ -1,7 +1,10 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Label.h>
 #include <libwidget/Window.h>
-#include <string.h>
+
+namespace Widget
+{
+
 
 Label::Label(Component *parent, String text)
     : Label(parent, text, Anchor::LEFT)
@@ -29,3 +32,5 @@ Vec2i Label::size()
 {
     return {font()->mesure_with_fulllineheight(_text.cstring()).size()};
 }
+
+} // namespace Widget

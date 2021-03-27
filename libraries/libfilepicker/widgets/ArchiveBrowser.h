@@ -10,7 +10,7 @@
 namespace FilePicker
 {
 
-class ArchiveBrowser : public Table
+class ArchiveBrowser : public Widget::Table
 {
 private:
     RefPtr<Navigation> _navigation;
@@ -19,7 +19,7 @@ private:
     OwnPtr<Observer<Navigation>> _navigation_observer;
 
 public:
-    ArchiveBrowser(Component *parent, RefPtr<Navigation> navigation, RefPtr<Archive> archive)
+    ArchiveBrowser(Widget::Component *parent, RefPtr<Navigation> navigation, RefPtr<Archive> archive)
         : Table(parent), _navigation(navigation), _archive(archive)
     {
         _listing = make<ArchiveListing>(navigation, archive);
@@ -34,7 +34,7 @@ public:
             scroll_to_top();
         });
 
-        on(Event::ACTION, [this](auto) {
+        on(Widget::Event::ACTION, [this](auto) {
             if (selected() >= 0)
             {
                 if (_listing->info(selected()).type == FILE_TYPE_DIRECTORY)

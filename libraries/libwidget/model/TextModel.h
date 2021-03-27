@@ -1,13 +1,15 @@
 #pragma once
 
-#include <libutils/unicode/Codepoint.h>
+#include <libgraphic/Font.h>
 #include <libutils/Observable.h>
 #include <libutils/OwnPtr.h>
 #include <libutils/RefCounted.h>
 #include <libutils/Vector.h>
-
-#include <libgraphic/Font.h>
+#include <libutils/unicode/Codepoint.h>
 #include <libwidget/Theme.h>
+
+namespace Widget
+{
 
 struct TextCursor;
 
@@ -349,3 +351,5 @@ public:
         _column = clamp(_column, 0, model.line(_line).length());
     }
 };
+
+} // namespace Widget

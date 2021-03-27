@@ -2,11 +2,11 @@
 
 #include <libutils/Rect.h>
 
-namespace Screen
+namespace Widget::Screen
 {
 
 Recti bound();
 
 void bound(Recti);
 
-} // namespace Screen
+} // namespace Widget::Screen

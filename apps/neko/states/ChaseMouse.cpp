@@ -10,7 +10,7 @@ namespace neko
 
 Vec2f ChaseMouse::pick_destination()
 {
-    return Application::mouse_position();
+    return Widget::Application::mouse_position();
 }
 
 ChaseMouse::ChaseMouse()

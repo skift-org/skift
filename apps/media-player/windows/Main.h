@@ -7,7 +7,7 @@
 namespace MediaPlayer
 {
 
-class Main : public Window
+class Main : public Widget::Window
 {
 public:
     Main();

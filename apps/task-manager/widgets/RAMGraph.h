@@ -10,14 +10,14 @@
 namespace task_manager
 {
 
-class RAMGraph : public Graph
+class RAMGraph : public Widget::Graph
 {
 private:
     RefPtr<TaskModel> _model;
 
-    Label *_label_usage;
-    Label *_label_available;
-    Label *_label_greedy;
+    Widget::Label *_label_usage;
+    Widget::Label *_label_available;
+    Widget::Label *_label_greedy;
 
     OwnPtr<Timer> _graph_timer{};
     OwnPtr<Timer> _text_timer{};

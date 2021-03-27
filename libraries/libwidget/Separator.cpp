@@ -1,6 +1,9 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Separator.h>
 
+namespace Widget
+{
+
 Separator::Separator(Component *parent) : Component(parent)
 {
 }
@@ -14,3 +17,5 @@ Vec2i Separator::size()
 {
     return Vec2i(1, 1);
 }
+
+} // namespace Widget

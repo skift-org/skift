@@ -14,41 +14,41 @@ static Demo _demos[] = {
 
 int main(int argc, char **argv)
 {
-    Result result = Application::initialize(argc, argv);
+    Result result = Widget::Application::initialize(argc, argv);
 
     if (result != SUCCESS)
     {
         return -1;
     }
 
-    Window *window = new Window(WINDOW_RESIZABLE);
+    Widget::Window *window = new Widget::Window(WINDOW_RESIZABLE);
     window->icon(Graphic::Icon::get("duck"));
     window->title("Demos");
     window->size(Vec2i(500, 400));
 
     window->root()->layout(VFLOW(0));
 
-    new TitleBar(window->root());
+    new Widget::TitleBar(window->root());
 
-    Component *navbar = new Container(window->root());
+    Widget::Component *navbar = new Widget::Container(window->root());
 
     navbar->insets(Insetsi(4, 4));
     navbar->layout(HGRID(4));
 
     DemoWidget *demo_widget = new DemoWidget(window->root());
-    demo_widget->flags(Component::FILL);
+    demo_widget->flags(Widget::Component::FILL);
     demo_widget->demo(&_demos[0]);
 
     for (size_t i = 0; _demos[i].name; i++)
     {
-        Component *demo_button = new Button(navbar, Button::TEXT, _demos[i].name);
+        Widget::Component *demo_button = new Widget::Button(navbar, Widget::Button::TEXT, _demos[i].name);
 
-        demo_button->on(Event::ACTION, [i, demo_widget](auto) {
+        demo_button->on(Widget::Event::ACTION, [i, demo_widget](auto) {
             demo_widget->demo(&_demos[i]);
         });
     }
 
     window->show();
 
-    return Application::run();
+    return Widget::Application::run();
 }

@@ -78,19 +78,19 @@ void TerminalWidget::paint(Graphic::Painter &painter, const Recti &dirty)
         else
         {
             render_cell(painter, cx, cy, cell);
-            painter.draw_rectangle(cell_bound(cx, cy), color(THEME_ANSI_CURSOR));
+            painter.draw_rectangle(cell_bound(cx, cy), color(Widget::THEME_ANSI_CURSOR));
         }
     }
 }
 
-void TerminalWidget::event(Event *event)
+void TerminalWidget::event(Widget::Event *event)
 {
     auto send_sequence = [&](auto sequence) {
         _terminal_device.server.write(sequence, strlen(sequence));
         event->accepted = true;
     };
 
-    if (event->type == Event::KEYBOARD_KEY_TYPED)
+    if (event->type == Widget::Event::KEYBOARD_KEY_TYPED)
     {
         switch (event->keyboard.key)
         {

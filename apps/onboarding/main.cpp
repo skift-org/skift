@@ -61,42 +61,42 @@ static const Vector<Page> PAGES = {
     },
 };
 
-void pages(Component *host, const Page &page)
+void pages(Widget::Component *host, const Page &page)
 {
-    new Label(host, page.header, Anchor::CENTER);
+    new Widget::Label(host, page.header, Anchor::CENTER);
 
-    auto content = new Container(host);
+    auto content = new Widget::Container(host);
     content->insets({8, 0});
     content->layout(VFLOW(2));
 
     for (auto &lines : page.lines)
     {
-        new Label(content, lines, Anchor::CENTER);
+        new Widget::Label(content, lines, Anchor::CENTER);
     }
 
-    new Label(host, page.footer, Anchor::CENTER);
+    new Widget::Label(host, page.footer, Anchor::CENTER);
 }
 
 int main(int argc, char **argv)
 {
-    Application::initialize(argc, argv);
+    Widget::Application::initialize(argc, argv);
 
-    Window *window = new Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC | WINDOW_NO_ROUNDED_CORNERS);
+    Widget::Window *window = new Widget::Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC | WINDOW_NO_ROUNDED_CORNERS);
 
     window->title("Onboarding");
     window->type(WINDOW_TYPE_POPOVER);
-    window->bound(Screen::bound());
+    window->bound(Widget::Screen::bound());
     window->opacity(0);
     window->show();
     window->root()->layout(STACK());
 
-    auto background = new Panel(window->root());
+    auto background = new Widget::Panel(window->root());
 
     background->layout(STACK());
-    background->color(THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
-    background->flags(Component::FILL);
+    background->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
+    background->flags(Widget::Component::FILL);
 
-    auto dialog = new Panel(background);
+    auto dialog = new Widget::Panel(background);
 
     dialog->pin_width(420);
     dialog->pin_height(420);
@@ -104,44 +104,44 @@ int main(int argc, char **argv)
     dialog->layout(VFLOW(0));
     dialog->border_radius(6);
 
-    auto illustration = new Panel(dialog);
+    auto illustration = new Widget::Panel(dialog);
     illustration->min_height(160);
     illustration->border_radius(6);
-    illustration->color(THEME_MIDDLEGROUND, Graphic::Colors::WHITE);
+    illustration->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::WHITE);
 
-    auto image = new Image(illustration, Graphic::Bitmap::placeholder());
-    image->flags(Component::FILL);
+    auto image = new Widget::Image(illustration, Graphic::Bitmap::placeholder());
+    image->flags(Widget::Component::FILL);
     image->scaling(Graphic::BitmapScaling::CENTER);
 
-    auto content = new Container(dialog);
-    content->flags(Component::FILL);
+    auto content = new Widget::Container(dialog);
+    content->flags(Widget::Component::FILL);
     content->insets(16);
     content->layout(VFLOW(4));
 
-    auto dots_container = new Container(dialog);
+    auto dots_container = new Widget::Container(dialog);
     dots_container->insets(16);
 
-    auto dots = new PaginationDots(dots_container, 5);
+    auto dots = new Widget::PaginationDots(dots_container, 5);
 
-    auto navigation = new Container(dialog);
+    auto navigation = new Widget::Container(dialog);
 
     navigation->layout(HFLOW(4));
     navigation->insets(8);
 
-    auto skipall_button = new Button(navigation, Button::TEXT, "Skip All");
+    auto skipall_button = new Widget::Button(navigation, Widget::Button::TEXT, "Skip All");
 
-    new Spacer(navigation);
+    new Widget::Spacer(navigation);
 
-    auto back_button = new Button(navigation, Button::OUTLINE, "Previous");
+    auto back_button = new Widget::Button(navigation, Widget::Button::OUTLINE, "Previous");
 
-    auto next_button = new Button(navigation, Button::FILLED, "Next");
+    auto next_button = new Widget::Button(navigation, Widget::Button::FILLED, "Next");
 
     int current_page = 0;
 
     auto set_current_page = [&](int index) {
         if (index == 5)
         {
-            Application::exit(PROCESS_SUCCESS);
+            Widget::Application::exit(PROCESS_SUCCESS);
         }
 
         if (index < 0 || index > 4)
@@ -164,22 +164,22 @@ int main(int argc, char **argv)
 
     set_current_page(0);
 
-    skipall_button->on(Event::ACTION, [](auto) {
-        Application::exit(PROCESS_SUCCESS);
+    skipall_button->on(Widget::Event::ACTION, [](auto) {
+        Widget::Application::exit(PROCESS_SUCCESS);
     });
 
-    back_button->on(Event::ACTION, [&](auto) {
+    back_button->on(Widget::Event::ACTION, [&](auto) {
         set_current_page(current_page - 1);
     });
 
-    next_button->on(Event::ACTION, [&](auto) {
+    next_button->on(Widget::Event::ACTION, [&](auto) {
         set_current_page(current_page + 1);
     });
 
-    window->on(Event::KEYBOARD_KEY_PRESS, [&](Event *event) {
+    window->on(Widget::Event::KEYBOARD_KEY_PRESS, [&](Widget::Event *event) {
         if (event->keyboard.key == KEYBOARD_KEY_ESC)
         {
-            Application::exit(PROCESS_SUCCESS);
+            Widget::Application::exit(PROCESS_SUCCESS);
         }
         else if (event->keyboard.key == KEYBOARD_KEY_RIGHT)
         {
@@ -191,5 +191,5 @@ int main(int argc, char **argv)
         }
     });
 
-    return Application::run();
+    return Widget::Application::run();
 }

@@ -1,8 +1,12 @@
+#include <string.h>
+
 #include <libsystem/Logger.h>
 #include <libutils/NumberParser.h>
 #include <libutils/json/Json.h>
 #include <libwidget/Theme.h>
-#include <string.h>
+
+namespace Widget
+{
 
 static bool _theme_is_dark = true;
 
@@ -107,9 +111,9 @@ bool theme_is_dark()
     return _theme_is_dark;
 }
 
-void theme_load(const char *path)
+void theme_load(String path)
 {
-    logger_info("Loading theme from '%s'", path);
+    logger_info("Loading theme from '%s'", path.cstring());
 
     auto root = Json::parse_file(path);
 
@@ -150,3 +154,5 @@ void theme_set_color(ThemeColorRole role, Graphic::Color color)
 {
     _theme_colors[role] = color;
 }
+
+} // namespace Widget

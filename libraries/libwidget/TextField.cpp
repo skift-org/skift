@@ -1,6 +1,8 @@
 #include <libgraphic/Painter.h>
-
 #include <libwidget/TextField.h>
+
+namespace Widget
+{
 
 TextField::TextField(Component *parent, RefPtr<TextModel> model)
     : Component(parent), _model(model)
@@ -132,3 +134,5 @@ void TextField::event(Event *event)
         event->accepted = true;
     }
 }
+
+} // namespace Widget

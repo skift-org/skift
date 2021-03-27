@@ -23,17 +23,17 @@ RAMGraph::RAMGraph(Component *parent, RefPtr<TaskModel> model)
     insets(Insetsi(8));
     flags(Component::FILL);
 
-    auto icon_and_text = new Container(this);
+    auto icon_and_text = new Widget::Container(this);
     icon_and_text->layout(HFLOW(4));
-    new IconPanel(icon_and_text, Graphic::Icon::get("chip"));
-    new Label(icon_and_text, "Memory");
+    new Widget::IconPanel(icon_and_text, Graphic::Icon::get("chip"));
+    new Widget::Label(icon_and_text, "Memory");
 
-    auto cpu_filler = new Container(this);
+    auto cpu_filler = new Widget::Container(this);
     cpu_filler->flags(Component::FILL);
 
-    _label_usage = new Label(this, "Usage: nil Mio", Anchor::RIGHT);
-    _label_available = new Label(this, "Available: nil Mio", Anchor::RIGHT);
-    _label_greedy = new Label(this, "Most greedy: nil", Anchor::RIGHT);
+    _label_usage = new Widget::Label(this, "Usage: nil Mio", Anchor::RIGHT);
+    _label_available = new Widget::Label(this, "Available: nil Mio", Anchor::RIGHT);
+    _label_greedy = new Widget::Label(this, "Most greedy: nil", Anchor::RIGHT);
 
     _graph_timer = own<Timer>(500, [&]() {
         SystemStatus status{};

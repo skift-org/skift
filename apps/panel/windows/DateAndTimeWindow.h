@@ -5,7 +5,7 @@
 namespace panel
 {
 
-class DateAndTimeWindow : public Window
+class DateAndTimeWindow : public Widget::Window
 {
 public:
     DateAndTimeWindow();

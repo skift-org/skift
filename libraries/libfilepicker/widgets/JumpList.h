@@ -11,7 +11,7 @@
 namespace FilePicker
 {
 
-class JumpList : public Panel
+class JumpList : public Widget::Panel
 {
 private:
     RefPtr<Navigation> _navigation;
@@ -19,10 +19,10 @@ private:
 
     OwnPtr<Observer<Bookmarks>> _bookmark_observer;
 
-    VScroll *_listing;
+    Widget::VScroll *_listing;
 
 public:
-    JumpList(Component *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
+    JumpList(Widget::Component *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
         : Panel(parent),
           _navigation(navigation),
           _bookmarks(bookmarks)
@@ -34,9 +34,9 @@ public:
             render();
         });
 
-        new Label(this, "Bookmarks");
+        new Widget::Label(this, "Bookmarks");
 
-        _listing = new VScroll(this);
+        _listing = new Widget::VScroll(this);
         _listing->flags(Component::FILL);
 
         render();
@@ -51,13 +51,13 @@ public:
         {
             auto bookmark = _bookmarks->all()[i];
 
-            auto button = new Button(
+            auto button = new Widget::Button(
                 _listing->host(),
-                Button::TEXT,
+                Widget::Button::TEXT,
                 bookmark.icon(),
                 bookmark.name());
 
-            button->on(Event::ACTION, [this, bookmark](auto) {
+            button->on(Widget::Event::ACTION, [this, bookmark](auto) {
                 _navigation->navigate(bookmark.path());
             });
         }

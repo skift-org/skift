@@ -9,7 +9,7 @@
 namespace Snake
 {
 
-struct BoardWidget : public Component
+struct BoardWidget : public Widget::Component
 {
     static constexpr auto CELL_SIZE = 32;
 
@@ -32,18 +32,18 @@ struct BoardWidget : public Component
     void paint(Graphic::Painter &painter, const Recti &) override
     {
         auto cell = [](Vec2i p) {
-            return Recti{Recti{p * CELL_SIZE, {CELL_SIZE}}};
+            return Recti{p * CELL_SIZE, {CELL_SIZE}};
         };
 
         for (int y = 0; y < board->height(); y++)
         {
             for (int x = 0; x < board->width(); x++)
             {
-                painter.fill_rectangle_rounded(cell({x, y}).shrinked({2}), 4, color(THEME_MIDDLEGROUND));
+                painter.fill_rectangle_rounded(cell({x, y}).shrinked({2}), 4, color(Widget::THEME_MIDDLEGROUND));
             }
         }
 
-        auto fruit_color = color(THEME_ANSI_BRIGHT_RED);
+        auto fruit_color = color(Widget::THEME_ANSI_BRIGHT_RED);
 
         for (auto fruit : board->fruits())
         {
@@ -53,7 +53,7 @@ struct BoardWidget : public Component
 
         auto &snake = board->snake();
 
-        auto snake_color = color(THEME_ANSI_BRIGHT_GREEN);
+        auto snake_color = color(Widget::THEME_ANSI_BRIGHT_GREEN);
 
         for (auto tail : snake.tail)
         {
@@ -64,9 +64,9 @@ struct BoardWidget : public Component
         painter.fill_rectangle_rounded(cell(snake.head).expended(8), 8, snake_color.with_alpha(0.5));
     }
 
-    void event(Event *event) override
+    void event(Widget::Event *event) override
     {
-        if (event->type == Event::KEYBOARD_KEY_PRESS)
+        if (event->type == Widget::Event::KEYBOARD_KEY_PRESS)
         {
             auto &keyboard_event = event->keyboard;
 

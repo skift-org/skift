@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
+namespace Widget
+{
+
 Variant::Variant(int value) : _type(VarianType::INT)
 {
     _as_float = value;
@@ -46,3 +49,5 @@ int variant_cmp(Variant left, Variant right)
         return strcmp(left.as_string(), right.as_string());
     }
 }
+
+} // namespace Widget

@@ -6,9 +6,10 @@
 #include "paint/PaintDocument.h"
 #include "paint/PaintTool.h"
 
-void PencilTool::event(PaintDocument &document, Event &event, Graphic::Color &color)
+void PencilTool::event(PaintDocument &document, Widget::Event &event, Graphic::Color &color)
 {
-    if (event.type == Event::MOUSE_MOVE || event.type == Event::MOUSE_BUTTON_PRESS)
+    if (event.type == Widget::Event::MOUSE_MOVE ||
+        event.type == Widget::Event::MOUSE_BUTTON_PRESS)
     {
         Vec2i from = event.mouse.old_position;
         Vec2i to = event.mouse.position;
@@ -21,10 +22,10 @@ void PencilTool::event(PaintDocument &document, Event &event, Graphic::Color &co
     }
 }
 
-void BrushTool::event(PaintDocument &document, Event &event, Graphic::Color &color)
+void BrushTool::event(PaintDocument &document, Widget::Event &event, Graphic::Color &color)
 {
-    if (event.type == Event::MOUSE_MOVE ||
-        event.type == Event::MOUSE_BUTTON_PRESS)
+    if (event.type == Widget::Event::MOUSE_MOVE ||
+        event.type == Widget::Event::MOUSE_BUTTON_PRESS)
     {
         if (event.mouse.buttons & (MOUSE_BUTTON_LEFT | MOUSE_BUTTON_RIGHT))
         {
@@ -36,9 +37,9 @@ void BrushTool::event(PaintDocument &document, Event &event, Graphic::Color &col
     }
 }
 
-void EraserTool::event(PaintDocument &document, Event &event, Graphic::Color &color)
+void EraserTool::event(PaintDocument &document, Widget::Event &event, Graphic::Color &color)
 {
-    if (event.type == Event::MOUSE_MOVE || event.type == Event::MOUSE_BUTTON_PRESS)
+    if (event.type == Widget::Event::MOUSE_MOVE || event.type == Widget::Event::MOUSE_BUTTON_PRESS)
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
@@ -104,9 +105,9 @@ static void flood_fill(Graphic::Bitmap &bitmap, Vec2i position, Graphic::Color t
     }
 }
 
-void FillTool::event(PaintDocument &document, Event &event, Graphic::Color &color)
+void FillTool::event(PaintDocument &document, Widget::Event &event, Graphic::Color &color)
 {
-    if (event.type == Event::MOUSE_BUTTON_PRESS)
+    if (event.type == Widget::Event::MOUSE_BUTTON_PRESS)
     {
         if (event.mouse.buttons & (MOUSE_BUTTON_LEFT | MOUSE_BUTTON_RIGHT))
         {
@@ -117,11 +118,11 @@ void FillTool::event(PaintDocument &document, Event &event, Graphic::Color &colo
     }
 }
 
-void PickerTool::event(PaintDocument &document, Event &event, Graphic::Color &color)
+void PickerTool::event(PaintDocument &document, Widget::Event &event, Graphic::Color &color)
 {
     __unused(color);
 
-    if (event.type == Event::MOUSE_BUTTON_PRESS)
+    if (event.type == Widget::Event::MOUSE_BUTTON_PRESS)
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {

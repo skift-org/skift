@@ -9,6 +9,10 @@
 #include <libwidget/Theme.h>
 #include <libwidget/Window.h>
 
+namespace Widget
+{
+
+
 void Window::toggle_maximise()
 {
     if (_is_maximised == true)
@@ -728,3 +732,5 @@ Graphic::Color Window::color(ThemeColorRole role)
 
     return theme_get_color(role);
 }
+
+} // namespace Widget

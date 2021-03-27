@@ -1,5 +1,8 @@
 #include <libwidget/Slider.h>
 
+namespace Widget
+{
+
 Recti Slider::track_bound()
 {
     return Recti{
@@ -80,3 +83,5 @@ void Slider::paint(Graphic::Painter &painter, const Recti &)
         painter.fill_rectangle_rounded(thumb_bound(), bound().height() / 2, color(THEME_BACKGROUND));
     }
 }
+
+} // namespace Widget

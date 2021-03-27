@@ -7,11 +7,11 @@
 
 int main(int argc, char **argv)
 {
-    Application::initialize(argc, argv);
+    Widget::Application::initialize(argc, argv);
 
-    theme_set_color(THEME_BACKGROUND, theme_get_color(THEME_ANSI_BACKGROUND));
+    theme_set_color(Widget::THEME_BACKGROUND, Widget::theme_get_color(Widget::THEME_ANSI_BACKGROUND));
 
-    Window *window = new Window(WINDOW_RESIZABLE | WINDOW_ACRYLIC);
+    Widget::Window *window = new Widget::Window(WINDOW_RESIZABLE | WINDOW_ACRYLIC);
 
     window->icon(Graphic::Icon::get("console-line"));
     window->title("Terminal");
@@ -20,14 +20,14 @@ int main(int argc, char **argv)
 
     window->root()->layout(VFLOW(0));
 
-    new TitleBar(window->root());
+    new Widget::TitleBar(window->root());
 
     auto widget = new TerminalWidget(window->root());
     widget->focus();
-    widget->flags(Component::FILL);
+    widget->flags(Widget::Component::FILL);
     widget->outsets({0, 6, 6, 6});
 
     window->show();
 
-    return Application::run();
+    return Widget::Application::run();
 }

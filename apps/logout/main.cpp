@@ -11,74 +11,74 @@
 
 int main(int argc, char **argv)
 {
-    Application::initialize(argc, argv);
+    Widget::Application::initialize(argc, argv);
 
-    Window *window = new Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC | WINDOW_NO_ROUNDED_CORNERS);
+    Widget::Window *window = new Widget::Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC | WINDOW_NO_ROUNDED_CORNERS);
 
     window->type(WINDOW_TYPE_POPOVER);
-    window->bound(Screen::bound());
+    window->bound(Widget::Screen::bound());
     window->opacity(0);
     window->root()->layout(STACK());
 
-    auto background = new Panel(window->root());
+    auto background = new Widget::Panel(window->root());
 
     background->layout(STACK());
-    background->color(THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
-    background->flags(Component::FILL);
+    background->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
+    background->flags(Widget::Component::FILL);
 
-    auto dialog = new Container(background);
+    auto dialog = new Widget::Container(background);
 
     dialog->min_width(256);
     dialog->min_height(256);
     dialog->layout(VFLOW(8));
 
-    auto icon_and_title_container = new Panel(dialog);
+    auto icon_and_title_container = new Widget::Panel(dialog);
     icon_and_title_container->layout(HFLOW(4));
     icon_and_title_container->border_radius(6);
     icon_and_title_container->insets(Insetsi{8});
 
-    auto title_icon = new IconPanel(icon_and_title_container, Graphic::Icon::get("power-standby"));
+    auto title_icon = new Widget::IconPanel(icon_and_title_container, Graphic::Icon::get("power-standby"));
     title_icon->icon_size(Graphic::ICON_36PX);
 
-    auto warning_container = new Container(icon_and_title_container);
-    warning_container->flags(Component::FILL);
+    auto warning_container = new Widget::Container(icon_and_title_container);
+    warning_container->flags(Widget::Component::FILL);
     warning_container->layout(VGRID(2));
 
-    new Label(warning_container, "Shutdown or restart your computer.", Anchor::BOTTOM_LEFT);
-    new Label(warning_container, "Any unsaved work will be lost!", Anchor::TOP_LEFT);
+    new Widget::Label(warning_container, "Shutdown or restart your computer.", Anchor::BOTTOM_LEFT);
+    new Widget::Label(warning_container, "Any unsaved work will be lost!", Anchor::TOP_LEFT);
 
-    new Spacer(dialog);
+    new Widget::Spacer(dialog);
 
-    auto shutdown_button = new Button(dialog, Button::TEXT, Graphic::Icon::get("power-standby"), "Shutdown");
+    auto shutdown_button = new Widget::Button(dialog, Widget::Button::TEXT, Graphic::Icon::get("power-standby"), "Shutdown");
 
-    shutdown_button->on(EventType::ACTION, [&](auto) {
+    shutdown_button->on(Widget::EventType::ACTION, [&](auto) {
         hj_system_shutdown();
     });
 
-    auto reboot_button = new Button(dialog, Button::TEXT, Graphic::Icon::get("restart"), "Reboot");
+    auto reboot_button = new Widget::Button(dialog, Widget::Button::TEXT, Graphic::Icon::get("restart"), "Reboot");
 
-    reboot_button->on(EventType::ACTION, [&](auto) {
+    reboot_button->on(Widget::EventType::ACTION, [&](auto) {
         hj_system_reboot();
     });
 
-    new Button(dialog, Button::TEXT, Graphic::Icon::get("logout"), "Logoff");
+    new Widget::Button(dialog, Widget::Button::TEXT, Graphic::Icon::get("logout"), "Logoff");
 
-    new Spacer(dialog);
+    new Widget::Spacer(dialog);
 
-    auto cancel_button = new Button(dialog, Button::FILLED, "Cancel");
+    auto cancel_button = new Widget::Button(dialog, Widget::Button::FILLED, "Cancel");
 
-    cancel_button->on(EventType::ACTION, [&](auto) {
+    cancel_button->on(Widget::EventType::ACTION, [&](auto) {
         window->hide();
     });
 
-    window->on(Event::KEYBOARD_KEY_PRESS, [&](Event *event) {
+    window->on(Widget::Event::KEYBOARD_KEY_PRESS, [&](Widget::Event *event) {
         if (event->keyboard.key == KEYBOARD_KEY_ESC)
         {
-            Application::exit(PROCESS_SUCCESS);
+            Widget::Application::exit(PROCESS_SUCCESS);
         }
     });
 
     window->show();
 
-    return Application::run();
+    return Widget::Application::run();
 }

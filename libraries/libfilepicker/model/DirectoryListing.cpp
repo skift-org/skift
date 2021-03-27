@@ -92,14 +92,14 @@ String DirectoryListing::header(int column)
     }
 }
 
-Variant DirectoryListing::data(int row, int column)
+Widget::Variant DirectoryListing::data(int row, int column)
 {
     auto &entry = _files[row];
 
     switch (column)
     {
     case COLUMN_NAME:
-        return Variant(entry.name.cstring()).with_icon(entry.icon);
+        return Widget::Variant(entry.name.cstring()).with_icon(entry.icon);
 
     case COLUMN_TYPE:
         switch (entry.type)
@@ -118,7 +118,7 @@ Variant DirectoryListing::data(int row, int column)
         }
 
     case COLUMN_SIZE:
-        return Variant((int)entry.size);
+        return Widget::Variant((int)entry.size);
 
     default:
         ASSERT_NOT_REACHED();

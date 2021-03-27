@@ -9,6 +9,9 @@
 #include <libwidget/Theme.h>
 #include <libwidget/Window.h>
 
+namespace Widget
+{
+
 void Component::id(String id)
 {
     _window->register_widget_by_id(id, this);
@@ -697,3 +700,5 @@ Vec2i Component::compute_size()
 
     return Vec2i(width, height);
 }
+
+} // namespace Widget

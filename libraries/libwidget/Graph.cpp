@@ -3,6 +3,9 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Graph.h>
 
+namespace Widget
+{
+
 Graph::Graph(Component *parent, size_t data_size, Graphic::Color data_color)
     : Component(parent)
 {
@@ -69,3 +72,5 @@ void Graph::record(float data)
 
     should_repaint();
 }
+
+} // namespace Widget

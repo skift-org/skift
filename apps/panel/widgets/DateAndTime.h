@@ -7,13 +7,13 @@
 namespace panel
 {
 
-class DateAndTime : public Button
+class DateAndTime : public Widget::Button
 {
 private:
     OwnPtr<Timer> _timer;
 
 public:
-    DateAndTime(Component *parent);
+    DateAndTime(Widget::Component *parent);
 };
 
 } // namespace panel

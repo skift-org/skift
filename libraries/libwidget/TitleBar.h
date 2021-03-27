@@ -2,6 +2,9 @@
 
 #include <libwidget/Component.h>
 
+namespace Widget
+{
+
 class TitleBar : public Component
 {
 private:
@@ -14,3 +17,5 @@ public:
 
     void event(Event *event) override;
 };
+
+} // namespace Widget

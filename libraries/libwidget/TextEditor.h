@@ -4,6 +4,9 @@
 #include <libwidget/ScrollBar.h>
 #include <libwidget/model/TextModel.h>
 
+namespace Widget
+{
+
 class TextEditor : public Component
 {
 private:
@@ -101,3 +104,5 @@ public:
 
     void do_layout() override;
 };
+
+} // namespace Widget

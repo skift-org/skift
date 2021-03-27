@@ -13,7 +13,7 @@
 #include <libfilepicker/widgets/ToolBar.h>
 
 class MainWindow :
-    public Window
+    public Widget::Window
 {
 private:
     RefPtr<FilePicker::Navigation> _navigation;
@@ -28,7 +28,7 @@ public:
     }
 
     MainWindow(RefPtr<FilePicker::Navigation> navigation, RefPtr<Archive> archive)
-        : Window(WINDOW_RESIZABLE), _navigation(navigation), _archive(archive)
+        : Widget::Window(WINDOW_RESIZABLE), _navigation(navigation), _archive(archive)
     {
         icon(Graphic::Icon::get("folder-zip"));
         title("Archive Manager");
@@ -42,18 +42,18 @@ public:
         root()->clear_children();
         root()->layout(VFLOW(0));
 
-        new TitleBar(root());
+        new Widget::TitleBar(root());
 
-        auto browser = new Container(root());
+        auto browser = new Widget::Container(root());
 
-        browser->flags(Component::FILL);
+        browser->flags(Widget::Component::FILL);
 
         if (!_archive)
         {
             browser->layout(STACK());
-            auto load_button = new Button(browser, Button::FILLED, Graphic::Icon::get("folder-open"), "Load an archive file");
-            load_button->on(Event::ACTION, [&](auto) {
-                if (_dialog.show() == DialogResult::OK)
+            auto load_button = new Widget::Button(browser, Widget::Button::FILLED, Graphic::Icon::get("folder-open"), "Load an archive file");
+            load_button->on(Widget::Event::ACTION, [&](auto) {
+                if (_dialog.show() == Widget::DialogResult::OK)
                 {
                     set_archive(Archive::open(Path::parse(*_dialog.selected_file())));
                 }
@@ -63,19 +63,19 @@ public:
         {
             browser->layout(VFLOW(0));
 
-            auto toolbar = new Panel(browser);
+            auto toolbar = new Widget::Panel(browser);
             toolbar->layout(HFLOW(4));
             toolbar->insets(Insetsi(4, 4));
             toolbar->max_height(38);
             toolbar->min_height(38);
 
-            new Button(toolbar, Button::TEXT, Graphic::Icon::get("archive-arrow-up"), "Extract All");
+            new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("archive-arrow-up"), "Extract All");
 
-            new Separator(toolbar);
+            new Widget::Separator(toolbar);
 
-            auto load_button = new Button(toolbar, Button::TEXT, Graphic::Icon::get("folder-open"));
-            load_button->on(Event::ACTION, [&](auto) {
-                if (_dialog.show() == DialogResult::OK)
+            auto load_button = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
+            load_button->on(Widget::Event::ACTION, [&](auto) {
+                if (_dialog.show() == Widget::DialogResult::OK)
                 {
                     set_archive(Archive::open(Path::parse(*_dialog.selected_file())));
                 }

@@ -7,14 +7,14 @@
 namespace panel
 {
 
-class RessourceMonitor : public Button
+class RessourceMonitor : public Widget::Button
 {
 private:
     OwnPtr<Timer> _ram_timer;
     OwnPtr<Timer> _cpu_timer;
 
 public:
-    RessourceMonitor(Component *parent);
+    RessourceMonitor(Widget::Component *parent);
 };
 
 } // namespace panel

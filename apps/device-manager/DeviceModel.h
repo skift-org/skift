@@ -3,7 +3,7 @@
 #include <libutils/json/Json.h>
 #include <libwidget/model/TableModel.h>
 
-class DeviceModel : public TableModel
+class DeviceModel : public Widget::TableModel
 {
 private:
     Json::Value _data = nullptr;
@@ -15,7 +15,7 @@ public:
 
     String header(int column) override;
 
-    Variant data(int row, int column) override;
+    Widget::Variant data(int row, int column) override;
 
     void update() override;
 };

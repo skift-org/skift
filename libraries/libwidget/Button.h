@@ -3,6 +3,9 @@
 #include <libgraphic/Icon.h>
 #include <libwidget/Component.h>
 
+namespace Widget
+{
+
 class Button : public Component
 {
 public:
@@ -34,3 +37,5 @@ public:
 
     void event(Event *event) override;
 };
+
+} // namespace Widget

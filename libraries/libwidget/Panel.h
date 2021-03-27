@@ -2,6 +2,9 @@
 
 #include <libwidget/Component.h>
 
+namespace Widget
+{
+
 class Panel : public Component
 {
 private:
@@ -14,3 +17,5 @@ public:
 
     void paint(Graphic::Painter &painter, const Recti &) override;
 };
+
+} // namespace Widget

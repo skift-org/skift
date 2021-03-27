@@ -21,7 +21,7 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
     auto cover = new Cover(root(), Graphic::Bitmap::load_from_or_placeholder("/Applications/media-player/cover.png"));
 
     cover->layout(VFLOW(0));
-    cover->flags(Widget::FILL);
+    cover->flags(Component::FILL);
 
     new TitleBar(cover);
     new Spacer(cover);

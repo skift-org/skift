@@ -1,7 +1,7 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Separator.h>
 
-Separator::Separator(Widget *parent) : Widget(parent)
+Separator::Separator(Component *parent) : Component(parent)
 {
 }
 

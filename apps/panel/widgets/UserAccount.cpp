@@ -5,7 +5,7 @@
 namespace panel
 {
 
-UserAccount::UserAccount(Widget *parent) : Label(parent, "")
+UserAccount::UserAccount(Component *parent) : Label(parent, "")
 {
     text(environment().get("POSIX").get("LOGNAME").as_string());
 }

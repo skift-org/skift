@@ -1,8 +1,8 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Panel.h>
 
-Panel::Panel(Widget *parent)
-    : Widget(parent)
+Panel::Panel(Component *parent)
+    : Component(parent)
 {
 }
 

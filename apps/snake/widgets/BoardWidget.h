@@ -2,22 +2,22 @@
 
 #include <libgraphic/Painter.h>
 #include <libsystem/eventloop/Timer.h>
-#include <libwidget/Widget.h>
+#include <libwidget/Component.h>
 
 #include "snake/model/Board.h"
 
 namespace Snake
 {
 
-struct BoardWidget : public Widget
+struct BoardWidget : public Component
 {
     static constexpr auto CELL_SIZE = 32;
 
     RefPtr<Board> board;
     OwnPtr<Timer> _timer;
 
-    BoardWidget(Widget *parent)
-        : Widget(parent)
+    BoardWidget(Component *parent)
+        : Component(parent)
     {
         board = make<Board>(15, 15);
 

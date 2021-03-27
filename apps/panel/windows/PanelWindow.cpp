@@ -31,7 +31,7 @@ PanelWindow::PanelWindow()
     root()->layout(VFLOW(0));
 
     auto container = new Container(root());
-    container->flags(Widget::FILL);
+    container->flags(Component::FILL);
     container->layout(HFLOW(8));
     container->insets(Insetsi(4));
 

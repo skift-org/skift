@@ -52,7 +52,7 @@ struct Layout
 #define HFLOW(_hspacing) \
     (Layout{Layout::HFLOW, 0, 0, Vec2i((_hspacing), 0)})
 
-class Widget
+class Component
 {
 private:
     bool _enabled = true;
@@ -77,13 +77,13 @@ private:
 
     EventHandler _handlers[EventType::__COUNT] = {};
 
-    Widget *_parent = {};
+    Component *_parent = {};
     Window *_window = {};
 
-    Vector<Widget *> _childs = {};
+    Vector<Component *> _childs = {};
 
-    __noncopyable(Widget);
-    __nonmovable(Widget);
+    __noncopyable(Component);
+    __nonmovable(Component);
 
 public:
     static constexpr auto FILL = (1 << 0);
@@ -161,9 +161,9 @@ public:
 
     /* --- subclass API ----------------------------------------------------- */
 
-    Widget(Widget *parent);
+    Component(Component *parent);
 
-    virtual ~Widget();
+    virtual ~Component();
 
     virtual void paint(Graphic::Painter &, const Recti &) {}
 
@@ -255,11 +255,11 @@ public:
 
     /* --- Childs ----------------------------------------------------------- */
 
-    Widget *child_at(Vec2i position);
+    Component *child_at(Vec2i position);
 
-    void add_child(Widget *child);
+    void add_child(Component *child);
 
-    void remove_child(Widget *child);
+    void remove_child(Component *child);
 
     void clear_children();
 

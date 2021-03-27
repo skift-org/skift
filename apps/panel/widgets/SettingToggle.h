@@ -18,7 +18,7 @@ private:
     bool _enabled;
 
 public:
-    SettingToggle(Widget *parent, String name, RefPtr<Graphic::Icon> icon, const char *setting)
+    SettingToggle(Component *parent, String name, RefPtr<Graphic::Icon> icon, const char *setting)
         : Button(parent, Button::TEXT),
           _name(name),
           _icon(icon)
@@ -45,7 +45,7 @@ public:
         icon->insets(Insetsi(0, 0, 0, 4));
 
         auto label = new Label(this, _name);
-        label->flags(Widget::FILL);
+        label->flags(Component::FILL);
 
         auto sw = new Switch(this);
         sw->state(_enabled);

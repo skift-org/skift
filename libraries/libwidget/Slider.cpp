@@ -42,7 +42,7 @@ void Slider::slide_to(Vec2i position)
     should_relayout();
 }
 
-Slider::Slider(Widget *parent) : Widget(parent)
+Slider::Slider(Component *parent) : Component(parent)
 {
     min_width(160);
 }

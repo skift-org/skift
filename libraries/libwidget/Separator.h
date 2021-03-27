@@ -1,10 +1,10 @@
 #pragma once
 
-#include <libwidget/Widget.h>
+#include <libwidget/Component.h>
 
-struct Separator : public Widget
+struct Separator : public Component
 {
-    Separator(Widget *parent);
+    Separator(Component *parent);
 
     void paint(Graphic::Painter &, const Recti &) override;
 

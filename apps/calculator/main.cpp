@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     // Calculator screen
     auto screen_container = new Panel(window->root());
     auto screen_label = new Label(screen_container, "#value", Anchor::CENTER);
-    screen_label->flags(Widget::FILL);
+    screen_label->flags(Component::FILL);
     screen_label->outsets(16);
     auto calculator_observer = calculator.observe([&](Calculator &calculator) {
         screen_label->text(IO::format("{}", calculator.screen()));

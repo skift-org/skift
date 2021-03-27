@@ -2,7 +2,7 @@
 #include <libwidget/Event.h>
 #include <libwidget/ScrollBar.h>
 
-ScrollBar::ScrollBar(Widget *parent) : Widget(parent)
+ScrollBar::ScrollBar(Component *parent) : Component(parent)
 {
     _track = 1024;
     _value = 0;

@@ -1,3 +1,3 @@
 #include <libwidget/Container.h>
 
-Container::Container(Widget *parent) : Widget(parent){};
+Container::Container(Component *parent) : Component(parent){};

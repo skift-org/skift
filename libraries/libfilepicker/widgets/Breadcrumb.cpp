@@ -10,8 +10,8 @@
 namespace FilePicker
 {
 
-Breadcrumb::Breadcrumb(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
-    : Widget(parent),
+Breadcrumb::Breadcrumb(Component *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
+    : Component(parent),
       _navigation(navigation),
       _bookmarks(bookmarks)
 {

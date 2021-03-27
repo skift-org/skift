@@ -5,9 +5,9 @@
 #include <libsystem/eventloop/Invoker.h>
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
+#include <libwidget/Component.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
-#include <libwidget/Widget.h>
 
 #include "compositor/Protocol.h"
 
@@ -51,13 +51,13 @@ private:
 
     EventHandler _handlers[EventType::__COUNT];
 
-    Widget *_root;
+    Component *_root;
 
-    Widget *_keyboard_focus = nullptr;
-    Widget *_mouse_focus = nullptr;
-    Widget *_mouse_over = nullptr;
+    Component *_keyboard_focus = nullptr;
+    Component *_mouse_focus = nullptr;
+    Component *_mouse_over = nullptr;
 
-    HashMap<String, Widget *> _widget_by_id{};
+    HashMap<String, Component *> _widget_by_id{};
 
     OwnPtr<Invoker> _repaint_invoker;
     OwnPtr<Invoker> _relayout_invoker;
@@ -150,15 +150,15 @@ public:
 
     /* --- Childs ----------------------------------------------------------- */
 
-    Widget *root() { return _root; }
+    Component *root() { return _root; }
 
-    void focus_widget(Widget *widget);
+    void focus_widget(Component *widget);
 
-    void widget_removed(Widget *widget);
+    void widget_removed(Component *widget);
 
-    void register_widget_by_id(String id, Widget *widget);
+    void register_widget_by_id(String id, Component *widget);
 
-    Widget *child_at(Vec2i position);
+    Component *child_at(Vec2i position);
 
     template <typename WidgetType, typename CallbackType>
     void with_widget(String name, CallbackType callback)
@@ -176,7 +176,7 @@ public:
 
     /* --- Focus ------------------------------------------------------------ */
 
-    bool has_keyboard_focus(Widget *widget);
+    bool has_keyboard_focus(Component *widget);
 
     /* --- Layout ----------------------------------------------------------- */
 

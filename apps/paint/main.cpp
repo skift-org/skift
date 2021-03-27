@@ -38,20 +38,20 @@ private:
     RefPtr<PaintDocument> _document;
 
     /// --- Toolbar --- ///
-    Widget *_open_document;
-    Widget *_save_document;
-    Widget *_new_document;
+    Component *_open_document;
+    Component *_save_document;
+    Component *_new_document;
 
-    Widget *_pencil;
-    Widget *_brush;
-    Widget *_eraser;
-    Widget *_fill;
-    Widget *_picker;
+    Component *_pencil;
+    Component *_brush;
+    Component *_eraser;
+    Component *_fill;
+    Component *_picker;
 
-    Widget *_insert_text;
-    Widget *_insert_line;
-    Widget *_insert_rectangle;
-    Widget *_insert_circle;
+    Component *_insert_text;
+    Component *_insert_line;
+    Component *_insert_rectangle;
+    Component *_insert_circle;
 
     Panel *_primary_color;
     Panel *_secondary_color;
@@ -75,7 +75,7 @@ public:
         create_toolbar(root());
 
         _canvas = new PaintCanvas(root(), document);
-        _canvas->flags(Widget::FILL);
+        _canvas->flags(Component::FILL);
 
         create_color_palette(root());
 
@@ -84,7 +84,7 @@ public:
         };
     }
 
-    void create_toolbar(Widget *parent)
+    void create_toolbar(Component *parent)
     {
         auto toolbar = new Panel(parent);
 
@@ -139,24 +139,24 @@ public:
 
         new Separator(toolbar);
 
-        Widget *primary_color_container = new Container(toolbar);
+        Component *primary_color_container = new Container(toolbar);
         primary_color_container->insets(Insetsi(4));
-        primary_color_container->flags(Widget::SQUARE);
+        primary_color_container->flags(Component::SQUARE);
 
         _primary_color = new Panel(primary_color_container);
         _primary_color->border_radius(4);
         _primary_color->color(THEME_MIDDLEGROUND, _document->primary_color());
 
-        Widget *secondary_color_container = new Container(toolbar);
+        Component *secondary_color_container = new Container(toolbar);
         secondary_color_container->insets(Insetsi(4));
-        secondary_color_container->flags(Widget::SQUARE);
+        secondary_color_container->flags(Component::SQUARE);
 
         _secondary_color = new Panel(secondary_color_container);
         _secondary_color->border_radius(4);
         _secondary_color->color(THEME_MIDDLEGROUND, _document->secondary_color());
     }
 
-    void create_color_palette(Widget *parent)
+    void create_color_palette(Component *parent)
     {
         auto palette = new Panel(parent);
 

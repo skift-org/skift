@@ -1,9 +1,9 @@
 #pragma once
 
-#include <libwidget/Widget.h>
+#include <libwidget/Component.h>
 #include <libwidget/model/TextModel.h>
 
-class TextField : public Widget
+class TextField : public Component
 {
 private:
     RefPtr<TextModel> _model;
@@ -13,7 +13,7 @@ private:
     int _hscroll_offset = 0;
 
 public:
-    TextField(Widget *parent, RefPtr<TextModel> model);
+    TextField(Component *parent, RefPtr<TextModel> model);
 
     ~TextField() override;
 

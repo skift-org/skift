@@ -61,7 +61,7 @@ static const Vector<Page> PAGES = {
     },
 };
 
-void pages(Widget *host, const Page &page)
+void pages(Component *host, const Page &page)
 {
     new Label(host, page.header, Anchor::CENTER);
 
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
 
     background->layout(STACK());
     background->color(THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
-    background->flags(Widget::FILL);
+    background->flags(Component::FILL);
 
     auto dialog = new Panel(background);
 
@@ -110,11 +110,11 @@ int main(int argc, char **argv)
     illustration->color(THEME_MIDDLEGROUND, Graphic::Colors::WHITE);
 
     auto image = new Image(illustration, Graphic::Bitmap::placeholder());
-    image->flags(Widget::FILL);
+    image->flags(Component::FILL);
     image->scaling(Graphic::BitmapScaling::CENTER);
 
     auto content = new Container(dialog);
-    content->flags(Widget::FILL);
+    content->flags(Component::FILL);
     content->insets(16);
     content->layout(VFLOW(4));
 

@@ -105,8 +105,8 @@ void Table::paint_cell(Graphic::Painter &painter, int row, int column)
     painter.pop();
 }
 
-Table::Table(Widget *parent)
-    : Widget(parent)
+Table::Table(Component *parent)
+    : Component(parent)
 {
     _scrollbar = new ScrollBar(this);
 
@@ -116,7 +116,7 @@ Table::Table(Widget *parent)
     });
 }
 
-Table::Table(Widget *parent, RefPtr<TableModel> model)
+Table::Table(Component *parent, RefPtr<TableModel> model)
     : Table(parent)
 {
     this->model(model);

@@ -1,15 +1,15 @@
 #pragma once
 
-#include <libwidget/Widget.h>
+#include <libwidget/Component.h>
 
-class Placeholder : public Widget
+class Placeholder : public Component
 {
 private:
     String _text;
     RefPtr<Graphic::Icon> _alert_icon;
 
 public:
-    Placeholder(Widget *parent, String text);
+    Placeholder(Component *parent, String text);
 
     void paint(Graphic::Painter &, const Recti &) override;
 };

@@ -6,7 +6,7 @@
 namespace panel
 {
 
-SearchBar::SearchBar(Widget *parent, RefPtr<TextModel> model) : Panel(parent)
+SearchBar::SearchBar(Component *parent, RefPtr<TextModel> model) : Panel(parent)
 {
     layout(HFLOW(4));
     insets({6});
@@ -19,7 +19,7 @@ SearchBar::SearchBar(Widget *parent, RefPtr<TextModel> model) : Panel(parent)
     icon->color(THEME_FOREGROUND, Graphic::Colors::BLACK);
 
     auto field = new TextField(this, model);
-    field->flags(Widget::FILL);
+    field->flags(Component::FILL);
     field->color(THEME_FOREGROUND, Graphic::Colors::BLACK);
     field->focus();
 }

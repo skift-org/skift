@@ -1,8 +1,8 @@
 #pragma once
 
-#include <libwidget/Widget.h>
+#include <libwidget/Component.h>
 
-class PaginationDots : public Widget
+class PaginationDots : public Component
 {
 private:
     int _count = 3;
@@ -30,7 +30,7 @@ public:
         _index = index;
     }
 
-    PaginationDots(Widget *parent, int count);
+    PaginationDots(Component *parent, int count);
 
     ~PaginationDots() override;
 

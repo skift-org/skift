@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libwidget/Widget.h>
+#include <libwidget/Component.h>
 
-struct Spacer : public Widget
+struct Spacer : public Component
 {
-    Spacer(Widget *parent) : Widget(parent)
+    Spacer(Component *parent) : Component(parent)
     {
-        flags(Widget::FILL | Widget::NO_MOUSE_HIT);
+        flags(Component::FILL | Component::NO_MOUSE_HIT);
     }
 };

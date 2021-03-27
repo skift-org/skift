@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 
     background->layout(STACK());
     background->color(THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
-    background->flags(Widget::FILL);
+    background->flags(Component::FILL);
 
     auto dialog = new Container(background);
 
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     title_icon->icon_size(Graphic::ICON_36PX);
 
     auto warning_container = new Container(icon_and_title_container);
-    warning_container->flags(Widget::FILL);
+    warning_container->flags(Component::FILL);
     warning_container->layout(VGRID(2));
 
     new Label(warning_container, "Shutdown or restart your computer.", Anchor::BOTTOM_LEFT);

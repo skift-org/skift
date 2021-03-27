@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     }
 
     auto field = new TextEditor(window->root(), model);
-    field->flags(Widget::FILL);
+    field->flags(Component::FILL);
     field->overscroll(true);
     field->insets({4});
     field->focus();

@@ -1,17 +1,17 @@
 #pragma once
 
-#include <libwidget/Widget.h>
+#include <libwidget/Component.h>
 
-class Image : public Widget
+class Image : public Component
 {
 private:
     RefPtr<Graphic::Bitmap> _bitmap;
     Graphic::BitmapScaling _scaling = Graphic::BitmapScaling::FIT;
 
 public:
-    Image(Widget *parent, RefPtr<Graphic::Bitmap> bitmap);
+    Image(Component *parent, RefPtr<Graphic::Bitmap> bitmap);
 
-    Image(Widget *parent, RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling);
+    Image(Component *parent, RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling);
 
     void change_bitmap(RefPtr<Graphic::Bitmap> bitmap);
 

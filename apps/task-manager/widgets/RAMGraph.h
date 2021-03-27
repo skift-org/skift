@@ -23,7 +23,7 @@ private:
     OwnPtr<Timer> _text_timer{};
 
 public:
-    RAMGraph(Widget *parent, RefPtr<TaskModel> model);
+    RAMGraph(Component *parent, RefPtr<TaskModel> model);
 };
 
 } // namespace task_manager

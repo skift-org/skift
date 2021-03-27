@@ -2,7 +2,7 @@
 
 #include <libsystem/eventloop/Timer.h>
 #include <libwidget/Application.h>
-#include <libwidget/Widget.h>
+#include <libwidget/Component.h>
 
 void colors_draw(Graphic::Painter &painter, Recti screen, float time);
 

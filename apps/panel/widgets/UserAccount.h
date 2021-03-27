@@ -8,7 +8,7 @@ namespace panel
 class UserAccount : public Label
 {
 public:
-    UserAccount(Widget *parent);
+    UserAccount(Component *parent);
 };
 
 } // namespace panel

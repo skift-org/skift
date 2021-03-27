@@ -2,8 +2,8 @@
 #include <libwidget/TextEditor.h>
 #include <libwidget/Window.h>
 
-TextEditor::TextEditor(Widget *parent, RefPtr<TextModel> model)
-    : Widget(parent),
+TextEditor::TextEditor(Component *parent, RefPtr<TextModel> model)
+    : Component(parent),
       _model(model)
 {
     _vscrollbar = new ScrollBar(this);

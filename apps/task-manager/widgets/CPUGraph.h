@@ -23,7 +23,7 @@ private:
     OwnPtr<Timer> _text_timer{};
 
 public:
-    CPUGraph(Widget *parent, RefPtr<TaskModel> model);
+    CPUGraph(Component *parent, RefPtr<TaskModel> model);
 };
 
 } // namespace task_manager

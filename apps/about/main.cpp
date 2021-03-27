@@ -27,7 +27,7 @@ void show_license()
     new TitleBar(license_window->root());
 
     auto field = new TextEditor(license_window->root(), TextModel::from_file("/Files/license.md"));
-    field->flags(Widget::FILL);
+    field->flags(Component::FILL);
     field->readonly(true);
     field->font(Graphic::Font::get("mono").take_value());
     field->focus();

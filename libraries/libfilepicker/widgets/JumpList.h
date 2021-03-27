@@ -22,7 +22,7 @@ private:
     VScroll *_listing;
 
 public:
-    JumpList(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
+    JumpList(Component *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
         : Panel(parent),
           _navigation(navigation),
           _bookmarks(bookmarks)
@@ -37,7 +37,7 @@ public:
         new Label(this, "Bookmarks");
 
         _listing = new VScroll(this);
-        _listing->flags(Widget::FILL);
+        _listing->flags(Component::FILL);
 
         render();
     }

@@ -8,7 +8,7 @@ namespace Settings
 class HomePage : public Container
 {
 public:
-    HomePage(Widget *parent);
+    HomePage(Component *parent);
 };
 
 } // namespace Settings

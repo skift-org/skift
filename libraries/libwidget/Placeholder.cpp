@@ -6,8 +6,8 @@
 #include <libwidget/Placeholder.h>
 #include <libwidget/Window.h>
 
-Placeholder::Placeholder(Widget *parent, String text)
-    : Widget(parent),
+Placeholder::Placeholder(Component *parent, String text)
+    : Component(parent),
       _alert_icon(Graphic::Icon::get("alert"))
 {
     _text = IO::format("Cannot create an instance of \"{}\".", text);

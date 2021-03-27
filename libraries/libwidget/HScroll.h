@@ -1,10 +1,10 @@
 #pragma once
 
+#include <libwidget/Component.h>
 #include <libwidget/Container.h>
 #include <libwidget/ScrollBar.h>
-#include <libwidget/Widget.h>
 
-class HScroll : public Widget
+class HScroll : public Component
 {
 private:
     Container *_host = nullptr;
@@ -13,12 +13,12 @@ private:
 public:
     Container *host() { return _host; }
 
-    HScroll(Widget *parent) : Widget(parent)
+    HScroll(Component *parent) : Component(parent)
     {
         _host = new Container(this);
 
         _scrollbar = new ScrollBar(this);
-        _scrollbar->flags(Widget::NOT_AFFECTED_BY_SCROLL);
+        _scrollbar->flags(Component::NOT_AFFECTED_BY_SCROLL);
 
         _scrollbar->on(Event::VALUE_CHANGE, [this](auto) {
             scroll({_scrollbar->value(), scroll().y()});

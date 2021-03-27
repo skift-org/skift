@@ -5,8 +5,8 @@
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/eventloop/Timer.h>
 #include <libterminal/Terminal.h>
-#include <libwidget/Widget.h>
-class TerminalWidget : public Widget
+#include <libwidget/Component.h>
+class TerminalWidget : public Component
 {
 private:
     OwnPtr<Terminal::Terminal> _terminal;
@@ -20,7 +20,7 @@ private:
 public:
     void blink() { _cursor_blink = !_cursor_blink; };
 
-    TerminalWidget(Widget *parent);
+    TerminalWidget(Component *parent);
 
     void handle_read();
 

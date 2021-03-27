@@ -12,7 +12,7 @@
 class DeviceManagerWindow : public Window
 {
 private:
-    Widget *_table;
+    Component *_table;
 
 public:
     DeviceManagerWindow() : Window(WINDOW_RESIZABLE)
@@ -30,7 +30,7 @@ public:
         model->update();
 
         _table = new Table(root(), model);
-        _table->flags(Widget::FILL);
+        _table->flags(Component::FILL);
     }
 };
 

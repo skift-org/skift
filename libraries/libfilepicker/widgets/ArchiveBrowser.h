@@ -19,13 +19,13 @@ private:
     OwnPtr<Observer<Navigation>> _navigation_observer;
 
 public:
-    ArchiveBrowser(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Archive> archive)
+    ArchiveBrowser(Component *parent, RefPtr<Navigation> navigation, RefPtr<Archive> archive)
         : Table(parent), _navigation(navigation), _archive(archive)
     {
         _listing = make<ArchiveListing>(navigation, archive);
         model(_listing);
 
-        flags(Widget::FILL);
+        flags(Component::FILL);
 
         empty_message("This archive is empty.");
 

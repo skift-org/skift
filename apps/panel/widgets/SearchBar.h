@@ -10,7 +10,7 @@ namespace panel
 class SearchBar : public Panel
 {
 public:
-    SearchBar(Widget *parent, RefPtr<TextModel> model);
+    SearchBar(Component *parent, RefPtr<TextModel> model);
 };
 
 } // namespace panel

@@ -81,7 +81,7 @@ public:
 
     virtual void render(Window *) {}
 
-    void create_buttons(Widget *parent)
+    void create_buttons(Component *parent)
     {
         if (_buttons & DialogButton::YES)
         {

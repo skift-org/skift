@@ -1,8 +1,8 @@
 #pragma once
 
-#include <libwidget/Widget.h>
+#include <libwidget/Component.h>
 
-class Graph : public Widget
+class Graph : public Component
 {
 private:
     Graphic::Color _color;
@@ -11,7 +11,7 @@ private:
     size_t _current;
 
 public:
-    Graph(Widget *parent, size_t data_size, Graphic::Color data_color);
+    Graph(Component *parent, size_t data_size, Graphic::Color data_color);
 
     ~Graph();
 

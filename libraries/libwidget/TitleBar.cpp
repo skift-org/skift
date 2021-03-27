@@ -5,7 +5,7 @@
 #include <libwidget/TitleBar.h>
 #include <libwidget/Window.h>
 
-TitleBar::TitleBar(Widget *parent) : Widget(parent)
+TitleBar::TitleBar(Component *parent) : Component(parent)
 {
     max_height(36);
 
@@ -22,17 +22,17 @@ TitleBar::TitleBar(Widget *parent) : Widget(parent)
 
     if (window()->flags() & WINDOW_RESIZABLE)
     {
-        Widget *button_minimize = new Button(this, Button::TEXT, Graphic::Icon::get("window-minimize"));
+        Component *button_minimize = new Button(this, Button::TEXT, Graphic::Icon::get("window-minimize"));
         button_minimize->insets(3);
 
-        Widget *button_maximize = new Button(this, Button::TEXT, Graphic::Icon::get("window-maximize"));
+        Component *button_maximize = new Button(this, Button::TEXT, Graphic::Icon::get("window-maximize"));
         button_maximize->insets(3);
         button_maximize->on(Event::ACTION, [this](auto) {
             window()->toggle_maximise();
         });
     }
 
-    Widget *close_button = new Button(this, Button::TEXT, Graphic::Icon::get("window-close"));
+    Component *close_button = new Button(this, Button::TEXT, Graphic::Icon::get("window-close"));
     close_button->insets(3);
 
     close_button->on(Event::ACTION, [this](auto) {

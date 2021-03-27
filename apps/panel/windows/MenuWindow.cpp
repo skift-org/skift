@@ -32,7 +32,7 @@ MenuWindow::MenuWindow()
 
     auto container = new Container(root());
     container->layout(VFLOW(0));
-    container->flags(Widget::FILL);
+    container->flags(Component::FILL);
 
     new Separator(root());
 

@@ -2,8 +2,8 @@
 
 #include <libgraphic/Painter.h>
 
-PaginationDots::PaginationDots(Widget *parent, int count)
-    : Widget(parent),
+PaginationDots::PaginationDots(Component *parent, int count)
+    : Component(parent),
       _count(count)
 {
     max_height(DOTSIZE);

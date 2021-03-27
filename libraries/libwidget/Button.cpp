@@ -73,23 +73,23 @@ void Button::event(Event *event)
     }
 }
 
-Button::Button(Widget *parent, Style style)
-    : Widget(parent),
+Button::Button(Component *parent, Style style)
+    : Component(parent),
       _style(style)
 {
     layout(HFLOW(0));
     insets(Insetsi(0, 6));
     min_height(32);
-    flags(Widget::GREEDY);
+    flags(Component::GREEDY);
 }
 
-Button::Button(Widget *parent, Style style, RefPtr<Graphic::Icon> icon)
+Button::Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon)
     : Button(parent, style)
 {
     layout(STACK());
     insets(Insetsi(6));
     min_width(32);
-    flags(Widget::GREEDY | Widget::SQUARE);
+    flags(Component::GREEDY | Component::SQUARE);
 
     auto icon_panel = new IconPanel(this, icon);
 
@@ -99,7 +99,7 @@ Button::Button(Widget *parent, Style style, RefPtr<Graphic::Icon> icon)
     }
 }
 
-Button::Button(Widget *parent, Style style, String text)
+Button::Button(Component *parent, Style style, String text)
     : Button(parent, style)
 {
     layout(STACK());
@@ -113,7 +113,7 @@ Button::Button(Widget *parent, Style style, String text)
     }
 }
 
-Button::Button(Widget *parent, Style style, RefPtr<Graphic::Icon> icon, String text)
+Button::Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon, String text)
     : Button(parent, style)
 {
     insets(Insetsi(0, 0, 6, 10));
@@ -131,7 +131,7 @@ Button::Button(Widget *parent, Style style, RefPtr<Graphic::Icon> icon, String t
     }
 }
 
-Button::Button(Widget *parent, Style style, RefPtr<Graphic::Bitmap> image, String text)
+Button::Button(Component *parent, Style style, RefPtr<Graphic::Bitmap> image, String text)
     : Button(parent, style)
 {
     insets(Insetsi(4, 4, 6, 10));

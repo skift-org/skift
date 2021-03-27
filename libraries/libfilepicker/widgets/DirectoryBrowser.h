@@ -25,13 +25,13 @@ public:
 
     Callback<void(String &path)> on_element_selected;
 
-    DirectoryBrowser(Widget *parent, RefPtr<Navigation> navigation)
+    DirectoryBrowser(Component *parent, RefPtr<Navigation> navigation)
         : Table(parent), _navigation(navigation)
     {
         _listing = make<DirectoryListing>(navigation);
         model(_listing);
 
-        flags(Widget::FILL);
+        flags(Component::FILL);
 
         empty_message("This directory is empty.");
 

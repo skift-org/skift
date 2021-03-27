@@ -8,7 +8,7 @@
 namespace panel
 {
 
-DateAndTime::DateAndTime(Widget *parent) : Button(parent, Button::TEXT)
+DateAndTime::DateAndTime(Component *parent) : Button(parent, Button::TEXT)
 {
     auto label = new Label(this, "");
 

@@ -10,7 +10,7 @@
 
 #define TERMINAL_IO_BUFFER_SIZE 4096
 
-TerminalWidget::TerminalWidget(Widget *parent) : Widget(parent)
+TerminalWidget::TerminalWidget(Component *parent) : Component(parent)
 {
     _terminal = own<Terminal::Terminal>(80, 24);
 

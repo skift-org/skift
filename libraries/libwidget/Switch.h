@@ -1,11 +1,11 @@
 #pragma once
 
 #include <libgraphic/Painter.h>
+#include <libwidget/Component.h>
 #include <libwidget/Container.h>
 #include <libwidget/Label.h>
-#include <libwidget/Widget.h>
 
-class Switch : public Widget
+class Switch : public Component
 {
 private:
     bool _state;
@@ -25,7 +25,7 @@ public:
         should_repaint();
     }
 
-    Switch(Widget *parent) : Widget(parent)
+    Switch(Component *parent) : Component(parent)
     {
         pin_width(WIDTH);
         pin_height(HEIGHT);

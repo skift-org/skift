@@ -3,8 +3,8 @@
 #include "paint/PaintCanvas.h"
 #include "paint/PaintTool.h"
 
-PaintCanvas::PaintCanvas(Widget *parent, RefPtr<PaintDocument> document)
-    : Widget(parent), _document(document)
+PaintCanvas::PaintCanvas(Component *parent, RefPtr<PaintDocument> document)
+    : Component(parent), _document(document)
 {
 }
 

@@ -4,17 +4,17 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/math/MinMax.h>
 #include <libwidget/Application.h>
+#include <libwidget/Component.h>
 #include <libwidget/Event.h>
 #include <libwidget/Theme.h>
-#include <libwidget/Widget.h>
 #include <libwidget/Window.h>
 
-void Widget::id(String id)
+void Component::id(String id)
 {
     _window->register_widget_by_id(id, this);
 }
 
-Graphic::Color Widget::color(ThemeColorRole role)
+Graphic::Color Component::color(ThemeColorRole role)
 {
     if (!enabled() || (_parent && !_parent->enabled()))
     {
@@ -42,26 +42,26 @@ Graphic::Color Widget::color(ThemeColorRole role)
     return _window->color(role);
 }
 
-void Widget::color(ThemeColorRole role, Graphic::Color color)
+void Component::color(ThemeColorRole role, Graphic::Color color)
 {
     _colors[role] = color;
 
     should_repaint();
 }
 
-CursorState Widget::cursor()
+CursorState Component::cursor()
 {
     return _cursor;
 }
 
-void Widget::cursor(CursorState cursor)
+void Component::cursor(CursorState cursor)
 {
     _cursor = cursor;
 
     window()->cursor(cursor);
 }
 
-Widget::Widget(Widget *parent)
+Component::Component(Component *parent)
 {
     _enabled = true;
     _container = Recti(32, 32);
@@ -73,7 +73,7 @@ Widget::Widget(Widget *parent)
     }
 }
 
-Widget::~Widget()
+Component::~Component()
 {
     clear_children();
 
@@ -90,14 +90,14 @@ Widget::~Widget()
     }
 }
 
-void Widget::do_layout()
+void Component::do_layout()
 {
     switch (_layout.type)
     {
 
     case Layout::STACK:
     {
-        _childs.foreach ([this](Widget *child) {
+        _childs.foreach ([this](Component *child) {
             if (child->flags() & FILL)
             {
                 auto bound = content();
@@ -187,7 +187,7 @@ void Widget::do_layout()
         int fill_child_count = 0;
 
         _childs.foreach ([&](auto child) {
-            if (child->flags() & Widget::FILL)
+            if (child->flags() & Component::FILL)
             {
                 fill_child_count++;
             }
@@ -195,7 +195,7 @@ void Widget::do_layout()
             {
                 fixed_child_count++;
 
-                if (child->flags() & Widget::SQUARE)
+                if (child->flags() & Component::SQUARE)
                 {
                     fixed_child_total_width += content().height();
                 }
@@ -219,7 +219,7 @@ void Widget::do_layout()
         int current = content().x();
 
         _childs.foreach ([&](auto child) {
-            if (child->flags() & Widget::FILL)
+            if (child->flags() & Component::FILL)
             {
                 child->container(Recti(
                     current,
@@ -231,7 +231,7 @@ void Widget::do_layout()
             }
             else
             {
-                if (child->flags() & Widget::SQUARE)
+                if (child->flags() & Component::SQUARE)
                 {
                     child->container(Recti(
                         current,
@@ -266,7 +266,7 @@ void Widget::do_layout()
         int fill_child_count = 0;
 
         _childs.foreach ([&](auto child) {
-            if (child->flags() & Widget::FILL)
+            if (child->flags() & Component::FILL)
             {
                 fill_child_count++;
             }
@@ -288,7 +288,7 @@ void Widget::do_layout()
         int current = content().y();
 
         _childs.foreach ([&](auto child) {
-            if (child->flags() & Widget::FILL)
+            if (child->flags() & Component::FILL)
             {
                 child->container({
                     content().x(),
@@ -301,7 +301,7 @@ void Widget::do_layout()
             }
             else
             {
-                if (child->flags() & Widget::SQUARE)
+                if (child->flags() & Component::SQUARE)
                 {
                     child->container({
                         content().x(),
@@ -335,7 +335,7 @@ void Widget::do_layout()
     }
 }
 
-void Widget::relayout()
+void Component::relayout()
 {
     do_layout();
 
@@ -350,7 +350,7 @@ void Widget::relayout()
     });
 }
 
-void Widget::should_relayout()
+void Component::should_relayout()
 {
     if (_window)
     {
@@ -358,7 +358,7 @@ void Widget::should_relayout()
     }
 }
 
-Vec2i Widget::size()
+Vec2i Component::size()
 {
     if (_childs.count() == 0)
     {
@@ -440,11 +440,11 @@ Vec2i Widget::size()
 
 /* --- Enable/ Disable state ------------------------------------------------ */
 
-bool Widget::enabled() { return _enabled; }
+bool Component::enabled() { return _enabled; }
 
-bool Widget::disabled() { return !_enabled; }
+bool Component::disabled() { return !_enabled; }
 
-void Widget::enable()
+void Component::enable()
 {
     if (disabled())
     {
@@ -458,7 +458,7 @@ void Widget::enable()
     }
 }
 
-void Widget::disable()
+void Component::disable()
 {
     if (enabled())
     {
@@ -472,7 +472,7 @@ void Widget::disable()
     }
 }
 
-void Widget::disable_if(bool condition)
+void Component::disable_if(bool condition)
 {
     if (condition)
     {
@@ -484,7 +484,7 @@ void Widget::disable_if(bool condition)
     }
 }
 
-void Widget::enable_if(bool condition)
+void Component::enable_if(bool condition)
 {
     if (condition)
     {
@@ -498,16 +498,16 @@ void Widget::enable_if(bool condition)
 
 /* --- Childs --------------------------------------------------------------- */
 
-Widget *Widget::child_at(Vec2i position)
+Component *Component::child_at(Vec2i position)
 {
-    Widget *result = this;
+    Component *result = this;
 
-    if (_flags & Widget::GREEDY)
+    if (_flags & Component::GREEDY)
     {
         return result;
     }
 
-    _childs.foreach_reversed([&](Widget *child) {
+    _childs.foreach_reversed([&](Component *child) {
         if (!(child->flags() & NO_MOUSE_HIT) && child->container().contains(position))
         {
             result = child->child_at(position - child->origin());
@@ -523,7 +523,7 @@ Widget *Widget::child_at(Vec2i position)
     return result;
 }
 
-void Widget::add_child(Widget *child)
+void Component::add_child(Component *child)
 {
     assert(child);
     assert(child->_parent == nullptr);
@@ -536,14 +536,14 @@ void Widget::add_child(Widget *child)
     should_repaint();
 }
 
-void Widget::remove_child(Widget *child)
+void Component::remove_child(Component *child)
 {
     assert(child->_parent == this);
     _childs.remove_value(child);
     should_relayout();
 }
 
-void Widget::clear_children()
+void Component::clear_children()
 {
     while (_childs.any())
     {
@@ -556,12 +556,12 @@ void Widget::clear_children()
 
 /* --- Focus state ---------------------------------------------------------- */
 
-bool Widget::focused()
+bool Component::focused()
 {
     return _window && _window->has_keyboard_focus(this);
 }
 
-void Widget::focus()
+void Component::focus()
 {
     if (_window)
     {
@@ -571,7 +571,7 @@ void Widget::focus()
 
 /* --- Paint ---------------------------------------------------------------- */
 
-void Widget::repaint(Graphic::Painter &painter, Recti rectangle)
+void Component::repaint(Graphic::Painter &painter, Recti rectangle)
 {
     if (bound().width() == 0 || bound().height() == 0)
     {
@@ -610,12 +610,12 @@ void Widget::repaint(Graphic::Painter &painter, Recti rectangle)
     painter.pop();
 }
 
-void Widget::should_repaint()
+void Component::should_repaint()
 {
     should_repaint(bound());
 }
 
-void Widget::should_repaint(Recti rectangle)
+void Component::should_repaint(Recti rectangle)
 {
     if (!overflow().colide_with(rectangle))
     {
@@ -637,13 +637,13 @@ void Widget::should_repaint(Recti rectangle)
 
 /* --- Events ----------------------------------------------------------------*/
 
-void Widget::on(EventType event_type, EventHandler handler)
+void Component::on(EventType event_type, EventHandler handler)
 {
     assert(event_type < EventType::__COUNT);
     _handlers[event_type] = move(handler);
 }
 
-void Widget::dispatch_event(Event *event)
+void Component::dispatch_event(Event *event)
 {
     if (enabled())
     {
@@ -662,7 +662,7 @@ void Widget::dispatch_event(Event *event)
     }
 }
 
-Vec2i Widget::compute_size()
+Vec2i Component::compute_size()
 {
     Vec2i size = this->size();
 

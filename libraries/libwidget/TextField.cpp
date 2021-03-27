@@ -2,8 +2,8 @@
 
 #include <libwidget/TextField.h>
 
-TextField::TextField(Widget *parent, RefPtr<TextModel> model)
-    : Widget(parent), _model(model)
+TextField::TextField(Component *parent, RefPtr<TextModel> model)
+    : Component(parent), _model(model)
 {
     _model_observer = _model->observe([this](auto &) {
         _cursor.clamp_within(*_model);

@@ -5,7 +5,7 @@
 #include <libwidget/ScrollBar.h>
 #include <libwidget/model/TableModel.h>
 
-class Table : public Widget
+class Table : public Component
 {
 private:
     static constexpr int TABLE_ROW_HEIGHT = 32;
@@ -69,9 +69,9 @@ public:
         should_relayout();
     }
 
-    Table(Widget *parent);
+    Table(Component *parent);
 
-    Table(Widget *parent, RefPtr<TableModel> model);
+    Table(Component *parent, RefPtr<TableModel> model);
 
     void paint(Graphic::Painter &painter, const Recti &dirty) override;
 

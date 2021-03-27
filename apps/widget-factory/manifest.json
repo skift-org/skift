@@ -1,5 +1,5 @@
 {
-    "name": "Widget Factory",
+    "name": "Component Factory",
     "comment": "A libwidget demo application.",
     "icon": "widgets",
     "command": "widget-factory"

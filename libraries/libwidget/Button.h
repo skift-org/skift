@@ -1,9 +1,9 @@
 #pragma once
 
 #include <libgraphic/Icon.h>
-#include <libwidget/Widget.h>
+#include <libwidget/Component.h>
 
-class Button : public Widget
+class Button : public Component
 {
 public:
     enum Style
@@ -20,15 +20,15 @@ private:
     Style _style = TEXT;
 
 public:
-    Button(Widget *parent, Style style);
+    Button(Component *parent, Style style);
 
-    Button(Widget *parent, Style style, RefPtr<Graphic::Icon> icon);
+    Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon);
 
-    Button(Widget *parent, Style style, String text);
+    Button(Component *parent, Style style, String text);
 
-    Button(Widget *parent, Style style, RefPtr<Graphic::Icon> icon, String text);
+    Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon, String text);
 
-    Button(Widget *parent, Style style, RefPtr<Graphic::Bitmap> image, String text);
+    Button(Component *parent, Style style, RefPtr<Graphic::Bitmap> image, String text);
 
     void paint(Graphic::Painter &painter, const Recti &rectangle) override;
 

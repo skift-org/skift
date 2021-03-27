@@ -16,22 +16,22 @@ private:
     RefPtr<Navigation> _navigation;
     RefPtr<Bookmarks> _bookmarks;
 
-    Widget *_go_backward;
-    Widget *_go_foreward;
-    Widget *_go_up;
-    Widget *_go_home;
+    Component *_go_backward;
+    Component *_go_foreward;
+    Component *_go_up;
+    Component *_go_home;
 
-    Widget *_breadcrumb;
+    Component *_breadcrumb;
 
-    Widget *_refresh;
-    Widget *_open_terminal;
+    Component *_refresh;
+    Component *_open_terminal;
 
     OwnPtr<Observer<Navigation>> _observer;
 
 public:
     static constexpr int NO_OPEN_TERMINAL = 1 << 0;
 
-    ToolBar(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks, int flags = 0)
+    ToolBar(Component *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks, int flags = 0)
         : Panel(parent),
           _navigation(navigation),
           _bookmarks(bookmarks)
@@ -68,7 +68,7 @@ public:
         new Separator(this);
 
         _breadcrumb = new Breadcrumb(this, _navigation, _bookmarks);
-        _breadcrumb->flags(Widget::FILL);
+        _breadcrumb->flags(Component::FILL);
 
         new Separator(this);
 
@@ -80,7 +80,7 @@ public:
 
         if (!(flags & NO_OPEN_TERMINAL))
         {
-            Widget *terminal_button = new Button(this, Button::TEXT, Graphic::Icon::get("console"));
+            Component *terminal_button = new Button(this, Button::TEXT, Graphic::Icon::get("console"));
 
             terminal_button->on(Event::ACTION, [](auto) {
                 process_run("terminal", NULL, TASK_NONE);

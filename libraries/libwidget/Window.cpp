@@ -328,7 +328,7 @@ void Window::end_resize()
     _is_resizing = false;
 }
 
-Widget *Window::child_at(Vec2i position)
+Component *Window::child_at(Vec2i position)
 {
     return root()->child_at(position);
 }
@@ -436,7 +436,7 @@ void Window::handle_lost_focus(Event *event)
 
         if (_mouse_focus)
         {
-            Widget *old_focus = _mouse_focus;
+            Component *old_focus = _mouse_focus;
             _mouse_focus = nullptr;
 
             Event e = *event;
@@ -608,7 +608,7 @@ void Window::handle_mouse_button_release(Event *event)
 {
     if (_mouse_focus)
     {
-        Widget *old_focus = _mouse_focus;
+        Component *old_focus = _mouse_focus;
         _mouse_focus = nullptr;
 
         old_focus->dispatch_event(event);
@@ -671,17 +671,17 @@ void Window::cursor(CursorState state)
     }
 }
 
-void Window::focus_widget(Widget *widget)
+void Window::focus_widget(Component *widget)
 {
     _keyboard_focus = widget;
 }
 
-bool Window::has_keyboard_focus(Widget *widget)
+bool Window::has_keyboard_focus(Component *widget)
 {
     return _keyboard_focus == widget;
 }
 
-void Window::widget_removed(Widget *widget)
+void Window::widget_removed(Component *widget)
 {
     if (_keyboard_focus == widget)
     {
@@ -701,7 +701,7 @@ void Window::widget_removed(Widget *widget)
     _widget_by_id.remove_value(widget);
 }
 
-void Window::register_widget_by_id(String id, Widget *widget)
+void Window::register_widget_by_id(String id, Component *widget)
 {
     _widget_by_id[id] = widget;
 }

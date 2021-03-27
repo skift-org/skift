@@ -11,7 +11,7 @@ private:
     String _filter;
 
 public:
-    ApplicationListing(Widget *parent);
+    ApplicationListing(Component *parent);
 
     void filter(const String &filter);
 

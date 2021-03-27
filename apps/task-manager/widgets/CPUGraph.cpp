@@ -17,13 +17,13 @@
 namespace task_manager
 {
 
-CPUGraph::CPUGraph(Widget *parent, RefPtr<TaskModel> model)
+CPUGraph::CPUGraph(Component *parent, RefPtr<TaskModel> model)
     : Graph(parent, 256, Graphic::Colors::SEAGREEN),
       _model(model)
 {
     layout(VFLOW(0));
     insets(Insetsi(8));
-    flags(Widget::FILL);
+    flags(Component::FILL);
 
     auto icon_and_text = new Container(this);
     icon_and_text->layout(HFLOW(4));
@@ -31,7 +31,7 @@ CPUGraph::CPUGraph(Widget *parent, RefPtr<TaskModel> model)
     new Label(icon_and_text, "Processor");
 
     auto cpu_filler = new Container(this);
-    cpu_filler->flags(Widget::FILL);
+    cpu_filler->flags(Component::FILL);
 
     _label_average = new Label(this, "Average: nil%", Anchor::RIGHT);
     _label_greedy = new Label(this, "Most greedy: nil", Anchor::RIGHT);

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <libwidget/Widget.h>
+#include <libwidget/Component.h>
 
-class ScrollBar : public Widget
+class ScrollBar : public Component
 {
 private:
     Vec2i _mouse_origin;
@@ -57,7 +57,7 @@ public:
         _horizontal = value;
     }
 
-    ScrollBar(Widget *parent);
+    ScrollBar(Component *parent);
 
     void scroll_to(Vec2i mouse_position);
 

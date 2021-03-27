@@ -1,13 +1,13 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Image.h>
 
-Image::Image(Widget *parent, RefPtr<Graphic::Bitmap> bitmap)
-    : Widget(parent), _bitmap(bitmap)
+Image::Image(Component *parent, RefPtr<Graphic::Bitmap> bitmap)
+    : Component(parent), _bitmap(bitmap)
 {
 }
 
-Image::Image(Widget *parent, RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling)
-    : Widget(parent), _bitmap(bitmap), _scaling(scaling)
+Image::Image(Component *parent, RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling)
+    : Component(parent), _bitmap(bitmap), _scaling(scaling)
 {
 }
 

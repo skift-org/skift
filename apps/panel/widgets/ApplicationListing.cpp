@@ -10,10 +10,10 @@
 namespace panel
 {
 
-ApplicationListing::ApplicationListing(Widget *parent) : VScroll(parent)
+ApplicationListing::ApplicationListing(Component *parent) : VScroll(parent)
 {
     layout(VFLOW(4));
-    flags(Widget::FILL);
+    flags(Component::FILL);
 
     render();
 }

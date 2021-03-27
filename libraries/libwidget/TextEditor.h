@@ -1,10 +1,10 @@
 #pragma once
 
+#include <libwidget/Component.h>
 #include <libwidget/ScrollBar.h>
-#include <libwidget/Widget.h>
 #include <libwidget/model/TextModel.h>
 
-class TextEditor : public Widget
+class TextEditor : public Component
 {
 private:
     RefPtr<TextModel> _model;
@@ -30,7 +30,7 @@ private:
 
     Recti view_bound()
     {
-        auto bound = Widget::bound();
+        auto bound = Component::bound();
 
         if (document_bound().height() > minimum_view_bound().height())
         {
@@ -54,7 +54,7 @@ private:
 
     Recti vscrollbar_bound()
     {
-        auto bound = Widget::bound().take_right(ScrollBar::SIZE);
+        auto bound = Component::bound().take_right(ScrollBar::SIZE);
 
         if (document_bound().width() > minimum_view_bound().width())
         {
@@ -66,7 +66,7 @@ private:
 
     Recti hscrollbar_bound()
     {
-        auto bound = Widget::bound().take_bottom(ScrollBar::SIZE);
+        auto bound = Component::bound().take_bottom(ScrollBar::SIZE);
 
         if (document_bound().height() > minimum_view_bound().height())
         {
@@ -91,7 +91,7 @@ public:
         should_repaint();
     }
 
-    TextEditor(Widget *parent, RefPtr<TextModel> model);
+    TextEditor(Component *parent, RefPtr<TextModel> model);
 
     ~TextEditor();
 

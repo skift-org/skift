@@ -3,13 +3,13 @@
 #include <libwidget/Window.h>
 #include <string.h>
 
-Label::Label(Widget *parent, String text)
+Label::Label(Component *parent, String text)
     : Label(parent, text, Anchor::LEFT)
 {
 }
 
-Label::Label(Widget *parent, String text, Anchor anchor)
-    : Widget(parent)
+Label::Label(Component *parent, String text, Anchor anchor)
+    : Component(parent)
 {
     _text = text;
     _anchor = anchor;

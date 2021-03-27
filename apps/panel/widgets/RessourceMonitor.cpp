@@ -10,7 +10,7 @@
 namespace panel
 {
 
-RessourceMonitor::RessourceMonitor(Widget *parent)
+RessourceMonitor::RessourceMonitor(Component *parent)
     : Button(parent, Button::TEXT)
 {
     layout(VGRID(1));

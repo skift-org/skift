@@ -18,33 +18,33 @@ int main(int argc, char **argv)
     auto window = own<Window>(WINDOW_RESIZABLE);
 
     window->icon(Graphic::Icon::get("widgets"));
-    window->title("Widget Factory");
+    window->title("Component Factory");
     window->size(Vec2i(500, 400));
 
     window->root()->layout(VFLOW(8));
 
     new TitleBar(window->root());
 
-    Widget *panel_hflow = new Container(window->root());
+    Component *panel_hflow = new Container(window->root());
     {
         panel_hflow->layout(HFLOW(8));
 
         auto p1 = new Panel(panel_hflow);
-        p1->flags(Widget::FILL);
+        p1->flags(Component::FILL);
 
         auto button = new Button(panel_hflow, Button::TEXT, "Hello, world!");
-        button->flags(Widget::FILL);
+        button->flags(Component::FILL);
 
         auto p2 = new Container(panel_hflow);
         p2->layout(STACK());
-        p2->flags(Widget::FILL);
+        p2->flags(Component::FILL);
 
         auto p3 = new Panel(panel_hflow);
-        p3->flags(Widget::FILL);
+        p3->flags(Component::FILL);
     }
 
     new Label(window->root(), "Buttons", Anchor::CENTER);
-    Widget *buttons = new Container(window->root());
+    Component *buttons = new Container(window->root());
     {
         buttons->layout(HFLOW(8));
         buttons->insets(Insetsi(0, 8));
@@ -59,10 +59,10 @@ int main(int argc, char **argv)
 
     new Label(window->root(), "Grid layout", Anchor::CENTER);
 
-    Widget *panel_grid = new Container(window->root());
+    Component *panel_grid = new Container(window->root());
     {
         panel_grid->layout(GRID(3, 3, 4, 4));
-        panel_grid->flags(Widget::FILL);
+        panel_grid->flags(Component::FILL);
 
         new Panel(panel_grid);
         new TextField(panel_grid, TextModel::empty());

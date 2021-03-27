@@ -1,8 +1,8 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/IconPanel.h>
 
-IconPanel::IconPanel(Widget *parent, RefPtr<Graphic::Icon> icon)
-    : Widget(parent), _icon(icon)
+IconPanel::IconPanel(Component *parent, RefPtr<Graphic::Icon> icon)
+    : Component(parent), _icon(icon)
 {
 }
 

@@ -12,7 +12,7 @@ struct FileInfo
 {
     String name;
     FileType type;
-    RefPtr<Icon> icon;
+    RefPtr<Graphic::Icon> icon;
     size_t size;
 };
 

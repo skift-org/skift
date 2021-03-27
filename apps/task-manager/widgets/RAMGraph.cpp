@@ -16,7 +16,7 @@ namespace task_manager
 {
 
 RAMGraph::RAMGraph(Widget *parent, RefPtr<TaskModel> model)
-    : Graph(parent, 256, Colors::ROYALBLUE),
+    : Graph(parent, 256, Graphic::Colors::ROYALBLUE),
       _model(model)
 {
     layout(VFLOW(0));
@@ -25,7 +25,7 @@ RAMGraph::RAMGraph(Widget *parent, RefPtr<TaskModel> model)
 
     auto icon_and_text = new Container(this);
     icon_and_text->layout(HFLOW(4));
-    new IconPanel(icon_and_text, Icon::get("chip"));
+    new IconPanel(icon_and_text, Graphic::Icon::get("chip"));
     new Label(icon_and_text, "Memory");
 
     auto cpu_filler = new Container(this);

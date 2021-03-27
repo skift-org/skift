@@ -12,8 +12,8 @@ Window::Window(
     WindowType type,
     struct Client *client,
     Recti bound,
-    RefPtr<Bitmap> frontbuffer,
-    RefPtr<Bitmap> backbuffer)
+    RefPtr<Graphic::Bitmap> frontbuffer,
+    RefPtr<Graphic::Bitmap> backbuffer)
     : _id(id),
       _flags(flags),
       _type(type),
@@ -223,7 +223,7 @@ void Window::flip_buffers(int frontbuffer_handle, Vec2i frontbuffer_size, int ba
     if (_frontbuffer->handle() != frontbuffer_handle)
     {
 
-        auto new_frontbuffer = Bitmap::create_shared_from_handle(frontbuffer_handle, frontbuffer_size);
+        auto new_frontbuffer = Graphic::Bitmap::create_shared_from_handle(frontbuffer_handle, frontbuffer_size);
 
         if (!new_frontbuffer.success())
         {
@@ -237,7 +237,7 @@ void Window::flip_buffers(int frontbuffer_handle, Vec2i frontbuffer_size, int ba
     if (_backbuffer->handle() != backbuffer_handle)
     {
 
-        auto new_backbuffer = Bitmap::create_shared_from_handle(backbuffer_handle, backbuffer_size);
+        auto new_backbuffer = Graphic::Bitmap::create_shared_from_handle(backbuffer_handle, backbuffer_size);
 
         if (!new_backbuffer.success())
         {

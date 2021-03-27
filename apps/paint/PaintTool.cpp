@@ -6,7 +6,7 @@
 #include "paint/PaintDocument.h"
 #include "paint/PaintTool.h"
 
-void PencilTool::event(PaintDocument &document, Event &event, Color &color)
+void PencilTool::event(PaintDocument &document, Event &event, Graphic::Color &color)
 {
     if (event.type == Event::MOUSE_MOVE || event.type == Event::MOUSE_BUTTON_PRESS)
     {
@@ -21,7 +21,7 @@ void PencilTool::event(PaintDocument &document, Event &event, Color &color)
     }
 }
 
-void BrushTool::event(PaintDocument &document, Event &event, Color &color)
+void BrushTool::event(PaintDocument &document, Event &event, Graphic::Color &color)
 {
     if (event.type == Event::MOUSE_MOVE ||
         event.type == Event::MOUSE_BUTTON_PRESS)
@@ -36,14 +36,14 @@ void BrushTool::event(PaintDocument &document, Event &event, Color &color)
     }
 }
 
-void EraserTool::event(PaintDocument &document, Event &event, Color &color)
+void EraserTool::event(PaintDocument &document, Event &event, Graphic::Color &color)
 {
     if (event.type == Event::MOUSE_MOVE || event.type == Event::MOUSE_BUTTON_PRESS)
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
             bresenham(event.mouse.old_position, event.mouse.position, 32, [&](auto vec1, auto vec2) {
-                document.painter().clear(Recti(vec1, vec2), Colors::BLACKTRANSPARENT);
+                document.painter().clear(Recti(vec1, vec2), Graphic::Colors::BLACKTRANSPARENT);
             });
             document.dirty(true);
         }
@@ -57,7 +57,7 @@ void EraserTool::event(PaintDocument &document, Event &event, Color &color)
     }
 }
 
-static void flood_fill(Bitmap &bitmap, Vec2i position, Color target, Color fill)
+static void flood_fill(Graphic::Bitmap &bitmap, Vec2i position, Graphic::Color target, Graphic::Color fill)
 {
     if (!bitmap.bound().contains(position))
         return;
@@ -104,20 +104,20 @@ static void flood_fill(Bitmap &bitmap, Vec2i position, Color target, Color fill)
     }
 }
 
-void FillTool::event(PaintDocument &document, Event &event, Color &color)
+void FillTool::event(PaintDocument &document, Event &event, Graphic::Color &color)
 {
     if (event.type == Event::MOUSE_BUTTON_PRESS)
     {
         if (event.mouse.buttons & (MOUSE_BUTTON_LEFT | MOUSE_BUTTON_RIGHT))
         {
-            Color target_color = document.bitmap().get_pixel(event.mouse.position);
+            Graphic::Color target_color = document.bitmap().get_pixel(event.mouse.position);
             flood_fill(document.bitmap(), event.mouse.position, target_color, color);
             document.dirty(true);
         }
     }
 }
 
-void PickerTool::event(PaintDocument &document, Event &event, Color &color)
+void PickerTool::event(PaintDocument &document, Event &event, Graphic::Color &color)
 {
     __unused(color);
 

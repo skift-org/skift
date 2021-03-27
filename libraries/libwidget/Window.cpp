@@ -64,14 +64,14 @@ Window::Window(WindowFlag flags)
     static int window_handle_counter = 0;
     _handle = window_handle_counter++;
 
-    _icon = Icon::get("application");
+    _icon = Graphic::Icon::get("application");
     _flags = flags;
 
-    frontbuffer = Bitmap::create_shared(250, 250).take_value();
-    frontbuffer_painter = own<Painter>(frontbuffer);
+    frontbuffer = Graphic::Bitmap::create_shared(250, 250).take_value();
+    frontbuffer_painter = own<Graphic::Painter>(frontbuffer);
 
-    backbuffer = Bitmap::create_shared(250, 250).take_value();
-    backbuffer_painter = own<Painter>(backbuffer);
+    backbuffer = Graphic::Bitmap::create_shared(250, 250).take_value();
+    backbuffer_painter = own<Graphic::Painter>(backbuffer);
 
     _root = new Container(nullptr);
     _root->window(this);
@@ -97,7 +97,7 @@ Window::~Window()
     delete _root;
 }
 
-void Window::repaint(Painter &painter, Recti rectangle)
+void Window::repaint(Graphic::Painter &painter, Recti rectangle)
 {
     if (_flags & WINDOW_TRANSPARENT || _flags & WINDOW_ACRYLIC)
     {
@@ -134,7 +134,7 @@ void Window::repaint_dirty()
     }
 
     Recti repaited_regions = Recti::empty();
-    Painter &painter = *backbuffer_painter;
+    Graphic::Painter &painter = *backbuffer_painter;
 
     _dirty_rects.foreach ([&](Recti &rect) {
         repaint(painter, rect);
@@ -211,11 +211,11 @@ void Window::change_framebuffer_if_needed()
         bound().height() > frontbuffer->height() ||
         bound().area() < frontbuffer->bound().area() * 0.75)
     {
-        frontbuffer = Bitmap::create_shared(bound().width(), bound().height()).take_value();
-        frontbuffer_painter = own<Painter>(frontbuffer);
+        frontbuffer = Graphic::Bitmap::create_shared(bound().width(), bound().height()).take_value();
+        frontbuffer_painter = own<Graphic::Painter>(frontbuffer);
 
-        backbuffer = Bitmap::create_shared(bound().width(), bound().height()).take_value();
-        backbuffer_painter = own<Painter>(backbuffer);
+        backbuffer = Graphic::Bitmap::create_shared(bound().width(), bound().height()).take_value();
+        backbuffer_painter = own<Graphic::Painter>(backbuffer);
     }
 }
 
@@ -706,7 +706,7 @@ void Window::register_widget_by_id(String id, Widget *widget)
     _widget_by_id[id] = widget;
 }
 
-Color Window::color(ThemeColorRole role)
+Graphic::Color Window::color(ThemeColorRole role)
 {
     if (!focused())
     {

@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     }
 
     Window *window = new Window(WINDOW_RESIZABLE);
-    window->icon(Icon::get("duck"));
+    window->icon(Graphic::Icon::get("duck"));
     window->title("Demos");
     window->size(Vec2i(500, 400));
 

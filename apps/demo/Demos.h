@@ -4,15 +4,15 @@
 #include <libwidget/Application.h>
 #include <libwidget/Widget.h>
 
-void colors_draw(Painter &painter, Recti screen, float time);
+void colors_draw(Graphic::Painter &painter, Recti screen, float time);
 
-void graphics_draw(Painter &painter, Recti screen, float time);
+void graphics_draw(Graphic::Painter &painter, Recti screen, float time);
 
-void lines_draw(Painter &painter, Recti screen, float time);
+void lines_draw(Graphic::Painter &painter, Recti screen, float time);
 
-void path_draw(Painter &Painter, Recti screen, float time);
+void path_draw(Graphic::Painter &Painter, Recti screen, float time);
 
-typedef void (*DrawDemoCallback)(Painter &painter, Recti screen, float time);
+typedef void (*DrawDemoCallback)(Graphic::Painter &painter, Recti screen, float time);
 
 struct Demo
 {

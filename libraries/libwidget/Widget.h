@@ -8,7 +8,11 @@
 #include <libwidget/Event.h>
 #include <libwidget/Theme.h>
 
+namespace Graphic
+{
 class Painter;
+} // namespace Graphic
+
 struct Window;
 
 struct Layout
@@ -65,9 +69,9 @@ private:
     Insetsi _insets{};
     Vec2i _content_scroll{};
 
-    Optional<Color> _colors[__THEME_COLOR_COUNT] = {};
+    Optional<Graphic::Color> _colors[__THEME_COLOR_COUNT] = {};
     Layout _layout = {};
-    RefPtr<Font> _font;
+    RefPtr<Graphic::Font> _font;
 
     CursorState _cursor = CURSOR_DEFAULT;
 
@@ -90,24 +94,24 @@ public:
 
     void id(String id);
 
-    RefPtr<Font> font()
+    RefPtr<Graphic::Font> font()
     {
         if (!_font)
         {
-            _font = Font::get("sans").take_value();
+            _font = Graphic::Font::get("sans").take_value();
         }
 
         return _font;
     }
 
-    void font(RefPtr<Font> font)
+    void font(RefPtr<Graphic::Font> font)
     {
         _font = font;
     }
 
-    Color color(ThemeColorRole role);
+    Graphic::Color color(ThemeColorRole role);
 
-    void color(ThemeColorRole role, Color color);
+    void color(ThemeColorRole role, Graphic::Color color);
 
     void layout(Layout layout) { _layout = layout; }
 
@@ -161,7 +165,7 @@ public:
 
     virtual ~Widget();
 
-    virtual void paint(Painter &, const Recti &) {}
+    virtual void paint(Graphic::Painter &, const Recti &) {}
 
     virtual void event(Event *) {}
 
@@ -267,7 +271,7 @@ public:
 
     /* --- Paint ------------------------------------------------------------ */
 
-    void repaint(Painter &painter, Recti rectangle);
+    void repaint(Graphic::Painter &painter, Recti rectangle);
 
     void should_repaint();
 

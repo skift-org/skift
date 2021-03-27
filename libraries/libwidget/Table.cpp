@@ -71,7 +71,7 @@ int Table::row_at(Vec2i position) const
     return row;
 }
 
-void Table::paint_cell(Painter &painter, int row, int column)
+void Table::paint_cell(Graphic::Painter &painter, int row, int column)
 {
     Recti bound = cell_bound(row, column);
     Variant data = _model->data(row, column);
@@ -83,7 +83,7 @@ void Table::paint_cell(Painter &painter, int row, int column)
     {
         painter.blit(
             *data.icon(),
-            ICON_18PX,
+            Graphic::ICON_18PX,
             Recti(bound.x() + 7, bound.y() + 7, 18, 18),
             color(THEME_FOREGROUND));
 
@@ -122,7 +122,7 @@ Table::Table(Widget *parent, RefPtr<TableModel> model)
     this->model(model);
 }
 
-void Table::paint(Painter &painter, const Recti &)
+void Table::paint(Graphic::Painter &painter, const Recti &)
 {
     if (!_model)
     {

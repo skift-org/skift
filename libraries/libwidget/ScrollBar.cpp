@@ -9,7 +9,7 @@ ScrollBar::ScrollBar(Widget *parent) : Widget(parent)
     _thumb = 512;
 }
 
-void ScrollBar::paint(Painter &painter, const Recti &)
+void ScrollBar::paint(Graphic::Painter &painter, const Recti &)
 {
     if (_thumb >= _track)
     {

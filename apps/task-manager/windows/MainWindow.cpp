@@ -11,7 +11,7 @@ namespace task_manager
 
 MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
 {
-    icon(Icon::get("memory"));
+    icon(Graphic::Icon::get("memory"));
     title("Task Manager");
     size(Vec2i(700, 500));
 
@@ -27,14 +27,14 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
     toolbar->max_height(38);
     toolbar->min_height(38);
 
-    new Button(toolbar, Button::FILLED, Icon::get("plus"), "New task");
+    new Button(toolbar, Button::FILLED, Graphic::Icon::get("plus"), "New task");
 
-    auto cancel_task_button = new Button(toolbar, Button::TEXT, Icon::get("close"), "Cancel task");
+    auto cancel_task_button = new Button(toolbar, Button::TEXT, Graphic::Icon::get("close"), "Cancel task");
     cancel_task_button->on(Event::ACTION, [&](auto) {
         auto result = MessageBox::create_and_show(
             "Cancel task",
             "Are you sure about that ?",
-            Icon::get("close"),
+            Graphic::Icon::get("close"),
             DialogButton::YES | DialogButton::NO);
 
         if (result == DialogResult::YES)

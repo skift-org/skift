@@ -29,7 +29,7 @@ struct BoardWidget : public Widget
         _timer->start();
     }
 
-    void paint(Painter &painter, const Recti &) override
+    void paint(Graphic::Painter &painter, const Recti &) override
     {
         auto cell = [](Vec2i p) {
             return Recti{Recti{p * CELL_SIZE, {CELL_SIZE}}};

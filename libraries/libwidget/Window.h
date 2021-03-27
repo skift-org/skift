@@ -19,7 +19,7 @@ private:
     int _handle = -1;
 
     String _title = "Window";
-    RefPtr<Icon> _icon;
+    RefPtr<Graphic::Icon> _icon;
     Recti _bound{250, 250};
     WindowFlag _flags;
     WindowType _type = WINDOW_TYPE_REGULAR;
@@ -40,11 +40,11 @@ private:
 
     CursorState cursor_state = CURSOR_DEFAULT;
 
-    RefPtr<Bitmap> frontbuffer;
-    OwnPtr<Painter> frontbuffer_painter;
+    RefPtr<Graphic::Bitmap> frontbuffer;
+    OwnPtr<Graphic::Painter> frontbuffer_painter;
 
-    RefPtr<Bitmap> backbuffer;
-    OwnPtr<Painter> backbuffer_painter;
+    RefPtr<Graphic::Bitmap> backbuffer;
+    OwnPtr<Graphic::Painter> backbuffer_painter;
 
     Vector<Recti> _dirty_rects{};
     bool _dirty_layout;
@@ -79,7 +79,7 @@ public:
 
     WindowFlag flags() { return _flags; }
 
-    void icon(RefPtr<Icon> icon)
+    void icon(RefPtr<Graphic::Icon> icon)
     {
         if (icon)
         {
@@ -87,7 +87,7 @@ public:
         }
     }
 
-    RefPtr<Icon> icon() { return _icon; }
+    RefPtr<Graphic::Icon> icon() { return _icon; }
 
     void opacity(float value) { _opacity = value; }
 
@@ -108,7 +108,7 @@ public:
 
     void type(WindowType type) { _type = type; }
 
-    Color color(ThemeColorRole role);
+    Graphic::Color color(ThemeColorRole role);
 
     Window(WindowFlag flags);
 
@@ -186,7 +186,7 @@ public:
 
     /* --- Render ----------------------------------------------------------- */
 
-    virtual void repaint(Painter &painter, Recti rectangle);
+    virtual void repaint(Graphic::Painter &painter, Recti rectangle);
 
     void repaint_dirty();
 

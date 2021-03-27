@@ -17,10 +17,10 @@ Breadcrumb::Breadcrumb(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Boo
 {
     layout(HFLOW(0));
 
-    _icon_computer = Icon::get("laptop");
-    _icon_expand = Icon::get("chevron-right");
-    _icon_bookmark = Icon::get("bookmark");
-    _icon_bookmark_outline = Icon::get("bookmark-outline");
+    _icon_computer = Graphic::Icon::get("laptop");
+    _icon_expand = Graphic::Icon::get("chevron-right");
+    _icon_bookmark = Graphic::Icon::get("bookmark");
+    _icon_bookmark_outline = Graphic::Icon::get("bookmark-outline");
 
     _navigation_observer = _navigation->observe([this](auto &) {
         render();
@@ -79,7 +79,7 @@ void Breadcrumb::render()
             add_bookmark->on(Event::ACTION, [this](auto) {
                 Bookmark bookmark{
                     _navigation->current().basename(),
-                    Icon::get("folder"),
+                    Graphic::Icon::get("folder"),
                     _navigation->current(),
                 };
 

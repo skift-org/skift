@@ -17,7 +17,7 @@ public:
     MainWindow(RefPtr<filepicker::Navigation> navigation, RefPtr<filepicker::Bookmarks> bookmarks)
         : Window(WINDOW_RESIZABLE)
     {
-        icon(Icon::get("folder"));
+        icon(Graphic::Icon::get("folder"));
         title("File Manager");
         size(Vec2i(700, 500));
 

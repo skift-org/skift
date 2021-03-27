@@ -17,7 +17,7 @@ private:
 public:
     DeviceManagerWindow() : Window(WINDOW_RESIZABLE)
     {
-        icon(Icon::get("expansion-card-variant"));
+        icon(Graphic::Icon::get("expansion-card-variant"));
         title("Device Manager");
         size(Vec2i(700, 500));
 

@@ -21,13 +21,13 @@ DemoWidget::DemoWidget(Widget *parent)
     _timer->start();
 }
 
-void DemoWidget::paint(Painter &painter, const Recti &)
+void DemoWidget::paint(Graphic::Painter &painter, const Recti &)
 {
     if (_demo)
     {
         _demo->callback(painter, bound(), _time);
     }
 
-    painter.draw_string(*font(), _demo->name, Vec2i(9, 17), Colors::BLACK);
-    painter.draw_string(*font(), _demo->name, Vec2i(8, 16), Colors::WHITE);
+    painter.draw_string(*font(), _demo->name, Vec2i(9, 17), Graphic::Colors::BLACK);
+    painter.draw_string(*font(), _demo->name, Vec2i(8, 16), Graphic::Colors::WHITE);
 }

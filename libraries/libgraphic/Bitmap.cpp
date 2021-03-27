@@ -5,6 +5,9 @@
 #include <libio/MemoryReader.h>
 #include <libsystem/system/Memory.h>
 
+namespace Graphic
+{
+
 static Color _placeholder_buffer[] = {
     Colors::MAGENTA,
     Colors::BLACK,
@@ -124,3 +127,5 @@ Bitmap::~Bitmap()
         memory_free(reinterpret_cast<uintptr_t>(_pixels));
     }
 }
+
+} // namespace Graphic

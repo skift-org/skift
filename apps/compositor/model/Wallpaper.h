@@ -11,13 +11,13 @@ namespace compositor
 class Wallpaper
 {
 private:
-    BitmapScaling _scaling = BitmapScaling::COVER;
+    Graphic::BitmapScaling _scaling = Graphic::BitmapScaling::COVER;
 
     Vec2i _resolution = {};
-    Color _background = Colors::BLACK;
-    RefPtr<Bitmap> _orginal = nullptr;
-    RefPtr<Bitmap> _scaled = nullptr;
-    RefPtr<Bitmap> _acrylic = nullptr;
+    Graphic::Color _background = Graphic::Colors::BLACK;
+    RefPtr<Graphic::Bitmap> _orginal = nullptr;
+    RefPtr<Graphic::Bitmap> _scaled = nullptr;
+    RefPtr<Graphic::Bitmap> _acrylic = nullptr;
 
     OwnPtr<Settings::Setting> _setting_image;
     OwnPtr<Settings::Setting> _setting_color;
@@ -33,12 +33,12 @@ public:
     int width() { return _resolution.x(); }
     int height() { return _resolution.y(); }
 
-    Bitmap &scaled()
+    Graphic::Bitmap &scaled()
     {
         return *_scaled;
     }
 
-    Bitmap &acrylic()
+    Graphic::Bitmap &acrylic()
     {
         return *_acrylic;
     }

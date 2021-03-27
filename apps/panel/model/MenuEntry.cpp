@@ -18,18 +18,18 @@ MenuEntry::MenuEntry(String id, const json::Value &value)
     });
 
     value.with("icon", [this](auto &v) {
-        icon = Icon::get(v.as_string());
+        icon = Graphic::Icon::get(v.as_string());
     });
 
     value.with("command", [this](auto &v) {
         command = v.as_string();
     });
 
-    auto bitmap = Bitmap::load_from(IO::format("/Applications/{}/{}.png", id, id));
+    auto bitmap = Graphic::Bitmap::load_from(IO::format("/Applications/{}/{}.png", id, id));
 
     if (!bitmap.success())
     {
-        bitmap = Bitmap::load_from("/Files/missing.png");
+        bitmap = Graphic::Bitmap::load_from("/Files/missing.png");
     }
 
     image = bitmap.value();

@@ -25,8 +25,8 @@ QuickSettingsWindow::QuickSettingsWindow()
     auto title = new Label(root(), "Quick settings");
     title->outsets({12, 6, 12, 12});
 
-    new SettingToggle(root(), "Show Wireframe", Icon::get("duck"), "appearance:widgets.wireframe");
-    new SettingToggle(root(), "Night Light", Icon::get("moon-waning-crescent"), "appearance:night-light.enable");
+    new SettingToggle(root(), "Show Wireframe", Graphic::Icon::get("duck"), "appearance:widgets.wireframe");
+    new SettingToggle(root(), "Night Light", Graphic::Icon::get("moon-waning-crescent"), "appearance:night-light.enable");
     (new Button(root(), Button::TEXT, "Light Theme"))->on(Event::ACTION, [](auto) { Settings::write(Settings::Path::parse("appearance:widgets.theme"), "skift-light"); });
     (new Button(root(), Button::TEXT, "Dark Theme"))->on(Event::ACTION, [](auto) { Settings::write(Settings::Path::parse("appearance:widgets.theme"), "skift-dark"); });
 

@@ -14,7 +14,7 @@ static auto logo_based_on_color_scheme()
     auto path = theme_is_dark() ? "/Applications/about/logo-white.png"
                                 : "/Applications/about/logo-black.png";
 
-    return Bitmap::load_from_or_placeholder(path);
+    return Graphic::Bitmap::load_from_or_placeholder(path);
 }
 
 void show_license()
@@ -29,7 +29,7 @@ void show_license()
     auto field = new TextEditor(license_window->root(), TextModel::from_file("/Files/license.md"));
     field->flags(Widget::FILL);
     field->readonly(true);
-    field->font(Font::get("mono").take_value());
+    field->font(Graphic::Font::get("mono").take_value());
     field->focus();
 
     license_window->show();
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 
     Window *window = new Window(WINDOW_NONE);
     window->title("about");
-    window->icon(Icon::get("information"));
+    window->icon(Graphic::Icon::get("information"));
     window->root()->layout(VFLOW(4));
 
     new TitleBar(window->root());
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     {
 
         auto system_logo = new Image(content_container, logo_based_on_color_scheme());
-        system_logo->scaling(BitmapScaling::CENTER);
+        system_logo->scaling(Graphic::BitmapScaling::CENTER);
         system_logo->outsets({32, 64});
 
         new Label(content_container, "The skift operating system.", Anchor::CENTER);

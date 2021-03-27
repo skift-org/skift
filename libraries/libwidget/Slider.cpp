@@ -66,7 +66,7 @@ void Slider::event(Event *event)
     }
 }
 
-void Slider::paint(Painter &painter, const Recti &)
+void Slider::paint(Graphic::Painter &painter, const Recti &)
 {
     if (window()->focused())
     {

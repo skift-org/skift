@@ -5,6 +5,9 @@
 #include <libutils/Scanner.h>
 #include <libutils/ScannerUtils.h>
 
+namespace Graphic
+{
+
 struct ColorName
 {
     const char *name;
@@ -224,3 +227,5 @@ Color Color::parse(String string)
 
     return Colors::MAGENTA;
 }
+
+} // namespace Graphic

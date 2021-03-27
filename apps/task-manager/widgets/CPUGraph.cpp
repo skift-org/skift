@@ -18,7 +18,7 @@ namespace task_manager
 {
 
 CPUGraph::CPUGraph(Widget *parent, RefPtr<TaskModel> model)
-    : Graph(parent, 256, Colors::SEAGREEN),
+    : Graph(parent, 256, Graphic::Colors::SEAGREEN),
       _model(model)
 {
     layout(VFLOW(0));
@@ -27,7 +27,7 @@ CPUGraph::CPUGraph(Widget *parent, RefPtr<TaskModel> model)
 
     auto icon_and_text = new Container(this);
     icon_and_text->layout(HFLOW(4));
-    new IconPanel(icon_and_text, Icon::get("memory"));
+    new IconPanel(icon_and_text, Graphic::Icon::get("memory"));
     new Label(icon_and_text, "Processor");
 
     auto cpu_filler = new Container(this);

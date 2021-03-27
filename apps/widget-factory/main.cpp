@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
     auto window = own<Window>(WINDOW_RESIZABLE);
 
-    window->icon(Icon::get("widgets"));
+    window->icon(Graphic::Icon::get("widgets"));
     window->title("Widget Factory");
     window->size(Vec2i(500, 400));
 
@@ -52,9 +52,9 @@ int main(int argc, char **argv)
         new Button(buttons, Button::TEXT, "BUTTON");
         new Button(buttons, Button::OUTLINE, "BUTTON");
         new Button(buttons, Button::FILLED, "BUTTON");
-        new Button(buttons, Button::TEXT, Icon::get("widgets"), "BUTTON");
-        new Button(buttons, Button::OUTLINE, Icon::get("widgets"), "BUTTON");
-        new Button(buttons, Button::FILLED, Icon::get("widgets"), "BUTTON");
+        new Button(buttons, Button::TEXT, Graphic::Icon::get("widgets"), "BUTTON");
+        new Button(buttons, Button::OUTLINE, Graphic::Icon::get("widgets"), "BUTTON");
+        new Button(buttons, Button::FILLED, Graphic::Icon::get("widgets"), "BUTTON");
     }
 
     new Label(window->root(), "Grid layout", Anchor::CENTER);

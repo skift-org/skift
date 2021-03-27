@@ -4,7 +4,6 @@
 
 class Container : public Widget
 {
-private:
 public:
     Container(Widget *parent);
 };

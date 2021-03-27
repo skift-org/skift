@@ -50,23 +50,23 @@ MenuWindow::MenuWindow()
     account_container->layout(HFLOW(4));
     account_container->insets({6});
 
-    new Button(account_container, Button::TEXT, Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string());
+    new Button(account_container, Button::TEXT, Graphic::Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string());
 
     new Spacer(account_container);
 
-    auto folder_button = new Button(account_container, Button::TEXT, Icon::get("folder"));
+    auto folder_button = new Button(account_container, Button::TEXT, Graphic::Icon::get("folder"));
 
     folder_button->on(EventType::ACTION, [&](auto) {
         process_run("file-manager", nullptr, 0);
     });
 
-    auto setting_button = new Button(account_container, Button::TEXT, Icon::get("cog"));
+    auto setting_button = new Button(account_container, Button::TEXT, Graphic::Icon::get("cog"));
 
     setting_button->on(EventType::ACTION, [&](auto) {
         process_run("settings", nullptr, 0);
     });
 
-    auto logout_button = new Button(account_container, Button::TEXT, Icon::get("power-standby"));
+    auto logout_button = new Button(account_container, Button::TEXT, Graphic::Icon::get("power-standby"));
     logout_button->on(EventType::ACTION, [&](auto) {
         process_run("logout", nullptr, 0);
     });

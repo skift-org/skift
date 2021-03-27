@@ -6,6 +6,9 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
 
+namespace Graphic
+{
+
 ResultOr<OwnPtr<Framebuffer>> Framebuffer::open()
 {
     Handle handle;
@@ -134,3 +137,5 @@ void Framebuffer::blit()
 
     _dirty_bounds.clear();
 }
+
+} // namespace Graphic

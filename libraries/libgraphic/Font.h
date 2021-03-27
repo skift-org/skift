@@ -1,9 +1,12 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
-#include <libutils/unicode/Codepoint.h>
 #include <libutils/String.h>
 #include <libutils/Vector.h>
+#include <libutils/unicode/Codepoint.h>
+
+namespace Graphic
+{
 
 class FontMetrics
 {
@@ -80,3 +83,5 @@ public:
 
     Recti mesure_with_fulllineheight(const char *string);
 };
+
+} // namespace Graphic

@@ -8,6 +8,9 @@
 #include <libutils/HashMap.h>
 #include <libutils/Path.h>
 
+namespace Graphic
+{
+
 static HashMap<String, RefPtr<Font>>
     _fonts;
 
@@ -115,3 +118,5 @@ Recti Font::mesure_with_fulllineheight(const char *string)
 
     return Recti(width, metrics().fulllineheight());
 }
+
+} // namespace Graphic

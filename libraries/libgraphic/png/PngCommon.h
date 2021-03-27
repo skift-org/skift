@@ -1,7 +1,8 @@
 #pragma once
+
 #include <libutils/Endian.h>
 
-namespace Png
+namespace Graphic::Png
 {
 
 enum CompressionMethod : uint8_t
@@ -129,4 +130,4 @@ enum FilterType : uint8_t
     FT_Paeth = 4
 };
 
-} // namespace Png
+} // namespace Graphic::Png

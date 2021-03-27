@@ -2,13 +2,13 @@
 
 #include "terminal/Common.h"
 
-RefPtr<Font> font()
+RefPtr<Graphic::Font> font()
 {
-    static RefPtr<Font> font = nullptr;
+    static RefPtr<Graphic::Font> font = nullptr;
 
     if (font == nullptr)
     {
-        font = Font::get("mono").take_value();
+        font = Graphic::Font::get("mono").take_value();
     }
 
     return font;
@@ -35,7 +35,7 @@ static ThemeColorRole _color_to_role[terminal::_COLOR_COUNT] = {
     [terminal::BACKGROUND] = THEME_ANSI_BACKGROUND,
 };
 
-Color color(terminal::Color terminal_color)
+Graphic::Color color(terminal::Color terminal_color)
 {
     return theme_get_color(_color_to_role[terminal_color]);
 }
@@ -56,7 +56,7 @@ Vec2i cell_size()
 }
 
 void render_cell(
-    Painter &painter,
+    Graphic::Painter &painter,
     int x,
     int y,
     Codepoint codepoint,
@@ -107,7 +107,7 @@ void render_cell(
     }
 }
 
-void render_cell(Painter &painter, int x, int y, terminal::Cell cell)
+void render_cell(Graphic::Painter &painter, int x, int y, terminal::Cell cell)
 {
     render_cell(painter, x, y, cell.codepoint, cell.attributes.foreground, cell.attributes.background, cell.attributes);
 }

@@ -26,7 +26,7 @@ private:
     Recti column_bound(int column) const;
     Recti cell_bound(int row, int column) const;
     int row_at(Vec2i position) const;
-    void paint_cell(Painter &painter, int row, int column);
+    void paint_cell(Graphic::Painter &painter, int row, int column);
 
 public:
     void model(RefPtr<TableModel> model)
@@ -73,7 +73,7 @@ public:
 
     Table(Widget *parent, RefPtr<TableModel> model);
 
-    void paint(Painter &painter, const Recti &dirty) override;
+    void paint(Graphic::Painter &painter, const Recti &dirty) override;
 
     void event(Event *event) override;
 

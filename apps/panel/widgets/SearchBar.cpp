@@ -12,15 +12,15 @@ SearchBar::SearchBar(Widget *parent, RefPtr<TextModel> model) : Panel(parent)
     insets({6});
     outsets({8});
     border_radius(6);
-    color(THEME_MIDDLEGROUND, Colors::WHITE);
+    color(THEME_MIDDLEGROUND, Graphic::Colors::WHITE);
     layout(HFLOW(4));
 
-    auto icon = new IconPanel(this, Icon::get("search"));
-    icon->color(THEME_FOREGROUND, Colors::BLACK);
+    auto icon = new IconPanel(this, Graphic::Icon::get("search"));
+    icon->color(THEME_FOREGROUND, Graphic::Colors::BLACK);
 
     auto field = new TextField(this, model);
     field->flags(Widget::FILL);
-    field->color(THEME_FOREGROUND, Colors::BLACK);
+    field->color(THEME_FOREGROUND, Graphic::Colors::BLACK);
     field->focus();
 }
 

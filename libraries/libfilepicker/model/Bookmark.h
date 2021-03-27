@@ -1,9 +1,9 @@
 #pragma once
 
 #include <libgraphic/Icon.h>
-#include <libutils/json/Json.h>
 #include <libutils/Path.h>
 #include <libutils/RefPtr.h>
+#include <libutils/json/Json.h>
 
 namespace filepicker
 {
@@ -12,7 +12,7 @@ struct Bookmark
 {
 private:
     String _name;
-    RefPtr<Icon> _icon;
+    RefPtr<Graphic::Icon> _icon;
     Path _path;
 
 public:
@@ -21,7 +21,7 @@ public:
         return _name;
     }
 
-    const RefPtr<Icon> icon() const
+    const RefPtr<Graphic::Icon> icon() const
     {
         return _icon;
     }
@@ -40,7 +40,7 @@ public:
             });
 
             value.with("icon", [&](auto &value) {
-                _icon = Icon::get(value.as_string());
+                _icon = Graphic::Icon::get(value.as_string());
             });
 
             value.with("path", [&](auto &value) {
@@ -49,7 +49,7 @@ public:
         }
     }
 
-    Bookmark(const String &name, const RefPtr<Icon> icon, const Path &path)
+    Bookmark(const String &name, const RefPtr<Graphic::Icon> icon, const Path &path)
         : _name(name),
           _icon(icon),
           _path(path)

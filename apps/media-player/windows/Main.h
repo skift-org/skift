@@ -9,7 +9,6 @@ namespace media_player
 
 class Main : public Window
 {
-private:
 public:
     Main();
 };

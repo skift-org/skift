@@ -95,7 +95,7 @@ public:
 
     ~TextEditor();
 
-    void paint(Painter &, const Recti &) override;
+    void paint(Graphic::Painter &, const Recti &) override;
 
     void event(Event *event) override;
 

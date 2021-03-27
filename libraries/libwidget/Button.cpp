@@ -5,7 +5,7 @@
 #include <libwidget/Image.h>
 #include <libwidget/Label.h>
 
-void Button::paint(Painter &painter, const Recti &rectangle)
+void Button::paint(Graphic::Painter &painter, const Recti &rectangle)
 {
     __unused(rectangle);
 
@@ -83,7 +83,7 @@ Button::Button(Widget *parent, Style style)
     flags(Widget::GREEDY);
 }
 
-Button::Button(Widget *parent, Style style, RefPtr<Icon> icon)
+Button::Button(Widget *parent, Style style, RefPtr<Graphic::Icon> icon)
     : Button(parent, style)
 {
     layout(STACK());
@@ -95,7 +95,7 @@ Button::Button(Widget *parent, Style style, RefPtr<Icon> icon)
 
     if (style == FILLED)
     {
-        icon_panel->color(THEME_FOREGROUND, Colors::WHITE);
+        icon_panel->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
     }
 }
 
@@ -109,11 +109,11 @@ Button::Button(Widget *parent, Style style, String text)
     auto label = new Label(this, text, Anchor::CENTER);
     if (style == FILLED)
     {
-        label->color(THEME_FOREGROUND, Colors::WHITE);
+        label->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
     }
 }
 
-Button::Button(Widget *parent, Style style, RefPtr<Icon> icon, String text)
+Button::Button(Widget *parent, Style style, RefPtr<Graphic::Icon> icon, String text)
     : Button(parent, style)
 {
     insets(Insetsi(0, 0, 6, 10));
@@ -126,18 +126,18 @@ Button::Button(Widget *parent, Style style, RefPtr<Icon> icon, String text)
 
     if (style == FILLED)
     {
-        label->color(THEME_FOREGROUND, Colors::WHITE);
-        icon_panel->color(THEME_FOREGROUND, Colors::WHITE);
+        label->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
+        icon_panel->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
     }
 }
 
-Button::Button(Widget *parent, Style style, RefPtr<Bitmap> image, String text)
+Button::Button(Widget *parent, Style style, RefPtr<Graphic::Bitmap> image, String text)
     : Button(parent, style)
 {
     insets(Insetsi(4, 4, 6, 10));
     min_width(64);
 
-    auto image_panel = new Image(this, image, BitmapScaling::FIT);
+    auto image_panel = new Image(this, image, Graphic::BitmapScaling::FIT);
     image_panel->outsets(Insetsi(0, 0, 0, 8));
     image_panel->min_width(36);
     image_panel->min_height(36);
@@ -146,6 +146,6 @@ Button::Button(Widget *parent, Style style, RefPtr<Bitmap> image, String text)
 
     if (style == FILLED)
     {
-        label->color(THEME_FOREGROUND, Colors::WHITE);
+        label->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
     }
 }

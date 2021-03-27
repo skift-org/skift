@@ -93,7 +93,7 @@ int main(int argc, char **argv)
     auto background = new Panel(window->root());
 
     background->layout(STACK());
-    background->color(THEME_MIDDLEGROUND, Colors::BLACK.with_alpha(0.5));
+    background->color(THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
     background->flags(Widget::FILL);
 
     auto dialog = new Panel(background);
@@ -107,11 +107,11 @@ int main(int argc, char **argv)
     auto illustration = new Panel(dialog);
     illustration->min_height(160);
     illustration->border_radius(6);
-    illustration->color(THEME_MIDDLEGROUND, Colors::WHITE);
+    illustration->color(THEME_MIDDLEGROUND, Graphic::Colors::WHITE);
 
-    auto image = new Image(illustration, Bitmap::placeholder());
+    auto image = new Image(illustration, Graphic::Bitmap::placeholder());
     image->flags(Widget::FILL);
-    image->scaling(BitmapScaling::CENTER);
+    image->scaling(Graphic::BitmapScaling::CENTER);
 
     auto content = new Container(dialog);
     content->flags(Widget::FILL);
@@ -156,7 +156,7 @@ int main(int argc, char **argv)
         dots->index(index);
 
         auto image_path = IO::format("/Applications/onboarding/illustration{}.png", index);
-        image->change_bitmap(Bitmap::load_from(image_path).value());
+        image->change_bitmap(Graphic::Bitmap::load_from(image_path).value());
 
         content->clear_children();
         pages(content, PAGES[index]);

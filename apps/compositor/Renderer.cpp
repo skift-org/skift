@@ -8,7 +8,7 @@
 
 #include "compositor/model/Wallpaper.h"
 
-static OwnPtr<Framebuffer> _framebuffer;
+static OwnPtr<Graphic::Framebuffer> _framebuffer;
 static OwnPtr<compositor::Wallpaper> _wallpaper;
 
 static Vector<Recti> _dirty_regions;
@@ -21,7 +21,7 @@ double _night_light_strenght = 0.5;
 
 void renderer_initialize()
 {
-    _framebuffer = Framebuffer::open().take_value();
+    _framebuffer = Graphic::Framebuffer::open().take_value();
     _wallpaper = own<compositor::Wallpaper>(_framebuffer->resolution().size());
     _wallpaper->on_change = []() { renderer_region_dirty(renderer_bound()); };
 
@@ -224,7 +224,7 @@ void renderer_repaint_dirty()
 
         if (_night_light_enable)
         {
-            _framebuffer->painter().tint(region, Color::from_rgb(1, 0.9, 0.8));
+            _framebuffer->painter().tint(region, Graphic::Color::from_rgb(1, 0.9, 0.8));
         }
 
         if (region.colide_with(cursor_bound()))
@@ -257,7 +257,7 @@ bool renderer_set_resolution(int width, int height)
     return true;
 }
 
-void renderer_set_wallaper(RefPtr<Bitmap>)
+void renderer_set_wallaper(RefPtr<Graphic::Bitmap>)
 {
     renderer_region_dirty(renderer_bound());
 }

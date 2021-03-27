@@ -15,7 +15,7 @@ class Neko : public Observable<Neko>
 private:
     int _tick = 0;
     Vec2f _position;
-    RefPtr<Bitmap> _sprites;
+    RefPtr<Graphic::Bitmap> _sprites;
 
     OwnPtr<Behavior> _behavior;
     OwnPtr<Behavior> _next_behavior;
@@ -34,7 +34,7 @@ public:
 
     void update();
 
-    void paint(Painter &painter);
+    void paint(Graphic::Painter &painter);
 
     void move_to(Vec2f position);
 

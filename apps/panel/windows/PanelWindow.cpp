@@ -36,9 +36,9 @@ PanelWindow::PanelWindow()
     container->insets(Insetsi(4));
 
     new Separator(root());
-    (new Separator(root()))->color(THEME_BORDER, Colors::BLACK.with_alpha(0.25));
+    (new Separator(root()))->color(THEME_BORDER, Graphic::Colors::BLACK.with_alpha(0.25));
 
-    auto menu = new Button(container, Button::TEXT, Icon::get("menu"), "Applications");
+    auto menu = new Button(container, Button::TEXT, Graphic::Icon::get("menu"), "Applications");
     menu->on(Event::ACTION, [this](auto) {
         _menu->show();
     });
@@ -61,7 +61,7 @@ PanelWindow::PanelWindow()
         process_run("task-manager", nullptr, 0);
     });
 
-    auto dots = new Button(container, Button::TEXT, Icon::get("dots"));
+    auto dots = new Button(container, Button::TEXT, Graphic::Icon::get("dots"));
 
     dots->on(Event::ACTION, [this](auto) {
         _quicksetting->show();

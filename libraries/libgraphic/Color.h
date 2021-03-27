@@ -5,6 +5,10 @@
 #include <libsystem/math/Lerp.h>
 #include <libutils/String.h>
 
+namespace Graphic
+{
+
+
 struct Color
 {
 private:
@@ -216,3 +220,5 @@ public:
     COLOR_LIST(__ENTRY)
 #undef __ENTRY
 };
+
+} // namespace Graphic

@@ -3,6 +3,9 @@
 #include <libgraphic/Bitmap.h>
 #include <libutils/String.h>
 
+namespace Graphic
+{
+
 #define ICON_SIZE_LIST(__ENTRY) \
     __ENTRY(18)                 \
     __ENTRY(24)                 \
@@ -36,3 +39,5 @@ public:
 
     void set_bitmap(IconSize size, RefPtr<Bitmap> bitmap);
 };
+
+} // namespace Graphic

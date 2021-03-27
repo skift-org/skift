@@ -12,5 +12,5 @@ public:
 
     Panel(Widget *parent);
 
-    void paint(Painter &painter, const Recti &) override;
+    void paint(Graphic::Painter &painter, const Recti &) override;
 };

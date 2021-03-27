@@ -35,7 +35,7 @@ public:
     {
     }
 
-    virtual void paint(Painter &painter, const Recti &)
+    virtual void paint(Graphic::Painter &painter, const Recti &)
     {
         auto c = _state ? color(THEME_ACCENT) : color(THEME_FOREGROUND_DISABLED);
 

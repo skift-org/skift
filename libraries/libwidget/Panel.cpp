@@ -6,7 +6,7 @@ Panel::Panel(Widget *parent)
 {
 }
 
-void Panel::paint(Painter &painter, const Recti &)
+void Panel::paint(Graphic::Painter &painter, const Recti &)
 {
     if (_border_radius > 0)
     {

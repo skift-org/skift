@@ -30,7 +30,7 @@ public:
     MainWindow(RefPtr<filepicker::Navigation> navigation, RefPtr<Archive> archive)
         : Window(WINDOW_RESIZABLE), _navigation(navigation), _archive(archive)
     {
-        icon(Icon::get("folder-zip"));
+        icon(Graphic::Icon::get("folder-zip"));
         title("Archive Manager");
         size(Vec2i(700, 500));
 
@@ -51,7 +51,7 @@ public:
         if (!_archive)
         {
             browser->layout(STACK());
-            auto load_button = new Button(browser, Button::FILLED, Icon::get("folder-open"), "Load an archive file");
+            auto load_button = new Button(browser, Button::FILLED, Graphic::Icon::get("folder-open"), "Load an archive file");
             load_button->on(Event::ACTION, [&](auto) {
                 if (_dialog.show() == DialogResult::OK)
                 {
@@ -69,11 +69,11 @@ public:
             toolbar->max_height(38);
             toolbar->min_height(38);
 
-            new Button(toolbar, Button::TEXT, Icon::get("archive-arrow-up"), "Extract All");
+            new Button(toolbar, Button::TEXT, Graphic::Icon::get("archive-arrow-up"), "Extract All");
 
             new Separator(toolbar);
 
-            auto load_button = new Button(toolbar, Button::TEXT, Icon::get("folder-open"));
+            auto load_button = new Button(toolbar, Button::TEXT, Graphic::Icon::get("folder-open"));
             load_button->on(Event::ACTION, [&](auto) {
                 if (_dialog.show() == DialogResult::OK)
                 {

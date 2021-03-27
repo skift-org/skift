@@ -6,6 +6,9 @@
 #include <libutils/HashMap.h>
 #include <libutils/Path.h>
 
+namespace Graphic
+{
+
 static HashMap<String, RefPtr<Icon>>
     _icons{};
 
@@ -81,3 +84,5 @@ void Icon::set_bitmap(IconSize size, RefPtr<Bitmap> bitmap)
 {
     _bitmaps[size] = bitmap;
 }
+
+} // namespace Graphic

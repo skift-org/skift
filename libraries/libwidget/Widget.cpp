@@ -14,7 +14,7 @@ void Widget::id(String id)
     _window->register_widget_by_id(id, this);
 }
 
-Color Widget::color(ThemeColorRole role)
+Graphic::Color Widget::color(ThemeColorRole role)
 {
     if (!enabled() || (_parent && !_parent->enabled()))
     {
@@ -42,7 +42,7 @@ Color Widget::color(ThemeColorRole role)
     return _window->color(role);
 }
 
-void Widget::color(ThemeColorRole role, Color color)
+void Widget::color(ThemeColorRole role, Graphic::Color color)
 {
     _colors[role] = color;
 
@@ -571,7 +571,7 @@ void Widget::focus()
 
 /* --- Paint ---------------------------------------------------------------- */
 
-void Widget::repaint(Painter &painter, Recti rectangle)
+void Widget::repaint(Graphic::Painter &painter, Recti rectangle)
 {
     if (bound().width() == 0 || bound().height() == 0)
     {
@@ -584,7 +584,7 @@ void Widget::repaint(Painter &painter, Recti rectangle)
 
     if (Application::show_wireframe())
     {
-        painter.fill_insets(bound(), _insets, Colors::MAGENTA.with_alpha(0.25));
+        painter.fill_insets(bound(), _insets, Graphic::Colors::MAGENTA.with_alpha(0.25));
     }
 
     painter.push();
@@ -604,7 +604,7 @@ void Widget::repaint(Painter &painter, Recti rectangle)
 
     if (Application::show_wireframe())
     {
-        painter.draw_rectangle(bound(), Colors::CYAN.with_alpha(0.25));
+        painter.draw_rectangle(bound(), Graphic::Colors::CYAN.with_alpha(0.25));
     }
 
     painter.pop();

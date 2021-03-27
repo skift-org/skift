@@ -104,7 +104,7 @@ void ArchiveListing::update()
         entry_info.uncompressed_size = entry.uncompressed_size;
         entry_info.type = FILE_TYPE_REGULAR;
         entry_info.name = entry.name;
-        entry_info.icon = Icon::get("file");
+        entry_info.icon = Graphic::Icon::get("file");
     }
 
     did_update();

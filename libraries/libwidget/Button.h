@@ -22,15 +22,15 @@ private:
 public:
     Button(Widget *parent, Style style);
 
-    Button(Widget *parent, Style style, RefPtr<Icon> icon);
+    Button(Widget *parent, Style style, RefPtr<Graphic::Icon> icon);
 
     Button(Widget *parent, Style style, String text);
 
-    Button(Widget *parent, Style style, RefPtr<Icon> icon, String text);
+    Button(Widget *parent, Style style, RefPtr<Graphic::Icon> icon, String text);
 
-    Button(Widget *parent, Style style, RefPtr<Bitmap> image, String text);
+    Button(Widget *parent, Style style, RefPtr<Graphic::Bitmap> image, String text);
 
-    void paint(Painter &painter, const Recti &rectangle) override;
+    void paint(Graphic::Painter &painter, const Recti &rectangle) override;
 
     void event(Event *event) override;
 };

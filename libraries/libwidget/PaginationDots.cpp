@@ -14,7 +14,7 @@ PaginationDots::~PaginationDots()
 {
 }
 
-void PaginationDots::paint(Painter &painter, const Recti &)
+void PaginationDots::paint(Graphic::Painter &painter, const Recti &)
 {
     for (int i = 0; i < _count; i++)
     {

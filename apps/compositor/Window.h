@@ -21,8 +21,8 @@ private:
     Recti _bound;
     CursorState _cursor_state{};
 
-    RefPtr<Bitmap> _frontbuffer;
-    RefPtr<Bitmap> _backbuffer;
+    RefPtr<Graphic::Bitmap> _frontbuffer;
+    RefPtr<Graphic::Bitmap> _backbuffer;
 
 public:
     int id() { return _id; }
@@ -35,7 +35,7 @@ public:
 
     void cursor_state(CursorState cursor_state) { _cursor_state = cursor_state; }
 
-    Bitmap &frontbuffer()
+    Graphic::Bitmap &frontbuffer()
     {
         assert_true(_frontbuffer);
         return *_frontbuffer;
@@ -47,8 +47,8 @@ public:
         WindowType type,
         struct Client *client,
         Recti bound,
-        RefPtr<Bitmap> frontbuffer,
-        RefPtr<Bitmap> backbuffer);
+        RefPtr<Graphic::Bitmap> frontbuffer,
+        RefPtr<Graphic::Bitmap> backbuffer);
 
     ~Window();
 

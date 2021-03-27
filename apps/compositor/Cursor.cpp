@@ -13,7 +13,7 @@ static MouseButton _mouse_buttons;
 static Vec2i _mouse_old_position;
 static MouseButton _mouse_old_buttons;
 
-static RefPtr<Bitmap> _cursor_bitmaps[__CURSOR_COUNT] = {};
+static RefPtr<Graphic::Bitmap> _cursor_bitmaps[__CURSOR_COUNT] = {};
 
 static Tick _last_click = 0;
 
@@ -33,7 +33,7 @@ void cursor_initialize()
 
     for (size_t i = 0; i < __CURSOR_COUNT; i++)
     {
-        _cursor_bitmaps[i] = Bitmap::load_from_or_placeholder(cursor_paths[i]);
+        _cursor_bitmaps[i] = Graphic::Bitmap::load_from_or_placeholder(cursor_paths[i]);
     }
 }
 
@@ -135,7 +135,7 @@ CursorState cursor_get_state()
     }
 }
 
-void cursor_render(Painter &painter)
+void cursor_render(Graphic::Painter &painter)
 {
     auto cursor_bitmap = _cursor_bitmaps[cursor_get_state()];
 

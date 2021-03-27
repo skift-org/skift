@@ -41,25 +41,25 @@ public:
         max_height(38);
         min_height(38);
 
-        _go_backward = new Button(this, Button::TEXT, Icon::get("arrow-left"));
+        _go_backward = new Button(this, Button::TEXT, Graphic::Icon::get("arrow-left"));
 
         _go_backward->on(Event::ACTION, [this](auto) {
             _navigation->go_backward();
         });
 
-        _go_foreward = new Button(this, Button::TEXT, Icon::get("arrow-right"));
+        _go_foreward = new Button(this, Button::TEXT, Graphic::Icon::get("arrow-right"));
 
         _go_foreward->on(Event::ACTION, [this](auto) {
             _navigation->go_forward();
         });
 
-        _go_up = new Button(this, Button::TEXT, Icon::get("arrow-up"));
+        _go_up = new Button(this, Button::TEXT, Graphic::Icon::get("arrow-up"));
 
         _go_up->on(Event::ACTION, [this](auto) {
             _navigation->go_up();
         });
 
-        _go_home = new Button(this, Button::TEXT, Icon::get("home"));
+        _go_home = new Button(this, Button::TEXT, Graphic::Icon::get("home"));
 
         _go_home->on(Event::ACTION, [this](auto) {
             _navigation->go_home();
@@ -72,7 +72,7 @@ public:
 
         new Separator(this);
 
-        _refresh = new Button(this, Button::TEXT, Icon::get("refresh"));
+        _refresh = new Button(this, Button::TEXT, Graphic::Icon::get("refresh"));
 
         _refresh->on(Event::ACTION, [this](auto) {
             _navigation->refresh();
@@ -80,7 +80,7 @@ public:
 
         if (!(flags & NO_OPEN_TERMINAL))
         {
-            Widget *terminal_button = new Button(this, Button::TEXT, Icon::get("console"));
+            Widget *terminal_button = new Button(this, Button::TEXT, Graphic::Icon::get("console"));
 
             terminal_button->on(Event::ACTION, [](auto) {
                 process_run("terminal", NULL, TASK_NONE);

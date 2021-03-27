@@ -13,12 +13,12 @@ class SettingToggle : public Button
 {
 private:
     String _name;
-    RefPtr<Icon> _icon;
+    RefPtr<Graphic::Icon> _icon;
     OwnPtr<Settings::Setting> _setting;
     bool _enabled;
 
 public:
-    SettingToggle(Widget *parent, String name, RefPtr<Icon> icon, const char *setting)
+    SettingToggle(Widget *parent, String name, RefPtr<Graphic::Icon> icon, const char *setting)
         : Button(parent, Button::TEXT),
           _name(name),
           _icon(icon)

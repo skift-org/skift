@@ -6,11 +6,11 @@
 class PaintDocument : public RefCounted<PaintDocument>
 {
 private:
-    RefPtr<Bitmap> _bitmap;
-    Painter _painter;
+    RefPtr<Graphic::Bitmap> _bitmap;
+    Graphic::Painter _painter;
 
-    Color _primary_color = Colors::BLACK;
-    Color _secondary_color = Colors::WHITE;
+    Graphic::Color _primary_color = Graphic::Colors::BLACK;
+    Graphic::Color _secondary_color = Graphic::Colors::WHITE;
 
     bool _dirty = true;
 
@@ -18,15 +18,15 @@ public:
     Callback<void()> on_color_change;
 
     Recti bound() { return _bitmap->bound(); }
-    Bitmap &bitmap() { return *_bitmap; }
-    Painter &painter() { return _painter; }
+    Graphic::Bitmap &bitmap() { return *_bitmap; }
+    Graphic::Painter &painter() { return _painter; }
 
     bool dirty() { return _dirty; }
     void dirty(bool value) { _dirty = value; }
 
-    Color primary_color() { return _primary_color; }
+    Graphic::Color primary_color() { return _primary_color; }
 
-    void primary_color(Color value)
+    void primary_color(Graphic::Color value)
     {
         _primary_color = value;
 
@@ -34,13 +34,13 @@ public:
             on_color_change();
     }
 
-    Color secondary_color()
+    Graphic::Color secondary_color()
     {
 
         return _secondary_color;
     }
 
-    void secondary_color(Color value)
+    void secondary_color(Graphic::Color value)
     {
         _secondary_color = value;
 
@@ -48,7 +48,7 @@ public:
             on_color_change();
     }
 
-    PaintDocument(RefPtr<Bitmap> bitmap)
+    PaintDocument(RefPtr<Graphic::Bitmap> bitmap)
         : _bitmap(bitmap),
           _painter(bitmap)
     {

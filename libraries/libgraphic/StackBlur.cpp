@@ -1,5 +1,8 @@
 #include <libgraphic/Painter.h>
 
+namespace Graphic
+{
+
 static unsigned short const stackblur_mul[255] = {
     512, 512, 456, 512, 328, 456, 335, 512, 405, 328, 271, 456, 388, 335, 292, 512,
     454, 405, 364, 328, 298, 271, 496, 456, 420, 388, 360, 335, 312, 292, 273, 512,
@@ -278,3 +281,5 @@ void stackblur(
         }
     }
 }
+
+} // namespace Graphic

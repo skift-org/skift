@@ -10,6 +10,9 @@
 #include <libtest/AssertGreaterThan.h>
 #include <libtest/AssertLowerThan.h>
 
+namespace Graphic
+{
+
 Painter::Painter(RefPtr<Bitmap> bitmap)
 {
     _bitmap = bitmap;
@@ -815,3 +818,5 @@ void Painter::acrylic(Recti rectangle)
     blur(rectangle, 16);
     noise(rectangle, 0.05);
 }
+
+} // namespace Graphic

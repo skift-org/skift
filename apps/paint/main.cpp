@@ -11,25 +11,25 @@
 #include "paint/PaintDocument.h"
 #include "paint/PaintTool.h"
 
-static Color _color_palette[] = {
-    Color::from_hex(0x000000),
-    Color::from_hex(0x1a1c2c),
-    Color::from_hex(0x5d275d),
-    Color::from_hex(0xb13e53),
-    Color::from_hex(0xef7d57),
-    Color::from_hex(0xffcd75),
-    Color::from_hex(0xa7f070),
-    Color::from_hex(0x38b764),
-    Color::from_hex(0x257179),
-    Color::from_hex(0x29366f),
-    Color::from_hex(0x3b5dc9),
-    Color::from_hex(0x41a6f6),
-    Color::from_hex(0x73eff7),
-    Color::from_hex(0xffffff),
-    Color::from_hex(0xf4f4f4),
-    Color::from_hex(0x94b0c2),
-    Color::from_hex(0x566c86),
-    Color::from_hex(0x333c57),
+static Graphic::Color _color_palette[] = {
+    Graphic::Color::from_hex(0x000000),
+    Graphic::Color::from_hex(0x1a1c2c),
+    Graphic::Color::from_hex(0x5d275d),
+    Graphic::Color::from_hex(0xb13e53),
+    Graphic::Color::from_hex(0xef7d57),
+    Graphic::Color::from_hex(0xffcd75),
+    Graphic::Color::from_hex(0xa7f070),
+    Graphic::Color::from_hex(0x38b764),
+    Graphic::Color::from_hex(0x257179),
+    Graphic::Color::from_hex(0x29366f),
+    Graphic::Color::from_hex(0x3b5dc9),
+    Graphic::Color::from_hex(0x41a6f6),
+    Graphic::Color::from_hex(0x73eff7),
+    Graphic::Color::from_hex(0xffffff),
+    Graphic::Color::from_hex(0xf4f4f4),
+    Graphic::Color::from_hex(0x94b0c2),
+    Graphic::Color::from_hex(0x566c86),
+    Graphic::Color::from_hex(0x333c57),
 };
 
 struct PaintWindow : public Window
@@ -62,7 +62,7 @@ private:
 public:
     PaintWindow(RefPtr<PaintDocument> document) : Window(WINDOW_RESIZABLE)
     {
-        icon(Icon::get("brush"));
+        icon(Graphic::Icon::get("brush"));
         title("Paint");
         size(Vec2i(600, 560));
 
@@ -93,37 +93,37 @@ public:
         toolbar->max_height(38);
         toolbar->min_height(38);
 
-        _open_document = new Button(toolbar, Button::TEXT, Icon::get("folder-open"));
-        _save_document = new Button(toolbar, Button::TEXT, Icon::get("content-save"));
-        _new_document = new Button(toolbar, Button::TEXT, Icon::get("image-plus"));
+        _open_document = new Button(toolbar, Button::TEXT, Graphic::Icon::get("folder-open"));
+        _save_document = new Button(toolbar, Button::TEXT, Graphic::Icon::get("content-save"));
+        _new_document = new Button(toolbar, Button::TEXT, Graphic::Icon::get("image-plus"));
 
         new Separator(toolbar);
 
-        _pencil = new Button(toolbar, Button::TEXT, Icon::get("pencil"));
+        _pencil = new Button(toolbar, Button::TEXT, Graphic::Icon::get("pencil"));
         _pencil->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<PencilTool>());
             update_toolbar();
         });
 
-        _brush = new Button(toolbar, Button::TEXT, Icon::get("brush"));
+        _brush = new Button(toolbar, Button::TEXT, Graphic::Icon::get("brush"));
         _brush->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<BrushTool>());
             update_toolbar();
         });
 
-        _eraser = new Button(toolbar, Button::TEXT, Icon::get("eraser"));
+        _eraser = new Button(toolbar, Button::TEXT, Graphic::Icon::get("eraser"));
         _eraser->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<EraserTool>());
             update_toolbar();
         });
 
-        _fill = new Button(toolbar, Button::TEXT, Icon::get("format-color-fill"));
+        _fill = new Button(toolbar, Button::TEXT, Graphic::Icon::get("format-color-fill"));
         _fill->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<FillTool>());
             update_toolbar();
         });
 
-        _picker = new Button(toolbar, Button::TEXT, Icon::get("eyedropper"));
+        _picker = new Button(toolbar, Button::TEXT, Graphic::Icon::get("eyedropper"));
         _picker->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<PickerTool>());
             update_toolbar();
@@ -132,10 +132,10 @@ public:
         new Separator(toolbar);
 
         // TODO:
-        _insert_text = new Button(toolbar, Button::TEXT, Icon::get("format-text-variant"));
-        _insert_line = new Button(toolbar, Button::TEXT, Icon::get("vector-line"));
-        _insert_rectangle = new Button(toolbar, Button::TEXT, Icon::get("rectangle-outline"));
-        _insert_circle = new Button(toolbar, Button::TEXT, Icon::get("circle-outline"));
+        _insert_text = new Button(toolbar, Button::TEXT, Graphic::Icon::get("format-text-variant"));
+        _insert_line = new Button(toolbar, Button::TEXT, Graphic::Icon::get("vector-line"));
+        _insert_rectangle = new Button(toolbar, Button::TEXT, Graphic::Icon::get("rectangle-outline"));
+        _insert_circle = new Button(toolbar, Button::TEXT, Graphic::Icon::get("circle-outline"));
 
         new Separator(toolbar);
 
@@ -169,7 +169,7 @@ public:
 
         for (size_t i = 0; i < __array_length(_color_palette); i++)
         {
-            Color color = _color_palette[i];
+            Graphic::Color color = _color_palette[i];
 
             auto color_widget = new Panel(palette);
             color_widget->border_radius(4);
@@ -202,8 +202,8 @@ int main(int argc, char **argv)
 {
     Application::initialize(argc, argv);
 
-    auto bitmap = Bitmap::create_shared(400, 400).take_value();
-    bitmap->clear(Colors::BLACKTRANSPARENT);
+    auto bitmap = Graphic::Bitmap::create_shared(400, 400).take_value();
+    bitmap->clear(Graphic::Colors::BLACKTRANSPARENT);
 
     auto document = make<PaintDocument>(bitmap);
 

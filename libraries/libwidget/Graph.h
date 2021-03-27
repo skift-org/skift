@@ -5,13 +5,13 @@
 class Graph : public Widget
 {
 private:
-    Color _color;
+    Graphic::Color _color;
     float *_data;
     size_t _data_size;
     size_t _current;
 
 public:
-    Graph(Widget *parent, size_t data_size, Color data_color);
+    Graph(Widget *parent, size_t data_size, Graphic::Color data_color);
 
     ~Graph();
 
@@ -34,7 +34,7 @@ public:
         return total / MIN(_current, _data_size);
     }
 
-    void paint(Painter &painter, const Recti &dirty) override;
+    void paint(Graphic::Painter &painter, const Recti &dirty) override;
 
     Vec2i size() override;
 };

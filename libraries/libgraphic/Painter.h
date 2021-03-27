@@ -9,6 +9,9 @@
 
 #define STATESTACK_SIZE 32
 
+namespace Graphic
+{
+
 struct PainterState
 {
     Vec2i origin;
@@ -132,3 +135,5 @@ private:
 
     void draw_circle_helper(Recti bound, Vec2i center, int radius, int thickness, Color color);
 };
+
+} // namespace Graphic

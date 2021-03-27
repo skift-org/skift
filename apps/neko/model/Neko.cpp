@@ -20,7 +20,7 @@ Recti Neko::sprite()
 
 Neko::Neko(Vec2f starting_position)
     : _position(starting_position),
-      _sprites(Bitmap::load_from_or_placeholder("/Applications/neko/sprites.png")),
+      _sprites(Graphic::Bitmap::load_from_or_placeholder("/Applications/neko/sprites.png")),
       _behavior(own<ChaseMouse>())
 {
 }
@@ -42,7 +42,7 @@ void Neko::update()
     }
 }
 
-void Neko::paint(Painter &painter)
+void Neko::paint(Graphic::Painter &painter)
 {
     painter.blit(*_sprites, sprite(), {SIZE, SIZE});
 }

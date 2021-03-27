@@ -5,6 +5,9 @@
 #include <libsystem/io/Handle.h>
 #include <libutils/OwnPtr.h>
 
+namespace Graphic
+{
+
 class Framebuffer
 {
 private:
@@ -34,3 +37,5 @@ public:
 
     void blit();
 };
+
+} // namespace Graphic

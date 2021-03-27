@@ -36,9 +36,9 @@ public:
         _update_timer->start();
     }
 
-    void repaint(Painter &painter, Recti rectangle)
+    void repaint(Graphic::Painter &painter, Recti rectangle)
     {
-        painter.clear(rectangle, Colors::TRANSPARENT);
+        painter.clear(rectangle, Graphic::Colors::TRANSPARENT);
         _neko.paint(painter);
     }
 };

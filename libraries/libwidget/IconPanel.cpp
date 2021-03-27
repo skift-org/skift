@@ -1,12 +1,12 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/IconPanel.h>
 
-IconPanel::IconPanel(Widget *parent, RefPtr<Icon> icon)
+IconPanel::IconPanel(Widget *parent, RefPtr<Graphic::Icon> icon)
     : Widget(parent), _icon(icon)
 {
 }
 
-void IconPanel::paint(Painter &painter, const Recti &)
+void IconPanel::paint(Graphic::Painter &painter, const Recti &)
 {
     if (!_icon)
     {

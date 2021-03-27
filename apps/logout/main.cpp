@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     auto background = new Panel(window->root());
 
     background->layout(STACK());
-    background->color(THEME_MIDDLEGROUND, Colors::BLACK.with_alpha(0.5));
+    background->color(THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
     background->flags(Widget::FILL);
 
     auto dialog = new Container(background);
@@ -37,8 +37,8 @@ int main(int argc, char **argv)
     icon_and_title_container->border_radius(6);
     icon_and_title_container->insets(Insetsi{8});
 
-    auto title_icon = new IconPanel(icon_and_title_container, Icon::get("power-standby"));
-    title_icon->icon_size(ICON_36PX);
+    auto title_icon = new IconPanel(icon_and_title_container, Graphic::Icon::get("power-standby"));
+    title_icon->icon_size(Graphic::ICON_36PX);
 
     auto warning_container = new Container(icon_and_title_container);
     warning_container->flags(Widget::FILL);
@@ -49,19 +49,19 @@ int main(int argc, char **argv)
 
     new Spacer(dialog);
 
-    auto shutdown_button = new Button(dialog, Button::TEXT, Icon::get("power-standby"), "Shutdown");
+    auto shutdown_button = new Button(dialog, Button::TEXT, Graphic::Icon::get("power-standby"), "Shutdown");
 
     shutdown_button->on(EventType::ACTION, [&](auto) {
         hj_system_shutdown();
     });
 
-    auto reboot_button = new Button(dialog, Button::TEXT, Icon::get("restart"), "Reboot");
+    auto reboot_button = new Button(dialog, Button::TEXT, Graphic::Icon::get("restart"), "Reboot");
 
     reboot_button->on(EventType::ACTION, [&](auto) {
         hj_system_reboot();
     });
 
-    new Button(dialog, Button::TEXT, Icon::get("logout"), "Logoff");
+    new Button(dialog, Button::TEXT, Graphic::Icon::get("logout"), "Logoff");
 
     new Spacer(dialog);
 

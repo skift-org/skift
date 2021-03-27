@@ -1,5 +1,8 @@
 #pragma once
 
+namespace Graphic
+{
+
 void stackblur(
     unsigned char *src,  ///< input image data
     unsigned int w,      ///< image width
@@ -9,3 +12,5 @@ void stackblur(
     unsigned int maxX,
     unsigned int minY,
     unsigned int maxY);
+
+};

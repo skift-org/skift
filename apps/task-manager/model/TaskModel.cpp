@@ -62,11 +62,11 @@ Variant TaskModel::data(int row, int column)
 
         if (task.get("user").is(json::TRUE))
         {
-            return value.with_icon(Icon::get("account"));
+            return value.with_icon(Graphic::Icon::get("account"));
         }
         else
         {
-            return value.with_icon(Icon::get("cog"));
+            return value.with_icon(Graphic::Icon::get("cog"));
         }
     }
 

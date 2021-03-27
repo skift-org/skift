@@ -20,14 +20,14 @@ void Client::handle(const CompositorCreateWindow &create_window)
         return;
     }
 
-    auto frontbuffer = Bitmap::create_shared_from_handle(create_window.frontbuffer, create_window.backbuffer_size);
+    auto frontbuffer = Graphic::Bitmap::create_shared_from_handle(create_window.frontbuffer, create_window.backbuffer_size);
 
     if (!frontbuffer.success())
     {
         return;
     }
 
-    auto backbuffer = Bitmap::create_shared_from_handle(create_window.backbuffer, create_window.backbuffer_size);
+    auto backbuffer = Graphic::Bitmap::create_shared_from_handle(create_window.backbuffer, create_window.backbuffer_size);
 
     if (!backbuffer.success())
     {

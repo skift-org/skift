@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 
     Window *window = new Window(WINDOW_RESIZABLE);
 
-    window->icon(Icon::get("text-box"));
+    window->icon(Graphic::Icon::get("text-box"));
 
     if (argc == 2)
     {
@@ -35,9 +35,9 @@ int main(int argc, char **argv)
     toolbar->max_height(38);
     toolbar->min_height(38);
 
-    new Button(toolbar, Button::TEXT, Icon::get("folder-open"));
-    new Button(toolbar, Button::TEXT, Icon::get("content-save"));
-    new Button(toolbar, Button::TEXT, Icon::get("file-plus"));
+    new Button(toolbar, Button::TEXT, Graphic::Icon::get("folder-open"));
+    new Button(toolbar, Button::TEXT, Graphic::Icon::get("content-save"));
+    new Button(toolbar, Button::TEXT, Graphic::Icon::get("file-plus"));
 
     auto model = TextModel::empty();
 

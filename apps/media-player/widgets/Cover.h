@@ -9,13 +9,13 @@ namespace media_player
 class Cover : public Widget
 {
 private:
-    RefPtr<Bitmap> _cover;
-    RefPtr<Bitmap> _backdrop;
+    RefPtr<Graphic::Bitmap> _cover;
+    RefPtr<Graphic::Bitmap> _backdrop;
 
 public:
-    Cover(Widget *parent, RefPtr<Bitmap> bitmap);
+    Cover(Widget *parent, RefPtr<Graphic::Bitmap> bitmap);
 
-    void paint(Painter &painter, const Recti &) override;
+    void paint(Graphic::Painter &painter, const Recti &) override;
 };
 
 } // namespace media_player

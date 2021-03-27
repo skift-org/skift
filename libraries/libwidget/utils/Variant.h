@@ -16,7 +16,7 @@ class Variant
 private:
     VarianType _type;
 
-    RefPtr<Icon> _icon = nullptr;
+    RefPtr<Graphic::Icon> _icon = nullptr;
     int _as_int;
     float _as_float;
     char _as_string[VARIANT_STRING_SIZE];
@@ -27,7 +27,7 @@ public:
         return _icon != nullptr;
     }
 
-    RefPtr<Icon> icon() { return _icon; }
+    RefPtr<Graphic::Icon> icon() { return _icon; }
 
     VarianType type() { return _type; }
 
@@ -45,7 +45,7 @@ public:
 
     Variant(String str);
 
-    Variant with_icon(RefPtr<Icon> icon)
+    Variant with_icon(RefPtr<Graphic::Icon> icon)
     {
         _icon = icon;
         return *this;

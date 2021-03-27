@@ -6,7 +6,7 @@
 
 static bool _theme_is_dark = true;
 
-static constexpr Color _theme_default_colors[__THEME_COLOR_COUNT] = {
+static constexpr Graphic::Color _theme_default_colors[__THEME_COLOR_COUNT] = {
     [THEME_BORDER] = THEME_DEFAULT_BORDER,
     [THEME_BACKGROUND] = THEME_DEFAULT_BACKGROUND,
     [THEME_MIDDLEGROUND] = THEME_DEFAULT_MIDDLEGROUND,
@@ -38,7 +38,7 @@ static constexpr Color _theme_default_colors[__THEME_COLOR_COUNT] = {
     [THEME_ANSI_BRIGHT_WHITE] = THEME_DEFAULT_ANSI_BRIGHT_WHITE,
 };
 
-static Color _theme_colors[__THEME_COLOR_COUNT] = {
+static Graphic::Color _theme_colors[__THEME_COLOR_COUNT] = {
     [THEME_BORDER] = THEME_DEFAULT_BORDER,
     [THEME_BACKGROUND] = THEME_DEFAULT_BACKGROUND,
     [THEME_MIDDLEGROUND] = THEME_DEFAULT_MIDDLEGROUND,
@@ -136,17 +136,17 @@ void theme_load(const char *path)
 
         if (color.is(json::STRING))
         {
-            _theme_colors[i] = Color::parse(color.as_string());
+            _theme_colors[i] = Graphic::Color::parse(color.as_string());
         }
     }
 }
 
-Color theme_get_color(ThemeColorRole role)
+Graphic::Color theme_get_color(ThemeColorRole role)
 {
     return _theme_colors[role];
 }
 
-void theme_set_color(ThemeColorRole role, Color color)
+void theme_set_color(ThemeColorRole role, Graphic::Color color)
 {
     _theme_colors[role] = color;
 }

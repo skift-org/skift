@@ -23,25 +23,25 @@ static auto get_icon_for_node(String current_directory, IO::Directory::Entry &en
 
             if (icon_name.is(json::STRING))
             {
-                return Icon::get(icon_name.as_string());
+                return Graphic::Icon::get(icon_name.as_string());
             }
         }
 
-        return Icon::get("folder");
+        return Graphic::Icon::get("folder");
     }
     else if (entry.stat.type == FILE_TYPE_PIPE ||
              entry.stat.type == FILE_TYPE_DEVICE ||
              entry.stat.type == FILE_TYPE_SOCKET)
     {
-        return Icon::get("pipe");
+        return Graphic::Icon::get("pipe");
     }
     else if (entry.stat.type == FILE_TYPE_TERMINAL)
     {
-        return Icon::get("console-network");
+        return Graphic::Icon::get("console-network");
     }
     else
     {
-        return Icon::get("file");
+        return Graphic::Icon::get("file");
     }
 }
 

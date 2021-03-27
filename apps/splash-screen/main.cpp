@@ -1,11 +1,11 @@
 #include <libgraphic/Framebuffer.h>
 #include <libsystem/process/Process.h>
 
-static const auto BACKGROUND = Colors::BLACK;
+static const auto BACKGROUND = Graphic::Colors::BLACK;
 
 int main(int, char *[])
 {
-    auto framebuffer_or_result = Framebuffer::open();
+    auto framebuffer_or_result = Graphic::Framebuffer::open();
 
     if (!framebuffer_or_result.success())
     {
@@ -14,7 +14,7 @@ int main(int, char *[])
 
     auto framebuffer = framebuffer_or_result.take_value();
 
-    auto logo = Bitmap::load_from_or_placeholder("/Applications/splash-screen/logo.png");
+    auto logo = Graphic::Bitmap::load_from_or_placeholder("/Applications/splash-screen/logo.png");
 
     auto logo_container = logo->bound().centered_within(framebuffer->resolution());
 

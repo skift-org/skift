@@ -6,10 +6,10 @@ class Placeholder : public Widget
 {
 private:
     String _text;
-    RefPtr<Icon> _alert_icon;
+    RefPtr<Graphic::Icon> _alert_icon;
 
 public:
     Placeholder(Widget *parent, String text);
 
-    void paint(Painter &, const Recti &) override;
+    void paint(Graphic::Painter &, const Recti &) override;
 };

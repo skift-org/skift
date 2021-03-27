@@ -8,6 +8,9 @@
 
 #include <libgraphic/Color.h>
 
+namespace Graphic
+{
+
 enum BitmapStorage
 {
     BITMAP_SHARED,
@@ -165,3 +168,5 @@ public:
         }
     }
 };
+
+} // namespace Graphic

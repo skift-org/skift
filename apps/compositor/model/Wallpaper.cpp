@@ -5,8 +5,8 @@ namespace compositor
 
 Wallpaper::Wallpaper(Vec2i resolution)
     : _resolution(resolution),
-      _scaled(Bitmap::create_shared(resolution.x(), resolution.y()).value()),
-      _acrylic(Bitmap::create_shared(resolution.x(), resolution.y()).value())
+      _scaled(Graphic::Bitmap::create_shared(resolution.x(), resolution.y()).value()),
+      _acrylic(Graphic::Bitmap::create_shared(resolution.x(), resolution.y()).value())
 {
     _render_invoker = own<Invoker>([this]() {
         render();
@@ -15,7 +15,7 @@ Wallpaper::Wallpaper(Vec2i resolution)
     _setting_image = own<Settings::Setting>("appearance:wallpaper.image", [this](auto &value) {
         if (value.is(json::STRING))
         {
-            _orginal = Bitmap::load_from_or_placeholder(value.as_string());
+            _orginal = Graphic::Bitmap::load_from_or_placeholder(value.as_string());
         }
         else
         {
@@ -28,11 +28,11 @@ Wallpaper::Wallpaper(Vec2i resolution)
     _setting_color = own<Settings::Setting>("appearance:wallpaper.color", [this](auto &value) {
         if (value.is(json::STRING))
         {
-            _background = Color::parse(value.as_string());
+            _background = Graphic::Color::parse(value.as_string());
         }
         else
         {
-            _background = Colors::MAGENTA;
+            _background = Graphic::Colors::MAGENTA;
         }
 
         _render_invoker->invoke_later();
@@ -43,19 +43,19 @@ Wallpaper::Wallpaper(Vec2i resolution)
 
         if (scaling_name == "center")
         {
-            _scaling = BitmapScaling::CENTER;
+            _scaling = Graphic::BitmapScaling::CENTER;
         }
         else if (scaling_name == "stretch")
         {
-            _scaling = BitmapScaling::STRETCH;
+            _scaling = Graphic::BitmapScaling::STRETCH;
         }
         else if (scaling_name == "cover")
         {
-            _scaling = BitmapScaling::COVER;
+            _scaling = Graphic::BitmapScaling::COVER;
         }
         else if (scaling_name == "fit")
         {
-            _scaling = BitmapScaling::FIT;
+            _scaling = Graphic::BitmapScaling::FIT;
         }
 
         _render_invoker->invoke_later();
@@ -66,7 +66,7 @@ Wallpaper::Wallpaper(Vec2i resolution)
 
 void Wallpaper::render_scaled()
 {
-    Painter painter{*_scaled};
+    Graphic::Painter painter{*_scaled};
 
     painter.clear(_background);
 
@@ -79,7 +79,7 @@ void Wallpaper::render_scaled()
 void Wallpaper::render_acrylic()
 {
     _acrylic->copy_from(*_scaled, _scaled->bound());
-    Painter painter(*_acrylic);
+    Graphic::Painter painter(*_acrylic);
 
     painter.acrylic(_acrylic->bound());
 }
@@ -98,8 +98,8 @@ void Wallpaper::render()
 void Wallpaper::change_resolution(Vec2i resolution)
 {
     _resolution = resolution;
-    _scaled = Bitmap::create_shared(_resolution.x(), _resolution.y()).value();
-    _acrylic = Bitmap::create_shared(_resolution.x(), _resolution.y()).value();
+    _scaled = Graphic::Bitmap::create_shared(_resolution.x(), _resolution.y()).value();
+    _acrylic = Graphic::Bitmap::create_shared(_resolution.x(), _resolution.y()).value();
 
     _render_invoker->invoke_later();
 }

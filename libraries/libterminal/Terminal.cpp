@@ -4,7 +4,7 @@
 #include <libsystem/math/MinMax.h>
 #include <libterminal/Terminal.h>
 
-namespace terminal
+namespace Terminal
 {
 
 Terminal::Terminal(int width, int height)
@@ -536,4 +536,4 @@ void Terminal::write(const char *buffer, size_t size)
     }
 }
 
-} // namespace terminal
+} // namespace Terminal

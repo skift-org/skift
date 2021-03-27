@@ -1,6 +1,6 @@
 #pragma once
 
-namespace terminal
+namespace Terminal
 {
 
 enum Color
@@ -28,4 +28,4 @@ enum Color
     _COLOR_COUNT
 };
 
-} // namespace terminal
+} // namespace Terminal

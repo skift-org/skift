@@ -5,7 +5,7 @@
 #include <libterminal/Cell.h>
 #include <libterminal/Cursor.h>
 
-namespace terminal
+namespace Terminal
 {
 
 enum class State
@@ -85,4 +85,4 @@ public:
     void write(const char *buffer, size_t size);
 };
 
-} // namespace terminal
+} // namespace Terminal

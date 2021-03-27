@@ -14,8 +14,8 @@ void render_cell(
     int x,
     int y,
     Codepoint codepoint,
-    terminal::Color foreground,
-    terminal::Color background,
-    terminal::Attributes attributes);
+    Terminal::Color foreground,
+    Terminal::Color background,
+    Terminal::Attributes attributes);
 
-void render_cell(Graphic::Painter &painter, int x, int y, terminal::Cell cell);
+void render_cell(Graphic::Painter &painter, int x, int y, Terminal::Cell cell);

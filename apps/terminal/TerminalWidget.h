@@ -9,7 +9,7 @@
 class TerminalWidget : public Widget
 {
 private:
-    OwnPtr<terminal::Terminal> _terminal;
+    OwnPtr<Terminal::Terminal> _terminal;
     bool _cursor_blink;
 
     IO::Terminal _terminal_device;

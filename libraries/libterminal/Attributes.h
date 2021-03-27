@@ -3,7 +3,7 @@
 #include <libsystem/Common.h>
 #include <libterminal/Color.h>
 
-namespace terminal
+namespace Terminal
 {
 
 struct Attributes
@@ -74,4 +74,4 @@ struct Attributes
     }
 };
 
-} // namespace terminal
+} // namespace Terminal

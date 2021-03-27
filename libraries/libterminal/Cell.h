@@ -1,9 +1,9 @@
 #pragma once
 
-#include <libutils/unicode/Codepoint.h>
 #include <libterminal/Attributes.h>
+#include <libutils/unicode/Codepoint.h>
 
-namespace terminal
+namespace Terminal
 {
 struct Cell
 {
@@ -12,4 +12,4 @@ struct Cell
     bool dirty;
 };
 
-} // namespace terminal
+} // namespace Terminal

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace terminal
+namespace Terminal
 {
 struct Cursor
 {
@@ -10,4 +10,4 @@ struct Cursor
     bool visible;
 };
 
-} // namespace terminal
+} // namespace Terminal

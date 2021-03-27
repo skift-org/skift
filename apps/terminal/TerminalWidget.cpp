@@ -1,9 +1,9 @@
 #include <libgraphic/Painter.h>
+#include <libsystem/Logger.h>
 #include <libsystem/process/Launchpad.h>
 #include <libtest/AssertEqual.h>
 #include <libwidget/Event.h>
 #include <libwidget/Window.h>
-#include <libsystem/Logger.h>
 
 #include "terminal/Common.h"
 #include "terminal/TerminalWidget.h"
@@ -12,7 +12,7 @@
 
 TerminalWidget::TerminalWidget(Widget *parent) : Widget(parent)
 {
-    _terminal = own<terminal::Terminal>(80, 24);
+    _terminal = own<Terminal::Terminal>(80, 24);
 
     _terminal_device = IO::Terminal::create().value();
 
@@ -44,7 +44,7 @@ void TerminalWidget::paint(Graphic::Painter &painter, const Recti &dirty)
     {
         for (int x = 0; x < _terminal->width(); x++)
         {
-            terminal::Cell cell = _terminal->cell_at(x, y);
+            Terminal::Cell cell = _terminal->cell_at(x, y);
             render_cell(painter, x, y, cell);
             _terminal->cell_undirty(x, y);
         }
@@ -55,7 +55,7 @@ void TerminalWidget::paint(Graphic::Painter &painter, const Recti &dirty)
 
     if (cell_bound(cx, cy).colide_with(dirty))
     {
-        terminal::Cell cell = _terminal->cell_at(cx, cy);
+        Terminal::Cell cell = _terminal->cell_at(cx, cy);
 
         if (window()->focused())
         {
@@ -66,9 +66,9 @@ void TerminalWidget::paint(Graphic::Painter &painter, const Recti &dirty)
                     cx,
                     cy,
                     cell.codepoint,
-                    terminal::BACKGROUND,
-                    terminal::FOREGROUND,
-                    terminal::Attributes::defaults());
+                    Terminal::BACKGROUND,
+                    Terminal::FOREGROUND,
+                    Terminal::Attributes::defaults());
             }
             else
             {

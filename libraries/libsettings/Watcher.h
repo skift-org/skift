@@ -8,7 +8,7 @@
 namespace Settings
 {
 
-using WatcherCallback = Callback<void(const json::Value &)>;
+using WatcherCallback = Callback<void(const Json::Value &)>;
 
 class Watcher
 {
@@ -33,7 +33,7 @@ public:
         unregister_watcher(*this);
     }
 
-    void invoke(const json::Value &value)
+    void invoke(const Json::Value &value)
     {
         _callback(value);
     }

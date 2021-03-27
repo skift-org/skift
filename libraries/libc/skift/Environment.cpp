@@ -1,6 +1,6 @@
 #include <libutils/json/Json.h>
 
-static json::Value *_root = nullptr;
+static Json::Value *_root = nullptr;
 
 void environment_load(const char *buffer)
 {
@@ -8,10 +8,10 @@ void environment_load(const char *buffer)
     {
         delete _root;
     }
-    _root = new json::Value(move(json::parse(buffer, strlen(buffer))));
+    _root = new Json::Value(move(Json::parse(buffer, strlen(buffer))));
 }
 
-json::Value &environment()
+Json::Value &environment()
 {
     assert(_root);
     return *_root;
@@ -22,7 +22,7 @@ String environment_copy()
     if (_root)
     {
         Prettifier pretty{};
-        json::prettify(pretty, *_root);
+        Json::prettify(pretty, *_root);
 
         return pretty.finalize();
     }

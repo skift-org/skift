@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libsettings/Path.h>
-#include <libutils/json/Json.h>
 #include <libutils/Optional.h>
+#include <libutils/json/Json.h>
 
 namespace Settings
 {
@@ -17,8 +17,8 @@ void unregister_watcher(Watcher &watcher);
 
 /* --- Public functions ----------------------------------------------------- */
 
-Optional<json::Value> read(const Path path);
+Optional<Json::Value> read(const Path path);
 
-bool write(const Path path, json::Value value);
+bool write(const Path path, Json::Value value);
 
 } // namespace Settings

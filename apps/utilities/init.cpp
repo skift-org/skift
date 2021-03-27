@@ -61,7 +61,7 @@ int main(int, const char *[])
     logger_level(LOGGER_TRACE);
 
     logger_info("Loading environement variables...");
-    environment() = json::parse_file("/Configs/environment.json");
+    environment() = Json::parse_file("/Configs/environment.json");
 
     if constexpr (__CONFIG_IS_TEST__)
     {

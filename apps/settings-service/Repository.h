@@ -38,7 +38,7 @@ struct Repository
         return repository;
     }
 
-    void write(const Path &path, const json::Value &value)
+    void write(const Path &path, const Json::Value &value)
     {
         if (!domains.has_key(path.domain))
         {
@@ -48,11 +48,11 @@ struct Repository
         domains[path.domain].write(path, value);
     }
 
-    json::Value read(const Path &path)
+    Json::Value read(const Path &path)
     {
         if (path.domain == "*")
         {
-            json::Value::Object obj;
+            Json::Value::Object obj;
 
             domains.foreach ([&](auto &key, auto &value) {
                 obj[key] = value.read(path);

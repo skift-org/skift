@@ -7,7 +7,7 @@
 namespace panel
 {
 
-MenuEntry::MenuEntry(String id, const json::Value &value)
+MenuEntry::MenuEntry(String id, const Json::Value &value)
 {
     value.with("name", [this](auto &v) {
         name = v.as_string();
@@ -66,7 +66,7 @@ Vector<MenuEntry> MenuEntry::load()
 
         if (manifest_file.exist())
         {
-            entries->emplace_back(entry.name, json::parse_file(path));
+            entries->emplace_back(entry.name, Json::parse_file(path));
         }
     }
 

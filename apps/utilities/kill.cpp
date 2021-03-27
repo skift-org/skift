@@ -25,7 +25,7 @@ int killall(String name)
         IO::errln("Don't kill cats, you monster!");
     }
 
-    auto processes = json::parse_file("/System/processes");
+    auto processes = Json::parse_file("/System/processes");
 
     for (size_t i = 0; i < processes.length(); i++)
     {

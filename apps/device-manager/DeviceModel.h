@@ -6,7 +6,7 @@
 class DeviceModel : public TableModel
 {
 private:
-    json::Value _data = nullptr;
+    Json::Value _data = nullptr;
 
 public:
     int rows() override;

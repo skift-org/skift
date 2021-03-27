@@ -111,7 +111,7 @@ void theme_load(const char *path)
 {
     logger_info("Loading theme from '%s'", path);
 
-    auto root = json::parse_file(path);
+    auto root = Json::parse_file(path);
 
     if (!root.has("colors"))
     {
@@ -123,7 +123,7 @@ void theme_load(const char *path)
 
     if (root.has("dark"))
     {
-        _theme_is_dark = root.get("dark").is(json::TRUE);
+        _theme_is_dark = root.get("dark").is(Json::TRUE);
     }
     else
     {
@@ -134,7 +134,7 @@ void theme_load(const char *path)
     {
         const auto &color = colors.get(_theme_colors_names[i]);
 
-        if (color.is(json::STRING))
+        if (color.is(Json::STRING))
         {
             _theme_colors[i] = Graphic::Color::parse(color.as_string());
         }

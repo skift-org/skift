@@ -14,7 +14,7 @@ private:
     OwnPtr<Watcher> _watcher;
     Settings::Path _path;
     WatcherCallback _callback;
-    Optional<json::Value> _value;
+    Optional<Json::Value> _value;
 
 public:
     Setting(const char *path, WatcherCallback callback)
@@ -34,12 +34,12 @@ public:
     {
     }
 
-    void write(const json::Value &value)
+    void write(const Json::Value &value)
     {
         Settings::write(_path, value);
     }
 
-    json::Value read()
+    Json::Value read()
     {
         if (!_value)
         {

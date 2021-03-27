@@ -13,7 +13,7 @@ Wallpaper::Wallpaper(Vec2i resolution)
     });
 
     _setting_image = own<Settings::Setting>("appearance:wallpaper.image", [this](auto &value) {
-        if (value.is(json::STRING))
+        if (value.is(Json::STRING))
         {
             _orginal = Graphic::Bitmap::load_from_or_placeholder(value.as_string());
         }
@@ -26,7 +26,7 @@ Wallpaper::Wallpaper(Vec2i resolution)
     });
 
     _setting_color = own<Settings::Setting>("appearance:wallpaper.color", [this](auto &value) {
-        if (value.is(json::STRING))
+        if (value.is(Json::STRING))
         {
             _background = Graphic::Color::parse(value.as_string());
         }

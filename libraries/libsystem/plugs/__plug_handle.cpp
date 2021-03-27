@@ -32,7 +32,7 @@ String __plug_process_resolve(String raw_path)
 {
     if (!environment().has("POSIX") ||
         !environment().get("POSIX").has("PWD") ||
-        !environment().get("POSIX").get("PWD").is(json::STRING))
+        !environment().get("POSIX").get("PWD").is(Json::STRING))
     {
         return raw_path;
     }

@@ -24,7 +24,7 @@ struct Message
 
     Type type;
     Optional<Path> path;
-    Optional<json::Value> payload;
+    Optional<Json::Value> payload;
 };
 
 struct Protocol

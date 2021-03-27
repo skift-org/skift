@@ -38,7 +38,7 @@ struct Domain
         return domain;
     }
 
-    void write(const Path &path, const json::Value &value)
+    void write(const Path &path, const Json::Value &value)
     {
         if (!bundles.has_key(path.bundle))
         {
@@ -48,11 +48,11 @@ struct Domain
         bundles[path.bundle].write(path, value);
     }
 
-    json::Value read(const Path &path)
+    Json::Value read(const Path &path)
     {
         if (path.domain == "*")
         {
-            json::Value::Object obj;
+            Json::Value::Object obj;
 
             bundles.foreach ([&](auto &key, auto &value) {
                 obj[key] = value.read(path);

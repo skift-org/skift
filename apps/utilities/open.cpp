@@ -17,9 +17,9 @@ Result open(const char *raw_path)
         return ERR_EXTENSION;
     }
 
-    auto file_extensions = json::parse_file(FILE_EXTENSIONS_DATABASE_PATH);
+    auto file_extensions = Json::parse_file(FILE_EXTENSIONS_DATABASE_PATH);
 
-    if (!file_extensions.is(json::OBJECT))
+    if (!file_extensions.is(Json::OBJECT))
     {
         IO::errln("The file extensions database is not found (" FILE_EXTENSIONS_DATABASE_PATH ").");
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
@@ -27,14 +27,14 @@ Result open(const char *raw_path)
 
     const auto &file_type = file_extensions.get(extension);
 
-    if (!file_type.is(json::STRING))
+    if (!file_type.is(Json::STRING))
     {
         return ERR_EXTENSION;
     }
 
-    auto file_types = json::parse_file(FILE_TYPES_DATABASE_PATH);
+    auto file_types = Json::parse_file(FILE_TYPES_DATABASE_PATH);
 
-    if (!file_types.is(json::OBJECT))
+    if (!file_types.is(Json::OBJECT))
     {
         IO::errln("The file types database is not found (" FILE_TYPES_DATABASE_PATH ").");
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
@@ -42,14 +42,14 @@ Result open(const char *raw_path)
 
     auto file_type_info = file_types.get(file_type.as_string());
 
-    if (!file_type_info.is(json::OBJECT))
+    if (!file_type_info.is(Json::OBJECT))
     {
         return ERR_EXTENSION;
     }
 
     auto file_type_open_with = file_type_info.get("open-with");
 
-    if (!file_type_open_with.is(json::STRING))
+    if (!file_type_open_with.is(Json::STRING))
     {
         return ERR_EXTENSION;
     }

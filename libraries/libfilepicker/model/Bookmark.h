@@ -31,9 +31,9 @@ public:
         return _path;
     }
 
-    Bookmark(const json::Value &value)
+    Bookmark(const Json::Value &value)
     {
-        if (value.is(json::OBJECT))
+        if (value.is(Json::OBJECT))
         {
             value.with("name", [&](auto &value) {
                 _name = value.as_string();
@@ -61,9 +61,9 @@ public:
         return _path == other._path;
     }
 
-    json::Value serialize()
+    Json::Value serialize()
     {
-        json::Value::Object obj{};
+        Json::Value::Object obj{};
 
         obj["name"] = _name;
         obj["icon"] = _icon->name();

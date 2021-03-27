@@ -60,7 +60,7 @@ Variant TaskModel::data(int row, int column)
     {
         Variant value = task.get("id").as_integer();
 
-        if (task.get("user").is(json::TRUE))
+        if (task.get("user").is(Json::TRUE))
         {
             return value.with_icon(Graphic::Icon::get("account"));
         }
@@ -89,11 +89,11 @@ Variant TaskModel::data(int row, int column)
 
 void TaskModel::update()
 {
-    _data = json::parse_file("/System/processes");
+    _data = Json::parse_file("/System/processes");
     did_update();
 }
 
-static String greedy(json::Value &data, const char *field)
+static String greedy(Json::Value &data, const char *field)
 {
     size_t most_greedy_index = 0;
     int most_greedy_value = 0;

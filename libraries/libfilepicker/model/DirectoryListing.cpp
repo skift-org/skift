@@ -15,13 +15,13 @@ static auto get_icon_for_node(String current_directory, IO::Directory::Entry &en
     {
         auto manifest_path = IO::format("{}/{}/manifest.json", current_directory, entry.name);
 
-        auto root = json::parse_file(manifest_path);
+        auto root = Json::parse_file(manifest_path);
 
-        if (root.is(json::OBJECT))
+        if (root.is(Json::OBJECT))
         {
             auto icon_name = root.get("icon");
 
-            if (icon_name.is(json::STRING))
+            if (icon_name.is(Json::STRING))
             {
                 return Graphic::Icon::get(icon_name.as_string());
             }

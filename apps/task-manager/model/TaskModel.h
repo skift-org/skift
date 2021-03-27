@@ -9,7 +9,7 @@ namespace task_manager
 class TaskModel : public TableModel
 {
 private:
-    json::Value _data;
+    Json::Value _data;
 
 public:
     int rows() override;

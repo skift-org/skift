@@ -28,7 +28,7 @@ int main(int argc, const char **argv)
         }
 
         Prettifier pretty;
-        json::prettify(pretty, *maybe_settings);
+        Json::prettify(pretty, *maybe_settings);
 
         stream_format(out_stream, "%s", pretty.finalize().cstring());
 
@@ -50,7 +50,7 @@ int main(int argc, const char **argv)
             args.usage();
         }
 
-        Settings::write(Settings::Path::parse(*maybe_key_name), json::parse(*maybe_value));
+        Settings::write(Settings::Path::parse(*maybe_key_name), Json::parse(*maybe_value));
 
         return PROCESS_SUCCESS;
     });
@@ -69,7 +69,7 @@ int main(int argc, const char **argv)
 
         watcher = own<Settings::Watcher>(Settings::Path::parse(*maybe_key_name), [&](auto &value) {
             Prettifier pretty;
-            json::prettify(pretty, value);
+            Json::prettify(pretty, value);
 
             stream_format(out_stream, "%s\n", pretty.finalize().cstring());
         });

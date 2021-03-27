@@ -17,7 +17,7 @@ struct MenuEntry
     RefPtr<Graphic::Bitmap> image;
     String command;
 
-    MenuEntry(String id, const json::Value &value);
+    MenuEntry(String id, const Json::Value &value);
 
     static Vector<MenuEntry> load();
 };

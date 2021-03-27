@@ -39,19 +39,19 @@ int main(int argc, char const *argv[])
     if (args.argc() == 0)
     {
         StreamScanner scanner{in_stream};
-        auto root = json::parse(scanner);
+        auto root = Json::parse(scanner);
 
         Prettifier pretty{options};
-        json::prettify(pretty, root);
+        Json::prettify(pretty, root);
         IO::write(IO::out(), pretty.finalize());
     }
     else
     {
         args.argv().foreach ([&](auto &path) {
-            auto root = json::parse_file(path);
+            auto root = Json::parse_file(path);
 
             Prettifier pretty{options};
-            json::prettify(pretty, root);
+            Json::prettify(pretty, root);
             IO::write(IO::out(), pretty.finalize());
 
             return Iteration::CONTINUE;

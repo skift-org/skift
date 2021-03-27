@@ -28,7 +28,7 @@ Result Protocol::encode_message(IO::Connection &connection, const Message &messa
     if (message.payload)
     {
         Prettifier pretty;
-        json::prettify(pretty, *message.payload);
+        Json::prettify(pretty, *message.payload);
         payload_buffer = pretty.finalize();
     }
 
@@ -74,7 +74,7 @@ ResultOr<Message> Protocol::decode_message(IO::Connection &connection)
         IO::MemoryWriter memory;
         TRY(IO::copy(connection, memory, header.payload_length));
         String str = memory.string();
-        message.payload = json::parse(str);
+        message.payload = Json::parse(str);
     }
 
     return message;

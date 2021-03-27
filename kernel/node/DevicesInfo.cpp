@@ -16,10 +16,10 @@ FsDeviceInfo::FsDeviceInfo() : FsNode(FILE_TYPE_DEVICE)
 
 Result FsDeviceInfo::open(FsHandle &handle)
 {
-    json::Value::Array root{};
+    Json::Value::Array root{};
 
     device_iterate([&](RefPtr<Device> device) {
-        json::Value::Object device_object{};
+        Json::Value::Object device_object{};
 
         __unused(device);
 
@@ -41,7 +41,7 @@ Result FsDeviceInfo::open(FsHandle &handle)
     });
 
     Prettifier pretty{};
-    json::prettify(pretty, root);
+    Json::prettify(pretty, root);
 
     handle.attached = pretty.finalize().storage().give_ref();
     handle.attached_size = reinterpret_cast<StringStorage *>(handle.attached)->size();

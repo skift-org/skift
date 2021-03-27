@@ -7,7 +7,7 @@
 #include <libutils/String.h>
 #include <libutils/json/Value.h>
 
-namespace json
+namespace Json
 {
 inline void prettify(Prettifier &pretty, const Value &value)
 {
@@ -94,4 +94,4 @@ inline void prettify(Prettifier &pretty, const Value &value)
     }
 }
 
-} // namespace json
+} // namespace Json

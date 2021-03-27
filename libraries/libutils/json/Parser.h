@@ -7,7 +7,7 @@
 #include <libutils/Strings.h>
 #include <libutils/json/Value.h>
 
-namespace json
+namespace Json
 {
 Value value(Scanner &scan);
 
@@ -200,4 +200,4 @@ inline Value parse_file(String path)
     return value(scan);
 }
 
-} // namespace json
+} // namespace Json

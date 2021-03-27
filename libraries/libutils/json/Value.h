@@ -5,7 +5,7 @@
 #include <libutils/String.h>
 #include <libutils/Vector.h>
 
-namespace json
+namespace Json
 {
 
 enum Type
@@ -42,7 +42,8 @@ public:
 private:
     Type _type;
 
-    union {
+    union
+    {
         StringStorage *_string;
         int _integer;
 #ifndef __KERNEL__
@@ -475,4 +476,4 @@ public:
     }
 };
 
-} // namespace json
+} // namespace Json

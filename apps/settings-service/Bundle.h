@@ -9,15 +9,15 @@ namespace Settings
 
 struct Bundle
 {
-    HashMap<String, json::Value> keys;
+    HashMap<String, Json::Value> keys;
 
     static Optional<Bundle> Load(const String &path)
     {
         Bundle bundle;
 
-        auto value = json::parse_file(path);
+        auto value = Json::parse_file(path);
 
-        if (!value.is(json::OBJECT))
+        if (!value.is(Json::OBJECT))
         {
             return {};
         }
@@ -32,16 +32,16 @@ struct Bundle
         return bundle;
     }
 
-    void write(const Path &path, const json::Value &value)
+    void write(const Path &path, const Json::Value &value)
     {
         keys[path.key] = value;
     }
 
-    json::Value read(const Path &path)
+    Json::Value read(const Path &path)
     {
         if (path.key == "*")
         {
-            json::Value::Object obj;
+            Json::Value::Object obj;
 
             keys.foreach ([&](auto &key, auto &value) {
                 obj[key] = value;

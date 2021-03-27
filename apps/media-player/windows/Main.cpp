@@ -7,7 +7,7 @@
 
 #include "media-player/windows/Main.h"
 
-namespace media_player
+namespace MediaPlayer
 {
 
 Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
@@ -38,4 +38,4 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
     new Slider(control_bar);
 }
 
-} // namespace media_player
+} // namespace MediaPlayer

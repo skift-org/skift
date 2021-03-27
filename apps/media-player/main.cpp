@@ -6,7 +6,7 @@ int main(int argc, char **argv)
 {
     Application::initialize(argc, argv);
 
-    auto window = new media_player::Main();
+    auto window = new MediaPlayer::Main();
 
     window->show();
 

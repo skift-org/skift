@@ -3,7 +3,7 @@
 #include <libgraphic/Bitmap.h>
 #include <libwidget/Widget.h>
 
-namespace media_player
+namespace MediaPlayer
 {
 
 class Cover : public Widget
@@ -18,4 +18,4 @@ public:
     void paint(Graphic::Painter &painter, const Recti &) override;
 };
 
-} // namespace media_player
+} // namespace MediaPlayer

@@ -2,7 +2,7 @@
 
 #include <libgraphic/Painter.h>
 
-namespace media_player
+namespace MediaPlayer
 {
 
 Cover::Cover(Widget *parent, RefPtr<Graphic::Bitmap> bitmap)
@@ -29,4 +29,4 @@ void Cover::paint(Graphic::Painter &painter, const Recti &)
     painter.draw_rectangle_rounded(cover_bound, 12, 1, Graphic::Colors::WHITE.with_alpha(0.25));
 }
 
-} // namespace media_player
+} // namespace MediaPlayer

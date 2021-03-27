@@ -5,7 +5,7 @@
 #include <libutils/RefPtr.h>
 #include <libutils/json/Json.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 struct Bookmark
@@ -73,4 +73,4 @@ public:
     }
 };
 
-} // namespace filepicker
+} // namespace FilePicker

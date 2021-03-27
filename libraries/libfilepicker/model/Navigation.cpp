@@ -1,6 +1,6 @@
 #include <libfilepicker/model/Navigation.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 Navigation::Navigation() : _current(Path::parse(""))
@@ -109,4 +109,4 @@ void Navigation::clear_foreward()
     _foreward.clear();
 }
 
-} // namespace filepicker
+} // namespace FilePicker

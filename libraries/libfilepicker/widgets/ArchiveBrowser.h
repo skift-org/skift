@@ -7,7 +7,7 @@
 
 #include <libfile/Archive.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 class ArchiveBrowser : public Table
@@ -50,4 +50,4 @@ public:
     }
 };
 
-} // namespace filepicker
+} // namespace FilePicker

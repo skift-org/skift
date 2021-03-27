@@ -3,7 +3,7 @@
 #include <libfilepicker/model/ArchiveListing.h>
 #include <libutils/json/Json.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 enum Column
@@ -115,4 +115,4 @@ const ArchiveEntryInfo &ArchiveListing::info(int index) const
     return _entries[index];
 }
 
-} // namespace filepicker
+} // namespace FilePicker

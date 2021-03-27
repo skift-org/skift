@@ -3,7 +3,7 @@
 
 #include <libfilepicker/model/Bookmarks.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 const Vector<Bookmark> &Bookmarks::all() const
@@ -80,4 +80,4 @@ void Bookmarks::save()
     file.write(data.cstring(), data.length());
 }
 
-} // namespace filepicker
+} // namespace FilePicker

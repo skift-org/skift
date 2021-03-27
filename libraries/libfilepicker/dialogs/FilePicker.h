@@ -4,7 +4,7 @@
 
 #include <libfilepicker/model/Navigation.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 class Dialog : public ::Dialog
@@ -23,4 +23,4 @@ public:
     virtual void render(Window *window);
 };
 
-} // namespace filepicker
+} // namespace FilePicker

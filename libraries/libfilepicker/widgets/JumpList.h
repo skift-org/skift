@@ -8,7 +8,7 @@
 #include <libfilepicker/model/Bookmarks.h>
 #include <libfilepicker/model/Navigation.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 class JumpList : public Panel
@@ -64,4 +64,4 @@ public:
     }
 };
 
-} // namespace filepicker
+} // namespace FilePicker

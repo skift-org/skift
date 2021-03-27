@@ -7,7 +7,7 @@
 #include <libfilepicker/model/Navigation.h>
 #include <libfilepicker/widgets/Breadcrumb.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 class ToolBar : public Panel
@@ -97,4 +97,4 @@ public:
     ~ToolBar() override {}
 };
 
-} // namespace filepicker
+} // namespace FilePicker

@@ -9,7 +9,7 @@
 
 #include <libfile/Archive.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 class ArchiveListing : public TableModel
@@ -36,4 +36,4 @@ public:
     const ArchiveEntryInfo &info(int index) const;
 };
 
-} // namespace filepicker
+} // namespace FilePicker

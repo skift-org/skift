@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 
         auto dialog_button = new Button(panel_grid, Button::FILLED, "Open dialog!");
         dialog_button->on(Event::ACTION, [&](auto) {
-            filepicker::Dialog picker{};
+            FilePicker::Dialog picker{};
             picker.show();
         });
 

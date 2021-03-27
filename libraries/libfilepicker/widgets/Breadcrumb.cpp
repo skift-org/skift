@@ -7,7 +7,7 @@
 
 #include <libfilepicker/widgets/Breadcrumb.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 Breadcrumb::Breadcrumb(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
@@ -89,4 +89,4 @@ void Breadcrumb::render()
     }
 }
 
-} // namespace filepicker
+} // namespace FilePicker

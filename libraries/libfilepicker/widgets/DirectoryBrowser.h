@@ -6,7 +6,7 @@
 #include <libfilepicker/model/DirectoryListing.h>
 #include <libfilepicker/model/Navigation.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 class DirectoryBrowser : public Table
@@ -57,4 +57,4 @@ public:
     }
 };
 
-} // namespace filepicker
+} // namespace FilePicker

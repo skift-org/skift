@@ -14,7 +14,7 @@ class MainWindow :
 {
 private:
 public:
-    MainWindow(RefPtr<filepicker::Navigation> navigation, RefPtr<filepicker::Bookmarks> bookmarks)
+    MainWindow(RefPtr<FilePicker::Navigation> navigation, RefPtr<FilePicker::Bookmarks> bookmarks)
         : Window(WINDOW_RESIZABLE)
     {
         icon(Graphic::Icon::get("folder"));
@@ -25,18 +25,18 @@ public:
 
         new TitleBar(root());
 
-        new filepicker::ToolBar(root(), navigation, bookmarks);
+        new FilePicker::ToolBar(root(), navigation, bookmarks);
 
         auto bookmarks_and_browser = new Container(root());
 
         bookmarks_and_browser->flags(Widget::FILL);
         bookmarks_and_browser->layout(HFLOW(1));
 
-        auto jump_list = new filepicker::JumpList(bookmarks_and_browser, navigation, bookmarks);
+        auto jump_list = new FilePicker::JumpList(bookmarks_and_browser, navigation, bookmarks);
 
         jump_list->min_width(160);
 
-        auto browser = new filepicker::DirectoryBrowser(bookmarks_and_browser, navigation);
+        auto browser = new FilePicker::DirectoryBrowser(bookmarks_and_browser, navigation);
 
         browser->on_element_selected = [&](String &path) {
             auto l = launchpad_create("open", "/System/Utilities/open");

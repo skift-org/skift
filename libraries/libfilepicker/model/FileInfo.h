@@ -5,7 +5,7 @@
 #include <libgraphic/Icon.h>
 #include <libutils/String.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 struct FileInfo
@@ -16,4 +16,4 @@ struct FileInfo
     size_t size;
 };
 
-} // namespace filepicker
+} // namespace FilePicker

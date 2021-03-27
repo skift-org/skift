@@ -5,7 +5,7 @@
 #include <libfilepicker/widgets/DirectoryBrowser.h>
 #include <libfilepicker/widgets/ToolBar.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 Dialog::Dialog()
@@ -45,4 +45,4 @@ void Dialog::render(Window *window)
     create_buttons(action_container);
 }
 
-} // namespace filepicker
+} // namespace FilePicker

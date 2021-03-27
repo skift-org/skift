@@ -5,7 +5,7 @@
 
 #include <libfilepicker/model/Bookmark.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 class Bookmarks :
@@ -33,4 +33,4 @@ public:
     void save();
 };
 
-} // namespace filepicker
+} // namespace FilePicker

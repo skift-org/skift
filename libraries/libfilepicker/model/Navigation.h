@@ -5,7 +5,7 @@
 #include <libutils/Path.h>
 #include <libutils/Vector.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 class Navigation :
@@ -56,4 +56,4 @@ public:
     void clear_foreward();
 };
 
-} // namespace filepicker
+} // namespace FilePicker

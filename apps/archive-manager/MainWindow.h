@@ -16,9 +16,9 @@ class MainWindow :
     public Window
 {
 private:
-    RefPtr<filepicker::Navigation> _navigation;
+    RefPtr<FilePicker::Navigation> _navigation;
     RefPtr<Archive> _archive;
-    filepicker::Dialog _dialog;
+    FilePicker::Dialog _dialog;
 
 public:
     void set_archive(RefPtr<Archive> archive)
@@ -27,7 +27,7 @@ public:
         render();
     }
 
-    MainWindow(RefPtr<filepicker::Navigation> navigation, RefPtr<Archive> archive)
+    MainWindow(RefPtr<FilePicker::Navigation> navigation, RefPtr<Archive> archive)
         : Window(WINDOW_RESIZABLE), _navigation(navigation), _archive(archive)
     {
         icon(Graphic::Icon::get("folder-zip"));
@@ -81,7 +81,7 @@ public:
                 }
             });
 
-            new filepicker::ArchiveBrowser(browser, _navigation, _archive);
+            new FilePicker::ArchiveBrowser(browser, _navigation, _archive);
         }
     }
 };

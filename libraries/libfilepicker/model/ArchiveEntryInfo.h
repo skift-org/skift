@@ -5,7 +5,7 @@
 #include <libgraphic/Icon.h>
 #include <libutils/String.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 struct ArchiveEntryInfo
@@ -17,4 +17,4 @@ struct ArchiveEntryInfo
     size_t uncompressed_size;
 };
 
-} // namespace filepicker
+} // namespace FilePicker

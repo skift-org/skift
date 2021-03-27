@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 {
     Application::initialize(argc, argv);
 
-    auto navigation = make<filepicker::Navigation>();
+    auto navigation = make<FilePicker::Navigation>();
 
     MainWindow *window = nullptr;
 

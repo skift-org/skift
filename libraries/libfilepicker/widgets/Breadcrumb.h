@@ -5,7 +5,7 @@
 #include <libfilepicker/model/Bookmarks.h>
 #include <libfilepicker/model/Navigation.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 struct Breadcrumb : public Widget
@@ -28,4 +28,4 @@ public:
     void render();
 };
 
-} // namespace filepicker
+} // namespace FilePicker

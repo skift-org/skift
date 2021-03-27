@@ -7,7 +7,7 @@
 #include <libfilepicker/model/FileInfo.h>
 #include <libfilepicker/model/Navigation.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 class DirectoryListing : public TableModel
@@ -33,4 +33,4 @@ public:
     const FileInfo &info(int index) const;
 };
 
-} // namespace filepicker
+} // namespace FilePicker

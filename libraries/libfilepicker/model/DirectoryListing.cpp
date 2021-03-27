@@ -6,7 +6,7 @@
 
 #include <libfilepicker/model/DirectoryListing.h>
 
-namespace filepicker
+namespace FilePicker
 {
 
 static auto get_icon_for_node(String current_directory, IO::Directory::Entry &entry)
@@ -156,4 +156,4 @@ const FileInfo &DirectoryListing::info(int index) const
     return _files[index];
 }
 
-} // namespace filepicker
+} // namespace FilePicker

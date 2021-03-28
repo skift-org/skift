@@ -1,4 +1,4 @@
-#include <libsettings/Settings.h>
+#include <libsettings/Service.h>
 
 #include <libsystem/process/Process.h>
 
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     auto set_has_wallaper = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("wallpaper"), "Set As Wallpaper");
 
     set_has_wallaper->on(Widget::Event::ACTION, [&](auto) {
-        Settings::write(Settings::Path::parse("appearance:wallpaper.image"), process_resolve(argv[1]));
+        Settings::Service::the()->write(Settings::Path::parse("appearance:wallpaper.image"), process_resolve(argv[1]));
     });
 
     auto image = new Widget::Image(window->root(), bitmap);

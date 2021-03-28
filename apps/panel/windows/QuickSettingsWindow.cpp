@@ -29,11 +29,11 @@ QuickSettingsWindow::QuickSettingsWindow()
     new SettingToggle(root(), "Night Light", Graphic::Icon::get("moon-waning-crescent"), "appearance:night-light.enable");
 
     (new Widget::Button(root(), Widget::Button::TEXT, "Light Theme"))->on(Widget::Event::ACTION, [](auto) {
-        Settings::write(Settings::Path::parse("appearance:widgets.theme"), "skift-light");
+        Settings::Service::the()->write(Settings::Path::parse("appearance:widgets.theme"), "skift-light");
     });
 
     (new Widget::Button(root(), Widget::Button::TEXT, "Dark Theme"))->on(Widget::Event::ACTION, [](auto) {
-        Settings::write(Settings::Path::parse("appearance:widgets.theme"), "skift-dark");
+        Settings::Service::the()->write(Settings::Path::parse("appearance:widgets.theme"), "skift-dark");
     });
 
     bound(bound_on_screen().with_height(root()->compute_size().y()));

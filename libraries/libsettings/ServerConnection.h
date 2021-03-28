@@ -19,7 +19,6 @@ public:
 
     ServerConnection(IO::Connection connection) : Peer{move(connection)}
     {
-        // sdjfmlsd
     }
 
     ResultOr<Message> request(Message message, Message::Type expected)

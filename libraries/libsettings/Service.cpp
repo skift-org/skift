@@ -1,16 +1,25 @@
-#include <libutils/Vector.h>
-
 #include <libsettings/ServerConnection.h>
-#include <libsettings/Settings.h>
+#include <libsettings/Service.h>
 #include <libsettings/Watcher.h>
+#include <libsystem/Logger.h>
+#include <libutils/Vector.h>
 
 namespace Settings
 {
 
-static Vector<Watcher *> _watchers;
-static OwnPtr<ServerConnection> _server;
+static RefPtr<Service> _instance = nullptr;
 
-static void notify_watchers(const Path &path, const Json::Value &value)
+RefPtr<Service> Service::the()
+{
+    if (_instance == nullptr)
+    {
+        _instance = make<Service>();
+    }
+
+    return _instance;
+}
+
+void Service::notify_watchers(const Path &path, const Json::Value &value)
 {
     for (size_t i = 0; i < _watchers.count(); i++)
     {
@@ -21,18 +30,20 @@ static void notify_watchers(const Path &path, const Json::Value &value)
     }
 }
 
-static ServerConnection &server()
+ServerConnection &Service::server()
 {
     if (!_server)
     {
         _server = ServerConnection::open();
-        _server->on_notify = notify_watchers;
+        _server->on_notify = [this](const Path &path, const Json::Value &value) {
+            notify_watchers(path, value);
+        };
     }
 
     return *_server;
 }
 
-static bool is_watching_path(const Path &path)
+bool Service::is_watching_path(const Path &path)
 {
     for (size_t i = 0; i < _watchers.count(); i++)
     {
@@ -45,7 +56,7 @@ static bool is_watching_path(const Path &path)
     return false;
 }
 
-void register_watcher(Watcher &watcher)
+void Service::register_watcher(Watcher &watcher)
 {
     if (!is_watching_path(watcher.path()))
     {
@@ -60,7 +71,7 @@ void register_watcher(Watcher &watcher)
     _watchers.push_back(&watcher);
 }
 
-void unregister_watcher(Watcher &watcher)
+void Service::unregister_watcher(Watcher &watcher)
 {
     _watchers.remove_value(&watcher);
 
@@ -75,7 +86,7 @@ void unregister_watcher(Watcher &watcher)
     }
 }
 
-Optional<Json::Value> read(const Path path)
+Optional<Json::Value> Service::read(const Path path)
 {
     Message message;
 
@@ -92,7 +103,7 @@ Optional<Json::Value> read(const Path path)
     return result_or_response.value().payload;
 }
 
-bool write(const Path path, Json::Value value)
+bool Service::write(const Path path, Json::Value value)
 {
     Message message;
 

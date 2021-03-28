@@ -3,7 +3,7 @@
 #include <libutils/Callback.h>
 
 #include <libsettings/Path.h>
-#include <libsettings/Settings.h>
+#include <libsettings/Service.h>
 
 namespace Settings
 {
@@ -15,6 +15,7 @@ class Watcher
 private:
     Path _path;
     WatcherCallback _callback;
+    RefPtr<Service> _service;
 
 public:
     const Path &path() const
@@ -23,14 +24,14 @@ public:
     }
 
     Watcher(Path path, WatcherCallback callback)
-        : _path{path}, _callback{callback}
+        : _path{path}, _callback{callback}, _service{Service::the()}
     {
-        register_watcher(*this);
+        _service->register_watcher(*this);
     }
 
     ~Watcher()
     {
-        unregister_watcher(*this);
+        _service->unregister_watcher(*this);
     }
 
     void invoke(const Json::Value &value)

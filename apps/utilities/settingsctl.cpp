@@ -2,7 +2,7 @@
 
 #include <libsystem/eventloop/EventLoop.h>
 
-#include <libsettings/Settings.h>
+#include <libsettings/Service.h>
 #include <libsettings/Watcher.h>
 
 int main(int argc, const char **argv)
@@ -19,7 +19,7 @@ int main(int argc, const char **argv)
     args.usage("--watch SETTINGS...");
 
     args.option_string('r', "read", "Read settings from the settings storage.", [&](auto &key_name) {
-        auto maybe_settings = Settings::read(Settings::Path::parse(key_name));
+        auto maybe_settings = Settings::Service::the()->read(Settings::Path::parse(key_name));
 
         if (!maybe_settings)
         {
@@ -50,7 +50,7 @@ int main(int argc, const char **argv)
             args.usage();
         }
 
-        Settings::write(Settings::Path::parse(*maybe_key_name), Json::parse(*maybe_value));
+        Settings::Service::the()->write(Settings::Path::parse(*maybe_key_name), Json::parse(*maybe_value));
 
         return PROCESS_SUCCESS;
     });

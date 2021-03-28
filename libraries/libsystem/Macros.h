@@ -12,8 +12,6 @@
 
 #define __cleanup(__function) __attribute__((__cleanup__(__function)))
 
-#define __cleanup_malloc __attribute__((__cleanup__(malloc_cleanup)))
-
 #define __flatten __attribute__((flatten))
 
 // Align the nearest _lower_ aligned address
@@ -37,7 +35,3 @@
 #define __nonmovable(__class_name)                \
     __class_name(const __class_name &&) = delete; \
     __class_name &operator=(const __class_name &&) = delete;
-
-#ifndef __always_inline
-#    define __always_inline inline __attribute__((always_inline))
-#endif

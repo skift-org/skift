@@ -106,18 +106,7 @@ RefPtr<Bitmap> Bitmap::load_from_or_placeholder(String path)
 Result Bitmap::save_to(String path)
 {
     __unused(path);
-    return Result::ERR_OPERATION_NOT_SUPPORTED;
-
-    // void *outbuffer __cleanup_malloc = nullptr;
-
-    // IO::File file{path, OPEN_READ};
-
-    // if (!file.exist())
-    // {
-    //     return ERR_NO_SUCH_FILE_OR_DIRECTORY;
-    // }
-
-    // return IO::write_all(file, {outbuffer, outbuffer_size});
+    return Result::ERR_NOT_IMPLEMENTED;
 }
 
 Bitmap::~Bitmap()

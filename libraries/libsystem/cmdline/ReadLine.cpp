@@ -36,7 +36,7 @@ static void readline_repaint(ReadLine *readline)
 {
     printf("\e[%luD\e[J", readline->old_cursor);
 
-    __cleanup_malloc char *cstring_buffer = readline_cstring(readline);
+    char *cstring_buffer = readline_cstring(readline);
 
     stream_write(out_stream, cstring_buffer, strlen(cstring_buffer));
 
@@ -45,6 +45,8 @@ static void readline_repaint(ReadLine *readline)
     printf("\e[%luC", readline->cursor);
 
     readline->old_cursor = readline->cursor;
+
+    free(cstring_buffer);
 }
 
 Result readline_readline(ReadLine *readline, char **line)

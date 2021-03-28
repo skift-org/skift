@@ -1,6 +1,6 @@
 #include <libio/Streams.h>
-#include <libutils/Vector.h>
 #include <libsystem/Logger.h>
+#include <libutils/Vector.h>
 
 #include "tests/Driver.h"
 
@@ -75,7 +75,7 @@ int run_all_testes()
 
     for (auto &test : *_tests)
     {
-        IO::err("test: {}: \e[1m{}\e[m... ", test.location.file, test.name);
+        IO::err("test: {}: \e[1m{}\e[m... ", test.location.file(), test.name);
 
         int child_pid = -1;
         hj_process_clone(&child_pid, TASK_WAITABLE);

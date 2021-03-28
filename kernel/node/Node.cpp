@@ -61,10 +61,10 @@ bool FsNode::is_acquire()
 
 void FsNode::acquire(int who_acquire)
 {
-    _lock.acquire_for(who_acquire, SOURCE_LOCATION);
+    _lock.acquire_for(who_acquire);
 }
 
 void FsNode::release(int who_release)
 {
-    _lock.release_for(who_release, SOURCE_LOCATION);
+    _lock.release_for(who_release);
 }

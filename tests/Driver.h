@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libtest/Asserts.h>
+#include <libutils/SourceLocation.h>
 
 namespace Test
 {
@@ -15,9 +16,9 @@ struct Test
 {
     const char *name;
     TestFunction function;
-    __SOURCE_LOCATION__ location;
+    Utils::SourceLocation location;
 
-    Test(const char *name, TestFunction function, __SOURCE_LOCATION__ location)
+    Test(const char *name, TestFunction function, Utils::SourceLocation location = Utils::SourceLocation::current())
     {
         this->name = name;
         this->function = function;
@@ -32,7 +33,6 @@ struct Test
     ::Test::Test __##__test_function##_object{ \
         #__test_function,                      \
         __##__test_function##_function,        \
-        SOURCE_LOCATION,                       \
     };                                         \
     void __##__test_function##_function()
 

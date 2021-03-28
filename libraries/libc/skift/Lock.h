@@ -4,6 +4,8 @@
 
 #include <assert.h>
 
+#include <libutils/SourceLocation.h>
+
 #ifdef __KERNEL__
 #    include "kernel/interrupts/Interupts.h"
 #endif
@@ -17,13 +19,13 @@ private:
     int _holder = NO_HOLDER;
     const char *_name = "lock-not-initialized";
 
-    __SOURCE_LOCATION__ _last_acquire_location = INVALID_SOURCE_LOCATION;
-    __SOURCE_LOCATION__ _last_release_location = INVALID_SOURCE_LOCATION;
+    Utils::SourceLocation _last_acquire_location{};
+    Utils::SourceLocation _last_release_location{};
 
     __nonmovable(Lock);
     __noncopyable(Lock);
 
-    void ensure_failed(const char *raison, __SOURCE_LOCATION__ location)
+    void ensure_failed(const char *raison, Utils::SourceLocation location)
     {
         __unused(raison);
         __unused(location);
@@ -50,9 +52,9 @@ public:
         return _name;
     }
 
-    __SOURCE_LOCATION__ acquire_location() { return _last_acquire_location; }
+    Utils::SourceLocation acquire_location() { return _last_acquire_location; }
 
-    __SOURCE_LOCATION__ release_location() { return _last_release_location; }
+    Utils::SourceLocation release_location() { return _last_release_location; }
 
     constexpr Lock(const char *name) : _name{name}
     {
@@ -65,12 +67,12 @@ public:
         return pid;
     }
 
-    void acquire(__SOURCE_LOCATION__ location)
+    void acquire(Utils::SourceLocation location = Utils::SourceLocation::current())
     {
         acquire_for(process_this(), location);
     }
 
-    void acquire_for(int holder, __SOURCE_LOCATION__ location)
+    void acquire_for(int holder, Utils::SourceLocation location = Utils::SourceLocation::current())
     {
         while (!__sync_bool_compare_and_swap(&_locked, 0, 1))
         {
@@ -87,12 +89,12 @@ public:
         _holder = holder;
     }
 
-    bool try_acquire(__SOURCE_LOCATION__ location)
+    bool try_acquire(Utils::SourceLocation location = Utils::SourceLocation::current())
     {
         return try_acquire_for(process_this(), location);
     }
 
-    bool try_acquire_for(int holder, __SOURCE_LOCATION__ location)
+    bool try_acquire_for(int holder, Utils::SourceLocation location = Utils::SourceLocation::current())
     {
         if (__sync_bool_compare_and_swap(&_locked, 0, 1))
         {
@@ -111,12 +113,12 @@ public:
         }
     }
 
-    void release(__SOURCE_LOCATION__ location)
+    void release(Utils::SourceLocation location = Utils::SourceLocation::current())
     {
         release_for(process_this(), location);
     }
 
-    void release_for(int holder, __SOURCE_LOCATION__ location)
+    void release_for(int holder, Utils::SourceLocation location = Utils::SourceLocation::current())
     {
         ensure_acquired_for(holder, location);
 
@@ -128,12 +130,12 @@ public:
         _holder = NO_HOLDER;
     }
 
-    void ensure_acquired(__SOURCE_LOCATION__ location)
+    void ensure_acquired(Utils::SourceLocation location = Utils::SourceLocation::current())
     {
         ensure_acquired_for(process_this(), location);
     }
 
-    void ensure_acquired_for(int holder, __SOURCE_LOCATION__ location)
+    void ensure_acquired_for(int holder, Utils::SourceLocation location = Utils::SourceLocation::current())
     {
         if (!locked())
         {
@@ -154,13 +156,13 @@ private:
     Lock &_lock;
 
 public:
-    LockHolder(Lock &lock) : _lock(lock)
+    LockHolder(Lock &lock, Utils::SourceLocation location = Utils::SourceLocation::current()) : _lock(lock)
     {
-        _lock.acquire(SOURCE_LOCATION);
+        _lock.acquire(location);
     }
 
     ~LockHolder()
     {
-        _lock.release(SOURCE_LOCATION);
+        _lock.release();
     }
 };

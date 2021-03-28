@@ -9,12 +9,12 @@ static Lock _memory_lock{"memory_lock"};
 
 void __plug_memory_lock()
 {
-    _memory_lock.acquire(SOURCE_LOCATION);
+    _memory_lock.acquire();
 }
 
 void __plug_memory_unlock()
 {
-    _memory_lock.release(SOURCE_LOCATION);
+    _memory_lock.release();
 }
 
 void *__plug_memory_alloc(size_t size)

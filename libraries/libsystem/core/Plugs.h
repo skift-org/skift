@@ -14,9 +14,6 @@ extern "C" void __plug_initialize();
 
 extern "C" void __plug_uninitialize(int exit_code);
 
-class Lock;
-__no_return void __plug_lock_ensure_failed(Lock &, const char *raison, __SOURCE_LOCATION__ location);
-
 /* --- Logger --------------------------------------------------------------- */
 
 void __plug_logger_lock();

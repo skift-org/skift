@@ -49,7 +49,7 @@ static const char *const witty_comments[] = {
 static bool has_panic = false;
 static bool nested_panic = false;
 
-void system_panic_internal(__SOURCE_LOCATION__ location, void *stackframe, const char *message, ...)
+void system_panic_internal(Utils::SourceLocation location, void *stackframe, const char *message, ...)
 {
     interrupts_retain();
     interrupts_disable_holding();
@@ -82,7 +82,7 @@ void system_panic_internal(__SOURCE_LOCATION__ location, void *stackframe, const
     }
 
     stream_vprintf(out_stream, message, va);
-    stream_format(out_stream, "\e[0m\n\tthrow by %s %s() ln%d", location.file, location.function, location.line);
+    stream_format(out_stream, "\e[0m\n\tthrow by %s %s() ln%d", location.file(), location.function(), location.line());
 
     stream_format(out_stream, "\n");
     stream_format(out_stream, "\n\tDiagnostic:");

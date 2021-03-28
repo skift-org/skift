@@ -52,12 +52,12 @@ bool FsHandle::locked()
 
 void FsHandle::acquire(int who_acquire)
 {
-    _lock.acquire_for(who_acquire, SOURCE_LOCATION);
+    _lock.acquire_for(who_acquire);
 }
 
 void FsHandle::release(int who_release)
 {
-    _lock.release_for(who_release, SOURCE_LOCATION);
+    _lock.release_for(who_release);
 }
 
 PollEvent FsHandle::poll(PollEvent events)

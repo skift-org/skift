@@ -21,12 +21,12 @@ void __plug_uninitialize(int exit_code)
 
 void __plug_logger_lock()
 {
-    _logger_lock.acquire(SOURCE_LOCATION);
+    _logger_lock.acquire();
 }
 
 void __plug_logger_unlock()
 {
-    _logger_lock.release(SOURCE_LOCATION);
+    _logger_lock.release();
 }
 
 void __no_return __plug_logger_fatal()

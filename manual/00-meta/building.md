@@ -95,7 +95,7 @@ $ sudo pacman -S base-devel bison flex mpc mpfr texinfo
 ```
 
 ```sh
-# On Red Hat or Red Hat based distros
+# On Red Hat or Red Hat-based distributions
 $ sudo dnf install bison flex mpc-devel mpfr-devel gmp-devel texinfo patch 
 ```
 

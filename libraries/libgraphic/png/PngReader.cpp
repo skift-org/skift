@@ -33,7 +33,6 @@ Result PngReader::read()
 
     IO::MemoryWriter uncompressed_writer;
     TRY(uncompress(uncompressed_writer));
-
     uint8_t *scanlines = uncompressed_writer.buffer();
 
     // Unfilter the scanlines
@@ -230,12 +229,12 @@ Result PngReader::unfilter(uint8_t *out, uint8_t *in)
 {
     // For PNG filter method 0
     // this function unfilters a single image (e.g. without interlacing this is called once, with Adam7 seven times)
-    // out must have enough bytes allocated already, in must have the scanlines + 1 filtertype byte per scanline
+    // out must have enough bytes allocated already, in must have the scanlines + 1 filter_type byte per scanline
     // w and h are image dimensions or dimensions of reduced image, bpp is bits per pixel
     // in and out are allowed to be the same memory address (but aren't the same size since in has the extra filter bytes)
     uint8_t *prevline = 0;
 
-    /*bytewidth is used for filtering, is 1 when bpp < 8, number of bytes per pixel otherwise*/
+    // bytewidth is used for filtering, is 1 when bpp < 8, number of bytes per pixel otherwise
     size_t bytewidth = (bits_per_pixel() + 7u) / 8u;
     size_t linebytes = (_width * bits_per_pixel() + 7u) / 8u;
 
@@ -243,9 +242,9 @@ Result PngReader::unfilter(uint8_t *out, uint8_t *in)
     {
         size_t outindex = linebytes * y;
         size_t inindex = (1 + linebytes) * y; /*the extra filterbyte added to each row*/
-        Png::FilterType filterType = (Png::FilterType)in[inindex];
+        Png::FilterType filter_type = (Png::FilterType)in[inindex];
 
-        TRY(unfilter_scanline(&out[outindex], &in[inindex + 1], prevline, bytewidth, filterType, linebytes));
+        TRY(unfilter_scanline(&out[outindex], &in[inindex + 1], prevline, bytewidth, filter_type, linebytes));
 
         prevline = &out[outindex];
     }
@@ -253,11 +252,9 @@ Result PngReader::unfilter(uint8_t *out, uint8_t *in)
     return Result::SUCCESS;
 }
 
-/*
-Path predictor, used by PNG filter type 4
-The parameters are of type short, but should come from unsigned charunsigned chars, the shorts
-are only needed to make the paeth calculation correct.
-*/
+// Path predictor, used by PNG filter type 4
+// The parameters are of type short, but should come from unsigned charunsigned chars, the shorts
+// are only needed to make the paeth calculation correct.
 static uint8_t paeth_predictor(int16_t a, int16_t b, int16_t c)
 {
     int16_t pa = abs(b - c);
@@ -276,28 +273,30 @@ static uint8_t paeth_predictor(int16_t a, int16_t b, int16_t c)
 
 // Copyright (c) 2005-2020 Lode Vandevenne
 Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
-                                    size_t bytewidth, Png::FilterType filterType, size_t length)
+                                    size_t bytewidth, Png::FilterType filter_type, size_t length)
 {
     // For PNG filter method 0
     // unfilter a PNG image scanline by scanline. when the pixels are smaller than 1 byte,
     // the filter works byte per byte (bytewidth = 1)
     // precon is the previous unfiltered scanline, recon the result, scanline the current one
-    // the incoming scanlines do NOT include the filtertype byte, that one is given in the parameter filterType instead
+    // the incoming scanlines do NOT include the filter_type byte, that one is given in the parameter filter_type instead
     // recon and scanline MAY be the same memory address! precon must be disjoint.
     size_t i;
 
-    switch (filterType)
+    switch (filter_type)
     {
     case Png::FT_None:
         for (i = 0; i != length; ++i)
             recon[i] = scanline[i];
         break;
+
     case Png::FT_Sub:
         for (i = 0; i != bytewidth; ++i)
             recon[i] = scanline[i];
         for (i = bytewidth; i < length; ++i)
             recon[i] = scanline[i] + recon[i - bytewidth];
         break;
+
     case Png::FT_Up:
         if (precon)
         {
@@ -310,6 +309,7 @@ Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, con
                 recon[i] = scanline[i];
         }
         break;
+
     case Png::FT_Average:
         if (precon)
         {
@@ -328,6 +328,7 @@ Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, con
                 recon[i] = scanline[i] + (recon[i - bytewidth] >> 1u);
         }
         break;
+
     case Png::FT_Paeth:
         if (precon)
         {
@@ -368,10 +369,12 @@ Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, con
             }
         }
         break;
+
     default:
-        logger_error("Invalid filter type: %u", filterType);
+        logger_error("Invalid filter type: %u", filter_type);
         return Result::ERR_INVALID_DATA; /*error: nonexistent filter type given*/
     }
+
     return Result::SUCCESS;
 }
 
@@ -394,6 +397,7 @@ Result PngReader::uncompress(IO::MemoryWriter &uncompressed_writer)
         logger_error("Invalid zlib sliding window size for PNG");
         return Result::ERR_INVALID_DATA;
     }
+
     auto flags = TRY(IO::read<uint8_t>(compressed_reader));
     __unused(flags);
 

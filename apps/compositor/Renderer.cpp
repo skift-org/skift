@@ -232,6 +232,11 @@ void renderer_repaint_dirty()
             renderer_region(cursor_bound());
 
             cursor_render(_framebuffer->painter());
+
+            if (_night_light_enable)
+            {
+                _framebuffer->painter().tint(cursor_bound(), Graphic::Color::from_rgb(1, 0.9, 0.8));
+            }
         }
 
         return Iteration::CONTINUE;

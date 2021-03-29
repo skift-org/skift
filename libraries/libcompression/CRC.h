@@ -5,35 +5,13 @@
 
 namespace Compression
 {
+
 class CRC
 {
 private:
     static const Array<uint32_t, 256> _table;
     uint32_t _crc = 0;
 
-public:
-    inline CRC(uint32_t crc = 0) : _crc(crc)
-    {
-    }
-
-    inline void add(const uint8_t *data, size_t size)
-    {
-        _crc = ~_crc;
-
-        for (size_t i = 0; i < size; ++i)
-        {
-            _crc = _table[data[i] ^ (uint8_t)_crc] ^ (_crc >> 8);
-        }
-
-        _crc = ~_crc;
-    }
-
-    inline uint32_t checksum()
-    {
-        return _crc;
-    }
-
-private:
     template <typename T, int N>
     static inline constexpr Array<T, N> calculate_table()
     {
@@ -57,5 +35,28 @@ private:
 
         return lookup;
     }
+
+public:
+    inline CRC(uint32_t crc = 0) : _crc(crc)
+    {
+    }
+
+    inline void add(const uint8_t *data, size_t size)
+    {
+        _crc = ~_crc;
+
+        for (size_t i = 0; i < size; ++i)
+        {
+            _crc = _table[data[i] ^ (uint8_t)_crc] ^ (_crc >> 8);
+        }
+
+        _crc = ~_crc;
+    }
+
+    inline uint32_t checksum()
+    {
+        return _crc;
+    }
 };
+
 } // namespace Compression

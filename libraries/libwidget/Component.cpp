@@ -100,7 +100,8 @@ void Component::do_layout()
 
     case Layout::STACK:
     {
-        _childs.foreach ([this](Component *child) {
+        for (auto &child : _childs)
+        {
             if (child->flags() & FILL)
             {
                 auto bound = content();
@@ -130,9 +131,7 @@ void Component::do_layout()
 
                 child->container(Recti{size}.centered_within(content()));
             }
-
-            return Iteration::CONTINUE;
-        });
+        }
     }
     break;
 
@@ -140,7 +139,8 @@ void Component::do_layout()
     {
         int index = 0;
 
-        _childs.foreach ([&](auto child) {
+        for (auto &child : _childs)
+        {
             int x = index % _layout.hcell;
             int y = index / _layout.hcell;
 
@@ -149,8 +149,7 @@ void Component::do_layout()
 
             child->container(column);
             index++;
-            return Iteration::CONTINUE;
-        });
+        }
     }
     break;
 
@@ -158,13 +157,12 @@ void Component::do_layout()
     {
         int index = 0;
 
-        _childs.foreach ([&](auto child) {
+        for (auto &child : _childs)
+        {
             auto bound = content().column(_childs.count(), index, _layout.spacing.x());
             child->container(bound);
             index++;
-
-            return Iteration::CONTINUE;
-        });
+        }
     }
     break;
 
@@ -172,13 +170,12 @@ void Component::do_layout()
     {
         int index = 0;
 
-        _childs.foreach ([&](auto child) {
+        for (auto &child : _childs)
+        {
             auto bound = content().row(_childs.count(), index, _layout.spacing.y());
             child->container(bound);
             index++;
-
-            return Iteration::CONTINUE;
-        });
+        }
     }
     break;
 
@@ -189,7 +186,8 @@ void Component::do_layout()
 
         int fill_child_count = 0;
 
-        _childs.foreach ([&](auto child) {
+        for (auto &child : _childs)
+        {
             if (child->flags() & Component::FILL)
             {
                 fill_child_count++;
@@ -207,9 +205,7 @@ void Component::do_layout()
                     fixed_child_total_width += child->compute_size().x();
                 }
             }
-
-            return Iteration::CONTINUE;
-        });
+        }
 
         int usable_space =
             content().width() -
@@ -221,7 +217,8 @@ void Component::do_layout()
 
         int current = content().x();
 
-        _childs.foreach ([&](auto child) {
+        for (auto &child : _childs)
+        {
             if (child->flags() & Component::FILL)
             {
                 child->container(Recti(
@@ -255,9 +252,7 @@ void Component::do_layout()
                     current += child->compute_size().x() + _layout.spacing.x();
                 }
             }
-
-            return Iteration::CONTINUE;
-        });
+        }
     }
     break;
 
@@ -265,10 +260,10 @@ void Component::do_layout()
     {
         int fixed_child_count = 0;
         int fixed_child_total_height = 0;
-
         int fill_child_count = 0;
 
-        _childs.foreach ([&](auto child) {
+        for (auto &child : _childs)
+        {
             if (child->flags() & Component::FILL)
             {
                 fill_child_count++;
@@ -278,9 +273,7 @@ void Component::do_layout()
                 fixed_child_count++;
                 fixed_child_total_height += child->compute_size().y();
             }
-
-            return Iteration::CONTINUE;
-        });
+        }
 
         int usable_space = content().height() - _layout.spacing.y() * (_childs.count() - 1);
 
@@ -290,7 +283,8 @@ void Component::do_layout()
 
         int current = content().y();
 
-        _childs.foreach ([&](auto child) {
+        for (auto &child : _childs)
+        {
             if (child->flags() & Component::FILL)
             {
                 child->container({
@@ -327,9 +321,7 @@ void Component::do_layout()
                     current += child->compute_size().y() + _layout.spacing.y();
                 }
             }
-
-            return Iteration::CONTINUE;
-        });
+        }
     }
     break;
 
@@ -347,10 +339,10 @@ void Component::relayout()
         return;
     }
 
-    _childs.foreach ([&](auto child) {
+    for (auto &child : _childs)
+    {
         child->relayout();
-        return Iteration::CONTINUE;
-    });
+    }
 }
 
 void Component::should_relayout()
@@ -373,25 +365,23 @@ Vec2i Component::size()
 
     if (_layout.type == Layout::STACK)
     {
-        _childs.foreach ([&](auto child) {
+        for (auto &child : _childs)
+        {
             Vec2i child_size = child->compute_size();
 
             width = MAX(width, child_size.x());
             height = MAX(height, child_size.y());
-
-            return Iteration::CONTINUE;
-        });
+        }
     }
     else if (_layout.type == Layout::GRID)
     {
-        _childs.foreach ([&](auto child) {
+        for (auto &child : _childs)
+        {
             Vec2i child_size = child->compute_size();
 
             width = MAX(width, child_size.x());
             height = MAX(height, child_size.y());
-
-            return Iteration::CONTINUE;
-        });
+        }
 
         width = width * _layout.hcell;
         height = height * _layout.vcell;
@@ -401,7 +391,8 @@ Vec2i Component::size()
     }
     else
     {
-        _childs.foreach ([&](auto child) {
+        for (auto &child : _childs)
+        {
             Vec2i child_size = child->compute_size();
 
             switch (_layout.type)
@@ -419,13 +410,9 @@ Vec2i Component::size()
                 break;
 
             default:
-                width = MAX(width, child_size.x());
-                height = MAX(height, child_size.y());
-                break;
+                ASSERT_NOT_REACHED();
             }
-
-            return Iteration::CONTINUE;
-        });
+        }
 
         if (_layout.type == Layout::HFLOW || _layout.type == Layout::HGRID)
         {
@@ -438,7 +425,7 @@ Vec2i Component::size()
         }
     }
 
-    return Vec2i(width, height);
+    return {width, height};
 }
 
 /* --- Enable/ Disable state ------------------------------------------------ */
@@ -594,16 +581,15 @@ void Component::repaint(Graphic::Painter &painter, Recti rectangle)
     paint(painter, rectangle);
     painter.pop();
 
-    _childs.foreach ([&](auto child) {
+    for (auto &child : _childs)
+    {
         auto local_rectangle = rectangle.offset(-child->origin());
 
         if (local_rectangle.colide_with(child->bound()))
         {
             child->repaint(painter, local_rectangle);
         }
-
-        return Iteration::CONTINUE;
-    });
+    }
 
     if (Application::show_wireframe())
     {

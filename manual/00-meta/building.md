@@ -32,12 +32,17 @@ And for testing and debugging
 
 ```sh
 # On Debian or Debian-based distributions
-$ sudo apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools imagemagick
+$ sudo apt install nasm gcc make binutils grub-pc-bin xorriso mtools imagemagick git qemu qemu-kvm
 ```
 
 ```sh
 # On Arch or Arch-based distributions
-$ sudo pacman -S nasm gcc make binutils grub qemu libisoburn mtools imagemagick
+$ sudo pacman -S nasm gcc make binutils grub qemu libisoburn mtools imagemagick git qemu
+```
+
+```sh
+# On Red Hat or Red Hat-based distributions
+$ sudo dnf install nasm gcc gcc-g++ make binutils xorriso mtools ImageMagick git qemu qemu-kvm
 ```
 
 ### About WSL
@@ -87,6 +92,11 @@ $ sudo apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev
 ```sh
 # On Arch or Arch-based distributions
 $ sudo pacman -S base-devel bison flex mpc mpfr texinfo
+```
+
+```sh
+# On Red Hat or Red Hat-based distributions
+$ sudo dnf install bison flex mpc-devel mpfr-devel gmp-devel texinfo patch 
 ```
 
 Then for building the toolchain run the `build-it.sh` script

@@ -104,10 +104,10 @@ fi
 
 TARGET32=i686-pc-skift
 
-mkdir -p "$DIR/build-x86_32/binutils"
-mkdir -p "$DIR/build-x86_32/gcc"
+mkdir -p "$DIR/build-gcc-x86_32/binutils"
+mkdir -p "$DIR/build-gcc-x86_32/gcc"
 
-pushd "$DIR/build-x86_32/"
+pushd "$DIR/build-gcc-x86_32/"
     unset PKG_CONFIG_LIBDIR # Just in case
 
     pushd binutils
@@ -145,10 +145,10 @@ popd
 
 TARGET64=x86_64-pc-skift
 
-mkdir -p "$DIR/build-x86_64/binutils"
-mkdir -p "$DIR/build-x86_64/gcc"
+mkdir -p "$DIR/build-gcc-x86_64/binutils"
+mkdir -p "$DIR/build-gcc-x86_64/gcc"
 
-pushd "$DIR/build-x86_64/"
+pushd "$DIR/build-gcc-x86_64/"
     unset PKG_CONFIG_LIBDIR # Just in case
 
     pushd binutils

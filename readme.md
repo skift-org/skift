@@ -54,7 +54,6 @@ skiftOS running in QEMU 5.1
 
 - [echfs](https://github.com/qword-os/echfs)
 - [limine](https://github.com/limine-bootloader/limine) (BSD-2-Clause License)
-- [lodepng](https://github.com/lvandeve/lodepng) (zlib License)
 - [Material Design Icons](http://materialdesignicons.com/) (SIL OPEN FONT LICENSE )
 - [serenityOS AK utilities](https://github.com/SerenityOS/serenity): 
   while not directly used in skift, AK was a big inspiration in the creation of libutils.

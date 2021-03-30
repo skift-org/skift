@@ -41,6 +41,11 @@ public:
         delete _buffer;
     }
 
+    ResultOr<size_t> buffered()
+    {
+        return _used;
+    }
+
     ResultOr<size_t> read(void *buffer, size_t size) override
     {
         size_t data_left = size;

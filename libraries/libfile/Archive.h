@@ -1,8 +1,9 @@
 #pragma once
 
+#include <libio/Reader.h>
+#include <libio/Writer.h>
 #include <libsystem/Result.h>
 #include <libutils/Path.h>
-
 class Archive : public RefCounted<Archive>
 {
 public:
@@ -32,8 +33,8 @@ public:
         return _entries;
     }
 
-    virtual Result extract(unsigned int entry_index, const char *dest_path) = 0;
-    virtual Result insert(const char *entry_name, const char *src_dir) = 0;
+    virtual Result extract(unsigned int entry_index, IO::Writer &writer) = 0;
+    virtual Result insert(const char *entry_name, IO::Reader &reader) = 0;
 
     inline const Path &get_path()
     {

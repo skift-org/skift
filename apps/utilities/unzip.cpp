@@ -43,8 +43,9 @@ int main(int argc, char const *argv[])
         for (const auto &entry : archive->entries())
         {
             IO::outln("{}: Entry: {} is being extracted...", argv[0], entry.name);
+            IO::File dest_file(entry.name.cstring(), OPEN_WRITE | OPEN_CREATE);
 
-            auto result = archive->extract(i, entry.name.cstring());
+            auto result = archive->extract(i, dest_file);
             if (result != Result::SUCCESS)
             {
                 IO::errln("{}: Failed to extract entry '{}' with error '{}'", argv[0], entry.name, get_result_description(result));

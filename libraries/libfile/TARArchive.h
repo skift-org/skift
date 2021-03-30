@@ -13,7 +13,7 @@ struct TARBlock
 
 bool tar_read(void *tarfile, TARBlock *block, size_t index);
 
-class TARArchive : public Archive
+class TARArchive final : public Archive
 {
 private:
     Result read_archive();
@@ -21,6 +21,6 @@ private:
 public:
     TARArchive(Path path, bool read = true);
 
-    Result extract(unsigned int entry_index, const char *dest_path) override;
-    Result insert(const char *entry_name, const char *src_path) override;
+    Result extract(unsigned int entry_index, IO::Writer &writer) override;
+    Result insert(const char *entry_name, IO::Reader &reader) override;
 };

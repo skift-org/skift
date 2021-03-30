@@ -81,7 +81,9 @@ int scheduler_running_id()
 
 void scheduler_yield()
 {
+    ASSERT_INTERRUPTS_NOT_RETAINED();
     arch_yield();
+    ASSERT_INTERRUPTS_NOT_RETAINED();
 }
 
 int scheduler_get_usage(int task_id)

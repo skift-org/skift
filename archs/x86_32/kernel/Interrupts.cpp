@@ -48,6 +48,8 @@ static const char *_exception_messages[32] = {
 
 extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
 {
+    ASSERT_INTERRUPTS_NOT_RETAINED();
+
     if (stackframe.intno < 32)
     {
         if (stackframe.cs == 0x1B)

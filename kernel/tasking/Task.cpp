@@ -60,24 +60,29 @@ Result Task::cancel(int exit_value)
 
 void Task::kill_me_if_you_dare()
 {
-    InterruptsRetainer retainer;
+    interrupts_retain();
 
-    if (_is_canceled)
+    if (!_is_canceled)
     {
-        if (_flags & TASK_WAITABLE)
-        {
-            state(TASK_STATE_CANCELING);
-        }
-        else
-        {
-            state(TASK_STATE_CANCELED);
-        }
+        interrupts_release();
+        return;
+    }
 
-        if (this == scheduler_running())
-        {
-            scheduler_yield();
-            ASSERT_NOT_REACHED();
-        }
+    if (_flags & TASK_WAITABLE)
+    {
+        state(TASK_STATE_CANCELING);
+    }
+    else
+    {
+        state(TASK_STATE_CANCELED);
+    }
+
+    if (this == scheduler_running())
+    {
+
+        interrupts_release();
+        scheduler_yield();
+        ASSERT_NOT_REACHED();
     }
 }
 
@@ -200,8 +205,8 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip, TaskFlags flags)
 void task_destroy(Task *task)
 {
     interrupts_retain();
-    task->state(TASK_STATE_NONE);
 
+    task->state(TASK_STATE_NONE);
     list_remove(_tasks, task);
 
     interrupts_release();
@@ -336,7 +341,7 @@ Result task_sleep(Task *task, int timeout)
 
 Result task_wait(int task_id, int *exit_value)
 {
-    InterruptsRetainer retainer;
+    interrupts_retain();
 
     Task *task = task_by_id(task_id);
 
@@ -345,10 +350,12 @@ Result task_wait(int task_id, int *exit_value)
         return ERR_NO_SUCH_TASK;
     }
 
-    if (!(task->_flags & TASK_USER))
+    if (!(task->_flags & TASK_WAITABLE))
     {
         return ERR_TASK_NOT_WAITABLE;
     }
+
+    interrupts_release();
 
     BlockerWait blocker{task, exit_value};
     return task_block(scheduler_running(), blocker, -1);
@@ -379,6 +386,7 @@ Result task_block(Task *task, Blocker &blocker, Timeout timeout)
     task->state(TASK_STATE_BLOCKED);
 
     interrupts_release();
+
     scheduler_yield();
 
     task->_blocker = nullptr;

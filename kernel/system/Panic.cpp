@@ -54,7 +54,8 @@ void system_panic_internal(Utils::SourceLocation location, void *stackframe, con
     interrupts_retain();
     interrupts_disable_holding();
 
-    font_set_bg(0xff333333);
+    font_set_bg(0xff110000);
+    font_set_fg(0xffaa0000);
 
     early_console_enable();
 

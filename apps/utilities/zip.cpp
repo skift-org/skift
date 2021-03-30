@@ -36,7 +36,7 @@ int main(int argc, char const *argv[])
     {
         IO::outln("{}: Entry: {} is being inserted...", argv[0], args.argv()[i]);
 
-        IO::File src_file(args.argv()[i].cstring());
+        IO::File src_file(args.argv()[i], OPEN_READ);
         if (!src_file.exist())
         {
             IO::errln("{}: File '{}' does not exist", argv[0], args.argv()[i]);

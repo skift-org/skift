@@ -33,7 +33,8 @@ void Deflate::write_uncompressed_block(const uint8_t *block_data, size_t block_l
 
 Result Deflate::write_uncompressed_blocks(IO::Reader &in_data, IO::BitWriter &out_writer, bool write_final)
 {
-    Array<uint8_t, UINT16_MAX> block_data;
+    Vector<uint8_t> block_data;
+    block_data.resize(UINT16_MAX);
     bool final_block = false;
 
     do

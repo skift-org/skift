@@ -1,31 +1,134 @@
 #pragma once
 
-#include <libutils/NumberParser.h>
-#include <libutils/Scanner.h>
-#include <libutils/ScannerUtils.h>
+#include <libio/MemoryReader.h>
+#include <libio/NumberScanner.h>
+#include <libio/Scanner.h>
 #include <libutils/StringBuilder.h>
 #include <libutils/Strings.h>
 #include <libutils/json/Value.h>
+#include <libio/ScopedReader.h>
 
 namespace Json
 {
-Value value(Scanner &scan);
 
-inline void whitespace(Scanner &scan)
+Value value(IO::Scanner &scan);
+
+inline void whitespace(IO::Scanner &scan)
 {
     scan.eat(Strings::WHITESPACE);
 }
 
-inline Value number(Scanner &scan)
+inline Value number(IO::Scanner &scan)
 {
 #ifdef __KERNEL__
-    return Value{scan_int(scan, 10)};
+    return {IO::NumberScanner::decimal().scan_int(scan)};
 #else
-    return {scan_float(scan)};
+    return {IO::NumberScanner::decimal().scan_float(scan)};
 #endif
 }
 
-inline String string(Scanner &scan)
+static inline const char *escape_sequence(IO::Scanner &scan)
+{
+    scan.skip('\\');
+
+    if (scan.ended())
+    {
+        return "\\";
+    }
+
+    char chr = scan.current();
+    scan.forward();
+
+    switch (chr)
+    {
+    case '"':
+        return "\"";
+
+    case '\\':
+        return "\\";
+
+    case '/':
+        return "/";
+
+    case 'b':
+        return "\b";
+
+    case 'f':
+        return "\f";
+
+    case 'n':
+        return "\n";
+
+    case 'r':
+        return "\r";
+
+    case 't':
+        return "\t";
+
+    case 'u':
+    {
+        auto read_4hex = [&]() {
+            char buffer[5];
+            for (size_t i = 0; i < 4 && scan.current_is(Strings::LOWERCASE_XDIGITS); i++)
+            {
+                buffer[i] = scan.current();
+                scan.forward();
+            }
+
+            IO::MemoryReader memory{buffer, 5};
+            IO::Scanner bufscan{memory};
+            return IO::NumberScanner::hexadecimal().scan_uint(bufscan).value_or(0);
+        };
+
+        uint32_t first_surrogate = read_4hex();
+
+        if (first_surrogate >= 0xDC00 && first_surrogate <= 0xDFFF)
+        {
+            // FIXME: We should use char8_t
+            return reinterpret_cast<const char *>(u8"�");
+        }
+
+        if (!(first_surrogate >= 0xD800 && first_surrogate <= 0xDBFF))
+        {
+            // Not an UTF16 surrogate pair.
+            static uint8_t utf8[5] = {};
+            codepoint_to_utf8(first_surrogate, utf8);
+            return (char *)utf8;
+        }
+
+        if (!scan.skip_word("\\u"))
+        {
+            // FIXME: We should use char8_t
+            return reinterpret_cast<const char *>(u8"�");
+        }
+
+        uint32_t second_surrogate = read_4hex();
+
+        if ((second_surrogate < 0xDC00) || (second_surrogate > 0xDFFF))
+        {
+            // Invalid second half of the surrogate pair
+            // FIXME: We should use char8_t
+            return reinterpret_cast<const char *>(u8"�");
+        }
+
+        Codepoint codepoint = 0x10000 + (((first_surrogate & 0x3FF) << 10) | (second_surrogate & 0x3FF));
+
+        static uint8_t utf8[5] = {};
+        codepoint_to_utf8(codepoint, utf8);
+        return (char *)utf8;
+    }
+
+    default:
+        break;
+    }
+
+    static char buffer[3] = "\\x";
+    buffer[1] = chr;
+
+    return buffer;
+}
+
+inline String string(IO::Scanner &scan)
 {
     StringBuilder builder{};
 
@@ -35,12 +138,12 @@ inline String string(Scanner &scan)
     {
         if (scan.current() == '\\')
         {
-            builder.append(scan_json_escape_sequence(scan));
+            builder.append(escape_sequence(scan));
         }
         else
         {
             builder.append(scan.current());
-            scan.foreward();
+            scan.forward();
         }
     }
 
@@ -49,7 +152,7 @@ inline String string(Scanner &scan)
     return builder.finalize();
 }
 
-inline Value array(Scanner &scan)
+inline Value array(IO::Scanner &scan)
 {
     scan.skip('[');
 
@@ -76,7 +179,7 @@ inline Value array(Scanner &scan)
     return move(array);
 }
 
-inline Value object(Scanner &scan)
+inline Value object(IO::Scanner &scan)
 {
     scan.skip('{');
 
@@ -108,7 +211,7 @@ inline Value object(Scanner &scan)
     return object;
 }
 
-inline Value keyword(Scanner &scan)
+inline Value keyword(IO::Scanner &scan)
 {
     StringBuilder builder{};
 
@@ -116,7 +219,7 @@ inline Value keyword(Scanner &scan)
            scan.do_continue())
     {
         builder.append(scan.current());
-        scan.foreward();
+        scan.forward();
     }
 
     auto keyword = builder.finalize();
@@ -125,17 +228,16 @@ inline Value keyword(Scanner &scan)
     {
         return true;
     }
-    else if (keyword == "false")
+
+    if (keyword == "false")
     {
         return false;
     }
-    else
-    {
-        return nullptr;
-    }
+    
+    return nullptr;
 }
 
-inline Value value(Scanner &scan)
+inline Value value(IO::Scanner &scan)
 {
     whitespace(scan);
 
@@ -168,36 +270,24 @@ inline Value value(Scanner &scan)
     return value;
 }
 
-inline Value parse(Scanner &scan)
+inline Value parse(IO::Reader &reader)
 {
-    scan_skip_utf8bom(scan);
+    IO::Scanner scan{reader};
+    scan.skip_utf8bom();
     return value(scan);
 }
 
-inline Value parse(const char *str, size_t size)
+inline Value parse(const char *buffer, size_t size)
 {
-    StringScanner scan{str, size};
-    return parse(scan);
-};
-
-inline Value parse(const String &str)
-{
-    StringScanner scan{str.cstring(), str.length()};
-    return parse(scan);
-};
-
-inline Value parse_file(String path)
-{
-    __cleanup(stream_cleanup) Stream *json_file = stream_open(path.cstring(), OPEN_READ | OPEN_BUFFERED);
-
-    if (handle_has_error(json_file))
-    {
-        return nullptr;
-    }
-
-    StreamScanner scan{json_file};
-    scan_skip_utf8bom(scan);
-    return value(scan);
+    IO::MemoryReader memory{buffer, size};
+    return parse(memory);
 }
+
+inline Value parse(String&str)
+{
+    IO::MemoryReader memory{str};
+    return parse(memory);
+}
+
 
 } // namespace Json

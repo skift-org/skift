@@ -1,6 +1,7 @@
 #include <abi/Syscalls.h>
 #include <skift/Environment.h>
 
+#include <libio/File.h>
 #include <libsystem/Logger.h>
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/process/Process.h>
@@ -61,7 +62,8 @@ int main(int, const char *[])
     logger_level(LOGGER_TRACE);
 
     logger_info("Loading environement variables...");
-    environment() = Json::parse_file("/Configs/environment.json");
+    IO::File file{"/Configs/environment.json", OPEN_READ};
+    environment() = Json::parse(file);
 
     if constexpr (__CONFIG_IS_TEST__)
     {

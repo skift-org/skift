@@ -2,6 +2,7 @@
 #include <libsystem/process/Launchpad.h>
 #include <libutils/Path.h>
 #include <libutils/json/Json.h>
+#include <libio/File.h>
 
 #define FILE_EXTENSIONS_DATABASE_PATH "/Configs/open/file-extensions.json"
 #define FILE_TYPES_DATABASE_PATH "/Configs/open/file-types.json"
@@ -17,7 +18,8 @@ Result open(const char *raw_path)
         return ERR_EXTENSION;
     }
 
-    auto file_extensions = Json::parse_file(FILE_EXTENSIONS_DATABASE_PATH);
+    IO::File database{FILE_EXTENSIONS_DATABASE_PATH, OPEN_READ};
+    auto file_extensions = Json::parse(database);
 
     if (!file_extensions.is(Json::OBJECT))
     {
@@ -32,7 +34,8 @@ Result open(const char *raw_path)
         return ERR_EXTENSION;
     }
 
-    auto file_types = Json::parse_file(FILE_TYPES_DATABASE_PATH);
+    IO::File type_database{FILE_TYPES_DATABASE_PATH, OPEN_READ};
+    auto file_types = Json::parse(type_database);
 
     if (!file_types.is(Json::OBJECT))
     {

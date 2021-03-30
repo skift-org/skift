@@ -45,7 +45,8 @@ bool Bookmarks::has(const Path &path) const
 
 RefPtr<Bookmarks> Bookmarks::load()
 {
-    auto raw_bookmarks = Json::parse_file("/Configs/file-manager/booksmark.json");
+    IO::File bookmarks_file{"/Configs/file-manager/booksmark.json", OPEN_READ};
+    auto raw_bookmarks = Json::parse(bookmarks_file);
 
     auto bookmarks = make<Bookmarks>();
 

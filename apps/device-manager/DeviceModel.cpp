@@ -1,3 +1,5 @@
+#include <libio/File.h>
+
 #include "device-manager/DeviceModel.h"
 
 enum Column
@@ -66,7 +68,7 @@ Widget::Variant DeviceModel::data(int row, int column)
 
 void DeviceModel::update()
 {
-    _data = Json::parse_file("/System/devices");
-
+    IO::File file{"/System/devices", OPEN_READ};
+    _data = Json::parse(file);
     did_update();
 }

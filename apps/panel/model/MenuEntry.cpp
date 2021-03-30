@@ -1,6 +1,7 @@
 #include <libio/Directory.h>
 #include <libio/File.h>
 #include <libio/Format.h>
+#include <libutils/json/Json.h>
 
 #include "panel/model/MenuEntry.h"
 
@@ -62,11 +63,11 @@ Vector<MenuEntry> MenuEntry::load()
 
         auto path = IO::format("/Applications/{}/manifest.json", entry.name);
 
-        IO::File manifest_file{path};
+        IO::File manifest_file{path, OPEN_READ};
 
         if (manifest_file.exist())
         {
-            entries->emplace_back(entry.name, Json::parse_file(path));
+            entries->emplace_back(entry.name, Json::parse(manifest_file));
         }
     }
 

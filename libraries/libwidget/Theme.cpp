@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include <libsystem/Logger.h>
+#include <libio/File.h>
 #include <libutils/NumberParser.h>
 #include <libutils/json/Json.h>
 #include <libwidget/Theme.h>
@@ -115,7 +116,8 @@ void theme_load(String path)
 {
     logger_info("Loading theme from '%s'", path.cstring());
 
-    auto root = Json::parse_file(path);
+    IO::File theme_file{path, OPEN_READ};
+    auto root = Json::parse(theme_file);
 
     if (!root.has("colors"))
     {

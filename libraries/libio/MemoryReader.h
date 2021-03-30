@@ -13,25 +13,28 @@ class MemoryReader final :
 {
 private:
     Slice _memory;
-    size_t _position;
+    size_t _position = 0;
 
 public:
     MemoryReader(const char *cstring)
-        : _memory{cstring},
-          _position{0}
+        : _memory{cstring}
     {
     }
 
     MemoryReader(const void *ptr, size_t size)
-        : _memory(ptr, size),
-          _position{0}
+        : _memory(ptr, size)
     {
     }
 
     MemoryReader(Slice memory)
-        : _memory{memory},
-          _position{0}
+        : _memory{memory}
     {
+    }
+
+    MemoryReader(RawStorage& raw)
+        : _memory(raw.storage())
+    {
+        
     }
 
     ResultOr<size_t> read(void *buffer, size_t size) override

@@ -1,0 +1,6 @@
+-xc++
+-std=c++20
+-Ilibraries
+-Iapps
+-Ilibraries/libc
+-I.

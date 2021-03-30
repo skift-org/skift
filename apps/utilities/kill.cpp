@@ -1,3 +1,4 @@
+#include <libio/File.h>
 #include <libsystem/process/Process.h>
 #include <libutils/ArgParse.h>
 #include <libutils/NumberParser.h>
@@ -25,7 +26,8 @@ int killall(String name)
         IO::errln("Don't kill cats, you monster!");
     }
 
-    auto processes = Json::parse_file("/System/processes");
+    IO::File file{"/System/processes", OPEN_READ};
+    auto processes = Json::parse(file);
 
     for (size_t i = 0; i < processes.length(); i++)
     {

@@ -1,7 +1,7 @@
 #pragma once
 
+#include <libio/File.h>
 #include <libutils/json/Json.h>
-
 #include <libsettings/Path.h>
 
 namespace Settings
@@ -15,7 +15,14 @@ struct Bundle
     {
         Bundle bundle;
 
-        auto value = Json::parse_file(path);
+        IO::File file{path, OPEN_READ};
+
+        if (!file.exist())
+        {
+            return {};
+        }
+        
+        auto value = Json::parse(file);
 
         if (!value.is(Json::OBJECT))
         {

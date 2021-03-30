@@ -1,4 +1,6 @@
 #include <libsystem/process/Process.h>
+#include <libio/File.h>
+#include <libutils/json/Json.h>
 
 #include "task-manager/model/TaskModel.h"
 
@@ -89,7 +91,8 @@ Widget::Variant TaskModel::data(int row, int column)
 
 void TaskModel::update()
 {
-    _data = Json::parse_file("/System/processes");
+    IO::File file{"/System/processes", OPEN_READ};
+    _data = Json::parse(file);
     did_update();
 }
 

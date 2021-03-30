@@ -3,7 +3,7 @@
 #include <libio/Directory.h>
 #include <libio/Format.h>
 #include <libutils/json/Json.h>
-
+#include <libio/File.h>
 #include <libfilepicker/model/DirectoryListing.h>
 
 namespace FilePicker
@@ -15,7 +15,8 @@ static auto get_icon_for_node(String current_directory, IO::Directory::Entry &en
     {
         auto manifest_path = IO::format("{}/{}/manifest.json", current_directory, entry.name);
 
-        auto root = Json::parse_file(manifest_path);
+        IO::File manifest_file{manifest_path, OPEN_READ};
+        auto root = Json::parse(manifest_file);
 
         if (root.is(Json::OBJECT))
         {

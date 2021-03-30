@@ -30,6 +30,12 @@ int loadkey_list_keymap()
 int loadkey_set_keymap(RefPtr<IO::Handle> keyboard_device, String keymap_path)
 {
     IO::File file{keymap_path, OPEN_READ};
+
+    if (!file.exist())
+    {
+        return PROCESS_FAILURE;
+    }
+
     auto read_all_result = IO::read_all(file);
 
     if (!read_all_result.success())

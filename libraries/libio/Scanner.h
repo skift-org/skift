@@ -18,6 +18,11 @@ private:
 
     void refill()
     {
+        if (_is_end_of_file)
+        {
+            return;
+        }
+
         char c = 0x69;
         auto read_result = _reader.read(&c, 1);
 

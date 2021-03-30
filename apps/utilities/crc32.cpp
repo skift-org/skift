@@ -19,11 +19,11 @@ int main(int argc, char const *argv[])
 
     for (unsigned int i = 0; i < args.argc(); i++)
     {
-        IO::File file{args.argv()[i].cstring(), OPEN_READ};
+        IO::File file{args.argv()[i], OPEN_READ};
 
         if (!file.exist())
         {
-            IO::errln("{}: File does not exist", file.path().value().string().cstring());
+            IO::errln("{}: File does not exist", file.path().value().string());
             return PROCESS_FAILURE;
         }
 
@@ -31,7 +31,7 @@ int main(int argc, char const *argv[])
         IO::CRCReader crc_reader(file);
         IO::copy(crc_reader, sink);
 
-        IO::outln("{}:\t{}", crc_reader.checksum(), file.path().value().string().cstring());
+        IO::outln("{}:\t{}", crc_reader.checksum(), file.path().value().string());
     }
 
     return PROCESS_SUCCESS;

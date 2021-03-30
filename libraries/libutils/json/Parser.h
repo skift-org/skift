@@ -233,7 +233,7 @@ inline Value keyword(IO::Scanner &scan)
     {
         return false;
     }
-    
+
     return nullptr;
 }
 

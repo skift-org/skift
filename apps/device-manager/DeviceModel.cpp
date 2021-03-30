@@ -69,6 +69,12 @@ Widget::Variant DeviceModel::data(int row, int column)
 void DeviceModel::update()
 {
     IO::File file{"/System/devices", OPEN_READ};
+
+    if (!file.exist())
+    {
+        return;
+    }
+
     _data = Json::parse(file);
     did_update();
 }

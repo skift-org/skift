@@ -21,7 +21,7 @@ struct Bundle
         {
             return {};
         }
-        
+
         auto value = Json::parse(file);
 
         if (!value.is(Json::OBJECT))

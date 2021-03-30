@@ -1,7 +1,7 @@
+#include <libio/File.h>
 #include <libio/Streams.h>
 #include <libutils/ArgParse.h>
 #include <libutils/json/Json.h>
-#include <libio/File.h>
 
 constexpr auto PROLOGUE = "Reformats JSON to make it easier to read.";
 
@@ -14,6 +14,7 @@ int main(int argc, char const *argv[])
 {
     ArgParse args{};
     args.should_abort_on_failure();
+    args.show_help_if_no_option_given();
 
     args.prologue(PROLOGUE);
 
@@ -48,8 +49,14 @@ int main(int argc, char const *argv[])
     else
     {
         args.argv().foreach ([&](auto &path) {
-            IO::File file {path, OPEN_READ};
-            auto root = Json::parse(path);
+            IO::File file{path, OPEN_READ};
+
+            if (!file.exist())
+            {
+                return Iteration::CONTINUE;
+            }
+
+            auto root = Json::parse(file);
 
             Prettifier pretty{options};
             Json::prettify(pretty, root);

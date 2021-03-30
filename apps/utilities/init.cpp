@@ -63,7 +63,15 @@ int main(int, const char *[])
 
     logger_info("Loading environement variables...");
     IO::File file{"/Configs/environment.json", OPEN_READ};
-    environment() = Json::parse(file);
+
+    if (file.exist())
+    {
+        environment() = Json::parse(file);
+    }
+    else
+    {
+        logger_error("Environment file not found!");
+    }
 
     if constexpr (__CONFIG_IS_TEST__)
     {

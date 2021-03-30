@@ -16,6 +16,14 @@ int kill(int pid)
 
 int killall(String name)
 {
+    IO::File file{"/System/processes", OPEN_READ};
+
+    if (!file.exist())
+    {
+        IO::errln("/System/processes not found");
+        return PROCESS_FAILURE;
+    }
+
     if (name == "neko")
     {
         IO::errln("Don't kill nekos, your are a bad persone!");
@@ -26,7 +34,6 @@ int killall(String name)
         IO::errln("Don't kill cats, you monster!");
     }
 
-    IO::File file{"/System/processes", OPEN_READ};
     auto processes = Json::parse(file);
 
     for (size_t i = 0; i < processes.length(); i++)

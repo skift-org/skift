@@ -1,10 +1,10 @@
 #include <string.h>
 
+#include <libfilepicker/model/DirectoryListing.h>
 #include <libio/Directory.h>
+#include <libio/File.h>
 #include <libio/Format.h>
 #include <libutils/json/Json.h>
-#include <libio/File.h>
-#include <libfilepicker/model/DirectoryListing.h>
 
 namespace FilePicker
 {
@@ -16,15 +16,19 @@ static auto get_icon_for_node(String current_directory, IO::Directory::Entry &en
         auto manifest_path = IO::format("{}/{}/manifest.json", current_directory, entry.name);
 
         IO::File manifest_file{manifest_path, OPEN_READ};
-        auto root = Json::parse(manifest_file);
 
-        if (root.is(Json::OBJECT))
+        if (manifest_file.exist())
         {
-            auto icon_name = root.get("icon");
+            auto root = Json::parse(manifest_file);
 
-            if (icon_name.is(Json::STRING))
+            if (root.is(Json::OBJECT))
             {
-                return Graphic::Icon::get(icon_name.as_string());
+                auto icon_name = root.get("icon");
+
+                if (icon_name.is(Json::STRING))
+                {
+                    return Graphic::Icon::get(icon_name.as_string());
+                }
             }
         }
 

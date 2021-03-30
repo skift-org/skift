@@ -286,7 +286,7 @@ Result write_central_directory(IO::SeekableWriter auto &writer, Vector<Archive::
     return IO::write(writer, end_record).result();
 }
 
-Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
+Result ZipArchive::extract(unsigned int entry_index, IO::Writer &writer)
 {
     // Read the compressed data from the entry
     const auto &entry = _entries[entry_index];
@@ -302,22 +302,12 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
     file_reader.seek(IO::SeekFrom::start(entry.archive_offset));
     IO::ScopedReader scoped_reader(file_reader, entry.compressed_size);
 
-    // Get a writer to the output
-    IO::File file_writer(dest_path, OPEN_WRITE | OPEN_CREATE);
-
     Compression::Inflate inf;
-    return inf.perform(scoped_reader, file_writer).result();
+    return inf.perform(scoped_reader, writer).result();
 }
 
-Result ZipArchive::insert(const char *entry_name, const char *src_path)
+Result ZipArchive::insert(const char *entry_name, IO::Reader &reader)
 {
-    IO::File src_reader{src_path, OPEN_READ};
-
-    if (!src_reader.exist())
-    {
-        return Result::ERR_NO_SUCH_FILE_OR_DIRECTORY;
-    }
-
     // TODO: create a new entry and write it to the output file
     IO::MemoryWriter memory_writer;
 
@@ -337,7 +327,8 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
 
     // Perform deflate on the data
     Compression::Deflate def(5);
-    TRY(def.perform(src_reader, compressed_writer));
+    IO::ReadCounter counter{reader};
+    TRY(def.perform(counter, compressed_writer));
 
     // Write our new entry
     logger_trace("Write new local header: '%s'", entry_name);
@@ -346,7 +337,7 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     new_entry.name = String(entry_name);
     new_entry.compressed_size = TRY(compressed_writer.length());
     new_entry.compression = CM_DEFLATED;
-    new_entry.uncompressed_size = TRY(src_reader.length());
+    new_entry.uncompressed_size = counter.count();
     new_entry.archive_offset = TRY(memory_writer.length()) + sizeof(LocalHeader) + new_entry.name.length();
 
     auto compressed_data = compressed_writer.slice();

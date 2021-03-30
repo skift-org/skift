@@ -36,7 +36,14 @@ int main(int argc, char const *argv[])
     {
         IO::outln("{}: Entry: {} is being inserted...", argv[0], args.argv()[i]);
 
-        auto result = archive->insert(args.argv()[i].cstring(), args.argv()[i].cstring());
+        IO::File src_file(args.argv()[i].cstring());
+        if (!src_file.exist())
+        {
+            IO::errln("{}: File '{}' does not exist", argv[0], args.argv()[i]);
+            return PROCESS_FAILURE;
+        }
+
+        auto result = archive->insert(args.argv()[i].cstring(), src_file);
 
         if (result != Result::SUCCESS)
         {

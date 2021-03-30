@@ -85,18 +85,18 @@ TARArchive::TARArchive(Path path, bool read) : Archive(path)
     }
 }
 
-Result TARArchive::extract(unsigned int entry_index, const char *dest_path)
+Result TARArchive::extract(unsigned int entry_index, IO::Writer &writer)
 {
     __unused(entry_index);
-    __unused(dest_path);
+    __unused(writer);
 
     return ERR_NOT_IMPLEMENTED;
 }
 
-Result TARArchive::insert(const char *entry_name, const char *src_path)
+Result TARArchive::insert(const char *entry_name, IO::Reader &reader)
 {
     __unused(entry_name);
-    __unused(src_path);
+    __unused(reader);
 
     return ERR_NOT_IMPLEMENTED;
 }

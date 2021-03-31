@@ -9,7 +9,7 @@ class Optional
 {
 private:
     bool _present = false;
-    char _storage[sizeof(T)];
+    union { T _storage; };
 
 public:
     bool present() const
@@ -20,13 +20,13 @@ public:
     T &value()
     {
         assert(present());
-        return *reinterpret_cast<T *>(_storage);
+        return _storage;
     }
 
     const T &value() const
     {
         assert(present());
-        return *reinterpret_cast<const T *>(_storage);
+        return _storage;
     }
 
     T take_value()

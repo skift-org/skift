@@ -91,7 +91,7 @@ public:
             _present = other._present;
             if (other._present)
             {
-                new (_storage) T(*other);
+                new (&_storage) T(*other);
             }
         }
 
@@ -106,7 +106,7 @@ public:
             _present = other._present;
             if (other._present)
             {
-                new (_storage) T(other.take_value());
+                new (&_storage) T(other.take_value());
             }
         }
 

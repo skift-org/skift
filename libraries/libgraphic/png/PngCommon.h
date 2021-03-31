@@ -123,11 +123,11 @@ struct Transparency
 
 enum FilterType : uint8_t
 {
-    FT_None = 0,
-    FT_Sub = 1,
-    FT_Up = 2,
-    FT_Average = 3,
-    FT_Paeth = 4
+    FT_NONE = 0,
+    FT_SUB = 1,
+    FT_UP = 2,
+    FT_AVERAGE = 3,
+    FT_PAETH = 4
 };
 
 } // namespace Graphic::Png

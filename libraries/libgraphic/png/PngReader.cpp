@@ -8,6 +8,7 @@
 #include <libtest/Asserts.h>
 #include <libutils/Array.h>
 #include <libutils/Chrono.h>
+#include <libtest/Asserts.h>
 
 namespace Graphic
 {
@@ -285,51 +286,70 @@ Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, con
 
     switch (filter_type)
     {
-    case Png::FT_None:
+    case Png::FT_NONE:
         for (i = 0; i != length; ++i)
+        {   
             recon[i] = scanline[i];
+        }
         break;
 
-    case Png::FT_Sub:
+    case Png::FT_SUB:
         for (i = 0; i != bytewidth; ++i)
+        {   
             recon[i] = scanline[i];
+        }
+
         for (i = bytewidth; i < length; ++i)
+        {   
             recon[i] = scanline[i] + recon[i - bytewidth];
+        }
         break;
 
-    case Png::FT_Up:
+    case Png::FT_UP:
         if (precon)
         {
             for (i = 0; i != length; ++i)
+            {   
                 recon[i] = scanline[i] + precon[i];
+            }
         }
         else
         {
             for (i = 0; i != length; ++i)
+            {   
                 recon[i] = scanline[i];
+            }
         }
         break;
 
-    case Png::FT_Average:
+    case Png::FT_AVERAGE:
         if (precon)
         {
             for (i = 0; i != bytewidth; ++i)
+            {   
                 recon[i] = scanline[i] + (precon[i] >> 1u);
+            }
 
             for (i = bytewidth; i < length; ++i)
+            {   
                 recon[i] = scanline[i] + ((recon[i - bytewidth] + precon[i]) >> 1u);
+            }
         }
         else
         {
             for (i = 0; i != bytewidth; ++i)
+            {   
                 recon[i] = scanline[i];
+            }
 
             for (i = bytewidth; i < length; ++i)
+            {   
                 recon[i] = scanline[i] + (recon[i - bytewidth] >> 1u);
+            }
         }
         break;
 
-    case Png::FT_Paeth:
+    case Png::FT_PAETH:
         if (precon)
         {
             for (i = 0; i != bytewidth; ++i)
@@ -362,6 +382,7 @@ Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, con
             {
                 recon[i] = scanline[i];
             }
+        
             for (i = bytewidth; i < length; ++i)
             {
                 /*paeth_predictor(recon[i - bytewidth], 0, 0) is always recon[i - bytewidth]*/
@@ -385,12 +406,14 @@ Result PngReader::uncompress(IO::MemoryWriter &uncompressed_writer)
     // Two bytes before the actual deflate data
     // See https://www.w3.org/TR/2003/REC-PNG-20031110/#10Compression
     auto cm_cinfo = TRY(IO::read<uint8_t>(compressed_reader));
+
     // ZLib compression mode should be DEFLATE
     if ((cm_cinfo & 15) != 8)
     {
         logger_error("Invalid zlib compression mode for PNG");
         return Result::ERR_INVALID_DATA;
     }
+
     // Sliding window should be 32k at max
     if (((cm_cinfo >> 4) & 15) > 7)
     {

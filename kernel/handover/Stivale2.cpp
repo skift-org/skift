@@ -85,6 +85,7 @@ void stivale2_parse_header(Handover *handover, void *header_ptr)
             handover->framebuffer_width = fb->framebuffer_width;
             handover->framebuffer_height = fb->framebuffer_height;
             handover->framebuffer_pitch = fb->framebuffer_pitch;
+            handover->framebuffer_bpp = fb->framebuffer_bpp;
 
             break;
         }

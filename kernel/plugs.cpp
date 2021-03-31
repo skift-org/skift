@@ -99,9 +99,9 @@ void __plug_logger_unlock()
     interrupts_release();
 }
 
-void __no_return __plug_logger_fatal()
+void __no_return __plug_logger_fatal(const char *message)
 {
-    system_panic("Fatal error occurred (see logs)!");
+    system_panic(message);
 }
 
 /* --- Processes ------------------------------------------------------------ */

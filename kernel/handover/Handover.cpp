@@ -25,7 +25,7 @@ void handover_assert(uint32_t magic)
     if (!(is_multiboot2(magic) ||
           is_stivale2(magic)))
     {
-        system_panic("Wrong bootloader please use any multiboot/stival bootloader\n\tMagic number: 0x%08x!", magic);
+        logger_fatal("Wrong bootloader please use any multiboot/stival bootloader\n\tMagic number: 0x%08x!", magic);
     }
 }
 

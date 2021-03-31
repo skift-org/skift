@@ -1,3 +1,5 @@
+#include <libsystem/Logger.h>
+
 #include "archs/Memory.h"
 
 #include "kernel/interrupts/Interupts.h"
@@ -58,8 +60,7 @@ MemoryRange physical_alloc(size_t size)
         }
     }
 
-    system_panic("Out of physical memory!\tTrying to allocat %dkio but free memory is %dkio !", size / 1024, (TOTAL_MEMORY - USED_MEMORY) / 1024);
-    return MemoryRange();
+    logger_fatal("Out of physical memory!\tTrying to allocat %dkio but free memory is %dkio !", size / 1024, (TOTAL_MEMORY - USED_MEMORY) / 1024);
 }
 
 void physical_free(MemoryRange range)

@@ -54,8 +54,8 @@ void system_panic_internal(Utils::SourceLocation location, void *stackframe, con
     interrupts_retain();
     interrupts_disable_holding();
 
-    font_set_bg(0xff110000);
-    font_set_fg(0xffaa0000);
+    font_set_bg(0xff171717);
+    font_set_fg(0xffFAFAFA);
 
     early_console_enable();
 
@@ -70,19 +70,28 @@ void system_panic_internal(Utils::SourceLocation location, void *stackframe, con
     if (!has_panic)
     {
         has_panic = true;
+
+        font_set_fg(0xffF59E0B);
         stream_format(out_stream, "\n\e[0;33m--- \e[0;31m!!!\e[0;33m ------------------------------------------------------------------------\e[0m\n");
+        font_set_fg(0xff404040);
+
         stream_format(out_stream, "\n\tKERNEL");
         stream_format(out_stream, " PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[system_get_tick() % __array_length(witty_comments)]);
     }
     else
     {
         nested_panic = true;
+        font_set_fg(0xffF59E0B);
         stream_format(out_stream, "\n\n\e[0;33m- - \e[0;31mNESTED\e[0;33m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\e[0m\n");
+        font_set_fg(0xff404040);
+
         stream_format(out_stream, "\n\tNESTED");
         stream_format(out_stream, " PANIC\n\t// %s\n\n\t\e[0;31m", YO_DAWG);
     }
 
+        font_set_fg(0xffDC2626);
     stream_vprintf(out_stream, message, va);
+    font_set_fg(0xff404040);
     stream_format(out_stream, "\e[0m\n\tthrow by %s %s() ln%d", location.file(), location.function(), location.line());
 
     stream_format(out_stream, "\n");
@@ -128,7 +137,9 @@ void system_panic_internal(Utils::SourceLocation location, void *stackframe, con
 
     stream_format(out_stream, "\n\tSystem halted!\n");
 
+    font_set_fg(0xffF59E0B);
     stream_format(out_stream, "\n\e[0;33m--------------------------------------------------------------------------------\n\n");
+    font_set_fg(0xffFAFAFA);
 
     system_stop();
 }

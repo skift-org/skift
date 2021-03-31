@@ -98,6 +98,7 @@ void multiboot2_parse_framebuffer(Handover *handover, struct multiboot_tag_frame
     handover->framebuffer_width = tag->framebuffer_width;
     handover->framebuffer_height = tag->framebuffer_height;
     handover->framebuffer_pitch = tag->framebuffer_pitch;
+    handover->framebuffer_bpp = tag->framebuffer_bpp / 8;
 }
 
 void multiboot2_parse_header(Handover *handover, void *header_ptr)

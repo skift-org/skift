@@ -31,7 +31,7 @@ void system_tick()
 {
     if (_system_tick + 1 < _system_tick)
     {
-        system_panic("System tick overflow!");
+        logger_fatal("System tick overflow!");
     }
 
     _system_tick++;

@@ -15,6 +15,7 @@ static uintptr_t _framebuffer_virtual = 0;
 static int _framebuffer_width = 0;
 static int _framebuffer_height = 0;
 static int _framebuffer_pitch = 0;
+static int _framebuffer_bpp = 0;
 
 class Framebuffer : public FsNode
 {
@@ -78,6 +79,7 @@ void framebuffer_initialize(Handover *handover)
     _framebuffer_width = handover->framebuffer_width;
     _framebuffer_height = handover->framebuffer_height;
     _framebuffer_pitch = handover->framebuffer_pitch;
+    _framebuffer_bpp = handover->framebuffer_bpp;
 
     logger_info("Framebuffer %dx%d", handover->framebuffer_width, handover->framebuffer_height);
 
@@ -103,7 +105,7 @@ void framebuffer_initialize(Handover *handover)
         return;
     }
 
-    graphic_did_find_framebuffer(_framebuffer_virtual, _framebuffer_width, _framebuffer_height);
+    graphic_did_find_framebuffer(_framebuffer_virtual, _framebuffer_width, _framebuffer_height, _framebuffer_pitch, _framebuffer_bpp);
 
     scheduler_running()->domain().link(Path::parse(FRAMEBUFFER_DEVICE_PATH), make<Framebuffer>());
 }

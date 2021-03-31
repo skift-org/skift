@@ -2,6 +2,7 @@
 #include <libsystem/math/MinMax.h>
 
 #include "kernel/drivers/BGA.h"
+#include "kernel/graphics/EarlyConsole.h"
 #include "kernel/graphics/Graphics.h"
 #include "kernel/handover/Handover.h"
 #include "kernel/interrupts/Interupts.h"
@@ -51,6 +52,13 @@ Result BGA::set_resolution(int width, int height)
         _width = width;
         _height = height;
 
+        graphic_did_find_framebuffer(
+            _framebuffer->base(),
+            _width,
+            _height,
+            _width * 4,
+            4);
+
         logger_info("Resolution set to %dx%d.", width, height);
 
         return SUCCESS;
@@ -61,7 +69,6 @@ BGA::BGA(DeviceAddress address) : PCIDevice(address, DeviceClass::FRAMEBUFFER)
 {
     _framebuffer = make<MMIORange>(bar(0).range());
     set_resolution(handover()->framebuffer_width, handover()->framebuffer_height);
-    graphic_did_find_framebuffer(_framebuffer->base(), handover()->framebuffer_width, handover()->framebuffer_height);
 }
 
 size_t BGA::size()
@@ -94,14 +101,7 @@ Result BGA::call(IOCall request, void *args)
     {
         IOCallDisplayModeArgs *mode = (IOCallDisplayModeArgs *)args;
 
-        Result result = set_resolution(mode->width, mode->height);
-
-        if (result == SUCCESS)
-        {
-            graphic_did_find_framebuffer(_framebuffer->base(), mode->width, mode->height);
-        }
-
-        return result;
+        return set_resolution(mode->width, mode->height);
     }
     else if (request == IOCALL_DISPLAY_BLIT)
     {

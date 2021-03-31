@@ -142,11 +142,6 @@ int font_height() { return 9; }
 
 int font_width() { return 9; }
 
-void plot(int x, int y, uint32_t color)
-{
-    graphic_framebuffer()[y * graphic_framebuffer_width() + x] = color;
-}
-
 void font_draw(Codepoint cp, int x, int y)
 {
     if (cp > 0x7f)
@@ -160,11 +155,11 @@ void font_draw(Codepoint cp, int x, int y)
 
             if (set)
             {
-                plot(x + xx, y + yy, fg);
+                graphic_framebuffer_plot(x + xx, y + yy, fg);
             }
             else
             {
-                plot(x + xx, y + yy, bg);
+                graphic_framebuffer_plot(x + xx, y + yy, bg);
             }
         }
     }

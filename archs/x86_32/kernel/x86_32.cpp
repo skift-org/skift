@@ -98,7 +98,7 @@ extern "C" void arch_main(void *info, uint32_t magic)
 
     if (handover->memory_usable < 127 * 1024)
     {
-        system_panic("No enough memory (%uKio)!", handover->memory_usable / 1024);
+        logger_fatal("No enough memory (%uKio)!", handover->memory_usable / 1024);
     }
 
     gdt_initialize();

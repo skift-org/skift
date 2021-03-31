@@ -1,3 +1,4 @@
+#include <stdio.h>
 
 #include <libsystem/Logger.h>
 #include <libsystem/core/Plugs.h>
@@ -54,7 +55,10 @@ void logger_log(LogLevel level, const char *file, int line, const char *fmt, ...
         va_list va;
         va_start(va, fmt);
 
-        stream_vprintf(log_stream, fmt, va);
+        char buffer[512];
+        vsnprintf(buffer, 512, fmt, va);
+
+        stream_write(log_stream, buffer, strlen(buffer));
         stream_format(log_stream, "\e[0m\n");
         stream_flush(log_stream);
 
@@ -62,7 +66,7 @@ void logger_log(LogLevel level, const char *file, int line, const char *fmt, ...
 
         if (level == LOGGER_FATAL)
         {
-            __plug_logger_fatal();
+            __plug_logger_fatal(buffer);
         }
 
         __plug_logger_unlock();

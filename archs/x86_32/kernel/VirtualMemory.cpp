@@ -161,7 +161,7 @@ MemoryRange arch_virtual_alloc(void *address_space, MemoryRange physical_range, 
         }
     }
 
-    system_panic("Out of virtual memory!");
+    logger_fatal("Out of virtual memory!");
 }
 
 void arch_virtual_free(void *address_space, MemoryRange virtual_range)

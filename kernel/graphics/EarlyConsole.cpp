@@ -34,9 +34,9 @@ void early_console_enable()
         _console_y = 0;
         _console_enabled = true;
 
-        for (int x = 0; x < early_console_width(); x++)
+        for (int x = 0; x <= early_console_width(); x++)
         {
-            for (int y = 0; y < early_console_height(); y++)
+            for (int y = 0; y <= early_console_height(); y++)
             {
                 font_draw((uint8_t)0, x * font_width(), y * font_height());
             }

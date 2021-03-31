@@ -29,8 +29,8 @@ void __plug_logger_unlock()
     _logger_lock.release();
 }
 
-void __no_return __plug_logger_fatal()
+void __no_return __plug_logger_fatal(const char *message)
 {
-    stream_format(err_stream, "Fatal error occurred (see logs)!\n");
+    stream_format(err_stream, "Fatal error occurred: %s!\n", message);
     process_abort();
 }

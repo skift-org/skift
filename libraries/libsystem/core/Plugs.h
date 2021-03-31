@@ -20,7 +20,7 @@ void __plug_logger_lock();
 
 void __plug_logger_unlock();
 
-void __no_return __plug_logger_fatal();
+void __no_return __plug_logger_fatal(const char *message);
 
 /* --- File system ---------------------------------------------------------- */
 

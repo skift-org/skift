@@ -3,9 +3,9 @@
 
 <p align="center">
   <a href="https://skiftos.org/">Website</a> -
-  <a href="manual/readme.md">Manual</a> -
-  <a href="https://discord.gg/gamGsfg">Discord</a> -
-  <a href="https://github.com/skiftOS/skift/releases">Releases</a>
+  <a href="manual/readme.md">Manuaw</a> -
+  <a href="https://discord.gg/gamGsfg">Discowd</a> -
+  <a href="https://github.com/skiftOS/skift/releases">Reweases</a>
 </p>
 
 # skiftOS
@@ -17,49 +17,49 @@
 [![GitHub issues](https://img.shields.io/github/issues-raw/skiftOS/skift)](https://github.com/skiftOS/skift/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/skiftOS/skift)](https://github.com/skiftOS/skift/pulls)
 
- - **skiftOS** is a simple, handmade operating system for the x86 platform, aiming for clean and pretty APIs while keeping the spirit of UNIX.
- - **skiftOS** includes many applications like an [Image Viewer](./apps/image-viewer), a [Text Editor](./apps/text-editor), a [Terminal Emulator](./apps/terminal), [etc](./apps)...
- - **skiftOS** features an UNIX-like terminal experience with many familiar UNIX utilities.
- - **skiftOS** is also pretty easy to build from source, just follow the [build guide](manual/00-meta/building.md).
- - **skiftOS** is capable of running on real hardware.
- - **skiftOS** features a graphical user interface (GUI), with a compositor.
- - **skiftOS** is constantly updated, for the latest release `.img` of skiftOS, click [here](https://github.com/skiftOS/skift/releases/latest).
- - **skiftOS** can [run DOOM :rage3:](https://github.com/skiftOS/port-doom)
+ - **skiftOS** is a simpwe, handmade opewating system fow the x86 pwatfowm, aiming fow cwean and pwetty apis whiwe keeping the spiwit of unix.
+ - **skiftOS** incwudes many appwications wike an [Image viewew](./apps/image-viewer), a [text editow](./apps/text-editor), a [Tewminaw emuwatow](./apps/terminal), [etc](./apps)...
+ - **skiftOS** featuwes an unix-wike tewminaw expewience with many famiwiaw unix utiwities.
+ - **skiftOS** is awso pwetty easy to buiwd fwom souwce, just fowwow the [buiwd guide](manual/00-meta/building.md).
+ - **skiftOS** is capabwe of wunning on weaw hawdwawe.
+ - **skiftOS** featuwes a gwaphicaw usew intewface (gui), with a compositow.
+ - **skiftOS** is constantwy updated, fow the watest wewease `.img` of skiftos, cwick [hewe](https://github.com/skiftOS/skift/releases/latest).
+ - **skiftOS** can [wun DOwOM :rage3:](https://github.com/skiftOS/port-doom)
 
-# Screenshots
+# Scweenshots
 
 <p align="center">
 <img src="manual/90-screenshots/2021-02-23.png" />
 <br>
-skiftOS running in QEMU 5.1
+skiftos wunning in qemu 5.1
 </p>
 
 # Links
 
-- [Manual](manual/readme.md)
-- [Building](manual/00-meta/building.md) **(start here if you are new)**
-- [Contributing](manual/00-meta/contributing.md)
+- [Manuaw](manual/readme.md)
+- [Buiwding](manual/00-meta/building.md) **(stawt hewe if you awe new)**
+- [Contwibuting](manual/00-meta/contributing.md)
 - [Code of conduct](manual/00-meta/code_of_conduct.md)
-- [Running on Virtual Box](manual/00-meta/running_in_vbox.md) **(click here to experience skiftOS)**
+- [Running on viwtuaw box](manual/00-meta/running_in_vbox.md) **(cwick hewe to expewience skiftos)**
 
-# Acknowledgements
+# Acknowwedgements
 
-## Contributors
+## Contwibutows UwU <3
 
 <a href="https://github.com/skiftOS/skift/graphs/contributors">
   <img src="https://contributors-img.web.app/image?repo=skiftOS/skift" />
 </a>
 
-## Projects
+## Pwojects
 
 - [echfs](https://github.com/qword-os/echfs)
 - [limine](https://github.com/limine-bootloader/limine) (BSD-2-Clause License)
-- [Material Design Icons](http://materialdesignicons.com/) (SIL OPEN FONT LICENSE )
-- [serenityOS AK utilities](https://github.com/SerenityOS/serenity): 
-  while not directly used in skift, AK was a big inspiration in the creation of libutils.
+- [Matewiaw design icons](http://materialdesignicons.com/) (SIL OPEN FONT LICENSE )
+- [sewenityos ak utiwities](https://github.com/SerenityOS/serenity): 
+ whiwe not diwectwy used in skift, ak was a big inspiwation in the cweation of wibutiws.
 
-# License
+# Wicense
 
-The skift operating system and its core components are licensed under the **MIT License**.
-
-See [license.md](license.md)
+the skift opewating system and its cowe components awe wicensed undew the **mit license** :o
+ 
+see [wicense.md](license.md)

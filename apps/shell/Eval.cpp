@@ -53,13 +53,13 @@ Result shell_exec(
     int *pid)
 {
     auto executable = find_command_path(command->command);
-    if (!executable)
+    if (!executable.present())
     {
         *pid = -1;
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    Launchpad *launchpad = launchpad_create(command->command, executable->cstring());
+    Launchpad *launchpad = launchpad_create(command->command, executable.value().cstring());
     launchpad_flags(launchpad, TASK_WAITABLE);
 
     list_foreach(char, arg, command->arguments)

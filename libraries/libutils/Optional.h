@@ -70,7 +70,7 @@ public:
         if (other.present())
         {
             _present = true;
-            new (&_storage) T(*other);
+            new (&_storage) T(other.value());
         }
     }
 
@@ -91,7 +91,7 @@ public:
             _present = other._present;
             if (other._present)
             {
-                new (&_storage) T(*other);
+                new (&_storage) T(other.value());
             }
         }
 
@@ -136,14 +136,4 @@ public:
             _present = false;
         }
     }
-
-    operator bool() const { return _present; }
-
-    T &operator*() { return value(); }
-
-    const T &operator*() const { return value(); }
-
-    T *operator->() { return &value(); }
-
-    const T *operator->() const { return &value(); }
 };

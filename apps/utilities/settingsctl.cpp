@@ -21,14 +21,14 @@ int main(int argc, const char **argv)
     args.option_string('r', "read", "Read settings from the settings storage.", [&](auto &key_name) {
         auto maybe_settings = Settings::Service::the()->read(Settings::Path::parse(key_name));
 
-        if (!maybe_settings)
+        if (!maybe_settings.present())
         {
             stream_format(err_stream, "%s: No such setting.\n", argv[0]);
             process_exit(PROCESS_FAILURE);
         }
 
         Prettifier pretty;
-        Json::prettify(pretty, *maybe_settings);
+        Json::prettify(pretty, maybe_settings.value());
 
         stream_format(out_stream, "%s", pretty.finalize().cstring());
 
@@ -38,19 +38,19 @@ int main(int argc, const char **argv)
     args.option('w', "write", "Write a setting to the settings storage.", [&](ArgParseContext &context) {
         auto maybe_key_name = context.pop_operand();
 
-        if (!maybe_key_name)
+        if (!maybe_key_name.present())
         {
             args.usage();
         }
 
         auto maybe_value = context.pop_operand();
 
-        if (!maybe_value)
+        if (!maybe_value.present())
         {
             args.usage();
         }
 
-        Settings::Service::the()->write(Settings::Path::parse(*maybe_key_name), Json::parse(*maybe_value));
+        Settings::Service::the()->write(Settings::Path::parse(maybe_key_name.value()), Json::parse(maybe_value.value()));
 
         return PROCESS_SUCCESS;
     });
@@ -60,14 +60,14 @@ int main(int argc, const char **argv)
     args.option(0, "watch", "Watch settings for changes.", [&](ArgParseContext &context) {
         auto maybe_key_name = context.pop_operand();
 
-        if (!maybe_key_name)
+        if (!maybe_key_name.present())
         {
             args.usage();
         }
 
         EventLoop::initialize();
 
-        watcher = own<Settings::Watcher>(Settings::Path::parse(*maybe_key_name), [&](auto &value) {
+        watcher = own<Settings::Watcher>(Settings::Path::parse(maybe_key_name.value()), [&](auto &value) {
             Prettifier pretty;
             Json::prettify(pretty, value);
 

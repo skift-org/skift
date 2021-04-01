@@ -43,12 +43,12 @@ public:
 
     Json::Value read()
     {
-        if (!_value)
+        if (!_value.present())
         {
             _value = _service->read(_path);
         }
 
-        return *_value;
+        return _value.value();
     }
 };
 

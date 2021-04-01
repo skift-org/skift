@@ -115,18 +115,18 @@ int gfxmode_set(String &mode_name)
 {
     auto mode = gfxmode_by_name(mode_name);
 
-    if (!mode)
+    if (!mode.present())
     {
         IO::errln("Error: unknow graphic mode: {}", mode_name);
         return PROCESS_FAILURE;
     }
 
-    int result = gfxmode_set_compositor(*mode);
+    int result = gfxmode_set_compositor(mode.value());
 
     if (result != 0)
     {
         __cleanup(stream_cleanup) Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
-        result = gfxmode_set_iocall(device, *mode);
+        result = gfxmode_set_iocall(device, mode.value());
     }
 
     if (result == 0)

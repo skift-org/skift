@@ -22,11 +22,6 @@ struct NumberScanner
 
     Optional<uint8_t> scan_digit(Scanner &scan)
     {
-        if (!scan.current_is(Strings::ALL_XDIGITS))
-        {
-            return {};
-        }
-
         char c = scan.current();
 
         for (int i = 0; i < _base; i++)
@@ -39,7 +34,7 @@ struct NumberScanner
             }
         }
 
-        ASSERT_NOT_REACHED();
+        return {};
     }
 
     Optional<uint64_t> scan_uint(Scanner &scan)
@@ -51,11 +46,10 @@ struct NumberScanner
 
         uint64_t value = 0;
 
-        while (!scan.ended() &&
-               scan.current_is(Strings::ALL_XDIGITS))
+        while (!scan.ended() && scan.current_is(Strings::ALL_XDIGITS))
         {
             value = value * _base;
-            value += *scan_digit(scan);
+            value += scan_digit(scan).value();
         }
 
         return value;
@@ -73,24 +67,24 @@ struct NumberScanner
 
         auto unsigned_value = scan_uint(scan);
 
-        if (!unsigned_value)
+        if (!unsigned_value.present())
         {
             return {};
         }
 
         if (is_negative)
         {
-            return -*unsigned_value;
+            return -unsigned_value.value();
         }
         else
         {
-            return *unsigned_value;
+            return unsigned_value.value();
         }
     }
 
     Optional<double> scan_float(Scanner &scan)
     {
-        int64_t ipart = scan_int(scan);
+        int64_t ipart = scan_int(scan).value_or(0);
 
         double fpart = 0;
 
@@ -100,7 +94,7 @@ struct NumberScanner
 
             while (scan.current_is(Strings::ALL_XDIGITS))
             {
-                fpart += multiplier * *scan_digit(scan);
+                fpart += multiplier * scan_digit(scan).value();
                 multiplier *= (1.0 / _base);
             }
         }
@@ -110,7 +104,7 @@ struct NumberScanner
         if (scan.current_is("eE"))
         {
             scan.forward();
-            exp = scan_int(scan);
+            exp = scan_int(scan).value_or(0);
         }
 
         return (ipart + fpart) * pow(_base, exp);

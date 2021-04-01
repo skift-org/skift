@@ -20,14 +20,14 @@ public:
     {
         assert(success());
 
-        return *_value;
+        return _value.value();
     }
 
     const T &value() const
     {
         assert(success());
 
-        return *_value;
+        return _value.value();
     }
 
     T value_or_default(T default_)

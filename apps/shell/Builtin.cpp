@@ -48,9 +48,9 @@ int shell_which(int argc, const char **argv)
     {
         auto executable = find_command_path(argv[i]);
 
-        if (executable)
+        if (executable.present())
         {
-            IO::outln("{}", *executable);
+            IO::outln("{}", executable.value());
         }
         else
         {

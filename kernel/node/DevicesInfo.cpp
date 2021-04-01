@@ -26,8 +26,8 @@ Result FsDeviceInfo::open(FsHandle &handle)
         device_object["name"] = device->name().cstring();
         device_object["path"] = device->path().cstring();
         device_object["address"] = device->address().as_static_cstring();
-        device_object["interrupt"] = device->interrupt();
-        device_object["refcount"] = device->refcount();
+        device_object["interrupt"] = (int64_t)device->interrupt();
+        device_object["refcount"] = (int64_t)device->refcount();
 
         auto *driver = driver_for(device->address());
         if (driver)

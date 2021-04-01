@@ -32,7 +32,7 @@ public:
     {
         if (message.type == Message::SERVER_NOTIFY)
         {
-            on_notify(*message.path, *message.payload);
+            on_notify(message.path.value(), message.payload.value());
         }
     }
 };

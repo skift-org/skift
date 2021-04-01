@@ -60,7 +60,7 @@ Widget::Variant TaskModel::data(int row, int column)
     {
     case COLUMN_ID:
     {
-        Widget::Variant value = task.get("id").as_integer();
+        Widget::Variant value = (int)task.get("id").as_integer();
 
         if (task.get("user").is(Json::TRUE))
         {

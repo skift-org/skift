@@ -37,9 +37,9 @@ Graphic::Color Component::color(ThemeColorRole role)
         }
     }
 
-    if (_colors[role])
+    if (_colors[role].present())
     {
-        return *_colors[role];
+        return _colors[role].value();
     }
 
     return _window->color(role);

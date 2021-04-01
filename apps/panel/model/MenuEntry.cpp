@@ -38,20 +38,18 @@ MenuEntry::MenuEntry(String id, const Json::Value &value)
 
 Vector<MenuEntry> MenuEntry::load()
 {
-    static Optional<Vector<MenuEntry>> entries;
+    static Vector<MenuEntry> entries;
 
-    if (entries)
+    if (entries.count() != 0)
     {
-        return *entries;
+        return entries;
     }
-
-    entries = Vector<MenuEntry>{};
 
     IO::Directory directory{"/Applications"};
 
     if (!directory.exist())
     {
-        return *entries;
+        return entries;
     }
 
     for (auto &entry : directory.entries())
@@ -67,15 +65,15 @@ Vector<MenuEntry> MenuEntry::load()
 
         if (manifest_file.exist())
         {
-            entries->emplace_back(entry.name, Json::parse(manifest_file));
+            entries.emplace_back(entry.name, Json::parse(manifest_file));
         }
     }
 
-    entries->sort([](auto &a, auto &b) {
+    entries.sort([](auto &a, auto &b) {
         return strcmp(a.name.cstring(), b.name.cstring());
     });
 
-    return *entries;
+    return entries;
 }
 
 } // namespace panel

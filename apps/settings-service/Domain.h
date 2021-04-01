@@ -27,11 +27,11 @@ struct Domain
 
             auto bundle = Bundle::Load(bundle_path);
 
-            if (bundle)
+            if (bundle.present())
             {
                 auto path = ::Path::parse(bundle_path);
 
-                domain.bundles[path.basename_without_extension()] = *bundle;
+                domain.bundles[path.basename_without_extension()] = bundle.value();
             }
         }
 

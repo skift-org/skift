@@ -17,15 +17,17 @@ FsProcessInfo::FsProcessInfo() : FsNode(FILE_TYPE_DEVICE)
 static Iteration serialize_task(Json::Value::Array *list, Task *task)
 {
     if (task->id == 0)
+    {   
         return Iteration::CONTINUE;
+    }
 
     Json::Value::Object task_object{};
 
-    task_object["id"] = task->id;
+    task_object["id"] = (int64_t)task->id;
     task_object["name"] = task->name;
     task_object["state"] = task_state_string(task->state());
-    task_object["cpu"] = scheduler_get_usage(task->id);
-    task_object["ram"] = (int)task_memory_usage(task);
+    task_object["cpu"] = (int64_t)scheduler_get_usage(task->id);
+    task_object["ram"] = (int64_t)task_memory_usage(task);
     task_object["user"] = (task->_flags & TASK_USER) == TASK_USER;
 
     list->push_back(move(task_object));

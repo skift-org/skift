@@ -143,14 +143,12 @@ public:
             [this, callback](ArgParseContext &ctx) {
                 auto maybe_strings = ctx.pop_operand();
 
-                if (maybe_strings)
-                {
-                    return callback(*maybe_strings);
-                }
-                else
+                if (!maybe_strings.present())
                 {
                     return usage();
                 }
+
+                return callback(maybe_strings.value());
             },
         });
     }
@@ -165,22 +163,22 @@ public:
             [this, callback](ArgParseContext &ctx) {
                 auto maybe_string = ctx.pop_operand();
 
-                if (!maybe_string)
+                if (!maybe_string.present())
                 {
                     return usage();
                 }
 
-                IO::MemoryReader memory{*maybe_string};
+                IO::MemoryReader memory{maybe_string.value()};
                 IO::Scanner scan{memory};
 
                 auto maybe_value = IO::NumberScanner::decimal().scan_int(scan);
 
-                if (!maybe_value)
+                if (!maybe_value.present())
                 {
                     return usage();
                 }
 
-                return callback(*maybe_value);
+                return callback(maybe_value.value());
             },
         });
     }

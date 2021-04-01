@@ -21,9 +21,9 @@ inline void whitespace(IO::Scanner &scan)
 inline Value number(IO::Scanner &scan)
 {
 #ifdef __KERNEL__
-    return {IO::NumberScanner::decimal().scan_int(scan)};
+    return IO::NumberScanner::decimal().scan_int(scan).value_or(0);
 #else
-    return {IO::NumberScanner::decimal().scan_float(scan)};
+    return IO::NumberScanner::decimal().scan_float(scan).value_or(0);
 #endif
 }
 
@@ -189,7 +189,7 @@ inline Value object(IO::Scanner &scan)
 
     if (scan.skip('}'))
     {
-        return move(object);
+        return object;
     }
 
     while (scan.current() != '}')

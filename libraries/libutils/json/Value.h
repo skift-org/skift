@@ -45,7 +45,7 @@ private:
     union
     {
         StringStorage *_string;
-        int _integer;
+        int64_t _integer;
 #ifndef __KERNEL__
         double _double;
 #endif
@@ -85,7 +85,7 @@ public:
         }
     }
 
-    inline int as_integer() const
+    inline int64_t as_integer() const
     {
         if (_type == INTEGER)
         {
@@ -219,7 +219,7 @@ public:
         _string = new StringStorage(COPY, cstring);
     }
 
-    inline Value(int value)
+    inline Value(int64_t value)
     {
         _type = INTEGER;
         _integer = value;

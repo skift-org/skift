@@ -22,14 +22,14 @@ RessourceMonitor::RessourceMonitor(Component *parent)
     auto cpu_graph = new Widget::Graph(this, 50, Graphic::Colors::SEAGREEN);
     new Widget::Label(cpu_graph, "CPU", Anchor::CENTER);
 
-    _ram_timer = own<Timer>(500, [ram_graph]() {
+    _ram_timer = own<Timer>(700, [ram_graph]() {
         SystemStatus status{};
         hj_system_status(&status);
 
         ram_graph->record(status.used_ram / (float)status.total_ram);
     });
 
-    _cpu_timer = own<Timer>(100, [cpu_graph]() {
+    _cpu_timer = own<Timer>(300, [cpu_graph]() {
         SystemStatus status{};
         hj_system_status(&status);
         cpu_graph->record(status.cpu_usage / 100.0);

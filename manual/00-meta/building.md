@@ -1,167 +1,166 @@
-# Build Guide
+# Buiwd guide
 
-## Table of content
+## Buiwd guide
 
 - [Build Guide](#build-guide)
-  - [Table of content](#table-of-content)
-  - [Supported environment](#supported-environment)
+  - [Tabwe of content](#table-of-content)
+  - [Suppowted enviwonment](#supported-environment)
     - [About WSL](#about-wsl)
-  - [Building skiftOS](#building-skiftos)
-    - [1. Get the source code](#1-get-the-source-code)
+  - [Buiwding skiftos](#building-skiftos)
+    - [1. Get the souwce code](#1-get-the-source-code)
     - [2. Setting up](#2-setting-up)
-    - [3. Building](#3-building)
-    - [4. Running in a virtual machine](#4-running-in-a-virtual-machine)
+    - [3. Buiwding](#3-building)
+    - [4. Running in a viwtuaw machine](#4-running-in-a-virtual-machine)
     - [5. Tips](#5-tips)
     - [6. Using the system](#6-using-the-system)
-    - [7. Contributing](#7-contributing)
+    - [7. Contwibuting](#7-contributing)
+## suppowted enviwonment
 
-## Supported environment
+buiwding skiftos wequiwes
 
-Building skiftOS requires
-
-- A good Linux distribution
+- a good linux distwibution
 - nasm
 - gcc
-- binutils
-- grub
-- ImageMagick
+- binutiws
+- gwub
+- imagemagick
 
-And for testing and debugging
+and fow testing and debugging
 - qemu
 - gdb
 
 ```sh
-# On Debian or Debian-based distributions
-$ sudo apt install nasm gcc make binutils grub-pc-bin xorriso mtools imagemagick git qemu qemu-kvm
+# on debian ow debian-based distwibutions
+$ sudo apt instaww nasm gcc make binutiws gwub-pc-bin xowwiso mtoows imagemagick git qemu qemu-kvm
 ```
 
 ```sh
-# On Arch or Arch-based distributions
-$ sudo pacman -S nasm gcc make binutils grub qemu libisoburn mtools imagemagick git qemu
+# on awch ow awch-based distwibutions
+$ sudo pacman -s nasm gcc make binutiws gwub qemu wibisobuwn mtoows imagemagick git qemu
 ```
 
 ```sh
-# On Red Hat or Red Hat-based distributions
-$ sudo dnf install nasm gcc gcc-g++ make binutils xorriso mtools ImageMagick git qemu qemu-kvm
+# on red hat ow red hat-based distwibutions
+$ sudo dnf instaww nasm gcc gcc-g++ make binutiws xowwiso mtoows imagemagick git qemu qemu-kvm
 ```
 
-### About WSL
+### about wsl
 
-It's possible to build skiftOS WSL1 and WSL2 but it's not well tested.
-If you have any problems consider upgrading to a GNU/linux distribution.
+it's possibwe to buiwd skiftos wsl1 and wsl2 but it's not weww tested.
+ if you have any pwobwems considew upgwading to a gnu/winux distwibution.
+ 
+## buiwding skiftos
 
-## Building skiftOS
+### 1. Get the souwce code
 
-### 1. Get the source code
-
-Clone the repository with all its submodules.
-
+cwone the wepositowy with aww its submoduwes.
+ 
 ```sh
-$ git clone --recursive https://github.com/skiftOS/skift
+$ git cwone --wecuwsive https://github.com/skiftos/skift
 
 $ cd skift
 ```
 
-Or if you have already cloned this repo without `--recursive` do:
+ow if you have awweady cwoned this wepo without `--wecuwsive` do:
 
 ```sh
 $ cd skift
 
-$ git submodule init
+$ git submoduwe init
 ```
 
 ### 2. Setting up
 
-Building the toolchain is pretty straight-forward,
-first make sure you have all GCC and binutils dependencies:
- - build-essential
+buiwding the toowchain is pwetty stwaight-fowwawd,
+fiwst make suwe you have aww gcc and binutiws dependencies:
+ - buiwd-essentiaw
  - bison
- - flex
- - libgmp3-dev
- - libmpc-dev
- - libmpfr-dev
+ - fwex
+ - wibgmp3-dev
+ - wibmpc-dev
+ - wibmpfw-dev
  - texinfo
 
-You can run the following command on ubuntu:
+you can wun the fowwowing command on ubuntu:
 
 ```sh
-# On Debian or Debian-based distributions
-$ sudo apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
+# on debian ow debian-based distwibutions
+$ sudo apt instaww buiwd-essentiaw bison fwex wibgmp3-dev wibmpc-dev wibmpfw-dev texinfo
 ```
 
 ```sh
-# On Arch or Arch-based distributions
-$ sudo pacman -S base-devel bison flex mpc mpfr texinfo
+# on awch ow awch-based distwibutions
+$ sudo pacman -s base-devew bison fwex mpc mpfw texinfo
 ```
 
 ```sh
-# On Red Hat or Red Hat-based distributions
-$ sudo dnf install bison flex mpc-devel mpfr-devel gmp-devel texinfo patch 
+# on red hat ow red hat-based distwibutions
+$ sudo dnf instaww bison fwex mpc-devew mpfw-devew gmp-devew texinfo patch 
 ```
 
-Then for building the toolchain run the `build-it.sh` script
+then fow buiwding the toowchain wun the `buiwd-it.sh` scwipt
 
 ```sh
-## Build the tool chain
-$ toolchain/build-it.sh
+## buiwd the toow chain
+$ toowchain/buiwd-it.sh
 
-## Then wait for completion
+## then wait fow compwetion
 ```
 
-The script will do the following operation without installing anything to the host system nor requiering root access:
- - Download `gcc` and `binutils` from the GNU project
- - Patch them using binutils.patch and gcc.patch which are located in the toolchain directory.
- - Then configure and build
+the scwipt wiww do the fowwowing opewation without instawwing anything to the host system now wequiewing woot access:
+ - downwoad `gcc` and `binutiws` fwom the gnu pwoject
+ - patch them using binutiws.patch and gcc.patch which awe wocated in the toowchain diwectowy.
+  - then configuwe and buiwd
 
-### 3. Building
+### 3. Buiwding
 
-From the root of this repo do:
+fwom the woot of this wepo do:
 
 ```sh
-$ make all
+$ make aww
 ```
 
-This command will build all the components of the operating system and generate an ISO bootable in QEMU or VirtualBox.
+this command wiww buiwd aww the components of the opewating system and genewate an iso bootabwe in qemu ow viwtuawbox.
+ 
+> the compatibiwity with viwtuaw box is not guawanteed, as we use qemu pwimawwy fow debugging and testing the system.
+ 
+### 4. Running in a viwtuaw machine
 
-> The compatibility with virtual box is not guaranteed, as we use QEMU primarly for debugging and testing the system.
-
-### 4. Running in a virtual machine
-
-The build system allows you to create and start a virtual machine of skiftOS by using one of the following commands:
+the buiwd system awwows you to cweate and stawt a viwtuaw machine of skiftos by using one of the fowwowing commands:
 
 ```sh
-$ make run CONFIG_VMACHINE=qemu # for QEMU
-# or
-$ make run CONFIG_VMACHINE=vbox # for Virtual Box
+$ make wun config_vmachine=qemu # fow qemu
+# ow
+$ make wun config_vmachine=vbox # fow viwtuaw box
 ```
 
 ### 5. Tips
 
-> If you made any modification to the source code or the content of the sysroot/ directory, the build system should be able to rebuild the project from step 3 automagically :^)
+> if you made any modification to the souwce code ow the content of the syswoot/ diwectowy, the buiwd system shouwd be abwe to webuiwd the pwoject fwom step 3 automagicawwy :^)
 
-> You can change the default keyboard layout by passing CONFIG_KEYBOARD_LAYOUT="fr_fr" to make.
-
+> you can change the defauwt keyboawd wayout by passing config_keyboard_layout="fw_fw" to make.
+ 
 ### 6. Using the system
 
-**How to change the keyboard layout?**
+**how to change the keyboawd wayout?**
 
 ```sh
-µ keyboardctl en_us
+µ keyboawdctw en_us
 ```
 
-**How to change display resolution?**
+**how to change dispway wesowution?**
 
 ```sh
-µ displayctl -s 1920x1080
+µ dispwayctw -s 1920x1080
 ```
-**How to change to wallpaper?**
+**how to change to wawwpapew?**
 
 ```sh
-µ wallpaperctl /Files/Wallpapers/paint.png
+µ wallpaperctl /fiwes/wawwpapews/paint.png
 ```
 
-### 7. Contributing
+### 7. Contwibuting
 
-A bug? A Missing feature? Please consider contributing to the project :hugs: ❤️
+a bug? a missing featuwe? pwease considew contwibuting to the pwoject :hugs: ❤️
 
-See [contributing.md](contributing.md)
+see [contwibuting.md](contributing.md)

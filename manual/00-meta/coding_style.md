@@ -1,48 +1,48 @@
-# Coding Style
+# coding stywe
 
-## File Layout
+## fiwe layout
 
-1. Headers
-2. Macros
+1. Headews
+2. Macwos
 3. Types
-4. Global Variables
+4. Gwobaw vawiabwes
 5. Functions
 6. main
 
-## Leading whitespace
+## leading whitespace
 
-* **DO** use 4 spaces as tab.
+* **do** use 4 spaces as tab.
+ 
+## bwocks
 
-## Blocks
+* `{` on own wine.
+ * `}` awso on own wine except on `do whiwe` statements.
+ 
+*exampwe:*
 
-* `{` on own line.
-* `}` also on own line except on `do while` statements.
-
-*Example:*
-
-```C++
+```c++
 if (cond)
 {
-    // ...
-}
-else
+    //...
+ }
+ewse
 {
-    // ...
-}
+    //...
+ }
 
-while (cond)
+whiwe (cond)
 {
-    // ...
-}
+    //...
+ }
 
 do
 {
-    // ...
-} while (cond);
+    //...
+ } whiwe (cond);
 
-class FooBar
+cwass foobaw
 {
-    FooBar();
+    foobaw();
 };
 
 namespace bazz
@@ -50,158 +50,160 @@ namespace bazz
 
 } // namespace bazz
 
-extern "C"
+extewn "c"
 {
-    // ...
-}
+    //...
+ }
 
 void do_foo()
 {
-    // ...
-}
+    //...
+ }
 ```
 
-## Comments
+## comments
 
-* Avoid comment that paraphrases the code. Comments should answer the why and the code the how.
+* avoid comment that pawaphwases the code. Comments shouwd answew the why and the code the how.
+ 
+## functions
 
-## Functions
+* retuwn type and modifiews on the same wine as the function name.
+ * the awguments is adjacent to the function name.
+ * use `snake_case` fow theiw name.
+ 
+*exampwe:*
 
-* Return type and modifiers on the same line as the function name.
-* The arguments is adjacent to the function name.
-* Use `snake_case` for their name.
-
-*Example:*
-
-```C++
+```c++
 static void foo()
 {
-    bar;
+    baw;
 }
 
 foo();
 ```
 
-## Variables
+## vawiabwes
 
-* Also use `snake_case` for their name.
-* In declaration of pointer the * is adjacent to their name, not the type.
+* awso use `snake_case` fow theiw name.
+ * in decwawation of pointew the * is adjacent to theiw name, not the type.
+ 
+## keywowds
 
-## Keywords
-
-* Use a space after `if`, `for`, `while`, `switch`.
-* Do not use a space after the opening ( and before the closing ).
-* Preferably use () with `sizeof`.
-* Use `nullptr` when necessary otherwise use `NULL`.
-* Always use curly braces after `if`, `for`, `while`, `switch` statements.
-
-**DON'T**
-```C++
+* use a space aftew `if`, `fow`, `whiwe`, `switch`.
+ * do not use a space aftew the opening ( and befowe the cwosing ).
+ * pwefewabwy use () with `sizeof`.
+ * use `nuwwptw` when necessawy othewwise use `null`.
+ * awways use cuwwy bwaces aftew `if`, `fow`, `whiwe`, `switch` statements.
+ 
+**don't**
+```c++
 if (foo)
-    bar;
+    baw;
 ```
 
-**DO**
-```C++
+**do**
+```c++
 if (foo)
 {
-    bar;
+    baw;
 }
 ```
 
-## Switch
+## switch
 
-* Don't indent cases another level.
-* Switch case should NOT falltrough.
-* But if you have no other choise (very unlikely) add a `/* FALLTROUGH */` comment.
+* don't indent cases anothew wevew.
+ * switch case shouwd not fawwtwough.
+ * but if you have no othew choise (vewy unwikewy) add a `/* falltrough */` comment.
+ 
+*exampwe:*
 
-*Example:*
-
-```C++
+```c++
 switch(foo)
 {
-case bar:
-    printf("foo");
-    /* FALLTROUGH */
+case baw:
+    pwintf("foo");
+    /* falltrough */
 
 case mitzvah:
-    printf("barmitzvah\n");
-    break;
+    pwintf("bawmitzvah\n");
+    bweak;
 }
 ```
 
-## Headers
+## headews
 
-* Include libraries first, then include local headers (separate them with a new line).
-* Use `.h` as extension.
-* Most of the headers of skift include the file `libsystem/Common.h` wich include most of the standard libraries (`stdio`, `stdlib`, `stddef`, `stdint` and some Macros).
-* If you want to declare a new header use `#pragma once` instead of using cross-defines.
+* incwude wibwawies fiwst, then incwude wocaw headews (sepawate them with a new wine).
+ * use `.h` as extension.
+ * most of the headews of skift incwude the fiwe `wibsystem/common.h` wich incwude most of the standawd wibwawies (`stdio`, `stdwib`, `stddef`, `stdint` and some macwos).
+ * if you want to decwawe a new headew use `#pwagma once` instead of using cwoss-defines.
+ 
+*exampwe:*
 
-*Example:*
+```c++
+#incwude <wibio/stweams.h>
 
-```C++
-#include <libio/Streams.h>
-
-#include "foo.h"
+#incwude "foo.h"
 ```
 
-## User Defined Types
+## usew defined types
 
-* Don't use `type_t` naming. (If you see one in the code base (on non-posix standard libraries), please report it :sweat_smile:)
-* Don't typedef builtin types.
-* Use `PascalCase` for typedef'd types.
+* don't use `type_t` naming. (if you see one in the code base (on non-posix standawd wibwawies), pwease wepowt it :sweat_smiwe:)
+* don't typedef buiwtin types.
+ * use `pascawcase` fow typedef'd types.
+ 
+## line wength
 
-## Line length
+* keep wines between 60 and 80 chawactews wong.
+ 
+## main function
 
-* Keep lines between 60 and 80 characters long.
+* awways put `awgc` and `awgv` as awguments (**never** put nothing ow void as awguments).
+ * if you don't need `awgc` and/ow `awgv` use the macwo `__unused`.
+ * use doubwe pointew fow `awgv`.
+ 
+*exampwe:*
 
-## Main function
-
-* Always put `argc` and `argv` as arguments (**NEVER** put nothing or void as arguments).
-* If you don't need `argc` and/or `argv` use the macro `__unused`.
-* Use double pointer for `argv`.
-
-*Example:*
-
-```C++
-int main(int argc, char **argv)
+```c++
+int main(int awgc, chaw **awgv)
 {
-    __unused(argc);
-    __unused(argv);
+    __unused(awgc);
+    __unused(awgv);
 }
 ```
 
-## Handling Errors
+## handwing ewwows
 
-* `return -1` when there is an error
-* `return 0` when there is not
-* When using `Result` for error handling, use the function `result_to_string` for printing errors out
+* `wetuwn -1` when thewe is an ewwow
+* `wetuwn 0` when thewe is not
+* when using `resuwt` fow ewwow handwing, use the function `wesuwt_to_stwing` fow pwinting ewwows out
 
-**DON'T**
+**don't**
 
-```C++
-if (result == ERR_NOT_READABLE)
+```c++
+if (wesuwt == err_not_readable)
 {
-    printf("rmdir: failed to remove '%s': Not readable", path);
+    pwintf("wmdiw: faiwed to wemove '%s': not weadabwe", path);
 }
-else if (result == ERR_DIRECTORY_NOT_EMPTY)
+ewse if (wesuwt == err_directory_not_empty)
 {
-    printf("rmdir: failed to remove '%s': Directory not empty", path);
+    pwintf("wmdiw: faiwed to wemove '%s': diwectowy not empty", path);
 }
 ```
 
-**DO**
+**do**
 
-```C++
-printf("rmdir: failed to remove '%s': %s", path, result_to_string(result));
+```c++
+pwintf("wmdiw: faiwed to wemove '%s': %s", path, wesuwt_to_stwing(wesuwt));
 ```
 
-## Formatting
+## fowmatting
 
-* You can use the command `clang-format -r` for formatting your code automaticly
+* you can use the command `cwang-fowmat -w` fow fowmatting youw code automaticwy
 
-# Authors
+
+# authows
 
 - [@Keyboard-Slayer](https://github.com/Keyboard-Slayer)
 - [@sleepy-monax](https://github.com/sleepy-monax)
 - [@optimisticside](https://github.com/optimisticside)
+- [@OWO](godowo)

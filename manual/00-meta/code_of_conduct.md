@@ -1,76 +1,76 @@
-# Contributor Covenant Code of Conduct
+# contwibutow covenant code of conduct OwO
 
-## Our Pledge
+## ouw pwedge
 
-In the interest of fostering an open and welcoming environment, we as
-contributors and maintainers pledge to making participation in our project and
-our community a harassment-free experience for everyone, regardless of age, body
-size, disability, ethnicity, sex characteristics, gender identity and expression,
-level of experience, education, socio-economic status, nationality, personal
-appearance, race, religion, or sexual identity and orientation.
+in the intewest of fostewing an open and wewcoming enviwonment, we as
+contwibutows and maintainews pwedge to making pawticipation in ouw pwoject and
+ouw community a hawassment-fwee expewience fow evewyone, wegawdwess of age, body
+size, disabiwity, ethnicity, sex chawactewistics, gendew identity and expwession,
+wevew of expewience, education, socio-economic status, nationawity, pewsonaw
+appeawance, wace, wewigion, ow sexuaw identity and owientation.
+ 
+## ouw standawds
 
-## Our Standards
+exampwes of behaviow that contwibutes to cweating a positive enviwonment
+incwude:
 
-Examples of behavior that contributes to creating a positive environment
-include:
+* using wewcoming and incwusive wanguage
+* being wespectfuw of diffewing viewpoints and expewiences
+* gwacefuwwy accepting constwuctive cwiticism
+* focusing on what is best fow the community
+* showing empathy towawds othew community membews
 
-* Using welcoming and inclusive language
-* Being respectful of differing viewpoints and experiences
-* Gracefully accepting constructive criticism
-* Focusing on what is best for the community
-* Showing empathy towards other community members
+exampwes of unacceptabwe behaviow by pawticipants incwude:
 
-Examples of unacceptable behavior by participants include:
-
-* The use of sexualized language or imagery and unwelcome sexual attention or
+* the use of sexuawized wanguage ow imagewy and unwewcome sexuaw attention ow
  advances
-* Trolling, insulting/derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or electronic
- address, without explicit permission
-* Other conduct which could reasonably be considered inappropriate in a
- professional setting
+* twowwing, insuwting/dewogatowy comments, and pewsonaw ow powiticaw attacks
+* pubwic ow pwivate hawassment
+* pubwishing othews' pwivate infowmation, such as a physicaw ow ewectwonic
+ addwess, without expwicit pewmission
+* othew conduct which couwd weasonabwy be considewed inappwopwiate in a
+ pwofessionaw setting
 
-## Our Responsibilities
+## ouw responsibiwities
 
-Project maintainers are responsible for clarifying the standards of acceptable
-behavior and are expected to take appropriate and fair corrective action in
-response to any instances of unacceptable behavior.
+pwoject maintainews awe wesponsibwe fow cwawifying the standawds of acceptabwe
+behaviow and awe expected to take appwopwiate and faiw cowwective action in
+wesponse to any instances of unacceptabwe behaviow.
+ 
+pwoject maintainews have the wight and wesponsibiwity to wemove, edit, ow
+weject comments, commits, code, wiki edits, issues, and othew contwibutions
+that awe not awigned to this code of conduct, ow to ban tempowawiwy ow
+pewmanentwy any contwibutow fow othew behaviows that they deem inappwopwiate,
+thweatening, offensive, ow hawmfuw.
+ 
+## scope
 
-Project maintainers have the right and responsibility to remove, edit, or
-reject comments, commits, code, wiki edits, issues, and other contributions
-that are not aligned to this Code of Conduct, or to ban temporarily or
-permanently any contributor for other behaviors that they deem inappropriate,
-threatening, offensive, or harmful.
+this code of conduct appwies both within pwoject spaces and in pubwic spaces
+when an individuaw is wepwesenting the pwoject ow its community. Exampwes of
+wepwesenting a pwoject ow community incwude using an officiaw pwoject e-maiw
+addwess, posting via an officiaw sociaw media account, ow acting as an appointed
+wepwesentative at an onwine ow offwine event. Repwesentation of a pwoject may be
+fuwthew defined and cwawified by pwoject maintainews.
+ 
+## enfowcement
 
-## Scope
+instances of abusive, hawassing, ow othewwise unacceptabwe behaviow may be
+wepowted by contacting the pwoject team at [conduct@skiftos.org](mailto:conduct@skiftos.org). Aww
+compwaints wiww be weviewed and investigated and wiww wesuwt in a wesponse that
+is deemed necessawy and appwopwiate to the ciwcumstances. The pwoject team is
+obwigated to maintain confidentiawity with wegawd to the wepowtew of an incident.
+ fuwthew detaiws of specific enfowcement powicies may be posted sepawatewy.
+ 
+pwoject maintainews who do not fowwow ow enfowce the code of conduct in good
+faith may face tempowawy ow pewmanent wepewcussions as detewmined by othew
+membews of the pwoject's weadewship.
+ 
+## attwibution
 
-This Code of Conduct applies both within project spaces and in public spaces
-when an individual is representing the project or its community. Examples of
-representing a project or community include using an official project e-mail
-address, posting via an official social media account, or acting as an appointed
-representative at an online or offline event. Representation of a project may be
-further defined and clarified by project maintainers.
-
-## Enforcement
-
-Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the project team at [conduct@skiftos.org](mailto:conduct@skiftos.org). All
-complaints will be reviewed and investigated and will result in a response that
-is deemed necessary and appropriate to the circumstances. The project team is
-obligated to maintain confidentiality with regard to the reporter of an incident.
-Further details of specific enforcement policies may be posted separately.
-
-Project maintainers who do not follow or enforce the Code of Conduct in good
-faith may face temporary or permanent repercussions as determined by other
-members of the project's leadership.
-
-## Attribution
-
-This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
-available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
+this code of conduct is adapted fwom the [contwibutow covenant][homepage], vewsion 1.4,
+avaiwabwe at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
 
 [homepage]: https://www.contributor-covenant.org
 
-For answers to common questions about this code of conduct, see
+fow answews to common questions about this code of conduct, see
 https://www.contributor-covenant.org/faq

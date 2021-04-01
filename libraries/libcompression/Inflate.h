@@ -6,7 +6,7 @@
 #include <libio/Writer.h>
 #include <libsystem/Common.h>
 #include <libsystem/Result.h>
-#include <libtest/AssertGreaterThan.h>
+#include <libutils/Assert.h>
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
 

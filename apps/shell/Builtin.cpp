@@ -1,8 +1,6 @@
 #include <assert.h>
-#include <stdio.h>
 
 #include <libio/Streams.h>
-
 #include <libsystem/process/Process.h>
 #include <libutils/NumberParser.h>
 

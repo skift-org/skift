@@ -5,10 +5,9 @@
 #include <libio/ScopedReader.h>
 #include <libio/Skip.h>
 #include <libsystem/Logger.h>
-#include <libtest/Asserts.h>
 #include <libutils/Array.h>
+#include <libutils/Assert.h>
 #include <libutils/Chrono.h>
-#include <libtest/Asserts.h>
 
 namespace Graphic
 {
@@ -288,19 +287,19 @@ Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, con
     {
     case Png::FT_NONE:
         for (i = 0; i != length; ++i)
-        {   
+        {
             recon[i] = scanline[i];
         }
         break;
 
     case Png::FT_SUB:
         for (i = 0; i != bytewidth; ++i)
-        {   
+        {
             recon[i] = scanline[i];
         }
 
         for (i = bytewidth; i < length; ++i)
-        {   
+        {
             recon[i] = scanline[i] + recon[i - bytewidth];
         }
         break;
@@ -309,14 +308,14 @@ Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, con
         if (precon)
         {
             for (i = 0; i != length; ++i)
-            {   
+            {
                 recon[i] = scanline[i] + precon[i];
             }
         }
         else
         {
             for (i = 0; i != length; ++i)
-            {   
+            {
                 recon[i] = scanline[i];
             }
         }
@@ -326,24 +325,24 @@ Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, con
         if (precon)
         {
             for (i = 0; i != bytewidth; ++i)
-            {   
+            {
                 recon[i] = scanline[i] + (precon[i] >> 1u);
             }
 
             for (i = bytewidth; i < length; ++i)
-            {   
+            {
                 recon[i] = scanline[i] + ((recon[i - bytewidth] + precon[i]) >> 1u);
             }
         }
         else
         {
             for (i = 0; i != bytewidth; ++i)
-            {   
+            {
                 recon[i] = scanline[i];
             }
 
             for (i = bytewidth; i < length; ++i)
-            {   
+            {
                 recon[i] = scanline[i] + (recon[i - bytewidth] >> 1u);
             }
         }
@@ -382,7 +381,7 @@ Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, con
             {
                 recon[i] = scanline[i];
             }
-        
+
             for (i = bytewidth; i < length; ++i)
             {
                 /*paeth_predictor(recon[i - bytewidth], 0, 0) is always recon[i - bytewidth]*/

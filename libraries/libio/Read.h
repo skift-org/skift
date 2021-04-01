@@ -2,7 +2,7 @@
 
 #include <libio/Copy.h>
 #include <libio/Reader.h>
-#include <libtest/AssertEqual.h>
+#include <libutils/Assert.h>
 #include <libutils/Vector.h>
 
 namespace IO
@@ -47,7 +47,7 @@ inline ResultOr<T> read(Reader &reader)
 {
     T result;
     size_t read = TRY(reader.read(&result, sizeof(T)));
-    assert_equal(read, sizeof(T));
+    Assert::equal(read, sizeof(T));
     return result;
 }
 

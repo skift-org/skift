@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libtest/Asserts.h>
+#include <libutils/Assert.h>
 #include <libutils/SourceLocation.h>
 
 namespace Test

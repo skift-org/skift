@@ -1,8 +1,3 @@
-#include <assert.h>
-#include <stdio.h>
-
-#include <libio/File.h>
-
 #include <libcompression/Deflate.h>
 #include <libcompression/Inflate.h>
 #include <libfile/ZipArchive.h>
@@ -137,7 +132,7 @@ Result read_local_headers(IO::SeekableReader auto &reader, Vector<Archive::Entry
         }
 
         auto &entry = entries.emplace_back();
-        assert_equal(IO::skip(reader, sizeof(LocalHeader)), SUCCESS);
+        Assert::equal(IO::skip(reader, sizeof(LocalHeader)), SUCCESS);
 
         // Get the uncompressed & compressed sizes
         entry.uncompressed_size = local_header.uncompressed_size();

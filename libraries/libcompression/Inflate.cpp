@@ -301,7 +301,7 @@ __flatten Result Inflate::read_blocks(IO::Reader &reader, IO::Writer &uncompress
                     unsigned int total_length = BASE_LENGTHS[length_index] + bits.grab_bits(BASE_LENGTH_EXTRA_BITS[length_index]);
                     unsigned int dist_code = dist_decoder.decode(bits);
 
-                    assert_lower_than(dist_code, 30);
+                    Assert::lower_than(dist_code, 30);
 
                     unsigned int total_dist = BASE_DISTANCE[dist_code] + bits.grab_bits(BASE_DISTANCE_EXTRA_BITS[dist_code]);
 

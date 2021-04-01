@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libtest/Asserts.h>
+#include <libutils/Assert.h>
 #include <libutils/TypeId.h>
 #include <libutils/Vector.h>
 
@@ -33,14 +33,14 @@ public:
     {
         for (size_t i = 0; i < _stack.count() - 1; ++i)
         {
-            assert_not_equal(_stack[i], _stack.peek_back());
+            Assert::not_equal(_stack[i], _stack.peek_back());
         }
     }
 
     template <typename T>
     void pop_type()
     {
-        assert_equal(_stack.pop_back(), GetTypeId<T>());
+        Assert::equal(_stack.pop_back(), GetTypeId<T>());
     }
 };
 

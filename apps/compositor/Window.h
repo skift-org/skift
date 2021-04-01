@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
-#include <libtest/AssertTrue.h>
+#include <libutils/Assert.h>
 #include <libutils/Rect.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
@@ -37,7 +37,7 @@ public:
 
     Graphic::Bitmap &frontbuffer()
     {
-        assert_true(_frontbuffer);
+        Assert::is_true(_frontbuffer);
         return *_frontbuffer;
     }
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libio/Read.h>
-#include <libtest/Asserts.h>
+#include <libutils/Assert.h>
 #include <libutils/InlineRingBuffer.h>
 
 namespace IO
@@ -122,7 +122,7 @@ public:
 
         hint(num_bits);
 
-        assert_lower_equal(num_bits, 32);
+        Assert::lower_equal(num_bits, 32);
 
         uint32_t result = 0;
 
@@ -160,7 +160,7 @@ public:
 
         hint(offset + num_bits);
 
-        assert_lower_equal(num_bits, 32);
+        Assert::lower_equal(num_bits, 32);
 
         uint32_t result = 0;
 
@@ -182,7 +182,7 @@ public:
 
         hint(num_bits);
 
-        assert_lower_equal(num_bits, 32);
+        Assert::lower_equal(num_bits, 32);
 
         uint32_t result = 0;
 
@@ -204,7 +204,7 @@ public:
 
         hint(num_bits);
 
-        assert_lower_equal(num_bits, 32);
+        Assert::lower_equal(num_bits, 32);
 
         uint32_t result = 0;
 

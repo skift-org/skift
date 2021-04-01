@@ -8,7 +8,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
-#include <libtest/AssertTrue.h>
+#include <libutils/Assert.h>
 
 #include "shell/Shell.h"
 
@@ -143,7 +143,7 @@ int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> 
         {
             ShellCommand *command = nullptr;
             list_peekat(pipeline->commands, i, (void **)&command);
-            assert_true(command);
+            Assert::is_true(command);
 
             RefPtr<IO::Handle> command_stdin = instream;
             RefPtr<IO::Handle> command_stdout = outstream;

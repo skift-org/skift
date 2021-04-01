@@ -1,14 +1,11 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include <libutils/Random.h>
-
 #include <libgraphic/Font.h>
 #include <libgraphic/Painter.h>
 #include <libgraphic/StackBlur.h>
-
-#include <libtest/AssertGreaterThan.h>
-#include <libtest/AssertLowerThan.h>
+#include <libutils/Assert.h>
+#include <libutils/Random.h>
 
 namespace Graphic
 {
@@ -27,7 +24,7 @@ Painter::Painter(RefPtr<Bitmap> bitmap)
 
 void Painter::push()
 {
-    assert_lower_than(_state_stack_top, STATESTACK_SIZE);
+    Assert::lower_than(_state_stack_top, STATESTACK_SIZE);
 
     _state_stack_top++;
     _state_stack[_state_stack_top] = _state_stack[_state_stack_top - 1];
@@ -35,7 +32,7 @@ void Painter::push()
 
 void Painter::pop()
 {
-    assert_greater_than(_state_stack_top, 0);
+    Assert::greater_than(_state_stack_top, 0);
     _state_stack_top--;
 }
 

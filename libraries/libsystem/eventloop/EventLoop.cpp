@@ -5,8 +5,7 @@
 #include <libsystem/math/MinMax.h>
 #include <libsystem/system/System.h>
 #include <libsystem/utils/List.h>
-#include <libtest/AssertFalse.h>
-#include <libtest/AssertTrue.h>
+#include <libutils/Assert.h>
 #include <libutils/Vector.h>
 
 namespace EventLoop
@@ -128,14 +127,14 @@ static Vector<AtExitHook> _atexit_hooks;
 
 void initialize()
 {
-    assert_false(_is_initialize);
+    Assert::is_false(_is_initialize);
 
     _is_initialize = true;
 }
 
 void uninitialize()
 {
-    assert_true(_is_initialize);
+    Assert::is_true(_is_initialize);
 
     for (size_t i = 0; i < _atexit_hooks.count(); i++)
     {
@@ -185,7 +184,7 @@ void atexit(AtExitHook hook)
 
 void pump(bool pool)
 {
-    assert_true(_is_initialize);
+    Assert::is_true(_is_initialize);
 
     Timeout timeout = 0;
 
@@ -213,8 +212,8 @@ void pump(bool pool)
 
 int run()
 {
-    assert_true(_is_initialize);
-    assert_false(_is_running);
+    Assert::is_true(_is_initialize);
+    Assert::is_false(_is_running);
 
     _is_running = true;
 
@@ -230,7 +229,7 @@ int run()
 
 void exit(int exit_value)
 {
-    assert_true(_is_initialize);
+    Assert::is_true(_is_initialize);
 
     _is_running = false;
     _exit_value = exit_value;
@@ -238,9 +237,9 @@ void exit(int exit_value)
 
 int run_nested()
 {
-    assert_true(_is_initialize);
-    assert_true(_is_running);
-    assert_false(_nested_is_running);
+    Assert::is_true(_is_initialize);
+    Assert::is_true(_is_running);
+    Assert::is_false(_nested_is_running);
 
     _nested_is_running = true;
 
@@ -254,8 +253,8 @@ int run_nested()
 
 void exit_nested(int exit_value)
 {
-    assert_true(_is_initialize);
-    assert_true(_nested_is_running);
+    Assert::is_true(_is_initialize);
+    Assert::is_true(_nested_is_running);
 
     _nested_is_running = false;
     _nested_exit_value = exit_value;

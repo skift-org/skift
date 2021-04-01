@@ -15,9 +15,9 @@ TEST(container_fetch_transient)
 
     auto types = container.get_all<Type42>();
 
-    assert_equal(types.count(), 2);
-    assert_equal(types[0]->func(), 42);
-    assert_equal(types[1]->func(), 42);
+    Assert::equal(types.count(), 2);
+    Assert::equal(types[0]->func(), 42);
+    Assert::equal(types[1]->func(), 42);
 
     assert_not_same_entity(types[0], types[1]);
 }

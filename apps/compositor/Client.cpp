@@ -1,7 +1,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
 #include <libsystem/utils/Hexdump.h>
-#include <libtest/AssertFalse.h>
+#include <libutils/Assert.h>
 
 #include "compositor/Client.h"
 #include "compositor/Cursor.h"
@@ -138,7 +138,7 @@ void Client::handle_goodbye()
 
 void Client::handle_request()
 {
-    assert_false(_disconnected);
+    Assert::is_false(_disconnected);
 
     CompositorMessage message = {};
     auto read_result = _connection.read(&message, sizeof(CompositorMessage));

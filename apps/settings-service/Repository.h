@@ -1,9 +1,7 @@
 #pragma once
 
-#include <libsettings/Path.h>
-#include <stdio.h>
-
 #include <libio/Directory.h>
+#include <libsettings/Path.h>
 #include <libutils/Path.h>
 
 #include "settings-service/Domain.h"

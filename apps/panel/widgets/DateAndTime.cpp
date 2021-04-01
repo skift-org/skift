@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include <libio/Format.h>
 #include <libwidget/Label.h>
 

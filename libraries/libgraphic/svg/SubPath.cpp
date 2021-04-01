@@ -1,7 +1,7 @@
 #include <libutils/Trans2.h>
 
 #include <libgraphic/svg/SubPath.h>
-#include <libtest/AssertLowerThan.h>
+#include <libutils/Assert.h>
 
 namespace Graphic
 {
@@ -13,7 +13,7 @@ size_t SubPath::length() const
 
 BezierCurve SubPath::curves(size_t index) const
 {
-    assert_lower_than(index, length());
+    Assert::lower_than(index, length());
 
     size_t i = index * 3;
     return {_points[i], _points[i + 1], _points[i + 2], _points[i + 3]};

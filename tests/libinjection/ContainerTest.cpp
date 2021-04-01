@@ -1,5 +1,4 @@
 #include <libinjection/Inject.h>
-#include <libtest/Asserts.h>
 
 #include "tests/Driver.h"
 #include "tests/libinjection/Asserts.h"
@@ -14,7 +13,7 @@ TEST(injection_container_fetch_simple_type)
 
     auto instance = container.get<Type42>();
 
-    assert_equal(instance->func(), 42);
+    Assert::equal(instance->func(), 42);
 }
 
 TEST(injection_container_fetch_type_behind_interface)
@@ -24,7 +23,7 @@ TEST(injection_container_fetch_type_behind_interface)
 
     auto instance = container.get<NumericType>();
 
-    assert_equal(instance->func(), 42);
+    Assert::equal(instance->func(), 42);
 }
 
 TEST(injection_container_fetch_multiple_types)
@@ -35,9 +34,9 @@ TEST(injection_container_fetch_multiple_types)
 
     auto numeric_types = container.get_all<NumericType>();
 
-    assert_equal(numeric_types.count(), 2);
-    assert_equal(numeric_types[0]->func(), 42);
-    assert_equal(numeric_types[1]->func(), 52);
+    Assert::equal(numeric_types.count(), 2);
+    Assert::equal(numeric_types[0]->func(), 42);
+    Assert::equal(numeric_types[1]->func(), 52);
 }
 
 TEST(injection_container_fetch_type_behind_multiple_interfaces)
@@ -48,14 +47,14 @@ TEST(injection_container_fetch_type_behind_multiple_interfaces)
     auto numeric_type = container.get<NumericType>();
     auto string_type = container.get<StringType>();
 
-    assert_not_null(numeric_type);
-    assert_not_null(string_type);
+    Assert::not_null(numeric_type);
+    Assert::not_null(string_type);
 
     // Is it the same undelying Injection::Entity ?
     assert_same_entity(numeric_type, string_type);
 
-    assert_equal(numeric_type->func(), 5);
-    assert_equal(string_type->string(), "apple");
+    Assert::equal(numeric_type->func(), 5);
+    Assert::equal(string_type->string(), "apple");
 }
 
 TEST(injection_constructor_injection)
@@ -67,10 +66,10 @@ TEST(injection_constructor_injection)
     auto car = container.get<Car>();
     auto engine = container.get<Engine>();
 
-    assert_not_null(car);
-    assert_not_null(engine);
+    Assert::not_null(car);
+    Assert::not_null(engine);
 
-    assert_equal(car->vroom(), 42);
+    Assert::equal(car->vroom(), 42);
     assert_same_entity(car->_engine, engine);
 }
 
@@ -85,6 +84,6 @@ TEST(injection_constructor_injection_list)
 
     auto zoo = container.get<Zoo>();
 
-    assert_not_null(zoo);
-    assert_equal(zoo->_animals.count(), 3);
+    Assert::not_null(zoo);
+    Assert::equal(zoo->_animals.count(), 3);
 }

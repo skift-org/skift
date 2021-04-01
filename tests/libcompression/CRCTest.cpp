@@ -1,5 +1,4 @@
 #include <libcompression/CRC.h>
-#include <libtest/Asserts.h>
 
 #include "tests/Driver.h"
 
@@ -23,7 +22,7 @@ TEST(crc32_test_single)
 
     checksum.add(testdata, sizeof(testdata));
 
-    assert_equal(checksum.checksum(), 0xd1562c0f);
+    Assert::equal(checksum.checksum(), 0xd1562c0f);
 }
 
 TEST(crc32_test_many)
@@ -49,5 +48,5 @@ TEST(crc32_test_many)
         checksum.add(&byte, sizeof(uint8_t));
     }
 
-    assert_equal(checksum.checksum(), 0xd1562c0f);
+    Assert::equal(checksum.checksum(), 0xd1562c0f);
 }

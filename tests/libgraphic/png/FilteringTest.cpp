@@ -1,5 +1,4 @@
 #include <libgraphic/png/PngReader.h>
-#include <libtest/Asserts.h>
 
 #include "tests/Driver.h"
 
@@ -38,9 +37,9 @@ TEST(pngreader_filtertype_grayscale_none)
 
     IO::MemoryReader mem_reader(f00n0g08, sizeof(f00n0g08));
     Graphic::PngReader png_reader(mem_reader);
-    assert_true(png_reader.valid());
-    assert_equal(png_reader.width(), 32);
-    assert_equal(png_reader.height(), 32);
+    Assert::is_true(png_reader.valid());
+    Assert::equal(png_reader.width(), 32);
+    Assert::equal(png_reader.height(), 32);
 }
 
 TEST(pngreader_filtertype_grayscale_sub)
@@ -76,9 +75,9 @@ TEST(pngreader_filtertype_grayscale_sub)
 
     IO::MemoryReader mem_reader(f01n0g08, sizeof(f01n0g08));
     Graphic::PngReader png_reader(mem_reader);
-    assert_true(png_reader.valid());
-    assert_equal(png_reader.width(), 32);
-    assert_equal(png_reader.height(), 32);
+    Assert::is_true(png_reader.valid());
+    Assert::equal(png_reader.width(), 32);
+    Assert::equal(png_reader.height(), 32);
 }
 
 TEST(pngreader_filtertype_grayscale_up)
@@ -117,9 +116,9 @@ TEST(pngreader_filtertype_grayscale_up)
 
     IO::MemoryReader mem_reader(f02n0g08, sizeof(f02n0g08));
     Graphic::PngReader png_reader(mem_reader);
-    assert_true(png_reader.valid());
-    assert_equal(png_reader.width(), 32);
-    assert_equal(png_reader.height(), 32);
+    Assert::is_true(png_reader.valid());
+    Assert::equal(png_reader.width(), 32);
+    Assert::equal(png_reader.height(), 32);
 }
 
 TEST(pngreader_filtertype_grayscale_average)
@@ -161,9 +160,9 @@ TEST(pngreader_filtertype_grayscale_average)
 
     IO::MemoryReader mem_reader(f03n0g08, sizeof(f03n0g08));
     Graphic::PngReader png_reader(mem_reader);
-    assert_true(png_reader.valid());
-    assert_equal(png_reader.width(), 32);
-    assert_equal(png_reader.height(), 32);
+    Assert::is_true(png_reader.valid());
+    Assert::equal(png_reader.width(), 32);
+    Assert::equal(png_reader.height(), 32);
 }
 
 TEST(pngreader_filtertype_grayscale_paeth)
@@ -195,7 +194,7 @@ TEST(pngreader_filtertype_grayscale_paeth)
 
     IO::MemoryReader mem_reader(f04n0g08, sizeof(f04n0g08));
     Graphic::PngReader png_reader(mem_reader);
-    assert_true(png_reader.valid());
-    assert_equal(png_reader.width(), 32);
-    assert_equal(png_reader.height(), 32);
+    Assert::is_true(png_reader.valid());
+    Assert::equal(png_reader.width(), 32);
+    Assert::equal(png_reader.height(), 32);
 }

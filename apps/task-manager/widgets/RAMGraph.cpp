@@ -1,14 +1,10 @@
 #include <abi/Syscalls.h>
 
-#include <libutils/StringBuilder.h>
-
 #include <libio/Format.h>
 #include <libsystem/system/System.h>
-
+#include <libutils/StringBuilder.h>
 #include <libwidget/Container.h>
 #include <libwidget/IconPanel.h>
-
-#include <stdio.h>
 
 #include "task-manager/widgets/RAMGraph.h"
 

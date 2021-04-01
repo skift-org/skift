@@ -17,8 +17,8 @@ TEST(simple_constructor_factory)
     Injection::inject_transient<TestStruct>(container);
 
     auto fetched_instance = container.get<TestStruct>();
-    assert_not_null(fetched_instance);
-    assert_equal(fetched_instance->fun(), 1234);
+    Assert::not_null(fetched_instance);
+    Assert::equal(fetched_instance->fun(), 1234);
 }
 
 TEST(constant_factory)
@@ -31,7 +31,7 @@ TEST(constant_factory)
     auto fetched_instance = container.get<TestStruct>();
 
     assert_same_entity(original_instance, fetched_instance);
-    assert_equal(fetched_instance->fun(), 1234);
+    Assert::equal(fetched_instance->fun(), 1234);
 }
 
 TEST(callback_factory)
@@ -40,8 +40,8 @@ TEST(callback_factory)
     Injection::inject_transient<TestStruct>(container, [](Context &) { return make<TestStruct>(); });
 
     auto fetched_instance = container.get<TestStruct>();
-    assert_not_null(fetched_instance);
-    assert_equal(fetched_instance->fun(), 1234);
+    Assert::not_null(fetched_instance);
+    Assert::equal(fetched_instance->fun(), 1234);
 }
 
 } // namespace Injection

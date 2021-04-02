@@ -12,7 +12,6 @@
 namespace Widget
 {
 
-
 void Window::toggle_maximise()
 {
     if (_is_maximised == true)
@@ -71,10 +70,10 @@ Window::Window(WindowFlag flags)
     _icon = Graphic::Icon::get("application");
     _flags = flags;
 
-    frontbuffer = Graphic::Bitmap::create_shared(250, 250).take_value();
+    frontbuffer = Graphic::Bitmap::create_shared(250, 250).value();
     frontbuffer_painter = own<Graphic::Painter>(frontbuffer);
 
-    backbuffer = Graphic::Bitmap::create_shared(250, 250).take_value();
+    backbuffer = Graphic::Bitmap::create_shared(250, 250).value();
     backbuffer_painter = own<Graphic::Painter>(backbuffer);
 
     _root = new Container(nullptr);
@@ -215,10 +214,10 @@ void Window::change_framebuffer_if_needed()
         bound().height() > frontbuffer->height() ||
         bound().area() < frontbuffer->bound().area() * 0.75)
     {
-        frontbuffer = Graphic::Bitmap::create_shared(bound().width(), bound().height()).take_value();
+        frontbuffer = Graphic::Bitmap::create_shared(bound().width(), bound().height()).value();
         frontbuffer_painter = own<Graphic::Painter>(frontbuffer);
 
-        backbuffer = Graphic::Bitmap::create_shared(bound().width(), bound().height()).take_value();
+        backbuffer = Graphic::Bitmap::create_shared(bound().width(), bound().height()).value();
         backbuffer_painter = own<Graphic::Painter>(backbuffer);
     }
 }

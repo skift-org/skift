@@ -76,7 +76,7 @@ int gfxmode_set_compositor(IOCallDisplayModeArgs mode)
         return PROCESS_FAILURE;
     }
 
-    auto connection = connect_result.take_value();
+    auto connection = connect_result.value();
 
     CompositorMessage message{
         .type = COMPOSITOR_MESSAGE_SET_RESOLUTION,

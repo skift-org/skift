@@ -42,13 +42,6 @@ public:
         }
     }
 
-    T take_value()
-    {
-        assert(success());
-
-        return _value.take_value();
-    }
-
     Result result() const { return _result; }
 
     const char *description()

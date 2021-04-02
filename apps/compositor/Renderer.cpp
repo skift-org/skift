@@ -21,7 +21,7 @@ double _night_light_strenght = 0.5;
 
 void renderer_initialize()
 {
-    _framebuffer = Graphic::Framebuffer::open().take_value();
+    _framebuffer = Graphic::Framebuffer::open().value();
     _wallpaper = own<compositor::Wallpaper>(_framebuffer->resolution().size());
     _wallpaper->on_change = []() { renderer_region_dirty(renderer_bound()); };
 

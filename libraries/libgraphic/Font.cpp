@@ -56,7 +56,7 @@ ResultOr<RefPtr<Font>> Font::get(String name)
             return bitmap_or_error.result();
         }
 
-        _fonts[name] = make<Font>(bitmap_or_error.take_value(), glyph_or_error.take_value());
+        _fonts[name] = make<Font>(bitmap_or_error.value(), glyph_or_error.value());
     }
 
     return _fonts[name];

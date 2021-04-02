@@ -134,7 +134,7 @@ ResultOr<RefPtr<FsHandle>> Domain::connect(Path path)
         return connection_or_result.result();
     }
 
-    auto connection = connection_or_result.take_value();
+    auto connection = connection_or_result.value();
     auto connection_handle = make<FsHandle>(connection, OPEN_CLIENT);
 
     BlockerConnect blocker{connection};

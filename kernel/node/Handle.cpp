@@ -253,7 +253,7 @@ ResultOr<RefPtr<FsHandle>> FsHandle::accept()
     // We need to create the fshandle before releasing the lock
     // Because this will increment FsNode::servers
 
-    auto connection = connection_or_result.take_value();
+    auto connection = connection_or_result.value();
 
     auto connection_handle = make<FsHandle>(connection, OPEN_SERVER);
 

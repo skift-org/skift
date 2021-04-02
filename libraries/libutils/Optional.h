@@ -9,7 +9,11 @@ class Optional
 {
 private:
     bool _present = false;
-    union { T _storage; };
+
+    union
+    {
+        T _storage;
+    };
 
 public:
     bool present() const
@@ -27,16 +31,6 @@ public:
     {
         assert(present());
         return _storage;
-    }
-
-    T take_value()
-    {
-        assert(present());
-
-        T v = move(value());
-        clear();
-
-        return v;
     }
 
     T value_or(const T &defaut_value) const
@@ -78,7 +72,7 @@ public:
     {
         if (other.present())
         {
-            new (&_storage) T(other.take_value());
+            new (&_storage) T(other.value());
             _present = true;
         }
     }
@@ -106,7 +100,7 @@ public:
             _present = other._present;
             if (other._present)
             {
-                new (&_storage) T(other.take_value());
+                new (&_storage) T(other.value());
             }
         }
 

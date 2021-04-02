@@ -383,7 +383,7 @@ Result initialize(int argc, char **argv)
 
     if (result_or_greetings.success())
     {
-        auto greetings = result_or_greetings.take_value();
+        auto greetings = result_or_greetings.value();
 
         Screen::bound(greetings.greetings.screen_bound);
     }

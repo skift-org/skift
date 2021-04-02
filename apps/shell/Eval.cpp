@@ -134,7 +134,7 @@ int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> 
 
         for (int i = 0; i < pipeline->commands->count() - 1; i++)
         {
-            pipes.push_back(IO::Pipe::create().take_value());
+            pipes.push_back(IO::Pipe::create().value());
         }
 
         Vector<int> processes;

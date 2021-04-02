@@ -40,8 +40,8 @@ void Client::handle(const CompositorCreateWindow &create_window)
         create_window.type,
         this,
         create_window.bound,
-        frontbuffer.take_value(),
-        backbuffer.take_value());
+        frontbuffer.value(),
+        backbuffer.value());
 }
 
 void Client::handle(const CompositorDestroyWindow &destroy_window)

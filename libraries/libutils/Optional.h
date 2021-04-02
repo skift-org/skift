@@ -1,6 +1,6 @@
 #pragma once
 
-#include <assert.h>
+
 #include <libutils/Move.h>
 #include <libutils/New.h>
 
@@ -16,28 +16,28 @@ private:
     };
 
 public:
-    bool present() const
+    ALWAYS_INLINE bool present() const
     {
         return _present;
     }
 
-    T &value()
+    ALWAYS_INLINE T &unwrap()
     {
         assert(present());
         return _storage;
     }
 
-    const T &value() const
+    ALWAYS_INLINE const T &unwrap() const
     {
         assert(present());
         return _storage;
     }
 
-    T value_or(const T &defaut_value) const
+    ALWAYS_INLINE T unwrap_or(const T &defaut_value) const
     {
         if (present())
         {
-            return value();
+            return unwrap();
         }
         else
         {
@@ -45,39 +45,39 @@ public:
         }
     }
 
-    Optional() {}
+    ALWAYS_INLINE Optional() {}
 
-    Optional(const T &value)
+    ALWAYS_INLINE Optional(const T &value)
     {
         _present = true;
         new (&_storage) T(value);
     }
 
-    Optional(T &&value)
+    ALWAYS_INLINE Optional(T &&value)
     {
         _present = true;
         new (&_storage) T(move(value));
     }
 
-    Optional(const Optional &other)
+    ALWAYS_INLINE Optional(const Optional &other)
     {
         if (other.present())
         {
             _present = true;
-            new (&_storage) T(other.value());
+            new (&_storage) T(other.unwrap());
         }
     }
 
-    Optional(Optional &&other)
+    ALWAYS_INLINE Optional(Optional &&other)
     {
         if (other.present())
         {
-            new (&_storage) T(other.value());
+            new (&_storage) T(other.unwrap());
             _present = true;
         }
     }
 
-    Optional &operator=(const Optional &other)
+    ALWAYS_INLINE Optional &operator=(const Optional &other)
     {
         if (this != &other)
         {
@@ -85,14 +85,14 @@ public:
             _present = other._present;
             if (other._present)
             {
-                new (&_storage) T(other.value());
+                new (&_storage) T(other.unwrap());
             }
         }
 
         return *this;
     }
 
-    Optional &operator=(Optional &&other)
+    ALWAYS_INLINE Optional &operator=(Optional &&other)
     {
         if (this != &other)
         {
@@ -100,33 +100,33 @@ public:
             _present = other._present;
             if (other._present)
             {
-                new (&_storage) T(other.value());
+                new (&_storage) T(other.unwrap());
             }
         }
 
         return *this;
     }
 
-    bool operator==(const T &other) const
+    ALWAYS_INLINE bool operator==(const T &other) const
     {
         if (!present())
         {
             return false;
         }
 
-        return value() == other;
+        return unwrap() == other;
     }
 
-    ~Optional()
+    ALWAYS_INLINE ~Optional()
     {
         clear();
     }
 
-    void clear()
+    ALWAYS_INLINE void clear()
     {
         if (_present)
         {
-            value().~T();
+            _storage.~T();
             _present = false;
         }
     }

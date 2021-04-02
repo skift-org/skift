@@ -14,7 +14,7 @@ public:
     static OwnPtr<ServerConnection> open()
     {
         auto connection = IO::Socket::connect("/Session/settings.ipc");
-        return own<ServerConnection>(connection.value());
+        return own<ServerConnection>(connection.unwrap());
     }
 
     ServerConnection(IO::Connection connection) : Peer{move(connection)}
@@ -32,7 +32,7 @@ public:
     {
         if (message.type == Message::SERVER_NOTIFY)
         {
-            on_notify(message.path.value(), message.payload.value());
+            on_notify(message.path.unwrap(), message.payload.unwrap());
         }
     }
 };

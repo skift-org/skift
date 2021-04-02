@@ -28,7 +28,7 @@ int main(int argc, const char **argv)
         }
 
         Prettifier pretty;
-        Json::prettify(pretty, maybe_settings.value());
+        Json::prettify(pretty, maybe_settings.unwrap());
 
         stream_format(out_stream, "%s", pretty.finalize().cstring());
 
@@ -50,7 +50,7 @@ int main(int argc, const char **argv)
             args.usage();
         }
 
-        Settings::Service::the()->write(Settings::Path::parse(maybe_key_name.value()), Json::parse(maybe_value.value()));
+        Settings::Service::the()->write(Settings::Path::parse(maybe_key_name.unwrap()), Json::parse(maybe_value.unwrap()));
 
         return PROCESS_SUCCESS;
     });
@@ -67,7 +67,7 @@ int main(int argc, const char **argv)
 
         EventLoop::initialize();
 
-        watcher = own<Settings::Watcher>(Settings::Path::parse(maybe_key_name.value()), [&](auto &value) {
+        watcher = own<Settings::Watcher>(Settings::Path::parse(maybe_key_name.unwrap()), [&](auto &value) {
             Prettifier pretty;
             Json::prettify(pretty, value);
 

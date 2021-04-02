@@ -154,7 +154,7 @@ int main(int argc, char **argv)
         dots->index(index);
 
         auto image_path = IO::format("/Applications/onboarding/illustration{}.png", index);
-        image->change_bitmap(Graphic::Bitmap::load_from(image_path).value());
+        image->change_bitmap(Graphic::Bitmap::load_from(image_path).unwrap());
 
         content->clear_children();
         pages(content, PAGES[index]);

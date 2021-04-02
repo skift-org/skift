@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
 
         if (!file.exist())
         {
-            IO::errln("{}: File does not exist", file.path().value().string());
+            IO::errln("{}: File does not exist", file.path().unwrap().string());
             return PROCESS_FAILURE;
         }
 
@@ -31,7 +31,7 @@ int main(int argc, char const *argv[])
         IO::CRCReader crc_reader(file);
         IO::copy(crc_reader, sink);
 
-        IO::outln("{}:\t{}", crc_reader.checksum(), file.path().value().string());
+        IO::outln("{}:\t{}", crc_reader.checksum(), file.path().unwrap().string());
     }
 
     return PROCESS_SUCCESS;

@@ -222,7 +222,7 @@ Vec2i mouse_position()
 
     if (result_or_mouse_position.success())
     {
-        auto mouse_position = result_or_mouse_position.value();
+        auto mouse_position = result_or_mouse_position.unwrap();
 
         return mouse_position.mouse_position.position;
     }
@@ -363,7 +363,7 @@ Result initialize(int argc, char **argv)
             Application::exit(PROCESS_FAILURE);
         }
 
-        size_t message_size = read_result.value();
+        size_t message_size = read_result.unwrap();
 
         if (message_size != sizeof(CompositorMessage))
         {
@@ -383,7 +383,7 @@ Result initialize(int argc, char **argv)
 
     if (result_or_greetings.success())
     {
-        auto greetings = result_or_greetings.value();
+        auto greetings = result_or_greetings.unwrap();
 
         Screen::bound(greetings.greetings.screen_bound);
     }

@@ -35,7 +35,7 @@ void ramdisk_load(Module *module)
                 continue;
             }
 
-            auto handle = result_or_handle.value();
+            auto handle = result_or_handle.unwrap();
 
             auto result_or_written = handle->write(block.data, block.size);
 

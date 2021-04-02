@@ -8,7 +8,7 @@ RefPtr<Graphic::Font> font()
 
     if (font == nullptr)
     {
-        font = Graphic::Font::get("mono").value();
+        font = Graphic::Font::get("mono").unwrap();
     }
 
     return font;

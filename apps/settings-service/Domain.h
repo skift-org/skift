@@ -31,7 +31,7 @@ struct Domain
             {
                 auto path = ::Path::parse(bundle_path);
 
-                domain.bundles[path.basename_without_extension()] = bundle.value();
+                domain.bundles[path.basename_without_extension()] = bundle.unwrap();
             }
         }
 

@@ -148,7 +148,7 @@ public:
                     return usage();
                 }
 
-                return callback(maybe_strings.value());
+                return callback(maybe_strings.unwrap());
             },
         });
     }
@@ -168,7 +168,7 @@ public:
                     return usage();
                 }
 
-                IO::MemoryReader memory{maybe_string.value()};
+                IO::MemoryReader memory{maybe_string.unwrap()};
                 IO::Scanner scan{memory};
 
                 auto maybe_value = IO::NumberScanner::decimal().scan_int(scan);
@@ -178,7 +178,7 @@ public:
                     return usage();
                 }
 
-                return callback(maybe_value.value());
+                return callback(maybe_value.unwrap());
             },
         });
     }

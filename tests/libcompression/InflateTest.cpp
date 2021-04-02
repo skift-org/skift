@@ -19,9 +19,9 @@ TEST(inflate_empty)
     // The inflate should have been succesful
     Assert::equal(result.result(), Result::SUCCESS);
     // The algorithm consumed all input bytes
-    Assert::equal(result.value(), sizeof(data));
+    Assert::equal(result.unwrap(), sizeof(data));
     // Should have generated no output
-    Assert::equal(mem_writer.length().value(), 0);
+    Assert::equal(mem_writer.length().unwrap(), 0);
 }
 
 TEST(inflate_empty_no_literals)
@@ -44,7 +44,7 @@ TEST(inflate_empty_no_literals)
     auto result = inf.perform(mem_reader, mem_writer);
 
     Assert::equal(result.result(), Result::SUCCESS);
-    Assert::equal(mem_writer.length().value(), 0);
+    Assert::equal(mem_writer.length().unwrap(), 0);
 }
 
 TEST(inflate_rle)
@@ -62,9 +62,9 @@ TEST(inflate_rle)
     // The inflate should have been succesful
     Assert::equal(result.result(), Result::SUCCESS);
     // The algorithm consumed all input bytes
-    Assert::equal(result.value(), sizeof(data));
+    Assert::equal(result.unwrap(), sizeof(data));
     // Should have generated 256 bytes
-    Assert::equal(mem_writer.length().value(), 256);
+    Assert::equal(mem_writer.length().unwrap(), 256);
     // All bytes should be zero
     auto uncompressed = Slice(mem_writer.slice());
     for (size_t i = 0; i < uncompressed.size(); i++)
@@ -91,9 +91,9 @@ TEST(inflate_huffman)
     // The inflate should have been succesful
     Assert::equal(result.result(), Result::SUCCESS);
     // The algorithm consumed all input bytes
-    Assert::equal(result.value(), sizeof(data));
+    Assert::equal(result.unwrap(), sizeof(data));
     // Should have generated 256 bytes
-    Assert::equal(mem_writer.length().value(), 256);
+    Assert::equal(mem_writer.length().unwrap(), 256);
     // All bytes should be zero
     auto uncompressed = Slice(mem_writer.slice());
     for (size_t i = 0; i < uncompressed.size(); i++)
@@ -118,7 +118,7 @@ TEST(inflate_max_matchlen)
     Assert::equal(result.result(), Result::SUCCESS);
 
     // The algorithm consumed all input bytes
-    Assert::equal(result.value(), sizeof(data));
+    Assert::equal(result.unwrap(), sizeof(data));
 
     // All bytes should be zero
     auto uncompressed = Slice(mem_writer.slice());
@@ -150,7 +150,7 @@ TEST(inflate_max_matchlen_alt)
     Assert::equal(result.result(), Result::SUCCESS);
 
     // The algorithm consumed all input bytes
-    Assert::equal(result.value(), sizeof(data));
+    Assert::equal(result.unwrap(), sizeof(data));
 
     // All bytes should be zero
     auto uncompressed = Slice(mem_writer.slice());
@@ -180,9 +180,9 @@ TEST(inflate_max_matchdist)
     Assert::equal(result.result(), Result::SUCCESS);
 
     // The algorithm consumed all input bytes
-    Assert::equal(result.value(), sizeof(data));
+    Assert::equal(result.unwrap(), sizeof(data));
 
-    Assert::equal(mem_writer.length().value(), 32771);
+    Assert::equal(mem_writer.length().unwrap(), 32771);
 
     auto uncompressed = Slice(mem_writer.slice());
     const uint8_t *out = (const uint8_t *)uncompressed.start();

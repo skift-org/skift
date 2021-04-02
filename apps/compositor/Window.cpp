@@ -231,7 +231,7 @@ void Window::flip_buffers(int frontbuffer_handle, Vec2i frontbuffer_size, int ba
             return;
         }
 
-        _frontbuffer = new_frontbuffer.value();
+        _frontbuffer = new_frontbuffer.unwrap();
     }
 
     if (_backbuffer->handle() != backbuffer_handle)
@@ -245,7 +245,7 @@ void Window::flip_buffers(int frontbuffer_handle, Vec2i frontbuffer_size, int ba
             return;
         }
 
-        _backbuffer = new_backbuffer.value();
+        _backbuffer = new_backbuffer.unwrap();
     }
 
     renderer_region_dirty(region.offset(bound().position()));

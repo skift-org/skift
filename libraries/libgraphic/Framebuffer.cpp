@@ -34,7 +34,7 @@ ResultOr<OwnPtr<Framebuffer>> Framebuffer::open()
         return bitmap_or_error.result();
     }
 
-    return own<Framebuffer>(handle, bitmap_or_error.value());
+    return own<Framebuffer>(handle, bitmap_or_error.unwrap());
 }
 
 Framebuffer::Framebuffer(Handle handle, RefPtr<Bitmap> bitmap)

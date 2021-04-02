@@ -100,7 +100,7 @@ Optional<Json::Value> Service::read(const Path path)
         return {};
     }
 
-    return result_or_response.value().payload;
+    return result_or_response.unwrap().payload;
 }
 
 bool Service::write(const Path path, Json::Value value)

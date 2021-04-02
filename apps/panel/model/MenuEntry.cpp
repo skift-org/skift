@@ -33,7 +33,7 @@ MenuEntry::MenuEntry(String id, const Json::Value &value)
         bitmap = Graphic::Bitmap::load_from("/Files/missing.png");
     }
 
-    image = bitmap.value();
+    image = bitmap.unwrap();
 }
 
 Vector<MenuEntry> MenuEntry::load()

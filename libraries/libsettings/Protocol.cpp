@@ -19,7 +19,7 @@ Result Protocol::encode_message(IO::Connection &connection, const Message &messa
     if (message.path.present())
     {
         Prettifier pretty;
-        message.path.value().prettify(pretty);
+        message.path.unwrap().prettify(pretty);
         path_buffer = pretty.finalize();
     }
 
@@ -28,7 +28,7 @@ Result Protocol::encode_message(IO::Connection &connection, const Message &messa
     if (message.payload.present())
     {
         Prettifier pretty;
-        Json::prettify(pretty, message.payload.value());
+        Json::prettify(pretty, message.payload.unwrap());
         payload_buffer = pretty.finalize();
     }
 

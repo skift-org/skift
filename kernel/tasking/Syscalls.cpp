@@ -432,7 +432,7 @@ Result hj_handle_open(int *handle,
 
     if (result_or_handle_index.success())
     {
-        *handle = result_or_handle_index.value();
+        *handle = result_or_handle_index.unwrap();
         return SUCCESS;
     }
     else
@@ -509,7 +509,7 @@ Result hj_handle_read(int handle, void *buffer, size_t size, size_t *read)
 
     if (result_or_read.success())
     {
-        *read = result_or_read.value();
+        *read = result_or_read.unwrap();
         return SUCCESS;
     }
     else
@@ -533,7 +533,7 @@ Result hj_handle_write(int handle, const void *buffer, size_t size, size_t *writ
 
     if (result_or_written.success())
     {
-        *written = result_or_written.value();
+        *written = result_or_written.unwrap();
         return SUCCESS;
     }
     else
@@ -565,7 +565,7 @@ Result hj_handle_seek(int handle, ssize64_t *offset, HjWhence whence, ssize64_t 
 
     if (result_offset != nullptr)
     {
-        *result_offset = seek_result.value_or_default(0);
+        *result_offset = seek_result.unwrap_or(0);
     }
 
     return seek_result.result();
@@ -601,7 +601,7 @@ Result hj_handle_connect(int *handle, const char *raw_path, size_t size)
 
     if (result_or_handle_index.success())
     {
-        *handle = result_or_handle_index.value();
+        *handle = result_or_handle_index.unwrap();
         return SUCCESS;
     }
     else
@@ -624,7 +624,7 @@ Result hj_handle_accept(int handle, int *connection_handle)
 
     if (result_or_handle_index.success())
     {
-        *connection_handle = result_or_handle_index.value();
+        *connection_handle = result_or_handle_index.unwrap();
         return SUCCESS;
     }
     else

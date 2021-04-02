@@ -29,7 +29,7 @@ static RefPtr<Icon> icon_load(String name)
 
         if (bitmap_or_result.success())
         {
-            icon->set_bitmap(static_cast<IconSize>(i), bitmap_or_result.value());
+            icon->set_bitmap(static_cast<IconSize>(i), bitmap_or_result.unwrap());
         }
     }
 

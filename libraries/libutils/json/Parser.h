@@ -21,9 +21,9 @@ inline void whitespace(IO::Scanner &scan)
 inline Value number(IO::Scanner &scan)
 {
 #ifdef __KERNEL__
-    return IO::NumberScanner::decimal().scan_int(scan).value_or(0);
+    return IO::NumberScanner::decimal().scan_int(scan).unwrap_or(0);
 #else
-    return IO::NumberScanner::decimal().scan_float(scan).value_or(0);
+    return IO::NumberScanner::decimal().scan_float(scan).unwrap_or(0);
 #endif
 }
 
@@ -77,7 +77,7 @@ static inline const char *escape_sequence(IO::Scanner &scan)
 
             IO::MemoryReader memory{buffer, 5};
             IO::Scanner bufscan{memory};
-            return IO::NumberScanner::hexadecimal().scan_uint(bufscan).value_or(0);
+            return IO::NumberScanner::hexadecimal().scan_uint(bufscan).unwrap_or(0);
         };
 
         uint32_t first_surrogate = read_4hex();

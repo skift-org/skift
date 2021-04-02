@@ -14,7 +14,7 @@ TerminalWidget::TerminalWidget(Component *parent) : Component(parent)
 {
     _terminal = own<Terminal::Terminal>(80, 24);
 
-    _terminal_device = IO::Terminal::create().value();
+    _terminal_device = IO::Terminal::create().unwrap();
 
     _server_notifier = own<Notifier>(_terminal_device.server, POLL_READ, [this]() {
         handle_read();
@@ -223,6 +223,6 @@ void TerminalWidget::handle_read()
         return;
     }
 
-    _terminal->write(buffer, read_result.value());
+    _terminal->write(buffer, read_result.unwrap());
     should_repaint();
 }

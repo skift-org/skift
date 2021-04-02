@@ -12,7 +12,7 @@ int main(int, char *[])
         return -1;
     }
 
-    auto framebuffer = framebuffer_or_result.value();
+    auto framebuffer = framebuffer_or_result.unwrap();
 
     auto logo = Graphic::Bitmap::load_from_or_placeholder("/Applications/splash-screen/logo.png");
 

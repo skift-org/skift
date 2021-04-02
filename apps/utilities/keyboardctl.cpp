@@ -45,8 +45,8 @@ int loadkey_set_keymap(RefPtr<IO::Handle> keyboard_device, String keymap_path)
         return PROCESS_FAILURE;
     }
 
-    KeyMap *keymap = (KeyMap *)read_all_result.value().start();
-    size_t keymap_size = read_all_result.value().size();
+    KeyMap *keymap = (KeyMap *)read_all_result.unwrap().start();
+    size_t keymap_size = read_all_result.unwrap().size();
 
     if (keymap_size < sizeof(KeyMap) ||
         keymap->magic[0] != 'k' ||

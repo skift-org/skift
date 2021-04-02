@@ -62,7 +62,7 @@ Result Deflate::perform(IO::Reader &uncompressed, IO::Writer &compressed)
 
     // If the data amount is too small it's not worth compressing it.
     // Depends on the compression level
-    if (buf_reader.buffered().value() < _min_size_to_compress)
+    if (buf_reader.buffered().unwrap() < _min_size_to_compress)
         [[unlikely]]
     {
         return compress_none(buf_reader, compressed);

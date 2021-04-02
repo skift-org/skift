@@ -108,7 +108,7 @@ ResultOr<size_t> FsHandle::read(void *buffer, size_t size)
         return read_result;
     }
 
-    _offset += read_result.value();
+    _offset += read_result.unwrap();
     _node->release(scheduler_running_id());
 
     return read_result;
@@ -142,7 +142,7 @@ ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
             return write_result;
         }
 
-        _offset += write_result.value();
+        _offset += write_result.unwrap();
 
         _node->release(scheduler_running_id());
 
@@ -253,7 +253,7 @@ ResultOr<RefPtr<FsHandle>> FsHandle::accept()
     // We need to create the fshandle before releasing the lock
     // Because this will increment FsNode::servers
 
-    auto connection = connection_or_result.value();
+    auto connection = connection_or_result.unwrap();
 
     auto connection_handle = make<FsHandle>(connection, OPEN_SERVER);
 

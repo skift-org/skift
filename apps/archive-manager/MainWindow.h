@@ -55,7 +55,7 @@ public:
             load_button->on(Widget::Event::ACTION, [&](auto) {
                 if (_dialog.show() == Widget::DialogResult::OK)
                 {
-                    set_archive(Archive::open(Path::parse(_dialog.selected_file().value())));
+                    set_archive(Archive::open(Path::parse(_dialog.selected_file().unwrap())));
                 }
             });
         }
@@ -77,7 +77,7 @@ public:
             load_button->on(Widget::Event::ACTION, [&](auto) {
                 if (_dialog.show() == Widget::DialogResult::OK)
                 {
-                    set_archive(Archive::open(Path::parse(_dialog.selected_file().value())));
+                    set_archive(Archive::open(Path::parse(_dialog.selected_file().unwrap())));
                 }
             });
 

@@ -14,27 +14,27 @@ private:
     Optional<T> _value;
 
 public:
-    bool success() { return _result == SUCCESS; }
+    ALWAYS_INLINE bool success() { return _result == SUCCESS; }
 
-    T &value()
+    ALWAYS_INLINE T &unwrap()
     {
         assert(success());
 
-        return _value.value();
+        return _value.unwrap();
     }
 
-    const T &value() const
+    ALWAYS_INLINE const T &unwrap() const
     {
         assert(success());
 
-        return _value.value();
+        return _value.unwrap();
     }
 
-    T value_or_default(T default_)
+    ALWAYS_INLINE T unwrap_or(T default_)
     {
         if (success())
         {
-            return _value.value();
+            return _value.unwrap();
         }
         else
         {
@@ -42,27 +42,27 @@ public:
         }
     }
 
-    Result result() const { return _result; }
+    ALWAYS_INLINE Result result() const { return _result; }
 
-    const char *description()
+    ALWAYS_INLINE const char *description()
     {
         return get_result_description(_result);
     }
 
-    ResultOr(Result result) : _result{result}, _value{} {}
+    ALWAYS_INLINE ResultOr(Result result) : _result{result}, _value{} {}
 
-    ResultOr(T value) : _result{SUCCESS}, _value{move(value)} {}
+    ALWAYS_INLINE ResultOr(T value) : _result{SUCCESS}, _value{move(value)} {}
 };
 
-static inline Result __extract_result(Result r) { return r; }
+ALWAYS_INLINE static inline Result __extract_result(Result r) { return r; }
 
 template <typename T>
-static inline Result __extract_result(ResultOr<T> r) { return r.result(); };
+ALWAYS_INLINE static inline Result __extract_result(ResultOr<T> r) { return r.result(); };
 
-static inline Result __extract_value(Result r) { return r; }
+ALWAYS_INLINE static inline Result __extract_value(Result r) { return r; }
 
 template <typename T>
-static inline T __extract_value(ResultOr<T> r) { return r.value(); };
+ALWAYS_INLINE static inline T __extract_value(ResultOr<T> r) { return r.unwrap(); };
 
 // This macro works like the try!() macro from rust.
 // If __stuff evaluate to an error it will short-circuit the function returning the error.

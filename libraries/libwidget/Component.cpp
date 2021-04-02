@@ -37,12 +37,7 @@ Graphic::Color Component::color(ThemeColorRole role)
         }
     }
 
-    if (_colors[role].present())
-    {
-        return _colors[role].value();
-    }
-
-    return _window->color(role);
+    return _colors[role].unwrap_or(_window->color(role));
 }
 
 void Component::color(ThemeColorRole role, Graphic::Color color)

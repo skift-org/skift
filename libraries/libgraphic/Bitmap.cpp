@@ -81,7 +81,7 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path)
 
     if (bitmap_or_result.success())
     {
-        auto bitmap = bitmap_or_result.value();
+        auto bitmap = bitmap_or_result.unwrap();
         memcpy(bitmap->pixels(), decoded_data, sizeof(Color) * decoded_width * decoded_height);
         return bitmap;
     }
@@ -100,7 +100,7 @@ RefPtr<Bitmap> Bitmap::load_from_or_placeholder(String path)
         return placeholder();
     }
 
-    return result.value();
+    return result.unwrap();
 }
 
 Result Bitmap::save_to(String path)

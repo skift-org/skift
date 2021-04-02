@@ -35,7 +35,7 @@ public:
     {
         auto accept_result = _handle->accept();
         TRY(accept_result);
-        return Connection{accept_result.value()};
+        return Connection{accept_result.unwrap()};
     }
 };
 

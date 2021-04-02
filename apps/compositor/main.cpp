@@ -74,7 +74,7 @@ int main(int argc, char const *argv[])
 
     auto keyboard_notifier = own<Notifier>(keyboard_stream, POLL_READ, [&]() {
         KeyboardPacket packet;
-        size_t size = keyboard_stream.read(&packet, sizeof(KeyboardPacket)).value();
+        size_t size = keyboard_stream.read(&packet, sizeof(KeyboardPacket)).unwrap();
 
         if (size == sizeof(KeyboardPacket))
         {
@@ -106,7 +106,7 @@ int main(int argc, char const *argv[])
 
     auto mouse_notifier = own<Notifier>(mouse_stream, POLL_READ, [&]() {
         MousePacket packet;
-        size_t size = mouse_stream.read(&packet, sizeof(MousePacket)).value();
+        size_t size = mouse_stream.read(&packet, sizeof(MousePacket)).unwrap();
 
         if (size == sizeof(MousePacket))
         {
@@ -121,7 +121,7 @@ int main(int argc, char const *argv[])
     });
 
     auto socker_notifier = own<Notifier>(socket, POLL_ACCEPT, [&]() {
-        IO::Connection incoming_connection = socket.accept().value();
+        IO::Connection incoming_connection = socket.accept().unwrap();
         Client::connect(incoming_connection);
         client_destroy_disconnected();
     });

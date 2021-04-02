@@ -202,7 +202,7 @@ int main(int argc, char **argv)
 {
     Widget::Application::initialize(argc, argv);
 
-    auto bitmap = Graphic::Bitmap::create_shared(400, 400).value();
+    auto bitmap = Graphic::Bitmap::create_shared(400, 400).unwrap();
     bitmap->clear(Graphic::Colors::BLACKTRANSPARENT);
 
     auto document = make<PaintDocument>(bitmap);

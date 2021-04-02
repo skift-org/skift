@@ -48,7 +48,7 @@ public:
             _value = _service->read(_path);
         }
 
-        return _value.value();
+        return _value.unwrap();
     }
 };
 

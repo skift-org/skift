@@ -14,6 +14,8 @@
 
 #define __flatten __attribute__((flatten))
 
+#define ALWAYS_INLINE __attribute__((always_inline))
+
 // Align the nearest _lower_ aligned address
 // ex: 8 with align = 8 -> 8
 // ex: 9 with align = 8 -> 16

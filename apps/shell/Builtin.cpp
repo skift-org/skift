@@ -48,7 +48,7 @@ int shell_which(int argc, const char **argv)
 
         if (executable.present())
         {
-            IO::outln("{}", executable.value());
+            IO::outln("{}", executable.unwrap());
         }
         else
         {

@@ -286,7 +286,7 @@ ResultOr<int> Handles::accept(int socket_handle_index)
         return accept_result.result();
     }
 
-    auto add_result = add(accept_result.value());
+    auto add_result = add(accept_result.unwrap());
 
     release(socket_handle_index);
 
@@ -327,7 +327,7 @@ Result Handles::duplex(
     }
     else
     {
-        *server = result_or_server.value();
+        *server = result_or_server.unwrap();
     }
 
     auto result_or_client = add(client_handle);
@@ -339,7 +339,7 @@ Result Handles::duplex(
     }
     else
     {
-        *client = result_or_client.value();
+        *client = result_or_client.unwrap();
     }
 
     return SUCCESS;

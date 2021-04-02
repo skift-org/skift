@@ -76,7 +76,7 @@ int gfxmode_set_compositor(IOCallDisplayModeArgs mode)
         return PROCESS_FAILURE;
     }
 
-    auto connection = connect_result.value();
+    auto connection = connect_result.unwrap();
 
     CompositorMessage message{
         .type = COMPOSITOR_MESSAGE_SET_RESOLUTION,
@@ -121,12 +121,12 @@ int gfxmode_set(String &mode_name)
         return PROCESS_FAILURE;
     }
 
-    int result = gfxmode_set_compositor(mode.value());
+    int result = gfxmode_set_compositor(mode.unwrap());
 
     if (result != 0)
     {
         __cleanup(stream_cleanup) Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
-        result = gfxmode_set_iocall(device, mode.value());
+        result = gfxmode_set_iocall(device, mode.unwrap());
     }
 
     if (result == 0)

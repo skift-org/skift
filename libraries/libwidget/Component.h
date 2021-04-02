@@ -131,7 +131,7 @@ public:
     {
         if (!_font)
         {
-            _font = Graphic::Font::get("sans").value();
+            _font = Graphic::Font::get("sans").unwrap();
         }
 
         return _font;

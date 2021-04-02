@@ -27,7 +27,7 @@ private:
         auto read_result = _reader.read(&c, 1);
 
         if (!read_result.success() ||
-            read_result.value() == 0)
+            read_result.unwrap() == 0)
         {
             _is_end_of_file = true;
             return;

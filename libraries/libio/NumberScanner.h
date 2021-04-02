@@ -49,7 +49,7 @@ struct NumberScanner
         while (!scan.ended() && scan.current_is(Strings::ALL_XDIGITS))
         {
             value = value * _base;
-            value += scan_digit(scan).value();
+            value += scan_digit(scan).unwrap();
         }
 
         return value;
@@ -74,17 +74,17 @@ struct NumberScanner
 
         if (is_negative)
         {
-            return -unsigned_value.value();
+            return -unsigned_value.unwrap();
         }
         else
         {
-            return unsigned_value.value();
+            return unsigned_value.unwrap();
         }
     }
 
     Optional<double> scan_float(Scanner &scan)
     {
-        int64_t ipart = scan_int(scan).value_or(0);
+        int64_t ipart = scan_int(scan).unwrap_or(0);
 
         double fpart = 0;
 
@@ -94,7 +94,7 @@ struct NumberScanner
 
             while (scan.current_is(Strings::ALL_XDIGITS))
             {
-                fpart += multiplier * scan_digit(scan).value();
+                fpart += multiplier * scan_digit(scan).unwrap();
                 multiplier *= (1.0 / _base);
             }
         }
@@ -104,7 +104,7 @@ struct NumberScanner
         if (scan.current_is("eE"))
         {
             scan.forward();
-            exp = scan_int(scan).value_or(0);
+            exp = scan_int(scan).unwrap_or(0);
         }
 
         return (ipart + fpart) * pow(_base, exp);

@@ -42,7 +42,7 @@ ResultOr<size_t> File::seek(SeekFrom from)
 
     if (seek_result.success())
     {
-        return (size_t)seek_result.value();
+        return (size_t)seek_result.unwrap();
     }
     else
     {
@@ -53,7 +53,7 @@ ResultOr<size_t> File::seek(SeekFrom from)
 ResultOr<size_t> File::tell()
 {
     // FIXME: sketchy cast
-    return (size_t)_handle->tell().value();
+    return (size_t)_handle->tell().unwrap();
 }
 
 ResultOr<size_t> File::length()
@@ -62,7 +62,7 @@ ResultOr<size_t> File::length()
 
     if (result_or_stat.success())
     {
-        return result_or_stat.value().size;
+        return result_or_stat.unwrap().size;
     }
     else
     {

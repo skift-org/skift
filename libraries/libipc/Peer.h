@@ -26,7 +26,7 @@ public:
 
             if (result_or_message.success())
             {
-                handle_message(result_or_message.value());
+                handle_message(result_or_message.unwrap());
             }
             else
             {

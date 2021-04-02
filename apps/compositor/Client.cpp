@@ -40,8 +40,8 @@ void Client::handle(const CompositorCreateWindow &create_window)
         create_window.type,
         this,
         create_window.bound,
-        frontbuffer.value(),
-        backbuffer.value());
+        frontbuffer.unwrap(),
+        backbuffer.unwrap());
 }
 
 void Client::handle(const CompositorDestroyWindow &destroy_window)
@@ -152,7 +152,7 @@ void Client::handle_request()
         return;
     }
 
-    size_t message_size = read_result.value();
+    size_t message_size = read_result.unwrap();
 
     if (message_size != sizeof(CompositorMessage))
     {

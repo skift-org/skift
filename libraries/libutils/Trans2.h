@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libutils/Bezier.h>
 #include <libutils/Vec2.h>
 
 #include <math.h>
@@ -150,6 +151,16 @@ public:
         };
     }
 
+    Bezier<Scalar> apply(const Bezier<Scalar> b) const
+    {
+        return {
+            apply(b.start()),
+            apply(b.cp1()),
+            apply(b.cp2()),
+            apply(b.end()),
+        };
+    }
+
     Vec2<Scalar> apply_no_translation(const Vec2<Scalar> v) const
     {
         return {
@@ -171,5 +182,6 @@ public:
     }
 };
 
+using Trans2i = Trans2<int>;
 using Trans2f = Trans2<float>;
 using Trans2d = Trans2<double>;

@@ -11,7 +11,7 @@ size_t SubPath::length() const
     return (_points.count() - 1) / 3;
 }
 
-BezierCurve SubPath::curves(size_t index) const
+Bezierf SubPath::curves(size_t index) const
 {
     Assert::lower_than(index, length());
 

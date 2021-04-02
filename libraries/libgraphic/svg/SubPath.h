@@ -3,7 +3,7 @@
 #include <libutils/Vector.h>
 
 #include <libgraphic/svg/Arc.h>
-#include <libgraphic/svg/BezierCurve.h>
+#include <libutils/Bezier.h>
 
 namespace Graphic
 {
@@ -17,7 +17,7 @@ private:
 public:
     size_t length() const;
 
-    BezierCurve curves(size_t index) const;
+    Bezierf curves(size_t index) const;
 
     bool closed() const { return _closed; }
 

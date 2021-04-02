@@ -13,7 +13,7 @@ namespace Graphic
 class Path
 {
 private:
-    Vector<SubPath> _subpath;
+    Vector<SubPath> _subpaths;
     bool _subpath_ended = true;
 
     SubPath &current()
@@ -23,7 +23,7 @@ private:
             begin_subpath();
         }
 
-        return _subpath[_subpath.count() - 1];
+        return _subpaths[_subpaths.count() - 1];
     }
 
     SubPath &current_or_begin()
@@ -33,7 +33,7 @@ private:
             begin_subpath(current().first_point());
         }
 
-        return _subpath[_subpath.count() - 1];
+        return _subpaths[_subpaths.count() - 1];
     }
 
 public:
@@ -45,14 +45,9 @@ public:
 
     static Path parse(Scanner &scan);
 
-    const SubPath &subpath(size_t index) const
+    const Vector<SubPath> &subpaths() const
     {
-        return _subpath[index];
-    }
-
-    size_t subpath_count() const
-    {
-        return _subpath.count();
+        return _subpaths;
     }
 
     Path()
@@ -72,7 +67,7 @@ public:
         }
 
         SubPath subpath{point};
-        _subpath.push_back(move(subpath));
+        _subpaths.push_back(move(subpath));
         _subpath_ended = false;
     }
 
@@ -83,7 +78,7 @@ public:
 
     void begin_subpath_relative(Vec2f point)
     {
-        if (_subpath.count() > 0)
+        if (_subpaths.count() > 0)
         {
             begin_subpath(current().last_point() + point);
         }

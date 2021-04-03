@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libutils/Array.h>
 #include <libutils/Trans2.h>
 
 #include <libgraphic/Bitmap.h>
@@ -34,7 +35,7 @@ class Painter
 private:
     RefPtr<Bitmap> _bitmap;
     int _state_stack_top = 0;
-    PainterState _state_stack[STATESTACK_SIZE];
+    Array<PainterState, STATESTACK_SIZE> _state_stack;
 
 public:
     RefPtr<Bitmap> bitmap() const { return _bitmap; }

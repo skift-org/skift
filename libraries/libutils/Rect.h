@@ -440,6 +440,7 @@ public:
                top() <= p.y() && bottom() > p.y();
     }
 
+    // Return true if *other* is fully contain
     bool contains(Rect other) const
     {
         return left() <= other.left() && right() >= other.right() &&

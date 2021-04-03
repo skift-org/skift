@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libutils/Array.h>
 #include <libutils/Edge.h>
 #include <libutils/Trans2.h>
 
@@ -64,7 +65,7 @@ private:
 public:
     Recti bound() const
     {
-        return Recti::from_two_point(_min, _max);
+        return Recti::from_two_point(_min, _max + Vec2i{1});
     }
 
     const Vector<Edgef> &edges()
@@ -95,6 +96,7 @@ public:
         else
         {
             _edges.push_back({_last.unwrap(), p});
+
             _last = p;
         }
 
@@ -137,90 +139,30 @@ private:
     RefPtr<Bitmap> _bitmap;
     EdgeList _edges;
     Vector<Edgef> _actives_edges;
+    Optional<Recti> _clip;
+    Vector<uint16_t> _scanline;
 
 public:
     static constexpr auto TOLERANCE = 0.25f;
     static constexpr auto MAX_DEPTH = 8;
 
-    Rasterizer(RefPtr<Bitmap> bitmap) : _bitmap{bitmap}
-    {
-    }
+    Rasterizer(RefPtr<Bitmap> bitmap);
 
-    void clear()
-    {
-        _edges.clear();
-    }
+    void clear();
 
-    void flatten(const Path &path, const Trans2f &transform)
-    {
-        for (auto &subpath : path.subpaths())
-        {
-            for (size_t i = 0; i < subpath.length(); i++)
-            {
-                auto curve = subpath.curves(i);
-                curve = transform.apply(curve);
-                _edges.append(curve);
-            }
-        }
-    }
+    void set_clip(Recti c);
 
-    void line(int start, int end, int y, Color color)
-    {
-        for (int x = start; x < end; x++)
-        {
-            _bitmap->blend_pixel({x, y}, color);
-        }
-    }
+    Recti get_clip();
 
-    void scanline(int start, int end, int y, Color color)
-    {
-        _actives_edges.clear();
+    void flatten(const Path &path, const Trans2f &transform);
 
-        for (auto &edge : _edges.edges())
-        {
-            if (y >= edge.min_y() && y < edge.max_y())
-            {
-                _actives_edges.push_back(edge);
-            }
-        }
+    void line(float start, float end);
 
-        _actives_edges.sort([](Edgef &a, Edgef &b) { return a.center().x() - b.center().x(); });
+    void scanline(int start, int end, float y);
 
-        bool odd_even = true;
+    void fill(Color color);
 
-        for (size_t i = 0; i + 1 < _actives_edges.count(); i++)
-        {
-            auto &a = _actives_edges[i];
-            auto &b = _actives_edges[i + 1];
-
-            int seg_start = MAX(a.intersect_y(y).x(), start);
-            int seg_end = MIN(b.intersect_y(y).x(), end);
-
-            if (odd_even)
-            {
-                line(seg_start, seg_end, y, color);
-            }
-
-            odd_even = !odd_even;
-        }
-    }
-
-    void fill(Color color)
-    {
-        auto bound = _edges.bound().clipped_with(_bitmap->bound());
-
-        for (int y = bound.top(); y < bound.bottom(); y++)
-        {
-            scanline(bound.left(), bound.right(), y, color);
-        }
-    }
-
-    void fill(Path &path, Trans2f transform, Color color)
-    {
-        clear();
-        flatten(path, transform);
-        fill(color);
-    }
+    void fill(Path &path, Trans2f transform, Color color);
 };
 
 } // namespace Graphic

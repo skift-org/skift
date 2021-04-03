@@ -1,7 +1,6 @@
 #pragma once
 
 #include <initializer_list>
-#include <type_traits>
 
 #include <assert.h>
 #include <libsystem/Common.h>

@@ -43,25 +43,37 @@ struct VariantOperations<First, Ts...>
     inline static void destroy(TypeId type, void *storage)
     {
         if (type == GetTypeId<First>())
+        {    
             reinterpret_cast<First *>(storage)->~First();
+        }
         else
+        {   
             VariantOperations<Ts...>::destroy(type, storage);
+        }
     }
 
     inline static void move(TypeId type, void *old_v, void *new_v)
     {
         if (type == GetTypeId<First>())
+        {
             new (new_v) First(move(*reinterpret_cast<First *>(old_v)));
+        }
         else
+        {
             VariantOperations<Ts...>::move(type, old_v, new_v);
+        }
     }
 
     inline static void copy(TypeId type, const void *old_v, void *new_v)
     {
         if (type == GetTypeId<First>())
+        {   
             new (new_v) First(*reinterpret_cast<const First *>(old_v));
+        }
         else
+        {   
             VariantOperations<Ts...>::copy(type, old_v, new_v);
+        }
     }
 
     template <typename TVisitor>
@@ -69,7 +81,7 @@ struct VariantOperations<First, Ts...>
     {
         if (type == GetTypeId<First>())
         {
-            visitor(*reinterpret_cast<const First *>(storage));
+            visitor(*reinterpret_cast<First *>(storage));
         }
         else
         {
@@ -97,7 +109,9 @@ private:
     AlignedStorage<data_size, data_align> _storage;
 
 public:
-    Variant() {}
+    Variant()
+    {
+    }
 
     template <typename T>
     requires In<T, Ts...>
@@ -190,5 +204,7 @@ struct Visitor : Ts...
 {
     using Ts::operator()...;
 };
+
+template<class... Ts> Visitor(Ts...) -> Visitor<Ts...>;
 
 } // namespace Utils

@@ -111,6 +111,8 @@ private:
 public:
     Variant()
     {
+        _type = GetTypeId<typename First<Ts...>::type>();
+        new (&_storage) typename First<Ts...>::type();
     }
 
     template <typename T>

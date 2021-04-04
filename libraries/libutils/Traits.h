@@ -505,3 +505,12 @@ using CopyConst =
 
 template <typename T, typename... Ts>
 concept In = (IsSame<T, Ts>::value || ...);
+
+template <typename... Ts>
+struct First {};
+
+template <typename TFirst, typename... Ts>
+struct First<TFirst, Ts...>
+{
+  using type = TFirst;
+};

@@ -5,6 +5,14 @@
 
 using Number = Utils::Variant<int, double>;
 
+TEST(variant_default_constructor)
+{
+    Number nbr;
+    Assert::is_true(nbr.is<int>());
+    Assert::is_false(nbr.is<double>());
+    Assert::equal(nbr.get<int>(), 0);
+}
+
 TEST(variant_is_method)
 {
     Number nbr;

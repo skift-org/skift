@@ -29,12 +29,12 @@ struct Test
 };
 
 #define TEST(__test_function)                  \
-    void __##__test_function##_function();     \
-    ::Test::Test __##__test_function##_object{ \
+    void __test_##__test_function##_function();     \
+    ::Test::Test __test_##__test_function##_object{ \
         #__test_function,                      \
-        __##__test_function##_function,        \
+        __test_##__test_function##_function,        \
     };                                         \
-    void __##__test_function##_function()
+    void __test_##__test_function##_function()
 
 int run_all_testes();
 

@@ -64,13 +64,9 @@ public:
 
     void blit(Bitmap &bitmap, BitmapScaling scaling, Recti destionation);
 
-    void blit_no_alpha(Bitmap &bitmap, Recti source, Recti destination);
-
     void blit(Icon &icon, IconSize size, Recti destination, Color color);
 
     void blit_rounded(Bitmap &bitmap, Recti source, Recti destination, int radius);
-
-    void blit_rounded_no_alpha(Bitmap &bitmap, Recti source, Recti destination, int radius);
 
     void clear(Color color);
 
@@ -127,10 +123,6 @@ private:
     void blit_fast(Bitmap &bitmap, Recti source, Recti destination);
 
     void blit_scaled(Bitmap &bitmap, Recti source, Recti destination);
-
-    void blit_fast_no_alpha(Bitmap &bitmap, Recti source, Recti destination);
-
-    void blit_scaled_no_alpha(Bitmap &bitmap, Recti source, Recti destination);
 
     void blit_colored(Bitmap &src, Recti source, Recti destination, Color color);
 

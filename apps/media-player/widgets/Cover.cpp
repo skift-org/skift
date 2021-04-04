@@ -21,11 +21,11 @@ Cover::Cover(Widget::Component *parent, RefPtr<Graphic::Bitmap> bitmap)
 
 void Cover::paint(Graphic::Painter &painter, const Recti &)
 {
-    painter.blit_no_alpha(*_backdrop, _backdrop->bound(), _backdrop->bound().cover(bound()));
+    painter.blit(*_backdrop, _backdrop->bound(), _backdrop->bound().cover(bound()));
 
     auto cover_bound = Recti{0, 0, 256, 256}.centered_within(bound());
 
-    painter.blit_rounded_no_alpha(*_cover, _cover->bound(), cover_bound, 12);
+    painter.blit_rounded(*_cover, _cover->bound(), cover_bound, 12);
     painter.draw_rectangle_rounded(cover_bound, 12, 1, Graphic::Colors::WHITE.with_alpha(0.25));
 }
 

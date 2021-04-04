@@ -155,14 +155,39 @@ public:
 
     static Color parse(String string);
 
-    static constexpr Color blend(Color fg, Color gb)
+    static constexpr Color blend(Color fg, Color bg)
     {
-        float a = (1 - fg.alphaf()) * gb.alphaf() + fg.alphaf();
-        float r = ((1 - fg.alphaf()) * gb.alphaf() * gb.redf() + fg.alphaf() * fg.redf()) / a;
-        float g = ((1 - fg.alphaf()) * gb.alphaf() * gb.greenf() + fg.alphaf() * fg.greenf()) / a;
-        float b = ((1 - fg.alphaf()) * gb.alphaf() * gb.bluef() + fg.alphaf() * fg.bluef()) / a;
+        if (fg.alpha() == 0xff)
+        {
+            return fg;
+        }
 
-        return from_rgba(r, g, b, a);
+        if (fg.alpha() == 0)
+        {
+            return bg;
+        }
+
+        if (bg.alpha() == 0xff)
+        {
+            unsigned alpha = fg.alpha();
+            unsigned inv_alpha = 255 - fg.alpha() + 1;
+
+            uint8_t r = (uint8_t)((alpha * fg.red() + inv_alpha * bg.red()) / 256);
+            uint8_t g = (uint8_t)((alpha * fg.green() + inv_alpha * bg.green()) / 256);
+            uint8_t b = (uint8_t)((alpha * fg.blue() + inv_alpha * bg.blue()) / 256);
+
+            return from_rgba_byte(r, g, b, 0xff);
+        }
+        else
+        {            
+            float a = (1 - fg.alphaf()) * bg.alphaf() + fg.alphaf();
+            float r = ((1 - fg.alphaf()) * bg.alphaf() * bg.redf() + fg.alphaf() * fg.redf()) / a;
+            float g = ((1 - fg.alphaf()) * bg.alphaf() * bg.greenf() + fg.alphaf() * fg.greenf()) / a;
+            float b = ((1 - fg.alphaf()) * bg.alphaf() * bg.bluef() + fg.alphaf() * fg.bluef()) / a;
+
+            return from_rgba(r, g, b, a);
+        }
+
     }
 
     static constexpr Color lerp(Color from, Color to, float transition)

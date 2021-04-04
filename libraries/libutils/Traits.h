@@ -502,3 +502,6 @@ using IsFloatingPoint = __IsFloatingPoint<typename RemoveConstVolatile<T>::Type>
 template <typename ReferenceType, typename T>
 using CopyConst =
     typename Conditional<IsConst<ReferenceType>::value, typename AddConst<T>::Type, typename RemoveConst<T>::Type>::Type;
+
+template <typename T, typename... Ts>
+concept In = (IsSame<T, Ts>::value || ...);

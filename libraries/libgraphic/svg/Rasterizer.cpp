@@ -107,20 +107,13 @@ void Rasterizer::fill(Color color)
 
         for (int i = bound.left(); i < bound.right(); i++)
         {
-            auto alpha = (_scanline[i] / 16.);
+            auto alpha = clamp((_scanline[i] / 16.), 0, 1);
 
-            if (alpha == 1)
+            if (alpha == 1 && color.alpha() == 255)
             {
-                if (color.alpha() == 255)
-                {
-                    _bitmap->set_pixel_no_check({i, y}, color);
-                }
-                else
-                {
-                    _bitmap->blend_pixel_no_check({i, y}, color.with_alpha(alpha));
-                }
+                _bitmap->set_pixel_no_check({i, y}, color);
             }
-            else
+            else if (alpha > 0.001)
             {
                 _bitmap->blend_pixel_no_check({i, y}, color.with_alpha(alpha));
             }

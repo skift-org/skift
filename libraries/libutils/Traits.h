@@ -50,18 +50,20 @@ struct RemoveConstVolatile
 };
 
 template <class T, T v>
-struct IntegralConstant
+struct Constant
 {
-    static constexpr T value = v;
     using ValueType = T;
-    using Type = IntegralConstant;
-    constexpr operator ValueType() const { return value; }
-    constexpr ValueType operator()() const { return value; }
+    using Type = Constant;
+
+    static constexpr T value = v;
+
+    constexpr ALWAYS_INLINE operator ValueType() const { return value; }
+    constexpr ALWAYS_INLINE ValueType operator()() const { return value; }
 };
 
-using FalseType = IntegralConstant<bool, false>;
+using FalseType = Constant<bool, false>;
 
-using TrueType = IntegralConstant<bool, true>;
+using TrueType = Constant<bool, true>;
 
 template <class T>
 struct IsLvalueReference : FalseType
@@ -74,17 +76,17 @@ struct IsLvalueReference<T &> : TrueType
 };
 
 template <class T>
-struct __IsPointerHelper : FalseType
+struct __IsPointer : FalseType
 {
 };
 
 template <class T>
-struct __IsPointerHelper<T *> : TrueType
+struct __IsPointer<T *> : TrueType
 {
 };
 
 template <class T>
-struct IsPointer : __IsPointerHelper<typename RemoveConstVolatile<T>::Type>
+struct IsPointer : __IsPointer<typename RemoveConstVolatile<T>::Type>
 {
 };
 
@@ -438,18 +440,23 @@ struct IsConst<const T> : TrueType
 {
 };
 
-template <typename T>
-struct IsUnion : public IntegralConstant<bool, __is_union(T)>
+template <class T>
+struct IsConst<const T *> : TrueType
 {
 };
 
 template <typename T>
-struct IsClass : public IntegralConstant<bool, __is_class(T)>
+struct IsUnion : public Constant<bool, __is_union(T)>
+{
+};
+
+template <typename T>
+struct IsClass : public Constant<bool, __is_class(T)>
 {
 };
 
 template <typename Base, typename Derived>
-struct IsBaseOf : public IntegralConstant<bool, __is_base_of(Base, Derived)>
+struct IsBaseOf : public Constant<bool, __is_base_of(Base, Derived)>
 {
 };
 
@@ -500,17 +507,46 @@ template <typename T>
 using IsFloatingPoint = __IsFloatingPoint<typename RemoveConstVolatile<T>::Type>;
 
 template <typename ReferenceType, typename T>
-using CopyConst =
-    typename Conditional<IsConst<ReferenceType>::value, typename AddConst<T>::Type, typename RemoveConst<T>::Type>::Type;
+using CopyConst = typename Conditional<IsConst<ReferenceType>::value, typename AddConst<T>::Type, typename RemoveConst<T>::Type>::Type;
 
 template <typename T, typename... Ts>
 concept In = (IsSame<T, Ts>::value || ...);
 
 template <typename... Ts>
-struct First {};
+struct First
+{
+};
 
 template <typename TFirst, typename... Ts>
 struct First<TFirst, Ts...>
 {
-  using type = TFirst;
+    using Type = TFirst;
+};
+
+template <typename TQuery, typename... Ts>
+struct IndexOf;
+
+template <typename TQuery>
+struct IndexOf<TQuery> : Constant<int, -1>
+{
+};
+
+template <typename TQuery, typename TFirst, typename... Ts>
+struct IndexOf<TQuery, TFirst, Ts...> : Constant<int, IsSame<TQuery, TFirst>::value ? 0 : IndexOf<TQuery, Ts...>::value + 1>
+{
+};
+
+template <size_t arg1, size_t... others>
+struct Max;
+
+template <size_t arg>
+struct Max<arg>
+{
+    static constexpr size_t value = arg;
+};
+
+template <size_t arg1, size_t arg2, size_t... others>
+struct Max<arg1, arg2, others...>
+{
+    static constexpr size_t value = arg1 >= arg2 ? Max<arg1, others...>::value : Max<arg2, others...>::value;
 };

@@ -1,6 +1,5 @@
 #include <libutils/Variant.h>
 
-#include "libutils/Assert.h"
 #include "tests/Driver.h"
 
 using Number = Utils::Variant<int, double>;
@@ -22,7 +21,7 @@ TEST(variant_is_method)
     nbr = 5;
     Assert::is_true(nbr.is<int>());
     Assert::is_false(nbr.is<double>());
-    
+
     nbr = 6.;
     Assert::is_true(nbr.is<double>());
     Assert::is_false(nbr.is<int>());
@@ -34,7 +33,7 @@ TEST(variant_get_method)
 
     nbr = 5;
     Assert::equal(nbr.get<int>(), 5);
-    
+
     nbr = 6.;
     Assert::equal(nbr.get<double>(), 6);
 }
@@ -71,10 +70,16 @@ TEST(variant_visit)
 
     bool has_visited_int = false;
     bool has_visited_double = false;
-    
+
     Utils::Visitor visitor{
-        [&](int &value) { Assert::equal(value, 5); has_visited_int = true;},
-        [&](double &value) { Assert::equal(value, 6.); has_visited_double = true;},
+        [&](int &value) {
+            Assert::equal(value, 5);
+            has_visited_int = true;
+        },
+        [&](double &value) {
+            Assert::equal(value, 6.);
+            has_visited_double = true;
+        },
     };
 
     nbr5.visit(visitor);
@@ -82,4 +87,40 @@ TEST(variant_visit)
 
     Assert::is_true(has_visited_int);
     Assert::is_true(has_visited_double);
+}
+
+TEST(variant_copy_ctor)
+{
+    Number nbr{5};
+    Number other = nbr;
+
+    Assert::is_true(other.is<int>());
+    Assert::equal(other.get<int>(), 5);
+}
+
+TEST(variant_copy_assign)
+{
+    Number nbr{5};
+    Number other{nbr};
+
+    Assert::is_true(other.is<int>());
+    Assert::equal(other.get<int>(), 5);
+}
+
+TEST(variant_move_ctor)
+{
+    Number nbr{5};
+    Number other{move(nbr)};
+
+    Assert::is_true(other.is<int>());
+    Assert::equal(other.get<int>(), 5);
+}
+
+TEST(variant_move_assign)
+{
+    Number nbr{5};
+    Number other = move(nbr);
+
+    Assert::is_true(other.is<int>());
+    Assert::equal(other.get<int>(), 5);
 }

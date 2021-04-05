@@ -5,6 +5,7 @@
 #include <libutils/Trans2.h>
 
 #include <libgraphic/Bitmap.h>
+#include <libgraphic/svg/Paint.h>
 #include <libgraphic/svg/Path.h>
 
 namespace Graphic
@@ -156,13 +157,9 @@ public:
 
     void flatten(const Path &path, const Trans2f &transform);
 
-    void line(float start, float end);
+    void rasterize(Paint &paint);
 
-    void scanline(int start, int end, float y);
-
-    void fill(Color color);
-
-    void fill(Path &path, Trans2f transform, Color color);
+    void fill(Path &path, Trans2f transform, Paint paint);
 };
 
 } // namespace Graphic

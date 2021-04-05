@@ -8,7 +8,6 @@
 namespace Graphic
 {
 
-
 struct Color
 {
 private:
@@ -179,7 +178,7 @@ public:
             return from_rgba_byte(r, g, b, 0xff);
         }
         else
-        {            
+        {
             float a = (1 - fg.alphaf()) * bg.alphaf() + fg.alphaf();
             float r = ((1 - fg.alphaf()) * bg.alphaf() * bg.redf() + fg.alphaf() * fg.redf()) / a;
             float g = ((1 - fg.alphaf()) * bg.alphaf() * bg.greenf() + fg.alphaf() * fg.greenf()) / a;
@@ -187,7 +186,6 @@ public:
 
             return from_rgba(r, g, b, a);
         }
-
     }
 
     static constexpr Color lerp(Color from, Color to, float transition)

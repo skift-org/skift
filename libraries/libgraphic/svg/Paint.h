@@ -10,9 +10,9 @@
 namespace Graphic
 {
 
-static constexpr auto MAX_GRADIANT_STOPS = 16;
+static constexpr auto MAX_GRADIENT_STOPS = 16;
 
-struct GradiantStop
+struct GradientStop
 {
     Color color;
     float value;
@@ -25,8 +25,8 @@ struct Fill
 
 struct Gradient
 {
-    Trans2f transfom;
-    Array<GradiantStop, MAX_GRADIANT_STOPS> stops;
+    Optional<Trans2f> transfom;
+    Array<GradientStop, MAX_GRADIENT_STOPS> stops;
     size_t count;
 };
 
@@ -46,23 +46,41 @@ static inline ALWAYS_INLINE Color sample(Paint &paint, Vec2f p)
         [&](Fill &fill) {
             result = fill.color;
         },
-        [&](Gradient &gradiant) {
-            if (gradiant.count == 0)
+        [&](Gradient &gradient) {
+            if (gradient.transfom.present())
+            {
+                p = gradient.transfom.unwrap().apply(p);
+            }
+
+            float v = p.x();
+
+            if (gradient.count == 0)
             {
                 result = Colors::BLACK;
             }
-            else if (gradiant.count == 1)
+            else if (gradient.count == 1 ||
+                     v <= gradient.stops[0].value)
             {
-                result = gradiant.stops[0].color;
+                result = gradient.stops[0].color;
+            }
+            else if (v >= gradient.stops[gradient.count - 1].value)
+            {
+                result = gradient.stops[gradient.count - 1].color;
             }
             else
             {
-                GradiantStop s0 = gradiant.stops[0];
-                GradiantStop s1 = gradiant.stops[1];
+                for (size_t i = 0; i + 1 < gradient.count; i++)
+                {
+                    GradientStop s0 = gradient.stops[i];
+                    GradientStop s1 = gradient.stops[i + 1];
 
-                Color blend = Color::lerp(s0.color, s1.color, ((p.x() - s0.value) / (s1.value - s0.value)));
-
-                result = blend;
+                    if (s0.value <= v && v < s1.value)
+                    {
+                        float localv = ((v - s0.value) / (s1.value - s0.value));
+                        result = Color::lerp(s0.color, s1.color, localv);
+                        break;
+                    }
+                }
             }
         },
         [&](Texture &texture) {

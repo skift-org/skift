@@ -26,14 +26,23 @@ void path_draw(Graphic::Painter &painter, Recti, float time)
         image,
     };
 
+    auto gradient = Graphic::Gradient{
+        Trans2f::identity(),
+        {
+            {Graphic::Colors::RED, 0},
+            {Graphic::Colors::GREEN, 1},
+        },
+        2,
+    };
+
     {
-        rast.fill(p0, t, texture);
+        rast.fill(p0, t, gradient);
         rast.fill(p1, t, Graphic::Fill{Graphic::Colors::WHITE});
         rast.fill(p2, t, Graphic::Fill{Graphic::Colors::WHITE});
         rast.fill(p3, t, Graphic::Fill{Graphic::Colors::WHITE});
         rast.fill(p4, t, Graphic::Fill{Graphic::Colors::WHITE});
         rast.fill(p5, t, Graphic::Fill{Graphic::Colors::WHITE});
-        rast.fill(p6, t, Graphic::Fill{Graphic::Colors::WHITE});
-        rast.fill(p7, t, Graphic::Fill{Graphic::Colors::WHITE});
+        rast.fill(p6, t, texture);
+        rast.fill(p7, t, texture);
     }
 }

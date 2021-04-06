@@ -1,9 +1,9 @@
 #pragma once
 
+#include <assert.h>
 #include <initializer_list>
 
-#include <assert.h>
-#include <libsystem/Common.h>
+#include <libsystem/math/MinMax.h>
 
 template <typename T, size_t N>
 class Array
@@ -37,9 +37,9 @@ public:
 
     constexpr Array(std::initializer_list<T> data)
     {
-        assert(data.size() == N);
+        assert(data.size() <= N);
 
-        for (size_t i = 0; i < N; i++)
+        for (size_t i = 0; i < MIN(N, data.size()); i++)
         {
             _storage[i] = *(data.begin() + i);
         }

@@ -32,7 +32,7 @@ Recti Rasterizer::get_clip()
     return c;
 }
 
-void Rasterizer::flatten(const Path &path, const Trans2f &transform)
+void Rasterizer::flatten(const Path &path, const Mat3x2f &transform)
 {
     for (auto &subpath : path.subpaths())
     {
@@ -121,7 +121,7 @@ void Rasterizer::rasterize(Paint &paint)
     }
 }
 
-void FLATTEN Rasterizer::fill(Path &path, Trans2f transform, Paint paint)
+void FLATTEN Rasterizer::fill(Path &path, const Mat3x2 &transform, Paint paint)
 {
     clear();
     flatten(path, transform);

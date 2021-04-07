@@ -16,12 +16,12 @@ void path_draw(Graphic::Painter &painter, Recti, float time)
     static auto image = Graphic::Bitmap::load_from("/Files/Profiles/avocado.png").unwrap();
 
     auto texture = Graphic::Texture{
-        Trans2f::scale(0.5) * Trans2f::rotation(time) * Trans2f::translation({0.5, 0.5}),
+        Mat3x2f::scale(0.5) * Mat3x2f::rotation(time) * Mat3x2f::translation({0.5, 0.5}),
         image,
     };
 
     auto gradient = Graphic::Gradient{
-        Trans2f::rotation(PI / 4) * Trans2f::translation({0.5, 0.5}),
+        Mat3x2f::rotation(PI / 4) * Mat3x2f::translation({0.5, 0.5}),
         {
             {Graphic::Color::from_rgb_byte(91, 206, 250), 0.2},
             {Graphic::Color::from_rgb_byte(245, 169, 184), 0.2},
@@ -37,6 +37,6 @@ void path_draw(Graphic::Painter &painter, Recti, float time)
         8,
     };
 
-    rast.fill(p0, Trans2f::scale(8) * Trans2f::translation({48, 64}), gradient);
-    rast.fill(p1, Trans2f::scale(8) * Trans2f::translation({48, 256}), texture);
+    rast.fill(p0, Mat3x2f::scale(8) * Mat3x2f::translation({48, 64}), gradient);
+    rast.fill(p1, Mat3x2f::scale(8) * Mat3x2f::translation({48, 256}), texture);
 }

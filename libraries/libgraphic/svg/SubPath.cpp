@@ -286,7 +286,7 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Vec2f point)
     }
 
     // Approximate the arc using cubic spline segments.
-    Trans2f t{
+    Mat3x2f t{
         cosrx,
         sinrx,
         -sinrx,

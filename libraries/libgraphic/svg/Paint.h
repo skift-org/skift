@@ -25,14 +25,14 @@ struct Fill
 
 struct Gradient
 {
-    Optional<Trans2f> transfom;
+    Optional<Mat3x2f> transfom;
     Array<GradientStop, MAX_GRADIENT_STOPS> stops;
     size_t count;
 };
 
 struct Texture
 {
-    Optional<Trans2f> transfom;
+    Optional<Mat3x2f> transfom;
     RefPtr<Bitmap> bitmap;
 };
 

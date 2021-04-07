@@ -67,7 +67,8 @@ Result Task::cancel(int exit_value)
 
     interrupts_release();
     kill_me_if_you_dare();
-    ASSERT_NOT_REACHED();
+
+    return SUCCESS;
 }
 
 void Task::kill_me_if_you_dare()
@@ -91,10 +92,13 @@ void Task::kill_me_if_you_dare()
 
     if (this == scheduler_running())
     {
-
         interrupts_release();
         scheduler_yield();
         ASSERT_NOT_REACHED();
+    }
+    else
+    {
+        interrupts_release();
     }
 }
 

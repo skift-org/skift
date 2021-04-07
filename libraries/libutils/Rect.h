@@ -5,7 +5,7 @@
 #include <libutils/Anchor.h>
 #include <libutils/Enum.h>
 #include <libutils/Insets.h>
-#include <libutils/Vec2.h>
+#include <libmath/Vec2.h>
 
 #include <libsystem/math/MinMax.h>
 

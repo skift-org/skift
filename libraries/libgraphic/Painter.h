@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libutils/Array.h>
-#include <libutils/Trans2.h>
+#include <libmath/Mat3x2.h>
 
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Font.h>

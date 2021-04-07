@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libutils/Edge.h>
-#include <libutils/Trans2.h>
+#include <libmath/Mat3x2.h>
 #include <libutils/Rect.h>
 #include <libutils/Vector.h>
 

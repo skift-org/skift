@@ -1,4 +1,4 @@
-#include <libutils/Vec2.h>
+#include <libmath/Vec2.h>
 #include <libutils/Vector.h>
 
 #include <math.h>

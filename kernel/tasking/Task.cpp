@@ -7,6 +7,7 @@
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
+#include "kernel/tasking/Finalizer.h"
 #include "kernel/tasking/Task-Memory.h"
 #include "kernel/tasking/Task.h"
 
@@ -20,8 +21,16 @@ TaskState Task::state()
 
 void Task::state(TaskState state)
 {
+    ASSERT_INTERRUPTS_RETAINED();
+
     scheduler_did_change_task_state(this, _state, state);
     _state = state;
+
+    if (state == TASK_STATE_CANCELED)
+    {
+        list_remove(_tasks, this);
+        Kernel::finalize_task(this);
+    }
 }
 
 void Task::interrupt()
@@ -207,7 +216,6 @@ void task_destroy(Task *task)
     interrupts_retain();
 
     task->state(TASK_STATE_NONE);
-    list_remove(_tasks, task);
 
     interrupts_release();
 

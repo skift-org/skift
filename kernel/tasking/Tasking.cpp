@@ -2,28 +2,8 @@
 
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
+#include "kernel/tasking/Finalizer.h"
 #include "kernel/tasking/Task.h"
-
-static Iteration destroy_task_if_canceled(void *target, Task *task)
-{
-    UNUSED(target);
-
-    if (task->state() == TASK_STATE_CANCELED)
-    {
-        task_destroy(task);
-    }
-
-    return Iteration::CONTINUE;
-}
-
-void garbage_collector()
-{
-    while (true)
-    {
-        task_sleep(scheduler_running(), 100);
-        task_iterate(nullptr, destroy_task_if_canceled);
-    }
-}
 
 void tasking_initialize()
 {
@@ -40,8 +20,7 @@ void tasking_initialize()
 
     scheduler_did_create_running_task(kernel_task);
 
-    Task *garbage_task = task_spawn(nullptr, "garbage-collector", garbage_collector, nullptr, TASK_NONE);
-    task_go(garbage_task);
+    Kernel::finalizer_initialize();
 
     logger_info("Tasking initialized!");
 }

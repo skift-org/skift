@@ -64,14 +64,14 @@ static Result __syscall(Syscall syscall, uintptr_t p1, uintptr_t p2, uintptr_t p
 
 #if defined(__x86_64__)
 
-    asm volatile("push %%rbx; movq %2,%%rbx; int $0x80; pop %%rbx"
+    asm volatile("push %%rbx; movq %2,%%rbx; push %%rbp; int $0x80; pop %%rbp; pop %%rbx"
                  : "=a"(__ret)
                  : "a"(syscall), "r"(p1), "c"(p2), "d"(p3), "S"(p4), "D"(p5)
                  : "memory");
 
 #elif defined(__i386__)
-
-    asm volatile("push %%ebx; movl %2,%%ebx; int $0x80; pop %%ebx"
+    // ebp need to be saved because hj_process_clone will trash it.
+    asm volatile("push %%ebx; movl %2,%%ebx; push %%ebp; int $0x80; pop %%ebp; pop %%ebx"
                  : "=a"(__ret)
                  : "0"(syscall), "r"(p1), "c"(p2), "d"(p3), "S"(p4), "D"(p5)
                  : "memory");

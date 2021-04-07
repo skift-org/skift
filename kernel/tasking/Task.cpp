@@ -172,7 +172,9 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip, TaskFlags flags)
     task->memory_mapping = list_create();
 
     if (parent)
+    {
         task->_domain = parent->_domain;
+    }
 
     // Setup fildes
     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)

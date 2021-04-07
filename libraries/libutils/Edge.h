@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libutils/Optional.h>
-#include <libutils/Vec2.h>
+#include <libmath/Vec2.h>
 #include <math.h>
 
 template <typename Scalar>

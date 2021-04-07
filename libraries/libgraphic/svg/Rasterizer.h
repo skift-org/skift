@@ -24,7 +24,7 @@ private:
 
     void clear();
 
-    void flatten(const Path &path, const Trans2f &transform);
+    void flatten(const Path &path, const Mat3x2f &transform);
 
     void rasterize(Paint &paint);
 
@@ -36,7 +36,7 @@ public:
 
     Recti get_clip();
 
-    void fill(Path &path, Trans2f transform, Paint paint);
+    void fill(Path &path, const Mat3x2f &transform, Paint paint);
 };
 
 } // namespace Graphic

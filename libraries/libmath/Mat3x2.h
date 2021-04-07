@@ -182,6 +182,6 @@ public:
     }
 };
 
-using Trans2i = Mat3x2<int>;
-using Trans2f = Mat3x2<float>;
-using Trans2d = Mat3x2<double>;
+using Mat3x2i = Mat3x2<int>;
+using Mat3x2f = Mat3x2<float>;
+using Mat3x2d = Mat3x2<double>;

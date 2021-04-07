@@ -47,10 +47,11 @@ void Task::interrupt()
 
 Result Task::cancel(int exit_value)
 {
-    InterruptsRetainer retainer;
+    interrupts_retain();
 
     if (_is_canceled)
     {
+        interrupts_release();
         return SUCCESS;
     }
 
@@ -59,10 +60,12 @@ Result Task::cancel(int exit_value)
 
     if (_is_doing_syscall)
     {
+        interrupts_release();
         interrupt();
         return SUCCESS;
     }
 
+    interrupts_release();
     kill_me_if_you_dare();
     ASSERT_NOT_REACHED();
 }

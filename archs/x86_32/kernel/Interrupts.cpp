@@ -56,7 +56,7 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
         {
             sti();
 
-            logger_error("Task %s(%d) triggered an exception: '%s' %x.%x (IP=%08x CR2=%08x)",
+            logger_error("Task %s(%d) triggered an exception: '%s' N°=%x Err=%x (IP=%08x CR2=%08x)",
                          scheduler_running()->name,
                          scheduler_running_id(),
                          _exception_messages[stackframe.intno],
@@ -74,7 +74,7 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
         {
             system_panic_with_context(
                 &stackframe,
-                "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !",
+                "CPU EXCEPTION: '%s' (N°=%d Err=%x) !",
                 _exception_messages[stackframe.intno],
                 stackframe.intno,
                 stackframe.err);

@@ -21,8 +21,8 @@ void interrupts_release();
 class InterruptsRetainer
 {
 private:
-    __noncopyable(InterruptsRetainer);
-    __nonmovable(InterruptsRetainer);
+    NONCOPYABLE(InterruptsRetainer);
+    NONMOVABLE(InterruptsRetainer);
 
 public:
     InterruptsRetainer()

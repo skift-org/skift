@@ -12,8 +12,8 @@ private:
     const char *_name;
     Tick _start;
 
-    __nonmovable(Chrono);
-    __noncopyable(Chrono);
+    NONMOVABLE(Chrono);
+    NONCOPYABLE(Chrono);
 
 public:
     Chrono(const char *name)

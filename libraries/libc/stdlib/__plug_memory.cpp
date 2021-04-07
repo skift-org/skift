@@ -26,6 +26,6 @@ void *__plug_memory_alloc(size_t size)
 
 void __plug_memory_free(void *address, size_t size)
 {
-    __unused(size);
+    UNUSED(size);
     hj_memory_free((uintptr_t)address);
 }

@@ -5,8 +5,8 @@
 sighandler_t signal(int sig, sighandler_t handler)
 {
     //TODO: connect this handler
-    __unused(sig);
-    __unused(handler);
+    UNUSED(sig);
+    UNUSED(handler);
 
     ASSERT_NOT_REACHED();
 

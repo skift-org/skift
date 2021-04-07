@@ -116,8 +116,8 @@ void update_terminal_size()
 
 int main(int argc, char **argv)
 {
-    __unused(argc);
-    __unused(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
     colors[','] = "\033[104m"; /* Blue background */
     colors['.'] = "\033[107m"; /* White stars */

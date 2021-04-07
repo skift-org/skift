@@ -13,7 +13,7 @@ BufferBuilder *buffer_builder_create(size_t preallocated)
 {
     preallocated = MAX(preallocated, 16);
 
-    BufferBuilder *buffer = __create(BufferBuilder);
+    BufferBuilder *buffer = CREATE(BufferBuilder);
 
     buffer->buffer = (char *)calloc(preallocated, sizeof(char));
     buffer->size = preallocated;

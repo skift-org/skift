@@ -53,7 +53,7 @@ int fstat(int fd, struct stat *buf)
 
 int mkdir(const char *pathname, mode_t mode)
 {
-    __unused(mode);
+    UNUSED(mode);
 
     return hj_filesystem_mkdir(pathname, strlen(pathname)) == Result::SUCCESS ? 0 : -1;
 }

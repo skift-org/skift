@@ -33,8 +33,8 @@ bool partition_load_mbr(RefPtr<Device> disk, const MBR &mbr)
 
 bool partition_load_gpt(RefPtr<Device> disk, const MBR &mbr)
 {
-    __unused(disk);
-    __unused(mbr);
+    UNUSED(disk);
+    UNUSED(mbr);
 
     // TODO: GPT partition support
 

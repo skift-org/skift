@@ -188,7 +188,7 @@ Result readline_readline(ReadLine *readline, char **line)
 
 ReadLine *readline_create(Stream *stream)
 {
-    ReadLine *readline = __create(ReadLine);
+    ReadLine *readline = CREATE(ReadLine);
 
     readline->stream = stream;
 

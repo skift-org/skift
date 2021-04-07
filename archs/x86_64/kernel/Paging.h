@@ -2,7 +2,7 @@
 
 #include <libsystem/Common.h>
 
-struct __packed PageMappingLevel4Entry
+struct PACKED PageMappingLevel4Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
     bool writable : 1;              // If 0, writes may not be allowed.
@@ -16,7 +16,7 @@ struct __packed PageMappingLevel4Entry
     bool execute_disabled : 1;      // If IA32_EFER.NXE = 1, Execute-disable
 };
 
-struct __packed PageMappingLevel4
+struct PACKED PageMappingLevel4
 {
     PageMappingLevel4Entry entries[512];
 };
@@ -29,7 +29,7 @@ static inline size_t pml4_index(uintptr_t address)
 static_assert(sizeof(PageMappingLevel4Entry) == sizeof(uint64_t));
 static_assert(sizeof(PageMappingLevel4) == 4096);
 
-struct __packed PageMappingLevel3Entry
+struct PACKED PageMappingLevel3Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
     bool writable : 1;              // If 0, writes may not be allowed.
@@ -45,7 +45,7 @@ struct __packed PageMappingLevel3Entry
     bool execute_disabled : 1;      // If IA32_EFER.NXE = 1, Execute-disable
 };
 
-struct __packed PageMappingLevel3
+struct PACKED PageMappingLevel3
 {
     PageMappingLevel3Entry entries[512];
 };
@@ -58,7 +58,7 @@ static inline size_t pml3_index(uintptr_t address)
 static_assert(sizeof(PageMappingLevel3Entry) == sizeof(uint64_t));
 static_assert(sizeof(PageMappingLevel3) == 4096);
 
-struct __packed PageMappingLevel2Entry
+struct PACKED PageMappingLevel2Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
     bool writable : 1;              // If 0, writes may not be allowed.
@@ -74,7 +74,7 @@ struct __packed PageMappingLevel2Entry
     bool execute_disabled : 1;      // If IA32_EFER.NXE = 1, Execute-disable
 };
 
-struct __packed PageMappingLevel2
+struct PACKED PageMappingLevel2
 {
     PageMappingLevel3Entry entries[512];
 };
@@ -87,7 +87,7 @@ static inline size_t pml2_index(uintptr_t address)
 static_assert(sizeof(PageMappingLevel2Entry) == sizeof(uint64_t));
 static_assert(sizeof(PageMappingLevel2) == 4096);
 
-struct __packed PageMappingLevel1Entry
+struct PACKED PageMappingLevel1Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
     bool writable : 1;              // If 0, writes may not be allowed.
@@ -105,7 +105,7 @@ struct __packed PageMappingLevel1Entry
     bool execute_disabled : 1;      // If IA32_EFER.NXE = 1, Execute-disable
 };
 
-struct __packed PageMappingLevel1
+struct PACKED PageMappingLevel1
 {
     PageMappingLevel3Entry entries[512];
 };

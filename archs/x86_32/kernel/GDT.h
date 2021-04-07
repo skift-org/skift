@@ -15,7 +15,7 @@
 #define GDT_FLAGS 0b1100
 #define TSS_FLAGS 0b0000
 
-struct __packed TSS
+struct PACKED TSS
 {
     uint32_t prev_tss;
     uint32_t esp0;
@@ -46,13 +46,13 @@ struct __packed TSS
     uint16_t iomap_base;
 };
 
-struct __packed GDTDescriptor
+struct PACKED GDTDescriptor
 {
     uint16_t size;
     uint32_t offset;
 };
 
-struct __packed GDTEntry
+struct PACKED GDTEntry
 {
     uint16_t limit0_15;
     uint16_t base0_15;

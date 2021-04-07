@@ -2,7 +2,7 @@
 
 #include <libsystem/Common.h>
 
-struct __packed MBREntry
+struct PACKED MBREntry
 {
     uint8_t attributes;
     uint8_t chs_start[3];
@@ -15,7 +15,7 @@ struct __packed MBREntry
 
 static_assert(sizeof(MBREntry) == 16);
 
-struct __packed MBR
+struct PACKED MBR
 {
     uint8_t bootstrap[440];
 

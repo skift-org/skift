@@ -82,7 +82,7 @@
 
 #define E1000_CTL_START_LINK 0x40 //set link up
 
-struct __packed E1000RXDescriptor
+struct PACKED E1000RXDescriptor
 {
     uint64_t address;
     uint16_t length;
@@ -92,7 +92,7 @@ struct __packed E1000RXDescriptor
     uint16_t special;
 };
 
-struct __packed E1000TXDescriptor
+struct PACKED E1000TXDescriptor
 {
     uint64_t address;
     uint16_t length;

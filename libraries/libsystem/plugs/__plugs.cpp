@@ -16,7 +16,7 @@ void __plug_initialize()
 
 void __plug_uninitialize(int exit_code)
 {
-    __unused(exit_code);
+    UNUSED(exit_code);
 }
 
 void __plug_logger_lock()
@@ -29,7 +29,7 @@ void __plug_logger_unlock()
     _logger_lock.release();
 }
 
-void __no_return __plug_logger_fatal(const char *message)
+void NO_RETURN __plug_logger_fatal(const char *message)
 {
     stream_format(err_stream, "Fatal error occurred: %s!\n", message);
     process_abort();

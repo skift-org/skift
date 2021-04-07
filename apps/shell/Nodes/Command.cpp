@@ -8,7 +8,7 @@ void shell_command_destroy(ShellCommand *node)
 
 ShellNode *shell_command_create(char *command, List *arguments)
 {
-    ShellCommand *node = __create(ShellCommand);
+    ShellCommand *node = CREATE(ShellCommand);
 
     node->type = SHELL_NODE_COMMAND;
     node->command = command;

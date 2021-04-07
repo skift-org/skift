@@ -130,15 +130,15 @@ bool AC97::can_write()
 
 ResultOr<size_t> AC97::write(size64_t offset, const void *buffer, size_t size)
 {
-    __unused(offset);
+    UNUSED(offset);
 
     return _buffer.write((char *)buffer, size);
 }
 
 Result AC97::call(IOCall request, void *args)
 {
-    __unused(request);
-    __unused(args);
+    UNUSED(request);
+    UNUSED(args);
 
     return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
 }

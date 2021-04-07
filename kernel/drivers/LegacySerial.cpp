@@ -25,7 +25,7 @@ bool LegacySerial::can_read()
 
 ResultOr<size_t> LegacySerial::read(size64_t offset, void *buffer, size_t size)
 {
-    __unused(offset);
+    UNUSED(offset);
 
     LockHolder holder(_buffer_lock);
 
@@ -34,7 +34,7 @@ ResultOr<size_t> LegacySerial::read(size64_t offset, void *buffer, size_t size)
 
 ResultOr<size_t> LegacySerial::write(size64_t offset, const void *buffer, size_t size)
 {
-    __unused(offset);
+    UNUSED(offset);
 
     LockHolder holder(_buffer_lock);
 

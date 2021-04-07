@@ -4,7 +4,7 @@
 
 List *list_create()
 {
-    List *list = __create(List);
+    List *list = CREATE(List);
 
     list->_count = 0;
     list->_head = nullptr;
@@ -71,7 +71,7 @@ void list_insert_sorted(List *list, void *value, ListCompareElementCallback call
             current = current->next;
         }
 
-        ListItem *item = __create(ListItem);
+        ListItem *item = CREATE(ListItem);
 
         item->prev = current;
         item->next = current->next;
@@ -258,7 +258,7 @@ void list_insert(List *list, int index, void *value)
         }
     }
 
-    ListItem *item = __create(ListItem);
+    ListItem *item = CREATE(ListItem);
 
     item->prev = current;
     item->next = current->next;
@@ -276,7 +276,7 @@ void list_insert(List *list, int index, void *value)
 
 void list_push(List *list, void *value)
 {
-    ListItem *item = __create(ListItem);
+    ListItem *item = CREATE(ListItem);
 
     item->value = value;
 
@@ -327,7 +327,7 @@ bool list_pop(List *list, void **value)
 
 void list_pushback(List *list, void *value)
 {
-    ListItem *item = __create(ListItem);
+    ListItem *item = CREATE(ListItem);
 
     item->prev = nullptr;
     item->next = nullptr;

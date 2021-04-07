@@ -21,7 +21,7 @@ Result FsDeviceInfo::open(FsHandle &handle)
     device_iterate([&](RefPtr<Device> device) {
         Json::Value::Object device_object{};
 
-        __unused(device);
+        UNUSED(device);
 
         device_object["name"] = device->name().cstring();
         device_object["path"] = device->path().cstring();

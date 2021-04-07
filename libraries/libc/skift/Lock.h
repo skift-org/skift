@@ -22,13 +22,13 @@ private:
     Utils::SourceLocation _last_acquire_location{};
     Utils::SourceLocation _last_release_location{};
 
-    __nonmovable(Lock);
-    __noncopyable(Lock);
+    NONMOVABLE(Lock);
+    NONCOPYABLE(Lock);
 
     void ensure_failed(const char *raison, Utils::SourceLocation location)
     {
-        __unused(raison);
-        __unused(location);
+        UNUSED(raison);
+        UNUSED(location);
         ASSERT_NOT_REACHED();
     }
 

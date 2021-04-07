@@ -92,7 +92,7 @@ size_t cmdline_option_padding(CommandLineOption *options)
 
 void cmdline_callback_help(CommandLine *cmdline, CommandLineOption *option)
 {
-    __unused(option);
+    UNUSED(option);
 
     if (cmdline->prologue)
     {

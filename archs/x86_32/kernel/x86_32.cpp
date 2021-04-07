@@ -130,7 +130,7 @@ extern "C" void arch_main(void *info, uint32_t magic)
     system_main(handover);
 }
 
-__no_return void arch_reboot()
+NO_RETURN void arch_reboot()
 {
     early_console_enable();
     logger_info("Rebooting...");
@@ -142,7 +142,7 @@ __no_return void arch_reboot()
     system_stop();
 }
 
-__no_return void arch_shutdown()
+NO_RETURN void arch_shutdown()
 {
     early_console_enable();
     logger_info("Shutting down...");

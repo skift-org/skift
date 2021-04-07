@@ -2,7 +2,7 @@
 
 #include <libsystem/Common.h>
 
-struct __packed InterruptStackFrame
+struct PACKED InterruptStackFrame
 {
     uint32_t gs, fs, es, ds;
     uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
@@ -10,7 +10,7 @@ struct __packed InterruptStackFrame
     uint32_t eip, cs, eflags;
 };
 
-struct __packed UserInterruptStackFrame
+struct PACKED UserInterruptStackFrame
 {
     uint32_t gs, fs, es, ds;
     uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;

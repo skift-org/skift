@@ -70,7 +70,7 @@ static void stream_initialize(Stream *stream)
 
 Stream *stream_open(const char *path, OpenFlag flags)
 {
-    Stream *stream = __create(Stream);
+    Stream *stream = CREATE(Stream);
 
     __plug_handle_open(HANDLE(stream), path, flags | OPEN_STREAM);
 
@@ -81,7 +81,7 @@ Stream *stream_open(const char *path, OpenFlag flags)
 
 Stream *stream_open_handle(int handle_id, OpenFlag flags)
 {
-    Stream *stream = __create(Stream);
+    Stream *stream = CREATE(Stream);
 
     HANDLE(stream)->id = handle_id;
     HANDLE(stream)->flags = flags | OPEN_STREAM;

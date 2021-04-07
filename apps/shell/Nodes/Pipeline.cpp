@@ -7,7 +7,7 @@ void shell_pipeline_destroy(ShellPipeline *node)
 
 ShellNode *shell_pipeline_create(List *commands)
 {
-    ShellPipeline *node = __create(ShellPipeline);
+    ShellPipeline *node = CREATE(ShellPipeline);
 
     node->type = SHELL_NODE_PIPELINE;
     node->destroy = (ShellNodeDestroyCallback)shell_pipeline_destroy;

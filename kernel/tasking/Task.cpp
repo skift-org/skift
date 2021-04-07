@@ -88,7 +88,7 @@ void Task::kill_me_if_you_dare()
 
 Task *task_create(Task *parent, const char *name, TaskFlags flags)
 {
-    __unused(parent);
+    UNUSED(parent);
 
     ASSERT_INTERRUPTS_RETAINED();
 

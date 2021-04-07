@@ -99,7 +99,7 @@ void __plug_logger_unlock()
     interrupts_release();
 }
 
-void __no_return __plug_logger_fatal(const char *message)
+void NO_RETURN __plug_logger_fatal(const char *message)
 {
     system_panic(message);
 }
@@ -218,9 +218,9 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
 
 Result __plug_handle_call(Handle *handle, IOCall request, void *args)
 {
-    __unused(handle);
-    __unused(request);
-    __unused(args);
+    UNUSED(handle);
+    UNUSED(request);
+    UNUSED(args);
 
     ASSERT_NOT_REACHED();
 }

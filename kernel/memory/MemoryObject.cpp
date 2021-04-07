@@ -19,7 +19,7 @@ MemoryObject *memory_object_create(size_t size)
 
     size = PAGE_ALIGN_UP(size);
 
-    MemoryObject *memory_object = __create(MemoryObject);
+    MemoryObject *memory_object = CREATE(MemoryObject);
 
     memory_object->id = _memory_object_id++;
     memory_object->refcount = 1;

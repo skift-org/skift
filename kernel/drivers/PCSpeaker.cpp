@@ -39,7 +39,7 @@ void PCSpeaker::note(int length, int freq)
 
 ResultOr<size_t> PCSpeaker::write(size64_t offset, const void *buffer, size_t size)
 {
-    __unused(offset);
+    UNUSED(offset);
     if (!size % (sizeof(struct Speaker)))
     {
         return 0;

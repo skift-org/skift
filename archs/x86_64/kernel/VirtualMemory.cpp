@@ -10,11 +10,11 @@
 #include "archs/x86_64/kernel/Paging.h"
 #include "archs/x86_64/kernel/x86_64.h"
 
-PageMappingLevel4 kpml4 __aligned(ARCH_PAGE_SIZE) = {};
-PageMappingLevel3 kpml3 __aligned(ARCH_PAGE_SIZE) = {};
+PageMappingLevel4 kpml4 ALIGNED(ARCH_PAGE_SIZE) = {};
+PageMappingLevel3 kpml3 ALIGNED(ARCH_PAGE_SIZE) = {};
 
-PageMappingLevel2 kpml2 __aligned(ARCH_PAGE_SIZE) = {};
-PageMappingLevel1 kpml1[512] __aligned(ARCH_PAGE_SIZE) = {};
+PageMappingLevel2 kpml2 ALIGNED(ARCH_PAGE_SIZE) = {};
+PageMappingLevel1 kpml1[512] ALIGNED(ARCH_PAGE_SIZE) = {};
 
 void *arch_kernel_address_space()
 {
@@ -304,7 +304,7 @@ void arch_address_space_destroy(void *address_space)
 {
     ASSERT_INTERRUPTS_RETAINED();
 
-    __unused(address_space);
+    UNUSED(address_space);
 
     ASSERT_NOT_REACHED();
 }

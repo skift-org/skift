@@ -31,14 +31,14 @@ int main(int argc, char *argv[])
         return PROCESS_FAILURE;
     }
 
-    __cleanup(stream_cleanup) Stream *streamin = stream_open(argv[1], OPEN_READ);
+    CLEANUP(stream_cleanup) Stream *streamin = stream_open(argv[1], OPEN_READ);
 
     if (handle_has_error(streamin))
     {
         return handle_get_error(streamin);
     }
 
-    __cleanup(stream_cleanup) Stream *streamout = stream_open("/Devices/speaker", OPEN_WRITE | OPEN_CREATE);
+    CLEANUP(stream_cleanup) Stream *streamout = stream_open("/Devices/speaker", OPEN_WRITE | OPEN_CREATE);
 
     if (handle_has_error(streamout))
     {

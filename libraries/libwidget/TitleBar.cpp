@@ -49,7 +49,7 @@ TitleBar::~TitleBar()
 
 void TitleBar::event(Event *event)
 {
-    __unused(event);
+    UNUSED(event);
 
     if (is_mouse_event(event))
     {

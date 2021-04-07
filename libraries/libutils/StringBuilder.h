@@ -14,8 +14,8 @@ private:
     size_t _size = 0;
     char *_buffer = nullptr;
 
-    __noncopyable(StringBuilder);
-    __nonmovable(StringBuilder);
+    NONCOPYABLE(StringBuilder);
+    NONMOVABLE(StringBuilder);
 
 public:
     size_t length() const

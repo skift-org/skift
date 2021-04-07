@@ -6,7 +6,7 @@
 
 static Iteration destroy_task_if_canceled(void *target, Task *task)
 {
-    __unused(target);
+    UNUSED(target);
 
     if (task->state() == TASK_STATE_CANCELED)
     {

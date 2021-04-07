@@ -10,13 +10,13 @@
 
 #define IDT_ENTRY_COUNT 256
 
-struct __packed IDT64Descriptor
+struct PACKED IDT64Descriptor
 {
     uint16_t size;
     uint64_t offset;
 };
 
-struct __packed IDT64Entry
+struct PACKED IDT64Entry
 {
     uint16_t offset_low16;
     uint16_t cs;

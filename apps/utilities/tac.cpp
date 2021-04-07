@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 
     for (int i = 1; i < argc; i++)
     {
-        __cleanup(stream_cleanup) Stream *stream = stream_open(argv[i], OPEN_READ);
+        CLEANUP(stream_cleanup) Stream *stream = stream_open(argv[i], OPEN_READ);
 
         if (handle_has_error(stream))
         {

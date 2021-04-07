@@ -8,8 +8,8 @@ namespace Settings
 class Setting
 {
 private:
-    __noncopyable(Setting);
-    __nonmovable(Setting);
+    NONCOPYABLE(Setting);
+    NONMOVABLE(Setting);
 
     RefPtr<Service> _service;
 

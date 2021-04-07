@@ -2,7 +2,7 @@
 #include <libio/File.h>
 #include <libsystem/Logger.h>
 
-struct __packed TARRawBlock
+struct PACKED TARRawBlock
 {
     char name[100];     /*   0 */
     char mode[8];       /* 100 */
@@ -87,16 +87,16 @@ TARArchive::TARArchive(Path path, bool read) : Archive(path)
 
 Result TARArchive::extract(unsigned int entry_index, IO::Writer &writer)
 {
-    __unused(entry_index);
-    __unused(writer);
+    UNUSED(entry_index);
+    UNUSED(writer);
 
     return ERR_NOT_IMPLEMENTED;
 }
 
 Result TARArchive::insert(const char *entry_name, IO::Reader &reader)
 {
-    __unused(entry_name);
-    __unused(reader);
+    UNUSED(entry_name);
+    UNUSED(reader);
 
     return ERR_NOT_IMPLEMENTED;
 }
@@ -133,7 +133,7 @@ Result TARArchive::read_archive()
             0,
         });
 
-        TRY(archive_file.seek(IO::SeekFrom::current(__align_up(block.file_size(), 512))));
+        TRY(archive_file.seek(IO::SeekFrom::current(ALIGN_UP(block.file_size(), 512))));
     }
 
     return SUCCESS;

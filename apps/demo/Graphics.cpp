@@ -6,7 +6,7 @@ static int _frame = 0;
 
 void graphics_draw(Graphic::Painter &painter, Recti screen, float time)
 {
-    __unused(time);
+    UNUSED(time);
 
     if (_test_image == nullptr)
     {

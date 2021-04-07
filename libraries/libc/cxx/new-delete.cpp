@@ -23,14 +23,14 @@ void __attribute__((weak)) operator delete[](void *ptr)
 
 void __attribute__((weak)) operator delete(void *ptr, size_t size)
 {
-    __unused(size);
+    UNUSED(size);
 
     free(ptr);
 }
 
 void __attribute__((weak)) operator delete[](void *ptr, size_t size)
 {
-    __unused(size);
+    UNUSED(size);
 
     free(ptr);
 }

@@ -39,7 +39,7 @@ struct MajorBlock
     MinorBlock *first;
 };
 
-#define MAJOR_BLOCK_HEADER_SIZE (__align_up(sizeof(MajorBlock), 16))
+#define MAJOR_BLOCK_HEADER_SIZE (ALIGN_UP(sizeof(MajorBlock), 16))
 
 struct MinorBlock
 {
@@ -62,7 +62,7 @@ struct MinorBlock
     MajorBlock *block;
 };
 
-#define MINOR_BLOCK_HEADER_SIZE (__align_up(sizeof(MinorBlock), 16))
+#define MINOR_BLOCK_HEADER_SIZE (ALIGN_UP(sizeof(MinorBlock), 16))
 
 // The root memory block acquired from the system.
 static MajorBlock *_heap_root = nullptr;
@@ -124,8 +124,8 @@ bool check_minor_magic(MinorBlock *min, void *ptr, void *caller)
         ((min->magic & 0xFFFF) == (LIBALLOC_MAGIC & 0xFFFF)) ||
         ((min->magic & 0xFF) == (LIBALLOC_MAGIC & 0xFF)))
     {
-        __unused(caller);
-        __unused(ptr);
+        UNUSED(caller);
+        UNUSED(ptr);
         // logger_error("Possible 1-3 byte overrun for magic 0x%x != 0x%x from 0x%x.",
         //              min->magic,
         //              LIBALLOC_MAGIC,
@@ -150,7 +150,7 @@ bool check_minor_magic(MinorBlock *min, void *ptr, void *caller)
 
 void *malloc(size_t req_size)
 {
-    req_size = __align_up(req_size, 16);
+    req_size = ALIGN_UP(req_size, 16);
 
     unsigned long long bestSize = 0;
     unsigned long size = req_size;
@@ -507,7 +507,7 @@ __attribute__((optimize("O0"))) void *calloc(size_t nobj, size_t size)
 
 void *realloc(void *ptr, size_t size)
 {
-    size = __align_up(size, 16);
+    size = ALIGN_UP(size, 16);
 
     if (size == 0)
     {

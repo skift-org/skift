@@ -14,7 +14,7 @@ static Random _random = {};
 
 void lines_draw(Graphic::Painter &painter, Recti screen, float time)
 {
-    __unused(time);
+    UNUSED(time);
 
     painter.fill_rectangle(screen, Graphic::Colors::BLACK.with_alpha(0.05));
 

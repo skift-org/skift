@@ -13,8 +13,8 @@ public:
         Observable<T> *_observable;
         Callback<void(T &)> _callback;
 
-        __noncopyable(_Observer);
-        __nonmovable(_Observer);
+        NONCOPYABLE(_Observer);
+        NONMOVABLE(_Observer);
 
         _Observer(Observable<T> *observable, Callback<void(T &)> callback)
             : _observable(observable),
@@ -41,8 +41,8 @@ public:
     };
 
 private:
-    __noncopyable(Observable);
-    __nonmovable(Observable);
+    NONCOPYABLE(Observable);
+    NONMOVABLE(Observable);
 
     Vector<_Observer *> _observers{};
 

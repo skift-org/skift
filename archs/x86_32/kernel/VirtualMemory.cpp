@@ -12,8 +12,8 @@
 #include "kernel/memory/Physical.h"
 #include "kernel/system/System.h"
 
-PageDirectory _kernel_page_directory __aligned(ARCH_PAGE_SIZE) = {};
-PageTable _kernel_page_tables[256] __aligned(ARCH_PAGE_SIZE) = {};
+PageDirectory _kernel_page_directory ALIGNED(ARCH_PAGE_SIZE) = {};
+PageTable _kernel_page_tables[256] ALIGNED(ARCH_PAGE_SIZE) = {};
 
 void arch_virtual_initialize()
 {

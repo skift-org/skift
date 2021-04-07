@@ -13,9 +13,9 @@ public:
 
     virtual void event(PaintDocument &document, Widget::Event &event, Graphic::Color &color)
     {
-        __unused(document);
-        __unused(event);
-        __unused(color);
+        UNUSED(document);
+        UNUSED(event);
+        UNUSED(color);
     }
 };
 

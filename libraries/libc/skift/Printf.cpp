@@ -190,7 +190,7 @@ void __printf_formate(printf_info_t *info, char c, va_list *va)
 
     // For unknown format string just put into the output.
     const int trash = va_arg(*va, int);
-    __unused(trash);
+    UNUSED(trash);
     info->append(info, '%');
     info->append(info, c);
 }

@@ -115,8 +115,8 @@ private:
 
     Vector<Component *> _childs = {};
 
-    __noncopyable(Component);
-    __nonmovable(Component);
+    NONCOPYABLE(Component);
+    NONMOVABLE(Component);
 
 public:
     static constexpr auto FILL = (1 << 0);

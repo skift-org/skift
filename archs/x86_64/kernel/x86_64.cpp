@@ -120,13 +120,13 @@ TimeStamp arch_get_time()
     return rtc_now();
 }
 
-__no_return void arch_reboot()
+NO_RETURN void arch_reboot()
 {
     logger_warn("STUB %s", __func__);
     ASSERT_NOT_REACHED();
 }
 
-__no_return void arch_shutdown()
+NO_RETURN void arch_shutdown()
 {
     logger_warn("STUB %s", __func__);
     ASSERT_NOT_REACHED();

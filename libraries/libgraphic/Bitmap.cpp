@@ -105,7 +105,7 @@ RefPtr<Bitmap> Bitmap::load_from_or_placeholder(String path)
 
 Result Bitmap::save_to(String path)
 {
-    __unused(path);
+    UNUSED(path);
     return Result::ERR_NOT_IMPLEMENTED;
 }
 

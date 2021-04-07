@@ -14,18 +14,18 @@ public:
 
     ResultOr<size_t> read(size64_t offset, void *buffer, size_t size) override
     {
-        __unused(offset);
-        __unused(buffer);
-        __unused(size);
+        UNUSED(offset);
+        UNUSED(buffer);
+        UNUSED(size);
 
         return 0;
     }
 
     ResultOr<size_t> write(size64_t offset, const void *buffer, size_t size) override
     {
-        __unused(offset);
-        __unused(buffer);
-        __unused(size);
+        UNUSED(offset);
+        UNUSED(buffer);
+        UNUSED(size);
 
         return size;
     }

@@ -8,7 +8,7 @@ void shell_redirect_destroy(ShellRedirect *node)
 
 ShellNode *shell_redirect_create(ShellNode *command, char *destination)
 {
-    ShellRedirect *node = __create(ShellRedirect);
+    ShellRedirect *node = CREATE(ShellRedirect);
 
     node->type = SHELL_NODE_REDIRECT;
     node->destroy = (ShellNodeDestroyCallback)shell_redirect_destroy;

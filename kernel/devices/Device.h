@@ -94,26 +94,26 @@ public:
 
     virtual ResultOr<size_t> read(size64_t offset, void *buffer, size_t size)
     {
-        __unused(offset);
-        __unused(buffer);
-        __unused(size);
+        UNUSED(offset);
+        UNUSED(buffer);
+        UNUSED(size);
 
         return ERR_NOT_READABLE;
     }
 
     virtual ResultOr<size_t> write(size64_t offset, const void *buffer, size_t size)
     {
-        __unused(offset);
-        __unused(buffer);
-        __unused(size);
+        UNUSED(offset);
+        UNUSED(buffer);
+        UNUSED(size);
 
         return ERR_NOT_WRITABLE;
     }
 
     virtual Result call(IOCall request, void *args)
     {
-        __unused(request);
-        __unused(args);
+        UNUSED(request);
+        UNUSED(args);
 
         return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }

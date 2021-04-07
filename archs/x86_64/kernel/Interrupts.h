@@ -2,7 +2,7 @@
 
 #include <libsystem/Common.h>
 
-struct __packed InterruptStackFrame
+struct PACKED InterruptStackFrame
 {
     uint64_t r15;
     uint64_t r14;

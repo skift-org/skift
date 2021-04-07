@@ -121,7 +121,7 @@ void Rasterizer::rasterize(Paint &paint)
     }
 }
 
-void __flatten Rasterizer::fill(Path &path, Trans2f transform, Paint paint)
+void FLATTEN Rasterizer::fill(Path &path, Trans2f transform, Paint paint)
 {
     clear();
     flatten(path, transform);

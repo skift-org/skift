@@ -10,9 +10,9 @@
 #define PAGE_TABLE_ENTRY_COUNT 1024
 #define PAGE_DIRECTORY_ENTRY_COUNT 1024
 
-union __packed PageTableEntry
+union PACKED PageTableEntry
 {
-    struct __packed
+    struct PACKED
     {
         bool Present : 1;
         bool Write : 1;
@@ -29,14 +29,14 @@ union __packed PageTableEntry
     uint32_t as_uint;
 };
 
-struct __packed PageTable
+struct PACKED PageTable
 {
     PageTableEntry entries[PAGE_TABLE_ENTRY_COUNT];
 };
 
-union __packed PageDirectoryEntry
+union PACKED PageDirectoryEntry
 {
-    struct __packed
+    struct PACKED
     {
         bool Present : 1;
         bool Write : 1;
@@ -52,7 +52,7 @@ union __packed PageDirectoryEntry
     uint32_t as_uint;
 };
 
-struct __packed PageDirectory
+struct PACKED PageDirectory
 {
     PageDirectoryEntry entries[PAGE_DIRECTORY_ENTRY_COUNT];
 };

@@ -71,7 +71,7 @@
 
 /* --- ELF32 ---------------------------------------------------------------- */
 
-struct __packed ELF32Header
+struct PACKED ELF32Header
 {
     uint8_t ident[ELF_IDENT_COUNT];
     uint16_t type;
@@ -104,7 +104,7 @@ struct __packed ELF32Header
     }
 };
 
-struct __packed ELF32Section
+struct PACKED ELF32Section
 {
     uint32_t name;
     uint32_t type;
@@ -150,7 +150,7 @@ struct ELF32
 
 /* --- ELF64 ---------------------------------------------------------------- */
 
-struct __packed ELF64Header
+struct PACKED ELF64Header
 {
     uint8_t ident[ELF_IDENT_COUNT];
     uint16_t type;
@@ -183,7 +183,7 @@ struct __packed ELF64Header
     }
 };
 
-struct __packed ELF64Section
+struct PACKED ELF64Section
 {
     uint32_t name;
     uint32_t type;
@@ -197,7 +197,7 @@ struct __packed ELF64Section
     uint64_t entsize;
 };
 
-struct __packed ELF64Program
+struct PACKED ELF64Program
 {
     uint32_t type;
     uint32_t flags;
@@ -210,7 +210,7 @@ struct __packed ELF64Program
     uint64_t align;
 };
 
-struct __packed ELF64Symbole
+struct PACKED ELF64Symbole
 {
     uint32_t name;
     uint8_t info;

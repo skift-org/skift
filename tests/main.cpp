@@ -4,8 +4,8 @@
 
 int main(int argc, char const *argv[])
 {
-    __unused(argc);
-    __unused(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
     return Test::run_all_testes();
 }

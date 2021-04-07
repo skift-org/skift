@@ -51,7 +51,7 @@ enum CompressionMethod : uint16_t
 
 using le_compression = LittleEndian<CompressionMethod>;
 
-struct __packed CentralDirectoryFileHeader
+struct PACKED CentralDirectoryFileHeader
 {
     le_uint32_t signature;
     le_uint16_t version;
@@ -72,7 +72,7 @@ struct __packed CentralDirectoryFileHeader
     le_uint32_t local_header_offset;
 };
 
-struct __packed CentralDirectoryEndRecord
+struct PACKED CentralDirectoryEndRecord
 {
     le_uint32_t signature;
     le_uint16_t disk1;
@@ -84,7 +84,7 @@ struct __packed CentralDirectoryEndRecord
     le_uint16_t len_comment;
 };
 
-struct __packed LocalHeader
+struct PACKED LocalHeader
 {
     le_uint32_t signature;
     le_uint16_t version;
@@ -101,7 +101,7 @@ struct __packed LocalHeader
 
 static_assert(sizeof(LocalHeader) == 30, "LocalHeader has invalid size!");
 
-struct __packed DataDescriptor
+struct PACKED DataDescriptor
 {
     le_uint32_t crc;
     le_uint32_t compressed_size;
@@ -150,7 +150,7 @@ Result read_local_headers(IO::SeekableReader auto &reader, Vector<Archive::Entry
             le_uint16_t extra_field_size = TRY(IO::read<uint16_t>(reader));
 
             // TODO: parse the known extra field types
-            __unused(extra_field_type);
+            UNUSED(extra_field_type);
             TRY(IO::skip(reader, extra_field_size()));
         }
 

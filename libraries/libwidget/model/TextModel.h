@@ -245,7 +245,7 @@ public:
 
     void move_up_within(TextModel &model)
     {
-        __unused(model);
+        UNUSED(model);
 
         if (_line > 0)
         {
@@ -256,7 +256,7 @@ public:
 
     void move_up_within(TextModel &model, size_t lines)
     {
-        __unused(model);
+        UNUSED(model);
 
         for (size_t i = 0; i < lines; i++)
         {
@@ -283,7 +283,7 @@ public:
 
     void move_left_within(TextModel &model)
     {
-        __unused(model);
+        UNUSED(model);
 
         if (_column > 0)
         {
@@ -316,7 +316,7 @@ public:
 
     void move_home_within(TextModelLine &line)
     {
-        __unused(line);
+        UNUSED(line);
 
         _column = 0;
         _prefered_column = _column;
@@ -330,7 +330,7 @@ public:
 
     void move_home_within(TextModel &model)
     {
-        __unused(model);
+        UNUSED(model);
 
         _line = 0;
         _column = 0;

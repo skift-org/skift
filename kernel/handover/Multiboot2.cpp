@@ -144,7 +144,7 @@ void multiboot2_parse_header(Handover *handover, void *header_ptr)
             break;
         }
 
-        tag = (struct multiboot_tag *)__align_up(
+        tag = (struct multiboot_tag *)ALIGN_UP(
             (uintptr_t)tag + tag->size,
             MULTIBOOT_TAG_ALIGN);
     }

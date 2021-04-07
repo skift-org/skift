@@ -56,8 +56,8 @@ bool acquire_lock()
 
 int main(int argc, char const *argv[])
 {
-    __unused(argc);
-    __unused(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
     if (!acquire_lock())
     {

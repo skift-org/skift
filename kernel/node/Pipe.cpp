@@ -22,7 +22,7 @@ bool FsPipe::can_write(FsHandle &)
 
 ResultOr<size_t> FsPipe::read(FsHandle &handle, void *buffer, size_t size)
 {
-    __unused(handle);
+    UNUSED(handle);
 
     if (!writers() && _buffer.empty())
     {
@@ -34,7 +34,7 @@ ResultOr<size_t> FsPipe::read(FsHandle &handle, void *buffer, size_t size)
 
 ResultOr<size_t> FsPipe::write(FsHandle &handle, const void *buffer, size_t size)
 {
-    __unused(handle);
+    UNUSED(handle);
 
     if (!readers())
     {

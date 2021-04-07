@@ -15,7 +15,7 @@
 
 #define GDT_FLAGS 0b1100
 
-struct __packed TSS64
+struct PACKED TSS64
 {
     uint32_t reserved;
 
@@ -32,13 +32,13 @@ struct __packed TSS64
     uint16_t iopb_offset;
 };
 
-struct __packed GDTDescriptor64
+struct PACKED GDTDescriptor64
 {
     uint16_t size;
     uint64_t offset;
 };
 
-struct __packed GDTEntry64
+struct PACKED GDTEntry64
 {
     uint16_t limit0_15;
     uint16_t base0_15;
@@ -88,7 +88,7 @@ struct __packed GDTEntry64
     }
 };
 
-struct __packed GDTTSSEntry64
+struct PACKED GDTTSSEntry64
 {
     uint16_t length;
     uint16_t base_low16;
@@ -120,7 +120,7 @@ struct __packed GDTTSSEntry64
     }
 };
 
-struct __packed GDT64
+struct PACKED GDT64
 {
     GDTEntry64 entries[GDT_ENTRY_COUNT] = {};
     GDTTSSEntry64 tss = {0};

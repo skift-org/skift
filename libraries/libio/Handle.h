@@ -15,7 +15,7 @@ private:
     int _handle = HANDLE_INVALID_ID;
     Result _result = ERR_BAD_HANDLE;
 
-    __noncopyable(Handle);
+    NONCOPYABLE(Handle);
 
 public:
     int id() const { return _handle; }

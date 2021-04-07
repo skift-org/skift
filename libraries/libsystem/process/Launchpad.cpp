@@ -10,7 +10,7 @@
 
 Launchpad *launchpad_create(const char *name, const char *executable)
 {
-    Launchpad *launchpad = __create(Launchpad);
+    Launchpad *launchpad = CREATE(Launchpad);
 
     strcpy(launchpad->name, name);
     strcpy(launchpad->executable, executable);

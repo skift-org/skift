@@ -27,7 +27,7 @@ static void unicode_string_ensure_capacity(UnicodeString *string, size_t size)
 
 UnicodeString *unicode_string_create(size_t size)
 {
-    UnicodeString *string = __create(UnicodeString);
+    UnicodeString *string = CREATE(UnicodeString);
 
     unicode_string_ensure_capacity(string, size);
     string->used = 0;
@@ -43,7 +43,7 @@ void unicode_string_destroy(UnicodeString *string)
 
 UnicodeString *unicode_string_clone(UnicodeString *original)
 {
-    UnicodeString *string = __create(UnicodeString);
+    UnicodeString *string = CREATE(UnicodeString);
 
     unicode_string_ensure_capacity(string, original->used);
     memcpy(string->buffer, original->buffer, original->used * sizeof(Codepoint));

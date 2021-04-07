@@ -129,7 +129,7 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
 
     *pid = -1;
 
-    __cleanup(stream_cleanup) Stream *elf_file = stream_open(launchpad->executable, OPEN_READ);
+    CLEANUP(stream_cleanup) Stream *elf_file = stream_open(launchpad->executable, OPEN_READ);
 
     if (handle_has_error(elf_file))
     {
@@ -168,7 +168,7 @@ Result task_exec(Task *task, Launchpad *launchpad)
 {
     assert(task == scheduler_running());
 
-    __cleanup(stream_cleanup) Stream *elf_file = stream_open(launchpad->executable, OPEN_READ);
+    CLEANUP(stream_cleanup) Stream *elf_file = stream_open(launchpad->executable, OPEN_READ);
 
     if (handle_has_error(elf_file))
     {

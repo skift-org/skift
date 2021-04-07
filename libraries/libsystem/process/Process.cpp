@@ -25,13 +25,13 @@ Result process_run(const char *command, int *pid, TaskFlags flags)
     return launchpad_launch(launchpad, pid);
 }
 
-void __no_return process_exit(int code)
+void NO_RETURN process_exit(int code)
 {
     __plug_uninitialize(code);
     __builtin_unreachable();
 }
 
-void __no_return process_abort()
+void NO_RETURN process_abort()
 {
     __plug_process_exit(PROCESS_FAILURE);
     __builtin_unreachable();

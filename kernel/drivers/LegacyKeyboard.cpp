@@ -7,7 +7,7 @@
 
 KeyMap *keyboard_load_keymap(const char *keymap_path)
 {
-    __cleanup(stream_cleanup) Stream *keymap_file = stream_open(keymap_path, OPEN_READ);
+    CLEANUP(stream_cleanup) Stream *keymap_file = stream_open(keymap_path, OPEN_READ);
 
     if (handle_has_error(keymap_file))
     {
@@ -213,7 +213,7 @@ bool LegacyKeyboard::can_read()
 
 ResultOr<size_t> LegacyKeyboard::read(size64_t offset, void *buffer, size_t size)
 {
-    __unused(offset);
+    UNUSED(offset);
 
     return _events.read((char *)buffer, (size / sizeof(KeyboardPacket)) * sizeof(KeyboardPacket));
 }

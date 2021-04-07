@@ -4,8 +4,8 @@
 
 int main(int argc, char **argv)
 {
-    __unused(argc);
-    __unused(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
     Stream *network_device = stream_open(NETWORK_DEVICE_PATH, OPEN_READ | OPEN_WRITE);
 

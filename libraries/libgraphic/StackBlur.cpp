@@ -49,7 +49,7 @@ void stackblur(
     unsigned int min_y,
     unsigned int max_y)
 {
-    __unused(h);
+    UNUSED(h);
 
     unsigned int x, y, xp, yp, i;
     unsigned int sp;

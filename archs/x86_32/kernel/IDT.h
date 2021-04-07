@@ -9,13 +9,13 @@
 
 #define IDT_ENTRY_COUNT 256
 
-struct __packed IDTDescriptor
+struct PACKED IDTDescriptor
 {
     uint16_t size;
     uint32_t offset;
 };
 
-struct __packed IDTEntry
+struct PACKED IDTEntry
 {
     uint16_t offset0_15; // offset bits 0..15
     uint16_t selector;   // a code segment selector in GDT or LDT

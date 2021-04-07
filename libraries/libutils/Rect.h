@@ -19,7 +19,7 @@ enum Border : int
 };
 
 template <typename Scalar>
-struct __packed Rect
+struct PACKED Rect
 {
 private:
     Scalar _x;

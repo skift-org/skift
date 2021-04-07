@@ -66,7 +66,7 @@ long long int strtoll(const char *str, char **end, int base)
 
 char *getenv(const char *name)
 {
-    __unused(name);
+    UNUSED(name);
     // Pretend the environment variable doesn't exist
     return NULL;
 }
@@ -79,7 +79,7 @@ void exit(int status)
 
 int system(const char *command)
 {
-    __unused(command);
+    UNUSED(command);
     // TODO: implement this
     return -1;
 }

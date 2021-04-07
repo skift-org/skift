@@ -6,8 +6,8 @@
 
 int main(int argc, const char **argv)
 {
-    __unused(argc);
-    __unused(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
     logger_info("Initializing setting-service...");
 

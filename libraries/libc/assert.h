@@ -6,7 +6,7 @@
 
 __BEGIN_HEADER
 
-void __no_return assert_failed(const char *expr, const char *file, const char *function, int line);
+void NO_RETURN assert_failed(const char *expr, const char *file, const char *function, int line);
 
 #ifndef assert
 #    define assert(__expr) ((__expr) ? (void)(0) : assert_failed(#    __expr, __FILE__, __FUNCTION__, __LINE__))

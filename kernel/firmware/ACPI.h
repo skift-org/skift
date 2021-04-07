@@ -6,7 +6,7 @@
 
 /* --- RSDP ----------------------------------------------------------------- */
 
-struct __packed RSDP
+struct PACKED RSDP
 {
     char signature[8];
     uint8_t checksum;
@@ -17,7 +17,7 @@ struct __packed RSDP
 
 /* --- SDTH ----------------------------------------------------------------- */
 
-struct __packed SDTH
+struct PACKED SDTH
 {
     char Signature[4];
     uint32_t Length;
@@ -32,7 +32,7 @@ struct __packed SDTH
 
 /* --- RSDT ----------------------------------------------------------------- */
 
-struct __packed RSDT
+struct PACKED RSDT
 {
     SDTH header;
     uint32_t childs[];
@@ -74,13 +74,13 @@ enum class MADTRecordType : uint8_t
     LAPIC_OVERRIDE = 5,
 };
 
-struct __packed MADTRecord
+struct PACKED MADTRecord
 {
     MADTRecordType type;
     uint8_t lenght;
 };
 
-struct __packed MADTLocalApicRecord
+struct PACKED MADTLocalApicRecord
 {
     MADTRecord header;
     uint8_t processor_id;
@@ -88,7 +88,7 @@ struct __packed MADTLocalApicRecord
     uint32_t flags;
 };
 
-struct __packed MADTIOApicRecord
+struct PACKED MADTIOApicRecord
 {
     MADTRecord header;
     uint8_t id;
@@ -97,7 +97,7 @@ struct __packed MADTIOApicRecord
     uint32_t interrupt_base;
 };
 
-struct __packed MADT
+struct PACKED MADT
 {
     SDTH header;
 

@@ -28,15 +28,15 @@ public:
 
     virtual String header(int column)
     {
-        __unused(column);
+        UNUSED(column);
 
         return "<no header>";
     }
 
     virtual Variant data(int row, int column)
     {
-        __unused(row);
-        __unused(column);
+        UNUSED(row);
+        UNUSED(column);
 
         return "<no data>";
     }

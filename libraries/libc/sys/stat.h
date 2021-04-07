@@ -20,11 +20,11 @@ struct stat
     uint16_t st_rdev;
     int32_t st_size;
     uint32_t st_atime;
-    uint32_t __unused1;
+    uint32_t UNUSED1;
     int32_t st_mtime;
-    uint32_t __unused2;
+    uint32_t UNUSED2;
     uint32_t st_ctime;
-    uint32_t __unused3;
+    uint32_t UNUSED3;
     uint32_t st_blksize;
     uint32_t st_blocks;
 };

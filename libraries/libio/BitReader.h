@@ -19,7 +19,7 @@ public:
 
     inline Result hint(size_t num_bits)
     {
-        size_t num_bytes = __align_up(_head + num_bits, 8) / 8;
+        size_t num_bytes = ALIGN_UP(_head + num_bits, 8) / 8;
 
         while (_buffer.used() < num_bytes)
         {

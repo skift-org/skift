@@ -21,7 +21,7 @@ void fpu_initialize()
     asm volatile("fninit");
 }
 
-char fpu_registers[512] __aligned(16);
+char fpu_registers[512] ALIGNED(16);
 
 void fpu_save_context(Task *task)
 {

@@ -67,7 +67,7 @@ enum class HearderType : uint8_t
 
 };
 
-struct __packed Header
+struct PACKED Header
 {
     HearderType type;
     uint8_t length;
@@ -143,7 +143,7 @@ struct __packed Header
     }
 };
 
-struct __packed BIOSInfo
+struct PACKED BIOSInfo
 {
     Header header;
 
@@ -154,7 +154,7 @@ struct __packed BIOSInfo
     const char *version() const { return header.string(_version); }
 };
 
-struct __packed SystemInfo
+struct PACKED SystemInfo
 {
     Header header;
 
@@ -171,7 +171,7 @@ struct __packed SystemInfo
     const char *serial_number() const { return header.string(_serial_number); }
 };
 
-struct __packed MainboardInfo
+struct PACKED MainboardInfo
 {
     Header header;
 
@@ -235,7 +235,7 @@ enum class EnclosureType : uint8_t
 #undef __ENTRY
 };
 
-struct __packed EnclosureInfo
+struct PACKED EnclosureInfo
 {
     Header header;
 
@@ -274,42 +274,42 @@ struct __packed EnclosureInfo
     const char *serial_number() const { return header.string(_serial_number); }
 };
 
-struct __packed ProcessorInfo
+struct PACKED ProcessorInfo
 {
     Header header;
 };
 
-struct __packed CacheInfo
+struct PACKED CacheInfo
 {
     Header header;
 };
 
-struct __packed SlotsInfo
+struct PACKED SlotsInfo
 {
     Header header;
 };
 
-struct __packed PhysicalMemoryArray
+struct PACKED PhysicalMemoryArray
 {
     Header header;
 };
 
-struct __packed MemoryDeviceInfo
+struct PACKED MemoryDeviceInfo
 {
     Header header;
 };
 
-struct __packed MemoryArrayMappedAddress
+struct PACKED MemoryArrayMappedAddress
 {
     Header header;
 };
 
-struct __packed MemoryDeviceMappedAddress
+struct PACKED MemoryDeviceMappedAddress
 {
     Header header;
 };
 
-struct __packed SystemBootInfo
+struct PACKED SystemBootInfo
 {
     Header header;
 };

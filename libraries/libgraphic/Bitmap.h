@@ -41,8 +41,8 @@ private:
     BitmapFiltering _filtering;
     Color *_pixels;
 
-    __noncopyable(Bitmap);
-    __nonmovable(Bitmap);
+    NONCOPYABLE(Bitmap);
+    NONMOVABLE(Bitmap);
 
 public:
     Bitmap(int handle, BitmapStorage storage, int width, int height, Color *pixels)
@@ -116,12 +116,12 @@ public:
         return _pixels[position.y() * width() + position.x()];
     }
 
-    __flatten Color sample(Vec2f position)
+    FLATTEN Color sample(Vec2f position)
     {
         return sample(bound(), position);
     }
 
-    __flatten Color sample(Recti source, Vec2f position)
+    FLATTEN Color sample(Recti source, Vec2f position)
     {
         Vec2i sample_position = source.position() + (source.size() * position);
 
@@ -141,7 +141,7 @@ public:
         return Color::blerp(c00, c10, c01, c11, xx - (int)xx, yy - (int)yy);
     }
 
-    __flatten void copy_from(Bitmap &source, Recti region)
+    FLATTEN void copy_from(Bitmap &source, Recti region)
     {
         region = region.clipped_with(source.bound());
         region = region.clipped_with(bound());

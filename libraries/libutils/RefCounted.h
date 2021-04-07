@@ -8,8 +8,8 @@ class RefCounted
 private:
     int _refcount = 1;
 
-    __noncopyable(RefCounted);
-    __nonmovable(RefCounted);
+    NONCOPYABLE(RefCounted);
+    NONMOVABLE(RefCounted);
 
 public:
     RefCounted() {}

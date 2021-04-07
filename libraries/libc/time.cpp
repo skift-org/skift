@@ -41,16 +41,16 @@ struct tm *localtime(const time_t *timer)
 
 size_t strftime(char *s, size_t n, const char *format, const struct tm *tptr)
 {
-    __unused(s);
-    __unused(n);
-    __unused(format);
-    __unused(tptr);
+    UNUSED(s);
+    UNUSED(n);
+    UNUSED(format);
+    UNUSED(tptr);
 
     return 0;
 }
 
 time_t mktime(struct tm *ptr)
 {
-    __unused(ptr);
+    UNUSED(ptr);
     ASSERT_NOT_REACHED();
 }

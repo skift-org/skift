@@ -69,7 +69,7 @@ OpenFlag stdio_parse_mode(const char *mode)
 
 FILE *fdopen(int fd, const char *mode)
 {
-    __unused(mode);
+    UNUSED(mode);
 
     FILE *result = (FILE *)malloc(sizeof(FILE));
     result->error = 0;
@@ -110,7 +110,7 @@ int fclose(FILE *file)
 
 int fflush(FILE *file)
 {
-    __unused(file);
+    UNUSED(file);
 
     return 0;
 }
@@ -305,8 +305,8 @@ int getchar(void)
 
 int fscanf(FILE *stream, const char *format, ...)
 {
-    __unused(stream);
-    __unused(format);
+    UNUSED(stream);
+    UNUSED(format);
 
     ASSERT_NOT_REACHED();
 
@@ -315,8 +315,8 @@ int fscanf(FILE *stream, const char *format, ...)
 
 int sscanf(const char *str, const char *format, ...)
 {
-    __unused(str);
-    __unused(format);
+    UNUSED(str);
+    UNUSED(format);
 
     ASSERT_NOT_REACHED();
 
@@ -400,10 +400,10 @@ void perror(const char *string)
 
 int setvbuf(FILE *stream, char *buf, int mode, size_t size)
 {
-    __unused(stream);
-    __unused(buf);
-    __unused(mode);
-    __unused(size);
+    UNUSED(stream);
+    UNUSED(buf);
+    UNUSED(mode);
+    UNUSED(size);
     // TODO: implement this
 
     ASSERT_NOT_REACHED();

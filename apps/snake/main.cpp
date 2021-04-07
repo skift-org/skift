@@ -4,8 +4,8 @@
 
 int main(int argc, char **argv)
 {
-    __unused(argc);
-    __unused(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
     Widget::Application::initialize(argc, argv);
 

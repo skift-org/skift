@@ -120,7 +120,7 @@ void FillTool::event(PaintDocument &document, Widget::Event &event, Graphic::Col
 
 void PickerTool::event(PaintDocument &document, Widget::Event &event, Graphic::Color &color)
 {
-    __unused(color);
+    UNUSED(color);
 
     if (event.type == Widget::Event::MOUSE_BUTTON_PRESS)
     {

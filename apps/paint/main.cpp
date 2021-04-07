@@ -167,7 +167,7 @@ public:
 
         palette->layout(HFLOW(4));
 
-        for (size_t i = 0; i < __array_length(_color_palette); i++)
+        for (size_t i = 0; i < AERAY_LENGTH(_color_palette); i++)
         {
             Graphic::Color color = _color_palette[i];
 

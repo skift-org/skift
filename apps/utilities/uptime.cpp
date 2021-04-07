@@ -6,8 +6,8 @@
 
 int main(int argc, char const *argv[])
 {
-    __unused(argc);
-    __unused(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
     SystemStatus status{};
     hj_system_status(&status);

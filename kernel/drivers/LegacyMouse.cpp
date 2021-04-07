@@ -194,7 +194,7 @@ bool LegacyMouse::can_read()
 
 ResultOr<size_t> LegacyMouse::read(size64_t offset, void *buffer, size_t size)
 {
-    __unused(offset);
+    UNUSED(offset);
 
     return _events.read((char *)buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
 }

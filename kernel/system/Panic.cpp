@@ -76,7 +76,7 @@ void system_panic_internal(Utils::SourceLocation location, void *stackframe, con
         font_set_fg(0xff404040);
 
         stream_format(out_stream, "\n\tKERNEL");
-        stream_format(out_stream, " PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[system_get_tick() % __array_length(witty_comments)]);
+        stream_format(out_stream, " PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[system_get_tick() % AERAY_LENGTH(witty_comments)]);
     }
     else
     {

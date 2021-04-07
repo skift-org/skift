@@ -26,8 +26,8 @@ private:
         return _used;
     }
 
-    __noncopyable(BufReader);
-    __nonmovable(BufReader);
+    NONCOPYABLE(BufReader);
+    NONMOVABLE(BufReader);
 
 public:
     BufReader(Reader &reader, size_t size)

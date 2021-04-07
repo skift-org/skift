@@ -23,7 +23,7 @@ enum ColourType : uint8_t
 
 using be_ct = LittleEndian<ColourType>;
 
-struct __packed ImageHeader
+struct PACKED ImageHeader
 {
     // iHDR
     static constexpr uint32_t SIG = 0x49484452;
@@ -36,14 +36,14 @@ struct __packed ImageHeader
     be_uint8_t interlace_method;
 };
 
-struct __packed Gamma
+struct PACKED Gamma
 {
     // gAMA
     static constexpr uint32_t SIG = 0x67414D41;
     be_uint32_t gamma;
 };
 
-struct __packed Chroma
+struct PACKED Chroma
 {
     // cHRM
     static constexpr uint32_t SIG = 0x6348524D;
@@ -57,13 +57,13 @@ struct __packed Chroma
     be_uint32_t blue_y;
 };
 
-struct __packed BackgroundColor
+struct PACKED BackgroundColor
 {
     // bKGD
     static constexpr uint32_t SIG = 0x624B4744;
 };
 
-struct __packed Time
+struct PACKED Time
 {
     // tIME
     static constexpr uint32_t SIG = 0x74494D45;
@@ -75,25 +75,25 @@ struct __packed Time
     be_uint8_t second;
 };
 
-struct __packed ImageData
+struct PACKED ImageData
 {
     // iDAT
     static constexpr uint32_t SIG = 0x49444154;
 };
 
-struct __packed TextualData
+struct PACKED TextualData
 {
     // tEXt
     static constexpr uint32_t SIG = 0x74455874;
 };
 
-struct __packed ImageEnd
+struct PACKED ImageEnd
 {
     // iEND
     static constexpr uint32_t SIG = 0x49454E44;
 };
 
-struct __packed PhysicalDimensions
+struct PACKED PhysicalDimensions
 {
     // pHYs
     static constexpr uint32_t SIG = 0x70485973;
@@ -102,14 +102,14 @@ struct __packed PhysicalDimensions
     be_uint8_t unit_specifier;
 };
 
-struct __packed sRGB
+struct PACKED sRGB
 {
     // sRGB
     static constexpr uint32_t SIG = 0x73524742;
     be_uint8_t rendering_intent;
 };
 
-struct __packed Palette
+struct PACKED Palette
 {
     // PLTE
     static constexpr uint32_t SIG = 0x504C5445;

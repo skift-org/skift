@@ -52,9 +52,9 @@ public:
 
     virtual Result call(FsHandle &handle, IOCall request, void *args)
     {
-        __unused(handle);
-        __unused(request);
-        __unused(args);
+        UNUSED(handle);
+        UNUSED(request);
+        UNUSED(args);
 
         return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
@@ -65,40 +65,40 @@ public:
 
     virtual ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
     {
-        __unused(handle);
-        __unused(buffer);
-        __unused(size);
+        UNUSED(handle);
+        UNUSED(buffer);
+        UNUSED(size);
 
         return ERR_NOT_READABLE;
     }
 
     virtual ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size)
     {
-        __unused(handle);
-        __unused(buffer);
-        __unused(size);
+        UNUSED(handle);
+        UNUSED(buffer);
+        UNUSED(size);
 
         return ERR_NOT_WRITABLE;
     }
 
     virtual RefPtr<FsNode> find(String name)
     {
-        __unused(name);
+        UNUSED(name);
 
         return nullptr;
     }
 
     virtual Result link(String name, RefPtr<FsNode> child)
     {
-        __unused(name);
-        __unused(child);
+        UNUSED(name);
+        UNUSED(child);
 
         return ERR_OPERATION_NOT_SUPPORTED;
     }
 
     virtual Result unlink(String name)
     {
-        __unused(name);
+        UNUSED(name);
 
         return ERR_OPERATION_NOT_SUPPORTED;
     }

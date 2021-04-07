@@ -25,7 +25,7 @@ static const IOCallDisplayModeArgs GFX_MODES[] = {
 
 Optional<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
 {
-    for (size_t i = 0; i < __array_length(GFX_MODES); i++)
+    for (size_t i = 0; i < AERAY_LENGTH(GFX_MODES); i++)
     {
         auto &gfx_mode = GFX_MODES[i];
 
@@ -40,7 +40,7 @@ Optional<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
 
 int gfxmode_list()
 {
-    for (size_t i = 0; i < __array_length(GFX_MODES); i++)
+    for (size_t i = 0; i < AERAY_LENGTH(GFX_MODES); i++)
     {
         auto &gfx_mode = GFX_MODES[i];
 
@@ -125,7 +125,7 @@ int gfxmode_set(String &mode_name)
 
     if (result != 0)
     {
-        __cleanup(stream_cleanup) Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
+        CLEANUP(stream_cleanup) Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
         result = gfxmode_set_iocall(device, mode.unwrap());
     }
 

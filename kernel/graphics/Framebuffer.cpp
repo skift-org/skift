@@ -32,7 +32,7 @@ public:
 
     Result call(FsHandle &handle, IOCall iocall, void *args) override
     {
-        __unused(handle);
+        UNUSED(handle);
 
         if (iocall == IOCALL_DISPLAY_GET_MODE)
         {

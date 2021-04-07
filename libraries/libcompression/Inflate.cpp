@@ -239,7 +239,7 @@ Result Inflate::build_dynamic_huffman_alphabet(IO::BitReader &input)
     return Result::SUCCESS;
 }
 
-__flatten Result Inflate::read_blocks(IO::Reader &reader, IO::Writer &uncompressed)
+FLATTEN Result Inflate::read_blocks(IO::Reader &reader, IO::Writer &uncompressed)
 {
     // We use this as our sliding window. We should write directly into "uncompressed in the future"
     // And limit the amount of data we keep in our sliding window (Dequeue would be nice)
@@ -335,7 +335,7 @@ __flatten Result Inflate::read_blocks(IO::Reader &reader, IO::Writer &uncompress
     return IO::copy(final_reader, uncompressed);
 }
 
-__flatten ResultOr<size_t> Inflate::perform(IO::Reader &compressed, IO::Writer &uncompressed)
+FLATTEN ResultOr<size_t> Inflate::perform(IO::Reader &compressed, IO::Writer &uncompressed)
 {
     IO::ReadCounter counter{compressed};
     TRY(read_blocks(counter, uncompressed));

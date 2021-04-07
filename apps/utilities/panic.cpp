@@ -2,8 +2,8 @@
 
 int main(int argc, char **argv)
 {
-    __unused(argc);
-    __unused(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
     // do a page fault
     asm("int $1");

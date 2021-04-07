@@ -12,9 +12,9 @@ const char *process_name();
 
 Result process_run(const char *command, int *pid, TaskFlags flags);
 
-void __no_return process_abort();
+void NO_RETURN process_abort();
 
-void __no_return process_exit(int code);
+void NO_RETURN process_exit(int code);
 
 Result process_cancel(int pid);
 

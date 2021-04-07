@@ -32,7 +32,7 @@ MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_objec
 {
     InterruptsRetainer retainer;
 
-    auto memory_mapping = __create(MemoryMapping);
+    auto memory_mapping = CREATE(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
     memory_mapping->address = arch_virtual_alloc(task->address_space, memory_object->range(), MEMORY_USER).base();
@@ -47,7 +47,7 @@ MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_ob
 {
     InterruptsRetainer retainer;
 
-    auto memory_mapping = __create(MemoryMapping);
+    auto memory_mapping = CREATE(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
     memory_mapping->address = address;

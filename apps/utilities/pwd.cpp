@@ -3,8 +3,8 @@
 
 int main(int argc, char **argv)
 {
-    __unused(argc);
-    __unused(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
     char buffer[PATH_LENGTH];
     process_get_directory(buffer, PATH_LENGTH);

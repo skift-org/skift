@@ -158,7 +158,7 @@ case mitzvah:
 ## Main function
 
 * Always put `argc` and `argv` as arguments (**NEVER** put nothing or void as arguments).
-* If you don't need `argc` and/or `argv` use the macro `__unused`.
+* If you don't need `argc` and/or `argv` use the macro `UNUSED`.
 * Use double pointer for `argv`.
 
 *Example:*
@@ -166,8 +166,8 @@ case mitzvah:
 ```C++
 int main(int argc, char **argv)
 {
-    __unused(argc);
-    __unused(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 }
 ```
 

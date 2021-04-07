@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     buttons_container->insets(6);
 
     auto button_percent = new Button(buttons_container, Button::OUTLINE, Graphic::Icon::get("percent"));
-    __unused(button_percent);
+    UNUSED(button_percent);
 
     auto button_clear_all = new Button(buttons_container, Button::OUTLINE, "CE");
     button_clear_all->on(Event::ACTION, [&](auto) { calculator.clear_all(); });
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     button_clear->on(Event::ACTION, [&](auto) { calculator.clear(); });
 
     auto button_backspace = new Button(buttons_container, Button::OUTLINE, Graphic::Icon::get("backspace-outline"));
-    __unused(button_backspace);
+    UNUSED(button_backspace);
 
     auto button_reciprocal = new Button(buttons_container, Button::OUTLINE, "1/x");
     button_reciprocal->on(Event::ACTION, [&](auto) { calculator.enter_operation(Operation::RECIPROCAL); });
@@ -99,13 +99,13 @@ int main(int argc, char **argv)
     button_plus->on(Event::ACTION, [&](auto) { calculator.enter_operation(Operation::ADD); });
 
     auto button_plus_minus = new Button(buttons_container, Button::OUTLINE, Graphic::Icon::get("plus-minus-variant"));
-    __unused(button_plus_minus);
+    UNUSED(button_plus_minus);
 
     auto button_0 = new Button(buttons_container, Button::OUTLINE, "0");
     button_0->on(Event::ACTION, [&](auto) { calculator.enter_number(0); });
 
     auto button_dot = new Button(buttons_container, Button::OUTLINE, ".");
-    __unused(button_dot);
+    UNUSED(button_dot);
 
     auto button_equal = new Button(buttons_container, Button::FILLED, Graphic::Icon::get("equal"));
     button_equal->on(Event::ACTION, [&](auto) { calculator.equal(); });

@@ -421,7 +421,7 @@ Result PngReader::uncompress(IO::MemoryWriter &uncompressed_writer)
     }
 
     auto flags = TRY(IO::read<uint8_t>(compressed_reader));
-    __unused(flags);
+    UNUSED(flags);
 
     // Decode our compressed image data
     Compression::Inflate inflate;

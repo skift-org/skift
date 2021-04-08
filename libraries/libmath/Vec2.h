@@ -17,10 +17,10 @@ public:
     static ALWAYS_INLINE Vec2 oneY() { return Vec2(0, 1); }
     static ALWAYS_INLINE Vec2 zero() { return Vec2(0, 0); }
 
-    ALWAYS_INLINE Scalar x() const { return _x; }
-    ALWAYS_INLINE Scalar y() const { return _y; }
+    ALWAYS_INLINE const Scalar &x() const { return _x; }
+    ALWAYS_INLINE const Scalar &y() const { return _y; }
 
-    ALWAYS_INLINE Scalar length()
+    ALWAYS_INLINE Scalar length() const
     {
         return sqrt(_x * _x + _y * _y);
     }
@@ -118,7 +118,7 @@ public:
         return {xx, yy};
     }
 
-    ALWAYS_INLINE Vec2 normalized()
+    ALWAYS_INLINE Vec2 normalized() const
     {
         Scalar magn = length();
 
@@ -132,17 +132,17 @@ public:
         }
     }
 
-    ALWAYS_INLINE Vec2 vector_to(Vec2 destination)
+    ALWAYS_INLINE Vec2 vector_to(const Vec2 &destination) const
     {
         return (destination - *this).normalized();
     }
 
-    ALWAYS_INLINE Scalar dot(Vec2 other)
+    ALWAYS_INLINE Scalar dot(const Vec2 &other) const
     {
         return x() * other.x() + y() * other.y();
     }
 
-    ALWAYS_INLINE Scalar angle_with(Vec2 other)
+    ALWAYS_INLINE Scalar angle_with(const Vec2 &other) const
     {
         // Normalize the dot product
         auto r = this->normalized().dot(other.normalized());

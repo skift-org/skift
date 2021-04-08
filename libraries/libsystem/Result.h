@@ -36,7 +36,8 @@
     __ENTRY(ERR_WRITE_ONLY_STREAM, "Write only stream")                           \
     __ENTRY(ERR_DIRECTORY_NOT_EMPTY, "Directory not empty")                       \
     __ENTRY(ERR_EXTENSION, "Unrecognized file extension")                         \
-    __ENTRY(ERR_ACCESS_DENIED, "Access denied")
+    __ENTRY(ERR_ACCESS_DENIED, "Access denied")                                   \
+    __ENTRY(ERR_UNKNOWN, "Unknown failure")
 
 enum Result
 {

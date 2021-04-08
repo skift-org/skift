@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libsystem/Common.h>
+#include <abi/Time.h>
 
 #define EPOCH_YEAR 1970
 
@@ -18,47 +19,6 @@ static const int DAYS_PER_YEAR[2] = {365, 366};
 
 #define IS_LEAP_YEAR(__year) \
     ((!((__year) % 4) && (__year) % 100) || !((__year) % 400))
-
-typedef uint32_t ElapsedTime;
-
-typedef uint32_t TimeStamp;
-
-typedef uint32_t Timeout;
-
-typedef uint32_t Tick;
-
-struct Time
-{
-    int second;
-    int minute;
-    int hour;
-};
-
-struct Date
-{
-    int day;
-    int month;
-    int year;
-};
-
-union DateTime
-{
-    struct
-    {
-        Time time;
-        Date date;
-    };
-
-    struct
-    {
-        int second;
-        int minute;
-        int hour;
-        int day;
-        int month;
-        int year;
-    };
-};
 
 TimeStamp timestamp_now();
 

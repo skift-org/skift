@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include <libc/skift/Time.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>

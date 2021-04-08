@@ -1,8 +1,8 @@
 #pragma once
 
 #include <assert.h>
-
 #include <libsystem/Common.h>
+
 
 enum LogLevel
 {

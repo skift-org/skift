@@ -31,7 +31,7 @@ public:
     StringStorage(CopyTag, const char *cstring, size_t length)
     {
         _length = strnlen(cstring, length);
-        _buffer = (char *)malloc(_length + 1);
+        _buffer = new char[_length + 1];
         memcpy(_buffer, cstring, _length);
         _buffer[_length] = '\0';
     }
@@ -49,6 +49,6 @@ public:
 
     ~StringStorage()
     {
-        free(_buffer);
+        delete[] _buffer;
     }
 };

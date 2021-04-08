@@ -5,7 +5,7 @@
 #include <abi/IOCall.h>
 #include <abi/Launchpad.h>
 #include <abi/System.h>
-#include <skift/Time.h>
+#include <abi/Time.h>
 
 #include <libio/Seek.h>
 #include <libutils/String.h>

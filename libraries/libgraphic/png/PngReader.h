@@ -1,10 +1,12 @@
 #pragma once
+
+#include <abi/Time.h>
+
 #include <libgraphic/Color.h>
 #include <libgraphic/png/PngCommon.h>
 #include <libio/MemoryWriter.h>
 #include <libio/Reader.h>
 #include <libutils/Vector.h>
-#include <skift/Time.h>
 
 namespace Graphic
 {

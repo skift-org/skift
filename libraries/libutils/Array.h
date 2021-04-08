@@ -1,9 +1,9 @@
 #pragma once
 
-#include <assert.h>
 #include <initializer_list>
 
 #include <libsystem/math/MinMax.h>
+#include <libutils/Assert.h>
 
 template <typename T, size_t N>
 class Array

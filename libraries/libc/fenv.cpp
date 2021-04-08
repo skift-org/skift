@@ -1,5 +1,6 @@
-#include <assert.h>
 #include <fenv.h>
+
+#include <libutils/Assert.h>
 
 int feclearexcept(int)
 {

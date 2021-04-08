@@ -90,7 +90,13 @@ void TerminalWidget::event(Widget::Event *event)
         event->accepted = true;
     };
 
-    if (event->type == Widget::Event::KEYBOARD_KEY_TYPED)
+    if (event->type == Widget::Event::MOUSE_SCROLL)
+    {
+        int lines = event->mouse.scroll > 0 ? 1 : -1;
+        _terminal->scroll(lines);
+        should_repaint();
+    }
+    else if (event->type == Widget::Event::KEYBOARD_KEY_TYPED)
     {
         switch (event->keyboard.key)
         {

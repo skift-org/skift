@@ -54,12 +54,7 @@ public:
     {
     }
 
-    void begin_subpath()
-    {
-        begin_subpath({0, 0});
-    }
-
-    void begin_subpath(Vec2f point)
+    void begin_subpath(Vec2f point = Vec2f::zero())
     {
         if (!_subpath_ended)
         {
@@ -71,12 +66,7 @@ public:
         _subpath_ended = false;
     }
 
-    void begin_subpath_relative()
-    {
-        begin_subpath_relative({0, 0});
-    }
-
-    void begin_subpath_relative(Vec2f point)
+    void begin_subpath_relative(Vec2f point = Vec2f::zero())
     {
         if (_subpaths.count() > 0)
         {

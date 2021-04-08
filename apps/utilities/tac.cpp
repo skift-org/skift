@@ -1,5 +1,6 @@
-#include <libsystem/cmdline/CMDLine.h>
-#include <libsystem/io/Stream.h>
+#include <libio/File.h>
+#include <libio/Streams.h>
+#include <libutils/ArgParse.h>
 #include <libutils/Path.h>
 #include <libutils/String.h>
 #include <libutils/StringBuilder.h>
@@ -8,31 +9,9 @@
 #include <cstring>
 
 static bool before = false;
-static char *separator = nullptr;
+static String separator;
 
-static const char *usages[] = {
-    "NAME...",
-    "[OPTION]... NAME...",
-    nullptr,
-};
-
-static CommandLineOption options[] = {
-    COMMANDLINE_OPT_HELP,
-    COMMANDLINE_OPT_STRING("separator", 's', separator,
-                           "Choose the separator[STRING] to be used instead of \\n",
-                           COMMANDLINE_NO_CALLBACK),
-    COMMANDLINE_OPT_BOOL("before", 'b', before,
-                         "Attach the separator before instead of after the string",
-                         COMMANDLINE_NO_CALLBACK),
-    COMMANDLINE_OPT_END};
-
-static CommandLine cmdline = CMDLINE(
-    usages,
-    options,
-    "Concatenate and print lines of file(s) in reverse.",
-    "If no filename provided read from input stream\nNote that command may not work as expected when \\0 is encountered");
-
-char *str_split(char *str, char *const sub_str)
+char *str_split(char *str, const char * sub_str)
 {
     /*
     Function to split string into parts with sub_str as delimiter
@@ -75,7 +54,7 @@ char *str_split(char *str, char *const sub_str)
     return nullptr;
 }
 
-Result tac(Stream *const input_stream)
+Result tac(IO::Reader &reader)
 {
     size_t read;
     char buffer[1024];
@@ -83,21 +62,19 @@ Result tac(Stream *const input_stream)
 
     StringBuilder temp;
     Vector<String> lines(20);
-    if (!separator)
+    if (separator.empty())
     {
-        separator = new char[2];
-        strcpy(separator, "\n");
+        separator = "\n";
     }
 
-    while ((read = stream_read(input_stream, buffer, 1024 - 1)) != 0)
+    while (TRY(reader.read(buffer, 1024 - 1)) != 0)
     {
-
         buffer[read] = 0;
-        split = str_split(buffer, separator);
+        split = str_split(buffer, separator.cstring());
         while (split != nullptr)
         {
             temp.append(split);
-            split = str_split(NULL, separator);
+            split = str_split(NULL, separator.cstring());
             if (!before && split)
             {
                 temp.append(separator);
@@ -117,28 +94,47 @@ Result tac(Stream *const input_stream)
 
     for (size_t i = lines.count(); i > 0; i--)
     {
-        stream_write(out_stream, lines[i - 1].cstring(), lines[i - 1].length());
-        if (handle_has_error(out_stream))
-        {
-            return handle_get_error(out_stream);
-        }
+        TRY(IO::out().write(lines[i - 1].cstring(), lines[i - 1].length()));
     }
 
     return SUCCESS;
 }
 
-int main(int argc, char **argv)
+constexpr auto PROLOGUE = "Concatenate and print lines of file(s) in reverse.";
+constexpr auto EPILOGUE = "If no filename provided read from input stream\nNote that command may not work as expected when \\0 is encountered";
+
+int main(int argc, char const *argv[])
 {
-    argc = cmdline_parse(&cmdline, argc, argv);
+    ArgParse args{};
+    args.should_abort_on_failure();
+    args.show_help_if_no_option_given();
+
+    args.prologue(PROLOGUE);
+    args.epiloge(EPILOGUE);
+
+    args.usage("NAME...");
+    args.usage("[OPTION]... NAME...");
+
+    args.option_string('s', "separator", "Choose the separator to be used instead of \\n", [&](String &s) {
+        separator = s;
+        return PROCESS_SUCCESS;
+    });
+
+    args.option_bool('b', "before", "Attach the separator before instead of after the string", [&](bool value) {
+        before = value;
+        return PROCESS_SUCCESS;
+    });
+
+    args.eval(argc, argv);
     Result result;
     int process_status = PROCESS_SUCCESS;
 
-    if (argc == 1)
+    if (args.argc() == 0)
     {
-        result = tac(in_stream);
+        result = tac(IO::in());
         if (result != SUCCESS)
         {
-            stream_format(err_stream, "%s: %s: %s", argv[0], "STDIN", get_result_description(result));
+            IO::errln("{}: {}: {}", argv[0], "STDIN", get_result_description(result));
             process_status = PROCESS_FAILURE;
         }
 
@@ -147,20 +143,20 @@ int main(int argc, char **argv)
 
     for (int i = 1; i < argc; i++)
     {
-        CLEANUP(stream_cleanup) Stream *stream = stream_open(argv[i], OPEN_READ);
+        IO::File file(argv[i], OPEN_READ);
 
-        if (handle_has_error(stream))
+        if (file.result() != Result::SUCCESS)
         {
-            stream_format(err_stream, "%s: %s: %s", argv[0], argv[i], get_result_description(handle_get_error(stream)));
+            IO::errln("{}: {}: {}", argv[0], argv[i], get_result_description(file.result()));
             process_status = PROCESS_FAILURE;
             continue;
         }
 
-        result = tac(stream);
+        result = tac(file);
 
         if (result != SUCCESS)
         {
-            stream_format(err_stream, "%s: %s: %s", argv[0], argv[i], get_result_description(result));
+            IO::errln("{}: {}: {}", argv[0], argv[i], get_result_description(result));
             process_status = PROCESS_FAILURE;
         }
     }

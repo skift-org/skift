@@ -11,7 +11,7 @@
 static bool before = false;
 static String separator;
 
-char *str_split(char *str, const char * sub_str)
+char *str_split(char *str, const char *sub_str)
 {
     /*
     Function to split string into parts with sub_str as delimiter
@@ -67,7 +67,7 @@ Result tac(IO::Reader &reader)
         separator = "\n";
     }
 
-    while (TRY(reader.read(buffer, 1024 - 1)) != 0)
+    while ((read = TRY(reader.read(buffer, 1024 - 1))) != 0)
     {
         buffer[read] = 0;
         split = str_split(buffer, separator.cstring());

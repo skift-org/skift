@@ -127,7 +127,6 @@ int main(int argc, char const *argv[])
 
     args.eval(argc, argv);
     Result result;
-    int process_status = PROCESS_SUCCESS;
 
     if (args.argc() == 0)
     {
@@ -135,20 +134,19 @@ int main(int argc, char const *argv[])
         if (result != SUCCESS)
         {
             IO::errln("{}: {}: {}", argv[0], "STDIN", get_result_description(result));
-            process_status = PROCESS_FAILURE;
+            return PROCESS_FAILURE;
         }
-
-        return process_status;
     }
 
-    for (int i = 1; i < argc; i++)
+    int process_result = PROCESS_SUCCESS;
+    for (auto filepath : args.argv())
     {
-        IO::File file(argv[i], OPEN_READ);
+        IO::File file(filepath, OPEN_READ);
 
         if (file.result() != Result::SUCCESS)
         {
-            IO::errln("{}: {}: {}", argv[0], argv[i], get_result_description(file.result()));
-            process_status = PROCESS_FAILURE;
+            IO::errln("{}: {}: {}", argv[0], filepath, get_result_description(file.result()));
+            process_result = PROCESS_FAILURE;
             continue;
         }
 
@@ -156,10 +154,10 @@ int main(int argc, char const *argv[])
 
         if (result != SUCCESS)
         {
-            IO::errln("{}: {}: {}", argv[0], argv[i], get_result_description(result));
-            process_status = PROCESS_FAILURE;
+            IO::errln("{}: {}: {}", argv[0], filepath, get_result_description(result));
+            process_result = PROCESS_FAILURE;
         }
     }
 
-    return process_status;
+    return process_result;
 }

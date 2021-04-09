@@ -13,6 +13,7 @@ constexpr auto EPILOGUE = "Options can be combined";
 int main(int argc, char const *argv[])
 {
     ArgParse args{};
+
     args.should_abort_on_failure();
     args.show_help_if_no_option_given();
 
@@ -36,7 +37,10 @@ int main(int argc, char const *argv[])
 
     args.epiloge(EPILOGUE);
 
-    args.eval(argc, argv);
+    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    {
+        return PROCESS_FAILURE;
+    }
 
     if (args.argc() == 0)
     {

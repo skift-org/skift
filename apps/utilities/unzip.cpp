@@ -16,7 +16,10 @@ int main(int argc, char const *argv[])
     args.usage("FILES...");
     args.usage("OPTION... FILES...");
 
-    args.eval(argc, argv);
+    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    {
+        return PROCESS_FAILURE;
+    }
 
     // Unzip all archives that were passed as arguments
     args.argv().foreach ([&](auto &path) {

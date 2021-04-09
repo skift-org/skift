@@ -354,7 +354,7 @@ public:
         return fail();
     }
 
-    int eval(int argc, char const *argv[])
+    [[nodiscard]] int eval(int argc, char const *argv[])
     {
         ArgParseContext context{argc, argv};
 

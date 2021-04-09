@@ -15,7 +15,10 @@ int main(int argc, char const *argv[])
     args.usage("FILES...");
     args.usage("OPTION... FILES...");
 
-    args.eval(argc, argv);
+    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    {
+        return PROCESS_FAILURE;
+    }
 
     for (unsigned int i = 0; i < args.argc(); i++)
     {

@@ -94,7 +94,10 @@ int main(int argc, const char *argv[])
 
     args.epiloge("If no filename provided read from standard input.\nOptions can be combined.");
 
-    args.eval(argc, argv);
+    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    {
+        return PROCESS_FAILURE;
+    }
 
     if (args.argc() == 0)
     {
@@ -104,7 +107,7 @@ int main(int argc, const char *argv[])
     for (auto filename : args.argv())
     {
         IO::File file{filename, OPEN_READ};
-        
+
         if (wrap_head(filename, file, true) != PROCESS_SUCCESS)
         {
             return PROCESS_FAILURE;

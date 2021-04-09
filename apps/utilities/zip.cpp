@@ -14,7 +14,10 @@ int main(int argc, char const *argv[])
     args.usage("ARCHIVE FILES...");
     args.usage("OPTION... ARCHIVE FILES...");
 
-    args.eval(argc, argv);
+    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    {
+        return PROCESS_FAILURE;
+    }
 
     if (args.argc() < 2)
     {

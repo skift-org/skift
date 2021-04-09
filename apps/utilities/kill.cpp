@@ -59,7 +59,10 @@ int main(int argc, char const *argv[])
     bool option_all;
     args.option(option_all, 'a', "all", "Kill all processes with a matching name.");
 
-    args.eval(argc, argv);
+    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    {
+        return PROCESS_FAILURE;
+    }
 
     if (option_all)
     {

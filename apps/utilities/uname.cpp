@@ -51,7 +51,10 @@ int main(int argc, char const *argv[])
 
     args.epiloge(EPILOGUE);
 
-    args.eval(argc, argv);
+    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    {
+        return PROCESS_FAILURE;
+    }
 
     SystemInfo info{};
     hj_system_info(&info);

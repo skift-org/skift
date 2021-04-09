@@ -21,7 +21,10 @@ int main(int argc, char const *argv[])
 
     args.epiloge(EPILOGE);
 
-    args.eval(argc, argv);
+    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    {
+        return PROCESS_FAILURE;
+    }
 
     char terminator = option_zero ? '\0' : '\n';
 

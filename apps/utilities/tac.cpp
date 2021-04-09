@@ -1,95 +1,35 @@
+#include <libio/Copy.h>
 #include <libio/File.h>
+#include <libio/Scanner.h>
 #include <libio/Streams.h>
 #include <libutils/ArgParse.h>
-#include <libutils/Path.h>
-#include <libutils/String.h>
-#include <libutils/StringBuilder.h>
-#include <libutils/Vector.h>
-
-#include <cstring>
 
 static bool before = false;
 static String separator;
 
-char *str_split(char *str, const char *sub_str)
-{
-    /*
-    Function to split string into parts with sub_str as delimiter
-    Similar to strtok in string.h
-    May not work as expected when the str contains '\0' in between
-    */
-    static char *start = nullptr;
-
-    if (start == nullptr)
-    {
-        start = str;
-    }
-
-    if (!*start)
-    {
-        return nullptr;
-    }
-
-    char *split = strstr(start, sub_str);
-
-    if (split)
-    {
-        if (*(split + strlen(sub_str)))
-        {
-            (*split) = 0;
-        }
-        char *tmp = start;
-        start = split + strlen(sub_str);
-        return tmp;
-    }
-
-    int len = strlen(start);
-    if (len)
-    {
-        char *tmp = start;
-        start += len;
-        return tmp;
-    }
-
-    return nullptr;
-}
-
 Result tac(IO::Reader &reader)
 {
-    size_t read;
-    char buffer[1024];
-    char *split = nullptr;
-
-    StringBuilder temp;
-    Vector<String> lines(20);
     if (separator.empty())
     {
         separator = "\n";
     }
 
-    while ((read = TRY(reader.read(buffer, 1024 - 1))) != 0)
-    {
-        buffer[read] = 0;
-        split = str_split(buffer, separator.cstring());
-        while (split != nullptr)
-        {
-            temp.append(split);
-            split = str_split(NULL, separator.cstring());
-            if (!before && split)
-            {
-                temp.append(separator);
-            }
+    IO::Scanner scanner(reader);
+    Vector<String> lines;
 
-            lines.push_back(temp.finalize());
-            if (before && split)
-            {
-                temp.append(separator);
-            }
-        }
-        if (temp.finalize().length())
+    while (!scanner.ended())
+    {
+        IO::MemoryWriter line_writer;
+        if (before)
         {
-            lines.push_back(temp.finalize());
+            TRY(IO::write(line_writer, separator));
         }
+        TRY(IO::copy_line(scanner, line_writer, separator, false));
+        if (!before)
+        {
+            TRY(IO::write(line_writer, separator));
+        }
+        lines.push_back(line_writer.string());
     }
 
     for (size_t i = lines.count(); i > 0; i--)
@@ -125,7 +65,11 @@ int main(int argc, char const *argv[])
         return PROCESS_SUCCESS;
     });
 
-    args.eval(argc, argv);
+    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    {
+        return PROCESS_FAILURE;
+    }
+
     Result result;
 
     if (args.argc() == 0)

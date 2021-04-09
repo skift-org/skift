@@ -54,8 +54,6 @@ extern "C" uint64_t interrupts_handler(uintptr_t rsp)
     {
         if (stackframe->cs == 0x1B)
         {
-            sti();
-
             logger_error("Task %s(%d) triggered an exception: '%s' %x.%x (IP=%08x CR2=%08x)",
                          scheduler_running()->name,
                          scheduler_running_id(),
@@ -68,6 +66,7 @@ extern "C" uint64_t interrupts_handler(uintptr_t rsp)
             task_dump(scheduler_running());
             arch_dump_stack_frame(stackframe);
 
+            sti();
             scheduler_running()->cancel(-1);
         }
         else

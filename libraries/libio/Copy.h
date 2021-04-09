@@ -97,6 +97,24 @@ static inline ResultOr<size_t> copy_line(Reader &from, Writer &to, char delimite
     return written;
 }
 
+static inline ResultOr<size_t> copy_line(Scanner &scan, Writer &to, String delimiter, bool write_delim = true)
+{
+    size_t written = 0;
+
+    while (!scan.current_is_word(delimiter.cstring()) && scan.do_continue())
+    {
+        written += TRY(IO::write(to, scan.current()));
+        scan.forward();
+    }
+
+    if (scan.skip_word(delimiter.cstring()) && write_delim)
+    {
+        IO::write(to, delimiter);
+    }
+
+    return written;
+}
+
 static inline Result head(Reader &from, Writer &to, char delimiter = '\n', size_t n = 10)
 {
     for (size_t i = 0; i < n; i++)

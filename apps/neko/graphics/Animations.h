@@ -24,7 +24,7 @@ static constexpr Animation TOGI_DOWN = {Sprite::DTOGI1, Sprite::DTOGI2};
 static constexpr Animation TOGI_LEFT = {Sprite::LTOGI1, Sprite::LTOGI2};
 static constexpr Animation TOGI_RIGHT = {Sprite::RTOGI1, Sprite::RTOGI2};
 
-Animation from_vector(Vec2f vec);
+Animation from_vector(Math::Vec2f vec);
 
 }; // namespace Animations
 

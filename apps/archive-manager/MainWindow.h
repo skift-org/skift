@@ -32,7 +32,7 @@ public:
     {
         icon(Graphic::Icon::get("folder-zip"));
         title("Archive Manager");
-        size(Vec2i(700, 500));
+        size(Math::Vec2i(700, 500));
 
         render();
     }

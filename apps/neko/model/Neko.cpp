@@ -18,7 +18,7 @@ Recti Neko::sprite()
     return {x * SIZE, y * SIZE, SIZE, SIZE};
 }
 
-Neko::Neko(Vec2f starting_position)
+Neko::Neko(Math::Vec2f starting_position)
     : _position(starting_position),
       _sprites(Graphic::Bitmap::load_from_or_placeholder("/Applications/neko/sprites.png")),
       _behavior(own<ChaseMouse>())
@@ -47,7 +47,7 @@ void Neko::paint(Graphic::Painter &painter)
     painter.blit(*_sprites, sprite(), {SIZE, SIZE});
 }
 
-void Neko::move_to(Vec2f destination)
+void Neko::move_to(Math::Vec2f destination)
 {
     if (_position.distance_to(destination) < SPEED)
     {

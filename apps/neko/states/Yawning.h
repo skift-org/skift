@@ -11,7 +11,7 @@ class Yawning :
     public Behavior
 {
 private:
-    Vec2i _last_mouse_position;
+    Math::Vec2i _last_mouse_position;
 
 public:
     const char *name() override { return "Yawning"; }

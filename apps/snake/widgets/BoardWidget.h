@@ -31,7 +31,7 @@ struct BoardWidget : public Widget::Component
 
     void paint(Graphic::Painter &painter, const Recti &) override
     {
-        auto cell = [](Vec2i p) {
+        auto cell = [](Math::Vec2i p) {
             return Recti{p * CELL_SIZE, {CELL_SIZE}};
         };
 
@@ -94,7 +94,7 @@ struct BoardWidget : public Widget::Component
         }
     }
 
-    Vec2i size() override
+    Math::Vec2i size() override
     {
         return {
             board->width() * CELL_SIZE,

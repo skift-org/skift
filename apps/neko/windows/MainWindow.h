@@ -29,7 +29,7 @@ public:
         });
 
         _neko_observer = _neko.observe([this](auto &) {
-            position(_neko.position() - Vec2i{Neko::SIZE / 2, Neko::SIZE});
+            position(_neko.position() - Math::Vec2i{Neko::SIZE / 2, Neko::SIZE});
             should_repaint(bound());
         });
 

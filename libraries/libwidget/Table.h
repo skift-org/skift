@@ -28,7 +28,7 @@ private:
     Recti row_bound(int row) const;
     Recti column_bound(int column) const;
     Recti cell_bound(int row, int column) const;
-    int row_at(Vec2i position) const;
+    int row_at(Math::Vec2i position) const;
     void paint_cell(Graphic::Painter &painter, int row, int column);
 
 public:

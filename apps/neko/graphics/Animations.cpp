@@ -9,7 +9,7 @@ static Animation direction_to_animation[3][3] = {
     {Animations::MOVE_DOWN_LEFT, Animations::MOVE_DOWN, Animations::MOVE_DOWN_RIGHT},
 };
 
-Animation from_vector(Vec2f vec)
+Animation from_vector(Math::Vec2f vec)
 {
     auto normalized = vec.normalized();
 

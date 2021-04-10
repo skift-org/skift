@@ -16,7 +16,7 @@ enum Facing
     RIGHT,
 };
 
-Vec2i facing_to_vec(Facing facing)
+Math::Vec2i facing_to_vec(Facing facing)
 {
     switch (facing)
     {
@@ -39,12 +39,12 @@ struct Snake
 {
     int score;
     Facing facing;
-    Vector<Vec2i> tail;
-    Vec2i head;
+    Vector<Math::Vec2i> tail;
+    Math::Vec2i head;
 
     Snake() {}
 
-    Snake(Vec2i start)
+    Snake(Math::Vec2i start)
     {
         head = start;
         facing = Facing::LEFT;
@@ -53,7 +53,7 @@ struct Snake
 
         for (int i = 0; i < 4; i++)
         {
-            tail.push_back(start + Vec2i{1 + i, 0});
+            tail.push_back(start + Math::Vec2i{1 + i, 0});
         }
     }
 
@@ -94,17 +94,17 @@ struct Snake
         head += facing_to_vec(facing);
     }
 
-    bool colide_with(Vec2i p)
+    bool colide_with(Math::Vec2i p)
     {
         return colide_with_head(p) || colide_with_body(p);
     }
 
-    bool colide_with_head(Vec2i p)
+    bool colide_with_head(Math::Vec2i p)
     {
         return head == p;
     }
 
-    bool colide_with_body(Vec2i p)
+    bool colide_with_body(Math::Vec2i p)
     {
         for (auto &t : tail)
         {

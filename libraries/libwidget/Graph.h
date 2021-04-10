@@ -39,7 +39,7 @@ public:
 
     void paint(Graphic::Painter &painter, const Recti &dirty) override;
 
-    Vec2i size() override;
+    Math::Vec2i size() override;
 };
 
 } // namespace Widget

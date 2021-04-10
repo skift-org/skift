@@ -62,9 +62,9 @@ struct CompositorCreateWindow
     WindowType type;
 
     int frontbuffer;
-    Vec2i frontbuffer_size;
+    Math::Vec2i frontbuffer_size;
     int backbuffer;
-    Vec2i backbuffer_size;
+    Math::Vec2i backbuffer_size;
 
     Recti bound;
 };
@@ -78,7 +78,7 @@ struct CompositorMoveWindow
 {
     int id;
 
-    Vec2i position;
+    Math::Vec2i position;
 };
 
 struct CompositorFlipWindow
@@ -86,9 +86,9 @@ struct CompositorFlipWindow
     int id;
 
     int frontbuffer;
-    Vec2i frontbuffer_size;
+    Math::Vec2i frontbuffer_size;
     int backbuffer;
-    Vec2i backbuffer_size;
+    Math::Vec2i backbuffer_size;
 
     Recti dirty;
     Recti bound;
@@ -121,14 +121,15 @@ struct CompositorChangedResolution
 
 struct CompositorMousePosition
 {
-    Vec2i position;
+    Math::Vec2i position;
 };
 
 struct CompositorMessage
 {
     CompositorMessageType type;
 
-    union {
+    union
+    {
         CompositorGreetings greetings;
         CompositorEvent event;
         CompositorCreateWindow create_window;

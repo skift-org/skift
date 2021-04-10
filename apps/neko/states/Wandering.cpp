@@ -8,7 +8,7 @@
 namespace neko
 {
 
-Vec2f Wandering::pick_destination()
+Math::Vec2f Wandering::pick_destination()
 {
     int x = _random.next_u32(Widget::Screen::bound().width() - Neko::SIZE * 2) + Neko::SIZE;
     int y = _random.next_u32(Widget::Screen::bound().height() - Neko::SIZE * 2) + Neko::SIZE;

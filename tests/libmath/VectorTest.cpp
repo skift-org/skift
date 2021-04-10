@@ -2,10 +2,10 @@
 
 #include "tests/Driver.h"
 
-TEST(vec2_add)
+TEST(math_vec2_add)
 {
-    Vec2f a{2.0f, 1.0f};
-    Vec2f b{3.0f, 4.0f};
+    Math::Vec2f a{2.0f, 1.0f};
+    Math::Vec2f b{3.0f, 4.0f};
 
     auto c = a + b;
 
@@ -13,10 +13,10 @@ TEST(vec2_add)
     Assert::equal(c.y(), 5.0f);
 }
 
-TEST(vec2_sub)
+TEST(math_vec2_sub)
 {
-    Vec2f a{2.0f, 1.0f};
-    Vec2f b{3.0f, 4.0f};
+    Math::Vec2f a{2.0f, 1.0f};
+    Math::Vec2f b{3.0f, 4.0f};
 
     auto c = a - b;
 
@@ -24,10 +24,10 @@ TEST(vec2_sub)
     Assert::equal(c.y(), -3.0f);
 }
 
-TEST(vec2_dot)
+TEST(math_vec2_dot)
 {
-    Vec2f a{1.0f, 0.0f};
-    Vec2f b{-1.0f, 1.0f};
+    Math::Vec2f a{1.0f, 0.0f};
+    Math::Vec2f b{-1.0f, 1.0f};
 
     auto c = a.dot(b);
 

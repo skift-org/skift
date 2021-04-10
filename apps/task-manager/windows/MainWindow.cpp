@@ -13,7 +13,7 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
 {
     icon(Graphic::Icon::get("memory"));
     title("Task Manager");
-    size(Vec2i(700, 500));
+    size(Math::Vec2i(700, 500));
 
     root()->layout(VFLOW(0));
 

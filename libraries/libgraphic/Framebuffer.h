@@ -29,7 +29,7 @@ public:
 
     ~Framebuffer();
 
-    Result set_resolution(Vec2i size);
+    Result set_resolution(Math::Vec2i size);
 
     void mark_dirty(Recti rectangle);
 

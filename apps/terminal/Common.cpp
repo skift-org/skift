@@ -40,17 +40,17 @@ Graphic::Color color(Terminal::Color terminal_color)
     return theme_get_color(_color_to_role[terminal_color]);
 }
 
-static Vec2i _cell_size = Vec2i(7, 16);
+static Math::Vec2i _cell_size = Math::Vec2i(7, 16);
 
 Recti cell_bound(int x, int y)
 {
     return {
-        Vec2i(x, y) * _cell_size,
+        Math::Vec2i(x, y) * _cell_size,
         _cell_size,
     };
 }
 
-Vec2i cell_size()
+Math::Vec2i cell_size()
 {
     return _cell_size;
 }
@@ -79,8 +79,8 @@ void render_cell(
     if (attributes.underline)
     {
         painter.draw_line(
-            bound.position() + Vec2i(0, 14),
-            bound.position() + Vec2i(bound.width(), 14),
+            bound.position() + Math::Vec2i(0, 14),
+            bound.position() + Math::Vec2i(bound.width(), 14),
             color(foreground));
     }
 
@@ -94,7 +94,7 @@ void render_cell(
     painter.draw_glyph(
         *font(),
         glyph,
-        bound.position() + Vec2i(0, 13),
+        bound.position() + Math::Vec2i(0, 13),
         color(foreground));
 
     if (attributes.bold)
@@ -102,7 +102,7 @@ void render_cell(
         painter.draw_glyph(
             *font(),
             glyph,
-            bound.position() + Vec2i(1, 13),
+            bound.position() + Math::Vec2i(1, 13),
             color(foreground));
     }
 }

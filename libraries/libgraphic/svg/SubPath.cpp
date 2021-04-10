@@ -19,7 +19,7 @@ Bezierf SubPath::curves(size_t index) const
     return {_points[i], _points[i + 1], _points[i + 2], _points[i + 3]};
 }
 
-Vec2f SubPath::first_point() const
+Math::Vec2f SubPath::first_point() const
 {
     if (_points.count() > 0)
     {
@@ -27,11 +27,11 @@ Vec2f SubPath::first_point() const
     }
     else
     {
-        return Vec2f::zero();
+        return Math::Vec2f::zero();
     }
 }
 
-Vec2f SubPath::last_point() const
+Math::Vec2f SubPath::last_point() const
 {
     if (_points.count() > 0)
     {
@@ -39,11 +39,11 @@ Vec2f SubPath::last_point() const
     }
     else
     {
-        return Vec2f::zero();
+        return Math::Vec2f::zero();
     }
 }
 
-Vec2f SubPath::last_cubic_control_point() const
+Math::Vec2f SubPath::last_cubic_control_point() const
 {
     if (_points.count() > 1)
     {
@@ -51,7 +51,7 @@ Vec2f SubPath::last_cubic_control_point() const
     }
     else
     {
-        return Vec2f::zero();
+        return Math::Vec2f::zero();
     }
 }
 
@@ -60,12 +60,12 @@ SubPath::SubPath()
     add({0, 0});
 }
 
-SubPath::SubPath(Vec2f start)
+SubPath::SubPath(Math::Vec2f start)
 {
     add(start);
 }
 
-void SubPath::add(Vec2f point)
+void SubPath::add(Math::Vec2f point)
 {
     _points.push_back(point);
 }
@@ -75,7 +75,7 @@ void SubPath::reset()
     reset({0, 0});
 }
 
-void SubPath::reset(Vec2f start)
+void SubPath::reset(Math::Vec2f start)
 {
     _closed = false;
     _points.clear();
@@ -88,7 +88,7 @@ void SubPath::close()
     line_to(first_point());
 }
 
-void SubPath::move_to(Vec2f point)
+void SubPath::move_to(Math::Vec2f point)
 {
     if (_points.count() == 1)
     {
@@ -100,12 +100,12 @@ void SubPath::move_to(Vec2f point)
     }
 }
 
-void SubPath::move_to_relative(Vec2f point)
+void SubPath::move_to_relative(Math::Vec2f point)
 {
     move_to(last_point() + point);
 }
 
-void SubPath::line_to(Vec2f point)
+void SubPath::line_to(Math::Vec2f point)
 {
     auto previous = last_point();
     auto delta = point - previous;
@@ -115,7 +115,7 @@ void SubPath::line_to(Vec2f point)
     add(point);
 }
 
-void SubPath::line_to_relative(Vec2f point)
+void SubPath::line_to_relative(Math::Vec2f point)
 {
     line_to(last_point() + point);
 }
@@ -140,14 +140,14 @@ void SubPath::hline_to_relative(float x)
     hline_to(last_point().x() + x);
 }
 
-void SubPath::cubic_bezier_to(Vec2f control_point1, Vec2f control_point2, Vec2f point)
+void SubPath::cubic_bezier_to(Math::Vec2f control_point1, Math::Vec2f control_point2, Math::Vec2f point)
 {
     add(control_point1);
     add(control_point2);
     add(point);
 }
 
-void SubPath::cubic_bezier_to_relative(Vec2f control_point1, Vec2f control_point2, Vec2f point)
+void SubPath::cubic_bezier_to_relative(Math::Vec2f control_point1, Math::Vec2f control_point2, Math::Vec2f point)
 {
     cubic_bezier_to(
         last_point() + control_point1,
@@ -155,18 +155,18 @@ void SubPath::cubic_bezier_to_relative(Vec2f control_point1, Vec2f control_point
         last_point() + point);
 }
 
-void SubPath::smooth_cubic_bezier_to(Vec2f control_point, Vec2f point)
+void SubPath::smooth_cubic_bezier_to(Math::Vec2f control_point, Math::Vec2f point)
 {
     auto cp = last_cubic_control_point() * 2 - last_point();
     cubic_bezier_to(cp, control_point, point);
 }
 
-void SubPath::smooth_cubic_bezier_to_relative(Vec2f control_point, Vec2f point)
+void SubPath::smooth_cubic_bezier_to_relative(Math::Vec2f control_point, Math::Vec2f point)
 {
     smooth_cubic_bezier_to(last_point() + control_point, last_point() + point);
 }
 
-void SubPath::quad_bezier_to(Vec2f control_point, Vec2f point)
+void SubPath::quad_bezier_to(Math::Vec2f control_point, Math::Vec2f point)
 {
     if (_points.count() > 0)
     {
@@ -179,25 +179,25 @@ void SubPath::quad_bezier_to(Vec2f control_point, Vec2f point)
     }
 }
 
-void SubPath::quad_bezier_to_relative(Vec2f control_point, Vec2f point)
+void SubPath::quad_bezier_to_relative(Math::Vec2f control_point, Math::Vec2f point)
 {
     quad_bezier_to(
         last_point() + control_point,
         last_point() + point);
 }
 
-void SubPath::smooth_quad_bezier_to(Vec2f point)
+void SubPath::smooth_quad_bezier_to(Math::Vec2f point)
 {
     auto cp = last_cubic_control_point() * 2 - last_point();
     quad_bezier_to(cp, point);
 }
 
-void SubPath::smooth_quad_bezier_to_relative(Vec2f point)
+void SubPath::smooth_quad_bezier_to_relative(Math::Vec2f point)
 {
     smooth_quad_bezier_to(last_point() + point);
 }
 
-void SubPath::arc_to(float rx, float ry, float angle, int flags, Vec2f point)
+void SubPath::arc_to(float rx, float ry, float angle, int flags, Math::Vec2f point)
 {
     auto pow2 = [](auto x) { return x * x; };
 
@@ -270,10 +270,10 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Vec2f point)
     float cy = sinrx * cxp + cosrx * cyp + (y1 + y2) / 2.0f;
 
     // 4) Calculate theta1, and delta theta.
-    Vec2f u{(x1p - cxp) / rx, (y1p - cyp) / ry};
-    Vec2f v{(-x1p - cxp) / rx, (-y1p - cyp) / ry};
+    Math::Vec2f u{(x1p - cxp) / rx, (y1p - cyp) / ry};
+    Math::Vec2f v{(-x1p - cxp) / rx, (-y1p - cyp) / ry};
 
-    float a1 = Vec2f{1, 0}.angle_with(u); // Initial angle
+    float a1 = Math::Vec2f{1, 0}.angle_with(u); // Initial angle
     float da = u.angle_with(v);
 
     if (!fs && da > 0)
@@ -286,7 +286,7 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Vec2f point)
     }
 
     // Approximate the arc using cubic spline segments.
-    Mat3x2f t{
+    Math::Mat3x2f t{
         cosrx,
         sinrx,
         -sinrx,
@@ -306,8 +306,8 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Vec2f point)
         kappa = -kappa;
     }
 
-    Vec2f current = Vec2f::zero();
-    Vec2f ptan = Vec2f::zero();
+    Math::Vec2f current = Math::Vec2f::zero();
+    Math::Vec2f ptan = Math::Vec2f::zero();
 
     for (int i = 0; i <= ndivs; i++)
     {
@@ -331,7 +331,7 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Vec2f point)
     line_to(point);
 }
 
-void SubPath::arc_to_relative(float rx, float ry, float angle, int flags, Vec2f point)
+void SubPath::arc_to_relative(float rx, float ry, float angle, int flags, Math::Vec2f point)
 {
     arc_to(rx, ry, angle, flags, last_point() + point);
 }

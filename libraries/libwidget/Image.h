@@ -22,7 +22,7 @@ public:
 
     void paint(Graphic::Painter &, const Recti &) override;
 
-    virtual Vec2i size() override;
+    virtual Math::Vec2i size() override;
 };
 
 } // namespace Widget

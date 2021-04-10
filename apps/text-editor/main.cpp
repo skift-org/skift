@@ -22,7 +22,7 @@ int main(int argc, char **argv)
         window->title("Text Editor");
     }
 
-    window->size(Vec2i(700, 500));
+    window->size(Math::Vec2i(700, 500));
 
     window->root()->layout(VFLOW(0));
 

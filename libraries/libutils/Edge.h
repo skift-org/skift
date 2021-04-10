@@ -1,15 +1,15 @@
 #pragma once
 
-#include <libutils/Optional.h>
 #include <libmath/Vec2.h>
+#include <libutils/Optional.h>
 #include <math.h>
 
 template <typename Scalar>
 class Edge
 {
 private:
-    Vec2<Scalar> _start;
-    Vec2<Scalar> _end;
+    Math::Vec2<Scalar> _start;
+    Math::Vec2<Scalar> _end;
 
 public:
     float sx() const { return _start.x(); }
@@ -23,29 +23,29 @@ public:
     Scalar max_x() const { return MAX(sx(), ex()); }
     Scalar max_y() const { return MAX(sy(), ey()); }
 
-    Vec2<Scalar> start() const { return _start; }
-    Vec2<Scalar> end() const { return _end; }
-    Vec2<Scalar> center() const { return (_start + _end) / 2; }
+    Math::Vec2<Scalar> start() const { return _start; }
+    Math::Vec2<Scalar> end() const { return _end; }
+    Math::Vec2<Scalar> center() const { return (_start + _end) / 2; }
 
     Edge()
     {
-        _start = Vec2<Scalar>::zero();
-        _end = Vec2<Scalar>::zero();
+        _start = Math::Vec2<Scalar>::zero();
+        _end = Math::Vec2<Scalar>::zero();
     }
 
-    Edge(Vec2<Scalar> start, Vec2<Scalar> end)
+    Edge(Math::Vec2<Scalar> start, Math::Vec2<Scalar> end)
     {
         _start = end;
         _end = start;
     }
 
-    Vec2<Scalar> intersection_y(Scalar y)
+    Math::Vec2<Scalar> intersection_y(Scalar y)
     {
         Scalar x = sx() + (y - sy()) / (ey() - sy()) * (ex() - sx());
         return {x, y};
     }
 
-    Optional<Vec2<Scalar>> intersection(Edge other)
+    Optional<Math::Vec2<Scalar>> intersection(Edge other)
     {
         float dx12 = ex() - sx();
         float dy12 = ey() - sy();
@@ -63,11 +63,11 @@ public:
 
         float t2 = ((other.sx() - sx()) * dy12 + (sy() - other.sy()) * dx12) / -denominator;
 
-        return Vec2<Scalar>{sx() + dx12 * t1, sy() + dy12 * t1};
+        return Math::Vec2<Scalar>{sx() + dx12 * t1, sy() + dy12 * t1};
     }
 
     // return > 0 if on right, < 0 if on left and 0 if on center
-    int side(Vec2<Scalar> p)
+    int side(Math::Vec2<Scalar> p)
     {
         return ((ex() - sx()) * (p.y() - sy()) - (ey() - sy()) * (p.x() - sx()));
     }

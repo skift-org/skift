@@ -60,9 +60,9 @@ void Graph::paint(Graphic::Painter &painter, const Recti &)
     painter.fill_rectangle(cursor, color(THEME_BORDER));
 }
 
-Vec2i Graph::size()
+Math::Vec2i Graph::size()
 {
-    return Vec2i(_data_size, 100);
+    return Math::Vec2i(_data_size, 100);
 }
 
 void Graph::record(float data)

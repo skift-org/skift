@@ -11,10 +11,10 @@ class Wandering : public Behavior
 {
 private:
     Random _random;
-    Vec2f _destination;
+    Math::Vec2f _destination;
     int _timer;
 
-    Vec2f pick_destination();
+    Math::Vec2f pick_destination();
 
 public:
     const char *name() override { return "Wandering"; }

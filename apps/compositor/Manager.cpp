@@ -28,7 +28,7 @@ Window *manager_get_window(struct Client *client, int id)
     return nullptr;
 }
 
-Window *manager_get_window_at(Vec2i position)
+Window *manager_get_window_at(Math::Vec2i position)
 {
     Window *result = nullptr;
 

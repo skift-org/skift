@@ -8,7 +8,7 @@ namespace Widget
 class ScrollBar : public Component
 {
 private:
-    Vec2i _mouse_origin;
+    Math::Vec2i _mouse_origin;
 
     int _track = 0;
     int _thumb = 0;
@@ -62,7 +62,7 @@ public:
 
     ScrollBar(Component *parent);
 
-    void scroll_to(Vec2i mouse_position);
+    void scroll_to(Math::Vec2i mouse_position);
 
     int value() { return _value; }
 
@@ -86,7 +86,7 @@ public:
 
     void event(Event *event) override;
 
-    virtual Vec2i size() override
+    virtual Math::Vec2i size() override
     {
         return {SIZE, SIZE};
     }

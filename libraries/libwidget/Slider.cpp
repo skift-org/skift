@@ -31,9 +31,9 @@ Recti Slider::thumb_bound()
     };
 }
 
-void Slider::slide_to(Vec2i position)
+void Slider::slide_to(Math::Vec2i position)
 {
-    Vec2i pos = position - bound().position();
+    Math::Vec2i pos = position - bound().position();
     _value = pos.x() / (double)bound().width();
     _value = clamp(_value, 0, 1);
 

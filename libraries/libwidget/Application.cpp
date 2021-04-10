@@ -179,7 +179,7 @@ void flip_window(Window *window, Recti dirty)
     wait_for_ack();
 }
 
-void move_window(Window *window, Vec2i position)
+void move_window(Window *window, Math::Vec2i position)
 {
     assert(_windows.contains(window));
 
@@ -209,7 +209,7 @@ void window_change_cursor(Window *window, CursorState state)
     send_message(message);
 }
 
-Vec2i mouse_position()
+Math::Vec2i mouse_position()
 {
     CompositorMessage message = {
         .type = COMPOSITOR_MESSAGE_GET_MOUSE_POSITION,
@@ -228,7 +228,7 @@ Vec2i mouse_position()
     }
     else
     {
-        return Vec2i::zero();
+        return Math::Vec2i::zero();
     }
 }
 

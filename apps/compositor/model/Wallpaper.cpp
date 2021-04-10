@@ -3,7 +3,7 @@
 namespace compositor
 {
 
-Wallpaper::Wallpaper(Vec2i resolution)
+Wallpaper::Wallpaper(Math::Vec2i resolution)
     : _resolution(resolution),
       _scaled(Graphic::Bitmap::create_shared(resolution.x(), resolution.y()).unwrap()),
       _acrylic(Graphic::Bitmap::create_shared(resolution.x(), resolution.y()).unwrap())
@@ -95,7 +95,7 @@ void Wallpaper::render()
     }
 }
 
-void Wallpaper::change_resolution(Vec2i resolution)
+void Wallpaper::change_resolution(Math::Vec2i resolution)
 {
     _resolution = resolution;
     _scaled = Graphic::Bitmap::create_shared(_resolution.x(), _resolution.y()).unwrap();

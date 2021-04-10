@@ -62,7 +62,7 @@ public:
     int handle() const { return _handle; }
     int width() const { return _width; }
     int height() const { return _height; }
-    Vec2i size() const { return Vec2i(_width, _height); }
+    Math::Vec2i size() const { return Math::Vec2i(_width, _height); }
     Recti bound() const { return Recti(_width, _height); }
 
     void filtering(BitmapFiltering filtering) { _filtering = filtering; }
@@ -71,7 +71,7 @@ public:
 
     static ResultOr<RefPtr<Bitmap>> create_shared(int width, int height);
 
-    static ResultOr<RefPtr<Bitmap>> create_shared_from_handle(int handle, Vec2i width_and_height);
+    static ResultOr<RefPtr<Bitmap>> create_shared_from_handle(int handle, Math::Vec2i width_and_height);
 
     static RefPtr<Bitmap> create_static(int width, int height, Color *pixels);
 
@@ -81,7 +81,7 @@ public:
 
     Result save_to(String path);
 
-    void set_pixel(Vec2i position, Color color)
+    void set_pixel(Math::Vec2i position, Color color)
     {
         if (bound().contains(position))
         {
@@ -89,51 +89,51 @@ public:
         }
     }
 
-    void set_pixel_no_check(Vec2i position, Color color)
+    void set_pixel_no_check(Math::Vec2i position, Color color)
     {
         _pixels[position.x() + position.y() * width()] = color;
     }
 
-    void blend_pixel(Vec2i position, Color color)
+    void blend_pixel(Math::Vec2i position, Color color)
     {
         Color background = get_pixel(position);
         set_pixel(position, Color::blend(color, background));
     }
 
-    void blend_pixel_no_check(Vec2i position, Color color)
+    void blend_pixel_no_check(Math::Vec2i position, Color color)
     {
         Color background = get_pixel_no_check(position);
         set_pixel_no_check(position, Color::blend(color, background));
     }
 
-    Color get_pixel(Vec2i position)
+    Color get_pixel(Math::Vec2i position)
     {
         return _pixels[clamp(position.y(), 0, height() - 1) * width() + clamp(position.x(), 0, width() - 1)];
     }
 
-    Color get_pixel_no_check(Vec2i position)
+    Color get_pixel_no_check(Math::Vec2i position)
     {
         return _pixels[position.y() * width() + position.x()];
     }
 
-    FLATTEN Color sample(Vec2f position)
+    FLATTEN Color sample(Math::Vec2f position)
     {
         return sample(bound(), position);
     }
 
-    FLATTEN Color sample(Recti source, Vec2f position)
+    FLATTEN Color sample(Recti source, Math::Vec2f position)
     {
-        Vec2i sample_position = source.position() + (source.size() * position);
+        Math::Vec2i sample_position = source.position() + (source.size() * position);
 
         if (_filtering == BitmapFiltering::NEAREST)
         {
             return get_pixel(source.position() + sample_position);
         }
 
-        Color c00 = get_pixel(sample_position + Vec2i(0, 0));
-        Color c10 = get_pixel(sample_position + Vec2i(1, 0));
-        Color c01 = get_pixel(sample_position + Vec2i(0, 1));
-        Color c11 = get_pixel(sample_position + Vec2i(1, 1));
+        Color c00 = get_pixel(sample_position + Math::Vec2i(0, 0));
+        Color c10 = get_pixel(sample_position + Math::Vec2i(1, 0));
+        Color c01 = get_pixel(sample_position + Math::Vec2i(0, 1));
+        Color c11 = get_pixel(sample_position + Math::Vec2i(1, 1));
 
         float xx = source.width() * position.x();
         float yy = source.height() * position.y();
@@ -155,7 +155,7 @@ public:
         {
             for (int x = region.x(); x < region.x() + region.width(); x++)
             {
-                set_pixel_no_check(Vec2i(x, y), source.get_pixel_no_check(Vec2i(x, y)));
+                set_pixel_no_check(Math::Vec2i(x, y), source.get_pixel_no_check(Math::Vec2i(x, y)));
             }
         }
     }

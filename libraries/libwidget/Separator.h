@@ -11,7 +11,7 @@ struct Separator : public Component
 
     void paint(Graphic::Painter &, const Recti &) override;
 
-    Vec2i size() override;
+    Math::Vec2i size() override;
 };
 
 } // namespace Widget

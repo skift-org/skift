@@ -4,6 +4,9 @@
 #include <libsystem/math/MinMax.h>
 #include <math.h>
 
+namespace Math
+{
+
 template <typename Scalar>
 class Vec3
 {
@@ -152,3 +155,5 @@ public:
 using Vec3i = Vec3<int>;
 using Vec3f = Vec3<float>;
 using Vec3d = Vec3<double>;
+
+} // namespace Math

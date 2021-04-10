@@ -11,8 +11,8 @@ void PencilTool::event(PaintDocument &document, Widget::Event &event, Graphic::C
     if (event.type == Widget::Event::MOUSE_MOVE ||
         event.type == Widget::Event::MOUSE_BUTTON_PRESS)
     {
-        Vec2i from = event.mouse.old_position;
-        Vec2i to = event.mouse.position;
+        Math::Vec2i from = event.mouse.old_position;
+        Math::Vec2i to = event.mouse.position;
 
         if (event.mouse.buttons & (MOUSE_BUTTON_LEFT | MOUSE_BUTTON_RIGHT))
         {
@@ -58,7 +58,7 @@ void EraserTool::event(PaintDocument &document, Widget::Event &event, Graphic::C
     }
 }
 
-static void flood_fill(Graphic::Bitmap &bitmap, Vec2i position, Graphic::Color target, Graphic::Color fill)
+static void flood_fill(Graphic::Bitmap &bitmap, Math::Vec2i position, Graphic::Color target, Graphic::Color fill)
 {
     if (!bitmap.bound().contains(position))
         return;
@@ -69,12 +69,12 @@ static void flood_fill(Graphic::Bitmap &bitmap, Vec2i position, Graphic::Color t
     if (bitmap.get_pixel(position) != target)
         return;
 
-    auto queue = Vector<Vec2i>(256);
+    auto queue = Vector<Math::Vec2i>(256);
     queue.push_back(position);
 
     while (!queue.empty())
     {
-        Vec2i current = queue.pop_back();
+        Math::Vec2i current = queue.pop_back();
 
         if (bitmap.get_pixel(current) != target)
         {
@@ -85,22 +85,22 @@ static void flood_fill(Graphic::Bitmap &bitmap, Vec2i position, Graphic::Color t
 
         if (current.x() != 0)
         {
-            queue.push_back(current + Vec2i(-1, 0));
+            queue.push_back(current + Math::Vec2i(-1, 0));
         }
 
         if (current.x() != bitmap.width() - 1)
         {
-            queue.push_back(current + Vec2i(1, 0));
+            queue.push_back(current + Math::Vec2i(1, 0));
         }
 
         if (current.y() != 0)
         {
-            queue.push_back(current + Vec2i(0, -1));
+            queue.push_back(current + Math::Vec2i(0, -1));
         }
 
         if (current.y() != bitmap.height() - 1)
         {
-            queue.push_back(current + Vec2i(0, 1));
+            queue.push_back(current + Math::Vec2i(0, 1));
         }
     }
 }

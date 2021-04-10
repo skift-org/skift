@@ -4,6 +4,9 @@
 #include <libsystem/math/MinMax.h>
 #include <math.h>
 
+namespace Math
+{
+
 template <typename Scalar>
 class Vec2
 {
@@ -20,7 +23,7 @@ public:
     ALWAYS_INLINE const Scalar &x() const { return _x; }
     ALWAYS_INLINE const Scalar &y() const { return _y; }
 
-    ALWAYS_INLINE Scalar length() const
+    ALWAYS_INLINE double length() const
     {
         return sqrt(_x * _x + _y * _y);
     }
@@ -34,8 +37,8 @@ public:
 
     template <typename OtherScalar>
     ALWAYS_INLINE Vec2(Vec2<OtherScalar> other)
-        : _x(static_cast<Scalar>(other.x())),
-          _y(static_cast<Scalar>(other.y()))
+        : _x{static_cast<Scalar>(other.x())},
+          _y{static_cast<Scalar>(other.y())}
     {
     }
 
@@ -105,7 +108,7 @@ public:
         return x() != rhs.x() || y() != rhs.y();
     }
 
-    ALWAYS_INLINE Scalar distance_to(const Vec2 &destination) const
+    ALWAYS_INLINE double distance_to(const Vec2 &destination) const
     {
         return (destination - *this).length();
     }
@@ -155,3 +158,5 @@ public:
 using Vec2i = Vec2<int>;
 using Vec2f = Vec2<float>;
 using Vec2d = Vec2<double>;
+
+} // namespace Math

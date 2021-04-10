@@ -22,7 +22,7 @@ Dialog::~Dialog()
 
 void Dialog::render(Widget::Window *window)
 {
-    window->size(Vec2i(600, 400));
+    window->size(Math::Vec2i(600, 400));
     window->root()->layout(VFLOW(0));
 
     new Widget::TitleBar(window->root());

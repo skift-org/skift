@@ -36,7 +36,7 @@ void TextEditor::paint(Graphic::Painter &painter, const Recti &)
     size_t last_visible_line = MIN((int)_model->line_count(), (bound().height() + _vscroll_offset) / metrics.fulllineheight() + 1);
 
     painter.push();
-    painter.transform(Vec2i{0, -_vscroll_offset} + view_bound().position().extract_y());
+    painter.transform(Math::Vec2i{0, -_vscroll_offset} + view_bound().position().extract_y());
 
     for (size_t i = first_visible_line; i < last_visible_line; i++)
     {
@@ -52,11 +52,11 @@ void TextEditor::paint(Graphic::Painter &painter, const Recti &)
         }
 
         painter.push();
-        painter.transform(Vec2i{-_hscroll_offset, 0} + view_bound().position().extract_x());
+        painter.transform(Math::Vec2i{-_hscroll_offset, 0} + view_bound().position().extract_x());
 
         auto paint_cursor = [&](Graphic::Painter &painter, int position) {
-            Vec2 cursor_position{position, metrics.fullascend(baseline)};
-            Vec2 cursor_size{2, metrics.fulllineheight()};
+            Math::Vec2 cursor_position{position, metrics.fullascend(baseline)};
+            Math::Vec2 cursor_size{2, metrics.fulllineheight()};
             Rect cursor_bound{cursor_position, cursor_size};
 
             painter.fill_rectangle(cursor_bound, color(THEME_ACCENT));

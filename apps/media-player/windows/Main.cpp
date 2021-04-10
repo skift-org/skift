@@ -14,7 +14,7 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
 {
     icon(Graphic::Icon::get("movie"));
     title("Media Player");
-    size(Vec2i(700, 500));
+    size(Math::Vec2i(700, 500));
 
     root()->layout(VFLOW(0));
 

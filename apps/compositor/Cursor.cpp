@@ -7,10 +7,10 @@
 #include "compositor/Renderer.h"
 #include "compositor/Window.h"
 
-static Vec2i _mouse_position;
+static Math::Vec2i _mouse_position;
 static Widget::MouseButton _mouse_buttons;
 
-static Vec2i _mouse_old_position;
+static Math::Vec2i _mouse_old_position;
 static Widget::MouseButton _mouse_old_buttons;
 
 static RefPtr<Graphic::Bitmap> _cursor_bitmaps[Widget::__CURSOR_COUNT] = {};
@@ -53,14 +53,14 @@ Widget::MouseButton cursor_pack_mouse_buttons(MousePacket packet)
     return buttons;
 }
 
-Vec2i vec2i_clamp_to_rect(Vec2i p, Recti rect)
+Math::Vec2i vec2i_clamp_to_rect(Math::Vec2i p, Recti rect)
 {
     return p.clamped(rect.position(), rect.position() + rect.size());
 }
 
-Vec2i cursor_pack_mouse_position(MousePacket packet)
+Math::Vec2i cursor_pack_mouse_position(MousePacket packet)
 {
-    return vec2i_clamp_to_rect(_mouse_position + Vec2i(packet.offx, packet.offy), renderer_bound());
+    return vec2i_clamp_to_rect(_mouse_position + Math::Vec2i(packet.offx, packet.offy), renderer_bound());
 }
 
 void cursor_handle_packet(MousePacket packet)
@@ -142,11 +142,11 @@ void cursor_render(Graphic::Painter &painter)
     painter.blit(*cursor_bitmap, cursor_bitmap->bound(), cursor_bound());
 }
 
-Recti cursor_bound_from_position(Vec2i position)
+Recti cursor_bound_from_position(Math::Vec2i position)
 {
     Widget::CursorState state = cursor_get_state();
 
-    Recti bound(position, Vec2i(28, 28));
+    Recti bound(position, Math::Vec2i(28, 28));
 
     if (state == Widget::CURSOR_MOVE ||
         state == Widget::CURSOR_RESIZEH ||
@@ -169,11 +169,11 @@ Recti cursor_bound()
     return cursor_bound_from_position(_mouse_position);
 }
 
-Recti cursor_dirty_bound_from_position(Vec2i position)
+Recti cursor_dirty_bound_from_position(Math::Vec2i position)
 {
     return Recti(
-        position + Vec2i(-28, -28),
-        Vec2i(56, 56));
+        position + Math::Vec2i(-28, -28),
+        Math::Vec2i(56, 56));
 }
 
 Recti cursor_dirty_bound()
@@ -181,7 +181,7 @@ Recti cursor_dirty_bound()
     return cursor_dirty_bound_from_position(_mouse_position);
 }
 
-Vec2i cursor_position()
+Math::Vec2i cursor_position()
 {
     return _mouse_position;
 }

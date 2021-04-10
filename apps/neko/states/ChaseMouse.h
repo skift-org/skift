@@ -8,9 +8,9 @@ namespace neko
 class ChaseMouse : public Behavior
 {
 private:
-    Vec2f _destination;
+    Math::Vec2f _destination;
 
-    Vec2f pick_destination();
+    Math::Vec2f pick_destination();
 
 public:
     const char *name() override { return "ChaseMouse"; }

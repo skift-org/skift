@@ -348,11 +348,11 @@ void Component::should_relayout()
     }
 }
 
-Vec2i Component::size()
+Math::Vec2i Component::size()
 {
     if (_childs.count() == 0)
     {
-        return Vec2i(0);
+        return Math::Vec2i(0);
     }
 
     int width = 0;
@@ -362,7 +362,7 @@ Vec2i Component::size()
     {
         for (auto &child : _childs)
         {
-            Vec2i child_size = child->compute_size();
+            Math::Vec2i child_size = child->compute_size();
 
             width = MAX(width, child_size.x());
             height = MAX(height, child_size.y());
@@ -372,7 +372,7 @@ Vec2i Component::size()
     {
         for (auto &child : _childs)
         {
-            Vec2i child_size = child->compute_size();
+            Math::Vec2i child_size = child->compute_size();
 
             width = MAX(width, child_size.x());
             height = MAX(height, child_size.y());
@@ -388,7 +388,7 @@ Vec2i Component::size()
     {
         for (auto &child : _childs)
         {
-            Vec2i child_size = child->compute_size();
+            Math::Vec2i child_size = child->compute_size();
 
             switch (_layout.type)
             {
@@ -483,7 +483,7 @@ void Component::enable_if(bool condition)
 
 /* --- Childs --------------------------------------------------------------- */
 
-Component *Component::child_at(Vec2i position)
+Component *Component::child_at(Math::Vec2i position)
 {
     Component *result = this;
 
@@ -646,9 +646,9 @@ void Component::dispatch_event(Event *event)
     }
 }
 
-Vec2i Component::compute_size()
+Math::Vec2i Component::compute_size()
 {
-    Vec2i size = this->size();
+    Math::Vec2i size = this->size();
 
     int width = size.x();
     int height = size.y();
@@ -679,7 +679,7 @@ Vec2i Component::compute_size()
     width += _outsets.left() + _outsets.right();
     height += _outsets.top() + _outsets.bottom();
 
-    return Vec2i(width, height);
+    return Math::Vec2i(width, height);
 }
 
 } // namespace Widget

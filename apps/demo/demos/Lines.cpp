@@ -4,8 +4,8 @@
 
 struct Line
 {
-    Vec2i start;
-    Vec2i finish;
+    Math::Vec2i start;
+    Math::Vec2i finish;
     Graphic::Color color;
 };
 
@@ -21,11 +21,11 @@ void lines_draw(Graphic::Painter &painter, Recti screen, float time)
     {
         Line line = {};
 
-        line.start = Vec2i(_random.next_u32(screen.width()),
-                           _random.next_u32(screen.height()));
+        line.start = Math::Vec2i(_random.next_u32(screen.width()),
+                                 _random.next_u32(screen.height()));
 
-        line.finish = Vec2i(_random.next_u32(screen.width()),
-                            _random.next_u32(screen.height()));
+        line.finish = Math::Vec2i(_random.next_u32(screen.width()),
+                                  _random.next_u32(screen.height()));
 
         line.color = Graphic::Color::from_hsv(_random.next_u32(360), 0.75, 0.9);
 

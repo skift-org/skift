@@ -64,7 +64,7 @@ public:
     {
         icon(Graphic::Icon::get("brush"));
         title("Paint");
-        size(Vec2i(600, 560));
+        size(Math::Vec2i(600, 560));
 
         _document = document;
 

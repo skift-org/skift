@@ -26,8 +26,8 @@ void TextField::paint(Graphic::Painter &painter, const Recti &)
     int baseline = bound().height() / 2 + metrics.capheight() / 2;
 
     auto paint_cursor = [&](Graphic::Painter &painter, int position) {
-        Vec2 cursor_position{position, metrics.fullascend(baseline)};
-        Vec2 cursor_size{2, metrics.fulllineheight()};
+        Math::Vec2 cursor_position{position, metrics.fullascend(baseline)};
+        Math::Vec2 cursor_size{2, metrics.fulllineheight()};
         Rect cursor_bound{cursor_position, cursor_size};
 
         painter.fill_rectangle(cursor_bound, color(THEME_ACCENT));
@@ -73,7 +73,7 @@ void TextField::scroll_to_cursor()
 {
 }
 
-Vec2i TextField::size()
+Math::Vec2i TextField::size()
 {
     return _model->line(0).bound(*font()).size();
 }

@@ -42,7 +42,7 @@ void Image::paint(Graphic::Painter &painter, const Recti &)
     painter.blit(*_bitmap, _scaling, bound());
 }
 
-Vec2i Image::size()
+Math::Vec2i Image::size()
 {
     if (_scaling == Graphic::BitmapScaling::CENTER)
     {

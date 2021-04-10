@@ -30,7 +30,7 @@ void ScrollBar::paint(Graphic::Painter &painter, const Recti &)
     }
 }
 
-void ScrollBar::scroll_to(Vec2i position)
+void ScrollBar::scroll_to(Math::Vec2i position)
 {
     if (_horizontal)
     {
@@ -96,7 +96,7 @@ void ScrollBar::event(Event *event)
         }
         else if (event->type == Event::MOUSE_MOVE && mouse_event.buttons & MOUSE_BUTTON_LEFT)
         {
-            Vec2i position = mouse_event.position - _mouse_origin;
+            Math::Vec2i position = mouse_event.position - _mouse_origin;
             scroll_to(position);
 
             event->accepted = true;

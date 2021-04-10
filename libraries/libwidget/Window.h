@@ -38,7 +38,7 @@ private:
     bool _resize_vertical = false;
     bool _resize_horizontal = false;
 
-    Vec2i _resize_begin;
+    Math::Vec2i _resize_begin;
     Recti _previous_bound;
 
     CursorState cursor_state = CURSOR_DEFAULT;
@@ -70,11 +70,11 @@ public:
 
     int frontbuffer_handle() const { return frontbuffer->handle(); }
 
-    Vec2i frontbuffer_size() const { return frontbuffer->size(); }
+    Math::Vec2i frontbuffer_size() const { return frontbuffer->size(); }
 
     int backbuffer_handle() const { return backbuffer->handle(); }
 
-    Vec2i backbuffer_size() const { return backbuffer->size(); }
+    Math::Vec2i backbuffer_size() const { return backbuffer->size(); }
 
     void title(String title) { _title = title; }
 
@@ -125,13 +125,13 @@ public:
 
     /* --- Geometry --------------------------------------------------------- */
 
-    Vec2i position() { return bound_on_screen().position(); }
+    Math::Vec2i position() { return bound_on_screen().position(); }
 
-    void position(Vec2i position) { bound(bound_on_screen().moved(position)); }
+    void position(Math::Vec2i position) { bound(bound_on_screen().moved(position)); }
 
-    Vec2i size() { return bound().size(); }
+    Math::Vec2i size() { return bound().size(); }
 
-    void size(Vec2i size) { bound(bound_on_screen().resized(size)); }
+    void size(Math::Vec2i size) { bound(bound_on_screen().resized(size)); }
 
     void resize_to_content();
 
@@ -143,11 +143,11 @@ public:
 
     void change_framebuffer_if_needed();
 
-    Border resize_bound_containe(Vec2i position);
+    Border resize_bound_containe(Math::Vec2i position);
 
-    void begin_resize(Vec2i mouse_position);
+    void begin_resize(Math::Vec2i mouse_position);
 
-    void do_resize(Vec2i mouse_position);
+    void do_resize(Math::Vec2i mouse_position);
 
     void end_resize();
 
@@ -161,7 +161,7 @@ public:
 
     void register_widget_by_id(String id, Component *widget);
 
-    Component *child_at(Vec2i position);
+    Component *child_at(Math::Vec2i position);
 
     template <typename WidgetType, typename CallbackType>
     void with_widget(String name, CallbackType callback)

@@ -258,13 +258,13 @@ void Window::hide()
     Application::hide_window(this);
 }
 
-Border Window::resize_bound_containe(Vec2i position)
+Border Window::resize_bound_containe(Math::Vec2i position)
 {
     Recti resize_bound = bound().expended(Insets(WINDOW_RESIZE_AREA));
     return resize_bound.contains(Insets(WINDOW_RESIZE_AREA), position);
 }
 
-void Window::begin_resize(Vec2i mouse_position)
+void Window::begin_resize(Math::Vec2i mouse_position)
 {
     _is_resizing = true;
 
@@ -273,7 +273,7 @@ void Window::begin_resize(Vec2i mouse_position)
     _resize_horizontal = borders & (Border::LEFT | Border::RIGHT);
     _resize_vertical = borders & (Border::TOP | Border::BOTTOM);
 
-    Vec2i resize_region_begin = position();
+    Math::Vec2i resize_region_begin = position();
 
     if (borders & Border::TOP)
     {
@@ -288,7 +288,7 @@ void Window::begin_resize(Vec2i mouse_position)
     _resize_begin = resize_region_begin;
 }
 
-void Window::do_resize(Vec2i mouse_position)
+void Window::do_resize(Math::Vec2i mouse_position)
 {
     Recti new_bound = Recti::from_two_point(
         _resize_begin,
@@ -308,7 +308,7 @@ void Window::do_resize(Vec2i mouse_position)
                         .with_height(bound().height());
     }
 
-    Vec2i content_size = root()->compute_size();
+    Math::Vec2i content_size = root()->compute_size();
 
     new_bound = new_bound.with_width(MAX(new_bound.width(), content_size.x()));
     new_bound = new_bound.with_height(MAX(new_bound.height(), content_size.y()));
@@ -322,7 +322,7 @@ void Window::do_resize(Vec2i mouse_position)
 
 void Window::resize_to_content()
 {
-    Vec2i content_size = root()->compute_size();
+    Math::Vec2i content_size = root()->compute_size();
     bound({position(), content_size});
 }
 
@@ -331,7 +331,7 @@ void Window::end_resize()
     _is_resizing = false;
 }
 
-Component *Window::child_at(Vec2i position)
+Component *Window::child_at(Math::Vec2i position)
 {
     return root()->child_at(position);
 }

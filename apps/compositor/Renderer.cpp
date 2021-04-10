@@ -249,7 +249,7 @@ void renderer_repaint_dirty()
 
 bool renderer_set_resolution(int width, int height)
 {
-    auto result = _framebuffer->set_resolution(Vec2i(width, height));
+    auto result = _framebuffer->set_resolution(Math::Vec2i(width, height));
 
     if (result != SUCCESS)
     {

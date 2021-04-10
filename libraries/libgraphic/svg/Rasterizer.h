@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libutils/Array.h>
 #include <libgraphic/svg/EdgeList.h>
+#include <libutils/Array.h>
 
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/svg/Paint.h>
@@ -24,19 +24,18 @@ private:
 
     void clear();
 
-    void flatten(const Path &path, const Mat3x2f &transform);
+    void flatten(const Path &path, const Math::Mat3x2f &transform);
 
     void rasterize(Paint &paint);
 
 public:
-
     Rasterizer(RefPtr<Bitmap> bitmap);
 
     void set_clip(Recti c);
 
     Recti get_clip();
 
-    void fill(Path &path, const Mat3x2f &transform, Paint paint);
+    void fill(Path &path, const Math::Mat3x2f &transform, Paint paint);
 };
 
 } // namespace Graphic

@@ -25,7 +25,7 @@ void IconPanel::paint(Graphic::Painter &painter, const Recti &)
         color(THEME_FOREGROUND));
 }
 
-Vec2i IconPanel::size()
+Math::Vec2i IconPanel::size()
 {
     if (_icon)
     {

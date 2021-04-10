@@ -13,7 +13,7 @@ namespace Graphic
 
 struct PainterState
 {
-    Vec2i origin;
+    Math::Vec2i origin;
     Recti clip;
 };
 
@@ -48,7 +48,7 @@ public:
 
     void clip(Recti rectangle);
 
-    void transform(Vec2i offset);
+    void transform(Math::Vec2i offset);
 
     Recti apply(Recti rectangle);
 
@@ -56,7 +56,7 @@ public:
 
     /* --- Drawing ---------------------------------------------------------- */
 
-    void plot(Vec2i position, Color color);
+    void plot(Math::Vec2i position, Color color);
 
     void blit(Bitmap &bitmap, Recti source, Recti destination);
 
@@ -78,17 +78,17 @@ public:
 
     void fill_checkboard(Recti bound, int cell_size, Color fg_color, Color bg_color);
 
-    void draw_line(Vec2i from, Vec2i to, Color color);
+    void draw_line(Math::Vec2i from, Math::Vec2i to, Color color);
 
     void draw_rectangle(Recti rectangle, Color color);
 
-    void draw_triangle(Vec2i p0, Vec2i p1, Vec2i p2, Color color);
+    void draw_triangle(Math::Vec2i p0, Math::Vec2i p1, Math::Vec2i p2, Color color);
 
     void draw_rectangle_rounded(Recti bound, int radius, int thickness, Color color);
 
-    void draw_glyph(Font &font, const Glyph &glyph, Vec2i position, Color color);
+    void draw_glyph(Font &font, const Glyph &glyph, Math::Vec2i position, Color color);
 
-    void draw_string(Font &font, const char *str, Vec2i position, Color color);
+    void draw_string(Font &font, const char *str, Math::Vec2i position, Color color);
 
     void draw_string_within(Font &font, const char *str, Recti container, Anchor anchor, Color color);
 
@@ -112,7 +112,7 @@ public:
     }
 
 private:
-    Vec2i origin() const { return _state_stack[_state_stack_top].origin; };
+    Math::Vec2i origin() const { return _state_stack[_state_stack_top].origin; };
 
     Recti apply_clip(Recti rectangle);
 
@@ -124,7 +124,7 @@ private:
 
     void blit_colored(Bitmap &src, Recti source, Recti destination, Color color);
 
-    void draw_circle_helper(Recti bound, Vec2i center, int radius, int thickness, Color color);
+    void draw_circle_helper(Recti bound, Math::Vec2i center, int radius, int thickness, Color color);
 };
 
 } // namespace Graphic

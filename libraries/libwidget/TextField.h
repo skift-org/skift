@@ -24,7 +24,7 @@ public:
 
     void paint(Graphic::Painter &painter, const Recti &rectangle) override;
 
-    Vec2i size() override;
+    Math::Vec2i size() override;
 
     void event(Event *event) override;
 };

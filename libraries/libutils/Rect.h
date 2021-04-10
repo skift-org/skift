@@ -2,10 +2,10 @@
 
 #include <math.h>
 
+#include <libmath/Vec2.h>
 #include <libutils/Anchor.h>
 #include <libutils/Enum.h>
 #include <libutils/Insets.h>
-#include <libmath/Vec2.h>
 
 #include <libsystem/math/MinMax.h>
 
@@ -33,7 +33,7 @@ public:
         return Rect(0, 0, 0, 0);
     }
 
-    static Rect from_two_point(Vec2<Scalar> a, Vec2<Scalar> b)
+    static Rect from_two_point(Math::Vec2<Scalar> a, Math::Vec2<Scalar> b)
     {
         auto x0 = MIN(a.x(), b.x());
         auto y0 = MIN(a.y(), b.y());
@@ -51,11 +51,11 @@ public:
 
     auto height() const { return _height; }
 
-    Vec2<Scalar> position() const { return {_x, _y}; }
+    Math::Vec2<Scalar> position() const { return {_x, _y}; }
 
-    Vec2<Scalar> size() const { return {_width, _height}; }
+    Math::Vec2<Scalar> size() const { return {_width, _height}; }
 
-    Vec2<Scalar> center() const { return position() + size() / 2; }
+    Math::Vec2<Scalar> center() const { return position() + size() / 2; }
 
     auto top_left() const { return position(); }
 
@@ -87,7 +87,7 @@ public:
     {
     }
 
-    Rect(Vec2<Scalar> size)
+    Rect(Math::Vec2<Scalar> size)
         : _x(0),
           _y(0),
           _width(size.x()),
@@ -95,7 +95,7 @@ public:
     {
     }
 
-    Rect(Vec2<Scalar> position, Vec2<Scalar> size)
+    Rect(Math::Vec2<Scalar> position, Math::Vec2<Scalar> size)
         : _x(position.x()),
           _y(position.y()),
           _width(size.x()),
@@ -201,12 +201,12 @@ public:
 
     Rect merged_with(Rect other) const
     {
-        Vec2<Scalar> topleft{
+        Math::Vec2<Scalar> topleft{
             MIN(_x, other._x),
             MIN(_y, other._y),
         };
 
-        Vec2<Scalar> bottomright{
+        Math::Vec2<Scalar> bottomright{
             MAX(_x + _width, other._x + other._width),
             MAX(_y + _height, other._y + other._height),
         };
@@ -221,11 +221,11 @@ public:
             return empty();
         }
 
-        Vec2<Scalar> topleft(
+        Math::Vec2<Scalar> topleft(
             MAX(left(), other.left()),
             MAX(top(), other.top()));
 
-        Vec2<Scalar> bottomright(
+        Math::Vec2<Scalar> bottomright(
             MIN(right(), other.right()),
             MIN(bottom(), other.bottom()));
 
@@ -407,7 +407,7 @@ public:
             _height + insets.top() + insets.bottom());
     }
 
-    Rect resized(Vec2<Scalar> size) const
+    Rect resized(Math::Vec2<Scalar> size) const
     {
         return Rect(
             _x,
@@ -416,12 +416,12 @@ public:
             size.y());
     }
 
-    Rect moved(Vec2<Scalar> position) const
+    Rect moved(Math::Vec2<Scalar> position) const
     {
         return Rect(position, size());
     }
 
-    Rect offset(Vec2<Scalar> offset) const
+    Rect offset(Math::Vec2<Scalar> offset) const
     {
         return Rect(position() + offset, size());
     }
@@ -434,7 +434,7 @@ public:
                _height + _y > other._y;
     }
 
-    bool contains(Vec2<Scalar> p) const
+    bool contains(Math::Vec2<Scalar> p) const
     {
         return left() <= p.x() && right() > p.x() &&
                top() <= p.y() && bottom() > p.y();
@@ -447,7 +447,7 @@ public:
                right() <= other.top() && bottom() >= other.bottom();
     }
 
-    Border contains(Insets<Scalar> spacing, Vec2<Scalar> position) const
+    Border contains(Insets<Scalar> spacing, Math::Vec2<Scalar> position) const
     {
         int borders = Border::NONE;
 

@@ -22,7 +22,7 @@ void bresenhamLow(int x0, int y0, int x1, int y1, int size, TCallback callback)
 
     while (x < x1)
     {
-        callback(Vec2(x, y) - Vec2i(size / 2), Vec2i(size, size));
+        callback(Math::Vec2(x, y) - Math::Vec2i(size / 2), Math::Vec2i(size, size));
         if (p >= 0)
         {
             y += i;
@@ -55,7 +55,7 @@ void bresenhamHigh(int x0, int y0, int x1, int y1, int size, TCallback callback)
 
     while (y < y1)
     {
-        callback(Vec2(x, y) - Vec2i(size / 2), Vec2i(size, size));
+        callback(Math::Vec2(x, y) - Math::Vec2i(size / 2), Math::Vec2i(size, size));
         if (p >= 0)
         {
             x += i;
@@ -70,7 +70,7 @@ void bresenhamHigh(int x0, int y0, int x1, int y1, int size, TCallback callback)
 }
 
 template <typename TCallback>
-void bresenham(Vec2i start, Vec2i end, int size, TCallback callback)
+void bresenham(Math::Vec2i start, Math::Vec2i end, int size, TCallback callback)
 {
     int x0 = start.x();
     int y0 = start.y();

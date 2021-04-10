@@ -22,7 +22,7 @@ private:
 
     Recti thumb_bound();
 
-    void slide_to(Vec2i position);
+    void slide_to(Math::Vec2i position);
 
 public:
     double value() { return _value; }

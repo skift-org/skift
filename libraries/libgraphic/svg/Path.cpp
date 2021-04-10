@@ -1,4 +1,5 @@
 #include <libgraphic/svg/Path.h>
+#include <libio/Streams.h>
 #include <libutils/ScannerUtils.h>
 
 namespace Graphic
@@ -21,14 +22,15 @@ static void whitespace_or_comma(Scanner &scan)
     }
 }
 
-static Vec2f coordinate(Scanner &scan)
+static Math::Vec2f coordinate(Scanner &scan)
 {
     auto x = scan_float(scan);
     whitespace_or_comma(scan);
     auto y = scan_float(scan);
     whitespace_or_comma(scan);
 
-    return Vec2f{(float)x, (float)y};
+    IO::logln("-> {}x{}", x, y);
+    return Math::Vec2f{(float)x, (float)y};
 }
 
 static int arcflags(Scanner &scan)
@@ -57,6 +59,8 @@ static int arcflags(Scanner &scan)
 
 static void operation(Scanner &scan, Path &path, char operation)
 {
+    IO::logln("begin op {c}", operation);
+
     switch (operation)
     {
     case 'M':
@@ -123,7 +127,6 @@ static void operation(Scanner &scan, Path &path, char operation)
         auto point = coordinate(scan);
 
         path.cubic_bezier_to(cp1, cp2, point);
-
         break;
     }
 
@@ -134,7 +137,6 @@ static void operation(Scanner &scan, Path &path, char operation)
         auto point = coordinate(scan);
 
         path.cubic_bezier_to_relative(cp1, cp2, point);
-
         break;
     }
 
@@ -142,8 +144,8 @@ static void operation(Scanner &scan, Path &path, char operation)
     {
         auto cp = coordinate(scan);
         auto point = coordinate(scan);
-        path.smooth_cubic_bezier_to(cp, point);
 
+        path.smooth_cubic_bezier_to(cp, point);
         break;
     }
 
@@ -227,6 +229,14 @@ static void operation(Scanner &scan, Path &path, char operation)
     default:
         break;
     }
+}
+
+Path Path::parse(const char *str)
+{
+    IO::logln("PARSING: {}", str);
+
+    StringScanner scan{str, strlen(str)};
+    return parse(scan);
 }
 
 Path Path::parse(Scanner &scan)

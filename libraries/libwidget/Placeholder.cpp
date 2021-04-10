@@ -19,7 +19,7 @@ void Placeholder::paint(Graphic::Painter &painter, const Recti &)
     painter.blit(
         *_alert_icon,
         Graphic::ICON_18PX,
-        _alert_icon->bound(Graphic::ICON_18PX).moved(Vec2i(8, 8)),
+        _alert_icon->bound(Graphic::ICON_18PX).moved(Math::Vec2i(8, 8)),
         Graphic::Colors::RED);
 
     painter.draw_string(*font(), _text.cstring(), {32, 20}, color(THEME_FOREGROUND));

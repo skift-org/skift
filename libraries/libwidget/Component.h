@@ -34,7 +34,7 @@ struct Layout
 
     int hcell;
     int vcell;
-    Vec2i spacing;
+    Math::Vec2i spacing;
 };
 
 #define STACK()                  \
@@ -42,7 +42,7 @@ struct Layout
         ::Widget::Layout::STACK, \
         0,                       \
         0,                       \
-        Vec2i::zero(),           \
+        Math::Vec2i::zero(),     \
     })
 
 #define GRID(_hcell, _vcell, _hspacing, _vspacing) \
@@ -50,39 +50,39 @@ struct Layout
         ::Widget::Layout::GRID,                    \
         (_hcell),                                  \
         (_vcell),                                  \
-        Vec2i((_hspacing), (_vspacing)),           \
+        Math::Vec2i((_hspacing), (_vspacing)),     \
     })
 
-#define VGRID(_vspacing)         \
-    (::Widget::Layout{           \
-        ::Widget::Layout::VGRID, \
-        0,                       \
-        0,                       \
-        Vec2i(0, (_vspacing)),   \
+#define VGRID(_vspacing)             \
+    (::Widget::Layout{               \
+        ::Widget::Layout::VGRID,     \
+        0,                           \
+        0,                           \
+        Math::Vec2i(0, (_vspacing)), \
     })
 
-#define HGRID(_hspacing)         \
-    (::Widget::Layout{           \
-        ::Widget::Layout::HGRID, \
-        0,                       \
-        0,                       \
-        Vec2i((_hspacing), 0),   \
+#define HGRID(_hspacing)             \
+    (::Widget::Layout{               \
+        ::Widget::Layout::HGRID,     \
+        0,                           \
+        0,                           \
+        Math::Vec2i((_hspacing), 0), \
     })
 
-#define VFLOW(_vspacing)         \
-    (::Widget::Layout{           \
-        ::Widget::Layout::VFLOW, \
-        0,                       \
-        0,                       \
-        Vec2i(0, (_vspacing)),   \
+#define VFLOW(_vspacing)             \
+    (::Widget::Layout{               \
+        ::Widget::Layout::VFLOW,     \
+        0,                           \
+        0,                           \
+        Math::Vec2i(0, (_vspacing)), \
     })
 
-#define HFLOW(_hspacing)         \
-    (::Widget::Layout{           \
-        ::Widget::Layout::HFLOW, \
-        0,                       \
-        0,                       \
-        Vec2i((_hspacing), 0),   \
+#define HFLOW(_hspacing)             \
+    (::Widget::Layout{               \
+        ::Widget::Layout::HFLOW,     \
+        0,                           \
+        0,                           \
+        Math::Vec2i((_hspacing), 0), \
     })
 
 class Component
@@ -100,7 +100,7 @@ private:
 
     Insetsi _outsets{};
     Insetsi _insets{};
-    Vec2i _content_scroll{};
+    Math::Vec2i _content_scroll{};
 
     Optional<Graphic::Color> _colors[__THEME_COLOR_COUNT] = {};
     Layout _layout = {};
@@ -204,11 +204,11 @@ public:
 
     virtual void do_layout();
 
-    virtual Vec2i size();
+    virtual Math::Vec2i size();
 
     /* --- Metrics ---------------------------------------------------------- */
 
-    Vec2i position_in_window()
+    Math::Vec2i position_in_window()
     {
         if (_parent)
         {
@@ -240,7 +240,7 @@ public:
 
     void container(Recti container) { _container = container; }
 
-    Vec2i origin() const
+    Math::Vec2i origin() const
     {
         if (_parent && !(_flags & NOT_AFFECTED_BY_SCROLL))
         {
@@ -264,9 +264,9 @@ public:
 
     Recti overflow() const { return bound().expended(_outsets); }
 
-    Vec2i scroll() { return _content_scroll; }
+    Math::Vec2i scroll() { return _content_scroll; }
 
-    void scroll(Vec2i content_scroll)
+    void scroll(Math::Vec2i content_scroll)
     {
         _content_scroll = content_scroll;
         should_repaint();
@@ -288,7 +288,7 @@ public:
 
     /* --- Childs ----------------------------------------------------------- */
 
-    Component *child_at(Vec2i position);
+    Component *child_at(Math::Vec2i position);
 
     void add_child(Component *child);
 
@@ -316,7 +316,7 @@ public:
 
     void should_relayout();
 
-    Vec2i compute_size();
+    Math::Vec2i compute_size();
 
     /* --- Events ----------------------------------------------------------- */
 

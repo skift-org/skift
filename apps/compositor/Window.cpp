@@ -47,7 +47,7 @@ Recti Window::cursor_capture_bound()
     }
 }
 
-void Window::move(Vec2i new_position)
+void Window::move(Math::Vec2i new_position)
 {
     renderer_region_dirty(bound());
 
@@ -80,7 +80,7 @@ void Window::send_event(Widget::Event event)
     _client->send_message(message);
 }
 
-void Window::handle_mouse_move(Vec2i old_position, Vec2i position, Widget::MouseButton buttons)
+void Window::handle_mouse_move(Math::Vec2i old_position, Math::Vec2i position, Widget::MouseButton buttons)
 {
     Widget::Event event = {
         .type = Widget::Event::MOUSE_MOVE,
@@ -101,7 +101,7 @@ void Window::handle_mouse_move(Vec2i old_position, Vec2i position, Widget::Mouse
     send_event(event);
 }
 
-static void handle_mouse_button(Window &window, Widget::MouseButton button, Widget::MouseButton old_buttons, Widget::MouseButton buttons, Vec2i position)
+static void handle_mouse_button(Window &window, Widget::MouseButton button, Widget::MouseButton old_buttons, Widget::MouseButton buttons, Math::Vec2i position)
 {
     bool was_button_pressed = old_buttons & button;
     bool is_button_pressed = buttons & button;
@@ -149,14 +149,14 @@ static void handle_mouse_button(Window &window, Widget::MouseButton button, Widg
     }
 }
 
-void Window::handle_mouse_buttons(Widget::MouseButton old_buttons, Widget::MouseButton buttons, Vec2i position)
+void Window::handle_mouse_buttons(Widget::MouseButton old_buttons, Widget::MouseButton buttons, Math::Vec2i position)
 {
     handle_mouse_button(*this, MOUSE_BUTTON_LEFT, old_buttons, buttons, position);
     handle_mouse_button(*this, MOUSE_BUTTON_RIGHT, old_buttons, buttons, position);
     handle_mouse_button(*this, MOUSE_BUTTON_MIDDLE, old_buttons, buttons, position);
 }
 
-void Window::handle_double_click(Vec2i position)
+void Window::handle_double_click(Math::Vec2i position)
 {
     Widget::Event event = {
         .type = Widget::Event::MOUSE_DOUBLE_CLICK,
@@ -177,7 +177,7 @@ void Window::handle_double_click(Vec2i position)
     send_event(event);
 }
 
-void Window::handle_mouse_scroll(Vec2i position, int scroll)
+void Window::handle_mouse_scroll(Math::Vec2i position, int scroll)
 {
     Widget::Event event = {
         .type = Widget::Event::MOUSE_SCROLL,
@@ -216,7 +216,7 @@ void Window::lost_focus()
     send_event(event);
 }
 
-void Window::flip_buffers(int frontbuffer_handle, Vec2i frontbuffer_size, int backbuffer_handle, Vec2i backbuffer_size, Recti region)
+void Window::flip_buffers(int frontbuffer_handle, Math::Vec2i frontbuffer_size, int backbuffer_handle, Math::Vec2i backbuffer_size, Recti region)
 {
     swap(_frontbuffer, _backbuffer);
 

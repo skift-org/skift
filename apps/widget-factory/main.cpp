@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 
     window->icon(Graphic::Icon::get("widgets"));
     window->title("Widget Factory");
-    window->size(Vec2i(500, 400));
+    window->size(Math::Vec2i(500, 400));
 
     window->root()->layout(VFLOW(8));
 

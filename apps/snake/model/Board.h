@@ -35,7 +35,7 @@ public:
 
     void reset()
     {
-        _snake = Snake{Vec2i{_width, _height} / 2};
+        _snake = Snake{Math::Vec2i{_width, _height} / 2};
 
         _fruits.clear();
         spawn();
@@ -45,7 +45,7 @@ public:
     {
         for (size_t i = _fruits.count(); i < 5; i++)
         {
-            Vec2i position{_random.next_u8() % _width, _random.next_u8() % _height};
+            Math::Vec2i position{_random.next_u8() % _width, _random.next_u8() % _height};
 
             bool obstructed = false;
 

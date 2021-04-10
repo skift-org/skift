@@ -29,7 +29,7 @@ ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(int width, int height)
     return bitmap;
 }
 
-ResultOr<RefPtr<Bitmap>> Bitmap::create_shared_from_handle(int handle, Vec2i width_and_height)
+ResultOr<RefPtr<Bitmap>> Bitmap::create_shared_from_handle(int handle, Math::Vec2i width_and_height)
 {
     Color *pixels = nullptr;
     size_t size = 0;

@@ -13,7 +13,7 @@ class Wallpaper
 private:
     Graphic::BitmapScaling _scaling = Graphic::BitmapScaling::COVER;
 
-    Vec2i _resolution = {};
+    Math::Vec2i _resolution = {};
     Graphic::Color _background = Graphic::Colors::BLACK;
     RefPtr<Graphic::Bitmap> _orginal = nullptr;
     RefPtr<Graphic::Bitmap> _scaled = nullptr;
@@ -43,7 +43,7 @@ public:
         return *_acrylic;
     }
 
-    Wallpaper(Vec2i resolution);
+    Wallpaper(Math::Vec2i resolution);
 
     void render_scaled();
 
@@ -51,7 +51,7 @@ public:
 
     void render();
 
-    void change_resolution(Vec2i resolution);
+    void change_resolution(Math::Vec2i resolution);
 };
 
 } // namespace compositor

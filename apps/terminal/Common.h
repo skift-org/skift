@@ -7,7 +7,7 @@ RefPtr<Graphic::Font> font();
 
 Recti cell_bound(int x, int y);
 
-Vec2i cell_size();
+Math::Vec2i cell_size();
 
 void render_cell(
     Graphic::Painter &painter,

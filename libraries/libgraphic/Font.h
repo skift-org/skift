@@ -45,7 +45,7 @@ struct Glyph
 {
     Codepoint codepoint;
     Recti bound;
-    Vec2i origin;
+    Math::Vec2i origin;
     int advance;
 };
 

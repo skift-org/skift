@@ -7,7 +7,6 @@
 namespace Widget
 {
 
-
 Recti Table::header_bound() const
 {
     return bound().take_top(TABLE_ROW_HEIGHT);
@@ -56,7 +55,7 @@ Recti Table::cell_bound(int row, int column) const
     };
 }
 
-int Table::row_at(Vec2i position) const
+int Table::row_at(Math::Vec2i position) const
 {
     if (!list_bound().contains(position))
     {
@@ -94,7 +93,7 @@ void Table::paint_cell(Graphic::Painter &painter, int row, int column)
         painter.draw_string(
             *font(),
             data.as_string(),
-            Vec2i(bound.x() + 7 + 18 + 7, bound.y() + 20),
+            Math::Vec2i(bound.x() + 7 + 18 + 7, bound.y() + 20),
             color(THEME_FOREGROUND));
     }
     else
@@ -102,7 +101,7 @@ void Table::paint_cell(Graphic::Painter &painter, int row, int column)
         painter.draw_string(
             *font(),
             data.as_string(),
-            Vec2i(bound.x() + 7, bound.y() + 20),
+            Math::Vec2i(bound.x() + 7, bound.y() + 20),
             color(THEME_FOREGROUND));
     }
 
@@ -181,8 +180,8 @@ void Table::paint(Graphic::Painter &painter, const Recti &)
             painter.fill_rectangle(header_bound_cell.take_right(1), color(THEME_BORDER));
         }
 
-        painter.draw_string(*font(), _model->header(column).cstring(), Vec2i(header_bound_cell.x() + 7, header_bound_cell.y() + 20), color(THEME_FOREGROUND));
-        painter.draw_string(*font(), _model->header(column).cstring(), Vec2i(header_bound_cell.x() + 7 + 1, header_bound_cell.y() + 20), color(THEME_FOREGROUND));
+        painter.draw_string(*font(), _model->header(column).cstring(), Math::Vec2i(header_bound_cell.x() + 7, header_bound_cell.y() + 20), color(THEME_FOREGROUND));
+        painter.draw_string(*font(), _model->header(column).cstring(), Math::Vec2i(header_bound_cell.x() + 7 + 1, header_bound_cell.y() + 20), color(THEME_FOREGROUND));
     }
 }
 

@@ -6,6 +6,9 @@
 #include <math.h>
 #include <string.h>
 
+namespace Math
+{
+
 template <typename Scalar>
 class Mat3x2
 {
@@ -39,7 +42,7 @@ public:
 
     static ALWAYS_INLINE Mat3x2 scale(Scalar s) { return scale({s, s}); }
 
-    static ALWAYS_INLINE Mat3x2 scale(const Vec2<Scalar>& s)
+    static ALWAYS_INLINE Mat3x2 scale(const Vec2<Scalar> &s)
     {
         return {
             s.x(),
@@ -143,7 +146,7 @@ public:
         };
     }
 
-    ALWAYS_INLINE Vec2<Scalar> apply(const Vec2<Scalar>& v) const
+    ALWAYS_INLINE Vec2<Scalar> apply(const Vec2<Scalar> &v) const
     {
         return {
             v.x() * _m[0] + v.y() * _m[2] + _m[4],
@@ -151,7 +154,7 @@ public:
         };
     }
 
-    ALWAYS_INLINE Bezier<Scalar> apply(const Bezier<Scalar>& b) const
+    ALWAYS_INLINE Bezier<Scalar> apply(const Bezier<Scalar> &b) const
     {
         return {
             apply(b.start()),
@@ -161,7 +164,7 @@ public:
         };
     }
 
-    ALWAYS_INLINE Vec2<Scalar> apply_no_translation(const Vec2<Scalar>& v) const
+    ALWAYS_INLINE Vec2<Scalar> apply_no_translation(const Vec2<Scalar> &v) const
     {
         return {
             v.x() * _m[0] + v.y() * _m[2],
@@ -169,7 +172,7 @@ public:
         };
     }
 
-    ALWAYS_INLINE Mat3x2 operator*(const Mat3x2& other) const
+    ALWAYS_INLINE Mat3x2 operator*(const Mat3x2 &other) const
     {
         return {
             _m[0] * other[0] + _m[1] * other[2],
@@ -185,3 +188,5 @@ public:
 using Mat3x2i = Mat3x2<int>;
 using Mat3x2f = Mat3x2<float>;
 using Mat3x2d = Mat3x2<double>;
+
+} // namespace Math

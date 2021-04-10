@@ -46,7 +46,7 @@ public:
         }
     }
 
-    Vec2i size() override
+    Math::Vec2i size() override
     {
         return {0, _host->size().y()};
     }

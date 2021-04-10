@@ -32,7 +32,7 @@ void MessageBox::render(Window *window)
 {
     window->icon(_icon);
 
-    window->size(Vec2i(300, 200));
+    window->size(Math::Vec2i(300, 200));
 
     window->root()->layout(VFLOW(0));
     window->root()->insets(Insetsi(8));

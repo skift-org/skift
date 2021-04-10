@@ -20,11 +20,11 @@ struct MouseEvent
 {
     int scroll;
 
-    Vec2i position;
-    Vec2i old_position;
+    Math::Vec2i position;
+    Math::Vec2i old_position;
 
-    Vec2i position_on_screen;
-    Vec2i old_position_on_screen;
+    Math::Vec2i position_on_screen;
+    Math::Vec2i old_position_on_screen;
 
     MouseButton button;
     MouseButton buttons;
@@ -81,7 +81,7 @@ struct Event
 using EventType = Event::Type;
 using EventHandler = Callback<void(Event *)>;
 
-#define is_mouse_event(__event)                                   \
+#define is_mouse_event(__event)                                                       \
     (((::Widget::Event *)(__event))->type == ::Widget::Event::MOUSE_MOVE ||           \
      ((::Widget::Event *)(__event))->type == ::Widget::Event::MOUSE_SCROLL ||         \
      ((::Widget::Event *)(__event))->type == ::Widget::Event::MOUSE_ENTER ||          \

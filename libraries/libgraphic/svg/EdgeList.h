@@ -1,11 +1,12 @@
 #pragma once
 
-#include <libutils/Edge.h>
 #include <libmath/Mat3x2.h>
+#include <libutils/Edge.h>
 #include <libutils/Rect.h>
 #include <libutils/Vector.h>
 
-namespace Graphic {
+namespace Graphic
+{
 
 class EdgeList
 {
@@ -13,12 +14,12 @@ private:
     static constexpr auto TOLERANCE = 0.25f;
     static constexpr auto MAX_DEPTH = 8;
 
-    Optional<Vec2f> _last;
+    Optional<Math::Vec2f> _last;
     Vector<Edgef> _edges;
 
     bool _has_min_max = false;
-    Vec2f _min;
-    Vec2f _max;
+    Math::Vec2f _min;
+    Math::Vec2f _max;
 
     void flatten(Bezierf curve, int depth)
     {
@@ -62,7 +63,7 @@ private:
 public:
     Recti bound() const
     {
-        return Recti::from_two_point(_min, _max + Vec2i{1});
+        return Recti::from_two_point(_min, _max + Math::Vec2i{1});
     }
 
     const Vector<Edgef> &edges()
@@ -84,7 +85,7 @@ public:
         }
     }
 
-    void append(Vec2f p)
+    void append(Math::Vec2f p)
     {
         if (!_last.present())
         {
@@ -122,8 +123,8 @@ public:
     {
         _has_min_max = false;
 
-        _min = Vec2f::zero();
-        _max = Vec2f::zero();
+        _min = Math::Vec2f::zero();
+        _max = Math::Vec2f::zero();
 
         _last.clear();
         _edges.clear();

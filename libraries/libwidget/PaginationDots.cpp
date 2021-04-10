@@ -34,7 +34,7 @@ void PaginationDots::paint(Graphic::Painter &painter, const Recti &)
     }
 }
 
-Vec2i PaginationDots::size()
+Math::Vec2i PaginationDots::size()
 {
     return {DOTSIZE * _count + DOTSPACING * (_count - 1), DOTSIZE};
 }

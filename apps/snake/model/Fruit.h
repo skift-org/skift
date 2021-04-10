@@ -7,7 +7,7 @@ namespace Snake
 
 struct Fruit
 {
-    Vec2i position;
+    Math::Vec2i position;
 };
 
 } // namespace Snake

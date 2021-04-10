@@ -32,7 +32,7 @@ Recti Rasterizer::get_clip()
     return c;
 }
 
-void Rasterizer::flatten(const Path &path, const Mat3x2f &transform)
+void Rasterizer::flatten(const Path &path, const Math::Mat3x2f &transform)
 {
     for (auto &subpath : path.subpaths())
     {
@@ -105,7 +105,7 @@ void Rasterizer::rasterize(Paint &paint)
 
         for (int i = bound.left(); i < bound.right(); i++)
         {
-            Vec2f p = {
+            Math::Vec2f p = {
                 (i - _edges.bound().left()) / (float)_edges.bound().width(),
                 (y - _edges.bound().top()) / (float)_edges.bound().height(),
             };
@@ -121,7 +121,7 @@ void Rasterizer::rasterize(Paint &paint)
     }
 }
 
-void FLATTEN Rasterizer::fill(Path &path, const Mat3x2f &transform, Paint paint)
+void FLATTEN Rasterizer::fill(Path &path, const Math::Mat3x2f &transform, Paint paint)
 {
     clear();
     flatten(path, transform);

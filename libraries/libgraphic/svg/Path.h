@@ -18,7 +18,7 @@ private:
 
     SubPath &current()
     {
-        if (_subpath_ended)
+        if (_subpaths.count() == 0)
         {
             begin_subpath();
         }
@@ -37,11 +37,7 @@ private:
     }
 
 public:
-    static Path parse(const char *str)
-    {
-        StringScanner scan{str, strlen(str)};
-        return parse(scan);
-    }
+    static Path parse(const char *str);
 
     static Path parse(Scanner &scan);
 
@@ -54,7 +50,7 @@ public:
     {
     }
 
-    void begin_subpath(Vec2f point = Vec2f::zero())
+    void begin_subpath(Math::Vec2f point = Math::Vec2f::zero())
     {
         if (!_subpath_ended)
         {
@@ -66,7 +62,7 @@ public:
         _subpath_ended = false;
     }
 
-    void begin_subpath_relative(Vec2f point = Vec2f::zero())
+    void begin_subpath_relative(Math::Vec2f point = Math::Vec2f::zero())
     {
         if (_subpaths.count() > 0)
         {
@@ -76,16 +72,6 @@ public:
         {
             begin_subpath(point);
         }
-    }
-
-    void reset_subpath()
-    {
-        current().reset();
-    }
-
-    void reset_subpath(Vec2f start)
-    {
-        current().reset(start);
     }
 
     void end_subpath()
@@ -99,22 +85,22 @@ public:
         _subpath_ended = true;
     }
 
-    void move_to(Vec2f point)
+    void move_to(Math::Vec2f point)
     {
         current().move_to(point);
     }
 
-    void move_to_relative(Vec2f point)
+    void move_to_relative(Math::Vec2f point)
     {
         current().move_to_relative(point);
     }
 
-    void line_to(Vec2f point)
+    void line_to(Math::Vec2f point)
     {
         current_or_begin().line_to(point);
     }
 
-    void line_to_relative(Vec2f point)
+    void line_to_relative(Math::Vec2f point)
     {
         current_or_begin().line_to_relative(point);
     }
@@ -139,52 +125,52 @@ public:
         current_or_begin().hline_to_relative(x);
     }
 
-    void cubic_bezier_to(Vec2f control_point1, Vec2f control_point2, Vec2f point)
+    void cubic_bezier_to(Math::Vec2f control_point1, Math::Vec2f control_point2, Math::Vec2f point)
     {
         current_or_begin().cubic_bezier_to(control_point1, control_point2, point);
     }
 
-    void cubic_bezier_to_relative(Vec2f control_point1, Vec2f control_point2, Vec2f point)
+    void cubic_bezier_to_relative(Math::Vec2f control_point1, Math::Vec2f control_point2, Math::Vec2f point)
     {
         current_or_begin().cubic_bezier_to_relative(control_point1, control_point2, point);
     }
 
-    void smooth_cubic_bezier_to(Vec2f control_point, Vec2f point)
+    void smooth_cubic_bezier_to(Math::Vec2f control_point, Math::Vec2f point)
     {
         current_or_begin().smooth_cubic_bezier_to(control_point, point);
     }
 
-    void smooth_cubic_bezier_to_relative(Vec2f control_point, Vec2f point)
+    void smooth_cubic_bezier_to_relative(Math::Vec2f control_point, Math::Vec2f point)
     {
         current_or_begin().smooth_cubic_bezier_to_relative(control_point, point);
     }
 
-    void quad_bezier_to(Vec2f control_point, Vec2f point)
+    void quad_bezier_to(Math::Vec2f control_point, Math::Vec2f point)
     {
         current_or_begin().quad_bezier_to(control_point, point);
     }
 
-    void quad_bezier_to_relative(Vec2f control_point, Vec2f point)
+    void quad_bezier_to_relative(Math::Vec2f control_point, Math::Vec2f point)
     {
         current_or_begin().quad_bezier_to_relative(control_point, point);
     }
 
-    void smooth_quad_bezier_to(Vec2f point)
+    void smooth_quad_bezier_to(Math::Vec2f point)
     {
         current_or_begin().smooth_quad_bezier_to(point);
     }
 
-    void smooth_quad_bezier_to_relative(Vec2f point)
+    void smooth_quad_bezier_to_relative(Math::Vec2f point)
     {
         current_or_begin().smooth_quad_bezier_to_relative(point);
     }
 
-    void arc_to(float rx, float ry, float angle, int flags, Vec2f point)
+    void arc_to(float rx, float ry, float angle, int flags, Math::Vec2f point)
     {
         current_or_begin().arc_to(rx, ry, angle, flags, point);
     }
 
-    void arc_to_relative(float rx, float ry, float angle, int flags, Vec2f point)
+    void arc_to_relative(float rx, float ry, float angle, int flags, Math::Vec2f point)
     {
         current_or_begin().arc_to_relative(rx, ry, angle, flags, point);
     }

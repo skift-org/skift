@@ -49,7 +49,7 @@ Framebuffer::~Framebuffer()
     __plug_handle_close(&_handle);
 }
 
-Result Framebuffer::set_resolution(Vec2i size)
+Result Framebuffer::set_resolution(Math::Vec2i size)
 {
     auto bitmap = TRY(Bitmap::create_shared(size.x(), size.y()));
 

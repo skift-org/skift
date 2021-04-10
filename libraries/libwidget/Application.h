@@ -16,11 +16,11 @@ void hide_window(Window *window);
 
 void flip_window(Window *window, Recti bound);
 
-void move_window(Window *window, Vec2i position);
+void move_window(Window *window, Math::Vec2i position);
 
 void window_change_cursor(Window *window, CursorState state);
 
-Vec2i mouse_position();
+Math::Vec2i mouse_position();
 
 /* --- Client --------------------------------------------------------------- */
 

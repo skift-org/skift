@@ -2,9 +2,9 @@
 
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Color.h>
+#include <libmath/Mat3x2.h>
 #include <libsystem/Logger.h>
 #include <libutils/Array.h>
-#include <libmath/Mat3x2.h>
 #include <libutils/Variant.h>
 
 namespace Graphic
@@ -25,20 +25,20 @@ struct Fill
 
 struct Gradient
 {
-    Optional<Mat3x2f> transfom;
+    Optional<Math::Mat3x2f> transfom;
     Array<GradientStop, MAX_GRADIENT_STOPS> stops;
     size_t count;
 };
 
 struct Texture
 {
-    Optional<Mat3x2f> transfom;
+    Optional<Math::Mat3x2f> transfom;
     RefPtr<Bitmap> bitmap;
 };
 
 using Paint = Utils::Variant<Fill, Gradient, Texture>;
 
-static inline ALWAYS_INLINE Color sample(Paint &paint, Vec2f p)
+static inline ALWAYS_INLINE Color sample(Paint &paint, Math::Vec2f p)
 {
     Color result = Colors::CYAN;
 

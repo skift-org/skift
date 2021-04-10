@@ -134,7 +134,7 @@ int run_all_testes()
     IO::errln("");
     IO::errln("test: Took \e[1m{}ms\e[m", end_tick - start_tick);
     IO::errln("test: Passed \e[1;32m{}\e[m", passed);
-    IO::errln("test: Failled \e[1;31m{}\e[m", failed);
+    IO::errln("test: Failed \e[1;31m{}\e[m", failed);
 
     if ((size_t)failed == _tests->count())
     {

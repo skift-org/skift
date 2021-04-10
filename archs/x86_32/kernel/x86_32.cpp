@@ -42,6 +42,8 @@ void arch_load_context(Task *task)
 
 void arch_task_go(Task *task)
 {
+    fpu_init_context(task);
+
     if (task->_flags & TASK_USER)
     {
         UserInterruptStackFrame stackframe = {};

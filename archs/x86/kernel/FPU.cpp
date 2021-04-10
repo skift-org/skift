@@ -2,6 +2,9 @@
 
 #include "archs/x86/kernel/FPU.h"
 
+char fpu_initial_context[512] ALIGNED(16);
+char fpu_registers[512] ALIGNED(16);
+
 void fpu_initialize()
 {
     asm volatile("clts");
@@ -10,6 +13,7 @@ void fpu_initialize()
                  : "=r"(t));
     t &= ~(1 << 2);
     t |= (1 << 1);
+    t |= (1 << 5);
     asm volatile("mov %0, %%cr0" ::"r"(t));
 
     asm volatile("mov %%cr4, %0"
@@ -19,9 +23,13 @@ void fpu_initialize()
 
     // Initialize the FPU
     asm volatile("fninit");
+    asm volatile("fxsave (%0)" ::"r"(fpu_initial_context));
 }
 
-char fpu_registers[512] ALIGNED(16);
+void fpu_init_context(Task *task)
+{
+    memcpy(&task->fpu_registers, &fpu_initial_context, 512);
+}
 
 void fpu_save_context(Task *task)
 {

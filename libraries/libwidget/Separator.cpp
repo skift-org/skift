@@ -8,7 +8,7 @@ Separator::Separator(Component *parent) : Component(parent)
 {
 }
 
-void Separator::paint(Graphic::Painter &painter, const Recti &dirty)
+void Separator::paint(Graphic::Painter &painter, const Math::Recti &dirty)
 {
     painter.fill_rectangle(dirty, color(THEME_BORDER));
 }

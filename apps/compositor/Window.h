@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
+#include <libmath/Rect.h>
 #include <libutils/Assert.h>
-#include <libutils/Rect.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
 
@@ -18,7 +18,7 @@ private:
     WindowType _type;
 
     struct Client *_client;
-    Recti _bound;
+    Math::Recti _bound;
     Widget::CursorState _cursor_state{};
 
     RefPtr<Graphic::Bitmap> _frontbuffer;
@@ -46,19 +46,19 @@ public:
         WindowFlag flags,
         WindowType type,
         struct Client *client,
-        Recti bound,
+        Math::Recti bound,
         RefPtr<Graphic::Bitmap> frontbuffer,
         RefPtr<Graphic::Bitmap> backbuffer);
 
     ~Window();
 
-    Recti bound();
+    Math::Recti bound();
 
-    Recti cursor_capture_bound();
+    Math::Recti cursor_capture_bound();
 
     void move(Math::Vec2i new_position);
 
-    void resize(Recti new_bound);
+    void resize(Math::Recti new_bound);
 
     void send_event(Widget::Event event);
 
@@ -74,5 +74,5 @@ public:
 
     void lost_focus();
 
-    void flip_buffers(int frontbuffer_handle, Math::Vec2i frontbuffer_size, int backbuffer_handle, Math::Vec2i backbuffer_size, Recti region);
+    void flip_buffers(int frontbuffer_handle, Math::Vec2i frontbuffer_size, int backbuffer_handle, Math::Vec2i backbuffer_size, Math::Recti region);
 };

@@ -15,14 +15,14 @@ void Rasterizer::clear()
     _edges.clear();
 }
 
-void Rasterizer::set_clip(Recti c)
+void Rasterizer::set_clip(Math::Recti c)
 {
     _clip = c;
 }
 
-Recti Rasterizer::get_clip()
+Math::Recti Rasterizer::get_clip()
 {
-    Recti c = _bitmap->bound().clipped_with(_edges.bound());
+    Math::Recti c = _bitmap->bound().clipped_with(_edges.bound());
 
     if (_clip.present())
     {

@@ -17,7 +17,7 @@ Label::Label(Component *parent, String text, Anchor anchor)
     _anchor = anchor;
 }
 
-void Label::paint(Graphic::Painter &painter, const Recti &)
+void Label::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     painter.draw_string_within(
         *font(),

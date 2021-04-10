@@ -23,14 +23,14 @@ void Window::toggle_maximise()
     {
         _is_maximised = true;
         _previous_bound = _bound;
-        Recti new_size = Screen::bound();
-        new_size = Recti(0, 38, new_size.width(), new_size.height() - 38);
+        Math::Recti new_size = Screen::bound();
+        new_size = Math::Recti(0, 38, new_size.width(), new_size.height() - 38);
 
         bound(new_size);
     }
 }
 
-void Window::bound(Recti new_bound)
+void Window::bound(Math::Recti new_bound)
 {
     auto have_same_size = _bound.size() == new_bound.size();
     auto have_same_position = _bound.position() == new_bound.position();
@@ -100,7 +100,7 @@ Window::~Window()
     delete _root;
 }
 
-void Window::repaint(Graphic::Painter &painter, Recti rectangle)
+void Window::repaint(Graphic::Painter &painter, Math::Recti rectangle)
 {
     if (_flags & WINDOW_TRANSPARENT || _flags & WINDOW_ACRYLIC)
     {
@@ -136,10 +136,10 @@ void Window::repaint_dirty()
         relayout();
     }
 
-    Recti repaited_regions = Recti::empty();
+    Math::Recti repaited_regions = Math::Recti::empty();
     Graphic::Painter &painter = *backbuffer_painter;
 
-    _dirty_rects.foreach ([&](Recti &rect) {
+    _dirty_rects.foreach ([&](Math::Recti &rect) {
         repaint(painter, rect);
 
         if (repaited_regions.is_empty())
@@ -172,7 +172,7 @@ void Window::relayout()
     _dirty_layout = false;
 }
 
-void Window::should_repaint(Recti rectangle)
+void Window::should_repaint(Math::Recti rectangle)
 {
     if (!_visible)
     {
@@ -258,9 +258,9 @@ void Window::hide()
     Application::hide_window(this);
 }
 
-Border Window::resize_bound_containe(Math::Vec2i position)
+Math::Border Window::resize_bound_containe(Math::Vec2i position)
 {
-    Recti resize_bound = bound().expended(Insets(WINDOW_RESIZE_AREA));
+    Math::Recti resize_bound = bound().expended(Insets(WINDOW_RESIZE_AREA));
     return resize_bound.contains(Insets(WINDOW_RESIZE_AREA), position);
 }
 
@@ -268,19 +268,19 @@ void Window::begin_resize(Math::Vec2i mouse_position)
 {
     _is_resizing = true;
 
-    Border borders = resize_bound_containe(mouse_position);
+    Math::Border borders = resize_bound_containe(mouse_position);
 
-    _resize_horizontal = borders & (Border::LEFT | Border::RIGHT);
-    _resize_vertical = borders & (Border::TOP | Border::BOTTOM);
+    _resize_horizontal = borders & (Math::Border::LEFT | Math::Border::RIGHT);
+    _resize_vertical = borders & (Math::Border::TOP | Math::Border::BOTTOM);
 
     Math::Vec2i resize_region_begin = position();
 
-    if (borders & Border::TOP)
+    if (borders & Math::Border::TOP)
     {
         resize_region_begin += size().extract_y();
     }
 
-    if (borders & Border::LEFT)
+    if (borders & Math::Border::LEFT)
     {
         resize_region_begin += size().extract_x();
     }
@@ -290,7 +290,7 @@ void Window::begin_resize(Math::Vec2i mouse_position)
 
 void Window::do_resize(Math::Vec2i mouse_position)
 {
-    Recti new_bound = Recti::from_two_point(
+    Math::Recti new_bound = Math::Recti::from_two_point(
         _resize_begin,
         position() + mouse_position);
 
@@ -465,7 +465,7 @@ void Window::handle_window_closing(Event *)
 
 void Window::handle_mouse_move(Event *event)
 {
-    Border borders = resize_bound_containe(event->mouse.position);
+    Math::Border borders = resize_bound_containe(event->mouse.position);
 
     if (_is_resizing && !_is_maximised)
     {
@@ -473,27 +473,27 @@ void Window::handle_mouse_move(Event *event)
     }
     else if (!_mouse_focus && borders && (_flags & WINDOW_RESIZABLE) && !_is_maximised)
     {
-        if ((borders & Border::TOP) && (borders & Border::LEFT))
+        if ((borders & Math::Border::TOP) && (borders & Math::Border::LEFT))
         {
             cursor(CURSOR_RESIZEHV);
         }
-        else if ((borders & Border::BOTTOM) && (borders & Border::RIGHT))
+        else if ((borders & Math::Border::BOTTOM) && (borders & Math::Border::RIGHT))
         {
             cursor(CURSOR_RESIZEHV);
         }
-        else if ((borders & Border::TOP) && (borders & Border::RIGHT))
+        else if ((borders & Math::Border::TOP) && (borders & Math::Border::RIGHT))
         {
             cursor(CURSOR_RESIZEVH);
         }
-        else if ((borders & Border::BOTTOM) && (borders & Border::LEFT))
+        else if ((borders & Math::Border::BOTTOM) && (borders & Math::Border::LEFT))
         {
             cursor(CURSOR_RESIZEVH);
         }
-        else if (borders & (Border::TOP | Border::BOTTOM))
+        else if (borders & (Math::Border::TOP | Math::Border::BOTTOM))
         {
             cursor(CURSOR_RESIZEV);
         }
-        else if (borders & (Border::LEFT | Border::RIGHT))
+        else if (borders & (Math::Border::LEFT | Math::Border::RIGHT))
         {
             cursor(CURSOR_RESIZEH);
         }

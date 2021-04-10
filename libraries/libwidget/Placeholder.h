@@ -14,7 +14,7 @@ private:
 public:
     Placeholder(Component *parent, String text);
 
-    void paint(Graphic::Painter &, const Recti &) override;
+    void paint(Graphic::Painter &, const Math::Recti &) override;
 };
 
 } // namespace Widget

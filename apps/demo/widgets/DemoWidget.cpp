@@ -21,7 +21,7 @@ DemoWidget::DemoWidget(Component *parent)
     _timer->start();
 }
 
-void DemoWidget::paint(Graphic::Painter &painter, const Recti &)
+void DemoWidget::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     if (_demo)
     {

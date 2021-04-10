@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libgraphic/Font.h>
+#include <libmath/Rect.h>
 #include <libsystem/utils/List.h>
-#include <libutils/Rect.h>
 
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
@@ -91,7 +91,7 @@ private:
     bool _enabled = true;
     int _flags = 0;
 
-    Recti _container;
+    Math::Recti _container;
 
     int _max_height = 0;
     int _max_width = 0;
@@ -198,7 +198,7 @@ public:
 
     virtual ~Component();
 
-    virtual void paint(Graphic::Painter &, const Recti &) {}
+    virtual void paint(Graphic::Painter &, const Math::Recti &) {}
 
     virtual void event(Event *) {}
 
@@ -236,9 +236,9 @@ public:
         should_relayout();
     }
 
-    Recti container() const { return _container; }
+    Math::Recti container() const { return _container; }
 
-    void container(Recti container) { _container = container; }
+    void container(Math::Recti container) { _container = container; }
 
     Math::Vec2i origin() const
     {
@@ -258,11 +258,11 @@ public:
         }
     }
 
-    Recti bound() const { return container().shrinked(_outsets).size(); }
+    Math::Recti bound() const { return container().shrinked(_outsets).size(); }
 
-    Recti content() const { return bound().shrinked(_insets); }
+    Math::Recti content() const { return bound().shrinked(_insets); }
 
-    Recti overflow() const { return bound().expended(_outsets); }
+    Math::Recti overflow() const { return bound().expended(_outsets); }
 
     Math::Vec2i scroll() { return _content_scroll; }
 
@@ -304,11 +304,11 @@ public:
 
     /* --- Paint ------------------------------------------------------------ */
 
-    void repaint(Graphic::Painter &painter, Recti rectangle);
+    void repaint(Graphic::Painter &painter, Math::Recti rectangle);
 
     void should_repaint();
 
-    void should_repaint(Recti rectangle);
+    void should_repaint(Math::Recti rectangle);
 
     /* --- Layout ----------------------------------------------------------- */
 

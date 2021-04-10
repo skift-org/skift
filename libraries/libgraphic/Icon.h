@@ -33,7 +33,7 @@ public:
 
     ~Icon();
 
-    Recti bound(IconSize size);
+    Math::Recti bound(IconSize size);
 
     RefPtr<Bitmap> bitmap(IconSize size);
 

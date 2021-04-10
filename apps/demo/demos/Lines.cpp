@@ -11,7 +11,7 @@ struct Line
 
 static Random _random = {};
 
-void lines_draw(Graphic::Painter &painter, Recti screen, float time)
+void lines_draw(Graphic::Painter &painter, Math::Recti screen, float time)
 {
     UNUSED(time);
 

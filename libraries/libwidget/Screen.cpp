@@ -3,14 +3,14 @@
 namespace Widget::Screen
 {
 
-static Recti _bound;
+static Math::Recti _bound;
 
-Recti bound()
+Math::Recti bound()
 {
     return _bound;
 }
 
-void bound(Recti bound)
+void bound(Math::Recti bound)
 {
     _bound = bound;
 }

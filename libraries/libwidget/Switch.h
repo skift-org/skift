@@ -38,11 +38,11 @@ public:
     {
     }
 
-    virtual void paint(Graphic::Painter &painter, const Recti &)
+    virtual void paint(Graphic::Painter &painter, const Math::Recti &)
     {
         auto c = _state ? color(THEME_ACCENT) : color(THEME_FOREGROUND_DISABLED);
 
-        auto control = Rect{WIDTH, HEIGHT}.centered_within(bound());
+        auto control = Math::Recti{WIDTH, HEIGHT}.centered_within(bound());
 
         painter.draw_rectangle_rounded(control, 99, 2, c);
 

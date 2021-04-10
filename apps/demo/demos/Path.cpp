@@ -24,7 +24,7 @@ void draw_path(Graphic::Painter &painter, const Graphic::Path &path, Math::Mat3x
     }
 }
 
-void path_draw(Graphic::Painter &painter, Recti, float)
+void path_draw(Graphic::Painter &painter, Math::Recti, float)
 {
     painter.clear(Graphic::Colors::BLACK);
 

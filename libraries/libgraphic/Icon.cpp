@@ -55,7 +55,7 @@ Icon::~Icon()
 {
 }
 
-Recti Icon::bound(IconSize size)
+Math::Recti Icon::bound(IconSize size)
 {
     return bitmap(size)->bound();
 }

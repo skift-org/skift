@@ -14,14 +14,14 @@ private:
 public:
     void tool(OwnPtr<PaintTool> tool) { _tool = tool; }
 
-    Recti paint_area()
+    Math::Recti paint_area()
     {
         return _document->bound().centered_within(bound());
     }
 
     PaintCanvas(Widget::Component *parent, RefPtr<PaintDocument> document);
 
-    void paint(Graphic::Painter &painter, const Recti &dirty) override;
+    void paint(Graphic::Painter &painter, const Math::Recti &dirty) override;
 
     void event(Widget::Event *event) override;
 };

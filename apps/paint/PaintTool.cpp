@@ -30,7 +30,7 @@ void BrushTool::event(PaintDocument &document, Widget::Event &event, Graphic::Co
         if (event.mouse.buttons & (MOUSE_BUTTON_LEFT | MOUSE_BUTTON_RIGHT))
         {
             bresenham(event.mouse.old_position, event.mouse.position, 32, [&](auto vec1, auto vec2) {
-                document.painter().fill_rectangle(Recti(vec1, vec2), color);
+                document.painter().fill_rectangle(Math::Recti(vec1, vec2), color);
             });
             document.dirty(true);
         }
@@ -44,14 +44,14 @@ void EraserTool::event(PaintDocument &document, Widget::Event &event, Graphic::C
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
             bresenham(event.mouse.old_position, event.mouse.position, 32, [&](auto vec1, auto vec2) {
-                document.painter().clear(Recti(vec1, vec2), Graphic::Colors::BLACKTRANSPARENT);
+                document.painter().clear(Math::Recti(vec1, vec2), Graphic::Colors::BLACKTRANSPARENT);
             });
             document.dirty(true);
         }
         else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
         {
             bresenham(event.mouse.old_position, event.mouse.position, 32, [&](auto vec1, auto vec2) {
-                document.painter().clear(Recti(vec1, vec2), color);
+                document.painter().clear(Math::Recti(vec1, vec2), color);
             });
             document.dirty(true);
         }

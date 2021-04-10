@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libmath/Mat3x2.h>
+#include <libmath/Rect.h>
 #include <libutils/Edge.h>
-#include <libutils/Rect.h>
 #include <libutils/Vector.h>
 
 namespace Graphic
@@ -61,9 +61,9 @@ private:
     }
 
 public:
-    Recti bound() const
+    Math::Recti bound() const
     {
-        return Recti::from_two_point(_min, _max + Math::Vec2i{1});
+        return Math::Recti::from_two_point(_min, _max + Math::Vec2i{1});
     }
 
     const Vector<Edgef> &edges()

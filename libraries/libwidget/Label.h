@@ -24,7 +24,7 @@ public:
 
     Label(Component *parent, String text, Anchor anchor);
 
-    void paint(Graphic::Painter &, const Recti &) override;
+    void paint(Graphic::Painter &, const Math::Recti &) override;
 
     Math::Vec2i size() override;
 };

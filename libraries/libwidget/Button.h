@@ -33,7 +33,7 @@ public:
 
     Button(Component *parent, Style style, RefPtr<Graphic::Bitmap> image, String text);
 
-    void paint(Graphic::Painter &painter, const Recti &rectangle) override;
+    void paint(Graphic::Painter &painter, const Math::Recti &rectangle) override;
 
     void event(Event *event) override;
 };

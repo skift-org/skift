@@ -9,7 +9,7 @@ Panel::Panel(Component *parent)
 {
 }
 
-void Panel::paint(Graphic::Painter &painter, const Recti &)
+void Panel::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     if (_border_radius > 0)
     {

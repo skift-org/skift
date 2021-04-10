@@ -42,7 +42,7 @@ Graphic::Color color(Terminal::Color terminal_color)
 
 static Math::Vec2i _cell_size = Math::Vec2i(7, 16);
 
-Recti cell_bound(int x, int y)
+Math::Recti cell_bound(int x, int y)
 {
     return {
         Math::Vec2i(x, y) * _cell_size,
@@ -64,7 +64,7 @@ void render_cell(
     Terminal::Color background,
     Terminal::Attributes attributes)
 {
-    Recti bound = cell_bound(x, y);
+    Math::Recti bound = cell_bound(x, y);
 
     if (attributes.invert)
     {

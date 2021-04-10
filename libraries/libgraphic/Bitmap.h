@@ -1,7 +1,7 @@
 #pragma once
 
+#include <libmath/Rect.h>
 #include <libsystem/Result.h>
-#include <libutils/Rect.h>
 #include <libutils/RefPtr.h>
 #include <libutils/ResultOr.h>
 #include <libutils/String.h>
@@ -63,7 +63,7 @@ public:
     int width() const { return _width; }
     int height() const { return _height; }
     Math::Vec2i size() const { return Math::Vec2i(_width, _height); }
-    Recti bound() const { return Recti(_width, _height); }
+    Math::Recti bound() const { return Math::Recti(_width, _height); }
 
     void filtering(BitmapFiltering filtering) { _filtering = filtering; }
 
@@ -121,7 +121,7 @@ public:
         return sample(bound(), position);
     }
 
-    FLATTEN Color sample(Recti source, Math::Vec2f position)
+    FLATTEN Color sample(Math::Recti source, Math::Vec2f position)
     {
         Math::Vec2i sample_position = source.position() + (source.size() * position);
 
@@ -141,7 +141,7 @@ public:
         return Color::blerp(c00, c10, c01, c11, xx - (int)xx, yy - (int)yy);
     }
 
-    FLATTEN void copy_from(Bitmap &source, Recti region)
+    FLATTEN void copy_from(Bitmap &source, Math::Recti region)
     {
         region = region.clipped_with(source.bound());
         region = region.clipped_with(bound());

@@ -7,7 +7,7 @@
 namespace Widget
 {
 
-void Button::paint(Graphic::Painter &painter, const Recti &rectangle)
+void Button::paint(Graphic::Painter &painter, const Math::Recti &rectangle)
 {
     UNUSED(rectangle);
 

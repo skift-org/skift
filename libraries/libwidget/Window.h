@@ -23,7 +23,7 @@ private:
 
     String _title = "Window";
     RefPtr<Graphic::Icon> _icon;
-    Recti _bound{250, 250};
+    Math::Recti _bound{250, 250};
     WindowFlag _flags;
     WindowType _type = WINDOW_TYPE_REGULAR;
 
@@ -39,7 +39,7 @@ private:
     bool _resize_horizontal = false;
 
     Math::Vec2i _resize_begin;
-    Recti _previous_bound;
+    Math::Recti _previous_bound;
 
     CursorState cursor_state = CURSOR_DEFAULT;
 
@@ -49,7 +49,7 @@ private:
     RefPtr<Graphic::Bitmap> backbuffer;
     OwnPtr<Graphic::Painter> backbuffer_painter;
 
-    Vector<Recti> _dirty_rects{};
+    Vector<Math::Recti> _dirty_rects{};
     bool _dirty_layout;
 
     EventHandler _handlers[EventType::__COUNT];
@@ -135,15 +135,15 @@ public:
 
     void resize_to_content();
 
-    Recti bound() { return _bound.moved({0, 0}); }
+    Math::Recti bound() { return _bound.moved({0, 0}); }
 
-    void bound(Recti bound);
+    void bound(Math::Recti bound);
 
-    Recti bound_on_screen() { return _bound; }
+    Math::Recti bound_on_screen() { return _bound; }
 
     void change_framebuffer_if_needed();
 
-    Border resize_bound_containe(Math::Vec2i position);
+    Math::Border resize_bound_containe(Math::Vec2i position);
 
     void begin_resize(Math::Vec2i mouse_position);
 
@@ -189,11 +189,11 @@ public:
 
     /* --- Render ----------------------------------------------------------- */
 
-    virtual void repaint(Graphic::Painter &painter, Recti rectangle);
+    virtual void repaint(Graphic::Painter &painter, Math::Recti rectangle);
 
     void repaint_dirty();
 
-    void should_repaint(Recti rectangle);
+    void should_repaint(Math::Recti rectangle);
 
     /* --- Events ----------------------------------------------------------- */
 

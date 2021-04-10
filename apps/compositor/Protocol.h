@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Rect.h>
+#include <libmath/Rect.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
 
@@ -47,7 +47,7 @@ enum WindowType
 
 struct CompositorGreetings
 {
-    Recti screen_bound;
+    Math::Recti screen_bound;
 };
 
 struct CompositorEvent
@@ -66,7 +66,7 @@ struct CompositorCreateWindow
     int backbuffer;
     Math::Vec2i backbuffer_size;
 
-    Recti bound;
+    Math::Recti bound;
 };
 
 struct CompositorDestroyWindow
@@ -90,8 +90,8 @@ struct CompositorFlipWindow
     int backbuffer;
     Math::Vec2i backbuffer_size;
 
-    Recti dirty;
-    Recti bound;
+    Math::Recti dirty;
+    Math::Recti bound;
 };
 
 struct CompositorEventWindow
@@ -116,7 +116,7 @@ struct CompositorSetResolution
 
 struct CompositorChangedResolution
 {
-    Recti resolution;
+    Math::Recti resolution;
 };
 
 struct CompositorMousePosition

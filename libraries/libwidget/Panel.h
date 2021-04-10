@@ -15,7 +15,7 @@ public:
 
     Panel(Component *parent);
 
-    void paint(Graphic::Painter &painter, const Recti &) override;
+    void paint(Graphic::Painter &painter, const Math::Recti &) override;
 };
 
 } // namespace Widget

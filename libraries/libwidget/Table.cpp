@@ -7,22 +7,22 @@
 namespace Widget
 {
 
-Recti Table::header_bound() const
+Math::Recti Table::header_bound() const
 {
     return bound().take_top(TABLE_ROW_HEIGHT);
 }
 
-Recti Table::list_bound() const
+Math::Recti Table::list_bound() const
 {
     return bound().shrinked(Insetsi(TABLE_ROW_HEIGHT, 0, 0));
 }
 
-Recti Table::scrollbar_bound() const
+Math::Recti Table::scrollbar_bound() const
 {
     return list_bound().take_right(16);
 }
 
-Recti Table::row_bound(int row) const
+Math::Recti Table::row_bound(int row) const
 {
     return {
         list_bound().x(),
@@ -32,7 +32,7 @@ Recti Table::row_bound(int row) const
     };
 }
 
-Recti Table::column_bound(int column) const
+Math::Recti Table::column_bound(int column) const
 {
     int column_count = _model->columns();
     int column_width = list_bound().width() / column_count;
@@ -45,7 +45,7 @@ Recti Table::column_bound(int column) const
     };
 }
 
-Recti Table::cell_bound(int row, int column) const
+Math::Recti Table::cell_bound(int row, int column) const
 {
     return {
         row_bound(row).x() + column * column_bound(column).width(),
@@ -76,7 +76,7 @@ int Table::row_at(Math::Vec2i position) const
 
 void Table::paint_cell(Graphic::Painter &painter, int row, int column)
 {
-    Recti bound = cell_bound(row, column);
+    Math::Recti bound = cell_bound(row, column);
     Variant data = _model->data(row, column);
 
     painter.push();
@@ -87,7 +87,7 @@ void Table::paint_cell(Graphic::Painter &painter, int row, int column)
         painter.blit(
             *data.icon(),
             Graphic::ICON_18PX,
-            Recti(bound.x() + 7, bound.y() + 7, 18, 18),
+            Math::Recti(bound.x() + 7, bound.y() + 7, 18, 18),
             color(THEME_FOREGROUND));
 
         painter.draw_string(
@@ -125,7 +125,7 @@ Table::Table(Component *parent, RefPtr<TableModel> model)
     this->model(model);
 }
 
-void Table::paint(Graphic::Painter &painter, const Recti &)
+void Table::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     if (!_model)
     {
@@ -168,7 +168,7 @@ void Table::paint(Graphic::Painter &painter, const Recti &)
 
     for (int column = 0; column < column_count; column++)
     {
-        Recti header_bound_cell{
+        Math::Recti header_bound_cell{
             header_bound().x() + column * column_width,
             header_bound().y(),
             column_width,

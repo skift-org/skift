@@ -20,7 +20,7 @@ public:
 
     void scaling(Graphic::BitmapScaling scaling);
 
-    void paint(Graphic::Painter &, const Recti &) override;
+    void paint(Graphic::Painter &, const Math::Recti &) override;
 
     virtual Math::Vec2i size() override;
 };

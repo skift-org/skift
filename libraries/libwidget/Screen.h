@@ -1,12 +1,12 @@
 #pragma once
 
-#include <libutils/Rect.h>
+#include <libmath/Rect.h>
 
 namespace Widget::Screen
 {
 
-Recti bound();
+Math::Recti bound();
 
-void bound(Recti);
+void bound(Math::Recti);
 
 } // namespace Widget::Screen

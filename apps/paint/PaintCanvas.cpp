@@ -8,7 +8,7 @@ PaintCanvas::PaintCanvas(Component *parent, RefPtr<PaintDocument> document)
 {
 }
 
-void PaintCanvas::paint(Graphic::Painter &painter, const Recti &)
+void PaintCanvas::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     auto paint_area = _document->bound().centered_within(bound());
 

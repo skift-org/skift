@@ -11,7 +11,7 @@ Window::Window(
     WindowFlag flags,
     WindowType type,
     struct Client *client,
-    Recti bound,
+    Math::Recti bound,
     RefPtr<Graphic::Bitmap> frontbuffer,
     RefPtr<Graphic::Bitmap> backbuffer)
     : _id(id),
@@ -30,12 +30,12 @@ Window::~Window()
     manager_unregister_window(this);
 }
 
-Recti Window::bound()
+Math::Recti Window::bound()
 {
     return _bound;
 }
 
-Recti Window::cursor_capture_bound()
+Math::Recti Window::cursor_capture_bound()
 {
     if (_flags & WINDOW_RESIZABLE)
     {
@@ -56,7 +56,7 @@ void Window::move(Math::Vec2i new_position)
     renderer_region_dirty(bound());
 }
 
-void Window::resize(Recti new_bound)
+void Window::resize(Math::Recti new_bound)
 {
 
     if (_bound != new_bound)
@@ -216,7 +216,7 @@ void Window::lost_focus()
     send_event(event);
 }
 
-void Window::flip_buffers(int frontbuffer_handle, Math::Vec2i frontbuffer_size, int backbuffer_handle, Math::Vec2i backbuffer_size, Recti region)
+void Window::flip_buffers(int frontbuffer_handle, Math::Vec2i frontbuffer_size, int backbuffer_handle, Math::Vec2i backbuffer_size, Math::Recti region)
 {
     swap(_frontbuffer, _backbuffer);
 

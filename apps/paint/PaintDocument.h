@@ -17,7 +17,7 @@ private:
 public:
     Callback<void()> on_color_change;
 
-    Recti bound() { return _bitmap->bound(); }
+    Math::Recti bound() { return _bitmap->bound(); }
     Graphic::Bitmap &bitmap() { return *_bitmap; }
     Graphic::Painter &painter() { return _painter; }
 

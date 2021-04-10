@@ -36,10 +36,10 @@ void Painter::pop()
     _state_stack_top--;
 }
 
-void Painter::clip(Recti rectangle)
+void Painter::clip(Math::Recti rectangle)
 {
-    Recti transformed_rectangle = rectangle.offset(origin());
-    Recti clipped_rectangle = transformed_rectangle.clipped_with(clip());
+    Math::Recti transformed_rectangle = rectangle.offset(origin());
+    Math::Recti clipped_rectangle = transformed_rectangle.clipped_with(clip());
 
     _state_stack[_state_stack_top].clip = clipped_rectangle;
 }
@@ -49,7 +49,7 @@ void Painter::transform(Math::Vec2i offset)
     _state_stack[_state_stack_top].origin += offset;
 }
 
-Recti Painter::apply_clip(Recti rectangle)
+Math::Recti Painter::apply_clip(Math::Recti rectangle)
 {
     if (rectangle.colide_with(clip()))
     {
@@ -60,36 +60,36 @@ Recti Painter::apply_clip(Recti rectangle)
     }
     else
     {
-        return Recti::empty();
+        return Math::Recti::empty();
     }
 }
 
-Recti Painter::apply_transform(Recti rectangle)
+Math::Recti Painter::apply_transform(Math::Recti rectangle)
 {
     return rectangle.offset(_state_stack[_state_stack_top].origin);
 }
 
-Recti Painter::apply(Recti rectangle)
+Math::Recti Painter::apply(Math::Recti rectangle)
 {
-    Recti result = apply_transform(rectangle);
+    Math::Recti result = apply_transform(rectangle);
     result = apply_clip(result);
 
     return result;
 }
 
-SourceDestionation Painter::apply(Recti source, Recti destination)
+SourceDestionation Painter::apply(Math::Recti source, Math::Recti destination)
 {
     if (destination.is_empty())
     {
-        return {Recti::empty(), Recti::empty()};
+        return {Math::Recti::empty(), Math::Recti::empty()};
     }
 
-    Recti transformed_destination = apply_transform(destination);
-    Recti clipped_destination = apply_clip(transformed_destination);
+    Math::Recti transformed_destination = apply_transform(destination);
+    Math::Recti clipped_destination = apply_clip(transformed_destination);
 
     if (clipped_destination.is_empty())
     {
-        return {Recti::empty(), Recti::empty()};
+        return {Math::Recti::empty(), Math::Recti::empty()};
     }
 
     double scalex = clipped_destination.width() / (double)destination.width();
@@ -98,7 +98,7 @@ SourceDestionation Painter::apply(Recti source, Recti destination)
     double other_scalex = source.width() / (double)destination.width();
     double other_scaley = source.height() / (double)destination.height();
 
-    Recti clipped_source = source.scaled(scalex, scaley);
+    Math::Recti clipped_source = source.scaled(scalex, scaley);
     clipped_source = clipped_source.offset((clipped_destination.position() - transformed_destination.position()) * Math::Vec2d{other_scalex, other_scaley});
 
     return {clipped_source, clipped_destination};
@@ -116,7 +116,7 @@ void Painter::plot(Math::Vec2i position, Color color)
     }
 }
 
-void Painter::blit_fast(Bitmap &bitmap, Recti source, Recti destination)
+void Painter::blit_fast(Bitmap &bitmap, Math::Recti source, Math::Recti destination)
 {
     auto result = apply(source, destination);
 
@@ -137,7 +137,7 @@ void Painter::blit_fast(Bitmap &bitmap, Recti source, Recti destination)
     }
 }
 
-void Painter::blit_scaled(Bitmap &bitmap, Recti source, Recti destination)
+void Painter::blit_scaled(Bitmap &bitmap, Math::Recti source, Math::Recti destination)
 {
     auto result = apply(source, destination);
 
@@ -159,7 +159,7 @@ void Painter::blit_scaled(Bitmap &bitmap, Recti source, Recti destination)
     }
 }
 
-FLATTEN void Painter::blit(Bitmap &bitmap, Recti source, Recti destination)
+FLATTEN void Painter::blit(Bitmap &bitmap, Math::Recti source, Math::Recti destination)
 {
     if (source.width() == destination.width() &&
         source.height() == destination.height())
@@ -172,7 +172,7 @@ FLATTEN void Painter::blit(Bitmap &bitmap, Recti source, Recti destination)
     }
 }
 
-void Painter::blit(Bitmap &bitmap, BitmapScaling scaling, Recti destionation)
+void Painter::blit(Bitmap &bitmap, BitmapScaling scaling, Math::Recti destionation)
 {
     if (scaling == BitmapScaling::COVER)
     {
@@ -201,7 +201,7 @@ FLATTEN void Painter::clear(Color color)
     clear(_bitmap->bound(), color);
 }
 
-FLATTEN void Painter::clear(Recti rectangle, Color color)
+FLATTEN void Painter::clear(Math::Recti rectangle, Color color)
 {
     rectangle = apply(rectangle);
 
@@ -219,7 +219,7 @@ FLATTEN void Painter::clear(Recti rectangle, Color color)
     }
 }
 
-FLATTEN void Painter::fill_rectangle(Recti rectangle, Color color)
+FLATTEN void Painter::fill_rectangle(Math::Recti rectangle, Color color)
 {
     rectangle = apply(rectangle);
 
@@ -237,13 +237,13 @@ FLATTEN void Painter::fill_rectangle(Recti rectangle, Color color)
     }
 }
 
-FLATTEN void Painter::fill_insets(Recti rectangle, Insetsi insets, Color color)
+FLATTEN void Painter::fill_insets(Math::Recti rectangle, Insetsi insets, Color color)
 {
-    Recti left_ear = rectangle.take_left(insets.left());
-    Recti right_ear = rectangle.take_right(insets.right());
+    Math::Recti left_ear = rectangle.take_left(insets.left());
+    Math::Recti right_ear = rectangle.take_right(insets.right());
 
-    Recti top = rectangle.cutoff_left_and_right(insets.left(), insets.right()).take_top(insets.top());
-    Recti bottom = rectangle.cutoff_left_and_right(insets.left(), insets.right()).take_bottom(insets.bottom());
+    Math::Recti top = rectangle.cutoff_left_and_right(insets.left(), insets.right()).take_top(insets.top());
+    Math::Recti bottom = rectangle.cutoff_left_and_right(insets.left(), insets.right()).take_bottom(insets.bottom());
 
     fill_rectangle(left_ear, color);
     fill_rectangle(right_ear, color);
@@ -251,7 +251,7 @@ FLATTEN void Painter::fill_insets(Recti rectangle, Insetsi insets, Color color)
     fill_rectangle(bottom, color);
 }
 
-static void fill_circle_helper(Painter &painter, Recti bound, Math::Vec2i center, int radius, Color color)
+static void fill_circle_helper(Painter &painter, Math::Recti bound, Math::Vec2i center, int radius, Color color)
 {
     auto circle_distance = [](Math::Vec2i center, float radius, Math::Vec2i position) {
         float distance = center.distance_to(position) - radius;
@@ -272,7 +272,7 @@ static void fill_circle_helper(Painter &painter, Recti bound, Math::Vec2i center
     }
 }
 
-static void blit_circle_helper(Painter &painter, Bitmap &bitmap, Recti source, Recti destination, Math::Vec2i center, int radius)
+static void blit_circle_helper(Painter &painter, Bitmap &bitmap, Math::Recti source, Math::Recti destination, Math::Vec2i center, int radius)
 {
     if (!painter.clip().colide_with(destination))
     {
@@ -303,16 +303,16 @@ static void blit_circle_helper(Painter &painter, Bitmap &bitmap, Recti source, R
     }
 }
 
-FLATTEN void Painter::blit_rounded(Bitmap &bitmap, Recti source, Recti destination, int radius)
+FLATTEN void Painter::blit_rounded(Bitmap &bitmap, Math::Recti source, Math::Recti destination, int radius)
 {
     radius = MIN(radius, destination.height() / 2);
     radius = MIN(radius, destination.width() / 2);
 
-    Recti left_ear_source = source.take_left(radius);
-    Recti right_ear_source = source.take_right(radius);
+    Math::Recti left_ear_source = source.take_left(radius);
+    Math::Recti right_ear_source = source.take_right(radius);
 
-    Recti left_ear_destination = destination.take_left(radius);
-    Recti right_ear_destination = destination.take_right(radius);
+    Math::Recti left_ear_destination = destination.take_left(radius);
+    Math::Recti right_ear_destination = destination.take_right(radius);
 
     blit_circle_helper(*this, bitmap, source.take_top_left(radius), destination.take_top_left(radius), Math::Vec2i(radius - 1, radius - 1), radius);
     blit_circle_helper(*this, bitmap, source.take_bottom_left(radius), destination.take_bottom_left(radius), Math::Vec2i(radius - 1, 0), radius);
@@ -325,13 +325,13 @@ FLATTEN void Painter::blit_rounded(Bitmap &bitmap, Recti source, Recti destinati
     blit(bitmap, source.cutoff_left_and_right(radius, radius), destination.cutoff_left_and_right(radius, radius));
 }
 
-FLATTEN void Painter::fill_rectangle_rounded(Recti bound, int radius, Color color)
+FLATTEN void Painter::fill_rectangle_rounded(Math::Recti bound, int radius, Color color)
 {
     radius = MIN(radius, bound.height() / 2);
     radius = MIN(radius, bound.width() / 2);
 
-    Recti left_ear = bound.take_left(radius);
-    Recti right_ear = bound.take_right(radius);
+    Math::Recti left_ear = bound.take_left(radius);
+    Math::Recti right_ear = bound.take_right(radius);
 
     fill_circle_helper(*this, left_ear.take_top(radius), Math::Vec2i(radius - 1, radius - 1), radius, color);
     fill_circle_helper(*this, left_ear.take_bottom(radius), Math::Vec2i(radius - 1, 0), radius, color);
@@ -344,7 +344,7 @@ FLATTEN void Painter::fill_rectangle_rounded(Recti bound, int radius, Color colo
     fill_rectangle(bound.cutoff_left_and_right(radius, radius), color);
 }
 
-FLATTEN void Painter::fill_checkboard(Recti bound, int cell_size, Color fg_color, Color bg_color)
+FLATTEN void Painter::fill_checkboard(Math::Recti bound, int cell_size, Color fg_color, Color bg_color)
 {
     for (int y = 0; y < bound.height(); y++)
     {
@@ -473,7 +473,7 @@ FLATTEN void Painter::draw_line(Math::Vec2i a, Math::Vec2i b, Color color)
     }
 }
 
-FLATTEN void Painter::draw_rectangle(Recti rect, Color color)
+FLATTEN void Painter::draw_rectangle(Math::Recti rect, Color color)
 {
     Math::Vec2i topleft = rect.position();
     Math::Vec2i topright = rect.position() + rect.size().extract_x() - Math::Vec2i::oneX();
@@ -501,7 +501,7 @@ static double sample_draw_circle(Math::Vec2i center, double radius, double thick
     return clamp((0.5 - distance) + (thickness / 2), 0, 1);
 }
 
-void Painter::draw_circle_helper(Recti bound, Math::Vec2i center, int radius, int thickness, Color color)
+void Painter::draw_circle_helper(Math::Recti bound, Math::Vec2i center, int radius, int thickness, Color color)
 {
     for (int y = 0; y < bound.height(); y++)
     {
@@ -517,13 +517,13 @@ void Painter::draw_circle_helper(Recti bound, Math::Vec2i center, int radius, in
     }
 }
 
-FLATTEN void Painter::draw_rectangle_rounded(Recti bound, int radius, int thickness, Color color)
+FLATTEN void Painter::draw_rectangle_rounded(Math::Recti bound, int radius, int thickness, Color color)
 {
     radius = MIN(radius, bound.height() / 2);
     radius = MIN(radius, bound.width() / 2);
 
-    Recti left_ear = bound.take_left(radius);
-    Recti right_ear = bound.take_right(radius);
+    Math::Recti left_ear = bound.take_left(radius);
+    Math::Recti right_ear = bound.take_right(radius);
 
     draw_circle_helper(left_ear.take_top(radius), Math::Vec2i(radius - 1, radius - 1), radius, thickness, color);
     draw_circle_helper(left_ear.take_bottom(radius), Math::Vec2i(radius - 1, 0), radius, thickness, color);
@@ -538,7 +538,7 @@ FLATTEN void Painter::draw_rectangle_rounded(Recti bound, int radius, int thickn
     fill_rectangle(bound.cutoff_left_and_right(radius, radius).take_bottom(thickness), color);
 }
 
-FLATTEN void Painter::blit(Icon &icon, IconSize size, Recti destination, Color color)
+FLATTEN void Painter::blit(Icon &icon, IconSize size, Math::Recti destination, Color color)
 {
     Bitmap &bitmap = *icon.bitmap(size);
 
@@ -558,7 +558,7 @@ FLATTEN void Painter::blit(Icon &icon, IconSize size, Recti destination, Color c
     }
 }
 
-FLATTEN void Painter::blit_colored(Bitmap &bitmap, Recti source, Recti destination, Color color)
+FLATTEN void Painter::blit_colored(Bitmap &bitmap, Math::Recti source, Math::Recti destination, Color color)
 {
     for (int y = 0; y < destination.height(); y++)
     {
@@ -578,7 +578,7 @@ FLATTEN void Painter::blit_colored(Bitmap &bitmap, Recti source, Recti destinati
 
 void Painter::draw_glyph(Font &font, const Glyph &glyph, Math::Vec2i position, Color color)
 {
-    Recti dest(position - glyph.origin, glyph.bound.size());
+    Math::Recti dest(position - glyph.origin, glyph.bound.size());
 
     // auto metrics = font.metrics();
     // auto baseline = position.y();
@@ -606,9 +606,9 @@ FLATTEN void Painter::draw_string(Font &font, const char *str, Math::Vec2i posit
     });
 }
 
-void Painter::draw_string_within(Font &font, const char *str, Recti container, Anchor anchor, Color color)
+void Painter::draw_string_within(Font &font, const char *str, Math::Recti container, Anchor anchor, Color color)
 {
-    Recti bound = font.mesure(str);
+    Math::Recti bound = font.mesure(str);
 
     bound = bound.place_within(container, anchor);
 
@@ -617,7 +617,7 @@ void Painter::draw_string_within(Font &font, const char *str, Recti container, A
 
 /* --- Effects -------------------------------------------------------------- */
 
-FLATTEN void Painter::blur(Recti rectangle, int radius)
+FLATTEN void Painter::blur(Math::Recti rectangle, int radius)
 {
     rectangle = apply(rectangle);
 
@@ -629,7 +629,7 @@ FLATTEN void Painter::blur(Recti rectangle, int radius)
               rectangle.y(), rectangle.y() + rectangle.height());
 }
 
-FLATTEN void Painter::saturation(Recti rectangle, float value)
+FLATTEN void Painter::saturation(Math::Recti rectangle, float value)
 {
     rectangle = apply(rectangle);
 
@@ -654,7 +654,7 @@ FLATTEN void Painter::saturation(Recti rectangle, float value)
     }
 }
 
-FLATTEN void Painter::noise(Recti rectangle, float opacity)
+FLATTEN void Painter::noise(Math::Recti rectangle, float opacity)
 {
     Random rand{0x12341234};
 
@@ -668,7 +668,7 @@ FLATTEN void Painter::noise(Recti rectangle, float opacity)
     }
 }
 
-FLATTEN void Painter::sepia(Recti rectangle, float value)
+FLATTEN void Painter::sepia(Math::Recti rectangle, float value)
 {
     rectangle = apply(rectangle);
 
@@ -689,7 +689,7 @@ FLATTEN void Painter::sepia(Recti rectangle, float value)
     }
 }
 
-FLATTEN void Painter::tint(Recti rectangle, Color color)
+FLATTEN void Painter::tint(Math::Recti rectangle, Color color)
 {
     rectangle = apply(rectangle);
 
@@ -709,7 +709,7 @@ FLATTEN void Painter::tint(Recti rectangle, Color color)
     }
 }
 
-void Painter::acrylic(Recti rectangle)
+void Painter::acrylic(Math::Recti rectangle)
 {
     saturation(rectangle, 0.25);
     blur(rectangle, 16);

@@ -38,7 +38,7 @@ TerminalWidget::TerminalWidget(Component *parent) : Component(parent)
     launchpad_launch(shell_launchpad, nullptr);
 }
 
-void TerminalWidget::paint(Graphic::Painter &painter, const Recti &dirty)
+void TerminalWidget::paint(Graphic::Painter &painter, const Math::Recti &dirty)
 {
     for (int y = 0; y < _terminal->height(); y++)
     {

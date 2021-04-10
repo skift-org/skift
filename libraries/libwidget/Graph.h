@@ -37,7 +37,7 @@ public:
         return total / MIN(_current, _data_size);
     }
 
-    void paint(Graphic::Painter &painter, const Recti &dirty) override;
+    void paint(Graphic::Painter &painter, const Math::Recti &dirty) override;
 
     Math::Vec2i size() override;
 };

@@ -6,7 +6,7 @@
 namespace neko
 {
 
-Recti Neko::sprite()
+Math::Recti Neko::sprite()
 {
     auto animation = _behavior->animation(*this);
 

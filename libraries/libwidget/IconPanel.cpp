@@ -9,14 +9,14 @@ IconPanel::IconPanel(Component *parent, RefPtr<Graphic::Icon> icon)
 {
 }
 
-void IconPanel::paint(Graphic::Painter &painter, const Recti &)
+void IconPanel::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     if (!_icon)
     {
         return;
     }
 
-    Recti destination = _icon->bound(_icon_size).centered_within(content());
+    Math::Recti destination = _icon->bound(_icon_size).centered_within(content());
 
     painter.blit(
         *_icon,

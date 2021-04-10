@@ -11,7 +11,7 @@
 static OwnPtr<Graphic::Framebuffer> _framebuffer;
 static OwnPtr<compositor::Wallpaper> _wallpaper;
 
-static Vector<Recti> _dirty_regions;
+static Vector<Math::Recti> _dirty_regions;
 
 static OwnPtr<Settings::Setting> _night_light_enable_setting;
 bool _night_light_enable = false;
@@ -38,7 +38,7 @@ void renderer_initialize()
     renderer_region_dirty(_framebuffer->resolution());
 }
 
-void renderer_region_dirty(Recti new_region)
+void renderer_region_dirty(Math::Recti new_region)
 {
     if (new_region.is_empty())
     {
@@ -47,13 +47,13 @@ void renderer_region_dirty(Recti new_region)
 
     bool merged = false;
 
-    _dirty_regions.foreach ([&](Recti &region) {
+    _dirty_regions.foreach ([&](Math::Recti &region) {
         if (region.colide_with(new_region))
         {
-            Recti top;
-            Recti botton;
-            Recti left;
-            Recti right;
+            Math::Recti top;
+            Math::Recti botton;
+            Math::Recti left;
+            Math::Recti right;
 
             new_region.substract(region, top, botton, left, right);
 
@@ -78,13 +78,13 @@ void renderer_region_dirty(Recti new_region)
     }
 }
 
-void renderer_composite_wallpaper(Recti region)
+void renderer_composite_wallpaper(Math::Recti region)
 {
     _framebuffer->painter().blit(_wallpaper->scaled(), region, region);
     _framebuffer->mark_dirty(region);
 }
 
-void renderer_composite_region(Recti region, Window *window_transparent)
+void renderer_composite_region(Math::Recti region, Window *window_transparent)
 {
     renderer_composite_wallpaper(region);
 
@@ -96,9 +96,9 @@ void renderer_composite_region(Recti region, Window *window_transparent)
 
         if (window->bound().colide_with(region))
         {
-            Recti destination = window->bound().clipped_with(region);
+            Math::Recti destination = window->bound().clipped_with(region);
 
-            Recti source(
+            Math::Recti source(
                 destination.position() - window->bound().position(),
                 destination.size());
 
@@ -116,7 +116,7 @@ void renderer_composite_region(Recti region, Window *window_transparent)
     _framebuffer->mark_dirty(region);
 }
 
-void renderer_region(Recti region)
+void renderer_region(Math::Recti region)
 {
     bool should_paint_wallpaper = true;
 
@@ -128,9 +128,9 @@ void renderer_region(Recti region)
     manager_iterate_front_to_back([&](Window *window) {
         if (window->bound().colide_with(region))
         {
-            Recti destination = window->bound().clipped_with(region);
+            Math::Recti destination = window->bound().clipped_with(region);
 
-            Recti source(
+            Math::Recti source(
                 destination.position() - window->bound().position(),
                 destination.size());
 
@@ -186,10 +186,10 @@ void renderer_region(Recti region)
 
             _framebuffer->mark_dirty(destination);
 
-            Recti top;
-            Recti botton;
-            Recti left;
-            Recti right;
+            Math::Recti top;
+            Math::Recti botton;
+            Math::Recti left;
+            Math::Recti right;
 
             region.substract(destination, top, botton, left, right);
 
@@ -212,14 +212,14 @@ void renderer_region(Recti region)
     }
 }
 
-Recti renderer_bound()
+Math::Recti renderer_bound()
 {
     return _framebuffer->resolution();
 }
 
 void renderer_repaint_dirty()
 {
-    _dirty_regions.foreach ([](Recti region) {
+    _dirty_regions.foreach ([](Math::Recti region) {
         renderer_region(region);
 
         if (_night_light_enable)

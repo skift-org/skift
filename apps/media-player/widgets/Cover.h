@@ -15,7 +15,7 @@ private:
 public:
     Cover(Widget::Component *parent, RefPtr<Graphic::Bitmap> bitmap);
 
-    void paint(Graphic::Painter &painter, const Recti &) override;
+    void paint(Graphic::Painter &painter, const Math::Recti &) override;
 };
 
 } // namespace MediaPlayer

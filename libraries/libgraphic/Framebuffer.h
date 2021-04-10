@@ -16,14 +16,14 @@ private:
     RefPtr<Bitmap> _bitmap;
     Painter _painter;
 
-    Vector<Recti> _dirty_bounds{};
+    Vector<Math::Recti> _dirty_bounds{};
 
 public:
     static ResultOr<OwnPtr<Framebuffer>> open();
 
     Painter &painter() { return _painter; }
 
-    Recti resolution() { return _bitmap->bound(); }
+    Math::Recti resolution() { return _bitmap->bound(); }
 
     Framebuffer(Handle handle, RefPtr<Bitmap> bitmap);
 
@@ -31,7 +31,7 @@ public:
 
     Result set_resolution(Math::Vec2i size);
 
-    void mark_dirty(Recti rectangle);
+    void mark_dirty(Math::Recti rectangle);
 
     void mark_dirty_all();
 

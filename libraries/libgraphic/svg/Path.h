@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Rect.h>
+#include <libmath/Rect.h>
 #include <libutils/Scanner.h>
 #include <libutils/Vector.h>
 

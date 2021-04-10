@@ -1,13 +1,13 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
-#include <libutils/Rect.h>
+#include <libmath/Rect.h>
 
 void renderer_initialize();
 
-Recti renderer_bound();
+Math::Recti renderer_bound();
 
-void renderer_region_dirty(Recti region);
+void renderer_region_dirty(Math::Recti region);
 
 void renderer_repaint_dirty();
 

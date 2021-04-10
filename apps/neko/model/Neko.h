@@ -20,7 +20,7 @@ private:
     OwnPtr<Behavior> _behavior;
     OwnPtr<Behavior> _next_behavior;
 
-    Recti sprite();
+    Math::Recti sprite();
 
 public:
     static constexpr int SIZE = 32;

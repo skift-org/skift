@@ -14,7 +14,7 @@ void show_window(Window *window);
 
 void hide_window(Window *window);
 
-void flip_window(Window *window, Recti bound);
+void flip_window(Window *window, Math::Recti bound);
 
 void move_window(Window *window, Math::Vec2i position);
 

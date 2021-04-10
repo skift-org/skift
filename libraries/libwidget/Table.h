@@ -22,12 +22,12 @@ private:
 
     String _empty_message{"No data to display"};
 
-    Recti scrollbar_bound() const;
-    Recti header_bound() const;
-    Recti list_bound() const;
-    Recti row_bound(int row) const;
-    Recti column_bound(int column) const;
-    Recti cell_bound(int row, int column) const;
+    Math::Recti scrollbar_bound() const;
+    Math::Recti header_bound() const;
+    Math::Recti list_bound() const;
+    Math::Recti row_bound(int row) const;
+    Math::Recti column_bound(int column) const;
+    Math::Recti cell_bound(int row, int column) const;
     int row_at(Math::Vec2i position) const;
     void paint_cell(Graphic::Painter &painter, int row, int column);
 
@@ -76,7 +76,7 @@ public:
 
     Table(Component *parent, RefPtr<TableModel> model);
 
-    void paint(Graphic::Painter &painter, const Recti &dirty) override;
+    void paint(Graphic::Painter &painter, const Math::Recti &dirty) override;
 
     void event(Event *event) override;
 

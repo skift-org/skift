@@ -88,14 +88,14 @@ const Glyph &Font::glyph(Codepoint codepoint) const
     return _default;
 }
 
-Recti Font::mesure(Codepoint codepoint) const
+Math::Recti Font::mesure(Codepoint codepoint) const
 {
     auto &g = glyph(codepoint);
 
     return {g.advance, metrics().lineheight()};
 }
 
-Recti Font::mesure(const char *string) const
+Math::Recti Font::mesure(const char *string) const
 {
     int width = 0;
 
@@ -104,10 +104,10 @@ Recti Font::mesure(const char *string) const
         width += g.advance;
     });
 
-    return Recti(width, metrics().lineheight());
+    return Math::Recti(width, metrics().lineheight());
 }
 
-Recti Font::mesure_with_fulllineheight(const char *string)
+Math::Recti Font::mesure_with_fulllineheight(const char *string)
 {
     int width = 0;
 
@@ -116,7 +116,7 @@ Recti Font::mesure_with_fulllineheight(const char *string)
         width += g.advance;
     });
 
-    return Recti(width, metrics().fulllineheight());
+    return Math::Recti(width, metrics().fulllineheight());
 }
 
 } // namespace Graphic

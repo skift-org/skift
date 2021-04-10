@@ -19,7 +19,7 @@ private:
     RefPtr<Bitmap> _bitmap;
     EdgeList _edges;
     Vector<Edgef> _actives_edges;
-    Optional<Recti> _clip;
+    Optional<Math::Recti> _clip;
     Vector<uint16_t> _scanline;
 
     void clear();
@@ -31,9 +31,9 @@ private:
 public:
     Rasterizer(RefPtr<Bitmap> bitmap);
 
-    void set_clip(Recti c);
+    void set_clip(Math::Recti c);
 
-    Recti get_clip();
+    Math::Recti get_clip();
 
     void fill(Path &path, const Math::Mat3x2f &transform, Paint paint);
 };

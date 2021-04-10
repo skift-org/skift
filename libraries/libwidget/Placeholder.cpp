@@ -12,7 +12,7 @@ Placeholder::Placeholder(Component *parent, String text)
     _text = IO::format("Cannot create an instance of \"{}\".", text);
 }
 
-void Placeholder::paint(Graphic::Painter &painter, const Recti &)
+void Placeholder::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     painter.draw_rectangle(bound(), Graphic::Colors::RED);
 

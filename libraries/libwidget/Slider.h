@@ -16,11 +16,11 @@ private:
 
     double _value = 0.5;
 
-    Recti track_bound();
+    Math::Recti track_bound();
 
-    Recti value_bound();
+    Math::Recti value_bound();
 
-    Recti thumb_bound();
+    Math::Recti thumb_bound();
 
     void slide_to(Math::Vec2i position);
 
@@ -33,7 +33,7 @@ public:
 
     void event(Event *event) override;
 
-    void paint(Graphic::Painter &painter, const Recti &) override;
+    void paint(Graphic::Painter &painter, const Math::Recti &) override;
 };
 
 } // namespace Widget

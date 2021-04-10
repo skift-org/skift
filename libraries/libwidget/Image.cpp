@@ -32,7 +32,7 @@ void Image::scaling(Graphic::BitmapScaling scaling)
     }
 }
 
-void Image::paint(Graphic::Painter &painter, const Recti &)
+void Image::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     if (!_bitmap)
     {

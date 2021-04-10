@@ -158,7 +158,7 @@ void hide_window(Window *window)
     exit_if_all_windows_are_closed();
 }
 
-void flip_window(Window *window, Recti dirty)
+void flip_window(Window *window, Math::Recti dirty)
 {
     assert(_windows.contains(window));
 

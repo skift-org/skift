@@ -53,7 +53,7 @@ Widget::MouseButton cursor_pack_mouse_buttons(MousePacket packet)
     return buttons;
 }
 
-Math::Vec2i vec2i_clamp_to_rect(Math::Vec2i p, Recti rect)
+Math::Vec2i vec2i_clamp_to_rect(Math::Vec2i p, Math::Recti rect)
 {
     return p.clamped(rect.position(), rect.position() + rect.size());
 }
@@ -142,11 +142,11 @@ void cursor_render(Graphic::Painter &painter)
     painter.blit(*cursor_bitmap, cursor_bitmap->bound(), cursor_bound());
 }
 
-Recti cursor_bound_from_position(Math::Vec2i position)
+Math::Recti cursor_bound_from_position(Math::Vec2i position)
 {
     Widget::CursorState state = cursor_get_state();
 
-    Recti bound(position, Math::Vec2i(28, 28));
+    Math::Recti bound(position, Math::Vec2i(28, 28));
 
     if (state == Widget::CURSOR_MOVE ||
         state == Widget::CURSOR_RESIZEH ||
@@ -164,19 +164,19 @@ Recti cursor_bound_from_position(Math::Vec2i position)
     return bound;
 }
 
-Recti cursor_bound()
+Math::Recti cursor_bound()
 {
     return cursor_bound_from_position(_mouse_position);
 }
 
-Recti cursor_dirty_bound_from_position(Math::Vec2i position)
+Math::Recti cursor_dirty_bound_from_position(Math::Vec2i position)
 {
-    return Recti(
+    return Math::Recti(
         position + Math::Vec2i(-28, -28),
         Math::Vec2i(56, 56));
 }
 
-Recti cursor_dirty_bound()
+Math::Recti cursor_dirty_bound()
 {
     return cursor_dirty_bound_from_position(_mouse_position);
 }

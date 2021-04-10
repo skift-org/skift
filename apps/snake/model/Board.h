@@ -78,7 +78,7 @@ public:
             reset();
         }
 
-        if (!Recti{_width, _height}.contains(_snake.head))
+        if (!Math::Recti{_width, _height}.contains(_snake.head))
         {
             reset();
         }

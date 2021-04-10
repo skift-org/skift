@@ -28,7 +28,7 @@ private:
 public:
     Callback<void()> on_change;
 
-    Recti bound() { return {{}, _resolution}; }
+    Math::Recti bound() { return {{}, _resolution}; }
 
     int width() { return _resolution.x(); }
     int height() { return _resolution.y(); }

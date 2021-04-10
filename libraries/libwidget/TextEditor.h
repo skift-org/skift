@@ -26,12 +26,12 @@ private:
 
     void scroll_to_cursor();
 
-    Recti minimum_view_bound()
+    Math::Recti minimum_view_bound()
     {
         return bound().cutoff_right(ScrollBar::SIZE).cutoff_botton(ScrollBar::SIZE);
     }
 
-    Recti view_bound()
+    Math::Recti view_bound()
     {
         auto bound = Component::bound();
 
@@ -48,14 +48,14 @@ private:
         return bound;
     }
 
-    Recti document_bound()
+    Math::Recti document_bound()
     {
         return _model->bound(*font())
             .offset({-_hscroll_offset, -_vscroll_offset})
             .offset(bound().position());
     }
 
-    Recti vscrollbar_bound()
+    Math::Recti vscrollbar_bound()
     {
         auto bound = Component::bound().take_right(ScrollBar::SIZE);
 
@@ -67,7 +67,7 @@ private:
         return bound;
     }
 
-    Recti hscrollbar_bound()
+    Math::Recti hscrollbar_bound()
     {
         auto bound = Component::bound().take_bottom(ScrollBar::SIZE);
 
@@ -98,7 +98,7 @@ public:
 
     ~TextEditor();
 
-    void paint(Graphic::Painter &, const Recti &) override;
+    void paint(Graphic::Painter &, const Math::Recti &) override;
 
     void event(Event *event) override;
 

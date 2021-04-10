@@ -20,7 +20,7 @@ Graph::~Graph()
     free(_data);
 }
 
-void Graph::paint(Graphic::Painter &painter, const Recti &)
+void Graph::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     int height = bound().height();
     int width = bound().width();
@@ -47,7 +47,7 @@ void Graph::paint(Graphic::Painter &painter, const Recti &)
         float where = i / (float)width;
         float data = graph_sample(where);
 
-        Recti bar{i, (int)(height * (1.0 - data)), 1, height};
+        Math::Recti bar{i, (int)(height * (1.0 - data)), 1, height};
 
         float dist = (1 - distance(where, cursor_position, 1));
 
@@ -55,7 +55,7 @@ void Graph::paint(Graphic::Painter &painter, const Recti &)
         painter.plot(bar.position(), _color);
     }
 
-    Recti cursor{(int)(width * cursor_position), 0, 1, height};
+    Math::Recti cursor{(int)(width * cursor_position), 0, 1, height};
 
     painter.fill_rectangle(cursor, color(THEME_BORDER));
 }

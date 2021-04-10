@@ -9,7 +9,7 @@ struct Separator : public Component
 {
     Separator(Component *parent);
 
-    void paint(Graphic::Painter &, const Recti &) override;
+    void paint(Graphic::Painter &, const Math::Recti &) override;
 
     Math::Vec2i size() override;
 };

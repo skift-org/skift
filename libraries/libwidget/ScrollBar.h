@@ -19,21 +19,21 @@ private:
 
     bool _horizontal = false;
 
-    Recti track_bound()
+    Math::Recti track_bound()
     {
         return bound().shrinked(Insetsi(4, 4, 4));
     }
 
-    Recti thumb_bound()
+    Math::Recti thumb_bound()
     {
-        Recti track = track_bound();
+        Math::Recti track = track_bound();
 
         if (_horizontal)
         {
             int thumb_width = MIN(track.width() * (_thumb / (float)_track), track.width());
             int thump_position = track.width() * (_value / (float)_track);
 
-            return Recti(
+            return Math::Recti(
                 track.x() + thump_position,
                 track.y(),
                 thumb_width,
@@ -44,7 +44,7 @@ private:
             int thumb_height = MIN(track.height() * (_thumb / (float)_track), track.height());
             int thump_position = track.height() * (_value / (float)_track);
 
-            return Recti(
+            return Math::Recti(
                 track.x(),
                 track.y() + thump_position,
                 track.width(),
@@ -82,7 +82,7 @@ public:
         should_repaint();
     }
 
-    void paint(Graphic::Painter &, const Recti &) override;
+    void paint(Graphic::Painter &, const Math::Recti &) override;
 
     void event(Event *event) override;
 

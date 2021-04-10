@@ -62,7 +62,7 @@ void Component::cursor(CursorState cursor)
 Component::Component(Component *parent)
 {
     _enabled = true;
-    _container = Recti(32, 32);
+    _container = Math::Recti(32, 32);
 
     if (parent)
     {
@@ -124,7 +124,7 @@ void Component::do_layout()
             {
                 auto size = child->compute_size();
 
-                child->container(Recti{size}.centered_within(content()));
+                child->container(Math::Recti{size}.centered_within(content()));
             }
         }
     }
@@ -139,8 +139,8 @@ void Component::do_layout()
             int x = index % _layout.hcell;
             int y = index / _layout.hcell;
 
-            Recti row = content().row(_layout.vcell, y, _layout.spacing.y());
-            Recti column = row.column(_layout.hcell, x, _layout.spacing.x());
+            Math::Recti row = content().row(_layout.vcell, y, _layout.spacing.y());
+            Math::Recti column = row.column(_layout.hcell, x, _layout.spacing.x());
 
             child->container(column);
             index++;
@@ -216,7 +216,7 @@ void Component::do_layout()
         {
             if (child->flags() & Component::FILL)
             {
-                child->container(Recti(
+                child->container(Math::Recti(
                     current,
                     content().y(),
                     fill_child_width,
@@ -228,7 +228,7 @@ void Component::do_layout()
             {
                 if (child->flags() & Component::SQUARE)
                 {
-                    child->container(Recti(
+                    child->container(Math::Recti(
                         current,
                         content().y(),
                         content().height(),
@@ -238,7 +238,7 @@ void Component::do_layout()
                 }
                 else
                 {
-                    child->container(Recti(
+                    child->container(Math::Recti(
                         current,
                         content().y(),
                         child->compute_size().x(),
@@ -556,7 +556,7 @@ void Component::focus()
 
 /* --- Paint ---------------------------------------------------------------- */
 
-void Component::repaint(Graphic::Painter &painter, Recti rectangle)
+void Component::repaint(Graphic::Painter &painter, Math::Recti rectangle)
 {
     if (bound().width() == 0 || bound().height() == 0)
     {
@@ -599,7 +599,7 @@ void Component::should_repaint()
     should_repaint(bound());
 }
 
-void Component::should_repaint(Recti rectangle)
+void Component::should_repaint(Math::Recti rectangle)
 {
     if (!overflow().colide_with(rectangle))
     {

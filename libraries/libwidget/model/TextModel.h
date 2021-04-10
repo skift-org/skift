@@ -64,7 +64,7 @@ public:
         _codepoints.remove_index(index);
     }
 
-    Recti bound(const Graphic::Font &font)
+    Math::Recti bound(const Graphic::Font &font)
     {
         int width = 0;
 
@@ -133,7 +133,7 @@ public:
 
     ~TextModel() {}
 
-    Recti bound(const Graphic::Font &font)
+    Math::Recti bound(const Graphic::Font &font)
     {
         int width = 0;
         int height = 0;

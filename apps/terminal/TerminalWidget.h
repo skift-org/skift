@@ -25,7 +25,7 @@ public:
 
     void handle_read();
 
-    void paint(Graphic::Painter &, const Recti &) override;
+    void paint(Graphic::Painter &, const Math::Recti &) override;
 
     void event(Widget::Event *event) override;
 

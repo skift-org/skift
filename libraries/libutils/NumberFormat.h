@@ -6,30 +6,36 @@
 #include <libio/Writer.h>
 #include <libutils/Strings.h>
 
-struct NumberFormat
+class NumberFormat
 {
+private:
     int _base;
     int _precision;
     bool _capitalized;
 
-    static NumberFormat binary()
+    char digit(int digit)
     {
-        return {2, 4, false};
+        assert(digit >= 0 && digit < _base);
+
+        if (_capitalized)
+        {
+            return Strings::LOWERCASE_XDIGITS[digit % _base];
+        }
+        else
+        {
+            return Strings::UPPERCASE_XDIGITS[digit % _base];
+        }
     }
 
-    static NumberFormat octal()
-    {
-        return {8, 4, false};
-    }
+public:
+    static NumberFormat binary() { return {2, 4, false}; }
+    static NumberFormat octal() { return {8, 4, false}; }
+    static NumberFormat decimal() { return {10, 4, false}; }
+    static NumberFormat hexadecimal() { return {16, 4, false}; }
 
-    static NumberFormat decimal()
+    NumberFormat(int base, int precision, bool capitalized)
+        : _base{base}, _precision{precision}, _capitalized{capitalized}
     {
-        return {10, 4, false};
-    }
-
-    static NumberFormat hexadecimal()
-    {
-        return {16, 4, false};
     }
 
     NumberFormat capitalized()
@@ -64,15 +70,7 @@ struct NumberFormat
 
         while (value != 0)
         {
-            if (_capitalized)
-            {
-                buffer[i] = Strings::LOWERCASE_XDIGITS[value % _base];
-            }
-            else
-            {
-                buffer[i] = Strings::UPPERCASE_XDIGITS[value % _base];
-            }
-
+            buffer[i] = digit(value % _base);
             value /= _base;
             i++;
         }
@@ -91,18 +89,26 @@ struct NumberFormat
     {
         size_t written = 0;
 
-        int64_t ipart = (int64_t)value;
-        double fpart = value - (double)ipart;
+        if (value < 0)
+        {
+            written += TRY(IO::write(writer, '-'));
+            value = -value;
+        }
 
+        int64_t ipart = (int64_t)value;
         written += TRY(format(writer, ipart));
 
         if (_precision > 0)
         {
             written += TRY(IO::write(writer, '.'));
 
-            int64_t ifpart = fpart * pow(_base, _precision);
+            double fpart = value - (double)ipart;
 
-            written += TRY(format(writer, ifpart));
+            for (int i = 0; i < _precision; i++)
+            {
+                fpart *= _base;
+                written += TRY(IO::write(writer, digit((int)fpart % _base)));
+            }
         }
 
         return written;

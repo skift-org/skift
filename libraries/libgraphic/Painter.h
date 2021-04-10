@@ -1,12 +1,10 @@
 #pragma once
 
-#include <libutils/Array.h>
-#include <libmath/Mat3x2.h>
-
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Font.h>
 #include <libgraphic/Icon.h>
-#include <libgraphic/svg/Path.h>
+#include <libmath/Mat3x2.h>
+#include <libutils/Array.h>
 
 #define STATESTACK_SIZE 32
 

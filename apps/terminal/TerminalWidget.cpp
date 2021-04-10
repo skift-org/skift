@@ -44,9 +44,9 @@ void TerminalWidget::paint(Graphic::Painter &painter, const Math::Recti &dirty)
     {
         for (int x = 0; x < _terminal->width(); x++)
         {
-            Terminal::Cell cell = _terminal->cell_at(x, y);
+            Terminal::Cell cell = _terminal->buffer().at(x, y);
             render_cell(painter, x, y, cell);
-            _terminal->cell_undirty(x, y);
+            _terminal->buffer().undirty(x, y);
         }
     }
 
@@ -55,7 +55,7 @@ void TerminalWidget::paint(Graphic::Painter &painter, const Math::Recti &dirty)
 
     if (cell_bound(cx, cy).colide_with(dirty))
     {
-        Terminal::Cell cell = _terminal->cell_at(cx, cy);
+        Terminal::Cell cell = _terminal->buffer().at(cx, cy);
 
         if (window()->focused())
         {

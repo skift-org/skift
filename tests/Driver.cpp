@@ -89,15 +89,31 @@ int run_all_testes()
         int child_result = PROCESS_FAILURE;
         process_wait(child_pid, &child_result);
 
-        if (child_result == PROCESS_SUCCESS)
+        if (test.flags & EXPECTED_TO_FAIL)
         {
-            IO::errln("\e[1;32mok\e[m");
-            passed++;
+            if (child_result == PROCESS_FAILURE)
+            {
+                IO::errln("\e[1;33mexpected to fail\e[m");
+                passed++;
+            }
+            else
+            {
+                IO::errln("\e[1;31mnot expected to succeeded\e[m");
+                failed++;
+            }
         }
         else
         {
-            IO::errln("\e[1;31mfailed\e[m");
-            failed++;
+            if (child_result == PROCESS_SUCCESS)
+            {
+                IO::errln("\e[1;32mok\e[m");
+                passed++;
+            }
+            else
+            {
+                IO::errln("\e[1;31mfailed\e[m");
+                failed++;
+            }
         }
     }
 
@@ -119,6 +135,11 @@ int run_all_testes()
     IO::errln("test: Took \e[1m{}ms\e[m", end_tick - start_tick);
     IO::errln("test: Passed \e[1;32m{}\e[m", passed);
     IO::errln("test: Failled \e[1;31m{}\e[m", failed);
+
+    if ((size_t)failed == _tests->count())
+    {
+        IO::errln("test: \e[1;31mWow, you did it! You broke everything, your parents should be proud of you :)\e[m");
+    }
 
     if (failed == 0)
     {

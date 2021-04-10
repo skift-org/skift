@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <assert.h>
 #include <libutils/Move.h>
 #include <libutils/New.h>
 

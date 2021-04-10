@@ -1,5 +1,4 @@
-
-#include "demo/Demos.h"
+#include "demo/demos/Demos.h"
 
 static RefPtr<Graphic::Bitmap> _test_image = nullptr;
 static int _frame = 0;

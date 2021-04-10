@@ -2,7 +2,7 @@
 #include <libwidget/Container.h>
 #include <libwidget/TitleBar.h>
 
-#include "demo/DemoWidget.h"
+#include "demo/widgets/DemoWidget.h"
 
 static Demo _demos[] = {
     {"Path", path_draw},

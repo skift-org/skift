@@ -1,7 +1,7 @@
 #include <libsystem/eventloop/Timer.h>
 #include <libwidget/Application.h>
 
-#include "demo/DemoWidget.h"
+#include "demo/widgets/DemoWidget.h"
 
 void demo_widget_on_timer_tick(DemoWidget *widget)
 {

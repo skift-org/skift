@@ -2,7 +2,7 @@
 
 #include <libwidget/Component.h>
 
-#include "demo/Demos.h"
+#include "demo/demos/Demos.h"
 
 class DemoWidget : public Widget::Component
 {

@@ -15,9 +15,9 @@ private:
     Vector<Cell> _buffer;
 
 public:
-    int width() { return _width; }
+    int width() const { return _width; }
 
-    int height() { return _height; }
+    int height() const { return _height; }
 
     Buffer(int width, int height)
         : _width{width}, _height{height}
@@ -32,7 +32,7 @@ public:
             return _buffer[y * _width + x];
         }
 
-        return {U' ', Attributes::defaults(), true};
+        return {U' ', {}, true};
     }
 
     void set(int x, int y, Cell cell)
@@ -90,7 +90,7 @@ public:
 
         for (int i = 0; i < width * height; i++)
         {
-            new_buffer[i] = {U' ', Attributes::defaults(), true};
+            new_buffer[i] = {U' ', {}, true};
         }
 
         for (int x = 0; x < MIN(width, _width); x++)
@@ -105,6 +105,40 @@ public:
 
         _width = width;
         _height = height;
+    }
+
+    void scroll(int how_many_line, Attributes attributes)
+    {
+        if (how_many_line < 0)
+        {
+            for (int line = 0; line < how_many_line; line++)
+            {
+                for (int i = (width() * height()) - 1; i >= height(); i++)
+                {
+                    int x = i % width();
+                    int y = i / width();
+
+                    set(x, y, at(x, y - 1));
+                }
+
+                clear_line(0, attributes);
+            }
+        }
+        else if (how_many_line > 0)
+        {
+            for (int line = 0; line < how_many_line; line++)
+            {
+                for (int i = 0; i < width() * (height() - 1); i++)
+                {
+                    int x = i % width();
+                    int y = i / width();
+
+                    set(x, y, at(x, y + 1));
+                }
+
+                clear_line(height() - 1, attributes);
+            }
+        }
     }
 };
 

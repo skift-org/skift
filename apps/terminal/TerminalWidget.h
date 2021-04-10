@@ -12,6 +12,7 @@ class TerminalWidget : public Widget::Component
 private:
     OwnPtr<Terminal::Terminal> _terminal;
     bool _cursor_blink;
+    int _scroll_offset = 0;
 
     IO::Terminal _terminal_device;
 

@@ -249,10 +249,26 @@ public:
         }
     }
 
-    void resize(size_t newCount)
+    void resize(size_t new_count)
     {
-        ensure_capacity(newCount);
-        _count = newCount;
+        ensure_capacity(new_count);
+
+        if (_count < new_count)
+        {
+            for (size_t i = _count; i < new_count; i++)
+            {
+                new (&_storage[i]) T();
+            }
+        }
+        else if (_count > new_count)
+        {
+            for (size_t i = new_count; i < _count; i++)
+            {
+                _storage[i].~T();
+            }
+        }
+
+        _count = new_count;
     }
 
     void ensure_capacity(size_t capacity)

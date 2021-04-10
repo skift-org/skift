@@ -8,14 +8,12 @@ namespace Terminal
 {
 
 Terminal::Terminal(int width, int height)
-    : _buffer{width, height}
+    : _surface{width, height}
 {
     _decoder.callback([this](auto codepoint) { write(codepoint); });
 
     _cursor = {0, 0, true};
     _saved_cursor = {0, 0, true};
-
-    _attributes = Attributes::defaults();
 
     _parameters_top = 0;
 
@@ -24,13 +22,11 @@ Terminal::Terminal(int width, int height)
         _parameter.empty = true;
         _parameter.value = 0;
     }
-
-    _buffer.clear_all(_attributes);
 }
 
 void Terminal::resize(int width, int height)
 {
-    _buffer.resize(width, height);
+    _surface.resize(width, height);
 
     _cursor.x = clamp(_cursor.x, 0, width - 1);
     _cursor.y = clamp(_cursor.y, 0, height - 1);
@@ -52,14 +48,14 @@ void Terminal::cursor_move(int offx, int offy)
     }
     else if (_cursor.y + offy < 0)
     {
-        scroll(_cursor.y + offy);
+        _surface.scroll(_cursor.y + offy, _attributes);
         _cursor.y = 0;
 
         cursor_move(offx, 0);
     }
     else if (_cursor.y + offy >= height())
     {
-        scroll((_cursor.y + offy) - (height() - 1));
+        _surface.scroll((_cursor.y + offy) - (height() - 1), _attributes);
         _cursor.y = height() - 1;
 
         cursor_move(offx, 0);
@@ -78,40 +74,6 @@ void Terminal::cursor_set(int x, int y)
 {
     _cursor.x = clamp(x, 0, width());
     _cursor.y = clamp(y, 0, height());
-}
-
-void Terminal::scroll(int how_many_line)
-{
-    if (how_many_line < 0)
-    {
-        for (int line = 0; line < how_many_line; line++)
-        {
-            for (int i = (width() * height()) - 1; i >= height(); i++)
-            {
-                int x = i % width();
-                int y = i / width();
-
-                _buffer.set(x, y, _buffer.at(x, y - 1));
-            }
-
-            _buffer.clear_line(0, _attributes);
-        }
-    }
-    else if (how_many_line > 0)
-    {
-        for (int line = 0; line < how_many_line; line++)
-        {
-            for (int i = 0; i < width() * (height() - 1); i++)
-            {
-                int x = i % width();
-                int y = i / width();
-
-                _buffer.set(x, y, _buffer.at(x, y + 1));
-            }
-
-            _buffer.clear_line(height() - 1, _attributes);
-        }
-    }
 }
 
 void Terminal::new_line()
@@ -144,7 +106,7 @@ void Terminal::append(Codepoint codepoint)
     }
     else
     {
-        _buffer.set(_cursor.x, _cursor.y, {codepoint, _attributes, true});
+        _surface.set(_cursor.x, _cursor.y, {codepoint, _attributes, true});
         cursor_move(1, 0);
     }
 }
@@ -261,52 +223,52 @@ void Terminal::do_ansi(Codepoint codepoint)
     case U'J':
         if (_parameters[0].value == 0)
         {
-            _buffer.clear(_cursor.x, _cursor.y, width(), height(), _attributes);
+            _surface.clear(_cursor.x, _cursor.y, width(), height(), _attributes);
         }
         else if (_parameters[0].value == 1)
         {
-            _buffer.clear(0, 0, _cursor.x, _cursor.y, _attributes);
+            _surface.clear(0, 0, _cursor.x, _cursor.y, _attributes);
         }
         else if (_parameters[0].value == 2)
         {
-            _buffer.clear(0, 0, width(), height(), _attributes);
+            _surface.clear(0, 0, width(), height(), _attributes);
         }
         break;
 
     case U'K':
         if (_parameters[0].value == 0)
         {
-            _buffer.clear(_cursor.x, _cursor.y, width(), _cursor.y, _attributes);
+            _surface.clear(_cursor.x, _cursor.y, width(), _cursor.y, _attributes);
         }
         else if (_parameters[0].value == 1)
         {
-            _buffer.clear(0, _cursor.y, _cursor.x, _cursor.y, _attributes);
+            _surface.clear(0, _cursor.y, _cursor.x, _cursor.y, _attributes);
         }
         else if (_parameters[0].value == 2)
         {
-            _buffer.clear(0, _cursor.y, width(), _cursor.y, _attributes);
+            _surface.clear(0, _cursor.y, width(), _cursor.y, _attributes);
         }
         break;
 
     case U'S':
         if (_parameters[0].empty)
         {
-            scroll(-1);
+            _surface.scroll(-1, _attributes);
         }
         else
         {
-            scroll(-_parameters[0].value);
+            _surface.scroll(-_parameters[0].value, _attributes);
         }
         break;
 
     case U'T':
         if (_parameters[0].empty)
         {
-            scroll(1);
+            _surface.scroll(1, _attributes);
         }
         else
         {
-            scroll(_parameters[0].value);
+            _surface.scroll(_parameters[0].value, _attributes);
         }
         break;
 
@@ -315,7 +277,7 @@ void Terminal::do_ansi(Codepoint codepoint)
         {
             if (_parameters[i].empty || _parameters[i].value == 0)
             {
-                _attributes = Attributes::defaults();
+                _attributes = {};
             }
             else
             {
@@ -397,11 +359,11 @@ void Terminal::write(Codepoint codepoint)
         }
         else if (codepoint == U'c')
         {
-            _attributes = Attributes::defaults();
+            _attributes = {};
             _state = State::WAIT_ESC;
 
             cursor_set(0, 0);
-            _buffer.clear_all(_attributes);
+            _surface.clear_all(_attributes);
         }
         else
         {
@@ -433,7 +395,6 @@ void Terminal::write(Codepoint codepoint)
         break;
 
     default:
-        logger_trace("ok wtf is going on here ? %d", _state);
         ASSERT_NOT_REACHED();
     }
 }

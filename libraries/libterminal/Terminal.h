@@ -4,6 +4,7 @@
 #include <libterminal/Attributes.h>
 #include <libterminal/Buffer.h>
 #include <libterminal/Cursor.h>
+#include <libterminal/Surface.h>
 
 namespace Terminal
 {
@@ -24,7 +25,8 @@ struct Parameter
 struct Terminal
 {
 private:
-    Buffer _buffer;
+    Surface _surface;
+
     UTF8Decoder _decoder;
 
     State _state = State::WAIT_ESC;
@@ -38,11 +40,11 @@ private:
     Parameter _parameters[MAX_PARAMETERS];
 
 public:
-    int width() { return _buffer.width(); }
+    int width() { return _surface.width(); }
 
-    int height() { return _buffer.height(); }
+    int height() { return _surface.height(); }
 
-    Buffer &buffer() { return _buffer; }
+    Surface &surface() { return _surface; }
 
     Cursor &cursor() { return _cursor; }
 
@@ -53,8 +55,6 @@ public:
     void cursor_move(int offx, int offy);
 
     void cursor_set(int x, int y);
-
-    void scroll(int how_many_line);
 
     void new_line();
 

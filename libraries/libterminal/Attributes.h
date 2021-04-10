@@ -8,17 +8,12 @@ namespace Terminal
 
 struct Attributes
 {
-    Color foreground;
-    Color background;
+    Color foreground = FOREGROUND;
+    Color background = BACKGROUND;
 
-    bool bold;
-    bool invert;
-    bool underline;
-
-    static Attributes defaults()
-    {
-        return {FOREGROUND, BACKGROUND, false, false, false};
-    }
+    bool bold = false;
+    bool invert = false;
+    bool underline = false;
 
     Attributes bolded() const
     {

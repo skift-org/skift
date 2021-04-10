@@ -7,7 +7,7 @@ namespace Terminal
 {
 struct Cell
 {
-    Codepoint codepoint;
+    Codepoint codepoint = U' ';
     Attributes attributes;
     bool dirty;
 };

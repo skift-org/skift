@@ -3,6 +3,7 @@
 #include <libsystem/process/Launchpad.h>
 #include <libutils/Assert.h>
 #include <libwidget/Event.h>
+#include <libwidget/ScrollBar.h>
 #include <libwidget/Window.h>
 
 #include "terminal/Common.h"
@@ -26,7 +27,7 @@ TerminalWidget::TerminalWidget(Component *parent) : Component(parent)
         int cx = _terminal->cursor().x;
         int cy = _terminal->cursor().y;
 
-        should_repaint(cell_bound(cx, cy).offset(bound().position()));
+        should_repaint(cell_bound(cx, cy).offset(bound().position() - Math::Vec2i{0, _scroll_offset}));
     });
 
     _cursor_blink_timer->start();
@@ -40,22 +41,25 @@ TerminalWidget::TerminalWidget(Component *parent) : Component(parent)
 
 void TerminalWidget::paint(Graphic::Painter &painter, const Math::Recti &dirty)
 {
+    painter.push();
+    painter.transform({0, -_scroll_offset});
+
     for (int y = 0; y < _terminal->height(); y++)
     {
         for (int x = 0; x < _terminal->width(); x++)
         {
-            Terminal::Cell cell = _terminal->buffer().at(x, y);
-            render_cell(painter, x, y, cell);
-            _terminal->buffer().undirty(x, y);
+            Terminal::Cell cell = _terminal->surface().at(x, y + _scroll_offset / cell_size().y());
+            render_cell(painter, x, y + _scroll_offset / cell_size().y(), cell);
+            _terminal->surface().undirty(x, y);
         }
     }
 
     int cx = _terminal->cursor().x;
-    int cy = _terminal->cursor().y;
+    int cy = _terminal->cursor().y - _scroll_offset / cell_size().y();
 
     if (cell_bound(cx, cy).colide_with(dirty))
     {
-        Terminal::Cell cell = _terminal->buffer().at(cx, cy);
+        Terminal::Cell cell = _terminal->surface().at(cx, cy);
 
         if (window()->focused())
         {
@@ -64,15 +68,15 @@ void TerminalWidget::paint(Graphic::Painter &painter, const Math::Recti &dirty)
                 render_cell(
                     painter,
                     cx,
-                    cy,
+                    cy + _scroll_offset / cell_size().y(),
                     cell.codepoint,
                     Terminal::BACKGROUND,
                     Terminal::FOREGROUND,
-                    Terminal::Attributes::defaults());
+                    {});
             }
             else
             {
-                render_cell(painter, cx, cy, cell);
+                render_cell(painter, cx, cy + _scroll_offset / cell_size().y(), cell);
             }
         }
         else
@@ -81,6 +85,8 @@ void TerminalWidget::paint(Graphic::Painter &painter, const Math::Recti &dirty)
             painter.draw_rectangle(cell_bound(cx, cy), color(Widget::THEME_ANSI_CURSOR));
         }
     }
+
+    painter.pop();
 }
 
 void TerminalWidget::event(Widget::Event *event)
@@ -90,7 +96,13 @@ void TerminalWidget::event(Widget::Event *event)
         event->accepted = true;
     };
 
-    if (event->type == Widget::Event::KEYBOARD_KEY_TYPED)
+    if (event->type == Widget::Event::MOUSE_SCROLL)
+    {
+        _scroll_offset += 48 * event->mouse.scroll;
+        _scroll_offset = clamp(_scroll_offset, -_terminal->surface().scrollback() * cell_size().y(), 0);
+        should_repaint();
+    }
+    else if (event->type == Widget::Event::KEYBOARD_KEY_TYPED)
     {
         switch (event->keyboard.key)
         {

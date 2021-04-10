@@ -115,7 +115,7 @@ void Rasterizer::rasterize(Paint &paint)
 
             if (alpha >= 0.003f)
             {
-                _bitmap->blend_pixel_no_check({i, y}, color.with_alpha(alpha));
+                _bitmap->blend_pixel_no_check({i, y}, color.with_alpha(color.alphaf() * alpha));
             }
         }
     }

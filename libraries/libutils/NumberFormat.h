@@ -87,12 +87,22 @@ public:
 
     ResultOr<size_t> format(IO::Writer &writer, double value)
     {
+        if (isnan(value))
+        {
+            return IO::write(writer, _capitalized ? "NaN" : "nan");
+        }
+
         size_t written = 0;
 
         if (value < 0)
         {
             written += TRY(IO::write(writer, '-'));
             value = -value;
+        }
+
+        if (isinf(value))
+        {
+            return IO::write(writer, _capitalized ? "INF" : "inf");
         }
 
         int64_t ipart = (int64_t)value;

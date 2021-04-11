@@ -1,7 +1,7 @@
 $(RAMDISK).gz: $(RAMDISK)
 	@gzip -c $(RAMDISK) > $(RAMDISK).gz
 
-$(KERNEL_BINARY).gz: $(KERNEL_BINARY) 
+$(KERNEL_BINARY).gz: $(KERNEL_BINARY)
 	@gzip -c $(KERNEL_BINARY) > $(KERNEL_BINARY).gz
 
 

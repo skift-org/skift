@@ -69,8 +69,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/disks/bootdisk-grub-x86_32.img.gz
-          asset_name: bootdisk-grub-x86_32.img.gz
+          asset_path: build/disks/skift-x86_32-grub-release.img.gz
+          asset_name: skift-x86_32-grub.img.gz
           asset_content_type: application/x-ima
 
       - name: Upload release assets (limine-x86_32)
@@ -80,8 +80,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/disks/bootdisk-limine-x86_32.img.gz
-          asset_name: bootdisk-limine-x86_32.img.gz
+          asset_path: build/disks/skift-x86_32-limine-release.img.gz
+          asset_name: skift-x86_32-limine.img.gz
           asset_content_type: application/x-ima
 
       - name: Upload release assets (limine-x86_64)
@@ -91,6 +91,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: disks/bootdisk-limine-x86_64.img.gz
-          asset_name: bootdisk-limine-x86_64.img.gz
+          asset_path: build/disks/skift-x86_64-limine-release.img.gz
+          asset_name: skift-x86_64-limine.img.gz
           asset_content_type: application/x-ima

@@ -97,7 +97,7 @@ ASFLAGS=-f elf32
 STRIP:=i686-pc-skift-strip
 
 
-include icons/.build.mk
+include sysroot/Files/Icons/.build.mk
 
 include kernel/archs/.build.mk
 include kernel/kernel/.build.mk

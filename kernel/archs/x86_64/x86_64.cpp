@@ -9,18 +9,18 @@
 #include "kernel/system/System.h"
 #include "kernel/tasking/Task.h"
 
-#include "archs/x86/kernel/COM.h"
-#include "archs/x86/kernel/CPUID.h"
-#include "archs/x86/kernel/FPU.h"
-#include "archs/x86/kernel/IOPort.h"
-#include "archs/x86/kernel/PIC.h"
-#include "archs/x86/kernel/PIT.h"
-#include "archs/x86/kernel/RTC.h"
+#include "archs/x86/COM.h"
+#include "archs/x86/CPUID.h"
+#include "archs/x86/FPU.h"
+#include "archs/x86/IOPort.h"
+#include "archs/x86/PIC.h"
+#include "archs/x86/PIT.h"
+#include "archs/x86/RTC.h"
 
-#include "archs/x86_64/kernel/GDT.h"
-#include "archs/x86_64/kernel/IDT.h"
-#include "archs/x86_64/kernel/Interrupts.h"
-#include "archs/x86_64/kernel/x86_64.h"
+#include "archs/x86_64/GDT.h"
+#include "archs/x86_64/IDT.h"
+#include "archs/x86_64/Interrupts.h"
+#include "archs/x86_64/x86_64.h"
 
 extern "C" void arch_main(void *info, uint32_t magic)
 {

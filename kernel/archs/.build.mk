@@ -6,12 +6,12 @@ CRTS= \
 -include kernel/archs/$(CONFIG_ARCH)/.build.mk
 
 KERNEL_SOURCES += \
-	$(wildcard kernel/archs/$(CONFIG_ARCH)/kernel/*.cpp) \
-	$(wildcard kernel/archs/$(CONFIG_ARCH)/kernel/*/*.cpp)
+	$(wildcard kernel/archs/$(CONFIG_ARCH)/*.cpp) \
+	$(wildcard kernel/archs/$(CONFIG_ARCH)/*/*.cpp)
 
 KERNEL_ASSEMBLY_SOURCES += \
-	$(wildcard kernel/archs/$(CONFIG_ARCH)/kernel/*.s) \
-	$(wildcard kernel/archs/$(CONFIG_ARCH)/kernel/*/*.s)
+	$(wildcard kernel/archs/$(CONFIG_ARCH)/*.s) \
+	$(wildcard kernel/archs/$(CONFIG_ARCH)/*/*.s)
 
 list-src:
 	@echo $(KERNEL_SOURCES)

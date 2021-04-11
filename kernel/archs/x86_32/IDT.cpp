@@ -1,5 +1,5 @@
 
-#include "archs/x86_32/kernel/IDT.h"
+#include "archs/x86_32/IDT.h"
 
 extern uintptr_t __interrupt_vector[];
 

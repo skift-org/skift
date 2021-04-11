@@ -7,9 +7,9 @@
 #include "kernel/system/System.h"
 #include "kernel/tasking/Syscalls.h"
 
-#include "archs/x86/kernel/PIC.h"
-#include "archs/x86_32/kernel/Interrupts.h"
-#include "archs/x86_32/kernel/x86_32.h"
+#include "archs/x86/PIC.h"
+#include "archs/x86_32/Interrupts.h"
+#include "archs/x86_32/x86_32.h"
 
 static const char *_exception_messages[32] = {
     "Division by zero",

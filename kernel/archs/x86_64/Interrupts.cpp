@@ -6,10 +6,10 @@
 #include "kernel/system/System.h"
 #include "kernel/tasking/Syscalls.h"
 
-#include "archs/x86/kernel/PIC.h"
+#include "archs/x86/PIC.h"
 
-#include "archs/x86_64/kernel/Interrupts.h"
-#include "archs/x86_64/kernel/x86_64.h"
+#include "archs/x86_64/Interrupts.h"
+#include "archs/x86_64/x86_64.h"
 
 static const char *_exception_messages[32] = {
     "Division by zero",

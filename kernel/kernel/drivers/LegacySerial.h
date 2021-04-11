@@ -3,7 +3,7 @@
 #include <libutils/RingBuffer.h>
 #include <skift/Lock.h>
 
-#include "archs/x86/kernel/COM.h"
+#include "archs/x86/COM.h"
 
 #include "kernel/devices/LegacyDevice.h"
 

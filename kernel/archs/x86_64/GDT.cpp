@@ -1,4 +1,4 @@
-#include "archs/x86_64/kernel/GDT.h"
+#include "archs/x86_64/GDT.h"
 
 static TSS64 tss = {
     .reserved = 0,

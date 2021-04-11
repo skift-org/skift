@@ -5,6 +5,6 @@ AR:=i686-pc-skift-ar
 AS=nasm
 ASFLAGS=-f elf32
 
-KERNEL_SOURCES += $(wildcard kernel/archs/x86/kernel/*.cpp)
+KERNEL_SOURCES += $(wildcard kernel/archs/x86/*.cpp)
 
-KERNEL_ASSEMBLY_SOURCES += $(wildcard kernel/archs/x86/kernel/*.s)
+KERNEL_ASSEMBLY_SOURCES += $(wildcard kernel/archs/x86/*.s)

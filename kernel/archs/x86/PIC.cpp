@@ -1,6 +1,6 @@
 
-#include "archs/x86/kernel/PIC.h"
-#include "archs/x86/kernel/IOPort.h"
+#include "archs/x86/PIC.h"
+#include "archs/x86/IOPort.h"
 
 #define PIC_WAIT()                    \
     do                                \

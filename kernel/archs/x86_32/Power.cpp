@@ -3,10 +3,10 @@
 #include "archs/Architectures.h"
 #include "archs/VirtualMemory.h"
 
-#include "archs/x86/kernel/IOPort.h"
-#include "archs/x86/kernel/x86.h"
-#include "archs/x86_32/kernel/ACPI.h"
-#include "archs/x86_32/kernel/Power.h"
+#include "archs/x86/IOPort.h"
+#include "archs/x86/x86.h"
+#include "archs/x86_32/ACPI.h"
+#include "archs/x86_32/Power.h"
 
 namespace x86
 {

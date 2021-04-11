@@ -1,7 +1,7 @@
 #include <libsystem/Logger.h>
 
-#include "archs/x86/kernel/PIC.h"
-#include "archs/x86_32/kernel/LAPIC.h"
+#include "archs/x86/PIC.h"
+#include "archs/x86_32/LAPIC.h"
 
 constexpr int LAPIC_EOI = 0x00B0;
 

@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "archs/x86/kernel/FPU.h"
+#include "archs/x86/FPU.h"
 
 char fpu_initial_context[512] ALIGNED(16);
 char fpu_registers[512] ALIGNED(16);

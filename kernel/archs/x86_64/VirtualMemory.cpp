@@ -1,5 +1,5 @@
-#include <libutils/ResultOr.h>
 #include <libsystem/Logger.h>
+#include <libutils/ResultOr.h>
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/memory/Memory.h"
@@ -7,8 +7,8 @@
 
 #include "archs/VirtualMemory.h"
 
-#include "archs/x86_64/kernel/Paging.h"
-#include "archs/x86_64/kernel/x86_64.h"
+#include "archs/x86_64/Paging.h"
+#include "archs/x86_64/x86_64.h"
 
 PageMappingLevel4 kpml4 ALIGNED(ARCH_PAGE_SIZE) = {};
 PageMappingLevel3 kpml3 ALIGNED(ARCH_PAGE_SIZE) = {};

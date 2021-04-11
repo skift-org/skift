@@ -1,6 +1,6 @@
 #pragma once
 
-#include "archs/x86/kernel/x86.h"
+#include "archs/x86/x86.h"
 
 static inline uint64_t RBP()
 {

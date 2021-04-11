@@ -46,9 +46,10 @@ CXX_WARNINGS := \
 BUILD_INCLUDE:= \
 	-I. \
 	-Ikernel \
-	-Iapps \
-	-Ilibraries \
-	-Ilibraries/libc
+	-Iuserspace/ \
+	-Iuserspace/apps \
+	-Iuserspace/libraries \
+	-Iuserspace/libraries/libc
 
 BUILD_DEFINES:= \
 	-D__BUILD_ARCH__=\""$(CONFIG_ARCH)"\" \
@@ -95,14 +96,20 @@ ASFLAGS=-f elf32
 
 STRIP:=i686-pc-skift-strip
 
-include kernel/archs/.build.mk
-include thirdparty/.build.mk
-include kernel/kernel/.build.mk
-include libraries/.build.mk
-include apps/.build.mk
+
 include icons/.build.mk
+
+include kernel/archs/.build.mk
+include kernel/kernel/.build.mk
+
+include userspace/archs/.build.mk
+include userspace/libraries/.build.mk
+include userspace/apps/.build.mk
+include userspace/tests/.build.mk
+include userspace/utilities/.build.mk
+
+include thirdparty/.build.mk
 include meta/distros/.build.mk
-include tests/.build.mk
 
 # --- Ramdisk -------------------------------------------- #
 

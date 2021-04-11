@@ -2,20 +2,20 @@ define APP_TEMPLATE =
 
 $(1)_BINARY  = $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/$($(1)_NAME)
 
-$(1)_SOURCES = $$(wildcard apps/$($(1)_NAME)/*.cpp) \
-			   $$(wildcard apps/$($(1)_NAME)/*/*.cpp)
+$(1)_SOURCES = $$(wildcard userspace/apps/$($(1)_NAME)/*.cpp) \
+			   $$(wildcard userspace/apps/$($(1)_NAME)/*/*.cpp)
 
-$(1)_ASSETS := $$(wildcard apps/$($(1)_NAME)/*.json) \
-			   $$(wildcard apps/$($(1)_NAME)/*.png)
+$(1)_ASSETS := $$(wildcard userspace/apps/$($(1)_NAME)/*.json) \
+			   $$(wildcard userspace/apps/$($(1)_NAME)/*.png)
 
-$(1)_ASSETS := $$(patsubst apps/$($(1)_NAME)/%, $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/%, $$($(1)_ASSETS))
+$(1)_ASSETS := $$(patsubst userspace/apps/$($(1)_NAME)/%, $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/%, $$($(1)_ASSETS))
 
-$(1)_OBJECTS = $$(patsubst apps/%.cpp, $$(BUILDROOT)/apps/%.o, $$($(1)_SOURCES))
+$(1)_OBJECTS = $$(patsubst userspace/apps/%.cpp, $$(BUILDROOT)/userspace/apps/%.o, $$($(1)_SOURCES))
 
 TARGETS += $$($(1)_BINARY) $$($(1)_ASSETS)
 OBJECTS += $$($(1)_OBJECTS)
 
-$(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/%: apps/$($(1)_NAME)/%
+$(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/%: userspace/apps/$($(1)_NAME)/%
 	$$(DIRECTORY_GUARD)
 	cp $$< $$@
 
@@ -28,12 +28,12 @@ $$($(1)_BINARY): $$($(1)_OBJECTS) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a
 		$(STRIP) $$@; \
 	fi
 
-$$(BUILDROOT)/apps/$$($(1)_NAME)/%.o: apps/$$($(1)_NAME)/%.cpp
+$$(BUILDROOT)/userspace/apps/$$($(1)_NAME)/%.o: userspace/apps/$$($(1)_NAME)/%.cpp
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [CXX] $$<
 	@$(CXX) $(CXXFLAGS) -c -o $$@ $$<
 
 endef
 
--include apps/*/.build.mk
+-include userspace/apps/*/.build.mk
 $(foreach app, $(APPS), $(eval $(call APP_TEMPLATE,$(app))))

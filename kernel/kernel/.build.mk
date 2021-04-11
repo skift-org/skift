@@ -8,32 +8,32 @@ KERNEL_ASSEMBLY_SOURCES += \
 	$(wildcard kernel/kernel/*/*.s)
 
 KERNEL_LIBRARIES_SOURCES = \
-	$(wildcard libraries/libc/string.cpp) \
-	$(wildcard libraries/libc/assert.cpp) \
-	$(wildcard libraries/libc/ctype.cpp) \
-	$(wildcard libraries/libc/skift/NumberFormatter.cpp) \
-	$(wildcard libraries/libc/skift/Printf.cpp) \
-	$(wildcard libraries/libc/skift/Time.cpp) \
-	$(wildcard libraries/libc/stdlib/allocator.cpp) \
-	$(wildcard libraries/libc/stdio/sprintf.cpp) \
-	$(wildcard libraries/libc/cxx/new-delete.cpp) \
-	$(wildcard libraries/libfile/TARArchive.cpp) \
-	$(wildcard libraries/libsystem/json/*.cpp) \
-	$(wildcard libraries/libsystem/*.cpp) \
-	$(wildcard libraries/libsystem/io/*.cpp) \
-	$(wildcard libraries/libsystem/unicode/*.cpp) \
-	$(wildcard libraries/libsystem/process/*.cpp) \
-	$(wildcard libraries/libsystem/utils/*.cpp) \
-	$(wildcard libraries/libsystem/core/*.cpp) \
-	$(wildcard libraries/libsystem/thread/*.cpp) \
-	$(wildcard libraries/libsystem/system/*.cpp) \
+	$(wildcard userspace/libraries/libc/string.cpp) \
+	$(wildcard userspace/libraries/libc/assert.cpp) \
+	$(wildcard userspace/libraries/libc/ctype.cpp) \
+	$(wildcard userspace/libraries/libc/skift/NumberFormatter.cpp) \
+	$(wildcard userspace/libraries/libc/skift/Printf.cpp) \
+	$(wildcard userspace/libraries/libc/skift/Time.cpp) \
+	$(wildcard userspace/libraries/libc/stdlib/allocator.cpp) \
+	$(wildcard userspace/libraries/libc/stdio/sprintf.cpp) \
+	$(wildcard userspace/libraries/libc/cxx/new-delete.cpp) \
+	$(wildcard userspace/libraries/libfile/TARArchive.cpp) \
+	$(wildcard userspace/libraries/libsystem/json/*.cpp) \
+	$(wildcard userspace/libraries/libsystem/*.cpp) \
+	$(wildcard userspace/libraries/libsystem/io/*.cpp) \
+	$(wildcard userspace/libraries/libsystem/unicode/*.cpp) \
+	$(wildcard userspace/libraries/libsystem/process/*.cpp) \
+	$(wildcard userspace/libraries/libsystem/utils/*.cpp) \
+	$(wildcard userspace/libraries/libsystem/core/*.cpp) \
+	$(wildcard userspace/libraries/libsystem/thread/*.cpp) \
+	$(wildcard userspace/libraries/libsystem/system/*.cpp) \
 
 KERNEL_BINARY = $(BUILDROOT)/kernel.bin
 
 KERNEL_OBJECTS = \
 	$(patsubst %.cpp, $(BUILDROOT)/%.o, $(KERNEL_SOURCES)) \
 	$(patsubst %.s, $(BUILDROOT)/%.s.o, $(KERNEL_ASSEMBLY_SOURCES)) \
-	$(patsubst libraries/%.cpp, $(BUILDROOT)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES))
+	$(patsubst userspace/libraries/%.cpp, $(BUILDROOT)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES))
 
 KERNEL_CXXFLAGS += \
 	$(CXXFLAGS) 	\
@@ -46,7 +46,7 @@ KERNEL_CXXFLAGS += \
 
 OBJECTS += $(KERNEL_OBJECTS)
 
-$(BUILDROOT)/kernel/%.o: libraries/%.cpp
+$(BUILDROOT)/kernel/%.o: userspace/libraries/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<

@@ -174,8 +174,8 @@ UNZIP_NAME = unzip
 define UTIL_TEMPLATE =
 
 $(1)_BINARY  = $(BUILD_DIRECTORY_UTILITIES)/$($(1)_NAME)
-$(1)_SOURCE  = apps/utilities/$($(1)_NAME).cpp
-$(1)_OBJECT  = $$(patsubst apps/utilities/%.cpp, $$(BUILDROOT)/apps/utilities/%.o, $$($(1)_SOURCE))
+$(1)_SOURCE  = userspace/utilities/$($(1)_NAME).cpp
+$(1)_OBJECT  = $$(patsubst userspace/utilities/%.cpp, $$(BUILDROOT)/userspace/utilities/%.o, $$($(1)_SOURCE))
 
 TARGETS += $$($(1)_BINARY)
 OBJECTS += $$($(1)_OBJECT)

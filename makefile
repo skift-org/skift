@@ -45,6 +45,7 @@ CXX_WARNINGS := \
 
 BUILD_INCLUDE:= \
 	-I. \
+	-Ikernel \
 	-Iapps \
 	-Ilibraries \
 	-Ilibraries/libc
@@ -94,10 +95,9 @@ ASFLAGS=-f elf32
 
 STRIP:=i686-pc-skift-strip
 
-include archs/.build.mk
-
+include kernel/archs/.build.mk
 include thirdparty/.build.mk
-include kernel/.build.mk
+include kernel/kernel/.build.mk
 include libraries/.build.mk
 include apps/.build.mk
 include icons/.build.mk

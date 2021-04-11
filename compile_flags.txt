@@ -1,6 +1,7 @@
 -xc++
 -std=c++20
--Ilibraries
--Iapps
--Ilibraries/libc
 -I.
+-Iapps
+-Ikernel/
+-Ilibraries
+-Ilibraries/libc

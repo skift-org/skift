@@ -1,11 +1,11 @@
 KERNEL_SOURCES += \
-	$(wildcard kernel/*.cpp) \
-	$(wildcard kernel/*/*.cpp) \
-	$(wildcard kernel/*/*/*.cpp)
+	$(wildcard kernel/kernel/*.cpp) \
+	$(wildcard kernel/kernel/*/*.cpp) \
+	$(wildcard kernel/kernel/*/*/*.cpp)
 
 KERNEL_ASSEMBLY_SOURCES += \
-	$(wildcard kernel/*.s) \
-	$(wildcard kernel/*/*.s)
+	$(wildcard kernel/kernel/*.s) \
+	$(wildcard kernel/kernel/*/*.s)
 
 KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libc/string.cpp) \
@@ -51,17 +51,17 @@ $(BUILDROOT)/kernel/%.o: libraries/%.cpp
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<
 
-$(BUILDROOT)/kernel/%.o: kernel/%.cpp
+$(BUILDROOT)/kernel/kernel/%.o: kernel/kernel/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
-$(BUILDROOT)/archs/%.o: archs/%.cpp
+$(BUILDROOT)/kernel/archs/%.o: kernel/archs/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<
 
-$(BUILDROOT)/archs/%.s.o: archs/%.s
+$(BUILDROOT)/kernel/archs/%.s.o: kernel/archs/%.s
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [AS] $<
 	@$(AS) $(ASFLAGS) $^ -o $@
@@ -69,4 +69,4 @@ $(BUILDROOT)/archs/%.s.o: archs/%.s
 $(KERNEL_BINARY): $(KERNEL_OBJECTS)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [LD] $(KERNEL_BINARY)
-	@$(CXX) $(LDFLAGS) $(KERNEL_LDFLAGS) -T archs/$(CONFIG_ARCH)/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc
+	@$(CXX) $(LDFLAGS) $(KERNEL_LDFLAGS) -T kernel/archs/$(CONFIG_ARCH)/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc

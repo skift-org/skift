@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := all
 
 export PATH := $(shell toolchain/use-it.sh):$(PATH)
-export PATH := $(shell toolbox/use-it.sh):$(PATH)
+export PATH := $(shell meta/utils/use-it.sh):$(PATH)
 export LC_ALL=C
 
 ifeq (, $(shell which convert))
@@ -11,7 +11,7 @@ endif
 
 DIRECTORY_GUARD=@mkdir -p $(@D)
 
-include configs/defaults.mk
+include meta/configs/defaults.mk
 
 BUILD_SYSTEM?=skift
 BUILD_DISTRO?=$(CONFIG_LOADER)-$(CONFIG_ARCH)
@@ -101,7 +101,7 @@ include kernel/.build.mk
 include libraries/.build.mk
 include apps/.build.mk
 include icons/.build.mk
-include distros/.build.mk
+include meta/distros/.build.mk
 include tests/.build.mk
 
 # --- Ramdisk -------------------------------------------- #
@@ -153,7 +153,7 @@ all: $(BOOTDISK)
 distro: $(BOOTDISK_GZIP)
 
 .PHONY: run
-include vms/$(CONFIG_VMACHINE).mk
+include meta/vms/$(CONFIG_VMACHINE).mk
 
 .PHONY: sync
 sync:

@@ -33,8 +33,8 @@ CONFIGS_PASS_TO_COMPILER = \
 
 CONFIG                ?=develop
 
-include configs/user.mk
-include configs/$(CONFIG).mk
+include meta/configs/user.mk
+include meta/configs/$(CONFIG).mk
 
 # Set the target architecture.
 # Possible values: x86_32/x86_64

@@ -28,12 +28,12 @@ KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libsystem/thread/*.cpp) \
 	$(wildcard libraries/libsystem/system/*.cpp) \
 
-KERNEL_BINARY = $(CONFIG_BUILD_DIRECTORY)/kernel.bin
+KERNEL_BINARY = $(BUILDROOT)/kernel.bin
 
 KERNEL_OBJECTS = \
-	$(patsubst %.cpp, $(CONFIG_BUILD_DIRECTORY)/%.o, $(KERNEL_SOURCES)) \
-	$(patsubst %.s, $(CONFIG_BUILD_DIRECTORY)/%.s.o, $(KERNEL_ASSEMBLY_SOURCES)) \
-	$(patsubst libraries/%.cpp, $(CONFIG_BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES))
+	$(patsubst %.cpp, $(BUILDROOT)/%.o, $(KERNEL_SOURCES)) \
+	$(patsubst %.s, $(BUILDROOT)/%.s.o, $(KERNEL_ASSEMBLY_SOURCES)) \
+	$(patsubst libraries/%.cpp, $(BUILDROOT)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES))
 
 KERNEL_CXXFLAGS += \
 	$(CXXFLAGS) 	\
@@ -46,22 +46,22 @@ KERNEL_CXXFLAGS += \
 
 OBJECTS += $(KERNEL_OBJECTS)
 
-$(CONFIG_BUILD_DIRECTORY)/kernel/%.o: libraries/%.cpp
+$(BUILDROOT)/kernel/%.o: libraries/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<
 
-$(CONFIG_BUILD_DIRECTORY)/kernel/%.o: kernel/%.cpp
+$(BUILDROOT)/kernel/%.o: kernel/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
-$(CONFIG_BUILD_DIRECTORY)/archs/%.o: archs/%.cpp
+$(BUILDROOT)/archs/%.o: archs/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<
 
-$(CONFIG_BUILD_DIRECTORY)/archs/%.s.o: archs/%.s
+$(BUILDROOT)/archs/%.s.o: archs/%.s
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [AS] $<
 	@$(AS) $(ASFLAGS) $^ -o $@

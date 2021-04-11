@@ -21,12 +21,13 @@ BUILD_GITREF=$(shell git rev-parse --abbrev-ref HEAD || echo unknown)@$(shell gi
 BUILD_UNAME=$(shell uname -s -o -m -r)
 DISKS_DIRECTORY=$(shell pwd)/disks
 
-SYSROOT=$(CONFIG_BUILD_DIRECTORY)/sysroot
-BOOTROOT=$(CONFIG_BUILD_DIRECTORY)/bootroot-$(CONFIG_LOADER)-$(CONFIG_ARCH)
+BUILDROOT=$(CONFIG_BUILD_DIRECTORY)/$(BUILD_TARGET)
+SYSROOT=$(BUILDROOT)/sysroot
+BOOTROOT=$(BUILDROOT)/bootroot-$(CONFIG_LOADER)-$(CONFIG_ARCH)
 BOOTDISK=$(DISKS_DIRECTORY)/bootdisk-$(CONFIG_LOADER)-$(CONFIG_ARCH).img
 BOOTDISK_GZIP=$(BOOTDISK).gz
 
-RAMDISK=$(CONFIG_BUILD_DIRECTORY)/ramdisk.tar
+RAMDISK=$(BUILDROOT)/ramdisk.tar
 
 BUILD_DIRECTORY_LIBS=$(SYSROOT)/System/Libraries
 BUILD_DIRECTORY_INCLUDE=$(SYSROOT)/System/Includes
@@ -62,6 +63,7 @@ CC:=i686-pc-skift-gcc
 CFLAGS= \
 	-std=gnu11 \
 	-MD \
+	--sysroot=$(SYSROOT) \
 	$(CONFIG_OPTIMISATIONS) \
 	$(BUILD_WARNING) \
 	$(BUILD_INCLUDE) \
@@ -72,6 +74,7 @@ CXX:=i686-pc-skift-g++
 CXXFLAGS:= \
 	-std=c++20 \
 	-MD \
+	--sysroot=$(SYSROOT) \
 	$(CONFIG_OPTIMISATIONS) \
 	$(BUILD_WARNING) \
 	$(CXX_WARNINGS) \
@@ -80,7 +83,8 @@ CXXFLAGS:= \
 	$(BUILD_CONFIGS)
 
 LD:=i686-pc-skift-ld
-LDFLAGS:=
+LDFLAGS:= \
+	--sysroot=$(SYSROOT)
 
 AR:=i686-pc-skift-ar
 ARFLAGS:=rcs
@@ -158,6 +162,10 @@ sync:
 
 .PHONY: clean
 clean:
+	rm -rf $(BUILDROOT)
+
+.PHONY: clean-all
+clean-all:
 	rm -rf $(CONFIG_BUILD_DIRECTORY)
 
 clean-fs:

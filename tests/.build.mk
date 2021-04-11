@@ -4,7 +4,7 @@ TESTS_SOURCES = $(wildcard tests/*.cpp) \
 			    $(wildcard tests/*/*.cpp) \
 				$(wildcard tests/*/*/*.cpp)
 
-TESTS_OBJECTS = $(patsubst %.cpp, $(CONFIG_BUILD_DIRECTORY)/%.o, $(TESTS_SOURCES))
+TESTS_OBJECTS = $(patsubst %.cpp, $(BUILDROOT)/%.o, $(TESTS_SOURCES))
 
 TESTS_LIBS = graphic compression injection io system c
 
@@ -20,7 +20,7 @@ $(TESTS_BINARY): $(TESTS_OBJECTS) $(patsubst %, $(BUILD_DIRECTORY_LIBS)/lib%.a, 
 		$(STRIP) $@; \
 	fi
 
-$(CONFIG_BUILD_DIRECTORY)/tests/%.o: tests/%.cpp
+$(BUILDROOT)/tests/%.o: tests/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [TESTS] [CXX] $<
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<

@@ -10,7 +10,7 @@ $(1)_ASSETS := $$(wildcard apps/$($(1)_NAME)/*.json) \
 
 $(1)_ASSETS := $$(patsubst apps/$($(1)_NAME)/%, $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/%, $$($(1)_ASSETS))
 
-$(1)_OBJECTS = $$(patsubst apps/%.cpp, $$(CONFIG_BUILD_DIRECTORY)/apps/%.o, $$($(1)_SOURCES))
+$(1)_OBJECTS = $$(patsubst apps/%.cpp, $$(BUILDROOT)/apps/%.o, $$($(1)_SOURCES))
 
 TARGETS += $$($(1)_BINARY) $$($(1)_ASSETS)
 OBJECTS += $$($(1)_OBJECTS)
@@ -28,7 +28,7 @@ $$($(1)_BINARY): $$($(1)_OBJECTS) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a
 		$(STRIP) $$@; \
 	fi
 
-$$(CONFIG_BUILD_DIRECTORY)/apps/$$($(1)_NAME)/%.o: apps/$$($(1)_NAME)/%.cpp
+$$(BUILDROOT)/apps/$$($(1)_NAME)/%.o: apps/$$($(1)_NAME)/%.cpp
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [CXX] $$<
 	@$(CXX) $(CXXFLAGS) -c -o $$@ $$<

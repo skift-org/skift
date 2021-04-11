@@ -1,5 +1,4 @@
 #include <libsystem/io/Filesystem.h>
-#include <libsystem/io/Stream.h>
 
 #include <libsystem/core/Plugs.h>
 

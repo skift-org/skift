@@ -1,7 +1,6 @@
 #include <string.h>
 
 #include <libsystem/Logger.h>
-#include <libsystem/io/Stream.h>
 #include <libutils/ResultOr.h>
 
 #include "archs/VirtualMemory.h"

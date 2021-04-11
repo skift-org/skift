@@ -1,6 +1,4 @@
 #include <libsystem/Result.h>
-#include <libsystem/io/Stream.h>
-#include <libsystem/process/Process.h>
 
 #define RESULT_ENUM_ENTRY_STRING(__entry, __description) #__entry,
 #define RESULT_ENUM_ENTRY_STRING_WITH_VALUE(__entry, __value, __description) #__entry,

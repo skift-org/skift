@@ -1,6 +1,5 @@
 #pragma once
 
-#include "kernel/graphics/PixelFormat.h"
 #include "kernel/memory/MemoryRange.h"
 
 #define HANDOVER_BOOTLOADER_NAME_SIZE 64

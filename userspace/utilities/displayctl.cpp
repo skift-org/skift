@@ -5,8 +5,6 @@
 #include <libio/Format.h>
 #include <libio/Socket.h>
 #include <libio/Streams.h>
-#include <libsystem/Result.h>
-#include <libsystem/io/Stream.h>
 
 #include "compositor/Protocol.h"
 
@@ -125,7 +123,8 @@ int gfxmode_set(String &mode_name)
 
     if (result != 0)
     {
-        CLEANUP(stream_cleanup) Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
+        CLEANUP(stream_cleanup)
+        Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
         result = gfxmode_set_iocall(device, mode.unwrap());
     }
 

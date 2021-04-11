@@ -1,6 +1,6 @@
-#include <libsystem/io/Stream.h>
-
 #include <stdio.h>
+
+#include <libsystem/io/Stream.h>
 
 int main(int argc, char **argv)
 {

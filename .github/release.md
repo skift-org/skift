@@ -2,7 +2,7 @@ These releases are published automatically every Monday. Please report any issue
 
 # Running skiftOS
 
-The recommended way of running skiftOS is in a virtual machine like QEMU or Virtual Box. With at least 512Mib of RAM. [More informations about running skift on Virtual-Box.](https://github.com/skiftOS/skift/blob/main/manual/00-meta/running_in_vbox.md)
+The recommended way of running skiftOS is in a virtual machine like QEMU or Virtual Box. With at least 512Mib of RAM. [More informations about running skift on Virtual-Box.](https://github.com/skiftOS/skift/blob/main/manual/meta/running_in_vbox.md)
 
 # Release Files
 

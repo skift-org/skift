@@ -51,7 +51,7 @@ jobs:
         timeout-minutes: 10
         continue-on-error: true
         run: |
-          python ./tests/host-driver.py ./disks/bootdisk-grub-x86_32.img
+          python ./tests/host-driver.py ./build/disks/bootdisk-grub-x86_32.img
 
       - name: Building skiftOS (x86_64)
         run: |
@@ -61,5 +61,5 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: disks
-          path: disks/
+          name: build/disks
+          path: build/disks/

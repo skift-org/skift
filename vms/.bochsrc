@@ -11,7 +11,7 @@ floppy_bootsig_check: disabled=0
 # no floppyb
 ata0: enabled=true, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
 ata0-master: type=none
-ata0-slave: type=disk, path=disks/bootdisk-limine-x86_64.img, status=inserted
+ata0-slave: type=disk, path=build/disks/bootdisk-limine-x86_64.img, status=inserted
 ata1: enabled=true, ioaddr1=0x170, ioaddr2=0x370, irq=15
 ata1-master: type=none
 ata1-slave: type=none

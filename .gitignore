@@ -6,7 +6,6 @@ toolchain/build-x86_32/
 toolchain/tarballs/
 toolchain/local/
 vm/
-disks/
 
 *.ignored
 *.out

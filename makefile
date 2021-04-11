@@ -19,7 +19,7 @@ BUILD_DISTRO?=$(CONFIG_LOADER)-$(CONFIG_ARCH)
 BUILD_TARGET=$(CONFIG)-$(CONFIG_ARCH)-$(BUILD_SYSTEM)
 BUILD_GITREF=$(shell git rev-parse --abbrev-ref HEAD || echo unknown)@$(shell git rev-parse --short HEAD || echo unknown)
 BUILD_UNAME=$(shell uname -s -o -m -r)
-DISKS_DIRECTORY=$(shell pwd)/disks
+DISKS_DIRECTORY=$(CONFIG_BUILD_DIRECTORY)/disks
 
 BUILDROOT=$(CONFIG_BUILD_DIRECTORY)/$(BUILD_TARGET)
 SYSROOT=$(BUILDROOT)/sysroot

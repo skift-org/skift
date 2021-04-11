@@ -69,7 +69,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: disks/bootdisk-grub-x86_32.img.gz
+          asset_path: build/disks/bootdisk-grub-x86_32.img.gz
           asset_name: bootdisk-grub-x86_32.img.gz
           asset_content_type: application/x-ima
 
@@ -80,7 +80,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: disks/bootdisk-limine-x86_32.img.gz
+          asset_path: build/disks/bootdisk-limine-x86_32.img.gz
           asset_name: bootdisk-limine-x86_32.img.gz
           asset_content_type: application/x-ima
 

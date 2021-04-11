@@ -338,13 +338,13 @@ Component *Window::child_at(Math::Vec2i position)
 
 void Window::on(EventType event, EventHandler handler)
 {
-    assert(event < EventType::__COUNT);
+    Assert::lower_than(event, EventType::__COUNT);
     _handlers[event] = move(handler);
 }
 
 void Window::dispatch_event(Event *event)
 {
-    assert(event);
+    Assert::not_null(event);
 
     if (is_mouse_event(event))
     {

@@ -5,6 +5,7 @@
 
 namespace Terminal
 {
+
 struct Cell
 {
     Codepoint codepoint = U' ';

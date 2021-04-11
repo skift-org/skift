@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include <libsystem/math/MinMax.h>
+#include <libmath/MinMax.h>
 #include <libsystem/unicode/UnicodeString.h>
 #include <libsystem/utils/BufferBuilder.h>
 

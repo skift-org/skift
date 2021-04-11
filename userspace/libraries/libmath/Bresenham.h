@@ -1,10 +1,12 @@
-#include <libmath/Vec2.h>
-#include <libutils/Vector.h>
-
 #include <math.h>
 
+#include <libmath/Vec2.h>
+
+namespace Math
+{
+
 template <typename TCallback>
-void bresenhamLow(int x0, int y0, int x1, int y1, int size, TCallback callback)
+void bresenham_low(int x0, int y0, int x1, int y1, int size, TCallback callback)
 {
     int dx, dy, i, p, x, y = 0;
     dx = x1 - x0;
@@ -37,7 +39,7 @@ void bresenhamLow(int x0, int y0, int x1, int y1, int size, TCallback callback)
 }
 
 template <typename TCallback>
-void bresenhamHigh(int x0, int y0, int x1, int y1, int size, TCallback callback)
+void bresenham_high(int x0, int y0, int x1, int y1, int size, TCallback callback)
 {
     int dx, dy, i, p, x, y = 0;
     dx = x1 - x0;
@@ -81,22 +83,24 @@ void bresenham(Math::Vec2i start, Math::Vec2i end, int size, TCallback callback)
     {
         if (x0 > x1)
         {
-            bresenhamLow(x1, y1, x0, y0, size, callback);
+            bresenham_low(x1, y1, x0, y0, size, callback);
         }
         else
         {
-            bresenhamLow(x0, y0, x1, y1, size, callback);
+            bresenham_low(x0, y0, x1, y1, size, callback);
         }
     }
     else
     {
         if (y0 > y1)
         {
-            bresenhamHigh(x1, y1, x0, y0, size, callback);
+            bresenham_high(x1, y1, x0, y0, size, callback);
         }
         else
         {
-            bresenhamHigh(x0, y0, x1, y1, size, callback);
+            bresenham_high(x0, y0, x1, y1, size, callback);
         }
     }
 }
+
+} // namespace Math

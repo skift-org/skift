@@ -1,5 +1,5 @@
+#include <libmath/MinMax.h>
 #include <libsystem/Logger.h>
-#include <libsystem/math/MinMax.h>
 
 #include "kernel/drivers/BGA.h"
 #include "kernel/graphics/EarlyConsole.h"

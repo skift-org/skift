@@ -1,6 +1,7 @@
+#include <libutils/Assert.h>
+
 #include <libsystem/cmdline/History.h>
 #include <libsystem/utils/List.h>
-#include <libutils/Assert.h>
 
 static List *history = nullptr;
 
@@ -23,8 +24,7 @@ void history_commit(UnicodeString *text)
 
     initialize_history_if_not_already();
 
-    if (history->any() &&
-        unicode_string_equals(history_peek(0), text))
+    if (history->any() && unicode_string_equals(history_peek(0), text))
     {
         // We don't want duplicated entry in our history!
         return;

@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <libutils/Vector.h>
 
-#include <libsystem/math/Bresenham.h>
+#include <libmath/Bresenham.h>
 
 #include "paint/PaintDocument.h"
 #include "paint/PaintTool.h"

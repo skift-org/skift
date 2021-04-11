@@ -3,10 +3,10 @@
 #include <skift/Printf.h>
 #include <string.h>
 
+#include <libmath/MinMax.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/io/Stream_internal.h>
-#include <libsystem/math/MinMax.h>
 
 Stream *_in_stream = nullptr;
 Stream *_out_stream = nullptr;

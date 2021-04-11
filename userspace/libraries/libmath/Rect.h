@@ -6,7 +6,7 @@
 #include <libmath/Vec2.h>
 #include <libutils/Anchor.h>
 
-#include <libsystem/math/MinMax.h>
+#include <libmath/MinMax.h>
 
 namespace Math
 {

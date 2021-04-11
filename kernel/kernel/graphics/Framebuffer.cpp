@@ -1,7 +1,7 @@
 #include <abi/Paths.h>
 
+#include <libmath/MinMax.h>
 #include <libsystem/Logger.h>
-#include <libsystem/math/MinMax.h>
 
 #include "archs/VirtualMemory.h"
 

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libgraphic/ColorsNames.h>
+#include <libmath/Lerp.h>
 #include <libsystem/Common.h>
-#include <libsystem/math/Lerp.h>
 #include <libutils/String.h>
 
 namespace Graphic
@@ -191,10 +191,10 @@ public:
     static constexpr Color lerp(Color from, Color to, float transition)
     {
         return from_rgba(
-            ::lerp(from.redf(), to.redf(), transition),
-            ::lerp(from.greenf(), to.greenf(), transition),
-            ::lerp(from.bluef(), to.bluef(), transition),
-            ::lerp(from.alphaf(), to.alphaf(), transition));
+            Math::lerp(from.redf(), to.redf(), transition),
+            Math::lerp(from.greenf(), to.greenf(), transition),
+            Math::lerp(from.bluef(), to.bluef(), transition),
+            Math::lerp(from.alphaf(), to.alphaf(), transition));
     }
 
     static constexpr Color blerp(Color c00, Color c10, Color c01, Color c11, float transitionx, float transitiony)

@@ -1,9 +1,9 @@
 #pragma once
 
+#include <libmath/MinMax.h>
 #include <libsystem/Common.h>
-#include <string.h>
-#include <libsystem/math/MinMax.h>
 #include <libutils/RefCounted.h>
+#include <string.h>
 
 #include "kernel/memory/MemoryRange.h"
 

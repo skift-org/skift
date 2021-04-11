@@ -63,7 +63,7 @@ const char *_bad_messages[] = {
 
 int run_all_testes()
 {
-    assert(_tests);
+    Assert::not_null(_tests);
 
     IO::errln("test: Running {} tests\n", _tests->count());
 

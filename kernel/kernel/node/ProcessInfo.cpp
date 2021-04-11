@@ -1,7 +1,7 @@
 #include <string.h>
 
+#include <libmath/MinMax.h>
 #include <libsystem/Result.h>
-#include <libsystem/math/MinMax.h>
 #include <libutils/json/Json.h>
 
 #include "kernel/interrupts/Interupts.h"
@@ -17,7 +17,7 @@ FsProcessInfo::FsProcessInfo() : FsNode(FILE_TYPE_DEVICE)
 static Iteration serialize_task(Json::Value::Array *list, Task *task)
 {
     if (task->id == 0)
-    {   
+    {
         return Iteration::CONTINUE;
     }
 

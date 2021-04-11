@@ -1,6 +1,6 @@
+#include <libmath/MinMax.h>
 #include <libsystem/Result.h>
 #include <string.h>
-#include <libsystem/math/MinMax.h>
 
 #include "kernel/node/File.h"
 #include "kernel/node/Handle.h"

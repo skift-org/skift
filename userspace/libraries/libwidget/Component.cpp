@@ -2,7 +2,7 @@
 
 #include <libgraphic/Font.h>
 #include <libgraphic/Painter.h>
-#include <libsystem/math/MinMax.h>
+#include <libmath/MinMax.h>
 #include <libwidget/Application.h>
 #include <libwidget/Component.h>
 #include <libwidget/Event.h>
@@ -510,8 +510,8 @@ Component *Component::child_at(Math::Vec2i position)
 
 void Component::add_child(Component *child)
 {
-    assert(child);
-    assert(child->_parent == nullptr);
+    Assert::not_null(child);
+    Assert::equal(child->_parent, nullptr);
 
     child->_parent = this;
     child->_window = _window;
@@ -523,7 +523,8 @@ void Component::add_child(Component *child)
 
 void Component::remove_child(Component *child)
 {
-    assert(child->_parent == this);
+    Assert::equal(child->_parent, this);
+
     _childs.remove_value(child);
     should_relayout();
 }

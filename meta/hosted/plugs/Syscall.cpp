@@ -1,5 +1,5 @@
 #include <abi/Syscalls.h>
-#include <libsystem/math/MinMax.h>
+#include <libmath/MinMax.h>
 
 #include <errno.h>
 #include <fcntl.h>

@@ -1,7 +1,7 @@
 #include <string.h>
 
+#include <libmath/MinMax.h>
 #include <libsystem/Result.h>
-#include <libsystem/math/MinMax.h>
 #include <libutils/json/Json.h>
 
 #include "kernel/devices/Devices.h"

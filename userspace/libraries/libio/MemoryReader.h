@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libio/Reader.h>
-#include <libsystem/math/MinMax.h>
+#include <libmath/MinMax.h>
 #include <libutils/Slice.h>
 
 namespace IO
@@ -31,10 +31,9 @@ public:
     {
     }
 
-    MemoryReader(RawStorage& raw)
+    MemoryReader(RawStorage &raw)
         : _memory(raw.storage())
     {
-        
     }
 
     ResultOr<size_t> read(void *buffer, size_t size) override

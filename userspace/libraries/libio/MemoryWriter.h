@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libio/Writer.h>
-#include <libsystem/math/MinMax.h>
+#include <libmath/MinMax.h>
 #include <libutils/SliceStorage.h>
 #include <libutils/StringStorage.h>
 

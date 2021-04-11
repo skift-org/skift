@@ -1,8 +1,8 @@
+#include <libmath/MinMax.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Invoker.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/eventloop/Timer.h>
-#include <libsystem/math/MinMax.h>
 #include <libsystem/system/System.h>
 #include <libsystem/utils/List.h>
 #include <libutils/Assert.h>

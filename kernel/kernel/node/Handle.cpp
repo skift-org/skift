@@ -2,8 +2,8 @@
 #include <assert.h>
 #include <string.h>
 
+#include <libmath/MinMax.h>
 #include <libsystem/Result.h>
-#include <libsystem/math/MinMax.h>
 
 #include "kernel/node/Connection.h"
 #include "kernel/node/Handle.h"

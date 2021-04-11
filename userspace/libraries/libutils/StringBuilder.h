@@ -1,8 +1,8 @@
 #pragma once
 
 #include <assert.h>
+#include <libmath/MinMax.h>
 #include <libsystem/Common.h>
-#include <libsystem/math/MinMax.h>
 #include <libutils/String.h>
 #include <libutils/Vector.h>
 #include <libutils/unicode/Codepoint.h>

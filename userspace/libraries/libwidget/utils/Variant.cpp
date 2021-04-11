@@ -1,7 +1,9 @@
 #include <assert.h>
-#include <libwidget/utils/Variant.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <libutils/Assert.h>
+#include <libwidget/utils/Variant.h>
 
 namespace Widget
 {
@@ -22,7 +24,7 @@ Variant::Variant(float value) : _type(VarianType::FLOAT)
 
 Variant::Variant(const char *fmt, ...) : _type(VarianType::STRING)
 {
-    assert(strlen(fmt) < VARIANT_STRING_SIZE);
+    Assert::lower_than(strlen(fmt), VARIANT_STRING_SIZE);
 
     va_list args;
     va_start(args, fmt);

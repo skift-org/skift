@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libgraphic/Font.h>
+#include <libutils/Assert.h>
 #include <libutils/Observable.h>
 #include <libutils/OwnPtr.h>
 #include <libutils/RefCounted.h>
@@ -29,7 +30,7 @@ public:
 
     Codepoint operator[](size_t index)
     {
-        assert(index < length());
+        Assert::lower_than(index, length());
 
         return _codepoints[index];
     }

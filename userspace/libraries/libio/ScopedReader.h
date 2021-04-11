@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libio/Reader.h>
-#include <libsystem/math/MinMax.h>
+#include <libmath/MinMax.h>
 
 namespace IO
 {

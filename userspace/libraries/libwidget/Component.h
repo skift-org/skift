@@ -3,7 +3,7 @@
 #include <libgraphic/Font.h>
 #include <libmath/Rect.h>
 #include <libsystem/utils/List.h>
-
+#include <libutils/Assert.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
 #include <libwidget/Theme.h>
@@ -154,7 +154,7 @@ public:
 
     void window(Window *window)
     {
-        assert(!_window);
+        Assert::is_true(_window == nullptr);
 
         _window = window;
     }

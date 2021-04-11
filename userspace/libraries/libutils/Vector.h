@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-#include <libsystem/math/MinMax.h>
+#include <libmath/MinMax.h>
 
 #include <libutils/Iteration.h>
 #include <libutils/New.h>

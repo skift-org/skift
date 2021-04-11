@@ -1,5 +1,5 @@
 
-#include <libsystem/math/MinMax.h>
+#include <libmath/MinMax.h>
 #include <libsystem/system/Memory.h>
 
 void memory_zero(void *where, size_t how_many)

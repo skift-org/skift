@@ -5,6 +5,9 @@
 #include <libutils/Callback.h>
 #include <libutils/RefPtr.h>
 
+namespace Async
+{
+
 class Timer
 {
 private:
@@ -37,3 +40,5 @@ public:
 
     void stop();
 };
+
+} // namespace Event

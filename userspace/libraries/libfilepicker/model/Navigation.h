@@ -1,7 +1,7 @@
 #pragma once
 
+#include <libasync/Observable.h>
 #include <libsystem/process/Process.h>
-#include <libutils/Observable.h>
 #include <libutils/Path.h>
 #include <libutils/Vector.h>
 
@@ -9,7 +9,7 @@ namespace FilePicker
 {
 
 class Navigation :
-    public Observable<Navigation>,
+    public Async::Observable<Navigation>,
     public RefCounted<Navigation>
 {
 private:

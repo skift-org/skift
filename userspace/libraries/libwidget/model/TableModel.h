@@ -1,7 +1,7 @@
 #pragma once
 
+#include <libasync/Observable.h>
 #include <libgraphic/Color.h>
-#include <libutils/Observable.h>
 #include <libwidget/utils/Variant.h>
 
 namespace Widget
@@ -9,7 +9,7 @@ namespace Widget
 
 class TableModel :
     public RefCounted<TableModel>,
-    public Observable<TableModel>
+    public Async::Observable<TableModel>
 {
 public:
     TableModel() {}

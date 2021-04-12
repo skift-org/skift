@@ -1,5 +1,8 @@
-#include <libsystem/eventloop/EventLoop.h>
-#include <libsystem/eventloop/Timer.h>
+#include <libasync/Loop.h>
+#include <libasync/Timer.h>
+
+namespace Async
+{
 
 Timer::Timer(Timeout interval, Callback<void()> callback)
     : _interval(interval),
@@ -17,7 +20,7 @@ void Timer::start()
     if (!_running)
     {
         _running = true;
-        EventLoop::register_timer(this);
+        Loop::register_timer(this);
     }
 }
 
@@ -26,6 +29,8 @@ void Timer::stop()
     if (_running)
     {
         _running = false;
-        EventLoop::unregister_timer(this);
+        Loop::unregister_timer(this);
     }
 }
+
+} // namespace Async

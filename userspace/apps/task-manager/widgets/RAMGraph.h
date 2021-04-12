@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/eventloop/Timer.h>
+#include <libasync/Timer.h>
 
 #include <libwidget/Graph.h>
 #include <libwidget/Label.h>
@@ -19,8 +19,8 @@ private:
     Widget::Label *_label_available;
     Widget::Label *_label_greedy;
 
-    OwnPtr<Timer> _graph_timer{};
-    OwnPtr<Timer> _text_timer{};
+    OwnPtr<Async::Timer> _graph_timer{};
+    OwnPtr<Async::Timer> _text_timer{};
 
 public:
     RAMGraph(Component *parent, RefPtr<TaskModel> model);

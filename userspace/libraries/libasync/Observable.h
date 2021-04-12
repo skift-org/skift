@@ -4,6 +4,9 @@
 #include <libutils/OwnPtr.h>
 #include <libutils/Vector.h>
 
+namespace Async
+{
+
 template <typename T>
 class Observable
 {
@@ -90,3 +93,5 @@ public:
 
 template <typename T>
 using Observer = typename Observable<T>::_Observer;
+
+} // namespace Async

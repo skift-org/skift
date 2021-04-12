@@ -15,7 +15,7 @@ class DirectoryListing : public Widget::TableModel
 private:
     RefPtr<Navigation> _navigation;
     Vector<FileInfo> _files{};
-    OwnPtr<Observer<Navigation>> _observer;
+    OwnPtr<Async::Observer<Navigation>> _observer;
 
 public:
     DirectoryListing(RefPtr<Navigation> navigation);

@@ -1,12 +1,12 @@
 #include <assert.h>
 
+#include <libasync/Loop.h>
+#include <libasync/Notifier.h>
 #include <libio/Connection.h>
 #include <libio/Format.h>
 #include <libio/Socket.h>
 #include <libsettings/Setting.h>
 #include <libsystem/Logger.h>
-#include <libsystem/eventloop/EventLoop.h>
-#include <libsystem/eventloop/Notifier.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/utils/Hexdump.h>
 #include <libwidget/Application.h>
@@ -32,7 +32,7 @@ enum class State
 Vector<Window *> _windows;
 State _state = State::UNINITIALIZED;
 IO::Connection _connection;
-OwnPtr<Notifier> _connection_notifier;
+OwnPtr<Async::Notifier> _connection_notifier;
 bool _wireframe = false;
 
 /* --- IPC ------------------------------------------------------------------ */
@@ -351,9 +351,9 @@ Result initialize(int argc, char **argv)
 
     _connection = TRY(IO::Socket::connect("/Session/compositor.ipc"));
 
-    EventLoop::initialize();
+    Async::Loop::initialize();
 
-    _connection_notifier = own<Notifier>(_connection, POLL_READ, []() {
+    _connection_notifier = own<Async::Notifier>(_connection, POLL_READ, []() {
         CompositorMessage message = {};
         auto read_result = _connection.read(&message, sizeof(CompositorMessage));
 
@@ -377,7 +377,7 @@ Result initialize(int argc, char **argv)
 
     _state = State::RUNNING;
 
-    EventLoop::atexit(uninitialized);
+    Async::Loop::atexit(uninitialized);
 
     auto result_or_greetings = wait_for_message(COMPOSITOR_MESSAGE_GREETINGS);
 
@@ -400,21 +400,21 @@ int run()
 {
     assert(_state == State::RUNNING);
 
-    return EventLoop::run();
+    return Async::Loop::run();
 }
 
 int run_nested()
 {
     assert(_state == State::RUNNING);
 
-    return EventLoop::run_nested();
+    return Async::Loop::run_nested();
 }
 
 int pump()
 {
     assert(_state == State::RUNNING);
 
-    EventLoop::pump(true);
+    Async::Loop::pump(true);
 
     return 0;
 }
@@ -436,13 +436,13 @@ void exit(int exit_value)
     _connection_notifier = nullptr;
     _connection.close();
 
-    EventLoop::exit(exit_value);
+    Async::Loop::exit(exit_value);
 }
 
 void exit_nested(int exit_value)
 {
     assert(_state == State::RUNNING);
-    EventLoop::exit_nested(exit_value);
+    Async::Loop::exit_nested(exit_value);
 }
 
 } // namespace Application

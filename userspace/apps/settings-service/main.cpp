@@ -1,6 +1,5 @@
+#include <libasync/Loop.h>
 #include <libsystem/Logger.h>
-#include <libsystem/eventloop/EventLoop.h>
-#include <libsystem/eventloop/Notifier.h>
 
 #include "settings-service/Server.h"
 
@@ -11,7 +10,7 @@ int main(int argc, const char **argv)
 
     logger_info("Initializing setting-service...");
 
-    EventLoop::initialize();
+    Async::Loop::initialize();
 
     logger_info("Loading settings...");
 
@@ -23,5 +22,5 @@ int main(int argc, const char **argv)
 
     logger_info("Ready!");
 
-    return EventLoop::run();
+    return Async::Loop::run();
 }

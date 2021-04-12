@@ -10,7 +10,7 @@ DateAndTime::DateAndTime(Component *parent) : Button(parent, Button::TEXT)
 {
     auto label = new Widget::Label(this, "");
 
-    _timer = own<Timer>(1000, [this, label]() {
+    _timer = own<Async::Timer>(1000, [this, label]() {
         TimeStamp timestamp = timestamp_now();
         DateTime datetime = timestamp_to_datetime(timestamp);
 

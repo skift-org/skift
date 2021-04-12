@@ -1,8 +1,8 @@
 #pragma once
 
+#include <libasync/Notifier.h>
 #include <libio/Connection.h>
 #include <libio/Socket.h>
-#include <libsystem/eventloop/Notifier.h>
 #include <libutils/Callback.h>
 #include <libutils/ResultOr.h>
 
@@ -14,14 +14,14 @@ class Peer
 {
 private:
     IO::Connection _connection;
-    OwnPtr<Notifier> _notifier;
+    OwnPtr<Async::Notifier> _notifier;
 
 public:
     bool connected() { return !_connection.closed(); }
 
     Peer(IO::Connection connection) : _connection{connection}
     {
-        _notifier = own<Notifier>(_connection, POLL_READ, [this]() {
+        _notifier = own<Async::Notifier>(_connection, POLL_READ, [this]() {
             auto result_or_message = Protocol::decode_message(_connection);
 
             if (result_or_message.success())

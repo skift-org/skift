@@ -1,8 +1,8 @@
 #pragma once
 
+#include <libasync/Observable.h>
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
-#include <libutils/Observable.h>
 
 #include "neko/graphics/Sprites.h"
 #include "neko/model/Behavior.h"
@@ -10,7 +10,7 @@
 namespace neko
 {
 
-class Neko : public Observable<Neko>
+class Neko : public Async::Observable<Neko>
 {
 private:
     int _tick = 0;

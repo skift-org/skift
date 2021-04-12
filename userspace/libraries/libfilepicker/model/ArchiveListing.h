@@ -18,7 +18,7 @@ private:
     RefPtr<Navigation> _navigation;
     RefPtr<Archive> _archive;
     Vector<ArchiveEntryInfo> _entries{};
-    OwnPtr<Observer<Navigation>> _observer;
+    OwnPtr<Async::Observer<Navigation>> _observer;
 
 public:
     ArchiveListing(RefPtr<Navigation> navigation, RefPtr<Archive> archive);

@@ -1,0 +1,3 @@
+LIBS += ASYNC
+
+ASYNC_NAME = async

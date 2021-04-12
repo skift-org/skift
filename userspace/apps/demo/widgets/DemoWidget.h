@@ -9,7 +9,7 @@ class DemoWidget : public Widget::Component
 private:
     double _time{};
     Demo *_demo;
-    OwnPtr<Timer> _timer;
+    OwnPtr<Async::Timer> _timer;
 
 public:
     Demo *demo() { return _demo; }

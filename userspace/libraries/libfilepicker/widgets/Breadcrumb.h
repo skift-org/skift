@@ -14,8 +14,8 @@ private:
     RefPtr<Navigation> _navigation;
     RefPtr<Bookmarks> _bookmarks;
 
-    OwnPtr<Observer<Navigation>> _navigation_observer;
-    OwnPtr<Observer<Bookmarks>> _bookmarks_observer;
+    OwnPtr<Async::Observer<Navigation>> _navigation_observer;
+    OwnPtr<Async::Observer<Bookmarks>> _bookmarks_observer;
 
     RefPtr<Graphic::Icon> _icon_computer;
     RefPtr<Graphic::Icon> _icon_expand;

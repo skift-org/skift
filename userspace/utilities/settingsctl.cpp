@@ -1,6 +1,6 @@
 #include <libutils/ArgParse.h>
 
-#include <libsystem/eventloop/EventLoop.h>
+#include <libasync/Loop.h>
 
 #include <libsettings/Service.h>
 #include <libsettings/Watcher.h>
@@ -65,7 +65,7 @@ int main(int argc, const char **argv)
             args.usage();
         }
 
-        EventLoop::initialize();
+        Async::Loop::initialize();
 
         watcher = own<Settings::Watcher>(Settings::Path::parse(maybe_key_name.unwrap()), [&](auto &value) {
             Prettifier pretty;
@@ -74,7 +74,7 @@ int main(int argc, const char **argv)
             stream_format(out_stream, "%s\n", pretty.finalize().cstring());
         });
 
-        return EventLoop::run();
+        return Async::Loop::run();
     });
 
     args.epiloge("Option cannot be combined.");

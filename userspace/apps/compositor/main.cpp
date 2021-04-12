@@ -1,13 +1,13 @@
 #include <abi/Paths.h>
 #include <assert.h>
 
+#include <libasync/Loop.h>
+#include <libasync/Notifier.h>
+#include <libasync/Timer.h>
 #include <libio/Connection.h>
 #include <libio/File.h>
 #include <libio/Socket.h>
 #include <libsystem/Logger.h>
-#include <libsystem/eventloop/EventLoop.h>
-#include <libsystem/eventloop/Notifier.h>
-#include <libsystem/eventloop/Timer.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/unicode/UTF8Decoder.h>
@@ -65,14 +65,14 @@ int main(int argc, char const *argv[])
         return PROCESS_FAILURE;
     }
 
-    EventLoop::initialize();
+    Async::Loop::initialize();
 
     IO::File keyboard_stream{KEYBOARD_DEVICE_PATH, OPEN_READ};
     IO::File mouse_stream{MOUSE_DEVICE_PATH, OPEN_READ};
 
     IO::Socket socket{"/Session/compositor.ipc", OPEN_CREATE};
 
-    auto keyboard_notifier = own<Notifier>(keyboard_stream, POLL_READ, [&]() {
+    auto keyboard_notifier = own<Async::Notifier>(keyboard_stream, POLL_READ, [&]() {
         KeyboardPacket packet;
         size_t size = keyboard_stream.read(&packet, sizeof(KeyboardPacket)).unwrap();
 
@@ -104,7 +104,7 @@ int main(int argc, char const *argv[])
         client_destroy_disconnected();
     });
 
-    auto mouse_notifier = own<Notifier>(mouse_stream, POLL_READ, [&]() {
+    auto mouse_notifier = own<Async::Notifier>(mouse_stream, POLL_READ, [&]() {
         MousePacket packet;
         size_t size = mouse_stream.read(&packet, sizeof(MousePacket)).unwrap();
 
@@ -120,13 +120,13 @@ int main(int argc, char const *argv[])
         client_destroy_disconnected();
     });
 
-    auto socker_notifier = own<Notifier>(socket, POLL_ACCEPT, [&]() {
+    auto socker_notifier = own<Async::Notifier>(socket, POLL_ACCEPT, [&]() {
         IO::Connection incoming_connection = socket.accept().unwrap();
         Client::connect(incoming_connection);
         client_destroy_disconnected();
     });
 
-    auto repaint_timer = own<Timer>(1000 / 60, []() {
+    auto repaint_timer = own<Async::Timer>(1000 / 60, []() {
         renderer_repaint_dirty();
         client_destroy_disconnected();
     });
@@ -137,5 +137,5 @@ int main(int argc, char const *argv[])
     cursor_initialize();
     renderer_initialize();
 
-    return EventLoop::run();
+    return Async::Loop::run();
 }

@@ -1,8 +1,8 @@
 #pragma once
 
+#include <libasync/Invoker.h>
+#include <libasync/Notifier.h>
 #include <libio/Socket.h>
-#include <libsystem/eventloop/Invoker.h>
-#include <libsystem/eventloop/Notifier.h>
 
 #include "settings-service/Client.h"
 #include "settings-service/Repository.h"
@@ -14,8 +14,8 @@ class Server
 {
 private:
     IO::Socket _socket;
-    OwnPtr<Notifier> _notifier;
-    OwnPtr<Invoker> _invoker;
+    OwnPtr<Async::Notifier> _notifier;
+    OwnPtr<Async::Invoker> _invoker;
 
     Vector<OwnPtr<Client>> _clients{};
     Repository &_repository;
@@ -25,7 +25,7 @@ public:
     {
         _socket = IO::Socket{"/Session/settings.ipc", OPEN_CREATE};
 
-        _notifier = own<Notifier>(_socket, POLL_ACCEPT, [this]() {
+        _notifier = own<Async::Notifier>(_socket, POLL_ACCEPT, [this]() {
             auto connection = _socket.accept();
 
             if (!connection.success())
@@ -46,7 +46,7 @@ public:
             _clients.push_back(client);
         });
 
-        _invoker = own<Invoker>([this]() {
+        _invoker = own<Async::Invoker>([this]() {
             _clients.remove_all_match([](auto &client) {
                 return !client->connected();
             });

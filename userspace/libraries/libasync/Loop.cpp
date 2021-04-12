@@ -1,14 +1,15 @@
-#include <libmath/MinMax.h>
-#include <libsystem/eventloop/EventLoop.h>
-#include <libsystem/eventloop/Invoker.h>
-#include <libsystem/eventloop/Notifier.h>
-#include <libsystem/eventloop/Timer.h>
+#include <libasync/Invoker.h>
+#include <libasync/Loop.h>
+#include <libasync/Notifier.h>
+#include <libasync/Timer.h>
 #include <libsystem/system/System.h>
-#include <libsystem/utils/List.h>
 #include <libutils/Assert.h>
 #include <libutils/Vector.h>
 
-namespace EventLoop
+namespace Async
+{
+
+namespace Loop
 {
 
 /* --- Notifiers ------------------------------------------------------------ */
@@ -260,4 +261,6 @@ void exit_nested(int exit_value)
     _nested_exit_value = exit_value;
 }
 
-} // namespace EventLoop
+} // namespace Loop
+
+} // namespace Async

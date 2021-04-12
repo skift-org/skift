@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/eventloop/Timer.h>
+#include <libasync/Timer.h>
 
 #include <libwidget/Button.h>
 
@@ -10,8 +10,8 @@ namespace panel
 class RessourceMonitor : public Widget::Button
 {
 private:
-    OwnPtr<Timer> _ram_timer;
-    OwnPtr<Timer> _cpu_timer;
+    OwnPtr<Async::Timer> _ram_timer;
+    OwnPtr<Async::Timer> _cpu_timer;
 
 public:
     RessourceMonitor(Widget::Component *parent);

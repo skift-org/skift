@@ -1,6 +1,5 @@
 #include <assert.h>
 
-#include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/system/Memory.h>
 #include <libwidget/Application.h>
 #include <libwidget/Container.h>
@@ -81,8 +80,8 @@ Window::Window(WindowFlag flags)
 
     _keyboard_focus = _root;
 
-    _repaint_invoker = own<Invoker>([this]() { repaint_dirty(); });
-    _relayout_invoker = own<Invoker>([this]() { relayout(); });
+    _repaint_invoker = own<Async::Invoker>([this]() { repaint_dirty(); });
+    _relayout_invoker = own<Async::Invoker>([this]() { relayout(); });
 
     Application::add_window(this);
     position({96, 72});

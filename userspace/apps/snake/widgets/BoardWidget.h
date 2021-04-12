@@ -1,7 +1,7 @@
 #pragma once
 
+#include <libasync/Timer.h>
 #include <libgraphic/Painter.h>
-#include <libsystem/eventloop/Timer.h>
 #include <libwidget/Component.h>
 
 #include "snake/model/Board.h"
@@ -14,14 +14,14 @@ struct BoardWidget : public Widget::Component
     static constexpr auto CELL_SIZE = 32;
 
     RefPtr<Board> board;
-    OwnPtr<Timer> _timer;
+    OwnPtr<Async::Timer> _timer;
 
     BoardWidget(Component *parent)
         : Component(parent)
     {
         board = make<Board>(15, 15);
 
-        _timer = own<Timer>(300, [this]() {
+        _timer = own<Async::Timer>(300, [this]() {
             board->update();
             should_repaint();
         });

@@ -218,7 +218,7 @@ Client::Client(IO::Connection connection)
 {
     _connection = connection;
 
-    _notifier = own<Notifier>(connection, POLL_READ, [this]() {
+    _notifier = own<Async::Notifier>(connection, POLL_READ, [this]() {
         this->handle_request();
     });
 

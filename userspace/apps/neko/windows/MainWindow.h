@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/eventloop/Timer.h>
+#include <libasync/Timer.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Window.h>
 
@@ -13,8 +13,8 @@ class MainWindow : public Widget::Window
 {
 private:
     Neko _neko;
-    OwnPtr<Timer> _update_timer;
-    OwnPtr<Observer<Neko>> _neko_observer;
+    OwnPtr<Async::Timer> _update_timer;
+    OwnPtr<Async::Observer<Neko>> _neko_observer;
 
 public:
     MainWindow()
@@ -24,7 +24,7 @@ public:
         type(WINDOW_TYPE_PANEL);
         size({Neko::SIZE, Neko::SIZE});
 
-        _update_timer = own<Timer>(1000 / 8, [this]() {
+        _update_timer = own<Async::Timer>(1000 / 8, [this]() {
             _neko.update();
         });
 

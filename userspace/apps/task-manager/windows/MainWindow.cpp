@@ -49,7 +49,7 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
     _table = new Widget::Table(root(), _table_model);
     _table->flags(Widget::Component::FILL);
 
-    _table_timer = own<Timer>(1000, [&]() {
+    _table_timer = own<Async::Timer>(1000, [&]() {
         _table_model->update();
     });
 

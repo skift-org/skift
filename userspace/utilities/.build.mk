@@ -159,7 +159,7 @@ NETCTL_NAME = netctl
 POWERCTL_LIBS = system io
 POWERCTL_NAME = powerctl
 
-SETTINGSCTL_LIBS = settings system io
+SETTINGSCTL_LIBS = settings async system io
 SETTINGSCTL_NAME = settingsctl
 
 WALLPAPERCTL_LIBS = graphic system io

@@ -1,13 +1,13 @@
 #pragma once
 
+#include <libasync/Notifier.h>
 #include <libio/Connection.h>
-#include <libsystem/eventloop/Notifier.h>
 
 #include "compositor/Protocol.h"
 
 struct Client
 {
-    OwnPtr<Notifier> _notifier = nullptr;
+    OwnPtr<Async::Notifier> _notifier = nullptr;
     IO::Connection _connection;
     bool _disconnected = false;
 

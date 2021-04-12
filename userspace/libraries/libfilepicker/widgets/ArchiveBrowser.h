@@ -16,7 +16,7 @@ private:
     RefPtr<Navigation> _navigation;
     RefPtr<Archive> _archive;
     RefPtr<ArchiveListing> _listing;
-    OwnPtr<Observer<Navigation>> _navigation_observer;
+    OwnPtr<Async::Observer<Navigation>> _navigation_observer;
 
 public:
     ArchiveBrowser(Widget::Component *parent, RefPtr<Navigation> navigation, RefPtr<Archive> archive)

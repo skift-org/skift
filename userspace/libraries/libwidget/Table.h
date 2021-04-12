@@ -14,7 +14,7 @@ private:
     static constexpr int TABLE_ROW_HEIGHT = 32;
 
     RefPtr<TableModel> _model = nullptr;
-    OwnPtr<Observer<TableModel>> _model_observer;
+    OwnPtr<Async::Observer<TableModel>> _model_observer;
 
     int _selected = -1;
     int _scroll_offset = 0;

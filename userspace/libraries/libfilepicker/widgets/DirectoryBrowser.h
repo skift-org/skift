@@ -14,7 +14,7 @@ class DirectoryBrowser : public Widget::Table
 private:
     RefPtr<Navigation> _navigation;
     RefPtr<DirectoryListing> _listing;
-    OwnPtr<Observer<Navigation>> _navigation_observer;
+    OwnPtr<Async::Observer<Navigation>> _navigation_observer;
 
 public:
     Optional<String> selected_path()

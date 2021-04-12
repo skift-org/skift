@@ -17,11 +17,11 @@ TerminalWidget::TerminalWidget(Component *parent) : Component(parent)
 
     _terminal_device = IO::Terminal::create().unwrap();
 
-    _server_notifier = own<Notifier>(_terminal_device.server, POLL_READ, [this]() {
+    _server_notifier = own<Async::Notifier>(_terminal_device.server, POLL_READ, [this]() {
         handle_read();
     });
 
-    _cursor_blink_timer = own<Timer>(250, [this]() {
+    _cursor_blink_timer = own<Async::Timer>(250, [this]() {
         blink();
 
         int cx = _terminal->cursor().x;

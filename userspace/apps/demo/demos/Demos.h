@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/eventloop/Timer.h>
+#include <libasync/Timer.h>
 #include <libwidget/Application.h>
 #include <libwidget/Component.h>
 

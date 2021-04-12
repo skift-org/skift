@@ -1,9 +1,9 @@
 #pragma once
 
+#include <libasync/Notifier.h>
+#include <libasync/Timer.h>
 #include <libgraphic/Font.h>
 #include <libio/Terminal.h>
-#include <libsystem/eventloop/Notifier.h>
-#include <libsystem/eventloop/Timer.h>
 #include <libterminal/Terminal.h>
 #include <libwidget/Component.h>
 
@@ -16,8 +16,8 @@ private:
 
     IO::Terminal _terminal_device;
 
-    OwnPtr<Timer> _cursor_blink_timer;
-    OwnPtr<Notifier> _server_notifier;
+    OwnPtr<Async::Timer> _cursor_blink_timer;
+    OwnPtr<Async::Notifier> _server_notifier;
 
 public:
     void blink() { _cursor_blink = !_cursor_blink; };

@@ -1,8 +1,11 @@
 #pragma once
 
+#include <libasync/Loop.h>
 #include <libio/Handle.h>
-#include <libsystem/eventloop/EventLoop.h>
 #include <libutils/Callback.h>
+
+namespace Async
+{
 
 class Notifier : public IO::RawHandle
 {
@@ -20,12 +23,12 @@ public:
           _events{events},
           _callback{callback}
     {
-        EventLoop::register_notifier(this);
+        Loop::register_notifier(this);
     }
 
     ~Notifier()
     {
-        EventLoop::unregister_notifier(this);
+        Loop::unregister_notifier(this);
     }
 
     void invoke()
@@ -33,3 +36,5 @@ public:
         _callback();
     }
 };
+
+} // namespace Async

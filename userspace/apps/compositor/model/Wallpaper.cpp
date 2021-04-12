@@ -8,7 +8,7 @@ Wallpaper::Wallpaper(Math::Vec2i resolution)
       _scaled(Graphic::Bitmap::create_shared(resolution.x(), resolution.y()).unwrap()),
       _acrylic(Graphic::Bitmap::create_shared(resolution.x(), resolution.y()).unwrap())
 {
-    _render_invoker = own<Invoker>([this]() {
+    _render_invoker = own<Async::Invoker>([this]() {
         render();
     });
 

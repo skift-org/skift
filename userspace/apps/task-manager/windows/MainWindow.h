@@ -16,7 +16,7 @@ private:
     CPUGraph *_cpu_graph;
     Widget::Table *_table;
     RefPtr<TaskModel> _table_model;
-    OwnPtr<Timer> _table_timer;
+    OwnPtr<Async::Timer> _table_timer;
 
 public:
     MainWinow();

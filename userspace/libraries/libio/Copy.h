@@ -92,7 +92,10 @@ static inline ResultOr<size_t> copy_line(Reader &from, Writer &to, char delimite
         TRY(from.read(&c, sizeof(c)));
     }
 
-    written += TRY(to.write(&c, sizeof(c)));
+    if (c == delimiter)
+    {
+        written += TRY(to.write(&c, sizeof(c)));
+    }
 
     return written;
 }

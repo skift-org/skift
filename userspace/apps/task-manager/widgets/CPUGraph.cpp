@@ -2,8 +2,8 @@
 
 #include <libutils/StringBuilder.h>
 
+#include <libasync/Timer.h>
 #include <libio/Format.h>
-#include <libsystem/eventloop/Timer.h>
 #include <libsystem/system/System.h>
 
 #include <libwidget/Container.h>
@@ -35,7 +35,7 @@ CPUGraph::CPUGraph(Component *parent, RefPtr<TaskModel> model)
     _label_greedy = new Widget::Label(this, "Most greedy: nil", Anchor::RIGHT);
     _label_uptime = new Widget::Label(this, "Uptime: nil", Anchor::RIGHT);
 
-    _graph_timer = own<Timer>(100, [&]() {
+    _graph_timer = own<Async::Timer>(100, [&]() {
         SystemStatus status{};
         hj_system_status(&status);
 
@@ -44,7 +44,7 @@ CPUGraph::CPUGraph(Component *parent, RefPtr<TaskModel> model)
 
     _graph_timer->start();
 
-    _text_timer = own<Timer>(1000, [&]() {
+    _text_timer = own<Async::Timer>(1000, [&]() {
         SystemStatus status{};
         hj_system_status(&status);
 

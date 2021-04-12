@@ -1,4 +1,4 @@
-#include <libsystem/eventloop/Timer.h>
+#include <libasync/Timer.h>
 #include <libwidget/Application.h>
 
 #include "demo/widgets/DemoWidget.h"
@@ -13,7 +13,7 @@ DemoWidget::DemoWidget(Component *parent)
     : Component(parent)
 {
     _demo = nullptr;
-    _timer = own<Timer>(1000 / 60, [this]() {
+    _timer = own<Async::Timer>(1000 / 60, [this]() {
         tick();
         should_repaint();
     });

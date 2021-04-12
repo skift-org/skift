@@ -10,7 +10,7 @@ class TextField : public Component
 {
 private:
     RefPtr<TextModel> _model;
-    OwnPtr<Observer<TextModel>> _model_observer;
+    OwnPtr<Async::Observer<TextModel>> _model_observer;
 
     TextCursor _cursor{};
     int _hscroll_offset = 0;

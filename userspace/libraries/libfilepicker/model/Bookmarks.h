@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Observable.h>
+#include <libasync/Observable.h>
 #include <libutils/Vector.h>
 
 #include <libfilepicker/model/Bookmark.h>
@@ -9,7 +9,7 @@ namespace FilePicker
 {
 
 class Bookmarks :
-    public Observable<Bookmarks>,
+    public Async::Observable<Bookmarks>,
     public RefCounted<Bookmarks>
 {
 private:

@@ -17,7 +17,7 @@ private:
     RefPtr<Navigation> _navigation;
     RefPtr<Bookmarks> _bookmarks;
 
-    OwnPtr<Observer<Bookmarks>> _bookmark_observer;
+    OwnPtr<Async::Observer<Bookmarks>> _bookmark_observer;
 
     Widget::VScroll *_listing;
 

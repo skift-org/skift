@@ -1,8 +1,8 @@
 #pragma once
 
+#include <libasync/Observable.h>
 #include <libgraphic/Font.h>
 #include <libutils/Assert.h>
-#include <libutils/Observable.h>
 #include <libutils/OwnPtr.h>
 #include <libutils/RefCounted.h>
 #include <libutils/Vector.h>
@@ -119,7 +119,7 @@ public:
 
 class TextModel :
     public RefCounted<TextModel>,
-    public Observable<TextModel>
+    public Async::Observable<TextModel>
 {
 private:
     Vector<OwnPtr<TextModelLine>> _lines{1024};

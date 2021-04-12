@@ -26,7 +26,7 @@ private:
     Widget::Component *_refresh;
     Widget::Component *_open_terminal;
 
-    OwnPtr<Observer<Navigation>> _observer;
+    OwnPtr<Async::Observer<Navigation>> _observer;
 
 public:
     static constexpr int NO_OPEN_TERMINAL = 1 << 0;

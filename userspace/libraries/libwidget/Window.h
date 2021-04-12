@@ -1,8 +1,8 @@
 #pragma once
 
+#include <libasync/Invoker.h>
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
-#include <libsystem/eventloop/Invoker.h>
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
 #include <libwidget/Component.h>
@@ -62,8 +62,8 @@ private:
 
     HashMap<String, Component *> _widget_by_id{};
 
-    OwnPtr<Invoker> _repaint_invoker;
-    OwnPtr<Invoker> _relayout_invoker;
+    OwnPtr<Async::Invoker> _repaint_invoker;
+    OwnPtr<Async::Invoker> _relayout_invoker;
 
 public:
     int handle() { return this->_handle; }

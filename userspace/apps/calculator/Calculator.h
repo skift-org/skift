@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Observable.h>
+#include <libasync/Observable.h>
 #include <math.h>
 
 enum class Operation
@@ -15,7 +15,7 @@ enum class Operation
     POWER,
 };
 
-class Calculator : public Observable<Calculator>
+class Calculator : public Async::Observable<Calculator>
 {
 private:
     Operation _operation = Operation::NONE;

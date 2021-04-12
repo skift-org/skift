@@ -3,8 +3,8 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
 
+#include <libasync/Invoker.h>
 #include <libsettings/Setting.h>
-#include <libsystem/eventloop/Invoker.h>
 
 namespace compositor
 {
@@ -23,7 +23,7 @@ private:
     OwnPtr<Settings::Setting> _setting_color;
     OwnPtr<Settings::Setting> _setting_scaling;
 
-    OwnPtr<Invoker> _render_invoker;
+    OwnPtr<Async::Invoker> _render_invoker;
 
 public:
     Callback<void()> on_change;

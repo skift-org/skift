@@ -31,7 +31,7 @@ RAMGraph::RAMGraph(Component *parent, RefPtr<TaskModel> model)
     _label_available = new Widget::Label(this, "Available: nil Mio", Anchor::RIGHT);
     _label_greedy = new Widget::Label(this, "Most greedy: nil", Anchor::RIGHT);
 
-    _graph_timer = own<Timer>(500, [&]() {
+    _graph_timer = own<Async::Timer>(500, [&]() {
         SystemStatus status{};
         hj_system_status(&status);
 
@@ -40,7 +40,7 @@ RAMGraph::RAMGraph(Component *parent, RefPtr<TaskModel> model)
 
     _graph_timer->start();
 
-    _text_timer = own<Timer>(1000, [&]() {
+    _text_timer = own<Async::Timer>(1000, [&]() {
         SystemStatus status{};
         hj_system_status(&status);
 

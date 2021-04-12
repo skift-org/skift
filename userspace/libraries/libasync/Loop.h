@@ -2,13 +2,16 @@
 
 #include <libsystem/Common.h>
 
+namespace Async
+{
+
 class Notifier;
 
 class Timer;
 
 class Invoker;
 
-namespace EventLoop
+namespace Loop
 {
 
 /* --- Notifiers ------------------------------------------------------------ */
@@ -49,4 +52,6 @@ int run_nested();
 
 void exit_nested(int exit_value);
 
-} // namespace EventLoop
+} // namespace Loop
+
+} // namespace Async

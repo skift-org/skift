@@ -1,8 +1,11 @@
 #pragma once
 
-#include <libsystem/eventloop/EventLoop.h>
+#include <libasync/Loop.h>
 #include <libutils/Callback.h>
 #include <libutils/RefCounted.h>
+
+namespace Async
+{
 
 class Invoker
 {
@@ -13,12 +16,12 @@ private:
 public:
     Invoker(Callback<void()> callback) : _callback(callback)
     {
-        EventLoop::register_invoker(this);
+        Loop::register_invoker(this);
     }
 
     ~Invoker()
     {
-        EventLoop::unregister_invoker(this);
+        Loop::unregister_invoker(this);
     }
 
     bool should_be_invoke_later()
@@ -42,3 +45,5 @@ public:
         _invoke_later = false;
     }
 };
+
+} // namespace Async

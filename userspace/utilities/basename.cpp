@@ -18,9 +18,10 @@ int main(int argc, char const *argv[])
     args.option(option_all, 'a', "multiple", "Support multiple arguments and treat each as a NAME");
     args.option(option_zero, 'z', "zero", "End each output line with NUL, not newline");
 
-    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    auto parse_result = args.eval(argc, argv);
+    if (parse_result != ArgParseResult::ShouldContinue)
     {
-        return PROCESS_FAILURE;
+        return parse_result == ArgParseResult::ShouldFinish ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     for (auto filepath : args.argv())

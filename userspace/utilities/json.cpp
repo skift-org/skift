@@ -27,19 +27,20 @@ int main(int argc, char const *argv[])
 
     args.option('c', "color", OPTION_COLOR_DESCRIPTION, [&](auto &) {
         options |= Prettifier::COLORS;
-        return PROCESS_SUCCESS;
+        return ArgParseResult::ShouldContinue;
     });
 
     args.option('i', "indent", OPTION_IDENT_DESCRIPTION, [&](auto &) {
         options |= Prettifier::INDENTS;
-        return PROCESS_SUCCESS;
+        return ArgParseResult::ShouldContinue;
     });
 
     args.epiloge(EPILOGUE);
 
-    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    auto parse_result = args.eval(argc, argv);
+    if (parse_result != ArgParseResult::ShouldContinue)
     {
-        return PROCESS_FAILURE;
+        return parse_result == ArgParseResult::ShouldFinish ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     if (args.argc() == 0)

@@ -24,7 +24,7 @@ int main(int argc, const char **argv)
         if (!maybe_settings.present())
         {
             stream_format(err_stream, "%s: No such setting.\n", argv[0]);
-            process_exit(PROCESS_FAILURE);
+            return ArgParseResult::Failure;
         }
 
         Prettifier pretty;
@@ -32,7 +32,7 @@ int main(int argc, const char **argv)
 
         stream_format(out_stream, "%s", pretty.finalize().cstring());
 
-        return PROCESS_SUCCESS;
+        return ArgParseResult::ShouldFinish;
     });
 
     args.option('w', "write", "Write a setting to the settings storage.", [&](ArgParseContext &context) {
@@ -52,7 +52,7 @@ int main(int argc, const char **argv)
 
         Settings::Service::the()->write(Settings::Path::parse(maybe_key_name.unwrap()), Json::parse(maybe_value.unwrap()));
 
-        return PROCESS_SUCCESS;
+        return ArgParseResult::ShouldFinish;
     });
 
     OwnPtr<Settings::Watcher> watcher = nullptr;
@@ -74,10 +74,10 @@ int main(int argc, const char **argv)
             stream_format(out_stream, "%s\n", pretty.finalize().cstring());
         });
 
-        return Async::Loop::run();
+        return Async::Loop::run() == 0 ? ArgParseResult::ShouldFinish : ArgParseResult::Failure;;
     });
 
     args.epiloge("Option cannot be combined.");
 
-    return args.eval(argc, argv);
+    return args.eval(argc, argv) == ArgParseResult::Failure ? PROCESS_FAILURE : PROCESS_SUCCESS;
 }

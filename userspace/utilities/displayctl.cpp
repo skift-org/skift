@@ -36,7 +36,7 @@ Optional<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
     return {};
 }
 
-int gfxmode_list()
+ArgParseResult gfxmode_list()
 {
     for (size_t i = 0; i < AERAY_LENGTH(GFX_MODES); i++)
     {
@@ -45,33 +45,33 @@ int gfxmode_list()
         IO::outln("- {}x{}", gfx_mode.width, gfx_mode.height);
     }
 
-    return PROCESS_SUCCESS;
+    return ArgParseResult::ShouldFinish;
 }
 
-int gfxmode_get(Stream *framebuffer_device)
+ArgParseResult gfxmode_get(Stream *framebuffer_device)
 {
     IOCallDisplayModeArgs framebuffer_info;
 
     if (stream_call(framebuffer_device, IOCALL_DISPLAY_GET_MODE, &framebuffer_info) < 0)
     {
         handle_printf_error(framebuffer_device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
-        return PROCESS_FAILURE;
+        return ArgParseResult::Failure;
     }
 
     IO::outln("Height: {}\nWidth: {}\n",
               framebuffer_info.width,
               framebuffer_info.height);
 
-    return PROCESS_SUCCESS;
+    return ArgParseResult::ShouldFinish;
 }
 
-int gfxmode_set_compositor(IOCallDisplayModeArgs mode)
+Result gfxmode_set_compositor(IOCallDisplayModeArgs mode)
 {
     auto connect_result = IO::Socket::connect("/Session/compositor.ipc");
 
     if (!connect_result.success())
     {
-        return PROCESS_FAILURE;
+        return Result::ERR_NOT_A_SOCKET;
     }
 
     auto connection = connect_result.unwrap();
@@ -95,53 +95,52 @@ int gfxmode_set_compositor(IOCallDisplayModeArgs mode)
 
     connection.write(&goodbye_message, sizeof(goodbye_message));
 
-    return PROCESS_SUCCESS;
+    return Result::SUCCESS;
 }
 
-int gfxmode_set_iocall(Stream *device, IOCallDisplayModeArgs mode)
+Result gfxmode_set_iocall(Stream *device, IOCallDisplayModeArgs mode)
 {
     if (stream_call(device, IOCALL_DISPLAY_SET_MODE, &mode) != SUCCESS)
     {
         handle_printf_error(device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
-        return PROCESS_FAILURE;
+        return Result::ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
 
-    return PROCESS_SUCCESS;
+    return Result::SUCCESS;
 }
 
-int gfxmode_set(String &mode_name)
+ArgParseResult gfxmode_set(String &mode_name)
 {
     auto mode = gfxmode_by_name(mode_name);
 
     if (!mode.present())
     {
         IO::errln("Error: unknow graphic mode: {}", mode_name);
-        return PROCESS_FAILURE;
+        return ArgParseResult::Failure;
     }
 
-    int result = gfxmode_set_compositor(mode.unwrap());
+    Result result = gfxmode_set_compositor(mode.unwrap());
 
-    if (result != 0)
+    if (result != Result::SUCCESS)
     {
         CLEANUP(stream_cleanup)
         Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
         result = gfxmode_set_iocall(device, mode.unwrap());
     }
 
-    if (result == 0)
+    if (result == Result::SUCCESS)
     {
         IO::outln("Graphic mode set to: {}", mode_name);
-        return PROCESS_SUCCESS;
+        return ArgParseResult::ShouldFinish;
     }
     else
     {
-        return PROCESS_FAILURE;
+        return ArgParseResult::Failure;
     }
 }
 
 int main(int argc, const char *argv[])
 {
-
     ArgParse args{};
 
     args.show_help_if_no_option_given();
@@ -166,5 +165,5 @@ int main(int argc, const char *argv[])
 
     args.epiloge("Options can be combined.");
 
-    return args.eval(argc, argv);
+    return args.eval(argc, argv) == ArgParseResult::Failure ? PROCESS_FAILURE : PROCESS_SUCCESS;
 }

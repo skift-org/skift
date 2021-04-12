@@ -126,6 +126,12 @@ ResultOr<size_t> format(IO::Writer &, const Formating &, double);
 
 ResultOr<size_t> format(IO::Writer &, const Formating &, const char *);
 
+template <typename T>
+ResultOr<size_t> format(IO::Writer &writer, const Formating &format, const T *ptr)
+{
+    return IO::format(writer, format, reinterpret_cast<uintptr_t>(ptr));
+}
+
 ResultOr<size_t> format(IO::Writer &, const Formating &, const String);
 
 ResultOr<size_t> format(IO::Writer &, const Formating &, const Path);

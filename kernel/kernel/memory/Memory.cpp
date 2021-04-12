@@ -4,7 +4,7 @@
 #include <libsystem/io/Stream.h>
 #include <string.h>
 
-#include "archs/VirtualMemory.h"
+#include "archs/Arch.h"
 
 #include "kernel/graphics/Graphics.h"
 #include "kernel/interrupts/Interupts.h"

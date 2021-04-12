@@ -1,7 +1,6 @@
 #include <libsystem/Logger.h>
 
-#include "archs/Architectures.h"
-#include "archs/VirtualMemory.h"
+#include "archs/Arch.h"
 
 #include "archs/x86/IOPort.h"
 #include "archs/x86/x86.h"

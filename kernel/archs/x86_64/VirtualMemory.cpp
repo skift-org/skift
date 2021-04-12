@@ -5,8 +5,7 @@
 #include "kernel/memory/Memory.h"
 #include "kernel/system/System.h"
 
-#include "archs/VirtualMemory.h"
-
+#include "archs/Arch.h"
 #include "archs/x86_64/Paging.h"
 #include "archs/x86_64/x86_64.h"
 

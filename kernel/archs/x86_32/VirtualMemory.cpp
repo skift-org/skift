@@ -3,7 +3,7 @@
 #include <libsystem/Logger.h>
 #include <libutils/ResultOr.h>
 
-#include "archs/VirtualMemory.h"
+#include "archs/Arch.h"
 #include "archs/x86_32/Paging.h"
 
 #include "kernel/interrupts/Interupts.h"

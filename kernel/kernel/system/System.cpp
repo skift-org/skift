@@ -1,7 +1,7 @@
 #include <libsystem/BuildInfo.h>
 #include <libsystem/Logger.h>
 
-#include "archs/Architectures.h"
+#include "archs/Arch.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 

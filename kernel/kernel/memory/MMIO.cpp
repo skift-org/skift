@@ -1,6 +1,6 @@
 #include <libsystem/Logger.h>
 
-#include "archs/VirtualMemory.h"
+#include "archs/Arch.h"
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/memory/MMIO.h"

@@ -1,4 +1,4 @@
-#include "archs/Architectures.h"
+#include "archs/Arch.h"
 
 #include "kernel/graphics/EarlyConsole.h"
 #include "kernel/graphics/Font.h"
@@ -89,7 +89,7 @@ void system_panic_internal(Utils::SourceLocation location, void *stackframe, con
         stream_format(out_stream, " PANIC\n\t// %s\n\n\t\e[0;31m", YO_DAWG);
     }
 
-        font_set_fg(0xffDC2626);
+    font_set_fg(0xffDC2626);
     stream_vprintf(out_stream, message, va);
     font_set_fg(0xff404040);
     stream_format(out_stream, "\e[0m\n\tthrow by %s %s() ln%d", location.file(), location.function(), location.line());

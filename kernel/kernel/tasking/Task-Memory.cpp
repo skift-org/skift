@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "archs/VirtualMemory.h"
+#include "archs/Arch.h"
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/tasking/Task-Memory.h"

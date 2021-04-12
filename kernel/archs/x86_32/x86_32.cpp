@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <libsystem/core/Plugs.h>
 
-#include "archs/VirtualMemory.h"
+#include "archs/Arch.h"
 #include "archs/x86/COM.h"
 #include "archs/x86/CPUID.h"
 #include "archs/x86/FPU.h"

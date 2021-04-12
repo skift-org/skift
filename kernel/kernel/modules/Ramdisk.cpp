@@ -3,7 +3,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 
-#include "archs/VirtualMemory.h"
+#include "archs/Arch.h"
 
 #include "kernel/memory/Memory.h"
 #include "kernel/modules/Modules.h"

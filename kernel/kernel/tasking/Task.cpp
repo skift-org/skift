@@ -1,8 +1,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "archs/Architectures.h"
-#include "archs/VirtualMemory.h"
+#include "archs/Arch.h"
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"

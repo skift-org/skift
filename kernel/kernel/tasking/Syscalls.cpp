@@ -5,7 +5,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 
-#include "archs/Architectures.h"
+#include "archs/Arch.h"
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"

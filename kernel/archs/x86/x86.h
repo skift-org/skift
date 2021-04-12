@@ -1,6 +1,6 @@
 #pragma once
 
-#include "archs/Architectures.h"
+#include "archs/Arch.h"
 
 #ifdef __x86_64__
 using CRRegister = uint64_t;

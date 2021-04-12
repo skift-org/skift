@@ -8,8 +8,7 @@
 #include <libsystem/io/Stream_internal.h>
 #include <libsystem/system/System.h>
 
-#include "archs/Architectures.h"
-#include "archs/VirtualMemory.h"
+#include "archs/Arch.h"
 
 #include "kernel/graphics/EarlyConsole.h"
 #include "kernel/interrupts/Interupts.h"

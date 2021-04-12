@@ -1,6 +1,6 @@
 #include <libsystem/Logger.h>
 
-#include "archs/Architectures.h"
+#include "archs/Arch.h"
 
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/interrupts/Interupts.h"

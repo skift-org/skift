@@ -100,7 +100,7 @@ static inline ResultOr<size_t> copy_line(Reader &from, Writer &to, char delimite
     return written;
 }
 
-static inline ResultOr<size_t> copy_line(Scanner &scan, Writer &to, String delimiter, bool write_delim = true)
+static inline ResultOr<size_t> copy_line(Scanner &scan, Writer &to, String delimiter = "\n", bool write_delim = true)
 {
     size_t written = 0;
 

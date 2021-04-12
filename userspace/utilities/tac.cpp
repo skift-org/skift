@@ -47,8 +47,6 @@ int main(int argc, char const *argv[])
 {
     ArgParse args{};
     args.should_abort_on_failure();
-    // TODO: remove this once **eval** handles "--help" correctly
-    args.show_help_if_no_operand_given();
 
     args.prologue(PROLOGUE);
     args.epiloge(EPILOGUE);
@@ -58,17 +56,18 @@ int main(int argc, char const *argv[])
 
     args.option_string('s', "separator", "Choose the separator to be used instead of \\n", [&](String &s) {
         separator = s;
-        return PROCESS_SUCCESS;
+        return ArgParseResult::ShouldContinue;
     });
 
     args.option_bool('b', "before", "Attach the separator before instead of after the string", [&](bool value) {
         before = value;
-        return PROCESS_SUCCESS;
+        return ArgParseResult::ShouldContinue;
     });
 
-    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    auto parse_result = args.eval(argc, argv);
+    if (parse_result != ArgParseResult::ShouldContinue)
     {
-        return PROCESS_FAILURE;
+        return parse_result == ArgParseResult::ShouldFinish ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     Result result;

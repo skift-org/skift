@@ -22,9 +22,10 @@ int main(int argc, const char *argv[])
 
     args.epiloge("Options can be combined.");
 
-    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    auto parse_result = args.eval(argc, argv);
+    if (parse_result != ArgParseResult::ShouldContinue)
     {
-        return PROCESS_FAILURE;
+        return parse_result == ArgParseResult::ShouldFinish ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     if (!option_time && !option_date && !option_epoch)

@@ -34,8 +34,6 @@ int main(int argc, char const *argv[])
 {
     ArgParse args;
     args.should_abort_on_failure();
-    // TODO: remove this once **eval** handles "--help" correctly
-    args.show_help_if_no_operand_given();
 
     args.prologue("Concatenate FILE(s) to standard output.");
 
@@ -43,9 +41,10 @@ int main(int argc, char const *argv[])
 
     args.option(option_linenumbers, 'n', "number", "Number all output lines");
 
-    if (args.eval(argc, argv) != PROCESS_SUCCESS)
+    auto parse_result = args.eval(argc, argv);
+    if (parse_result != ArgParseResult::ShouldContinue)
     {
-        return PROCESS_FAILURE;
+        return parse_result == ArgParseResult::ShouldFinish ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     Result result;

@@ -5,6 +5,8 @@
 #include <libio/Scanner.h>
 #include <libio/Streams.h>
 
+#include <libmath/Vec3.h>
+
 #include <libsystem/process/Process.h>
 
 #include <libutils/Callback.h>
@@ -12,6 +14,13 @@
 #include <libutils/String.h>
 #include <libutils/Traits.h>
 #include <libutils/Vector.h>
+
+enum class ArgParseResult
+{
+    ShouldContinue,
+    ShouldFinish,
+    Failure,
+};
 
 class ArgParseContext
 {
@@ -67,7 +76,8 @@ public:
     }
 };
 
-using ArgParseOptionCallback = Callback<int(ArgParseContext &)>;
+using ArgParseOptionCallback = Callback<ArgParseResult(ArgParseContext &)>;
+using ArgParseVersion = Math::Vec3i;
 
 struct ArgParseOption
 {
@@ -86,6 +96,7 @@ private:
     String _prologue;
     String _epiloge;
     Vector<String> _argv;
+    ArgParseVersion _version;
 
     bool _should_abort_on_failure = false;
     bool _show_help_if_no_operand_given = false;
@@ -110,7 +121,7 @@ public:
 
     void show_help_if_no_option_given() { _show_help_if_no_option_given = true; }
 
-    ArgParse()
+    ArgParse(const ArgParseVersion &v = {0, 0, 1}) : _version(v)
     {
         _option.push_back(
             {
@@ -119,6 +130,16 @@ public:
                 "Show this help message and exit.",
                 [&](auto &) {
                     return help();
+                },
+            });
+
+        _option.push_back(
+            {
+                '\0',
+                "version",
+                "Output version information and exit.",
+                [&](auto &) {
+                    return version();
                 },
             });
     }
@@ -133,7 +154,7 @@ public:
         });
     }
 
-    void option_string(char shortname, String longname, String description, Callback<int(String &)> callback)
+    void option_string(char shortname, String longname, String description, Callback<ArgParseResult(String &)> callback)
     {
         _option.push_back({
             shortname,
@@ -153,7 +174,7 @@ public:
         });
     }
 
-    void option_int(char shortname, String longname, String description, Callback<int(int)> callback)
+    void option_int(char shortname, String longname, String description, Callback<ArgParseResult(int)> callback)
     {
         _option.push_back({
             shortname,
@@ -183,7 +204,7 @@ public:
         });
     }
 
-    void option_bool(char shortname, String longname, String description, Callback<int(bool)> callback)
+    void option_bool(char shortname, String longname, String description, Callback<ArgParseResult(bool)> callback)
     {
         option(shortname, longname, description, [this, callback](ArgParseContext &ctx) {
             bool value = true;
@@ -213,7 +234,7 @@ public:
     {
         option_bool(shortname, longname, description, [&](bool v) {
             value = v;
-            return PROCESS_SUCCESS;
+            return ArgParseResult::ShouldContinue;
         });
     }
 
@@ -223,7 +244,7 @@ public:
             if (ctx.any())
             {
                 value = ctx.pop();
-                return PROCESS_SUCCESS;
+                return ArgParseResult::ShouldContinue;
             }
             else
             {
@@ -232,7 +253,13 @@ public:
         });
     }
 
-    int help()
+    ArgParseResult version()
+    {
+        IO::outln("{} (Skift utilities) {}", _name, _version);
+        return ArgParseResult::ShouldFinish;
+    }
+
+    ArgParseResult help()
     {
         if (!_prologue.null_or_empty())
         {
@@ -333,28 +360,28 @@ public:
             IO::outln("{}", _epiloge);
         }
 
-        return PROCESS_SUCCESS;
+        return ArgParseResult::ShouldFinish;
     }
 
-    int fail()
+    ArgParseResult fail()
     {
         IO::errln("Try '{} --help' for more information.\n", _name);
-        return PROCESS_FAILURE;
+        return ArgParseResult::Failure;
     }
 
-    int usage()
+    ArgParseResult usage()
     {
         IO::errln("{}: missing operand.", _name.cstring());
         return fail();
     }
 
-    int invalid_option(String option)
+    ArgParseResult invalid_option(String option)
     {
         IO::errln("{}: invalide option '{}'!", _name.cstring(), option.cstring());
         return fail();
     }
 
-    [[nodiscard]] int eval(int argc, char const *argv[])
+    [[nodiscard]] ArgParseResult eval(int argc, char const *argv[])
     {
         ArgParseContext context{argc, argv};
 
@@ -379,15 +406,19 @@ public:
                 {
                     if (_option[i].longname == argument)
                     {
-                        int result = _option[i].callback(context);
+                        ArgParseResult result = _option[i].callback(context);
 
-                        if (result != PROCESS_SUCCESS)
+                        if (result == ArgParseResult::Failure)
                         {
                             if (_should_abort_on_failure)
                             {
                                 process_exit(PROCESS_FAILURE);
                             }
 
+                            return result;
+                        }
+                        else if(result == ArgParseResult::ShouldFinish)
+                        {
                             return result;
                         }
 
@@ -411,9 +442,9 @@ public:
                     {
                         if (_option[i].shortname == scan.current())
                         {
-                            int result = _option[i].callback(context);
+                            ArgParseResult result = _option[i].callback(context);
 
-                            if (result != PROCESS_SUCCESS)
+                            if (result == ArgParseResult::Failure)
                             {
                                 if (_should_abort_on_failure)
                                 {
@@ -452,6 +483,6 @@ public:
             return usage();
         }
 
-        return PROCESS_SUCCESS;
+        return ArgParseResult::ShouldContinue;
     }
 };

@@ -4,6 +4,8 @@
 #include <libio/MemoryWriter.h>
 #include <libio/Scanner.h>
 #include <libio/Write.h>
+#include <libmath/Vec2.h>
+#include <libmath/Vec3.h>
 #include <libutils/Path.h>
 #include <libutils/String.h>
 
@@ -135,6 +137,28 @@ ResultOr<size_t> format(IO::Writer &writer, const Formating &format, const T *pt
 ResultOr<size_t> format(IO::Writer &, const Formating &, const String);
 
 ResultOr<size_t> format(IO::Writer &, const Formating &, const Path);
+
+template <typename T>
+ResultOr<size_t> format(IO::Writer &writer, const Formating &format, const Math::Vec2<T>& vec)
+{
+    size_t result = 0;
+    result += TRY(IO::format(writer, format, vec.x()));
+    result += TRY(IO::format(writer, format, "."));
+    result += TRY(IO::format(writer, format, vec.y()));
+    return result;
+}
+
+template <typename T>
+ResultOr<size_t> format(IO::Writer &writer, const Formating &format, const Math::Vec3<T>& vec)
+{
+    size_t result = 0;
+    result += TRY(IO::format(writer, format, vec.x()));
+    result += TRY(IO::format(writer, format, "."));
+    result += TRY(IO::format(writer, format, vec.y()));
+    result += TRY(IO::format(writer, format, "."));
+    result += TRY(IO::format(writer, format, vec.z()));
+    return result;
+}
 
 static inline ResultOr<size_t> format(IO::Writer &writer, Scanner &scan)
 {

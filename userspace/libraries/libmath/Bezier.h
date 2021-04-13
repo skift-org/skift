@@ -2,6 +2,9 @@
 
 #include <libmath/Vec2.h>
 
+namespace Math
+{
+
 template <typename Scalar>
 class Bezier
 {
@@ -32,3 +35,5 @@ public:
 using Bezieri = Bezier<int>;
 using Bezierf = Bezier<float>;
 using Bezierd = Bezier<double>;
+
+} // namespace Math

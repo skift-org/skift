@@ -1,7 +1,7 @@
 #pragma once
 
+#include <libmath/Bezier.h>
 #include <libmath/Vec2.h>
-#include <libutils/Bezier.h>
 
 #include <math.h>
 #include <string.h>

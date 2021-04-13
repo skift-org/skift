@@ -10,7 +10,7 @@ void draw_path(Graphic::Painter &painter, const Graphic::Path &path, Math::Mat3x
 
         for (size_t i = 0; i < subpath.length(); i++)
         {
-            Bezierf curve = transform.apply(subpath.curves(i));
+            Math::Bezierf curve = transform.apply(subpath.curves(i));
 
             painter.draw_line(curve.start(), curve.cp1(), color);
             painter.draw_line(curve.cp1(), curve.cp2(), color);

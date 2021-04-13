@@ -21,7 +21,7 @@ private:
     Math::Vec2f _min;
     Math::Vec2f _max;
 
-    void flatten(Bezierf curve, int depth)
+    void flatten(Math::Bezierf curve, int depth)
     {
         if (depth > MAX_DEPTH)
         {
@@ -51,11 +51,11 @@ private:
         auto bcd = (bc + cd) / 2;
         auto abcd = (abc + bcd) / 2;
 
-        Bezierf curve_a{a, ab, abc, abcd};
+        Math::Bezierf curve_a{a, ab, abc, abcd};
 
         flatten(curve_a, depth + 1);
 
-        Bezierf curve_b{abcd, bcd, cd, d};
+        Math::Bezierf curve_b{abcd, bcd, cd, d};
 
         flatten(curve_b, depth + 1);
     }
@@ -111,7 +111,7 @@ public:
         }
     }
 
-    void append(Bezierf curve)
+    void append(Math::Bezierf curve)
     {
         begin();
         append(curve.start());

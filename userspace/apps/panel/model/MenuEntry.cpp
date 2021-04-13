@@ -1,7 +1,7 @@
 #include <libio/Directory.h>
 #include <libio/File.h>
 #include <libio/Format.h>
-#include <libutils/json/Json.h>
+#include <libjson/Json.h>
 
 #include "panel/model/MenuEntry.h"
 

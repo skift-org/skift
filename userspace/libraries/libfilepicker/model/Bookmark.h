@@ -1,9 +1,9 @@
 #pragma once
 
 #include <libgraphic/Icon.h>
+#include <libjson/Json.h>
 #include <libutils/Path.h>
 #include <libutils/RefPtr.h>
-#include <libutils/json/Json.h>
 
 namespace FilePicker
 {

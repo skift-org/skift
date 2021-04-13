@@ -3,10 +3,10 @@
 #include <libio/MemoryReader.h>
 #include <libio/NumberScanner.h>
 #include <libio/Scanner.h>
+#include <libio/ScopedReader.h>
+#include <libjson/Value.h>
 #include <libutils/StringBuilder.h>
 #include <libutils/Strings.h>
-#include <libutils/json/Value.h>
-#include <libio/ScopedReader.h>
 
 namespace Json
 {
@@ -283,11 +283,10 @@ inline Value parse(const char *buffer, size_t size)
     return parse(memory);
 }
 
-inline Value parse(String&str)
+inline Value parse(String &str)
 {
     IO::MemoryReader memory{str};
     return parse(memory);
 }
-
 
 } // namespace Json

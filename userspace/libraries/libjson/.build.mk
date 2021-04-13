@@ -1,0 +1,3 @@
+LIBS += JSON
+
+JSON_NAME = json

@@ -1,9 +1,9 @@
 #pragma once
 
+#include <libjson/Json.h>
 #include <libsettings/Path.h>
 #include <libsettings/ServerConnection.h>
 #include <libutils/Optional.h>
-#include <libutils/json/Json.h>
 
 namespace Settings
 {

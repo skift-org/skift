@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/json/Json.h>
+#include <libjson/Json.h>
 #include <libwidget/model/TableModel.h>
 
 class DeviceModel : public Widget::TableModel

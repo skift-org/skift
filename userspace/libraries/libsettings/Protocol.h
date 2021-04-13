@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libipc/Peer.h>
-#include <libutils/json/Json.h>
+#include <libjson/Json.h>
 
 #include <libsettings/Path.h>
 

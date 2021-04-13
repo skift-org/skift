@@ -1,9 +1,9 @@
 #pragma once
 
 #include <libgraphic/Icon.h>
+#include <libjson/Json.h>
 #include <libutils/String.h>
 #include <libutils/Vector.h>
-#include <libutils/json/Json.h>
 
 namespace panel
 {

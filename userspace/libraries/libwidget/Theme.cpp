@@ -1,9 +1,9 @@
 #include <string.h>
 
 #include <libio/File.h>
+#include <libjson/Json.h>
 #include <libsystem/Logger.h>
 #include <libutils/NumberParser.h>
-#include <libutils/json/Json.h>
 #include <libwidget/Theme.h>
 
 namespace Widget

@@ -1,7 +1,7 @@
 #include <libio/File.h>
 #include <libio/Streams.h>
+#include <libjson/Json.h>
 #include <libutils/ArgParse.h>
-#include <libutils/json/Json.h>
 
 constexpr auto PROLOGUE = "Reformats JSON to make it easier to read.";
 

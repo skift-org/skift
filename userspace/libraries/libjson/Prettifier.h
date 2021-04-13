@@ -2,10 +2,10 @@
 
 #include <skift/NumberFormatter.h>
 
+#include <libjson/Value.h>
 #include <libutils/Prettifier.h>
 #include <libutils/Scanner.h>
 #include <libutils/String.h>
-#include <libutils/json/Value.h>
 
 namespace Json
 {

@@ -11,7 +11,6 @@ namespace Widget
 class Slider : public Component
 {
 private:
-    static constexpr auto THUMP_SIZE = 12;
     static constexpr auto TRACK_HEIGHT = 4;
 
     double _value = 0.5;
@@ -19,8 +18,6 @@ private:
     Math::Recti track_bound();
 
     Math::Recti value_bound();
-
-    Math::Recti thumb_bound();
 
     void slide_to(Math::Vec2i position);
 

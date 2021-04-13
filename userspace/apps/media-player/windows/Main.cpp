@@ -33,9 +33,12 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
 
     new Widget::Button(control_bar, Widget::Button::FILLED, Graphic::Icon::get("play"));
     new Widget::Button(control_bar, Widget::Button::OUTLINE, Graphic::Icon::get("stop"));
-    new Widget::Button(control_bar, Widget::Button::OUTLINE, Graphic::Icon::get("volume-high"));
 
-    new Widget::Slider(control_bar);
+    new Widget::Spacer(control_bar);
+
+    auto slider = new Widget::Slider(control_bar);
+    slider->layout(HFLOW(0));
+    new Widget::Button(slider, Widget::Button::TEXT, Graphic::Icon::get("volume-high"));
 }
 
 } // namespace MediaPlayer

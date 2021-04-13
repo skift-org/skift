@@ -3,15 +3,16 @@
 #include <math.h>
 #include <string.h>
 
+#include <libio/Write.h>
 #include <libio/Writer.h>
 #include <libutils/Strings.h>
 
 class NumberFormat
 {
 private:
-    int _base;
-    int _precision;
-    bool _capitalized;
+    int _base = 10;
+    int _precision = 4;
+    bool _capitalized = false;
 
     char digit(int digit)
     {

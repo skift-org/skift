@@ -45,7 +45,7 @@ ArgParseResult gfxmode_list()
         IO::outln("- {}x{}", gfx_mode.width, gfx_mode.height);
     }
 
-    return ArgParseResult::ShouldFinish;
+    return ArgParseResult::SHOULD_FINISH;
 }
 
 ArgParseResult gfxmode_get(Stream *framebuffer_device)
@@ -55,14 +55,14 @@ ArgParseResult gfxmode_get(Stream *framebuffer_device)
     if (stream_call(framebuffer_device, IOCALL_DISPLAY_GET_MODE, &framebuffer_info) < 0)
     {
         handle_printf_error(framebuffer_device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
-        return ArgParseResult::Failure;
+        return ArgParseResult::FAILURE;
     }
 
     IO::outln("Height: {}\nWidth: {}\n",
               framebuffer_info.width,
               framebuffer_info.height);
 
-    return ArgParseResult::ShouldFinish;
+    return ArgParseResult::SHOULD_FINISH;
 }
 
 Result gfxmode_set_compositor(IOCallDisplayModeArgs mode)
@@ -116,7 +116,7 @@ ArgParseResult gfxmode_set(String &mode_name)
     if (!mode.present())
     {
         IO::errln("Error: unknow graphic mode: {}", mode_name);
-        return ArgParseResult::Failure;
+        return ArgParseResult::FAILURE;
     }
 
     Result result = gfxmode_set_compositor(mode.unwrap());
@@ -131,11 +131,11 @@ ArgParseResult gfxmode_set(String &mode_name)
     if (result == Result::SUCCESS)
     {
         IO::outln("Graphic mode set to: {}", mode_name);
-        return ArgParseResult::ShouldFinish;
+        return ArgParseResult::SHOULD_FINISH;
     }
     else
     {
-        return ArgParseResult::Failure;
+        return ArgParseResult::FAILURE;
     }
 }
 
@@ -165,5 +165,5 @@ int main(int argc, const char *argv[])
 
     args.epiloge("Options can be combined.");
 
-    return args.eval(argc, argv) == ArgParseResult::Failure ? PROCESS_FAILURE : PROCESS_SUCCESS;
+    return args.eval(argc, argv) == ArgParseResult::FAILURE ? PROCESS_FAILURE : PROCESS_SUCCESS;
 }

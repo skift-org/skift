@@ -78,9 +78,9 @@ int main(int argc, const char *argv[])
     args.prologue("Options can be combined.");
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::ShouldContinue)
+    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::ShouldFinish ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     if (args.argc() == 0)

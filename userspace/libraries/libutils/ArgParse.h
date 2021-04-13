@@ -17,9 +17,9 @@
 
 enum class ArgParseResult
 {
-    ShouldContinue,
-    ShouldFinish,
-    Failure,
+    SHOULD_CONTINUE,
+    SHOULD_FINISH,
+    FAILURE,
 };
 
 class ArgParseContext
@@ -234,7 +234,7 @@ public:
     {
         option_bool(shortname, longname, description, [&](bool v) {
             value = v;
-            return ArgParseResult::ShouldContinue;
+            return ArgParseResult::SHOULD_CONTINUE;
         });
     }
 
@@ -244,7 +244,7 @@ public:
             if (ctx.any())
             {
                 value = ctx.pop();
-                return ArgParseResult::ShouldContinue;
+                return ArgParseResult::SHOULD_CONTINUE;
             }
             else
             {
@@ -256,7 +256,7 @@ public:
     ArgParseResult version()
     {
         IO::outln("{} (Skift utilities) {}", _name, _version);
-        return ArgParseResult::ShouldFinish;
+        return ArgParseResult::SHOULD_FINISH;
     }
 
     ArgParseResult help()
@@ -360,13 +360,13 @@ public:
             IO::outln("{}", _epiloge);
         }
 
-        return ArgParseResult::ShouldFinish;
+        return ArgParseResult::SHOULD_FINISH;
     }
 
     ArgParseResult fail()
     {
         IO::errln("Try '{} --help' for more information.\n", _name);
-        return ArgParseResult::Failure;
+        return ArgParseResult::FAILURE;
     }
 
     ArgParseResult usage()
@@ -408,7 +408,7 @@ public:
                     {
                         ArgParseResult result = _option[i].callback(context);
 
-                        if (result == ArgParseResult::Failure)
+                        if (result == ArgParseResult::FAILURE)
                         {
                             if (_should_abort_on_failure)
                             {
@@ -417,7 +417,7 @@ public:
 
                             return result;
                         }
-                        else if(result == ArgParseResult::ShouldFinish)
+                        else if(result == ArgParseResult::SHOULD_FINISH)
                         {
                             return result;
                         }
@@ -444,7 +444,7 @@ public:
                         {
                             ArgParseResult result = _option[i].callback(context);
 
-                            if (result == ArgParseResult::Failure)
+                            if (result == ArgParseResult::FAILURE)
                             {
                                 if (_should_abort_on_failure)
                                 {
@@ -483,6 +483,6 @@ public:
             return usage();
         }
 
-        return ArgParseResult::ShouldContinue;
+        return ArgParseResult::SHOULD_CONTINUE;
     }
 };

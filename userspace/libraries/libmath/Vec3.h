@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <libio/Format.h>
 #include <libmath/MinMax.h>
 #include <math.h>
 
@@ -151,6 +152,18 @@ public:
         return x() * other.x() + y() * other.y() + z() * other.z();
     }
 };
+
+template <typename T>
+ResultOr<size_t> format(IO::Writer &writer, const IO::Formating &format, const Math::Vec3<T>& vec)
+{
+    size_t result = 0;
+    result += TRY(IO::format(writer, format, vec.x()));
+    result += TRY(IO::format(writer, format, "."));
+    result += TRY(IO::format(writer, format, vec.y()));
+    result += TRY(IO::format(writer, format, "."));
+    result += TRY(IO::format(writer, format, vec.z()));
+    return result;
+}
 
 using Vec3i = Vec3<int>;
 using Vec3f = Vec3<float>;

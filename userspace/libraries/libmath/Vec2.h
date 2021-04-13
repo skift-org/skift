@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <libio/Format.h>
 #include <libmath/MinMax.h>
 #include <math.h>
 
@@ -154,6 +155,16 @@ public:
         return sign * acosf(r);
     }
 };
+
+template <typename T>
+ResultOr<size_t> format(IO::Writer &writer, const IO::Formating &format, const Math::Vec2<T>& vec)
+{
+    size_t result = 0;
+    result += TRY(IO::format(writer, format, vec.x()));
+    result += TRY(IO::format(writer, format, "."));
+    result += TRY(IO::format(writer, format, vec.y()));
+    return result;
+}
 
 using Vec2i = Vec2<int>;
 using Vec2f = Vec2<float>;

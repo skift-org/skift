@@ -56,18 +56,18 @@ int main(int argc, char const *argv[])
 
     args.option_string('s', "separator", "Choose the separator to be used instead of \\n", [&](String &s) {
         separator = s;
-        return ArgParseResult::ShouldContinue;
+        return ArgParseResult::SHOULD_CONTINUE;
     });
 
     args.option_bool('b', "before", "Attach the separator before instead of after the string", [&](bool value) {
         before = value;
-        return ArgParseResult::ShouldContinue;
+        return ArgParseResult::SHOULD_CONTINUE;
     });
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::ShouldContinue)
+    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::ShouldFinish ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     Result result;

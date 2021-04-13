@@ -13,13 +13,13 @@ int main(int argc, char const *argv[])
 
     args.option('r', "reboot", "Reboot the system.", [&](auto &) {
         hj_system_reboot();
-        return ArgParseResult::ShouldFinish;
+        return ArgParseResult::SHOULD_FINISH;
     });
 
     args.option('s', "shutdown", "Shutdown the system.", [&](auto &) {
         hj_system_shutdown();
-        return ArgParseResult::ShouldFinish;
+        return ArgParseResult::SHOULD_FINISH;
     });
 
-    return args.eval(argc, argv) == ArgParseResult::Failure ? PROCESS_FAILURE : PROCESS_SUCCESS;
+    return args.eval(argc, argv) == ArgParseResult::FAILURE ? PROCESS_FAILURE : PROCESS_SUCCESS;
 }

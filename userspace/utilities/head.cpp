@@ -60,7 +60,7 @@ int main(int argc, const char *argv[])
         [](int value) {
             option_count = value;
             option_count_lines = false;
-            return ArgParseResult::ShouldContinue;
+            return ArgParseResult::SHOULD_CONTINUE;
         });
 
     args.option_int(
@@ -70,7 +70,7 @@ int main(int argc, const char *argv[])
         [](int value) {
             option_count = value;
             option_count_lines = true;
-            return ArgParseResult::ShouldContinue;
+            return ArgParseResult::SHOULD_CONTINUE;
         });
 
     args.option(option_quiet, 'q', "quiet", "Never print headers giving file names.");
@@ -89,15 +89,15 @@ int main(int argc, const char *argv[])
             {
                 option_delimiter = '\n';
             }
-            return ArgParseResult::ShouldContinue;
+            return ArgParseResult::SHOULD_CONTINUE;
         });
 
     args.epiloge("If no filename provided read from standard input.\nOptions can be combined.");
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::ShouldContinue)
+    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::ShouldFinish ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     if (args.argc() == 0)

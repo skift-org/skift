@@ -42,9 +42,9 @@ int main(int argc, char const *argv[])
     args.option(option_linenumbers, 'n', "number", "Number all output lines");
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::ShouldContinue)
+    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::ShouldFinish ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     Result result;

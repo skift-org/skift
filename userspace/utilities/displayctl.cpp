@@ -67,14 +67,7 @@ ArgParseResult gfxmode_get(Stream *framebuffer_device)
 
 Result gfxmode_set_compositor(IOCallDisplayModeArgs mode)
 {
-    auto connect_result = IO::Socket::connect("/Session/compositor.ipc");
-
-    if (!connect_result.success())
-    {
-        return Result::ERR_NOT_A_SOCKET;
-    }
-
-    auto connection = connect_result.unwrap();
+    auto connection = TRY(IO::Socket::connect("/Session/compositor.ipc"));
 
     CompositorMessage message{
         .type = COMPOSITOR_MESSAGE_SET_RESOLUTION,
@@ -84,7 +77,7 @@ Result gfxmode_set_compositor(IOCallDisplayModeArgs mode)
         },
     };
 
-    connection.write(&message, sizeof(message));
+    TRY(connection.write(&message, sizeof(message)));
 
     process_sleep(1000);
 
@@ -93,7 +86,7 @@ Result gfxmode_set_compositor(IOCallDisplayModeArgs mode)
         .greetings = {},
     };
 
-    connection.write(&goodbye_message, sizeof(goodbye_message));
+    TRY(connection.write(&goodbye_message, sizeof(goodbye_message)));
 
     return Result::SUCCESS;
 }

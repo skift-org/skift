@@ -3,6 +3,13 @@
 namespace Widget
 {
 
+const auto THUMB_SIZE = 16;
+
+int Slider::icon_size()
+{
+    return track_bound().height() - 8;
+}
+
 Math::Recti Slider::track_bound()
 {
     return bound();
@@ -10,13 +17,13 @@ Math::Recti Slider::track_bound()
 
 Math::Recti Slider::value_bound()
 {
-    return track_bound().take_left((track_bound().width() - bound().height()) * _value + bound().height());
+    return track_bound().take_left((track_bound().width() - THUMB_SIZE - (icon_size())) * _value + THUMB_SIZE + icon_size());
 }
 
 void Slider::slide_to(Math::Vec2i position)
 {
-    Math::Vec2i pos = position - bound().position() - bound().height() + bound().height() / 2;
-    _value = pos.x() / (double)(bound().width() - bound().height());
+    Math::Vec2i pos = position - bound().position() - THUMB_SIZE - icon_size() + THUMB_SIZE / 2;
+    _value = pos.x() / (double)(bound().width() - THUMB_SIZE - icon_size());
     _value = clamp(_value, 0, 1);
 
     Event event_value_changed = {};
@@ -53,8 +60,9 @@ void Slider::event(Event *event)
 
 void Slider::paint(Graphic::Painter &painter, const Math::Recti &)
 {
-    painter.fill_rectangle_rounded(value_bound(), 4, color(THEME_ACCENT));
-    painter.draw_rectangle_rounded(track_bound(), 4, 1, color(THEME_BORDER));
+    painter.fill_rectangle_rounded(value_bound(), 6, color(THEME_ACCENT));
+    painter.draw_rectangle_rounded(track_bound(), 6, 1, color(THEME_ACCENT));
+    painter.fill_rectangle_rounded(value_bound().take_right(16).shrinked(Insetsi{12, 6}), 6, color(THEME_FOREGROUND));
 }
 
 } // namespace Widget

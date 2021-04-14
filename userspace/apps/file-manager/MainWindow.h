@@ -34,7 +34,7 @@ public:
 
         auto jump_list = new FilePicker::JumpList(bookmarks_and_browser, navigation, bookmarks);
 
-        jump_list->min_width(160);
+        jump_list->min_width(192);
 
         auto browser = new FilePicker::DirectoryBrowser(bookmarks_and_browser, navigation);
 

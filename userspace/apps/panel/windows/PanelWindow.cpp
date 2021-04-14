@@ -18,11 +18,7 @@ PanelWindow::PanelWindow()
 {
     title("Panel");
     type(WINDOW_TYPE_PANEL);
-    bound(Widget::Screen::bound().take_top(HEIGHT));
     opacity(0.85);
-    on(Widget::Event::DISPLAY_SIZE_CHANGED, [this](auto) {
-        bound(Widget::Screen::bound().take_top(HEIGHT));
-    });
 
     _menu = own<MenuWindow>();
     _datetime = own<DateAndTimeWindow>();
@@ -65,6 +61,11 @@ PanelWindow::PanelWindow()
 
     dots->on(Widget::Event::ACTION, [this](auto) {
         _quicksetting->show();
+    });
+
+    bound(Widget::Screen::bound().take_top(root()->compute_size().y()));
+    on(Widget::Event::DISPLAY_SIZE_CHANGED, [this](auto) {
+        bound(Widget::Screen::bound().take_top(root()->compute_size().y()));
     });
 }
 

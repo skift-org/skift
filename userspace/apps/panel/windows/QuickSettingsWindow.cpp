@@ -1,4 +1,7 @@
+#include <libwidget/Panel.h>
 #include <libwidget/Screen.h>
+#include <libwidget/Spacer.h>
+#include <skift/Environment.h>
 
 #include "panel/widgets/SettingToggle.h"
 #include "panel/windows/PanelWindow.h"
@@ -34,6 +37,30 @@ QuickSettingsWindow::QuickSettingsWindow()
 
     (new Widget::Button(root(), Widget::Button::TEXT, "Dark Theme"))->on(Widget::Event::ACTION, [](auto) {
         Settings::Service::the()->write(Settings::Path::parse("appearance:widgets.theme"), "skift-dark");
+    });
+
+    auto account_container = new Widget::Container(root());
+    account_container->layout(HFLOW(4));
+
+    new Widget::Button(account_container, Widget::Button::TEXT, Graphic::Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string());
+
+    new Widget::Spacer(account_container);
+
+    auto folder_button = new Widget::Button(account_container, Widget::Button::TEXT, Graphic::Icon::get("folder"));
+
+    folder_button->on(Widget::EventType::ACTION, [&](auto) {
+        process_run("file-manager", nullptr, 0);
+    });
+
+    auto setting_button = new Widget::Button(account_container, Widget::Button::TEXT, Graphic::Icon::get("cog"));
+
+    setting_button->on(Widget::EventType::ACTION, [&](auto) {
+        process_run("settings", nullptr, 0);
+    });
+
+    auto logout_button = new Widget::Button(account_container, Widget::Button::TEXT, Graphic::Icon::get("power-standby"));
+    logout_button->on(Widget::EventType::ACTION, [&](auto) {
+        process_run("logout", nullptr, 0);
     });
 
     bound(bound_on_screen().with_height(root()->compute_size().y()));

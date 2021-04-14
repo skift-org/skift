@@ -24,8 +24,6 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
 
     toolbar->layout(HFLOW(4));
     toolbar->insets(Insetsi(4, 4));
-    toolbar->max_height(38);
-    toolbar->min_height(38);
 
     new Widget::Button(toolbar, Widget::Button::FILLED, Graphic::Icon::get("plus"), "New task");
 

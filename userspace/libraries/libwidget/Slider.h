@@ -15,6 +15,8 @@ private:
 
     double _value = 0.5;
 
+    int icon_size();
+
     Math::Recti track_bound();
 
     Math::Recti value_bound();

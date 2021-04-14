@@ -32,8 +32,6 @@ int main(int argc, char **argv)
 
     toolbar->layout(HFLOW(4));
     toolbar->insets(Insetsi(4, 4));
-    toolbar->max_height(38);
-    toolbar->min_height(38);
 
     new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
     new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("content-save"));

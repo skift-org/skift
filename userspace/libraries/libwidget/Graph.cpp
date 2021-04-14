@@ -62,7 +62,7 @@ void Graph::paint(Graphic::Painter &painter, const Math::Recti &)
 
 Math::Vec2i Graph::size()
 {
-    return Math::Vec2i(_data_size, 100);
+    return Math::Vec2i(_data_size, 8);
 }
 
 void Graph::record(float data)

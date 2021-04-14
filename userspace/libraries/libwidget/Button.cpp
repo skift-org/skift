@@ -80,8 +80,8 @@ Button::Button(Component *parent, Style style)
       _style(style)
 {
     layout(HFLOW(0));
-    insets(Insetsi(0, 6));
-    min_height(32);
+    //insets(Insetsi(0, 16));
+    min_height(36);
     flags(Component::GREEDY);
 }
 
@@ -89,8 +89,9 @@ Button::Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon)
     : Button(parent, style)
 {
     layout(STACK());
-    insets(Insetsi(6));
-    min_width(32);
+
+    min_width(64);
+    min_height(36);
     flags(Component::GREEDY | Component::SQUARE);
 
     auto icon_panel = new IconPanel(this, icon);
@@ -105,7 +106,7 @@ Button::Button(Component *parent, Style style, String text)
     : Button(parent, style)
 {
     layout(STACK());
-    insets(Insetsi(0, 6));
+    insets(Insetsi(0, 16));
     min_width(64);
 
     auto label = new Label(this, text, Anchor::CENTER);
@@ -118,11 +119,11 @@ Button::Button(Component *parent, Style style, String text)
 Button::Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon, String text)
     : Button(parent, style)
 {
-    insets(Insetsi(0, 0, 6, 10));
+    insets(Insetsi(0, 0, 12, 16));
     min_width(64);
 
     auto icon_panel = new IconPanel(this, icon);
-    icon_panel->insets(Insetsi(0, 0, 0, 4));
+    icon_panel->insets(Insetsi(0, 0, 0, 8));
 
     auto label = new Label(this, text);
 
@@ -136,7 +137,7 @@ Button::Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon, Strin
 Button::Button(Component *parent, Style style, RefPtr<Graphic::Bitmap> image, String text)
     : Button(parent, style)
 {
-    insets(Insetsi(4, 4, 6, 10));
+    insets(Insetsi(4, 4, 12, 16));
     min_width(64);
 
     auto image_panel = new Image(this, image, Graphic::BitmapScaling::FIT);

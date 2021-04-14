@@ -66,8 +66,6 @@ public:
             auto toolbar = new Widget::Panel(browser);
             toolbar->layout(HFLOW(4));
             toolbar->insets(Insetsi(4, 4));
-            toolbar->max_height(38);
-            toolbar->min_height(38);
 
             new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("archive-arrow-up"), "Extract All");
 

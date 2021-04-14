@@ -38,8 +38,6 @@ public:
     {
         layout(HFLOW(4));
         insets(Insetsi(4, 4));
-        max_height(38);
-        min_height(38);
 
         _go_backward = new Widget::Button(this, Widget::Button::TEXT, Graphic::Icon::get("arrow-left"));
 

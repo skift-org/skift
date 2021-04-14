@@ -10,10 +10,8 @@ namespace Widget
 
 TitleBar::TitleBar(Component *parent) : Component(parent)
 {
-    max_height(36);
-
     layout(HFLOW(4));
-    insets({6, 6});
+    insets(4);
 
     new Button(
         this,
@@ -25,18 +23,13 @@ TitleBar::TitleBar(Component *parent) : Component(parent)
 
     if (window()->flags() & WINDOW_RESIZABLE)
     {
-        Component *button_minimize = new Button(this, Button::TEXT, Graphic::Icon::get("window-minimize"));
-        button_minimize->insets(3);
-
-        Component *button_maximize = new Button(this, Button::TEXT, Graphic::Icon::get("window-maximize"));
-        button_maximize->insets(3);
+        Component *button_maximize = new Button(this, Button::TEXT, Graphic::Icon::get("plus"));
         button_maximize->on(Event::ACTION, [this](auto) {
             window()->toggle_maximise();
         });
     }
 
-    Component *close_button = new Button(this, Button::TEXT, Graphic::Icon::get("window-close"));
-    close_button->insets(3);
+    Component *close_button = new Button(this, Button::TEXT, Graphic::Icon::get("close"));
 
     close_button->on(Event::ACTION, [this](auto) {
         window()->hide();

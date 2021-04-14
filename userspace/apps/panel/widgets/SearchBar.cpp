@@ -14,6 +14,7 @@ SearchBar::SearchBar(Widget::Component *parent, RefPtr<Widget::TextModel> model)
     border_radius(6);
     color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::WHITE);
     layout(HFLOW(4));
+    min_height(36);
 
     auto icon = new Widget::IconPanel(this, Graphic::Icon::get("search"));
     icon->color(Widget::THEME_FOREGROUND, Graphic::Colors::BLACK);

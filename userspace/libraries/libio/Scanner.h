@@ -4,6 +4,8 @@
 #include <libutils/InlineRingBuffer.h>
 #include <libutils/unicode/Codepoint.h>
 
+#include <string.h>
+
 namespace IO
 {
 

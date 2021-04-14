@@ -4,7 +4,6 @@
 
 ResultOr<String> read_comment(IO::Scanner &scan)
 {
-    logger_info("Begin: \"read_comment\"");
     StringBuilder builder{};
     scan.forward();
     while (scan.current() != '>')
@@ -46,21 +45,18 @@ ResultOr<String> read_tag(IO::Scanner &scan)
 
 ResultOr<String> read_end_tag(IO::Scanner &scan)
 {
-    logger_info("Begin: \"read_end_tag\"");
     scan.forward(2);
     return read_tag(scan);
 }
 
 ResultOr<String> read_start_tag(IO::Scanner &scan)
 {
-    logger_info("Begin: \"read_start_tag\"");
     scan.forward();
     return read_tag(scan);
 }
 
 Result read_node(IO::Scanner &scan, Xml::Node &node)
 {
-    logger_info("Begin: \"read_node\"");
     scan.eat(Strings::WHITESPACE);
 
     if (scan.current() != '<')
@@ -70,9 +66,7 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
         return Result::ERR_INVALID_DATA;
     }
 
-    bool is_done = false;
-
-    while (!is_done && scan.do_continue())
+    while (scan.do_continue())
     {
         char c = scan.peek(1);
         // Comment
@@ -95,13 +89,12 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
                 logger_error("End-tag does not match start-tag: ET %s ST %s", end_tag.cstring(), node.name().cstring());
                 return Result::ERR_INVALID_DATA;
             }
-            is_done = true;
+            return Result::SUCCESS;
         }
         // Start-Tag
         else if (node.name().empty())
         {
             node.name() = TRY(read_start_tag(scan));
-            logger_info("node.name: %s", node.name().cstring());
 
             StringBuilder builder{};
             while (scan.current() != '<')
@@ -111,12 +104,12 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
             }
 
             node.content() = builder.finalize();
-            logger_info("node.content: %s", node.content().cstring());
         }
         // Child-Node
         else
         {
             TRY(read_node(scan, node.children().emplace_back()));
+            scan.eat(Strings::WHITESPACE);
         }
     }
 

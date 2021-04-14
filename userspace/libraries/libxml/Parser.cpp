@@ -116,12 +116,39 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
     return Result::SUCCESS;
 }
 
+Result read_declaration(IO::Scanner &scan, Xml::Declaration &)
+{
+    scan.eat(Strings::WHITESPACE);
+
+    if (scan.current() != '<')
+    {
+        logger_error("Failed to \"read_declaration\"");
+        logger_error("Unexpected symbol: %i", scan.current());
+        return Result::ERR_INVALID_DATA;
+    }
+
+    if (scan.peek(1) != '?')
+    {
+        // We have no declaration
+        return Result::SUCCESS;
+    }
+
+    while (scan.current() != '>' && scan.do_continue())
+    {
+        //TODO: read declaration content
+        scan.forward();
+    }
+
+    return Result::SUCCESS;
+}
+
 FLATTEN ResultOr<Xml::Document> Xml::parse(IO::Reader &reader)
 {
     IO::Scanner scan{reader};
     scan.skip_utf8bom();
 
     Xml::Document doc;
+    TRY(read_declaration(scan, doc.declaration()));
     TRY(read_node(scan, doc.root()));
 
     return doc;

@@ -29,7 +29,7 @@ Result read_attribute(IO::Scanner &scan, String &name, String &value)
     StringBuilder builder{};
 
     // Attribute name
-    while (scan.current_is(Strings::ALL_ALPHA))
+    while (scan.current_is(Strings::ALL_ALPHA) || (scan.current() == ':'))
     {
         builder.append(scan.current());
         scan.forward();
@@ -39,7 +39,7 @@ Result read_attribute(IO::Scanner &scan, String &name, String &value)
     // Attribute equal
     if (!scan.skip('='))
     {
-        logger_error("Expected = after attribute name");
+        logger_error("Expected = after attribute name: %i", scan.current());
         return Result::ERR_INVALID_DATA;
     }
 
@@ -61,13 +61,14 @@ Result read_attribute(IO::Scanner &scan, String &name, String &value)
     return Result::SUCCESS;
 }
 
-ResultOr<String> read_tag(IO::Scanner &scan, HashMap<String, String> &attributes, bool read_attributes = false)
+template <bool has_attributes>
+ResultOr<String> read_tag(IO::Scanner &scan, HashMap<String, String> &attributes, bool &empty_tag)
 {
     StringBuilder builder{};
 
     // Read tag-name
     bool scan_name = true;
-    while (scan.current() != '>' && scan.do_continue())
+    while (scan.current() != '>' && !scan.current_is_word("/>") && scan.do_continue())
     {
         // There may be no whitespace before the tagname
         // See https://www.w3.org/TR/REC-xml/#sec-starttags
@@ -83,7 +84,7 @@ ResultOr<String> read_tag(IO::Scanner &scan, HashMap<String, String> &attributes
         }
         else if (scan.current() != ' ')
         {
-            if (read_attributes)
+            if constexpr (has_attributes)
             {
                 String name, value;
                 TRY(read_attribute(scan, name, value));
@@ -101,6 +102,10 @@ ResultOr<String> read_tag(IO::Scanner &scan, HashMap<String, String> &attributes
         if (scan.current() == ' ')
             scan_name = false;
     }
+
+    // If the tag ended with /> it was an empty tag
+    empty_tag = scan.skip_word("/>");
+
     scan.forward();
 
     return builder.finalize();
@@ -110,16 +115,17 @@ ResultOr<String> read_tag(IO::Scanner &scan, HashMap<String, String> &attributes
 ResultOr<String> read_end_tag(IO::Scanner &scan)
 {
     scan.forward(2);
-    HashMap<String, String> tmp;
-    return read_tag(scan, tmp, false);
+    HashMap<String, String> tmp_attributes;
+    bool tmp_empty_tag;
+    return read_tag<false>(scan, tmp_attributes, tmp_empty_tag);
 }
 
 // See https://www.w3.org/TR/xml/#dt-stag
 // TODO: this can also be an empty_tag
-ResultOr<String> read_start_tag(IO::Scanner &scan, HashMap<String, String> &attributes, bool & /*empty_tag*/)
+ResultOr<String> read_start_tag(IO::Scanner &scan, HashMap<String, String> &attributes, bool &empty_tag)
 {
     scan.forward();
-    return read_tag(scan, attributes, true);
+    return read_tag<true>(scan, attributes, empty_tag);
 }
 
 // See https://www.w3.org/TR/xml/#sec-logical-struct
@@ -166,10 +172,10 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
             node.name() = TRY(read_start_tag(scan, node.attributes(), empty_tag));
 
             // It was an empty tag, so we have no content / end-tag
-            // if (empty_tag)
-            // {
-            //     return Result::SUCCESS;
-            // }
+            if (empty_tag)
+            {
+                return Result::SUCCESS;
+            }
 
             // Read the content for the tag
             StringBuilder builder{};

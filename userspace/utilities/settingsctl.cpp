@@ -65,8 +65,6 @@ int main(int argc, const char **argv)
             args.usage();
         }
 
-        Async::Loop::initialize();
-
         watcher = own<Settings::Watcher>(Settings::Path::parse(maybe_key_name.unwrap()), [&](auto &value) {
             Prettifier pretty;
             Json::prettify(pretty, value);
@@ -74,7 +72,7 @@ int main(int argc, const char **argv)
             stream_format(out_stream, "%s\n", pretty.finalize().cstring());
         });
 
-        return Async::Loop::run() == 0 ? ArgParseResult::SHOULD_FINISH : ArgParseResult::FAILURE;;
+        return Async::Loop::the()->run() == 0 ? ArgParseResult::SHOULD_FINISH : ArgParseResult::FAILURE;
     });
 
     args.epiloge("Option cannot be combined.");

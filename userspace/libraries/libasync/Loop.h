@@ -1,9 +1,13 @@
 #pragma once
 
-#include <libsystem/Common.h>
+#include <libio/Handle.h>
+#include <libutils/RefCounted.h>
+#include <libutils/Vector.h>
 
 namespace Async
 {
+
+using AtExitHook = void (*)(void);
 
 class Notifier;
 
@@ -11,47 +15,61 @@ class Timer;
 
 class Invoker;
 
-namespace Loop
+class Loop : public RefCounted<Loop>
 {
+private:
+    bool _is_running = false;
+    int _exit_value = PROCESS_SUCCESS;
 
-/* --- Notifiers ------------------------------------------------------------ */
+    bool _nested_is_running = false;
+    int _nested_exit_value = 0;
 
-void register_notifier(Notifier *notifier);
+    Vector<HandlePoll> _polls;
 
-void unregister_notifier(Notifier *notifier);
+    Vector<Notifier *> _notifiers;
+    Vector<Timer *> _timers;
+    Vector<Invoker *> _invoker;
 
-/* --- Timers --------------------------------------------------------------- */
+    void update_polling_list();
 
-void register_timer(Timer *timer);
+    void update_notifier(int id, PollEvent event);
 
-void unregister_timer(Timer *timer);
+    void update_timers();
 
-/* --- Invokers ------------------------------------------------------------- */
+    void update_invoker();
 
-void register_invoker(Invoker *timer);
+    Timeout get_timeout();
 
-void unregister_invoker(Invoker *timer);
+public:
+    static RefPtr<Loop> the();
 
-/* --- Loop ----------------------------------------------------------------- */
+    Loop();
 
-using AtExitHook = void (*)(void);
+    ~Loop();
 
-void initialize();
+    void register_notifier(Notifier *notifier);
 
-void uninitialize();
+    void unregister_notifier(Notifier *notifier);
 
-void atexit(AtExitHook hook);
+    void register_timer(Timer *timer);
 
-void pump(bool pool);
+    void unregister_timer(Timer *timer);
 
-int run();
+    void register_invoker(Invoker *timer);
 
-void exit(int exit_value);
+    void unregister_invoker(Invoker *timer);
 
-int run_nested();
+    void atexit(AtExitHook hook);
 
-void exit_nested(int exit_value);
+    void pump(bool pool);
 
-} // namespace Loop
+    int run();
+
+    void exit(int exit_value);
+
+    int run_nested();
+
+    void exit_nested(int exit_value);
+};
 
 } // namespace Async

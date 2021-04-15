@@ -351,8 +351,6 @@ Result initialize(int argc, char **argv)
 
     _connection = TRY(IO::Socket::connect("/Session/compositor.ipc"));
 
-    Async::Loop::initialize();
-
     _connection_notifier = own<Async::Notifier>(_connection, POLL_READ, []() {
         CompositorMessage message = {};
         auto read_result = _connection.read(&message, sizeof(CompositorMessage));
@@ -377,8 +375,6 @@ Result initialize(int argc, char **argv)
 
     _state = State::RUNNING;
 
-    Async::Loop::atexit(uninitialized);
-
     auto result_or_greetings = wait_for_message(COMPOSITOR_MESSAGE_GREETINGS);
 
     if (result_or_greetings.success())
@@ -391,30 +387,25 @@ Result initialize(int argc, char **argv)
     return SUCCESS;
 }
 
-void uninitialized()
-{
-    _state = State::UNINITIALIZED;
-}
-
 int run()
 {
     assert(_state == State::RUNNING);
 
-    return Async::Loop::run();
+    return Async::Loop::the()->run();
 }
 
 int run_nested()
 {
     assert(_state == State::RUNNING);
 
-    return Async::Loop::run_nested();
+    return Async::Loop::the()->run_nested();
 }
 
 int pump()
 {
     assert(_state == State::RUNNING);
 
-    Async::Loop::pump(true);
+    Async::Loop::the()->pump(true);
 
     return 0;
 }
@@ -436,13 +427,13 @@ void exit(int exit_value)
     _connection_notifier = nullptr;
     _connection.close();
 
-    Async::Loop::exit(exit_value);
+    Async::Loop::the()->exit(exit_value);
 }
 
 void exit_nested(int exit_value)
 {
     assert(_state == State::RUNNING);
-    Async::Loop::exit_nested(exit_value);
+    Async::Loop::the()->exit_nested(exit_value);
 }
 
 } // namespace Application

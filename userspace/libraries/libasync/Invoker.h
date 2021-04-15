@@ -1,27 +1,27 @@
 #pragma once
 
-#include <libasync/Loop.h>
+#include <libasync/Source.h>
 #include <libutils/Callback.h>
-#include <libutils/RefCounted.h>
 
 namespace Async
 {
 
-class Invoker
+class Invoker : public Source
 {
 private:
     bool _invoke_later = false;
     Callback<void()> _callback;
+    RefPtr<Loop> _eventloop;
 
 public:
     Invoker(Callback<void()> callback) : _callback(callback)
     {
-        Loop::register_invoker(this);
+        loop().register_invoker(this);
     }
 
     ~Invoker()
     {
-        Loop::unregister_invoker(this);
+        loop().unregister_invoker(this);
     }
 
     bool should_be_invoke_later()

@@ -65,8 +65,6 @@ int main(int argc, char const *argv[])
         return PROCESS_FAILURE;
     }
 
-    Async::Loop::initialize();
-
     IO::File keyboard_stream{KEYBOARD_DEVICE_PATH, OPEN_READ};
     IO::File mouse_stream{MOUSE_DEVICE_PATH, OPEN_READ};
 
@@ -137,5 +135,5 @@ int main(int argc, char const *argv[])
     cursor_initialize();
     renderer_initialize();
 
-    return Async::Loop::run();
+    return Async::Loop::the()->run();
 }

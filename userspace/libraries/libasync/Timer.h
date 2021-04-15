@@ -2,13 +2,15 @@
 
 #include <skift/Time.h>
 
+#include <libasync/Source.h>
 #include <libutils/Callback.h>
 #include <libutils/RefPtr.h>
 
 namespace Async
 {
 
-class Timer
+class Timer :
+    public Source
 {
 private:
     bool _running = false;
@@ -32,13 +34,34 @@ public:
         _callback();
     }
 
-    Timer(Timeout interval, Callback<void()> callback);
+    Timer(Timeout interval, Callback<void()> callback)
+        : _interval(interval),
+          _callback(callback)
+    {
+    }
 
-    ~Timer();
+    ~Timer()
+    {
+        stop();
+    }
 
-    void start();
+    void start()
+    {
+        if (!_running)
+        {
+            _running = true;
+            loop().register_timer(this);
+        }
+    }
 
-    void stop();
+    void stop()
+    {
+        if (_running)
+        {
+            _running = false;
+            loop().unregister_timer(this);
+        }
+    }
 };
 
-} // namespace Event
+} // namespace Async

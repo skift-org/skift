@@ -9,15 +9,33 @@
 namespace Async
 {
 
-namespace Loop
-{
-
 /* --- Notifiers ------------------------------------------------------------ */
 
-static Vector<Notifier *> _notifiers;
-static Vector<HandlePoll> _polls;
+static RefPtr<Loop> _instance = nullptr;
 
-void update_notifier()
+RefPtr<Loop> Loop::the()
+{
+    if (_instance == nullptr)
+    {
+        _instance = make<Loop>();
+    }
+
+    return _instance;
+}
+
+void Loop::update_notifier(int id, PollEvent event)
+{
+    for (size_t i = 0; i < _notifiers.count(); i++)
+    {
+        if (_notifiers[i]->handle()->id() == id &&
+            _notifiers[i]->events() & event)
+        {
+            _notifiers[i]->invoke();
+        }
+    }
+}
+
+void Loop::update_polling_list()
 {
     _polls.clear();
 
@@ -31,48 +49,34 @@ void update_notifier()
     }
 }
 
-void register_notifier(Notifier *notifier)
+void Loop::register_notifier(Notifier *notifier)
 {
 
     _notifiers.push_back(notifier);
 
-    update_notifier();
+    update_polling_list();
 }
 
-void unregister_notifier(Notifier *notifier)
+void Loop::unregister_notifier(Notifier *notifier)
 {
     _notifiers.remove_all_value(notifier);
 
-    update_notifier();
-}
-
-void update_notifier(int id, PollEvent event)
-{
-    for (size_t i = 0; i < _notifiers.count(); i++)
-    {
-        if (_notifiers[i]->handle()->id() == id &&
-            _notifiers[i]->events() & event)
-        {
-            _notifiers[i]->invoke();
-        }
-    }
+    update_polling_list();
 }
 
 /* --- Timers --------------------------------------------------------------- */
 
-static Vector<Timer *> _timers;
-
-void register_timer(Timer *timer)
+void Loop::register_timer(Timer *timer)
 {
     _timers.push_back(timer);
 }
 
-void unregister_timer(Timer *timer)
+void Loop::unregister_timer(Timer *timer)
 {
     _timers.remove_value(timer);
 }
 
-void update_timers()
+void Loop::update_timers()
 {
     TimeStamp current_fire = system_get_ticks();
 
@@ -91,19 +95,17 @@ void update_timers()
 
 /* --- Invokers ------------------------------------------------------------- */
 
-static Vector<Invoker *> _invoker;
-
-void register_invoker(Invoker *invoker)
+void Loop::register_invoker(Invoker *invoker)
 {
     _invoker.push_back(invoker);
 }
 
-void unregister_invoker(Invoker *invoker)
+void Loop::unregister_invoker(Invoker *invoker)
 {
     _invoker.remove_value(invoker);
 }
 
-void update_invoker()
+void Loop::update_invoker()
 {
     _invoker.foreach ([](Invoker *invoker) {
         if (invoker->should_be_invoke_later())
@@ -117,37 +119,21 @@ void update_invoker()
 
 /* --- Loop ----------------------------------------------------------------- */
 
-static bool _is_running = false;
-static bool _is_initialize = false;
-static int _exit_value = PROCESS_SUCCESS;
-
-static bool _nested_is_running = false;
-static int _nested_exit_value = 0;
-
 static Vector<AtExitHook> _atexit_hooks;
 
-void initialize()
+Loop::Loop()
 {
-    Assert::is_false(_is_initialize);
-
-    _is_initialize = true;
 }
 
-void uninitialize()
+Loop::~Loop()
 {
-    Assert::is_true(_is_initialize);
-
     for (size_t i = 0; i < _atexit_hooks.count(); i++)
     {
         _atexit_hooks[i]();
     }
-
-    _atexit_hooks.clear();
-
-    _is_initialize = false;
 }
 
-static Timeout get_timeout()
+Timeout Loop::get_timeout()
 {
     Timeout timeout = UINT32_MAX;
 
@@ -178,14 +164,13 @@ static Timeout get_timeout()
     return timeout;
 }
 
-void atexit(AtExitHook hook)
+void Loop::atexit(AtExitHook hook)
 {
     _atexit_hooks.push_back(hook);
 }
 
-void pump(bool pool)
+void Loop::pump(bool pool)
 {
-    Assert::is_true(_is_initialize);
 
     Timeout timeout = 0;
 
@@ -211,9 +196,8 @@ void pump(bool pool)
     update_invoker();
 }
 
-int run()
+int Loop::run()
 {
-    Assert::is_true(_is_initialize);
     Assert::is_false(_is_running);
 
     _is_running = true;
@@ -223,22 +207,18 @@ int run()
         pump(false);
     }
 
-    uninitialize();
-
     return _exit_value;
 }
 
-void exit(int exit_value)
+void Loop::exit(int exit_value)
 {
-    Assert::is_true(_is_initialize);
 
     _is_running = false;
     _exit_value = exit_value;
 }
 
-int run_nested()
+int Loop::run_nested()
 {
-    Assert::is_true(_is_initialize);
     Assert::is_true(_is_running);
     Assert::is_false(_nested_is_running);
 
@@ -252,15 +232,12 @@ int run_nested()
     return _nested_exit_value;
 }
 
-void exit_nested(int exit_value)
+void Loop::exit_nested(int exit_value)
 {
-    Assert::is_true(_is_initialize);
     Assert::is_true(_nested_is_running);
 
     _nested_is_running = false;
     _nested_exit_value = exit_value;
 }
-
-} // namespace Loop
 
 } // namespace Async

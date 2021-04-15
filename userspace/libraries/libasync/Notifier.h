@@ -1,13 +1,15 @@
 #pragma once
 
-#include <libasync/Loop.h>
+#include <libasync/Source.h>
 #include <libio/Handle.h>
 #include <libutils/Callback.h>
 
 namespace Async
 {
 
-class Notifier : public IO::RawHandle
+class Notifier :
+    public IO::RawHandle,
+    public Source
 {
 private:
     RefPtr<IO::Handle> _handle;
@@ -23,12 +25,12 @@ public:
           _events{events},
           _callback{callback}
     {
-        Loop::register_notifier(this);
+        loop().register_notifier(this);
     }
 
     ~Notifier()
     {
-        Loop::unregister_notifier(this);
+        loop().unregister_notifier(this);
     }
 
     void invoke()

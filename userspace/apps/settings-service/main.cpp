@@ -10,8 +10,6 @@ int main(int argc, const char **argv)
 
     logger_info("Initializing setting-service...");
 
-    Async::Loop::initialize();
-
     logger_info("Loading settings...");
 
     auto repository = Settings::Repository::load();
@@ -22,5 +20,5 @@ int main(int argc, const char **argv)
 
     logger_info("Ready!");
 
-    return Async::Loop::run();
+    return Async::Loop::the()->run();
 }

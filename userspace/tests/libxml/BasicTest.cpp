@@ -18,5 +18,6 @@ TEST(xml_valid)
 
     Xml::Document doc = result.unwrap();
     Assert::equal(doc.root().name(), "Test");
+    Assert::equal(doc.root().attributes().count(), 2);
     Assert::equal(doc.root().children().count(), 4);
 }

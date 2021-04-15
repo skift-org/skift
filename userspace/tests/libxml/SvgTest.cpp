@@ -1,5 +1,6 @@
 #include <libio/Directory.h>
 #include <libio/File.h>
+#include <libio/Streams.h>
 #include <libxml/Parser.h>
 
 #include "tests/Driver.h"
@@ -17,6 +18,8 @@ TEST(xml_all_svg_test)
         {
             continue;
         }
+
+        IO::logln("Parsing {}", path);
 
         IO::File file(path, OPEN_READ);
         Assert::is_true(file.exist());

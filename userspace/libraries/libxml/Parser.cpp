@@ -1,5 +1,5 @@
 #include <libio/NumberScanner.h>
-#include <libsystem/Logger.h>
+#include <libio/Streams.h>
 #include <libutils/HashMap.h>
 #include <libxml/Parser.h>
 
@@ -13,7 +13,7 @@ ResultOr<String> read_comment(IO::Scanner &scan)
         builder.append(scan.current());
         if (scan.ended())
         {
-            logger_error("Failed to \"read_comment\"");
+            IO::logln("Failed to \"read_comment\"");
             return Result::ERR_INVALID_DATA;
         }
 
@@ -29,7 +29,7 @@ Result read_attribute(IO::Scanner &scan, String &name, String &value)
     StringBuilder builder{};
 
     // Attribute name
-    while (scan.current_is(Strings::ALL_ALPHA) || (scan.current() == ':'))
+    while (scan.current_is(Strings::ALL_ALPHA) || (scan.current() == ':') || (scan.current() == '-'))
     {
         builder.append(scan.current());
         scan.forward();
@@ -39,14 +39,14 @@ Result read_attribute(IO::Scanner &scan, String &name, String &value)
     // Attribute equal
     if (!scan.skip('='))
     {
-        logger_error("Expected = after attribute name: %i", scan.current());
+        IO::logln("Expected = after attribute name: {}", scan.current());
         return Result::ERR_INVALID_DATA;
     }
 
     // TODO: handle single quotes
     if (!scan.skip('\"'))
     {
-        logger_error("Expected \" to start an attribute value");
+        IO::logln("Expected \" to start an attribute value");
         return Result::ERR_INVALID_DATA;
     }
 
@@ -76,7 +76,7 @@ ResultOr<String> read_tag(IO::Scanner &scan, HashMap<String, String> &attributes
         {
             if (scan.current() == ' ')
             {
-                logger_error("Whitespaces before tagname not allowed");
+                IO::logln("Whitespaces before tagname not allowed");
                 return Result::ERR_INVALID_DATA;
             }
 
@@ -92,7 +92,7 @@ ResultOr<String> read_tag(IO::Scanner &scan, HashMap<String, String> &attributes
             }
             else
             {
-                logger_error("Unexpected symbol in end-tag: %i", scan.current());
+                IO::logln("Unexpected symbol in end-tag: {}", scan.current());
                 return Result::ERR_INVALID_DATA;
             }
         }
@@ -105,8 +105,11 @@ ResultOr<String> read_tag(IO::Scanner &scan, HashMap<String, String> &attributes
 
     // If the tag ended with /> it was an empty tag
     empty_tag = scan.skip_word("/>");
-
-    scan.forward();
+    // Else just skip the >
+    if (!empty_tag)
+    {
+        scan.forward();
+    }
 
     return builder.finalize();
 }
@@ -135,8 +138,8 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
 
     if (scan.current() != '<')
     {
-        logger_error("Failed to \"read_node\"");
-        logger_error("Unexpected symbol: %i", scan.current());
+        IO::logln("Failed to \"read_node\"");
+        IO::logln("Unexpected symbol: {}", scan.current());
         return Result::ERR_INVALID_DATA;
     }
 
@@ -153,14 +156,15 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
         {
             if (node.name().empty())
             {
-                logger_error("End-tag without a start-tag");
+                IO::logln("End-tag without a start-tag");
                 return Result::ERR_INVALID_DATA;
             }
 
             String end_tag = TRY(read_end_tag(scan));
+            IO::logln("Start-tag: {}", end_tag);
             if (end_tag != node.name())
             {
-                logger_error("End-tag does not match start-tag: ET %s ST %s", end_tag.cstring(), node.name().cstring());
+                IO::logln("End-tag does not match start-tag: ET {} ST {}", end_tag, node.name());
                 return Result::ERR_INVALID_DATA;
             }
             return Result::SUCCESS;
@@ -170,7 +174,7 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
         {
             bool empty_tag;
             node.name() = TRY(read_start_tag(scan, node.attributes(), empty_tag));
-
+            IO::logln("Start-tag: {} [{}]", node.name(), empty_tag);
             // It was an empty tag, so we have no content / end-tag
             if (empty_tag)
             {
@@ -205,15 +209,15 @@ Result read_declaration(IO::Scanner &scan, Xml::Declaration &)
 
     if (scan.current() != '<')
     {
-        logger_error("Failed to \"read_declaration\"");
-        logger_error("Unexpected symbol: %i", scan.current());
+        IO::logln("Failed to \"read_declaration\"");
+        IO::logln("Unexpected symbol: {}", scan.current());
         return Result::ERR_INVALID_DATA;
     }
 
     // We have no declaration
     if (scan.peek(1) != '?')
     {
-        logger_warn("Missing XML declaration");
+        IO::logln("Missing XML declaration");
         return Result::SUCCESS;
     }
 
@@ -227,7 +231,7 @@ Result read_declaration(IO::Scanner &scan, Xml::Declaration &)
     // Skip ?>
     if (!scan.skip_word("?>"))
     {
-        logger_error("Failed to \"read_declaration\"");
+        IO::logln("Failed to \"read_declaration\"");
         return Result::ERR_INVALID_DATA;
     }
 

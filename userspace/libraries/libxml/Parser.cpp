@@ -3,6 +3,7 @@
 #include <libutils/HashMap.h>
 #include <libxml/Parser.h>
 
+//See https://www.w3.org/TR/xml/#NT-Comment
 ResultOr<String> read_comment(IO::Scanner &scan)
 {
     StringBuilder builder{};
@@ -22,23 +23,41 @@ ResultOr<String> read_comment(IO::Scanner &scan)
     return builder.finalize();
 }
 
+// See https://www.w3.org/TR/xml/#NT-Attribute
 Result read_attribute(IO::Scanner &scan, String &name, String &value)
 {
     StringBuilder builder{};
 
-    while (scan.current() != '=')
+    // Attribute name
+    while (scan.current_is(Strings::ALL_ALPHA))
     {
         builder.append(scan.current());
         scan.forward();
     }
     name = builder.finalize();
-    scan.skip('=');
-    while (scan.current() != ' ' && scan.current() != '>')
+
+    // Attribute equal
+    if (!scan.skip('='))
+    {
+        logger_error("Expected = after attribute name");
+        return Result::ERR_INVALID_DATA;
+    }
+
+    // TODO: handle single quotes
+    if (!scan.skip('\"'))
+    {
+        logger_error("Expected \" to start an attribute value");
+        return Result::ERR_INVALID_DATA;
+    }
+
+    // Attribute value
+    while (scan.current() != '\"')
     {
         builder.append(scan.current());
         scan.forward();
     }
     value = builder.finalize();
+
     return Result::SUCCESS;
 }
 
@@ -67,12 +86,12 @@ ResultOr<String> read_tag(IO::Scanner &scan, HashMap<String, String> &attributes
             if (read_attributes)
             {
                 String name, value;
-                read_attribute(scan, name, value);
+                TRY(read_attribute(scan, name, value));
                 attributes[name] = value;
             }
             else
             {
-                logger_error("Unexpected symbol in end-tag");
+                logger_error("Unexpected symbol in end-tag: %i", scan.current());
                 return Result::ERR_INVALID_DATA;
             }
         }
@@ -87,6 +106,7 @@ ResultOr<String> read_tag(IO::Scanner &scan, HashMap<String, String> &attributes
     return builder.finalize();
 }
 
+// See https://www.w3.org/TR/xml/#dt-etag
 ResultOr<String> read_end_tag(IO::Scanner &scan)
 {
     scan.forward(2);
@@ -94,12 +114,15 @@ ResultOr<String> read_end_tag(IO::Scanner &scan)
     return read_tag(scan, tmp, false);
 }
 
-ResultOr<String> read_start_tag(IO::Scanner &scan, HashMap<String, String> &attributes)
+// See https://www.w3.org/TR/xml/#dt-stag
+// TODO: this can also be an empty_tag
+ResultOr<String> read_start_tag(IO::Scanner &scan, HashMap<String, String> &attributes, bool & /*empty_tag*/)
 {
     scan.forward();
-    return read_tag(scan, attributes, false);
+    return read_tag(scan, attributes, true);
 }
 
+// See https://www.w3.org/TR/xml/#sec-logical-struct
 Result read_node(IO::Scanner &scan, Xml::Node &node)
 {
     scan.eat(Strings::WHITESPACE);
@@ -136,11 +159,19 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
             }
             return Result::SUCCESS;
         }
-        // Start-Tag
+        // Start-Tag & Empty-Tag
         else if (node.name().empty())
         {
-            node.name() = TRY(read_start_tag(scan, node.attributes()));
+            bool empty_tag;
+            node.name() = TRY(read_start_tag(scan, node.attributes(), empty_tag));
 
+            // It was an empty tag, so we have no content / end-tag
+            // if (empty_tag)
+            // {
+            //     return Result::SUCCESS;
+            // }
+
+            // Read the content for the tag
             StringBuilder builder{};
             while (scan.current() != '<')
             {
@@ -161,6 +192,7 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
     return Result::SUCCESS;
 }
 
+// See https://www.w3.org/TR/xml/#sec-prolog-dtd
 Result read_declaration(IO::Scanner &scan, Xml::Declaration &)
 {
     scan.eat(Strings::WHITESPACE);
@@ -172,16 +204,25 @@ Result read_declaration(IO::Scanner &scan, Xml::Declaration &)
         return Result::ERR_INVALID_DATA;
     }
 
+    // We have no declaration
     if (scan.peek(1) != '?')
     {
-        // We have no declaration
+        logger_warn("Missing XML declaration");
         return Result::SUCCESS;
     }
 
-    while (scan.current() != '>' && scan.do_continue())
+    // declaration ends with ?>
+    while (!scan.current_is_word("?>") && scan.do_continue())
     {
         //TODO: read declaration content
         scan.forward();
+    }
+
+    // Skip ?>
+    if (!scan.skip_word("?>"))
+    {
+        logger_error("Failed to \"read_declaration\"");
+        return Result::ERR_INVALID_DATA;
     }
 
     return Result::SUCCESS;

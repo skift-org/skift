@@ -30,6 +30,7 @@ ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int r
     }
 
     auto bitmap = TRY(Bitmap::create_shared(width * resolution, height * resolution));
+    bitmap->clear(Colors::TRANSPARENT);
     Rasterizer rast{bitmap};
 
     for (auto child : doc.root().children())
@@ -37,7 +38,7 @@ ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int r
         if (child.name() == "path")
         {
             auto path = Graphic::Path::parse(child.attributes()["d"].cstring());
-            rast.fill(path, Math::Mat3x2f::scale(resolution), Graphic::Fill{Graphic::Colors::MAGENTA.with_alpha(0.5)});
+            rast.fill(path, Math::Mat3x2f::scale(resolution), Graphic::Fill{Graphic::Colors::BLACK});
         }
         else
         {

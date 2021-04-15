@@ -2,7 +2,7 @@
 
 #include <libgraphic/Icon.h>
 #include <libjson/Json.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 #include <libutils/RefPtr.h>
 
 namespace FilePicker
@@ -13,7 +13,7 @@ struct Bookmark
 private:
     String _name;
     RefPtr<Graphic::Icon> _icon;
-    Path _path;
+    IO::Path _path;
 
 public:
     const String &name() const
@@ -26,7 +26,7 @@ public:
         return _icon;
     }
 
-    const Path &path() const
+    const IO::Path &path() const
     {
         return _path;
     }
@@ -44,12 +44,12 @@ public:
             });
 
             value.with("path", [&](auto &value) {
-                _path = Path::parse(value.as_string());
+                _path = IO::Path::parse(value.as_string());
             });
         }
     }
 
-    Bookmark(const String &name, const RefPtr<Graphic::Icon> icon, const Path &path)
+    Bookmark(const String &name, const RefPtr<Graphic::Icon> icon, const IO::Path &path)
         : _name(name),
           _icon(icon),
           _path(path)

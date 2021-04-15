@@ -3,7 +3,7 @@
 
 #include <assert.h>
 #include <libsystem/core/Plugs.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 int __plug_process_this()
 {

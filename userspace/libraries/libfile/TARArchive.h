@@ -19,7 +19,7 @@ private:
     Result read_archive();
 
 public:
-    TARArchive(Path path, bool read = true);
+    TARArchive(IO::Path path, bool read = true);
 
     Result extract(unsigned int entry_index, IO::Writer &writer) override;
     Result insert(const char *entry_name, IO::Reader &reader) override;

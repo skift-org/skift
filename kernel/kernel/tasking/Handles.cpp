@@ -85,13 +85,13 @@ Result Handles::release(int handle_index)
     return SUCCESS;
 }
 
-ResultOr<int> Handles::open(Domain &domain, Path &path, OpenFlag flags)
+ResultOr<int> Handles::open(Domain &domain, IO::Path &path, OpenFlag flags)
 {
     auto handle = TRY(domain.open(path, flags));
     return add(handle);
 }
 
-ResultOr<int> Handles::connect(Domain &domain, Path &path)
+ResultOr<int> Handles::connect(Domain &domain, IO::Path &path)
 {
     auto handle = TRY(domain.connect(path));
     return add(handle);

@@ -24,19 +24,19 @@ Result Directory::read_entries()
 
 Directory::Directory(const char *path)
     : _handle{make<Handle>(path, OPEN_READ | OPEN_DIRECTORY)},
-      _path{Path::parse(path)}
+      _path{IO::Path::parse(path)}
 {
     read_entries();
 }
 
 Directory::Directory(String path)
     : _handle{make<Handle>(path, OPEN_READ | OPEN_DIRECTORY)},
-      _path{Path::parse(path)}
+      _path{IO::Path::parse(path)}
 {
     read_entries();
 }
 
-Directory::Directory(const Path &path)
+Directory::Directory(const IO::Path &path)
     : _handle{make<Handle>(path.string(), OPEN_READ | OPEN_DIRECTORY)},
       _path{path}
 {

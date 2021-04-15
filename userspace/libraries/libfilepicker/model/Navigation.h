@@ -2,7 +2,7 @@
 
 #include <libasync/Observable.h>
 #include <libsystem/process/Process.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 #include <libutils/Vector.h>
 
 namespace FilePicker
@@ -13,9 +13,9 @@ class Navigation :
     public RefCounted<Navigation>
 {
 private:
-    Vector<Path> _backward{};
-    Path _current{};
-    Vector<Path> _foreward{};
+    Vector<IO::Path> _backward{};
+    IO::Path _current{};
+    Vector<IO::Path> _foreward{};
 
 public:
     enum Direction
@@ -25,7 +25,7 @@ public:
         FOREWARD
     };
 
-    const Path &current() const { return _current; }
+    const IO::Path &current() const { return _current; }
 
     Navigation();
 
@@ -49,9 +49,9 @@ public:
 
     void navigate(String directory);
 
-    void navigate(Path path);
+    void navigate(IO::Path path);
 
-    void navigate(Path path, Direction record_history);
+    void navigate(IO::Path path, Direction record_history);
 
     void clear_foreward();
 };

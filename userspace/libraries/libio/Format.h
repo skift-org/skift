@@ -4,7 +4,7 @@
 #include <libio/MemoryWriter.h>
 #include <libio/Scanner.h>
 #include <libio/Write.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 #include <libutils/String.h>
 
 namespace IO
@@ -134,7 +134,7 @@ ResultOr<size_t> format(IO::Writer &writer, const Formating &format, const T *pt
 
 ResultOr<size_t> format(IO::Writer &, const Formating &, const String);
 
-ResultOr<size_t> format(IO::Writer &, const Formating &, const Path);
+ResultOr<size_t> format(IO::Writer &, const Formating &, const IO::Path);
 
 static inline ResultOr<size_t> format(IO::Writer &writer, Scanner &scan)
 {

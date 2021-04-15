@@ -33,7 +33,7 @@ int main(int argc, char const *argv[])
         return PROCESS_FAILURE;
     }
 
-    auto archive = make<ZipArchive>(Path::parse(args.argv()[0]), false);
+    auto archive = make<ZipArchive>(IO::Path::parse(args.argv()[0]), false);
 
     // Pack all files that were passed as arguments
     for (unsigned int i = 1; i < args.argc(); i++)

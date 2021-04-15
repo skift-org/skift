@@ -1,10 +1,12 @@
 #include <libgraphic/Bitmap.h>
-#include <libgraphic/png/PngReader.h>
+#include <libgraphic/png/Png.h>
+#include <libgraphic/svg/Svg.h>
 #include <libio/Copy.h>
 #include <libio/File.h>
 #include <libio/MemoryReader.h>
+#include <libio/Path.h>
+#include <libio/Streams.h>
 #include <libsystem/system/Memory.h>
-
 namespace Graphic
 {
 
@@ -66,29 +68,17 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    Graphic::PngReader png_reader{file};
-
-    if (!png_reader.valid())
+    IO::Path p = IO::Path::parse(path);
+    if (p.extension() == ".png")
     {
-        return ERR_BAD_IMAGE_FILE_FORMAT;
+        return Png::load(file);
     }
-
-    unsigned int decoded_width = png_reader.width();
-    unsigned int decoded_height = png_reader.height();
-    const Color *decoded_data = png_reader.pixels().raw_storage();
-
-    auto bitmap_or_result = Bitmap::create_shared(decoded_width, decoded_height);
-
-    if (bitmap_or_result.success())
+    else if (p.extension() == ".svg")
     {
-        auto bitmap = bitmap_or_result.unwrap();
-        memcpy(bitmap->pixels(), decoded_data, sizeof(Color) * decoded_width * decoded_height);
-        return bitmap;
+        return Svg::render(file, 10);
     }
-    else
-    {
-        return bitmap_or_result;
-    }
+    IO::logln("Unknown bitmap extension: {}", p.extension());
+    return Result::ERR_NOT_IMPLEMENTED;
 }
 
 RefPtr<Bitmap> Bitmap::load_from_or_placeholder(String path)

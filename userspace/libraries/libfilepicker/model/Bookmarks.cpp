@@ -17,7 +17,7 @@ void Bookmarks::add(Bookmark &&bookmark)
     did_update();
 }
 
-void Bookmarks::remove(const Path &path)
+void Bookmarks::remove(const IO::Path &path)
 {
     for (size_t i = 0; i < _bookmarks.count(); i++)
     {
@@ -30,7 +30,7 @@ void Bookmarks::remove(const Path &path)
     }
 }
 
-bool Bookmarks::has(const Path &path) const
+bool Bookmarks::has(const IO::Path &path) const
 {
     for (size_t i = 0; i < _bookmarks.count(); i++)
     {

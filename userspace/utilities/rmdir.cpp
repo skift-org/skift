@@ -64,7 +64,7 @@ int main(int argc, const char *argv[])
         }
         else
         {
-            auto path = Path::parse(directory);
+            auto path = IO::Path::parse(directory);
 
             while (path.length() > 0)
             {

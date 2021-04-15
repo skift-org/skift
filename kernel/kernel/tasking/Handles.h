@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 #include "kernel/node/Handle.h"
 
@@ -28,9 +28,9 @@ public:
 
     ~Handles() { close_all(); }
 
-    ResultOr<int> open(Domain &domain, Path &path, OpenFlag flags);
+    ResultOr<int> open(Domain &domain, IO::Path &path, OpenFlag flags);
 
-    ResultOr<int> connect(Domain &domain, Path &socket_path);
+    ResultOr<int> connect(Domain &domain, IO::Path &socket_path);
 
     Result close(int handle_index);
 

@@ -5,17 +5,17 @@ namespace IO
 
 File::File(const char *path, OpenFlag flags)
     : _handle{make<Handle>(path, flags | OPEN_STREAM)},
-      _path{Path::parse(path)}
+      _path{IO::Path::parse(path)}
 {
 }
 
 File::File(String path, OpenFlag flags)
     : _handle{make<Handle>(path, flags | OPEN_STREAM)},
-      _path{Path::parse(path)}
+      _path{IO::Path::parse(path)}
 {
 }
 
-File::File(Path &path, OpenFlag flags)
+File::File(IO::Path &path, OpenFlag flags)
     : _handle{make<Handle>(path.string(), flags | OPEN_STREAM)},
       _path{path}
 {

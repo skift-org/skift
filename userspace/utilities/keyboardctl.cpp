@@ -20,7 +20,7 @@ ArgParseResult loadkey_list_keymap()
 
     for (auto entry : keymap_directory.entries())
     {
-        Path keymap_path = Path::parse(entry.name);
+        IO::Path keymap_path = IO::Path::parse(entry.name);
         IO::outln("- {}", keymap_path.basename_without_extension());
     }
 

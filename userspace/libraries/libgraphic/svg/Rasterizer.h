@@ -6,10 +6,8 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/svg/Paint.h>
 #include <libgraphic/svg/Path.h>
-
 namespace Graphic
 {
-
 class Rasterizer
 {
 private:

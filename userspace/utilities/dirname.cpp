@@ -1,5 +1,5 @@
 #include <libutils/ArgParse.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 constexpr auto PROLOGUE = "Output each NAME with its last non - slash component and trailing slashes removed.";
 constexpr auto OPTION_ZERO_DESCRIPTION = "End each output line with NUL, not newline.";
@@ -31,7 +31,7 @@ int main(int argc, char const *argv[])
 
     for (size_t i = 0; i < args.argc(); i++)
     {
-        auto path = Path::parse(args.argv()[i]);
+        auto path = IO::Path::parse(args.argv()[i]);
 
         IO::out("{}{c}", path.dirname(), terminator);
     }

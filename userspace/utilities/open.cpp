@@ -2,14 +2,14 @@
 #include <libio/Streams.h>
 #include <libjson/Json.h>
 #include <libsystem/process/Launchpad.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 #define FILE_EXTENSIONS_DATABASE_PATH "/Configs/open/file-extensions.json"
 #define FILE_TYPES_DATABASE_PATH "/Configs/open/file-types.json"
 
 Result open(const char *raw_path)
 {
-    auto path = Path::parse(raw_path);
+    auto path = IO::Path::parse(raw_path);
 
     auto extension = path.extension();
 

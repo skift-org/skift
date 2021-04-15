@@ -5,7 +5,7 @@
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/process/Process.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 Result __plug_process_get_directory(char *buffer, size_t size)
 {
@@ -39,13 +39,13 @@ String __plug_process_resolve(String raw_path)
 
     auto &raw_pwd = environment().get("POSIX").get("PWD");
 
-    auto path = Path::parse(raw_path);
+    auto path = IO::Path::parse(raw_path);
 
     if (!path.absolute())
     {
-        auto pwd = Path::parse(raw_pwd.as_string());
+        auto pwd = IO::Path::parse(raw_pwd.as_string());
 
-        path = Path::join(pwd, path);
+        path = IO::Path::join(pwd, path);
     }
 
     return path.normalized().string();

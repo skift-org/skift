@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libio/Handle.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 namespace IO
 {
@@ -18,19 +18,19 @@ public:
 
 private:
     RefPtr<Handle> _handle;
-    Optional<Path> _path;
+    Optional<IO::Path> _path;
     Vector<Entry> _entries;
 
     Result read_entries();
 
 public:
-    const Optional<Path> &path() { return _path; }
+    const Optional<IO::Path> &path() { return _path; }
     const Vector<Entry> &entries() { return _entries; }
 
     Directory() {}
     Directory(const char *path);
     Directory(String path);
-    Directory(const Path &path);
+    Directory(const IO::Path &path);
     Directory(RefPtr<Handle> handle);
 
     RefPtr<Handle> handle() override { return _handle; }

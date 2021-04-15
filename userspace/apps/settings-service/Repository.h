@@ -2,7 +2,7 @@
 
 #include <libio/Directory.h>
 #include <libsettings/Path.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 #include "settings-service/Domain.h"
 
@@ -36,7 +36,7 @@ struct Repository
         return repository;
     }
 
-    void write(const Path &path, const Json::Value &value)
+    void write(const Settings::Path &path, const Json::Value &value)
     {
         if (!domains.has_key(path.domain))
         {
@@ -46,7 +46,7 @@ struct Repository
         domains[path.domain].write(path, value);
     }
 
-    Json::Value read(const Path &path)
+    Json::Value read(const Settings::Path &path)
     {
         if (path.domain == "*")
         {

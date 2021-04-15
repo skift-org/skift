@@ -144,6 +144,7 @@ public:
         _primary_color = new Widget::Panel(primary_color_container);
         _primary_color->border_radius(4);
         _primary_color->color(Widget::THEME_MIDDLEGROUND, _document->primary_color());
+        _primary_color->flags(Widget::Component::FILL);
 
         Widget::Component *secondary_color_container = new Widget::Container(toolbar);
         secondary_color_container->insets(Insetsi(4));
@@ -152,6 +153,7 @@ public:
         _secondary_color = new Widget::Panel(secondary_color_container);
         _secondary_color->border_radius(4);
         _secondary_color->color(Widget::THEME_MIDDLEGROUND, _document->secondary_color());
+        _secondary_color->flags(Widget::Component::FILL);
     }
 
     void create_color_palette(Widget::Component *parent)

@@ -4,7 +4,7 @@
 #include <abi/Task.h>
 
 #include <libsystem/utils/List.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 #include "kernel/memory/Memory.h"
 #include "kernel/scheduling/Blocker.h"

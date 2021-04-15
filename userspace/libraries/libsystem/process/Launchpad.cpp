@@ -6,7 +6,7 @@
 #include <libsystem/core/Plugs.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 Launchpad *launchpad_create(const char *name, const char *executable)
 {
@@ -25,7 +25,7 @@ Launchpad *launchpad_create(const char *name, const char *executable)
     launchpad->handles[2] = 2;
     launchpad->handles[3] = 3;
 
-    auto executable_path = Path::parse(executable);
+    auto executable_path = IO::Path::parse(executable);
     launchpad_argument(launchpad, executable_path.basename().cstring());
 
 #ifndef __KERNEL__

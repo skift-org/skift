@@ -3,7 +3,7 @@
 #include <libio/Reader.h>
 #include <libio/Writer.h>
 #include <libsystem/Result.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 class Archive : public RefCounted<Archive>
 {
 public:
@@ -18,13 +18,13 @@ public:
 
 protected:
     Vector<Entry> _entries;
-    Path _path;
+    IO::Path _path;
     bool _valid = true;
 
 public:
-    static RefPtr<Archive> open(Path path, bool read = true);
+    static RefPtr<Archive> open(IO::Path path, bool read = true);
 
-    Archive(Path path) : _path(path)
+    Archive(IO::Path path) : _path(path)
     {
     }
 
@@ -36,7 +36,7 @@ public:
     virtual Result extract(unsigned int entry_index, IO::Writer &writer) = 0;
     virtual Result insert(const char *entry_name, IO::Reader &reader) = 0;
 
-    inline const Path &get_path()
+    inline const IO::Path &get_path()
     {
         return _path;
     }

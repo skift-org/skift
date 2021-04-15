@@ -31,7 +31,7 @@ Domain &Domain::operator=(const Domain &other)
     return *this;
 }
 
-RefPtr<FsNode> Domain::find(Path path)
+RefPtr<FsNode> Domain::find(IO::Path path)
 {
     auto current = root();
 
@@ -56,7 +56,7 @@ RefPtr<FsNode> Domain::find(Path path)
     return current;
 }
 
-ResultOr<RefPtr<FsHandle>> Domain::open(Path path, OpenFlag flags)
+ResultOr<RefPtr<FsHandle>> Domain::open(IO::Path path, OpenFlag flags)
 {
     bool should_create_if_not_present = (flags & OPEN_CREATE) == OPEN_CREATE;
 
@@ -111,7 +111,7 @@ ResultOr<RefPtr<FsHandle>> Domain::open(Path path, OpenFlag flags)
     return make<FsHandle>(node, flags);
 }
 
-ResultOr<RefPtr<FsHandle>> Domain::connect(Path path)
+ResultOr<RefPtr<FsHandle>> Domain::connect(IO::Path path)
 {
     auto node = find(path);
 
@@ -143,7 +143,7 @@ ResultOr<RefPtr<FsHandle>> Domain::connect(Path path)
     return connection_handle;
 }
 
-Result Domain::mkdir(Path path)
+Result Domain::mkdir(IO::Path path)
 {
     if (path.length() == 0)
     {
@@ -154,12 +154,12 @@ Result Domain::mkdir(Path path)
     return link(path, make<FsDirectory>());
 }
 
-Result Domain::mkpipe(Path path)
+Result Domain::mkpipe(IO::Path path)
 {
     return link(path, make<FsPipe>());
 }
 
-Result Domain::mklink(Path old_path, Path new_path)
+Result Domain::mklink(IO::Path old_path, IO::Path new_path)
 {
     auto destination = find(old_path);
 
@@ -176,7 +176,7 @@ Result Domain::mklink(Path old_path, Path new_path)
     return link(new_path, destination);
 }
 
-Result Domain::link(Path path, RefPtr<FsNode> node)
+Result Domain::link(IO::Path path, RefPtr<FsNode> node)
 {
     auto parent = find(path.dirpath());
 
@@ -197,7 +197,7 @@ Result Domain::link(Path path, RefPtr<FsNode> node)
     return result;
 }
 
-Result Domain::unlink(Path path)
+Result Domain::unlink(IO::Path path)
 {
     auto parent = find(path.dirpath());
 
@@ -219,7 +219,7 @@ Result Domain::unlink(Path path)
 }
 
 // FIXME: check for loops when renaming directory
-Result Domain::rename(Path old_path, Path new_path)
+Result Domain::rename(IO::Path old_path, IO::Path new_path)
 {
     auto old_parent = find(old_path.dirpath());
     auto new_parent = find(new_path.dirpath());

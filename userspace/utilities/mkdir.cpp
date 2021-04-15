@@ -4,7 +4,7 @@
 
 #include <libsystem/io/Filesystem.h>
 
-Result mkdir(Path path)
+Result mkdir(IO::Path path)
 {
     IO::Directory parent{path};
 
@@ -17,7 +17,7 @@ Result mkdir(Path path)
     return SUCCESS;
 }
 
-Result mkdir_parent(Path path)
+Result mkdir_parent(IO::Path path)
 {
     for (size_t i = 0; i < path.length(); i++)
     {
@@ -52,14 +52,14 @@ int main(int argc, const char *argv[])
     {
         if (parent)
         {
-            if (mkdir_parent(Path::parse(directory)) != SUCCESS)
+            if (mkdir_parent(IO::Path::parse(directory)) != SUCCESS)
             {
                 return PROCESS_FAILURE;
             }
         }
         else
         {
-            if (mkdir(Path::parse(directory)) != SUCCESS)
+            if (mkdir(IO::Path::parse(directory)) != SUCCESS)
             {
                 return PROCESS_FAILURE;
             }

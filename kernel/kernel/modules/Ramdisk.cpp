@@ -14,7 +14,7 @@ void ramdisk_load(Module *module)
     TARBlock block;
     for (size_t i = 0; tar_read((void *)module->range.base(), &block, i); i++)
     {
-        auto file_path = Path::parse(block.name);
+        auto file_path = IO::Path::parse(block.name);
 
         if (block.name[strlen(block.name) - 1] == '/')
         {

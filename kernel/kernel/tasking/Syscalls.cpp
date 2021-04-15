@@ -247,7 +247,7 @@ Result hj_filesystem_mkdir(const char *raw_path, size_t size)
         return ERR_BAD_ADDRESS;
     }
 
-    auto path = Path::parse(raw_path, size).normalized();
+    auto path = IO::Path::parse(raw_path, size).normalized();
 
     auto &domain = scheduler_running()->domain();
 
@@ -261,7 +261,7 @@ Result hj_filesystem_mkpipe(const char *raw_path, size_t size)
         return ERR_BAD_ADDRESS;
     }
 
-    auto path = Path::parse(raw_path, size).normalized();
+    auto path = IO::Path::parse(raw_path, size).normalized();
 
     auto &domain = scheduler_running()->domain();
 
@@ -277,9 +277,9 @@ Result hj_filesystem_link(const char *raw_old_path, size_t old_size,
         return ERR_BAD_ADDRESS;
     }
 
-    Path old_path = Path::parse(raw_old_path, old_size).normalized();
+    IO::Path old_path = IO::Path::parse(raw_old_path, old_size).normalized();
 
-    Path new_path = Path::parse(raw_new_path, new_size).normalized();
+    IO::Path new_path = IO::Path::parse(raw_new_path, new_size).normalized();
 
     auto &domain = scheduler_running()->domain();
 
@@ -295,7 +295,7 @@ Result hj_filesystem_unlink(const char *raw_path, size_t size)
         return ERR_BAD_ADDRESS;
     }
 
-    auto path = Path::parse(raw_path, size).normalized();
+    auto path = IO::Path::parse(raw_path, size).normalized();
 
     auto &domain = scheduler_running()->domain();
 
@@ -311,9 +311,9 @@ Result hj_filesystem_rename(const char *raw_old_path, size_t old_size,
         return ERR_BAD_ADDRESS;
     }
 
-    Path old_path = Path::parse(raw_old_path, old_size).normalized();
+    IO::Path old_path = IO::Path::parse(raw_old_path, old_size).normalized();
 
-    Path new_path = Path::parse(raw_new_path, new_size).normalized();
+    IO::Path new_path = IO::Path::parse(raw_new_path, new_size).normalized();
 
     auto &domain = scheduler_running()->domain();
 
@@ -422,7 +422,7 @@ Result hj_handle_open(int *handle,
         return ERR_BAD_ADDRESS;
     }
 
-    auto path = Path::parse(raw_path, size).normalized();
+    auto path = IO::Path::parse(raw_path, size).normalized();
 
     auto &handles = scheduler_running()->handles();
 
@@ -591,7 +591,7 @@ Result hj_handle_connect(int *handle, const char *raw_path, size_t size)
         return ERR_BAD_ADDRESS;
     }
 
-    auto path = Path::parse(raw_path, size).normalized();
+    auto path = IO::Path::parse(raw_path, size).normalized();
 
     auto &handles = scheduler_running()->handles();
 

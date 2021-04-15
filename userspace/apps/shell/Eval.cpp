@@ -105,7 +105,7 @@ int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> 
 
         int pid;
         Result result = shell_exec(command, instream, outstream, &pid);
-        auto path = Path::parse(command->command, Path::PARENT_SHORTHAND);
+        auto path = IO::Path::parse(command->command, IO::Path::PARENT_SHORTHAND);
 
         if (result == SUCCESS)
         {

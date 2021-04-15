@@ -5,6 +5,7 @@
     ".jpg": "image",
     ".json": "text",
     ".png": "image",
+    ".svg": "image",
     ".text": "text",
     ".txt": "text",
     ".html": "text",

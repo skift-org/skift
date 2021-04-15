@@ -141,7 +141,7 @@ Result __plug_process_wait(int pid, int *exit_value)
 
 void __plug_handle_open(Handle *handle, const char *raw_path, OpenFlag flags)
 {
-    auto path = Path::parse(raw_path);
+    auto path = IO::Path::parse(raw_path);
     auto &handles = scheduler_running()->handles();
     auto &domain = scheduler_running()->domain();
 

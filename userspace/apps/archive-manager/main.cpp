@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        auto archive = Archive::open(Path::parse(argv[1]));
+        auto archive = Archive::open(IO::Path::parse(argv[1]));
         window = new MainWindow(navigation, archive);
     }
 

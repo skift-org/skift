@@ -4,7 +4,7 @@
 #include <libio/Streams.h>
 #include <libsystem/io/Filesystem.h>
 #include <libutils/ArgParse.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 int main(int argc, char const *argv[])
 {
@@ -34,7 +34,7 @@ int main(int argc, char const *argv[])
             return Iteration::STOP;
         }
 
-        auto archive = make<ZipArchive>(Path::parse(path));
+        auto archive = make<ZipArchive>(IO::Path::parse(path));
 
         if (!archive->valid())
         {

@@ -4,7 +4,7 @@
 #include <libgraphic/Icon.h>
 #include <libio/Format.h>
 #include <libutils/HashMap.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 namespace Graphic
 {

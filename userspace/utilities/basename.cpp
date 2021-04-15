@@ -1,6 +1,6 @@
 #include <libio/Streams.h>
 #include <libutils/ArgParse.h>
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 int main(int argc, char const *argv[])
 {
@@ -26,7 +26,7 @@ int main(int argc, char const *argv[])
 
     for (auto filepath : args.argv())
     {
-        auto basename = Path::parse(filepath).basename();
+        auto basename = IO::Path::parse(filepath).basename();
         if (option_zero)
         {
             IO::write(IO::out(), basename);

@@ -107,5 +107,5 @@ void framebuffer_initialize(Handover *handover)
 
     graphic_did_find_framebuffer(_framebuffer_virtual, _framebuffer_width, _framebuffer_height, _framebuffer_pitch, _framebuffer_bpp);
 
-    scheduler_running()->domain().link(Path::parse(FRAMEBUFFER_DEVICE_PATH), make<Framebuffer>());
+    scheduler_running()->domain().link(IO::Path::parse(FRAMEBUFFER_DEVICE_PATH), make<Framebuffer>());
 }

@@ -7,6 +7,8 @@
 #include <libutils/StringBuilder.h>
 #include <libutils/Vector.h>
 
+namespace IO
+{
 struct Path
 {
 private:
@@ -387,3 +389,4 @@ public:
         return builder.finalize();
     }
 };
+}

@@ -93,7 +93,7 @@ ResultOr<size_t> format(Writer &writer, const Formating &, const String string)
     return IO::write(writer, string.cstring());
 }
 
-ResultOr<size_t> format(Writer &writer, const Formating &, const Path path)
+ResultOr<size_t> format(Writer &writer, const Formating &, const IO::Path path)
 {
     return IO::write(writer, path.string());
 }

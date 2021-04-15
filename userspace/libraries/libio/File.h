@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Path.h>
+#include <libio/Path.h>
 
 #include <libio/Handle.h>
 #include <libio/Reader.h>
@@ -17,10 +17,10 @@ class File final :
 {
 private:
     RefPtr<Handle> _handle;
-    Optional<Path> _path;
+    Optional<IO::Path> _path;
 
 public:
-    const Optional<Path> &path() { return _path; }
+    const Optional<IO::Path> &path() { return _path; }
 
     File() {}
 
@@ -28,7 +28,7 @@ public:
 
     File(String path, OpenFlag flags = 0);
 
-    File(Path &path, OpenFlag flags = 0);
+    File(IO::Path &path, OpenFlag flags = 0);
 
     File(RefPtr<Handle> handle);
 

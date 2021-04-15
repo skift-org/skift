@@ -1,10 +1,10 @@
 #include <libgraphic/svg/Rasterizer.h>
 #include <libgraphic/svg/Svg.h>
 #include <libio/NumberScanner.h>
-#include <libsystem/Logger.h>
+#include <libio/Streams.h>
 #include <libxml/Parser.h>
 
-ResultOr<Graphic::Bitmap> Graphic::Svg::render(IO::Reader &reader, int resolution)
+ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int resolution)
 {
     auto doc = TRY(Xml::parse(reader));
 
@@ -36,14 +36,14 @@ ResultOr<Graphic::Bitmap> Graphic::Svg::render(IO::Reader &reader, int resolutio
     {
         if (child.name() == "path")
         {
-            auto path = Path::parse(child.attributes()["d"].cstring());
+            auto path = Graphic::Path::parse(child.attributes()["d"].cstring());
             rast.fill(path, Math::Mat3x2f::scale(resolution), Graphic::Fill{Graphic::Colors::MAGENTA.with_alpha(0.5)});
         }
         else
         {
-            logger_warn("Unhandled svg node: %s", child.name());
+            IO::logln("Unhandled svg node: %s", child.name());
         }
     }
 
-    return Result::SUCCESS;
+    return bitmap;
 }

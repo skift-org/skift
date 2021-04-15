@@ -3,7 +3,7 @@
 #include <libgraphic/Bitmap.h>
 #include <libio/Reader.h>
 
-namespace Graphic::Svg
+namespace Graphic::Png
 {
-ResultOr<RefPtr<Bitmap>> render(IO::Reader &reader, int resolution);
+ResultOr<RefPtr<Bitmap>> load(IO::Reader &reader);
 } // namespace Graphic::Svg

@@ -24,9 +24,9 @@ public:
 
     void add(Bookmark &&bookmark);
 
-    void remove(const Path &path);
+    void remove(const IO::Path &path);
 
-    bool has(const Path &path) const;
+    bool has(const IO::Path &path) const;
 
     static RefPtr<Bookmarks> load();
 

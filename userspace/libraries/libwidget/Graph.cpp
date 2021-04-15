@@ -9,6 +9,9 @@ namespace Widget
 Graph::Graph(Component *parent, size_t data_size, Graphic::Color data_color)
     : Component(parent)
 {
+    min_width(64);
+    min_height(16);
+
     _data = (float *)calloc(data_size, sizeof(float));
     _data_size = data_size;
     _color = data_color;
@@ -58,11 +61,6 @@ void Graph::paint(Graphic::Painter &painter, const Math::Recti &)
     Math::Recti cursor{(int)(width * cursor_position), 0, 1, height};
 
     painter.fill_rectangle(cursor, color(THEME_BORDER));
-}
-
-Math::Vec2i Graph::size()
-{
-    return Math::Vec2i(_data_size, 8);
 }
 
 void Graph::record(float data)

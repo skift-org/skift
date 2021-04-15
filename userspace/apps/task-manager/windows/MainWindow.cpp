@@ -56,7 +56,7 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
     /// --- Graphs --- ///
     auto graphs_container = new Widget::Panel(root());
     graphs_container->layout(HFLOW(0));
-    graphs_container->max_height(96);
+    graphs_container->min_height(128);
 
     _cpu_graph = new CPUGraph(graphs_container, _table_model);
 

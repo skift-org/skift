@@ -38,8 +38,6 @@ public:
     }
 
     void paint(Graphic::Painter &painter, const Math::Recti &dirty) override;
-
-    Math::Vec2i size() override;
 };
 
 } // namespace Widget

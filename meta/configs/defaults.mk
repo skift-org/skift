@@ -44,7 +44,7 @@ CONFIG_ARCH           ?=x86_32
 
 # Set the toolchaine to use
 # Possible values: gnu/llvm
-CONGIG_TOOLCHAIN	  ?=gcc
+CONGIG_TOOLCHAIN	  ?=gnu
 
 # Set the directory where output file will be generated.
 CONFIG_BUILD_DIRECTORY?=$(shell pwd)/build

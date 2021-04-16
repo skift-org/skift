@@ -68,8 +68,8 @@
 
 ## 3. Files
 
- - [manifest.json](30-files/manifest.md)
+ - [manifest.json](files/manifest.md)
 
 ## 4. Human Interface
 
-- [Guidelines](40-human-interface/guidelines.md)
+- [Guidelines](human-interface/guidelines.md)

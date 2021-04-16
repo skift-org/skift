@@ -172,7 +172,7 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
         // Start-Tag & Empty-Tag
         else if (node.name().empty())
         {
-            bool empty_tag;
+            bool empty_tag = false;
             node.name() = TRY(read_start_tag(scan, node.attributes(), empty_tag));
             IO::logln("Start-tag: {} [{}]", node.name(), empty_tag);
             // It was an empty tag, so we have no content / end-tag

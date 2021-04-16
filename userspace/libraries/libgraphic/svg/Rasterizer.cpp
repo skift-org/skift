@@ -42,6 +42,14 @@ void Rasterizer::flatten(const Path &path, const Math::Mat3x2f &transform)
             curve = transform.apply(curve);
             _edges.append(curve);
         }
+
+        if (!subpath.closed())
+        {
+            _edges.begin();
+            _edges.append(transform.apply(subpath.curves(subpath.length() - 1).end()));
+            _edges.append(transform.apply(subpath.curves(0).start()));
+            _edges.end();
+        }
     }
 }
 

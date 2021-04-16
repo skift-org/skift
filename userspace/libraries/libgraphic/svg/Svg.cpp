@@ -31,6 +31,7 @@ ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int r
 
     auto bitmap = TRY(Bitmap::create_shared(width * resolution, height * resolution));
     bitmap->clear(Colors::TRANSPARENT);
+    bitmap->filtering(BitmapFiltering::NEAREST);
     Rasterizer rast{bitmap};
 
     for (auto child : doc.root().children())

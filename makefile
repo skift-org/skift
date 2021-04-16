@@ -57,6 +57,7 @@ BUILD_DEFINES:= \
 	-D__BUILD_VERSION__=\""$(CONFIG_VERSION)"\"
 
 # --- Configs -------------------------------------------- #
+
 CC:=i686-pc-skift-gcc
 CFLAGS= \
 	-std=gnu11 \
@@ -80,19 +81,7 @@ CXXFLAGS:= \
 	$(BUILD_DEFINES) \
 	$(BUILD_CONFIGS)
 
-LD:=i686-pc-skift-ld
-LDFLAGS:= \
-	--sysroot=$(SYSROOT)
-
-AR:=i686-pc-skift-ar
-ARFLAGS:=rcs
-
-AS=nasm
-ASFLAGS=-f elf32
-
-STRIP:=i686-pc-skift-strip
-
-
+include meta/toolchains/$(CONFIG_ARCH)-$(CONGIG_TOOLCHAIN).mk
 include kernel/archs/.build.mk
 include kernel/kernel/.build.mk
 

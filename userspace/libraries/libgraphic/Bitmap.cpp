@@ -59,7 +59,7 @@ RefPtr<Bitmap> Bitmap::placeholder()
     return create_static(2, 2, _placeholder_buffer);
 }
 
-ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path)
+ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path, int size_hint)
 {
     IO::File file{path, OPEN_READ};
 
@@ -75,15 +75,15 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path)
     }
     else if (p.extension() == ".svg")
     {
-        return Svg::render(file, 10);
+        return Svg::render(file, size_hint);
     }
     IO::logln("Unknown bitmap extension: {}", p.extension());
     return Result::ERR_NOT_IMPLEMENTED;
 }
 
-RefPtr<Bitmap> Bitmap::load_from_or_placeholder(String path)
+RefPtr<Bitmap> Bitmap::load_from_or_placeholder(String path, int size_hint)
 {
-    auto result = load_from(path);
+    auto result = load_from(path, size_hint);
 
     if (!result.success())
     {

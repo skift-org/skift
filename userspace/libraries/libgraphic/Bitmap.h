@@ -75,9 +75,9 @@ public:
 
     static RefPtr<Bitmap> create_static(int width, int height, Color *pixels);
 
-    static ResultOr<RefPtr<Bitmap>> load_from(String path);
+    static ResultOr<RefPtr<Bitmap>> load_from(String path, int size_hint = -1);
 
-    static RefPtr<Bitmap> load_from_or_placeholder(String path);
+    static RefPtr<Bitmap> load_from_or_placeholder(String path, int size_hint = -1);
 
     Result save_to(String path);
 

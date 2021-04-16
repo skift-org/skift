@@ -3,17 +3,14 @@
 
 #include <libgraphic/Icon.h>
 #include <libio/Format.h>
-#include <libutils/HashMap.h>
 #include <libio/Path.h>
+#include <libutils/HashMap.h>
 
 namespace Graphic
 {
 
 static HashMap<String, RefPtr<Icon>>
     _icons{};
-
-#define ICON_SIZE_NAME_ENTRY(__size) #__size,
-const char *_icon_size_names[] = {ICON_SIZE_LIST(ICON_SIZE_NAME_ENTRY)};
 
 #define ICON_SIZES_ENTRY(__size) __size,
 const int _icon_sizes[] = {ICON_SIZE_LIST(ICON_SIZES_ENTRY)};
@@ -24,8 +21,8 @@ static RefPtr<Icon> icon_load(String name)
 
     for (size_t i = 0; i < __ICON_SIZE_COUNT; i++)
     {
-        auto path = IO::format("/Files/Icons/{}@{}px.png", name, _icon_size_names[i]);
-        auto bitmap_or_result = Bitmap::load_from(path);
+        auto path = IO::format("/Files/Icons/{}.svg", name);
+        auto bitmap_or_result = Bitmap::load_from(path, _icon_sizes[i]);
 
         if (bitmap_or_result.success())
         {

@@ -32,12 +32,12 @@ And for testing and debugging
 
 ```sh
 # On Debian or Debian-based distributions
-$ sudo apt install nasm gcc make binutils grub-pc-bin xorriso mtools imagemagick git qemu qemu-kvm
+$ sudo apt install nasm gcc make binutils grub-pc-bin xorriso mtools git qemu qemu-kvm
 ```
 
 ```sh
 # On Arch or Arch-based distributions
-$ sudo pacman -S nasm gcc make binutils grub qemu libisoburn mtools imagemagick git qemu
+$ sudo pacman -S nasm gcc make binutils grub qemu libisoburn mtools git qemu
 ```
 
 ```sh

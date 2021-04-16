@@ -4,7 +4,7 @@
 #include <libio/Streams.h>
 #include <libxml/Parser.h>
 
-ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int resolution)
+ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int size_hint)
 {
     auto doc = TRY(Xml::parse(reader));
 
@@ -14,7 +14,9 @@ ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int r
         return Result::ERR_INVALID_DATA;
     }
     auto dec_scanner = IO::NumberScanner::decimal();
-    int width, height;
+
+    int width = 16;
+    int height = 16;
 
     // Width attribute
     {
@@ -22,6 +24,7 @@ ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int r
         auto width_scanner = IO::Scanner(width_reader);
         width = dec_scanner.scan_int(width_scanner).unwrap();
     }
+
     // Height attribute
     {
         auto height_reader = IO::MemoryReader(doc.root().attributes()["height"]);
@@ -29,7 +32,14 @@ ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int r
         height = dec_scanner.scan_int(height_scanner).unwrap();
     }
 
-    auto bitmap = TRY(Bitmap::create_shared(width * resolution, height * resolution));
+    float scale = 1;
+
+    if (size_hint > 0)
+    {
+        scale = (float)size_hint / MAX(width, height);
+    }
+
+    auto bitmap = TRY(Bitmap::create_shared(width * scale, height * scale));
     bitmap->clear(Colors::TRANSPARENT);
     bitmap->filtering(BitmapFiltering::NEAREST);
     Rasterizer rast{bitmap};
@@ -45,7 +55,7 @@ ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int r
             }
 
             auto path = Graphic::Path::parse(child.attributes()["d"].cstring());
-            rast.fill(path, Math::Mat3x2f::scale(resolution), Graphic::Fill{fillColor});
+            rast.fill(path, Math::Mat3x2f::scale(scale), Graphic::Fill{fillColor});
         }
         else
         {

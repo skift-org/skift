@@ -5,10 +5,6 @@ export PATH := $(shell toolchain/use-it.sh):$(PATH)
 export PATH := $(shell meta/utils/use-it.sh):$(PATH)
 export LC_ALL=C
 
-ifeq (, $(shell which convert))
-$(error "No ImageMagick in PATH, consider installing it")
-endif
-
 DIRECTORY_GUARD=@mkdir -p $(@D)
 
 include meta/configs/defaults.mk
@@ -96,8 +92,6 @@ ASFLAGS=-f elf32
 
 STRIP:=i686-pc-skift-strip
 
-
-include sysroot/Files/Icons/.build.mk
 
 include kernel/archs/.build.mk
 include kernel/kernel/.build.mk

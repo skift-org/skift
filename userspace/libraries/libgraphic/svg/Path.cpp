@@ -29,7 +29,6 @@ static Math::Vec2f coordinate(Scanner &scan)
     auto y = scan_float(scan);
     whitespace_or_comma(scan);
 
-    IO::logln("-> {}x{}", x, y);
     return Math::Vec2f{(float)x, (float)y};
 }
 
@@ -59,8 +58,6 @@ static int arcflags(Scanner &scan)
 
 static void operation(Scanner &scan, Path &path, char operation)
 {
-    IO::logln("begin op {c}", operation);
-
     switch (operation)
     {
     case 'M':
@@ -233,8 +230,6 @@ static void operation(Scanner &scan, Path &path, char operation)
 
 Path Path::parse(const char *str)
 {
-    IO::logln("PARSING: {}", str);
-
     StringScanner scan{str, strlen(str)};
     return parse(scan);
 }

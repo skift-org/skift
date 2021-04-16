@@ -161,7 +161,6 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
             }
 
             String end_tag = TRY(read_end_tag(scan));
-            IO::logln("Start-tag: {}", end_tag);
             if (end_tag != node.name())
             {
                 IO::logln("End-tag does not match start-tag: ET {} ST {}", end_tag, node.name());
@@ -174,7 +173,6 @@ Result read_node(IO::Scanner &scan, Xml::Node &node)
         {
             bool empty_tag = false;
             node.name() = TRY(read_start_tag(scan, node.attributes(), empty_tag));
-            IO::logln("Start-tag: {} [{}]", node.name(), empty_tag);
             // It was an empty tag, so we have no content / end-tag
             if (empty_tag)
             {
@@ -217,7 +215,6 @@ Result read_declaration(IO::Scanner &scan, Xml::Declaration &)
     // We have no declaration
     if (scan.peek(1) != '?')
     {
-        IO::logln("Missing XML declaration");
         return Result::SUCCESS;
     }
 

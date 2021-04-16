@@ -38,8 +38,14 @@ ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int r
     {
         if (child.name() == "path")
         {
+            Color fillColor = Colors::BLACK;
+            if (child.attributes().has_key("fill"))
+            {
+                fillColor = Color::parse(child.attributes()["fill"]);
+            }
+
             auto path = Graphic::Path::parse(child.attributes()["d"].cstring());
-            rast.fill(path, Math::Mat3x2f::scale(resolution), Graphic::Fill{Graphic::Colors::BLACK});
+            rast.fill(path, Math::Mat3x2f::scale(resolution), Graphic::Fill{fillColor});
         }
         else
         {

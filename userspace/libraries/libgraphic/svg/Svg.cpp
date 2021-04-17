@@ -1,12 +1,14 @@
 #include <libgraphic/svg/Rasterizer.h>
 #include <libgraphic/svg/Svg.h>
+#include <libio/BufReader.h>
 #include <libio/NumberScanner.h>
 #include <libio/Streams.h>
 #include <libxml/Parser.h>
 
 ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int size_hint)
 {
-    auto doc = TRY(Xml::parse(reader));
+    IO::BufReader buf{reader, 512};
+    auto doc = TRY(Xml::parse(buf));
 
     if (doc.root().name() != "svg")
     {

@@ -157,13 +157,9 @@ public:
 };
 
 template <typename T>
-ResultOr<size_t> format(IO::Writer &writer, const IO::Formating &format, const Math::Vec2<T>& vec)
+ResultOr<size_t> format(IO::Writer &writer, const IO::Formating &, const Math::Vec2<T> &vec)
 {
-    size_t result = 0;
-    result += TRY(IO::format(writer, format, vec.x()));
-    result += TRY(IO::format(writer, format, "."));
-    result += TRY(IO::format(writer, format, vec.y()));
-    return result;
+    return IO::format(writer, "({}, {})", vec.x(), vec.y());
 }
 
 using Vec2i = Vec2<int>;

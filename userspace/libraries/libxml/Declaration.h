@@ -4,7 +4,9 @@
 
 namespace Xml
 {
+
 using Version = Math::Vec2i;
+
 class Declaration
 {
 private:
@@ -13,5 +15,9 @@ private:
     bool _standalone = true;
 
 public:
+    const Version &version() const { return _version; }
+    const String &encoding() const { return _encoding; }
+    bool standalone() const { return _standalone; }
 };
+
 } // namespace Xml

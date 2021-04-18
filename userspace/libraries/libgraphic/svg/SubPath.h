@@ -2,7 +2,7 @@
 
 #include <libutils/Vector.h>
 
-#include <libgraphic/svg/Arc.h>
+#include <libmath/Arc.h>
 #include <libmath/CubicBezier.h>
 
 namespace Graphic

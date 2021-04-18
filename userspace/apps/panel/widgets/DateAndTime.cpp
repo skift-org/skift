@@ -8,7 +8,10 @@ namespace panel
 
 DateAndTime::DateAndTime(Component *parent) : Button(parent, Button::TEXT)
 {
-    auto label = new Widget::Label(this, "");
+    min_width(128);
+
+    auto label = new Widget::Label(this, "", Anchor::CENTER);
+    label->flags(FILL);
 
     _timer = own<Async::Timer>(1000, [this, label]() {
         TimeStamp timestamp = timestamp_now();

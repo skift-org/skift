@@ -23,7 +23,7 @@ void Window::toggle_maximise()
         _is_maximised = true;
         _previous_bound = _bound;
         Math::Recti new_size = Screen::bound();
-        new_size = Math::Recti(0, 38, new_size.width(), new_size.height() - 38);
+        new_size = Math::Recti(0, 51, new_size.width(), new_size.height() - 51);
 
         bound(new_size);
     }

@@ -43,15 +43,24 @@ Result read_attribute(IO::Scanner &scan, String &name, String &value)
         return Result::ERR_INVALID_DATA;
     }
 
-    // TODO: handle single quotes
-    if (!scan.skip('\"'))
+    bool single_quotes = false;
+
+    if (scan.skip('\''))
     {
-        IO::logln("Expected \" to start an attribute value");
+        single_quotes = true;
+    }
+    else if (scan.skip('\"'))
+    {
+        single_quotes = false;
+    }
+    else
+    {
+        IO::logln("Expected \" or ' to start an attribute value");
         return Result::ERR_INVALID_DATA;
     }
 
     // Attribute value
-    while (scan.current() != '\"')
+    while (scan.do_continue() && scan.current() != (single_quotes ? '\'' : '\"'))
     {
         builder.append(scan.current());
         scan.forward();

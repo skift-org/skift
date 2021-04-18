@@ -1,8 +1,8 @@
 #pragma once
 
+#include <libmath/Edge.h>
 #include <libmath/Mat3x2.h>
 #include <libmath/Rect.h>
-#include <libutils/Edge.h>
 #include <libutils/Vector.h>
 
 namespace Graphic
@@ -15,13 +15,13 @@ private:
     static constexpr auto MAX_DEPTH = 8;
 
     Optional<Math::Vec2f> _last;
-    Vector<Edgef> _edges;
+    Vector<Math::Edgef> _edges;
 
     bool _has_min_max = false;
     Math::Vec2f _min;
     Math::Vec2f _max;
 
-    void flatten(Math::Bezierf curve, int depth)
+    void flatten(Math::CubicBezierf curve, int depth)
     {
         if (depth > MAX_DEPTH)
         {
@@ -51,11 +51,11 @@ private:
         auto bcd = (bc + cd) / 2;
         auto abcd = (abc + bcd) / 2;
 
-        Math::Bezierf curve_a{a, ab, abc, abcd};
+        Math::CubicBezierf curve_a{a, ab, abc, abcd};
 
         flatten(curve_a, depth + 1);
 
-        Math::Bezierf curve_b{abcd, bcd, cd, d};
+        Math::CubicBezierf curve_b{abcd, bcd, cd, d};
 
         flatten(curve_b, depth + 1);
     }
@@ -66,7 +66,7 @@ public:
         return Math::Recti::from_two_point(_min, _max + Math::Vec2i{1});
     }
 
-    const Vector<Edgef> &edges()
+    Vector<Math::Edgef> const &edges()
     {
         return _edges;
     }
@@ -111,7 +111,7 @@ public:
         }
     }
 
-    void append(Math::Bezierf curve)
+    void append(Math::CubicBezierf curve)
     {
         begin();
         append(curve.start());

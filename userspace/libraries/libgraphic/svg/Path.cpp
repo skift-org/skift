@@ -1,5 +1,6 @@
 #include <libgraphic/svg/Path.h>
 #include <libio/Streams.h>
+#include <libmath/Arc.h>
 #include <libutils/ScannerUtils.h>
 
 namespace Graphic
@@ -38,7 +39,7 @@ static int arcflags(Scanner &scan)
 
     if (scan.current_is("1"))
     {
-        flags |= Arc::LARGE;
+        flags |= Math::Arcf::LARGE;
     }
     scan.foreward();
 
@@ -46,7 +47,7 @@ static int arcflags(Scanner &scan)
 
     if (scan.current_is("1"))
     {
-        flags |= Arc::SWEEP;
+        flags |= Math::Arcf::SWEEP;
     }
 
     scan.foreward();

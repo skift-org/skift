@@ -4,6 +4,9 @@
 #include <libutils/Optional.h>
 #include <math.h>
 
+namespace Math
+{
+
 template <typename Scalar>
 class Edge
 {
@@ -76,3 +79,5 @@ public:
 using Edgei = Edge<int>;
 using Edgef = Edge<float>;
 using Edged = Edge<double>;
+
+} // namespace Math

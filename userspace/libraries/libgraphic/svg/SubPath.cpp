@@ -1,7 +1,9 @@
+#include <libutils/Assert.h>
+
+#include <libmath/Arc.h>
 #include <libmath/Mat3x2.h>
 
 #include <libgraphic/svg/SubPath.h>
-#include <libutils/Assert.h>
 
 namespace Graphic
 {
@@ -11,7 +13,7 @@ size_t SubPath::length() const
     return (_points.count() - 1) / 3;
 }
 
-Math::Bezierf SubPath::curves(size_t index) const
+Math::CubicBezierf SubPath::curves(size_t index) const
 {
     Assert::lower_than(index, length());
 
@@ -254,8 +256,8 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Math::Vec2f poi
         s = sqrtf(sa / sb);
     }
 
-    bool fa = (flags & Arc::LARGE) == Arc::LARGE; // Large arc
-    bool fs = (flags & Arc::SWEEP) == Arc::SWEEP; // Sweep direction
+    bool fa = (flags & Math::Arcf::LARGE) == Math::Arcf::LARGE; // Large arc
+    bool fs = (flags & Math::Arcf::SWEEP) == Math::Arcf::SWEEP; // Sweep direction
 
     if (fa == fs)
     {

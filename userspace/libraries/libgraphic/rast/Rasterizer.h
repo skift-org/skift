@@ -1,13 +1,15 @@
 #pragma once
 
-#include <libgraphic/svg/EdgeList.h>
 #include <libutils/Array.h>
 
 #include <libgraphic/Bitmap.h>
-#include <libgraphic/svg/Paint.h>
+#include <libgraphic/rast/EdgeList.h>
+#include <libgraphic/rast/Paint.h>
 #include <libgraphic/svg/Path.h>
+
 namespace Graphic
 {
+
 class Rasterizer
 {
 private:
@@ -16,7 +18,7 @@ private:
 
     RefPtr<Bitmap> _bitmap;
     EdgeList _edges;
-    Vector<Edgef> _actives_edges;
+    Vector<Math::Edgef> _actives_edges;
     Optional<Math::Recti> _clip;
     Vector<uint16_t> _scanline;
 

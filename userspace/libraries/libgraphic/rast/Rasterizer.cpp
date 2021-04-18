@@ -1,6 +1,7 @@
-#include <libgraphic/Painter.h>
-#include <libgraphic/svg/Rasterizer.h>
 #include <libsystem/Logger.h>
+
+#include <libgraphic/Painter.h>
+#include <libgraphic/rast/Rasterizer.h>
 
 namespace Graphic
 {
@@ -76,7 +77,7 @@ void Rasterizer::rasterize(Paint &paint)
             }
         }
 
-        _actives_edges.sort([&](Edgef &a, Edgef &b) { return a.intersection_y(y).x() - b.intersection_y(y).x(); });
+        _actives_edges.sort([&](Math::Edgef &a, Math::Edgef &b) { return a.intersection_y(y).x() - b.intersection_y(y).x(); });
 
         bool odd_even = true;
 

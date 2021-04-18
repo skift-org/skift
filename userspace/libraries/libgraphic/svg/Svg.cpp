@@ -1,9 +1,10 @@
-#include <libgraphic/svg/Rasterizer.h>
-#include <libgraphic/svg/Svg.h>
 #include <libio/BufReader.h>
 #include <libio/NumberScanner.h>
 #include <libio/Streams.h>
 #include <libxml/Parser.h>
+
+#include <libgraphic/rast/Rasterizer.h>
+#include <libgraphic/svg/Svg.h>
 
 ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int size_hint)
 {

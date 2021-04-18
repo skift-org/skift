@@ -58,8 +58,7 @@ static inline ALWAYS_INLINE Color sample(Paint &paint, Math::Vec2f p)
             {
                 result = Colors::BLACK;
             }
-            else if (gradient.count == 1 ||
-                     v <= gradient.stops[0].value)
+            else if (gradient.count == 1 || v <= gradient.stops[0].value)
             {
                 result = gradient.stops[0].color;
             }

@@ -6,7 +6,7 @@ namespace Math
 {
 
 template <typename Scalar>
-class Bezier
+class CubicBezier
 {
 private:
     Math::Vec2<Scalar> _start;
@@ -20,10 +20,10 @@ public:
     const Math::Vec2<Scalar> &cp2() const { return _cp2; }
     const Math::Vec2<Scalar> &end() const { return _end; }
 
-    Bezier(Math::Vec2<Scalar> start,
-           Math::Vec2<Scalar> cp1,
-           Math::Vec2<Scalar> cp2,
-           Math::Vec2<Scalar> end)
+    CubicBezier(Math::Vec2<Scalar> start,
+                Math::Vec2<Scalar> cp1,
+                Math::Vec2<Scalar> cp2,
+                Math::Vec2<Scalar> end)
         : _start{start},
           _cp1{cp1},
           _cp2{cp2},
@@ -32,8 +32,8 @@ public:
     }
 };
 
-using Bezieri = Bezier<int>;
-using Bezierf = Bezier<float>;
-using Bezierd = Bezier<double>;
+using CubicBezieri = CubicBezier<int>;
+using CubicBezierf = CubicBezier<float>;
+using CubicBezierd = CubicBezier<double>;
 
 } // namespace Math

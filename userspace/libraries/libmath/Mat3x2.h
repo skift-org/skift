@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libmath/Bezier.h>
+#include <libmath/CubicBezier.h>
 #include <libmath/Vec2.h>
 
 #include <math.h>
@@ -154,7 +154,7 @@ public:
         };
     }
 
-    ALWAYS_INLINE Bezier<Scalar> apply(const Bezier<Scalar> &b) const
+    ALWAYS_INLINE CubicBezier<Scalar> apply(const CubicBezier<Scalar> &b) const
     {
         return {
             apply(b.start()),

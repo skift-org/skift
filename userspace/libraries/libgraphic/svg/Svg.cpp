@@ -6,7 +6,37 @@
 #include <libgraphic/rast/Rasterizer.h>
 #include <libgraphic/svg/Svg.h>
 
-ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int size_hint)
+namespace Graphic::Svg
+{
+
+void render_node(Rasterizer &rast, Xml::Node &node, Math::Mat3x2f transformation, Color fillcolor)
+{
+    for (auto child : node.children())
+    {
+        Color current = fillcolor;
+
+        if (child.attributes().has_key("fill"))
+        {
+            current = Color::parse(child.attributes()["fill"]);
+        }
+
+        if (child.name() == "path")
+        {
+            auto path = Graphic::Path::parse(child.attributes()["d"].cstring());
+            rast.fill(path, transformation, Graphic::Fill{current});
+        }
+        else if (child.name() == "g")
+        {
+            render_node(rast, child, transformation, current);
+        }
+        else
+        {
+            IO::logln("Unhandled svg node: {}", child.name());
+        }
+    }
+}
+
+ResultOr<RefPtr<Graphic::Bitmap>> render(IO::Reader &reader, int size_hint)
 {
     IO::BufReader buf{reader, 512};
     auto doc = TRY(Xml::parse(buf));
@@ -18,18 +48,20 @@ ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int s
     }
     auto dec_scanner = IO::NumberScanner::decimal();
 
-    int width = 16;
-    int height = 16;
+    int width = 1024;
+    int height = 1024;
 
-    // Width attribute
+    if (doc.root().attributes().has_key("width"))
     {
+        // Width attribute
         auto width_reader = IO::MemoryReader(doc.root().attributes()["width"]);
         auto width_scanner = IO::Scanner(width_reader);
         width = dec_scanner.scan_int(width_scanner).unwrap();
     }
 
-    // Height attribute
+    if (doc.root().attributes().has_key("height"))
     {
+        // Height attribute
         auto height_reader = IO::MemoryReader(doc.root().attributes()["height"]);
         auto height_scanner = IO::Scanner(height_reader);
         height = dec_scanner.scan_int(height_scanner).unwrap();
@@ -47,24 +79,9 @@ ResultOr<RefPtr<Graphic::Bitmap>> Graphic::Svg::render(IO::Reader &reader, int s
     bitmap->filtering(BitmapFiltering::NEAREST);
     Rasterizer rast{bitmap};
 
-    for (auto child : doc.root().children())
-    {
-        if (child.name() == "path")
-        {
-            Color fillColor = Colors::BLACK;
-            if (child.attributes().has_key("fill"))
-            {
-                fillColor = Color::parse(child.attributes()["fill"]);
-            }
-
-            auto path = Graphic::Path::parse(child.attributes()["d"].cstring());
-            rast.fill(path, Math::Mat3x2f::scale(scale), Graphic::Fill{fillColor});
-        }
-        else
-        {
-            IO::logln("Unhandled svg node: %s", child.name());
-        }
-    }
+    render_node(rast, doc.root(), Math::Mat3x2f::scale(scale), Colors::BLACK);
 
     return bitmap;
 }
+
+} // namespace Graphic::Svg

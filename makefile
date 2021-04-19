@@ -68,7 +68,6 @@ CFLAGS= \
 	$(BUILD_DEFINES) \
 	$(BUILD_CONFIGS)
 
-CXX:=i686-pc-skift-g++
 CXXFLAGS:= \
 	-std=c++20 \
 	-MD \

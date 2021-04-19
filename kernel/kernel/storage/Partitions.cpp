@@ -1,9 +1,9 @@
 #include <libsystem/Logger.h>
 
-#include "kernel/storage/Partitions.h"
 #include "kernel/devices/Devices.h"
-#include "kernel/storage/MBR.h"
 #include "kernel/storage/Partition.h"
+#include "kernel/storage/Partitions.h"
+#include "mbr/MBR.h"
 
 bool partition_load_mbr(RefPtr<Device> disk, const MBR &mbr)
 {

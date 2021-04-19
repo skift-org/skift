@@ -42,6 +42,7 @@ CXX_WARNINGS := \
 BUILD_INCLUDE:= \
 	-I. \
 	-Ikernel \
+	-Ikernel/modules \
 	-Iuserspace/ \
 	-Iuserspace/apps \
 	-Iuserspace/libraries \
@@ -81,6 +82,7 @@ CXXFLAGS:= \
 
 include meta/toolchains/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN).mk
 include kernel/archs/.build.mk
+include kernel/modules/.build.mk
 include kernel/kernel/.build.mk
 
 include userspace/archs/.build.mk

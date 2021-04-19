@@ -4,7 +4,7 @@
 #include "archs/x86_32/IOAPIC.h"
 #include "archs/x86_32/LAPIC.h"
 
-#include "kernel/firmware/ACPI.h"
+#include "acpi/ACPI.h"
 
 void acpi_madt_initialize(MADT *madt)
 {

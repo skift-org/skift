@@ -1,13 +1,13 @@
 #pragma once
 
 #include <assert.h>
-#include <stdio.h>
 #include <libutils/Iteration.h>
+#include <stdio.h>
 
-#include "kernel/bus/LegacyAddress.h"
-#include "kernel/bus/PCIAddress.h"
-#include "kernel/bus/UNIXAddress.h"
-#include "kernel/bus/VirtioAddress.h"
+#include "pci/PCIAddress.h"
+#include "ps2/LegacyAddress.h"
+#include "unix/UNIXAddress.h"
+#include "virtio/VirtioAddress.h"
 
 enum DeviceBus
 {
@@ -51,7 +51,6 @@ public:
     UNIXAddress unix()
     {
         assert(_bus == BUS_UNIX);
-
         return _unix;
     };
 

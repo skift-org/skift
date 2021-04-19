@@ -1,6 +1,7 @@
 -xc++
 -std=c++20
 -Ikernel/
+-Ikernel/modules
 -Iuserspace
 -Iuserspace/apps
 -Iuserspace/libraries

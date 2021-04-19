@@ -16,10 +16,10 @@
 #include "archs/x86_32/Power.h"
 #include "archs/x86_32/x86_32.h"
 
-#include "kernel/firmware/SMBIOS.h"
 #include "kernel/graphics/EarlyConsole.h"
 #include "kernel/graphics/Graphics.h"
 #include "kernel/system/System.h"
+#include "smbios/SMBIOS.h"
 
 void arch_disable_interrupts() { cli(); }
 

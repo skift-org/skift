@@ -78,4 +78,3 @@ T *deref_if_not_null(T *ptr)
 
     return ptr;
 }
-

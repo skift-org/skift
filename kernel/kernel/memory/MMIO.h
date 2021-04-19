@@ -14,9 +14,6 @@ private:
     bool _own_physical_range = false;
     MemoryRange _physical_range = {};
 
-    NONCOPYABLE(MMIORange);
-    NONMOVABLE(MMIORange);
-
 public:
     uintptr_t base() { return _virtual_range.base(); }
 

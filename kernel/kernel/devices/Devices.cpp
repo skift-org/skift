@@ -5,11 +5,11 @@
 #include <libutils/StringBuilder.h>
 #include <libutils/Vector.h>
 
-#include "kernel/bus/Legacy.h"
-#include "kernel/bus/PCI.h"
-#include "kernel/bus/UNIX.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/devices/Driver.h"
+#include "pci/PCI.h"
+#include "ps2/Legacy.h"
+#include "unix/UNIX.h"
 
 static Vector<RefPtr<Device>> *_devices = nullptr;
 

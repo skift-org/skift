@@ -56,16 +56,6 @@ $(BUILDROOT)/kernel/kernel/%.o: kernel/kernel/%.cpp
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
-$(BUILDROOT)/kernel/archs/%.o: kernel/archs/%.cpp
-	$(DIRECTORY_GUARD)
-	@echo [KERNEL] [CXX] $<
-	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<
-
-$(BUILDROOT)/kernel/archs/%.s.o: kernel/archs/%.s
-	$(DIRECTORY_GUARD)
-	@echo [KERNEL] [AS] $<
-	@$(AS) $(ASFLAGS) $^ -o $@
-
 $(KERNEL_BINARY): $(KERNEL_OBJECTS)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [LD] $(KERNEL_BINARY)

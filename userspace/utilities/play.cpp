@@ -1,6 +1,6 @@
 #include <libsystem/io/Stream.h>
 
-#include "kernel/drivers/AC97.h"
+#include "ac97/AC97.h"
 
 int main(int argc, char **argv)
 {

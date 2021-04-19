@@ -9,17 +9,18 @@
 
 #include "kernel/devices/Devices.h"
 #include "kernel/devices/Driver.h"
-#include "kernel/filesystem/DevicesFileSystem.h"
 #include "kernel/graphics/Graphics.h"
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/modules/Modules.h"
-#include "kernel/node/DevicesInfo.h"
-#include "kernel/node/ProcessInfo.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/storage/Partitions.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Tasking.h"
 #include "kernel/tasking/Userspace.h"
+
+#include "devfs/DevicesFileSystem.h"
+#include "devfs/DevicesInfo.h"
+#include "procfs/ProcessInfo.h"
 
 static void splash_screen()
 {

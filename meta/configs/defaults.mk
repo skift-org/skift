@@ -26,7 +26,7 @@ CONFIGS = \
 CONFIGS_PASS_TO_COMPILER = \
 	CONFIG \
 	CONFIG_ARCH \
-	CONGIG_TOOLCHAIN \
+	CONFIG_TOOLCHAIN \
 	CONFIG_KEYBOARD_LAYOUT \
 	CONFIG_NAME \
 	CONFIG_VERSION \
@@ -44,7 +44,7 @@ CONFIG_ARCH           ?=x86_32
 
 # Set the toolchaine to use
 # Possible values: gnu/llvm
-CONGIG_TOOLCHAIN	  ?=gnu
+CONFIG_TOOLCHAIN	  ?=gnu
 
 # Set the directory where output file will be generated.
 CONFIG_BUILD_DIRECTORY?=$(shell pwd)/build

@@ -58,7 +58,6 @@ BUILD_DEFINES:= \
 
 # --- Configs -------------------------------------------- #
 
-CC:=i686-pc-skift-gcc
 CFLAGS= \
 	-std=gnu11 \
 	-MD \
@@ -81,7 +80,7 @@ CXXFLAGS:= \
 	$(BUILD_DEFINES) \
 	$(BUILD_CONFIGS)
 
-include meta/toolchains/$(CONFIG_ARCH)-$(CONGIG_TOOLCHAIN).mk
+include meta/toolchains/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN).mk
 include kernel/archs/.build.mk
 include kernel/kernel/.build.mk
 

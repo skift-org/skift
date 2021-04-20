@@ -6,7 +6,10 @@
 
 #include "acpi/ACPI.h"
 
-void acpi_madt_initialize(MADT *madt)
+namespace Acpi
+{
+
+void madt_initialize(MADT *madt)
 {
     logger_info("MADT found, size is %d", madt->record_count());
 
@@ -50,7 +53,7 @@ void acpi_madt_initialize(MADT *madt)
     });
 }
 
-void acpi_initialize(Handover *handover)
+void initialize(Handover *handover)
 {
     if (!handover->acpi_rsdp_address)
     {
@@ -64,5 +67,7 @@ void acpi_initialize(Handover *handover)
 
     MADT *madt = (MADT *)rsdt->child("APIC");
 
-    acpi_madt_initialize(madt);
+    madt_initialize(madt);
 }
+
+} // namespace Acpi

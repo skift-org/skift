@@ -4,7 +4,7 @@
 
 #include "kernel/memory/MemoryRange.h"
 
-namespace smbios
+namespace Smbios
 {
 
 #define SMBIOS_HEADER_TYPE_LIST(__ENTRY)                 \
@@ -377,4 +377,4 @@ static inline EntryPoint *find(MemoryRange range)
     return nullptr;
 }
 
-} // namespace smbios
+} // namespace Smbios

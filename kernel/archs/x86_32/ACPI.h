@@ -2,4 +2,9 @@
 
 #include "kernel/handover/Handover.h"
 
-void acpi_initialize(Handover *handover);
+namespace Acpi
+{
+
+void initialize(Handover *handover);
+
+} // namespace Acpi

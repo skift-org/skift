@@ -2,8 +2,10 @@
 
 #include <string.h>
 
-#include <libsystem/Common.h>
 #include <libutils/Iteration.h>
+
+namespace Acpi
+{
 
 /* --- RSDP ----------------------------------------------------------------- */
 
@@ -130,3 +132,5 @@ struct PACKED MADT
         return result;
     }
 };
+
+} // namespace Acpi

@@ -67,7 +67,7 @@ public:
         _open_document->on(Widget::Event::ACTION, [&](auto) {
             if (_dialog.show() == Widget::DialogResult::OK)
             {
-                load_document(_dialog.selected_file().unwrap().cstring());
+                load_document(_dialog.selected_file().unwrap());
             }
         });
         _save_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("content-save"));

@@ -111,7 +111,7 @@ public:
         return join(parse(left), right);
     }
 
-    static Path join(Path &left, String right)
+    static Path join(const Path &left, String right)
     {
         return join(left, parse(right));
     }
@@ -136,7 +136,7 @@ public:
         return join(left, right);
     }
 
-    static Path join(Path &left, Path &right)
+    static Path join(const Path &left, const Path &right)
     {
         Vector<String> combined_elements{};
 

@@ -4,7 +4,7 @@
 
 #include "kernel/node/Node.h"
 
-struct DirectoryListing
+struct FileListing
 {
     size_t count;
     DirectoryEntry entries[];

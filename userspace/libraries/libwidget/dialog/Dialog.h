@@ -82,12 +82,15 @@ public:
 
     virtual void render(Window *) {}
 
+    virtual void on_button(DialogButton) {}
+
     void create_buttons(Component *parent)
     {
         if (_buttons & DialogButton::YES)
         {
             auto button = new Button(parent, Button::OUTLINE, "Yes");
             button->on(Event::ACTION, [&](auto) {
+                on_button(DialogButton::YES);
                 close(DialogResult::YES);
                 _window->hide();
             });
@@ -97,6 +100,7 @@ public:
         {
             auto button = new Button(parent, Button::OUTLINE, "No");
             button->on(Event::ACTION, [&](auto) {
+                on_button(DialogButton::NO);
                 close(DialogResult::NO);
                 _window->hide();
             });
@@ -106,6 +110,7 @@ public:
         {
             auto button = new Button(parent, Button::OUTLINE, "Ok");
             button->on(Event::ACTION, [&](auto) {
+                on_button(DialogButton::OK);
                 close(DialogResult::OK);
                 _window->hide();
             });
@@ -115,6 +120,7 @@ public:
         {
             auto button = new Button(parent, Button::OUTLINE, "Cancel");
             button->on(Event::ACTION, [&](auto) {
+                on_button(DialogButton::CANCEL);
                 close(DialogResult::CANCEL);
                 _window->hide();
             });

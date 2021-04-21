@@ -5,7 +5,7 @@
 #include <libwidget/Window.h>
 
 #include <libfilepicker/model/Navigation.h>
-#include <libfilepicker/widgets/DirectoryBrowser.h>
+#include <libfilepicker/widgets/FileBrowser.h>
 #include <libfilepicker/widgets/JumpList.h>
 #include <libfilepicker/widgets/ToolBar.h>
 
@@ -37,7 +37,7 @@ public:
 
         jump_list->min_width(192);
 
-        auto browser = new FilePicker::DirectoryBrowser(bookmarks_and_browser, navigation);
+        auto browser = new FilePicker::FileBrowser(bookmarks_and_browser, navigation);
 
         browser->on_element_selected = [&](String &path) {
             auto l = launchpad_create("open", "/System/Utilities/open");

@@ -11,7 +11,7 @@ FsDirectory::FsDirectory() : FsNode(FILE_TYPE_DIRECTORY)
 
 Result FsDirectory::open(FsHandle &handle)
 {
-    DirectoryListing *listing = (DirectoryListing *)malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * _childs.count());
+    FileListing *listing = (FileListing *)malloc(sizeof(FileListing) + sizeof(DirectoryEntry) * _childs.count());
 
     listing->count = _childs.count();
 
@@ -47,7 +47,7 @@ ResultOr<size_t> FsDirectory::read(FsHandle &handle, void *buffer, size_t size)
     {
         size_t index = handle.offset() / sizeof(DirectoryEntry);
 
-        DirectoryListing *listing = (DirectoryListing *)handle.attached;
+        FileListing *listing = (FileListing *)handle.attached;
 
         if (index < listing->count)
         {

@@ -98,6 +98,8 @@ public:
 
     ~TextEditor();
 
+    void update_model(RefPtr<TextModel> model);
+
     void paint(Graphic::Painter &, const Math::Recti &) override;
 
     void event(Event *event) override;

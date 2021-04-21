@@ -1,5 +1,4 @@
-#include "libio/Format.h"
-#include "libio/Path.h"
+#include <libfilepicker/FilePicker.h>
 #include <libsystem/Logger.h>
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
@@ -7,52 +6,83 @@
 #include <libwidget/TextEditor.h>
 #include <libwidget/TitleBar.h>
 
+struct TextWindow : public Widget::Window
+{
+private:
+    /// --- Toolbar --- ///
+    Widget::Component *_open_document;
+    Widget::Component *_save_document;
+    Widget::Component *_new_document;
+
+    RefPtr<Widget::TextModel> _text_model;
+    Widget::TitleBar *_title_bar;
+    Widget::TextEditor *_text_editor;
+
+    FilePicker::Dialog _dialog;
+
+    void load_document(const char *path)
+    {
+        if (path != nullptr)
+        {
+            logger_info("Opening text document from '%s'", path);
+            _title_bar->title(path);
+            _text_model = Widget::TextModel::from_file(path);
+            _text_editor->update_model(_text_model);
+        }
+    }
+
+public:
+    TextWindow(const char *path) : Window(WINDOW_RESIZABLE)
+    {
+        size(Math::Vec2i(700, 500));
+
+        root()->layout(VFLOW(0));
+
+        _title_bar = new Widget::TitleBar(
+            root(),
+            Graphic::Icon::get("text-box"),
+            "Text Editor");
+
+        create_toolbar(root());
+
+        _text_editor = new Widget::TextEditor(root(), _text_model);
+        _text_editor->flags(Widget::Component::FILL);
+        _text_editor->overscroll(true);
+        _text_editor->insets({4});
+        _text_editor->focus();
+
+        load_document(path);
+    }
+
+    void create_toolbar(Widget::Component *parent)
+    {
+        auto toolbar = new Widget::Panel(parent);
+
+        toolbar->layout(HFLOW(4));
+        toolbar->insets(Insetsi(4, 4));
+
+        _open_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
+        _open_document->on(Widget::Event::ACTION, [&](auto) {
+            if (_dialog.show() == Widget::DialogResult::OK)
+            {
+                load_document(_dialog.selected_file().unwrap().cstring());
+            }
+        });
+        _save_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("content-save"));
+        _save_document->on(Widget::Event::ACTION, [&](auto) {
+            FilePicker::Dialog picker{};
+            picker.show();
+        });
+        _new_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("image-plus"));
+    }
+};
+
 int main(int argc, char **argv)
 {
     Widget::Application::initialize(argc, argv);
 
-    Widget::Window *window = new Widget::Window(WINDOW_RESIZABLE);
-    window->size(Math::Vec2i(700, 500));
-    window->root()->layout(VFLOW(0));
-
-    if (argc == 2)
-    {
-        new Widget::TitleBar(
-            window->root(),
-            Graphic::Icon::get("text-box"),
-            IO::format("Text Editor · {}", IO::Path::parse(argv[1]).basename()));
-    }
-    else
-    {
-        new Widget::TitleBar(
-            window->root(),
-            Graphic::Icon::get("text-box"),
-            "Text Editor");
-    }
-
-    auto *toolbar = new Widget::Panel(window->root());
-
-    toolbar->layout(HFLOW(4));
-    toolbar->insets(Insetsi(4, 4));
-
-    new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
-    new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("content-save"));
-    new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("file-plus"));
-
-    auto model = Widget::TextModel::empty();
-
-    if (argc == 2)
-    {
-        logger_info("Opening text document from '%s'", argv[1]);
-        model = Widget::TextModel::from_file(argv[1]);
-    }
-
-    auto *field = new Widget::TextEditor(window->root(), model);
-    field->flags(Widget::Component::FILL);
-    field->overscroll(true);
-    field->insets({4});
-    field->focus();
-
+    const char *path = argc > 1 ? argv[1] : nullptr;
+    auto window = new TextWindow(path);
     window->show();
 
     return Widget::Application::run();

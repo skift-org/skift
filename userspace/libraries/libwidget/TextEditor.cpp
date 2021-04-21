@@ -261,6 +261,13 @@ void TextEditor::do_layout()
     update_scrollbar();
 }
 
+void TextEditor::update_model(RefPtr<TextModel> model)
+{
+    _model = model;
+
+    update_scrollbar();
+}
+
 void TextEditor::scroll_to_cursor()
 {
     auto metrics = font()->metrics();

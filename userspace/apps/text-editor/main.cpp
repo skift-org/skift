@@ -1,5 +1,5 @@
 #include <libfilepicker/FilePicker.h>
-#include <libsystem/Logger.h>
+#include <libio/Streams.h>
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
 #include <libwidget/Panel.h>
@@ -24,9 +24,9 @@ private:
     {
         if (!path.null_or_empty())
         {
-            logger_info("Opening text document from '%s'", path);
+            IO::logln("Opening text document from {}", path);
             _title_bar->title(path);
-            _text_model = Widget::TextModel::from_file(path.cstring());
+            _text_model = Widget::TextModel::from_file(path);
             _text_editor->update_model(_text_model);
         }
     }
@@ -44,6 +44,8 @@ public:
             "Text Editor");
 
         create_toolbar(root());
+
+        _text_model = Widget::TextModel::empty();
 
         _text_editor = new Widget::TextEditor(root(), _text_model);
         _text_editor->flags(Widget::Component::FILL);
@@ -81,7 +83,7 @@ int main(int argc, char **argv)
 {
     Widget::Application::initialize(argc, argv);
 
-    const char *path = argc > 1 ? argv[1] : nullptr;
+    const char *path = argc > 1 ? argv[1] : "";
     auto window = new TextWindow(path);
     window->show();
 

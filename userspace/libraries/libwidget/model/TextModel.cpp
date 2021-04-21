@@ -1,4 +1,6 @@
-#include <libutils/Scanner.h>
+#include <libio/BufReader.h>
+#include <libio/File.h>
+#include <libio/Scanner.h>
 #include <libutils/StringBuilder.h>
 #include <libwidget/model/TextModel.h>
 
@@ -12,13 +14,13 @@ RefPtr<TextModel> TextModel::empty()
     return model;
 }
 
-RefPtr<TextModel> TextModel::from_file(const char *path)
+RefPtr<TextModel> TextModel::from_file(String path)
 {
     auto model = make<TextModel>();
 
-    Stream *stream = stream_open(path, OPEN_READ | OPEN_BUFFERED);
-
-    StreamScanner scan{stream};
+    IO::File file{path, OPEN_READ};
+    IO::BufReader buf_reader{file, 512};
+    IO::Scanner scan{buf_reader};
 
     // Skip the utf8 bom header if present.
     scan.skip_word("\xEF\xBB\xBF");
@@ -31,15 +33,13 @@ RefPtr<TextModel> TextModel::from_file(const char *path)
                scan.current_codepoint() != '\n')
         {
             line->append(scan.current_codepoint());
-            scan.foreward_codepoint();
+            scan.forward_codepoint();
         }
 
         scan.skip('\n'); // skip the \n
 
         model->append_line(line);
     }
-
-    stream_close(stream);
 
     if (model->line_count() == 0)
     {

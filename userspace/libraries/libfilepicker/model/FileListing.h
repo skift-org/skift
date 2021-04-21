@@ -4,21 +4,22 @@
 #include <libutils/Vector.h>
 #include <libwidget/model/TableModel.h>
 
-#include <libfilepicker/model/DirectoryInfo.h>
+#include <libfilepicker/model/FileInfo.h>
 #include <libfilepicker/model/Navigation.h>
 
 namespace FilePicker
 {
 
-class DirectoryListing : public Widget::TableModel
+class FileListing : public Widget::TableModel
 {
 private:
     RefPtr<Navigation> _navigation;
-    Vector<DirectoryInfo> _directories{};
+    Vector<FileInfo> _files{};
     OwnPtr<Async::Observer<Navigation>> _observer;
+    String _extension;
 
 public:
-    DirectoryListing(RefPtr<Navigation> navigation);
+    FileListing(RefPtr<Navigation> navigation, String extension = "");
 
     int rows() override;
 
@@ -30,7 +31,7 @@ public:
 
     void update() override;
 
-    const DirectoryInfo &info(int index) const;
+    const FileInfo &info(int index) const;
 };
 
 } // namespace FilePicker

@@ -9,51 +9,9 @@
 namespace FilePicker
 {
 
-static auto get_icon_for_node(String current_directory, IO::Directory::Entry &entry)
-{
-    if (entry.stat.type == FILE_TYPE_DIRECTORY)
-    {
-        auto manifest_path = IO::format("{}/{}/manifest.json", current_directory, entry.name);
-
-        IO::File manifest_file{manifest_path, OPEN_READ};
-
-        if (manifest_file.exist())
-        {
-            auto root = Json::parse(manifest_file);
-
-            if (root.is(Json::OBJECT))
-            {
-                auto icon_name = root.get("icon");
-
-                if (icon_name.is(Json::STRING))
-                {
-                    return Graphic::Icon::get(icon_name.as_string());
-                }
-            }
-        }
-
-        return Graphic::Icon::get("folder");
-    }
-    else if (entry.stat.type == FILE_TYPE_PIPE ||
-             entry.stat.type == FILE_TYPE_DEVICE ||
-             entry.stat.type == FILE_TYPE_SOCKET)
-    {
-        return Graphic::Icon::get("pipe");
-    }
-    else if (entry.stat.type == FILE_TYPE_TERMINAL)
-    {
-        return Graphic::Icon::get("console-network");
-    }
-    else
-    {
-        return Graphic::Icon::get("file");
-    }
-}
-
 enum Column
 {
     COLUMN_NAME,
-    COLUMN_TYPE,
     COLUMN_SIZE,
 
     __COLUMN_COUNT,
@@ -71,7 +29,7 @@ DirectoryListing::DirectoryListing(RefPtr<Navigation> navigation)
 
 int DirectoryListing::rows()
 {
-    return _files.count();
+    return _directories.count();
 }
 
 int DirectoryListing::columns()
@@ -86,9 +44,6 @@ String DirectoryListing::header(int column)
     case COLUMN_NAME:
         return "Name";
 
-    case COLUMN_TYPE:
-        return "Type";
-
     case COLUMN_SIZE:
         return "Size";
 
@@ -99,31 +54,15 @@ String DirectoryListing::header(int column)
 
 Widget::Variant DirectoryListing::data(int row, int column)
 {
-    auto &entry = _files[row];
+    auto &entry = _directories[row];
 
     switch (column)
     {
     case COLUMN_NAME:
         return Widget::Variant(entry.name.cstring()).with_icon(entry.icon);
 
-    case COLUMN_TYPE:
-        switch (entry.type)
-        {
-        case FILE_TYPE_REGULAR:
-            return "Regular file";
-
-        case FILE_TYPE_DIRECTORY:
-            return "Directory";
-
-        case FILE_TYPE_DEVICE:
-            return "Device";
-
-        default:
-            return "Special file";
-        }
-
     case COLUMN_SIZE:
-        return Widget::Variant((int)entry.size);
+        return Widget::Variant(IO::format("{} Items", entry.size));
 
     default:
         ASSERT_NOT_REACHED();
@@ -132,7 +71,7 @@ Widget::Variant DirectoryListing::data(int row, int column)
 
 void DirectoryListing::update()
 {
-    _files.clear();
+    _directories.clear();
 
     IO::Directory directory{_navigation->current()};
 
@@ -143,22 +82,29 @@ void DirectoryListing::update()
 
     for (auto entry : directory.entries())
     {
-        FileInfo node{
+        if (entry.stat.type != FileType::FILE_TYPE_DIRECTORY)
+        {
+            continue;
+        }
+
+        auto path = IO::Path::join(_navigation->current(), entry.name);
+        IO::Directory subdirectory{path};
+
+        DirectoryInfo node{
             .name = entry.name,
-            .type = entry.stat.type,
-            .icon = get_icon_for_node(_navigation->current().string(), entry),
-            .size = entry.stat.size,
+            .icon = Graphic::Icon::get("folder"),
+            .size = subdirectory.entries().count(),
         };
 
-        _files.push_back(node);
+        _directories.push_back(node);
     }
 
     did_update();
 }
 
-const FileInfo &DirectoryListing::info(int index) const
+const DirectoryInfo &DirectoryListing::info(int index) const
 {
-    return _files[index];
+    return _directories[index];
 }
 
 } // namespace FilePicker

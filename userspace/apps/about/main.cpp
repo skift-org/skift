@@ -1,3 +1,4 @@
+#include "libgraphic/Icon.h"
 #include <libsystem/BuildInfo.h>
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
@@ -19,11 +20,13 @@ static auto logo_based_on_color_scheme()
 void show_license()
 {
     auto license_window = new Widget::Window(WINDOW_NONE);
-    license_window->title("License");
     license_window->size({570, 416});
     license_window->root()->layout(VFLOW(0));
 
-    new Widget::TitleBar(license_window->root());
+    new Widget::TitleBar(
+        license_window->root(),
+        Graphic::Icon::get("information"),
+        "License");
 
     auto field = new Widget::TextEditor(license_window->root(), Widget::TextModel::from_file("/Files/license.md"));
     field->flags(Widget::Component::FILL);
@@ -39,11 +42,12 @@ int main(int argc, char **argv)
     Widget::Application::initialize(argc, argv);
 
     Widget::Window *window = new Widget::Window(WINDOW_NONE);
-    window->title("about");
-    window->icon(Graphic::Icon::get("information"));
     window->root()->layout(VFLOW(4));
 
-    new Widget::TitleBar(window->root());
+    new Widget::TitleBar(
+        window->root(),
+        Graphic::Icon::get("information"),
+        "About");
 
     auto content_container = new Widget::Container(window->root());
     content_container->layout(VFLOW(4));

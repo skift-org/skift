@@ -30,8 +30,6 @@ DialogResult MessageBox::create_and_show(String title, String message, RefPtr<Gr
 
 void MessageBox::render(Window *window)
 {
-    window->icon(_icon);
-
     window->size(Math::Vec2i(300, 200));
 
     window->root()->layout(VFLOW(0));

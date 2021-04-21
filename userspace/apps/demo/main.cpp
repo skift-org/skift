@@ -22,13 +22,14 @@ int main(int argc, char **argv)
     }
 
     Widget::Window *window = new Widget::Window(WINDOW_RESIZABLE);
-    window->icon(Graphic::Icon::get("duck"));
-    window->title("Demos");
     window->size(Math::Vec2i(500, 400));
 
     window->root()->layout(VFLOW(0));
 
-    new Widget::TitleBar(window->root());
+    new Widget::TitleBar(
+        window->root(),
+        Graphic::Icon::get("duck"),
+        "Demos");
 
     Widget::Component *navbar = new Widget::Container(window->root());
 

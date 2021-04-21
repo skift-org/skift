@@ -1,3 +1,4 @@
+#include "libgraphic/Icon.h"
 #include <libwidget/Spacer.h>
 #include <libwidget/TitleBar.h>
 
@@ -13,7 +14,6 @@ Dialog::Dialog()
     _navigation = make<Navigation>();
     _navigation->go_home_dont_record_history();
     buttons(Widget::DialogButton::OK | Widget::DialogButton::CANCEL);
-    title("File picker");
 }
 
 Dialog::~Dialog()
@@ -25,7 +25,10 @@ void Dialog::render(Widget::Window *window)
     window->size(Math::Vec2i(600, 400));
     window->root()->layout(VFLOW(0));
 
-    new Widget::TitleBar(window->root());
+    new Widget::TitleBar(
+        window->root(),
+        Graphic::Icon::get("widgets"),
+        "File picker");
 
     new ToolBar(window->root(), _navigation, nullptr, ToolBar::NO_OPEN_TERMINAL);
 

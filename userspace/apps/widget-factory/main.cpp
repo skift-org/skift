@@ -1,3 +1,4 @@
+#include "libwidget/Component.h"
 #include <libfilepicker/FilePicker.h>
 #include <libwidget/Application.h>
 #include <libwidget/Container.h>
@@ -12,18 +13,21 @@ int main(int argc, char **argv)
     Widget::Application::initialize(argc, argv);
 
     auto acrylic_window = own<Widget::Window>(WINDOW_ACRYLIC);
-    acrylic_window->title("Acrylic!");
-    new Widget::TitleBar(acrylic_window->root());
+    acrylic_window->root()->layout(VFLOW(0));
+    new Widget::TitleBar(
+        acrylic_window->root(),
+        Graphic::Icon::get("widgets"),
+        "Acrylic!");
 
     auto window = own<Widget::Window>(WINDOW_RESIZABLE);
 
-    window->icon(Graphic::Icon::get("widgets"));
-    window->title("Widget Factory");
     window->size(Math::Vec2i(500, 400));
-
     window->root()->layout(VFLOW(8));
 
-    new Widget::TitleBar(window->root());
+    new Widget::TitleBar(
+        window->root(),
+        Graphic::Icon::get("widgets"),
+        "Widget Factory");
 
     Widget::Component *panel_hflow = new Widget::Container(window->root());
     {

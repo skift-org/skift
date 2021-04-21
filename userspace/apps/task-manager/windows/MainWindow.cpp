@@ -11,13 +11,14 @@ namespace task_manager
 
 MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
 {
-    icon(Graphic::Icon::get("memory"));
-    title("Task Manager");
     size(Math::Vec2i(700, 500));
 
     root()->layout(VFLOW(0));
 
-    new Widget::TitleBar(root());
+    new Widget::TitleBar(
+        root(),
+        Graphic::Icon::get("memory"),
+        "Task Manager");
 
     /// --- Toolbar --- ///
     auto toolbar = new Widget::Panel(root());

@@ -66,7 +66,6 @@ Window::Window(WindowFlag flags)
     static int window_handle_counter = 0;
     _handle = window_handle_counter++;
 
-    _icon = Graphic::Icon::get("application");
     _flags = flags;
 
     frontbuffer = Graphic::Bitmap::create_shared(250, 250).unwrap();
@@ -699,13 +698,6 @@ void Window::widget_removed(Component *widget)
     {
         _mouse_focus = nullptr;
     }
-
-    _widget_by_id.remove_value(widget);
-}
-
-void Window::register_widget_by_id(String id, Component *widget)
-{
-    _widget_by_id[id] = widget;
 }
 
 Graphic::Color Window::color(ThemeColorRole role)

@@ -125,8 +125,6 @@ public:
     static constexpr auto NO_MOUSE_HIT = (1 << 3);
     static constexpr auto NOT_AFFECTED_BY_SCROLL = (1 << 4);
 
-    void id(String id);
-
     RefPtr<Graphic::Font> font()
     {
         if (!_font)

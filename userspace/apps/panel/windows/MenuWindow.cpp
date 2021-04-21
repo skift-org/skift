@@ -13,7 +13,6 @@ namespace panel
 MenuWindow::MenuWindow()
     : Window(WINDOW_ALWAYS_FOCUSED | WINDOW_AUTO_CLOSE | WINDOW_ACRYLIC)
 {
-    title("Panel");
     bound((Math::Recti{4, PanelWindow::HEIGHT, 500, 400}));
     type(WINDOW_TYPE_POPOVER);
     opacity(0.85);

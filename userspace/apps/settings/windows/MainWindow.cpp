@@ -10,13 +10,14 @@ namespace Settings
 
 MainWindow::MainWindow() : Window(WINDOW_RESIZABLE)
 {
-    title("Settings");
-    icon(Graphic::Icon::get("cog"));
     size({700, 500});
 
     root()->layout(VFLOW(0));
 
-    new Widget::TitleBar(root());
+    new Widget::TitleBar(
+        root(),
+        Graphic::Icon::get("cog"),
+        "Settings");
 
     auto navigation_bar = new Widget::Panel(root());
     navigation_bar->layout(HFLOW(4));

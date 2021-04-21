@@ -35,10 +35,9 @@ private:
     Window *_window = nullptr;
 
 public:
-    void title(String title)
-    {
-        _title = title;
-    }
+    String title() { return _title; }
+
+    void title(String title) { _title = title; }
 
     void buttons(int buttons) { _buttons = buttons; }
 
@@ -57,7 +56,6 @@ public:
         _window = new Window(WINDOW_NONE);
 
         _window->type(WINDOW_TYPE_POPOVER);
-        _window->title(_title);
 
         _window->on(Event::WINDOW_CLOSING, [&](auto) {
             close(DialogResult::CLOSE);

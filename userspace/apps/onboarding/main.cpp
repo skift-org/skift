@@ -81,7 +81,6 @@ int main(int argc, char **argv)
 
     Widget::Window *window = new Widget::Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC | WINDOW_NO_ROUNDED_CORNERS);
 
-    window->title("Onboarding");
     window->type(WINDOW_TYPE_POPOVER);
     window->bound(Widget::Screen::bound());
     window->opacity(0);

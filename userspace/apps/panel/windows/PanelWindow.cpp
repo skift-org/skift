@@ -16,7 +16,6 @@ namespace panel
 PanelWindow::PanelWindow()
     : Widget::Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC | WINDOW_NO_ROUNDED_CORNERS)
 {
-    title("Panel");
     type(WINDOW_TYPE_PANEL);
     opacity(0.85);
 

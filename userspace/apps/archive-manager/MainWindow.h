@@ -30,8 +30,6 @@ public:
     MainWindow(RefPtr<FilePicker::Navigation> navigation, RefPtr<Archive> archive)
         : Widget::Window(WINDOW_RESIZABLE), _navigation(navigation), _archive(archive)
     {
-        icon(Graphic::Icon::get("folder-zip"));
-        title("Archive Manager");
         size(Math::Vec2i(700, 500));
 
         render();
@@ -42,7 +40,10 @@ public:
         root()->clear_children();
         root()->layout(VFLOW(0));
 
-        new Widget::TitleBar(root());
+        new Widget::TitleBar(
+            root(),
+            Graphic::Icon::get("folder-zip"),
+            "Archive Manager");
 
         auto browser = new Widget::Container(root());
 

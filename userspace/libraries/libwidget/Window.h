@@ -21,8 +21,6 @@ class Window
 private:
     int _handle = -1;
 
-    String _title = "Window";
-    RefPtr<Graphic::Icon> _icon;
     Math::Recti _bound{250, 250};
     WindowFlag _flags;
     WindowType _type = WINDOW_TYPE_REGULAR;
@@ -60,8 +58,6 @@ private:
     Component *_mouse_focus = nullptr;
     Component *_mouse_over = nullptr;
 
-    HashMap<String, Component *> _widget_by_id{};
-
     OwnPtr<Async::Invoker> _repaint_invoker;
     OwnPtr<Async::Invoker> _relayout_invoker;
 
@@ -76,21 +72,7 @@ public:
 
     Math::Vec2i backbuffer_size() const { return backbuffer->size(); }
 
-    void title(String title) { _title = title; }
-
-    String title() { return _title; }
-
     WindowFlag flags() { return _flags; }
-
-    void icon(RefPtr<Graphic::Icon> icon)
-    {
-        if (icon)
-        {
-            _icon = icon;
-        }
-    }
-
-    RefPtr<Graphic::Icon> icon() { return _icon; }
 
     void opacity(float value) { _opacity = value; }
 
@@ -159,23 +141,7 @@ public:
 
     void widget_removed(Component *widget);
 
-    void register_widget_by_id(String id, Component *widget);
-
     Component *child_at(Math::Vec2i position);
-
-    template <typename WidgetType, typename CallbackType>
-    void with_widget(String name, CallbackType callback)
-    {
-        if (_widget_by_id.has_key(name))
-        {
-            auto widget = dynamic_cast<WidgetType *>(_widget_by_id[name]);
-
-            if (widget)
-            {
-                callback(widget);
-            }
-        }
-    }
 
     /* --- Focus ------------------------------------------------------------ */
 

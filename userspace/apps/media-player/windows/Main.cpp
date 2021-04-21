@@ -12,8 +12,6 @@ namespace MediaPlayer
 
 Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
 {
-    icon(Graphic::Icon::get("movie"));
-    title("Media Player");
     size(Math::Vec2i(700, 500));
 
     root()->layout(VFLOW(0));
@@ -23,7 +21,11 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
     cover->layout(VFLOW(0));
     cover->flags(Widget::Component::FILL);
 
-    new Widget::TitleBar(cover);
+    new Widget::TitleBar(
+        cover,
+        Graphic::Icon::get("movie"),
+        "Media Player");
+
     new Widget::Spacer(cover);
 
     auto control_bar = new Widget::Container(cover);

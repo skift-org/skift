@@ -17,13 +17,14 @@ public:
     MainWindow(RefPtr<FilePicker::Navigation> navigation, RefPtr<FilePicker::Bookmarks> bookmarks)
         : Widget::Window(WINDOW_RESIZABLE)
     {
-        icon(Graphic::Icon::get("folder"));
-        title("File Manager");
         size(Math::Vec2i(700, 500));
 
         root()->layout(VFLOW(0));
 
-        new Widget::TitleBar(root());
+        new Widget::TitleBar(
+            root(),
+            Graphic::Icon::get("folder"),
+            "File Manager");
 
         new FilePicker::ToolBar(root(), navigation, bookmarks);
 

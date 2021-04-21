@@ -13,14 +13,15 @@ int main(int argc, char **argv)
 
     Widget::Window *window = new Widget::Window(WINDOW_RESIZABLE | WINDOW_ACRYLIC);
 
-    window->icon(Graphic::Icon::get("console-line"));
-    window->title("Terminal");
     window->size(Math::Vec2i(700, 500));
     window->opacity(0.85);
 
     window->root()->layout(VFLOW(0));
 
-    new Widget::TitleBar(window->root());
+    new Widget::TitleBar(
+        window->root(),
+        Graphic::Icon::get("console-line"),
+        "Terminal");
 
     auto widget = new TerminalWidget(window->root());
     widget->focus();

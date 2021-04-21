@@ -1,3 +1,5 @@
+#include "libio/Format.h"
+#include "libio/Path.h"
 #include <libsystem/Logger.h>
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
@@ -10,25 +12,25 @@ int main(int argc, char **argv)
     Widget::Application::initialize(argc, argv);
 
     Widget::Window *window = new Widget::Window(WINDOW_RESIZABLE);
-
-    window->icon(Graphic::Icon::get("text-box"));
+    window->size(Math::Vec2i(700, 500));
+    window->root()->layout(VFLOW(0));
 
     if (argc == 2)
     {
-        window->title(argv[1]);
+        new Widget::TitleBar(
+            window->root(),
+            Graphic::Icon::get("text-box"),
+            IO::format("Text Editor · {}", IO::Path::parse(argv[1]).basename()));
     }
     else
     {
-        window->title("Text Editor");
+        new Widget::TitleBar(
+            window->root(),
+            Graphic::Icon::get("text-box"),
+            "Text Editor");
     }
 
-    window->size(Math::Vec2i(700, 500));
-
-    window->root()->layout(VFLOW(0));
-
-    new Widget::TitleBar(window->root());
-
-    auto toolbar = new Widget::Panel(window->root());
+    auto *toolbar = new Widget::Panel(window->root());
 
     toolbar->layout(HFLOW(4));
     toolbar->insets(Insetsi(4, 4));
@@ -45,7 +47,7 @@ int main(int argc, char **argv)
         model = Widget::TextModel::from_file(argv[1]);
     }
 
-    auto field = new Widget::TextEditor(window->root(), model);
+    auto *field = new Widget::TextEditor(window->root(), model);
     field->flags(Widget::Component::FILL);
     field->overscroll(true);
     field->insets({4});

@@ -62,15 +62,16 @@ private:
 public:
     PaintWindow(RefPtr<PaintDocument> document) : Window(WINDOW_RESIZABLE)
     {
-        icon(Graphic::Icon::get("brush"));
-        title("Paint");
         size(Math::Vec2i(600, 560));
 
         _document = document;
 
         root()->layout(VFLOW(0));
 
-        new Widget::TitleBar(root());
+        new Widget::TitleBar(
+            root(),
+            Graphic::Icon::get("brush"),
+            "Paint");
 
         create_toolbar(root());
 

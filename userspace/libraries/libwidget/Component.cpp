@@ -12,11 +12,6 @@
 namespace Widget
 {
 
-void Component::id(String id)
-{
-    _window->register_widget_by_id(id, this);
-}
-
 Graphic::Color Component::color(ThemeColorRole role)
 {
     if (!enabled() || (_parent && !_parent->enabled()))

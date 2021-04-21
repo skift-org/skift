@@ -16,13 +16,14 @@ int main(int argc, char **argv)
     Application::initialize(argc, argv);
 
     auto window = new Window(WINDOW_NONE);
-    window->title("Calculator");
-    window->icon(Graphic::Icon::get("calculator-variant"));
     window->root()->layout(VFLOW(0));
 
     Calculator calculator{};
 
-    new TitleBar(window->root());
+    new TitleBar(
+        window->root(),
+        Graphic::Icon::get("calculator-variant"),
+        "Calculator");
 
     // Calculator screen
     auto screen_container = new Panel(window->root());

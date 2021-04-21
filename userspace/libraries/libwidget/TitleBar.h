@@ -40,7 +40,7 @@ public:
 
     void should_rebuild()
     {
-        _rebuild_invoker->should_be_invoke_later();
+        _rebuild_invoker->invoke_later();
     }
 
     void build();

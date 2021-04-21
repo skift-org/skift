@@ -24,7 +24,7 @@ public:
         loop().unregister_invoker(this);
     }
 
-    bool should_be_invoke_later()
+    [[nodiscard]] bool should_be_invoke_later()
     {
         return _invoke_later;
     }

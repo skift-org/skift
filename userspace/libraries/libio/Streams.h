@@ -97,7 +97,7 @@ static inline ResultOr<String> inln()
     return String{writer.string()};
 }
 
-template <Formatable... Args>
+template <typename... Args>
 static ResultOr<size_t> print(Writer &writer, const char *fmt, Args... args)
 {
     MemoryReader memory{fmt};
@@ -105,7 +105,7 @@ static ResultOr<size_t> print(Writer &writer, const char *fmt, Args... args)
     return format(writer, scan, forward<Args>(args)...);
 }
 
-template <Formatable... Args>
+template <typename... Args>
 static ResultOr<size_t> println(Writer &writer, const char *fmt, Args... args)
 {
     MemoryReader memory{fmt};
@@ -114,22 +114,22 @@ static ResultOr<size_t> println(Writer &writer, const char *fmt, Args... args)
     return written + TRY(IO::write(writer, '\n'));
 }
 
-template <Formatable... Args>
+template <typename... Args>
 static ResultOr<size_t> out(const char *fmt, Args... args) { return print(out(), fmt, forward<Args>(args)...); }
 
-template <Formatable... Args>
+template <typename... Args>
 static ResultOr<size_t> outln(const char *fmt, Args... args) { return println(out(), fmt, forward<Args>(args)...); }
 
-template <Formatable... Args>
+template <typename... Args>
 static ResultOr<size_t> err(const char *fmt, Args... args) { return print(err(), fmt, forward<Args>(args)...); }
 
-template <Formatable... Args>
+template <typename... Args>
 static ResultOr<size_t> errln(const char *fmt, Args... args) { return println(err(), fmt, forward<Args>(args)...); }
 
-template <Formatable... Args>
+template <typename... Args>
 static ResultOr<size_t> log(const char *fmt, Args... args) { return print(log(), fmt, forward<Args>(args)...); }
 
-template <Formatable... Args>
+template <typename... Args>
 static ResultOr<size_t> logln(const char *fmt, Args... args) { return println(log(), fmt, forward<Args>(args)...); }
 
 } // namespace IO

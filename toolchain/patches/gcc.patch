@@ -1,16 +1,16 @@
 diff --git a/config.sub b/config.sub
-index a318a4686..808badcb0 100755
+index 63c1f1c8b..827ebc375 100755
 --- a/config.sub
 +++ b/config.sub
-@@ -1343,7 +1343,7 @@ case $os in
- 	     | hpux* | unos* | osf* | luna* | dgux* | auroraux* | solaris* \
- 	     | sym* | kopensolaris* | plan9* \
+@@ -1703,7 +1703,7 @@ case $os in
+ 	     | os9* | macos* | osx* | ios* \
+ 	     | mpw* | magic* | mmixware* | mon960* | lnews* \
  	     | amigaos* | amigados* | msdos* | newsos* | unicos* | aof* \
--	     | aos* | aros* | cloudabi* | sortix* \
-+	     | aos* | aros* | cloudabi* | sortix* | skift* \
+-	     | aos* | aros* | cloudabi* | sortix* | twizzler* \
++	     | aos* | aros* | cloudabi* | sortix* | skift* | twizzler* \
  	     | nindy* | vxsim* | vxworks* | ebmon* | hms* | mvs* \
  	     | clix* | riscos* | uniplus* | iris* | isc* | rtu* | xenix* \
- 	     | knetbsd* | mirbsd* | netbsd* \
+ 	     | mirbsd* | netbsd* | dicos* | openedition* | ose* \
 diff --git a/fixincludes/mkfixinc.sh b/fixincludes/mkfixinc.sh
 index df90720b7..d17a16fff 100755
 --- a/fixincludes/mkfixinc.sh
@@ -24,10 +24,10 @@ index df90720b7..d17a16fff 100755
      i?86-*-mingw32* | \
      x86_64-*-mingw32* | \
 diff --git a/gcc/config.gcc b/gcc/config.gcc
-index cf1a87e2e..0ea5c7fa7 100644
+index 357b0bed0..c3675878b 100644
 --- a/gcc/config.gcc
 +++ b/gcc/config.gcc
-@@ -675,6 +675,13 @@ x86_cpus="generic intel"
+@@ -686,6 +686,13 @@ x86_cpus="generic intel"
  
  # Common parts for widely ported systems.
  case ${target} in
@@ -41,7 +41,7 @@ index cf1a87e2e..0ea5c7fa7 100644
  *-*-darwin*)
    tmake_file="t-darwin "
    tm_file="${tm_file} darwin.h"
-@@ -1033,6 +1040,12 @@ case ${target} in
+@@ -1084,6 +1091,12 @@ case ${target} in
  esac
  
  case ${target} in
@@ -56,7 +56,7 @@ index cf1a87e2e..0ea5c7fa7 100644
  	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-errata.h aarch64/aarch64-elf-raw.h"
 diff --git a/gcc/config/skift.h b/gcc/config/skift.h
 new file mode 100644
-index 000000000..e9fb8ab0d
+index 000000000..0ea73aad4
 --- /dev/null
 +++ b/gcc/config/skift.h
 @@ -0,0 +1,34 @@
@@ -85,20 +85,20 @@ index 000000000..e9fb8ab0d
 +
 +/* Additional predefined macros. */
 +#undef TARGET_OS_CPP_BUILTINS
-+#define TARGET_OS_CPP_BUILTINS()      \
-+   do                                 \
-+   {                                  \
-+      builtin_define("__skift__");    \
-+      builtin_define("__unix__");     \
-+      builtin_assert("system=skift"); \
-+      builtin_assert("system=unix");  \
-+      builtin_assert("system=posix"); \
-+   } while (0);
++#define TARGET_OS_CPP_BUILTINS()        \
++    do                                  \
++    {                                   \
++        builtin_define("__skift__");    \
++        builtin_define("__unix__");     \
++        builtin_assert("system=skift"); \
++        builtin_assert("system=unix");  \
++        builtin_assert("system=posix"); \
++    } while (0);
 diff --git a/libgcc/config.host b/libgcc/config.host
-index 1ff415923..91543e550 100644
+index f808b61be..1d01d092d 100644
 --- a/libgcc/config.host
 +++ b/libgcc/config.host
-@@ -1485,6 +1485,14 @@ nvptx-*)
+@@ -1500,6 +1500,14 @@ nvptx-*)
  	tmake_file="$tmake_file nvptx/t-nvptx"
  	extra_parts="crt0.o"
  	;;
@@ -114,10 +114,10 @@ index 1ff415923..91543e550 100644
  	echo "*** Configuration ${host} not supported" 1>&2
  	exit 1
 diff --git a/libstdc++-v3/configure b/libstdc++-v3/configure
-index 9f9c5a241..40027b90c 100755
+index 13f2e697e..bdc6f89aa 100755
 --- a/libstdc++-v3/configure
 +++ b/libstdc++-v3/configure
-@@ -29846,6 +29846,5968 @@ else
+@@ -29270,6 +29270,5977 @@ else
  
  # Base decisions on target environment.
  case "${host}" in
@@ -297,15 +297,24 @@ index 9f9c5a241..40027b90c 100755
 +  # Note this is only for shared objects.
 +  ac_ld_relro=no
 +  if test x"$with_gnu_ld" = x"yes"; then
-+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ld that supports -Wl,-z,relro" >&5
++    # cygwin and mingw uses PE, which has no ELF relro support,
++    # multi target ld may confuse configure machinery
++    case "$host" in
++    *-*-cygwin*)
++     ;;
++    *-*-mingw*)
++     ;;
++    *)
++      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ld that supports -Wl,-z,relro" >&5
 +$as_echo_n "checking for ld that supports -Wl,-z,relro... " >&6; }
-+    cxx_z_relo=`$LD -v --help 2>/dev/null | grep "z relro"`
-+    if test -n "$cxx_z_relo"; then
-+      OPT_LDFLAGS="-Wl,-z,relro"
-+      ac_ld_relro=yes
-+    fi
-+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ld_relro" >&5
++      cxx_z_relo=`$LD -v --help 2>/dev/null | grep "z relro"`
++      if test -n "$cxx_z_relo"; then
++        OPT_LDFLAGS="-Wl,-z,relro"
++        ac_ld_relro=yes
++      fi
++      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ld_relro" >&5
 +$as_echo "$ac_ld_relro" >&6; }
++    esac
 +  fi
 +
 +  # Set linker optimization flags.
@@ -6087,7 +6096,7 @@ index 9f9c5a241..40027b90c 100755
      # This is a freestanding configuration; there is nothing to do here.
      ;;
 diff --git a/libstdc++-v3/crossconfig.m4 b/libstdc++-v3/crossconfig.m4
-index fe1828835..7a717c65e 100644
+index ff44d5ae0..ed022fe1d 100644
 --- a/libstdc++-v3/crossconfig.m4
 +++ b/libstdc++-v3/crossconfig.m4
 @@ -5,6 +5,13 @@ dnl

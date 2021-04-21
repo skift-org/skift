@@ -4,11 +4,6 @@
 namespace IO
 {
 
-ResultOr<size_t> Format::format(Writer &writer)
-{
-    return IO::format(writer, "Object({#x})", reinterpret_cast<uintptr_t>(this));
-}
-
 ResultOr<size_t> format(Writer &writer, const Formating &formating, char value)
 {
     if (formating.type == Formating::CHARACTER)

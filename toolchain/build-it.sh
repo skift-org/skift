@@ -3,15 +3,15 @@ set -e
 
 # ----- Configs -------------------------------------------------------------- #
 
-BINUTILS_VERSION=2.33.1
+BINUTILS_VERSION=2.36
 BINUTILS_DIRECTORY="binutils-$BINUTILS_VERSION"
 BINUTILS_FILENAME="$BINUTILS_DIRECTORY.tar.gz"
 BINUTILS_URL="http://ftp.gnu.org/gnu/binutils/$BINUTILS_FILENAME"
 
-GCC_VERSION=10.1.0
-GCC_DIRECTORY="gcc-$GCC_VERSION"
-GCC_FILENAME="$GCC_DIRECTORY.tar.gz"
-GCC_URL="http://ftp.gnu.org/gnu/gcc/$GCC_DIRECTORY/$GCC_FILENAME"
+GCC_VERSION=11.1
+GCC_DIRECTORY="gcc-11.1.0-RC-20210420"
+GCC_FILENAME="gcc-11.1.0-RC-20210420.tar.gz"
+GCC_URL="https://gcc.gnu.org/pub/gcc/snapshots/11.1.0-RC-20210420/gcc-11.1.0-RC-20210420.tar.gz"
 
 # ---------------------------------------------------------------------------- #
 
@@ -130,7 +130,7 @@ pushd "$DIR/build-x86_32/"
             --with-sysroot=$SYSROOT \
             --enable-languages=c,c++|| exit 1
 
-        make -C "$DIR/../" install-headers || exit 1
+        make -C "$DIR/../" install-headers-for-cross-compiler || exit 1
 
         make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
         make install-gcc install-target-libgcc || exit 1
@@ -171,7 +171,7 @@ pushd "$DIR/build-x86_64/"
             --with-sysroot=$SYSROOT \
             --enable-languages=c,c++|| exit 1
 
-        make -C "$DIR/../" install-headers || exit 1
+        make -C "$DIR/../" install-headers-for-cross-compiler || exit 1
 
         make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
         make install-gcc install-target-libgcc || exit 1

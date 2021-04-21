@@ -2,9 +2,9 @@
 
 #include <libio/MemoryReader.h>
 #include <libio/MemoryWriter.h>
+#include <libio/Path.h>
 #include <libio/Scanner.h>
 #include <libio/Write.h>
-#include <libio/Path.h>
 #include <libutils/String.h>
 
 namespace IO
@@ -88,18 +88,6 @@ struct Formating
     }
 };
 
-struct Format
-{
-    virtual ~Format() {}
-    virtual ResultOr<size_t> format(IO::Writer &writer);
-};
-
-template <typename T>
-concept Formatable = IsBaseOf<Format, T>::value || requires(IO::Writer &writer, const Formating &formating, const T &t)
-{
-    format(writer, formating, t);
-};
-
 ResultOr<size_t> format(IO::Writer &, const Formating &, char);
 
 ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned char);
@@ -149,7 +137,7 @@ static inline ResultOr<size_t> format(IO::Writer &writer, Scanner &scan)
     return written;
 }
 
-template <Formatable First, Formatable... Args>
+template <typename First, typename... Args>
 static inline ResultOr<size_t> format(Writer &writer, Scanner &scan, First first, Args... args)
 {
     size_t written = 0;
@@ -165,13 +153,9 @@ static inline ResultOr<size_t> format(Writer &writer, Scanner &scan, First first
         auto formating = Formating::parse(scan);
 
         auto format_proxy = [&]() {
-            if constexpr (IsBaseOf<Format, First>::value)
-            {
-                return first.format(writer);
-            }
-            else if constexpr (requires(const First &t) {
-                                   format(writer, formating, t);
-                               })
+            if constexpr (requires(const First &t) {
+                              format(writer, formating, t);
+                          })
             {
                 return format(writer, formating, first);
             }
@@ -192,7 +176,7 @@ static inline ResultOr<size_t> format(Writer &writer, Scanner &scan, First first
     return written;
 }
 
-template <Formatable... Args>
+template <typename... Args>
 static inline ResultOr<size_t> format(Writer &writer, const char *fmt, Args... args)
 {
     MemoryReader memory{fmt};
@@ -205,7 +189,7 @@ static inline ResultOr<size_t> format(Writer &writer, const char *fmt)
     return IO::write(writer, fmt);
 }
 
-template <Formatable... Args>
+template <typename... Args>
 static inline String format(const char *fmt, Args... args)
 {
     MemoryWriter memory{};

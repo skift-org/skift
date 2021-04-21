@@ -128,7 +128,7 @@ private:
 public:
     static RefPtr<TextModel> empty();
 
-    static RefPtr<TextModel> from_file(const char *path);
+    static RefPtr<TextModel> from_file(String path);
 
     TextModel() {}
 

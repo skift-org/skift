@@ -20,13 +20,13 @@ private:
 
     FilePicker::Dialog _dialog;
 
-    void load_document(const char *path)
+    void load_document(String path)
     {
-        if (path != nullptr)
+        if (!path.null_or_empty())
         {
             logger_info("Opening text document from '%s'", path);
             _title_bar->title(path);
-            _text_model = Widget::TextModel::from_file(path);
+            _text_model = Widget::TextModel::from_file(path.cstring());
             _text_editor->update_model(_text_model);
         }
     }

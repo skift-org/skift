@@ -45,6 +45,11 @@ $ sudo pacman -S nasm gcc make binutils grub qemu libisoburn mtools git qemu
 $ sudo dnf install nasm gcc gcc-g++ make binutils xorriso mtools ImageMagick git qemu qemu-kvm
 ```
 
+```sh
+# On openSUSE or openSuse-based distributions
+$ sudo zypper install nasm gcc make binutils xorriso mtools ImageMagick git qemu qemu-kvm
+```
+
 ### About WSL
 
 It's possible to build skiftOS WSL1 and WSL2 but it's not well tested.
@@ -96,7 +101,12 @@ $ sudo pacman -S base-devel bison flex mpc mpfr texinfo
 
 ```sh
 # On Red Hat or Red Hat-based distributions
-$ sudo dnf install bison flex mpc-devel mpfr-devel gmp-devel texinfo patch 
+$ sudo dnf install bison flex mpfr-devel gmp-devel texinfo patch 
+```
+
+```sh
+# On openSUSE or openSUSE-based distributions
+$ sudo dnf install bison flex mpc-devel mpfr-devel gmp-devel texinfo patch
 ```
 
 Then for building the toolchain run the `build-it.sh` script

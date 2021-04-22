@@ -32,6 +32,10 @@ $(1)_HEADERS = \
 	$$(wildcard userspace/libraries/lib$($(1)_NAME)/*.h) \
 	$$(wildcard userspace/libraries/lib$($(1)_NAME)/*/*.h)
 
+$(1)_MODULEMAP=$$(BUILDROOT)/userspace/libraries/$($(1)_NAME)/$($(1)_NAME).modulemap
+
+MODULEMAPS += $$($(1)_MODULEMAP)
+
 TARGETS += $$($(1)_ARCHIVE)
 OBJECTS += $$($(1)_OBJECTS)
 
@@ -47,7 +51,7 @@ $$($(1)_ARCHIVE): $$($(1)_OBJECTS)
 	@echo [LIB$(1)] [AR] $$@
 	@$(AR) $(ARFLAGS) $$@ $$^
 
-$(BUILDROOT)/userspace/libraries/lib$($(1)_NAME)/%.o: userspace/libraries/lib$($(1)_NAME)/%.cpp
+$(BUILDROOT)/userspace/libraries/lib$($(1)_NAME)/%.o: userspace/libraries/lib$($(1)_NAME)/%.cpp $(CXX_MODULE_MAPPER)
 	$$(DIRECTORY_GUARD)
 	@echo [LIB$(1)] [CXX] $$<
 	@$(CXX) $(CXXFLAGS) $($(1)_CXXFLAGS) -c -o $$@ $$<
@@ -61,6 +65,11 @@ $(BUILDROOT)/userspace/libraries/lib$($(1)_NAME)/%.s.o: userspace/libraries/lib$
 	$$(DIRECTORY_GUARD)
 	@echo [LIB$(1)] [AS] $$<
 	@$(AS) $(ASFLAGS) $$^ -o $$@
+
+$$($(1)_MODULEMAP): $$(filter %.module.cpp, $$($(1)_SOURCES)) $$($(1)_HEADERS)
+	$$(DIRECTORY_GUARD)
+	@echo [$(1)] [GENERATE-MODULEMAP] $$@
+	@generate-modulemap.py userspace/libraries/ $$(BUILDROOT)/userspace/libraries/ $$^ > $$@
 
 endef
 

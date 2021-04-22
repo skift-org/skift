@@ -39,6 +39,8 @@ CXX_WARNINGS := \
 	-Wnon-virtual-dtor \
 	-Woverloaded-virtual
 
+CXX_MODULE_MAPPER:=$(BUILDROOT)/global.modulemap
+
 BUILD_INCLUDE:= \
 	-I. \
 	-Ikernel \
@@ -71,6 +73,8 @@ CFLAGS= \
 
 CXXFLAGS:= \
 	-std=c++20 \
+	-fmodules-ts \
+	-fmodule-mapper=$(CXX_MODULE_MAPPER) \
 	-MD \
 	--sysroot=$(SYSROOT) \
 	$(CONFIG_OPTIMISATIONS) \
@@ -173,3 +177,15 @@ build/sysroot/System/Includes/%.h: userspace/libraries/libc/%.h
 	cp $< $@
 
 -include $(OBJECTS:.o=.d)
+
+$(CXX_MODULE_MAPPER): $(MODULEMAPS)
+	$(DIRECTORY_GUARD)
+	@echo [GLOBAL] [GENERATE-MODULEMAP] $(CXX_MODULE_MAPPER)
+	@cat $^ > $@
+
+list-modulemaps:
+	echo $(MODULEMAPS)
+
+all-modulemaps: $(MODULEMAPS)
+
+global-modulemaps: $(CXX_MODULE_MAPPER)

@@ -20,7 +20,7 @@ $(TESTS_BINARY): $(TESTS_OBJECTS) $(patsubst %, $(BUILD_DIRECTORY_LIBS)/lib%.a, 
 		$(STRIP) $@; \
 	fi
 
-$(BUILDROOT)/userspace/tests/%.o: userspace/tests/%.cpp
+$(BUILDROOT)/userspace/tests/%.o: userspace/tests/%.cpp $(CXX_MODULE_MAPPER)
 	$(DIRECTORY_GUARD)
 	@echo [TESTS] [CXX] $<
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<

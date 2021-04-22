@@ -46,12 +46,12 @@ KERNEL_CXXFLAGS += \
 
 OBJECTS += $(KERNEL_OBJECTS)
 
-$(BUILDROOT)/kernel/%.o: userspace/libraries/%.cpp
+$(BUILDROOT)/kernel/%.o: userspace/libraries/%.cpp $(CXX_MODULE_MAPPER)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<
 
-$(BUILDROOT)/kernel/kernel/%.o: kernel/kernel/%.cpp
+$(BUILDROOT)/kernel/kernel/%.o: kernel/kernel/%.cpp $(CXX_MODULE_MAPPER)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<

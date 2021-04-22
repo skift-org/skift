@@ -1,7 +1,6 @@
 #include <string.h>
 
-#include <libfilepicker/model/FileListing.h>
-#include <libio/Directory.h>
+#include <libfilepicker/model/FilesystemModel.h>
 #include <libio/File.h>
 #include <libio/Format.h>
 #include <libjson/Json.h>
@@ -59,8 +58,8 @@ enum Column
     __COLUMN_COUNT,
 };
 
-FileListing::FileListing(RefPtr<Navigation> navigation, String extension)
-    : _navigation(navigation), _extension(extension)
+FilesystemModel::FilesystemModel(RefPtr<Navigation> navigation, Callback<bool(IO::Directory::Entry &)> filter)
+    : _navigation(navigation), _filter(filter)
 {
     _observer = navigation->observe([this](auto &) {
         update();
@@ -69,17 +68,17 @@ FileListing::FileListing(RefPtr<Navigation> navigation, String extension)
     update();
 }
 
-int FileListing::rows()
+int FilesystemModel::rows()
 {
     return _files.count();
 }
 
-int FileListing::columns()
+int FilesystemModel::columns()
 {
     return __COLUMN_COUNT;
 }
 
-String FileListing::header(int column)
+String FilesystemModel::header(int column)
 {
     switch (column)
     {
@@ -97,7 +96,7 @@ String FileListing::header(int column)
     }
 }
 
-Widget::Variant FileListing::data(int row, int column)
+Widget::Variant FilesystemModel::data(int row, int column)
 {
     auto &entry = _files[row];
 
@@ -123,14 +122,21 @@ Widget::Variant FileListing::data(int row, int column)
         }
 
     case COLUMN_SIZE:
-        return Widget::Variant(IO::format("{} Bytes", entry.size));
+        if (entry.type == FILE_TYPE_DIRECTORY)
+        {
+            return Widget::Variant(IO::format("{} Items", entry.size));
+        }
+        else
+        {
+            return Widget::Variant(IO::format("{} Bytes", entry.size));
+        }
 
     default:
         ASSERT_NOT_REACHED();
     }
 }
 
-void FileListing::update()
+void FilesystemModel::update()
 {
     _files.clear();
 
@@ -143,18 +149,25 @@ void FileListing::update()
 
     for (auto entry : directory.entries())
     {
-        auto path = IO::Path::join(_navigation->current(), entry.name);
-
-        if (!_extension.null_or_empty() && path.extension() != _extension)
+        if (_filter && !_filter(entry))
         {
             continue;
+        }
+
+        size_t size = entry.stat.size;
+
+        if (entry.stat.type == FILE_TYPE_DIRECTORY)
+        {
+            auto path = IO::Path::join(_navigation->current(), entry.name);
+            IO::Directory subdirectory{path};
+            size = subdirectory.entries().count();
         }
 
         FileInfo node{
             .name = entry.name,
             .type = entry.stat.type,
             .icon = get_icon_for_node(_navigation->current().string(), entry),
-            .size = entry.stat.size,
+            .size = size,
         };
 
         _files.push_back(node);
@@ -163,7 +176,7 @@ void FileListing::update()
     did_update();
 }
 
-const FileInfo &FileListing::info(int index) const
+const FileInfo &FilesystemModel::info(int index) const
 {
     return _files[index];
 }

@@ -1,24 +1,26 @@
 #pragma once
 
+#include <libio/Directory.h>
 #include <libio/Path.h>
 #include <libutils/Vector.h>
 #include <libwidget/model/TableModel.h>
 
-#include <libfilepicker/model/DirectoryInfo.h>
+#include <libfilepicker/model/FileInfo.h>
 #include <libfilepicker/model/Navigation.h>
 
 namespace FilePicker
 {
 
-class DirectoryListing : public Widget::TableModel
+class FilesystemModel : public Widget::TableModel
 {
 private:
     RefPtr<Navigation> _navigation;
-    Vector<DirectoryInfo> _directories{};
+    Vector<FileInfo> _files{};
     OwnPtr<Async::Observer<Navigation>> _observer;
+    Callback<bool(IO::Directory::Entry &)> _filter;
 
 public:
-    DirectoryListing(RefPtr<Navigation> navigation);
+    FilesystemModel(RefPtr<Navigation> navigation, Callback<bool(IO::Directory::Entry &)> filter = nullptr);
 
     int rows() override;
 
@@ -30,7 +32,7 @@ public:
 
     void update() override;
 
-    const DirectoryInfo &info(int index) const;
+    const FileInfo &info(int index) const;
 };
 
 } // namespace FilePicker

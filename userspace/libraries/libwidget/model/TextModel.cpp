@@ -14,7 +14,7 @@ RefPtr<TextModel> TextModel::empty()
     return model;
 }
 
-RefPtr<TextModel> TextModel::from_file(String path)
+RefPtr<TextModel> TextModel::open(String path)
 {
     auto model = make<TextModel>();
 

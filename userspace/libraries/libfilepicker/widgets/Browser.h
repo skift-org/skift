@@ -3,7 +3,7 @@
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/Table.h>
 
-#include <libfilepicker/model/DirectoryListing.h>
+#include <libfilepicker/model/FilesystemModel.h>
 #include <libfilepicker/model/Navigation.h>
 
 namespace FilePicker
@@ -14,9 +14,17 @@ class Browser : public Widget::Table
 protected:
     RefPtr<Navigation> _navigation;
     OwnPtr<Async::Observer<Navigation>> _navigation_observer;
+    RefPtr<FilesystemModel> _listing;
 
 public:
-    virtual Optional<String> selected_path() = 0;
+    Optional<String> selected_path()
+    {
+        if (selected() == -1)
+        {
+            return {};
+        }
+        return process_resolve(_listing->info(selected()).name);
+    }
 
     Browser(Widget::Component *parent, RefPtr<Navigation> navigation)
         : Widget::Table(parent), _navigation(navigation)

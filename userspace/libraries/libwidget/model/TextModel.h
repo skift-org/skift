@@ -151,6 +151,8 @@ public:
 
     String string();
 
+    ResultOr<size_t> save(String path);
+
     void clear()
     {
         _lines.clear();

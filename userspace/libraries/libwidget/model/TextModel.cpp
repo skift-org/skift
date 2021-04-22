@@ -76,6 +76,12 @@ String TextModel::string()
     return builder.finalize();
 }
 
+ResultOr<size_t> TextModel::save(String path)
+{
+    IO::File file{path, OPEN_WRITE | OPEN_CREATE};
+    return IO::write(file, string());
+}
+
 void TextModel::append_at(TextCursor &cursor, Codepoint codepoint)
 {
     line(cursor.line()).append_at(cursor.column(), codepoint);

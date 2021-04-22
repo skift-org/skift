@@ -78,6 +78,11 @@ Math::Vec2i TextField::size()
     return _model->line(0).bound(*font()).size();
 }
 
+String TextField::text()
+{
+    return _model->string();
+}
+
 void TextField::event(Event *event)
 {
     if (event->type == Event::KEYBOARD_KEY_TYPED)

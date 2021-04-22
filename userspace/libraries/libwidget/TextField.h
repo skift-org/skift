@@ -27,6 +27,8 @@ public:
     Math::Vec2i size() override;
 
     void event(Event *event) override;
+
+    String text();
 };
 
 } // namespace Widget

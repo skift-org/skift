@@ -17,6 +17,10 @@ private:
 public:
     Optional<String> selected_path() override
     {
+        if (selected() == -1)
+        {
+            return {};
+        }
         return process_resolve(_listing->info(selected()).name);
     }
 

@@ -1,4 +1,5 @@
 #include <libfilepicker/FilePicker.h>
+#include <libio/File.h>
 #include <libio/Streams.h>
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
@@ -18,8 +19,6 @@ private:
     Widget::TitleBar *_title_bar;
     Widget::TextEditor *_text_editor;
 
-    FilePicker::Dialog _dialog;
-
     void load_document(String path)
     {
         if (!path.null_or_empty())
@@ -28,6 +27,17 @@ private:
             _title_bar->title(path);
             _text_model = Widget::TextModel::from_file(path);
             _text_editor->update_model(_text_model);
+        }
+    }
+
+    void save_document(String path)
+    {
+        if (!path.null_or_empty())
+        {
+            IO::logln("Saving text document to {}", path);
+            _title_bar->title(path);
+            IO::File file{path, OPEN_WRITE | OPEN_CREATE};
+            IO::write(file, _text_model->string());
         }
     }
 
@@ -65,15 +75,19 @@ public:
 
         _open_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
         _open_document->on(Widget::Event::ACTION, [&](auto) {
-            if (_dialog.show() == Widget::DialogResult::OK)
+            FilePicker::Dialog picker{};
+            if (picker.show() == Widget::DialogResult::OK)
             {
-                load_document(_dialog.selected_file().unwrap());
+                load_document(picker.selected_file().unwrap());
             }
         });
         _save_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("content-save"));
         _save_document->on(Widget::Event::ACTION, [&](auto) {
-            FilePicker::Dialog picker{};
-            picker.show();
+            FilePicker::Dialog picker{FilePicker::DIALOG_FLAGS_SAVE};
+            if (picker.show() == Widget::DialogResult::OK)
+            {
+                save_document(picker.selected_file().unwrap());
+            }
         });
         _new_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("image-plus"));
     }

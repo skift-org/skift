@@ -21,6 +21,30 @@ Dialog::~Dialog()
 {
 }
 
+String Dialog::get_title()
+{
+    StringBuilder builder;
+    if (_flags & DialogFlags::DIALOG_FLAGS_OPEN)
+    {
+        builder.append("Open ");
+    }
+    else if (_flags & DialogFlags::DIALOG_FLAGS_SAVE)
+    {
+        builder.append("Save ");
+    }
+
+    if (_flags & DialogFlags::DIALOG_FLAGS_FOLDER)
+    {
+        builder.append("folder");
+    }
+    else
+    {
+        builder.append("document");
+    }
+
+    return builder.finalize();
+}
+
 void Dialog::render(Widget::Window *window)
 {
     window->size(Math::Vec2i(600, 400));
@@ -29,7 +53,7 @@ void Dialog::render(Widget::Window *window)
     new Widget::TitleBar(
         window->root(),
         Graphic::Icon::get("widgets"),
-        "File picker");
+        get_title());
 
     new ToolBar(window->root(), _navigation, nullptr, ToolBar::NO_OPEN_TERMINAL);
 
@@ -50,6 +74,14 @@ void Dialog::render(Widget::Window *window)
     auto action_container = new Widget::Panel(window->root());
 
     action_container->layout(HFLOW(4));
+
+    if (_flags & DialogFlags::DIALOG_FLAGS_SAVE)
+    {
+        _text_field = new Widget::TextField(action_container, Widget::TextModel::empty());
+        _text_field->flags(Widget::Component::FILL);
+        _text_field->focus();
+    }
+
     action_container->insets(Insetsi(4, 4));
 
     new Widget::Spacer(action_container);
@@ -61,7 +93,14 @@ void Dialog::on_button(Widget::DialogButton btn)
 {
     if (btn == Widget::DialogButton::OK)
     {
-        _selected_file = _browser->selected_path();
+        if (_flags & DialogFlags::DIALOG_FLAGS_OPEN)
+        {
+            _selected_file = _browser->selected_path();
+        }
+        else
+        {
+            _selected_file = IO::Path::join(_navigation->current(), _text_field->text()).string();
+        }
     }
 }
 

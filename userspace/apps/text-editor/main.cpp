@@ -25,7 +25,7 @@ private:
         {
             IO::logln("Opening text document from {}", path);
             _title_bar->title(path);
-            _text_model = Widget::TextModel::from_file(path);
+            _text_model = Widget::TextModel::open(path);
             _text_editor->update_model(_text_model);
         }
     }

@@ -36,8 +36,7 @@ private:
         {
             IO::logln("Saving text document to {}", path);
             _title_bar->title(path);
-            IO::File file{path, OPEN_WRITE | OPEN_CREATE};
-            IO::write(file, _text_model->string());
+            _text_model->save(path);
         }
     }
 

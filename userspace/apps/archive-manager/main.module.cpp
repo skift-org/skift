@@ -5,9 +5,9 @@ module;
 #include <libsystem/process/Process.h>
 #include <libwidget/Application.h>
 
-export module Main;
+export module ArchiveManager;
 
-import ArchiveManager;
+import ArchiveManager.MainWindow;
 
 int main(int argc, char **argv)
 {

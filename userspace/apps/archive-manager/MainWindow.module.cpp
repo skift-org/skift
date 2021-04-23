@@ -12,7 +12,7 @@ module;
 #include <libfilepicker/widgets/JumpList.h>
 #include <libfilepicker/widgets/ToolBar.h>
 
-export module ArchiveManager;
+export module ArchiveManager.MainWindow;
 
 export class MainWindow :
     public Widget::Window

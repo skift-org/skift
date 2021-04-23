@@ -37,7 +37,7 @@ $$($(1)_BINARY): $$($(1)_OBJECTS) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a
 		$(STRIP) $$@; \
 	fi
 
-$$(BUILDROOT)/userspace/apps/$$($(1)_NAME)/%.o: userspace/apps/$$($(1)_NAME)/%.cpp $(CXX_MODULE_MAPPER)
+$$(BUILDROOT)/userspace/apps/$$($(1)_NAME)/%.o: userspace/apps/$$($(1)_NAME)/%.cpp
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [CXX] $$<
 	@$(CXX) $(CXXFLAGS) -c -o $$@ $$<

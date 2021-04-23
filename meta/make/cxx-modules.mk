@@ -7,3 +7,6 @@ cxx-modulemaps-list:
 	@echo $(MODULEMAPS)
 
 cxx-modulemaps-all: $(CXX_MODULE_MAPPER)
+
+%.c++m:
+	@echo IGNORE $@

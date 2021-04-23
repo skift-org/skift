@@ -8,7 +8,7 @@ KERNEL_ASSEMBLY_SOURCES += \
 	$(wildcard kernel/archs/$(CONFIG_ARCH)/*.s) \
 	$(wildcard kernel/archs/$(CONFIG_ARCH)/*/*.s)
 
-$(BUILDROOT)/kernel/archs/%.o: kernel/archs/%.cpp $(CXX_MODULE_MAPPER)
+$(BUILDROOT)/kernel/archs/%.o: kernel/archs/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<

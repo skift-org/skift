@@ -53,7 +53,7 @@ $$($(1)_ARCHIVE): $$($(1)_OBJECTS)
 	@echo [LIB$(1)] [AR] $$@
 	@$(AR) $(ARFLAGS) $$@ $$^
 
-$(BUILDROOT)/userspace/libraries/lib$($(1)_NAME)/%.o: userspace/libraries/lib$($(1)_NAME)/%.cpp $(CXX_MODULE_MAPPER)
+$(BUILDROOT)/userspace/libraries/lib$($(1)_NAME)/%.o: userspace/libraries/lib$($(1)_NAME)/%.cpp
 	$$(DIRECTORY_GUARD)
 	@echo [LIB$(1)] [CXX] $$<
 	@$(CXX) $(CXXFLAGS) $($(1)_CXXFLAGS) -c -o $$@ $$<

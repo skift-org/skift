@@ -194,7 +194,7 @@ $$($(1)_BINARY): $$($(1)_OBJECT) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a,
 		$(STRIP) $$@; \
 	fi
 
-$$($(1)_OBJECT): $$($(1)_SOURCE) $(CXX_MODULE_MAPPER)
+$$($(1)_OBJECT): $$($(1)_SOURCE)
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [CXX] $$<
 	@$(CXX) $(CXXFLAGS) -c -o $$@ $$<

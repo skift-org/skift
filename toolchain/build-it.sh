@@ -140,8 +140,6 @@ pushd "$DIR/build-x86_32/"
     popd
 popd
 
-exit
-
 # Build GCC and binutils for the x86_64 target
 # ---------------------------------------------------------------------------- #
 

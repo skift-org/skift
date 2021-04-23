@@ -173,12 +173,17 @@ UNZIP_NAME = unzip
 
 define UTIL_TEMPLATE =
 
-$(1)_BINARY  = $(BUILD_DIRECTORY_UTILITIES)/$($(1)_NAME)
-$(1)_SOURCE  = userspace/utilities/$($(1)_NAME).cpp
-$(1)_OBJECT  = $$(patsubst userspace/utilities/%.cpp, $$(BUILDROOT)/userspace/utilities/%.o, $$($(1)_SOURCE))
+$(1)_BINARY=$(BUILD_DIRECTORY_UTILITIES)/$($(1)_NAME)
+
+$(1)_SOURCE=userspace/utilities/$($(1)_NAME).cpp
+
+$(1)_OBJECT=$$(patsubst userspace/utilities/%.cpp, $$(BUILDROOT)/userspace/utilities/%.o, $$($(1)_SOURCE))
+
+$(1)_DEPENDENCIES=$$(BUILDROOT)/userspace/utilities/$($(1)_NAME).deps
 
 TARGETS += $$($(1)_BINARY)
 OBJECTS += $$($(1)_OBJECT)
+DEPENDENCIES += $$($(1)_DEPENDENCIES)
 
 $$($(1)_BINARY): $$($(1)_OBJECT) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a, $$($(1)_LIBS) system) $(CRTS)
 	$$(DIRECTORY_GUARD)
@@ -193,6 +198,10 @@ $$($(1)_OBJECT): $$($(1)_SOURCE) $(CXX_MODULE_MAPPER)
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [CXX] $$<
 	@$(CXX) $(CXXFLAGS) -c -o $$@ $$<
+
+$$($(1)_DEPENDENCIES): $$($(1)_SOURCE) $(CXX_MODULE_MAPPER)
+	@echo [$(1)] [GENERATE-DEPENDENCIES] $$@
+	@generate-dependencies.py userspace/utilities/ $$(BUILDROOT)/userspace/utilities/ $$^ > $$@
 
 endef
 

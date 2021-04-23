@@ -130,7 +130,7 @@ pushd "$DIR/build-x86_32/"
             --with-sysroot=$SYSROOT \
             --enable-languages=c,c++|| exit 1
 
-        make -C "$DIR/../" install-headers-for-cross-compiler || exit 1
+        make -C "$DIR/../" crosscompiler-headers || exit 1
 
         make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
         make install-gcc install-target-libgcc || exit 1
@@ -171,7 +171,7 @@ pushd "$DIR/build-x86_64/"
             --with-sysroot=$SYSROOT \
             --enable-languages=c,c++|| exit 1
 
-        make -C "$DIR/../" install-headers-for-cross-compiler || exit 1
+        make -C "$DIR/../" crosscompiler-headers || exit 1
 
         make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
         make install-gcc install-target-libgcc || exit 1

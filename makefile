@@ -165,27 +165,5 @@ clean-all:
 clean-fs:
 	rm -rf $(SYSROOT)
 
-.PHONY: install-headers-for-cross-compiler
-install-headers-for-cross-compiler: $(patsubst $(BUILD_DIRECTORY_INCLUDE)/%, build/sysroot/System/Includes/%, $(HEADERS))
-
-build/sysroot/System/Includes/%.h: userspace/libraries/%.h
-	$(DIRECTORY_GUARD)
-	cp $< $@
-
-build/sysroot/System/Includes/%.h: userspace/libraries/libc/%.h
-	$(DIRECTORY_GUARD)
-	cp $< $@
-
--include $(OBJECTS:.o=.d)
-
-$(CXX_MODULE_MAPPER): $(MODULEMAPS)
-	$(DIRECTORY_GUARD)
-	@echo [GLOBAL] [GENERATE-MODULEMAP] $(CXX_MODULE_MAPPER)
-	@cat $^ > $@
-
-list-modulemaps:
-	echo $(MODULEMAPS)
-
-all-modulemaps: $(MODULEMAPS)
-
-global-modulemaps: $(CXX_MODULE_MAPPER)
+-include $(wildcard meta/make/*.mk)
+-include $(DEPENDENCIES) $(OBJECTS:.o=.d)

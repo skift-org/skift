@@ -5,6 +5,7 @@ src_dir = sys.argv[1]
 dst_dir = sys.argv[2]
 files = sys.argv[3:]
 
+
 def panic(msg):
     print(msg, file=sys.stderr)
     sys.exit(-1)
@@ -18,7 +19,7 @@ for file_name in files:
     if file_name.endswith(".h"):
         module_name = file_name.replace(src_dir, "")
         module_path = (dst_dir + file_name.replace(src_dir, "")) \
-            .replace(".h", ".h.ii")
+            .replace(".h", ".pch")
         print(f"{module_name} {module_path}")
     elif file_name.endswith(".module.cpp"):
         with open(file_name) as f:
@@ -32,7 +33,7 @@ for file_name in files:
                 .replace(";", "")
 
             module_path = (dst_dir + file_name.replace(src_dir, "")) \
-                .replace(".module.cpp", ".module.ii")
+                .replace(".module.cpp", ".gmc")
 
             print(f"{module_name} {module_path}")
     else:

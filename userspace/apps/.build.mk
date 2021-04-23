@@ -22,6 +22,7 @@ $(1)_DEPENDENCIES=$$(BUILDROOT)/userspace/apps/$($(1)_NAME)/$($(1)_NAME).deps
 TARGETS += $$($(1)_BINARY) $$($(1)_ASSETS)
 OBJECTS += $$($(1)_OBJECTS)
 MODULEMAPS += $$($(1)_MODULEMAP)
+DEPENDENCIES += $$($(1)_DEPENDENCIES)
 
 $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/%: userspace/apps/$($(1)_NAME)/%
 	$$(DIRECTORY_GUARD)
@@ -46,7 +47,9 @@ $$($(1)_MODULEMAP): $$(filter %.module.cpp, $$($(1)_SOURCES)) $$($(1)_HEADERS)
 	@echo [$(1)] [GENERATE-MODULEMAP] $$@
 	@generate-modulemap.py userspace/apps/ $$(BUILDROOT)/userspace/apps/ $$^ > $$@
 
-$$($(1)_DEPENDENCIES): $$($(1)_SOURCES) $$($(1)_HEADERS)
+$$($(1)_DEPENDENCIES): $$($(1)_SOURCES) $$($(1)_HEADERS) $(CXX_MODULE_MAPPER)
+	@echo [$(1)] [GENERATE-DEPENDENCIES] $$@
+	@generate-dependencies.py userspace/apps/ $$(BUILDROOT)/userspace/apps/ $$^ > $$@
 
 endef
 

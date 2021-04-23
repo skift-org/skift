@@ -1,6 +1,3 @@
-module;
-
-#include "libwidget/Component.h"
 #include <libfilepicker/FilePicker.h>
 #include <libwidget/Application.h>
 #include <libwidget/Container.h>
@@ -9,8 +6,6 @@ module;
 #include <libwidget/Switch.h>
 #include <libwidget/TextField.h>
 #include <libwidget/TitleBar.h>
-
-export module WidgetFactory;
 
 int main(int argc, char **argv)
 {

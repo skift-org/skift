@@ -1,5 +1,3 @@
-module;
-
 #include <libfilepicker/FilePicker.h>
 #include <libio/File.h>
 #include <libio/Streams.h>
@@ -8,8 +6,6 @@ module;
 #include <libwidget/Panel.h>
 #include <libwidget/TextEditor.h>
 #include <libwidget/TitleBar.h>
-
-export module TextEditor;
 
 struct TextWindow : public Widget::Window
 {

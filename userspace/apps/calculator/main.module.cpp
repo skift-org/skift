@@ -9,9 +9,9 @@ module;
 #include <libwidget/Panel.h>
 #include <libwidget/TitleBar.h>
 
-export module Main;
+export module Calculator;
 
-import Calculator;
+import Calculator.Core;
 
 int main(int argc, char **argv)
 {

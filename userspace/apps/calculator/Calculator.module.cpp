@@ -3,7 +3,7 @@ module;
 #include <libasync/Observable.h>
 #include <math.h>
 
-export module Calculator;
+export module Calculator.Core;
 
 export enum class Operation {
     NONE,

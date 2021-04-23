@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libgraphic/font/Font.h>
 #include <libio/Reader.h>
 #include <libmath/Rect.h>
 

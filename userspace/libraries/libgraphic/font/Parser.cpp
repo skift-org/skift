@@ -1,5 +1,8 @@
 #include <libgraphic/font/Parser.h>
+#include <libgraphic/font/TrueTypeFontFace.h>
 
-ResultOr<RefPtr<FontFace>> Graphics::Font::load(IO::Reader &reader)
+ResultOr<RefPtr<Graphic::Font::FontFace>> Graphic::Font::load(IO::Reader &reader)
 {
+    RefPtr<FontFace> result = TrueTypeFontFace::load(reader).unwrap();
+    return result;
 }

@@ -12,7 +12,7 @@ enum FontStyle
     FONT_STYLE_BOLD,
     FONT_STYLE_ITALIC
 };
-class FontFace
+class FontFace : public RefCounted<FontFace>
 {
 public:
     virtual String family() = 0;

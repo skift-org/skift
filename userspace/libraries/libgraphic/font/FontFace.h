@@ -8,17 +8,15 @@ namespace Graphic::Font
 {
 enum FontStyle
 {
-  FONT_STYLE_REGULAR,
-  FONT_STYLE_BOLD,
-  FONT_STYLE_ITALIC
-}
-
+    FONT_STYLE_REGULAR,
+    FONT_STYLE_BOLD,
+    FONT_STYLE_ITALIC
+};
 class FontFace
 {
 public:
-    virtual String name() = 0;
     virtual String family() = 0;
     virtual FontStyle style() = 0;
-    virtual Glyph glyph(Codepoint c) = 0;
+    virtual Optional<Glyph> glyph(Codepoint c) = 0;
 };
 } // namespace Graphic::Font

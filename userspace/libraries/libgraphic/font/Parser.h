@@ -1,9 +1,9 @@
 #pragma once
 
-#include <libgraphic/font/Font.h>
+#include <libgraphic/font/FontFace.h>
 #include <libio/Reader.h>
 
 namespace Graphic::Font
 {
-ResultOr<RefPtr<Font>> load(IO::Reader &reader);
+ResultOr<RefPtr<FontFace>> load(IO::Reader &reader);
 } // namespace Graphic::Font

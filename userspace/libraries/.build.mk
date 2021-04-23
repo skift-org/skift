@@ -32,9 +32,9 @@ $(1)_HEADERS = \
 	$$(wildcard userspace/libraries/lib$($(1)_NAME)/*.h) \
 	$$(wildcard userspace/libraries/lib$($(1)_NAME)/*/*.h)
 
-$(1)_MODULEMAP=$$(BUILDROOT)/userspace/libraries/$($(1)_NAME)/$($(1)_NAME).modulemap
+$(1)_MODULEMAP=$$(BUILDROOT)/userspace/libraries/$($(1)_NAME).modulemap
 
-$(1)_DEPENDENCIES=$$(BUILDROOT)/userspace/libraries/$($(1)_NAME)/$($(1)_NAME).deps
+$(1)_DEPENDENCIES=$$(BUILDROOT)/userspace/libraries/$($(1)_NAME).deps
 
 TARGETS += $$($(1)_ARCHIVE)
 OBJECTS += $$($(1)_OBJECTS)

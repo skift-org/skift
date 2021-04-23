@@ -32,11 +32,10 @@ for file_name in files:
             if not first_line.startswith("export module "):
                 if not first_line.startswith("module "):
                     panic("The file is not a valid module file")
-                else:
-                    continue
 
             module_name = first_line \
                 .replace("export module ", "") \
+                .replace("module ", "") \
                 .replace(";", "")
 
             module_path = (dst_dir + file_name.replace(src_dir, "")) \

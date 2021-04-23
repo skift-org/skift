@@ -15,9 +15,9 @@ $(1)_ASSETS := $$(patsubst userspace/apps/$($(1)_NAME)/%, $(BUILD_DIRECTORY_APPS
 
 $(1)_OBJECTS = $$(patsubst userspace/apps/%.cpp, $$(BUILDROOT)/userspace/apps/%.o, $$($(1)_SOURCES))
 
-$(1)_MODULEMAP=$$(BUILDROOT)/userspace/apps/$($(1)_NAME)/$($(1)_NAME).modulemap
+$(1)_MODULEMAP=$$(BUILDROOT)/userspace/apps/$($(1)_NAME).modulemap
 
-$(1)_DEPENDENCIES=$$(BUILDROOT)/userspace/apps/$($(1)_NAME)/$($(1)_NAME).deps
+$(1)_DEPENDENCIES=$$(BUILDROOT)/userspace/apps/$($(1)_NAME).deps
 
 TARGETS += $$($(1)_BINARY) $$($(1)_ASSETS)
 OBJECTS += $$($(1)_OBJECTS)

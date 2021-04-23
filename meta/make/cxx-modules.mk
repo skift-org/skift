@@ -4,6 +4,6 @@ $(CXX_MODULE_MAPPER): $(MODULEMAPS)
 	@cat $^ > $@
 
 cxx-modulemaps-list:
-	echo $(MODULEMAPS)
+	@echo $(MODULEMAPS)
 
 cxx-modulemaps-all: $(CXX_MODULE_MAPPER)

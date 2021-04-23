@@ -1,10 +1,11 @@
-#pragma once
+module;
 
 #include <libasync/Observable.h>
 #include <math.h>
 
-enum class Operation
-{
+export module Calculator;
+
+export enum class Operation {
     NONE,
     ADD,
     SUBSTRACT,
@@ -15,7 +16,7 @@ enum class Operation
     POWER,
 };
 
-class Calculator : public Async::Observable<Calculator>
+export class Calculator : public Async::Observable<Calculator>
 {
 private:
     Operation _operation = Operation::NONE;

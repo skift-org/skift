@@ -74,6 +74,7 @@ $$($(1)_MODULEMAP): $$(filter %.module.cpp, $$($(1)_SOURCES)) $$($(1)_HEADERS)
 	@generate-modulemap.py userspace/libraries/ $$(BUILDROOT)/userspace/libraries/ $$^ > $$@
 
 $$($(1)_DEPENDENCIES): $$($(1)_SOURCES) $$($(1)_HEADERS) $(CXX_MODULE_MAPPER)
+	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [GENERATE-DEPENDENCIES] $$@
 	@generate-dependencies.py userspace/libraries/ $$(BUILDROOT)/userspace/libraries/ $$^ > $$@
 

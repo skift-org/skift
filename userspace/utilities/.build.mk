@@ -200,6 +200,7 @@ $$($(1)_OBJECT): $$($(1)_SOURCE) $(CXX_MODULE_MAPPER)
 	@$(CXX) $(CXXFLAGS) -c -o $$@ $$<
 
 $$($(1)_DEPENDENCIES): $$($(1)_SOURCE) $(CXX_MODULE_MAPPER)
+	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [GENERATE-DEPENDENCIES] $$@
 	@generate-dependencies.py userspace/utilities/ $$(BUILDROOT)/userspace/utilities/ $$^ > $$@
 

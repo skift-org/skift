@@ -14,7 +14,6 @@ def panic(msg):
 def log(msg):
     print(msg, file=sys.stderr)
 
-
 for file_name in files:
     if file_name.endswith(".h"):
         module_name = file_name.replace(src_dir, "")
@@ -24,6 +23,9 @@ for file_name in files:
     elif file_name.endswith(".module.cpp"):
         with open(file_name) as f:
             first_line = f.readline().strip()
+
+            while not first_line.startswith("export module "):
+                first_line = f.readline().strip()
 
             if not first_line.startswith("export module "):
                 panic("The file is not a valid module file")

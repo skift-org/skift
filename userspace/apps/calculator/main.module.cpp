@@ -1,3 +1,5 @@
+module;
+
 #include <libio/Format.h>
 
 #include <libwidget/Application.h>
@@ -7,7 +9,9 @@
 #include <libwidget/Panel.h>
 #include <libwidget/TitleBar.h>
 
-#include "calculator/Calculator.h"
+export module Main;
+
+import Calculator;
 
 int main(int argc, char **argv)
 {

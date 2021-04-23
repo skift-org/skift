@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <libfile/Archive.h>
 #include <libwidget/Container.h>
@@ -12,7 +12,9 @@
 #include <libfilepicker/widgets/JumpList.h>
 #include <libfilepicker/widgets/ToolBar.h>
 
-class MainWindow :
+export module ArchiveManager;
+
+export class MainWindow :
     public Widget::Window
 {
 private:

@@ -1,8 +1,13 @@
+module;
+
 #include <libfile/Archive.h>
+#include <libfilepicker/model/Navigation.h>
 #include <libsystem/process/Process.h>
 #include <libwidget/Application.h>
 
-#include "archive-manager/MainWindow.h"
+export module Main;
+
+import ArchiveManager;
 
 int main(int argc, char **argv)
 {

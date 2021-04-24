@@ -10,7 +10,6 @@ UTILITIES = \
 	ECHO \
 	ENV \
 	FALSE \
-	GREP \
 	HEAD \
 	HEXDUMP \
 	INIT \
@@ -71,9 +70,6 @@ ECHO_NAME = echo
 
 ENV_LIBS = system io
 ENV_NAME = env
-
-GREP_LIBS = system io
-GREP_NAME = grep
 
 HEAD_LIBS = system io
 HEAD_NAME = head

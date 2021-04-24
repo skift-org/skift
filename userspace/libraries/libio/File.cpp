@@ -36,6 +36,11 @@ ResultOr<size_t> File::write(const void *buffer, size_t size)
     return _handle->write(buffer, size);
 }
 
+ResultOr<size_t> File::call(IOCall call, void *args)
+{
+    return _handle->call(call, args);
+}
+
 ResultOr<size_t> File::seek(SeekFrom from)
 {
     auto seek_result = _handle->seek(from);

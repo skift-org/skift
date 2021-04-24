@@ -220,7 +220,7 @@ void TerminalWidget::do_layout()
         _terminal->resize(width, height);
 
         IOCallTerminalSizeArgs args = {width, height};
-        _terminal_device.server.handle()->call(IOCALL_TERMINAL_SET_SIZE, &args);
+        _terminal_device.server.call(IOCALL_TERMINAL_SET_SIZE, &args);
     }
 }
 

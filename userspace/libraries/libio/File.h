@@ -36,6 +36,8 @@ public:
 
     ResultOr<size_t> write(const void *buffer, size_t size) override;
 
+    ResultOr<size_t> call(IOCall call, void *args);
+
     ResultOr<size_t> seek(SeekFrom from) override;
 
     ResultOr<size_t> tell() override;

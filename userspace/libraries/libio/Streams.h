@@ -146,4 +146,15 @@ static ResultOr<size_t> logln(const char *fmt, Args... args)
     return written;
 }
 
+template <typename... Args>
+static ResultOr<size_t> panicln(const char *fmt, Args... args)
+{
+    IO::BufLine buf{log()};
+
+    print(buf, "\e[97;101m{}({}) ", process_name(), process_this());
+    print(buf, fmt, forward<Args>(args)...);
+    IO::write(buf, "\e[m\n");
+    process_abort();
+}
+
 } // namespace IO

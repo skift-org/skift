@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include <libio/Streams.h>
 #include <libsystem/system/Memory.h>
 #include <libsystem/utils/Hexdump.h>
 #include <libutils/Assert.h>
@@ -16,7 +16,7 @@ void Client::handle(const CompositorCreateWindow &create_window)
 {
     if (manager_get_window(this, create_window.id))
     {
-        logger_error("Duplicated window id %d!", create_window.id);
+        IO::logln("Duplicated window id {}!", create_window.id);
         return;
     }
 
@@ -50,7 +50,7 @@ void Client::handle(const CompositorDestroyWindow &destroy_window)
 
     if (!window)
     {
-        logger_warn("Invalid window id %d for client %08x", destroy_window.id, this);
+        IO::logln("Invalid window id {} for client {08x}", destroy_window.id, this);
         return;
     }
 
@@ -63,7 +63,7 @@ void Client::handle(const CompositorMoveWindow &move_window)
 
     if (!window)
     {
-        logger_warn("Invalid window id %d for client %08x", move_window.id, this);
+        IO::logln("Invalid window id {} for client {08x}", move_window.id, this);
         return;
     }
 
@@ -76,7 +76,7 @@ void Client::handle(const CompositorFlipWindow &flip_window)
 
     if (!window)
     {
-        logger_warn("Invalid window id %d for client %08x", flip_window.id, this);
+        IO::logln("Invalid window id {} for client {08x}", flip_window.id, this);
         return;
     }
 
@@ -94,7 +94,7 @@ void Client::handle(const CompositorCursorWindow &cursor_window)
 
     if (!window)
     {
-        logger_warn("Invalid window id %d for client %08x", cursor_window.id, this);
+        IO::logln("Invalid window id {} for client {08x}", cursor_window.id, this);
         return;
     }
 
@@ -145,8 +145,7 @@ void Client::handle_request()
 
     if (!read_result.success())
     {
-        logger_error("Client handle has error: %s!", read_result.description());
-
+        IO::logln("Client handle has error: {}!", read_result.description());
         _disconnected = true;
         client_destroy_disconnected();
         return;
@@ -156,7 +155,7 @@ void Client::handle_request()
 
     if (message_size != sizeof(CompositorMessage))
     {
-        logger_error("Got a message with an invalid size from client %u != %u!", sizeof(CompositorMessage), message_size);
+        IO::logln("Got a message with an invalid size from client {} != {}!", sizeof(CompositorMessage), message_size);
         hexdump(&message, message_size);
 
         _disconnected = true;
@@ -199,7 +198,7 @@ void Client::handle_request()
         break;
 
     default:
-        logger_error("Invalid message for client %08x", this);
+        IO::logln("Invalid message for client {08x}", this);
         hexdump(&message, message_size);
 
         _disconnected = true;
@@ -222,7 +221,7 @@ Client::Client(IO::Connection connection)
         this->handle_request();
     });
 
-    logger_info("Client %08x connected", this);
+    IO::logln("Client {08x} connected", this);
 
     this->send_message((CompositorMessage){
         .type = COMPOSITOR_MESSAGE_GREETINGS,
@@ -249,7 +248,7 @@ void client_close_all_windows(Client *client)
 
 Client::~Client()
 {
-    logger_info("Disconnecting client %08x", this);
+    IO::logln("Disconnecting client {08x}", this);
 
     client_close_all_windows(this);
 }
@@ -273,7 +272,7 @@ Result Client::send_message(CompositorMessage message)
 
     if (!write_result.success())
     {
-        logger_error("Failed to send message to %08x: %s", this, write_result.description());
+        IO::logln("Failed to send message to {08x}: {}", this, write_result.description());
         _disconnected = true;
         return write_result.result();
     }

@@ -4,7 +4,7 @@
 #include <libio/Read.h>
 #include <libio/ScopedReader.h>
 #include <libio/Skip.h>
-#include <libsystem/Logger.h>
+#include <libio/Streams.h>
 #include <libutils/Array.h>
 #include <libutils/Assert.h>
 #include <libutils/Chrono.h>
@@ -25,7 +25,7 @@ Result PngReader::read()
     // Doesn't matter if the read above can't read all bytes, this will fail anyways
     if (signature != Array<uint8_t, 8>{137, 80, 78, 71, 13, 10, 26, 10})
     {
-        logger_error("Invalid PNG signature!");
+        IO::logln("Invalid PNG signature!");
         return Result::ERR_INVALID_DATA;
     }
 
@@ -72,14 +72,14 @@ Result PngReader::read_chunks()
             // We don't support ADAM7 yet
             if (image_header.interlace_method() != 0)
             {
-                logger_error("Unsupported interlace method: %u", image_header.interlace_method());
+                IO::logln("Unsupported interlace method: {}", image_header.interlace_method());
                 return Result::ERR_NOT_IMPLEMENTED;
             }
 
             // Same for bit depth
             if (image_header.bit_depth() != 8)
             {
-                logger_error("Unsupported bitdepth: %u", image_header.bit_depth());
+                IO::logln("Unsupported bitdepth: {}", image_header.bit_depth());
                 return Result::ERR_NOT_IMPLEMENTED;
             }
 
@@ -148,7 +148,7 @@ Result PngReader::read_chunks()
                 auto num_entries = chunk_length();
                 if (num_entries > _palette.count())
                 {
-                    logger_error("Transparency chunk has more entries than current palette");
+                    IO::logln("Transparency chunk has more entries than current palette");
                     return Result::ERR_INVALID_DATA;
                 }
 
@@ -160,12 +160,12 @@ Result PngReader::read_chunks()
             }
             else if (_colour_type == Png::CT_GREY || _colour_type == Png::CT_RGB)
             {
-                logger_error("Transparency chunk not implemented for current colour type");
+                IO::logln("Transparency chunk not implemented for current colour type");
                 return Result::ERR_NOT_IMPLEMENTED;
             }
             else
             {
-                logger_error("Transparency chunk not allowed for current colour type");
+                IO::logln("Transparency chunk not allowed for current colour type");
                 return Result::ERR_INVALID_DATA;
             }
         }
@@ -176,7 +176,7 @@ Result PngReader::read_chunks()
             // The first chunk begins with the compression method
             if (idat_counter > 0 && prev_signature != Png::ImageData::SIG)
             {
-                logger_error("Multiple iDat chunks must be subsequent");
+                IO::logln("Multiple iDat chunks must be subsequent");
                 return Result::ERR_INVALID_DATA;
             }
 
@@ -205,7 +205,7 @@ Result PngReader::read_chunks()
 
         default:
         {
-            logger_error("Unknown PNG chunk: %u", chunk_signature());
+            IO::logln("Unknown PNG chunk: {08x}", chunk_signature());
             Vector<uint8_t> data;
             TRY(IO::read_vector(scoped_reader, data));
         }
@@ -215,7 +215,7 @@ Result PngReader::read_chunks()
         auto crc = TRY(IO::read<be_uint32_t>(_reader));
         if (crc() != crc_reader.checksum())
         {
-            logger_error("Chunk checksum validation failed");
+            IO::logln("Chunk checksum validation failed");
             return Result::ERR_INVALID_DATA;
         }
         prev_signature = chunk_signature();
@@ -391,7 +391,7 @@ Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, con
         break;
 
     default:
-        logger_error("Invalid filter type: %u", filter_type);
+        IO::logln("Invalid filter type: {}", filter_type);
         return Result::ERR_INVALID_DATA; /*error: nonexistent filter type given*/
     }
 
@@ -409,14 +409,14 @@ Result PngReader::uncompress(IO::MemoryWriter &uncompressed_writer)
     // ZLib compression mode should be DEFLATE
     if ((cm_cinfo & 15) != 8)
     {
-        logger_error("Invalid zlib compression mode for PNG");
+        IO::logln("Invalid zlib compression mode for PNG");
         return Result::ERR_INVALID_DATA;
     }
 
     // Sliding window should be 32k at max
     if (((cm_cinfo >> 4) & 15) > 7)
     {
-        logger_error("Invalid zlib sliding window size for PNG");
+        IO::logln("Invalid zlib sliding window size for PNG");
         return Result::ERR_INVALID_DATA;
     }
 
@@ -468,7 +468,7 @@ Result PngReader::convert(uint8_t *buffer)
     case Png::CT_PALETTE:
         if (_palette.empty())
         {
-            logger_error("Palette colour type requires a palett data");
+            IO::logln("Palette colour type requires a palett data");
             return Result::ERR_INVALID_DATA;
         }
 
@@ -478,7 +478,7 @@ Result PngReader::convert(uint8_t *buffer)
         }
         break;
     default:
-        logger_error("Unsupported PNG colour type: %u", _colour_type);
+        IO::logln("Unsupported PNG colour type: %u", _colour_type);
         return Result::ERR_NOT_IMPLEMENTED;
     }
 

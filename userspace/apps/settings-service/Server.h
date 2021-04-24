@@ -107,7 +107,7 @@ public:
         }
         else
         {
-            logger_warn("Unknown message %d!", message.type);
+            IO::logln("Unknown message {}!", message.type);
         }
     }
 

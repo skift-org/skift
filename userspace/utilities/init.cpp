@@ -2,13 +2,13 @@
 #include <skift/Environment.h>
 
 #include <libio/File.h>
-#include <libsystem/Logger.h>
+#include <libio/Streams.h>
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/process/Process.h>
 
 void start_service(const char *command, const char *socket)
 {
-    logger_info("Starting '%s'...", command);
+    IO::logln("Starting '{}'...", command);
     int compositor_pid = -1;
     process_run(command, &compositor_pid, TASK_WAITABLE);
 
@@ -59,9 +59,7 @@ void start_headless()
 
 int main(int, const char *[])
 {
-    logger_level(LOGGER_TRACE);
-
-    logger_info("Loading environement variables...");
+    IO::logln("Loading environement variables...");
     IO::File file{"/Configs/environment.json", OPEN_READ};
 
     if (file.exist())
@@ -70,22 +68,22 @@ int main(int, const char *[])
     }
     else
     {
-        logger_error("Environment file not found!");
+        IO::logln("Environment file not found!");
     }
 
     if constexpr (__CONFIG_IS_TEST__)
     {
-        logger_info("Running in testing mode...");
+        IO::logln("Running in testing mode...");
         start_test();
     }
     else if (filesystem_exist(FRAMEBUFFER_DEVICE_PATH, FILE_TYPE_DEVICE))
     {
-        logger_info("Running in graphical mode...");
+        IO::logln("Running in graphical mode...");
         start_desktop();
     }
     else
     {
-        logger_warn("No framebuffer! Starting a shell, good luck :^)");
+        IO::logln("No framebuffer! Starting a shell, good luck :^)");
         start_headless();
     }
 

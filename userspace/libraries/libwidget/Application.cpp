@@ -5,6 +5,7 @@
 #include <libio/Connection.h>
 #include <libio/Format.h>
 #include <libio/Socket.h>
+#include <libio/Streams.h>
 #include <libsettings/Setting.h>
 #include <libsystem/Logger.h>
 #include <libsystem/process/Process.h>
@@ -72,7 +73,7 @@ void do_message(const CompositorMessage &message)
     }
     else
     {
-        logger_error("Got an invalid message from compositor (%d)!", message.type);
+        IO::logln("Got an invalid message from compositor ({})!", message.type);
         hexdump(&message, sizeof(CompositorMessage));
         Application::exit(PROCESS_FAILURE);
     }
@@ -357,7 +358,7 @@ Result initialize(int argc, char **argv)
 
         if (!read_result.success())
         {
-            logger_error("Connection to the compositor closed %s!", read_result.description());
+            IO::logln("Connection to the compositor closed {}!", read_result.description());
             Application::exit(PROCESS_FAILURE);
         }
 
@@ -365,7 +366,7 @@ Result initialize(int argc, char **argv)
 
         if (message_size != sizeof(CompositorMessage))
         {
-            logger_error("Got a message with an invalid size from compositor %u != %u!", sizeof(CompositorMessage), message_size);
+            IO::logln("Got a message with an invalid size from compositor {} != {}!", sizeof(CompositorMessage), message_size);
             hexdump(&message, message_size);
             Application::exit(PROCESS_FAILURE);
         }

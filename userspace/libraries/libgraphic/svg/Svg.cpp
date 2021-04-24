@@ -43,9 +43,10 @@ ResultOr<RefPtr<Graphic::Bitmap>> render(IO::Reader &reader, int size_hint)
 
     if (doc.root().name() != "svg")
     {
-        logger_error("Svg file must begin with svg root element");
+        IO::logln("Svg file must begin with svg root element");
         return Result::ERR_INVALID_DATA;
     }
+
     auto dec_scanner = IO::NumberScanner::decimal();
 
     int width = 1024;

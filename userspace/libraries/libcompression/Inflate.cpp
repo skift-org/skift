@@ -6,7 +6,7 @@
 #include <libio/Copy.h>
 #include <libio/MemoryWriter.h>
 #include <libio/Skip.h>
-#include <libsystem/Logger.h>
+#include <libio/Streams.h>
 #include <libutils/InlineRingBuffer.h>
 
 namespace Compression
@@ -319,14 +319,14 @@ FLATTEN Result Inflate::read_blocks(IO::Reader &reader, IO::Writer &uncompressed
                 }
                 else
                 {
-                    logger_error("Invalid decoded symbol: %u", decoded_symbol);
+                    IO::logln("Invalid decoded symbol: {}", decoded_symbol);
                     return Result::ERR_INVALID_DATA;
                 }
             }
         }
         else
         {
-            logger_error("Invalid block type: %u", btype);
+            IO::logln("Invalid block type: {}", btype);
             return Result::ERR_INVALID_DATA;
         }
     } while (!bfinal);

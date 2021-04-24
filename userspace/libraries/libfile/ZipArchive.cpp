@@ -8,6 +8,7 @@
 #include <libio/Read.h>
 #include <libio/ScopedReader.h>
 #include <libio/Skip.h>
+#include <libio/Streams.h>
 #include <libio/Write.h>
 #include <libsystem/Logger.h>
 #include <libutils/Endian.h>
@@ -114,7 +115,7 @@ ZipArchive::ZipArchive(IO::Path path, bool read) : Archive(path)
 {
     if (read)
     {
-        logger_trace("Did read archive, result: %u ", read_archive());
+        IO::logln("Did read archive, result: {}", read_archive());
     }
 }
 
@@ -174,7 +175,7 @@ Result read_central_directory(IO::SeekableReader auto &reader)
     // Central directory starts here
     while (TRY(reader.tell()) < (TRY(reader.length()) - sizeof(CentralDirectoryFileHeader)))
     {
-        logger_trace("Read central directory header");
+        IO::logln("Read central directory header");
         auto cd_file_header = TRY(IO::peek<CentralDirectoryFileHeader>(reader));
 
         // Check if this is a central directory file header
@@ -187,7 +188,7 @@ Result read_central_directory(IO::SeekableReader auto &reader)
         TRY(IO::skip(reader, sizeof(CentralDirectoryFileHeader)));
 
         String name = TRY(IO::read_string(reader, cd_file_header.len_filename()));
-        logger_trace("Found central directory header: '%s'", name.cstring());
+        IO::logln("Found central directory header: '{}'", name);
 
         TRY(IO::skip(reader, cd_file_header.len_extrafield()));
         TRY(IO::skip(reader, cd_file_header.len_comment()));
@@ -197,7 +198,7 @@ Result read_central_directory(IO::SeekableReader auto &reader)
     le_uint32_t central_dir_end_sig = TRY(IO::read<uint32_t>(reader));
     if (central_dir_end_sig() != ZIP_END_OF_CENTRAL_DIR_HEADER_SIG)
     {
-        logger_error("Missing 'central directory end record' signature!");
+        IO::logln("Missing 'central directory end record' signature!");
         return Result::ERR_INVALID_DATA;
     }
 
@@ -213,16 +214,16 @@ Result ZipArchive::read_archive()
     // Archive does not exist
     if (!archive_file.exist())
     {
-        logger_error("Archive does not exist: %s", _path.string().cstring());
+        IO::logln("Archive does not exist: {}", _path.string());
         return Result::ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    logger_trace("Opening file: '%s'", _path.string().cstring());
+    IO::logln("Opening file: '%s'", _path.string());
 
     // A valid zip must atleast contain a "CentralDirectoryEndRecord"
     if (TRY(archive_file.length()) < sizeof(CentralDirectoryEndRecord))
     {
-        logger_error("Archive is too small to be a valid .zip: %s %u", _path.string().cstring(), archive_file.length());
+        IO::logln("Archive is too small to be a valid .zip: {} {}", _path.string(), archive_file.length().unwrap());
         return Result::ERR_INVALID_DATA;
     }
 
@@ -255,7 +256,7 @@ Result write_central_directory(IO::SeekableWriter auto &writer, Vector<Archive::
     auto start = TRY(writer.tell());
     for (const auto &entry : entries)
     {
-        logger_trace("Write central directory header: '%s'", entry.name.cstring());
+        IO::logln("Write central directory header: '{}'", entry.name);
         CentralDirectoryFileHeader header;
         header.flags = EF_NONE;
         header.compressed_size = entry.compressed_size;
@@ -288,7 +289,7 @@ Result ZipArchive::extract(unsigned int entry_index, IO::Writer &writer)
 
     if (entry.compression != CM_DEFLATED)
     {
-        logger_error("ZipArchive: Unsupported compression: %u\n", entry.compression);
+        IO::logln("ZipArchive: Unsupported compression: {}", entry.compression);
         return Result::ERR_NOT_IMPLEMENTED;
     }
 
@@ -313,7 +314,7 @@ Result ZipArchive::insert(const char *entry_name, IO::Reader &reader)
         file_reader.seek(IO::SeekFrom::start(entry.archive_offset));
 
         IO::ScopedReader scoped_reader(file_reader, entry.compressed_size);
-        logger_trace("Write existing local header: '%s'", entry.name.cstring());
+        IO::logln("Write existing local header: '{}'", entry.name);
         TRY(write_entry(entry, memory_writer, scoped_reader, entry.compressed_size));
     }
 
@@ -326,7 +327,7 @@ Result ZipArchive::insert(const char *entry_name, IO::Reader &reader)
     TRY(def.perform(counter, compressed_writer));
 
     // Write our new entry
-    logger_trace("Write new local header: '%s'", entry_name);
+    IO::logln("Write new local header: '{}'", entry_name);
 
     auto &new_entry = _entries.emplace_back();
     new_entry.name = String(entry_name);

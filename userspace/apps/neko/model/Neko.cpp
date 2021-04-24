@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include <libio/Streams.h>
 
 #include "neko/model/Neko.h"
 #include "neko/states/ChaseMouse.h"
@@ -64,7 +64,7 @@ void Neko::move_to(Math::Vec2f destination)
 
 void Neko::behavior(OwnPtr<Behavior> behavior)
 {
-    logger_info("Switched behavior to %s!", behavior->name());
+    IO::logln("Switched behavior to {}!", behavior->name());
 
     _next_behavior = behavior;
 }

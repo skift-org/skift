@@ -1,5 +1,5 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/Logger.h>
+#include <libio/Streams.h>
 #include <libsystem/process/Launchpad.h>
 #include <libutils/Assert.h>
 #include <libwidget/Event.h>
@@ -231,7 +231,7 @@ void TerminalWidget::handle_read()
 
     if (!read_result.success())
     {
-        logger_error("Terminal: read from server failed: %s", read_result.description());
+        IO::logln("Terminal: read from server failed: %s", read_result.description());
         return;
     }
 

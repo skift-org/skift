@@ -7,7 +7,7 @@
 #include <libio/Connection.h>
 #include <libio/File.h>
 #include <libio/Socket.h>
-#include <libsystem/Logger.h>
+#include <libio/Streams.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/unicode/UTF8Decoder.h>
@@ -96,7 +96,7 @@ int main(int argc, char const *argv[])
         }
         else
         {
-            logger_warn("Invalid keyboard packet with size=%d !", size);
+            IO::logln("Invalid keyboard packet with size={}!", size);
         }
 
         client_destroy_disconnected();
@@ -112,7 +112,7 @@ int main(int argc, char const *argv[])
         }
         else
         {
-            logger_warn("Invalid mouse packet with size=%d !", size);
+            IO::logln("Invalid mouse packet with size={}!", size);
         }
 
         client_destroy_disconnected();

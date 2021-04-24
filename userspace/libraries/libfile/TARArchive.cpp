@@ -1,6 +1,6 @@
 #include <libfile/TARArchive.h>
 #include <libio/File.h>
-#include <libsystem/Logger.h>
+#include <libio/Streams.h>
 
 struct PACKED TARRawBlock
 {
@@ -110,11 +110,11 @@ Result TARArchive::read_archive()
     // Archive does not exist
     if (!archive_file.exist())
     {
-        logger_error("Archive does not exist: %s", _path.string().cstring());
+        IO::logln("Archive does not exist: {}", _path.string().cstring());
         return SUCCESS;
     }
 
-    logger_trace("Opening file: '%s'", _path.string().cstring());
+    IO::logln("Opening file: '{}'", _path.string().cstring());
 
     TARRawBlock block;
     while (TRY(archive_file.read(&block, sizeof(TARRawBlock))) == sizeof(TARRawBlock))

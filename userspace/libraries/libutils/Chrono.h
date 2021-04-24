@@ -1,8 +1,7 @@
 #pragma once
 
 #include <abi/Syscalls.h>
-#include <libsystem/Logger.h>
-
+#include <libio/Streams.h>
 namespace Utils
 {
 
@@ -27,7 +26,7 @@ public:
         Tick end;
         hj_system_tick(&end);
 
-        logger_trace("Chrono '%s' ended at %u", _name, end - _start);
+        IO::logln("Chrono '{}' ended at {}", _name, end - _start);
     }
 };
 

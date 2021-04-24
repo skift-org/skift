@@ -38,16 +38,12 @@ extern "C"
 
         int entry_index = __exit_entry_count;
 
-        // logger_debug("__cxa_finalize: %d entries in the finalizer list", entry_index);
-
         while (--entry_index >= 0)
         {
             auto &exit_entry = __exit_entries[entry_index];
             bool needs_calling = !exit_entry.has_been_called && (!dso_handle || dso_handle == exit_entry.dso_handle);
             if (needs_calling)
             {
-                // logger_debug("__cxa_finalize: calling entry[%d] %p(%p) dso: %p", entry_index, exit_entry.method, exit_entry.parameter, exit_entry.dso_handle);
-
                 exit_entry.method(exit_entry.parameter);
                 exit_entry.has_been_called = true;
             }

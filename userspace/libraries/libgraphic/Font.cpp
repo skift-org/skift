@@ -3,10 +3,11 @@
 #include <libgraphic/Font.h>
 #include <libio/File.h>
 #include <libio/Format.h>
+#include <libio/Path.h>
 #include <libio/Read.h>
+#include <libio/Streams.h>
 #include <libsystem/Logger.h>
 #include <libutils/HashMap.h>
-#include <libio/Path.h>
 
 namespace Graphic
 {
@@ -44,7 +45,7 @@ ResultOr<RefPtr<Font>> Font::get(String name)
 
         if (!glyph_or_error.success())
         {
-            logger_error("Failed to load font %s: missing glyphs", name.cstring());
+            IO::logln("Failed to load font {}: missing glyphs", name.cstring());
             return glyph_or_error.result();
         }
 
@@ -52,7 +53,7 @@ ResultOr<RefPtr<Font>> Font::get(String name)
 
         if (!bitmap_or_error.success())
         {
-            logger_error("Failed to load font %s: missing bitmap", name.cstring());
+            IO::logln("Failed to load font {}: missing bitmap", name.cstring());
             return bitmap_or_error.result();
         }
 

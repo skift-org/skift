@@ -1,8 +1,8 @@
 #include <string.h>
 
 #include <libio/File.h>
+#include <libio/Streams.h>
 #include <libjson/Json.h>
-#include <libsystem/Logger.h>
 #include <libutils/NumberParser.h>
 #include <libwidget/Theme.h>
 
@@ -114,7 +114,7 @@ bool theme_is_dark()
 
 void theme_load(String path)
 {
-    logger_info("Loading theme from '%s'", path.cstring());
+    IO::logln("Loading theme from '{}'", path.cstring());
 
     IO::File theme_file{path, OPEN_READ};
 

@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include <libio/Streams.h>
 
 #include "compositor/Client.h"
 #include "compositor/Manager.h"
@@ -227,7 +227,7 @@ void Window::flip_buffers(int frontbuffer_handle, Math::Vec2i frontbuffer_size, 
 
         if (!new_frontbuffer.success())
         {
-            logger_error("Client application gave us a jankie shared memory object id");
+            IO::logln("Client application gave us a jankie shared memory object id");
             return;
         }
 
@@ -241,7 +241,7 @@ void Window::flip_buffers(int frontbuffer_handle, Math::Vec2i frontbuffer_size, 
 
         if (!new_backbuffer.success())
         {
-            logger_error("Client application gave us a jankie shared memory object id");
+            IO::logln("Client application gave us a jankie shared memory object id");
             return;
         }
 

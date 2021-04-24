@@ -1,7 +1,10 @@
 #pragma once
 
+#include <libio/BufLine.h>
 #include <libio/Format.h>
 #include <libio/Handle.h>
+
+#include <libsystem/process/Process.h>
 
 namespace IO
 {
@@ -130,6 +133,17 @@ template <typename... Args>
 static ResultOr<size_t> log(const char *fmt, Args... args) { return print(log(), fmt, forward<Args>(args)...); }
 
 template <typename... Args>
-static ResultOr<size_t> logln(const char *fmt, Args... args) { return println(log(), fmt, forward<Args>(args)...); }
+static ResultOr<size_t> logln(const char *fmt, Args... args)
+{
+    IO::BufLine buf{log()};
+
+    size_t written = 0;
+
+    written = TRY(print(buf, "\e[{}m{}({}) \e[37m", (process_this() % 6) + 91, process_name(), process_this()));
+    written += TRY(print(buf, fmt, forward<Args>(args)...));
+    written += TRY(IO::write(buf, "\e[m\n"));
+
+    return written;
+}
 
 } // namespace IO

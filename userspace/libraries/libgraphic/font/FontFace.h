@@ -8,10 +8,11 @@ namespace Graphic::Font
 {
 enum FontStyle
 {
-    FONT_STYLE_REGULAR,
-    FONT_STYLE_BOLD,
-    FONT_STYLE_ITALIC
+    FONT_STYLE_REGULAR  = (1 << 0),
+    FONT_STYLE_BOLD     = (1 << 1),
+    FONT_STYLE_ITALIC   = (1 << 2)
 };
+
 class FontFace : public RefCounted<FontFace>
 {
 public:

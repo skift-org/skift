@@ -7,11 +7,10 @@
 namespace Widget
 {
 
-static inline RefPtr<Element> spacing(Insetsi insets, RefPtr<Element> child)
+static inline RefPtr<Element> spacing(Insetsi outsets, RefPtr<Element> child)
 {
-    auto layout = stack({fill(child)});
-    layout->insets(insets);
-    return layout;
+    child->outsets(outsets);
+    return child;
 }
 
 } // namespace Widget

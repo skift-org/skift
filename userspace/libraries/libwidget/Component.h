@@ -2,6 +2,7 @@
 
 #include <libasync/Invoker.h>
 #include <libwidget/Element.h>
+#include <libwidget/Layouts.h>
 
 namespace Widget
 {
@@ -12,13 +13,13 @@ private:
     OwnPtr<Async::Invoker> _rebuild_invoker;
 
 public:
-    void mounted() override { build(); }
+    void mounted() override { add(fill(build())); }
 
     Component()
     {
-        _rebuild_invoker = own<Async::Invoker>([&] {
+        _rebuild_invoker = own<Async::Invoker>([this] {
             clear();
-            build();
+            add(fill(build()));
         });
     }
 
@@ -27,7 +28,7 @@ public:
         _rebuild_invoker->invoke_later();
     }
 
-    virtual void build() {}
+    virtual RefPtr<Element> build() { return nullptr; }
 };
 
 } // namespace Widget

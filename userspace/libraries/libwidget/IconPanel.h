@@ -13,13 +13,16 @@ private:
     Graphic::IconSize _icon_size = Graphic::ICON_18PX;
 
 public:
-    void icon_size(Graphic::IconSize size) { _icon_size = size; }
-
-    IconPanel(RefPtr<Graphic::Icon> icon);
+    IconPanel(RefPtr<Graphic::Icon> icon, Graphic::IconSize size = Graphic::IconSize::ICON_18PX);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 
     Math::Vec2i size() override;
 };
+
+static inline RefPtr<IconPanel> icon(String icon, Graphic::IconSize size = Graphic::IconSize::ICON_18PX)
+{
+    return make<IconPanel>(Graphic::Icon::get(icon), size);
+}
 
 } // namespace Widget

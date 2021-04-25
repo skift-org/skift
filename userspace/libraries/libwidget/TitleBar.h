@@ -17,10 +17,6 @@ private:
     bool _is_dragging = false;
 
 public:
-    String title() { return _title; }
-
-    RefPtr<Graphic::Icon> icon() { return _icon; }
-
     void title(String title)
     {
         _title = title;
@@ -37,9 +33,12 @@ public:
 
     void event(Event *event) override;
 
-    void build() override;
+    RefPtr<Element> build() override;
 };
 
-static inline RefPtr<TitleBar> titlebar(RefPtr<Graphic::Icon> icon, String title) { return make<TitleBar>(icon, title); }
+static inline RefPtr<TitleBar> titlebar(RefPtr<Graphic::Icon> icon, String title)
+{
+    return make<TitleBar>(icon, title);
+}
 
 } // namespace Widget

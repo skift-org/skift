@@ -147,13 +147,6 @@ public:
 
     int flags() { return _flags; }
 
-    void window(Window *window)
-    {
-        Assert::is_true(_window == nullptr);
-
-        _window = window;
-    }
-
     Window *window()
     {
         Assert::not_null(_window);
@@ -296,7 +289,10 @@ public:
 
     void add(Vector<RefPtr<Element>> childs)
     {
-        _childs.push_back_many(childs);
+        for (auto &child : childs)
+        {
+            add(child);
+        }
     }
 
     RefPtr<Element> add(RefPtr<Element> child);
@@ -304,6 +300,8 @@ public:
     void del(RefPtr<Element> child);
 
     void mount(Element &parent);
+
+    void mount(Window &window);
 
     void unmount();
 

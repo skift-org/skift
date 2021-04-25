@@ -2,7 +2,6 @@
 
 #include <libsystem/system/Memory.h>
 #include <libwidget/Application.h>
-#include <libwidget/Container.h>
 #include <libwidget/Event.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Theme.h>
@@ -74,8 +73,12 @@ Window::Window(WindowFlag flags)
     backbuffer = Graphic::Bitmap::create_shared(250, 250).unwrap();
     backbuffer_painter = own<Graphic::Painter>(backbuffer);
 
-    _root = make<Container>();
-    _root->window(this);
+    _root = build();
+    if (_root == nullptr)
+    {
+        _root = make<Element>();
+    }
+    _root->mount(*this);
 
     _keyboard_focus = _root.naked();
 

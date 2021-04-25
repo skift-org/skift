@@ -1,14 +1,31 @@
 #pragma once
 
 #include <libwidget/Button.h>
+#include <libwidget/IconPanel.h>
+#include <libwidget/Label.h>
+#include <libwidget/Layouts.h>
 
 namespace Settings
 {
 
-class Link : public Widget::Button
+RefPtr<Widget::Element> link(
+    RefPtr<Widget::Element> icon,
+    String text,
+    Callback<void(void)> on_click = nullptr)
 {
-public:
-    Link(RefPtr<Graphic::Icon> icon, String name);
-};
+    auto button = Widget::button(Widget::Button::TEXT, on_click);
+
+    button->add(
+        Widget::spacing(
+            {8, 24},
+            Widget::vflow(
+                4,
+                {
+                    Widget::fill(icon),
+                    Widget::label(text, Anchor::CENTER),
+                })));
+
+    return fill(button);
+}
 
 } // namespace Settings

@@ -35,8 +35,7 @@ int main(int, char **)
     icon_and_title_container->border_radius(6);
     icon_and_title_container->insets(Insetsi{8});
 
-    auto title_icon = icon_and_title_container->add<Widget::IconPanel>(Graphic::Icon::get("power-standby"));
-    title_icon->icon_size(Graphic::ICON_36PX);
+    auto title_icon = Widget::icon("power-standby", Graphic::ICON_36PX);
 
     auto warning_container = icon_and_title_container->add<Widget::Container>();
     warning_container->flags(Widget::Element::FILL);

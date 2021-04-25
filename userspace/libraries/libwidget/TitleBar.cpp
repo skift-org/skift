@@ -1,6 +1,8 @@
 #include <libgraphic/Painter.h>
 
 #include <libwidget/Button.h>
+#include <libwidget/IconPanel.h>
+#include <libwidget/Layouts.h>
 #include <libwidget/Spacer.h>
 #include <libwidget/TitleBar.h>
 #include <libwidget/Window.h>
@@ -15,8 +17,6 @@ TitleBar::TitleBar(RefPtr<Graphic::Icon> icon, String title)
 
 void TitleBar::event(Event *event)
 {
-    UNUSED(event);
-
     if (is_mouse_event(event))
     {
         if (window()->maximised())
@@ -52,28 +52,29 @@ void TitleBar::event(Event *event)
     }
 }
 
-void TitleBar::build()
+RefPtr<Element> TitleBar::build()
 {
-    layout(HFLOW(4));
-    insets(4);
+    bool window_resizable = window()->flags() & WINDOW_RESIZABLE;
 
-    add<Button>(Button::TEXT, _icon, _title);
+    // clang-format off
 
-    add<Spacer>();
+    return spacing(
+        4,
+        hflow(4, {
+            button(Button::TEXT, _icon, _title),
+            spacer(),
+            window_resizable
+                ? button(Button::TEXT, Graphic::Icon::get("plus"), [this] {
+                    window()->toggle_maximise();
+                })
+                : nullptr,
+            button(Button::TEXT, Graphic::Icon::get("close"), [this] {
+                window()->hide();
+            })
+        })
+    );
 
-    if (window()->flags() & WINDOW_RESIZABLE)
-    {
-        auto button_maximize = add<Button>(Button::TEXT, Graphic::Icon::get("plus"));
-        button_maximize->on(Event::ACTION, [this](auto) {
-            window()->toggle_maximise();
-        });
-    }
-
-    auto close_button = add<Button>(Button::TEXT, Graphic::Icon::get("close"));
-
-    close_button->on(Event::ACTION, [this](auto) {
-        window()->hide();
-    });
+    // clang-format on
 }
 
 } // namespace Widget

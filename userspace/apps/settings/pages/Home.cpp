@@ -5,24 +5,34 @@ namespace Settings
 {
 
 HomePage::HomePage()
-    : Container()
 {
     layout(STACK());
     flags(Element::FILL);
+}
 
-    auto links = add<Container>();
-    links->layout(GRID(6, 4, 8, 8));
-    links->insets(16);
+RefPtr<Widget::Element> HomePage::build()
+{
+    using namespace Widget;
 
-    links->add<Link>(Graphic::Icon::get("home"), "test");
-    links->add<Link>(Graphic::Icon::get("home"), "test");
-    links->add<Link>(Graphic::Icon::get("home"), "test");
-    links->add<Link>(Graphic::Icon::get("home"), "test");
-    links->add<Link>(Graphic::Icon::get("home"), "test");
-    links->add<Link>(Graphic::Icon::get("home"), "test");
-    links->add<Link>(Graphic::Icon::get("home"), "test");
-    links->add<Link>(Graphic::Icon::get("home"), "test");
-    links->add<Link>(Graphic::Icon::get("home"), "test");
+    // clang-format off
+    return stack({
+        spacing(16,
+            grid(4, 4, 8, 8,
+                {
+                    link(icon("home",Graphic::ICON_36PX), "test"),
+                    link(icon("home",Graphic::ICON_36PX), "test"),
+                    link(icon("home",Graphic::ICON_36PX), "test"),
+                    link(icon("home",Graphic::ICON_36PX), "test"),
+                    link(icon("home",Graphic::ICON_36PX), "test"),
+                    link(icon("home",Graphic::ICON_36PX), "test"),
+                    link(icon("home",Graphic::ICON_36PX), "test"),
+                    link(icon("home",Graphic::ICON_36PX), "test"),
+                    link(icon("home",Graphic::ICON_36PX), "test"),
+                }
+            )
+        )
+    });
+    // clang-format on
 }
 
 } // namespace Settings

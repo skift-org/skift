@@ -135,6 +135,8 @@ public:
 
     /* --- Childs ----------------------------------------------------------- */
 
+    virtual RefPtr<Element> build() { return nullptr; }
+
     RefPtr<Element> root() { return _root; }
 
     void focus_widget(Element *widget);

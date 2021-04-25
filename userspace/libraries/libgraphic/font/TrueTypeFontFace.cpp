@@ -112,8 +112,7 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
         switch (table_tag())
         {
         case TABLE_TAG_CMAP:
-            IO::logln("CMAP: {}", table_offset());
-            _has_cmap = true;
+            read_table_cmap(table_reader);
             break;
         case TABLE_TAG_LOCA:
             IO::logln("LOCA: {}", table_offset());
@@ -174,17 +173,22 @@ ResultOr<Math::Vec2<uint16_t>> Graphic::Font::TrueTypeFontFace::read_version(IO:
 
 Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &reader)
 {
-    auto version = TRY(read_version(reader));
+    auto version = TRY(IO::read<uint16_t>(reader));
     UNUSED(version);
     auto num_encodings = TRY(IO::read<be_uint16_t>(reader));
+    IO::logln("CMAP num_encodings: {}", num_encodings());
 
     for (uint16_t i = 0; i < num_encodings(); i++)
     {
-        auto platform_id = TRY(IO::read<be_truetype_platform>(reader));
+        auto platform_id = TRY(IO::read<be_uint16_t>(reader));
         UNUSED(platform_id);
+        IO::logln("CMAP platform_id: {}", platform_id());
+
         TRY(IO::read<be_uint16_t>(reader));
         TRY(IO::read<be_uint32_t>(reader));
     }
+
+    _has_cmap = true;
 
     return Result::SUCCESS;
 }

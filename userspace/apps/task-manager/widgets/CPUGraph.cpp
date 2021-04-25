@@ -7,7 +7,7 @@
 #include <libsystem/system/System.h>
 
 #include <libwidget/Container.h>
-#include <libwidget/IconPanel.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Label.h>
 
 #include "task-manager/widgets/CPUGraph.h"
@@ -25,7 +25,7 @@ CPUGraph::CPUGraph(RefPtr<TaskModel> model)
 
     auto icon_and_text = add<Widget::Container>();
     icon_and_text->layout(HFLOW(4));
-    icon_and_text->add<Widget::IconPanel>(Graphic::Icon::get("memory"));
+    icon_and_text->add(Widget::icon("memory"));
     icon_and_text->add<Widget::Label>("Processor");
 
     auto cpu_filler = add<Widget::Container>();

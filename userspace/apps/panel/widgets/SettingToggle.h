@@ -2,7 +2,7 @@
 
 #include <libsettings/Setting.h>
 #include <libwidget/Button.h>
-#include <libwidget/IconPanel.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Label.h>
 #include <libwidget/Switch.h>
 
@@ -41,7 +41,7 @@ public:
 
         insets({12, 12, 12, 12});
 
-        auto icon = add<Widget::IconPanel>(_icon);
+        auto icon = add(Widget::icon(_icon));
         icon->insets(Insetsi(0, 0, 0, 4));
 
         auto label = add<Widget::Label>(_name);

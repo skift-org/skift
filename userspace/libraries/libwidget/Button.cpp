@@ -1,6 +1,6 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Button.h>
-#include <libwidget/IconPanel.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Image.h>
 #include <libwidget/Label.h>
 
@@ -91,7 +91,7 @@ Button::Button(Style style, RefPtr<Graphic::Icon> icon) : Button{style}
     min_height(36);
     flags(Element::GREEDY | Element::SQUARE);
 
-    auto icon_panel = add<IconPanel>(icon);
+    auto icon_panel = add(Widget::icon(icon));
 
     if (style == FILLED)
     {
@@ -117,7 +117,7 @@ Button::Button(Style style, RefPtr<Graphic::Icon> icon, String text) : Button{st
     insets(Insetsi(0, 0, 12, 16));
     min_width(64);
 
-    auto icon_panel = add<IconPanel>(icon);
+    auto icon_panel = add(Widget::icon(icon));
     icon_panel->insets(Insetsi(0, 0, 0, 8));
 
     auto label = add<Label>(text);

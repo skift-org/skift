@@ -1,7 +1,7 @@
 #include <libgraphic/Painter.h>
 
 #include <libwidget/Button.h>
-#include <libwidget/IconPanel.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Layouts.h>
 #include <libwidget/Spacer.h>
 #include <libwidget/TitleBar.h>

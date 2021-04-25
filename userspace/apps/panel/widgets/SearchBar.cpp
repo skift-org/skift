@@ -1,4 +1,4 @@
-#include <libwidget/IconPanel.h>
+#include <libwidget/Elements.h>
 #include <libwidget/TextField.h>
 
 #include "panel/widgets/SearchBar.h"
@@ -16,7 +16,7 @@ SearchBar::SearchBar(RefPtr<Widget::TextModel> model) : Panel()
     layout(HFLOW(4));
     min_height(36);
 
-    auto icon = add<Widget::IconPanel>(Graphic::Icon::get("search"));
+    auto icon = add(Widget::icon("search"));
     icon->color(Widget::THEME_FOREGROUND, Graphic::Colors::BLACK);
 
     auto field = add<Widget::TextField>(model);

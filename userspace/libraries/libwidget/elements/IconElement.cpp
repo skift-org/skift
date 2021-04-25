@@ -1,15 +1,15 @@
 #include <libgraphic/Painter.h>
-#include <libwidget/IconPanel.h>
+#include <libwidget/elements/IconElement.h>
 
 namespace Widget
 {
 
-IconPanel::IconPanel(RefPtr<Graphic::Icon> icon, Graphic::IconSize size)
+IconElement::IconElement(RefPtr<Graphic::Icon> icon, Graphic::IconSize size)
     : _icon(icon), _icon_size{size}
 {
 }
 
-void IconPanel::paint(Graphic::Painter &painter, const Math::Recti &)
+void IconElement::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     if (!_icon)
     {
@@ -25,7 +25,7 @@ void IconPanel::paint(Graphic::Painter &painter, const Math::Recti &)
         color(THEME_FOREGROUND));
 }
 
-Math::Vec2i IconPanel::size()
+Math::Vec2i IconElement::size()
 {
     if (_icon)
     {

@@ -4,7 +4,7 @@
 #include <libsystem/system/System.h>
 #include <libutils/StringBuilder.h>
 #include <libwidget/Container.h>
-#include <libwidget/IconPanel.h>
+#include <libwidget/Elements.h>
 
 #include "task-manager/widgets/RAMGraph.h"
 
@@ -21,7 +21,7 @@ RAMGraph::RAMGraph(RefPtr<TaskModel> model)
 
     auto icon_and_text = add<Widget::Container>();
     icon_and_text->layout(HFLOW(4));
-    icon_and_text->add<Widget::IconPanel>(Graphic::Icon::get("chip"));
+    icon_and_text->add(Widget::icon("chip"));
     icon_and_text->add<Widget::Label>("Memory");
 
     auto cpu_filler = add<Widget::Container>();

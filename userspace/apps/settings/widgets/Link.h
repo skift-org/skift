@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libwidget/Button.h>
-#include <libwidget/IconPanel.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Label.h>
 #include <libwidget/Layouts.h>
 

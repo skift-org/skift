@@ -192,4 +192,25 @@ public:
     void handle_keyboard_key_release(Event *event);
 };
 
+static inline Window *window(WindowFlag flags, Math::Vec2i size, RefPtr<Element> root)
+{
+    auto window = new Window(flags);
+    window->size(size);
+    window->root()->add(root);
+    return window;
+}
+
+static inline Window *window(WindowFlag flags, RefPtr<Element> root)
+{
+    auto window = new Window(flags);
+    window->root()->add(root);
+    window->resize_to_content();
+    return window;
+}
+
+static inline Window *window(RefPtr<Element> root)
+{
+    return window(WINDOW_NONE, root);
+}
+
 } // namespace Widget

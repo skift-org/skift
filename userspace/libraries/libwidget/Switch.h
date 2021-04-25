@@ -28,8 +28,9 @@ public:
         should_repaint();
     }
 
-    Switch()
+    Switch(bool state = false)
     {
+        _state = state;
         pin_width(WIDTH);
         pin_height(HEIGHT);
     }
@@ -71,5 +72,7 @@ public:
         }
     }
 };
+
+static inline RefPtr<Switch> toggle(bool state = false) { return make<Switch>(state); }
 
 } // namespace Widget

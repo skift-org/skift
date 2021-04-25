@@ -35,4 +35,6 @@ public:
     void paint(Graphic::Painter &painter, const Math::Recti &) override;
 };
 
+static inline RefPtr<Slider> slider() { return make<Slider>(); }
+
 } // namespace Widget

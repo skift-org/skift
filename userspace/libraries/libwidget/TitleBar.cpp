@@ -11,9 +11,6 @@ namespace Widget
 TitleBar::TitleBar(RefPtr<Graphic::Icon> icon, String title)
     : _icon{icon}, _title{title}
 {
-    _rebuild_invoker = own<Async::Invoker>([&] {
-        clear();
-    });
 }
 
 void TitleBar::event(Event *event)

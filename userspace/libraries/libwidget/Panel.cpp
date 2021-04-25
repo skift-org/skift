@@ -4,9 +4,9 @@
 namespace Widget
 {
 
-Panel::Panel()
-
+Panel::Panel(int radius)
 {
+    _border_radius = radius;
 }
 
 void Panel::paint(Graphic::Painter &painter, const Math::Recti &)

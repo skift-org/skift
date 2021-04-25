@@ -31,4 +31,6 @@ public:
     String text();
 };
 
+static inline RefPtr<TextField> textfield(RefPtr<TextModel> model) { return make<TextField>(model); }
+
 } // namespace Widget

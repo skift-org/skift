@@ -13,4 +13,6 @@ struct Spacer : public Element
     }
 };
 
+static inline RefPtr<Spacer> spacer() { return make<Spacer>(); }
+
 } // namespace Widget

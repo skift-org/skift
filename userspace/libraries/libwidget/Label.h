@@ -29,4 +29,6 @@ public:
     Math::Vec2i size() override;
 };
 
+static inline RefPtr<Label> label(String text, Anchor anchor = Anchor::LEFT) { return make<Label>(text, anchor); }
+
 } // namespace Widget

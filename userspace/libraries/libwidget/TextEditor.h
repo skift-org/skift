@@ -107,4 +107,6 @@ public:
     void do_layout() override;
 };
 
+static inline RefPtr<TextEditor> texteditor(RefPtr<TextModel> model) { return make<TextEditor>(model); }
+
 } // namespace Widget

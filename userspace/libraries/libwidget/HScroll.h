@@ -9,15 +9,22 @@ namespace Widget
 class HScroll : public Element
 {
 private:
-    RefPtr<Container> _host = nullptr;
+    RefPtr<Element> _host = nullptr;
     RefPtr<ScrollBar> _scrollbar = nullptr;
 
 public:
-    RefPtr<Container> host() { return _host; }
+    RefPtr<Element> host() { return _host; }
 
-    HScroll()
+    HScroll(RefPtr<Element> content = nullptr)
     {
-        _host = add<Container>();
+        if (content != nullptr)
+        {
+            _host = add(content);
+        }
+        else
+        {
+            _host = add<Element>();
+        }
 
         _scrollbar = add<ScrollBar>();
         _scrollbar->flags(Element::NOT_AFFECTED_BY_SCROLL);
@@ -51,5 +58,7 @@ public:
         return {0, _host->size().y()};
     }
 };
+
+static inline RefPtr<HScroll> hscroll(RefPtr<Element> content = nullptr) { return make<HScroll>(content); }
 
 } // namespace Widget

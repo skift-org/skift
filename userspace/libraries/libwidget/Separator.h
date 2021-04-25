@@ -14,4 +14,6 @@ struct Separator : public Element
     Math::Vec2i size() override;
 };
 
+static inline RefPtr<Separator> separator() { return make<Separator>(); }
+
 } // namespace Widget

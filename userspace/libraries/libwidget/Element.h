@@ -294,6 +294,11 @@ public:
         return add(make<T>(forward<Args>(args)...));
     }
 
+    void add(Vector<RefPtr<Element>> childs)
+    {
+        _childs.push_back_many(childs);
+    }
+
     RefPtr<Element> add(RefPtr<Element> child);
 
     void del(RefPtr<Element> child);

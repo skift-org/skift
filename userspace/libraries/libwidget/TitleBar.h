@@ -2,18 +2,17 @@
 
 #include <libasync/Invoker.h>
 #include <libwidget/Button.h>
+#include <libwidget/Component.h>
 #include <libwidget/Spacer.h>
 
 namespace Widget
 {
 
-class TitleBar : public Element
+class TitleBar : public Component
 {
 private:
     RefPtr<Graphic::Icon> _icon;
     String _title;
-
-    OwnPtr<Async::Invoker> _rebuild_invoker;
 
     bool _is_dragging = false;
 
@@ -38,14 +37,9 @@ public:
 
     void event(Event *event) override;
 
-    void should_rebuild()
-    {
-        _rebuild_invoker->invoke_later();
-    }
-
-    void mounted() override { build(); }
-
-    void build();
+    void build() override;
 };
+
+static inline RefPtr<TitleBar> titlebar(RefPtr<Graphic::Icon> icon, String title) { return make<TitleBar>(icon, title); }
 
 } // namespace Widget

@@ -10,15 +10,22 @@ namespace Widget
 class VScroll : public Element
 {
 private:
-    RefPtr<Container> _host = nullptr;
+    RefPtr<Element> _host = nullptr;
     RefPtr<ScrollBar> _scrollbar = nullptr;
 
 public:
-    RefPtr<Container> host() { return _host; }
+    RefPtr<Element> host() { return _host; }
 
-    VScroll()
+    VScroll(RefPtr<Element> content = nullptr)
     {
-        _host = add<Container>();
+        if (content != nullptr)
+        {
+            _host = add(content);
+        }
+        else
+        {
+            _host = add<Element>();
+        }
 
         _scrollbar = add<ScrollBar>();
         _scrollbar->flags(Element::NOT_AFFECTED_BY_SCROLL);
@@ -56,5 +63,7 @@ public:
         return {_host->size().x(), 0};
     }
 };
+
+static inline RefPtr<VScroll> vscroll(RefPtr<Element> content = nullptr) { return make<VScroll>(content); }
 
 } // namespace Widget

@@ -60,7 +60,7 @@ public:
         _horizontal = value;
     }
 
-    ScrollBar();
+    ScrollBar(bool horizontal = false);
 
     void scroll_to(Math::Vec2i mouse_position);
 
@@ -91,5 +91,7 @@ public:
         return {SIZE, SIZE};
     }
 };
+
+static inline RefPtr<ScrollBar> scrollbar(bool horizontal) { return make<ScrollBar>(horizontal); }
 
 } // namespace Widget

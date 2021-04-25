@@ -25,4 +25,11 @@ public:
     virtual Math::Vec2i size() override;
 };
 
+static inline RefPtr<Image> image(
+    RefPtr<Graphic::Bitmap> bitmap,
+    Graphic::BitmapScaling scaling = Graphic::BitmapScaling::FIT)
+{
+    return make<Image>(bitmap, scaling);
+}
+
 } // namespace Widget

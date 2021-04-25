@@ -3,10 +3,8 @@
 
 #include "file-manager/MainWindow.h"
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
-    Widget::Application::initialize(argc, argv);
-
     auto navigation = make<FilePicker::Navigation>();
     auto bookmarks = FilePicker::Bookmarks::load();
 
@@ -15,5 +13,5 @@ int main(int argc, char **argv)
     navigation->go_home_dont_record_history();
     window->show();
 
-    return Widget::Application::run();
+    return Widget::Application::the()->run();
 }

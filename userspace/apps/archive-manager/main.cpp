@@ -6,8 +6,6 @@
 
 int main(int argc, char **argv)
 {
-    Widget::Application::initialize(argc, argv);
-
     auto navigation = make<FilePicker::Navigation>();
 
     MainWindow *window = nullptr;
@@ -24,5 +22,5 @@ int main(int argc, char **argv)
 
     window->show();
 
-    return Widget::Application::run();
+    return Widget::Application::the()->run();
 }

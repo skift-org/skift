@@ -12,15 +12,8 @@ static Demo _demos[] = {
     {nullptr, nullptr},
 };
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
-    Result result = Widget::Application::initialize(argc, argv);
-
-    if (result != SUCCESS)
-    {
-        return -1;
-    }
-
     Widget::Window *window = new Widget::Window(WINDOW_RESIZABLE);
     window->size(Math::Vec2i(500, 400));
 
@@ -48,5 +41,5 @@ int main(int argc, char **argv)
 
     window->show();
 
-    return Widget::Application::run();
+    return Widget::Application::the()->run();
 }

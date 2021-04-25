@@ -32,7 +32,7 @@ void Idle::update(Neko &neko)
 
         neko.behavior(_random.pick(next, AERAY_LENGTH(next)));
     }
-    else if (Widget::Application::mouse_position().distance_to(neko.position()) > 64)
+    else if (Widget::Application::the()->mouse_position().distance_to(neko.position()) > 64)
     {
         neko.behavior(own<Surprised>());
     }

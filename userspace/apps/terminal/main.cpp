@@ -5,10 +5,8 @@
 
 #include "terminal/TerminalWidget.h"
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
-    Widget::Application::initialize(argc, argv);
-
     theme_set_color(Widget::THEME_BACKGROUND, Widget::theme_get_color(Widget::THEME_ANSI_BACKGROUND));
 
     Widget::Window *window = new Widget::Window(WINDOW_RESIZABLE | WINDOW_ACRYLIC);
@@ -29,5 +27,5 @@ int main(int argc, char **argv)
 
     window->show();
 
-    return Widget::Application::run();
+    return Widget::Application::the()->run();
 }

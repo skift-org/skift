@@ -1,49 +1,98 @@
 #include <assert.h>
 
 #include <libasync/Loop.h>
-#include <libasync/Notifier.h>
-#include <libio/Connection.h>
 #include <libio/Format.h>
 #include <libio/Socket.h>
 #include <libio/Streams.h>
-#include <libsettings/Setting.h>
-#include <libsystem/Logger.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/utils/Hexdump.h>
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
 
-#include "compositor/Protocol.h"
-
 namespace Widget
-{
-
-namespace Application
 {
 
 /* --- Context -------------------------------------------------------------- */
 
-enum class State
-{
-    UNINITIALIZED,
-    RUNNING,
-    EXITING,
-};
+static RefPtr<Application> _instance = nullptr;
 
-Vector<Window *> _windows;
-State _state = State::UNINITIALIZED;
-IO::Connection _connection;
-OwnPtr<Async::Notifier> _connection_notifier;
-bool _wireframe = false;
+RefPtr<Application> Application::the()
+{
+    if (_instance == nullptr)
+    {
+        _instance = make<Application>();
+    }
+
+    return _instance;
+}
+
+Application::Application()
+{
+    _setting_theme = own<Settings::Setting>(
+        "appearance:widgets.theme",
+        [this](const Json::Value &value) {
+            auto new_theme = value.as_string();
+
+            theme_load(IO::format("/Files/Themes/{}.json", value.as_string()));
+
+            for (size_t i = 0; i < _windows.count(); i++)
+            {
+                _windows[i]->should_repaint(_windows[i]->bound());
+            }
+        });
+
+    _setting_wireframe = own<Settings::Setting>(
+        "appearance:widgets.wireframe",
+        [this](const Json::Value &value) {
+            _wireframe = value.as_bool();
+            for (size_t i = 0; i < _windows.count(); i++)
+            {
+                _windows[i]->should_repaint(_windows[i]->bound());
+            }
+        });
+
+    _connection = IO::Socket::connect("/Session/compositor.ipc").unwrap();
+
+    _connection_notifier = own<Async::Notifier>(_connection, POLL_READ, [this]() {
+        CompositorMessage message = {};
+        auto read_result = _connection.read(&message, sizeof(CompositorMessage));
+
+        if (!read_result.success())
+        {
+            IO::logln("Connection to the compositor closed {}!", read_result.description());
+            this->exit(PROCESS_FAILURE);
+        }
+
+        size_t message_size = read_result.unwrap();
+
+        if (message_size != sizeof(CompositorMessage))
+        {
+            IO::logln("Got a message with an invalid size from compositor {} != {}!", sizeof(CompositorMessage), message_size);
+            hexdump(&message, message_size);
+            this->exit(PROCESS_FAILURE);
+        }
+
+        do_message(message);
+    });
+
+    auto result_or_greetings = wait_for_message(COMPOSITOR_MESSAGE_GREETINGS);
+
+    if (result_or_greetings.success())
+    {
+        auto greetings = result_or_greetings.unwrap();
+
+        Screen::bound(greetings.greetings.screen_bound);
+    }
+}
 
 /* --- IPC ------------------------------------------------------------------ */
 
-void send_message(CompositorMessage message)
+void Application::send_message(CompositorMessage message)
 {
     _connection.write(&message, sizeof(message));
 }
 
-void do_message(const CompositorMessage &message)
+void Application::do_message(const CompositorMessage &message)
 {
     if (message.type == COMPOSITOR_MESSAGE_EVENT_WINDOW)
     {
@@ -79,7 +128,7 @@ void do_message(const CompositorMessage &message)
     }
 }
 
-ResultOr<CompositorMessage> wait_for_message(CompositorMessageType expected_message)
+ResultOr<CompositorMessage> Application::wait_for_message(CompositorMessageType expected_message)
 {
     Vector<CompositorMessage> pendings;
 
@@ -110,19 +159,13 @@ ResultOr<CompositorMessage> wait_for_message(CompositorMessageType expected_mess
     return message;
 }
 
-void wait_for_ack()
+void Application::wait_for_ack()
 {
     wait_for_message(COMPOSITOR_MESSAGE_ACK);
 }
 
-bool show_wireframe()
+void Application::show_window(Window *window)
 {
-    return _wireframe;
-}
-
-void show_window(Window *window)
-{
-    assert(_state >= State::RUNNING);
     assert(_windows.contains(window));
 
     CompositorMessage message = {
@@ -142,9 +185,7 @@ void show_window(Window *window)
     send_message(message);
 }
 
-void exit_if_all_windows_are_closed();
-
-void hide_window(Window *window)
+void Application::hide_window(Window *window)
 {
     assert(_windows.contains(window));
 
@@ -159,7 +200,7 @@ void hide_window(Window *window)
     exit_if_all_windows_are_closed();
 }
 
-void flip_window(Window *window, Math::Recti dirty)
+void Application::flip_window(Window *window, Math::Recti dirty)
 {
     assert(_windows.contains(window));
 
@@ -180,7 +221,7 @@ void flip_window(Window *window, Math::Recti dirty)
     wait_for_ack();
 }
 
-void move_window(Window *window, Math::Vec2i position)
+void Application::move_window(Window *window, Math::Vec2i position)
 {
     assert(_windows.contains(window));
 
@@ -195,7 +236,7 @@ void move_window(Window *window, Math::Vec2i position)
     send_message(message);
 }
 
-void window_change_cursor(Window *window, CursorState state)
+void Application::window_change_cursor(Window *window, CursorState state)
 {
     assert(_windows.contains(window));
 
@@ -210,7 +251,7 @@ void window_change_cursor(Window *window, CursorState state)
     send_message(message);
 }
 
-Math::Vec2i mouse_position()
+Math::Vec2i Application::mouse_position()
 {
     CompositorMessage message = {
         .type = COMPOSITOR_MESSAGE_GET_MOUSE_POSITION,
@@ -233,7 +274,7 @@ Math::Vec2i mouse_position()
     }
 }
 
-void goodbye()
+void Application::goodbye()
 {
     CompositorMessage m = {
         .type = COMPOSITOR_MESSAGE_GOODBYE,
@@ -247,7 +288,7 @@ void goodbye()
 
 /* --- Windows -------------------------------------------------------------- */
 
-void hide_all_windows()
+void Application::hide_all_windows()
 {
     for (size_t i = 0; i < _windows.count(); i++)
     {
@@ -255,9 +296,9 @@ void hide_all_windows()
     }
 }
 
-void exit_if_all_windows_are_closed()
+void Application::exit_if_all_windows_are_closed()
 {
-    if (_state == State::EXITING)
+    if (_exiting)
     {
         return;
     }
@@ -279,23 +320,19 @@ void exit_if_all_windows_are_closed()
     }
 }
 
-void add_window(Window *window)
+void Application::add_window(Window *window)
 {
-    assert(_state >= State::RUNNING);
-
     _windows.push_back(window);
 }
 
-void remove_window(Window *window)
+void Application::remove_window(Window *window)
 {
     _windows.push_back(window);
     exit_if_all_windows_are_closed();
 }
 
-Window *get_window(int id)
+Window *Application::get_window(int id)
 {
-    assert(_state >= State::RUNNING);
-
     for (size_t i = 0; i < _windows.count(); i++)
     {
         if (_windows[i]->handle() == id)
@@ -309,117 +346,33 @@ Window *get_window(int id)
 
 /* --- Application ---------------------------------------------------------- */
 
-void hide_all_windows();
-void uninitialized();
-
-static OwnPtr<Settings::Setting> _setting_theme;
-static OwnPtr<Settings::Setting> _setting_wireframe;
-
-Result initialize(int argc, char **argv)
+int Application::run()
 {
-    assert(_state == State::UNINITIALIZED);
-
-    _setting_theme = own<Settings::Setting>(
-        "appearance:widgets.theme",
-        [](const Json::Value &value) {
-            auto new_theme = value.as_string();
-
-            theme_load(IO::format("/Files/Themes/{}.json", value.as_string()));
-
-            for (size_t i = 0; i < _windows.count(); i++)
-            {
-                _windows[i]->should_repaint(_windows[i]->bound());
-            }
-        });
-
-    _setting_wireframe = own<Settings::Setting>(
-        "appearance:widgets.wireframe",
-        [](const Json::Value &value) {
-            _wireframe = value.as_bool();
-            for (size_t i = 0; i < _windows.count(); i++)
-            {
-                _windows[i]->should_repaint(_windows[i]->bound());
-            }
-        });
-
-    for (int i = 0; i < argc; i++)
-    {
-        if (strcmp(argv[i], "--wireframe") == 0)
-        {
-            _wireframe = true;
-        }
-    }
-
-    _connection = TRY(IO::Socket::connect("/Session/compositor.ipc"));
-
-    _connection_notifier = own<Async::Notifier>(_connection, POLL_READ, []() {
-        CompositorMessage message = {};
-        auto read_result = _connection.read(&message, sizeof(CompositorMessage));
-
-        if (!read_result.success())
-        {
-            IO::logln("Connection to the compositor closed {}!", read_result.description());
-            Application::exit(PROCESS_FAILURE);
-        }
-
-        size_t message_size = read_result.unwrap();
-
-        if (message_size != sizeof(CompositorMessage))
-        {
-            IO::logln("Got a message with an invalid size from compositor {} != {}!", sizeof(CompositorMessage), message_size);
-            hexdump(&message, message_size);
-            Application::exit(PROCESS_FAILURE);
-        }
-
-        do_message(message);
-    });
-
-    _state = State::RUNNING;
-
-    auto result_or_greetings = wait_for_message(COMPOSITOR_MESSAGE_GREETINGS);
-
-    if (result_or_greetings.success())
-    {
-        auto greetings = result_or_greetings.unwrap();
-
-        Screen::bound(greetings.greetings.screen_bound);
-    }
-
-    return SUCCESS;
+    Assert::is_false(_exiting);
+    return loop().run();
 }
 
-int run()
+int Application::run_nested()
 {
-    assert(_state == State::RUNNING);
-
-    return Async::Loop::the()->run();
+    Assert::is_false(_exiting);
+    return loop().run_nested();
 }
 
-int run_nested()
+int Application::pump()
 {
-    assert(_state == State::RUNNING);
-
-    return Async::Loop::the()->run_nested();
-}
-
-int pump()
-{
-    assert(_state == State::RUNNING);
-
-    Async::Loop::the()->pump(true);
-
+    Assert::is_false(_exiting);
+    loop().pump(true);
     return 0;
 }
 
-void exit(int exit_value)
+void Application::exit(int exit_value)
 {
-    if (_state == State::EXITING)
+    if (_exiting)
     {
         return;
     }
 
-    assert(_state == State::RUNNING);
-    _state = State::EXITING;
+    _exiting = true;
 
     hide_all_windows();
 
@@ -428,15 +381,13 @@ void exit(int exit_value)
     _connection_notifier = nullptr;
     _connection.close();
 
-    Async::Loop::the()->exit(exit_value);
+    loop().exit(exit_value);
 }
 
-void exit_nested(int exit_value)
+void Application::exit_nested(int exit_value)
 {
-    assert(_state == State::RUNNING);
-    Async::Loop::the()->exit_nested(exit_value);
+    assert(!_exiting);
+    loop().exit_nested(exit_value);
 }
-
-} // namespace Application
 
 } // namespace Widget

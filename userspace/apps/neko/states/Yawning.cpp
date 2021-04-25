@@ -10,13 +10,13 @@ namespace neko
 {
 
 Yawning::Yawning()
-    : _last_mouse_position(Widget::Application::mouse_position())
+    : _last_mouse_position(Widget::Application::the()->mouse_position())
 {
 }
 
 void Yawning::update(Neko &neko)
 {
-    auto new_mouse_position = Widget::Application::mouse_position();
+    auto new_mouse_position = Widget::Application::the()->mouse_position();
 
     if (_last_mouse_position.distance_to(new_mouse_position) > 16)
     {

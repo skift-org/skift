@@ -198,10 +198,8 @@ public:
     }
 };
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
-    Widget::Application::initialize(argc, argv);
-
     auto bitmap = Graphic::Bitmap::create_shared(400, 400).unwrap();
     bitmap->clear(Graphic::Colors::BLACKTRANSPARENT);
 
@@ -210,5 +208,5 @@ int main(int argc, char **argv)
     auto window = new PaintWindow(document);
     window->show();
 
-    return Widget::Application::run();
+    return Widget::Application::the()->run();
 }

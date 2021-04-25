@@ -7,10 +7,8 @@
 #include <libwidget/TextField.h>
 #include <libwidget/TitleBar.h>
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
-    Widget::Application::initialize(argc, argv);
-
     auto acrylic_window = own<Widget::Window>(WINDOW_ACRYLIC);
     acrylic_window->root()->layout(VFLOW(0));
     acrylic_window->root()->add<Widget::TitleBar>(Graphic::Icon::get("widgets"), "Acrylic!");
@@ -88,5 +86,5 @@ int main(int argc, char **argv)
 
     window->show();
 
-    return Widget::Application::run();
+    return Widget::Application::the()->run();
 }

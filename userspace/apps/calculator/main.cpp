@@ -9,11 +9,9 @@
 
 #include "calculator/Calculator.h"
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
     using namespace Widget;
-
-    Application::initialize(argc, argv);
 
     Calculator calculator{};
 
@@ -148,5 +146,5 @@ int main(int argc, char **argv)
     win->resize_to_content();
     win->show();
 
-    return Application::run();
+    return Application::the()->run();
 }

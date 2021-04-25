@@ -9,10 +9,8 @@
 #include <libwidget/Screen.h>
 #include <libwidget/Spacer.h>
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
-    Widget::Application::initialize(argc, argv);
-
     Widget::Window *window = new Widget::Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC | WINDOW_NO_ROUNDED_CORNERS);
 
     window->type(WINDOW_TYPE_POPOVER);
@@ -74,11 +72,11 @@ int main(int argc, char **argv)
     window->on(Widget::Event::KEYBOARD_KEY_PRESS, [&](Widget::Event *event) {
         if (event->keyboard.key == KEYBOARD_KEY_ESC)
         {
-            Widget::Application::exit(PROCESS_SUCCESS);
+            Widget::Application::the()->exit(PROCESS_SUCCESS);
         }
     });
 
     window->show();
 
-    return Widget::Application::run();
+    return Widget::Application::the()->run();
 }

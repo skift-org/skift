@@ -66,7 +66,7 @@ public:
 
         _window->show();
 
-        Application::run_nested();
+        Application::the()->run_nested();
 
         delete _window;
         _window = nullptr;
@@ -76,7 +76,7 @@ public:
 
     void close(DialogResult result)
     {
-        Application::exit_nested(0);
+        Application::the()->exit_nested(0);
         _result = result;
     }
 

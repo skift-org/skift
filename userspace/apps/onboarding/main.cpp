@@ -75,10 +75,8 @@ void pages(RefPtr<Widget::Element> host, const Page &page)
     host->add<Widget::Label>(page.footer, Anchor::CENTER);
 }
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
-    Widget::Application::initialize(argc, argv);
-
     Widget::Window *window = new Widget::Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC | WINDOW_NO_ROUNDED_CORNERS);
 
     window->type(WINDOW_TYPE_POPOVER);
@@ -138,7 +136,7 @@ int main(int argc, char **argv)
     auto set_current_page = [&](int index) {
         if (index == 5)
         {
-            Widget::Application::exit(PROCESS_SUCCESS);
+            Widget::Application::the()->exit(PROCESS_SUCCESS);
         }
 
         if (index < 0 || index > 4)
@@ -162,7 +160,7 @@ int main(int argc, char **argv)
     set_current_page(0);
 
     skipall_button->on(Widget::Event::ACTION, [](auto) {
-        Widget::Application::exit(PROCESS_SUCCESS);
+        Widget::Application::the()->exit(PROCESS_SUCCESS);
     });
 
     back_button->on(Widget::Event::ACTION, [&](auto) {
@@ -176,7 +174,7 @@ int main(int argc, char **argv)
     window->on(Widget::Event::KEYBOARD_KEY_PRESS, [&](Widget::Event *event) {
         if (event->keyboard.key == KEYBOARD_KEY_ESC)
         {
-            Widget::Application::exit(PROCESS_SUCCESS);
+            Widget::Application::the()->exit(PROCESS_SUCCESS);
         }
         else if (event->keyboard.key == KEYBOARD_KEY_RIGHT)
         {
@@ -188,5 +186,5 @@ int main(int argc, char **argv)
         }
     });
 
-    return Widget::Application::run();
+    return Widget::Application::the()->run();
 }

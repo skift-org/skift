@@ -4,12 +4,9 @@
 
 static constexpr int PANEL_HEIGHT = 38;
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
-    Widget::Application::initialize(argc, argv);
-
     auto window = own<panel::PanelWindow>();
     window->show();
-
-    return Widget::Application::run();
+    return Widget::Application::the()->run();
 }

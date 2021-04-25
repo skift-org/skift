@@ -93,11 +93,9 @@ public:
 
 int main(int argc, char **argv)
 {
-    Widget::Application::initialize(argc, argv);
-
     const char *path = argc > 1 ? argv[1] : "";
     auto window = new TextWindow(path);
     window->show();
 
-    return Widget::Application::run();
+    return Widget::Application::the()->run();
 }

@@ -41,11 +41,9 @@ void show_license()
     // clang-format on
 }
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
     using namespace Widget;
-
-    Application::initialize(argc, argv);
 
     // clang-format off
 
@@ -74,7 +72,7 @@ int main(int argc, char **argv)
                     }),
                     spacer(),
                     button(Button::FILLED, "Ok", [] {
-                        Application::exit(PROCESS_SUCCESS);
+                        Application::the()->exit(PROCESS_SUCCESS);
                     })
                 })
             )
@@ -85,5 +83,5 @@ int main(int argc, char **argv)
 
     win->show();
 
-    return Application::run();
+    return Application::the()->run();
 }

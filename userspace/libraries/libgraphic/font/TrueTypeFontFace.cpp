@@ -1,3 +1,4 @@
+#include <libgraphic/font/TrueTypeFont.h>
 #include <libgraphic/font/TrueTypeFontFace.h>
 #include <libio/FourCC.h>
 #include <libio/Skip.h>
@@ -31,8 +32,10 @@ constexpr uint32_t TABLE_TAG_MAXP = IO::make_tag('m', 'a', 'x', 'p');
 ResultOr<RefPtr<Graphic::Font::TrueTypeFontFace>> Graphic::Font::TrueTypeFontFace::load(IO::Reader &reader)
 {
     RefPtr<Graphic::Font::TrueTypeFontFace> result;
+    auto data = TRY(IO::read_all(reader));
+    IO::MemoryReader mem_reader(data);
 
-    auto tag = TRY(IO::read_tag(reader));
+    auto tag = TRY(IO::read_tag(mem_reader));
     switch (tag())
     {
     case TAG_TrueType_V_1:
@@ -50,8 +53,6 @@ ResultOr<RefPtr<Graphic::Font::TrueTypeFontFace>> Graphic::Font::TrueTypeFontFac
         return Result::ERR_INVALID_DATA;
     }
 
-    auto data = TRY(IO::read_all(reader));
-    IO::MemoryReader mem_reader(data);
     TRY(result->read_tables(mem_reader));
 
     if (!result->_has_cmap || !result->_has_head || !result->_has_hhea || !result->_has_hmtx)
@@ -79,21 +80,29 @@ ResultOr<RefPtr<Graphic::Font::TrueTypeFontFace>> Graphic::Font::TrueTypeFontFac
 
 Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
 {
-    Assert::equal(TRY(reader.tell()), 0);
-    auto num_tables = TRY(IO::read<le_uint16_t>(reader));
+    auto num_tables = TRY(IO::read<be_uint16_t>(reader));
     IO::logln("Font contains {} tables", num_tables());
-    TRY(IO::skip(reader, 6));
+
+    // We don't really need any of these
+    auto search_range = TRY(IO::read<be_uint16_t>(reader));
+    auto entry_selector = TRY(IO::read<be_uint16_t>(reader));
+    auto range_shift = TRY(IO::read<be_uint16_t>(reader));
+    UNUSED(search_range);
+    UNUSED(entry_selector);
+    UNUSED(range_shift);
 
     for (uint16_t i = 0; i < num_tables(); i++)
     {
         // Read the table entry
         auto table_tag = TRY(IO::read_tag(reader));
-        auto table_checksum = TRY(IO::read<le_uint32_t>(reader));
-        auto table_offset = TRY(IO::read<le_uint32_t>(reader));
-        auto table_size = TRY(IO::read<le_uint32_t>(reader));
+        auto table_checksum = TRY(IO::read<be_uint32_t>(reader));
+        auto table_offset = TRY(IO::read<be_uint32_t>(reader));
+        auto table_size = TRY(IO::read<be_uint32_t>(reader));
 
         // Jump to the table position and create our readers
         auto old_pos = TRY(reader.tell());
+        Assert::lower_equal((size_t)table_offset(), TRY(reader.length()));
+
         reader.seek(IO::SeekFrom::start(table_offset()));
         IO::ScopedReader table_reader(reader, table_size());
 
@@ -155,20 +164,39 @@ Optional<Graphic::Font::Glyph> Graphic::Font::TrueTypeFontFace::glyph(Codepoint 
     return {};
 }
 
-Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader & /*reader*/)
+ResultOr<Math::Vec2<uint16_t>> Graphic::Font::TrueTypeFontFace::read_version(IO::Reader &reader)
 {
+    auto major = TRY(IO::read<be_uint16_t>(reader));
+    auto minor = TRY(IO::read<be_uint16_t>(reader));
+
+    return Math::Vec2<uint16_t>{major(), minor()};
+}
+
+Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &reader)
+{
+    auto version = TRY(read_version(reader));
+    UNUSED(version);
+    auto num_encodings = TRY(IO::read<be_uint16_t>(reader));
+
+    for (uint16_t i = 0; i < num_encodings(); i++)
+    {
+        auto platform_id = TRY(IO::read<be_truetype_platform>(reader));
+        UNUSED(platform_id);
+        TRY(IO::read<be_uint16_t>(reader));
+        TRY(IO::read<be_uint32_t>(reader));
+    }
+
     return Result::SUCCESS;
 }
 
 Result Graphic::Font::TrueTypeFontFace::read_table_maxp(IO::Reader &reader)
 {
-    auto major = TRY(IO::read<le_uint16_t>(reader));
-    auto minor = TRY(IO::read<le_uint16_t>(reader));
+    auto version = TRY(read_version(reader));
 
-    _num_glyphs = TRY(IO::read<le_uint16_t>(reader))();
+    _num_glyphs = TRY(IO::read<be_uint16_t>(reader))();
 
     // Version 1.0 has extra data
-    if (major() == 1 && minor() == 0)
+    if (version.x() == 1 && version.y() == 0)
     {
         // TODO: read extra data for version 1.0
         // https://docs.microsoft.com/en-us/typography/opentype/spec/maxp

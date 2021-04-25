@@ -2,13 +2,13 @@
 
 #include <libgraphic/Painter.h>
 #include <libutils/Callback.h>
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 #include <libwidget/Window.h>
 
 namespace Widget
 {
 
-class Slider : public Component
+class Slider : public Element
 {
 private:
     static constexpr auto TRACK_HEIGHT = 4;

@@ -8,7 +8,7 @@
 namespace Widget
 {
 
-class Table : public Component
+class Table : public Element
 {
 private:
     static constexpr int TABLE_ROW_HEIGHT = 32;

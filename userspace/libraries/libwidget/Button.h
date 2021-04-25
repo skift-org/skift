@@ -1,12 +1,12 @@
 #pragma once
 
 #include <libgraphic/Icon.h>
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 namespace Widget
 {
 
-class Button : public Component
+class Button : public Element
 {
 public:
     enum Style

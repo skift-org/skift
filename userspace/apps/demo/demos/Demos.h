@@ -2,7 +2,7 @@
 
 #include <libasync/Timer.h>
 #include <libwidget/Application.h>
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 void colors_draw(Graphic::Painter &painter, Math::Recti screen, float time);
 

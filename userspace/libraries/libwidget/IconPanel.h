@@ -1,12 +1,12 @@
 #pragma once
 
 #include <libgraphic/Icon.h>
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 namespace Widget
 {
 
-class IconPanel : public Component
+class IconPanel : public Element
 {
 private:
     RefPtr<Graphic::Icon> _icon;

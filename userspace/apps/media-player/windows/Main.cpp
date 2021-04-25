@@ -19,7 +19,7 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
     auto cover = root()->add<Cover>(Graphic::Bitmap::load_from_or_placeholder("/Applications/media-player/cover.png"));
 
     cover->layout(VFLOW(0));
-    cover->flags(Widget::Component::FILL);
+    cover->flags(Widget::Element::FILL);
 
     cover->add<Widget::TitleBar>(
         Graphic::Icon::get("movie"),

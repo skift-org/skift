@@ -84,7 +84,7 @@ public:
 
     virtual void on_button(DialogButton) {}
 
-    void create_buttons(RefPtr<Component> parent)
+    void create_buttons(RefPtr<Element> parent)
     {
         if (_buttons & DialogButton::YES)
         {

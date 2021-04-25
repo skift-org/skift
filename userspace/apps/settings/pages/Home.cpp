@@ -8,7 +8,7 @@ HomePage::HomePage()
     : Container()
 {
     layout(STACK());
-    flags(Component::FILL);
+    flags(Element::FILL);
 
     auto links = add<Container>();
     links->layout(GRID(6, 4, 8, 8));

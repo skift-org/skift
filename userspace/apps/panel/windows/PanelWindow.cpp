@@ -26,7 +26,7 @@ PanelWindow::PanelWindow()
     root()->layout(VFLOW(0));
 
     auto container = root()->add<Widget::Container>();
-    container->flags(Widget::Component::FILL);
+    container->flags(Widget::Element::FILL);
     container->layout(HFLOW(8));
     container->insets(Insetsi(4));
 

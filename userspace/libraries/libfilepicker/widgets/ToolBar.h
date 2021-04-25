@@ -16,15 +16,15 @@ private:
     RefPtr<Navigation> _navigation;
     RefPtr<Bookmarks> _bookmarks;
 
-    RefPtr<Widget::Component> _go_backward;
-    RefPtr<Widget::Component> _go_foreward;
-    RefPtr<Widget::Component> _go_up;
-    RefPtr<Widget::Component> _go_home;
+    RefPtr<Widget::Element> _go_backward;
+    RefPtr<Widget::Element> _go_foreward;
+    RefPtr<Widget::Element> _go_up;
+    RefPtr<Widget::Element> _go_home;
 
-    RefPtr<Widget::Component> _breadcrumb;
+    RefPtr<Widget::Element> _breadcrumb;
 
-    RefPtr<Widget::Component> _refresh;
-    RefPtr<Widget::Component> _open_terminal;
+    RefPtr<Widget::Element> _refresh;
+    RefPtr<Widget::Element> _open_terminal;
 
     OwnPtr<Async::Observer<Navigation>> _observer;
 
@@ -66,7 +66,7 @@ public:
         add<Widget::Separator>();
 
         _breadcrumb = add<Breadcrumb>(_navigation, _bookmarks);
-        _breadcrumb->flags(Component::FILL);
+        _breadcrumb->flags(Element::FILL);
 
         add<Widget::Separator>();
 

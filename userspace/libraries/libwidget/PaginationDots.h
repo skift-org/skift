@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 namespace Widget
 {
 
-class PaginationDots : public Component
+class PaginationDots : public Element
 {
 private:
     int _count = 3;

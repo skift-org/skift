@@ -1,14 +1,14 @@
 #pragma once
 
 #include <libgraphic/Painter.h>
-#include <libwidget/Component.h>
 #include <libwidget/Container.h>
+#include <libwidget/Element.h>
 #include <libwidget/Label.h>
 
 namespace Widget
 {
 
-class Switch : public Component
+class Switch : public Element
 {
 private:
     bool _state;

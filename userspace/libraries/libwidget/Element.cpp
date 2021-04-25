@@ -4,7 +4,7 @@
 #include <libgraphic/Painter.h>
 #include <libmath/MinMax.h>
 #include <libwidget/Application.h>
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 #include <libwidget/Event.h>
 #include <libwidget/Theme.h>
 #include <libwidget/Window.h>
@@ -12,7 +12,7 @@
 namespace Widget
 {
 
-Graphic::Color Component::color(ThemeColorRole role)
+Graphic::Color Element::color(ThemeColorRole role)
 {
     if (!enabled() || (_parent && !_parent->enabled()))
     {
@@ -40,32 +40,32 @@ Graphic::Color Component::color(ThemeColorRole role)
     return _colors[role].unwrap_or(_window->color(role));
 }
 
-void Component::color(ThemeColorRole role, Graphic::Color color)
+void Element::color(ThemeColorRole role, Graphic::Color color)
 {
     _colors[role] = color;
 
     should_repaint();
 }
 
-CursorState Component::cursor()
+CursorState Element::cursor()
 {
     return _cursor;
 }
 
-void Component::cursor(CursorState cursor)
+void Element::cursor(CursorState cursor)
 {
     _cursor = cursor;
 
     window()->cursor(cursor);
 }
 
-Component::Component()
+Element::Element()
 {
     _enabled = true;
     _container = Math::Recti(32, 32);
 }
 
-Component::~Component()
+Element::~Element()
 {
     if (_window)
     {
@@ -74,7 +74,7 @@ Component::~Component()
     }
 }
 
-void Component::do_layout()
+void Element::do_layout()
 {
     switch (_layout.type)
     {
@@ -169,7 +169,7 @@ void Component::do_layout()
 
         for (auto &child : _childs)
         {
-            if (child->flags() & Component::FILL)
+            if (child->flags() & Element::FILL)
             {
                 fill_child_count++;
             }
@@ -177,7 +177,7 @@ void Component::do_layout()
             {
                 fixed_child_count++;
 
-                if (child->flags() & Component::SQUARE)
+                if (child->flags() & Element::SQUARE)
                 {
                     fixed_child_total_width += content().height();
                 }
@@ -200,7 +200,7 @@ void Component::do_layout()
 
         for (auto &child : _childs)
         {
-            if (child->flags() & Component::FILL)
+            if (child->flags() & Element::FILL)
             {
                 child->container(Math::Recti(
                     current,
@@ -212,7 +212,7 @@ void Component::do_layout()
             }
             else
             {
-                if (child->flags() & Component::SQUARE)
+                if (child->flags() & Element::SQUARE)
                 {
                     child->container(Math::Recti(
                         current,
@@ -245,7 +245,7 @@ void Component::do_layout()
 
         for (auto &child : _childs)
         {
-            if (child->flags() & Component::FILL)
+            if (child->flags() & Element::FILL)
             {
                 fill_child_count++;
             }
@@ -266,7 +266,7 @@ void Component::do_layout()
 
         for (auto &child : _childs)
         {
-            if (child->flags() & Component::FILL)
+            if (child->flags() & Element::FILL)
             {
                 child->container({
                     content().x(),
@@ -279,7 +279,7 @@ void Component::do_layout()
             }
             else
             {
-                if (child->flags() & Component::SQUARE)
+                if (child->flags() & Element::SQUARE)
                 {
                     child->container({
                         content().x(),
@@ -311,7 +311,7 @@ void Component::do_layout()
     }
 }
 
-void Component::relayout()
+void Element::relayout()
 {
     do_layout();
 
@@ -326,7 +326,7 @@ void Component::relayout()
     }
 }
 
-void Component::should_relayout()
+void Element::should_relayout()
 {
     if (_window)
     {
@@ -334,7 +334,7 @@ void Component::should_relayout()
     }
 }
 
-Math::Vec2i Component::size()
+Math::Vec2i Element::size()
 {
     if (_childs.count() == 0)
     {
@@ -411,11 +411,11 @@ Math::Vec2i Component::size()
 
 /* --- Enable/ Disable state ------------------------------------------------ */
 
-bool Component::enabled() { return _enabled; }
+bool Element::enabled() { return _enabled; }
 
-bool Component::disabled() { return !_enabled; }
+bool Element::disabled() { return !_enabled; }
 
-void Component::enable()
+void Element::enable()
 {
     if (disabled())
     {
@@ -429,7 +429,7 @@ void Component::enable()
     }
 }
 
-void Component::disable()
+void Element::disable()
 {
     if (enabled())
     {
@@ -443,7 +443,7 @@ void Component::disable()
     }
 }
 
-void Component::disable_if(bool condition)
+void Element::disable_if(bool condition)
 {
     if (condition)
     {
@@ -455,7 +455,7 @@ void Component::disable_if(bool condition)
     }
 }
 
-void Component::enable_if(bool condition)
+void Element::enable_if(bool condition)
 {
     if (condition)
     {
@@ -469,16 +469,16 @@ void Component::enable_if(bool condition)
 
 /* --- Childs --------------------------------------------------------------- */
 
-Component *Component::at(Math::Vec2i position)
+Element *Element::at(Math::Vec2i position)
 {
-    Component *result = this;
+    Element *result = this;
 
-    if (_flags & Component::GREEDY)
+    if (_flags & Element::GREEDY)
     {
         return result;
     }
 
-    _childs.foreach_reversed([&](RefPtr<Component> child) {
+    _childs.foreach_reversed([&](RefPtr<Element> child) {
         if (!(child->flags() & NO_MOUSE_HIT) && child->container().contains(position))
         {
             result = child->at(position - child->origin());
@@ -494,7 +494,7 @@ Component *Component::at(Math::Vec2i position)
     return result;
 }
 
-RefPtr<Component> Component::add(RefPtr<Component> child)
+RefPtr<Element> Element::add(RefPtr<Element> child)
 {
     Assert::not_null(child);
     Assert::equal(child->_parent, nullptr);
@@ -512,7 +512,7 @@ RefPtr<Component> Component::add(RefPtr<Component> child)
     return child;
 }
 
-void Component::del(RefPtr<Component> child)
+void Element::del(RefPtr<Element> child)
 {
     Assert::equal(child->_parent, this);
 
@@ -522,7 +522,7 @@ void Component::del(RefPtr<Component> child)
     should_relayout();
 }
 
-void Component::mount(Component &parent)
+void Element::mount(Element &parent)
 {
     _parent = &parent;
     _window = parent.window();
@@ -535,7 +535,7 @@ void Component::mount(Component &parent)
     mounted();
 }
 
-void Component::unmount()
+void Element::unmount()
 {
     if (_parent)
     {
@@ -549,7 +549,7 @@ void Component::unmount()
     }
 }
 
-void Component::clear()
+void Element::clear()
 {
     _childs.clear();
 
@@ -559,12 +559,12 @@ void Component::clear()
 
 /* --- Focus state ---------------------------------------------------------- */
 
-bool Component::focused()
+bool Element::focused()
 {
     return _window && _window->has_keyboard_focus(this);
 }
 
-void Component::focus()
+void Element::focus()
 {
     if (_window)
     {
@@ -574,7 +574,7 @@ void Component::focus()
 
 /* --- Paint ---------------------------------------------------------------- */
 
-void Component::repaint(Graphic::Painter &painter, Math::Recti rectangle)
+void Element::repaint(Graphic::Painter &painter, Math::Recti rectangle)
 {
     if (bound().width() == 0 || bound().height() == 0)
     {
@@ -612,12 +612,12 @@ void Component::repaint(Graphic::Painter &painter, Math::Recti rectangle)
     painter.pop();
 }
 
-void Component::should_repaint()
+void Element::should_repaint()
 {
     should_repaint(bound());
 }
 
-void Component::should_repaint(Math::Recti rectangle)
+void Element::should_repaint(Math::Recti rectangle)
 {
     if (!overflow().colide_with(rectangle))
     {
@@ -639,13 +639,13 @@ void Component::should_repaint(Math::Recti rectangle)
 
 /* --- Events ----------------------------------------------------------------*/
 
-void Component::on(EventType event_type, EventHandler handler)
+void Element::on(EventType event_type, EventHandler handler)
 {
     assert(event_type < EventType::__COUNT);
     _handlers[event_type] = move(handler);
 }
 
-void Component::dispatch_event(Event *event)
+void Element::dispatch_event(Event *event)
 {
     if (enabled())
     {
@@ -664,7 +664,7 @@ void Component::dispatch_event(Event *event)
     }
 }
 
-Math::Vec2i Component::compute_size()
+Math::Vec2i Element::compute_size()
 {
     Math::Vec2i size = this->size();
 

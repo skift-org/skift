@@ -21,7 +21,7 @@ CPUGraph::CPUGraph(RefPtr<TaskModel> model)
 {
     layout(VFLOW(0));
     insets(Insetsi(8));
-    flags(Component::FILL);
+    flags(Element::FILL);
 
     auto icon_and_text = add<Widget::Container>();
     icon_and_text->layout(HFLOW(4));
@@ -29,7 +29,7 @@ CPUGraph::CPUGraph(RefPtr<TaskModel> model)
     icon_and_text->add<Widget::Label>("Processor");
 
     auto cpu_filler = add<Widget::Container>();
-    cpu_filler->flags(Component::FILL);
+    cpu_filler->flags(Element::FILL);
 
     _label_average = add<Widget::Label>("Average: nil%", Anchor::RIGHT);
     _label_greedy = add<Widget::Label>("Most greedy: nil", Anchor::RIGHT);

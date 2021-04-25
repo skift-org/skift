@@ -36,7 +36,7 @@ void MessageBox::render(Window *window)
     window->root()->insets(Insetsi(8));
 
     auto message_label = window->root()->add<Label>(_message, Anchor::CENTER);
-    message_label->flags(Component::FILL);
+    message_label->flags(Element::FILL);
 
     auto container = window->root()->add<Container>();
     container->layout(HFLOW(4));

@@ -38,20 +38,20 @@ private:
     RefPtr<PaintDocument> _document;
 
     /// --- Toolbar --- ///
-    RefPtr<Widget::Component> _open_document;
-    RefPtr<Widget::Component> _save_document;
-    RefPtr<Widget::Component> _new_document;
+    RefPtr<Widget::Element> _open_document;
+    RefPtr<Widget::Element> _save_document;
+    RefPtr<Widget::Element> _new_document;
 
-    RefPtr<Widget::Component> _pencil;
-    RefPtr<Widget::Component> _brush;
-    RefPtr<Widget::Component> _eraser;
-    RefPtr<Widget::Component> _fill;
-    RefPtr<Widget::Component> _picker;
+    RefPtr<Widget::Element> _pencil;
+    RefPtr<Widget::Element> _brush;
+    RefPtr<Widget::Element> _eraser;
+    RefPtr<Widget::Element> _fill;
+    RefPtr<Widget::Element> _picker;
 
-    RefPtr<Widget::Component> _insert_text;
-    RefPtr<Widget::Component> _insert_line;
-    RefPtr<Widget::Component> _insert_rectangle;
-    RefPtr<Widget::Component> _insert_circle;
+    RefPtr<Widget::Element> _insert_text;
+    RefPtr<Widget::Element> _insert_line;
+    RefPtr<Widget::Element> _insert_rectangle;
+    RefPtr<Widget::Element> _insert_circle;
 
     RefPtr<Widget::Panel> _primary_color;
     RefPtr<Widget::Panel> _secondary_color;
@@ -75,7 +75,7 @@ public:
         create_toolbar(root());
 
         _canvas = root()->add<PaintCanvas>(document);
-        _canvas->flags(Widget::Component::FILL);
+        _canvas->flags(Widget::Element::FILL);
 
         create_color_palette(root());
 
@@ -84,7 +84,7 @@ public:
         };
     }
 
-    void create_toolbar(RefPtr<Widget::Component> parent)
+    void create_toolbar(RefPtr<Widget::Element> parent)
     {
         auto toolbar = parent->add<Widget::Panel>();
 
@@ -139,24 +139,24 @@ public:
 
         auto primary_color_container = toolbar->add<Widget::Container>();
         primary_color_container->insets(Insetsi(4));
-        primary_color_container->flags(Widget::Component::SQUARE);
+        primary_color_container->flags(Widget::Element::SQUARE);
 
         _primary_color = primary_color_container->add<Widget::Panel>();
         _primary_color->border_radius(4);
         _primary_color->color(Widget::THEME_MIDDLEGROUND, _document->primary_color());
-        _primary_color->flags(Widget::Component::FILL);
+        _primary_color->flags(Widget::Element::FILL);
 
         auto secondary_color_container = toolbar->add<Widget::Container>();
         secondary_color_container->insets(Insetsi(4));
-        secondary_color_container->flags(Widget::Component::SQUARE);
+        secondary_color_container->flags(Widget::Element::SQUARE);
 
         _secondary_color = secondary_color_container->add<Widget::Panel>();
         _secondary_color->border_radius(4);
         _secondary_color->color(Widget::THEME_MIDDLEGROUND, _document->secondary_color());
-        _secondary_color->flags(Widget::Component::FILL);
+        _secondary_color->flags(Widget::Element::FILL);
     }
 
-    void create_color_palette(RefPtr<Widget::Component> parent)
+    void create_color_palette(RefPtr<Widget::Element> parent)
     {
         auto palette = parent->add<Widget::Panel>();
 

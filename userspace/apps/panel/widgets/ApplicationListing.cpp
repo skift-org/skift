@@ -13,7 +13,7 @@ namespace panel
 ApplicationListing::ApplicationListing() : VScroll()
 {
     layout(VFLOW(4));
-    flags(Component::FILL);
+    flags(Element::FILL);
 
     render();
 }

@@ -1,12 +1,12 @@
 #pragma once
 
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 #include <libwidget/model/TextModel.h>
 
 namespace Widget
 {
 
-class TextField : public Component
+class TextField : public Element
 {
 private:
     RefPtr<TextModel> _model;

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 #include "paint/PaintDocument.h"
 #include "paint/PaintTool.h"
 
-class PaintCanvas : public Widget::Component
+class PaintCanvas : public Widget::Element
 {
 private:
     RefPtr<PaintDocument> _document;

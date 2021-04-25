@@ -1,10 +1,10 @@
 #pragma once
 
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 #include "demo/demos/Demos.h"
 
-class DemoWidget : public Widget::Component
+class DemoWidget : public Widget::Element
 {
 private:
     double _time{};

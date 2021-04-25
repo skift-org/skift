@@ -1,6 +1,6 @@
+#include <libio/Path.h>
 #include <libio/Streams.h>
 #include <libutils/ArgParse.h>
-#include <libio/Path.h>
 
 int main(int argc, char const *argv[])
 {
@@ -11,7 +11,7 @@ int main(int argc, char const *argv[])
 
     args.show_help_if_no_operand_given();
 
-    args.prologue("Print NAME with any leading directory components removed.");
+    args.prologue("Print NAME with any leading directory Elements removed.");
 
     bool option_all = false;
     bool option_zero = false;

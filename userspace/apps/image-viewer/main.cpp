@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     });
 
     auto image = window->root()->add<Widget::Image>(bitmap);
-    image->flags(Widget::Component::FILL);
+    image->flags(Widget::Element::FILL);
 
     window->show();
 

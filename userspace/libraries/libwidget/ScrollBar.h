@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 namespace Widget
 {
 
-class ScrollBar : public Component
+class ScrollBar : public Element
 {
 private:
     Math::Vec2i _mouse_origin;

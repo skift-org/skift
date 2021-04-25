@@ -1,12 +1,12 @@
 #pragma once
 
 #include <libutils/String.h>
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 namespace Widget
 {
 
-class Label : public Component
+class Label : public Element
 {
 private:
     String _text = "Label";

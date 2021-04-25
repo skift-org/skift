@@ -29,7 +29,7 @@ public:
     Browser(RefPtr<Navigation> navigation)
         : Widget::Table(), _navigation(navigation)
     {
-        flags(Component::FILL);
+        flags(Element::FILL);
 
         empty_message("This directory is empty.");
 

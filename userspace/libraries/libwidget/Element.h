@@ -85,7 +85,7 @@ struct Layout
         Math::Vec2i((_hspacing), 0), \
     })
 
-class Component : public RefCounted<Component>
+class Element : public RefCounted<Element>
 {
 private:
     bool _enabled = true;
@@ -110,10 +110,10 @@ private:
 
     EventHandler _handlers[EventType::__COUNT] = {};
 
-    Component *_parent = {};
+    Element *_parent = {};
     Window *_window = {};
 
-    Vector<RefPtr<Component>> _childs = {};
+    Vector<RefPtr<Element>> _childs = {};
 
 public:
     static constexpr auto FILL = (1 << 0);
@@ -190,9 +190,9 @@ public:
 
     /* --- subclass API ----------------------------------------------------- */
 
-    Component();
+    Element();
 
-    virtual ~Component();
+    virtual ~Element();
 
     virtual void paint(Graphic::Painter &, const Math::Recti &) {}
 
@@ -286,7 +286,7 @@ public:
 
     /* --- Childs ----------------------------------------------------------- */
 
-    Component *at(Math::Vec2i position);
+    Element *at(Math::Vec2i position);
 
     template <typename T, typename... Args>
     RefPtr<T> add(Args &&...args)
@@ -294,11 +294,11 @@ public:
         return add(make<T>(forward<Args>(args)...));
     }
 
-    RefPtr<Component> add(RefPtr<Component> child);
+    RefPtr<Element> add(RefPtr<Element> child);
 
-    void del(RefPtr<Component> child);
+    void del(RefPtr<Element> child);
 
-    void mount(Component &parent);
+    void mount(Element &parent);
 
     void unmount();
 

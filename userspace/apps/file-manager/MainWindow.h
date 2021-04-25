@@ -29,7 +29,7 @@ public:
 
         auto bookmarks_and_browser = root()->add<Widget::Container>();
 
-        bookmarks_and_browser->flags(Widget::Component::FILL);
+        bookmarks_and_browser->flags(Widget::Element::FILL);
         bookmarks_and_browser->layout(HFLOW(1));
 
         auto jump_list = bookmarks_and_browser->add<FilePicker::JumpList>(navigation, bookmarks);

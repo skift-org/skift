@@ -6,7 +6,7 @@
 namespace Widget
 {
 
-class HScroll : public Component
+class HScroll : public Element
 {
 private:
     RefPtr<Container> _host = nullptr;
@@ -20,7 +20,7 @@ public:
         _host = add<Container>();
 
         _scrollbar = add<ScrollBar>();
-        _scrollbar->flags(Component::NOT_AFFECTED_BY_SCROLL);
+        _scrollbar->flags(Element::NOT_AFFECTED_BY_SCROLL);
 
         _scrollbar->on(Event::VALUE_CHANGE, [this](auto) {
             scroll({_scrollbar->value(), scroll().y()});

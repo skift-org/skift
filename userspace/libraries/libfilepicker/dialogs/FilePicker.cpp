@@ -75,7 +75,7 @@ void Dialog::render(Widget::Window *window)
     if (_flags & DialogFlags::DIALOG_FLAGS_SAVE)
     {
         _text_field = action_container->add<Widget::TextField>(Widget::TextModel::empty());
-        _text_field->flags(Widget::Component::FILL);
+        _text_field->flags(Widget::Element::FILL);
         _text_field->focus();
     }
 

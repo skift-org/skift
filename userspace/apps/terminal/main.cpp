@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 
     auto widget = window->root()->add<TerminalWidget>();
     widget->focus();
-    widget->flags(Widget::Component::FILL);
+    widget->flags(Widget::Element::FILL);
     widget->outsets({0, 6, 6, 6});
 
     window->show();

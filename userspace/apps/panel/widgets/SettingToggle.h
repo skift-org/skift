@@ -45,7 +45,7 @@ public:
         icon->insets(Insetsi(0, 0, 0, 4));
 
         auto label = add<Widget::Label>(_name);
-        label->flags(Component::FILL);
+        label->flags(Element::FILL);
 
         auto sw = add<Widget::Switch>();
         sw->state(_enabled);

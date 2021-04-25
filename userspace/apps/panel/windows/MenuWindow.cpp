@@ -26,7 +26,7 @@ MenuWindow::MenuWindow()
 
     auto container = root()->add<Widget::Container>();
     container->layout(VFLOW(0));
-    container->flags(Widget::Component::FILL);
+    container->flags(Widget::Element::FILL);
 
     auto model = Widget::TextModel::empty();
 

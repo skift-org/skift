@@ -28,7 +28,7 @@ public:
         model->update();
 
         _table = root()->add<Widget::Table>(model);
-        _table->flags(Widget::Component::FILL);
+        _table->flags(Widget::Element::FILL);
     }
 };
 

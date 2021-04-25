@@ -327,7 +327,7 @@ void Window::end_resize()
     _is_resizing = false;
 }
 
-Component *Window::child_at(Math::Vec2i position)
+Element *Window::child_at(Math::Vec2i position)
 {
     return root()->at(position);
 }
@@ -435,7 +435,7 @@ void Window::handle_lost_focus(Event *event)
 
         if (_mouse_focus)
         {
-            Component *old_focus = _mouse_focus;
+            Element *old_focus = _mouse_focus;
             _mouse_focus = nullptr;
 
             Event e = *event;
@@ -607,7 +607,7 @@ void Window::handle_mouse_button_release(Event *event)
 {
     if (_mouse_focus)
     {
-        Component *old_focus = _mouse_focus;
+        Element *old_focus = _mouse_focus;
         _mouse_focus = nullptr;
 
         old_focus->dispatch_event(event);
@@ -670,17 +670,17 @@ void Window::cursor(CursorState state)
     }
 }
 
-void Window::focus_widget(Component *widget)
+void Window::focus_widget(Element *widget)
 {
     _keyboard_focus = widget;
 }
 
-bool Window::has_keyboard_focus(Component *widget)
+bool Window::has_keyboard_focus(Element *widget)
 {
     return _keyboard_focus == widget;
 }
 
-void Window::widget_removed(Component *widget)
+void Window::widget_removed(Element *widget)
 {
     if (_keyboard_focus == widget)
     {

@@ -20,7 +20,7 @@ SearchBar::SearchBar(RefPtr<Widget::TextModel> model) : Panel()
     icon->color(Widget::THEME_FOREGROUND, Graphic::Colors::BLACK);
 
     auto field = add<Widget::TextField>(model);
-    field->flags(Component::FILL);
+    field->flags(Element::FILL);
     field->color(Widget::THEME_FOREGROUND, Graphic::Colors::BLACK);
     field->focus();
 }

@@ -35,7 +35,7 @@ Color Color::parse(String string)
 {
     StringScanner scan{string.cstring(), string.length()};
 
-    auto parse_component = [&](StringScanner &scan) {
+    auto parse_Element = [&](StringScanner &scan) {
         whitespace(scan);
 
         auto value = number(scan);
@@ -136,9 +136,9 @@ Color Color::parse(String string)
     {
         scan.skip('(');
 
-        auto red = parse_component(scan);
-        auto green = parse_component(scan);
-        auto blue = parse_component(scan);
+        auto red = parse_Element(scan);
+        auto green = parse_Element(scan);
+        auto blue = parse_Element(scan);
 
         scan.skip(')');
 
@@ -148,9 +148,9 @@ Color Color::parse(String string)
     {
         scan.skip('(');
 
-        auto red = parse_component(scan);
-        auto green = parse_component(scan);
-        auto blue = parse_component(scan);
+        auto red = parse_Element(scan);
+        auto green = parse_Element(scan);
+        auto blue = parse_Element(scan);
 
         whitespace(scan);
         auto alpha = number(scan);

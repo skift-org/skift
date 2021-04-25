@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 namespace Widget
 {
 
-class Placeholder : public Component
+class Placeholder : public Element
 {
 private:
     String _text;

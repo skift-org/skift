@@ -37,7 +37,7 @@ public:
         add<Widget::Label>("Bookmarks");
 
         _listing = add<Widget::VScroll>();
-        _listing->flags(Component::FILL);
+        _listing->flags(Element::FILL);
 
         render();
     }

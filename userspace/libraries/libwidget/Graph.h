@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 namespace Widget
 {
 
-class Graph : public Component
+class Graph : public Element
 {
 private:
     Graphic::Color _color;

@@ -1,12 +1,12 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 namespace MediaPlayer
 {
 
-class Cover : public Widget::Component
+class Cover : public Widget::Element
 {
 private:
     RefPtr<Graphic::Bitmap> _cover;

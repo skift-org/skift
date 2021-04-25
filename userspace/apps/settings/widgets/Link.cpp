@@ -14,7 +14,7 @@ Link::Link(RefPtr<Graphic::Icon> icon, String name)
 
     auto icon_container = add<Widget::IconPanel>(icon);
     icon_container->icon_size(Graphic::ICON_36PX);
-    icon_container->flags(Component::FILL);
+    icon_container->flags(Element::FILL);
     add<Widget::Label>(name, Anchor::CENTER);
 }
 

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 namespace Widget
 {
 
-struct Separator : public Component
+struct Separator : public Element
 {
     Separator();
 

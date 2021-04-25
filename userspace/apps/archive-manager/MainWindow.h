@@ -46,7 +46,7 @@ public:
 
         auto browser = root()->add<Widget::Container>();
 
-        browser->flags(Widget::Component::FILL);
+        browser->flags(Widget::Element::FILL);
 
         if (!_archive)
         {

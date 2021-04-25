@@ -11,9 +11,9 @@ struct TextWindow : public Widget::Window
 {
 private:
     /// --- Toolbar --- ///
-    RefPtr<Widget::Component> _open_document;
-    RefPtr<Widget::Component> _save_document;
-    RefPtr<Widget::Component> _new_document;
+    RefPtr<Widget::Element> _open_document;
+    RefPtr<Widget::Element> _save_document;
+    RefPtr<Widget::Element> _new_document;
 
     RefPtr<Widget::TextModel> _text_model;
     RefPtr<Widget::TitleBar> _title_bar;
@@ -56,7 +56,7 @@ public:
         _text_model = Widget::TextModel::empty();
 
         _text_editor = root()->add<Widget::TextEditor>(_text_model);
-        _text_editor->flags(Widget::Component::FILL);
+        _text_editor->flags(Widget::Element::FILL);
         _text_editor->overscroll(true);
         _text_editor->insets({4});
         _text_editor->focus();
@@ -64,7 +64,7 @@ public:
         load_document(path);
     }
 
-    void create_toolbar(RefPtr<Widget::Component> parent)
+    void create_toolbar(RefPtr<Widget::Element> parent)
     {
         auto toolbar = parent->add<Widget::Panel>();
 

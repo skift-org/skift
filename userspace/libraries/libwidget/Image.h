@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 namespace Widget
 {
 
-class Image : public Component
+class Image : public Element
 {
 private:
     RefPtr<Graphic::Bitmap> _bitmap;

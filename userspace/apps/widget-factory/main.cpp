@@ -29,17 +29,17 @@ int main(int argc, char **argv)
         panel_hflow->layout(HFLOW(8));
 
         auto p1 = panel_hflow->add<Widget::Panel>();
-        p1->flags(Widget::Component::FILL);
+        p1->flags(Widget::Element::FILL);
 
         auto button = panel_hflow->add<Widget::Button>(Widget::Button::TEXT, "Hello, world!");
-        button->flags(Widget::Component::FILL);
+        button->flags(Widget::Element::FILL);
 
         auto p2 = panel_hflow->add<Widget::Container>();
         p2->layout(STACK());
-        p2->flags(Widget::Component::FILL);
+        p2->flags(Widget::Element::FILL);
 
         auto p3 = panel_hflow->add<Widget::Panel>();
-        p3->flags(Widget::Component::FILL);
+        p3->flags(Widget::Element::FILL);
     }
 
     window->root()->add<Widget::Label>("Buttons", Anchor::CENTER);
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     auto panel_grid = window->root()->add<Widget::Container>();
     {
         panel_grid->layout(GRID(3, 3, 4, 4));
-        panel_grid->flags(Widget::Component::FILL);
+        panel_grid->flags(Widget::Element::FILL);
 
         panel_grid->add<Widget::Panel>();
         panel_grid->add<Widget::TextField>(Widget::TextModel::empty());

@@ -1,15 +1,15 @@
 #pragma once
 
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 namespace Widget
 {
 
-struct Spacer : public Component
+struct Spacer : public Element
 {
     Spacer()
     {
-        flags(Component::FILL | Component::NO_MOUSE_HIT);
+        flags(Element::FILL | Element::NO_MOUSE_HIT);
     }
 };
 

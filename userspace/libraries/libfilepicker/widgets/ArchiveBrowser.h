@@ -25,7 +25,7 @@ public:
         _listing = make<ArchiveListing>(navigation, archive);
         model(_listing);
 
-        flags(Component::FILL);
+        flags(Element::FILL);
 
         empty_message("This archive is empty.");
 

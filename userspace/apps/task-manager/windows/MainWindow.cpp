@@ -45,7 +45,7 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
     _table_model = make<TaskModel>();
 
     _table = root()->add<Widget::Table>(_table_model);
-    _table->flags(Widget::Component::FILL);
+    _table->flags(Widget::Element::FILL);
 
     _table_timer = own<Async::Timer>(1000, [&]() {
         _table_model->update();

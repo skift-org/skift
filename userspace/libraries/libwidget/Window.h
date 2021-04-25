@@ -5,8 +5,8 @@
 #include <libgraphic/Painter.h>
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
-#include <libwidget/Component.h>
 #include <libwidget/Cursor.h>
+#include <libwidget/Element.h>
 #include <libwidget/Event.h>
 
 #include "compositor/Protocol.h"
@@ -52,11 +52,11 @@ private:
 
     EventHandler _handlers[EventType::__COUNT];
 
-    RefPtr<Component> _root;
+    RefPtr<Element> _root;
 
-    Component *_keyboard_focus = nullptr;
-    Component *_mouse_focus = nullptr;
-    Component *_mouse_over = nullptr;
+    Element *_keyboard_focus = nullptr;
+    Element *_mouse_focus = nullptr;
+    Element *_mouse_over = nullptr;
 
     OwnPtr<Async::Invoker> _repaint_invoker;
     OwnPtr<Async::Invoker> _relayout_invoker;
@@ -135,17 +135,17 @@ public:
 
     /* --- Childs ----------------------------------------------------------- */
 
-    RefPtr<Component> root() { return _root; }
+    RefPtr<Element> root() { return _root; }
 
-    void focus_widget(Component *widget);
+    void focus_widget(Element *widget);
 
-    void widget_removed(Component *widget);
+    void widget_removed(Element *widget);
 
-    Component *child_at(Math::Vec2i position);
+    Element *child_at(Math::Vec2i position);
 
     /* --- Focus ------------------------------------------------------------ */
 
-    bool has_keyboard_focus(Component *widget);
+    bool has_keyboard_focus(Element *widget);
 
     /* --- Layout ----------------------------------------------------------- */
 

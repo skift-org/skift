@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
 namespace Widget
 {
 
-class Panel : public Component
+class Panel : public Element
 {
 private:
     int _border_radius = 0;

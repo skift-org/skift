@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     navbar->layout(HGRID(4));
 
     auto demo_widget = window->root()->add<DemoWidget>();
-    demo_widget->flags(Widget::Component::FILL);
+    demo_widget->flags(Widget::Element::FILL);
     demo_widget->demo(&_demos[0]);
 
     for (size_t i = 0; _demos[i].name; i++)

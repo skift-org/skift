@@ -80,7 +80,7 @@ Button::Button(Style style) : _style{style}
     layout(HFLOW(0));
     //insets(Insetsi(0, 16));
     min_height(36);
-    flags(Component::GREEDY);
+    flags(Element::GREEDY);
 }
 
 Button::Button(Style style, RefPtr<Graphic::Icon> icon) : Button{style}
@@ -89,7 +89,7 @@ Button::Button(Style style, RefPtr<Graphic::Icon> icon) : Button{style}
 
     min_width(64);
     min_height(36);
-    flags(Component::GREEDY | Component::SQUARE);
+    flags(Element::GREEDY | Element::SQUARE);
 
     auto icon_panel = add<IconPanel>(icon);
 

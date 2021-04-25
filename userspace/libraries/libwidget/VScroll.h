@@ -1,13 +1,13 @@
 #pragma once
 
-#include <libwidget/Component.h>
 #include <libwidget/Container.h>
+#include <libwidget/Element.h>
 #include <libwidget/ScrollBar.h>
 
 namespace Widget
 {
 
-class VScroll : public Component
+class VScroll : public Element
 {
 private:
     RefPtr<Container> _host = nullptr;
@@ -21,7 +21,7 @@ public:
         _host = add<Container>();
 
         _scrollbar = add<ScrollBar>();
-        _scrollbar->flags(Component::NOT_AFFECTED_BY_SCROLL);
+        _scrollbar->flags(Element::NOT_AFFECTED_BY_SCROLL);
 
         _scrollbar->on(Event::VALUE_CHANGE, [this](auto) {
             scroll({scroll().x(), _scrollbar->value()});

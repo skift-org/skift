@@ -5,9 +5,9 @@
 #include <libgraphic/Font.h>
 #include <libio/Terminal.h>
 #include <libterminal/Terminal.h>
-#include <libwidget/Component.h>
+#include <libwidget/Element.h>
 
-class TerminalWidget : public Widget::Component
+class TerminalWidget : public Widget::Element
 {
 private:
     OwnPtr<Terminal::Terminal> _terminal;

@@ -28,7 +28,7 @@ void show_license()
         "License");
 
     auto field = license_window->root()->add<Widget::TextEditor>(Widget::TextModel::open("/Files/license.md"));
-    field->flags(Widget::Component::FILL);
+    field->flags(Widget::Element::FILL);
     field->readonly(true);
     field->font(Graphic::Font::get("mono").unwrap());
     field->focus();

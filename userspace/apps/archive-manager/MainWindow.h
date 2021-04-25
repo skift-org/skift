@@ -2,7 +2,7 @@
 
 #include <libfile/Archive.h>
 #include <libwidget/Container.h>
-#include <libwidget/Panel.h>
+
 #include <libwidget/TitleBar.h>
 #include <libwidget/Window.h>
 
@@ -63,7 +63,7 @@ public:
         {
             browser->layout(VFLOW(0));
 
-            auto toolbar = browser->add<Widget::Panel>();
+            auto toolbar = browser->add(Widget::panel());
             toolbar->layout(HFLOW(4));
             toolbar->insets(Insetsi(4, 4));
 

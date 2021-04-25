@@ -3,10 +3,8 @@
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Image.h>
 #include <libwidget/Label.h>
 #include <libwidget/PaginationDots.h>
-#include <libwidget/Panel.h>
 #include <libwidget/Screen.h>
 
 struct Page
@@ -85,28 +83,26 @@ int main(int, char **)
     window->show();
     window->root()->layout(STACK());
 
-    auto background = window->root()->add<Widget::Panel>();
+    auto background = window->root()->add(Widget::panel());
 
     background->layout(STACK());
     background->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
     background->flags(Widget::Element::FILL);
 
-    auto dialog = background->add<Widget::Panel>();
+    auto dialog = background->add(Widget::panel(6));
 
     dialog->pin_width(420);
     dialog->pin_height(420);
 
     dialog->layout(VFLOW(0));
-    dialog->border_radius(6);
 
-    auto illustration = dialog->add<Widget::Panel>();
+    auto illustration = dialog->add(Widget::panel(6));
     illustration->min_height(160);
-    illustration->border_radius(6);
     illustration->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::WHITE);
 
-    auto image = illustration->add<Widget::Image>(Graphic::Bitmap::placeholder());
+    auto image = Widget::image(Graphic::Bitmap::placeholder(), Graphic::BitmapScaling::CENTER);
+    illustration->add(image);
     image->flags(Widget::Element::FILL);
-    image->scaling(Graphic::BitmapScaling::CENTER);
 
     auto content = dialog->add<Widget::Container>();
     content->flags(Widget::Element::FILL);

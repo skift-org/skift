@@ -1,6 +1,6 @@
 #include <libwidget/Button.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Panel.h>
+
 #include <libwidget/TitleBar.h>
 #include <libwidget/dialog/MessageBox.h>
 
@@ -20,7 +20,7 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
         "Task Manager");
 
     /// --- Toolbar --- ///
-    auto toolbar = root()->add<Widget::Panel>();
+    auto toolbar = root()->add(Widget::panel());
 
     toolbar->layout(HFLOW(4));
     toolbar->insets(Insetsi(4, 4));
@@ -54,7 +54,7 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
     _table_timer->start();
 
     /// --- Graphs --- ///
-    auto graphs_container = root()->add<Widget::Panel>();
+    auto graphs_container = root()->add(Widget::panel());
     graphs_container->layout(HFLOW(0));
     graphs_container->min_height(128);
 

@@ -1,15 +1,15 @@
 #include <libgraphic/Painter.h>
-#include <libwidget/Panel.h>
+#include <libwidget/elements/PanelElement.h>
 
 namespace Widget
 {
 
-Panel::Panel(int radius)
+PanelElement::PanelElement(int radius)
 {
     _border_radius = radius;
 }
 
-void Panel::paint(Graphic::Painter &painter, const Math::Recti &)
+void PanelElement::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     if (_border_radius > 0)
     {

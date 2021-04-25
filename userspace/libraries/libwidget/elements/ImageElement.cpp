@@ -1,20 +1,20 @@
 #include <libgraphic/Painter.h>
-#include <libwidget/Image.h>
+#include <libwidget/elements/ImageElement.h>
 
 namespace Widget
 {
 
-Image::Image(RefPtr<Graphic::Bitmap> bitmap)
+ImageElement::ImageElement(RefPtr<Graphic::Bitmap> bitmap)
     : _bitmap(bitmap)
 {
 }
 
-Image::Image(RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling)
+ImageElement::ImageElement(RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling)
     : _bitmap(bitmap), _scaling(scaling)
 {
 }
 
-void Image::change_bitmap(RefPtr<Graphic::Bitmap> bitmap)
+void ImageElement::change_bitmap(RefPtr<Graphic::Bitmap> bitmap)
 {
     if (_bitmap != bitmap)
     {
@@ -23,7 +23,7 @@ void Image::change_bitmap(RefPtr<Graphic::Bitmap> bitmap)
     }
 }
 
-void Image::scaling(Graphic::BitmapScaling scaling)
+void ImageElement::scaling(Graphic::BitmapScaling scaling)
 {
     if (_scaling != scaling)
     {
@@ -32,7 +32,7 @@ void Image::scaling(Graphic::BitmapScaling scaling)
     }
 }
 
-void Image::paint(Graphic::Painter &painter, const Math::Recti &)
+void ImageElement::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     if (!_bitmap)
     {
@@ -42,7 +42,7 @@ void Image::paint(Graphic::Painter &painter, const Math::Recti &)
     painter.blit(*_bitmap, _scaling, bound());
 }
 
-Math::Vec2i Image::size()
+Math::Vec2i ImageElement::size()
 {
     if (_scaling == Graphic::BitmapScaling::CENTER)
     {

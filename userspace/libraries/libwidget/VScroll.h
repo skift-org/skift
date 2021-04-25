@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libwidget/Container.h>
 #include <libwidget/Element.h>
 #include <libwidget/ScrollBar.h>
 

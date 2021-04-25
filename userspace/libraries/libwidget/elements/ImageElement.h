@@ -5,16 +5,16 @@
 namespace Widget
 {
 
-class Image : public Element
+class ImageElement : public Element
 {
 private:
     RefPtr<Graphic::Bitmap> _bitmap;
     Graphic::BitmapScaling _scaling = Graphic::BitmapScaling::FIT;
 
 public:
-    Image(RefPtr<Graphic::Bitmap> bitmap);
+    ImageElement(RefPtr<Graphic::Bitmap> bitmap);
 
-    Image(RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling);
+    ImageElement(RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling);
 
     void change_bitmap(RefPtr<Graphic::Bitmap> bitmap);
 
@@ -25,11 +25,11 @@ public:
     virtual Math::Vec2i size() override;
 };
 
-static inline RefPtr<Image> image(
+static inline RefPtr<ImageElement> image(
     RefPtr<Graphic::Bitmap> bitmap,
     Graphic::BitmapScaling scaling = Graphic::BitmapScaling::FIT)
 {
-    return make<Image>(bitmap, scaling);
+    return make<ImageElement>(bitmap, scaling);
 }
 
 } // namespace Widget

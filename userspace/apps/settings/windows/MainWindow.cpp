@@ -1,5 +1,5 @@
 #include <libwidget/Button.h>
-#include <libwidget/Panel.h>
+
 #include <libwidget/TitleBar.h>
 
 #include "settings/pages/Home.h"
@@ -18,7 +18,7 @@ MainWindow::MainWindow() : Window(WINDOW_RESIZABLE)
         Graphic::Icon::get("cog"),
         "Settings");
 
-    auto navigation_bar = root()->add<Widget::Panel>();
+    auto navigation_bar = root()->add(Widget::panel());
     navigation_bar->layout(HFLOW(4));
     navigation_bar->insets(4);
 

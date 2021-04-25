@@ -4,8 +4,6 @@
 
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
-#include <libwidget/Image.h>
-#include <libwidget/Panel.h>
 #include <libwidget/TitleBar.h>
 
 int main(int argc, char **argv)
@@ -22,7 +20,7 @@ int main(int argc, char **argv)
         Graphic::Icon::get("image"),
         "Image Viewer");
 
-    auto toolbar = window->root()->add<Widget::Panel>();
+    auto toolbar = window->root()->add(Widget::panel());
     toolbar->layout(HFLOW(0));
     toolbar->insets(4);
 
@@ -34,7 +32,7 @@ int main(int argc, char **argv)
         Settings::Service::the()->write(Settings::Path::parse("appearance:wallpaper.image"), process_resolve(argv[1]));
     });
 
-    auto image = window->root()->add<Widget::Image>(bitmap);
+    auto image = window->root()->add(Widget::image(bitmap));
     image->flags(Widget::Element::FILL);
 
     window->show();

@@ -2,7 +2,7 @@
 
 #include <libwidget/Button.h>
 #include <libwidget/Label.h>
-#include <libwidget/Panel.h>
+
 #include <libwidget/VScroll.h>
 
 #include <libfilepicker/model/Bookmarks.h>
@@ -11,7 +11,7 @@
 namespace FilePicker
 {
 
-class JumpList : public Widget::Panel
+class JumpList : public Widget::PanelElement
 {
 private:
     RefPtr<Navigation> _navigation;
@@ -23,7 +23,7 @@ private:
 
 public:
     JumpList(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
-        : Panel(),
+        : PanelElement(),
           _navigation(navigation),
           _bookmarks(bookmarks)
     {

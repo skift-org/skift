@@ -5,7 +5,7 @@
 #include <libwidget/Container.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Label.h>
-#include <libwidget/Panel.h>
+
 #include <libwidget/Screen.h>
 
 int main(int, char **)
@@ -17,7 +17,7 @@ int main(int, char **)
     window->opacity(0);
     window->root()->layout(STACK());
 
-    auto background = window->root()->add<Widget::Panel>();
+    auto background = window->root()->add(Widget::panel());
 
     background->layout(STACK());
     background->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
@@ -29,9 +29,8 @@ int main(int, char **)
     dialog->min_height(256);
     dialog->layout(VFLOW(8));
 
-    auto icon_and_title_container = dialog->add<Widget::Panel>();
+    auto icon_and_title_container = dialog->add(Widget::panel(6));
     icon_and_title_container->layout(HFLOW(4));
-    icon_and_title_container->border_radius(6);
     icon_and_title_container->insets(Insetsi{8});
 
     auto title_icon = Widget::icon("power-standby", Graphic::ICON_36PX);

@@ -2,8 +2,7 @@
 #include <libwidget/Application.h>
 #include <libwidget/Container.h>
 #include <libwidget/Label.h>
-#include <libwidget/Panel.h>
-#include <libwidget/Switch.h>
+
 #include <libwidget/TextField.h>
 #include <libwidget/TitleBar.h>
 
@@ -26,7 +25,7 @@ int main(int, char **)
     {
         panel_hflow->layout(HFLOW(8));
 
-        auto p1 = panel_hflow->add<Widget::Panel>();
+        auto p1 = panel_hflow->add(Widget::panel());
         p1->flags(Widget::Element::FILL);
 
         auto button = panel_hflow->add<Widget::Button>(Widget::Button::TEXT, "Hello, world!");
@@ -36,7 +35,7 @@ int main(int, char **)
         p2->layout(STACK());
         p2->flags(Widget::Element::FILL);
 
-        auto p3 = panel_hflow->add<Widget::Panel>();
+        auto p3 = panel_hflow->add(Widget::panel());
         p3->flags(Widget::Element::FILL);
     }
 
@@ -61,7 +60,7 @@ int main(int, char **)
         panel_grid->layout(GRID(3, 3, 4, 4));
         panel_grid->flags(Widget::Element::FILL);
 
-        panel_grid->add<Widget::Panel>();
+        panel_grid->add(Widget::panel());
         panel_grid->add<Widget::TextField>(Widget::TextModel::empty());
         auto text_field = panel_grid->add<Widget::TextField>(Widget::TextModel::empty());
         text_field->focus();
@@ -79,9 +78,9 @@ int main(int, char **)
             picker.show();
         });
 
-        panel_grid->add<Widget::Panel>();
-        panel_grid->add<Widget::Panel>();
-        panel_grid->add<Widget::Panel>();
+        panel_grid->add(Widget::panel());
+        panel_grid->add(Widget::panel());
+        panel_grid->add(Widget::panel());
     }
 
     window->show();

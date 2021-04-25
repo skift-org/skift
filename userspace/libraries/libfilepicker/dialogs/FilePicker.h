@@ -31,7 +31,7 @@ private:
 public:
     Dialog(DialogFlags flags = DIALOG_FLAGS_OPEN);
 
-    ~Dialog();
+    virtual ~Dialog() {}
 
     Optional<String> selected_file() const { return _selected_file; }
 

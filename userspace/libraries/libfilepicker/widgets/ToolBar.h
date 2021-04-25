@@ -2,7 +2,6 @@
 
 #include <libwidget/Button.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Panel.h>
 
 #include <libfilepicker/model/Navigation.h>
 #include <libfilepicker/widgets/Breadcrumb.h>
@@ -10,7 +9,7 @@
 namespace FilePicker
 {
 
-class ToolBar : public Widget::Panel
+class ToolBar : public Widget::PanelElement
 {
 private:
     RefPtr<Navigation> _navigation;
@@ -32,7 +31,7 @@ public:
     static constexpr int NO_OPEN_TERMINAL = 1 << 0;
 
     ToolBar(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks, int flags = 0)
-        : Panel(),
+        : PanelElement(),
           _navigation(navigation),
           _bookmarks(bookmarks)
     {

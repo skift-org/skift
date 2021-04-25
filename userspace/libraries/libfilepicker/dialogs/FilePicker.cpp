@@ -17,10 +17,6 @@ Dialog::Dialog(DialogFlags flags) : _flags(flags)
     buttons(Widget::DialogButton::OK | Widget::DialogButton::CANCEL);
 }
 
-Dialog::~Dialog()
-{
-}
-
 String Dialog::get_title()
 {
     StringBuilder builder;
@@ -68,7 +64,7 @@ void Dialog::render(Widget::Window *window)
         _browser = file_browser;
     }
 
-    auto action_container = window->root()->add<Widget::Panel>();
+    auto action_container = window->root()->add(Widget::panel());
 
     action_container->layout(HFLOW(4));
 

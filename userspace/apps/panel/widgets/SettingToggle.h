@@ -4,7 +4,6 @@
 #include <libwidget/Button.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Label.h>
-#include <libwidget/Switch.h>
 
 namespace panel
 {
@@ -47,8 +46,7 @@ public:
         auto label = add<Widget::Label>(_name);
         label->flags(Element::FILL);
 
-        auto sw = add<Widget::Switch>();
-        sw->state(_enabled);
+        auto sw = add(Widget::toggle(_enabled));
     }
 
     void event(Widget::Event *event) override

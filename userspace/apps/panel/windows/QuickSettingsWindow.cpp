@@ -1,7 +1,8 @@
-#include <libwidget/Elements.h>
-#include <libwidget/Panel.h>
-#include <libwidget/Screen.h>
 #include <skift/Environment.h>
+
+#include <libwidget/Container.h>
+#include <libwidget/Elements.h>
+#include <libwidget/Screen.h>
 
 #include "panel/widgets/SettingToggle.h"
 #include "panel/windows/PanelWindow.h"

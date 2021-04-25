@@ -38,6 +38,11 @@ public:
 
     ResultOr<size_t> read(void *buffer, size_t size) override
     {
+        if (_position > _memory.size())
+        {
+            return 0;
+        }
+
         size_t remaining = MIN(_memory.size() - _position, size);
 
         memcpy(buffer, ((uint8_t *)_memory.start()) + _position, remaining);

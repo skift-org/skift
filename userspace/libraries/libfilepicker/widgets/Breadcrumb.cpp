@@ -2,7 +2,6 @@
 
 #include <libwidget/Button.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Spacer.h>
 #include <libwidget/Window.h>
 
 #include <libfilepicker/widgets/Breadcrumb.h>
@@ -59,7 +58,7 @@ void Breadcrumb::render()
         });
     }
 
-    add<Widget::Spacer>();
+    add(Widget::spacer());
 
     if (_bookmarks)
     {

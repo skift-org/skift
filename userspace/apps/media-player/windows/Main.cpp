@@ -1,8 +1,8 @@
 #include <libgraphic/Icon.h>
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Slider.h>
-#include <libwidget/Spacer.h>
 #include <libwidget/TitleBar.h>
 
 #include "media-player/windows/Main.h"
@@ -25,7 +25,7 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
         Graphic::Icon::get("movie"),
         "Media Player");
 
-    cover->add<Widget::Spacer>();
+    cover->add(Widget::spacer());
 
     auto control_bar = cover->add<Widget::Container>();
 
@@ -35,7 +35,7 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
     control_bar->add<Widget::Button>(Widget::Button::FILLED, Graphic::Icon::get("play"));
     control_bar->add<Widget::Button>(Widget::Button::OUTLINE, Graphic::Icon::get("stop"));
 
-    control_bar->add<Widget::Spacer>();
+    control_bar->add(Widget::spacer());
 
     auto slider = control_bar->add<Widget::Slider>();
     slider->layout(HFLOW(0));

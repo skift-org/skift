@@ -69,7 +69,7 @@ public:
 
             toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("archive-arrow-up"), "Extract All");
 
-            toolbar->add<Widget::Separator>();
+            toolbar->add(Widget::separator());
 
             auto load_button = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
             load_button->on(Widget::Event::ACTION, [&](auto) {

@@ -1,9 +1,8 @@
 #include <libsystem/process/Process.h>
 
 #include <libwidget/Container.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Screen.h>
-#include <libwidget/Separator.h>
-#include <libwidget/Spacer.h>
 
 #include "panel/widgets/DateAndTime.h"
 #include "panel/widgets/RessourceMonitor.h"
@@ -30,15 +29,15 @@ PanelWindow::PanelWindow()
     container->layout(HFLOW(8));
     container->insets(Insetsi(4));
 
-    root()->add<Widget::Separator>();
-    root()->add<Widget::Separator>()->color(Widget::THEME_BORDER, Graphic::Colors::BLACK.with_alpha(0.25));
+    root()->add(Widget::separator());
+    root()->add(Widget::separator())->color(Widget::THEME_BORDER, Graphic::Colors::BLACK.with_alpha(0.25));
 
     auto menu = container->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("menu"), "Applications");
     menu->on(Widget::Event::ACTION, [this](auto) {
         _menu->show();
     });
 
-    container->add<Widget::Spacer>();
+    container->add(Widget::spacer());
 
     auto date_and_time = container->add<DateAndTime>();
 
@@ -46,7 +45,7 @@ PanelWindow::PanelWindow()
         _datetime->show();
     });
 
-    container->add<Widget::Spacer>();
+    container->add(Widget::spacer());
 
     container->add<UserAccount>();
 

@@ -3,8 +3,8 @@
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Panel.h>
-#include <libwidget/Separator.h>
 #include <libwidget/TitleBar.h>
 
 #include "paint/PaintCanvas.h"
@@ -95,7 +95,7 @@ public:
         _save_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("content-save"));
         _new_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("image-plus"));
 
-        toolbar->add<Widget::Separator>();
+        toolbar->add(Widget::separator());
 
         _pencil = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("pencil"));
         _pencil->on(Widget::Event::ACTION, [this](auto) {
@@ -127,7 +127,7 @@ public:
             update_toolbar();
         });
 
-        toolbar->add<Widget::Separator>();
+        toolbar->add(Widget::separator());
 
         // TODO:
         _insert_text = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("format-text-variant"));
@@ -135,7 +135,7 @@ public:
         _insert_rectangle = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("rectangle-outline"));
         _insert_circle = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("circle-outline"));
 
-        toolbar->add<Widget::Separator>();
+        toolbar->add(Widget::separator());
 
         auto primary_color_container = toolbar->add<Widget::Container>();
         primary_color_container->insets(Insetsi(4));

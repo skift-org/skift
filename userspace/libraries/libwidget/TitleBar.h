@@ -3,7 +3,7 @@
 #include <libasync/Invoker.h>
 #include <libwidget/Button.h>
 #include <libwidget/Component.h>
-#include <libwidget/Spacer.h>
+#include <libwidget/Elements.h>
 
 namespace Widget
 {

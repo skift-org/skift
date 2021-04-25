@@ -2,12 +2,12 @@
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Image.h>
 #include <libwidget/Label.h>
 #include <libwidget/PaginationDots.h>
 #include <libwidget/Panel.h>
 #include <libwidget/Screen.h>
-#include <libwidget/Spacer.h>
 
 struct Page
 {
@@ -125,7 +125,7 @@ int main(int, char **)
 
     auto skipall_button = navigation->add<Widget::Button>(Widget::Button::TEXT, "Skip All");
 
-    navigation->add<Widget::Spacer>();
+    navigation->add(Widget::spacer());
 
     auto back_button = navigation->add<Widget::Button>(Widget::Button::OUTLINE, "Previous");
 

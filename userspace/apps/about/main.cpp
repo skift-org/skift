@@ -2,9 +2,9 @@
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Image.h>
 #include <libwidget/Label.h>
-#include <libwidget/Spacer.h>
 #include <libwidget/TextEditor.h>
 #include <libwidget/TitleBar.h>
 

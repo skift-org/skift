@@ -1,6 +1,6 @@
 #include <libwidget/Button.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Panel.h>
-#include <libwidget/Separator.h>
 #include <libwidget/TitleBar.h>
 #include <libwidget/dialog/MessageBox.h>
 
@@ -60,7 +60,7 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
 
     _cpu_graph = graphs_container->add<CPUGraph>(_table_model);
 
-    graphs_container->add<Widget::Separator>();
+    graphs_container->add(Widget::separator());
 
     _ram_graph = graphs_container->add<RAMGraph>(_table_model);
 }

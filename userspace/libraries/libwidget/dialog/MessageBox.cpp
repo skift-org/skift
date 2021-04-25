@@ -1,6 +1,6 @@
 #include <libwidget/Container.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Label.h>
-#include <libwidget/Spacer.h>
 #include <libwidget/dialog/MessageBox.h>
 
 namespace Widget
@@ -41,7 +41,7 @@ void MessageBox::render(Window *window)
     auto container = window->root()->add<Container>();
     container->layout(HFLOW(4));
 
-    container->add<Spacer>();
+    container->add(spacer());
 
     create_buttons(container);
 }

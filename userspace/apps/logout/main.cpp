@@ -7,7 +7,6 @@
 #include <libwidget/Label.h>
 #include <libwidget/Panel.h>
 #include <libwidget/Screen.h>
-#include <libwidget/Spacer.h>
 
 int main(int, char **)
 {
@@ -44,7 +43,7 @@ int main(int, char **)
     warning_container->add<Widget::Label>("Shutdown or restart your computer.", Anchor::BOTTOM_LEFT);
     warning_container->add<Widget::Label>("Any unsaved work will be lost!", Anchor::TOP_LEFT);
 
-    dialog->add<Widget::Spacer>();
+    dialog->add(Widget::spacer());
 
     auto shutdown_button = dialog->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("power-standby"), "Shutdown");
 
@@ -60,7 +59,7 @@ int main(int, char **)
 
     dialog->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("logout"), "Logoff");
 
-    dialog->add<Widget::Spacer>();
+    dialog->add(Widget::spacer());
 
     auto cancel_button = dialog->add<Widget::Button>(Widget::Button::FILLED, "Cancel");
 

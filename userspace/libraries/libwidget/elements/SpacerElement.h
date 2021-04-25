@@ -5,14 +5,18 @@
 namespace Widget
 {
 
-struct Spacer : public Element
+class SpacerElement : public Element
 {
-    Spacer()
+public:
+    SpacerElement()
     {
         flags(Element::FILL | Element::NO_MOUSE_HIT);
     }
 };
 
-static inline RefPtr<Spacer> spacer() { return make<Spacer>(); }
+static inline RefPtr<SpacerElement> spacer()
+{
+    return make<SpacerElement>();
+}
 
 } // namespace Widget

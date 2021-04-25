@@ -8,15 +8,12 @@
 namespace Widget
 {
 
-TitleBar::TitleBar(Component *parent, RefPtr<Graphic::Icon> icon, String title)
-    : Component(parent), _icon{icon}, _title{title}
+TitleBar::TitleBar(RefPtr<Graphic::Icon> icon, String title)
+    : _icon{icon}, _title{title}
 {
     _rebuild_invoker = own<Async::Invoker>([&] {
-        clear_children();
-        build();
+        clear();
     });
-
-    build();
 }
 
 void TitleBar::event(Event *event)
@@ -63,19 +60,19 @@ void TitleBar::build()
     layout(HFLOW(4));
     insets(4);
 
-    new Button(this, Button::TEXT, _icon, _title);
+    add<Button>(Button::TEXT, _icon, _title);
 
-    new Spacer(this);
+    add<Spacer>();
 
     if (window()->flags() & WINDOW_RESIZABLE)
     {
-        Component *button_maximize = new Button(this, Button::TEXT, Graphic::Icon::get("plus"));
+        auto button_maximize = add<Button>(Button::TEXT, Graphic::Icon::get("plus"));
         button_maximize->on(Event::ACTION, [this](auto) {
             window()->toggle_maximise();
         });
     }
 
-    Component *close_button = new Button(this, Button::TEXT, Graphic::Icon::get("close"));
+    auto close_button = add<Button>(Button::TEXT, Graphic::Icon::get("close"));
 
     close_button->on(Event::ACTION, [this](auto) {
         window()->hide();

@@ -22,7 +22,7 @@ private:
 public:
     void blink() { _cursor_blink = !_cursor_blink; };
 
-    TerminalWidget(Component *parent);
+    TerminalWidget();
 
     void handle_read();
 

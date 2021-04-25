@@ -4,8 +4,8 @@
 namespace Widget
 {
 
-Panel::Panel(Component *parent)
-    : Component(parent)
+Panel::Panel()
+
 {
 }
 

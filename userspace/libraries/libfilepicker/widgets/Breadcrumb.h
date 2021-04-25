@@ -23,7 +23,7 @@ private:
     RefPtr<Graphic::Icon> _icon_bookmark_outline;
 
 public:
-    Breadcrumb(Widget::Component *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks);
+    Breadcrumb(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks);
 
     void render();
 };

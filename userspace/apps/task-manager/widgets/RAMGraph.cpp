@@ -11,25 +11,25 @@
 namespace task_manager
 {
 
-RAMGraph::RAMGraph(Component *parent, RefPtr<TaskModel> model)
-    : Graph(parent, 256, Graphic::Colors::ROYALBLUE),
+RAMGraph::RAMGraph(RefPtr<TaskModel> model)
+    : Graph(256, Graphic::Colors::ROYALBLUE),
       _model(model)
 {
     layout(VFLOW(0));
     insets(Insetsi(8));
     flags(Component::FILL);
 
-    auto icon_and_text = new Widget::Container(this);
+    auto icon_and_text = add<Widget::Container>();
     icon_and_text->layout(HFLOW(4));
-    new Widget::IconPanel(icon_and_text, Graphic::Icon::get("chip"));
-    new Widget::Label(icon_and_text, "Memory");
+    icon_and_text->add<Widget::IconPanel>(Graphic::Icon::get("chip"));
+    icon_and_text->add<Widget::Label>("Memory");
 
-    auto cpu_filler = new Widget::Container(this);
+    auto cpu_filler = add<Widget::Container>();
     cpu_filler->flags(Component::FILL);
 
-    _label_usage = new Widget::Label(this, "Usage: nil Mio", Anchor::RIGHT);
-    _label_available = new Widget::Label(this, "Available: nil Mio", Anchor::RIGHT);
-    _label_greedy = new Widget::Label(this, "Most greedy: nil", Anchor::RIGHT);
+    _label_usage = add<Widget::Label>("Usage: nil Mio", Anchor::RIGHT);
+    _label_available = add<Widget::Label>("Available: nil Mio", Anchor::RIGHT);
+    _label_greedy = add<Widget::Label>("Most greedy: nil", Anchor::RIGHT);
 
     _graph_timer = own<Async::Timer>(500, [&]() {
         SystemStatus status{};

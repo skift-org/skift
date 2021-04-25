@@ -15,25 +15,25 @@
 namespace task_manager
 {
 
-CPUGraph::CPUGraph(Component *parent, RefPtr<TaskModel> model)
-    : Graph(parent, 256, Graphic::Colors::SEAGREEN),
+CPUGraph::CPUGraph(RefPtr<TaskModel> model)
+    : Graph(256, Graphic::Colors::SEAGREEN),
       _model(model)
 {
     layout(VFLOW(0));
     insets(Insetsi(8));
     flags(Component::FILL);
 
-    auto icon_and_text = new Widget::Container(this);
+    auto icon_and_text = add<Widget::Container>();
     icon_and_text->layout(HFLOW(4));
-    new Widget::IconPanel(icon_and_text, Graphic::Icon::get("memory"));
-    new Widget::Label(icon_and_text, "Processor");
+    icon_and_text->add<Widget::IconPanel>(Graphic::Icon::get("memory"));
+    icon_and_text->add<Widget::Label>("Processor");
 
-    auto cpu_filler = new Widget::Container(this);
+    auto cpu_filler = add<Widget::Container>();
     cpu_filler->flags(Component::FILL);
 
-    _label_average = new Widget::Label(this, "Average: nil%", Anchor::RIGHT);
-    _label_greedy = new Widget::Label(this, "Most greedy: nil", Anchor::RIGHT);
-    _label_uptime = new Widget::Label(this, "Uptime: nil", Anchor::RIGHT);
+    _label_average = add<Widget::Label>("Average: nil%", Anchor::RIGHT);
+    _label_greedy = add<Widget::Label>("Most greedy: nil", Anchor::RIGHT);
+    _label_uptime = add<Widget::Label>("Uptime: nil", Anchor::RIGHT);
 
     _graph_timer = own<Async::Timer>(100, [&]() {
         SystemStatus status{};

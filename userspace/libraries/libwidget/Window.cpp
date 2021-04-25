@@ -74,10 +74,10 @@ Window::Window(WindowFlag flags)
     backbuffer = Graphic::Bitmap::create_shared(250, 250).unwrap();
     backbuffer_painter = own<Graphic::Painter>(backbuffer);
 
-    _root = new Container(nullptr);
+    _root = make<Container>();
     _root->window(this);
 
-    _keyboard_focus = _root;
+    _keyboard_focus = _root.naked();
 
     _repaint_invoker = own<Async::Invoker>([this]() { repaint_dirty(); });
     _relayout_invoker = own<Async::Invoker>([this]() { relayout(); });
@@ -94,8 +94,6 @@ Window::~Window()
     }
 
     Application::remove_window(this);
-
-    delete _root;
 }
 
 void Window::repaint(Graphic::Painter &painter, Math::Recti rectangle)
@@ -331,7 +329,7 @@ void Window::end_resize()
 
 Component *Window::child_at(Math::Vec2i position)
 {
-    return root()->child_at(position);
+    return root()->at(position);
 }
 
 void Window::on(EventType event, EventHandler handler)

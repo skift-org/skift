@@ -16,61 +16,61 @@ private:
     RefPtr<Navigation> _navigation;
     RefPtr<Bookmarks> _bookmarks;
 
-    Widget::Component *_go_backward;
-    Widget::Component *_go_foreward;
-    Widget::Component *_go_up;
-    Widget::Component *_go_home;
+    RefPtr<Widget::Component> _go_backward;
+    RefPtr<Widget::Component> _go_foreward;
+    RefPtr<Widget::Component> _go_up;
+    RefPtr<Widget::Component> _go_home;
 
-    Widget::Component *_breadcrumb;
+    RefPtr<Widget::Component> _breadcrumb;
 
-    Widget::Component *_refresh;
-    Widget::Component *_open_terminal;
+    RefPtr<Widget::Component> _refresh;
+    RefPtr<Widget::Component> _open_terminal;
 
     OwnPtr<Async::Observer<Navigation>> _observer;
 
 public:
     static constexpr int NO_OPEN_TERMINAL = 1 << 0;
 
-    ToolBar(Widget::Component *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks, int flags = 0)
-        : Panel(parent),
+    ToolBar(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks, int flags = 0)
+        : Panel(),
           _navigation(navigation),
           _bookmarks(bookmarks)
     {
         layout(HFLOW(4));
         insets(Insetsi(4, 4));
 
-        _go_backward = new Widget::Button(this, Widget::Button::TEXT, Graphic::Icon::get("arrow-left"));
+        _go_backward = add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("arrow-left"));
 
         _go_backward->on(Widget::Event::ACTION, [this](auto) {
             _navigation->go_backward();
         });
 
-        _go_foreward = new Widget::Button(this, Widget::Button::TEXT, Graphic::Icon::get("arrow-right"));
+        _go_foreward = add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("arrow-right"));
 
         _go_foreward->on(Widget::Event::ACTION, [this](auto) {
             _navigation->go_forward();
         });
 
-        _go_up = new Widget::Button(this, Widget::Button::TEXT, Graphic::Icon::get("arrow-up"));
+        _go_up = add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("arrow-up"));
 
         _go_up->on(Widget::Event::ACTION, [this](auto) {
             _navigation->go_up();
         });
 
-        _go_home = new Widget::Button(this, Widget::Button::TEXT, Graphic::Icon::get("home"));
+        _go_home = add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("home"));
 
         _go_home->on(Widget::Event::ACTION, [this](auto) {
             _navigation->go_home();
         });
 
-        new Widget::Separator(this);
+        add<Widget::Separator>();
 
-        _breadcrumb = new Breadcrumb(this, _navigation, _bookmarks);
+        _breadcrumb = add<Breadcrumb>(_navigation, _bookmarks);
         _breadcrumb->flags(Component::FILL);
 
-        new Widget::Separator(this);
+        add<Widget::Separator>();
 
-        _refresh = new Widget::Button(this, Widget::Button::TEXT, Graphic::Icon::get("refresh"));
+        _refresh = add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("refresh"));
 
         _refresh->on(Widget::Event::ACTION, [this](auto) {
             _navigation->refresh();
@@ -78,7 +78,7 @@ public:
 
         if (!(flags & NO_OPEN_TERMINAL))
         {
-            Component *terminal_button = new Widget::Button(this, Widget::Button::TEXT, Graphic::Icon::get("console"));
+            auto terminal_button = add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("console"));
 
             terminal_button->on(Widget::Event::ACTION, [](auto) {
                 process_run("terminal", NULL, TASK_NONE);

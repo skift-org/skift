@@ -28,7 +28,7 @@ public:
 
     void value(double value) { _value = value; }
 
-    Slider(Component *parent);
+    Slider();
 
     void event(Event *event) override;
 

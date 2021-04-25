@@ -52,7 +52,7 @@ private:
 
     EventHandler _handlers[EventType::__COUNT];
 
-    Component *_root;
+    RefPtr<Component> _root;
 
     Component *_keyboard_focus = nullptr;
     Component *_mouse_focus = nullptr;
@@ -135,7 +135,7 @@ public:
 
     /* --- Childs ----------------------------------------------------------- */
 
-    Component *root() { return _root; }
+    RefPtr<Component> root() { return _root; }
 
     void focus_widget(Component *widget);
 

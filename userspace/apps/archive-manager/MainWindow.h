@@ -37,22 +37,21 @@ public:
 
     void render()
     {
-        root()->clear_children();
+        root()->clear();
         root()->layout(VFLOW(0));
 
-        new Widget::TitleBar(
-            root(),
+        root()->add<Widget::TitleBar>(
             Graphic::Icon::get("folder-zip"),
             "Archive Manager");
 
-        auto browser = new Widget::Container(root());
+        auto browser = root()->add<Widget::Container>();
 
         browser->flags(Widget::Component::FILL);
 
         if (!_archive)
         {
             browser->layout(STACK());
-            auto load_button = new Widget::Button(browser, Widget::Button::FILLED, Graphic::Icon::get("folder-open"), "Load an archive file");
+            auto load_button = browser->add<Widget::Button>(Widget::Button::FILLED, Graphic::Icon::get("folder-open"), "Load an archive file");
             load_button->on(Widget::Event::ACTION, [&](auto) {
                 if (_dialog.show() == Widget::DialogResult::OK)
                 {
@@ -64,15 +63,15 @@ public:
         {
             browser->layout(VFLOW(0));
 
-            auto toolbar = new Widget::Panel(browser);
+            auto toolbar = browser->add<Widget::Panel>();
             toolbar->layout(HFLOW(4));
             toolbar->insets(Insetsi(4, 4));
 
-            new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("archive-arrow-up"), "Extract All");
+            toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("archive-arrow-up"), "Extract All");
 
-            new Widget::Separator(toolbar);
+            toolbar->add<Widget::Separator>();
 
-            auto load_button = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
+            auto load_button = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
             load_button->on(Widget::Event::ACTION, [&](auto) {
                 if (_dialog.show() == Widget::DialogResult::OK)
                 {
@@ -80,7 +79,7 @@ public:
                 }
             });
 
-            new FilePicker::ArchiveBrowser(browser, _navigation, _archive);
+            browser->add<FilePicker::ArchiveBrowser>(_navigation, _archive);
         }
     }
 };

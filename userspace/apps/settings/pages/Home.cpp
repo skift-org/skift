@@ -4,25 +4,25 @@
 namespace Settings
 {
 
-HomePage::HomePage(Component *parent)
-    : Container(parent)
+HomePage::HomePage()
+    : Container()
 {
     layout(STACK());
     flags(Component::FILL);
 
-    auto links = new Container(this);
+    auto links = add<Container>();
     links->layout(GRID(6, 4, 8, 8));
     links->insets(16);
 
-    new Link(links, Graphic::Icon::get("home"), "test");
-    new Link(links, Graphic::Icon::get("home"), "test");
-    new Link(links, Graphic::Icon::get("home"), "test");
-    new Link(links, Graphic::Icon::get("home"), "test");
-    new Link(links, Graphic::Icon::get("home"), "test");
-    new Link(links, Graphic::Icon::get("home"), "test");
-    new Link(links, Graphic::Icon::get("home"), "test");
-    new Link(links, Graphic::Icon::get("home"), "test");
-    new Link(links, Graphic::Icon::get("home"), "test");
+    links->add<Link>(Graphic::Icon::get("home"), "test");
+    links->add<Link>(Graphic::Icon::get("home"), "test");
+    links->add<Link>(Graphic::Icon::get("home"), "test");
+    links->add<Link>(Graphic::Icon::get("home"), "test");
+    links->add<Link>(Graphic::Icon::get("home"), "test");
+    links->add<Link>(Graphic::Icon::get("home"), "test");
+    links->add<Link>(Graphic::Icon::get("home"), "test");
+    links->add<Link>(Graphic::Icon::get("home"), "test");
+    links->add<Link>(Graphic::Icon::get("home"), "test");
 }
 
 } // namespace Settings

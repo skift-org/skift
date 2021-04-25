@@ -12,9 +12,9 @@ private:
     Graphic::BitmapScaling _scaling = Graphic::BitmapScaling::FIT;
 
 public:
-    Image(Component *parent, RefPtr<Graphic::Bitmap> bitmap);
+    Image(RefPtr<Graphic::Bitmap> bitmap);
 
-    Image(Component *parent, RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling);
+    Image(RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling);
 
     void change_bitmap(RefPtr<Graphic::Bitmap> bitmap);
 

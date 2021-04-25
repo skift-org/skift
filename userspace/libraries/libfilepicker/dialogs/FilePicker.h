@@ -22,9 +22,9 @@ class Dialog : public ::Widget::Dialog
 private:
     RefPtr<Navigation> _navigation = nullptr;
     Optional<String> _selected_file{};
-    Browser *_browser;
+    RefPtr<Browser> _browser;
     DialogFlags _flags;
-    Widget::TextField *_text_field;
+    RefPtr<Widget::TextField> _text_field;
 
     String get_title();
 

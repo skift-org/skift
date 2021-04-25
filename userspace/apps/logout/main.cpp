@@ -20,52 +20,52 @@ int main(int argc, char **argv)
     window->opacity(0);
     window->root()->layout(STACK());
 
-    auto background = new Widget::Panel(window->root());
+    auto background = window->root()->add<Widget::Panel>();
 
     background->layout(STACK());
     background->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
     background->flags(Widget::Component::FILL);
 
-    auto dialog = new Widget::Container(background);
+    auto dialog = background->add<Widget::Container>();
 
     dialog->min_width(256);
     dialog->min_height(256);
     dialog->layout(VFLOW(8));
 
-    auto icon_and_title_container = new Widget::Panel(dialog);
+    auto icon_and_title_container = dialog->add<Widget::Panel>();
     icon_and_title_container->layout(HFLOW(4));
     icon_and_title_container->border_radius(6);
     icon_and_title_container->insets(Insetsi{8});
 
-    auto title_icon = new Widget::IconPanel(icon_and_title_container, Graphic::Icon::get("power-standby"));
+    auto title_icon = icon_and_title_container->add<Widget::IconPanel>(Graphic::Icon::get("power-standby"));
     title_icon->icon_size(Graphic::ICON_36PX);
 
-    auto warning_container = new Widget::Container(icon_and_title_container);
+    auto warning_container = icon_and_title_container->add<Widget::Container>();
     warning_container->flags(Widget::Component::FILL);
     warning_container->layout(VGRID(2));
 
-    new Widget::Label(warning_container, "Shutdown or restart your computer.", Anchor::BOTTOM_LEFT);
-    new Widget::Label(warning_container, "Any unsaved work will be lost!", Anchor::TOP_LEFT);
+    warning_container->add<Widget::Label>("Shutdown or restart your computer.", Anchor::BOTTOM_LEFT);
+    warning_container->add<Widget::Label>("Any unsaved work will be lost!", Anchor::TOP_LEFT);
 
-    new Widget::Spacer(dialog);
+    dialog->add<Widget::Spacer>();
 
-    auto shutdown_button = new Widget::Button(dialog, Widget::Button::TEXT, Graphic::Icon::get("power-standby"), "Shutdown");
+    auto shutdown_button = dialog->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("power-standby"), "Shutdown");
 
     shutdown_button->on(Widget::EventType::ACTION, [&](auto) {
         hj_system_shutdown();
     });
 
-    auto reboot_button = new Widget::Button(dialog, Widget::Button::TEXT, Graphic::Icon::get("restart"), "Reboot");
+    auto reboot_button = dialog->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("restart"), "Reboot");
 
     reboot_button->on(Widget::EventType::ACTION, [&](auto) {
         hj_system_reboot();
     });
 
-    new Widget::Button(dialog, Widget::Button::TEXT, Graphic::Icon::get("logout"), "Logoff");
+    dialog->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("logout"), "Logoff");
 
-    new Widget::Spacer(dialog);
+    dialog->add<Widget::Spacer>();
 
-    auto cancel_button = new Widget::Button(dialog, Widget::Button::FILLED, "Cancel");
+    auto cancel_button = dialog->add<Widget::Button>(Widget::Button::FILLED, "Cancel");
 
     cancel_button->on(Widget::EventType::ACTION, [&](auto) {
         window->hide();

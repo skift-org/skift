@@ -13,7 +13,7 @@ private:
     OwnPtr<Async::Timer> _timer;
 
 public:
-    DateAndTime(Widget::Component *parent);
+    DateAndTime();
 };
 
 } // namespace panel

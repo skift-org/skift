@@ -59,20 +59,20 @@ static const Vector<Page> PAGES = {
     },
 };
 
-void pages(Widget::Component *host, const Page &page)
+void pages(RefPtr<Widget::Component> host, const Page &page)
 {
-    new Widget::Label(host, page.header, Anchor::CENTER);
+    host->add<Widget::Label>(page.header, Anchor::CENTER);
 
-    auto content = new Widget::Container(host);
+    auto content = host->add<Widget::Container>();
     content->insets({8, 0});
     content->layout(VFLOW(2));
 
     for (auto &lines : page.lines)
     {
-        new Widget::Label(content, lines, Anchor::CENTER);
+        content->add<Widget::Label>(lines, Anchor::CENTER);
     }
 
-    new Widget::Label(host, page.footer, Anchor::CENTER);
+    host->add<Widget::Label>(page.footer, Anchor::CENTER);
 }
 
 int main(int argc, char **argv)
@@ -87,13 +87,13 @@ int main(int argc, char **argv)
     window->show();
     window->root()->layout(STACK());
 
-    auto background = new Widget::Panel(window->root());
+    auto background = window->root()->add<Widget::Panel>();
 
     background->layout(STACK());
     background->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
     background->flags(Widget::Component::FILL);
 
-    auto dialog = new Widget::Panel(background);
+    auto dialog = background->add<Widget::Panel>();
 
     dialog->pin_width(420);
     dialog->pin_height(420);
@@ -101,37 +101,37 @@ int main(int argc, char **argv)
     dialog->layout(VFLOW(0));
     dialog->border_radius(6);
 
-    auto illustration = new Widget::Panel(dialog);
+    auto illustration = dialog->add<Widget::Panel>();
     illustration->min_height(160);
     illustration->border_radius(6);
     illustration->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::WHITE);
 
-    auto image = new Widget::Image(illustration, Graphic::Bitmap::placeholder());
+    auto image = illustration->add<Widget::Image>(Graphic::Bitmap::placeholder());
     image->flags(Widget::Component::FILL);
     image->scaling(Graphic::BitmapScaling::CENTER);
 
-    auto content = new Widget::Container(dialog);
+    auto content = dialog->add<Widget::Container>();
     content->flags(Widget::Component::FILL);
     content->insets(16);
     content->layout(VFLOW(4));
 
-    auto dots_container = new Widget::Container(dialog);
+    auto dots_container = dialog->add<Widget::Container>();
     dots_container->insets(16);
 
-    auto dots = new Widget::PaginationDots(dots_container, 5);
+    auto dots = dots_container->add<Widget::PaginationDots>(5);
 
-    auto navigation = new Widget::Container(dialog);
+    auto navigation = dialog->add<Widget::Container>();
 
     navigation->layout(HFLOW(4));
     navigation->insets(8);
 
-    auto skipall_button = new Widget::Button(navigation, Widget::Button::TEXT, "Skip All");
+    auto skipall_button = navigation->add<Widget::Button>(Widget::Button::TEXT, "Skip All");
 
-    new Widget::Spacer(navigation);
+    navigation->add<Widget::Spacer>();
 
-    auto back_button = new Widget::Button(navigation, Widget::Button::OUTLINE, "Previous");
+    auto back_button = navigation->add<Widget::Button>(Widget::Button::OUTLINE, "Previous");
 
-    auto next_button = new Widget::Button(navigation, Widget::Button::FILLED, "Next");
+    auto next_button = navigation->add<Widget::Button>(Widget::Button::FILLED, "Next");
 
     int current_page = 0;
 
@@ -155,7 +155,7 @@ int main(int argc, char **argv)
         auto image_path = IO::format("/Applications/onboarding/illustration{}.png", index);
         image->change_bitmap(Graphic::Bitmap::load_from(image_path).unwrap());
 
-        content->clear_children();
+        content->clear();
         pages(content, PAGES[index]);
     };
 

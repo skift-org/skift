@@ -34,7 +34,7 @@ public:
         should_rebuild();
     }
 
-    TitleBar(Component *parent, RefPtr<Graphic::Icon> icon, String title);
+    TitleBar(RefPtr<Graphic::Icon> icon, String title);
 
     void event(Event *event) override;
 
@@ -42,6 +42,8 @@ public:
     {
         _rebuild_invoker->invoke_later();
     }
+
+    void mounted() override { build(); }
 
     void build();
 };

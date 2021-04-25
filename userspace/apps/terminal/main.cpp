@@ -18,12 +18,11 @@ int main(int argc, char **argv)
 
     window->root()->layout(VFLOW(0));
 
-    new Widget::TitleBar(
-        window->root(),
+    window->root()->add<Widget::TitleBar>(
         Graphic::Icon::get("console-line"),
         "Terminal");
 
-    auto widget = new TerminalWidget(window->root());
+    auto widget = window->root()->add<TerminalWidget>();
     widget->focus();
     widget->flags(Widget::Component::FILL);
     widget->outsets({0, 6, 6, 6});

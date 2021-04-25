@@ -14,7 +14,7 @@ private:
     OwnPtr<Async::Timer> _cpu_timer;
 
 public:
-    RessourceMonitor(Widget::Component *parent);
+    RessourceMonitor();
 };
 
 } // namespace panel

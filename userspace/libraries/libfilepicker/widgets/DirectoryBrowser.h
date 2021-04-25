@@ -11,8 +11,8 @@ namespace FilePicker
 class DirectoryBrowser : public Browser
 {
 public:
-    DirectoryBrowser(Widget::Component *parent, RefPtr<Navigation> navigation)
-        : Browser(parent, navigation)
+    DirectoryBrowser(RefPtr<Navigation> navigation)
+        : Browser(navigation)
     {
         _listing = make<FilesystemModel>(navigation, [](IO::Directory::Entry &entry) {
             return entry.stat.type == FILE_TYPE_DIRECTORY;

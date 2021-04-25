@@ -5,17 +5,16 @@
 namespace Widget
 {
 
-TextEditor::TextEditor(Component *parent, RefPtr<TextModel> model)
-    : Component(parent),
-      _model(model)
+TextEditor::TextEditor(RefPtr<TextModel> model)
+    : _model(model)
 {
-    _vscrollbar = new ScrollBar(this);
+    _vscrollbar = add<ScrollBar>();
     _vscrollbar->on(Event::VALUE_CHANGE, [this](auto) {
         _vscroll_offset = _vscrollbar->value();
         should_repaint();
     });
 
-    _hscrollbar = new ScrollBar(this);
+    _hscrollbar = add<ScrollBar>();
     _hscrollbar->horizontal(true);
 
     _hscrollbar->on(Event::VALUE_CHANGE, [this](auto) {

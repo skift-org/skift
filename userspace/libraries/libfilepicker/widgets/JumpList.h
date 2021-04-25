@@ -19,11 +19,11 @@ private:
 
     OwnPtr<Async::Observer<Bookmarks>> _bookmark_observer;
 
-    Widget::VScroll *_listing;
+    RefPtr<Widget::VScroll> _listing;
 
 public:
-    JumpList(Widget::Component *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
-        : Panel(parent),
+    JumpList(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
+        : Panel(),
           _navigation(navigation),
           _bookmarks(bookmarks)
     {
@@ -34,9 +34,9 @@ public:
             render();
         });
 
-        new Widget::Label(this, "Bookmarks");
+        add<Widget::Label>("Bookmarks");
 
-        _listing = new Widget::VScroll(this);
+        _listing = add<Widget::VScroll>();
         _listing->flags(Component::FILL);
 
         render();
@@ -44,15 +44,14 @@ public:
 
     void render()
     {
-        _listing->host()->clear_children();
+        _listing->host()->clear();
         _listing->host()->layout(VFLOW(4));
 
         for (size_t i = 0; i < _bookmarks->all().count(); i++)
         {
             auto bookmark = _bookmarks->all()[i];
 
-            auto button = new Widget::Button(
-                _listing->host(),
+            auto button = _listing->host()->add<Widget::Button>(
                 Widget::Button::TEXT,
                 bookmark.icon(),
                 bookmark.name());

@@ -85,7 +85,7 @@ struct Layout
         Math::Vec2i((_hspacing), 0), \
     })
 
-class Component
+class Component : public RefCounted<Component>
 {
 private:
     bool _enabled = true;
@@ -113,10 +113,7 @@ private:
     Component *_parent = {};
     Window *_window = {};
 
-    Vector<Component *> _childs = {};
-
-    NONCOPYABLE(Component);
-    NONMOVABLE(Component);
+    Vector<RefPtr<Component>> _childs = {};
 
 public:
     static constexpr auto FILL = (1 << 0);
@@ -159,6 +156,7 @@ public:
 
     Window *window()
     {
+        Assert::not_null(_window);
         return _window;
     }
 
@@ -192,13 +190,15 @@ public:
 
     /* --- subclass API ----------------------------------------------------- */
 
-    Component(Component *parent);
+    Component();
 
     virtual ~Component();
 
     virtual void paint(Graphic::Painter &, const Math::Recti &) {}
 
     virtual void event(Event *) {}
+
+    virtual void mounted() {}
 
     virtual void do_layout();
 
@@ -286,13 +286,23 @@ public:
 
     /* --- Childs ----------------------------------------------------------- */
 
-    Component *child_at(Math::Vec2i position);
+    Component *at(Math::Vec2i position);
 
-    void add_child(Component *child);
+    template <typename T, typename... Args>
+    RefPtr<T> add(Args &&...args)
+    {
+        return add(make<T>(forward<Args>(args)...));
+    }
 
-    void remove_child(Component *child);
+    RefPtr<Component> add(RefPtr<Component> child);
 
-    void clear_children();
+    void del(RefPtr<Component> child);
+
+    void mount(Component &parent);
+
+    void unmount();
+
+    void clear();
 
     /* --- Focus state ------------------------------------------------------ */
 

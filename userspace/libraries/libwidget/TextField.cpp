@@ -4,8 +4,8 @@
 namespace Widget
 {
 
-TextField::TextField(Component *parent, RefPtr<TextModel> model)
-    : Component(parent), _model(model)
+TextField::TextField(RefPtr<TextModel> model)
+    : _model(model)
 {
     _model_observer = _model->observe([this](auto &) {
         _cursor.clamp_within(*_model);

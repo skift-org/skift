@@ -28,7 +28,7 @@ public:
         should_repaint();
     }
 
-    Switch(Component *parent) : Component(parent)
+    Switch()
     {
         pin_width(WIDTH);
         pin_height(HEIGHT);

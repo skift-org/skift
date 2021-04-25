@@ -15,7 +15,7 @@ private:
 public:
     void icon_size(Graphic::IconSize size) { _icon_size = size; }
 
-    IconPanel(Component *parent, RefPtr<Graphic::Icon> icon);
+    IconPanel(RefPtr<Graphic::Icon> icon);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 

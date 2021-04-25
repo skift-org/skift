@@ -50,20 +50,17 @@ void Dialog::render(Widget::Window *window)
     window->size(Math::Vec2i(600, 400));
     window->root()->layout(VFLOW(0));
 
-    new Widget::TitleBar(
-        window->root(),
-        Graphic::Icon::get("widgets"),
-        get_title());
+    window->root()->add<Widget::TitleBar>(Graphic::Icon::get("widgets"), get_title());
 
-    new ToolBar(window->root(), _navigation, nullptr, ToolBar::NO_OPEN_TERMINAL);
+    window->root()->add<ToolBar>(_navigation, nullptr, ToolBar::NO_OPEN_TERMINAL);
 
     if (_flags & DialogFlags::DIALOG_FLAGS_FOLDER)
     {
-        _browser = new DirectoryBrowser(window->root(), _navigation);
+        _browser = window->root()->add<DirectoryBrowser>(_navigation);
     }
     else
     {
-        auto file_browser = new FileBrowser(window->root(), _navigation);
+        auto file_browser = window->root()->add<FileBrowser>(_navigation);
         file_browser->on_element_selected = [this](String &path) {
             _selected_file = path;
             close(Widget::DialogResult::OK);
@@ -71,20 +68,20 @@ void Dialog::render(Widget::Window *window)
         _browser = file_browser;
     }
 
-    auto action_container = new Widget::Panel(window->root());
+    auto action_container = window->root()->add<Widget::Panel>();
 
     action_container->layout(HFLOW(4));
 
     if (_flags & DialogFlags::DIALOG_FLAGS_SAVE)
     {
-        _text_field = new Widget::TextField(action_container, Widget::TextModel::empty());
+        _text_field = action_container->add<Widget::TextField>(Widget::TextModel::empty());
         _text_field->flags(Widget::Component::FILL);
         _text_field->focus();
     }
 
     action_container->insets(Insetsi(4, 4));
 
-    new Widget::Spacer(action_container);
+    action_container->add<Widget::Spacer>();
 
     create_buttons(action_container);
 }

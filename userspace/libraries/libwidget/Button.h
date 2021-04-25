@@ -23,15 +23,15 @@ private:
     Style _style = TEXT;
 
 public:
-    Button(Component *parent, Style style);
+    Button(Style style);
 
-    Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon);
+    Button(Style style, RefPtr<Graphic::Icon> icon);
 
-    Button(Component *parent, Style style, String text);
+    Button(Style style, String text);
 
-    Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon, String text);
+    Button(Style style, RefPtr<Graphic::Icon> icon, String text);
 
-    Button(Component *parent, Style style, RefPtr<Graphic::Bitmap> image, String text);
+    Button(Style style, RefPtr<Graphic::Bitmap> image, String text);
 
     void paint(Graphic::Painter &painter, const Math::Recti &rectangle) override;
 

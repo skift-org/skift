@@ -16,7 +16,7 @@ private:
     int _hscroll_offset = 0;
 
 public:
-    TextField(Component *parent, RefPtr<TextModel> model);
+    TextField(RefPtr<TextModel> model);
 
     ~TextField() override;
 

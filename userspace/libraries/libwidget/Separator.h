@@ -7,7 +7,7 @@ namespace Widget
 
 struct Separator : public Component
 {
-    Separator(Component *parent);
+    Separator();
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 

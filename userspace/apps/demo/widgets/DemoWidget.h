@@ -20,7 +20,7 @@ public:
         should_repaint();
     }
 
-    DemoWidget(Component *parent);
+    DemoWidget();
 
     void tick() { _time += 1.0 / 60; }
 

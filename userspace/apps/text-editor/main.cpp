@@ -11,13 +11,13 @@ struct TextWindow : public Widget::Window
 {
 private:
     /// --- Toolbar --- ///
-    Widget::Component *_open_document;
-    Widget::Component *_save_document;
-    Widget::Component *_new_document;
+    RefPtr<Widget::Component> _open_document;
+    RefPtr<Widget::Component> _save_document;
+    RefPtr<Widget::Component> _new_document;
 
     RefPtr<Widget::TextModel> _text_model;
-    Widget::TitleBar *_title_bar;
-    Widget::TextEditor *_text_editor;
+    RefPtr<Widget::TitleBar> _title_bar;
+    RefPtr<Widget::TextEditor> _text_editor;
 
     void load_document(String path)
     {
@@ -47,8 +47,7 @@ public:
 
         root()->layout(VFLOW(0));
 
-        _title_bar = new Widget::TitleBar(
-            root(),
+        _title_bar = root()->add<Widget::TitleBar>(
             Graphic::Icon::get("text-box"),
             "Text Editor");
 
@@ -56,7 +55,7 @@ public:
 
         _text_model = Widget::TextModel::empty();
 
-        _text_editor = new Widget::TextEditor(root(), _text_model);
+        _text_editor = root()->add<Widget::TextEditor>(_text_model);
         _text_editor->flags(Widget::Component::FILL);
         _text_editor->overscroll(true);
         _text_editor->insets({4});
@@ -65,14 +64,14 @@ public:
         load_document(path);
     }
 
-    void create_toolbar(Widget::Component *parent)
+    void create_toolbar(RefPtr<Widget::Component> parent)
     {
-        auto toolbar = new Widget::Panel(parent);
+        auto toolbar = parent->add<Widget::Panel>();
 
         toolbar->layout(HFLOW(4));
         toolbar->insets(Insetsi(4, 4));
 
-        _open_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
+        _open_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
         _open_document->on(Widget::Event::ACTION, [&](auto) {
             FilePicker::Dialog picker{};
             if (picker.show() == Widget::DialogResult::OK)
@@ -80,7 +79,7 @@ public:
                 load_document(picker.selected_file().unwrap());
             }
         });
-        _save_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("content-save"));
+        _save_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("content-save"));
         _save_document->on(Widget::Event::ACTION, [&](auto) {
             FilePicker::Dialog picker{FilePicker::DIALOG_FLAGS_SAVE};
             if (picker.show() == Widget::DialogResult::OK)
@@ -88,7 +87,7 @@ public:
                 save_document(picker.selected_file().unwrap());
             }
         });
-        _new_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("image-plus"));
+        _new_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("image-plus"));
     }
 };
 

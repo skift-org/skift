@@ -18,7 +18,7 @@ private:
 
     int _selected = -1;
     int _scroll_offset = 0;
-    ScrollBar *_scrollbar;
+    RefPtr<ScrollBar> _scrollbar;
 
     String _empty_message{"No data to display"};
 
@@ -72,9 +72,9 @@ public:
         should_relayout();
     }
 
-    Table(Component *parent);
+    Table();
 
-    Table(Component *parent, RefPtr<TableModel> model);
+    Table(RefPtr<TableModel> model);
 
     void paint(Graphic::Painter &painter, const Math::Recti &dirty) override;
 

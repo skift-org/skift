@@ -13,8 +13,8 @@ private:
     RefPtr<TextModel> _model;
     TextCursor _cursor{};
 
-    ScrollBar *_vscrollbar;
-    ScrollBar *_hscrollbar;
+    RefPtr<ScrollBar> _vscrollbar;
+    RefPtr<ScrollBar> _hscrollbar;
 
     int _vscroll_offset = 0;
     int _hscroll_offset = 0;
@@ -94,7 +94,7 @@ public:
         should_repaint();
     }
 
-    TextEditor(Component *parent, RefPtr<TextModel> model);
+    TextEditor(RefPtr<TextModel> model);
 
     ~TextEditor();
 

@@ -23,12 +23,11 @@ void show_license()
     license_window->size({570, 416});
     license_window->root()->layout(VFLOW(0));
 
-    new Widget::TitleBar(
-        license_window->root(),
+    license_window->root()->add<Widget::TitleBar>(
         Graphic::Icon::get("information"),
         "License");
 
-    auto field = new Widget::TextEditor(license_window->root(), Widget::TextModel::open("/Files/license.md"));
+    auto field = license_window->root()->add<Widget::TextEditor>(Widget::TextModel::open("/Files/license.md"));
     field->flags(Widget::Component::FILL);
     field->readonly(true);
     field->font(Graphic::Font::get("mono").unwrap());
@@ -44,39 +43,38 @@ int main(int argc, char **argv)
     Widget::Window *window = new Widget::Window(WINDOW_NONE);
     window->root()->layout(VFLOW(4));
 
-    new Widget::TitleBar(
-        window->root(),
+    window->root()->add<Widget::TitleBar>(
         Graphic::Icon::get("information"),
         "About");
 
-    auto content_container = new Widget::Container(window->root());
+    auto content_container = window->root()->add<Widget::Container>();
     content_container->layout(VFLOW(4));
     content_container->insets(6);
     {
 
-        auto system_logo = new Widget::Image(content_container, logo_based_on_color_scheme());
+        auto system_logo = content_container->add<Widget::Image>(logo_based_on_color_scheme());
         system_logo->scaling(Graphic::BitmapScaling::CENTER);
         system_logo->outsets({32, 64});
 
-        new Widget::Label(content_container, "The skift operating system.", Anchor::CENTER);
-        new Widget::Label(content_container, __BUILD_VERSION__, Anchor::CENTER);
-        new Widget::Label(content_container, __BUILD_GITREF__ "/" __BUILD_CONFIG__, Anchor::CENTER);
-        new Widget::Label(content_container, "Copyright © 2018-2021", Anchor::CENTER);
-        new Widget::Label(content_container, "N. Van Bossuyt & contributors.", Anchor::CENTER);
+        content_container->add<Widget::Label>("The skift operating system.", Anchor::CENTER);
+        content_container->add<Widget::Label>(__BUILD_VERSION__, Anchor::CENTER);
+        content_container->add<Widget::Label>(__BUILD_GITREF__ "/" __BUILD_CONFIG__, Anchor::CENTER);
+        content_container->add<Widget::Label>("Copyright © 2018-2021", Anchor::CENTER);
+        content_container->add<Widget::Label>("N. Van Bossuyt & contributors.", Anchor::CENTER);
     }
 
-    auto buttons_container = new Widget::Container(window->root());
+    auto buttons_container = window->root()->add<Widget::Container>();
     buttons_container->layout(HFLOW(0));
     buttons_container->insets(6);
     {
-        auto license_button = new Widget::Button(buttons_container, Widget::Button::OUTLINE, "License");
+        auto license_button = buttons_container->add<Widget::Button>(Widget::Button::OUTLINE, "License");
         license_button->on(Widget::Event::ACTION, [window](auto) {
             show_license();
         });
 
-        new Widget::Spacer(buttons_container);
+        buttons_container->add<Widget::Spacer>();
 
-        auto ok_button = new Widget::Button(buttons_container, Widget::Button::FILLED, "Ok");
+        auto ok_button = buttons_container->add<Widget::Button>(Widget::Button::FILLED, "Ok");
         ok_button->on(Widget::Event::ACTION, [window](auto) {
             window->hide();
         });

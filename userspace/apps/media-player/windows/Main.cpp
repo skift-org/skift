@@ -16,31 +16,30 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
 
     root()->layout(VFLOW(0));
 
-    auto cover = new Cover(root(), Graphic::Bitmap::load_from_or_placeholder("/Applications/media-player/cover.png"));
+    auto cover = root()->add<Cover>(Graphic::Bitmap::load_from_or_placeholder("/Applications/media-player/cover.png"));
 
     cover->layout(VFLOW(0));
     cover->flags(Widget::Component::FILL);
 
-    new Widget::TitleBar(
-        cover,
+    cover->add<Widget::TitleBar>(
         Graphic::Icon::get("movie"),
         "Media Player");
 
-    new Widget::Spacer(cover);
+    cover->add<Widget::Spacer>();
 
-    auto control_bar = new Widget::Container(cover);
+    auto control_bar = cover->add<Widget::Container>();
 
     control_bar->insets(12);
     control_bar->layout(HFLOW(4));
 
-    new Widget::Button(control_bar, Widget::Button::FILLED, Graphic::Icon::get("play"));
-    new Widget::Button(control_bar, Widget::Button::OUTLINE, Graphic::Icon::get("stop"));
+    control_bar->add<Widget::Button>(Widget::Button::FILLED, Graphic::Icon::get("play"));
+    control_bar->add<Widget::Button>(Widget::Button::OUTLINE, Graphic::Icon::get("stop"));
 
-    new Widget::Spacer(control_bar);
+    control_bar->add<Widget::Spacer>();
 
-    auto slider = new Widget::Slider(control_bar);
+    auto slider = control_bar->add<Widget::Slider>();
     slider->layout(HFLOW(0));
-    new Widget::Button(slider, Widget::Button::TEXT, Graphic::Icon::get("volume-high"));
+    slider->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("volume-high"));
 }
 
 } // namespace MediaPlayer

@@ -26,8 +26,8 @@ public:
         return process_resolve(_listing->info(selected()).name);
     }
 
-    Browser(Widget::Component *parent, RefPtr<Navigation> navigation)
-        : Widget::Table(parent), _navigation(navigation)
+    Browser(RefPtr<Navigation> navigation)
+        : Widget::Table(), _navigation(navigation)
     {
         flags(Component::FILL);
 

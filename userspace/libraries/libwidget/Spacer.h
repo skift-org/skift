@@ -7,7 +7,7 @@ namespace Widget
 
 struct Spacer : public Component
 {
-    Spacer(Component *parent) : Component(parent)
+    Spacer()
     {
         flags(Component::FILL | Component::NO_MOUSE_HIT);
     }

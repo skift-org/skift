@@ -8,7 +8,7 @@ namespace panel
 class UserAccount : public Widget::Label
 {
 public:
-    UserAccount(Widget::Component *parent);
+    UserAccount();
 };
 
 } // namespace panel

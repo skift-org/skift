@@ -5,13 +5,13 @@
 namespace Widget
 {
 
-Label::Label(Component *parent, String text)
-    : Label(parent, text, Anchor::LEFT)
+Label::Label(String text)
+    : Label(text, Anchor::LEFT)
 {
 }
 
-Label::Label(Component *parent, String text, Anchor anchor)
-    : Component(parent)
+Label::Label(String text, Anchor anchor)
+
 {
     _text = text;
     _anchor = anchor;

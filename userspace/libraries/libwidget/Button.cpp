@@ -75,9 +75,7 @@ void Button::event(Event *event)
     }
 }
 
-Button::Button(Component *parent, Style style)
-    : Component(parent),
-      _style(style)
+Button::Button(Style style) : _style{style}
 {
     layout(HFLOW(0));
     //insets(Insetsi(0, 16));
@@ -85,8 +83,7 @@ Button::Button(Component *parent, Style style)
     flags(Component::GREEDY);
 }
 
-Button::Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon)
-    : Button(parent, style)
+Button::Button(Style style, RefPtr<Graphic::Icon> icon) : Button{style}
 {
     layout(STACK());
 
@@ -94,7 +91,7 @@ Button::Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon)
     min_height(36);
     flags(Component::GREEDY | Component::SQUARE);
 
-    auto icon_panel = new IconPanel(this, icon);
+    auto icon_panel = add<IconPanel>(icon);
 
     if (style == FILLED)
     {
@@ -102,30 +99,28 @@ Button::Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon)
     }
 }
 
-Button::Button(Component *parent, Style style, String text)
-    : Button(parent, style)
+Button::Button(Style style, String text) : Button{style}
 {
     layout(STACK());
     insets(Insetsi(0, 16));
     min_width(64);
 
-    auto label = new Label(this, text, Anchor::CENTER);
+    auto label = add<Label>(text, Anchor::CENTER);
     if (style == FILLED)
     {
         label->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
     }
 }
 
-Button::Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon, String text)
-    : Button(parent, style)
+Button::Button(Style style, RefPtr<Graphic::Icon> icon, String text) : Button{style}
 {
     insets(Insetsi(0, 0, 12, 16));
     min_width(64);
 
-    auto icon_panel = new IconPanel(this, icon);
+    auto icon_panel = add<IconPanel>(icon);
     icon_panel->insets(Insetsi(0, 0, 0, 8));
 
-    auto label = new Label(this, text);
+    auto label = add<Label>(text);
 
     if (style == FILLED)
     {
@@ -134,18 +129,17 @@ Button::Button(Component *parent, Style style, RefPtr<Graphic::Icon> icon, Strin
     }
 }
 
-Button::Button(Component *parent, Style style, RefPtr<Graphic::Bitmap> image, String text)
-    : Button(parent, style)
+Button::Button(Style style, RefPtr<Graphic::Bitmap> image, String text) : Button{style}
 {
     insets(Insetsi(4, 4, 12, 16));
     min_width(64);
 
-    auto image_panel = new Image(this, image, Graphic::BitmapScaling::FIT);
+    auto image_panel = add<Image>(image, Graphic::BitmapScaling::FIT);
     image_panel->outsets(Insetsi(0, 0, 0, 8));
     image_panel->min_width(36);
     image_panel->min_height(36);
 
-    auto label = new Label(this, text);
+    auto label = add<Label>(text);
 
     if (style == FILLED)
     {

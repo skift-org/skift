@@ -33,7 +33,7 @@ public:
         _index = index;
     }
 
-    PaginationDots(Component *parent, int count);
+    PaginationDots(int count);
 
     ~PaginationDots() override;
 

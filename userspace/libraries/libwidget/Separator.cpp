@@ -4,7 +4,7 @@
 namespace Widget
 {
 
-Separator::Separator(Component *parent) : Component(parent)
+Separator::Separator()
 {
 }
 

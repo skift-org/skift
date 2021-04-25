@@ -24,40 +24,40 @@ QuickSettingsWindow::QuickSettingsWindow()
     root()->layout(VFLOW(4));
     root()->insets(6);
 
-    auto title = new Widget::Label(root(), "Quick settings");
+    auto title = root()->add<Widget::Label>("Quick settings");
     title->outsets({12, 6, 12, 12});
 
-    new SettingToggle(root(), "Show Wireframe", Graphic::Icon::get("duck"), "appearance:widgets.wireframe");
-    new SettingToggle(root(), "Night Light", Graphic::Icon::get("moon-waning-crescent"), "appearance:night-light.enable");
+    root()->add<SettingToggle>("Show Wireframe", Graphic::Icon::get("duck"), "appearance:widgets.wireframe");
+    root()->add<SettingToggle>("Night Light", Graphic::Icon::get("moon-waning-crescent"), "appearance:night-light.enable");
 
-    (new Widget::Button(root(), Widget::Button::TEXT, "Light Theme"))->on(Widget::Event::ACTION, [](auto) {
+    root()->add<Widget::Button>(Widget::Button::TEXT, "Light Theme")->on(Widget::Event::ACTION, [](auto) {
         Settings::Service::the()->write(Settings::Path::parse("appearance:widgets.theme"), "skift-light");
     });
 
-    (new Widget::Button(root(), Widget::Button::TEXT, "Dark Theme"))->on(Widget::Event::ACTION, [](auto) {
+    root()->add<Widget::Button>(Widget::Button::TEXT, "Dark Theme")->on(Widget::Event::ACTION, [](auto) {
         Settings::Service::the()->write(Settings::Path::parse("appearance:widgets.theme"), "skift-dark");
     });
 
-    auto account_container = new Widget::Container(root());
+    auto account_container = root()->add<Widget::Container>();
     account_container->layout(HFLOW(4));
 
-    new Widget::Button(account_container, Widget::Button::TEXT, Graphic::Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string());
+    account_container->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string());
 
-    new Widget::Spacer(account_container);
+    account_container->add<Widget::Spacer>();
 
-    auto folder_button = new Widget::Button(account_container, Widget::Button::TEXT, Graphic::Icon::get("folder"));
+    auto folder_button = account_container->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("folder"));
 
     folder_button->on(Widget::EventType::ACTION, [&](auto) {
         process_run("file-manager", nullptr, 0);
     });
 
-    auto setting_button = new Widget::Button(account_container, Widget::Button::TEXT, Graphic::Icon::get("cog"));
+    auto setting_button = account_container->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("cog"));
 
     setting_button->on(Widget::EventType::ACTION, [&](auto) {
         process_run("settings", nullptr, 0);
     });
 
-    auto logout_button = new Widget::Button(account_container, Widget::Button::TEXT, Graphic::Icon::get("power-standby"));
+    auto logout_button = account_container->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("power-standby"));
     logout_button->on(Widget::EventType::ACTION, [&](auto) {
         process_run("logout", nullptr, 0);
     });

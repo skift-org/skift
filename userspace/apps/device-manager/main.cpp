@@ -12,7 +12,7 @@
 class DeviceManagerWindow : public Widget::Window
 {
 private:
-    Widget::Component *_table;
+    RefPtr<Widget::Table> _table;
 
 public:
     DeviceManagerWindow() : Widget::Window(WINDOW_RESIZABLE)
@@ -21,16 +21,13 @@ public:
 
         root()->layout(VFLOW(0));
 
-        new Widget::TitleBar(
-            root(),
-            Graphic::Icon::get("expansion-card-variant"),
-            "Device Manager");
+        root()->add<Widget::TitleBar>(Graphic::Icon::get("expansion-card-variant"), "Device Manager");
 
         auto model = make<DeviceModel>();
 
         model->update();
 
-        _table = new Widget::Table(root(), model);
+        _table = root()->add<Widget::Table>(model);
         _table->flags(Widget::Component::FILL);
     }
 };

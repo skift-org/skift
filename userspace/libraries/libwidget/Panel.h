@@ -13,7 +13,7 @@ private:
 public:
     void border_radius(int value) { _border_radius = value; }
 
-    Panel(Component *parent);
+    Panel();
 
     void paint(Graphic::Painter &painter, const Math::Recti &) override;
 };

@@ -16,8 +16,8 @@ struct BoardWidget : public Widget::Component
     RefPtr<Board> board;
     OwnPtr<Async::Timer> _timer;
 
-    BoardWidget(Component *parent)
-        : Component(parent)
+    BoardWidget()
+
     {
         board = make<Board>(15, 15);
 

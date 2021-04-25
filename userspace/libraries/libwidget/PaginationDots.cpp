@@ -5,9 +5,8 @@
 namespace Widget
 {
 
-PaginationDots::PaginationDots(Component *parent, int count)
-    : Component(parent),
-      _count(count)
+PaginationDots::PaginationDots(int count)
+    : _count(count)
 {
     max_height(DOTSIZE);
     max_width(size().x());

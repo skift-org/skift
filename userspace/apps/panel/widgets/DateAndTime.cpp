@@ -6,11 +6,11 @@
 namespace panel
 {
 
-DateAndTime::DateAndTime(Component *parent) : Button(parent, Button::TEXT)
+DateAndTime::DateAndTime() : Button(Button::TEXT)
 {
     min_width(128);
 
-    auto label = new Widget::Label(this, "", Anchor::CENTER);
+    auto label = add<Widget::Label>("", Anchor::CENTER);
     label->flags(FILL);
 
     _timer = own<Async::Timer>(1000, [this, label]() {

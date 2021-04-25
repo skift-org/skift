@@ -84,11 +84,11 @@ public:
 
     virtual void on_button(DialogButton) {}
 
-    void create_buttons(Component *parent)
+    void create_buttons(RefPtr<Component> parent)
     {
         if (_buttons & DialogButton::YES)
         {
-            auto button = new Button(parent, Button::OUTLINE, "Yes");
+            auto button = parent->add<Button>(Button::OUTLINE, "Yes");
             button->on(Event::ACTION, [&](auto) {
                 on_button(DialogButton::YES);
                 close(DialogResult::YES);
@@ -98,7 +98,7 @@ public:
 
         if (_buttons & DialogButton::NO)
         {
-            auto button = new Button(parent, Button::OUTLINE, "No");
+            auto button = parent->add<Button>(Button::OUTLINE, "No");
             button->on(Event::ACTION, [&](auto) {
                 on_button(DialogButton::NO);
                 close(DialogResult::NO);
@@ -108,7 +108,7 @@ public:
 
         if (_buttons & DialogButton::OK)
         {
-            auto button = new Button(parent, Button::OUTLINE, "Ok");
+            auto button = parent->add<Button>(Button::OUTLINE, "Ok");
             button->on(Event::ACTION, [&](auto) {
                 on_button(DialogButton::OK);
                 close(DialogResult::OK);
@@ -118,7 +118,7 @@ public:
 
         if (_buttons & DialogButton::CANCEL)
         {
-            auto button = new Button(parent, Button::OUTLINE, "Cancel");
+            auto button = parent->add<Button>(Button::OUTLINE, "Cancel");
             button->on(Event::ACTION, [&](auto) {
                 on_button(DialogButton::CANCEL);
                 close(DialogResult::CANCEL);

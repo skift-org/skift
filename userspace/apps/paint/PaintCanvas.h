@@ -19,7 +19,7 @@ public:
         return _document->bound().centered_within(bound());
     }
 
-    PaintCanvas(Widget::Component *parent, RefPtr<PaintDocument> document);
+    PaintCanvas(RefPtr<PaintDocument> document);
 
     void paint(Graphic::Painter &painter, const Math::Recti &dirty) override;
 

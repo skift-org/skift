@@ -14,7 +14,7 @@ private:
     size_t _current;
 
 public:
-    Graph(Component *parent, size_t data_size, Graphic::Color data_color);
+    Graph(size_t data_size, Graphic::Color data_color);
 
     ~Graph();
 

@@ -12,7 +12,7 @@ private:
     RefPtr<Graphic::Icon> _alert_icon;
 
 public:
-    Placeholder(Component *parent, String text);
+    Placeholder(String text);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 };

@@ -9,17 +9,17 @@ namespace Widget
 class HScroll : public Component
 {
 private:
-    Container *_host = nullptr;
-    ScrollBar *_scrollbar = nullptr;
+    RefPtr<Container> _host = nullptr;
+    RefPtr<ScrollBar> _scrollbar = nullptr;
 
 public:
-    Container *host() { return _host; }
+    RefPtr<Container> host() { return _host; }
 
-    HScroll(Component *parent) : Component(parent)
+    HScroll()
     {
-        _host = new Container(this);
+        _host = add<Container>();
 
-        _scrollbar = new ScrollBar(this);
+        _scrollbar = add<ScrollBar>();
         _scrollbar->flags(Component::NOT_AFFECTED_BY_SCROLL);
 
         _scrollbar->on(Event::VALUE_CHANGE, [this](auto) {

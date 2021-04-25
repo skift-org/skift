@@ -24,15 +24,15 @@ MenuWindow::MenuWindow()
     root()->layout(HFLOW(0));
     root()->insets(6);
 
-    auto container = new Widget::Container(root());
+    auto container = root()->add<Widget::Container>();
     container->layout(VFLOW(0));
     container->flags(Widget::Component::FILL);
 
     auto model = Widget::TextModel::empty();
 
-    new SearchBar(container, model);
+    container->add<SearchBar>(model);
 
-    auto listing = new ApplicationListing(container);
+    auto listing = container->add<ApplicationListing>();
 
     _search_query_observer = model->observe([listing](auto &text) {
         listing->filter(text.string());

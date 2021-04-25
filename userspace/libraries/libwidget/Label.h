@@ -20,9 +20,9 @@ public:
         should_repaint();
     }
 
-    Label(Component *parent, String text);
+    Label(String text);
 
-    Label(Component *parent, String text, Anchor anchor);
+    Label(String text, Anchor anchor);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 

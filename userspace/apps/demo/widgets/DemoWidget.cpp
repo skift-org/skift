@@ -9,8 +9,7 @@ void demo_widget_on_timer_tick(DemoWidget *widget)
     widget->should_repaint();
 }
 
-DemoWidget::DemoWidget(Component *parent)
-    : Component(parent)
+DemoWidget::DemoWidget()
 {
     _demo = nullptr;
     _timer = own<Async::Timer>(1000 / 60, [this]() {

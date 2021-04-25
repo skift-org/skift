@@ -32,6 +32,11 @@ Graphic::Color Component::color(ThemeColorRole role)
         }
     }
 
+    if (!_window)
+    {
+        return Graphic::Colors::MAGENTA;
+    }
+
     return _colors[role].unwrap_or(_window->color(role));
 }
 
@@ -54,28 +59,14 @@ void Component::cursor(CursorState cursor)
     window()->cursor(cursor);
 }
 
-Component::Component(Component *parent)
+Component::Component()
 {
     _enabled = true;
     _container = Math::Recti(32, 32);
-
-    if (parent)
-    {
-        _window = parent->_window;
-        parent->add_child(this);
-    }
 }
 
 Component::~Component()
 {
-    clear_children();
-
-    if (_parent)
-    {
-        _parent->remove_child(this);
-        _parent = nullptr;
-    }
-
     if (_window)
     {
         _window->widget_removed(this);
@@ -478,7 +469,7 @@ void Component::enable_if(bool condition)
 
 /* --- Childs --------------------------------------------------------------- */
 
-Component *Component::child_at(Math::Vec2i position)
+Component *Component::at(Math::Vec2i position)
 {
     Component *result = this;
 
@@ -487,10 +478,10 @@ Component *Component::child_at(Math::Vec2i position)
         return result;
     }
 
-    _childs.foreach_reversed([&](Component *child) {
+    _childs.foreach_reversed([&](RefPtr<Component> child) {
         if (!(child->flags() & NO_MOUSE_HIT) && child->container().contains(position))
         {
-            result = child->child_at(position - child->origin());
+            result = child->at(position - child->origin());
 
             return Iteration::STOP;
         }
@@ -503,33 +494,64 @@ Component *Component::child_at(Math::Vec2i position)
     return result;
 }
 
-void Component::add_child(Component *child)
+RefPtr<Component> Component::add(RefPtr<Component> child)
 {
     Assert::not_null(child);
     Assert::equal(child->_parent, nullptr);
 
-    child->_parent = this;
-    child->_window = _window;
     _childs.push_back(child);
+
+    if (_window != nullptr)
+    {
+        child->mount(*this);
+    }
 
     should_relayout();
     should_repaint();
+
+    return child;
 }
 
-void Component::remove_child(Component *child)
+void Component::del(RefPtr<Component> child)
 {
     Assert::equal(child->_parent, this);
+
+    child->unmount();
 
     _childs.remove_value(child);
     should_relayout();
 }
 
-void Component::clear_children()
+void Component::mount(Component &parent)
 {
-    while (_childs.any())
+    _parent = &parent;
+    _window = parent.window();
+
+    for (auto &child : _childs)
     {
-        delete _childs.peek();
+        child->mount(*this);
     }
+
+    mounted();
+}
+
+void Component::unmount()
+{
+    if (_parent)
+    {
+        _parent = nullptr;
+        _window = nullptr;
+
+        for (auto &child : _childs)
+        {
+            child->unmount();
+        }
+    }
+}
+
+void Component::clear()
+{
+    _childs.clear();
 
     should_relayout();
     should_repaint();

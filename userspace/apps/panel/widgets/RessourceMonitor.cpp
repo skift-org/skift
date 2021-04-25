@@ -10,22 +10,21 @@
 namespace panel
 {
 
-RessourceMonitor::RessourceMonitor(Component *parent)
-    : Button(parent, Button::TEXT)
+RessourceMonitor::RessourceMonitor()
+    : Button(Button::TEXT)
 {
     layout(VGRID(1));
     insets(0);
 
-    auto ram_graph = new Widget::Graph(this, 50, Graphic::Colors::ROYALBLUE);
-    new Widget::Label(ram_graph, "RAM", Anchor::CENTER);
+    auto ram_graph = add<Widget::Graph>(50, Graphic::Colors::ROYALBLUE);
+    ram_graph->add<Widget::Label>("RAM", Anchor::CENTER);
 
-    auto cpu_graph = new Widget::Graph(this, 50, Graphic::Colors::SEAGREEN);
-    new Widget::Label(cpu_graph, "CPU", Anchor::CENTER);
+    auto cpu_graph = add<Widget::Graph>(50, Graphic::Colors::SEAGREEN);
+    cpu_graph->add<Widget::Label>("CPU", Anchor::CENTER);
 
     _ram_timer = own<Async::Timer>(700, [ram_graph]() {
         SystemStatus status{};
         hj_system_status(&status);
-
         ram_graph->record(status.used_ram / (float)status.total_ram);
     });
 

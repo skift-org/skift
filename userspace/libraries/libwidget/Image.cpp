@@ -4,13 +4,13 @@
 namespace Widget
 {
 
-Image::Image(Component *parent, RefPtr<Graphic::Bitmap> bitmap)
-    : Component(parent), _bitmap(bitmap)
+Image::Image(RefPtr<Graphic::Bitmap> bitmap)
+    : _bitmap(bitmap)
 {
 }
 
-Image::Image(Component *parent, RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling)
-    : Component(parent), _bitmap(bitmap), _scaling(scaling)
+Image::Image(RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling)
+    : _bitmap(bitmap), _scaling(scaling)
 {
 }
 

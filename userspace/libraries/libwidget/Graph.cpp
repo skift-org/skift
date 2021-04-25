@@ -6,8 +6,7 @@
 namespace Widget
 {
 
-Graph::Graph(Component *parent, size_t data_size, Graphic::Color data_color)
-    : Component(parent)
+Graph::Graph(size_t data_size, Graphic::Color data_color)
 {
     min_width(64);
     min_height(16);

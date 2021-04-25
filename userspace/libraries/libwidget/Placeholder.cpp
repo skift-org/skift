@@ -5,9 +5,8 @@
 namespace Widget
 {
 
-Placeholder::Placeholder(Component *parent, String text)
-    : Component(parent),
-      _alert_icon(Graphic::Icon::get("alert"))
+Placeholder::Placeholder(String text)
+    : _alert_icon(Graphic::Icon::get("alert"))
 {
     _text = IO::format("Cannot create an instance of \"{}\".", text);
 }

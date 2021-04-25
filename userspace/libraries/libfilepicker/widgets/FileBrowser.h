@@ -14,8 +14,8 @@ class FileBrowser : public Browser
 public:
     Callback<void(String &path)> on_element_selected;
 
-    FileBrowser(Widget::Component *parent, RefPtr<Navigation> navigation)
-        : Browser(parent, navigation)
+    FileBrowser(RefPtr<Navigation> navigation)
+        : Browser(navigation)
     {
         _listing = make<FilesystemModel>(navigation);
         model(_listing);

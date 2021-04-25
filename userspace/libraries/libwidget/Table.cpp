@@ -108,10 +108,10 @@ void Table::paint_cell(Graphic::Painter &painter, int row, int column)
     painter.pop();
 }
 
-Table::Table(Component *parent)
-    : Component(parent)
+Table::Table()
+
 {
-    _scrollbar = new ScrollBar(this);
+    _scrollbar = add<ScrollBar>();
 
     _scrollbar->on(Event::VALUE_CHANGE, [this](auto) {
         _scroll_offset = _scrollbar->value();
@@ -119,8 +119,8 @@ Table::Table(Component *parent)
     });
 }
 
-Table::Table(Component *parent, RefPtr<TableModel> model)
-    : Table(parent)
+Table::Table(RefPtr<TableModel> model)
+    : Table()
 {
     this->model(model);
 }

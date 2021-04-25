@@ -60,7 +60,7 @@ public:
         _horizontal = value;
     }
 
-    ScrollBar(Component *parent);
+    ScrollBar();
 
     void scroll_to(Math::Vec2i mouse_position);
 

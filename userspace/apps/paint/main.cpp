@@ -38,26 +38,26 @@ private:
     RefPtr<PaintDocument> _document;
 
     /// --- Toolbar --- ///
-    Widget::Component *_open_document;
-    Widget::Component *_save_document;
-    Widget::Component *_new_document;
+    RefPtr<Widget::Component> _open_document;
+    RefPtr<Widget::Component> _save_document;
+    RefPtr<Widget::Component> _new_document;
 
-    Widget::Component *_pencil;
-    Widget::Component *_brush;
-    Widget::Component *_eraser;
-    Widget::Component *_fill;
-    Widget::Component *_picker;
+    RefPtr<Widget::Component> _pencil;
+    RefPtr<Widget::Component> _brush;
+    RefPtr<Widget::Component> _eraser;
+    RefPtr<Widget::Component> _fill;
+    RefPtr<Widget::Component> _picker;
 
-    Widget::Component *_insert_text;
-    Widget::Component *_insert_line;
-    Widget::Component *_insert_rectangle;
-    Widget::Component *_insert_circle;
+    RefPtr<Widget::Component> _insert_text;
+    RefPtr<Widget::Component> _insert_line;
+    RefPtr<Widget::Component> _insert_rectangle;
+    RefPtr<Widget::Component> _insert_circle;
 
-    Widget::Panel *_primary_color;
-    Widget::Panel *_secondary_color;
+    RefPtr<Widget::Panel> _primary_color;
+    RefPtr<Widget::Panel> _secondary_color;
 
     /// --- Canvas --- ///
-    PaintCanvas *_canvas;
+    RefPtr<PaintCanvas> _canvas;
 
 public:
     PaintWindow(RefPtr<PaintDocument> document) : Window(WINDOW_RESIZABLE)
@@ -68,14 +68,13 @@ public:
 
         root()->layout(VFLOW(0));
 
-        new Widget::TitleBar(
-            root(),
+        root()->add<Widget::TitleBar>(
             Graphic::Icon::get("brush"),
             "Paint");
 
         create_toolbar(root());
 
-        _canvas = new PaintCanvas(root(), document);
+        _canvas = root()->add<PaintCanvas>(document);
         _canvas->flags(Widget::Component::FILL);
 
         create_color_palette(root());
@@ -85,81 +84,81 @@ public:
         };
     }
 
-    void create_toolbar(Widget::Component *parent)
+    void create_toolbar(RefPtr<Widget::Component> parent)
     {
-        auto toolbar = new Widget::Panel(parent);
+        auto toolbar = parent->add<Widget::Panel>();
 
         toolbar->layout(HFLOW(4));
         toolbar->insets(Insetsi(4, 4));
 
-        _open_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
-        _save_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("content-save"));
-        _new_document = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("image-plus"));
+        _open_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
+        _save_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("content-save"));
+        _new_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("image-plus"));
 
-        new Widget::Separator(toolbar);
+        toolbar->add<Widget::Separator>();
 
-        _pencil = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("pencil"));
+        _pencil = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("pencil"));
         _pencil->on(Widget::Event::ACTION, [this](auto) {
             _canvas->tool(own<PencilTool>());
             update_toolbar();
         });
 
-        _brush = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("brush"));
+        _brush = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("brush"));
         _brush->on(Widget::Event::ACTION, [this](auto) {
             _canvas->tool(own<BrushTool>());
             update_toolbar();
         });
 
-        _eraser = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("eraser"));
+        _eraser = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("eraser"));
         _eraser->on(Widget::Event::ACTION, [this](auto) {
             _canvas->tool(own<EraserTool>());
             update_toolbar();
         });
 
-        _fill = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("format-color-fill"));
+        _fill = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("format-color-fill"));
         _fill->on(Widget::Event::ACTION, [this](auto) {
             _canvas->tool(own<FillTool>());
             update_toolbar();
         });
 
-        _picker = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("eyedropper"));
+        _picker = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("eyedropper"));
         _picker->on(Widget::Event::ACTION, [this](auto) {
             _canvas->tool(own<PickerTool>());
             update_toolbar();
         });
 
-        new Widget::Separator(toolbar);
+        toolbar->add<Widget::Separator>();
 
         // TODO:
-        _insert_text = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("format-text-variant"));
-        _insert_line = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("vector-line"));
-        _insert_rectangle = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("rectangle-outline"));
-        _insert_circle = new Widget::Button(toolbar, Widget::Button::TEXT, Graphic::Icon::get("circle-outline"));
+        _insert_text = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("format-text-variant"));
+        _insert_line = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("vector-line"));
+        _insert_rectangle = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("rectangle-outline"));
+        _insert_circle = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("circle-outline"));
 
-        new Widget::Separator(toolbar);
+        toolbar->add<Widget::Separator>();
 
-        Widget::Component *primary_color_container = new Widget::Container(toolbar);
+        auto primary_color_container = toolbar->add<Widget::Container>();
         primary_color_container->insets(Insetsi(4));
         primary_color_container->flags(Widget::Component::SQUARE);
 
-        _primary_color = new Widget::Panel(primary_color_container);
+        _primary_color = primary_color_container->add<Widget::Panel>();
         _primary_color->border_radius(4);
         _primary_color->color(Widget::THEME_MIDDLEGROUND, _document->primary_color());
         _primary_color->flags(Widget::Component::FILL);
 
-        Widget::Component *secondary_color_container = new Widget::Container(toolbar);
+        auto secondary_color_container = toolbar->add<Widget::Container>();
         secondary_color_container->insets(Insetsi(4));
         secondary_color_container->flags(Widget::Component::SQUARE);
 
-        _secondary_color = new Widget::Panel(secondary_color_container);
+        _secondary_color = secondary_color_container->add<Widget::Panel>();
         _secondary_color->border_radius(4);
         _secondary_color->color(Widget::THEME_MIDDLEGROUND, _document->secondary_color());
         _secondary_color->flags(Widget::Component::FILL);
     }
 
-    void create_color_palette(Widget::Component *parent)
+    void create_color_palette(RefPtr<Widget::Component> parent)
     {
-        auto palette = new Widget::Panel(parent);
+        auto palette = parent->add<Widget::Panel>();
 
         palette->layout(HFLOW(4));
         palette->insets(Insetsi(4, 4));
@@ -172,7 +171,7 @@ public:
         {
             Graphic::Color color = _color_palette[i];
 
-            auto color_widget = new Widget::Panel(palette);
+            auto color_widget = palette->add<Widget::Panel>();
             color_widget->border_radius(4);
             color_widget->min_width(30);
             color_widget->color(Widget::THEME_MIDDLEGROUND, color);

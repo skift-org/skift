@@ -18,12 +18,11 @@ public:
     {
         root()->layout(VFLOW(0));
 
-        new Widget::TitleBar(
-            root(),
+        root()->add<Widget::TitleBar>(
             Graphic::Icon::get("snake"),
             "Snake");
 
-        auto board = new BoardWidget(root());
+        auto board = root()->add<BoardWidget>();
         board->outsets({32});
         board->focus();
 

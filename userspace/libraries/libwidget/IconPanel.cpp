@@ -4,8 +4,8 @@
 namespace Widget
 {
 
-IconPanel::IconPanel(Component *parent, RefPtr<Graphic::Icon> icon)
-    : Component(parent), _icon(icon)
+IconPanel::IconPanel(RefPtr<Graphic::Icon> icon)
+    : _icon(icon)
 {
 }
 

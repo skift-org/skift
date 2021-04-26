@@ -1,6 +1,7 @@
 #include <libgraphic/font/TrueTypeFont.h>
 #include <libgraphic/font/TrueTypeFontFace.h>
 #include <libio/FourCC.h>
+#include <libio/ReadCounter.h>
 #include <libio/Skip.h>
 #include <libio/Streams.h>
 #include <libutils/Endian.h>
@@ -171,24 +172,115 @@ ResultOr<Math::Vec2<uint16_t>> Graphic::Font::TrueTypeFontFace::read_version(IO:
     return Math::Vec2<uint16_t>{major(), minor()};
 }
 
-Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &reader)
+Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
 {
+    auto reader = IO::ReadCounter(_reader);
+    _has_cmap = true;
     auto version = TRY(IO::read<uint16_t>(reader));
     UNUSED(version);
     auto num_encodings = TRY(IO::read<be_uint16_t>(reader));
     IO::logln("CMAP num_encodings: {}", num_encodings());
 
-    for (uint16_t i = 0; i < num_encodings(); i++)
+    uint32_t encoding_table_offset = 0;
+
+    // Find an encoding we can work with (Unicode)
+    for (uint16_t i = 0; i < num_encodings() && encoding_table_offset == 0; i++)
     {
         auto platform_id = TRY(IO::read<be_uint16_t>(reader));
-        UNUSED(platform_id);
-        IO::logln("CMAP platform_id: {}", platform_id());
+        auto encoding_id = TRY(IO::read<be_uint16_t>(reader));
+        UNUSED(encoding_id);
+        auto subtable_offset = TRY(IO::read<be_uint32_t>(reader));
 
-        TRY(IO::read<be_uint16_t>(reader));
-        TRY(IO::read<be_uint32_t>(reader));
+        switch (platform_id())
+        {
+        case TT_PLATFORM_WINDOWS:
+            if (encoding_id() == TT_ENCODING_WIN_UNICODE_BMP ||
+                encoding_id() == TT_ENCODING_WIN_UNICODE_FULL)
+            {
+                encoding_table_offset = subtable_offset();
+            }
+            break;
+        case TT_PLATFORM_UNICODE:
+        {
+            encoding_table_offset = subtable_offset();
+        }
+        default:
+            break;
+        }
+
+        if (encoding_table_offset == 0)
+        {
+            IO::logln("Skipped unsupported encoding table (Platform: {} Encoding: {})", platform_id(), encoding_id());
+        }
+        else
+        {
+            IO::logln("Using encoding table (Platform: {} Encoding: {})", platform_id(), encoding_id());
+        }
     }
 
-    _has_cmap = true;
+    if (encoding_table_offset == 0)
+    {
+        IO::errln("Found no supported encoding table");
+        return Result::ERR_INVALID_DATA;
+    }
+
+    // Skip to our position
+    auto to_skip = encoding_table_offset - reader.count();
+    TRY(IO::skip(reader, to_skip));
+
+    // Read the character mapping
+    auto mapping_format = TRY(IO::read<be_uint16_t>(reader));
+    IO::logln("Character mapping format: {}", mapping_format());
+    auto length = TRY(IO::read<be_uint16_t>(reader));   // length of table in bytes
+    auto language = TRY(IO::read<be_uint16_t>(reader)); // language
+    UNUSED(language);
+
+    switch (mapping_format())
+    {
+    case TT_MAPPING_FMT_APPLE_BYTE_ENCODING:
+    {
+        // We already the first 6 bytes of this table
+        for (uint16_t i = 0; i < (length() - 6) && i < 256; i++)
+        {
+            _codepoint_glyph_mapping[i] = TRY(IO::read<be_uint8_t>(reader))();
+        }
+        break;
+    }
+    case TT_MAPPING_FMT_SEGMENT:
+    {
+        auto seg_count = TRY(IO::read<be_uint16_t>(reader))() / 2;
+        auto search_range = TRY(IO::read<be_uint16_t>(reader));
+        UNUSED(search_range);
+        auto entry_selector = TRY(IO::read<be_uint16_t>(reader));
+        UNUSED(entry_selector);
+        auto range_shift = TRY(IO::read<be_uint16_t>(reader));
+        UNUSED(range_shift);
+
+        auto end_codes = TRY(IO::read_vector<be_uint16_t>(reader, seg_count));
+        IO::skip(reader, sizeof(uint16_t));
+        auto start_codes = TRY(IO::read_vector<be_uint16_t>(reader, seg_count));
+        auto deltas = TRY(IO::read_vector<be_uint16_t>(reader, seg_count));
+        auto range_offsets = TRY(IO::read_vector<be_uint16_t>(reader, seg_count));
+
+        // read all segments
+        for (uint16_t current_seg = 0; current_seg < seg_count; current_seg++)
+        {
+            const auto &start_code = start_codes[current_seg]();
+            const auto &end_code = end_codes[current_seg]();
+            const auto &delta = deltas[current_seg]();
+            UNUSED(delta);
+            auto range = end_code - start_code;
+
+            for (uint16_t i = 0; i < range; i++)
+            {
+                auto glyph_index = TRY(IO::read<be_uint16_t>(reader))();
+                _codepoint_glyph_mapping[i + start_code] = glyph_index;
+            }
+        }
+    }
+    default:
+        break;
+    }
 
     return Result::SUCCESS;
 }

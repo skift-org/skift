@@ -2,6 +2,7 @@
 
 #include <libio/Copy.h>
 #include <libio/Reader.h>
+#include <libutils/Array.h>
 #include <libutils/Assert.h>
 #include <libutils/Vector.h>
 
@@ -24,6 +25,34 @@ ResultOr<size_t> read_vector(Reader &reader, Vector<T> &vector)
     }
 
     return read;
+}
+
+template <typename T>
+ResultOr<Vector<T>> read_vector(Reader &reader, size_t n)
+{
+    Vector<T> result;
+
+    T object;
+    for (size_t i = 0; i < n; i++)
+    {
+        result[i] = TRY(reader.read(&object, sizeof(T)));
+    }
+
+    return result;
+}
+
+template <typename T, size_t N>
+ResultOr<Array<T, N>> read_array(Reader &reader)
+{
+    Array<T, N> result;
+
+    T object;
+    for (size_t i = 0; i < N; i++)
+    {
+        result[i] = TRY(reader.read(&object, sizeof(T)));
+    }
+
+    return result;
 }
 
 inline ResultOr<String> read_string(Reader &reader, size_t len)

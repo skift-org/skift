@@ -5,6 +5,7 @@
 #include <libio/ScopedReader.h>
 #include <libmath/Vec2.h>
 #include <libutils/unicode/Codepoint.h>
+#include <libutils/HashMap.h>
 
 namespace Graphic::Font
 {
@@ -13,6 +14,7 @@ class TrueTypeFontFace : public FontFace
 {
 private:
     uint16_t _num_glyphs;
+    HashMap<Codepoint, uint32_t> _codepoint_glyph_mapping;
 
     bool _has_cmap, _has_glyf, _has_loca, _has_head, _has_hhea, _has_hmtx;
 

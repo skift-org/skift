@@ -12,9 +12,17 @@ private:
     TState _state = {};
 
 public:
+    Callback<void(const TState &)> on_state_change;
+
     void state(TState state)
     {
         _state = state;
+
+        if (on_state_change)
+        {
+            on_state_change(_state);
+        }
+
         should_relayout();
         should_repaint();
     }

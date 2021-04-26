@@ -1,7 +1,6 @@
 #pragma once
 
 #include <libwidget/Button.h>
-#include <libwidget/Label.h>
 
 #include <libwidget/VScroll.h>
 
@@ -34,7 +33,7 @@ public:
             render();
         });
 
-        add<Widget::Label>("Bookmarks");
+        add(Widget::label("Bookmarks"));
 
         _listing = add<Widget::VScroll>();
         _listing->flags(Element::FILL);

@@ -1,7 +1,6 @@
 #include <libfilepicker/FilePicker.h>
 #include <libwidget/Application.h>
 #include <libwidget/Container.h>
-#include <libwidget/Label.h>
 
 #include <libwidget/TextField.h>
 #include <libwidget/TitleBar.h>
@@ -39,7 +38,7 @@ int main(int, char **)
         p3->flags(Widget::Element::FILL);
     }
 
-    window->root()->add<Widget::Label>("Buttons", Anchor::CENTER);
+    window->root()->add(Widget::label("Buttons", Anchor::CENTER));
     auto buttons = window->root()->add<Widget::Container>();
     {
         buttons->layout(HFLOW(8));
@@ -53,7 +52,7 @@ int main(int, char **)
         buttons->add<Widget::Button>(Widget::Button::FILLED, Graphic::Icon::get("widgets"), "BUTTON");
     }
 
-    window->root()->add<Widget::Label>("Grid layout", Anchor::CENTER);
+    window->root()->add(Widget::label("Grid layout", Anchor::CENTER));
 
     auto panel_grid = window->root()->add<Widget::Container>();
     {

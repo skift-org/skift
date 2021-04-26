@@ -25,7 +25,7 @@ QuickSettingsWindow::QuickSettingsWindow()
     root()->layout(VFLOW(4));
     root()->insets(6);
 
-    auto title = root()->add<Widget::Label>("Quick settings");
+    auto title = root()->add(Widget::label("Quick settings"));
     title->outsets({12, 6, 12, 12});
 
     root()->add<SettingToggle>("Show Wireframe", Graphic::Icon::get("duck"), "appearance:widgets.wireframe");

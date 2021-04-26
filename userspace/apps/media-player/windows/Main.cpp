@@ -2,7 +2,6 @@
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Slider.h>
 #include <libwidget/TitleBar.h>
 
 #include "media-player/windows/Main.h"
@@ -37,7 +36,7 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
 
     control_bar->add(Widget::spacer());
 
-    auto slider = control_bar->add<Widget::Slider>();
+    auto slider = control_bar->add(Widget::slider());
     slider->layout(HFLOW(0));
     slider->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("volume-high"));
 }

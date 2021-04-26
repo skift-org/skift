@@ -1,7 +1,7 @@
 #include <libsystem/process/Process.h>
 #include <libutils/FuzzyMatcher.h>
 #include <libwidget/Button.h>
-#include <libwidget/Label.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Window.h>
 
 #include "panel/model/MenuEntry.h"
@@ -59,7 +59,7 @@ void ApplicationListing::render()
 
     if (!find_any)
     {
-        host()->add<Widget::Label>("No application found!", Anchor::CENTER);
+        host()->add(Widget::label("No application found!", Anchor::CENTER));
     }
 }
 

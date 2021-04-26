@@ -1,9 +1,9 @@
 #include <libio/Format.h>
+
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Label.h>
 #include <libwidget/PaginationDots.h>
 #include <libwidget/Screen.h>
 
@@ -59,7 +59,7 @@ static const Vector<Page> PAGES = {
 
 void pages(RefPtr<Widget::Element> host, const Page &page)
 {
-    host->add<Widget::Label>(page.header, Anchor::CENTER);
+    host->add(Widget::label(page.header, Anchor::CENTER));
 
     auto content = host->add<Widget::Container>();
     content->insets({8, 0});
@@ -67,10 +67,10 @@ void pages(RefPtr<Widget::Element> host, const Page &page)
 
     for (auto &lines : page.lines)
     {
-        content->add<Widget::Label>(lines, Anchor::CENTER);
+        content->add(Widget::label(lines, Anchor::CENTER));
     }
 
-    host->add<Widget::Label>(page.footer, Anchor::CENTER);
+    host->add(Widget::label(page.footer, Anchor::CENTER));
 }
 
 int main(int, char **)

@@ -3,7 +3,6 @@
 #include <libsettings/Setting.h>
 #include <libwidget/Button.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Label.h>
 
 namespace panel
 {
@@ -43,7 +42,7 @@ public:
         auto icon = add(Widget::icon(_icon));
         icon->insets(Insetsi(0, 0, 0, 4));
 
-        auto label = add<Widget::Label>(_name);
+        auto label = add(Widget::label(_name));
         label->flags(Element::FILL);
 
         auto sw = add(Widget::toggle(_enabled));

@@ -1,8 +1,9 @@
 #pragma once
 
 #include <libasync/Invoker.h>
-#include <libwidget/Element.h>
+#include <libio/Streams.h>
 #include <libwidget/Layouts.h>
+#include <libwidget/elements/LabelElement.h>
 
 namespace Widget
 {
@@ -13,13 +14,29 @@ private:
     OwnPtr<Async::Invoker> _rebuild_invoker;
 
 public:
-    void mounted() override { add(fill(build())); }
+    RefPtr<Element> check(RefPtr<Element> el)
+    {
+        if (el == nullptr)
+        {
+            IO::logln("Build function returned nullptr!");
+            return label("Build function returned nullptr!");
+        }
+        else
+        {
+            return el;
+        }
+    }
+
+    void mounted() override
+    {
+        add(fill(check(build())));
+    }
 
     Component()
     {
         _rebuild_invoker = own<Async::Invoker>([this] {
             clear();
-            add(fill(build()));
+            add(fill(check(build())));
         });
     }
 

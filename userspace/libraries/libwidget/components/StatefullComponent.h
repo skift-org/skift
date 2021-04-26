@@ -12,7 +12,7 @@ private:
     TState _state = {};
 
 public:
-    const void state(TState state)
+    void state(TState state)
     {
         _state = state;
         should_rebuild();

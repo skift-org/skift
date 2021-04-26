@@ -2,7 +2,6 @@
 
 #include <libwidget/Button.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Label.h>
 #include <libwidget/Layouts.h>
 
 namespace Settings

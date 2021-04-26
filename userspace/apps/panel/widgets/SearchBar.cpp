@@ -18,7 +18,7 @@ SearchBar::SearchBar(RefPtr<Widget::TextModel> model) : PanelElement(6)
     auto icon = add(Widget::icon("search"));
     icon->color(Widget::THEME_FOREGROUND, Graphic::Colors::BLACK);
 
-    auto field = add<Widget::TextField>(model);
+    auto field = add(Widget::textfield(model));
     field->flags(Element::FILL);
     field->color(Widget::THEME_FOREGROUND, Graphic::Colors::BLACK);
     field->focus();

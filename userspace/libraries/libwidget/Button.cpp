@@ -1,7 +1,6 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Button.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Label.h>
 
 namespace Widget
 {
@@ -104,10 +103,10 @@ Button::Button(Style style, String text) : Button{style}
     insets(Insetsi(0, 16));
     min_width(64);
 
-    auto label = add<Label>(text, Anchor::CENTER);
+    auto lbl = add(label(text, Anchor::CENTER));
     if (style == FILLED)
     {
-        label->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
+        lbl->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
     }
 }
 
@@ -119,11 +118,11 @@ Button::Button(Style style, RefPtr<Graphic::Icon> icon, String text) : Button{st
     auto icon_panel = add(Widget::icon(icon));
     icon_panel->insets(Insetsi(0, 0, 0, 8));
 
-    auto label = add<Label>(text);
+    auto lbl = add(label(text));
 
     if (style == FILLED)
     {
-        label->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
+        lbl->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
         icon_panel->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
     }
 }
@@ -138,11 +137,11 @@ Button::Button(Style style, RefPtr<Graphic::Bitmap> image, String text) : Button
     image_panel->min_width(36);
     image_panel->min_height(36);
 
-    auto label = add<Label>(text);
+    auto lbl = add(label(text));
 
     if (style == FILLED)
     {
-        label->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
+        lbl->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
     }
 }
 

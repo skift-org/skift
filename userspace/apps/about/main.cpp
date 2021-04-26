@@ -2,11 +2,9 @@
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Label.h>
+#include <libwidget/Layouts.h>
 #include <libwidget/TextEditor.h>
 #include <libwidget/TitleBar.h>
-
-#include <libwidget/Layouts.h>
 
 static auto logo_based_on_color_scheme()
 {
@@ -28,7 +26,7 @@ void show_license()
     // clang-format off
 
     auto license_window = window(
-        vflow(0, {
+        vflow({
             titlebar(Graphic::Icon::get("information"), "License"),
             fill(texteditor),
         })

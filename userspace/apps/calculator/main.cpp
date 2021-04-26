@@ -2,9 +2,8 @@
 
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
-#include <libwidget/Label.h>
-#include <libwidget/Layouts.h>
 
+#include <libwidget/Layouts.h>
 #include <libwidget/TitleBar.h>
 
 #include "calculator/Calculator.h"

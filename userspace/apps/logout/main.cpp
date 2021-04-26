@@ -4,13 +4,15 @@
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Label.h>
-
 #include <libwidget/Screen.h>
 
 int main(int, char **)
 {
-    Widget::Window *window = new Widget::Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC | WINDOW_NO_ROUNDED_CORNERS);
+    Widget::Window *window = new Widget::Window(
+        WINDOW_BORDERLESS |
+        WINDOW_ALWAYS_FOCUSED |
+        WINDOW_ACRYLIC |
+        WINDOW_NO_ROUNDED_CORNERS);
 
     window->type(WINDOW_TYPE_POPOVER);
     window->bound(Widget::Screen::bound());
@@ -39,8 +41,8 @@ int main(int, char **)
     warning_container->flags(Widget::Element::FILL);
     warning_container->layout(VGRID(2));
 
-    warning_container->add<Widget::Label>("Shutdown or restart your computer.", Anchor::BOTTOM_LEFT);
-    warning_container->add<Widget::Label>("Any unsaved work will be lost!", Anchor::TOP_LEFT);
+    warning_container->add(Widget::label("Shutdown or restart your computer.", Anchor::BOTTOM_LEFT));
+    warning_container->add(Widget::label("Any unsaved work will be lost!", Anchor::TOP_LEFT));
 
     dialog->add(Widget::spacer());
 

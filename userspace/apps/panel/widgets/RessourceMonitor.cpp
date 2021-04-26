@@ -2,8 +2,8 @@
 #include <skift/Environment.h>
 
 #include <libasync/Timer.h>
+#include <libwidget/Elements.h>
 #include <libwidget/Graph.h>
-#include <libwidget/Label.h>
 
 #include "panel/widgets/RessourceMonitor.h"
 
@@ -17,10 +17,10 @@ RessourceMonitor::RessourceMonitor()
     insets(0);
 
     auto ram_graph = add<Widget::Graph>(50, Graphic::Colors::ROYALBLUE);
-    ram_graph->add<Widget::Label>("RAM", Anchor::CENTER);
+    ram_graph->add(Widget::label("RAM", Anchor::CENTER));
 
     auto cpu_graph = add<Widget::Graph>(50, Graphic::Colors::SEAGREEN);
-    cpu_graph->add<Widget::Label>("CPU", Anchor::CENTER);
+    cpu_graph->add(Widget::label("CPU", Anchor::CENTER));
 
     _ram_timer = own<Async::Timer>(700, [ram_graph]() {
         SystemStatus status{};

@@ -8,7 +8,6 @@
 
 #include <libwidget/Container.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Label.h>
 
 #include "task-manager/widgets/CPUGraph.h"
 
@@ -26,14 +25,19 @@ CPUGraph::CPUGraph(RefPtr<TaskModel> model)
     auto icon_and_text = add<Widget::Container>();
     icon_and_text->layout(HFLOW(4));
     icon_and_text->add(Widget::icon("memory"));
-    icon_and_text->add<Widget::Label>("Processor");
+    icon_and_text->add(Widget::label("Processor"));
 
     auto cpu_filler = add<Widget::Container>();
     cpu_filler->flags(Element::FILL);
 
-    _label_average = add<Widget::Label>("Average: nil%", Anchor::RIGHT);
-    _label_greedy = add<Widget::Label>("Most greedy: nil", Anchor::RIGHT);
-    _label_uptime = add<Widget::Label>("Uptime: nil", Anchor::RIGHT);
+    _label_average = Widget::label("Average: nil%", Anchor::RIGHT);
+    add(_label_average);
+
+    _label_greedy = Widget::label("Most greedy: nil", Anchor::RIGHT);
+    add(_label_greedy);
+
+    _label_uptime = Widget::label("Uptime: nil", Anchor::RIGHT);
+    add(_label_uptime);
 
     _graph_timer = own<Async::Timer>(100, [&]() {
         SystemStatus status{};

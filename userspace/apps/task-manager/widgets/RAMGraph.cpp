@@ -22,14 +22,19 @@ RAMGraph::RAMGraph(RefPtr<TaskModel> model)
     auto icon_and_text = add<Widget::Container>();
     icon_and_text->layout(HFLOW(4));
     icon_and_text->add(Widget::icon("chip"));
-    icon_and_text->add<Widget::Label>("Memory");
+    icon_and_text->add(Widget::label("Memory"));
 
     auto cpu_filler = add<Widget::Container>();
     cpu_filler->flags(Element::FILL);
 
-    _label_usage = add<Widget::Label>("Usage: nil Mio", Anchor::RIGHT);
-    _label_available = add<Widget::Label>("Available: nil Mio", Anchor::RIGHT);
-    _label_greedy = add<Widget::Label>("Most greedy: nil", Anchor::RIGHT);
+    _label_usage = Widget::label("Usage: nil Mio", Anchor::RIGHT);
+    add(_label_usage);
+
+    _label_available = Widget::label("Available: nil Mio", Anchor::RIGHT);
+    add(_label_available);
+
+    _label_greedy = Widget::label("Most greedy: nil", Anchor::RIGHT);
+    add(_label_greedy);
 
     _graph_timer = own<Async::Timer>(500, [&]() {
         SystemStatus status{};

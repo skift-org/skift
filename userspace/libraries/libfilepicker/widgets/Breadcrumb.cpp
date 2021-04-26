@@ -1,6 +1,5 @@
 #include <libgraphic/Painter.h>
 
-#include <libwidget/Button.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Window.h>
 
@@ -40,7 +39,7 @@ void Breadcrumb::render()
 
     auto &path = _navigation->current();
 
-    auto computer_button = add<Widget::Button>(Widget::Button::TEXT, _icon_computer);
+    auto computer_button = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, _icon_computer);
 
     computer_button->on(Widget::Event::ACTION, [this](auto) {
         _navigation->navigate("/");
@@ -50,7 +49,7 @@ void Breadcrumb::render()
     {
         add(Widget::icon(_icon_expand));
 
-        auto button = add<Widget::Button>(Widget::Button::TEXT, path[i]);
+        auto button = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, path[i]);
         button->min_width(0);
 
         button->on(Widget::Event::ACTION, [this, i](auto) {
@@ -64,7 +63,7 @@ void Breadcrumb::render()
     {
         if (_bookmarks->has(_navigation->current()))
         {
-            auto remove_bookmark = add<Widget::Button>(Widget::Button::TEXT, _icon_bookmark);
+            auto remove_bookmark = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, _icon_bookmark);
 
             remove_bookmark->on(Widget::Event::ACTION, [this](auto) {
                 _bookmarks->remove(_navigation->current());
@@ -72,7 +71,7 @@ void Breadcrumb::render()
         }
         else
         {
-            auto add_bookmark = add<Widget::Button>(Widget::Button::TEXT, _icon_bookmark_outline);
+            auto add_bookmark = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, _icon_bookmark_outline);
 
             add_bookmark->on(Widget::Event::ACTION, [this](auto) {
                 Bookmark bookmark{

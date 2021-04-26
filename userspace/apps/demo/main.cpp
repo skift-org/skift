@@ -1,4 +1,3 @@
-#include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/TitleBar.h>
 
@@ -32,7 +31,7 @@ int main(int, char **)
 
     for (size_t i = 0; _demos[i].name; i++)
     {
-        auto demo_button = navbar->add<Widget::Button>(Widget::Button::TEXT, _demos[i].name);
+        auto demo_button = navbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, _demos[i].name);
 
         demo_button->on(Widget::Event::ACTION, [i, demo_widget](auto) {
             demo_widget->demo(&_demos[i]);

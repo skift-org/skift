@@ -1,13 +1,12 @@
 #pragma once
 
 #include <libsettings/Setting.h>
-#include <libwidget/Button.h>
 #include <libwidget/Elements.h>
 
 namespace panel
 {
 
-class SettingToggle : public Widget::Button
+class SettingToggle : public Widget::ButtonElement
 {
 private:
     String _name;
@@ -17,7 +16,7 @@ private:
 
 public:
     SettingToggle(String name, RefPtr<Graphic::Icon> icon, const char *setting)
-        : Button(Button::TEXT),
+        : ButtonElement(ButtonElement::TEXT),
           _name(name),
           _icon(icon)
     {
@@ -56,7 +55,7 @@ public:
             event->accepted = true;
         }
 
-        Button::event(event);
+        ButtonElement::event(event);
     }
 };
 

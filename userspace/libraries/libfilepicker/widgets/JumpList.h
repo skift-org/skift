@@ -1,7 +1,5 @@
 #pragma once
 
-#include <libwidget/Button.h>
-
 #include <libwidget/VScroll.h>
 
 #include <libfilepicker/model/Bookmarks.h>
@@ -50,8 +48,8 @@ public:
         {
             auto bookmark = _bookmarks->all()[i];
 
-            auto button = _listing->host()->add<Widget::Button>(
-                Widget::Button::TEXT,
+            auto button = _listing->host()->add<Widget::ButtonElement>(
+                Widget::ButtonElement::TEXT,
                 bookmark.icon(),
                 bookmark.name());
 

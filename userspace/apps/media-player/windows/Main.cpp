@@ -1,5 +1,4 @@
 #include <libgraphic/Icon.h>
-#include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Elements.h>
 #include <libwidget/TitleBar.h>
@@ -31,14 +30,14 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
     control_bar->insets(12);
     control_bar->layout(HFLOW(4));
 
-    control_bar->add<Widget::Button>(Widget::Button::FILLED, Graphic::Icon::get("play"));
-    control_bar->add<Widget::Button>(Widget::Button::OUTLINE, Graphic::Icon::get("stop"));
+    control_bar->add<Widget::ButtonElement>(Widget::ButtonElement::FILLED, Graphic::Icon::get("play"));
+    control_bar->add<Widget::ButtonElement>(Widget::ButtonElement::OUTLINE, Graphic::Icon::get("stop"));
 
     control_bar->add(Widget::spacer());
 
     auto slider = control_bar->add(Widget::slider());
     slider->layout(HFLOW(0));
-    slider->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("volume-high"));
+    slider->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("volume-high"));
 }
 
 } // namespace MediaPlayer

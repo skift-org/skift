@@ -1,4 +1,3 @@
-#include <libwidget/Button.h>
 
 #include <libwidget/TitleBar.h>
 
@@ -22,9 +21,9 @@ MainWindow::MainWindow() : Window(WINDOW_RESIZABLE)
     navigation_bar->layout(HFLOW(4));
     navigation_bar->insets(4);
 
-    navigation_bar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("arrow-left"));
-    navigation_bar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("arrow-right"));
-    navigation_bar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("home"));
+    navigation_bar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("arrow-left"));
+    navigation_bar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("arrow-right"));
+    navigation_bar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("home"));
 
     root()->add<HomePage>();
 }

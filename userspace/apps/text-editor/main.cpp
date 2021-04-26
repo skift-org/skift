@@ -2,7 +2,6 @@
 #include <libio/File.h>
 #include <libio/Streams.h>
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
 
 #include <libwidget/TextEditor.h>
 #include <libwidget/TitleBar.h>
@@ -71,7 +70,7 @@ public:
         toolbar->layout(HFLOW(4));
         toolbar->insets(Insetsi(4, 4));
 
-        _open_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
+        _open_document = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("folder-open"));
         _open_document->on(Widget::Event::ACTION, [&](auto) {
             FilePicker::Dialog picker{};
             if (picker.show() == Widget::DialogResult::OK)
@@ -79,7 +78,7 @@ public:
                 load_document(picker.selected_file().unwrap());
             }
         });
-        _save_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("content-save"));
+        _save_document = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("content-save"));
         _save_document->on(Widget::Event::ACTION, [&](auto) {
             FilePicker::Dialog picker{FilePicker::DIALOG_FLAGS_SAVE};
             if (picker.show() == Widget::DialogResult::OK)
@@ -87,7 +86,7 @@ public:
                 save_document(picker.selected_file().unwrap());
             }
         });
-        _new_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("image-plus"));
+        _new_document = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("image-plus"));
     }
 };
 

@@ -1,7 +1,6 @@
 #include <libio/Format.h>
 
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Elements.h>
 #include <libwidget/PaginationDots.h>
@@ -119,13 +118,13 @@ int main(int, char **)
     navigation->layout(HFLOW(4));
     navigation->insets(8);
 
-    auto skipall_button = navigation->add<Widget::Button>(Widget::Button::TEXT, "Skip All");
+    auto skipall_button = navigation->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, "Skip All");
 
     navigation->add(Widget::spacer());
 
-    auto back_button = navigation->add<Widget::Button>(Widget::Button::OUTLINE, "Previous");
+    auto back_button = navigation->add<Widget::ButtonElement>(Widget::ButtonElement::OUTLINE, "Previous");
 
-    auto next_button = navigation->add<Widget::Button>(Widget::Button::FILLED, "Next");
+    auto next_button = navigation->add<Widget::ButtonElement>(Widget::ButtonElement::FILLED, "Next");
 
     int current_page = 0;
 

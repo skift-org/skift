@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libwidget/Button.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Layouts.h>
 
@@ -12,19 +11,23 @@ RefPtr<Widget::Element> link(
     String text,
     Callback<void(void)> on_click = nullptr)
 {
-    auto button = Widget::button(Widget::Button::TEXT, on_click);
+    using namespace Widget;
 
-    button->add(
-        Widget::spacing(
-            {8, 24},
-            Widget::vflow(
-                4,
-                {
-                    Widget::fill(icon),
-                    Widget::label(text, Anchor::CENTER),
-                })));
+    // clang-format off
 
-    return fill(button);
+    return fill(
+        basic_button(
+            spacing({8, 24},
+                vflow(4, {
+                    fill(icon),
+                    label(text, Anchor::CENTER)
+                })
+            ),
+            on_click
+        )
+    );
+
+    // clang-format on
 }
 
 } // namespace Settings

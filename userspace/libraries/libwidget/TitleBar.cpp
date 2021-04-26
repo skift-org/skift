@@ -1,6 +1,5 @@
 #include <libgraphic/Painter.h>
 
-#include <libwidget/Button.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Layouts.h>
 #include <libwidget/TitleBar.h>
@@ -60,14 +59,14 @@ RefPtr<Element> TitleBar::build()
     return spacing(
         4,
         hflow(4, {
-            button(Button::TEXT, _icon, _title),
+            basic_button(_icon, _title),
             spacer(),
             window_resizable
-                ? button(Button::TEXT, Graphic::Icon::get("plus"), [this] {
+                ? basic_button(Graphic::Icon::get("plus"), [this] {
                     window()->toggle_maximise();
                 })
                 : nullptr,
-            button(Button::TEXT, Graphic::Icon::get("close"), [this] {
+            basic_button(Graphic::Icon::get("close"), [this] {
                 window()->hide();
             })
         })

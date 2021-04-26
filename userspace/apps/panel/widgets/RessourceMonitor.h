@@ -2,12 +2,10 @@
 
 #include <libasync/Timer.h>
 
-#include <libwidget/Button.h>
-
 namespace panel
 {
 
-class RessourceMonitor : public Widget::Button
+class RessourceMonitor : public Widget::ButtonElement
 {
 private:
     OwnPtr<Async::Timer> _ram_timer;

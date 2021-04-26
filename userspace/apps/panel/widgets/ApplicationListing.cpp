@@ -1,6 +1,5 @@
 #include <libsystem/process/Process.h>
 #include <libutils/FuzzyMatcher.h>
-#include <libwidget/Button.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Window.h>
 
@@ -47,7 +46,7 @@ void ApplicationListing::render()
 
         find_any = true;
 
-        auto item = host()->add<Widget::Button>(Widget::Button::TEXT, entry.image, entry.name);
+        auto item = host()->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, entry.image, entry.name);
 
         item->on(Widget::Event::ACTION, [this, entry](auto) {
             process_run(entry.command.cstring(), nullptr, 0);

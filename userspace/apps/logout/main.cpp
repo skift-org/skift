@@ -1,7 +1,6 @@
 #include <abi/Syscalls.h>
 
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Screen.h>
@@ -46,23 +45,23 @@ int main(int, char **)
 
     dialog->add(Widget::spacer());
 
-    auto shutdown_button = dialog->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("power-standby"), "Shutdown");
+    auto shutdown_button = dialog->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("power-standby"), "Shutdown");
 
     shutdown_button->on(Widget::EventType::ACTION, [&](auto) {
         hj_system_shutdown();
     });
 
-    auto reboot_button = dialog->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("restart"), "Reboot");
+    auto reboot_button = dialog->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("restart"), "Reboot");
 
     reboot_button->on(Widget::EventType::ACTION, [&](auto) {
         hj_system_reboot();
     });
 
-    dialog->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("logout"), "Logoff");
+    dialog->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("logout"), "Logoff");
 
     dialog->add(Widget::spacer());
 
-    auto cancel_button = dialog->add<Widget::Button>(Widget::Button::FILLED, "Cancel");
+    auto cancel_button = dialog->add<Widget::ButtonElement>(Widget::ButtonElement::FILLED, "Cancel");
 
     cancel_button->on(Widget::EventType::ACTION, [&](auto) {
         window->hide();

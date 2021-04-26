@@ -11,7 +11,7 @@ namespace panel
 {
 
 RessourceMonitor::RessourceMonitor()
-    : Button(Button::TEXT)
+    : ButtonElement(ButtonElement::TEXT)
 {
     layout(VGRID(1));
     insets(0);

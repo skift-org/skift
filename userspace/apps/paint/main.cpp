@@ -1,7 +1,6 @@
 #include <assert.h>
 
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Elements.h>
 
@@ -91,37 +90,37 @@ public:
         toolbar->layout(HFLOW(4));
         toolbar->insets(Insetsi(4, 4));
 
-        _open_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("folder-open"));
-        _save_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("content-save"));
-        _new_document = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("image-plus"));
+        _open_document = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("folder-open"));
+        _save_document = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("content-save"));
+        _new_document = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("image-plus"));
 
         toolbar->add(Widget::separator());
 
-        _pencil = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("pencil"));
+        _pencil = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("pencil"));
         _pencil->on(Widget::Event::ACTION, [this](auto) {
             _canvas->tool(own<PencilTool>());
             update_toolbar();
         });
 
-        _brush = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("brush"));
+        _brush = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("brush"));
         _brush->on(Widget::Event::ACTION, [this](auto) {
             _canvas->tool(own<BrushTool>());
             update_toolbar();
         });
 
-        _eraser = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("eraser"));
+        _eraser = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("eraser"));
         _eraser->on(Widget::Event::ACTION, [this](auto) {
             _canvas->tool(own<EraserTool>());
             update_toolbar();
         });
 
-        _fill = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("format-color-fill"));
+        _fill = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("format-color-fill"));
         _fill->on(Widget::Event::ACTION, [this](auto) {
             _canvas->tool(own<FillTool>());
             update_toolbar();
         });
 
-        _picker = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("eyedropper"));
+        _picker = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("eyedropper"));
         _picker->on(Widget::Event::ACTION, [this](auto) {
             _canvas->tool(own<PickerTool>());
             update_toolbar();
@@ -130,10 +129,10 @@ public:
         toolbar->add(Widget::separator());
 
         // TODO:
-        _insert_text = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("format-text-variant"));
-        _insert_line = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("vector-line"));
-        _insert_rectangle = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("rectangle-outline"));
-        _insert_circle = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("circle-outline"));
+        _insert_text = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("format-text-variant"));
+        _insert_line = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("vector-line"));
+        _insert_rectangle = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("rectangle-outline"));
+        _insert_circle = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("circle-outline"));
 
         toolbar->add(Widget::separator());
 

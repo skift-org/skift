@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libwidget/Button.h>
 #include <libwidget/Elements.h>
 
 #include <libfilepicker/model/Navigation.h>
@@ -38,25 +37,25 @@ public:
         layout(HFLOW(4));
         insets(Insetsi(4, 4));
 
-        _go_backward = add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("arrow-left"));
+        _go_backward = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("arrow-left"));
 
         _go_backward->on(Widget::Event::ACTION, [this](auto) {
             _navigation->go_backward();
         });
 
-        _go_foreward = add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("arrow-right"));
+        _go_foreward = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("arrow-right"));
 
         _go_foreward->on(Widget::Event::ACTION, [this](auto) {
             _navigation->go_forward();
         });
 
-        _go_up = add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("arrow-up"));
+        _go_up = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("arrow-up"));
 
         _go_up->on(Widget::Event::ACTION, [this](auto) {
             _navigation->go_up();
         });
 
-        _go_home = add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("home"));
+        _go_home = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("home"));
 
         _go_home->on(Widget::Event::ACTION, [this](auto) {
             _navigation->go_home();
@@ -69,7 +68,7 @@ public:
 
         add(Widget::separator());
 
-        _refresh = add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("refresh"));
+        _refresh = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("refresh"));
 
         _refresh->on(Widget::Event::ACTION, [this](auto) {
             _navigation->refresh();
@@ -77,7 +76,7 @@ public:
 
         if (!(flags & NO_OPEN_TERMINAL))
         {
-            auto terminal_button = add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("console"));
+            auto terminal_button = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("console"));
 
             terminal_button->on(Widget::Event::ACTION, [](auto) {
                 process_run("terminal", NULL, TASK_NONE);

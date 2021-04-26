@@ -1,5 +1,4 @@
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Layouts.h>
 #include <libwidget/TitleBar.h>
@@ -15,7 +14,7 @@ struct CounterComponent :
     {
         return hflow({
             fill(label(IO::format("You clicked {} times", state()))),
-            button(Button::TEXT, "Click Me!", [this] { state(state() + 1); }),
+            basic_button("Click Me!", [this] { state(state() + 1); }),
         });
     }
 };

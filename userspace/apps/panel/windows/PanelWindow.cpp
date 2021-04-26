@@ -32,7 +32,7 @@ PanelWindow::PanelWindow()
     root()->add(Widget::separator());
     root()->add(Widget::separator())->color(Widget::THEME_BORDER, Graphic::Colors::BLACK.with_alpha(0.25));
 
-    auto menu = container->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("menu"), "Applications");
+    auto menu = container->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("menu"), "Applications");
     menu->on(Widget::Event::ACTION, [this](auto) {
         _menu->show();
     });
@@ -55,7 +55,7 @@ PanelWindow::PanelWindow()
         process_run("task-manager", nullptr, 0);
     });
 
-    auto dots = container->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("dots"));
+    auto dots = container->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("dots"));
 
     dots->on(Widget::Event::ACTION, [this](auto) {
         _quicksetting->show();

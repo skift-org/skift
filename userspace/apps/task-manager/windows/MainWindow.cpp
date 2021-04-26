@@ -1,4 +1,3 @@
-#include <libwidget/Button.h>
 #include <libwidget/Elements.h>
 
 #include <libwidget/TitleBar.h>
@@ -25,9 +24,9 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
     toolbar->layout(HFLOW(4));
     toolbar->insets(Insetsi(4, 4));
 
-    toolbar->add<Widget::Button>(Widget::Button::FILLED, Graphic::Icon::get("plus"), "New task");
+    toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::FILLED, Graphic::Icon::get("plus"), "New task");
 
-    auto cancel_task_button = toolbar->add<Widget::Button>(Widget::Button::TEXT, Graphic::Icon::get("close"), "Cancel task");
+    auto cancel_task_button = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("close"), "Cancel task");
     cancel_task_button->on(Widget::Event::ACTION, [&](auto) {
         auto result = Widget::MessageBox::create_and_show(
             "Cancel task",

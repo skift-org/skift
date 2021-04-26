@@ -1,5 +1,5 @@
 #include <libio/Format.h>
-#include <libwidget/Button.h>
+#include <libwidget/Elements.h>
 
 #include "panel/widgets/DateAndTime.h"
 
@@ -23,7 +23,7 @@ DateAndTime::DateAndTime()
 RefPtr<Widget::Element> DateAndTime::build()
 {
     DateTime datetime = state();
-    return Widget::button(Widget::Button::TEXT, IO::format("{02d}:{02d}:{02d}", datetime.hour, datetime.minute, datetime.second));
+    return Widget::basic_button(IO::format("{02d}:{02d}:{02d}", datetime.hour, datetime.minute, datetime.second));
 }
 
 } // namespace panel

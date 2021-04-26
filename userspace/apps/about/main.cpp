@@ -1,6 +1,5 @@
 #include <libsystem/BuildInfo.h>
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Layouts.h>
 #include <libwidget/TextEditor.h>
@@ -63,11 +62,11 @@ int main(int, char **)
 
             spacing(6,
                 hflow(4,{
-                    button(Button::OUTLINE, "License",  [] {
+                    outlined_button("License",  [] {
                         show_license();
                     }),
                     spacer(),
-                    button(Button::FILLED, "Ok", [] {
+                    filled_button("Ok", [] {
                         Application::the()->exit(PROCESS_SUCCESS);
                     })
                 })

@@ -2,7 +2,7 @@
 
 #include <libgraphic/Icon.h>
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
+#include <libwidget/Elements.h>
 
 namespace Widget
 {
@@ -88,7 +88,7 @@ public:
     {
         if (_buttons & DialogButton::YES)
         {
-            auto button = parent->add<Button>(Button::OUTLINE, "Yes");
+            auto button = parent->add<ButtonElement>(ButtonElement::OUTLINE, "Yes");
             button->on(Event::ACTION, [&](auto) {
                 on_button(DialogButton::YES);
                 close(DialogResult::YES);
@@ -98,7 +98,7 @@ public:
 
         if (_buttons & DialogButton::NO)
         {
-            auto button = parent->add<Button>(Button::OUTLINE, "No");
+            auto button = parent->add<ButtonElement>(ButtonElement::OUTLINE, "No");
             button->on(Event::ACTION, [&](auto) {
                 on_button(DialogButton::NO);
                 close(DialogResult::NO);
@@ -108,7 +108,7 @@ public:
 
         if (_buttons & DialogButton::OK)
         {
-            auto button = parent->add<Button>(Button::OUTLINE, "Ok");
+            auto button = parent->add<ButtonElement>(ButtonElement::OUTLINE, "Ok");
             button->on(Event::ACTION, [&](auto) {
                 on_button(DialogButton::OK);
                 close(DialogResult::OK);
@@ -118,7 +118,7 @@ public:
 
         if (_buttons & DialogButton::CANCEL)
         {
-            auto button = parent->add<Button>(Button::OUTLINE, "Cancel");
+            auto button = parent->add<ButtonElement>(ButtonElement::OUTLINE, "Cancel");
             button->on(Event::ACTION, [&](auto) {
                 on_button(DialogButton::CANCEL);
                 close(DialogResult::CANCEL);

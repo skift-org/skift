@@ -31,11 +31,11 @@ template <typename T>
 ResultOr<Vector<T>> read_vector(Reader &reader, size_t n)
 {
     Vector<T> result;
+    result.resize(n);
 
-    T object;
     for (size_t i = 0; i < n; i++)
     {
-        result[i] = TRY(reader.read(&object, sizeof(T)));
+        result[i] = TRY(IO::read<T>(reader)));
     }
 
     return result;
@@ -46,10 +46,9 @@ ResultOr<Array<T, N>> read_array(Reader &reader)
 {
     Array<T, N> result;
 
-    T object;
     for (size_t i = 0; i < N; i++)
     {
-        result[i] = TRY(reader.read(&object, sizeof(T)));
+        result[i] = TRY(IO::read<T>(reader)));
     }
 
     return result;

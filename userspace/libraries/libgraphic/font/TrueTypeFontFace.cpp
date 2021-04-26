@@ -229,6 +229,7 @@ Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
     TRY(IO::skip(reader, to_skip));
 
     // Read the character mapping
+    reader.reset();
     auto mapping_format = TRY(IO::read<be_uint16_t>(reader));
     IO::logln("Character mapping format: {}", mapping_format());
     auto length = TRY(IO::read<be_uint16_t>(reader));   // length of table in bytes
@@ -240,12 +241,12 @@ Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
     case TT_MAPPING_FMT_APPLE_BYTE_ENCODING:
     {
         // We already the first 6 bytes of this table
-        for (uint16_t i = 0; i < (length() - 6) && i < 256; i++)
+        for (uint16_t i = 0; i < (length() - reader.count()) && i < 256; i++)
         {
             _codepoint_glyph_mapping[i] = TRY(IO::read<be_uint8_t>(reader))();
         }
-        break;
     }
+    break;
     case TT_MAPPING_FMT_SEGMENT:
     {
         auto seg_count = TRY(IO::read<be_uint16_t>(reader))() / 2;
@@ -257,27 +258,39 @@ Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
         UNUSED(range_shift);
 
         auto end_codes = TRY(IO::read_vector<be_uint16_t>(reader, seg_count));
-        IO::skip(reader, sizeof(uint16_t));
+        TRY(IO::skip(reader, sizeof(uint16_t)));
         auto start_codes = TRY(IO::read_vector<be_uint16_t>(reader, seg_count));
         auto deltas = TRY(IO::read_vector<be_uint16_t>(reader, seg_count));
         auto range_offsets = TRY(IO::read_vector<be_uint16_t>(reader, seg_count));
 
-        // read all segments
+        IO::logln("SegCount: {}", seg_count);
+
+        // Read all segments
         for (uint16_t current_seg = 0; current_seg < seg_count; current_seg++)
         {
             const auto &start_code = start_codes[current_seg]();
             const auto &end_code = end_codes[current_seg]();
             const auto &delta = deltas[current_seg]();
-            UNUSED(delta);
+            const auto &range_offset = range_offsets[current_seg]();
+            IO::logln("StartCode: {}, EndCode: {}", start_code, end_code);
+
             auto range = end_code - start_code;
 
             for (uint16_t i = 0; i < range; i++)
             {
-                auto glyph_index = TRY(IO::read<be_uint16_t>(reader))();
-                _codepoint_glyph_mapping[i + start_code] = glyph_index;
+                if (range_offset == 0)
+                {
+                    _codepoint_glyph_mapping[i + start_code] = i + start_code + delta;
+                    IO::logln("Mapped {} to {}", i + start_code, i + start_code + delta);
+                }
+                else
+                {
+                    IO::logln("Cannot map {} yet", i + start_code);
+                }
             }
         }
     }
+    break;
     default:
         break;
     }

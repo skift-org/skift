@@ -226,6 +226,7 @@ Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
 
     // Skip to our position
     auto to_skip = encoding_table_offset - reader.count();
+    IO::logln("Skipping {} bytes to subtable", to_skip);
     TRY(IO::skip(reader, to_skip));
 
     // Read the character mapping
@@ -263,36 +264,44 @@ Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
         auto deltas = TRY(IO::read_vector<be_uint16_t>(reader, seg_count));
         auto range_offsets = TRY(IO::read_vector<be_uint16_t>(reader, seg_count));
 
+        auto header_length = 16 + (seg_count * 8);
+        auto num_glyphs = (length() - header_length) / sizeof(uint16_t);
+        auto glyph_ids = TRY(IO::read_vector<be_uint16_t>(reader, num_glyphs));
+
         IO::logln("SegCount: {}", seg_count);
 
-        // Read all segments
-        for (uint16_t current_seg = 0; current_seg < seg_count; current_seg++)
+        // Read all segments, last segment is a pseudo-segment (start & end both set to 0xFFFF)
+        for (uint16_t current_seg = 0; current_seg < (seg_count - 1); current_seg++)
         {
             const auto &start_code = start_codes[current_seg]();
             const auto &end_code = end_codes[current_seg]();
             const auto &delta = deltas[current_seg]();
             const auto &range_offset = range_offsets[current_seg]();
-            IO::logln("StartCode: {}, EndCode: {}", start_code, end_code);
+            IO::logln("StartCode: {}, EndCode: {}, RangeOffset: {}", start_code, end_code, range_offset);
 
             auto range = end_code - start_code;
 
-            for (uint16_t i = 0; i < range; i++)
+            for (uint16_t i = 0; i <= range; i++)
             {
+                uint16_t glyph_index = 0;
                 if (range_offset == 0)
                 {
-                    _codepoint_glyph_mapping[i + start_code] = i + start_code + delta;
-                    IO::logln("Mapped {} to {}", i + start_code, i + start_code + delta);
+                    glyph_index = start_code + i + delta;
                 }
                 else
                 {
-                    IO::logln("Cannot map {} yet", i + start_code);
+                    glyph_index = glyph_ids[(range_offset / 2) + i - seg_count + current_seg]();
                 }
+
+                _codepoint_glyph_mapping[start_code + i] = glyph_index;
+                IO::logln("Mapped {} to {}", start_code + i, glyph_index);
             }
         }
     }
     break;
     default:
-        break;
+        IO::errln("Unsupported mapping format: {}", mapping_format());
+        return Result::ERR_NOT_IMPLEMENTED;
     }
 
     return Result::SUCCESS;

@@ -73,17 +73,7 @@ Window::Window(WindowFlag flags)
     backbuffer = Graphic::Bitmap::create_shared(250, 250).unwrap();
     backbuffer_painter = own<Graphic::Painter>(backbuffer);
 
-    _root = build();
-    if (_root == nullptr)
-    {
-        _root = make<Element>();
-    }
-    _root->mount(*this);
-
-    _keyboard_focus = _root.naked();
-
-    _repaint_invoker = own<Async::Invoker>([this]() { repaint_dirty(); });
-    _relayout_invoker = own<Async::Invoker>([this]() { relayout(); });
+    _update_invoker = own<Async::Invoker>([this] { update(); });
 
     Application::the()->add_window(this);
     position({96, 72});
@@ -97,6 +87,47 @@ Window::~Window()
     }
 
     Application::the()->remove_window(this);
+}
+
+void Window::relayout()
+{
+    root()->container(bound());
+    root()->relayout();
+
+    _dirty_layout = false;
+}
+
+void Window::should_relayout()
+{
+    if (_dirty_layout || !_visible)
+    {
+        return;
+    }
+
+    _dirty_layout = true;
+
+    _update_invoker->invoke_later();
+}
+
+void Window::should_repaint(Math::Recti rectangle)
+{
+    if (!_visible || rectangle.is_empty())
+    {
+        return;
+    }
+
+    _update_invoker->invoke_later();
+
+    for (size_t i = 0; i < _dirty_paint.count(); i++)
+    {
+        if (_dirty_paint[i].colide_with(rectangle))
+        {
+            _dirty_paint[i] = _dirty_paint[i].merged_with(rectangle);
+            return;
+        }
+    }
+
+    _dirty_paint.push_back(rectangle);
 }
 
 void Window::repaint(Graphic::Painter &painter, Math::Recti rectangle)
@@ -126,10 +157,18 @@ void Window::repaint(Graphic::Painter &painter, Math::Recti rectangle)
     painter.pop();
 }
 
-void Window::repaint_dirty()
+void Window::flip(Math::Recti region)
 {
-    // FIXME: find a better way to schedule update after layout.
+    frontbuffer->copy_from(*backbuffer, region);
 
+    swap(frontbuffer, backbuffer);
+    swap(frontbuffer_painter, backbuffer_painter);
+
+    Application::the()->flip_window(this, region);
+}
+
+void Window::update()
+{
     if (_dirty_layout)
     {
         relayout();
@@ -138,7 +177,7 @@ void Window::repaint_dirty()
     Math::Recti repaited_regions = Math::Recti::empty();
     Graphic::Painter &painter = *backbuffer_painter;
 
-    _dirty_rects.foreach ([&](Math::Recti &rect) {
+    _dirty_paint.foreach ([&](Math::Recti &rect) {
         repaint(painter, rect);
 
         if (repaited_regions.is_empty())
@@ -153,58 +192,9 @@ void Window::repaint_dirty()
         return Iteration::CONTINUE;
     });
 
-    _dirty_rects.clear();
+    _dirty_paint.clear();
 
-    frontbuffer->copy_from(*backbuffer, repaited_regions);
-
-    swap(frontbuffer, backbuffer);
-    swap(frontbuffer_painter, backbuffer_painter);
-
-    Application::the()->flip_window(this, repaited_regions);
-}
-
-void Window::relayout()
-{
-    root()->container(bound());
-    root()->relayout();
-
-    _dirty_layout = false;
-}
-
-void Window::should_repaint(Math::Recti rectangle)
-{
-    if (!_visible)
-    {
-        return;
-    }
-
-    if (_dirty_rects.empty())
-    {
-        _repaint_invoker->invoke_later();
-    }
-
-    for (size_t i = 0; i < _dirty_rects.count(); i++)
-    {
-        if (_dirty_rects[i].colide_with(rectangle))
-        {
-            _dirty_rects[i] = _dirty_rects[i].merged_with(rectangle);
-            return;
-        }
-    }
-
-    _dirty_rects.push_back(rectangle);
-}
-
-void Window::should_relayout()
-{
-    if (_dirty_layout || !_visible)
-    {
-        return;
-    }
-
-    _dirty_layout = true;
-
-    _relayout_invoker->invoke_later();
+    flip(repaited_regions);
 }
 
 void Window::change_framebuffer_if_needed()
@@ -250,8 +240,7 @@ void Window::hide()
         return;
     }
 
-    _relayout_invoker->cancel();
-    _repaint_invoker->cancel();
+    _update_invoker->cancel();
 
     _visible = false;
     Application::the()->hide_window(this);

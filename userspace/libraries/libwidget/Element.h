@@ -85,6 +85,13 @@ struct Layout
         Math::Vec2i((_hspacing), 0), \
     })
 
+#define WIDGET_BUILDER(__type, __name)                    \
+    template <typename... TArgs>                          \
+    ::RefPtr<__type> __name(TArgs &&...args)              \
+    {                                                     \
+        return ::make<__type>(::forward<TArgs>(args)...); \
+    }
+
 class Element : public RefCounted<Element>
 {
 private:
@@ -313,14 +320,6 @@ public:
 
     void focus();
 
-    /* --- Paint ------------------------------------------------------------ */
-
-    void repaint(Graphic::Painter &painter, Math::Recti rectangle);
-
-    void should_repaint();
-
-    void should_repaint(Math::Recti rectangle);
-
     /* --- Layout ----------------------------------------------------------- */
 
     void relayout();
@@ -328,6 +327,14 @@ public:
     void should_relayout();
 
     Math::Vec2i compute_size();
+
+    /* --- Paint ------------------------------------------------------------ */
+
+    void repaint(Graphic::Painter &painter, Math::Recti rectangle);
+
+    void should_repaint();
+
+    void should_repaint(Math::Recti rectangle);
 
     /* --- Events ----------------------------------------------------------- */
 

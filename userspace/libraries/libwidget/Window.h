@@ -3,6 +3,7 @@
 #include <libasync/Invoker.h>
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
+#include <libio/Streams.h>
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
 #include <libwidget/Cursor.h>
@@ -47,8 +48,9 @@ private:
     RefPtr<Graphic::Bitmap> backbuffer;
     OwnPtr<Graphic::Painter> backbuffer_painter;
 
-    Vector<Math::Recti> _dirty_rects{};
+    bool _dirty_build;
     bool _dirty_layout;
+    Vector<Math::Recti> _dirty_paint{};
 
     EventHandler _handlers[EventType::__COUNT];
 
@@ -58,8 +60,10 @@ private:
     Element *_mouse_focus = nullptr;
     Element *_mouse_over = nullptr;
 
-    OwnPtr<Async::Invoker> _repaint_invoker;
-    OwnPtr<Async::Invoker> _relayout_invoker;
+    OwnPtr<Async::Invoker> _update_invoker;
+
+    NONCOPYABLE(Window);
+    NONMOVABLE(Window);
 
 public:
     int handle() { return this->_handle; }
@@ -95,7 +99,7 @@ public:
 
     Graphic::Color color(ThemeColorRole role);
 
-    Window(WindowFlag flags);
+    Window(WindowFlag flags = WINDOW_NONE);
 
     virtual ~Window();
 
@@ -135,9 +139,22 @@ public:
 
     /* --- Childs ----------------------------------------------------------- */
 
-    virtual RefPtr<Element> build() { return nullptr; }
+    virtual RefPtr<Element> build()
+    {
+        return make<Element>();
+    }
 
-    RefPtr<Element> root() { return _root; }
+    RefPtr<Element> root()
+    {
+        if (!_root)
+        {
+            _root = build();
+            _root->mount(*this);
+            _keyboard_focus = _root.naked();
+        }
+
+        return _root;
+    }
 
     void focus_widget(Element *widget);
 
@@ -149,17 +166,17 @@ public:
 
     bool has_keyboard_focus(Element *widget);
 
-    /* --- Layout ----------------------------------------------------------- */
+    /* --- Update ----------------------------------------------------------- */
 
     void relayout();
 
+    void repaint(Graphic::Painter &painter, Math::Recti rectangle);
+
+    void flip(Math::Recti region);
+
+    void update();
+
     void should_relayout();
-
-    /* --- Render ----------------------------------------------------------- */
-
-    virtual void repaint(Graphic::Painter &painter, Math::Recti rectangle);
-
-    void repaint_dirty();
 
     void should_repaint(Math::Recti rectangle);
 

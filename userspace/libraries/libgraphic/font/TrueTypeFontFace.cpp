@@ -1,4 +1,3 @@
-#include <libgraphic/font/TrueTypeFont.h>
 #include <libgraphic/font/TrueTypeFontFace.h>
 #include <libio/FourCC.h>
 #include <libio/ReadCounter.h>
@@ -120,8 +119,7 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
             _has_loca = true;
             break;
         case TABLE_TAG_HEAD:
-            IO::logln("HEAD: {}", table_offset());
-            _has_head = true;
+            read_table_head(table_reader);
             break;
         case TABLE_TAG_GLYF:
             IO::logln("GLYF: {}", table_offset());
@@ -164,12 +162,12 @@ Optional<Graphic::Font::Glyph> Graphic::Font::TrueTypeFontFace::glyph(Codepoint 
     return {};
 }
 
-ResultOr<Math::Vec2<uint16_t>> Graphic::Font::TrueTypeFontFace::read_version(IO::Reader &reader)
+ResultOr<Graphic::Font::TrueTypeVersion> Graphic::Font::TrueTypeFontFace::read_version(IO::Reader &reader)
 {
     auto major = TRY(IO::read<be_uint16_t>(reader));
     auto minor = TRY(IO::read<be_uint16_t>(reader));
 
-    return Math::Vec2<uint16_t>{major(), minor()};
+    return TrueTypeVersion{major, minor};
 }
 
 Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
@@ -307,6 +305,14 @@ Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
     return Result::SUCCESS;
 }
 
+Result Graphic::Font::TrueTypeFontFace::read_table_head(IO::Reader &reader)
+{
+    auto header = TRY(IO::read<TrueTypeHeader>(reader));
+    UNUSED(header);
+
+    return Result::SUCCESS;
+}
+
 Result Graphic::Font::TrueTypeFontFace::read_table_maxp(IO::Reader &reader)
 {
     auto version = TRY(read_version(reader));
@@ -314,7 +320,7 @@ Result Graphic::Font::TrueTypeFontFace::read_table_maxp(IO::Reader &reader)
     _num_glyphs = TRY(IO::read<be_uint16_t>(reader))();
 
     // Version 1.0 has extra data
-    if (version.x() == 1 && version.y() == 0)
+    if (version.x()() == 1 && version.y()() == 0)
     {
         // TODO: read extra data for version 1.0
         // https://docs.microsoft.com/en-us/typography/opentype/spec/maxp

@@ -1,9 +1,33 @@
 #pragma once
+#include <libmath/Rect.h>
+#include <libmath/Vec2.h>
 #include <libutils/Endian.h>
 #include <stdint.h>
 
 namespace Graphic::Font
 {
+using TrueTypeVersion = Math::Vec2<be_uint16_t>;
+using TrueTypeFixed = Math::Vec2<be_uint16_t>;
+
+struct TrueTypeHeader
+{
+    TrueTypeVersion version;
+    TrueTypeFixed revision;
+    be_uint32_t checksum_adjustment;
+    be_uint32_t magic_number;
+    be_uint16_t flags;
+    be_uint16_t units_per_em;
+    be_uint64_t created;
+    be_uint64_t modified;
+    // Bounding box that matches all glyphs
+    Math::Rect<be_int16_t> glyphs_bounding_box;
+    be_uint16_t style;
+    be_uint16_t lowest_rec_ppem;
+    be_int16_t font_direction_hint;
+    be_int16_t index_to_loc_fmt;
+    be_int16_t glyph_data_fmt;
+};
+
 enum TrueTypePlatform : uint16_t
 {
     TT_PLATFORM_UNICODE = 0,

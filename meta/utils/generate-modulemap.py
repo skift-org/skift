@@ -22,7 +22,7 @@ for file_name in files:
             .replace(".h", ".pch")
         print(f"{module_name} {module_path}")
 
-    elif file_name.endswith(".module.cpp"):
+    elif file_name.endswith(".cppm"):
         with open(file_name) as f:
             first_line = f.readline().strip()
 
@@ -39,7 +39,7 @@ for file_name in files:
                 .replace(";", "")
 
             module_path = (dst_dir + file_name.replace(src_dir, "")) \
-                .replace(".module.cpp", ".gmc")
+                .replace(".cppm", ".gmc")
 
             print(f"{module_name} {module_path}")
     else:

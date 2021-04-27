@@ -42,7 +42,7 @@ $$(BUILDROOT)/userspace/apps/$$($(1)_NAME)/%.o: userspace/apps/$$($(1)_NAME)/%.c
 	@echo [$(1)] [CXX] $$<
 	@$(CXX) $(CXXFLAGS) -c -o $$@ $$<
 
-$$($(1)_MODULEMAP): $$(filter %.module.cpp, $$($(1)_SOURCES)) $$($(1)_HEADERS)
+$$($(1)_MODULEMAP): $$(filter %.cppm, $$($(1)_SOURCES)) $$($(1)_HEADERS)
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [GENERATE-MODULEMAP] $$@
 	@generate-modulemap.py userspace/apps/ $$(BUILDROOT)/userspace/apps/ $$^ > $$@

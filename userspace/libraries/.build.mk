@@ -68,7 +68,7 @@ $(BUILDROOT)/userspace/libraries/lib$($(1)_NAME)/%.s.o: userspace/libraries/lib$
 	@echo [LIB$(1)] [AS] $$<
 	@$(AS) $(ASFLAGS) $$^ -o $$@
 
-$$($(1)_MODULEMAP): $$(filter %.module.cpp, $$($(1)_SOURCES)) $$($(1)_HEADERS)
+$$($(1)_MODULEMAP): $$(filter %.cppm, $$($(1)_SOURCES)) $$($(1)_HEADERS)
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [GENERATE-MODULEMAP] $$@
 	@generate-modulemap.py userspace/libraries/ $$(BUILDROOT)/userspace/libraries/ $$^ > $$@

@@ -23,7 +23,6 @@
  - **skiftOS** is also pretty easy to build from source, just follow the [build guide](manual/meta/building.md).
  - **skiftOS** is capable of running on real hardware.
  - **skiftOS** features a graphical user interface (GUI), with a compositor.
- - **skiftOS** is constantly updated, for the latest release `.img` of skiftOS, click [here](https://github.com/skiftOS/skift/releases/latest).
  - **skiftOS** can [run DOOM :rage3:](https://github.com/skiftOS/port-doom)
 
 # Screenshots

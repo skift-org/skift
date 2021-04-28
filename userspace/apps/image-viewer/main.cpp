@@ -25,11 +25,9 @@ int main(int argc, char **argv)
 
     auto bitmap = Graphic::Bitmap::load_from_or_placeholder(argv[1]);
 
-    auto set_has_wallaper = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("wallpaper"), "Set As Wallpaper");
-
-    set_has_wallaper->on(Widget::Event::ACTION, [&](auto) {
+    auto set_has_wallaper = toolbar->add(Widget::basic_button(Graphic::Icon::get("wallpaper"), "Set As Wallpaper", [&] {
         Settings::Service::the()->write(Settings::Path::parse("appearance:wallpaper.image"), process_resolve(argv[1]));
-    });
+    }));
 
     auto image = window->root()->add(Widget::image(bitmap));
     image->flags(Widget::Element::FILL);

@@ -31,11 +31,9 @@ int main(int, char **)
 
     for (size_t i = 0; _demos[i].name; i++)
     {
-        auto demo_button = navbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, _demos[i].name);
-
-        demo_button->on(Widget::Event::ACTION, [i, demo_widget](auto) {
+        auto demo_button = navbar->add(Widget::basic_button(_demos[i].name, [i, demo_widget] {
             demo_widget->demo(&_demos[i]);
-        });
+        }));
     }
 
     window->show();

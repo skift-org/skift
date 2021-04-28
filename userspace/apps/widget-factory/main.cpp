@@ -28,7 +28,7 @@ int main(int, char **)
         auto p1 = panel_hflow->add(Widget::panel());
         p1->flags(Widget::Element::FILL);
 
-        auto button = panel_hflow->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, "Hello, world!");
+        auto button = panel_hflow->add(Widget::basic_button("Hello, world!"));
         button->flags(Widget::Element::FILL);
 
         auto p2 = panel_hflow->add<Widget::Container>();
@@ -44,12 +44,12 @@ int main(int, char **)
         buttons->layout(HFLOW(8));
         buttons->insets(Insetsi(0, 8));
 
-        buttons->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, "BUTTON");
-        buttons->add<Widget::ButtonElement>(Widget::ButtonElement::OUTLINE, "BUTTON");
-        buttons->add<Widget::ButtonElement>(Widget::ButtonElement::FILLED, "BUTTON");
-        buttons->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("widgets"), "BUTTON");
-        buttons->add<Widget::ButtonElement>(Widget::ButtonElement::OUTLINE, Graphic::Icon::get("widgets"), "BUTTON");
-        buttons->add<Widget::ButtonElement>(Widget::ButtonElement::FILLED, Graphic::Icon::get("widgets"), "BUTTON");
+        buttons->add(Widget::basic_button("BUTTON"));
+        buttons->add(Widget::outline_button("BUTTON"));
+        buttons->add(Widget::filled_button("BUTTON"));
+        buttons->add(Widget::basic_button(Graphic::Icon::get("widgets"), "BUTTON"));
+        buttons->add(Widget::outline_button(Graphic::Icon::get("widgets"), "BUTTON"));
+        buttons->add(Widget::filled_button(Graphic::Icon::get("widgets"), "BUTTON"));
     }
 
     window->root()->add(Widget::label("Grid layout", Anchor::CENTER));
@@ -61,18 +61,16 @@ int main(int, char **)
         auto text_field = panel_grid->add<Widget::TextField>(Widget::TextModel::empty());
         text_field->focus();
 
-        auto acrylic_button = panel_grid->add<Widget::ButtonElement>(Widget::ButtonElement::FILLED, "Open acrylic window !");
-        acrylic_button->on(Widget::Event::ACTION, [&](auto) {
+        auto acrylic_button = panel_grid->add(Widget::filled_button("Open acrylic window !", [&] {
             acrylic_window->show();
-        });
+        }));
 
-        panel_grid->add<Widget::ButtonElement>(Widget::ButtonElement::FILLED, "Grid layout!");
+        panel_grid->add(Widget::filled_button("Grid layout!"));
 
-        auto dialog_button = panel_grid->add<Widget::ButtonElement>(Widget::ButtonElement::FILLED, "Open dialog!");
-        dialog_button->on(Widget::Event::ACTION, [&](auto) {
+        auto dialog_button = panel_grid->add(Widget::filled_button("Open dialog!", [&] {
             FilePicker::Dialog picker{};
             picker.show();
-        });
+        }));
 
         panel_grid->add(Widget::panel());
         panel_grid->add(Widget::panel());

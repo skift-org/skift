@@ -70,23 +70,24 @@ public:
         toolbar->layout(HFLOW(4));
         toolbar->insets(Insetsi(4, 4));
 
-        _open_document = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("folder-open"));
-        _open_document->on(Widget::Event::ACTION, [&](auto) {
+        _open_document = toolbar->add(Widget::basic_button(Graphic::Icon::get("folder-open"), [&] {
             FilePicker::Dialog picker{};
+
             if (picker.show() == Widget::DialogResult::OK)
             {
                 load_document(picker.selected_file().unwrap());
             }
-        });
-        _save_document = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("content-save"));
-        _save_document->on(Widget::Event::ACTION, [&](auto) {
+        }));
+
+        _save_document = toolbar->add(Widget::basic_button(Graphic::Icon::get("content-save"), [&] {
             FilePicker::Dialog picker{FilePicker::DIALOG_FLAGS_SAVE};
             if (picker.show() == Widget::DialogResult::OK)
             {
                 save_document(picker.selected_file().unwrap());
             }
-        });
-        _new_document = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("image-plus"));
+        }));
+
+        _new_document = toolbar->add(Widget::basic_button(Graphic::Icon::get("image-plus")));
     }
 };
 

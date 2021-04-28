@@ -24,14 +24,6 @@ private:
 public:
     ButtonElement(Style style);
 
-    ButtonElement(Style style, RefPtr<Graphic::Icon> icon);
-
-    ButtonElement(Style style, String text);
-
-    ButtonElement(Style style, RefPtr<Graphic::Icon> icon, String text);
-
-    ButtonElement(Style style, RefPtr<Graphic::Bitmap> image, String text);
-
     void paint(Graphic::Painter &painter, const Math::Recti &rectangle) override;
 
     void event(Event *event) override;
@@ -49,15 +41,17 @@ RefPtr<ButtonElement> basic_button(String text, Callback<void(void)> on_click = 
 
 RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Icon> icon, String text, Callback<void(void)> on_click = nullptr);
 
+RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Bitmap> image, String text, Callback<void(void)> on_click = nullptr);
+
 /* --- Outlined Button ------------------------------------------------------ */
 
-RefPtr<ButtonElement> outlined_button(RefPtr<Element> child, Callback<void(void)> on_click = nullptr);
+RefPtr<ButtonElement> outline_button(RefPtr<Element> child, Callback<void(void)> on_click = nullptr);
 
-RefPtr<ButtonElement> outlined_button(RefPtr<Graphic::Icon> icon, Callback<void(void)> on_click = nullptr);
+RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, Callback<void(void)> on_click = nullptr);
 
-RefPtr<ButtonElement> outlined_button(String text, Callback<void(void)> on_click = nullptr);
+RefPtr<ButtonElement> outline_button(String text, Callback<void(void)> on_click = nullptr);
 
-RefPtr<ButtonElement> outlined_button(RefPtr<Graphic::Icon> icon, String text, Callback<void(void)> on_click = nullptr);
+RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, String text, Callback<void(void)> on_click = nullptr);
 
 /* --- Filled Button -------------------------------------------------------- */
 

@@ -36,89 +36,89 @@ int main(int, char **)
         grid(
             4, 6, 4, 4,
             {
-                outlined_button(Graphic::Icon::get("percent")),
+                outline_button(Graphic::Icon::get("percent")),
 
-                outlined_button("CE", [&] {
+                outline_button("CE", [&] {
                     calculator.clear_all();
                 }),
 
-                outlined_button("C", [&] {
+                outline_button("C", [&] {
                     calculator.clear();
                 }),
 
-                outlined_button(Graphic::Icon::get("backspace-outline")),
+                outline_button(Graphic::Icon::get("backspace-outline")),
 
-                outlined_button("1/x", [&] {
+                outline_button("1/x", [&] {
                     calculator.enter_operation(Operation::RECIPROCAL);
                 }),
 
-                outlined_button(Graphic::Icon::get("exponent"), [&] {
+                outline_button(Graphic::Icon::get("exponent"), [&] {
                     calculator.enter_operation(Operation::POWER);
                 }),
 
-                outlined_button(Graphic::Icon::get("square-root"), [&] {
+                outline_button(Graphic::Icon::get("square-root"), [&] {
                     calculator.enter_operation(Operation::SQRT);
                 }),
 
-                outlined_button(Graphic::Icon::get("slash-forward"), [&] {
+                outline_button(Graphic::Icon::get("slash-forward"), [&] {
                     calculator.enter_operation(Operation::DIVIDE);
                 }),
 
-                outlined_button("7", [&] {
+                outline_button("7", [&] {
                     calculator.enter_number(7);
                 }),
 
-                outlined_button("8", [&] {
+                outline_button("8", [&] {
                     calculator.enter_number(8);
                 }),
 
-                outlined_button("9", [&] {
+                outline_button("9", [&] {
                     calculator.enter_number(9);
                 }),
 
-                outlined_button(Graphic::Icon::get("close"), [&] {
+                outline_button(Graphic::Icon::get("close"), [&] {
                     calculator.enter_operation(Operation::MULTIPLY);
                 }),
 
-                outlined_button("4", [&] {
+                outline_button("4", [&] {
                     calculator.enter_number(4);
                 }),
 
-                outlined_button("5", [&] {
+                outline_button("5", [&] {
                     calculator.enter_number(5);
                 }),
 
-                outlined_button("6", [&] {
+                outline_button("6", [&] {
                     calculator.enter_number(6);
                 }),
 
-                outlined_button(Graphic::Icon::get("minus"), [&] {
+                outline_button(Graphic::Icon::get("minus"), [&] {
                     calculator.enter_operation(Operation::SUBSTRACT);
                 }),
 
-                outlined_button("1", [&] {
+                outline_button("1", [&] {
                     calculator.enter_number(1);
                 }),
 
-                outlined_button("2", [&] {
+                outline_button("2", [&] {
                     calculator.enter_number(2);
                 }),
 
-                outlined_button("3", [&] {
+                outline_button("3", [&] {
                     calculator.enter_number(3);
                 }),
 
-                outlined_button(Graphic::Icon::get("plus"), [&] {
+                outline_button(Graphic::Icon::get("plus"), [&] {
                     calculator.enter_operation(Operation::ADD);
                 }),
 
-                outlined_button(Graphic::Icon::get("plus-minus-variant")),
+                outline_button(Graphic::Icon::get("plus-minus-variant")),
 
-                outlined_button("0", [&] {
+                outline_button("0", [&] {
                     calculator.enter_number(0);
                 }),
 
-                outlined_button("."),
+                outline_button("."),
 
                 filled_button(Graphic::Icon::get("equal"), [&] {
                     calculator.equal();

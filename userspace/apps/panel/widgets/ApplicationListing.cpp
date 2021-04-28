@@ -46,12 +46,10 @@ void ApplicationListing::render()
 
         find_any = true;
 
-        auto item = host()->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, entry.image, entry.name);
-
-        item->on(Widget::Event::ACTION, [this, entry](auto) {
+        auto item = host()->add(Widget::basic_button(entry.image, entry.name, [this, entry] {
             process_run(entry.command.cstring(), nullptr, 0);
             window()->hide();
-        });
+        }));
 
         return Iteration::CONTINUE;
     });

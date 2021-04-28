@@ -37,29 +37,21 @@ public:
         layout(HFLOW(4));
         insets(Insetsi(4, 4));
 
-        _go_backward = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("arrow-left"));
-
-        _go_backward->on(Widget::Event::ACTION, [this](auto) {
+        _go_backward = add(Widget::basic_button(Graphic::Icon::get("arrow-left"), [this] {
             _navigation->go_backward();
-        });
+        }));
 
-        _go_foreward = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("arrow-right"));
-
-        _go_foreward->on(Widget::Event::ACTION, [this](auto) {
+        _go_foreward = add(Widget::basic_button(Graphic::Icon::get("arrow-right"), [this] {
             _navigation->go_forward();
-        });
+        }));
 
-        _go_up = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("arrow-up"));
-
-        _go_up->on(Widget::Event::ACTION, [this](auto) {
+        _go_up = add(Widget::basic_button(Graphic::Icon::get("arrow-up"), [this] {
             _navigation->go_up();
-        });
+        }));
 
-        _go_home = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("home"));
-
-        _go_home->on(Widget::Event::ACTION, [this](auto) {
+        _go_home = add(Widget::basic_button(Graphic::Icon::get("home"), [this] {
             _navigation->go_home();
-        });
+        }));
 
         add(Widget::separator());
 
@@ -68,19 +60,15 @@ public:
 
         add(Widget::separator());
 
-        _refresh = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("refresh"));
-
-        _refresh->on(Widget::Event::ACTION, [this](auto) {
+        _refresh = add(Widget::basic_button(Graphic::Icon::get("refresh"), [this] {
             _navigation->refresh();
-        });
+        }));
 
         if (!(flags & NO_OPEN_TERMINAL))
         {
-            auto terminal_button = add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("console"));
-
-            terminal_button->on(Widget::Event::ACTION, [](auto) {
+            add(Widget::basic_button(Graphic::Icon::get("console"), [] {
                 process_run("terminal", NULL, TASK_NONE);
-            });
+            }));
         }
 
         _observer = _navigation->observe([this](auto &) {

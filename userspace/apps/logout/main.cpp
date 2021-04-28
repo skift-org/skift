@@ -46,27 +46,21 @@ int main(int, char **)
 
     dialog->add(Widget::spacer());
 
-    auto shutdown_button = dialog->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("power-standby"), "Shutdown");
-
-    shutdown_button->on(Widget::EventType::ACTION, [&](auto) {
+    auto shutdown_button = dialog->add(Widget::basic_button(Graphic::Icon::get("power-standby"), "Shutdown", [&] {
         hj_system_shutdown();
-    });
+    }));
 
-    auto reboot_button = dialog->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("restart"), "Reboot");
-
-    reboot_button->on(Widget::EventType::ACTION, [&](auto) {
+    auto reboot_button = dialog->add(Widget::basic_button(Graphic::Icon::get("restart"), "Reboot", [&] {
         hj_system_reboot();
-    });
+    }));
 
-    dialog->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("logout"), "Logoff");
+    dialog->add(Widget::basic_button(Graphic::Icon::get("logout"), "Logoff"));
 
     dialog->add(Widget::spacer());
 
-    auto cancel_button = dialog->add<Widget::ButtonElement>(Widget::ButtonElement::FILLED, "Cancel");
-
-    cancel_button->on(Widget::EventType::ACTION, [&](auto) {
+    auto cancel_button = dialog->add(Widget::filled_button("Cancel", [&] {
         window->hide();
-    });
+    }));
 
     window->on(Widget::Event::KEYBOARD_KEY_PRESS, [&](Widget::Event *event) {
         if (event->keyboard.key == KEYBOARD_KEY_ESC)

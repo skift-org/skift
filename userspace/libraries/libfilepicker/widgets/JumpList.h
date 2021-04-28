@@ -48,14 +48,9 @@ public:
         {
             auto bookmark = _bookmarks->all()[i];
 
-            auto button = _listing->host()->add<Widget::ButtonElement>(
-                Widget::ButtonElement::TEXT,
-                bookmark.icon(),
-                bookmark.name());
-
-            button->on(Widget::Event::ACTION, [this, bookmark](auto) {
+            _listing->host()->add(Widget::basic_button(bookmark.icon(), bookmark.name(), [this, bookmark] {
                 _navigation->navigate(bookmark.path());
-            });
+            }));
         }
     }
 };

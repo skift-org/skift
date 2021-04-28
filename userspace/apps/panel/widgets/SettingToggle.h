@@ -28,10 +28,6 @@ public:
         render();
     }
 
-    ~SettingToggle()
-    {
-    }
-
     void render()
     {
         clear();

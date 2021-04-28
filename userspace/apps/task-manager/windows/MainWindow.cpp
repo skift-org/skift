@@ -24,10 +24,9 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
     toolbar->layout(HFLOW(4));
     toolbar->insets(Insetsi(4, 4));
 
-    toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::FILLED, Graphic::Icon::get("plus"), "New task");
+    toolbar->add(Widget::filled_button(Graphic::Icon::get("plus"), "New task"));
 
-    auto cancel_task_button = toolbar->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("close"), "Cancel task");
-    cancel_task_button->on(Widget::Event::ACTION, [&](auto) {
+    auto cancel_task_button = toolbar->add(Widget::basic_button(Graphic::Icon::get("close"), "Cancel task", [&] {
         auto result = Widget::MessageBox::create_and_show(
             "Cancel task",
             "Are you sure about that ?",
@@ -38,7 +37,7 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
         {
             _table_model->kill_task(_table->selected());
         };
-    });
+    }));
 
     /// --- Table view --- //
     _table_model = make<TaskModel>();

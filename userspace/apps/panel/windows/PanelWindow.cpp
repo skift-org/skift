@@ -32,10 +32,9 @@ PanelWindow::PanelWindow()
     root()->add(Widget::separator());
     root()->add(Widget::separator())->color(Widget::THEME_BORDER, Graphic::Colors::BLACK.with_alpha(0.25));
 
-    auto menu = container->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("menu"), "Applications");
-    menu->on(Widget::Event::ACTION, [this](auto) {
+    auto menu = container->add(Widget::basic_button(Graphic::Icon::get("menu"), "Applications", [this] {
         _menu->show();
-    });
+    }));
 
     container->add(Widget::spacer());
 
@@ -55,11 +54,9 @@ PanelWindow::PanelWindow()
         process_run("task-manager", nullptr, 0);
     });
 
-    auto dots = container->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("dots"));
-
-    dots->on(Widget::Event::ACTION, [this](auto) {
+    auto dots = container->add(Widget::basic_button(Graphic::Icon::get("dots"), [this] {
         _quicksetting->show();
-    });
+    }));
 
     bound(Widget::Screen::bound().take_top(root()->compute_size().y()));
     on(Widget::Event::DISPLAY_SIZE_CHANGED, [this](auto) {

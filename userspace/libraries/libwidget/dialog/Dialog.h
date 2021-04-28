@@ -88,42 +88,38 @@ public:
     {
         if (_buttons & DialogButton::YES)
         {
-            auto button = parent->add<ButtonElement>(ButtonElement::OUTLINE, "Yes");
-            button->on(Event::ACTION, [&](auto) {
+            parent->add(Widget::outline_button("Yes", [&] {
                 on_button(DialogButton::YES);
                 close(DialogResult::YES);
                 _window->hide();
-            });
+            }));
         }
 
         if (_buttons & DialogButton::NO)
         {
-            auto button = parent->add<ButtonElement>(ButtonElement::OUTLINE, "No");
-            button->on(Event::ACTION, [&](auto) {
+            parent->add(Widget::outline_button("No", [&] {
                 on_button(DialogButton::NO);
                 close(DialogResult::NO);
                 _window->hide();
-            });
+            }));
         }
 
         if (_buttons & DialogButton::OK)
         {
-            auto button = parent->add<ButtonElement>(ButtonElement::OUTLINE, "Ok");
-            button->on(Event::ACTION, [&](auto) {
+            parent->add(Widget::outline_button("Ok", [&] {
                 on_button(DialogButton::OK);
                 close(DialogResult::OK);
                 _window->hide();
-            });
+            }));
         }
 
         if (_buttons & DialogButton::CANCEL)
         {
-            auto button = parent->add<ButtonElement>(ButtonElement::OUTLINE, "Cancel");
-            button->on(Event::ACTION, [&](auto) {
+            parent->add(Widget::outline_button("Cancel", [&] {
                 on_button(DialogButton::CANCEL);
                 close(DialogResult::CANCEL);
                 _window->hide();
-            });
+            }));
         }
     }
 };

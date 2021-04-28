@@ -118,13 +118,13 @@ int main(int, char **)
     navigation->layout(HFLOW(4));
     navigation->insets(8);
 
-    auto skipall_button = navigation->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, "Skip All");
+    auto skipall_button = navigation->add(Widget::basic_button("Skip All"));
 
     navigation->add(Widget::spacer());
 
-    auto back_button = navigation->add<Widget::ButtonElement>(Widget::ButtonElement::OUTLINE, "Previous");
+    auto back_button = navigation->add(Widget::outline_button("Previous"));
 
-    auto next_button = navigation->add<Widget::ButtonElement>(Widget::ButtonElement::FILLED, "Next");
+    auto next_button = navigation->add(Widget::filled_button("Next"));
 
     int current_page = 0;
 

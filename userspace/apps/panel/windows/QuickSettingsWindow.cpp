@@ -4,7 +4,6 @@
 #include <libwidget/Elements.h>
 #include <libwidget/Screen.h>
 
-#include "libwidget/elements/ButtonElement.h"
 #include "panel/widgets/SettingToggle.h"
 #include "panel/windows/PanelWindow.h"
 #include "panel/windows/QuickSettingsWindow.h"
@@ -32,18 +31,18 @@ QuickSettingsWindow::QuickSettingsWindow()
     root()->add<SettingToggle>("Show Wireframe", Graphic::Icon::get("duck"), "appearance:widgets.wireframe");
     root()->add<SettingToggle>("Night Light", Graphic::Icon::get("moon-waning-crescent"), "appearance:night-light.enable");
 
-    root()->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, "Light Theme")->on(Widget::Event::ACTION, [](auto) {
+    root()->add(Widget::basic_button("Light Theme", [] {
         Settings::Service::the()->write(Settings::Path::parse("appearance:widgets.theme"), "skift-light");
-    });
+    }));
 
-    root()->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, "Dark Theme")->on(Widget::Event::ACTION, [](auto) {
+    root()->add(Widget::basic_button("Dark Theme", [] {
         Settings::Service::the()->write(Settings::Path::parse("appearance:widgets.theme"), "skift-dark");
-    });
+    }));
 
     auto account_container = root()->add<Widget::Container>();
     account_container->layout(HFLOW(4));
 
-    account_container->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string());
+    account_container->add(Widget::basic_button(Graphic::Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string()));
 
     account_container->add(Widget::spacer());
 

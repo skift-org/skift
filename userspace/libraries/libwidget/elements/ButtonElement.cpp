@@ -81,67 +81,6 @@ ButtonElement::ButtonElement(Style style) : _style{style}
     flags(Element::GREEDY);
 }
 
-ButtonElement::ButtonElement(Style style, RefPtr<Graphic::Icon> icon) : ButtonElement{style}
-{
-    min_width(64);
-    min_height(36);
-    flags(Element::GREEDY | Element::SQUARE);
-
-    auto icon_panel = add(Widget::icon(icon));
-
-    if (style == FILLED)
-    {
-        icon_panel->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
-    }
-}
-
-ButtonElement::ButtonElement(Style style, String text) : ButtonElement{style}
-{
-    insets(Insetsi(0, 16));
-    min_width(64);
-
-    auto lbl = add(label(text, Anchor::CENTER));
-    if (style == FILLED)
-    {
-        lbl->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
-    }
-}
-
-ButtonElement::ButtonElement(Style style, RefPtr<Graphic::Icon> icon, String text) : ButtonElement{style}
-{
-    insets(Insetsi(0, 0, 12, 16));
-    min_width(64);
-
-    auto icon_panel = add(Widget::icon(icon));
-    icon_panel->insets(Insetsi(0, 0, 0, 8));
-
-    auto lbl = add(label(text));
-
-    if (style == FILLED)
-    {
-        lbl->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
-        icon_panel->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
-    }
-}
-
-ButtonElement::ButtonElement(Style style, RefPtr<Graphic::Bitmap> image, String text) : ButtonElement{style}
-{
-    insets(Insetsi(4, 4, 12, 16));
-    min_width(64);
-
-    auto image_panel = add(Widget::image(image));
-    image_panel->outsets(Insetsi(0, 0, 0, 8));
-    image_panel->min_width(36);
-    image_panel->min_height(36);
-
-    auto lbl = add(label(text));
-
-    if (style == FILLED)
-    {
-        lbl->color(THEME_FOREGROUND, Graphic::Colors::WHITE);
-    }
-}
-
 RefPtr<ButtonElement> button(ButtonElement::Style style, RefPtr<Element> child, Callback<void(void)> on_click)
 {
     auto button = make<ButtonElement>(style);
@@ -198,9 +137,21 @@ RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Icon> icon, String text, Call
         on_click);
 }
 
+RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Bitmap> image, String text, Callback<void(void)> on_click)
+{
+    return button(
+        ButtonElement::TEXT,
+        spacing({0, 0, 12, 16},
+                Widget::hflow({
+                    spacing({0, 0, 0, 8}, Widget::image(image, Graphic::BitmapScaling::CENTER)),
+                    Widget::label(text, Anchor::CENTER),
+                })),
+        on_click);
+}
+
 /* --- Outlined Button ------------------------------------------------------ */
 
-RefPtr<ButtonElement> outlined_button(RefPtr<Element> child, Callback<void(void)> on_click)
+RefPtr<ButtonElement> outline_button(RefPtr<Element> child, Callback<void(void)> on_click)
 {
     return button(
         ButtonElement::OUTLINE,
@@ -208,7 +159,7 @@ RefPtr<ButtonElement> outlined_button(RefPtr<Element> child, Callback<void(void)
         on_click);
 }
 
-RefPtr<ButtonElement> outlined_button(RefPtr<Graphic::Icon> icon, Callback<void(void)> on_click)
+RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, Callback<void(void)> on_click)
 {
     return button(
         ButtonElement::OUTLINE,
@@ -217,7 +168,7 @@ RefPtr<ButtonElement> outlined_button(RefPtr<Graphic::Icon> icon, Callback<void(
         on_click);
 }
 
-RefPtr<ButtonElement> outlined_button(String text, Callback<void(void)> on_click)
+RefPtr<ButtonElement> outline_button(String text, Callback<void(void)> on_click)
 {
     return button(
         ButtonElement::OUTLINE,
@@ -226,7 +177,7 @@ RefPtr<ButtonElement> outlined_button(String text, Callback<void(void)> on_click
         on_click);
 }
 
-RefPtr<ButtonElement> outlined_button(RefPtr<Graphic::Icon> icon, String text, Callback<void(void)> on_click)
+RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, String text, Callback<void(void)> on_click)
 {
     return button(
         ButtonElement::OUTLINE,

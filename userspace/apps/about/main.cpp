@@ -62,7 +62,7 @@ int main(int, char **)
 
             spacing(6,
                 hflow(4,{
-                    outlined_button("License",  [] {
+                    outline_button("License",  [] {
                         show_license();
                     }),
                     spacer(),

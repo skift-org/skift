@@ -21,6 +21,7 @@ private:
     Result read_table_head(IO::Reader &reader);
     Result read_table_maxp(IO::Reader &reader);
     Result read_table_cmap(IO::Reader &reader);
+    Result read_table_glyf(IO::Reader &reader);
     Result read_tables(IO::MemoryReader &reader);
 
     ResultOr<TrueTypeVersion> read_version(IO::Reader &reader);

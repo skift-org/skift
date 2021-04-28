@@ -38,6 +38,23 @@ struct TrueTypeHeader
 
 constexpr uint32_t TRUETYPE_MAGIC_NUMBER = 0x5F0F3CF5;
 
+struct TrueTypeGlyphHeader
+{
+    be_int16_t num_contours;
+    Math::Rect<be_int16_t> bounding_box;
+};
+
+enum TrueTypeGlyphSimpleFlags : uint8_t
+{
+    TT_GLYPH_ON_CURVE_POINT = (1 << 0),
+    TT_GLYPH_XSHORT_VECTOR = (1 << 1),
+    TT_GLYPH_YSHORT_VECTOR = (1 << 2),
+    TT_GLYPH_REPEAT = (1 << 3),
+    TT_GLYPH_X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR = (1 << 4),
+    TT_GLYPH_Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR = (1 << 5),
+    TT_GLYPH_OVERLAP_SIMPLE = (1 << 6)
+};
+
 enum TrueTypePlatform : uint16_t
 {
     TT_PLATFORM_UNICODE = 0,

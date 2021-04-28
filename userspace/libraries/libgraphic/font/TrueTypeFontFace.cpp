@@ -137,7 +137,7 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
             break;
         case TABLE_TAG_GLYF:
             IO::logln("GLYF: {}", table.offset());
-            _has_glyf = true;
+            TRY(read_table_glyf(table_reader));
             break;
         case TABLE_TAG_HHEA:
             IO::logln("HHEA: {}", table.offset());
@@ -340,6 +340,111 @@ Result Graphic::Font::TrueTypeFontFace::read_table_maxp(IO::Reader &reader)
     {
         // TODO: read extra data for version 1.0
         // https://docs.microsoft.com/en-us/typography/opentype/spec/maxp
+    }
+
+    return Result::SUCCESS;
+}
+
+Result Graphic::Font::TrueTypeFontFace::read_table_glyf(IO::Reader &reader)
+{
+    _has_glyf = true;
+
+    for (uint16_t glyph_idx = 0; glyph_idx < _num_glyphs; glyph_idx++)
+    {
+        auto header = TRY(IO::read<TrueTypeGlyphHeader>(reader));
+
+        // Simple glyph
+        if (header.num_contours() > 0)
+        {
+            auto end_indices = TRY(IO::read_vector<be_uint16_t>(reader, header.num_contours()));
+            auto num_instructions = TRY(IO::read<be_uint16_t>(reader));
+            auto instructions = TRY(IO::read_vector<be_uint8_t>(reader, num_instructions()));
+
+            // Number of points is the end index of the last contour
+            auto num_points = end_indices.peek_back();
+
+            // TODO: resize these in advance & put them in a single vector (Vec2<int16_t>)
+            Vector<TrueTypeGlyphSimpleFlags> flags_vec(num_points());
+            Vector<Math::Vec2<int16_t>> coords(num_points());
+            coords.resize(num_points());
+
+            // Read flags
+            {
+                uint8_t repeat_count = 0;
+                for (uint16_t point_idx = 0; point_idx < num_points(); point_idx++)
+                {
+                    if (repeat_count == 0)
+                    {
+                        auto flags = TRY(IO::read<TrueTypeGlyphSimpleFlags>(reader));
+                        flags_vec.push_back(flags);
+                        // This flags tells us that the flag is repeated N times
+                        if (flags & TT_GLYPH_REPEAT)
+                        {
+                            repeat_count = TRY(IO::read<be_uint8_t>(reader))();
+                        }
+                    }
+                    else
+                    {
+                        flags_vec.push_back(flags_vec.peek_back());
+                        repeat_count--;
+                    }
+                }
+            }
+
+            // Read x coordinates
+            {
+                int32_t x = 0;
+                for (uint16_t point_idx = 0; point_idx < num_points(); point_idx++)
+                {
+                    const auto &flags = flags_vec[point_idx];
+                    // It's a new coordinate (uint8_t + signflag)
+                    if (flags & TT_GLYPH_XSHORT_VECTOR)
+                    {
+                        int16_t delta_x = TRY(IO::read<be_uint8_t>(reader))();
+                        const bool positive = flags & TT_GLYPH_X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR;
+                        x += positive ? delta_x : -delta_x;
+                    }
+                    // It's a new coordinate (int16_t)
+                    else if (!(flags & TT_GLYPH_X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR))
+                    {
+                        int16_t delta_x = TRY(IO::read<be_int16_t>(reader))();
+                        x += delta_x;
+                    }
+                    coords[point_idx].x() = x;
+                }
+            }
+
+            // Read y coordinates
+            {
+                int32_t y = 0;
+                for (uint16_t point_idx = 0; point_idx < num_points(); point_idx++)
+                {
+                    const auto &flags = flags_vec[point_idx];
+                    // It's a new coordinate (uint8_t + signflag)
+                    if (flags & TT_GLYPH_YSHORT_VECTOR)
+                    {
+                        int16_t delta_y = TRY(IO::read<be_uint8_t>(reader))();
+                        const bool positive = flags & TT_GLYPH_Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR;
+                        y += positive ? delta_y : -delta_y;
+                    }
+                    // It's a new coordinate (int16_t)
+                    else if (!(flags & TT_GLYPH_Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR))
+                    {
+                        int16_t delta_y = TRY(IO::read<be_int16_t>(reader))();
+                        y += delta_y;
+                    }
+                    coords[point_idx].y() = y;
+                }
+            }
+
+            // Now create our contours
+            for (uint16_t point_idx = 0; point_idx < num_points(); point_idx++)
+            {
+            }
+        }
+        else // Composite glyph
+        {
+        }
     }
 
     return Result::SUCCESS;

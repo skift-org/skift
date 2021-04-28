@@ -64,4 +64,4 @@ skiftOS running in QEMU 5.1
 
 The skift operating system and its core components are licensed under the **MIT License**.
 
-The full text of the license is can be accessed via [this link](https://opensource.org/licenses/MIT) and is also included in the [license.md](license.md) file of this software package.
+The full text of the license can be accessed via [this link](https://opensource.org/licenses/MIT) and is also included in the [license.md](license.md) file of this software package.

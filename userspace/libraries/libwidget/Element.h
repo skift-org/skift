@@ -1,5 +1,6 @@
 #pragma once
 
+#include "libutils/Vector.h"
 #include <libgraphic/Font.h>
 #include <libmath/Rect.h>
 #include <libsystem/utils/List.h>
@@ -24,8 +25,6 @@ struct Layout
     {
         STACK,
         GRID,
-        VGRID,
-        HGRID,
         VFLOW,
         HFLOW,
     };
@@ -51,22 +50,6 @@ struct Layout
         (_hcell),                                  \
         (_vcell),                                  \
         Math::Vec2i((_hspacing), (_vspacing)),     \
-    })
-
-#define VGRID(_vspacing)             \
-    (::Widget::Layout{               \
-        ::Widget::Layout::VGRID,     \
-        0,                           \
-        0,                           \
-        Math::Vec2i(0, (_vspacing)), \
-    })
-
-#define HGRID(_hspacing)             \
-    (::Widget::Layout{               \
-        ::Widget::Layout::HGRID,     \
-        0,                           \
-        0,                           \
-        Math::Vec2i((_hspacing), 0), \
     })
 
 #define VFLOW(_vspacing)             \
@@ -287,6 +270,8 @@ public:
     /* --- Childs ----------------------------------------------------------- */
 
     Element *at(Math::Vec2i position);
+
+    const Vector<RefPtr<Element>> &childs() { return _childs; }
 
     template <typename T, typename... Args>
     RefPtr<T> add(Args &&...args)

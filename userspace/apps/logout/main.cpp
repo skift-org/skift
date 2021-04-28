@@ -1,3 +1,4 @@
+#include "libwidget/Element.h"
 #include <abi/Syscalls.h>
 
 #include <libwidget/Application.h>
@@ -38,7 +39,7 @@ int main(int, char **)
 
     auto warning_container = icon_and_title_container->add<Widget::Container>();
     warning_container->flags(Widget::Element::FILL);
-    warning_container->layout(VGRID(2));
+    warning_container->layout(VFLOW(2));
 
     warning_container->add(Widget::label("Shutdown or restart your computer.", Anchor::BOTTOM_LEFT));
     warning_container->add(Widget::label("Any unsaved work will be lost!", Anchor::TOP_LEFT));

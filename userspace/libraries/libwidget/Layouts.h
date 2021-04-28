@@ -1,7 +1,6 @@
 #pragma once
 
 #include <libwidget/layouts/Flags.h>
-#include <libwidget/layouts/Flow.h>
-#include <libwidget/layouts/Grid.h>
-#include <libwidget/layouts/Spacing.h>
-#include <libwidget/layouts/Stack.h>
+#include <libwidget/layouts/FlowLayout.h>
+#include <libwidget/layouts/GridLayout.h>
+#include <libwidget/layouts/StackLayout.h>

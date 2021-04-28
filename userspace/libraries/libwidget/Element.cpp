@@ -134,32 +134,6 @@ void Element::do_layout()
     }
     break;
 
-    case Layout::HGRID:
-    {
-        int index = 0;
-
-        for (auto &child : _childs)
-        {
-            auto bound = content().column(_childs.count(), index, _layout.spacing.x());
-            child->container(bound);
-            index++;
-        }
-    }
-    break;
-
-    case Layout::VGRID:
-    {
-        int index = 0;
-
-        for (auto &child : _childs)
-        {
-            auto bound = content().row(_childs.count(), index, _layout.spacing.y());
-            child->container(bound);
-            index++;
-        }
-    }
-    break;
-
     case Layout::HFLOW:
     {
         int fixed_child_count = 0;
@@ -239,7 +213,6 @@ void Element::do_layout()
 
     case Layout::VFLOW:
     {
-        int fixed_child_count = 0;
         int fixed_child_total_height = 0;
         int fill_child_count = 0;
 
@@ -251,7 +224,6 @@ void Element::do_layout()
             }
             else
             {
-                fixed_child_count++;
                 fixed_child_total_height += child->compute_size().y();
             }
         }
@@ -379,13 +351,11 @@ Math::Vec2i Element::size()
             switch (_layout.type)
             {
             case Layout::HFLOW:
-            case Layout::HGRID:
                 width += child_size.x();
                 height = MAX(height, child_size.y());
                 break;
 
             case Layout::VFLOW:
-            case Layout::VGRID:
                 width = MAX(width, child_size.x());
                 height += child_size.y();
                 break;
@@ -395,12 +365,12 @@ Math::Vec2i Element::size()
             }
         }
 
-        if (_layout.type == Layout::HFLOW || _layout.type == Layout::HGRID)
+        if (_layout.type == Layout::HFLOW)
         {
             width += _layout.spacing.x() * (_childs.count() - 1);
         }
 
-        if (_layout.type == Layout::VFLOW || _layout.type == Layout::VGRID)
+        if (_layout.type == Layout::VFLOW)
         {
             height += _layout.spacing.y() * (_childs.count() - 1);
         }

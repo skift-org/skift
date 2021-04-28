@@ -23,7 +23,7 @@ int main(int, char **)
     auto navbar = window->root()->add<Widget::Container>();
 
     navbar->insets(Insetsi(4, 4));
-    navbar->layout(HGRID(4));
+    navbar->layout(VFLOW(4));
 
     auto demo_widget = window->root()->add<DemoWidget>();
     demo_widget->flags(Widget::Element::FILL);

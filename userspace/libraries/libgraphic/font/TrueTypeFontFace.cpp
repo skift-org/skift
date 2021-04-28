@@ -4,6 +4,7 @@
 #include <libio/Skip.h>
 #include <libio/Streams.h>
 #include <libutils/Endian.h>
+#include <libutils/Sort.h>
 
 // Font tags
 // TrueType Version 1
@@ -91,57 +92,59 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
     UNUSED(entry_selector);
     UNUSED(range_shift);
 
+    Vector<TrueTypeTable> tables;
+    tables.resize(num_tables());
+
     for (uint16_t i = 0; i < num_tables(); i++)
     {
         // Read the table entry
-        auto table_tag = TRY(IO::read_tag(reader));
-        auto table_checksum = TRY(IO::read<be_uint32_t>(reader));
-        auto table_offset = TRY(IO::read<be_uint32_t>(reader));
-        auto table_size = TRY(IO::read<be_uint32_t>(reader));
+        tables[i] = TRY(IO::read<TrueTypeTable>(reader));
+    }
 
+    // TODO: reorder the tables on how we need them to be parsed
+    Utils::quicksort(tables.begin(), tables.end(), [](auto a, auto b) {
+        return 0;
+    });
+
+    for (const auto &table : tables)
+    {
         // Jump to the table position and create our readers
-        auto old_pos = TRY(reader.tell());
-        Assert::lower_equal((size_t)table_offset(), TRY(reader.length()));
-
-        reader.seek(IO::SeekFrom::start(table_offset()));
-        IO::ScopedReader table_reader(reader, table_size());
+        reader.seek(IO::SeekFrom::start(table.offset()));
+        IO::ScopedReader table_reader(reader, table.size());
 
         // TODO: validate the checksum
-        UNUSED(table_checksum);
 
-        switch (table_tag())
+        switch (table.tag())
         {
         case TABLE_TAG_CMAP:
-            read_table_cmap(table_reader);
+            TRY(read_table_cmap(table_reader));
             break;
         case TABLE_TAG_LOCA:
-            IO::logln("LOCA: {}", table_offset());
+            IO::logln("LOCA: {}", table.offset());
             _has_loca = true;
             break;
         case TABLE_TAG_HEAD:
-            read_table_head(table_reader);
+            TRY(read_table_head(table_reader));
             break;
         case TABLE_TAG_GLYF:
-            IO::logln("GLYF: {}", table_offset());
+            IO::logln("GLYF: {}", table.offset());
             _has_glyf = true;
             break;
         case TABLE_TAG_HHEA:
-            IO::logln("HHEA: {}", table_offset());
+            IO::logln("HHEA: {}", table.offset());
             _has_hhea = true;
             break;
         case TABLE_TAG_HMTX:
-            IO::logln("HMTX: {}", table_offset());
+            IO::logln("HMTX: {}", table.offset());
             _has_hmtx = true;
             break;
         case TABLE_TAG_MAXP:
-            read_table_maxp(table_reader);
+            TRY(read_table_maxp(table_reader));
             break;
         default:
             // IO::logln("Unknown table tag for font: {}", table_tag);
             break;
         }
-
-        reader.seek(IO::SeekFrom::start(old_pos));
     }
 
     return Result::SUCCESS;
@@ -307,8 +310,15 @@ Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
 
 Result Graphic::Font::TrueTypeFontFace::read_table_head(IO::Reader &reader)
 {
+    _has_head = true;
     auto header = TRY(IO::read<TrueTypeHeader>(reader));
-    UNUSED(header);
+
+    if (header.magic_number() != TRUETYPE_MAGIC_NUMBER)
+    {
+        return Result::ERR_INVALID_DATA;
+    }
+
+    // TODO: use what we need
 
     return Result::SUCCESS;
 }

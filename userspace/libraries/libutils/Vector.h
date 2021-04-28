@@ -592,6 +592,11 @@ public:
             ++_ptr;
             return *this;
         }
+        iterator operator--()
+        {
+            --_ptr;
+            return *this;
+        }
         bool operator!=(const iterator &other) const { return _ptr != other._ptr; }
         const T &operator*() const { return *_ptr; }
 

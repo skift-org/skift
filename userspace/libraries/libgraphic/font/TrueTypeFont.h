@@ -9,6 +9,14 @@ namespace Graphic::Font
 using TrueTypeVersion = Math::Vec2<be_uint16_t>;
 using TrueTypeFixed = Math::Vec2<be_uint16_t>;
 
+struct TrueTypeTable
+{
+    be_uint32_t tag;
+    be_uint32_t checksum;
+    be_uint32_t offset;
+    be_uint32_t size;
+};
+
 struct TrueTypeHeader
 {
     TrueTypeVersion version;
@@ -27,6 +35,8 @@ struct TrueTypeHeader
     be_int16_t index_to_loc_fmt;
     be_int16_t glyph_data_fmt;
 };
+
+constexpr uint32_t TRUETYPE_MAGIC_NUMBER = 0x5F0F3CF5;
 
 enum TrueTypePlatform : uint16_t
 {

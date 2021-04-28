@@ -83,8 +83,6 @@ ButtonElement::ButtonElement(Style style) : _style{style}
 
 ButtonElement::ButtonElement(Style style, RefPtr<Graphic::Icon> icon) : ButtonElement{style}
 {
-    layout(STACK());
-
     min_width(64);
     min_height(36);
     flags(Element::GREEDY | Element::SQUARE);
@@ -99,7 +97,6 @@ ButtonElement::ButtonElement(Style style, RefPtr<Graphic::Icon> icon) : ButtonEl
 
 ButtonElement::ButtonElement(Style style, String text) : ButtonElement{style}
 {
-    layout(STACK());
     insets(Insetsi(0, 16));
     min_width(64);
 

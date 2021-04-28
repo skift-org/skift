@@ -1,3 +1,4 @@
+#include "libwidget/layouts/GridLayout.h"
 #include <libfilepicker/FilePicker.h>
 #include <libwidget/Application.h>
 #include <libwidget/Container.h>
@@ -31,7 +32,6 @@ int main(int, char **)
         button->flags(Widget::Element::FILL);
 
         auto p2 = panel_hflow->add<Widget::Container>();
-        p2->layout(STACK());
         p2->flags(Widget::Element::FILL);
 
         auto p3 = panel_hflow->add(Widget::panel());
@@ -54,11 +54,8 @@ int main(int, char **)
 
     window->root()->add(Widget::label("Grid layout", Anchor::CENTER));
 
-    auto panel_grid = window->root()->add<Widget::Container>();
+    auto panel_grid = window->root()->add(Widget::fill(Widget::grid(3, 3, 4, 4, {})));
     {
-        panel_grid->layout(GRID(3, 3, 4, 4));
-        panel_grid->flags(Widget::Element::FILL);
-
         panel_grid->add(Widget::panel());
         panel_grid->add<Widget::TextField>(Widget::TextModel::empty());
         auto text_field = panel_grid->add<Widget::TextField>(Widget::TextModel::empty());

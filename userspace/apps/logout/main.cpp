@@ -1,4 +1,4 @@
-#include "libwidget/Element.h"
+#include "libwidget/layouts/Flags.h"
 #include <abi/Syscalls.h>
 
 #include <libwidget/Application.h>
@@ -35,7 +35,7 @@ int main(int, char **)
     icon_and_title_container->layout(HFLOW(4));
     icon_and_title_container->insets(Insetsi{8});
 
-    auto title_icon = Widget::icon("power-standby", Graphic::ICON_36PX);
+    icon_and_title_container->add(Widget::square(Widget::icon("power-standby", Graphic::ICON_36PX)));
 
     auto warning_container = icon_and_title_container->add<Widget::Container>();
     warning_container->flags(Widget::Element::FILL);

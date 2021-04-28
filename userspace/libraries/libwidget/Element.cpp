@@ -116,24 +116,6 @@ void Element::do_layout()
     }
     break;
 
-    case Layout::GRID:
-    {
-        int index = 0;
-
-        for (auto &child : _childs)
-        {
-            int x = index % _layout.hcell;
-            int y = index / _layout.hcell;
-
-            Math::Recti row = content().row(_layout.vcell, y, _layout.spacing.y());
-            Math::Recti column = row.column(_layout.hcell, x, _layout.spacing.x());
-
-            child->container(column);
-            index++;
-        }
-    }
-    break;
-
     case Layout::HFLOW:
     {
         int fixed_child_count = 0;
@@ -325,22 +307,6 @@ Math::Vec2i Element::size()
             width = MAX(width, child_size.x());
             height = MAX(height, child_size.y());
         }
-    }
-    else if (_layout.type == Layout::GRID)
-    {
-        for (auto &child : _childs)
-        {
-            Math::Vec2i child_size = child->compute_size();
-
-            width = MAX(width, child_size.x());
-            height = MAX(height, child_size.y());
-        }
-
-        width = width * _layout.hcell;
-        height = height * _layout.vcell;
-
-        width += _layout.spacing.x() * _layout.hcell;
-        height += _layout.spacing.y() * _layout.vcell;
     }
     else
     {

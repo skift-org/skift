@@ -40,9 +40,7 @@ public:
         root()->clear();
         root()->layout(VFLOW(0));
 
-        root()->add<Widget::TitleBar>(
-            Graphic::Icon::get("folder-zip"),
-            "Archive Manager");
+        root()->add(Widget::titlebar(Graphic::Icon::get("folder-zip"), "Archive Manager"));
 
         auto browser = root()->add<Widget::Container>();
 

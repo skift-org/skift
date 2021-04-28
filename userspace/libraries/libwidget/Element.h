@@ -24,7 +24,6 @@ struct Layout
     enum Type
     {
         STACK,
-        GRID,
         VFLOW,
         HFLOW,
     };
@@ -42,14 +41,6 @@ struct Layout
         0,                       \
         0,                       \
         Math::Vec2i::zero(),     \
-    })
-
-#define GRID(_hcell, _vcell, _hspacing, _vspacing) \
-    (::Widget::Layout{                             \
-        ::Widget::Layout::GRID,                    \
-        (_hcell),                                  \
-        (_vcell),                                  \
-        Math::Vec2i((_hspacing), (_vspacing)),     \
     })
 
 #define VFLOW(_vspacing)             \

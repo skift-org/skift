@@ -6,7 +6,6 @@ namespace Settings
 
 HomePage::HomePage()
 {
-    layout(STACK());
     flags(Element::FILL);
 }
 

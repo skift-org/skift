@@ -4,6 +4,7 @@
 #include <libwidget/Elements.h>
 #include <libwidget/Screen.h>
 
+#include "libwidget/elements/ButtonElement.h"
 #include "panel/widgets/SettingToggle.h"
 #include "panel/windows/PanelWindow.h"
 #include "panel/windows/QuickSettingsWindow.h"
@@ -46,22 +47,17 @@ QuickSettingsWindow::QuickSettingsWindow()
 
     account_container->add(Widget::spacer());
 
-    auto folder_button = account_container->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("folder"));
-
-    folder_button->on(Widget::EventType::ACTION, [&](auto) {
+    auto folder_button = account_container->add(Widget::basic_button(Graphic::Icon::get("folder"), [&] {
         process_run("file-manager", nullptr, 0);
-    });
+    }));
 
-    auto setting_button = account_container->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("cog"));
-
-    setting_button->on(Widget::EventType::ACTION, [&](auto) {
+    auto setting_button = account_container->add(Widget::basic_button(Graphic::Icon::get("cog"), [&] {
         process_run("settings", nullptr, 0);
-    });
+    }));
 
-    auto logout_button = account_container->add<Widget::ButtonElement>(Widget::ButtonElement::TEXT, Graphic::Icon::get("power-standby"));
-    logout_button->on(Widget::EventType::ACTION, [&](auto) {
+    auto logout_button = account_container->add(Widget::basic_button(Graphic::Icon::get("power-standby"), [&] {
         process_run("logout", nullptr, 0);
-    });
+    }));
 
     bound(bound_on_screen().with_height(root()->compute_size().y()));
 }

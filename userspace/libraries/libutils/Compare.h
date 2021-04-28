@@ -17,7 +17,7 @@ inline T max(T &a, T &b, Compare comp)
 }
 
 template <class T, class Compare>
-inline T median_of_three(const T &a, T &b, T &c, Compare comp)
+inline T median_of_three(const T &a, const T &b, const T &c, Compare comp)
 {
     return max(min(a, b, comp), min(max(a, b, comp), c, comp), comp);
 }

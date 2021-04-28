@@ -2,7 +2,7 @@
 
 #include <libutils/Compare.h>
 #include <libutils/Iterator.h>
-#include <libutils/Swap.h>
+#include <libutils/Move.h>
 
 namespace Utils
 {
@@ -43,8 +43,8 @@ inline void quicksort(Iterator first, Iterator last, Compare comp)
     swap(*pivPos, *pivot);
 
     // Divide and conquer
-    quicksort(first, pivPos, comp, 0);
-    quicksort(next(pivPos), last, comp, 0);
+    quicksort(first, pivPos, comp);
+    quicksort(next(pivPos), last, comp);
 }
 
 } // namespace Utils

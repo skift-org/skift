@@ -101,9 +101,16 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
         tables[i] = TRY(IO::read<TrueTypeTable>(reader));
     }
 
-    // TODO: reorder the tables on how we need them to be parsed
-    Utils::quicksort(tables.begin(), tables.end(), [](auto a, auto b) {
-        return 0;
+    // Reorder the tables on how we need them to be parsed (Head & MaxP required before the others)
+    tables.sort([](auto a, auto b) {
+        if (a.tag() == TABLE_TAG_HEAD)
+            return false;
+
+        if (a.tag() == TABLE_TAG_MAXP)
+            return false;
+
+        UNUSED(b);
+        return true;
     });
 
     for (const auto &table : tables)
@@ -117,6 +124,7 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
         switch (table.tag())
         {
         case TABLE_TAG_CMAP:
+            IO::logln("CMAP: {}", table.offset());
             TRY(read_table_cmap(table_reader));
             break;
         case TABLE_TAG_LOCA:
@@ -124,6 +132,7 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
             _has_loca = true;
             break;
         case TABLE_TAG_HEAD:
+            IO::logln("HEAD: {}", table.offset());
             TRY(read_table_head(table_reader));
             break;
         case TABLE_TAG_GLYF:
@@ -139,6 +148,7 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
             _has_hmtx = true;
             break;
         case TABLE_TAG_MAXP:
+            IO::logln("MAXP: {}", table.offset());
             TRY(read_table_maxp(table_reader));
             break;
         default:
@@ -269,8 +279,6 @@ Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
         auto num_glyphs = (length() - header_length) / sizeof(uint16_t);
         auto glyph_ids = TRY(IO::read_vector<be_uint16_t>(reader, num_glyphs));
 
-        IO::logln("SegCount: {}", seg_count);
-
         // Read all segments, last segment is a pseudo-segment (start & end both set to 0xFFFF)
         for (uint16_t current_seg = 0; current_seg < (seg_count - 1); current_seg++)
         {
@@ -278,7 +286,6 @@ Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
             const auto &end_code = end_codes[current_seg]();
             const auto &delta = deltas[current_seg]();
             const auto &range_offset = range_offsets[current_seg]();
-            IO::logln("StartCode: {}, EndCode: {}, RangeOffset: {}", start_code, end_code, range_offset);
 
             auto range = end_code - start_code;
 
@@ -295,7 +302,6 @@ Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
                 }
 
                 _codepoint_glyph_mapping[start_code + i] = glyph_index;
-                IO::logln("Mapped {} to {}", start_code + i, glyph_index);
             }
         }
     }

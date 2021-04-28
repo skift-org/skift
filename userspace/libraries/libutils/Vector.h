@@ -8,6 +8,7 @@
 #include <libmath/MinMax.h>
 
 #include <libutils/Iteration.h>
+#include <libutils/Iterator.h>
 #include <libutils/New.h>
 #include <libutils/RefPtr.h>
 
@@ -582,30 +583,8 @@ public:
         return false;
     }
 
-    // Vector iteration
-    class iterator
-    {
-    public:
-        iterator(T *ptr) : _ptr(ptr) {}
-        iterator operator++()
-        {
-            ++_ptr;
-            return *this;
-        }
-        iterator operator--()
-        {
-            --_ptr;
-            return *this;
-        }
-        bool operator!=(const iterator &other) const { return _ptr != other._ptr; }
-        const T &operator*() const { return *_ptr; }
-
-    private:
-        T *_ptr;
-    };
-
-    iterator begin() const { return iterator(_storage); }
-    iterator end() const { return iterator(_storage + _count); }
+    Utils::ContiguousIterator<T> begin() const { return {_storage}; }
+    Utils::ContiguousIterator<T> end() const { return {_storage + _count}; }
 };
 
 template <typename T>

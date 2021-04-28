@@ -45,4 +45,32 @@ inline size_t distance(Iterator first, Iterator last)
     return result;
 }
 
+template <class T>
+class ContiguousIterator
+{
+public:
+    ContiguousIterator(T *ptr) : _ptr(ptr) {}
+    ContiguousIterator operator++()
+    {
+        ++_ptr;
+        return *this;
+    }
+    ContiguousIterator operator--()
+    {
+        --_ptr;
+        return *this;
+    }
+
+    T &operator->()
+    {
+        return *_ptr;
+    }
+
+    bool operator!=(const ContiguousIterator<T> &other) const { return _ptr != other._ptr; }
+    const T &operator*() const { return *_ptr; }
+
+private:
+    T *_ptr;
+};
+
 } // namespace Utils

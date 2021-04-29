@@ -29,7 +29,7 @@ public:
         return {width, height};
     }
 
-    void do_layout() override
+    void layout() override
     {
         for (auto &child : childs())
         {
@@ -65,6 +65,13 @@ public:
         }
     }
 };
+
+static inline RefPtr<Element> stack(RefPtr<Element> child)
+{
+    auto layout = make<StackLayout>();
+    layout->add(child);
+    return layout;
+}
 
 static inline RefPtr<Element> stack(Vector<RefPtr<Element>> childs)
 {

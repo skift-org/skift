@@ -14,12 +14,12 @@ int main(int argc, char **argv)
     Widget::Window *window = new Widget::Window(WINDOW_RESIZABLE);
 
     window->size(Math::Vec2i(700, 500));
-    window->root()->layout(VFLOW(0));
+    window->root()->DONT_USE_ME_layout(VFLOW(0));
 
     window->root()->add(Widget::titlebar(Graphic::Icon::get("image"), "Image Viewer"));
 
     auto toolbar = window->root()->add(Widget::panel());
-    toolbar->layout(HFLOW(0));
+    toolbar->DONT_USE_ME_layout(HFLOW(0));
     toolbar->insets(4);
 
     auto bitmap = Graphic::Bitmap::load_from_or_placeholder(argv[1]);

@@ -80,7 +80,7 @@ public:
 
     void event(Event *event) override;
 
-    void do_layout() override;
+    void layout() override;
 };
 
 static inline RefPtr<Table> table(RefPtr<TableModel> model) { return make<Table>(model); }

@@ -24,7 +24,7 @@ public:
           _navigation(navigation),
           _bookmarks(bookmarks)
     {
-        layout(VFLOW(6));
+        DONT_USE_ME_layout(VFLOW(6));
         insets(Insetsi{4});
 
         _bookmark_observer = bookmarks->observe([this](auto &) {
@@ -42,7 +42,7 @@ public:
     void render()
     {
         _listing->host()->clear();
-        _listing->host()->layout(VFLOW(4));
+        _listing->host()->DONT_USE_ME_layout(VFLOW(4));
 
         for (size_t i = 0; i < _bookmarks->all().count(); i++)
         {

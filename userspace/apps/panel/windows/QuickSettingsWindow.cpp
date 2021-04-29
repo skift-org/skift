@@ -21,14 +21,14 @@ QuickSettingsWindow::QuickSettingsWindow()
         bound(Widget::Screen::bound().take_right(WIDTH).shrinked({PanelWindow::HEIGHT, 0, 0, 0}).with_height(HEIGHT));
     });
 
-    root()->layout(VFLOW(4));
+    root()->DONT_USE_ME_layout(VFLOW(4));
     root()->insets(6);
 
     auto title = root()->add(Widget::label("Quick settings"));
     title->outsets({12, 6, 12, 12});
 
-    root()->add<SettingToggle>("Show Wireframe", Graphic::Icon::get("duck"), "appearance:widgets.wireframe");
-    root()->add<SettingToggle>("Night Light", Graphic::Icon::get("moon-waning-crescent"), "appearance:night-light.enable");
+    root()->add(setting_toggle(Graphic::Icon::get("duck"), "Show Wireframe", "appearance:widgets.wireframe"));
+    root()->add(setting_toggle(Graphic::Icon::get("moon-waning-crescent"), "Night Light", "appearance:night-light.enable"));
 
     root()->add(Widget::basic_button("Light Theme", [] {
         Settings::Service::the()->write(Settings::Path::parse("appearance:widgets.theme"), "skift-light");
@@ -39,7 +39,7 @@ QuickSettingsWindow::QuickSettingsWindow()
     }));
 
     auto account_container = root()->add<Widget::Element>();
-    account_container->layout(HFLOW(4));
+    account_container->DONT_USE_ME_layout(HFLOW(4));
 
     account_container->add(Widget::basic_button(Graphic::Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string()));
 

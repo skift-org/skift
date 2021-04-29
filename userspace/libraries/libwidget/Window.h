@@ -48,7 +48,6 @@ private:
     RefPtr<Graphic::Bitmap> backbuffer;
     OwnPtr<Graphic::Painter> backbuffer_painter;
 
-    bool _dirty_build;
     bool _dirty_layout;
     Vector<Math::Recti> _dirty_paint{};
 
@@ -139,11 +138,6 @@ public:
 
     /* --- Childs ----------------------------------------------------------- */
 
-    virtual RefPtr<Element> build()
-    {
-        return make<Element>();
-    }
-
     RefPtr<Element> root()
     {
         if (!_root)
@@ -165,6 +159,23 @@ public:
     /* --- Focus ------------------------------------------------------------ */
 
     bool has_keyboard_focus(Element *widget);
+
+    /* --- Rebuild ---------------------------------------------------------- */
+
+    virtual RefPtr<Element> build()
+    {
+        return make<Element>();
+    }
+
+    void should_rebuild()
+    {
+        if (_root)
+        {
+            _root->unmount();
+            _root = nullptr;
+            should_relayout();
+        }
+    }
 
     /* --- Update ----------------------------------------------------------- */
 

@@ -10,12 +10,12 @@ MainWindow::MainWindow() : Window(WINDOW_RESIZABLE)
 {
     size({700, 500});
 
-    root()->layout(VFLOW(0));
+    root()->DONT_USE_ME_layout(VFLOW(0));
 
     root()->add(Widget::titlebar(Graphic::Icon::get("cog"), "Settings"));
 
     auto navigation_bar = root()->add(Widget::panel());
-    navigation_bar->layout(HFLOW(4));
+    navigation_bar->DONT_USE_ME_layout(HFLOW(4));
     navigation_bar->insets(4);
 
     navigation_bar->add(Widget::basic_button(Graphic::Icon::get("arrow-left")));

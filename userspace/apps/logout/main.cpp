@@ -16,11 +16,11 @@ int main(int, char **)
     window->type(WINDOW_TYPE_POPOVER);
     window->bound(Widget::Screen::bound());
     window->opacity(0);
-    window->root()->layout(STACK());
+    window->root()->DONT_USE_ME_layout(STACK());
 
     auto background = window->root()->add(Widget::panel());
 
-    background->layout(STACK());
+    background->DONT_USE_ME_layout(STACK());
     background->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
     background->flags(Widget::Element::FILL);
 
@@ -28,17 +28,17 @@ int main(int, char **)
 
     dialog->min_width(256);
     dialog->min_height(256);
-    dialog->layout(VFLOW(8));
+    dialog->DONT_USE_ME_layout(VFLOW(8));
 
     auto icon_and_title_container = dialog->add(Widget::panel(6));
-    icon_and_title_container->layout(HFLOW(4));
+    icon_and_title_container->DONT_USE_ME_layout(HFLOW(4));
     icon_and_title_container->insets(Insetsi{8});
 
     icon_and_title_container->add(Widget::square(Widget::icon("power-standby", Graphic::ICON_36PX)));
 
     auto warning_container = icon_and_title_container->add<Widget::Element>();
     warning_container->flags(Widget::Element::FILL);
-    warning_container->layout(VFLOW(2));
+    warning_container->DONT_USE_ME_layout(VFLOW(2));
 
     warning_container->add(Widget::label("Shutdown or restart your computer.", Anchor::BOTTOM_LEFT));
     warning_container->add(Widget::label("Any unsaved work will be lost!", Anchor::TOP_LEFT));

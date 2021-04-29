@@ -251,7 +251,7 @@ void TextEditor::update_scrollbar()
         _hscroll_offset);
 }
 
-void TextEditor::do_layout()
+void TextEditor::layout()
 {
     _vscrollbar->container(vscrollbar_bound());
     _hscrollbar->container(hscrollbar_bound());

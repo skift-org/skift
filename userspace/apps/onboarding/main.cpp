@@ -60,7 +60,7 @@ void pages(RefPtr<Widget::Element> host, const Page &page)
 
     auto content = host->add<Widget::Element>();
     content->insets({8, 0});
-    content->layout(VFLOW(2));
+    content->DONT_USE_ME_layout(VFLOW(2));
 
     for (auto &lines : page.lines)
     {
@@ -78,11 +78,11 @@ int main(int, char **)
     window->bound(Widget::Screen::bound());
     window->opacity(0);
     window->show();
-    window->root()->layout(STACK());
+    window->root()->DONT_USE_ME_layout(STACK());
 
     auto background = window->root()->add(Widget::panel());
 
-    background->layout(STACK());
+    background->DONT_USE_ME_layout(STACK());
     background->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
     background->flags(Widget::Element::FILL);
 
@@ -91,7 +91,7 @@ int main(int, char **)
     dialog->pin_width(420);
     dialog->pin_height(420);
 
-    dialog->layout(VFLOW(0));
+    dialog->DONT_USE_ME_layout(VFLOW(0));
 
     auto illustration = dialog->add(Widget::panel(6));
     illustration->min_height(160);
@@ -104,7 +104,7 @@ int main(int, char **)
     auto content = dialog->add<Widget::Element>();
     content->flags(Widget::Element::FILL);
     content->insets(16);
-    content->layout(VFLOW(4));
+    content->DONT_USE_ME_layout(VFLOW(4));
 
     auto dots_container = dialog->add<Widget::Element>();
     dots_container->insets(16);
@@ -114,7 +114,7 @@ int main(int, char **)
 
     auto navigation = dialog->add<Widget::Element>();
 
-    navigation->layout(HFLOW(4));
+    navigation->DONT_USE_ME_layout(HFLOW(4));
     navigation->insets(8);
 
     auto skipall_button = navigation->add(Widget::basic_button("Skip All"));

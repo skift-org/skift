@@ -43,7 +43,7 @@ String Dialog::get_title()
 void Dialog::render(Widget::Window *window)
 {
     window->size(Math::Vec2i(600, 400));
-    window->root()->layout(VFLOW(0));
+    window->root()->DONT_USE_ME_layout(VFLOW(0));
 
     window->root()->add(Widget::titlebar(Graphic::Icon::get("widgets"), get_title()));
 
@@ -65,7 +65,7 @@ void Dialog::render(Widget::Window *window)
 
     auto action_container = window->root()->add(Widget::panel());
 
-    action_container->layout(HFLOW(4));
+    action_container->DONT_USE_ME_layout(HFLOW(4));
 
     if (_flags & DialogFlags::DIALOG_FLAGS_SAVE)
     {

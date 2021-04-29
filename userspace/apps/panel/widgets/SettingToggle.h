@@ -1,58 +1,43 @@
 #pragma once
 
 #include <libsettings/Setting.h>
-#include <libwidget/Elements.h>
+#include <libwidget/Components.h>
 
 namespace panel
 {
 
-class SettingToggle : public Widget::ButtonElement
+class SettingToggle : public Widget::Statefull<bool>
 {
 private:
     String _name;
     RefPtr<Graphic::Icon> _icon;
     OwnPtr<Settings::Setting> _setting;
-    bool _enabled;
 
 public:
-    SettingToggle(String name, RefPtr<Graphic::Icon> icon, const char *setting)
-        : ButtonElement(ButtonElement::TEXT),
-          _name(name),
+    SettingToggle(RefPtr<Graphic::Icon> icon, String name, const char *setting)
+        : _name(name),
           _icon(icon)
     {
         _setting = own<Settings::Setting>(setting, [this](auto &value) {
-            _enabled = value.as_bool();
-            render();
+            update(value.as_bool());
         });
-
-        render();
     }
 
-    void render()
+    virtual RefPtr<Element> build(bool state)
     {
-        clear();
-
-        insets({12, 12, 12, 12});
-
-        auto icon = add(Widget::icon(_icon));
-        icon->insets(Insetsi(0, 0, 0, 4));
-
-        auto label = add(Widget::label(_name));
-        label->flags(Element::FILL);
-
-        auto sw = add(Widget::toggle(_enabled));
-    }
-
-    void event(Widget::Event *event) override
-    {
-        if (event->type == Widget::Event::ACTION)
-        {
-            _setting->write(!_enabled);
-            event->accepted = true;
-        }
-
-        ButtonElement::event(event);
+        return Widget::basic_button(
+            Widget::spacing({0, 0, 12, 16},
+                            Widget::hflow(8, {
+                                                 Widget::icon(_icon),
+                                                 Widget::fill(Widget::label(_name)),
+                                                 Widget::toggle(state),
+                                             })),
+            [this, state] {
+                _setting->write(!state);
+            });
     }
 };
+
+WIDGET_BUILDER(SettingToggle, setting_toggle);
 
 } // namespace panel

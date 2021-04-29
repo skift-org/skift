@@ -28,7 +28,7 @@ ScrollElement::ScrollElement(RefPtr<Element> content, bool horizontal)
     });
 }
 
-void ScrollElement::do_layout()
+void ScrollElement::layout()
 {
     if (_horizontal)
     {

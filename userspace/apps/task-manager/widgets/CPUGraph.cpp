@@ -17,12 +17,12 @@ CPUGraph::CPUGraph(RefPtr<TaskModel> model)
     : Graph(256, Graphic::Colors::SEAGREEN),
       _model(model)
 {
-    layout(VFLOW(0));
+    DONT_USE_ME_layout(VFLOW(0));
     insets(Insetsi(8));
     flags(Element::FILL);
 
     auto icon_and_text = add<Widget::Element>();
-    icon_and_text->layout(HFLOW(4));
+    icon_and_text->DONT_USE_ME_layout(HFLOW(4));
     icon_and_text->add(Widget::icon("memory"));
     icon_and_text->add(Widget::label("Processor"));
 

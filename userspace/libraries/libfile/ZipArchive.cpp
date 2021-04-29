@@ -218,7 +218,7 @@ Result ZipArchive::read_archive()
         return Result::ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    IO::logln("Opening file: '%s'", _path.string());
+    IO::logln("Opening file: '{}'", _path.string());
 
     // A valid zip must atleast contain a "CentralDirectoryEndRecord"
     if (TRY(archive_file.length()) < sizeof(CentralDirectoryEndRecord))

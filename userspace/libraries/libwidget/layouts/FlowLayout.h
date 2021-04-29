@@ -48,7 +48,7 @@ public:
         return {width, height};
     }
 
-    void do_layout() override
+    void layout() override
     {
         int fill_child_count = 0;
         int fixed_child_total_size = 0;
@@ -123,7 +123,6 @@ static inline RefPtr<Element> vflow(Vector<RefPtr<Element>> childs)
 static inline RefPtr<Element> vflow(int spacing, Vector<RefPtr<Element>> childs)
 {
     auto layout = make<FlowLayout>(spacing, false);
-    layout->layout(VFLOW(spacing));
     layout->add(childs);
     return layout;
 }

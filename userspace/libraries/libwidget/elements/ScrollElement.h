@@ -17,7 +17,7 @@ public:
 
     ScrollElement(RefPtr<Element> content = nullptr, bool horizontal = false);
 
-    void do_layout() override;
+    void layout() override;
 
     void event(Event *event) override;
 

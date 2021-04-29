@@ -21,11 +21,11 @@ PanelWindow::PanelWindow()
     _datetime = own<DateAndTimeWindow>();
     _quicksetting = own<QuickSettingsWindow>();
 
-    root()->layout(VFLOW(0));
+    root()->DONT_USE_ME_layout(VFLOW(0));
 
     auto container = root()->add<Widget::Element>();
     container->flags(Widget::Element::FILL);
-    container->layout(HFLOW(8));
+    container->DONT_USE_ME_layout(HFLOW(8));
     container->insets(Insetsi(4));
 
     root()->add(Widget::separator());

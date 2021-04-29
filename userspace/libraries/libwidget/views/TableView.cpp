@@ -225,7 +225,7 @@ void Table::event(Event *event)
     }
 }
 
-void Table::do_layout()
+void Table::layout()
 {
     if (!_model)
     {

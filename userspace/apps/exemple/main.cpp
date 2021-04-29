@@ -22,8 +22,6 @@ WIDGET_BUILDER(CounterComponent, counter);
 
 struct MainWindow : public Window
 {
-    MainWindow() : Window() {}
-
     RefPtr<Element> build() override
     {
         return vflow({

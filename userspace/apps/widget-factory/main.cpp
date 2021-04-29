@@ -6,19 +6,19 @@
 int main(int, char **)
 {
     auto acrylic_window = own<Widget::Window>(WINDOW_ACRYLIC);
-    acrylic_window->root()->layout(VFLOW(0));
+    acrylic_window->root()->DONT_USE_ME_layout(VFLOW(0));
     acrylic_window->root()->add(Widget::titlebar(Graphic::Icon::get("widgets"), "Acrylic!"));
 
     auto window = own<Widget::Window>(WINDOW_RESIZABLE);
 
     window->size(Math::Vec2i(500, 400));
-    window->root()->layout(VFLOW(8));
+    window->root()->DONT_USE_ME_layout(VFLOW(8));
 
     window->root()->add(Widget::titlebar(Graphic::Icon::get("widgets"), "Widget Factory"));
 
     auto panel_hflow = window->root()->add<Widget::Element>();
     {
-        panel_hflow->layout(HFLOW(8));
+        panel_hflow->DONT_USE_ME_layout(HFLOW(8));
 
         auto p1 = panel_hflow->add(Widget::panel());
         p1->flags(Widget::Element::FILL);
@@ -36,7 +36,7 @@ int main(int, char **)
     window->root()->add(Widget::label("Buttons", Anchor::CENTER));
     auto buttons = window->root()->add<Widget::Element>();
     {
-        buttons->layout(HFLOW(8));
+        buttons->DONT_USE_ME_layout(HFLOW(8));
         buttons->insets(Insetsi(0, 8));
 
         buttons->add(Widget::basic_button("BUTTON"));

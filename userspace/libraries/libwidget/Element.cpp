@@ -74,7 +74,7 @@ Element::~Element()
     }
 }
 
-void Element::do_layout()
+void Element::layout()
 {
     switch (_layout.type)
     {
@@ -267,14 +267,14 @@ void Element::do_layout()
 
 void Element::relayout()
 {
-    do_layout();
-
-    if (_childs.empty())
+    if (childs().empty())
     {
         return;
     }
 
-    for (auto &child : _childs)
+    layout();
+
+    for (auto &child : childs())
     {
         child->relayout();
     }

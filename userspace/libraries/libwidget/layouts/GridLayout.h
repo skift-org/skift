@@ -49,7 +49,7 @@ public:
         return {width, height};
     }
 
-    void do_layout() override
+    void layout() override
     {
         int index = 0;
 

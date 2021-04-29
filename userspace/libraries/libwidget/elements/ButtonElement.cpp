@@ -75,8 +75,6 @@ void ButtonElement::event(Event *event)
 
 ButtonElement::ButtonElement(Style style) : _style{style}
 {
-    layout(HFLOW(0));
-    //insets(Insetsi(0, 16));
     min_height(36);
     flags(Element::GREEDY);
 }
@@ -111,7 +109,7 @@ RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Icon> icon, Callback<void(voi
 {
     return button(
         ButtonElement::TEXT,
-        spacing({0, 16},
+        spacing({0, 9},
                 Widget::icon(icon)),
         on_click);
 }
@@ -163,7 +161,7 @@ RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, Callback<void(v
 {
     return button(
         ButtonElement::OUTLINE,
-        spacing({0, 16},
+        spacing({0, 9},
                 Widget::icon(icon)),
         on_click);
 }
@@ -203,7 +201,7 @@ RefPtr<ButtonElement> filled_button(RefPtr<Graphic::Icon> icon, Callback<void(vo
 {
     return button(
         ButtonElement::FILLED,
-        spacing({0, 16},
+        spacing({0, 9},
                 Widget::icon(icon)),
         on_click);
 }

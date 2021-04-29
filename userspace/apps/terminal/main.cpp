@@ -13,7 +13,7 @@ int main(int, char **)
     window->size(Math::Vec2i(700, 500));
     window->opacity(0.85);
 
-    window->root()->layout(VFLOW(0));
+    window->root()->DONT_USE_ME_layout(VFLOW(0));
 
     window->root()->add(Widget::titlebar(Graphic::Icon::get("console-line"), "Terminal"));
 

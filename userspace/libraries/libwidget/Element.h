@@ -78,12 +78,12 @@ private:
     int _min_height = 0;
     int _min_width = 0;
 
+    Layout _layout{};
     Insetsi _outsets{};
     Insetsi _insets{};
     Math::Vec2i _content_scroll{};
 
     Optional<Graphic::Color> _colors[__THEME_COLOR_COUNT] = {};
-    Layout _layout = {};
     RefPtr<Graphic::Font> _font;
 
     CursorState _cursor = CURSOR_DEFAULT;
@@ -96,6 +96,8 @@ private:
     Vector<RefPtr<Element>> _childs = {};
 
 public:
+    void DONT_USE_ME_layout(Layout layout) { _layout = layout; }
+
     static constexpr auto FILL = (1 << 0);
     static constexpr auto GREEDY = (1 << 1);
     static constexpr auto SQUARE = (1 << 2);
@@ -120,8 +122,6 @@ public:
     Graphic::Color color(ThemeColorRole role);
 
     void color(ThemeColorRole role, Graphic::Color color);
-
-    void layout(Layout layout) { _layout = layout; }
 
     void flags(int attributes) { _flags = attributes; }
 
@@ -173,7 +173,7 @@ public:
 
     virtual void mounted() {}
 
-    virtual void do_layout();
+    virtual void layout();
 
     virtual Math::Vec2i size();
 

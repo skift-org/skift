@@ -103,7 +103,7 @@ public:
 
     void event(Event *event) override;
 
-    void do_layout() override;
+    void layout() override;
 };
 
 static inline RefPtr<TextEditor> texteditor(RefPtr<TextModel> model) { return make<TextEditor>(model); }

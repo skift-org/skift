@@ -14,7 +14,7 @@ namespace panel
 RessourceMonitor::RessourceMonitor()
     : ButtonElement(ButtonElement::TEXT)
 {
-    layout(VFLOW(1));
+    DONT_USE_ME_layout(VFLOW(1));
     insets(0);
 
     auto ram_graph = add<Widget::Graph>(50, Graphic::Colors::ROYALBLUE);

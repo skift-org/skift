@@ -30,5 +30,5 @@ public:
 
     void event(Widget::Event *event) override;
 
-    void do_layout() override;
+    void layout() override;
 };

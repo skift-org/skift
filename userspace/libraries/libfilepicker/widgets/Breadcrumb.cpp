@@ -12,7 +12,7 @@ Breadcrumb::Breadcrumb(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmark
     : _navigation(navigation),
       _bookmarks(bookmarks)
 {
-    layout(HFLOW(0));
+    DONT_USE_ME_layout(HFLOW(0));
 
     _icon_computer = Graphic::Icon::get("laptop");
     _icon_expand = Graphic::Icon::get("chevron-right");
@@ -41,7 +41,7 @@ void Breadcrumb::render()
 
     auto computer_button = add(Widget::basic_button(_icon_computer));
 
-    computer_button->on(Widget::Event::ACTION, [this] (auto) {
+    computer_button->on(Widget::Event::ACTION, [this](auto) {
         _navigation->navigate("/");
     });
 

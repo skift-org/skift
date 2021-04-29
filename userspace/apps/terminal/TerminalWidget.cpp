@@ -206,7 +206,7 @@ void TerminalWidget::event(Widget::Event *event)
     }
 }
 
-void TerminalWidget::do_layout()
+void TerminalWidget::layout()
 {
     int width = bound().width() / cell_size().x();
     int height = bound().height() / cell_size().y();

@@ -11,14 +11,14 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
 {
     size(Math::Vec2i(700, 500));
 
-    root()->layout(VFLOW(0));
+    root()->DONT_USE_ME_layout(VFLOW(0));
 
     root()->add(Widget::titlebar(Graphic::Icon::get("memory"), "Task Manager"));
 
     /// --- Toolbar --- ///
     auto toolbar = root()->add(Widget::panel());
 
-    toolbar->layout(HFLOW(4));
+    toolbar->DONT_USE_ME_layout(HFLOW(4));
     toolbar->insets(Insetsi(4, 4));
 
     toolbar->add(Widget::filled_button(Graphic::Icon::get("plus"), "New task"));
@@ -50,7 +50,7 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
 
     /// --- Graphs --- ///
     auto graphs_container = root()->add(Widget::panel());
-    graphs_container->layout(HFLOW(0));
+    graphs_container->DONT_USE_ME_layout(HFLOW(0));
     graphs_container->min_height(128);
 
     _cpu_graph = graphs_container->add<CPUGraph>(_table_model);

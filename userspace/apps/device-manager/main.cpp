@@ -19,7 +19,7 @@ public:
     {
         size(Math::Vec2i(700, 500));
 
-        root()->layout(VFLOW(0));
+        root()->DONT_USE_ME_layout(VFLOW(0));
 
         root()->add(Widget::titlebar(Graphic::Icon::get("expansion-card-variant"), "Device Manager"));
 

@@ -34,7 +34,7 @@ public:
           _navigation(navigation),
           _bookmarks(bookmarks)
     {
-        layout(HFLOW(4));
+        DONT_USE_ME_layout(HFLOW(4));
         insets(Insetsi(4, 4));
 
         _go_backward = add(Widget::basic_button(Graphic::Icon::get("arrow-left"), [this] {

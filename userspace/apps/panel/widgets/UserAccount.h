@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libwidget/Component.h>
+#include <libwidget/Components.h>
 
 namespace panel
 {

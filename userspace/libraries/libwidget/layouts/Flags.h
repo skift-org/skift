@@ -6,19 +6,22 @@
 namespace Widget
 {
 
-static inline RefPtr<Element> fill(RefPtr<Element> child)
+template <typename TElement>
+static inline RefPtr<TElement> fill(RefPtr<TElement> child)
 {
     child->flags(child->flags() | Element::FILL);
     return child;
 }
 
-static inline RefPtr<Element> square(RefPtr<Element> child)
+template <typename TElement>
+static inline RefPtr<TElement> square(RefPtr<TElement> child)
 {
     child->flags(child->flags() | Element::SQUARE);
     return child;
 }
 
-static inline RefPtr<Element> spacing(Insetsi outsets, RefPtr<Element> child)
+template <typename TElement>
+static inline RefPtr<TElement> spacing(Insetsi outsets, RefPtr<TElement> child)
 {
     child->outsets(outsets);
     return child;

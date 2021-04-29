@@ -2,7 +2,7 @@
 
 #include <libasync/Timer.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Graph.h>
+#include <libwidget/Views.h>
 
 #include "task-manager/model/TaskModel.h"
 

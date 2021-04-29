@@ -1,7 +1,6 @@
 #pragma once
 
-#include <libwidget/Element.h>
-#include <libwidget/ScrollBar.h>
+#include <libwidget/Elements.h>
 #include <libwidget/model/TextModel.h>
 
 namespace Widget
@@ -13,8 +12,8 @@ private:
     RefPtr<TextModel> _model;
     TextCursor _cursor{};
 
-    RefPtr<ScrollBar> _vscrollbar;
-    RefPtr<ScrollBar> _hscrollbar;
+    RefPtr<ScrollBarElement> _vscrollbar;
+    RefPtr<ScrollBarElement> _hscrollbar;
 
     int _vscroll_offset = 0;
     int _hscroll_offset = 0;
@@ -28,7 +27,7 @@ private:
 
     Math::Recti minimum_view_bound()
     {
-        return bound().cutoff_right(ScrollBar::SIZE).cutoff_botton(ScrollBar::SIZE);
+        return bound().cutoff_right(ScrollBarElement::SIZE).cutoff_botton(ScrollBarElement::SIZE);
     }
 
     Math::Recti view_bound()
@@ -37,12 +36,12 @@ private:
 
         if (document_bound().height() > minimum_view_bound().height())
         {
-            bound = bound.cutoff_right(ScrollBar::SIZE);
+            bound = bound.cutoff_right(ScrollBarElement::SIZE);
         }
 
         if (document_bound().width() > minimum_view_bound().width())
         {
-            bound = bound.cutoff_botton(ScrollBar::SIZE);
+            bound = bound.cutoff_botton(ScrollBarElement::SIZE);
         }
 
         return bound;
@@ -57,11 +56,11 @@ private:
 
     Math::Recti vscrollbar_bound()
     {
-        auto bound = Element::bound().take_right(ScrollBar::SIZE);
+        auto bound = Element::bound().take_right(ScrollBarElement::SIZE);
 
         if (document_bound().width() > minimum_view_bound().width())
         {
-            bound = bound.cutoff_botton(ScrollBar::SIZE);
+            bound = bound.cutoff_botton(ScrollBarElement::SIZE);
         }
 
         return bound;
@@ -69,11 +68,11 @@ private:
 
     Math::Recti hscrollbar_bound()
     {
-        auto bound = Element::bound().take_bottom(ScrollBar::SIZE);
+        auto bound = Element::bound().take_bottom(ScrollBarElement::SIZE);
 
         if (document_bound().height() > minimum_view_bound().height())
         {
-            bound = bound.cutoff_right(ScrollBar::SIZE);
+            bound = bound.cutoff_right(ScrollBarElement::SIZE);
         }
 
         return bound;

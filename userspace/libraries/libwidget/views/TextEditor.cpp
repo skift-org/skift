@@ -1,6 +1,6 @@
 #include <libgraphic/Painter.h>
-#include <libwidget/TextEditor.h>
 #include <libwidget/Window.h>
+#include <libwidget/views/TextEditor.h>
 
 namespace Widget
 {
@@ -8,14 +8,13 @@ namespace Widget
 TextEditor::TextEditor(RefPtr<TextModel> model)
     : _model(model)
 {
-    _vscrollbar = add<ScrollBar>();
+    _vscrollbar = add<ScrollBarElement>();
     _vscrollbar->on(Event::VALUE_CHANGE, [this](auto) {
         _vscroll_offset = _vscrollbar->value();
         should_repaint();
     });
 
-    _hscrollbar = add<ScrollBar>();
-    _hscrollbar->horizontal(true);
+    _hscrollbar = add<ScrollBarElement>(true);
 
     _hscrollbar->on(Event::VALUE_CHANGE, [this](auto) {
         _hscroll_offset = _hscrollbar->value();

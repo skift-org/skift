@@ -1,22 +1,17 @@
-#include <libwidget/PaginationDots.h>
-
 #include <libgraphic/Painter.h>
+#include <libwidget/elements/DotsElement.h>
 
 namespace Widget
 {
 
-PaginationDots::PaginationDots(int count)
+DotsElement::DotsElement(int count)
     : _count(count)
 {
     max_height(DOTSIZE);
     max_width(size().x());
 }
 
-PaginationDots::~PaginationDots()
-{
-}
-
-void PaginationDots::paint(Graphic::Painter &painter, const Math::Recti &)
+void DotsElement::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     for (int i = 0; i < _count; i++)
     {
@@ -33,7 +28,7 @@ void PaginationDots::paint(Graphic::Painter &painter, const Math::Recti &)
     }
 }
 
-Math::Vec2i PaginationDots::size()
+Math::Vec2i DotsElement::size()
 {
     return {DOTSIZE * _count + DOTSPACING * (_count - 1), DOTSIZE};
 }

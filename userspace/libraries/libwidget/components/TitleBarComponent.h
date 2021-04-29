@@ -1,13 +1,13 @@
 #pragma once
 
 #include <libasync/Invoker.h>
-#include <libwidget/Component.h>
 #include <libwidget/Elements.h>
+#include <libwidget/components/Component.h>
 
 namespace Widget
 {
 
-class TitleBar : public Component
+class TitleBarComponent : public Component
 {
 private:
     RefPtr<Graphic::Icon> _icon;
@@ -28,16 +28,16 @@ public:
         should_rebuild();
     }
 
-    TitleBar(RefPtr<Graphic::Icon> icon, String title);
+    TitleBarComponent(RefPtr<Graphic::Icon> icon, String title);
 
     void event(Event *event) override;
 
     RefPtr<Element> build() override;
 };
 
-static inline RefPtr<TitleBar> titlebar(RefPtr<Graphic::Icon> icon, String title)
+static inline RefPtr<TitleBarComponent> titlebar(RefPtr<Graphic::Icon> icon, String title)
 {
-    return make<TitleBar>(icon, title);
+    return make<TitleBarComponent>(icon, title);
 }
 
 } // namespace Widget

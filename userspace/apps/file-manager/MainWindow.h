@@ -1,7 +1,6 @@
 #pragma once
 
-#include <libwidget/Container.h>
-#include <libwidget/TitleBar.h>
+#include <libwidget/Components.h>
 #include <libwidget/Window.h>
 
 #include <libfilepicker/model/Navigation.h>
@@ -21,13 +20,11 @@ public:
 
         root()->layout(VFLOW(0));
 
-        root()->add<Widget::TitleBar>(
-            Graphic::Icon::get("folder"),
-            "File Manager");
+        root()->add(Widget::titlebar(Graphic::Icon::get("folder"), "File Manager"));
 
         root()->add<FilePicker::ToolBar>(navigation, bookmarks);
 
-        auto bookmarks_and_browser = root()->add<Widget::Container>();
+        auto bookmarks_and_browser = root()->add<Widget::Element>();
 
         bookmarks_and_browser->flags(Widget::Element::FILL);
         bookmarks_and_browser->layout(HFLOW(1));

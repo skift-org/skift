@@ -1,5 +1,5 @@
 #include <libgraphic/Painter.h>
-#include <libwidget/TextField.h>
+#include <libwidget/views/TextField.h>
 
 namespace Widget
 {

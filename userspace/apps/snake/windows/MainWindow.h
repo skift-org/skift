@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libwidget/TitleBar.h>
+#include <libwidget/Components.h>
 #include <libwidget/Window.h>
 
 #include "libgraphic/Icon.h"
@@ -18,9 +18,7 @@ public:
     {
         root()->layout(VFLOW(0));
 
-        root()->add<Widget::TitleBar>(
-            Graphic::Icon::get("snake"),
-            "Snake");
+        root()->add(Widget::titlebar(Graphic::Icon::get("snake"), "Snake"));
 
         auto board = root()->add<BoardWidget>();
         board->outsets({32});

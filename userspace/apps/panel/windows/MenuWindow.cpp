@@ -1,4 +1,3 @@
-#include <libwidget/Container.h>
 #include <libwidget/Screen.h>
 
 #include "panel/model/MenuEntry.h"
@@ -24,7 +23,7 @@ MenuWindow::MenuWindow()
     root()->layout(HFLOW(0));
     root()->insets(6);
 
-    auto container = root()->add<Widget::Container>();
+    auto container = root()->add<Widget::Element>();
     container->layout(VFLOW(0));
     container->flags(Widget::Element::FILL);
 

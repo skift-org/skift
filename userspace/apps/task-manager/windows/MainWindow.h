@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libwidget/Table.h>
+#include <libwidget/Views.h>
 #include <libwidget/Window.h>
 
 #include "task-manager/widgets/CPUGraph.h"

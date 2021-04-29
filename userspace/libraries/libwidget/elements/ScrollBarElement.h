@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class ScrollBar : public Element
+class ScrollBarElement : public Element
 {
 private:
     Math::Vec2i _mouse_origin;
@@ -55,12 +55,7 @@ private:
 public:
     static constexpr int SIZE = 16;
 
-    void horizontal(bool value)
-    {
-        _horizontal = value;
-    }
-
-    ScrollBar(bool horizontal = false);
+    ScrollBarElement(bool horizontal = false);
 
     void scroll_to(Math::Vec2i mouse_position);
 
@@ -92,9 +87,9 @@ public:
     }
 };
 
-static inline RefPtr<ScrollBar> scrollbar(bool horizontal)
+static inline RefPtr<ScrollBarElement> scrollbar(bool horizontal)
 {
-    return make<ScrollBar>(horizontal);
+    return make<ScrollBarElement>(horizontal);
 }
 
 } // namespace Widget

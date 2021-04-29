@@ -1,27 +1,22 @@
-#include "libwidget/layouts/GridLayout.h"
 #include <libfilepicker/FilePicker.h>
 #include <libwidget/Application.h>
-#include <libwidget/Container.h>
-
-#include <libwidget/TextField.h>
-#include <libwidget/TitleBar.h>
+#include <libwidget/Components.h>
+#include <libwidget/Layouts.h>
 
 int main(int, char **)
 {
     auto acrylic_window = own<Widget::Window>(WINDOW_ACRYLIC);
     acrylic_window->root()->layout(VFLOW(0));
-    acrylic_window->root()->add<Widget::TitleBar>(Graphic::Icon::get("widgets"), "Acrylic!");
+    acrylic_window->root()->add(Widget::titlebar(Graphic::Icon::get("widgets"), "Acrylic!"));
 
     auto window = own<Widget::Window>(WINDOW_RESIZABLE);
 
     window->size(Math::Vec2i(500, 400));
     window->root()->layout(VFLOW(8));
 
-    window->root()->add<Widget::TitleBar>(
-        Graphic::Icon::get("widgets"),
-        "Widget Factory");
+    window->root()->add(Widget::titlebar(Graphic::Icon::get("widgets"), "Widget Factory"));
 
-    auto panel_hflow = window->root()->add<Widget::Container>();
+    auto panel_hflow = window->root()->add<Widget::Element>();
     {
         panel_hflow->layout(HFLOW(8));
 
@@ -31,7 +26,7 @@ int main(int, char **)
         auto button = panel_hflow->add(Widget::basic_button("Hello, world!"));
         button->flags(Widget::Element::FILL);
 
-        auto p2 = panel_hflow->add<Widget::Container>();
+        auto p2 = panel_hflow->add<Widget::Element>();
         p2->flags(Widget::Element::FILL);
 
         auto p3 = panel_hflow->add(Widget::panel());
@@ -39,7 +34,7 @@ int main(int, char **)
     }
 
     window->root()->add(Widget::label("Buttons", Anchor::CENTER));
-    auto buttons = window->root()->add<Widget::Container>();
+    auto buttons = window->root()->add<Widget::Element>();
     {
         buttons->layout(HFLOW(8));
         buttons->insets(Insetsi(0, 8));

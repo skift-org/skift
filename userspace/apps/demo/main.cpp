@@ -1,5 +1,4 @@
-#include <libwidget/Container.h>
-#include <libwidget/TitleBar.h>
+#include <libwidget/Components.h>
 
 #include "demo/widgets/DemoWidget.h"
 
@@ -18,9 +17,9 @@ int main(int, char **)
 
     window->root()->layout(VFLOW(0));
 
-    window->root()->add<Widget::TitleBar>(Graphic::Icon::get("duck"), "Demos");
+    window->root()->add(Widget::titlebar(Graphic::Icon::get("duck"), "Demos"));
 
-    auto navbar = window->root()->add<Widget::Container>();
+    auto navbar = window->root()->add<Widget::Element>();
 
     navbar->insets(Insetsi(4, 4));
     navbar->layout(VFLOW(4));

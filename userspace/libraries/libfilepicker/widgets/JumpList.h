@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libwidget/VScroll.h>
+#include <libwidget/Elements.h>
 
 #include <libfilepicker/model/Bookmarks.h>
 #include <libfilepicker/model/Navigation.h>
@@ -16,7 +16,7 @@ private:
 
     OwnPtr<Async::Observer<Bookmarks>> _bookmark_observer;
 
-    RefPtr<Widget::VScroll> _listing;
+    RefPtr<Widget::ScrollElement> _listing;
 
 public:
     JumpList(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
@@ -33,8 +33,8 @@ public:
 
         add(Widget::label("Bookmarks"));
 
-        _listing = add<Widget::VScroll>();
-        _listing->flags(Element::FILL);
+        _listing = Widget::fill(Widget::scroll());
+        add(_listing);
 
         render();
     }

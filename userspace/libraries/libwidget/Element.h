@@ -1,6 +1,5 @@
 #pragma once
 
-#include "libutils/Vector.h"
 #include <libgraphic/Font.h>
 #include <libmath/Rect.h>
 #include <libsystem/utils/List.h>

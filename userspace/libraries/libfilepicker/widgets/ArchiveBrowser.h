@@ -1,9 +1,8 @@
 #pragma once
 
-#include <libwidget/Table.h>
-
 #include <libfilepicker/model/ArchiveListing.h>
 #include <libfilepicker/model/Navigation.h>
+#include <libwidget/Views.h>
 
 #include <libfile/Archive.h>
 

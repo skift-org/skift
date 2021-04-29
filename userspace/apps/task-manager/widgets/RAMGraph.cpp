@@ -3,7 +3,6 @@
 #include <libio/Format.h>
 #include <libsystem/system/System.h>
 #include <libutils/StringBuilder.h>
-#include <libwidget/Container.h>
 #include <libwidget/Elements.h>
 
 #include "task-manager/widgets/RAMGraph.h"
@@ -19,12 +18,12 @@ RAMGraph::RAMGraph(RefPtr<TaskModel> model)
     insets(Insetsi(8));
     flags(Element::FILL);
 
-    auto icon_and_text = add<Widget::Container>();
+    auto icon_and_text = add<Widget::Element>();
     icon_and_text->layout(HFLOW(4));
     icon_and_text->add(Widget::icon("chip"));
     icon_and_text->add(Widget::label("Memory"));
 
-    auto cpu_filler = add<Widget::Container>();
+    auto cpu_filler = add<Widget::Element>();
     cpu_filler->flags(Element::FILL);
 
     _label_usage = Widget::label("Usage: nil Mio", Anchor::RIGHT);

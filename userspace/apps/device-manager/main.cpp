@@ -4,8 +4,8 @@
 #include <libsystem/system/System.h>
 
 #include <libwidget/Application.h>
-#include <libwidget/Table.h>
-#include <libwidget/TitleBar.h>
+#include <libwidget/Components.h>
+#include <libwidget/Views.h>
 
 #include "device-manager/DeviceModel.h"
 
@@ -21,7 +21,7 @@ public:
 
         root()->layout(VFLOW(0));
 
-        root()->add<Widget::TitleBar>(Graphic::Icon::get("expansion-card-variant"), "Device Manager");
+        root()->add(Widget::titlebar(Graphic::Icon::get("expansion-card-variant"), "Device Manager"));
 
         auto model = make<DeviceModel>();
 

@@ -2,7 +2,7 @@
 
 #include <libutils/String.h>
 
-#include <libwidget/ScrollBar.h>
+#include <libwidget/Elements.h>
 #include <libwidget/model/TableModel.h>
 
 namespace Widget
@@ -18,7 +18,7 @@ private:
 
     int _selected = -1;
     int _scroll_offset = 0;
-    RefPtr<ScrollBar> _scrollbar;
+    RefPtr<ScrollBarElement> _scrollbar;
 
     String _empty_message{"No data to display"};
 

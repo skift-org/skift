@@ -18,24 +18,21 @@ public:
     void paint(Graphic::Painter &painter, const Math::Recti &) override;
 };
 
-static inline RefPtr<PanelElement> panel()
-{
-    return make<PanelElement>();
-}
-
-static inline RefPtr<PanelElement> panel(int radius)
+static inline RefPtr<PanelElement> panel(int radius = 0)
 {
     return make<PanelElement>(radius);
 }
 
-static inline RefPtr<PanelElement> panel(RefPtr<Element> child)
+template <typename TElement>
+static inline RefPtr<PanelElement> panel(RefPtr<TElement> child)
 {
     auto panel = make<PanelElement>();
     panel->add(child);
     return panel;
 }
 
-static inline RefPtr<PanelElement> panel(int radius, RefPtr<Element> child)
+template <typename TElement>
+static inline RefPtr<PanelElement> panel(int radius, RefPtr<TElement> child)
 {
     auto panel = make<PanelElement>(radius);
     panel->add(child);

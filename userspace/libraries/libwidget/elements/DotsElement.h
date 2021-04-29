@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class PaginationDots : public Element
+class DotsElement : public Element
 {
 private:
     int _count = 3;
@@ -33,13 +33,16 @@ public:
         _index = index;
     }
 
-    PaginationDots(int count);
-
-    ~PaginationDots() override;
+    DotsElement(int count);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 
     Math::Vec2i size() override;
 };
+
+static inline RefPtr<DotsElement> dots(int count)
+{
+    return make<DotsElement>(count);
+}
 
 } // namespace  Widget

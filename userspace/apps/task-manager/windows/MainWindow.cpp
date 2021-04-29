@@ -1,6 +1,5 @@
+#include <libwidget/Components.h>
 #include <libwidget/Elements.h>
-
-#include <libwidget/TitleBar.h>
 #include <libwidget/dialog/MessageBox.h>
 
 #include "task-manager/windows/MainWindow.h"
@@ -14,9 +13,7 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
 
     root()->layout(VFLOW(0));
 
-    root()->add<Widget::TitleBar>(
-        Graphic::Icon::get("memory"),
-        "Task Manager");
+    root()->add(Widget::titlebar(Graphic::Icon::get("memory"), "Task Manager"));
 
     /// --- Toolbar --- ///
     auto toolbar = root()->add(Widget::panel());

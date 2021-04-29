@@ -3,7 +3,8 @@
 #include <libsystem/process/Process.h>
 
 #include <libwidget/Application.h>
-#include <libwidget/TitleBar.h>
+#include <libwidget/Components.h>
+#include <libwidget/Elements.h>
 
 int main(int argc, char **argv)
 {
@@ -15,9 +16,7 @@ int main(int argc, char **argv)
     window->size(Math::Vec2i(700, 500));
     window->root()->layout(VFLOW(0));
 
-    window->root()->add<Widget::TitleBar>(
-        Graphic::Icon::get("image"),
-        "Image Viewer");
+    window->root()->add(Widget::titlebar(Graphic::Icon::get("image"), "Image Viewer"));
 
     auto toolbar = window->root()->add(Widget::panel());
     toolbar->layout(HFLOW(0));

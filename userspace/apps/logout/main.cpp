@@ -2,7 +2,6 @@
 #include <abi/Syscalls.h>
 
 #include <libwidget/Application.h>
-#include <libwidget/Container.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Screen.h>
 
@@ -25,7 +24,7 @@ int main(int, char **)
     background->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::BLACK.with_alpha(0.5));
     background->flags(Widget::Element::FILL);
 
-    auto dialog = background->add<Widget::Container>();
+    auto dialog = background->add<Widget::Element>();
 
     dialog->min_width(256);
     dialog->min_height(256);
@@ -37,7 +36,7 @@ int main(int, char **)
 
     icon_and_title_container->add(Widget::square(Widget::icon("power-standby", Graphic::ICON_36PX)));
 
-    auto warning_container = icon_and_title_container->add<Widget::Container>();
+    auto warning_container = icon_and_title_container->add<Widget::Element>();
     warning_container->flags(Widget::Element::FILL);
     warning_container->layout(VFLOW(2));
 

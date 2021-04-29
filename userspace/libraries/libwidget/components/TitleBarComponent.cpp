@@ -2,18 +2,18 @@
 
 #include <libwidget/Elements.h>
 #include <libwidget/Layouts.h>
-#include <libwidget/TitleBar.h>
 #include <libwidget/Window.h>
+#include <libwidget/components/TitleBarComponent.h>
 
 namespace Widget
 {
 
-TitleBar::TitleBar(RefPtr<Graphic::Icon> icon, String title)
+TitleBarComponent::TitleBarComponent(RefPtr<Graphic::Icon> icon, String title)
     : _icon{icon}, _title{title}
 {
 }
 
-void TitleBar::event(Event *event)
+void TitleBarComponent::event(Event *event)
 {
     if (is_mouse_event(event))
     {
@@ -30,10 +30,9 @@ void TitleBar::event(Event *event)
             cursor(CURSOR_MOVE);
             event->accepted = true;
         }
-        else if (
-            _is_dragging &&
-            event->type == Event::MOUSE_BUTTON_RELEASE &&
-            event->mouse.button == MOUSE_BUTTON_LEFT)
+        else if (_is_dragging &&
+                 event->type == Event::MOUSE_BUTTON_RELEASE &&
+                 event->mouse.button == MOUSE_BUTTON_LEFT)
         {
             _is_dragging = false;
             cursor(CURSOR_DEFAULT);
@@ -50,7 +49,7 @@ void TitleBar::event(Event *event)
     }
 }
 
-RefPtr<Element> TitleBar::build()
+RefPtr<Element> TitleBarComponent::build()
 {
     bool window_resizable = window()->flags() & WINDOW_RESIZABLE;
 

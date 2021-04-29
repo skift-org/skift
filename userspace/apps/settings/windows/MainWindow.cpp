@@ -1,5 +1,4 @@
-
-#include <libwidget/TitleBar.h>
+#include <libwidget/Components.h>
 
 #include "settings/pages/Home.h"
 #include "settings/windows/MainWindow.h"
@@ -13,9 +12,7 @@ MainWindow::MainWindow() : Window(WINDOW_RESIZABLE)
 
     root()->layout(VFLOW(0));
 
-    root()->add<Widget::TitleBar>(
-        Graphic::Icon::get("cog"),
-        "Settings");
+    root()->add(Widget::titlebar(Graphic::Icon::get("cog"), "Settings"));
 
     auto navigation_bar = root()->add(Widget::panel());
     navigation_bar->layout(HFLOW(4));

@@ -1,9 +1,8 @@
 #include <libio/Format.h>
 
 #include <libwidget/Application.h>
-
+#include <libwidget/Components.h>
 #include <libwidget/Layouts.h>
-#include <libwidget/TitleBar.h>
 
 #include "calculator/Calculator.h"
 

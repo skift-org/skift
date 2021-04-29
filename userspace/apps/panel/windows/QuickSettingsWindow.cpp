@@ -1,6 +1,5 @@
 #include <skift/Environment.h>
 
-#include <libwidget/Container.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Screen.h>
 
@@ -39,7 +38,7 @@ QuickSettingsWindow::QuickSettingsWindow()
         Settings::Service::the()->write(Settings::Path::parse("appearance:widgets.theme"), "skift-dark");
     }));
 
-    auto account_container = root()->add<Widget::Container>();
+    auto account_container = root()->add<Widget::Element>();
     account_container->layout(HFLOW(4));
 
     account_container->add(Widget::basic_button(Graphic::Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string()));

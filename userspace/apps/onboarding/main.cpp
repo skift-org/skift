@@ -1,9 +1,7 @@
 #include <libio/Format.h>
 
 #include <libwidget/Application.h>
-#include <libwidget/Container.h>
 #include <libwidget/Elements.h>
-#include <libwidget/PaginationDots.h>
 #include <libwidget/Screen.h>
 
 struct Page
@@ -60,7 +58,7 @@ void pages(RefPtr<Widget::Element> host, const Page &page)
 {
     host->add(Widget::label(page.header, Anchor::CENTER));
 
-    auto content = host->add<Widget::Container>();
+    auto content = host->add<Widget::Element>();
     content->insets({8, 0});
     content->layout(VFLOW(2));
 
@@ -103,17 +101,18 @@ int main(int, char **)
     illustration->add(image);
     image->flags(Widget::Element::FILL);
 
-    auto content = dialog->add<Widget::Container>();
+    auto content = dialog->add<Widget::Element>();
     content->flags(Widget::Element::FILL);
     content->insets(16);
     content->layout(VFLOW(4));
 
-    auto dots_container = dialog->add<Widget::Container>();
+    auto dots_container = dialog->add<Widget::Element>();
     dots_container->insets(16);
 
-    auto dots = dots_container->add<Widget::PaginationDots>(5);
+    auto dots = Widget::dots(PAGES.count());
+    dots_container->add(dots);
 
-    auto navigation = dialog->add<Widget::Container>();
+    auto navigation = dialog->add<Widget::Element>();
 
     navigation->layout(HFLOW(4));
     navigation->insets(8);

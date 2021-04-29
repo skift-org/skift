@@ -1,9 +1,8 @@
 #pragma once
 
 #include <libfile/Archive.h>
-#include <libwidget/Container.h>
 
-#include <libwidget/TitleBar.h>
+#include <libwidget/Components.h>
 #include <libwidget/Window.h>
 
 #include <libfilepicker/FilePicker.h>
@@ -42,7 +41,7 @@ public:
 
         root()->add(Widget::titlebar(Graphic::Icon::get("folder-zip"), "Archive Manager"));
 
-        auto browser = root()->add<Widget::Container>();
+        auto browser = root()->add<Widget::Element>();
 
         browser->flags(Widget::Element::FILL);
 

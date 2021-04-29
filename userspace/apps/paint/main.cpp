@@ -1,10 +1,8 @@
 #include <assert.h>
 
 #include <libwidget/Application.h>
-#include <libwidget/Container.h>
+#include <libwidget/Components.h>
 #include <libwidget/Elements.h>
-
-#include <libwidget/TitleBar.h>
 
 #include "paint/PaintCanvas.h"
 #include "paint/PaintDocument.h"
@@ -67,9 +65,7 @@ public:
 
         root()->layout(VFLOW(0));
 
-        root()->add<Widget::TitleBar>(
-            Graphic::Icon::get("brush"),
-            "Paint");
+        root()->add(Widget::titlebar(Graphic::Icon::get("brush"), "Paint"));
 
         create_toolbar(root());
 
@@ -131,7 +127,7 @@ public:
 
         toolbar->add(Widget::separator());
 
-        auto primary_color_container = toolbar->add<Widget::Container>();
+        auto primary_color_container = toolbar->add<Widget::Element>();
         primary_color_container->insets(Insetsi(4));
         primary_color_container->flags(Widget::Element::SQUARE);
 
@@ -139,7 +135,7 @@ public:
         _primary_color->color(Widget::THEME_MIDDLEGROUND, _document->primary_color());
         _primary_color->flags(Widget::Element::FILL);
 
-        auto secondary_color_container = toolbar->add<Widget::Container>();
+        auto secondary_color_container = toolbar->add<Widget::Element>();
         secondary_color_container->insets(Insetsi(4));
         secondary_color_container->flags(Widget::Element::SQUARE);
 

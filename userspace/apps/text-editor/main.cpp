@@ -2,9 +2,8 @@
 #include <libio/File.h>
 #include <libio/Streams.h>
 #include <libwidget/Application.h>
-
-#include <libwidget/TextEditor.h>
-#include <libwidget/TitleBar.h>
+#include <libwidget/Components.h>
+#include <libwidget/Elements.h>
 
 struct TextWindow : public Widget::Window
 {
@@ -15,7 +14,7 @@ private:
     RefPtr<Widget::Element> _new_document;
 
     RefPtr<Widget::TextModel> _text_model;
-    RefPtr<Widget::TitleBar> _title_bar;
+    RefPtr<Widget::TitleBarComponent> _title_bar;
     RefPtr<Widget::TextEditor> _text_editor;
 
     void load_document(String path)
@@ -46,9 +45,8 @@ public:
 
         root()->layout(VFLOW(0));
 
-        _title_bar = root()->add<Widget::TitleBar>(
-            Graphic::Icon::get("text-box"),
-            "Text Editor");
+        _title_bar = Widget::titlebar(Graphic::Icon::get("text-box"), "Text Editor");
+        root()->add(_title_bar);
 
         create_toolbar(root());
 

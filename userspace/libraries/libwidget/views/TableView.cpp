@@ -1,8 +1,7 @@
 #include <libgraphic/Painter.h>
-#include <libwidget/ScrollBar.h>
-#include <libwidget/Table.h>
 #include <libwidget/Theme.h>
 #include <libwidget/Window.h>
+#include <libwidget/views/TableView.h>
 
 namespace Widget
 {
@@ -111,7 +110,7 @@ void Table::paint_cell(Graphic::Painter &painter, int row, int column)
 Table::Table()
 
 {
-    _scrollbar = add<ScrollBar>();
+    _scrollbar = add<ScrollBarElement>();
 
     _scrollbar->on(Event::VALUE_CHANGE, [this](auto) {
         _scroll_offset = _scrollbar->value();

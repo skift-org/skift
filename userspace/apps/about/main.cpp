@@ -1,9 +1,9 @@
 #include <libsystem/BuildInfo.h>
 #include <libwidget/Application.h>
+#include <libwidget/Components.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Layouts.h>
-#include <libwidget/TextEditor.h>
-#include <libwidget/TitleBar.h>
+#include <libwidget/Views.h>
 
 static auto logo_based_on_color_scheme()
 {

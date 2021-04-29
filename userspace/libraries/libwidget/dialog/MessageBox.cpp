@@ -1,4 +1,3 @@
-#include <libwidget/Container.h>
 #include <libwidget/Elements.h>
 
 #include <libwidget/dialog/MessageBox.h>
@@ -38,7 +37,7 @@ void MessageBox::render(Window *window)
     auto message_label = window->root()->add(label(_message, Anchor::CENTER));
     message_label->flags(Element::FILL);
 
-    auto container = window->root()->add<Container>();
+    auto container = window->root()->add<Element>();
     container->layout(HFLOW(4));
 
     container->add(spacer());

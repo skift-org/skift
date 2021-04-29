@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libwidget/TextField.h>
+#include <libwidget/Components.h>
 #include <libwidget/dialog/Dialog.h>
 
 #include <libfilepicker/model/Navigation.h>

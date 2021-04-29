@@ -3,7 +3,6 @@
 #include <libsystem/process/Launchpad.h>
 #include <libutils/Assert.h>
 #include <libwidget/Event.h>
-#include <libwidget/ScrollBar.h>
 #include <libwidget/Window.h>
 
 #include "terminal/Common.h"

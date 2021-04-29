@@ -1,9 +1,8 @@
 #include <libwidget/Application.h>
+#include <libwidget/Components.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Layouts.h>
-#include <libwidget/TitleBar.h>
 #include <libwidget/Window.h>
-#include <libwidget/components/StatefullComponent.h>
 
 using namespace Widget;
 
@@ -28,7 +27,7 @@ struct MainWindow : public Window
     RefPtr<Element> build() override
     {
         return vflow({
-            titlebar(Graphic::Icon::get("duck"), "exemple"),
+            titlebar(Graphic::Icon::get("duck"), "Exemple"),
             spacing(16, counter()),
         });
     }

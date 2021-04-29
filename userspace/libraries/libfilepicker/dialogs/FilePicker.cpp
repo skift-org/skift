@@ -1,6 +1,5 @@
-#include "libgraphic/Icon.h"
+#include <libwidget/Components.h>
 #include <libwidget/Elements.h>
-#include <libwidget/TitleBar.h>
 
 #include <libfilepicker/dialogs/FilePicker.h>
 #include <libfilepicker/widgets/DirectoryBrowser.h>
@@ -46,7 +45,7 @@ void Dialog::render(Widget::Window *window)
     window->size(Math::Vec2i(600, 400));
     window->root()->layout(VFLOW(0));
 
-    window->root()->add<Widget::TitleBar>(Graphic::Icon::get("widgets"), get_title());
+    window->root()->add(Widget::titlebar(Graphic::Icon::get("widgets"), get_title()));
 
     window->root()->add<ToolBar>(_navigation, nullptr, ToolBar::NO_OPEN_TERMINAL);
 

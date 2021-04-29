@@ -1,11 +1,11 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Event.h>
-#include <libwidget/ScrollBar.h>
+#include <libwidget/elements/ScrollBarElement.h>
 
 namespace Widget
 {
 
-ScrollBar::ScrollBar(bool horizontal)
+ScrollBarElement::ScrollBarElement(bool horizontal)
 {
     _horizontal = horizontal;
     _track = 1024;
@@ -13,7 +13,7 @@ ScrollBar::ScrollBar(bool horizontal)
     _thumb = 512;
 }
 
-void ScrollBar::paint(Graphic::Painter &painter, const Math::Recti &)
+void ScrollBarElement::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     if (_thumb >= _track)
     {
@@ -31,7 +31,7 @@ void ScrollBar::paint(Graphic::Painter &painter, const Math::Recti &)
     }
 }
 
-void ScrollBar::scroll_to(Math::Vec2i position)
+void ScrollBarElement::scroll_to(Math::Vec2i position)
 {
     if (_horizontal)
     {
@@ -51,7 +51,7 @@ void ScrollBar::scroll_to(Math::Vec2i position)
     should_repaint();
 }
 
-void ScrollBar::event(Event *event)
+void ScrollBarElement::event(Event *event)
 {
     if (_thumb >= _track)
     {

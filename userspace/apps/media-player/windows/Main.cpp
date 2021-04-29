@@ -1,7 +1,5 @@
-#include <libgraphic/Icon.h>
-#include <libwidget/Container.h>
+#include <libwidget/Components.h>
 #include <libwidget/Elements.h>
-#include <libwidget/TitleBar.h>
 
 #include "media-player/windows/Main.h"
 
@@ -19,13 +17,11 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
     cover->layout(VFLOW(0));
     cover->flags(Widget::Element::FILL);
 
-    cover->add<Widget::TitleBar>(
-        Graphic::Icon::get("movie"),
-        "Media Player");
+    cover->add(Widget::titlebar(Graphic::Icon::get("movie"), "Media Player"));
 
     cover->add(Widget::spacer());
 
-    auto control_bar = cover->add<Widget::Container>();
+    auto control_bar = cover->add<Widget::Element>();
 
     control_bar->insets(12);
     control_bar->layout(HFLOW(4));

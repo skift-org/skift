@@ -9,7 +9,7 @@
 namespace panel
 {
 
-ApplicationListing::ApplicationListing() : VScroll()
+ApplicationListing::ApplicationListing()
 {
     layout(VFLOW(4));
     flags(Element::FILL);

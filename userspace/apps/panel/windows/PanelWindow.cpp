@@ -1,6 +1,5 @@
 #include <libsystem/process/Process.h>
 
-#include <libwidget/Container.h>
 #include <libwidget/Elements.h>
 #include <libwidget/Screen.h>
 
@@ -24,7 +23,7 @@ PanelWindow::PanelWindow()
 
     root()->layout(VFLOW(0));
 
-    auto container = root()->add<Widget::Container>();
+    auto container = root()->add<Widget::Element>();
     container->flags(Widget::Element::FILL);
     container->layout(HFLOW(8));
     container->insets(Insetsi(4));

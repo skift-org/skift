@@ -3,7 +3,7 @@
 
 #include <libasync/Timer.h>
 #include <libwidget/Elements.h>
-#include <libwidget/Graph.h>
+#include <libwidget/Views.h>
 
 #include "libwidget/Element.h"
 #include "panel/widgets/RessourceMonitor.h"

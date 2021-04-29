@@ -1,5 +1,5 @@
 #include <libwidget/Elements.h>
-#include <libwidget/TextField.h>
+#include <libwidget/Views.h>
 
 #include "panel/widgets/SearchBar.h"
 

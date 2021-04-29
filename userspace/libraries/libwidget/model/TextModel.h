@@ -20,14 +20,6 @@ private:
     Vector<Codepoint> _codepoints{};
 
 public:
-    TextModelLine()
-    {
-    }
-
-    ~TextModelLine()
-    {
-    }
-
     Codepoint operator[](size_t index)
     {
         Assert::lower_than(index, length());
@@ -130,10 +122,6 @@ public:
 
     static RefPtr<TextModel> open(String path);
 
-    TextModel() {}
-
-    ~TextModel() {}
-
     Math::Recti bound(const Graphic::Font &font)
     {
         int width = 0;
@@ -223,6 +211,7 @@ private:
 
 public:
     size_t line() { return _line; }
+
     size_t column() { return _column; }
 
     void move_to_within(TextModel &model, size_t line)

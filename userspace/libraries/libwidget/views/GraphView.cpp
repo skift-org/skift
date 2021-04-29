@@ -1,7 +1,7 @@
 #include <assert.h>
 
 #include <libgraphic/Painter.h>
-#include <libwidget/Graph.h>
+#include <libwidget/views/GraphView.h>
 
 namespace Widget
 {

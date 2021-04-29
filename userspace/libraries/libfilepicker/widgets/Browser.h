@@ -1,7 +1,8 @@
 #pragma once
 
 #include <libsystem/process/Launchpad.h>
-#include <libwidget/Table.h>
+
+#include <libwidget/Views.h>
 
 #include <libfilepicker/model/FilesystemModel.h>
 #include <libfilepicker/model/Navigation.h>
@@ -23,6 +24,7 @@ public:
         {
             return {};
         }
+
         return process_resolve(_listing->info(selected()).name);
     }
 

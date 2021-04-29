@@ -1,6 +1,5 @@
 #include <libwidget/Application.h>
-#include <libwidget/ScrollBar.h>
-#include <libwidget/TitleBar.h>
+#include <libwidget/Components.h>
 #include <libwidget/Window.h>
 
 #include "terminal/TerminalWidget.h"
@@ -16,9 +15,7 @@ int main(int, char **)
 
     window->root()->layout(VFLOW(0));
 
-    window->root()->add<Widget::TitleBar>(
-        Graphic::Icon::get("console-line"),
-        "Terminal");
+    window->root()->add(Widget::titlebar(Graphic::Icon::get("console-line"), "Terminal"));
 
     auto widget = window->root()->add<TerminalWidget>();
     widget->focus();

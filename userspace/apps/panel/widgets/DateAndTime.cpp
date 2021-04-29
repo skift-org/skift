@@ -14,16 +14,15 @@ DateAndTime::DateAndTime()
         TimeStamp timestamp = timestamp_now();
         DateTime datetime = timestamp_to_datetime(timestamp);
 
-        state(datetime);
+        update(datetime);
     });
 
     _timer->start();
 }
 
-RefPtr<Widget::Element> DateAndTime::build()
+RefPtr<Widget::Element> DateAndTime::build(DateTime state)
 {
-    DateTime datetime = state();
-    return Widget::basic_button(IO::format("{02d}:{02d}:{02d}", datetime.hour, datetime.minute, datetime.second));
+    return Widget::basic_button(IO::format("{02d}:{02d}:{02d}", state.hour, state.minute, state.second));
 }
 
 } // namespace panel

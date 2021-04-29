@@ -7,13 +7,13 @@
 using namespace Widget;
 
 struct CounterComponent :
-    public StatefullComponent<int>
+    public Statefull<int>
 {
-    RefPtr<Element> build()
+    RefPtr<Element> build(int state) override
     {
         return hflow({
-            fill(label(IO::format("You clicked {} times", state()))),
-            basic_button("Click Me!", [this] { state(state() + 1); }),
+            fill(label(IO::format("You clicked {} times", state))),
+            basic_button("Click Me!", [this, state] { update(state + 1); }),
         });
     }
 };

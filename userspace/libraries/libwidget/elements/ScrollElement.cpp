@@ -34,7 +34,7 @@ void ScrollElement::do_layout()
     {
         int content_size = _host->size().x();
 
-        _host->container(content().take_left(content_size));
+        _host->container(content().take_left(content_size).cutoff_botton(ScrollBarElement::SIZE));
         _scrollbar->container(content().take_bottom(ScrollBarElement::SIZE));
         _scrollbar->update(content_size, content().width(), scroll().y());
     }
@@ -42,7 +42,7 @@ void ScrollElement::do_layout()
     {
         int content_size = _host->size().y();
 
-        _host->container(content().take_top(content_size));
+        _host->container(content().take_top(content_size).cutoff_right(ScrollBarElement::SIZE));
         _scrollbar->container(content().take_right(ScrollBarElement::SIZE));
         _scrollbar->update(content_size, content().height(), scroll().x());
     }

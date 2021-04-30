@@ -42,7 +42,7 @@ $ sudo pacman -S nasm gcc make binutils grub qemu libisoburn mtools git qemu
 
 ```sh
 # On Red Hat or Red Hat-based distributions
-$ sudo dnf install nasm gcc gcc-g++ make binutils xorriso mtools ImageMagick git qemu qemu-kvm
+$ sudo dnf install nasm gcc gcc-g++ make binutils xorriso mtools ImageMagick git qemu qemu-kvm patch
 ```
 
 ### About WSL

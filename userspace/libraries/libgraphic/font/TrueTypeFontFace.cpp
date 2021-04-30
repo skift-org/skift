@@ -148,7 +148,7 @@ Result Graphic::Font::TrueTypeFontFace::parse_tables(IO::MemoryReader &reader)
             TRY(read_table_head(table_reader));
             break;
         case TABLE_TAG_GLYF:
-            IO::logln("GLYF: {}", table.offset());
+            IO::logln("GLYF: {} {}", table.offset(), table.size());
             TRY(read_table_glyf(table_reader));
             break;
         case TABLE_TAG_HHEA:
@@ -355,11 +355,12 @@ Result Graphic::Font::TrueTypeFontFace::read_table_maxp(IO::Reader &reader)
 
 Result Graphic::Font::TrueTypeFontFace::read_table_loca(IO::Reader &reader)
 {
-    for (uint16_t i = 0; i < _num_glyphs; i++)
+    _glyph_offsets.resize(_num_glyphs + 1);
+    for (uint16_t i = 0; i < _num_glyphs + 1; i++)
     {
         if (_header.glyph_data_fmt() == 0)
         {
-            _glyph_offsets[i] = TRY(IO::read<be_uint16_t>(reader))();
+            _glyph_offsets[i] = TRY(IO::read<be_uint16_t>(reader))() * 2;
         }
         else
         {
@@ -372,6 +373,10 @@ Result Graphic::Font::TrueTypeFontFace::read_table_loca(IO::Reader &reader)
 
 Result Graphic::Font::TrueTypeFontFace::read_table_glyf(IO::Reader &reader)
 {
+    auto glyph_data = TRY(IO::read_all(reader));
+    IO::MemoryReader glyph_reader(glyph_data);
+    _glyphs.resize(_num_glyphs);
+
     for (uint16_t glyph_idx = 0; glyph_idx < _num_glyphs; glyph_idx++)
     {
         if (_glyph_offsets[glyph_idx] == _glyph_offsets[glyph_idx + 1])
@@ -380,14 +385,15 @@ Result Graphic::Font::TrueTypeFontFace::read_table_glyf(IO::Reader &reader)
             continue;
         }
 
-        auto header = TRY(IO::read<TrueTypeGlyphHeader>(reader));
+        TRY(glyph_reader.seek(IO::SeekFrom::start(_glyph_offsets[glyph_idx])));
+        auto header = TRY(IO::read<TrueTypeGlyphHeader>(glyph_reader));
 
         // Simple glyph
         if (header.num_contours() > 0)
         {
-            auto end_indices = TRY(IO::read_vector<be_uint16_t>(reader, header.num_contours()));
-            auto num_instructions = TRY(IO::read<be_uint16_t>(reader));
-            auto instructions = TRY(IO::read_vector<be_uint8_t>(reader, num_instructions()));
+            auto end_indices = TRY(IO::read_vector<be_uint16_t>(glyph_reader, header.num_contours()));
+            auto num_instructions = TRY(IO::read<be_uint16_t>(glyph_reader));
+            auto instructions = TRY(IO::read_vector<be_uint8_t>(glyph_reader, num_instructions()));
 
             // Number of points is the end index of the last contour
             auto num_points = end_indices.peek_back();
@@ -404,12 +410,12 @@ Result Graphic::Font::TrueTypeFontFace::read_table_glyf(IO::Reader &reader)
                 {
                     if (repeat_count == 0)
                     {
-                        auto flags = TRY(IO::read<TrueTypeGlyphSimpleFlags>(reader));
+                        auto flags = TRY(IO::read<TrueTypeGlyphSimpleFlags>(glyph_reader));
                         flags_vec.push_back(flags);
                         // This flags tells us that the flag is repeated N times
                         if (flags & TT_GLYPH_REPEAT)
                         {
-                            repeat_count = TRY(IO::read<be_uint8_t>(reader))();
+                            repeat_count = TRY(IO::read<be_uint8_t>(glyph_reader))();
                         }
                     }
                     else
@@ -429,14 +435,14 @@ Result Graphic::Font::TrueTypeFontFace::read_table_glyf(IO::Reader &reader)
                     // It's a new coordinate (uint8_t + signflag)
                     if (flags & TT_GLYPH_XSHORT_VECTOR)
                     {
-                        int16_t delta_x = TRY(IO::read<be_uint8_t>(reader))();
+                        int16_t delta_x = TRY(IO::read<be_uint8_t>(glyph_reader))();
                         const bool positive = flags & TT_GLYPH_X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR;
                         x += positive ? delta_x : -delta_x;
                     }
                     // It's a new coordinate (int16_t)
                     else if (!(flags & TT_GLYPH_X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR))
                     {
-                        int16_t delta_x = TRY(IO::read<be_int16_t>(reader))();
+                        int16_t delta_x = TRY(IO::read<be_int16_t>(glyph_reader))();
                         x += delta_x;
                     }
                     coords[point_idx].x() = x;
@@ -452,14 +458,14 @@ Result Graphic::Font::TrueTypeFontFace::read_table_glyf(IO::Reader &reader)
                     // It's a new coordinate (uint8_t + signflag)
                     if (flags & TT_GLYPH_YSHORT_VECTOR)
                     {
-                        int16_t delta_y = TRY(IO::read<be_uint8_t>(reader))();
+                        int16_t delta_y = TRY(IO::read<be_uint8_t>(glyph_reader))();
                         const bool positive = flags & TT_GLYPH_Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR;
                         y += positive ? delta_y : -delta_y;
                     }
                     // It's a new coordinate (int16_t)
                     else if (!(flags & TT_GLYPH_Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR))
                     {
-                        int16_t delta_y = TRY(IO::read<be_int16_t>(reader))();
+                        int16_t delta_y = TRY(IO::read<be_int16_t>(glyph_reader))();
                         y += delta_y;
                     }
                     coords[point_idx].y() = y;
@@ -469,6 +475,10 @@ Result Graphic::Font::TrueTypeFontFace::read_table_glyf(IO::Reader &reader)
             // Now create our contours
             for (uint16_t point_idx = 0; point_idx < num_points(); point_idx++)
             {
+                auto& glyph = _glyphs[glyph_idx];
+                Math::Vec2f scaled_point = { coords[point_idx].x() / (float)_header.units_per_em(),
+                                             coords[point_idx].y() / (float)_header.units_per_em() };
+                glyph.edges.append(scaled_point); 
             }
         }
         else // Composite glyph

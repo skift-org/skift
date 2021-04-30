@@ -19,6 +19,7 @@ private:
     TrueTypeHeader _header;
     Vector<uint32_t> _glyph_offsets;
     Vector<TrueTypeTable> _tables;
+    Vector<Glyph> _glyphs;
 
     Result read_tables(IO::MemoryReader &reader);
     Result parse_tables(IO::MemoryReader &reader);

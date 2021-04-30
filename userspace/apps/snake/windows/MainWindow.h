@@ -14,7 +14,6 @@ class MainWindow : public Widget::Window
 private:
 public:
     MainWindow()
-        : Window{WINDOW_NONE}
     {
         root()->DONT_USE_ME_layout(VFLOW(0));
 
@@ -27,8 +26,11 @@ public:
         resize_to_content();
     }
 
-    ~MainWindow()
+    RefPtr<Widget::Element> build()
     {
+        return Widget::vflow({
+            Widget::titlebar(Graphic::Icon::get("snake"), "Snake"),
+        });
     }
 };
 

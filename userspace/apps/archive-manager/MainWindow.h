@@ -58,7 +58,7 @@ public:
         else
         {
             return vflow({
-                titlebar(Graphic::Icon::get("folder-zip"), IO::format("Archive Manager: {}", _archive->get_path().basename())),
+                titlebar(Graphic::Icon::get("folder-zip"), IO::format("Archive Manager - {}", _archive->get_path().basename())),
                 toolbar({
                     basic_button(Graphic::Icon::get("archive-arrow-up"), "Extract All"),
                     separator(),

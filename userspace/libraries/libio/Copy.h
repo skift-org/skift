@@ -73,6 +73,18 @@ static inline ResultOr<Slice> read_all(Reader &reader)
     return Slice{memory.slice()};
 }
 
+static inline ResultOr<Slice> read_all(MemoryReader &reader)
+{
+    if (TRY(reader.tell()) == 0)
+    {
+        return reader.memory();
+    }
+    else
+    {
+        return read_all((Reader &)reader);
+    }
+}
+
 static inline Result write_all(Writer &writer, Slice data)
 {
     MemoryReader memory{data};

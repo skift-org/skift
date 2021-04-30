@@ -54,18 +54,23 @@ ResultOr<RefPtr<Graphic::Font::TrueTypeFontFace>> Graphic::Font::TrueTypeFontFac
         return Result::ERR_INVALID_DATA;
     }
 
+    // First read the tables metadata
     TRY(result->read_tables(mem_reader));
 
-    if (!result->_has_cmap || !result->_has_head || !result->_has_hhea || !result->_has_hmtx)
+    // Check if we're missing any required data
+    if (!result->has_table(TABLE_TAG_CMAP) ||
+        !result->has_table(TABLE_TAG_HEAD) ||
+        !result->has_table(TABLE_TAG_HHEA) ||
+        !result->has_table(TABLE_TAG_HMTX))
     {
         IO::errln("Font is missing a required table!");
         return Result::ERR_INVALID_DATA;
     }
 
-    if (result->_has_glyf)
+    if (result->has_table(TABLE_TAG_GLYF))
     {
         // required for truetype
-        if (!result->_has_loca)
+        if (!result->has_table(TABLE_TAG_LOCA))
         {
             return Result::ERR_INVALID_DATA;
         }
@@ -73,6 +78,9 @@ ResultOr<RefPtr<Graphic::Font::TrueTypeFontFace>> Graphic::Font::TrueTypeFontFac
     else
     {
     }
+
+    // Now actually parse all tables
+    result->parse_tables(mem_reader);
 
     IO::logln("Font has {} glyphs", result->_num_glyphs);
 
@@ -92,17 +100,16 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
     UNUSED(entry_selector);
     UNUSED(range_shift);
 
-    Vector<TrueTypeTable> tables;
-    tables.resize(num_tables());
+    _tables.resize(num_tables());
 
     for (uint16_t i = 0; i < num_tables(); i++)
     {
         // Read the table entry
-        tables[i] = TRY(IO::read<TrueTypeTable>(reader));
+        _tables[i] = TRY(IO::read<TrueTypeTable>(reader));
     }
 
     // Reorder the tables on how we need them to be parsed (Head & MaxP required before the others)
-    tables.sort([](auto a, auto b) {
+    _tables.sort([](auto a, auto b) {
         if (a.tag() == TABLE_TAG_HEAD)
             return false;
 
@@ -113,10 +120,15 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
         return true;
     });
 
-    for (const auto &table : tables)
+    return Result::SUCCESS;
+}
+
+Result Graphic::Font::TrueTypeFontFace::parse_tables(IO::MemoryReader &reader)
+{
+    for (const auto &table : _tables)
     {
         // Jump to the table position and create our readers
-        reader.seek(IO::SeekFrom::start(table.offset()));
+        TRY(reader.seek(IO::SeekFrom::start(table.offset())));
         IO::ScopedReader table_reader(reader, table.size());
 
         // TODO: validate the checksum
@@ -129,7 +141,7 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
             break;
         case TABLE_TAG_LOCA:
             IO::logln("LOCA: {}", table.offset());
-            _has_loca = true;
+            TRY(read_table_loca(table_reader));
             break;
         case TABLE_TAG_HEAD:
             IO::logln("HEAD: {}", table.offset());
@@ -141,11 +153,9 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
             break;
         case TABLE_TAG_HHEA:
             IO::logln("HHEA: {}", table.offset());
-            _has_hhea = true;
             break;
         case TABLE_TAG_HMTX:
             IO::logln("HMTX: {}", table.offset());
-            _has_hmtx = true;
             break;
         case TABLE_TAG_MAXP:
             IO::logln("MAXP: {}", table.offset());
@@ -186,7 +196,6 @@ ResultOr<Graphic::Font::TrueTypeVersion> Graphic::Font::TrueTypeFontFace::read_v
 Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
 {
     auto reader = IO::ReadCounter(_reader);
-    _has_cmap = true;
     auto version = TRY(IO::read<uint16_t>(reader));
     UNUSED(version);
     auto num_encodings = TRY(IO::read<be_uint16_t>(reader));
@@ -316,10 +325,9 @@ Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
 
 Result Graphic::Font::TrueTypeFontFace::read_table_head(IO::Reader &reader)
 {
-    _has_head = true;
-    auto header = TRY(IO::read<TrueTypeHeader>(reader));
+    _header = TRY(IO::read<TrueTypeHeader>(reader));
 
-    if (header.magic_number() != TRUETYPE_MAGIC_NUMBER)
+    if (_header.magic_number() != TRUETYPE_MAGIC_NUMBER)
     {
         return Result::ERR_INVALID_DATA;
     }
@@ -345,12 +353,33 @@ Result Graphic::Font::TrueTypeFontFace::read_table_maxp(IO::Reader &reader)
     return Result::SUCCESS;
 }
 
+Result Graphic::Font::TrueTypeFontFace::read_table_loca(IO::Reader &reader)
+{
+    for (uint16_t i = 0; i < _num_glyphs; i++)
+    {
+        if (_header.glyph_data_fmt() == 0)
+        {
+            _glyph_offsets[i] = TRY(IO::read<be_uint16_t>(reader))();
+        }
+        else
+        {
+            _glyph_offsets[i] = TRY(IO::read<be_uint32_t>(reader))();
+        }
+    }
+
+    return Result::SUCCESS;
+}
+
 Result Graphic::Font::TrueTypeFontFace::read_table_glyf(IO::Reader &reader)
 {
-    _has_glyf = true;
-
     for (uint16_t glyph_idx = 0; glyph_idx < _num_glyphs; glyph_idx++)
     {
+        if (_glyph_offsets[glyph_idx] == _glyph_offsets[glyph_idx + 1])
+        {
+            IO::logln("This is an empty glyph");
+            continue;
+        }
+
         auto header = TRY(IO::read<TrueTypeGlyphHeader>(reader));
 
         // Simple glyph

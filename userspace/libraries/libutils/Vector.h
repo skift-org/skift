@@ -10,6 +10,7 @@
 #include <libutils/Iteration.h>
 #include <libutils/Iterator.h>
 #include <libutils/New.h>
+#include <libutils/Optional.h>
 #include <libutils/RefPtr.h>
 
 template <typename T>
@@ -248,6 +249,20 @@ public:
                 }
             }
         }
+    }
+
+    template <typename Predicate>
+    Optional<T> find(Predicate match)
+    {
+        for (size_t i = 0; i + 1 < _count; i++)
+        {
+            if (match(_storage[i]))
+            {
+                return _storage[i];
+            }
+        }
+
+        return {};
     }
 
     void resize(size_t new_count)

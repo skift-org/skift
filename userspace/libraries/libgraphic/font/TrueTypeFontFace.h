@@ -5,6 +5,7 @@
 #include <libio/Reader.h>
 #include <libio/ScopedReader.h>
 #include <libutils/HashMap.h>
+#include <libutils/Vector.h>
 #include <libutils/unicode/Codepoint.h>
 
 namespace Graphic::Font
@@ -15,20 +16,29 @@ class TrueTypeFontFace : public FontFace
 private:
     uint16_t _num_glyphs;
     HashMap<Codepoint, uint32_t> _codepoint_glyph_mapping;
+    TrueTypeHeader _header;
+    Vector<uint32_t> _glyph_offsets;
+    Vector<TrueTypeTable> _tables;
 
-    bool _has_cmap, _has_glyf, _has_loca, _has_head, _has_hhea, _has_hmtx;
+    Result read_tables(IO::MemoryReader &reader);
+    Result parse_tables(IO::MemoryReader &reader);
 
     Result read_table_head(IO::Reader &reader);
     Result read_table_maxp(IO::Reader &reader);
     Result read_table_cmap(IO::Reader &reader);
+    Result read_table_loca(IO::Reader &reader);
     Result read_table_glyf(IO::Reader &reader);
-    Result read_tables(IO::MemoryReader &reader);
-
+    
     ResultOr<TrueTypeVersion> read_version(IO::Reader &reader);
 
 public:
     static ResultOr<RefPtr<TrueTypeFontFace>>
     load(IO::Reader &reader);
+
+    inline bool has_table(uint32_t tag)
+    {
+        return _tables.find([&](auto &t) { return t.tag() == tag; }).present();
+    }
 
     virtual String family() override;
     virtual FontStyle style() override;

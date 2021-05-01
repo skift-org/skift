@@ -49,7 +49,7 @@ void Window::bound(Math::Recti new_bound)
     }
     else if (!have_same_position)
     {
-        Application::the()->move_window(this, _bound.position());
+        Application::the().move_window(this, _bound.position());
     }
 
     if (!have_same_size)
@@ -75,7 +75,7 @@ Window::Window(WindowFlag flags)
 
     _update_invoker = own<Async::Invoker>([this] { update(); });
 
-    Application::the()->add_window(this);
+    Application::the().add_window(this);
     position({96, 72});
 }
 
@@ -86,7 +86,7 @@ Window::~Window()
         hide();
     }
 
-    Application::the()->remove_window(this);
+    Application::the().remove_window(this);
 }
 
 void Window::relayout()
@@ -164,7 +164,7 @@ void Window::flip(Math::Recti region)
     swap(frontbuffer, backbuffer);
     swap(frontbuffer_painter, backbuffer_painter);
 
-    Application::the()->flip_window(this, region);
+    Application::the().flip_window(this, region);
 }
 
 void Window::update()
@@ -230,7 +230,7 @@ void Window::show()
     swap(frontbuffer, backbuffer);
     swap(frontbuffer_painter, backbuffer_painter);
 
-    Application::the()->show_window(this);
+    Application::the().show_window(this);
 }
 
 void Window::hide()
@@ -243,7 +243,7 @@ void Window::hide()
     _update_invoker->cancel();
 
     _visible = false;
-    Application::the()->hide_window(this);
+    Application::the().hide_window(this);
 }
 
 Math::Border Window::resize_bound_containe(Math::Vec2i position)
@@ -657,7 +657,7 @@ void Window::cursor(CursorState state)
 
     if (cursor_state != state)
     {
-        Application::the()->window_change_cursor(this, state);
+        Application::the().window_change_cursor(this, state);
         cursor_state = state;
     }
 }

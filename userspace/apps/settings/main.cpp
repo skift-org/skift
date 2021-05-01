@@ -6,5 +6,5 @@ int main(int, char **)
 {
     auto window = new Settings::MainWindow();
     window->show();
-    return Widget::Application::the()->run();
+    return Widget::Application::the().run();
 }

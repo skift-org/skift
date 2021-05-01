@@ -143,5 +143,5 @@ int main(int, char **)
     win->resize_to_content();
     win->show();
 
-    return Application::the()->run();
+    return Application::the().run();
 }

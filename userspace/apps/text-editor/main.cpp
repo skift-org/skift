@@ -95,5 +95,5 @@ int main(int argc, char **argv)
     auto window = new TextWindow(path);
     window->show();
 
-    return Widget::Application::the()->run();
+    return Widget::Application::the().run();
 }

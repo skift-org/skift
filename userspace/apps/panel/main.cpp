@@ -8,5 +8,5 @@ int main(int, char **)
 {
     auto window = own<panel::PanelWindow>();
     window->show();
-    return Widget::Application::the()->run();
+    return Widget::Application::the().run();
 }

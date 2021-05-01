@@ -14,20 +14,22 @@ namespace Widget
 
 /* --- Context -------------------------------------------------------------- */
 
-static RefPtr<Application> _instance = nullptr;
+static Application *_instance = nullptr;
 
-RefPtr<Application> Application::the()
+Application &Application::the()
 {
     if (_instance == nullptr)
     {
-        _instance = make<Application>();
+        _instance = new Application();
     }
 
-    return _instance;
+    return *_instance;
 }
 
 Application::Application()
 {
+    _instance = this;
+
     _setting_theme = own<Settings::Setting>(
         "appearance:widgets.theme",
         [this](const Json::Value &value) {
@@ -84,6 +86,8 @@ Application::Application()
         Screen::bound(greetings.greetings.screen_bound);
     }
 }
+
+Application::~Application() {}
 
 /* --- IPC ------------------------------------------------------------------ */
 
@@ -349,6 +353,15 @@ Window *Application::get_window(int id)
 int Application::run()
 {
     Assert::is_false(_exiting);
+
+    auto window = build();
+
+    if (window != nullptr)
+    {
+        window->resize_to_content();
+        window->show();
+    }
+
     return loop().run();
 }
 

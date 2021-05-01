@@ -22,5 +22,5 @@ int main(int argc, char **argv)
 
     window->show();
 
-    return Widget::Application::the()->run();
+    return Widget::Application::the().run();
 }

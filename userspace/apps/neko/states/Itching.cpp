@@ -10,13 +10,13 @@ namespace neko
 {
 
 Itching::Itching()
-    : _last_mouse_position(Widget::Application::the()->mouse_position())
+    : _last_mouse_position(Widget::Application::the().mouse_position())
 {
 }
 
 void Itching::update(Neko &neko)
 {
-    auto new_mouse_position = Widget::Application::the()->mouse_position();
+    auto new_mouse_position = Widget::Application::the().mouse_position();
 
     if (_last_mouse_position.distance_to(new_mouse_position) > 16)
     {

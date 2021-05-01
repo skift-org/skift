@@ -64,11 +64,11 @@ int main(int, char **)
     window->on(Widget::Event::KEYBOARD_KEY_PRESS, [&](Widget::Event *event) {
         if (event->keyboard.key == KEYBOARD_KEY_ESC)
         {
-            Widget::Application::the()->exit(PROCESS_SUCCESS);
+            Widget::Application::the().exit(PROCESS_SUCCESS);
         }
     });
 
     window->show();
 
-    return Widget::Application::the()->run();
+    return Widget::Application::the().run();
 }

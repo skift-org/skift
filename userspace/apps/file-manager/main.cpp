@@ -13,5 +13,5 @@ int main(int, char **)
     navigation->go_home_dont_record_history();
     window->show();
 
-    return Widget::Application::the()->run();
+    return Widget::Application::the().run();
 }

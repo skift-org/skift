@@ -67,7 +67,7 @@ int main(int, char **)
                     }),
                     spacer(),
                     filled_button("Ok", [] {
-                        Application::the()->exit(PROCESS_SUCCESS);
+                        Application::the().exit(PROCESS_SUCCESS);
                     })
                 })
             )
@@ -78,5 +78,5 @@ int main(int, char **)
 
     win->show();
 
-    return Application::the()->run();
+    return Application::the().run();
 }

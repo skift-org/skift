@@ -1,6 +1,6 @@
 {
-    "name": "Exemple",
-    "comment": "A simple exemple application.",
-    "icon": "duck",
-    "command": "exemple"
+    "name": "Device Manager",
+    "comment": "Manage installed device on your system.",
+    "icon": "expansion-card-variant",
+    "command": "device-manager"
 }

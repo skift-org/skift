@@ -37,5 +37,5 @@ int main(int, char **)
 
     window->show();
 
-    return Widget::Application::the()->run();
+    return Widget::Application::the().run();
 }

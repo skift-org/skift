@@ -1,6 +1,0 @@
-{
-    "name": "Device Manager",
-    "comment": "Manage installed device on your system.",
-    "icon": "expansion-card-variant",
-    "command": "device-manager"
-}

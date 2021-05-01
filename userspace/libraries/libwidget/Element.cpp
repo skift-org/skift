@@ -530,7 +530,7 @@ void Element::repaint(Graphic::Painter &painter, Math::Recti rectangle)
     painter.transform(origin());
     painter.clip(bound());
 
-    if (Application::the()->show_wireframe())
+    if (Application::the().show_wireframe())
     {
         painter.fill_insets(bound(), _insets, Graphic::Colors::MAGENTA.with_alpha(0.25));
     }
@@ -549,7 +549,7 @@ void Element::repaint(Graphic::Painter &painter, Math::Recti rectangle)
         }
     }
 
-    if (Application::the()->show_wireframe())
+    if (Application::the().show_wireframe())
     {
         painter.draw_rectangle(bound(), Graphic::Colors::CYAN.with_alpha(0.25));
     }

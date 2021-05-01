@@ -130,7 +130,7 @@ int main(int, char **)
     auto set_current_page = [&](int index) {
         if (index == 5)
         {
-            Widget::Application::the()->exit(PROCESS_SUCCESS);
+            Widget::Application::the().exit(PROCESS_SUCCESS);
         }
 
         if (index < 0 || index > 4)
@@ -154,7 +154,7 @@ int main(int, char **)
     set_current_page(0);
 
     skipall_button->on(Widget::Event::ACTION, [](auto) {
-        Widget::Application::the()->exit(PROCESS_SUCCESS);
+        Widget::Application::the().exit(PROCESS_SUCCESS);
     });
 
     back_button->on(Widget::Event::ACTION, [&](auto) {
@@ -168,7 +168,7 @@ int main(int, char **)
     window->on(Widget::Event::KEYBOARD_KEY_PRESS, [&](Widget::Event *event) {
         if (event->keyboard.key == KEYBOARD_KEY_ESC)
         {
-            Widget::Application::the()->exit(PROCESS_SUCCESS);
+            Widget::Application::the().exit(PROCESS_SUCCESS);
         }
         else if (event->keyboard.key == KEYBOARD_KEY_RIGHT)
         {
@@ -180,5 +180,5 @@ int main(int, char **)
         }
     });
 
-    return Widget::Application::the()->run();
+    return Widget::Application::the().run();
 }

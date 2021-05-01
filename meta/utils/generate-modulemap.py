@@ -15,6 +15,15 @@ def log(msg):
     print(msg, file=sys.stderr)
 
 
+def find_module_export(file):
+    for line in file.readlines():
+        line = line.strip()
+        if line.startswith("export module ") or line.startswith("module "):
+            return line
+
+    return None
+
+
 for file_name in files:
     if file_name.endswith(".h"):
         module_name = file_name.replace(src_dir, "")
@@ -24,16 +33,12 @@ for file_name in files:
 
     elif file_name.endswith(".cppm"):
         with open(file_name) as f:
-            first_line = f.readline().strip()
+            module_export = find_module_export(f)
 
-            while not (first_line.startswith("export module ") or first_line.startswith("module ")):
-                first_line = f.readline().strip()
+            if module_export is None:
+                continue
 
-            if not first_line.startswith("export module "):
-                if not first_line.startswith("module "):
-                    panic("The file is not a valid module file")
-
-            module_name = first_line \
+            module_name = module_export \
                 .replace("export module ", "") \
                 .replace("module ", "") \
                 .replace(";", "")

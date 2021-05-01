@@ -32,11 +32,11 @@ for file_name in file_names:
 
         target_name = ""
 
-        if file_name.endswith(".cpp"):
+        if file_name.endswith(".c") or file_name.endswith(".h"):
+            continue
+        elif file_name.endswith(".cpp") or file_name.endswith(".cppm"):
             target_name = file_name.replace(
-                src_dir, dst_dir).replace(".cpp", ".o")
-        elif file_name.endswith(".h"):
-            target_name = file_name
+                src_dir, dst_dir) + ".o"
         else:
             panic(f"Unreconized file type: {file_name}")
 
@@ -48,10 +48,10 @@ for file_name in file_names:
             module_name = ""
 
             if line.startswith("import \""):
-                module_name = line.replace("import \"", "").replace("\"", "")
+                module_name = line.replace("import \"", "").replace("\";", "")
 
             elif line.startswith("import <"):
-                module_name = line.replace("import <", "").replace(">", "")
+                module_name = line.replace("import <", "").replace(">;", "")
 
             elif line.startswith("import "):
                 module_name = line.replace("import ", "").replace(";", "")

@@ -71,7 +71,7 @@ Both issue lists are sorted by total number of comments. While not perfect, numb
 
 In order to get your PR through the review process as fast as possible, here are some do's and don'ts to try to stick to:
 
-- Conform to the project [coding style](manual/meta/coding_style.md). Please use `clang-format` with the `.clang-format` file included with the project.
+- Conform to the project [coding style](coding_style.md). Please use `clang-format` with the `.clang-format` file included with the project.
 - When committing, the first line of your commit message should be "category: Brief description of what's being changed.". The "category" can be a subdirectory, but also something like "POSIX compliance" or "module-name". Whatever seems logical.
 - Don't touch anything outside the stated scope of the PR.
 - Don't iterate excessively on your design across multiple commits.

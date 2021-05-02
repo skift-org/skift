@@ -57,10 +57,21 @@ $(BUILDROOT)/userspace/libraries/lib$($(1)_NAME)/%.cppm.o: userspace/libraries/l
 	@echo [LIB$(1)] [CXX] $$<
 	@$(CXX) $(CXXFLAGS) $($(1)_CXXFLAGS) -c -o $$@ $$<
 
+ifneq ($(1), C)
 $(BUILDROOT)/userspace/libraries/lib$($(1)_NAME)/%.pch: userspace/libraries/lib$($(1)_NAME)/%.h
 	$$(DIRECTORY_GUARD)
 	@echo [LIB$(1)] [CXX] $$<
-	cd userspace/libraries/; $(CXX) -x c++ -fmodule-header $(CXXFLAGS) $$@
+
+	cd userspace/libraries/; \
+	$(CXX) -x c++-system-header $(CXXFLAGS) $$(patsubst userspace/libraries/%, %, $$<)
+else
+$(BUILDROOT)/userspace/libraries/%.pch: userspace/libraries/lib$($(1)_NAME)/%.h
+	$$(DIRECTORY_GUARD)
+	@echo [LIB$(1)] [CXX] $$<
+
+	cd userspace/libraries/; \
+	$(CXX) -x c++-system-header $(CXXFLAGS) $$(patsubst userspace/libraries/%, %, $$<)
+endif
 
 $(BUILDROOT)/userspace/libraries/lib$($(1)_NAME)/%.c.o: userspace/libraries/lib$($(1)_NAME)/%.c
 	$$(DIRECTORY_GUARD)

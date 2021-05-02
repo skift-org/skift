@@ -29,7 +29,10 @@ for file_name in files:
         module_name = file_name.replace(src_dir, "")
         module_path = (dst_dir + file_name.replace(src_dir, "")) \
             .replace(".h", ".pch")
-        print(f"{module_name} {module_path}")
+
+        module_name = module_name.replace("libc/", "")
+
+        print(f"./{module_name} {module_path}")
 
     elif file_name.endswith(".cppm"):
         with open(file_name) as f:

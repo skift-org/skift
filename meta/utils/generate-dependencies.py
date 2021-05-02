@@ -32,8 +32,13 @@ for file_name in file_names:
 
         target_name = ""
 
-        if file_name.endswith(".c") or file_name.endswith(".h"):
+        if file_name.endswith(".c"):
             continue
+
+        elif file_name.endswith(".h"):
+            target_name = file_name.replace(
+                src_dir, dst_dir).replace(".h", ".pch")
+
         elif file_name.endswith(".cpp") or file_name.endswith(".cppm"):
             target_name = file_name.replace(
                 src_dir, dst_dir) + ".o"
@@ -49,15 +54,32 @@ for file_name in file_names:
 
             if line.startswith("import \""):
                 module_name = line.replace("import \"", "").replace("\";", "")
+                module_name = "./" + module_name
 
             elif line.startswith("import <"):
                 module_name = line.replace("import <", "").replace(">;", "")
+                module_name = "./" + module_name
+
+            elif line.startswith("#include \""):
+                module_name = line.replace("#include \"", "").replace("\"", "")
+                module_name = "./" + module_name
+
+            elif line.startswith("#include <"):
+                module_name = line.replace("#include <", "").replace(">", "")
+                module_name = "./" + module_name
 
             elif line.startswith("import "):
                 module_name = line.replace("import ", "").replace(";", "")
 
             if module_name != "":
-                resolved_module_name = modules[module_name]
+                resolved_module_name = ""
+
+                if module_name in modules:
+                    resolved_module_name = modules[module_name]
+                else:
+                    resolved_module_name = (dst_dir + module_name.replace(
+                        ".h", ".pch")).replace("/./", "/")
+
                 resolved_module_name = resolved_module_name.replace(
                     ".gmc", ".module.o")
                 print(resolved_module_name, end=' ')

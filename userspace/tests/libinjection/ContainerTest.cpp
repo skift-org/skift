@@ -1,4 +1,4 @@
-#include <libinjection/Inject.h>
+#include <libinjection/Builder.h>
 
 #include "tests/Driver.h"
 #include "tests/libinjection/Asserts.h"
@@ -6,31 +6,37 @@
 #include "tests/libinjection/mock/NumberAndString.h"
 #include "tests/libinjection/mock/Zoo.h"
 
-TEST(injection_container_fetch_simple_type)
+namespace Injection
 {
-    Injection::Container container;
-    Injection::inject_singleton<Type42>(container);
+
+TEST(container_fetch_simple_type)
+{
+    Container container;
+    Builder{container}
+        .singleton<Type42>();
 
     auto instance = container.get<Type42>();
 
     Assert::equal(instance->func(), 42);
 }
 
-TEST(injection_container_fetch_type_behind_interface)
+TEST(container_fetch_type_behind_interface)
 {
-    Injection::Container container;
-    Injection::inject_singleton<Type42, NumericType>(container);
+    Container container;
+    Builder{container}
+        .singleton<Type42, NumericType>();
 
     auto instance = container.get<NumericType>();
 
     Assert::equal(instance->func(), 42);
 }
 
-TEST(injection_container_fetch_multiple_types)
+TEST(container_fetch_multiple_types)
 {
-    Injection::Container container;
-    Injection::inject_singleton<Type42, NumericType>(container);
-    Injection::inject_singleton<Type52, NumericType>(container);
+    Container container;
+    Builder{container}
+        .singleton<Type42, NumericType>()
+        .singleton<Type52, NumericType>();
 
     auto numeric_types = container.get_all<NumericType>();
 
@@ -39,10 +45,11 @@ TEST(injection_container_fetch_multiple_types)
     Assert::equal(numeric_types[1]->func(), 52);
 }
 
-TEST(injection_container_fetch_type_behind_multiple_interfaces)
+TEST(container_fetch_type_behind_multiple_interfaces)
 {
-    Injection::Container container;
-    Injection::inject_singleton<Type5Apple, NumericType, StringType>(container);
+    Container container;
+    Builder{container}
+        .singleton<Type5Apple, NumericType, StringType>();
 
     auto numeric_type = container.get<NumericType>();
     auto string_type = container.get<StringType>();
@@ -50,18 +57,19 @@ TEST(injection_container_fetch_type_behind_multiple_interfaces)
     Assert::not_null(numeric_type);
     Assert::not_null(string_type);
 
-    // Is it the same undelying Injection::Entity ?
+    // Is it the same undelying Entity ?
     assert_same_entity(numeric_type, string_type);
 
     Assert::equal(numeric_type->func(), 5);
     Assert::equal(string_type->string(), "apple");
 }
 
-TEST(injection_constructor_injection)
+TEST(constructor_injection)
 {
-    Injection::Container container;
-    Injection::inject_singleton<Car>(container);
-    Injection::inject_singleton<Engine>(container);
+    Container container;
+    Builder{container}
+        .singleton<Car>()
+        .singleton<Engine>();
 
     auto car = container.get<Car>();
     auto engine = container.get<Engine>();
@@ -73,17 +81,19 @@ TEST(injection_constructor_injection)
     assert_same_entity(car->_engine, engine);
 }
 
-TEST(injection_constructor_injection_list)
+TEST(constructor_injection_list)
 {
-    Injection::Container container;
-
-    Injection::inject_singleton<Lion, Animal>(container);
-    Injection::inject_singleton<Cat, Animal>(container);
-    Injection::inject_singleton<Dog, Animal>(container);
-    Injection::inject_singleton<Zoo>(container);
+    Container container;
+    Builder{container}
+        .singleton<Lion, Animal>()
+        .singleton<Cat, Animal>()
+        .singleton<Dog, Animal>()
+        .singleton<Zoo>();
 
     auto zoo = container.get<Zoo>();
 
     Assert::not_null(zoo);
     Assert::equal(zoo->_animals.count(), 3);
 }
+
+} // namespace Injection

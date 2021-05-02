@@ -1,25 +1,30 @@
 #include <libinjection/Entity.h>
 
+namespace Injection
+{
+
 struct EntityWithSimpleConstructor
 {
     EntityWithSimpleConstructor() {}
 };
 
-static_assert(!Injection::ContextInjectable<EntityWithSimpleConstructor>);
-static_assert(!Injection::ConstructorInjectable<EntityWithSimpleConstructor>);
+static_assert(!ContextInjectable<EntityWithSimpleConstructor>);
+static_assert(!ConstructorInjectable<EntityWithSimpleConstructor>);
 
 struct EntityWithContextInjection
 {
-    EntityWithContextInjection(Injection::Context &) {}
+    EntityWithContextInjection(Context &) {}
 };
 
-static_assert(Injection::ContextInjectable<EntityWithContextInjection>);
-static_assert(!Injection::ConstructorInjectable<EntityWithContextInjection>);
+static_assert(ContextInjectable<EntityWithContextInjection>);
+static_assert(!ConstructorInjectable<EntityWithContextInjection>);
 
 struct EntityWithConstructorInjection
 {
     INJECTOR(EntityWithConstructorInjection()) {}
 };
 
-static_assert(!Injection::ContextInjectable<EntityWithConstructorInjection>);
-static_assert(Injection::ConstructorInjectable<EntityWithConstructorInjection>);
+static_assert(!ContextInjectable<EntityWithConstructorInjection>);
+static_assert(ConstructorInjectable<EntityWithConstructorInjection>);
+
+} // namespace Injection

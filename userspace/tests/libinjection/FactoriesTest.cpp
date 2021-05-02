@@ -1,17 +1,21 @@
-#include <libinjection/Inject.h>
+#include <libinjection/Builder.h>
 
 #include "tests/Driver.h"
 #include "tests/libinjection/Asserts.h"
 
-struct TestStruct : public Injection::Entity
+namespace Injection
+{
+
+struct TestStruct : public Entity
 {
     int fun() { return 1234; }
 };
 
 TEST(simple_constructor_factory)
 {
-    Injection::Container container;
-    Injection::inject_transient<TestStruct>(container);
+    Container container;
+    Builder{container}
+        .transient<TestStruct>();
 
     auto fetched_instance = container.get<TestStruct>();
     Assert::not_null(fetched_instance);
@@ -20,10 +24,11 @@ TEST(simple_constructor_factory)
 
 TEST(constant_factory)
 {
-    Injection::Container container;
+    Container container;
+    Builder builder{container};
 
     auto original_instance = make<TestStruct>();
-    Injection::inject_transient<TestStruct>(container, original_instance);
+    builder.transient<TestStruct>(original_instance);
 
     auto fetched_instance = container.get<TestStruct>();
 
@@ -33,10 +38,13 @@ TEST(constant_factory)
 
 TEST(callback_factory)
 {
-    Injection::Container container;
-    Injection::inject_transient<TestStruct>(container, [](Injection::Context &) { return make<TestStruct>(); });
+    Container container;
+    Builder{container}
+        .transient<TestStruct>([](Context &) { return make<TestStruct>(); });
 
     auto fetched_instance = container.get<TestStruct>();
     Assert::not_null(fetched_instance);
     Assert::equal(fetched_instance->fun(), 1234);
 }
+
+} // namespace Injection

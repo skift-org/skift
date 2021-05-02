@@ -1,4 +1,4 @@
-#include <libinjection/Inject.h>
+#include <libinjection/Builder.h>
 
 #include "tests/Driver.h"
 #include "tests/libinjection/Asserts.h"
@@ -10,8 +10,10 @@ namespace Injection
 TEST(container_fetch_transient)
 {
     Container container;
-    inject_transient<Type42>(container);
-    inject_transient<Type42>(container);
+    Builder builder{container};
+
+    builder.transient<Type42>();
+    builder.transient<Type42>();
 
     auto types = container.get_all<Type42>();
 

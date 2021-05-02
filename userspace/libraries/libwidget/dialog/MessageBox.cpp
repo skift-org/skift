@@ -31,14 +31,12 @@ void MessageBox::render(Window *window)
 {
     window->size(Math::Vec2i(300, 200));
 
-    window->root()->DONT_USE_ME_layout(VFLOW(0));
     window->root()->insets(Insetsi(8));
 
     auto message_label = window->root()->add(label(_message, Anchor::CENTER));
     message_label->flags(Element::FILL);
 
     auto container = window->root()->add<Element>();
-    container->DONT_USE_ME_layout(HFLOW(4));
 
     container->add(spacer());
 

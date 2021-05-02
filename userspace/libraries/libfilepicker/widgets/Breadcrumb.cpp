@@ -12,8 +12,6 @@ Breadcrumb::Breadcrumb(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmark
     : _navigation(navigation),
       _bookmarks(bookmarks)
 {
-    DONT_USE_ME_layout(HFLOW(0));
-
     _icon_computer = Graphic::Icon::get("laptop");
     _icon_expand = Graphic::Icon::get("chevron-right");
     _icon_bookmark = Graphic::Icon::get("bookmark");

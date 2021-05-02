@@ -18,8 +18,6 @@ public:
     {
         size(Math::Vec2i(700, 500));
 
-        root()->DONT_USE_ME_layout(VFLOW(0));
-
         root()->add(Widget::titlebar(Graphic::Icon::get("folder"), "File Manager"));
 
         root()->add<FilePicker::ToolBar>(navigation, bookmarks);
@@ -27,7 +25,6 @@ public:
         auto bookmarks_and_browser = root()->add<Widget::Element>();
 
         bookmarks_and_browser->flags(Widget::Element::FILL);
-        bookmarks_and_browser->DONT_USE_ME_layout(HFLOW(1));
 
         auto jump_list = bookmarks_and_browser->add<FilePicker::JumpList>(navigation, bookmarks);
 

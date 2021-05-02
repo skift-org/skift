@@ -21,7 +21,6 @@ QuickSettingsWindow::QuickSettingsWindow()
         bound(Widget::Screen::bound().take_right(WIDTH).shrinked({PanelWindow::HEIGHT, 0, 0, 0}).with_height(HEIGHT));
     });
 
-    root()->DONT_USE_ME_layout(VFLOW(4));
     root()->insets(6);
 
     auto title = root()->add(Widget::label("Quick settings"));
@@ -39,7 +38,6 @@ QuickSettingsWindow::QuickSettingsWindow()
     }));
 
     auto account_container = root()->add<Widget::Element>();
-    account_container->DONT_USE_ME_layout(HFLOW(4));
 
     account_container->add(Widget::basic_button(Graphic::Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string()));
 

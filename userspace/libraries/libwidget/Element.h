@@ -18,46 +18,6 @@ namespace Widget
 
 struct Window;
 
-struct Layout
-{
-    enum Type
-    {
-        STACK,
-        VFLOW,
-        HFLOW,
-    };
-
-    Type type;
-
-    int hcell;
-    int vcell;
-    Math::Vec2i spacing;
-};
-
-#define STACK()                  \
-    (::Widget::Layout{           \
-        ::Widget::Layout::STACK, \
-        0,                       \
-        0,                       \
-        Math::Vec2i::zero(),     \
-    })
-
-#define VFLOW(_vspacing)             \
-    (::Widget::Layout{               \
-        ::Widget::Layout::VFLOW,     \
-        0,                           \
-        0,                           \
-        Math::Vec2i(0, (_vspacing)), \
-    })
-
-#define HFLOW(_hspacing)             \
-    (::Widget::Layout{               \
-        ::Widget::Layout::HFLOW,     \
-        0,                           \
-        0,                           \
-        Math::Vec2i((_hspacing), 0), \
-    })
-
 #define WIDGET_BUILDER(__type, __name)                    \
     template <typename... TArgs>                          \
     ::RefPtr<__type> __name(TArgs &&...args)              \
@@ -78,7 +38,6 @@ private:
     int _min_height = 0;
     int _min_width = 0;
 
-    Layout _layout{};
     Insetsi _outsets{};
     Insetsi _insets{};
     Math::Vec2i _content_scroll{};
@@ -96,8 +55,6 @@ private:
     Vector<RefPtr<Element>> _childs = {};
 
 public:
-    void DONT_USE_ME_layout(Layout layout) { _layout = layout; }
-
     static constexpr auto FILL = (1 << 0);
     static constexpr auto GREEDY = (1 << 1);
     static constexpr auto SQUARE = (1 << 2);

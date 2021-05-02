@@ -43,8 +43,6 @@ public:
     {
         size(Math::Vec2i(700, 500));
 
-        root()->DONT_USE_ME_layout(VFLOW(0));
-
         _title_bar = Widget::titlebar(Graphic::Icon::get("text-box"), "Text Editor");
         root()->add(_title_bar);
 
@@ -65,7 +63,6 @@ public:
     {
         auto toolbar = parent->add(Widget::panel());
 
-        toolbar->DONT_USE_ME_layout(HFLOW(4));
         toolbar->insets(Insetsi(4, 4));
 
         _open_document = toolbar->add(Widget::basic_button(Graphic::Icon::get("folder-open"), [&] {

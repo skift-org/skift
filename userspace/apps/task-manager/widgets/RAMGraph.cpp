@@ -14,12 +14,10 @@ RAMGraph::RAMGraph(RefPtr<TaskModel> model)
     : Graph(256, Graphic::Colors::ROYALBLUE),
       _model(model)
 {
-    DONT_USE_ME_layout(VFLOW(0));
     insets(Insetsi(8));
     flags(Element::FILL);
 
     auto icon_and_text = add<Widget::Element>();
-    icon_and_text->DONT_USE_ME_layout(HFLOW(4));
     icon_and_text->add(Widget::icon("chip"));
     icon_and_text->add(Widget::label("Memory"));
 

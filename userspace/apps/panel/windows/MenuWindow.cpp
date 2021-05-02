@@ -20,11 +20,9 @@ MenuWindow::MenuWindow()
         bound(Widget::Screen::bound().with_width(WIDTH).shrinked({PanelWindow::HEIGHT, 0, 0, 0}));
     });
 
-    root()->DONT_USE_ME_layout(HFLOW(0));
     root()->insets(6);
 
     auto container = root()->add<Widget::Element>();
-    container->DONT_USE_ME_layout(VFLOW(0));
     container->flags(Widget::Element::FILL);
 
     auto model = Widget::TextModel::empty();

@@ -11,7 +11,6 @@ namespace panel
 
 ApplicationListing::ApplicationListing()
 {
-    DONT_USE_ME_layout(VFLOW(4));
     flags(Element::FILL);
 
     render();
@@ -34,7 +33,6 @@ void ApplicationListing::render()
     FuzzyMatcher matcher;
 
     host()->clear();
-    host()->DONT_USE_ME_layout(VFLOW(4));
 
     bool find_any = false;
 

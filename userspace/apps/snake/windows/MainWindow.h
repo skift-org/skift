@@ -11,12 +11,9 @@ namespace Snake
 
 class MainWindow : public Widget::Window
 {
-private:
 public:
     MainWindow()
     {
-        root()->DONT_USE_ME_layout(VFLOW(0));
-
         root()->add(Widget::titlebar(Graphic::Icon::get("snake"), "Snake"));
 
         auto board = root()->add<BoardWidget>();

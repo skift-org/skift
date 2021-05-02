@@ -63,8 +63,6 @@ public:
 
         _document = document;
 
-        root()->DONT_USE_ME_layout(VFLOW(0));
-
         root()->add(Widget::titlebar(Graphic::Icon::get("brush"), "Paint"));
 
         create_toolbar(root());
@@ -83,7 +81,6 @@ public:
     {
         auto toolbar = parent->add(Widget::panel());
 
-        toolbar->DONT_USE_ME_layout(HFLOW(4));
         toolbar->insets(Insetsi(4, 4));
 
         _open_document = toolbar->add(Widget::basic_button(Graphic::Icon::get("folder-open")));
@@ -148,12 +145,9 @@ public:
     {
         auto palette = parent->add(Widget::panel());
 
-        palette->DONT_USE_ME_layout(HFLOW(4));
         palette->insets(Insetsi(4, 4));
         palette->max_height(38);
         palette->min_height(38);
-
-        palette->DONT_USE_ME_layout(HFLOW(4));
 
         for (size_t i = 0; i < AERAY_LENGTH(_color_palette); i++)
         {

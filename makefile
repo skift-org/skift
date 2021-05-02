@@ -39,8 +39,6 @@ CXX_WARNINGS := \
 	-Wnon-virtual-dtor \
 	-Woverloaded-virtual
 
-CXX_MODULE_MAPPER:=$(BUILDROOT)/global.modulemap
-
 BUILD_INCLUDE:= \
 	-I. \
 	-Ikernel \
@@ -73,8 +71,6 @@ CFLAGS= \
 
 CXXFLAGS:= \
 	-std=c++20 \
-	-fmodules-ts \
-	-fmodule-mapper=$(CXX_MODULE_MAPPER) \
 	-MD \
 	--sysroot=$(SYSROOT) \
 	$(CONFIG_OPTIMISATIONS) \
@@ -166,4 +162,4 @@ clean-fs:
 	rm -rf $(SYSROOT)
 
 -include $(wildcard meta/make/*.mk)
--include $(DEPENDENCIES) $(OBJECTS:.o=.d)
+-include $(OBJECTS:.o=.d)

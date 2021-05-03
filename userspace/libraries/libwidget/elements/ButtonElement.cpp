@@ -130,7 +130,7 @@ RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Icon> icon, String text, Call
         spacing({0, 0, 12, 16},
                 Widget::hflow({
                     spacing({0, 0, 0, 8}, Widget::icon(icon)),
-                    Widget::label(text, Anchor::CENTER),
+                    Widget::label(text),
                 })),
         on_click);
 }
@@ -142,7 +142,7 @@ RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Bitmap> image, String text, C
         spacing({0, 0, 12, 16},
                 Widget::hflow({
                     spacing({0, 0, 0, 8}, Widget::image(image, Graphic::BitmapScaling::CENTER)),
-                    Widget::label(text, Anchor::CENTER),
+                    Widget::label(text),
                 })),
         on_click);
 }
@@ -171,7 +171,7 @@ RefPtr<ButtonElement> outline_button(String text, Callback<void(void)> on_click)
     return button(
         ButtonElement::OUTLINE,
         spacing({0, 16},
-                Widget::label(text)),
+                Widget::label(text, Anchor::CENTER)),
         on_click);
 }
 
@@ -182,7 +182,7 @@ RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, String text, Ca
         spacing({0, 0, 12, 16},
                 Widget::hflow({
                     spacing({0, 0, 0, 8}, Widget::icon(icon)),
-                    Widget::label(text, Anchor::CENTER),
+                    Widget::label(text),
                 })),
         on_click);
 }
@@ -222,7 +222,7 @@ RefPtr<ButtonElement> filled_button(RefPtr<Graphic::Icon> icon, String text, Cal
         spacing({0, 0, 12, 16},
                 Widget::hflow({
                     spacing({0, 0, 0, 8}, Widget::icon(icon)),
-                    Widget::label(text, Anchor::CENTER),
+                    Widget::label(text),
                 })),
         on_click);
 }

@@ -84,11 +84,6 @@ void Element::layout()
 
 void Element::relayout()
 {
-    if (childs().empty())
-    {
-        return;
-    }
-
     layout();
 
     for (auto &child : childs())

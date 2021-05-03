@@ -26,6 +26,8 @@ private:
 
     void flatten(const Path &path, const Math::Mat3x2f &transform);
 
+    void flatten(const EdgeList &edges, const Math::Mat3x2f &transform);
+
     void rasterize(Paint &paint);
 
 public:
@@ -35,7 +37,9 @@ public:
 
     Math::Recti get_clip();
 
-    void fill(Path &path, const Math::Mat3x2f &transform, Paint paint);
+    void fill(const Path &path, const Math::Mat3x2f &transform, Paint paint);
+
+    void fill(const EdgeList &edges, const Math::Mat3x2f &transform, Paint paint);
 };
 
 } // namespace Graphic

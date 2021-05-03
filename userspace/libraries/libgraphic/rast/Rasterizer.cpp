@@ -54,6 +54,15 @@ void Rasterizer::flatten(const Path &path, const Math::Mat3x2f &transform)
     }
 }
 
+void Rasterizer::flatten(const EdgeList &edges, const Math::Mat3x2f &transform)
+{
+    for (auto &edge : edges.edges())
+    {
+        _edges.append(transform.apply(edge.start()));
+        _edges.append(transform.apply(edge.end()));
+    }
+}
+
 void Rasterizer::rasterize(Paint &paint)
 {
     auto line = [&](float start, float end) {
@@ -130,10 +139,17 @@ void Rasterizer::rasterize(Paint &paint)
     }
 }
 
-void FLATTEN Rasterizer::fill(Path &path, const Math::Mat3x2f &transform, Paint paint)
+void FLATTEN Rasterizer::fill(const Path &path, const Math::Mat3x2f &transform, Paint paint)
 {
     clear();
     flatten(path, transform);
+    rasterize(paint);
+}
+
+void FLATTEN Rasterizer::fill(const EdgeList &edges, const Math::Mat3x2f &transform, Paint paint)
+{
+    clear();
+    flatten(edges, transform);
     rasterize(paint);
 }
 

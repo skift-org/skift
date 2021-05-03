@@ -66,7 +66,7 @@ public:
         return Math::Recti::from_two_point(_min, _max + Math::Vec2i{1});
     }
 
-    Vector<Math::Edgef> const &edges()
+    Vector<Math::Edgef> const &edges() const
     {
         return _edges;
     }

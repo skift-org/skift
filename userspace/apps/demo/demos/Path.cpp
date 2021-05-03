@@ -1,6 +1,6 @@
 #include <libgraphic/rast/Rasterizer.h>
 
-#include "demo/demos/Demos.h"
+#include "demo/Demo.h"
 
 void draw_path(Graphic::Painter &painter, const Graphic::Path &path, Math::Mat3x2f transform, Graphic::Color color)
 {

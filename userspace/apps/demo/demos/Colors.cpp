@@ -1,4 +1,4 @@
-#include "demo/demos/Demos.h"
+#include "demo/Demo.h"
 
 void colors_draw(Graphic::Painter &painter, Math::Recti screen, float time)
 {

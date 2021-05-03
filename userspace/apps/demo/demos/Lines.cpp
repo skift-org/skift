@@ -1,6 +1,6 @@
 #include <libutils/Random.h>
 
-#include "demo/demos/Demos.h"
+#include "demo/Demo.h"
 
 struct Line
 {

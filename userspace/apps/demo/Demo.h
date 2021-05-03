@@ -1,8 +1,6 @@
 #pragma once
 
-#include <libasync/Timer.h>
-#include <libwidget/Application.h>
-#include <libwidget/Element.h>
+#include <libgraphic/Painter.h>
 
 void colors_draw(Graphic::Painter &painter, Math::Recti screen, float time);
 
@@ -12,10 +10,10 @@ void lines_draw(Graphic::Painter &painter, Math::Recti screen, float time);
 
 void path_draw(Graphic::Painter &Painter, Math::Recti screen, float time);
 
-typedef void (*DrawDemoCallback)(Graphic::Painter &painter, Math::Recti screen, float time);
+using DemoCallback = void (*)(Graphic::Painter &painter, Math::Recti screen, float time);
 
 struct Demo
 {
     const char *name;
-    DrawDemoCallback callback;
+    DemoCallback callback;
 };

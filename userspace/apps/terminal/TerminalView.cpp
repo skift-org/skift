@@ -5,12 +5,37 @@
 #include <libwidget/Event.h>
 #include <libwidget/Window.h>
 
-#include "terminal/Common.h"
-#include "terminal/TerminalWidget.h"
+#include "terminal/TerminalView.h"
 
 #define TERMINAL_IO_BUFFER_SIZE 4096
 
-TerminalWidget::TerminalWidget()
+static Widget::ThemeColorRole _color_to_role[Terminal::_COLOR_COUNT] = {
+    [Terminal::BLACK] = Widget::THEME_ANSI_BLACK,
+    [Terminal::RED] = Widget::THEME_ANSI_RED,
+    [Terminal::GREEN] = Widget::THEME_ANSI_GREEN,
+    [Terminal::YELLOW] = Widget::THEME_ANSI_YELLOW,
+    [Terminal::BLUE] = Widget::THEME_ANSI_BLUE,
+    [Terminal::MAGENTA] = Widget::THEME_ANSI_MAGENTA,
+    [Terminal::CYAN] = Widget::THEME_ANSI_CYAN,
+    [Terminal::GREY] = Widget::THEME_ANSI_WHITE,
+    [Terminal::BRIGHT_BLACK] = Widget::THEME_ANSI_BRIGHT_BLACK,
+    [Terminal::BRIGHT_RED] = Widget::THEME_ANSI_BRIGHT_RED,
+    [Terminal::BRIGHT_GREEN] = Widget::THEME_ANSI_BRIGHT_GREEN,
+    [Terminal::BRIGHT_YELLOW] = Widget::THEME_ANSI_BRIGHT_YELLOW,
+    [Terminal::BRIGHT_BLUE] = Widget::THEME_ANSI_BRIGHT_BLUE,
+    [Terminal::BRIGHT_MAGENTA] = Widget::THEME_ANSI_BRIGHT_MAGENTA,
+    [Terminal::BRIGHT_CYAN] = Widget::THEME_ANSI_BRIGHT_CYAN,
+    [Terminal::BRIGHT_GREY] = Widget::THEME_ANSI_BRIGHT_WHITE,
+    [Terminal::FOREGROUND] = Widget::THEME_ANSI_FOREGROUND,
+    [Terminal::BACKGROUND] = Widget::THEME_ANSI_BACKGROUND,
+};
+
+Graphic::Color TerminalView::cell_color(Terminal::Color terminal_color)
+{
+    return theme_get_color(_color_to_role[terminal_color]);
+}
+
+TerminalView::TerminalView()
 {
     _terminal = own<Terminal::Terminal>(80, 24);
 
@@ -36,9 +61,63 @@ TerminalWidget::TerminalWidget()
     launchpad_handle(shell_launchpad, _terminal_device.client, 1);
     launchpad_handle(shell_launchpad, _terminal_device.client, 2);
     launchpad_launch(shell_launchpad, nullptr);
+
+    font(Graphic::Font::get("mono").unwrap());
 }
 
-void TerminalWidget::paint(Graphic::Painter &painter, const Math::Recti &dirty)
+void TerminalView::paint_cell(
+    Graphic::Painter &painter,
+    int x,
+    int y,
+    Codepoint codepoint,
+    Terminal::Color foreground,
+    Terminal::Color background,
+    Terminal::Attributes attributes)
+{
+    Math::Recti bound = cell_bound(x, y);
+
+    if (attributes.invert)
+    {
+        swap(foreground, background);
+    }
+
+    if (background != Terminal::BACKGROUND)
+    {
+        painter.clear(bound, cell_color(background));
+    }
+
+    if (attributes.underline)
+    {
+        painter.draw_line(
+            bound.position() + Math::Vec2i(0, 14),
+            bound.position() + Math::Vec2i(bound.width(), 14),
+            cell_color(foreground));
+    }
+
+    if (codepoint == U' ')
+    {
+        return;
+    }
+
+    auto &glyph = font()->glyph(codepoint);
+
+    painter.draw_glyph(
+        *font(),
+        glyph,
+        bound.position() + Math::Vec2i(0, 13),
+        cell_color(foreground));
+
+    if (attributes.bold)
+    {
+        painter.draw_glyph(
+            *font(),
+            glyph,
+            bound.position() + Math::Vec2i(1, 13),
+            cell_color(foreground));
+    }
+}
+
+void TerminalView::paint(Graphic::Painter &painter, const Math::Recti &dirty)
 {
     painter.push();
     painter.transform({0, -_scroll_offset});
@@ -48,7 +127,7 @@ void TerminalWidget::paint(Graphic::Painter &painter, const Math::Recti &dirty)
         for (int x = 0; x < _terminal->width(); x++)
         {
             Terminal::Cell cell = _terminal->surface().at(x, y + _scroll_offset / cell_size().y());
-            render_cell(painter, x, y + _scroll_offset / cell_size().y(), cell);
+            paint_cell(painter, x, y + _scroll_offset / cell_size().y(), cell);
             _terminal->surface().undirty(x, y);
         }
     }
@@ -64,7 +143,7 @@ void TerminalWidget::paint(Graphic::Painter &painter, const Math::Recti &dirty)
         {
             if (_cursor_blink)
             {
-                render_cell(
+                paint_cell(
                     painter,
                     cx,
                     cy + _scroll_offset / cell_size().y(),
@@ -75,12 +154,12 @@ void TerminalWidget::paint(Graphic::Painter &painter, const Math::Recti &dirty)
             }
             else
             {
-                render_cell(painter, cx, cy + _scroll_offset / cell_size().y(), cell);
+                paint_cell(painter, cx, cy + _scroll_offset / cell_size().y(), cell);
             }
         }
         else
         {
-            render_cell(painter, cx, cy, cell);
+            paint_cell(painter, cx, cy, cell);
             painter.draw_rectangle(cell_bound(cx, cy), color(Widget::THEME_ANSI_CURSOR));
         }
     }
@@ -88,7 +167,7 @@ void TerminalWidget::paint(Graphic::Painter &painter, const Math::Recti &dirty)
     painter.pop();
 }
 
-void TerminalWidget::event(Widget::Event *event)
+void TerminalView::event(Widget::Event *event)
 {
     auto send_sequence = [&](auto sequence) {
         _terminal_device.server.write(sequence, strlen(sequence));
@@ -100,6 +179,10 @@ void TerminalWidget::event(Widget::Event *event)
         _scroll_offset += 48 * event->mouse.scroll;
         _scroll_offset = clamp(_scroll_offset, -_terminal->surface().scrollback() * cell_size().y(), 0);
         should_repaint();
+    }
+    else if (event->type == Widget::Event::MOUSE_BUTTON_PRESS)
+    {
+        focus();
     }
     else if (event->type == Widget::Event::KEYBOARD_KEY_TYPED)
     {
@@ -206,13 +289,15 @@ void TerminalWidget::event(Widget::Event *event)
     }
 }
 
-void TerminalWidget::layout()
+void TerminalView::layout()
 {
     int width = bound().width() / cell_size().x();
     int height = bound().height() / cell_size().y();
 
     width = MAX(width, 8);
     height = MAX(height, 8);
+
+    IO::logln("Resize {}x{}", width, height);
 
     if (_terminal->width() != width || _terminal->height() != height)
     {
@@ -223,14 +308,14 @@ void TerminalWidget::layout()
     }
 }
 
-void TerminalWidget::handle_read()
+void TerminalView::handle_read()
 {
     char buffer[TERMINAL_IO_BUFFER_SIZE];
     auto read_result = _terminal_device.server.read(buffer, TERMINAL_IO_BUFFER_SIZE);
 
     if (!read_result.success())
     {
-        IO::logln("Terminal: read from server failed: %s", read_result.description());
+        IO::logln("Terminal: Read from server failed: %s", read_result.description());
         return;
     }
 

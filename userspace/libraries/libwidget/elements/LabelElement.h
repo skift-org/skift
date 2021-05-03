@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libutils/String.h>
-#include <libwidget/elements/StatefullElement.h>
+#include <libwidget/elements/StatefulElement.h>
 
 namespace Widget
 {
@@ -13,7 +13,7 @@ struct LabelState
 };
 
 struct LabelElement :
-    public StatefullElement<LabelState>
+    public StatefulElement<LabelState>
 {
     void text(String text)
     {

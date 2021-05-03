@@ -6,7 +6,7 @@ namespace Widget
 {
 
 template <typename TState>
-class StatefullElement : public Element
+class StatefulElement : public Element
 {
 private:
     TState _state = {};

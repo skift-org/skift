@@ -2,12 +2,12 @@
 
 #include <libasync/Timer.h>
 
-#include <libwidget/components/Statefull.h>
+#include <libwidget/Components.h>
 
 namespace panel
 {
 
-class DateAndTime : public Widget::Statefull<DateTime>
+class DateAndTime : public Widget::Stateful<DateTime>
 {
 private:
     OwnPtr<Async::Timer> _timer;

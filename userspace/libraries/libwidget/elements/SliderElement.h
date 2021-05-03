@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libwidget/elements/StatefullElement.h>
+#include <libwidget/elements/StatefulElement.h>
 
 namespace Widget
 {
 
-class SliderElement : public StatefullElement<double>
+class SliderElement : public StatefulElement<double>
 {
 private:
     int icon_size();

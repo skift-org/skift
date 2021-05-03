@@ -6,7 +6,7 @@
 namespace panel
 {
 
-class SettingToggle : public Widget::Statefull<bool>
+class SettingToggle : public Widget::Stateful<bool>
 {
 private:
     String _name;

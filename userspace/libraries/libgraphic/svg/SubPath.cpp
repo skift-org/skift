@@ -318,7 +318,7 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Math::Vec2f poi
         dx = cosf(a);
         dy = sinf(a);
 
-        auto p = t.apply({dx * rx, dy * ry});
+        auto p = t.apply(Math::Vec2f{dx * rx, dy * ry});
         auto tan = t.apply_no_translation({-dy * rx * kappa, dx * ry * kappa});
 
         if (i > 0)

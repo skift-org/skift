@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libmath/CubicBezier.h>
+#include <libmath/Edge.h>
 #include <libmath/Vec2.h>
 
 #include <math.h>
@@ -146,14 +147,6 @@ public:
         };
     }
 
-    ALWAYS_INLINE Vec2<Scalar> apply(const Vec2<Scalar> &v) const
-    {
-        return {
-            v.x() * _m[0] + v.y() * _m[2] + _m[4],
-            v.x() * _m[1] + v.y() * _m[3] + _m[5],
-        };
-    }
-
     ALWAYS_INLINE CubicBezier<Scalar> apply(const CubicBezier<Scalar> &b) const
     {
         return {
@@ -161,6 +154,22 @@ public:
             apply(b.cp1()),
             apply(b.cp2()),
             apply(b.end()),
+        };
+    }
+
+    ALWAYS_INLINE CubicBezier<Scalar> apply(const Edge<Scalar> &e) const
+    {
+        return {
+            apply(e.start()),
+            apply(e.end()),
+        };
+    }
+
+    ALWAYS_INLINE Vec2<Scalar> apply(const Vec2<Scalar> &v) const
+    {
+        return {
+            v.x() * _m[0] + v.y() * _m[2] + _m[4],
+            v.x() * _m[1] + v.y() * _m[3] + _m[5],
         };
     }
 

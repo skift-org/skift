@@ -6,8 +6,6 @@
 #include <libmath/Mat3x2.h>
 #include <libutils/Array.h>
 
-#define STATESTACK_SIZE 32
-
 namespace Graphic
 {
 
@@ -31,6 +29,8 @@ struct SourceDestionation
 class Painter
 {
 private:
+    static constexpr auto STATESTACK_SIZE = 32;
+
     RefPtr<Bitmap> _bitmap;
     int _state_stack_top = 0;
     Array<PainterState, STATESTACK_SIZE> _state_stack;

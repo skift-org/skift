@@ -10,17 +10,30 @@
 namespace Graphic
 {
 
+struct RasterizeState
+{
+    Math::Vec2i origin;
+    Math::Recti clip;
+};
+
 class Rasterizer
 {
 private:
+    NONCOPYABLE(Rasterizer);
+    NONMOVABLE(Rasterizer);
+
+    static constexpr auto STATESTACK_SIZE = 32;
     static constexpr auto TOLERANCE = 0.25f;
     static constexpr auto MAX_DEPTH = 8;
 
     RefPtr<Bitmap> _bitmap;
     EdgeList _edges;
     Vector<Math::Edgef> _actives_edges;
-    Optional<Math::Recti> _clip;
     Vector<uint16_t> _scanline;
+
+    Array<RasterizeState, STATESTACK_SIZE> _stats{};
+
+    int _top = 0;
 
     void clear();
 
@@ -33,9 +46,17 @@ private:
 public:
     Rasterizer(RefPtr<Bitmap> bitmap);
 
-    void set_clip(Math::Recti c);
+    void push();
 
-    Math::Recti get_clip();
+    void pop();
+
+    void clip(Math::Recti c);
+
+    Math::Recti clip();
+
+    void origin(Math::Vec2i o);
+
+    Math::Vec2i origin();
 
     void fill(const Path &path, const Math::Mat3x2f &transform, Paint paint);
 

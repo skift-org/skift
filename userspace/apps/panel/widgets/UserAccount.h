@@ -13,4 +13,6 @@ public:
     RefPtr<Widget::Element> build() override;
 };
 
+WIDGET_BUILDER(UserAccount, user_account);
+
 } // namespace panel

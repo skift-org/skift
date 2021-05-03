@@ -20,6 +20,8 @@ public:
     static constexpr int HEIGHT = 38;
 
     PanelWindow();
+
+    RefPtr<Widget::Element> build() override;
 };
 
 } // namespace panel

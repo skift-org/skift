@@ -12,6 +12,8 @@ public:
     static constexpr int HEIGHT = 320;
 
     QuickSettingsWindow();
+
+    RefPtr<Widget::Element> build() override;
 };
 
 } // namespace panel

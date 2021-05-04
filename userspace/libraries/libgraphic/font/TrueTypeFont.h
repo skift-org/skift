@@ -4,7 +4,7 @@
 #include <libutils/Endian.h>
 #include <stdint.h>
 
-namespace Graphic::Font
+namespace Graphic::SuperCoolFont
 {
 using TrueTypeVersion = Math::Vec2<be_uint16_t>;
 using TrueTypeFixed = Math::Vec2<be_uint16_t>;
@@ -88,4 +88,4 @@ enum TrueTypeMappingFormat : uint16_t
     TT_MAPPING_FMT_MANY_TO_ONE = 13,
     TT_MAPPING_FMT_UNICODE_VARIATIONS = 14
 };
-} // namespace Graphic::Font
+} // namespace Graphic::SuperCoolFont

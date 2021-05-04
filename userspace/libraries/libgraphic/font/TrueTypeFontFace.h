@@ -8,7 +8,7 @@
 #include <libutils/Vector.h>
 #include <libutils/unicode/Codepoint.h>
 
-namespace Graphic::Font
+namespace Graphic::SuperCoolFont
 {
 
 class TrueTypeFontFace : public FontFace
@@ -45,4 +45,4 @@ public:
     virtual FontStyle style() override;
     virtual Optional<Glyph> glyph(Codepoint c) override;
 };
-} // namespace Graphic::Font
+} // namespace Graphic::SuperCoolFont

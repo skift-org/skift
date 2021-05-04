@@ -3,7 +3,7 @@
 #include <libgraphic/font/FontFace.h>
 #include <libio/Reader.h>
 
-namespace Graphic::Font
+namespace Graphic::SuperCoolFont
 {
 ResultOr<RefPtr<FontFace>> load(IO::Reader &reader);
-} // namespace Graphic::Font
+} // namespace Graphic::SuperCoolFont

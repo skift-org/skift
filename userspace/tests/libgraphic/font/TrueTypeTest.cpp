@@ -7,6 +7,6 @@ TEST(font_load_truetype)
 {
     IO::File file("/Files/Tests/font/Roboto-Regular.ttf", OPEN_READ);
     Assert::is_true(file.exist());
-    auto result = Graphic::Font::load(file);
+    auto result = Graphic::SuperCoolFont::load(file);
     Assert::equal(result.result(), Result::SUCCESS);
 }

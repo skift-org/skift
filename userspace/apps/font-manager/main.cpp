@@ -1,19 +1,12 @@
 #include <libwidget/Application.h>
-#include <libwidget/Components.h>
-#include <libwidget/Window.h>
 
-int main(int, char **)
+#include "font-manager/FontManagerWindow.h"
+
+int main(int argc, char **argv)
 {
-    Widget::Window *window = new Widget::Window(WINDOW_RESIZABLE);
-    window->size(Math::Vec2i(500, 400));
-
-    window->root()->add(Widget::titlebar(Graphic::Icon::get("font-format"), "Font manager"));
-
-    auto navbar = window->root()->add<Widget::Element>();
-
-    navbar->insets(Insetsi(4, 4));
-
+    const char *path = argc > 1 ? argv[1] : "";
+    auto window = new FontManagerWindow(path);
     window->show();
 
-    return Widget::Application::the().run();
+    return Application::the().run();
 }

@@ -4,7 +4,7 @@
 #include <libio/Reader.h>
 #include <libutils/unicode/Codepoint.h>
 
-namespace Graphic::Font
+namespace Graphic::SuperCoolFont
 {
 enum FontStyle
 {
@@ -20,4 +20,4 @@ public:
     virtual FontStyle style() = 0;
     virtual Optional<Glyph> glyph(Codepoint c) = 0;
 };
-} // namespace Graphic::Font
+} // namespace Graphic::SuperCoolFont

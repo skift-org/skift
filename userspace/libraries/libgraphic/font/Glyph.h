@@ -4,7 +4,7 @@
 #include <libmath/Rect.h>
 #include <libgraphic/rast/EdgeList.h>
 
-namespace Graphic::Font
+namespace Graphic::SuperCoolFont
 {
 struct Glyph
 {
@@ -12,4 +12,4 @@ struct Glyph
     Math::Recti bounds;
     EdgeList edges;
 };
-} // namespace Graphic::Font
+} // namespace Graphic::SuperCoolFont

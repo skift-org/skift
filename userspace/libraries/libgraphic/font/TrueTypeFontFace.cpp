@@ -30,9 +30,9 @@ constexpr uint32_t TABLE_TAG_GPOS = IO::make_tag('G', 'P', 'O', 'S');
 constexpr uint32_t TABLE_TAG_MAXP = IO::make_tag('m', 'a', 'x', 'p');
 
 // TODO: we don't require a memreader here really
-ResultOr<RefPtr<Graphic::Font::TrueTypeFontFace>> Graphic::Font::TrueTypeFontFace::load(IO::Reader &reader)
+ResultOr<RefPtr<Graphic::SuperCoolFont::TrueTypeFontFace>> Graphic::SuperCoolFont::TrueTypeFontFace::load(IO::Reader &reader)
 {
-    RefPtr<Graphic::Font::TrueTypeFontFace> result;
+    RefPtr<Graphic::SuperCoolFont::TrueTypeFontFace> result;
     auto data = TRY(IO::read_all(reader));
     IO::MemoryReader mem_reader(data);
 
@@ -87,7 +87,7 @@ ResultOr<RefPtr<Graphic::Font::TrueTypeFontFace>> Graphic::Font::TrueTypeFontFac
     return result;
 }
 
-Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
+Result Graphic::SuperCoolFont::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
 {
     auto num_tables = TRY(IO::read<be_uint16_t>(reader));
     IO::logln("Font contains {} tables", num_tables());
@@ -123,7 +123,7 @@ Result Graphic::Font::TrueTypeFontFace::read_tables(IO::MemoryReader &reader)
     return Result::SUCCESS;
 }
 
-Result Graphic::Font::TrueTypeFontFace::parse_tables(IO::MemoryReader &reader)
+Result Graphic::SuperCoolFont::TrueTypeFontFace::parse_tables(IO::MemoryReader &reader)
 {
     for (const auto &table : _tables)
     {
@@ -170,22 +170,29 @@ Result Graphic::Font::TrueTypeFontFace::parse_tables(IO::MemoryReader &reader)
     return Result::SUCCESS;
 }
 
-String Graphic::Font::TrueTypeFontFace::family()
+String Graphic::SuperCoolFont::TrueTypeFontFace::family()
 {
     return "";
 }
 
-Graphic::Font::FontStyle Graphic::Font::TrueTypeFontFace::style()
+Graphic::SuperCoolFont::FontStyle Graphic::SuperCoolFont::TrueTypeFontFace::style()
 {
     return FONT_STYLE_REGULAR;
 }
 
-Optional<Graphic::Font::Glyph> Graphic::Font::TrueTypeFontFace::glyph(Codepoint /*c*/)
+Optional<Graphic::SuperCoolFont::Glyph> Graphic::SuperCoolFont::TrueTypeFontFace::glyph(Codepoint c)
 {
-    return {};
+    if (!_codepoint_glyph_mapping.has_key(c))
+    {
+        return {};
+    }
+
+    // TODO: this is probably not correct yet
+    auto idx = _codepoint_glyph_mapping[c];
+    return _glyphs[idx];
 }
 
-ResultOr<Graphic::Font::TrueTypeVersion> Graphic::Font::TrueTypeFontFace::read_version(IO::Reader &reader)
+ResultOr<Graphic::SuperCoolFont::TrueTypeVersion> Graphic::SuperCoolFont::TrueTypeFontFace::read_version(IO::Reader &reader)
 {
     auto major = TRY(IO::read<be_uint16_t>(reader));
     auto minor = TRY(IO::read<be_uint16_t>(reader));
@@ -193,7 +200,7 @@ ResultOr<Graphic::Font::TrueTypeVersion> Graphic::Font::TrueTypeFontFace::read_v
     return TrueTypeVersion{major, minor};
 }
 
-Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
+Result Graphic::SuperCoolFont::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
 {
     auto reader = IO::ReadCounter(_reader);
     auto version = TRY(IO::read<uint16_t>(reader));
@@ -323,7 +330,7 @@ Result Graphic::Font::TrueTypeFontFace::read_table_cmap(IO::Reader &_reader)
     return Result::SUCCESS;
 }
 
-Result Graphic::Font::TrueTypeFontFace::read_table_head(IO::Reader &reader)
+Result Graphic::SuperCoolFont::TrueTypeFontFace::read_table_head(IO::Reader &reader)
 {
     _header = TRY(IO::read<TrueTypeHeader>(reader));
 
@@ -337,7 +344,7 @@ Result Graphic::Font::TrueTypeFontFace::read_table_head(IO::Reader &reader)
     return Result::SUCCESS;
 }
 
-Result Graphic::Font::TrueTypeFontFace::read_table_maxp(IO::Reader &reader)
+Result Graphic::SuperCoolFont::TrueTypeFontFace::read_table_maxp(IO::Reader &reader)
 {
     auto version = TRY(read_version(reader));
 
@@ -353,7 +360,7 @@ Result Graphic::Font::TrueTypeFontFace::read_table_maxp(IO::Reader &reader)
     return Result::SUCCESS;
 }
 
-Result Graphic::Font::TrueTypeFontFace::read_table_loca(IO::Reader &reader)
+Result Graphic::SuperCoolFont::TrueTypeFontFace::read_table_loca(IO::Reader &reader)
 {
     _glyph_offsets.resize(_num_glyphs + 1);
     for (uint16_t i = 0; i < _num_glyphs + 1; i++)
@@ -371,7 +378,7 @@ Result Graphic::Font::TrueTypeFontFace::read_table_loca(IO::Reader &reader)
     return Result::SUCCESS;
 }
 
-Result Graphic::Font::TrueTypeFontFace::read_table_glyf(IO::Reader &reader)
+Result Graphic::SuperCoolFont::TrueTypeFontFace::read_table_glyf(IO::Reader &reader)
 {
     auto glyph_data = TRY(IO::read_all(reader));
     IO::MemoryReader glyph_reader(glyph_data);
@@ -475,10 +482,10 @@ Result Graphic::Font::TrueTypeFontFace::read_table_glyf(IO::Reader &reader)
             // Now create our contours
             for (uint16_t point_idx = 0; point_idx < num_points(); point_idx++)
             {
-                auto& glyph = _glyphs[glyph_idx];
-                Math::Vec2f scaled_point = { coords[point_idx].x() / (float)_header.units_per_em(),
-                                             coords[point_idx].y() / (float)_header.units_per_em() };
-                glyph.edges.append(scaled_point); 
+                auto &glyph = _glyphs[glyph_idx];
+                Math::Vec2f scaled_point = {coords[point_idx].x() / (float)_header.units_per_em(),
+                                            coords[point_idx].y() / (float)_header.units_per_em()};
+                glyph.edges.append(scaled_point);
             }
         }
         else // Composite glyph

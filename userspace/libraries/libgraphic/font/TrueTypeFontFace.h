@@ -14,7 +14,7 @@ namespace Graphic::SuperCoolFont
 class TrueTypeFontFace : public FontFace
 {
 private:
-    uint16_t _num_glyphs;
+    uint16_t _num_glyphs = 0;
     HashMap<Codepoint, uint32_t> _codepoint_glyph_mapping;
     TrueTypeHeader _header;
     Vector<uint32_t> _glyph_offsets;

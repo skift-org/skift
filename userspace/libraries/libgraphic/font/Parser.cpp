@@ -3,6 +3,12 @@
 
 ResultOr<RefPtr<Graphic::SuperCoolFont::FontFace>> Graphic::SuperCoolFont::load(IO::Reader &reader)
 {
-    RefPtr<FontFace> result = TrueTypeFontFace::load(reader).unwrap();
-    return result;
+    auto result = TrueTypeFontFace::load(reader);
+    if(!result.success())
+    {
+        return result.result();
+    }
+
+    RefPtr<FontFace> tmp = result.unwrap();
+    return tmp;
 }

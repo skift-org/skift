@@ -72,15 +72,18 @@ ResultOr<RefPtr<Graphic::SuperCoolFont::TrueTypeFontFace>> Graphic::SuperCoolFon
         // required for truetype
         if (!result->has_table(TABLE_TAG_LOCA))
         {
+            IO::errln("Font requires LOCA table when using GLYF table!");
             return Result::ERR_INVALID_DATA;
         }
     }
     else
     {
+        IO::errln("Only supporting GLYF tables for glyph data current");
+        return Result::ERR_NOT_IMPLEMENTED;
     }
 
     // Now actually parse all tables
-    result->parse_tables(mem_reader);
+    TRY(result->parse_tables(mem_reader));
 
     IO::logln("Font has {} glyphs", result->_num_glyphs);
 

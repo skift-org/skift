@@ -68,10 +68,7 @@ Window::Window(WindowFlag flags)
     _flags = flags;
 
     frontbuffer = Graphic::Bitmap::create_shared(250, 250).unwrap();
-    frontbuffer_painter = own<Graphic::Painter>(frontbuffer);
-
     backbuffer = Graphic::Bitmap::create_shared(250, 250).unwrap();
-    backbuffer_painter = own<Graphic::Painter>(backbuffer);
 
     _update_invoker = own<Async::Invoker>([this] { update(); });
 
@@ -162,7 +159,6 @@ void Window::flip(Math::Recti region)
     frontbuffer->copy_from(*backbuffer, region);
 
     swap(frontbuffer, backbuffer);
-    swap(frontbuffer_painter, backbuffer_painter);
 
     Application::the().flip_window(this, region);
 }
@@ -175,7 +171,8 @@ void Window::update()
     }
 
     Math::Recti repaited_regions = Math::Recti::empty();
-    Graphic::Painter &painter = *backbuffer_painter;
+
+    Graphic::Painter painter{*backbuffer};
 
     _dirty_paint.foreach ([&](Math::Recti &rect) {
         repaint(painter, rect);
@@ -204,10 +201,7 @@ void Window::change_framebuffer_if_needed()
         bound().area() < frontbuffer->bound().area() * 0.75)
     {
         frontbuffer = Graphic::Bitmap::create_shared(bound().width(), bound().height()).unwrap();
-        frontbuffer_painter = own<Graphic::Painter>(frontbuffer);
-
         backbuffer = Graphic::Bitmap::create_shared(bound().width(), bound().height()).unwrap();
-        backbuffer_painter = own<Graphic::Painter>(backbuffer);
     }
 }
 
@@ -223,12 +217,13 @@ void Window::show()
     change_framebuffer_if_needed();
 
     relayout();
-    repaint(*backbuffer_painter, bound());
+
+    Graphic::Painter painter{*backbuffer};
+    repaint(painter, bound());
 
     frontbuffer->copy_from(*backbuffer, bound());
 
     swap(frontbuffer, backbuffer);
-    swap(frontbuffer_painter, backbuffer_painter);
 
     Application::the().show_window(this);
 }

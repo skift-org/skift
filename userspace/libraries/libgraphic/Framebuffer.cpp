@@ -39,8 +39,7 @@ ResultOr<OwnPtr<Framebuffer>> Framebuffer::open()
 
 Framebuffer::Framebuffer(Handle handle, RefPtr<Bitmap> bitmap)
     : _handle(handle),
-      _bitmap(bitmap),
-      _painter(bitmap)
+      _bitmap(bitmap)
 {
 }
 
@@ -63,7 +62,6 @@ Result Framebuffer::set_resolution(Math::Vec2i size)
     }
 
     _bitmap = bitmap;
-    _painter = Painter(_bitmap);
 
     return SUCCESS;
 }

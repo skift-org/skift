@@ -14,16 +14,15 @@ private:
     Handle _handle;
 
     RefPtr<Bitmap> _bitmap;
-    Painter _painter;
 
     Vector<Math::Recti> _dirty_bounds{};
 
 public:
     static ResultOr<OwnPtr<Framebuffer>> open();
 
-    Painter &painter() { return _painter; }
-
     Math::Recti resolution() { return _bitmap->bound(); }
+
+    Bitmap &bitmap() { return *_bitmap; }
 
     Framebuffer(Handle handle, RefPtr<Bitmap> bitmap);
 

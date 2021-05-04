@@ -43,10 +43,7 @@ private:
     CursorState cursor_state = CURSOR_DEFAULT;
 
     RefPtr<Graphic::Bitmap> frontbuffer;
-    OwnPtr<Graphic::Painter> frontbuffer_painter;
-
     RefPtr<Graphic::Bitmap> backbuffer;
-    OwnPtr<Graphic::Painter> backbuffer_painter;
 
     bool _dirty_layout;
     Vector<Math::Recti> _dirty_paint{};

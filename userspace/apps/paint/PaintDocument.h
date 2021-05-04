@@ -50,7 +50,7 @@ public:
 
     PaintDocument(RefPtr<Graphic::Bitmap> bitmap)
         : _bitmap(bitmap),
-          _painter(bitmap)
+          _painter(*bitmap)
     {
     }
 };

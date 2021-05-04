@@ -3,13 +3,13 @@
 #include <libio/Streams.h>
 #include <libxml/Parser.h>
 
-#include <libgraphic/rast/Rasterizer.h>
+#include <libgraphic/Painter.h>
 #include <libgraphic/svg/Svg.h>
 
 namespace Graphic::Svg
 {
 
-void render_node(Rasterizer &rast, Xml::Node &node, Math::Mat3x2f transformation, Color fillcolor)
+void render_node(Painter &rast, Xml::Node &node, Math::Mat3x2f transformation, Color fillcolor)
 {
     for (auto child : node.children())
     {
@@ -78,9 +78,9 @@ ResultOr<RefPtr<Graphic::Bitmap>> render(IO::Reader &reader, int size_hint)
     auto bitmap = TRY(Bitmap::create_shared(width * scale, height * scale));
     bitmap->clear(Colors::TRANSPARENT);
     bitmap->filtering(BitmapFiltering::NEAREST);
-    Rasterizer rast{bitmap};
+    Painter painter{*bitmap};
 
-    render_node(rast, doc.root(), Math::Mat3x2f::scale(scale), Colors::BLACK);
+    render_node(painter, doc.root(), Math::Mat3x2f::scale(scale), Colors::BLACK);
 
     return bitmap;
 }

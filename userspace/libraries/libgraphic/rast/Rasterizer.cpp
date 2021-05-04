@@ -6,15 +6,10 @@
 namespace Graphic
 {
 
-Rasterizer::Rasterizer(RefPtr<Bitmap> bitmap) : _bitmap{bitmap}
+Rasterizer::Rasterizer(Bitmap &bitmap, TransformStack &stack)
+    : _bitmap{bitmap}, _stack{stack}
 {
-    _scanline.resize(_bitmap->width());
-
-    _top = 0;
-    _stats[0] = {
-        Math::Vec2i::zero(),
-        bitmap->bound(),
-    };
+    _scanline.resize(_bitmap.width());
 }
 
 void Rasterizer::clear()
@@ -30,7 +25,7 @@ void Rasterizer::flatten(const Path &path, const Math::Mat3x2f &transform)
         {
             auto curve = subpath.curves(i);
 
-            curve = Math::Mat3x2f::translation(origin()).apply(curve);
+            curve = Math::Mat3x2f::translation(_stack.origin()).apply(curve);
             curve = transform.apply(curve);
 
             _edges.append(curve);
@@ -99,7 +94,7 @@ void Rasterizer::rasterize(Paint &paint)
         }
     };
 
-    auto bound = clip();
+    auto bound = _stack.clip();
 
     for (int y = bound.top(); y < bound.bottom(); y++)
     {
@@ -125,60 +120,23 @@ void Rasterizer::rasterize(Paint &paint)
 
             if (alpha >= 0.003f)
             {
-                _bitmap->blend_pixel_no_check({i, y}, color.with_alpha(color.alphaf() * alpha));
+                _bitmap.blend_pixel_no_check({i, y}, color.with_alpha(color.alphaf() * alpha));
             }
         }
     }
 }
 
-void Rasterizer::push()
-{
-    Assert::lower_than(_top, STATESTACK_SIZE);
-
-    _top++;
-    _stats[_top] = _stats[_top - 1];
-}
-
-void Rasterizer::pop()
-{
-    Assert::greater_than(_top, 0);
-    _top--;
-}
-
-void Rasterizer::clip(Math::Recti rect)
-{
-    Math::Recti transformed_rect = rect.offset(origin());
-    Math::Recti clipped_rect = transformed_rect.clipped_with(clip());
-
-    _stats[_top].clip = clipped_rect;
-}
-
-Math::Recti Rasterizer::clip()
-{
-    return _stats[_top].clip;
-}
-
-void Rasterizer::origin(Math::Vec2i o)
-{
-    _stats[_top].origin += o;
-}
-
-Math::Vec2i Rasterizer::origin()
-{
-    return _stats[_top].origin;
-}
-
 void FLATTEN Rasterizer::fill(const Path &path, const Math::Mat3x2f &transform, Paint paint)
 {
     clear();
-    flatten(path, transform * Math::Mat3x2f::translation(origin()));
+    flatten(path, transform * Math::Mat3x2f::translation(_stack.origin()));
     rasterize(paint);
 }
 
 void FLATTEN Rasterizer::fill(const EdgeList &edges, const Math::Mat3x2f &transform, Paint paint)
 {
     clear();
-    flatten(edges, transform * Math::Mat3x2f::translation(origin()));
+    flatten(edges, transform * Math::Mat3x2f::translation(_stack.origin()));
     rasterize(paint);
 }
 

@@ -9,7 +9,7 @@ Cover::Cover(RefPtr<Graphic::Bitmap> bitmap) : _cover(bitmap)
 {
     _backdrop = Graphic::Bitmap::create_shared(64, 64).unwrap();
 
-    Graphic::Painter painter(_backdrop);
+    Graphic::Painter painter{*_backdrop};
 
     painter.blit(*_cover, _cover->bound(), _cover->bound().cover(_backdrop->bound()));
     painter.saturation(_backdrop->bound(), 1);

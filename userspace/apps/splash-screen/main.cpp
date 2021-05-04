@@ -18,7 +18,7 @@ int main(int, char *[])
 
     auto logo_container = logo->bound().centered_within(framebuffer->resolution());
 
-    auto &painter = framebuffer->painter();
+    Graphic::Painter painter{framebuffer->bitmap()};
 
     painter.clear(BACKGROUND);
     painter.blit(*logo, logo->bound(), logo_container);

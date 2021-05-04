@@ -483,13 +483,15 @@ Result Graphic::SuperCoolFont::TrueTypeFontFace::read_table_glyf(IO::Reader &rea
             }
 
             // Now create our contours
+            auto &glyph = _glyphs[glyph_idx];
+            glyph.edges.begin();
             for (uint16_t point_idx = 0; point_idx < num_points(); point_idx++)
             {
-                auto &glyph = _glyphs[glyph_idx];
                 Math::Vec2f scaled_point = {coords[point_idx].x() / (float)_header.units_per_em(),
                                             coords[point_idx].y() / (float)_header.units_per_em()};
                 glyph.edges.append(scaled_point);
             }
+            glyph.edges.end();
         }
         else // Composite glyph
         {

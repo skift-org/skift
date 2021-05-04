@@ -26,19 +26,22 @@ template <typename TState, typename TCallback>
 struct FonctionalStateful : public Rebuildable
 {
 private:
-    TState _state{};
+    TState _state;
     TCallback _callback;
 
 public:
-    FonctionalStateful(TCallback callback)
-        : _callback{callback}
+    FonctionalStateful(TState state, TCallback callback)
+        : _state{state}, _callback{callback}
     {
     }
 
     void update(TState state)
     {
-        _state = state;
-        should_rebuild();
+        if (_state != state)
+        {
+            _state = state;
+            should_rebuild();
+        }
     }
 
     RefPtr<Element> do_build() final
@@ -50,7 +53,13 @@ public:
 template <typename TState, typename TCallback>
 static inline RefPtr<FonctionalStateful<TState, TCallback>> stateful(TCallback callback)
 {
-    return make<FonctionalStateful<TState, TCallback>>(callback);
+    return make<FonctionalStateful<TState, TCallback>>(TState{}, callback);
+}
+
+template <typename TState, typename TCallback>
+static inline RefPtr<FonctionalStateful<TState, TCallback>> stateful(TState state, TCallback callback)
+{
+    return make<FonctionalStateful<TState, TCallback>>(state, callback);
 }
 
 } // namespace Widget

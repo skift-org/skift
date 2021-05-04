@@ -1,7 +1,5 @@
-#include "abi/IOCall.h"
-#include "libsystem/Macros.h"
-#include "libsystem/Result.h"
 #include <abi/Syscalls.h>
+#include <libio/Streams.h>
 #include <libmath/MinMax.h>
 
 #include <errno.h>
@@ -136,7 +134,7 @@ Result hj_handle_open(int *handle, const char *raw_path, size_t size, OpenFlag f
 {
     char buffer[256];
     strlcpy(buffer, raw_path, MIN(256, size + 1));
-    open(buffer, open_flags_to_posix(flags));
+    *handle = open(buffer, open_flags_to_posix(flags));
 
     return errno_to_skift_result();
 }

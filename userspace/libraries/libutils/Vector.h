@@ -308,8 +308,6 @@ public:
         free(_storage);
         _storage = new_storage;
         _capacity = new_capacity;
-
-        _count++;
     }
 
     void grow()

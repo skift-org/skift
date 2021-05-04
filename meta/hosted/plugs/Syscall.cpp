@@ -1,3 +1,6 @@
+#include "abi/IOCall.h"
+#include "libsystem/Macros.h"
+#include "libsystem/Result.h"
 #include <abi/Syscalls.h>
 #include <libmath/MinMax.h>
 
@@ -174,4 +177,13 @@ Result hj_handle_stat(int handle, FileState *state)
     *state = stat_to_skift(sb);
 
     return errno_to_skift_result();
+}
+
+Result hj_handle_call(int handle, IOCall call, void *args)
+{
+    UNUSED(handle);
+    UNUSED(call);
+    UNUSED(args);
+
+    return ERR_NOT_IMPLEMENTED;
 }

@@ -1,17 +1,10 @@
-#include <libsystem/process/Process.h>
-#include <libwidget/Application.h>
+#include "file-manager/FileManagerApplication.h"
 
-#include "file-manager/MainWindow.h"
-
-int main(int, char **)
+int main(int argc, char const *argv[])
 {
-    auto navigation = make<FilePicker::Navigation>();
-    auto bookmarks = FilePicker::Bookmarks::load();
+    UNUSED(argc);
+    UNUSED(argv);
 
-    auto window = new MainWindow(navigation, bookmarks);
-
-    navigation->go_home_dont_record_history();
-    window->show();
-
-    return Widget::Application::the().run();
+    FileManagerApplication app;
+    return app.run();
 }

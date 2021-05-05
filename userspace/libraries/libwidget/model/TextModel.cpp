@@ -47,8 +47,6 @@ RefPtr<TextModel> TextModel::open(String path)
         model->append_line(own<TextModelLine>());
     }
 
-    model->span_add(TextModelSpan(0, 0, 10, THEME_ANSI_RED, THEME_ANSI_BLUE));
-
     if (model->line_count() == 0)
     {
         model->append_line(own<TextModelLine>());
@@ -87,8 +85,6 @@ RefPtr<TextModel> TextModel::create(String text)
     {
         model->append_line(own<TextModelLine>());
     }
-
-    model->span_add(TextModelSpan(0, 0, 10, THEME_ANSI_RED, THEME_ANSI_BLUE));
 
     if (model->line_count() == 0)
     {

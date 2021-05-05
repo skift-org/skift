@@ -221,6 +221,8 @@ void TextEditor::event(Event *event)
     }
     else if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
+        focus();
+
         size_t line = ((size_t)(event->mouse.position - bound().position()).y() + _vscroll_offset) / metrics.fulllineheight();
 
         _cursor.move_to_within(*_model, line);

@@ -138,6 +138,12 @@ void TextField::event(Event *event)
 
         event->accepted = true;
     }
+    else if (event->type == Event::MOUSE_BUTTON_PRESS)
+    {
+        focus();
+        should_repaint();
+        event->accepted = true;
+    }
 }
 
 } // namespace Widget

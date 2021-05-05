@@ -64,7 +64,7 @@ public:
                 basic_button(Graphic::Icon::get("image-plus")),
             }),
 
-            texteditor(_text_model),
+            fill(texteditor(_text_model)),
         });
     }
 };

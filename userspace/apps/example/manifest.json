@@ -1,6 +1,6 @@
 {
-    "name": "Exemple",
-    "comment": "A simple exemple application.",
+    "name": "Example",
+    "comment": "A simple example application.",
     "icon": "duck",
     "command": "exemple"
 }

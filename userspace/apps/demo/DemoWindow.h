@@ -10,8 +10,7 @@ struct DemoWindow : public Widget::Window
 {
     DemoWindow() : Window{WINDOW_RESIZABLE} {}
 
-    RefPtr<Widget::Element>
-    build()
+    RefPtr<Widget::Element> build()
     {
         return Widget::stateful<int>([](auto state, auto update) {
             Demo demos[] = {

@@ -7,12 +7,12 @@ using namespace Widget;
 
 int main(int argc, char const *argv[])
 {
-    // clang-format off
-
     UNUSED(argc);
     UNUSED(argv);
 
     Application app;
+
+    // clang-format off
 
     auto win = window(
         vflow({
@@ -29,9 +29,9 @@ int main(int argc, char const *argv[])
         })
     );
 
+    // clang-format on
+
     win->show();
 
     return app.run();
-
-    // clang-format on
 }

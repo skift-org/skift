@@ -13,5 +13,7 @@ int main(int argc, const char *argv[])
 
     Assert::is_true(font.success());
 
+    auto glyph = font.unwrap()->glyph('A');
+
     return EXIT_SUCCESS;
 }

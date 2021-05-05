@@ -1,3 +1,4 @@
+#include <font-manager/widgets/GlyphElement.h>
 #include <libfilepicker/FilePicker.h>
 #include <libgraphic/font/FontFace.h>
 #include <libgraphic/font/Parser.h>
@@ -14,14 +15,13 @@ struct FontManagerWindow : public Window
 {
 private:
     RefPtr<Graphic::SuperCoolFont::FontFace> _font_face;
-    RefPtr<Graphic::Bitmap> _bitmap;
+    Graphic::SuperCoolFont::Glyph _current_glyph;
     Codepoint _current_codepoint = 'A';
 
 public:
     FontManagerWindow(String path) : Window(WINDOW_RESIZABLE)
     {
         size(Math::Vec2i(700, 500));
-        _bitmap = Graphic::Bitmap::create_shared(200, 200).unwrap();
         load_font(path);
     }
 
@@ -40,13 +40,10 @@ public:
 
     void update_glyph()
     {
-        auto glyph = _font_face->glyph(_current_codepoint);
-        _bitmap->clear(Graphic::Colors::WHITE);
-
-        if (glyph.present())
+        auto opt_glyph = _font_face->glyph(_current_codepoint);
+        if (opt_glyph.present())
         {
-            Graphic::Rasterizer rast{_bitmap};
-            rast.fill(glyph.unwrap().edges, Math::Mat3x2f::scale(20.0f), Graphic::Fill{Graphic::Colors::WHITE});
+            _current_glyph = _font_face->glyph(_current_codepoint).unwrap();
         }
         should_rebuild();
     }
@@ -58,7 +55,7 @@ public:
         return vflow({
             titlebar(Graphic::Icon::get("font-format"), "Font Manager"),
             fill(
-                image(_bitmap))
+                glyph(_current_glyph))
                 });
 
         // clang-format on

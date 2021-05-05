@@ -492,6 +492,13 @@ Result Graphic::SuperCoolFont::TrueTypeFontFace::read_table_glyf(IO::Reader &rea
                 glyph.edges.append(scaled_point);
             }
             glyph.edges.end();
+
+            // Not store the bounds
+            auto minX = header.bounding_box.x()();
+            auto minY = header.bounding_box.y()();
+            auto maxX = header.bounding_box.width()();
+            auto maxY = header.bounding_box.height()();
+            glyph.bounds = Math::Recti(minX, minY, maxX - minX, maxY - minY);
         }
         else // Composite glyph
         {

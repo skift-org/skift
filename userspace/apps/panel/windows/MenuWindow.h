@@ -1,5 +1,7 @@
 #pragma once
 
+#include "libutils/RefPtr.h"
+#include "libwidget/Element.h"
 #include <libwidget/model/TextModel.h>
 
 #include <libwidget/Window.h>
@@ -16,6 +18,8 @@ public:
     static constexpr int WIDTH = 320;
 
     MenuWindow();
+
+    RefPtr<Widget::Element> build() override;
 };
 
 } // namespace panel

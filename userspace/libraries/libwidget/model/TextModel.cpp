@@ -1,3 +1,4 @@
+#include "libio/MemoryReader.h"
 #include <libio/BufReader.h>
 #include <libio/File.h>
 #include <libio/Scanner.h>
@@ -21,6 +22,47 @@ RefPtr<TextModel> TextModel::open(String path)
     IO::File file{path, OPEN_READ};
     IO::BufReader buf_reader{file, 512};
     IO::Scanner scan{buf_reader};
+
+    // Skip the utf8 bom header if present.
+    scan.skip_word("\xEF\xBB\xBF");
+
+    while (scan.do_continue())
+    {
+        auto line = own<TextModelLine>();
+
+        while (scan.do_continue() &&
+               scan.current_codepoint() != '\n')
+        {
+            line->append(scan.current_codepoint());
+            scan.forward_codepoint();
+        }
+
+        scan.skip('\n'); // skip the \n
+
+        model->append_line(line);
+    }
+
+    if (model->line_count() == 0)
+    {
+        model->append_line(own<TextModelLine>());
+    }
+
+    model->span_add(TextModelSpan(0, 0, 10, THEME_ANSI_RED, THEME_ANSI_BLUE));
+
+    if (model->line_count() == 0)
+    {
+        model->append_line(own<TextModelLine>());
+    }
+
+    return model;
+}
+
+RefPtr<TextModel> TextModel::create(String text)
+{
+    auto model = make<TextModel>();
+
+    IO::MemoryReader memory{text};
+    IO::Scanner scan{memory};
 
     // Skip the utf8 bom header if present.
     scan.skip_word("\xEF\xBB\xBF");

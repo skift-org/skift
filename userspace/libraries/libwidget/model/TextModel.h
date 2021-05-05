@@ -122,6 +122,8 @@ public:
 
     static RefPtr<TextModel> open(String path);
 
+    static RefPtr<TextModel> create(String text);
+
     Math::Recti bound(const Graphic::Font &font)
     {
         int width = 0;

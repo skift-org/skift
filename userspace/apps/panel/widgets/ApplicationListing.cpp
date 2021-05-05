@@ -3,38 +3,27 @@
 #include <libwidget/Elements.h>
 #include <libwidget/Window.h>
 
+#include "libutils/Vector.h"
+#include "libwidget/Element.h"
+#include "libwidget/elements/ScrollElement.h"
+#include "libwidget/layouts/FlowLayout.h"
 #include "panel/model/MenuEntry.h"
 #include "panel/widgets/ApplicationListing.h"
 
 namespace panel
 {
 
-ApplicationListing::ApplicationListing()
+ApplicationListing::ApplicationListing(String filter)
+    : _filter{filter}
 {
     flags(Element::FILL);
-
-    render();
 }
 
-void ApplicationListing::filter(const String &filter)
-{
-    if (_filter == filter)
-    {
-        return;
-    }
-
-    _filter = filter;
-
-    render();
-}
-
-void ApplicationListing::render()
+RefPtr<Widget::Element> ApplicationListing::build()
 {
     FuzzyMatcher matcher;
 
-    host()->clear();
-
-    bool find_any = false;
+    Vector<RefPtr<Widget::Element>> childs;
 
     MenuEntry::load().foreach ([&](auto &entry) {
         if (!matcher.match(_filter, entry.name))
@@ -42,9 +31,7 @@ void ApplicationListing::render()
             return Iteration::CONTINUE;
         }
 
-        find_any = true;
-
-        auto item = host()->add(Widget::basic_button(entry.image, entry.name, [this, entry] {
+        childs.push_back(Widget::basic_button(entry.image, entry.name, [this, entry] {
             process_run(entry.command.cstring(), nullptr, 0);
             window()->hide();
         }));
@@ -52,10 +39,12 @@ void ApplicationListing::render()
         return Iteration::CONTINUE;
     });
 
-    if (!find_any)
+    if (childs.count() == 0)
     {
-        host()->add(Widget::label("No application found!", Anchor::CENTER));
+        childs.push_back(Widget::label("No application found!", Anchor::CENTER));
     }
+
+    return Widget::scroll(Widget::vflow(4, childs));
 }
 
 } // namespace panel

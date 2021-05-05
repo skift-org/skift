@@ -21,7 +21,7 @@ public:
     FontManagerWindow(String path) : Window(WINDOW_RESIZABLE)
     {
         size(Math::Vec2i(700, 500));
-        _bitmap = Graphic::Bitmap::create_static(200, 200, nullptr);
+        _bitmap = Graphic::Bitmap::create_shared(200, 200).unwrap();
         load_font(path);
     }
 

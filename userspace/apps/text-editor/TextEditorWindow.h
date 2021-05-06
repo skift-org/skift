@@ -4,8 +4,8 @@
 #include <libwidget/Components.h>
 #include <libwidget/Layouts.h>
 #include <libwidget/Window.h>
-#include <libwidget/model/TextModel.h>
 #include <libwidget/dialog/MessageBox.h>
+#include <libwidget/model/TextModel.h>
 
 using namespace Widget;
 
@@ -51,6 +51,10 @@ public:
             {
                 on_save();
             }
+            else if (event->keyboard.key == Key::KEYBOARD_KEY_W && event->keyboard.modifiers == KEY_MODIFIER_CTRL)
+            {
+                try_hide();
+            }
             else
             {
                 event->accepted = false;
@@ -58,22 +62,25 @@ public:
         });
 
         on(EventType::WINDOW_CLOSING, [this](Event *event) {
-            bool close = true;
-            show_warning([&](auto result) {
-                switch (result)
-                {
-                case DialogResult::YES:
-                    on_save();
-                    break;
-                case DialogResult::NO:
-                    break;
-                default:
-                    close = false;
-                    break;
-                }
-            });
+            bool keep = false;
+            if (_modified)
+            {
+                show_warning([&](auto result) {
+                    switch (result)
+                    {
+                    case DialogResult::YES:
+                        on_save();
+                        break;
+                    case DialogResult::NO:
+                        break;
+                    default:
+                        keep = true;
+                        break;
+                    }
+                });
+            }
 
-            event->accepted = close;
+            event->accepted = keep;
         });
     }
 
@@ -199,17 +206,16 @@ public:
     {
         _text_editor->focus();
 
-        return vflow({
-            _titlebar,
-            toolbar({
-                basic_button(Graphic::Icon::get("folder-open"), [&] {
-                    on_load();
-                }),
-                basic_button(Graphic::Icon::get("content-save"), [&] {
-                    on_save();
-                }),
-                basic_button(Graphic::Icon::get("image-plus")),
-            }),
-            fill(_text_editor)});
+        return vflow({_titlebar,
+                      toolbar({
+                          basic_button(Graphic::Icon::get("folder-open"), [&] {
+                              on_load();
+                          }),
+                          basic_button(Graphic::Icon::get("content-save"), [&] {
+                              on_save();
+                          }),
+                          basic_button(Graphic::Icon::get("image-plus")),
+                      }),
+                      fill(_text_editor)});
     }
 };

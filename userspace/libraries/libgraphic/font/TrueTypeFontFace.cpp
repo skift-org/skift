@@ -490,8 +490,18 @@ Result Graphic::SuperCoolFont::TrueTypeFontFace::read_table_glyf(IO::Reader &rea
                 Math::Vec2f scaled_point = {coords[point_idx].x() / (float)_header.units_per_em(),
                                             coords[point_idx].y() / (float)_header.units_per_em()};
                 glyph.edges.append(scaled_point);
+
+                // This contour is done    
+                if(point_idx == end_indices.peek()())
+                {
+                    glyph.edges.end();
+                    glyph.edges.begin();
+                    end_indices.pop();
+                }
             }
             glyph.edges.end();
+            // Only the last indice / end indice should be left in there
+            Assert::equal(end_indices.count(), 1);
 
             // Not store the bounds
             auto minX = header.bounding_box.x()();

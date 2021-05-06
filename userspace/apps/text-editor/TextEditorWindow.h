@@ -1,6 +1,5 @@
 #include <libfilepicker/FilePicker.h>
 #include <libio/Streams.h>
-#include <libsystem/process/Process.h>
 
 #include <libwidget/Components.h>
 #include <libwidget/Layouts.h>
@@ -171,11 +170,7 @@ public:
 
     void show_warning(Callback<void(DialogResult)> callback)
     {
-        auto title = StringBuilder()
-                         .append("Do you want to save document \"")
-                         .append(_path)
-                         .append("\"?")
-                         .finalize();
+        auto title = IO::format("Do you want to save document \"{}\"?", _path);
 
         auto dialog_result = Widget::MessageBox::
             create_and_show(title,

@@ -103,6 +103,8 @@ public:
 
     void hide();
 
+    void try_hide();
+
     void cursor(CursorState state);
 
     /* --- Geometry --------------------------------------------------------- */
@@ -199,8 +201,6 @@ public:
     void handle_got_focus(Event *event);
 
     void handle_lost_focus(Event *event);
-
-    void handle_window_closing(Event *event);
 
     void handle_mouse_move(Event *event);
 

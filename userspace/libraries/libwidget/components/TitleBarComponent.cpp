@@ -66,7 +66,7 @@ RefPtr<Element> TitleBarComponent::build()
                 })
                 : nullptr,
             basic_button(Graphic::Icon::get("close"), [this] {
-                window()->hide();
+                window()->try_hide();
             })
         })
     );

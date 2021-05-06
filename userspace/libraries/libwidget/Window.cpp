@@ -241,6 +241,24 @@ void Window::hide()
     Application::the().hide_window(this);
 }
 
+void Window::try_hide()
+{
+    if (!_visible)
+    {
+        return;
+    }
+
+    Event event = {};
+    event.type = Event::WINDOW_CLOSING;
+
+    dispatch_event(&event);
+
+    if (!event.accepted)
+    {
+        hide();
+    }
+}
+
 Math::Border Window::resize_bound_containe(Math::Vec2i position)
 {
     Math::Recti resize_bound = bound().expended(Insets(WINDOW_RESIZE_AREA));
@@ -362,10 +380,6 @@ void Window::handle_event(Event *event)
         handle_lost_focus(event);
         break;
 
-    case Event::WINDOW_CLOSING:
-        handle_window_closing(event);
-        break;
-
     case Event::MOUSE_MOVE:
         handle_mouse_move(event);
         break;
@@ -439,11 +453,6 @@ void Window::handle_lost_focus(Event *event)
             _mouse_over = nullptr;
         }
     }
-}
-
-void Window::handle_window_closing(Event *)
-{
-    hide();
 }
 
 void Window::handle_mouse_move(Event *event)

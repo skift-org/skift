@@ -73,10 +73,7 @@ public:
                 }
             });
 
-            if (close)
-            {
-                event->accepted = false;
-            }
+            event->accepted = close;
         });
     }
 

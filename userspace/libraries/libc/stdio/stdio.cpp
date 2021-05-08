@@ -189,7 +189,7 @@ int fseek(FILE *file, long offset, int whence)
 long ftell(FILE *stream)
 {
     ssize64_t offset = 0;
-    Result r = hj_handle_seek(stream->handle, 0, HJ_WHENCE_CURRENT, &offset);
+    Result r = hj_handle_seek(stream->handle, nullptr, HJ_WHENCE_CURRENT, &offset);
 
     if (r != Result::SUCCESS)
     {

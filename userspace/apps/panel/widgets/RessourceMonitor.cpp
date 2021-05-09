@@ -14,8 +14,6 @@ namespace panel
 RessourceMonitor::RessourceMonitor()
     : ButtonElement(ButtonElement::TEXT)
 {
-    insets(0);
-
     auto ram_graph = add<Widget::Graph>(50, Graphic::Colors::ROYALBLUE);
     ram_graph->flags(Widget::Element::FILL);
     ram_graph->add(Widget::label("RAM", Anchor::CENTER));

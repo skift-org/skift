@@ -81,8 +81,6 @@ public:
     {
         auto toolbar = parent->add(Widget::panel());
 
-        toolbar->insets(Insetsi(4, 4));
-
         _open_document = toolbar->add(Widget::basic_button(Graphic::Icon::get("folder-open")));
         _save_document = toolbar->add(Widget::basic_button(Graphic::Icon::get("content-save")));
         _new_document = toolbar->add(Widget::basic_button(Graphic::Icon::get("image-plus")));
@@ -125,7 +123,6 @@ public:
         toolbar->add(Widget::separator());
 
         auto primary_color_container = toolbar->add<Widget::Element>();
-        primary_color_container->insets(Insetsi(4));
         primary_color_container->flags(Widget::Element::SQUARE);
 
         _primary_color = primary_color_container->add(Widget::panel(4));
@@ -133,7 +130,6 @@ public:
         _primary_color->flags(Widget::Element::FILL);
 
         auto secondary_color_container = toolbar->add<Widget::Element>();
-        secondary_color_container->insets(Insetsi(4));
         secondary_color_container->flags(Widget::Element::SQUARE);
 
         _secondary_color = secondary_color_container->add(Widget::panel(4));
@@ -145,7 +141,6 @@ public:
     {
         auto palette = parent->add(Widget::panel());
 
-        palette->insets(Insetsi(4, 4));
         palette->max_height(38);
         palette->min_height(38);
 

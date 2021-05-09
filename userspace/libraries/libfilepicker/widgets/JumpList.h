@@ -24,8 +24,6 @@ public:
           _navigation(navigation),
           _bookmarks(bookmarks)
     {
-        insets(Insetsi{4});
-
         _bookmark_observer = bookmarks->observe([this](auto &) {
             render();
         });

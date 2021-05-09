@@ -59,7 +59,6 @@ void pages(RefPtr<Widget::Element> host, const Page &page)
     host->add(Widget::label(page.header, Anchor::CENTER));
 
     auto content = host->add<Widget::Element>();
-    content->insets({8, 0});
 
     for (auto &lines : page.lines)
     {
@@ -88,7 +87,6 @@ int main(int, char **)
     dialog->pin_width(420);
     dialog->pin_height(420);
 
-
     auto illustration = dialog->add(Widget::panel(6));
     illustration->min_height(160);
     illustration->color(Widget::THEME_MIDDLEGROUND, Graphic::Colors::WHITE);
@@ -99,17 +97,13 @@ int main(int, char **)
 
     auto content = dialog->add<Widget::Element>();
     content->flags(Widget::Element::FILL);
-    content->insets(16);
 
     auto dots_container = dialog->add<Widget::Element>();
-    dots_container->insets(16);
 
     auto dots = Widget::dots(PAGES.count());
     dots_container->add(dots);
 
     auto navigation = dialog->add<Widget::Element>();
-
-    navigation->insets(8);
 
     auto skipall_button = navigation->add(Widget::basic_button("Skip All"));
 

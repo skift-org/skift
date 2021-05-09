@@ -35,32 +35,32 @@ public:
         {
             if (child->flags() & FILL)
             {
-                auto bound = content();
+                auto b = bound();
 
                 if (child->max_width() || child->max_height())
                 {
-                    if (child->max_width() > 0 && bound.width() > child->max_width())
+                    if (child->max_width() > 0 && b.width() > child->max_width())
                     {
-                        bound = bound.with_width(child->max_width());
+                        b = b.with_width(child->max_width());
                     }
 
-                    if (child->max_height() > 0 && bound.height() > child->max_height())
+                    if (child->max_height() > 0 && b.height() > child->max_height())
                     {
-                        bound = bound.with_height(child->max_height());
+                        b = b.with_height(child->max_height());
                     }
 
-                    child->container(bound.centered_within(content()));
+                    child->container(b.centered_within(bound()));
                 }
                 else
                 {
-                    child->container(content());
+                    child->container(bound());
                 }
             }
             else
             {
                 auto size = child->compute_size();
 
-                child->container(Math::Recti{size}.centered_within(content()));
+                child->container(Math::Recti{size}.centered_within(bound()));
             }
         }
     }

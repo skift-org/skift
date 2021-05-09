@@ -20,11 +20,4 @@ static inline RefPtr<TElement> square(RefPtr<TElement> child)
     return child;
 }
 
-template <typename TElement>
-static inline RefPtr<TElement> spacing(Insetsi outsets, RefPtr<TElement> child)
-{
-    child->outsets(outsets);
-    return child;
-}
-
 } // namespace Widget

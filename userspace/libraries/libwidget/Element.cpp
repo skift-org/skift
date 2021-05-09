@@ -78,7 +78,7 @@ void Element::layout()
 {
     for (auto &child : _childs)
     {
-        child->container(content());
+        child->container(bound());
     }
 }
 
@@ -306,11 +306,6 @@ void Element::repaint(Graphic::Painter &painter, Math::Recti rectangle)
     painter.transform(origin());
     painter.clip(bound());
 
-    if (Application::the().show_wireframe())
-    {
-        painter.fill_insets(bound(), _insets, Graphic::Colors::MAGENTA.with_alpha(0.25));
-    }
-
     painter.push();
     paint(painter, rectangle);
     painter.pop();
@@ -340,7 +335,7 @@ void Element::should_repaint()
 
 void Element::should_repaint(Math::Recti rectangle)
 {
-    if (!overflow().colide_with(rectangle))
+    if (!bound().colide_with(rectangle))
     {
         return;
     }
@@ -392,9 +387,6 @@ Math::Vec2i Element::compute_size()
     int width = size.x();
     int height = size.y();
 
-    width += _insets.left() + _insets.right();
-    height += _insets.top() + _insets.bottom();
-
     if (_max_width)
     {
         width = MIN(width, _max_width);
@@ -414,9 +406,6 @@ Math::Vec2i Element::compute_size()
     {
         height = MAX(height, _min_height);
     }
-
-    width += _outsets.left() + _outsets.right();
-    height += _outsets.top() + _outsets.bottom();
 
     return Math::Vec2i(width, height);
 }

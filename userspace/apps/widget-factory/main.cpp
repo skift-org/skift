@@ -32,8 +32,6 @@ int main(int, char **)
     window->root()->add(Widget::label("Buttons", Anchor::CENTER));
     auto buttons = window->root()->add<Widget::Element>();
     {
-        buttons->insets(Insetsi(0, 8));
-
         buttons->add(Widget::basic_button("BUTTON"));
         buttons->add(Widget::outline_button("BUTTON"));
         buttons->add(Widget::filled_button("BUTTON"));

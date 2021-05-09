@@ -18,7 +18,6 @@ int main(int argc, char **argv)
     window->root()->add(Widget::titlebar(Graphic::Icon::get("image"), "Image Viewer"));
 
     auto toolbar = window->root()->add(Widget::panel());
-    toolbar->insets(4);
 
     auto bitmap = Graphic::Bitmap::load_from_or_placeholder(argv[1]);
 

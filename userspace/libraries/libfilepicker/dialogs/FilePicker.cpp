@@ -71,8 +71,6 @@ void Dialog::render(Widget::Window *window)
         _text_field->focus();
     }
 
-    action_container->insets(Insetsi(4, 4));
-
     action_container->add(Widget::spacer());
 
     create_buttons(action_container);

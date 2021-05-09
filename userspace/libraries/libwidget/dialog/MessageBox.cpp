@@ -31,8 +31,6 @@ void MessageBox::render(Window *window)
 {
     window->size(Math::Vec2i(300, 200));
 
-    window->root()->insets(Insetsi(8));
-
     auto message_label = window->root()->add(label(_message, Anchor::CENTER));
     message_label->flags(Element::FILL);
 

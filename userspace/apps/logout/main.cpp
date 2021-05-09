@@ -28,7 +28,6 @@ int main(int, char **)
     dialog->min_height(256);
 
     auto icon_and_title_container = dialog->add(Widget::panel(6));
-    icon_and_title_container->insets(Insetsi{8});
 
     icon_and_title_container->add(Widget::square(Widget::icon("power-standby", Graphic::ICON_36PX)));
 

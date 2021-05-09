@@ -20,8 +20,6 @@ Main::Main() : Window(WINDOW_NONE | WINDOW_RESIZABLE)
 
     auto control_bar = cover->add<Widget::Element>();
 
-    control_bar->insets(12);
-
     control_bar->add(Widget::filled_button(Graphic::Icon::get("play")));
     control_bar->add(Widget::outline_button(Graphic::Icon::get("stop")));
 

@@ -15,7 +15,7 @@ void DotsElement::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     for (int i = 0; i < _count; i++)
     {
-        auto dot = content().column(_count, i, DOTSPACING);
+        auto dot = bound().column(_count, i, DOTSPACING);
 
         if (_index == i)
         {

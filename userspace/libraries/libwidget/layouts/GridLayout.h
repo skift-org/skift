@@ -58,7 +58,7 @@ public:
             int x = index % _hcells;
             int y = index / _hcells;
 
-            Math::Recti row = content().row(_vcells, y, _vspacing);
+            Math::Recti row = bound().row(_vcells, y, _vspacing);
             Math::Recti column = row.column(_hcells, x, _hspacing);
 
             child->container(column);

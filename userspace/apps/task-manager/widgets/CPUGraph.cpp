@@ -17,7 +17,6 @@ CPUGraph::CPUGraph(RefPtr<TaskModel> model)
     : Graph(256, Graphic::Colors::SEAGREEN),
       _model(model)
 {
-    insets(Insetsi(8));
     flags(Element::FILL);
 
     auto icon_and_text = add<Widget::Element>();

@@ -14,7 +14,6 @@ RAMGraph::RAMGraph(RefPtr<TaskModel> model)
     : Graph(256, Graphic::Colors::ROYALBLUE),
       _model(model)
 {
-    insets(Insetsi(8));
     flags(Element::FILL);
 
     auto icon_and_text = add<Widget::Element>();

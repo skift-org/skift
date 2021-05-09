@@ -61,7 +61,7 @@ public:
             }
             else if (child->flags() & Element::SQUARE)
             {
-                fixed_child_total_size += _horizontal ? content().height() : content().width();
+                fixed_child_total_size += _horizontal ? bound().height() : bound().width();
             }
             else
             {
@@ -69,20 +69,20 @@ public:
             }
         }
 
-        int usable_space = (_horizontal ? content().width() : content().height()) - _spacing * (childs().count() - 1);
+        int usable_space = (_horizontal ? bound().width() : bound().height()) - _spacing * (childs().count() - 1);
         int fill_child_total_size = MAX(0, usable_space - fixed_child_total_size);
         int fill_child_size = (fill_child_total_size) / MAX(1, fill_child_count);
-        int current = _horizontal ? content().x() : content().y();
+        int current = _horizontal ? bound().x() : bound().y();
 
         for (auto &child : childs())
         {
             if (child->flags() & Element::FILL)
             {
                 child->container({
-                    _horizontal ? current : content().y(),
-                    _horizontal ? content().y() : current,
-                    _horizontal ? fill_child_size : content().width(),
-                    _horizontal ? content().height() : fill_child_size,
+                    _horizontal ? current : bound().y(),
+                    _horizontal ? bound().y() : current,
+                    _horizontal ? fill_child_size : bound().width(),
+                    _horizontal ? bound().height() : fill_child_size,
                 });
 
                 current += fill_child_size + _spacing;
@@ -90,21 +90,21 @@ public:
             else if (child->flags() & Element::SQUARE)
             {
                 child->container({
-                    _horizontal ? current : content().x(),
-                    _horizontal ? content().y() : current,
-                    _horizontal ? content().height() : content().width(),
-                    _horizontal ? content().height() : content().width(),
+                    _horizontal ? current : bound().x(),
+                    _horizontal ? bound().y() : current,
+                    _horizontal ? bound().height() : bound().width(),
+                    _horizontal ? bound().height() : bound().width(),
                 });
 
-                current += (_horizontal ? content().height() : content().width()) + _spacing;
+                current += (_horizontal ? bound().height() : bound().width()) + _spacing;
             }
             else
             {
                 child->container({
-                    _horizontal ? current : content().x(),
-                    _horizontal ? content().y() : current,
-                    _horizontal ? child->compute_size().x() : content().width(),
-                    _horizontal ? content().height() : child->compute_size().y(),
+                    _horizontal ? current : bound().x(),
+                    _horizontal ? bound().y() : current,
+                    _horizontal ? child->compute_size().x() : bound().width(),
+                    _horizontal ? bound().height() : child->compute_size().y(),
                 });
 
                 current += (_horizontal ? child->compute_size().x() : child->compute_size().y()) + _spacing;

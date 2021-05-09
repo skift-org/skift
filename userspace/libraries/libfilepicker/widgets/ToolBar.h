@@ -34,8 +34,6 @@ public:
           _navigation(navigation),
           _bookmarks(bookmarks)
     {
-        insets(Insetsi(4, 4));
-
         _go_backward = add(Widget::basic_button(Graphic::Icon::get("arrow-left"), [this] {
             _navigation->go_backward();
         }));

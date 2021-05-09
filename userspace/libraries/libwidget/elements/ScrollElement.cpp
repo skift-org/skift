@@ -34,17 +34,17 @@ void ScrollElement::layout()
     {
         int content_size = _host->size().x();
 
-        _host->container(content().take_left(content_size).cutoff_botton(ScrollBarElement::SIZE));
-        _scrollbar->container(content().take_bottom(ScrollBarElement::SIZE));
-        _scrollbar->update(content_size, content().width(), scroll().y());
+        _host->container(bound().take_left(content_size).cutoff_botton(ScrollBarElement::SIZE));
+        _scrollbar->container(bound().take_bottom(ScrollBarElement::SIZE));
+        _scrollbar->update(content_size, bound().width(), scroll().y());
     }
     else
     {
         int content_size = _host->size().y();
 
-        _host->container(content().take_top(content_size).cutoff_right(ScrollBarElement::SIZE));
-        _scrollbar->container(content().take_right(ScrollBarElement::SIZE));
-        _scrollbar->update(content_size, content().height(), scroll().x());
+        _host->container(bound().take_top(content_size).cutoff_right(ScrollBarElement::SIZE));
+        _scrollbar->container(bound().take_right(ScrollBarElement::SIZE));
+        _scrollbar->update(content_size, bound().height(), scroll().x());
     }
 }
 

@@ -25,7 +25,7 @@ void LabelElement::paint(Graphic::Painter &painter, const Math::Recti &)
     painter.draw_string_within(
         *font(),
         s.text.cstring(),
-        content(),
+        bound(),
         s.anchor,
         color(THEME_FOREGROUND));
 }

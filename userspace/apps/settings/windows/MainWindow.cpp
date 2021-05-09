@@ -13,7 +13,6 @@ MainWindow::MainWindow() : Window(WINDOW_RESIZABLE)
     root()->add(Widget::titlebar(Graphic::Icon::get("cog"), "Settings"));
 
     auto navigation_bar = root()->add(Widget::panel());
-    navigation_bar->insets(4);
 
     navigation_bar->add(Widget::basic_button(Graphic::Icon::get("arrow-left")));
     navigation_bar->add(Widget::basic_button(Graphic::Icon::get("arrow-right")));

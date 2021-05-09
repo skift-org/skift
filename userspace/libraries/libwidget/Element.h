@@ -38,8 +38,6 @@ private:
     int _min_height = 0;
     int _min_width = 0;
 
-    Insetsi _outsets{};
-    Insetsi _insets{};
     Math::Vec2i _content_scroll{};
 
     Optional<Graphic::Color> _colors[__THEME_COLOR_COUNT] = {};
@@ -148,22 +146,6 @@ public:
         }
     }
 
-    Insetsi outsets() const { return _outsets; }
-
-    void outsets(Insetsi outsets)
-    {
-        _outsets = outsets;
-        should_relayout();
-    }
-
-    Insetsi insets() const { return _insets; }
-
-    void insets(Insetsi insets)
-    {
-        _insets = insets;
-        should_relayout();
-    }
-
     Math::Recti container() const { return _container; }
 
     void container(Math::Recti container) { _container = container; }
@@ -173,24 +155,17 @@ public:
         if (_parent && !(_flags & NOT_AFFECTED_BY_SCROLL))
         {
             return {
-                _outsets.left() + container().x() - _parent->scroll().x(),
-                _outsets.top() + container().y() - _parent->scroll().y(),
+                container().x() - _parent->scroll().x(),
+                container().y() - _parent->scroll().y(),
             };
         }
         else
         {
-            return {
-                _outsets.left() + container().x(),
-                _outsets.top() + container().y(),
-            };
+            return container().position();
         }
     }
 
-    Math::Recti bound() const { return container().shrinked(_outsets).size(); }
-
-    Math::Recti content() const { return bound().shrinked(_insets); }
-
-    Math::Recti overflow() const { return bound().expended(_outsets); }
+    Math::Recti bound() const { return container().size(); }
 
     Math::Vec2i scroll() { return _content_scroll; }
 

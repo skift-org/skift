@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libmath/Vec2.h>
+
 template <typename Scalar>
 struct Insets
 {
@@ -14,6 +16,11 @@ public:
     auto bottom() const { return _bottom; }
     auto left() const { return _left; }
     auto right() const { return _right; }
+
+    Math::Vec2<Scalar> all()
+    {
+        return {left() + right(), top() + bottom()};
+    }
 
     Insets()
         : Insets(0, 0, 0, 0)

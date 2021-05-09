@@ -17,7 +17,6 @@ public:
         root()->add(Widget::titlebar(Graphic::Icon::get("snake"), "Snake"));
 
         auto board = root()->add<BoardWidget>();
-        board->outsets({32});
         board->focus();
 
         resize_to_content();

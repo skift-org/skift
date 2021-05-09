@@ -16,8 +16,6 @@ MainWinow::MainWinow() : Window(WINDOW_RESIZABLE)
     /// --- Toolbar --- ///
     auto toolbar = root()->add(Widget::panel());
 
-    toolbar->insets(Insetsi(4, 4));
-
     toolbar->add(Widget::filled_button(Graphic::Icon::get("plus"), "New task"));
 
     auto cancel_task_button = toolbar->add(Widget::basic_button(Graphic::Icon::get("close"), "Cancel task", [&] {

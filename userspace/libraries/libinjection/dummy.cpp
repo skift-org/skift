@@ -1,1 +1,0 @@
-void __injection_dummy() {}

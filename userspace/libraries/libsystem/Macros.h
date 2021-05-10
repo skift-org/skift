@@ -28,12 +28,12 @@
 // ex: 7 with align = 8 -> 8
 #define ALIGN_UP(__addr, __align) (((__addr) + (__align)-1) & ~((__align)-1))
 
-#define AERAY_LENGTH(__array) (sizeof(__array) / sizeof(__array[0]))
+#define ARRAY_LENGTH(__array) (sizeof(__array) / sizeof(__array[0]))
 
-#define NONCOPYABLE(__class_name)              \
+#define NONCOPYABLE(__class_name)                \
     __class_name(const __class_name &) = delete; \
     __class_name &operator=(const __class_name &) = delete;
 
-#define NONMOVABLE(__class_name)                \
+#define NONMOVABLE(__class_name)                  \
     __class_name(const __class_name &&) = delete; \
     __class_name &operator=(const __class_name &&) = delete;

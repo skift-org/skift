@@ -30,7 +30,7 @@ void Idle::update(Neko &neko)
             own<Itching>(),
         };
 
-        neko.behavior(_random.pick(next, AERAY_LENGTH(next)));
+        neko.behavior(_random.pick(next, ARRAY_LENGTH(next)));
     }
     else if (Widget::Application::the().mouse_position().distance_to(neko.position()) > 64)
     {

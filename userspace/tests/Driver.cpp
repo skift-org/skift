@@ -124,11 +124,11 @@ int run_all_testes()
 
     if (failed == 0)
     {
-        IO::errln("\e[90m// {}\e[m", _good_messages[end_tick % AERAY_LENGTH(_good_messages)]);
+        IO::errln("\e[90m// {}\e[m", _good_messages[end_tick % ARRAY_LENGTH(_good_messages)]);
     }
     else
     {
-        IO::errln("\e[90m// {}\e[m", _bad_messages[end_tick % AERAY_LENGTH(_bad_messages)]);
+        IO::errln("\e[90m// {}\e[m", _bad_messages[end_tick % ARRAY_LENGTH(_bad_messages)]);
     }
 
     IO::errln("");

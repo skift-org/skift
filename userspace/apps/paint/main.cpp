@@ -144,7 +144,7 @@ public:
         palette->max_height(38);
         palette->min_height(38);
 
-        for (size_t i = 0; i < AERAY_LENGTH(_color_palette); i++)
+        for (size_t i = 0; i < ARRAY_LENGTH(_color_palette); i++)
         {
             Graphic::Color color = _color_palette[i];
 

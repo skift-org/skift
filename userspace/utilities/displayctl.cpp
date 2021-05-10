@@ -23,7 +23,7 @@ static const IOCallDisplayModeArgs GFX_MODES[] = {
 
 Optional<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
 {
-    for (size_t i = 0; i < AERAY_LENGTH(GFX_MODES); i++)
+    for (size_t i = 0; i < ARRAY_LENGTH(GFX_MODES); i++)
     {
         auto &gfx_mode = GFX_MODES[i];
 
@@ -38,7 +38,7 @@ Optional<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
 
 ArgParseResult gfxmode_list()
 {
-    for (size_t i = 0; i < AERAY_LENGTH(GFX_MODES); i++)
+    for (size_t i = 0; i < ARRAY_LENGTH(GFX_MODES); i++)
     {
         auto &gfx_mode = GFX_MODES[i];
 

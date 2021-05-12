@@ -7,7 +7,7 @@
 namespace Widget
 {
 
-class Rebuildable : public Element
+class RebuildableComponent : public Element
 {
 private:
     OwnPtr<Async::Invoker> _rebuild_invoker;
@@ -18,7 +18,7 @@ public:
         rebuild();
     }
 
-    Rebuildable()
+    RebuildableComponent()
     {
         _rebuild_invoker = own<Async::Invoker>([this] {
             rebuild();

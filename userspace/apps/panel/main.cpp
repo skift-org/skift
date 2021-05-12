@@ -1,12 +1,25 @@
 #include <libwidget/Application.h>
 
-#include "panel/windows/PanelWindow.h"
+#include "panel/windows/Status.h"
 
-static constexpr int PANEL_HEIGHT = 38;
-
-int main(int, char **)
+namespace Panel
 {
-    auto window = own<panel::PanelWindow>();
-    window->show();
-    return Widget::Application::the().run();
+
+struct PanelApplication : public Widget::Application
+{
+    OwnPtr<Widget::Window> build() override
+    {
+        return own<Status>();
+    }
+};
+
+} // namespace Panel
+
+int main(int argc, char const *argv[])
+{
+    UNUSED(argc);
+    UNUSED(argv);
+
+    Panel::PanelApplication app;
+    return app.run();
 }

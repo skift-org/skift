@@ -1,41 +1,48 @@
-#include <abi/Syscalls.h>
-#include <skift/Environment.h>
-
-#include <libasync/Timer.h>
-#include <libwidget/Elements.h>
+#include <libwidget/Layouts.h>
 #include <libwidget/Views.h>
 
-#include "libwidget/Element.h"
 #include "panel/widgets/RessourceMonitor.h"
 
-namespace panel
+using namespace Widget;
+
+namespace Panel
 {
 
 RessourceMonitor::RessourceMonitor()
-    : ButtonElement(ButtonElement::TEXT)
 {
-    auto ram_graph = add<Widget::Graph>(50, Graphic::Colors::ROYALBLUE);
-    ram_graph->flags(Widget::Element::FILL);
-    ram_graph->add(Widget::label("RAM", Anchor::CENTER));
-
-    auto cpu_graph = add<Widget::Graph>(50, Graphic::Colors::SEAGREEN);
-    cpu_graph->flags(Widget::Element::FILL);
-    cpu_graph->add(Widget::label("CPU", Anchor::CENTER));
-
-    _ram_timer = own<Async::Timer>(700, [ram_graph]() {
+    _ram_model = make<Widget::GraphModel>(50);
+    _ram_timer = own<Async::Timer>(700, [this]() {
         SystemStatus status{};
         hj_system_status(&status);
-        ram_graph->record(status.used_ram / (float)status.total_ram);
+        _ram_model->record(status.used_ram / (float)status.total_ram);
     });
 
-    _cpu_timer = own<Async::Timer>(300, [cpu_graph]() {
+    _cpu_model = make<Widget::GraphModel>(50);
+    _cpu_timer = own<Async::Timer>(300, [this]() {
         SystemStatus status{};
         hj_system_status(&status);
-        cpu_graph->record(status.cpu_usage / 100.0);
+        _cpu_model->record(status.cpu_usage / 100.0);
     });
 
     _ram_timer->start();
     _cpu_timer->start();
 }
 
-} // namespace panel
+RefPtr<Element> RessourceMonitor::build()
+{
+    using namespace Widget;
+
+    return hflow({
+        stack({
+            fill(graph(_cpu_model, Graphic::Colors::SEAGREEN)),
+            fill(spacing({0, 12}, label("CPU", Anchor::CENTER))),
+        }),
+        separator(),
+        stack({
+            fill(graph(_ram_model, Graphic::Colors::ROYALBLUE)),
+            fill(spacing({0, 12}, label("RAM", Anchor::CENTER))),
+        }),
+    });
+}
+
+} // namespace Panel

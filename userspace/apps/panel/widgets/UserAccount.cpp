@@ -1,17 +1,18 @@
 #include <skift/Environment.h>
 
-#include <libwidget/Elements.h>
-
 #include "panel/widgets/UserAccount.h"
 
-namespace panel
+using namespace Widget;
+
+namespace Panel
 {
 
-UserAccount::UserAccount() {}
-
-RefPtr<Widget::Element> UserAccount::build()
+RefPtr<Element> UserAccountComponent::build()
 {
-    return Widget::label(environment().get("POSIX").get("LOGNAME").as_string());
+    return label(environment()
+                     .get("POSIX")
+                     .get("LOGNAME")
+                     .as_string());
 }
 
-} // namespace panel
+} // namespace Panel

@@ -1,22 +1,22 @@
 #pragma once
 
-#include "libwidget/Element.h"
 #include <libwidget/Components.h>
 
-namespace panel
+namespace Panel
 {
 
-class ApplicationListing : public Widget::Component
+struct ApplicationListingComponent :
+    public Widget::Component
 {
 private:
     String _filter;
 
 public:
-    ApplicationListing(String filter);
+    ApplicationListingComponent(String filter);
 
     RefPtr<Widget::Element> build();
 };
 
-WIDGET_BUILDER(ApplicationListing, application_listing);
+WIDGET_BUILDER(ApplicationListingComponent, application_listing);
 
-} // namespace panel
+} // namespace Panel

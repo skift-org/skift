@@ -6,23 +6,14 @@
 namespace Widget
 {
 
-Graph::Graph(size_t data_size, Graphic::Color data_color)
+GraphView::GraphView(RefPtr<GraphModel> model, Graphic::Color color)
+    : _model{model},
+      _color{color}
 {
-    min_width(64);
-    min_height(16);
-
-    _data = (float *)calloc(data_size, sizeof(float));
-    _data_size = data_size;
-    _color = data_color;
-    _current = 0;
+    _observer = model->observe([this](auto &) { should_repaint(); });
 }
 
-Graph::~Graph()
-{
-    free(_data);
-}
-
-void Graph::paint(Graphic::Painter &painter, const Math::Recti &)
+void GraphView::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     int height = bound().height();
     int width = bound().width();
@@ -36,18 +27,12 @@ void Graph::paint(Graphic::Painter &painter, const Math::Recti &)
         return fabsf(to - from) / (float)size;
     };
 
-    auto graph_sample = [&](float where) {
-        assert(where >= 0 && where <= 1);
-
-        return _data[(size_t)(_data_size * where)];
-    };
-
-    float cursor_position = (_current % _data_size) / (float)_data_size;
+    float cursor_position = _model->current();
 
     for (int i = 0; i < width; i++)
     {
         float where = i / (float)width;
-        float data = graph_sample(where);
+        float data = _model->sample(where);
 
         Math::Recti bar{i, (int)(height * (1.0 - data)), 1, height};
 
@@ -60,14 +45,6 @@ void Graph::paint(Graphic::Painter &painter, const Math::Recti &)
     Math::Recti cursor{(int)(width * cursor_position), 0, 1, height};
 
     painter.fill_rectangle(cursor, color(THEME_BORDER));
-}
-
-void Graph::record(float data)
-{
-    _data[_current % _data_size] = data;
-    _current++;
-
-    should_repaint();
 }
 
 } // namespace Widget

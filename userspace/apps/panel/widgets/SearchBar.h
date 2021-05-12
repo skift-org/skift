@@ -1,26 +1,24 @@
 #pragma once
 
-#include "libutils/Callback.h"
-#include "libutils/RefPtr.h"
-#include "libwidget/Element.h"
 #include <libwidget/Components.h>
 #include <libwidget/model/TextModel.h>
 
-namespace panel
+namespace Panel
 {
 
-class SearchBar : public Widget::Component
+struct SearchBarComponent :
+    public Widget::Component
 {
 private:
     RefPtr<Widget::TextModel> _model;
     Callback<void(String)> _on_change;
 
 public:
-    SearchBar(String text, Callback<void(String)> on_change);
+    SearchBarComponent(String text, Callback<void(String)> on_change);
 
     RefPtr<Widget::Element> build() override;
 };
 
-WIDGET_BUILDER(SearchBar, search_bar);
+WIDGET_BUILDER(SearchBarComponent, search_bar);
 
-} // namespace panel
+} // namespace Panel

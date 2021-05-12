@@ -35,6 +35,7 @@ private:
     RefPtr<PaintDocument> _document;
 
     /// --- Toolbar --- ///
+
     RefPtr<Widget::Element> _open_document;
     RefPtr<Widget::Element> _save_document;
     RefPtr<Widget::Element> _new_document;
@@ -54,6 +55,7 @@ private:
     RefPtr<Widget::Element> _secondary_color;
 
     /// --- Canvas --- ///
+
     RefPtr<PaintCanvas> _canvas;
 
 public:

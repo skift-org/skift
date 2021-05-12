@@ -5,9 +5,6 @@
 #include <libutils/String.h>
 #include <libutils/Vector.h>
 
-namespace panel
-{
-
 struct MenuEntry
 {
     String id;
@@ -21,5 +18,3 @@ struct MenuEntry
 
     static Vector<MenuEntry> load();
 };
-
-} // namespace panel

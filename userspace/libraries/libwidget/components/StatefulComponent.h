@@ -1,38 +1,21 @@
 #pragma once
 
-#include <libwidget/components/Rebuildable.h>
+#include <libwidget/components/RebuildableComponent.h>
 
 namespace Widget
 {
 
 template <typename TState>
-class Stateful : public Rebuildable
+class StatefulComponentBase :
+    public RebuildableComponent
 {
 private:
     TState _state{};
 
 public:
-    void update(TState state)
+    TState const &state() const
     {
-        _state = state;
-        should_rebuild();
-    }
-
-    RefPtr<Element> do_build() final { return build(_state); }
-    virtual RefPtr<Element> build(TState) { return nullptr; }
-};
-
-template <typename TState, typename TCallback>
-struct FonctionalStateful : public Rebuildable
-{
-private:
-    TState _state;
-    TCallback _callback;
-
-public:
-    FonctionalStateful(TState state, TCallback callback)
-        : _state{state}, _callback{callback}
-    {
+        return _state;
     }
 
     void update(TState state)
@@ -44,22 +27,90 @@ public:
         }
     }
 
-    RefPtr<Element> do_build() final
+    StatefulComponentBase()
+        : _state{}
     {
-        return _callback(_state, [this](TState state) { update(state); });
+    }
+
+    StatefulComponentBase(TState state)
+        : _state{state}
+    {
     }
 };
 
-template <typename TState, typename TCallback>
-static inline RefPtr<FonctionalStateful<TState, TCallback>> stateful(TCallback callback)
+template <
+    typename TState,
+    typename TStatefulBase = StatefulComponentBase<TState>>
+struct StatefulComponent : public TStatefulBase
 {
-    return make<FonctionalStateful<TState, TCallback>>(TState{}, callback);
+    using TStatefulBase::state;
+    using TStatefulBase::update;
+
+    StatefulComponent()
+        : TStatefulBase()
+    {
+    }
+
+    StatefulComponent(TState state)
+        : TStatefulBase(state)
+    {
+    }
+
+    RefPtr<Element> do_build() final
+    {
+        return build(state());
+    }
+
+    virtual RefPtr<Element> build(TState)
+    {
+        return nullptr;
+    }
+};
+
+template <
+    typename TState,
+    typename TCallback,
+    typename TStatefulBase = StatefulComponentBase<TState>>
+struct FunctionalStatefulComponent : public TStatefulBase
+{
+private:
+    TCallback _callback;
+
+public:
+    using TStatefulBase::state;
+    using TStatefulBase::update;
+
+    FunctionalStatefulComponent(TState state, TCallback callback)
+        : TStatefulBase(state), _callback{callback}
+    {
+    }
+
+    RefPtr<Element> do_build() final
+    {
+        return _callback(state(), [this](TState state) {
+            update(state);
+        });
+    }
+};
+
+template <
+    typename TState,
+    typename TCallback,
+    typename TStateful = FunctionalStatefulComponent<TState, TCallback>>
+static inline RefPtr<TStateful> stateful(
+    TCallback callback)
+{
+    return make<TStateful>(TState{}, callback);
 }
 
-template <typename TState, typename TCallback>
-static inline RefPtr<FonctionalStateful<TState, TCallback>> stateful(TState state, TCallback callback)
+template <
+    typename TState,
+    typename TCallback,
+    typename TStateful = FunctionalStatefulComponent<TState, TCallback>>
+static inline RefPtr<TStateful> stateful(
+    TState state, TCallback callback)
 {
-    return make<FonctionalStateful<TState, TCallback>>(state, callback);
+    return make<TStateful>(state, callback);
 }
 
 } // namespace Widget

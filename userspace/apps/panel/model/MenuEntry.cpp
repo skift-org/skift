@@ -5,9 +5,6 @@
 
 #include "panel/model/MenuEntry.h"
 
-namespace panel
-{
-
 MenuEntry::MenuEntry(String id, const Json::Value &value)
 {
     value.with("name", [this](auto &v) {
@@ -47,11 +44,6 @@ Vector<MenuEntry> MenuEntry::load()
 
     IO::Directory directory{"/Applications"};
 
-    if (!directory.exist())
-    {
-        return entries;
-    }
-
     for (auto &entry : directory.entries())
     {
         if (entry.stat.type != FILE_TYPE_DIRECTORY)
@@ -75,5 +67,3 @@ Vector<MenuEntry> MenuEntry::load()
 
     return entries;
 }
-
-} // namespace panel

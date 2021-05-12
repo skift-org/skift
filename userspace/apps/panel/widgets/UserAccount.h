@@ -2,17 +2,15 @@
 
 #include <libwidget/Components.h>
 
-namespace panel
+namespace Panel
 {
 
-class UserAccount : public Widget::Component
+struct UserAccountComponent :
+    public Widget::Component
 {
-public:
-    UserAccount();
-
     RefPtr<Widget::Element> build() override;
 };
 
-WIDGET_BUILDER(UserAccount, user_account);
+WIDGET_BUILDER(UserAccountComponent, user_account);
 
-} // namespace panel
+} // namespace Panel

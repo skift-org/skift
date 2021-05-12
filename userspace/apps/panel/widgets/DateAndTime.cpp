@@ -1,28 +1,17 @@
-#include <libio/Format.h>
-#include <libwidget/Elements.h>
-
 #include "panel/widgets/DateAndTime.h"
 
-namespace panel
+using namespace Widget;
+
+namespace Panel
 {
 
-DateAndTime::DateAndTime()
+RefPtr<Element> DateAndTimeComponent::build()
 {
-    min_width(128);
-
-    _timer = own<Async::Timer>(1000, [this]() {
-        TimeStamp timestamp = timestamp_now();
-        DateTime datetime = timestamp_to_datetime(timestamp);
-
-        update(datetime);
+    return refresher(1000, [] {
+        DateTime datetime = timestamp_to_datetime(timestamp_now());
+        auto text = IO::format("{02d}:{02d}:{02d}", datetime.hour, datetime.minute, datetime.second);
+        return basic_button(text);
     });
+};
 
-    _timer->start();
-}
-
-RefPtr<Widget::Element> DateAndTime::build(DateTime state)
-{
-    return Widget::basic_button(IO::format("{02d}:{02d}:{02d}", state.hour, state.minute, state.second));
-}
-
-} // namespace panel
+} // namespace Panel

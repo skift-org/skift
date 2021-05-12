@@ -1,18 +1,17 @@
+#include <libwidget/Screen.h>
 #include <skift/Environment.h>
 
-#include <libwidget/Elements.h>
-#include <libwidget/Screen.h>
-
 #include "panel/widgets/SettingToggle.h"
-#include "panel/windows/PanelWindow.h"
-#include "panel/windows/QuickSettingsWindow.h"
+#include "panel/windows/QuickSettings.h"
+
+#include "panel/Constants.h"
 
 using namespace Widget;
 
-namespace panel
+namespace Panel
 {
 
-QuickSettingsWindow::QuickSettingsWindow()
+QuickSettings::QuickSettings()
     : Window(WINDOW_AUTO_CLOSE | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC)
 {
     type(WINDOW_TYPE_POPOVER);
@@ -20,18 +19,18 @@ QuickSettingsWindow::QuickSettingsWindow()
 
     on(Event::DISPLAY_SIZE_CHANGED, [this](auto) {
         bound(Screen::bound()
-                  .take_right(WIDTH)
-                  .shrinked({PanelWindow::HEIGHT, 0, 0, 0})
+                  .take_right(QUICK_SETTINGS_WINDOW_WIDTH)
+                  .shrinked({PANEL_WINDOW_HEIGHT, 0, 0, 0})
                   .with_height(root()->compute_size().y()));
     });
 
     bound(Screen::bound()
-              .take_right(WIDTH)
-              .shrinked({PanelWindow::HEIGHT, 0, 0, 0})
+              .take_right(QUICK_SETTINGS_WINDOW_WIDTH)
+              .shrinked({PANEL_WINDOW_HEIGHT, 0, 0, 0})
               .with_height(root()->compute_size().y()));
 }
 
-RefPtr<Element> QuickSettingsWindow::build()
+RefPtr<Element> QuickSettings::build()
 {
     // clang-format off
 
@@ -47,7 +46,7 @@ RefPtr<Element> QuickSettingsWindow::build()
         basic_button("Dark Theme", [] {
             Settings::Service::the()->write(Settings::Path::parse("appearance:widgets.theme"), "skift-dark");
         }),
-        Widget::panel(
+        panel(
             spacing(4,
                 hflow(6, {
                     basic_button(Graphic::Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string()),
@@ -69,4 +68,4 @@ RefPtr<Element> QuickSettingsWindow::build()
     // clang-format on
 }
 
-} // namespace panel
+} // namespace Panel

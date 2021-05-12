@@ -1,33 +1,17 @@
 #pragma once
 
 #include <libasync/Timer.h>
-
 #include <libwidget/Components.h>
 
-namespace panel
+namespace Panel
 {
 
-class DateAndTime : public Widget::Stateful<DateTime>
+struct DateAndTimeComponent :
+    public Widget::Component
 {
-private:
-    OwnPtr<Async::Timer> _timer;
-
-public:
-    DateAndTime();
-
-    RefPtr<Widget::Element> build(DateTime state) override;
+    RefPtr<Widget::Element> build() override;
 };
 
-static inline RefPtr<DateAndTime> date_and_time(Callback<void(void)> on_click)
-{
-    auto date_and_time = make<DateAndTime>();
+WIDGET_BUILDER(DateAndTimeComponent, date_and_time);
 
-    if (on_click)
-    {
-        date_and_time->on(Widget::Event::ACTION, [on_click](auto) { on_click(); });
-    }
-
-    return date_and_time;
-}
-
-} // namespace panel
+} // namespace Panel

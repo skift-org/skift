@@ -10,7 +10,9 @@
 
 namespace Graphic
 {
+
 class Painter;
+
 } // namespace Graphic
 
 namespace Widget
@@ -20,7 +22,7 @@ struct Window;
 
 #define WIDGET_BUILDER(__type, __name)                    \
     template <typename... TArgs>                          \
-    ::RefPtr<__type> __name(TArgs &&...args)              \
+    ::RefPtr<::Widget::Element> __name(TArgs &&...args)   \
     {                                                     \
         return ::make<__type>(::forward<TArgs>(args)...); \
     }

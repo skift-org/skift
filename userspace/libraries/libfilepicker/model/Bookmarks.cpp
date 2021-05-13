@@ -47,7 +47,7 @@ RefPtr<Bookmarks> Bookmarks::load()
 {
     auto bookmarks = make<Bookmarks>();
 
-    IO::File bookmarks_file{"/Configs/file-manager/booksmark.json", OPEN_READ};
+    IO::File bookmarks_file{"/Configs/file-manager/bookmarks.json", OPEN_READ};
 
     if (!bookmarks_file.exist())
     {
@@ -83,7 +83,7 @@ void Bookmarks::save()
 
     auto data = pretty.finalize();
 
-    IO::File file{"/Configs/file-manager/booksmark.json", OPEN_WRITE | OPEN_CREATE};
+    IO::File file{"/Configs/file-manager/bookmarks.json", OPEN_WRITE | OPEN_CREATE};
 
     if (!file.exist())
     {

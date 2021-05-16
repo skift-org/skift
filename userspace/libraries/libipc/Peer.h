@@ -10,8 +10,10 @@ namespace IPC
 {
 
 template <typename Protocol>
-class Peer
+struct Peer
 {
+    using MessageType = typename Protocol::Message;
+
 private:
     IO::Connection _connection;
     OwnPtr<Async::Notifier> _notifier;
@@ -40,7 +42,7 @@ public:
         close();
     }
 
-    Result send(const Protocol::Message &message)
+    Result send(const MessageType &message)
     {
         auto result = Protocol::encode_message(_connection, message);
 
@@ -52,7 +54,7 @@ public:
         return result;
     }
 
-    ResultOr<typename Protocol::Message> receive()
+    ResultOr<MessageType> receive()
     {
         auto result_or_message = Protocol::decode_message(_connection);
 
@@ -65,7 +67,7 @@ public:
     }
 
     template <typename TPredicate>
-    ResultOr<typename Protocol::Message> send_and_wait_for(Protocol::Message message, TPredicate predicate)
+    ResultOr<MessageType> send_and_wait_for(MessageType message, TPredicate predicate)
     {
         TRY(send(message));
 
@@ -83,7 +85,9 @@ public:
     void close()
     {
         if (_connection.closed())
+        {
             return;
+        }
 
         handle_disconnect();
 
@@ -91,7 +95,7 @@ public:
         _connection.close();
     }
 
-    virtual void handle_message(const Protocol::Message &) {}
+    virtual void handle_message(const MessageType &) {}
     virtual void handle_disconnect() {}
 };
 

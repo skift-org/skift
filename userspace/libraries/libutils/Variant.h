@@ -154,7 +154,6 @@ public:
     template <typename T, typename... Args>
     void set(Args &&...args)
     {
-        // First we destroy the current contents
         Operations::destroy(_index, &_storage);
         new (&_storage) T(forward<Args>(args)...);
         _index = IndexOf<T, Ts...>();

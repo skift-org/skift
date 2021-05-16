@@ -5,17 +5,19 @@
 #include <libwidget/Layouts.h>
 #include <libwidget/Views.h>
 
+using namespace Widget;
+
 static auto logo_based_on_color_scheme()
 {
-    auto path = Widget::theme_is_dark() ? "/Applications/about/logo-white.png"
-                                        : "/Applications/about/logo-black.png";
+    auto path = Widget::theme_is_dark()
+                    ? "/Applications/about/logo-white.png"
+                    : "/Applications/about/logo-black.png";
 
     return Graphic::Bitmap::load_from_or_placeholder(path);
 }
 
-void show_license()
+static void show_license()
 {
-    using namespace Widget;
 
     auto texteditor = Widget::texteditor(Widget::TextModel::open("/Files/license.md"));
     texteditor->readonly(true);
@@ -36,9 +38,12 @@ void show_license()
     // clang-format on
 }
 
-int main(int, char **)
+int main(int argc, char const *argv[])
 {
-    using namespace Widget;
+    UNUSED(argc);
+    UNUSED(argv);
+
+    Application app;
 
     // clang-format off
 
@@ -66,8 +71,8 @@ int main(int, char **)
                         show_license();
                     }),
                     spacer(),
-                    filled_button("Ok", [] {
-                        Application::the().exit(PROCESS_SUCCESS);
+                    filled_button("Ok", [&] {
+                        app.exit(PROCESS_SUCCESS);
                     })
                 })
             )
@@ -78,5 +83,5 @@ int main(int, char **)
 
     win->show();
 
-    return Application::the().run();
+    return app.run();
 }

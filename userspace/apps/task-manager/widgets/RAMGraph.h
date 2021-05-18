@@ -1,27 +1,27 @@
 #pragma once
 
 #include <libasync/Timer.h>
+#include <libwidget/Components.h>
 #include <libwidget/Views.h>
 
 #include "task-manager/model/TaskModel.h"
 
-namespace task_manager
+namespace TaskManager
 {
 
-class RAMGraph : public Widget::Graph
+class RAMGraphComponent : public Widget::Component
 {
 private:
-    RefPtr<TaskModel> _model;
-
-    RefPtr<Widget::LabelElement> _label_usage;
-    RefPtr<Widget::LabelElement> _label_available;
-    RefPtr<Widget::LabelElement> _label_greedy;
-
-    OwnPtr<Async::Timer> _graph_timer{};
-    OwnPtr<Async::Timer> _text_timer{};
+    RefPtr<TaskModel> _tasks;
+    RefPtr<Widget::GraphModel> _usage;
+    OwnPtr<Async::Timer> _update;
 
 public:
-    RAMGraph(RefPtr<TaskModel> model);
+    RAMGraphComponent(RefPtr<TaskModel> tasks);
+
+    RefPtr<Element> build() override;
 };
 
-} // namespace task_manager
+WIDGET_BUILDER(RAMGraphComponent, ram_graph);
+
+} // namespace TaskManager

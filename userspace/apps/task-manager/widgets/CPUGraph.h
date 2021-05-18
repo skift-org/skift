@@ -1,28 +1,26 @@
 #pragma once
 
 #include <libasync/Timer.h>
-#include <libwidget/Elements.h>
+#include <libwidget/Components.h>
 #include <libwidget/Views.h>
 
 #include "task-manager/model/TaskModel.h"
 
-namespace task_manager
+namespace TaskManager
 {
-
-class CPUGraph : public Widget::Graph
+class CPUGraphComponent : public Widget::Component
 {
 private:
-    RefPtr<TaskModel> _model;
-
-    RefPtr<Widget::LabelElement> _label_average;
-    RefPtr<Widget::LabelElement> _label_greedy;
-    RefPtr<Widget::LabelElement> _label_uptime;
-
-    OwnPtr<Async::Timer> _graph_timer{};
-    OwnPtr<Async::Timer> _text_timer{};
+    RefPtr<TaskModel> _tasks;
+    RefPtr<Widget::GraphModel> _usage;
+    OwnPtr<Async::Timer> _update;
 
 public:
-    CPUGraph(RefPtr<TaskModel> model);
+    CPUGraphComponent(RefPtr<TaskModel> tasks);
+
+    RefPtr<Element> build() override;
 };
 
-} // namespace task_manager
+WIDGET_BUILDER(CPUGraphComponent, cpu_graph);
+
+} // namespace TaskManager

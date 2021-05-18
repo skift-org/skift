@@ -1,10 +1,11 @@
 #include <libio/File.h>
+#include <libio/Streams.h>
 #include <libjson/Json.h>
 #include <libsystem/process/Process.h>
 
 #include "task-manager/model/TaskModel.h"
 
-namespace task_manager
+namespace TaskManager
 {
 
 enum Column
@@ -128,12 +129,26 @@ static String greedy(Json::Value &data, const char *field)
 
 String TaskModel::ram_greedy()
 {
-    return greedy(_data, "ram");
+    if (!_data.is(Json::NIL))
+    {
+        return greedy(_data, "ram");
+    }
+    else
+    {
+        return "<none>";
+    }
 }
 
 String TaskModel::cpu_greedy()
 {
-    return greedy(_data, "cpu");
+    if (!_data.is(Json::NIL))
+    {
+        return greedy(_data, "cpu");
+    }
+    else
+    {
+        return "<none>";
+    }
 }
 
 Result TaskModel::kill_task(int row)
@@ -141,4 +156,4 @@ Result TaskModel::kill_task(int row)
     return process_cancel(data(row, COLUMN_ID).as_int());
 }
 
-} // namespace task_manager
+} // namespace TaskManager

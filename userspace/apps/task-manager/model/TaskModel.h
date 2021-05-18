@@ -3,7 +3,7 @@
 #include <libjson/Json.h>
 #include <libwidget/model/TableModel.h>
 
-namespace task_manager
+namespace TaskManager
 {
 
 class TaskModel : public Widget::TableModel
@@ -29,4 +29,4 @@ public:
     Result kill_task(int row);
 };
 
-}; // namespace task_manager
+} // namespace TaskManager

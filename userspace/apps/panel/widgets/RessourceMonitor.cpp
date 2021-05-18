@@ -10,15 +10,15 @@ namespace Panel
 
 RessourceMonitor::RessourceMonitor()
 {
-    _ram_model = make<Widget::GraphModel>(50);
-    _ram_timer = own<Async::Timer>(700, [this]() {
+    _ram_model = make<GraphModel>(50);
+    _ram_timer = own<Async::Timer>(700, [this] {
         SystemStatus status{};
         hj_system_status(&status);
         _ram_model->record(status.used_ram / (float)status.total_ram);
     });
 
-    _cpu_model = make<Widget::GraphModel>(50);
-    _cpu_timer = own<Async::Timer>(300, [this]() {
+    _cpu_model = make<GraphModel>(50);
+    _cpu_timer = own<Async::Timer>(300, [this] {
         SystemStatus status{};
         hj_system_status(&status);
         _cpu_model->record(status.cpu_usage / 100.0);
@@ -30,7 +30,6 @@ RessourceMonitor::RessourceMonitor()
 
 RefPtr<Element> RessourceMonitor::build()
 {
-    using namespace Widget;
 
     return hflow({
         stack({

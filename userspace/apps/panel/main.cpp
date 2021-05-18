@@ -5,7 +5,7 @@
 namespace Panel
 {
 
-struct PanelApplication : public Widget::Application
+struct Application : public Widget::Application
 {
     OwnPtr<Widget::Window> build() override
     {
@@ -20,6 +20,6 @@ int main(int argc, char const *argv[])
     UNUSED(argc);
     UNUSED(argv);
 
-    Panel::PanelApplication app;
+    Panel::Application app;
     return app.run();
 }

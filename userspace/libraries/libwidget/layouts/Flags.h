@@ -13,8 +13,7 @@ static inline RefPtr<TElement> fill(RefPtr<TElement> child)
     return child;
 }
 
-template <typename TElement>
-static inline Vector<RefPtr<TElement>> fill(Vector<RefPtr<TElement>> childs)
+static inline Vector<RefPtr<Element>> fill(Vector<RefPtr<Element>> childs)
 {
     for (auto &child : childs)
     {
@@ -46,6 +45,14 @@ static inline RefPtr<TElement> min_height(int value, RefPtr<TElement> child)
 }
 
 template <typename TElement>
+static inline RefPtr<TElement> min_size(Math::Vec2i size, RefPtr<TElement> child)
+{
+    child->min_width(size.x());
+    child->min_height(size.y());
+    return child;
+}
+
+template <typename TElement>
 static inline RefPtr<TElement> max_width(int value, RefPtr<TElement> child)
 {
     child->max_width(value);
@@ -56,6 +63,14 @@ template <typename TElement>
 static inline RefPtr<TElement> max_height(int value, RefPtr<TElement> child)
 {
     child->max_height(value);
+    return child;
+}
+
+template <typename TElement>
+static inline RefPtr<TElement> max_size(Math::Vec2i size, RefPtr<TElement> child)
+{
+    child->max_width(size.x());
+    child->max_height(size.y());
     return child;
 }
 

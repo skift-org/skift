@@ -16,7 +16,7 @@ private:
     size_t _current = 0;
 
 public:
-    GraphModel(size_t size)
+    GraphModel(size_t size = 100)
     {
         _data.resize(size);
     }

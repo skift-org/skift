@@ -9,7 +9,9 @@
 namespace Snake
 {
 
-struct Board : public RefPtr<Board>, public RefCounted<Board>
+struct Board :
+    public RefPtr<Board>,
+    public RefCounted<Board>
 {
 private:
     int _width = 16;
@@ -35,8 +37,7 @@ public:
 
     void reset()
     {
-        _snake = Snake{Math::Vec2i{_width, _height} / 2};
-
+        _snake = {Math::Vec2i{_width, _height} / 2};
         _fruits.clear();
         spawn();
     }
@@ -73,21 +74,28 @@ public:
     {
         _snake.move();
 
-        if (_snake.colide_with_body(_snake.head))
+        if (_snake.colide_with_body(_snake.head()))
         {
             reset();
         }
 
-        if (!Math::Recti{_width, _height}.contains(_snake.head))
+        if (!Math::Recti{_width, _height}.contains(_snake.head()))
         {
             reset();
         }
 
         int old_fruit_count = _fruits.count();
-        _fruits.remove_all_match([&](Fruit &fruit) { return _snake.colide_with(fruit.position); });
+
+        _fruits.remove_all_match([&](auto &fruit) {
+            return _snake.colide_with(fruit.position);
+        });
+
         int new_fruit_count = _fruits.count();
 
-        _snake.score += old_fruit_count - new_fruit_count;
+        if (old_fruit_count != new_fruit_count)
+        {
+            _snake.eat();
+        }
 
         spawn();
     }

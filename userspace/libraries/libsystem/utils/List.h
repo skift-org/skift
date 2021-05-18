@@ -51,7 +51,7 @@ void list_insert_sorted(List *list, void *value, ListCompareElementCallback comp
 
 void *list_peek(List *list);
 
-bool list_peek_and_pushback(List *list, void **value);
+bool list_requeue(List *list, void **value);
 
 void *list_peekback(List *list);
 

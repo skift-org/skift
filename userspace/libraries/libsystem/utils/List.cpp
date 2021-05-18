@@ -104,7 +104,7 @@ void *list_peek(List *list)
     }
 }
 
-bool list_peek_and_pushback(List *list, void **value)
+bool list_requeue(List *list, void **value)
 {
     *value = list_peek(list);
 

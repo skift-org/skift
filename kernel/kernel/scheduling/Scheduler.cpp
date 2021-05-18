@@ -121,7 +121,7 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
     list_iterate(blocked_tasks, nullptr, (ListIterationCallback)wakeup_task_if_unblocked);
 
     // Get the next task
-    if (!list_peek_and_pushback(running_tasks, (void **)&running))
+    if (!list_requeue(running_tasks, (void **)&running))
     {
         // Or the idle task if there are no running tasks.
         running = idle;

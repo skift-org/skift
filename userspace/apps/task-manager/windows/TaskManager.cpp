@@ -28,11 +28,15 @@ RefPtr<Element> TaskManager::build()
             titlebar(Graphic::Icon::get("memory"), "Task Manager"),
             fill(process_table(_model)),
             separator(),
-            min_height(128, hflow({
-                fill(cpu_graph(_model)),
-                separator(),
-                fill(ram_graph(_model)),
-            })),
+            min_height(128,
+                panel(
+                    hflow({
+                        fill(cpu_graph(_model)),
+                        separator(),
+                        fill(ram_graph(_model)),
+                    })
+                )
+            ),
         })
     );
 

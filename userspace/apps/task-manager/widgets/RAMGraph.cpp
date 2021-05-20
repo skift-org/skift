@@ -38,7 +38,10 @@ RefPtr<Element> RAMGraphComponent::build()
 
                 return spacing(6,
                     vflow(4, {
-                        hflow({icon("chip"), label("Memory")}),
+                        hflow(4, {
+                            icon("chip"),
+                            label("Memory")
+                        }),
                         spacer(),
                         label(IO::format("Usage: {} Mio", usage), Anchor::RIGHT),
                         label(IO::format("Available: {} Mio", available), Anchor::RIGHT),

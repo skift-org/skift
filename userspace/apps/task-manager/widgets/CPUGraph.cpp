@@ -29,7 +29,7 @@ RefPtr<Element> CPUGraphComponent::build()
     return stack({
         fill({
             graph(_usage, Colors::SEAGREEN),
-            refresher(1000, [this]{
+            refresher(1000, [this] {
                 SystemStatus status{};
                 hj_system_status(&status);
 
@@ -43,7 +43,10 @@ RefPtr<Element> CPUGraphComponent::build()
 
                 return spacing(6,
                     vflow(4, {
-                        hflow({icon("memory"), label("Processor")}),
+                        hflow(4, {
+                            icon("memory"),
+                            label("Processor")
+                        }),
                         spacer(),
                         label(IO::format("Average: {}%", (int)(_usage->average() * 100)), Anchor::RIGHT),
                         label(IO::format("Most greedy: {}", _tasks->cpu_greedy()), Anchor::RIGHT),

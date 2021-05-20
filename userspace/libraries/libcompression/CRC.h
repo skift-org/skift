@@ -6,42 +6,50 @@
 namespace Compression
 {
 
-class CRC
+struct CRCTable : public Array<uint32_t, 256>
 {
-private:
-    static const Array<uint32_t, 256> _table;
-    uint32_t _crc = 0;
+    static constexpr uint32_t POLYNOMIAL = 0xEDB88320;
 
-    template <typename T, int N>
-    static inline constexpr Array<T, N> calculate_table()
+    constexpr CRCTable()
     {
-        Array<T, N> lookup;
-        const unsigned long POLYNOMIAL = 0xEDB88320;
-        unsigned long remainder = 0;
-        unsigned char b = 0;
+        uint32_t remainder = 0;
+        uint8_t b = 0;
+
         do
         {
-            // Start with the data byte
             remainder = b;
-            for (unsigned long bit = 8; bit > 0; --bit)
+
+            for (uint8_t bit = 8; bit > 0; --bit)
             {
                 if (remainder & 1)
+                {
                     remainder = (remainder >> 1) ^ POLYNOMIAL;
+                }
                 else
+                {
                     remainder = (remainder >> 1);
+                }
             }
-            lookup[(size_t)b] = remainder;
-        } while (0 != ++b);
 
-        return lookup;
+            at(b) = remainder;
+        } while (0 != ++b);
     }
+};
+
+struct CRC
+{
+private:
+    CRCTable _table;
+    uint32_t _crc = 0;
 
 public:
-    inline CRC(uint32_t crc = 0) : _crc(crc)
+    uint32_t checksum() const { return _crc; }
+
+    CRC(uint32_t crc = 0) : _crc{crc}
     {
     }
 
-    inline void add(const uint8_t *data, size_t size)
+    void add(const uint8_t *data, size_t size)
     {
         _crc = ~_crc;
 
@@ -51,11 +59,6 @@ public:
         }
 
         _crc = ~_crc;
-    }
-
-    inline uint32_t checksum()
-    {
-        return _crc;
     }
 };
 

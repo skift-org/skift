@@ -30,7 +30,6 @@ public:
           _navigation(navigation),
           _archive(archive)
     {
-        size(Math::Vec2i(700, 500));
     }
 
     virtual RefPtr<Widget::Element> build()
@@ -41,36 +40,42 @@ public:
 
         if (_archive == nullptr)
         {
-            return vflow({
-                titlebar(Graphic::Icon::get("folder-zip"), "Archive Manager"),
-                fill(
-                    stack(
-                        filled_button(Graphic::Icon::get("folder-open"), "Load an archive file", [&] {
-                            if (_dialog.show() == DialogResult::OK)
+            return min_size(
+                {700, 500},
+                vflow({
+                    titlebar(Graphic::Icon::get("folder-zip"), "Archive Manager"),
+                    fill(
+                        stack(
+                            filled_button(Graphic::Icon::get("folder-open"), "Load an archive file", [&] {
+                                if (_dialog.show() == DialogResult::OK)
+                                {
+                                    set_archive(Archive::open(IO::Path::parse(_dialog.selected_file().unwrap())));
+                                }
+                            })
+                        )
+                    )
+                })
+            );
+        }
+        else
+        {
+            return min_size(
+                {700, 500},
+                vflow({
+                    titlebar(Graphic::Icon::get("folder-zip"), IO::format("Archive Manager - {}", _archive->get_path().basename())),
+                    toolbar({
+                        basic_button(Graphic::Icon::get("archive-arrow-up"), "Extract All"),
+                        separator(),
+                        basic_button(Graphic::Icon::get("folder-open"), [&] {
+                            if (_dialog.show() == Widget::DialogResult::OK)
                             {
                                 set_archive(Archive::open(IO::Path::parse(_dialog.selected_file().unwrap())));
                             }
                         })
-                    )
-                )
-            });
-        }
-        else
-        {
-            return vflow({
-                titlebar(Graphic::Icon::get("folder-zip"), IO::format("Archive Manager - {}", _archive->get_path().basename())),
-                toolbar({
-                    basic_button(Graphic::Icon::get("archive-arrow-up"), "Extract All"),
-                    separator(),
-                    basic_button(Graphic::Icon::get("folder-open"), [&] {
-                        if (_dialog.show() == Widget::DialogResult::OK)
-                        {
-                            set_archive(Archive::open(IO::Path::parse(_dialog.selected_file().unwrap())));
-                        }
-                    })
-                }),
-                make<FilePicker::ArchiveBrowser>(_navigation, _archive)
-            });
+                    }),
+                    make<FilePicker::ArchiveBrowser>(_navigation, _archive)
+                })
+            );
         }
 
         // clang-format on

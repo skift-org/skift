@@ -17,7 +17,7 @@ private:
     Callback<void()> _callback;
 
 public:
-    RefPtr<IO::Handle> handle() { return _handle; }
+    RefPtr<IO::Handle> handle() override { return _handle; }
     PollEvent events() { return _events; }
 
     Notifier(RawHandle &raw_handle, PollEvent events, Callback<void()> callback)

@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 #include <libutils/ResultOr.h>
 
 #include "archs/Arch.h"
@@ -163,7 +163,7 @@ MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, Memor
         }
     }
 
-    logger_fatal("Out of virtual memory!");
+    system_panic("Out of virtual memory!");
 }
 
 void virtual_free(void *address_space, MemoryRange virtual_range)
@@ -206,7 +206,7 @@ void *address_space_create()
 
     if (memory_alloc(kernel_address_space(), sizeof(PageDirectory), MEMORY_CLEAR, (uintptr_t *)&page_directory) != SUCCESS)
     {
-        logger_error("Page directory allocation failed!");
+        Kernel::logln("Page directory allocation failed!");
 
         return nullptr;
     }

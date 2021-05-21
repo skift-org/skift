@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "archs/x86/IOAPIC.h"
 #include "archs/x86/LAPIC.h"
@@ -10,7 +10,7 @@ namespace Acpi
 
 void madt_initialize(MADT *madt)
 {
-    logger_info("MADT found, size is %d", madt->record_count());
+    Kernel::logln("MADT found, size is {}", madt->record_count());
 
     Arch::x86::lapic_found(madt->local_apic);
 
@@ -20,28 +20,28 @@ void madt_initialize(MADT *madt)
         case MADTRecordType::LAPIC:
         {
             auto local_apic = reinterpret_cast<MADTLocalApicRecord *>(record);
-            logger_info("Local APIC (cpu_id=%d, apic_id=%d, flags=%08x)", local_apic->processor_id, local_apic->apic_id, local_apic->flags);
+            Kernel::logln("Local APIC (cpu_id={}, apic_id={}, flags={08x})", local_apic->processor_id, local_apic->apic_id, local_apic->flags);
         }
         break;
 
         case MADTRecordType::IOAPIC:
         {
             auto ioapic = reinterpret_cast<MADTIOApicRecord *>(record);
-            logger_info("I/O APIC (id=%d, address=%08x)", ioapic->id, ioapic->address);
+            Kernel::logln("I/O APIC (id={d}, address={08x})", ioapic->id, ioapic->address);
             Arch::x86::ioapic_found(ioapic->address);
         }
         break;
 
         case MADTRecordType::ISO:
-            logger_info("Interrupt Source Override");
+            Kernel::logln("Interrupt Source Override");
             break;
 
         case MADTRecordType::NMI:
-            logger_info("Non-maskable interrupts");
+            Kernel::logln("Non-maskable interrupts");
             break;
 
         case MADTRecordType::LAPIC_OVERRIDE:
-            logger_info("Local APIC Address Override");
+            Kernel::logln("Local APIC Address Override");
             break;
 
         default:
@@ -56,7 +56,7 @@ void initialize(Handover *handover)
 {
     if (!handover->acpi_rsdp_address)
     {
-        logger_warn("No acpi rsdp found!");
+        Kernel::logln("No acpi rsdp found!");
         return;
     }
 

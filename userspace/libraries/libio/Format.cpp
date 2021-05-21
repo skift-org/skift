@@ -68,6 +68,8 @@ ResultOr<size_t> format(IO::Writer &writer, const Formating &, unsigned long lon
     return NumberFormat::decimal().format(writer, (uint64_t)value);
 }
 
+#ifndef __KERNEL__
+
 ResultOr<size_t> format(Writer &writer, const Formating &, float value)
 {
     return NumberFormat::decimal().format(writer, value);
@@ -77,6 +79,8 @@ ResultOr<size_t> format(Writer &writer, const Formating &, double value)
 {
     return NumberFormat::decimal().format(writer, value);
 }
+
+#endif
 
 ResultOr<size_t> format(Writer &writer, const Formating &, const char *cstring)
 {

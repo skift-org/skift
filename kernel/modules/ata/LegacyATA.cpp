@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "ata/LegacyATA.h"
 #include "system/scheduling/Scheduler.h"
@@ -133,7 +133,7 @@ void LegacyATA::identify()
 
     /* Now, send IDENTIFY */
     out8(io_port + ATA_REG_COMMAND, ATA_CMD_IDENTIFY);
-    logger_info("Sent IDENTIFY");
+    Kernel::logln("Sent IDENTIFY");
 
     /* Now, read status port */
     uint8_t status = in8(io_port + ATA_REG_STATUS);
@@ -149,14 +149,14 @@ void LegacyATA::identify()
 
             if (status & ATA_SR_ERR)
             {
-                logger_error("%s%s has ERR set. Disabled.", _bus == ATA_PRIMARY ? "Primary" : "Secondary",
-                             _drive == ATA_PRIMARY ? " master" : " slave");
+                Kernel::logln("{}-{} has ERR set. Disabled.", _bus == ATA_PRIMARY ? "Primary" : "Secondary",
+                              _drive == ATA_PRIMARY ? " master" : " slave");
 
                 return;
             }
         } while (!(status & ATA_SR_DRQ));
 
-        logger_info("%s%s is online.", _bus == ATA_PRIMARY ? "Primary" : "Secondary", _drive == ATA_PRIMARY ? " master" : " slave");
+        Kernel::logln("{}-{} is online.", _bus == ATA_PRIMARY ? "Primary" : "Secondary", _drive == ATA_PRIMARY ? " master" : " slave");
 
         // Read back the data
         for (size_t i = 0; i < _ide_buffer.count(); i++)
@@ -179,12 +179,13 @@ void LegacyATA::identify()
 
         _num_blocks = _ide_buffer[ATA_IDENT_NUM_BLOCKS1] << 16 | _ide_buffer[ATA_IDENT_NUM_BLOCKS0];
 
-        logger_info("IDENITY: Modelname: %s LBA48: %i NB: %i", _model.cstring(), _supports_48lba, _num_blocks);
+        Kernel::logln("IDENITY: Modelname: {} LBA48: {} NB: {}", _model, _supports_48lba, _num_blocks);
     }
     else
     {
-        logger_error("%s%s does not exist.", _bus == ATA_PRIMARY ? "Primary" : "Secondary",
-                     _drive == ATA_PRIMARY ? " master" : " slave");
+        Kernel::logln("{}-{} does not exist.",
+                      _bus == ATA_PRIMARY ? "Primary" : "Secondary",
+                      _drive == ATA_PRIMARY ? " master" : " slave");
     }
 }
 
@@ -211,8 +212,8 @@ void LegacyATA::poll(uint16_t io_port)
 
         if (status & ATA_SR_ERR)
         {
-            logger_error("%s%s has ERR set. Disabled.", _bus == ATA_PRIMARY ? "Primary" : "Secondary",
-                         _drive == ATA_PRIMARY ? " master" : " slave");
+            Kernel::logln("{}-{} has ERR set. Disabled.", _bus == ATA_PRIMARY ? "Primary" : "Secondary",
+                          _drive == ATA_PRIMARY ? " master" : " slave");
 
             return;
         }

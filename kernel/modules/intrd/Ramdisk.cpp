@@ -1,6 +1,6 @@
 
+#include "system/Streams.h"
 #include <libfile/TARArchive.h>
-#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 
 #include "archs/Arch.h"
@@ -22,7 +22,7 @@ void ramdisk_load(Module *module)
 
             if (result != SUCCESS)
             {
-                logger_warn("Failed to create directory %s: %s", block.name, result_to_string(result));
+                Kernel::logln("Failed to create directory {}: {}", block.name, result_to_string(result));
             }
         }
         else if ((block.typeflag & 8) == 0 || (block.typeflag & 8) == 5)
@@ -31,7 +31,7 @@ void ramdisk_load(Module *module)
 
             if (!result_or_handle.success())
             {
-                logger_warn("Failed to open file %s! %s", block.name, result_to_string(result_or_handle.result()));
+                Kernel::logln("Failed to open file {}! {}", block.name, result_to_string(result_or_handle.result()));
                 continue;
             }
 
@@ -41,12 +41,12 @@ void ramdisk_load(Module *module)
 
             if (!result_or_written.success())
             {
-                logger_error("Failed to write file: %s", result_to_string(result_or_written.result()));
+                Kernel::logln("Failed to write file: {}", result_to_string(result_or_written.result()));
             }
         }
     }
 
     memory_free(Arch::kernel_address_space(), module->range);
 
-    logger_info("Loading ramdisk succeeded.");
+    Kernel::logln("Loading ramdisk succeeded.");
 }

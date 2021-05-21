@@ -1,5 +1,5 @@
+#include "system/Streams.h"
 #include <libmath/MinMax.h>
-#include <libsystem/Logger.h>
 
 #include "bga/BGA.h"
 #include "system/graphics/EarlyConsole.h"
@@ -23,7 +23,7 @@ Result BGA::set_resolution(int width, int height)
 {
     if (width * height * sizeof(uint32_t) > _framebuffer->size())
     {
-        logger_warn("Not enoughs VRAM for setting the resolution to %dx%d.", width, height);
+        Kernel::logln("Not enoughs VRAM for setting the resolution to {}x{}.", width, height);
 
         return ERR_OUT_OF_MEMORY;
     }
@@ -59,7 +59,7 @@ Result BGA::set_resolution(int width, int height)
             _width * 4,
             4);
 
-        logger_info("Resolution set to %dx%d.", width, height);
+        Kernel::logln("Resolution set to {}x{}.", width, height);
 
         return SUCCESS;
     }

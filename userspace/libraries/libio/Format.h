@@ -108,9 +108,13 @@ ResultOr<size_t> format(IO::Writer &, const Formating &, long long int);
 
 ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned long long int);
 
+#ifndef __KERNEL__
+
 ResultOr<size_t> format(IO::Writer &, const Formating &, float);
 
 ResultOr<size_t> format(IO::Writer &, const Formating &, double);
+
+#endif
 
 ResultOr<size_t> format(IO::Writer &, const Formating &, const char *);
 

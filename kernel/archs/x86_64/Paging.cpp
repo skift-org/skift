@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 #include <libutils/ResultOr.h>
 
 #include "system/interrupts/Interupts.h"
@@ -223,7 +223,7 @@ MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, Memor
         }
     }
 
-    logger_fatal("Out of virtual memory!");
+    system_panic("Out of virtual memory!");
 }
 
 void virtual_free(void *address_space, MemoryRange virtual_range)

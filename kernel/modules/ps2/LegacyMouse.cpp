@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "ps2/LegacyMouse.h"
 
@@ -78,7 +78,7 @@ void LegacyMouse::handle_finished_packet(uint8_t packet0, uint8_t packet1, uint8
 
     if (_events.write((const char *)&event, sizeof(MousePacket)) != sizeof(MousePacket))
     {
-        logger_warn("Mouse buffer overflow!");
+        Kernel::logln("Mouse buffer overflow!");
     }
 }
 

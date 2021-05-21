@@ -1,5 +1,5 @@
 
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "system/node/Pipe.h"
 #include "system/node/Terminal.h"
@@ -48,7 +48,7 @@ Result Handles::remove(int handle_index)
 
     if (!is_valid_handle(handle_index))
     {
-        logger_warn("Got a bad handle %d from task %d", handle_index, scheduler_running_id());
+        Kernel::logln("Got a bad handle {} from task {}", handle_index, scheduler_running_id());
         return ERR_BAD_HANDLE;
     }
 
@@ -63,7 +63,7 @@ RefPtr<FsHandle> Handles::acquire(int handle_index)
 
     if (!is_valid_handle(handle_index))
     {
-        logger_warn("Got a bad handle %d from task %d", handle_index, scheduler_running_id());
+        Kernel::logln("Got a bad handle {} from task {}", handle_index, scheduler_running_id());
         return nullptr;
     }
 
@@ -77,7 +77,7 @@ Result Handles::release(int handle_index)
 
     if (!is_valid_handle(handle_index))
     {
-        logger_warn("Got a bad handle %d from task %d", handle_index, scheduler_running_id());
+        Kernel::logln("Got a bad handle {} from task {}", handle_index, scheduler_running_id());
         return ERR_BAD_HANDLE;
     }
 

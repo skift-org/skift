@@ -1,7 +1,7 @@
 
 /* modules.c : kernel modules/ramdisk loader                                  */
 
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 #include <string.h>
 
 #include "system/modules/Modules.h"
@@ -14,25 +14,25 @@ void module_load(Module *module)
     }
     else
     {
-        logger_warn("Unknow module '%s'!", module->command_line);
+        Kernel::logln("Unknow module '{}'!", module->command_line);
     }
 }
 
 void modules_initialize(Handover *handover)
 {
-    logger_info("Loading modules:");
+    Kernel::logln("Loading modules:");
     for (size_t i = 0; i < handover->modules_size; i++)
     {
         Module *module = &handover->modules[i];
 
-        logger_info("\tModule %d: %08x-%08x: %s",
-                    i,
-                    module->range.base(),
-                    module->range.base() + module->range.size() - 1,
-                    module->command_line);
+        Kernel::logln("\tModule {}: {p}-{p}: {}",
+                      i,
+                      module->range.base(),
+                      module->range.base() + module->range.size() - 1,
+                      module->command_line);
 
         module_load(module);
     }
 
-    logger_info("%d module loaded!", handover->modules_size);
+    Kernel::logln("{} module loaded!", handover->modules_size);
 }

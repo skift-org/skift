@@ -1,7 +1,7 @@
 #include <skift/NumberFormatter.h>
 #include <string.h>
 
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 #include <libutils/StringBuilder.h>
 #include <libutils/Vector.h>
 
@@ -105,23 +105,23 @@ void device_initialize()
 {
     pci_initialize();
 
-    logger_info("Initializing devices...");
+    Kernel::logln("Initializing devices...");
 
     _devices = new Vector<RefPtr<Device>>();
 
     device_scan([&](DeviceAddress address) {
-        logger_info("Initializing device %s...", address.as_static_cstring());
+        Kernel::logln("Initializing device {}...", address.as_static_cstring());
 
         auto driver = driver_for(address);
 
         if (!driver)
         {
-            logger_warn("No driver found!");
+            Kernel::logln("No driver found!");
 
             return Iteration::CONTINUE;
         }
 
-        logger_info("Found a driver: %s", driver->name());
+        Kernel::logln("Found a driver: {}", driver->name());
 
         auto device = driver->instance(address);
         if (!device->did_fail())

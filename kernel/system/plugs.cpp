@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <skift/Plugs.h>
 
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 #include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
@@ -39,14 +39,9 @@ void __plug_initialize()
     log_stream = &internal_log_stream;
 }
 
-void __plug_uninitialize(int)
-{
-    ASSERT_NOT_REACHED();
-}
-
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
 {
-    logger_fatal("Assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
+    system_panic("Assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
     ASSERT_NOT_REACHED();
 }
 
@@ -96,11 +91,6 @@ void __plug_logger_lock()
 void __plug_logger_unlock()
 {
     interrupts_release();
-}
-
-void NO_RETURN __plug_logger_fatal(const char *message)
-{
-    system_panic(message);
 }
 
 /* --- Processes ------------------------------------------------------------ */

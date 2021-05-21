@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "archs/Memory.h"
 
@@ -60,7 +60,7 @@ MemoryRange physical_alloc(size_t size)
         }
     }
 
-    logger_fatal("Out of physical memory!\tTrying to allocat %dkio but free memory is %dkio !", size / 1024, (TOTAL_MEMORY - USED_MEMORY) / 1024);
+    system_panic("Out of physical memory!\tTrying to allocat %dkio but free memory is %dkio !", size / 1024, (TOTAL_MEMORY - USED_MEMORY) / 1024);
 }
 
 void physical_free(MemoryRange range)

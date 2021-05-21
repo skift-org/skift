@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "mbr/MBR.h"
 #include "system/devices/Devices.h"
@@ -12,15 +12,15 @@ bool partition_load_mbr(RefPtr<Device> disk, const MBR &mbr)
         return false;
     }
 
-    logger_info("MBR on '%s': ", disk->path().cstring());
-    logger_info("    - magic     = 0x%04x", mbr.magic);
-    logger_info("    - signature = 0x%08x", mbr.signature);
+    Kernel::logln("MBR on '{}': ", disk->path().cstring());
+    Kernel::logln("    - magic     = {#04x}", mbr.magic);
+    Kernel::logln("    - signature = {#08x}", mbr.signature);
 
     for (size_t i = 0; i < 4; i++)
     {
         const MBREntry &entry = mbr.entries[i];
 
-        logger_info("    - Partition[%d] = {start=%8d, size=%8d, type=0x%01x}", i, entry.start, entry.size, entry.type);
+        Kernel::logln("    - Partition[{}] = {start={8d}, size={8d}, type=0x{x}}", i, entry.start, entry.size, entry.type);
 
         if (entry.type != 0)
         {
@@ -54,7 +54,7 @@ void partitions_initialize()
 
             if (!success)
             {
-                logger_warn("Device '%s' don't have a valid partion table!", device->path().cstring());
+                Kernel::logln("Device '{}' don't have a valid partion table!", device->path());
             }
         }
 

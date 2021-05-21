@@ -1,5 +1,5 @@
+#include "system/Streams.h"
 #include <assert.h>
-#include <libsystem/Logger.h>
 
 #include "system/interrupts/Dispatcher.h"
 #include "system/interrupts/Interupts.h"
@@ -59,14 +59,14 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
         {
             x86::sti();
 
-            logger_error("Task %s(%d) triggered an exception: '%s' N°=%x Err=%x (IP=%08x CR2=%08x)",
-                         scheduler_running()->name,
-                         scheduler_running_id(),
-                         _exception_messages[stackframe.intno],
-                         stackframe.intno,
-                         stackframe.err,
-                         stackframe.eip,
-                         x86::CR2());
+            Kernel::logln("Task {}({}) triggered an exception: '{}' N°={x} Err={x} (IP={08x} CR2={08x})",
+                          scheduler_running()->name,
+                          scheduler_running_id(),
+                          _exception_messages[stackframe.intno],
+                          stackframe.intno,
+                          stackframe.err,
+                          stackframe.eip,
+                          x86::CR2());
 
             task_dump(scheduler_running());
             Arch::dump_stack_frame(reinterpret_cast<void *>(&stackframe));
@@ -77,7 +77,7 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
         {
             system_panic_with_context(
                 &stackframe,
-                "CPU EXCEPTION: '%s' (N°=%d Err=%x) !",
+                "CPU EXCEPTION: '{}' (N°={} Err={x}) !",
                 _exception_messages[stackframe.intno],
                 stackframe.intno,
                 stackframe.err);

@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "archs/Arch.h"
 
@@ -12,7 +12,7 @@ void interrupts_initialize()
 {
     dispatcher_initialize();
 
-    logger_info("Enabling interrupts!");
+    Kernel::logln("Enabling interrupts!");
 
     interrupts_enable_holding();
     Arch::enable_interrupts();

@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "system/interrupts/Dispatcher.h"
 #include "system/interrupts/Interupts.h"
@@ -57,14 +57,14 @@ extern "C" uint64_t interrupts_handler(uintptr_t rsp)
     {
         if (stackframe->cs == 0x1B)
         {
-            logger_error("Task %s(%d) triggered an exception: '%s' %x.%x (IP=%08x CR2=%08x)",
-                         scheduler_running()->name,
-                         scheduler_running_id(),
-                         _exception_messages[stackframe->intno],
-                         stackframe->intno,
-                         stackframe->err,
-                         stackframe->rip,
-                         x86::CR2());
+            Kernel::logln("Task {}({}) triggered an exception: '{}' {x}.{x} (IP={08x} CR2={08x})",
+                          scheduler_running()->name,
+                          scheduler_running_id(),
+                          _exception_messages[stackframe->intno],
+                          stackframe->intno,
+                          stackframe->err,
+                          stackframe->rip,
+                          x86::CR2());
 
             task_dump(scheduler_running());
             Arch::dump_stack_frame(stackframe);
@@ -76,7 +76,7 @@ extern "C" uint64_t interrupts_handler(uintptr_t rsp)
         {
             system_panic_with_context(
                 stackframe,
-                "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !",
+                "CPU EXCEPTION: '{}' (INT:{} ERR:{x}) !",
                 _exception_messages[stackframe->intno],
                 stackframe->intno,
                 stackframe->err);

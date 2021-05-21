@@ -1,5 +1,3 @@
-#include <libsystem/Logger.h>
-
 #include <libgraphic/Painter.h>
 #include <libgraphic/rast/Rasterizer.h>
 

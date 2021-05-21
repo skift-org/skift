@@ -3,7 +3,6 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Color.h>
 #include <libmath/Mat3x2.h>
-#include <libsystem/Logger.h>
 #include <libutils/Array.h>
 #include <libutils/Variant.h>
 

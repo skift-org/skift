@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "archs/x86/IOAPIC.h"
 
@@ -10,7 +10,7 @@ static volatile uint32_t *ioapic = nullptr;
 void ioapic_found(uintptr_t address)
 {
     ioapic = reinterpret_cast<uint32_t *>(address);
-    logger_info("IOAPIC found at %08x", ioapic);
+    Kernel::logln("IOAPIC found at {08x}", ioapic);
 }
 
 uint32_t ioapic_read(uint32_t reg)

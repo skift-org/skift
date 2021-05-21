@@ -82,13 +82,13 @@ TimeStamp get_time()
 
 NO_RETURN void reboot()
 {
-    logger_warn("STUB %s", __func__);
+    Kernel::logln("STUB {}", __func__);
     ASSERT_NOT_REACHED();
 }
 
 NO_RETURN void shutdown()
 {
-    logger_warn("STUB %s", __func__);
+    Kernel::logln("STUB {}", __func__);
     ASSERT_NOT_REACHED();
 }
 

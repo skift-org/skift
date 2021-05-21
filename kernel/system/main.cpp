@@ -18,6 +18,8 @@
 #include "system/tasking/Tasking.h"
 #include "system/tasking/Userspace.h"
 
+#include "system/Streams.h"
+
 #include "devfs/DevicesFileSystem.h"
 #include "devfs/DevicesInfo.h"
 #include "procfs/ProcessInfo.h"
@@ -38,6 +40,8 @@ static void splash_screen()
 
 void system_main(Handover *handover)
 {
+    Kernel::logln("Hello, world from libio!");
+
     splash_screen();
     system_initialize();
     memory_initialize(handover);

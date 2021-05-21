@@ -1,16 +1,17 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 
 #include "system/graphics/EarlyConsole.h"
+#include "system/system/System.h"
 #include "system/tasking/Userspace.h"
 
 #define DEFAULT_ENVIRONMENT "{}"
 
 void userspace_initialize()
 {
-    logger_info("Starting the userspace...");
+    Kernel::logln("Starting the userspace...");
 
     Launchpad *init_lauchpad = launchpad_create("init", "/System/Utilities/init");
     launchpad_flags(init_lauchpad, TASK_WAITABLE | TASK_USER);
@@ -33,11 +34,11 @@ void userspace_initialize()
 
     if (result != SUCCESS)
     {
-        logger_fatal("Failed to start init : %s", result_to_string(result));
+        system_panic("Failed to start init : %s", result_to_string(result));
     }
 
     int init_exit_value = 0;
     process_wait(init_process, &init_exit_value);
 
-    logger_fatal("Init has return with code %d!", init_exit_value);
+    system_panic("Init has return with code %d!", init_exit_value);
 }

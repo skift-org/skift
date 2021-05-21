@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "system/graphics/Graphics.h"
 #include "system/interrupts/Interupts.h"
@@ -39,7 +39,7 @@ void graphic_did_find_framebuffer(uintptr_t address, int width, int height, int 
     _framebuffer_pitch = pitch;
     _framebuffer_bpp = bpp;
 
-    logger_info("Framebuffer: w:%d h:%d p:%d bpp:%d", width, height, pitch, bpp);
+    Kernel::logln("Framebuffer: w:{} h:{} p:{} bpp:{}", width, height, pitch, bpp);
 }
 
 bool graphic_has_framebuffer()

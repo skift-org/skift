@@ -1,7 +1,7 @@
 #include <abi/Paths.h>
 
+#include "system/Streams.h"
 #include <libmath/MinMax.h>
-#include <libsystem/Logger.h>
 
 #include "archs/Arch.h"
 
@@ -81,11 +81,11 @@ void framebuffer_initialize(Handover *handover)
     _framebuffer_pitch = handover->framebuffer_pitch;
     _framebuffer_bpp = handover->framebuffer_bpp;
 
-    logger_info("Framebuffer %dx%d", handover->framebuffer_width, handover->framebuffer_height);
+    Kernel::logln("Framebuffer {}x{}", handover->framebuffer_width, handover->framebuffer_height);
 
     if (_framebuffer_width == 0 || _framebuffer_height == 0)
     {
-        logger_warn("No framebuffer!");
+        Kernel::logln("No framebuffer!");
         return;
     }
 
@@ -101,7 +101,7 @@ void framebuffer_initialize(Handover *handover)
 
     if (_framebuffer_virtual == 0)
     {
-        logger_error("Failed to allocate memory for the framebuffer!");
+        Kernel::logln("Failed to allocate memory for the framebuffer!");
         return;
     }
 

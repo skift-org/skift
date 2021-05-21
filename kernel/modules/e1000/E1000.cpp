@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 #include <libsystem/utils/Hexdump.h>
 
 #include "e1000/E1000.h"
@@ -157,7 +157,7 @@ size_t E1000::receive_packet(void *buffer, size_t size)
 {
     UNUSED(size);
 
-    logger_trace("rx");
+    Kernel::logln("rx");
 
     uint32_t packet_size = _rx_descriptors[_current_rx_descriptors].length;
     _rx_buffers[_current_rx_descriptors]->read(0, buffer, packet_size);
@@ -172,7 +172,7 @@ size_t E1000::receive_packet(void *buffer, size_t size)
 
 size_t E1000::send_packet(const void *buffer, size_t size)
 {
-    logger_trace("tx");
+    Kernel::logln("tx");
 
     _tx_buffers[_current_tx_descriptors]->write(0, buffer, size);
     _tx_descriptors[_current_tx_descriptors].length = size;
@@ -215,7 +215,7 @@ void E1000::handle_interrupt()
 {
     uint32_t status = read_register(E1000_REG_STATUS);
 
-    // logger_trace("e1000 interrupt (STATUS=%08x)!", status);
+    // Kernel::logln("e1000 interrupt (STATUS={08x})!", status);
 
     if (status & 4)
     {
@@ -239,7 +239,7 @@ ResultOr<size_t> E1000::read(size64_t offset, void *buffer, size_t size)
     UNUSED(offset);
 
     size_t packet_size = receive_packet(buffer, size);
-    logger_trace("Packet receive (size=%u)", packet_size);
+    Kernel::logln("Packet receive (size={})", packet_size);
     hexdump(buffer, packet_size);
 
     return packet_size;
@@ -250,7 +250,7 @@ ResultOr<size_t> E1000::write(size64_t offset, const void *buffer, size_t size)
     UNUSED(offset);
 
     size_t packet_size = send_packet(buffer, size);
-    logger_trace("Packet send (size=%u)", packet_size);
+    Kernel::logln("Packet send (size={})", packet_size);
     hexdump(buffer, packet_size);
 
     return packet_size;

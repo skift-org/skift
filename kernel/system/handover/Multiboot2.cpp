@@ -1,5 +1,5 @@
+#include "system/Streams.h"
 #include <assert.h>
-#include <libsystem/Logger.h>
 #include <string.h>
 
 #include <thirdparty/multiboot/Multiboot2.h>
@@ -111,7 +111,7 @@ void multiboot2_parse_header(Handover *handover, void *header_ptr)
 
     while (tag->type != MULTIBOOT_TAG_TYPE_END)
     {
-        logger_info("\t%08x: %s", tag, _multiboot2_tag_name[tag->type]);
+        Kernel::logln("\t{08}: {}", tag, _multiboot2_tag_name[tag->type]);
 
         switch (tag->type)
         {
@@ -140,7 +140,7 @@ void multiboot2_parse_header(Handover *handover, void *header_ptr)
             break;
 
         default:
-            logger_warn("\t\t-> IGNORED");
+            Kernel::logln("\t\t-> IGNORED");
             break;
         }
 

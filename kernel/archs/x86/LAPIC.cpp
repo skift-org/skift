@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "archs/x86/LAPIC.h"
 #include "archs/x86/PIC.h"
@@ -13,7 +13,7 @@ static volatile uint32_t *lapic = nullptr;
 void lapic_found(uintptr_t address)
 {
     lapic = reinterpret_cast<uint32_t *>(address);
-    logger_info("LAPIC found at %08x", lapic);
+    Kernel::logln("LAPIC found at {08x}", lapic);
 }
 
 uint32_t lapic_read(uint32_t reg)
@@ -38,4 +38,4 @@ void lapic_initialize()
     lapic_write(0xF0, lapic_read(0xF0) | 0x100);
 }
 
-} // namespace x86
+} // namespace Arch::x86

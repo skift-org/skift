@@ -22,6 +22,7 @@ KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard userspace/libraries/libsystem/core/*.cpp) \
 	$(wildcard userspace/libraries/libsystem/thread/*.cpp) \
 	$(wildcard userspace/libraries/libsystem/system/*.cpp) \
+	$(wildcard userspace/libraries/libio/Format.cpp) \
 
 KERNEL_BINARY = $(BUILDROOT)/kernel.bin
 

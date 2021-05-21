@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "archs/Arch.h"
 
@@ -11,7 +11,7 @@ namespace Arch::x86
 
 void reboot_8042()
 {
-    logger_info("Trying to reboot using the 8042...");
+    Kernel::logln("Trying to reboot using the 8042...");
 
     uint8_t good = 0x02;
 
@@ -26,7 +26,7 @@ void reboot_8042()
 
 void reboot_triple_fault()
 {
-    logger_info("Trying to reboot by doing a triple fault...");
+    Kernel::logln("Trying to reboot by doing a triple fault...");
     cli();
     Arch::address_space_switch(0x0);
     *(uint32_t *)0x0 = 0xDEADDEAD;
@@ -34,7 +34,7 @@ void reboot_triple_fault()
 
 void shutdown_virtual_machines()
 {
-    logger_info("Maybe your are running a VM, trying to shutdown using io ports...");
+    Kernel::logln("Maybe your are running a VM, trying to shutdown using io ports...");
 
     // Bochs, and older versions of QEMU(than 2.0)
     out16(0xB004, 0x2000);
@@ -48,7 +48,7 @@ void shutdown_virtual_machines()
 
 void shutdown_acpi()
 {
-    logger_info("Trying to shutdown using acpi...");
+    Kernel::logln("Trying to shutdown using acpi...");
 }
 
 } // namespace Arch::x86

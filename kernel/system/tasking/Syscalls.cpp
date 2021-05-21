@@ -1,8 +1,8 @@
 #include <assert.h>
 #include <string.h>
 
+#include "system/Streams.h"
 #include <libsystem/BuildInfo.h>
-#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 
 #include "archs/Arch.h"
@@ -143,7 +143,7 @@ Result hj_process_exit(int exit_code)
 {
     if (exit_code != PROCESS_SUCCESS)
     {
-        logger_error("Process terminated with error code %d!", exit_code);
+        Kernel::logln("Process terminated with error code {}!", exit_code);
         Arch::backtrace();
     }
 
@@ -688,14 +688,14 @@ SyscallHandler syscall_get_handler(Syscall syscall)
     {
         if ((SyscallHandler)syscalls[syscall] == nullptr)
         {
-            logger_error("Syscall not implemented ID=%d call by PROCESS=%d.", syscall, scheduler_running_id());
+            Kernel::logln("Syscall not implemented ID={} call by PROCESS={}.", syscall, scheduler_running_id());
         }
 
         return (SyscallHandler)syscalls[syscall];
     }
     else
     {
-        logger_error("Unknow syscall ID=%d call by PROCESS=%d.", syscall, scheduler_running_id());
+        Kernel::logln("Unknow syscall ID={} call by PROCESS={}.", syscall, scheduler_running_id());
         return nullptr;
     }
 }
@@ -711,7 +711,7 @@ uintptr_t task_do_syscall(Syscall syscall, uintptr_t arg0, uintptr_t arg1, uintp
 
     if (handler == nullptr)
     {
-        logger_error("Invalid syscall: %d", syscall);
+        Kernel::logln("Invalid syscall: {}", syscall);
         return ERR_INVALID_ARGUMENT;
     }
 
@@ -721,8 +721,8 @@ uintptr_t task_do_syscall(Syscall syscall, uintptr_t arg0, uintptr_t arg1, uintp
 
     if (result != SUCCESS && result != TIMEOUT)
     {
-        logger_trace(
-            "%s(%08x, %08x, %08x, %08x, %08x) returned %s",
+        Kernel::logln(
+            "{}({08x}, {08x}, {08x}, {08x}, {08x}) returned {}",
             syscall_names[syscall],
             arg0, arg1, arg2, arg3, arg4,
             result_to_string((Result)result));

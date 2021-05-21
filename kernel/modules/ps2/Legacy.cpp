@@ -52,10 +52,6 @@ Iteration legacy_scan(IterationCallback<LegacyAddress> callback)
         return Iteration::STOP;
     }
 
-    if (callback(LEGACY_SPEAKER) == Iteration::STOP)
-    {
-        return Iteration::STOP;
-    }
 
     return Iteration::CONTINUE;
 }

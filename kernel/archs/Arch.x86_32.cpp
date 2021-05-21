@@ -9,6 +9,7 @@
 #include "archs/x86_32/Paging.h"
 #include "archs/x86_32/x86_32.h"
 
+#include "system/Streams.h"
 #include "system/graphics/EarlyConsole.h"
 
 namespace Arch
@@ -81,24 +82,24 @@ TimeStamp get_time() { return rtc_now(); }
 NO_RETURN void reboot()
 {
     early_console_enable();
-    logger_info("Rebooting...");
+    Kernel::logln("Rebooting...");
 
     x86::reboot_8042();
     x86::reboot_triple_fault();
 
-    logger_info("Failed to reboot: Halting!");
+    Kernel::logln("Failed to reboot: Halting!");
     system_stop();
 }
 
 NO_RETURN void shutdown()
 {
     early_console_enable();
-    logger_info("Shutting down...");
+    Kernel::logln("Shutting down...");
 
     x86::shutdown_virtual_machines();
     x86::shutdown_acpi();
 
-    logger_error("Failed to shutdown: Halting!");
+    Kernel::logln("Failed to shutdown: Halting!");
     system_stop();
 }
 

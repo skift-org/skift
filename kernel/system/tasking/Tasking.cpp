@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "system/scheduling/Scheduler.h"
 #include "system/system/System.h"
@@ -7,7 +7,7 @@
 
 void tasking_initialize()
 {
-    logger_info("Initializing tasking...");
+    Kernel::logln("Initializing tasking...");
 
     Task *idle_task = task_spawn(nullptr, "idle", system_hang, nullptr, TASK_NONE);
     task_go(idle_task);
@@ -22,5 +22,5 @@ void tasking_initialize()
 
     Kernel::finalizer_initialize();
 
-    logger_info("Tasking initialized!");
+    Kernel::logln("Tasking initialized!");
 }

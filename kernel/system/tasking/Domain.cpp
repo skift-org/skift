@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "system/node/Directory.h"
 #include "system/node/File.h"

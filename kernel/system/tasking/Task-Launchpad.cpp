@@ -1,8 +1,8 @@
 #include <assert.h>
 #include <string.h>
 
+#include "system/Streams.h"
 #include <libfile/ELF.h>
-#include <libsystem/Logger.h>
 
 #include "system/interrupts/Interupts.h"
 #include "system/scheduling/Scheduler.h"
@@ -27,7 +27,7 @@ struct ELFLoader
 
         if (program_header->vaddr <= 0x100000)
         {
-            logger_error("ELF program no in user memory (0x%08x)!", program_header->vaddr);
+            Kernel::logln("ELF program no in user memory ({p})!", program_header->vaddr);
             return ERR_EXEC_FORMAT_ERROR;
         }
 
@@ -42,7 +42,7 @@ struct ELFLoader
 
         if (read != program_header->filesz)
         {
-            logger_error("Didn't read the right amount from the ELF file!");
+            Kernel::logln("Didn't read the right amount from the ELF file!");
 
             task_switch_address_space(scheduler_running(), parent_address_space);
 
@@ -134,7 +134,7 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
 
     if (handle_has_error(elf_file))
     {
-        logger_error("Failed to open ELF file %s: %s!", launchpad->executable, handle_error_string(elf_file));
+        Kernel::logln("Failed to open ELF file {}: {}!", launchpad->executable, handle_error_string(elf_file));
         return handle_get_error(elf_file);
     }
 
@@ -174,7 +174,7 @@ Result task_exec(Task *task, Launchpad *launchpad)
 
     if (handle_has_error(elf_file))
     {
-        logger_error("Failed to open ELF file %s: %s!", launchpad->executable, handle_error_string(elf_file));
+        Kernel::logln("Failed to open ELF file {}: {}!", launchpad->executable, handle_error_string(elf_file));
         return handle_get_error(elf_file);
     }
 

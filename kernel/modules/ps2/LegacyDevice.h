@@ -42,9 +42,6 @@ public:
         case LEGACY_MOUSE:
             return 12;
 
-        case LEGACY_SPEAKER:
-            return -1;
-
         default:
             break;
         }

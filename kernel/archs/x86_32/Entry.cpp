@@ -30,7 +30,7 @@ extern "C" void arch_x86_32_main(void *info, uint32_t magic)
 
     if (handover->memory_usable < 127 * 1024)
     {
-        logger_fatal("No enough memory (%uKio)!", handover->memory_usable / 1024);
+        system_panic("No enough memory (%uKio)!", handover->memory_usable / 1024);
     }
 
     gdt_initialize();
@@ -45,14 +45,14 @@ extern "C" void arch_x86_32_main(void *info, uint32_t magic)
 
     if (smbios_entrypoint)
     {
-        logger_info("Found SMBIOS entrypoint at %08x (Version %d.%02d)", smbios_entrypoint, smbios_entrypoint->major_version, smbios_entrypoint->major_version);
+        Kernel::logln("Found SMBIOS entrypoint at {08x} (Version {}.{02d})", smbios_entrypoint, smbios_entrypoint->major_version, smbios_entrypoint->major_version);
 
         smbios_entrypoint->iterate([&](Smbios::Header *table) {
-            logger_info(" - %s (Type=%d, StringCount=%d) ", table->name(), table->type, table->string_table_lenght());
+            Kernel::logln(" - {} (Type={}, StringCount={}) ", table->name(), (int)table->type, table->string_table_lenght());
 
             for (size_t i = 1; i < table->string_table_lenght(); i++)
             {
-                logger_info("    - %s", table->string(i));
+                Kernel::logln("    - {}", table->string(i));
             }
 
             return Iteration::CONTINUE;

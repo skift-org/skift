@@ -1,7 +1,7 @@
 #pragma once
 
+#include "system/Streams.h"
 #include <libsystem/Common.h>
-#include <libsystem/Logger.h>
 
 namespace Arch::x86_32
 {
@@ -84,19 +84,6 @@ struct PACKED GDTEntry
     constexpr GDTEntry(TSS *tss, uint8_t access, uint8_t flags)
         : GDTEntry((uintptr_t)tss, ((uintptr_t)tss) + sizeof(TSS), access, flags)
     {
-    }
-
-    void dump(int i)
-    {
-        logger_trace("GDT[%d] = limit0_15=%04x base0_15=%04x base16_23=%02x access=%02x limit16_19=%02x flags=%02x base24_31=%02x",
-                     i,
-                     limit0_15,
-                     base0_15,
-                     base16_23,
-                     access,
-                     limit16_19,
-                     flags,
-                     base24_31);
     }
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "system/Streams.h"
 #include <libsystem/Common.h>
-#include <libsystem/Logger.h>
 
 namespace Arch::x86_64
 {

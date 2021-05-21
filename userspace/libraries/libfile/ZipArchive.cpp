@@ -10,7 +10,6 @@
 #include <libio/Skip.h>
 #include <libio/Streams.h>
 #include <libio/Write.h>
-#include <libsystem/Logger.h>
 #include <libutils/Endian.h>
 
 // Central header

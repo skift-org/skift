@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 #include <libsystem/io/Stream.h>
 
 #include "system/Configs.h"
@@ -12,7 +12,7 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
 
     if (handle_has_error(keymap_file))
     {
-        logger_error("Failed to load keymap from %s: %s", keymap_path, handle_error_string(keymap_file));
+        Kernel::logln("Failed to load keymap from {}: {}", keymap_path, handle_error_string(keymap_file));
 
         return nullptr;
     }
@@ -22,19 +22,19 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
 
     if (stat.type != FILE_TYPE_REGULAR)
     {
-        logger_info("Failed to load keymap from %s: This is not a regular file", keymap_path);
+        Kernel::logln("Failed to load keymap from {}: This is not a regular file", keymap_path);
 
         return nullptr;
     }
 
-    logger_info("Allocating keymap of size %dkio", stat.size / 1024);
+    Kernel::logln("Allocating keymap of size {}kio", stat.size / 1024);
     KeyMap *keymap = (KeyMap *)malloc(stat.size);
 
     size_t read = stream_read(keymap_file, keymap, stat.size);
 
     if (read != stat.size)
     {
-        logger_error("Failed to load keymap from %s: %s", keymap_path, handle_error_string(keymap_file));
+        Kernel::logln("Failed to load keymap from {}: {}", keymap_path, handle_error_string(keymap_file));
 
         free(keymap);
 
@@ -59,7 +59,7 @@ Codepoint LegacyKeyboard::key_to_codepoint(Key key)
 {
     if (!_keymap)
     {
-        logger_warn("No keymap loaded!");
+        Kernel::logln("No keymap loaded!");
         return 0;
     }
 
@@ -124,7 +124,7 @@ void LegacyKeyboard::handle_key(Key key, KeyMotion motion)
 {
     if (!key_is_valid(key))
     {
-        logger_warn("Invalid scancode %d", key);
+        Kernel::logln("Invalid scancode {}", key);
         return;
     }
 

@@ -1,5 +1,5 @@
+#include "system/Streams.h"
 #include <libsystem/BuildInfo.h>
-#include <libsystem/Logger.h>
 
 #include "archs/Arch.h"
 #include "system/scheduling/Scheduler.h"
@@ -16,7 +16,7 @@ void system_hang()
 void system_stop()
 {
     Arch::disable_interrupts();
-    logger_info("System stopped!");
+    Kernel::logln("System stopped!");
 
     while (1)
     {
@@ -31,7 +31,7 @@ void system_tick()
 {
     if (_system_tick + 1 < _system_tick)
     {
-        logger_fatal("System tick overflow!");
+        system_panic("System tick overflow!");
     }
 
     _system_tick++;
@@ -52,5 +52,5 @@ ElapsedTime system_get_uptime()
 void system_initialize()
 {
     _system_boot_timestamp = Arch::get_time();
-    logger_info("hjert - " __BUILD_GITREF__);
+    Kernel::logln("hjert - " __BUILD_GITREF__);
 }

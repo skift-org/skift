@@ -1,5 +1,3 @@
-#include <libsystem/Logger.h>
-
 extern "C"
 {
     typedef void (*AtExitFunction)(void *);

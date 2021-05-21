@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 #include <libutils/Vector.h>
 
 #include "pci/PCIDevice.h"
@@ -10,7 +10,6 @@
 #include "bga/BGA.h"
 #include "com/LegacySerial.h"
 #include "e1000/E1000.h"
-#include "pcspkr/PCSpeaker.h"
 #include "ps2/LegacyKeyboard.h"
 #include "ps2/LegacyMouse.h"
 #include "unix/UnixNull.h"
@@ -26,7 +25,7 @@ static Vector<DeviceMatcher *> *_matchers;
 
 void driver_initialize()
 {
-    logger_info("Installing drivers...");
+    Kernel::logln("Installing drivers...");
 
     _matchers = new Vector<DeviceMatcher *>();
 
@@ -51,7 +50,6 @@ void driver_initialize()
     _matchers->push_back(new LegacyDeviceMatcher<LegacySerial>{"Legacy Serial Port (COM2)", LEGACY_COM2});
     _matchers->push_back(new LegacyDeviceMatcher<LegacySerial>{"Legacy Serial Port (COM3)", LEGACY_COM3});
     _matchers->push_back(new LegacyDeviceMatcher<LegacySerial>{"Legacy Serial Port (COM4)", LEGACY_COM4});
-    _matchers->push_back(new LegacyDeviceMatcher<PCSpeaker>{"PCSpeaker", LEGACY_SPEAKER});
 
     _matchers->push_back(new LegacyDeviceMatcher<LegacyATA>{"ATA0 Disk", LEGACY_ATA0});
     _matchers->push_back(new LegacyDeviceMatcher<LegacyATA>{"ATA1 Disk", LEGACY_ATA1});
@@ -64,7 +62,7 @@ void driver_initialize()
 
     for (size_t i = 0; i < _matchers->count(); i++)
     {
-        logger_info("Driver: %s", (*_matchers)[i]->name());
+        Kernel::logln("Driver: {}", (*_matchers)[i]->name());
     }
 }
 

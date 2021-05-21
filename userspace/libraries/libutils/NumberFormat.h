@@ -81,6 +81,8 @@ public:
         return writer.write(buffer, i);
     }
 
+#ifndef __KERNEL__
+
     ResultOr<size_t> format(IO::Writer &writer, float value)
     {
         return format(writer, (double)value);
@@ -124,4 +126,6 @@ public:
 
         return written;
     }
+
+#endif
 };

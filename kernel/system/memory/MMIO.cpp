@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 
 #include "archs/Arch.h"
 
@@ -28,8 +28,8 @@ MMIORange::MMIORange(MemoryRange range)
     _physical_range = {range};
     _virtual_range = {Arch::virtual_alloc(Arch::kernel_address_space(), _physical_range, MEMORY_NONE)};
 
-    logger_info("Created MMIO region %08x-%08x mapped to %08x-%08x",
-                range.base(), range.end(), _virtual_range.base(), _virtual_range.end());
+    Kernel::logln("Created MMIO region {08x}-{08x} mapped to {08x}-{08x}",
+                  range.base(), range.end(), _virtual_range.base(), _virtual_range.end());
 }
 
 MMIORange::~MMIORange()

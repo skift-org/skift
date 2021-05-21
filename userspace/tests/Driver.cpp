@@ -1,5 +1,4 @@
 #include <libio/Streams.h>
-#include <libsystem/Logger.h>
 #include <libutils/Vector.h>
 
 #include "tests/Driver.h"

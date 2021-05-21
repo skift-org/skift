@@ -37,6 +37,5 @@ void __attribute__((weak)) operator delete[](void *ptr, size_t size)
 
 extern "C" void __attribute__((weak)) __cxa_pure_virtual()
 {
-    // logger_fatal("Attempt at calling a pure virtual function!");
     ASSERT_NOT_REACHED();
 }

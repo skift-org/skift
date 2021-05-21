@@ -1,5 +1,5 @@
+#include "system/Streams.h"
 #include <assert.h>
-#include <libsystem/Logger.h>
 
 #include "system/devices/Devices.h"
 #include "system/interrupts/Dispatcher.h"

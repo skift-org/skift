@@ -6,7 +6,6 @@
 #include <libio/Path.h>
 #include <libio/Read.h>
 #include <libio/Streams.h>
-#include <libsystem/Logger.h>
 #include <libutils/HashMap.h>
 
 namespace Graphic

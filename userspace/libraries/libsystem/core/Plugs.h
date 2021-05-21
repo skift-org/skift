@@ -10,17 +10,7 @@
 #include <libio/Seek.h>
 #include <libutils/String.h>
 
-extern "C" void __plug_initialize();
-
-extern "C" void __plug_uninitialize(int exit_code);
-
-/* --- Logger --------------------------------------------------------------- */
-
-void __plug_logger_lock();
-
-void __plug_logger_unlock();
-
-void NO_RETURN __plug_logger_fatal(const char *message);
+void __plug_initialize();
 
 /* --- File system ---------------------------------------------------------- */
 

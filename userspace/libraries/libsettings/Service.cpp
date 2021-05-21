@@ -1,7 +1,6 @@
 #include <libsettings/ServerConnection.h>
 #include <libsettings/Service.h>
 #include <libsettings/Watcher.h>
-#include <libsystem/Logger.h>
 #include <libutils/Vector.h>
 
 namespace Settings

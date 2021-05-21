@@ -26,7 +26,7 @@ extern "C" void arch_x86_64_entry(void *info, uint32_t magic)
 
     if (handover->memory_usable < 127 * 1024)
     {
-        logger_fatal("No enoughs memory (%uKio)!", handover->memory_usable / 1024);
+        system_panic("No enoughs memory (%uKio)!", handover->memory_usable / 1024);
     }
 
     gdt_initialize();

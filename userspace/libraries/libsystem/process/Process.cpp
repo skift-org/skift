@@ -27,7 +27,7 @@ Result process_run(const char *command, int *pid, TaskFlags flags)
 
 void NO_RETURN process_exit(int code)
 {
-    __plug_uninitialize(code);
+    __plug_process_exit(code);
     __builtin_unreachable();
 }
 

@@ -1,4 +1,4 @@
-#include <libsystem/Logger.h>
+#include "system/Streams.h"
 #include <string.h>
 
 #include <thirdparty/limine/stivale/stivale2.h>

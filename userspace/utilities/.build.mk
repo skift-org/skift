@@ -24,7 +24,6 @@ UTILITIES = \
 	NOW \
 	OPEN \
 	PANIC \
-	PIANO \
 	PLAY \
 	POWERCTL \
 	PWD	\
@@ -139,9 +138,6 @@ YES_NAME = yes
 
 PWD_LIBS = system io
 PWD_NAME = pwd
-
-PIANO_LIBS = system io
-PIANO_NAME = piano
 
 DISPLAYCTL_LIBS = system io
 DISPLAYCTL_NAME = displayctl

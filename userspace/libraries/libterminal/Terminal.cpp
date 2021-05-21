@@ -1,7 +1,6 @@
 #include <assert.h>
 
 #include <libmath/MinMax.h>
-#include <libsystem/Logger.h>
 #include <libterminal/Terminal.h>
 
 namespace Terminal

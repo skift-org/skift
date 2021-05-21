@@ -1,6 +1,6 @@
 
+#include "system/Streams.h"
 #include <assert.h>
-#include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
 #include <string.h>
 
@@ -24,7 +24,7 @@ static MemoryRange kernel_memory_range()
 
 void memory_initialize(Handover *handover)
 {
-    logger_info("Initializing memory management...");
+    Kernel::logln("Initializing memory management...");
 
     for (size_t i = 0; i < 1024 * 1024 / 8; i++)
     {
@@ -46,10 +46,10 @@ void memory_initialize(Handover *handover)
     USED_MEMORY = 0;
     TOTAL_MEMORY = handover->memory_usable;
 
-    logger_info("Mapping kernel...");
+    Kernel::logln("Mapping kernel...");
     memory_map_identity(Arch::kernel_address_space(), kernel_memory_range(), MEMORY_NONE);
 
-    logger_info("Mapping modules...");
+    Kernel::logln("Mapping modules...");
     for (size_t i = 0; i < handover->modules_size; i++)
     {
         memory_map_identity(Arch::kernel_address_space(), handover->modules[i].range, MEMORY_NONE);
@@ -65,10 +65,10 @@ void memory_initialize(Handover *handover)
 
     Arch::virtual_memory_enable();
 
-    logger_info("%uKio of memory detected", TOTAL_MEMORY / 1024);
-    logger_info("%uKio of memory is used by the kernel", USED_MEMORY / 1024);
+    Kernel::logln("{}Kio of memory detected", TOTAL_MEMORY / 1024);
+    Kernel::logln("{}Kio of memory is used by the kernel", USED_MEMORY / 1024);
 
-    logger_info("Paging enabled!");
+    Kernel::logln("Paging enabled!");
 
     _memory_initialized = true;
 
@@ -153,7 +153,7 @@ Result memory_alloc(void *address_space, size_t size, MemoryFlags flags, uintptr
     if (!size)
     {
         *out_address = 0;
-        logger_warn("Allocation with size=0!");
+        Kernel::logln("Allocation with size=0!");
         return SUCCESS;
     }
 
@@ -163,7 +163,7 @@ Result memory_alloc(void *address_space, size_t size, MemoryFlags flags, uintptr
 
     if (physical_range.empty())
     {
-        logger_error("Failed to allocate memory: Not enough physical memory!");
+        Kernel::logln("Failed to allocate memory: Not enough physical memory!");
         return ERR_OUT_OF_MEMORY;
     }
 
@@ -173,7 +173,7 @@ Result memory_alloc(void *address_space, size_t size, MemoryFlags flags, uintptr
     {
         physical_free(physical_range);
 
-        logger_error("Failed to allocate memory: Not enough virtual memory!");
+        Kernel::logln("Failed to allocate memory: Not enough virtual memory!");
         return ERR_OUT_OF_MEMORY;
     }
 
@@ -211,7 +211,7 @@ Result memory_alloc_identity(void *address_space, MemoryFlags flags, uintptr_t *
         }
     }
 
-    logger_warn("Failed to allocate identity mapped page!");
+    Kernel::logln("Failed to allocate identity mapped page!");
 
     *out_address = 0;
 

@@ -81,17 +81,11 @@ CXXFLAGS:= \
 	$(BUILD_CONFIGS)
 
 include meta/toolchains/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN).mk
-include kernel/archs/.build.mk
-include kernel/modules/.build.mk
-include kernel/kernel/.build.mk
 
-include userspace/archs/.build.mk
-include userspace/libraries/.build.mk
-include userspace/apps/.build.mk
-include userspace/tests/.build.mk
-include userspace/utilities/.build.mk
-
+include kernel/.build.mk
+include userspace/.build.mk
 include thirdparty/.build.mk
+
 include meta/distros/.build.mk
 
 # --- Ramdisk -------------------------------------------- #

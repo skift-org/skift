@@ -97,7 +97,7 @@ Optional<Json::Value> Service::read(const Path path)
 
     if (!result_or_response.success())
     {
-        return {};
+        return NONE;
     }
 
     return result_or_response.unwrap().payload;

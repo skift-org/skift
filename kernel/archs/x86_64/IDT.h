@@ -3,6 +3,9 @@
 #include <libsystem/Common.h>
 #include <libsystem/Logger.h>
 
+namespace Arch::x86_64
+{
+
 #define INTGATE 0x8e
 #define TRAPGATE 0xeF
 
@@ -43,3 +46,5 @@ struct PACKED IDT64Entry
 extern "C" void idt_flush(uint64_t);
 
 void idt_initialize();
+
+} // namespace Arch::x86_64

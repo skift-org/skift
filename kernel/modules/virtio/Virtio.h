@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kernel/devices/DeviceAddress.h"
+#include "system/devices/DeviceAddress.h"
 
 // 2.1 Device Status Field
 

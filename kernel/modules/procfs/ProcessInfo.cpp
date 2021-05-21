@@ -4,11 +4,11 @@
 #include <libmath/MinMax.h>
 #include <libsystem/Result.h>
 
-#include "kernel/interrupts/Interupts.h"
-#include "kernel/node/Handle.h"
-#include "kernel/scheduling/Scheduler.h"
-#include "kernel/tasking/Task-Memory.h"
 #include "procfs/ProcessInfo.h"
+#include "system/interrupts/Interupts.h"
+#include "system/node/Handle.h"
+#include "system/scheduling/Scheduler.h"
+#include "system/tasking/Task-Memory.h"
 
 FsProcessInfo::FsProcessInfo() : FsNode(FILE_TYPE_DEVICE)
 {

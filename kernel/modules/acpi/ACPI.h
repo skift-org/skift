@@ -4,6 +4,8 @@
 
 #include <libutils/Iteration.h>
 
+#include "system/handover/Handover.h"
+
 namespace Acpi
 {
 
@@ -132,5 +134,7 @@ struct PACKED MADT
         return result;
     }
 };
+
+void initialize(Handover *handover);
 
 } // namespace Acpi

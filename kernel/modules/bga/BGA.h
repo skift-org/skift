@@ -1,7 +1,7 @@
 #pragma once
 
-#include "kernel/memory/MMIO.h"
 #include "pci/PCIDevice.h"
+#include "system/memory/MMIO.h"
 
 #define BGA_ADDRESS 0x01CE
 #define BGA_DATA 0x01CF

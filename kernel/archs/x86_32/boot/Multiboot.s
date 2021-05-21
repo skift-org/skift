@@ -17,8 +17,8 @@ _kstart:
 	push eax ; Push the multiboot magic
 	push ebx ; Push the multiboot header adress.
 
-	extern arch_main
-	call arch_main
+	extern arch_x86_32_main
+	call arch_x86_32_main
 
 	cli
 

@@ -1,7 +1,7 @@
 #include <libsystem/Logger.h>
 
-#include "kernel/scheduling/Scheduler.h"
-#include "kernel/tasking/Task.h"
+#include "system/scheduling/Scheduler.h"
+#include "system/tasking/Task.h"
 
 #include "ac97/AC97.h"
 

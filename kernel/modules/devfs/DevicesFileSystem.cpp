@@ -2,10 +2,10 @@
 #include <libsystem/Logger.h>
 
 #include "devfs/DevicesFileSystem.h"
-#include "kernel/devices/Device.h"
-#include "kernel/devices/Devices.h"
-#include "kernel/node/Device.h"
-#include "kernel/scheduling/Scheduler.h"
+#include "system/devices/Device.h"
+#include "system/devices/Devices.h"
+#include "system/node/Device.h"
+#include "system/scheduling/Scheduler.h"
 
 void devices_filesystem_initialize()
 {

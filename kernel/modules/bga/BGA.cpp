@@ -2,10 +2,10 @@
 #include <libsystem/Logger.h>
 
 #include "bga/BGA.h"
-#include "kernel/graphics/EarlyConsole.h"
-#include "kernel/graphics/Graphics.h"
-#include "kernel/handover/Handover.h"
-#include "kernel/interrupts/Interupts.h"
+#include "system/graphics/EarlyConsole.h"
+#include "system/graphics/Graphics.h"
+#include "system/handover/Handover.h"
+#include "system/interrupts/Interupts.h"
 
 void BGA::write_register(uint16_t address, uint16_t data)
 {

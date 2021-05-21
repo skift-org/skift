@@ -1,9 +1,12 @@
 #pragma once
 
+#include <libsystem/Common.h>
+
 #include "archs/x86/IOPort.h"
 #include "archs/x86/x86.h"
 
-#include <libsystem/Common.h>
+namespace Arch::x86_32
+{
 
 static inline uint32_t EBP()
 {
@@ -34,3 +37,5 @@ static inline void wrmsr(uint32_t msr, uint32_t lo, uint32_t hi)
                  :
                  : "a"(lo), "d"(hi), "c"(msr));
 }
+
+} // namespace Arch::x86_32

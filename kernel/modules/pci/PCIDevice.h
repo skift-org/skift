@@ -1,7 +1,7 @@
 #pragma once
 
-#include "kernel/devices/Driver.h"
-#include "kernel/memory/MemoryRange.h"
+#include "system/devices/Driver.h"
+#include "system/memory/MemoryRange.h"
 
 #include "pci/PCI.h"
 

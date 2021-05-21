@@ -1,6 +1,6 @@
 #include "pcspkr/PCSpeaker.h"
-#include "kernel/scheduling/Scheduler.h"
-#include "kernel/tasking/Task.h"
+#include "system/scheduling/Scheduler.h"
+#include "system/tasking/Task.h"
 
 PCSpeaker::PCSpeaker(DeviceAddress address) : LegacyDevice(address, DeviceClass::PCSPEAKER) {}
 

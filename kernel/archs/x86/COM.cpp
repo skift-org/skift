@@ -1,4 +1,4 @@
-#include "kernel/interrupts/Interupts.h"
+#include "system/interrupts/Interupts.h"
 
 #include "archs/x86/COM.h"
 #include "archs/x86_32/x86_32.h"

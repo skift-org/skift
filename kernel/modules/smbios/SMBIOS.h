@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include "kernel/memory/MemoryRange.h"
+#include "system/memory/MemoryRange.h"
 
 namespace Smbios
 {

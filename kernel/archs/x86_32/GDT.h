@@ -3,6 +3,9 @@
 #include <libsystem/Common.h>
 #include <libsystem/Logger.h>
 
+namespace Arch::x86_32
+{
+
 #define GDT_ENTRY_COUNT 6
 
 #define GDT_PRESENT 0b10010000     // Present bit. This must be 1 for all valid selectors.
@@ -104,3 +107,5 @@ extern "C" void gdt_flush(uint32_t);
 extern "C" void tss_flush(uint32_t);
 
 void set_kernel_stack(uint32_t stack);
+
+} // namespace Arch::x86_32

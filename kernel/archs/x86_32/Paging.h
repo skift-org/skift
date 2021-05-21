@@ -4,6 +4,9 @@
 
 #include "archs/Memory.h"
 
+namespace Arch::x86_32
+{
+
 #define PAGE_DIRECTORY_INDEX(vaddr) ((vaddr) >> 22)
 #define PAGE_TABLE_INDEX(vaddr) (((vaddr) >> 12) & 0x03ff)
 
@@ -64,3 +67,27 @@ extern "C" void paging_disable();
 extern "C" void paging_load_directory(uintptr_t directory);
 
 extern "C" void paging_invalidate_tlb();
+
+void *kernel_address_space();
+
+void virtual_initialize();
+
+void virtual_memory_enable();
+
+bool virtual_present(void *address_space, uintptr_t virtual_address);
+
+uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address);
+
+Result virtual_map(void *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
+
+MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, MemoryFlags flags);
+
+void virtual_free(void *address_space, MemoryRange virtual_range);
+
+void *address_space_create();
+
+void address_space_destroy(void *address_space);
+
+void address_space_switch(void *address_space);
+
+} // namespace Arch::x86_32

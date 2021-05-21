@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kernel/devices/Driver.h"
+#include "system/devices/Driver.h"
 
 #include "ps2/Legacy.h"
 

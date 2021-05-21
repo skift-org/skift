@@ -1,5 +1,8 @@
 #include "archs/x86_64/GDT.h"
 
+namespace Arch::x86_64
+{
+
 static TSS64 tss = {
     .reserved = 0,
     .rsp = {},
@@ -37,3 +40,5 @@ void set_kernel_stack(uint64_t stack)
     tss.rsp[0] = stack;
     tss.ist[0] = stack;
 }
+
+} // namespace Arch::x86_64

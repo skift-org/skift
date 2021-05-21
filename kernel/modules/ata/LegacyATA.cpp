@@ -1,8 +1,8 @@
 #include <libsystem/Logger.h>
 
 #include "ata/LegacyATA.h"
-#include "kernel/scheduling/Scheduler.h"
-#include "kernel/tasking/Task.h"
+#include "system/scheduling/Scheduler.h"
+#include "system/tasking/Task.h"
 
 // Bus
 #define ATA_PRIMARY 0x00

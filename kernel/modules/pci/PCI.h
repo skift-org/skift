@@ -2,7 +2,7 @@
 
 #include <libutils/Callback.h>
 
-#include "kernel/devices/DeviceAddress.h"
+#include "system/devices/DeviceAddress.h"
 
 void pci_initialize();
 

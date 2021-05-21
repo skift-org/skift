@@ -5,9 +5,9 @@
 
 #include "archs/Arch.h"
 
-#include "kernel/memory/Memory.h"
-#include "kernel/modules/Modules.h"
-#include "kernel/scheduling/Scheduler.h"
+#include "system/memory/Memory.h"
+#include "system/modules/Modules.h"
+#include "system/scheduling/Scheduler.h"
 
 void ramdisk_load(Module *module)
 {
@@ -46,7 +46,7 @@ void ramdisk_load(Module *module)
         }
     }
 
-    memory_free(arch_kernel_address_space(), module->range);
+    memory_free(Arch::kernel_address_space(), module->range);
 
     logger_info("Loading ramdisk succeeded.");
 }

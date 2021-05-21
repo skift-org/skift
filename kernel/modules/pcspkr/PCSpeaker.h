@@ -1,10 +1,10 @@
 #pragma once
 
-#include "kernel/devices/Device.h"
-#include "kernel/scheduling/Scheduler.h"
-#include "kernel/tasking/Task.h"
 #include "pcspkr/PCSpeaker.h"
 #include "ps2/LegacyDevice.h"
+#include "system/devices/Device.h"
+#include "system/scheduling/Scheduler.h"
+#include "system/tasking/Task.h"
 
 struct Speaker
 {

@@ -2,6 +2,9 @@
 
 #include "archs/Arch.h"
 
+namespace Arch::x86
+{
+
 #ifdef __x86_64__
 using CRRegister = uint64_t;
 #else
@@ -53,3 +56,5 @@ static inline void cli() { asm volatile("cli"); }
 static inline void sti() { asm volatile("sti"); }
 
 static inline void hlt() { asm volatile("hlt"); }
+
+} // namespace Arch::x86

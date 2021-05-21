@@ -7,7 +7,7 @@
 #include <libutils/SourceLocation.h>
 
 #ifdef __KERNEL__
-#    include "kernel/interrupts/Interupts.h"
+#    include "system/interrupts/Interupts.h"
 #endif
 
 class Lock

@@ -2,6 +2,9 @@
 
 #include <libsystem/Common.h>
 
+namespace Arch::x86_64
+{
+
 struct PACKED PageMappingLevel4Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
@@ -121,3 +124,27 @@ static_assert(sizeof(PageMappingLevel1) == 4096);
 extern "C" void paging_load_directory(uintptr_t directory);
 
 extern "C" void paging_invalidate_tlb();
+
+void *kernel_address_space();
+
+void virtual_initialize();
+
+void virtual_memory_enable();
+
+bool virtual_present(void *address_space, uintptr_t virtual_address);
+
+uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address);
+
+Result virtual_map(void *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
+
+MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, MemoryFlags flags);
+
+void virtual_free(void *address_space, MemoryRange virtual_range);
+
+void *address_space_create();
+
+void address_space_destroy(void *address_space);
+
+void address_space_switch(void *address_space);
+
+} // namespace Arch::x86_64

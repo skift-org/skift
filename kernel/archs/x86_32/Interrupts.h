@@ -2,6 +2,9 @@
 
 #include <libsystem/Common.h>
 
+namespace Arch::x86_32
+{
+
 struct PACKED InterruptStackFrame
 {
     uint32_t gs, fs, es, ds;
@@ -22,3 +25,5 @@ struct PACKED UserInterruptStackFrame
 void interrupts_dump_stackframe(InterruptStackFrame *stackframe);
 
 void interrupts_initialize();
+
+} // namespace Arch::x86_32

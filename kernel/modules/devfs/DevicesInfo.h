@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kernel/node/Node.h"
+#include "system/node/Node.h"
 
 class FsDeviceInfo : public FsNode
 {

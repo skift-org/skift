@@ -5,10 +5,10 @@
 #include <libsystem/Result.h>
 
 #include "devfs/DevicesInfo.h"
-#include "kernel/devices/Devices.h"
-#include "kernel/interrupts/Interupts.h"
-#include "kernel/node/Handle.h"
-#include "kernel/scheduling/Scheduler.h"
+#include "system/devices/Devices.h"
+#include "system/interrupts/Interupts.h"
+#include "system/node/Handle.h"
+#include "system/scheduling/Scheduler.h"
 
 FsDeviceInfo::FsDeviceInfo() : FsNode(FILE_TYPE_DEVICE)
 {

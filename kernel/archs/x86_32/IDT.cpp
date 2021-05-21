@@ -1,7 +1,10 @@
 
 #include "archs/x86_32/IDT.h"
 
-extern uintptr_t __interrupt_vector[];
+namespace Arch::x86_32
+{
+
+extern "C" uintptr_t __interrupt_vector[];
 
 IDTEntry idt[IDT_ENTRY_COUNT] = {};
 
@@ -30,3 +33,5 @@ void idt_initialize()
 
     idt_flush((uint32_t)&idt_descriptor);
 }
+
+} // namespace Arch::x86_32

@@ -1,5 +1,8 @@
 #include "archs/x86_32/GDT.h"
 
+namespace Arch::x86_32
+{
+
 static TSS tss = {
     .prev_tss = 0,
     .esp0 = 0,
@@ -53,3 +56,5 @@ void set_kernel_stack(uint32_t stack)
 {
     tss.esp0 = stack;
 }
+
+} // namespace Arch::x86_32

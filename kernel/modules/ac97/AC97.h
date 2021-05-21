@@ -3,8 +3,8 @@
 #include <libutils/RingBuffer.h>
 #include <libutils/Vector.h>
 
-#include "kernel/memory/MMIO.h"
 #include "pci/PCIDevice.h"
+#include "system/memory/MMIO.h"
 
 #define SND_KNOB_MASTER 0
 #define SND_KNOB_VENDOR 1024

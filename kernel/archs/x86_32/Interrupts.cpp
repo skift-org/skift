@@ -1,15 +1,18 @@
 #include <assert.h>
 #include <libsystem/Logger.h>
 
-#include "kernel/interrupts/Dispatcher.h"
-#include "kernel/interrupts/Interupts.h"
-#include "kernel/scheduling/Scheduler.h"
-#include "kernel/system/System.h"
-#include "kernel/tasking/Syscalls.h"
+#include "system/interrupts/Dispatcher.h"
+#include "system/interrupts/Interupts.h"
+#include "system/scheduling/Scheduler.h"
+#include "system/system/System.h"
+#include "system/tasking/Syscalls.h"
 
 #include "archs/x86/PIC.h"
 #include "archs/x86_32/Interrupts.h"
 #include "archs/x86_32/x86_32.h"
+
+namespace Arch::x86_32
+{
 
 static const char *_exception_messages[32] = {
     "Division by zero",
@@ -54,7 +57,7 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
     {
         if (stackframe.cs == 0x1B)
         {
-            sti();
+            x86::sti();
 
             logger_error("Task %s(%d) triggered an exception: '%s' N°=%x Err=%x (IP=%08x CR2=%08x)",
                          scheduler_running()->name,
@@ -63,10 +66,10 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
                          stackframe.intno,
                          stackframe.err,
                          stackframe.eip,
-                         CR2());
+                         x86::CR2());
 
             task_dump(scheduler_running());
-            arch_dump_stack_frame(reinterpret_cast<void *>(&stackframe));
+            Arch::dump_stack_frame(reinterpret_cast<void *>(&stackframe));
 
             scheduler_running()->cancel(PROCESS_FAILURE);
         }
@@ -108,7 +111,7 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
     }
     else if (stackframe.intno == 128)
     {
-        sti();
+        x86::sti();
 
         Syscall syscall = (Syscall)stackframe.eax;
 
@@ -140,10 +143,12 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
             usf->eip = (uintptr_t)running_task->entry_point;
         }
 
-        cli();
+        x86::cli();
     }
 
     pic_ack(stackframe.intno);
 
     return esp;
 }
+
+} // namespace Arch::x86_32

@@ -4,56 +4,61 @@
 #include <libsystem/Result.h>
 #include <skift/Time.h>
 
-#include "kernel/memory/MemoryRange.h"
+#include "system/memory/MemoryRange.h"
 
 struct Task;
 
-void arch_disable_interrupts();
+namespace Arch
+{
 
-void arch_enable_interrupts();
+void disable_interrupts();
 
-void arch_halt();
+void enable_interrupts();
 
-void arch_yield();
+void halt();
 
-void arch_save_context(Task *task);
+void yield();
 
-void arch_load_context(Task *task);
+void save_context(Task *task);
 
-void arch_task_go(Task *task);
+void load_context(Task *task);
 
-size_t arch_debug_write(const void *buffer, size_t size);
+void task_go(Task *task);
 
-TimeStamp arch_get_time();
+size_t debug_write(const void *buffer, size_t size);
 
-NO_RETURN void arch_reboot();
+TimeStamp get_time();
 
-NO_RETURN void arch_shutdown();
+NO_RETURN void reboot();
 
-void arch_panic_dump();
+NO_RETURN void shutdown();
 
-void arch_dump_stack_frame(void *stackframe);
+void panic_dump();
 
-void arch_backtrace();
+void dump_stack_frame(void *stackframe);
 
-void *arch_kernel_address_space();
+void backtrace();
 
-void arch_virtual_initialize();
+void *kernel_address_space();
 
-void arch_virtual_memory_enable();
+void virtual_initialize();
 
-bool arch_virtual_present(void *address_space, uintptr_t virtual_address);
+void virtual_memory_enable();
 
-uintptr_t arch_virtual_to_physical(void *address_space, uintptr_t virtual_address);
+bool virtual_present(void *address_space, uintptr_t virtual_address);
 
-Result arch_virtual_map(void *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
+uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address);
 
-MemoryRange arch_virtual_alloc(void *address_space, MemoryRange physical_range, MemoryFlags flags);
+Result virtual_map(void *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
 
-void arch_virtual_free(void *address_space, MemoryRange virtual_range);
+MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, MemoryFlags flags);
 
-void *arch_address_space_create();
+void virtual_free(void *address_space, MemoryRange virtual_range);
 
-void arch_address_space_destroy(void *address_space);
+void *address_space_create();
 
-void arch_address_space_switch(void *address_space);
+void address_space_destroy(void *address_space);
+
+void address_space_switch(void *address_space);
+
+} // namespace Arch

@@ -1,6 +1,7 @@
 -include kernel/archs/$(CONFIG_ARCH)/.build.mk
 
 KERNEL_SOURCES += \
+	$(wildcard kernel/archs/Arch.$(CONFIG_ARCH).cpp) \
 	$(wildcard kernel/archs/$(CONFIG_ARCH)/*.cpp) \
 	$(wildcard kernel/archs/$(CONFIG_ARCH)/*/*.cpp)
 

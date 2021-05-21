@@ -2,6 +2,9 @@
 
 #include <libsystem/Common.h>
 
+namespace Arch::x86_64
+{
+
 struct PACKED InterruptStackFrame
 {
     uint64_t r15;
@@ -30,3 +33,5 @@ struct PACKED InterruptStackFrame
     uint64_t rsp;
     uint64_t ss;
 };
+
+} // namespace Arch::x86_64

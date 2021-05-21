@@ -2,6 +2,9 @@
 
 #include <libsystem/Common.h>
 
+namespace Arch::x86_32
+{
+
 #define INTGATE 0x8e
 #define TRAPGATE 0xeF
 
@@ -37,3 +40,5 @@ struct PACKED IDTEntry
 extern "C" void idt_flush(uint32_t);
 
 void idt_initialize();
+
+} // namespace Arch::x86_32

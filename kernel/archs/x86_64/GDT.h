@@ -3,6 +3,9 @@
 #include <libsystem/Common.h>
 #include <libsystem/Logger.h>
 
+namespace Arch::x86_64
+{
+
 #define GDT_ENTRY_COUNT 5
 
 #define GDT_SEGMENT (0b00010000)
@@ -133,3 +136,5 @@ extern "C" void gdt_flush(uint64_t);
 extern "C" void tss_flush(uint64_t);
 
 void set_kernel_stack(uint64_t stack);
+
+} // namespace Arch::x86_64

@@ -115,7 +115,6 @@ bool list_requeue(List *list, void **value)
         // Pop
         if (list->_count == 1)
         {
-            list->_count = 0;
             list->_head = nullptr;
             list->_tail = nullptr;
         }
@@ -123,28 +122,23 @@ bool list_requeue(List *list, void **value)
         {
             item->next->prev = nullptr;
             list->_head = item->next;
-
-            list->_count--;
         }
 
         // Push back
         item->prev = nullptr;
         item->next = nullptr;
 
-        list->_count++;
-
         if (list->_tail == nullptr)
         {
-            list->_tail = item;
             list->_head = item;
         }
         else
         {
             list->_tail->next = item;
             item->prev = list->_tail;
-            list->_tail = item;
         }
 
+        list->_tail = item;
         return true;
     }
     else
@@ -284,15 +278,15 @@ void list_push(List *list, void *value)
 
     if (list->_head == nullptr)
     {
-        list->_head = item;
         list->_tail = item;
     }
     else
     {
         list->_head->prev = item;
         item->next = list->_head;
-        list->_head = item;
     }
+
+    list->_head = item;
 }
 
 bool list_pop(List *list, void **value)
@@ -329,8 +323,6 @@ void list_pushback(List *list, void *value)
 {
     ListItem *item = CREATE(ListItem);
 
-    item->prev = nullptr;
-    item->next = nullptr;
     item->value = value;
 
     list->_count++;

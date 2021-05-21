@@ -3,8 +3,8 @@
 #include <libsystem/utils/Hexdump.h>
 #include <libutils/Vector.h>
 
-#include "kernel/memory/MMIO.h"
 #include "pci/PCIDevice.h"
+#include "system/memory/MMIO.h"
 
 #define E1000_REG_CONTROL 0x0000
 #define E1000_REG_STATUS 0x0008

@@ -1,3 +1,4 @@
+#include <libutils/List.h>
 
 #include "archs/Arch.h"
 
@@ -11,13 +12,13 @@ static int scheduler_record[SCHEDULER_RECORD_COUNT] = {};
 static Task *running = nullptr;
 static Task *idle = nullptr;
 
-static List *blocked_tasks;
-static List *running_tasks;
+static Utils::List<Task *> *blocked_tasks;
+static Utils::List<Task *> *running_tasks;
 
 void scheduler_initialize()
 {
-    blocked_tasks = list_create();
-    running_tasks = list_create();
+    blocked_tasks = new Utils::List<Task *>();
+    running_tasks = new Utils::List<Task *>();
 }
 
 void scheduler_did_create_idle_task(Task *task)
@@ -38,22 +39,23 @@ void scheduler_did_change_task_state(Task *task, TaskState oldstate, TaskState n
     {
         if (oldstate == TASK_STATE_RUNNING)
         {
-            list_remove(running_tasks, task);
+            running_tasks->remove(task);
         }
 
         if (oldstate == TASK_STATE_BLOCKED)
         {
-            list_remove(blocked_tasks, task);
+            blocked_tasks->remove(task);
         }
 
         if (newstate == TASK_STATE_BLOCKED)
         {
-            list_push(blocked_tasks, task);
+            blocked_tasks->push_back(task);
         }
 
         if (newstate == TASK_STATE_RUNNING)
         {
-            list_push(running_tasks, task);
+            // Maybe we should push the task to the start of the list if it's a low latency tasks.
+            running_tasks->push_back(task);
         }
     }
 }
@@ -102,13 +104,6 @@ int scheduler_get_usage(int task_id)
     return (count * 100) / SCHEDULER_RECORD_COUNT;
 }
 
-static Iteration wakeup_task_if_unblocked(void *, Task *task)
-{
-    task->try_unblock();
-
-    return Iteration::CONTINUE;
-}
-
 uintptr_t schedule(uintptr_t current_stack_pointer)
 {
     scheduler_context_switch = true;
@@ -118,14 +113,12 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
 
     scheduler_record[system_get_tick() % SCHEDULER_RECORD_COUNT] = running->id;
 
-    list_iterate(blocked_tasks, nullptr, (ListIterationCallback)wakeup_task_if_unblocked);
+    blocked_tasks->foreach([](auto &task) {
+        task->try_unblock();
+        return Iteration::CONTINUE;
+    });
 
-    // Get the next task
-    if (!list_requeue(running_tasks, (void **)&running))
-    {
-        // Or the idle task if there are no running tasks.
-        running = idle;
-    }
+    running = running_tasks->requeue().unwrap_or(idle);
 
     arch_address_space_switch(running->address_space);
     arch_load_context(running);

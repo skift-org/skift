@@ -19,14 +19,14 @@ struct Bundle
 
         if (!file.exist())
         {
-            return {};
+            return NONE;
         }
 
         auto value = Json::parse(file);
 
         if (!value.is(Json::OBJECT))
         {
-            return {};
+            return NONE;
         }
 
         auto obj = value.as_object();

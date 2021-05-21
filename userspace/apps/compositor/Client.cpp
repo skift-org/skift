@@ -138,7 +138,7 @@ void Client::handle_goodbye()
 
 void Client::handle_request()
 {
-    Assert::is_false(_disconnected);
+    Assert::falsity(_disconnected);
 
     CompositorMessage message = {};
     auto read_result = _connection.read(&message, sizeof(CompositorMessage));

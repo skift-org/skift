@@ -20,7 +20,7 @@ inline void not_null(const A a, Utils::SourceLocation location = Utils::SourceLo
     }
 }
 
-inline void is_true(bool a, Utils::SourceLocation location = Utils::SourceLocation::current())
+inline void truth(bool a, Utils::SourceLocation location = Utils::SourceLocation::current())
 {
     if constexpr (!(__CONFIG_IS_RELEASE__))
     {
@@ -31,7 +31,7 @@ inline void is_true(bool a, Utils::SourceLocation location = Utils::SourceLocati
     }
 }
 
-inline void is_false(bool a, Utils::SourceLocation location = Utils::SourceLocation::current())
+inline void falsity(bool a, Utils::SourceLocation location = Utils::SourceLocation::current())
 {
     if constexpr (!(__CONFIG_IS_RELEASE__))
     {
@@ -114,11 +114,11 @@ inline void lower_than(const A a, const B b, Utils::SourceLocation location = Ut
     }
 }
 
-inline void not_reached(Utils::SourceLocation location = Utils::SourceLocation::current())
+inline void unreachable(Utils::SourceLocation location = Utils::SourceLocation::current())
 {
     if constexpr (!(__CONFIG_IS_RELEASE__))
     {
-        assert_failed("not_reached() reached!", location.file(), location.function(), location.line());
+        assert_failed("the unreachable() has been reached, and that's not a good thing!", location.file(), location.function(), location.line());
     }
 }
 

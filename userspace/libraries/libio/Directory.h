@@ -18,7 +18,7 @@ public:
 
 private:
     RefPtr<Handle> _handle;
-    Optional<IO::Path> _path;
+    Optional<IO::Path> _path = NONE;
     Vector<Entry> _entries;
 
     Result read_entries();

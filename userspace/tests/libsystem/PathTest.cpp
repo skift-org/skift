@@ -6,28 +6,28 @@ TEST(absolute_path_are_absolute)
 {
     auto p = IO::Path::parse("/home/user/local");
 
-    Assert::is_true(p.absolute());
+    Assert::truth(p.absolute());
 }
 
 TEST(absolute_path_are_no_relative)
 {
     auto p = IO::Path::parse("/home/user/local");
 
-    Assert::is_false(p.relative());
+    Assert::falsity(p.relative());
 }
 
 TEST(relative_path_are_not_absolute)
 {
     auto p = IO::Path::parse("user/local");
 
-    Assert::is_false(p.absolute());
+    Assert::falsity(p.absolute());
 }
 
 TEST(relative_path_are_relative)
 {
     auto p = IO::Path::parse("user/local");
 
-    Assert::is_true(p.relative());
+    Assert::truth(p.relative());
 }
 
 TEST(same_path_are_equals)

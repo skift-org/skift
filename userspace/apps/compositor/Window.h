@@ -37,7 +37,7 @@ public:
 
     Graphic::Bitmap &frontbuffer()
     {
-        Assert::is_true(_frontbuffer);
+        Assert::truth(_frontbuffer);
         return *_frontbuffer;
     }
 

@@ -198,7 +198,7 @@ void Loop::pump(bool pool)
 
 int Loop::run()
 {
-    Assert::is_false(_is_running);
+    Assert::falsity(_is_running);
 
     _is_running = true;
 
@@ -219,8 +219,8 @@ void Loop::exit(int exit_value)
 
 int Loop::run_nested()
 {
-    Assert::is_true(_is_running);
-    Assert::is_false(_nested_is_running);
+    Assert::truth(_is_running);
+    Assert::falsity(_nested_is_running);
 
     _nested_is_running = true;
 
@@ -234,7 +234,7 @@ int Loop::run_nested()
 
 void Loop::exit_nested(int exit_value)
 {
-    Assert::is_true(_nested_is_running);
+    Assert::truth(_nested_is_running);
 
     _nested_is_running = false;
     _nested_exit_value = exit_value;

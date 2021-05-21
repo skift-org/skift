@@ -43,7 +43,7 @@ Optional<String> find_command_path(String command)
         }
     }
 
-    return {};
+    return NONE;
 }
 
 Result shell_exec(
@@ -144,7 +144,7 @@ int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> 
         {
             ShellCommand *command = nullptr;
             list_peekat(pipeline->commands, i, (void **)&command);
-            Assert::is_true(command);
+            Assert::truth(command);
 
             RefPtr<IO::Handle> command_stdin = instream;
             RefPtr<IO::Handle> command_stdout = outstream;

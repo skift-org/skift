@@ -60,14 +60,12 @@ public:
 
     Optional<String> pop_operand()
     {
-        if (current()[0] != '-')
+        if (current()[0] == '-')
         {
-            return pop();
+            return NONE;
         }
-        else
-        {
-            return {};
-        }
+
+        return pop();
     }
 
     String pop()
@@ -417,7 +415,7 @@ public:
 
                             return result;
                         }
-                        else if(result == ArgParseResult::SHOULD_FINISH)
+                        else if (result == ArgParseResult::SHOULD_FINISH)
                         {
                             return result;
                         }

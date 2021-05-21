@@ -22,7 +22,7 @@ public:
     {
         if (selected() == -1)
         {
-            return {};
+            return NONE;
         }
 
         return process_resolve(_listing->info(selected()).name);

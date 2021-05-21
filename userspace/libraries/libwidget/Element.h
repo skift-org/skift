@@ -2,7 +2,7 @@
 
 #include <libgraphic/Font.h>
 #include <libmath/Rect.h>
-#include <libsystem/utils/List.h>
+#include <libutils/Array.h>
 #include <libutils/Assert.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
@@ -42,7 +42,7 @@ private:
 
     Math::Vec2i _content_scroll{};
 
-    Optional<Graphic::Color> _colors[__THEME_COLOR_COUNT] = {};
+    Array<Optional<Graphic::Color>, __THEME_COLOR_COUNT> _colors = {NONE};
     RefPtr<Graphic::Font> _font;
 
     CursorState _cursor = CURSOR_DEFAULT;

@@ -49,7 +49,7 @@ public:
         return get_result_description(_result);
     }
 
-    ALWAYS_INLINE ResultOr(Result result) : _result{result}, _value{} {}
+    ALWAYS_INLINE ResultOr(Result result) : _result{result}, _value{NONE} {}
 
     ALWAYS_INLINE ResultOr(T value) : _result{SUCCESS}, _value{move(value)} {}
 };

@@ -21,7 +21,7 @@ class Dialog : public ::Widget::Dialog
 {
 private:
     RefPtr<Navigation> _navigation = nullptr;
-    Optional<String> _selected_file{};
+    Optional<String> _selected_file = NONE;
     RefPtr<Browser> _browser;
     DialogFlags _flags;
     RefPtr<Widget::TextField> _text_field;

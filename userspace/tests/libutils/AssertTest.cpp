@@ -10,22 +10,22 @@ TESTF(assert_not_null_should_fail, Test::EXPECTED_TO_FAIL)
     Assert::not_null(nullptr);
 }
 
-TEST(assert_is_true)
+TEST(assert_truth)
 {
-    Assert::is_true(true);
+    Assert::truth(true);
 }
-TESTF(assert_is_true_should_fail, Test::EXPECTED_TO_FAIL)
+TESTF(assert_truth_should_fail, Test::EXPECTED_TO_FAIL)
 {
-    Assert::is_true(false);
+    Assert::truth(false);
 }
 
-TEST(assert_is_false)
+TEST(assert_falsity)
 {
-    Assert::is_false(false);
+    Assert::falsity(false);
 }
-TESTF(assert_is_false_should_fail, Test::EXPECTED_TO_FAIL)
+TESTF(assert_falsity_should_fail, Test::EXPECTED_TO_FAIL)
 {
-    Assert::is_false(true);
+    Assert::falsity(true);
 }
 
 TEST(assert_equal)
@@ -98,7 +98,7 @@ TESTF(assert_lower_than_should_fail, Test::EXPECTED_TO_FAIL)
     Assert::lower_than(96, 72);
 }
 
-TESTF(assert_not_reached_should_fail, Test::EXPECTED_TO_FAIL)
+TESTF(assert_unreachable_should_fail, Test::EXPECTED_TO_FAIL)
 {
-    Assert::not_reached();
+    Assert::unreachable();
 }

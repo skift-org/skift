@@ -22,7 +22,7 @@ TEST(pngreader_colourtype_8bit_grayscale)
 
     IO::MemoryReader mem_reader(basn0g08, sizeof(basn0g08));
     Graphic::PngReader png_reader(mem_reader);
-    Assert::is_true(png_reader.valid());
+    Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
 }
@@ -44,7 +44,7 @@ TEST(pngreader_colourtype_8bit_grayscale_alpha)
 
     IO::MemoryReader mem_reader(basn4a08, sizeof(basn4a08));
     Graphic::PngReader png_reader(mem_reader);
-    Assert::is_true(png_reader.valid());
+    Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
 }
@@ -68,7 +68,7 @@ TEST(pngreader_colourtype_8bit_rgb)
 
     IO::MemoryReader mem_reader(basn2c08, sizeof(basn2c08));
     Graphic::PngReader png_reader(mem_reader);
-    Assert::is_true(png_reader.valid());
+    Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
 }
@@ -95,7 +95,7 @@ TEST(pngreader_colourtype_8bit_rgb_alpha)
 
     IO::MemoryReader mem_reader(basn6a08, sizeof(basn6a08));
     Graphic::PngReader png_reader(mem_reader);
-    Assert::is_true(png_reader.valid());
+    Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
 }
@@ -214,7 +214,7 @@ TEST(pngreader_colourtype_8bit_rgb_palette)
 
     IO::MemoryReader mem_reader(basn3p08, sizeof(basn3p08));
     Graphic::PngReader png_reader(mem_reader);
-    Assert::is_true(png_reader.valid());
+    Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
 }

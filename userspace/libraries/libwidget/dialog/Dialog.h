@@ -51,7 +51,7 @@ public:
 
     DialogResult show()
     {
-        Assert::is_true(_window == nullptr);
+        Assert::truth(_window == nullptr);
 
         _window = new Window(WINDOW_NONE);
 

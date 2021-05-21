@@ -6,7 +6,7 @@
 TEST(xml_basic_test)
 {
     IO::File file("/Files/Tests/xml/basic.xml", OPEN_READ);
-    Assert::is_true(file.exist());
+    Assert::truth(file.exist());
     auto result = Xml::parse(file);
     Assert::equal(result.result(), Result::SUCCESS);
 
@@ -18,7 +18,7 @@ TEST(xml_basic_test)
     Assert::equal(doc.root().children().count(), 4);
 
     // Check the testid attribute
-    Assert::is_true(doc.root().attributes().has_key("TestAttr"));
+    Assert::truth(doc.root().attributes().has_key("TestAttr"));
     Assert::equal(doc.root().attributes()["TestAttr"], "0001");
 
     // Check the name child
@@ -30,7 +30,7 @@ TEST(xml_basic_test)
 TEST(xml_empty_tags_test)
 {
     IO::File file("/Files/Tests/xml/empty_tags.xml", OPEN_READ);
-    Assert::is_true(file.exist());
+    Assert::truth(file.exist());
     auto result = Xml::parse(file);
     Assert::equal(result.result(), Result::SUCCESS);
 
@@ -44,9 +44,9 @@ TEST(xml_empty_tags_test)
     // Check the empty tag child
     auto &child = doc.root().children()[0];
     Assert::equal(child.name(), "EmptyTag");
-    Assert::is_true(child.content().empty());
+    Assert::truth(child.content().empty());
 
     // Check the testid attribute
-    Assert::is_true(child.attributes().has_key("TestAttr"));
+    Assert::truth(child.attributes().has_key("TestAttr"));
     Assert::equal(child.attributes()["TestAttr"], "0001");
 }

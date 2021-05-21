@@ -352,7 +352,7 @@ Window *Application::get_window(int id)
 
 int Application::run()
 {
-    Assert::is_false(_exiting);
+    Assert::falsity(_exiting);
 
     auto window = build();
 
@@ -367,13 +367,13 @@ int Application::run()
 
 int Application::run_nested()
 {
-    Assert::is_false(_exiting);
+    Assert::falsity(_exiting);
     return loop().run_nested();
 }
 
 int Application::pump()
 {
-    Assert::is_false(_exiting);
+    Assert::falsity(_exiting);
     loop().pump(true);
     return 0;
 }

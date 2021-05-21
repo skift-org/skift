@@ -8,8 +8,8 @@ TEST(variant_default_constructor)
 {
     Number nbr;
 
-    Assert::is_true(nbr.is<int>());
-    Assert::is_false(nbr.is<double>());
+    Assert::truth(nbr.is<int>());
+    Assert::falsity(nbr.is<double>());
 
     Assert::equal(nbr.get<int>(), 0);
 }
@@ -19,12 +19,12 @@ TEST(variant_is_method)
     Number nbr;
 
     nbr = 5;
-    Assert::is_true(nbr.is<int>());
-    Assert::is_false(nbr.is<double>());
+    Assert::truth(nbr.is<int>());
+    Assert::falsity(nbr.is<double>());
 
     nbr = 6.;
-    Assert::is_true(nbr.is<double>());
-    Assert::is_false(nbr.is<int>());
+    Assert::truth(nbr.is<double>());
+    Assert::falsity(nbr.is<int>());
 }
 
 TEST(variant_get_method)
@@ -44,7 +44,7 @@ TEST(variant_with_method)
 
     nbr = 5;
     nbr.with<double>([](double &) {
-        Assert::not_reached();
+        Assert::unreachable();
     });
 
     nbr.with<int>([](int &v) {
@@ -53,7 +53,7 @@ TEST(variant_with_method)
 
     nbr = 6.;
     nbr.with<int>([](int &) {
-        Assert::not_reached();
+        Assert::unreachable();
     });
 
     nbr.with<double>([](double &v) {
@@ -85,8 +85,8 @@ TEST(variant_visit)
     nbr5.visit(visitor);
     nbr6.visit(visitor);
 
-    Assert::is_true(has_visited_int);
-    Assert::is_true(has_visited_double);
+    Assert::truth(has_visited_int);
+    Assert::truth(has_visited_double);
 }
 
 TEST(variant_copy_ctor)
@@ -94,7 +94,7 @@ TEST(variant_copy_ctor)
     Number nbr{5};
     Number other = nbr;
 
-    Assert::is_true(other.is<int>());
+    Assert::truth(other.is<int>());
     Assert::equal(other.get<int>(), 5);
 }
 
@@ -103,7 +103,7 @@ TEST(variant_copy_assign)
     Number nbr{5};
     Number other{nbr};
 
-    Assert::is_true(other.is<int>());
+    Assert::truth(other.is<int>());
     Assert::equal(other.get<int>(), 5);
 }
 
@@ -112,7 +112,7 @@ TEST(variant_move_ctor)
     Number nbr{5};
     Number other{move(nbr)};
 
-    Assert::is_true(other.is<int>());
+    Assert::truth(other.is<int>());
     Assert::equal(other.get<int>(), 5);
 }
 
@@ -121,6 +121,6 @@ TEST(variant_move_assign)
     Number nbr{5};
     Number other = move(nbr);
 
-    Assert::is_true(other.is<int>());
+    Assert::truth(other.is<int>());
     Assert::equal(other.get<int>(), 5);
 }

@@ -15,7 +15,7 @@ struct Dispatch<>
 {
     static void func(int, auto, auto &)
     {
-        Assert::not_reached();
+        Assert::unreachable();
     }
 };
 

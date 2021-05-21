@@ -8,7 +8,7 @@ TEST(string_with_content)
 
     Assert::equal(hello_world, "Hello, world!");
     Assert::not_equal(hello_world, "Something else blablabla!");
-    Assert::is_false(hello_world.null_or_empty());
+    Assert::falsity(hello_world.null_or_empty());
 }
 
 TEST(empty_strings)
@@ -17,7 +17,7 @@ TEST(empty_strings)
 
     Assert::equal(empty, "");
     Assert::not_equal(empty, "Something else blablabla!");
-    Assert::is_true(empty.null_or_empty());
+    Assert::truth(empty.null_or_empty());
 }
 
 TEST(string_move_operator)

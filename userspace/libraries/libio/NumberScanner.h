@@ -34,14 +34,14 @@ struct NumberScanner
             }
         }
 
-        return {};
+        return NONE;
     }
 
     Optional<uint64_t> scan_uint(Scanner &scan)
     {
         if (!scan.current_is(Strings::ALL_XDIGITS))
         {
-            return {};
+            return NONE;
         }
 
         uint64_t value = 0;
@@ -60,7 +60,7 @@ struct NumberScanner
         if (!scan.current_is(Strings::ALL_XDIGITS) &&
             !scan.current_is("-"))
         {
-            return {};
+            return NONE;
         }
 
         bool is_negative = scan.skip('-');
@@ -69,7 +69,7 @@ struct NumberScanner
 
         if (!unsigned_value.present())
         {
-            return {};
+            return NONE;
         }
 
         if (is_negative)

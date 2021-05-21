@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <libutils/Move.h>
 #include <libutils/New.h>
+#include <libutils/Tags.h>
 
 template <typename T>
 class Optional
@@ -45,7 +46,11 @@ public:
         }
     }
 
-    ALWAYS_INLINE Optional() {}
+    ALWAYS_INLINE explicit Optional() {}
+
+    ALWAYS_INLINE Optional(NoneTag)
+    {
+    }
 
     ALWAYS_INLINE Optional(const T &value)
     {

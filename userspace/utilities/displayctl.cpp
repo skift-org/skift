@@ -33,7 +33,7 @@ Optional<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
         }
     }
 
-    return {};
+    return NONE;
 }
 
 ArgParseResult gfxmode_list()

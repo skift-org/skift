@@ -78,11 +78,6 @@ void Bookmarks::save()
         array.push_back(_bookmarks[i].serialize());
     }
 
-    Prettifier pretty;
-    Json::prettify(pretty, move(array));
-
-    auto data = pretty.finalize();
-
     IO::File file{"/Configs/file-manager/bookmarks.json", OPEN_WRITE | OPEN_CREATE};
 
     if (!file.exist())
@@ -90,7 +85,7 @@ void Bookmarks::save()
         return;
     }
 
-    file.write(data.cstring(), data.length());
+    IO::write(file, Json::stringify(array));
 }
 
 } // namespace FilePicker

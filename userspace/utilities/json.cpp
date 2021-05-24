@@ -1,7 +1,7 @@
 #include <libio/File.h>
 #include <libio/Streams.h>
 #include <libjson/Json.h>
-#include <libutils/ArgParse.h>
+#include <libshell/ArgParse.h>
 
 constexpr auto PROLOGUE = "Reformats JSON to make it easier to read.";
 
@@ -12,7 +12,7 @@ constexpr auto EPILOGUE = "Options can be combined";
 
 int main(int argc, char const *argv[])
 {
-    ArgParse args{};
+    Shell::ArgParse args{};
 
     args.should_abort_on_failure();
     args.show_help_if_no_option_given();
@@ -23,37 +23,38 @@ int main(int argc, char const *argv[])
     args.usage("OPTION...");
     args.usage("OPTION... FILES...");
 
-    auto options = Prettifier::NONE;
+    auto options = IO::Prettier::NONE;
 
     args.option('c', "color", OPTION_COLOR_DESCRIPTION, [&](auto &) {
-        options |= Prettifier::COLORS;
-        return ArgParseResult::SHOULD_CONTINUE;
+        options |= IO::Prettier::COLORS;
+        return Shell::ArgParseResult::SHOULD_CONTINUE;
     });
 
     args.option('i', "indent", OPTION_IDENT_DESCRIPTION, [&](auto &) {
-        options |= Prettifier::INDENTS;
-        return ArgParseResult::SHOULD_CONTINUE;
+        options |= IO::Prettier::INDENTS;
+        return Shell::ArgParseResult::SHOULD_CONTINUE;
     });
 
     args.epiloge(EPILOGUE);
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
+    if (parse_result != Shell::ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == Shell::ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     if (args.argc() == 0)
     {
         auto root = Json::parse(IO::in());
 
-        Prettifier pretty{options};
+        IO::MemoryWriter memory;
+        IO::Prettier pretty{memory, options};
         Json::prettify(pretty, root);
-        IO::write(IO::out(), pretty.finalize());
+        IO::write(IO::out(), memory.string());
     }
     else
     {
-        args.argv().foreach ([&](auto &path) {
+        args.argv().foreach([&](auto &path) {
             IO::File file{path, OPEN_READ};
 
             if (!file.exist())
@@ -63,9 +64,10 @@ int main(int argc, char const *argv[])
 
             auto root = Json::parse(file);
 
-            Prettifier pretty{options};
+            IO::MemoryWriter memory;
+            IO::Prettier pretty{memory, options};
             Json::prettify(pretty, root);
-            IO::write(IO::out(), pretty.finalize());
+            IO::write(IO::out(), memory.string());
 
             return Iteration::CONTINUE;
         });

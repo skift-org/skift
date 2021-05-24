@@ -1,13 +1,12 @@
 #include <abi/Syscalls.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <libio/Streams.h>
-#include <libsystem/cmdline/ReadLine.h>
+#include <libshell/ReadLine.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 #include <skift/Environment.h>
-
-#include <stdio.h>
-#include <string.h>
 
 #include "shell/Shell.h"
 
@@ -52,25 +51,21 @@ int main(int argc, char **argv)
 
     stream_set_write_buffer_mode(out_stream, STREAM_BUFFERED_NONE);
 
-    ReadLine *readline = readline_create(in_stream);
+    Shell::History history;
 
     int command_exit_value = 0;
 
     while (true)
     {
         shell_prompt(command_exit_value);
-        char *command = nullptr;
-        if (readline_readline(readline, &command) != SUCCESS)
+        auto line = Shell::readline(IO::in(), IO::out(), history);
+
+        if (!line.success())
         {
             return -1;
         }
 
-        ShellNode *node = shell_parse(command);
-
-        if (command)
-        {
-            free(command);
-        }
+        ShellNode *node = shell_parse(line.unwrap().cstring());
 
         command_exit_value = shell_eval(node, IO::in().handle(), IO::out().handle());
 

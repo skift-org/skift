@@ -1,9 +1,8 @@
+#include <libutils/Vector.h>
 #include <skift/NumberFormatter.h>
 #include <string.h>
 
 #include "system/Streams.h"
-#include <libutils/StringBuilder.h>
-#include <libutils/Vector.h>
 
 #include "pci/PCI.h"
 #include "ps2/Legacy.h"
@@ -44,22 +43,19 @@ void device_scan(IterationCallback<DeviceAddress> callback)
 
 String device_claim_name(DeviceClass klass)
 {
-    const char *name = _device_names[(uint8_t)klass];
-
-    StringBuilder builder{};
-
-    builder.append(name);
-
-    if (_device_ids[(uint8_t)klass] > 0)
-    {
-        char number_buffer[12] = {};
-        format_int(FORMAT_DECIMAL, _device_ids[(uint8_t)klass], number_buffer, 12);
-        builder.append(number_buffer);
-    }
-
     _device_ids[(uint8_t)klass]++;
 
-    return builder.finalize();
+    if (_device_ids[(uint8_t)klass] == 1)
+    {
+        return _device_names[(uint8_t)klass];
+    }
+    else
+    {
+        return IO::format(
+            "{}{}",
+            _device_names[(uint8_t)klass],
+            _device_ids[(uint8_t)klass] - 1);
+    }
 }
 
 void device_iterate(IterationCallback<RefPtr<Device>> callback)

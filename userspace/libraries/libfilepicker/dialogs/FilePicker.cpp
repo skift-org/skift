@@ -18,26 +18,10 @@ Dialog::Dialog(DialogFlags flags) : _flags(flags)
 
 String Dialog::get_title()
 {
-    StringBuilder builder;
-    if (_flags & DialogFlags::DIALOG_FLAGS_OPEN)
-    {
-        builder.append("Open ");
-    }
-    else if (_flags & DialogFlags::DIALOG_FLAGS_SAVE)
-    {
-        builder.append("Save ");
-    }
-
-    if (_flags & DialogFlags::DIALOG_FLAGS_FOLDER)
-    {
-        builder.append("folder");
-    }
-    else
-    {
-        builder.append("document");
-    }
-
-    return builder.finalize();
+    return IO::format(
+        "{} {}",
+        _flags & DialogFlags::DIALOG_FLAGS_OPEN ? "Open" : "Save",
+        _flags & DialogFlags::DIALOG_FLAGS_FOLDER ? "folder" : "document");
 }
 
 void Dialog::render(Widget::Window *window)

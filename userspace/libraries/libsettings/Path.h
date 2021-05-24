@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libutils/Prettifier.h>
-#include <libutils/ScannerUtils.h>
+#include <libio/Prettier.h>
+#include <libio/Scanner.h>
 
 namespace Settings
 {
@@ -12,11 +12,11 @@ struct Path
     String bundle;
     String key;
 
-    static Path parse(Scanner &scan);
-    static Path parse(const String &str);
+    static Path parse(IO::Scanner &scan);
+    static Path parse(String str);
     static Path parse(const char *str, size_t size);
 
-    void prettify(Prettifier &pretty) const;
+    void prettify(IO::Prettier &pretty) const;
 
     bool match(const Path &other) const;
 

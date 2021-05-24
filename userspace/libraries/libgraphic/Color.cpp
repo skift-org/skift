@@ -1,9 +1,10 @@
 #include <string.h>
 
 #include <libgraphic/Color.h>
-#include <libutils/NumberParser.h>
-#include <libutils/Scanner.h>
-#include <libutils/ScannerUtils.h>
+#include <libio/MemoryReader.h>
+#include <libio/NumberScanner.h>
+#include <libio/Scanner.h>
+#include <libutils/Strings.h>
 
 namespace Graphic
 {
@@ -21,26 +22,27 @@ static constexpr ColorName _color_names[] = {
 #undef __ENTRY
 };
 
-static void whitespace(Scanner &scan)
+static void parse_whitespace(IO::Scanner &scan)
 {
-    scan.eat(Strings::WHITESPACE);
+    scan.eat_any(Strings::WHITESPACE);
 }
 
-static double number(Scanner &scan)
+static double parse_number(IO::Scanner &scan)
 {
-    return scan_float(scan);
+    return IO::NumberScanner::decimal().scan_float(scan).unwrap_or(0);
 }
 
 Color Color::parse(String string)
 {
-    StringScanner scan{string.cstring(), string.length()};
+    IO::MemoryReader memory{string};
+    IO::Scanner scan{memory};
 
-    auto parse_Element = [&](StringScanner &scan) {
-        whitespace(scan);
+    auto parse_Element = [&](IO::Scanner &scan) {
+        parse_whitespace(scan);
 
-        auto value = number(scan);
+        auto value = parse_number(scan);
 
-        whitespace(scan);
+        parse_whitespace(scan);
 
         if (scan.skip('%'))
         {
@@ -51,7 +53,7 @@ Color Color::parse(String string)
             value /= 255;
         }
 
-        whitespace(scan);
+        parse_whitespace(scan);
 
         return value;
     };
@@ -61,12 +63,10 @@ Color Color::parse(String string)
         size_t length = 0;
         char buffer[9];
 
-        while (scan.current_is(Strings::ALL_XDIGITS) && length < 8)
+        while (scan.peek_is_any(Strings::ALL_XDIGITS) && length < 8)
         {
-            buffer[length] = scan.current();
+            buffer[length] = scan.next();
             length++;
-
-            scan.foreward();
         }
 
         buffer[length] = '\0';
@@ -130,7 +130,9 @@ Color Color::parse(String string)
             hex[7] = buffer[7];
         }
 
-        return from_hexa(parse_uint_inline(PARSER_HEXADECIMAL, hex, 0));
+        IO::MemoryReader memory{hex};
+        IO::Scanner hexscan{memory};
+        return from_hexa(IO::NumberScanner::hexadecimal().scan_uint(hexscan).unwrap_or(0));
     }
     else if (scan.skip_word("rgb"))
     {
@@ -152,9 +154,9 @@ Color Color::parse(String string)
         auto green = parse_Element(scan);
         auto blue = parse_Element(scan);
 
-        whitespace(scan);
-        auto alpha = number(scan);
-        whitespace(scan);
+        parse_whitespace(scan);
+        auto alpha = parse_number(scan);
+        parse_whitespace(scan);
 
         scan.skip(')');
 
@@ -164,21 +166,21 @@ Color Color::parse(String string)
     {
         scan.skip('(');
 
-        whitespace(scan);
-        auto hue = number(scan);
-        whitespace(scan);
+        parse_whitespace(scan);
+        auto hue = parse_number(scan);
+        parse_whitespace(scan);
 
         scan.skip(',');
 
-        whitespace(scan);
-        auto saturation = number(scan);
-        whitespace(scan);
+        parse_whitespace(scan);
+        auto saturation = parse_number(scan);
+        parse_whitespace(scan);
 
         scan.skip(',');
 
-        whitespace(scan);
-        auto value = number(scan);
-        whitespace(scan);
+        parse_whitespace(scan);
+        auto value = parse_number(scan);
+        parse_whitespace(scan);
 
         scan.skip(')');
 
@@ -188,27 +190,27 @@ Color Color::parse(String string)
     {
         scan.skip('(');
 
-        whitespace(scan);
-        auto hue = number(scan);
-        whitespace(scan);
+        parse_whitespace(scan);
+        auto hue = parse_number(scan);
+        parse_whitespace(scan);
 
         scan.skip(',');
 
-        whitespace(scan);
-        auto saturation = number(scan);
-        whitespace(scan);
+        parse_whitespace(scan);
+        auto saturation = parse_number(scan);
+        parse_whitespace(scan);
 
         scan.skip(',');
 
-        whitespace(scan);
-        auto value = number(scan);
-        whitespace(scan);
+        parse_whitespace(scan);
+        auto value = parse_number(scan);
+        parse_whitespace(scan);
 
         scan.skip(',');
 
-        whitespace(scan);
-        auto alpha = number(scan);
-        whitespace(scan);
+        parse_whitespace(scan);
+        auto alpha = parse_number(scan);
+        parse_whitespace(scan);
 
         scan.skip(')');
 

@@ -3,7 +3,6 @@
 #include <libio/File.h>
 #include <libio/Streams.h>
 #include <libjson/Json.h>
-#include <libutils/NumberParser.h>
 #include <libwidget/Theme.h>
 
 namespace Widget

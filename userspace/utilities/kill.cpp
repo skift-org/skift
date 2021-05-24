@@ -1,8 +1,7 @@
 #include <libio/File.h>
 #include <libjson/Json.h>
+#include <libshell/ArgParse.h>
 #include <libsystem/process/Process.h>
-#include <libutils/ArgParse.h>
-#include <libutils/NumberParser.h>
 
 int kill(int pid)
 {
@@ -51,7 +50,7 @@ int killall(String name)
 
 int main(int argc, char const *argv[])
 {
-    ArgParse args;
+    Shell::ArgParse args;
 
     args.show_help_if_no_operand_given();
     args.should_abort_on_failure();
@@ -60,9 +59,11 @@ int main(int argc, char const *argv[])
     args.option(option_all, 'a', "all", "Kill all processes with a matching name.");
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
+    if (parse_result != Shell::ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == Shell::ArgParseResult::SHOULD_FINISH
+                   ? PROCESS_SUCCESS
+                   : PROCESS_FAILURE;
     }
 
     if (option_all)
@@ -79,9 +80,7 @@ int main(int argc, char const *argv[])
     {
         for (size_t i = 0; i < args.argc(); i++)
         {
-            int pid = parse_uint_inline(PARSER_DECIMAL, args.argv()[i].cstring(), -1);
-
-            if (kill(pid) != PROCESS_SUCCESS)
+            if (kill(atoi(args.argv()[i].cstring())) != PROCESS_SUCCESS)
             {
                 return PROCESS_FAILURE;
             }

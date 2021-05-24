@@ -1,7 +1,7 @@
 #include <libio/Copy.h>
 #include <libio/File.h>
 #include <libio/Streams.h>
-#include <libutils/ArgParse.h>
+#include <libshell/ArgParse.h>
 
 static bool option_count_lines = true;
 static int option_count = 10;
@@ -43,7 +43,7 @@ int wrap_head(String name, IO::Reader &input, bool many)
 
 int main(int argc, const char *argv[])
 {
-    ArgParse args;
+    Shell::ArgParse args;
 
     args.should_abort_on_failure();
 
@@ -60,7 +60,7 @@ int main(int argc, const char *argv[])
         [](int value) {
             option_count = value;
             option_count_lines = false;
-            return ArgParseResult::SHOULD_CONTINUE;
+            return Shell::ArgParseResult::SHOULD_CONTINUE;
         });
 
     args.option_int(
@@ -70,7 +70,7 @@ int main(int argc, const char *argv[])
         [](int value) {
             option_count = value;
             option_count_lines = true;
-            return ArgParseResult::SHOULD_CONTINUE;
+            return Shell::ArgParseResult::SHOULD_CONTINUE;
         });
 
     args.option(option_quiet, 'q', "quiet", "Never print headers giving file names.");
@@ -89,15 +89,17 @@ int main(int argc, const char *argv[])
             {
                 option_delimiter = '\n';
             }
-            return ArgParseResult::SHOULD_CONTINUE;
+            return Shell::ArgParseResult::SHOULD_CONTINUE;
         });
 
     args.epiloge("If no filename provided read from standard input.\nOptions can be combined.");
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
+    if (parse_result != Shell::ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == Shell::ArgParseResult::SHOULD_FINISH
+                   ? PROCESS_SUCCESS
+                   : PROCESS_FAILURE;
     }
 
     if (args.argc() == 0)

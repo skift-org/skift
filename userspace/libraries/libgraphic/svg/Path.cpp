@@ -1,91 +1,94 @@
 #include <libgraphic/svg/Path.h>
+#include <libio/NumberScanner.h>
 #include <libio/Streams.h>
 #include <libmath/Arc.h>
-#include <libutils/ScannerUtils.h>
 
 namespace Graphic
 {
+
 static constexpr auto WHITESPACE = "\n\r\t ";
 static constexpr auto OPERATIONS = "MmZzLlHhVvCcSsQqTtAa";
 
-static void whitespace(Scanner &scan)
+static void parse_whitespace(IO::Scanner &scan)
 {
-    scan.eat(WHITESPACE);
+    scan.eat_any(WHITESPACE);
 }
 
-static void whitespace_or_comma(Scanner &scan)
+static void parse_whitespace_or_comma(IO::Scanner &scan)
 {
-    whitespace(scan);
+    parse_whitespace(scan);
 
     if (scan.skip(','))
     {
-        whitespace(scan);
+        parse_whitespace(scan);
     }
 }
 
-static Math::Vec2f coordinate(Scanner &scan)
+static float parse_float(IO::Scanner &scan)
 {
-    auto x = scan_float(scan);
-    whitespace_or_comma(scan);
-    auto y = scan_float(scan);
-    whitespace_or_comma(scan);
+    return IO::NumberScanner::decimal().scan_float(scan).unwrap_or(0);
+}
+
+static Math::Vec2f parse_coordinate(IO::Scanner &scan)
+{
+    auto x = parse_float(scan);
+    parse_whitespace_or_comma(scan);
+    auto y = parse_float(scan);
+    parse_whitespace_or_comma(scan);
 
     return Math::Vec2f{(float)x, (float)y};
 }
 
-static int arcflags(Scanner &scan)
+static int parse_arcflags(IO::Scanner &scan)
 {
     int flags = 0;
 
-    if (scan.current_is("1"))
+    if (scan.next() == '1')
     {
         flags |= Math::Arcf::LARGE;
     }
-    scan.foreward();
 
-    whitespace_or_comma(scan);
+    parse_whitespace_or_comma(scan);
 
-    if (scan.current_is("1"))
+    if (scan.next() == '1')
     {
         flags |= Math::Arcf::SWEEP;
     }
 
-    scan.foreward();
-
-    whitespace_or_comma(scan);
+    parse_whitespace_or_comma(scan);
 
     return flags;
 }
 
-static void operation(Scanner &scan, Path &path, char operation)
+static void parse_operation(IO::Scanner &scan, Path &path, char operation)
 {
     switch (operation)
     {
     case 'M':
-        path.begin_subpath(coordinate(scan));
+        path.begin_subpath(parse_coordinate(scan));
 
-        whitespace(scan);
+        parse_whitespace(scan);
 
         // If a moveto is followed by multiple pairs of coordinates,
         // the subsequent pairs are treated as implicit lineto commands.
-        while (scan.do_continue() &&
-               !scan.current_is(OPERATIONS))
+        while (!scan.ended() &&
+               !scan.peek_is_any(OPERATIONS))
         {
-            path.line_to(coordinate(scan));
+            path.line_to(parse_coordinate(scan));
         }
         break;
 
     case 'm':
-        path.begin_subpath_relative(coordinate(scan));
+        path.begin_subpath_relative(parse_coordinate(scan));
 
-        whitespace(scan);
+        parse_whitespace(scan);
 
         // If a moveto is followed by multiple pairs of coordinates,
         // the subsequent pairs are treated as implicit lineto commands.
-        while (scan.do_continue() &&
-               !scan.current_is(OPERATIONS))
+        while (!scan.ended() &&
+               !scan.peek_is_any(OPERATIONS))
         {
-            path.line_to_relative(coordinate(scan));
+            path.line_to_relative(parse_coordinate(scan));
         }
         break;
 
@@ -95,34 +98,34 @@ static void operation(Scanner &scan, Path &path, char operation)
         break;
 
     case 'L':
-        path.line_to(coordinate(scan));
+        path.line_to(parse_coordinate(scan));
         break;
 
     case 'l':
-        path.line_to_relative(coordinate(scan));
+        path.line_to_relative(parse_coordinate(scan));
         break;
 
     case 'H':
-        path.hline_to(scan_float(scan));
+        path.hline_to(parse_float(scan));
         break;
 
     case 'h':
-        path.hline_to_relative(scan_float(scan));
+        path.hline_to_relative(parse_float(scan));
         break;
 
     case 'V':
-        path.vline_to(scan_float(scan));
+        path.vline_to(parse_float(scan));
         break;
 
     case 'v':
-        path.vline_to_relative(scan_float(scan));
+        path.vline_to_relative(parse_float(scan));
         break;
 
     case 'C':
     {
-        auto cp1 = coordinate(scan);
-        auto cp2 = coordinate(scan);
-        auto point = coordinate(scan);
+        auto cp1 = parse_coordinate(scan);
+        auto cp2 = parse_coordinate(scan);
+        auto point = parse_coordinate(scan);
 
         path.cubic_bezier_to(cp1, cp2, point);
         break;
@@ -130,9 +133,9 @@ static void operation(Scanner &scan, Path &path, char operation)
 
     case 'c':
     {
-        auto cp1 = coordinate(scan);
-        auto cp2 = coordinate(scan);
-        auto point = coordinate(scan);
+        auto cp1 = parse_coordinate(scan);
+        auto cp2 = parse_coordinate(scan);
+        auto point = parse_coordinate(scan);
 
         path.cubic_bezier_to_relative(cp1, cp2, point);
         break;
@@ -140,8 +143,8 @@ static void operation(Scanner &scan, Path &path, char operation)
 
     case 'S':
     {
-        auto cp = coordinate(scan);
-        auto point = coordinate(scan);
+        auto cp = parse_coordinate(scan);
+        auto point = parse_coordinate(scan);
 
         path.smooth_cubic_bezier_to(cp, point);
         break;
@@ -149,8 +152,8 @@ static void operation(Scanner &scan, Path &path, char operation)
 
     case 's':
     {
-        auto cp = coordinate(scan);
-        auto point = coordinate(scan);
+        auto cp = parse_coordinate(scan);
+        auto point = parse_coordinate(scan);
         path.smooth_cubic_bezier_to_relative(cp, point);
 
         break;
@@ -158,8 +161,8 @@ static void operation(Scanner &scan, Path &path, char operation)
 
     case 'Q':
     {
-        auto cp = coordinate(scan);
-        auto point = coordinate(scan);
+        auto cp = parse_coordinate(scan);
+        auto point = parse_coordinate(scan);
         path.quad_bezier_to(cp, point);
 
         break;
@@ -167,8 +170,8 @@ static void operation(Scanner &scan, Path &path, char operation)
 
     case 'q':
     {
-        auto cp = coordinate(scan);
-        auto point = coordinate(scan);
+        auto cp = parse_coordinate(scan);
+        auto point = parse_coordinate(scan);
         path.quad_bezier_to_relative(cp, point);
 
         break;
@@ -176,30 +179,30 @@ static void operation(Scanner &scan, Path &path, char operation)
 
     case 'T':
     {
-        path.smooth_quad_bezier_to(coordinate(scan));
+        path.smooth_quad_bezier_to(parse_coordinate(scan));
         break;
     }
 
     case 't':
     {
-        path.smooth_quad_bezier_to_relative(coordinate(scan));
+        path.smooth_quad_bezier_to_relative(parse_coordinate(scan));
         break;
     }
 
     case 'A':
     {
-        auto rx = scan_float(scan);
-        whitespace_or_comma(scan);
+        auto rx = parse_float(scan);
+        parse_whitespace_or_comma(scan);
 
-        auto ry = scan_float(scan);
-        whitespace_or_comma(scan);
+        auto ry = parse_float(scan);
+        parse_whitespace_or_comma(scan);
 
-        auto a = scan_float(scan);
-        whitespace_or_comma(scan);
+        auto a = parse_float(scan);
+        parse_whitespace_or_comma(scan);
 
-        auto flags = arcflags(scan);
+        auto flags = parse_arcflags(scan);
 
-        auto point = coordinate(scan);
+        auto point = parse_coordinate(scan);
 
         path.arc_to(rx, ry, a, flags, point);
         break;
@@ -207,18 +210,18 @@ static void operation(Scanner &scan, Path &path, char operation)
 
     case 'a':
     {
-        auto rx = scan_float(scan);
-        whitespace_or_comma(scan);
+        auto rx = parse_float(scan);
+        parse_whitespace_or_comma(scan);
 
-        auto ry = scan_float(scan);
-        whitespace_or_comma(scan);
+        auto ry = parse_float(scan);
+        parse_whitespace_or_comma(scan);
 
-        auto a = scan_float(scan);
-        whitespace_or_comma(scan);
+        auto a = parse_float(scan);
+        parse_whitespace_or_comma(scan);
 
-        auto flags = arcflags(scan);
+        auto flags = parse_arcflags(scan);
 
-        auto point = coordinate(scan);
+        auto point = parse_coordinate(scan);
         path.arc_to_relative(rx, ry, a, flags, point);
 
         break;
@@ -231,34 +234,34 @@ static void operation(Scanner &scan, Path &path, char operation)
 
 Path Path::parse(const char *str)
 {
-    StringScanner scan{str, strlen(str)};
+    IO::MemoryReader memory{str};
+    IO::Scanner scan{memory};
     return parse(scan);
 }
 
-Path Path::parse(Scanner &scan)
+Path Path::parse(IO::Scanner &scan)
 {
     Path path;
 
-    whitespace(scan);
+    parse_whitespace(scan);
 
-    if (scan.skip("none"))
+    if (scan.skip_word("none"))
     {
         // None indicates that there is no path data for the element
         return path;
     }
 
-    while (scan.do_continue() &&
-           scan.current_is(OPERATIONS))
+    while (!scan.ended() &&
+           scan.peek_is_any(OPERATIONS))
     {
-        char op = scan.current();
-        scan.foreward();
+        char op = scan.next();
 
         do
         {
-            whitespace(scan);
-            operation(scan, path, op);
-            whitespace_or_comma(scan);
-        } while (scan.do_continue() && !scan.current_is(OPERATIONS));
+            parse_whitespace(scan);
+            parse_operation(scan, path, op);
+            parse_whitespace_or_comma(scan);
+        } while (!scan.ended() && !scan.peek_is_any(OPERATIONS));
     }
 
     return path;

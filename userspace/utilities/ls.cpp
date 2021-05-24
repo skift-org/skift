@@ -1,6 +1,6 @@
 #include <libio/Directory.h>
 #include <libio/Streams.h>
-#include <libutils/ArgParse.h>
+#include <libshell/ArgParse.h>
 
 static bool option_all = false;
 static bool option_list = false;
@@ -63,7 +63,7 @@ Result ls(String target_path, bool with_prefix)
 
 int main(int argc, const char *argv[])
 {
-    ArgParse args;
+    Shell::ArgParse args;
 
     args.usage("");
     args.usage("FILES...");
@@ -78,9 +78,11 @@ int main(int argc, const char *argv[])
     args.prologue("Options can be combined.");
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
+    if (parse_result != Shell::ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == Shell::ArgParseResult::SHOULD_FINISH
+                   ? PROCESS_SUCCESS
+                   : PROCESS_FAILURE;
     }
 
     if (args.argc() == 0)

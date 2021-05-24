@@ -8,9 +8,9 @@
 #include <libio/File.h>
 #include <libio/Socket.h>
 #include <libio/Streams.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/unicode/UTF8Decoder.h>
 
 #include "compositor/Client.h"
 #include "compositor/Cursor.h"

@@ -24,7 +24,7 @@ TEST(xml_basic_test)
     // Check the name child
     auto &child = doc.root().children()[0];
     Assert::equal(child.name(), "Name");
-    Assert::equal(child.content(), "Convert number to string");
+    Assert::equal(child.inner_text(), "Convert number to string");
 }
 
 TEST(xml_empty_tags_test)

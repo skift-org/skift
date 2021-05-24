@@ -1,5 +1,3 @@
-#include <libutils/ArgParse.h>
-
 #include "tests/Driver.h"
 
 int main(int argc, char const *argv[])

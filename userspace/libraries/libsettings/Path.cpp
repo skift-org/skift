@@ -1,24 +1,25 @@
-#include <libutils/ScannerUtils.h>
-
+#include <libio/Format.h>
+#include <libio/MemoryReader.h>
+#include <libio/MemoryWriter.h>
+#include <libio/Write.h>
 #include <libsettings/Path.h>
 
 namespace Settings
 {
 
-Path Path::parse(Scanner &scan)
+Path Path::parse(IO::Scanner &scan)
 {
     Path path;
 
     auto parse_string = [&](char sep) {
-        StringBuilder build;
+        IO::MemoryWriter memory;
 
-        while (scan.current() != sep && scan.do_continue())
+        while (scan.peek() != sep && !scan.ended())
         {
-            build.append(scan.current());
-            scan.foreward();
+            IO::write(memory, scan.next());
         }
 
-        return build.finalize();
+        return memory.string();
     };
 
     path.domain = parse_string(':');
@@ -40,25 +41,23 @@ Path Path::parse(Scanner &scan)
     return path;
 }
 
-Path Path::parse(const String &str)
+Path Path::parse(String str)
 {
-    StringScanner scan{str.cstring(), str.length()};
+    IO::MemoryReader memory{str};
+    IO::Scanner scan{memory};
     return parse(scan);
 };
 
 Path Path::parse(const char *str, size_t size)
 {
-    StringScanner scan{str, size};
+    IO::MemoryReader memory{str, size};
+    IO::Scanner scan{memory};
     return parse(scan);
 };
 
-void Path::prettify(Prettifier &pretty) const
+void Path::prettify(IO::Prettier &pretty) const
 {
-    pretty.append(domain);
-    pretty.append(':');
-    pretty.append(bundle);
-    pretty.append('.');
-    pretty.append(key);
+    IO::format(pretty, "{}:{}.{}", domain, bundle, key);
 }
 
 bool Path::match(const Path &other) const

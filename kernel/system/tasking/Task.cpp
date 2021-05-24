@@ -3,6 +3,7 @@
 
 #include "archs/Arch.h"
 
+#include "system/Streams.h"
 #include "system/interrupts/Interupts.h"
 #include "system/scheduling/Scheduler.h"
 #include "system/system/System.h"
@@ -417,24 +418,24 @@ void task_dump(Task *task)
 
     InterruptsRetainer retainer;
 
-    stream_format(out_stream, "\n\t - Task %d %s", task->id, task->name);
-    stream_format(out_stream, "\n\t   State: %s", task_state_string(task->state()));
-    stream_format(out_stream, "\n\t   Memory: ");
+    Kernel::logln("\t - Task {} {}", task->id, task->name);
+    Kernel::logln("\t   State: {}", task_state_string(task->state()));
+    Kernel::logln("\t   Memory: ");
 
     list_foreach(MemoryMapping, mapping, task->memory_mapping)
     {
         auto virtual_range = mapping->range();
-        stream_format(out_stream, "\n\t   - %08x - %08x (%08x)", virtual_range.base(), virtual_range.end(), virtual_range.size());
+        Kernel::logln("\t   - {08x} - {08x} ({08x})", virtual_range.base(), virtual_range.end(), virtual_range.size());
     }
 
     if (task->address_space == Arch::kernel_address_space())
     {
-        stream_format(out_stream, "\n\t   Address Space: %08x (kpdir)", task->address_space);
+        Kernel::logln("\t   Address Space: {08x} (kpdir)", task->address_space);
     }
     else
     {
-        stream_format(out_stream, "\n\t   Address Space: %08x", task->address_space);
+        Kernel::logln("\t   Address Space: {08x}", task->address_space);
     }
 
-    stream_format(out_stream, "\n");
+    Kernel::logln("\n");
 }

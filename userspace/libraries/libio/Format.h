@@ -30,6 +30,7 @@ struct Formating
         HEXADECIMAL,
     };
 
+    Align align;
     bool prefix;
     Type type = DEFAULT;
 
@@ -40,7 +41,7 @@ struct Formating
         scan.skip('{');
 
         auto parse_type = [&]() {
-            switch (scan.current())
+            switch (scan.peek())
             {
             case 's':
                 format.type = STRING;
@@ -66,20 +67,30 @@ struct Formating
                 format.type = HEXADECIMAL;
                 break;
 
+            case 'p':
+                format.prefix = true;
+                format.type = HEXADECIMAL;
+                break;
+
             default:
                 break;
             }
         };
 
-        if (scan.current_is("scbdox"))
+        if (scan.skip('#'))
         {
-            parse_type();
-            scan.forward();
+            format.prefix = true;
         }
 
-        while (!scan.ended() && scan.current() != '}')
+        if (scan.peek_is_any("scbdoxp"))
         {
-            scan.forward();
+            parse_type();
+            scan.next();
+        }
+
+        while (!scan.ended() && scan.peek() != '}')
+        {
+            scan.next();
         }
 
         scan.skip('}');
@@ -134,8 +145,7 @@ static inline ResultOr<size_t> format(IO::Writer &writer, Scanner &scan)
 
     while (!scan.ended())
     {
-        written += TRY(IO::write(writer, scan.current()));
-        scan.forward();
+        written += TRY(IO::write(writer, scan.next()));
     }
 
     return written;
@@ -146,13 +156,12 @@ static inline ResultOr<size_t> format(Writer &writer, Scanner &scan, First first
 {
     size_t written = 0;
 
-    while (!scan.ended() && scan.current() != '{')
+    while (!scan.ended() && scan.peek() != '{')
     {
-        written += TRY(IO::write(writer, scan.current()));
-        scan.forward();
+        written += TRY(IO::write(writer, scan.next()));
     }
 
-    if (scan.current() == '{')
+    if (scan.peek() == '{')
     {
         auto formating = Formating::parse(scan);
 

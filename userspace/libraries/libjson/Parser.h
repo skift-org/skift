@@ -1,24 +1,25 @@
 #pragma once
 
 #include <libio/MemoryReader.h>
+#include <libio/MemoryWriter.h>
 #include <libio/NumberScanner.h>
 #include <libio/Scanner.h>
 #include <libio/ScopedReader.h>
+#include <libio/Write.h>
 #include <libjson/Value.h>
-#include <libutils/StringBuilder.h>
 #include <libutils/Strings.h>
 
 namespace Json
 {
 
-Value value(IO::Scanner &scan);
+Value parse_value(IO::Scanner &scan);
 
-inline void whitespace(IO::Scanner &scan)
+inline void parse_whitespace(IO::Scanner &scan)
 {
-    scan.eat(Strings::WHITESPACE);
+    scan.eat_any(Strings::WHITESPACE);
 }
 
-inline Value number(IO::Scanner &scan)
+inline Value parse_number(IO::Scanner &scan)
 {
 #ifdef __KERNEL__
     return IO::NumberScanner::decimal().scan_int(scan).unwrap_or(0);
@@ -27,7 +28,7 @@ inline Value number(IO::Scanner &scan)
 #endif
 }
 
-static inline const char *escape_sequence(IO::Scanner &scan)
+static inline const char *parse_escape_sequence(IO::Scanner &scan)
 {
     scan.skip('\\');
 
@@ -36,8 +37,7 @@ static inline const char *escape_sequence(IO::Scanner &scan)
         return "\\";
     }
 
-    char chr = scan.current();
-    scan.forward();
+    char chr = scan.next();
 
     switch (chr)
     {
@@ -69,10 +69,9 @@ static inline const char *escape_sequence(IO::Scanner &scan)
     {
         auto read_4hex = [&]() {
             char buffer[5];
-            for (size_t i = 0; i < 4 && scan.current_is(Strings::LOWERCASE_XDIGITS); i++)
+            for (size_t i = 0; i < 4 && scan.peek_is_any(Strings::LOWERCASE_XDIGITS); i++)
             {
-                buffer[i] = scan.current();
-                scan.forward();
+                buffer[i] = scan.next();
             }
 
             IO::MemoryReader memory{buffer, 5};
@@ -128,37 +127,37 @@ static inline const char *escape_sequence(IO::Scanner &scan)
     return buffer;
 }
 
-inline String string(IO::Scanner &scan)
+inline String parse_string(IO::Scanner &scan)
 {
-    StringBuilder builder{};
+    IO::MemoryWriter builder{};
 
     scan.skip('"');
 
-    while (scan.current() != '"' && scan.do_continue())
+    while (scan.peek() != '"' &&
+           !scan.ended())
     {
-        if (scan.current() == '\\')
+        if (scan.peek() == '\\')
         {
-            builder.append(escape_sequence(scan));
+            IO::write(builder, parse_escape_sequence(scan));
         }
         else
         {
-            builder.append(scan.current());
-            scan.forward();
+            IO::write(builder, scan.next());
         }
     }
 
     scan.skip('"');
 
-    return builder.finalize();
+    return builder.string();
 }
 
-inline Value array(IO::Scanner &scan)
+inline Value parse_array(IO::Scanner &scan)
 {
     scan.skip('[');
 
     Value::Array array{};
 
-    whitespace(scan);
+    parse_whitespace(scan);
 
     if (scan.skip(']'))
     {
@@ -170,40 +169,40 @@ inline Value array(IO::Scanner &scan)
     do
     {
         scan.skip(',');
-        array.push_back(value(scan));
+        array.push_back(parse_value(scan));
         index++;
-    } while (scan.current() == ',');
+    } while (scan.peek() == ',');
 
     scan.skip(']');
 
     return move(array);
 }
 
-inline Value object(IO::Scanner &scan)
+inline Value parse_object(IO::Scanner &scan)
 {
     scan.skip('{');
 
     Value::Object object{};
 
-    whitespace(scan);
+    parse_whitespace(scan);
 
     if (scan.skip('}'))
     {
         return object;
     }
 
-    while (scan.current() != '}')
+    while (scan.peek() != '}')
     {
-        auto k = string(scan);
-        whitespace(scan);
+        auto k = parse_string(scan);
+        parse_whitespace(scan);
 
         scan.skip(':');
 
-        object[k] = value(scan);
+        object[k] = parse_value(scan);
 
         scan.skip(',');
 
-        whitespace(scan);
+        parse_whitespace(scan);
     }
 
     scan.skip('}');
@@ -211,61 +210,43 @@ inline Value object(IO::Scanner &scan)
     return object;
 }
 
-inline Value keyword(IO::Scanner &scan)
+inline Value parse_value(IO::Scanner &scan)
 {
-    StringBuilder builder{};
-
-    while (scan.current_is(Strings::LOWERCASE_ALPHA) &&
-           scan.do_continue())
-    {
-        builder.append(scan.current());
-        scan.forward();
-    }
-
-    auto keyword = builder.finalize();
-
-    if (keyword == "true")
-    {
-        return true;
-    }
-
-    if (keyword == "false")
-    {
-        return false;
-    }
-
-    return nullptr;
-}
-
-inline Value value(IO::Scanner &scan)
-{
-    whitespace(scan);
+    parse_whitespace(scan);
 
     Value value{};
 
-    if (scan.current() == '"')
+    if (scan.peek() == '"')
     {
-        value = string(scan);
+        value = parse_string(scan);
     }
-    else if (scan.current_is("-") ||
-             scan.current_is("0123456789"))
+    else if (scan.peek() == '-' ||
+             scan.peek_is_any("0123456789"))
     {
-        value = number(scan);
+        value = parse_number(scan);
     }
-    else if (scan.current() == '{')
+    else if (scan.peek() == '{')
     {
-        value = object(scan);
+        value = parse_object(scan);
     }
-    else if (scan.current() == '[')
+    else if (scan.peek() == '[')
     {
-        value = array(scan);
+        value = parse_array(scan);
+    }
+    else if (scan.skip_word("true"))
+    {
+        value = true;
+    }
+    else if (scan.skip_word("false"))
+    {
+        value = false;
     }
     else
     {
-        value = keyword(scan);
+        value = nullptr;
     }
 
-    whitespace(scan);
+    parse_whitespace(scan);
 
     return value;
 }
@@ -274,7 +255,7 @@ inline Value parse(IO::Reader &reader)
 {
     IO::Scanner scan{reader};
     scan.skip_utf8bom();
-    return value(scan);
+    return parse_value(scan);
 }
 
 inline Value parse(const char *buffer, size_t size)

@@ -87,11 +87,11 @@ static inline ResultOr<String> inln()
     Scanner scan{in()};
     MemoryWriter writer{};
 
-    while (!(scan.ended() || scan.current() == '\n'))
+    while (!(scan.ended() || scan.peek() == '\n'))
     {
-        writer.write(scan.current());
-        IO::write(out(), scan.current());
-        scan.forward();
+        writer.write(scan.peek());
+        IO::write(out(), scan.peek());
+        scan.next();
     }
 
     IO::write(out(), '\n');

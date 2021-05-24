@@ -1,10 +1,10 @@
 #include <libio/Path.h>
 #include <libio/Streams.h>
-#include <libutils/ArgParse.h>
+#include <libshell/ArgParse.h>
 
 int main(int argc, char const *argv[])
 {
-    ArgParse args;
+    Shell::ArgParse args;
 
     args.usage("NAME...");
     args.usage("OPTIONS... NAME...");
@@ -19,9 +19,9 @@ int main(int argc, char const *argv[])
     args.option(option_zero, 'z', "zero", "End each output line with NUL, not newline");
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
+    if (parse_result != Shell::ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == Shell::ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     for (auto filepath : args.argv())

@@ -3,10 +3,10 @@
 #include <abi/IOCall.h>
 #include <abi/Paths.h>
 
+#include <libio/Format.h>
 #include <libutils/RefPtr.h>
 #include <libutils/ResultOr.h>
 #include <libutils/String.h>
-#include <libutils/StringBuilder.h>
 #include <libutils/Vector.h>
 
 #include "system/devices/DeviceAddress.h"
@@ -34,11 +34,7 @@ public:
 
     String path()
     {
-        return StringBuilder()
-            .append(DEVICE_PATH)
-            .append("/")
-            .append(name())
-            .finalize();
+        return IO::format("{}/{}", DEVICE_PATH, name());
     }
 
     DeviceAddress address()

@@ -12,10 +12,10 @@ namespace IO
 class Scanner final
 {
 private:
-    static constexpr int PEEK_SIZE = 64;
+    static constexpr int MAX_PEEK = 64;
 
     Reader &_reader;
-    Utils::InlineRingBuffer<uint8_t, PEEK_SIZE> _peek{};
+    Utils::InlineRingBuffer<uint8_t, MAX_PEEK> _peek{};
     bool _is_end_of_file = false;
 
     void refill()
@@ -28,14 +28,14 @@ private:
         char c = 0x69;
         auto read_result = _reader.read(&c, 1);
 
-        if (!read_result.success() ||
-            read_result.unwrap() == 0)
+        if (read_result.unwrap_or(0) == 0)
         {
             _is_end_of_file = true;
-            return;
         }
-
-        _peek.put(c);
+        else
+        {
+            _peek.put(c);
+        }
     }
 
 public:
@@ -54,20 +54,30 @@ public:
         return _is_end_of_file;
     }
 
-    void forward()
+    char next()
     {
         if (_peek.empty())
         {
             refill();
         }
 
-        if (!ended())
+        if (ended())
         {
-            _peek.get();
+            return '\0';
+        }
+
+        return _peek.get();
+    }
+
+    void next(size_t n)
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            next();
         }
     }
 
-    char peek(size_t peek)
+    char peek(size_t peek = 0)
     {
         while (!ended() && peek >= _peek.used())
         {
@@ -82,60 +92,98 @@ public:
         return _peek.peek(peek);
     }
 
-    bool do_continue()
+    bool peek_is_any(const char *what)
     {
-        return !ended();
+        return peek_is_any(0, what, strlen(what));
     }
 
-    void forward(size_t n)
+    bool peek_is_any(const char *what, size_t size)
     {
-        for (size_t i = 0; i < n; i++)
-        {
-            forward();
-        }
+        return peek_is_any(0, what, size);
     }
 
-    void forward_codepoint()
+    bool peek_is_any(size_t offset, const char *what)
     {
-        if ((current() & 0xf8) == 0xf0)
+        return peek_is_any(offset, what, strlen(what));
+    }
+
+    bool peek_is_any(size_t offset, const char *what, size_t size)
+    {
+        for (size_t i = 0; i < size; i++)
         {
-            forward(4);
+            if (peek(offset) == what[i])
+            {
+                return true;
+            }
         }
-        else if ((current() & 0xf0) == 0xe0)
+
+        return false;
+    }
+
+    bool peek_is_word(const char *word)
+    {
+        return peek_is_word(0, word, strlen(word));
+    }
+
+    bool peek_is_word(const char *word, size_t size)
+    {
+        return peek_is_word(0, word, size);
+    }
+
+    bool peek_is_word(size_t offset, const char *word)
+    {
+        return peek_is_word(offset, word, strlen(word));
+    }
+
+    bool peek_is_word(size_t offset, const char *word, size_t size)
+    {
+        for (size_t i = 0; i < size; i++)
         {
-            forward(3);
+            if (peek(offset + i) != word[i])
+            {
+                return false;
+            }
         }
-        else if ((current() & 0xe0) == 0xc0)
+
+        return true;
+    }
+
+    void next_codepoint()
+    {
+        if ((peek() & 0xf8) == 0xf0)
         {
-            forward(2);
+            next(4);
+        }
+        else if ((peek() & 0xf0) == 0xe0)
+        {
+            next(3);
+        }
+        else if ((peek() & 0xe0) == 0xc0)
+        {
+            next(2);
         }
         else
         {
-            forward(1);
+            next(1);
         }
     }
 
-    char current()
-    {
-        return peek(0);
-    }
-
-    Codepoint current_codepoint()
+    Codepoint peek_codepoint()
     {
         size_t size = 0;
         Codepoint codepoint = peek(0);
 
-        if ((current() & 0xf8) == 0xf0)
+        if ((peek() & 0xf8) == 0xf0)
         {
             size = 4;
             codepoint = (0x07 & codepoint) << 18;
         }
-        else if ((current() & 0xf0) == 0xe0)
+        else if ((peek() & 0xf0) == 0xe0)
         {
             size = 3;
             codepoint = (0x0f & codepoint) << 12;
         }
-        else if ((current() & 0xe0) == 0xc0)
+        else if ((peek() & 0xe0) == 0xc0)
         {
             codepoint = (0x1f & codepoint) << 6;
             size = 2;
@@ -149,62 +197,34 @@ public:
         return codepoint;
     }
 
-    bool current_is(const char *what)
-    {
-        return current_is(what, strlen(what));
-    }
-
-    bool current_is(const char *what, size_t size)
-    {
-        for (size_t i = 0; i < size; i++)
-        {
-            if (current() == what[i])
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    bool current_is_word(const char *word)
-    {
-        for (size_t i = 0; word[i]; i++)
-        {
-            if (peek(i) != word[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    void eat(const char *what)
-    {
-        while (current_is(what) && do_continue())
-        {
-            forward();
-        }
-    }
-
     bool skip(char chr)
     {
-        if (current() == chr)
-        {
-            forward();
-
-            return true;
-        }
-
-        return false;
+        return skip_any(&chr, 1);
     }
 
-    bool skip(const char *chr)
+    void eat_any(const char *what)
     {
-        if (current_is(chr))
+        return eat_any(what, strlen(what));
+    }
+
+    void eat_any(const char *what, size_t size)
+    {
+        while (peek_is_any(what, size) && !ended())
         {
-            forward();
+            next();
+        }
+    }
+
+    bool skip_any(const char *chr)
+    {
+        return skip_any(chr, strlen(chr));
+    }
+
+    bool skip_any(const char *chr, size_t size)
+    {
+        if (peek_is_any(chr, size))
+        {
+            next();
 
             return true;
         }
@@ -214,11 +234,16 @@ public:
 
     bool skip_word(const char *word)
     {
-        if (current_is_word(word))
+        return skip_word(word, strlen(word));
+    }
+
+    bool skip_word(const char *word, size_t size)
+    {
+        if (peek_is_word(word))
         {
-            for (size_t i = 0; i < strlen(word); i++)
+            for (size_t i = 0; i < size; i++)
             {
-                forward();
+                next();
             }
 
             return true;

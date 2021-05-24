@@ -1,5 +1,8 @@
+#include <libsystem/io/Stream.h>
+
 #include "archs/Arch.h"
 
+#include "system/Streams.h"
 #include "system/graphics/EarlyConsole.h"
 #include "system/graphics/Font.h"
 #include "system/interrupts/Interupts.h"
@@ -67,52 +70,45 @@ void system_panic_internal(Utils::SourceLocation location, void *stackframe, con
         system_stop();
     }
 
+    Kernel::logln("\n");
+
     if (!has_panic)
     {
         has_panic = true;
 
-        font_set_fg(0xffF59E0B);
-        stream_format(out_stream, "\n\e[0;33m--- \e[0;31m!!!\e[0;33m ------------------------------------------------------------------------\e[0m\n");
-        font_set_fg(0xff404040);
-
-        stream_format(out_stream, "\n\tKERNEL");
-        stream_format(out_stream, " PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[system_get_tick() % ARRAY_LENGTH(witty_comments)]);
+        Kernel::logln("--- !!! ------------------------------------------------------------------------");
+        Kernel::logln("");
+        Kernel::logln("\tKERNEL PANIC");
+        Kernel::logln("\t// {}", witty_comments[system_get_tick() % ARRAY_LENGTH(witty_comments)]);
     }
     else
     {
         nested_panic = true;
-        font_set_fg(0xffF59E0B);
-        stream_format(out_stream, "\n\n\e[0;33m- - \e[0;31mNESTED\e[0;33m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\e[0m\n");
-        font_set_fg(0xff404040);
 
-        stream_format(out_stream, "\n\tNESTED");
-        stream_format(out_stream, " PANIC\n\t// %s\n\n\t\e[0;31m", YO_DAWG);
+        Kernel::logln("- - NESTED - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+        Kernel::logln("");
+        Kernel::logln("\tNESTED KERNEL PANIC", YO_DAWG);
+        Kernel::logln("\t// {}", YO_DAWG);
     }
 
-    font_set_fg(0xffDC2626);
     stream_vprintf(out_stream, message, va);
-    font_set_fg(0xff404040);
-    stream_format(out_stream, "\e[0m\n\tthrow by %s %s() ln%d", location.file(), location.function(), location.line());
 
-    stream_format(out_stream, "\n");
-    stream_format(out_stream, "\n\tDiagnostic:");
-    stream_format(out_stream, "\n\tThe system was running for %d tick.", system_get_tick());
+    Kernel::logln("\tthrow by {} {}() ln{}", location.file(), location.function(), location.line());
+    Kernel::logln("\tThe system was running for {} tick.", system_get_tick());
 
     if (scheduler_running_id() != -1)
     {
-        stream_format(out_stream, "\n\tThe running process is %d: %s", scheduler_running_id(), scheduler_running()->name);
+        Kernel::logln("\tThe running process is {}: {}", scheduler_running_id(), scheduler_running()->name);
     }
 
     if (scheduler_is_context_switch())
     {
-        stream_format(out_stream, "\n\tWe are context switching\n", system_get_tick());
-    }
-    else
-    {
-        stream_format(out_stream, "\n");
+        Kernel::logln("\tWe are context switching", system_get_tick());
     }
 
-    stream_format(out_stream, "\n\tStackframe:\n");
+    Kernel::logln("");
+
+    Kernel::logln("\tStackframe:");
     if (stackframe)
     {
         Arch::dump_stack_frame(stackframe);
@@ -121,11 +117,11 @@ void system_panic_internal(Utils::SourceLocation location, void *stackframe, con
     {
         Arch::backtrace();
     }
-    stream_format(out_stream, "\n");
+    Kernel::logln("");
 
     memory_dump();
 
-    stream_format(out_stream, "\n");
+    Kernel::logln("");
 
     if (!nested_panic)
     {
@@ -133,13 +129,11 @@ void system_panic_internal(Utils::SourceLocation location, void *stackframe, con
         Arch::panic_dump();
     }
 
-    stream_format(out_stream, "\n");
+    Kernel::logln("");
 
-    stream_format(out_stream, "\n\tSystem halted!\n");
-
-    font_set_fg(0xffF59E0B);
-    stream_format(out_stream, "\n\e[0;33m--------------------------------------------------------------------------------\n\n");
-    font_set_fg(0xffFAFAFA);
+    Kernel::logln("\tSystem halted!");
+    Kernel::logln("--------------------------------------------------------------------------------");
+    Kernel::logln("");
 
     system_stop();
 }

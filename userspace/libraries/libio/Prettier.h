@@ -1,10 +1,16 @@
 #pragma once
 
-#include <libutils/StringBuilder.h>
+#include <libio/Write.h>
+#include <libio/Writer.h>
 
-struct Prettifier : public StringBuilder
+namespace IO
+{
+
+struct Prettier :
+    public IO::Writer
 {
 private:
+    IO::Writer &_writer;
     int _depth = 0;
     int _flags;
 
@@ -12,20 +18,40 @@ public:
     static constexpr auto NONE = 0;
     static constexpr auto COLORS = 1 << 0;
     static constexpr auto INDENTS = 1 << 1;
+    static constexpr auto USETAB = 1 << 2;
 
-    Prettifier(int flags = NONE) : _flags(flags)
+    Prettier(IO::Writer &writer, int flags = NONE)
+        : _writer{writer},
+          _flags{flags}
     {
+    }
+
+    ResultOr<size_t> write(const void *buffer, size_t size) override
+    {
+        return _writer.write(buffer, size);
+    }
+
+    Result flush() override
+    {
+        return _writer.flush();
     }
 
     void ident()
     {
         if (_flags & INDENTS)
         {
-            append('\n');
+            IO::write(_writer, '\n');
 
             for (int i = 0; i < _depth; i++)
             {
-                append("    ");
+                if (_flags & USETAB)
+                {
+                    IO::write(_writer, "\t");
+                }
+                else
+                {
+                    IO::write(_writer, "    ");
+                }
             }
         }
     }
@@ -54,7 +80,7 @@ public:
                 "\e[96m",
             };
 
-            append(depth_color[_depth % 6]);
+            IO::write(_writer, depth_color[_depth % 6]);
         }
     }
 
@@ -62,7 +88,9 @@ public:
     {
         if (_flags & COLORS)
         {
-            append("\e[m");
+            IO::write(_writer, "\e[m");
         }
     }
 };
+
+} // namespace IO

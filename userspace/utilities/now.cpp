@@ -1,11 +1,11 @@
 #include <skift/Time.h>
 
 #include <libio/Streams.h>
-#include <libutils/ArgParse.h>
+#include <libshell/ArgParse.h>
 
 int main(int argc, const char *argv[])
 {
-    ArgParse args;
+    Shell::ArgParse args;
 
     args.prologue("Get the time of the day.");
     args.usage("");
@@ -23,9 +23,11 @@ int main(int argc, const char *argv[])
     args.epiloge("Options can be combined.");
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
+    if (parse_result != Shell::ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == Shell::ArgParseResult::SHOULD_FINISH
+                   ? PROCESS_SUCCESS
+                   : PROCESS_FAILURE;
     }
 
     if (!option_time && !option_date && !option_epoch)

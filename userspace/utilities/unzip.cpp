@@ -1,14 +1,14 @@
 
 #include <libfile/ZipArchive.h>
 #include <libio/File.h>
-#include <libio/Streams.h>
-#include <libsystem/io/Filesystem.h>
-#include <libutils/ArgParse.h>
 #include <libio/Path.h>
+#include <libio/Streams.h>
+#include <libshell/ArgParse.h>
+#include <libsystem/io/Filesystem.h>
 
 int main(int argc, char const *argv[])
 {
-    ArgParse args;
+    Shell::ArgParse args;
 
     args.show_help_if_no_operand_given();
     args.should_abort_on_failure();
@@ -17,13 +17,13 @@ int main(int argc, char const *argv[])
     args.usage("OPTION... FILES...");
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
+    if (parse_result != Shell::ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == Shell::ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     // Unzip all archives that were passed as arguments
-    args.argv().foreach ([&](auto &path) {
+    args.argv().foreach([&](auto &path) {
         IO::errln("{}: Unzip '{}'", argv[0], path);
 
         IO::File file{path};

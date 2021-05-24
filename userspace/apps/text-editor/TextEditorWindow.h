@@ -12,22 +12,16 @@ using namespace Widget;
 struct TextEditorWindow : public Window
 {
 private:
-    RefPtr<TitleBarComponent> _titlebar;
-    RefPtr<TextEditor> _text_editor;
     RefPtr<TextModel> _text_model;
     OwnPtr<Async::Observer<Widget::TextModel>> _text_observer;
 
     bool _modified = false;
     String _path = "";
-    String _default_title = "Text Editor";
-    String _title = _default_title;
 
 public:
     TextEditorWindow(String path) : Window(WINDOW_RESIZABLE)
     {
-        _titlebar = titlebar(Graphic::Icon::get("text-box"), _title);
         _text_model = TextModel::empty();
-        _text_editor = texteditor(_text_model);
 
         size(Math::Vec2i(700, 500));
         load_document(path);
@@ -35,10 +29,7 @@ public:
             if (!_modified)
             {
                 _modified = true;
-
-                _titlebar->title(generate_title(_path, "*"));
-
-                should_relayout();
+                should_rebuild();
             }
         });
 
@@ -89,15 +80,12 @@ public:
         if (!path.null_or_empty())
         {
             IO::logln("Opening text document from {}", path);
-            _text_model = TextModel::open(path);
 
+            _text_model = TextModel::open(path);
             _path = path;
             _modified = false;
 
-            _titlebar->title(generate_title(_path));
-
-            _text_editor->update_model(_text_model);
-            should_relayout();
+            should_rebuild();
         }
     }
 
@@ -106,15 +94,12 @@ public:
         if (!path.null_or_empty())
         {
             IO::logln("Saving text document to {}", path);
+
             if (_text_model->save(path).success())
             {
                 _path = path;
                 _modified = false;
-
-                _titlebar->title(generate_title(path));
-
-                _text_editor->focus();
-                should_relayout();
+                should_rebuild();
             }
         }
     }
@@ -181,41 +166,54 @@ public:
                             "If you don't save, any changes will be lost forever!",
                             Graphic::Icon::get("warning"),
                             DialogButton::YES | DialogButton::NO | DialogButton::CANCEL);
+
         callback(dialog_result);
     }
 
-    String generate_title(String path, String modifier = "")
+    String generate_title()
     {
-        auto str_builder = StringBuilder();
-        str_builder.append(_default_title);
-
-        if (!path.null_or_empty())
+        if (_path.null_or_empty())
         {
-            str_builder.append(" - ").append(path);
+            if (_modified)
+            {
+                return IO::format("Text Editor - Untitled*");
+            }
+            else
+            {
+                return "Text Editor";
+            }
         }
-
-        if (!modifier.null_or_empty())
+        else
         {
-            str_builder.append(modifier);
+            if (_modified)
+            {
+                return IO::format("Text Editor - {}*", _path);
+            }
+            else
+            {
+                return IO::format("Text Editor - {}", _path);
+            }
         }
-
-        return str_builder.finalize();
     }
 
     RefPtr<Element> build() override
     {
-        _text_editor->focus();
+        // clang-format off
 
-        return vflow({_titlebar,
-                      toolbar({
-                          basic_button(Graphic::Icon::get("folder-open"), [&] {
-                              on_load();
-                          }),
-                          basic_button(Graphic::Icon::get("content-save"), [&] {
-                              on_save();
-                          }),
-                          basic_button(Graphic::Icon::get("image-plus")),
-                      }),
-                      fill(_text_editor)});
+        return vflow({
+            titlebar(Graphic::Icon::get("text-box"), generate_title()),
+            toolbar({
+                basic_button(Graphic::Icon::get("folder-open"), [&] {
+                    on_load();
+                }),
+                basic_button(Graphic::Icon::get("content-save"), [&] {
+                    on_save();
+                }),
+                basic_button(Graphic::Icon::get("image-plus")),
+            }),
+            fill(texteditor(_text_model))
+        });
+
+        // clang-format on
     }
 };

@@ -1,3 +1,4 @@
+#include <abi/Paths.h>
 #include <abi/Syscalls.h>
 #include <skift/Environment.h>
 
@@ -87,7 +88,7 @@ int main(int, const char *[])
         start_headless();
     }
 
-    stream_format(err_stream, "\n\n\t\e[1;34mGoodbye!\e[m - n°1\n\n");
+    IO::err("\n\n\t\e[1;34mGoodbye!\e[m - n°1\n\n");
 
     return PROCESS_SUCCESS;
 }

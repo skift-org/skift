@@ -15,6 +15,9 @@
 #include <libutils/Traits.h>
 #include <libutils/Vector.h>
 
+namespace Shell
+{
+
 enum class ArgParseResult
 {
     SHOULD_CONTINUE,
@@ -210,6 +213,7 @@ public:
             if (ctx.any())
             {
                 if (ctx.current() == "true" ||
+                    ctx.current() == "y" ||
                     ctx.current() == "yes")
                 {
                     value = true;
@@ -217,6 +221,7 @@ public:
                 }
 
                 if (ctx.current() == "false" ||
+                    ctx.current() == "n" ||
                     ctx.current() == "no")
                 {
                     value = false;
@@ -432,13 +437,13 @@ public:
             }
             else if (scan.skip('-'))
             {
-                while (scan.do_continue())
+                while (!scan.ended())
                 {
                     bool found_valid_option = false;
 
                     for (size_t i = 0; i < _option.count(); i++)
                     {
-                        if (_option[i].shortname == scan.current())
+                        if (_option[i].shortname == scan.peek())
                         {
                             ArgParseResult result = _option[i].callback(context);
 
@@ -459,10 +464,10 @@ public:
 
                     if (!found_valid_option)
                     {
-                        return invalid_option(scan.current());
+                        return invalid_option(scan.peek());
                     }
 
-                    scan.forward();
+                    scan.next();
                 }
             }
             else
@@ -484,3 +489,5 @@ public:
         return ArgParseResult::SHOULD_CONTINUE;
     }
 };
+
+} // namespace Shell

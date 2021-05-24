@@ -1,9 +1,9 @@
 #include <assert.h>
+#include <libfile/ELF.h>
+#include <libsystem/io/Stream.h>
 #include <string.h>
 
 #include "system/Streams.h"
-#include <libfile/ELF.h>
-
 #include "system/interrupts/Interupts.h"
 #include "system/scheduling/Scheduler.h"
 #include "system/tasking/Task-Launchpad.h"

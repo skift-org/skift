@@ -1,3 +1,4 @@
+#include <abi/Paths.h>
 #include <string.h>
 
 #include <libio/File.h>

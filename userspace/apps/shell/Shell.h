@@ -16,6 +16,6 @@ struct ShellBuiltin
 
 ShellBuiltinCallback shell_get_builtin(const char *name);
 
-ShellNode *shell_parse(char *command_text);
+ShellNode *shell_parse(const char *command_text);
 
 int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> outstream);

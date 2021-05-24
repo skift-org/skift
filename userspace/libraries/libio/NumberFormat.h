@@ -7,12 +7,23 @@
 #include <libio/Writer.h>
 #include <libutils/Strings.h>
 
-class NumberFormat
+namespace IO
+{
+
+enum Sign
+{
+    ALWAYS,
+    ONLY_NEGATIVE,
+    SPACE_FOR_POSITIVE,
+};
+
+struct NumberFormat
 {
 private:
     int _base = 10;
     int _precision = 4;
     bool _capitalized = false;
+    Sign _sign = ONLY_NEGATIVE;
 
     char digit(int digit)
     {
@@ -28,15 +39,35 @@ private:
         }
     }
 
+    ResultOr<size_t> sign(IO::Writer &writer, auto value)
+    {
+        if (value < 0)
+        {
+            return IO::write(writer, '-');
+        }
+        else if (_sign == Sign::ALWAYS)
+        {
+            return IO::write(writer, '+');
+        }
+        else if (_sign == Sign::SPACE_FOR_POSITIVE)
+        {
+            return IO::write(writer, ' ');
+        }
+
+        return 0;
+    }
+
 public:
     static NumberFormat binary() { return {2, 4, false}; }
     static NumberFormat octal() { return {8, 4, false}; }
     static NumberFormat decimal() { return {10, 4, false}; }
     static NumberFormat hexadecimal() { return {16, 4, false}; }
 
-    NumberFormat(int base, int precision, bool capitalized)
-        : _base{base}, _precision{precision}, _capitalized{capitalized}
+    NumberFormat precision(int value)
     {
+        NumberFormat copy = *this;
+        copy._precision = value;
+        return copy;
     }
 
     NumberFormat capitalized()
@@ -46,13 +77,26 @@ public:
         return copy;
     }
 
+    NumberFormat sign(Sign sign)
+    {
+        NumberFormat copy = *this;
+        copy._sign = sign;
+        return copy;
+    }
+
+    NumberFormat(int base, int precision, bool capitalized)
+        : _base{base}, _precision{precision}, _capitalized{capitalized}
+    {
+    }
+
     ResultOr<size_t> format(IO::Writer &writer, int64_t value)
     {
         size_t written = 0;
 
+        written += TRY(sign(writer, value));
+
         if (value < 0)
         {
-            written += TRY(IO::write(writer, '-'));
             value = -value;
         }
 
@@ -97,9 +141,10 @@ public:
 
         size_t written = 0;
 
+        written += TRY(sign(writer, value));
+
         if (value < 0)
         {
-            written += TRY(IO::write(writer, '-'));
             value = -value;
         }
 
@@ -129,3 +174,5 @@ public:
 
 #endif
 };
+
+} // namespace IO

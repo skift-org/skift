@@ -116,10 +116,10 @@ static inline ResultOr<size_t> copy_line(Scanner &scan, Writer &to, String delim
 {
     size_t written = 0;
 
-    while (!scan.current_is_word(delimiter.cstring()) && scan.do_continue())
+    while (!scan.peek_is_word(delimiter.cstring()) &&
+           !scan.ended())
     {
-        written += TRY(IO::write(to, scan.current()));
-        scan.forward();
+        written += TRY(IO::write(to, scan.next()));
     }
 
     if (scan.skip_word(delimiter.cstring()) && write_delim)

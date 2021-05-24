@@ -1,21 +1,21 @@
 #include <abi/Keyboard.h>
 #include <abi/Paths.h>
 
-#include <libutils/ArgParse.h>
+#include <libshell/ArgParse.h>
 
 #include <libio/Copy.h>
 #include <libio/Directory.h>
 #include <libio/File.h>
 #include <libio/Streams.h>
 
-ArgParseResult loadkey_list_keymap()
+Shell::ArgParseResult loadkey_list_keymap()
 {
     IO::Directory keymap_directory{"/Files/Keyboards"};
 
     if (!keymap_directory.exist())
     {
         IO::errln("keyboardctl: Failed to query keymaps from /Files/Keyboards");
-        return ArgParseResult::FAILURE;
+        return Shell::ArgParseResult::FAILURE;
     }
 
     for (auto entry : keymap_directory.entries())
@@ -24,16 +24,16 @@ ArgParseResult loadkey_list_keymap()
         IO::outln("- {}", keymap_path.basename_without_extension());
     }
 
-    return ArgParseResult::SHOULD_FINISH;
+    return Shell::ArgParseResult::SHOULD_FINISH;
 }
 
-ArgParseResult loadkey_set_keymap(RefPtr<IO::Handle> keyboard_device, String keymap_path)
+Shell::ArgParseResult loadkey_set_keymap(RefPtr<IO::Handle> keyboard_device, String keymap_path)
 {
     IO::File file{keymap_path, OPEN_READ};
 
     if (!file.exist())
     {
-        return ArgParseResult::FAILURE;
+        return Shell::ArgParseResult::FAILURE;
     }
 
     auto read_all_result = IO::read_all(file);
@@ -42,7 +42,7 @@ ArgParseResult loadkey_set_keymap(RefPtr<IO::Handle> keyboard_device, String key
     {
         IO::errln("keyboardctl: Failed to open the keymap file: {}", read_all_result.description());
 
-        return ArgParseResult::FAILURE;
+        return Shell::ArgParseResult::FAILURE;
     }
 
     KeyMap *keymap = (KeyMap *)read_all_result.unwrap().start();
@@ -56,7 +56,7 @@ ArgParseResult loadkey_set_keymap(RefPtr<IO::Handle> keyboard_device, String key
     {
         IO::errln("keyboardctl: Invalid keymap file format!");
 
-        return ArgParseResult::FAILURE;
+        return Shell::ArgParseResult::FAILURE;
     }
 
     IOCallKeyboardSetKeymapArgs args = {
@@ -70,32 +70,32 @@ ArgParseResult loadkey_set_keymap(RefPtr<IO::Handle> keyboard_device, String key
     {
         IO::errln("keyboardctl: Failed to open the keymap file: {}", get_result_description(call_result));
 
-        return ArgParseResult::FAILURE;
+        return Shell::ArgParseResult::FAILURE;
     }
 
     IO::outln("Keymap set to {}({})", keymap->language, keymap->region);
 
-    return ArgParseResult::SHOULD_FINISH;
+    return Shell::ArgParseResult::SHOULD_FINISH;
 }
 
-ArgParseResult loadkey_get_keymap(RefPtr<IO::Handle> keyboard_device)
+Shell::ArgParseResult loadkey_get_keymap(RefPtr<IO::Handle> keyboard_device)
 {
     KeyMap keymap;
 
     if (keyboard_device->call(IOCALL_KEYBOARD_GET_KEYMAP, &keymap) != SUCCESS)
     {
         IO::errln("keyboardctl: Failed to retrived the current keymap");
-        return ArgParseResult::FAILURE;
+        return Shell::ArgParseResult::FAILURE;
     }
 
     IO::outln("Current keymap is {}({})", keymap.language, keymap.region);
 
-    return ArgParseResult::SHOULD_FINISH;
+    return Shell::ArgParseResult::SHOULD_FINISH;
 }
 
 int main(int argc, const char *argv[])
 {
-    ArgParse args{};
+    Shell::ArgParse args{};
     args.should_abort_on_failure();
     args.show_help_if_no_option_given();
 
@@ -128,5 +128,7 @@ int main(int argc, const char *argv[])
         return loadkey_set_keymap(keyboard_handle, kaymap_path);
     });
 
-    return args.eval(argc, argv) == ArgParseResult::FAILURE ? PROCESS_FAILURE : PROCESS_SUCCESS;
+    return args.eval(argc, argv) == Shell::ArgParseResult::FAILURE
+               ? PROCESS_FAILURE
+               : PROCESS_SUCCESS;
 }

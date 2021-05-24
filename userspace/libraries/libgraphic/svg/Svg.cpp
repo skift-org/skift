@@ -43,7 +43,7 @@ ResultOr<RefPtr<Graphic::Bitmap>> render(IO::Reader &reader, int size_hint)
 
     if (doc.root().name() != "svg")
     {
-        IO::logln("Svg file must begin with svg root element");
+        IO::logln("Svg file must begin with svg root element (expected 'svg' got '{}' and content is '{}')", doc.root().name(), doc.root().content());
         return Result::ERR_INVALID_DATA;
     }
 

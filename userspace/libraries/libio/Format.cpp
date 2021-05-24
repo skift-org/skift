@@ -1,5 +1,5 @@
 #include <libio/Format.h>
-#include <libutils/NumberFormat.h>
+#include <libio/NumberFormat.h>
 
 namespace IO
 {

@@ -1,10 +1,10 @@
 #include <abi/Paths.h>
 
-#include <libutils/ArgParse.h>
-
 #include <libio/Format.h>
 #include <libio/Socket.h>
 #include <libio/Streams.h>
+#include <libshell/ArgParse.h>
+#include <libsystem/io/Stream.h>
 
 #include "compositor/Protocol.h"
 
@@ -36,7 +36,7 @@ Optional<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
     return NONE;
 }
 
-ArgParseResult gfxmode_list()
+Shell::ArgParseResult gfxmode_list()
 {
     for (size_t i = 0; i < ARRAY_LENGTH(GFX_MODES); i++)
     {
@@ -45,24 +45,24 @@ ArgParseResult gfxmode_list()
         IO::outln("- {}x{}", gfx_mode.width, gfx_mode.height);
     }
 
-    return ArgParseResult::SHOULD_FINISH;
+    return Shell::ArgParseResult::SHOULD_FINISH;
 }
 
-ArgParseResult gfxmode_get(Stream *framebuffer_device)
+Shell::ArgParseResult gfxmode_get(Stream *framebuffer_device)
 {
     IOCallDisplayModeArgs framebuffer_info;
 
     if (stream_call(framebuffer_device, IOCALL_DISPLAY_GET_MODE, &framebuffer_info) < 0)
     {
         handle_printf_error(framebuffer_device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
-        return ArgParseResult::FAILURE;
+        return Shell::ArgParseResult::FAILURE;
     }
 
     IO::outln("Height: {}\nWidth: {}\n",
               framebuffer_info.width,
               framebuffer_info.height);
 
-    return ArgParseResult::SHOULD_FINISH;
+    return Shell::ArgParseResult::SHOULD_FINISH;
 }
 
 Result gfxmode_set_compositor(IOCallDisplayModeArgs mode)
@@ -102,14 +102,14 @@ Result gfxmode_set_iocall(Stream *device, IOCallDisplayModeArgs mode)
     return Result::SUCCESS;
 }
 
-ArgParseResult gfxmode_set(String &mode_name)
+Shell::ArgParseResult gfxmode_set(String &mode_name)
 {
     auto mode = gfxmode_by_name(mode_name);
 
     if (!mode.present())
     {
         IO::errln("Error: unknow graphic mode: {}", mode_name);
-        return ArgParseResult::FAILURE;
+        return Shell::ArgParseResult::FAILURE;
     }
 
     Result result = gfxmode_set_compositor(mode.unwrap());
@@ -124,17 +124,17 @@ ArgParseResult gfxmode_set(String &mode_name)
     if (result == Result::SUCCESS)
     {
         IO::outln("Graphic mode set to: {}", mode_name);
-        return ArgParseResult::SHOULD_FINISH;
+        return Shell::ArgParseResult::SHOULD_FINISH;
     }
     else
     {
-        return ArgParseResult::FAILURE;
+        return Shell::ArgParseResult::FAILURE;
     }
 }
 
 int main(int argc, const char *argv[])
 {
-    ArgParse args{};
+    Shell::ArgParse args{};
 
     args.show_help_if_no_option_given();
     args.should_abort_on_failure();
@@ -158,5 +158,7 @@ int main(int argc, const char *argv[])
 
     args.epiloge("Options can be combined.");
 
-    return args.eval(argc, argv) == ArgParseResult::FAILURE ? PROCESS_FAILURE : PROCESS_SUCCESS;
+    return args.eval(argc, argv) == Shell::ArgParseResult::FAILURE
+               ? PROCESS_FAILURE
+               : PROCESS_SUCCESS;
 }

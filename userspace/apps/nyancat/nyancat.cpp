@@ -97,9 +97,8 @@ void newline(int n)
 void update_terminal_size()
 {
     IOCallTerminalSizeArgs terminal_size;
-    stream_call(out_stream, IOCALL_TERMINAL_GET_SIZE, &terminal_size);
-
-    if (handle_has_error(out_stream))
+    auto result = IO::out().handle()->call(IOCALL_TERMINAL_GET_SIZE, &terminal_size);
+    if (result != SUCCESS)
     {
         return;
     }
@@ -146,13 +145,8 @@ int main(int argc, char **argv)
     {
         update_terminal_size();
 
-        if (handle_has_error(out_stream))
-        {
-            return PROCESS_FAILURE;
-        }
-
         /* Reset cursor */
-        IO::out("\033[H");
+        IO::out("\033[H").unwrap();
 
         /* Render the frame */
         for (y = min_row; y < max_row; ++y)

@@ -2,7 +2,6 @@
 #include <libio/BufReader.h>
 #include <libio/File.h>
 #include <libio/Scanner.h>
-#include <libutils/StringBuilder.h>
 #include <libwidget/model/TextModel.h>
 
 namespace Widget
@@ -26,15 +25,15 @@ RefPtr<TextModel> TextModel::open(String path)
     // Skip the utf8 bom header if present.
     scan.skip_word("\xEF\xBB\xBF");
 
-    while (scan.do_continue())
+    while (!scan.ended())
     {
         auto line = own<TextModelLine>();
 
-        while (scan.do_continue() &&
-               scan.current_codepoint() != '\n')
+        while (!scan.ended() &&
+               scan.peek_codepoint() != '\n')
         {
-            line->append(scan.current_codepoint());
-            scan.forward_codepoint();
+            line->append(scan.peek_codepoint());
+            scan.next_codepoint();
         }
 
         scan.skip('\n'); // skip the \n
@@ -65,15 +64,15 @@ RefPtr<TextModel> TextModel::create(String text)
     // Skip the utf8 bom header if present.
     scan.skip_word("\xEF\xBB\xBF");
 
-    while (scan.do_continue())
+    while (!scan.ended())
     {
         auto line = own<TextModelLine>();
 
-        while (scan.do_continue() &&
-               scan.current_codepoint() != '\n')
+        while (!scan.ended() &&
+               scan.peek_codepoint() != '\n')
         {
-            line->append(scan.current_codepoint());
-            scan.forward_codepoint();
+            line->append(scan.peek_codepoint());
+            scan.next_codepoint();
         }
 
         scan.skip('\n'); // skip the \n
@@ -96,22 +95,24 @@ RefPtr<TextModel> TextModel::create(String text)
 
 String TextModel::string()
 {
-    StringBuilder builder;
+    IO::MemoryWriter memory;
 
     for (size_t i = 0; i < _lines.count(); i++)
     {
         for (size_t j = 0; j < _lines[i]->length(); j++)
         {
-            builder.append_codepoint(_lines[i]->operator[](j));
+            char buffer[5];
+            codepoint_to_utf8(_lines[i]->operator[](j), (uint8_t *)buffer);
+            IO::write(memory, buffer);
         }
 
         if (i + 1 < _lines.count())
         {
-            builder.append('\n');
+            IO::write(memory, '\n');
         }
     }
 
-    return builder.finalize();
+    return memory.string();
 }
 
 ResultOr<size_t> TextModel::save(String path)

@@ -1,257 +1,251 @@
-#include <libio/NumberScanner.h>
 #include <libio/Streams.h>
-#include <libutils/HashMap.h>
+#include <libutils/Strings.h>
 #include <libxml/Parser.h>
 
-//See https://www.w3.org/TR/xml/#NT-Comment
-ResultOr<String> read_comment(IO::Scanner &scan)
-{
-    StringBuilder builder{};
-    scan.forward();
-    while (scan.current() != '>')
-    {
-        builder.append(scan.current());
-        if (scan.ended())
-        {
-            IO::logln("Failed to \"read_comment\"");
-            return Result::ERR_INVALID_DATA;
-        }
+/* --- Attributes ----------------------------------------------------------- */
 
-        scan.forward();
+static String parse_attribute_name(IO::Scanner &scan)
+{
+    IO::MemoryWriter memory;
+
+    while (scan.peek_is_any(Strings::ALL_ALPHA) ||
+           scan.peek() == ':' ||
+           scan.peek() == '-')
+    {
+        IO::write(memory, scan.next());
     }
 
-    return builder.finalize();
+    return memory.string();
 }
 
-// See https://www.w3.org/TR/xml/#NT-Attribute
-Result read_attribute(IO::Scanner &scan, String &name, String &value)
+static String parse_attribute_value(IO::Scanner &scan)
 {
-    StringBuilder builder{};
+    IO::MemoryWriter memory;
 
-    // Attribute name
-    while (scan.current_is(Strings::ALL_ALPHA) || (scan.current() == ':') || (scan.current() == '-'))
-    {
-        builder.append(scan.current());
-        scan.forward();
-    }
-    name = builder.finalize();
-
-    // Attribute equal
-    if (!scan.skip('='))
-    {
-        IO::logln("Expected = after attribute name: {}", scan.current());
-        return Result::ERR_INVALID_DATA;
-    }
-
-    bool single_quotes = false;
+    char ending = '\0';
 
     if (scan.skip('\''))
     {
-        single_quotes = true;
+        ending = '\'';
     }
     else if (scan.skip('\"'))
     {
-        single_quotes = false;
+        ending = '\"';
     }
     else
     {
-        IO::logln("Expected \" or ' to start an attribute value");
+        return "";
+    }
+
+    while (scan.peek() != ending &&
+           !scan.ended())
+    {
+        IO::write(memory, scan.next());
+    }
+
+    scan.skip(ending);
+
+    return memory.string();
+}
+
+// See https://www.w3.org/TR/xml/#NT-Attribute
+static Result parse_attribute(IO::Scanner &scan, String &name, String &value)
+{
+    name = parse_attribute_name(scan);
+
+    if (!scan.skip('='))
+    {
         return Result::ERR_INVALID_DATA;
     }
 
-    // Attribute value
-    while (scan.do_continue() && scan.current() != (single_quotes ? '\'' : '\"'))
-    {
-        builder.append(scan.current());
-        scan.forward();
-    }
-    value = builder.finalize();
+    value = parse_attribute_value(scan);
 
     return Result::SUCCESS;
 }
 
-template <bool has_attributes>
-ResultOr<String> read_tag(IO::Scanner &scan, HashMap<String, String> &attributes, bool &empty_tag)
+/* --- Tag ------------------------------------------------------------------ */
+
+static bool is_tag_end(IO::Scanner &scan)
 {
-    StringBuilder builder{};
-
-    // Read tag-name
-    bool scan_name = true;
-    while (scan.current() != '>' && !scan.current_is_word("/>") && scan.do_continue())
-    {
-        // There may be no whitespace before the tagname
-        // See https://www.w3.org/TR/REC-xml/#sec-starttags
-        if (scan_name)
-        {
-            if (scan.current() == ' ')
-            {
-                IO::logln("Whitespaces before tagname not allowed");
-                return Result::ERR_INVALID_DATA;
-            }
-
-            builder.append(scan.current());
-        }
-        else if (scan.current() != ' ')
-        {
-            if constexpr (has_attributes)
-            {
-                String name, value;
-                TRY(read_attribute(scan, name, value));
-                attributes[name] = value;
-            }
-            else
-            {
-                IO::logln("Unexpected symbol in end-tag: {}", scan.current());
-                return Result::ERR_INVALID_DATA;
-            }
-        }
-
-        scan.forward();
-
-        if (scan.current() == ' ')
-            scan_name = false;
-    }
-
-    // If the tag ended with /> it was an empty tag
-    empty_tag = scan.skip_word("/>");
-    // Else just skip the >
-    if (!empty_tag)
-    {
-        scan.forward();
-    }
-
-    return builder.finalize();
+    return scan.peek() == '>' || scan.peek_is_word("/>");
 }
 
-// See https://www.w3.org/TR/xml/#dt-etag
-ResultOr<String> read_end_tag(IO::Scanner &scan)
+static String parse_tag_name(IO::Scanner &scan)
 {
-    scan.forward(2);
-    HashMap<String, String> tmp_attributes;
-    bool tmp_empty_tag;
-    return read_tag<false>(scan, tmp_attributes, tmp_empty_tag);
+    IO::MemoryWriter memory;
+
+    while (!is_tag_end(scan) &&
+           !scan.peek_is_any(Strings::WHITESPACE) &&
+           !scan.ended())
+    {
+        IO::write(memory, scan.next());
+    }
+
+    return memory.string();
 }
 
 // See https://www.w3.org/TR/xml/#dt-stag
-// TODO: this can also be an empty_tag
-ResultOr<String> read_start_tag(IO::Scanner &scan, HashMap<String, String> &attributes, bool &empty_tag)
+static void parse_start_tag(IO::Scanner &scan, Xml::Node &node, bool &empty_tag)
 {
-    scan.forward();
-    return read_tag<true>(scan, attributes, empty_tag);
+    scan.skip('<');
+
+    node.name(parse_tag_name(scan));
+
+    scan.eat_any(Strings::WHITESPACE);
+
+    while (!is_tag_end(scan) &&
+           !scan.ended())
+    {
+        String name, value;
+        parse_attribute(scan, name, value);
+        node.attributes()[name] = value;
+
+        scan.eat_any(Strings::WHITESPACE);
+    }
+
+    empty_tag = scan.skip_word("/>");
+
+    if (!empty_tag)
+    {
+        scan.skip('>');
+    }
+}
+
+// See https://www.w3.org/TR/xml/#dt-etag
+static String parse_end_tag(IO::Scanner &scan)
+{
+    scan.skip_word("</");
+    String name = parse_tag_name(scan);
+    scan.eat_any(Strings::WHITESPACE);
+    scan.skip('>');
+    return name;
+}
+
+/* --- Node ----------------------------------------------------------------- */
+
+static Xml::Node parse_node(IO::Scanner &scan);
+
+// See https://www.w3.org/TR/xml/#NT-Comment
+static Xml::Node parse_comment_node(IO::Scanner &scan)
+{
+    IO::MemoryWriter memory;
+    scan.skip_word("<!--");
+
+    while (!scan.peek_is_word("-->") &&
+           !scan.ended())
+    {
+        IO::write(memory, scan.peek());
+        scan.next();
+    }
+
+    scan.skip_word("-->");
+
+    Xml::Node node;
+    node.content(memory.string());
+    return node;
+}
+
+static Xml::Node parse_tag_node(IO::Scanner &scan)
+{
+    Xml::Node node;
+    bool self_closing;
+
+    parse_start_tag(scan, node, self_closing);
+
+    if (self_closing)
+    {
+        return node;
+    }
+
+    scan.eat_any(Strings::WHITESPACE);
+
+    while (!scan.peek_is_word("</") &&
+           !scan.ended())
+    {
+        node.children().push_back(parse_node(scan));
+        scan.eat_any(Strings::WHITESPACE);
+    }
+
+    parse_end_tag(scan);
+
+    return node;
+}
+
+static Xml::Node parse_text_node(IO::Scanner &scan)
+{
+    IO::logln("Starting text node {c}", scan.peek());
+
+    Xml::Node node;
+    IO::MemoryWriter memory{};
+
+    while (scan.peek() != '<' &&
+           !scan.ended())
+    {
+        IO::write(memory, scan.next());
+    }
+
+    node.content(memory.string());
+    IO::logln("Ending text node {c}", scan.peek());
+    return node;
 }
 
 // See https://www.w3.org/TR/xml/#sec-logical-struct
-Result read_node(IO::Scanner &scan, Xml::Node &node)
+static Xml::Node parse_node(IO::Scanner &scan)
 {
-    scan.eat(Strings::WHITESPACE);
-
-    if (scan.current() != '<')
+    if (scan.peek_is_word("<!--"))
     {
-        IO::logln("Failed to \"read_node\"");
-        IO::logln("Unexpected symbol: {}", scan.current());
-        return Result::ERR_INVALID_DATA;
+        return parse_comment_node(scan);
     }
-
-    while (scan.do_continue())
+    else if (scan.peek() == '<')
     {
-        char c = scan.peek(1);
-        // Comment
-        if (c == '!')
-        {
-            TRY(read_comment(scan));
-        }
-        // End-Tag
-        else if (c == '/')
-        {
-            if (node.name().empty())
-            {
-                IO::logln("End-tag without a start-tag");
-                return Result::ERR_INVALID_DATA;
-            }
-
-            String end_tag = TRY(read_end_tag(scan));
-            if (end_tag != node.name())
-            {
-                IO::logln("End-tag does not match start-tag: ET {} ST {}", end_tag, node.name());
-                return Result::ERR_INVALID_DATA;
-            }
-            return Result::SUCCESS;
-        }
-        // Start-Tag & Empty-Tag
-        else if (node.name().empty())
-        {
-            bool empty_tag = false;
-            node.name() = TRY(read_start_tag(scan, node.attributes(), empty_tag));
-            // It was an empty tag, so we have no content / end-tag
-            if (empty_tag)
-            {
-                return Result::SUCCESS;
-            }
-
-            // Read the content for the tag
-            StringBuilder builder{};
-            while (scan.current() != '<')
-            {
-                builder.append(scan.current());
-                scan.forward();
-            }
-
-            node.content() = builder.finalize();
-        }
-        // Child-Node
-        else
-        {
-            TRY(read_node(scan, node.children().emplace_back()));
-            scan.eat(Strings::WHITESPACE);
-        }
+        return parse_tag_node(scan);
     }
-
-    return Result::SUCCESS;
+    else
+    {
+        return parse_text_node(scan);
+    }
 }
+
+/* --- Declaration ---------------------------------------------------------- */
 
 // See https://www.w3.org/TR/xml/#sec-prolog-dtd
-Result read_declaration(IO::Scanner &scan, Xml::Declaration &)
+static Xml::Declaration parse_declaration(IO::Scanner &scan)
 {
-    scan.eat(Strings::WHITESPACE);
+    Xml::Declaration declaration;
 
-    if (scan.current() != '<')
-    {
-        IO::logln("Failed to \"read_declaration\"");
-        IO::logln("Unexpected symbol: {}", scan.current());
-        return Result::ERR_INVALID_DATA;
-    }
+    scan.skip_word("<?");
 
-    // We have no declaration
-    if (scan.peek(1) != '?')
-    {
-        return Result::SUCCESS;
-    }
-
-    // declaration ends with ?>
-    while (!scan.current_is_word("?>") && scan.do_continue())
+    while (!scan.peek_is_word("?>") &&
+           !scan.ended())
     {
         //TODO: read declaration content
-        scan.forward();
+        scan.next();
     }
 
-    // Skip ?>
-    if (!scan.skip_word("?>"))
-    {
-        IO::logln("Failed to \"read_declaration\"");
-        return Result::ERR_INVALID_DATA;
-    }
+    scan.skip_word("?>");
 
-    return Result::SUCCESS;
+    return declaration;
 }
 
-FLATTEN ResultOr<Xml::Document> Xml::parse(IO::Reader &reader)
+ResultOr<Xml::Document> Xml::parse(IO::Reader &reader)
 {
     IO::Scanner scan{reader};
+    Xml::Document document;
+
     scan.skip_utf8bom();
 
-    Xml::Document doc;
-    TRY(read_declaration(scan, doc.declaration()));
-    TRY(read_node(scan, doc.root()));
+    scan.eat_any(Strings::WHITESPACE);
 
-    return doc;
+    if (scan.peek_is_word("<?"))
+    {
+        document.declaration(parse_declaration(scan));
+    }
+    scan.eat_any(Strings::WHITESPACE);
+
+    if (scan.peek() == '<')
+    {
+        document.root(parse_node(scan));
+    }
+
+    return document;
 }

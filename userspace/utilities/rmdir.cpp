@@ -1,7 +1,7 @@
 #include <libio/Directory.h>
 #include <libio/Streams.h>
+#include <libshell/ArgParse.h>
 #include <libsystem/io/Filesystem.h>
-#include <libutils/ArgParse.h>
 
 static bool force = false;
 static bool remove_parents = false;
@@ -32,7 +32,7 @@ Result rmdir(String path)
 
 int main(int argc, const char *argv[])
 {
-    ArgParse args;
+    Shell::ArgParse args;
 
     args.show_help_if_no_operand_given();
 
@@ -48,9 +48,11 @@ int main(int argc, const char *argv[])
     args.epiloge("Options can be combined.");
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
+    if (parse_result != Shell::ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == Shell::ArgParseResult::SHOULD_FINISH
+                   ? PROCESS_SUCCESS
+                   : PROCESS_FAILURE;
     }
 
     for (auto directory : args.argv())

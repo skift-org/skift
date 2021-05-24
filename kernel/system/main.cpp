@@ -26,16 +26,16 @@
 
 static void splash_screen()
 {
-    stream_format(log_stream, "\n");
-    stream_format(log_stream, "                         _   _     _ _____ ____ _____                           \n");
-    stream_format(log_stream, "                        | | | |   | | ____|  _ \\_   _|                          \n");
-    stream_format(log_stream, "                        | |_| |_  | |  _| | |_) || |                            \n");
-    stream_format(log_stream, "                        |  _  | |_| | |___|  _ < | |                            \n");
-    stream_format(log_stream, "                        |_| |_|\\___/|_____|_| \\_\\|_|                            \n");
-    stream_format(log_stream, "                                                                                \n");
-    stream_format(log_stream, "\u001b[34;1m--------------------------------------------------------------------------------\e[0m\n");
-    stream_format(log_stream, "                              Copyright (c) 2018-2021 The skiftOS contributors \n");
-    stream_format(log_stream, "\n");
+    Kernel::logln("");
+    Kernel::logln("                         _   _     _ _____ ____ _____                           ");
+    Kernel::logln("                        | | | |   | | ____|  _ \\_   _|                          ");
+    Kernel::logln("                        | |_| |_  | |  _| | |_) || |                            ");
+    Kernel::logln("                        |  _  | |_| | |___|  _ < | |                            ");
+    Kernel::logln("                        |_| |_|\\___/|_____|_| \\_\\|_|                            ");
+    Kernel::logln("                                                                                ");
+    Kernel::logln("\u001b[34;1m--------------------------------------------------------------------------------\e[0m");
+    Kernel::logln("                              Copyright (c) 2018-2021 The skiftOS contributors ");
+    Kernel::logln("");
 }
 
 void system_main(Handover *handover)

@@ -1,9 +1,9 @@
 #include <abi/Syscalls.h>
 
 #include <libio/Streams.h>
+#include <libshell/ArgParse.h>
 #include <libsystem/BuildInfo.h>
 #include <libsystem/system/System.h>
-#include <libutils/ArgParse.h>
 
 constexpr auto PROLOGUE = "Print certain system information.  With no OPTION, same as -s.";
 
@@ -20,7 +20,7 @@ constexpr auto EPILOGUE = "Options can be combined";
 int main(int argc, char const *argv[])
 {
 
-    ArgParse args;
+    Shell::ArgParse args;
     args.should_abort_on_failure();
 
     args.prologue(PROLOGUE);
@@ -52,9 +52,9 @@ int main(int argc, char const *argv[])
     args.epiloge(EPILOGUE);
 
     auto parse_result = args.eval(argc, argv);
-    if (parse_result != ArgParseResult::SHOULD_CONTINUE)
+    if (parse_result != Shell::ArgParseResult::SHOULD_CONTINUE)
     {
-        return parse_result == ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
+        return parse_result == Shell::ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
     SystemInfo info{};

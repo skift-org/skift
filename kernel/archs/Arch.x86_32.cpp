@@ -122,13 +122,13 @@ void backtrace_internal(uint32_t ebp)
     while (stackframe)
     {
         empty = false;
-        stream_format(log_stream, "\t%08x\n", stackframe->eip);
+        Kernel::logln("\t{08x}", stackframe->eip);
         stackframe = stackframe->ebp;
     }
 
     if (empty)
     {
-        stream_format(log_stream, "\t[EMPTY]\n");
+        Kernel::logln("\t[EMPTY]");
     }
 }
 
@@ -136,14 +136,13 @@ void dump_stack_frame(void *sf)
 {
     auto stackframe = reinterpret_cast<x86_32::InterruptStackFrame *>(sf);
 
-    stream_format(out_stream, "\tCS=%04x DS=%04x ES=%04x FS=%04x GS=%04x\n", stackframe->cs, stackframe->ds, stackframe->es, stackframe->fs, stackframe->gs);
-    stream_format(out_stream, "\tEAX=%08x EBX=%08x ECX=%08x EDX=%08x\n", stackframe->eax, stackframe->ebx, stackframe->ecx, stackframe->edx);
-    stream_format(out_stream, "\tEDI=%08x ESI=%08x EBP=%08x ESP=%08x\n", stackframe->edi, stackframe->esi, stackframe->ebp, stackframe->esp);
-    stream_format(out_stream, "\tINT=%08x ERR=%08x EIP=%08x FLG=%08x\n", stackframe->intno, stackframe->err, stackframe->eip, stackframe->eflags);
+    Kernel::logln("\tCS={04x} DS={04x} ES={04x} FS={04x} GS={04x}", stackframe->cs, stackframe->ds, stackframe->es, stackframe->fs, stackframe->gs);
+    Kernel::logln("\tEAX={08x} EBX={08x} ECX={08x} EDX={08x}", stackframe->eax, stackframe->ebx, stackframe->ecx, stackframe->edx);
+    Kernel::logln("\tEDI={08x} ESI={08x} EBP={08x} ESP={08x}", stackframe->edi, stackframe->esi, stackframe->ebp, stackframe->esp);
+    Kernel::logln("\tINT={08x} ERR={08x} EIP={08x} FLG={08x}", stackframe->intno, stackframe->err, stackframe->eip, stackframe->eflags);
+    Kernel::logln("\tCR0={08x} CR2={08x} CR3={08x} CR4={08x}", x86::CR0(), x86::CR2(), x86::CR3(), x86::CR4());
+    Kernel::logln("\n\tBacktrace:\n");
 
-    stream_format(out_stream, "\tCR0=%08x CR2=%08x CR3=%08x CR4=%08x\n", x86::CR0(), x86::CR2(), x86::CR3(), x86::CR4());
-
-    stream_format(out_stream, "\n\tBacktrace:\n");
     backtrace_internal(stackframe->ebp);
 }
 

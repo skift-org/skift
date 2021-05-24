@@ -1,7 +1,6 @@
 #pragma once
 
 #include <libmath/Rect.h>
-#include <libutils/Scanner.h>
 #include <libutils/Vector.h>
 
 #include <libgraphic/svg/SubPath.h>
@@ -38,7 +37,7 @@ private:
 public:
     static Path parse(const char *str);
 
-    static Path parse(Scanner &scan);
+    static Path parse(IO::Scanner &scan);
 
     const Vector<SubPath> &subpaths() const
     {

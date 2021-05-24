@@ -19,7 +19,7 @@ private:
     DeviceClass _klass;
     String _name;
 
-    Vector<RefPtr<Device>> _childs{};
+    Vector<RefPtr<Device>> _children{};
 
 public:
     DeviceClass klass()
@@ -44,12 +44,12 @@ public:
 
     void add(RefPtr<Device> child)
     {
-        _childs.push_back(child);
+        _children.push_back(child);
     }
 
     Iteration iterate(IterationCallback<RefPtr<Device>> &callback)
     {
-        return _childs.foreach([&](auto device) {
+        return _children.foreach([&](auto device) {
             if (callback(device) == Iteration::STOP)
             {
                 return Iteration::STOP;

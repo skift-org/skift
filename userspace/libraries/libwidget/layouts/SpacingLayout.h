@@ -18,17 +18,17 @@ public:
 
     virtual void layout()
     {
-        if (childs().count() > 0)
+        if (children().count() > 0)
         {
-            childs()[0]->container(bound().shrinked(_spacing));
+            children()[0]->container(bound().shrinked(_spacing));
         }
     }
 
     virtual Math::Vec2i size()
     {
-        if (childs().count() > 0)
+        if (children().count() > 0)
         {
-            return childs()[0]->compute_size() + _spacing.all();
+            return children()[0]->compute_size() + _spacing.all();
         }
         else
         {

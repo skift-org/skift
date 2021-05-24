@@ -13,14 +13,14 @@ static inline RefPtr<TElement> fill(RefPtr<TElement> child)
     return child;
 }
 
-static inline Vector<RefPtr<Element>> fill(Vector<RefPtr<Element>> childs)
+static inline Vector<RefPtr<Element>> fill(Vector<RefPtr<Element>> children)
 {
-    for (auto &child : childs)
+    for (auto &child : children)
     {
         child->flags(child->flags() | Element::FILL);
     }
 
-    return childs;
+    return children;
 }
 
 template <typename TElement>

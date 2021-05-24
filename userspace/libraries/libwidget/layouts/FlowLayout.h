@@ -20,7 +20,7 @@ public:
 
     Math::Vec2i size() override
     {
-        if (childs().count() == 0)
+        if (children().count() == 0)
         {
             return Math::Vec2i(0);
         }
@@ -28,7 +28,7 @@ public:
         int width = 0;
         int height = 0;
 
-        for (auto &child : childs())
+        for (auto &child : children())
         {
             Math::Vec2i child_size = child->compute_size();
 
@@ -38,11 +38,11 @@ public:
 
         if (_horizontal)
         {
-            width += _spacing * (childs().count() - 1);
+            width += _spacing * (children().count() - 1);
         }
         else
         {
-            height += _spacing * (childs().count() - 1);
+            height += _spacing * (children().count() - 1);
         }
 
         return {width, height};
@@ -53,7 +53,7 @@ public:
         int fill_child_count = 0;
         int fixed_child_total_size = 0;
 
-        for (auto &child : childs())
+        for (auto &child : children())
         {
             if (child->flags() & Element::FILL)
             {
@@ -69,12 +69,12 @@ public:
             }
         }
 
-        int usable_space = (_horizontal ? bound().width() : bound().height()) - _spacing * (childs().count() - 1);
+        int usable_space = (_horizontal ? bound().width() : bound().height()) - _spacing * (children().count() - 1);
         int fill_child_total_size = MAX(0, usable_space - fixed_child_total_size);
         int fill_child_size = (fill_child_total_size) / MAX(1, fill_child_count);
         int current = _horizontal ? bound().x() : bound().y();
 
-        for (auto &child : childs())
+        for (auto &child : children())
         {
             if (child->flags() & Element::FILL)
             {
@@ -113,31 +113,31 @@ public:
     }
 };
 
-static inline RefPtr<Element> vflow(Vector<RefPtr<Element>> childs)
+static inline RefPtr<Element> vflow(Vector<RefPtr<Element>> children)
 {
     auto layout = make<FlowLayout>(0, false);
-    layout->add(childs);
+    layout->add(children);
     return layout;
 }
 
-static inline RefPtr<Element> vflow(int spacing, Vector<RefPtr<Element>> childs)
+static inline RefPtr<Element> vflow(int spacing, Vector<RefPtr<Element>> children)
 {
     auto layout = make<FlowLayout>(spacing, false);
-    layout->add(childs);
+    layout->add(children);
     return layout;
 }
 
-static inline RefPtr<Element> hflow(Vector<RefPtr<Element>> childs)
+static inline RefPtr<Element> hflow(Vector<RefPtr<Element>> children)
 {
     auto layout = make<FlowLayout>(0, true);
-    layout->add(childs);
+    layout->add(children);
     return layout;
 }
 
-static inline RefPtr<Element> hflow(int spacing, Vector<RefPtr<Element>> childs)
+static inline RefPtr<Element> hflow(int spacing, Vector<RefPtr<Element>> children)
 {
     auto layout = make<FlowLayout>(spacing, true);
-    layout->add(childs);
+    layout->add(children);
     return layout;
 }
 

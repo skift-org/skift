@@ -8,14 +8,14 @@
 namespace Widget
 {
 
-static inline RefPtr<Element> toolbar(Vector<RefPtr<Element>> childs)
+static inline RefPtr<Element> toolbar(Vector<RefPtr<Element>> children)
 {
     // clang-format off
 
     return panel(
         fill(
             vflow({
-                spacing(4, hflow(4, childs)),
+                spacing(4, hflow(4, children)),
                 separator(),
             })
         )

@@ -76,7 +76,7 @@ Element::~Element()
 
 void Element::layout()
 {
-    for (auto &child : _childs)
+    for (auto &child : _children)
     {
         child->container(bound());
     }
@@ -86,7 +86,7 @@ void Element::relayout()
 {
     layout();
 
-    for (auto &child : childs())
+    for (auto &child : children())
     {
         child->relayout();
     }
@@ -102,7 +102,7 @@ void Element::should_relayout()
 
 Math::Vec2i Element::size()
 {
-    if (_childs.count() == 0)
+    if (_children.count() == 0)
     {
         return Math::Vec2i(0);
     }
@@ -110,7 +110,7 @@ Math::Vec2i Element::size()
     int width = 0;
     int height = 0;
 
-    for (auto &child : _childs)
+    for (auto &child : _children)
     {
         Math::Vec2i child_size = child->compute_size();
 
@@ -179,7 +179,7 @@ void Element::enable_if(bool condition)
     }
 }
 
-/* --- Childs --------------------------------------------------------------- */
+/* --- Children ------------------------------------------------------------- */
 
 Element *Element::at(Math::Vec2i position)
 {
@@ -190,7 +190,7 @@ Element *Element::at(Math::Vec2i position)
         return result;
     }
 
-    _childs.foreach_reversed([&](RefPtr<Element> child) {
+    _children.foreach_reversed([&](RefPtr<Element> child) {
         if (!(child->flags() & NO_MOUSE_HIT) && child->container().contains(position))
         {
             result = child->at(position - child->origin());
@@ -215,7 +215,7 @@ RefPtr<Element> Element::add(RefPtr<Element> child)
 
     Assert::equal(child->_parent, nullptr);
 
-    _childs.push_back(child);
+    _children.push_back(child);
 
     if (_window != nullptr)
     {
@@ -234,7 +234,7 @@ void Element::del(RefPtr<Element> child)
 
     child->unmount();
 
-    _childs.remove_value(child);
+    _children.remove_value(child);
     should_relayout();
 }
 
@@ -248,7 +248,7 @@ void Element::mount(Window &window)
 {
     _window = &window;
 
-    for (auto &child : _childs)
+    for (auto &child : _children)
     {
         child->mount(*this);
     }
@@ -263,7 +263,7 @@ void Element::unmount()
         _parent = nullptr;
         _window = nullptr;
 
-        for (auto &child : _childs)
+        for (auto &child : _children)
         {
             child->unmount();
         }
@@ -272,7 +272,7 @@ void Element::unmount()
 
 void Element::clear()
 {
-    _childs.clear();
+    _children.clear();
 
     should_relayout();
     should_repaint();
@@ -310,7 +310,7 @@ void Element::repaint(Graphic::Painter &painter, Math::Recti rectangle)
     paint(painter, rectangle);
     painter.pop();
 
-    for (auto &child : _childs)
+    for (auto &child : _children)
     {
         auto local_rectangle = rectangle.offset(-child->origin());
 

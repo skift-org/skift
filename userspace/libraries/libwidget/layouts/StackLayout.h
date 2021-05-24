@@ -10,7 +10,7 @@ class StackLayout : public Element
 public:
     Math::Vec2i size() override
     {
-        if (childs().count() == 0)
+        if (children().count() == 0)
         {
             return Math::Vec2i(0);
         }
@@ -18,7 +18,7 @@ public:
         int width = 0;
         int height = 0;
 
-        for (auto &child : childs())
+        for (auto &child : children())
         {
             Math::Vec2i child_size = child->compute_size();
 
@@ -31,7 +31,7 @@ public:
 
     void layout() override
     {
-        for (auto &child : childs())
+        for (auto &child : children())
         {
             if (child->flags() & FILL)
             {
@@ -73,10 +73,10 @@ static inline RefPtr<Element> stack(RefPtr<Element> child)
     return layout;
 }
 
-static inline RefPtr<Element> stack(Vector<RefPtr<Element>> childs)
+static inline RefPtr<Element> stack(Vector<RefPtr<Element>> children)
 {
     auto layout = make<StackLayout>();
-    layout->add(childs);
+    layout->add(children);
     return layout;
 }
 

@@ -19,7 +19,7 @@ struct FsDirectoryEntry
 class FsDirectory : public FsNode
 {
 private:
-    Vector<FsDirectoryEntry> _childs{};
+    Vector<FsDirectoryEntry> _children{};
 
 public:
     FsDirectory();

@@ -52,7 +52,7 @@ private:
     Element *_parent = {};
     Window *_window = {};
 
-    Vector<RefPtr<Element>> _childs = {};
+    Vector<RefPtr<Element>> _children = {};
 
 public:
     static constexpr auto FILL = (1 << 0);
@@ -191,11 +191,11 @@ public:
 
     void enable_if(bool condition);
 
-    /* --- Childs ----------------------------------------------------------- */
+    /* --- Children --------------------------------------------------------- */
 
     Element *at(Math::Vec2i position);
 
-    const Vector<RefPtr<Element>> &childs() { return _childs; }
+    const Vector<RefPtr<Element>> &children() { return _children; }
 
     template <typename T, typename... Args>
     RefPtr<T> add(Args &&...args)
@@ -203,9 +203,9 @@ public:
         return add(make<T>(forward<Args>(args)...));
     }
 
-    void add(Vector<RefPtr<Element>> childs)
+    void add(Vector<RefPtr<Element>> children)
     {
-        for (auto &child : childs)
+        for (auto &child : children)
         {
             add(child);
         }

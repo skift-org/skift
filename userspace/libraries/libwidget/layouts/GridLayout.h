@@ -24,7 +24,7 @@ public:
 
     Math::Vec2i size() override
     {
-        if (childs().count() == 0)
+        if (children().count() == 0)
         {
             return Math::Vec2i(0);
         }
@@ -32,7 +32,7 @@ public:
         int width = 0;
         int height = 0;
 
-        for (auto &child : childs())
+        for (auto &child : children())
         {
             Math::Vec2i child_size = child->compute_size();
 
@@ -53,7 +53,7 @@ public:
     {
         int index = 0;
 
-        for (auto &child : childs())
+        for (auto &child : children())
         {
             int x = index % _hcells;
             int y = index / _hcells;
@@ -67,10 +67,10 @@ public:
     }
 };
 
-static inline RefPtr<Element> grid(int hcells, int vcells, int hspacing, int vspacing, Vector<RefPtr<Element>> childs)
+static inline RefPtr<Element> grid(int hcells, int vcells, int hspacing, int vspacing, Vector<RefPtr<Element>> children)
 {
     auto layout = make<GridLayout>(hcells, vcells, hspacing, vspacing);
-    layout->add(childs);
+    layout->add(children);
     return layout;
 }
 

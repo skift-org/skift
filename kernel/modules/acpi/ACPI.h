@@ -40,11 +40,11 @@ struct PACKED SDTH
 struct PACKED RSDT
 {
     SDTH header;
-    uint32_t childs[];
+    uint32_t children[];
 
     SDTH *child(size_t index)
     {
-        return reinterpret_cast<SDTH *>(childs[index]);
+        return reinterpret_cast<SDTH *>(children[index]);
     }
 
     size_t child_count()

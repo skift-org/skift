@@ -11,13 +11,13 @@ FsDirectory::FsDirectory() : FsNode(FILE_TYPE_DIRECTORY)
 
 Result FsDirectory::open(FsHandle &handle)
 {
-    FileListing *listing = (FileListing *)malloc(sizeof(FileListing) + sizeof(DirectoryEntry) * _childs.count());
+    FileListing *listing = (FileListing *)malloc(sizeof(FileListing) + sizeof(DirectoryEntry) * _children.count());
 
-    listing->count = _childs.count();
+    listing->count = _children.count();
 
     int current_index = 0;
 
-    _childs.foreach([&](auto &entry) {
+    _children.foreach([&](auto &entry) {
         auto record = &listing->entries[current_index];
         auto node = entry.node;
 
@@ -70,7 +70,7 @@ RefPtr<FsNode> FsDirectory::find(String name)
 {
     RefPtr<FsNode> result;
 
-    _childs.foreach([&](auto &entry) {
+    _children.foreach([&](auto &entry) {
         if (entry.name == name)
         {
             result = entry.node;
@@ -91,7 +91,7 @@ Result FsDirectory::link(String name, RefPtr<FsNode> child)
         return ERR_FILE_EXISTS;
     }
 
-    _childs.push_back({name, child});
+    _children.push_back({name, child});
 
     return SUCCESS;
 }
@@ -99,7 +99,7 @@ Result FsDirectory::link(String name, RefPtr<FsNode> child)
 Result FsDirectory::unlink(String name)
 {
 
-    bool has_removed_an_entry = _childs.remove_all_match(
+    bool has_removed_an_entry = _children.remove_all_match(
         [&](auto &e) {
             return e.name == name;
         });

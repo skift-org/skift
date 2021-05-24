@@ -19,15 +19,15 @@ RefPtr<Element> ApplicationListingComponent::build()
 {
     FuzzyMatcher matcher;
 
-    Vector<RefPtr<Element>> childs;
+    Vector<RefPtr<Element>> children;
 
-    MenuEntry::load().foreach ([&](auto &entry) {
+    MenuEntry::load().foreach([&](auto &entry) {
         if (!matcher.match(_filter, entry.name))
         {
             return Iteration::CONTINUE;
         }
 
-        childs.push_back(basic_button(entry.image, entry.name, [this, entry] {
+        children.push_back(basic_button(entry.image, entry.name, [this, entry] {
             process_run(entry.command.cstring(), nullptr, 0);
             window()->hide();
         }));
@@ -35,12 +35,12 @@ RefPtr<Element> ApplicationListingComponent::build()
         return Iteration::CONTINUE;
     });
 
-    if (childs.count() == 0)
+    if (children.count() == 0)
     {
-        childs.push_back(label("No application found!", Anchor::CENTER));
+        children.push_back(label("No application found!", Anchor::CENTER));
     }
 
-    return Widget::scroll(vflow(4, childs));
+    return Widget::scroll(vflow(4, children));
 }
 
 } // namespace Panel

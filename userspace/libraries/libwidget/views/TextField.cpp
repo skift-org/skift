@@ -37,18 +37,18 @@ void TextField::paint(Graphic::Painter &painter, const Math::Recti &)
 
     for (size_t j = 0; j < line.length(); j++)
     {
-        Codepoint codepoint = line[j];
+        Text::Rune rune = line[j];
 
         if (j == _cursor.column())
         {
             paint_cursor(painter, advance);
         }
 
-        if (codepoint == U'\t')
+        if (rune == U'\t')
         {
             advance += 8 * 4;
         }
-        else if (codepoint == U'\r')
+        else if (rune == U'\r')
         {
             // ignore
         }
@@ -56,7 +56,7 @@ void TextField::paint(Graphic::Painter &painter, const Math::Recti &)
         {
             auto span = _model->span_at(0, j);
 
-            auto glyph = font()->glyph(codepoint);
+            auto glyph = font()->glyph(rune);
             painter.draw_glyph(*font(), glyph, {advance, baseline}, color(span.foreground()));
 
             advance += glyph.advance;
@@ -131,9 +131,9 @@ void TextField::event(Event *event)
         {
             // ignore
         }
-        else if (event->keyboard.codepoint != 0)
+        else if (event->keyboard.rune != 0)
         {
-            _model->append_at(_cursor, event->keyboard.codepoint);
+            _model->append_at(_cursor, event->keyboard.rune);
         }
 
         event->accepted = true;

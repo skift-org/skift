@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/utils/List.h>
+#include <libutils/List.h>
 
 enum ShellNodeType
 {
@@ -23,12 +23,12 @@ struct ShellNode
 struct ShellCommand : public ShellNode
 {
     char *command;
-    List /* of cstring */ *arguments;
+    List<char *> *arguments;
 };
 
 struct ShellPipeline : public ShellNode
 {
-    List *commands;
+    List<ShellNode *> *commands;
 };
 
 struct ShellRedirect : public ShellNode
@@ -39,8 +39,8 @@ struct ShellRedirect : public ShellNode
 
 void shell_node_destroy(ShellNode *node);
 
-ShellNode *shell_command_create(char *command, List *arguments);
+ShellNode *shell_command_create(char *command, List<char *> *arguments);
 
-ShellNode *shell_pipeline_create(List *commands);
+ShellNode *shell_pipeline_create(List<ShellNode *> *commands);
 
 ShellNode *shell_redirect_create(ShellNode *command, char *destination);

@@ -1,6 +1,10 @@
 #pragma once
 
 #include <assert.h>
+#include <libutils/Std.h>
+
+namespace Utils
+{
 
 template <typename T>
 class OwnPtr
@@ -146,7 +150,9 @@ public:
 };
 
 template <typename Type, typename... Args>
-inline OwnPtr<Type> own(Args &&... args)
+inline OwnPtr<Type> own(Args &&...args)
 {
-    return OwnPtr<Type>(new Type(forward<Args>(args)...));
+    return OwnPtr<Type>(new Type(std::forward<Args>(args)...));
 }
+
+} // namespace Utils

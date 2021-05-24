@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libutils/HashMap.h>
-#include <libutils/Move.h>
+#include <libutils/Std.h>
 #include <libutils/String.h>
 #include <libutils/Vector.h>
 
@@ -244,7 +244,7 @@ public:
     inline Value(Object &&object)
     {
         _type = OBJECT;
-        _object = new Object(move(object));
+        _object = new Object(std::move(object));
     }
 
     inline Value(const Array &array)
@@ -256,7 +256,7 @@ public:
     inline Value(Array &&array)
     {
         _type = ARRAY;
-        _array = new Array(move(array));
+        _array = new Array(std::move(array));
     }
 
     inline Value(bool boolean)
@@ -316,8 +316,8 @@ public:
 
     inline Value(Value &&other)
     {
-        _type = exchange_and_return_initial_value(other._type, NIL);
-        _all = exchange_and_return_initial_value(other._all, 0);
+        _type = std::exchange(other._type, NIL);
+        _all = std::exchange(other._all, 0);
     }
 
     inline ~Value()
@@ -450,8 +450,8 @@ public:
 
     inline Value &operator=(Value &&other)
     {
-        swap(_type, other._type);
-        swap(_all, other._all);
+        std::swap(_type, other._type);
+        std::swap(_all, other._all);
 
         return *this;
     }

@@ -183,7 +183,7 @@ static inline ResultOr<size_t> format(Writer &writer, Scanner &scan, First first
 
     if (!scan.ended())
     {
-        written += TRY(format(writer, scan, forward<Args>(args)...));
+        written += TRY(format(writer, scan, std::forward<Args>(args)...));
     }
 
     return written;
@@ -194,7 +194,7 @@ static inline ResultOr<size_t> format(Writer &writer, const char *fmt, Args... a
 {
     MemoryReader memory{fmt};
     Scanner scan{memory};
-    return format(writer, scan, forward<Args>(args)...);
+    return format(writer, scan, std::forward<Args>(args)...);
 }
 
 static inline ResultOr<size_t> format(Writer &writer, const char *fmt)
@@ -206,7 +206,7 @@ template <typename... Args>
 static inline String format(const char *fmt, Args... args)
 {
     MemoryWriter memory{};
-    format(memory, fmt, forward<Args>(args)...);
+    format(memory, fmt, std::forward<Args>(args)...);
     return memory.string();
 }
 

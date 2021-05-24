@@ -8,7 +8,7 @@ void environment_load(const char *buffer)
     {
         delete _root;
     }
-    _root = new Json::Value(move(Json::parse(buffer, strlen(buffer))));
+    _root = new Json::Value(std::move(Json::parse(buffer, strlen(buffer))));
 }
 
 Json::Value &environment()

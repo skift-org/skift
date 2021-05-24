@@ -38,7 +38,7 @@ MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_objec
     memory_mapping->address = Arch::virtual_alloc(task->address_space, memory_object->range(), MEMORY_USER).base();
     memory_mapping->size = memory_object->range().size();
 
-    list_pushback(task->memory_mapping, memory_mapping);
+    task->memory_mapping->push_back(memory_mapping);
 
     return memory_mapping;
 }
@@ -55,7 +55,7 @@ MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_ob
 
     assert(SUCCESS == Arch::virtual_map(task->address_space, memory_object->range(), address, MEMORY_USER));
 
-    list_pushback(task->memory_mapping, memory_mapping);
+    task->memory_mapping->push_back(memory_mapping);
 
     return memory_mapping;
 }
@@ -67,13 +67,13 @@ void task_memory_mapping_destroy(Task *task, MemoryMapping *memory_mapping)
     Arch::virtual_free(task->address_space, (MemoryRange){memory_mapping->address, memory_mapping->size});
     memory_object_deref(memory_mapping->object);
 
-    list_remove(task->memory_mapping, memory_mapping);
+    task->memory_mapping->remove(memory_mapping);
     free(memory_mapping);
 }
 
 MemoryMapping *task_memory_mapping_by_address(Task *task, uintptr_t address)
 {
-    list_foreach(MemoryMapping, memory_mapping, task->memory_mapping)
+    for (auto *memory_mapping : *task->memory_mapping)
     {
         if (memory_mapping->address == address)
         {
@@ -86,7 +86,7 @@ MemoryMapping *task_memory_mapping_by_address(Task *task, uintptr_t address)
 
 bool task_memory_mapping_colides(Task *task, uintptr_t address, size_t size)
 {
-    list_foreach(MemoryMapping, memory_mapping, task->memory_mapping)
+    for (auto *memory_mapping : *task->memory_mapping)
     {
         if (address < memory_mapping->address + memory_mapping->size &&
             address + size > memory_mapping->address)
@@ -205,7 +205,7 @@ size_t task_memory_usage(Task *task)
 {
     size_t total = 0;
 
-    list_foreach(MemoryMapping, memory_mapping, task->memory_mapping)
+    for (auto *memory_mapping : *task->memory_mapping)
     {
         total += memory_mapping->size;
     }

@@ -1,9 +1,12 @@
 #pragma once
 
-#include <libsystem/Common.h>
 #include <libutils/RefCounted.h>
 #include <libutils/Tags.h>
 #include <libutils/Traits.h>
+#include <libutils/Std.h>
+
+namespace Utils
+{
 
 template <typename T>
 class RefPtr
@@ -166,7 +169,7 @@ public:
     template <typename... TArgs>
     auto operator()(TArgs &&...args)
     {
-        return (*this->naked())(forward<TArgs>(args)...);
+        return (*this->naked())(std::forward<TArgs>(args)...);
     }
 };
 
@@ -179,13 +182,13 @@ inline RefPtr<T> adopt(T &object)
 template <typename Type, typename... Args>
 inline RefPtr<Type> make(Args &&...args)
 {
-    return RefPtr<Type>(adopt(*new Type(forward<Args>(args)...)));
+    return RefPtr<Type>(adopt(*new Type(std::forward<Args>(args)...)));
 }
 
 template <typename Type, typename... Args>
 inline CallableRefPtr<Type> make_callable(Args &&...args)
 {
-    return CallableRefPtr<Type>(adopt(*new Type(forward<Args>(args)...)));
+    return CallableRefPtr<Type>(adopt(*new Type(std::forward<Args>(args)...)));
 }
 
 template <typename T>
@@ -206,3 +209,5 @@ template <typename T>
 struct IsRefPtr<RefPtr<T>> : public TrueType
 {
 };
+
+} // namespace Utils

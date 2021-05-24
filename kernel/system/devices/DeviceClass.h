@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/Common.h>
+#include <libutils/Prelude.h>
 
 #define DEVICE_CLASS_LIST(__ENTRY)    \
     __ENTRY(NONE, none)               \

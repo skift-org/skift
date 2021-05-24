@@ -1,6 +1,9 @@
 #pragma once
 
-#include <libsystem/Common.h>
+#include <libutils/Prelude.h>
+
+namespace Utils
+{
 
 using TypeId = uintptr_t;
 
@@ -12,3 +15,5 @@ static TypeId GetTypeId()
 }
 
 constexpr TypeId INVALID_TYPE_ID = -1;
+
+} // namespace Utils

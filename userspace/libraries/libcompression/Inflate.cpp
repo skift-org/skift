@@ -292,7 +292,7 @@ FLATTEN Result Inflate::read_blocks(IO::Reader &reader, IO::Writer &uncompressed
                 if (decoded_symbol <= 255)
                 {
                     // Literal symbol
-                    IO::write<uint8_t>(dest_writer, decoded_symbol);
+                    IO::write(dest_writer, decoded_symbol);
                 }
                 else if (decoded_symbol >= 257 && decoded_symbol <= 285)
                 {
@@ -309,7 +309,7 @@ FLATTEN Result Inflate::read_blocks(IO::Reader &reader, IO::Writer &uncompressed
                     {
                         size_t offset = TRY(dest_writer.length()) - total_dist;
                         uint8_t val = dest_writer.buffer()[offset];
-                        IO::write<uint8_t>(dest_writer, val);
+                        IO::write(dest_writer, val);
                     }
                 }
                 else if (decoded_symbol == 256)

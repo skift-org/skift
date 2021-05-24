@@ -25,7 +25,7 @@ TEST(string_move_operator)
     String first = "first";
     String second = "second";
 
-    first = move(second);
+    first = std::move(second);
 
     Assert::equal(first, "second");
     Assert::equal(second, "first");

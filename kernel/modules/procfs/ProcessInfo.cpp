@@ -30,7 +30,7 @@ static Iteration serialize_task(Json::Value::Array *list, Task *task)
     task_object["ram"] = (int64_t)task_memory_usage(task);
     task_object["user"] = (task->_flags & TASK_USER) == TASK_USER;
 
-    list->push_back(move(task_object));
+    list->push_back(std::move(task_object));
 
     return Iteration::CONTINUE;
 }

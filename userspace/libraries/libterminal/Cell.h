@@ -1,14 +1,14 @@
 #pragma once
 
 #include <libterminal/Attributes.h>
-#include <libutils/unicode/Codepoint.h>
+#include <libtext/Rune.h>
 
 namespace Terminal
 {
 
 struct Cell
 {
-    Codepoint codepoint = U' ';
+    Text::Rune rune = U' ';
     Attributes attributes;
     bool dirty;
 };

@@ -87,7 +87,7 @@ int main(int argc, char const *argv[])
                     .keyboard = {
                         .key = packet.key,
                         .modifiers = packet.modifiers,
-                        .codepoint = packet.codepoint,
+                        .rune = packet.rune,
                     },
                 };
 

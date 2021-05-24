@@ -66,7 +66,7 @@ public:
     void draw_rectangle_rounded(Math::Recti bound, int radius, int thickness, Color color);
     void draw_glyph(Font &font, const Glyph &glyph, Math::Vec2i position, Color color);
     void draw_string(Font &font, const char *str, Math::Vec2i position, Color color);
-    void draw_string_within(Font &font, const char *str, Math::Recti container, Anchor anchor, Color color);
+    void draw_string_within(Font &font, const char *str, Math::Recti container, Math::Anchor anchor, Color color);
 
     /* --- Effects ---------------------------------------------------------- */
 

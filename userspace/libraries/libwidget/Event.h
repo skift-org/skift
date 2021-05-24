@@ -3,8 +3,8 @@
 #include <abi/Keyboard.h>
 
 #include <libmath/Rect.h>
+#include <libtext/Rune.h>
 #include <libutils/Callback.h>
-#include <libutils/unicode/Codepoint.h>
 
 namespace Widget
 {
@@ -34,7 +34,7 @@ struct KeyboardEvent
 {
     Key key;
     KeyModifier modifiers;
-    Codepoint codepoint;
+    Text::Rune rune;
 };
 
 struct Event

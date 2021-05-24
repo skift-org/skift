@@ -1,6 +1,9 @@
 #pragma once
 
-#include <libsystem/Common.h>
+#include <libutils/Prelude.h>
+
+namespace Utils
+{
 
 static inline uint32_t hash(const void *object, size_t size)
 {
@@ -38,3 +41,5 @@ inline uint32_t hash<uint64_t>(const uint64_t &value)
 {
     return hash(&value, sizeof(value));
 }
+
+} // namespace Utils

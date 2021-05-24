@@ -3,6 +3,9 @@
 #include <libutils/Hash.h>
 #include <libutils/Vector.h>
 
+namespace Utils
+{
+
 template <typename TKey, typename TValue>
 class HashMap
 {
@@ -33,7 +36,7 @@ private:
         Item *result = nullptr;
         auto &b = bucket(hash);
 
-        b.foreach ([&](Item &item) {
+        b.foreach([&](Item &item) {
             if (item.hash == hash && item.key == key)
             {
                 result = &item;
@@ -75,7 +78,7 @@ public:
     }
 
     HashMap(HashMap &&other)
-        : _buckets(move(other._buckets))
+        : _buckets(std::move(other._buckets))
     {
     }
 
@@ -95,7 +98,7 @@ public:
 
     void remove_value(TValue &value)
     {
-        _buckets.foreach ([&](auto &bucket) {
+        _buckets.foreach([&](auto &bucket) {
             bucket.remove_all_match([&](auto &item) {
                 return item.value == value;
             });
@@ -113,7 +116,7 @@ public:
     {
         bool result = false;
 
-        this->foreach ([&](auto &, auto &v) {
+        this->foreach([&](auto &, auto &v) {
             if (v == value)
             {
                 result = true;
@@ -129,10 +132,10 @@ public:
     }
 
     template <typename TCallback>
-    Iteration foreach (TCallback callback) const
+    Iteration foreach(TCallback callback) const
     {
-        return _buckets.foreach ([&](auto &bucket) {
-            return bucket.foreach ([&](auto &item) {
+        return _buckets.foreach([&](auto &bucket) {
+            return bucket.foreach([&](auto &item) {
                 return callback(item.key, item.value);
             });
         });
@@ -146,7 +149,7 @@ public:
 
     HashMap &operator=(HashMap &&other)
     {
-        swap(_buckets, other._buckets);
+        std::swap(_buckets, other._buckets);
         return *this;
     }
 
@@ -166,3 +169,5 @@ public:
         }
     }
 };
+
+} // namespace Utils

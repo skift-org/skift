@@ -17,7 +17,7 @@ public:
         return own<ServerConnection>(connection.unwrap());
     }
 
-    ServerConnection(IO::Connection connection) : Peer{move(connection)}
+    ServerConnection(IO::Connection connection) : Peer{std::move(connection)}
     {
     }
 

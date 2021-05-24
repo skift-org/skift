@@ -1,9 +1,11 @@
 #pragma once
 
 #include <assert.h>
-#include <libutils/Move.h>
-#include <libutils/New.h>
+#include <libutils/Std.h>
 #include <libutils/Tags.h>
+
+namespace Utils
+{
 
 template <typename T>
 class Optional
@@ -61,7 +63,7 @@ public:
     ALWAYS_INLINE Optional(T &&value)
     {
         _present = true;
-        new (&_storage) T(move(value));
+        new (&_storage) T(std::move(value));
     }
 
     ALWAYS_INLINE Optional(const Optional &other)
@@ -136,3 +138,5 @@ public:
         }
     }
 };
+
+} // namespace Utils

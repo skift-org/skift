@@ -1,4 +1,4 @@
-#include <libutils/FuzzyMatcher.h>
+#include <libtext/FuzzyMatcher.h>
 #include <libwidget/Layouts.h>
 #include <libwidget/Window.h>
 
@@ -17,7 +17,7 @@ ApplicationListingComponent::ApplicationListingComponent(String filter) : _filte
 
 RefPtr<Element> ApplicationListingComponent::build()
 {
-    FuzzyMatcher matcher;
+    Text::FuzzyMatcher matcher;
 
     Vector<RefPtr<Element>> children;
 
@@ -37,7 +37,7 @@ RefPtr<Element> ApplicationListingComponent::build()
 
     if (children.count() == 0)
     {
-        children.push_back(label("No application found!", Anchor::CENTER));
+        children.push_back(label("No application found!", Math::Anchor::CENTER));
     }
 
     return Widget::scroll(vflow(4, children));

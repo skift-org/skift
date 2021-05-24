@@ -38,7 +38,7 @@ static ResultOr<size_t> logln(const char *fmt, Args... args)
         written += TRY(IO::write(buf, "early() "));
     }
 
-    written += TRY(IO::print(buf, fmt, forward<Args>(args)...));
+    written += TRY(IO::print(buf, fmt, std::forward<Args>(args)...));
     written += TRY(IO::write(buf, "\e[m\n"));
 
     return written;

@@ -2,9 +2,9 @@
 
 #include <__libc__.h>
 
-#include <libsystem/bits/abs.h>
-#include <libsystem/bits/float.h>
-#include <libsystem/bits/pi.h>
+#include <libc/bits/abs.h>
+#include <libc/bits/float.h>
+#include <libc/bits/pi.h>
 
 __BEGIN_HEADER
 

@@ -1,19 +1,22 @@
 #pragma once
 
+#include <libtext/Rune.h>
 #include <libutils/Callback.h>
-#include <libutils/unicode/Codepoint.h>
+
+namespace Text
+{
 
 class UTF8Decoder
 {
 private:
     bool _decoding = false;
-    Codepoint _accumulator = 0;
+    Text::Rune _accumulator = 0;
     int _remaining = 0;
 
-    Callback<void(Codepoint)> _callback{};
+    Callback<void(Text::Rune)> _callback{};
 
 public:
-    void callback(Callback<void(Codepoint)> callback)
+    void callback(Callback<void(Text::Rune)> callback)
     {
         _callback = callback;
     }
@@ -22,7 +25,7 @@ public:
     {
     }
 
-    UTF8Decoder(Callback<void(Codepoint)> callback)
+    UTF8Decoder(Callback<void(Text::Rune)> callback)
         : _callback(callback)
     {
     }
@@ -93,3 +96,5 @@ public:
         _remaining = 0;
     }
 };
+
+} // namespace Text

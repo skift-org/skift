@@ -1,7 +1,10 @@
 #pragma once
 
-#include <libsystem/Common.h>
+#include <libutils/Prelude.h>
 #include <skift/Time.h>
+
+namespace Math
+{
 
 class Random
 {
@@ -80,3 +83,5 @@ public:
 
 #endif
 };
+
+} // namespace Math

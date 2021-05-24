@@ -43,9 +43,16 @@ ResultOr<size_t> format(Writer &writer, const Formating &, int value)
     return NumberFormat::decimal().format(writer, (int64_t)value);
 }
 
-ResultOr<size_t> format(Writer &writer, const Formating &, unsigned int value)
+ResultOr<size_t> format(Writer &writer, const Formating &format, unsigned int value)
 {
-    return NumberFormat::decimal().format(writer, (uint64_t)value);
+    if (format.type == Formating::HEXADECIMAL)
+    {
+        return NumberFormat::hexadecimal().format(writer, (uint64_t)value);
+    }
+    else
+    {
+        return NumberFormat::decimal().format(writer, (uint64_t)value);
+    }
 }
 
 ResultOr<size_t> format(Writer &writer, const Formating &, long int value)
@@ -53,9 +60,16 @@ ResultOr<size_t> format(Writer &writer, const Formating &, long int value)
     return NumberFormat::decimal().format(writer, (int64_t)value);
 }
 
-ResultOr<size_t> format(Writer &writer, const Formating &, unsigned long int value)
+ResultOr<size_t> format(Writer &writer, const Formating &format, unsigned long int value)
 {
-    return NumberFormat::decimal().format(writer, (uint64_t)value);
+    if (format.type == Formating::HEXADECIMAL)
+    {
+        return NumberFormat::hexadecimal().format(writer, (uint64_t)value);
+    }
+    else
+    {
+        return NumberFormat::decimal().format(writer, (uint64_t)value);
+    }
 }
 
 ResultOr<size_t> format(IO::Writer &writer, const Formating &, long long int value)
@@ -89,7 +103,7 @@ ResultOr<size_t> format(Writer &writer, const Formating &, const char *cstring)
 
 ResultOr<size_t> format(Writer &writer, const Formating &, const String string)
 {
-    return IO::write(writer, string.cstring());
+    return IO::write(writer, string);
 }
 
 ResultOr<size_t> format(Writer &writer, const Formating &, const IO::Path path)

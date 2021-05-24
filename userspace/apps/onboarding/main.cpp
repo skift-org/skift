@@ -56,16 +56,16 @@ static const Vector<Page> PAGES = {
 
 void pages(RefPtr<Widget::Element> host, const Page &page)
 {
-    host->add(Widget::label(page.header, Anchor::CENTER));
+    host->add(Widget::label(page.header, Math::Anchor::CENTER));
 
     auto content = host->add<Widget::Element>();
 
     for (auto &lines : page.lines)
     {
-        content->add(Widget::label(lines, Anchor::CENTER));
+        content->add(Widget::label(lines, Math::Anchor::CENTER));
     }
 
-    host->add(Widget::label(page.footer, Anchor::CENTER));
+    host->add(Widget::label(page.footer, Math::Anchor::CENTER));
 }
 
 int main(int, char **)

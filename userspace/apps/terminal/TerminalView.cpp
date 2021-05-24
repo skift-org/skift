@@ -69,7 +69,7 @@ void TerminalView::paint_cell(
     Graphic::Painter &painter,
     int x,
     int y,
-    Codepoint codepoint,
+    Text::Rune rune,
     Terminal::Color foreground,
     Terminal::Color background,
     Terminal::Attributes attributes)
@@ -78,7 +78,7 @@ void TerminalView::paint_cell(
 
     if (attributes.invert)
     {
-        swap(foreground, background);
+        std::swap(foreground, background);
     }
 
     if (background != Terminal::BACKGROUND)
@@ -94,12 +94,12 @@ void TerminalView::paint_cell(
             cell_color(foreground));
     }
 
-    if (codepoint == U' ')
+    if (rune == U' ')
     {
         return;
     }
 
-    auto &glyph = font()->glyph(codepoint);
+    auto &glyph = font()->glyph(rune);
 
     painter.draw_glyph(
         *font(),
@@ -147,7 +147,7 @@ void TerminalView::paint(Graphic::Painter &painter, const Math::Recti &dirty)
                     painter,
                     cx,
                     cy + _scroll_offset / cell_size().y(),
-                    cell.codepoint,
+                    cell.rune,
                     Terminal::BACKGROUND,
                     Terminal::FOREGROUND,
                     {});
@@ -277,10 +277,10 @@ void TerminalView::event(Widget::Event *event)
             break;
 
         default:
-            if (event->keyboard.codepoint != 0)
+            if (event->keyboard.rune != 0)
             {
                 uint8_t buffer[5];
-                int size = codepoint_to_utf8(event->keyboard.codepoint, buffer);
+                int size = Text::rune_to_utf8(event->keyboard.rune, buffer);
                 _terminal_device.server.write(buffer, size);
                 event->accepted = true;
             }

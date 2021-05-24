@@ -2,6 +2,9 @@
 
 #include <assert.h>
 
+namespace Utils
+{
+
 template <typename T>
 class RefCounted
 {
@@ -78,3 +81,5 @@ T *deref_if_not_null(T *ptr)
 
     return ptr;
 }
+
+} // namespace Utils

@@ -19,7 +19,7 @@ private:
 
     Key scancode_to_key(int scancode);
 
-    Codepoint key_to_codepoint(Key key);
+    Text::Rune key_to_rune(Key key);
 
     KeyModifier modifiers();
 

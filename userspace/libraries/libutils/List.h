@@ -1,9 +1,9 @@
 #pragma once
 
-#include <libsystem/Common.h>
 #include <libutils/Assert.h>
 #include <libutils/Iteration.h>
 #include <libutils/Optional.h>
+#include <libutils/Prelude.h>
 
 namespace Utils
 {
@@ -56,7 +56,7 @@ public:
         });
     }
 
-    List(List &&other) { *this = move(other); }
+    List(List &&other) { *this = std::move(other); }
 
     List &operator=(const List &other)
     {
@@ -76,9 +76,9 @@ public:
     {
         if (this != &other)
         {
-            swap(_count, other._count);
-            swap(_head, other._head);
-            swap(_tail, other._tail);
+            std::swap(_count, other._count);
+            std::swap(_head, other._head);
+            std::swap(_tail, other._tail);
         }
 
         return *this;
@@ -216,7 +216,7 @@ public:
 
         _count--;
 
-        T value = move(node->value);
+        T value = std::move(node->value);
         delete node;
         return value;
     }
@@ -240,7 +240,7 @@ public:
 
         _count--;
 
-        T value = move(node->value);
+        T value = std::move(node->value);
         delete node;
         return value;
     }
@@ -313,6 +313,36 @@ public:
             current = next;
         }
     }
+
+    struct Iterator
+    {
+    private:
+        Node *_node;
+
+    public:
+        Iterator(Node *node) : _node{node}
+        {
+        }
+
+        Iterator operator++()
+        {
+            _node = _node->next;
+            return *this;
+        }
+
+        bool operator!=(const Iterator &other) const
+        {
+            return _node != other._node;
+        }
+
+        const T &operator*() const
+        {
+            return _node->value;
+        }
+    };
+
+    Iterator begin() const { return _head; }
+    Iterator end() const { return nullptr; }
 };
 
 } // namespace Utils

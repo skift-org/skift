@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libmath/Rect.h>
-#include <libsystem/utils/List.h>
+#include <libutils/List.h>
 
 #include "compositor/Protocol.h"
 
@@ -10,7 +10,7 @@ struct Window;
 
 void manager_initialize();
 
-List *manager_get_windows();
+List<Window *> &manager_get_windows();
 
 struct Window *manager_get_window(struct Client *client, int id);
 
@@ -29,7 +29,7 @@ struct Window *manager_focus_window();
 template <typename Callback>
 Iteration manager_iterate_by_type_front_to_back(WindowType type, Callback callback)
 {
-    list_foreach(Window, window, manager_get_windows())
+    for (auto *window : manager_get_windows())
     {
         if (window->type() == type)
         {
@@ -62,7 +62,7 @@ void manager_iterate_front_to_back(Callback callback)
 template <typename Callback>
 Iteration manager_iterate_by_type_back_to_front(WindowType type, Callback callback)
 {
-    list_foreach_reversed(Window, window, manager_get_windows())
+    for (auto *window : manager_get_windows())
     {
         if (window->type() == type)
         {

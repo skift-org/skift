@@ -5,7 +5,6 @@
 #include <libio/Socket.h>
 #include <libio/Streams.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/utils/Hexdump.h>
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
 
@@ -70,7 +69,6 @@ Application::Application()
         if (message_size != sizeof(CompositorMessage))
         {
             IO::logln("Got a message with an invalid size from compositor {} != {}!", sizeof(CompositorMessage), message_size);
-            hexdump(&message, message_size);
             this->exit(PROCESS_FAILURE);
         }
 
@@ -127,7 +125,6 @@ void Application::do_message(const CompositorMessage &message)
     else
     {
         IO::logln("Got an invalid message from compositor ({})!", message.type);
-        hexdump(&message, sizeof(CompositorMessage));
         Application::exit(PROCESS_FAILURE);
     }
 }
@@ -141,12 +138,12 @@ ResultOr<CompositorMessage> Application::wait_for_message(CompositorMessageType 
 
     while (message.type != expected_message)
     {
-        pendings.push_back(move(message));
+        pendings.push_back(std::move(message));
         auto result = _connection.read(&message, sizeof(CompositorMessage));
 
         if (!result.success())
         {
-            pendings.foreach ([&](auto &message) {
+            pendings.foreach([&](auto &message) {
                 do_message(message);
                 return Iteration::CONTINUE;
             });
@@ -155,7 +152,7 @@ ResultOr<CompositorMessage> Application::wait_for_message(CompositorMessageType 
         }
     }
 
-    pendings.foreach ([&](auto &message) {
+    pendings.foreach([&](auto &message) {
         do_message(message);
         return Iteration::CONTINUE;
     });

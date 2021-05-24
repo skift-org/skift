@@ -9,7 +9,7 @@ namespace Widget
 struct LabelState
 {
     String text = "LabelElement";
-    Anchor anchor = Anchor::LEFT;
+    Math::Anchor anchor = Math::Anchor::LEFT;
 };
 
 struct LabelElement :
@@ -22,7 +22,7 @@ struct LabelElement :
         state(s);
     }
 
-    void anchor(Anchor anchor)
+    void anchor(Math::Anchor anchor)
     {
         auto s = state();
         s.anchor = anchor;
@@ -31,14 +31,14 @@ struct LabelElement :
 
     LabelElement(String text);
 
-    LabelElement(String text, Anchor anchor);
+    LabelElement(String text, Math::Anchor anchor);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 
     Math::Vec2i size() override;
 };
 
-static inline RefPtr<LabelElement> label(String text, Anchor anchor = Anchor::LEFT)
+static inline RefPtr<LabelElement> label(String text, Math::Anchor anchor = Math::Anchor::LEFT)
 {
     return make<LabelElement>(text, anchor);
 }

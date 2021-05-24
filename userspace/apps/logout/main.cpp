@@ -34,8 +34,8 @@ int main(int, char **)
     auto warning_container = icon_and_title_container->add<Widget::Element>();
     warning_container->flags(Widget::Element::FILL);
 
-    warning_container->add(Widget::label("Shutdown or restart your computer.", Anchor::BOTTOM_LEFT));
-    warning_container->add(Widget::label("Any unsaved work will be lost!", Anchor::TOP_LEFT));
+    warning_container->add(Widget::label("Shutdown or restart your computer.", Math::Anchor::BOTTOM_LEFT));
+    warning_container->add(Widget::label("Any unsaved work will be lost!", Math::Anchor::TOP_LEFT));
 
     dialog->add(Widget::spacer());
 

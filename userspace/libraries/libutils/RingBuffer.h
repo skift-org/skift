@@ -3,7 +3,10 @@
 #include <assert.h>
 #include <string.h>
 
-#include <libutils/Move.h>
+#include <libutils/Std.h>
+
+namespace Utils
+{
 
 template <typename T>
 class RingBuffer
@@ -53,11 +56,11 @@ public:
 
     RingBuffer &operator=(RingBuffer &&other)
     {
-        swap(_head, other._head);
-        swap(_tail, other._tail);
-        swap(_size, other._size);
-        swap(_used, other._used);
-        swap(_buffer, other._buffer);
+        std::swap(_head, other._head);
+        std::swap(_tail, other._tail);
+        std::swap(_size, other._size);
+        std::swap(_used, other._used);
+        std::swap(_buffer, other._buffer);
 
         return *this;
     }
@@ -136,3 +139,5 @@ public:
         return written;
     }
 };
+
+} // namespace Utils

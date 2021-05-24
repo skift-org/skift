@@ -9,7 +9,7 @@ namespace Terminal
 Terminal::Terminal(int width, int height)
     : _surface{width, height}
 {
-    _decoder.callback([this](auto codepoint) { write(codepoint); });
+    _decoder.callback([this](auto rune) { write(rune); });
 
     _cursor = {0, 0, true};
     _saved_cursor = {0, 0, true};
@@ -85,34 +85,34 @@ void Terminal::backspace()
     cursor_move(-1, 0);
 }
 
-void Terminal::append(Codepoint codepoint)
+void Terminal::append(Text::Rune rune)
 {
-    if (codepoint == U'\n')
+    if (rune == U'\n')
     {
         new_line();
     }
-    else if (codepoint == U'\r')
+    else if (rune == U'\r')
     {
         cursor_move(-_cursor.x, 0);
     }
-    else if (codepoint == U'\t')
+    else if (rune == U'\t')
     {
         cursor_move(8 - (_cursor.x % 8), 0);
     }
-    else if (codepoint == U'\b')
+    else if (rune == U'\b')
     {
         backspace();
     }
     else
     {
-        _surface.set(_cursor.x, _cursor.y, {codepoint, _attributes, true});
+        _surface.set(_cursor.x, _cursor.y, {rune, _attributes, true});
         cursor_move(1, 0);
     }
 }
 
-void Terminal::do_ansi(Codepoint codepoint)
+void Terminal::do_ansi(Text::Rune rune)
 {
-    switch (codepoint)
+    switch (rune)
     {
     case U'A':
         if (_parameters[0].empty)
@@ -327,12 +327,12 @@ void Terminal::do_ansi(Codepoint codepoint)
     }
 }
 
-void Terminal::write(Codepoint codepoint)
+void Terminal::write(Text::Rune rune)
 {
     switch (_state)
     {
     case State::WAIT_ESC:
-        if (codepoint == U'\e')
+        if (rune == U'\e')
         {
             for (auto &_parameter : _parameters)
             {
@@ -347,16 +347,16 @@ void Terminal::write(Codepoint codepoint)
         else
         {
             _state = State::WAIT_ESC;
-            append(codepoint);
+            append(rune);
         }
         break;
 
     case State::EXPECT_BRACKET:
-        if (codepoint == U'[')
+        if (rune == U'[')
         {
             _state = State::READ_ATTRIBUTE;
         }
-        else if (codepoint == U'c')
+        else if (rune == U'c')
         {
             _attributes = {};
             _state = State::WAIT_ESC;
@@ -367,20 +367,20 @@ void Terminal::write(Codepoint codepoint)
         else
         {
             _state = State::WAIT_ESC;
-            append(codepoint);
+            append(rune);
         }
         break;
 
     case State::READ_ATTRIBUTE:
-        if (codepoint_is_digit(codepoint))
+        if (Text::rune_is_digit(rune))
         {
             _parameters[_parameters_top].empty = false;
             _parameters[_parameters_top].value *= 10;
-            _parameters[_parameters_top].value += codepoint_numeric_value(codepoint);
+            _parameters[_parameters_top].value += Text::rune_numeric_value(rune);
         }
         else
         {
-            if (codepoint == U';')
+            if (rune == U';')
             {
                 _parameters_top++;
             }
@@ -388,7 +388,7 @@ void Terminal::write(Codepoint codepoint)
             {
                 _state = State::WAIT_ESC;
 
-                do_ansi(codepoint);
+                do_ansi(rune);
             }
         }
         break;

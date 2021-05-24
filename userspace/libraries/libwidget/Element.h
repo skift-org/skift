@@ -20,11 +20,11 @@ namespace Widget
 
 struct Window;
 
-#define WIDGET_BUILDER(__type, __name)                    \
-    template <typename... TArgs>                          \
-    ::RefPtr<::Widget::Element> __name(TArgs &&...args)   \
-    {                                                     \
-        return ::make<__type>(::forward<TArgs>(args)...); \
+#define WIDGET_BUILDER(__type, __name)                         \
+    template <typename... TArgs>                               \
+    ::RefPtr<::Widget::Element> __name(TArgs &&...args)        \
+    {                                                          \
+        return ::make<__type>(::std::forward<TArgs>(args)...); \
     }
 
 class Element : public RefCounted<Element>
@@ -200,7 +200,7 @@ public:
     template <typename T, typename... Args>
     RefPtr<T> add(Args &&...args)
     {
-        return add(make<T>(forward<Args>(args)...));
+        return add(make<T>(std::forward<Args>(args)...));
     }
 
     void add(Vector<RefPtr<Element>> children)

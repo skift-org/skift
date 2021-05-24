@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Random.h>
+#include <libmath/Random.h>
 
 #include "neko/model/Behavior.h"
 
@@ -11,7 +11,7 @@ class Idle :
     public Behavior
 {
 private:
-    Random _random;
+    Math::Random _random;
     int _timer;
 
 public:

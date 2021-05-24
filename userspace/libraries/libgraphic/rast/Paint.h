@@ -35,13 +35,13 @@ struct Texture
     RefPtr<Bitmap> bitmap;
 };
 
-using Paint = Utils::Variant<Fill, Gradient, Texture>;
+using Paint = Variant<Fill, Gradient, Texture>;
 
 static inline ALWAYS_INLINE Color sample(Paint &paint, Math::Vec2f p)
 {
     Color result = Colors::CYAN;
 
-    paint.visit(Utils::Visitor{
+    paint.visit(Visitor{
         [&](Fill &fill) {
             result = fill.color;
         },

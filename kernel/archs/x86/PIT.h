@@ -1,5 +1,5 @@
 #pragma once
 
-#include <libsystem/Common.h>
+#include <libutils/Prelude.h>
 
 void pit_initialize(int frequency);

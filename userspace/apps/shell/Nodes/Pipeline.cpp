@@ -2,10 +2,15 @@
 
 void shell_pipeline_destroy(ShellPipeline *node)
 {
-    list_destroy_with_callback(node->commands, (ListDestroyElementCallback)shell_node_destroy);
+    for (auto *command : *node->commands)
+    {
+        shell_node_destroy(command);
+    }
+
+    delete node->commands;
 }
 
-ShellNode *shell_pipeline_create(List *commands)
+ShellNode *shell_pipeline_create(List<ShellNode *> *commands)
 {
     ShellPipeline *node = CREATE(ShellPipeline);
 

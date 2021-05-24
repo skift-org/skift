@@ -32,14 +32,14 @@ public:
 
     Handle(Handle &&other)
     {
-        _handle = exchange_and_return_initial_value(other._handle, HANDLE_INVALID_ID);
-        _result = exchange_and_return_initial_value(other._result, ERR_BAD_HANDLE);
+        _handle = std::exchange(other._handle, HANDLE_INVALID_ID);
+        _result = std::exchange(other._result, ERR_BAD_HANDLE);
     }
 
     Handle &operator=(Handle &&other)
     {
-        swap(_handle, other._handle);
-        swap(_result, other._result);
+        std::swap(_handle, other._handle);
+        std::swap(_result, other._result);
 
         return *this;
     }

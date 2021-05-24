@@ -6,6 +6,9 @@
 #include <libutils/Storage.h>
 #include <libutils/Tags.h>
 
+namespace Utils
+{
+
 class StringStorage final :
     public Storage
 {
@@ -52,3 +55,5 @@ public:
         delete[] _buffer;
     }
 };
+
+} // namespace Utils

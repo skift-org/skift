@@ -63,7 +63,7 @@ Result shell_exec(
     Launchpad *launchpad = launchpad_create(command->command, executable.unwrap().cstring());
     launchpad_flags(launchpad, TASK_WAITABLE);
 
-    list_foreach(char, arg, command->arguments)
+    for (auto *arg : *command->arguments)
     {
         launchpad_argument(launchpad, arg);
     }
@@ -91,7 +91,7 @@ int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> 
             argv[0] = command->command;
             int argc = 1;
 
-            list_foreach(char, arg, command->arguments)
+            for (auto *arg : *command->arguments)
             {
                 argv[argc] = arg;
                 argc++;
@@ -133,40 +133,45 @@ int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> 
 
         Vector<IO::Pipe> pipes;
 
-        for (int i = 0; i < pipeline->commands->count() - 1; i++)
+        for (size_t i = 0; i < pipeline->commands->count() - 1; i++)
         {
             pipes.push_back(IO::Pipe::create().unwrap());
         }
 
         Vector<int> processes;
 
-        for (int i = 0; i < pipeline->commands->count(); i++)
+        size_t index = 0;
+        for (auto *command : *pipeline->commands)
         {
-            ShellCommand *command = nullptr;
-            list_peekat(pipeline->commands, i, (void **)&command);
             Assert::truth(command);
 
             RefPtr<IO::Handle> command_stdin = instream;
             RefPtr<IO::Handle> command_stdout = outstream;
 
-            if (i > 0)
+            if (index > 0)
             {
-                command_stdin = pipes[i - 1].reader;
+                command_stdin = pipes[index - 1].reader;
             }
 
-            if (i < pipeline->commands->count() - 1)
+            if (index < pipeline->commands->count() - 1)
             {
-                command_stdout = pipes[i].writer;
+                command_stdout = pipes[index].writer;
             }
 
-            shell_exec(command, command_stdin, command_stdout, &processes.emplace_back(-1));
+            shell_exec(
+                static_cast<ShellCommand *>(command),
+                command_stdin,
+                command_stdout,
+                &processes.emplace_back(-1));
+
+            index++;
         }
 
         pipes.clear();
 
         int exit_value;
 
-        for (int i = 0; i < pipeline->commands->count(); i++)
+        for (size_t i = 0; i < pipeline->commands->count(); i++)
         {
             process_wait(processes[i], &exit_value);
         }

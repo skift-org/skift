@@ -2,7 +2,6 @@
 
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
-#include <libsystem/io/Handle.h>
 #include <libutils/OwnPtr.h>
 
 namespace Graphic

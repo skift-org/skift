@@ -65,7 +65,7 @@ static ShellNode *command(IO::Scanner &scan)
 
     whitespace(scan);
 
-    List *arguments = list_create();
+    auto arguments = new List<char *>();
 
     whitespace(scan);
 
@@ -73,7 +73,7 @@ static ShellNode *command(IO::Scanner &scan)
            scan.peek() != '|' &&
            scan.peek() != '>')
     {
-        list_pushback(arguments, strdup(argument(scan).cstring()));
+        arguments->push_back(strdup(argument(scan).cstring()));
         whitespace(scan);
     }
 
@@ -82,19 +82,19 @@ static ShellNode *command(IO::Scanner &scan)
 
 static ShellNode *pipeline(IO::Scanner &scan)
 {
-    List *commands = list_create();
+    auto commands = new List<ShellNode *>();
 
     do
     {
         whitespace(scan);
-        list_pushback(commands, command(scan));
+        commands->push_back(command(scan));
         whitespace(scan);
     } while (scan.skip('|'));
 
     if (commands->count() == 1)
     {
-        ShellNode *node = (ShellNode *)list_peek(commands);
-        list_destroy(commands);
+        ShellNode *node = (ShellNode *)commands->peek();
+        delete commands;
         return node;
     }
 

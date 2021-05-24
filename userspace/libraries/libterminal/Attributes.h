@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libsystem/Common.h>
 #include <libterminal/Color.h>
+#include <libutils/Prelude.h>
 
 namespace Terminal
 {

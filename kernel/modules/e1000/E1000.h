@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libsystem/utils/Hexdump.h>
 #include <libutils/Vector.h>
 
 #include "pci/PCIDevice.h"

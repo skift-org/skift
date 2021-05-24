@@ -52,7 +52,7 @@ static const char *const witty_comments[] = {
 static bool has_panic = false;
 static bool nested_panic = false;
 
-void system_panic_internal(Utils::SourceLocation location, void *stackframe, const char *message, ...)
+void system_panic_internal(SourceLocation location, void *stackframe, const char *message, ...)
 {
     interrupts_retain();
     interrupts_disable_holding();

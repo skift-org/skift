@@ -12,7 +12,7 @@
 #include "system/tasking/Task.h"
 
 static int _task_ids = 0;
-static List *_tasks;
+static List<Task *> *_tasks;
 
 TaskState Task::state()
 {
@@ -28,7 +28,7 @@ void Task::state(TaskState state)
 
     if (state == TASK_STATE_CANCELED)
     {
-        list_remove(_tasks, this);
+        _tasks->remove(this);
         Kernel::finalize_task(this);
     }
 }
@@ -110,7 +110,7 @@ Task *task_create(Task *parent, const char *name, TaskFlags flags)
 
     if (_tasks == nullptr)
     {
-        _tasks = list_create();
+        _tasks = new List<Task *>();
     }
 
     Task *task = new Task{};
@@ -133,7 +133,7 @@ Task *task_create(Task *parent, const char *name, TaskFlags flags)
         task->_domain = parent->_domain;
 
     // Setup shms
-    task->memory_mapping = list_create();
+    task->memory_mapping = new List<MemoryMapping *>();
 
     memory_alloc(task->address_space, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
     task->kernel_stack_pointer = ((uintptr_t)task->kernel_stack + PROCESS_STACK_SIZE);
@@ -149,7 +149,7 @@ Task *task_create(Task *parent, const char *name, TaskFlags flags)
 
     Arch::save_context(task);
 
-    list_pushback(_tasks, task);
+    _tasks->push_back(task);
 
     return task;
 }
@@ -160,7 +160,7 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip, TaskFlags flags)
 
     if (_tasks == nullptr)
     {
-        _tasks = list_create();
+        _tasks = new List<Task *>();
     }
 
     Task *task = new Task{};
@@ -173,7 +173,7 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip, TaskFlags flags)
     task->address_space = Arch::address_space_create();
 
     // Setup shms
-    task->memory_mapping = list_create();
+    task->memory_mapping = new List<MemoryMapping *>();
 
     if (parent)
     {
@@ -189,7 +189,7 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip, TaskFlags flags)
     memory_alloc(task->address_space, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
     task->kernel_stack_pointer = ((uintptr_t)task->kernel_stack + PROCESS_STACK_SIZE);
 
-    list_foreach(MemoryMapping, mapping, parent->memory_mapping)
+    for (auto *mapping : *parent->memory_mapping)
     {
         auto virtual_range = mapping->range();
 
@@ -213,7 +213,7 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip, TaskFlags flags)
     task->user_stack_pointer = sp;
     task->entry_point = (TaskEntryPoint)ip;
 
-    list_pushback(_tasks, task);
+    _tasks->push_back(task);
 
     task_go(task);
 
@@ -228,14 +228,13 @@ void task_destroy(Task *task)
 
     interrupts_release();
 
-    MemoryMapping *mapping = nullptr;
-
-    while ((mapping = (MemoryMapping *)list_peek(task->memory_mapping)))
+    while (task->memory_mapping->any())
     {
+        MemoryMapping *mapping = task->memory_mapping->peek();
         task_memory_mapping_destroy(task, mapping);
     }
 
-    list_destroy(task->memory_mapping);
+    delete task->memory_mapping;
 
     memory_free(task->address_space, MemoryRange{(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
 
@@ -249,10 +248,9 @@ void task_destroy(Task *task)
 
 void task_clear_userspace(Task *task)
 {
-    MemoryMapping *mapping = nullptr;
-
-    while ((mapping = (MemoryMapping *)list_peek(task->memory_mapping)))
+    while (task->memory_mapping->any())
     {
+        MemoryMapping *mapping = task->memory_mapping->peek();
         task_memory_mapping_destroy(task, mapping);
     }
 
@@ -272,12 +270,12 @@ void task_iterate(void *target, TaskIterateCallback callback)
         return;
     }
 
-    list_iterate(_tasks, target, (ListIterationCallback)callback);
+    _tasks->foreach([&](auto *task) { callback(target, task); return Iteration::CONTINUE; });
 }
 
 Task *task_by_id(int id)
 {
-    list_foreach(Task, task, _tasks)
+    for (auto *task : *_tasks)
     {
         if (task->id == id)
         {
@@ -414,7 +412,9 @@ Result task_block(Task *task, Blocker &blocker, Timeout timeout)
 void task_dump(Task *task)
 {
     if (!task)
+    {
         return;
+    }
 
     InterruptsRetainer retainer;
 
@@ -422,7 +422,7 @@ void task_dump(Task *task)
     Kernel::logln("\t   State: {}", task_state_string(task->state()));
     Kernel::logln("\t   Memory: ");
 
-    list_foreach(MemoryMapping, mapping, task->memory_mapping)
+    for (auto *mapping : *task->memory_mapping)
     {
         auto virtual_range = mapping->range();
         Kernel::logln("\t   - {08x} - {08x} ({08x})", virtual_range.base(), virtual_range.end(), virtual_range.size());

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libio/Reader.h>
+#include <libtext/Rune.h>
 #include <libutils/InlineRingBuffer.h>
-#include <libutils/unicode/Codepoint.h>
 
 #include <string.h>
 
@@ -15,7 +15,7 @@ private:
     static constexpr int MAX_PEEK = 64;
 
     Reader &_reader;
-    Utils::InlineRingBuffer<uint8_t, MAX_PEEK> _peek{};
+    InlineRingBuffer<uint8_t, MAX_PEEK> _peek{};
     bool _is_end_of_file = false;
 
     void refill()
@@ -148,7 +148,7 @@ public:
         return true;
     }
 
-    void next_codepoint()
+    void next_rune()
     {
         if ((peek() & 0xf8) == 0xf0)
         {
@@ -168,33 +168,33 @@ public:
         }
     }
 
-    Codepoint peek_codepoint()
+    Text::Rune peek_rune()
     {
         size_t size = 0;
-        Codepoint codepoint = peek(0);
+        Text::Rune rune = peek(0);
 
         if ((peek() & 0xf8) == 0xf0)
         {
             size = 4;
-            codepoint = (0x07 & codepoint) << 18;
+            rune = (0x07 & rune) << 18;
         }
         else if ((peek() & 0xf0) == 0xe0)
         {
             size = 3;
-            codepoint = (0x0f & codepoint) << 12;
+            rune = (0x0f & rune) << 12;
         }
         else if ((peek() & 0xe0) == 0xc0)
         {
-            codepoint = (0x1f & codepoint) << 6;
+            rune = (0x1f & rune) << 6;
             size = 2;
         }
 
         for (size_t i = 1; i < size; i++)
         {
-            codepoint |= (0x3f & peek(i)) << (6 * (size - i - 1));
+            rune |= (0x3f & peek(i)) << (6 * (size - i - 1));
         }
 
-        return codepoint;
+        return rune;
     }
 
     bool skip(char chr)

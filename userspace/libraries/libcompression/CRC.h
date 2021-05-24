@@ -1,7 +1,7 @@
 #pragma once
-#include <libsystem/Common.h>
 #include <libsystem/Result.h>
 #include <libutils/Array.h>
+#include <libutils/Prelude.h>
 
 namespace Compression
 {

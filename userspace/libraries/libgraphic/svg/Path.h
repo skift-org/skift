@@ -56,7 +56,7 @@ public:
         }
 
         SubPath subpath{point};
-        _subpaths.push_back(move(subpath));
+        _subpaths.push_back(std::move(subpath));
         _subpath_ended = false;
     }
 

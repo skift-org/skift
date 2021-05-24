@@ -2,7 +2,7 @@
 
 #include "tests/Driver.h"
 
-using Number = Utils::Variant<int, double>;
+using Number = Variant<int, double>;
 
 TEST(variant_default_constructor)
 {
@@ -71,7 +71,7 @@ TEST(variant_visit)
     bool has_visited_int = false;
     bool has_visited_double = false;
 
-    Utils::Visitor visitor{
+    Visitor visitor{
         [&](int &value) {
             Assert::equal(value, 5);
             has_visited_int = true;
@@ -110,7 +110,7 @@ TEST(variant_copy_assign)
 TEST(variant_move_ctor)
 {
     Number nbr{5};
-    Number other{move(nbr)};
+    Number other{std::move(nbr)};
 
     Assert::truth(other.is<int>());
     Assert::equal(other.get<int>(), 5);
@@ -119,7 +119,7 @@ TEST(variant_move_ctor)
 TEST(variant_move_assign)
 {
     Number nbr{5};
-    Number other = move(nbr);
+    Number other = std::move(nbr);
 
     Assert::truth(other.is<int>());
     Assert::equal(other.get<int>(), 5);

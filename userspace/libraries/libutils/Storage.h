@@ -2,6 +2,9 @@
 
 #include <libutils/RefPtr.h>
 
+namespace Utils
+{
+
 struct Storage : public RefCounted<Storage>
 {
     virtual ~Storage() {}
@@ -21,3 +24,5 @@ struct RawStorage
 
     virtual RefPtr<Storage> storage() = 0;
 };
+
+} // namespace Utils

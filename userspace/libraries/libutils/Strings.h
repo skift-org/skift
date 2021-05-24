@@ -1,6 +1,8 @@
 #pragma once
 
-namespace Strings
+#include <libutils/Prelude.h>
+
+namespace Utils::Strings
 {
 
 static constexpr auto WHITESPACE = " \n\r\t";
@@ -15,4 +17,4 @@ static constexpr auto ALL_ALPHA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRS
 static constexpr auto LOWERCASE_ALPHA = "abcdefghijklmnopqrstuvwxyz";
 static constexpr auto UPPERCASE_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-} // namespace Strings
+} // namespace Utils::Strings

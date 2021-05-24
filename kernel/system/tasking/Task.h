@@ -4,7 +4,7 @@
 #include <abi/Task.h>
 
 #include <libio/Path.h>
-#include <libsystem/utils/List.h>
+#include <libutils/List.h>
 
 #include "system/memory/Memory.h"
 #include "system/scheduling/Blocker.h"
@@ -13,6 +13,8 @@
 #include "system/tasking/Handles.h"
 
 typedef void (*TaskEntryPoint)();
+
+struct MemoryMapping;
 
 struct Task
 {
@@ -37,7 +39,7 @@ struct Task
     TaskEntryPoint entry_point;
     char fpu_registers[512];
 
-    List *memory_mapping;
+    List<MemoryMapping *> *memory_mapping;
     void *address_space;
 
     int exit_value = 0;

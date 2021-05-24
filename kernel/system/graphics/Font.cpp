@@ -142,7 +142,7 @@ int font_height() { return 9; }
 
 int font_width() { return 9; }
 
-void font_draw(Codepoint cp, int x, int y)
+void font_draw(Text::Rune cp, int x, int y)
 {
     if (cp > 0x7f)
         return;

@@ -48,13 +48,14 @@ Shell::ArgParseResult gfxmode_list()
     return Shell::ArgParseResult::SHOULD_FINISH;
 }
 
-Shell::ArgParseResult gfxmode_get(Stream *framebuffer_device)
+Shell::ArgParseResult gfxmode_get()
 {
     IOCallDisplayModeArgs framebuffer_info;
 
-    if (stream_call(framebuffer_device, IOCALL_DISPLAY_GET_MODE, &framebuffer_info) < 0)
+    Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
+    if (stream_call(device, IOCALL_DISPLAY_GET_MODE, &framebuffer_info) != SUCCESS)
     {
-        handle_printf_error(framebuffer_device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
+        IO::errln("Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
         return Shell::ArgParseResult::FAILURE;
     }
 
@@ -95,7 +96,7 @@ Result gfxmode_set_iocall(Stream *device, IOCallDisplayModeArgs mode)
 {
     if (stream_call(device, IOCALL_DISPLAY_SET_MODE, &mode) != SUCCESS)
     {
-        handle_printf_error(device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
+        IO::errln("Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
         return Result::ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
 
@@ -149,7 +150,7 @@ int main(int argc, const char *argv[])
     });
 
     args.option('g', "get", "Get the current graphic mode.", [](auto &) {
-        return gfxmode_list();
+        return gfxmode_get();
     });
 
     args.option_string('s', "set", "Set graphic mode.", [&](String &mode) {

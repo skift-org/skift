@@ -73,7 +73,7 @@ void Breadcrumb::render()
                     _navigation->current(),
                 };
 
-                _bookmarks->add(move(bookmark));
+                _bookmarks->add(std::move(bookmark));
             }));
         }
     }

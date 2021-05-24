@@ -134,7 +134,7 @@ case mitzvah:
 
 * Include libraries first, then include local headers (separate them with a new line).
 * Use `.h` as extension.
-* Most of the headers of skift include the file `libsystem/Common.h` wich include most of the standard libraries (`stdio`, `stdlib`, `stddef`, `stdint` and some Macros).
+* Most of the headers of skift include the file `libutils/Prelude.h` wich include most of the standard libraries (`stdio`, `stdlib`, `stddef`, `stdint` and some Macros).
 * If you want to declare a new header use `#pragma once` instead of using cross-defines.
 
 *Example:*

@@ -49,8 +49,6 @@ int main(int argc, char **argv)
         }
     }
 
-    stream_set_write_buffer_mode(out_stream, STREAM_BUFFERED_NONE);
-
     Shell::History history;
 
     int command_exit_value = 0;

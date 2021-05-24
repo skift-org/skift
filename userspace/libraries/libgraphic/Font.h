@@ -1,9 +1,9 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
+#include <libtext/Rune.h>
 #include <libutils/String.h>
 #include <libutils/Vector.h>
-#include <libutils/unicode/Codepoint.h>
 
 namespace Graphic
 {
@@ -43,7 +43,7 @@ public:
 
 struct Glyph
 {
-    Codepoint codepoint;
+    Text::Rune rune;
     Math::Recti bound;
     Math::Vec2i origin;
     int advance;
@@ -68,16 +68,16 @@ public:
 
     Font(RefPtr<Bitmap> bitmap, Vector<Glyph> glyphs)
         : _bitmap(bitmap),
-          _glyphs(move(glyphs))
+          _glyphs(std::move(glyphs))
     {
         _default = glyph(U'?');
     }
 
-    bool has(Codepoint codepoint) const;
+    bool has(Text::Rune rune) const;
 
-    const Glyph &glyph(Codepoint codepoint) const;
+    const Glyph &glyph(Text::Rune rune) const;
 
-    Math::Recti mesure(Codepoint codepoint) const;
+    Math::Recti mesure(Text::Rune rune) const;
 
     Math::Recti mesure(const char *string) const;
 

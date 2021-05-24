@@ -140,7 +140,7 @@ void Table::paint(Graphic::Painter &painter, const Math::Recti &)
             *font(),
             _empty_message.cstring(),
             list_bound().take_top(TABLE_ROW_HEIGHT),
-            Anchor::CENTER,
+            Math::Anchor::CENTER,
             color(THEME_FOREGROUND));
     }
     else

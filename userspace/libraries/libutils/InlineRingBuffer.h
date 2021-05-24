@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Move.h>
+#include <libutils/Std.h>
 
 namespace Utils
 {
@@ -52,10 +52,10 @@ public:
 
     InlineRingBuffer &operator=(InlineRingBuffer &&other)
     {
-        swap(_head, other._head);
-        swap(_tail, other._tail);
-        swap(_used, other._used);
-        swap(_buffer, other._buffer);
+        std::swap(_head, other._head);
+        std::swap(_tail, other._tail);
+        std::swap(_used, other._used);
+        std::swap(_buffer, other._buffer);
 
         return *this;
     }

@@ -91,7 +91,7 @@ static inline const char *parse_escape_sequence(IO::Scanner &scan)
         {
             // Not an UTF16 surrogate pair.
             static uint8_t utf8[5] = {};
-            codepoint_to_utf8(first_surrogate, utf8);
+            Text::rune_to_utf8(first_surrogate, utf8);
             return (char *)utf8;
         }
 
@@ -110,10 +110,10 @@ static inline const char *parse_escape_sequence(IO::Scanner &scan)
             return reinterpret_cast<const char *>(u8"�");
         }
 
-        Codepoint codepoint = 0x10000 + (((first_surrogate & 0x3FF) << 10) | (second_surrogate & 0x3FF));
+        Text::Rune rune = 0x10000 + (((first_surrogate & 0x3FF) << 10) | (second_surrogate & 0x3FF));
 
         static uint8_t utf8[5] = {};
-        codepoint_to_utf8(codepoint, utf8);
+        Text::rune_to_utf8(rune, utf8);
         return (char *)utf8;
     }
 
@@ -161,7 +161,7 @@ inline Value parse_array(IO::Scanner &scan)
 
     if (scan.skip(']'))
     {
-        return move(array);
+        return array;
     }
 
     int index = 0;
@@ -175,7 +175,7 @@ inline Value parse_array(IO::Scanner &scan)
 
     scan.skip(']');
 
-    return move(array);
+    return array;
 }
 
 inline Value parse_object(IO::Scanner &scan)

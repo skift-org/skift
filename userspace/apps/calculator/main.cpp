@@ -16,7 +16,7 @@ int main(int, char **)
 
     auto titlebar_container = titlebar(Graphic::Icon::get("calculator-variant"), "Calculator");
 
-    auto screen_label = label("#value", Anchor::CENTER);
+    auto screen_label = label("#value",Math::Anchor::CENTER);
     auto calculator_observer = calculator.observe([&](Calculator &calculator) {
         screen_label->text(IO::format("{}", calculator.screen()));
     });

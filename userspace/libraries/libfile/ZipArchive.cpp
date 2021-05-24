@@ -245,7 +245,7 @@ Result write_entry(const Archive::Entry &entry, IO::Writer &writer, IO::Reader &
     header.signature = ZIP_LOCAL_DIR_HEADER_SIG;
 
     // Write data
-    TRY(IO::write(writer, header));
+    TRY(IO::write_struct(writer, header));
     TRY(IO::write(writer, entry.name));
     return IO::copy(compressed, writer);
 }
@@ -266,7 +266,7 @@ Result write_central_directory(IO::SeekableWriter auto &writer, Vector<Archive::
         header.len_extrafield = 0;
         header.len_comment = 0;
         header.signature = ZIP_CENTRAL_DIR_HEADER_SIG;
-        TRY(IO::write(writer, header));
+        TRY(IO::write_struct(writer, header));
         TRY(IO::write(writer, entry.name));
     }
     auto end = TRY(writer.tell());
@@ -278,7 +278,7 @@ Result write_central_directory(IO::SeekableWriter auto &writer, Vector<Archive::
     end_record.disk_entries = entries.count();
     end_record.total_entries = entries.count();
     end_record.len_comment = 0;
-    return IO::write(writer, end_record).result();
+    return IO::write_struct(writer, end_record).result();
 }
 
 Result ZipArchive::extract(unsigned int entry_index, IO::Writer &writer)

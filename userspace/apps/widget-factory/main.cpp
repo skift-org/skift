@@ -29,7 +29,7 @@ int main(int, char **)
         p3->flags(Widget::Element::FILL);
     }
 
-    window->root()->add(Widget::label("Buttons", Anchor::CENTER));
+    window->root()->add(Widget::label("Buttons", Math::Anchor::CENTER));
     auto buttons = window->root()->add<Widget::Element>();
     {
         buttons->add(Widget::basic_button("BUTTON"));
@@ -40,7 +40,7 @@ int main(int, char **)
         buttons->add(Widget::filled_button(Graphic::Icon::get("widgets"), "BUTTON"));
     }
 
-    window->root()->add(Widget::label("Grid layout", Anchor::CENTER));
+    window->root()->add(Widget::label("Grid layout", Math::Anchor::CENTER));
 
     auto panel_grid = window->root()->add(Widget::fill(Widget::grid(3, 3, 4, 4, {})));
     {

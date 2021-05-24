@@ -218,7 +218,7 @@ void Window::lost_focus()
 
 void Window::flip_buffers(int frontbuffer_handle, Math::Vec2i frontbuffer_size, int backbuffer_handle, Math::Vec2i backbuffer_size, Math::Recti region)
 {
-    swap(_frontbuffer, _backbuffer);
+    std::swap(_frontbuffer, _backbuffer);
 
     if (_frontbuffer->handle() != frontbuffer_handle)
     {

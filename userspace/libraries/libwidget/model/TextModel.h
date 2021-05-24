@@ -2,11 +2,11 @@
 
 #include <libasync/Observable.h>
 #include <libgraphic/Font.h>
+#include <libtext/Rune.h>
 #include <libutils/Assert.h>
 #include <libutils/OwnPtr.h>
 #include <libutils/RefCounted.h>
 #include <libutils/Vector.h>
-#include <libutils/unicode/Codepoint.h>
 #include <libwidget/Theme.h>
 
 namespace Widget
@@ -17,53 +17,53 @@ struct TextCursor;
 class TextModelLine
 {
 private:
-    Vector<Codepoint> _codepoints{};
+    Vector<Text::Rune> _runes{};
 
 public:
-    Codepoint operator[](size_t index)
+    Text::Rune operator[](size_t index)
     {
         Assert::lower_than(index, length());
 
-        return _codepoints[index];
+        return _runes[index];
     }
 
     size_t length()
     {
-        return _codepoints.count();
+        return _runes.count();
     }
 
-    void append(Codepoint codepoint)
+    void append(Text::Rune rune)
     {
-        _codepoints.push_back(codepoint);
+        _runes.push_back(rune);
     }
 
     void append(const TextModelLine &line)
     {
-        _codepoints.push_back_many(line._codepoints);
+        _runes.push_back_many(line._runes);
     }
 
-    void append_at(size_t index, Codepoint codepoint)
+    void append_at(size_t index, Text::Rune rune)
     {
-        _codepoints.insert(index, codepoint);
+        _runes.insert(index, rune);
     }
 
     void backspace_at(size_t index)
     {
-        _codepoints.remove_index(index - 1);
+        _runes.remove_index(index - 1);
     }
 
     void delete_at(size_t index)
     {
-        _codepoints.remove_index(index);
+        _runes.remove_index(index);
     }
 
     Math::Recti bound(const Graphic::Font &font)
     {
         int width = 0;
 
-        for (size_t i = 0; i < _codepoints.count(); i++)
+        for (size_t i = 0; i < _runes.count(); i++)
         {
-            width += font.mesure(_codepoints[i]).width();
+            width += font.mesure(_runes[i]).width();
         }
 
         return {width, font.metrics().fulllineheight()};
@@ -161,7 +161,7 @@ public:
 
     void append_line(OwnPtr<TextModelLine> line) { _lines.push_back(line); }
 
-    void append_at(TextCursor &cursor, Codepoint codepoint);
+    void append_at(TextCursor &cursor, Text::Rune rune);
 
     void backspace_at(TextCursor &cursor);
 

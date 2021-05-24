@@ -1,4 +1,4 @@
-#include <libsystem/utils/List.h>
+#include <libutils/List.h>
 
 #include "system/interrupts/Interupts.h"
 #include "system/memory/Memory.h"
@@ -6,11 +6,11 @@
 #include "system/memory/Physical.h"
 
 static int _memory_object_id = 0;
-static List *_memory_objects;
+static List<MemoryObject *> *_memory_objects;
 
 void memory_object_initialize()
 {
-    _memory_objects = list_create();
+    _memory_objects = new List<MemoryObject *>();
 }
 
 MemoryObject *memory_object_create(size_t size)
@@ -25,14 +25,14 @@ MemoryObject *memory_object_create(size_t size)
     memory_object->refcount = 1;
     memory_object->_range = physical_alloc(size);
 
-    list_pushback(_memory_objects, memory_object);
+    _memory_objects->push_back(memory_object);
 
     return memory_object;
 }
 
 void memory_object_destroy(MemoryObject *memory_object)
 {
-    list_remove(_memory_objects, memory_object);
+    _memory_objects->remove(memory_object);
 
     physical_free(memory_object->range());
     free(memory_object);
@@ -59,12 +59,12 @@ MemoryObject *memory_object_by_id(int id)
 {
     InterruptsRetainer retainer;
 
-    list_foreach(MemoryObject, memory_object, _memory_objects)
+    for (auto *object : *_memory_objects)
     {
-        if (memory_object->id == id)
+        if (object->id == id)
         {
-            memory_object_ref(memory_object);
-            return memory_object;
+            memory_object_ref(object);
+            return object;
         }
     }
 

@@ -72,7 +72,7 @@ public:
 
             scan.skip('/');
 
-            return move(elements);
+            return elements;
         };
 
         Vector<String> elements{};
@@ -94,7 +94,7 @@ public:
             }
         }
 
-        return {absolute, move(elements)};
+        return {absolute, std::move(elements)};
     }
 
     static Path join(String left, String right)
@@ -144,7 +144,7 @@ public:
         combined_elements.push_back_many(left._elements);
         combined_elements.push_back_many(right._elements);
 
-        return {left.absolute(), move(combined_elements)};
+        return {left.absolute(), std::move(combined_elements)};
     }
 
     Path()
@@ -161,8 +161,8 @@ public:
 
     Path(Path &&other)
     {
-        swap(_absolute, other._absolute);
-        swap(_elements, other._elements);
+        std::swap(_absolute, other._absolute);
+        std::swap(_elements, other._elements);
     }
 
     Path &operator=(const Path &other)
@@ -180,8 +180,8 @@ public:
     {
         if (this != &other)
         {
-            swap(_absolute, other._absolute);
-            swap(_elements, other._elements);
+            std::swap(_absolute, other._absolute);
+            std::swap(_elements, other._elements);
         }
 
         return *this;
@@ -236,7 +236,7 @@ public:
             return Iteration::CONTINUE;
         });
 
-        return {_absolute, move(stack)};
+        return {_absolute, std::move(stack)};
     }
 
     String basename() const
@@ -320,7 +320,7 @@ public:
             }
         }
 
-        return {_absolute, move(stack)};
+        return {_absolute, std::move(stack)};
     }
 
     String extension() const
@@ -360,7 +360,7 @@ public:
             }
         }
 
-        return {_absolute, move(stack)};
+        return {_absolute, std::move(stack)};
     }
 
     String string() const

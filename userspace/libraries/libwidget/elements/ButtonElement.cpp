@@ -119,7 +119,7 @@ RefPtr<ButtonElement> basic_button(String text, Callback<void(void)> on_click)
     return button(
         ButtonElement::TEXT,
         spacing({0, 16},
-                Widget::label(text, Anchor::CENTER)),
+                Widget::label(text, Math::Anchor::CENTER)),
         on_click);
 }
 
@@ -171,7 +171,7 @@ RefPtr<ButtonElement> outline_button(String text, Callback<void(void)> on_click)
     return button(
         ButtonElement::OUTLINE,
         spacing({0, 16},
-                Widget::label(text, Anchor::CENTER)),
+                Widget::label(text, Math::Anchor::CENTER)),
         on_click);
 }
 

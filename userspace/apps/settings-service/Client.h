@@ -16,7 +16,7 @@ public:
     Callback<void(Client &, const Message &message)> on_message;
     Callback<void()> on_disconnect;
 
-    Client(IO::Connection connection) : Peer{move(connection)}
+    Client(IO::Connection connection) : Peer{std::move(connection)}
     {
     }
 

@@ -17,7 +17,7 @@ ResultOr<size_t> read_vector(Reader &reader, Vector<T> &vector)
     size_t last_read = TRY(reader.read(&object, sizeof(T)));
     while (last_read > 0)
     {
-        vector.push_back(move(object));
+        vector.push_back(std::move(object));
         read += last_read;
 
         last_read = TRY(reader.read(&object, sizeof(T)));

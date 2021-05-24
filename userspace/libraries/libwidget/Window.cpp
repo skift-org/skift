@@ -158,7 +158,7 @@ void Window::flip(Math::Recti region)
 {
     frontbuffer->copy_from(*backbuffer, region);
 
-    swap(frontbuffer, backbuffer);
+    std::swap(frontbuffer, backbuffer);
 
     Application::the().flip_window(this, region);
 }
@@ -174,7 +174,7 @@ void Window::update()
 
     Graphic::Painter painter{*backbuffer};
 
-    _dirty_paint.foreach ([&](Math::Recti &rect) {
+    _dirty_paint.foreach([&](Math::Recti &rect) {
         repaint(painter, rect);
 
         if (repaited_regions.is_empty())
@@ -223,7 +223,7 @@ void Window::show()
 
     frontbuffer->copy_from(*backbuffer, bound());
 
-    swap(frontbuffer, backbuffer);
+    std::swap(frontbuffer, backbuffer);
 
     Application::the().show_window(this);
 }
@@ -340,7 +340,7 @@ Element *Window::child_at(Math::Vec2i position)
 void Window::on(EventType event, EventHandler handler)
 {
     Assert::lower_than(event, EventType::__COUNT);
-    _handlers[event] = move(handler);
+    _handlers[event] = std::move(handler);
 }
 
 void Window::dispatch_event(Event *event)

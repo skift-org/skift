@@ -5,22 +5,27 @@
 namespace Kernel
 {
 
-static List *_task_to_finalize = nullptr;
+static List<Task *> *_task_to_finalize = nullptr;
 
 void finalize_task(Task *task)
 {
     ASSERT_INTERRUPTS_RETAINED();
 
     assert(_task_to_finalize != nullptr);
-    list_pushback(_task_to_finalize, task);
+    _task_to_finalize->push_back(task);
 }
 
 Task *finalizer_pop_task()
 {
     InterruptsRetainer retainer;
-    Task *task = nullptr;
-    list_pop(_task_to_finalize, (void **)&task);
-    return task;
+    if (_task_to_finalize->any())
+    {
+        return _task_to_finalize->pop();
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 void finalizer_task()
@@ -41,7 +46,7 @@ void finalizer_task()
 
 void finalizer_initialize()
 {
-    _task_to_finalize = list_create();
+    _task_to_finalize = new List<Task *>();
 
     Task *finalizer = task_spawn(nullptr, "finalizer", finalizer_task, nullptr, TASK_NONE);
     task_go(finalizer);

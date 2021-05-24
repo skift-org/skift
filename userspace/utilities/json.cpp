@@ -50,7 +50,7 @@ int main(int argc, char const *argv[])
         IO::MemoryWriter memory;
         IO::Prettier pretty{memory, options};
         Json::prettify(pretty, root);
-        IO::write(IO::out(), memory.string());
+        IO::write(IO::out(), memory.slice());
     }
     else
     {
@@ -67,7 +67,7 @@ int main(int argc, char const *argv[])
             IO::MemoryWriter memory;
             IO::Prettier pretty{memory, options};
             Json::prettify(pretty, root);
-            IO::write(IO::out(), memory.string());
+            IO::write(IO::out(), memory.slice());
 
             return Iteration::CONTINUE;
         });

@@ -77,7 +77,7 @@ void Framebuffer::mark_dirty(Math::Recti new_bound)
 
     bool merged = false;
 
-    _dirty_bounds.foreach ([&](Math::Recti &region) {
+    _dirty_bounds.foreach([&](Math::Recti &region) {
         int region_area = region.area();
         int merge_area = region.merged_with(new_bound).area();
 
@@ -111,7 +111,7 @@ void Framebuffer::blit()
         return;
     }
 
-    _dirty_bounds.foreach ([&](auto &bound) {
+    _dirty_bounds.foreach([&](auto &bound) {
         IOCallDisplayBlitArgs args;
 
         args.buffer = reinterpret_cast<uint32_t *>(_bitmap->pixels());
@@ -124,11 +124,6 @@ void Framebuffer::blit()
         args.blit_height = bound.height();
 
         __plug_handle_call(&_handle, IOCALL_DISPLAY_BLIT, &args);
-
-        if (handle_has_error(&_handle))
-        {
-            handle_printf_error(&_handle, "Failed to iocall device " FRAMEBUFFER_DEVICE_PATH);
-        }
 
         return Iteration::CONTINUE;
     });

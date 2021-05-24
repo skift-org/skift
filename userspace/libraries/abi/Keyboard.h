@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/unicode/Codepoint.h>
+#include <libtext/Rune.h>
 
 #define KEY_LIST(__ENTRY)                              \
     __ENTRY(KEYBOARD_KEY_INVALID, 0x0)                 \
@@ -140,7 +140,7 @@ struct KeyboardPacket
 {
     Key key;
     KeyModifier modifiers;
-    Codepoint codepoint;
+    Text::Rune rune;
     KeyMotion motion;
 };
 
@@ -148,10 +148,10 @@ struct KeyMapping
 {
     Key key;
 
-    Codepoint regular_codepoint;
-    Codepoint shift_codepoint;
-    Codepoint alt_codepoint;
-    Codepoint shift_alt_codepoint;
+    Text::Rune regular_rune;
+    Text::Rune shift_rune;
+    Text::Rune alt_rune;
+    Text::Rune shift_alt_rune;
 };
 
 #define KEYMAP_LANGUAGE_SIZE 16

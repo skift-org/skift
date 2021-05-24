@@ -3,10 +3,15 @@
 void shell_command_destroy(ShellCommand *node)
 {
     free(node->command);
-    list_destroy_with_callback(node->arguments, free);
+    for (auto *arg : *node->arguments)
+    {
+        free(arg);
+    }
+
+    delete node->arguments;
 }
 
-ShellNode *shell_command_create(char *command, List *arguments)
+ShellNode *shell_command_create(char *command, List<char *> *arguments)
 {
     ShellCommand *node = CREATE(ShellCommand);
 

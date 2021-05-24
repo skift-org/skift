@@ -5,7 +5,6 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/io/Stream_internal.h>
 #include <libsystem/system/System.h>
 
 #include "archs/Arch.h"

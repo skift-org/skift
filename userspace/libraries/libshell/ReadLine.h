@@ -55,11 +55,11 @@ ResultOr<String> readline(
     auto line_as_string = [&]() -> String {
         IO::MemoryWriter memory;
 
-        for (auto &codepoint : current_line())
+        for (auto &rune : current_line())
         {
-            //char buffer[5];
-            //codepoint_to_utf8(codepoint, (uint8_t *)buffer);
-            IO::write(memory, (char)codepoint);
+            char buffer[5];
+            Text::rune_to_utf8(rune, (uint8_t *)buffer);
+            IO::write(memory, buffer);
         }
 
         return memory.string();
@@ -139,9 +139,9 @@ ResultOr<String> readline(
         else
         {
             recall_history();
-            Codepoint codepoint = scan.peek_codepoint();
-            scan.next_codepoint();
-            editor.insert(codepoint);
+            Text::Rune rune = scan.peek_rune();
+            scan.next_rune();
+            editor.insert(rune);
         }
 
         TRY(render());

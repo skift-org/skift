@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/Common.h>
+#include <libutils/Prelude.h>
 
 #define ELF_MAG0 0x7F
 #define ELF_MAG1 'E'

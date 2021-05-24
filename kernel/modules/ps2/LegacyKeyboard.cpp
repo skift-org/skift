@@ -55,7 +55,7 @@ Key LegacyKeyboard::scancode_to_key(int scancode)
     return KEYBOARD_KEY_INVALID;
 }
 
-Codepoint LegacyKeyboard::key_to_codepoint(Key key)
+Text::Rune LegacyKeyboard::key_to_rune(Key key)
 {
     if (!_keymap)
     {
@@ -73,15 +73,15 @@ Codepoint LegacyKeyboard::key_to_codepoint(Key key)
     if (_keystate[KEYBOARD_KEY_LSHIFT] == KEY_MOTION_DOWN ||
         _keystate[KEYBOARD_KEY_RSHIFT] == KEY_MOTION_DOWN)
     {
-        return mapping->shift_codepoint;
+        return mapping->shift_rune;
     }
     else if (_keystate[KEYBOARD_KEY_RALT] == KEY_MOTION_DOWN)
     {
-        return mapping->alt_codepoint;
+        return mapping->alt_rune;
     }
     else
     {
-        return mapping->regular_codepoint;
+        return mapping->regular_rune;
     }
 }
 
@@ -128,14 +128,14 @@ void LegacyKeyboard::handle_key(Key key, KeyMotion motion)
         return;
     }
 
-    Codepoint codepoint = key_to_codepoint(key);
+    Text::Rune rune = key_to_rune(key);
 
     if (_keystate[key] == KEY_MOTION_UP && motion == KEY_MOTION_DOWN)
     {
         KeyboardPacket packet = {
             key,
             modifiers(),
-            codepoint,
+            rune,
             KEY_MOTION_DOWN,
         };
 
@@ -147,7 +147,7 @@ void LegacyKeyboard::handle_key(Key key, KeyMotion motion)
         KeyboardPacket packet = {
             key,
             modifiers(),
-            codepoint,
+            rune,
             KEY_MOTION_UP,
         };
 
@@ -159,7 +159,7 @@ void LegacyKeyboard::handle_key(Key key, KeyMotion motion)
         KeyboardPacket packet = {
             key,
             modifiers(),
-            codepoint,
+            rune,
             KEY_MOTION_TYPED,
         };
 

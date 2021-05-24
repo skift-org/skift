@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Random.h>
+#include <libmath/Random.h>
 #include <libutils/Vector.h>
 
 #include "snake/model/Fruit.h"
@@ -19,7 +19,7 @@ private:
 
     Snake _snake;
     Vector<Fruit> _fruits;
-    Random _random;
+    Math::Random _random;
 
 public:
     int width() { return _width; }

@@ -34,12 +34,12 @@ RefPtr<Element> RessourceMonitor::build()
     return hflow({
         stack({
             fill(graph(_cpu_model, Graphic::Colors::SEAGREEN)),
-            fill(spacing({0, 12}, label("CPU", Anchor::CENTER))),
+            fill(spacing({0, 12}, label("CPU", Math::Anchor::CENTER))),
         }),
         separator(),
         stack({
             fill(graph(_ram_model, Graphic::Colors::ROYALBLUE)),
-            fill(spacing({0, 12}, label("RAM", Anchor::CENTER))),
+            fill(spacing({0, 12}, label("RAM", Math::Anchor::CENTER))),
         }),
     });
 }

@@ -1,6 +1,5 @@
 #include <libio/Streams.h>
 #include <libsystem/system/Memory.h>
-#include <libsystem/utils/Hexdump.h>
 #include <libutils/Assert.h>
 
 #include "compositor/Client.h"
@@ -156,7 +155,6 @@ void Client::handle_request()
     if (message_size != sizeof(CompositorMessage))
     {
         IO::logln("Got a message with an invalid size from client {} != {}!", sizeof(CompositorMessage), message_size);
-        hexdump(&message, message_size);
 
         _disconnected = true;
         client_destroy_disconnected();
@@ -199,7 +197,6 @@ void Client::handle_request()
 
     default:
         IO::logln("Invalid message for client {08x}", this);
-        hexdump(&message, message_size);
 
         _disconnected = true;
         client_destroy_disconnected();
@@ -243,7 +240,14 @@ Iteration destroy_window_if_client_match(Client *client, Window *window)
 
 void client_close_all_windows(Client *client)
 {
-    list_iterate(manager_get_windows(), client, (ListIterationCallback)destroy_window_if_client_match);
+    manager_get_windows().foreach([&](auto *window) {
+        if (window->client() == client)
+        {
+            delete window;
+        }
+
+        return Iteration::CONTINUE;
+    });
 }
 
 Client::~Client()
@@ -255,7 +259,7 @@ Client::~Client()
 
 void client_broadcast(CompositorMessage message)
 {
-    _clients.foreach ([&](auto &client) {
+    _clients.foreach([&](auto &client) {
         client->send_message(message);
         return Iteration::CONTINUE;
     });

@@ -63,18 +63,18 @@ void TextEditor::paint(Graphic::Painter &painter, const Math::Recti &)
         int advance = 0;
         for (size_t j = 0; j < line.length(); j++)
         {
-            Codepoint codepoint = line[j];
+            Text::Rune rune = line[j];
 
             if (i == _cursor.line() && j == _cursor.column())
             {
                 paint_cursor(painter, advance);
             }
 
-            if (codepoint == U'\t')
+            if (rune == U'\t')
             {
                 advance += font()->mesure(U' ').width();
             }
-            else if (codepoint == U'\r')
+            else if (rune == U'\r')
             {
                 // ignore
             }
@@ -82,7 +82,7 @@ void TextEditor::paint(Graphic::Painter &painter, const Math::Recti &)
             {
                 auto span = _model->span_at(i, j);
 
-                auto glyph = font()->glyph(codepoint);
+                auto glyph = font()->glyph(rune);
                 painter.draw_glyph(*font(), glyph, {advance, baseline}, color(span.foreground()));
                 advance += glyph.advance;
             }
@@ -203,9 +203,9 @@ void TextEditor::event(Event *event)
                 _model->newline_at(_cursor);
                 scroll_to_cursor();
             }
-            else if (event->keyboard.codepoint != 0)
+            else if (event->keyboard.rune != 0)
             {
-                _model->append_at(_cursor, event->keyboard.codepoint);
+                _model->append_at(_cursor, event->keyboard.rune);
                 scroll_to_cursor();
             }
         }

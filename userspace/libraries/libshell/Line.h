@@ -1,12 +1,12 @@
 #pragma once
 
+#include <libtext/Rune.h>
 #include <libutils/Vector.h>
-#include <libutils/unicode/Codepoint.h>
 
 namespace Shell
 {
 
-struct Line : public Vector<Codepoint>
+struct Line : public Vector<Text::Rune>
 {
 };
 

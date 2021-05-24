@@ -1,8 +1,8 @@
 #pragma once
+
 #include <libcompression/Common.h>
 #include <libio/BitWriter.h>
 #include <libio/Reader.h>
-#include <libsystem/Common.h>
 #include <libsystem/Result.h>
 
 namespace Compression

@@ -4,6 +4,9 @@
 
 #include <libutils/String.h>
 
+namespace Text
+{
+
 class FuzzyMatcher
 {
 private:
@@ -30,3 +33,5 @@ public:
         return pattern_index == pattern.length();
     }
 };
+
+} // namespace Text

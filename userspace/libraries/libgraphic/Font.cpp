@@ -62,11 +62,11 @@ ResultOr<RefPtr<Font>> Font::get(String name)
     return _fonts[name];
 }
 
-bool Font::has(Codepoint codepoint) const
+bool Font::has(Text::Rune rune) const
 {
-    for (int i = 0; _glyphs[i].codepoint != 0; i++)
+    for (int i = 0; _glyphs[i].rune != 0; i++)
     {
-        if (_glyphs[i].codepoint == codepoint)
+        if (_glyphs[i].rune == rune)
         {
             return true;
         }
@@ -75,11 +75,11 @@ bool Font::has(Codepoint codepoint) const
     return false;
 }
 
-const Glyph &Font::glyph(Codepoint codepoint) const
+const Glyph &Font::glyph(Text::Rune rune) const
 {
-    for (int i = 0; _glyphs[i].codepoint != 0; i++)
+    for (int i = 0; _glyphs[i].rune != 0; i++)
     {
-        if (_glyphs[i].codepoint == codepoint)
+        if (_glyphs[i].rune == rune)
         {
             return _glyphs[i];
         }
@@ -88,9 +88,9 @@ const Glyph &Font::glyph(Codepoint codepoint) const
     return _default;
 }
 
-Math::Recti Font::mesure(Codepoint codepoint) const
+Math::Recti Font::mesure(Text::Rune rune) const
 {
-    auto &g = glyph(codepoint);
+    auto &g = glyph(rune);
 
     return {g.advance, metrics().lineheight()};
 }
@@ -99,8 +99,8 @@ Math::Recti Font::mesure(const char *string) const
 {
     int width = 0;
 
-    codepoint_foreach(reinterpret_cast<const uint8_t *>(string), [&](auto codepoint) {
-        auto &g = glyph(codepoint);
+    Text::rune_foreach(reinterpret_cast<const uint8_t *>(string), [&](auto rune) {
+        auto &g = glyph(rune);
         width += g.advance;
     });
 
@@ -111,8 +111,8 @@ Math::Recti Font::mesure_with_fulllineheight(const char *string)
 {
     int width = 0;
 
-    codepoint_foreach(reinterpret_cast<const uint8_t *>(string), [&](auto codepoint) {
-        auto &g = glyph(codepoint);
+    Text::rune_foreach(reinterpret_cast<const uint8_t *>(string), [&](auto rune) {
+        auto &g = glyph(rune);
         width += g.advance;
     });
 

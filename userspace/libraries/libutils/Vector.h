@@ -1,29 +1,21 @@
 #pragma once
 
-#include <initializer_list>
-#include <type_traits>
-
 #include <string.h>
 
 #include <libmath/MinMax.h>
-
 #include <libutils/Iteration.h>
-#include <libutils/New.h>
 #include <libutils/RefPtr.h>
+#include <libutils/Std.h>
+
+namespace Utils
+{
 
 template <typename T>
 void typed_copy(T *destination, T *source, size_t count)
 {
-    if constexpr (std::is_trivially_copyable_v<T>)
+    for (size_t i = 0; i < count; i++)
     {
-        memcpy(destination, source, sizeof(T) * count);
-    }
-    else
-    {
-        for (size_t i = 0; i < count; i++)
-        {
-            new (&destination[i]) T(source[i]);
-        }
+        new (&destination[i]) T(source[i]);
     }
 }
 
@@ -34,11 +26,11 @@ void typed_move(T *destination, T *source, size_t count)
     {
         if (destination <= source)
         {
-            new (&destination[i]) T(move(source[i]));
+            new (&destination[i]) T(std::move(source[i]));
         }
         else
         {
-            new (&destination[count - i - 1]) T(move(source[count - i - 1]));
+            new (&destination[count - i - 1]) T(std::move(source[count - i - 1]));
         }
     }
 }
@@ -107,9 +99,9 @@ public:
 
     Vector(Vector &&other)
     {
-        swap(_storage, other._storage);
-        swap(_count, other._count);
-        swap(_capacity, other._capacity);
+        std::swap(_storage, other._storage);
+        std::swap(_count, other._count);
+        std::swap(_capacity, other._capacity);
     }
 
     ~Vector()
@@ -138,9 +130,9 @@ public:
     {
         if (this != &other)
         {
-            swap(_storage, other._storage);
-            swap(_count, other._count);
-            swap(_capacity, other._capacity);
+            std::swap(_storage, other._storage);
+            std::swap(_count, other._count);
+            std::swap(_capacity, other._capacity);
         }
 
         return *this;
@@ -195,19 +187,16 @@ public:
             return;
         }
 
-        if constexpr (!std::is_trivially_destructible_v<T>)
+        for (size_t i = 0; i < _count; i++)
         {
-            for (size_t i = 0; i < _count; i++)
-            {
-                _storage[i].~T();
-            }
+            _storage[i].~T();
         }
 
         _count = 0;
     }
 
     template <typename Callback>
-    Iteration foreach (Callback callback) const
+    Iteration foreach(Callback callback) const
     {
         for (size_t i = 0; i < _count; i++)
         {
@@ -243,7 +232,7 @@ public:
             {
                 if (comparator(_storage[i], _storage[j]) > 0)
                 {
-                    swap(_storage[i], _storage[j]);
+                    std::swap(_storage[i], _storage[j]);
                 }
             }
         }
@@ -302,7 +291,7 @@ public:
 
         for (size_t i = 0; i < _count; i++)
         {
-            new (&new_storage[i]) T(move(_storage[i]));
+            new (&new_storage[i]) T(std::move(_storage[i]));
         }
 
         free(_storage);
@@ -319,7 +308,7 @@ public:
 
             for (size_t i = 0; i < _count; i++)
             {
-                new (&new_storage[i]) T(move(_storage[i]));
+                new (&new_storage[i]) T(std::move(_storage[i]));
             }
 
             free(_storage);
@@ -342,7 +331,7 @@ public:
 
             for (size_t i = 0; i < _count; i++)
             {
-                new (&new_storage[i]) T(move(_storage[i]));
+                new (&new_storage[i]) T(std::move(_storage[i]));
                 _storage[i].~T();
             }
 
@@ -365,11 +354,11 @@ public:
 
         for (size_t j = _count - 1; j > index; j--)
         {
-            new (&_storage[j]) T(move(_storage[j - 1]));
+            new (&_storage[j]) T(std::move(_storage[j - 1]));
             at(j - 1).~T();
         }
 
-        new (&_storage[index]) T(move(value));
+        new (&_storage[index]) T(std::move(value));
 
         return _storage[index];
     }
@@ -421,7 +410,7 @@ public:
 
         for (size_t i = index; i < _count - 1; ++i)
         {
-            new (&_storage[i]) T(move(_storage[i + 1]));
+            new (&_storage[i]) T(std::move(_storage[i + 1]));
             _storage[i + 1].~T();
         }
 
@@ -472,7 +461,7 @@ public:
     {
         assert(index < _count);
 
-        T copy = move(_storage[index]);
+        T copy = std::move(_storage[index]);
         remove_index(index);
         return copy;
     }
@@ -484,7 +473,7 @@ public:
 
     T &push(T &&value)
     {
-        return insert(0, move(value));
+        return insert(0, std::move(value));
     }
 
     template <typename... Args>
@@ -494,11 +483,11 @@ public:
 
         for (size_t j = _count - 1; j > 0; j--)
         {
-            new (&_storage[j]) T(move(_storage[j - 1]));
+            new (&_storage[j]) T(std::move(_storage[j - 1]));
             at(j - 1).~T();
         }
 
-        new (&_storage[0]) T(forward<Args>(args)...);
+        new (&_storage[0]) T(std::forward<Args>(args)...);
         return _storage[0];
     }
 
@@ -509,7 +498,7 @@ public:
 
     T &push_back(T &&value)
     {
-        return insert(_count, move(value));
+        return insert(_count, std::move(value));
     }
 
     template <typename... Args>
@@ -517,7 +506,7 @@ public:
     {
         grow();
 
-        new (&_storage[_count - 1]) T(forward<Args>(args)...);
+        new (&_storage[_count - 1]) T(std::forward<Args>(args)...);
         return _storage[_count - 1];
     }
 
@@ -541,7 +530,7 @@ public:
     {
         assert(_count > 0);
 
-        T value = move(_storage[0]);
+        T value = std::move(_storage[0]);
         remove_index(0);
 
         return value;
@@ -551,7 +540,7 @@ public:
     {
         assert(_count > 0);
 
-        T value = move(_storage[_count - 1]);
+        T value = std::move(_storage[_count - 1]);
         remove_index(_count - 1);
 
         return value;
@@ -582,25 +571,8 @@ public:
         return false;
     }
 
-    // Vector iteration
-    class iterator
-    {
-    public:
-        iterator(T *ptr) : _ptr(ptr) {}
-        iterator operator++()
-        {
-            ++_ptr;
-            return *this;
-        }
-        bool operator!=(const iterator &other) const { return _ptr != other._ptr; }
-        const T &operator*() const { return *_ptr; }
-
-    private:
-        T *_ptr;
-    };
-
-    iterator begin() const { return iterator(_storage); }
-    iterator end() const { return iterator(_storage + _count); }
+    ContiguousIterator<T> begin() const { return _storage; }
+    ContiguousIterator<T> end() const { return _storage + _count; }
 };
 
 template <typename T>
@@ -621,3 +593,5 @@ struct TrimVector<Vector<T>>
 {
     typedef T type;
 };
+
+} // namespace Utils

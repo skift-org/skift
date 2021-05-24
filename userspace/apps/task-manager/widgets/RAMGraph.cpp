@@ -43,9 +43,9 @@ RefPtr<Element> RAMGraphComponent::build()
                             label("Memory")
                         }),
                         spacer(),
-                        label(IO::format("Usage: {} Mio", usage), Anchor::RIGHT),
-                        label(IO::format("Available: {} Mio", available), Anchor::RIGHT),
-                        label(IO::format("Most greedy: {}", _tasks->ram_greedy()), Anchor::RIGHT),
+                        label(IO::format("Usage: {} Mio", usage),Math::Anchor::RIGHT),
+                        label(IO::format("Available: {} Mio", available),Math::Anchor::RIGHT),
+                        label(IO::format("Most greedy: {}", _tasks->ram_greedy()),Math::Anchor::RIGHT),
                     })
                 );
             })

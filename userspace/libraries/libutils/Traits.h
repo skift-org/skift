@@ -1,6 +1,9 @@
 #pragma once
 
-#include <libsystem/Common.h>
+#include <libutils/Prelude.h>
+
+namespace Utils
+{
 
 template <bool B, class T = void>
 struct EnableIf
@@ -550,3 +553,5 @@ struct Max<arg1, arg2, others...>
 {
     static constexpr size_t value = arg1 >= arg2 ? Max<arg1, others...>::value : Max<arg2, others...>::value;
 };
+
+} // namespace Utils

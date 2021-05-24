@@ -4,10 +4,10 @@
 #include <libio/Read.h>
 #include <libio/ReadCounter.h>
 #include <libio/Writer.h>
-#include <libsystem/Common.h>
 #include <libsystem/Result.h>
 #include <libutils/Assert.h>
 #include <libutils/HashMap.h>
+#include <libutils/Prelude.h>
 #include <libutils/Vector.h>
 
 namespace Compression

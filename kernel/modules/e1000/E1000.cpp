@@ -1,5 +1,4 @@
 #include "system/Streams.h"
-#include <libsystem/utils/Hexdump.h>
 
 #include "e1000/E1000.h"
 
@@ -240,7 +239,6 @@ ResultOr<size_t> E1000::read(size64_t offset, void *buffer, size_t size)
 
     size_t packet_size = receive_packet(buffer, size);
     Kernel::logln("Packet receive (size={})", packet_size);
-    hexdump(buffer, packet_size);
 
     return packet_size;
 }
@@ -251,7 +249,6 @@ ResultOr<size_t> E1000::write(size64_t offset, const void *buffer, size_t size)
 
     size_t packet_size = send_packet(buffer, size);
     Kernel::logln("Packet send (size={})", packet_size);
-    hexdump(buffer, packet_size);
 
     return packet_size;
 }

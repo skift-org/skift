@@ -1,10 +1,13 @@
 #pragma once
 
 #include <libutils/Hash.h>
-#include <libutils/Move.h>
 #include <libutils/RefPtr.h>
 #include <libutils/Slice.h>
+#include <libutils/Std.h>
 #include <libutils/StringStorage.h>
+
+namespace Utils
+{
 
 class String :
     public RawStorage
@@ -84,7 +87,7 @@ public:
     }
 
     String(String &&other)
-        : _storage(move(other._storage))
+        : _storage(std::move(other._storage))
     {
     }
 
@@ -102,7 +105,7 @@ public:
     {
         if (this != &other)
         {
-            swap(_storage, other._storage);
+            std::swap(_storage, other._storage);
         }
 
         return *this;
@@ -175,3 +178,5 @@ inline uint32_t hash<String>(const String &value)
 {
     return hash(value.cstring(), value.length());
 }
+
+} // namespace Utils

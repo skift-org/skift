@@ -2,7 +2,7 @@
 
 #include <skift/Time.h>
 
-#include <libsystem/Common.h>
+#include <libutils/Prelude.h>
 #include <libutils/SourceLocation.h>
 
 #include "system/handover/Handover.h"
@@ -28,7 +28,7 @@ ElapsedTime system_get_uptime();
     system_panic_internal(::Utils::SourceLocation::current(), __context, __args)
 
 void NO_RETURN system_panic_internal(
-    Utils::SourceLocation location,
+    SourceLocation location,
     void *stackframe,
     const char *message,
     ...);

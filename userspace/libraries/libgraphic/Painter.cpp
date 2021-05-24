@@ -4,8 +4,8 @@
 #include <libgraphic/Font.h>
 #include <libgraphic/Painter.h>
 #include <libgraphic/StackBlur.h>
+#include <libmath/Random.h>
 #include <libutils/Assert.h>
-#include <libutils/Random.h>
 
 namespace Graphic
 {
@@ -316,13 +316,13 @@ FLATTEN void Painter::draw_line(Math::Vec2i a, Math::Vec2i b, Color color)
     const bool steep = fabs(y1 - a.y()) > fabs(x1 - x0);
     if (steep)
     {
-        swap(x0, y0);
-        swap(x1, y1);
+        std::swap(x0, y0);
+        std::swap(x1, y1);
     }
     if (x0 > x1)
     {
-        swap(x0, x1);
-        swap(y0, y1);
+        std::swap(x0, x1);
+        std::swap(y0, y1);
     }
 
     const float dx = x1 - x0;
@@ -515,14 +515,14 @@ void Painter::draw_glyph(Font &font, const Glyph &glyph, Math::Vec2i position, C
 
 FLATTEN void Painter::draw_string(Font &font, const char *str, Math::Vec2i position, Color color)
 {
-    codepoint_foreach(reinterpret_cast<const uint8_t *>(str), [&](auto codepoint) {
-        auto &glyph = font.glyph(codepoint);
+    Text::rune_foreach(reinterpret_cast<const uint8_t *>(str), [&](auto rune) {
+        auto &glyph = font.glyph(rune);
         draw_glyph(font, glyph, position, color);
         position = position + Math::Vec2i(glyph.advance, 0);
     });
 }
 
-void Painter::draw_string_within(Font &font, const char *str, Math::Recti container, Anchor anchor, Color color)
+void Painter::draw_string_within(Font &font, const char *str, Math::Recti container, Math::Anchor anchor, Color color)
 {
     Math::Recti bound = font.mesure(str);
 
@@ -572,13 +572,13 @@ FLATTEN void Painter::saturation(Math::Recti rectangle, float value)
 
 FLATTEN void Painter::noise(Math::Recti rectangle, float opacity)
 {
-    Random rand{0x12341234};
+    Math::Random random{0x12341234};
 
     for (int y = 0; y < rectangle.height(); y++)
     {
         for (int x = 0; x < rectangle.width(); x++)
         {
-            double noise = rand.next_double();
+            double noise = random.next_double();
             plot({rectangle.x() + x, rectangle.y() + y}, Color::from_rgba(noise, noise, noise, opacity));
         }
     }

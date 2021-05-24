@@ -1,5 +1,8 @@
 #pragma once
 
+namespace Utils
+{
+
 enum class AdoptTag
 {
     __value
@@ -31,3 +34,5 @@ constexpr auto WRAP = WrapTag::__value;
 
 /* The object should be empty initialized */
 constexpr auto NONE = NoneTag::__value;
+
+} // namespace Utils

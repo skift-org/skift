@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libsystem/Common.h>
 #include <libutils/Callback.h>
+#include <libutils/Prelude.h>
 
 #include "system/devices/DeviceAddress.h"
 #include "system/devices/DeviceClass.h"

@@ -1,5 +1,8 @@
 #pragma once
 
+namespace Math
+{
+
 enum class Anchor
 {
     LEFT,
@@ -12,3 +15,5 @@ enum class Anchor
     BOTTOM_CENTER,
     BOTTOM_RIGHT,
 };
+
+} // namespace Math

@@ -1,9 +1,10 @@
 #pragma once
 
-#include <initializer_list>
-
 #include <libmath/MinMax.h>
 #include <libutils/Assert.h>
+
+namespace Utils
+{
 
 template <typename T, size_t N>
 class Array
@@ -87,23 +88,15 @@ public:
         return true;
     }
 
-    // Array iteration
-    class iterator
+    constexpr ContiguousIterator<T> begin() const
     {
-    public:
-        iterator(T *ptr) : _ptr(ptr) {}
-        iterator operator++()
-        {
-            ++_ptr;
-            return *this;
-        }
-        bool operator!=(const iterator &other) const { return _ptr != other._ptr; }
-        const T &operator*() const { return *_ptr; }
+        return _storage;
+    }
 
-    private:
-        T *_ptr;
-    };
-
-    constexpr iterator begin() const { return iterator(_storage); }
-    constexpr iterator end() const { return iterator(_storage + N); }
+    constexpr ContiguousIterator<T> end() const
+    {
+        return _storage + N;
+    }
 };
+
+} // namespace Utils

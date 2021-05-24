@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Random.h>
+#include <libmath/Random.h>
 
 #include "neko/model/Behavior.h"
 

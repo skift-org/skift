@@ -45,14 +45,14 @@ public:
         Graphic::Painter &painter,
         int x,
         int y,
-        Codepoint codepoint,
+        Text::Rune rune,
         Terminal::Color foreground,
         Terminal::Color background,
         Terminal::Attributes attributes);
 
     void paint_cell(Graphic::Painter &painter, int x, int y, Terminal::Cell cell)
     {
-        paint_cell(painter, x, y, cell.codepoint, cell.attributes.foreground, cell.attributes.background, cell.attributes);
+        paint_cell(painter, x, y, cell.rune, cell.attributes.foreground, cell.attributes.background, cell.attributes);
     }
 
     void paint(Graphic::Painter &, const Math::Recti &) override;

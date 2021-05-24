@@ -1,13 +1,13 @@
 #pragma once
 
-#include <libutils/Random.h>
+#include <libmath/Random.h>
 
 #include "unix/UNIXDevice.h"
 
 class UnixRandom : public UNIXDevice
 {
 private:
-    Random _random{};
+    Math::Random _random{};
 
 public:
     UnixRandom(DeviceAddress address) : UNIXDevice(address, DeviceClass::RANDOM)

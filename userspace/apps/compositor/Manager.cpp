@@ -2,22 +2,22 @@
 #include "compositor/Renderer.h"
 #include "compositor/Window.h"
 
-static List *_managed_windows;
+static List<Window *> *_managed_windows;
 static Window *_focused_window = nullptr;
 
 void manager_initialize()
 {
-    _managed_windows = list_create();
+    _managed_windows = new List<Window *>();
 }
 
-List *manager_get_windows()
+List<Window *> &manager_get_windows()
 {
-    return _managed_windows;
+    return *_managed_windows;
 }
 
 Window *manager_get_window(struct Client *client, int id)
 {
-    list_foreach(Window, window, _managed_windows)
+    for (auto *window : *_managed_windows)
     {
         if (window->client() == client && window->id() == id)
         {
@@ -55,9 +55,9 @@ void manager_register_window(Window *window)
 void manager_unregister_window(Window *window)
 {
     renderer_region_dirty(window->bound());
-    list_remove(_managed_windows, window);
+    _managed_windows->remove(window);
 
-    manager_set_focus_window((Window *)list_peek(_managed_windows));
+    manager_set_focus_window(_managed_windows->peek());
 }
 
 void manager_set_focus_window(Window *window)
@@ -71,8 +71,8 @@ void manager_set_focus_window(Window *window)
 
     if (_focused_window)
     {
-        list_remove(_managed_windows, window);
-        list_push(_managed_windows, window);
+        _managed_windows->remove(window);
+        _managed_windows->push(window);
 
         window->get_focus();
     }

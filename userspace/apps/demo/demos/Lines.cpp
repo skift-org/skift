@@ -1,4 +1,4 @@
-#include <libutils/Random.h>
+#include <libmath/Random.h>
 
 #include "demo/Demo.h"
 
@@ -9,7 +9,7 @@ struct Line
     Graphic::Color color;
 };
 
-static Random _random = {};
+static Math::Random _random = {};
 
 void lines_draw(Graphic::Painter &painter, Math::Recti screen, float time)
 {

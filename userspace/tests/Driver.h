@@ -24,9 +24,9 @@ struct Test
     Flags flags;
     const char *name;
     TestFunction function;
-    Utils::SourceLocation location;
+    SourceLocation location;
 
-    Test(Flags flags, const char *name, TestFunction function, Utils::SourceLocation location = Utils::SourceLocation::current())
+    Test(Flags flags, const char *name, TestFunction function, SourceLocation location = SourceLocation::current())
     {
         this->flags = flags;
         this->name = name;

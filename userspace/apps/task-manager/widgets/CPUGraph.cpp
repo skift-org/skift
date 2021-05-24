@@ -48,9 +48,9 @@ RefPtr<Element> CPUGraphComponent::build()
                             label("Processor")
                         }),
                         spacer(),
-                        label(IO::format("Average: {}%", (int)(_usage->average() * 100)), Anchor::RIGHT),
-                        label(IO::format("Most greedy: {}", _tasks->cpu_greedy()), Anchor::RIGHT),
-                        label(IO::format("Uptime: {03}:{02}:{02}:{02}", days, hours, minutes, seconds), Anchor::RIGHT)
+                        label(IO::format("Average: {}%", (int)(_usage->average() * 100)),Math::Anchor::RIGHT),
+                        label(IO::format("Most greedy: {}", _tasks->cpu_greedy()),Math::Anchor::RIGHT),
+                        label(IO::format("Uptime: {03}:{02}:{02}:{02}", days, hours, minutes, seconds),Math::Anchor::RIGHT)
                     })
                 );
             })

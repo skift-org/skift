@@ -31,7 +31,7 @@ void MessageBox::render(Window *window)
 {
     window->size(Math::Vec2i(300, 200));
 
-    auto message_label = window->root()->add(label(_message, Anchor::CENTER));
+    auto message_label = window->root()->add(label(_message, Math::Anchor::CENTER));
     message_label->flags(Element::FILL);
 
     auto container = window->root()->add<Element>();

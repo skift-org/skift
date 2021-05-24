@@ -30,10 +30,10 @@ RefPtr<TextModel> TextModel::open(String path)
         auto line = own<TextModelLine>();
 
         while (!scan.ended() &&
-               scan.peek_codepoint() != '\n')
+               scan.peek_rune() != '\n')
         {
-            line->append(scan.peek_codepoint());
-            scan.next_codepoint();
+            line->append(scan.peek_rune());
+            scan.next_rune();
         }
 
         scan.skip('\n'); // skip the \n
@@ -69,10 +69,10 @@ RefPtr<TextModel> TextModel::create(String text)
         auto line = own<TextModelLine>();
 
         while (!scan.ended() &&
-               scan.peek_codepoint() != '\n')
+               scan.peek_rune() != '\n')
         {
-            line->append(scan.peek_codepoint());
-            scan.next_codepoint();
+            line->append(scan.peek_rune());
+            scan.next_rune();
         }
 
         scan.skip('\n'); // skip the \n
@@ -102,7 +102,7 @@ String TextModel::string()
         for (size_t j = 0; j < _lines[i]->length(); j++)
         {
             char buffer[5];
-            codepoint_to_utf8(_lines[i]->operator[](j), (uint8_t *)buffer);
+            Text::rune_to_utf8(_lines[i]->operator[](j), (uint8_t *)buffer);
             IO::write(memory, buffer);
         }
 
@@ -121,9 +121,9 @@ ResultOr<size_t> TextModel::save(String path)
     return IO::write(file, string());
 }
 
-void TextModel::append_at(TextCursor &cursor, Codepoint codepoint)
+void TextModel::append_at(TextCursor &cursor, Text::Rune rune)
 {
-    line(cursor.line()).append_at(cursor.column(), codepoint);
+    line(cursor.line()).append_at(cursor.column(), rune);
     cursor.move_right_within(*this);
     did_update();
 }

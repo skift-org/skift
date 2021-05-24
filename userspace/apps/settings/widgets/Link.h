@@ -20,7 +20,7 @@ RefPtr<Widget::Element> link(
             spacing({8, 24},
                 vflow(4, {
                     fill(icon),
-                    label(text, Anchor::CENTER)
+                    label(text,Math::Anchor::CENTER)
                 })
             ),
             on_click

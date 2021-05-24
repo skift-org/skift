@@ -48,7 +48,7 @@ public:
         _cursor = _line.count();
     }
 
-    void insert(Codepoint cp)
+    void insert(Text::Rune cp)
     {
         _line.insert(_cursor, cp);
         _cursor++;

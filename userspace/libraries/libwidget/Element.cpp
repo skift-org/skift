@@ -358,7 +358,7 @@ void Element::should_repaint(Math::Recti rectangle)
 void Element::on(EventType event_type, EventHandler handler)
 {
     assert(event_type < EventType::__COUNT);
-    _handlers[event_type] = move(handler);
+    _handlers[event_type] = std::move(handler);
 }
 
 void Element::dispatch_event(Event *event)

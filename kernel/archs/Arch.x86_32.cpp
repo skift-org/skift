@@ -103,11 +103,6 @@ NO_RETURN void shutdown()
     system_stop();
 }
 
-void panic_dump()
-{
-    cpuid_dump();
-}
-
 struct Stackframe
 {
     Stackframe *ebp;

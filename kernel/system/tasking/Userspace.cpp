@@ -1,8 +1,8 @@
-#include "system/Streams.h"
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 
+#include "system/Streams.h"
 #include "system/graphics/EarlyConsole.h"
 #include "system/system/System.h"
 #include "system/tasking/Userspace.h"

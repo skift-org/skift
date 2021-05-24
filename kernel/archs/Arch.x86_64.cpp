@@ -92,11 +92,6 @@ NO_RETURN void shutdown()
     ASSERT_NOT_REACHED();
 }
 
-void panic_dump()
-{
-    cpuid_dump();
-}
-
 struct Stackframe
 {
     Stackframe *rbp;

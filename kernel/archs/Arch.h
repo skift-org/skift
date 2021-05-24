@@ -33,8 +33,6 @@ NO_RETURN void reboot();
 
 NO_RETURN void shutdown();
 
-void panic_dump();
-
 void dump_stack_frame(void *stackframe);
 
 void backtrace();

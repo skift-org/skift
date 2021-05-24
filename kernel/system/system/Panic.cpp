@@ -126,7 +126,6 @@ void system_panic_internal(SourceLocation location, void *stackframe, const char
     if (!nested_panic)
     {
         task_dump(scheduler_running());
-        Arch::panic_dump();
     }
 
     Kernel::logln("");

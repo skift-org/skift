@@ -148,5 +148,3 @@ extern "C" uint32_t cpuid_get_feature_ECX();
 extern uint32_t cpuid_get_feature_EDX();
 extern uint32_t cpuid_get_feature_ECX();
 #endif
-
-void cpuid_dump();

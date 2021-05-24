@@ -1,7 +1,6 @@
 #include <assert.h>
 #include <skift/Plugs.h>
 
-#include "system/Streams.h"
 #include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
@@ -9,6 +8,7 @@
 
 #include "archs/Arch.h"
 
+#include "system/Streams.h"
 #include "system/graphics/EarlyConsole.h"
 #include "system/interrupts/Interupts.h"
 #include "system/memory/Memory.h"

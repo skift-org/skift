@@ -1,11 +1,10 @@
 
-#include "system/Streams.h"
 #include <assert.h>
-#include <libsystem/io/Stream.h>
 #include <string.h>
 
 #include "archs/Arch.h"
 
+#include "system/Streams.h"
 #include "system/graphics/Graphics.h"
 #include "system/interrupts/Interupts.h"
 #include "system/memory/Memory.h"
@@ -77,9 +76,9 @@ void memory_initialize(Handover *handover)
 
 void memory_dump()
 {
-    stream_format(out_stream, "\n\tMemory status:");
-    stream_format(out_stream, "\n\t - Used  physical Memory: %12dkib", USED_MEMORY / 1024);
-    stream_format(out_stream, "\n\t - Total physical Memory: %12dkib", TOTAL_MEMORY / 1024);
+    Kernel::logln("\tMemory status:");
+    Kernel::logln("\t - Used  physical Memory: {12d}kib", USED_MEMORY / 1024);
+    Kernel::logln("\t - Total physical Memory: {12d}kib", TOTAL_MEMORY / 1024);
 }
 
 size_t memory_get_used()

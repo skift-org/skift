@@ -129,8 +129,9 @@ void system_panic_internal(SourceLocation location, void *stackframe, const char
     }
 
     Kernel::logln("");
-
     Kernel::logln("\tSystem halted!");
+    Kernel::logln("");
+
     Kernel::logln("--------------------------------------------------------------------------------");
     Kernel::logln("");
 

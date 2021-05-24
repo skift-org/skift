@@ -106,13 +106,13 @@ void backtrace_internal(uint64_t rbp)
     while (stackframe)
     {
         empty = false;
-        stream_format(log_stream, "\t%016x\n", stackframe->rip);
+        Kernel::logln("\t{016x}", stackframe->rip);
         stackframe = stackframe->rbp;
     }
 
     if (empty)
     {
-        stream_format(log_stream, "\t[EMPTY]\n");
+        Kernel::logln("\t[EMPTY]");
     }
 }
 
@@ -120,48 +120,48 @@ void dump_stack_frame(void *sfptr)
 {
     auto stackframe = reinterpret_cast<x86_64::InterruptStackFrame *>(sfptr);
 
-    stream_format(out_stream, "\tRAX=%016x RBX=%016x RCX=%016x \n",
+    Kernel::logln("\tRAX={016x} RBX={016x} RCX={016x}",
                   stackframe->rax,
                   stackframe->rbx,
                   stackframe->rcx);
 
-    stream_format(out_stream, "\tRDX=%016x RSI=%016x RDI=%016x\n",
+    Kernel::logln("\tRDX={016x} RSI={016x} RDI={016x}",
                   stackframe->rdx,
                   stackframe->rsi,
                   stackframe->rdi);
 
-    stream_format(out_stream, "\tR08=%016x R09=%016x R10=%016x\n",
+    Kernel::logln("\tR08={016x} R09={016x} R10={016x}",
                   stackframe->r8,
                   stackframe->r9,
                   stackframe->r10);
 
-    stream_format(out_stream, "\tR11=%016x R12=%016x R13=%016x\n",
+    Kernel::logln("\tR11={016x} R12={016x} R13={016x}",
                   stackframe->r11,
                   stackframe->r12,
                   stackframe->r13);
 
-    stream_format(out_stream, "\tR14=%016x R15=%016x RBP=%016x\n",
+    Kernel::logln("\tR14={016x} R15={016x} RBP={016x}",
                   stackframe->r14,
                   stackframe->r15,
                   stackframe->rbp);
 
-    stream_format(out_stream, "\n");
+    Kernel::logln("");
 
-    stream_format(out_stream, "\tINT=%08x ERR=%08x\n", stackframe->intno, stackframe->err);
+    Kernel::logln("\tINT={08x} ERR={08x}\n", stackframe->intno, stackframe->err);
 
-    stream_format(out_stream, "\n");
+    Kernel::logln("");
 
-    stream_format(out_stream, "\tRIP=%016x  CS=%016x FLG=%016x\n"
-                              "\tRSP=%016x  SS=%016x",
+    Kernel::logln("\tRIP={016x}  CS={016x} FLG={016x}\n"
+                  "\tRSP={016x}  SS={016x}",
                   stackframe->rip,
                   stackframe->cs,
                   stackframe->rflags,
                   stackframe->rsp,
                   stackframe->ss);
 
-    stream_format(out_stream, " CR0=%016x\n\tCR2=%016x CR3=%016x CR4=%016x\n", x86::CR0(), x86::CR2(), x86::CR3(), x86::CR4());
+    Kernel::logln("\tCR0={016x} CR2={016x} CR3={016x} CR4={016x}", x86::CR0(), x86::CR2(), x86::CR3(), x86::CR4());
 
-    stream_format(out_stream, "\n\tBacktrace:\n");
+    Kernel::logln("\n\tBacktrace:");
     backtrace_internal(stackframe->rbp);
 }
 

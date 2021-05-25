@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class GridLayout : public Element
+struct GridLayout : public Element
 {
 private:
     int _hcells;

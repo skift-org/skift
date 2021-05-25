@@ -9,7 +9,7 @@
 namespace Utils
 {
 
-class String :
+struct String :
     public RawStorage
 {
 private:

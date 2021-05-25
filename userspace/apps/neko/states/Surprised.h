@@ -5,7 +5,7 @@
 namespace neko
 {
 
-class Surprised : public Behavior
+struct Surprised : public Behavior
 {
 private:
 public:

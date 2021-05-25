@@ -6,7 +6,7 @@
 namespace Math
 {
 
-class Random
+struct Random
 {
 private:
     uint64_t _state;

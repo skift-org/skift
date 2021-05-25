@@ -5,7 +5,7 @@
 namespace Utils
 {
 
-class SourceLocation
+struct SourceLocation
 {
 private:
     const char *_file;

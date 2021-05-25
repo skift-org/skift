@@ -1,14 +1,14 @@
 #pragma once
 
 #include <abi/Keyboard.h>
+#include <libutils/Lock.h>
 #include <libutils/RingBuffer.h>
-#include <skift/Lock.h>
 
 #include "ps2/LegacyDevice.h"
 
 #define PS2KBD_ESCAPE 0xE0
 
-class LegacyKeyboard : public LegacyDevice
+struct LegacyKeyboard : public LegacyDevice
 {
 private:
     Lock _events_lock{"legacy-keyboard-event"};

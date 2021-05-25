@@ -4,7 +4,7 @@
 
 #include "system/node/Handle.h"
 
-class Handles
+struct Handles
 {
 private:
     Lock _lock{"handles-lock"};

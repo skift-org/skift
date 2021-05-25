@@ -4,7 +4,7 @@
 
 #include "archs/Memory.h"
 
-class MemoryRange
+struct MemoryRange
 {
 private:
     uintptr_t _base;

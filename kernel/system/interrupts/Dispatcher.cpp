@@ -45,7 +45,7 @@ static void dispatcher_snapshot(bool *destination)
     memset(_pending_interrupts, 0, sizeof(_pending_interrupts));
 }
 
-class BlockerDispatcher : public Blocker
+struct BlockerDispatcher : public Blocker
 {
 public:
     bool can_unblock(Task &) override

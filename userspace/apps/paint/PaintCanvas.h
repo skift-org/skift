@@ -5,7 +5,7 @@
 #include "paint/PaintDocument.h"
 #include "paint/PaintTool.h"
 
-class PaintCanvas : public Widget::Element
+struct PaintCanvas : public Widget::Element
 {
 private:
     RefPtr<PaintDocument> _document;

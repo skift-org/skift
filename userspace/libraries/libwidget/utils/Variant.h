@@ -14,7 +14,7 @@ enum VarianType
     STRING,
 };
 
-class Variant
+struct Variant
 {
 private:
     VarianType _type;

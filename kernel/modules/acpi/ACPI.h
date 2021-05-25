@@ -70,7 +70,7 @@ struct PACKED RSDT
 
 /* --- MADT ----------------------------------------------------------------- */
 
-enum class MADTRecordType : uint8_t
+enum struct MADTRecordType : uint8_t
 {
     LAPIC = 0,
     IOAPIC = 1,

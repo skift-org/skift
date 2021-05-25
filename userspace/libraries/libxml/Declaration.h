@@ -7,7 +7,7 @@ namespace Xml
 
 using Version = Math::Vec2i;
 
-class Declaration
+struct Declaration
 {
 private:
     Version _version = {1, 0};

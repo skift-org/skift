@@ -9,7 +9,7 @@
 namespace FilePicker
 {
 
-class ArchiveBrowser : public Widget::Table
+struct ArchiveBrowser : public Widget::Table
 {
 private:
     RefPtr<Navigation> _navigation;

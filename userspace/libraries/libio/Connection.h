@@ -8,7 +8,7 @@
 namespace IO
 {
 
-class Connection final :
+struct Connection final :
     public Reader,
     public Writer,
     public RawHandle

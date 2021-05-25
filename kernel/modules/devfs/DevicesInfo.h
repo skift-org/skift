@@ -2,7 +2,7 @@
 
 #include "system/node/Node.h"
 
-class FsDeviceInfo : public FsNode
+struct FsDeviceInfo : public FsNode
 {
 private:
 public:

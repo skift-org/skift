@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class FlowLayout : public Element
+struct FlowLayout : public Element
 {
 private:
     int _spacing = 0;

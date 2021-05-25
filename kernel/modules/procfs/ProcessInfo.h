@@ -2,7 +2,7 @@
 
 #include "system/node/Node.h"
 
-class FsProcessInfo : public FsNode
+struct FsProcessInfo : public FsNode
 {
 private:
 public:

@@ -9,7 +9,7 @@
 namespace IO
 {
 
-class Scanner final
+struct Scanner final
 {
 private:
     static constexpr int MAX_PEEK = 64;

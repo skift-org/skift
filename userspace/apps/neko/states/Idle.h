@@ -7,7 +7,7 @@
 namespace neko
 {
 
-class Idle :
+struct Idle :
     public Behavior
 {
 private:

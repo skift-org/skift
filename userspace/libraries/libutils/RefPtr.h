@@ -1,15 +1,15 @@
 #pragma once
 
 #include <libutils/RefCounted.h>
+#include <libutils/Std.h>
 #include <libutils/Tags.h>
 #include <libutils/Traits.h>
-#include <libutils/Std.h>
 
 namespace Utils
 {
 
 template <typename T>
-class RefPtr
+struct RefPtr
 {
 private:
     T *_ptr = nullptr;
@@ -163,7 +163,7 @@ public:
 };
 
 template <typename T>
-class CallableRefPtr : public RefPtr<T>
+struct CallableRefPtr : public RefPtr<T>
 {
 public:
     template <typename... TArgs>

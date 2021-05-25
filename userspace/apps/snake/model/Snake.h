@@ -8,7 +8,7 @@
 namespace Snake
 {
 
-enum class Facing
+enum struct Facing
 {
     UP,
     DOWN,

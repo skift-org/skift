@@ -9,7 +9,7 @@
 namespace Async
 {
 
-class Timer :
+struct Timer :
     public Source
 {
 private:

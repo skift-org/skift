@@ -8,7 +8,7 @@
 namespace Compression
 {
 
-class Deflate
+struct Deflate
 {
 private:
     unsigned int _compression_level;

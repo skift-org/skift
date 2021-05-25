@@ -7,7 +7,7 @@
 namespace Widget
 {
 
-class TableModel :
+struct TableModel :
     public RefCounted<TableModel>,
     public Async::Observable<TableModel>
 {

@@ -6,7 +6,7 @@ namespace Widget
 {
 
 template <typename TState>
-class StatefulComponentBase :
+struct StatefulComponentBase :
     public RebuildableComponent
 {
 private:

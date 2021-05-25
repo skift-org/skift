@@ -7,7 +7,7 @@
 namespace neko
 {
 
-class Animation
+struct Animation
 {
 private:
     Sprite _frames[2];

@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class MessageBox : public Dialog
+struct MessageBox : public Dialog
 {
 private:
     RefPtr<Graphic::Icon> _icon{};

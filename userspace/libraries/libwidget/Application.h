@@ -11,7 +11,7 @@
 namespace Widget
 {
 
-class Application :
+struct Application :
     public Async::Source
 {
 private:

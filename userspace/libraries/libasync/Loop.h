@@ -9,13 +9,13 @@ namespace Async
 
 using AtExitHook = void (*)(void);
 
-class Notifier;
+struct Notifier;
 
-class Timer;
+struct Timer;
 
-class Invoker;
+struct Invoker;
 
-class Loop : public RefCounted<Loop>
+struct Loop : public RefCounted<Loop>
 {
 private:
     bool _is_running = false;

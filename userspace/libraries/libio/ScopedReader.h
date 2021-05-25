@@ -6,7 +6,7 @@
 namespace IO
 {
 
-class ScopedReader :
+struct ScopedReader :
     public Reader
 {
 private:

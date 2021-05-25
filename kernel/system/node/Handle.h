@@ -5,7 +5,7 @@
 
 #include "system/node/Node.h"
 
-class FsHandle : public RefCounted<FsHandle>
+struct FsHandle : public RefCounted<FsHandle>
 {
 private:
     Lock _lock{"fshandle"};

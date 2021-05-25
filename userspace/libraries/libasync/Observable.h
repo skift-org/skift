@@ -8,7 +8,7 @@ namespace Async
 {
 
 template <typename T>
-class Observable
+struct Observable
 {
 public:
     struct _Observer

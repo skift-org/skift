@@ -232,7 +232,7 @@ public:
     }
 };
 
-class Colors
+struct Colors
 {
 private:
     Colors(/* args */) {}

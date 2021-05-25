@@ -2,7 +2,7 @@
 
 #include "system/node/Node.h"
 
-class FsFile : public FsNode
+struct FsFile : public FsNode
 {
 private:
     char *_buffer;

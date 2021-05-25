@@ -7,7 +7,7 @@ namespace Utils
 {
 
 template <typename TKey, typename TValue>
-class HashMap
+struct HashMap
 {
 private:
     struct Item

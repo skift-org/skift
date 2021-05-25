@@ -1,14 +1,14 @@
 #pragma once
 
 #include <libasync/Observable.h>
-#include <libsystem/process/Process.h>
 #include <libio/Path.h>
+#include <libsystem/process/Process.h>
 #include <libutils/Vector.h>
 
 namespace FilePicker
 {
 
-class Navigation :
+struct Navigation :
     public Async::Observable<Navigation>,
     public RefCounted<Navigation>
 {

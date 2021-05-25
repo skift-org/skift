@@ -8,7 +8,7 @@ namespace Math
 {
 
 template <typename Scalar>
-class Edge
+struct Edge
 {
 private:
     Math::Vec2<Scalar> _start;

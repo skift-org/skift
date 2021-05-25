@@ -5,7 +5,7 @@
 namespace Settings
 {
 
-class HomePage : public Widget::Component
+struct HomePage : public Widget::Component
 {
 public:
     HomePage();

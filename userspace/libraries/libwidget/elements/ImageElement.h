@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class ImageElement : public Element
+struct ImageElement : public Element
 {
 private:
     RefPtr<Graphic::Bitmap> _bitmap;

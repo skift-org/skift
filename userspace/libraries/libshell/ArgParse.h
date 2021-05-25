@@ -18,14 +18,14 @@
 namespace Shell
 {
 
-enum class ArgParseResult
+enum struct ArgParseResult
 {
     SHOULD_CONTINUE,
     SHOULD_FINISH,
     FAILURE,
 };
 
-class ArgParseContext
+struct ArgParseContext
 {
 private:
     Vector<String> _arguments;
@@ -88,7 +88,7 @@ struct ArgParseOption
     ArgParseOptionCallback callback;
 };
 
-class ArgParse
+struct ArgParse
 {
 private:
     String _name;

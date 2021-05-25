@@ -7,7 +7,7 @@
 namespace neko
 {
 
-class Yawning :
+struct Yawning :
     public Behavior
 {
 private:

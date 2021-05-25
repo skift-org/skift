@@ -9,7 +9,7 @@
 namespace Terminal
 {
 
-enum class State
+enum struct State
 {
     WAIT_ESC,
     EXPECT_BRACKET,

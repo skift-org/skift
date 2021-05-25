@@ -4,7 +4,7 @@
 
 #include "system/node/Node.h"
 
-class FsConnection : public FsNode
+struct FsConnection : public FsNode
 {
 private:
     static constexpr int BUFFER_SIZE = 4096;

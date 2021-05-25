@@ -3,7 +3,7 @@
 #include "system/devices/Device.h"
 #include "system/devices/DeviceAddress.h"
 
-class DeviceMatcher
+struct DeviceMatcher
 {
 private:
     DeviceBus _bus;

@@ -3,7 +3,7 @@
 #include <libjson/Json.h>
 #include <libwidget/model/TableModel.h>
 
-class DeviceModel : public Widget::TableModel
+struct DeviceModel : public Widget::TableModel
 {
 private:
     Json::Value _data = nullptr;

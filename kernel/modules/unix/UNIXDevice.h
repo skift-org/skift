@@ -2,7 +2,7 @@
 
 #include "unix/UNIX.h"
 
-class UNIXDevice : public Device
+struct UNIXDevice : public Device
 {
 private:
 public:
@@ -17,7 +17,7 @@ public:
 };
 
 template <typename UNIXDeviceType>
-class UNIXDeviceMatcher : public DeviceMatcher
+struct UNIXDeviceMatcher : public DeviceMatcher
 {
 private:
     UNIXAddress _address;

@@ -11,7 +11,7 @@
 namespace FilePicker
 {
 
-class FilesystemModel : public Widget::TableModel
+struct FilesystemModel : public Widget::TableModel
 {
 private:
     RefPtr<Navigation> _navigation;

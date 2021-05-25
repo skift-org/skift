@@ -13,7 +13,7 @@
 namespace Compression
 {
 
-class Inflate
+struct Inflate
 {
 private:
     // Fixed huffmann

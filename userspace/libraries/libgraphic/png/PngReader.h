@@ -10,7 +10,7 @@
 
 namespace Graphic
 {
-class PngReader
+struct PngReader
 {
 private:
     bool _valid = false;

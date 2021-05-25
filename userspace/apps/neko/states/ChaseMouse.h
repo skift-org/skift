@@ -5,7 +5,7 @@
 namespace neko
 {
 
-class ChaseMouse : public Behavior
+struct ChaseMouse : public Behavior
 {
 private:
     Math::Vec2f _destination;

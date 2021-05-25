@@ -7,7 +7,7 @@
 namespace Async
 {
 
-class Notifier :
+struct Notifier :
     public IO::RawHandle,
     public Source
 {

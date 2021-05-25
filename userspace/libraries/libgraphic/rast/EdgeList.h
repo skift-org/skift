@@ -8,7 +8,7 @@
 namespace Graphic
 {
 
-class EdgeList
+struct EdgeList
 {
 private:
     static constexpr auto TOLERANCE = 0.25f;

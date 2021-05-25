@@ -11,7 +11,7 @@
 namespace Graphic
 {
 
-class Painter;
+struct Painter;
 
 } // namespace Graphic
 
@@ -27,7 +27,7 @@ struct Window;
         return ::make<__type>(::std::forward<TArgs>(args)...); \
     }
 
-class Element : public RefCounted<Element>
+struct Element : public RefCounted<Element>
 {
 private:
     bool _enabled = true;

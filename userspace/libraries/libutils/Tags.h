@@ -3,21 +3,21 @@
 namespace Utils
 {
 
-enum class AdoptTag
+enum struct AdoptTag
 {
     __value
 };
 
-enum class CopyTag
+enum struct CopyTag
 {
     __value
 };
 
-enum class WrapTag
+enum struct WrapTag
 {
     __value
 };
-enum class NoneTag
+enum struct NoneTag
 {
     __value
 };

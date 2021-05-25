@@ -15,7 +15,7 @@ struct RasterizeState
     Math::Recti clip;
 };
 
-class Rasterizer
+struct Rasterizer
 {
 private:
     NONCOPYABLE(Rasterizer);

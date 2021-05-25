@@ -10,7 +10,7 @@ namespace Utils
 {
 
 template <typename T>
-class ResultOr
+struct ResultOr
 {
 private:
     Result _result = SUCCESS;

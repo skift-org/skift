@@ -68,7 +68,7 @@ struct PACKED AC97BufferDescriptor
     uint32_t cl;
 };
 
-class AC97 : public PCIDevice
+struct AC97 : public PCIDevice
 {
 private:
     uint16_t _status;

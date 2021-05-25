@@ -8,7 +8,7 @@ namespace Utils
 {
 
 template <typename T>
-class Optional
+struct Optional
 {
 private:
     bool _present = false;

@@ -5,14 +5,14 @@
 
 #include "pci/PCI.h"
 
-enum class PCIBarType
+enum struct PCIBarType
 {
     MMIO32,
     MMIO64,
     PIO,
 };
 
-class PCIBar
+struct PCIBar
 {
 private:
     PCIBarType _type;
@@ -43,7 +43,7 @@ public:
     }
 };
 
-class PCIDevice : public Device
+struct PCIDevice : public Device
 {
 private:
     int _vendor;
@@ -135,7 +135,7 @@ public:
 };
 
 template <typename PCIDeviceType>
-class PCIDeviceMatcher : public DeviceMatcher
+struct PCIDeviceMatcher : public DeviceMatcher
 {
 private:
     uint16_t _vendor;

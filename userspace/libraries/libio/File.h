@@ -9,7 +9,7 @@
 namespace IO
 {
 
-class File final :
+struct File final :
     public Reader,
     public Writer,
     public Seek,

@@ -8,7 +8,7 @@
 namespace IO
 {
 
-class MemoryWriter :
+struct MemoryWriter :
     public Writer,
     public Seek
 {

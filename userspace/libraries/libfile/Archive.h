@@ -1,10 +1,10 @@
 #pragma once
 
+#include <libio/Path.h>
 #include <libio/Reader.h>
 #include <libio/Writer.h>
 #include <libsystem/Result.h>
-#include <libio/Path.h>
-class Archive : public RefCounted<Archive>
+struct Archive : public RefCounted<Archive>
 {
 public:
     struct Entry

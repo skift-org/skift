@@ -9,7 +9,7 @@
 namespace FilePicker
 {
 
-class FileBrowser : public Browser
+struct FileBrowser : public Browser
 {
 public:
     Callback<void(String &path)> on_element_selected;

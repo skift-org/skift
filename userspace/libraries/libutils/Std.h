@@ -30,13 +30,13 @@ constexpr typename RemoveReference<T>::Type &&move(T &&arg)
     return static_cast<typename RemoveReference<T>::Type &&>(arg);
 }
 
-template <class T>
+template <typename T>
 constexpr T &&forward(typename RemoveReference<T>::Type &param)
 {
     return static_cast<T &&>(param);
 }
 
-template <class T>
+template <typename T>
 constexpr T &&forward(typename RemoveReference<T>::Type &&param)
 {
     return static_cast<T &&>(param);
@@ -59,7 +59,7 @@ constexpr T exchange(T &slot, U &&value)
 }
 
 template <typename T>
-class initializer_list
+struct initializer_list
 {
 private:
     T *_data;

@@ -8,7 +8,7 @@
 #include <libfilepicker/widgets/JumpList.h>
 #include <libfilepicker/widgets/ToolBar.h>
 
-class MainWindow :
+struct MainWindow :
     public Widget::Window
 {
 private:

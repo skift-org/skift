@@ -7,7 +7,7 @@
 namespace Widget
 {
 
-class RebuildableComponent : public Element
+struct RebuildableComponent : public Element
 {
 private:
     OwnPtr<Async::Invoker> _rebuild_invoker;

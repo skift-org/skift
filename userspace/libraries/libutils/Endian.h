@@ -40,7 +40,7 @@ constexpr TValue swap_big_endian(TValue value)
 }
 
 template <typename TValue>
-class PACKED BigEndian
+struct PACKED BigEndian
 {
 private:
     TValue _value{0};
@@ -57,7 +57,7 @@ public:
 };
 
 template <typename TValue>
-class PACKED LittleEndian
+struct PACKED LittleEndian
 {
 private:
     TValue _value{0};

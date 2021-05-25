@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class Component : public RebuildableComponent
+struct Component : public RebuildableComponent
 {
     RefPtr<Element> do_build() final { return build(); }
     virtual RefPtr<Element> build() { return nullptr; }

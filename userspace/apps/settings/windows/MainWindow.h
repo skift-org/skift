@@ -5,7 +5,7 @@
 namespace Settings
 {
 
-class MainWindow : public Widget::Window
+struct MainWindow : public Widget::Window
 {
 public:
     MainWindow();

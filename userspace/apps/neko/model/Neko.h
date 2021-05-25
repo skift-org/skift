@@ -10,7 +10,7 @@
 namespace neko
 {
 
-class Neko : public Async::Observable<Neko>
+struct Neko : public Async::Observable<Neko>
 {
 private:
     int _tick = 0;

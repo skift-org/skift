@@ -9,7 +9,7 @@
 
 #include "device-manager/DeviceModel.h"
 
-class DeviceManagerWindow : public Widget::Window
+struct DeviceManagerWindow : public Widget::Window
 {
 private:
     RefPtr<DeviceModel> _model;

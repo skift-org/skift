@@ -6,7 +6,7 @@ namespace Math
 {
 
 template <typename Scalar>
-class VLine
+struct VLine
 {
 private:
     Vec2<Scalar> _start;

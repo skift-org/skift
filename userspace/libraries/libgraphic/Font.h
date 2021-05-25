@@ -8,7 +8,7 @@
 namespace Graphic
 {
 
-class FontMetrics
+struct FontMetrics
 {
 private:
     int _lineheight;
@@ -49,7 +49,7 @@ struct Glyph
     int advance;
 };
 
-class Font : public RefCounted<Font>
+struct Font : public RefCounted<Font>
 {
 private:
     RefPtr<Bitmap> _bitmap;

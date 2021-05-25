@@ -9,7 +9,7 @@
 namespace TaskManager
 {
 
-class RAMGraphComponent : public Widget::Component
+struct RAMGraphComponent : public Widget::Component
 {
 private:
     RefPtr<TaskModel> _tasks;

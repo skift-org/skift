@@ -18,7 +18,7 @@
     __ENTRY(SOUND, sound)             \
     __ENTRY(PCSPEAKER, speaker)
 
-enum class DeviceClass : uint8_t
+enum struct DeviceClass : uint8_t
 {
 #define DEVICE_ENUM_ENTRY(__name, ...) __name,
     DEVICE_CLASS_LIST(DEVICE_ENUM_ENTRY)

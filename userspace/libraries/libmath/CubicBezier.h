@@ -6,7 +6,7 @@ namespace Math
 {
 
 template <typename Scalar>
-class CubicBezier
+struct CubicBezier
 {
 private:
     Math::Vec2<Scalar> _start;

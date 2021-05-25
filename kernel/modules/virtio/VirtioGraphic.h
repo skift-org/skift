@@ -2,7 +2,7 @@
 
 #include "virtio/VirtioDevice.h"
 
-class VirtioGraphic : public VirtioDevice
+struct VirtioGraphic : public VirtioDevice
 {
 private:
 public:

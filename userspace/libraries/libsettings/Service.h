@@ -8,9 +8,9 @@
 namespace Settings
 {
 
-class Watcher;
+struct Watcher;
 
-class Service : public RefCounted<Service>
+struct Service : public RefCounted<Service>
 {
 private:
     Vector<Watcher *> _watchers;

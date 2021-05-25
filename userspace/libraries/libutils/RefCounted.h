@@ -6,7 +6,7 @@ namespace Utils
 {
 
 template <typename T>
-class RefCounted
+struct RefCounted
 {
 private:
     int _refcount = 1;

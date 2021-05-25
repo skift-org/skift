@@ -3,7 +3,7 @@
 #include "pci/PCIDevice.h"
 #include "virtio/Virtio.h"
 
-class VirtioDevice : public PCIDevice
+struct VirtioDevice : public PCIDevice
 {
 private:
 public:
@@ -17,7 +17,7 @@ public:
 };
 
 template <typename VirtioDeviceType>
-class VirtioDeviceMatcher : public DeviceMatcher
+struct VirtioDeviceMatcher : public DeviceMatcher
 {
 private:
     VirtioAddress _address;

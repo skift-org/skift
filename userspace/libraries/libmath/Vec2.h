@@ -9,7 +9,7 @@ namespace Math
 {
 
 template <typename Scalar>
-class Vec2
+struct Vec2
 {
 private:
     Scalar _x;

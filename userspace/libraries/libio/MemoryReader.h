@@ -7,7 +7,7 @@
 namespace IO
 {
 
-class MemoryReader final :
+struct MemoryReader final :
     public Reader,
     public Seek
 {

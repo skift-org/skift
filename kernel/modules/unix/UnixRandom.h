@@ -4,7 +4,7 @@
 
 #include "unix/UNIXDevice.h"
 
-class UnixRandom : public UNIXDevice
+struct UnixRandom : public UNIXDevice
 {
 private:
     Math::Random _random{};

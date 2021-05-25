@@ -6,7 +6,7 @@
 namespace IO
 {
 
-enum class Whence : uint8_t
+enum struct Whence : uint8_t
 {
     START = HJ_WHENCE_START,
     CURRENT = HJ_WHENCE_CURRENT,

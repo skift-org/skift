@@ -8,7 +8,7 @@
 namespace IO
 {
 
-class Handle :
+struct Handle :
     public RefCounted<Handle>
 {
 private:

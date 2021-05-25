@@ -6,7 +6,7 @@
 namespace Text
 {
 
-class UTF8Decoder
+struct UTF8Decoder
 {
 private:
     bool _decoding = false;

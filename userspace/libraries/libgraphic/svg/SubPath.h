@@ -8,7 +8,7 @@
 namespace Graphic
 {
 
-class SubPath
+struct SubPath
 {
 private:
     Vector<Math::Vec2f> _points;

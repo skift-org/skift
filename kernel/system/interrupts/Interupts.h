@@ -18,7 +18,7 @@ void interrupts_retain();
 
 void interrupts_release();
 
-class InterruptsRetainer
+struct InterruptsRetainer
 {
 private:
     NONCOPYABLE(InterruptsRetainer);

@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class DotsElement : public Element
+struct DotsElement : public Element
 {
 private:
     int _count = 3;

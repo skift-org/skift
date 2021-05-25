@@ -12,7 +12,7 @@
 #include "system/devices/DeviceAddress.h"
 #include "system/devices/DeviceClass.h"
 
-class Device : public RefCounted<Device>
+struct Device : public RefCounted<Device>
 {
 private:
     DeviceAddress _address;

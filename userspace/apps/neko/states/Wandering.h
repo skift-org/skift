@@ -7,7 +7,7 @@
 namespace neko
 {
 
-class Wandering : public Behavior
+struct Wandering : public Behavior
 {
 private:
     Math::Random _random;

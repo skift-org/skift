@@ -10,7 +10,7 @@
 namespace Settings
 {
 
-class Server
+struct Server
 {
 private:
     IO::Socket _socket;

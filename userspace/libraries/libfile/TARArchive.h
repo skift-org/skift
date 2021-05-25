@@ -13,7 +13,7 @@ struct TARBlock
 
 bool tar_read(void *tarfile, TARBlock *block, size_t index);
 
-class TARArchive final : public Archive
+struct TARArchive final : public Archive
 {
 private:
     Result read_archive();

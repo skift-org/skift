@@ -7,7 +7,7 @@
 
 #include "system/memory/MemoryRange.h"
 
-class MMIORange : public RefCounted<MMIORange>
+struct MMIORange : public RefCounted<MMIORange>
 {
 private:
     MemoryRange _virtual_range = {};

@@ -9,7 +9,7 @@
 namespace neko
 {
 
-class MainWindow : public Widget::Window
+struct MainWindow : public Widget::Window
 {
 private:
     Neko _neko;
@@ -36,9 +36,9 @@ public:
         _update_timer->start();
     }
 
-    void repaint(Graphic::Painter &painter, Math::Recti rectangle)
+    void repaint(Graphic::Painter &painter, Math::Recti rectangle) override
     {
-        painter.clear(rectangle, Graphic::Colors::TRANSPARENT);
+        painter.clear(rectangle, Graphic::Colors::GREEN);
         _neko.paint(painter);
     }
 };

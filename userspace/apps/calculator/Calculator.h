@@ -3,7 +3,7 @@
 #include <libasync/Observable.h>
 #include <math.h>
 
-enum class Operation
+enum struct Operation
 {
     NONE,
     ADD,
@@ -15,7 +15,7 @@ enum class Operation
     POWER,
 };
 
-class Calculator : public Async::Observable<Calculator>
+struct Calculator : public Async::Observable<Calculator>
 {
 private:
     Operation _operation = Operation::NONE;

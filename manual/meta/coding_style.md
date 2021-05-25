@@ -40,7 +40,7 @@ do
     // ...
 } while (cond);
 
-class FooBar
+struct FooBar
 {
     FooBar();
 };

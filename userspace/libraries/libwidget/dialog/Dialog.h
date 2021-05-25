@@ -15,7 +15,7 @@ enum DialogButton
     CANCEL = (1 << 3)
 };
 
-enum class DialogResult
+enum struct DialogResult
 {
     NONE,
     YES,
@@ -25,7 +25,7 @@ enum class DialogResult
     CLOSE,
 };
 
-class Dialog
+struct Dialog
 {
 private:
     DialogResult _result = DialogResult::NONE;

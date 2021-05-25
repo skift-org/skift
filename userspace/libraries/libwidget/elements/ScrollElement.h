@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class ScrollElement : public Element
+struct ScrollElement : public Element
 {
 private:
     bool _horizontal = false;

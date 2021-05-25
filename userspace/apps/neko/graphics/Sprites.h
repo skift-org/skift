@@ -5,7 +5,7 @@
 namespace neko
 {
 
-enum class Sprite : uint8_t
+enum struct Sprite : uint8_t
 {
     AWAKE = 0x00,
 

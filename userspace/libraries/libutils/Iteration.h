@@ -5,7 +5,7 @@
 namespace Utils
 {
 
-enum class Iteration
+enum struct Iteration
 {
     CONTINUE,
     STOP,

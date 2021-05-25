@@ -1,13 +1,13 @@
 #pragma once
 
+#include <libutils/Lock.h>
 #include <libutils/RingBuffer.h>
-#include <skift/Lock.h>
 
 #include "archs/x86/COM.h"
 
 #include "ps2/LegacyDevice.h"
 
-class LegacySerial : public LegacyDevice
+struct LegacySerial : public LegacyDevice
 {
 private:
     RingBuffer<char> _buffer{4096};

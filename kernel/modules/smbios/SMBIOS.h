@@ -56,7 +56,7 @@ namespace Smbios
     __ENTRY(INACTIVE, 126)                               \
     __ENTRY(END_OF_TABLE, 127)
 
-enum class HearderType : uint8_t
+enum struct HearderType : uint8_t
 {
 
 #define __ENTRY(__name, __id) \
@@ -226,7 +226,7 @@ struct PACKED MainboardInfo
     __ENTRY(MINI_PC, 0x23)               \
     __ENTRY(STICK_PC, 0x24)
 
-enum class EnclosureType : uint8_t
+enum struct EnclosureType : uint8_t
 {
 #define __ENTRY(__name, __id) \
     __name = __id,

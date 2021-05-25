@@ -4,7 +4,7 @@
 
 #include "unix/UNIXDevice.h"
 
-class UnixZero : public UNIXDevice
+struct UnixZero : public UNIXDevice
 {
 private:
 public:

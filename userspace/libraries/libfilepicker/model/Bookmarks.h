@@ -8,7 +8,7 @@
 namespace FilePicker
 {
 
-class Bookmarks :
+struct Bookmarks :
     public Async::Observable<Bookmarks>,
     public RefCounted<Bookmarks>
 {

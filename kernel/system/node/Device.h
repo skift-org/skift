@@ -4,7 +4,7 @@
 #include "system/node/Handle.h"
 #include "system/node/Node.h"
 
-class FsDevice : public FsNode
+struct FsDevice : public FsNode
 {
 private:
     RefPtr<Device> _device;

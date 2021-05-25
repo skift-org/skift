@@ -9,7 +9,7 @@
 
 struct Task;
 
-class Blocker
+struct Blocker
 {
 private:
     Result _result = SUCCESS;
@@ -61,7 +61,7 @@ public:
     virtual void on_interrupt(Task &) {}
 };
 
-class BlockerAccept : public Blocker
+struct BlockerAccept : public Blocker
 {
 private:
     RefPtr<FsNode> _node;
@@ -76,7 +76,7 @@ public:
     void on_unblock(Task &task) override;
 };
 
-class BlockerConnect : public Blocker
+struct BlockerConnect : public Blocker
 {
 private:
     RefPtr<FsNode> _connection;
@@ -90,7 +90,7 @@ public:
     bool can_unblock(Task &task) override;
 };
 
-class BlockerRead : public Blocker
+struct BlockerRead : public Blocker
 {
 private:
     FsHandle &_handle;
@@ -114,7 +114,7 @@ struct Selected
     PollEvent result;
 };
 
-class BlockerSelect : public Blocker
+struct BlockerSelect : public Blocker
 {
 private:
     Vector<Selected> &_handles;
@@ -128,7 +128,7 @@ public:
     bool can_unblock(Task &task) override;
 };
 
-class BlockerTime : public Blocker
+struct BlockerTime : public Blocker
 {
 public:
     BlockerTime() {}
@@ -136,7 +136,7 @@ public:
     bool can_unblock(Task &) override { return false; }
 };
 
-class BlockerWait : public Blocker
+struct BlockerWait : public Blocker
 {
 private:
     Task *_task;
@@ -153,7 +153,7 @@ public:
     void on_unblock(Task &task) override;
 };
 
-class BlockerWrite : public Blocker
+struct BlockerWrite : public Blocker
 {
 private:
     FsHandle &_handle;

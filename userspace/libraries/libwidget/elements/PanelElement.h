@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class PanelElement : public Element
+struct PanelElement : public Element
 {
 private:
     int _border_radius = 0;

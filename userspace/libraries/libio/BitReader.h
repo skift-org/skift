@@ -6,7 +6,7 @@
 
 namespace IO
 {
-class BitReader
+struct BitReader
 {
 private:
     IO::Reader &_reader;
@@ -45,7 +45,7 @@ public:
         _buffer.flush();
     }
 
-    template <class T>
+    template <typename T>
     inline T grab()
     {
         hint(sizeof(T) * 8);
@@ -60,14 +60,14 @@ public:
         return value;
     }
 
-    template <class T>
+    template <typename T>
     inline T grab_aligned()
     {
         flush();
         return grab<T>();
     }
 
-    template <class T>
+    template <typename T>
     inline T peek()
     {
         hint(sizeof(T) * 8);

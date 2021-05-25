@@ -8,7 +8,7 @@
 
 namespace Xml
 {
-class Document
+struct Document
 {
 private:
     Node _root;

@@ -8,7 +8,7 @@
 namespace FilePicker
 {
 
-class JumpList : public Widget::PanelElement
+struct JumpList : public Widget::PanelElement
 {
 private:
     RefPtr<Navigation> _navigation;

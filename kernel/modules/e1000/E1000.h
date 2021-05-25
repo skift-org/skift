@@ -102,7 +102,7 @@ struct PACKED E1000TXDescriptor
     uint16_t special;
 };
 
-class E1000 : public PCIDevice
+struct E1000 : public PCIDevice
 {
 private:
     RefPtr<MMIORange> _mmio_range = {};

@@ -18,7 +18,7 @@ enum DeviceBus
     BUS_LEGACY
 };
 
-class DeviceAddress
+struct DeviceAddress
 {
 private:
     DeviceBus _bus;

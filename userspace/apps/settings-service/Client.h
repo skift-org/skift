@@ -7,7 +7,7 @@
 namespace Settings
 {
 
-class Client : public IPC::Peer<Protocol>
+struct Client : public IPC::Peer<Protocol>
 {
 private:
     Vector<Path> _subscriptions;

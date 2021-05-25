@@ -2,7 +2,7 @@
 
 #include "system/devices/Device.h"
 
-class Partition : public Device
+struct Partition : public Device
 {
 private:
     RefPtr<Device> _disk;

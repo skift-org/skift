@@ -17,7 +17,7 @@
 namespace Widget
 {
 
-class Window
+struct Window
 {
 private:
     int _handle = -1;
@@ -180,7 +180,7 @@ public:
 
     void relayout();
 
-    void repaint(Graphic::Painter &painter, Math::Recti rectangle);
+    void repaint(Graphic::Painter &painter, Math::Recti rectangle) override;
 
     void flip(Math::Recti region);
 

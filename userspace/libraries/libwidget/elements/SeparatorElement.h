@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class SeparatorElement : public Element
+struct SeparatorElement : public Element
 {
 public:
     void paint(Graphic::Painter &painter, const Math::Recti &dirty) override;

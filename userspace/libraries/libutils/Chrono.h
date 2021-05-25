@@ -6,7 +6,7 @@
 namespace Utils
 {
 
-class Chrono
+struct Chrono
 {
 private:
     const char *_name;

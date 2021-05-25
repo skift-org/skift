@@ -11,7 +11,7 @@ namespace Math
 {
 
 template <typename Scalar>
-class Mat3x2
+struct Mat3x2
 {
 private:
     Scalar _m[6] = {};

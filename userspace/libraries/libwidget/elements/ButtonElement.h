@@ -6,7 +6,7 @@
 namespace Widget
 {
 
-class ButtonElement : public Element
+struct ButtonElement : public Element
 {
 public:
     enum Style

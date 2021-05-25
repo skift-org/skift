@@ -4,7 +4,7 @@
 
 #include "system/node/Node.h"
 
-class FsTerminal : public FsNode
+struct FsTerminal : public FsNode
 {
 private:
     static constexpr int BUFFER_SIZE = 1024;

@@ -6,7 +6,7 @@
 namespace IO
 {
 
-class Socket :
+struct Socket :
     public RawHandle
 {
 private:

@@ -6,7 +6,7 @@
 namespace Widget
 {
 
-class TextEditor : public Element
+struct TextEditor : public Element
 {
 private:
     RefPtr<TextModel> _model;

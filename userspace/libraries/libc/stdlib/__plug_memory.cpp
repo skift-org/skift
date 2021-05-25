@@ -2,7 +2,7 @@
 
 #include <abi/Syscalls.h>
 
-#include <skift/Lock.h>
+#include <libutils/Lock.h>
 #include <skift/Plugs.h>
 
 static Lock _memory_lock{"memory_lock"};

@@ -4,7 +4,7 @@
 
 #include "system/node/Node.h"
 
-class FsPipe : public FsNode
+struct FsPipe : public FsNode
 {
 private:
     static constexpr int BUFFER_SIZE = 4096;

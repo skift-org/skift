@@ -41,7 +41,7 @@
 
 #define PCI_NONE 0xFFFF
 
-class PCIAddress
+struct PCIAddress
 {
 private:
     int _bus = 0;

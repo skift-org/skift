@@ -17,7 +17,7 @@ static int _framebuffer_height = 0;
 static int _framebuffer_pitch = 0;
 static int _framebuffer_bpp = 0;
 
-class Framebuffer : public FsNode
+struct Framebuffer : public FsNode
 {
 private:
     /* data */

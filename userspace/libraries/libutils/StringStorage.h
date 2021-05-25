@@ -9,7 +9,7 @@
 namespace Utils
 {
 
-class StringStorage final :
+struct StringStorage final :
     public Storage
 {
 private:

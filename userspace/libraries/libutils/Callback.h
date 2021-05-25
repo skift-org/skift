@@ -10,21 +10,20 @@ namespace Utils
 {
 
 template <typename>
-class Callback;
+struct Callback;
 
 template <typename Out, typename... In>
-class Callback<Out(In...)>
+struct Callback<Out(In...)>
 {
 private:
-    class CallableWrapperBase
+    struct CallableWrapperBase
     {
-    public:
         virtual ~CallableWrapperBase() {}
         virtual Out call(In...) const = 0;
     };
 
     template <typename CallableType>
-    class CallableWrapper final : public CallableWrapperBase
+    struct CallableWrapper final : public CallableWrapperBase
     {
     private:
         CallableType _callable;
@@ -50,13 +49,13 @@ public:
     Callback() = default;
     Callback(nullptr_t) {}
 
-    template <typename CallableType, class = typename EnableIf<!(IsPointer<CallableType>::value && IsFunction<typename RemovePointer<CallableType>::Type>::value) && IsRvalueReference<CallableType &&>::value>::Type>
+    template <typename CallableType, typename = typename EnableIf<!(IsPointer<CallableType>::value && IsFunction<typename RemovePointer<CallableType>::Type>::value) && IsRvalueReference<CallableType &&>::value>::Type>
     Callback(CallableType &&callable)
         : _wrapper(own<CallableWrapper<CallableType>>(std::move(callable)))
     {
     }
 
-    template <typename FunctionType, class = typename EnableIf<IsPointer<FunctionType>::value && IsFunction<typename RemovePointer<FunctionType>::Type>::value>::Type>
+    template <typename FunctionType, typename = typename EnableIf<IsPointer<FunctionType>::value && IsFunction<typename RemovePointer<FunctionType>::Type>::value>::Type>
     Callback(FunctionType f)
         : _wrapper(own<CallableWrapper<FunctionType>>(std::move(f)))
     {
@@ -70,14 +69,14 @@ public:
 
     explicit operator bool() const { return _wrapper; }
 
-    template <typename CallableType, class = typename EnableIf<!(IsPointer<CallableType>::value && IsFunction<typename RemovePointer<CallableType>::Type>::value) && IsRvalueReference<CallableType &&>::value>::Type>
+    template <typename CallableType, typename = typename EnableIf<!(IsPointer<CallableType>::value && IsFunction<typename RemovePointer<CallableType>::Type>::value) && IsRvalueReference<CallableType &&>::value>::Type>
     Callback &operator=(CallableType &&callable)
     {
         _wrapper = own<CallableWrapper<CallableType>>(std::move(callable));
         return *this;
     }
 
-    template <typename FunctionType, class = typename EnableIf<IsPointer<FunctionType>::value && IsFunction<typename RemovePointer<FunctionType>::Type>::value>::Type>
+    template <typename FunctionType, typename = typename EnableIf<IsPointer<FunctionType>::value && IsFunction<typename RemovePointer<FunctionType>::Type>::value>::Type>
     Callback &operator=(FunctionType f)
     {
         _wrapper = own<CallableWrapper<FunctionType>>(std::move(f));

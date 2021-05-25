@@ -2,12 +2,12 @@
 
 #include <abi/Mouse.h>
 #include <libutils/Array.h>
+#include <libutils/Lock.h>
 #include <libutils/RingBuffer.h>
-#include <skift/Lock.h>
 
 #include "ps2/LegacyDevice.h"
 
-class LegacyMouse : public LegacyDevice
+struct LegacyMouse : public LegacyDevice
 {
 private:
     Lock _events_lock{"legacy-mouse-event"};

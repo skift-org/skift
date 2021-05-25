@@ -6,7 +6,7 @@
 namespace Async
 {
 
-class Source
+struct Source
 {
 private:
     RefPtr<Loop> _eventloop;

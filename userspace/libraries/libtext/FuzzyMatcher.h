@@ -7,7 +7,7 @@
 namespace Text
 {
 
-class FuzzyMatcher
+struct FuzzyMatcher
 {
 private:
 public:

@@ -4,7 +4,7 @@
 
 namespace IO
 {
-class BitWriter
+struct BitWriter
 {
 public:
     BitWriter(Writer &writer) : _writer(writer)

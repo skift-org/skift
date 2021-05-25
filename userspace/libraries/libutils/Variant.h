@@ -182,13 +182,13 @@ public:
     }
 };
 
-template <class... Ts>
+template <typename... Ts>
 struct Visitor : Ts...
 {
     using Ts::operator()...;
 };
 
-template <class... Ts>
+template <typename... Ts>
 Visitor(Ts...) -> Visitor<Ts...>;
 
 } // namespace Utils

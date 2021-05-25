@@ -6,7 +6,7 @@
 namespace MediaPlayer
 {
 
-class Cover : public Widget::Element
+struct Cover : public Widget::Element
 {
 private:
     RefPtr<Graphic::Bitmap> _cover;

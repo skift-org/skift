@@ -6,7 +6,7 @@
 namespace IO
 {
 
-class Directory :
+struct Directory :
     public RawHandle
 {
 public:

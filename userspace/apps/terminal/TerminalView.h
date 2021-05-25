@@ -7,7 +7,7 @@
 #include <libterminal/Terminal.h>
 #include <libwidget/Element.h>
 
-class TerminalView : public Widget::Element
+struct TerminalView : public Widget::Element
 {
 private:
     OwnPtr<Terminal::Terminal> _terminal;

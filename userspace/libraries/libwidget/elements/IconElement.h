@@ -6,7 +6,7 @@
 namespace Widget
 {
 
-class IconElement : public Element
+struct IconElement : public Element
 {
 private:
     RefPtr<Graphic::Icon> _icon;

@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class StackLayout : public Element
+struct StackLayout : public Element
 {
 public:
     Math::Vec2i size() override

@@ -28,7 +28,7 @@ enum Type
     __TYPE_COUNT,
 };
 
-class Value
+struct Value
 {
 public:
     struct Array : public Vector<Value>

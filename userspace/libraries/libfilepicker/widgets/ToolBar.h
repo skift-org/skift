@@ -8,7 +8,7 @@
 namespace FilePicker
 {
 
-class ToolBar : public Widget::PanelElement
+struct ToolBar : public Widget::PanelElement
 {
 private:
     RefPtr<Navigation> _navigation;

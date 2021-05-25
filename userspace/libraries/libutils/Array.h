@@ -7,7 +7,7 @@ namespace Utils
 {
 
 template <typename T, size_t N>
-class Array
+struct Array
 {
     static_assert(N > 0, "Array must have size greater than 0");
 

@@ -6,7 +6,7 @@ namespace Utils
 {
 
 template <typename T, size_t N>
-class InlineRingBuffer
+struct InlineRingBuffer
 {
 private:
     size_t _head = 0;

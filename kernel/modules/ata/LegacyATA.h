@@ -1,11 +1,11 @@
 #pragma once
 
 #include <libutils/Array.h>
-#include <skift/Lock.h>
+#include <libutils/Lock.h>
 
 #include "ps2/LegacyDevice.h"
 
-class LegacyATA : public LegacyDevice
+struct LegacyATA : public LegacyDevice
 {
 private:
     Lock _buffer_lock{"legacy-ata"};

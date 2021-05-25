@@ -7,7 +7,7 @@ namespace Utils
 {
 
 template <typename T>
-class OwnPtr
+struct OwnPtr
 {
 private:
     T *_ptr = nullptr;

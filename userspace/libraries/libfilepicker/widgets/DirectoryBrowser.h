@@ -8,7 +8,7 @@
 namespace FilePicker
 {
 
-class DirectoryBrowser : public Browser
+struct DirectoryBrowser : public Browser
 {
 public:
     DirectoryBrowser(RefPtr<Navigation> navigation)

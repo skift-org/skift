@@ -13,7 +13,7 @@
 namespace Graphic
 {
 
-class Painter
+struct Painter
 {
 private:
     Bitmap &_bitmap;

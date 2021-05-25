@@ -5,9 +5,9 @@
 namespace neko
 {
 
-class Neko;
+struct Neko;
 
-class Behavior
+struct Behavior
 {
 public:
     virtual const char *name() { return "undefined"; }

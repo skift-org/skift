@@ -25,7 +25,7 @@ struct SourceDestination
     }
 };
 
-class TransformStack
+struct TransformStack
 {
 private:
     static constexpr auto STATESTACK_SIZE = 32;

@@ -2,7 +2,7 @@
 
 #include "unix/UNIXDevice.h"
 
-class UnixNull : public UNIXDevice
+struct UnixNull : public UNIXDevice
 {
 private:
 public:

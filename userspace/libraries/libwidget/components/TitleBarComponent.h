@@ -7,7 +7,7 @@
 namespace Widget
 {
 
-class TitleBarComponent : public Component
+struct TitleBarComponent : public Component
 {
 private:
     RefPtr<Graphic::Icon> _icon;

@@ -2,7 +2,7 @@
 
 #include "virtio/VirtioDevice.h"
 
-class VirtioEntropy : public VirtioDevice
+struct VirtioEntropy : public VirtioDevice
 {
 private:
 public:

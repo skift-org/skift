@@ -12,7 +12,7 @@
 namespace FilePicker
 {
 
-class ArchiveListing : public Widget::TableModel
+struct ArchiveListing : public Widget::TableModel
 {
 private:
     RefPtr<Navigation> _navigation;

@@ -6,7 +6,7 @@
 namespace Xml
 {
 
-class Node
+struct Node
 {
 private:
     Vector<Node> _children;

@@ -8,7 +8,7 @@
 namespace Graphic
 {
 
-class Path
+struct Path
 {
 private:
     Vector<SubPath> _subpaths;

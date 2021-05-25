@@ -3,7 +3,7 @@
 #include <libgraphic/Painter.h>
 #include <libutils/Callback.h>
 
-class PaintDocument : public RefCounted<PaintDocument>
+struct PaintDocument : public RefCounted<PaintDocument>
 {
 private:
     RefPtr<Graphic::Bitmap> _bitmap;

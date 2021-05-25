@@ -23,7 +23,7 @@ enum BitmapFiltering
     LINEAR,
 };
 
-enum class BitmapScaling
+enum struct BitmapScaling
 {
     CENTER,
     STRETCH,
@@ -31,7 +31,7 @@ enum class BitmapScaling
     FIT,
 };
 
-class Bitmap : public RefCounted<Bitmap>
+struct Bitmap : public RefCounted<Bitmap>
 {
 private:
     int _handle;

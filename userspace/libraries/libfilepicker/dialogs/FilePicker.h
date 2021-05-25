@@ -17,7 +17,7 @@ enum DialogFlags
     DIALOG_FLAGS_MULTIPLE = 8
 };
 
-class Dialog : public ::Widget::Dialog
+struct Dialog : public ::Widget::Dialog
 {
 private:
     RefPtr<Navigation> _navigation = nullptr;

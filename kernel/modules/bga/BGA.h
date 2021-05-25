@@ -15,7 +15,7 @@
 #define BGA_ENABLED 0x01
 #define BGA_LINEAR_FRAMEBUFFER 0x40
 
-class BGA : public PCIDevice
+struct BGA : public PCIDevice
 {
 private:
     int _width;

@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class ScrollBarElement : public Element
+struct ScrollBarElement : public Element
 {
 private:
     Math::Vec2i _mouse_origin;

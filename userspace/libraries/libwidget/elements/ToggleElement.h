@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class ToggleElement : public StatefulElement<bool>
+struct ToggleElement : public StatefulElement<bool>
 {
 public:
     static constexpr auto WIDTH = 36;

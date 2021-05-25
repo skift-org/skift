@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class SliderElement : public StatefulElement<double>
+struct SliderElement : public StatefulElement<double>
 {
 private:
     int icon_size();

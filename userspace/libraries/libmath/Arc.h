@@ -6,7 +6,7 @@ namespace Math
 {
 
 template <typename Scalar>
-class Arc
+struct Arc
 {
 public:
     enum ArcFlag

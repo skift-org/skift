@@ -8,7 +8,7 @@
 
 namespace compositor
 {
-class Wallpaper
+struct Wallpaper
 {
 private:
     Graphic::BitmapScaling _scaling = Graphic::BitmapScaling::COVER;

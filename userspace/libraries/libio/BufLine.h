@@ -6,7 +6,7 @@
 namespace IO
 {
 
-class BufLine : public IO::Writer
+struct BufLine : public IO::Writer
 {
 private:
     IO::Writer &_writer;

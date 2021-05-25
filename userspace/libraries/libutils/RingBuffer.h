@@ -9,7 +9,7 @@ namespace Utils
 {
 
 template <typename T>
-class RingBuffer
+struct RingBuffer
 {
 private:
     size_t _head = 0;

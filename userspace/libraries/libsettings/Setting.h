@@ -5,7 +5,7 @@
 namespace Settings
 {
 
-class Setting
+struct Setting
 {
 private:
     NONCOPYABLE(Setting);

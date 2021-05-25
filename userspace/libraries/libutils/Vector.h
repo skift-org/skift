@@ -36,7 +36,7 @@ void typed_move(T *destination, T *source, size_t count)
 }
 
 template <typename T>
-class Vector
+struct Vector
 {
 private:
     T *_storage = nullptr;

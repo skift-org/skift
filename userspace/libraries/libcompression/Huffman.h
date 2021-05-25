@@ -5,7 +5,7 @@
 namespace Compression
 {
 
-class HuffmanDecoder
+struct HuffmanDecoder
 {
 private:
     const Vector<unsigned int> &_alphabet;

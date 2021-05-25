@@ -5,7 +5,7 @@
 
 struct PaintDocument;
 
-class PaintTool
+struct PaintTool
 {
 private:
 public:
@@ -19,35 +19,35 @@ public:
     }
 };
 
-class PencilTool : public PaintTool
+struct PencilTool : public PaintTool
 {
 private:
 public:
     void event(PaintDocument &document, Widget::Event &event, Graphic::Color &color);
 };
 
-class BrushTool : public PaintTool
+struct BrushTool : public PaintTool
 {
 private:
 public:
     void event(PaintDocument &document, Widget::Event &event, Graphic::Color &color);
 };
 
-class EraserTool : public PaintTool
+struct EraserTool : public PaintTool
 {
 private:
 public:
     void event(PaintDocument &document, Widget::Event &event, Graphic::Color &color);
 };
 
-class FillTool : public PaintTool
+struct FillTool : public PaintTool
 {
 private:
 public:
     void event(PaintDocument &document, Widget::Event &event, Graphic::Color &color);
 };
 
-class PickerTool : public PaintTool
+struct PickerTool : public PaintTool
 {
 private:
 public:

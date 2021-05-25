@@ -6,7 +6,7 @@
 namespace Async
 {
 
-class Invoker : public Source
+struct Invoker : public Source
 {
 private:
     bool _invoke_later = false;

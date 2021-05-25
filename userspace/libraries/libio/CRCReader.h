@@ -6,7 +6,7 @@
 namespace IO
 {
 
-class CRCReader :
+struct CRCReader :
     public Reader
 {
 private:

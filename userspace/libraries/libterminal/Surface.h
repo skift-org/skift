@@ -5,7 +5,7 @@
 namespace Terminal
 {
 
-class Surface
+struct Surface
 {
 private:
     Buffer _buffer;

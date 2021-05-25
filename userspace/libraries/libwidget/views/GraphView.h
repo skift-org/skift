@@ -6,7 +6,7 @@
 namespace Widget
 {
 
-class GraphView : public Element
+struct GraphView : public Element
 {
 private:
     RefPtr<GraphModel> _model = nullptr;

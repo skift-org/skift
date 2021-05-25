@@ -6,7 +6,7 @@
 namespace Widget
 {
 
-class TextField : public Element
+struct TextField : public Element
 {
 private:
     RefPtr<TextModel> _model;

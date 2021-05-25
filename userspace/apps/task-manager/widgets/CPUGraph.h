@@ -8,7 +8,7 @@
 
 namespace TaskManager
 {
-class CPUGraphComponent : public Widget::Component
+struct CPUGraphComponent : public Widget::Component
 {
 private:
     RefPtr<TaskModel> _tasks;

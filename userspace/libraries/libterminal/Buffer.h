@@ -7,7 +7,7 @@
 namespace Terminal
 {
 
-class Buffer
+struct Buffer
 {
 private:
     int _width;

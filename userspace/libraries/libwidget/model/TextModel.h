@@ -14,7 +14,7 @@ namespace Widget
 
 struct TextCursor;
 
-class TextModelLine
+struct TextModelLine
 {
 private:
     Vector<Text::Rune> _runes{};
@@ -70,7 +70,7 @@ public:
     }
 };
 
-class TextModelSpan
+struct TextModelSpan
 {
 private:
     size_t _line;
@@ -109,7 +109,7 @@ public:
     }
 };
 
-class TextModel :
+struct TextModel :
     public RefCounted<TextModel>,
     public Async::Observable<TextModel>
 {

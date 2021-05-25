@@ -18,7 +18,7 @@ enum IconSize
     ICON_SIZE_LIST(ICON_SIZE_ENUM_ENTRY) __ICON_SIZE_COUNT,
 };
 
-class Icon : public RefCounted<Icon>
+struct Icon : public RefCounted<Icon>
 {
 private:
     String _name;

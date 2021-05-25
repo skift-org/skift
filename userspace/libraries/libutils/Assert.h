@@ -8,7 +8,7 @@
 namespace Utils::Assert
 {
 
-template <class A>
+template <typename A>
 inline void not_null(const A a, SourceLocation location = SourceLocation::current())
 {
     if constexpr (!(__CONFIG_IS_RELEASE__))
@@ -42,7 +42,7 @@ inline void falsity(bool a, SourceLocation location = SourceLocation::current())
     }
 }
 
-template <class A, class B>
+template <typename A, typename B>
 inline void equal(const A a, const B b, SourceLocation location = SourceLocation::current())
 {
     if constexpr (!(__CONFIG_IS_RELEASE__))
@@ -54,7 +54,7 @@ inline void equal(const A a, const B b, SourceLocation location = SourceLocation
     }
 }
 
-template <class A, class B>
+template <typename A, typename B>
 inline void not_equal(const A a, const B b, SourceLocation location = SourceLocation::current())
 {
     if constexpr (!(__CONFIG_IS_RELEASE__))
@@ -66,7 +66,7 @@ inline void not_equal(const A a, const B b, SourceLocation location = SourceLoca
     }
 }
 
-template <class A, class B>
+template <typename A, typename B>
 inline void greater_equal(const A a, const B b, SourceLocation location = SourceLocation::current())
 {
     if constexpr (!(__CONFIG_IS_RELEASE__))
@@ -78,7 +78,7 @@ inline void greater_equal(const A a, const B b, SourceLocation location = Source
     }
 }
 
-template <class A, class B>
+template <typename A, typename B>
 inline void greater_than(const A a, const B b, SourceLocation location = SourceLocation::current())
 {
     if constexpr (!(__CONFIG_IS_RELEASE__))
@@ -90,7 +90,7 @@ inline void greater_than(const A a, const B b, SourceLocation location = SourceL
     }
 }
 
-template <class A, class B>
+template <typename A, typename B>
 inline void lower_equal(const A a, const B b, SourceLocation location = SourceLocation::current())
 {
     if constexpr (!(__CONFIG_IS_RELEASE__))
@@ -102,7 +102,7 @@ inline void lower_equal(const A a, const B b, SourceLocation location = SourceLo
     }
 }
 
-template <class A, class B>
+template <typename A, typename B>
 inline void lower_than(const A a, const B b, SourceLocation location = SourceLocation::current())
 {
     if constexpr (!(__CONFIG_IS_RELEASE__))

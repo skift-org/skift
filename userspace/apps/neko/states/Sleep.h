@@ -5,7 +5,7 @@
 namespace neko
 {
 
-class Sleep : public Behavior
+struct Sleep : public Behavior
 {
 private:
     Math::Vec2i _last_mouse_position;

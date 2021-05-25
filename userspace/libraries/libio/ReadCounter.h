@@ -5,7 +5,7 @@
 namespace IO
 {
 
-class ReadCounter :
+struct ReadCounter :
     public Reader
 {
 private:

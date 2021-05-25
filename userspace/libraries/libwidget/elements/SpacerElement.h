@@ -5,7 +5,7 @@
 namespace Widget
 {
 
-class SpacerElement : public Element
+struct SpacerElement : public Element
 {
 public:
     SpacerElement()

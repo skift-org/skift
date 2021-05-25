@@ -6,7 +6,7 @@
 namespace Settings
 {
 
-class ServerConnection : public IPC::Peer<Protocol>
+struct ServerConnection : public IPC::Peer<Protocol>
 {
 public:
     Callback<void(const Path &path, const Json::Value &value)> on_notify;

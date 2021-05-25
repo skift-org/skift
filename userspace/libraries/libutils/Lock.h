@@ -10,7 +10,10 @@
 #    include "system/interrupts/Interupts.h"
 #endif
 
-class Lock
+namespace Utils
+{
+
+struct Lock
 {
 private:
     static constexpr auto NO_HOLDER = 0xDEADDEAD;
@@ -150,7 +153,7 @@ public:
     }
 };
 
-class LockHolder
+struct LockHolder
 {
 private:
     Lock &_lock;
@@ -166,3 +169,5 @@ public:
         _lock.release();
     }
 };
+
+} // namespace Utils

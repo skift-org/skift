@@ -7,7 +7,7 @@
 namespace Graphic
 {
 
-class Framebuffer
+struct Framebuffer
 {
 private:
     Handle _handle;

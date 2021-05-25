@@ -2,7 +2,7 @@
 
 #include <libfile/Archive.h>
 
-class ZipArchive : public Archive
+struct ZipArchive : public Archive
 {
 public:
     ZipArchive(IO::Path path, bool read = true);

@@ -5,7 +5,7 @@
 #include "system/node/Handle.h"
 #include "system/node/Node.h"
 
-class Domain
+struct Domain
 {
 private:
     RefPtr<FsNode> _root;

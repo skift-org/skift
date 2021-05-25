@@ -10,7 +10,7 @@
 namespace FilePicker
 {
 
-class Browser : public Widget::Table
+struct Browser : public Widget::Table
 {
 protected:
     RefPtr<Navigation> _navigation;

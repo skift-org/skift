@@ -4,7 +4,7 @@ namespace Math
 {
 
 template <typename Scalar>
-class QuadBezier
+struct QuadBezier
 {
 private:
     Math::Vec2<Scalar> _start;

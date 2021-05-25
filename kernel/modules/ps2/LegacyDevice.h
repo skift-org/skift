@@ -4,7 +4,7 @@
 
 #include "ps2/Legacy.h"
 
-class LegacyDevice : public Device
+struct LegacyDevice : public Device
 {
 private:
 public:
@@ -51,7 +51,7 @@ public:
 };
 
 template <typename LegacyDeviceType>
-class LegacyDeviceMatcher : public DeviceMatcher
+struct LegacyDeviceMatcher : public DeviceMatcher
 {
 private:
     LegacyAddress _address;

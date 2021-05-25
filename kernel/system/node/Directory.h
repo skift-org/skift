@@ -16,7 +16,7 @@ struct FsDirectoryEntry
     RefPtr<FsNode> node;
 };
 
-class FsDirectory : public FsNode
+struct FsDirectory : public FsNode
 {
 private:
     Vector<FsDirectoryEntry> _children{};

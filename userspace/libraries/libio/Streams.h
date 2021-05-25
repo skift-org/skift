@@ -9,7 +9,7 @@
 namespace IO
 {
 
-class InStream :
+struct InStream :
     public Reader,
     public RawHandle
 {
@@ -25,7 +25,7 @@ public:
     RefPtr<Handle> handle() override { return _handle; }
 };
 
-class OutStream :
+struct OutStream :
     public Writer,
     public RawHandle
 {
@@ -41,7 +41,7 @@ public:
     RefPtr<Handle> handle() override { return _handle; }
 };
 
-class ErrStream :
+struct ErrStream :
     public Writer,
     public RawHandle
 
@@ -58,7 +58,7 @@ public:
     RefPtr<Handle> handle() override { return _handle; }
 };
 
-class LogStream :
+struct LogStream :
     public Writer,
     public RawHandle
 {

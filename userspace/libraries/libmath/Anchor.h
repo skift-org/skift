@@ -3,7 +3,7 @@
 namespace Math
 {
 
-enum class Anchor
+enum struct Anchor
 {
     LEFT,
     CENTER,

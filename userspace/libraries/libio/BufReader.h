@@ -8,7 +8,7 @@
 namespace IO
 {
 
-class BufReader : public Reader
+struct BufReader : public Reader
 {
 private:
     Reader &_reader;

@@ -5,7 +5,7 @@
 #include <libutils/Storage.h>
 #include <libutils/Tags.h>
 
-class SliceStorage final :
+struct SliceStorage final :
     public Storage
 {
 private:

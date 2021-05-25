@@ -5,7 +5,7 @@
 namespace neko
 {
 
-class Itching : public Behavior
+struct Itching : public Behavior
 {
 private:
     Math::Vec2i _last_mouse_position;

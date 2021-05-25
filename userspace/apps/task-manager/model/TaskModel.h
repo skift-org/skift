@@ -6,7 +6,7 @@
 namespace TaskManager
 {
 
-class TaskModel : public Widget::TableModel
+struct TaskModel : public Widget::TableModel
 {
 private:
     Json::Value _data;

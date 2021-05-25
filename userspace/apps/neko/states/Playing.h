@@ -5,7 +5,7 @@
 namespace neko
 {
 
-class Playing : public Behavior
+struct Playing : public Behavior
 {
 private:
     Math::Vec2i _last_mouse_position;

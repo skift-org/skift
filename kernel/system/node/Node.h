@@ -4,10 +4,10 @@
 #include <abi/IOCall.h>
 
 #include <libsystem/Result.h>
+#include <libutils/Lock.h>
 #include <libutils/RefPtr.h>
 #include <libutils/ResultOr.h>
 #include <libutils/String.h>
-#include <skift/Lock.h>
 
 struct FsNode;
 struct FsHandle;

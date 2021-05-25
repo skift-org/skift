@@ -180,7 +180,7 @@ public:
 
     void relayout();
 
-    void repaint(Graphic::Painter &painter, Math::Recti rectangle) override;
+    virtual void repaint(Graphic::Painter &painter, Math::Recti rectangle);
 
     void flip(Math::Recti region);
 

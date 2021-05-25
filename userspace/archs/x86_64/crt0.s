@@ -8,6 +8,8 @@ _start:
     pop rsi ; argv
     pop rdx ; env
 
+    and rsp, 0xFFFFFFFFFFFFFFF0
+
     call __entry_point
     ud2
 .end:

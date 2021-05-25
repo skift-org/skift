@@ -2,3 +2,10 @@
 	path = thirdparty/echfs
 	url = https://github.com/skiftOS/echfs
 	branch=master
+[submodule "thirdparty/limine"]
+	path = thirdparty/limine
+	url = https://github.com/limine-bootloader/limine
+	branch=latest-binary
+[submodule "thirdparty/stivale"]
+	path = thirdparty/stivale
+	url = https://github.com/stivale/stivale

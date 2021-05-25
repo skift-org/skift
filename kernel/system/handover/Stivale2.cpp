@@ -1,8 +1,7 @@
-#include "system/Streams.h"
 #include <string.h>
+#include <thirdparty/stivale/stivale2.h>
 
-#include <thirdparty/limine/stivale/stivale2.h>
-
+#include "system/Streams.h"
 #include "system/handover/Handover.h"
 
 bool is_stivale2(uint32_t magic)

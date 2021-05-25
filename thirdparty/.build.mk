@@ -5,6 +5,6 @@ LIMINE_LOADER:=thirdparty/limine/limine.bin
 $(ECHFS):
 	cd thirdparty/echfs/ && $(MAKE) all
 
-$(LIMINE_LOADER):
+$(LIMINE):
 	cd thirdparty/limine/ && $(MAKE) all
 

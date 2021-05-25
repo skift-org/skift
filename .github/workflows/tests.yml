@@ -47,16 +47,22 @@ jobs:
           make clean
           make all CONFIG=test CONFIG_LOADER=grub CONFIG_ARCH=x86_32
 
+      - name: Building skiftOS (x86_64)
+        run: |
+          make clean
+          make all CONFIG=test CONFIG_LOADER=limine CONFIG_ARCH=x86_64
+
       - name: Run all tests (x86_32)
         timeout-minutes: 10
         continue-on-error: true
         run: |
           python ./meta/utils/test-driver.py ./build/disks/skift-x86_32-grub-test.img
 
-      - name: Building skiftOS (x86_64)
+      - name: Run all tests (x86_64)
+        timeout-minutes: 10
+        continue-on-error: true
         run: |
-          make clean
-          make all CONFIG=test CONFIG_LOADER=limine CONFIG_ARCH=x86_64
+          python ./meta/utils/test-driver.py ./build/disks/skift-x86_64-grub-test.img
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2

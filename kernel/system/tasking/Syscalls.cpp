@@ -114,13 +114,10 @@ Result hj_process_launch(Launchpad *launchpad, int *pid)
     return result;
 }
 
-Result hj_process_clone(int *pid, TaskFlags flags)
+Result hj_process_clone(int *, TaskFlags)
 {
     // Implemented in archs/x86_32/Interrupts.cpp
-    UNUSED(pid);
-    UNUSED(flags);
-
-    ASSERT_NOT_REACHED();
+    return ERR_NOT_IMPLEMENTED;
 }
 
 Result hj_process_exec(Launchpad *launchpad)

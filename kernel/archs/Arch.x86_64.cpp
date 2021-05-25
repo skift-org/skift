@@ -2,6 +2,7 @@
 #include "archs/x86/COM.h"
 #include "archs/x86/CPUID.h"
 #include "archs/x86/FPU.h"
+#include "archs/x86/Power.h"
 #include "archs/x86/RTC.h"
 #include "archs/x86_64/GDT.h"
 #include "archs/x86_64/Interrupts.h"
@@ -82,14 +83,26 @@ TimeStamp get_time()
 
 NO_RETURN void reboot()
 {
-    Kernel::logln("STUB {}", __func__);
-    ASSERT_NOT_REACHED();
+    early_console_enable();
+    Kernel::logln("Rebooting...");
+
+    x86::reboot_8042();
+    x86::reboot_triple_fault();
+
+    Kernel::logln("Failed to reboot: Halting!");
+    system_stop();
 }
 
 NO_RETURN void shutdown()
 {
-    Kernel::logln("STUB {}", __func__);
-    ASSERT_NOT_REACHED();
+    early_console_enable();
+    Kernel::logln("Shutting down...");
+
+    x86::shutdown_virtual_machines();
+    x86::shutdown_acpi();
+
+    Kernel::logln("Failed to shutdown: Halting!");
+    system_stop();
 }
 
 struct Stackframe

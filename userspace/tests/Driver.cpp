@@ -77,7 +77,12 @@ int run_all_testes()
         IO::err("test: {}: \e[1m{}\e[m... ", test.location.file(), test.name);
 
         int child_pid = -1;
-        hj_process_clone(&child_pid, TASK_WAITABLE);
+        if (hj_process_clone(&child_pid, TASK_WAITABLE) != SUCCESS)
+        {
+            IO::errln("\e[1;33mclone failled\e[m");
+            failed++;
+            continue;
+        }
 
         if (child_pid == 0)
         {

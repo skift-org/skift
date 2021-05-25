@@ -55,7 +55,7 @@ union PACKED PageDirectoryEntry
     uint32_t as_uint;
 };
 
-struct PACKED PageDirectory
+struct PACKED PageDirectory : public Arch::AddressSpace
 {
     PageDirectoryEntry entries[PAGE_DIRECTORY_ENTRY_COUNT];
 };
@@ -68,26 +68,26 @@ extern "C" void paging_load_directory(uintptr_t directory);
 
 extern "C" void paging_invalidate_tlb();
 
-void *kernel_address_space();
+PageDirectory *kernel_page_directory();
 
 void virtual_initialize();
 
 void virtual_memory_enable();
 
-bool virtual_present(void *address_space, uintptr_t virtual_address);
+bool virtual_present(PageDirectory *page_directory, uintptr_t virtual_address);
 
-uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address);
+uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_address);
 
-Result virtual_map(void *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
+Result virtual_map(PageDirectory *page_directory, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
 
-MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, MemoryFlags flags);
+MemoryRange virtual_alloc(PageDirectory *page_directory, MemoryRange physical_range, MemoryFlags flags);
 
-void virtual_free(void *address_space, MemoryRange virtual_range);
+void virtual_free(PageDirectory *page_directory, MemoryRange virtual_range);
 
-void *address_space_create();
+PageDirectory *page_directory_create();
 
-void address_space_destroy(void *address_space);
+void page_directory_destroy(PageDirectory *page_directory);
 
-void address_space_switch(void *address_space);
+void page_directory_switch(PageDirectory *page_directory);
 
 } // namespace Arch::x86_32

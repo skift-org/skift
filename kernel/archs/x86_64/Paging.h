@@ -5,7 +5,7 @@
 namespace Arch::x86_64
 {
 
-struct PACKED PageMappingLevel4Entry
+struct PACKED PML4Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
     bool writable : 1;              // If 0, writes may not be allowed.
@@ -19,9 +19,9 @@ struct PACKED PageMappingLevel4Entry
     bool execute_disabled : 1;      // If IA32_EFER.NXE = 1, Execute-disable
 };
 
-struct PACKED PageMappingLevel4
+struct PACKED PML4 : public AddressSpace
 {
-    PageMappingLevel4Entry entries[512];
+    PML4Entry entries[512];
 };
 
 static inline size_t pml4_index(uintptr_t address)
@@ -29,10 +29,10 @@ static inline size_t pml4_index(uintptr_t address)
     return (address >> 39) & 0x1FF;
 }
 
-static_assert(sizeof(PageMappingLevel4Entry) == sizeof(uint64_t));
-static_assert(sizeof(PageMappingLevel4) == 4096);
+static_assert(sizeof(PML4Entry) == sizeof(uint64_t));
+static_assert(sizeof(PML4) == 4096);
 
-struct PACKED PageMappingLevel3Entry
+struct PACKED PML3Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
     bool writable : 1;              // If 0, writes may not be allowed.
@@ -48,9 +48,9 @@ struct PACKED PageMappingLevel3Entry
     bool execute_disabled : 1;      // If IA32_EFER.NXE = 1, Execute-disable
 };
 
-struct PACKED PageMappingLevel3
+struct PACKED PML3
 {
-    PageMappingLevel3Entry entries[512];
+    PML3Entry entries[512];
 };
 
 static inline size_t pml3_index(uintptr_t address)
@@ -58,10 +58,10 @@ static inline size_t pml3_index(uintptr_t address)
     return (address >> 30) & 0x1FF;
 }
 
-static_assert(sizeof(PageMappingLevel3Entry) == sizeof(uint64_t));
-static_assert(sizeof(PageMappingLevel3) == 4096);
+static_assert(sizeof(PML3Entry) == sizeof(uint64_t));
+static_assert(sizeof(PML3) == 4096);
 
-struct PACKED PageMappingLevel2Entry
+struct PACKED PML2Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
     bool writable : 1;              // If 0, writes may not be allowed.
@@ -77,9 +77,9 @@ struct PACKED PageMappingLevel2Entry
     bool execute_disabled : 1;      // If IA32_EFER.NXE = 1, Execute-disable
 };
 
-struct PACKED PageMappingLevel2
+struct PACKED PML2
 {
-    PageMappingLevel3Entry entries[512];
+    PML3Entry entries[512];
 };
 
 static inline size_t pml2_index(uintptr_t address)
@@ -87,10 +87,10 @@ static inline size_t pml2_index(uintptr_t address)
     return (address >> 21) & 0x1FF;
 }
 
-static_assert(sizeof(PageMappingLevel2Entry) == sizeof(uint64_t));
-static_assert(sizeof(PageMappingLevel2) == 4096);
+static_assert(sizeof(PML2Entry) == sizeof(uint64_t));
+static_assert(sizeof(PML2) == 4096);
 
-struct PACKED PageMappingLevel1Entry
+struct PACKED PML1Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
     bool writable : 1;              // If 0, writes may not be allowed.
@@ -108,9 +108,9 @@ struct PACKED PageMappingLevel1Entry
     bool execute_disabled : 1;      // If IA32_EFER.NXE = 1, Execute-disable
 };
 
-struct PACKED PageMappingLevel1
+struct PACKED PML1
 {
-    PageMappingLevel3Entry entries[512];
+    PML3Entry entries[512];
 };
 
 static inline size_t pml1_index(uintptr_t address)
@@ -118,33 +118,33 @@ static inline size_t pml1_index(uintptr_t address)
     return (address >> 12) & 0x1FF;
 }
 
-static_assert(sizeof(PageMappingLevel1Entry) == sizeof(uint64_t));
-static_assert(sizeof(PageMappingLevel1) == 4096);
+static_assert(sizeof(PML1Entry) == sizeof(uint64_t));
+static_assert(sizeof(PML1) == 4096);
 
 extern "C" void paging_load_directory(uintptr_t directory);
 
 extern "C" void paging_invalidate_tlb();
 
-void *kernel_address_space();
+PML4 *kernel_pml4();
+
+PML4 *pml4_create();
+
+void pml4_destroy(PML4 *pml4);
+
+void pml4_switch(PML4 *pml4);
 
 void virtual_initialize();
 
 void virtual_memory_enable();
 
-bool virtual_present(void *address_space, uintptr_t virtual_address);
+bool virtual_present(PML4 *pml4, uintptr_t virtual_address);
 
-uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address);
+uintptr_t virtual_to_physical(PML4 *pml4, uintptr_t virtual_address);
 
-Result virtual_map(void *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
+Result virtual_map(PML4 *pml4, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
 
-MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, MemoryFlags flags);
+MemoryRange virtual_alloc(PML4 *pml4, MemoryRange physical_range, MemoryFlags flags);
 
-void virtual_free(void *address_space, MemoryRange virtual_range);
-
-void *address_space_create();
-
-void address_space_destroy(void *address_space);
-
-void address_space_switch(void *address_space);
+void virtual_free(PML4 *pml4, MemoryRange virtual_range);
 
 } // namespace Arch::x86_64

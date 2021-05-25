@@ -170,9 +170,9 @@ void backtrace()
     backtrace_internal(x86_64::RBP());
 }
 
-void *kernel_address_space()
+AddressSpace *kernel_address_space()
 {
-    return x86_64::kernel_address_space();
+    return x86_64::kernel_pml4();
 }
 
 void virtual_initialize()
@@ -185,44 +185,44 @@ void virtual_memory_enable()
     return x86_64::virtual_memory_enable();
 }
 
-bool virtual_present(void *address_space, uintptr_t virtual_address)
+bool virtual_present(AddressSpace *address_space, uintptr_t virtual_address)
 {
-    return x86_64::virtual_present(address_space, virtual_address);
+    return x86_64::virtual_present(static_cast<x86_64::PML4 *>(address_space), virtual_address);
 }
 
-uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address)
+uintptr_t virtual_to_physical(AddressSpace *address_space, uintptr_t virtual_address)
 {
-    return x86_64::virtual_to_physical(address_space, virtual_address);
+    return x86_64::virtual_to_physical(static_cast<x86_64::PML4 *>(address_space), virtual_address);
 }
 
-Result virtual_map(void *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
+Result virtual_map(AddressSpace *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
 {
-    return x86_64::virtual_map(address_space, physical_range, virtual_address, flags);
+    return x86_64::virtual_map(static_cast<x86_64::PML4 *>(address_space), physical_range, virtual_address, flags);
 }
 
-MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, MemoryFlags flags)
+MemoryRange virtual_alloc(AddressSpace *address_space, MemoryRange physical_range, MemoryFlags flags)
 {
-    return x86_64::virtual_alloc(address_space, physical_range, flags);
+    return x86_64::virtual_alloc(static_cast<x86_64::PML4 *>(address_space), physical_range, flags);
 }
 
-void virtual_free(void *address_space, MemoryRange virtual_range)
+void virtual_free(AddressSpace *address_space, MemoryRange virtual_range)
 {
-    return x86_64::virtual_free(address_space, virtual_range);
+    return x86_64::virtual_free(static_cast<x86_64::PML4 *>(address_space), virtual_range);
 }
 
-void *address_space_create()
+AddressSpace *address_space_create()
 {
-    return x86_64::address_space_create();
+    return x86_64::pml4_create();
 }
 
-void address_space_destroy(void *address_space)
+void address_space_destroy(AddressSpace *address_space)
 {
-    return x86_64::address_space_destroy(address_space);
+    return x86_64::pml4_destroy(static_cast<x86_64::PML4 *>(address_space));
 }
 
-void address_space_switch(void *address_space)
+void address_space_switch(AddressSpace *address_space)
 {
-    return x86_64::address_space_switch(address_space);
+    return x86_64::pml4_switch(static_cast<x86_64::PML4 *>(address_space));
 }
 
 } // namespace Arch

@@ -31,7 +31,7 @@ struct ELFLoader
             return ERR_EXEC_FORMAT_ERROR;
         }
 
-        void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
+        auto *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
 
         MemoryRange range = MemoryRange::around_non_aligned_address(program_header->vaddr, program_header->memsz);
 
@@ -87,7 +87,7 @@ struct ELFLoader
 
 void task_pass_argc_argv_env(Task *task, Launchpad *launchpad)
 {
-    void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
+    auto *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
 
     uintptr_t argv_list[PROCESS_ARG_COUNT] = {};
 

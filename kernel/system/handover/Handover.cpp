@@ -57,7 +57,7 @@ void handover_dump()
                       module->range.base() + module->range.size() - 1,
                       module->command_line);
     }
-    Kernel::logln("\t-> %d module found", _handover.modules_size);
+    Kernel::logln("\t-> {} module found", _handover.modules_size);
 }
 
 Handover *handover_initialize(void *header, uint32_t magic)

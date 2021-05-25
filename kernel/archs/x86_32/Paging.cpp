@@ -35,16 +35,14 @@ void virtual_memory_enable()
     paging_enable();
 }
 
-void *kernel_address_space()
+PageDirectory *kernel_page_directory()
 {
     return &_kernel_page_directory;
 }
 
-bool virtual_present(void *address_space, uintptr_t virtual_address)
+bool virtual_present(PageDirectory *page_directory, uintptr_t virtual_address)
 {
     ASSERT_INTERRUPTS_RETAINED();
-
-    auto page_directory = reinterpret_cast<PageDirectory *>(address_space);
 
     int page_directory_index = PAGE_DIRECTORY_INDEX(virtual_address);
     PageDirectoryEntry &page_directory_entry = page_directory->entries[page_directory_index];
@@ -62,11 +60,9 @@ bool virtual_present(void *address_space, uintptr_t virtual_address)
     return page_table_entry.Present;
 }
 
-uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address)
+uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_address)
 {
     ASSERT_INTERRUPTS_RETAINED();
-
-    auto page_directory = reinterpret_cast<PageDirectory *>(address_space);
 
     int page_directory_index = PAGE_DIRECTORY_INDEX(virtual_address);
     PageDirectoryEntry &page_directory_entry = page_directory->entries[page_directory_index];
@@ -89,11 +85,9 @@ uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address)
     return (page_table_entry.PageFrameNumber * ARCH_PAGE_SIZE) + (virtual_address & 0xfff);
 }
 
-Result virtual_map(void *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
+Result virtual_map(PageDirectory *page_directory, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
 {
     ASSERT_INTERRUPTS_RETAINED();
-
-    auto page_directory = reinterpret_cast<PageDirectory *>(address_space);
 
     for (size_t i = 0; i < physical_range.size() / ARCH_PAGE_SIZE; i++)
     {
@@ -127,7 +121,7 @@ Result virtual_map(void *address_space, MemoryRange physical_range, uintptr_t vi
     return SUCCESS;
 }
 
-MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, MemoryFlags flags)
+MemoryRange virtual_alloc(PageDirectory *page_directory, MemoryRange physical_range, MemoryFlags flags)
 {
     ASSERT_INTERRUPTS_RETAINED();
 
@@ -141,7 +135,7 @@ MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, Memor
     {
         uintptr_t current_address = i * ARCH_PAGE_SIZE;
 
-        if (!virtual_present(address_space, current_address))
+        if (!virtual_present(page_directory, current_address))
         {
             if (current_size == 0)
             {
@@ -152,9 +146,9 @@ MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, Memor
 
             if (current_size == physical_range.size())
             {
-                assert(SUCCESS == virtual_map(address_space, physical_range, virtual_address, flags));
+                assert(SUCCESS == virtual_map(page_directory, physical_range, virtual_address, flags));
 
-                return (MemoryRange){virtual_address, current_size};
+                return {virtual_address, current_size};
             }
         }
         else
@@ -166,11 +160,9 @@ MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, Memor
     system_panic("Out of virtual memory!");
 }
 
-void virtual_free(void *address_space, MemoryRange virtual_range)
+void virtual_free(PageDirectory *page_directory, MemoryRange virtual_range)
 {
     ASSERT_INTERRUPTS_RETAINED();
-
-    auto page_directory = reinterpret_cast<PageDirectory *>(address_space);
 
     for (size_t i = 0; i < virtual_range.size() / ARCH_PAGE_SIZE; i++)
     {
@@ -198,13 +190,13 @@ void virtual_free(void *address_space, MemoryRange virtual_range)
     paging_invalidate_tlb();
 }
 
-void *address_space_create()
+PageDirectory *page_directory_create()
 {
     InterruptsRetainer retainer;
 
     PageDirectory *page_directory = nullptr;
 
-    if (memory_alloc(kernel_address_space(), sizeof(PageDirectory), MEMORY_CLEAR, (uintptr_t *)&page_directory) != SUCCESS)
+    if (memory_alloc(kernel_page_directory(), sizeof(PageDirectory), MEMORY_CLEAR, (uintptr_t *)&page_directory) != SUCCESS)
     {
         Kernel::logln("Page directory allocation failed!");
 
@@ -227,13 +219,11 @@ void *address_space_create()
     return page_directory;
 }
 
-void address_space_destroy(void *address_space)
+void page_directory_destroy(PageDirectory *page_directory)
 {
     InterruptsRetainer retainer;
 
-    assert(address_space != kernel_address_space());
-
-    auto page_directory = reinterpret_cast<PageDirectory *>(address_space);
+    assert(page_directory != kernel_page_directory());
 
     for (size_t i = 256; i < 1024; i++)
     {
@@ -264,10 +254,10 @@ void address_space_destroy(void *address_space)
     memory_free(kernel_address_space(), (MemoryRange){(uintptr_t)page_directory, sizeof(PageDirectory)});
 }
 
-void address_space_switch(void *address_space)
+void page_directory_switch(PageDirectory *page_directory)
 {
     InterruptsRetainer retainer;
-    paging_load_directory(virtual_to_physical(kernel_address_space(), (uintptr_t)address_space));
+    paging_load_directory(virtual_to_physical(kernel_page_directory(), (uintptr_t)page_directory));
 }
 
 } // namespace Arch::x86_32

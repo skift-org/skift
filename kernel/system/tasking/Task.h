@@ -40,7 +40,7 @@ struct Task
     char fpu_registers[512];
 
     List<MemoryMapping *> *memory_mapping;
-    void *address_space;
+    Arch::AddressSpace *address_space;
 
     int exit_value = 0;
 

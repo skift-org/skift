@@ -29,6 +29,6 @@ Result task_memory_include(Task *task, int handle, uintptr_t *out_address, size_
 
 Result task_memory_get_handle(Task *task, uintptr_t address, int *out_handle);
 
-void *task_switch_address_space(Task *task, void *address_space);
+Arch::AddressSpace *task_switch_address_space(Task *task, Arch::AddressSpace *address_space);
 
 size_t task_memory_usage(Task *task);

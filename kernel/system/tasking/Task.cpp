@@ -140,7 +140,7 @@ Task *task_create(Task *parent, const char *name, TaskFlags flags)
 
     if (task->_flags & TASK_USER)
     {
-        void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
+        auto *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
         task_memory_map(task, 0xff000000, PROCESS_STACK_SIZE, MEMORY_CLEAR | MEMORY_USER);
         task->user_stack_pointer = 0xff000000 + PROCESS_STACK_SIZE;
         task->user_stack = (void *)0xff000000;
@@ -200,7 +200,7 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip, TaskFlags flags)
         assert(virtual_range.base());
         memcpy(buffer, (void *)virtual_range.base(), virtual_range.size());
 
-        void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
+        auto *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
 
         task_memory_map(task, virtual_range.base(), virtual_range.size(), MEMORY_USER);
         memcpy((void *)virtual_range.base(), buffer, virtual_range.size());
@@ -254,7 +254,7 @@ void task_clear_userspace(Task *task)
         task_memory_mapping_destroy(task, mapping);
     }
 
-    void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
+    auto *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
     task_memory_map(task, 0xff000000, PROCESS_STACK_SIZE, MEMORY_CLEAR | MEMORY_USER);
     task->user_stack_pointer = 0xff000000 + PROCESS_STACK_SIZE;
     task->user_stack = (void *)0xff000000;

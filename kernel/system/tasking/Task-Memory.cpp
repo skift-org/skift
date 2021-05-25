@@ -190,9 +190,9 @@ Result task_memory_get_handle(Task *task, uintptr_t address, int *out_handle)
     return SUCCESS;
 }
 
-void *task_switch_address_space(Task *task, void *address_space)
+Arch::AddressSpace *task_switch_address_space(Task *task, Arch::AddressSpace *address_space)
 {
-    void *old_address_space = task->address_space;
+    auto *old_address_space = task->address_space;
 
     task->address_space = address_space;
 

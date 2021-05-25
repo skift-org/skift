@@ -95,7 +95,7 @@ size_t memory_get_total()
     return TOTAL_MEMORY;
 }
 
-Result memory_map(void *address_space, MemoryRange virtual_range, MemoryFlags flags)
+Result memory_map(Arch::AddressSpace *address_space, MemoryRange virtual_range, MemoryFlags flags)
 {
     assert(virtual_range.is_page_aligned());
 
@@ -125,7 +125,7 @@ Result memory_map(void *address_space, MemoryRange virtual_range, MemoryFlags fl
     return SUCCESS;
 }
 
-Result memory_map_identity(void *address_space, MemoryRange physical_range, MemoryFlags flags)
+Result memory_map_identity(Arch::AddressSpace *address_space, MemoryRange physical_range, MemoryFlags flags)
 {
     assert(physical_range.is_page_aligned());
 
@@ -142,7 +142,7 @@ Result memory_map_identity(void *address_space, MemoryRange physical_range, Memo
     return SUCCESS;
 }
 
-Result memory_alloc(void *address_space, size_t size, MemoryFlags flags, uintptr_t *out_address)
+Result memory_alloc(Arch::AddressSpace *address_space, size_t size, MemoryFlags flags, uintptr_t *out_address)
 
 {
     assert(IS_PAGE_ALIGN(size));
@@ -185,7 +185,7 @@ Result memory_alloc(void *address_space, size_t size, MemoryFlags flags, uintptr
     return SUCCESS;
 }
 
-Result memory_alloc_identity(void *address_space, MemoryFlags flags, uintptr_t *out_address)
+Result memory_alloc_identity(Arch::AddressSpace *address_space, MemoryFlags flags, uintptr_t *out_address)
 {
     InterruptsRetainer retainer;
 
@@ -217,7 +217,7 @@ Result memory_alloc_identity(void *address_space, MemoryFlags flags, uintptr_t *
     return ERR_OUT_OF_MEMORY;
 }
 
-Result memory_free(void *address_space, MemoryRange virtual_range)
+Result memory_free(Arch::AddressSpace *address_space, MemoryRange virtual_range)
 {
     assert(virtual_range.is_page_aligned());
 

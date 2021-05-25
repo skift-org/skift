@@ -1,6 +1,6 @@
-#include "system/Streams.h"
 #include <libutils/ResultOr.h>
 
+#include "system/Streams.h"
 #include "system/interrupts/Interupts.h"
 #include "system/memory/Memory.h"
 #include "system/system/System.h"
@@ -12,13 +12,12 @@
 namespace Arch::x86_64
 {
 
-PageMappingLevel4 kpml4 ALIGNED(ARCH_PAGE_SIZE) = {};
-PageMappingLevel3 kpml3 ALIGNED(ARCH_PAGE_SIZE) = {};
+PML4 kpml4 ALIGNED(ARCH_PAGE_SIZE) = {};
+PML3 kpml3 ALIGNED(ARCH_PAGE_SIZE) = {};
+PML2 kpml2 ALIGNED(ARCH_PAGE_SIZE) = {};
+PML1 kpml1[512] ALIGNED(ARCH_PAGE_SIZE) = {};
 
-PageMappingLevel2 kpml2 ALIGNED(ARCH_PAGE_SIZE) = {};
-PageMappingLevel1 kpml1[512] ALIGNED(ARCH_PAGE_SIZE) = {};
-
-void *kernel_address_space()
+PML4 *kernel_pml4()
 {
     return &kpml4;
 }
@@ -49,14 +48,13 @@ void virtual_initialize()
 
 void virtual_memory_enable()
 {
-    address_space_switch(kernel_address_space());
+    pml4_switch(kernel_pml4());
 }
 
-bool virtual_present(void *address_space, uintptr_t virtual_address)
+bool virtual_present(PML4 *pml4, uintptr_t virtual_address)
 {
     ASSERT_INTERRUPTS_RETAINED();
 
-    auto pml4 = reinterpret_cast<PageMappingLevel4 *>(address_space);
     auto &pml4_entry = pml4->entries[pml4_index(virtual_address)];
 
     if (!pml4_entry.present)
@@ -64,7 +62,7 @@ bool virtual_present(void *address_space, uintptr_t virtual_address)
         return false;
     }
 
-    auto pml3 = reinterpret_cast<PageMappingLevel3 *>(pml4_entry.physical_address * ARCH_PAGE_SIZE);
+    auto pml3 = reinterpret_cast<PML3 *>(pml4_entry.physical_address * ARCH_PAGE_SIZE);
     auto &pml3_entry = pml3->entries[pml3_index(virtual_address)];
 
     if (!pml3_entry.present)
@@ -72,7 +70,7 @@ bool virtual_present(void *address_space, uintptr_t virtual_address)
         return false;
     }
 
-    auto pml2 = reinterpret_cast<PageMappingLevel2 *>(pml3_entry.physical_address * ARCH_PAGE_SIZE);
+    auto pml2 = reinterpret_cast<PML2 *>(pml3_entry.physical_address * ARCH_PAGE_SIZE);
     auto &pml2_entry = pml2->entries[pml2_index(virtual_address)];
 
     if (!pml2_entry.present)
@@ -80,17 +78,16 @@ bool virtual_present(void *address_space, uintptr_t virtual_address)
         return false;
     }
 
-    auto pml1 = reinterpret_cast<PageMappingLevel1 *>(pml2_entry.physical_address * ARCH_PAGE_SIZE);
+    auto pml1 = reinterpret_cast<PML1 *>(pml2_entry.physical_address * ARCH_PAGE_SIZE);
     auto &pml1_entry = pml1->entries[pml1_index(virtual_address)];
 
     return pml1_entry.present;
 }
 
-uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address)
+uintptr_t virtual_to_physical(PML4 *pml4, uintptr_t virtual_address)
 {
     ASSERT_INTERRUPTS_RETAINED();
 
-    auto pml4 = reinterpret_cast<PageMappingLevel4 *>(address_space);
     auto &pml4_entry = pml4->entries[pml4_index(virtual_address)];
 
     if (!pml4_entry.present)
@@ -98,7 +95,7 @@ uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address)
         return 0;
     }
 
-    auto pml3 = reinterpret_cast<PageMappingLevel3 *>(pml4_entry.physical_address * ARCH_PAGE_SIZE);
+    auto pml3 = reinterpret_cast<PML3 *>(pml4_entry.physical_address * ARCH_PAGE_SIZE);
     auto &pml3_entry = pml3->entries[pml3_index(virtual_address)];
 
     if (!pml3_entry.present)
@@ -106,7 +103,7 @@ uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address)
         return 0;
     }
 
-    auto pml2 = reinterpret_cast<PageMappingLevel2 *>(pml3_entry.physical_address * ARCH_PAGE_SIZE);
+    auto pml2 = reinterpret_cast<PML2 *>(pml3_entry.physical_address * ARCH_PAGE_SIZE);
     auto &pml2_entry = pml2->entries[pml2_index(virtual_address)];
 
     if (!pml2_entry.present)
@@ -114,7 +111,7 @@ uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address)
         return 0;
     }
 
-    auto pml1 = reinterpret_cast<PageMappingLevel1 *>(pml2_entry.physical_address * ARCH_PAGE_SIZE);
+    auto pml1 = reinterpret_cast<PML1 *>(pml2_entry.physical_address * ARCH_PAGE_SIZE);
     auto &pml1_entry = pml1->entries[pml1_index(virtual_address)];
 
     if (!pml1_entry.present)
@@ -125,22 +122,20 @@ uintptr_t virtual_to_physical(void *address_space, uintptr_t virtual_address)
     return (pml1_entry.physical_address * ARCH_PAGE_SIZE) + (virtual_address & 0xfff);
 }
 
-Result virtual_map(void *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
+Result virtual_map(PML4 *pml4, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
 {
     ASSERT_INTERRUPTS_RETAINED();
-
-    auto plm4 = reinterpret_cast<PageMappingLevel4 *>(address_space);
 
     for (size_t i = 0; i < physical_range.page_count(); i++)
     {
         uint64_t address = virtual_address + i * ARCH_PAGE_SIZE;
 
-        auto pml4_entry = &plm4->entries[pml4_index(address)];
-        auto pml3 = reinterpret_cast<PageMappingLevel3 *>(pml4_entry->physical_address * ARCH_PAGE_SIZE);
+        auto pml4_entry = &pml4->entries[pml4_index(address)];
+        auto pml3 = reinterpret_cast<PML3 *>(pml4_entry->physical_address * ARCH_PAGE_SIZE);
 
         if (!pml4_entry->present)
         {
-            TRY(memory_alloc_identity(address_space, MEMORY_CLEAR, (uintptr_t *)&pml3));
+            TRY(memory_alloc_identity(pml4, MEMORY_CLEAR, (uintptr_t *)&pml3));
 
             pml4_entry->present = 1;
             pml4_entry->writable = 1;
@@ -149,11 +144,11 @@ Result virtual_map(void *address_space, MemoryRange physical_range, uintptr_t vi
         }
 
         auto pml3_entry = &pml3->entries[pml3_index(address)];
-        auto pml2 = reinterpret_cast<PageMappingLevel2 *>(pml3_entry->physical_address * ARCH_PAGE_SIZE);
+        auto pml2 = reinterpret_cast<PML2 *>(pml3_entry->physical_address * ARCH_PAGE_SIZE);
 
         if (!pml3_entry->present)
         {
-            TRY(memory_alloc_identity(address_space, MEMORY_CLEAR, (uintptr_t *)&pml2));
+            TRY(memory_alloc_identity(pml4, MEMORY_CLEAR, (uintptr_t *)&pml2));
 
             pml3_entry->present = 1;
             pml3_entry->writable = 1;
@@ -162,11 +157,11 @@ Result virtual_map(void *address_space, MemoryRange physical_range, uintptr_t vi
         }
 
         auto pml2_entry = &pml2->entries[pml2_index(address)];
-        auto pml1 = reinterpret_cast<PageMappingLevel1 *>(pml2_entry->physical_address * ARCH_PAGE_SIZE);
+        auto pml1 = reinterpret_cast<PML1 *>(pml2_entry->physical_address * ARCH_PAGE_SIZE);
 
         if (!pml2_entry->present)
         {
-            TRY(memory_alloc_identity(address_space, MEMORY_CLEAR, (uintptr_t *)&pml1));
+            TRY(memory_alloc_identity(pml4, MEMORY_CLEAR, (uintptr_t *)&pml1));
 
             pml2_entry->present = 1;
             pml2_entry->writable = 1;
@@ -187,7 +182,7 @@ Result virtual_map(void *address_space, MemoryRange physical_range, uintptr_t vi
     return SUCCESS;
 }
 
-MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, MemoryFlags flags)
+MemoryRange virtual_alloc(PML4 *pml4, MemoryRange physical_range, MemoryFlags flags)
 {
     ASSERT_INTERRUPTS_RETAINED();
 
@@ -201,7 +196,7 @@ MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, Memor
     {
         uintptr_t current_address = i * ARCH_PAGE_SIZE;
 
-        if (!virtual_present(address_space, current_address))
+        if (!virtual_present(pml4, current_address))
         {
             if (current_size == 0)
             {
@@ -212,7 +207,7 @@ MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, Memor
 
             if (current_size == physical_range.size())
             {
-                assert(SUCCESS == virtual_map(address_space, physical_range, virtual_address, flags));
+                assert(SUCCESS == virtual_map(pml4, physical_range, virtual_address, flags));
 
                 return (MemoryRange){virtual_address, current_size};
             }
@@ -226,7 +221,7 @@ MemoryRange virtual_alloc(void *address_space, MemoryRange physical_range, Memor
     system_panic("Out of virtual memory!");
 }
 
-void virtual_free(void *address_space, MemoryRange virtual_range)
+void virtual_free(PML4 *pml4, MemoryRange virtual_range)
 {
     ASSERT_INTERRUPTS_RETAINED();
 
@@ -234,15 +229,14 @@ void virtual_free(void *address_space, MemoryRange virtual_range)
     {
         uint64_t address = virtual_range.base() + i * ARCH_PAGE_SIZE;
 
-        auto plm4 = reinterpret_cast<PageMappingLevel4 *>(address_space);
-        auto pml4_entry = &plm4->entries[pml4_index(address)];
+        auto pml4_entry = &pml4->entries[pml4_index(address)];
 
         if (!pml4_entry->present)
         {
             continue;
         }
 
-        auto pml3 = reinterpret_cast<PageMappingLevel3 *>(pml4_entry->physical_address * ARCH_PAGE_SIZE);
+        auto pml3 = reinterpret_cast<PML3 *>(pml4_entry->physical_address * ARCH_PAGE_SIZE);
         auto pml3_entry = &pml3->entries[pml3_index(address)];
 
         if (!pml3_entry->present)
@@ -250,7 +244,7 @@ void virtual_free(void *address_space, MemoryRange virtual_range)
             continue;
         }
 
-        auto pml2 = reinterpret_cast<PageMappingLevel2 *>(pml3_entry->physical_address * ARCH_PAGE_SIZE);
+        auto pml2 = reinterpret_cast<PML2 *>(pml3_entry->physical_address * ARCH_PAGE_SIZE);
         auto pml2_entry = &pml2->entries[pml2_index(address)];
 
         if (!pml2_entry->present)
@@ -258,7 +252,7 @@ void virtual_free(void *address_space, MemoryRange virtual_range)
             continue;
         }
 
-        auto pml1 = reinterpret_cast<PageMappingLevel1 *>(pml2_entry->physical_address * ARCH_PAGE_SIZE);
+        auto pml1 = reinterpret_cast<PML1 *>(pml2_entry->physical_address * ARCH_PAGE_SIZE);
         auto pml1_entry = &pml1->entries[pml1_index(address)];
 
         *pml1_entry = {};
@@ -267,13 +261,13 @@ void virtual_free(void *address_space, MemoryRange virtual_range)
     paging_invalidate_tlb();
 }
 
-void *address_space_create()
+PML4 *pml4_create()
 {
-    PageMappingLevel4 *pml4;
-    memory_alloc_identity(kernel_address_space(), MEMORY_CLEAR, (uintptr_t *)&pml4);
+    PML4 *pml4;
+    memory_alloc_identity(kernel_pml4(), MEMORY_CLEAR, (uintptr_t *)&pml4);
 
-    PageMappingLevel3 *pml3;
-    memory_alloc_identity(kernel_address_space(), MEMORY_CLEAR, (uintptr_t *)&pml3);
+    PML3 *pml3;
+    memory_alloc_identity(kernel_pml4(), MEMORY_CLEAR, (uintptr_t *)&pml3);
 
     auto &pml4_entry = pml4->entries[0];
     pml4_entry.user = 1;
@@ -281,8 +275,8 @@ void *address_space_create()
     pml4_entry.present = 1;
     pml4_entry.physical_address = (uint64_t)pml3 / ARCH_PAGE_SIZE;
 
-    PageMappingLevel2 *pml2;
-    memory_alloc_identity(kernel_address_space(), MEMORY_CLEAR, (uintptr_t *)&pml2);
+    PML2 *pml2;
+    memory_alloc_identity(kernel_pml4(), MEMORY_CLEAR, (uintptr_t *)&pml2);
 
     auto &pml3_entry = pml3->entries[0];
     pml3_entry.user = 1;
@@ -302,18 +296,19 @@ void *address_space_create()
     return pml4;
 }
 
-void address_space_destroy(void *address_space)
+void pml4_destroy(PML4 *pml4)
 {
+    return;
     ASSERT_INTERRUPTS_RETAINED();
 
-    UNUSED(address_space);
+    UNUSED(pml4);
 
     ASSERT_NOT_REACHED();
 }
 
-void address_space_switch(void *address_space)
+void pml4_switch(PML4 *pml4)
 {
-    paging_load_directory((uintptr_t)address_space);
+    paging_load_directory((uintptr_t)pml4);
 }
 
 } // namespace Arch::x86_64

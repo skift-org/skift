@@ -1,4 +1,4 @@
-These releases are published automatically every Monday. Please report any issues you accounter. For support, you can contact us on [discord](http://discord.skiftos.org).
+These releases are published automatically every Monday. Please report any issues you encounter. For support, you can contact us on [discord](http://discord.skiftos.org).
 
 # Running skiftOS
 

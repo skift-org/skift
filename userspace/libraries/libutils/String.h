@@ -173,6 +173,9 @@ public:
     }
 };
 
+template <typename T>
+concept ToString = requires(const T &t) { t.string(); };
+
 template <>
 inline uint32_t hash<String>(const String &value)
 {

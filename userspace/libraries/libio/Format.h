@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libio/Formatter.h>
 #include <libio/MemoryReader.h>
 #include <libio/MemoryWriter.h>
 #include <libio/Path.h>
@@ -9,135 +10,6 @@
 
 namespace IO
 {
-
-struct Formating
-{
-    enum Align
-    {
-        LEFT,
-        CENTER,
-        RIGHT,
-    };
-
-    enum Type
-    {
-        DEFAULT,
-        STRING,
-        CHARACTER,
-        BINARY,
-        DECIMAL,
-        OCTAL,
-        HEXADECIMAL,
-    };
-
-    Align align;
-    bool prefix;
-    Type type = DEFAULT;
-
-    static Formating parse(Scanner &scan)
-    {
-        Formating format{};
-
-        scan.skip('{');
-
-        auto parse_type = [&]() {
-            switch (scan.peek())
-            {
-            case 's':
-                format.type = STRING;
-                break;
-
-            case 'c':
-                format.type = CHARACTER;
-                break;
-
-            case 'b':
-                format.type = BINARY;
-                break;
-
-            case 'd':
-                format.type = DECIMAL;
-                break;
-
-            case 'o':
-                format.type = OCTAL;
-                break;
-
-            case 'x':
-                format.type = HEXADECIMAL;
-                break;
-
-            case 'p':
-                format.prefix = true;
-                format.type = HEXADECIMAL;
-                break;
-
-            default:
-                break;
-            }
-        };
-
-        if (scan.skip('#'))
-        {
-            format.prefix = true;
-        }
-
-        if (scan.peek_is_any("scbdoxp"))
-        {
-            parse_type();
-            scan.next();
-        }
-
-        while (!scan.ended() && scan.peek() != '}')
-        {
-            scan.next();
-        }
-
-        scan.skip('}');
-
-        return format;
-    }
-};
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, char);
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned char);
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, short int);
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned short int);
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, int);
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned int);
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, long int);
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned long int);
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, long long int);
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, unsigned long long int);
-
-#ifndef __KERNEL__
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, float);
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, double);
-
-#endif
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, const char *);
-
-template <typename T>
-ResultOr<size_t> format(IO::Writer &writer, const Formating &format, const T *ptr)
-{
-    return IO::format(writer, format, reinterpret_cast<uintptr_t>(ptr));
-}
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, const String);
-
-ResultOr<size_t> format(IO::Writer &, const Formating &, const IO::Path);
 
 static inline ResultOr<size_t> format(IO::Writer &writer, Scanner &scan)
 {
@@ -163,22 +35,8 @@ static inline ResultOr<size_t> format(Writer &writer, Scanner &scan, First first
 
     if (scan.peek() == '{')
     {
-        auto formating = Formating::parse(scan);
-
-        auto format_proxy = [&]() {
-            if constexpr (requires(const First &t) {
-                              format(writer, formating, t);
-                          })
-            {
-                return format(writer, formating, first);
-            }
-            else
-            {
-                ASSERT_NOT_REACHED();
-            }
-        };
-
-        written += TRY(format_proxy());
+        auto fmt = Formatter::parse(scan);
+        written += TRY(fmt.format(writer, first));
     }
 
     if (!scan.ended())

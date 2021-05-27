@@ -1,7 +1,6 @@
 #pragma once
 
 #include <libio/Format.h>
-#include <libio/NumberFormat.h>
 #include <libio/Prettier.h>
 #include <libjson/Value.h>
 #include <libutils/String.h>
@@ -19,12 +18,12 @@ inline void prettify(IO::Prettier &pretty, const Value &value)
     }
     else if (value.is(INTEGER))
     {
-        IO::NumberFormat::decimal().format(pretty, value.as_integer());
+        IO::Formatter::decimal().format(pretty, value.as_integer());
     }
 #ifndef __KERNEL__
     else if (value.is(DOUBLE))
     {
-        IO::NumberFormat::decimal().format(pretty, value.as_double());
+        IO::Formatter::decimal().format(pretty, value.as_double());
     }
 #endif
     else if (value.is(OBJECT))

@@ -5,3 +5,6 @@
 [submodule "thirdparty/stivale"]
 	path = thirdparty/stivale
 	url = https://github.com/stivale/stivale
+[submodule "thirdparty/echfs"]
+	path = thirdparty/echfs
+	url = https://github.com/echfs/echfs

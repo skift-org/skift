@@ -1,7 +1,3 @@
-[submodule "thirdparty/echfs"]
-	path = thirdparty/echfs
-	url = https://github.com/skiftOS/echfs
-	branch=master
 [submodule "thirdparty/limine"]
 	path = thirdparty/limine
 	url = https://github.com/limine-bootloader/limine

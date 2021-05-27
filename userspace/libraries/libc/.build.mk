@@ -2,7 +2,7 @@ LIBS += C
 
 C_NAME = c
 
-# -fno-tree-loop-distribute-patterns is needed because gcc 
+# -fno-tree-loop-distribute-patterns is needed because gcc
 # like to optimise away our implementation of memcpy
 
 C_CXXFLAGS = \

@@ -1,7 +1,7 @@
 #pragma once
 
-#define RESULT_ENUM(__ENTRY, __ENTRY_WITH_VALUE)                                  \
-    __ENTRY_WITH_VALUE(SUCCESS, 0, "Success")                                     \
+#define RESULT_ENUM(__ENTRY)                                                      \
+    __ENTRY(SUCCESS, "Success")                                                   \
     __ENTRY(TIMEOUT, "Timed out")                                                 \
     __ENTRY(INTERRUPTED, "Interrupted")                                           \
     __ENTRY(ERR_BAD_ADDRESS, "Bad address")                                       \
@@ -42,10 +42,8 @@
 enum Result
 {
 #define RESULT_ENUM_ENTRY(__name, __description) __name,
-#define RESULT_ENUM_ENTRY_WITH_VALUE(__name, __value, __description) __name,
-    RESULT_ENUM(RESULT_ENUM_ENTRY, RESULT_ENUM_ENTRY_WITH_VALUE)
+    RESULT_ENUM(RESULT_ENUM_ENTRY)
 #undef RESULT_ENUM_ENTRY
-#undef RESULT_ENUM_ENTRY_WITH_VALUE
         __RESULT_COUNT
 };
 

@@ -16,8 +16,12 @@ void abort()
 int atoi(const char *str)
 {
     int n = 0, neg = 0;
+
     while (isspace(*str))
+    {
         str++;
+    }
+
     switch (*str)
     {
     case '-':
@@ -27,9 +31,13 @@ int atoi(const char *str)
         str++;
         break;
     }
+
     /* Compute n as a negative number to avoid overflow on INT_MIN */
     while (isdigit(*str))
+    {
         n = 10 * n - (*str++ - '0');
+    }
+
     return neg ? n : -n;
 }
 
@@ -39,9 +47,15 @@ long int strtol(const char *str, char **end, int base)
     while (*str)
     {
         if (*str == '+')
+        {
             str++;
+        }
+
         if (!isspace(*str))
+        {
             break;
+        }
+
         str++;
     }
 
@@ -53,8 +67,12 @@ long int strtol(const char *str, char **end, int base)
     }
 
     unsigned long number = strtoul(str, end, base);
+
     if (negative)
+    {
         return static_cast<long>((~number) + 1);
+    }
+
     return number;
 }
 

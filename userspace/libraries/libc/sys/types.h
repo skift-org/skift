@@ -24,6 +24,7 @@ typedef int pid_t;
 
 #define FD_SETSIZE 64
 typedef long fd_mask;
+
 typedef struct _fd_set
 {
     fd_mask fds_bits[2];

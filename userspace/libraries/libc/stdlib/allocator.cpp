@@ -205,8 +205,6 @@ void *malloc(size_t req_size)
             bestSize = diff;
         }
 
-#ifdef USE_CASE1
-
         // CASE 1:  There is not enough space in this major block.
         if (diff < (size + MINOR_BLOCK_HEADER_SIZE))
         {
@@ -240,10 +238,6 @@ void *malloc(size_t req_size)
             // .. fall through to CASE 2 ..
         }
 
-#endif
-
-#ifdef USE_CASE2
-
         // CASE 2: It's a brand new block.
         if (maj->first == nullptr)
         {
@@ -263,9 +257,6 @@ void *malloc(size_t req_size)
             return p;
         }
 
-#endif
-
-#ifdef USE_CASE3
         {
             // CASE 3: Block in use and enough space at the start of the block.
             size_t diff = (uintptr_t)(maj->first);
@@ -291,10 +282,6 @@ void *malloc(size_t req_size)
                 return p;
             }
         }
-
-#endif
-
-#ifdef USE_CASE4
 
         // CASE 4: There is enough space in this block. But is it contiguous?
         MinorBlock *min = maj->first;
@@ -365,10 +352,6 @@ void *malloc(size_t req_size)
             min = min->next;
         } // while min != nullptr ...
 
-#endif
-
-#ifdef USE_CASE5
-
         // CASE 5: Block full! Ensure next block and loop.
         if (maj->next == nullptr)
         {
@@ -393,8 +376,6 @@ void *malloc(size_t req_size)
 
             maj->next->prev = maj;
         }
-
-#endif
 
         maj = maj->next;
     } // while (maj != nullptr)

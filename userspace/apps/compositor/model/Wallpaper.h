@@ -26,7 +26,7 @@ private:
     OwnPtr<Async::Invoker> _render_invoker;
 
 public:
-    Callback<void()> on_change;
+    Func<void()> on_change;
 
     Math::Recti bound() { return {{}, _resolution}; }
 

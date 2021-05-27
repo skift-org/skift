@@ -9,7 +9,7 @@
 
 #include <libsystem/process/Process.h>
 
-#include <libutils/Callback.h>
+#include <libutils/Func.h>
 #include <libutils/Optional.h>
 #include <libutils/String.h>
 #include <libutils/Traits.h>
@@ -77,7 +77,7 @@ public:
     }
 };
 
-using ArgParseOptionCallback = Callback<ArgParseResult(ArgParseContext &)>;
+using ArgParseOptionCallback = Func<ArgParseResult(ArgParseContext &)>;
 using ArgParseVersion = Math::Vec3i;
 
 struct ArgParseOption
@@ -155,7 +155,7 @@ public:
         });
     }
 
-    void option_string(char shortname, String longname, String description, Callback<ArgParseResult(String &)> callback)
+    void option_string(char shortname, String longname, String description, Func<ArgParseResult(String &)> callback)
     {
         _option.push_back({
             shortname,
@@ -175,7 +175,7 @@ public:
         });
     }
 
-    void option_int(char shortname, String longname, String description, Callback<ArgParseResult(int)> callback)
+    void option_int(char shortname, String longname, String description, Func<ArgParseResult(int)> callback)
     {
         _option.push_back({
             shortname,
@@ -205,7 +205,7 @@ public:
         });
     }
 
-    void option_bool(char shortname, String longname, String description, Callback<ArgParseResult(bool)> callback)
+    void option_bool(char shortname, String longname, String description, Func<ArgParseResult(bool)> callback)
     {
         option(shortname, longname, description, [this, callback](ArgParseContext &ctx) {
             bool value = true;

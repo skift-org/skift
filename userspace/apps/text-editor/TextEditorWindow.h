@@ -157,7 +157,7 @@ public:
         return false;
     }
 
-    void show_warning(Callback<void(DialogResult)> callback)
+    void show_warning(Func<void(DialogResult)> callback)
     {
         auto title = IO::format("Do you want to save document \"{}\"?", _path);
 

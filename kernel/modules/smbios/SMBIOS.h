@@ -344,8 +344,8 @@ struct EntryPoint
         return checksum;
     }
 
-    template <typename IterationCallback>
-    void iterate(IterationCallback callback)
+    template <typename IterFunc>
+    void iterate(IterFunc callback)
     {
         Header *header = reinterpret_cast<Header *>(table_address);
 

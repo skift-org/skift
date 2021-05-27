@@ -60,10 +60,10 @@ template <typename T>
 struct CallbackFactory
 {
 private:
-    Callback<RefPtr<T>(Context &)> _callback;
+    Func<RefPtr<T>(Context &)> _callback;
 
 public:
-    CallbackFactory(Callback<RefPtr<T>(Context &)> callback)
+    CallbackFactory(Func<RefPtr<T>(Context &)> callback)
         : _callback{callback}
     {
     }

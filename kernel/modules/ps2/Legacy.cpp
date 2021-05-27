@@ -1,6 +1,6 @@
 #include "ps2/Legacy.h"
 
-Iteration legacy_scan(IterationCallback<LegacyAddress> callback)
+Iteration legacy_scan(IterFunc<LegacyAddress> callback)
 {
     if (callback(LEGACY_MOUSE) == Iteration::STOP)
     {
@@ -51,7 +51,6 @@ Iteration legacy_scan(IterationCallback<LegacyAddress> callback)
     {
         return Iteration::STOP;
     }
-
 
     return Iteration::CONTINUE;
 }

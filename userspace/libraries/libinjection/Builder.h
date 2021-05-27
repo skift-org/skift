@@ -48,13 +48,13 @@ public:
     }
 
     template <typename TInstance>
-    Builder &singleton(Callback<RefPtr<TInstance>()> instance)
+    Builder &singleton(Func<RefPtr<TInstance>()> instance)
     {
         return singleton<TInstance, TInstance>(instance);
     }
 
     template <typename TInstance, typename... TInterfaces>
-    requires(sizeof...(TInterfaces) > 0) Builder &singleton(Callback<RefPtr<TInstance>()> instance)
+    requires(sizeof...(TInterfaces) > 0) Builder &singleton(Func<RefPtr<TInstance>()> instance)
     {
         CallbackFactory<TInstance> factory{instance};
         _container.add<CallbackFactory, SingletonLifeTime, TInstance, TInterfaces...>(factory);
@@ -90,13 +90,13 @@ public:
     }
 
     template <typename TInstance>
-    Builder &transient(Callback<RefPtr<TInstance>(Context &)> instance)
+    Builder &transient(Func<RefPtr<TInstance>(Context &)> instance)
     {
         return transient<TInstance, TInstance>(instance);
     }
 
     template <typename TInstance, typename... TInterfaces>
-    requires(sizeof...(TInterfaces) > 0) Builder &transient(Callback<RefPtr<TInstance>(Context &)> instance)
+    requires(sizeof...(TInterfaces) > 0) Builder &transient(Func<RefPtr<TInstance>(Context &)> instance)
     {
         CallbackFactory<TInstance> factory{instance};
         _container.add<CallbackFactory, TransientLifeTime, TInstance, TInterfaces...>(factory);

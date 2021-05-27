@@ -79,7 +79,7 @@ ButtonElement::ButtonElement(Style style) : _style{style}
     flags(Element::GREEDY);
 }
 
-RefPtr<ButtonElement> button(ButtonElement::Style style, RefPtr<Element> child, Callback<void(void)> on_click)
+RefPtr<ButtonElement> button(ButtonElement::Style style, RefPtr<Element> child, Func<void(void)> on_click)
 {
     auto button = make<ButtonElement>(style);
 
@@ -97,7 +97,7 @@ RefPtr<ButtonElement> button(ButtonElement::Style style, RefPtr<Element> child, 
 
 /* --- Basic Button --------------------------------------------------------- */
 
-RefPtr<ButtonElement> basic_button(RefPtr<Element> child, Callback<void(void)> on_click)
+RefPtr<ButtonElement> basic_button(RefPtr<Element> child, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::TEXT,
@@ -105,7 +105,7 @@ RefPtr<ButtonElement> basic_button(RefPtr<Element> child, Callback<void(void)> o
         on_click);
 }
 
-RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Icon> icon, Callback<void(void)> on_click)
+RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Icon> icon, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::TEXT,
@@ -114,7 +114,7 @@ RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Icon> icon, Callback<void(voi
         on_click);
 }
 
-RefPtr<ButtonElement> basic_button(String text, Callback<void(void)> on_click)
+RefPtr<ButtonElement> basic_button(String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::TEXT,
@@ -123,7 +123,7 @@ RefPtr<ButtonElement> basic_button(String text, Callback<void(void)> on_click)
         on_click);
 }
 
-RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Icon> icon, String text, Callback<void(void)> on_click)
+RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Icon> icon, String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::TEXT,
@@ -135,7 +135,7 @@ RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Icon> icon, String text, Call
         on_click);
 }
 
-RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Bitmap> image, String text, Callback<void(void)> on_click)
+RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Bitmap> image, String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::TEXT,
@@ -149,7 +149,7 @@ RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Bitmap> image, String text, C
 
 /* --- Outlined Button ------------------------------------------------------ */
 
-RefPtr<ButtonElement> outline_button(RefPtr<Element> child, Callback<void(void)> on_click)
+RefPtr<ButtonElement> outline_button(RefPtr<Element> child, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::OUTLINE,
@@ -157,7 +157,7 @@ RefPtr<ButtonElement> outline_button(RefPtr<Element> child, Callback<void(void)>
         on_click);
 }
 
-RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, Callback<void(void)> on_click)
+RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::OUTLINE,
@@ -166,7 +166,7 @@ RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, Callback<void(v
         on_click);
 }
 
-RefPtr<ButtonElement> outline_button(String text, Callback<void(void)> on_click)
+RefPtr<ButtonElement> outline_button(String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::OUTLINE,
@@ -175,7 +175,7 @@ RefPtr<ButtonElement> outline_button(String text, Callback<void(void)> on_click)
         on_click);
 }
 
-RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, String text, Callback<void(void)> on_click)
+RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::OUTLINE,
@@ -189,7 +189,7 @@ RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, String text, Ca
 
 /* --- Filled Button -------------------------------------------------------- */
 
-RefPtr<ButtonElement> filled_button(RefPtr<Element> child, Callback<void(void)> on_click)
+RefPtr<ButtonElement> filled_button(RefPtr<Element> child, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::FILLED,
@@ -197,7 +197,7 @@ RefPtr<ButtonElement> filled_button(RefPtr<Element> child, Callback<void(void)> 
         on_click);
 }
 
-RefPtr<ButtonElement> filled_button(RefPtr<Graphic::Icon> icon, Callback<void(void)> on_click)
+RefPtr<ButtonElement> filled_button(RefPtr<Graphic::Icon> icon, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::FILLED,
@@ -206,7 +206,7 @@ RefPtr<ButtonElement> filled_button(RefPtr<Graphic::Icon> icon, Callback<void(vo
         on_click);
 }
 
-RefPtr<ButtonElement> filled_button(String text, Callback<void(void)> on_click)
+RefPtr<ButtonElement> filled_button(String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::FILLED,
@@ -215,7 +215,7 @@ RefPtr<ButtonElement> filled_button(String text, Callback<void(void)> on_click)
         on_click);
 }
 
-RefPtr<ButtonElement> filled_button(RefPtr<Graphic::Icon> icon, String text, Callback<void(void)> on_click)
+RefPtr<ButtonElement> filled_button(RefPtr<Graphic::Icon> icon, String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::FILLED,

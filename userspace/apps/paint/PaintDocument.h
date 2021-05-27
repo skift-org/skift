@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libgraphic/Painter.h>
-#include <libutils/Callback.h>
+#include <libutils/Func.h>
 
 struct PaintDocument : public RefCounted<PaintDocument>
 {
@@ -15,7 +15,7 @@ private:
     bool _dirty = true;
 
 public:
-    Callback<void()> on_color_change;
+    Func<void()> on_color_change;
 
     Math::Recti bound() { return _bitmap->bound(); }
     Graphic::Bitmap &bitmap() { return *_bitmap; }

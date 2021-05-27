@@ -12,7 +12,7 @@ private:
     TState _state = {};
 
 public:
-    Callback<void(const TState &)> on_state_change;
+    Func<void(const TState &)> on_state_change;
 
     void state(TState state)
     {

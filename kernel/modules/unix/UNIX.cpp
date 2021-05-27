@@ -1,6 +1,6 @@
 #include "unix/UNIX.h"
 
-Iteration unix_scan(IterationCallback<UNIXAddress> callback)
+Iteration unix_scan(IterFunc<UNIXAddress> callback)
 {
     if (callback(UNIX_ZERO) == Iteration::STOP)
     {

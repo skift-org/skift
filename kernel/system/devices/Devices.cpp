@@ -17,7 +17,7 @@ static const char *_device_names[(uint8_t)DeviceClass::__COUNT] = {
 #define DEVICE_NAMES_ENTRY(__type, __name) #__name,
     DEVICE_CLASS_LIST(DEVICE_NAMES_ENTRY)};
 
-void device_scan(IterationCallback<DeviceAddress> callback)
+void device_scan(IterFunc<DeviceAddress> callback)
 {
     if (legacy_scan([&](LegacyAddress address) {
             return callback(DeviceAddress(address));
@@ -58,7 +58,7 @@ String device_claim_name(DeviceClass klass)
     }
 }
 
-void device_iterate(IterationCallback<RefPtr<Device>> callback)
+void device_iterate(IterFunc<RefPtr<Device>> callback)
 {
     if (_devices)
     {

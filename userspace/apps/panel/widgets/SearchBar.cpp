@@ -8,7 +8,7 @@ using namespace Widget;
 namespace Panel
 {
 
-SearchBarComponent::SearchBarComponent(String text, Callback<void(String)> on_change)
+SearchBarComponent::SearchBarComponent(String text, Func<void(String)> on_change)
     : _model{TextModel::create(text)},
       _on_change{on_change}
 {

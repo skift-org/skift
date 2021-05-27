@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Callback.h>
+#include <libutils/Func.h>
 
 namespace Utils
 {
@@ -12,7 +12,7 @@ enum struct Iteration
 };
 
 template <typename T>
-using IterationCallback = Callback<Iteration(T)>;
+using IterFunc = Func<Iteration(T)>;
 
 template <typename T>
 struct ContiguousIterator

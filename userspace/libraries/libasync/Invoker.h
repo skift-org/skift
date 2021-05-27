@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libasync/Source.h>
-#include <libutils/Callback.h>
+#include <libutils/Func.h>
 
 namespace Async
 {
@@ -10,11 +10,11 @@ struct Invoker : public Source
 {
 private:
     bool _invoke_later = false;
-    Callback<void()> _callback;
+    Func<void()> _callback;
     RefPtr<Loop> _eventloop;
 
 public:
-    Invoker(Callback<void()> callback) : _callback(callback)
+    Invoker(Func<void()> callback) : _callback(callback)
     {
         loop().register_invoker(this);
     }

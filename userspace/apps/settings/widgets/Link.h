@@ -9,7 +9,7 @@ namespace Settings
 RefPtr<Widget::Element> link(
     RefPtr<Widget::Element> icon,
     String text,
-    Callback<void(void)> on_click = nullptr)
+    Func<void(void)> on_click = nullptr)
 {
     using namespace Widget;
 

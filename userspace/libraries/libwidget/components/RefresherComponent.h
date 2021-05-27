@@ -10,10 +10,10 @@ struct Refresher : public RebuildableComponent
 {
 private:
     OwnPtr<Async::Timer> _timer;
-    Callback<RefPtr<Element>()> _callback;
+    Func<RefPtr<Element>()> _callback;
 
 public:
-    Refresher(Timeout interval, Callback<RefPtr<Element>()> callback)
+    Refresher(Timeout interval, Func<RefPtr<Element>()> callback)
         : _timer{own<Async::Timer>(interval, [this]() {
               should_rebuild();
           })},

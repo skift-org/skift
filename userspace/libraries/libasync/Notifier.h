@@ -2,7 +2,7 @@
 
 #include <libasync/Source.h>
 #include <libio/Handle.h>
-#include <libutils/Callback.h>
+#include <libutils/Func.h>
 
 namespace Async
 {
@@ -14,13 +14,13 @@ struct Notifier :
 private:
     RefPtr<IO::Handle> _handle;
     PollEvent _events;
-    Callback<void()> _callback;
+    Func<void()> _callback;
 
 public:
     RefPtr<IO::Handle> handle() override { return _handle; }
     PollEvent events() { return _events; }
 
-    Notifier(RawHandle &raw_handle, PollEvent events, Callback<void()> callback)
+    Notifier(RawHandle &raw_handle, PollEvent events, Func<void()> callback)
         : _handle{raw_handle.handle()},
           _events{events},
           _callback{callback}

@@ -12,7 +12,7 @@ namespace FilePicker
 struct FileBrowser : public Browser
 {
 public:
-    Callback<void(String &path)> on_element_selected;
+    Func<void(String &path)> on_element_selected;
 
     FileBrowser(RefPtr<Navigation> navigation)
         : Browser(navigation)

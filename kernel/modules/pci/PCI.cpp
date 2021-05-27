@@ -6,14 +6,14 @@
 #include "archs/x86_32/x86_32.h"
 #include "pci/PCI.h"
 
-Iteration pci_scan_bus(IterationCallback<PCIAddress> &callback, int bus);
+Iteration pci_scan_bus(IterFunc<PCIAddress> &callback, int bus);
 
-Iteration pci_scan_hit(IterationCallback<PCIAddress> &callback, PCIAddress &address)
+Iteration pci_scan_hit(IterFunc<PCIAddress> &callback, PCIAddress &address)
 {
     return callback(address);
 }
 
-Iteration pci_scan_func(IterationCallback<PCIAddress> &callback, PCIAddress &address)
+Iteration pci_scan_func(IterFunc<PCIAddress> &callback, PCIAddress &address)
 {
     if (pci_scan_hit(callback, address) == Iteration::STOP)
     {
@@ -30,7 +30,7 @@ Iteration pci_scan_func(IterationCallback<PCIAddress> &callback, PCIAddress &add
     }
 }
 
-Iteration pci_scan_slot(IterationCallback<PCIAddress> &callback, int bus, int slot)
+Iteration pci_scan_slot(IterFunc<PCIAddress> &callback, int bus, int slot)
 {
     PCIAddress address{bus, slot, 0};
 
@@ -63,7 +63,7 @@ Iteration pci_scan_slot(IterationCallback<PCIAddress> &callback, int bus, int sl
     return Iteration::CONTINUE;
 }
 
-Iteration pci_scan_bus(IterationCallback<PCIAddress> &callback, int bus)
+Iteration pci_scan_bus(IterFunc<PCIAddress> &callback, int bus)
 {
     for (int slot = 0; slot < 32; ++slot)
     {
@@ -76,7 +76,7 @@ Iteration pci_scan_bus(IterationCallback<PCIAddress> &callback, int bus)
     return Iteration::CONTINUE;
 }
 
-Iteration pci_scan(IterationCallback<PCIAddress> callback)
+Iteration pci_scan(IterFunc<PCIAddress> callback)
 {
     PCIAddress address{};
 

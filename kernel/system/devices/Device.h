@@ -47,7 +47,7 @@ public:
         _children.push_back(child);
     }
 
-    Iteration iterate(IterationCallback<RefPtr<Device>> &callback)
+    Iteration iterate(IterFunc<RefPtr<Device>> &callback)
     {
         return _children.foreach([&](auto device) {
             if (callback(device) == Iteration::STOP)

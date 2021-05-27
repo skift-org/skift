@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Callback.h>
+#include <libutils/Func.h>
 
 #include <libsettings/Path.h>
 #include <libsettings/Service.h>
@@ -8,7 +8,7 @@
 namespace Settings
 {
 
-using WatcherCallback = Callback<void(const Json::Value &)>;
+using WatcherCallback = Func<void(const Json::Value &)>;
 
 struct Watcher
 {

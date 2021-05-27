@@ -3,7 +3,7 @@
 #include <skift/Time.h>
 
 #include <libasync/Source.h>
-#include <libutils/Callback.h>
+#include <libutils/Func.h>
 #include <libutils/RefPtr.h>
 
 namespace Async
@@ -16,7 +16,7 @@ private:
     bool _running = false;
     TimeStamp _scheduled = 0;
     Timeout _interval = 0;
-    Callback<void()> _callback;
+    Func<void()> _callback;
 
 public:
     auto running() { return _running; }
@@ -34,7 +34,7 @@ public:
         _callback();
     }
 
-    Timer(Timeout interval, Callback<void()> callback)
+    Timer(Timeout interval, Func<void()> callback)
         : _interval(interval),
           _callback(callback)
     {

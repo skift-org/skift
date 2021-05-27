@@ -4,7 +4,7 @@
 
 #include <libmath/Rect.h>
 #include <libtext/Rune.h>
-#include <libutils/Callback.h>
+#include <libutils/Func.h>
 
 namespace Widget
 {
@@ -79,7 +79,7 @@ struct Event
 };
 
 using EventType = Event::Type;
-using EventHandler = Callback<void(Event *)>;
+using EventHandler = Func<void(Event *)>;
 
 #define is_mouse_event(__event)                                                       \
     (((::Widget::Event *)(__event))->type == ::Widget::Event::MOUSE_MOVE ||           \

@@ -3,7 +3,7 @@
 #include <libasync/Notifier.h>
 #include <libio/Connection.h>
 #include <libio/Socket.h>
-#include <libutils/Callback.h>
+#include <libutils/Func.h>
 #include <libutils/ResultOr.h>
 
 namespace IPC

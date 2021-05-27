@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libtext/Rune.h>
-#include <libutils/Callback.h>
+#include <libutils/Func.h>
 
 namespace Text
 {
@@ -13,10 +13,10 @@ private:
     Text::Rune _accumulator = 0;
     int _remaining = 0;
 
-    Callback<void(Text::Rune)> _callback{};
+    Func<void(Text::Rune)> _callback{};
 
 public:
-    void callback(Callback<void(Text::Rune)> callback)
+    void callback(Func<void(Text::Rune)> callback)
     {
         _callback = callback;
     }
@@ -25,7 +25,7 @@ public:
     {
     }
 
-    UTF8Decoder(Callback<void(Text::Rune)> callback)
+    UTF8Decoder(Func<void(Text::Rune)> callback)
         : _callback(callback)
     {
     }

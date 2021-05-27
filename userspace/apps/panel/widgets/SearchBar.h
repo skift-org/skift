@@ -11,10 +11,10 @@ struct SearchBarComponent :
 {
 private:
     RefPtr<Widget::TextModel> _model;
-    Callback<void(String)> _on_change;
+    Func<void(String)> _on_change;
 
 public:
-    SearchBarComponent(String text, Callback<void(String)> on_change);
+    SearchBarComponent(String text, Func<void(String)> on_change);
 
     RefPtr<Widget::Element> build() override;
 };

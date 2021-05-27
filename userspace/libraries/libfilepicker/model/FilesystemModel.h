@@ -17,10 +17,10 @@ private:
     RefPtr<Navigation> _navigation;
     Vector<FileInfo> _files{};
     OwnPtr<Async::Observer<Navigation>> _observer;
-    Callback<bool(IO::Directory::Entry &)> _filter;
+    Func<bool(IO::Directory::Entry &)> _filter;
 
 public:
-    FilesystemModel(RefPtr<Navigation> navigation, Callback<bool(IO::Directory::Entry &)> filter = nullptr);
+    FilesystemModel(RefPtr<Navigation> navigation, Func<bool(IO::Directory::Entry &)> filter = nullptr);
 
     int rows() override;
 

@@ -9,7 +9,7 @@ namespace Settings
 struct ServerConnection : public IPC::Peer<Protocol>
 {
 public:
-    Callback<void(const Path &path, const Json::Value &value)> on_notify;
+    Func<void(const Path &path, const Json::Value &value)> on_notify;
 
     static OwnPtr<ServerConnection> open()
     {

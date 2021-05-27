@@ -2,10 +2,10 @@
 #include <skift/Environment.h>
 
 #include <libio/Directory.h>
+#include <libio/Path.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/process/Process.h>
-#include <libio/Path.h>
 
 Result __plug_process_get_directory(char *buffer, size_t size)
 {
@@ -99,12 +99,6 @@ void __plug_handle_open(Handle *handle, const char *raw_path, OpenFlag flags)
     handle->result = hj_handle_open(&handle->id, path.cstring(), path.length(), flags);
 }
 
-void __plug_handle_connect(Handle *handle, const char *raw_path)
-{
-    auto path = process_resolve(raw_path);
-
-    handle->result = hj_handle_connect(&handle->id, path.cstring(), path.length());
-}
 
 void __plug_handle_close(Handle *handle)
 {
@@ -161,17 +155,3 @@ int __plug_handle_stat(Handle *handle, FileState *stat)
     return 0;
 }
 
-void __plug_handle_accept(Handle *handle, Handle *connection_handle)
-{
-    handle->result = hj_handle_accept(handle->id, &connection_handle->id);
-}
-
-Result __plug_create_pipe(int *reader_handle, int *writer_handle)
-{
-    return hj_create_pipe(reader_handle, writer_handle);
-}
-
-Result __plug_create_term(int *server_handle, int *client_handle)
-{
-    return hj_create_term(server_handle, client_handle);
-}

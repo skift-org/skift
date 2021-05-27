@@ -66,10 +66,3 @@ int __plug_handle_tell(Handle *handle);
 
 int __plug_handle_stat(Handle *handle, FileState *stat);
 
-void __plug_handle_connect(Handle *handle, const char *path);
-
-void __plug_handle_accept(Handle *handle, Handle *connection_handle);
-
-Result __plug_create_pipe(int *reader_handle, int *writer_handle);
-
-Result __plug_create_term(int *server_handle, int *client_handle);

@@ -72,25 +72,6 @@ Stream *stream_open_handle(int handle_id, OpenFlag flags)
     return stream;
 }
 
-Result stream_create_term(Stream **server, Stream **client)
-{
-    *server = nullptr;
-    *client = nullptr;
-
-    int server_handle = HANDLE_INVALID_ID;
-    int client_handle = HANDLE_INVALID_ID;
-
-    Result result = __plug_create_term(&server_handle, &client_handle);
-
-    if (result == SUCCESS)
-    {
-        *server = stream_open_handle(server_handle, OPEN_READ | OPEN_WRITE);
-        *client = stream_open_handle(client_handle, OPEN_READ | OPEN_WRITE);
-    }
-
-    return result;
-}
-
 void stream_close(Stream *stream)
 {
     __plug_handle_close(HANDLE(stream));
@@ -156,47 +137,12 @@ int stream_seek(Stream *stream, IO::SeekFrom from)
     return __plug_handle_seek(HANDLE(stream), from);
 }
 
-int stream_tell(Stream *stream)
-{
-    return __plug_handle_tell(HANDLE(stream));
-}
-
 void stream_stat(Stream *stream, FileState *stat)
 {
     stat->type = FILE_TYPE_UNKNOWN;
     stat->size = 0;
 
     __plug_handle_stat(HANDLE(stream), stat);
-}
-
-int stream_putchar(Stream *stream, char c)
-{
-    if (stream_write(stream, &c, sizeof(char)) != sizeof(c))
-    {
-        return -1;
-    }
-
-    return c;
-}
-
-char stream_getchar(Stream *stream)
-{
-    char c;
-
-    if (stream_read(stream, &c, sizeof(char)) != sizeof(char))
-    {
-        return -1;
-    }
-
-    return c;
-}
-
-int stream_ungetchar(Stream *stream, char c)
-{
-    stream->has_unget = true;
-    stream->unget_char = c;
-
-    return 0;
 }
 
 void stream_format_append(printf_info_t *info, char c)
@@ -226,9 +172,4 @@ int stream_vprintf(Stream *stream, const char *fmt, va_list va)
     info.allocated = -1;
 
     return __printf(&info, va);
-}
-
-bool stream_is_end_file(Stream *stream)
-{
-    return stream->is_end_of_file;
 }

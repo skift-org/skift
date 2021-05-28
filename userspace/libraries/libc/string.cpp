@@ -62,19 +62,21 @@ void *memmove(void *dest, const void *src, size_t n)
     return dest;
 }
 
+#ifdef __x86_64__
+
 void *memcpy(void *s1, const void *s2, size_t n)
 {
-    unsigned int *ldest = (unsigned int *)s1;
-    unsigned int *lsrc = (unsigned int *)s2;
+    int64_t *ldest = (int64_t *)s1;
+    const int64_t*lsrc = (const int64_t *)s2;
 
-    while (n >= sizeof(unsigned int))
+    while (n >= sizeof(int64_t))
     {
         *ldest++ = *lsrc++;
-        n -= sizeof(unsigned int);
+        n -= sizeof(int64_t);
     }
 
     char *cdest = (char *)ldest;
-    char *csrc = (char *)lsrc;
+    const char *csrc = (const char *)lsrc;
 
     while (n > 0)
     {
@@ -84,6 +86,32 @@ void *memcpy(void *s1, const void *s2, size_t n)
 
     return s1;
 }
+
+#else
+
+void *memcpy(void *s1, const void *s2, size_t n)
+{
+    unsigned int *ldest = (unsigned int *)s1;
+    const unsigned int *lsrc = (const unsigned int *)s2;
+
+    while (n >= sizeof(unsigned int))
+    {
+        *ldest++ = *lsrc++;
+        n -= sizeof(unsigned int);
+    }
+
+    char *cdest = (char *)ldest;
+    const char *csrc = (const char *)lsrc;
+
+    while (n > 0)
+    {
+        *cdest++ = *csrc++;
+        n -= 1;
+    }
+
+    return s1;
+}
+#endif
 
 void *memset(void *str, int c, size_t n)
 {

@@ -82,7 +82,7 @@ void Loop::update_timers()
 
     auto timers_list_copy = _timers;
 
-    timers_list_copy.foreach ([&](auto timer) {
+    timers_list_copy.foreach([&](auto timer) {
         if (timer->running() && timer->scheduled() <= current_fire)
         {
             timer->trigger();
@@ -107,7 +107,7 @@ void Loop::unregister_invoker(Invoker *invoker)
 
 void Loop::update_invoker()
 {
-    _invoker.foreach ([](Invoker *invoker) {
+    _invoker.foreach([](Invoker *invoker) {
         if (invoker->should_be_invoke_later())
         {
             invoker->invoke();
@@ -139,7 +139,7 @@ Timeout Loop::get_timeout()
 
     TimeStamp current_tick = system_get_ticks();
 
-    _timers.foreach ([&](auto timer) {
+    _timers.foreach([&](auto timer) {
         if (!timer->running() || timer->interval() == 0)
         {
             return Iteration::CONTINUE;

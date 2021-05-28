@@ -1,8 +1,8 @@
 #include <libio/File.h>
+#include <libio/Path.h>
 #include <libio/Streams.h>
 #include <libjson/Json.h>
 #include <libsystem/process/Launchpad.h>
-#include <libio/Path.h>
 
 #define FILE_EXTENSIONS_DATABASE_PATH "/Configs/open/file-extensions.json"
 #define FILE_TYPES_DATABASE_PATH "/Configs/open/file-types.json"

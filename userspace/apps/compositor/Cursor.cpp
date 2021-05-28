@@ -1,6 +1,6 @@
 #include <libgraphic/Bitmap.h>
-#include <libsystem/system/System.h>
 #include <libio/Path.h>
+#include <libsystem/system/System.h>
 
 #include "compositor/Cursor.h"
 #include "compositor/Manager.h"

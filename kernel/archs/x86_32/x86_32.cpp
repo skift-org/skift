@@ -19,4 +19,3 @@
 #include "system/graphics/EarlyConsole.h"
 #include "system/graphics/Graphics.h"
 #include "system/system/System.h"
-

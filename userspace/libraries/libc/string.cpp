@@ -62,42 +62,25 @@ void *memmove(void *dest, const void *src, size_t n)
     return dest;
 }
 
+void *memcpy(void *s1, const void *s2, size_t n)
+{
+
+    // use the best size for memcpy block depending on the architecture
 #ifdef __x86_64__
-
-void *memcpy(void *s1, const void *s2, size_t n)
-{
-    int64_t *ldest = (int64_t *)s1;
-    const int64_t*lsrc = (const int64_t *)s2;
-
-    while (n >= sizeof(int64_t))
-    {
-        *ldest++ = *lsrc++;
-        n -= sizeof(int64_t);
-    }
-
-    char *cdest = (char *)ldest;
-    const char *csrc = (const char *)lsrc;
-
-    while (n > 0)
-    {
-        *cdest++ = *csrc++;
-        n -= 1;
-    }
-
-    return s1;
-}
-
+    using MemcpyBlock = int64_t;
+#elif define __x86_32__
+    using MemcpyBlock = int32_t;
 #else
+    using MemcpyBlock = int8_t;
+#endif
 
-void *memcpy(void *s1, const void *s2, size_t n)
-{
-    unsigned int *ldest = (unsigned int *)s1;
-    const unsigned int *lsrc = (const unsigned int *)s2;
+    MemcpyBlock *ldest = (MemcpyBlock *)s1;
+    const MemcpyBlock *lsrc = (const MemcpyBlock *)s2;
 
-    while (n >= sizeof(unsigned int))
+    while (n >= sizeof(MemcpyBlock))
     {
         *ldest++ = *lsrc++;
-        n -= sizeof(unsigned int);
+        n -= sizeof(MemcpyBlock);
     }
 
     char *cdest = (char *)ldest;
@@ -111,7 +94,6 @@ void *memcpy(void *s1, const void *s2, size_t n)
 
     return s1;
 }
-#endif
 
 void *memset(void *str, int c, size_t n)
 {

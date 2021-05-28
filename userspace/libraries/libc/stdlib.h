@@ -4,7 +4,7 @@
 
 #include <stddef.h>
 
-#include <libc/bits/abs.h>
+#include <bits/abs.h>
 
 __BEGIN_HEADER
 

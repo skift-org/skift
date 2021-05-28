@@ -99,7 +99,6 @@ void __plug_handle_open(Handle *handle, const char *raw_path, OpenFlag flags)
     handle->result = hj_handle_open(&handle->id, path.cstring(), path.length(), flags);
 }
 
-
 void __plug_handle_close(Handle *handle)
 {
     if (handle->id >= 0)
@@ -154,4 +153,3 @@ int __plug_handle_stat(Handle *handle, FileState *stat)
 
     return 0;
 }
-

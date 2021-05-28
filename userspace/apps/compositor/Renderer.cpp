@@ -47,7 +47,7 @@ void renderer_region_dirty(Math::Recti new_region)
 
     bool merged = false;
 
-    _dirty_regions.foreach ([&](Math::Recti &region) {
+    _dirty_regions.foreach([&](Math::Recti &region) {
         if (region.colide_with(new_region))
         {
             Math::Recti top;
@@ -221,7 +221,7 @@ void renderer_repaint_dirty()
 {
     Graphic::Painter painter{_framebuffer->bitmap()};
 
-    _dirty_regions.foreach ([&](Math::Recti region) {
+    _dirty_regions.foreach([&](Math::Recti region) {
         renderer_region(painter, region);
 
         if (_night_light_enable)

@@ -3,10 +3,10 @@
 #include <skift/Environment.h>
 #include <string.h>
 
+#include <libio/Path.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
-#include <libio/Path.h>
 
 Launchpad *launchpad_create(const char *name, const char *executable)
 {

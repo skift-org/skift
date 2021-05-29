@@ -62,17 +62,29 @@ void *memmove(void *dest, const void *src, size_t n)
     return dest;
 }
 
+#if defined(__x86_64__) || defined(__x86_32__)
+static inline void __movsb_copy(void *from, const void *to, size_t size) {
+  asm volatile ("rep movsb"
+                : "=D" (from),
+                  "=S" (to),
+                  "=c" (size)
+                : "D" (from),
+                  "S" (to),
+                  "c" (size)
+                : "memory");
+
+}
+
+#endif
+
+
 void *memcpy(void *s1, const void *s2, size_t n)
 {
-
-    // use the best size for memcpy block depending on the architecture
-#ifdef __x86_64__
-    using MemcpyBlock = int64_t;
-#elif define __x86_32__
-    using MemcpyBlock = int32_t;
+#if defined(__x86_64__) || defined(__x86_32__)
+    __movsb_copy(s1, s2, n);
+    return s1;
 #else
-    using MemcpyBlock = int8_t;
-#endif
+    using MemcpyBlock = intptr_t;
 
     MemcpyBlock *ldest = (MemcpyBlock *)s1;
     const MemcpyBlock *lsrc = (const MemcpyBlock *)s2;
@@ -93,6 +105,7 @@ void *memcpy(void *s1, const void *s2, size_t n)
     }
 
     return s1;
+#endif
 }
 
 void *memset(void *str, int c, size_t n)

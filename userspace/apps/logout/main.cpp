@@ -29,7 +29,7 @@ int main(int, char **)
 
     auto icon_and_title_container = dialog->add(Widget::panel(6));
 
-    icon_and_title_container->add(Widget::square(Widget::icon("power-standby", Graphic::ICON_36PX)));
+    icon_and_title_container->add(Widget::square(Widget::icon(Graphic::Icon::get("power-standby"), Graphic::ICON_36PX)));
 
     auto warning_container = icon_and_title_container->add<Widget::Element>();
     warning_container->flags(Widget::Element::FILL);

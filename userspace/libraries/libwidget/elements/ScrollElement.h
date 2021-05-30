@@ -24,9 +24,6 @@ public:
     Math::Vec2i size() override;
 };
 
-static inline RefPtr<ScrollElement> scroll(RefPtr<Element> content = nullptr, bool horizontal = false)
-{
-    return make<ScrollElement>(content, horizontal);
-}
+WIDGET_BUILDER(ScrollElement, scroll)
 
 } // namespace Widget

@@ -6,19 +6,21 @@
 namespace Widget
 {
 
-template <typename TObservable, typename TCallback>
+template <typename TObservable>
 struct ObserverComponent : public RebuildableComponent
 {
 private:
-    TCallback _callback;
-    Async::Observer<TObservable> _observer;
+    OwnPtr<Async::Observer<TObservable>> _observer;
+    Func<RefPtr<Element>()> _callback;
 
 public:
-    ObserverComponent(TObservable observable)
+    ObserverComponent(TObservable &observable, Func<RefPtr<Element>()> callback)
     {
         _observer = observable.observe([this](auto &) {
             should_rebuild();
         });
+
+        _callback = callback;
     }
 
     RefPtr<Element> do_build() final
@@ -27,11 +29,10 @@ public:
     }
 };
 
-template <typename TObservable, typename TCallback>
-static inline RefPtr<ObserverComponent<TObservable, TCallback>> stateful(
-    TObservable observable, TCallback callback)
+template <typename TObservable>
+static inline auto observer(TObservable &observable, Func<RefPtr<Element>()> callback) -> RefPtr<Element>
 {
-    return make<ObserverComponent<TObservable, TCallback>>(observable, callback);
+    return make<ObserverComponent<TObservable>>(observable, callback);
 }
 
 } // namespace Widget

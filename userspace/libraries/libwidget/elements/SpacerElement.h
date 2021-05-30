@@ -14,9 +14,6 @@ public:
     }
 };
 
-static inline RefPtr<SpacerElement> spacer()
-{
-    return make<SpacerElement>();
-}
+WIDGET_BUILDER(SpacerElement, spacer);
 
 } // namespace Widget

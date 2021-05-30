@@ -39,7 +39,7 @@ RefPtr<Element> RAMGraphComponent::build()
                 return spacing(6,
                     vflow(4, {
                         hflow(4, {
-                            icon("chip"),
+                            icon(Graphic::Icon::get("chip")),
                             label("Memory")
                         }),
                         spacer(),

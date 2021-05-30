@@ -1,7 +1,11 @@
 #pragma once
 
-#include <libasync/Observable.h>
 #include <math.h>
+
+#include <libasync/Observable.h>
+
+namespace Calculator
+{
 
 enum struct Operation
 {
@@ -15,7 +19,7 @@ enum struct Operation
     POWER,
 };
 
-struct Calculator : public Async::Observable<Calculator>
+struct Engine : public Async::Observable<Engine>
 {
 private:
     Operation _operation = Operation::NONE;
@@ -83,7 +87,7 @@ public:
         }
     }
 
-    Calculator()
+    Engine()
     {
     }
 
@@ -135,3 +139,5 @@ public:
         did_update();
     }
 };
+
+} // namespace Calculator

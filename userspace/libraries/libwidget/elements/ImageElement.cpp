@@ -4,11 +4,6 @@
 namespace Widget
 {
 
-ImageElement::ImageElement(RefPtr<Graphic::Bitmap> bitmap)
-    : _bitmap(bitmap)
-{
-}
-
 ImageElement::ImageElement(RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling)
     : _bitmap(bitmap), _scaling(scaling)
 {

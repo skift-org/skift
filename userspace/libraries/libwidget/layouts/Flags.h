@@ -74,4 +74,10 @@ static inline RefPtr<TElement> max_size(Math::Vec2i size, RefPtr<TElement> child
     return child;
 }
 
+static inline RefPtr<Element> enable_if(bool value, RefPtr<Element> element)
+{
+    element->enable_if(value);
+    return element;
+}
+
 } // namespace Widget

@@ -29,18 +29,13 @@ struct LabelElement :
         state(s);
     }
 
-    LabelElement(String text);
-
-    LabelElement(String text, Math::Anchor anchor);
+    LabelElement(String text, Math::Anchor anchor = Math::Anchor::LEFT);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 
     Math::Vec2i size() override;
 };
 
-static inline RefPtr<LabelElement> label(String text, Math::Anchor anchor = Math::Anchor::LEFT)
-{
-    return make<LabelElement>(text, anchor);
-}
+WIDGET_BUILDER(LabelElement, label);
 
 } // namespace Widget

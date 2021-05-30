@@ -13,6 +13,6 @@ public:
     Math::Vec2i size() override;
 };
 
-static inline RefPtr<SeparatorElement> separator() { return make<SeparatorElement>(); }
+WIDGET_BUILDER(SeparatorElement, separator);
 
 } // namespace Widget

@@ -5,11 +5,6 @@
 namespace Widget
 {
 
-LabelElement::LabelElement(String text)
-    : LabelElement(text, Math::Anchor::LEFT)
-{
-}
-
 LabelElement::LabelElement(String text, Math::Anchor anchor)
 {
     state({

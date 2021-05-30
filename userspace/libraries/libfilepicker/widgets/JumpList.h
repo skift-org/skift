@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libwidget/Elements.h>
+#include <libwidget/Layouts.h>
 
 #include <libfilepicker/model/Bookmarks.h>
 #include <libfilepicker/model/Navigation.h>
@@ -8,46 +9,40 @@
 namespace FilePicker
 {
 
-struct JumpList : public Widget::PanelElement
+struct JumpList : public Widget::Component
 {
 private:
     RefPtr<Navigation> _navigation;
     RefPtr<Bookmarks> _bookmarks;
 
-    OwnPtr<Async::Observer<Bookmarks>> _bookmark_observer;
-
-    RefPtr<Widget::ScrollElement> _listing;
-
 public:
     JumpList(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
-        : PanelElement(),
-          _navigation(navigation),
+        : _navigation(navigation),
           _bookmarks(bookmarks)
     {
-        _bookmark_observer = bookmarks->observe([this](auto &) {
-            render();
-        });
-
-        add(Widget::label("Bookmarks"));
-
-        _listing = Widget::fill(Widget::scroll());
-        add(_listing);
-
-        render();
     }
 
-    void render()
+    RefPtr<Element> build()
     {
-        _listing->host()->clear();
+        Vector<RefPtr<Element>> children;
 
         for (size_t i = 0; i < _bookmarks->all().count(); i++)
         {
             auto bookmark = _bookmarks->all()[i];
 
-            _listing->host()->add(Widget::basic_button(bookmark.icon(), bookmark.name(), [this, bookmark] {
+            children.push_back(Widget::basic_button(bookmark.icon(), bookmark.name(), [this, bookmark] {
                 _navigation->navigate(bookmark.path());
             }));
         }
+
+        return Widget::observer(
+            *_bookmarks,
+            [&] {
+                return Widget::vflow({
+                    Widget::label("Bookmarks"),
+                    Widget::scroll(Widget::vflow(children)),
+                });
+            });
     }
 };
 

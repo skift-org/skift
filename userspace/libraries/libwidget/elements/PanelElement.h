@@ -18,10 +18,7 @@ public:
     void paint(Graphic::Painter &painter, const Math::Recti &) override;
 };
 
-static inline RefPtr<PanelElement> panel(int radius = 0)
-{
-    return make<PanelElement>(radius);
-}
+WIDGET_BUILDER(PanelElement, panel);
 
 template <typename TElement>
 static inline RefPtr<PanelElement> panel(RefPtr<TElement> child)

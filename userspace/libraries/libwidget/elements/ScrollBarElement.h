@@ -87,9 +87,6 @@ public:
     }
 };
 
-static inline RefPtr<ScrollBarElement> scrollbar(bool horizontal)
-{
-    return make<ScrollBarElement>(horizontal);
-}
+WIDGET_BUILDER(ScrollBarElement, scrollbar)
 
 } // namespace Widget

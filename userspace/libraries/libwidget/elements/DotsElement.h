@@ -8,41 +8,20 @@ namespace Widget
 struct DotsElement : public Element
 {
 private:
-    int _count = 3;
-    int _index = 0;
+    const int _count;
+    const int _index;
 
 public:
     static constexpr int DOTSIZE = 4;
     static constexpr int DOTSPACING = 8;
 
-    int count() const { return _count; }
-
-    void count(int count)
-    {
-        _count = count;
-        max_width(size().x());
-        should_relayout();
-        should_repaint();
-    }
-
-    int index() const { return _index; }
-
-    void index(int index)
-    {
-        should_repaint();
-        _index = index;
-    }
-
-    DotsElement(int count);
+    DotsElement(int count, int index);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 
     Math::Vec2i size() override;
 };
 
-static inline RefPtr<DotsElement> dots(int count)
-{
-    return make<DotsElement>(count);
-}
+WIDGET_BUILDER(DotsElement, dots);
 
 } // namespace  Widget

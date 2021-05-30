@@ -23,7 +23,7 @@ RefPtr<Element> SearchBarComponent::build()
             spacing(8,
                 hflow(4,
                 {
-                    icon("search"),
+                    icon(Graphic::Icon::get("search")),
                     fill(textfield(_model)),
                 })
             )

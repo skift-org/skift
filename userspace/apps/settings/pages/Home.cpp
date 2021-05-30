@@ -18,15 +18,15 @@ RefPtr<Widget::Element> HomePage::build()
         spacing(16,
             grid(4, 4, 8, 8,
                 {
-                    link(icon("home",Graphic::ICON_36PX), "test"),
-                    link(icon("home",Graphic::ICON_36PX), "test"),
-                    link(icon("home",Graphic::ICON_36PX), "test"),
-                    link(icon("home",Graphic::ICON_36PX), "test"),
-                    link(icon("home",Graphic::ICON_36PX), "test"),
-                    link(icon("home",Graphic::ICON_36PX), "test"),
-                    link(icon("home",Graphic::ICON_36PX), "test"),
-                    link(icon("home",Graphic::ICON_36PX), "test"),
-                    link(icon("home",Graphic::ICON_36PX), "test"),
+                    link(icon(Graphic::Icon::get("home"), Graphic::ICON_36PX), "test"),
+                    link(icon(Graphic::Icon::get("home"), Graphic::ICON_36PX), "test"),
+                    link(icon(Graphic::Icon::get("home"), Graphic::ICON_36PX), "test"),
+                    link(icon(Graphic::Icon::get("home"), Graphic::ICON_36PX), "test"),
+                    link(icon(Graphic::Icon::get("home"), Graphic::ICON_36PX), "test"),
+                    link(icon(Graphic::Icon::get("home"), Graphic::ICON_36PX), "test"),
+                    link(icon(Graphic::Icon::get("home"), Graphic::ICON_36PX), "test"),
+                    link(icon(Graphic::Icon::get("home"), Graphic::ICON_36PX), "test"),
+                    link(icon(Graphic::Icon::get("home"), Graphic::ICON_36PX), "test"),
                 }
             )
         )

@@ -24,9 +24,6 @@ public:
     void paint(Graphic::Painter &painter, const Math::Recti &) override;
 };
 
-static inline RefPtr<SliderElement> slider()
-{
-    return make<SliderElement>();
-}
+WIDGET_BUILDER(SliderElement, slider);
 
 } // namespace Widget

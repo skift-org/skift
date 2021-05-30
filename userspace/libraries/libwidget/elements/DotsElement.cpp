@@ -4,8 +4,8 @@
 namespace Widget
 {
 
-DotsElement::DotsElement(int count)
-    : _count(count)
+DotsElement::DotsElement(int count, int index)
+    : _count{count}, _index{index}
 {
     max_height(DOTSIZE);
     max_width(size().x());

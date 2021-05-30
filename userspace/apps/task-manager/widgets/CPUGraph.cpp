@@ -44,7 +44,7 @@ RefPtr<Element> CPUGraphComponent::build()
                 return spacing(6,
                     vflow(4, {
                         hflow(4, {
-                            icon("memory"),
+                            icon(Graphic::Icon::get("memory")),
                             label("Processor")
                         }),
                         spacer(),

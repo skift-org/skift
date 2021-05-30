@@ -20,18 +20,6 @@ public:
     Math::Vec2i size() override;
 };
 
-static inline RefPtr<IconElement> icon(
-    RefPtr<Graphic::Icon> icon,
-    Graphic::IconSize size = Graphic::IconSize::ICON_18PX)
-{
-    return make<IconElement>(icon, size);
-}
-
-static inline RefPtr<IconElement> icon(
-    String icon,
-    Graphic::IconSize size = Graphic::IconSize::ICON_18PX)
-{
-    return make<IconElement>(Graphic::Icon::get(icon), size);
-}
+WIDGET_BUILDER(IconElement, icon)
 
 } // namespace Widget

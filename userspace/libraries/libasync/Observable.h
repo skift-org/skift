@@ -29,17 +29,23 @@ public:
         ~_Observer()
         {
             if (_observable)
+            {
                 _observable->unregister_observer(this);
+            }
         }
 
         void detach()
         {
             _observable = nullptr;
+            _callback = nullptr;
         }
 
         void notify(T &subject)
         {
-            _callback(subject);
+            if (_callback)
+            {
+                _callback(subject);
+            }
         }
     };
 

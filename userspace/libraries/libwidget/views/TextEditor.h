@@ -79,25 +79,7 @@ private:
     }
 
 public:
-    void readonly(bool value)
-    {
-        _readonly = value;
-        should_relayout();
-        should_repaint();
-    }
-
-    void overscroll(bool value)
-    {
-        _overscroll = value;
-        should_relayout();
-        should_repaint();
-    }
-
     TextEditor(RefPtr<TextModel> model);
-
-    ~TextEditor();
-
-    void update_model(RefPtr<TextModel> model);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 
@@ -106,6 +88,6 @@ public:
     void layout() override;
 };
 
-static inline RefPtr<TextEditor> texteditor(RefPtr<TextModel> model) { return make<TextEditor>(model); }
+WIDGET_BUILDER(TextEditor, texteditor);
 
 } // namespace Widget

@@ -26,7 +26,6 @@ static auto license()
 {
     return outline_button("License", [] {
         auto editor = texteditor(TextModel::open("/Files/license.md"));
-        editor->readonly(true);
         editor->font(Font::get("mono").unwrap());
         editor->focus();
 

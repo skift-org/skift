@@ -33,22 +33,24 @@ private:
             int thumb_width = MIN(track.width() * (_thumb / (float)_track), track.width());
             int thump_position = track.width() * (_value / (float)_track);
 
-            return Math::Recti(
+            return {
                 track.x() + thump_position,
                 track.y(),
                 thumb_width,
-                track.height());
+                track.height(),
+            };
         }
         else
         {
             int thumb_height = MIN(track.height() * (_thumb / (float)_track), track.height());
             int thump_position = track.height() * (_value / (float)_track);
 
-            return Math::Recti(
+            return {
                 track.x(),
                 track.y() + thump_position,
                 track.width(),
-                thumb_height);
+                thumb_height,
+            };
         }
     }
 

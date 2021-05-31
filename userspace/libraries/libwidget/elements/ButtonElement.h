@@ -8,7 +8,6 @@ namespace Widget
 
 struct ButtonElement : public Element
 {
-public:
     enum Style
     {
         TEXT,

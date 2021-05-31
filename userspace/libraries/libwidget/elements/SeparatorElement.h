@@ -7,7 +7,6 @@ namespace Widget
 
 struct SeparatorElement : public Element
 {
-public:
     void paint(Graphic::Painter &painter, const Math::Recti &dirty) override;
 
     Math::Vec2i size() override;

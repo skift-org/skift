@@ -15,20 +15,6 @@ struct LabelState
 struct LabelElement :
     public StatefulElement<LabelState>
 {
-    void text(String text)
-    {
-        auto s = state();
-        s.text = text;
-        state(s);
-    }
-
-    void anchor(Math::Anchor anchor)
-    {
-        auto s = state();
-        s.anchor = anchor;
-        state(s);
-    }
-
     LabelElement(String text, Math::Anchor anchor = Math::Anchor::LEFT);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;

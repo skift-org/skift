@@ -83,6 +83,6 @@ public:
     void layout() override;
 };
 
-static inline RefPtr<Table> table(RefPtr<TableModel> model) { return make<Table>(model); }
+WIDGET_BUILDER(Table, table);
 
 } // namespace Widget

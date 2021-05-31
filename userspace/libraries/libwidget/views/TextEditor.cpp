@@ -22,10 +22,6 @@ TextEditor::TextEditor(RefPtr<TextModel> model)
     });
 }
 
-TextEditor::~TextEditor()
-{
-}
-
 void TextEditor::paint(Graphic::Painter &painter, const Math::Recti &)
 {
     auto metrics = font()->metrics();
@@ -257,13 +253,6 @@ void TextEditor::layout()
 {
     _vscrollbar->container(vscrollbar_bound());
     _hscrollbar->container(hscrollbar_bound());
-
-    update_scrollbar();
-}
-
-void TextEditor::update_model(RefPtr<TextModel> model)
-{
-    _model = model;
 
     update_scrollbar();
 }

@@ -14,10 +14,6 @@ private:
 public:
     ImageElement(RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling = Graphic::BitmapScaling::FIT);
 
-    void change_bitmap(RefPtr<Graphic::Bitmap> bitmap);
-
-    void scaling(Graphic::BitmapScaling scaling);
-
     void paint(Graphic::Painter &, const Math::Recti &) override;
 
     virtual Math::Vec2i size() override;

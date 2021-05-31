@@ -12,7 +12,7 @@ private:
 
 public:
     SpacingLayout(Insetsi spacing)
-        : _spacing{spacing}
+         : _spacing{spacing}
     {
     }
 

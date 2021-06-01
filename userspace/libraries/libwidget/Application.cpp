@@ -355,7 +355,15 @@ int Application::run()
 
     if (window != nullptr)
     {
-        window->resize_to_content();
+        if (window->flags() & WINDOW_FULLSCREEN)
+        {
+            window->bound(Screen::bound());
+        }
+        else
+        {
+            window->resize_to_content();
+        }
+
         window->show();
     }
 

@@ -3,36 +3,36 @@
 
 #include <abi/Syscalls.h>
 
-OpenFlag fcntl_parse_mode(int mode)
+HjOpenFlag fcntl_parse_mode(int mode)
 {
-    OpenFlag flags = OPEN_STREAM;
+    HjOpenFlag flags = HJ_OPEN_STREAM;
 
     // Open Mode
     if (mode == O_RDONLY)
     {
-        flags |= OPEN_READ;
+        flags |= HJ_OPEN_READ;
     }
     else if (mode == O_WRONLY)
     {
-        flags |= OPEN_WRITE;
+        flags |= HJ_OPEN_WRITE;
     }
     else if (mode == O_RDWR)
     {
-        flags |= OPEN_READ | OPEN_WRITE;
+        flags |= HJ_OPEN_READ | HJ_OPEN_WRITE;
     }
 
     // Flags
     if (mode & O_CREAT)
     {
-        flags |= OPEN_CREATE;
+        flags |= HJ_OPEN_CREATE;
     }
     if (mode & O_APPEND)
     {
-        flags |= OPEN_APPEND;
+        flags |= HJ_OPEN_APPEND;
     }
     if (mode & O_DIRECTORY)
     {
-        flags |= OPEN_DIRECTORY;
+        flags |= HJ_OPEN_DIRECTORY;
     }
 
     return flags;

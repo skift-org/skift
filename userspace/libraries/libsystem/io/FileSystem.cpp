@@ -2,7 +2,7 @@
 
 #include <libsystem/core/Plugs.h>
 
-bool filesystem_exist(const char *path, FileType type)
+bool filesystem_exist(const char *path, HjFileType type)
 {
     Handle handle;
     __plug_handle_open(&handle, path, 0);
@@ -12,7 +12,7 @@ bool filesystem_exist(const char *path, FileType type)
         return false;
     }
 
-    FileState state;
+    HjStat state;
     __plug_handle_stat(&handle, &state);
 
     if (handle_has_error(&handle))

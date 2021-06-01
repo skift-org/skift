@@ -10,7 +10,7 @@
 #include "system/scheduling/Blocker.h"
 #include "system/scheduling/Scheduler.h"
 
-FsHandle::FsHandle(RefPtr<FsNode> node, OpenFlag flags)
+FsHandle::FsHandle(RefPtr<FsNode> node, HjOpenFlag flags)
 {
     _node = node;
     _flags = flags;
@@ -89,9 +89,9 @@ PollEvent FsHandle::poll(PollEvent events)
 
 ResultOr<size_t> FsHandle::read(void *buffer, size_t size)
 {
-    if (!has_flag(OPEN_READ) &&
-        !has_flag(OPEN_SERVER) &&
-        !has_flag(OPEN_CLIENT))
+    if (!has_flag(HJ_OPEN_READ) &&
+        !has_flag(HJ_OPEN_SERVER) &&
+        !has_flag(HJ_OPEN_CLIENT))
     {
         return ERR_WRITE_ONLY_STREAM;
     }
@@ -116,9 +116,9 @@ ResultOr<size_t> FsHandle::read(void *buffer, size_t size)
 
 ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
 {
-    if (!has_flag(OPEN_WRITE) &&
-        !has_flag(OPEN_SERVER) &&
-        !has_flag(OPEN_CLIENT))
+    if (!has_flag(HJ_OPEN_WRITE) &&
+        !has_flag(HJ_OPEN_SERVER) &&
+        !has_flag(HJ_OPEN_CLIENT))
     {
         return ERR_READ_ONLY_STREAM;
     }
@@ -128,7 +128,7 @@ ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
 
         TRY(task_block(scheduler_running(), blocker, -1));
 
-        if (has_flag(OPEN_APPEND))
+        if (has_flag(HJ_OPEN_APPEND))
         {
             _offset = _node->size();
         }
@@ -227,7 +227,7 @@ Result FsHandle::call(IOCall request, void *args)
     return result;
 }
 
-Result FsHandle::stat(FileState *stat)
+Result FsHandle::stat(HjStat *stat)
 {
     _node->acquire(scheduler_running_id());
     stat->size = _node->size();
@@ -255,7 +255,7 @@ ResultOr<RefPtr<FsHandle>> FsHandle::accept()
 
     auto connection = connection_or_result.unwrap();
 
-    auto connection_handle = make<FsHandle>(connection, OPEN_SERVER);
+    auto connection_handle = make<FsHandle>(connection, HJ_OPEN_SERVER);
 
     _node->release(scheduler_running_id());
 

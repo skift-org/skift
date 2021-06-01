@@ -52,7 +52,7 @@ Shell::ArgParseResult gfxmode_get()
 {
     IOCallDisplayModeArgs framebuffer_info;
 
-    Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
+    Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, HJ_OPEN_READ);
     if (stream_call(device, IOCALL_DISPLAY_GET_MODE, &framebuffer_info) != SUCCESS)
     {
         IO::errln("Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
@@ -118,7 +118,7 @@ Shell::ArgParseResult gfxmode_set(String &mode_name)
     if (result != Result::SUCCESS)
     {
         CLEANUP(stream_cleanup)
-        Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
+        Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, HJ_OPEN_READ);
         result = gfxmode_set_iocall(device, mode.unwrap());
     }
 

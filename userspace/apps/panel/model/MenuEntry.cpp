@@ -46,14 +46,14 @@ Vector<MenuEntry> MenuEntry::load()
 
     for (auto &entry : directory.entries())
     {
-        if (entry.stat.type != FILE_TYPE_DIRECTORY)
+        if (entry.stat.type != HJ_FILE_TYPE_DIRECTORY)
         {
             continue;
         }
 
         auto path = IO::format("/Applications/{}/manifest.json", entry.name);
 
-        IO::File manifest_file{path, OPEN_READ};
+        IO::File manifest_file{path, HJ_OPEN_READ};
 
         if (manifest_file.exist())
         {

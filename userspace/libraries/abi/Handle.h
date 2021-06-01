@@ -14,7 +14,7 @@ typedef unsigned int PollEvent;
 struct Handle
 {
     int id;
-    OpenFlag flags;
+    HjOpenFlag flags;
     Result result;
 };
 
@@ -35,6 +35,3 @@ struct HandlePoll
 
 #define handle_get_error(__handle) (HANDLE(__handle)->result)
 
-#define handle_clear_error(__handle) (HANDLE(__handle)->result = SUCCESS)
-
-#define handle_has_flags(__handle, __flags) ((HANDLE(__handle)->flags & (__flags)) == (__flags))

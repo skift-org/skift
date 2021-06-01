@@ -10,11 +10,11 @@ namespace FilePicker
 
 static auto get_icon_for_node(String current_directory, IO::Directory::Entry &entry)
 {
-    if (entry.stat.type == FILE_TYPE_DIRECTORY)
+    if (entry.stat.type == HJ_FILE_TYPE_DIRECTORY)
     {
         auto manifest_path = IO::format("{}/{}/manifest.json", current_directory, entry.name);
 
-        IO::File manifest_file{manifest_path, OPEN_READ};
+        IO::File manifest_file{manifest_path, HJ_OPEN_READ};
 
         if (manifest_file.exist())
         {
@@ -33,13 +33,13 @@ static auto get_icon_for_node(String current_directory, IO::Directory::Entry &en
 
         return Graphic::Icon::get("folder");
     }
-    else if (entry.stat.type == FILE_TYPE_PIPE ||
-             entry.stat.type == FILE_TYPE_DEVICE ||
-             entry.stat.type == FILE_TYPE_SOCKET)
+    else if (entry.stat.type == HJ_FILE_TYPE_PIPE ||
+             entry.stat.type == HJ_FILE_TYPE_DEVICE ||
+             entry.stat.type == HJ_FILE_TYPE_SOCKET)
     {
         return Graphic::Icon::get("pipe");
     }
-    else if (entry.stat.type == FILE_TYPE_TERMINAL)
+    else if (entry.stat.type == HJ_FILE_TYPE_TERMINAL)
     {
         return Graphic::Icon::get("console-network");
     }
@@ -108,13 +108,13 @@ Widget::Variant FilesystemModel::data(int row, int column)
     case COLUMN_TYPE:
         switch (entry.type)
         {
-        case FILE_TYPE_REGULAR:
+        case HJ_FILE_TYPE_REGULAR:
             return "Regular file";
 
-        case FILE_TYPE_DIRECTORY:
+        case HJ_FILE_TYPE_DIRECTORY:
             return "Directory";
 
-        case FILE_TYPE_DEVICE:
+        case HJ_FILE_TYPE_DEVICE:
             return "Device";
 
         default:
@@ -122,7 +122,7 @@ Widget::Variant FilesystemModel::data(int row, int column)
         }
 
     case COLUMN_SIZE:
-        if (entry.type == FILE_TYPE_DIRECTORY)
+        if (entry.type == HJ_FILE_TYPE_DIRECTORY)
         {
             return Widget::Variant(IO::format("{} Items", entry.size));
         }
@@ -156,7 +156,7 @@ void FilesystemModel::update()
 
         size_t size = entry.stat.size;
 
-        if (entry.stat.type == FILE_TYPE_DIRECTORY)
+        if (entry.stat.type == HJ_FILE_TYPE_DIRECTORY)
         {
             auto path = IO::Path::join(_navigation->current(), entry.name);
             IO::Directory subdirectory{path};

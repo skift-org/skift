@@ -16,7 +16,7 @@ struct FsNode : public RefCounted<FsNode>
 {
 private:
     Lock _lock{"fsnode"};
-    FileType _type;
+    HjFileType _type;
 
     unsigned int _readers = 0;
     unsigned int _writers = 0;
@@ -24,7 +24,7 @@ private:
     unsigned int _server = 0;
 
 public:
-    FileType type() { return _type; }
+    HjFileType type() { return _type; }
 
     unsigned int readers() { return _readers; }
 
@@ -34,7 +34,7 @@ public:
 
     unsigned int server() { return _server; }
 
-    FsNode(FileType type);
+    FsNode(HjFileType type);
 
     virtual ~FsNode()
     {

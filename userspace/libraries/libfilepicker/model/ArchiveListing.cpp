@@ -69,10 +69,10 @@ Widget::Variant ArchiveListing::data(int row, int column)
     case COLUMN_TYPE:
         switch (entry.type)
         {
-        case FILE_TYPE_REGULAR:
+        case HJ_FILE_TYPE_REGULAR:
             return "Regular file";
 
-        case FILE_TYPE_DIRECTORY:
+        case HJ_FILE_TYPE_DIRECTORY:
             return "Directory";
 
         default:
@@ -102,7 +102,7 @@ void ArchiveListing::update()
         auto &entry_info = _entries.emplace_back();
         entry_info.compressed_size = entry.compressed_size;
         entry_info.uncompressed_size = entry.uncompressed_size;
-        entry_info.type = FILE_TYPE_REGULAR;
+        entry_info.type = HJ_FILE_TYPE_REGULAR;
         entry_info.name = entry.name;
         entry_info.icon = Graphic::Icon::get("file");
     }

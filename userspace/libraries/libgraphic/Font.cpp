@@ -17,7 +17,7 @@ static HashMap<String, RefPtr<Font>>
 static ResultOr<Vector<Glyph>> font_load_glyph(String name)
 {
     auto path = IO::format("/Files/Fonts/{}.glyph", name);
-    IO::File glyph_file{path, OPEN_READ};
+    IO::File glyph_file{path, HJ_OPEN_READ};
 
     if (!glyph_file.exist())
     {

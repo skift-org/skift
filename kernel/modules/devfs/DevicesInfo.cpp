@@ -10,7 +10,7 @@
 #include "system/node/Handle.h"
 #include "system/scheduling/Scheduler.h"
 
-FsDeviceInfo::FsDeviceInfo() : FsNode(FILE_TYPE_DEVICE)
+FsDeviceInfo::FsDeviceInfo() : FsNode(HJ_FILE_TYPE_DEVICE)
 {
 }
 

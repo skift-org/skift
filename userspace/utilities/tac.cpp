@@ -85,7 +85,7 @@ int main(int argc, char const *argv[])
     int process_result = PROCESS_SUCCESS;
     for (auto filepath : args.argv())
     {
-        IO::File file(filepath, OPEN_READ);
+        IO::File file(filepath, HJ_OPEN_READ);
 
         if (file.result() != Result::SUCCESS)
         {

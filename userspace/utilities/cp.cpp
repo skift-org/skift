@@ -16,8 +16,8 @@ int main(int argc, char **argv)
         return PROCESS_FAILURE;
     }
 
-    IO::File source{argv[1], OPEN_READ};
-    IO::File destination{argv[2], OPEN_WRITE | OPEN_CREATE};
+    IO::File source{argv[1], HJ_OPEN_READ};
+    IO::File destination{argv[2], HJ_OPEN_WRITE | HJ_OPEN_CREATE};
 
     Result result = IO::copy(source, destination);
 

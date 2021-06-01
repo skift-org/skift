@@ -17,8 +17,6 @@ namespace Arch::x86_32
 
 extern "C" void arch_x86_32_main(void *info, uint32_t magic)
 {
-    __plug_initialize();
-
     com_initialize(COM1);
     com_initialize(COM2);
     com_initialize(COM3);

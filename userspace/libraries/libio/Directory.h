@@ -13,7 +13,7 @@ public:
     struct Entry
     {
         String name;
-        FileState stat;
+        HjStat stat;
     };
 
 private:

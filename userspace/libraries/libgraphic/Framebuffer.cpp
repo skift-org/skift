@@ -12,20 +12,10 @@ namespace Graphic
 ResultOr<OwnPtr<Framebuffer>> Framebuffer::open()
 {
     Handle handle;
-    __plug_handle_open(&handle, FRAMEBUFFER_DEVICE_PATH, OPEN_READ | OPEN_WRITE);
-
-    if (handle_has_error(&handle))
-    {
-        return handle_get_error(&handle);
-    }
+    TRY(__plug_handle_open(&handle, FRAMEBUFFER_DEVICE_PATH, HJ_OPEN_READ | HJ_OPEN_WRITE));
 
     IOCallDisplayModeArgs mode_info = {};
-    __plug_handle_call(&handle, IOCALL_DISPLAY_GET_MODE, &mode_info);
-
-    if (handle_has_error(&handle))
-    {
-        return handle_get_error(&handle);
-    }
+    TRY(__plug_handle_call(&handle, IOCALL_DISPLAY_GET_MODE, &mode_info));
 
     auto bitmap_or_error = Bitmap::create_shared(mode_info.width, mode_info.height);
 
@@ -54,12 +44,7 @@ Result Framebuffer::set_resolution(Math::Vec2i size)
 
     IOCallDisplayModeArgs mode_info = (IOCallDisplayModeArgs){size.x(), size.y()};
 
-    __plug_handle_call(&_handle, IOCALL_DISPLAY_SET_MODE, &mode_info);
-
-    if (handle_has_error(&_handle))
-    {
-        return handle_get_error(&_handle);
-    }
+    TRY(__plug_handle_call(&_handle, IOCALL_DISPLAY_SET_MODE, &mode_info));
 
     _bitmap = bitmap;
 

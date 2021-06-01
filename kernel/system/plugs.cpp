@@ -3,7 +3,6 @@
 
 #include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
-#include <libsystem/io/Stream.h>
 #include <libsystem/system/System.h>
 
 #include "archs/Arch.h"
@@ -19,24 +18,6 @@
 #include "system/tasking/Task-Memory.h"
 
 /* --- Framework initialization --------------------------------------------- */
-
-Stream *in_stream = nullptr;
-Stream *out_stream = nullptr;
-Stream *err_stream = nullptr;
-Stream *log_stream = nullptr;
-
-#define INTERNAL_LOG_STREAM_HANDLE HANDLE_INVALID_ID
-static Stream internal_log_stream = {};
-
-void __plug_initialize()
-{
-    internal_log_stream.handle.id = INTERNAL_LOG_STREAM_HANDLE;
-
-    in_stream = nullptr;
-    out_stream = &internal_log_stream;
-    err_stream = &internal_log_stream;
-    log_stream = &internal_log_stream;
-}
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
 {
@@ -128,7 +109,7 @@ Result __plug_process_wait(int pid, int *exit_value)
 
 /* ---Handles plugs --------------------------------------------------------- */
 
-void __plug_handle_open(Handle *handle, const char *raw_path, OpenFlag flags)
+Result __plug_handle_open(Handle *handle, const char *raw_path, HjOpenFlag flags)
 {
     auto path = IO::Path::parse(raw_path);
     auto &handles = scheduler_running()->handles();
@@ -142,6 +123,8 @@ void __plug_handle_open(Handle *handle, const char *raw_path, OpenFlag flags)
     {
         handle->id = result_or_handle_index.unwrap();
     }
+
+    return result_or_handle_index.result();
 }
 
 void __plug_handle_close(Handle *handle)
@@ -156,8 +139,6 @@ void __plug_handle_close(Handle *handle)
 
 size_t __plug_handle_read(Handle *handle, void *buffer, size_t size)
 {
-    assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
-
     auto &handles = scheduler_running()->handles();
 
     auto result_or_read = handles.read(handle->id, buffer, size);
@@ -176,31 +157,19 @@ size_t __plug_handle_read(Handle *handle, void *buffer, size_t size)
 
 size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
 {
-    if (handle->id == INTERNAL_LOG_STREAM_HANDLE)
+    auto &handles = scheduler_running()->handles();
+
+    auto result_or_write = handles.write(handle->id, buffer, size);
+
+    handle->result = result_or_write.result();
+
+    if (result_or_write.success())
     {
-        handle->result = SUCCESS;
-
-        early_console_write(buffer, size);
-        Arch::debug_write(buffer, size);
-
-        return size;
+        return result_or_write.unwrap();
     }
     else
     {
-        auto &handles = scheduler_running()->handles();
-
-        auto result_or_write = handles.write(handle->id, buffer, size);
-
-        handle->result = result_or_write.result();
-
-        if (result_or_write.success())
-        {
-            return result_or_write.unwrap();
-        }
-        else
-        {
-            return 0;
-        }
+        return 0;
     }
 }
 
@@ -215,8 +184,6 @@ Result __plug_handle_call(Handle *handle, IOCall request, void *args)
 
 int __plug_handle_seek(Handle *handle, IO::SeekFrom from)
 {
-    assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
-
     auto &handles = scheduler_running()->handles();
 
     handle->result = handles.seek(handle->id, from).result();
@@ -226,8 +193,6 @@ int __plug_handle_seek(Handle *handle, IO::SeekFrom from)
 
 int __plug_handle_tell(Handle *handle)
 {
-    assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
-
     auto &handles = scheduler_running()->handles();
 
     auto result_or_offset = handles.seek(handle->id, IO::SeekFrom::current(0));
@@ -244,10 +209,8 @@ int __plug_handle_tell(Handle *handle)
     }
 }
 
-int __plug_handle_stat(Handle *handle, FileState *stat)
+int __plug_handle_stat(Handle *handle, HjStat *stat)
 {
-    assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
-
     auto &handles = scheduler_running()->handles();
 
     handle->result = handles.stat(handle->id, stat);

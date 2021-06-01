@@ -5,7 +5,6 @@
 #include <libio/Pipe.h>
 #include <libio/Streams.h>
 #include <libsystem/io/Filesystem.h>
-#include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 #include <libutils/Assert.h>
@@ -113,7 +112,7 @@ int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> 
             process_wait(pid, &command_result);
             return command_result;
         }
-        else if (filesystem_exist(path.string().cstring(), FILE_TYPE_DIRECTORY))
+        else if (filesystem_exist(path.string().cstring(), HJ_FILE_TYPE_DIRECTORY))
         {
             process_set_directory(path.string().cstring());
 
@@ -184,7 +183,7 @@ int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> 
     {
         ShellRedirect *redirect = (ShellRedirect *)node;
 
-        IO::File file{redirect->destination, OPEN_WRITE | OPEN_CREATE};
+        IO::File file{redirect->destination, HJ_OPEN_WRITE | HJ_OPEN_CREATE};
 
         if (file.exist())
         {

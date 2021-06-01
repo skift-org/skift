@@ -68,7 +68,7 @@ Widget::Variant DeviceModel::data(int row, int column)
 
 void DeviceModel::update()
 {
-    IO::File file{"/System/devices", OPEN_READ};
+    IO::File file{"/System/devices", HJ_OPEN_READ};
 
     if (!file.exist())
     {

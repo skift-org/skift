@@ -18,7 +18,7 @@ RefPtr<TextModel> TextModel::open(String path)
 {
     auto model = make<TextModel>();
 
-    IO::File file{path, OPEN_READ};
+    IO::File file{path, HJ_OPEN_READ};
     IO::BufReader buf_reader{file, 512};
     IO::Scanner scan{buf_reader};
 
@@ -117,7 +117,7 @@ String TextModel::string()
 
 ResultOr<size_t> TextModel::save(String path)
 {
-    IO::File file{path, OPEN_WRITE | OPEN_CREATE};
+    IO::File file{path, HJ_OPEN_WRITE | HJ_OPEN_CREATE};
     return IO::write(file, string());
 }
 

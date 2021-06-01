@@ -7,66 +7,21 @@
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 
-Stream *_in_stream = nullptr;
-Stream *_out_stream = nullptr;
-Stream *_err_stream = nullptr;
-Stream *_log_stream = nullptr;
-
-Stream *__stream_get_in_stream()
-{
-    if (_in_stream == nullptr)
-    {
-        _in_stream = stream_open_handle(0, OPEN_READ);
-    }
-
-    return _in_stream;
-}
-
-Stream *__stream_get_out_stream()
-{
-    if (_out_stream == nullptr)
-    {
-        _out_stream = stream_open_handle(1, OPEN_WRITE | OPEN_BUFFERED);
-    }
-
-    return _out_stream;
-}
-
-Stream *__stream_get_err_stream()
-{
-    if (_err_stream == nullptr)
-    {
-        _err_stream = stream_open_handle(2, OPEN_WRITE | OPEN_BUFFERED);
-    }
-
-    return _err_stream;
-}
-
-Stream *__stream_get_log_stream()
-{
-    if (_log_stream == nullptr)
-    {
-        _log_stream = stream_open_handle(3, OPEN_WRITE | OPEN_BUFFERED);
-    }
-
-    return _log_stream;
-}
-
-Stream *stream_open(const char *path, OpenFlag flags)
+Stream *stream_open(const char *path, HjOpenFlag flags)
 {
     Stream *stream = CREATE(Stream);
 
-    __plug_handle_open(HANDLE(stream), path, flags | OPEN_STREAM);
+    __plug_handle_open(HANDLE(stream), path, flags | HJ_OPEN_STREAM);
 
     return stream;
 }
 
-Stream *stream_open_handle(int handle_id, OpenFlag flags)
+Stream *stream_open_handle(int handle_id, HjOpenFlag flags)
 {
     Stream *stream = CREATE(Stream);
 
     HANDLE(stream)->id = handle_id;
-    HANDLE(stream)->flags = flags | OPEN_STREAM;
+    HANDLE(stream)->flags = flags | HJ_OPEN_STREAM;
     HANDLE(stream)->result = SUCCESS;
 
     return stream;
@@ -137,9 +92,9 @@ int stream_seek(Stream *stream, IO::SeekFrom from)
     return __plug_handle_seek(HANDLE(stream), from);
 }
 
-void stream_stat(Stream *stream, FileState *stat)
+void stream_stat(Stream *stream, HjStat *stat)
 {
-    stat->type = FILE_TYPE_UNKNOWN;
+    stat->type = HJ_FILE_TYPE_UNKNOWN;
     stat->size = 0;
 
     __plug_handle_stat(HANDLE(stream), stat);

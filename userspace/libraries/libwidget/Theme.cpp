@@ -115,7 +115,7 @@ void theme_load(String path)
 {
     IO::logln("Loading theme from '{}'", path.cstring());
 
-    IO::File theme_file{path, OPEN_READ};
+    IO::File theme_file{path, HJ_OPEN_READ};
 
     if (!theme_file.exist())
     {

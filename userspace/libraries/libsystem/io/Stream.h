@@ -21,26 +21,9 @@ struct Stream
     bool is_end_of_file;
 };
 
-#ifndef __KERNEL__
-Stream *__stream_get_in_stream();
-Stream *__stream_get_out_stream();
-Stream *__stream_get_err_stream();
-Stream *__stream_get_log_stream();
+Stream *stream_open(const char *path, HjOpenFlag flags);
 
-#    define in_stream (__stream_get_in_stream())
-#    define out_stream (__stream_get_out_stream())
-#    define err_stream (__stream_get_err_stream())
-#    define log_stream (__stream_get_log_stream())
-#else
-extern Stream *in_stream;
-extern Stream *out_stream;
-extern Stream *err_stream;
-extern Stream *log_stream;
-#endif
-
-Stream *stream_open(const char *path, OpenFlag flags);
-
-Stream *stream_open_handle(int handle_id, OpenFlag flags);
+Stream *stream_open_handle(int handle_id, HjOpenFlag flags);
 
 void stream_close(Stream *stream);
 
@@ -54,7 +37,7 @@ Result stream_call(Stream *stream, IOCall request, void *arg);
 
 int stream_seek(Stream *stream, IO::SeekFrom from);
 
-void stream_stat(Stream *stream, FileState *stat);
+void stream_stat(Stream *stream, HjStat *stat);
 
 int stream_format(Stream *stream, const char *fmt, ...);
 

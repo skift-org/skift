@@ -10,7 +10,7 @@ int main(int argc, char **argv)
         return PROCESS_FAILURE;
     }
 
-    IO::File file{argv[1], OPEN_READ};
+    IO::File file{argv[1], HJ_OPEN_READ};
 
     if (file.result() != SUCCESS)
     {

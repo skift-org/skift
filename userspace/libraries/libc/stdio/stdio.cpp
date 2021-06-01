@@ -34,9 +34,9 @@ FILE *__stdio_get_stdlog()
     return &_stdlog;
 }
 
-OpenFlag stdio_parse_mode(const char *mode)
+HjOpenFlag stdio_parse_mode(const char *mode)
 {
-    OpenFlag flags = 0;
+    HjOpenFlag flags = 0;
 
     for (int i = 0; mode[i]; i++)
     {
@@ -44,23 +44,23 @@ OpenFlag stdio_parse_mode(const char *mode)
 
         if (c == 'r')
         {
-            flags |= OPEN_READ;
+            flags |= HJ_OPEN_READ;
         }
         else if (c == 'w')
         {
-            flags |= OPEN_WRITE;
-            flags |= OPEN_CREATE;
-            flags |= OPEN_TRUNC;
+            flags |= HJ_OPEN_WRITE;
+            flags |= HJ_OPEN_CREATE;
+            flags |= HJ_OPEN_TRUNC;
         }
         else if (c == 'a')
         {
-            flags |= OPEN_WRITE;
-            flags |= OPEN_CREATE;
-            flags |= OPEN_APPEND;
+            flags |= HJ_OPEN_WRITE;
+            flags |= HJ_OPEN_CREATE;
+            flags |= HJ_OPEN_APPEND;
         }
         else if (c == '+')
         {
-            flags |= OPEN_READ;
+            flags |= HJ_OPEN_READ;
         }
     }
 
@@ -81,7 +81,7 @@ FILE *fdopen(int fd, const char *mode)
 
 FILE *fopen(const char *path, const char *mode)
 {
-    OpenFlag flags = stdio_parse_mode(mode);
+    HjOpenFlag flags = stdio_parse_mode(mode);
 
     int handle = 0;
     Result result = hj_handle_open(&handle, path, strlen(path), flags);

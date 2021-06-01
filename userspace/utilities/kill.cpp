@@ -15,7 +15,7 @@ int kill(int pid)
 
 int killall(String name)
 {
-    IO::File file{"/System/processes", OPEN_READ};
+    IO::File file{"/System/processes", HJ_OPEN_READ};
 
     if (!file.exist())
     {

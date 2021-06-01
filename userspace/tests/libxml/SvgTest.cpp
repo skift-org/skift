@@ -21,7 +21,7 @@ TEST(xml_all_svg_test)
 
         IO::logln("Parsing {}", path);
 
-        IO::File file(path, OPEN_READ);
+        IO::File file(path, HJ_OPEN_READ);
         Assert::truth(file.exist());
 
         auto result = Xml::parse(file);

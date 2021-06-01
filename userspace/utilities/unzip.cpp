@@ -4,7 +4,6 @@
 #include <libio/Path.h>
 #include <libio/Streams.h>
 #include <libshell/ArgParse.h>
-#include <libsystem/io/Filesystem.h>
 
 int main(int argc, char const *argv[])
 {
@@ -47,7 +46,7 @@ int main(int argc, char const *argv[])
         for (const auto &entry : archive->entries())
         {
             IO::outln("{}: Entry: {} is being extracted...", argv[0], entry.name);
-            IO::File dest_file(entry.name, OPEN_WRITE | OPEN_CREATE);
+            IO::File dest_file(entry.name, HJ_OPEN_WRITE | HJ_OPEN_CREATE);
 
             auto result = archive->extract(i, dest_file);
             if (result != Result::SUCCESS)

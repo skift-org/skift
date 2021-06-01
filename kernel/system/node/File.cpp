@@ -5,7 +5,7 @@
 #include "system/node/File.h"
 #include "system/node/Handle.h"
 
-FsFile::FsFile() : FsNode(FILE_TYPE_REGULAR)
+FsFile::FsFile() : FsNode(HJ_FILE_TYPE_REGULAR)
 {
     _buffer = (char *)malloc(512);
     _buffer_allocated = 512;
@@ -19,7 +19,7 @@ FsFile::~FsFile()
 
 Result FsFile::open(FsHandle &handle)
 {
-    if (handle.has_flag(OPEN_TRUNC))
+    if (handle.has_flag(HJ_OPEN_TRUNC))
     {
         free(_buffer);
         _buffer = (char *)malloc(512);

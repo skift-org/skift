@@ -13,8 +13,6 @@ namespace Arch::x86_64
 
 extern "C" void arch_x86_64_entry(void *info, uint32_t magic)
 {
-    __plug_initialize();
-
     com_initialize(COM1);
     com_initialize(COM2);
     com_initialize(COM3);

@@ -208,7 +208,7 @@ Result ZipArchive::read_archive()
 {
     _valid = false;
 
-    IO::File archive_file(_path, OPEN_READ);
+    IO::File archive_file(_path, HJ_OPEN_READ);
 
     // Archive does not exist
     if (!archive_file.exist())
@@ -293,7 +293,7 @@ Result ZipArchive::extract(unsigned int entry_index, IO::Writer &writer)
     }
 
     // Get a reader to the uncompressed data
-    IO::File file_reader(_path, OPEN_READ);
+    IO::File file_reader(_path, HJ_OPEN_READ);
     file_reader.seek(IO::SeekFrom::start(entry.archive_offset));
     IO::ScopedReader scoped_reader(file_reader, entry.compressed_size);
 
@@ -309,7 +309,7 @@ Result ZipArchive::insert(const char *entry_name, IO::Reader &reader)
     // Write local headers
     for (const auto &entry : _entries)
     {
-        IO::File file_reader(_path, OPEN_READ);
+        IO::File file_reader(_path, HJ_OPEN_READ);
         file_reader.seek(IO::SeekFrom::start(entry.archive_offset));
 
         IO::ScopedReader scoped_reader(file_reader, entry.compressed_size);
@@ -342,6 +342,6 @@ Result ZipArchive::insert(const char *entry_name, IO::Reader &reader)
     // Write central directory
     TRY(write_central_directory(memory_writer, _entries));
 
-    IO::File file_writer(_path, OPEN_WRITE | OPEN_CREATE);
+    IO::File file_writer(_path, HJ_OPEN_WRITE | HJ_OPEN_CREATE);
     return IO::write_all(file_writer, Slice(memory_writer.slice()));
 }

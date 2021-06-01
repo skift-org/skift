@@ -10,16 +10,6 @@
 #include <libio/Seek.h>
 #include <libutils/String.h>
 
-void __plug_initialize();
-
-/* --- File system ---------------------------------------------------------- */
-
-Result __plug_filesystem_link(const char *oldpath, const char *newpath);
-
-Result __plug_filesystem_unlink(const char *path);
-
-Result __plug_filesystem_mkdir(const char *path);
-
 /* --- System --------------------------------------------------------------- */
 
 TimeStamp __plug_system_get_time();
@@ -50,7 +40,7 @@ Result __plug_process_wait(int pid, int *exit_value);
 
 /* --- I/O ------------------------------------------------------------------ */
 
-void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags);
+Result __plug_handle_open(Handle *handle, const char *path, HjOpenFlag flags);
 
 void __plug_handle_close(Handle *handle);
 
@@ -64,5 +54,4 @@ int __plug_handle_seek(Handle *handle, IO::SeekFrom from);
 
 int __plug_handle_tell(Handle *handle);
 
-int __plug_handle_stat(Handle *handle, FileState *stat);
-
+int __plug_handle_stat(Handle *handle, HjStat *stat);

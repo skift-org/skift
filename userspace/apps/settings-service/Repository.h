@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libio/Directory.h>
-#include <libsettings/Path.h>
 #include <libio/Path.h>
+#include <libsettings/Path.h>
 
 #include "settings-service/Domain.h"
 
@@ -20,7 +20,7 @@ struct Repository
 
         for (auto entry : dir_repository.entries())
         {
-            if (entry.stat.type != FILE_TYPE_DIRECTORY)
+            if (entry.stat.type != HJ_FILE_TYPE_DIRECTORY)
             {
                 continue;
             }
@@ -52,7 +52,7 @@ struct Repository
         {
             Json::Value::Object obj;
 
-            domains.foreach ([&](auto &key, auto &value) {
+            domains.foreach([&](auto &key, auto &value) {
                 obj[key] = value.read(path);
 
                 return Iteration::CONTINUE;

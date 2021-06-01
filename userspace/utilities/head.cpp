@@ -109,7 +109,7 @@ int main(int argc, const char *argv[])
 
     for (auto filename : args.argv())
     {
-        IO::File file{filename, OPEN_READ};
+        IO::File file{filename, HJ_OPEN_READ};
 
         if (wrap_head(filename, file, true) != PROCESS_SUCCESS)
         {

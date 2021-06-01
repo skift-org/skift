@@ -23,7 +23,7 @@ private:
 public:
     Server(Repository &repository) : _repository(repository)
     {
-        _socket = IO::Socket{"/Session/settings.ipc", OPEN_CREATE};
+        _socket = IO::Socket{"/Session/settings.ipc", HJ_OPEN_CREATE};
 
         _notifier = own<Async::Notifier>(_socket, POLL_ACCEPT, [this]() {
             auto connection = _socket.accept();

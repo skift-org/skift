@@ -24,7 +24,7 @@ public:
     {
     }
 
-    Handle(const String path, OpenFlag flags)
+    Handle(const String path, HjOpenFlag flags)
     {
         auto resolved_path = process_resolve(path);
         _result = hj_handle_open(&_handle, resolved_path.cstring(), resolved_path.length(), flags);
@@ -88,9 +88,9 @@ public:
         return result_offset;
     }
 
-    ResultOr<FileState> stat()
+    ResultOr<HjStat> stat()
     {
-        FileState stat{};
+        HjStat stat{};
         _result = TRY(hj_handle_stat(_handle, &stat));
         return stat;
     }

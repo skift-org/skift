@@ -29,7 +29,7 @@ Shell::ArgParseResult loadkey_list_keymap()
 
 Shell::ArgParseResult loadkey_set_keymap(RefPtr<IO::Handle> keyboard_device, String keymap_path)
 {
-    IO::File file{keymap_path, OPEN_READ};
+    IO::File file{keymap_path, HJ_OPEN_READ};
 
     if (!file.exist())
     {
@@ -106,7 +106,7 @@ int main(int argc, const char *argv[])
 
     args.epiloge("Options can be combined.");
 
-    auto keyboard_handle = make<IO::Handle>(KEYBOARD_DEVICE_PATH, OPEN_READ);
+    auto keyboard_handle = make<IO::Handle>(KEYBOARD_DEVICE_PATH, HJ_OPEN_READ);
 
     if (!keyboard_handle->valid())
     {

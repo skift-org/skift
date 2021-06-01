@@ -14,41 +14,41 @@ enum HjWhence
     HJ_WHENCE_END,
 };
 
-enum FileType
+enum HjFileType
 {
-    FILE_TYPE_UNKNOWN,
+    HJ_FILE_TYPE_UNKNOWN,
 
-    FILE_TYPE_REGULAR,
-    FILE_TYPE_DEVICE,
-    FILE_TYPE_DIRECTORY,
-    FILE_TYPE_PIPE,
-    FILE_TYPE_SOCKET,
-    FILE_TYPE_CONNECTION,
-    FILE_TYPE_TERMINAL,
+    HJ_FILE_TYPE_REGULAR,
+    HJ_FILE_TYPE_DEVICE,
+    HJ_FILE_TYPE_DIRECTORY,
+    HJ_FILE_TYPE_PIPE,
+    HJ_FILE_TYPE_SOCKET,
+    HJ_FILE_TYPE_CONNECTION,
+    HJ_FILE_TYPE_TERMINAL,
 };
 
-#define OPEN_READ (1 << 0)
-#define OPEN_WRITE (1 << 1)
-#define OPEN_CREATE (1 << 2)
-#define OPEN_APPEND (1 << 3)
-#define OPEN_TRUNC (1 << 4)
-#define OPEN_BUFFERED (1 << 5)
-#define OPEN_STREAM (1 << 6)
-#define OPEN_DIRECTORY (1 << 7)
-#define OPEN_SOCKET (1 << 8)
-#define OPEN_CLIENT (1 << 9)
-#define OPEN_SERVER (1 << 10)
+#define HJ_OPEN_READ (1 << 0)
+#define HJ_OPEN_WRITE (1 << 1)
+#define HJ_OPEN_CREATE (1 << 2)
+#define HJ_OPEN_APPEND (1 << 3)
+#define HJ_OPEN_TRUNC (1 << 4)
+#define HJ_OPEN_BUFFERED (1 << 5)
+#define HJ_OPEN_STREAM (1 << 6)
+#define HJ_OPEN_DIRECTORY (1 << 7)
+#define HJ_OPEN_SOCKET (1 << 8)
+#define HJ_OPEN_CLIENT (1 << 9)
+#define HJ_OPEN_SERVER (1 << 10)
 
-typedef unsigned int OpenFlag;
+typedef unsigned int HjOpenFlag;
 
-struct FileState
+struct HjStat
 {
     size_t size;
-    FileType type;
+    HjFileType type;
 };
 
-struct DirectoryEntry
+struct HjDirEntry
 {
     char name[FILE_NAME_LENGTH];
-    FileState stat;
+    HjStat stat;
 };

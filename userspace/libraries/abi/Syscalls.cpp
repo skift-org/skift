@@ -159,7 +159,7 @@ Result hj_create_term(int *server_handle, int *client_handle)
     return __syscall(HJ_CREATE_TERM, (uintptr_t)server_handle, (uintptr_t)client_handle);
 }
 
-Result hj_handle_open(int *handle, const char *raw_path, size_t size, OpenFlag flags)
+Result hj_handle_open(int *handle, const char *raw_path, size_t size, HjOpenFlag flags)
 {
     return __syscall(HJ_HANDLE_OPEN, (uintptr_t)handle, (uintptr_t)raw_path, (uintptr_t)size, flags);
 }
@@ -204,7 +204,7 @@ Result hj_handle_seek(int handle, ssize64_t *offset, HjWhence whence, ssize64_t 
     return __syscall(HJ_HANDLE_SEEK, (uintptr_t)handle, (uintptr_t)offset, (uintptr_t)whence, (uintptr_t)result_offset);
 }
 
-Result hj_handle_stat(int handle, FileState *state)
+Result hj_handle_stat(int handle, HjStat *state)
 {
     return __syscall(HJ_HANDLE_STAT, (uintptr_t)handle, (uintptr_t)state);
 }

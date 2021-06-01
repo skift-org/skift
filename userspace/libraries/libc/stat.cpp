@@ -6,13 +6,13 @@
 
 #include <abi/Syscalls.h>
 
-int file_type_to_stat(FileType type)
+int file_type_to_stat(HjFileType type)
 {
     switch (type)
     {
-    case FILE_TYPE_REGULAR:
+    case HJ_FILE_TYPE_REGULAR:
         return _IFREG;
-    case FILE_TYPE_DIRECTORY:
+    case HJ_FILE_TYPE_DIRECTORY:
         return _IFDIR;
     default:
         // Log this
@@ -20,7 +20,7 @@ int file_type_to_stat(FileType type)
     }
 }
 
-void file_state_to_stat(FileState *in, struct stat *out)
+void file_state_to_stat(HjStat *in, struct stat *out)
 {
     out->st_size = in->size;
     out->st_mode = file_type_to_stat(in->type);
@@ -28,7 +28,7 @@ void file_state_to_stat(FileState *in, struct stat *out)
 
 int stat(const char *path, struct stat *buf)
 {
-    int handle = open(path, OPEN_READ);
+    int handle = open(path, HJ_OPEN_READ);
 
     if (handle == -1)
         return -1;
@@ -45,7 +45,7 @@ int stat(const char *path, struct stat *buf)
 
 int fstat(int fd, struct stat *buf)
 {
-    FileState state;
+    HjStat state;
     Result result = hj_handle_stat(fd, &state);
     file_state_to_stat(&state, buf);
     return result == Result::SUCCESS ? -1 : 0;

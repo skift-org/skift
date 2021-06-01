@@ -5,7 +5,7 @@ namespace IO
 
 Result Directory::read_entries()
 {
-    DirectoryEntry entry;
+    HjDirEntry entry;
 
     auto read = TRY(_handle->read(&entry, sizeof(entry)));
 
@@ -23,21 +23,21 @@ Result Directory::read_entries()
 }
 
 Directory::Directory(const char *path)
-    : _handle{make<Handle>(path, OPEN_READ | OPEN_DIRECTORY)},
+    : _handle{make<Handle>(path, HJ_OPEN_READ | HJ_OPEN_DIRECTORY)},
       _path{IO::Path::parse(path)}
 {
     read_entries();
 }
 
 Directory::Directory(String path)
-    : _handle{make<Handle>(path, OPEN_READ | OPEN_DIRECTORY)},
+    : _handle{make<Handle>(path, HJ_OPEN_READ | HJ_OPEN_DIRECTORY)},
       _path{IO::Path::parse(path)}
 {
     read_entries();
 }
 
 Directory::Directory(const IO::Path &path)
-    : _handle{make<Handle>(path.string(), OPEN_READ | OPEN_DIRECTORY)},
+    : _handle{make<Handle>(path.string(), HJ_OPEN_READ | HJ_OPEN_DIRECTORY)},
       _path{path}
 {
     read_entries();

@@ -16,7 +16,7 @@ const char *file_type_name[] = {
 
 void ls_print_entry(IO::Directory::Entry &entry)
 {
-    FileState stat = entry.stat;
+    HjStat stat = entry.stat;
 
     if (option_list)
     {
@@ -25,7 +25,7 @@ void ls_print_entry(IO::Directory::Entry &entry)
 
     if (option_all || entry.name[0] != '.')
     {
-        IO::format(IO::out(), (stat.type == FILE_TYPE_DIRECTORY && option_color) ? "\e[1;34m{}\e[0m/ " : "{}  ", entry.name);
+        IO::format(IO::out(), (stat.type == HJ_FILE_TYPE_DIRECTORY && option_color) ? "\e[1;34m{}\e[0m/ " : "{}  ", entry.name);
     }
 
     if (option_list)

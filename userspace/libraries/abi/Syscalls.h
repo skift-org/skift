@@ -143,7 +143,7 @@ Result hj_system_shutdown();
 Result hj_create_pipe(int *reader_handle, int *writer_handle);
 Result hj_create_term(int *server_handle, int *client_handle);
 
-Result hj_handle_open(int *handle, const char *raw_path, size_t size, OpenFlag flags);
+Result hj_handle_open(int *handle, const char *raw_path, size_t size, HjOpenFlag flags);
 Result hj_handle_close(int handle);
 Result hj_handle_reopen(int handle, int *reopened);
 Result hj_handle_copy(int source, int destination);
@@ -152,7 +152,7 @@ Result hj_handle_read(int handle, void *buffer, size_t size, size_t *read);
 Result hj_handle_write(int handle, const void *buffer, size_t size, size_t *written);
 Result hj_handle_call(int handle, IOCall request, void *args);
 Result hj_handle_seek(int handle, ssize64_t *offset, HjWhence whence, ssize64_t *result);
-Result hj_handle_stat(int handle, FileState *state);
+Result hj_handle_stat(int handle, HjStat *state);
 Result hj_handle_connect(int *handle, const char *raw_path, size_t size);
 Result hj_handle_accept(int handle, int *connection_handle);
 

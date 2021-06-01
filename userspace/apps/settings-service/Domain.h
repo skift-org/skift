@@ -18,7 +18,7 @@ struct Domain
 
         for (auto entry : directory.entries())
         {
-            if (entry.stat.type != FILE_TYPE_REGULAR)
+            if (entry.stat.type != HJ_FILE_TYPE_REGULAR)
             {
                 continue;
             }
@@ -54,7 +54,7 @@ struct Domain
         {
             Json::Value::Object obj;
 
-            bundles.foreach ([&](auto &key, auto &value) {
+            bundles.foreach([&](auto &key, auto &value) {
                 obj[key] = value.read(path);
 
                 return Iteration::CONTINUE;

@@ -11,7 +11,7 @@ private:
 
 public:
     FsDevice(RefPtr<Device> device)
-        : FsNode(FILE_TYPE_DEVICE),
+        : FsNode(HJ_FILE_TYPE_DEVICE),
           _device(device)
     {
     }

@@ -27,7 +27,7 @@ private:
     OwnPtr<Async::Observer<Navigation>> _observer;
 
 public:
-    static constexpr int NO_OPEN_TERMINAL = 1 << 0;
+    static constexpr int NO_HJ_OPEN_TERMINAL = 1 << 0;
 
     ToolBar(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks, int flags = 0)
         : PanelElement(),
@@ -61,7 +61,7 @@ public:
             _navigation->refresh();
         }));
 
-        if (!(flags & NO_OPEN_TERMINAL))
+        if (!(flags & NO_HJ_OPEN_TERMINAL))
         {
             add(Widget::basic_button(Graphic::Icon::get("console"), [] {
                 process_run("terminal", NULL, TASK_NONE);

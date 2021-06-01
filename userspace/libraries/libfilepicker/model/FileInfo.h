@@ -11,7 +11,7 @@ namespace FilePicker
 struct FileInfo
 {
     String name;
-    FileType type;
+    HjFileType type;
     RefPtr<Graphic::Icon> icon;
     size_t size;
 };

@@ -24,11 +24,11 @@ public:
 
     File() {}
 
-    File(const char *path, OpenFlag flags = 0);
+    File(const char *path, HjOpenFlag flags = 0);
 
-    File(String path, OpenFlag flags = 0);
+    File(String path, HjOpenFlag flags = 0);
 
-    File(IO::Path &path, OpenFlag flags = 0);
+    File(IO::Path &path, HjOpenFlag flags = 0);
 
     File(RefPtr<Handle> handle);
 

@@ -61,7 +61,7 @@ RefPtr<Bitmap> Bitmap::placeholder()
 
 ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path, int size_hint)
 {
-    IO::File file{path, OPEN_READ};
+    IO::File file{path, HJ_OPEN_READ};
 
     if (!file.exist())
     {

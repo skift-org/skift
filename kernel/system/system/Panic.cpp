@@ -1,4 +1,4 @@
-#include <libsystem/io/Stream.h>
+#include <stdio.h>
 
 #include "archs/Arch.h"
 
@@ -91,7 +91,9 @@ void system_panic_internal(SourceLocation location, void *stackframe, const char
         Kernel::logln("\t// {}", YO_DAWG);
     }
 
-    stream_vprintf(out_stream, message, va);
+    char buffer[256];
+    vsnprintf(buffer, 256, message, va);
+    Kernel::logln(buffer);
 
     Kernel::logln("\tthrow by {} {}() ln{}", location.file(), location.function(), location.line());
     Kernel::logln("\tThe system was running for {} tick.", system_get_tick());

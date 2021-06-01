@@ -3,20 +3,20 @@
 namespace IO
 {
 
-File::File(const char *path, OpenFlag flags)
-    : _handle{make<Handle>(path, flags | OPEN_STREAM)},
+File::File(const char *path, HjOpenFlag flags)
+    : _handle{make<Handle>(path, flags | HJ_OPEN_STREAM)},
       _path{IO::Path::parse(path)}
 {
 }
 
-File::File(String path, OpenFlag flags)
-    : _handle{make<Handle>(path, flags | OPEN_STREAM)},
+File::File(String path, HjOpenFlag flags)
+    : _handle{make<Handle>(path, flags | HJ_OPEN_STREAM)},
       _path{IO::Path::parse(path)}
 {
 }
 
-File::File(IO::Path &path, OpenFlag flags)
-    : _handle{make<Handle>(path.string(), flags | OPEN_STREAM)},
+File::File(IO::Path &path, HjOpenFlag flags)
+    : _handle{make<Handle>(path.string(), flags | HJ_OPEN_STREAM)},
       _path{path}
 {
 }

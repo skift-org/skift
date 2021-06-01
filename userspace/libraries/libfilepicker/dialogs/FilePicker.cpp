@@ -30,7 +30,7 @@ void Dialog::render(Widget::Window *window)
 
     window->root()->add(Widget::titlebar(Graphic::Icon::get("widgets"), get_title()));
 
-    window->root()->add<ToolBar>(_navigation, nullptr, ToolBar::NO_OPEN_TERMINAL);
+    window->root()->add<ToolBar>(_navigation, nullptr, ToolBar::NO_HJ_OPEN_TERMINAL);
 
     if (_flags & DialogFlags::DIALOG_FLAGS_FOLDER)
     {

@@ -4,7 +4,7 @@
 
 int main(int argc, const char *argv[])
 {
-    IO::File file{"sysroot/Files/Wallpapers/peaks.png", OPEN_READ};
+    IO::File file{"sysroot/Files/Wallpapers/peaks.png", HJ_OPEN_READ};
     Png::Reader png_reader{file};
 
     Assert::truth(png_reader.valid());

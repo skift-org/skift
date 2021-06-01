@@ -18,7 +18,7 @@ Result open(const char *raw_path)
         return ERR_EXTENSION;
     }
 
-    IO::File database{FILE_EXTENSIONS_DATABASE_PATH, OPEN_READ};
+    IO::File database{FILE_EXTENSIONS_DATABASE_PATH, HJ_OPEN_READ};
     auto file_extensions = Json::parse(database);
 
     if (!file_extensions.is(Json::OBJECT))
@@ -34,7 +34,7 @@ Result open(const char *raw_path)
         return ERR_EXTENSION;
     }
 
-    IO::File type_database{FILE_TYPES_DATABASE_PATH, OPEN_READ};
+    IO::File type_database{FILE_TYPES_DATABASE_PATH, HJ_OPEN_READ};
     auto file_types = Json::parse(type_database);
 
     if (!file_types.is(Json::OBJECT))

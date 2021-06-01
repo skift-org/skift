@@ -411,7 +411,7 @@ Result hj_create_term(int *server_handle, int *client_handle)
 
 Result hj_handle_open(int *handle,
                       const char *raw_path, size_t size,
-                      OpenFlag flags)
+                      HjOpenFlag flags)
 {
     if (!syscall_validate_ptr((uintptr_t)handle, sizeof(int)) ||
         !syscall_validate_ptr((uintptr_t)raw_path, size))
@@ -569,9 +569,9 @@ Result hj_handle_seek(int handle, ssize64_t *offset_ptr, HjWhence whence, ssize6
     return seek_result.result();
 }
 
-Result hj_handle_stat(int handle, FileState *state)
+Result hj_handle_stat(int handle, HjStat *state)
 {
-    if (!syscall_validate_ptr((uintptr_t)state, sizeof(FileState)))
+    if (!syscall_validate_ptr((uintptr_t)state, sizeof(HjStat)))
     {
         return ERR_BAD_ADDRESS;
     }

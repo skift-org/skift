@@ -85,7 +85,7 @@ Result Handles::release(int handle_index)
     return SUCCESS;
 }
 
-ResultOr<int> Handles::open(Domain &domain, IO::Path &path, OpenFlag flags)
+ResultOr<int> Handles::open(Domain &domain, IO::Path &path, HjOpenFlag flags)
 {
     auto handle = TRY(domain.open(path, flags));
     return add(handle);
@@ -252,7 +252,7 @@ Result Handles::call(int handle_index, IOCall request, void *args)
     return result;
 }
 
-Result Handles::stat(int handle_index, FileState *stat)
+Result Handles::stat(int handle_index, HjStat *stat)
 {
     auto handle = acquire(handle_index);
 
@@ -296,9 +296,9 @@ ResultOr<int> Handles::accept(int socket_handle_index)
 Result Handles::duplex(
     RefPtr<FsNode> node,
     int *server,
-    OpenFlag server_flags,
+    HjOpenFlag server_flags,
     int *client,
-    OpenFlag client_flags)
+    HjOpenFlag client_flags)
 {
     *server = HANDLE_INVALID_ID;
     *client = HANDLE_INVALID_ID;
@@ -351,10 +351,10 @@ Result Handles::term(int *server, int *client)
         make<FsTerminal>(),
 
         server,
-        OPEN_SERVER | OPEN_READ | OPEN_WRITE,
+        HJ_OPEN_SERVER | HJ_OPEN_READ | HJ_OPEN_WRITE,
 
         client,
-        OPEN_CLIENT | OPEN_READ | OPEN_WRITE);
+        HJ_OPEN_CLIENT | HJ_OPEN_READ | HJ_OPEN_WRITE);
 }
 
 Result Handles::pipe(int *reader, int *writer)
@@ -363,9 +363,9 @@ Result Handles::pipe(int *reader, int *writer)
         make<FsPipe>(),
 
         reader,
-        OPEN_READ,
+        HJ_OPEN_READ,
         writer,
-        OPEN_WRITE);
+        HJ_OPEN_WRITE);
 }
 
 Result Handles::pass(Handles &handles, int source, int destination)

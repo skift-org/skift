@@ -20,7 +20,7 @@ Result __plug_process_set_directory(const char *path)
 
     int handle;
 
-    TRY(hj_handle_open(&handle, new_path.cstring(), new_path.length(), OPEN_DIRECTORY));
+    TRY(hj_handle_open(&handle, new_path.cstring(), new_path.length(), HJ_OPEN_DIRECTORY));
     TRY(hj_handle_close(handle));
 
     environment().get("POSIX").put("PWD", new_path);
@@ -92,11 +92,12 @@ Result filesystem_mkpipe(const char *raw_path)
     return hj_filesystem_mkpipe(path.cstring(), path.length());
 }
 
-void __plug_handle_open(Handle *handle, const char *raw_path, OpenFlag flags)
+Result __plug_handle_open(Handle *handle, const char *raw_path, HjOpenFlag flags)
 {
     auto path = process_resolve(raw_path);
 
     handle->result = hj_handle_open(&handle->id, path.cstring(), path.length(), flags);
+    return handle->result;
 }
 
 void __plug_handle_close(Handle *handle)
@@ -147,7 +148,7 @@ int __plug_handle_tell(Handle *handle)
     return result;
 }
 
-int __plug_handle_stat(Handle *handle, FileState *stat)
+int __plug_handle_stat(Handle *handle, HjStat *stat)
 {
     handle->result = hj_handle_stat(handle->id, stat);
 

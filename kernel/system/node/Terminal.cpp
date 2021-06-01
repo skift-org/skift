@@ -3,11 +3,11 @@
 #include "system/node/Handle.h"
 #include "system/node/Terminal.h"
 
-FsTerminal::FsTerminal() : FsNode(FILE_TYPE_TERMINAL) {}
+FsTerminal::FsTerminal() : FsNode(HJ_FILE_TYPE_TERMINAL) {}
 
 bool FsTerminal::can_read(FsHandle &handle)
 {
-    if (handle.has_flag(OPEN_SERVER))
+    if (handle.has_flag(HJ_OPEN_SERVER))
     {
         return !client_to_server_buffer.empty() || !writers();
     }
@@ -19,7 +19,7 @@ bool FsTerminal::can_read(FsHandle &handle)
 
 bool FsTerminal::can_write(FsHandle &handle)
 {
-    if (handle.has_flag(OPEN_SERVER))
+    if (handle.has_flag(HJ_OPEN_SERVER))
     {
         return !server_to_client_buffer.full() || !readers();
     }
@@ -31,7 +31,7 @@ bool FsTerminal::can_write(FsHandle &handle)
 
 ResultOr<size_t> FsTerminal::read(FsHandle &handle, void *buffer, size_t size)
 {
-    if (handle.has_flag(OPEN_SERVER))
+    if (handle.has_flag(HJ_OPEN_SERVER))
     {
         if (writers())
         {
@@ -57,7 +57,7 @@ ResultOr<size_t> FsTerminal::read(FsHandle &handle, void *buffer, size_t size)
 
 ResultOr<size_t> FsTerminal::write(FsHandle &handle, const void *buffer, size_t size)
 {
-    if (handle.has_flag(OPEN_SERVER))
+    if (handle.has_flag(HJ_OPEN_SERVER))
     {
         if (readers())
         {

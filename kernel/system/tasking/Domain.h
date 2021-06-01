@@ -23,7 +23,7 @@ public:
 
     RefPtr<FsNode> find(IO::Path path);
 
-    ResultOr<RefPtr<FsHandle>> open(IO::Path path, OpenFlag flags);
+    ResultOr<RefPtr<FsHandle>> open(IO::Path path, HjOpenFlag flags);
 
     ResultOr<RefPtr<FsHandle>> connect(IO::Path path);
 

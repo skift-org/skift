@@ -10,7 +10,7 @@
 #include "system/scheduling/Scheduler.h"
 #include "system/tasking/Task-Memory.h"
 
-FsProcessInfo::FsProcessInfo() : FsNode(FILE_TYPE_DEVICE)
+FsProcessInfo::FsProcessInfo() : FsNode(HJ_FILE_TYPE_DEVICE)
 {
 }
 

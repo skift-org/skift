@@ -28,7 +28,7 @@ public:
 
     ~Handles() { close_all(); }
 
-    ResultOr<int> open(Domain &domain, IO::Path &path, OpenFlag flags);
+    ResultOr<int> open(Domain &domain, IO::Path &path, HjOpenFlag flags);
 
     ResultOr<int> connect(Domain &domain, IO::Path &socket_path);
 
@@ -50,14 +50,14 @@ public:
 
     Result call(int handle_index, IOCall request, void *args);
 
-    Result stat(int handle_index, FileState *stat);
+    Result stat(int handle_index, HjStat *stat);
 
     ResultOr<int> accept(int handle_index);
 
     Result duplex(
         RefPtr<FsNode> node,
-        int *server, OpenFlag server_flags,
-        int *client, OpenFlag client_flags);
+        int *server, HjOpenFlag server_flags,
+        int *client, HjOpenFlag client_flags);
 
     Result term(int *server, int *client);
 

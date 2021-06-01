@@ -9,11 +9,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-int open_flags_to_posix(OpenFlag flags)
+int open_flags_to_posix(HjOpenFlag flags)
 {
     int result = 0;
 
-    if ((flags & OPEN_WRITE) && (flags & OPEN_READ))
+    if ((flags & HJ_OPEN_WRITE) && (flags & HJ_OPEN_READ))
     {
         result |= O_RDWR;
     }
@@ -22,47 +22,47 @@ int open_flags_to_posix(OpenFlag flags)
         result |= O_RDONLY;
     }
 
-    if (flags & OPEN_CREATE)
+    if (flags & HJ_OPEN_CREATE)
     {
         result |= O_CREAT;
     }
 
-    if (flags & OPEN_APPEND)
+    if (flags & HJ_OPEN_APPEND)
     {
         result |= O_APPEND;
     }
 
-    if (flags & OPEN_TRUNC)
+    if (flags & HJ_OPEN_TRUNC)
     {
         result |= O_TRUNC;
     }
 
-    if (flags & OPEN_BUFFERED)
+    if (flags & HJ_OPEN_BUFFERED)
     {
         // TODO
     }
 
-    if (flags & OPEN_STREAM)
+    if (flags & HJ_OPEN_STREAM)
     {
         // TODO
     }
 
-    if (flags & OPEN_DIRECTORY)
+    if (flags & HJ_OPEN_DIRECTORY)
     {
         // TODO
     }
 
-    if (flags & OPEN_SOCKET)
+    if (flags & HJ_OPEN_SOCKET)
     {
         // TODO
     }
 
-    if (flags & OPEN_CLIENT)
+    if (flags & HJ_OPEN_CLIENT)
     {
         // TODO
     }
 
-    if (flags & OPEN_SERVER)
+    if (flags & HJ_OPEN_SERVER)
     {
         // TODO
     }
@@ -90,24 +90,24 @@ int whence_to_posix(HjWhence whence)
     return -1;
 }
 
-FileType mode_to_skift_file_type(mode_t mode)
+HjFileType mode_to_skift_file_type(mode_t mode)
 {
     if (S_ISDIR(mode))
     {
-        return FILE_TYPE_DIRECTORY;
+        return HJ_FILE_TYPE_DIRECTORY;
     }
 
     if (S_ISFIFO(mode))
     {
-        return FILE_TYPE_PIPE;
+        return HJ_FILE_TYPE_PIPE;
     }
 
-    return FILE_TYPE_REGULAR;
+    return HJ_FILE_TYPE_REGULAR;
 }
 
-FileState stat_to_skift(struct stat sb)
+HjStat stat_to_skift(struct stat sb)
 {
-    FileState result;
+    HjStat result;
 
     result.size = sb.st_size;
     result.type = mode_to_skift_file_type(sb.st_mode);
@@ -130,7 +130,7 @@ Result errno_to_skift_result()
     return result;
 }
 
-Result hj_handle_open(int *handle, const char *raw_path, size_t size, OpenFlag flags)
+Result hj_handle_open(int *handle, const char *raw_path, size_t size, HjOpenFlag flags)
 {
     char buffer[256];
     strlcpy(buffer, raw_path, MIN(256, size + 1));
@@ -167,7 +167,7 @@ Result hj_handle_seek(int handle, ssize64_t *offset, HjWhence whence, ssize64_t 
     return errno_to_skift_result();
 }
 
-Result hj_handle_stat(int handle, FileState *state)
+Result hj_handle_stat(int handle, HjStat *state)
 {
     struct stat sb;
     fstat(handle, &sb);

@@ -55,7 +55,7 @@ int main(int argc, char const *argv[])
     else
     {
         args.argv().foreach([&](auto &path) {
-            IO::File file{path, OPEN_READ};
+            IO::File file{path, HJ_OPEN_READ};
 
             if (!file.exist())
             {

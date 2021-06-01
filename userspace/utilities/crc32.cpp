@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
 
     for (unsigned int i = 0; i < args.argc(); i++)
     {
-        IO::File file{args.argv()[i], OPEN_READ};
+        IO::File file{args.argv()[i], HJ_OPEN_READ};
 
         if (!file.exist())
         {

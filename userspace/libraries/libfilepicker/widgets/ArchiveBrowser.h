@@ -36,7 +36,7 @@ public:
         on(Widget::Event::ACTION, [this](auto) {
             if (selected() >= 0)
             {
-                if (_listing->info(selected()).type == FILE_TYPE_DIRECTORY)
+                if (_listing->info(selected()).type == HJ_FILE_TYPE_DIRECTORY)
                 {
                     _navigation->navigate(_listing->info(selected()).name);
                 }

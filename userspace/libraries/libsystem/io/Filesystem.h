@@ -14,4 +14,4 @@ Result filesystem_mkpipe(const char *path);
 
 Result filesystem_rename(const char *old_path, const char *new_path);
 
-bool filesystem_exist(const char *path, FileType type);
+bool filesystem_exist(const char *path, HjFileType type);

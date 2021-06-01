@@ -4,7 +4,6 @@
 
 #include <libio/Streams.h>
 #include <libshell/ReadLine.h>
-#include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 #include <skift/Environment.h>
 

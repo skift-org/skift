@@ -37,7 +37,7 @@ RefPtr<FsNode> Domain::find(IO::Path path)
 
     for (size_t i = 0; i < path.length(); i++)
     {
-        if (current && current->type() == FILE_TYPE_DIRECTORY)
+        if (current && current->type() == HJ_FILE_TYPE_DIRECTORY)
         {
             auto element = path[i];
 
@@ -56,9 +56,9 @@ RefPtr<FsNode> Domain::find(IO::Path path)
     return current;
 }
 
-ResultOr<RefPtr<FsHandle>> Domain::open(IO::Path path, OpenFlag flags)
+ResultOr<RefPtr<FsHandle>> Domain::open(IO::Path path, HjOpenFlag flags)
 {
-    bool should_create_if_not_present = (flags & OPEN_CREATE) == OPEN_CREATE;
+    bool should_create_if_not_present = (flags & HJ_OPEN_CREATE) == HJ_OPEN_CREATE;
 
     auto node = find(path);
 
@@ -68,7 +68,7 @@ ResultOr<RefPtr<FsHandle>> Domain::open(IO::Path path, OpenFlag flags)
 
         if (parent)
         {
-            if (flags & OPEN_SOCKET)
+            if (flags & HJ_OPEN_SOCKET)
             {
                 node = make<FsSocket>();
             }
@@ -88,22 +88,22 @@ ResultOr<RefPtr<FsHandle>> Domain::open(IO::Path path, OpenFlag flags)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if ((flags & OPEN_DIRECTORY) && node->type() != FILE_TYPE_DIRECTORY)
+    if ((flags & HJ_OPEN_DIRECTORY) && node->type() != HJ_FILE_TYPE_DIRECTORY)
     {
         return ERR_NOT_A_DIRECTORY;
     }
 
-    if ((flags & OPEN_SOCKET) && node->type() != FILE_TYPE_SOCKET)
+    if ((flags & HJ_OPEN_SOCKET) && node->type() != HJ_FILE_TYPE_SOCKET)
     {
         return ERR_NOT_A_SOCKET;
     }
 
-    bool is_node_stream = node->type() == FILE_TYPE_PIPE ||
-                          node->type() == FILE_TYPE_REGULAR ||
-                          node->type() == FILE_TYPE_DEVICE ||
-                          node->type() == FILE_TYPE_TERMINAL;
+    bool is_node_stream = node->type() == HJ_FILE_TYPE_PIPE ||
+                          node->type() == HJ_FILE_TYPE_REGULAR ||
+                          node->type() == HJ_FILE_TYPE_DEVICE ||
+                          node->type() == HJ_FILE_TYPE_TERMINAL;
 
-    if ((flags & OPEN_STREAM) && !(is_node_stream))
+    if ((flags & HJ_OPEN_STREAM) && !(is_node_stream))
     {
         return ERR_NOT_A_STREAM;
     }
@@ -120,7 +120,7 @@ ResultOr<RefPtr<FsHandle>> Domain::connect(IO::Path path)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (node->type() != FILE_TYPE_SOCKET)
+    if (node->type() != HJ_FILE_TYPE_SOCKET)
     {
         return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
     }
@@ -135,7 +135,7 @@ ResultOr<RefPtr<FsHandle>> Domain::connect(IO::Path path)
     }
 
     auto connection = connection_or_result.unwrap();
-    auto connection_handle = make<FsHandle>(connection, OPEN_CLIENT);
+    auto connection_handle = make<FsHandle>(connection, HJ_OPEN_CLIENT);
 
     BlockerConnect blocker{connection};
     TRY(task_block(scheduler_running(), blocker, -1));
@@ -168,7 +168,7 @@ Result Domain::mklink(IO::Path old_path, IO::Path new_path)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (destination->type() == FILE_TYPE_DIRECTORY)
+    if (destination->type() == HJ_FILE_TYPE_DIRECTORY)
     {
         return ERR_IS_A_DIRECTORY;
     }
@@ -185,7 +185,7 @@ Result Domain::link(IO::Path path, RefPtr<FsNode> node)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (parent->type() != FILE_TYPE_DIRECTORY)
+    if (parent->type() != HJ_FILE_TYPE_DIRECTORY)
     {
         return ERR_NOT_A_DIRECTORY;
     }
@@ -206,7 +206,7 @@ Result Domain::unlink(IO::Path path)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (parent->type() != FILE_TYPE_DIRECTORY)
+    if (parent->type() != HJ_FILE_TYPE_DIRECTORY)
     {
         return ERR_NOT_A_DIRECTORY;
     }
@@ -229,8 +229,8 @@ Result Domain::rename(IO::Path old_path, IO::Path new_path)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (old_parent->type() != FILE_TYPE_DIRECTORY ||
-        new_parent->type() != FILE_TYPE_DIRECTORY)
+    if (old_parent->type() != HJ_FILE_TYPE_DIRECTORY ||
+        new_parent->type() != HJ_FILE_TYPE_DIRECTORY)
     {
         return ERR_NOT_A_DIRECTORY;
     }

@@ -1,10 +1,10 @@
-#include "demo/DemoApplication.h"
+#include "demo/Application.h"
 
 int main(int argc, char const *argv[])
 {
     UNUSED(argc);
     UNUSED(argv);
 
-    DemoApplication app;
+    Demo::Application app;
     return app.run();
 }

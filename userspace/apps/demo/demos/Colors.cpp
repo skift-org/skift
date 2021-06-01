@@ -1,6 +1,9 @@
 #include "demo/Demo.h"
 
-void colors_draw(Graphic::Painter &painter, Math::Recti screen, float time)
+namespace Demo
+{
+
+void colors(Graphic::Painter &painter, Math::Recti screen, float time)
 {
     float hue = (int)(time * 80) % 360;
 
@@ -13,3 +16,5 @@ void colors_draw(Graphic::Painter &painter, Math::Recti screen, float time)
         }
     }
 }
+
+} // namespace Demo

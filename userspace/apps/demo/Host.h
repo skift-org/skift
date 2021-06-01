@@ -5,7 +5,10 @@
 
 #include "demo/Demo.h"
 
-struct DemoHostElement : public Widget::Element
+namespace Demo
+{
+
+struct Host : public Widget::Element
 {
 private:
     Demo _demo;
@@ -13,7 +16,7 @@ private:
     OwnPtr<Async::Timer> _timer;
 
 public:
-    DemoHostElement(Demo demo) : _demo{demo}
+    Host(Demo demo) : _demo{demo}
     {
         _timer = own<Async::Timer>(1000 / 60, [this]() {
             _time += 1.0 / 60;
@@ -34,4 +37,6 @@ public:
     }
 };
 
-WIDGET_BUILDER(DemoHostElement, demo_host);
+WIDGET_BUILDER(Host, demo_host);
+
+} // namespace Demo

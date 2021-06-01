@@ -1,9 +1,12 @@
 #include "demo/Demo.h"
 
+namespace Demo
+{
+
 static RefPtr<Graphic::Bitmap> _test_image = nullptr;
 static int _frame = 0;
 
-void graphics_draw(Graphic::Painter &painter, Math::Recti screen, float time)
+void graphics(Graphic::Painter &painter, Math::Recti screen, float time)
 {
     UNUSED(time);
 
@@ -44,3 +47,5 @@ void graphics_draw(Graphic::Painter &painter, Math::Recti screen, float time)
 
     _frame++;
 }
+
+} // namespace Demo

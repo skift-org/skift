@@ -2,6 +2,9 @@
 
 #include "demo/Demo.h"
 
+namespace Demo
+{
+
 void draw_path(Graphic::Painter &painter, const Graphic::Path &path, Math::Mat3x2f transform, Graphic::Color color)
 {
     for (size_t i = 0; i < path.subpaths().count(); i++)
@@ -24,7 +27,7 @@ void draw_path(Graphic::Painter &painter, const Graphic::Path &path, Math::Mat3x
     }
 }
 
-void path_draw(Graphic::Painter &painter, Math::Recti, float)
+void path(Graphic::Painter &painter, Math::Recti, float)
 {
     painter.clear(Graphic::Colors::BLACK);
 
@@ -37,3 +40,5 @@ void path_draw(Graphic::Painter &painter, Math::Recti, float)
     draw_path(painter, p0, Math::Mat3x2f::scale(10), Graphic::Colors::BLUE);
     draw_path(painter, p1, Math::Mat3x2f::scale(10), Graphic::Colors::GREEN);
 }
+
+} // namespace Demo

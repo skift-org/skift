@@ -104,7 +104,7 @@ auto navigation(auto state, auto update)
         Widget::hflow({
             Widget::enable_if(state > 0, Widget::basic_button("Previous", [=] { update(state - 1); })),
             Widget::fill(Widget::stack(Widget::dots(PAGES.count(), state))),
-            Widget::min_width(72, (state + 1 < (int)PAGES.count() ? next_button(state, update) : finish_button())),
+            (state + 1 < (int)PAGES.count() ? next_button(state, update) : finish_button()),
         }));
 }
 

@@ -1,4 +1,4 @@
-#include <libgraphic/png/PngReader.h>
+#include <libpng/Reader.h>
 
 #include "tests/Driver.h"
 
@@ -21,7 +21,7 @@ TEST(pngreader_colourtype_8bit_grayscale)
         0x4e, 0x44, 0xae, 0x42, 0x60, 0x82};
 
     IO::MemoryReader mem_reader(basn0g08, sizeof(basn0g08));
-    Graphic::PngReader png_reader(mem_reader);
+    Png::Reader png_reader(mem_reader);
     Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
@@ -43,7 +43,7 @@ TEST(pngreader_colourtype_8bit_grayscale_alpha)
         0x4e, 0x44, 0xae, 0x42, 0x60, 0x82};
 
     IO::MemoryReader mem_reader(basn4a08, sizeof(basn4a08));
-    Graphic::PngReader png_reader(mem_reader);
+    Png::Reader png_reader(mem_reader);
     Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
@@ -67,7 +67,7 @@ TEST(pngreader_colourtype_8bit_rgb)
         0x82};
 
     IO::MemoryReader mem_reader(basn2c08, sizeof(basn2c08));
-    Graphic::PngReader png_reader(mem_reader);
+    Png::Reader png_reader(mem_reader);
     Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
@@ -94,7 +94,7 @@ TEST(pngreader_colourtype_8bit_rgb_alpha)
         0xae, 0x42, 0x60, 0x82};
 
     IO::MemoryReader mem_reader(basn6a08, sizeof(basn6a08));
-    Graphic::PngReader png_reader(mem_reader);
+    Png::Reader png_reader(mem_reader);
     Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
@@ -213,7 +213,7 @@ TEST(pngreader_colourtype_8bit_rgb_palette)
         0x60, 0x82};
 
     IO::MemoryReader mem_reader(basn3p08, sizeof(basn3p08));
-    Graphic::PngReader png_reader(mem_reader);
+    Png::Reader png_reader(mem_reader);
     Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);

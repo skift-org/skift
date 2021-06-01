@@ -1,23 +1,23 @@
 #include <libcompression/Inflate.h>
-#include <libgraphic/png/PngReader.h>
 #include <libio/CRCReader.h>
 #include <libio/Read.h>
 #include <libio/ScopedReader.h>
 #include <libio/Skip.h>
 #include <libio/Streams.h>
+#include <libpng/Reader.h>
 #include <libutils/Array.h>
 #include <libutils/Assert.h>
 #include <libutils/Chrono.h>
 
-namespace Graphic
+namespace Png
 {
 
-PngReader::PngReader(IO::Reader &reader) : _reader(reader)
+Reader::Reader(IO::Reader &reader) : _reader(reader)
 {
     _valid = read() == Result::SUCCESS;
 }
 
-Result PngReader::read()
+Result Reader::read()
 {
     Array<uint8_t, 8> signature;
     _reader.read(signature.raw_storage(), sizeof(signature));
@@ -47,7 +47,7 @@ Result PngReader::read()
     return Result::SUCCESS;
 }
 
-Result PngReader::read_chunks()
+Result Reader::read_chunks()
 {
     size_t idat_counter = 0;
     bool end = false;
@@ -134,7 +134,7 @@ Result PngReader::read_chunks()
                 uint8_t green = TRY(IO::read<uint8_t>(scoped_reader));
                 uint8_t blue = TRY(IO::read<uint8_t>(scoped_reader));
 
-                _palette.push_back(Color::from_rgb_byte(red, green, blue));
+                _palette.push_back(Graphic::Color::from_rgb_byte(red, green, blue));
             }
         }
         break;
@@ -225,7 +225,7 @@ Result PngReader::read_chunks()
 }
 
 // Copyright (c) 2005-2020 Lode Vandevenne
-Result PngReader::unfilter(uint8_t *out, uint8_t *in)
+Result Reader::unfilter(uint8_t *out, uint8_t *in)
 {
     // For PNG filter method 0
     // this function unfilters a single image (e.g. without interlacing this is called once, with Adam7 seven times)
@@ -272,8 +272,8 @@ static uint8_t paeth_predictor(int16_t a, int16_t b, int16_t c)
 }
 
 // Copyright (c) 2005-2020 Lode Vandevenne
-Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
-                                    size_t bytewidth, Png::FilterType filter_type, size_t length)
+Result Reader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
+                                 size_t bytewidth, Png::FilterType filter_type, size_t length)
 {
     // For PNG filter method 0
     // unfilter a PNG image scanline by scanline. when the pixels are smaller than 1 byte,
@@ -398,7 +398,7 @@ Result PngReader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, con
     return Result::SUCCESS;
 }
 
-Result PngReader::uncompress(IO::MemoryWriter &uncompressed_writer)
+Result Reader::uncompress(IO::MemoryWriter &uncompressed_writer)
 {
     IO::MemoryReader compressed_reader(Slice(_idat_writer.slice()));
 
@@ -428,7 +428,7 @@ Result PngReader::uncompress(IO::MemoryWriter &uncompressed_writer)
     return inflate.perform(compressed_reader, uncompressed_writer).result();
 }
 
-Result PngReader::convert(uint8_t *buffer)
+Result Reader::convert(uint8_t *buffer)
 {
     _pixels.resize(_width * _height);
 
@@ -437,32 +437,32 @@ Result PngReader::convert(uint8_t *buffer)
     case Png::CT_RGBA:
         for (size_t i = 0; i < _width * _height; i++)
         {
-            _pixels[i] = Color::from_rgba_byte(buffer[i * 4],
-                                               buffer[i * 4 + 1],
-                                               buffer[i * 4 + 2],
-                                               buffer[i * 4 + 3]);
+            _pixels[i] = Graphic::Color::from_rgba_byte(buffer[i * 4],
+                                                        buffer[i * 4 + 1],
+                                                        buffer[i * 4 + 2],
+                                                        buffer[i * 4 + 3]);
         }
         break;
     case Png::CT_RGB:
         for (size_t i = 0; i < _width * _height; i++)
         {
-            _pixels[i] = Color::from_rgb_byte(buffer[i * 3],
-                                              buffer[i * 3 + 1],
-                                              buffer[i * 3 + 2]);
+            _pixels[i] = Graphic::Color::from_rgb_byte(buffer[i * 3],
+                                                       buffer[i * 3 + 1],
+                                                       buffer[i * 3 + 2]);
         }
         break;
 
     case Png::CT_GREY:
         for (size_t i = 0; i < _width * _height; i++)
         {
-            _pixels[i] = Color::from_monochrome_byte(buffer[i]);
+            _pixels[i] = Graphic::Color::from_monochrome_byte(buffer[i]);
         }
         break;
     case Png::CT_GREY_ALPHA:
         for (size_t i = 0; i < _width * _height; i++)
         {
-            _pixels[i] = Color::from_monochrome_alpha_byte(buffer[i * 2],
-                                                           buffer[i * 2 + 1]);
+            _pixels[i] = Graphic::Color::from_monochrome_alpha_byte(buffer[i * 2],
+                                                                    buffer[i * 2 + 1]);
         }
         break;
     case Png::CT_PALETTE:
@@ -485,4 +485,4 @@ Result PngReader::convert(uint8_t *buffer)
     return Result::SUCCESS;
 }
 
-} // namespace Graphic
+} // namespace Png

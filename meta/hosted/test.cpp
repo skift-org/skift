@@ -1,11 +1,11 @@
-#include <libgraphic/png/PngReader.h>
 #include <libio/File.h>
+#include <libpng/Reader.h>
 #include <libutils/Assert.h>
 
 int main(int argc, const char *argv[])
 {
     IO::File file{"sysroot/Files/Wallpapers/peaks.png", OPEN_READ};
-    Graphic::PngReader png_reader(file);
+    Png::Reader png_reader{file};
 
     Assert::truth(png_reader.valid());
 

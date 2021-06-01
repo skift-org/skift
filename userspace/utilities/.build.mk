@@ -154,7 +154,7 @@ POWERCTL_NAME = powerctl
 SETTINGSCTL_LIBS = settings async system io
 SETTINGSCTL_NAME = settingsctl
 
-WALLPAPERCTL_LIBS = graphic system io
+WALLPAPERCTL_LIBS = graphic  png system io
 WALLPAPERCTL_NAME = wallpaperctl
 
 ZIP_LIBS = file system io compression

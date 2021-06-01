@@ -6,7 +6,7 @@ TESTS_SOURCES = $(wildcard userspace/tests/*.cpp) \
 
 TESTS_OBJECTS = $(patsubst %.cpp, $(BUILDROOT)/%.o, $(TESTS_SOURCES))
 
-TESTS_LIBS = graphic compression injection xml io system c
+TESTS_LIBS = graphic  png compression injection xml io system c
 
 TARGETS += $(TESTS_BINARY)
 OBJECTS += $(TESTS_OBJECTS)

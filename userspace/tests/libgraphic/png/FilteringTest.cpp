@@ -1,4 +1,4 @@
-#include <libgraphic/png/PngReader.h>
+#include <libpng/Reader.h>
 
 #include "tests/Driver.h"
 
@@ -35,8 +35,9 @@ TEST(pngreader_filtertype_grayscale_none)
         0x7d, 0xca, 0x58, 0x50, 0xa6, 0xce, 0xb6, 0x00, 0x00, 0x00, 0x00, 0x49,
         0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82};
 
-    IO::MemoryReader mem_reader(f00n0g08, sizeof(f00n0g08));
-    Graphic::PngReader png_reader(mem_reader);
+    IO::MemoryReader mem_reader{f00n0g08, ARRAY_LENGTH(f00n0g08)};
+    Png::Reader png_reader{mem_reader};
+
     Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
@@ -73,8 +74,9 @@ TEST(pngreader_filtertype_grayscale_sub)
         0x01, 0x95, 0x51, 0x2c, 0x83, 0x13, 0x7f, 0xab, 0x0a, 0x00, 0x00, 0x00,
         0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82};
 
-    IO::MemoryReader mem_reader(f01n0g08, sizeof(f01n0g08));
-    Graphic::PngReader png_reader(mem_reader);
+    IO::MemoryReader mem_reader(f01n0g08, ARRAY_LENGTH(f01n0g08));
+    Png::Reader png_reader{mem_reader};
+
     Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
@@ -114,8 +116,9 @@ TEST(pngreader_filtertype_grayscale_up)
         0xe4, 0x97, 0xbf, 0xbf, 0xcc, 0xeb, 0xfd, 0x00, 0x00, 0x00, 0x00, 0x49,
         0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82};
 
-    IO::MemoryReader mem_reader(f02n0g08, sizeof(f02n0g08));
-    Graphic::PngReader png_reader(mem_reader);
+    IO::MemoryReader mem_reader{f02n0g08, ARRAY_LENGTH(f02n0g08)};
+    Png::Reader png_reader{mem_reader};
+
     Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
@@ -158,8 +161,9 @@ TEST(pngreader_filtertype_grayscale_average)
         0x42, 0xbc, 0xfe, 0x0b, 0x39, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e,
         0x44, 0xae, 0x42, 0x60, 0x82};
 
-    IO::MemoryReader mem_reader(f03n0g08, sizeof(f03n0g08));
-    Graphic::PngReader png_reader(mem_reader);
+    IO::MemoryReader mem_reader{f03n0g08, ARRAY_LENGTH(f03n0g08)};
+    Png::Reader png_reader{mem_reader};
+
     Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);
@@ -192,8 +196,9 @@ TEST(pngreader_filtertype_grayscale_paeth)
         0x07, 0x21, 0x99, 0x60, 0x81, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e,
         0x44, 0xae, 0x42, 0x60, 0x82};
 
-    IO::MemoryReader mem_reader(f04n0g08, sizeof(f04n0g08));
-    Graphic::PngReader png_reader(mem_reader);
+    IO::MemoryReader mem_reader{f04n0g08, sizeof(f04n0g08)};
+    Png::Reader png_reader{mem_reader};
+
     Assert::truth(png_reader.valid());
     Assert::equal(png_reader.width(), 32);
     Assert::equal(png_reader.height(), 32);

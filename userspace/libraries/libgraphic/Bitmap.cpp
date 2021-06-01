@@ -1,11 +1,11 @@
 #include <libgraphic/Bitmap.h>
-#include <libgraphic/png/Png.h>
 #include <libgraphic/svg/Svg.h>
 #include <libio/Copy.h>
 #include <libio/File.h>
 #include <libio/MemoryReader.h>
 #include <libio/Path.h>
 #include <libio/Streams.h>
+#include <libpng/Png.h>
 #include <libsystem/system/Memory.h>
 namespace Graphic
 {

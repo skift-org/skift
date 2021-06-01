@@ -10,7 +10,7 @@ g++ \
     -D__CONFIG_IS_HOSTED__=1 \
     -DDISABLE_LOGGER \
     meta/hosted/test.cpp \
-    userspace/libraries/libgraphic/png/PngReader.cpp \
+    userspace/libraries/libpng/Reader.cpp \
     userspace/libraries/libcompression/Inflate.cpp \
     userspace/libraries/libcompression/CRC.cpp \
     userspace/libraries/libio/File.cpp \

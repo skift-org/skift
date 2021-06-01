@@ -3,24 +3,25 @@
 #include <abi/Time.h>
 
 #include <libgraphic/Color.h>
-#include <libgraphic/png/PngCommon.h>
 #include <libio/MemoryWriter.h>
 #include <libio/Reader.h>
+#include <libpng/Common.h>
 #include <libutils/Vector.h>
 
-namespace Graphic
+namespace Png
 {
-struct PngReader
+
+struct Reader
 {
 private:
     bool _valid = false;
     uint32_t _width = 0;
     uint32_t _height = 0;
     uint8_t _bit_depth = 0;
-    Vector<Color> _pixels;
-    Vector<Color> _palette;
+    Vector<Graphic::Color> _pixels;
+    Vector<Graphic::Color> _palette;
     DateTime _modified;
-    Png::ColourType _colour_type;
+    ColourType _colour_type;
     IO::Reader &_reader;
     IO::MemoryWriter _idat_writer;
 
@@ -66,10 +67,10 @@ public:
     inline bool valid() const { return _valid; }
     inline uint32_t width() const { return _width; }
     inline uint32_t height() const { return _height; }
-    inline const Vector<Color> &pixels() const { return _pixels; }
+    inline const Vector<Graphic::Color> &pixels() const { return _pixels; }
     inline const DateTime &modified() const { return _modified; }
 
-    PngReader(IO::Reader &reader);
+    Reader(IO::Reader &reader);
 };
 
-} // namespace Graphic
+} // namespace Png

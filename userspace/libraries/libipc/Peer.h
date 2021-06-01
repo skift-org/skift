@@ -42,7 +42,7 @@ public:
         close();
     }
 
-    Result send(const MessageType &message)
+    HjResult send(const MessageType &message)
     {
         auto result = Protocol::encode_message(_connection, message);
 

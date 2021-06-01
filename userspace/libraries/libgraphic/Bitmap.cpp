@@ -78,7 +78,7 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path, int size_hint)
         return Svg::render(file, size_hint);
     }
     IO::logln("Unknown bitmap extension: {}", p.extension());
-    return Result::ERR_NOT_IMPLEMENTED;
+    return ERR_NOT_IMPLEMENTED;
 }
 
 RefPtr<Bitmap> Bitmap::load_from_or_placeholder(String path, int size_hint)
@@ -93,10 +93,10 @@ RefPtr<Bitmap> Bitmap::load_from_or_placeholder(String path, int size_hint)
     return result.unwrap();
 }
 
-Result Bitmap::save_to(String path)
+HjResult Bitmap::save_to(String path)
 {
     UNUSED(path);
-    return Result::ERR_NOT_IMPLEMENTED;
+    return ERR_NOT_IMPLEMENTED;
 }
 
 Bitmap::~Bitmap()

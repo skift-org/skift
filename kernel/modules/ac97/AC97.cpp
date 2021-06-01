@@ -136,7 +136,7 @@ ResultOr<size_t> AC97::write(size64_t offset, const void *buffer, size_t size)
     return _buffer.write((char *)buffer, size);
 }
 
-Result AC97::call(IOCall request, void *args)
+HjResult AC97::call(IOCall request, void *args)
 {
     UNUSED(request);
     UNUSED(args);

@@ -24,7 +24,7 @@ ResultOr<int> Handles::add(RefPtr<FsHandle> handle)
     return ERR_TOO_MANY_HANDLE;
 }
 
-Result Handles::add_at(RefPtr<FsHandle> handle, int index)
+HjResult Handles::add_at(RefPtr<FsHandle> handle, int index)
 {
     if (index < 0 && index >= PROCESS_HANDLE_COUNT)
     {
@@ -42,7 +42,7 @@ bool Handles::is_valid_handle(int handle)
            _handles[handle] != nullptr;
 }
 
-Result Handles::remove(int handle_index)
+HjResult Handles::remove(int handle_index)
 {
     LockHolder holder(_lock);
 
@@ -71,7 +71,7 @@ RefPtr<FsHandle> Handles::acquire(int handle_index)
     return _handles[handle_index];
 }
 
-Result Handles::release(int handle_index)
+HjResult Handles::release(int handle_index)
 {
     LockHolder holder(_lock);
 
@@ -97,7 +97,7 @@ ResultOr<int> Handles::connect(Domain &domain, IO::Path &path)
     return add(handle);
 }
 
-Result Handles::close(int handle_index)
+HjResult Handles::close(int handle_index)
 {
     return remove(handle_index);
 }
@@ -112,7 +112,7 @@ void Handles::close_all()
     }
 }
 
-Result Handles::reopen(int handle, int *reopened)
+HjResult Handles::reopen(int handle, int *reopened)
 {
     auto original_handle = acquire(handle);
 
@@ -128,7 +128,7 @@ Result Handles::reopen(int handle, int *reopened)
     return SUCCESS;
 }
 
-Result Handles::copy(int source, int destination)
+HjResult Handles::copy(int source, int destination)
 {
     auto source_handle = acquire(source);
 
@@ -142,7 +142,7 @@ Result Handles::copy(int source, int destination)
     return add_at(copy_handle, destination);
 }
 
-Result Handles::poll(HandlePoll *handles, size_t count, Timeout timeout)
+HjResult Handles::poll(HandlePoll *handles, size_t count, Timeout timeout)
 {
     Vector<Selected> selected;
 
@@ -174,7 +174,7 @@ Result Handles::poll(HandlePoll *handles, size_t count, Timeout timeout)
 
     {
         BlockerSelect blocker{selected};
-        Result block_result = task_block(scheduler_running(), blocker, timeout);
+        HjResult block_result = task_block(scheduler_running(), blocker, timeout);
 
         if (block_result != SUCCESS)
         {
@@ -236,7 +236,7 @@ ResultOr<ssize64_t> Handles::seek(int handle_index, IO::SeekFrom from)
     return seek_result;
 }
 
-Result Handles::call(int handle_index, IOCall request, void *args)
+HjResult Handles::call(int handle_index, IOCall request, void *args)
 {
     auto handle = acquire(handle_index);
 
@@ -252,7 +252,7 @@ Result Handles::call(int handle_index, IOCall request, void *args)
     return result;
 }
 
-Result Handles::stat(int handle_index, HjStat *stat)
+HjResult Handles::stat(int handle_index, HjStat *stat)
 {
     auto handle = acquire(handle_index);
 
@@ -293,7 +293,7 @@ ResultOr<int> Handles::accept(int socket_handle_index)
     return add_result;
 }
 
-Result Handles::duplex(
+HjResult Handles::duplex(
     RefPtr<FsNode> node,
     int *server,
     HjOpenFlag server_flags,
@@ -345,7 +345,7 @@ Result Handles::duplex(
     return SUCCESS;
 }
 
-Result Handles::term(int *server, int *client)
+HjResult Handles::term(int *server, int *client)
 {
     return duplex(
         make<FsTerminal>(),
@@ -357,7 +357,7 @@ Result Handles::term(int *server, int *client)
         HJ_OPEN_CLIENT | HJ_OPEN_READ | HJ_OPEN_WRITE);
 }
 
-Result Handles::pipe(int *reader, int *writer)
+HjResult Handles::pipe(int *reader, int *writer)
 {
     return duplex(
         make<FsPipe>(),
@@ -368,7 +368,7 @@ Result Handles::pipe(int *reader, int *writer)
         HJ_OPEN_WRITE);
 }
 
-Result Handles::pass(Handles &handles, int source, int destination)
+HjResult Handles::pass(Handles &handles, int source, int destination)
 {
     {
         LockHolder holder(_lock);

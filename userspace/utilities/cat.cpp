@@ -1,14 +1,14 @@
 
+#include <abi/Result.h>
 #include <libio/Copy.h>
 #include <libio/File.h>
 #include <libio/Streams.h>
 #include <libshell/ArgParse.h>
-#include <libsystem/Result.h>
 #include <libutils/Array.h>
 
 static bool option_linenumbers = false;
 
-Result cat(IO::Reader &reader)
+HjResult cat(IO::Reader &reader)
 {
     if (option_linenumbers)
     {
@@ -22,7 +22,7 @@ Result cat(IO::Reader &reader)
             line++;
         }
 
-        return Result::SUCCESS;
+        return HjResult::SUCCESS;
     }
     else
     {
@@ -47,7 +47,7 @@ int main(int argc, char const *argv[])
         return parse_result == Shell::ArgParseResult::SHOULD_FINISH ? PROCESS_SUCCESS : PROCESS_FAILURE;
     }
 
-    Result result;
+    HjResult result;
     if (args.argc() == 0)
     {
         result = cat(IO::in());
@@ -63,7 +63,7 @@ int main(int argc, char const *argv[])
     {
         IO::File file(filepath, HJ_OPEN_READ);
 
-        if (file.result() != Result::SUCCESS)
+        if (file.result() != HjResult::SUCCESS)
         {
             IO::errln("{}: {}: {}", argv[0], filepath, get_result_description(file.result()));
             process_result = PROCESS_FAILURE;

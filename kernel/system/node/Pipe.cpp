@@ -1,5 +1,5 @@
 
-#include <libsystem/Result.h>
+#include <abi/Result.h>
 
 #include "system/node/Handle.h"
 #include "system/node/Pipe.h"

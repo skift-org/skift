@@ -265,7 +265,7 @@ void client_broadcast(CompositorMessage message)
     });
 }
 
-Result Client::send_message(CompositorMessage message)
+HjResult Client::send_message(CompositorMessage message)
 {
     if (_disconnected)
     {

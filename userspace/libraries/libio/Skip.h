@@ -6,7 +6,7 @@
 namespace IO
 {
 
-static inline Result skip(Reader &from, size_t n)
+static inline HjResult skip(Reader &from, size_t n)
 {
     Sink sink;
     return copy(from, sink, n);

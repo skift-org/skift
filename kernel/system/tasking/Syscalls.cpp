@@ -2,8 +2,8 @@
 #include <string.h>
 
 #include "system/Streams.h"
+#include <abi/Result.h>
 #include <libsystem/BuildInfo.h>
-#include <libsystem/Result.h>
 
 #include "archs/Arch.h"
 
@@ -14,7 +14,7 @@
 #include "system/tasking/Task-Launchpad.h"
 #include "system/tasking/Task-Memory.h"
 
-typedef Result (*SyscallHandler)(uintptr_t, uintptr_t, uintptr_t, uintptr_t, uintptr_t);
+typedef HjResult (*SyscallHandler)(uintptr_t, uintptr_t, uintptr_t, uintptr_t, uintptr_t);
 
 bool syscall_validate_ptr(uintptr_t ptr, size_t size)
 {
@@ -23,7 +23,7 @@ bool syscall_validate_ptr(uintptr_t ptr, size_t size)
 
 /* --- Process -------------------------------------------------------------- */
 
-Result hj_process_this(int *pid)
+HjResult hj_process_this(int *pid)
 {
     if (!syscall_validate_ptr((uintptr_t)pid, sizeof(int)))
     {
@@ -35,7 +35,7 @@ Result hj_process_this(int *pid)
     return SUCCESS;
 }
 
-Result hj_process_name(char *name, size_t size)
+HjResult hj_process_name(char *name, size_t size)
 {
     if (!syscall_validate_ptr((uintptr_t)name, size))
     {
@@ -95,7 +95,7 @@ static void free_launchpad(Launchpad *launchpad)
     }
 }
 
-Result hj_process_launch(Launchpad *launchpad, int *pid)
+HjResult hj_process_launch(Launchpad *launchpad, int *pid)
 {
     if (!valid_launchpad(launchpad) ||
         !syscall_validate_ptr((uintptr_t)pid, sizeof(int)))
@@ -107,20 +107,20 @@ Result hj_process_launch(Launchpad *launchpad, int *pid)
 
     launchpad_copy.flags |= TASK_USER;
 
-    Result result = task_launch(scheduler_running(), &launchpad_copy, pid);
+    HjResult result = task_launch(scheduler_running(), &launchpad_copy, pid);
 
     free_launchpad(&launchpad_copy);
 
     return result;
 }
 
-Result hj_process_clone(int *, TaskFlags)
+HjResult hj_process_clone(int *, TaskFlags)
 {
     // Implemented in archs/x86_32/Interrupts.cpp
     return ERR_NOT_IMPLEMENTED;
 }
 
-Result hj_process_exec(Launchpad *launchpad)
+HjResult hj_process_exec(Launchpad *launchpad)
 {
     if (!valid_launchpad(launchpad))
     {
@@ -129,14 +129,14 @@ Result hj_process_exec(Launchpad *launchpad)
 
     auto launchpad_copy = copy_launchpad(launchpad);
 
-    Result result = task_exec(scheduler_running(), &launchpad_copy);
+    HjResult result = task_exec(scheduler_running(), &launchpad_copy);
 
     free_launchpad(&launchpad_copy);
 
     return result;
 }
 
-Result hj_process_exit(int exit_code)
+HjResult hj_process_exit(int exit_code)
 {
     if (exit_code != PROCESS_SUCCESS)
     {
@@ -147,7 +147,7 @@ Result hj_process_exit(int exit_code)
     return scheduler_running()->cancel(exit_code);
 }
 
-Result hj_process_cancel(int pid)
+HjResult hj_process_cancel(int pid)
 {
     InterruptsRetainer retainer;
 
@@ -167,16 +167,16 @@ Result hj_process_cancel(int pid)
     }
 }
 
-Result hj_process_sleep(int time)
+HjResult hj_process_sleep(int time)
 {
     return task_sleep(scheduler_running(), time);
 }
 
-Result hj_process_wait(int tid, int *user_exit_value)
+HjResult hj_process_wait(int tid, int *user_exit_value)
 {
     int exit_value;
 
-    Result result = task_wait(tid, &exit_value);
+    HjResult result = task_wait(tid, &exit_value);
 
     if (syscall_validate_ptr((uintptr_t)user_exit_value, sizeof(int)))
     {
@@ -188,7 +188,7 @@ Result hj_process_wait(int tid, int *user_exit_value)
 
 /* --- Shared memory -------------------------------------------------------- */
 
-Result hj_memory_alloc(size_t size, uintptr_t *out_address)
+HjResult hj_memory_alloc(size_t size, uintptr_t *out_address)
 {
     if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)))
     {
@@ -198,7 +198,7 @@ Result hj_memory_alloc(size_t size, uintptr_t *out_address)
     return task_memory_alloc(scheduler_running(), size, out_address);
 }
 
-Result hj_memory_map(uintptr_t address, size_t size, int flags)
+HjResult hj_memory_map(uintptr_t address, size_t size, int flags)
 {
     if (!syscall_validate_ptr(address, size))
     {
@@ -208,12 +208,12 @@ Result hj_memory_map(uintptr_t address, size_t size, int flags)
     return task_memory_map(scheduler_running(), address, size, flags);
 }
 
-Result hj_memory_free(uintptr_t address)
+HjResult hj_memory_free(uintptr_t address)
 {
     return task_memory_free(scheduler_running(), address);
 }
 
-Result hj_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
+HjResult hj_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
 {
 
     if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)) ||
@@ -225,7 +225,7 @@ Result hj_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
     return task_memory_include(scheduler_running(), handle, out_address, out_size);
 }
 
-Result hj_memory_get_handle(uintptr_t address, int *out_handle)
+HjResult hj_memory_get_handle(uintptr_t address, int *out_handle)
 {
     if (!syscall_validate_ptr((uintptr_t)out_handle, sizeof(int)))
     {
@@ -237,7 +237,7 @@ Result hj_memory_get_handle(uintptr_t address, int *out_handle)
 
 /* --- Filesystem ----------------------------------------------------------- */
 
-Result hj_filesystem_mkdir(const char *raw_path, size_t size)
+HjResult hj_filesystem_mkdir(const char *raw_path, size_t size)
 {
     if (!syscall_validate_ptr((uintptr_t)raw_path, size))
     {
@@ -251,7 +251,7 @@ Result hj_filesystem_mkdir(const char *raw_path, size_t size)
     return domain.mkdir(path);
 }
 
-Result hj_filesystem_mkpipe(const char *raw_path, size_t size)
+HjResult hj_filesystem_mkpipe(const char *raw_path, size_t size)
 {
     if (!syscall_validate_ptr((uintptr_t)raw_path, size))
     {
@@ -265,8 +265,8 @@ Result hj_filesystem_mkpipe(const char *raw_path, size_t size)
     return domain.mkpipe(path);
 }
 
-Result hj_filesystem_link(const char *raw_old_path, size_t old_size,
-                          const char *raw_new_path, size_t new_size)
+HjResult hj_filesystem_link(const char *raw_old_path, size_t old_size,
+                            const char *raw_new_path, size_t new_size)
 {
     if (!syscall_validate_ptr((uintptr_t)raw_old_path, old_size) &&
         !syscall_validate_ptr((uintptr_t)raw_new_path, new_size))
@@ -280,12 +280,12 @@ Result hj_filesystem_link(const char *raw_old_path, size_t old_size,
 
     auto &domain = scheduler_running()->domain();
 
-    Result result = domain.mklink(old_path, new_path);
+    HjResult result = domain.mklink(old_path, new_path);
 
     return result;
 }
 
-Result hj_filesystem_unlink(const char *raw_path, size_t size)
+HjResult hj_filesystem_unlink(const char *raw_path, size_t size)
 {
     if (!syscall_validate_ptr((uintptr_t)raw_path, size))
     {
@@ -299,8 +299,8 @@ Result hj_filesystem_unlink(const char *raw_path, size_t size)
     return domain.unlink(path);
 }
 
-Result hj_filesystem_rename(const char *raw_old_path, size_t old_size,
-                            const char *raw_new_path, size_t new_size)
+HjResult hj_filesystem_rename(const char *raw_old_path, size_t old_size,
+                              const char *raw_new_path, size_t new_size)
 {
     if (!syscall_validate_ptr((uintptr_t)raw_old_path, old_size) &&
         !syscall_validate_ptr((uintptr_t)raw_new_path, new_size))
@@ -319,7 +319,7 @@ Result hj_filesystem_rename(const char *raw_old_path, size_t old_size,
 
 /* --- System info getter --------------------------------------------------- */
 
-Result hj_system_info(SystemInfo *info)
+HjResult hj_system_info(SystemInfo *info)
 {
     strncpy(info->kernel_name, "hjert", SYSTEM_INFO_FIELD_SIZE);
 
@@ -337,7 +337,7 @@ Result hj_system_info(SystemInfo *info)
 
 ElapsedTime system_get_uptime();
 
-Result hj_system_status(SystemStatus *status)
+HjResult hj_system_status(SystemStatus *status)
 {
     // FIXME: get a real uptime value;
     status->uptime = system_get_uptime();
@@ -351,14 +351,14 @@ Result hj_system_status(SystemStatus *status)
     return SUCCESS;
 }
 
-Result hj_system_get_time(TimeStamp *timestamp)
+HjResult hj_system_get_time(TimeStamp *timestamp)
 {
     *timestamp = Arch::get_time();
 
     return SUCCESS;
 }
 
-Result hj_system_get_ticks(uint32_t *tick)
+HjResult hj_system_get_ticks(uint32_t *tick)
 {
     if (!syscall_validate_ptr((uintptr_t)tick, sizeof(uintptr_t)))
     {
@@ -369,13 +369,13 @@ Result hj_system_get_ticks(uint32_t *tick)
     return SUCCESS;
 }
 
-Result hj_system_reboot()
+HjResult hj_system_reboot()
 {
     Arch::reboot();
     ASSERT_NOT_REACHED();
 }
 
-Result hj_system_shutdown()
+HjResult hj_system_shutdown()
 {
     Arch::shutdown();
     ASSERT_NOT_REACHED();
@@ -383,7 +383,7 @@ Result hj_system_shutdown()
 
 /* --- Create --------------------------------------------------------------- */
 
-Result hj_create_pipe(int *reader_handle, int *writer_handle)
+HjResult hj_create_pipe(int *reader_handle, int *writer_handle)
 {
     if (!syscall_validate_ptr((uintptr_t)reader_handle, sizeof(int)) ||
         !syscall_validate_ptr((uintptr_t)writer_handle, sizeof(int)))
@@ -394,7 +394,7 @@ Result hj_create_pipe(int *reader_handle, int *writer_handle)
     return scheduler_running()->handles().pipe(reader_handle, writer_handle);
 }
 
-Result hj_create_term(int *server_handle, int *client_handle)
+HjResult hj_create_term(int *server_handle, int *client_handle)
 {
     if (!syscall_validate_ptr((uintptr_t)server_handle, sizeof(int)) ||
         !syscall_validate_ptr((uintptr_t)client_handle, sizeof(int)))
@@ -409,9 +409,9 @@ Result hj_create_term(int *server_handle, int *client_handle)
 
 /* --- Handles -------------------------------------------------------------- */
 
-Result hj_handle_open(int *handle,
-                      const char *raw_path, size_t size,
-                      HjOpenFlag flags)
+HjResult hj_handle_open(int *handle,
+                        const char *raw_path, size_t size,
+                        HjOpenFlag flags)
 {
     if (!syscall_validate_ptr((uintptr_t)handle, sizeof(int)) ||
         !syscall_validate_ptr((uintptr_t)raw_path, size))
@@ -439,14 +439,14 @@ Result hj_handle_open(int *handle,
     }
 }
 
-Result hj_handle_close(int handle)
+HjResult hj_handle_close(int handle)
 {
     auto &handles = scheduler_running()->handles();
 
     return handles.close(handle);
 }
 
-Result hj_handle_reopen(int handle, int *reopened)
+HjResult hj_handle_reopen(int handle, int *reopened)
 {
     if (!syscall_validate_ptr((uintptr_t)reopened, sizeof(int)))
     {
@@ -458,14 +458,14 @@ Result hj_handle_reopen(int handle, int *reopened)
     return handles.reopen(handle, reopened);
 }
 
-Result hj_handle_copy(int source, int destination)
+HjResult hj_handle_copy(int source, int destination)
 {
     auto &handles = scheduler_running()->handles();
 
     return handles.copy(source, destination);
 }
 
-Result hj_handle_poll(HandlePoll *handle_poll, size_t count, Timeout timeout)
+HjResult hj_handle_poll(HandlePoll *handle_poll, size_t count, Timeout timeout)
 {
     if (!syscall_validate_ptr((uintptr_t)handle_poll, sizeof(HandlePoll) * count))
     {
@@ -492,7 +492,7 @@ Result hj_handle_poll(HandlePoll *handle_poll, size_t count, Timeout timeout)
     return handles.poll(handle_poll, count, timeout);
 }
 
-Result hj_handle_read(int handle, void *buffer, size_t size, size_t *read)
+HjResult hj_handle_read(int handle, void *buffer, size_t size, size_t *read)
 {
     if (!syscall_validate_ptr((uintptr_t)buffer, size) ||
         !syscall_validate_ptr((uintptr_t)read, sizeof(size_t)))
@@ -516,7 +516,7 @@ Result hj_handle_read(int handle, void *buffer, size_t size, size_t *read)
     }
 }
 
-Result hj_handle_write(int handle, const void *buffer, size_t size, size_t *written)
+HjResult hj_handle_write(int handle, const void *buffer, size_t size, size_t *written)
 {
     if (!syscall_validate_ptr((uintptr_t)buffer, size) ||
         !syscall_validate_ptr((uintptr_t)written, sizeof(size_t)))
@@ -540,14 +540,14 @@ Result hj_handle_write(int handle, const void *buffer, size_t size, size_t *writ
     }
 }
 
-Result hj_handle_call(int handle, IOCall request, void *args)
+HjResult hj_handle_call(int handle, IOCall request, void *args)
 {
     auto &handles = scheduler_running()->handles();
 
     return handles.call(handle, request, args);
 }
 
-Result hj_handle_seek(int handle, ssize64_t *offset_ptr, HjWhence whence, ssize64_t *result_ptr)
+HjResult hj_handle_seek(int handle, ssize64_t *offset_ptr, HjWhence whence, ssize64_t *result_ptr)
 {
     if ((offset_ptr != nullptr && !syscall_validate_ptr((uintptr_t)offset_ptr, sizeof(int))) ||
         (result_ptr != nullptr && !syscall_validate_ptr((uintptr_t)result_ptr, sizeof(int))))
@@ -569,7 +569,7 @@ Result hj_handle_seek(int handle, ssize64_t *offset_ptr, HjWhence whence, ssize6
     return seek_result.result();
 }
 
-Result hj_handle_stat(int handle, HjStat *state)
+HjResult hj_handle_stat(int handle, HjStat *state)
 {
     if (!syscall_validate_ptr((uintptr_t)state, sizeof(HjStat)))
     {
@@ -581,7 +581,7 @@ Result hj_handle_stat(int handle, HjStat *state)
     return handles.stat(handle, state);
 }
 
-Result hj_handle_connect(int *handle, const char *raw_path, size_t size)
+HjResult hj_handle_connect(int *handle, const char *raw_path, size_t size)
 {
     if (!syscall_validate_ptr((uintptr_t)handle, sizeof(int)) &&
         !syscall_validate_ptr((uintptr_t)raw_path, size))
@@ -609,7 +609,7 @@ Result hj_handle_connect(int *handle, const char *raw_path, size_t size)
     }
 }
 
-Result hj_handle_accept(int handle, int *connection_handle)
+HjResult hj_handle_accept(int handle, int *connection_handle)
 {
     if (!syscall_validate_ptr((uintptr_t)connection_handle, sizeof(int)))
     {
@@ -704,7 +704,7 @@ uintptr_t task_do_syscall(Syscall syscall, uintptr_t arg0, uintptr_t arg1, uintp
 {
     SyscallHandler handler = syscall_get_handler(syscall);
 
-    Result result = SUCCESS;
+    HjResult result = SUCCESS;
 
     if (handler == nullptr)
     {
@@ -722,7 +722,7 @@ uintptr_t task_do_syscall(Syscall syscall, uintptr_t arg0, uintptr_t arg1, uintp
             "{}({08x}, {08x}, {08x}, {08x}, {08x}) returned {}",
             syscall_names[syscall],
             arg0, arg1, arg2, arg3, arg4,
-            result_to_string((Result)result));
+            result_to_string((HjResult)result));
     }
 
     scheduler_running()->kill_me_if_you_dare();

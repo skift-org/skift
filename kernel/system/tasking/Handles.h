@@ -13,15 +13,15 @@ private:
 
     ResultOr<int> add(RefPtr<FsHandle> handle);
 
-    Result add_at(RefPtr<FsHandle> handle, int index);
+    HjResult add_at(RefPtr<FsHandle> handle, int index);
 
     bool is_valid_handle(int handle);
 
-    Result remove(int handle_index);
+    HjResult remove(int handle_index);
 
     RefPtr<FsHandle> acquire(int handle_index);
 
-    Result release(int handle_index);
+    HjResult release(int handle_index);
 
 public:
     Handles() {}
@@ -32,15 +32,15 @@ public:
 
     ResultOr<int> connect(Domain &domain, IO::Path &socket_path);
 
-    Result close(int handle_index);
+    HjResult close(int handle_index);
 
     void close_all();
 
-    Result reopen(int handle, int *reopened);
+    HjResult reopen(int handle, int *reopened);
 
-    Result copy(int source, int destination);
+    HjResult copy(int source, int destination);
 
-    Result poll(HandlePoll *handles, size_t count, Timeout timeout);
+    HjResult poll(HandlePoll *handles, size_t count, Timeout timeout);
 
     ResultOr<size_t> read(int handle_index, void *buffer, size_t size);
 
@@ -48,20 +48,20 @@ public:
 
     ResultOr<ssize64_t> seek(int handle_index, IO::SeekFrom from);
 
-    Result call(int handle_index, IOCall request, void *args);
+    HjResult call(int handle_index, IOCall request, void *args);
 
-    Result stat(int handle_index, HjStat *stat);
+    HjResult stat(int handle_index, HjStat *stat);
 
     ResultOr<int> accept(int handle_index);
 
-    Result duplex(
+    HjResult duplex(
         RefPtr<FsNode> node,
         int *server, HjOpenFlag server_flags,
         int *client, HjOpenFlag client_flags);
 
-    Result term(int *server, int *client);
+    HjResult term(int *server, int *client);
 
-    Result pipe(int *reader, int *writer);
+    HjResult pipe(int *reader, int *writer);
 
-    Result pass(Handles &handles, int source, int destination);
+    HjResult pass(Handles &handles, int source, int destination);
 };

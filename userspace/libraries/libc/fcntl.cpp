@@ -42,9 +42,9 @@ int open(const char *path, int mode, ...)
 {
     int flags = fcntl_parse_mode(mode);
     int handle = 0;
-    Result result = hj_handle_open(&handle, path, strlen(path), flags);
+    HjResult result = hj_handle_open(&handle, path, strlen(path), flags);
 
-    if (result != Result::SUCCESS)
+    if (result != HjResult::SUCCESS)
     {
         // TODO: set errno
         return -1;

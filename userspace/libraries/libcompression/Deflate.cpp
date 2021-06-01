@@ -31,7 +31,7 @@ void Deflate::write_uncompressed_block(const uint8_t *block_data, size_t block_l
     out_writer.put_data(block_data, block_len);
 }
 
-Result Deflate::write_uncompressed_blocks(IO::Reader &in_data, IO::BitWriter &out_writer, bool write_final)
+HjResult Deflate::write_uncompressed_blocks(IO::Reader &in_data, IO::BitWriter &out_writer, bool write_final)
 {
     Vector<uint8_t> block_data;
     block_data.resize(UINT16_MAX);
@@ -46,16 +46,16 @@ Result Deflate::write_uncompressed_blocks(IO::Reader &in_data, IO::BitWriter &ou
         write_uncompressed_block(block_data.raw_storage(), len, out_writer, write_final && final_block);
     } while (!final_block);
 
-    return Result::SUCCESS;
+    return HjResult::SUCCESS;
 }
 
-Result Deflate::compress_none(IO::Reader &uncompressed, IO::Writer &compressed)
+HjResult Deflate::compress_none(IO::Reader &uncompressed, IO::Writer &compressed)
 {
     IO::BitWriter bit_writer(compressed);
     return write_uncompressed_blocks(uncompressed, bit_writer, true);
 }
 
-Result Deflate::perform(IO::Reader &uncompressed, IO::Writer &compressed)
+HjResult Deflate::perform(IO::Reader &uncompressed, IO::Writer &compressed)
 {
     // Use a bufreader to increase performance and actually check for the minimum size
     IO::BufReader buf_reader(uncompressed, 4096);

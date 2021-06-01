@@ -45,7 +45,7 @@ void Task::interrupt()
     }
 }
 
-Result Task::cancel(int exit_value)
+HjResult Task::cancel(int exit_value)
 {
     interrupts_retain();
 
@@ -348,13 +348,13 @@ void task_go(Task *task)
     task->state(TASK_STATE_RUNNING);
 }
 
-Result task_sleep(Task *task, int timeout)
+HjResult task_sleep(Task *task, int timeout)
 {
     BlockerTime blocker{};
     return task_block(task, blocker, timeout);
 }
 
-Result task_wait(int task_id, int *exit_value)
+HjResult task_wait(int task_id, int *exit_value)
 {
     interrupts_retain();
 
@@ -376,7 +376,7 @@ Result task_wait(int task_id, int *exit_value)
     return task_block(scheduler_running(), blocker, -1);
 }
 
-Result task_block(Task *task, Blocker &blocker, Timeout timeout)
+HjResult task_block(Task *task, Blocker &blocker, Timeout timeout)
 {
     assert(!task->_blocker);
 

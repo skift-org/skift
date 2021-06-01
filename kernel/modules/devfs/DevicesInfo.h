@@ -8,7 +8,7 @@ private:
 public:
     FsDeviceInfo();
 
-    Result open(FsHandle &handle) override;
+    HjResult open(FsHandle &handle) override;
 
     void close(FsHandle &handle) override;
 

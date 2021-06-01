@@ -45,9 +45,9 @@ public:
 
     ResultOr<ssize64_t> seek(IO::SeekFrom from);
 
-    Result call(IOCall request, void *args);
+    HjResult call(IOCall request, void *args);
 
-    Result stat(HjStat *stat);
+    HjResult stat(HjStat *stat);
 
     ResultOr<RefPtr<FsHandle>> accept();
 };

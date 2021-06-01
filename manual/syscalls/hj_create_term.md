@@ -1,7 +1,7 @@
 # hj_create_term
 
 ```c
-Result hj_create_term(int *server_handle, int *client_handle);
+HjResult hj_create_term(int *server_handle, int *client_handle);
 ```
 
 ## Description

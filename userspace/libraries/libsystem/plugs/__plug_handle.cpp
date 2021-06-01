@@ -7,14 +7,14 @@
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/process/Process.h>
 
-Result __plug_process_get_directory(char *buffer, size_t size)
+HjResult __plug_process_get_directory(char *buffer, size_t size)
 {
     auto &pwd = environment().get("POSIX").get("PWD");
     strncpy(buffer, pwd.as_string().cstring(), size);
     return SUCCESS;
 }
 
-Result __plug_process_set_directory(const char *path)
+HjResult __plug_process_set_directory(const char *path)
 {
     auto new_path = process_resolve(path);
 
@@ -51,7 +51,7 @@ String __plug_process_resolve(String raw_path)
     return path.normalized().string();
 }
 
-Result filesystem_link(const char *raw_old_path, const char *raw_new_path)
+HjResult filesystem_link(const char *raw_old_path, const char *raw_new_path)
 {
     auto old_path = process_resolve(raw_old_path);
     auto new_path = process_resolve(raw_new_path);
@@ -61,7 +61,7 @@ Result filesystem_link(const char *raw_old_path, const char *raw_new_path)
         new_path.cstring(), new_path.length());
 }
 
-Result filesystem_rename(const char *raw_old_path, const char *raw_new_path)
+HjResult filesystem_rename(const char *raw_old_path, const char *raw_new_path)
 {
     auto old_path = process_resolve(raw_old_path);
     auto new_path = process_resolve(raw_new_path);
@@ -71,28 +71,28 @@ Result filesystem_rename(const char *raw_old_path, const char *raw_new_path)
         new_path.cstring(), new_path.length());
 }
 
-Result filesystem_unlink(const char *raw_path)
+HjResult filesystem_unlink(const char *raw_path)
 {
     auto path = process_resolve(raw_path);
 
     return hj_filesystem_unlink(path.cstring(), path.length());
 }
 
-Result filesystem_mkdir(const char *raw_path)
+HjResult filesystem_mkdir(const char *raw_path)
 {
     auto path = process_resolve(raw_path);
 
     return hj_filesystem_mkdir(path.cstring(), path.length());
 }
 
-Result filesystem_mkpipe(const char *raw_path)
+HjResult filesystem_mkpipe(const char *raw_path)
 {
     auto path = process_resolve(raw_path);
 
     return hj_filesystem_mkpipe(path.cstring(), path.length());
 }
 
-Result __plug_handle_open(Handle *handle, const char *raw_path, HjOpenFlag flags)
+HjResult __plug_handle_open(Handle *handle, const char *raw_path, HjOpenFlag flags)
 {
     auto path = process_resolve(raw_path);
 
@@ -126,7 +126,7 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
     return written;
 }
 
-Result __plug_handle_call(Handle *handle, IOCall request, void *args)
+HjResult __plug_handle_call(Handle *handle, IOCall request, void *args)
 {
     handle->result = hj_handle_call(handle->id, request, args);
 

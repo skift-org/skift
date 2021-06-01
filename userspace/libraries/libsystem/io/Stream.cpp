@@ -82,7 +82,7 @@ size_t stream_write(Stream *stream, const void *buffer, size_t size)
     return __plug_handle_write(HANDLE(stream), buffer, size);
 }
 
-Result stream_call(Stream *stream, IOCall request, void *arg)
+HjResult stream_call(Stream *stream, IOCall request, void *arg)
 {
     return __plug_handle_call(HANDLE(stream), request, arg);
 }

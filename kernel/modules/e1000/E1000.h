@@ -156,5 +156,5 @@ public:
 
     ResultOr<size_t> write(size64_t offset, const void *buffer, size_t size) override;
 
-    Result call(IOCall request, void *args) override;
+    HjResult call(IOCall request, void *args) override;
 };

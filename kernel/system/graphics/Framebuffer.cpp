@@ -30,7 +30,7 @@ public:
     {
     }
 
-    Result call(FsHandle &handle, IOCall iocall, void *args) override
+    HjResult call(FsHandle &handle, IOCall iocall, void *args) override
     {
         UNUSED(handle);
 

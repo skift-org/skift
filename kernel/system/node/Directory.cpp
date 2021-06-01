@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include <libsystem/Result.h>
+#include <abi/Result.h>
 
 #include "system/node/Directory.h"
 #include "system/node/Handle.h"
@@ -9,7 +9,7 @@ FsDirectory::FsDirectory() : FsNode(HJ_FILE_TYPE_DIRECTORY)
 {
 }
 
-Result FsDirectory::open(FsHandle &handle)
+HjResult FsDirectory::open(FsHandle &handle)
 {
     FileListing *listing = (FileListing *)malloc(sizeof(FileListing) + sizeof(HjDirEntry) * _children.count());
 
@@ -84,7 +84,7 @@ RefPtr<FsNode> FsDirectory::find(String name)
     return result;
 }
 
-Result FsDirectory::link(String name, RefPtr<FsNode> child)
+HjResult FsDirectory::link(String name, RefPtr<FsNode> child)
 {
     if (find(name))
     {
@@ -96,7 +96,7 @@ Result FsDirectory::link(String name, RefPtr<FsNode> child)
     return SUCCESS;
 }
 
-Result FsDirectory::unlink(String name)
+HjResult FsDirectory::unlink(String name)
 {
 
     bool has_removed_an_entry = _children.remove_all_match(

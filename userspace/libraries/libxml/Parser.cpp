@@ -49,18 +49,18 @@ static String parse_attribute_value(IO::Scanner &scan)
 }
 
 // See https://www.w3.org/TR/xml/#NT-Attribute
-static Result parse_attribute(IO::Scanner &scan, String &name, String &value)
+static HjResult parse_attribute(IO::Scanner &scan, String &name, String &value)
 {
     name = parse_attribute_name(scan);
 
     if (!scan.skip('='))
     {
-        return Result::ERR_INVALID_DATA;
+        return ERR_INVALID_DATA;
     }
 
     value = parse_attribute_value(scan);
 
-    return Result::SUCCESS;
+    return HjResult::SUCCESS;
 }
 
 /* --- Tag ------------------------------------------------------------------ */

@@ -45,7 +45,7 @@ public:
         return _device->write(handle.offset(), buffer, size);
     }
 
-    Result call(FsHandle &, IOCall request, void *args) override
+    HjResult call(FsHandle &, IOCall request, void *args) override
     {
         return _device->call(request, args);
     }

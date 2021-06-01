@@ -1,8 +1,7 @@
 #include <abi/Paths.h>
-#include <string.h>
-
 #include <libio/File.h>
 #include <libio/Streams.h>
+#include <string.h>
 
 int main(int argc, char **argv)
 {

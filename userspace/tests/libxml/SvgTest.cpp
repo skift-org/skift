@@ -25,6 +25,6 @@ TEST(xml_all_svg_test)
         Assert::truth(file.exist());
 
         auto result = Xml::parse(file);
-        Assert::equal(result.result(), Result::SUCCESS);
+        Assert::equal(result.result(), HjResult::SUCCESS);
     }
 }

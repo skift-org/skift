@@ -143,7 +143,7 @@ ResultOr<RefPtr<FsHandle>> Domain::connect(IO::Path path)
     return connection_handle;
 }
 
-Result Domain::mkdir(IO::Path path)
+HjResult Domain::mkdir(IO::Path path)
 {
     if (path.length() == 0)
     {
@@ -154,12 +154,12 @@ Result Domain::mkdir(IO::Path path)
     return link(path, make<FsDirectory>());
 }
 
-Result Domain::mkpipe(IO::Path path)
+HjResult Domain::mkpipe(IO::Path path)
 {
     return link(path, make<FsPipe>());
 }
 
-Result Domain::mklink(IO::Path old_path, IO::Path new_path)
+HjResult Domain::mklink(IO::Path old_path, IO::Path new_path)
 {
     auto destination = find(old_path);
 
@@ -176,7 +176,7 @@ Result Domain::mklink(IO::Path old_path, IO::Path new_path)
     return link(new_path, destination);
 }
 
-Result Domain::link(IO::Path path, RefPtr<FsNode> node)
+HjResult Domain::link(IO::Path path, RefPtr<FsNode> node)
 {
     auto parent = find(path.dirpath());
 
@@ -197,7 +197,7 @@ Result Domain::link(IO::Path path, RefPtr<FsNode> node)
     return result;
 }
 
-Result Domain::unlink(IO::Path path)
+HjResult Domain::unlink(IO::Path path)
 {
     auto parent = find(path.dirpath());
 
@@ -219,7 +219,7 @@ Result Domain::unlink(IO::Path path)
 }
 
 // FIXME: check for loops when renaming directory
-Result Domain::rename(IO::Path old_path, IO::Path new_path)
+HjResult Domain::rename(IO::Path old_path, IO::Path new_path)
 {
     auto old_parent = find(old_path.dirpath());
     auto new_parent = find(new_path.dirpath());

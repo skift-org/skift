@@ -122,7 +122,7 @@ uintptr_t virtual_to_physical(PML4 *pml4, uintptr_t virtual_address)
     return (pml1_entry.physical_address * ARCH_PAGE_SIZE) + (virtual_address & 0xfff);
 }
 
-Result virtual_map(PML4 *pml4, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
+HjResult virtual_map(PML4 *pml4, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
 {
     ASSERT_INTERRUPTS_RETAINED();
 

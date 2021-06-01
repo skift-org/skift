@@ -46,14 +46,14 @@ int stat(const char *path, struct stat *buf)
 int fstat(int fd, struct stat *buf)
 {
     HjStat state;
-    Result result = hj_handle_stat(fd, &state);
+    HjResult result = hj_handle_stat(fd, &state);
     file_state_to_stat(&state, buf);
-    return result == Result::SUCCESS ? -1 : 0;
+    return result == HjResult::SUCCESS ? -1 : 0;
 }
 
 int mkdir(const char *pathname, mode_t mode)
 {
     UNUSED(mode);
 
-    return hj_filesystem_mkdir(pathname, strlen(pathname)) == Result::SUCCESS ? 0 : -1;
+    return hj_filesystem_mkdir(pathname, strlen(pathname)) == HjResult::SUCCESS ? 0 : -1;
 }

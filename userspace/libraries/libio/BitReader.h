@@ -17,7 +17,7 @@ private:
 public:
     inline BitReader(IO::Reader &reader) : _reader(reader) {}
 
-    inline Result hint(size_t num_bits)
+    inline HjResult hint(size_t num_bits)
     {
         size_t num_bytes = ALIGN_UP(_head + num_bits, 8) / 8;
 
@@ -82,7 +82,7 @@ public:
         return value;
     }
 
-    inline Result skip_bits(size_t num_bits)
+    inline HjResult skip_bits(size_t num_bits)
     {
         if (num_bits == 0)
         {

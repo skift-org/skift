@@ -100,7 +100,7 @@ bool task_memory_mapping_colides(Task *task, uintptr_t address, size_t size)
 
 /* --- User facing API ------------------------------------------------------ */
 
-Result task_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
+HjResult task_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
 {
     kill_me_if_too_greedy(task, size);
 
@@ -115,7 +115,7 @@ Result task_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
     return SUCCESS;
 }
 
-Result task_memory_map(Task *task, uintptr_t address, size_t size, MemoryFlags flags)
+HjResult task_memory_map(Task *task, uintptr_t address, size_t size, MemoryFlags flags)
 {
     kill_me_if_too_greedy(task, size);
 
@@ -138,7 +138,7 @@ Result task_memory_map(Task *task, uintptr_t address, size_t size, MemoryFlags f
     return SUCCESS;
 }
 
-Result task_memory_free(Task *task, uintptr_t address)
+HjResult task_memory_free(Task *task, uintptr_t address)
 {
     auto memory_mapping = task_memory_mapping_by_address(task, address);
 
@@ -152,7 +152,7 @@ Result task_memory_free(Task *task, uintptr_t address)
     return SUCCESS;
 }
 
-Result task_memory_include(Task *task, int handle, uintptr_t *out_address, size_t *out_size)
+HjResult task_memory_include(Task *task, int handle, uintptr_t *out_address, size_t *out_size)
 {
     auto memory_object = memory_object_by_id(handle);
 
@@ -177,7 +177,7 @@ Result task_memory_include(Task *task, int handle, uintptr_t *out_address, size_
     return SUCCESS;
 }
 
-Result task_memory_get_handle(Task *task, uintptr_t address, int *out_handle)
+HjResult task_memory_get_handle(Task *task, uintptr_t address, int *out_handle)
 {
     auto memory_mapping = task_memory_mapping_by_address(task, address);
 

@@ -118,7 +118,7 @@ ZipArchive::ZipArchive(IO::Path path, bool read) : Archive(path)
     }
 }
 
-Result read_local_headers(IO::SeekableReader auto &reader, Vector<Archive::Entry> &entries)
+HjResult read_local_headers(IO::SeekableReader auto &reader, Vector<Archive::Entry> &entries)
 {
     // Read all local file headers and data descriptors
     while (TRY(reader.tell()) < (TRY(reader.length()) - sizeof(LocalHeader)))
@@ -166,10 +166,10 @@ Result read_local_headers(IO::SeekableReader auto &reader, Vector<Archive::Entry
         }
     }
 
-    return Result::SUCCESS;
+    return HjResult::SUCCESS;
 }
 
-Result read_central_directory(IO::SeekableReader auto &reader)
+HjResult read_central_directory(IO::SeekableReader auto &reader)
 {
     // Central directory starts here
     while (TRY(reader.tell()) < (TRY(reader.length()) - sizeof(CentralDirectoryFileHeader)))
@@ -198,13 +198,13 @@ Result read_central_directory(IO::SeekableReader auto &reader)
     if (central_dir_end_sig() != ZIP_END_OF_CENTRAL_DIR_HEADER_SIG)
     {
         IO::logln("Missing 'central directory end record' signature!");
-        return Result::ERR_INVALID_DATA;
+        return ERR_INVALID_DATA;
     }
 
-    return Result::SUCCESS;
+    return HjResult::SUCCESS;
 }
 
-Result ZipArchive::read_archive()
+HjResult ZipArchive::read_archive()
 {
     _valid = false;
 
@@ -214,7 +214,7 @@ Result ZipArchive::read_archive()
     if (!archive_file.exist())
     {
         IO::logln("Archive does not exist: {}", _path.string());
-        return Result::ERR_NO_SUCH_FILE_OR_DIRECTORY;
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
     IO::logln("Opening file: '{}'", _path.string());
@@ -223,17 +223,17 @@ Result ZipArchive::read_archive()
     if (TRY(archive_file.length()) < sizeof(CentralDirectoryEndRecord))
     {
         IO::logln("Archive is too small to be a valid .zip: {} {}", _path.string(), archive_file.length().unwrap());
-        return Result::ERR_INVALID_DATA;
+        return ERR_INVALID_DATA;
     }
 
     TRY(read_local_headers(archive_file, _entries));
     TRY(read_central_directory(archive_file));
 
     _valid = true;
-    return Result::SUCCESS;
+    return HjResult::SUCCESS;
 }
 
-Result write_entry(const Archive::Entry &entry, IO::Writer &writer, IO::Reader &compressed, size_t compressed_size)
+HjResult write_entry(const Archive::Entry &entry, IO::Writer &writer, IO::Reader &compressed, size_t compressed_size)
 {
     LocalHeader header;
     header.flags = EF_NONE;
@@ -250,7 +250,7 @@ Result write_entry(const Archive::Entry &entry, IO::Writer &writer, IO::Reader &
     return IO::copy(compressed, writer);
 }
 
-Result write_central_directory(IO::SeekableWriter auto &writer, Vector<Archive::Entry> &entries)
+HjResult write_central_directory(IO::SeekableWriter auto &writer, Vector<Archive::Entry> &entries)
 {
     auto start = TRY(writer.tell());
     for (const auto &entry : entries)
@@ -281,7 +281,7 @@ Result write_central_directory(IO::SeekableWriter auto &writer, Vector<Archive::
     return IO::write_struct(writer, end_record).result();
 }
 
-Result ZipArchive::extract(unsigned int entry_index, IO::Writer &writer)
+HjResult ZipArchive::extract(unsigned int entry_index, IO::Writer &writer)
 {
     // Read the compressed data from the entry
     const auto &entry = _entries[entry_index];
@@ -289,7 +289,7 @@ Result ZipArchive::extract(unsigned int entry_index, IO::Writer &writer)
     if (entry.compression != CM_DEFLATED)
     {
         IO::logln("ZipArchive: Unsupported compression: {}", entry.compression);
-        return Result::ERR_NOT_IMPLEMENTED;
+        return ERR_NOT_IMPLEMENTED;
     }
 
     // Get a reader to the uncompressed data
@@ -301,7 +301,7 @@ Result ZipArchive::extract(unsigned int entry_index, IO::Writer &writer)
     return inf.perform(scoped_reader, writer).result();
 }
 
-Result ZipArchive::insert(const char *entry_name, IO::Reader &reader)
+HjResult ZipArchive::insert(const char *entry_name, IO::Reader &reader)
 {
     // TODO: create a new entry and write it to the output file
     IO::MemoryWriter memory_writer;

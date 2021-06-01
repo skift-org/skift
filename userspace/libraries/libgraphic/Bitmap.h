@@ -1,7 +1,7 @@
 #pragma once
 
+#include <abi/Result.h>
 #include <libmath/Rect.h>
-#include <libsystem/Result.h>
 #include <libutils/RefPtr.h>
 #include <libutils/ResultOr.h>
 #include <libutils/String.h>
@@ -79,7 +79,7 @@ public:
 
     static RefPtr<Bitmap> load_from_or_placeholder(String path, int size_hint = -1);
 
-    Result save_to(String path);
+    HjResult save_to(String path);
 
     void set_pixel(Math::Vec2i position, Color color)
     {

@@ -19,7 +19,7 @@ int main(int argc, char const *argv[])
     }
 
     int pid = -1;
-    Result result = launchpad_launch(launchpad, &pid);
+    HjResult result = launchpad_launch(launchpad, &pid);
 
     if (result < 0)
     {

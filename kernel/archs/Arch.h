@@ -1,7 +1,7 @@
 #pragma once
 
 #include <abi/Memory.h>
-#include <libsystem/Result.h>
+#include <abi/Result.h>
 #include <skift/Time.h>
 
 #include "system/memory/MemoryRange.h"
@@ -57,7 +57,7 @@ bool virtual_present(AddressSpace *address_space, uintptr_t virtual_address);
 
 uintptr_t virtual_to_physical(AddressSpace *address_space, uintptr_t virtual_address);
 
-Result virtual_map(AddressSpace *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
+HjResult virtual_map(AddressSpace *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
 
 MemoryRange virtual_alloc(AddressSpace *address_space, MemoryRange physical_range, MemoryFlags flags);
 

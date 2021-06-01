@@ -31,7 +31,7 @@ struct Protocol
 {
     using Message = Settings::Message;
 
-    static Result encode_message(IO::Connection &connection, const Message &message);
+    static HjResult encode_message(IO::Connection &connection, const Message &message);
 
     static ResultOr<Message> decode_message(IO::Connection &connection);
 };

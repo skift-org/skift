@@ -2,16 +2,16 @@
 
 #include <abi/Filesystem.h>
 
-#include <libsystem/Result.h>
+#include <abi/Result.h>
 
-Result filesystem_link(const char *oldpath, const char *newpath);
+HjResult filesystem_link(const char *oldpath, const char *newpath);
 
-Result filesystem_unlink(const char *path);
+HjResult filesystem_unlink(const char *path);
 
-Result filesystem_mkdir(const char *path);
+HjResult filesystem_mkdir(const char *path);
 
-Result filesystem_mkpipe(const char *path);
+HjResult filesystem_mkpipe(const char *path);
 
-Result filesystem_rename(const char *old_path, const char *new_path);
+HjResult filesystem_rename(const char *old_path, const char *new_path);
 
 bool filesystem_exist(const char *path, HjFileType type);

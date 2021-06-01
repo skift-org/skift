@@ -85,7 +85,7 @@ uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_a
     return (page_table_entry.PageFrameNumber * ARCH_PAGE_SIZE) + (virtual_address & 0xfff);
 }
 
-Result virtual_map(PageDirectory *page_directory, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
+HjResult virtual_map(PageDirectory *page_directory, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
 {
     ASSERT_INTERRUPTS_RETAINED();
 

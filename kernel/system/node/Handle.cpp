@@ -2,8 +2,8 @@
 #include <assert.h>
 #include <string.h>
 
+#include <abi/Result.h>
 #include <libmath/MinMax.h>
-#include <libsystem/Result.h>
 
 #include "system/node/Connection.h"
 #include "system/node/Handle.h"
@@ -218,16 +218,16 @@ ResultOr<ssize64_t> FsHandle::seek(IO::SeekFrom from)
     return _offset;
 }
 
-Result FsHandle::call(IOCall request, void *args)
+HjResult FsHandle::call(IOCall request, void *args)
 {
     _node->acquire(scheduler_running_id());
-    Result result = _node->call(*this, request, args);
+    HjResult result = _node->call(*this, request, args);
     _node->release(scheduler_running_id());
 
     return result;
 }
 
-Result FsHandle::stat(HjStat *stat)
+HjResult FsHandle::stat(HjStat *stat)
 {
     _node->acquire(scheduler_running_id());
     stat->size = _node->size();

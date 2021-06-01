@@ -14,10 +14,10 @@ namespace Png
 
 Reader::Reader(IO::Reader &reader) : _reader(reader)
 {
-    _valid = read() == Result::SUCCESS;
+    _valid = read() == HjResult::SUCCESS;
 }
 
-Result Reader::read()
+HjResult Reader::read()
 {
     Array<uint8_t, 8> signature;
     _reader.read(signature.raw_storage(), sizeof(signature));
@@ -26,7 +26,7 @@ Result Reader::read()
     if (signature != Array<uint8_t, 8>{137, 80, 78, 71, 13, 10, 26, 10})
     {
         IO::logln("Invalid PNG signature!");
-        return Result::ERR_INVALID_DATA;
+        return ERR_INVALID_DATA;
     }
 
     TRY(read_chunks());
@@ -44,10 +44,10 @@ Result Reader::read()
     TRY(convert(raw_buffer));
     delete[] raw_buffer;
 
-    return Result::SUCCESS;
+    return HjResult::SUCCESS;
 }
 
-Result Reader::read_chunks()
+HjResult Reader::read_chunks()
 {
     size_t idat_counter = 0;
     bool end = false;
@@ -55,6 +55,7 @@ Result Reader::read_chunks()
     while (!end)
     {
         auto chunk_length = TRY(IO::read<be_uint32_t>(_reader));
+
         // CRC checksum includes the chunk signature and chunk data
         // See https://www.w3.org/TR/2003/REC-PNG-20031110/#5Introduction
         IO::CRCReader crc_reader(_reader);
@@ -63,9 +64,9 @@ Result Reader::read_chunks()
 
         switch (chunk_signature())
         {
-        case Png::ImageHeader::SIG:
+        case ImageHeader::SIG:
         {
-            auto image_header = TRY(IO::read<Png::ImageHeader>(scoped_reader));
+            auto image_header = TRY(IO::read<ImageHeader>(scoped_reader));
             _width = image_header.width();
             _height = image_header.height();
 
@@ -73,14 +74,14 @@ Result Reader::read_chunks()
             if (image_header.interlace_method() != 0)
             {
                 IO::logln("Unsupported interlace method: {}", image_header.interlace_method());
-                return Result::ERR_NOT_IMPLEMENTED;
+                return ERR_NOT_IMPLEMENTED;
             }
 
             // Same for bit depth
             if (image_header.bit_depth() != 8)
             {
                 IO::logln("Unsupported bitdepth: {}", image_header.bit_depth());
-                return Result::ERR_NOT_IMPLEMENTED;
+                return ERR_NOT_IMPLEMENTED;
             }
 
             _bit_depth = image_header.bit_depth();
@@ -88,28 +89,28 @@ Result Reader::read_chunks()
         }
         break;
 
-        case Png::Gamma::SIG:
+        case Gamma::SIG:
         {
-            TRY(IO::read<Png::Gamma>(scoped_reader));
+            TRY(IO::read<Gamma>(scoped_reader));
         }
         break;
 
-        case Png::Chroma::SIG:
+        case Chroma::SIG:
         {
-            TRY(IO::read<Png::Chroma>(scoped_reader));
+            TRY(IO::read<Chroma>(scoped_reader));
         }
         break;
 
-        case Png::BackgroundColor::SIG:
+        case BackgroundColor::SIG:
         {
             Vector<uint8_t> data;
             TRY(IO::read_vector(scoped_reader, data));
         }
         break;
 
-        case Png::Time::SIG:
+        case Time::SIG:
         {
-            auto modified_date = TRY(IO::read<Png::Time>(scoped_reader));
+            auto modified_date = TRY(IO::read<Time>(scoped_reader));
             _modified.year = modified_date.year();
             _modified.month = modified_date.month();
             _modified.day = modified_date.day();
@@ -119,13 +120,13 @@ Result Reader::read_chunks()
         }
         break;
 
-        case Png::sRGB::SIG:
+        case sRGB::SIG:
         {
-            TRY(IO::read<Png::sRGB>(scoped_reader));
+            TRY(IO::read<sRGB>(scoped_reader));
         }
         break;
 
-        case Png::Palette::SIG:
+        case Palette::SIG:
         {
             auto num_entries = chunk_length() / 3;
             for (size_t i = 0; i < num_entries; i++)
@@ -139,17 +140,17 @@ Result Reader::read_chunks()
         }
         break;
 
-        case Png::Transparency::SIG:
+        case Transparency::SIG:
         {
             // Must appear after palette chunk according to specification
             // See: https://www.w3.org/TR/2003/REC-PNG-20031110/#5ChunkOrdering
-            if (_colour_type == Png::CT_PALETTE)
+            if (_colour_type == CT_PALETTE)
             {
                 auto num_entries = chunk_length();
                 if (num_entries > _palette.count())
                 {
                     IO::logln("Transparency chunk has more entries than current palette");
-                    return Result::ERR_INVALID_DATA;
+                    return ERR_INVALID_DATA;
                 }
 
                 for (size_t i = 0; i < num_entries; i++)
@@ -158,26 +159,26 @@ Result Reader::read_chunks()
                     _palette[i] = _palette[i].with_alpha_byte(alpha);
                 }
             }
-            else if (_colour_type == Png::CT_GREY || _colour_type == Png::CT_RGB)
+            else if (_colour_type == CT_GREY || _colour_type == CT_RGB)
             {
                 IO::logln("Transparency chunk not implemented for current colour type");
-                return Result::ERR_NOT_IMPLEMENTED;
+                return ERR_NOT_IMPLEMENTED;
             }
             else
             {
                 IO::logln("Transparency chunk not allowed for current colour type");
-                return Result::ERR_INVALID_DATA;
+                return ERR_INVALID_DATA;
             }
         }
         break;
 
-        case Png::ImageData::SIG:
+        case ImageData::SIG:
         {
             // The first chunk begins with the compression method
-            if (idat_counter > 0 && prev_signature != Png::ImageData::SIG)
+            if (idat_counter > 0 && prev_signature != ImageData::SIG)
             {
                 IO::logln("Multiple iDat chunks must be subsequent");
-                return Result::ERR_INVALID_DATA;
+                return ERR_INVALID_DATA;
             }
 
             // Read the data for this chunk into our concatenated compressed data
@@ -186,18 +187,18 @@ Result Reader::read_chunks()
         }
         break;
 
-        case Png::TextualData::SIG:
+        case TextualData::SIG:
         {
             Vector<uint8_t> data;
             TRY(IO::read_vector(scoped_reader, data));
         }
         break;
 
-        case Png::PhysicalDimensions::SIG:
-            TRY(IO::read<Png::PhysicalDimensions>(scoped_reader));
+        case PhysicalDimensions::SIG:
+            TRY(IO::read<PhysicalDimensions>(scoped_reader));
             break;
 
-        case Png::ImageEnd::SIG:
+        case ImageEnd::SIG:
         {
             end = true;
         }
@@ -216,16 +217,16 @@ Result Reader::read_chunks()
         if (crc() != crc_reader.checksum())
         {
             IO::logln("Chunk checksum validation failed");
-            return Result::ERR_INVALID_DATA;
+            return ERR_INVALID_DATA;
         }
         prev_signature = chunk_signature();
     }
 
-    return Result::SUCCESS;
+    return HjResult::SUCCESS;
 }
 
 // Copyright (c) 2005-2020 Lode Vandevenne
-Result Reader::unfilter(uint8_t *out, uint8_t *in)
+HjResult Reader::unfilter(uint8_t *out, uint8_t *in)
 {
     // For PNG filter method 0
     // this function unfilters a single image (e.g. without interlacing this is called once, with Adam7 seven times)
@@ -242,14 +243,14 @@ Result Reader::unfilter(uint8_t *out, uint8_t *in)
     {
         size_t outindex = linebytes * y;
         size_t inindex = (1 + linebytes) * y; /*the extra filterbyte added to each row*/
-        Png::FilterType filter_type = (Png::FilterType)in[inindex];
+        FilterType filter_type = (FilterType)in[inindex];
 
         TRY(unfilter_scanline(&out[outindex], &in[inindex + 1], prevline, bytewidth, filter_type, linebytes));
 
         prevline = &out[outindex];
     }
 
-    return Result::SUCCESS;
+    return HjResult::SUCCESS;
 }
 
 // Path predictor, used by PNG filter type 4
@@ -261,7 +262,7 @@ static uint8_t paeth_predictor(int16_t a, int16_t b, int16_t c)
     int16_t pb = abs(a - c);
     int16_t pc = abs(a + b - c - c);
 
-    /* return input value associated with smallest of pa, pb, pc (with certain priority if equal) */
+    // Return input value associated with smallest of pa, pb, pc (with certain priority if equal)
     if (pb < pa)
     {
         a = b;
@@ -272,8 +273,8 @@ static uint8_t paeth_predictor(int16_t a, int16_t b, int16_t c)
 }
 
 // Copyright (c) 2005-2020 Lode Vandevenne
-Result Reader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
-                                 size_t bytewidth, Png::FilterType filter_type, size_t length)
+HjResult Reader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
+                                   size_t bytewidth, FilterType filter_type, size_t length)
 {
     // For PNG filter method 0
     // unfilter a PNG image scanline by scanline. when the pixels are smaller than 1 byte,
@@ -285,14 +286,14 @@ Result Reader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const 
 
     switch (filter_type)
     {
-    case Png::FT_NONE:
+    case FT_NONE:
         for (i = 0; i != length; ++i)
         {
             recon[i] = scanline[i];
         }
         break;
 
-    case Png::FT_SUB:
+    case FT_SUB:
         for (i = 0; i != bytewidth; ++i)
         {
             recon[i] = scanline[i];
@@ -304,7 +305,7 @@ Result Reader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const 
         }
         break;
 
-    case Png::FT_UP:
+    case FT_UP:
         if (precon)
         {
             for (i = 0; i != length; ++i)
@@ -321,7 +322,7 @@ Result Reader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const 
         }
         break;
 
-    case Png::FT_AVERAGE:
+    case FT_AVERAGE:
         if (precon)
         {
             for (i = 0; i != bytewidth; ++i)
@@ -348,12 +349,13 @@ Result Reader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const 
         }
         break;
 
-    case Png::FT_PAETH:
+    case FT_PAETH:
         if (precon)
         {
             for (i = 0; i != bytewidth; ++i)
             {
-                recon[i] = (scanline[i] + precon[i]); /*paeth_predictor(0, precon[i], 0) is always precon[i]*/
+                // paeth_predictor(0, precon[i], 0) is always precon[i]
+                recon[i] = (scanline[i] + precon[i]);
             }
 
             if (bytewidth >= 2)
@@ -384,7 +386,7 @@ Result Reader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const 
 
             for (i = bytewidth; i < length; ++i)
             {
-                /*paeth_predictor(recon[i - bytewidth], 0, 0) is always recon[i - bytewidth]*/
+                // paeth_predictor(recon[i - bytewidth], 0, 0) is always recon[i - bytewidth]
                 recon[i] = (scanline[i] + recon[i - bytewidth]);
             }
         }
@@ -392,13 +394,14 @@ Result Reader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const 
 
     default:
         IO::logln("Invalid filter type: {}", filter_type);
-        return Result::ERR_INVALID_DATA; /*error: nonexistent filter type given*/
+        // error: nonexistent filter type given
+        return ERR_INVALID_DATA;
     }
 
-    return Result::SUCCESS;
+    return HjResult::SUCCESS;
 }
 
-Result Reader::uncompress(IO::MemoryWriter &uncompressed_writer)
+HjResult Reader::uncompress(IO::MemoryWriter &uncompressed_writer)
 {
     IO::MemoryReader compressed_reader(Slice(_idat_writer.slice()));
 
@@ -410,14 +413,14 @@ Result Reader::uncompress(IO::MemoryWriter &uncompressed_writer)
     if ((cm_cinfo & 15) != 8)
     {
         IO::logln("Invalid zlib compression mode for PNG");
-        return Result::ERR_INVALID_DATA;
+        return ERR_INVALID_DATA;
     }
 
     // Sliding window should be 32k at max
     if (((cm_cinfo >> 4) & 15) > 7)
     {
         IO::logln("Invalid zlib sliding window size for PNG");
-        return Result::ERR_INVALID_DATA;
+        return ERR_INVALID_DATA;
     }
 
     auto flags = TRY(IO::read<uint8_t>(compressed_reader));
@@ -428,13 +431,13 @@ Result Reader::uncompress(IO::MemoryWriter &uncompressed_writer)
     return inflate.perform(compressed_reader, uncompressed_writer).result();
 }
 
-Result Reader::convert(uint8_t *buffer)
+HjResult Reader::convert(uint8_t *buffer)
 {
     _pixels.resize(_width * _height);
 
     switch (_colour_type)
     {
-    case Png::CT_RGBA:
+    case CT_RGBA:
         for (size_t i = 0; i < _width * _height; i++)
         {
             _pixels[i] = Graphic::Color::from_rgba_byte(buffer[i * 4],
@@ -443,7 +446,7 @@ Result Reader::convert(uint8_t *buffer)
                                                         buffer[i * 4 + 3]);
         }
         break;
-    case Png::CT_RGB:
+    case CT_RGB:
         for (size_t i = 0; i < _width * _height; i++)
         {
             _pixels[i] = Graphic::Color::from_rgb_byte(buffer[i * 3],
@@ -452,24 +455,24 @@ Result Reader::convert(uint8_t *buffer)
         }
         break;
 
-    case Png::CT_GREY:
+    case CT_GREY:
         for (size_t i = 0; i < _width * _height; i++)
         {
             _pixels[i] = Graphic::Color::from_monochrome_byte(buffer[i]);
         }
         break;
-    case Png::CT_GREY_ALPHA:
+    case CT_GREY_ALPHA:
         for (size_t i = 0; i < _width * _height; i++)
         {
             _pixels[i] = Graphic::Color::from_monochrome_alpha_byte(buffer[i * 2],
                                                                     buffer[i * 2 + 1]);
         }
         break;
-    case Png::CT_PALETTE:
+    case CT_PALETTE:
         if (_palette.empty())
         {
             IO::logln("Palette colour type requires a palett data");
-            return Result::ERR_INVALID_DATA;
+            return ERR_INVALID_DATA;
         }
 
         for (size_t i = 0; i < _width * _height; i++)
@@ -479,10 +482,10 @@ Result Reader::convert(uint8_t *buffer)
         break;
     default:
         IO::logln("Unsupported PNG colour type: %u", _colour_type);
-        return Result::ERR_NOT_IMPLEMENTED;
+        return ERR_NOT_IMPLEMENTED;
     }
 
-    return Result::SUCCESS;
+    return HjResult::SUCCESS;
 }
 
 } // namespace Png

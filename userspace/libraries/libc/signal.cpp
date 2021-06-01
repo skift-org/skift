@@ -19,7 +19,7 @@ int raise(int sig)
     {
     case SIGTERM:
     case SIGKILL:
-        return hj_process_exit(-1) == Result::SUCCESS ? 0 : -1;
+        return hj_process_exit(-1) == HjResult::SUCCESS ? 0 : -1;
     default:
         return -1;
     }

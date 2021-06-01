@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <skift/Plugs.h>
 
-#include <libsystem/Result.h>
+#include <abi/Result.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/system/System.h>
 
@@ -92,24 +92,24 @@ const char *__plug_process_name()
     }
 }
 
-Result __plug_process_launch(Launchpad *launchpad, int *pid)
+HjResult __plug_process_launch(Launchpad *launchpad, int *pid)
 {
     return task_launch(scheduler_running(), launchpad, pid);
 }
 
-Result __plug_process_sleep(int time)
+HjResult __plug_process_sleep(int time)
 {
     return task_sleep(scheduler_running(), time);
 }
 
-Result __plug_process_wait(int pid, int *exit_value)
+HjResult __plug_process_wait(int pid, int *exit_value)
 {
     return task_wait(pid, exit_value);
 }
 
 /* ---Handles plugs --------------------------------------------------------- */
 
-Result __plug_handle_open(Handle *handle, const char *raw_path, HjOpenFlag flags)
+HjResult __plug_handle_open(Handle *handle, const char *raw_path, HjOpenFlag flags)
 {
     auto path = IO::Path::parse(raw_path);
     auto &handles = scheduler_running()->handles();
@@ -173,7 +173,7 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
     }
 }
 
-Result __plug_handle_call(Handle *handle, IOCall request, void *args)
+HjResult __plug_handle_call(Handle *handle, IOCall request, void *args)
 {
     UNUSED(handle);
     UNUSED(request);
@@ -227,10 +227,10 @@ void __plug_process_exit(int)
     ASSERT_NOT_REACHED();
 }
 
-Result __plug_process_cancel(int) { ASSERT_NOT_REACHED(); }
+HjResult __plug_process_cancel(int) { ASSERT_NOT_REACHED(); }
 
-Result __plug_process_get_directory(char *, size_t) { ASSERT_NOT_REACHED(); }
+HjResult __plug_process_get_directory(char *, size_t) { ASSERT_NOT_REACHED(); }
 
-Result __plug_process_set_directory(const char *) { ASSERT_NOT_REACHED(); }
+HjResult __plug_process_set_directory(const char *) { ASSERT_NOT_REACHED(); }
 
 String __plug_process_resolve(String raw_path) { return raw_path; }

@@ -1,7 +1,7 @@
 # hj_create_pipe
 
 ```c
-Result hj_create_pipe(int *reader_handle, int *writer_handle);
+HjResult hj_create_pipe(int *reader_handle, int *writer_handle);
 ```
 
 ## Description

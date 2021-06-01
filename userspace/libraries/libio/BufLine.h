@@ -36,7 +36,7 @@ public:
         return size;
     }
 
-    Result flush() override
+    HjResult flush() override
     {
         auto result = _writer.write(_buffer.raw_storage(), _used).result();
         _used = 0;

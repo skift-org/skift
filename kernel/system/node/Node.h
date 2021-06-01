@@ -3,7 +3,7 @@
 #include <abi/Filesystem.h>
 #include <abi/IOCall.h>
 
-#include <libsystem/Result.h>
+#include <abi/Result.h>
 #include <libutils/Lock.h>
 #include <libutils/RefPtr.h>
 #include <libutils/ResultOr.h>
@@ -44,13 +44,13 @@ public:
 
     void deref_handle(FsHandle &handle);
 
-    virtual Result open(FsHandle &) { return SUCCESS; }
+    virtual HjResult open(FsHandle &) { return SUCCESS; }
 
     virtual void close(FsHandle &) {}
 
     virtual size_t size() { return 0; }
 
-    virtual Result call(FsHandle &handle, IOCall request, void *args)
+    virtual HjResult call(FsHandle &handle, IOCall request, void *args)
     {
         UNUSED(handle);
         UNUSED(request);
@@ -88,7 +88,7 @@ public:
         return nullptr;
     }
 
-    virtual Result link(String name, RefPtr<FsNode> child)
+    virtual HjResult link(String name, RefPtr<FsNode> child)
     {
         UNUSED(name);
         UNUSED(child);
@@ -96,7 +96,7 @@ public:
         return ERR_OPERATION_NOT_SUPPORTED;
     }
 
-    virtual Result unlink(String name)
+    virtual HjResult unlink(String name)
     {
         UNUSED(name);
 

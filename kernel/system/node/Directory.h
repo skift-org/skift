@@ -24,7 +24,7 @@ private:
 public:
     FsDirectory();
 
-    Result open(FsHandle &handle) override;
+    HjResult open(FsHandle &handle) override;
 
     void close(FsHandle &handle) override;
 
@@ -32,7 +32,7 @@ public:
 
     RefPtr<FsNode> find(String name) override;
 
-    Result link(String name, RefPtr<FsNode> child) override;
+    HjResult link(String name, RefPtr<FsNode> child) override;
 
-    Result unlink(String name) override;
+    HjResult unlink(String name) override;
 };

@@ -253,7 +253,7 @@ ResultOr<size_t> E1000::write(size64_t offset, const void *buffer, size_t size)
     return packet_size;
 }
 
-Result E1000::call(IOCall request, void *args)
+HjResult E1000::call(IOCall request, void *args)
 {
     if (request == IOCALL_NETWORK_GET_STATE)
     {

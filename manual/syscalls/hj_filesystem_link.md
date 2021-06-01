@@ -1,7 +1,7 @@
 # hj_filesystem_link
 
 ```c++
-Result hj_filesystem_link(
+HjResult hj_filesystem_link(
     const char *old_path,
     size_t old_path_size,
     const char *new_path,

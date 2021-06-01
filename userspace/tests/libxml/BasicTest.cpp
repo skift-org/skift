@@ -8,7 +8,7 @@ TEST(xml_basic_test)
     IO::File file("/Files/Tests/xml/basic.xml", HJ_OPEN_READ);
     Assert::truth(file.exist());
     auto result = Xml::parse(file);
-    Assert::equal(result.result(), Result::SUCCESS);
+    Assert::equal(result.result(), HjResult::SUCCESS);
 
     Xml::Document doc = result.unwrap();
 
@@ -32,7 +32,7 @@ TEST(xml_empty_tags_test)
     IO::File file("/Files/Tests/xml/empty_tags.xml", HJ_OPEN_READ);
     Assert::truth(file.exist());
     auto result = Xml::parse(file);
-    Assert::equal(result.result(), Result::SUCCESS);
+    Assert::equal(result.result(), HjResult::SUCCESS);
 
     Xml::Document doc = result.unwrap();
 

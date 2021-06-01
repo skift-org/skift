@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     IO::File source{argv[1], HJ_OPEN_READ};
     IO::File destination{argv[2], HJ_OPEN_WRITE | HJ_OPEN_CREATE};
 
-    Result result = IO::copy(source, destination);
+    HjResult result = IO::copy(source, destination);
 
     if (result != SUCCESS)
     {

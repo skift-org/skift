@@ -141,7 +141,7 @@ bool virtual_present(PML4 *pml4, uintptr_t virtual_address);
 
 uintptr_t virtual_to_physical(PML4 *pml4, uintptr_t virtual_address);
 
-Result virtual_map(PML4 *pml4, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
+HjResult virtual_map(PML4 *pml4, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
 
 MemoryRange virtual_alloc(PML4 *pml4, MemoryRange physical_range, MemoryFlags flags);
 

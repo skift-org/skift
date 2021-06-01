@@ -66,7 +66,7 @@ Shell::ArgParseResult gfxmode_get()
     return Shell::ArgParseResult::SHOULD_FINISH;
 }
 
-Result gfxmode_set_compositor(IOCallDisplayModeArgs mode)
+HjResult gfxmode_set_compositor(IOCallDisplayModeArgs mode)
 {
     auto connection = TRY(IO::Socket::connect("/Session/compositor.ipc"));
 
@@ -89,18 +89,18 @@ Result gfxmode_set_compositor(IOCallDisplayModeArgs mode)
 
     TRY(connection.write(&goodbye_message, sizeof(goodbye_message)));
 
-    return Result::SUCCESS;
+    return HjResult::SUCCESS;
 }
 
-Result gfxmode_set_iocall(Stream *device, IOCallDisplayModeArgs mode)
+HjResult gfxmode_set_iocall(Stream *device, IOCallDisplayModeArgs mode)
 {
     if (stream_call(device, IOCALL_DISPLAY_SET_MODE, &mode) != SUCCESS)
     {
         IO::errln("Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
-        return Result::ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
+        return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
 
-    return Result::SUCCESS;
+    return HjResult::SUCCESS;
 }
 
 Shell::ArgParseResult gfxmode_set(String &mode_name)
@@ -113,16 +113,16 @@ Shell::ArgParseResult gfxmode_set(String &mode_name)
         return Shell::ArgParseResult::FAILURE;
     }
 
-    Result result = gfxmode_set_compositor(mode.unwrap());
+    HjResult result = gfxmode_set_compositor(mode.unwrap());
 
-    if (result != Result::SUCCESS)
+    if (result != HjResult::SUCCESS)
     {
         CLEANUP(stream_cleanup)
         Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, HJ_OPEN_READ);
         result = gfxmode_set_iocall(device, mode.unwrap());
     }
 
-    if (result == Result::SUCCESS)
+    if (result == HjResult::SUCCESS)
     {
         IO::outln("Graphic mode set to: {}", mode_name);
         return Shell::ArgParseResult::SHOULD_FINISH;

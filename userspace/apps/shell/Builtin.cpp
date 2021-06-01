@@ -14,7 +14,7 @@ int shell_builtin_cd(int argc, const char **argv)
         new_directory = argv[1];
     }
 
-    Result result = process_set_directory(new_directory);
+    HjResult result = process_set_directory(new_directory);
 
     if (result != SUCCESS)
     {

@@ -25,4 +25,4 @@ void launchpad_handle(Launchpad *launchpad, IO::Handle &handle, int destination)
 
 void launchpad_handle(Launchpad *launchpad, Handle *handle_to_pass, int destination);
 
-Result launchpad_launch(Launchpad *launchpad, int *pid);
+HjResult launchpad_launch(Launchpad *launchpad, int *pid);

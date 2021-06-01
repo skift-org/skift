@@ -1,5 +1,5 @@
 #pragma once
-#include <libsystem/Result.h>
+#include <abi/Result.h>
 #include <libutils/Array.h>
 #include <libutils/Prelude.h>
 

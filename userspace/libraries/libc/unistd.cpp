@@ -6,9 +6,9 @@
 ssize_t read(int fd, void *buf, size_t count)
 {
     size_t read = 0;
-    Result result = hj_handle_read(fd, buf, count, &read);
+    HjResult result = hj_handle_read(fd, buf, count, &read);
 
-    if (result != Result::SUCCESS)
+    if (result != HjResult::SUCCESS)
     {
         return -1;
     }
@@ -21,9 +21,9 @@ ssize_t read(int fd, void *buf, size_t count)
 ssize_t write(int fd, const void *buf, size_t count)
 {
     size_t written = 0;
-    Result result = hj_handle_write(fd, buf, count, &written);
+    HjResult result = hj_handle_write(fd, buf, count, &written);
 
-    if (result != Result::SUCCESS)
+    if (result != HjResult::SUCCESS)
     {
         return -1;
     }
@@ -35,7 +35,7 @@ ssize_t write(int fd, const void *buf, size_t count)
 
 int unlink(const char *pathname)
 {
-    return hj_filesystem_unlink(pathname, strlen(pathname)) == Result::SUCCESS ? 0 : -1;
+    return hj_filesystem_unlink(pathname, strlen(pathname)) == HjResult::SUCCESS ? 0 : -1;
 }
 
 int rmdir(const char *dirname)
@@ -45,7 +45,7 @@ int rmdir(const char *dirname)
 
 int close(int fd)
 {
-    return hj_handle_close(fd) == Result::SUCCESS ? 0 : -1;
+    return hj_handle_close(fd) == HjResult::SUCCESS ? 0 : -1;
 }
 
 off_t lseek(int fd, off_t offset, int whence)
@@ -53,8 +53,8 @@ off_t lseek(int fd, off_t offset, int whence)
     ssize64_t offset_64 = offset;
     ssize64_t offset_beg;
 
-    Result result = hj_handle_seek(fd, &offset_64, (HjWhence)whence, &offset_beg);
-    if (result != Result::SUCCESS)
+    HjResult result = hj_handle_seek(fd, &offset_64, (HjWhence)whence, &offset_beg);
+    if (result != HjResult::SUCCESS)
     {
         // TODO: set errno
         return (off_t)-1;

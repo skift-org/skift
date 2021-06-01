@@ -115,9 +115,9 @@ HjStat stat_to_skift(struct stat sb)
     return result;
 }
 
-Result errno_to_skift_result()
+HjResult errno_to_skift_result()
 {
-    Result result = SUCCESS;
+    HjResult result = SUCCESS;
 
     if (errno != 0 && result == SUCCESS)
     {
@@ -130,7 +130,7 @@ Result errno_to_skift_result()
     return result;
 }
 
-Result hj_handle_open(int *handle, const char *raw_path, size_t size, HjOpenFlag flags)
+HjResult hj_handle_open(int *handle, const char *raw_path, size_t size, HjOpenFlag flags)
 {
     char buffer[256];
     strlcpy(buffer, raw_path, MIN(256, size + 1));
@@ -139,35 +139,35 @@ Result hj_handle_open(int *handle, const char *raw_path, size_t size, HjOpenFlag
     return errno_to_skift_result();
 }
 
-Result hj_handle_close(int handle)
+HjResult hj_handle_close(int handle)
 {
     close(handle);
 
     return errno_to_skift_result();
 }
 
-Result hj_handle_read(int handle, void *buffer, size_t size, size_t *amount_read)
+HjResult hj_handle_read(int handle, void *buffer, size_t size, size_t *amount_read)
 {
     *amount_read = read(handle, buffer, size);
 
     return errno_to_skift_result();
 }
 
-Result hj_handle_write(int handle, const void *buffer, size_t size, size_t *amount_written)
+HjResult hj_handle_write(int handle, const void *buffer, size_t size, size_t *amount_written)
 {
     *amount_written = write(handle, buffer, size);
 
     return errno_to_skift_result();
 }
 
-Result hj_handle_seek(int handle, ssize64_t *offset, HjWhence whence, ssize64_t *result)
+HjResult hj_handle_seek(int handle, ssize64_t *offset, HjWhence whence, ssize64_t *result)
 {
     *result = lseek(handle, *offset, whence_to_posix(whence));
 
     return errno_to_skift_result();
 }
 
-Result hj_handle_stat(int handle, HjStat *state)
+HjResult hj_handle_stat(int handle, HjStat *state)
 {
     struct stat sb;
     fstat(handle, &sb);
@@ -177,7 +177,7 @@ Result hj_handle_stat(int handle, HjStat *state)
     return errno_to_skift_result();
 }
 
-Result hj_handle_call(int handle, IOCall call, void *args)
+HjResult hj_handle_call(int handle, IOCall call, void *args)
 {
     UNUSED(handle);
     UNUSED(call);

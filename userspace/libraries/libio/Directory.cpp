@@ -3,7 +3,7 @@
 namespace IO
 {
 
-Result Directory::read_entries()
+HjResult Directory::read_entries()
 {
     HjDirEntry entry;
 

@@ -95,7 +95,7 @@ size_t memory_get_total()
     return TOTAL_MEMORY;
 }
 
-Result memory_map(Arch::AddressSpace *address_space, MemoryRange virtual_range, MemoryFlags flags)
+HjResult memory_map(Arch::AddressSpace *address_space, MemoryRange virtual_range, MemoryFlags flags)
 {
     assert(virtual_range.is_page_aligned());
 
@@ -108,7 +108,7 @@ Result memory_map(Arch::AddressSpace *address_space, MemoryRange virtual_range, 
         if (!Arch::virtual_present(address_space, virtual_address))
         {
             auto physical_range = physical_alloc(ARCH_PAGE_SIZE);
-            Result virtual_map_result = Arch::virtual_map(address_space, physical_range, virtual_address, flags);
+            HjResult virtual_map_result = Arch::virtual_map(address_space, physical_range, virtual_address, flags);
 
             if (virtual_map_result != SUCCESS)
             {
@@ -125,7 +125,7 @@ Result memory_map(Arch::AddressSpace *address_space, MemoryRange virtual_range, 
     return SUCCESS;
 }
 
-Result memory_map_identity(Arch::AddressSpace *address_space, MemoryRange physical_range, MemoryFlags flags)
+HjResult memory_map_identity(Arch::AddressSpace *address_space, MemoryRange physical_range, MemoryFlags flags)
 {
     assert(physical_range.is_page_aligned());
 
@@ -142,7 +142,7 @@ Result memory_map_identity(Arch::AddressSpace *address_space, MemoryRange physic
     return SUCCESS;
 }
 
-Result memory_alloc(Arch::AddressSpace *address_space, size_t size, MemoryFlags flags, uintptr_t *out_address)
+HjResult memory_alloc(Arch::AddressSpace *address_space, size_t size, MemoryFlags flags, uintptr_t *out_address)
 
 {
     assert(IS_PAGE_ALIGN(size));
@@ -185,7 +185,7 @@ Result memory_alloc(Arch::AddressSpace *address_space, size_t size, MemoryFlags 
     return SUCCESS;
 }
 
-Result memory_alloc_identity(Arch::AddressSpace *address_space, MemoryFlags flags, uintptr_t *out_address)
+HjResult memory_alloc_identity(Arch::AddressSpace *address_space, MemoryFlags flags, uintptr_t *out_address)
 {
     InterruptsRetainer retainer;
 
@@ -217,7 +217,7 @@ Result memory_alloc_identity(Arch::AddressSpace *address_space, MemoryFlags flag
     return ERR_OUT_OF_MEMORY;
 }
 
-Result memory_free(Arch::AddressSpace *address_space, MemoryRange virtual_range)
+HjResult memory_free(Arch::AddressSpace *address_space, MemoryRange virtual_range)
 {
     assert(virtual_range.is_page_aligned());
 

@@ -34,5 +34,5 @@ public:
 
     ResultOr<size_t> read(size64_t offset, void *buffer, size_t size) override;
 
-    Result call(IOCall request, void *args) override;
+    HjResult call(IOCall request, void *args) override;
 };

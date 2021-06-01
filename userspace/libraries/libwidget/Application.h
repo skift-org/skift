@@ -59,7 +59,7 @@ public:
 
     Window *get_window(int id);
 
-    Result initialize(int argc, char **argv);
+    HjResult initialize(int argc, char **argv);
 
     int run();
 

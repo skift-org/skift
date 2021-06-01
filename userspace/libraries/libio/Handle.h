@@ -13,7 +13,7 @@ struct Handle :
 {
 private:
     int _handle = HANDLE_INVALID_ID;
-    Result _result = ERR_BAD_HANDLE;
+    HjResult _result = ERR_BAD_HANDLE;
 
     NONCOPYABLE(Handle);
 
@@ -67,7 +67,7 @@ public:
         return data_written;
     }
 
-    Result call(IOCall request, void *args)
+    HjResult call(IOCall request, void *args)
     {
         _result = hj_handle_call(_handle, request, args);
         return _result;
@@ -107,7 +107,7 @@ public:
         return _handle != HANDLE_INVALID_ID;
     }
 
-    Result result()
+    HjResult result()
     {
         return _result;
     }

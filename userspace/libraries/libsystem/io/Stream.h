@@ -33,7 +33,7 @@ size_t stream_read(Stream *stream, void *buffer, size_t size);
 
 size_t stream_write(Stream *stream, const void *buffer, size_t size);
 
-Result stream_call(Stream *stream, IOCall request, void *arg);
+HjResult stream_call(Stream *stream, IOCall request, void *arg);
 
 int stream_seek(Stream *stream, IO::SeekFrom from);
 

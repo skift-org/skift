@@ -186,7 +186,7 @@ uintptr_t virtual_to_physical(AddressSpace *address_space, uintptr_t virtual_add
     return x86_32::virtual_to_physical(static_cast<x86_32::PageDirectory *>(address_space), virtual_address);
 }
 
-Result virtual_map(AddressSpace *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
+HjResult virtual_map(AddressSpace *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
 {
     return x86_32::virtual_map(static_cast<x86_32::PageDirectory *>(address_space), physical_range, virtual_address, flags);
 }

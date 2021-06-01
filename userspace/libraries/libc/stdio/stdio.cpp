@@ -84,9 +84,9 @@ FILE *fopen(const char *path, const char *mode)
     HjOpenFlag flags = stdio_parse_mode(mode);
 
     int handle = 0;
-    Result result = hj_handle_open(&handle, path, strlen(path), flags);
+    HjResult result = hj_handle_open(&handle, path, strlen(path), flags);
 
-    if (result != Result::SUCCESS)
+    if (result != HjResult::SUCCESS)
     {
         // TODO: set errno
         return NULL;
@@ -102,10 +102,10 @@ FILE *fopen(const char *path, const char *mode)
 
 int fclose(FILE *file)
 {
-    Result result = hj_handle_close(file->handle);
+    HjResult result = hj_handle_close(file->handle);
     free(file);
 
-    return result == Result::SUCCESS ? 0 : -1;
+    return result == HjResult::SUCCESS ? 0 : -1;
 }
 
 int fflush(FILE *file)
@@ -118,7 +118,7 @@ int fflush(FILE *file)
 size_t fread(void *ptr, size_t size, size_t count, FILE *file)
 {
     size_t total = 0;
-    Result result;
+    HjResult result;
     uint8_t *dst_ptr = (uint8_t *)ptr;
 
     for (size_t i = 0; i < count; i++)
@@ -127,7 +127,7 @@ size_t fread(void *ptr, size_t size, size_t count, FILE *file)
         result = hj_handle_read(file->handle, dst_ptr, size, &read);
         total += read;
         dst_ptr += read;
-        if (result != Result::SUCCESS)
+        if (result != HjResult::SUCCESS)
         {
             // TODO: set errno
             return total;
@@ -145,7 +145,7 @@ size_t fread(void *ptr, size_t size, size_t count, FILE *file)
 size_t fwrite(const void *ptr, size_t size, size_t count, FILE *file)
 {
     size_t total = 0;
-    Result result;
+    HjResult result;
     const uint8_t *dst_ptr = (const uint8_t *)ptr;
 
     for (size_t i = 0; i < count; i++)
@@ -154,7 +154,7 @@ size_t fwrite(const void *ptr, size_t size, size_t count, FILE *file)
         result = hj_handle_write(file->handle, dst_ptr, size, &written);
         total += written;
         dst_ptr += written;
-        if (result != Result::SUCCESS)
+        if (result != HjResult::SUCCESS)
         {
             // TODO: set errno
             return total;
@@ -166,7 +166,7 @@ size_t fwrite(const void *ptr, size_t size, size_t count, FILE *file)
 
 int fseek(FILE *file, long offset, int whence)
 {
-    Result r = Result::ERR_NOT_IMPLEMENTED;
+    HjResult r = ERR_NOT_IMPLEMENTED;
 
     ssize64_t offset64 = offset;
 
@@ -183,15 +183,15 @@ int fseek(FILE *file, long offset, int whence)
         r = hj_handle_seek(file->handle, &offset64, HJ_WHENCE_END, NULL);
     }
 
-    return r == Result::SUCCESS ? 0 : -1;
+    return r == HjResult::SUCCESS ? 0 : -1;
 }
 
 long ftell(FILE *stream)
 {
     ssize64_t offset = 0;
-    Result r = hj_handle_seek(stream->handle, nullptr, HJ_WHENCE_CURRENT, &offset);
+    HjResult r = hj_handle_seek(stream->handle, nullptr, HJ_WHENCE_CURRENT, &offset);
 
-    if (r != Result::SUCCESS)
+    if (r != HjResult::SUCCESS)
     {
         // TODO: check error
     }
@@ -255,9 +255,9 @@ int remove(const char *pathname)
 
 int rename(const char *oldpath, const char *newpath)
 {
-    Result r = hj_filesystem_rename(oldpath, strlen(oldpath), newpath, strlen(newpath));
+    HjResult r = hj_filesystem_rename(oldpath, strlen(oldpath), newpath, strlen(newpath));
 
-    return r == Result::SUCCESS ? 0 : -1;
+    return r == HjResult::SUCCESS ? 0 : -1;
 }
 
 int fputs(const char *string, FILE *stream)

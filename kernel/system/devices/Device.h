@@ -107,7 +107,7 @@ public:
         return ERR_NOT_WRITABLE;
     }
 
-    virtual Result call(IOCall request, void *args)
+    virtual HjResult call(IOCall request, void *args)
     {
         UNUSED(request);
         UNUSED(args);

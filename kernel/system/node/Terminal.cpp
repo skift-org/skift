@@ -81,7 +81,7 @@ ResultOr<size_t> FsTerminal::write(FsHandle &handle, const void *buffer, size_t 
     }
 }
 
-Result FsTerminal::call(FsHandle &handle, IOCall request, void *args)
+HjResult FsTerminal::call(FsHandle &handle, IOCall request, void *args)
 {
     UNUSED(handle);
 

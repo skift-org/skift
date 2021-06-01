@@ -1,7 +1,7 @@
 #pragma once
 
 #include <abi/Memory.h>
-#include <libsystem/Result.h>
+#include <abi/Result.h>
 
 #include "archs/Arch.h"
 #include "system/handover/Handover.h"
@@ -15,12 +15,12 @@ size_t memory_get_used();
 
 size_t memory_get_total();
 
-Result memory_map(Arch::AddressSpace *address_space, MemoryRange range, MemoryFlags flags);
+HjResult memory_map(Arch::AddressSpace *address_space, MemoryRange range, MemoryFlags flags);
 
-Result memory_map_identity(Arch::AddressSpace *address_space, MemoryRange range, MemoryFlags flags);
+HjResult memory_map_identity(Arch::AddressSpace *address_space, MemoryRange range, MemoryFlags flags);
 
-Result memory_alloc(Arch::AddressSpace *address_space, size_t size, MemoryFlags flags, uintptr_t *out_address);
+HjResult memory_alloc(Arch::AddressSpace *address_space, size_t size, MemoryFlags flags, uintptr_t *out_address);
 
-Result memory_alloc_identity(Arch::AddressSpace *address_space, MemoryFlags flags, uintptr_t *out_address);
+HjResult memory_alloc_identity(Arch::AddressSpace *address_space, MemoryFlags flags, uintptr_t *out_address);
 
-Result memory_free(Arch::AddressSpace *address_space, MemoryRange range);
+HjResult memory_free(Arch::AddressSpace *address_space, MemoryRange range);

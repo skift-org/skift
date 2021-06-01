@@ -12,12 +12,12 @@ struct Task;
 struct Blocker
 {
 private:
-    Result _result = SUCCESS;
+    HjResult _result = SUCCESS;
     TimeStamp _timeout = -1;
     bool _interrupted = false;
 
 public:
-    Result result() { return _result; }
+    HjResult result() { return _result; }
 
     void timeout(TimeStamp ts) { _timeout = ts; }
 
@@ -35,7 +35,7 @@ public:
         on_timeout(task);
     }
 
-    void interrupt(Task &task, Result result)
+    void interrupt(Task &task, HjResult result)
     {
         _interrupted = true;
         _result = result;

@@ -19,7 +19,7 @@ uint16_t BGA::read_register(uint16_t address)
     return in16(BGA_DATA);
 }
 
-Result BGA::set_resolution(int width, int height)
+HjResult BGA::set_resolution(int width, int height)
 {
     if (width * height * sizeof(uint32_t) > _framebuffer->size())
     {
@@ -86,7 +86,7 @@ ResultOr<size_t> BGA::write(size64_t offset, const void *buffer, size_t size)
     return _framebuffer->write(offset, buffer, size);
 }
 
-Result BGA::call(IOCall request, void *args)
+HjResult BGA::call(IOCall request, void *args)
 {
     if (request == IOCALL_DISPLAY_GET_MODE)
     {

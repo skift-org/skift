@@ -48,7 +48,7 @@ public:
 
     bool exist();
 
-    Result result()
+    HjResult result()
     {
         if (!_handle)
         {

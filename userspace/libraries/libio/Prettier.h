@@ -31,7 +31,7 @@ public:
         return _writer.write(buffer, size);
     }
 
-    Result flush() override
+    HjResult flush() override
     {
         return _writer.flush();
     }

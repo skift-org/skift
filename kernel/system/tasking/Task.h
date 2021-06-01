@@ -54,7 +54,7 @@ struct Task
 
     void state(TaskState state);
 
-    Result cancel(int exit_value);
+    HjResult cancel(int exit_value);
 
     void try_unblock()
     {
@@ -122,10 +122,10 @@ uintptr_t task_user_stack_push_ptr(Task *task, void *ptr);
 
 void task_go(Task *task);
 
-Result task_sleep(Task *task, int timeout);
+HjResult task_sleep(Task *task, int timeout);
 
-Result task_wait(int task_id, int *exit_value);
+HjResult task_wait(int task_id, int *exit_value);
 
-Result task_block(Task *task, Blocker &blocker, Timeout timeout);
+HjResult task_block(Task *task, Blocker &blocker, Timeout timeout);
 
 void task_dump(Task *task);

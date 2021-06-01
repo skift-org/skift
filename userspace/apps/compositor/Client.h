@@ -17,7 +17,7 @@ struct Client
 
     ~Client();
 
-    Result send_message(CompositorMessage message);
+    HjResult send_message(CompositorMessage message);
 
     void handle(const CompositorCreateWindow &create_window);
 

@@ -2,8 +2,8 @@
 #include <abi/IOCall.h>
 #include <abi/Paths.h>
 
+#include <abi/Result.h>
 #include <libgraphic/Framebuffer.h>
-#include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
 
 namespace Graphic
@@ -38,7 +38,7 @@ Framebuffer::~Framebuffer()
     __plug_handle_close(&_handle);
 }
 
-Result Framebuffer::set_resolution(Math::Vec2i size)
+HjResult Framebuffer::set_resolution(Math::Vec2i size)
 {
     auto bitmap = TRY(Bitmap::create_shared(size.x(), size.y()));
 

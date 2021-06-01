@@ -1,7 +1,7 @@
 # hj_handle_copy
 
 ```c
-Result hj_handle_copy(int source, int destination);
+HjResult hj_handle_copy(int source, int destination);
 ```
 
 ## Description

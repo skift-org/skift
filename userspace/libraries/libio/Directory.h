@@ -21,7 +21,7 @@ private:
     Optional<IO::Path> _path = NONE;
     Vector<Entry> _entries;
 
-    Result read_entries();
+    HjResult read_entries();
 
 public:
     const Optional<IO::Path> &path() { return _path; }

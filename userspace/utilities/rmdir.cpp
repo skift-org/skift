@@ -7,7 +7,7 @@ static bool force = false;
 static bool remove_parents = false;
 static bool verbose = false;
 
-Result rmdir(String path)
+HjResult rmdir(String path)
 {
     IO::Directory directory{path};
 
@@ -16,7 +16,7 @@ Result rmdir(String path)
         return ERR_DIRECTORY_NOT_EMPTY;
     }
 
-    Result unlink_result = filesystem_unlink(path.cstring());
+    HjResult unlink_result = filesystem_unlink(path.cstring());
 
     if (unlink_result != SUCCESS)
     {

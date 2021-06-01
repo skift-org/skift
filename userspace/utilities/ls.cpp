@@ -34,7 +34,7 @@ void ls_print_entry(IO::Directory::Entry &entry)
     }
 }
 
-Result ls(String target_path, bool with_prefix)
+HjResult ls(String target_path, bool with_prefix)
 {
     IO::Directory directory{target_path};
 
@@ -90,7 +90,7 @@ int main(int argc, const char *argv[])
         return ls(".", false);
     }
 
-    Result result;
+    HjResult result;
     int exit_code = PROCESS_SUCCESS;
 
     for (auto file : args.argv())

@@ -1,7 +1,7 @@
 # hj_handle_reopen
 
 ```c
-Result hj_handle_reopen(int handle, int *reopened);
+HjResult hj_handle_reopen(int handle, int *reopened);
 ```
 
 ## Description

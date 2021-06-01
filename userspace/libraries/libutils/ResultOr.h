@@ -1,7 +1,7 @@
 #pragma once
 
+#include <abi/Result.h>
 #include <assert.h>
-#include <libsystem/Result.h>
 
 #include <libutils/Optional.h>
 #include <libutils/Std.h>
@@ -13,7 +13,7 @@ template <typename T>
 struct ResultOr
 {
 private:
-    Result _result = SUCCESS;
+    HjResult _result = SUCCESS;
     Optional<T> _value;
 
 public:
@@ -45,24 +45,24 @@ public:
         }
     }
 
-    ALWAYS_INLINE Result result() const { return _result; }
+    ALWAYS_INLINE HjResult result() const { return _result; }
 
     ALWAYS_INLINE const char *description()
     {
         return get_result_description(_result);
     }
 
-    ALWAYS_INLINE ResultOr(Result result) : _result{result}, _value{NONE} {}
+    ALWAYS_INLINE ResultOr(HjResult result) : _result{result}, _value{NONE} {}
 
     ALWAYS_INLINE ResultOr(T value) : _result{SUCCESS}, _value{std::move(value)} {}
 };
 
-ALWAYS_INLINE static inline Result __extract_result(Result r) { return r; }
+ALWAYS_INLINE static inline HjResult __extract_result(HjResult r) { return r; }
 
 template <typename T>
-ALWAYS_INLINE static inline Result __extract_result(ResultOr<T> r) { return r.result(); };
+ALWAYS_INLINE static inline HjResult __extract_result(ResultOr<T> r) { return r.result(); };
 
-ALWAYS_INLINE static inline Result __extract_value(Result r) { return r; }
+ALWAYS_INLINE static inline HjResult __extract_value(HjResult r) { return r; }
 
 template <typename T>
 ALWAYS_INLINE static inline T __extract_value(ResultOr<T> r) { return r.unwrap(); };

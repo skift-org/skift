@@ -1,7 +1,7 @@
-#include "system/Streams.h"
 #include <abi/Paths.h>
 
 #include "devfs/DevicesFileSystem.h"
+#include "system/Streams.h"
 #include "system/devices/Device.h"
 #include "system/devices/Devices.h"
 #include "system/node/Device.h"

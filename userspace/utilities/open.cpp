@@ -7,7 +7,7 @@
 #define FILE_EXTENSIONS_DATABASE_PATH "/Configs/open/file-extensions.json"
 #define FILE_TYPES_DATABASE_PATH "/Configs/open/file-types.json"
 
-Result open(const char *raw_path)
+HjResult open(const char *raw_path)
 {
     auto path = IO::Path::parse(raw_path);
 
@@ -74,7 +74,7 @@ int main(int argc, char const *argv[])
         return PROCESS_FAILURE;
     }
 
-    Result result = open(argv[1]);
+    HjResult result = open(argv[1]);
     if (result != SUCCESS)
     {
         IO::errln("{}: {}: {}", argv[0], argv[1], get_result_description(result));

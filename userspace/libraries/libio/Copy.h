@@ -12,7 +12,7 @@ namespace IO
 
 constexpr int COPY_CHUNK_SIZE = 4096;
 
-static inline Result copy(Reader &from, Writer &to, size_t n)
+static inline HjResult copy(Reader &from, Writer &to, size_t n)
 {
     size_t remaining = n;
 
@@ -40,7 +40,7 @@ static inline Result copy(Reader &from, Writer &to, size_t n)
     } while (1);
 }
 
-static inline Result copy(Reader &from, Writer &to)
+static inline HjResult copy(Reader &from, Writer &to)
 {
     do
     {
@@ -85,7 +85,7 @@ static inline ResultOr<Slice> read_all(MemoryReader &reader)
     }
 }
 
-static inline Result write_all(Writer &writer, Slice data)
+static inline HjResult write_all(Writer &writer, Slice data)
 {
     MemoryReader memory{data};
     return copy(memory, writer);
@@ -130,7 +130,7 @@ static inline ResultOr<size_t> copy_line(Scanner &scan, Writer &to, String delim
     return written;
 }
 
-static inline Result head(Reader &from, Writer &to, char delimiter = '\n', size_t n = 10)
+static inline HjResult head(Reader &from, Writer &to, char delimiter = '\n', size_t n = 10)
 {
     for (size_t i = 0; i < n; i++)
     {
@@ -140,7 +140,7 @@ static inline Result head(Reader &from, Writer &to, char delimiter = '\n', size_
     return SUCCESS;
 }
 
-static inline Result tail(Reader &from, Writer &to, char delimiter = '\n', size_t n = 10)
+static inline HjResult tail(Reader &from, Writer &to, char delimiter = '\n', size_t n = 10)
 {
     Vector<Slice> tail;
 

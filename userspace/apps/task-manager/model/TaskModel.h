@@ -26,7 +26,7 @@ public:
 
     String cpu_greedy();
 
-    Result kill_task(int row);
+    HjResult kill_task(int row);
 };
 
 } // namespace TaskManager

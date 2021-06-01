@@ -17,7 +17,7 @@ TEST(inflate_empty)
     auto result = inf.perform(mem_reader, mem_writer);
 
     // The inflate should have been succesful
-    Assert::equal(result.result(), Result::SUCCESS);
+    Assert::equal(result.result(), HjResult::SUCCESS);
     // The algorithm consumed all input bytes
     Assert::equal(result.unwrap(), sizeof(data));
     // Should have generated no output
@@ -43,7 +43,7 @@ TEST(inflate_empty_no_literals)
     Compression::Inflate inf;
     auto result = inf.perform(mem_reader, mem_writer);
 
-    Assert::equal(result.result(), Result::SUCCESS);
+    Assert::equal(result.result(), HjResult::SUCCESS);
     Assert::equal(mem_writer.length().unwrap(), 0);
 }
 
@@ -60,7 +60,7 @@ TEST(inflate_rle)
     auto result = inf.perform(mem_reader, mem_writer);
 
     // The inflate should have been succesful
-    Assert::equal(result.result(), Result::SUCCESS);
+    Assert::equal(result.result(), HjResult::SUCCESS);
     // The algorithm consumed all input bytes
     Assert::equal(result.unwrap(), sizeof(data));
     // Should have generated 256 bytes
@@ -89,7 +89,7 @@ TEST(inflate_huffman)
     auto result = inf.perform(mem_reader, mem_writer);
 
     // The inflate should have been succesful
-    Assert::equal(result.result(), Result::SUCCESS);
+    Assert::equal(result.result(), HjResult::SUCCESS);
     // The algorithm consumed all input bytes
     Assert::equal(result.unwrap(), sizeof(data));
     // Should have generated 256 bytes
@@ -115,7 +115,7 @@ TEST(inflate_max_matchlen)
     auto result = inf.perform(mem_reader, mem_writer);
 
     // The inflate should have been succesful
-    Assert::equal(result.result(), Result::SUCCESS);
+    Assert::equal(result.result(), HjResult::SUCCESS);
 
     // The algorithm consumed all input bytes
     Assert::equal(result.unwrap(), sizeof(data));
@@ -147,7 +147,7 @@ TEST(inflate_max_matchlen_alt)
     auto result = inf.perform(mem_reader, mem_writer);
 
     // The inflate should have been succesful
-    Assert::equal(result.result(), Result::SUCCESS);
+    Assert::equal(result.result(), HjResult::SUCCESS);
 
     // The algorithm consumed all input bytes
     Assert::equal(result.unwrap(), sizeof(data));
@@ -177,7 +177,7 @@ TEST(inflate_max_matchdist)
     auto result = inf.perform(mem_reader, mem_writer);
 
     // The inflate should have been succesful
-    Assert::equal(result.result(), Result::SUCCESS);
+    Assert::equal(result.result(), HjResult::SUCCESS);
 
     // The algorithm consumed all input bytes
     Assert::equal(result.unwrap(), sizeof(data));

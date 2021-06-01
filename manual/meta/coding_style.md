@@ -175,7 +175,7 @@ int main(int argc, char **argv)
 
 * `return -1` when there is an error
 * `return 0` when there is not
-* When using `Result` for error handling, use the function `result_to_string` for printing errors out
+* When using `HjResult` for error handling, use the function `result_to_string` for printing errors out
 
 **DON'T**
 

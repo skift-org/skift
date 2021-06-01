@@ -151,7 +151,7 @@ String TaskModel::cpu_greedy()
     }
 }
 
-Result TaskModel::kill_task(int row)
+HjResult TaskModel::kill_task(int row)
 {
     return process_cancel(data(row, COLUMN_ID).as_int());
 }

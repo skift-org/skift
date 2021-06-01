@@ -27,7 +27,7 @@ public:
 
     ~Framebuffer();
 
-    Result set_resolution(Math::Vec2i size);
+    HjResult set_resolution(Math::Vec2i size);
 
     void mark_dirty(Math::Recti rectangle);
 

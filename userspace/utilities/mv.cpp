@@ -15,7 +15,7 @@ int main(int argc, char **argv)
         return PROCESS_FAILURE;
     }
 
-    Result result = filesystem_rename(argv[1], argv[2]);
+    HjResult result = filesystem_rename(argv[1], argv[2]);
 
     if (result != SUCCESS)
     {

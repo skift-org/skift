@@ -45,7 +45,7 @@ Optional<String> find_command_path(String command)
     return NONE;
 }
 
-Result shell_exec(
+HjResult shell_exec(
     ShellCommand *command,
     RefPtr<IO::Handle> instream,
     RefPtr<IO::Handle> outstream,
@@ -103,7 +103,7 @@ int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> 
         }
 
         int pid;
-        Result result = shell_exec(command, instream, outstream, &pid);
+        HjResult result = shell_exec(command, instream, outstream, &pid);
         auto path = IO::Path::parse(command->command, IO::Path::PARENT_SHORTHAND);
 
         if (result == SUCCESS)

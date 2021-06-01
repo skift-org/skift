@@ -12,7 +12,7 @@ struct MessageHeader
     size_t payload_length;
 };
 
-Result Protocol::encode_message(IO::Connection &connection, const Message &message)
+HjResult Protocol::encode_message(IO::Connection &connection, const Message &message)
 {
     String path_buffer = "";
 

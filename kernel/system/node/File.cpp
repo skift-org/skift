@@ -1,5 +1,5 @@
+#include <abi/Result.h>
 #include <libmath/MinMax.h>
-#include <libsystem/Result.h>
 #include <string.h>
 
 #include "system/node/File.h"
@@ -17,7 +17,7 @@ FsFile::~FsFile()
     free(_buffer);
 }
 
-Result FsFile::open(FsHandle &handle)
+HjResult FsFile::open(FsHandle &handle)
 {
     if (handle.has_flag(HJ_OPEN_TRUNC))
     {

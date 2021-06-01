@@ -28,7 +28,7 @@ void userspace_initialize()
     early_console_disable(); // We disable the early console to prevent artifact.
 
     int init_process = -1;
-    Result result = launchpad_launch(init_lauchpad, &init_process);
+    HjResult result = launchpad_launch(init_lauchpad, &init_process);
 
     stream_close(serial_device);
 

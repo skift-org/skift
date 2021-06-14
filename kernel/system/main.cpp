@@ -40,8 +40,6 @@ static void splash_screen()
 
 void system_main(Handover *handover)
 {
-    Kernel::logln("Hello, world from libio!");
-
     splash_screen();
     system_initialize();
     memory_initialize(handover);

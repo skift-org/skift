@@ -67,11 +67,6 @@ struct PACKED GDTEntry64
     {
     }
 
-    GDTEntry64(TSS64 *tss, uint8_t access, uint8_t flags)
-        : GDTEntry64((uintptr_t)tss, ((uintptr_t)tss) + sizeof(TSS64), access, flags)
-    {
-    }
-
     constexpr GDTEntry64(uint8_t flags, uint8_t granularity)
         : GDTEntry64(0, 0, granularity, flags)
     {

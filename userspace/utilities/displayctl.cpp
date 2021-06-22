@@ -109,7 +109,7 @@ Shell::ArgParseResult gfxmode_set(String &mode_name)
 
     if (!mode.present())
     {
-        IO::errln("Error: unknow graphic mode: {}", mode_name);
+        IO::errln("Error: unknown graphic mode: {}", mode_name);
         return Shell::ArgParseResult::FAILURE;
     }
 

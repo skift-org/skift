@@ -79,6 +79,8 @@ pushd tarballs
         tar -xf "$GCC_FILENAME"
 
         pushd "$GCC_DIRECTORY"
+            ./contrib/download_prerequisites
+
             if [ "$DEV_MODE" = "1" ]; then
                 git init
                 git add .

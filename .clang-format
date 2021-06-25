@@ -15,5 +15,5 @@ BreakInheritanceList: AfterColon
 IndentPPDirectives: AfterHash
 ForEachMacros: ["__dummy_foreach"]
 SpaceBeforeParens: ControlStatementsExceptForEachMacros
-
+AlignAfterOpenBracket: DontAlign
 ...

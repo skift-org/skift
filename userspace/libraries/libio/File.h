@@ -44,6 +44,8 @@ public:
 
     ResultOr<size_t> length() override;
 
+    ResultOr<HjFileType> type();
+
     virtual RefPtr<Handle> handle() override { return _handle; }
 
     bool exist();

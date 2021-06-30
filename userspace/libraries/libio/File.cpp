@@ -63,16 +63,14 @@ ResultOr<size_t> File::tell()
 
 ResultOr<size_t> File::length()
 {
-    auto result_or_stat = _handle->stat();
+    auto stat = TRY(_handle->stat());
+    return stat.size;
+}
 
-    if (result_or_stat.success())
-    {
-        return result_or_stat.unwrap().size;
-    }
-    else
-    {
-        return 0;
-    }
+ResultOr<HjFileType> File::type()
+{
+    auto stat = TRY(_handle->stat());
+    return stat.type;
 }
 
 bool File::exist()

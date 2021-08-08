@@ -82,7 +82,7 @@ first make sure you have all GCC and binutils dependencies:
  - libmpfr-dev
  - texinfo
 
-You can run the following command on ubuntu:
+You can run the following commands to install the dependencies on different distros:
 
 ```sh
 # On Debian or Debian-based distributions
@@ -108,9 +108,9 @@ $ toolchain/build-it.sh
 ## Then wait for completion
 ```
 
-The script will do the following operation without installing anything to the host system nor requiering root access:
+The script will do the following operation without installing anything to the host system nor requiring root access:
  - Download `gcc` and `binutils` from the GNU project
- - Patch them using binutils.patch and gcc.patch which are located in the toolchain directory.
+ - Patch them using binutils.patch and gcc.patch which are located in the toolchain directory
  - Then configure and build
 
 ### 3. Building

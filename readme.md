@@ -8,8 +8,33 @@
   <a href="https://github.com/skiftOS/skift/releases">Releases</a>
 </p>
 
+```
+Hi everyone,
+
+It's as been a while since I've pushed to this repository.
+
+Skift is not in active development and hasn't been for a
+bit more than two months. There are a few reasons for this,
+the main one is that I'm working on a new micro-kernel
+with @supercyp.
+
+I want to thanks everyone who helped and contributed
+to this project :)
+
+Feel free to fork, but you might want to drop some of the
+latest commits because I was experimenting with a new UI
+framework and broke most UIs.
+
+I'm planning to archive this repository soon.
+
+- Monax
+
+PS: You might want to check out https://github.com/brutal-org/brutal
+```
+
 # skiftOS
 
+[![No Maintenance Intended](https://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 [![Tests](https://github.com/skiftOS/skift/actions/workflows/tests.yml/badge.svg)](https://github.com/skiftOS/skift/actions/workflows/tests.yml)
 [![Deploy](https://github.com/skiftOS/skift/actions/workflows/deploy.yml/badge.svg)](https://github.com/skiftOS/skift/actions/workflows/deploy.yml)
 [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/skiftOS/skift?include_prereleases)](https://github.com/skiftOS/skift/releases)
@@ -17,13 +42,13 @@
 [![GitHub issues](https://img.shields.io/github/issues-raw/skiftOS/skift)](https://github.com/skiftOS/skift/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/skiftOS/skift)](https://github.com/skiftOS/skift/pulls)
 
- - **skiftOS** is an operating system built from scratch in modern C++. 
- - **skiftOS** is featuring a reactive UI library and has a strong emphasis on user experience. 
- - **skiftOS** exposes its features to developers through clean APIs.
- - **skiftOS** includes many applications like an [Image Viewer](./userspace/apps/image-viewer), a [Text Editor](./userspace/apps/text-editor), a [Terminal Emulator](./userspace/apps/terminal), [etc](./userspace/apps)...
- - **skiftOS** features an UNIX-like terminal experience with many familiar UNIX utilities.
- - **skiftOS** is also pretty easy to build from source, just follow the [build guide](manual/meta/building.md).
- - **skiftOS** is capable of running on real hardware.
+- **skiftOS** is an operating system built from scratch in modern C++.
+- **skiftOS** is featuring a reactive UI library and has a strong emphasis on user experience.
+- **skiftOS** exposes its features to developers through clean APIs.
+- **skiftOS** includes many applications like an [Image Viewer](./userspace/apps/image-viewer), a [Text Editor](./userspace/apps/text-editor), a [Terminal Emulator](./userspace/apps/terminal), [etc](./userspace/apps)...
+- **skiftOS** features an UNIX-like terminal experience with many familiar UNIX utilities.
+- **skiftOS** is also pretty easy to build from source, just follow the [build guide](manual/meta/building.md).
+- **skiftOS** is capable of running on real hardware.
 
 # Screenshots
 

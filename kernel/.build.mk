@@ -1,5 +1,5 @@
-include kernel/archs/.build.mk 
-include kernel/modules/.build.mk 
+include kernel/archs/.build.mk
+include kernel/modules/.build.mk
 include kernel/system/.build.mk
 
 KERNEL_LIBRARIES_SOURCES = \

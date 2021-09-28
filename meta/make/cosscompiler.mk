@@ -1,9 +1,9 @@
 
-build/sysroot/System/Includes/%.h: userspace/libraries/%.h
+build/sysroot/System/Includes/%.h: userspace/libs/%.h
 	$(DIRECTORY_GUARD)
 	cp $< $@
 
-build/sysroot/System/Includes/%.h: userspace/libraries/libc/%.h
+build/sysroot/System/Includes/%.h: userspace/libs/libc/%.h
 	$(DIRECTORY_GUARD)
 	cp $< $@
 

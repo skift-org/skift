@@ -4,5 +4,5 @@
 -Ikernel/modules
 -Iuserspace
 -Iuserspace/apps
--Iuserspace/libraries
--Iuserspace/libraries/libc
+-Iuserspace/libs
+-Iuserspace/libs/libc

@@ -45,8 +45,8 @@ BUILD_INCLUDE:= \
 	-Ikernel/modules \
 	-Iuserspace/ \
 	-Iuserspace/apps \
-	-Iuserspace/libraries \
-	-Iuserspace/libraries/libc
+	-Iuserspace/libs \
+	-Iuserspace/libs/libc
 
 BUILD_DEFINES:= \
 	-D__BUILD_ARCH__=\""$(CONFIG_ARCH)"\" \

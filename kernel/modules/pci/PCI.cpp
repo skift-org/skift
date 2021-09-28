@@ -8,14 +8,9 @@
 
 Iteration pci_scan_bus(IterFunc<PCIAddress> &callback, int bus);
 
-Iteration pci_scan_hit(IterFunc<PCIAddress> &callback, PCIAddress &address)
-{
-    return callback(address);
-}
-
 Iteration pci_scan_func(IterFunc<PCIAddress> &callback, PCIAddress &address)
 {
-    if (pci_scan_hit(callback, address) == Iteration::STOP)
+    if (callback(address) == Iteration::STOP)
     {
         return Iteration::STOP;
     }

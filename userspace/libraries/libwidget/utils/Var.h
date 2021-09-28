@@ -5,24 +5,24 @@
 namespace Widget
 {
 
-#define VARIANT_STRING_SIZE 128
+#define VAR_STRING_SIZE 128
 
-enum VarianType
+enum VarType
 {
     INT,
     FLOAT,
     STRING,
 };
 
-struct Variant
+struct Var
 {
 private:
-    VarianType _type;
+    VarType _type;
 
     RefPtr<Graphic::Icon> _icon = nullptr;
     int _as_int;
     float _as_float;
-    char _as_string[VARIANT_STRING_SIZE];
+    char _as_string[VAR_STRING_SIZE];
 
 public:
     bool has_icon()
@@ -32,7 +32,7 @@ public:
 
     RefPtr<Graphic::Icon> icon() { return _icon; }
 
-    VarianType type() { return _type; }
+    VarType type() { return _type; }
 
     int as_int() { return _as_int; }
 
@@ -40,21 +40,21 @@ public:
 
     const char *as_string() { return _as_string; }
 
-    Variant(int value);
+    Var(int value);
 
-    Variant(float value);
+    Var(float value);
 
-    Variant(const char *fmt, ...);
+    Var(const char *fmt, ...);
 
-    Variant(String str);
+    Var(String str);
 
-    Variant with_icon(RefPtr<Graphic::Icon> icon)
+    Var with_icon(RefPtr<Graphic::Icon> icon)
     {
         _icon = icon;
         return *this;
     }
 };
 
-int variant_cmp(Variant left, Variant right);
+int variant_cmp(Var left, Var right);
 
 } // namespace Widget

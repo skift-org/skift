@@ -14,7 +14,7 @@ private:
 
     RefPtr<Bitmap> _bitmap;
 
-    Vector<Math::Recti> _dirty_bounds{};
+    Vec<Math::Recti> _dirty_bounds{};
 
 public:
     static ResultOr<OwnPtr<Framebuffer>> open();

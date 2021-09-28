@@ -15,7 +15,7 @@ struct Application :
     public Async::Source
 {
 private:
-    Vector<Window *> _windows;
+    Vec<Window *> _windows;
     IO::Connection _connection;
     OwnPtr<Async::Notifier> _connection_notifier;
     OwnPtr<Settings::Setting> _setting_theme;

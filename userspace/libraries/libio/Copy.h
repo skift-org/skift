@@ -2,7 +2,7 @@
 
 #include <libutils/Array.h>
 #include <libutils/Slice.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include <libio/MemoryReader.h>
 #include <libio/MemoryWriter.h>
@@ -142,9 +142,10 @@ static inline HjResult head(Reader &from, Writer &to, char delimiter = '\n', siz
 
 static inline HjResult tail(Reader &from, Writer &to, char delimiter = '\n', size_t n = 10)
 {
-    Vector<Slice> tail;
+    Vec<Slice> tail;
 
-    auto append_line = [&](Slice line) {
+    auto append_line = [&](Slice line)
+    {
         tail.push_back(line);
         if (tail.count() > n)
         {

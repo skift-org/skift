@@ -3,7 +3,7 @@
 #include <abi/Mouse.h>
 #include <libutils/Array.h>
 #include <libutils/Lock.h>
-#include <libutils/RingBuffer.h>
+#include <libutils/Ring.h>
 
 #include "ps2/LegacyDevice.h"
 
@@ -11,7 +11,7 @@ struct LegacyMouse : public LegacyDevice
 {
 private:
     Lock _events_lock{"legacy-mouse-event"};
-    RingBuffer<char> _events{sizeof(MousePacket) * 1024};
+    Ring<char> _events{sizeof(MousePacket) * 1024};
     int _cycle = 0;
     Array<uint8_t, 4> _packet;
     bool _quirk_no_mouse_whell = true;

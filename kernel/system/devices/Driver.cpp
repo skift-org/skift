@@ -1,5 +1,5 @@
 #include "system/Streams.h"
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include "pci/PCIDevice.h"
 #include "ps2/LegacyDevice.h"
@@ -21,13 +21,13 @@
 #include "virtio/VirtioGraphic.h"
 #include "virtio/VirtioNetwork.h"
 
-static Vector<DeviceMatcher *> *_matchers;
+static Vec<DeviceMatcher *> *_matchers;
 
 void driver_initialize()
 {
     Kernel::logln("Installing drivers...");
 
-    _matchers = new Vector<DeviceMatcher *>();
+    _matchers = new Vec<DeviceMatcher *>();
 
     _matchers->push_back(new PCIDeviceMatcher<BGA>{"QEMU Graphics Adaptator", 0x1234, 0x1111});
     _matchers->push_back(new PCIDeviceMatcher<BGA>{"Virtual Box Graphics Adaptator", 0x80ee, 0xbeef});

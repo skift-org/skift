@@ -6,7 +6,7 @@
 #include <libutils/Assert.h>
 #include <libutils/OwnPtr.h>
 #include <libutils/RefCounted.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 #include <libwidget/Theme.h>
 
 namespace Widget
@@ -17,7 +17,7 @@ struct TextCursor;
 struct TextModelLine
 {
 private:
-    Vector<Text::Rune> _runes{};
+    Vec<Text::Rune> _runes{};
 
 public:
     Text::Rune operator[](size_t index)
@@ -114,8 +114,8 @@ struct TextModel :
     public Async::Observable<TextModel>
 {
 private:
-    Vector<OwnPtr<TextModelLine>> _lines{1024};
-    Vector<TextModelSpan> _spans{1024};
+    Vec<OwnPtr<TextModelLine>> _lines{1024};
+    Vec<TextModelSpan> _spans{1024};
 
 public:
     static RefPtr<TextModel> empty();
@@ -177,10 +177,9 @@ public:
 
     void span_add(TextModelSpan span)
     {
-        _spans.insert_sorted(span, [](auto &left, auto &right) {
-            return left.line() < right.line() &&
-                   left.start() < right.start();
-        });
+        _spans.insert_sorted(span, [](auto &left, auto &right)
+            { return left.line() < right.line() &&
+                     left.start() < right.start(); });
     }
 
     TextModelSpan span_at(size_t line, size_t column)

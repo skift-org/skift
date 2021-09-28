@@ -73,7 +73,7 @@ static inline RefPtr<Element> stack(RefPtr<Element> child)
     return layout;
 }
 
-static inline RefPtr<Element> stack(Vector<RefPtr<Element>> children)
+static inline RefPtr<Element> stack(Vec<RefPtr<Element>> children)
 {
     auto layout = make<StackLayout>();
     layout->add(children);

@@ -7,7 +7,7 @@
 #include <libio/MemoryWriter.h>
 #include <libio/Skip.h>
 #include <libio/Streams.h>
-#include <libutils/InlineRingBuffer.h>
+#include <libutils/InlineRing.h>
 
 namespace Compression
 {
@@ -66,7 +66,7 @@ static constexpr uint8_t BASE_DISTANCE_EXTRA_BITS[] = {
     13, 13,     //28-29
 };
 
-void Inflate::get_bit_length_count(HashMap<unsigned int, unsigned int> &bit_length_count, const Vector<unsigned int> &code_bit_lengths)
+void Inflate::get_bit_length_count(HashMap<unsigned int, unsigned int> &bit_length_count, const Vec<unsigned int> &code_bit_lengths)
 {
     for (unsigned int i = 0; i != code_bit_lengths.count(); i++)
     {
@@ -94,7 +94,7 @@ void Inflate::get_first_code(HashMap<unsigned int, unsigned int> &first_codes, H
     }
 }
 
-void Inflate::assign_huffman_codes(Vector<unsigned int> &assigned_codes, const Vector<unsigned int> &code_bit_lengths, HashMap<unsigned int, unsigned int> &first_codes)
+void Inflate::assign_huffman_codes(Vec<unsigned int> &assigned_codes, const Vec<unsigned int> &code_bit_lengths, HashMap<unsigned int, unsigned int> &first_codes)
 {
     assigned_codes.resize(code_bit_lengths.count());
 
@@ -111,7 +111,7 @@ void Inflate::assign_huffman_codes(Vector<unsigned int> &assigned_codes, const V
     }
 }
 
-void Inflate::build_huffman_alphabet(Vector<unsigned int> &alphabet, const Vector<unsigned int> &code_bit_lengths)
+void Inflate::build_huffman_alphabet(Vec<unsigned int> &alphabet, const Vec<unsigned int> &code_bit_lengths)
 {
     HashMap<unsigned int, unsigned int> bit_length_count, first_codes;
 
@@ -162,8 +162,8 @@ void Inflate::build_fixed_huffman_alphabet()
 
 HjResult Inflate::build_dynamic_huffman_alphabet(IO::BitReader &input)
 {
-    Vector<unsigned int> code_length_of_code_length_order = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
-    Vector<unsigned int> code_length_of_code_length = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    Vec<unsigned int> code_length_of_code_length_order = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
+    Vec<unsigned int> code_length_of_code_length = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     unsigned int hlit = input.grab_bits(5) + 257;
     unsigned int hdist = input.grab_bits(5) + 1;
@@ -180,10 +180,10 @@ HjResult Inflate::build_dynamic_huffman_alphabet(IO::BitReader &input)
         code_length_of_code_length[code_length_of_code_length_order[i]] = input.grab_bits(3);
     }
 
-    Vector<unsigned int> lit_len_and_dist_alphabets;
+    Vec<unsigned int> lit_len_and_dist_alphabets;
     build_huffman_alphabet(lit_len_and_dist_alphabets, code_length_of_code_length);
 
-    Vector<unsigned int> lit_len_and_dist_trees_unpacked;
+    Vec<unsigned int> lit_len_and_dist_trees_unpacked;
     HuffmanDecoder huffman(lit_len_and_dist_alphabets, code_length_of_code_length);
     while (lit_len_and_dist_trees_unpacked.count() < (hdist + hlit))
     {
@@ -281,10 +281,10 @@ FLATTEN HjResult Inflate::read_blocks(IO::Reader &reader, IO::Writer &uncompress
 
             // Do the actual huffman decoding
             HuffmanDecoder symbol_decoder(btype == BT_FIXED_HUFFMAN ? _fixed_alphabet : _lit_len_alphabet,
-                                          btype == BT_FIXED_HUFFMAN ? _fixed_code_bit_lengths : _lit_len_code_bit_length);
+                btype == BT_FIXED_HUFFMAN ? _fixed_code_bit_lengths : _lit_len_code_bit_length);
 
             HuffmanDecoder dist_decoder(btype == BT_FIXED_HUFFMAN ? _fixed_dist_alphabet : _dist_alphabet,
-                                        btype == BT_FIXED_HUFFMAN ? _fixed_dist_code_bit_lengths : _dist_code_bit_length);
+                btype == BT_FIXED_HUFFMAN ? _fixed_dist_code_bit_lengths : _dist_code_bit_length);
 
             while (true)
             {

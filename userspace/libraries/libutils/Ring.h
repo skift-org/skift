@@ -1,77 +1,97 @@
 #pragma once
 
+#include <assert.h>
+#include <string.h>
+
 #include <libutils/Std.h>
 
 namespace Utils
 {
 
-template <typename T, size_t N>
-struct InlineRingBuffer
+template <typename T>
+struct Ring
 {
 private:
     size_t _head = 0;
     size_t _tail = 0;
+    size_t _size = 0;
     size_t _used = 0;
 
-    T _buffer[N] = {};
+    T *_buffer = nullptr;
 
 public:
-    InlineRingBuffer() {}
-
-    InlineRingBuffer(const InlineRingBuffer &other)
-        : _head(other._head),
-          _tail(other._tail),
-          _used(other._used)
+    Ring(size_t size)
     {
-        memcpy(_buffer, other._buffer, N);
+        _size = size;
+        _buffer = new T[size];
     }
 
-    InlineRingBuffer(InlineRingBuffer &&other)
+    Ring(const Ring &other) : _head(other._head),
+                              _tail(other._tail),
+                              _size(other._size),
+                              _used(other._used)
+    {
+        _buffer = new T[other._size];
+        memcpy(_buffer, other._buffer, other._size);
+    }
+
+    Ring(Ring &&other)
         : _head(other._head),
           _tail(other._tail),
+          _size(other._size),
           _used(other._used),
           _buffer(other._buffer)
     {
         other._head = 0;
         other._tail = 0;
+        other._size = 0;
         other._used = 0;
         other._buffer = nullptr;
     }
 
-    void flush()
+    Ring &operator=(const Ring &other)
     {
-        _head = 0;
-        _tail = 0;
-        _used = 0;
+        return *this = Ring(other);
     }
 
-    InlineRingBuffer &operator=(const InlineRingBuffer &other)
-    {
-        return *this = InlineRingBuffer(other);
-    }
-
-    InlineRingBuffer &operator=(InlineRingBuffer &&other)
+    Ring &operator=(Ring &&other)
     {
         std::swap(_head, other._head);
         std::swap(_tail, other._tail);
+        std::swap(_size, other._size);
         std::swap(_used, other._used);
         std::swap(_buffer, other._buffer);
 
         return *this;
     }
 
-    bool empty() const { return _used == 0; }
+    ~Ring()
+    {
+        if (_buffer)
+            delete[] _buffer;
+    }
 
-    bool full() const { return _used == N; }
+    bool empty() const
+    {
+        return _used == 0;
+    }
 
-    size_t used() const { return _used; }
+    bool full() const
+    {
+        return _used == _size;
+    }
+
+    size_t used() const
+    {
+        return _used;
+    }
 
     void put(T c)
     {
         assert(!full());
 
         _buffer[_head] = c;
-        _head = (_head + 1) % N;
+        _head = (_head + 1) % (_size);
         _used++;
     }
 
@@ -79,8 +99,8 @@ public:
     {
         assert(!empty());
 
-        T c = _buffer[_tail];
-        _tail = (_tail + 1) % N;
+        char c = _buffer[_tail];
+        _tail = (_tail + 1) % (_size);
         _used--;
 
         return c;
@@ -88,7 +108,7 @@ public:
 
     T peek(size_t peek)
     {
-        int offset = (_tail + peek) % N;
+        int offset = (_tail + peek) % (_size);
 
         return _buffer[offset];
     }

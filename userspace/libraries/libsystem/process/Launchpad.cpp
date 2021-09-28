@@ -76,7 +76,7 @@ void launchpad_argument(Launchpad *launchpad, const char *argument)
     launchpad->argc++;
 }
 
-void launchpad_arguments(Launchpad *launchpad, const Vector<String> &arguments)
+void launchpad_arguments(Launchpad *launchpad, const Vec<String> &arguments)
 {
     for (size_t i = 0; i < arguments.count(); i++)
     {

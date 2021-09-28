@@ -6,7 +6,7 @@
 #include <libio/Scanner.h>
 #include <libio/Write.h>
 #include <libutils/String.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace IO
 {
@@ -14,7 +14,7 @@ struct Path
 {
 private:
     bool _absolute = false;
-    Vector<String> _elements{};
+    Vec<String> _elements{};
 
 public:
     static constexpr int PARENT_SHORTHAND = 1; // .... -> ../../..
@@ -62,7 +62,7 @@ public:
 
         auto parse_shorthand = [](auto &scan)
         {
-            Vector<String> elements{};
+            Vec<String> elements{};
 
             scan.skip_word("..");
             elements.push("..");
@@ -77,7 +77,7 @@ public:
             return elements;
         };
 
-        Vector<String> elements{};
+        Vec<String> elements{};
 
         while (!scan.ended())
         {
@@ -141,7 +141,7 @@ public:
 
     static Path join(const Path &left, const Path &right)
     {
-        Vector<String> combined_elements{};
+        Vec<String> combined_elements{};
 
         combined_elements.push_back_many(left._elements);
         combined_elements.push_back_many(right._elements);
@@ -157,7 +157,7 @@ public:
     {
     }
 
-    Path(bool absolute, Vector<String> &&elements) : _absolute(absolute), _elements(elements)
+    Path(bool absolute, Vec<String> &&elements) : _absolute(absolute), _elements(elements)
     {
     }
 
@@ -216,7 +216,7 @@ public:
 
     Path normalized()
     {
-        Vector<String> stack{};
+        Vec<String> stack{};
 
         _elements.foreach([&](auto &element)
             {
@@ -313,7 +313,7 @@ public:
 
     Path dirpath() const
     {
-        Vector<String> stack{};
+        Vec<String> stack{};
 
         if (length() > 0)
         {
@@ -353,7 +353,7 @@ public:
 
     Path parent(size_t index) const
     {
-        Vector<String> stack{};
+        Vec<String> stack{};
 
         if (index <= length())
         {

@@ -2,7 +2,7 @@
 
 #include <libio/Directory.h>
 #include <libio/Path.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 #include <libwidget/model/TableModel.h>
 
 #include <libfilepicker/model/FileInfo.h>
@@ -15,7 +15,7 @@ struct FilesystemModel : public Widget::TableModel
 {
 private:
     RefPtr<Navigation> _navigation;
-    Vector<FileInfo> _files{};
+    Vec<FileInfo> _files{};
     OwnPtr<Async::Observer<Navigation>> _observer;
     Func<bool(IO::Directory::Entry &)> _filter;
 
@@ -28,7 +28,7 @@ public:
 
     String header(int column) override;
 
-    Widget::Variant data(int row, int column) override;
+    Widget::Var data(int row, int column) override;
 
     void update() override;
 

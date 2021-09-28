@@ -24,20 +24,20 @@ public:
 
     RefPtr<Element> build()
     {
-        Vector<RefPtr<Element>> children;
+        Vec<RefPtr<Element>> children;
 
         for (size_t i = 0; i < _bookmarks->all().count(); i++)
         {
             auto bookmark = _bookmarks->all()[i];
 
-            children.push_back(Widget::basic_button(bookmark.icon(), bookmark.name(), [this, bookmark] {
-                _navigation->navigate(bookmark.path());
-            }));
+            children.push_back(Widget::basic_button(bookmark.icon(), bookmark.name(), [this, bookmark]
+                { _navigation->navigate(bookmark.path()); }));
         }
 
         return Widget::observer(
             *_bookmarks,
-            [&] {
+            [&]
+            {
                 return Widget::vflow({
                     Widget::label("Bookmarks"),
                     Widget::scroll(Widget::vflow(children)),

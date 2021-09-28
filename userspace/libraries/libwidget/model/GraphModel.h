@@ -12,7 +12,7 @@ struct GraphModel :
     public Async::Observable<GraphModel>
 {
 private:
-    Vector<float> _data{};
+    Vec<float> _data{};
     size_t _current = 0;
 
 public:
@@ -26,7 +26,7 @@ public:
         return _current / (float)_data.count();
     }
 
-    const Vector<float> &data() const
+    const Vec<float> &data() const
     {
         return _data;
     }

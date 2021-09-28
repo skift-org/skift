@@ -21,7 +21,7 @@ static const IOCallDisplayModeArgs GFX_MODES[] = {
     {3840, 2160},
 };
 
-Optional<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
+Opt<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
 {
     for (size_t i = 0; i < ARRAY_LENGTH(GFX_MODES); i++)
     {
@@ -60,8 +60,8 @@ Shell::ArgParseResult gfxmode_get()
     }
 
     IO::outln("Height: {}\nWidth: {}\n",
-              framebuffer_info.width,
-              framebuffer_info.height);
+        framebuffer_info.width,
+        framebuffer_info.height);
 
     return Shell::ArgParseResult::SHOULD_FINISH;
 }
@@ -145,17 +145,14 @@ int main(int argc, const char *argv[])
 
     args.prologue("Get or set graphics modes.");
 
-    args.option('l', "list", "List all available graphics modes.", [](auto &) {
-        return gfxmode_list();
-    });
+    args.option('l', "list", "List all available graphics modes.", [](auto &)
+        { return gfxmode_list(); });
 
-    args.option('g', "get", "Get the current graphic mode.", [](auto &) {
-        return gfxmode_get();
-    });
+    args.option('g', "get", "Get the current graphic mode.", [](auto &)
+        { return gfxmode_get(); });
 
-    args.option_string('s', "set", "Set graphic mode.", [&](String &mode) {
-        return gfxmode_set(mode);
-    });
+    args.option_string('s', "set", "Set graphic mode.", [&](String &mode)
+        { return gfxmode_set(mode); });
 
     args.epiloge("Options can be combined.");
 

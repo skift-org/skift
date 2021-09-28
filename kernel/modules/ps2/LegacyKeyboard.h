@@ -2,7 +2,7 @@
 
 #include <abi/Keyboard.h>
 #include <libutils/Lock.h>
-#include <libutils/RingBuffer.h>
+#include <libutils/Ring.h>
 
 #include "ps2/LegacyDevice.h"
 
@@ -12,7 +12,7 @@ struct LegacyKeyboard : public LegacyDevice
 {
 private:
     Lock _events_lock{"legacy-keyboard-event"};
-    RingBuffer<char> _events{sizeof(KeyboardPacket) * 1024};
+    Ring<char> _events{sizeof(KeyboardPacket) * 1024};
     bool _escaped = false;
     KeyMap *_keymap = nullptr;
     KeyMotion _keystate[__KEY_COUNT] = {};

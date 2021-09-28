@@ -118,7 +118,7 @@ ZipArchive::ZipArchive(IO::Path path, bool read) : Archive(path)
     }
 }
 
-HjResult read_local_headers(IO::SeekableReader auto &reader, Vector<Archive::Entry> &entries)
+HjResult read_local_headers(IO::SeekableReader auto &reader, Vec<Archive::Entry> &entries)
 {
     // Read all local file headers and data descriptors
     while (TRY(reader.tell()) < (TRY(reader.length()) - sizeof(LocalHeader)))
@@ -250,7 +250,7 @@ HjResult write_entry(const Archive::Entry &entry, IO::Writer &writer, IO::Reader
     return IO::copy(compressed, writer);
 }
 
-HjResult write_central_directory(IO::SeekableWriter auto &writer, Vector<Archive::Entry> &entries)
+HjResult write_central_directory(IO::SeekableWriter auto &writer, Vec<Archive::Entry> &entries)
 {
     auto start = TRY(writer.tell());
     for (const auto &entry : entries)

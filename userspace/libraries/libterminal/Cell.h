@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libterminal/Attributes.h>
+#include <libterminal/Attrs.h>
 #include <libtext/Rune.h>
 
 namespace Terminal
@@ -9,7 +9,7 @@ namespace Terminal
 struct Cell
 {
     Text::Rune rune = U' ';
-    Attributes attributes;
+    Attrs attributes;
     bool dirty;
 };
 

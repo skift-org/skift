@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libmath/Vec2.h>
-#include <libutils/Optional.h>
+#include <libutils/Opt.h>
 #include <math.h>
 
 namespace Math
@@ -48,7 +48,7 @@ public:
         return {x, y};
     }
 
-    Optional<Math::Vec2<Scalar>> intersection(Edge other)
+    Opt<Math::Vec2<Scalar>> intersection(Edge other)
     {
         float dx12 = ex() - sx();
         float dy12 = ey() - sy();

@@ -7,21 +7,17 @@
 
 MenuEntry::MenuEntry(String id, const Json::Value &value)
 {
-    value.with("name", [this](auto &v) {
-        name = v.as_string();
-    });
+    value.with("name", [this](auto &v)
+        { name = v.as_string(); });
 
-    value.with("comment", [this](auto &v) {
-        comment = v.as_string();
-    });
+    value.with("comment", [this](auto &v)
+        { comment = v.as_string(); });
 
-    value.with("icon", [this](auto &v) {
-        icon = Graphic::Icon::get(v.as_string());
-    });
+    value.with("icon", [this](auto &v)
+        { icon = Graphic::Icon::get(v.as_string()); });
 
-    value.with("command", [this](auto &v) {
-        command = v.as_string();
-    });
+    value.with("command", [this](auto &v)
+        { command = v.as_string(); });
 
     auto bitmap = Graphic::Bitmap::load_from(IO::format("/Applications/{}/{}.png", id, id));
 
@@ -33,9 +29,9 @@ MenuEntry::MenuEntry(String id, const Json::Value &value)
     image = bitmap.unwrap();
 }
 
-Vector<MenuEntry> MenuEntry::load()
+Vec<MenuEntry> MenuEntry::load()
 {
-    static Vector<MenuEntry> entries;
+    static Vec<MenuEntry> entries;
 
     if (entries.count() != 0)
     {
@@ -61,9 +57,8 @@ Vector<MenuEntry> MenuEntry::load()
         }
     }
 
-    entries.sort([](auto &a, auto &b) {
-        return strcmp(a.name.cstring(), b.name.cstring());
-    });
+    entries.sort([](auto &a, auto &b)
+        { return strcmp(a.name.cstring(), b.name.cstring()); });
 
     return entries;
 }

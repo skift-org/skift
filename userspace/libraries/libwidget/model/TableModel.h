@@ -2,7 +2,7 @@
 
 #include <libasync/Observable.h>
 #include <libgraphic/Color.h>
-#include <libwidget/utils/Variant.h>
+#include <libwidget/utils/Var.h>
 
 namespace Widget
 {
@@ -33,7 +33,7 @@ public:
         return "<no header>";
     }
 
-    virtual Variant data(int row, int column)
+    virtual Var data(int row, int column)
     {
         UNUSED(row);
         UNUSED(column);

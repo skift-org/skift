@@ -17,12 +17,13 @@ ResultOr<String> readline(
     History &history)
 {
     size_t last_cursor = 0;
-    Optional<size_t> history_index;
+    Opt<size_t> history_index;
     LineEditor editor{};
     IO::Scanner scan{input};
     bool should_continue = true;
 
-    auto recall_history = [&]() {
+    auto recall_history = [&]()
+    {
         if (history_index.present())
         {
             editor.line(history.peek(history_index.unwrap()));
@@ -30,7 +31,8 @@ ResultOr<String> readline(
         }
     };
 
-    auto current_line = [&]() {
+    auto current_line = [&]()
+    {
         if (history_index.present())
         {
             return history.peek(history_index.unwrap());
@@ -41,7 +43,8 @@ ResultOr<String> readline(
         }
     };
 
-    auto current_cursor = [&]() {
+    auto current_cursor = [&]()
+    {
         if (history_index.present())
         {
             return history.peek(history_index.unwrap()).count();
@@ -52,7 +55,8 @@ ResultOr<String> readline(
         }
     };
 
-    auto line_as_string = [&]() -> String {
+    auto line_as_string = [&]() -> String
+    {
         IO::MemoryWriter memory;
 
         for (auto &rune : current_line())
@@ -65,7 +69,8 @@ ResultOr<String> readline(
         return memory.string();
     };
 
-    auto render = [&]() {
+    auto render = [&]()
+    {
         TRY(IO::format(output, "\e[{}D\e[J", last_cursor));
         TRY(IO::write(output, line_as_string()));
         TRY(IO::format(output, "\e[{}D", current_line().count()));

@@ -15,7 +15,7 @@ HjResult tac(IO::Reader &reader)
     }
 
     IO::Scanner scanner(reader);
-    Vector<String> lines;
+    Vec<String> lines;
 
     while (!scanner.ended())
     {
@@ -54,15 +54,17 @@ int main(int argc, char const *argv[])
     args.usage("NAME...");
     args.usage("[OPTION]... NAME...");
 
-    args.option_string('s', "separator", "Choose the separator to be used instead of \\n", [&](String &s) {
-        separator = s;
-        return Shell::ArgParseResult::SHOULD_CONTINUE;
-    });
+    args.option_string('s', "separator", "Choose the separator to be used instead of \\n", [&](String &s)
+        {
+            separator = s;
+            return Shell::ArgParseResult::SHOULD_CONTINUE;
+        });
 
-    args.option_bool('b', "before", "Attach the separator before instead of after the string", [&](bool value) {
-        before = value;
-        return Shell::ArgParseResult::SHOULD_CONTINUE;
-    });
+    args.option_bool('b', "before", "Attach the separator before instead of after the string", [&](bool value)
+        {
+            before = value;
+            return Shell::ArgParseResult::SHOULD_CONTINUE;
+        });
 
     auto parse_result = args.eval(argc, argv);
     if (parse_result != Shell::ArgParseResult::SHOULD_CONTINUE)

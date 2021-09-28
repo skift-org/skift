@@ -43,27 +43,24 @@ static void resolve(int index, auto storage, auto visitor)
 }
 
 template <typename... Ts>
-struct VariantOperations
+struct VarOperations
 {
     inline static void destroy(int index, void *storage)
     {
-        resolve<Ts...>(index, storage, []<typename T>(T &t) {
-            t.~T();
-        });
+        resolve<Ts...>(index, storage, []<typename T>(T &t)
+            { t.~T(); });
     }
 
     inline static void move(int index, void *source, void *destination)
     {
-        resolve<Ts...>(index, source, [&]<typename T>(T &t) {
-            new (destination) T(::std::move(t));
-        });
+        resolve<Ts...>(index, source, [&]<typename T>(T &t)
+            { new (destination) T(::std::move(t)); });
     }
 
     inline static void copy(int index, const void *source, void *destination)
     {
-        resolve<Ts...>(index, source, [&]<typename T>(const T &t) {
-            new (destination) T(t);
-        });
+        resolve<Ts...>(index, source, [&]<typename T>(const T &t)
+            { new (destination) T(t); });
     }
 
     /* --- Visit ------------------------------------------------------------ */
@@ -82,19 +79,19 @@ struct AlignedStorage
 };
 
 template <typename... Ts>
-struct Variant
+struct Var
 {
 private:
     static const size_t data_size = Max<sizeof(Ts)...>::value;
     static const size_t data_align = Max<alignof(Ts)...>::value;
 
-    using Operations = VariantOperations<Ts...>;
+    using Operations = VarOperations<Ts...>;
 
     int _index = -1;
     AlignedStorage<data_size, data_align> _storage;
 
 public:
-    Variant()
+    Var()
     {
         _index = 0;
         new (&_storage) typename First<Ts...>::Type();
@@ -102,30 +99,30 @@ public:
 
     template <typename T>
     requires In<T, Ts...>
-    Variant(T value)
+    Var(T value)
     {
         _index = IndexOf<T, Ts...>();
         new (&_storage) T(value);
     }
 
-    Variant(const Variant<Ts...> &other)
+    Var(const Var<Ts...> &other)
     {
         _index = other._index;
         Operations::copy(other._index, &other._storage, &_storage);
     }
 
-    Variant(Variant<Ts...> &&other)
+    Var(Var<Ts...> &&other)
     {
         _index = other._index;
         Operations::move(other._index, &other._storage, &_storage);
     }
 
-    ~Variant()
+    ~Var()
     {
         Operations::destroy(_index, &_storage);
     }
 
-    Variant<Ts...> &operator=(const Variant<Ts...> &other)
+    Var<Ts...> &operator=(const Var<Ts...> &other)
     {
         Operations::destroy(_index, &_storage);
         _index = other._index;
@@ -134,7 +131,7 @@ public:
         return *this;
     }
 
-    Variant<Ts...> &operator=(Variant<Ts...> &&other)
+    Var<Ts...> &operator=(Var<Ts...> &&other)
     {
         if (this != &other)
         {

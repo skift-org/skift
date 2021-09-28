@@ -19,9 +19,8 @@ enum Column
 ArchiveListing::ArchiveListing(RefPtr<Navigation> navigation, RefPtr<Archive> archive)
     : _navigation(navigation), _archive(archive)
 {
-    _observer = navigation->observe([this](auto &) {
-        update();
-    });
+    _observer = navigation->observe([this](auto &)
+        { update(); });
 
     update();
 }
@@ -57,14 +56,14 @@ String ArchiveListing::header(int column)
     }
 }
 
-Widget::Variant ArchiveListing::data(int row, int column)
+Widget::Var ArchiveListing::data(int row, int column)
 {
     auto &entry = _entries[row];
 
     switch (column)
     {
     case COLUMN_NAME:
-        return Widget::Variant(entry.name.cstring()).with_icon(entry.icon);
+        return Widget::Var(entry.name.cstring()).with_icon(entry.icon);
 
     case COLUMN_TYPE:
         switch (entry.type)
@@ -80,10 +79,10 @@ Widget::Variant ArchiveListing::data(int row, int column)
         }
 
     case COLUMN_COMPRESSED_SIZE:
-        return Widget::Variant((int)entry.compressed_size);
+        return Widget::Var((int)entry.compressed_size);
 
     case COLUMN_UNCOMPRESSED_SIZE:
-        return Widget::Variant((int)entry.uncompressed_size);
+        return Widget::Var((int)entry.uncompressed_size);
 
     default:
         ASSERT_NOT_REACHED();

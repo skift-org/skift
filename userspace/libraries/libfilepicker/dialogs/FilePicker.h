@@ -21,7 +21,7 @@ struct Dialog : public ::Widget::Dialog
 {
 private:
     RefPtr<Navigation> _navigation = nullptr;
-    Optional<String> _selected_file = NONE;
+    Opt<String> _selected_file = NONE;
     RefPtr<Browser> _browser;
     DialogFlags _flags;
     RefPtr<Widget::TextField> _text_field;
@@ -33,7 +33,7 @@ public:
 
     virtual ~Dialog() {}
 
-    Optional<String> selected_file() const { return _selected_file; }
+    Opt<String> selected_file() const { return _selected_file; }
 
     virtual void render(Widget::Window *window) override;
     virtual void on_button(Widget::DialogButton btn) override;

@@ -36,7 +36,7 @@ void typed_move(T *destination, T *source, size_t count)
 }
 
 template <typename T>
-struct Vector
+struct Vec
 {
 private:
     T *_storage = nullptr;
@@ -65,14 +65,14 @@ public:
         return _storage[index];
     }
 
-    Vector() : Vector(16) {}
+    Vec() : Vec(16) {}
 
-    Vector(size_t capacity)
+    Vec(size_t capacity)
     {
         ensure_capacity(capacity);
     }
 
-    Vector(std::initializer_list<T> data)
+    Vec(std::initializer_list<T> data)
     {
         ensure_capacity(data.size());
 
@@ -82,14 +82,14 @@ public:
         }
     }
 
-    Vector(AdoptTag, T *storage, size_t size)
+    Vec(AdoptTag, T *storage, size_t size)
         : _storage(storage),
           _count(size),
           _capacity(size)
     {
     }
 
-    Vector(const Vector &other)
+    Vec(const Vec &other)
     {
         ensure_capacity(other.count());
 
@@ -97,14 +97,14 @@ public:
         typed_copy(_storage, other._storage, _count);
     }
 
-    Vector(Vector &&other)
+    Vec(Vec &&other)
     {
         std::swap(_storage, other._storage);
         std::swap(_count, other._count);
         std::swap(_capacity, other._capacity);
     }
 
-    ~Vector()
+    ~Vec()
     {
         clear();
 
@@ -112,7 +112,7 @@ public:
             free(_storage);
     }
 
-    Vector &operator=(const Vector &other)
+    Vec &operator=(const Vec &other)
     {
         if (this != &other)
         {
@@ -126,7 +126,7 @@ public:
         return *this;
     }
 
-    Vector &operator=(Vector &&other)
+    Vec &operator=(Vec &&other)
     {
         if (this != &other)
         {
@@ -152,12 +152,12 @@ public:
         return _storage[index];
     }
 
-    bool operator!=(const Vector &other) const
+    bool operator!=(const Vec &other) const
     {
         return !(*this == other);
     }
 
-    bool operator==(const Vector &other) const
+    bool operator==(const Vec &other) const
     {
         if (this == &other)
         {
@@ -510,7 +510,7 @@ public:
         return _storage[_count - 1];
     }
 
-    void push_back_many(const Vector<T> &values)
+    void push_back_many(const Vec<T> &values)
     {
         for (size_t i = 0; i < values.count(); i++)
         {
@@ -576,20 +576,20 @@ public:
 };
 
 template <typename T>
-struct IsVector : public FalseType
+struct IsVec : public FalseType
 {
 };
 
 template <typename T>
-struct IsVector<Vector<T>> : public TrueType
+struct IsVec<Vec<T>> : public TrueType
 {
 };
 
 template <typename T>
-struct TrimVector;
+struct TrimVec;
 
 template <typename T>
-struct TrimVector<Vector<T>>
+struct TrimVec<Vec<T>>
 {
     typedef T type;
 };

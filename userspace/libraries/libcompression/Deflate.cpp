@@ -33,7 +33,7 @@ void Deflate::write_uncompressed_block(const uint8_t *block_data, size_t block_l
 
 HjResult Deflate::write_uncompressed_blocks(IO::Reader &in_data, IO::BitWriter &out_writer, bool write_final)
 {
-    Vector<uint8_t> block_data;
+    Vec<uint8_t> block_data;
     block_data.resize(UINT16_MAX);
     bool final_block = false;
 

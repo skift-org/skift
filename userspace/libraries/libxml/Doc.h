@@ -3,22 +3,24 @@
 #include <libio/Reader.h>
 #include <libio/Scanner.h>
 #include <libutils/String.h>
-#include <libxml/Declaration.h>
+#include <libxml/Decl.h>
 #include <libxml/Node.h>
 
 namespace Xml
 {
-struct Document
+
+struct Doc
 {
 private:
     Node _root;
-    Declaration _declaration;
+    Decl _decl;
 
 public:
-    Declaration &declaration() { return _declaration; }
-    void declaration(Declaration declaration) { _declaration = declaration; }
+    Decl &decl() { return _decl; }
+    void decl(Decl decl) { _decl = decl; }
 
     Node &root() { return _root; }
     void root(Node node) { _root = node; }
 };
+
 } // namespace Xml

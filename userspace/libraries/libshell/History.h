@@ -8,7 +8,7 @@ namespace Shell
 struct History
 {
 private:
-    Vector<Line> _history;
+    Vec<Line> _history;
 
 public:
     void commit(Line line)

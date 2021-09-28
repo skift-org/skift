@@ -3,7 +3,7 @@
 #include <libgraphic/Icon.h>
 #include <libjson/Json.h>
 #include <libutils/String.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 struct MenuEntry
 {
@@ -16,5 +16,5 @@ struct MenuEntry
 
     MenuEntry(String id, const Json::Value &value);
 
-    static Vector<MenuEntry> load();
+    static Vec<MenuEntry> load();
 };

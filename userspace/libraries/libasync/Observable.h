@@ -2,7 +2,7 @@
 
 #include <libutils/Func.h>
 #include <libutils/OwnPtr.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Async
 {
@@ -53,7 +53,7 @@ private:
     NONCOPYABLE(Observable);
     NONMOVABLE(Observable);
 
-    Vector<_Observer *> _observers{};
+    Vec<_Observer *> _observers{};
 
     void register_observer(_Observer *ob)
     {
@@ -83,7 +83,7 @@ public:
 
     void did_update()
     {
-        Vector<_Observer *> observers_copy{_observers};
+        Vec<_Observer *> observers_copy{_observers};
 
         for (size_t i = 0; i < observers_copy.count(); i++)
         {

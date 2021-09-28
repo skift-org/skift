@@ -8,11 +8,11 @@ namespace Compression
 struct HuffmanDecoder
 {
 private:
-    const Vector<unsigned int> &_alphabet;
-    const Vector<unsigned int> &_code_bit_lengths;
+    const Vec<unsigned int> &_alphabet;
+    const Vec<unsigned int> &_code_bit_lengths;
 
 public:
-    inline HuffmanDecoder(Vector<unsigned int> &alphabet, Vector<unsigned int> &code_bit_lengths) : _alphabet(alphabet), _code_bit_lengths(code_bit_lengths)
+    inline HuffmanDecoder(Vec<unsigned int> &alphabet, Vec<unsigned int> &code_bit_lengths) : _alphabet(alphabet), _code_bit_lengths(code_bit_lengths)
     {
     }
 

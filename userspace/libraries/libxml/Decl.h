@@ -1,13 +1,13 @@
 #pragma once
 #include <libmath/Vec2.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Xml
 {
 
 using Version = Math::Vec2i;
 
-struct Declaration
+struct Decl
 {
 private:
     Version _version = {1, 0};

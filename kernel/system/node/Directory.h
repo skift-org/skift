@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include "system/node/Node.h"
 
@@ -19,7 +19,7 @@ struct FsHjDirEntry
 struct FsDirectory : public FsNode
 {
 private:
-    Vector<FsHjDirEntry> _children{};
+    Vec<FsHjDirEntry> _children{};
 
 public:
     FsDirectory();

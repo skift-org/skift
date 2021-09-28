@@ -17,7 +17,7 @@ private:
     OwnPtr<Async::Notifier> _notifier;
     OwnPtr<Async::Invoker> _invoker;
 
-    Vector<OwnPtr<Client>> _clients{};
+    Vec<OwnPtr<Client>> _clients{};
     Repository &_repository;
 
 public:
@@ -25,32 +25,33 @@ public:
     {
         _socket = IO::Socket{"/Session/settings.ipc", HJ_OPEN_CREATE};
 
-        _notifier = own<Async::Notifier>(_socket, POLL_ACCEPT, [this]() {
-            auto connection = _socket.accept();
-
-            if (!connection.success())
+        _notifier = own<Async::Notifier>(_socket, POLL_ACCEPT, [this]()
             {
-                return;
-            }
+                auto connection = _socket.accept();
 
-            auto client = own<Client>(connection.unwrap());
+                if (!connection.success())
+                {
+                    return;
+                }
 
-            client->on_message = [this](auto &client, auto &message) {
-                handle_client_message(client, message);
-            };
+                auto client = own<Client>(connection.unwrap());
 
-            client->on_disconnect = [this]() {
-                handle_client_disconnected();
-            };
+                client->on_message = [this](auto &client, auto &message)
+                {
+                    handle_client_message(client, message);
+                };
 
-            _clients.push_back(client);
-        });
+                client->on_disconnect = [this]()
+                {
+                    handle_client_disconnected();
+                };
 
-        _invoker = own<Async::Invoker>([this]() {
-            _clients.remove_all_match([](auto &client) {
-                return !client->connected();
+                _clients.push_back(client);
             });
-        });
+
+        _invoker = own<Async::Invoker>([this]()
+            { _clients.remove_all_match([](auto &client)
+                  { return !client->connected(); }); });
     }
 
     void handle_client_message(Client &client, const Message &message)

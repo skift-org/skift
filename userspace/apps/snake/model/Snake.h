@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libmath/Vec2.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include "snake/model/Fruit.h"
 
@@ -17,7 +17,7 @@ enum struct Facing
 };
 
 using Head = Math::Vec2i;
-using Tail = Vector<Math::Vec2i>;
+using Tail = Vec<Math::Vec2i>;
 
 struct Snake
 {

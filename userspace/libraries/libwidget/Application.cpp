@@ -134,7 +134,7 @@ void Application::do_message(const CompositorMessage &message)
 
 ResultOr<CompositorMessage> Application::wait_for_message(CompositorMessageType expected_message)
 {
-    Vector<CompositorMessage> pendings;
+    Vec<CompositorMessage> pendings;
 
     CompositorMessage message{};
     TRY(_connection.read(&message, sizeof(message)));

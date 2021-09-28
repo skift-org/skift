@@ -10,10 +10,10 @@
 #include <libsystem/process/Process.h>
 
 #include <libutils/Func.h>
-#include <libutils/Optional.h>
+#include <libutils/Opt.h>
 #include <libutils/String.h>
 #include <libutils/Traits.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Shell
 {
@@ -28,7 +28,7 @@ enum struct ArgParseResult
 struct ArgParseContext
 {
 private:
-    Vector<String> _arguments;
+    Vec<String> _arguments;
 
 public:
     ArgParseContext(int argc, char const *argv[])
@@ -49,9 +49,9 @@ public:
         return _arguments.peek();
     }
 
-    Vector<String> pop_operands()
+    Vec<String> pop_operands()
     {
-        Vector<String> operands;
+        Vec<String> operands;
 
         while (any() && current()[0] != '-')
         {
@@ -61,7 +61,7 @@ public:
         return operands;
     }
 
-    Optional<String> pop_operand()
+    Opt<String> pop_operand()
     {
         if (current()[0] == '-')
         {
@@ -92,11 +92,11 @@ struct ArgParse
 {
 private:
     String _name;
-    Vector<String> _usages;
-    Vector<ArgParseOption> _option;
+    Vec<String> _usages;
+    Vec<ArgParseOption> _option;
     String _prologue;
     String _epiloge;
-    Vector<String> _argv;
+    Vec<String> _argv;
     ArgParseVersion _version;
 
     bool _should_abort_on_failure = false;
@@ -129,7 +129,8 @@ public:
                 'h',
                 "help",
                 "Show this help message and exit.",
-                [&](auto &) {
+                [&](auto &)
+                {
                     return help();
                 },
             });
@@ -139,7 +140,8 @@ public:
                 '\0',
                 "version",
                 "Output version information and exit.",
-                [&](auto &) {
+                [&](auto &)
+                {
                     return version();
                 },
             });
@@ -162,7 +164,8 @@ public:
             longname,
             description,
 
-            [this, callback](ArgParseContext &ctx) {
+            [this, callback](ArgParseContext &ctx)
+            {
                 auto maybe_strings = ctx.pop_operand();
 
                 if (!maybe_strings.present())
@@ -182,7 +185,8 @@ public:
             longname,
             description,
 
-            [this, callback](ArgParseContext &ctx) {
+            [this, callback](ArgParseContext &ctx)
+            {
                 auto maybe_string = ctx.pop_operand();
 
                 if (!maybe_string.present())
@@ -207,53 +211,56 @@ public:
 
     void option_bool(char shortname, String longname, String description, Func<ArgParseResult(bool)> callback)
     {
-        option(shortname, longname, description, [this, callback](ArgParseContext &ctx) {
-            bool value = true;
-
-            if (ctx.any())
+        option(shortname, longname, description, [this, callback](ArgParseContext &ctx)
             {
-                if (ctx.current() == "true" ||
-                    ctx.current() == "y" ||
-                    ctx.current() == "yes")
+                bool value = true;
+
+                if (ctx.any())
                 {
-                    value = true;
-                    ctx.pop();
+                    if (ctx.current() == "true" ||
+                        ctx.current() == "y" ||
+                        ctx.current() == "yes")
+                    {
+                        value = true;
+                        ctx.pop();
+                    }
+
+                    if (ctx.current() == "false" ||
+                        ctx.current() == "n" ||
+                        ctx.current() == "no")
+                    {
+                        value = false;
+                        ctx.pop();
+                    }
                 }
 
-                if (ctx.current() == "false" ||
-                    ctx.current() == "n" ||
-                    ctx.current() == "no")
-                {
-                    value = false;
-                    ctx.pop();
-                }
-            }
-
-            return callback(value);
-        });
+                return callback(value);
+            });
     }
 
     void option(bool &value, char shortname, String longname, String description)
     {
-        option_bool(shortname, longname, description, [&](bool v) {
-            value = v;
-            return ArgParseResult::SHOULD_CONTINUE;
-        });
+        option_bool(shortname, longname, description, [&](bool v)
+            {
+                value = v;
+                return ArgParseResult::SHOULD_CONTINUE;
+            });
     }
 
     void option(String &value, char shortname, String longname, String description)
     {
-        option(shortname, longname, description, [&](auto &ctx) {
-            if (ctx.any())
+        option(shortname, longname, description, [&](auto &ctx)
             {
-                value = ctx.pop();
-                return ArgParseResult::SHOULD_CONTINUE;
-            }
-            else
-            {
-                return usage();
-            }
-        });
+                if (ctx.any())
+                {
+                    value = ctx.pop();
+                    return ArgParseResult::SHOULD_CONTINUE;
+                }
+                else
+                {
+                    return usage();
+                }
+            });
     }
 
     ArgParseResult version()
@@ -283,7 +290,8 @@ public:
 
         if (_option.any())
         {
-            auto compute_padding = [&](auto &options) {
+            auto compute_padding = [&](auto &options)
+            {
                 size_t max = 0;
 
                 for (size_t i = 0; i < options.count(); i++)

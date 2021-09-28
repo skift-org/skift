@@ -41,18 +41,18 @@ TerminalView::TerminalView()
 
     _terminal_device = IO::Terminal::create().unwrap();
 
-    _server_notifier = own<Async::Notifier>(_terminal_device.server, POLL_READ, [this]() {
-        handle_read();
-    });
+    _server_notifier = own<Async::Notifier>(_terminal_device.server, POLL_READ, [this]()
+        { handle_read(); });
 
-    _cursor_blink_timer = own<Async::Timer>(250, [this]() {
-        blink();
+    _cursor_blink_timer = own<Async::Timer>(250, [this]()
+        {
+            blink();
 
-        int cx = _terminal->cursor().x;
-        int cy = _terminal->cursor().y;
+            int cx = _terminal->cursor().x;
+            int cy = _terminal->cursor().y;
 
-        should_repaint(cell_bound(cx, cy).offset(bound().position() - Math::Vec2i{0, _scroll_offset}));
-    });
+            should_repaint(cell_bound(cx, cy).offset(bound().position() - Math::Vec2i{0, _scroll_offset}));
+        });
 
     _cursor_blink_timer->start();
 
@@ -72,7 +72,7 @@ void TerminalView::paint_cell(
     Text::Rune rune,
     Terminal::Color foreground,
     Terminal::Color background,
-    Terminal::Attributes attributes)
+    Terminal::Attrs attributes)
 {
     Math::Recti bound = cell_bound(x, y);
 
@@ -169,7 +169,8 @@ void TerminalView::paint(Graphic::Painter &painter, const Math::Recti &dirty)
 
 void TerminalView::event(Widget::Event *event)
 {
-    auto send_sequence = [&](auto sequence) {
+    auto send_sequence = [&](auto sequence)
+    {
         _terminal_device.server.write(sequence, strlen(sequence));
         event->accepted = true;
     };

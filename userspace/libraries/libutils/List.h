@@ -2,7 +2,7 @@
 
 #include <libutils/Assert.h>
 #include <libutils/Iter.h>
-#include <libutils/Optional.h>
+#include <libutils/Opt.h>
 #include <libutils/Prelude.h>
 
 namespace Utils
@@ -135,7 +135,7 @@ public:
         }
     }
 
-    Optional<T> requeue()
+    Opt<T> requeue()
     {
         if (_count == 0)
         {

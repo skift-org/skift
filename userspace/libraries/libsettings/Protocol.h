@@ -23,8 +23,8 @@ struct Message
     };
 
     Type type;
-    Optional<Path> path;
-    Optional<Json::Value> payload;
+    Opt<Path> path;
+    Opt<Json::Value> payload;
 };
 
 struct Protocol

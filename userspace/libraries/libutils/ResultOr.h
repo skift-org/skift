@@ -3,7 +3,7 @@
 #include <abi/Result.h>
 #include <assert.h>
 
-#include <libutils/Optional.h>
+#include <libutils/Opt.h>
 #include <libutils/Std.h>
 
 namespace Utils
@@ -14,7 +14,7 @@ struct ResultOr
 {
 private:
     HjResult _result = SUCCESS;
-    Optional<T> _value;
+    Opt<T> _value;
 
 public:
     ALWAYS_INLINE bool success() { return _result == SUCCESS; }
@@ -70,16 +70,17 @@ ALWAYS_INLINE static inline T __extract_value(ResultOr<T> r) { return r.unwrap()
 // This macro works like the try!() macro from rust.
 // If __stuff evaluate to an error it will short-circuit the function returning the error.
 // Else __stuff is SUCCESS then propagate the value.
-#define TRY(__stuff)                                        \
-    ({                                                      \
-        auto __eval__ = __stuff;                            \
-                                                            \
-        if (::Utils::__extract_result(__eval__) != SUCCESS) \
-        {                                                   \
-            return ::Utils::__extract_result(__eval__);     \
-        }                                                   \
-                                                            \
-        ::Utils::__extract_value(__eval__);                 \
-    })
+#define TRY(__stuff)                                            \
+    (                                                           \
+        {                                                       \
+            auto __eval__ = __stuff;                            \
+                                                                \
+            if (::Utils::__extract_result(__eval__) != SUCCESS) \
+            {                                                   \
+                return ::Utils::__extract_result(__eval__);     \
+            }                                                   \
+                                                                \
+            ::Utils::__extract_value(__eval__);                 \
+        })
 
 } // namespace Utils

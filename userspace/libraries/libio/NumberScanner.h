@@ -37,7 +37,7 @@ public:
         return false;
     }
 
-    Optional<uint8_t> scan_digit(Scanner &scan)
+    Opt<uint8_t> scan_digit(Scanner &scan)
     {
         char c = scan.peek();
 
@@ -54,7 +54,7 @@ public:
         return NONE;
     }
 
-    Optional<uint64_t> scan_uint(Scanner &scan)
+    Opt<uint64_t> scan_uint(Scanner &scan)
     {
         if (!is_digit(scan))
         {
@@ -72,7 +72,7 @@ public:
         return value;
     }
 
-    Optional<int64_t> scan_int(Scanner &scan)
+    Opt<int64_t> scan_int(Scanner &scan)
     {
         if (!is_digit(scan) &&
             scan.peek() != '-')
@@ -99,7 +99,7 @@ public:
         }
     }
 
-    Optional<double> scan_float(Scanner &scan)
+    Opt<double> scan_float(Scanner &scan)
     {
         int64_t ipart = scan_int(scan).unwrap_or(0);
 

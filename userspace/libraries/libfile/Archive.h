@@ -17,7 +17,7 @@ public:
     };
 
 protected:
-    Vector<Entry> _entries;
+    Vec<Entry> _entries;
     IO::Path _path;
     bool _valid = true;
 
@@ -28,7 +28,7 @@ public:
     {
     }
 
-    inline const Vector<Entry> &entries()
+    inline const Vec<Entry> &entries()
     {
         return _entries;
     }

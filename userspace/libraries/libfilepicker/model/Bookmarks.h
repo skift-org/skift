@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libasync/Observable.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include <libfilepicker/model/Bookmark.h>
 
@@ -13,14 +13,14 @@ struct Bookmarks :
     public RefCounted<Bookmarks>
 {
 private:
-    Vector<Bookmark> _bookmarks{};
+    Vec<Bookmark> _bookmarks{};
 
 public:
     Bookmarks()
     {
     }
 
-    const Vector<Bookmark> &all() const;
+    const Vec<Bookmark> &all() const;
 
     void add(Bookmark &&bookmark);
 

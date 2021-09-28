@@ -76,7 +76,7 @@ int Table::row_at(Math::Vec2i position) const
 void Table::paint_cell(Graphic::Painter &painter, int row, int column)
 {
     Math::Recti bound = cell_bound(row, column);
-    Variant data = _model->data(row, column);
+    Var data = _model->data(row, column);
 
     painter.push();
     painter.clip(bound);
@@ -112,10 +112,11 @@ Table::Table()
 {
     _scrollbar = add<ScrollBarElement>();
 
-    _scrollbar->on(Event::VALUE_CHANGE, [this](auto) {
-        _scroll_offset = _scrollbar->value();
-        should_repaint();
-    });
+    _scrollbar->on(Event::VALUE_CHANGE, [this](auto)
+        {
+            _scroll_offset = _scrollbar->value();
+            should_repaint();
+        });
 }
 
 Table::Table(RefPtr<TableModel> model)

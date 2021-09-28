@@ -1,8 +1,8 @@
-#include <libutils/Variant.h>
+#include <libutils/Var.h>
 
 #include "tests/Driver.h"
 
-using Number = Variant<int, double>;
+using Number = Var<int, double>;
 
 TEST(variant_default_constructor)
 {
@@ -43,22 +43,18 @@ TEST(variant_with_method)
     Number nbr;
 
     nbr = 5;
-    nbr.with<double>([](double &) {
-        Assert::unreachable();
-    });
+    nbr.with<double>([](double &)
+        { Assert::unreachable(); });
 
-    nbr.with<int>([](int &v) {
-        Assert::equal(v, 5);
-    });
+    nbr.with<int>([](int &v)
+        { Assert::equal(v, 5); });
 
     nbr = 6.;
-    nbr.with<int>([](int &) {
-        Assert::unreachable();
-    });
+    nbr.with<int>([](int &)
+        { Assert::unreachable(); });
 
-    nbr.with<double>([](double &v) {
-        Assert::equal(v, 6.);
-    });
+    nbr.with<double>([](double &v)
+        { Assert::equal(v, 6.); });
 
     Assert::equal(nbr.get<double>(), 6);
 }
@@ -72,11 +68,13 @@ TEST(variant_visit)
     bool has_visited_double = false;
 
     Visitor visitor{
-        [&](int &value) {
+        [&](int &value)
+        {
             Assert::equal(value, 5);
             has_visited_int = true;
         },
-        [&](double &value) {
+        [&](double &value)
+        {
             Assert::equal(value, 6.);
             has_visited_double = true;
         },

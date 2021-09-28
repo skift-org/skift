@@ -14,7 +14,7 @@ namespace Graphic
 static HashMap<String, RefPtr<Font>>
     _fonts;
 
-static ResultOr<Vector<Glyph>> font_load_glyph(String name)
+static ResultOr<Vec<Glyph>> font_load_glyph(String name)
 {
     auto path = IO::format("/Files/Fonts/{}.glyph", name);
     IO::File glyph_file{path, HJ_OPEN_READ};
@@ -24,7 +24,7 @@ static ResultOr<Vector<Glyph>> font_load_glyph(String name)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    Vector<Glyph> glyphs;
+    Vec<Glyph> glyphs;
 
     TRY(IO::read_vector(glyph_file, glyphs));
 
@@ -99,10 +99,11 @@ Math::Recti Font::mesure(const char *string) const
 {
     int width = 0;
 
-    Text::rune_foreach(reinterpret_cast<const uint8_t *>(string), [&](auto rune) {
-        auto &g = glyph(rune);
-        width += g.advance;
-    });
+    Text::rune_foreach(reinterpret_cast<const uint8_t *>(string), [&](auto rune)
+        {
+            auto &g = glyph(rune);
+            width += g.advance;
+        });
 
     return Math::Recti(width, metrics().lineheight());
 }
@@ -111,10 +112,11 @@ Math::Recti Font::mesure_with_fulllineheight(const char *string)
 {
     int width = 0;
 
-    Text::rune_foreach(reinterpret_cast<const uint8_t *>(string), [&](auto rune) {
-        auto &g = glyph(rune);
-        width += g.advance;
-    });
+    Text::rune_foreach(reinterpret_cast<const uint8_t *>(string), [&](auto rune)
+        {
+            auto &g = glyph(rune);
+            width += g.advance;
+        });
 
     return Math::Recti(width, metrics().fulllineheight());
 }

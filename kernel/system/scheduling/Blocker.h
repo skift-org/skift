@@ -2,7 +2,7 @@
 
 #include <skift/Time.h>
 
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include "system/node/Handle.h"
 #include "system/system/System.h"
@@ -117,10 +117,10 @@ struct Selected
 struct BlockerSelect : public Blocker
 {
 private:
-    Vector<Selected> &_handles;
+    Vec<Selected> &_handles;
 
 public:
-    BlockerSelect(Vector<Selected> &handles)
+    BlockerSelect(Vec<Selected> &handles)
         : _handles{handles}
     {
     }

@@ -48,7 +48,7 @@ public:
         Text::Rune rune,
         Terminal::Color foreground,
         Terminal::Color background,
-        Terminal::Attributes attributes);
+        Terminal::Attrs attributes);
 
     void paint_cell(Graphic::Painter &painter, int x, int y, Terminal::Cell cell)
     {

@@ -2,7 +2,7 @@
 
 #include <libio/Read.h>
 #include <libutils/Assert.h>
-#include <libutils/InlineRingBuffer.h>
+#include <libutils/InlineRing.h>
 
 namespace IO
 {
@@ -10,7 +10,7 @@ struct BitReader
 {
 private:
     IO::Reader &_reader;
-    InlineRingBuffer<uint8_t, 16> _buffer;
+    InlineRing<uint8_t, 16> _buffer;
     size_t _head = 0;
     bool _end_of_file;
 

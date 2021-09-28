@@ -17,10 +17,10 @@ struct File final :
 {
 private:
     RefPtr<Handle> _handle;
-    Optional<IO::Path> _path = NONE;
+    Opt<IO::Path> _path = NONE;
 
 public:
-    const Optional<IO::Path> &path() { return _path; }
+    const Opt<IO::Path> &path() { return _path; }
 
     File() {}
 

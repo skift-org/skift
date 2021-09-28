@@ -3,7 +3,7 @@
 #include <libasync/Observable.h>
 #include <libio/Path.h>
 #include <libsystem/process/Process.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace FilePicker
 {
@@ -13,9 +13,9 @@ struct Navigation :
     public RefCounted<Navigation>
 {
 private:
-    Vector<IO::Path> _backward{};
+    Vec<IO::Path> _backward{};
     IO::Path _current{};
-    Vector<IO::Path> _foreward{};
+    Vec<IO::Path> _foreward{};
 
 public:
     enum Direction

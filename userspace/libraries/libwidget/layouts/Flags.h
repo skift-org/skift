@@ -13,7 +13,7 @@ static inline RefPtr<TElement> fill(RefPtr<TElement> child)
     return child;
 }
 
-static inline Vector<RefPtr<Element>> fill(Vector<RefPtr<Element>> children)
+static inline Vec<RefPtr<Element>> fill(Vec<RefPtr<Element>> children)
 {
     for (auto &child : children)
     {

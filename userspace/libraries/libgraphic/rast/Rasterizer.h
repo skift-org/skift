@@ -28,8 +28,8 @@ private:
     TransformStack &_stack;
 
     EdgeList _edges;
-    Vector<Math::Edgef> _actives_edges;
-    Vector<uint16_t> _scanline;
+    Vec<Math::Edgef> _actives_edges;
+    Vec<uint16_t> _scanline;
 
     void clear();
 

@@ -2,7 +2,7 @@
 
 #include <libinjection/Entity.h>
 #include <libutils/String.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 struct Animal : public Injection::Entity
 {
@@ -26,9 +26,9 @@ struct Dog : public Animal
 
 struct Zoo : public Injection::Entity
 {
-    Vector<RefPtr<Animal>> _animals;
+    Vec<RefPtr<Animal>> _animals;
 
-    INJECTOR(Zoo(Vector<RefPtr<Animal>> animal))
+    INJECTOR(Zoo(Vec<RefPtr<Animal>> animal))
         : _animals{animal}
     {
     }

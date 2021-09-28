@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include "pci/PCIDevice.h"
 #include "system/memory/MMIO.h"
@@ -114,12 +114,12 @@ private:
     int _current_rx_descriptors = 0;
     RefPtr<MMIORange> _rx_descriptors_range{};
     E1000RXDescriptor *_rx_descriptors{};
-    Vector<RefPtr<MMIORange>> _rx_buffers;
+    Vec<RefPtr<MMIORange>> _rx_buffers;
 
     int _current_tx_descriptors = 0;
     RefPtr<MMIORange> _tx_descriptors_range{};
     E1000TXDescriptor *_tx_descriptors{};
-    Vector<RefPtr<MMIORange>> _tx_buffers;
+    Vec<RefPtr<MMIORange>> _tx_buffers;
 
     void write_register(uint16_t offset, uint32_t value);
 

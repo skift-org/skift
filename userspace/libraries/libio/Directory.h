@@ -18,14 +18,14 @@ public:
 
 private:
     RefPtr<Handle> _handle;
-    Optional<IO::Path> _path = NONE;
-    Vector<Entry> _entries;
+    Opt<IO::Path> _path = NONE;
+    Vec<Entry> _entries;
 
     HjResult read_entries();
 
 public:
-    const Optional<IO::Path> &path() { return _path; }
-    const Vector<Entry> &entries() { return _entries; }
+    const Opt<IO::Path> &path() { return _path; }
+    const Vec<Entry> &entries() { return _entries; }
 
     Directory() {}
     Directory(const char *path);

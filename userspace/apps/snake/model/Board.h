@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libmath/Random.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include "snake/model/Fruit.h"
 #include "snake/model/Snake.h"
@@ -18,7 +18,7 @@ private:
     int _height = 16;
 
     Snake _snake;
-    Vector<Fruit> _fruits;
+    Vec<Fruit> _fruits;
     Math::Random _random;
 
 public:
@@ -26,7 +26,7 @@ public:
     int height() { return _height; }
 
     Snake &snake() { return _snake; }
-    Vector<Fruit> &fruits() { return _fruits; }
+    Vec<Fruit> &fruits() { return _fruits; }
 
     Board(int width, int height)
         : _width{width},
@@ -86,9 +86,8 @@ public:
 
         int old_fruit_count = _fruits.count();
 
-        _fruits.remove_all_match([&](auto &fruit) {
-            return _snake.colide_with(fruit.position);
-        });
+        _fruits.remove_all_match([&](auto &fruit)
+            { return _snake.colide_with(fruit.position); });
 
         int new_fruit_count = _fruits.count();
 

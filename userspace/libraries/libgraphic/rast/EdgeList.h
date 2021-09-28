@@ -3,7 +3,7 @@
 #include <libmath/Edge.h>
 #include <libmath/Mat3x2.h>
 #include <libmath/Rect.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Graphic
 {
@@ -14,8 +14,8 @@ private:
     static constexpr auto TOLERANCE = 0.25f;
     static constexpr auto MAX_DEPTH = 8;
 
-    Optional<Math::Vec2f> _last;
-    Vector<Math::Edgef> _edges;
+    Opt<Math::Vec2f> _last;
+    Vec<Math::Edgef> _edges;
 
     bool _has_min_max = false;
     Math::Vec2f _min;
@@ -66,7 +66,7 @@ public:
         return Math::Recti::from_two_point(_min, _max + Math::Vec2i{1});
     }
 
-    Vector<Math::Edgef> const &edges() const
+    Vec<Math::Edgef> const &edges() const
     {
         return _edges;
     }

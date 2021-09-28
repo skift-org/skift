@@ -144,9 +144,10 @@ HjResult Handles::copy(int source, int destination)
 
 HjResult Handles::poll(HandlePoll *handles, size_t count, Timeout timeout)
 {
-    Vector<Selected> selected;
+    Vec<Selected> selected;
 
-    auto release_handles = [&]() {
+    auto release_handles = [&]()
+    {
         for (size_t i = 0; i < selected.count(); i++)
         {
             handles[i].result = selected[i].result;
@@ -306,7 +307,8 @@ HjResult Handles::duplex(
     auto server_handle = make<FsHandle>(node, server_flags);
     auto client_handle = make<FsHandle>(node, client_flags);
 
-    auto close_opened_handles = [&]() {
+    auto close_opened_handles = [&]()
+    {
         if (*server != HANDLE_INVALID_ID)
         {
             remove(*server);

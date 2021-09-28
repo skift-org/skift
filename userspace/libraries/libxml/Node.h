@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libutils/HashMap.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Xml
 {
@@ -9,7 +9,7 @@ namespace Xml
 struct Node
 {
 private:
-    Vector<Node> _children;
+    Vec<Node> _children;
     String _content;
     String _name;
     HashMap<String, String> _attributes;
@@ -21,7 +21,7 @@ public:
     const String &content() const { return _content; }
     void content(String content) { _content = content; }
 
-    Vector<Node> &children() { return _children; }
+    Vec<Node> &children() { return _children; }
     HashMap<String, String> &attributes() { return _attributes; }
 
     const String inner_text() const

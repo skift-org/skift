@@ -2,7 +2,7 @@
 
 #include <libio/Reader.h>
 #include <libtext/Rune.h>
-#include <libutils/InlineRingBuffer.h>
+#include <libutils/InlineRing.h>
 
 #include <string.h>
 
@@ -15,7 +15,7 @@ private:
     static constexpr int MAX_PEEK = 64;
 
     Reader &_reader;
-    InlineRingBuffer<uint8_t, MAX_PEEK> _peek{};
+    InlineRing<uint8_t, MAX_PEEK> _peek{};
     bool _is_end_of_file = false;
 
     void refill()

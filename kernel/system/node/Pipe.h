@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/RingBuffer.h>
+#include <libutils/Ring.h>
 
 #include "system/node/Node.h"
 
@@ -9,7 +9,7 @@ struct FsPipe : public FsNode
 private:
     static constexpr int BUFFER_SIZE = 4096;
 
-    RingBuffer<char> _buffer{BUFFER_SIZE};
+    Ring<char> _buffer{BUFFER_SIZE};
 
 public:
     FsPipe();

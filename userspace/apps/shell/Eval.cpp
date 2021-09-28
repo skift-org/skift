@@ -11,12 +11,12 @@
 
 #include "shell/Shell.h"
 
-Optional<String> find_command_path(String command)
+Opt<String> find_command_path(String command)
 {
     if (command[0] == '/' || command[0] == '.')
     {
         IO::File file{command};
-        return file.exist() ? command : Optional<String>{};
+        return file.exist() ? command : Opt<String>{};
     }
     else
     {
@@ -130,14 +130,14 @@ int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> 
     {
         ShellPipeline *pipeline = (ShellPipeline *)node;
 
-        Vector<IO::Pipe> pipes;
+        Vec<IO::Pipe> pipes;
 
         for (size_t i = 0; i < pipeline->commands->count() - 1; i++)
         {
             pipes.push_back(IO::Pipe::create().unwrap());
         }
 
-        Vector<int> processes;
+        Vec<int> processes;
 
         size_t index = 0;
         for (auto *command : *pipeline->commands)

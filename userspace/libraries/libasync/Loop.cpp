@@ -4,7 +4,7 @@
 #include <libasync/Timer.h>
 #include <libsystem/system/System.h>
 #include <libutils/Assert.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Async
 {
@@ -121,7 +121,7 @@ void Loop::update_invoker()
 
 /* --- Loop ----------------------------------------------------------------- */
 
-static Vector<AtExitHook> _atexit_hooks;
+static Vec<AtExitHook> _atexit_hooks;
 
 Loop::Loop()
 {

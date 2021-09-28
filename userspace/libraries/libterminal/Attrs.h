@@ -6,7 +6,7 @@
 namespace Terminal
 {
 
-struct Attributes
+struct Attrs
 {
     Color foreground = FOREGROUND;
     Color background = BACKGROUND;
@@ -15,51 +15,51 @@ struct Attributes
     bool invert = false;
     bool underline = false;
 
-    Attributes bolded() const
+    Attrs bolded() const
     {
-        Attributes attr = *this;
+        Attrs attr = *this;
         attr.bold = true;
         return attr;
     }
 
-    Attributes inverted() const
+    Attrs inverted() const
     {
-        Attributes attr = *this;
+        Attrs attr = *this;
         attr.invert = true;
         return attr;
     }
 
-    Attributes underlined() const
+    Attrs underlined() const
     {
-        Attributes attr = *this;
+        Attrs attr = *this;
         attr.underline = true;
         return attr;
     }
 
-    Attributes reset() const
+    Attrs reset() const
     {
-        Attributes attr = *this;
+        Attrs attr = *this;
         attr.bold = false;
         attr.invert = false;
         attr.underline = false;
         return attr;
     }
 
-    Attributes with_forground(Color color) const
+    Attrs with_forground(Color color) const
     {
-        Attributes attr = *this;
+        Attrs attr = *this;
         attr.foreground = color;
         return attr;
     }
 
-    Attributes with_background(Color color) const
+    Attrs with_background(Color color) const
     {
-        Attributes attr = *this;
+        Attrs attr = *this;
         attr.background = color;
         return attr;
     }
 
-    bool operator==(const Attributes &other) const
+    bool operator==(const Attrs &other) const
     {
         return foreground == other.foreground &&
                background == other.background &&

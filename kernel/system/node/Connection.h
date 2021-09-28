@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/RingBuffer.h>
+#include <libutils/Ring.h>
 
 #include "system/node/Node.h"
 
@@ -11,8 +11,8 @@ private:
 
     bool _accepted = false;
 
-    RingBuffer<char> _data_to_server{BUFFER_SIZE};
-    RingBuffer<char> _data_to_client{BUFFER_SIZE};
+    Ring<char> _data_to_server{BUFFER_SIZE};
+    Ring<char> _data_to_client{BUFFER_SIZE};
 
 public:
     FsConnection();

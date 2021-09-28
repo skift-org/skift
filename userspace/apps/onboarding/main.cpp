@@ -11,11 +11,11 @@ namespace Onboarding
 struct Page
 {
     String header;
-    Vector<String> lines;
+    Vec<String> lines;
     String footer;
 };
 
-static const Vector<Page> PAGES = {
+static const Vec<Page> PAGES = {
     {
         "Welcome to skiftOS!",
         {
@@ -60,7 +60,7 @@ static const Vector<Page> PAGES = {
 
 auto page(auto state)
 {
-    Vector<RefPtr<Widget::Element>> elements;
+    Vec<RefPtr<Widget::Element>> elements;
 
     elements.push_back(Widget::spacing({0, 16, 0}, Widget::label(PAGES[state].header, Math::Anchor::CENTER)));
 
@@ -85,16 +85,14 @@ auto illustration(auto state)
 
 auto finish_button()
 {
-    return Widget::filled_button("Finish", [=] {
-        Widget::Application::the().exit(PROCESS_SUCCESS);
-    });
+    return Widget::filled_button("Finish", [=]
+        { Widget::Application::the().exit(PROCESS_SUCCESS); });
 }
 
 auto next_button(auto state, auto update)
 {
-    return Widget::filled_button("Next", [=] {
-        update(state + 1);
-    });
+    return Widget::filled_button("Next", [=]
+        { update(state + 1); });
 }
 
 auto navigation(auto state, auto update)
@@ -102,7 +100,8 @@ auto navigation(auto state, auto update)
     return Widget::spacing(
         16,
         Widget::hflow({
-            Widget::enable_if(state > 0, Widget::basic_button("Previous", [=] { update(state - 1); })),
+            Widget::enable_if(state > 0, Widget::basic_button("Previous", [=]
+                                             { update(state - 1); })),
             Widget::fill(Widget::stack(Widget::dots(PAGES.count(), state))),
             (state + 1 < (int)PAGES.count() ? next_button(state, update) : finish_button()),
         }));

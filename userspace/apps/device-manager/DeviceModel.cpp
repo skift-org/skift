@@ -43,7 +43,7 @@ String DeviceModel::header(int column)
     }
 }
 
-Widget::Variant DeviceModel::data(int row, int column)
+Widget::Var DeviceModel::data(int row, int column)
 {
     auto &device = _data.get(row);
 

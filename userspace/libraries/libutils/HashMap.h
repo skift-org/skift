@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libutils/Hash.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Utils
 {
@@ -19,9 +19,9 @@ private:
 
     static constexpr int BUCKET_COUNT = 256;
 
-    Vector<Vector<Item>> _buckets{};
+    Vec<Vec<Item>> _buckets{};
 
-    Vector<Item> &bucket(uint32_t hash)
+    Vec<Item> &bucket(uint32_t hash)
     {
         return _buckets[hash % BUCKET_COUNT];
     }

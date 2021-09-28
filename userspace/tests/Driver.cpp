@@ -1,18 +1,18 @@
 #include <libio/Streams.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include "tests/Driver.h"
 
 namespace Test
 {
 
-static Vector<Test> *_tests;
+static Vec<Test> *_tests;
 
 void __register_test(Test &test)
 {
     if (!_tests)
     {
-        _tests = new Vector<Test>();
+        _tests = new Vec<Test>();
     }
 
     _tests->push_back(test);

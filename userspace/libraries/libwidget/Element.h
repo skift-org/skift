@@ -42,7 +42,7 @@ private:
 
     Math::Vec2i _content_scroll{};
 
-    Array<Optional<Graphic::Color>, __THEME_COLOR_COUNT> _colors = {NONE};
+    Array<Opt<Graphic::Color>, __THEME_COLOR_COUNT> _colors = {NONE};
     RefPtr<Graphic::Font> _font;
 
     CursorState _cursor = CURSOR_DEFAULT;
@@ -52,7 +52,7 @@ private:
     Element *_parent = {};
     Window *_window = {};
 
-    Vector<RefPtr<Element>> _children = {};
+    Vec<RefPtr<Element>> _children = {};
 
 public:
     static constexpr auto FILL = (1 << 0);
@@ -195,7 +195,7 @@ public:
 
     Element *at(Math::Vec2i position);
 
-    const Vector<RefPtr<Element>> &children() { return _children; }
+    const Vec<RefPtr<Element>> &children() { return _children; }
 
     template <typename T, typename... Args>
     RefPtr<T> add(Args &&...args)
@@ -203,7 +203,7 @@ public:
         return add(make<T>(std::forward<Args>(args)...));
     }
 
-    void add(Vector<RefPtr<Element>> children)
+    void add(Vec<RefPtr<Element>> children)
     {
         for (auto &child : children)
         {

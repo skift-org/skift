@@ -3,7 +3,7 @@
 #include <libutils/HashMap.h>
 #include <libutils/Std.h>
 #include <libutils/String.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Json
 {
@@ -31,7 +31,7 @@ enum Type
 struct Value
 {
 public:
-    struct Array : public Vector<Value>
+    struct Array : public Vec<Value>
     {
     };
 

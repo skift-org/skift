@@ -61,9 +61,8 @@ enum Column
 FilesystemModel::FilesystemModel(RefPtr<Navigation> navigation, Func<bool(IO::Directory::Entry &)> filter)
     : _navigation(navigation), _filter(filter)
 {
-    _observer = navigation->observe([this](auto &) {
-        update();
-    });
+    _observer = navigation->observe([this](auto &)
+        { update(); });
 
     update();
 }
@@ -96,14 +95,14 @@ String FilesystemModel::header(int column)
     }
 }
 
-Widget::Variant FilesystemModel::data(int row, int column)
+Widget::Var FilesystemModel::data(int row, int column)
 {
     auto &entry = _files[row];
 
     switch (column)
     {
     case COLUMN_NAME:
-        return Widget::Variant(entry.name.cstring()).with_icon(entry.icon);
+        return Widget::Var(entry.name.cstring()).with_icon(entry.icon);
 
     case COLUMN_TYPE:
         switch (entry.type)
@@ -124,11 +123,11 @@ Widget::Variant FilesystemModel::data(int row, int column)
     case COLUMN_SIZE:
         if (entry.type == HJ_FILE_TYPE_DIRECTORY)
         {
-            return Widget::Variant(IO::format("{} Items", entry.size));
+            return Widget::Var(IO::format("{} Items", entry.size));
         }
         else
         {
-            return Widget::Variant(IO::format("{} Bytes", entry.size));
+            return Widget::Var(IO::format("{} Bytes", entry.size));
         }
 
     default:

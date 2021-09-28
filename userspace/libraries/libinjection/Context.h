@@ -2,7 +2,7 @@
 
 #include <libutils/Assert.h>
 #include <libutils/TypeId.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Injection
 {
@@ -12,7 +12,7 @@ struct Container;
 struct Context
 {
 private:
-    Vector<TypeId> _stack;
+    Vec<TypeId> _stack;
     Container &_container;
 
 public:

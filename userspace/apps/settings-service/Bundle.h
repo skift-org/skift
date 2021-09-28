@@ -11,7 +11,7 @@ struct Bundle
 {
     HashMap<String, Json::Value> keys;
 
-    static Optional<Bundle> Load(const String &path)
+    static Opt<Bundle> Load(const String &path)
     {
         Bundle bundle;
 

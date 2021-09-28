@@ -3,7 +3,7 @@
 #include <libgraphic/Bitmap.h>
 #include <libtext/Rune.h>
 #include <libutils/String.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Graphic
 {
@@ -54,7 +54,7 @@ struct Font : public RefCounted<Font>
 private:
     RefPtr<Bitmap> _bitmap;
     Glyph _default;
-    Vector<Glyph> _glyphs;
+    Vec<Glyph> _glyphs;
 
 public:
     const FontMetrics metrics() const
@@ -66,7 +66,7 @@ public:
 
     static ResultOr<RefPtr<Font>> get(String name);
 
-    Font(RefPtr<Bitmap> bitmap, Vector<Glyph> glyphs)
+    Font(RefPtr<Bitmap> bitmap, Vec<Glyph> glyphs)
         : _bitmap(bitmap),
           _glyphs(std::move(glyphs))
     {

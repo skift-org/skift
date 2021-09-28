@@ -6,7 +6,7 @@
 #include <libio/MemoryWriter.h>
 #include <libio/Reader.h>
 #include <libpng/Common.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Png
 {
@@ -18,8 +18,8 @@ private:
     uint32_t _width = 0;
     uint32_t _height = 0;
     uint8_t _bit_depth = 0;
-    Vector<Graphic::Color> _pixels;
-    Vector<Graphic::Color> _palette;
+    Vec<Graphic::Color> _pixels;
+    Vec<Graphic::Color> _palette;
     DateTime _modified;
     ColourType _colour_type;
     IO::Reader &_reader;
@@ -28,7 +28,7 @@ private:
     HjResult uncompress(IO::MemoryWriter &uncompressed_writer);
     HjResult unfilter(uint8_t *in, uint8_t *out);
     HjResult unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
-                               size_t bytewidth, Png::FilterType filterType, size_t length);
+        size_t bytewidth, Png::FilterType filterType, size_t length);
     HjResult convert(uint8_t *data);
     HjResult read_chunks();
 
@@ -67,7 +67,7 @@ public:
     inline bool valid() const { return _valid; }
     inline uint32_t width() const { return _width; }
     inline uint32_t height() const { return _height; }
-    inline const Vector<Graphic::Color> &pixels() const { return _pixels; }
+    inline const Vec<Graphic::Color> &pixels() const { return _pixels; }
     inline const DateTime &modified() const { return _modified; }
 
     Reader(IO::Reader &reader);

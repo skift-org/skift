@@ -15,7 +15,7 @@ public:
 
     String header(int column) override;
 
-    Widget::Variant data(int row, int column) override;
+    Widget::Var data(int row, int column) override;
 
     void update() override;
 };

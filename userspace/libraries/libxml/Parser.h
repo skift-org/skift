@@ -1,7 +1,7 @@
 #pragma once
-#include <libxml/Document.h>
+#include <libxml/Doc.h>
 
 namespace Xml
 {
-ResultOr<Document> parse(IO::Reader &reader);
+ResultOr<Doc> parse(IO::Reader &reader);
 }

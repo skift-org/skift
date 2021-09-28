@@ -1,7 +1,7 @@
 #include <libsettings/ServerConnection.h>
 #include <libsettings/Service.h>
 #include <libsettings/Watcher.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Settings
 {
@@ -34,7 +34,8 @@ ServerConnection &Service::server()
     if (!_server)
     {
         _server = ServerConnection::open();
-        _server->on_notify = [this](const Path &path, const Json::Value &value) {
+        _server->on_notify = [this](const Path &path, const Json::Value &value)
+        {
             notify_watchers(path, value);
         };
     }
@@ -85,7 +86,7 @@ void Service::unregister_watcher(Watcher &watcher)
     }
 }
 
-Optional<Json::Value> Service::read(const Path path)
+Opt<Json::Value> Service::read(const Path path)
 {
     Message message;
 

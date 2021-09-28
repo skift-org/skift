@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libutils/RingBuffer.h>
-#include <libutils/Vector.h>
+#include <libutils/Ring.h>
+#include <libutils/Vec.h>
 
 #include "pci/PCIDevice.h"
 #include "system/memory/MMIO.h"
@@ -79,14 +79,14 @@ private:
     uint8_t _last_valid_index;
 
     // device ring buffer
-    RingBuffer<char> _buffer{AC97_RINGBUFFER_LEN};
+    Ring<char> _buffer{AC97_RINGBUFFER_LEN};
 
     // buffer descriptors range
     RefPtr<MMIORange> buffer_descriptors_range{};
     // buffer descriptor list of size 32 (MAX SIZE FOR AC97)
     AC97BufferDescriptor *buffer_descriptors_list;
     // 32*30720 buffer array for playing sound using PCM 16 Bit out (DMA)
-    Vector<RefPtr<MMIORange>> buffers;
+    Vec<RefPtr<MMIORange>> buffers;
 
     bool _quirk_5bit_volume;
 

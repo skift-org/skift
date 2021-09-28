@@ -8,7 +8,7 @@ namespace Utils
 {
 
 template <typename T>
-struct Optional
+struct Opt
 {
 private:
     bool _present = false;
@@ -48,25 +48,25 @@ public:
         }
     }
 
-    ALWAYS_INLINE explicit Optional() {}
+    ALWAYS_INLINE explicit Opt() {}
 
-    ALWAYS_INLINE Optional(NoneTag)
+    ALWAYS_INLINE Opt(NoneTag)
     {
     }
 
-    ALWAYS_INLINE Optional(const T &value)
+    ALWAYS_INLINE Opt(const T &value)
     {
         _present = true;
         new (&_storage) T(value);
     }
 
-    ALWAYS_INLINE Optional(T &&value)
+    ALWAYS_INLINE Opt(T &&value)
     {
         _present = true;
         new (&_storage) T(std::move(value));
     }
 
-    ALWAYS_INLINE Optional(const Optional &other)
+    ALWAYS_INLINE Opt(const Opt &other)
     {
         if (other.present())
         {
@@ -75,7 +75,7 @@ public:
         }
     }
 
-    ALWAYS_INLINE Optional(Optional &&other)
+    ALWAYS_INLINE Opt(Opt &&other)
     {
         if (other.present())
         {
@@ -84,7 +84,7 @@ public:
         }
     }
 
-    ALWAYS_INLINE Optional &operator=(const Optional &other)
+    ALWAYS_INLINE Opt &operator=(const Opt &other)
     {
         if (this != &other)
         {
@@ -99,7 +99,7 @@ public:
         return *this;
     }
 
-    ALWAYS_INLINE Optional &operator=(Optional &&other)
+    ALWAYS_INLINE Opt &operator=(Opt &&other)
     {
         if (this != &other)
         {
@@ -124,7 +124,7 @@ public:
         return unwrap() == other;
     }
 
-    ALWAYS_INLINE ~Optional()
+    ALWAYS_INLINE ~Opt()
     {
         clear();
     }

@@ -5,7 +5,7 @@
 #include <libgraphic/Painter.h>
 #include <libio/Streams.h>
 #include <libutils/HashMap.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Element.h>
 #include <libwidget/Event.h>
@@ -46,7 +46,7 @@ private:
     RefPtr<Graphic::Bitmap> backbuffer;
 
     bool _dirty_layout;
-    Vector<Math::Recti> _dirty_paint{};
+    Vec<Math::Recti> _dirty_paint{};
 
     EventHandler _handlers[EventType::__COUNT];
 

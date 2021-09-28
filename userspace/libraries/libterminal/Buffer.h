@@ -2,7 +2,7 @@
 
 #include <libterminal/Cell.h>
 #include <libutils/Assert.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Terminal
 {
@@ -12,7 +12,7 @@ struct Buffer
 private:
     int _width;
     int _height;
-    Vector<Cell> _buffer;
+    Vec<Cell> _buffer;
 
 public:
     int width() const { return _width; }
@@ -59,7 +59,7 @@ public:
         }
     }
 
-    void clear(int fromx, int fromy, int tox, int toy, Attributes attributes)
+    void clear(int fromx, int fromy, int tox, int toy, Attrs attributes)
     {
         for (int i = fromx + fromy * _width; i < tox + toy * _width; i++)
         {
@@ -67,12 +67,12 @@ public:
         }
     }
 
-    void clear_all(Attributes attributes)
+    void clear_all(Attrs attributes)
     {
         clear(0, 0, _width, _height, attributes);
     }
 
-    void clear_line(int line, Attributes attributes)
+    void clear_line(int line, Attrs attributes)
     {
         if (line >= 0 && line < _height)
         {
@@ -85,7 +85,7 @@ public:
 
     void resize(int width, int height)
     {
-        Vector<Cell> new_buffer;
+        Vec<Cell> new_buffer;
         new_buffer.resize(width * height);
 
         for (int i = 0; i < width * height; i++)
@@ -107,7 +107,7 @@ public:
         _height = height;
     }
 
-    void scroll(int how_many_line, Attributes attributes)
+    void scroll(int how_many_line, Attrs attributes)
     {
         if (how_many_line < 0)
         {

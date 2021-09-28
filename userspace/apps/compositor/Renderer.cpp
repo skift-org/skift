@@ -1,5 +1,5 @@
 #include <libgraphic/Framebuffer.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include "compositor/Cursor.h"
 #include "compositor/Manager.h"
@@ -11,7 +11,7 @@
 static OwnPtr<Graphic::Framebuffer> _framebuffer;
 static OwnPtr<compositor::Wallpaper> _wallpaper;
 
-static Vector<Math::Recti> _dirty_regions;
+static Vec<Math::Recti> _dirty_regions;
 
 static OwnPtr<Settings::Setting> _night_light_enable_setting;
 bool _night_light_enable = false;

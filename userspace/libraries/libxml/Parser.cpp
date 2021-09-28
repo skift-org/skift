@@ -2,7 +2,7 @@
 #include <libutils/Strings.h>
 #include <libxml/Parser.h>
 
-/* --- Attributes ----------------------------------------------------------- */
+/* --- Attrs ----------------------------------------------------------- */
 
 static String parse_attribute_name(IO::Scanner &scan)
 {
@@ -206,31 +206,31 @@ static Xml::Node parse_node(IO::Scanner &scan)
     }
 }
 
-/* --- Declaration ---------------------------------------------------------- */
+/* --- Decl ---------------------------------------------------------- */
 
 // See https://www.w3.org/TR/xml/#sec-prolog-dtd
-static Xml::Declaration parse_declaration(IO::Scanner &scan)
+static Xml::Decl parse_decl(IO::Scanner &scan)
 {
-    Xml::Declaration declaration;
+    Xml::Decl decl;
 
     scan.skip_word("<?");
 
     while (!scan.peek_is_word("?>") &&
            !scan.ended())
     {
-        //TODO: read declaration content
+        //TODO: read decl content
         scan.next();
     }
 
     scan.skip_word("?>");
 
-    return declaration;
+    return decl;
 }
 
-ResultOr<Xml::Document> Xml::parse(IO::Reader &reader)
+ResultOr<Xml::Doc> Xml::parse(IO::Reader &reader)
 {
     IO::Scanner scan{reader};
-    Xml::Document document;
+    Xml::Doc document;
 
     scan.skip_utf8bom();
 
@@ -238,7 +238,7 @@ ResultOr<Xml::Document> Xml::parse(IO::Reader &reader)
 
     if (scan.peek_is_word("<?"))
     {
-        document.declaration(parse_declaration(scan));
+        document.decl(parse_decl(scan));
     }
     scan.eat_any(Strings::WHITESPACE);
 

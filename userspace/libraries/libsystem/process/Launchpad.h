@@ -5,7 +5,7 @@
 
 #include <libio/Handle.h>
 #include <libutils/String.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 Launchpad *launchpad_create(const char *name, const char *executable);
 
@@ -15,7 +15,7 @@ void launchpad_flags(Launchpad *launchpad, TaskFlags flags);
 
 void launchpad_argument(Launchpad *launchpad, const char *argument);
 
-void launchpad_arguments(Launchpad *launchpad, const Vector<String> &arguments);
+void launchpad_arguments(Launchpad *launchpad, const Vec<String> &arguments);
 
 void launchpad_environment(Launchpad *launchpad, const char *buffer);
 

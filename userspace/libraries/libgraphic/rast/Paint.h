@@ -4,7 +4,7 @@
 #include <libgraphic/Color.h>
 #include <libmath/Mat3x2.h>
 #include <libutils/Array.h>
-#include <libutils/Variant.h>
+#include <libutils/Var.h>
 
 namespace Graphic
 {
@@ -24,28 +24,30 @@ struct Fill
 
 struct Gradient
 {
-    Optional<Math::Mat3x2f> transfom;
+    Opt<Math::Mat3x2f> transfom;
     Array<GradientStop, MAX_GRADIENT_STOPS> stops;
     size_t count;
 };
 
 struct Texture
 {
-    Optional<Math::Mat3x2f> transfom;
+    Opt<Math::Mat3x2f> transfom;
     RefPtr<Bitmap> bitmap;
 };
 
-using Paint = Variant<Fill, Gradient, Texture>;
+using Paint = Var<Fill, Gradient, Texture>;
 
 static inline ALWAYS_INLINE Color sample(Paint &paint, Math::Vec2f p)
 {
     Color result = Colors::CYAN;
 
     paint.visit(Visitor{
-        [&](Fill &fill) {
+        [&](Fill &fill)
+        {
             result = fill.color;
         },
-        [&](Gradient &gradient) {
+        [&](Gradient &gradient)
+        {
             if (gradient.transfom.present())
             {
                 p = gradient.transfom.unwrap().apply(p);
@@ -81,7 +83,8 @@ static inline ALWAYS_INLINE Color sample(Paint &paint, Math::Vec2f p)
                 }
             }
         },
-        [&](Texture &texture) {
+        [&](Texture &texture)
+        {
             if (texture.transfom.present())
             {
                 p = texture.transfom.unwrap().apply(p);

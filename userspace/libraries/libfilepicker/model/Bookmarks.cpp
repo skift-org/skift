@@ -6,7 +6,7 @@
 namespace FilePicker
 {
 
-const Vector<Bookmark> &Bookmarks::all() const
+const Vec<Bookmark> &Bookmarks::all() const
 {
     return _bookmarks;
 }

@@ -18,7 +18,7 @@ protected:
     RefPtr<FilesystemModel> _listing;
 
 public:
-    Optional<String> selected_path()
+    Opt<String> selected_path()
     {
         if (selected() == -1)
         {
@@ -35,10 +35,11 @@ public:
 
         empty_message("This directory is empty.");
 
-        _navigation_observer = navigation->observe([this](auto &) {
-            select(-1);
-            scroll_to_top();
-        });
+        _navigation_observer = navigation->observe([this](auto &)
+            {
+                select(-1);
+                scroll_to_top();
+            });
     }
 };
 

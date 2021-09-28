@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libutils/Lock.h>
-#include <libutils/RingBuffer.h>
+#include <libutils/Ring.h>
 
 #include "archs/x86/COM.h"
 
@@ -10,7 +10,7 @@
 struct LegacySerial : public LegacyDevice
 {
 private:
-    RingBuffer<char> _buffer{4096};
+    Ring<char> _buffer{4096};
     Lock _buffer_lock{"legacy-serial"};
 
     COMPort port() { return (COMPort)legacy_address(); }

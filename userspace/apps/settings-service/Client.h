@@ -2,7 +2,7 @@
 
 #include <libipc/Peer.h>
 #include <libsettings/Protocol.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Settings
 {
@@ -10,7 +10,7 @@ namespace Settings
 struct Client : public IPC::Peer<Protocol>
 {
 private:
-    Vector<Path> _subscriptions;
+    Vec<Path> _subscriptions;
 
 public:
     Func<void(Client &, const Message &message)> on_message;

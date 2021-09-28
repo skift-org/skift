@@ -10,7 +10,7 @@ TEST(xml_basic_test)
     auto result = Xml::parse(file);
     Assert::equal(result.result(), HjResult::SUCCESS);
 
-    Xml::Document doc = result.unwrap();
+    Xml::Doc doc = result.unwrap();
 
     // Check the root
     Assert::equal(doc.root().name(), "Root");
@@ -34,7 +34,7 @@ TEST(xml_empty_tags_test)
     auto result = Xml::parse(file);
     Assert::equal(result.result(), HjResult::SUCCESS);
 
-    Xml::Document doc = result.unwrap();
+    Xml::Doc doc = result.unwrap();
 
     // Check the root
     Assert::equal(doc.root().name(), "Root");

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libmath/Rect.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include <libgraphic/svg/SubPath.h>
 
@@ -11,7 +11,7 @@ namespace Graphic
 struct Path
 {
 private:
-    Vector<SubPath> _subpaths;
+    Vec<SubPath> _subpaths;
     bool _subpath_ended = true;
 
     SubPath &current()
@@ -39,7 +39,7 @@ public:
 
     static Path parse(IO::Scanner &scan);
 
-    const Vector<SubPath> &subpaths() const
+    const Vec<SubPath> &subpaths() const
     {
         return _subpaths;
     }

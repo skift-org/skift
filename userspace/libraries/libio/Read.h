@@ -3,13 +3,13 @@
 #include <libio/Copy.h>
 #include <libio/Reader.h>
 #include <libutils/Assert.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace IO
 {
 
 template <typename T>
-ResultOr<size_t> read_vector(Reader &reader, Vector<T> &vector)
+ResultOr<size_t> read_vector(Reader &reader, Vec<T> &vector)
 {
     size_t read = 0;
 

@@ -49,17 +49,17 @@ public:
         _buffer.undirty(x, convert_y(y));
     }
 
-    void clear(int fromx, int fromy, int tox, int toy, Attributes attributes)
+    void clear(int fromx, int fromy, int tox, int toy, Attrs attributes)
     {
         _buffer.clear(fromx, convert_y(fromy), tox, convert_y(toy), attributes);
     }
 
-    void clear_all(Attributes attributes)
+    void clear_all(Attrs attributes)
     {
         clear(0, 0, _width, _height, attributes);
     }
 
-    void clear_line(int line, Attributes attributes)
+    void clear_line(int line, Attrs attributes)
     {
         _buffer.clear_line(convert_y(line), attributes);
     }
@@ -71,7 +71,7 @@ public:
         _height = height;
     }
 
-    void scroll(int how_many_line, Attributes attributes)
+    void scroll(int how_many_line, Attrs attributes)
     {
         _buffer.scroll(how_many_line, attributes);
         _scrollback += how_many_line;

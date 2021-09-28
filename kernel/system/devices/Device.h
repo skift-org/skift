@@ -7,7 +7,7 @@
 #include <libutils/RefPtr.h>
 #include <libutils/ResultOr.h>
 #include <libutils/String.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include "system/devices/DeviceAddress.h"
 #include "system/devices/DeviceClass.h"
@@ -19,7 +19,7 @@ private:
     DeviceClass _klass;
     String _name;
 
-    Vector<RefPtr<Device>> _children{};
+    Vec<RefPtr<Device>> _children{};
 
 public:
     DeviceClass klass()

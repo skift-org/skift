@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/RingBuffer.h>
+#include <libutils/Ring.h>
 
 #include "system/node/Node.h"
 
@@ -13,8 +13,8 @@ private:
     int _height = 25;
 
 public:
-    RingBuffer<char> server_to_client_buffer{BUFFER_SIZE};
-    RingBuffer<char> client_to_server_buffer{BUFFER_SIZE};
+    Ring<char> server_to_client_buffer{BUFFER_SIZE};
+    Ring<char> client_to_server_buffer{BUFFER_SIZE};
 
     FsTerminal();
 

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include "system/node/Node.h"
 
 struct FsSocket : public FsNode
 {
 private:
-    Vector<RefPtr<FsNode>> _pending{};
+    Vec<RefPtr<FsNode>> _pending{};
 
 public:
     FsSocket();

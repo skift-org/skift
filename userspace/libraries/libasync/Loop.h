@@ -2,7 +2,7 @@
 
 #include <libio/Handle.h>
 #include <libutils/RefCounted.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 namespace Async
 {
@@ -24,11 +24,11 @@ private:
     bool _nested_is_running = false;
     int _nested_exit_value = 0;
 
-    Vector<HandlePoll> _polls;
+    Vec<HandlePoll> _polls;
 
-    Vector<Notifier *> _notifiers;
-    Vector<Timer *> _timers;
-    Vector<Invoker *> _invoker;
+    Vec<Notifier *> _notifiers;
+    Vec<Timer *> _timers;
+    Vec<Invoker *> _invoker;
 
     void update_polling_list();
 

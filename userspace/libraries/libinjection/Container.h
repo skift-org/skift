@@ -3,7 +3,7 @@
 #include <libutils/Assert.h>
 #include <libutils/HashMap.h>
 #include <libutils/TypeId.h>
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include <libinjection/Entity.h>
 #include <libinjection/Lifetimes.h>
@@ -15,7 +15,7 @@ namespace Injection
 struct Container
 {
 private:
-    HashMap<TypeId, Vector<RefPtr<AnyRef>>> _retrievers;
+    HashMap<TypeId, Vec<RefPtr<AnyRef>>> _retrievers;
 
 public:
     template <typename TLifetime, typename... TInterfaces>
@@ -69,9 +69,9 @@ public:
     }
 
     template <typename TInterface>
-    Vector<RefPtr<TInterface>> get_all(Context &context)
+    Vec<RefPtr<TInterface>> get_all(Context &context)
     {
-        Vector<RefPtr<TInterface>> instances;
+        Vec<RefPtr<TInterface>> instances;
 
         TypeId id = GetTypeId<TInterface>();
 
@@ -80,7 +80,7 @@ public:
             return instances;
         }
 
-        Vector<RefPtr<AnyRef>> &retrievers = _retrievers[id];
+        Vec<RefPtr<AnyRef>> &retrievers = _retrievers[id];
 
         for (size_t i = 0; i < retrievers.count(); i++)
         {
@@ -91,23 +91,23 @@ public:
     }
 
     template <typename TInterface>
-    Vector<RefPtr<TInterface>> get_all()
+    Vec<RefPtr<TInterface>> get_all()
     {
         Context context{*this};
         return get_all<TInterface>(context);
     }
 
     template <typename TQuery>
-    requires(!IsVector<TQuery>::value) TQuery query(Context &context)
+    requires(!IsVec<TQuery>::value) TQuery query(Context &context)
     {
         using TInterface = typename TrimRefPtr<TQuery>::type;
         return get<TInterface>(context);
     }
 
     template <typename TQuery>
-    requires(IsVector<TQuery>::value) TQuery query(Context &context)
+    requires(IsVec<TQuery>::value) TQuery query(Context &context)
     {
-        using TInterface = typename TrimRefPtr<typename TrimVector<TQuery>::type>::type;
+        using TInterface = typename TrimRefPtr<typename TrimVec<TQuery>::type>::type;
         return get_all<TInterface>(context);
     }
 };

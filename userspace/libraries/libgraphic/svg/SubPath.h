@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 
 #include <libmath/Arc.h>
 #include <libmath/CubicBezier.h>
@@ -11,7 +11,7 @@ namespace Graphic
 struct SubPath
 {
 private:
-    Vector<Math::Vec2f> _points;
+    Vec<Math::Vec2f> _points;
     bool _closed = false;
 
 public:

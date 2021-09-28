@@ -1,4 +1,4 @@
-#include <libutils/Vector.h>
+#include <libutils/Vec.h>
 #include <skift/NumberFormatter.h>
 #include <string.h>
 
@@ -10,7 +10,7 @@
 #include "system/devices/Driver.h"
 #include "unix/UNIX.h"
 
-static Vector<RefPtr<Device>> *_devices = nullptr;
+static Vec<RefPtr<Device>> *_devices = nullptr;
 
 static int _device_ids[(uint8_t)DeviceClass::__COUNT] = {};
 static const char *_device_names[(uint8_t)DeviceClass::__COUNT] = {
@@ -103,7 +103,7 @@ void device_initialize()
 
     Kernel::logln("Initializing devices...");
 
-    _devices = new Vector<RefPtr<Device>>();
+    _devices = new Vec<RefPtr<Device>>();
 
     device_scan([&](DeviceAddress address)
         {

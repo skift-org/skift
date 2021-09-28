@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libterminal/Attributes.h>
+#include <libterminal/Attrs.h>
 #include <libterminal/Buffer.h>
 #include <libterminal/Cursor.h>
 #include <libterminal/Surface.h>
@@ -33,7 +33,7 @@ private:
     Cursor _saved_cursor;
     Cursor _cursor;
 
-    Attributes _attributes;
+    Attrs _attributes;
 
     static constexpr int MAX_PARAMETERS = 8;
     int _parameters_top;

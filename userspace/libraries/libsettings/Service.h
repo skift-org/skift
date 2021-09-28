@@ -3,7 +3,7 @@
 #include <libjson/Json.h>
 #include <libsettings/Path.h>
 #include <libsettings/ServerConnection.h>
-#include <libutils/Optional.h>
+#include <libutils/Opt.h>
 
 namespace Settings
 {
@@ -13,7 +13,7 @@ struct Watcher;
 struct Service : public RefCounted<Service>
 {
 private:
-    Vector<Watcher *> _watchers;
+    Vec<Watcher *> _watchers;
     OwnPtr<ServerConnection> _server;
 
 public:
@@ -34,7 +34,7 @@ public:
 
     void unregister_watcher(Watcher &watcher);
 
-    Optional<Json::Value> read(const Path path);
+    Opt<Json::Value> read(const Path path);
 
     bool write(const Path path, Json::Value value);
 };

@@ -37,7 +37,7 @@ struct Formatter
 {
 private:
     Type _type = Type::DEFAULT;
-    Optional<int> _width;
+    Opt<int> _width;
     char _padding = ' ';
     int _precision = 4;
     bool _capitalized = false;

@@ -19,7 +19,7 @@ RefPtr<Element> ApplicationListingComponent::build()
 {
     Text::FuzzyMatcher matcher;
 
-    Vector<RefPtr<Element>> children;
+    Vec<RefPtr<Element>> children;
 
     MenuEntry::load().foreach([&](auto &entry)
         {

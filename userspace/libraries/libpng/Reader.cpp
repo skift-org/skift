@@ -103,7 +103,7 @@ HjResult Reader::read_chunks()
 
         case BackgroundColor::SIG:
         {
-            Vector<uint8_t> data;
+            Vec<uint8_t> data;
             TRY(IO::read_vector(scoped_reader, data));
         }
         break;
@@ -189,7 +189,7 @@ HjResult Reader::read_chunks()
 
         case TextualData::SIG:
         {
-            Vector<uint8_t> data;
+            Vec<uint8_t> data;
             TRY(IO::read_vector(scoped_reader, data));
         }
         break;
@@ -207,7 +207,7 @@ HjResult Reader::read_chunks()
         default:
         {
             IO::logln("Unknown PNG chunk: {08x}", chunk_signature());
-            Vector<uint8_t> data;
+            Vec<uint8_t> data;
             TRY(IO::read_vector(scoped_reader, data));
         }
         break;
@@ -274,7 +274,7 @@ static uint8_t paeth_predictor(int16_t a, int16_t b, int16_t c)
 
 // Copyright (c) 2005-2020 Lode Vandevenne
 HjResult Reader::unfilter_scanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
-                                   size_t bytewidth, FilterType filter_type, size_t length)
+    size_t bytewidth, FilterType filter_type, size_t length)
 {
     // For PNG filter method 0
     // unfilter a PNG image scanline by scanline. when the pixels are smaller than 1 byte,
@@ -441,17 +441,17 @@ HjResult Reader::convert(uint8_t *buffer)
         for (size_t i = 0; i < _width * _height; i++)
         {
             _pixels[i] = Graphic::Color::from_rgba_byte(buffer[i * 4],
-                                                        buffer[i * 4 + 1],
-                                                        buffer[i * 4 + 2],
-                                                        buffer[i * 4 + 3]);
+                buffer[i * 4 + 1],
+                buffer[i * 4 + 2],
+                buffer[i * 4 + 3]);
         }
         break;
     case CT_RGB:
         for (size_t i = 0; i < _width * _height; i++)
         {
             _pixels[i] = Graphic::Color::from_rgb_byte(buffer[i * 3],
-                                                       buffer[i * 3 + 1],
-                                                       buffer[i * 3 + 2]);
+                buffer[i * 3 + 1],
+                buffer[i * 3 + 2]);
         }
         break;
 
@@ -465,7 +465,7 @@ HjResult Reader::convert(uint8_t *buffer)
         for (size_t i = 0; i < _width * _height; i++)
         {
             _pixels[i] = Graphic::Color::from_monochrome_alpha_byte(buffer[i * 2],
-                                                                    buffer[i * 2 + 1]);
+                buffer[i * 2 + 1]);
         }
         break;
     case CT_PALETTE:

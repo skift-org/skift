@@ -70,7 +70,8 @@ Window::Window(WindowFlag flags)
     frontbuffer = Graphic::Bitmap::create_shared(250, 250).unwrap();
     backbuffer = Graphic::Bitmap::create_shared(250, 250).unwrap();
 
-    _update_invoker = own<Async::Invoker>([this] { update(); });
+    _update_invoker = own<Async::Invoker>([this]
+        { update(); });
 
     Application::the().add_window(this);
     position({96, 72});
@@ -174,20 +175,21 @@ void Window::update()
 
     Graphic::Painter painter{*backbuffer};
 
-    _dirty_paint.foreach([&](Math::Recti &rect) {
-        repaint(painter, rect);
-
-        if (repaited_regions.is_empty())
+    _dirty_paint.foreach([&](Math::Recti &rect)
         {
-            repaited_regions = rect;
-        }
-        else
-        {
-            repaited_regions = rect.merged_with(repaited_regions);
-        }
+            repaint(painter, rect);
 
-        return Iteration::CONTINUE;
-    });
+            if (repaited_regions.is_empty())
+            {
+                repaited_regions = rect;
+            }
+            else
+            {
+                repaited_regions = rect.merged_with(repaited_regions);
+            }
+
+            return Iter::CONTINUE;
+        });
 
     _dirty_paint.clear();
 

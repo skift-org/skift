@@ -36,17 +36,18 @@ private:
         Item *result = nullptr;
         auto &b = bucket(hash);
 
-        b.foreach([&](Item &item) {
-            if (item.hash == hash && item.key == key)
+        b.foreach([&](Item &item)
             {
-                result = &item;
-                return Iteration::STOP;
-            }
-            else
-            {
-                return Iteration::CONTINUE;
-            }
-        });
+                if (item.hash == hash && item.key == key)
+                {
+                    result = &item;
+                    return Iter::STOP;
+                }
+                else
+                {
+                    return Iter::CONTINUE;
+                }
+            });
 
         return result;
     }
@@ -91,20 +92,19 @@ public:
     {
         uint32_t h = hash<TKey>(key);
 
-        bucket(h).remove_all_match([&](auto &item) {
-            return item.hash == h && item.key == key;
-        });
+        bucket(h).remove_all_match([&](auto &item)
+            { return item.hash == h && item.key == key; });
     }
 
     void remove_value(TValue &value)
     {
-        _buckets.foreach([&](auto &bucket) {
-            bucket.remove_all_match([&](auto &item) {
-                return item.value == value;
-            });
+        _buckets.foreach([&](auto &bucket)
+            {
+                bucket.remove_all_match([&](auto &item)
+                    { return item.value == value; });
 
-            return Iteration::CONTINUE;
-        });
+                return Iter::CONTINUE;
+            });
     }
 
     bool has_key(const TKey &key)
@@ -116,29 +116,28 @@ public:
     {
         bool result = false;
 
-        this->foreach([&](auto &, auto &v) {
-            if (v == value)
+        this->foreach([&](auto &, auto &v)
             {
-                result = true;
-                return Iteration::STOP;
-            }
-            else
-            {
-                return Iteration::CONTINUE;
-            }
-        });
+                if (v == value)
+                {
+                    result = true;
+                    return Iter::STOP;
+                }
+                else
+                {
+                    return Iter::CONTINUE;
+                }
+            });
 
         return result;
     }
 
     template <typename TCallback>
-    Iteration foreach(TCallback callback) const
+    Iter foreach(TCallback callback) const
     {
-        return _buckets.foreach([&](auto &bucket) {
-            return bucket.foreach([&](auto &item) {
-                return callback(item.key, item.value);
-            });
-        });
+        return _buckets.foreach([&](auto &bucket)
+            { return bucket.foreach([&](auto &item)
+                  { return callback(item.key, item.value); }); });
     }
 
     HashMap &operator=(const HashMap &other)

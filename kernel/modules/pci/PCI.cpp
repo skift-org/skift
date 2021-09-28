@@ -6,13 +6,13 @@
 #include "archs/x86_32/x86_32.h"
 #include "pci/PCI.h"
 
-Iteration pci_scan_bus(IterFunc<PCIAddress> &callback, int bus);
+Iter pci_scan_bus(IterFunc<PCIAddress> &callback, int bus);
 
-Iteration pci_scan_func(IterFunc<PCIAddress> &callback, PCIAddress &address)
+Iter pci_scan_func(IterFunc<PCIAddress> &callback, PCIAddress &address)
 {
-    if (callback(address) == Iteration::STOP)
+    if (callback(address) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
     if (address.read_class_sub_class() == PCI_TYPE_BRIDGE)
@@ -21,27 +21,27 @@ Iteration pci_scan_func(IterFunc<PCIAddress> &callback, PCIAddress &address)
     }
     else
     {
-        return Iteration::CONTINUE;
+        return Iter::CONTINUE;
     }
 }
 
-Iteration pci_scan_slot(IterFunc<PCIAddress> &callback, int bus, int slot)
+Iter pci_scan_slot(IterFunc<PCIAddress> &callback, int bus, int slot)
 {
     PCIAddress address{bus, slot, 0};
 
     if (address.read16(PCI_VENDOR_ID) == PCI_NONE)
     {
-        return Iteration::CONTINUE;
+        return Iter::CONTINUE;
     }
 
-    if (pci_scan_func(callback, address) == Iteration::STOP)
+    if (pci_scan_func(callback, address) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
     if (!address.read8(PCI_HEADER_TYPE))
     {
-        return Iteration::CONTINUE;
+        return Iter::CONTINUE;
     }
 
     for (int func = 1; func < 8; func++)
@@ -49,29 +49,29 @@ Iteration pci_scan_slot(IterFunc<PCIAddress> &callback, int bus, int slot)
         PCIAddress address{bus, slot, func};
 
         if (address.read16(PCI_VENDOR_ID) != PCI_NONE &&
-            pci_scan_func(callback, address) == Iteration::STOP)
+            pci_scan_func(callback, address) == Iter::STOP)
         {
-            return Iteration::STOP;
+            return Iter::STOP;
         }
     }
 
-    return Iteration::CONTINUE;
+    return Iter::CONTINUE;
 }
 
-Iteration pci_scan_bus(IterFunc<PCIAddress> &callback, int bus)
+Iter pci_scan_bus(IterFunc<PCIAddress> &callback, int bus)
 {
     for (int slot = 0; slot < 32; ++slot)
     {
-        if (pci_scan_slot(callback, bus, slot) == Iteration::STOP)
+        if (pci_scan_slot(callback, bus, slot) == Iter::STOP)
         {
-            return Iteration::STOP;
+            return Iter::STOP;
         }
     }
 
-    return Iteration::CONTINUE;
+    return Iter::CONTINUE;
 }
 
-Iteration pci_scan(IterFunc<PCIAddress> callback)
+Iter pci_scan(IterFunc<PCIAddress> callback)
 {
     PCIAddress address{};
 
@@ -86,16 +86,16 @@ Iteration pci_scan(IterFunc<PCIAddress> callback)
 
         if (address.read16(PCI_VENDOR_ID) == PCI_NONE)
         {
-            return Iteration::CONTINUE;
+            return Iter::CONTINUE;
         }
 
-        if (pci_scan_bus(callback, func) == Iteration::STOP)
+        if (pci_scan_bus(callback, func) == Iter::STOP)
         {
-            return Iteration::STOP;
+            return Iter::STOP;
         }
     }
 
-    return Iteration::CONTINUE;
+    return Iter::CONTINUE;
 }
 
 static bool _has_isa_bridge = false;
@@ -104,39 +104,41 @@ static uint8_t _isa_remaps[4] = {};
 
 void pci_initialize_isa_bridge()
 {
-    auto is_isa_bridge = [](PCIAddress &address) {
+    auto is_isa_bridge = [](PCIAddress &address)
+    {
         return address.read16(PCI_CLASS) == 0x06 &&
                address.read16(PCI_SUBCLASS) == 0x01;
     };
 
-    pci_scan([&](PCIAddress address) {
-        if (is_isa_bridge(address))
+    pci_scan([&](PCIAddress address)
         {
-            Kernel::logln("Found isa bridge on PCI:{02x}:{02x}.{x}", address.bus(), address.slot(), address.func());
-            _isa_bridge_address = address;
-            _has_isa_bridge = true;
-
-            for (int i = 0; i < 4; ++i)
+            if (is_isa_bridge(address))
             {
-                _isa_remaps[i] = address.read8(0x60 + i);
+                Kernel::logln("Found isa bridge on PCI:{02x}:{02x}.{x}", address.bus(), address.slot(), address.func());
+                _isa_bridge_address = address;
+                _has_isa_bridge = true;
 
-                if (_isa_remaps[i] == 0x80)
+                for (int i = 0; i < 4; ++i)
                 {
-                    _isa_remaps[i] = 10 + (i % 1);
+                    _isa_remaps[i] = address.read8(0x60 + i);
+
+                    if (_isa_remaps[i] == 0x80)
+                    {
+                        _isa_remaps[i] = 10 + (i % 1);
+                    }
                 }
+
+                uint32_t out = 0;
+                memcpy(&out, &_isa_remaps, 4);
+                address.write32(0x60, out);
+
+                return Iter::STOP;
             }
-
-            uint32_t out = 0;
-            memcpy(&out, &_isa_remaps, 4);
-            address.write32(0x60, out);
-
-            return Iteration::STOP;
-        }
-        else
-        {
-            return Iteration::CONTINUE;
-        }
-    });
+            else
+            {
+                return Iter::CONTINUE;
+            }
+        });
 }
 
 int pci_get_interrupt(PCIAddress address)
@@ -154,7 +156,7 @@ int pci_get_interrupt(PCIAddress address)
         int int_line = address.read8(PCI_INTERRUPT_LINE);
 
         Kernel::logln("Slot is {}, irq pin is {}, so pirq is {} and that maps to {}? int_line={}",
-                      address.slot(), irq_pin, pirq, _isa_remaps[pirq], int_line);
+            address.slot(), irq_pin, pirq, _isa_remaps[pirq], int_line);
 
         for (int i = 0; i < 4; ++i)
         {

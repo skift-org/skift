@@ -14,11 +14,11 @@ FsProcessInfo::FsProcessInfo() : FsNode(HJ_FILE_TYPE_DEVICE)
 {
 }
 
-static Iteration serialize_task(Json::Value::Array *list, Task *task)
+static Iter serialize_task(Json::Value::Array *list, Task *task)
 {
     if (task->id == 0)
     {
-        return Iteration::CONTINUE;
+        return Iter::CONTINUE;
     }
 
     Json::Value::Object task_object{};
@@ -32,7 +32,7 @@ static Iteration serialize_task(Json::Value::Array *list, Task *task)
 
     list->push_back(std::move(task_object));
 
-    return Iteration::CONTINUE;
+    return Iter::CONTINUE;
 }
 
 HjResult FsProcessInfo::open(FsHandle &handle)

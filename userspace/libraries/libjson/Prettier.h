@@ -38,28 +38,29 @@ inline void prettify(IO::Prettier &pretty, const Value &value)
 
             size_t index = 0;
 
-            object.foreach([&](auto &key, auto &value) {
-                pretty.ident();
-
-                pretty.color_depth();
-
-                IO::write(pretty, '"');
-                IO::write(pretty, key);
-                IO::write(pretty, '"');
-
-                pretty.color_clear();
-
-                IO::write(pretty, ": ");
-                prettify(pretty, value);
-
-                if (index + 1 < object.count())
+            object.foreach([&](auto &key, auto &value)
                 {
-                    IO::write(pretty, ',');
-                }
+                    pretty.ident();
 
-                index++;
-                return Iteration::CONTINUE;
-            });
+                    pretty.color_depth();
+
+                    IO::write(pretty, '"');
+                    IO::write(pretty, key);
+                    IO::write(pretty, '"');
+
+                    pretty.color_clear();
+
+                    IO::write(pretty, ": ");
+                    prettify(pretty, value);
+
+                    if (index + 1 < object.count())
+                    {
+                        IO::write(pretty, ',');
+                    }
+
+                    index++;
+                    return Iter::CONTINUE;
+                });
 
             pretty.pop_ident();
         }

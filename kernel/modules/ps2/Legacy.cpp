@@ -1,56 +1,56 @@
 #include "ps2/Legacy.h"
 
-Iteration legacy_scan(IterFunc<LegacyAddress> callback)
+Iter legacy_scan(IterFunc<LegacyAddress> callback)
 {
-    if (callback(LEGACY_MOUSE) == Iteration::STOP)
+    if (callback(LEGACY_MOUSE) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    if (callback(LEGACY_KEYBOARD) == Iteration::STOP)
+    if (callback(LEGACY_KEYBOARD) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    if (callback(LEGACY_ATA0) == Iteration::STOP)
+    if (callback(LEGACY_ATA0) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    if (callback(LEGACY_ATA1) == Iteration::STOP)
+    if (callback(LEGACY_ATA1) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    if (callback(LEGACY_ATA2) == Iteration::STOP)
+    if (callback(LEGACY_ATA2) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    if (callback(LEGACY_ATA3) == Iteration::STOP)
+    if (callback(LEGACY_ATA3) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    if (callback(LEGACY_COM1) == Iteration::STOP)
+    if (callback(LEGACY_COM1) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    if (callback(LEGACY_COM2) == Iteration::STOP)
+    if (callback(LEGACY_COM2) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    if (callback(LEGACY_COM3) == Iteration::STOP)
+    if (callback(LEGACY_COM3) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    if (callback(LEGACY_COM4) == Iteration::STOP)
+    if (callback(LEGACY_COM4) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    return Iteration::CONTINUE;
+    return Iter::CONTINUE;
 }

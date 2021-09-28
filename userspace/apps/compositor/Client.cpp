@@ -214,9 +214,8 @@ Client::Client(IO::Connection connection)
 {
     _connection = connection;
 
-    _notifier = own<Async::Notifier>(connection, POLL_READ, [this]() {
-        this->handle_request();
-    });
+    _notifier = own<Async::Notifier>(connection, POLL_READ, [this]()
+        { this->handle_request(); });
 
     IO::logln("Client {08x} connected", this);
 
@@ -228,26 +227,27 @@ Client::Client(IO::Connection connection)
     });
 }
 
-Iteration destroy_window_if_client_match(Client *client, Window *window)
+Iter destroy_window_if_client_match(Client *client, Window *window)
 {
     if (window->client() == client)
     {
         delete window;
     }
 
-    return Iteration::CONTINUE;
+    return Iter::CONTINUE;
 }
 
 void client_close_all_windows(Client *client)
 {
-    manager_get_windows().foreach([&](auto *window) {
-        if (window->client() == client)
+    manager_get_windows().foreach([&](auto *window)
         {
-            delete window;
-        }
+            if (window->client() == client)
+            {
+                delete window;
+            }
 
-        return Iteration::CONTINUE;
-    });
+            return Iter::CONTINUE;
+        });
 }
 
 Client::~Client()
@@ -259,10 +259,11 @@ Client::~Client()
 
 void client_broadcast(CompositorMessage message)
 {
-    _clients.foreach([&](auto &client) {
-        client->send_message(message);
-        return Iteration::CONTINUE;
-    });
+    _clients.foreach([&](auto &client)
+        {
+            client->send_message(message);
+            return Iter::CONTINUE;
+        });
 }
 
 HjResult Client::send_message(CompositorMessage message)
@@ -286,5 +287,6 @@ HjResult Client::send_message(CompositorMessage message)
 
 void client_destroy_disconnected()
 {
-    _clients.remove_all_match([](auto &client) { return client->_disconnected; });
+    _clients.remove_all_match([](auto &client)
+        { return client->_disconnected; });
 }

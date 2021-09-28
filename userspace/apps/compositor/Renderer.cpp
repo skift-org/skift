@@ -23,17 +23,20 @@ void renderer_initialize()
 {
     _framebuffer = Graphic::Framebuffer::open().unwrap();
     _wallpaper = own<compositor::Wallpaper>(_framebuffer->resolution().size());
-    _wallpaper->on_change = []() { renderer_region_dirty(renderer_bound()); };
+    _wallpaper->on_change = []()
+    { renderer_region_dirty(renderer_bound()); };
 
-    _night_light_enable_setting = own<Settings::Setting>("appearance:night-light.enable", [](auto &value) {
-        _night_light_enable = value.as_bool();
-        renderer_region_dirty(renderer_bound());
-    });
+    _night_light_enable_setting = own<Settings::Setting>("appearance:night-light.enable", [](auto &value)
+        {
+            _night_light_enable = value.as_bool();
+            renderer_region_dirty(renderer_bound());
+        });
 
-    _night_light_stenght_setting = own<Settings::Setting>("appearance:night-light.stenght", [](auto &value) {
-        _night_light_strenght = value.as_double();
-        renderer_region_dirty(renderer_bound());
-    });
+    _night_light_stenght_setting = own<Settings::Setting>("appearance:night-light.stenght", [](auto &value)
+        {
+            _night_light_strenght = value.as_double();
+            renderer_region_dirty(renderer_bound());
+        });
 
     renderer_region_dirty(_framebuffer->resolution());
 }
@@ -47,30 +50,31 @@ void renderer_region_dirty(Math::Recti new_region)
 
     bool merged = false;
 
-    _dirty_regions.foreach([&](Math::Recti &region) {
-        if (region.colide_with(new_region))
+    _dirty_regions.foreach([&](Math::Recti &region)
         {
-            Math::Recti top;
-            Math::Recti botton;
-            Math::Recti left;
-            Math::Recti right;
+            if (region.colide_with(new_region))
+            {
+                Math::Recti top;
+                Math::Recti botton;
+                Math::Recti left;
+                Math::Recti right;
 
-            new_region.substract(region, top, botton, left, right);
+                new_region.substract(region, top, botton, left, right);
 
-            renderer_region_dirty(top);
-            renderer_region_dirty(botton);
-            renderer_region_dirty(left);
-            renderer_region_dirty(right);
+                renderer_region_dirty(top);
+                renderer_region_dirty(botton);
+                renderer_region_dirty(left);
+                renderer_region_dirty(right);
 
-            merged = true;
+                merged = true;
 
-            return Iteration::STOP;
-        }
-        else
-        {
-            return Iteration::CONTINUE;
-        }
-    });
+                return Iter::STOP;
+            }
+            else
+            {
+                return Iter::CONTINUE;
+            }
+        });
 
     if (!merged)
     {
@@ -88,30 +92,31 @@ void renderer_composite_region(Graphic::Painter &painter, Math::Recti region, Wi
 {
     renderer_composite_wallpaper(painter, region);
 
-    manager_iterate_back_to_front([&](Window *window) {
-        if (window == window_transparent)
+    manager_iterate_back_to_front([&](Window *window)
         {
-            return Iteration::STOP;
-        }
-
-        if (window->bound().colide_with(region))
-        {
-            Math::Recti destination = window->bound().clipped_with(region);
-
-            Math::Recti source(
-                destination.position() - window->bound().position(),
-                destination.size());
-
-            if (window->flags() & WINDOW_ACRYLIC)
+            if (window == window_transparent)
             {
-                painter.blit(_wallpaper->acrylic(), destination, destination);
+                return Iter::STOP;
             }
 
-            painter.blit(window->frontbuffer(), source, destination);
-        }
+            if (window->bound().colide_with(region))
+            {
+                Math::Recti destination = window->bound().clipped_with(region);
 
-        return Iteration::CONTINUE;
-    });
+                Math::Recti source(
+                    destination.position() - window->bound().position(),
+                    destination.size());
+
+                if (window->flags() & WINDOW_ACRYLIC)
+                {
+                    painter.blit(_wallpaper->acrylic(), destination, destination);
+                }
+
+                painter.blit(window->frontbuffer(), source, destination);
+            }
+
+            return Iter::CONTINUE;
+        });
 
     _framebuffer->mark_dirty(region);
 }
@@ -125,86 +130,87 @@ void renderer_region(Graphic::Painter &painter, Math::Recti region)
         return;
     }
 
-    manager_iterate_front_to_back([&](Window *window) {
-        if (window->bound().colide_with(region))
+    manager_iterate_front_to_back([&](Window *window)
         {
-            Math::Recti destination = window->bound().clipped_with(region);
-
-            Math::Recti source(
-                destination.position() - window->bound().position(),
-                destination.size());
-
-            int radius = 6;
-
-            if (window->flags() & WINDOW_TRANSPARENT)
+            if (window->bound().colide_with(region))
             {
-                renderer_composite_region(painter, destination, window);
-                painter.blit(window->frontbuffer(), source, destination);
-            }
-            else if (window->flags() & WINDOW_ACRYLIC)
-            {
-                if (window->flags() & WINDOW_NO_ROUNDED_CORNERS)
+                Math::Recti destination = window->bound().clipped_with(region);
+
+                Math::Recti source(
+                    destination.position() - window->bound().position(),
+                    destination.size());
+
+                int radius = 6;
+
+                if (window->flags() & WINDOW_TRANSPARENT)
                 {
-                    painter.blit(_wallpaper->acrylic(), region, region);
+                    renderer_composite_region(painter, destination, window);
                     painter.blit(window->frontbuffer(), source, destination);
+                }
+                else if (window->flags() & WINDOW_ACRYLIC)
+                {
+                    if (window->flags() & WINDOW_NO_ROUNDED_CORNERS)
+                    {
+                        painter.blit(_wallpaper->acrylic(), region, region);
+                        painter.blit(window->frontbuffer(), source, destination);
+                    }
+                    else
+                    {
+                        painter.push();
+                        painter.clip(destination);
+
+                        renderer_composite_region(painter, window->bound().take_top_left(radius).clipped_with(region), window);
+                        renderer_composite_region(painter, window->bound().take_top_right(radius).clipped_with(region), window);
+                        renderer_composite_region(painter, window->bound().take_bottom_left(radius).clipped_with(region), window);
+                        renderer_composite_region(painter, window->bound().take_bottom_right(radius).clipped_with(region), window);
+
+                        painter.blit_rounded(_wallpaper->acrylic(), window->bound(), window->bound(), radius);
+                        painter.blit_rounded(window->frontbuffer(), window->bound().size(), window->bound(), radius);
+                        painter.pop();
+                    }
                 }
                 else
                 {
-                    painter.push();
-                    painter.clip(destination);
+                    if (window->flags() & WINDOW_NO_ROUNDED_CORNERS)
+                    {
+                        painter.blit(window->frontbuffer(), source, destination);
+                    }
+                    else
+                    {
+                        painter.push();
+                        painter.clip(destination);
 
-                    renderer_composite_region(painter, window->bound().take_top_left(radius).clipped_with(region), window);
-                    renderer_composite_region(painter, window->bound().take_top_right(radius).clipped_with(region), window);
-                    renderer_composite_region(painter, window->bound().take_bottom_left(radius).clipped_with(region), window);
-                    renderer_composite_region(painter, window->bound().take_bottom_right(radius).clipped_with(region), window);
+                        renderer_composite_region(painter, window->bound().take_top_left(radius).clipped_with(region), window);
+                        renderer_composite_region(painter, window->bound().take_top_right(radius).clipped_with(region), window);
+                        renderer_composite_region(painter, window->bound().take_bottom_left(radius).clipped_with(region), window);
+                        renderer_composite_region(painter, window->bound().take_bottom_right(radius).clipped_with(region), window);
 
-                    painter.blit_rounded(_wallpaper->acrylic(), window->bound(), window->bound(), radius);
-                    painter.blit_rounded(window->frontbuffer(), window->bound().size(), window->bound(), radius);
-                    painter.pop();
+                        painter.blit_rounded(window->frontbuffer(), window->bound().size(), window->bound(), radius);
+                        painter.pop();
+                    }
                 }
+
+                _framebuffer->mark_dirty(destination);
+
+                Math::Recti top;
+                Math::Recti botton;
+                Math::Recti left;
+                Math::Recti right;
+
+                region.substract(destination, top, botton, left, right);
+
+                renderer_region(painter, top);
+                renderer_region(painter, botton);
+                renderer_region(painter, left);
+                renderer_region(painter, right);
+
+                should_paint_wallpaper = false;
+
+                return Iter::STOP;
             }
-            else
-            {
-                if (window->flags() & WINDOW_NO_ROUNDED_CORNERS)
-                {
-                    painter.blit(window->frontbuffer(), source, destination);
-                }
-                else
-                {
-                    painter.push();
-                    painter.clip(destination);
 
-                    renderer_composite_region(painter, window->bound().take_top_left(radius).clipped_with(region), window);
-                    renderer_composite_region(painter, window->bound().take_top_right(radius).clipped_with(region), window);
-                    renderer_composite_region(painter, window->bound().take_bottom_left(radius).clipped_with(region), window);
-                    renderer_composite_region(painter, window->bound().take_bottom_right(radius).clipped_with(region), window);
-
-                    painter.blit_rounded(window->frontbuffer(), window->bound().size(), window->bound(), radius);
-                    painter.pop();
-                }
-            }
-
-            _framebuffer->mark_dirty(destination);
-
-            Math::Recti top;
-            Math::Recti botton;
-            Math::Recti left;
-            Math::Recti right;
-
-            region.substract(destination, top, botton, left, right);
-
-            renderer_region(painter, top);
-            renderer_region(painter, botton);
-            renderer_region(painter, left);
-            renderer_region(painter, right);
-
-            should_paint_wallpaper = false;
-
-            return Iteration::STOP;
-        }
-
-        return Iteration::CONTINUE;
-    });
+            return Iter::CONTINUE;
+        });
 
     if (should_paint_wallpaper)
     {
@@ -221,28 +227,29 @@ void renderer_repaint_dirty()
 {
     Graphic::Painter painter{_framebuffer->bitmap()};
 
-    _dirty_regions.foreach([&](Math::Recti region) {
-        renderer_region(painter, region);
-
-        if (_night_light_enable)
+    _dirty_regions.foreach([&](Math::Recti region)
         {
-            painter.tint(region, Graphic::Color::from_rgb(1, 0.9, 0.8));
-        }
-
-        if (region.colide_with(cursor_bound()))
-        {
-            renderer_region(painter, cursor_bound());
-
-            cursor_render(painter);
+            renderer_region(painter, region);
 
             if (_night_light_enable)
             {
-                painter.tint(cursor_bound(), Graphic::Color::from_rgb(1, 0.9, 0.8));
+                painter.tint(region, Graphic::Color::from_rgb(1, 0.9, 0.8));
             }
-        }
 
-        return Iteration::CONTINUE;
-    });
+            if (region.colide_with(cursor_bound()))
+            {
+                renderer_region(painter, cursor_bound());
+
+                cursor_render(painter);
+
+                if (_night_light_enable)
+                {
+                    painter.tint(cursor_bound(), Graphic::Color::from_rgb(1, 0.9, 0.8));
+                }
+            }
+
+            return Iter::CONTINUE;
+        });
 
     _framebuffer->blit();
 

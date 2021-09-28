@@ -22,43 +22,44 @@ int main(int argc, char const *argv[])
     }
 
     // Unzip all archives that were passed as arguments
-    args.argv().foreach([&](auto &path) {
-        IO::errln("{}: Unzip '{}'", argv[0], path);
-
-        IO::File file{path};
-        if (!file.exist())
+    args.argv().foreach([&](auto &path)
         {
-            IO::errln("{}: File does not exist '{}'", argv[0], path);
-            process_exit(PROCESS_FAILURE);
-            return Iteration::STOP;
-        }
+            IO::errln("{}: Unzip '{}'", argv[0], path);
 
-        auto archive = make<ZipArchive>(IO::Path::parse(path));
-
-        if (!archive->valid())
-        {
-            IO::errln("{}: Failed to read zip archive '{}'", argv[0], path);
-            process_exit(PROCESS_FAILURE);
-            return Iteration::STOP;
-        }
-
-        unsigned int i = 0;
-        for (const auto &entry : archive->entries())
-        {
-            IO::outln("{}: Entry: {} is being extracted...", argv[0], entry.name);
-            IO::File dest_file(entry.name, HJ_OPEN_WRITE | HJ_OPEN_CREATE);
-
-            auto result = archive->extract(i, dest_file);
-            if (result != HjResult::SUCCESS)
+            IO::File file{path};
+            if (!file.exist())
             {
-                IO::errln("{}: Failed to extract entry '{}' with error '{}'", argv[0], entry.name, get_result_description(result));
+                IO::errln("{}: File does not exist '{}'", argv[0], path);
                 process_exit(PROCESS_FAILURE);
+                return Iter::STOP;
             }
 
-            i++;
-        }
-        return Iteration::CONTINUE;
-    });
+            auto archive = make<ZipArchive>(IO::Path::parse(path));
+
+            if (!archive->valid())
+            {
+                IO::errln("{}: Failed to read zip archive '{}'", argv[0], path);
+                process_exit(PROCESS_FAILURE);
+                return Iter::STOP;
+            }
+
+            unsigned int i = 0;
+            for (const auto &entry : archive->entries())
+            {
+                IO::outln("{}: Entry: {} is being extracted...", argv[0], entry.name);
+                IO::File dest_file(entry.name, HJ_OPEN_WRITE | HJ_OPEN_CREATE);
+
+                auto result = archive->extract(i, dest_file);
+                if (result != HjResult::SUCCESS)
+                {
+                    IO::errln("{}: Failed to extract entry '{}' with error '{}'", argv[0], entry.name, get_result_description(result));
+                    process_exit(PROCESS_FAILURE);
+                }
+
+                i++;
+            }
+            return Iter::CONTINUE;
+        });
 
     return PROCESS_SUCCESS;
 }

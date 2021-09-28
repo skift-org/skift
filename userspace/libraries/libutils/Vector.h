@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include <libmath/MinMax.h>
-#include <libutils/Iteration.h>
+#include <libutils/Iter.h>
 #include <libutils/RefPtr.h>
 #include <libutils/Std.h>
 
@@ -196,31 +196,31 @@ public:
     }
 
     template <typename Callback>
-    Iteration foreach(Callback callback) const
+    Iter foreach(Callback callback) const
     {
         for (size_t i = 0; i < _count; i++)
         {
-            if (callback(_storage[i]) == Iteration::STOP)
+            if (callback(_storage[i]) == Iter::STOP)
             {
-                return Iteration::STOP;
+                return Iter::STOP;
             }
         }
 
-        return Iteration::CONTINUE;
+        return Iter::CONTINUE;
     }
 
     template <typename Callback>
-    Iteration foreach_reversed(Callback callback) const
+    Iter foreach_reversed(Callback callback) const
     {
         for (size_t i = _count; i > 0; i--)
         {
-            if (callback(_storage[i - 1]) == Iteration::STOP)
+            if (callback(_storage[i - 1]) == Iter::STOP)
             {
-                return Iteration::STOP;
+                return Iter::STOP;
             }
         }
 
-        return Iteration::CONTINUE;
+        return Iter::CONTINUE;
     }
 
     template <typename Comparator>

@@ -21,19 +21,21 @@ RefPtr<Element> ApplicationListingComponent::build()
 
     Vector<RefPtr<Element>> children;
 
-    MenuEntry::load().foreach([&](auto &entry) {
-        if (!matcher.match(_filter, entry.name))
+    MenuEntry::load().foreach([&](auto &entry)
         {
-            return Iteration::CONTINUE;
-        }
+            if (!matcher.match(_filter, entry.name))
+            {
+                return Iter::CONTINUE;
+            }
 
-        children.push_back(basic_button(entry.image, entry.name, [this, entry] {
-            process_run(entry.command.cstring(), nullptr, 0);
-            window()->hide();
-        }));
+            children.push_back(basic_button(entry.image, entry.name, [this, entry]
+                {
+                    process_run(entry.command.cstring(), nullptr, 0);
+                    window()->hide();
+                }));
 
-        return Iteration::CONTINUE;
-    });
+            return Iter::CONTINUE;
+        });
 
     if (children.count() == 0)
     {

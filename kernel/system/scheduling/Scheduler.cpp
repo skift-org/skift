@@ -113,10 +113,11 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
 
     scheduler_record[system_get_tick() % SCHEDULER_RECORD_COUNT] = running->id;
 
-    blocked_tasks->foreach([](auto &task) {
-        task->try_unblock();
-        return Iteration::CONTINUE;
-    });
+    blocked_tasks->foreach([](auto &task)
+        {
+            task->try_unblock();
+            return Iter::CONTINUE;
+        });
 
     running = running_tasks->requeue().unwrap_or(idle);
 

@@ -8,4 +8,4 @@ void pci_initialize();
 
 int pci_get_interrupt(PCIAddress address);
 
-Iteration pci_scan(IterFunc<PCIAddress> callback);
+Iter pci_scan(IterFunc<PCIAddress> callback);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libutils/Assert.h>
-#include <libutils/Iteration.h>
+#include <libutils/Iter.h>
 #include <libutils/Optional.h>
 #include <libutils/Prelude.h>
 
@@ -51,9 +51,8 @@ public:
 
     List(const List &other)
     {
-        other.foreach([this](const T &el) {
-            push_back(el);
-        });
+        other.foreach([this](const T &el)
+            { push_back(el); });
     }
 
     List(List &&other) { *this = std::move(other); }
@@ -64,9 +63,8 @@ public:
         {
             clear();
 
-            other.foreach([this](const T &el) {
-                push_back(el);
-            });
+            other.foreach([this](const T &el)
+                { push_back(el); });
         }
 
         return *this;
@@ -261,23 +259,24 @@ public:
     {
         bool result = false;
 
-        foreach([&](auto &el) {
-            if (el == value)
+        foreach([&](auto &el)
             {
-                result = true;
-                return Iteration::STOP;
-            }
-            else
-            {
-                return Iteration::CONTINUE;
-            }
-        });
+                if (el == value)
+                {
+                    result = true;
+                    return Iter::STOP;
+                }
+                else
+                {
+                    return Iter::CONTINUE;
+                }
+            });
 
         return result;
     }
 
     template <typename TCallback>
-    Iteration foreach(TCallback callback) const
+    Iter foreach(TCallback callback) const
     {
         Node *current = _head;
 
@@ -285,19 +284,19 @@ public:
         {
             Node *next = current->next;
 
-            if (callback(current->value) == Iteration::STOP)
+            if (callback(current->value) == Iter::STOP)
             {
-                return Iteration::STOP;
+                return Iter::STOP;
             }
 
             current = next;
         }
 
-        return Iteration::CONTINUE;
+        return Iter::CONTINUE;
     }
 
     template <typename TCallback>
-    Iteration foreach_reversed(TCallback callback) const
+    Iter foreach_reversed(TCallback callback) const
     {
         Node *current = _tail;
 
@@ -305,9 +304,9 @@ public:
         {
             Node *next = current->prev;
 
-            if (callback(current->value) == Iteration::STOP)
+            if (callback(current->value) == Iter::STOP)
             {
-                return Iteration::STOP;
+                return Iter::STOP;
             }
 
             current = next;

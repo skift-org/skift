@@ -14,42 +14,43 @@ void madt_initialize(MADT *madt)
 
     Arch::x86::lapic_found(madt->local_apic);
 
-    madt->foreach_record([](auto record) {
-        switch (record->type)
+    madt->foreach_record([](auto record)
         {
-        case MADTRecordType::LAPIC:
-        {
-            auto local_apic = reinterpret_cast<MADTLocalApicRecord *>(record);
-            Kernel::logln("Local APIC (cpu_id={}, apic_id={}, flags={08x})", local_apic->processor_id, local_apic->apic_id, local_apic->flags);
-        }
-        break;
-
-        case MADTRecordType::IOAPIC:
-        {
-            auto ioapic = reinterpret_cast<MADTIOApicRecord *>(record);
-            Kernel::logln("I/O APIC (id={d}, address={08x})", ioapic->id, ioapic->address);
-            Arch::x86::ioapic_found(ioapic->address);
-        }
-        break;
-
-        case MADTRecordType::ISO:
-            Kernel::logln("Interrupt Source Override");
+            switch (record->type)
+            {
+            case MADTRecordType::LAPIC:
+            {
+                auto local_apic = reinterpret_cast<MADTLocalApicRecord *>(record);
+                Kernel::logln("Local APIC (cpu_id={}, apic_id={}, flags={08x})", local_apic->processor_id, local_apic->apic_id, local_apic->flags);
+            }
             break;
 
-        case MADTRecordType::NMI:
-            Kernel::logln("Non-maskable interrupts");
+            case MADTRecordType::IOAPIC:
+            {
+                auto ioapic = reinterpret_cast<MADTIOApicRecord *>(record);
+                Kernel::logln("I/O APIC (id={d}, address={08x})", ioapic->id, ioapic->address);
+                Arch::x86::ioapic_found(ioapic->address);
+            }
             break;
 
-        case MADTRecordType::LAPIC_OVERRIDE:
-            Kernel::logln("Local APIC Address Override");
-            break;
+            case MADTRecordType::ISO:
+                Kernel::logln("Interrupt Source Override");
+                break;
 
-        default:
-            break;
-        }
+            case MADTRecordType::NMI:
+                Kernel::logln("Non-maskable interrupts");
+                break;
 
-        return Iteration::CONTINUE;
-    });
+            case MADTRecordType::LAPIC_OVERRIDE:
+                Kernel::logln("Local APIC Address Override");
+                break;
+
+            default:
+                break;
+            }
+
+            return Iter::CONTINUE;
+        });
 }
 
 void initialize(Handover *handover)

@@ -351,7 +351,7 @@ struct EntryPoint
 
         while (header->type != HearderType::END_OF_TABLE)
         {
-            if (callback(header) == Iteration::STOP)
+            if (callback(header) == Iter::STOP)
             {
                 return;
             }

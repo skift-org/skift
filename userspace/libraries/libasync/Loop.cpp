@@ -82,15 +82,16 @@ void Loop::update_timers()
 
     auto timers_list_copy = _timers;
 
-    timers_list_copy.foreach([&](auto timer) {
-        if (timer->running() && timer->scheduled() <= current_fire)
+    timers_list_copy.foreach([&](auto timer)
         {
-            timer->trigger();
-            timer->schedule(current_fire + timer->interval());
-        }
+            if (timer->running() && timer->scheduled() <= current_fire)
+            {
+                timer->trigger();
+                timer->schedule(current_fire + timer->interval());
+            }
 
-        return Iteration::CONTINUE;
-    });
+            return Iter::CONTINUE;
+        });
 }
 
 /* --- Invokers ------------------------------------------------------------- */
@@ -107,14 +108,15 @@ void Loop::unregister_invoker(Invoker *invoker)
 
 void Loop::update_invoker()
 {
-    _invoker.foreach([](Invoker *invoker) {
-        if (invoker->should_be_invoke_later())
+    _invoker.foreach([](Invoker *invoker)
         {
-            invoker->invoke();
-        }
+            if (invoker->should_be_invoke_later())
+            {
+                invoker->invoke();
+            }
 
-        return Iteration::CONTINUE;
-    });
+            return Iter::CONTINUE;
+        });
 }
 
 /* --- Loop ----------------------------------------------------------------- */
@@ -139,27 +141,28 @@ Timeout Loop::get_timeout()
 
     TimeStamp current_tick = system_get_ticks();
 
-    _timers.foreach([&](auto timer) {
-        if (!timer->running() || timer->interval() == 0)
+    _timers.foreach([&](auto timer)
         {
-            return Iteration::CONTINUE;
-        }
+            if (!timer->running() || timer->interval() == 0)
+            {
+                return Iter::CONTINUE;
+            }
 
-        if (timer->scheduled() < current_tick)
-        {
-            timeout = 0;
-            return Iteration::CONTINUE;
-        }
+            if (timer->scheduled() < current_tick)
+            {
+                timeout = 0;
+                return Iter::CONTINUE;
+            }
 
-        Timeout remaining = timer->scheduled() - current_tick;
+            Timeout remaining = timer->scheduled() - current_tick;
 
-        if (remaining <= timeout)
-        {
-            timeout = remaining;
-        }
+            if (remaining <= timeout)
+            {
+                timeout = remaining;
+            }
 
-        return Iteration::CONTINUE;
-    });
+            return Iter::CONTINUE;
+        });
 
     return timeout;
 }

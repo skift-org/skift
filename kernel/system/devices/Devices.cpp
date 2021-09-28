@@ -19,23 +19,20 @@ static const char *_device_names[(uint8_t)DeviceClass::__COUNT] = {
 
 void device_scan(IterFunc<DeviceAddress> callback)
 {
-    if (legacy_scan([&](LegacyAddress address) {
-            return callback(DeviceAddress(address));
-        }) == Iteration::STOP)
+    if (legacy_scan([&](LegacyAddress address)
+            { return callback(DeviceAddress(address)); }) == Iter::STOP)
     {
         return;
     }
 
-    if (pci_scan([&](PCIAddress address) {
-            return callback(DeviceAddress(address));
-        }) == Iteration::STOP)
+    if (pci_scan([&](PCIAddress address)
+            { return callback(DeviceAddress(address)); }) == Iter::STOP)
     {
         return;
     }
 
-    if (unix_scan([&](UNIXAddress address) {
-            return callback(DeviceAddress(address));
-        }) == Iteration::STOP)
+    if (unix_scan([&](UNIXAddress address)
+            { return callback(DeviceAddress(address)); }) == Iter::STOP)
     {
         return;
     }
@@ -62,39 +59,42 @@ void device_iterate(IterFunc<RefPtr<Device>> callback)
 {
     if (_devices)
     {
-        _devices->foreach([&](auto &device) {
-            if (callback(device) == Iteration::STOP)
+        _devices->foreach([&](auto &device)
             {
-                return Iteration::STOP;
-            }
+                if (callback(device) == Iter::STOP)
+                {
+                    return Iter::STOP;
+                }
 
-            return device->iterate(callback);
-        });
+                return device->iterate(callback);
+            });
     }
 }
 
 void devices_acknowledge_interrupt(int interrupt)
 {
-    device_iterate([&](auto device) {
-        if (device->interrupt() == interrupt)
+    device_iterate([&](auto device)
         {
-            device->acknowledge_interrupt();
-        }
+            if (device->interrupt() == interrupt)
+            {
+                device->acknowledge_interrupt();
+            }
 
-        return Iteration::CONTINUE;
-    });
+            return Iter::CONTINUE;
+        });
 }
 
 void devices_handle_interrupt(int interrupt)
 {
-    device_iterate([&](auto device) {
-        if (device->interrupt() == interrupt)
+    device_iterate([&](auto device)
         {
-            device->handle_interrupt();
-        }
+            if (device->interrupt() == interrupt)
+            {
+                device->handle_interrupt();
+            }
 
-        return Iteration::CONTINUE;
-    });
+            return Iter::CONTINUE;
+        });
 }
 
 void device_initialize()
@@ -105,26 +105,27 @@ void device_initialize()
 
     _devices = new Vector<RefPtr<Device>>();
 
-    device_scan([&](DeviceAddress address) {
-        Kernel::logln("Initializing device {}...", address.as_static_cstring());
-
-        auto driver = driver_for(address);
-
-        if (!driver)
+    device_scan([&](DeviceAddress address)
         {
-            Kernel::logln("No driver found!");
+            Kernel::logln("Initializing device {}...", address.as_static_cstring());
 
-            return Iteration::CONTINUE;
-        }
+            auto driver = driver_for(address);
 
-        Kernel::logln("Found a driver: {}", driver->name());
+            if (!driver)
+            {
+                Kernel::logln("No driver found!");
 
-        auto device = driver->instance(address);
-        if (!device->did_fail())
-        {
-            _devices->push_back(device);
-        }
+                return Iter::CONTINUE;
+            }
 
-        return Iteration::CONTINUE;
-    });
+            Kernel::logln("Found a driver: {}", driver->name());
+
+            auto device = driver->instance(address);
+            if (!device->did_fail())
+            {
+                _devices->push_back(device);
+            }
+
+            return Iter::CONTINUE;
+        });
 }

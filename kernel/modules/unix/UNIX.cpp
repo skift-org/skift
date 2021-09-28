@@ -1,21 +1,21 @@
 #include "unix/UNIX.h"
 
-Iteration unix_scan(IterFunc<UNIXAddress> callback)
+Iter unix_scan(IterFunc<UNIXAddress> callback)
 {
-    if (callback(UNIX_ZERO) == Iteration::STOP)
+    if (callback(UNIX_ZERO) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    if (callback(UNIX_NULL) == Iteration::STOP)
+    if (callback(UNIX_NULL) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    if (callback(UNIX_RANDOM) == Iteration::STOP)
+    if (callback(UNIX_RANDOM) == Iter::STOP)
     {
-        return Iteration::STOP;
+        return Iter::STOP;
     }
 
-    return Iteration::CONTINUE;
+    return Iter::CONTINUE;
 }

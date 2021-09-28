@@ -270,7 +270,11 @@ void task_iterate(void *target, TaskIterateCallback callback)
         return;
     }
 
-    _tasks->foreach([&](auto *task) { callback(target, task); return Iteration::CONTINUE; });
+    _tasks->foreach([&](auto *task)
+        {
+            callback(target, task);
+            return Iter::CONTINUE;
+        });
 }
 
 Task *task_by_id(int id)

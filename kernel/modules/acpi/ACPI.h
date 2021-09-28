@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include <libutils/Iteration.h>
+#include <libutils/Iter.h>
 
 #include "system/handover/Handover.h"
 
@@ -120,7 +120,7 @@ struct PACKED MADT
         {
             current = (MADTRecord *)(((uintptr_t)current) + current->lenght);
 
-            if (callback(current) != Iteration::CONTINUE)
+            if (callback(current) != Iter::CONTINUE)
             {
                 return;
             }
@@ -130,7 +130,11 @@ struct PACKED MADT
     size_t record_count()
     {
         size_t result = 0;
-        foreach_record([&](auto) { result++;  return Iteration::CONTINUE; });
+        foreach_record([&](auto)
+            {
+                result++;
+                return Iter::CONTINUE;
+            });
         return result;
     }
 };

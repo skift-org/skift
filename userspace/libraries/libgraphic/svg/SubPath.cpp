@@ -201,7 +201,8 @@ void SubPath::smooth_quad_bezier_to_relative(Math::Vec2f point)
 
 void SubPath::arc_to(float rx, float ry, float angle, int flags, Math::Vec2f point)
 {
-    auto pow2 = [](auto x) { return x * x; };
+    auto pow2 = [](auto x)
+    { return x * x; };
 
     // Ported from canvg (https://code.google.com/p/canvg/)
     float x1 = last_point().x(); // start point
@@ -298,7 +299,7 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Math::Vec2f poi
     };
 
     // Split arc into max 90 degree segments.
-    // The loop assumes an iteration per end point (including start and end), this +1.
+    // The loop assumes an Iter per end point (including start and end), this +1.
     int ndivs = (int)(fabsf(da) / (PI * 0.5f) + 1.0f);
     float hda = (da / (float)ndivs) / 2.0f;
     float kappa = fabsf(4.0f / 3.0f * (1.0f - cosf(hda)) / sinf(hda));

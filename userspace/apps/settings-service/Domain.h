@@ -54,11 +54,12 @@ struct Domain
         {
             Json::Value::Object obj;
 
-            bundles.foreach([&](auto &key, auto &value) {
-                obj[key] = value.read(path);
+            bundles.foreach([&](auto &key, auto &value)
+                {
+                    obj[key] = value.read(path);
 
-                return Iteration::CONTINUE;
-            });
+                    return Iter::CONTINUE;
+                });
 
             return obj;
         }

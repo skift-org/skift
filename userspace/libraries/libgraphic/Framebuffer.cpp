@@ -62,20 +62,21 @@ void Framebuffer::mark_dirty(Math::Recti new_bound)
 
     bool merged = false;
 
-    _dirty_bounds.foreach([&](Math::Recti &region) {
-        int region_area = region.area();
-        int merge_area = region.merged_with(new_bound).area();
-
-        if (region.colide_with(new_bound) && (region_area + new_bound.area() > merge_area))
+    _dirty_bounds.foreach([&](Math::Recti &region)
         {
-            region = region.merged_with(new_bound);
-            merged = true;
+            int region_area = region.area();
+            int merge_area = region.merged_with(new_bound).area();
 
-            return Iteration::STOP;
-        }
+            if (region.colide_with(new_bound) && (region_area + new_bound.area() > merge_area))
+            {
+                region = region.merged_with(new_bound);
+                merged = true;
 
-        return Iteration::CONTINUE;
-    });
+                return Iter::STOP;
+            }
+
+            return Iter::CONTINUE;
+        });
 
     if (!merged)
     {
@@ -96,22 +97,23 @@ void Framebuffer::blit()
         return;
     }
 
-    _dirty_bounds.foreach([&](auto &bound) {
-        IOCallDisplayBlitArgs args;
+    _dirty_bounds.foreach([&](auto &bound)
+        {
+            IOCallDisplayBlitArgs args;
 
-        args.buffer = reinterpret_cast<uint32_t *>(_bitmap->pixels());
-        args.buffer_width = _bitmap->width();
-        args.buffer_height = _bitmap->height();
+            args.buffer = reinterpret_cast<uint32_t *>(_bitmap->pixels());
+            args.buffer_width = _bitmap->width();
+            args.buffer_height = _bitmap->height();
 
-        args.blit_x = bound.x();
-        args.blit_y = bound.y();
-        args.blit_width = bound.width();
-        args.blit_height = bound.height();
+            args.blit_x = bound.x();
+            args.blit_y = bound.y();
+            args.blit_width = bound.width();
+            args.blit_height = bound.height();
 
-        __plug_handle_call(&_handle, IOCALL_DISPLAY_BLIT, &args);
+            __plug_handle_call(&_handle, IOCALL_DISPLAY_BLIT, &args);
 
-        return Iteration::CONTINUE;
-    });
+            return Iter::CONTINUE;
+        });
 
     _dirty_bounds.clear();
 }

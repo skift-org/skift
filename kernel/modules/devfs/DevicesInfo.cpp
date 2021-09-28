@@ -17,27 +17,28 @@ HjResult FsDeviceInfo::open(FsHandle &handle)
 {
     Json::Value::Array root{};
 
-    device_iterate([&](RefPtr<Device> device) {
-        Json::Value::Object device_object{};
-
-        UNUSED(device);
-
-        device_object["name"] = device->name().cstring();
-        device_object["path"] = device->path().cstring();
-        device_object["address"] = device->address().as_static_cstring();
-        device_object["interrupt"] = (int64_t)device->interrupt();
-        device_object["refcount"] = (int64_t)device->refcount();
-
-        auto *driver = driver_for(device->address());
-        if (driver)
+    device_iterate([&](RefPtr<Device> device)
         {
-            device_object["description"] = driver->name();
-        }
+            Json::Value::Object device_object{};
 
-        root.push_back(device_object);
+            UNUSED(device);
 
-        return Iteration::CONTINUE;
-    });
+            device_object["name"] = device->name().cstring();
+            device_object["path"] = device->path().cstring();
+            device_object["address"] = device->address().as_static_cstring();
+            device_object["interrupt"] = (int64_t)device->interrupt();
+            device_object["refcount"] = (int64_t)device->refcount();
+
+            auto *driver = driver_for(device->address());
+            if (driver)
+            {
+                device_object["description"] = driver->name();
+            }
+
+            root.push_back(device_object);
+
+            return Iter::CONTINUE;
+        });
 
     auto str = Json::stringify(root);
     handle.attached = str.storage().give_ref();

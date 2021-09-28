@@ -43,21 +43,22 @@ bool partition_load_gpt(RefPtr<Device> disk, const MBR &mbr)
 
 void partitions_initialize()
 {
-    device_iterate([](RefPtr<Device> device) {
-        if (device->klass() == DeviceClass::DISK)
+    device_iterate([](RefPtr<Device> device)
         {
-            MBR mbr;
-            device->read(0, &mbr, sizeof(MBR));
-
-            bool success = partition_load_gpt(device, mbr) ||
-                           partition_load_mbr(device, mbr);
-
-            if (!success)
+            if (device->klass() == DeviceClass::DISK)
             {
-                Kernel::logln("Device '{}' don't have a valid partion table!", device->path());
-            }
-        }
+                MBR mbr;
+                device->read(0, &mbr, sizeof(MBR));
 
-        return Iteration::CONTINUE;
-    });
+                bool success = partition_load_gpt(device, mbr) ||
+                               partition_load_mbr(device, mbr);
+
+                if (!success)
+                {
+                    Kernel::logln("Device '{}' don't have a valid partion table!", device->path());
+                }
+            }
+
+            return Iter::CONTINUE;
+        });
 }

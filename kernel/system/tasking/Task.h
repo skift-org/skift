@@ -99,7 +99,7 @@ void task_destroy(Task *task);
 
 void task_clear_userspace(Task *task);
 
-typedef Iteration (*TaskIterateCallback)(void *target, Task *task);
+typedef Iter (*TaskIterateCallback)(void *target, Task *task);
 void task_iterate(void *target, TaskIterateCallback callback);
 
 Task *task_by_id(int id);

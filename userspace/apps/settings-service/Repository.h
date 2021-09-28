@@ -52,11 +52,12 @@ struct Repository
         {
             Json::Value::Object obj;
 
-            domains.foreach([&](auto &key, auto &value) {
-                obj[key] = value.read(path);
+            domains.foreach([&](auto &key, auto &value)
+                {
+                    obj[key] = value.read(path);
 
-                return Iteration::CONTINUE;
-            });
+                    return Iter::CONTINUE;
+                });
 
             return obj;
         }

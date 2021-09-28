@@ -5,14 +5,14 @@
 namespace Utils
 {
 
-enum struct Iteration
+enum struct Iter
 {
     CONTINUE,
     STOP,
 };
 
 template <typename T>
-using IterFunc = Func<Iteration(T)>;
+using IterFunc = Func<Iter(T)>;
 
 template <typename T>
 struct ContiguousIterator

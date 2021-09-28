@@ -17,19 +17,20 @@ HjResult FsDirectory::open(FsHandle &handle)
 
     int current_index = 0;
 
-    _children.foreach([&](auto &entry) {
-        auto record = &listing->entries[current_index];
-        auto node = entry.node;
+    _children.foreach([&](auto &entry)
+        {
+            auto record = &listing->entries[current_index];
+            auto node = entry.node;
 
-        strcpy(record->name, entry.name.cstring());
+            strcpy(record->name, entry.name.cstring());
 
-        record->stat.type = node->type();
-        record->stat.size = node->size();
+            record->stat.type = node->type();
+            record->stat.size = node->size();
 
-        current_index++;
+            current_index++;
 
-        return Iteration::CONTINUE;
-    });
+            return Iter::CONTINUE;
+        });
 
     handle.attached = listing;
 
@@ -70,16 +71,17 @@ RefPtr<FsNode> FsDirectory::find(String name)
 {
     RefPtr<FsNode> result;
 
-    _children.foreach([&](auto &entry) {
-        if (entry.name == name)
+    _children.foreach([&](auto &entry)
         {
-            result = entry.node;
+            if (entry.name == name)
+            {
+                result = entry.node;
 
-            return Iteration::STOP;
-        }
+                return Iter::STOP;
+            }
 
-        return Iteration::CONTINUE;
-    });
+            return Iter::CONTINUE;
+        });
 
     return result;
 }
@@ -100,7 +102,8 @@ HjResult FsDirectory::unlink(String name)
 {
 
     bool has_removed_an_entry = _children.remove_all_match(
-        [&](auto &e) {
+        [&](auto &e)
+        {
             return e.name == name;
         });
 

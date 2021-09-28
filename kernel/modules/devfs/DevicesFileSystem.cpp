@@ -12,11 +12,12 @@ void devices_filesystem_initialize()
     auto &domain = scheduler_running()->domain();
     domain.mkdir(IO::Path::parse(DEVICE_PATH));
 
-    device_iterate([&](auto device) {
-        String path = device->path();
-        Kernel::logln("Mounting {} to {}", device->address().as_static_cstring(), path);
-        domain.link(IO::Path::parse(path), make<FsDevice>(device));
+    device_iterate([&](auto device)
+        {
+            String path = device->path();
+            Kernel::logln("Mounting {} to {}", device->address().as_static_cstring(), path);
+            domain.link(IO::Path::parse(path), make<FsDevice>(device));
 
-        return Iteration::CONTINUE;
-    });
+            return Iter::CONTINUE;
+        });
 }

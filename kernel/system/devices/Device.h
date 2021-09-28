@@ -47,16 +47,17 @@ public:
         _children.push_back(child);
     }
 
-    Iteration iterate(IterFunc<RefPtr<Device>> &callback)
+    Iter iterate(IterFunc<RefPtr<Device>> &callback)
     {
-        return _children.foreach([&](auto device) {
-            if (callback(device) == Iteration::STOP)
+        return _children.foreach([&](auto device)
             {
-                return Iteration::STOP;
-            }
+                if (callback(device) == Iter::STOP)
+                {
+                    return Iter::STOP;
+                }
 
-            return device->iterate(callback);
-        });
+                return device->iterate(callback);
+            });
     }
 
     Device(DeviceAddress address, DeviceClass klass);

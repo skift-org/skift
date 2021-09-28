@@ -31,7 +31,8 @@ Application::Application()
 
     _setting_theme = own<Settings::Setting>(
         "appearance:widgets.theme",
-        [this](const Json::Value &value) {
+        [this](const Json::Value &value)
+        {
             auto new_theme = value.as_string();
 
             theme_load(IO::format("/Files/Themes/{}.json", value.as_string()));
@@ -44,7 +45,8 @@ Application::Application()
 
     _setting_wireframe = own<Settings::Setting>(
         "appearance:widgets.wireframe",
-        [this](const Json::Value &value) {
+        [this](const Json::Value &value)
+        {
             _wireframe = value.as_bool();
             for (size_t i = 0; i < _windows.count(); i++)
             {
@@ -54,26 +56,27 @@ Application::Application()
 
     _connection = IO::Socket::connect("/Session/compositor.ipc").unwrap();
 
-    _connection_notifier = own<Async::Notifier>(_connection, POLL_READ, [this]() {
-        CompositorMessage message = {};
-        auto read_result = _connection.read(&message, sizeof(CompositorMessage));
-
-        if (!read_result.success())
+    _connection_notifier = own<Async::Notifier>(_connection, POLL_READ, [this]()
         {
-            IO::logln("Connection to the compositor closed {}!", read_result.description());
-            this->exit(PROCESS_FAILURE);
-        }
+            CompositorMessage message = {};
+            auto read_result = _connection.read(&message, sizeof(CompositorMessage));
 
-        size_t message_size = read_result.unwrap();
+            if (!read_result.success())
+            {
+                IO::logln("Connection to the compositor closed {}!", read_result.description());
+                this->exit(PROCESS_FAILURE);
+            }
 
-        if (message_size != sizeof(CompositorMessage))
-        {
-            IO::logln("Got a message with an invalid size from compositor {} != {}!", sizeof(CompositorMessage), message_size);
-            this->exit(PROCESS_FAILURE);
-        }
+            size_t message_size = read_result.unwrap();
 
-        do_message(message);
-    });
+            if (message_size != sizeof(CompositorMessage))
+            {
+                IO::logln("Got a message with an invalid size from compositor {} != {}!", sizeof(CompositorMessage), message_size);
+                this->exit(PROCESS_FAILURE);
+            }
+
+            do_message(message);
+        });
 
     auto result_or_greetings = wait_for_message(COMPOSITOR_MESSAGE_GREETINGS);
 
@@ -143,19 +146,21 @@ ResultOr<CompositorMessage> Application::wait_for_message(CompositorMessageType 
 
         if (!result.success())
         {
-            pendings.foreach([&](auto &message) {
-                do_message(message);
-                return Iteration::CONTINUE;
-            });
+            pendings.foreach([&](auto &message)
+                {
+                    do_message(message);
+                    return Iter::CONTINUE;
+                });
 
             return result.result();
         }
     }
 
-    pendings.foreach([&](auto &message) {
-        do_message(message);
-        return Iteration::CONTINUE;
-    });
+    pendings.foreach([&](auto &message)
+        {
+            do_message(message);
+            return Iter::CONTINUE;
+        });
 
     return message;
 }

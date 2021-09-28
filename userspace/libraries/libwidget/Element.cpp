@@ -190,18 +190,19 @@ Element *Element::at(Math::Vec2i position)
         return result;
     }
 
-    _children.foreach_reversed([&](RefPtr<Element> child) {
-        if (!(child->flags() & NO_MOUSE_HIT) && child->container().contains(position))
+    _children.foreach_reversed([&](RefPtr<Element> child)
         {
-            result = child->at(position - child->origin());
+            if (!(child->flags() & NO_MOUSE_HIT) && child->container().contains(position))
+            {
+                result = child->at(position - child->origin());
 
-            return Iteration::STOP;
-        }
-        else
-        {
-            return Iteration::CONTINUE;
-        }
-    });
+                return Iter::STOP;
+            }
+            else
+            {
+                return Iter::CONTINUE;
+            }
+        });
 
     return result;
 }

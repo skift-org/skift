@@ -31,10 +31,11 @@ struct Bundle
 
         auto obj = value.as_object();
 
-        obj.foreach([&](auto &key, auto &value) {
-            bundle.keys[key] = value;
-            return Iteration::CONTINUE;
-        });
+        obj.foreach([&](auto &key, auto &value)
+            {
+                bundle.keys[key] = value;
+                return Iter::CONTINUE;
+            });
 
         return bundle;
     }
@@ -50,11 +51,12 @@ struct Bundle
         {
             Json::Value::Object obj;
 
-            keys.foreach([&](auto &key, auto &value) {
-                obj[key] = value;
+            keys.foreach([&](auto &key, auto &value)
+                {
+                    obj[key] = value;
 
-                return Iteration::CONTINUE;
-            });
+                    return Iter::CONTINUE;
+                });
 
             return obj;
         }

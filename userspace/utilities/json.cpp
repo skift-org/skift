@@ -25,15 +25,17 @@ int main(int argc, char const *argv[])
 
     auto options = IO::Prettier::NONE;
 
-    args.option('c', "color", OPTION_COLOR_DESCRIPTION, [&](auto &) {
-        options |= IO::Prettier::COLORS;
-        return Shell::ArgParseResult::SHOULD_CONTINUE;
-    });
+    args.option('c', "color", OPTION_COLOR_DESCRIPTION, [&](auto &)
+        {
+            options |= IO::Prettier::COLORS;
+            return Shell::ArgParseResult::SHOULD_CONTINUE;
+        });
 
-    args.option('i', "indent", OPTION_IDENT_DESCRIPTION, [&](auto &) {
-        options |= IO::Prettier::INDENTS;
-        return Shell::ArgParseResult::SHOULD_CONTINUE;
-    });
+    args.option('i', "indent", OPTION_IDENT_DESCRIPTION, [&](auto &)
+        {
+            options |= IO::Prettier::INDENTS;
+            return Shell::ArgParseResult::SHOULD_CONTINUE;
+        });
 
     args.epiloge(EPILOGUE);
 
@@ -54,23 +56,24 @@ int main(int argc, char const *argv[])
     }
     else
     {
-        args.argv().foreach([&](auto &path) {
-            IO::File file{path, HJ_OPEN_READ};
-
-            if (!file.exist())
+        args.argv().foreach([&](auto &path)
             {
-                return Iteration::CONTINUE;
-            }
+                IO::File file{path, HJ_OPEN_READ};
 
-            auto root = Json::parse(file);
+                if (!file.exist())
+                {
+                    return Iter::CONTINUE;
+                }
 
-            IO::MemoryWriter memory;
-            IO::Prettier pretty{memory, options};
-            Json::prettify(pretty, root);
-            IO::write(IO::out(), memory.slice());
+                auto root = Json::parse(file);
 
-            return Iteration::CONTINUE;
-        });
+                IO::MemoryWriter memory;
+                IO::Prettier pretty{memory, options};
+                Json::prettify(pretty, root);
+                IO::write(IO::out(), memory.slice());
+
+                return Iter::CONTINUE;
+            });
     }
 
     return PROCESS_SUCCESS;

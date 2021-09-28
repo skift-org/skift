@@ -1,7 +1,7 @@
 #pragma once
 
 #include <assert.h>
-#include <libutils/Iteration.h>
+#include <libutils/Iter.h>
 #include <stdio.h>
 
 #include "pci/PCIAddress.h"
@@ -93,11 +93,11 @@ public:
 
         case BUS_PCI:
             snprintf(buffer, 127, "pci:%02x:%02x.%x %04x:%04x",
-                     pci().bus(),
-                     pci().slot(),
-                     pci().func(),
-                     pci().read16(PCI_VENDOR_ID),
-                     pci().read16(PCI_DEVICE_ID));
+                pci().bus(),
+                pci().slot(),
+                pci().func(),
+                pci().read16(PCI_VENDOR_ID),
+                pci().read16(PCI_DEVICE_ID));
             break;
 
         default:

@@ -47,7 +47,8 @@ public:
             absolute = true;
         }
 
-        auto parse_element = [](auto &scan) {
+        auto parse_element = [](auto &scan)
+        {
             IO::MemoryWriter memory;
 
             while (!scan.skip(PATH_SEPARATOR) &&
@@ -59,7 +60,8 @@ public:
             return memory.string();
         };
 
-        auto parse_shorthand = [](auto &scan) {
+        auto parse_shorthand = [](auto &scan)
+        {
             Vector<String> elements{};
 
             scan.skip_word("..");
@@ -216,25 +218,26 @@ public:
     {
         Vector<String> stack{};
 
-        _elements.foreach([&](auto &element) {
-            if (element == ".." && stack.count() > 0)
+        _elements.foreach([&](auto &element)
             {
-                stack.pop_back();
-            }
-            else if (_absolute && element == "..")
-            {
-                if (stack.count() > 0)
+                if (element == ".." && stack.count() > 0)
                 {
                     stack.pop_back();
                 }
-            }
-            else if (element != ".")
-            {
-                stack.push_back(element);
-            }
+                else if (_absolute && element == "..")
+                {
+                    if (stack.count() > 0)
+                    {
+                        stack.pop_back();
+                    }
+                }
+                else if (element != ".")
+                {
+                    stack.push_back(element);
+                }
 
-            return Iteration::CONTINUE;
-        });
+                return Iter::CONTINUE;
+            });
 
         return {_absolute, std::move(stack)};
     }

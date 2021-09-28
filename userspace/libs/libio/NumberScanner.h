@@ -10,7 +10,6 @@ namespace IO
 
 struct NumberScanner
 {
-private:
     int _base = 10;
 
 public:

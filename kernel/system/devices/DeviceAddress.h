@@ -7,7 +7,6 @@
 #include "pci/PCIAddress.h"
 #include "ps2/LegacyAddress.h"
 #include "unix/UNIXAddress.h"
-#include "virtio/VirtioAddress.h"
 
 enum DeviceBus
 {

@@ -24,7 +24,6 @@ UTILITIES = \
 	NOW \
 	OPEN \
 	PANIC \
-	PLAY \
 	POWERCTL \
 	PWD	\
 	RMDIR \
@@ -54,9 +53,6 @@ CP_NAME = cp
 
 CRC32_LIBS = system io compression
 CRC32_NAME = crc32
-
-PLAY_LIBS = system io
-PLAY_NAME = play
 
 DSTART_LIBS = system io
 DSTART_NAME = dstart

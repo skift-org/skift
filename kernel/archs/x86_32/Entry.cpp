@@ -10,7 +10,6 @@
 #include "system/graphics/Graphics.h"
 
 #include "acpi/ACPI.h"
-#include "smbios/SMBIOS.h"
 
 namespace Arch::x86_32
 {
@@ -38,26 +37,6 @@ extern "C" void arch_x86_32_main(void *info, uint32_t magic)
     pit_initialize(1000);
 
     Acpi::initialize(handover);
-    //lapic_initialize();
-    Smbios::EntryPoint *smbios_entrypoint = Smbios::find({0xF0000, 0xFFFF});
-
-    if (smbios_entrypoint)
-    {
-        Kernel::logln("Found SMBIOS entrypoint at {08x} (Version {}.{02d})", smbios_entrypoint, smbios_entrypoint->major_version, smbios_entrypoint->major_version);
-
-        smbios_entrypoint->iterate([&](Smbios::Header *table)
-            {
-                Kernel::logln(" - {} (Type={}, StringCount={}) ", table->name(), (int)table->type, table->string_table_lenght());
-
-                for (size_t i = 1; i < table->string_table_lenght(); i++)
-                {
-                    Kernel::logln("    - {}", table->string(i));
-                }
-
-                return Iter::CONTINUE;
-            });
-    }
-
     system_main(handover);
 }
 

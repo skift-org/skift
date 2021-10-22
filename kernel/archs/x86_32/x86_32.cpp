@@ -15,7 +15,6 @@
 #include "archs/x86_32/Interrupts.h"
 #include "archs/x86_32/x86_32.h"
 
-#include "smbios/SMBIOS.h"
 #include "system/graphics/EarlyConsole.h"
 #include "system/graphics/Graphics.h"
 #include "system/system/System.h"

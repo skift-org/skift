@@ -13,7 +13,6 @@
 #include "system/interrupts/Interupts.h"
 #include "system/modules/Modules.h"
 #include "system/scheduling/Scheduler.h"
-#include "system/storage/Partitions.h"
 #include "system/system/System.h"
 #include "system/tasking/Tasking.h"
 #include "system/tasking/Userspace.h"
@@ -49,7 +48,6 @@ void system_main(Handover *handover)
     modules_initialize(handover);
     driver_initialize();
     device_initialize();
-    partitions_initialize();
     process_info_initialize();
     device_info_initialize();
     devices_filesystem_initialize();

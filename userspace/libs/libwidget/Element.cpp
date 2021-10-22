@@ -190,7 +190,7 @@ Element *Element::at(Math::Vec2i position)
         return result;
     }
 
-    _children.foreach_reversed([&](RefPtr<Element> child)
+    _children.foreach_reversed([&](Ref<Element> child)
         {
             if (!(child->flags() & NO_MOUSE_HIT) && child->container().contains(position))
             {
@@ -207,7 +207,7 @@ Element *Element::at(Math::Vec2i position)
     return result;
 }
 
-RefPtr<Element> Element::add(RefPtr<Element> child)
+Ref<Element> Element::add(Ref<Element> child)
 {
     if (child == nullptr)
     {
@@ -229,7 +229,7 @@ RefPtr<Element> Element::add(RefPtr<Element> child)
     return child;
 }
 
-void Element::del(RefPtr<Element> child)
+void Element::del(Ref<Element> child)
 {
     Assert::equal(child->_parent, this);
 

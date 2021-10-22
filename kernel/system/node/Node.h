@@ -5,14 +5,14 @@
 
 #include <abi/Result.h>
 #include <libutils/Lock.h>
-#include <libutils/RefPtr.h>
+#include <libutils/Ref.h>
 #include <libutils/ResultOr.h>
 #include <libutils/String.h>
 
 struct FsNode;
 struct FsHandle;
 
-struct FsNode : public RefCounted<FsNode>
+struct FsNode : public Shared<FsNode>
 {
 private:
     Lock _lock{"fsnode"};
@@ -81,14 +81,14 @@ public:
         return ERR_NOT_WRITABLE;
     }
 
-    virtual RefPtr<FsNode> find(String name)
+    virtual Ref<FsNode> find(String name)
     {
         UNUSED(name);
 
         return nullptr;
     }
 
-    virtual HjResult link(String name, RefPtr<FsNode> child)
+    virtual HjResult link(String name, Ref<FsNode> child)
     {
         UNUSED(name);
         UNUSED(child);
@@ -109,11 +109,11 @@ public:
     // Return true if the connection is accepted
     virtual bool is_accepted() { return false; }
 
-    virtual ResultOr<RefPtr<FsNode>> connect() { return ERR_SOCKET_OPERATION_ON_NON_SOCKET; }
+    virtual ResultOr<Ref<FsNode>> connect() { return ERR_SOCKET_OPERATION_ON_NON_SOCKET; }
 
     virtual bool can_accept() { return false; }
 
-    virtual ResultOr<RefPtr<FsNode>> accept() { return ERR_SOCKET_OPERATION_ON_NON_SOCKET; }
+    virtual ResultOr<Ref<FsNode>> accept() { return ERR_SOCKET_OPERATION_ON_NON_SOCKET; }
 
     bool is_acquire();
 

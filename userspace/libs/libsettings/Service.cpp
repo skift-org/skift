@@ -6,9 +6,9 @@
 namespace Settings
 {
 
-static RefPtr<Service> _instance = nullptr;
+static Ref<Service> _instance = nullptr;
 
-RefPtr<Service> Service::the()
+Ref<Service> Service::the()
 {
     if (_instance == nullptr)
     {

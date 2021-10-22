@@ -1,7 +1,7 @@
 #pragma once
 
+#include <libutils/Box.h>
 #include <libutils/Func.h>
-#include <libutils/OwnPtr.h>
 #include <libutils/Vec.h>
 
 namespace Async
@@ -91,7 +91,7 @@ public:
         }
     }
 
-    OwnPtr<_Observer> observe(Func<void(T &)> callback)
+    Box<_Observer> observe(Func<void(T &)> callback)
     {
         return own<_Observer>(this, callback);
     }

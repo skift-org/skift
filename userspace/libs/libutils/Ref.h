@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libutils/RefCounted.h>
+#include <libutils/Shared.h>
 #include <libutils/Std.h>
 #include <libutils/Tags.h>
 #include <libutils/Traits.h>
@@ -9,51 +9,51 @@ namespace Utils
 {
 
 template <typename T>
-struct RefPtr
+struct Ref
 {
 private:
     T *_ptr = nullptr;
 
 public:
-    RefPtr() {}
+    Ref() {}
 
-    RefPtr(nullptr_t) {}
+    Ref(nullptr_t) {}
 
-    RefPtr(T &object) : _ptr(&object)
+    Ref(T &object) : _ptr(&object)
     {
         ref_if_not_null(_ptr);
     }
 
-    RefPtr(AdoptTag, T &object) : _ptr(const_cast<T *>(&object)) {}
+    Ref(AdoptTag, T &object) : _ptr(const_cast<T *>(&object)) {}
 
-    RefPtr(const RefPtr &other) : _ptr(other.naked())
+    Ref(const Ref &other) : _ptr(other.naked())
     {
         ref_if_not_null(_ptr);
     }
 
-    RefPtr(AdoptTag, RefPtr &other) : _ptr(other.give_ref()) {}
+    Ref(AdoptTag, Ref &other) : _ptr(other.give_ref()) {}
 
-    RefPtr(RefPtr &&other) : _ptr(other.give_ref()) {}
+    Ref(Ref &&other) : _ptr(other.give_ref()) {}
 
     template <typename U>
-    RefPtr(const RefPtr<U> &other) : _ptr(static_cast<T *>(other.naked()))
+    Ref(const Ref<U> &other) : _ptr(static_cast<T *>(other.naked()))
     {
         ref_if_not_null(_ptr);
     }
 
     template <typename U>
-    RefPtr(AdoptTag, RefPtr<U> &other) : _ptr(static_cast<T *>(other.give_ref())) {}
+    Ref(AdoptTag, Ref<U> &other) : _ptr(static_cast<T *>(other.give_ref())) {}
 
     template <typename U>
-    RefPtr(RefPtr<U> &&other) : _ptr(static_cast<T *>(other.give_ref())) {}
+    Ref(Ref<U> &&other) : _ptr(static_cast<T *>(other.give_ref())) {}
 
-    ~RefPtr()
+    ~Ref()
     {
         deref_if_not_null(_ptr);
         _ptr = nullptr;
     }
 
-    RefPtr &operator=(nullptr_t)
+    Ref &operator=(nullptr_t)
     {
         deref_if_not_null(_ptr);
         _ptr = nullptr;
@@ -61,7 +61,7 @@ public:
         return *this;
     }
 
-    RefPtr &operator=(const RefPtr &other)
+    Ref &operator=(const Ref &other)
     {
         if (_ptr != other.naked())
         {
@@ -73,7 +73,7 @@ public:
         return *this;
     }
 
-    RefPtr &operator=(RefPtr &&other)
+    Ref &operator=(Ref &&other)
     {
         if (this != &other)
         {
@@ -85,7 +85,7 @@ public:
     }
 
     template <typename U>
-    RefPtr &operator=(RefPtr<U> &other)
+    Ref &operator=(Ref<U> &other)
     {
         if (_ptr != other.naked())
         {
@@ -98,7 +98,7 @@ public:
     }
 
     template <typename U>
-    RefPtr &operator=(RefPtr<U> &&other)
+    Ref &operator=(Ref<U> &&other)
     {
         if (this != static_cast<void *>(&other))
         {
@@ -119,9 +119,9 @@ public:
 
     const T &operator*() const { return *_ptr; }
 
-    bool operator==(const RefPtr<T> other) const { return _ptr == other._ptr; }
+    bool operator==(const Ref<T> other) const { return _ptr == other._ptr; }
 
-    bool operator!=(const RefPtr<T> other) const { return _ptr != other._ptr; }
+    bool operator!=(const Ref<T> other) const { return _ptr != other._ptr; }
 
     bool operator==(const T *other) const { return _ptr == other; }
 
@@ -163,7 +163,7 @@ public:
 };
 
 template <typename T>
-struct CallableRefPtr : public RefPtr<T>
+struct CallableRef : public Ref<T>
 {
 public:
     template <typename... TArgs>
@@ -174,39 +174,39 @@ public:
 };
 
 template <typename T>
-inline RefPtr<T> adopt(T &object)
+inline Ref<T> adopt(T &object)
 {
-    return RefPtr<T>(ADOPT, object);
+    return Ref<T>(ADOPT, object);
 }
 
 template <typename Type, typename... Args>
-inline RefPtr<Type> make(Args &&...args)
+inline Ref<Type> make(Args &&...args)
 {
-    return RefPtr<Type>(adopt(*new Type(std::forward<Args>(args)...)));
+    return Ref<Type>(adopt(*new Type(std::forward<Args>(args)...)));
 }
 
 template <typename Type, typename... Args>
-inline CallableRefPtr<Type> make_callable(Args &&...args)
+inline CallableRef<Type> make_callable(Args &&...args)
 {
-    return CallableRefPtr<Type>(adopt(*new Type(std::forward<Args>(args)...)));
+    return CallableRef<Type>(adopt(*new Type(std::forward<Args>(args)...)));
 }
 
 template <typename T>
-struct TrimRefPtr;
+struct TrimRef;
 
 template <typename T>
-struct TrimRefPtr<RefPtr<T>>
+struct TrimRef<Ref<T>>
 {
     typedef T type;
 };
 
 template <typename T>
-struct IsRefPtr : public FalseType
+struct IsRef : public FalseType
 {
 };
 
 template <typename T>
-struct IsRefPtr<RefPtr<T>> : public TrueType
+struct IsRef<Ref<T>> : public TrueType
 {
 };
 

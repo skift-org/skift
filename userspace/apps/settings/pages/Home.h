@@ -10,7 +10,7 @@ struct HomePage : public Widget::Component
 public:
     HomePage();
 
-    RefPtr<Widget::Element> build() override;
+    Ref<Widget::Element> build() override;
 };
 
 } // namespace Settings

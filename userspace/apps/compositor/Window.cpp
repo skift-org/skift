@@ -12,8 +12,8 @@ Window::Window(
     WindowType type,
     struct Client *client,
     Math::Recti bound,
-    RefPtr<Graphic::Bitmap> frontbuffer,
-    RefPtr<Graphic::Bitmap> backbuffer)
+    Ref<Graphic::Bitmap> frontbuffer,
+    Ref<Graphic::Bitmap> backbuffer)
     : _id(id),
       _flags(flags),
       _type(type),

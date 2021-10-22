@@ -14,7 +14,7 @@ private:
 public:
     ApplicationListingComponent(String filter);
 
-    RefPtr<Widget::Element> build();
+    Ref<Widget::Element> build();
 };
 
 WIDGET_BUILDER(ApplicationListingComponent, application_listing);

@@ -3,7 +3,7 @@
 namespace Demo
 {
 
-static RefPtr<Graphic::Bitmap> _test_image = nullptr;
+static Ref<Graphic::Bitmap> _test_image = nullptr;
 static int _frame = 0;
 
 void graphics(Graphic::Painter &painter, Math::Recti screen, float time)

@@ -2,12 +2,12 @@
 
 #include <libmath/MinMax.h>
 #include <libutils/Prelude.h>
-#include <libutils/RefCounted.h>
+#include <libutils/Shared.h>
 #include <string.h>
 
 #include "system/memory/MemoryRange.h"
 
-struct MMIORange : public RefCounted<MMIORange>
+struct MMIORange : public Shared<MMIORange>
 {
 private:
     MemoryRange _virtual_range = {};

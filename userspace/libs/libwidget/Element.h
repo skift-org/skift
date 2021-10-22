@@ -22,12 +22,12 @@ struct Window;
 
 #define WIDGET_BUILDER(__type, __name)                         \
     template <typename... TArgs>                               \
-    ::RefPtr<::Widget::Element> __name(TArgs &&...args)        \
+    ::Ref<::Widget::Element> __name(TArgs &&...args)           \
     {                                                          \
         return ::make<__type>(::std::forward<TArgs>(args)...); \
     }
 
-struct Element : public RefCounted<Element>
+struct Element : public Shared<Element>
 {
 private:
     bool _enabled = true;
@@ -43,7 +43,7 @@ private:
     Math::Vec2i _content_scroll{};
 
     Array<Opt<Graphic::Color>, __THEME_COLOR_COUNT> _colors = {NONE};
-    RefPtr<Graphic::Font> _font;
+    Ref<Graphic::Font> _font;
 
     CursorState _cursor = CURSOR_DEFAULT;
 
@@ -52,7 +52,7 @@ private:
     Element *_parent = {};
     Window *_window = {};
 
-    Vec<RefPtr<Element>> _children = {};
+    Vec<Ref<Element>> _children = {};
 
 public:
     static constexpr auto FILL = (1 << 0);
@@ -61,7 +61,7 @@ public:
     static constexpr auto NO_MOUSE_HIT = (1 << 3);
     static constexpr auto NOT_AFFECTED_BY_SCROLL = (1 << 4);
 
-    RefPtr<Graphic::Font> font()
+    Ref<Graphic::Font> font()
     {
         if (!_font)
         {
@@ -71,7 +71,7 @@ public:
         return _font;
     }
 
-    void font(RefPtr<Graphic::Font> font)
+    void font(Ref<Graphic::Font> font)
     {
         _font = font;
     }
@@ -195,15 +195,15 @@ public:
 
     Element *at(Math::Vec2i position);
 
-    const Vec<RefPtr<Element>> &children() { return _children; }
+    const Vec<Ref<Element>> &children() { return _children; }
 
     template <typename T, typename... Args>
-    RefPtr<T> add(Args &&...args)
+    Ref<T> add(Args &&...args)
     {
         return add(make<T>(std::forward<Args>(args)...));
     }
 
-    void add(Vec<RefPtr<Element>> children)
+    void add(Vec<Ref<Element>> children)
     {
         for (auto &child : children)
         {
@@ -211,9 +211,9 @@ public:
         }
     }
 
-    RefPtr<Element> add(RefPtr<Element> child);
+    Ref<Element> add(Ref<Element> child);
 
-    void del(RefPtr<Element> child);
+    void del(Ref<Element> child);
 
     void mount(Element &parent);
 

@@ -21,7 +21,7 @@ private:
     int _width;
     int _height;
 
-    RefPtr<MMIORange> _framebuffer;
+    Ref<MMIORange> _framebuffer;
 
     void write_register(uint16_t address, uint16_t data);
     uint16_t read_register(uint16_t address);

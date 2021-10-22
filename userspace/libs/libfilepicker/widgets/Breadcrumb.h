@@ -11,19 +11,19 @@ namespace FilePicker
 struct Breadcrumb : public Widget::Element
 {
 private:
-    RefPtr<Navigation> _navigation;
-    RefPtr<Bookmarks> _bookmarks;
+    Ref<Navigation> _navigation;
+    Ref<Bookmarks> _bookmarks;
 
-    OwnPtr<Async::Observer<Navigation>> _navigation_observer;
-    OwnPtr<Async::Observer<Bookmarks>> _bookmarks_observer;
+    Box<Async::Observer<Navigation>> _navigation_observer;
+    Box<Async::Observer<Bookmarks>> _bookmarks_observer;
 
-    RefPtr<Graphic::Icon> _icon_computer;
-    RefPtr<Graphic::Icon> _icon_expand;
-    RefPtr<Graphic::Icon> _icon_bookmark;
-    RefPtr<Graphic::Icon> _icon_bookmark_outline;
+    Ref<Graphic::Icon> _icon_computer;
+    Ref<Graphic::Icon> _icon_expand;
+    Ref<Graphic::Icon> _icon_bookmark;
+    Ref<Graphic::Icon> _icon_bookmark_outline;
 
 public:
-    Breadcrumb(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks);
+    Breadcrumb(Ref<Navigation> navigation, Ref<Bookmarks> bookmarks);
 
     void render();
 };

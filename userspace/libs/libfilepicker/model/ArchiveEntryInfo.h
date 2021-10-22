@@ -12,7 +12,7 @@ struct ArchiveEntryInfo
 {
     String name;
     HjFileType type;
-    RefPtr<Graphic::Icon> icon;
+    Ref<Graphic::Icon> icon;
     size_t compressed_size;
     size_t uncompressed_size;
 };

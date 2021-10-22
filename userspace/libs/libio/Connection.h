@@ -14,13 +14,13 @@ struct Connection final :
     public RawHandle
 {
 private:
-    RefPtr<Handle> _handle;
+    Ref<Handle> _handle;
 
 public:
-    RefPtr<Handle> handle() override { return _handle; }
+    Ref<Handle> handle() override { return _handle; }
 
     Connection() {}
-    Connection(RefPtr<Handle> handle) : _handle{handle} {}
+    Connection(Ref<Handle> handle) : _handle{handle} {}
 
     ResultOr<size_t> read(void *buffer, size_t size) override
     {

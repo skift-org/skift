@@ -10,7 +10,7 @@ namespace Example
 
 struct Application : public Widget::Application
 {
-    OwnPtr<Window> build() override
+    Box<Window> build() override
     {
         // clang-format off
 

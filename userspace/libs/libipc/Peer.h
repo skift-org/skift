@@ -16,25 +16,26 @@ struct Peer
 
 private:
     IO::Connection _connection;
-    OwnPtr<Async::Notifier> _notifier;
+    Box<Async::Notifier> _notifier;
 
 public:
     bool connected() { return !_connection.closed(); }
 
     Peer(IO::Connection connection) : _connection{connection}
     {
-        _notifier = own<Async::Notifier>(_connection, POLL_READ, [this]() {
-            auto result_or_message = Protocol::decode_message(_connection);
+        _notifier = own<Async::Notifier>(_connection, POLL_READ, [this]()
+            {
+                auto result_or_message = Protocol::decode_message(_connection);
 
-            if (result_or_message.success())
-            {
-                handle_message(result_or_message.unwrap());
-            }
-            else
-            {
-                close();
-            }
-        });
+                if (result_or_message.success())
+                {
+                    handle_message(result_or_message.unwrap());
+                }
+                else
+                {
+                    close();
+                }
+            });
     }
 
     virtual ~Peer()

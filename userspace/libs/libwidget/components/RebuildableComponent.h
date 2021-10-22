@@ -10,7 +10,7 @@ namespace Widget
 struct RebuildableComponent : public Element
 {
 private:
-    OwnPtr<Async::Invoker> _rebuild_invoker;
+    Box<Async::Invoker> _rebuild_invoker;
 
 public:
     void mounted() override
@@ -20,9 +20,8 @@ public:
 
     RebuildableComponent()
     {
-        _rebuild_invoker = own<Async::Invoker>([this] {
-            rebuild();
-        });
+        _rebuild_invoker = own<Async::Invoker>([this]
+            { rebuild(); });
     }
 
     void should_rebuild()
@@ -36,7 +35,7 @@ public:
         add(fill(placeholder(do_build())));
     }
 
-    virtual RefPtr<Element> do_build() { return nullptr; }
+    virtual Ref<Element> do_build() { return nullptr; }
 };
 
 } // namespace Widget

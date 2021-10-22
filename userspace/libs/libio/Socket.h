@@ -10,10 +10,10 @@ struct Socket :
     public RawHandle
 {
 private:
-    RefPtr<Handle> _handle;
+    Ref<Handle> _handle;
 
 public:
-    RefPtr<Handle> handle() { return _handle; }
+    Ref<Handle> handle() { return _handle; }
 
     Socket()
     {

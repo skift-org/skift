@@ -9,13 +9,13 @@ struct ScrollElement : public Element
 {
 private:
     bool _horizontal = false;
-    RefPtr<Element> _host = nullptr;
-    RefPtr<ScrollBarElement> _scrollbar = nullptr;
+    Ref<Element> _host = nullptr;
+    Ref<ScrollBarElement> _scrollbar = nullptr;
 
 public:
-    RefPtr<Element> host() { return _host; }
+    Ref<Element> host() { return _host; }
 
-    ScrollElement(RefPtr<Element> content = nullptr, bool horizontal = false);
+    ScrollElement(Ref<Element> content = nullptr, bool horizontal = false);
 
     void layout() override;
 

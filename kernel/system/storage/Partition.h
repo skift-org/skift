@@ -5,7 +5,7 @@
 struct Partition : public Device
 {
 private:
-    RefPtr<Device> _disk;
+    Ref<Device> _disk;
     int _index;
     size64_t _start;
     size64_t _size;
@@ -13,7 +13,7 @@ private:
     size64_t end() { return _start + _size; }
 
 public:
-    Partition(RefPtr<Device> disk, int index, size64_t start, size64_t size)
+    Partition(Ref<Device> disk, int index, size64_t start, size64_t size)
         : Device({}, DeviceClass::PARTITION),
           _disk{disk},
           _index{index},

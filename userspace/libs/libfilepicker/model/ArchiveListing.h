@@ -15,13 +15,13 @@ namespace FilePicker
 struct ArchiveListing : public Widget::TableModel
 {
 private:
-    RefPtr<Navigation> _navigation;
-    RefPtr<Archive> _archive;
+    Ref<Navigation> _navigation;
+    Ref<Archive> _archive;
     Vec<ArchiveEntryInfo> _entries{};
-    OwnPtr<Async::Observer<Navigation>> _observer;
+    Box<Async::Observer<Navigation>> _observer;
 
 public:
-    ArchiveListing(RefPtr<Navigation> navigation, RefPtr<Archive> archive);
+    ArchiveListing(Ref<Navigation> navigation, Ref<Archive> archive);
 
     int rows() override;
 

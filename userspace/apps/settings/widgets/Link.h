@@ -6,8 +6,8 @@
 namespace Settings
 {
 
-RefPtr<Widget::Element> link(
-    RefPtr<Widget::Element> icon,
+Ref<Widget::Element> link(
+    Ref<Widget::Element> icon,
     String text,
     Func<void(void)> on_click = nullptr)
 {

@@ -9,7 +9,7 @@ namespace IO
 {
 
 struct Handle :
-    public RefCounted<Handle>
+    public Shared<Handle>
 {
 private:
     int _handle = HANDLE_INVALID_ID;
@@ -95,7 +95,7 @@ public:
         return stat;
     }
 
-    ResultOr<RefPtr<Handle>> accept()
+    ResultOr<Ref<Handle>> accept()
     {
         int connection_handle;
         _result = TRY(hj_handle_accept(_handle, &connection_handle));
@@ -117,7 +117,7 @@ struct RawHandle
 {
     virtual ~RawHandle() {}
 
-    virtual RefPtr<Handle> handle() = 0;
+    virtual Ref<Handle> handle() = 0;
 };
 
 } // namespace IO

@@ -14,8 +14,8 @@ struct BoardView :
     static constexpr auto CELL_SIZE = 32;
 
 private:
-    RefPtr<Board> board;
-    OwnPtr<Async::Timer> _timer;
+    Ref<Board> board;
+    Box<Async::Timer> _timer;
 
 public:
     BoardView();

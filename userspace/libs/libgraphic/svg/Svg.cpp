@@ -36,7 +36,7 @@ void render_node(Painter &rast, Xml::Node &node, Math::Mat3x2f transformation, C
     }
 }
 
-ResultOr<RefPtr<Graphic::Bitmap>> render(IO::Reader &reader, int size_hint)
+ResultOr<Ref<Graphic::Bitmap>> render(IO::Reader &reader, int size_hint)
 {
     IO::BufReader buf{reader, 512};
     auto doc = TRY(Xml::parse(buf));

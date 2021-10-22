@@ -6,7 +6,7 @@ namespace Widget
 {
 
 template <typename TElement>
-static inline RefPtr<TElement> placeholder(RefPtr<TElement> element)
+static inline Ref<TElement> placeholder(Ref<TElement> element)
 {
     if (element == nullptr)
     {

@@ -9,12 +9,12 @@ namespace Widget
 struct GraphView : public Element
 {
 private:
-    RefPtr<GraphModel> _model = nullptr;
+    Ref<GraphModel> _model = nullptr;
     Graphic::Color _color;
-    OwnPtr<Async::Observer<GraphModel>> _observer;
+    Box<Async::Observer<GraphModel>> _observer;
 
 public:
-    GraphView(RefPtr<GraphModel> model, Graphic::Color color);
+    GraphView(Ref<GraphModel> model, Graphic::Color color);
 
     void paint(Graphic::Painter &painter, const Math::Recti &dirty) override;
 };

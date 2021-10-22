@@ -11,7 +11,7 @@ struct ServerConnection : public IPC::Peer<Protocol>
 public:
     Func<void(const Path &path, const Json::Value &value)> on_notify;
 
-    static OwnPtr<ServerConnection> open()
+    static Box<ServerConnection> open()
     {
         auto connection = IO::Socket::connect("/Session/settings.ipc");
         return own<ServerConnection>(connection.unwrap());
@@ -23,9 +23,8 @@ public:
 
     ResultOr<Message> request(Message message, Message::Type expected)
     {
-        return send_and_wait_for(message, [&](const Message &incoming) {
-            return incoming.type == expected;
-        });
+        return send_and_wait_for(message, [&](const Message &incoming)
+            { return incoming.type == expected; });
     }
 
     void handle_message(const Message &message) override

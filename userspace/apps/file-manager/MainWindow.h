@@ -13,7 +13,7 @@ struct MainWindow :
 {
 private:
 public:
-    MainWindow(RefPtr<FilePicker::Navigation> navigation, RefPtr<FilePicker::Bookmarks> bookmarks)
+    MainWindow(Ref<FilePicker::Navigation> navigation, Ref<FilePicker::Bookmarks> bookmarks)
         : Widget::Window(WINDOW_RESIZABLE)
     {
         size(Math::Vec2i(700, 500));
@@ -32,7 +32,8 @@ public:
 
         auto browser = bookmarks_and_browser->add<FilePicker::FileBrowser>(navigation);
 
-        browser->on_element_selected = [&](String &path) {
+        browser->on_element_selected = [&](String &path)
+        {
             auto l = launchpad_create("open", "/System/Utilities/open");
             launchpad_argument(l, path.cstring());
             launchpad_launch(l, nullptr);

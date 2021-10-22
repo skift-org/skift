@@ -31,7 +31,7 @@ Domain &Domain::operator=(const Domain &other)
     return *this;
 }
 
-RefPtr<FsNode> Domain::find(IO::Path path)
+Ref<FsNode> Domain::find(IO::Path path)
 {
     auto current = root();
 
@@ -56,7 +56,7 @@ RefPtr<FsNode> Domain::find(IO::Path path)
     return current;
 }
 
-ResultOr<RefPtr<FsHandle>> Domain::open(IO::Path path, HjOpenFlag flags)
+ResultOr<Ref<FsHandle>> Domain::open(IO::Path path, HjOpenFlag flags)
 {
     bool should_create_if_not_present = (flags & HJ_OPEN_CREATE) == HJ_OPEN_CREATE;
 
@@ -111,7 +111,7 @@ ResultOr<RefPtr<FsHandle>> Domain::open(IO::Path path, HjOpenFlag flags)
     return make<FsHandle>(node, flags);
 }
 
-ResultOr<RefPtr<FsHandle>> Domain::connect(IO::Path path)
+ResultOr<Ref<FsHandle>> Domain::connect(IO::Path path)
 {
     auto node = find(path);
 
@@ -176,7 +176,7 @@ HjResult Domain::mklink(IO::Path old_path, IO::Path new_path)
     return link(new_path, destination);
 }
 
-HjResult Domain::link(IO::Path path, RefPtr<FsNode> node)
+HjResult Domain::link(IO::Path path, Ref<FsNode> node)
 {
     auto parent = find(path.dirpath());
 

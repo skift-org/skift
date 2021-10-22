@@ -11,16 +11,16 @@ struct SettingToggleComponent :
 {
 private:
     String _name;
-    RefPtr<Graphic::Icon> _icon;
-    OwnPtr<Settings::Setting> _setting;
+    Ref<Graphic::Icon> _icon;
+    Box<Settings::Setting> _setting;
 
 public:
     SettingToggleComponent(
-        RefPtr<Graphic::Icon> icon,
+        Ref<Graphic::Icon> icon,
         String name,
         const char *setting);
 
-    RefPtr<Element> build(bool state) override;
+    Ref<Element> build(bool state) override;
 };
 
 WIDGET_BUILDER(SettingToggleComponent, setting_toggle);

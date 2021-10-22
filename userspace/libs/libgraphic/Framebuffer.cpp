@@ -9,7 +9,7 @@
 namespace Graphic
 {
 
-ResultOr<OwnPtr<Framebuffer>> Framebuffer::open()
+ResultOr<Box<Framebuffer>> Framebuffer::open()
 {
     Handle handle;
     TRY(__plug_handle_open(&handle, FRAMEBUFFER_DEVICE_PATH, HJ_OPEN_READ | HJ_OPEN_WRITE));
@@ -27,7 +27,7 @@ ResultOr<OwnPtr<Framebuffer>> Framebuffer::open()
     return own<Framebuffer>(handle, bitmap_or_error.unwrap());
 }
 
-Framebuffer::Framebuffer(Handle handle, RefPtr<Bitmap> bitmap)
+Framebuffer::Framebuffer(Handle handle, Ref<Bitmap> bitmap)
     : _handle(handle),
       _bitmap(bitmap)
 {

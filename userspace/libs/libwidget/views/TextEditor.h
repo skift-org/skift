@@ -9,11 +9,11 @@ namespace Widget
 struct TextEditor : public Element
 {
 private:
-    RefPtr<TextModel> _model;
+    Ref<TextModel> _model;
     TextCursor _cursor{};
 
-    RefPtr<ScrollBarElement> _vscrollbar;
-    RefPtr<ScrollBarElement> _hscrollbar;
+    Ref<ScrollBarElement> _vscrollbar;
+    Ref<ScrollBarElement> _hscrollbar;
 
     int _vscroll_offset = 0;
     int _hscroll_offset = 0;
@@ -79,7 +79,7 @@ private:
     }
 
 public:
-    TextEditor(RefPtr<TextModel> model);
+    TextEditor(Ref<TextModel> model);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 

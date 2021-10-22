@@ -3,10 +3,10 @@
 #include <libgraphic/Painter.h>
 #include <libutils/Func.h>
 
-struct PaintDocument : public RefCounted<PaintDocument>
+struct PaintDocument : public Shared<PaintDocument>
 {
 private:
-    RefPtr<Graphic::Bitmap> _bitmap;
+    Ref<Graphic::Bitmap> _bitmap;
     Graphic::Painter _painter;
 
     Graphic::Color _primary_color = Graphic::Colors::BLACK;
@@ -48,7 +48,7 @@ public:
             on_color_change();
     }
 
-    PaintDocument(RefPtr<Graphic::Bitmap> bitmap)
+    PaintDocument(Ref<Graphic::Bitmap> bitmap)
         : _bitmap(bitmap),
           _painter(*bitmap)
     {

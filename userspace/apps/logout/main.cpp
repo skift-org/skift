@@ -21,16 +21,14 @@ auto title()
 
 auto shutdown_button()
 {
-    return Widget::basic_button(Graphic::Icon::get("power-standby"), "Shutdown", [&] {
-        hj_system_shutdown();
-    });
+    return Widget::basic_button(Graphic::Icon::get("power-standby"), "Shutdown", [&]
+        { hj_system_shutdown(); });
 }
 
 auto reboot_button()
 {
-    return Widget::basic_button(Graphic::Icon::get("restart"), "Reboot", [&] {
-        hj_system_reboot();
-    });
+    return Widget::basic_button(Graphic::Icon::get("restart"), "Reboot", [&]
+        { hj_system_reboot(); });
 }
 
 auto logoff_button()
@@ -40,9 +38,8 @@ auto logoff_button()
 
 auto cancel_button(auto window)
 {
-    return Widget::filled_button("Cancel", [window] {
-        window->hide();
-    });
+    return Widget::filled_button("Cancel", [window]
+        { window->hide(); });
 }
 
 struct Window : public Widget::Window
@@ -57,7 +54,7 @@ struct Window : public Widget::Window
         opacity(0.5);
     }
 
-    RefPtr<Widget::Element> build() override
+    Ref<Widget::Element> build() override
     {
         using namespace Widget;
 
@@ -92,7 +89,7 @@ struct Window : public Widget::Window
 
 struct Application : public Widget::Application
 {
-    OwnPtr<Widget::Window> build() override
+    Box<Widget::Window> build() override
     {
         return own<Window>();
     }

@@ -9,13 +9,13 @@
 namespace Graphic
 {
 
-static HashMap<String, RefPtr<Icon>>
+static HashMap<String, Ref<Icon>>
     _icons{};
 
 #define ICON_SIZES_ENTRY(__size) __size,
 const int _icon_sizes[] = {ICON_SIZE_LIST(ICON_SIZES_ENTRY)};
 
-static RefPtr<Icon> icon_load(String name)
+static Ref<Icon> icon_load(String name)
 {
     auto icon = make<Icon>(name);
 
@@ -33,7 +33,7 @@ static RefPtr<Icon> icon_load(String name)
     return icon;
 }
 
-RefPtr<Icon> Icon::get(String name)
+Ref<Icon> Icon::get(String name)
 {
     if (!_icons.has_key(name))
     {
@@ -57,7 +57,7 @@ Math::Recti Icon::bound(IconSize size)
     return bitmap(size)->bound();
 }
 
-RefPtr<Bitmap> Icon::bitmap(IconSize size)
+Ref<Bitmap> Icon::bitmap(IconSize size)
 {
     if (!_bitmaps[size])
     {
@@ -77,7 +77,7 @@ RefPtr<Bitmap> Icon::bitmap(IconSize size)
     ASSERT_NOT_REACHED();
 }
 
-void Icon::set_bitmap(IconSize size, RefPtr<Bitmap> bitmap)
+void Icon::set_bitmap(IconSize size, Ref<Bitmap> bitmap)
 {
     _bitmaps[size] = bitmap;
 }

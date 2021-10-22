@@ -13,7 +13,7 @@ struct FileListing
 struct FsHjDirEntry
 {
     String name;
-    RefPtr<FsNode> node;
+    Ref<FsNode> node;
 };
 
 struct FsDirectory : public FsNode
@@ -30,9 +30,9 @@ public:
 
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
 
-    RefPtr<FsNode> find(String name) override;
+    Ref<FsNode> find(String name) override;
 
-    HjResult link(String name, RefPtr<FsNode> child) override;
+    HjResult link(String name, Ref<FsNode> child) override;
 
     HjResult unlink(String name) override;
 };

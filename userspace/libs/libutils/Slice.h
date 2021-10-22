@@ -2,7 +2,7 @@
 
 #include <libutils/Prelude.h>
 
-#include <libutils/RefPtr.h>
+#include <libutils/Ref.h>
 #include <libutils/SliceStorage.h>
 #include <libutils/Std.h>
 
@@ -10,7 +10,7 @@ struct Slice :
     public RawStorage
 {
 private:
-    RefPtr<Storage> _storage;
+    Ref<Storage> _storage;
 
     const void *_start = nullptr;
     size_t _size = 0;
@@ -34,14 +34,14 @@ public:
     {
     }
 
-    Slice(RefPtr<Storage> storage)
+    Slice(Ref<Storage> storage)
     {
         _storage = storage;
         _start = _storage->start();
         _size = _storage->size();
     }
 
-    Slice(RefPtr<Storage> storage, size_t offset, size_t size)
+    Slice(Ref<Storage> storage, size_t offset, size_t size)
     {
         _storage = storage;
         _start = _storage->start();
@@ -83,7 +83,7 @@ public:
         }
     }
 
-    RefPtr<Storage> storage() override
+    Ref<Storage> storage() override
     {
         return _storage;
     }

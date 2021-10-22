@@ -11,24 +11,26 @@ namespace Panel
 RessourceMonitor::RessourceMonitor()
 {
     _ram_model = make<GraphModel>(50);
-    _ram_timer = own<Async::Timer>(700, [this] {
-        SystemStatus status{};
-        hj_system_status(&status);
-        _ram_model->record(status.used_ram / (float)status.total_ram);
-    });
+    _ram_timer = own<Async::Timer>(700, [this]
+        {
+            SystemStatus status{};
+            hj_system_status(&status);
+            _ram_model->record(status.used_ram / (float)status.total_ram);
+        });
 
     _cpu_model = make<GraphModel>(50);
-    _cpu_timer = own<Async::Timer>(300, [this] {
-        SystemStatus status{};
-        hj_system_status(&status);
-        _cpu_model->record(status.cpu_usage / 100.0);
-    });
+    _cpu_timer = own<Async::Timer>(300, [this]
+        {
+            SystemStatus status{};
+            hj_system_status(&status);
+            _cpu_model->record(status.cpu_usage / 100.0);
+        });
 
     _ram_timer->start();
     _cpu_timer->start();
 }
 
-RefPtr<Element> RessourceMonitor::build()
+Ref<Element> RessourceMonitor::build()
 {
 
     return hflow({

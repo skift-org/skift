@@ -49,10 +49,10 @@ struct Glyph
     int advance;
 };
 
-struct Font : public RefCounted<Font>
+struct Font : public Shared<Font>
 {
 private:
-    RefPtr<Bitmap> _bitmap;
+    Ref<Bitmap> _bitmap;
     Glyph _default;
     Vec<Glyph> _glyphs;
 
@@ -64,9 +64,9 @@ public:
 
     Bitmap &bitmap() { return *_bitmap; }
 
-    static ResultOr<RefPtr<Font>> get(String name);
+    static ResultOr<Ref<Font>> get(String name);
 
-    Font(RefPtr<Bitmap> bitmap, Vec<Glyph> glyphs)
+    Font(Ref<Bitmap> bitmap, Vec<Glyph> glyphs)
         : _bitmap(bitmap),
           _glyphs(std::move(glyphs))
     {

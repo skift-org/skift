@@ -8,7 +8,7 @@ namespace Panel
 struct UserAccountComponent :
     public Widget::Component
 {
-    RefPtr<Widget::Element> build() override;
+    Ref<Widget::Element> build() override;
 };
 
 WIDGET_BUILDER(UserAccountComponent, user_account);

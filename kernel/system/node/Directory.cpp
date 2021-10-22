@@ -67,9 +67,9 @@ ResultOr<size_t> FsDirectory::read(FsHandle &handle, void *buffer, size_t size)
     }
 }
 
-RefPtr<FsNode> FsDirectory::find(String name)
+Ref<FsNode> FsDirectory::find(String name)
 {
-    RefPtr<FsNode> result;
+    Ref<FsNode> result;
 
     _children.foreach([&](auto &entry)
         {
@@ -86,7 +86,7 @@ RefPtr<FsNode> FsDirectory::find(String name)
     return result;
 }
 
-HjResult FsDirectory::link(String name, RefPtr<FsNode> child)
+HjResult FsDirectory::link(String name, Ref<FsNode> child)
 {
     if (find(name))
     {

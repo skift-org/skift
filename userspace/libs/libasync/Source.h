@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libasync/Loop.h>
-#include <libutils/RefPtr.h>
+#include <libutils/Ref.h>
 
 namespace Async
 {
@@ -9,7 +9,7 @@ namespace Async
 struct Source
 {
 private:
-    RefPtr<Loop> _eventloop;
+    Ref<Loop> _eventloop;
 
 public:
     Loop &loop() { return *_eventloop; }

@@ -12,19 +12,19 @@ namespace FilePicker
 struct JumpList : public Widget::Component
 {
 private:
-    RefPtr<Navigation> _navigation;
-    RefPtr<Bookmarks> _bookmarks;
+    Ref<Navigation> _navigation;
+    Ref<Bookmarks> _bookmarks;
 
 public:
-    JumpList(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
+    JumpList(Ref<Navigation> navigation, Ref<Bookmarks> bookmarks)
         : _navigation(navigation),
           _bookmarks(bookmarks)
     {
     }
 
-    RefPtr<Element> build()
+    Ref<Element> build()
     {
-        Vec<RefPtr<Element>> children;
+        Vec<Ref<Element>> children;
 
         for (size_t i = 0; i < _bookmarks->all().count(); i++)
         {

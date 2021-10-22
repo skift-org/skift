@@ -16,7 +16,7 @@ struct File final :
     public RawHandle
 {
 private:
-    RefPtr<Handle> _handle;
+    Ref<Handle> _handle;
     Opt<IO::Path> _path = NONE;
 
 public:
@@ -30,7 +30,7 @@ public:
 
     File(IO::Path &path, HjOpenFlag flags = 0);
 
-    File(RefPtr<Handle> handle);
+    File(Ref<Handle> handle);
 
     ResultOr<size_t> read(void *buffer, size_t size) override;
 
@@ -46,7 +46,7 @@ public:
 
     ResultOr<HjFileType> type();
 
-    virtual RefPtr<Handle> handle() override { return _handle; }
+    virtual Ref<Handle> handle() override { return _handle; }
 
     bool exist();
 

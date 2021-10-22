@@ -7,8 +7,8 @@ namespace Widget
 
 struct Component : public RebuildableComponent
 {
-    RefPtr<Element> do_build() final { return build(); }
-    virtual RefPtr<Element> build() { return nullptr; }
+    Ref<Element> do_build() final { return build(); }
+    virtual Ref<Element> build() { return nullptr; }
 };
 
 } // namespace Widget

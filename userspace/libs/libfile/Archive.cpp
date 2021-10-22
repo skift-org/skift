@@ -2,7 +2,7 @@
 #include <libfile/TARArchive.h>
 #include <libfile/ZipArchive.h>
 
-RefPtr<Archive> Archive::open(IO::Path path, bool read)
+Ref<Archive> Archive::open(IO::Path path, bool read)
 {
     if (path.extension() == ".zip")
     {

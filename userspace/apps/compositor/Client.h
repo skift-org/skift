@@ -7,7 +7,7 @@
 
 struct Client
 {
-    OwnPtr<Async::Notifier> _notifier = nullptr;
+    Box<Async::Notifier> _notifier = nullptr;
     IO::Connection _connection;
     bool _disconnected = false;
 

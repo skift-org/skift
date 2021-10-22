@@ -9,7 +9,7 @@ using namespace Graphic;
 namespace Snake
 {
 
-RefPtr<Element> Game::build()
+Ref<Element> Game::build()
 {
     return vflow({
         titlebar(Icon::get("snake"), "Snake"),

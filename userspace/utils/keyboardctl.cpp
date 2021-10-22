@@ -26,7 +26,7 @@ Shell::ArgParseResult loadkey_list_keymap()
     return Shell::ArgParseResult::SHOULD_FINISH;
 }
 
-Shell::ArgParseResult loadkey_set_keymap(RefPtr<IO::Handle> keyboard_device, String keymap_path)
+Shell::ArgParseResult loadkey_set_keymap(Ref<IO::Handle> keyboard_device, String keymap_path)
 {
     IO::File file{keymap_path, HJ_OPEN_READ};
 
@@ -77,7 +77,7 @@ Shell::ArgParseResult loadkey_set_keymap(RefPtr<IO::Handle> keyboard_device, Str
     return Shell::ArgParseResult::SHOULD_FINISH;
 }
 
-Shell::ArgParseResult loadkey_get_keymap(RefPtr<IO::Handle> keyboard_device)
+Shell::ArgParseResult loadkey_get_keymap(Ref<IO::Handle> keyboard_device)
 {
     KeyMap keymap;
 
@@ -114,18 +114,17 @@ int main(int argc, const char *argv[])
         return PROCESS_FAILURE;
     }
 
-    args.option('l', "list", "List all installed keymap on this system.", [&](auto &) {
-        return loadkey_list_keymap();
-    });
+    args.option('l', "list", "List all installed keymap on this system.", [&](auto &)
+        { return loadkey_list_keymap(); });
 
-    args.option('g', "get", "Get the current keyboard keymap.", [&](auto &) {
-        return loadkey_get_keymap(keyboard_handle);
-    });
+    args.option('g', "get", "Get the current keyboard keymap.", [&](auto &)
+        { return loadkey_get_keymap(keyboard_handle); });
 
-    args.option_string('s', "set", "Set the current keyboard keymap.", [&](auto &keymap_name) {
-        auto kaymap_path = IO::format("/Files/Keyboards/{}.kmap", keymap_name);
-        return loadkey_set_keymap(keyboard_handle, kaymap_path);
-    });
+    args.option_string('s', "set", "Set the current keyboard keymap.", [&](auto &keymap_name)
+        {
+            auto kaymap_path = IO::format("/Files/Keyboards/{}.kmap", keymap_name);
+            return loadkey_set_keymap(keyboard_handle, kaymap_path);
+        });
 
     return args.eval(argc, argv) == Shell::ArgParseResult::FAILURE
                ? PROCESS_FAILURE

@@ -60,7 +60,7 @@ static const Vec<Page> PAGES = {
 
 auto page(auto state)
 {
-    Vec<RefPtr<Widget::Element>> elements;
+    Vec<Ref<Widget::Element>> elements;
 
     elements.push_back(Widget::spacing({0, 16, 0}, Widget::label(PAGES[state].header, Math::Anchor::CENTER)));
 
@@ -109,7 +109,7 @@ auto navigation(auto state, auto update)
 
 struct Window : public Widget::Window
 {
-    RefPtr<Widget::Element> build() override
+    Ref<Widget::Element> build() override
     {
         // clang-format off
 
@@ -135,7 +135,7 @@ struct Window : public Widget::Window
 
 struct Application : public Widget::Application
 {
-    OwnPtr<Widget::Window> build() override
+    Box<Widget::Window> build() override
     {
         return own<Window>();
     }

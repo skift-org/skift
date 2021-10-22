@@ -21,7 +21,7 @@ public:
 WIDGET_BUILDER(PanelElement, panel);
 
 template <typename TElement>
-static inline RefPtr<PanelElement> panel(RefPtr<TElement> child)
+static inline Ref<PanelElement> panel(Ref<TElement> child)
 {
     auto panel = make<PanelElement>();
     panel->add(child);
@@ -29,7 +29,7 @@ static inline RefPtr<PanelElement> panel(RefPtr<TElement> child)
 }
 
 template <typename TElement>
-static inline RefPtr<PanelElement> panel(int radius, RefPtr<TElement> child)
+static inline Ref<PanelElement> panel(int radius, Ref<TElement> child)
 {
     auto panel = make<PanelElement>(radius);
     panel->add(child);

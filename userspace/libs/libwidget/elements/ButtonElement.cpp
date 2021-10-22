@@ -79,7 +79,7 @@ ButtonElement::ButtonElement(Style style) : _style{style}
     flags(Element::GREEDY);
 }
 
-RefPtr<ButtonElement> button(ButtonElement::Style style, RefPtr<Element> child, Func<void(void)> on_click)
+Ref<ButtonElement> button(ButtonElement::Style style, Ref<Element> child, Func<void(void)> on_click)
 {
     auto button = make<ButtonElement>(style);
 
@@ -89,7 +89,8 @@ RefPtr<ButtonElement> button(ButtonElement::Style style, RefPtr<Element> child, 
 
     if (on_click)
     {
-        button->on(Event::ACTION, [on_click](auto) { on_click(); });
+        button->on(Event::ACTION, [on_click](auto)
+            { on_click(); });
     }
 
     return button;
@@ -97,7 +98,7 @@ RefPtr<ButtonElement> button(ButtonElement::Style style, RefPtr<Element> child, 
 
 /* --- Basic Button --------------------------------------------------------- */
 
-RefPtr<ButtonElement> basic_button(RefPtr<Element> child, Func<void(void)> on_click)
+Ref<ButtonElement> basic_button(Ref<Element> child, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::TEXT,
@@ -105,51 +106,51 @@ RefPtr<ButtonElement> basic_button(RefPtr<Element> child, Func<void(void)> on_cl
         on_click);
 }
 
-RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Icon> icon, Func<void(void)> on_click)
+Ref<ButtonElement> basic_button(Ref<Graphic::Icon> icon, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::TEXT,
         spacing({0, 9},
-                Widget::icon(icon)),
+            Widget::icon(icon)),
         on_click);
 }
 
-RefPtr<ButtonElement> basic_button(String text, Func<void(void)> on_click)
+Ref<ButtonElement> basic_button(String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::TEXT,
         spacing({0, 16},
-                Widget::label(text, Math::Anchor::CENTER)),
+            Widget::label(text, Math::Anchor::CENTER)),
         on_click);
 }
 
-RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Icon> icon, String text, Func<void(void)> on_click)
+Ref<ButtonElement> basic_button(Ref<Graphic::Icon> icon, String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::TEXT,
         spacing({0, 0, 12, 16},
-                Widget::hflow({
-                    spacing({0, 0, 0, 8}, Widget::icon(icon)),
-                    Widget::label(text),
-                })),
+            Widget::hflow({
+                spacing({0, 0, 0, 8}, Widget::icon(icon)),
+                Widget::label(text),
+            })),
         on_click);
 }
 
-RefPtr<ButtonElement> basic_button(RefPtr<Graphic::Bitmap> image, String text, Func<void(void)> on_click)
+Ref<ButtonElement> basic_button(Ref<Graphic::Bitmap> image, String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::TEXT,
         spacing({0, 0, 12, 16},
-                Widget::hflow({
-                    spacing({0, 0, 0, 8}, Widget::image(image, Graphic::BitmapScaling::CENTER)),
-                    Widget::label(text),
-                })),
+            Widget::hflow({
+                spacing({0, 0, 0, 8}, Widget::image(image, Graphic::BitmapScaling::CENTER)),
+                Widget::label(text),
+            })),
         on_click);
 }
 
 /* --- Outlined Button ------------------------------------------------------ */
 
-RefPtr<ButtonElement> outline_button(RefPtr<Element> child, Func<void(void)> on_click)
+Ref<ButtonElement> outline_button(Ref<Element> child, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::OUTLINE,
@@ -157,39 +158,39 @@ RefPtr<ButtonElement> outline_button(RefPtr<Element> child, Func<void(void)> on_
         on_click);
 }
 
-RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, Func<void(void)> on_click)
+Ref<ButtonElement> outline_button(Ref<Graphic::Icon> icon, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::OUTLINE,
         spacing({0, 9},
-                Widget::icon(icon)),
+            Widget::icon(icon)),
         on_click);
 }
 
-RefPtr<ButtonElement> outline_button(String text, Func<void(void)> on_click)
+Ref<ButtonElement> outline_button(String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::OUTLINE,
         spacing({0, 16},
-                Widget::label(text, Math::Anchor::CENTER)),
+            Widget::label(text, Math::Anchor::CENTER)),
         on_click);
 }
 
-RefPtr<ButtonElement> outline_button(RefPtr<Graphic::Icon> icon, String text, Func<void(void)> on_click)
+Ref<ButtonElement> outline_button(Ref<Graphic::Icon> icon, String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::OUTLINE,
         spacing({0, 0, 12, 16},
-                Widget::hflow({
-                    spacing({0, 0, 0, 8}, Widget::icon(icon)),
-                    Widget::label(text),
-                })),
+            Widget::hflow({
+                spacing({0, 0, 0, 8}, Widget::icon(icon)),
+                Widget::label(text),
+            })),
         on_click);
 }
 
 /* --- Filled Button -------------------------------------------------------- */
 
-RefPtr<ButtonElement> filled_button(RefPtr<Element> child, Func<void(void)> on_click)
+Ref<ButtonElement> filled_button(Ref<Element> child, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::FILLED,
@@ -197,33 +198,33 @@ RefPtr<ButtonElement> filled_button(RefPtr<Element> child, Func<void(void)> on_c
         on_click);
 }
 
-RefPtr<ButtonElement> filled_button(RefPtr<Graphic::Icon> icon, Func<void(void)> on_click)
+Ref<ButtonElement> filled_button(Ref<Graphic::Icon> icon, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::FILLED,
         spacing({0, 9},
-                Widget::icon(icon)),
+            Widget::icon(icon)),
         on_click);
 }
 
-RefPtr<ButtonElement> filled_button(String text, Func<void(void)> on_click)
+Ref<ButtonElement> filled_button(String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::FILLED,
         spacing({0, 16},
-                Widget::label(text)),
+            Widget::label(text)),
         on_click);
 }
 
-RefPtr<ButtonElement> filled_button(RefPtr<Graphic::Icon> icon, String text, Func<void(void)> on_click)
+Ref<ButtonElement> filled_button(Ref<Graphic::Icon> icon, String text, Func<void(void)> on_click)
 {
     return button(
         ButtonElement::FILLED,
         spacing({0, 0, 12, 16},
-                Widget::hflow({
-                    spacing({0, 0, 0, 8}, Widget::icon(icon)),
-                    Widget::label(text),
-                })),
+            Widget::hflow({
+                spacing({0, 0, 0, 8}, Widget::icon(icon)),
+                Widget::label(text),
+            })),
         on_click);
 }
 

@@ -4,7 +4,7 @@
 
 #include <libasync/Source.h>
 #include <libutils/Func.h>
-#include <libutils/RefPtr.h>
+#include <libutils/Ref.h>
 
 namespace Async
 {

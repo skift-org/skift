@@ -14,7 +14,7 @@ struct Window : public Widget::Window
 
     Window() : Widget::Window{WINDOW_RESIZABLE} {}
 
-    RefPtr<Widget::Element> build()
+    Ref<Widget::Element> build()
     {
         return Widget::stateful<size_t>([](auto state, auto update)
             {
@@ -25,7 +25,7 @@ struct Window : public Widget::Window
                     {"Lines", lines},
                 };
 
-                Vec<RefPtr<Widget::Element>> buttons{};
+                Vec<Ref<Widget::Element>> buttons{};
 
                 for (size_t i = 0; i < ARRAY_LENGTH(DEMOS); i++)
                 {

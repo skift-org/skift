@@ -11,9 +11,9 @@ private:
     NONCOPYABLE(Setting);
     NONMOVABLE(Setting);
 
-    RefPtr<Service> _service;
+    Ref<Service> _service;
 
-    OwnPtr<Watcher> _watcher;
+    Box<Watcher> _watcher;
     Settings::Path _path;
     WatcherCallback _callback;
     Opt<Json::Value> _value = NONE;

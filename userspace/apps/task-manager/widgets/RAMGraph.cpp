@@ -9,20 +9,21 @@ using namespace Graphic;
 namespace TaskManager
 {
 
-RAMGraphComponent::RAMGraphComponent(RefPtr<TaskModel> tasks) : _tasks{tasks}
+RAMGraphComponent::RAMGraphComponent(Ref<TaskModel> tasks) : _tasks{tasks}
 {
     _usage = make<Widget::GraphModel>();
 
-    _update = own<Async::Timer>(500, [this] {
-        SystemStatus status{};
-        hj_system_status(&status);
-        _usage->record(status.used_ram / (float)status.total_ram);
-    });
+    _update = own<Async::Timer>(500, [this]
+        {
+            SystemStatus status{};
+            hj_system_status(&status);
+            _usage->record(status.used_ram / (float)status.total_ram);
+        });
 
     _update->start();
 }
 
-RefPtr<Element> RAMGraphComponent::build()
+Ref<Element> RAMGraphComponent::build()
 {
     // clang-format off
 

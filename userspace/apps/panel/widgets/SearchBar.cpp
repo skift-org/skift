@@ -14,7 +14,7 @@ SearchBarComponent::SearchBarComponent(String text, Func<void(String)> on_change
 {
 }
 
-RefPtr<Element> SearchBarComponent::build()
+Ref<Element> SearchBarComponent::build()
 {
     // clang-format off
 

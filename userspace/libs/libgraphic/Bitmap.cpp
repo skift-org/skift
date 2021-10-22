@@ -17,7 +17,7 @@ static Color _placeholder_buffer[] = {
     Colors::MAGENTA,
 };
 
-ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(int width, int height)
+ResultOr<Ref<Bitmap>> Bitmap::create_shared(int width, int height)
 {
     Color *pixels = nullptr;
     TRY(memory_alloc(width * height * sizeof(Color), reinterpret_cast<uintptr_t *>(&pixels)));
@@ -31,7 +31,7 @@ ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(int width, int height)
     return bitmap;
 }
 
-ResultOr<RefPtr<Bitmap>> Bitmap::create_shared_from_handle(int handle, Math::Vec2i width_and_height)
+ResultOr<Ref<Bitmap>> Bitmap::create_shared_from_handle(int handle, Math::Vec2i width_and_height)
 {
     Color *pixels = nullptr;
     size_t size = 0;
@@ -49,17 +49,17 @@ ResultOr<RefPtr<Bitmap>> Bitmap::create_shared_from_handle(int handle, Math::Vec
     return make<Bitmap>(handle, BITMAP_SHARED, width_and_height.x(), width_and_height.y(), pixels);
 }
 
-RefPtr<Bitmap> Bitmap::create_static(int width, int height, Color *pixels)
+Ref<Bitmap> Bitmap::create_static(int width, int height, Color *pixels)
 {
     return make<Bitmap>(-1, BITMAP_STATIC, width, height, pixels);
 }
 
-RefPtr<Bitmap> Bitmap::placeholder()
+Ref<Bitmap> Bitmap::placeholder()
 {
     return create_static(2, 2, _placeholder_buffer);
 }
 
-ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path, int size_hint)
+ResultOr<Ref<Bitmap>> Bitmap::load_from(String path, int size_hint)
 {
     IO::File file{path, HJ_OPEN_READ};
 
@@ -81,7 +81,7 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(String path, int size_hint)
     return ERR_NOT_IMPLEMENTED;
 }
 
-RefPtr<Bitmap> Bitmap::load_from_or_placeholder(String path, int size_hint)
+Ref<Bitmap> Bitmap::load_from_or_placeholder(String path, int size_hint)
 {
     auto result = load_from(path, size_hint);
 

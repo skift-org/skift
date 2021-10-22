@@ -8,7 +8,7 @@ namespace Panel
 struct QuickSettings : public Widget::Window
 {
     QuickSettings();
-    RefPtr<Widget::Element> build() override;
+    Ref<Widget::Element> build() override;
 };
 
 } // namespace Panel

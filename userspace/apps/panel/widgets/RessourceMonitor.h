@@ -11,15 +11,15 @@ struct RessourceMonitor :
     public Widget::Component
 {
 private:
-    OwnPtr<Async::Timer> _ram_timer;
-    RefPtr<Widget::GraphModel> _ram_model;
-    OwnPtr<Async::Timer> _cpu_timer;
-    RefPtr<Widget::GraphModel> _cpu_model;
+    Box<Async::Timer> _ram_timer;
+    Ref<Widget::GraphModel> _ram_model;
+    Box<Async::Timer> _cpu_timer;
+    Ref<Widget::GraphModel> _cpu_model;
 
 public:
     RessourceMonitor();
 
-    RefPtr<Element> build() override;
+    Ref<Element> build() override;
 };
 
 WIDGET_BUILDER(RessourceMonitor, ressource_monitor);

@@ -11,14 +11,14 @@ namespace TaskManager
 struct CPUGraphComponent : public Widget::Component
 {
 private:
-    RefPtr<TaskModel> _tasks;
-    RefPtr<Widget::GraphModel> _usage;
-    OwnPtr<Async::Timer> _update;
+    Ref<TaskModel> _tasks;
+    Ref<Widget::GraphModel> _usage;
+    Box<Async::Timer> _update;
 
 public:
-    CPUGraphComponent(RefPtr<TaskModel> tasks);
+    CPUGraphComponent(Ref<TaskModel> tasks);
 
-    RefPtr<Element> build() override;
+    Ref<Element> build() override;
 };
 
 WIDGET_BUILDER(CPUGraphComponent, cpu_graph);

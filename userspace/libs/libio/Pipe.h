@@ -8,8 +8,8 @@ namespace IO
 
 struct Pipe
 {
-    RefPtr<Handle> reader;
-    RefPtr<Handle> writer;
+    Ref<Handle> reader;
+    Ref<Handle> writer;
 
     static ResultOr<Pipe> create()
     {

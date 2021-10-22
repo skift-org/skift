@@ -11,13 +11,13 @@ namespace TaskManager
 struct TaskManager : public Widget::Window
 {
 private:
-    RefPtr<TaskModel> _model;
-    OwnPtr<Async::Timer> _update;
+    Ref<TaskModel> _model;
+    Box<Async::Timer> _update;
 
 public:
     TaskManager();
 
-    RefPtr<Widget::Element> build() override;
+    Ref<Widget::Element> build() override;
 };
 
 } // namespace TaskManager

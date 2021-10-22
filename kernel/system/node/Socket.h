@@ -7,14 +7,14 @@
 struct FsSocket : public FsNode
 {
 private:
-    Vec<RefPtr<FsNode>> _pending{};
+    Vec<Ref<FsNode>> _pending{};
 
 public:
     FsSocket();
 
-    ResultOr<RefPtr<FsNode>> connect() override;
+    ResultOr<Ref<FsNode>> connect() override;
 
     bool can_accept() override;
 
-    ResultOr<RefPtr<FsNode>> accept() override;
+    ResultOr<Ref<FsNode>> accept() override;
 };

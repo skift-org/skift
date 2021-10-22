@@ -17,7 +17,7 @@ public:
     };
 
 private:
-    RefPtr<Handle> _handle;
+    Ref<Handle> _handle;
     Opt<IO::Path> _path = NONE;
     Vec<Entry> _entries;
 
@@ -31,9 +31,9 @@ public:
     Directory(const char *path);
     Directory(String path);
     Directory(const IO::Path &path);
-    Directory(RefPtr<Handle> handle);
+    Directory(Ref<Handle> handle);
 
-    RefPtr<Handle> handle() override { return _handle; }
+    Ref<Handle> handle() override { return _handle; }
 
     bool exist();
 };

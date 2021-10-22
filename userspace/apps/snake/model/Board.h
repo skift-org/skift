@@ -10,8 +10,8 @@ namespace Snake
 {
 
 struct Board :
-    public RefPtr<Board>,
-    public RefCounted<Board>
+    public Ref<Board>,
+    public Shared<Board>
 {
 private:
     int _width = 16;

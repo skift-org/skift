@@ -34,7 +34,7 @@ public:
         return _address == address.unix();
     }
 
-    RefPtr<Device> instance(DeviceAddress address)
+    Ref<Device> instance(DeviceAddress address)
     {
         return make<UNIXDeviceType>(address);
     }

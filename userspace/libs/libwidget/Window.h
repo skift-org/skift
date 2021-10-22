@@ -42,21 +42,21 @@ private:
 
     CursorState cursor_state = CURSOR_DEFAULT;
 
-    RefPtr<Graphic::Bitmap> frontbuffer;
-    RefPtr<Graphic::Bitmap> backbuffer;
+    Ref<Graphic::Bitmap> frontbuffer;
+    Ref<Graphic::Bitmap> backbuffer;
 
     bool _dirty_layout;
     Vec<Math::Recti> _dirty_paint{};
 
     EventHandler _handlers[EventType::__COUNT];
 
-    RefPtr<Element> _root;
+    Ref<Element> _root;
 
     Element *_keyboard_focus = nullptr;
     Element *_mouse_focus = nullptr;
     Element *_mouse_over = nullptr;
 
-    OwnPtr<Async::Invoker> _update_invoker;
+    Box<Async::Invoker> _update_invoker;
 
     NONCOPYABLE(Window);
     NONMOVABLE(Window);
@@ -137,7 +137,7 @@ public:
 
     /* --- Children --------------------------------------------------------- */
 
-    RefPtr<Element> root()
+    Ref<Element> root()
     {
         if (!_root)
         {
@@ -161,7 +161,7 @@ public:
 
     /* --- Rebuild ---------------------------------------------------------- */
 
-    virtual RefPtr<Element> build()
+    virtual Ref<Element> build()
     {
         return make<Element>();
     }
@@ -219,7 +219,7 @@ public:
     void handle_keyboard_key_release(Event *event);
 };
 
-static inline OwnPtr<Window> window(WindowFlag flags, Math::Vec2i size, RefPtr<Element> root)
+static inline Box<Window> window(WindowFlag flags, Math::Vec2i size, Ref<Element> root)
 {
     auto window = own<Window>(flags);
     window->size(size);
@@ -227,7 +227,7 @@ static inline OwnPtr<Window> window(WindowFlag flags, Math::Vec2i size, RefPtr<E
     return window;
 }
 
-static inline OwnPtr<Window> window(WindowFlag flags, RefPtr<Element> root)
+static inline Box<Window> window(WindowFlag flags, Ref<Element> root)
 {
     auto window = own<Window>(flags);
     window->root()->add(root);
@@ -235,7 +235,7 @@ static inline OwnPtr<Window> window(WindowFlag flags, RefPtr<Element> root)
     return window;
 }
 
-static inline OwnPtr<Window> window(RefPtr<Element> root)
+static inline Box<Window> window(Ref<Element> root)
 {
     return window(WINDOW_NONE, root);
 }

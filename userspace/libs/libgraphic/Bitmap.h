@@ -2,7 +2,7 @@
 
 #include <abi/Result.h>
 #include <libmath/Rect.h>
-#include <libutils/RefPtr.h>
+#include <libutils/Ref.h>
 #include <libutils/ResultOr.h>
 #include <libutils/String.h>
 
@@ -31,7 +31,7 @@ enum struct BitmapScaling
     FIT,
 };
 
-struct Bitmap : public RefCounted<Bitmap>
+struct Bitmap : public Shared<Bitmap>
 {
 private:
     int _handle;
@@ -67,17 +67,17 @@ public:
 
     void filtering(BitmapFiltering filtering) { _filtering = filtering; }
 
-    static RefPtr<Bitmap> placeholder();
+    static Ref<Bitmap> placeholder();
 
-    static ResultOr<RefPtr<Bitmap>> create_shared(int width, int height);
+    static ResultOr<Ref<Bitmap>> create_shared(int width, int height);
 
-    static ResultOr<RefPtr<Bitmap>> create_shared_from_handle(int handle, Math::Vec2i width_and_height);
+    static ResultOr<Ref<Bitmap>> create_shared_from_handle(int handle, Math::Vec2i width_and_height);
 
-    static RefPtr<Bitmap> create_static(int width, int height, Color *pixels);
+    static Ref<Bitmap> create_static(int width, int height, Color *pixels);
 
-    static ResultOr<RefPtr<Bitmap>> load_from(String path, int size_hint = -1);
+    static ResultOr<Ref<Bitmap>> load_from(String path, int size_hint = -1);
 
-    static RefPtr<Bitmap> load_from_or_placeholder(String path, int size_hint = -1);
+    static Ref<Bitmap> load_from_or_placeholder(String path, int size_hint = -1);
 
     HjResult save_to(String path);
 

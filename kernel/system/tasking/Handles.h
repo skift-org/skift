@@ -9,17 +9,17 @@ struct Handles
 private:
     Lock _lock{"handles-lock"};
 
-    RefPtr<FsHandle> _handles[PROCESS_HANDLE_COUNT];
+    Ref<FsHandle> _handles[PROCESS_HANDLE_COUNT];
 
-    ResultOr<int> add(RefPtr<FsHandle> handle);
+    ResultOr<int> add(Ref<FsHandle> handle);
 
-    HjResult add_at(RefPtr<FsHandle> handle, int index);
+    HjResult add_at(Ref<FsHandle> handle, int index);
 
     bool is_valid_handle(int handle);
 
     HjResult remove(int handle_index);
 
-    RefPtr<FsHandle> acquire(int handle_index);
+    Ref<FsHandle> acquire(int handle_index);
 
     HjResult release(int handle_index);
 
@@ -55,7 +55,7 @@ public:
     ResultOr<int> accept(int handle_index);
 
     HjResult duplex(
-        RefPtr<FsNode> node,
+        Ref<FsNode> node,
         int *server, HjOpenFlag server_flags,
         int *client, HjOpenFlag client_flags);
 

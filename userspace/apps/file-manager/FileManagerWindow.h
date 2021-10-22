@@ -9,7 +9,7 @@ struct FileManagerWindow : public Widget::Window
 {
     FileManagerWindow() : Window{WINDOW_RESIZABLE} {}
 
-    RefPtr<Widget::Element> build()
+    Ref<Widget::Element> build()
     {
         return Widget::vflow({
             Widget::titlebar(Graphic::Icon::get("folder"), "File Manager"),

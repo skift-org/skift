@@ -9,20 +9,21 @@ using namespace Graphic;
 namespace TaskManager
 {
 
-CPUGraphComponent::CPUGraphComponent(RefPtr<TaskModel> tasks) : _tasks{tasks}
+CPUGraphComponent::CPUGraphComponent(Ref<TaskModel> tasks) : _tasks{tasks}
 {
     _usage = make<Widget::GraphModel>();
 
-    _update = own<Async::Timer>(500, [this] {
-        SystemStatus status{};
-        hj_system_status(&status);
-        _usage->record(status.cpu_usage / 100.0);
-    });
+    _update = own<Async::Timer>(500, [this]
+        {
+            SystemStatus status{};
+            hj_system_status(&status);
+            _usage->record(status.cpu_usage / 100.0);
+        });
 
     _update->start();
 }
 
-RefPtr<Element> CPUGraphComponent::build()
+Ref<Element> CPUGraphComponent::build()
 {
     // clang-format off
 

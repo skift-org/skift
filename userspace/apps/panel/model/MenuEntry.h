@@ -10,8 +10,8 @@ struct MenuEntry
     String id;
     String name;
     String comment;
-    RefPtr<Graphic::Icon> icon;
-    RefPtr<Graphic::Bitmap> image;
+    Ref<Graphic::Icon> icon;
+    Ref<Graphic::Bitmap> image;
     String command;
 
     MenuEntry(String id, const Json::Value &value);

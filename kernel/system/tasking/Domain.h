@@ -8,10 +8,10 @@
 struct Domain
 {
 private:
-    RefPtr<FsNode> _root;
+    Ref<FsNode> _root;
 
 public:
-    RefPtr<FsNode> root() { return _root; }
+    Ref<FsNode> root() { return _root; }
 
     Domain();
 
@@ -21,13 +21,13 @@ public:
 
     Domain &operator=(const Domain &other);
 
-    RefPtr<FsNode> find(IO::Path path);
+    Ref<FsNode> find(IO::Path path);
 
-    ResultOr<RefPtr<FsHandle>> open(IO::Path path, HjOpenFlag flags);
+    ResultOr<Ref<FsHandle>> open(IO::Path path, HjOpenFlag flags);
 
-    ResultOr<RefPtr<FsHandle>> connect(IO::Path path);
+    ResultOr<Ref<FsHandle>> connect(IO::Path path);
 
-    HjResult link(IO::Path path, RefPtr<FsNode> node);
+    HjResult link(IO::Path path, Ref<FsNode> node);
 
     HjResult unlink(IO::Path path);
 

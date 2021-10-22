@@ -8,7 +8,7 @@
 namespace Widget
 {
 
-TitleBarComponent::TitleBarComponent(RefPtr<Graphic::Icon> icon, String title)
+TitleBarComponent::TitleBarComponent(Ref<Graphic::Icon> icon, String title)
     : _icon{icon}, _title{title}
 {
 }
@@ -49,7 +49,7 @@ void TitleBarComponent::event(Event *event)
     }
 }
 
-RefPtr<Element> TitleBarComponent::build()
+Ref<Element> TitleBarComponent::build()
 {
     bool window_resizable = window()->flags() & WINDOW_RESIZABLE;
 

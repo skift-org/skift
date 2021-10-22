@@ -7,7 +7,7 @@
 struct TerminalApplication :
     public Widget::Application
 {
-    OwnPtr<Widget::Window> build()
+    Box<Widget::Window> build()
     {
         return own<TerminalWindow>();
     }

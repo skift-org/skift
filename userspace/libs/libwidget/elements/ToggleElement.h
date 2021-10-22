@@ -17,7 +17,7 @@ struct ToggleElement : public StatefulElement<bool>
     virtual void event(Event *event);
 };
 
-static inline RefPtr<ToggleElement> toggle(bool state)
+static inline Ref<ToggleElement> toggle(bool state)
 {
     auto toggle = make<ToggleElement>();
     toggle->state(state);

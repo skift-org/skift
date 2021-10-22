@@ -9,7 +9,7 @@
 
 void device_scan(IterFunc<DeviceAddress> address);
 
-void device_iterate(IterFunc<RefPtr<Device>> callback);
+void device_iterate(IterFunc<Ref<Device>> callback);
 
 String device_claim_name(DeviceClass klass);
 
@@ -19,4 +19,4 @@ void devices_acknowledge_interrupt(int interrupt);
 
 void devices_handle_interrupt(int interrupt);
 
-void device_mount(RefPtr<Device> device);
+void device_mount(Ref<Device> device);

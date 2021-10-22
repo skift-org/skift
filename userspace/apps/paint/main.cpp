@@ -32,34 +32,34 @@ static Graphic::Color _color_palette[] = {
 struct PaintWindow : public Widget::Window
 {
 private:
-    RefPtr<PaintDocument> _document;
+    Ref<PaintDocument> _document;
 
     /// --- Toolbar --- ///
 
-    RefPtr<Widget::Element> _open_document;
-    RefPtr<Widget::Element> _save_document;
-    RefPtr<Widget::Element> _new_document;
+    Ref<Widget::Element> _open_document;
+    Ref<Widget::Element> _save_document;
+    Ref<Widget::Element> _new_document;
 
-    RefPtr<Widget::Element> _pencil;
-    RefPtr<Widget::Element> _brush;
-    RefPtr<Widget::Element> _eraser;
-    RefPtr<Widget::Element> _fill;
-    RefPtr<Widget::Element> _picker;
+    Ref<Widget::Element> _pencil;
+    Ref<Widget::Element> _brush;
+    Ref<Widget::Element> _eraser;
+    Ref<Widget::Element> _fill;
+    Ref<Widget::Element> _picker;
 
-    RefPtr<Widget::Element> _insert_text;
-    RefPtr<Widget::Element> _insert_line;
-    RefPtr<Widget::Element> _insert_rectangle;
-    RefPtr<Widget::Element> _insert_circle;
+    Ref<Widget::Element> _insert_text;
+    Ref<Widget::Element> _insert_line;
+    Ref<Widget::Element> _insert_rectangle;
+    Ref<Widget::Element> _insert_circle;
 
-    RefPtr<Widget::Element> _primary_color;
-    RefPtr<Widget::Element> _secondary_color;
+    Ref<Widget::Element> _primary_color;
+    Ref<Widget::Element> _secondary_color;
 
     /// --- Canvas --- ///
 
-    RefPtr<PaintCanvas> _canvas;
+    Ref<PaintCanvas> _canvas;
 
 public:
-    PaintWindow(RefPtr<PaintDocument> document) : Window(WINDOW_RESIZABLE)
+    PaintWindow(Ref<PaintDocument> document) : Window(WINDOW_RESIZABLE)
     {
         size(Math::Vec2i(600, 560));
 
@@ -74,12 +74,13 @@ public:
 
         create_color_palette(root());
 
-        document->on_color_change = [this]() {
+        document->on_color_change = [this]()
+        {
             update_toolbar();
         };
     }
 
-    void create_toolbar(RefPtr<Widget::Element> parent)
+    void create_toolbar(Ref<Widget::Element> parent)
     {
         auto toolbar = parent->add(Widget::panel());
 
@@ -89,30 +90,35 @@ public:
 
         toolbar->add(Widget::separator());
 
-        _pencil = toolbar->add(Widget::basic_button(Graphic::Icon::get("pencil"), [this] {
-            _canvas->tool(own<PencilTool>());
-            update_toolbar();
-        }));
+        _pencil = toolbar->add(Widget::basic_button(Graphic::Icon::get("pencil"), [this]
+            {
+                _canvas->tool(own<PencilTool>());
+                update_toolbar();
+            }));
 
-        _brush = toolbar->add(Widget::basic_button(Graphic::Icon::get("brush"), [this] {
-            _canvas->tool(own<BrushTool>());
-            update_toolbar();
-        }));
+        _brush = toolbar->add(Widget::basic_button(Graphic::Icon::get("brush"), [this]
+            {
+                _canvas->tool(own<BrushTool>());
+                update_toolbar();
+            }));
 
-        _eraser = toolbar->add(Widget::basic_button(Graphic::Icon::get("eraser"), [this] {
-            _canvas->tool(own<EraserTool>());
-            update_toolbar();
-        }));
+        _eraser = toolbar->add(Widget::basic_button(Graphic::Icon::get("eraser"), [this]
+            {
+                _canvas->tool(own<EraserTool>());
+                update_toolbar();
+            }));
 
-        _fill = toolbar->add(Widget::basic_button(Graphic::Icon::get("format-color-fill"), [this] {
-            _canvas->tool(own<FillTool>());
-            update_toolbar();
-        }));
+        _fill = toolbar->add(Widget::basic_button(Graphic::Icon::get("format-color-fill"), [this]
+            {
+                _canvas->tool(own<FillTool>());
+                update_toolbar();
+            }));
 
-        _picker = toolbar->add(Widget::basic_button(Graphic::Icon::get("eyedropper"), [this] {
-            _canvas->tool(own<PickerTool>());
-            update_toolbar();
-        }));
+        _picker = toolbar->add(Widget::basic_button(Graphic::Icon::get("eyedropper"), [this]
+            {
+                _canvas->tool(own<PickerTool>());
+                update_toolbar();
+            }));
 
         toolbar->add(Widget::separator());
 
@@ -139,7 +145,7 @@ public:
         _secondary_color->flags(Widget::Element::FILL);
     }
 
-    void create_color_palette(RefPtr<Widget::Element> parent)
+    void create_color_palette(Ref<Widget::Element> parent)
     {
         auto palette = parent->add(Widget::panel());
 
@@ -154,18 +160,19 @@ public:
             color_widget->min_width(30);
             color_widget->color(Widget::THEME_MIDDLEGROUND, color);
 
-            color_widget->on(Widget::Event::MOUSE_BUTTON_PRESS, [this, color](auto event) {
-                if (event->mouse.button == MOUSE_BUTTON_LEFT)
+            color_widget->on(Widget::Event::MOUSE_BUTTON_PRESS, [this, color](auto event)
                 {
-                    _document->primary_color(color);
-                }
-                else if (event->mouse.button == MOUSE_BUTTON_RIGHT)
-                {
-                    _document->secondary_color(color);
-                }
+                    if (event->mouse.button == MOUSE_BUTTON_LEFT)
+                    {
+                        _document->primary_color(color);
+                    }
+                    else if (event->mouse.button == MOUSE_BUTTON_RIGHT)
+                    {
+                        _document->secondary_color(color);
+                    }
 
-                update_toolbar();
-            });
+                    update_toolbar();
+                });
         }
     }
 

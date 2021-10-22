@@ -15,7 +15,7 @@ struct Watcher
 private:
     Path _path;
     WatcherCallback _callback;
-    RefPtr<Service> _service;
+    Ref<Service> _service;
 
 public:
     const Path &path() const

@@ -113,28 +113,28 @@ public:
     }
 };
 
-static inline RefPtr<Element> vflow(Vec<RefPtr<Element>> children)
+static inline Ref<Element> vflow(Vec<Ref<Element>> children)
 {
     auto layout = make<FlowLayout>(0, false);
     layout->add(children);
     return layout;
 }
 
-static inline RefPtr<Element> vflow(int spacing, Vec<RefPtr<Element>> children)
+static inline Ref<Element> vflow(int spacing, Vec<Ref<Element>> children)
 {
     auto layout = make<FlowLayout>(spacing, false);
     layout->add(children);
     return layout;
 }
 
-static inline RefPtr<Element> hflow(Vec<RefPtr<Element>> children)
+static inline Ref<Element> hflow(Vec<Ref<Element>> children)
 {
     auto layout = make<FlowLayout>(0, true);
     layout->add(children);
     return layout;
 }
 
-static inline RefPtr<Element> hflow(int spacing, Vec<RefPtr<Element>> children)
+static inline Ref<Element> hflow(int spacing, Vec<Ref<Element>> children)
 {
     auto layout = make<FlowLayout>(spacing, true);
     layout->add(children);

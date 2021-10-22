@@ -12,8 +12,8 @@ using namespace Widget;
 struct TextEditorWindow : public Window
 {
 private:
-    RefPtr<TextModel> _text_model;
-    OwnPtr<Async::Observer<Widget::TextModel>> _text_observer;
+    Ref<TextModel> _text_model;
+    Box<Async::Observer<Widget::TextModel>> _text_observer;
 
     bool _modified = false;
     String _path = "";
@@ -25,54 +25,58 @@ public:
 
         size(Math::Vec2i(700, 500));
         load_document(path);
-        _text_observer = _text_model->observe([this](auto &) {
-            if (!_modified)
+        _text_observer = _text_model->observe([this](auto &)
             {
-                _modified = true;
-                should_rebuild();
-            }
-        });
+                if (!_modified)
+                {
+                    _modified = true;
+                    should_rebuild();
+                }
+            });
 
-        on(EventType::KEYBOARD_KEY_TYPED, [this](Event *event) {
-            if (event->keyboard.key == Key::KEYBOARD_KEY_O && event->keyboard.modifiers == KEY_MODIFIER_CTRL)
+        on(EventType::KEYBOARD_KEY_TYPED, [this](Event *event)
             {
-                on_load();
-            }
-            else if (event->keyboard.key == Key::KEYBOARD_KEY_S && event->keyboard.modifiers == KEY_MODIFIER_CTRL)
-            {
-                on_save();
-            }
-            else if (event->keyboard.key == Key::KEYBOARD_KEY_W && event->keyboard.modifiers == KEY_MODIFIER_CTRL)
-            {
-                try_hide();
-            }
-            else
-            {
-                event->accepted = false;
-            }
-        });
+                if (event->keyboard.key == Key::KEYBOARD_KEY_O && event->keyboard.modifiers == KEY_MODIFIER_CTRL)
+                {
+                    on_load();
+                }
+                else if (event->keyboard.key == Key::KEYBOARD_KEY_S && event->keyboard.modifiers == KEY_MODIFIER_CTRL)
+                {
+                    on_save();
+                }
+                else if (event->keyboard.key == Key::KEYBOARD_KEY_W && event->keyboard.modifiers == KEY_MODIFIER_CTRL)
+                {
+                    try_hide();
+                }
+                else
+                {
+                    event->accepted = false;
+                }
+            });
 
-        on(EventType::WINDOW_CLOSING, [this](Event *event) {
-            bool keep = false;
-            if (_modified)
+        on(EventType::WINDOW_CLOSING, [this](Event *event)
             {
-                show_warning([&](auto result) {
-                    switch (result)
-                    {
-                    case DialogResult::YES:
-                        on_save();
-                        break;
-                    case DialogResult::NO:
-                        break;
-                    default:
-                        keep = true;
-                        break;
-                    }
-                });
-            }
+                bool keep = false;
+                if (_modified)
+                {
+                    show_warning([&](auto result)
+                        {
+                            switch (result)
+                            {
+                            case DialogResult::YES:
+                                on_save();
+                                break;
+                            case DialogResult::NO:
+                                break;
+                            default:
+                                keep = true;
+                                break;
+                            }
+                        });
+                }
 
-            event->accepted = keep;
-        });
+                event->accepted = keep;
+            });
     }
 
     void load_document(String path)
@@ -127,19 +131,20 @@ public:
         bool show_picker = true;
         if (_modified)
         {
-            show_warning([&](auto result) {
-                switch (result)
+            show_warning([&](auto result)
                 {
-                case DialogResult::YES:
-                    on_save();
-                    break;
-                case DialogResult::NO:
-                    break;
-                default:
-                    show_picker = false;
-                    break;
-                }
-            });
+                    switch (result)
+                    {
+                    case DialogResult::YES:
+                        on_save();
+                        break;
+                    case DialogResult::NO:
+                        break;
+                    default:
+                        show_picker = false;
+                        break;
+                    }
+                });
         }
 
         if (show_picker)
@@ -163,9 +168,9 @@ public:
 
         auto dialog_result = Widget::MessageBox::
             create_and_show(title,
-                            "If you don't save, any changes will be lost forever!",
-                            Graphic::Icon::get("warning"),
-                            DialogButton::YES | DialogButton::NO | DialogButton::CANCEL);
+                "If you don't save, any changes will be lost forever!",
+                Graphic::Icon::get("warning"),
+                DialogButton::YES | DialogButton::NO | DialogButton::CANCEL);
 
         callback(dialog_result);
     }
@@ -196,7 +201,7 @@ public:
         }
     }
 
-    RefPtr<Element> build() override
+    Ref<Element> build() override
     {
         // clang-format off
 

@@ -24,7 +24,7 @@ public:
 
     virtual bool match(DeviceAddress address) = 0;
 
-    virtual RefPtr<Device> instance(DeviceAddress address) = 0;
+    virtual Ref<Device> instance(DeviceAddress address) = 0;
 };
 
 void driver_initialize();

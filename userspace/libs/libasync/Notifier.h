@@ -12,12 +12,12 @@ struct Notifier :
     public Source
 {
 private:
-    RefPtr<IO::Handle> _handle;
+    Ref<IO::Handle> _handle;
     PollEvent _events;
     Func<void()> _callback;
 
 public:
-    RefPtr<IO::Handle> handle() override { return _handle; }
+    Ref<IO::Handle> handle() override { return _handle; }
     PollEvent events() { return _events; }
 
     Notifier(RawHandle &raw_handle, PollEvent events, Func<void()> callback)

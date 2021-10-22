@@ -14,10 +14,10 @@ struct Server
 {
 private:
     IO::Socket _socket;
-    OwnPtr<Async::Notifier> _notifier;
-    OwnPtr<Async::Invoker> _invoker;
+    Box<Async::Notifier> _notifier;
+    Box<Async::Invoker> _invoker;
 
-    Vec<OwnPtr<Client>> _clients{};
+    Vec<Box<Client>> _clients{};
     Repository &_repository;
 
 public:

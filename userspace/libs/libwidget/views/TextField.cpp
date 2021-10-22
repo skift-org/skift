@@ -4,15 +4,16 @@
 namespace Widget
 {
 
-TextField::TextField(RefPtr<TextModel> model)
+TextField::TextField(Ref<TextModel> model)
     : _model(model)
 {
-    _model_observer = _model->observe([this](auto &) {
-        _cursor.clamp_within(*_model);
+    _model_observer = _model->observe([this](auto &)
+        {
+            _cursor.clamp_within(*_model);
 
-        scroll_to_cursor();
-        should_repaint();
-    });
+            scroll_to_cursor();
+            should_repaint();
+        });
 }
 
 TextField::~TextField()
@@ -25,7 +26,8 @@ void TextField::paint(Graphic::Painter &painter, const Math::Recti &)
     auto metrics = font()->metrics();
     int baseline = bound().height() / 2 + metrics.capheight() / 2;
 
-    auto paint_cursor = [&](Graphic::Painter &painter, int position) {
+    auto paint_cursor = [&](Graphic::Painter &painter, int position)
+    {
         Math::Vec2i cursor_position{position, metrics.fullascend(baseline)};
         Math::Vec2i cursor_size{2, metrics.fulllineheight()};
         Math::Recti cursor_bound{cursor_position, cursor_size};

@@ -8,11 +8,11 @@ namespace Widget
 struct ImageElement : public Element
 {
 private:
-    RefPtr<Graphic::Bitmap> _bitmap;
+    Ref<Graphic::Bitmap> _bitmap;
     Graphic::BitmapScaling _scaling = Graphic::BitmapScaling::FIT;
 
 public:
-    ImageElement(RefPtr<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling = Graphic::BitmapScaling::FIT);
+    ImageElement(Ref<Graphic::Bitmap> bitmap, Graphic::BitmapScaling scaling = Graphic::BitmapScaling::FIT);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 

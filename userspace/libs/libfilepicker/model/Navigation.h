@@ -10,7 +10,7 @@ namespace FilePicker
 
 struct Navigation :
     public Async::Observable<Navigation>,
-    public RefCounted<Navigation>
+    public Shared<Navigation>
 {
 private:
     Vec<IO::Path> _backward{};

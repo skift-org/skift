@@ -1,9 +1,9 @@
 #pragma once
 
 #include <libgraphic/Icon.h>
-#include <libjson/Json.h>
 #include <libio/Path.h>
-#include <libutils/RefPtr.h>
+#include <libjson/Json.h>
+#include <libutils/Ref.h>
 
 namespace FilePicker
 {
@@ -12,7 +12,7 @@ struct Bookmark
 {
 private:
     String _name;
-    RefPtr<Graphic::Icon> _icon;
+    Ref<Graphic::Icon> _icon;
     IO::Path _path;
 
 public:
@@ -21,7 +21,7 @@ public:
         return _name;
     }
 
-    const RefPtr<Graphic::Icon> icon() const
+    const Ref<Graphic::Icon> icon() const
     {
         return _icon;
     }
@@ -35,21 +35,18 @@ public:
     {
         if (value.is(Json::OBJECT))
         {
-            value.with("name", [&](auto &value) {
-                _name = value.as_string();
-            });
+            value.with("name", [&](auto &value)
+                { _name = value.as_string(); });
 
-            value.with("icon", [&](auto &value) {
-                _icon = Graphic::Icon::get(value.as_string());
-            });
+            value.with("icon", [&](auto &value)
+                { _icon = Graphic::Icon::get(value.as_string()); });
 
-            value.with("path", [&](auto &value) {
-                _path = IO::Path::parse(value.as_string());
-            });
+            value.with("path", [&](auto &value)
+                { _path = IO::Path::parse(value.as_string()); });
         }
     }
 
-    Bookmark(const String &name, const RefPtr<Graphic::Icon> icon, const IO::Path &path)
+    Bookmark(const String &name, const Ref<Graphic::Icon> icon, const IO::Path &path)
         : _name(name),
           _icon(icon),
           _path(path)

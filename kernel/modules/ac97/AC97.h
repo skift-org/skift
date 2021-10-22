@@ -82,11 +82,11 @@ private:
     Ring<char> _buffer{AC97_RINGBUFFER_LEN};
 
     // buffer descriptors range
-    RefPtr<MMIORange> buffer_descriptors_range{};
+    Ref<MMIORange> buffer_descriptors_range{};
     // buffer descriptor list of size 32 (MAX SIZE FOR AC97)
     AC97BufferDescriptor *buffer_descriptors_list;
     // 32*30720 buffer array for playing sound using PCM 16 Bit out (DMA)
-    Vec<RefPtr<MMIORange>> buffers;
+    Vec<Ref<MMIORange>> buffers;
 
     bool _quirk_5bit_volume;
 

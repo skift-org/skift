@@ -2,7 +2,7 @@
 
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
-#include <libutils/OwnPtr.h>
+#include <libutils/Box.h>
 
 namespace Graphic
 {
@@ -12,18 +12,18 @@ struct Framebuffer
 private:
     Handle _handle;
 
-    RefPtr<Bitmap> _bitmap;
+    Ref<Bitmap> _bitmap;
 
     Vec<Math::Recti> _dirty_bounds{};
 
 public:
-    static ResultOr<OwnPtr<Framebuffer>> open();
+    static ResultOr<Box<Framebuffer>> open();
 
     Math::Recti resolution() { return _bitmap->bound(); }
 
     Bitmap &bitmap() { return *_bitmap; }
 
-    Framebuffer(Handle handle, RefPtr<Bitmap> bitmap);
+    Framebuffer(Handle handle, Ref<Bitmap> bitmap);
 
     ~Framebuffer();
 

@@ -14,13 +14,13 @@ namespace FilePicker
 struct FilesystemModel : public Widget::TableModel
 {
 private:
-    RefPtr<Navigation> _navigation;
+    Ref<Navigation> _navigation;
     Vec<FileInfo> _files{};
-    OwnPtr<Async::Observer<Navigation>> _observer;
+    Box<Async::Observer<Navigation>> _observer;
     Func<bool(IO::Directory::Entry &)> _filter;
 
 public:
-    FilesystemModel(RefPtr<Navigation> navigation, Func<bool(IO::Directory::Entry &)> filter = nullptr);
+    FilesystemModel(Ref<Navigation> navigation, Func<bool(IO::Directory::Entry &)> filter = nullptr);
 
     int rows() override;
 

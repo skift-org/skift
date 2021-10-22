@@ -7,10 +7,10 @@
 struct FsDevice : public FsNode
 {
 private:
-    RefPtr<Device> _device;
+    Ref<Device> _device;
 
 public:
-    FsDevice(RefPtr<Device> device)
+    FsDevice(Ref<Device> device)
         : FsNode(HJ_FILE_TYPE_DEVICE),
           _device(device)
     {

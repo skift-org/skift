@@ -20,11 +20,11 @@ enum DialogFlags
 struct Dialog : public ::Widget::Dialog
 {
 private:
-    RefPtr<Navigation> _navigation = nullptr;
+    Ref<Navigation> _navigation = nullptr;
     Opt<String> _selected_file = NONE;
-    RefPtr<Browser> _browser;
+    Ref<Browser> _browser;
     DialogFlags _flags;
-    RefPtr<Widget::TextField> _text_field;
+    Ref<Widget::TextField> _text_field;
 
     String get_title();
 

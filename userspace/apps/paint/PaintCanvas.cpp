@@ -3,7 +3,7 @@
 #include "paint/PaintCanvas.h"
 #include "paint/PaintTool.h"
 
-PaintCanvas::PaintCanvas(RefPtr<PaintDocument> document)
+PaintCanvas::PaintCanvas(Ref<PaintDocument> document)
     : _document(document)
 {
 }

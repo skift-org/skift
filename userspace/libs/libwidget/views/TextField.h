@@ -9,14 +9,14 @@ namespace Widget
 struct TextField : public Element
 {
 private:
-    RefPtr<TextModel> _model;
-    OwnPtr<Async::Observer<TextModel>> _model_observer;
+    Ref<TextModel> _model;
+    Box<Async::Observer<TextModel>> _model_observer;
 
     TextCursor _cursor{};
     int _hscroll_offset = 0;
 
 public:
-    TextField(RefPtr<TextModel> model);
+    TextField(Ref<TextModel> model);
 
     ~TextField() override;
 

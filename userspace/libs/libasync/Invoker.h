@@ -11,7 +11,7 @@ struct Invoker : public Source
 private:
     bool _invoke_later = false;
     Func<void()> _callback;
-    RefPtr<Loop> _eventloop;
+    Ref<Loop> _eventloop;
 
 public:
     Invoker(Func<void()> callback) : _callback(callback)

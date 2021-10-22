@@ -10,27 +10,26 @@ template <typename TObservable>
 struct ObserverComponent : public RebuildableComponent
 {
 private:
-    OwnPtr<Async::Observer<TObservable>> _observer;
-    Func<RefPtr<Element>()> _callback;
+    Box<Async::Observer<TObservable>> _observer;
+    Func<Ref<Element>()> _callback;
 
 public:
-    ObserverComponent(TObservable &observable, Func<RefPtr<Element>()> callback)
+    ObserverComponent(TObservable &observable, Func<Ref<Element>()> callback)
     {
-        _observer = observable.observe([this](auto &) {
-            should_rebuild();
-        });
+        _observer = observable.observe([this](auto &)
+            { should_rebuild(); });
 
         _callback = callback;
     }
 
-    RefPtr<Element> do_build() final
+    Ref<Element> do_build() final
     {
         return _callback();
     }
 };
 
 template <typename TObservable>
-static inline auto observer(TObservable &observable, Func<RefPtr<Element>()> callback) -> RefPtr<Element>
+static inline auto observer(TObservable &observable, Func<Ref<Element>()> callback) -> Ref<Element>
 {
     return make<ObserverComponent<TObservable>>(observable, callback);
 }

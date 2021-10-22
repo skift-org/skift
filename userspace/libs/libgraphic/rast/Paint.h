@@ -32,7 +32,7 @@ struct Gradient
 struct Texture
 {
     Opt<Math::Mat3x2f> transfom;
-    RefPtr<Bitmap> bitmap;
+    Ref<Bitmap> bitmap;
 };
 
 using Paint = Var<Fill, Gradient, Texture>;

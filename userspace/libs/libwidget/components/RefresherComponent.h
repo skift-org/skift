@@ -9,20 +9,19 @@ namespace Widget
 struct Refresher : public RebuildableComponent
 {
 private:
-    OwnPtr<Async::Timer> _timer;
-    Func<RefPtr<Element>()> _callback;
+    Box<Async::Timer> _timer;
+    Func<Ref<Element>()> _callback;
 
 public:
-    Refresher(Timeout interval, Func<RefPtr<Element>()> callback)
-        : _timer{own<Async::Timer>(interval, [this]() {
-              should_rebuild();
-          })},
+    Refresher(Timeout interval, Func<Ref<Element>()> callback)
+        : _timer{own<Async::Timer>(interval, [this]()
+              { should_rebuild(); })},
           _callback{callback}
     {
         _timer->start();
     }
 
-    RefPtr<Element> do_build() final
+    Ref<Element> do_build() final
     {
         return _callback();
     }

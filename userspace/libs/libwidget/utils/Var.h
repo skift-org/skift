@@ -19,7 +19,7 @@ struct Var
 private:
     VarType _type;
 
-    RefPtr<Graphic::Icon> _icon = nullptr;
+    Ref<Graphic::Icon> _icon = nullptr;
     int _as_int;
     float _as_float;
     char _as_string[VAR_STRING_SIZE];
@@ -30,7 +30,7 @@ public:
         return _icon != nullptr;
     }
 
-    RefPtr<Graphic::Icon> icon() { return _icon; }
+    Ref<Graphic::Icon> icon() { return _icon; }
 
     VarType type() { return _type; }
 
@@ -48,7 +48,7 @@ public:
 
     Var(String str);
 
-    Var with_icon(RefPtr<Graphic::Icon> icon)
+    Var with_icon(Ref<Graphic::Icon> icon)
     {
         _icon = icon;
         return *this;

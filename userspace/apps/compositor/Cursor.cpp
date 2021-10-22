@@ -13,7 +13,7 @@ static Widget::MouseButton _mouse_buttons;
 static Math::Vec2i _mouse_old_position;
 static Widget::MouseButton _mouse_old_buttons;
 
-static RefPtr<Graphic::Bitmap> _cursor_bitmaps[Widget::__CURSOR_COUNT] = {};
+static Ref<Graphic::Bitmap> _cursor_bitmaps[Widget::__CURSOR_COUNT] = {};
 
 static Tick _last_click = 0;
 

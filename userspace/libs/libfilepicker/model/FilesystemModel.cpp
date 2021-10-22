@@ -58,7 +58,7 @@ enum Column
     __COLUMN_COUNT,
 };
 
-FilesystemModel::FilesystemModel(RefPtr<Navigation> navigation, Func<bool(IO::Directory::Entry &)> filter)
+FilesystemModel::FilesystemModel(Ref<Navigation> navigation, Func<bool(IO::Directory::Entry &)> filter)
     : _navigation(navigation), _filter(filter)
 {
     _observer = navigation->observe([this](auto &)

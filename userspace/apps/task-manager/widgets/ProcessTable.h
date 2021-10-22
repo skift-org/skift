@@ -10,12 +10,12 @@ struct ProcessTableComponent :
     public Widget::Component
 {
 private:
-    RefPtr<Widget::TableModel> _model;
+    Ref<Widget::TableModel> _model;
 
 public:
-    ProcessTableComponent(RefPtr<Widget::TableModel> model);
+    ProcessTableComponent(Ref<Widget::TableModel> model);
 
-    RefPtr<Element> build() override;
+    Ref<Element> build() override;
 };
 
 WIDGET_BUILDER(ProcessTableComponent, process_table);

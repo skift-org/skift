@@ -65,7 +65,7 @@ public:
     {
         if (_type == STRING)
         {
-            return String(RefPtr<StringStorage>{*_string});
+            return String(Ref<StringStorage>{*_string});
         }
         else if (_type == TRUE)
         {

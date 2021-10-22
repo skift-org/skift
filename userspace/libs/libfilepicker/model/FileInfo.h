@@ -12,7 +12,7 @@ struct FileInfo
 {
     String name;
     HjFileType type;
-    RefPtr<Graphic::Icon> icon;
+    Ref<Graphic::Icon> icon;
     size_t size;
 };
 

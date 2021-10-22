@@ -14,7 +14,7 @@ struct TerminalWindow :
         opacity(0.85);
     }
 
-    RefPtr<Widget::Element> build() override
+    Ref<Widget::Element> build() override
     {
         return Widget::vflow({
             Widget::titlebar(Graphic::Icon::get("console-line"), "Terminal"),

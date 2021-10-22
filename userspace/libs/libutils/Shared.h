@@ -6,18 +6,18 @@ namespace Utils
 {
 
 template <typename T>
-struct RefCounted
+struct Shared
 {
 private:
     int _refcount = 1;
 
-    NONCOPYABLE(RefCounted);
-    NONMOVABLE(RefCounted);
+    NONCOPYABLE(Shared);
+    NONMOVABLE(Shared);
 
 public:
-    RefCounted() {}
+    Shared() {}
 
-    virtual ~RefCounted()
+    virtual ~Shared()
     {
         assert(_refcount == 0);
     }
@@ -33,29 +33,19 @@ public:
         int refcount = __atomic_sub_fetch(&_refcount, 1, __ATOMIC_SEQ_CST);
         assert(refcount >= 0);
 
-        if (refcount == 1)
-        {
-            if constexpr (requires(const T &t) {
-                              t.one_ref_left();
-                          })
-            {
-                this->one_ref_left();
-            }
-        }
-
         if (refcount == 0)
         {
             delete static_cast<T *>(this);
         }
     }
 
-    int refcount()
+    int refcount() const
     {
         return _refcount;
     }
 };
 
-struct AnyRef : public RefCounted<AnyRef>
+struct AnyRef : public Shared<AnyRef>
 {
     virtual ~AnyRef() = default;
 };

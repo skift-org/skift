@@ -30,10 +30,11 @@ Status::Status()
     _quicksetting = own<QuickSettings>();
 
     bound(Screen::bound().take_top(PANEL_WINDOW_HEIGHT));
-    on(Event::DISPLAY_SIZE_CHANGED, [this](auto) { should_rebuild(); });
+    on(Event::DISPLAY_SIZE_CHANGED, [this](auto)
+        { should_rebuild(); });
 }
 
-RefPtr<Element> Status::build()
+Ref<Element> Status::build()
 {
     // clang-format off
 

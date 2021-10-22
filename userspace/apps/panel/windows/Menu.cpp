@@ -24,26 +24,25 @@ Menu::Menu() : Window(WINDOW_ALWAYS_FOCUSED | WINDOW_AUTO_CLOSE | WINDOW_ACRYLIC
     type(WINDOW_TYPE_POPOVER);
     opacity(0.85);
 
-    on(Event::DISPLAY_SIZE_CHANGED, [this](auto) {
-        bound(Screen::bound()
-                  .with_width(MENU_WINDOW_WIDTH)
-                  .shrinked({PANEL_WINDOW_HEIGHT, 0, 0, 0}));
-    });
+    on(Event::DISPLAY_SIZE_CHANGED, [this](auto)
+        { bound(Screen::bound()
+                    .with_width(MENU_WINDOW_WIDTH)
+                    .shrinked({PANEL_WINDOW_HEIGHT, 0, 0, 0})); });
 
-    on(Event::KEYBOARD_KEY_PRESS, [this](Event *event) {
-        if (event->keyboard.key == KEYBOARD_KEY_ESC)
+    on(Event::KEYBOARD_KEY_PRESS, [this](Event *event)
         {
-            hide();
-            event->accepted = true;
-        }
-    });
+            if (event->keyboard.key == KEYBOARD_KEY_ESC)
+            {
+                hide();
+                event->accepted = true;
+            }
+        });
 
-    on(Event::GOT_FOCUS, [&](auto) {
-        should_rebuild();
-    });
+    on(Event::GOT_FOCUS, [&](auto)
+        { should_rebuild(); });
 }
 
-RefPtr<Element> Menu::build()
+Ref<Element> Menu::build()
 {
     // clang-format off
 

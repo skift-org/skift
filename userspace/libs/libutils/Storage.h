@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libutils/RefPtr.h>
+#include <libutils/Ref.h>
 
 namespace Utils
 {
 
-struct Storage : public RefCounted<Storage>
+struct Storage : public Shared<Storage>
 {
     virtual ~Storage() {}
 
@@ -22,7 +22,7 @@ struct RawStorage
 {
     virtual ~RawStorage() {}
 
-    virtual RefPtr<Storage> storage() = 0;
+    virtual Ref<Storage> storage() = 0;
 };
 
 } // namespace Utils

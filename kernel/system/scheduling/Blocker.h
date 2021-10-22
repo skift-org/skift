@@ -64,10 +64,10 @@ public:
 struct BlockerAccept : public Blocker
 {
 private:
-    RefPtr<FsNode> _node;
+    Ref<FsNode> _node;
 
 public:
-    BlockerAccept(RefPtr<FsNode> node) : _node(node)
+    BlockerAccept(Ref<FsNode> node) : _node(node)
     {
     }
 
@@ -79,10 +79,10 @@ public:
 struct BlockerConnect : public Blocker
 {
 private:
-    RefPtr<FsNode> _connection;
+    Ref<FsNode> _connection;
 
 public:
-    BlockerConnect(RefPtr<FsNode> connection)
+    BlockerConnect(Ref<FsNode> connection)
         : _connection(connection)
     {
     }
@@ -109,7 +109,7 @@ public:
 struct Selected
 {
     int handle_index;
-    RefPtr<FsHandle> handle;
+    Ref<FsHandle> handle;
     PollEvent events;
     PollEvent result;
 };

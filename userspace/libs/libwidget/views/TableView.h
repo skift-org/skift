@@ -13,12 +13,12 @@ struct Table : public Element
 private:
     static constexpr int TABLE_ROW_HEIGHT = 32;
 
-    RefPtr<TableModel> _model = nullptr;
-    OwnPtr<Async::Observer<TableModel>> _model_observer;
+    Ref<TableModel> _model = nullptr;
+    Box<Async::Observer<TableModel>> _model_observer;
 
     int _selected = -1;
     int _scroll_offset = 0;
-    RefPtr<ScrollBarElement> _scrollbar;
+    Ref<ScrollBarElement> _scrollbar;
 
     String _empty_message{"No data to display"};
 
@@ -32,13 +32,14 @@ private:
     void paint_cell(Graphic::Painter &painter, int row, int column);
 
 public:
-    void model(RefPtr<TableModel> model)
+    void model(Ref<TableModel> model)
     {
         _model = model;
-        _model_observer = model->observe([this](auto &) {
-            should_repaint();
-            should_relayout();
-        });
+        _model_observer = model->observe([this](auto &)
+            {
+                should_repaint();
+                should_relayout();
+            });
     }
 
     void empty_message(String message)
@@ -74,7 +75,7 @@ public:
 
     Table();
 
-    Table(RefPtr<TableModel> model);
+    Table(Ref<TableModel> model);
 
     void paint(Graphic::Painter &painter, const Math::Recti &dirty) override;
 

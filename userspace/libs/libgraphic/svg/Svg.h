@@ -6,6 +6,6 @@
 namespace Graphic::Svg
 {
 
-ResultOr<RefPtr<Bitmap>> render(IO::Reader &reader, int resolution);
+ResultOr<Ref<Bitmap>> render(IO::Reader &reader, int resolution);
 
 } // namespace Graphic::Svg

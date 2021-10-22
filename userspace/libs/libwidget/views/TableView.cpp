@@ -119,7 +119,7 @@ Table::Table()
         });
 }
 
-Table::Table(RefPtr<TableModel> model)
+Table::Table(Ref<TableModel> model)
     : Table()
 {
     this->model(model);

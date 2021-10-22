@@ -11,9 +11,9 @@ namespace Async
 
 /* --- Notifiers ------------------------------------------------------------ */
 
-static RefPtr<Loop> _instance = nullptr;
+static Ref<Loop> _instance = nullptr;
 
-RefPtr<Loop> Loop::the()
+Ref<Loop> Loop::the()
 {
     if (_instance == nullptr)
     {

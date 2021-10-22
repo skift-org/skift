@@ -15,11 +15,11 @@ ApplicationListingComponent::ApplicationListingComponent(String filter) : _filte
     flags(Element::FILL);
 }
 
-RefPtr<Element> ApplicationListingComponent::build()
+Ref<Element> ApplicationListingComponent::build()
 {
     Text::FuzzyMatcher matcher;
 
-    Vec<RefPtr<Element>> children;
+    Vec<Ref<Element>> children;
 
     MenuEntry::load().foreach([&](auto &entry)
         {

@@ -3,7 +3,7 @@
 namespace Widget
 {
 
-ScrollElement::ScrollElement(RefPtr<Element> content, bool horizontal)
+ScrollElement::ScrollElement(Ref<Element> content, bool horizontal)
     : _horizontal{horizontal}
 {
     if (content != nullptr)
@@ -18,14 +18,15 @@ ScrollElement::ScrollElement(RefPtr<Element> content, bool horizontal)
     _scrollbar = add<ScrollBarElement>();
     _scrollbar->flags(Element::NOT_AFFECTED_BY_SCROLL);
 
-    _scrollbar->on(Event::VALUE_CHANGE, [this](auto) {
-        scroll({
-            _horizontal ? _scrollbar->value() : scroll().x(),
-            _horizontal ? scroll().y() : _scrollbar->value(),
-        });
+    _scrollbar->on(Event::VALUE_CHANGE, [this](auto)
+        {
+            scroll({
+                _horizontal ? _scrollbar->value() : scroll().x(),
+                _horizontal ? scroll().y() : _scrollbar->value(),
+            });
 
-        should_repaint();
-    });
+            should_repaint();
+        });
 }
 
 void ScrollElement::layout()

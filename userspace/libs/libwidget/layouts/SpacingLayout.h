@@ -12,7 +12,7 @@ private:
 
 public:
     SpacingLayout(Insetsi spacing)
-         : _spacing{spacing}
+        : _spacing{spacing}
     {
     }
 
@@ -38,7 +38,7 @@ public:
 };
 
 template <typename TElement>
-static inline RefPtr<Element> spacing(Insetsi spacing, RefPtr<TElement> child)
+static inline Ref<Element> spacing(Insetsi spacing, Ref<TElement> child)
 {
     auto el = make<SpacingLayout>(spacing);
     el->add(child);

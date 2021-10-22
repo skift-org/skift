@@ -10,7 +10,7 @@
 #include "system/devices/Driver.h"
 #include "unix/UNIX.h"
 
-static Vec<RefPtr<Device>> *_devices = nullptr;
+static Vec<Ref<Device>> *_devices = nullptr;
 
 static int _device_ids[(uint8_t)DeviceClass::__COUNT] = {};
 static const char *_device_names[(uint8_t)DeviceClass::__COUNT] = {
@@ -55,7 +55,7 @@ String device_claim_name(DeviceClass klass)
     }
 }
 
-void device_iterate(IterFunc<RefPtr<Device>> callback)
+void device_iterate(IterFunc<Ref<Device>> callback)
 {
     if (_devices)
     {
@@ -103,7 +103,7 @@ void device_initialize()
 
     Kernel::logln("Initializing devices...");
 
-    _devices = new Vec<RefPtr<Device>>();
+    _devices = new Vec<Ref<Device>>();
 
     device_scan([&](DeviceAddress address)
         {

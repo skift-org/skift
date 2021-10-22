@@ -2,13 +2,13 @@
 
 #include <libasync/Observable.h>
 #include <libgraphic/Color.h>
-#include <libutils/RefCounted.h>
+#include <libutils/Shared.h>
 
 namespace Widget
 {
 
 struct GraphModel :
-    public RefCounted<GraphModel>,
+    public Shared<GraphModel>,
     public Async::Observable<GraphModel>
 {
 private:

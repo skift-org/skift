@@ -81,7 +81,7 @@ public:
     }
 
     // Create a string and flush the buffer!;
-    RefPtr<StringStorage> string()
+    Ref<StringStorage> string()
     {
         write('\0'); // Null terminator
 
@@ -96,7 +96,7 @@ public:
         return make<StringStorage>(ADOPT, (char *)result, size - 1);
     }
 
-    RefPtr<SliceStorage> slice()
+    Ref<SliceStorage> slice()
     {
         uint8_t *result = _buffer;
         size_t size = _used;

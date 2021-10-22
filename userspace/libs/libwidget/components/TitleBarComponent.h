@@ -10,16 +10,16 @@ namespace Widget
 struct TitleBarComponent : public Component
 {
 private:
-    RefPtr<Graphic::Icon> _icon;
+    Ref<Graphic::Icon> _icon;
     String _title;
     bool _is_dragging = false;
 
 public:
-    TitleBarComponent(RefPtr<Graphic::Icon> icon, String title);
+    TitleBarComponent(Ref<Graphic::Icon> icon, String title);
 
     void event(Event *event) override;
 
-    RefPtr<Element> build() override;
+    Ref<Element> build() override;
 };
 
 WIDGET_BUILDER(TitleBarComponent, titlebar);

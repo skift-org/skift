@@ -4,7 +4,7 @@
 namespace Widget
 {
 
-IconElement::IconElement(RefPtr<Graphic::Icon> icon, Graphic::IconSize size)
+IconElement::IconElement(Ref<Graphic::Icon> icon, Graphic::IconSize size)
     : _icon{icon}, _icon_size{size}
 {
 }

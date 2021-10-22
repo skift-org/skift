@@ -17,7 +17,7 @@ HjResult FsDeviceInfo::open(FsHandle &handle)
 {
     Json::Value::Array root{};
 
-    device_iterate([&](RefPtr<Device> device)
+    device_iterate([&](Ref<Device> device)
         {
             Json::Value::Object device_object{};
 

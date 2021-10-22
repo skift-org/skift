@@ -5,16 +5,15 @@ using namespace Widget;
 namespace Panel
 {
 
-SettingToggleComponent::SettingToggleComponent(RefPtr<Graphic::Icon> icon, String name, const char *setting)
+SettingToggleComponent::SettingToggleComponent(Ref<Graphic::Icon> icon, String name, const char *setting)
     : _name(name),
       _icon(icon)
 {
-    _setting = own<Settings::Setting>(setting, [this](auto &value) {
-        update(value.as_bool());
-    });
+    _setting = own<Settings::Setting>(setting, [this](auto &value)
+        { update(value.as_bool()); });
 }
 
-RefPtr<Element> SettingToggleComponent::build(bool state)
+Ref<Element> SettingToggleComponent::build(bool state)
 {
     // clang-format off
 

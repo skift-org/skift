@@ -12,14 +12,13 @@ TaskManager::TaskManager() : Window(WINDOW_RESIZABLE)
 {
     _model = make<TaskModel>();
 
-    _update = own<Async::Timer>(1000, [this] {
-        _model->update();
-    });
+    _update = own<Async::Timer>(1000, [this]
+        { _model->update(); });
 
     _update->start();
 }
 
-RefPtr<Element> TaskManager::build()
+Ref<Element> TaskManager::build()
 {
     // clang-format off
 

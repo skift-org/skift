@@ -2,7 +2,7 @@
 
 #include <assert.h>
 
-#include <libutils/OwnPtr.h>
+#include <libutils/Box.h>
 #include <libutils/Std.h>
 #include <libutils/Traits.h>
 
@@ -40,7 +40,7 @@ private:
         }
     };
 
-    OwnPtr<CallableWrapperBase> _wrapper;
+    Box<CallableWrapperBase> _wrapper;
 
 public:
     Func() = default;

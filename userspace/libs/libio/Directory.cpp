@@ -15,9 +15,8 @@ HjResult Directory::read_entries()
         read = TRY(_handle->read(&entry, sizeof(entry)));
     }
 
-    _entries.sort([](auto &left, auto &right) {
-        return strcmp(left.name.cstring(), right.name.cstring());
-    });
+    _entries.sort([](auto &left, auto &right)
+        { return strcmp(left.name.cstring(), right.name.cstring()); });
 
     return SUCCESS;
 }
@@ -43,7 +42,7 @@ Directory::Directory(const IO::Path &path)
     read_entries();
 }
 
-Directory::Directory(RefPtr<Handle> handle)
+Directory::Directory(Ref<Handle> handle)
     : _handle{handle}
 {
     read_entries();

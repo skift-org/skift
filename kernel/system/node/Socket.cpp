@@ -7,7 +7,7 @@ FsSocket::FsSocket() : FsNode(HJ_FILE_TYPE_SOCKET)
 {
 }
 
-ResultOr<RefPtr<FsNode>> FsSocket::connect()
+ResultOr<Ref<FsNode>> FsSocket::connect()
 {
     auto connection = make<FsConnection>();
     _pending.push_back(connection);
@@ -19,7 +19,7 @@ bool FsSocket::can_accept()
     return _pending.any();
 }
 
-ResultOr<RefPtr<FsNode>> FsSocket::accept()
+ResultOr<Ref<FsNode>> FsSocket::accept()
 {
     assert(_pending.any());
 

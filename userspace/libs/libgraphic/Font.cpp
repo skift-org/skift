@@ -11,7 +11,7 @@
 namespace Graphic
 {
 
-static HashMap<String, RefPtr<Font>>
+static HashMap<String, Ref<Font>>
     _fonts;
 
 static ResultOr<Vec<Glyph>> font_load_glyph(String name)
@@ -31,12 +31,12 @@ static ResultOr<Vec<Glyph>> font_load_glyph(String name)
     return glyphs;
 }
 
-static ResultOr<RefPtr<Bitmap>> font_load_bitmap(String name)
+static ResultOr<Ref<Bitmap>> font_load_bitmap(String name)
 {
     return Bitmap::load_from(IO::format("/Files/Fonts/{}.png", name));
 }
 
-ResultOr<RefPtr<Font>> Font::get(String name)
+ResultOr<Ref<Font>> Font::get(String name)
 {
     if (!_fonts.has_key(name))
     {

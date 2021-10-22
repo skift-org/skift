@@ -4,7 +4,7 @@
 namespace Png
 {
 
-ResultOr<RefPtr<Graphic::Bitmap>> load(IO::Reader &reader)
+ResultOr<Ref<Graphic::Bitmap>> load(IO::Reader &reader)
 {
     Reader png_reader{reader};
 

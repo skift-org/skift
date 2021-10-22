@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libio/Handle.h>
-#include <libutils/RefCounted.h>
+#include <libutils/Shared.h>
 #include <libutils/Vec.h>
 
 namespace Async
@@ -15,7 +15,7 @@ struct Timer;
 
 struct Invoker;
 
-struct Loop : public RefCounted<Loop>
+struct Loop : public Shared<Loop>
 {
 private:
     bool _is_running = false;
@@ -41,7 +41,7 @@ private:
     Timeout get_timeout();
 
 public:
-    static RefPtr<Loop> the();
+    static Ref<Loop> the();
 
     Loop();
 

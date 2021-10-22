@@ -4,7 +4,7 @@
 
 #include <libmath/MinMax.h>
 #include <libutils/Iter.h>
-#include <libutils/RefPtr.h>
+#include <libutils/Ref.h>
 #include <libutils/Std.h>
 
 namespace Utils

@@ -12,13 +12,13 @@ namespace FilePicker
 struct ArchiveBrowser : public Widget::Table
 {
 private:
-    RefPtr<Navigation> _navigation;
-    RefPtr<Archive> _archive;
-    RefPtr<ArchiveListing> _listing;
-    OwnPtr<Async::Observer<Navigation>> _navigation_observer;
+    Ref<Navigation> _navigation;
+    Ref<Archive> _archive;
+    Ref<ArchiveListing> _listing;
+    Box<Async::Observer<Navigation>> _navigation_observer;
 
 public:
-    ArchiveBrowser(RefPtr<Navigation> navigation, RefPtr<Archive> archive)
+    ArchiveBrowser(Ref<Navigation> navigation, Ref<Archive> archive)
         : Table(), _navigation(navigation), _archive(archive)
     {
         _listing = make<ArchiveListing>(navigation, archive);
@@ -28,24 +28,26 @@ public:
 
         empty_message("This archive is empty.");
 
-        _navigation_observer = navigation->observe([this](auto &) {
-            select(-1);
-            scroll_to_top();
-        });
-
-        on(Widget::Event::ACTION, [this](auto) {
-            if (selected() >= 0)
+        _navigation_observer = navigation->observe([this](auto &)
             {
-                if (_listing->info(selected()).type == HJ_FILE_TYPE_DIRECTORY)
+                select(-1);
+                scroll_to_top();
+            });
+
+        on(Widget::Event::ACTION, [this](auto)
+            {
+                if (selected() >= 0)
                 {
-                    _navigation->navigate(_listing->info(selected()).name);
+                    if (_listing->info(selected()).type == HJ_FILE_TYPE_DIRECTORY)
+                    {
+                        _navigation->navigate(_listing->info(selected()).name);
+                    }
+                    else
+                    {
+                        // FIXME: Extract and Open the file.
+                    }
                 }
-                else
-                {
-                    // FIXME: Extract and Open the file.
-                }
-            }
-        });
+            });
     }
 };
 

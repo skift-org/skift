@@ -9,11 +9,11 @@ namespace MediaPlayer
 struct Cover : public Widget::Element
 {
 private:
-    RefPtr<Graphic::Bitmap> _cover;
-    RefPtr<Graphic::Bitmap> _backdrop;
+    Ref<Graphic::Bitmap> _cover;
+    Ref<Graphic::Bitmap> _backdrop;
 
 public:
-    Cover(RefPtr<Graphic::Bitmap> bitmap);
+    Cover(Ref<Graphic::Bitmap> bitmap);
 
     void paint(Graphic::Painter &painter, const Math::Recti &) override;
 };

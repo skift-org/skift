@@ -17,12 +17,11 @@ QuickSettings::QuickSettings()
     type(WINDOW_TYPE_POPOVER);
     opacity(0.85);
 
-    on(Event::DISPLAY_SIZE_CHANGED, [this](auto) {
-        bound(Screen::bound()
-                  .take_right(QUICK_SETTINGS_WINDOW_WIDTH)
-                  .shrinked({PANEL_WINDOW_HEIGHT, 0, 0, 0})
-                  .with_height(root()->compute_size().y()));
-    });
+    on(Event::DISPLAY_SIZE_CHANGED, [this](auto)
+        { bound(Screen::bound()
+                    .take_right(QUICK_SETTINGS_WINDOW_WIDTH)
+                    .shrinked({PANEL_WINDOW_HEIGHT, 0, 0, 0})
+                    .with_height(root()->compute_size().y())); });
 
     bound(Screen::bound()
               .take_right(QUICK_SETTINGS_WINDOW_WIDTH)
@@ -30,7 +29,7 @@ QuickSettings::QuickSettings()
               .with_height(root()->compute_size().y()));
 }
 
-RefPtr<Element> QuickSettings::build()
+Ref<Element> QuickSettings::build()
 {
     // clang-format off
 

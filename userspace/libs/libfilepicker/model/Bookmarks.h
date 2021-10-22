@@ -10,7 +10,7 @@ namespace FilePicker
 
 struct Bookmarks :
     public Async::Observable<Bookmarks>,
-    public RefCounted<Bookmarks>
+    public Shared<Bookmarks>
 {
 private:
     Vec<Bookmark> _bookmarks{};
@@ -28,7 +28,7 @@ public:
 
     bool has(const IO::Path &path) const;
 
-    static RefPtr<Bookmarks> load();
+    static Ref<Bookmarks> load();
 
     void save();
 };

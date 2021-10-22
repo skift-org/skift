@@ -7,28 +7,28 @@ namespace Utils
 {
 
 template <typename T>
-struct OwnPtr
+struct Box
 {
 private:
     T *_ptr = nullptr;
 
 public:
-    OwnPtr() {}
-    OwnPtr(nullptr_t) {}
+    Box() {}
+    Box(nullptr_t) {}
 
-    OwnPtr(T *ptr) : _ptr(ptr) {}
+    Box(T *ptr) : _ptr(ptr) {}
 
-    OwnPtr(const OwnPtr &other) : _ptr(const_cast<OwnPtr &>(other).give_ref()) {}
+    Box(const Box &other) : _ptr(const_cast<Box &>(other).give_ref()) {}
 
-    OwnPtr(OwnPtr &&other) : _ptr(other.give_ref()) {}
-
-    template <typename U>
-    OwnPtr(const OwnPtr<U> &other) : _ptr(static_cast<U *>(const_cast<OwnPtr<U>>(other).give_ref())) {}
+    Box(Box &&other) : _ptr(other.give_ref()) {}
 
     template <typename U>
-    OwnPtr(OwnPtr<U> &&other) : _ptr(static_cast<U *>(other.give_ref())) {}
+    Box(const Box<U> &other) : _ptr(static_cast<U *>(const_cast<Box<U>>(other).give_ref())) {}
 
-    ~OwnPtr()
+    template <typename U>
+    Box(Box<U> &&other) : _ptr(static_cast<U *>(other.give_ref())) {}
+
+    ~Box()
     {
         if (_ptr)
         {
@@ -37,7 +37,7 @@ public:
         }
     }
 
-    OwnPtr &operator=(OwnPtr &other)
+    Box &operator=(Box &other)
     {
         if (naked() != other.naked())
         {
@@ -53,7 +53,7 @@ public:
     }
 
     template <typename U>
-    OwnPtr &operator=(OwnPtr<U> &other)
+    Box &operator=(Box<U> &other)
     {
         if (naked() != other.naked())
         {
@@ -68,7 +68,7 @@ public:
         return *this;
     }
 
-    OwnPtr &operator=(OwnPtr &&other)
+    Box &operator=(Box &&other)
     {
         if (this != &other)
         {
@@ -84,7 +84,7 @@ public:
     }
 
     template <typename U>
-    OwnPtr &operator=(OwnPtr<U> &&other)
+    Box &operator=(Box<U> &&other)
     {
         if (this != static_cast<void *>(&other))
         {
@@ -109,13 +109,13 @@ public:
 
     const T &operator*() const { return *_ptr; }
 
-    bool operator==(const OwnPtr<T> &other) const
+    bool operator==(const Box<T> &other) const
     {
         return _ptr == other._ptr;
     }
 
     template <typename U>
-    bool operator==(const OwnPtr<U> &other) const
+    bool operator==(const Box<U> &other) const
     {
         return _ptr == static_cast<U *>(other._ptr);
     }
@@ -150,9 +150,9 @@ public:
 };
 
 template <typename Type, typename... Args>
-inline OwnPtr<Type> own(Args &&...args)
+inline Box<Type> own(Args &&...args)
 {
-    return OwnPtr<Type>(new Type(std::forward<Args>(args)...));
+    return Box<Type>(new Type(std::forward<Args>(args)...));
 }
 
 } // namespace Utils

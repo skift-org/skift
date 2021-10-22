@@ -10,14 +10,14 @@
 struct TerminalView : public Widget::Element
 {
 private:
-    OwnPtr<Terminal::Terminal> _terminal;
+    Box<Terminal::Terminal> _terminal;
     bool _cursor_blink;
     int _scroll_offset = 0;
 
     IO::Terminal _terminal_device;
 
-    OwnPtr<Async::Timer> _cursor_blink_timer;
-    OwnPtr<Async::Notifier> _server_notifier;
+    Box<Async::Timer> _cursor_blink_timer;
+    Box<Async::Notifier> _server_notifier;
 
 public:
     void blink() { _cursor_blink = !_cursor_blink; };

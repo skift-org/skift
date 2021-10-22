@@ -18,4 +18,4 @@ ShellBuiltinCallback shell_get_builtin(const char *name);
 
 ShellNode *shell_parse(const char *command_text);
 
-int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> outstream);
+int shell_eval(ShellNode *node, Ref<IO::Handle> instream, Ref<IO::Handle> outstream);

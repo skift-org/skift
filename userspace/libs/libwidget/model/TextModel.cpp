@@ -7,14 +7,14 @@
 namespace Widget
 {
 
-RefPtr<TextModel> TextModel::empty()
+Ref<TextModel> TextModel::empty()
 {
     auto model = make<TextModel>();
     model->append_line(own<TextModelLine>());
     return model;
 }
 
-RefPtr<TextModel> TextModel::open(String path)
+Ref<TextModel> TextModel::open(String path)
 {
     auto model = make<TextModel>();
 
@@ -54,7 +54,7 @@ RefPtr<TextModel> TextModel::open(String path)
     return model;
 }
 
-RefPtr<TextModel> TextModel::create(String text)
+Ref<TextModel> TextModel::create(String text)
 {
     auto model = make<TextModel>();
 

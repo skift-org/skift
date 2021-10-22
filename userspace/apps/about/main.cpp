@@ -24,24 +24,25 @@ static auto logo()
 
 static auto license()
 {
-    return outline_button("License", [] {
-        auto editor = texteditor(TextModel::open("/Files/license.md"));
-        editor->font(Font::get("mono").unwrap());
-        editor->focus();
+    return outline_button("License", []
+        {
+            auto editor = texteditor(TextModel::open("/Files/license.md"));
+            editor->font(Font::get("mono").unwrap());
+            editor->focus();
 
-        auto license_window = window(
-            vflow({
-                titlebar(Icon::get("information"), "License"),
-                fill(editor),
-            }));
+            auto license_window = window(
+                vflow({
+                    titlebar(Icon::get("information"), "License"),
+                    fill(editor),
+                }));
 
-        license_window->show();
-    });
+            license_window->show();
+        });
 }
 
 struct Application : public Widget::Application
 {
-    OwnPtr<Window> build() override
+    Box<Window> build() override
     {
         // clang-format off
 

@@ -5,11 +5,11 @@
 
 #include "system/node/Node.h"
 
-struct FsHandle : public RefCounted<FsHandle>
+struct FsHandle : public Shared<FsHandle>
 {
 private:
     Lock _lock{"fshandle"};
-    RefPtr<FsNode> _node = nullptr;
+    Ref<FsNode> _node = nullptr;
     HjOpenFlag _flags = 0;
     size_t _offset = 0;
 
@@ -25,7 +25,7 @@ public:
 
     bool has_flag(HjOpenFlag flag) { return (_flags & flag) == flag; }
 
-    FsHandle(RefPtr<FsNode> node, HjOpenFlag flags);
+    FsHandle(Ref<FsNode> node, HjOpenFlag flags);
 
     FsHandle(FsHandle &other);
 
@@ -49,5 +49,5 @@ public:
 
     HjResult stat(HjStat *stat);
 
-    ResultOr<RefPtr<FsHandle>> accept();
+    ResultOr<Ref<FsHandle>> accept();
 };

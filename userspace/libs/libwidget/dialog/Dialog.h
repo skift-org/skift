@@ -57,10 +57,11 @@ public:
 
         _window->type(WINDOW_TYPE_POPOVER);
 
-        _window->on(Event::WINDOW_CLOSING, [&](auto) {
-            close(DialogResult::CLOSE);
-            _window->hide();
-        });
+        _window->on(Event::WINDOW_CLOSING, [&](auto)
+            {
+                close(DialogResult::CLOSE);
+                _window->hide();
+            });
 
         render(_window);
 
@@ -84,42 +85,46 @@ public:
 
     virtual void on_button(DialogButton) {}
 
-    void create_buttons(RefPtr<Element> parent)
+    void create_buttons(Ref<Element> parent)
     {
         if (_buttons & DialogButton::YES)
         {
-            parent->add(Widget::outline_button("Yes", [&] {
-                on_button(DialogButton::YES);
-                close(DialogResult::YES);
-                _window->hide();
-            }));
+            parent->add(Widget::outline_button("Yes", [&]
+                {
+                    on_button(DialogButton::YES);
+                    close(DialogResult::YES);
+                    _window->hide();
+                }));
         }
 
         if (_buttons & DialogButton::NO)
         {
-            parent->add(Widget::outline_button("No", [&] {
-                on_button(DialogButton::NO);
-                close(DialogResult::NO);
-                _window->hide();
-            }));
+            parent->add(Widget::outline_button("No", [&]
+                {
+                    on_button(DialogButton::NO);
+                    close(DialogResult::NO);
+                    _window->hide();
+                }));
         }
 
         if (_buttons & DialogButton::OK)
         {
-            parent->add(Widget::outline_button("Ok", [&] {
-                on_button(DialogButton::OK);
-                close(DialogResult::OK);
-                _window->hide();
-            }));
+            parent->add(Widget::outline_button("Ok", [&]
+                {
+                    on_button(DialogButton::OK);
+                    close(DialogResult::OK);
+                    _window->hide();
+                }));
         }
 
         if (_buttons & DialogButton::CANCEL)
         {
-            parent->add(Widget::outline_button("Cancel", [&] {
-                on_button(DialogButton::CANCEL);
-                close(DialogResult::CANCEL);
-                _window->hide();
-            }));
+            parent->add(Widget::outline_button("Cancel", [&]
+                {
+                    on_button(DialogButton::CANCEL);
+                    close(DialogResult::CANCEL);
+                    _window->hide();
+                }));
         }
     }
 };

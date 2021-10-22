@@ -9,7 +9,7 @@ HomePage::HomePage()
     flags(Element::FILL);
 }
 
-RefPtr<Widget::Element> HomePage::build()
+Ref<Widget::Element> HomePage::build()
 {
     using namespace Widget;
 

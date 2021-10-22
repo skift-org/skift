@@ -6,11 +6,12 @@
 namespace Widget
 {
 
-GraphView::GraphView(RefPtr<GraphModel> model, Graphic::Color color)
+GraphView::GraphView(Ref<GraphModel> model, Graphic::Color color)
     : _model{model},
       _color{color}
 {
-    _observer = model->observe([this](auto &) { should_repaint(); });
+    _observer = model->observe([this](auto &)
+        { should_repaint(); });
 }
 
 void GraphView::paint(Graphic::Painter &painter, const Math::Recti &)
@@ -18,7 +19,8 @@ void GraphView::paint(Graphic::Painter &painter, const Math::Recti &)
     int height = bound().height();
     int width = bound().width();
 
-    auto distance = [](float from, float to, int size) {
+    auto distance = [](float from, float to, int size)
+    {
         if (from > to)
         {
             from -= size;

@@ -67,7 +67,7 @@ public:
     }
 };
 
-static inline RefPtr<Element> grid(int hcells, int vcells, int hspacing, int vspacing, Vec<RefPtr<Element>> children)
+static inline Ref<Element> grid(int hcells, int vcells, int hspacing, int vspacing, Vec<Ref<Element>> children)
 {
     auto layout = make<GridLayout>(hcells, vcells, hspacing, vspacing);
     layout->add(children);

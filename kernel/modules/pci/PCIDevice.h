@@ -86,11 +86,13 @@ public:
 
         size_t bar_offset = PCI_BAR0 + index * 4;
 
-        auto read_bar = [&]() {
+        auto read_bar = [&]()
+        {
             return pci_address().read32(bar_offset);
         };
 
-        auto write_bar = [&](uint32_t value) {
+        auto write_bar = [&](uint32_t value)
+        {
             return pci_address().write32(bar_offset, value);
         };
 
@@ -155,7 +157,7 @@ public:
                _device == address.pci().read16(PCI_DEVICE_ID);
     }
 
-    RefPtr<Device> instance(DeviceAddress address)
+    Ref<Device> instance(DeviceAddress address)
     {
         return make<PCIDeviceType>(address);
     }

@@ -7,13 +7,13 @@ namespace Widget
 {
 
 template <typename TElement>
-static inline RefPtr<TElement> fill(RefPtr<TElement> child)
+static inline Ref<TElement> fill(Ref<TElement> child)
 {
     child->flags(child->flags() | Element::FILL);
     return child;
 }
 
-static inline Vec<RefPtr<Element>> fill(Vec<RefPtr<Element>> children)
+static inline Vec<Ref<Element>> fill(Vec<Ref<Element>> children)
 {
     for (auto &child : children)
     {
@@ -24,28 +24,28 @@ static inline Vec<RefPtr<Element>> fill(Vec<RefPtr<Element>> children)
 }
 
 template <typename TElement>
-static inline RefPtr<TElement> square(RefPtr<TElement> child)
+static inline Ref<TElement> square(Ref<TElement> child)
 {
     child->flags(child->flags() | Element::SQUARE);
     return child;
 }
 
 template <typename TElement>
-static inline RefPtr<TElement> min_width(int value, RefPtr<TElement> child)
+static inline Ref<TElement> min_width(int value, Ref<TElement> child)
 {
     child->min_width(value);
     return child;
 }
 
 template <typename TElement>
-static inline RefPtr<TElement> min_height(int value, RefPtr<TElement> child)
+static inline Ref<TElement> min_height(int value, Ref<TElement> child)
 {
     child->min_height(value);
     return child;
 }
 
 template <typename TElement>
-static inline RefPtr<TElement> min_size(Math::Vec2i size, RefPtr<TElement> child)
+static inline Ref<TElement> min_size(Math::Vec2i size, Ref<TElement> child)
 {
     child->min_width(size.x());
     child->min_height(size.y());
@@ -53,28 +53,28 @@ static inline RefPtr<TElement> min_size(Math::Vec2i size, RefPtr<TElement> child
 }
 
 template <typename TElement>
-static inline RefPtr<TElement> max_width(int value, RefPtr<TElement> child)
+static inline Ref<TElement> max_width(int value, Ref<TElement> child)
 {
     child->max_width(value);
     return child;
 }
 
 template <typename TElement>
-static inline RefPtr<TElement> max_height(int value, RefPtr<TElement> child)
+static inline Ref<TElement> max_height(int value, Ref<TElement> child)
 {
     child->max_height(value);
     return child;
 }
 
 template <typename TElement>
-static inline RefPtr<TElement> max_size(Math::Vec2i size, RefPtr<TElement> child)
+static inline Ref<TElement> max_size(Math::Vec2i size, Ref<TElement> child)
 {
     child->max_width(size.x());
     child->max_height(size.y());
     return child;
 }
 
-static inline RefPtr<Element> enable_if(bool value, RefPtr<Element> element)
+static inline Ref<Element> enable_if(bool value, Ref<Element> element)
 {
     element->enable_if(value);
     return element;

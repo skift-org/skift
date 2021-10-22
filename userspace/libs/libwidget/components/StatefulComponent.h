@@ -56,12 +56,12 @@ struct StatefulComponent : public TStatefulBase
     {
     }
 
-    RefPtr<Element> do_build() final
+    Ref<Element> do_build() final
     {
         return build(state());
     }
 
-    virtual RefPtr<Element> build(TState)
+    virtual Ref<Element> build(TState)
     {
         return nullptr;
     }
@@ -85,11 +85,10 @@ public:
     {
     }
 
-    RefPtr<Element> do_build() final
+    Ref<Element> do_build() final
     {
-        return _callback(state(), [this](TState state) {
-            update(state);
-        });
+        return _callback(state(), [this](TState state)
+            { update(state); });
     }
 };
 
@@ -97,7 +96,7 @@ template <
     typename TState,
     typename TCallback,
     typename TStateful = FunctionalStatefulComponent<TState, TCallback>>
-static inline RefPtr<TStateful> stateful(
+static inline Ref<TStateful> stateful(
     TCallback callback)
 {
     return make<TStateful>(TState{}, callback);
@@ -107,7 +106,7 @@ template <
     typename TState,
     typename TCallback,
     typename TStateful = FunctionalStatefulComponent<TState, TCallback>>
-static inline RefPtr<TStateful> stateful(
+static inline Ref<TStateful> stateful(
     TState state, TCallback callback)
 {
     return make<TStateful>(state, callback);

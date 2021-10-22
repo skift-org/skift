@@ -4,7 +4,7 @@
 #include <libio/Path.h>
 #include <libio/Reader.h>
 #include <libio/Writer.h>
-struct Archive : public RefCounted<Archive>
+struct Archive : public Shared<Archive>
 {
 public:
     struct Entry
@@ -22,7 +22,7 @@ protected:
     bool _valid = true;
 
 public:
-    static RefPtr<Archive> open(IO::Path path, bool read = true);
+    static Ref<Archive> open(IO::Path path, bool read = true);
 
     Archive(IO::Path path) : _path(path)
     {

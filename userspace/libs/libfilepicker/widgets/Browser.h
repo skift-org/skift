@@ -13,9 +13,9 @@ namespace FilePicker
 struct Browser : public Widget::Table
 {
 protected:
-    RefPtr<Navigation> _navigation;
-    OwnPtr<Async::Observer<Navigation>> _navigation_observer;
-    RefPtr<FilesystemModel> _listing;
+    Ref<Navigation> _navigation;
+    Box<Async::Observer<Navigation>> _navigation_observer;
+    Ref<FilesystemModel> _listing;
 
 public:
     Opt<String> selected_path()
@@ -28,7 +28,7 @@ public:
         return process_resolve(_listing->info(selected()).name);
     }
 
-    Browser(RefPtr<Navigation> navigation)
+    Browser(Ref<Navigation> navigation)
         : Widget::Table(), _navigation(navigation)
     {
         flags(Element::FILL);

@@ -8,15 +8,15 @@
 
 #include "compositor/model/Wallpaper.h"
 
-static OwnPtr<Graphic::Framebuffer> _framebuffer;
-static OwnPtr<compositor::Wallpaper> _wallpaper;
+static Box<Graphic::Framebuffer> _framebuffer;
+static Box<compositor::Wallpaper> _wallpaper;
 
 static Vec<Math::Recti> _dirty_regions;
 
-static OwnPtr<Settings::Setting> _night_light_enable_setting;
+static Box<Settings::Setting> _night_light_enable_setting;
 bool _night_light_enable = false;
 
-static OwnPtr<Settings::Setting> _night_light_stenght_setting;
+static Box<Settings::Setting> _night_light_stenght_setting;
 double _night_light_strenght = 0.5;
 
 void renderer_initialize()
@@ -271,7 +271,7 @@ bool renderer_set_resolution(int width, int height)
     return true;
 }
 
-void renderer_set_wallaper(RefPtr<Graphic::Bitmap>)
+void renderer_set_wallaper(Ref<Graphic::Bitmap>)
 {
     renderer_region_dirty(renderer_bound());
 }

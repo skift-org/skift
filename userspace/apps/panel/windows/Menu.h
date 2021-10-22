@@ -9,7 +9,7 @@ struct Menu :
     public Widget::Window
 {
     Menu();
-    RefPtr<Widget::Element> build() override;
+    Ref<Widget::Element> build() override;
 };
 
 } // namespace Panel

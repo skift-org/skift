@@ -18,14 +18,14 @@ enum IconSize
     ICON_SIZE_LIST(ICON_SIZE_ENUM_ENTRY) __ICON_SIZE_COUNT,
 };
 
-struct Icon : public RefCounted<Icon>
+struct Icon : public Shared<Icon>
 {
 private:
     String _name;
-    RefPtr<Bitmap> _bitmaps[__ICON_SIZE_COUNT] = {};
+    Ref<Bitmap> _bitmaps[__ICON_SIZE_COUNT] = {};
 
 public:
-    static RefPtr<Icon> get(String name);
+    static Ref<Icon> get(String name);
 
     String &name() { return _name; }
 
@@ -35,9 +35,9 @@ public:
 
     Math::Recti bound(IconSize size);
 
-    RefPtr<Bitmap> bitmap(IconSize size);
+    Ref<Bitmap> bitmap(IconSize size);
 
-    void set_bitmap(IconSize size, RefPtr<Bitmap> bitmap);
+    void set_bitmap(IconSize size, Ref<Bitmap> bitmap);
 };
 
 } // namespace Graphic

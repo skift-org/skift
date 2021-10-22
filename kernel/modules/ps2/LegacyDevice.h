@@ -68,7 +68,7 @@ public:
         return _address == address.legacy();
     }
 
-    RefPtr<Device> instance(DeviceAddress address)
+    Ref<Device> instance(DeviceAddress address)
     {
         return make<LegacyDeviceType>(address);
     }

@@ -9,7 +9,7 @@
 #include "compositor/Renderer.h"
 #include "compositor/Window.h"
 
-static Vec<OwnPtr<Client>> _clients;
+static Vec<Box<Client>> _clients;
 
 void Client::handle(const CompositorCreateWindow &create_window)
 {

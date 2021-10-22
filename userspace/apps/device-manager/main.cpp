@@ -12,7 +12,7 @@
 struct DeviceManagerWindow : public Widget::Window
 {
 private:
-    RefPtr<DeviceModel> _model;
+    Ref<DeviceModel> _model;
 
 public:
     DeviceManagerWindow() : Widget::Window(WINDOW_RESIZABLE)
@@ -22,7 +22,7 @@ public:
         _model->update();
     }
 
-    RefPtr<Widget::Element> build() override
+    Ref<Widget::Element> build() override
     {
         using namespace Widget;
 

@@ -14,7 +14,7 @@ struct InStream :
     public RawHandle
 {
 private:
-    RefPtr<Handle> _handle;
+    Ref<Handle> _handle;
 
 public:
     using Reader::read;
@@ -22,7 +22,7 @@ public:
     InStream() : _handle{make<Handle>(0)} {}
 
     ResultOr<size_t> read(void *buffer, size_t size) override { return _handle->read(buffer, size); }
-    RefPtr<Handle> handle() override { return _handle; }
+    Ref<Handle> handle() override { return _handle; }
 };
 
 struct OutStream :
@@ -30,7 +30,7 @@ struct OutStream :
     public RawHandle
 {
 private:
-    RefPtr<Handle> _handle;
+    Ref<Handle> _handle;
 
 public:
     using Writer::write;
@@ -38,7 +38,7 @@ public:
     OutStream() : _handle{make<Handle>(1)} {}
 
     ResultOr<size_t> write(const void *buffer, size_t size) override { return _handle->write(buffer, size); }
-    RefPtr<Handle> handle() override { return _handle; }
+    Ref<Handle> handle() override { return _handle; }
 };
 
 struct ErrStream :
@@ -47,7 +47,7 @@ struct ErrStream :
 
 {
 private:
-    RefPtr<Handle> _handle;
+    Ref<Handle> _handle;
 
 public:
     using Writer::write;
@@ -55,7 +55,7 @@ public:
     ErrStream() : _handle{make<Handle>(2)} {}
 
     ResultOr<size_t> write(const void *buffer, size_t size) override { return _handle->write(buffer, size); }
-    RefPtr<Handle> handle() override { return _handle; }
+    Ref<Handle> handle() override { return _handle; }
 };
 
 struct LogStream :
@@ -63,7 +63,7 @@ struct LogStream :
     public RawHandle
 {
 private:
-    RefPtr<Handle> _handle;
+    Ref<Handle> _handle;
 
 public:
     using Writer::write;
@@ -71,7 +71,7 @@ public:
     LogStream() : _handle{make<Handle>(3)} {}
 
     ResultOr<size_t> write(const void *buffer, size_t size) override { return _handle->write(buffer, size); }
-    RefPtr<Handle> handle() override { return _handle; }
+    Ref<Handle> handle() override { return _handle; }
 };
 
 InStream &in();

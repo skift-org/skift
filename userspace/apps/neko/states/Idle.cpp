@@ -23,7 +23,7 @@ void Idle::update(Neko &neko)
 {
     if (_timer < neko.tick())
     {
-        OwnPtr<Behavior> next[] = {
+        Box<Behavior> next[] = {
             own<Wandering>(),
             own<Yawning>(),
             own<Playing>(),

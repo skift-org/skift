@@ -4,7 +4,7 @@
 #include <abi/Paths.h>
 
 #include <libio/Format.h>
-#include <libutils/RefPtr.h>
+#include <libutils/Ref.h>
 #include <libutils/ResultOr.h>
 #include <libutils/String.h>
 #include <libutils/Vec.h>
@@ -12,14 +12,14 @@
 #include "system/devices/DeviceAddress.h"
 #include "system/devices/DeviceClass.h"
 
-struct Device : public RefCounted<Device>
+struct Device : public Shared<Device>
 {
 private:
     DeviceAddress _address;
     DeviceClass _klass;
     String _name;
 
-    Vec<RefPtr<Device>> _children{};
+    Vec<Ref<Device>> _children{};
 
 public:
     DeviceClass klass()
@@ -42,12 +42,12 @@ public:
         return _address;
     }
 
-    void add(RefPtr<Device> child)
+    void add(Ref<Device> child)
     {
         _children.push_back(child);
     }
 
-    Iter iterate(IterFunc<RefPtr<Device>> &callback)
+    Iter iterate(IterFunc<Ref<Device>> &callback)
     {
         return _children.foreach([&](auto device)
             {

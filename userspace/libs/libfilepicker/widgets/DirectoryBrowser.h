@@ -11,20 +11,20 @@ namespace FilePicker
 struct DirectoryBrowser : public Browser
 {
 public:
-    DirectoryBrowser(RefPtr<Navigation> navigation)
+    DirectoryBrowser(Ref<Navigation> navigation)
         : Browser(navigation)
     {
-        _listing = make<FilesystemModel>(navigation, [](IO::Directory::Entry &entry) {
-            return entry.stat.type == HJ_FILE_TYPE_DIRECTORY;
-        });
+        _listing = make<FilesystemModel>(navigation, [](IO::Directory::Entry &entry)
+            { return entry.stat.type == HJ_FILE_TYPE_DIRECTORY; });
         model(_listing);
 
-        on(Widget::Event::ACTION, [this](auto) {
-            if (selected() >= 0)
+        on(Widget::Event::ACTION, [this](auto)
             {
-                _navigation->navigate(_listing->info(selected()).name);
-            }
-        });
+                if (selected() >= 0)
+                {
+                    _navigation->navigate(_listing->info(selected()).name);
+                }
+            });
     }
 };
 

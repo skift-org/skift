@@ -15,10 +15,10 @@ struct Neko : public Async::Observable<Neko>
 private:
     int _tick = 0;
     Math::Vec2f _position;
-    RefPtr<Graphic::Bitmap> _sprites;
+    Ref<Graphic::Bitmap> _sprites;
 
-    OwnPtr<Behavior> _behavior;
-    OwnPtr<Behavior> _next_behavior;
+    Box<Behavior> _behavior;
+    Box<Behavior> _next_behavior;
 
     Math::Recti sprite();
 
@@ -38,7 +38,7 @@ public:
 
     void move_to(Math::Vec2f position);
 
-    void behavior(OwnPtr<Behavior>);
+    void behavior(Box<Behavior>);
 };
 
 } // namespace neko

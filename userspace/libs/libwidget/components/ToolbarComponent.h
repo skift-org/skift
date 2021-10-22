@@ -8,7 +8,7 @@
 namespace Widget
 {
 
-static inline RefPtr<Element> toolbar(Vec<RefPtr<Element>> children)
+static inline Ref<Element> toolbar(Vec<Ref<Element>> children)
 {
     // clang-format off
 

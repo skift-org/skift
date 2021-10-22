@@ -47,8 +47,8 @@ Opt<String> find_command_path(String command)
 
 HjResult shell_exec(
     ShellCommand *command,
-    RefPtr<IO::Handle> instream,
-    RefPtr<IO::Handle> outstream,
+    Ref<IO::Handle> instream,
+    Ref<IO::Handle> outstream,
     int *pid)
 {
     auto executable = find_command_path(command->command);
@@ -73,7 +73,7 @@ HjResult shell_exec(
     return launchpad_launch(launchpad, pid);
 }
 
-int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> outstream)
+int shell_eval(ShellNode *node, Ref<IO::Handle> instream, Ref<IO::Handle> outstream)
 {
     switch (node->type)
     {
@@ -144,8 +144,8 @@ int shell_eval(ShellNode *node, RefPtr<IO::Handle> instream, RefPtr<IO::Handle> 
         {
             Assert::truth(command);
 
-            RefPtr<IO::Handle> command_stdin = instream;
-            RefPtr<IO::Handle> command_stdout = outstream;
+            Ref<IO::Handle> command_stdin = instream;
+            Ref<IO::Handle> command_stdout = outstream;
 
             if (index > 0)
             {

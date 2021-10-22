@@ -43,7 +43,7 @@ bool Bookmarks::has(const IO::Path &path) const
     return false;
 }
 
-RefPtr<Bookmarks> Bookmarks::load()
+Ref<Bookmarks> Bookmarks::load()
 {
     auto bookmarks = make<Bookmarks>();
 

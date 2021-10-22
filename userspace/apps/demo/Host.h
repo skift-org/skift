@@ -13,15 +13,16 @@ struct Host : public Widget::Element
 private:
     Demo _demo;
     double _time{};
-    OwnPtr<Async::Timer> _timer;
+    Box<Async::Timer> _timer;
 
 public:
     Host(Demo demo) : _demo{demo}
     {
-        _timer = own<Async::Timer>(1000 / 60, [this]() {
-            _time += 1.0 / 60;
-            should_repaint();
-        });
+        _timer = own<Async::Timer>(1000 / 60, [this]()
+            {
+                _time += 1.0 / 60;
+                should_repaint();
+            });
 
         _timer->start();
     }

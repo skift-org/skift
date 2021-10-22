@@ -14,26 +14,27 @@ struct FileBrowser : public Browser
 public:
     Func<void(String &path)> on_element_selected;
 
-    FileBrowser(RefPtr<Navigation> navigation)
+    FileBrowser(Ref<Navigation> navigation)
         : Browser(navigation)
     {
         _listing = make<FilesystemModel>(navigation);
         model(_listing);
 
-        on(Widget::Event::ACTION, [this](auto) {
-            if (selected() >= 0)
+        on(Widget::Event::ACTION, [this](auto)
             {
-                if (_listing->info(selected()).type == HJ_FILE_TYPE_DIRECTORY)
+                if (selected() >= 0)
                 {
-                    _navigation->navigate(_listing->info(selected()).name);
+                    if (_listing->info(selected()).type == HJ_FILE_TYPE_DIRECTORY)
+                    {
+                        _navigation->navigate(_listing->info(selected()).name);
+                    }
+                    else if (on_element_selected)
+                    {
+                        auto resolved_path = process_resolve(_listing->info(selected()).name);
+                        on_element_selected(resolved_path);
+                    }
                 }
-                else if (on_element_selected)
-                {
-                    auto resolved_path = process_resolve(_listing->info(selected()).name);
-                    on_element_selected(resolved_path);
-                }
-            }
-        });
+            });
     }
 };
 

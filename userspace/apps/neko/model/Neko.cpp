@@ -62,7 +62,7 @@ void Neko::move_to(Math::Vec2f destination)
     did_update();
 }
 
-void Neko::behavior(OwnPtr<Behavior> behavior)
+void Neko::behavior(Box<Behavior> behavior)
 {
     IO::logln("Switched behavior to {}!", behavior->name());
 

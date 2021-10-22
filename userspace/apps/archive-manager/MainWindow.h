@@ -14,25 +14,25 @@ struct MainWindow :
     public Widget::Window
 {
 private:
-    RefPtr<FilePicker::Navigation> _navigation;
-    RefPtr<Archive> _archive;
+    Ref<FilePicker::Navigation> _navigation;
+    Ref<Archive> _archive;
     FilePicker::Dialog _dialog;
 
 public:
-    void set_archive(RefPtr<Archive> archive)
+    void set_archive(Ref<Archive> archive)
     {
         _archive = archive;
         should_rebuild();
     }
 
-    MainWindow(RefPtr<FilePicker::Navigation> navigation, RefPtr<Archive> archive)
+    MainWindow(Ref<FilePicker::Navigation> navigation, Ref<Archive> archive)
         : Widget::Window(WINDOW_RESIZABLE),
           _navigation(navigation),
           _archive(archive)
     {
     }
 
-    virtual RefPtr<Widget::Element> build()
+    virtual Ref<Widget::Element> build()
     {
         using namespace Widget;
 

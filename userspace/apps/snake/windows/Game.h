@@ -7,7 +7,7 @@ namespace Snake
 
 struct Game : public Widget::Window
 {
-    RefPtr<Widget::Element> build();
+    Ref<Widget::Element> build();
 };
 
 } // namespace Snake

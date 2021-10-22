@@ -21,7 +21,7 @@ File::File(IO::Path &path, HjOpenFlag flags)
 {
 }
 
-File::File(RefPtr<Handle> handle)
+File::File(Ref<Handle> handle)
     : _handle{handle}
 {
 }

@@ -7,7 +7,7 @@ using namespace Widget;
 namespace Panel
 {
 
-RefPtr<Element> UserAccountComponent::build()
+Ref<Element> UserAccountComponent::build()
 {
     return label(environment()
                      .get("POSIX")

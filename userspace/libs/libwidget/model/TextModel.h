@@ -4,8 +4,8 @@
 #include <libgraphic/Font.h>
 #include <libtext/Rune.h>
 #include <libutils/Assert.h>
-#include <libutils/OwnPtr.h>
-#include <libutils/RefCounted.h>
+#include <libutils/Box.h>
+#include <libutils/Shared.h>
 #include <libutils/Vec.h>
 #include <libwidget/Theme.h>
 
@@ -110,19 +110,19 @@ public:
 };
 
 struct TextModel :
-    public RefCounted<TextModel>,
+    public Shared<TextModel>,
     public Async::Observable<TextModel>
 {
 private:
-    Vec<OwnPtr<TextModelLine>> _lines{1024};
+    Vec<Box<TextModelLine>> _lines{1024};
     Vec<TextModelSpan> _spans{1024};
 
 public:
-    static RefPtr<TextModel> empty();
+    static Ref<TextModel> empty();
 
-    static RefPtr<TextModel> open(String path);
+    static Ref<TextModel> open(String path);
 
-    static RefPtr<TextModel> create(String text);
+    static Ref<TextModel> create(String text);
 
     Math::Recti bound(const Graphic::Font &font)
     {
@@ -159,7 +159,7 @@ public:
 
     size_t line_count() const { return _lines.count(); }
 
-    void append_line(OwnPtr<TextModelLine> line) { _lines.push_back(line); }
+    void append_line(Box<TextModelLine> line) { _lines.push_back(line); }
 
     void append_at(TextCursor &cursor, Text::Rune rune);
 

@@ -8,14 +8,14 @@ namespace Panel
 struct Status : public Widget::Window
 {
 private:
-    OwnPtr<Widget::Window> _menu;
-    OwnPtr<Widget::Window> _datetime;
-    OwnPtr<Widget::Window> _quicksetting;
+    Box<Widget::Window> _menu;
+    Box<Widget::Window> _datetime;
+    Box<Widget::Window> _quicksetting;
 
 public:
     Status();
 
-    RefPtr<Widget::Element> build() override;
+    Ref<Widget::Element> build() override;
 };
 
 } // namespace Panel

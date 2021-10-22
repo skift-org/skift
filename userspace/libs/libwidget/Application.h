@@ -17,9 +17,9 @@ struct Application :
 private:
     Vec<Window *> _windows;
     IO::Connection _connection;
-    OwnPtr<Async::Notifier> _connection_notifier;
-    OwnPtr<Settings::Setting> _setting_theme;
-    OwnPtr<Settings::Setting> _setting_wireframe;
+    Box<Async::Notifier> _connection_notifier;
+    Box<Settings::Setting> _setting_theme;
+    Box<Settings::Setting> _setting_wireframe;
     bool _wireframe = false;
     bool _exiting = false;
 
@@ -39,7 +39,7 @@ public:
 
     virtual ~Application();
 
-    virtual OwnPtr<Window> build() { return nullptr; }
+    virtual Box<Window> build() { return nullptr; }
 
     void show_window(Window *window);
 

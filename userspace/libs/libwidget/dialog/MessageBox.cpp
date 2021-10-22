@@ -10,12 +10,12 @@ DialogResult MessageBox::create_and_show(String title, String message)
     return create_and_show(title, message, Graphic::Icon::get("info"), DialogButton::OK);
 }
 
-DialogResult MessageBox::create_and_show(String title, String message, RefPtr<Graphic::Icon> icon)
+DialogResult MessageBox::create_and_show(String title, String message, Ref<Graphic::Icon> icon)
 {
     return create_and_show(title, message, icon, DialogButton::OK);
 }
 
-DialogResult MessageBox::create_and_show(String title, String message, RefPtr<Graphic::Icon> icon, int buttons)
+DialogResult MessageBox::create_and_show(String title, String message, Ref<Graphic::Icon> icon, int buttons)
 {
     MessageBox dialog;
 

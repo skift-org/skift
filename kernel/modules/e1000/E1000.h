@@ -105,21 +105,21 @@ struct PACKED E1000TXDescriptor
 struct E1000 : public PCIDevice
 {
 private:
-    RefPtr<MMIORange> _mmio_range = {};
+    Ref<MMIORange> _mmio_range = {};
     uint16_t _pio_base = 0;
 
     bool _has_eeprom = false;
     MacAddress _mac_address = {};
 
     int _current_rx_descriptors = 0;
-    RefPtr<MMIORange> _rx_descriptors_range{};
+    Ref<MMIORange> _rx_descriptors_range{};
     E1000RXDescriptor *_rx_descriptors{};
-    Vec<RefPtr<MMIORange>> _rx_buffers;
+    Vec<Ref<MMIORange>> _rx_buffers;
 
     int _current_tx_descriptors = 0;
-    RefPtr<MMIORange> _tx_descriptors_range{};
+    Ref<MMIORange> _tx_descriptors_range{};
     E1000TXDescriptor *_tx_descriptors{};
-    Vec<RefPtr<MMIORange>> _tx_buffers;
+    Vec<Ref<MMIORange>> _tx_buffers;
 
     void write_register(uint16_t offset, uint32_t value);
 

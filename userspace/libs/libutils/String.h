@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libutils/Hash.h>
-#include <libutils/RefPtr.h>
+#include <libutils/Ref.h>
 #include <libutils/Slice.h>
 #include <libutils/Std.h>
 #include <libutils/StringStorage.h>
@@ -13,7 +13,7 @@ struct String :
     public RawStorage
 {
 private:
-    RefPtr<StringStorage> _storage;
+    Ref<StringStorage> _storage;
 
 public:
     size_t length() const
@@ -76,7 +76,7 @@ public:
         _storage = make<StringStorage>(COPY, cstr, 1);
     }
 
-    String(RefPtr<StringStorage> storage)
+    String(Ref<StringStorage> storage)
         : _storage(storage)
     {
     }
@@ -162,19 +162,22 @@ public:
         return at(index);
     }
 
-    RefPtr<Storage> storage() override
+    Ref<Storage> storage() override
     {
         return _storage;
     }
 
-    RefPtr<StringStorage> string_storage()
+    Ref<StringStorage> string_storage()
     {
         return _storage;
     }
 };
 
 template <typename T>
-concept ToString = requires(const T &t) { t.string(); };
+concept ToString = requires(const T &t)
+{
+    t.string();
+};
 
 template <>
 inline uint32_t hash<String>(const String &value)

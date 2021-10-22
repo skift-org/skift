@@ -7,7 +7,7 @@
 #include "system/scheduling/Scheduler.h"
 #include "system/tasking/Handles.h"
 
-ResultOr<int> Handles::add(RefPtr<FsHandle> handle)
+ResultOr<int> Handles::add(Ref<FsHandle> handle)
 {
     LockHolder holder(_lock);
 
@@ -24,7 +24,7 @@ ResultOr<int> Handles::add(RefPtr<FsHandle> handle)
     return ERR_TOO_MANY_HANDLE;
 }
 
-HjResult Handles::add_at(RefPtr<FsHandle> handle, int index)
+HjResult Handles::add_at(Ref<FsHandle> handle, int index)
 {
     if (index < 0 && index >= PROCESS_HANDLE_COUNT)
     {
@@ -57,7 +57,7 @@ HjResult Handles::remove(int handle_index)
     return SUCCESS;
 }
 
-RefPtr<FsHandle> Handles::acquire(int handle_index)
+Ref<FsHandle> Handles::acquire(int handle_index)
 {
     LockHolder holder(_lock);
 
@@ -295,7 +295,7 @@ ResultOr<int> Handles::accept(int socket_handle_index)
 }
 
 HjResult Handles::duplex(
-    RefPtr<FsNode> node,
+    Ref<FsNode> node,
     int *server,
     HjOpenFlag server_flags,
     int *client,

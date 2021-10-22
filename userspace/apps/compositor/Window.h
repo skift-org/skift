@@ -21,8 +21,8 @@ private:
     Math::Recti _bound;
     Widget::CursorState _cursor_state{};
 
-    RefPtr<Graphic::Bitmap> _frontbuffer;
-    RefPtr<Graphic::Bitmap> _backbuffer;
+    Ref<Graphic::Bitmap> _frontbuffer;
+    Ref<Graphic::Bitmap> _backbuffer;
 
 public:
     int id() { return _id; }
@@ -47,8 +47,8 @@ public:
         WindowType type,
         struct Client *client,
         Math::Recti bound,
-        RefPtr<Graphic::Bitmap> frontbuffer,
-        RefPtr<Graphic::Bitmap> backbuffer);
+        Ref<Graphic::Bitmap> frontbuffer,
+        Ref<Graphic::Bitmap> backbuffer);
 
     ~Window();
 

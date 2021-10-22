@@ -9,7 +9,7 @@ namespace Demo
 
 struct Application : public Widget::Application
 {
-    OwnPtr<Widget::Window> build() override
+    Box<Widget::Window> build() override
     {
         return own<Window>();
     }

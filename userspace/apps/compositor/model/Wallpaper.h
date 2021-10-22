@@ -15,15 +15,15 @@ private:
 
     Math::Vec2i _resolution = {};
     Graphic::Color _background = Graphic::Colors::BLACK;
-    RefPtr<Graphic::Bitmap> _orginal = nullptr;
-    RefPtr<Graphic::Bitmap> _scaled = nullptr;
-    RefPtr<Graphic::Bitmap> _acrylic = nullptr;
+    Ref<Graphic::Bitmap> _orginal = nullptr;
+    Ref<Graphic::Bitmap> _scaled = nullptr;
+    Ref<Graphic::Bitmap> _acrylic = nullptr;
 
-    OwnPtr<Settings::Setting> _setting_image;
-    OwnPtr<Settings::Setting> _setting_color;
-    OwnPtr<Settings::Setting> _setting_scaling;
+    Box<Settings::Setting> _setting_image;
+    Box<Settings::Setting> _setting_color;
+    Box<Settings::Setting> _setting_scaling;
 
-    OwnPtr<Async::Invoker> _render_invoker;
+    Box<Async::Invoker> _render_invoker;
 
 public:
     Func<void()> on_change;

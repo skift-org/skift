@@ -9,11 +9,11 @@ namespace Widget
 struct IconElement : public Element
 {
 private:
-    RefPtr<Graphic::Icon> _icon;
+    Ref<Graphic::Icon> _icon;
     Graphic::IconSize _icon_size = Graphic::ICON_18PX;
 
 public:
-    IconElement(RefPtr<Graphic::Icon> icon, Graphic::IconSize size = Graphic::IconSize::ICON_18PX);
+    IconElement(Ref<Graphic::Icon> icon, Graphic::IconSize size = Graphic::IconSize::ICON_18PX);
 
     void paint(Graphic::Painter &, const Math::Recti &) override;
 

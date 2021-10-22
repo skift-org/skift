@@ -10,7 +10,7 @@
 #include "system/scheduling/Blocker.h"
 #include "system/scheduling/Scheduler.h"
 
-FsHandle::FsHandle(RefPtr<FsNode> node, HjOpenFlag flags)
+FsHandle::FsHandle(Ref<FsNode> node, HjOpenFlag flags)
 {
     _node = node;
     _flags = flags;
@@ -123,7 +123,8 @@ ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
         return ERR_READ_ONLY_STREAM;
     }
 
-    auto attempt_a_write = [&](const void *buffer, size_t size) -> ResultOr<size_t> {
+    auto attempt_a_write = [&](const void *buffer, size_t size) -> ResultOr<size_t>
+    {
         BlockerWrite blocker{*this};
 
         TRY(task_block(scheduler_running(), blocker, -1));
@@ -237,7 +238,7 @@ HjResult FsHandle::stat(HjStat *stat)
     return SUCCESS;
 }
 
-ResultOr<RefPtr<FsHandle>> FsHandle::accept()
+ResultOr<Ref<FsHandle>> FsHandle::accept()
 {
     BlockerAccept blocker{_node};
     TRY(task_block(scheduler_running(), blocker, -1));

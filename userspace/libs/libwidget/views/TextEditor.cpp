@@ -5,21 +5,23 @@
 namespace Widget
 {
 
-TextEditor::TextEditor(RefPtr<TextModel> model)
+TextEditor::TextEditor(Ref<TextModel> model)
     : _model(model)
 {
     _vscrollbar = add<ScrollBarElement>();
-    _vscrollbar->on(Event::VALUE_CHANGE, [this](auto) {
-        _vscroll_offset = _vscrollbar->value();
-        should_repaint();
-    });
+    _vscrollbar->on(Event::VALUE_CHANGE, [this](auto)
+        {
+            _vscroll_offset = _vscrollbar->value();
+            should_repaint();
+        });
 
     _hscrollbar = add<ScrollBarElement>(true);
 
-    _hscrollbar->on(Event::VALUE_CHANGE, [this](auto) {
-        _hscroll_offset = _hscrollbar->value();
-        should_repaint();
-    });
+    _hscrollbar->on(Event::VALUE_CHANGE, [this](auto)
+        {
+            _hscroll_offset = _hscrollbar->value();
+            should_repaint();
+        });
 }
 
 void TextEditor::paint(Graphic::Painter &painter, const Math::Recti &)
@@ -48,7 +50,8 @@ void TextEditor::paint(Graphic::Painter &painter, const Math::Recti &)
         painter.push();
         painter.transform(Math::Vec2i{-_hscroll_offset, 0} + view_bound().position().extract_x());
 
-        auto paint_cursor = [&](Graphic::Painter &painter, int position) {
+        auto paint_cursor = [&](Graphic::Painter &painter, int position)
+        {
             Math::Vec2i cursor_position{position, metrics.fullascend(baseline)};
             Math::Vec2i cursor_size{2, metrics.fulllineheight()};
             Math::Recti cursor_bound{cursor_position, cursor_size};

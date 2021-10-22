@@ -5,7 +5,7 @@
 #include "system/storage/Partition.h"
 #include "system/storage/Partitions.h"
 
-bool partition_load_mbr(RefPtr<Device> disk, const MBR &mbr)
+bool partition_load_mbr(Ref<Device> disk, const MBR &mbr)
 {
     if (mbr.magic != 0xAA55)
     {
@@ -31,7 +31,7 @@ bool partition_load_mbr(RefPtr<Device> disk, const MBR &mbr)
     return true;
 }
 
-bool partition_load_gpt(RefPtr<Device> disk, const MBR &mbr)
+bool partition_load_gpt(Ref<Device> disk, const MBR &mbr)
 {
     UNUSED(disk);
     UNUSED(mbr);
@@ -43,7 +43,7 @@ bool partition_load_gpt(RefPtr<Device> disk, const MBR &mbr)
 
 void partitions_initialize()
 {
-    device_iterate([](RefPtr<Device> device)
+    device_iterate([](Ref<Device> device)
         {
             if (device->klass() == DeviceClass::DISK)
             {

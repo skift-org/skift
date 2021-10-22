@@ -10,15 +10,15 @@ namespace Settings
 
 struct Watcher;
 
-struct Service : public RefCounted<Service>
+struct Service : public Shared<Service>
 {
 private:
     Vec<Watcher *> _watchers;
-    OwnPtr<ServerConnection> _server;
+    Box<ServerConnection> _server;
 
 public:
     // FIXME: Move this to an injection container.
-    static RefPtr<Service> the();
+    static Ref<Service> the();
 
     ServerConnection &server();
 

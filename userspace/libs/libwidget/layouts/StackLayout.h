@@ -66,14 +66,14 @@ public:
     }
 };
 
-static inline RefPtr<Element> stack(RefPtr<Element> child)
+static inline Ref<Element> stack(Ref<Element> child)
 {
     auto layout = make<StackLayout>();
     layout->add(child);
     return layout;
 }
 
-static inline RefPtr<Element> stack(Vec<RefPtr<Element>> children)
+static inline Ref<Element> stack(Vec<Ref<Element>> children)
 {
     auto layout = make<StackLayout>();
     layout->add(children);

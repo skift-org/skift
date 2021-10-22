@@ -47,7 +47,7 @@ CONFIG_ARCH           ?=x86_32
 CONFIG_TOOLCHAIN	  ?=gnu
 
 # Set the directory where output file will be generated.
-CONFIG_BUILD_DIRECTORY?=$(shell pwd)/build
+CONFIG_BUILD_DIRECTORY?=$(shell pwd)/bin
 
 # Prevent the virtual machine to reboot (if supported).
 CONFIG_NOREBOOT       ?=false

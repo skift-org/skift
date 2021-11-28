@@ -1,12 +1,15 @@
-
-![Banner](manual/header.png)
-
+<br>
+<br>
+<br>
+<p align="center">🪦🪦🪦</p>
+<p align="center">skiftOS</p>
+<p align="center">2018-2021</p>
 <p align="center">
-  <a href="https://skiftos.org/">Website</a> -
-  <a href="manual/readme.md">Manual</a> -
-  <a href="http://discord.skiftos.org">Discord</a> -
-  <a href="https://github.com/skiftOS/skift/releases">Releases</a>
+"Long live <a href="https://github.com/brutal-org/brutal">BRUTAL</a>!"
 </p>
+<br>
+<br>
+<br>
 
 # skiftOS
 

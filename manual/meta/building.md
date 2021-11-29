@@ -154,7 +154,7 @@ $ make run CONFIG_VMACHINE=vbox # for Virtual Box
 ```sh
 µ displayctl -s 1920x1080
 ```
-**How to change to wallpaper?**
+**How to change the wallpaper?**
 
 ```sh
 µ wallpaperctl /Files/Wallpapers/paint.png

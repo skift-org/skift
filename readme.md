@@ -25,7 +25,7 @@
 - **skiftOS** is featuring a reactive UI library and has a strong emphasis on user experience.
 - **skiftOS** exposes its features to developers through clean APIs.
 - **skiftOS** includes many applications like an [Image Viewer](./userspace/apps/image-viewer), a [Text Editor](./userspace/apps/text-editor), a [Terminal Emulator](./userspace/apps/terminal), [etc](./userspace/apps)...
-- **skiftOS** features an UNIX-like terminal experience with many familiar UNIX utilities.
+- **skiftOS** features a UNIX-like terminal experience with many familiar UNIX utilities.
 - **skiftOS** is also pretty easy to build from source, just follow the [build guide](manual/meta/building.md).
 - **skiftOS** is capable of running on real hardware.
 

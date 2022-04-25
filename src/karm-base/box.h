@@ -1,7 +1,9 @@
 #pragma once
 
-#include <karm-base/std.h>
+#include <karm-debug/panic.h>
 #include <karm-meta/traits.h>
+
+#include "std.h"
 
 namespace Karm::Base
 {
@@ -25,7 +27,8 @@ struct Box
 
     constexpr ~Box()
     {
-        delete _ptr;
+        if (_ptr)
+            delete _ptr;
     }
 
     constexpr Box &operator=(Box const &) = delete;
@@ -39,8 +42,20 @@ struct Box
         return *this;
     }
 
-    constexpr T *operator->() { return _ptr; }
-    constexpr T &operator*() { return *_ptr; }
+    constexpr T *operator->()
+    {
+        if (!_ptr)
+            Debug::panic("Deferencing moved from Box<T>");
+
+        return _ptr;
+    }
+    constexpr T &operator*()
+    {
+        if (!_ptr)
+            Debug::panic("Deferencing moved from Box<T>");
+
+        return *_ptr;
+    }
 
     template <typename... Args>
     constexpr static Box<T> make(Args... args)

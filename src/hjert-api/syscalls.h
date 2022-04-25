@@ -1,7 +1,8 @@
 #pragma once
 
-#include <hjert-api/types.h>
 #include <karm-base/error.h>
+
+#include "types.h"
 
 namespace Hjert::Api
 {

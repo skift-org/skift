@@ -1,7 +1,7 @@
 #pragma once
 
-#include <karm-base/cons.h>
-#include <karm-base/vec.h>
+#include "cons.h"
+#include "vec.h"
 
 namespace Karm::Base
 {

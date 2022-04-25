@@ -1,9 +1,10 @@
 #pragma once
 
 #include <karm-base/std.h>
-#include <karm-meta/cmp.h>
-#include <karm-meta/const.h>
-#include <karm-meta/ref.h>
+
+#include "cmp.h"
+#include "const.h"
+#include "ref.h"
 
 namespace Karm::Meta
 {

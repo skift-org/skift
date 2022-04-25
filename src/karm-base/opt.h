@@ -1,7 +1,7 @@
 #pragma once
 
-#include <karm-base/inert.h>
-#include <karm-base/std.h>
+#include "inert.h"
+#include "std.h"
 
 namespace Karm::Base
 {
@@ -67,7 +67,7 @@ struct Opt
 
     operator bool() { return _present; }
 
-    T &operator->() { return &_value; }
+    T *operator->() { return &_value; }
 
     T &operator*() { return *_value; }
 

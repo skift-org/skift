@@ -1,8 +1,8 @@
 #pragma once
 
-#include <karm-base/box.h>
-#include <karm-base/cons.h>
-#include <karm-base/opt.h>
+#include "box.h"
+#include "cons.h"
+#include "opt.h"
 
 namespace Karm::Base
 {

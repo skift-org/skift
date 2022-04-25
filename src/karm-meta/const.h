@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-meta/cond.h>
+#include "cond.h"
 
 namespace Karm::Meta
 {

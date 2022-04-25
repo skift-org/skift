@@ -1,7 +1,11 @@
 #pragma once
 
-#include <karm-base/std.h>
+#include <karm-debug/panic.h>
 #include <karm-meta/traits.h>
+
+#include "opt.h"
+#include "ref.h"
+#include "std.h"
 
 namespace Karm::Base
 {
@@ -14,6 +18,11 @@ struct _Rc
     virtual ~_Rc() = default;
     virtual void *_unwrap() = 0;
 
+    bool dying()
+    {
+        return _strong == 0;
+    }
+
     _Rc *collect()
     {
         if (_strong == 0 && _weak == 0)
@@ -21,6 +30,7 @@ struct _Rc
             delete this;
             return nullptr;
         }
+
         return this;
     }
 
@@ -59,7 +69,7 @@ struct _Rc
     {
         if (_strong == 0)
         {
-            return nullptr;
+            Debug::panic("Dereferencing weak reference to dead object");
         }
 
         return *static_cast<T *>(_unwrap());
@@ -76,30 +86,46 @@ struct Rc : _Rc
 template <typename T>
 struct Strong
 {
-    _Rc *_ptr = nullptr;
+    _Rc *_rc = nullptr;
 
     constexpr Strong() = delete;
 
-    constexpr Strong(_Rc *ptr) : _ptr(ptr->ref_strong()) {}
+    constexpr Strong(_Rc *ptr) : _rc(ptr->ref_strong()) {}
 
     template <Meta::Derive<T> U>
-    constexpr Strong(Strong<U> const &other) : _ptr(_ref(other._ptr)) {}
+    constexpr Strong(Strong<U> const &other) : _rc(other._rc->ref_strong()) {}
 
     template <Meta::Derive<T> U>
-    constexpr Strong(Strong<U> &&other) { std::swap(_ptr, other._ptr); }
+    constexpr Strong(Strong<U> &&other) : _rc(std::exchange(other._rc, nullptr)) {}
 
-    constexpr ~Strong() { _ptr = _ptr->deref_strong(); }
+    constexpr ~Strong()
+    {
+        if (_rc)
+            _rc = _rc->deref_strong();
+    }
 
     constexpr Strong &operator=(Strong const &other) { return *this = Strong(other); }
 
     constexpr Strong &operator=(Strong &&other)
     {
-        std::swap(_ptr, other._ptr);
+        std::swap(_rc, other._rc);
         return *this;
     }
 
-    constexpr T *operator->() { return &_ptr->unwrap_strong<T>(); }
-    constexpr T &operator*() { return _ptr->unwrap_strong<T>(); }
+    constexpr T *operator->()
+    {
+        if (!_rc)
+            Debug::panic("Deferencing moved from Strong<T>");
+
+        return &_rc->unwrap_strong<T>();
+    }
+    constexpr T &operator*()
+    {
+        if (!_rc)
+            Debug::panic("Deferencing moved from Strong<T>");
+
+        return _rc->unwrap_strong<T>();
+    }
 
     template <typename... Args>
     constexpr static Strong<T> make(Args... args)
@@ -114,33 +140,69 @@ struct Strong
     }
 };
 
-/* TODO: Weak
 template <typename T>
 struct Weak
 {
-    _Rc *_ptr = nullptr;
+    _Rc *_rc = nullptr;
 
     constexpr Weak() = delete;
 
     template <Meta::Derive<T> U>
-    constexpr Weak(Weak<U> const &other) : _ptr(_ref(other._ptr)) {}
+    constexpr Weak(Strong<U> const &other) : _rc(other._rc->ref_weak()) {}
 
     template <Meta::Derive<T> U>
-    constexpr Weak(Weak<U> &&other) { std::swap(_ptr, other._ptr); }
+    constexpr Weak(Weak<U> const &other) : _rc(other._rc->ref_weak()) {}
 
-    constexpr ~Weak() { _ptr = _ptr->deref_weak(); }
+    template <Meta::Derive<T> U>
+    constexpr Weak(Weak<U> &&other) { std::swap(_rc, other._rc); }
+
+    constexpr ~Weak()
+    {
+        if (_rc)
+            _rc->deref_weak();
+    }
 
     constexpr Weak &operator=(Weak const &other) { return *this = Weak(other); }
 
     constexpr Weak &operator=(Weak &&other)
     {
-        std::swap(_ptr, other._ptr);
+        std::swap(_rc, other._rc);
         return *this;
     }
 
-    constexpr T *operator->() { return &_ptr->unwrap_weak<T>(); }
-    constexpr T &operator*() { return _ptr->unwrap_weak<T>(); }
+    operator bool()
+    {
+        return _rc && _rc->dying() && (_rc = _rc->deref_weak());
+    }
+
+    operator bool() const
+    {
+        return _rc && _rc->dying();
+    }
+
+    T *operator->()
+    {
+        if (!_rc)
+            Debug::panic("Deferencing moved from Weak<T>");
+
+        return _rc->unwrap_weak<T>();
+    }
+
+    T *unwrap()
+    {
+        if (!_rc)
+            Debug::panic("Deferencing moved from Weak<T>");
+
+        return _rc->unwrap_weak<T>();
+    }
+
+    void visit(auto visitor)
+    {
+        if (*this)
+        {
+            visitor(**this);
+        }
+    }
 };
-*/
 
 } // namespace Karm::Base

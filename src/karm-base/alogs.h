@@ -1,7 +1,7 @@
 #pragma once
 
-#include <karm-base/opt.h>
-#include <karm-base/std.h>
+#include "opt.h"
+#include "std.h"
 
 namespace Karm::Base
 {

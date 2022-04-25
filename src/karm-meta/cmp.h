@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-meta/value.h>
+#include "value.h"
 
 namespace Karm::Meta
 {
@@ -17,6 +17,5 @@ struct _Same<T, T> : True
 
 template <typename T, typename U>
 concept Same = _Same<T, U>::VALUE;
-
 
 } // namespace Karm::Meta

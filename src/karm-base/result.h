@@ -1,7 +1,7 @@
 #pragma once
 
-#include <karm-base/error.h>
-#include <karm-base/opt.h>
+#include "error.h"
+#include "opt.h"
 
 namespace Karm::Base
 {
@@ -10,7 +10,7 @@ template <typename Value>
 struct Result
 {
     Error _error;
-    Opt<Value> _value = NONE;
+    Opt<Value> _value = NIL;
 
     constexpr Result(Error error) : _error(error) {}
     constexpr Result(Value value) : _error(), _value(value) {}

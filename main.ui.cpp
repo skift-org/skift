@@ -2,7 +2,9 @@
 #include <karm-base/cons.h>
 #include <karm-base/func.h>
 #include <karm-base/rc.h>
+#include <karm-base/tuple.h>
 #include <karm-base/vec.h>
+#include <karm-meta/id.h>
 
 namespace Karm::Ui
 {
@@ -11,99 +13,162 @@ struct _Prop
 {
 };
 
-template <typename T>
-struct Prop
-{
-    T _value = {};
-};
+// Represents a collection of properties.
 
 struct _Props
 {
+    virtual ~_Props() = default;
+
+    virtual _Prop *_get(Meta::TypeId id) = 0;
+
+    virtual void _set(Meta::TypeId id, _Prop *prop) = 0;
+
+    template <typename T>
+    Base::Opt<Base::Ref<T>> get()
+    {
+        auto prop = _get(Meta::type_id<T>());
+
+        if (!prop)
+        {
+            return Base::NONE;
+        }
+
+        return prop;
+    }
+
+    template <typename T>
+    void set(T &prop)
+    {
+        _set(Meta::type_id<T>(), &prop);
+    }
 };
 
-template <Meta::Derive<_Prop>... Ts>
-struct Props : _Props
+template <typename... Ts>
+struct Props : public _Props
 {
+    Base::Tuple<Ts...> _buf;
+
+    _Prop *_get(Meta::TypeId id) override
+    {
+        _Prop *result = nullptr;
+
+        _buf.visit(
+            [&]<typename T>(auto &i)
+            {
+                if (Meta::type_id<T>() == id)
+                {
+                    result = &i;
+                }
+            });
+
+        return result;
+    }
+
+    void _set(Meta::TypeId id, _Prop *prop) override
+    {
+        _buf.visit(
+            [&]<typename T>(auto &i)
+            {
+                if (Meta::type_id<T>() == id)
+                {
+                    i = *reinterpret_cast<T *>(prop);
+                }
+            });
+    }
 };
 
-struct _Node : public Base::Cons<Base::OptStrong<_Node>, Base::OptStrong<_Node>>
+struct _Node
 {
-    Base::OptWeak<_Node> parent;
+    virtual ~_Node() = default;
+
+    virtual _Props *props() = 0;
 };
 
+template <typename... Ts>
 struct Node : public _Node
 {
+    Props<Ts...> _props;
+
+    _Props *props() override { return &_props; }
 };
+
+using Frag = Base::Vec<Base::Box<struct _Trans>>;
 
 struct _Trans
 {
     virtual ~_Trans() = default;
 
-    virtual Base::Vec<Base::Box<struct _Trans>> build() = 0;
+    virtual _Props *props() = 0;
 
-    virtual Base::Strong<struct _Node> realize() = 0;
+    virtual Frag children() = 0;
 };
 
-template <typename N, typename... Ps>
-struct Trans : _Trans
+template <typename... Ts>
+struct Trans : public _Trans
 {
-    Base::Strong<struct _Node> realize() override
+    Props<Ts...> _props;
+
+    Trans(Props<Ts...> &&props) : _props(std::forward<Props<Ts...>>(props)){};
+
+    _Props *props() override
     {
-        return Base::make_strong<N>();
+        return &_props;
     }
 };
 
-template <typename N, typename... Ps>
-struct BaseTrans : public Trans<N, Ps...>
+template <typename N, typename... Ts>
+struct StaticTrans : public Trans<N, Ts...>
 {
+    Frag _children;
+
+    StaticTrans(Props<Ts...> &&props, Frag &&children)
+        : Trans<N, Ts...>(std::forward<Props<Ts...>>(props)),
+          _children(std::forward<Frag>(children))
+    {
+    }
+
+    Frag children() override
+    {
+        return std::move(_children);
+    }
 };
 
-template <typename N, typename... Ps>
-struct FuncTrans : public Trans<N, Ps...>
+template <typename... Ts>
+struct FuncTrans : public Trans<Ts...>
 {
+    using F = Base::Func<Frag(Props<Ts...>)>;
+
+    F _build;
+
+    FuncTrans(Props<Ts...> &&props, F &&build)
+        : Trans<_Node, Ts...>(std::forward<Props<Ts...>>(props)),
+          _build(std::forward<Base::Func<Frag(_Props &)>>(build))
+    {
+    }
+
+    Frag children() override
+    {
+        return _build(this->_props);
+    }
 };
 
-template <typename N, typename... Props>
-Base::Box<struct _Trans> make_trans(Base::Vec<Base::Box<_Trans>> &&children, Props... props);
-
-template <typename N, typename... Props>
-Base::Box<struct _Trans> make_trans(Base::Func<Base::Vec<Base::Box<_Trans>>()> build, Props... pros);
-
-Base::Strong<_Node> make_root()
+template <typename N, typename... Ts>
+Base::Box<_Trans> $<N>(Props<Ts...> props = {}, Frag children = {})
 {
-    return Base::make_strong<_Node>();
+    return Base::make_box<StaticTrans<N, Ts...>>(std::forward<Props<Ts...>>(props), std::forward<Frag>(children));
 }
 
-struct Engine
+template <typename... Ts>
+Base::Box<_Trans> $(Props<Ts...> props = {}, Base::Func<Frag(Props<Ts...>)> build = {})
 {
-    void render(Base::Strong<struct _Node> &container, Base::Box<struct _Trans> &element)
-    {
-        Base::Strong<struct _Node> node = element->realize();
-        Base::Vec<Base::Box<struct _Trans>> children = element->build();
-
-        for (auto &child : children)
-        {
-            render(node, child);
-        }
-
-        container->children.push(std::move(node));
-    }
-};
+    return Base::make_box<StaticTrans<Ts...>>(std::forward<Props<Ts...>>(props), std::forward<Frag>(build));
+}
 
 }; // namespace Karm::Ui
 
-template<typename T>
-void $();
+using namespace Karm::Ui;
 
 int main()
 {
-    auto app = $<Div>({
-        
-    });
-
-    Karm::Ui::Engine engine;
-    auto root = Karm::Ui::make_root();
-    auto app = Karm::Ui::make_trans<Karm::Ui::Node>();
-
-    engine.render(root, app);
+    auto app = $<Node<>>({});
 }

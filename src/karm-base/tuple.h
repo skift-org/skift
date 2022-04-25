@@ -9,6 +9,19 @@ namespace Karm::Base
 template <typename... Ts>
 struct Tuple;
 
+template <>
+struct Tuple<>
+{
+    static constexpr size_t size = 0;
+
+    constexpr size_t len()
+    {
+        return 0;
+    }
+
+    constexpr void visit(auto) {}
+};
+
 template <typename Car>
 struct Tuple<Car>
 {

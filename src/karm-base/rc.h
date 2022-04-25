@@ -80,6 +80,7 @@ template <typename T>
 struct Rc : _Rc
 {
     T _buf;
+    Rc(T &&buf) : _buf(std::forward<T>(buf)) {}
     void *_unwrap() override { return &_buf; }
 };
 
@@ -126,19 +127,16 @@ struct Strong
 
         return _rc->unwrap_strong<T>();
     }
-
-    template <typename... Args>
-    constexpr static Strong<T> make(Args... args)
-    {
-        return {new Rc<T>(T{std::forward<Args>(args)...})};
-    }
-
-    template <Meta::Derive<T> U, typename... Args>
-    constexpr static Strong<T> make(Args... args)
-    {
-        return {new Rc<U>(U{std::forward<Args>(args)...})};
-    }
 };
+
+template <typename T>
+using OptStrong = Opt<Strong<T>>;
+
+template <typename T, typename... Args>
+constexpr static Strong<T> make_strong(Args... args)
+{
+    return {new Rc<T>(T{std::forward<Args>(args)...})};
+}
 
 template <typename T>
 struct Weak
@@ -204,5 +202,8 @@ struct Weak
         }
     }
 };
+
+template <typename T>
+using OptWeak = Opt<Weak<T>>;
 
 } // namespace Karm::Base

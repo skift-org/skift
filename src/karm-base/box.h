@@ -56,18 +56,12 @@ struct Box
 
         return *_ptr;
     }
-
-    template <typename... Args>
-    constexpr static Box<T> make(Args... args)
-    {
-        return {new T(std::forward<Args>(args)...)};
-    }
-
-    template <Meta::Derive<T> U, typename... Args>
-    constexpr static Box<T> make(Args... args)
-    {
-        return {new U(std::forward<Args>(args)...)};
-    }
 };
+
+template <typename T, typename... Args>
+constexpr static Box<T> make_box(Args... args)
+{
+    return {new T(std::forward<Args>(args)...)};
+}
 
 } // namespace Karm::Base

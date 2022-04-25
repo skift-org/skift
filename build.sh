@@ -1,2 +1,4 @@
 #!/usr/bin/env bash
-clang++ $(cat compile_flags.txt) -o main.out main.cpp && ./main.out
+mkdir -p bin
+
+clang++ $(cat compile_flags.txt) -o bin/$1.out $1.cpp && ./bin/$1.out

@@ -60,6 +60,6 @@ struct Error
     Error unwrap() const { return *this; }
 };
 
-static constexpr Error::Code OK = Error::OK;
+inline constexpr Error::Code OK = Error::OK;
 
 } // namespace Karm::Base

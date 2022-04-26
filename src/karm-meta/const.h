@@ -2,14 +2,13 @@
 
 #include "cond.h"
 
-namespace Karm::Meta
-{
+namespace Karm::Meta {
 
 template <typename T>
-static constexpr bool _Const = false;
+inline constexpr bool _Const = false;
 
 template <typename T>
-static constexpr bool _Const<const T> = true;
+inline constexpr bool _Const<const T> = true;
 
 template <typename T>
 concept Const = _Const<T>;
@@ -18,14 +17,12 @@ template <typename T>
 using AddConst = T const;
 
 template <typename T>
-struct _RemoveConst
-{
+struct _RemoveConst {
     using Type = T;
 };
 
 template <typename T>
-struct _RemoveConst<T const>
-{
+struct _RemoveConst<T const> {
     using Type = T;
 };
 

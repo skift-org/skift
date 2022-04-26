@@ -1,11 +1,9 @@
 #pragma once
 
-namespace Karm::Meta
-{
+namespace Karm::Meta {
 
 template <typename T, T value>
-struct Value
-{
+struct Value {
     static constexpr T VALUE = value;
     consteval operator T() const { return value; }
     consteval T operator()() const { return value; }

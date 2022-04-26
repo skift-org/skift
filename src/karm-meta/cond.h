@@ -1,17 +1,14 @@
 #pragma once
 
-namespace Karm::Meta
-{
+namespace Karm::Meta {
 
 template <bool cond, typename TTrue, typename TFalse>
-struct _Cond
-{
+struct _Cond {
     using Type = TTrue;
 };
 
 template <typename TTrue, typename TFalse>
-struct _Cond<false, TTrue, TFalse>
-{
+struct _Cond<false, TTrue, TFalse> {
     using Type = TFalse;
 };
 

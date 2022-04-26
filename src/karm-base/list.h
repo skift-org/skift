@@ -1,35 +1,30 @@
 #pragma once
 
+#include "_prelude.h"
+
 #include "box.h"
 #include "cons.h"
 #include "opt.h"
 
-namespace Karm::Base
-{
+namespace Karm::Base {
 
 template <typename T>
-struct List
-{
-    struct Node : Cons<T, Opt<Box<Node>>>
-    {
+struct List {
+    struct Node : Cons<T, Opt<Box<Node>>> {
     };
 
     Opt<Node> _head = NONE;
 
-    void push(T const &value)
-    {
+    void push(T const &value) {
         _head = Node{value, _head};
     }
 
-    void push(T &&value)
-    {
+    void push(T &&value) {
         _head = Node{std::move(value), _head};
     }
 
-    Opt<T> pop()
-    {
-        if (!_head)
-        {
+    Opt<T> pop() {
+        if (!_head) {
             return NONE;
         }
 
@@ -38,26 +33,21 @@ struct List
         return value;
     }
 
-    void clear()
-    {
+    void clear() {
         _head = NONE;
     }
 
-    auto begin() const
-    {
+    auto begin() const {
         return _head;
     }
 
-    auto end() const
-    {
+    auto end() const {
         return NONE;
     }
 
-    size_t len()
-    {
+    size_t len() {
         size_t len = 0;
-        for (auto const &i : *this)
-        {
+        for (auto const &i : *this) {
             len++;
         }
         return len;

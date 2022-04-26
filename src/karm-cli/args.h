@@ -1,10 +1,8 @@
 #pragma once
 
-namespace Karm::Cli
-{
+namespace Karm::Cli {
 
-struct Args
-{
+struct Args {
 };
 
 } // namespace Karm::Cli

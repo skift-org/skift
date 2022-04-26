@@ -2,17 +2,14 @@
 
 #include "value.h"
 
-namespace Karm::Meta
-{
+namespace Karm::Meta {
 
 template <typename T, typename U>
-struct _Same : False
-{
+struct _Same : False {
 };
 
 template <typename T>
-struct _Same<T, T> : True
-{
+struct _Same<T, T> : True {
 };
 
 template <typename T, typename U>

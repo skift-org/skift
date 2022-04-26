@@ -1,11 +1,11 @@
-#include <karm-base/func.h>
+#include <karm-text/str.h>
 
-int fi(int a)
-{
-    return a + 1;
-}
+using namespace Karm::Base;
+using namespace Karm::Text;
 
-int main()
-{
-    Karm::Base::Func<int(int)> f = fi;
+int main() {
+    Str a = u8"test";
+    Str b = u8"test";
+
+    return Op::gteq(a, b);
 }

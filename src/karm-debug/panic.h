@@ -1,8 +1,14 @@
 #pragma once
 
-namespace Karm::Debug
-{
+#include <stdio.h>
+#include <stdlib.h>
 
-void panic(char const *msg);
+namespace Karm::Debug {
+
+[[noreturn]] static void panic(char const *msg) {
+    fprintf(stderr, "PANIC: %s\n", msg);
+    *(volatile int *)0 = 0;
+    abort();
+}
 
 } // namespace Karm::Debug

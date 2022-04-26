@@ -1,13 +1,13 @@
 #pragma once
 
+#include "_prelude.h"
+
 #include "std.h"
 
-namespace Karm::Base
-{
+namespace Karm::Base {
 
 template <typename T, size_t N>
-struct Array
-{
+struct Array {
     T _buf[N];
 
     constexpr Array() = default;

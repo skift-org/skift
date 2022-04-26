@@ -1,9 +1,7 @@
-namespace Karm::Math
-{
+namespace Karm::Math {
 
 template <typename T>
-struct Rect
-{
+struct Rect {
     T x, y, w, h;
 };
 

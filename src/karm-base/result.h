@@ -1,16 +1,16 @@
 #pragma once
 
+#include "_prelude.h"
+
 #include "error.h"
 #include "opt.h"
 
-namespace Karm::Base
-{
+namespace Karm::Base {
 
 template <typename Value>
-struct Result
-{
+struct [[nodiscard]] Result {
     Error _error;
-    Opt<Value> _value = NIL;
+    Opt<Value> _value = NONE;
 
     constexpr Result(Error error) : _error(error) {}
     constexpr Result(Value value) : _error(), _value(value) {}

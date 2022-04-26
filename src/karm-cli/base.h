@@ -2,8 +2,7 @@
 
 #include <karm-base/result.h>
 
-namespace Karm::Cli
-{
+namespace Karm::Cli {
 
 using Result = Base::Result<int>;
 

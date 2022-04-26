@@ -1,54 +1,46 @@
 #pragma once
 
 #include <karm-meta/ref.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <string.h>
+
+#include "_prelude.h"
 
 inline void *operator new(size_t, void *ptr) { return ptr; }
 
 inline void *operator new[](size_t, void *ptr) { return ptr; }
 
-namespace std
-{
+namespace std {
 
 template <typename T>
-Karm::Meta::RemoveRef<T> &&move(T &&t) noexcept
-{
+Karm::Meta::RemoveRef<T> &&move(T &&t) noexcept {
     return static_cast<Karm::Meta::RemoveRef<T> &&>(t);
 }
 
 template <typename T>
-constexpr T &&forward(Karm::Meta::RemoveRef<T> &param)
-{
+constexpr T &&forward(Karm::Meta::RemoveRef<T> &param) {
     return static_cast<T &&>(param);
 }
 
 template <typename T>
-constexpr T &&forward(Karm::Meta::RemoveRef<T> &&param)
-{
+constexpr T &&forward(Karm::Meta::RemoveRef<T> &&param) {
     return static_cast<T &&>(param);
 }
 
 template <typename T, typename U = T>
-constexpr T exchange(T &slot, U &&value)
-{
+constexpr T exchange(T &slot, U &&value) {
     T old = move(slot);
     slot = forward<U>(value);
     return old;
 }
 
 template <typename T>
-void swap(T &lhs, T &rhs)
-{
+void swap(T &lhs, T &rhs) {
     T tmp = move(lhs);
     lhs = move(rhs);
     rhs = move(tmp);
 }
 
 template <typename T>
-struct initializer_list
-{
+struct initializer_list {
     T *_buf;
     size_t _len;
 

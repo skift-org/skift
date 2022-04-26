@@ -3,30 +3,27 @@
 #include <karm-debug/panic.h>
 #include <karm-meta/traits.h>
 
+#include "_prelude.h"
+
 #include "opt.h"
 #include "ref.h"
 #include "std.h"
 
-namespace Karm::Base
-{
+namespace Karm::Base {
 
-struct _Rc
-{
+struct _Rc {
     int _strong = 0;
     int _weak = 0;
 
     virtual ~_Rc() = default;
     virtual void *_unwrap() = 0;
 
-    bool dying()
-    {
+    bool dying() {
         return _strong == 0;
     }
 
-    _Rc *collect()
-    {
-        if (_strong == 0 && _weak == 0)
-        {
+    _Rc *collect() {
+        if (_strong == 0 && _weak == 0) {
             delete this;
             return nullptr;
         }
@@ -34,41 +31,34 @@ struct _Rc
         return this;
     }
 
-    _Rc *ref_strong()
-    {
+    _Rc *ref_strong() {
         _strong++;
         return this;
     }
 
-    _Rc *deref_strong()
-    {
+    _Rc *deref_strong() {
         _strong--;
         return collect();
     }
 
     template <typename T>
-    T &unwrap_strong()
-    {
+    T &unwrap_strong() {
         return *static_cast<T *>(_unwrap());
     }
 
-    _Rc *ref_weak()
-    {
+    _Rc *ref_weak() {
         _weak++;
         return this;
     }
 
-    _Rc *deref_weak()
-    {
+    _Rc *deref_weak() {
         _weak--;
         return collect();
     }
 
     template <typename T>
-    T *unwrap_weak()
-    {
-        if (_strong == 0)
-        {
+    T *unwrap_weak() {
+        if (_strong == 0) {
             Debug::panic("Dereferencing weak reference to dead object");
         }
 
@@ -77,21 +67,23 @@ struct _Rc
 };
 
 template <typename T>
-struct Rc : _Rc
-{
+struct Rc : _Rc {
     T _buf;
     Rc(T &&buf) : _buf(std::forward<T>(buf)) {}
     void *_unwrap() override { return &_buf; }
 };
 
 template <typename T>
-struct Strong
-{
+struct Strong {
     _Rc *_rc = nullptr;
 
     constexpr Strong() = delete;
 
     constexpr Strong(_Rc *ptr) : _rc(ptr->ref_strong()) {}
+
+    constexpr Strong(Strong const &other) : _rc(other._rc->ref_strong()) {}
+
+    constexpr Strong(Strong &&other) : _rc(std::exchange(other._rc, nullptr)) {}
 
     template <Meta::Derive<T> U>
     constexpr Strong(Strong<U> const &other) : _rc(other._rc->ref_strong()) {}
@@ -99,29 +91,26 @@ struct Strong
     template <Meta::Derive<T> U>
     constexpr Strong(Strong<U> &&other) : _rc(std::exchange(other._rc, nullptr)) {}
 
-    constexpr ~Strong()
-    {
+    constexpr ~Strong() {
         if (_rc)
             _rc = _rc->deref_strong();
     }
 
     constexpr Strong &operator=(Strong const &other) { return *this = Strong(other); }
 
-    constexpr Strong &operator=(Strong &&other)
-    {
+    constexpr Strong &operator=(Strong &&other) {
         std::swap(_rc, other._rc);
         return *this;
     }
 
-    constexpr T *operator->()
-    {
+    constexpr T *operator->() const {
         if (!_rc)
             Debug::panic("Deferencing moved from Strong<T>");
 
         return &_rc->unwrap_strong<T>();
     }
-    constexpr T &operator*()
-    {
+
+    constexpr T &operator*() const {
         if (!_rc)
             Debug::panic("Deferencing moved from Strong<T>");
 
@@ -133,14 +122,12 @@ template <typename T>
 using OptStrong = Opt<Strong<T>>;
 
 template <typename T, typename... Args>
-constexpr static Strong<T> make_strong(Args... args)
-{
+constexpr static Strong<T> make_strong(Args... args) {
     return {new Rc<T>(T{std::forward<Args>(args)...})};
 }
 
 template <typename T>
-struct Weak
-{
+struct Weak {
     _Rc *_rc = nullptr;
 
     constexpr Weak() = delete;
@@ -154,50 +141,42 @@ struct Weak
     template <Meta::Derive<T> U>
     constexpr Weak(Weak<U> &&other) { std::swap(_rc, other._rc); }
 
-    constexpr ~Weak()
-    {
+    constexpr ~Weak() {
         if (_rc)
             _rc->deref_weak();
     }
 
     constexpr Weak &operator=(Weak const &other) { return *this = Weak(other); }
 
-    constexpr Weak &operator=(Weak &&other)
-    {
+    constexpr Weak &operator=(Weak &&other) {
         std::swap(_rc, other._rc);
         return *this;
     }
 
-    operator bool()
-    {
+    operator bool() {
         return _rc && _rc->dying() && (_rc = _rc->deref_weak());
     }
 
-    operator bool() const
-    {
+    operator bool() const {
         return _rc && _rc->dying();
     }
 
-    T *operator->()
-    {
+    T *operator->() {
         if (!_rc)
             Debug::panic("Deferencing moved from Weak<T>");
 
         return _rc->unwrap_weak<T>();
     }
 
-    T *unwrap()
-    {
+    T *unwrap() {
         if (!_rc)
             Debug::panic("Deferencing moved from Weak<T>");
 
         return _rc->unwrap_weak<T>();
     }
 
-    void visit(auto visitor)
-    {
-        if (*this)
-        {
+    void visit(auto visitor) {
+        if (*this) {
             visitor(**this);
         }
     }

@@ -2,19 +2,16 @@
 
 #include <karm-base/std.h>
 
-namespace Hjert::Api
-{
+namespace Hjert::Api {
 
 using Id = uint64_t;
 
-struct Message
-{
+struct Message {
     uint64_t flags;
     Id from;
     Id to;
 
-    union
-    {
+    union {
         uint64_t args[5];
         uint8_t buf[sizeof(args)];
     };

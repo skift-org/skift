@@ -1,12 +1,11 @@
 #pragma once
 
-namespace Karm::Base
-{
+#include "_prelude.h"
 
-struct Error
-{
-    enum Code
-    {
+namespace Karm::Base {
+
+struct [[nodiscard]] Error {
+    enum Code {
         OK,
 
         NOT_FOUND,

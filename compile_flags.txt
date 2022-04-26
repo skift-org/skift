@@ -1,5 +1,10 @@
 -xc++
+-Og
 -std=c++20
+-fno-exceptions
+-fno-rtti
+-fsanitize=address
+-fsanitize=undefined
 -Isrc
 -Wall
 -Wextra

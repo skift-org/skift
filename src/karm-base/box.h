@@ -3,14 +3,15 @@
 #include <karm-debug/panic.h>
 #include <karm-meta/traits.h>
 
+#include "_prelude.h"
+
+#include "opt.h"
 #include "std.h"
 
-namespace Karm::Base
-{
+namespace Karm::Base {
 
 template <typename T>
-struct Box
-{
+struct Box {
     T *_ptr = nullptr;
 
     constexpr Box() = delete;
@@ -18,15 +19,13 @@ struct Box
     constexpr Box(Box const &) = delete;
 
     template <Meta::Derive<T> U>
-    constexpr Box(Box<U> &&other)
-    {
+    constexpr Box(Box<U> &&other) {
         delete _ptr;
         _ptr = other._ptr;
         other._ptr = nullptr;
     }
 
-    constexpr ~Box()
-    {
+    constexpr ~Box() {
         if (_ptr)
             delete _ptr;
     }
@@ -34,23 +33,20 @@ struct Box
     constexpr Box &operator=(Box const &) = delete;
 
     template <Meta::Derive<T> U>
-    constexpr Box &operator=(Box &&other)
-    {
+    constexpr Box &operator=(Box &&other) {
         delete _ptr;
         _ptr = other._ptr;
         other._ptr = nullptr;
         return *this;
     }
 
-    constexpr T *operator->()
-    {
+    constexpr T *operator->() {
         if (!_ptr)
             Debug::panic("Deferencing moved from Box<T>");
 
         return _ptr;
     }
-    constexpr T &operator*()
-    {
+    constexpr T &operator*() {
         if (!_ptr)
             Debug::panic("Deferencing moved from Box<T>");
 
@@ -58,9 +54,11 @@ struct Box
     }
 };
 
+template <typename T>
+using OptBox = Opt<Box<T>>;
+
 template <typename T, typename... Args>
-constexpr static Box<T> make_box(Args... args)
-{
+constexpr static Box<T> make_box(Args... args) {
     return {new T(std::forward<Args>(args)...)};
 }
 

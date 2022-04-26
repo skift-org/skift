@@ -2,8 +2,11 @@ BasedOnStyle: LLVM
 UseTab: Never
 IndentWidth: 4
 TabWidth: 4
-BreakBeforeBraces: Allman
+
 AllowShortIfStatementsOnASingleLine: false
+AllowShortLambdasOnASingleLine: None
+LambdaBodyIndentation: OuterScope
+
 IndentCaseLabels: false
 ColumnLimit: 0
 AccessModifierOffset: -4
@@ -13,11 +16,12 @@ BreakInheritanceList: AfterColon
 IndentPPDirectives: AfterHash
 ForEachMacros: ["__dummy_foreach"]
 SpaceBeforeParens: ControlStatementsExceptForEachMacros
+
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:           '<[[:alnum:].\/-]+>'
-    Priority:        0
-    SortPriority:    0
-  - Regex:           '"[[:alnum:].\/-]+"'
-    Priority:        10
-    SortPriority:    10
+    - Regex: '<[[:alnum:].\/-]+>'
+      Priority: 0
+      SortPriority: 0
+    - Regex: '"[[:alnum:].\/-]+"'
+      Priority: 10
+      SortPriority: 10

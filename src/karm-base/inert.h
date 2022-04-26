@@ -14,33 +14,26 @@ struct Inert {
 
     Inert(){};
 
-    Inert(T &&other) {
-        construct(std::forward<T>(other));
-    }
-
-    Inert &operator=(T &&other) {
-        construct(std::forward<T>(other));
-        return *this;
-    }
-
     ~Inert() {}
 
     template <typename... Args>
-    void construct(Args... args) {
+    void ctor(Args... args) {
         new (&_value) T(std::forward<Args>(args)...);
     }
 
-    void destroy() {
+    void dtor() {
         _value.~T();
     }
 
-    T move() {
-        T value = std::move(_value);
-        destroy();
-        return value;
+    T &unwrap() {
+        return _value;
     }
 
-    T &unwrap() { return _value; }
+    T take() {
+        T value = std::move(_value);
+        dtor();
+        return value;
+    }
 };
 
 }; // namespace Karm::Base

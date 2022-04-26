@@ -25,7 +25,7 @@ struct Vec {
         _len = other._len;
         _buf = new Inert<T>[_cap];
         for (size_t i = 0; i < _len; i++) {
-            _buf[i].construct(std::move(other._buf[i]));
+            _buf[i].ctor(other.unwrap[i]);
         }
     }
 
@@ -36,17 +36,17 @@ struct Vec {
     }
 
     Vec(std::initializer_list<T> &&list) {
-        _cap = list.size();
+        _cap = list.len();
         _len = _cap;
         _buf = new Inert<T>[_cap];
         for (size_t i = 0; i < _len; i++) {
-            _buf[i].construct(std::forward<T>(list[i]));
+            _buf[i].ctor(std::move<T>(list[i]));
         }
     }
 
     ~Vec() {
         for (size_t i = 0; i < _len; i++) {
-            _buf[i].destroy();
+            _buf[i].dtor();
         }
 
         delete[] _buf;
@@ -68,37 +68,33 @@ struct Vec {
         if (cap <= _cap)
             return;
 
-        Vec tmp(cap);
+        Inert<T> *tmp = new Inert<T>[cap];
         for (size_t i = 0; i < _len; i++) {
-            tmp._buf[i].construct(_buf[i].move());
+            tmp[i].ctor(_buf[i].take());
         }
 
-        std::swap(_buf, tmp._buf);
-        std::swap(_cap, tmp._cap);
+        delete[] _buf;
+        _buf = tmp;
+        _cap = cap;
     }
 
     void insert(size_t index, T const &value) {
-        ensure(_len + 1);
-        for (size_t i = _len; i > index; i--) {
-            _buf[i] = _buf[i - 1].move();
-        }
-        _buf[index].construct(value);
-        _len++;
+        insert(index, T(value));
     }
 
     void insert(size_t index, T &&value) {
         ensure(_len + 1);
         for (size_t i = _len; i > index; i--) {
-            _buf[i] = _buf[i - 1].move();
+            _buf[i].ctor(_buf[i - 1].take());
         }
-        _buf[index].construct(std::forward<T>(value));
+        _buf[index].ctor(std::forward<T>(value));
         _len++;
     }
 
     T remove(size_t index) {
-        T tmp = _buf[index].move();
+        T tmp = _buf[index].take();
         for (size_t i = index; i < _len - 1; i++) {
-            _buf[i] = _buf[i + 1].move();
+            _buf[i].construct(_buf[i + 1].take());
         }
         _len--;
         return tmp;
@@ -106,7 +102,7 @@ struct Vec {
 
     void clear() {
         for (size_t i = 0; i < _len; i++) {
-            _buf[i].destroy();
+            _buf[i].dtor();
         }
         _len = 0;
     }
@@ -135,6 +131,10 @@ struct Vec {
     }
 
     T *begin() {
+        if (_len == 0) {
+            return nullptr;
+        }
+
         return &_buf[0].unwrap();
     }
 

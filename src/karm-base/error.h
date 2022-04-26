@@ -2,6 +2,8 @@
 
 #include "_prelude.h"
 
+#include "macros.h"
+
 namespace Karm::Base {
 
 struct [[nodiscard]] Error {
@@ -54,11 +56,14 @@ struct [[nodiscard]] Error {
     constexpr Error(Code code) : _code(code) {}
 
     operator bool() const { return _code == OK; }
+
     Code code() const { return _code; }
-    Error error() const { return *this; }
+    Error none() const { return *this; }
     Error unwrap() const { return *this; }
 };
 
 inline constexpr Error::Code OK = Error::OK;
+
+static_assert(Tryable<Error>);
 
 } // namespace Karm::Base

@@ -16,8 +16,11 @@ struct [[nodiscard]] Result {
     constexpr Result(Value value) : _error(), _value(value) {}
 
     constexpr operator bool() { return _error; }
-    constexpr Error error() const { return _error; }
-    constexpr Value unwrap() { return _value.unwrap(); }
+    constexpr Error none() const { return _error; }
+    constexpr Value &unwrap() { return _value.unwrap(); }
+    constexpr Value take() { return _value.take(); }
 };
+
+static_assert(Tryable<Result<int>>);
 
 } // namespace Karm::Base

@@ -3,6 +3,7 @@
 #include <karm-base/std.h>
 
 namespace Karm::Meta {
+
 using TypeId = uintptr_t;
 
 template <typename T>

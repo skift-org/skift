@@ -7,12 +7,10 @@
 #include <karm-base/tuple.h>
 #include <karm-base/vec.h>
 #include <karm-meta/id.h>
-#include <stdio.h>
-#include <typeinfo>
 
 namespace Karm::Ui {
 
-struct Node : public Base::Vec<Base::Opt<Base::Strong<Node>>> {
+struct Node : public Base::Vec<Base::OptStrong<Node>> {
     void dump(int indent) {
         for (int i = 0; i < indent; i++) {
             printf(" ");
@@ -27,7 +25,7 @@ struct Node : public Base::Vec<Base::Opt<Base::Strong<Node>>> {
 };
 
 struct Ctx {
-    Base::OptStrong<Node> _curr;
+    Base::OptStrong<Node> _curr = Base::make_strong<Node>();
 
     void scope(auto inner) {
         auto prev = _curr.unwrap();
@@ -82,13 +80,26 @@ using namespace Karm::Ui;
 
 static void app(Ctx &ctx) {
     window(ctx, [&] {
-
+        vstack(ctx, [&] {
+            text(ctx, [&] {
+            });
+            hstack(ctx, [&] {
+                input(ctx, [&] {
+                });
+                button(ctx, [&] {
+                });
+            });
+            hstack(ctx, [&] {
+                button(ctx, [&] {
+                });
+                button(ctx, [&] {
+                });
+            });
+        });
     });
 }
 
 int main(int, char **) {
-    printf("TEST\n");
-
     Ctx ctx;
     app(ctx);
     ctx._curr.with([](auto &node) {

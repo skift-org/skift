@@ -67,7 +67,7 @@ struct _Rc {
 };
 
 template <typename T>
-struct Rc : _Rc {
+struct Rc : public _Rc {
     T _buf;
     Rc(T &&buf) : _buf(std::forward<T>(buf)) {}
     void *_unwrap() override { return &_buf; }
@@ -92,11 +92,14 @@ struct Strong {
     constexpr Strong(Strong<U> &&other) : _rc(std::exchange(other._rc, nullptr)) {}
 
     constexpr ~Strong() {
-        if (_rc)
+        if (_rc) {
             _rc = _rc->deref_strong();
+        }
     }
 
-    constexpr Strong &operator=(Strong const &other) { return *this = Strong(other); }
+    constexpr Strong &operator=(Strong const &other) {
+        return *this = Strong(other);
+    }
 
     constexpr Strong &operator=(Strong &&other) {
         std::swap(_rc, other._rc);
@@ -104,15 +107,17 @@ struct Strong {
     }
 
     constexpr T *operator->() const {
-        if (!_rc)
+        if (!_rc) {
             Debug::panic("Deferencing moved from Strong<T>");
+        }
 
         return &_rc->unwrap_strong<T>();
     }
 
     constexpr T &operator*() const {
-        if (!_rc)
+        if (!_rc) {
             Debug::panic("Deferencing moved from Strong<T>");
+        }
 
         return _rc->unwrap_strong<T>();
     }
@@ -142,8 +147,9 @@ struct Weak {
     constexpr Weak(Weak<U> &&other) { std::swap(_rc, other._rc); }
 
     constexpr ~Weak() {
-        if (_rc)
+        if (_rc) {
             _rc->deref_weak();
+        }
     }
 
     constexpr Weak &operator=(Weak const &other) { return *this = Weak(other); }
@@ -168,7 +174,7 @@ struct Weak {
         return _rc->unwrap_weak<T>();
     }
 
-    T *unwrap() {
+    T &unwrap() {
         if (!_rc)
             Debug::panic("Deferencing moved from Weak<T>");
 

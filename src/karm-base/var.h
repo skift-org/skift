@@ -78,7 +78,20 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    T unwrap() {
+    T &unwrap() {
+        if (_type != Meta::index_of<T, Ts...>()) {
+            Debug::panic("Unwrapping wrong type");
+        }
+
+        return *static_cast<T *>(_buf);
+    }
+
+    template <Meta::Contains<Ts...> T>
+    T take() {
+        if (_type != Meta::index_of<T, Ts...>()) {
+            Debug::panic("Taking wrong type");
+        }
+
         return std::move(*static_cast<T *>(_buf));
     }
 
@@ -90,15 +103,13 @@ struct Var {
     }
 
     void visit(auto visitor) {
-        Meta::index_cast<Ts...>(_type, _buf,
-                                [&]<typename U>(U *ptr) {
+        Meta::index_cast<Ts...>(_type, _buf, [&]<typename U>(U *ptr) {
             visitor(*ptr);
         });
     }
 
     void visit(auto visitor) const {
-        Meta::index_cast<Ts...>(_type, _buf,
-                                [&]<typename U>(U const *ptr) {
+        Meta::index_cast<Ts...>(_type, _buf, [&]<typename U>(U const *ptr) {
             visitor(*ptr);
         });
     }

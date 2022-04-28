@@ -10,7 +10,7 @@ struct _Ops {
     void (*copy)(void *, void *);
 
     template <typename T>
-    static _Ops make() {
+    static auto make() -> _Ops {
         _Ops ops;
         ops.dtor = [](void *ptr) {
             delete static_cast<T *>(ptr);
@@ -25,17 +25,17 @@ struct _Ops {
 };
 
 struct Any {
-    Meta::TypeId _type;
+    Meta::Id _type;
     void *_buf;
     _Ops _ops;
 
     Any() = delete;
 
     template <typename T>
-    Any(T const &value) : _type(Meta::type_id<T>()), _buf(new T(value)), _ops(_Ops::make<T>()) {}
+    Any(T const &value) : _type(Meta::make_id<T>()), _buf(new T(value)), _ops(_Ops::make<T>()) {}
 
     template <typename T>
-    Any(T &&value) : _type(Meta::type_id<T>()), _buf(new T(std::move(value))), _ops(_Ops::make<T>()) {}
+    Any(T &&value) : _type(Meta::make_id<T>()), _buf(new T(std::move(value))), _ops(_Ops::make<T>()) {}
 
     Any(Any const &other) : _type(other._type), _buf(other._buf), _ops(other._ops) {
         _ops.copy(_buf, other._buf);
@@ -50,26 +50,26 @@ struct Any {
     }
 
     template <typename T>
-    Any &operator=(T const &value) {
+    auto operator=(T const &value) -> Any & {
         return *this = Any(value);
     }
 
     template <typename T>
-    Any &operator=(T &&value) {
+    auto operator=(T &&value) -> Any & {
         _ops.dtor(_buf);
 
-        _type = Meta::type_id<T>();
+        _type = Meta::make_id<T>();
         _buf = new T(std::move(value));
         _ops = _Ops::make<T>();
 
         return *this;
     }
 
-    Any &operator=(Any const &other) {
+    auto operator=(Any const &other) -> Any & {
         return *this = Any(other);
     }
 
-    Any &operator=(Any &&other) {
+    auto operator=(Any &&other) -> Any & {
         _ops.dtor(_buf);
 
         _type = other._type;
@@ -82,16 +82,16 @@ struct Any {
     }
 
     template <typename T>
-    T &unwrap() {
-        if (_type != Meta::type_id<T>()) {
+    auto unwrap() -> T & {
+        if (_type != Meta::make_id<T>()) {
             Debug::panic("Unwrapping wrong type");
         }
         return *static_cast<T *>(_buf);
     }
 
     template <typename T>
-    T const &unwrap() const {
-        if (_type != Meta::type_id<T>()) {
+    auto unwrap() const -> T const & {
+        if (_type != Meta::make_id<T>()) {
             Debug::panic("Unwrapping wrong type");
         }
         return *static_cast<T *>(_buf);
@@ -108,8 +108,8 @@ struct Any {
     }
 
     template <typename T>
-    bool is() const {
-        return _type == Meta::type_id<T>();
+    auto is() const -> bool {
+        return _type == Meta::make_id<T>();
     }
 };
 

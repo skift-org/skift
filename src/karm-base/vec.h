@@ -52,11 +52,11 @@ struct Vec {
         delete[] _buf;
     }
 
-    Vec &operator=(Vec const &other) {
+    auto operator=(Vec const &other) -> Vec & {
         return *this = Vec(other);
     }
 
-    Vec &operator=(Vec &&other) {
+    auto operator=(Vec &&other) -> Vec & {
         std::swap(_buf, other._buf);
         std::swap(_cap, other._cap);
         std::swap(_len, other._len);
@@ -91,7 +91,7 @@ struct Vec {
         _len++;
     }
 
-    T remove(size_t index) {
+    auto remove(size_t index) -> T {
         T tmp = _buf[index].take();
         for (size_t i = index; i < _len - 1; i++) {
             _buf[i].construct(_buf[i + 1].take());
@@ -115,14 +115,14 @@ struct Vec {
         insert(_len, std::forward<T>(value));
     }
 
-    Opt<T> pop() {
+    auto pop() -> Opt<T> {
         if (_len == 0)
             return NONE;
 
         return remove(_len - 1);
     }
 
-    OptRef<T> peek() {
+    auto peek() -> OptRef<T> {
         if (_len == 0) {
             return NONE;
         }
@@ -130,33 +130,24 @@ struct Vec {
         return Ref<T>(_buf[_len - 1]);
     }
 
-    T *begin() {
+    auto begin() -> T * {
         if (_len == 0) {
             return nullptr;
         }
-
         return &_buf[0].unwrap();
     }
 
-    T *end() {
-        return begin() + _len;
-    }
+    auto end() -> T * { return begin() + _len; }
 
-    T const *begin() const {
-        return &_buf[0].unwrap();
-    }
+    auto begin() const -> T const * { return &_buf[0].unwrap(); }
 
-    T const *end() const {
-        return begin() + _len;
-    }
+    auto end() const -> T const * { return begin() + _len; }
 
-    T *buf() {
-        return begin();
-    }
+    auto buf() -> T * { return begin(); }
 
-    size_t len() const {
-        return _len;
-    }
+    auto buf() const -> T const * { return begin(); }
+
+    auto len() const -> size_t { return _len; }
 };
 
 } // namespace Karm::Base

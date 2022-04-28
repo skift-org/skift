@@ -49,30 +49,30 @@ struct Opt {
 
     ~Opt() { release(); }
 
-    Opt &operator=(None) {
+    auto operator=(None) -> Opt & {
         release();
         return *this;
     }
 
-    Opt &operator=(T const &value) {
+    auto operator=(T const &value) -> Opt & {
         release();
         _present = true;
         _value.ctor(value);
         return *this;
     }
 
-    Opt &operator=(T &&value) {
+    auto operator=(T &&value) -> Opt & {
         release();
         _present = true;
         _value.ctor(std::forward<T>(value));
         return *this;
     }
 
-    Opt &operator=(Opt const &other) {
+    auto operator=(Opt const &other) -> Opt & {
         return *this = Opt(other);
     }
 
-    Opt &operator=(Opt &&other) {
+    auto operator=(Opt &&other) -> Opt & {
         release();
         if (other._present) {
             _value.ctor(other._value.take());
@@ -83,13 +83,13 @@ struct Opt {
 
     operator bool() const { return _present; }
 
-    T *operator->() { return &_value; }
+    auto operator->() -> T * { return &_value; }
 
-    T &operator*() { return *_value; }
+    auto operator*() -> T & { return *_value; }
 
-    T const *operator->() const { return &_value; }
+    auto operator->() const -> T const * { return &_value; }
 
-    T const &operator*() const { return *_value; }
+    auto operator*() const -> T const & { return *_value; }
 
     void release() {
         if (_present) {
@@ -98,18 +98,18 @@ struct Opt {
         }
     }
 
-    bool none() {
+    auto none() -> bool {
         return _present;
     }
 
-    T &unwrap() {
+    auto unwrap() -> T & {
         if (!_present) {
             Debug::panic("Unwrapping None");
         }
         return _value.unwrap();
     }
 
-    T take() {
+    auto take() -> T {
         if (!_present) {
             Debug::panic("Taking None");
         }

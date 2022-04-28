@@ -4,12 +4,16 @@
 
 namespace Karm::Meta {
 
-using TypeId = uintptr_t;
+using Id = uintptr_t;
 
 template <typename T>
-static TypeId type_id() {
+struct _Id {
     static uint32_t _;
-    return reinterpret_cast<TypeId>(&_);
+};
+
+template <typename T>
+static Id make_id() {
+    return reinterpret_cast<Id>(&_Id<T>::_);
 }
 
 } // namespace Karm::Meta

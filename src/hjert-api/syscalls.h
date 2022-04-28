@@ -12,7 +12,7 @@ template <Id id, typename Self>
 struct Syscall {
     static constexpr Id ID = id;
 
-    Karm::Base::Error call() {
+    auto call() -> Karm::Base::Error {
         return static_cast<Karm::Base::Error::Code>(do_syscall(this, sizeof(Self)));
     }
 };

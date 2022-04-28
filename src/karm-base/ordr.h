@@ -23,39 +23,39 @@ struct Ordr {
 
     constexpr Ordr(Value value) : _value(value) {}
 
-    bool operator==(const Ordr &other) const = default;
+    constexpr auto operator==(const Ordr &other) const -> bool = default;
 
-    constexpr bool is_eq() const { return _value == EQUAL; }
-    constexpr bool is_ne() const { return _value != EQUAL; }
-    constexpr bool is_lt() const { return _value == LESS; }
-    constexpr bool is_gt() const { return _value == GREATER; }
-    constexpr bool is_lteq() const { return _value != GREATER; }
-    constexpr bool is_gteq() const { return _value != LESS; }
+    constexpr auto is_eq() const -> bool { return _value == EQUAL; }
+    constexpr auto is_ne() const -> bool { return _value != EQUAL; }
+    constexpr auto is_lt() const -> bool { return _value == LESS; }
+    constexpr auto is_gt() const -> bool { return _value == GREATER; }
+    constexpr auto is_lteq() const -> bool { return _value != GREATER; }
+    constexpr auto is_gteq() const -> bool { return _value != LESS; }
 };
 
 namespace Op {
 
-constexpr bool eq(auto const &lhs, auto const &rhs) {
+constexpr auto eq(auto const &lhs, auto const &rhs) -> bool {
     return lhs.cmp(rhs).is_eq();
 }
 
-constexpr bool ne(auto const &lhs, auto const &rhs) {
+constexpr auto ne(auto const &lhs, auto const &rhs) -> bool {
     return lhs.cmp(rhs).is_ne();
 }
 
-constexpr bool lt(auto const &lhs, auto const &rhs) {
+constexpr auto lt(auto const &lhs, auto const &rhs) -> bool {
     return lhs.cmp(rhs).is_lt();
 }
 
-constexpr bool gt(auto const &lhs, auto const &rhs) {
+constexpr auto gt(auto const &lhs, auto const &rhs) -> bool {
     return lhs.cmp(rhs).is_lt();
 }
 
-constexpr bool gteq(auto const &lhs, auto const &rhs) {
+constexpr auto gteq(auto const &lhs, auto const &rhs) -> bool {
     return lhs.cmp(rhs).is_gteq();
 }
 
-constexpr bool lteq(auto const &lhs, auto const &rhs) {
+constexpr auto lteq(auto const &lhs, auto const &rhs) -> bool {
     return lhs.cmp(rhs).is_lteq();
 }
 

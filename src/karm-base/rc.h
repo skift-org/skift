@@ -18,11 +18,11 @@ struct _Rc {
     virtual ~_Rc() = default;
     virtual void *_unwrap() = 0;
 
-    bool dying() {
+    auto dying() -> bool {
         return _strong == 0;
     }
 
-    _Rc *collect() {
+    auto collect() -> _Rc * {
         if (_strong == 0 && _weak == 0) {
             delete this;
             return nullptr;
@@ -31,33 +31,33 @@ struct _Rc {
         return this;
     }
 
-    _Rc *ref_strong() {
+    auto ref_strong() -> _Rc * {
         _strong++;
         return this;
     }
 
-    _Rc *deref_strong() {
+    auto deref_strong() -> _Rc * {
         _strong--;
         return collect();
     }
 
     template <typename T>
-    T &unwrap_strong() {
+    auto unwrap_strong() -> T & {
         return *static_cast<T *>(_unwrap());
     }
 
-    _Rc *ref_weak() {
+    auto ref_weak() -> _Rc * {
         _weak++;
         return this;
     }
 
-    _Rc *deref_weak() {
+    auto deref_weak() -> _Rc * {
         _weak--;
         return collect();
     }
 
     template <typename T>
-    T *unwrap_weak() {
+    auto unwrap_weak() -> _Rc * {
         if (_strong == 0) {
             Debug::panic("Dereferencing weak reference to dead object");
         }
@@ -70,7 +70,7 @@ template <typename T>
 struct Rc : public _Rc {
     T _buf;
     Rc(T &&buf) : _buf(std::forward<T>(buf)) {}
-    void *_unwrap() override { return &_buf; }
+    auto _unwrap() -> void * override { return &_buf; }
 };
 
 template <typename T>
@@ -97,16 +97,16 @@ struct Strong {
         }
     }
 
-    constexpr Strong &operator=(Strong const &other) {
+    constexpr auto operator=(Strong const &other) -> Strong & {
         return *this = Strong(other);
     }
 
-    constexpr Strong &operator=(Strong &&other) {
+    constexpr auto operator=(Strong &&other) -> Strong & {
         std::swap(_rc, other._rc);
         return *this;
     }
 
-    constexpr T *operator->() const {
+    constexpr auto operator->() const -> T * {
         if (!_rc) {
             Debug::panic("Deferencing moved from Strong<T>");
         }
@@ -114,7 +114,7 @@ struct Strong {
         return &_rc->unwrap_strong<T>();
     }
 
-    constexpr T &operator*() const {
+    constexpr auto operator*() const -> T & {
         if (!_rc) {
             Debug::panic("Deferencing moved from Strong<T>");
         }
@@ -127,7 +127,7 @@ template <typename T>
 using OptStrong = Opt<Strong<T>>;
 
 template <typename T, typename... Args>
-constexpr static Strong<T> make_strong(Args... args) {
+constexpr static auto make_strong(Args... args) -> Strong<T> {
     return {new Rc<T>(T{std::forward<Args>(args)...})};
 }
 
@@ -152,9 +152,11 @@ struct Weak {
         }
     }
 
-    constexpr Weak &operator=(Weak const &other) { return *this = Weak(other); }
+    constexpr auto operator=(Weak const &other) -> Weak & {
+        return *this = Weak(other);
+    }
 
-    constexpr Weak &operator=(Weak &&other) {
+    constexpr auto operator=(Weak &&other) -> Weak & {
         std::swap(_rc, other._rc);
         return *this;
     }
@@ -167,14 +169,14 @@ struct Weak {
         return _rc && _rc->dying();
     }
 
-    T *operator->() {
+    auto operator->() -> T * {
         if (!_rc)
             Debug::panic("Deferencing moved from Weak<T>");
 
         return _rc->unwrap_weak<T>();
     }
 
-    T &unwrap() {
+    auto unwrap() -> T & {
         if (!_rc)
             Debug::panic("Deferencing moved from Weak<T>");
 

@@ -23,7 +23,7 @@ struct List {
         _head = Node{std::move(value), _head};
     }
 
-    Opt<T> pop() {
+    auto pop() -> Opt<T> {
         if (!_head) {
             return NONE;
         }
@@ -45,7 +45,7 @@ struct List {
         return NONE;
     }
 
-    size_t len() {
+    auto len() -> size_t {
         size_t len = 0;
         for (auto const &i : *this) {
             len++;

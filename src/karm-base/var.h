@@ -45,12 +45,12 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    Var &operator=(T const &value) {
+    auto operator=(T const &value) -> Var & {
         return *this = Var(value);
     }
 
     template <Meta::Contains<Ts...> T>
-    Var &operator=(T &&value) {
+    auto operator=(T &&value) -> Var & {
         Meta::index_cast<Ts...>(_type, _buf, []<typename U>(U &ptr) {
             ptr.~U();
         });
@@ -61,9 +61,9 @@ struct Var {
         return *this;
     }
 
-    Var &operator=(Var const &other) { return *this = Var(other); }
+    auto operator=(Var const &other) -> Var & { return *this = Var(other); }
 
-    Var &operator=(Var &&other) {
+    auto operator=(Var &&other) -> Var & {
         Meta::index_cast<Ts...>(_type, _buf, []<typename T>(T &ptr) {
             ptr.~T();
         });
@@ -78,7 +78,7 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    T &unwrap() {
+    auto unwrap() -> T & {
         if (_type != Meta::index_of<T, Ts...>()) {
             Debug::panic("Unwrapping wrong type");
         }
@@ -87,7 +87,7 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    T take() {
+    auto take() -> T {
         if (_type != Meta::index_of<T, Ts...>()) {
             Debug::panic("Taking wrong type");
         }
@@ -115,7 +115,7 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    bool is() {
+    auto is() -> bool {
         return _type == Meta::index_of<T, Ts...>();
     }
 };

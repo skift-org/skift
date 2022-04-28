@@ -57,9 +57,9 @@ struct [[nodiscard]] Error {
 
     operator bool() const { return _code == OK; }
 
-    Code code() const { return _code; }
-    Error none() const { return *this; }
-    Error unwrap() const { return *this; }
+    auto code() const -> Code { return _code; }
+    auto none() const -> Error { return *this; }
+    auto unwrap() const -> Error { return *this; }
 };
 
 inline constexpr Error::Code OK = Error::OK;

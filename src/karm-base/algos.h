@@ -7,9 +7,9 @@
 
 namespace Karm::Base {
 
-static Opt<size_t> index_of(auto const &container, auto const &value) {
+static auto index_of(auto const &c, auto const &value) -> Opt<size_t> {
     size_t index = 0;
-    for (auto const &i : container) {
+    for (auto const &i : c) {
         if (i == value) {
             return index;
         }
@@ -18,8 +18,8 @@ static Opt<size_t> index_of(auto const &container, auto const &value) {
     return NONE;
 }
 
-static constexpr bool any(auto const &container, auto const &predicate) {
-    for (auto const &i : container) {
+static auto any(auto const &c, auto const &predicate) -> bool {
+    for (auto const &i : c) {
         if (predicate(i)) {
             return true;
         }
@@ -27,8 +27,8 @@ static constexpr bool any(auto const &container, auto const &predicate) {
     return false;
 }
 
-static constexpr bool all(auto const &container, auto const &predicate) {
-    for (auto const &i : container) {
+static auto all(auto const &c, auto const &predicate) -> bool {
+    for (auto const &i : c) {
         if (!predicate(i)) {
             return false;
         }
@@ -37,8 +37,8 @@ static constexpr bool all(auto const &container, auto const &predicate) {
     return true;
 }
 
-static constexpr bool none(auto const &container, auto const &predicate) {
-    for (auto const &i : container) {
+static auto none(auto const &c, auto const &predicate) -> bool {
+    for (auto const &i : c) {
         if (predicate(i)) {
             return false;
         }
@@ -47,9 +47,8 @@ static constexpr bool none(auto const &container, auto const &predicate) {
     return true;
 }
 
-static constexpr auto find(auto const &container, auto const &predicate)
-    -> Opt<decltype(*container.first())> {
-    for (auto const &i : container) {
+static auto find(auto const &c, auto const &predicate) -> Opt<decltype(*c.first())> {
+    for (auto const &i : c) {
         if (predicate(i)) {
             return i;
         }
@@ -58,13 +57,13 @@ static constexpr auto find(auto const &container, auto const &predicate)
     return NONE;
 }
 
-static constexpr size_t len(auto const &container) {
-    if constexpr (requires { container.len(); }) {
-        return container.len();
+static auto len(auto const &c) -> size_t {
+    if (requires { c.len(); }) {
+        return c.len();
     } else {
         size_t len = 0;
 
-        for (auto const &i : container) {
+        for (auto const &i : c) {
             len++;
         }
 
@@ -72,21 +71,20 @@ static constexpr size_t len(auto const &container) {
     }
 }
 
-static constexpr auto map(auto const &container, auto const &mapper)
-    -> decltype(container) {
-    decltype(container) result;
+static auto map(auto const &c, auto const &mapper) -> decltype(c) {
+    decltype(c) result;
 
-    for (auto const &i : container) {
+    for (auto const &i : c) {
         result.push(mapper(i));
     }
 
     return result;
 }
 
-static constexpr auto filter(auto const &container, auto const &predicate) -> decltype(container) {
-    decltype(container) result;
+static auto filter(auto const &c, auto const &predicate) -> decltype(c) {
+    decltype(c) result;
 
-    for (auto const &i : container) {
+    for (auto const &i : c) {
         if (predicate(i)) {
             result.push(i);
         }
@@ -95,21 +93,20 @@ static constexpr auto filter(auto const &container, auto const &predicate) -> de
     return result;
 }
 
-static constexpr auto apply(auto const &container, auto const &applier) -> decltype(container) {
-    decltype(container) result;
+static auto apply(auto const &c, auto const &applier) -> decltype(c) {
+    decltype(c) result;
 
-    for (auto const &i : container) {
+    for (auto const &i : c) {
         applier(i);
     }
 
     return result;
 }
 
-static constexpr auto reduce(auto const &container, auto const &reducer, auto const &initial)
-    -> decltype(initial) {
+static auto reduce(auto const &c, auto const &reducer, auto const &initial) -> decltype(initial) {
     auto result = initial;
 
-    for (auto const &i : container) {
+    for (auto const &i : c) {
         result = reducer(result, i);
     }
 

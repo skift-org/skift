@@ -11,14 +11,14 @@ struct Header {
 };
 
 struct Message {
-    struct Encoder : Io::Writer {
-        Io::Result write(void const *, size_t size);
+    struct Encoder {
+        auto write(void const *, size_t size) -> Base::Result<size_t>;
         Message finalize();
     };
 
-    struct Decoder : Io::Reader {
+    struct Decoder {
         Decoder(Message &message);
-        Io::Result read(void *data, size_t size);
+        auto read(void *data, size_t size) -> Base::Result<size_t>;
     };
 };
 
@@ -27,8 +27,8 @@ struct Procedure {
     constexpr static Id ID = id;
     constexpr static bool do_return = false;
 
-    void encode(Io::Writer &writer, Args &&...args) {
-        (Base::pack(writer, std::forward<Args>(args)), ...);
+    auto encode(Io::Writer auto &writer, Args &&...args) -> Base::Result<size_t> {
+        return Base::pack(writer, std::forward<Args>(args)...);
     }
 };
 
@@ -38,20 +38,20 @@ struct Function : public Procedure<id, Args...> {
 
     constexpr static bool do_return = true;
 
-    Io::Result decode(Io::Reader &reader, Ret &ret) {
+    auto decode(Io::Reader auto &reader, Ret &ret) -> Base::Result<size_t> {
         return Base::unpack(reader, ret);
     }
 };
 
-Base::Error do_procedure_call(Message req);
+auto do_procedure_call(Message req) -> Base::Error;
 
-Base::Error do_function_call(Message req, Message &resp);
+auto do_function_call(Message req, Message &resp) -> Base::Error;
 
 struct Endpoint {
 };
 
 struct Peer {
-    static Peer &self();
+    static auto self() -> Peer &;
 
     void handle(Message &message);
 
@@ -67,7 +67,7 @@ struct Handle {
     uint64_t _value;
 
     template <typename Func, typename... Args>
-    Base::Result<typename Func::Return> call(Args &&...args) {
+    auto call(Args &&...args) -> Base::Result<typename Func::Return> {
         Func func;
 
         Message::Encoder encoder;

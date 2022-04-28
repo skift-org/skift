@@ -62,12 +62,12 @@ struct Func<Out(In...)> {
 
     // clang-format on
 
-    Out operator()(In... in) {
+    auto operator()(In... in) -> Out {
         return (*_wrap)(std::forward<In>(in)...);
     }
 
     template <typename F>
-    Func &operator=(F f) {
+    auto operator=(F f) -> Func & {
         _wrap = make_box(Wrap<F>{std::forward<F>(f)});
         return *this;
     }

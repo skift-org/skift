@@ -1,27 +1,44 @@
 #pragma once
 
+#include <karm-base/macros.h>
 #include <karm-base/result.h>
+#include <karm-meta/same.h>
 
 namespace Karm::Io {
 
-using Result = Base::Result<size_t>;
+struct Seek {
+    enum class Whence {
+        BEGIN,
+        CURRENT,
+        END,
+    };
 
-struct Writer {
-    virtual Result write(void const *data, size_t size) = 0;
-};
+    Whence whence;
+    ssize_t offset;
 
-struct Reader {
-    virtual Result read(void *data, size_t size) = 0;
-};
+    static auto from_begin(ssize_t offset) -> Seek {
+        return Seek{Whence::BEGIN, offset};
+    }
 
-struct Sink : public Writer {
-    Result write(void const *, size_t size) { return size; }
-};
+    static auto from_current(ssize_t offset) -> Seek {
+        return Seek{Whence::CURRENT, offset};
+    }
 
-struct Zero : public Reader {
-    Result read(void *data, size_t size) {
-        memset(data, 0, size);
-        return size;
+    static Seek from_end(ssize_t offset) {
+        return Seek{Whence::END, offset};
+    }
+
+    auto apply(ssize_t current) const -> size_t {
+        switch (whence) {
+        case Whence::BEGIN:
+            return offset;
+
+        case Whence::CURRENT:
+            return current + offset;
+            
+        case Whence::END:
+            return -offset;
+        }
     }
 };
 

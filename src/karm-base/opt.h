@@ -36,7 +36,7 @@ struct Opt {
 
     Opt(Opt const &other) : _present(other._present) {
         if (_present) {
-            _value.ctor(other._value);
+            _value.ctor(other._value.unwrap());
         }
     }
 
@@ -75,6 +75,7 @@ struct Opt {
     auto operator=(Opt &&other) -> Opt & {
         release();
         if (other._present) {
+            _present = true;
             _value.ctor(other._value.take());
             other.release();
         }
@@ -118,10 +119,12 @@ struct Opt {
         return v;
     }
 
-    void with(auto visitor) {
+    bool with(auto visitor) {
         if (_present) {
             visitor(_value.unwrap());
+            return true;
         }
+        return false;
     }
 
     void visit(auto visitor) {

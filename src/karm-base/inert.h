@@ -29,6 +29,10 @@ struct Inert {
         return _value;
     }
 
+    auto unwrap() const -> T const & {
+        return _value;
+    }
+
     auto take() -> T {
         T value = std::move(_value);
         dtor();

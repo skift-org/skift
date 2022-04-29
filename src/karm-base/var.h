@@ -96,10 +96,12 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    void with(auto visitor) {
+    bool with(auto visitor) {
         if (_type == Meta::index_of<T, Ts...>()) {
             visitor(*static_cast<T *>(_buf));
+            return true;
         }
+        return false;
     }
 
     void visit(auto visitor) {

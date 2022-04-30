@@ -5,8 +5,10 @@
 #include <karm-base/func.h>
 #include <karm-base/rc.h>
 #include <karm-base/tuple.h>
+#include <karm-base/var.h>
 #include <karm-base/vec.h>
 #include <karm-meta/id.h>
+#include <karm-text/str.h>
 
 namespace Karm::Ui {
 
@@ -45,7 +47,22 @@ struct Node : public Base::Cons<Base::OptStrong<Node>, Base::OptStrong<Node>> {
     }
 };
 
-using Builder = Base::Func<void(struct Ctx &)>;
+using Builder = Base::Func<void()>;
+
+struct Children : public Base::Opt<Builder> {
+    using Base::Opt<Builder>::Opt;
+
+    Children(auto &&builder) : Base::Opt<Builder>(std::forward<decltype(builder)>(builder)) {
+    }
+
+    void operator()() {
+        with([&](auto &f) {
+            f();
+        });
+    }
+};
+
+static struct Ctx *_ctx = {};
 
 struct Ctx {
     Builder _builder;
@@ -56,21 +73,22 @@ struct Ctx {
 
     Ctx(Builder &&builder)
         : _builder(std::forward<Builder>(builder)) {
+        _ctx = this;
     }
 
-    void scope(auto inner) {
-        if (!_update) {
-            auto parent = _curr;
-            _curr = Base::make_strong<Node>();
-            inner();
-            parent->push_car(_curr);
-            _curr = parent;
-        } else {
+    inline void scope(auto inner) {
+        if (_update) {
             auto parent = _wip.unwrap();
             _wip = Base::make_strong<Node>();
             inner();
             parent->push_car(_wip.unwrap());
             _wip = parent;
+        } else {
+            auto parent = _curr;
+            _curr = Base::make_strong<Node>();
+            inner();
+            parent->push_car(_curr);
+            _curr = parent;
         }
     }
 
@@ -112,10 +130,10 @@ struct Ctx {
     void render() {
         if (_update) {
             _wip = Base::make_strong<Node>();
-            _builder(*this);
+            _builder();
             _curr = reconcile();
         } else {
-            _builder(*this);
+            _builder();
             _update = true;
         }
     }
@@ -125,39 +143,43 @@ struct Ctx {
     }
 };
 
-void Window(Ctx &ctx, auto inner) {
-    ctx.scope([&] {
-        inner();
+Ctx &ctx() {
+    return *_ctx;
+}
+
+void Window(Children children = {}) {
+    ctx().scope([&] {
+        children();
     });
 }
 
-void VStack(Ctx &ctx, auto inner) {
-    ctx.scope([&] {
-        inner();
+void VStack(Children children = {}) {
+    ctx().scope([&] {
+        children();
     });
 }
 
-void HStack(Ctx &ctx, auto inner) {
-    ctx.scope([&] {
-        inner();
+void HStack(Children children = {}) {
+    ctx().scope([&] {
+        children();
     });
 }
 
-void Button(Ctx &ctx, auto inner) {
-    ctx.scope([&] {
-        inner();
+void Button(Children children = {}) {
+    ctx().scope([&] {
+        children();
     });
 }
 
-void Text(Ctx &ctx, auto inner) {
-    ctx.scope([&] {
-        inner();
+void Label(Karm::Text::Str, Children children = {}) {
+    ctx().scope([&] {
+        children();
     });
 }
 
-void Input(Ctx &ctx, auto inner) {
-    ctx.scope([&] {
-        inner();
+void Input(Children children = {}) {
+    ctx().scope([&] {
+        children();
     });
 }
 
@@ -168,24 +190,19 @@ using namespace Karm::Ui;
 // Simple todo app
 
 int state = 2;
-
 int main(int, char **) {
-    Ctx app{[](auto &ctx) {
-        Window(ctx, [&] {
-            VStack(ctx, [&] {
-                Text(ctx, [&] {
-                });
-                HStack(ctx, [&] {
+    Ctx app{[] {
+        Window([] {
+            VStack([] {
+                Label(u8"Hello, world!");
+                HStack([] {
                     for (int i = 0; i < state; i++) {
-                        Button(ctx, [&] {
-                        });
+                        Button();
                     }
                 });
-                HStack(ctx, [&] {
-                    Button(ctx, [&] {
-                    });
-                    Button(ctx, [&] {
-                    });
+                HStack([] {
+                    Button();
+                    Button();
                 });
             });
         });

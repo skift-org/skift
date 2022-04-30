@@ -1,9 +1,9 @@
 #pragma once
 
-namespace Karm::Base {
+namespace Karm::Text {
 
 using Unit = char8_t;
 
 using Rune = char32_t;
 
-} // namespace Karm::Base
+} // namespace Karm::Text

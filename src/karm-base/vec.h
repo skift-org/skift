@@ -2,6 +2,7 @@
 
 #include "_prelude.h"
 
+#include "clamp.h"
 #include "inert.h"
 #include "opt.h"
 #include "ref.h"
@@ -94,10 +95,20 @@ struct Vec {
     auto remove(size_t index) -> T {
         T tmp = _buf[index].take();
         for (size_t i = index; i < _len - 1; i++) {
-            _buf[i].construct(_buf[i + 1].take());
+            _buf[i].ctor(_buf[i + 1].take());
         }
         _len--;
         return tmp;
+    }
+
+    void truncate(size_t len) {
+        len = min(len, _len);
+
+        for (size_t i = len; i < _len; i++) {
+            _buf[i].dtor();
+        }
+
+        _len = len;
     }
 
     void clear() {
@@ -115,19 +126,53 @@ struct Vec {
         insert(_len, std::forward<T>(value));
     }
 
-    auto pop() -> Opt<T> {
-        if (_len == 0)
-            return NONE;
+    auto pop() -> T {
+        if (_len == 0) {
+            Debug::panic("pop on empty Vec");
+        }
 
         return remove(_len - 1);
     }
 
-    auto peek() -> OptRef<T> {
-        if (_len == 0) {
-            return NONE;
+    void put(size_t index, T const &value) {
+        if (index >= _len) {
+            Debug::panic("index out of range");
         }
 
-        return Ref<T>(_buf[_len - 1]);
+        _buf[index].dtor();
+        _buf[index].ctor(value);
+    }
+
+    auto peek() -> T & {
+        if (_len == 0) {
+            Debug::panic("peek on empty Vec");
+        }
+
+        return _buf[_len - 1].unwrap();
+    }
+
+    auto peek() const -> T const & {
+        if (_len == 0) {
+            Debug::panic("peek on empty Vec");
+        }
+
+        return _buf[_len - 1].unwrap();
+    }
+
+    auto peek(size_t index) -> T & {
+        if (index >= _len) {
+            Debug::panic("index out of range");
+        }
+
+        return _buf[index];
+    }
+
+    auto peek(size_t index) const -> T const & {
+        if (index >= _len) {
+            Debug::panic("index out of range");
+        }
+
+        return _buf[index];
     }
 
     auto begin() -> T * {

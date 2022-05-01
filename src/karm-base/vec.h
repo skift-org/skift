@@ -37,7 +37,7 @@ struct Vec {
     }
 
     Vec(std::initializer_list<T> &&list) {
-        _cap = list.len();
+        _cap = list.size();
         _len = _cap;
         _buf = new Inert<T>[_cap];
         for (size_t i = 0; i < _len; i++) {

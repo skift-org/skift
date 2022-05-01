@@ -41,20 +41,22 @@ constexpr void swap(T &lhs, T &rhs) {
 
 template <typename T>
 struct initializer_list {
-    T *_buf;
-    size_t _len;
+    T *_data;
+    size_t _size;
 
-    constexpr initializer_list(T const *data, size_t size) : _buf(data), _len(size) {}
+    constexpr initializer_list(T const *data, size_t size) : _data(data), _size(size) {}
 
-    constexpr initializer_list() : _buf(0), _len(0) {}
+    constexpr initializer_list() : _data(0), _size(0) {}
 
-    constexpr auto operator[](size_t index) const -> T const & { return _buf[index]; }
+    constexpr auto operator[](size_t index) const -> T const & { return _data[index]; }
 
-    constexpr auto len() const -> size_t { return _len; }
+    constexpr auto begin() const -> T const * { return _data; }
 
-    constexpr auto begin() const -> T const * { return _buf; }
+    constexpr auto end() const -> T const * { return _data + _size; }
 
-    constexpr auto end() const -> T const * { return _buf + _len; }
+    constexpr auto size() const -> size_t { return _size; }
+
+    constexpr auto empty() const -> bool { return _size == 0; }
 };
 
 } // namespace std

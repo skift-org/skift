@@ -67,7 +67,6 @@ static struct Ctx *_ctx = {};
 struct Ctx {
     Builder _builder;
 
-    bool _update = false;
     Base::Strong<Node> _curr = Base::make_strong<Node>();
     Base::OptStrong<Node> _wip;
 
@@ -77,19 +76,11 @@ struct Ctx {
     }
 
     inline void scope(auto inner) {
-        if (_update) {
-            auto parent = _wip.unwrap();
-            _wip = Base::make_strong<Node>();
-            inner();
-            parent->push_car(_wip.unwrap());
-            _wip = parent;
-        } else {
-            auto parent = _curr;
-            _curr = Base::make_strong<Node>();
-            inner();
-            parent->push_car(_curr);
-            _curr = parent;
-        }
+        auto parent = _wip.unwrap();
+        _wip = Base::make_strong<Node>();
+        inner();
+        parent->push_car(_wip.unwrap());
+        _wip = parent;
     }
 
     Base::OptStrong<Node> reconcile(Base::OptStrong<Node> optCurr, Base::OptStrong<Node> optWip) {
@@ -128,14 +119,9 @@ struct Ctx {
     }
 
     void render() {
-        if (_update) {
-            _wip = Base::make_strong<Node>();
-            _builder();
-            _curr = reconcile();
-        } else {
-            _builder();
-            _update = true;
-        }
+        _wip = Base::make_strong<Node>();
+        _builder();
+        _curr = reconcile();
     }
 
     void dump() {

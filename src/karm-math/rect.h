@@ -17,6 +17,15 @@ union Rect {
 
     T _els[4];
 
+    Rect() : x(0), y(0), width(0), height(0) {
+    }
+
+    Rect(T x, T y, T width, T height) : x(x), y(y), width(width), height(height) {
+    }
+
+    Rect(Vec2<T> xy, Vec2<T> wh) : xy(xy), wh(wh) {
+    }
+
     auto min() const -> Vec2<T> { return {x, y}; }
 
     auto max() const -> Vec2<T> { return {x + width, y + height}; }
@@ -69,9 +78,25 @@ union Rect {
         height = v.y - v.x;
     }
 
+    auto contains(Vec2<T> const &v) const -> bool {
+        return v.x >= x && v.y >= y && v.x < x + width && v.y < y + height;
+    }
+
+    auto contains(Rect<T> const &r) const -> bool {
+        return r.x >= x && r.y >= y && r.x + r.width <= x + width && r.y + r.height <= y + height;
+    }
+
+    auto colide(Rect<T> const &r) const -> bool {
+        return r.x + r.width > x && r.y + r.height > y && r.x < x + width && r.y < y + height;
+    }
+
     auto operator[](int i) -> T { return _els[i]; }
 
     auto operator[](int i) const -> T { return _els[i]; }
 };
+
+using Recti = Rect<int>;
+
+using Rectf = Rect<double>;
 
 } // namespace Karm::Math

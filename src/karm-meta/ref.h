@@ -1,6 +1,5 @@
 #pragma once
 
-#include "value.h"
 
 namespace Karm::Meta {
 
@@ -22,28 +21,22 @@ struct _RemoveRef<T &&> {
 template <typename T>
 using RemoveRef = typename _RemoveRef<T>::Type;
 
-template <typename T>
-struct _LvalueRef : False {
-};
+template <typename>
+inline constexpr bool _LvalueRef = false;
 
 template <typename T>
-struct _LvalueRef<T &> : True {
-};
+inline constexpr bool _LvalueRef<T &> = true;
 
 template <typename T>
-concept LvalueRef = _LvalueRef<T>::VALUE;
+concept LvalueRef = _LvalueRef<T>;
+
+template <typename>
+inline constexpr bool _RvalueRef = false;
 
 template <typename T>
-struct _RvalueRef : False {
-};
+inline constexpr bool _RvalueRef<T &&> = true;
 
 template <typename T>
-struct _RvalueRef<T &&> : True {
-};
-
-template <typename T>
-concept RvalueRef = _RvalueRef<T>::VALUE;
-
-
+concept RvalueRef = _RvalueRef<T>;
 
 } // namespace Karm::Meta

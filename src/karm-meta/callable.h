@@ -1,108 +1,89 @@
-#include "value.h"
+#include "ptr.h"
 
 namespace Karm::Meta {
 
 template <typename>
-struct _Callable : False {
-};
+inline constexpr bool _Func = false;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args...)> : True {
-};
+inline constexpr bool _Func<Ret(Args...)> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args..., ...)> : True {
-};
+inline constexpr bool _Func<Ret(Args..., ...)> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args...) const> : True {
-};
+inline constexpr bool _Func<Ret(Args...) const> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args..., ...) const> : True {
-};
+inline constexpr bool _Func<Ret(Args..., ...) const> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args...) volatile> : True {
-};
+inline constexpr bool _Func<Ret(Args...) volatile> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args..., ...) volatile> : True {
-};
+inline constexpr bool _Func<Ret(Args..., ...) volatile> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args...) const volatile> : True {
-};
+inline constexpr bool _Func<Ret(Args...) const volatile> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args..., ...) const volatile> : True {
-};
+inline constexpr bool _Func<Ret(Args..., ...) const volatile> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args...) &> : True {
-};
+inline constexpr bool _Func<Ret(Args...) &> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args..., ...) &> : True {
-};
+inline constexpr bool _Func<Ret(Args..., ...) &> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args...) const &> : True {
-};
+inline constexpr bool _Func<Ret(Args...) const &> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args..., ...) const &> : True {
-};
+inline constexpr bool _Func<Ret(Args..., ...) const &> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args...) volatile &> : True {
-};
+inline constexpr bool _Func<Ret(Args...) volatile &> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args..., ...) volatile &> : True {
-};
+inline constexpr bool _Func<Ret(Args..., ...) volatile &> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args...) const volatile &> : True {
-};
+inline constexpr bool _Func<Ret(Args...) const volatile &> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args..., ...) const volatile &> : True {
-};
+inline constexpr bool _Func<Ret(Args..., ...) const volatile &> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args...) &&> : True {
-};
+inline constexpr bool _Func<Ret(Args...) &&> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args..., ...) &&> : True {
-};
+inline constexpr bool _Func<Ret(Args..., ...) &&> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args...) const &&> : True {
-};
+inline constexpr bool _Func<Ret(Args...) const &&> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args..., ...) const &&> : True {
-};
+inline constexpr bool _Func<Ret(Args..., ...) const &&> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args...) volatile &&> : True {
-};
+inline constexpr bool _Func<Ret(Args...) volatile &&> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args..., ...) volatile &&> : True {
-};
+inline constexpr bool _Func<Ret(Args..., ...) volatile &&> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args...) const volatile &&> : True {
-};
+inline constexpr bool _Func<Ret(Args...) const volatile &&> = true;
 
 template <typename Ret, typename... Args>
-struct _Callable<Ret(Args..., ...) const volatile &&> : True {
-};
+inline constexpr bool _Func<Ret(Args..., ...) const volatile &&> = true;
 
 template <typename T>
-concept Callable = _Callable<T>::VALUE;
+concept Func = _Func<T>;
+
+template <typename T>
+concept FuncPtr = Ptr<T> and Meta::Func<RemovePtr<T>>;
+
+template <typename T, typename... Args>
+inline constexpr bool Callable = requires(T f) { t(declval<Args>()...); };
 
 } // namespace Karm::Meta

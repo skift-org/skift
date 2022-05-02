@@ -46,7 +46,22 @@ struct Box {
 
         return _ptr;
     }
+
     constexpr auto operator*() -> T & {
+        if (!_ptr)
+            Debug::panic("Deferencing moved from Box<T>");
+
+        return *_ptr;
+    }
+
+    constexpr auto operator->() const -> T const * {
+        if (!_ptr)
+            Debug::panic("Deferencing moved from Box<T>");
+
+        return _ptr;
+    }
+
+    constexpr auto operator*() const -> T const & {
         if (!_ptr)
             Debug::panic("Deferencing moved from Box<T>");
 

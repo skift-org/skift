@@ -1,7 +1,5 @@
 #pragma once
 
-#include "value.h"
-
 namespace Karm::Meta {
 
 template <typename T>

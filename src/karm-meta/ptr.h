@@ -1,17 +1,15 @@
-#include "value.h"
+#pragma once
 
 namespace Karm::Meta {
 
-template <typename T>
-struct _Ptr : False {
-};
+template <typename>
+inline constexpr bool _Ptr = false;
 
 template <typename T>
-struct _Ptr<T *> : True {
-};
+inline constexpr bool _Ptr<T *> = true;
 
 template <typename T>
-concept Ptr = _Ptr<T>::VALUE;
+concept Ptr = _Ptr<T>;
 
 template <typename T>
 struct _RemovePtr {

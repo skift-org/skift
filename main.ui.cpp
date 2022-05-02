@@ -13,6 +13,7 @@
 namespace Karm::Ui {
 
 static uint32_t id = 0;
+
 struct Node : public Base::Cons<Base::OptStrong<Node>, Base::OptStrong<Node>> {
     uint32_t _id = id++;
 
@@ -62,25 +63,26 @@ struct Children : public Base::Opt<Builder> {
     }
 };
 
-static struct Ctx *_ctx = {};
+static struct Ui *_ui = {};
 
-struct Ctx {
+struct Ui {
     Builder _builder;
 
     Base::Strong<Node> _curr = Base::make_strong<Node>();
     Base::OptStrong<Node> _wip;
 
-    Ctx(Builder &&builder)
+    Ui(Builder &&builder)
         : _builder(std::forward<Builder>(builder)) {
-        _ctx = this;
+        _ui = this;
     }
 
-    inline void scope(auto inner) {
+    inline Node &scope(auto inner) {
         auto parent = _wip.unwrap();
         _wip = Base::make_strong<Node>();
         inner();
         parent->push_car(_wip.unwrap());
         _wip = parent;
+        return *_wip.unwrap();
     }
 
     Base::OptStrong<Node> reconcile(Base::OptStrong<Node> optCurr, Base::OptStrong<Node> optWip) {
@@ -129,42 +131,102 @@ struct Ctx {
     }
 };
 
-Ctx &ctx() {
-    return *_ctx;
+Ui &ui() {
+    return *_ui;
 }
 
-void Window(Children children = {}) {
-    ctx().scope([&] {
+struct Event {};
+
+using EventFunc = Base::Func<void(Event const &)>;
+
+template <typename T>
+struct State {
+    T _value;
+
+    auto value() const -> T const & {
+        return _value;
+    }
+
+    void update(auto fn) {
+        _value = fn(_value);
+    }
+};
+
+template <typename T>
+State<T> &useState(T value) {
+    return {};
+}
+
+template <typename T>
+struct Atom {
+    T _value;
+
+    auto value() const -> T const & {
+        return _value;
+    }
+
+    void update(auto fn) {
+        _value = fn(_value);
+    }
+};
+
+template <typename T>
+Atom<T> useAtom() {
+    return {};
+}
+
+void useEffect(Base::Func<Base::Func<void()>()>);
+
+Node &Window(Children children = {}) {
+    return ui().scope([&] {
         children();
     });
 }
 
-void VStack(Children children = {}) {
-    ctx().scope([&] {
+Node &Widget(Children children = {}) {
+    return ui().scope([&] {
         children();
     });
 }
 
-void HStack(Children children = {}) {
-    ctx().scope([&] {
+Node &VStack(Children children = {}) {
+    return Widget([&] {
         children();
     });
 }
 
-void Button(Children children = {}) {
-    ctx().scope([&] {
+Node &HStack(Children children = {}) {
+    return Widget([&] {
         children();
     });
 }
 
-void Label(Karm::Text::Str, Children children = {}) {
-    ctx().scope([&] {
+Node &ZStack(Children children = {}) {
+    return Widget([&] {
+        children();
+    });
+} 
+
+template <typename... Ts>
+Node &Label(Karm::Text::Str, Ts &...) {
+    return Widget([&] {
+    });
+}
+
+Node &Button(EventFunc, Children children = {}) {
+    return Widget([&] {
         children();
     });
 }
 
-void Input(Children children = {}) {
-    ctx().scope([&] {
+Node &Button(Text::Str text, EventFunc event) {
+    return Button(std::forward<EventFunc>(event), [&] {
+        Label(text);
+    });
+}
+
+Node &Input(Children children = {}) {
+    return Widget([&] {
         children();
     });
 }
@@ -175,32 +237,19 @@ using namespace Karm::Ui;
 
 // Simple todo app
 
-int state = 2;
 int main(int, char **) {
-    Ctx app{[] {
+    Ui app{[] {
         Window([] {
-            VStack([] {
-                Label(u8"Hello, world!");
-                HStack([] {
-                    for (int i = 0; i < state; i++) {
-                        Button();
-                    }
-                });
-                HStack([] {
-                    Button();
-                    Button();
+            auto state = useState(0);
+
+            Label(u8"You, clicked {} times", state.value());
+            Button(u8"Click me!", [state]() mutable {
+                state.update([](auto &s) {
+                    return s + 1;
                 });
             });
         });
     }};
 
-    app.render();
-    app.dump();
-
-    printf("\nState change:\n");
-    state = 5;
-    app.render();
-    app.dump();
-
-    return 0;
+    return app.run();
 }

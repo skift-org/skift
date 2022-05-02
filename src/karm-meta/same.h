@@ -1,18 +1,14 @@
 #pragma once
 
-#include "value.h"
-
 namespace Karm::Meta {
 
 template <typename T, typename U>
-struct _Same : False {
-};
+inline constexpr bool _Same = false;
 
 template <typename T>
-struct _Same<T, T> : True {
-};
+inline constexpr bool _Same<T, T> = true;
 
 template <typename T, typename U>
-concept Same = _Same<T, U>::VALUE;
+concept Same = _Same<T, U>;
 
 } // namespace Karm::Meta

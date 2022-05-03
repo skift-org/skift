@@ -4,10 +4,10 @@
 
 namespace Karm::Ui {
 
-struct _Dock : public _Widget {
+struct _Grid : public _Widget {
 };
 
-void dock(Children children = {}) {
+void grid(Children children = {}) {
     widget([&] {
         children();
     });

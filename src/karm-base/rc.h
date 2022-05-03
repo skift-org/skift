@@ -69,7 +69,9 @@ struct _Rc {
 template <typename T>
 struct Rc : public _Rc {
     T _buf;
-    Rc(T &&buf) : _buf(std::forward<T>(buf)) {}
+    template <typename... Args>
+    Rc(Args &&...args) : _buf(std::forward<Args>(args)...) {}
+
     auto _unwrap() -> void * override { return &_buf; }
 };
 
@@ -128,7 +130,7 @@ using OptStrong = Opt<Strong<T>>;
 
 template <typename T, typename... Args>
 constexpr static auto make_strong(Args... args) -> Strong<T> {
-    return {new Rc<T>(T{std::forward<Args>(args)...})};
+    return {new Rc<T>(std::forward<Args>(args)...)};
 }
 
 template <typename T>

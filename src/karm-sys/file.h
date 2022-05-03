@@ -12,11 +12,7 @@ struct File {
     Path _path;
 
     static auto create(Path &path) -> Result<File> {
-        auto fd = Fd::create(path);
-        if (!fd) {
-            return fd.error();
-        }
-        return File{*fd, path};
+        return File{try$(Fd::create(path)), path};
     }
 
     static auto open(Path &path) -> Result<File>;

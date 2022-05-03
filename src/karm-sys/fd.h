@@ -6,6 +6,8 @@
 #include <karm-meta/same.h>
 #include <karm-text/str.h>
 
+#include "path.h"
+
 namespace Karm::Embed {
 
 using _Fd = int;
@@ -18,9 +20,9 @@ struct _Pipe {
     _Fd out;
 };
 
-auto _open(Text::Str path) -> Base::Result<_Fd>;
+auto _open(Sys::Path path) -> Base::Result<_Fd>;
 
-auto _create(Text::Str path) -> Base::Result<_Fd>;
+auto _create(Sys::Path path) -> Base::Result<_Fd>;
 
 auto _pipe() -> Base::Result<_Pipe>;
 
@@ -78,11 +80,11 @@ struct Fd {
         return *this;
     }
 
-    static Base::Result<Fd> open(Text::Str path) {
+    static Base::Result<Fd> open(Sys::Path path) {
         return Fd{try$(Embed::_open(path))};
     }
 
-    static Base::Result<Fd> create(Text::Str path) {
+    static Base::Result<Fd> create(Sys::Path path) {
         return Fd{try$(Embed::_create(path))};
     }
 

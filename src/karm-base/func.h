@@ -14,6 +14,7 @@ struct Func;
 
 template <typename Out, typename... In>
 struct Func<Out(In...)> {
+
     struct _Wrap {
         virtual ~_Wrap() = default;
         virtual Out operator()(In...) = 0;

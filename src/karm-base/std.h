@@ -4,6 +4,15 @@
 
 #include "_prelude.h"
 
+#ifndef __skift__
+
+#    include <new>
+#    include <utility>
+
+#    include <initializer_list>
+
+#else
+
 inline auto operator new(size_t, void *ptr) -> void * { return ptr; }
 
 inline auto operator new[](size_t, void *ptr) -> void * { return ptr; }
@@ -60,3 +69,5 @@ struct initializer_list {
 };
 
 } // namespace std
+
+#endif

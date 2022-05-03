@@ -26,7 +26,7 @@ struct Vec {
         _len = other._len;
         _buf = new Inert<T>[_cap];
         for (size_t i = 0; i < _len; i++) {
-            _buf[i].ctor(other.unwrap[i]);
+            _buf[i].ctor(other.peek(i));
         }
     }
 
@@ -36,12 +36,12 @@ struct Vec {
         std::swap(_len, other._len);
     }
 
-    Vec(std::initializer_list<T> &&list) {
-        _cap = list.size();
-        _len = _cap;
+    Vec(std::initializer_list<T> &&other) {
+        _cap = other._len;
+        _len = other._len;
         _buf = new Inert<T>[_cap];
         for (size_t i = 0; i < _len; i++) {
-            _buf[i].ctor(std::move<T>(list[i]));
+            _buf[i].ctor(std::move<T>(other.peek(i)));
         }
     }
 

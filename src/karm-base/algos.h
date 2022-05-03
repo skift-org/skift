@@ -27,6 +27,13 @@ static auto any(auto const &c, auto const &predicate) -> bool {
     return false;
 }
 
+static auto any(auto const &c) -> bool {
+    for (auto const &i : c) {
+        return true;
+    }
+    return false;
+}
+
 static auto all(auto const &c, auto const &predicate) -> bool {
     for (auto const &i : c) {
         if (!predicate(i)) {

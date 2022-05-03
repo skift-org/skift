@@ -1,5 +1,6 @@
 #define NO_PRELUDE
 
+#include <karm-base/algos.h>
 #include <karm-base/box.h>
 #include <karm-base/cons.h>
 #include <karm-base/func.h>
@@ -14,37 +15,34 @@ namespace Karm::Ui {
 
 static uint32_t id = 0;
 
-struct Node : public Base::Cons<Base::OptStrong<Node>, Base::OptStrong<Node>> {
+struct Node {
     uint32_t _id = id++;
+    Base::Vec<Base::Strong<Node>> _children;
 
-    void push_cdr(Base::Strong<Node> &node) {
-        if (!cdr.with([&](auto &n) {
-                n->push_cdr(node);
-            })) {
-            cdr = node;
-        }
+    size_t len() const {
+        return _children.len();
     }
 
-    void push_car(Base::Strong<Node> &node) {
-        if (!car.with([&](auto &n) {
-                n->push_cdr(node);
-            })) {
-            car = node;
-        }
+    Base::Strong<Node> peek(size_t index) const {
+        return _children.peek(index);
+    }
+
+    void push(Base::Strong<Node> node) {
+        _children.push(node);
+    }
+
+    void truncate(size_t len) {
+        _children.truncate(len);
     }
 
     void dump(int indent) {
-        for (int i = 0; i < indent; i++) {
+        for (int i = 0; i < indent * 4; i++) {
             printf(" ");
         }
         printf("Node %d\n", _id);
-        car.with([&](auto const &children) {
-            children->dump(indent + 1);
-        });
-
-        cdr.with([&](auto const &sibling) {
-            sibling->dump(indent);
-        });
+        for (auto &child : _children) {
+            child->dump(indent + 1);
+        }
     }
 };
 
@@ -66,68 +64,62 @@ struct Children : public Base::Opt<Builder> {
 static struct Ui *_ui = {};
 
 struct Ui {
-    Builder _builder;
+    struct Ctx {
+        Base::Strong<Node> parent;
+        size_t index = 0;
+    };
 
+    Base::Vec<Ctx> _stack;
     Base::Strong<Node> _curr = Base::make_strong<Node>();
-    Base::OptStrong<Node> _wip;
+
+    Builder _builder;
 
     Ui(Builder &&builder)
         : _builder(std::forward<Builder>(builder)) {
         _ui = this;
     }
 
-    inline Node &scope(auto inner) {
-        auto parent = _wip.unwrap();
-        _wip = Base::make_strong<Node>();
+    Ctx &current() {
+        return _stack.top();
+    }
+
+    Base::Strong<Node> resolve() {
+        if (current().index < current().parent->len()) {
+            return current().parent->peek(current().index++);
+        } else {
+            Base::Strong<Node> node = Base::make_strong<Node>();
+            current().parent->push(node);
+            current().index++;
+            return node;
+        }
+    }
+
+    void begin() {
+        _stack.push(Ctx{resolve()});
+    }
+
+    void end() {
+        current().parent->truncate(current().index + 1);
+        _stack.pop();
+    }
+
+    inline void scope(auto inner) {
+        begin();
         inner();
-        parent->push_car(_wip.unwrap());
-        _wip = parent;
-        return *_wip.unwrap();
-    }
-
-    Base::OptStrong<Node> reconcile(Base::OptStrong<Node> optCurr, Base::OptStrong<Node> optWip) {
-        if (!optWip) {
-            return Base::NONE;
-        }
-
-        if (!optCurr) {
-            return optWip;
-        }
-
-        Base::Strong<Node> curr = optCurr.unwrap();
-        Base::Strong<Node> wip = optWip.unwrap();
-
-        if (wip->car) {
-            if (curr->car) {
-                curr->car = reconcile(curr->car, wip->car);
-            } else {
-                curr->car = wip->car;
-            }
-        }
-
-        if (wip->cdr) {
-            if (curr->cdr) {
-                curr->cdr = reconcile(curr->cdr, wip->cdr);
-            } else {
-                curr->cdr = wip->cdr;
-            }
-        }
-
-        return curr;
-    }
-
-    Base::Strong<Node> reconcile() {
-        return reconcile(_curr, _wip).unwrap();
+        end();
     }
 
     void render() {
-        _wip = Base::make_strong<Node>();
+        _stack.push(Ctx{_curr});
         _builder();
-        _curr = reconcile();
     }
 
     void dump() {
         _curr->dump(0);
+    }
+
+    int run() {
+        return 0;
     }
 };
 
@@ -143,6 +135,9 @@ template <typename T>
 struct State {
     T _value;
 
+    State(T value) : _value(value) {
+    }
+
     auto value() const -> T const & {
         return _value;
     }
@@ -153,8 +148,10 @@ struct State {
 };
 
 template <typename T>
-State<T> &useState(T value) {
-    return {};
+State<T> useState(T value) {
+    State<T> state{value};
+
+    return state;
 }
 
 template <typename T>
@@ -177,56 +174,56 @@ Atom<T> useAtom() {
 
 void useEffect(Base::Func<Base::Func<void()>()>);
 
-Node &Window(Children children = {}) {
-    return ui().scope([&] {
+void Window(Children children = {}) {
+    ui().scope([&] {
         children();
     });
 }
 
-Node &Widget(Children children = {}) {
-    return ui().scope([&] {
+void Widget(Children children = {}) {
+    ui().scope([&] {
         children();
     });
 }
 
-Node &VStack(Children children = {}) {
-    return Widget([&] {
+void VStack(Children children = {}) {
+    Widget([&] {
         children();
     });
 }
 
-Node &HStack(Children children = {}) {
-    return Widget([&] {
+void HStack(Children children = {}) {
+    Widget([&] {
         children();
     });
 }
 
-Node &ZStack(Children children = {}) {
-    return Widget([&] {
+void ZStack(Children children = {}) {
+    Widget([&] {
         children();
     });
-} 
+}
 
 template <typename... Ts>
-Node &Label(Karm::Text::Str, Ts &...) {
-    return Widget([&] {
+void Label(Karm::Text::Str, Ts &...) {
+    Widget([&] {
     });
 }
 
-Node &Button(EventFunc, Children children = {}) {
-    return Widget([&] {
+void Button(EventFunc, Children children = {}) {
+    Widget([&] {
         children();
     });
 }
 
-Node &Button(Text::Str text, EventFunc event) {
-    return Button(std::forward<EventFunc>(event), [&] {
+void Button(Text::Str text, EventFunc event) {
+    Button(std::forward<EventFunc>(event), [&] {
         Label(text);
     });
 }
 
-Node &Input(Children children = {}) {
-    return Widget([&] {
+void Input(Children children = {}) {
+    Widget([&] {
         children();
     });
 }
@@ -237,19 +234,32 @@ using namespace Karm::Ui;
 
 // Simple todo app
 
+int x = 5;
+
 int main(int, char **) {
     Ui app{[] {
         Window([] {
             auto state = useState(0);
 
             Label(u8"You, clicked {} times", state.value());
-            Button(u8"Click me!", [state]() mutable {
+            Button(u8"Click me!", [&](Event const &) mutable {
                 state.update([](auto &s) {
                     return s + 1;
                 });
             });
+
+            for (int i = 0; i < x; i++) {
+                Label(u8"Hello");
+            }
         });
     }};
+
+    app.render();
+    app.dump();
+
+    x = 2;
+    app.render();
+    app.dump();
 
     return app.run();
 }

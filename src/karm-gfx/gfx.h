@@ -8,7 +8,7 @@
 
 namespace Karm::Gfx {
 
-struct Ctx {
+struct Gfx {
     struct _Ctx {
         Math::Recti clip;
         Math::Vec2i origin;

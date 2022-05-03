@@ -143,7 +143,7 @@ struct Vec {
         _buf[index].ctor(value);
     }
 
-    auto peek() -> T & {
+    auto top() -> T & {
         if (_len == 0) {
             Debug::panic("peek on empty Vec");
         }
@@ -151,7 +151,7 @@ struct Vec {
         return _buf[_len - 1].unwrap();
     }
 
-    auto peek() const -> T const & {
+    auto top() const -> T const & {
         if (_len == 0) {
             Debug::panic("peek on empty Vec");
         }
@@ -164,7 +164,7 @@ struct Vec {
             Debug::panic("index out of range");
         }
 
-        return _buf[index];
+        return _buf[index].unwrap();
     }
 
     auto peek(size_t index) const -> T const & {
@@ -172,7 +172,7 @@ struct Vec {
             Debug::panic("index out of range");
         }
 
-        return _buf[index];
+        return _buf[index].unwrap();
     }
 
     auto begin() -> T * {

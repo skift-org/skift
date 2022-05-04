@@ -53,11 +53,11 @@ struct Vec {
         delete[] _buf;
     }
 
-    auto operator=(Vec const &other) -> Vec & {
+    Vec &operator=(Vec const &other) {
         return *this = Vec(other);
     }
 
-    auto operator=(Vec &&other) -> Vec & {
+    Vec &operator=(Vec &&other) {
         std::swap(_buf, other._buf);
         std::swap(_cap, other._cap);
         std::swap(_len, other._len);
@@ -92,7 +92,7 @@ struct Vec {
         _len++;
     }
 
-    auto remove(size_t index) -> T {
+    T remove(size_t index) {
         T tmp = _buf[index].take();
         for (size_t i = index; i < _len - 1; i++) {
             _buf[i].ctor(_buf[i + 1].take());
@@ -126,7 +126,7 @@ struct Vec {
         insert(_len, std::forward<T>(value));
     }
 
-    auto pop() -> T {
+    T pop() {
         if (_len == 0) {
             Debug::panic("pop on empty Vec");
         }
@@ -143,7 +143,7 @@ struct Vec {
         _buf[index].ctor(value);
     }
 
-    auto top() -> T & {
+    T &top() {
         if (_len == 0) {
             Debug::panic("peek on empty Vec");
         }
@@ -151,7 +151,7 @@ struct Vec {
         return _buf[_len - 1].unwrap();
     }
 
-    auto top() const -> T const & {
+    T const &top() const {
         if (_len == 0) {
             Debug::panic("peek on empty Vec");
         }
@@ -159,7 +159,7 @@ struct Vec {
         return _buf[_len - 1].unwrap();
     }
 
-    auto peek(size_t index) -> T & {
+    T &peek(size_t index) {
         if (index >= _len) {
             Debug::panic("index out of range");
         }
@@ -167,7 +167,7 @@ struct Vec {
         return _buf[index].unwrap();
     }
 
-    auto peek(size_t index) const -> T const & {
+    T const &peek(size_t index) const {
         if (index >= _len) {
             Debug::panic("index out of range");
         }
@@ -175,24 +175,24 @@ struct Vec {
         return _buf[index].unwrap();
     }
 
-    auto begin() -> T * {
+    T *begin() {
         if (_len == 0) {
             return nullptr;
         }
         return &_buf[0].unwrap();
     }
 
-    auto end() -> T * { return begin() + _len; }
+    T *end() { return begin() + _len; }
 
-    auto begin() const -> T const * { return &_buf[0].unwrap(); }
+    T const *begin() const { return &_buf[0].unwrap(); }
 
-    auto end() const -> T const * { return begin() + _len; }
+    T const *end() const { return begin() + _len; }
 
-    auto buf() -> T * { return begin(); }
+    T *buf() { return begin(); }
 
-    auto buf() const -> T const * { return begin(); }
+    T const *buf() const { return begin(); }
 
-    auto len() const -> size_t { return _len; }
+    size_t len() const { return _len; }
 };
 
 } // namespace Karm::Base

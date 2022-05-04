@@ -30,9 +30,9 @@ struct List {
         std::swap(_tail, other._tail);
     }
 
-    auto operator=(List const &other) -> List & = delete;
+    List &operator=(List const &other) = delete;
 
-    auto operator=(List &&other) -> List & {
+    List &operator=(List &&other) {
         std::swap(_len, other._len);
         std::swap(_head, other._head);
         std::swap(_tail, other._tail);
@@ -40,7 +40,7 @@ struct List {
     }
 
     void push(T &&value) {
-        Strong<_Node> node = make_strong<_Node>(std::forward(value), NONE, NONE);
+        Strong<_Node> node = makeStrong<_Node>(std::forward(value), NONE, NONE);
 
         if (_tail) {
             _tail->next = node;
@@ -57,7 +57,7 @@ struct List {
         push(T{value});
     }
 
-    auto pop() -> T {
+    T pop() {
         if (!_len) {
             Debug::panic("pop from empty list");
         }
@@ -74,7 +74,7 @@ struct List {
         return node->buf;
     }
 
-    auto peek() -> T & {
+    T &peek() {
         if (!_len) {
             Debug::panic("peek from empty list");
         }
@@ -82,7 +82,7 @@ struct List {
         return _tail->buf;
     }
 
-    auto peek(size_t index) -> T & {
+    T &peek(size_t index) {
         if (index >= _len) {
             Debug::panic("index out of range");
         }
@@ -95,7 +95,7 @@ struct List {
         return node->buf;
     }
 
-    auto peek(size_t index) const -> T const & {
+    T const &peek(size_t index) const {
         if (index >= _len) {
             Debug::panic("index out of range");
         }
@@ -113,23 +113,23 @@ struct List {
 
         operator bool() const { return curr; }
 
-        auto operator*() -> T & { return curr->buf; }
+        T &operator*() { return curr->buf; }
 
-        auto operator++() -> Iter & {
+        Iter &operator++() {
             curr = curr->next;
             return *this;
         }
 
-        auto operator!=(Iter const &other) const -> bool {
+        bool operator!=(Iter const &other) const {
             return curr != other.curr;
         }
     };
 
-    auto begin() -> Iter {
+    Iter begin() {
         return _head;
     }
 
-    auto end() -> Iter {
+    Iter end() {
         return _tail;
     }
 
@@ -138,7 +138,7 @@ struct List {
         _tail = NONE;
     }
 
-    auto len() -> size_t {
+    size_t len() {
         return _len;
     }
 };

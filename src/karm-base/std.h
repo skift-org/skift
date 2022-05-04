@@ -13,29 +13,29 @@
 
 #else
 
-inline auto operator new(size_t, void *ptr) -> void * { return ptr; }
+inline void *operator new(size_t, void *ptr) { return ptr; }
 
-inline auto operator new[](size_t, void *ptr) -> void * { return ptr; }
+inline void *operator new[](size_t, void *ptr) { return ptr; }
 
 namespace std {
 
 template <typename T>
-constexpr auto move(T &&t) noexcept -> Karm::Meta::RemoveRef<T> && {
+constexpr Karm::Meta::RemoveRef<T> &&move(T &&t) noexcept {
     return static_cast<Karm::Meta::RemoveRef<T> &&>(t);
 }
 
 template <typename T>
-constexpr auto forward(Karm::Meta::RemoveRef<T> &param) -> T && {
+constexpr T &&forward(Karm::Meta::RemoveRef<T> &param) {
     return static_cast<T &&>(param);
 }
 
 template <typename T>
-constexpr auto forward(Karm::Meta::RemoveRef<T> &&param) -> T && {
+constexpr T &&forward(Karm::Meta::RemoveRef<T> &&param) {
     return static_cast<T &&>(param);
 }
 
 template <typename T, typename U = T>
-constexpr auto exchange(T &slot, U &&value) -> T {
+constexpr T exchange(T &slot, U &&value) {
     T old = move(slot);
     slot = forward<U>(value);
     return old;
@@ -57,15 +57,15 @@ struct initializer_list {
 
     constexpr initializer_list() : _data(0), _size(0) {}
 
-    constexpr auto operator[](size_t index) const -> T const & { return _data[index]; }
+    constexpr T const &operator[](size_t index) const { return _data[index]; }
 
-    constexpr auto begin() const -> T const * { return _data; }
+    constexpr T const *begin() const { return _data; }
 
-    constexpr auto end() const -> T const * { return _data + _size; }
+    constexpr T const *end() const { return _data + _size; }
 
-    constexpr auto size() const -> size_t { return _size; }
+    constexpr size_t size() const { return _size; }
 
-    constexpr auto empty() const -> bool { return _size == 0; }
+    constexpr bool empty() const { return _size == 0; }
 };
 
 } // namespace std

@@ -7,7 +7,7 @@
 
 namespace Karm::Base {
 
-static auto index_of(auto const &c, auto const &value) -> Opt<size_t> {
+static Opt<size_t> indexOf(auto const &c, auto const &value) {
     size_t index = 0;
     for (auto const &i : c) {
         if (i == value) {
@@ -18,7 +18,7 @@ static auto index_of(auto const &c, auto const &value) -> Opt<size_t> {
     return NONE;
 }
 
-static auto any(auto const &c, auto const &predicate) -> bool {
+static bool any(auto const &c, auto const &predicate) {
     for (auto const &i : c) {
         if (predicate(i)) {
             return true;
@@ -27,14 +27,14 @@ static auto any(auto const &c, auto const &predicate) -> bool {
     return false;
 }
 
-static auto any(auto const &c) -> bool {
+static bool any(auto const &c) {
     for (auto const &i : c) {
         return true;
     }
     return false;
 }
 
-static auto all(auto const &c, auto const &predicate) -> bool {
+static bool all(auto const &c, auto const &predicate) {
     for (auto const &i : c) {
         if (!predicate(i)) {
             return false;
@@ -44,7 +44,7 @@ static auto all(auto const &c, auto const &predicate) -> bool {
     return true;
 }
 
-static auto none(auto const &c, auto const &predicate) -> bool {
+static bool none(auto const &c, auto const &predicate) {
     for (auto const &i : c) {
         if (predicate(i)) {
             return false;
@@ -64,7 +64,7 @@ static auto find(auto const &c, auto const &predicate) -> Opt<decltype(*c.first(
     return NONE;
 }
 
-static auto len(auto const &c) -> size_t {
+static size_t len(auto const &c) {
     if (requires { c.len(); }) {
         return c.len();
     } else {

@@ -30,38 +30,38 @@ struct Box {
             delete _ptr;
     }
 
-    constexpr auto operator=(Box const &) -> Box & = delete;
+    constexpr Box &operator=(Box const &) = delete;
 
     template <Meta::Derive<T> U>
-    constexpr auto operator=(Box &&other) -> Box & {
+    constexpr Box &operator=(Box &&other) {
         delete _ptr;
         _ptr = other._ptr;
         other._ptr = nullptr;
         return *this;
     }
 
-    constexpr auto operator->() -> T * {
+    constexpr T *operator->() {
         if (!_ptr)
             Debug::panic("Deferencing moved from Box<T>");
 
         return _ptr;
     }
 
-    constexpr auto operator*() -> T & {
+    constexpr T &operator*() {
         if (!_ptr)
             Debug::panic("Deferencing moved from Box<T>");
 
         return *_ptr;
     }
 
-    constexpr auto operator->() const -> T const * {
+    constexpr T const *operator->() const {
         if (!_ptr)
             Debug::panic("Deferencing moved from Box<T>");
 
         return _ptr;
     }
 
-    constexpr auto operator*() const -> T const & {
+    constexpr T const &operator*() const {
         if (!_ptr)
             Debug::panic("Deferencing moved from Box<T>");
 
@@ -73,7 +73,7 @@ template <typename T>
 using OptBox = Opt<Box<T>>;
 
 template <typename T, typename... Args>
-constexpr static auto make_box(Args... args) -> Box<T> {
+constexpr static Box<T> makeBox(Args... args) {
     return {new T(std::forward<Args>(args)...)};
 }
 

@@ -16,9 +16,9 @@ struct [[nodiscard]] Result {
     constexpr Result(Value value) : _error(), _value(value) {}
 
     constexpr operator bool() { return _error; }
-    constexpr auto none() const -> Error { return _error; }
-    constexpr auto unwrap() -> Value & { return _value.unwrap(); }
-    constexpr auto take() -> Value { return _value.take(); }
+    constexpr Error none() const { return _error; }
+    constexpr Value &unwrap() { return _value.unwrap(); }
+    constexpr Value take() { return _value.take(); }
 };
 
 static_assert(Tryable<Result<int>>);

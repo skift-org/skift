@@ -11,11 +11,11 @@ struct File {
     Fd _fd;
     Path _path;
 
-    static auto create(Path &path) -> Result<File> {
+    static Result<File> create(Path &path) {
         return File{try$(Fd::create(path)), path};
     }
 
-    static auto open(Path &path) -> Result<File>;
+    static Result<File> open(Path &path);
 };
 
 } // namespace Karm::Sys

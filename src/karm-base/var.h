@@ -15,17 +15,17 @@ struct Var {
     Var() = delete;
 
     template <Meta::Contains<Ts...> T>
-    Var(T const &value) : _type(Meta::index_of<T, Ts...>()) {
+    Var(T const &value) : _type(Meta::indexOf<T, Ts...>()) {
         new (_buf) T(value);
     }
 
     template <Meta::Contains<Ts...> T>
-    Var(T &&value) : _type(Meta::index_of<T, Ts...>()) {
+    Var(T &&value) : _type(Meta::indexOf<T, Ts...>()) {
         new (_buf) T(std::move(value));
     }
 
     Var(Var const &other) : _type(other._type) {
-        Meta::index_cast<Ts...>(
+        Meta::indexCast<Ts...>(
             _type, other._buf,
             [this]<typename T>(T const &ptr) {
             new (_buf) T(ptr);
@@ -33,44 +33,44 @@ struct Var {
     }
 
     Var(Var &&other) : _type(other._type) {
-        Meta::index_cast<Ts...>(_type, other._buf, [this]<typename T>(T &ptr) {
+        Meta::indexCast<Ts...>(_type, other._buf, [this]<typename T>(T &ptr) {
             new (_buf) T(std::move(ptr));
         });
     }
 
     ~Var() {
-        Meta::index_cast<Ts...>(_type, _buf, []<typename T>(T &ptr) {
+        Meta::indexCast<Ts...>(_type, _buf, []<typename T>(T &ptr) {
             ptr.~T();
         });
     }
 
     template <Meta::Contains<Ts...> T>
-    auto operator=(T const &value) -> Var & {
+    Var &operator=(T const &value) {
         return *this = Var(value);
     }
 
     template <Meta::Contains<Ts...> T>
-    auto operator=(T &&value) -> Var & {
-        Meta::index_cast<Ts...>(_type, _buf, []<typename U>(U &ptr) {
+    Var &operator=(T &&value) {
+        Meta::indexCast<Ts...>(_type, _buf, []<typename U>(U &ptr) {
             ptr.~U();
         });
 
-        _type = Meta::index_of<T, Ts...>();
+        _type = Meta::indexOf<T, Ts...>();
         new (_buf) T(std::move(value));
 
         return *this;
     }
 
-    auto operator=(Var const &other) -> Var & { return *this = Var(other); }
+    Var &operator=(Var const &other) { return *this = Var(other); }
 
-    auto operator=(Var &&other) -> Var & {
-        Meta::index_cast<Ts...>(_type, _buf, []<typename T>(T &ptr) {
+    Var &operator=(Var &&other) {
+        Meta::indexCast<Ts...>(_type, _buf, []<typename T>(T &ptr) {
             ptr.~T();
         });
 
         _type = other._type;
 
-        Meta::index_cast<Ts...>(_type, other._buf, [this]<typename T>(T &ptr) {
+        Meta::indexCast<Ts...>(_type, other._buf, [this]<typename T>(T &ptr) {
             new (_buf) T(std::move(ptr));
         });
 
@@ -78,8 +78,8 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    auto unwrap() -> T & {
-        if (_type != Meta::index_of<T, Ts...>()) {
+    T &unwrap() {
+        if (_type != Meta::indexOf<T, Ts...>()) {
             Debug::panic("Unwrapping wrong type");
         }
 
@@ -87,8 +87,8 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    auto take() -> T {
-        if (_type != Meta::index_of<T, Ts...>()) {
+    T take() {
+        if (_type != Meta::indexOf<T, Ts...>()) {
             Debug::panic("Taking wrong type");
         }
 
@@ -97,7 +97,7 @@ struct Var {
 
     template <Meta::Contains<Ts...> T>
     bool with(auto visitor) {
-        if (_type == Meta::index_of<T, Ts...>()) {
+        if (_type == Meta::indexOf<T, Ts...>()) {
             visitor(*static_cast<T *>(_buf));
             return true;
         }
@@ -105,20 +105,20 @@ struct Var {
     }
 
     void visit(auto visitor) {
-        Meta::index_cast<Ts...>(_type, _buf, [&]<typename U>(U *ptr) {
+        Meta::indexCast<Ts...>(_type, _buf, [&]<typename U>(U *ptr) {
             visitor(*ptr);
         });
     }
 
     void visit(auto visitor) const {
-        Meta::index_cast<Ts...>(_type, _buf, [&]<typename U>(U const *ptr) {
+        Meta::indexCast<Ts...>(_type, _buf, [&]<typename U>(U const *ptr) {
             visitor(*ptr);
         });
     }
 
     template <Meta::Contains<Ts...> T>
-    auto is() -> bool {
-        return _type == Meta::index_of<T, Ts...>();
+    bool is() {
+        return _type == Meta::indexOf<T, Ts...>();
     }
 };
 

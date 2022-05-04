@@ -11,7 +11,7 @@ template <typename T>
 struct Atom {
     T _value;
 
-    auto value() const -> T const & {
+    T const &value() const {
         return _value;
     }
 
@@ -21,7 +21,7 @@ struct Atom {
 };
 
 template <typename T>
-Atom<T> use_atom() {
+Atom<T> useAtom() {
     return {};
 }
 

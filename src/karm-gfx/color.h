@@ -19,7 +19,7 @@ union Color {
 
     constexpr Color(uint32_t rgba) : raw(rgba) {}
 
-    constexpr auto blend(const Color &bg) const -> Color {
+    constexpr Color blend(const Color &bg) const {
         if (a == 0xff) {
             return *this;
         } else if (a == 0) {
@@ -36,7 +36,7 @@ union Color {
         }
     }
 
-    constexpr auto lerp(const Color &other, float t) const -> Color {
+    constexpr Color lerp(const Color &other, float t) const {
         return {
             static_cast<uint8_t>(r + (other.r - r) * t),
             static_cast<uint8_t>(g + (other.g - g) * t),

@@ -29,32 +29,32 @@ union Trans2 {
 
     Trans2(double xx, double xy, double yx, double yy, double ox, double oy) : _els{xx, xy, yx, yy, ox, oy} {}
 
-    static auto rotate(double angle) -> Trans2 {
+    static Trans2 rotate(double angle) {
         double c = cos(angle);
         double s = sin(angle);
         return {c, -s, s, c, 0, 0};
     }
 
-    static auto skew(double x, double y) -> Trans2 {
+    static Trans2 skew(double x, double y) {
         return {1, x, y, 1, 0, 0};
     }
 
-    static auto scale(double x, double y) -> Trans2 {
+    static Trans2 scale(double x, double y) {
         return {x, 0, 0, y, 0, 0};
     }
 
-    static auto translate(double x, double y) -> Trans2 {
+    static Trans2 translate(double x, double y) {
         return {1, 0, 0, 1, x, y};
     }
 
-    auto apply(Vec2f const &v) const -> Vec2f {
+    Vec2f apply(Vec2f const &v) const {
         return {
             v.x * xx + v.y * xy,
             v.x * yx + v.y * yy,
         };
     }
 
-    auto operator*(Trans2 const &other) const -> Trans2 {
+    Trans2 operator*(Trans2 const &other) const {
         return {
             xx * other.xx + xy * other.yx,
             xx * other.xy + xy * other.yy,

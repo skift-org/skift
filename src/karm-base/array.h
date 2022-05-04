@@ -12,11 +12,11 @@ struct Array {
 
     constexpr Array() = default;
 
-    constexpr auto len() -> size_t { return N; }
+    constexpr size_t len() { return N; }
 
-    constexpr auto begin() -> T * { return _buf; }
+    constexpr T *begin() { return _buf; }
 
-    constexpr auto end() -> T * { return _buf + N; }
+    constexpr T *end() { return _buf + N; }
 };
 
 } // namespace Karm::Base

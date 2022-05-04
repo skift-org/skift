@@ -6,14 +6,14 @@
 
 namespace Hjert::Api {
 
-int do_syscall(void *, size_t);
+int doSyscall(void *, size_t);
 
 template <Id id, typename Self>
 struct Syscall {
     static constexpr Id ID = id;
 
-    auto call() -> Karm::Base::Error {
-        return static_cast<Karm::Base::Error::Code>(do_syscall(this, sizeof(Self)));
+    Karm::Base::Error call() {
+        return static_cast<Karm::Base::Error::Code>(doSyscall(this, sizeof(Self)));
     }
 };
 

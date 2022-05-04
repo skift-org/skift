@@ -33,7 +33,7 @@ struct Ui {
     };
 
     Base::Vec<Ctx> _stack;
-    Base::Strong<Node> _curr = Base::make_strong<Node>();
+    Base::Strong<Node> _curr = Base::makeStrong<Node>();
 
     Builder _builder;
 
@@ -50,7 +50,7 @@ struct Ui {
         if (current().child < current().parent->len()) {
             return current().parent->peek(current().child++);
         } else {
-            Base::Strong<Node> node = Base::make_strong<Node>();
+            Base::Strong<Node> node = Base::makeStrong<Node>();
             current().parent->mount(node);
             current().child++;
             return node;
@@ -79,7 +79,7 @@ struct Ui {
         _builder();
     }
 
-    void should_rebuild() {
+    void shouldRebuild() {
     }
 
     void dump() {

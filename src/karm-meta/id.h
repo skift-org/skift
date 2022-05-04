@@ -12,7 +12,7 @@ struct _Id {
 };
 
 template <typename T>
-static Id make_id() {
+static Id makeId() {
     return reinterpret_cast<Id>(&_Id<T>::_);
 }
 

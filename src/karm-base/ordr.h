@@ -23,40 +23,40 @@ struct Ordr {
 
     constexpr Ordr(Value value) : _value(value) {}
 
-    constexpr auto operator==(const Ordr &other) const -> bool = default;
+    constexpr bool operator==(const Ordr &other) const = default;
 
-    constexpr auto is_eq() const -> bool { return _value == EQUAL; }
-    constexpr auto is_ne() const -> bool { return _value != EQUAL; }
-    constexpr auto is_lt() const -> bool { return _value == LESS; }
-    constexpr auto is_gt() const -> bool { return _value == GREATER; }
-    constexpr auto is_lteq() const -> bool { return _value != GREATER; }
-    constexpr auto is_gteq() const -> bool { return _value != LESS; }
+    constexpr bool isEq() const { return _value == EQUAL; }
+    constexpr bool isNe() const { return _value != EQUAL; }
+    constexpr bool isLt() const { return _value == LESS; }
+    constexpr bool isGt() const { return _value == GREATER; }
+    constexpr bool isLtEq() const { return _value != GREATER; }
+    constexpr bool isGtEq() const { return _value != LESS; }
 };
 
 namespace Op {
 
-constexpr auto eq(auto const &lhs, auto const &rhs) -> bool {
-    return lhs.cmp(rhs).is_eq();
+constexpr bool eq(auto const &lhs, auto const &rhs) {
+    return lhs.cmp(rhs).isEq();
 }
 
-constexpr auto ne(auto const &lhs, auto const &rhs) -> bool {
-    return lhs.cmp(rhs).is_ne();
+constexpr bool ne(auto const &lhs, auto const &rhs) {
+    return lhs.cmp(rhs).isNe();
 }
 
-constexpr auto lt(auto const &lhs, auto const &rhs) -> bool {
-    return lhs.cmp(rhs).is_lt();
+constexpr bool lt(auto const &lhs, auto const &rhs) {
+    return lhs.cmp(rhs).isLt();
 }
 
-constexpr auto gt(auto const &lhs, auto const &rhs) -> bool {
-    return lhs.cmp(rhs).is_lt();
+constexpr bool gt(auto const &lhs, auto const &rhs) {
+    return lhs.cmp(rhs).isGt();
 }
 
-constexpr auto gteq(auto const &lhs, auto const &rhs) -> bool {
-    return lhs.cmp(rhs).is_gteq();
+constexpr bool gteq(auto const &lhs, auto const &rhs) {
+    return lhs.cmp(rhs).isGtEq();
 }
 
-constexpr auto lteq(auto const &lhs, auto const &rhs) -> bool {
-    return lhs.cmp(rhs).is_lteq();
+constexpr bool lteq(auto const &lhs, auto const &rhs) {
+    return lhs.cmp(rhs).isLtEq();
 }
 
 } // namespace Op

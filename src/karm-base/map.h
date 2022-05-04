@@ -27,7 +27,7 @@ struct Map {
         _els.push(Cons<K, V>{key, value});
     }
 
-    auto get(K const &key) -> Opt<V> {
+    Opt<V> get(K const &key) {
         for (auto &i : _els) {
             if (i.car == key) {
                 return i.cdr;
@@ -37,15 +37,15 @@ struct Map {
         return NONE;
     }
 
-    auto begin() const {
+    Cons<K, V> const *begin() const {
         return _els.begin();
     }
 
-    auto end() const {
+    Cons<K, V> const *end() const {
         return _els.end();
     }
 
-    auto len() -> size_t {
+    size_t len() {
         return _els.len();
     }
 

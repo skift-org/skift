@@ -22,68 +22,68 @@ union Vec2 {
 
     constexpr Vec2(T value) : _els{value, value} {}
 
-    auto min() const -> T {
+    T min() const {
         return Base::min(x, y);
     }
 
-    auto max() const -> T {
+    T max() const {
         return Base::max(x, y);
     }
 
-    auto dot(Vec2 const &other) const -> T {
+    T dot(Vec2 const &other) const {
         return x * other.x + y * other.y;
     }
 
-    auto len() const -> T {
+    T len() const {
         return sqrt(dot(*this));
     }
 
-    auto dist(Vec2 const &other) const -> T {
+    T dist(Vec2 const &other) const {
         return (*this - other).len();
     }
 
-    auto norm() const -> Vec2 {
+    Vec2 norm() const {
         T len = this->len();
         return {x / len, y / len};
     }
 
-    auto angle(Vec2 const &other) const -> T {
+    T angle(Vec2 const &other) const {
         return atan2(other.y - y, other.x - x);
     }
 
-    auto operator[](int i) const -> T {
+    T operator[](int i) const {
         return _els[i];
     }
 
-    auto operator+(T const &other) const -> Vec2 {
+    Vec2 operator+(T const &other) const {
         return {x + other, y + other};
     }
 
-    auto operator-(T const &other) const -> Vec2 {
+    Vec2 operator-(T const &other) const {
         return {x - other, y - other};
     }
 
-    auto operator*(T const &other) const -> Vec2 {
+    Vec2 operator*(T const &other) const {
         return {x * other, y * other};
     }
 
-    auto operator/(T const &other) const -> Vec2 {
+    Vec2 operator/(T const &other) const {
         return {x / other, y / other};
     }
 
-    auto operator+(Vec2 const &other) const -> Vec2 {
+    Vec2 operator+(Vec2 const &other) const {
         return {x + other.x, y + other.y};
     }
 
-    auto operator-(Vec2 const &other) const -> Vec2 {
+    Vec2 operator-(Vec2 const &other) const {
         return {x - other.x, y - other.y};
     }
 
-    auto operator*(Vec2 const &other) const -> Vec2 {
+    Vec2 operator*(Vec2 const &other) const {
         return {x * other.x, y * other.y};
     }
 
-    auto operator/(Vec2 const &other) const -> Vec2 {
+    Vec2 operator/(Vec2 const &other) const {
         return {x / other.x, y / other.y};
     }
 };
@@ -111,64 +111,64 @@ union Vec3 {
 
     constexpr Vec3(T value) : _els{value, value, value} {}
 
-    auto min() const -> T {
+    T min() const {
         return Base::min(x, y, z);
     }
 
-    auto max() const -> T {
+    T max() const {
         return Base::max(x, y, z);
     }
 
-    auto dot(Vec3 const &other) const -> T {
+    T dot(Vec3 const &other) const {
         return x * other.x + y * other.y + z * other.z;
     }
 
-    auto len() const -> T {
+    T len() const {
         return sqrt(dot(*this));
     }
 
-    auto dist(Vec3 const &other) const -> T {
+    T dist(Vec3 const &other) const {
         return (*this - other).len();
     }
 
-    auto norm() const -> Vec3 {
+    Vec3 norm() const {
         T len = this->len();
         return {x / len, y / len, z / len};
     }
 
-    auto operator[](int i) -> T {
+    T operator[](int i) {
         return _els[i];
     }
 
-    auto operator+(T const &other) const -> Vec3 {
+    Vec3 operator+(T const &other) const {
         return {x + other, y + other, z + other};
     }
 
-    auto operator-(T const &other) const -> Vec3 {
+    Vec3 operator-(T const &other) const {
         return {x - other, y - other, z - other};
     }
 
-    auto operator*(T const &other) const -> Vec3 {
+    Vec3 operator*(T const &other) const {
         return {x * other, y * other, z * other};
     }
 
-    auto operator/(T const &other) const -> Vec3 {
+    Vec3 operator/(T const &other) const {
         return {x / other, y / other, z / other};
     }
 
-    auto operator+(Vec3 const &other) const -> Vec3 {
+    Vec3 operator+(Vec3 const &other) const {
         return {x + other.x, y + other.y, z + other.z};
     }
 
-    auto operator-(Vec3 const &other) const -> Vec3 {
+    Vec3 operator-(Vec3 const &other) const {
         return {x - other.x, y - other.y, z - other.z};
     }
 
-    auto operator*(Vec3 const &other) const -> Vec3 {
+    Vec3 operator*(Vec3 const &other) const {
         return {x * other.x, y * other.y, z * other.z};
     }
 
-    auto operator/(Vec3 const &other) const -> Vec3 {
+    Vec3 operator/(Vec3 const &other) const {
         return {x / other.x, y / other.y, z / other.z};
     }
 };
@@ -201,64 +201,64 @@ union Vec4 {
 
     Vec4(T value) : _els{value, value, value, value} {}
 
-    auto min() const -> T {
+    T min() const {
         return Base::min(x, y, z, w);
     }
 
-    auto max() const -> T {
+    T max() const {
         return Base::max(x, y, z, w);
     }
 
-    auto dot(Vec4 const &other) const -> T {
+    T dot(Vec4 const &other) const {
         return x * other.x + y * other.y + z * other.z + w * other.w;
     }
 
-    auto len() const -> T {
+    T len() const {
         return sqrt(dot(*this));
     }
 
-    auto dist(Vec4 const &other) const -> T {
+    T dist(Vec4 const &other) const {
         return (*this - other).len();
     }
 
-    auto norm() const -> Vec4 {
+    Vec4 norm() const {
         T len = this->len();
         return {x / len, y / len, z / len, w / len};
     }
 
-    auto operator[](int i) -> T {
+    T operator[](int i) {
         return _els[i];
     }
 
-    auto operator+(T const &other) const -> Vec4 {
+    Vec4 operator+(T const &other) const {
         return {x + other, y + other, z + other, w + other};
     }
 
-    auto operator-(T const &other) const -> Vec4 {
+    Vec4 operator-(T const &other) const {
         return {x - other, y - other, z - other, w - other};
     }
 
-    auto operator*(T const &other) const -> Vec4 {
+    Vec4 operator*(T const &other) const {
         return {x * other, y * other, z * other, w * other};
     }
 
-    auto operator/(T const &other) const -> Vec4 {
+    Vec4 operator/(T const &other) const {
         return {x / other, y / other, z / other, w / other};
     }
 
-    auto operator+(Vec4 const &other) const -> Vec4 {
+    Vec4 operator+(Vec4 const &other) const {
         return {x + other.x, y + other.y, z + other.z, w + other.w};
     }
 
-    auto operator-(Vec4 const &other) const -> Vec4 {
+    Vec4 operator-(Vec4 const &other) const {
         return {x - other.x, y - other.y, z - other.z, w - other.w};
     }
 
-    auto operator*(Vec4 const &other) const -> Vec4 {
+    Vec4 operator*(Vec4 const &other) const {
         return {x * other.x, y * other.y, z * other.z, w * other.w};
     }
 
-    auto operator/(Vec4 const &other) const -> Vec4 {
+    Vec4 operator/(Vec4 const &other) const {
         return {x / other.x, y / other.y, z / other.z, w / other.w};
     }
 };

@@ -17,7 +17,7 @@ struct Flow {
     Flow(_F f) : _f(f) {}
 
     template <typename T>
-    auto vec() -> Math::Vec2<T> {
+    Math::Vec2<T> vec() {
         switch (_f) {
         case LTR:
             return {1, 0};
@@ -31,7 +31,7 @@ struct Flow {
     }
 
     template <typename T>
-    auto start(Math::Rect<T> r) -> T {
+    T start(Math::Rect<T> r) {
         switch (_f) {
         case LTR:
             return r.start();
@@ -63,7 +63,7 @@ struct Flow {
     }
 
     template <typename T>
-    auto end(Math::Rect<T> r) -> T {
+    T end(Math::Rect<T> r) {
         switch (_f) {
         case LTR:
             return r.end();
@@ -95,7 +95,7 @@ struct Flow {
     }
 
     template <typename T>
-    auto top(Math::Rect<T> r) -> T {
+    T top(Math::Rect<T> r) {
         switch (_f) {
         case LTR:
         case RTL:
@@ -123,7 +123,7 @@ struct Flow {
     }
 
     template <typename T>
-    auto bottom(Math::Rect<T> r) -> T {
+    T bottom(Math::Rect<T> r) {
         switch (_f) {
         case LTR:
         case RTL:
@@ -151,7 +151,7 @@ struct Flow {
     }
 
     template <typename T>
-    auto width(Math::Rect<T> r) -> T {
+    T width(Math::Rect<T> r) {
         switch (_f) {
         case LTR:
         case RTL:
@@ -179,7 +179,7 @@ struct Flow {
     }
 
     template <typename T>
-    auto height(Math::Rect<T> r) -> T {
+    T height(Math::Rect<T> r) {
         switch (_f) {
         case LTR:
         case RTL:
@@ -207,7 +207,7 @@ struct Flow {
     }
 
     template <typename T>
-    auto origin(Math::Rect<T> r) -> Math::Vec2<T> {
+    Math::Vec2<T> origin(Math::Rect<T> r) {
         return {start(r), top(r)};
     }
 
@@ -218,7 +218,7 @@ struct Flow {
     }
 
     template <typename T>
-    auto center(Math::Rect<T> r) -> Math::Vec2<T> {
+    Math::Vec2<T> center(Math::Rect<T> r) {
         return {start(r) + width(r) / 2, top(r) + height(r) / 2};
     }
 

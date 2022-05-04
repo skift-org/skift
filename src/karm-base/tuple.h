@@ -14,7 +14,7 @@ template <>
 struct Tuple<> {
     static constexpr size_t size = 0;
 
-    constexpr auto len() -> size_t { return 0; }
+    constexpr size_t len() { return 0; }
 
     constexpr void visit(auto) {}
 };
@@ -24,7 +24,7 @@ struct Tuple<Car> {
     Car car;
     None cdr;
 
-    constexpr auto len() -> size_t {
+    constexpr size_t len() {
         return 1;
     }
 
@@ -32,7 +32,7 @@ struct Tuple<Car> {
         f(car);
     }
 
-    constexpr auto cons() -> Cons<Car, None> {
+    constexpr Cons<Car, None> cons() {
         return {car, None{}};
     }
 };
@@ -42,7 +42,7 @@ struct Tuple<Car, Cdr...> {
     Car car;
     Tuple<Cdr...> cdr;
 
-    constexpr auto len() -> size_t {
+    constexpr size_t len() {
         return 1 + cdr.len();
     }
 
@@ -51,7 +51,7 @@ struct Tuple<Car, Cdr...> {
         cdr.visit(f);
     }
 
-    constexpr auto cons() -> Cons<Car, None> {
+    constexpr Cons<Car, None> cons() {
         return {car, cdr.cons()};
     }
 };

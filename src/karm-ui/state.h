@@ -14,7 +14,7 @@ struct State {
     State(T value) : _value(value) {
     }
 
-    auto value() const -> T const & {
+    T const &value() const {
         return _value;
     }
 
@@ -24,7 +24,7 @@ struct State {
 };
 
 template <typename T>
-State<T> use_state(T value) {
+State<T> useState(T value) {
     State<T> state{value};
 
     return state;

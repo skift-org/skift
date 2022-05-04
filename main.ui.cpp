@@ -8,7 +8,7 @@ using namespace Karm::Ui;
 int main(int, char **) {
     Ui app{[] {
         window([] {
-            auto state = use_state(0);
+            auto state = useState(0);
 
             label(u8"You, clicked {} times", state.value());
             button(u8"Click me!", [&](Event const &) {

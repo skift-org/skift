@@ -12,13 +12,13 @@ struct Header {
 
 struct Message {
     struct Encoder {
-        auto write(void const *, size_t size) -> Base::Result<size_t>;
+        Base::Result<size_t> write(void const *, size_t size);
         Message finalize();
     };
 
     struct Decoder {
         Decoder(Message &message);
-        auto read(void *data, size_t size) -> Base::Result<size_t>;
+        Base::Result<size_t> read(void *data, size_t size);
     };
 };
 
@@ -27,7 +27,7 @@ struct Procedure {
     constexpr static Id ID = id;
     constexpr static bool do_return = false;
 
-    auto encode(Io::Writer auto &writer, Args &&...args) -> Base::Result<size_t> {
+    Base::Result<size_t> encode(Io::Writable auto &writer, Args &&...args) {
         return Base::pack(writer, std::forward<Args>(args)...);
     }
 };
@@ -38,20 +38,20 @@ struct Function : public Procedure<id, Args...> {
 
     constexpr static bool do_return = true;
 
-    auto decode(Io::Reader auto &reader, Ret &ret) -> Base::Result<size_t> {
+    Base::Result<size_t> decode(Io::Readable auto &reader, Ret &ret) {
         return Base::unpack(reader, ret);
     }
 };
 
-auto do_procedure_call(Message req) -> Base::Error;
+Base::Error doProcedureCall(Message req);
 
-auto do_function_call(Message req, Message &resp) -> Base::Error;
+Base::Error doFunctionCall(Message req, Message &resp);
 
 struct Endpoint {
 };
 
 struct Peer {
-    static auto self() -> Peer &;
+    static Peer &self();
 
     void handle(Message &message);
 
@@ -67,7 +67,7 @@ struct Handle {
     uint64_t _value;
 
     template <typename Func, typename... Args>
-    auto call(Args &&...args) -> Base::Result<typename Func::Return> {
+    Base::Result<typename Func::Return> call(Args &&...args) {
         Func func;
 
         Message::Encoder encoder;
@@ -75,7 +75,7 @@ struct Handle {
 
         if constexpr (Func::do_return) {
             Message response;
-            try$(do_function_call(encoder.finalize(), response));
+            try$(doFunctionCall(encoder.finalize(), response));
 
             Message::Decoder decoder{response};
             typename Func::Return ret;
@@ -83,7 +83,7 @@ struct Handle {
 
             return {ret};
         } else {
-            return do_procedure_call(encoder.finalize());
+            return doProcedureCall(encoder.finalize());
         }
     }
 };

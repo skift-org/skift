@@ -7,44 +7,46 @@
 
 namespace Karm::Io {
 
-struct Sink {
-    auto write(void const *, size_t size) -> Base::Result<size_t> { return size; }
+struct Sink : public Writer {
+    Base::Result<size_t> write(void const *, size_t size) override { return size; }
 };
 
-struct Zero {
-    auto read(void *data, size_t size) -> Base::Result<size_t> {
+struct Zero : public Reader {
+    Base::Result<size_t> read(void *data, size_t size) override {
         memset(data, 0, size);
         return size;
     }
 };
 
-struct Repeat {
+struct Repeat : public Reader {
     uint8_t _byte;
 
     Repeat(uint8_t byte) : _byte(byte) {}
 
-    auto read(void *data, size_t size) -> Base::Result<size_t> {
+    Base::Result<size_t> read(void *data, size_t size) override {
         memset(data, _byte, size);
         return size;
     }
 };
 
-struct Empty {
-    auto read(void *, size_t) -> Base::Result<size_t> { return 0; }
+struct Empty : public Reader {
+    Base::Result<size_t> read(void *, size_t) override {
+        return 0;
+    }
 };
 
-template <Reader Reader>
-struct Limite {
-    Reader _reader;
+template <Readable Readable>
+struct Limite : public Reader {
+    Readable _reader;
     size_t _limit;
     size_t _read;
 
-    Limite(Reader &&reader, size_t limit)
-        : _reader(std::forward<Reader>(reader)),
+    Limite(Readable &&reader, size_t limit)
+        : _reader(std::forward<Readable>(reader)),
           _limit(limit) {
     }
 
-    auto read(void *data, size_t size) -> Base::Result<size_t> {
+    Base::Result<size_t> read(void *data, size_t size) override {
         if (_read + size > _limit) {
             size = _limit - _read;
         }
@@ -55,26 +57,26 @@ struct Limite {
     }
 };
 
-template <SeekableWriter Writer>
-struct Slice {
-    Writer _writer;
+template <SeekableWritable Writable>
+struct Slice : public Writer, public Seeker {
+    Writable _writer;
     size_t _start;
     size_t _end;
 
-    Slice(Writer writer, size_t size)
-        : _writer(std::forward<Writer>(writer)) {
+    Slice(Writable writer, size_t size)
+        : _writer(std::forward<Writable>(writer)) {
         _start = try$(_writer.tell());
         _end = _start + size;
     }
 
-    auto seek(Seek seek) -> Base::Result<size_t> {
+    Base::Result<size_t> seek(Seek seek) override {
         size_t pos = try$(tell(_writer));
         pos = seek.apply(pos);
         pos = clamp(pos, _start, _end);
-        return try$(_writer.seek(Seek::from_begin(pos)));
+        return try$(_writer.seek(Seek::fromBegin(pos)));
     }
 
-    auto write(void const *data, size_t size) -> Base::Result<size_t> {
+    Base::Result<size_t> write(void const *data, size_t size) override {
         size_t pos = try$(tell(_writer));
 
         if (pos < _start) {

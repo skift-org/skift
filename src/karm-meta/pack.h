@@ -22,7 +22,7 @@ inline constexpr size_t _IndexOf<T, First, Rest...> = Same<T, First> ? 0 : _Inde
 
 template <typename T, typename... Ts>
 requires Contains<T, Ts...>
-static consteval size_t index_of() {
+static consteval size_t indexOf() {
     return _IndexOf<T, Ts...>;
 }
 
@@ -48,7 +48,7 @@ struct _IndexCast<Data, First, Rest...> {
 };
 
 template <typename... Ts>
-static void index_cast(size_t index, auto *ptr, auto func) {
+static void indexCast(size_t index, auto *ptr, auto func) {
     _IndexCast<RemoveRef<decltype(*ptr)>, Ts...>::eval(index, ptr, func);
 }
 

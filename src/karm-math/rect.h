@@ -26,11 +26,11 @@ union Rect {
     Rect(Vec2<T> xy, Vec2<T> wh) : xy(xy), wh(wh) {
     }
 
-    auto min() const -> Vec2<T> { return {x, y}; }
+    Vec2<T> min() const { return {x, y}; }
 
-    auto max() const -> Vec2<T> { return {x + width, y + height}; }
+    Vec2<T> max() const { return {x + width, y + height}; }
 
-    auto start() const -> T { return x; }
+    T start() const { return x; }
 
     void start(T value) {
         T d = value - x;
@@ -38,14 +38,14 @@ union Rect {
         width -= d;
     }
 
-    auto end() const -> T { return x + width; }
+    T end() const { return x + width; }
 
     void end(T value) {
         T d = value - (x + width);
         width += d;
     }
 
-    auto top() const -> T { return y; }
+    T top() const { return y; }
 
     void top(T value) {
         T d = value - y;
@@ -53,46 +53,46 @@ union Rect {
         height -= d;
     }
 
-    auto bottom() const -> T { return y + height; }
+    T bottom() const { return y + height; }
 
     void bottom(T value) {
         T d = value - (y + height);
         height += d;
     }
 
-    auto center() const -> Vec2<T> { return {x + width / 2, y + height / 2}; }
+    Vec2<T> center() const { return {x + width / 2, y + height / 2}; }
 
-    auto size() const -> Vec2<T> { return {width, height}; }
+    Vec2<T> size() const { return {width, height}; }
 
-    auto xw() const -> Vec2<T> { return {x, x + width}; }
+    Vec2<T> xw() const { return {x, x + width}; }
 
     void xw(Vec2<T> const &v) {
         x = v.x;
         width = v.y - v.x;
     }
 
-    auto yh() const -> Vec2<T> { return {y, y + height}; }
+    Vec2<T> yh() const { return {y, y + height}; }
 
     void yh(Vec2<T> const &v) {
         y = v.x;
         height = v.y - v.x;
     }
 
-    auto contains(Vec2<T> const &v) const -> bool {
+    bool contains(Vec2<T> const &v) const {
         return v.x >= x && v.y >= y && v.x < x + width && v.y < y + height;
     }
 
-    auto contains(Rect<T> const &r) const -> bool {
+    bool contains(Rect<T> const &r) const {
         return r.x >= x && r.y >= y && r.x + r.width <= x + width && r.y + r.height <= y + height;
     }
 
-    auto colide(Rect<T> const &r) const -> bool {
+    bool colide(Rect<T> const &r) const {
         return r.x + r.width > x && r.y + r.height > y && r.x < x + width && r.y < y + height;
     }
 
-    auto operator[](int i) -> T { return _els[i]; }
+    T operator[](int i) { return _els[i]; }
 
-    auto operator[](int i) const -> T { return _els[i]; }
+    T operator[](int i) const { return _els[i]; }
 };
 
 using Recti = Rect<int>;

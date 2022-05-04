@@ -7,19 +7,19 @@
 
 namespace Karm::Base {
 
-auto pack(Io::Writer auto &writer, Meta::Trivial auto const &v) -> Result<size_t> {
+Result<size_t> pack(Io::Writable auto &writer, Meta::Trivial auto const &v) {
     return writer.write(&v, sizeof(v));
 }
 
-auto pack(Io::Writer auto &writer, Meta::Trivial auto... v) -> Result<size_t> {
+Result<size_t> pack(Io::Writable auto &writer, Meta::Trivial auto... v) {
     return (pack(writer, v) + ...);
 }
 
-auto unpack(Io::Reader auto &reader, Meta::Trivial auto &v) -> Result<size_t> {
+Result<size_t> unpack(Io::Readable auto &reader, Meta::Trivial auto &v) {
     return reader.read(&v, sizeof(v));
 }
 
-auto unpack(Io::Reader auto &reader, Meta::Trivial auto... v) -> Result<size_t> {
+Result<size_t> unpack(Io::Readable auto &reader, Meta::Trivial auto... v) {
     return (unpack(reader, v) + ...);
 }
 

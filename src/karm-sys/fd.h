@@ -20,25 +20,25 @@ struct _Pipe {
     _Fd out;
 };
 
-auto _open(Sys::Path path) -> Base::Result<_Fd>;
+Base::Result<_Fd> _open(Sys::Path path);
 
-auto _create(Sys::Path path) -> Base::Result<_Fd>;
+Base::Result<_Fd> _create(Sys::Path path);
 
-auto _pipe() -> Base::Result<_Pipe>;
+Base::Result<_Pipe> _pipe();
 
 void _ref(_Fd fd);
 
 void _deref(_Fd fd);
 
-auto _read(_Fd fd, void *buf, size_t size) -> Base::Result<size_t>;
+Base::Result<size_t> _read(_Fd fd, void *buf, size_t size);
 
-auto _write(_Fd fd, void const *buf, size_t size) -> Base::Result<size_t>;
+Base::Result<size_t> _write(_Fd fd, void const *buf, size_t size);
 
-auto _seek(_Fd fd, Io::Seek seek) -> Base::Result<size_t>;
+Base::Result<size_t> _seek(_Fd fd, Io::Seek seek);
 
-auto _flush(_Fd fd) -> Base::Result<size_t>;
+Base::Result<size_t> _flush(_Fd fd);
 
-auto _dup(_Fd fd) -> Base::Result<_Fd>;
+Base::Result<_Fd> _dup(_Fd fd);
 
 } // namespace Karm::Embed
 

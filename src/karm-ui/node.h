@@ -28,7 +28,7 @@ struct Node {
     uint32_t _id = id++;
 
     Base::Vec<Base::Strong<Node>> _children;
-    Base::Vec<Base::Box<Hook>> _hooks ;
+    Base::Vec<Base::Box<Hook>> _hooks;
 
     Node() {
     }
@@ -47,12 +47,12 @@ struct Node {
 
     void mount(Base::Strong<Node> node) {
         _children.push(node);
-        node->on_mount();
+        node->onMount();
     }
 
     void truncate(size_t len) {
         for (size_t i = len; i < _children.len(); i++) {
-            _children.peek(i)->on_unmount();
+            _children.peek(i)->onUnmount();
         }
 
         _children.truncate(len);
@@ -63,7 +63,7 @@ struct Node {
     template <typename T, typename... Ts>
     T &hook(size_t index, Ts... ts) {
         if (index == _hooks.len()) {
-            _hooks.push(Base::make_box<T>(ts...));
+            _hooks.push(Base::makeBox<T>(ts...));
         }
 
         return *_hooks.peek(index);
@@ -71,29 +71,29 @@ struct Node {
 
     /* --- Life Cycle ------------------------------------------------------- */
 
-    void on_mount() {
+    void onMount() {
         for (auto &hook : _hooks) {
-            hook->on_mount();
+            hook->onMount();
         }
     }
 
-    void on_unmount() {
+    void onUnmount() {
         for (auto &hook : _hooks) {
-            hook->on_unmount();
+            hook->onUnmount();
         }
     }
 
     /* --- Layout & Paint --------------------------------------------------- */
 
-    virtual void on_layout() {
+    virtual void onLayout() {
         for (auto &child : _children) {
-            child->on_layout();
+            child->onLayout();
         }
     }
 
-    virtual void on_paint(Gfx::Gfx &gfx) {
+    virtual void onPaint(Gfx::Gfx &gfx) {
         for (auto &child : _children) {
-            child->on_paint(gfx);
+            child->onPaint(gfx);
         }
     }
 

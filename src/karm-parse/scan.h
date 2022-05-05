@@ -15,7 +15,7 @@ struct Scan {
         return _head >= _str.len();
     }
 
-    char peek() {
+    Text::Rune peek() {
         if (ended()) {
             return '\0';
         }
@@ -23,7 +23,7 @@ struct Scan {
         return _str[_head];
     }
 
-    char peek(size_t offset) {
+    Text::Rune peek(size_t offset) {
         if ((_head + offset) >= _str.len()) {
             return '\0';
         }
@@ -31,7 +31,7 @@ struct Scan {
         return _str[_head + offset];
     }
 
-    char next() {
+    Text::Rune next() {
         if (ended()) {
             return '\0';
         }
@@ -39,15 +39,13 @@ struct Scan {
         return _str[_head++];
     }
 
-    char next(size_t offset) {
-        if ((_head + offset) >= _str.len()) {
-            return '\0';
+    void next(size_t offset) {
+        if ((_head + offset) <= _str.len()) {
+            _head += offset;
         }
-
-        return _str[_head + offset];
     }
 
-    bool skip(char c) {
+    bool skip(Text::Rune c) {
         if (peek() == c) {
             _head++;
             return true;
@@ -63,20 +61,12 @@ struct Scan {
             }
         }
 
-        _head += str.len();
+        next(str.len());
         return true;
     }
 
     bool skip(auto predicate) {
-        while (!ended() && predicate(peek())) {
-            _head++;
-        }
-
-        return !ended();
-    }
-
-    bool eat(char c) {
-        if (peek() == c) {
+        if (!ended() && predicate(peek())) {
             _head++;
             return true;
         }
@@ -84,12 +74,20 @@ struct Scan {
         return false;
     }
 
-    bool eat(auto predicate) {
-        while (!ended() && predicate(peek())) {
-            _head++;
+    bool eat(Text::Rune c) {
+        bool result = false;
+        while (skip(c)) {
+            result = true;
         }
+        return result;
+    }
 
-        return !ended();
+    bool eat(auto predicate) {
+        bool result = false;
+        while (skip(predicate)) {
+            result = true;
+        }
+        return result;
     }
 
     void begin() {

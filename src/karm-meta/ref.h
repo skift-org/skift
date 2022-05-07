@@ -1,6 +1,5 @@
 #pragma once
 
-
 namespace Karm::Meta {
 
 template <class T>

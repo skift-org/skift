@@ -3,7 +3,10 @@
 #include <karm-base/result.h>
 #include <karm-base/tuple.h>
 #include <karm-io/traits.h>
+#include <karm-io/funcs.h>
+#include <karm-parse/scan.h>
 #include <karm-text/str.h>
+
 
 namespace Karm::Fmt {
 
@@ -18,6 +21,39 @@ struct Fmt {
         HEXADECIMAL,
         POINTER,
     } type;
+
+    static Fmt parse(Parse::Scan &scan) {
+        Fmt fmt;
+
+        switch (scan.next()) {
+        case 'c':
+            fmt.type = CHAR;
+            break;
+        case 's':
+            fmt.type = STRING;
+            break;
+        case 'b':
+            fmt.type = BINARY;
+            break;
+        case 'o':
+            fmt.type = OCTAL;
+            break;
+        case 'd':
+            fmt.type = DECIMAL;
+            break;
+        case 'x':
+            fmt.type = HEXADECIMAL;
+            break;
+        case 'p':
+            fmt.type = POINTER;
+            break;
+        default:
+            fmt.type = NONE;
+            break;
+        }
+
+        return fmt;
+    }
 };
 
 struct _Args {
@@ -48,7 +84,24 @@ struct Args : public _Args {
     }
 };
 
-Base::Result<size_t> _format(Io::Writer &writer, Text::Str str, _Args &args);
+Base::Result<size_t> _format(Io::Writer &writer, Text::Str str, _Args &args) {
+    Parse::Scan scan{str};
+    size_t written = 0;
+    size_t index = 0;
+
+    while (!scan.ended()) {
+        Text::Rune c = scan.next();
+
+        if (c == '{') {
+            Fmt fmt = Fmt::parse(scan);
+            args.format(fmt, writer, index);
+            index++;
+        } else {
+            writer.write(c);
+            written++;
+        }
+    }
+}
 
 template <typename... Ts>
 Base::Result<size_t> format(Io::Writer &writer, Text::Str str, Ts &&...ts) {

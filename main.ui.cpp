@@ -7,13 +7,14 @@ using namespace Karm::Ui;
 
 int main(int, char **) {
     Ui app{[] {
-        window([] {
+        window([&] {
             auto state = useState(0);
 
-            label(u8"You, clicked {} times", state.value());
+            label(u8"You, clicked {} times", *state);
+
             button(u8"Click me!", [&](Event const &) {
                 state.update([](auto &s) {
-                    return s + 1;
+                    s++;
                 });
             });
         });

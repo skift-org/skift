@@ -11,20 +11,7 @@
 namespace Karm::Ui {
 
 static uint32_t id = 0;
-
-struct NoCopy {
-    NoCopy() = default;
-    NoCopy(NoCopy const &) = delete;
-    NoCopy &operator=(NoCopy const &) = delete;
-};
-
-struct NoMove {
-    NoMove() = default;
-    NoMove(NoMove &&) = delete;
-    NoMove &operator=(NoMove &&) = delete;
-};
-
-struct Node {
+struct Node : Meta::NoCopy, Meta::NoMove {
     uint32_t _id = id++;
 
     Base::Vec<Base::Strong<Node>> _children;
@@ -66,7 +53,7 @@ struct Node {
             _hooks.push(Base::makeBox<T>(ts...));
         }
 
-        return *_hooks.peek(index);
+        return static_cast<T &>(*_hooks.peek(index));
     }
 
     /* --- Life Cycle ------------------------------------------------------- */
@@ -103,7 +90,15 @@ struct Node {
         for (int i = 0; i < indent * 4; i++) {
             printf(" ");
         }
-        printf("Node %d\n", _id);
+
+        printf("Node %d: ", _id);
+
+        for (auto &hook : _hooks) {
+            printf("%s ", (char const *)hook->desc().buf());
+        }
+
+        printf("\n");
+
         for (auto &child : _children) {
             child->dump(indent + 1);
         }

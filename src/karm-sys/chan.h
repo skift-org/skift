@@ -1,19 +1,22 @@
 #pragma once
 
+#include <embed/sys.h>
+#include <karm-io/traits.h>
+
 #include "fd.h"
 
 namespace Karm::Sys {
 
-struct In {
-    Fd _fd{0};
+struct In : public Io::Reader {
+    Base::Strong<Fd> _fd = Embed::createIn();
 };
 
-struct Out {
-    Fd _fd{1};
+struct Out : public Io::Writer {
+    Base::Strong<Fd> _fd = Embed::createOut();
 };
 
-struct Err {
-    Fd _fd{2};
+struct Err : public Io::Writer {
+    Base::Strong<Fd> _fd = Embed::createErr();
 };
 
 In &in();

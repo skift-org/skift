@@ -5,7 +5,7 @@
 -fno-rtti
 -fsanitize=address
 -fsanitize=undefined
--Isrc
+-I.
 -Wall
 -Wextra
 -Werror

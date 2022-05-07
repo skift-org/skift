@@ -8,8 +8,8 @@ namespace Karm::Ui {
 struct _Widget : public Node {
 };
 
-void widget(Children children = {}) {
-    group([&] {
+static inline void widget(Children children = {}) {
+    ui().group([&] {
         children();
     });
 }

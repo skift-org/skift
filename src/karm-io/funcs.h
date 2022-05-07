@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/clamp.h>
+#include <karm-text/rune.h>
 
 #include "impls.h"
 #include "traits.h"
@@ -27,9 +28,12 @@ Base::Result<size_t> pwrite(Writable auto &writer, void const *data, size_t size
     return try$(writer.write(data, size));
 }
 
-Base::Result<uint8_t> putc(Writable auto &writer, uint8_t byte) {
-    try$(writer.write(&byte, 1));
-    return byte;
+Base::Result<size_t> putc(Writable auto &writer, uint8_t byte) {
+    return writer.write(&byte, 1);
+}
+
+Base::Result<size_t> putr(Writable auto &writer, Text::Rune rune) {
+    return writer.write(&rune, 1);
 }
 
 /* --- Seek ----------------------------------------------------------------- */

@@ -9,7 +9,7 @@ struct _Window : public Node {
 };
 
 void window(Children children = {}) {
-    group([&] {
+    ui().group([&] {
         children();
     });
 }

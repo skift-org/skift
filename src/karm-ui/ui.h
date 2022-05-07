@@ -42,28 +42,31 @@ struct Ui {
         _ui = this;
     }
 
-    Ctx &current() {
+    Ctx &currentCtx() {
         return _stack.top();
     }
 
+    Node &currentNode() {
+        return *currentCtx().parent;
+    }
+
     Base::Strong<Node> reconcile() {
-        if (current().child < current().parent->len()) {
-            return current().parent->peek(current().child++);
+        if (currentCtx().child < currentNode().len()) {
+            return currentNode().peek(currentCtx().child++);
         } else {
             Base::Strong<Node> node = Base::makeStrong<Node>();
-            current().parent->mount(node);
-            current().child++;
+            currentNode().mount(node);
+            currentCtx().child++;
             return node;
         }
     }
-
     void begin() {
         _stack.push(Ctx{reconcile()});
     }
 
     Node &end() {
         Node &node = *_stack.top().parent;
-        current().parent->truncate(current().child + 1);
+        currentNode().truncate(currentCtx().child + 1);
         _stack.pop();
         return node;
     }
@@ -72,6 +75,11 @@ struct Ui {
         begin();
         inner();
         return end();
+    }
+
+    template <typename T, typename... Ts>
+    T &hook(Ts... ts) {
+        return currentNode().hook<T>(currentCtx().hook++, ts...);
     }
 
     void rebuild() {
@@ -95,12 +103,6 @@ struct Ui {
 
 Ui &ui() {
     return *_ui;
-}
-
-Node &group(Children children = {}) {
-    return ui().group([&] {
-        children();
-    });
 }
 
 } // namespace Karm::Ui

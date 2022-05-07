@@ -1,33 +1,37 @@
 #pragma once
 
 #include "hook.h"
+#include "ui.h"
 
 namespace Karm::Ui {
 
-struct _StateHook : public Hook {
-};
-
 template <typename T>
-struct State {
+struct State : public Hook {
     T _value;
 
     State(T value) : _value(value) {
     }
 
-    T const &value() const {
+    Text::Str desc() const override {
+        return u8"State";
+    }
+
+    T const *operator->() const {
+        return &_value;
+    }
+
+    T const &operator*() const {
         return _value;
     }
 
     void update(auto fn) {
-        _value = fn(_value);
+        fn(_value);
     }
 };
 
 template <typename T>
-State<T> useState(T value) {
-    State<T> state{value};
-
-    return state;
+State<T> &useState(T value) {
+    return ui().hook<State<T>>(value);
 }
 
 } // namespace Karm::Ui

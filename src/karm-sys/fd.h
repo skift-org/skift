@@ -1,117 +1,30 @@
 #pragma once
 
-#include <karm-base/macros.h>
-#include <karm-base/result.h>
+#include <karm-base/rc.h>
 #include <karm-io/types.h>
 #include <karm-meta/same.h>
-#include <karm-text/str.h>
 
 #include "path.h"
-
-namespace Karm::Embed {
-
-using _Fd = int;
-
-struct _Stat {
-};
-
-struct _Pipe {
-    _Fd in;
-    _Fd out;
-};
-
-Base::Result<_Fd> _open(Sys::Path path);
-
-Base::Result<_Fd> _create(Sys::Path path);
-
-Base::Result<_Pipe> _pipe();
-
-void _ref(_Fd fd);
-
-void _deref(_Fd fd);
-
-Base::Result<size_t> _read(_Fd fd, void *buf, size_t size);
-
-Base::Result<size_t> _write(_Fd fd, void const *buf, size_t size);
-
-Base::Result<size_t> _seek(_Fd fd, Io::Seek seek);
-
-Base::Result<size_t> _flush(_Fd fd);
-
-Base::Result<_Fd> _dup(_Fd fd);
-
-} // namespace Karm::Embed
 
 namespace Karm::Sys {
 
 struct Fd {
-    Embed::_Fd _fd = -1;
+    virtual ~Fd() = default;
 
-    Fd(Embed::_Fd fd) : _fd(fd) {}
+    virtual Base::Result<size_t> read(void *buf, size_t size) = 0;
 
-    Fd(Fd const &other) : _fd(other._fd) {
-        Embed::_ref(_fd);
-    }
+    virtual Base::Result<size_t> write(void const *buf, size_t size) = 0;
 
-    Fd(Fd &&other) : _fd(other._fd) { other._fd = -1; }
+    virtual Base::Result<size_t> seek(Io::Seek seek) = 0;
 
-    ~Fd() {
-        if (_fd != -1) {
-            Embed::_deref(_fd);
-        }
-    }
+    virtual Base::Result<size_t> flush() = 0;
 
-    Fd &operator=(Fd const &other) {
-        if (_fd != -1) {
-            Embed::_deref(_fd);
-        }
-
-        _fd = other._fd;
-        Embed::_ref(_fd);
-        return *this;
-    }
-
-    Fd &operator=(Fd &&other) {
-        if (_fd != -1) {
-            Embed::_deref(_fd);
-        }
-        _fd = other._fd;
-        other._fd = -1;
-        return *this;
-    }
-
-    static Base::Result<Fd> open(Sys::Path path) {
-        return Fd{try$(Embed::_open(path))};
-    }
-
-    static Base::Result<Fd> create(Sys::Path path) {
-        return Fd{try$(Embed::_create(path))};
-    }
-
-    Base::Result<size_t> read(void *buf, size_t size) {
-        return Embed::_read(_fd, buf, size);
-    }
-
-    Base::Result<size_t> write(void const *buf, size_t size) {
-        return Embed::_write(_fd, buf, size);
-    }
-
-    Base::Result<size_t> seek(Io::Seek seek) {
-        return Embed::_seek(_fd, seek);
-    }
-
-    Base::Result<size_t> flush() {
-        return Embed::_flush(_fd);
-    }
-
-    Base::Result<Fd> dup() {
-        return Fd{try$(Embed::_dup(_fd))};
-    }
+    virtual Base::Result<Base::Strong<Fd>> dup() = 0;
 };
 
 template <typename T>
 concept AsFd = requires(T t) {
-    { t.fd() } -> Meta::Same<Fd &>;
+    { t.fd() } -> Meta::Same<Base::Strong<Fd>>;
 };
 
 } // namespace Karm::Sys

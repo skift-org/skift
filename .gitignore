@@ -1,1 +1,4 @@
 bin/
+obj/
+.cache/
+__pycache__/

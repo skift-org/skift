@@ -2,3 +2,4 @@ bin/
 obj/
 .cache/
 __pycache__/
+.vscode/

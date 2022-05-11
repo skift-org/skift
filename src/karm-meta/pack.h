@@ -12,18 +12,18 @@ template <typename T, typename... List>
 concept Contains = (Same<T, List> || ...);
 
 template <typename...>
-inline constexpr size_t _IndexOf = 0;
+inline constexpr size_t _indexOf = 0;
 
 template <typename T, typename First>
-inline constexpr size_t _IndexOf<T, First> = 0;
+inline constexpr size_t _indexOf<T, First> = 0;
 
 template <typename T, typename First, typename... Rest>
-inline constexpr size_t _IndexOf<T, First, Rest...> = Same<T, First> ? 0 : _IndexOf<T, Rest...>() + 1;
+inline constexpr size_t _indexOf<T, First, Rest...> = Same<T, First> ? 0 : _indexOf<T, Rest...> + 1;
 
 template <typename T, typename... Ts>
 requires Contains<T, Ts...>
 static consteval size_t indexOf() {
-    return _IndexOf<T, Ts...>;
+    return _indexOf<T, Ts...>;
 }
 
 template <typename...>

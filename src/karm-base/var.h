@@ -9,37 +9,36 @@ namespace Karm::Base {
 template <typename... Ts>
 struct Var {
     alignas(max(alignof(Ts)...)) char _buf[max(sizeof(Ts)...)];
-
-    uint8_t _type;
+    uint8_t _index;
 
     Var() = delete;
 
     template <Meta::Contains<Ts...> T>
-    Var(T const &value) : _type(Meta::indexOf<T, Ts...>()) {
+    Var(T const &value) : _index(Meta::indexOf<T, Ts...>()) {
         new (_buf) T(value);
     }
 
     template <Meta::Contains<Ts...> T>
-    Var(T &&value) : _type(Meta::indexOf<T, Ts...>()) {
+    Var(T &&value) : _index(Meta::indexOf<T, Ts...>()) {
         new (_buf) T(std::move(value));
     }
 
-    Var(Var const &other) : _type(other._type) {
+    Var(Var const &other) : _index(other._index) {
         Meta::indexCast<Ts...>(
-            _type, other._buf,
+            _index, other._buf,
             [this]<typename T>(T const &ptr) {
-            new (_buf) T(ptr);
+                new (_buf) T(ptr);
             });
     }
 
-    Var(Var &&other) : _type(other._type) {
-        Meta::indexCast<Ts...>(_type, other._buf, [this]<typename T>(T &ptr) {
+    Var(Var &&other) : _index(other._index) {
+        Meta::indexCast<Ts...>(_index, other._buf, [this]<typename T>(T &ptr) {
             new (_buf) T(std::move(ptr));
         });
     }
 
     ~Var() {
-        Meta::indexCast<Ts...>(_type, _buf, []<typename T>(T &ptr) {
+        Meta::indexCast<Ts...>(_index, _buf, []<typename T>(T &ptr) {
             ptr.~T();
         });
     }
@@ -51,11 +50,11 @@ struct Var {
 
     template <Meta::Contains<Ts...> T>
     Var &operator=(T &&value) {
-        Meta::indexCast<Ts...>(_type, _buf, []<typename U>(U &ptr) {
+        Meta::indexCast<Ts...>(_index, _buf, []<typename U>(U &ptr) {
             ptr.~U();
         });
 
-        _type = Meta::indexOf<T, Ts...>();
+        _index = Meta::indexOf<T, Ts...>();
         new (_buf) T(std::move(value));
 
         return *this;
@@ -64,13 +63,13 @@ struct Var {
     Var &operator=(Var const &other) { return *this = Var(other); }
 
     Var &operator=(Var &&other) {
-        Meta::indexCast<Ts...>(_type, _buf, []<typename T>(T &ptr) {
+        Meta::indexCast<Ts...>(_index, _buf, []<typename T>(T &ptr) {
             ptr.~T();
         });
 
-        _type = other._type;
+        _index = other._index;
 
-        Meta::indexCast<Ts...>(_type, other._buf, [this]<typename T>(T &ptr) {
+        Meta::indexCast<Ts...>(_index, other._buf, [this]<typename T>(T &ptr) {
             new (_buf) T(std::move(ptr));
         });
 
@@ -79,7 +78,7 @@ struct Var {
 
     template <Meta::Contains<Ts...> T>
     T &unwrap() {
-        if (_type != Meta::indexOf<T, Ts...>()) {
+        if (_index != Meta::indexOf<T, Ts...>()) {
             Debug::panic("Unwrapping wrong type");
         }
 
@@ -88,7 +87,7 @@ struct Var {
 
     template <Meta::Contains<Ts...> T>
     T take() {
-        if (_type != Meta::indexOf<T, Ts...>()) {
+        if (_index != Meta::indexOf<T, Ts...>()) {
             Debug::panic("Taking wrong type");
         }
 
@@ -97,7 +96,7 @@ struct Var {
 
     template <Meta::Contains<Ts...> T>
     bool with(auto visitor) {
-        if (_type == Meta::indexOf<T, Ts...>()) {
+        if (_index == Meta::indexOf<T, Ts...>()) {
             visitor(*static_cast<T *>(_buf));
             return true;
         }
@@ -105,21 +104,23 @@ struct Var {
     }
 
     void visit(auto visitor) {
-        Meta::indexCast<Ts...>(_type, _buf, [&]<typename U>(U *ptr) {
+        Meta::indexCast<Ts...>(_index, _buf, [&]<typename U>(U *ptr) {
             visitor(*ptr);
         });
     }
 
     void visit(auto visitor) const {
-        Meta::indexCast<Ts...>(_type, _buf, [&]<typename U>(U const *ptr) {
+        Meta::indexCast<Ts...>(_index, _buf, [&]<typename U>(U const *ptr) {
             visitor(*ptr);
         });
     }
 
     template <Meta::Contains<Ts...> T>
     bool is() {
-        return _type == Meta::indexOf<T, Ts...>();
+        return _index == Meta::indexOf<T, Ts...>();
     }
+
+    size_t index() const { return _index; }
 };
 
 } // namespace Karm::Base

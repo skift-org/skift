@@ -7,8 +7,11 @@
 
 #ifndef NO_PRELUDE
 
-namespace Karm::Base {
-};
+namespace Karm {
+namespace Base {
+
+}; // namespace Base
+}; // namespace Karm
 
 using namespace Karm::Base;
 

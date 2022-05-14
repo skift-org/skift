@@ -1,8 +1,8 @@
 #pragma once
 
+#include <karm-base/string.h>
 #include <karm-base/vec.h>
 #include <karm-math/rect.h>
-#include <karm-text/str.h>
 
 #include "buf.h"
 
@@ -46,7 +46,7 @@ struct Gfx {
 
     void rect(Math::Recti rect);
 
-    void text(Math::Vec2i pos, Text::Str text);
+    void text(Math::Vec2i pos, Base::Str text);
 };
 
 } // namespace Karm::Gfx

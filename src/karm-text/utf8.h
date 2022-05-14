@@ -1,8 +1,6 @@
 #pragma once
 
-#include <karm-base/clamp.h>
-#include <karm-base/std.h>
-#include <karm-text/rune.h>
+#include <karm-base/string.h>
 
 namespace Karm::Text {
 
@@ -25,7 +23,7 @@ struct Utf8 {
             return 1;
     }
 
-    Rune decode(uint8_t *buf, size_t len) {
+    Base::Rune decode(uint8_t *buf, size_t len) {
         if (len == 0 || scalar_len(buf[0]) > len) {
             return U'�';
         } else if ((_buf[0] & 0xf8) == 0xf0) {
@@ -45,7 +43,7 @@ struct Utf8 {
         }
     }
 
-    bool decode(uint8_t byte, Rune &rune) {
+    bool decode(uint8_t byte, Base::Rune &rune) {
         _buf[_len++] = byte;
 
         if (_len == scalar_len(_buf[0])) {
@@ -56,25 +54,5 @@ struct Utf8 {
         return false;
     }
 };
-
-constexpr size_t u8strlen(char8_t const *str) {
-    size_t len = 0;
-    while (*str) {
-        len++;
-        str++;
-    }
-    return len;
-}
-
-constexpr int u8strcmp(char8_t const *lhs, size_t lhs_len, char8_t const *rhs, size_t rhs_len) {
-    size_t len = Base::min(lhs_len, rhs_len);
-    for (size_t i = 0; i < len; i++) {
-        int cmp = lhs[i] - rhs[i];
-        if (cmp != 0) {
-            return cmp;
-        }
-    }
-    return lhs_len - rhs_len;
-}
 
 } // namespace Karm::Text

@@ -14,7 +14,7 @@ namespace Karm::Base {
 struct None {
 };
 
-static inline constexpr None NONE = None{};
+inline constexpr None NONE = None{};
 
 template <typename T>
 struct Opt {

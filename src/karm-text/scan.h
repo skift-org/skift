@@ -1,21 +1,22 @@
 #pragma once
 
-#include <karm-text/str.h>
+#include <karm-base/string.h>
+#include <karm-meta/callable.h>
 
-namespace Karm::Parse {
+namespace Karm::Text {
 
 struct Scan {
-    Text::Str _str;
+    Base::Str _str;
     size_t _head;
     size_t _begin;
 
-    Scan(Text::Str str) : _str(str), _head(0) {}
+    Scan(Base::Str str) : _str(str), _head(0) {}
 
     bool ended() {
         return _head >= _str.len();
     }
 
-    Text::Rune peek() {
+    Base::Rune peek() {
         if (ended()) {
             return '\0';
         }
@@ -23,7 +24,7 @@ struct Scan {
         return _str[_head];
     }
 
-    Text::Rune peek(size_t offset) {
+    Base::Rune peek(size_t offset) {
         if ((_head + offset) >= _str.len()) {
             return '\0';
         }
@@ -31,7 +32,7 @@ struct Scan {
         return _str[_head + offset];
     }
 
-    Text::Rune next() {
+    Base::Rune next() {
         if (ended()) {
             return '\0';
         }
@@ -45,7 +46,7 @@ struct Scan {
         }
     }
 
-    bool skip(Text::Rune c) {
+    bool skip(Base::Rune c) {
         if (peek() == c) {
             _head++;
             return true;
@@ -54,7 +55,7 @@ struct Scan {
         return false;
     }
 
-    bool skip(Text::Str str) {
+    bool skip(Base::Str str) {
         for (size_t i = 0; i < str.len(); i++) {
             if (peek(i) != str[i]) {
                 return false;
@@ -65,7 +66,7 @@ struct Scan {
         return true;
     }
 
-    bool skip(auto predicate) {
+    bool skip(auto predicate) requires Meta::Callable<decltype(predicate), Base::Rune> {
         if (!ended() && predicate(peek())) {
             _head++;
             return true;
@@ -74,7 +75,7 @@ struct Scan {
         return false;
     }
 
-    bool eat(Text::Rune c) {
+    bool eat(Base::Rune c) {
         bool result = false;
         while (skip(c)) {
             result = true;
@@ -90,13 +91,21 @@ struct Scan {
         return result;
     }
 
+    bool eval(auto expr) {
+        return expr(*this);
+    }
+
+    bool operator()(auto expr) {
+        return expr(*this);
+    }
+
     void begin() {
         _begin = _head;
     }
 
-    Text::Str end() {
+    Base::Str end() {
         return _str.sub(_begin, _head - _begin);
     }
 };
 
-} // namespace Karm::Parse
+} // namespace Karm::Text

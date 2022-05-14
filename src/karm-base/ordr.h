@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-meta/same.h>
+#include <karm-meta/traits.h>
 
 #include "_prelude.h"
 
@@ -33,37 +33,61 @@ struct Ordr {
     constexpr bool isGtEq() const { return _value != LESS; }
 };
 
-namespace Op {
-
-constexpr bool eq(auto const &lhs, auto const &rhs) {
-    return lhs.cmp(rhs).isEq();
-}
-
-constexpr bool ne(auto const &lhs, auto const &rhs) {
-    return lhs.cmp(rhs).isNe();
-}
-
-constexpr bool lt(auto const &lhs, auto const &rhs) {
-    return lhs.cmp(rhs).isLt();
-}
-
-constexpr bool gt(auto const &lhs, auto const &rhs) {
-    return lhs.cmp(rhs).isGt();
-}
-
-constexpr bool gteq(auto const &lhs, auto const &rhs) {
-    return lhs.cmp(rhs).isGtEq();
-}
-
-constexpr bool lteq(auto const &lhs, auto const &rhs) {
-    return lhs.cmp(rhs).isLtEq();
-}
-
-} // namespace Op
-
 template <typename T>
 concept Ordered = requires(T const &lhs, T const &rhs) {
     { lhs.cmp(rhs) } -> Meta::Same<Ordr>;
 };
+
+namespace Op {
+
+constexpr bool eq(Ordered auto const &lhs, Ordered auto const &rhs) {
+    return lhs.cmp(rhs).isEq();
+}
+
+constexpr bool eq(auto const &lhs, auto const &rhs) requires(!Ordered<decltype(lhs)> && !Ordered<decltype(rhs)>) {
+    return lhs == rhs;
+}
+
+constexpr bool ne(Ordered auto const &lhs, Ordered auto const &rhs) {
+    return lhs.cmp(rhs).isNe();
+}
+
+constexpr bool ne(auto const &lhs, auto const &rhs) requires(!Ordered<decltype(lhs)> && !Ordered<decltype(rhs)>) {
+    return lhs != rhs;
+}
+
+constexpr bool lt(Ordered auto const &lhs, Ordered auto const &rhs) {
+    return lhs.cmp(rhs).isLt();
+}
+
+constexpr bool lt(auto const &lhs, auto const &rhs) requires(!Ordered<decltype(lhs)> && !Ordered<decltype(rhs)>) {
+    return lhs < rhs;
+}
+
+constexpr bool gt(Ordered auto const &lhs, Ordered auto const &rhs) {
+    return lhs.cmp(rhs).isGt();
+}
+
+constexpr bool gt(auto const &lhs, auto const &rhs) requires(!Ordered<decltype(lhs)> && !Ordered<decltype(rhs)>) {
+    return lhs > rhs;
+}
+
+constexpr bool gteq(Ordered auto const &lhs, Ordered auto const &rhs) {
+    return lhs.cmp(rhs).isGtEq();
+}
+
+constexpr bool gteq(auto const &lhs, auto const &rhs) requires(!Ordered<decltype(lhs)> && !Ordered<decltype(rhs)>) {
+    return lhs >= rhs;
+}
+
+constexpr bool lteq(Ordered auto const &lhs, Ordered auto const &rhs) {
+    return lhs.cmp(rhs).isLtEq();
+}
+
+constexpr bool lteq(auto const &lhs, auto const &rhs) requires(!Ordered<decltype(lhs)> && !Ordered<decltype(rhs)>) {
+    return lhs <= rhs;
+}
+
+} // namespace Op
 
 } // namespace Karm::Base

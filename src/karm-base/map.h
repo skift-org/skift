@@ -3,6 +3,7 @@
 #include "_prelude.h"
 
 #include "cons.h"
+#include "ordr.h"
 #include "vec.h"
 
 namespace Karm::Base {
@@ -18,7 +19,7 @@ struct Map {
 
     void put(K const &key, V const &value) {
         for (auto &i : _els) {
-            if (i.car == key) {
+            if (Op::eq(i.car, key)) {
                 i.cdr = value;
                 return;
             }
@@ -29,7 +30,7 @@ struct Map {
 
     Opt<V> get(K const &key) {
         for (auto &i : _els) {
-            if (i.car == key) {
+            if (Op::eq(i.car, key)) {
                 return i.cdr;
             }
         }

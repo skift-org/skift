@@ -5,7 +5,6 @@ TabWidth: 4
 
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLambdasOnASingleLine: None
-LambdaBodyIndentation: OuterScope
 
 IndentCaseLabels: false
 ColumnLimit: 0

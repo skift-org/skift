@@ -1,7 +1,6 @@
 #pragma once
 
 #include <karm-meta/callable.h>
-#include <karm-meta/ptr.h>
 
 #include "_prelude.h"
 

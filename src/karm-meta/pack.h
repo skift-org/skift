@@ -2,9 +2,8 @@
 
 #include <karm-base/std.h>
 
-#include "const.h"
-#include "ref.h"
-#include "same.h"
+#include "cvrp.h"
+#include "traits.h"
 
 namespace Karm::Meta {
 

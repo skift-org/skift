@@ -27,7 +27,7 @@ struct Var {
         Meta::indexCast<Ts...>(
             _index, other._buf,
             [this]<typename T>(T const &ptr) {
-                new (_buf) T(ptr);
+            new (_buf) T(ptr);
             });
     }
 
@@ -122,5 +122,13 @@ struct Var {
 
     size_t index() const { return _index; }
 };
+
+template <typename... Ts>
+struct Visitor : Ts... {
+    using Ts::operator()...;
+};
+
+template <class... Ts>
+Visitor(Ts...) -> Visitor<Ts...>;
 
 } // namespace Karm::Base

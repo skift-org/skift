@@ -14,6 +14,8 @@ template <>
 struct Tuple<> {
     static constexpr size_t size = 0;
 
+    constexpr Tuple() {}
+
     constexpr size_t len() { return 0; }
 
     constexpr void visit(auto) {}
@@ -23,6 +25,8 @@ template <typename Car>
 struct Tuple<Car> {
     Car car;
     None cdr;
+
+    constexpr Tuple(Car &&car) : car(car) {}
 
     constexpr size_t len() {
         return 1;
@@ -42,6 +46,9 @@ struct Tuple<Car, Cdr...> {
     Car car;
     Tuple<Cdr...> cdr;
 
+    constexpr Tuple(Car &&car, Cdr &&...cdr) : car(car), cdr(std::forward<Cdr>(cdr)...) {
+    }
+
     constexpr size_t len() {
         return 1 + cdr.len();
     }
@@ -51,7 +58,7 @@ struct Tuple<Car, Cdr...> {
         cdr.visit(f);
     }
 
-    constexpr Cons<Car, None> cons() {
+    constexpr Cons<Car, Tuple<Cdr...>> cons() {
         return {car, cdr.cons()};
     }
 };

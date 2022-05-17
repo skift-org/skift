@@ -1,6 +1,0 @@
-{
-    "project": "karm",
-    "target": "src/karm",
-    "sources": ["src/all.h"],
-    "include_paths": ["src"]
-}

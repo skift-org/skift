@@ -30,10 +30,10 @@ TARGET=${SYS}-${ARCH}-${BOARD}
 # --- Toolchain -------------------------------------------------------------- #
 
 CC=clang
-CFLAGS=-std=gnu2x -Wall -Wextra -Werror -Isrc
+CFLAGS=-MD -std=gnu2x -Wall -Wextra -Werror -Isrc
 
 CXX=clang++
-CXXFLAGS=-std=gnu++20 -Wall -Wextra -Werror -Isrc
+CXXFLAGS=-MD -std=gnu++2b -Wall -Wextra -Werror -Isrc
 
 LD=ld
 LDFLAGS=
@@ -66,17 +66,12 @@ dump:
 	$(info $(strip [$(ALL_META) null]))
 	@echo ""
 
-.PHONY: dump-libs
-dump-libs:
-	$(info $(ALL_LIBS))
-	@echo ""
-
-.PHONY: dump-bins
-dump-bins:
-	$(info $(ALL_BINS))
-	@echo ""
-
 .PHONY: clean
 clean:
 	rm -rf ${OBJDIR}
+	rm -rf ${BINDIR}
 
+.PHONY: nuke
+nuke:
+	rm -rf obj/
+	rm -rf bin/

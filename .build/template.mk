@@ -9,6 +9,8 @@ PKG_SRCS:=$(wildcard $(PKG_SRCDIR)/*.cpp) $(wildcard $(PKG_SRCDIR)/*.s)
 PKG_OBJS:=$(patsubst $(PKG_SRCDIR)/%,$(PKG_OBJDIR)/%.o,$(PKG_SRCS))
 PKG_LIBS:=$(patsubst %,$(BINDIR)/%.a,$(PKG_DEPS))
 
+-include $(PKG_OBJS:.o=.d)
+
 define RECIPES
 
 $(PKG_BIN): $(PKG_OBJS)
@@ -27,9 +29,7 @@ $(eval $(call RECIPES))
 
 define PKG_META
 {
-    "id": "$(PKG)",
-
-	"name": "$(PKG_NAME)",
+	"id": "$(PKG_NAME)",
     "deps": "$(PKG_DEPS)",
 
     "srcdir": "$(PKG_SRCDIR)",

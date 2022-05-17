@@ -12,7 +12,7 @@ def mkdir(path: str) -> str:
 
 def rm(path: str) -> None:
     if os.path.exists(path):
-        os.remove(path)
+        popen(["rm", "-rf", path])
 
 
 def popen(args: list[str]) -> tuple[int, str]:
@@ -23,7 +23,7 @@ def popen(args: list[str]) -> tuple[int, str]:
 
 
 def make(*args: str) -> tuple[int, str]:
-    return popen(["make", "-f", ".build/backend.mk", *args])
+    return popen(["make", "-f", ".sk/backend.mk", *args])
 
 
 def git_branch() -> Optional[str]:

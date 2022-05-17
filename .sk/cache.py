@@ -22,7 +22,7 @@ def popen(args: list[str]) -> tuple[int, str]:
 
 
 def make(*args: str) -> tuple[int, str]:
-    return utils.popen(["make", "-f", ".build/backend.mk", *args])
+    return popen(["make", "-f", ".sk/build.mk", *args])
 
 
 def nuke() -> None:

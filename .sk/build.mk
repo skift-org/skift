@@ -53,7 +53,7 @@ $(OBJDIR)/%.cpp.o: $(SRCDIR)/%.cpp
 	$(MKCWD)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
-TEMPLATE:=.build/template.mk
+TEMPLATE:=.sk/template.mk
 include $(wildcard ${SRCDIR}/*/build.mk)
 
 # --- Phonies ---------------------------------------------------------------- #

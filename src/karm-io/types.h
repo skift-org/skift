@@ -2,17 +2,17 @@
 
 #include <karm-base/macros.h>
 #include <karm-base/result.h>
-#include <karm-meta/same.h>
+#include <karm-meta/traits.h>
 
 namespace Karm::Io {
 
-struct Seek {
-    enum class Whence {
-        BEGIN,
-        CURRENT,
-        END,
-    };
+enum class Whence {
+    BEGIN,
+    CURRENT,
+    END,
+};
 
+struct Seek {
     Whence whence;
     ssize_t offset;
 

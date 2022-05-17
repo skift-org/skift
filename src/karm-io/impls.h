@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/clamp.h>
+#include <karm-base/result.h>
 
 #include "traits.h"
 #include "types.h"
@@ -63,11 +64,7 @@ struct Slice : public Writer, public Seeker {
     size_t _start;
     size_t _end;
 
-    Slice(Writable writer, size_t size)
-        : _writer(std::forward<Writable>(writer)) {
-        _start = try$(_writer.tell());
-        _end = _start + size;
-    }
+    Slice(Writable writer, size_t start, size_t end) : _writer(writer), _start(start), _end(end) {}
 
     Base::Result<size_t> seek(Seek seek) override {
         size_t pos = try$(tell(_writer));
@@ -90,5 +87,13 @@ struct Slice : public Writer, public Seeker {
         return try$(_writer.write(data, size));
     }
 };
+
+template <SeekableWritable Writable>
+static inline Base::Result<Slice<Writable>> makeSlice(Writable &&writer, size_t size) {
+    auto start = try$(writer.tell());
+    auto end = start + size;
+
+    return Slice{std::forward<Writable>(writer), start, end};
+}
 
 } // namespace Karm::Io

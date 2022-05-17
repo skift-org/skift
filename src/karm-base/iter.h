@@ -4,7 +4,7 @@
 #include "opt.h"
 #include "ordr.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename Next>
 struct Iter {
@@ -321,4 +321,4 @@ constexpr auto range(T start, T end, T step) {
     }};
 }
 
-} // namespace Karm::Base
+} // namespace Karm

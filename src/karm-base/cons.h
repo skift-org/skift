@@ -2,7 +2,7 @@
 
 #include "_prelude.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename TCar, typename TCdr>
 struct Cons {
@@ -13,4 +13,4 @@ struct Cons {
     Cdr cdr;
 };
 
-} // namespace Karm::Base
+} // namespace Karm

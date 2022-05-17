@@ -9,11 +9,11 @@
 namespace Karm::Io {
 
 struct Sink : public Writer {
-    Base::Result<size_t> write(void const *, size_t size) override { return size; }
+    Result<size_t> write(void const *, size_t size) override { return size; }
 };
 
 struct Zero : public Reader {
-    Base::Result<size_t> read(void *data, size_t size) override {
+    Result<size_t> read(void *data, size_t size) override {
         memset(data, 0, size);
         return size;
     }
@@ -24,14 +24,14 @@ struct Repeat : public Reader {
 
     Repeat(uint8_t byte) : _byte(byte) {}
 
-    Base::Result<size_t> read(void *data, size_t size) override {
+    Result<size_t> read(void *data, size_t size) override {
         memset(data, _byte, size);
         return size;
     }
 };
 
 struct Empty : public Reader {
-    Base::Result<size_t> read(void *, size_t) override {
+    Result<size_t> read(void *, size_t) override {
         return 0;
     }
 };
@@ -47,7 +47,7 @@ struct Limite : public Reader {
           _limit(limit) {
     }
 
-    Base::Result<size_t> read(void *data, size_t size) override {
+    Result<size_t> read(void *data, size_t size) override {
         if (_read + size > _limit) {
             size = _limit - _read;
         }
@@ -66,14 +66,14 @@ struct Slice : public Writer, public Seeker {
 
     Slice(Writable writer, size_t start, size_t end) : _writer(writer), _start(start), _end(end) {}
 
-    Base::Result<size_t> seek(Seek seek) override {
+    Result<size_t> seek(Seek seek) override {
         size_t pos = try$(tell(_writer));
         pos = seek.apply(pos);
         pos = clamp(pos, _start, _end);
         return try$(_writer.seek(Seek::fromBegin(pos)));
     }
 
-    Base::Result<size_t> write(void const *data, size_t size) override {
+    Result<size_t> write(void const *data, size_t size) override {
         size_t pos = try$(tell(_writer));
 
         if (pos < _start) {
@@ -89,7 +89,7 @@ struct Slice : public Writer, public Seeker {
 };
 
 template <SeekableWritable Writable>
-static inline Base::Result<Slice<Writable>> makeSlice(Writable &&writer, size_t size) {
+static inline Result<Slice<Writable>> makeSlice(Writable &&writer, size_t size) {
     auto start = try$(writer.tell());
     auto end = start + size;
 

@@ -20,7 +20,7 @@ struct NumberFormater {
             return;
         }
 
-        Base::Rune c = scan.next();
+        Rune c = scan.next();
 
         switch (c) {
         case 'b':
@@ -44,9 +44,9 @@ struct NumberFormater {
         }
     }
 
-    Base::Result<size_t> format_unsigned(Io::Writer &writer, uint64_t value) {
+    Result<size_t> format_unsigned(Io::Writer &writer, uint64_t value) {
         size_t i = 0;
-        Base::Array<uint8_t, 65> buf;
+        Array<uint8_t, 65> buf;
 
         do {
             buf[i++] = value % base + '0';
@@ -59,14 +59,14 @@ struct NumberFormater {
 
 template <typename T>
 struct UnsignedFormatter : public NumberFormater {
-    Base::Result<size_t> format(Io::Writer &writer, T const value) {
+    Result<size_t> format(Io::Writer &writer, T const value) {
         return format_unsigned(writer, value);
     }
 };
 
 template <typename T>
 struct SignedFormatter : public NumberFormater {
-    Base::Result<size_t> format(Io::Writer &writer, T const value) {
+    Result<size_t> format(Io::Writer &writer, T const value) {
         size_t written = 0;
         if (value < 0) {
             written += try$(Io::putc(writer, '-'));
@@ -109,14 +109,14 @@ struct Formatter<Str> {
     void parse(Text::Scan &) {
     }
 
-    Base::Result<size_t> format(Io::Writer &writer, Str const &text) {
+    Result<size_t> format(Io::Writer &writer, Str const &text) {
         return writer.write(text.buf(), text.len());
     }
 };
 
 struct _Args {
     virtual size_t len() = 0;
-    virtual Base::Result<size_t> format(Text::Scan &scan, Io::Writer &writer, size_t index) = 0;
+    virtual Result<size_t> format(Text::Scan &scan, Io::Writer &writer, size_t index) = 0;
 };
 
 template <typename... Ts>
@@ -127,8 +127,8 @@ struct Args : public _Args {
 
     size_t len() override { return _tuple.len(); }
 
-    Base::Result<size_t> format(Text::Scan &scan, Io::Writer &writer, size_t index) override {
-        Base::Result<size_t> result = 0;
+    Result<size_t> format(Text::Scan &scan, Io::Writer &writer, size_t index) override {
+        Result<size_t> result = 0;
         _tuple.visit([&](auto const &t) {
             if (index == 0) {
                 using U = Meta::RemoveConstVolatileRef<decltype(t)>;
@@ -143,13 +143,13 @@ struct Args : public _Args {
     }
 };
 
-Base::Result<size_t> _format(Io::Writer &writer, Base::Str format, _Args &args) {
+Result<size_t> _format(Io::Writer &writer, Str format, _Args &args) {
     Text::Scan scan{format};
     size_t written = 0;
     size_t index = 0;
 
     while (!scan.ended()) {
-        Base::Rune c = scan.next();
+        Rune c = scan.next();
 
         if (c == '{') {
             scan.begin();
@@ -169,7 +169,7 @@ Base::Result<size_t> _format(Io::Writer &writer, Base::Str format, _Args &args) 
 }
 
 template <typename... Ts>
-Base::Result<size_t> format(Io::Writer &writer, Base::Str format, Ts &&...ts) {
+Result<size_t> format(Io::Writer &writer, Str format, Ts &&...ts) {
     Args<Ts...> args{std::forward<Ts>(ts)...};
     return _format(writer, format, args);
 }

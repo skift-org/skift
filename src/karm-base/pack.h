@@ -5,7 +5,7 @@
 
 #include "_prelude.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 Result<size_t> pack(Io::Writable auto &writer, Meta::Trivial auto const &v) {
     return writer.write(&v, sizeof(v));
@@ -23,4 +23,4 @@ Result<size_t> unpack(Io::Readable auto &reader, Meta::Trivial auto... v) {
     return (unpack(reader, v) + ...);
 }
 
-} // namespace Karm::Base
+} // namespace Karm

@@ -4,11 +4,11 @@
 
 #include "scan.h"
 
-namespace Re {
+namespace Karm::Re {
 
 inline auto single(auto... c) {
-    return [=](Karm::Text::Scan &scan) {
-        if (((scan.peek() == (Karm::Base::Rune)c) || ...)) {
+    return [=](Text::Scan &scan) {
+        if (((scan.peek() == (Rune)c) || ...)) {
             scan.next();
             return true;
         } else {
@@ -17,34 +17,34 @@ inline auto single(auto... c) {
     };
 }
 
-inline auto word(Karm::Base::Str word) {
-    return [=](Karm::Text::Scan &scan) {
+inline auto word(Str word) {
+    return [=](Text::Scan &scan) {
         return scan.skip(word);
     };
 }
 
-inline auto range(Karm::Base::Rune start, Karm::Base::Rune end) {
-    return [=](Karm::Text::Scan &scan) {
+inline auto range(Rune start, Rune end) {
+    return [=](Text::Scan &scan) {
         return scan.peek() >= start && scan.peek() <= end;
     };
 }
 
 template <typename... Exprs>
 inline auto either(Exprs... exprs) {
-    return [=](Karm::Text::Scan &scan) {
+    return [=](Text::Scan &scan) {
         return (exprs(scan) || ...);
     };
 }
 
 template <typename... Exprs>
 inline auto chain(Exprs... exprs) {
-    return [=](Karm::Text::Scan &scan) {
+    return [=](Text::Scan &scan) {
         return (exprs(scan) && ...);
     };
 }
 
 inline auto negate(auto expr) {
-    return [=](Karm::Text::Scan &scan) {
+    return [=](Text::Scan &scan) {
         return !expr(scan);
     };
 }
@@ -52,7 +52,7 @@ inline auto negate(auto expr) {
 /* --- Quantifiers ---------------------------------------------------------- */
 
 inline auto zero_or_more(auto expr) {
-    return [=](Karm::Text::Scan &scan) {
+    return [=](Text::Scan &scan) {
         while (expr(scan))
             ;
         return true;
@@ -60,7 +60,7 @@ inline auto zero_or_more(auto expr) {
 }
 
 inline auto one_or_more(auto expr) {
-    return [=](Karm::Text::Scan &scan) {
+    return [=](Text::Scan &scan) {
         if (!expr(scan))
             return false;
         while (expr(scan))
@@ -70,7 +70,7 @@ inline auto one_or_more(auto expr) {
 }
 
 inline auto zero_or_one(auto expr) {
-    return [=](Karm::Text::Scan &scan) {
+    return [=](Text::Scan &scan) {
         expr(scan);
         return true;
     };
@@ -124,18 +124,18 @@ inline auto blank() {
 
 /* --- Utils ---------------------------------------------------------------- */
 
-inline auto separator(Karm::Base::Rune r) {
+inline auto separator(Rune r) {
     return chain(
         zero_or_more(space()),
         single(r),
         zero_or_more(space()));
 }
 
-inline auto separator(Karm::Base::Str w) {
+inline auto separator(Str w) {
     return chain(
         zero_or_more(space()),
         word(w),
         zero_or_more(space()));
 }
 
-} // namespace Re
+} // namespace Karm::Re

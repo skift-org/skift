@@ -10,11 +10,11 @@ struct Emit {
     Io::Writer &_writer;
     size_t _total = 0;
 
-    void operator()(Base::Rune c) {
+    void operator()(Rune c) {
         _total += Io::putr(_writer, c);
     }
 
-    void operator()(Base::Str str) {
+    void operator()(Str str) {
         _total += _writer.write(str.buf(), str.len());
     }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-text/str.h>
+#include <karm-base/string.h>
 
 #include "widget.h"
 
@@ -10,7 +10,7 @@ struct _Label : public _Widget {
 };
 
 template <typename... Ts>
-void label(Karm::Text::Str, Ts &...) {
+void label(Str, Ts &...) {
     widget([&] {
     });
 }

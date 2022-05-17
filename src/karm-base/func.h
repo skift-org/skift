@@ -6,7 +6,7 @@
 
 #include "box.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename>
 struct Func;
@@ -70,4 +70,4 @@ struct Func<Out(In...)> {
     }
 };
 
-} // namespace Karm::Base
+} // namespace Karm

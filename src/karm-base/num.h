@@ -1,5 +1,5 @@
 #pragma once
 
-namespace Karm::Base {
+namespace Karm {
 struct Num {};
-} // namespace Karm::Base
+} // namespace Karm

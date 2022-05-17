@@ -16,7 +16,7 @@ struct Gfx {
     };
 
     Buf _buf;
-    Base::Vec<_Ctx> _stack;
+    Vec<_Ctx> _stack;
 
     /* --- Cycle ------------------------------------------------------------ */
 
@@ -46,7 +46,7 @@ struct Gfx {
 
     void rect(Math::Recti rect);
 
-    void text(Math::Vec2i pos, Base::Str text);
+    void text(Math::Vec2i pos, Str text);
 };
 
 } // namespace Karm::Gfx

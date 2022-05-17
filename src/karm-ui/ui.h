@@ -8,12 +8,12 @@
 
 namespace Karm::Ui {
 
-using Builder = Base::Func<void()>;
+using Builder = Func<void()>;
 
-struct Children : public Base::Opt<Builder> {
-    using Base::Opt<Builder>::Opt;
+struct Children : public Opt<Builder> {
+    using Opt<Builder>::Opt;
 
-    Children(auto &&builder) : Base::Opt<Builder>(std::forward<decltype(builder)>(builder)) {
+    Children(auto &&builder) : Opt<Builder>(std::forward<decltype(builder)>(builder)) {
     }
 
     void operator()() {
@@ -27,13 +27,13 @@ static struct Ui *_ui = {};
 
 struct Ui {
     struct Ctx {
-        Base::Strong<Node> parent;
+        Strong<Node> parent;
         size_t child = 0;
         size_t hook = 0;
     };
 
-    Base::Vec<Ctx> _stack;
-    Base::Strong<Node> _curr = Base::makeStrong<Node>();
+    Vec<Ctx> _stack;
+    Strong<Node> _curr = makeStrong<Node>();
 
     Builder _builder;
 
@@ -50,11 +50,11 @@ struct Ui {
         return *currentCtx().parent;
     }
 
-    Base::Strong<Node> reconcile() {
+    Strong<Node> reconcile() {
         if (currentCtx().child < currentNode().len()) {
             return currentNode().peek(currentCtx().child++);
         } else {
-            Base::Strong<Node> node = Base::makeStrong<Node>();
+            Strong<Node> node = makeStrong<Node>();
             currentNode().mount(node);
             currentCtx().child++;
             return node;

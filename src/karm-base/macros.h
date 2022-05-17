@@ -11,7 +11,7 @@
         __expr.unwrap();          \
     })
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename T>
 concept Tryable = requires(T t) {
@@ -40,4 +40,4 @@ auto unwrap_or_else(Tryable auto &opt, auto default_value) -> decltype(opt.unwra
     return opt.unwrap();
 }
 
-} // namespace Karm::Base
+} // namespace Karm

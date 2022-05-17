@@ -7,7 +7,7 @@
 #include "slice.h"
 #include "std.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename T, size_t N>
 struct Array {
@@ -81,4 +81,4 @@ struct Array {
     }
 };
 
-} // namespace Karm::Base
+} // namespace Karm

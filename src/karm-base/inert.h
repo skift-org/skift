@@ -4,7 +4,7 @@
 
 #include "std.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename T>
 struct Inert {
@@ -40,4 +40,4 @@ struct Inert {
     }
 };
 
-}; // namespace Karm::Base
+}; // namespace Karm

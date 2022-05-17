@@ -8,7 +8,7 @@
 #include "opt.h"
 #include "ref.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename T>
 struct Vec {
@@ -205,4 +205,4 @@ struct Vec {
     size_t len() const { return _len; }
 };
 
-} // namespace Karm::Base
+} // namespace Karm

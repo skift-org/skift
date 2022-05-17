@@ -10,12 +10,12 @@ namespace Karm::Io {
 
 /* --- Read ----------------------------------------------------------------- */
 
-Base::Result<size_t> pread(Readable auto &reader, void *data, size_t size, Seek seek) {
+Result<size_t> pread(Readable auto &reader, void *data, size_t size, Seek seek) {
     auto result = try$(reader.seek(seek));
     return try$(reader.read(data, size));
 }
 
-Base::Result<uint8_t> getc(Readable auto &reader) {
+Result<uint8_t> getc(Readable auto &reader) {
     uint8_t byte;
     try$(reader.read(&byte, 1));
     return byte;
@@ -23,44 +23,44 @@ Base::Result<uint8_t> getc(Readable auto &reader) {
 
 /* --- Write ---------------------------------------------------------------- */
 
-Base::Result<size_t> pwrite(Writable auto &writer, void const *data, size_t size, Seek seek) {
+Result<size_t> pwrite(Writable auto &writer, void const *data, size_t size, Seek seek) {
     auto result = try$(writer.seek(seek));
     return try$(writer.write(data, size));
 }
 
-Base::Result<size_t> putc(Writable auto &writer, uint8_t byte) {
+Result<size_t> putc(Writable auto &writer, uint8_t byte) {
     return writer.write(&byte, 1);
 }
 
-Base::Result<size_t> putr(Writable auto &writer, Base::Rune rune) {
+Result<size_t> putr(Writable auto &writer, Rune rune) {
     return writer.write(&rune, 1);
 }
 
 /* --- Seek ----------------------------------------------------------------- */
 
-Base::Result<size_t> tell(Seekable auto &seeker) {
+Result<size_t> tell(Seekable auto &seeker) {
     return try$(seeker.seek(Seek::fromCurrent(0)));
 }
 
-Base::Result<size_t> size(Seekable auto &seeker) {
+Result<size_t> size(Seekable auto &seeker) {
     size_t current = try$(tell(seeker));
     size_t end = try$(seeker.seek(Seek::fromEnd(0)));
     try$(seeker.seek(Seek::fromBegin(current)));
     return end;
 }
 
-Base::Result<size_t> skip(Seekable auto &seeker, size_t n) {
+Result<size_t> skip(Seekable auto &seeker, size_t n) {
     return try$(seeker.seek(Seek::fromCurrent(n)));
 }
 
-Base::Result<size_t> skip(Readable auto &reader, size_t n) {
+Result<size_t> skip(Readable auto &reader, size_t n) {
     Sink sink;
     return copy(reader, sink, n);
 }
 
 /* --- Copy ----------------------------------------------------------------- */
 
-Base::Result<size_t> copy(Readable auto &reader, Writable auto &writer) {
+Result<size_t> copy(Readable auto &reader, Writable auto &writer) {
     uint8_t buffer[4096];
     size_t result = 0;
     while (true) {
@@ -77,11 +77,11 @@ Base::Result<size_t> copy(Readable auto &reader, Writable auto &writer) {
     return result;
 }
 
-Base::Result<size_t> copy(Readable auto &reader, Writable auto &writer, size_t size) {
+Result<size_t> copy(Readable auto &reader, Writable auto &writer, size_t size) {
     uint8_t buffer[4096];
     size_t result = 0;
     while (size > 0) {
-        auto read = try$(reader.read(buffer, Base::min(size, sizeof(buffer))));
+        auto read = try$(reader.read(buffer, min(size, sizeof(buffer))));
         if (read == 0) {
             break;
         }

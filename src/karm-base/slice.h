@@ -3,7 +3,7 @@
 #include "iter.h"
 #include "ordr.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename T>
 struct Slice {
@@ -131,4 +131,4 @@ struct MutSlice {
     }
 };
 
-} // namespace Karm::Base
+} // namespace Karm

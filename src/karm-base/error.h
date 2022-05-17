@@ -5,7 +5,7 @@
 #include "macros.h"
 #include "string.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 #define FOREACH_ERROR(ERROR)         \
     ERROR(OK)                        \
@@ -73,7 +73,7 @@ struct [[nodiscard]] Error {
 
     Error unwrap() const { return *this; }
 
-    Base::Str msg() {
+    Str msg() {
         if (_msg.len() > 0) {
             return _msg;
         }
@@ -96,4 +96,4 @@ static_assert(Tryable<Error>);
 
 #undef FOREACH_ERROR
 
-} // namespace Karm::Base
+} // namespace Karm

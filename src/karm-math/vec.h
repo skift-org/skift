@@ -23,11 +23,11 @@ union Vec2 {
     constexpr Vec2(T value) : _els{value, value} {}
 
     T min() const {
-        return Base::min(x, y);
+        return min(x, y);
     }
 
     T max() const {
-        return Base::max(x, y);
+        return max(x, y);
     }
 
     T dot(Vec2 const &other) const {
@@ -112,11 +112,11 @@ union Vec3 {
     constexpr Vec3(T value) : _els{value, value, value} {}
 
     T min() const {
-        return Base::min(x, y, z);
+        return min(x, y, z);
     }
 
     T max() const {
-        return Base::max(x, y, z);
+        return max(x, y, z);
     }
 
     T dot(Vec3 const &other) const {
@@ -202,11 +202,11 @@ union Vec4 {
     Vec4(T value) : _els{value, value, value, value} {}
 
     T min() const {
-        return Base::min(x, y, z, w);
+        return min(x, y, z, w);
     }
 
     T max() const {
-        return Base::max(x, y, z, w);
+        return max(x, y, z, w);
     }
 
     T dot(Vec4 const &other) const {

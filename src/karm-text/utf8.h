@@ -13,11 +13,11 @@ struct Utf8 {
         _len = 0;
     }
 
-    bool decode(char byte, Base::Rune &rune) {
+    bool decode(char byte, Rune &rune) {
         _buf[_len++] = byte;
 
-        if (_len == Base::rune_len(_buf[0])) {
-            rune = Base::rune_decode(_buf, _len);
+        if (_len == rune_len(_buf[0])) {
+            rune = rune_decode(_buf, _len);
             return true;
         }
 

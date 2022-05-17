@@ -316,12 +316,12 @@ struct Gravity {
         }
 
         if (_g & COVER) {
-            double scale = Base::max(parent.size() / child.size());
+            double scale = max(parent.size() / child.size());
             child.size(child.size() * scale);
         }
 
         if (_g & FIT) {
-            double scale = Base::min(parent.size() / child.size());
+            double scale = min(parent.size() / child.size());
             child.size(child.size() * scale);
         }
 

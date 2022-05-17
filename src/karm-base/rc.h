@@ -9,7 +9,7 @@
 #include "ref.h"
 #include "std.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 struct _Rc {
     int _strong = 0;
@@ -195,4 +195,4 @@ struct Weak {
 template <typename T>
 using OptWeak = Opt<Weak<T>>;
 
-} // namespace Karm::Base
+} // namespace Karm

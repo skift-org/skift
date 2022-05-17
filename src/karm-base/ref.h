@@ -6,7 +6,7 @@
 
 #include "opt.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename T>
 struct Ref {
@@ -20,4 +20,4 @@ struct Ref {
 template <typename T>
 using OptRef = Opt<Ref<T>>;
 
-} // namespace Karm::Base
+} // namespace Karm

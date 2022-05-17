@@ -3,7 +3,7 @@
 #include <karm-debug/panic.h>
 #include <karm-meta/id.h>
 
-namespace Karm::Base {
+namespace Karm {
 
 struct _Ops {
     void (*dtor)(void *);
@@ -103,4 +103,4 @@ struct Any {
     }
 };
 
-} // namespace Karm::Base
+} // namespace Karm

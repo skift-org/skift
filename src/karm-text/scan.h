@@ -7,11 +7,11 @@
 namespace Karm::Text {
 
 struct Scan {
-    Base::Str _str;
+    Str _str;
     size_t _head;
     size_t _begin;
 
-    Scan(Base::Str str) : _str(str), _head(0) {}
+    Scan(Str str) : _str(str), _head(0) {}
 
     bool ended() {
         return _head >= _str.len();
@@ -21,7 +21,7 @@ struct Scan {
         return _str.len() - _head;
     }
 
-    Base::Rune peek() {
+    Rune peek() {
         if (ended()) {
             return '\0';
         }
@@ -29,7 +29,7 @@ struct Scan {
         return rune_decode(_str.buf() + _head, rem());
     }
 
-    Base::Rune peek(size_t count) {
+    Rune peek(size_t count) {
         char const *buf = _str.buf() + _head;
 
         while (count-- > 0 && buf < _str.end()) {
@@ -43,12 +43,12 @@ struct Scan {
         return rune_decode(buf, rem());
     }
 
-    Base::Rune next() {
+    Rune next() {
         if (ended()) {
             return '\0';
         }
 
-        Base::Rune c = rune_decode(_str.buf() + _head, rem());
+        Rune c = rune_decode(_str.buf() + _head, rem());
         _head += rune_len(c);
         return c;
     }
@@ -59,7 +59,7 @@ struct Scan {
         }
     }
 
-    bool skip(Base::Rune c) {
+    bool skip(Rune c) {
         if (peek() == c) {
             _head++;
             return true;
@@ -68,7 +68,7 @@ struct Scan {
         return false;
     }
 
-    bool skip(Base::Str str) {
+    bool skip(Str str) {
         size_t i = 0;
         for (auto r : runes(str)) {
             if (peek(i++) != r) {
@@ -80,7 +80,7 @@ struct Scan {
         return true;
     }
 
-    bool skip(auto predicate) requires Meta::Callable<decltype(predicate), Base::Rune> {
+    bool skip(auto predicate) requires Meta::Callable<decltype(predicate), Rune> {
         if (!ended() && predicate(peek())) {
             next();
             return true;
@@ -89,7 +89,7 @@ struct Scan {
         return false;
     }
 
-    bool eat(Base::Rune c) {
+    bool eat(Rune c) {
         bool result = false;
         while (skip(c)) {
             result = true;
@@ -117,7 +117,7 @@ struct Scan {
         _begin = _head;
     }
 
-    Base::Str end() {
+    Str end() {
         return _str.sub(_begin, _head - _begin);
     }
 };

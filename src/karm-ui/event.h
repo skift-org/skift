@@ -6,6 +6,6 @@ namespace Karm::Ui {
 
 struct Event {};
 
-using EventFunc = Base::Func<void(Event const &)>;
+using EventFunc = Func<void(Event const &)>;
 
 } // namespace Karm::Ui

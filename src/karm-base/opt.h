@@ -9,7 +9,7 @@
 #include "macros.h"
 #include "std.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 struct None {
 };
@@ -143,6 +143,6 @@ struct Opt {
     }
 };
 
-static_assert(Tryable<Karm::Base::Opt<int>>);
+static_assert(Tryable<Opt<int>>);
 
-} // namespace Karm::Base
+} // namespace Karm

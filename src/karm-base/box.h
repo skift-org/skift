@@ -8,7 +8,7 @@
 #include "opt.h"
 #include "std.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename T>
 struct Box {
@@ -77,4 +77,4 @@ constexpr static Box<T> makeBox(Args... args) {
     return {new T(std::forward<Args>(args)...)};
 }
 
-} // namespace Karm::Base
+} // namespace Karm

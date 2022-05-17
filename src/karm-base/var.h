@@ -4,7 +4,7 @@
 
 #include "_prelude.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename... Ts>
 struct Var {
@@ -27,7 +27,7 @@ struct Var {
         Meta::indexCast<Ts...>(
             _index, other._buf,
             [this]<typename T>(T const &ptr) {
-            new (_buf) T(ptr);
+                new (_buf) T(ptr);
             });
     }
 
@@ -131,4 +131,4 @@ struct Visitor : Ts... {
 template <class... Ts>
 Visitor(Ts...) -> Visitor<Ts...>;
 
-} // namespace Karm::Base
+} // namespace Karm

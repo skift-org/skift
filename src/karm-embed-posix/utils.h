@@ -4,8 +4,8 @@
 
 namespace Karm::Embed::Posix {
 
-Base::Error fromErrno(int error);
+Error fromErrno(int error);
 
-Base::Error fromLastErrno();
+Error fromLastErrno();
 
 } // namespace Karm::Embed::Posix

@@ -12,8 +12,8 @@ struct State : public Hook {
     State(T value) : _value(value) {
     }
 
-    Text::Str desc() const override {
-        return u8"State";
+    Str desc() const override {
+        return "State";
     }
 
     T const *operator->() const {

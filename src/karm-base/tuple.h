@@ -5,7 +5,7 @@
 #include "cons.h"
 #include "opt.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename... Ts>
 struct Tuple;
@@ -63,4 +63,4 @@ struct Tuple<Car, Cdr...> {
     }
 };
 
-} // namespace Karm::Base
+} // namespace Karm

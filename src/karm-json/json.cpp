@@ -10,7 +10,7 @@ inline auto number_start() {
         Re::single('-'));
 }
 
-Base::String parse_string(Text::Scan &scan);
+String parse_string(Text::Scan &scan);
 
 Object parse_object(Text::Scan &scan) {
     Object result;
@@ -18,7 +18,7 @@ Object parse_object(Text::Scan &scan) {
     scan(Re::separator('{'));
 
     while (!scan.ended() && scan.peek() != '}') {
-        Base::String key = parse_string(scan);
+        String key = parse_string(scan);
         scan(Re::separator(':'));
         result.put(key, parse(scan));
         scan(Re::separator(','));
@@ -66,7 +66,7 @@ Value parse(Text::Scan &scan) {
         return false;
 
     if (scan(Re::separator("null")))
-        return Base::NONE;
+        return NONE;
 
     Debug::panic("parse error");
 }
@@ -98,7 +98,7 @@ void dump(Text::Emit &emit, Value const &value) {
         emit("]");
     };
 
-    auto dump_string = [&](Base::String const &str) {
+    auto dump_string = [&](String const &str) {
         emit("\"");
         emit(str);
         emit("\"");
@@ -116,7 +116,7 @@ void dump(Text::Emit &emit, Value const &value) {
         emit("null");
     };
 
-    auto visitor = Base::Visitor{
+    auto visitor = Visitor{
         dump_object,
         dump_array,
         dump_string,

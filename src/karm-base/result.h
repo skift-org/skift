@@ -6,7 +6,7 @@
 #include "opt.h"
 #include "std.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename Value>
 struct [[nodiscard]] Result {
@@ -24,4 +24,4 @@ struct [[nodiscard]] Result {
 
 static_assert(Tryable<Result<int>>);
 
-} // namespace Karm::Base
+} // namespace Karm

@@ -11,9 +11,9 @@
 namespace Karm::Json {
 
 struct Value;
-using Object = Base::Map<Base::String, Value>;
-using Array = Base::Vec<Value>;
-struct Value : public Base::Var<Object, Array, Base::String, Base::Num, bool, Base::None> {
+using Object = Map<String, Value>;
+using Array = Vec<Value>;
+struct Value : public Var<Object, Array, String, Num, bool, None> {
     using Var::Var;
 };
 

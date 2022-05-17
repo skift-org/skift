@@ -2,7 +2,7 @@
 
 #include "_prelude.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 constexpr auto max(auto value) { return value; }
 constexpr auto max(auto first, auto... rest) {
@@ -21,4 +21,4 @@ constexpr auto clamp(auto value, auto min, auto max) {
                                            : value;
 }
 
-} // namespace Karm::Base
+} // namespace Karm

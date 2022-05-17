@@ -14,8 +14,8 @@ static uint32_t id = 0;
 struct Node : Meta::NoCopy, Meta::NoMove {
     uint32_t _id = id++;
 
-    Base::Vec<Base::Strong<Node>> _children;
-    Base::Vec<Base::Box<Hook>> _hooks;
+    Vec<Strong<Node>> _children;
+    Vec<Box<Hook>> _hooks;
 
     Node() {
     }
@@ -28,11 +28,11 @@ struct Node : Meta::NoCopy, Meta::NoMove {
         return _children.len();
     }
 
-    Base::Strong<Node> peek(size_t index) const {
+    Strong<Node> peek(size_t index) const {
         return _children.peek(index);
     }
 
-    void mount(Base::Strong<Node> node) {
+    void mount(Strong<Node> node) {
         _children.push(node);
         node->onMount();
     }
@@ -50,7 +50,7 @@ struct Node : Meta::NoCopy, Meta::NoMove {
     template <typename T, typename... Ts>
     T &hook(size_t index, Ts... ts) {
         if (index == _hooks.len()) {
-            _hooks.push(Base::makeBox<T>(ts...));
+            _hooks.push(makeBox<T>(ts...));
         }
 
         return static_cast<T &>(*_hooks.peek(index));
@@ -59,13 +59,13 @@ struct Node : Meta::NoCopy, Meta::NoMove {
     /* --- Life Cycle ------------------------------------------------------- */
 
     void onMount() {
-        for (auto &hook : _hooks) {
+        for (auto &hook : _hooks.iter()) {
             hook->onMount();
         }
     }
 
     void onUnmount() {
-        for (auto &hook : _hooks) {
+        for (auto &hook : _hooks.iter()) {
             hook->onUnmount();
         }
     }
@@ -73,13 +73,13 @@ struct Node : Meta::NoCopy, Meta::NoMove {
     /* --- Layout & Paint --------------------------------------------------- */
 
     virtual void onLayout() {
-        for (auto &child : _children) {
+        for (auto &child : _children.iter()) {
             child->onLayout();
         }
     }
 
     virtual void onPaint(Gfx::Gfx &gfx) {
-        for (auto &child : _children) {
+        for (auto &child : _children.iter()) {
             child->onPaint(gfx);
         }
     }
@@ -93,13 +93,13 @@ struct Node : Meta::NoCopy, Meta::NoMove {
 
         printf("Node %d: ", _id);
 
-        for (auto &hook : _hooks) {
+        for (auto &hook : _hooks.iter()) {
             printf("%s ", (char const *)hook->desc().buf());
         }
 
         printf("\n");
 
-        for (auto &child : _children) {
+        for (auto &child : _children.iter()) {
             child->dump(indent + 1);
         }
     }

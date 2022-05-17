@@ -4,7 +4,7 @@
 
 #include "string.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 using Rune = uint32_t;
 
@@ -70,4 +70,4 @@ constexpr Runes runes(Str const &str) {
     return Runes{str.buf(), str.len()};
 }
 
-} // namespace Karm::Base
+} // namespace Karm

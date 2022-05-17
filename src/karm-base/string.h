@@ -5,7 +5,7 @@
 #include "slice.h"
 #include "std.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 using Str = Slice<char>;
 
@@ -107,4 +107,4 @@ struct String {
     }
 };
 
-} // namespace Karm::Base
+} // namespace Karm

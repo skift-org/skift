@@ -7,7 +7,7 @@
 #include "opt.h"
 #include "rc.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename T>
 struct List {
@@ -143,4 +143,4 @@ struct List {
     }
 };
 
-} // namespace Karm::Base
+} // namespace Karm

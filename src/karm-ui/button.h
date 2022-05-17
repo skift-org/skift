@@ -14,7 +14,7 @@ void button(EventFunc, Children children = {}) {
     });
 }
 
-void button(Text::Str text, EventFunc event) {
+void button(Str text, EventFunc event) {
     button(std::forward<EventFunc>(event), [&] {
         label(text);
     });

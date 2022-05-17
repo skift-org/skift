@@ -6,7 +6,7 @@
 #include "ordr.h"
 #include "vec.h"
 
-namespace Karm::Base {
+namespace Karm {
 
 template <typename K, typename V>
 struct Map {
@@ -51,4 +51,4 @@ struct Map {
     }
 };
 
-} // namespace Karm::Base
+} // namespace Karm

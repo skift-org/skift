@@ -4,6 +4,6 @@
 
 namespace Karm::Cli {
 
-using Result = Base::Result<int>;
+using Result = Result<int>;
 
 } // namespace Karm::Cli

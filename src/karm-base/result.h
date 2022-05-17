@@ -4,6 +4,7 @@
 
 #include "error.h"
 #include "opt.h"
+#include "std.h"
 
 namespace Karm::Base {
 
@@ -13,7 +14,7 @@ struct [[nodiscard]] Result {
     Opt<Value> _value = NONE;
 
     constexpr Result(Error error) : _error(error) {}
-    constexpr Result(Value value) : _error(), _value(value) {}
+    constexpr Result(Value &&value) : _error(), _value(value) {}
 
     constexpr operator bool() { return _error; }
     constexpr Error none() const { return _error; }

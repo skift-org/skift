@@ -38,12 +38,8 @@ struct Map {
         return NONE;
     }
 
-    Cons<K, V> const *begin() const {
-        return _els.begin();
-    }
-
-    Cons<K, V> const *end() const {
-        return _els.end();
+    auto iter() {
+        return _els.iter();
     }
 
     size_t len() {

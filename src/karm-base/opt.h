@@ -17,6 +17,11 @@ struct None {
 inline constexpr None NONE = None{};
 
 template <typename T>
+bool operator==(None, T *ptr) {
+    return ptr == nullptr;
+}
+
+template <typename T>
 struct Opt {
     bool _present = false;
 
@@ -80,6 +85,10 @@ struct Opt {
             other.release();
         }
         return *this;
+    }
+
+    bool operator==(None) const {
+        return !_present;
     }
 
     operator bool() const { return _present; }

@@ -4,6 +4,7 @@
 
 #include "clamp.h"
 #include "inert.h"
+#include "iter.h"
 #include "opt.h"
 #include "ref.h"
 
@@ -175,22 +176,31 @@ struct Vec {
         return _buf[index].unwrap();
     }
 
-    T *begin() {
-        if (_len == 0) {
-            return nullptr;
-        }
+    constexpr auto iter() const {
+        return Iter([&, i = 0uz]() mutable -> T * {
+            if (i >= _len) {
+                return nullptr;
+            }
+
+            return &_buf[i++].unwrap();
+        });
+    }
+
+    constexpr auto iter_rev() const {
+        return Iter([&, i = _len - 1]() mutable -> T const * {
+            if (i < 0) {
+                return NONE;
+            }
+
+            return &_buf[i--].unwrap();
+        });
+    }
+
+    T *buf() {
         return &_buf[0].unwrap();
     }
 
-    T *end() { return begin() + _len; }
-
-    T const *begin() const { return &_buf[0].unwrap(); }
-
-    T const *end() const { return begin() + _len; }
-
-    T *buf() { return begin(); }
-
-    T const *buf() const { return begin(); }
+    T const *buf() const { return &_buf[0].unwrap(); }
 
     size_t len() const { return _len; }
 };

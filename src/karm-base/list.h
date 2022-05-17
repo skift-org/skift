@@ -3,6 +3,7 @@
 #include "_prelude.h"
 
 #include "cons.h"
+#include "iter.h"
 #include "opt.h"
 #include "rc.h"
 
@@ -108,29 +109,28 @@ struct List {
         return node->buf;
     }
 
-    struct Iter {
-        OptStrong<_Node> curr;
-
-        operator bool() const { return curr; }
-
-        T &operator*() { return curr->buf; }
-
-        Iter &operator++() {
-            curr = curr->next;
-            return *this;
-        }
-
-        bool operator!=(Iter const &other) const {
-            return curr != other.curr;
-        }
-    };
-
-    Iter begin() {
-        return _head;
+    auto iter() {
+        return Iter([curr = _head]() mutable -> Opt<T> {
+            if (curr) {
+                auto ret = curr->buf;
+                curr = curr->next;
+                return ret;
+            } else {
+                return NONE;
+            }
+        });
     }
 
-    Iter end() {
-        return _tail;
+    auto iter_rev() {
+        return Iter([curr = _tail]() mutable -> Opt<T> {
+            if (curr) {
+                auto ret = curr->buf;
+                curr = curr->prev;
+                return ret;
+            } else {
+                return NONE;
+            }
+        });
     }
 
     void clear() {

@@ -48,19 +48,24 @@ namespace Karm::Base {
     ERROR(UNSUPPORTED)               \
     ERROR(UNEXPECTED_EOF)            \
     ERROR(OUT_OF_MEMORY)             \
+    ERROR(LIMIT_REACHED)             \
     ERROR(OTHER)
 
 struct [[nodiscard]] Error {
-    enum Code {
+    enum class Code {
 #define ITER(NAME) NAME,
         FOREACH_ERROR(ITER)
 #undef ITER
     } _code;
+    Str _msg;
 
-    constexpr Error() : _code(OK) {}
-    constexpr Error(Code code) : _code(code) {}
+    using enum Code;
 
-    operator bool() const { return _code == OK; }
+    constexpr Error() : _code(Code::OK) {}
+    constexpr Error(Code code) : _code(code), _msg("") {}
+    constexpr Error(Code code, Str msg) : _code(code), _msg(msg) {}
+
+    operator bool() const { return _code == Code::OK; }
 
     Code code() const { return _code; }
 
@@ -69,6 +74,10 @@ struct [[nodiscard]] Error {
     Error unwrap() const { return *this; }
 
     Base::Str msg() {
+        if (_msg.len() > 0) {
+            return _msg;
+        }
+
         switch (_code) {
 #define ITER(NAME) \
     case NAME:     \
@@ -84,5 +93,7 @@ struct [[nodiscard]] Error {
 inline constexpr Error::Code OK = Error::OK;
 
 static_assert(Tryable<Error>);
+
+#undef FOREACH_ERROR
 
 } // namespace Karm::Base

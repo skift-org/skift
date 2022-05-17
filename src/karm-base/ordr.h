@@ -9,10 +9,10 @@
 namespace Karm::Base {
 
 struct Ordr {
-    enum Value {
-        LESS = -1,
+    enum Value : int8_t {
+        LESS = -128,
         EQUAL = 0,
-        GREATER = 1,
+        GREATER = 127,
     };
 
     Value _value;
@@ -40,54 +40,67 @@ concept Ordered = requires(T const &lhs, T const &rhs) {
 
 namespace Op {
 
-constexpr bool eq(Ordered auto const &lhs, Ordered auto const &rhs) {
-    return lhs.cmp(rhs).isEq();
+template <Ordered T>
+constexpr Ordr cmp(T const &lhs, T const &rhs) {
+    return lhs.cmp(rhs);
 }
 
-constexpr bool eq(auto const &lhs, auto const &rhs) requires(!Ordered<decltype(lhs)> && !Ordered<decltype(rhs)>) {
-    return lhs == rhs;
+// fallback for types that don't implement Ordered
+template <typename T>
+requires(!Ordered<T>) constexpr Ordr cmp(T const &lhs, T const &rhs) {
+    if (lhs < rhs) {
+        return Ordr::LESS;
+    } else if (lhs > rhs) {
+        return Ordr::GREATER;
+    } else {
+        return Ordr::EQUAL;
+    }
+}
+
+template <typename T>
+Ordr cmp(T const *lhs, size_t lhs_len, T const *rhs, size_t rhs_len) {
+    size_t len = min(lhs_len, rhs_len);
+
+    for (size_t i = 0; i < len; i++) {
+        Ordr c = cmp(lhs[i], rhs[i]);
+        if (c != Ordr::EQUAL) {
+            return c;
+        }
+    }
+
+    if (lhs_len < rhs_len) {
+        return Ordr::LESS;
+    } else if (lhs_len > rhs_len) {
+        return Ordr::GREATER;
+    } else {
+        return Ordr::EQUAL;
+    }
+}
+
+constexpr bool eq(Ordered auto const &lhs, Ordered auto const &rhs) {
+    return cmp(lhs, rhs).isEq();
 }
 
 constexpr bool ne(Ordered auto const &lhs, Ordered auto const &rhs) {
-    return lhs.cmp(rhs).isNe();
-}
-
-constexpr bool ne(auto const &lhs, auto const &rhs) requires(!Ordered<decltype(lhs)> && !Ordered<decltype(rhs)>) {
-    return lhs != rhs;
+    return cmp(lhs, rhs).isNe();
 }
 
 constexpr bool lt(Ordered auto const &lhs, Ordered auto const &rhs) {
-    return lhs.cmp(rhs).isLt();
-}
-
-constexpr bool lt(auto const &lhs, auto const &rhs) requires(!Ordered<decltype(lhs)> && !Ordered<decltype(rhs)>) {
-    return lhs < rhs;
+    return cmp(lhs, rhs).isLt();
 }
 
 constexpr bool gt(Ordered auto const &lhs, Ordered auto const &rhs) {
-    return lhs.cmp(rhs).isGt();
-}
-
-constexpr bool gt(auto const &lhs, auto const &rhs) requires(!Ordered<decltype(lhs)> && !Ordered<decltype(rhs)>) {
-    return lhs > rhs;
+    return cmp(lhs, rhs).isGt();
 }
 
 constexpr bool gteq(Ordered auto const &lhs, Ordered auto const &rhs) {
-    return lhs.cmp(rhs).isGtEq();
-}
-
-constexpr bool gteq(auto const &lhs, auto const &rhs) requires(!Ordered<decltype(lhs)> && !Ordered<decltype(rhs)>) {
-    return lhs >= rhs;
+    return cmp(lhs, rhs).isGtEq();
 }
 
 constexpr bool lteq(Ordered auto const &lhs, Ordered auto const &rhs) {
-    return lhs.cmp(rhs).isLtEq();
-}
-
-constexpr bool lteq(auto const &lhs, auto const &rhs) requires(!Ordered<decltype(lhs)> && !Ordered<decltype(rhs)>) {
-    return lhs <= rhs;
+    return cmp(lhs, rhs).isLtEq();
 }
 
 } // namespace Op
 
-} // namespace Karm::Base
+} // namespace KBase

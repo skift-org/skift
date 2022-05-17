@@ -8,7 +8,12 @@ namespace Re {
 
 inline auto single(auto... c) {
     return [=](Karm::Text::Scan &scan) {
-        return ((scan.peek() == (Karm::Base::Rune)c) || ...);
+        if (((scan.peek() == (Karm::Base::Rune)c) || ...)) {
+            scan.next();
+            return true;
+        } else {
+            return false;
+        }
     };
 }
 
@@ -25,16 +30,22 @@ inline auto range(Karm::Base::Rune start, Karm::Base::Rune end) {
 }
 
 template <typename... Exprs>
-inline auto range_or(Exprs... exprs) {
+inline auto either(Exprs... exprs) {
     return [=](Karm::Text::Scan &scan) {
         return (exprs(scan) || ...);
     };
 }
 
 template <typename... Exprs>
-inline auto range_and(Exprs... exprs) {
+inline auto chain(Exprs... exprs) {
     return [=](Karm::Text::Scan &scan) {
         return (exprs(scan) && ...);
+    };
+}
+
+inline auto negate(auto expr) {
+    return [=](Karm::Text::Scan &scan) {
+        return !expr(scan);
     };
 }
 
@@ -67,32 +78,35 @@ inline auto zero_or_one(auto expr) {
 
 /* --- Posix Classes -------------------------------------------------------- */
 
-inline auto
-posix_upper() {
+inline auto upper() {
     return range('A', 'Z');
 }
 
-inline auto posix_lower() {
+inline auto lower() {
     return range('a', 'z');
 }
 
-inline auto posix_alpha() {
-    return range_or(posix_upper(), posix_lower());
+inline auto alpha() {
+    return either(upper(), lower());
 }
 
-inline auto posix_digit() {
+inline auto digit() {
     return range('0', '9');
 }
 
-inline auto posix_xdigit() {
-    return range_or(posix_digit(), range('a', 'f'), range('A', 'F'));
+inline auto xdigit() {
+    return either(digit(), range('a', 'f'), range('A', 'F'));
 }
 
-inline auto posix_alnum() {
-    return range_or(posix_alpha(), posix_digit());
+inline auto alnum() {
+    return either(alpha(), digit());
 }
 
-inline auto posix_punct() {
+inline auto word() {
+    return either(alnum(), single('_'));
+}
+
+inline auto punct() {
     return single(
         '!', '"', '#', '$', '%', '&', '\'', '(',
         ')', '*', '+', ',', '-', '.', '/', ':',
@@ -100,24 +114,28 @@ inline auto posix_punct() {
         ']', '^', '_', '`', '{', '|', '}', '~');
 }
 
-inline auto posix_space() {
+inline auto space() {
     return single(' ', '\t', '\n', '\r');
+}
+
+inline auto blank() {
+    return single(' ', '\t');
 }
 
 /* --- Utils ---------------------------------------------------------------- */
 
-inline auto separator(Karm::Base::Rune rune) {
-    return range_and(
-        zero_or_more(posix_space()),
-        single(rune),
-        zero_or_more(posix_space()));
+inline auto separator(Karm::Base::Rune r) {
+    return chain(
+        zero_or_more(space()),
+        single(r),
+        zero_or_more(space()));
 }
 
-inline auto separator(Karm::Base::Str word) {
-    return range_and(
-        zero_or_more(posix_space()),
-        Re::word(word),
-        zero_or_more(posix_space()));
+inline auto separator(Karm::Base::Str w) {
+    return chain(
+        zero_or_more(space()),
+        word(w),
+        zero_or_more(space()));
 }
 
 } // namespace Re

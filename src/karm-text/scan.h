@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/rune.h>
 #include <karm-base/string.h>
 #include <karm-meta/callable.h>
 
@@ -16,20 +17,30 @@ struct Scan {
         return _head >= _str.len();
     }
 
+    size_t rem() {
+        return _str.len() - _head;
+    }
+
     Base::Rune peek() {
         if (ended()) {
             return '\0';
         }
 
-        return _str[_head];
+        return rune_decode(_str.buf() + _head, rem());
     }
 
-    Base::Rune peek(size_t offset) {
-        if ((_head + offset) >= _str.len()) {
+    Base::Rune peek(size_t count) {
+        char const *buf = _str.buf() + _head;
+
+        while (count-- > 0 && buf < _str.end()) {
+            buf += rune_len(*buf);
+        }
+
+        if (buf >= _str.end()) {
             return '\0';
         }
 
-        return _str[_head + offset];
+        return rune_decode(buf, rem());
     }
 
     Base::Rune next() {
@@ -37,12 +48,14 @@ struct Scan {
             return '\0';
         }
 
-        return _str[_head++];
+        Base::Rune c = rune_decode(_str.buf() + _head, rem());
+        _head += rune_len(c);
+        return c;
     }
 
-    void next(size_t offset) {
-        if ((_head + offset) <= _str.len()) {
-            _head += offset;
+    void next(size_t count) {
+        for (size_t i = 0; i < count; i++) {
+            next();
         }
     }
 
@@ -56,8 +69,9 @@ struct Scan {
     }
 
     bool skip(Base::Str str) {
-        for (size_t i = 0; i < str.len(); i++) {
-            if (peek(i) != str[i]) {
+        size_t i = 0;
+        for (auto r : runes(str)) {
+            if (peek(i++) != r) {
                 return false;
             }
         }
@@ -68,7 +82,7 @@ struct Scan {
 
     bool skip(auto predicate) requires Meta::Callable<decltype(predicate), Base::Rune> {
         if (!ended() && predicate(peek())) {
-            _head++;
+            next();
             return true;
         }
 

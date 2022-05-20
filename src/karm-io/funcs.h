@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/clamp.h>
+#include <karm-base/rune.h>
 #include <karm-base/string.h>
 
 #include "impls.h"

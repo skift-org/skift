@@ -32,9 +32,9 @@ struct Procedure {
     }
 };
 
-template <Id id, typename Ret, typename... Args>
+template <Id id, typename _Ret, typename... Args>
 struct Function : public Procedure<id, Args...> {
-    using Return = Ret;
+    using Ret = _Ret;
 
     constexpr static bool do_return = true;
 
@@ -67,7 +67,7 @@ struct Handle {
     uint64_t _value;
 
     template <typename Func, typename... Args>
-    Result<typename Func::Return> call(Args &&...args) {
+    Result<typename Func::Ret> call(Args &&...args) {
         Func func;
 
         Message::Encoder encoder;
@@ -78,7 +78,7 @@ struct Handle {
             try$(doFunctionCall(encoder.finalize(), response));
 
             Message::Decoder decoder{response};
-            typename Func::Return ret;
+            typename Func::Ret ret;
             try$(func.decode(decoder, ret));
 
             return {ret};

@@ -1,8 +1,11 @@
 #pragma once
 
+#include <karm-debug/panic.h>
 #include <karm-meta/pack.h>
 
 #include "_prelude.h"
+
+#include "clamp.h"
 
 namespace Karm {
 
@@ -104,15 +107,11 @@ struct Var {
     }
 
     void visit(auto visitor) {
-        Meta::indexCast<Ts...>(_index, _buf, [&]<typename U>(U *ptr) {
-            visitor(*ptr);
-        });
+        Meta::indexCast<Ts...>(_index, _buf, visitor);
     }
 
     void visit(auto visitor) const {
-        Meta::indexCast<Ts...>(_index, _buf, [&]<typename U>(U const *ptr) {
-            visitor(*ptr);
-        });
+        Meta::indexCast<Ts...>(_index, _buf, visitor);
     }
 
     template <Meta::Contains<Ts...> T>

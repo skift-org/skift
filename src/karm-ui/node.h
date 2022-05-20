@@ -78,7 +78,7 @@ struct Node : Meta::NoCopy, Meta::NoMove {
         }
     }
 
-    virtual void onPaint(Gfx::Gfx &gfx) {
+    virtual void onPaint(Gfx::Ctx &gfx) {
         for (auto &child : _children.iter()) {
             child->onPaint(gfx);
         }

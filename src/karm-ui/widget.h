@@ -9,7 +9,7 @@ struct _Widget : public Node {
 };
 
 static inline void widget(Children children = {}) {
-    ui().group([&] {
+    ctx().group([&] {
         children();
     });
 }

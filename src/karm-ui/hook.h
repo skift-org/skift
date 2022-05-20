@@ -2,7 +2,6 @@
 
 #include <karm-base/string.h>
 
-
 namespace Karm::Ui {
 
 struct Hook {
@@ -10,9 +9,9 @@ struct Hook {
 
     virtual Str desc() const = 0;
 
-    virtual void onMount(){};
+    virtual void onMount() {}
 
-    virtual void onUnmount(){};
+    virtual void onUnmount() {}
 };
 
 } // namespace Karm::Ui

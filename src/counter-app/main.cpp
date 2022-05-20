@@ -4,16 +4,16 @@
 #include <karm-ui/state.h>
 #include <karm-ui/window.h>
 
-using namespace Karm::Ui;
+using namespace Karm;
 
 ExitCode entryPoint(CliArgs const &) {
-    Ui app{[] {
-        window([&] {
-            auto state = useState(0);
+    Ui::Ctx app{[] {
+        Ui::window([&] {
+            auto state = Ui::useState(0);
 
-            label("You, clicked {} times", *state);
+            Ui::label("You, clicked {} times", *state);
 
-            button("Click me!", [&](Event const &) {
+            Ui::button("Click me!", [&](Ui::Event const &) {
                 state.update([](auto &s) {
                     s++;
                 });

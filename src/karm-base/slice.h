@@ -39,23 +39,31 @@ struct Slice {
         return _len;
     }
 
+    constexpr char const *begin() const {
+        return _buf;
+    }
+
+    constexpr char const *end() const {
+        return _buf + _len;
+    }
+
     constexpr auto iter() const {
-        return Iter([&, i = 0uz]() mutable -> T * {
+        return Iter([&, i = 0uz]() mutable -> T const * {
             if (i >= _len) {
                 return nullptr;
             }
 
-            return &_buf[i++].unwrap();
+            return &_buf[i++];
         });
     }
 
     constexpr auto iter_rev() const {
         return Iter([&, i = _len - 1]() mutable -> T const * {
             if (i < 0) {
-                return NONE;
+                return nullptr;
             }
 
-            return &_buf[i--].unwrap();
+            return &_buf[i--];
         });
     }
 };

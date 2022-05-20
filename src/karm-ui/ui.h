@@ -23,67 +23,67 @@ struct Children : public Opt<Builder> {
     }
 };
 
-static struct Ui *_ui = {};
+static struct Ctx *_ctx = {};
 
-struct Ui {
-    struct Ctx {
+struct Ctx {
+    struct Scope {
         Strong<Node> parent;
         size_t child = 0;
         size_t hook = 0;
     };
 
-    Vec<Ctx> _stack;
+    Vec<Scope> _stack;
     Strong<Node> _curr = makeStrong<Node>();
 
     Builder _builder;
 
-    Ui(Builder &&builder)
+    Ctx(Builder &&builder)
         : _builder(std::forward<Builder>(builder)) {
-        _ui = this;
+        _ctx = this;
     }
 
-    Ctx &currentCtx() {
+    Scope &currentScope() {
         return _stack.top();
     }
 
     Node &currentNode() {
-        return *currentCtx().parent;
+        return *currentScope().parent;
     }
 
     Strong<Node> reconcile() {
-        if (currentCtx().child < currentNode().len()) {
-            return currentNode().peek(currentCtx().child++);
+        if (currentScope().child < currentNode().len()) {
+            return currentNode().peek(currentScope().child++);
         } else {
             Strong<Node> node = makeStrong<Node>();
             currentNode().mount(node);
-            currentCtx().child++;
+            currentScope().child++;
             return node;
         }
     }
-    void begin() {
-        _stack.push(Ctx{reconcile()});
+    void push() {
+        _stack.push(Scope{reconcile()});
     }
 
-    Node &end() {
+    Node &pop() {
         Node &node = *_stack.top().parent;
-        currentNode().truncate(currentCtx().child + 1);
+        currentNode().truncate(currentScope().child + 1);
         _stack.pop();
         return node;
     }
 
     inline Node &group(auto inner) {
-        begin();
+        push();
         inner();
-        return end();
+        return pop();
     }
 
     template <typename T, typename... Ts>
     T &hook(Ts... ts) {
-        return currentNode().hook<T>(currentCtx().hook++, ts...);
+        return currentNode().hook<T>(currentScope().hook++, ts...);
     }
 
     void rebuild() {
-        _stack.push(Ctx{_curr});
+        _stack.push(Scope{_curr});
         _builder();
     }
 
@@ -101,8 +101,8 @@ struct Ui {
     }
 };
 
-Ui &ui() {
-    return *_ui;
+Ctx &ctx() {
+    return *_ctx;
 }
 
 } // namespace Karm::Ui

@@ -18,7 +18,7 @@ struct Map {
         : _els(std::move(list)) {}
 
     void put(K const &key, V const &value) {
-        for (auto &i : _els) {
+        for (auto &i : _els.iter()) {
             if (Op::eq(i.car, key)) {
                 i.cdr = value;
                 return;
@@ -39,6 +39,10 @@ struct Map {
     }
 
     auto iter() {
+        return _els.iter();
+    }
+
+    auto iter() const {
         return _els.iter();
     }
 

@@ -41,6 +41,10 @@ struct String {
         delete[] _buf;
     }
 
+    operator Str() const {
+        return Str(_buf, _len);
+    }
+
     String &operator=(String const &other) {
         return *this = String(other);
     }
@@ -53,25 +57,25 @@ struct String {
         return *this;
     }
 
-    operator Str() const {
-        return Str(_buf, _len);
-    }
+    char *begin() { return _buf; }
 
-    char const *buf() const {
-        return _buf;
-    }
+    char const *begin() const { return _buf; }
 
-    char *buf() {
-        return _buf;
-    }
+    char *end() { return _buf + _len; }
 
-    size_t len() const {
-        return _len;
-    }
+    char const *end() const { return _buf + _len; }
 
-    Ordr cmp(Str const &other) const {
+    auto iter() { return Slice<char>(_buf, _len).iter(); }
+
+    auto cmp(Str const &other) const {
         return static_cast<Str>(*this).cmp(other);
     }
+
+    char *buf() { return _buf; }
+
+    char const *buf() const { return _buf; }
+
+    size_t len() const { return _len; }
 
     void ensure(size_t cap) {
         if (cap <= _cap)

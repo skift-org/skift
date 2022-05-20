@@ -31,7 +31,7 @@ struct State : public Hook {
 
 template <typename T>
 State<T> &useState(T value) {
-    return ui().hook<State<T>>(value);
+    return ctx().hook<State<T>>(value);
 }
 
 } // namespace Karm::Ui

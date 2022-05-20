@@ -5,8 +5,8 @@
 namespace Karm::Json {
 
 inline auto number_start() {
-    return Re::range_or(
-        Re::posix_digit(),
+    return Re::either(
+        Re::digit(),
         Re::single('-'));
 }
 
@@ -75,7 +75,7 @@ void dump(Text::Emit &emit, Value const &value) {
     auto dump_object = [&](Object const &obj) {
         emit("{");
         bool first = true;
-        for (auto const &pair : obj) {
+        for (auto const &pair : obj.iter()) {
             if (!first)
                 emit(",");
             dump(emit, pair.car);
@@ -89,7 +89,7 @@ void dump(Text::Emit &emit, Value const &value) {
     auto dump_array = [&](Array const &arr) {
         emit("[");
         bool first = true;
-        for (auto const &item : arr) {
+        for (auto const &item : arr.iter()) {
             if (!first)
                 emit(",");
             dump(emit, item);
@@ -112,7 +112,7 @@ void dump(Text::Emit &emit, Value const &value) {
         emit(b ? "true" : "false");
     };
 
-    auto dump_none = [&]() {
+    auto dump_none = [&](None const &) {
         emit("null");
     };
 

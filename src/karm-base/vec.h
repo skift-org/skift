@@ -176,13 +176,33 @@ struct Vec {
         return _buf[index].unwrap();
     }
 
-    constexpr auto iter() const {
+    constexpr auto iter() {
         return Iter([&, i = 0uz]() mutable -> T * {
             if (i >= _len) {
                 return nullptr;
             }
 
             return &_buf[i++].unwrap();
+        });
+    }
+
+    constexpr auto iter() const {
+        return Iter([&, i = 0uz]() mutable -> T const * {
+            if (i >= _len) {
+                return nullptr;
+            }
+
+            return &_buf[i++].unwrap();
+        });
+    }
+
+    constexpr auto iter_rev() {
+        return Iter([&, i = _len - 1]() mutable -> T * {
+            if (i < 0) {
+                return NONE;
+            }
+
+            return &_buf[i--].unwrap();
         });
     }
 

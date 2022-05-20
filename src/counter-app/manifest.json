@@ -1,0 +1,7 @@
+{
+    "id": "counter-app",
+    "type": "app",
+    "deps": [
+        "karm-ui"
+    ]
+}

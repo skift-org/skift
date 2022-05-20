@@ -1,0 +1,8 @@
+{
+    "id": "karm-ui",
+    "type": "lib",
+    "deps": [
+        "karm-gfx",
+        "karm-embed"
+    ]
+}

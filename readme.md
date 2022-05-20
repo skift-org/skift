@@ -26,7 +26,7 @@ ExitCode entryPoint(CliArgs const &) {
 }
 ```
 
-### Advanced Cli
+### Advance Cli
 
 ```c++
 ExitCode entryPoint(CliArgs const &args) {

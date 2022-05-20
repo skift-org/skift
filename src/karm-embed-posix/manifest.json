@@ -1,0 +1,16 @@
+{
+    "id": "karm-embed-posix",
+    "type": "lib",
+    "requires": {
+        "sys": [
+            "linux",
+            "darwin"
+        ]
+    },
+    "inject": [
+        "karm-embed"
+    ],
+    "deps": [
+        "karm-base"
+    ]
+}

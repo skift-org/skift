@@ -1,0 +1,7 @@
+{
+    "id": "karm-io",
+    "type": "lib",
+    "deps": [
+        "karm-base"
+    ]
+}

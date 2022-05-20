@@ -1,0 +1,7 @@
+{
+    "id": "karm-sys",
+    "type": "lib",
+    "deps": [
+        "karm-embed"
+    ]
+}

@@ -1,0 +1,8 @@
+{
+    "id": "karm-main",
+    "type": "lib",
+    "deps": [
+        "karm-cli",
+        "karm-sys"
+    ]
+}

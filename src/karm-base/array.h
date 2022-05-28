@@ -60,24 +60,46 @@ struct Array {
 
     constexpr size_t len() const { return N; }
 
-    constexpr auto iter() const {
-        return Iter{[&, i = 0uz]() mutable -> Opt<T> {
+    constexpr auto iter() {
+        return Iter([&, i = 0uz]() mutable -> T * {
             if (i >= N) {
-                return NONE;
+                return nullptr;
             }
 
-            return _buf[i++];
-        }};
+            return &_buf[i++];
+        });
     }
 
-    constexpr auto iter_rev() const {
-        return Iter{[&, i = N]() mutable -> Opt<T> {
+    constexpr auto iter() const {
+        return Iter([&, i = 0uz]() mutable -> T const * {
+            if (i >= N) {
+                return nullptr;
+            }
+
+            return &_buf[i++];
+        });
+    }
+
+    constexpr auto iter_rev() {
+        return Iter([&, i = N]() mutable -> T * {
             if (i == 0) {
                 return NONE;
             }
 
-            return _buf[--i];
-        }};
+            i--;
+            return &_buf[i];
+        });
+    }
+
+    constexpr auto iter_rev() const {
+        return Iter([&, i = N]() mutable -> T const * {
+            if (i == 0) {
+                return NONE;
+            }
+
+            i--;
+            return &_buf[i];
+        });
     }
 };
 

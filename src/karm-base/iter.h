@@ -17,7 +17,7 @@ struct Iter {
         return Iter{[=]() mutable {
             auto v = next();
 
-            if (!next) {
+            if (!v) {
                 return NONE;
             }
 
@@ -297,26 +297,34 @@ constexpr auto range(T end) {
 
 template <typename T>
 constexpr auto range(T start, T end) {
-    return Iter{[value = start, end]() mutable -> Opt<T> {
+    return Iter{[value = start, start, end]() mutable -> Opt<T> {
         if (value >= end) {
             return NONE;
         }
 
         auto result = value;
-        value++;
+        if (start < end) {
+            value++;
+        } else {
+            value++;
+        }
         return result;
     }};
 }
 
 template <typename T>
 constexpr auto range(T start, T end, T step) {
-    return Iter{[value = start, end, step]() mutable -> Opt<T> {
+    return Iter{[value = start, start, end, step]() mutable -> Opt<T> {
         if (value >= end) {
             return NONE;
         }
 
         auto result = value;
-        value += step;
+        if (start < end) {
+            value += step;
+        } else {
+            value -= step;
+        }
         return result;
     }};
 }

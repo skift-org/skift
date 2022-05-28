@@ -11,10 +11,14 @@ import sys
 
 
 def load_json(filename: str) -> Any:
-    with open(filename) as f:
-        data = json.load(f)
-        data["dir"] = os.path.dirname(filename)
-        return data
+    try:
+        with open(filename) as f:
+            data = json.load(f)
+            data["dir"] = os.path.dirname(filename)
+            return data
+    except:
+        print("Error loading manifest: " + filename)
+        sys.exit(1)
 
 
 def load_manifests(manifests: list) -> list:
@@ -128,7 +132,7 @@ def find_files(manifests: dict) -> dict:
 
         if item["type"] == "lib":
             item["out"] = "bin/" + key + ".a"
-        elif item["type"] == "app":
+        elif item["type"] == "exe":
             item["out"] = "bin/" + key + ".elf"
         else:
             raise Exception("Unknown type: " + item["type"])
@@ -147,11 +151,12 @@ def find_libs(manifests: dict) -> dict:
 
 
 # --- Evironment ------------------------------------------------------------- #
+
 ENV = {
     "arch": "x86_64",
     "sub": "",
     "vendor": "",
-    "sys": "",
+    "sys": os.uname()[0].lower(),
     "abi": "",
 }
 
@@ -233,6 +238,7 @@ manifests = inject_manifest(manifests)
 manifests = resolve_deps(manifests)
 manifests = find_files(manifests)
 manifests = find_libs(manifests)
-print(json.dumps(manifests, indent=4))
-print("--------------")
+#print(json.dumps(manifests, indent=4))
+# print("--------------")
+print(ENV)
 generate_ninja(open("build.ninja", "w"), manifests, ENV, TOOLCHAIN)

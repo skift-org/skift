@@ -9,6 +9,8 @@ namespace Karm::Embed {
 struct PosixFd : public Sys::Fd {
     int _raw;
 
+    PosixFd(int raw) : _raw(raw) {}
+
     Result<size_t> read(void *buf, size_t size) override {
         ssize_t result = ::read(_raw, buf, size);
 
@@ -68,7 +70,8 @@ struct PosixFd : public Sys::Fd {
 };
 
 Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
-    int fd = ::open(path.c_str(), O_RDONLY);
+    String str = path.str();
+    int fd = ::open(str.buf(), O_RDONLY);
 
     if (fd < 0) {
         return Posix::fromLastErrno();
@@ -78,7 +81,9 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
 }
 
 Result<Strong<Sys::Fd>> createFile(Sys::Path path) {
-    int fd = ::open(path.c_str(), O_RDWR | O_CREAT, 0644);
+    String str = path.str();
+
+    int fd = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
 
     if (fd < 0) {
         return Posix::fromLastErrno();
@@ -87,28 +92,29 @@ Result<Strong<Sys::Fd>> createFile(Sys::Path path) {
     return {makeStrong<PosixFd>(fd)};
 }
 
-Result<Cons<Strong<Sys::Fd>, Strong<Sys::Fd>>> createPipe() {
+Result<Pair<Strong<Sys::Fd>>> createPipe() {
     int fds[2];
 
     if (::pipe(fds) < 0) {
         return Posix::fromLastErrno();
     }
 
-    return {
+    return Pair<Strong<Sys::Fd>>{
         makeStrong<PosixFd>(fds[0]),
-        makeStrong<PosixFd>(fds[1])};
+        makeStrong<PosixFd>(fds[1]),
+    };
 }
 
 Result<Strong<Sys::Fd>> createIn() {
-    return makeStrong<PosixFd>(0);
+    return {makeStrong<PosixFd>(0)};
 }
 
 Result<Strong<Sys::Fd>> createOut() {
-    return makeStrong<PosixFd>(1);
+    return {makeStrong<PosixFd>(1)};
 }
 
 Result<Strong<Sys::Fd>> createErr() {
-    return makeStrong<PosixFd>(2);
+    return {makeStrong<PosixFd>(2)};
 }
 
 } // namespace Karm::Embed

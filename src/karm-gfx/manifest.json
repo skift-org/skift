@@ -1,7 +1,0 @@
-{
-    "id": "karm-gfx",
-    "type": "lib",
-    "deps": [
-        "karm-math"
-    ]
-}

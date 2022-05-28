@@ -1,0 +1,16 @@
+{
+    "id": "hjert-i686",
+    "description": "The Hjert micro-kernel platform layer for i686",
+    "type": "lib",
+    "requires": {
+        "sys": [
+            "kernel"
+        ],
+        "arch": [
+            "i686"
+        ]
+    },
+    "inject": [
+        "hjert-base"
+    ]
+}

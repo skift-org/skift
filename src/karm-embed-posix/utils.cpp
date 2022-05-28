@@ -5,6 +5,14 @@
 namespace Karm::Embed::Posix {
 
 Error fromErrno(int error) {
+    if (EOPNOTSUPP != ENOTSUP && error == EOPNOTSUPP) {
+        return Error(Error::UNSUPPORTED, "Operation not supported on socket.");
+    }
+
+    if (EWOULDBLOCK != EAGAIN && error == EWOULDBLOCK) {
+        return Error(Error::WOULD_BLOCK, "Operation would block.");
+    }
+
     switch (error) {
     case E2BIG:
         return Error(Error::ARGUMENT_LIST_TOO_LONG, "Argument list too long.");
@@ -126,8 +134,6 @@ Error fromErrno(int error) {
         return Error(Error::INVALID_INPUT, "Inappropriate I/O control operation.");
     case ENXIO:
         return Error(Error::NOT_FOUND, "No such device or address.");
-    case EOPNOTSUPP:
-        return Error(Error::UNSUPPORTED, "Operation not supported on socket.");
     case EOVERFLOW:
         return Error(Error::OTHER, "Value too large to be stored in data type.");
     case EOWNERDEAD:
@@ -156,11 +162,8 @@ Error fromErrno(int error) {
         return Error(Error::TIMED_OUT, "Connection timed out.");
     case ETXTBSY:
         return Error(Error::RESOURCE_BUSY, "Text file busy.");
-    case EWOULDBLOCK:
-        return Error(Error::WOULD_BLOCK, "Operation would block.");
     case EXDEV:
         return Error(Error::INVALID_INPUT, "Cross-device link.");
-
     default:
         return Error::OTHER;
     }

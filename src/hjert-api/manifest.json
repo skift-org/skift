@@ -1,5 +1,6 @@
 {
     "id": "hjert-api",
+    "description": "The Hjert micro-kernel APIs",
     "type": "lib",
     "deps": []
 }

@@ -18,8 +18,10 @@ struct Syscall {
 };
 
 struct Log : Syscall<0xb412722092f3afc1, Log> {
-    char const *buf;
+    void const *buf;
     size_t len;
 };
+
+
 
 } // namespace Hjert::Api

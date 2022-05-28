@@ -18,6 +18,8 @@ struct Tuple<> {
 
     constexpr size_t len() { return 0; }
 
+    constexpr static void visit(void *, auto) {}
+
     constexpr void visit(auto) {}
 };
 
@@ -30,6 +32,10 @@ struct Tuple<Car> {
 
     constexpr size_t len() {
         return 1;
+    }
+
+    constexpr static auto visit(void *ptr, auto f) {
+        f(*static_cast<Car *>(ptr));
     }
 
     constexpr void visit(auto f) {
@@ -51,6 +57,11 @@ struct Tuple<Car, Cdr...> {
 
     constexpr size_t len() {
         return 1 + cdr.len();
+    }
+
+    constexpr static void visit(void *ptr, auto f) {
+        f(*static_cast<Car *>(ptr));
+        Tuple<Cdr...>::visit(f, ptr);
     }
 
     constexpr void visit(auto f) {

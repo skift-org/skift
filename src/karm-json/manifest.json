@@ -1,7 +1,0 @@
-{
-    "id": "karm-json",
-    "type": "lib",
-    "deps": [
-        "karm-text"
-    ]
-}

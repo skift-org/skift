@@ -1,0 +1,77 @@
+#pragma once
+
+#include "std.h"
+
+namespace Karm {
+
+enum MemOrder {
+    RELAXED = __ATOMIC_RELAXED,
+    CONSUME = __ATOMIC_CONSUME,
+    ACQUIRE = __ATOMIC_ACQUIRE,
+    RELEASE = __ATOMIC_RELEASE,
+    ACQ_REL = __ATOMIC_ACQ_REL,
+    SEQ_CST = __ATOMIC_SEQ_CST
+};
+
+static void memory_barier(MemOrder order = SEQ_CST) {
+    __atomic_thread_fence(order);
+}
+
+template <typename T>
+struct Atomic {
+
+    T _val;
+
+    constexpr Atomic() = default;
+
+    Atomic(T const &val) : _val(val) {
+    }
+
+    Atomic(T &&val) : _val(std::move(val)) {
+    }
+
+    T xchg(T desired, MemOrder order = MemOrder::SEQ_CST) {
+        return __atomic_exchange_n(&_val, desired, order);
+    }
+
+    bool cmpxchg(T expected, T desired, MemOrder order = MemOrder::SEQ_CST) {
+        return cmpxchg(expected, desired, order);
+    }
+
+    bool cmpxchg(T &expected, T desired, MemOrder order = MemOrder::SEQ_CST) {
+        if (order == ACQ_REL || order == RELAXED)
+            return __atomic_compare_exchange_n(&_val, &expected, desired, false, RELAXED, ACQUIRE);
+
+        return __atomic_compare_exchange_n(&_val, &expected, desired, false, order, order);
+    }
+
+    T fetch_add(T desired, MemOrder order = MemOrder::SEQ_CST) {
+        return __atomic_fetch_add(&_val, desired, order);
+    }
+
+    T fetch_sub(T desired, MemOrder order = MemOrder::SEQ_CST) {
+        return __atomic_fetch_sub(&_val, desired, order);
+    }
+
+    T fetch_inc(MemOrder order = MemOrder::SEQ_CST) {
+        return __atomic_fetch_add(&_val, 1, order);
+    }
+
+    T fetch_dec(MemOrder order = MemOrder::SEQ_CST) {
+        return __atomic_fetch_sub(&_val, 1, order);
+    }
+
+    T load(MemOrder order = MemOrder::SEQ_CST) {
+        return __atomic_load_n(&_val, order);
+    }
+
+    void store(T desired, MemOrder order = MemOrder::SEQ_CST) {
+        __atomic_store_n(&_val, desired, order);
+    }
+
+    bool lock_free() {
+        return __atomic_is_lock_free(&_val);
+    }
+};
+
+}; // namespace Karm

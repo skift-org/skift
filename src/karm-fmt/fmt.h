@@ -7,7 +7,6 @@
 #include <karm-base/tuple.h>
 #include <karm-io/funcs.h>
 #include <karm-io/traits.h>
-#include <karm-text/emit.h>
 #include <karm-text/scan.h>
 
 namespace Karm::Fmt {
@@ -115,6 +114,7 @@ struct Formatter<Str> {
 };
 
 struct _Args {
+    virtual ~_Args() = default;
     virtual size_t len() = 0;
     virtual Result<size_t> format(Text::Scan &scan, Io::Writer &writer, size_t index) = 0;
 };

@@ -11,8 +11,7 @@
 
 namespace Karm {
 
-struct None {
-};
+struct None {};
 
 inline constexpr None NONE = None{};
 

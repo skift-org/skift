@@ -5,14 +5,18 @@
 namespace Karm::Sys {
 
 struct Path {
-    Str _buf;
+    Str _str;
 
     Path() = default;
 
-    Path(Str path) : _buf(path) {}
+    Path(Str path) : _str(path) {}
 
     Ordr cmp(Path const &other) const {
-        return _buf.cmp(other._buf);
+        return _str.cmp(other._str);
+    }
+
+    Str str() const {
+        return _str;
     }
 };
 

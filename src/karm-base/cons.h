@@ -13,4 +13,7 @@ struct Cons {
     Cdr cdr;
 };
 
+template <typename T>
+using Pair = Cons<T, T>;
+
 } // namespace Karm

@@ -1,0 +1,13 @@
+{
+    "id": "hjert-base",
+    "description": "The Hjert micro-kernel",
+    "type": "exe",
+    "deps": [
+        "karm-base"
+    ],
+    "requires": {
+        "sys": [
+            "kernel"
+        ]
+    }
+}

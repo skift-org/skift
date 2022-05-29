@@ -11,7 +11,7 @@ namespace Karm {
 
 template <typename T, size_t N>
 struct Array {
-    T _buf[N];
+    T _buf[N] = {};
 
     constexpr Array() = default;
 
@@ -22,7 +22,7 @@ struct Array {
         }
     }
 
-    T &operator[](size_t i) {
+    constexpr T &operator[](size_t i) {
         return _buf[i];
     }
 

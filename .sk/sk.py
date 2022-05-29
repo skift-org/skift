@@ -1,3 +1,5 @@
+import errno
+import shutil
 from typing import Any, TextIO
 
 import json
@@ -5,6 +7,8 @@ import os
 import copy
 import ninja
 import sys
+import hashlib
+import subprocess
 
 
 # --- Manifest Loading ------------------------------------------------------- #
@@ -120,20 +124,20 @@ def find_assets_files(manifest: dict) -> list:
     return os.listdir(manifest["dir"] + "/assets")
 
 
-def find_files(manifests: dict) -> dict:
+def find_files(manifests: dict, env) -> dict:
     manifest = copy.deepcopy(manifests)
     for key in manifest:
         item = manifest[key]
         item["tests"] = find_tests_files(item)
         item["assets"] = find_assets_files(item)
         item["srcs"] = find_source_files(item)
-        item["objs"] = [(x.replace("src/", "obj/") + ".o", x)
+        item["objs"] = [(x.replace("src/", env["objdir"] + "/") + ".o", x)
                         for x in item["srcs"]]
 
         if item["type"] == "lib":
-            item["out"] = "bin/" + key + ".a"
+            item["out"] = env["bindir"] + "/" + key + ".a"
         elif item["type"] == "exe":
-            item["out"] = "bin/" + key + ".elf"
+            item["out"] = env["bindir"] + "/" + key + ".elf"
         else:
             raise Exception("Unknown type: " + item["type"])
 
@@ -151,6 +155,7 @@ def find_libs(manifests: dict) -> dict:
 
 
 # --- Evironment ------------------------------------------------------------- #
+
 
 ENV_HOST = {
     "toolchain": "clang",
@@ -199,6 +204,18 @@ ENV_EFI = {
 PASS = ["toolchain", "arch", "sub", "vendor", "sys", "abi", "freestanding"]
 
 
+def hash_env(env: dict) -> str:
+    result = ""
+    for key in PASS:
+        result += key + "=" + str(env[key]) + ";"
+
+    return hashlib.sha256(result.encode()).hexdigest()
+
+
+def hash_id(env: dict) -> str:
+    return f"{env['toolchain']}-{env['arch']}-{env['sub']}-{env['vendor']}-{env['sys']}-{env['abi']}"
+
+
 def preprocess_env(env: dict, manifests: dict) -> dict:
     result = copy.deepcopy(env)
 
@@ -226,9 +243,25 @@ def preprocess_env(env: dict, manifests: dict) -> dict:
     result["cxxflags"] = "-std=gnu++2b -Isrc -Wall -Wextra -Werror -fcolor-diagnostics -fno-exceptions -fno-rtti " + \
         result["cxxflags"]
 
+    result["id"] = hash_id(env)
+    result["hash"] = hash_env(env)
+    result["dir"] = f".build/{result['hash'][:8]}"
+    result["bindir"] = f"{result['dir']}/bin"
+    result["objdir"] = f"{result['dir']}/obj"
+
     return result
 
 # --- Generator -------------------------------------------------------------- #
+
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
 
 
 def generate_ninja(out: TextIO, manifests: dict, env: dict) -> None:
@@ -283,15 +316,73 @@ def generate_ninja(out: TextIO, manifests: dict, env: dict) -> None:
     writer.build("all", "phony", all)
 
 
-environment = ENV_EFI
+# --- Commands --------------------------------------------------------------- #
+CMDS = {}
 
-manifests_list = load_manifests(find_manifests("."))
-manifests = list2dict(filter_manifests(manifests_list, environment))
-manifests = inject_manifest(manifests)
-manifests = resolve_deps(manifests)
-manifests = find_files(manifests)
-manifests = find_libs(manifests)
 
-environment = preprocess_env(environment, manifests)
-print(json.dumps(environment, indent=4))
-generate_ninja(open("build.ninja", "w"), manifests, environment)
+def prepare_env(environment: dict, manifests_list: dict) -> dict:
+    manifests = list2dict(filter_manifests(manifests_list, environment))
+    manifests = inject_manifest(manifests)
+    manifests = resolve_deps(manifests)
+    environment = preprocess_env(environment, manifests)
+    manifests = find_files(manifests, environment)
+    manifests = find_libs(manifests)
+
+    environment["ninjafile"] = environment["dir"] + "/build.ninja"
+    mkdir_p(environment["dir"])
+
+    generate_ninja(open(environment["ninjafile"], "w"), manifests, environment)
+
+    with open(environment["dir"] + "/build.json", "w") as f:
+        json.dump(manifests, f, indent=4)
+
+    with open(environment["dir"] + "/env.json", "w") as f:
+        json.dump(environment, f, indent=4)
+
+    return environment
+
+
+def build_env(environment: dict):
+    proc = subprocess.run(["ninja", "-j", "1", "-f", environment["ninjafile"]])
+    if proc.returncode != 0:
+        sys.exit(proc.returncode)
+
+
+def build_cmd():
+    manifests_list = load_manifests(find_manifests("."))
+
+    env_efi = prepare_env(ENV_EFI, manifests_list)
+    build_env(env_efi)
+    env_host = prepare_env(ENV_HOST, manifests_list)
+    build_env(env_host)
+
+
+def clean_cmd():
+    shutil.rmtree(".build", ignore_errors=True)
+
+
+def nuke_cmd():
+    shutil.rmtree(".build", ignore_errors=True)
+    shutil.rmtree(".cache", ignore_errors=True)
+
+
+def help_cmd():
+    print("Usage: sk.py <command>")
+    print("")
+    print("Commands:")
+    for cmd in CMDS:
+        print("  " + cmd)
+
+
+CMDS = {
+    "build": build_cmd,
+    "clean": clean_cmd,
+    "nuke": nuke_cmd,
+    "help": help_cmd,
+}
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        help_cmd()
+    else:
+        CMDS[sys.argv[1]]()

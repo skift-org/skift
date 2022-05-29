@@ -25,7 +25,7 @@ struct _Str : public Slice<U> {
             }
 
             Rune r;
-            return E::decode(r, cursor) ? r : NONE;
+            return E::decode(r, cursor) ? Opt<Rune>(r) : Opt<Rune>(NONE);
         });
     }
 };
@@ -49,7 +49,7 @@ struct _MutStr : public MutSlice<U> {
             }
 
             Rune r;
-            return E::decode(r, cursor) ? r : NONE;
+            return E::decode(r, cursor) ? Opt<Rune>(r) : Opt<Rune>(NONE);
         });
     }
 };
@@ -117,7 +117,7 @@ struct _String {
             }
 
             Rune r;
-            return E::decode(r, cursor) ? r : NONE;
+            return E::decode(r, cursor) ? Opt<Rune>(r) : Opt<Rune>(NONE);
         });
     }
 

@@ -1,5 +1,5 @@
-bin/
-obj/
 .cache/
+.build/
 __pycache__/
 .vscode/
+.ninja_log

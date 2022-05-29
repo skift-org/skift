@@ -82,13 +82,33 @@ struct Opt {
 
     operator bool() const { return _present; }
 
-    T *operator->() { return &_value; }
+    T *operator->() {
+        if (!_present) {
+            panic("Unwrapping None");
+        }
+        return &_value.unwrap();
+    }
 
-    T &operator*() { return *_value; }
+    T &operator*() {
+        if (!_present) {
+            panic("Unwrapping None");
+        }
+        return _value.unwrap();
+    }
 
-    T const *operator->() const { return &_value; }
+    T const *operator->() const {
+        if (!_present) {
+            panic("Unwrapping None");
+        }
+        return &_value.unwrap();
+    }
 
-    T const &operator*() const { return *_value; }
+    T const &operator*() const {
+        if (!_present) {
+            panic("Unwrapping None");
+        }
+        return _value.unwrap();
+    }
 
     void release() {
         if (_present) {

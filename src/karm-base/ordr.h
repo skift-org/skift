@@ -23,6 +23,14 @@ struct Ordr {
 
     constexpr Ordr(Value value) : _value(value) {}
 
+    constexpr Ordr operator|(const Ordr &other) const {
+        if (_value != EQUAL) {
+            return other;
+        }
+
+        return EQUAL;
+    }
+
     constexpr bool operator==(const Ordr &other) const = default;
 
     constexpr bool isEq() const { return _value == EQUAL; }

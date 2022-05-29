@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-embed/base.h>
+#include <embed/base.h>
 #include <karm-meta/utils.h>
 
 #include "atomic.h"

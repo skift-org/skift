@@ -1,0 +1,27 @@
+#pragma once
+
+#include <stddef.h>
+
+namespace std {
+
+template <typename T>
+struct initializer_list {
+    T *_data;
+    size_t _size;
+
+    constexpr initializer_list(T const *data, size_t size) : _data(data), _size(size) {}
+
+    constexpr initializer_list() : _data(0), _size(0) {}
+
+    constexpr T const &operator[](size_t index) const { return _data[index]; }
+
+    constexpr T const *begin() const { return _data; }
+
+    constexpr T const *end() const { return _data + _size; }
+
+    constexpr size_t size() const { return _size; }
+
+    constexpr bool empty() const { return _size == 0; }
+};
+
+} // namespace std

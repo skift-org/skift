@@ -1,13 +1,11 @@
 #pragma once
 
-#include <karm-debug/logger.h>
-#include <karm-debug/panic.h>
-
 #include "_prelude.h"
 
 #include "inert.h"
 #include "keywords.h"
 #include "macros.h"
+#include "panic.h"
 #include "std.h"
 
 namespace Karm {
@@ -105,14 +103,14 @@ struct Opt {
 
     T &unwrap() {
         if (!_present) {
-            Debug::panic("Unwrapping None");
+            panic("Unwrapping None");
         }
         return _value.unwrap();
     }
 
     T take() {
         if (!_present) {
-            Debug::panic("Taking None");
+            panic("Taking None");
         }
         T v = _value.take();
         release();

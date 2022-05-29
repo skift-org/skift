@@ -2,7 +2,7 @@
 
 #include "utils.h"
 
-namespace Karm::Embed::Posix {
+namespace Embed::Posix {
 
 Error fromErrno(int error) {
     if (EOPNOTSUPP != ENOTSUP && error == EOPNOTSUPP) {
@@ -173,4 +173,4 @@ Error fromLastErrno() {
     return fromErrno(errno);
 }
 
-} // namespace Karm::Embed::Posix
+} // namespace Embed::Posix

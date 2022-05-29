@@ -4,6 +4,9 @@
 
 namespace Karm::Cli {
 
-using Result = Result<int>;
+struct Success {};
+static constexpr Success SUCCESS = {};
+
+using Result = Result<Success>;
 
 } // namespace Karm::Cli

@@ -129,21 +129,21 @@ struct Args : public _Args {
 
     Result<size_t> format(Text::Scan &scan, Io::Writer &writer, size_t index) override {
         Result<size_t> result = 0;
+        size_t i = 0;
         _tuple.visit([&](auto const &t) {
-            if (index == 0) {
+            if (index == i) {
                 using U = Meta::RemoveConstVolatileRef<decltype(t)>;
                 Formatter<U> formatter;
                 formatter.parse(scan);
                 result = formatter.format(writer, t);
-            } else {
-                index--;
             }
+            i++;
         });
         return result;
     }
 };
 
-Result<size_t> _format(Io::Writer &writer, Str format, _Args &args) {
+static inline Result<size_t> _format(Io::Writer &writer, Str format, _Args &args) {
     Text::Scan scan{format};
     size_t written = 0;
     size_t index = 0;
@@ -157,6 +157,7 @@ Result<size_t> _format(Io::Writer &writer, Str format, _Args &args) {
             while (scan.peek() != '}') {
                 scan.next();
             }
+            scan.next();
             Text::Scan inner{scan.end()};
             written += try$(args.format(inner, writer, index));
             index++;
@@ -169,7 +170,7 @@ Result<size_t> _format(Io::Writer &writer, Str format, _Args &args) {
 }
 
 template <typename... Ts>
-Result<size_t> format(Io::Writer &writer, Str format, Ts &&...ts) {
+static inline Result<size_t> format(Io::Writer &writer, Str format, Ts &&...ts) {
     Args<Ts...> args{std::forward<Ts>(ts)...};
     return _format(writer, format, args);
 }

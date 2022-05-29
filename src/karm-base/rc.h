@@ -1,11 +1,11 @@
 #pragma once
 
-#include <karm-debug/panic.h>
 #include <karm-meta/traits.h>
 
 #include "_prelude.h"
 
 #include "opt.h"
+#include "panic.h"
 #include "ref.h"
 #include "std.h"
 
@@ -59,7 +59,7 @@ struct _Rc {
     template <typename T>
     _Rc *unwrapWeak() {
         if (_strong == 0) {
-            Debug::panic("Dereferencing weak reference to dead object");
+            panic("Dereferencing weak reference to dead object");
         }
 
         return *static_cast<T *>(_unwrap());
@@ -110,7 +110,7 @@ struct Strong {
 
     constexpr T *operator->() const {
         if (!_rc) {
-            Debug::panic("Deferencing moved from Strong<T>");
+            panic("Deferencing moved from Strong<T>");
         }
 
         return &_rc->unwrapStrong<T>();
@@ -118,7 +118,7 @@ struct Strong {
 
     constexpr T &operator*() const {
         if (!_rc) {
-            Debug::panic("Deferencing moved from Strong<T>");
+            panic("Deferencing moved from Strong<T>");
         }
 
         return _rc->unwrapStrong<T>();
@@ -173,14 +173,14 @@ struct Weak {
 
     T *operator->() {
         if (!_rc)
-            Debug::panic("Deferencing moved from Weak<T>");
+            panic("Deferencing moved from Weak<T>");
 
         return _rc->unwrapWeak<T>();
     }
 
     T &unwrap() {
         if (!_rc)
-            Debug::panic("Deferencing moved from Weak<T>");
+            panic("Deferencing moved from Weak<T>");
 
         return _rc->unwrapWeak<T>();
     }

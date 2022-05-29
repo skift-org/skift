@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-embed/sys.h>
+#include <embed/sys.h>
 
 #include "fd.h"
 

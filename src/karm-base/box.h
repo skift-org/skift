@@ -1,11 +1,11 @@
 #pragma once
 
-#include <karm-debug/panic.h>
 #include <karm-meta/traits.h>
 
 #include "_prelude.h"
 
 #include "opt.h"
+#include "panic.h"
 #include "std.h"
 
 namespace Karm {
@@ -42,28 +42,28 @@ struct Box {
 
     constexpr T *operator->() {
         if (!_ptr)
-            Debug::panic("Deferencing moved from Box<T>");
+            panic("Deferencing moved from Box<T>");
 
         return _ptr;
     }
 
     constexpr T &operator*() {
         if (!_ptr)
-            Debug::panic("Deferencing moved from Box<T>");
+            panic("Deferencing moved from Box<T>");
 
         return *_ptr;
     }
 
     constexpr T const *operator->() const {
         if (!_ptr)
-            Debug::panic("Deferencing moved from Box<T>");
+            panic("Deferencing moved from Box<T>");
 
         return _ptr;
     }
 
     constexpr T const &operator*() const {
         if (!_ptr)
-            Debug::panic("Deferencing moved from Box<T>");
+            panic("Deferencing moved from Box<T>");
 
         return *_ptr;
     }

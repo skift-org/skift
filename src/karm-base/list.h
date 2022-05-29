@@ -60,7 +60,7 @@ struct List {
 
     T pop() {
         if (!_len) {
-            Debug::panic("pop from empty list");
+            panic("pop from empty list");
         }
 
         Strong<_Node> node = _tail;
@@ -77,7 +77,7 @@ struct List {
 
     T &peek() {
         if (!_len) {
-            Debug::panic("peek from empty list");
+            panic("peek from empty list");
         }
 
         return _tail->buf;
@@ -85,7 +85,7 @@ struct List {
 
     T &peek(size_t index) {
         if (index >= _len) {
-            Debug::panic("index out of range");
+            panic("index out of range");
         }
 
         Strong<_Node> node = _head;
@@ -98,7 +98,7 @@ struct List {
 
     T const &peek(size_t index) const {
         if (index >= _len) {
-            Debug::panic("index out of range");
+            panic("index out of range");
         }
 
         Strong<_Node> node = _head;

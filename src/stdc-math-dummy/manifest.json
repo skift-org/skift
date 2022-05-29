@@ -1,0 +1,15 @@
+{
+    "id": "stdc-math-dummy",
+    "description": "Dummy for the ISO C Standard Mathematical Library (ISO/IEC 9899)",
+    "type": "lib",
+    "root-include": true,
+    "requires": {
+        "sys": [
+            "efi",
+            "kernel"
+        ]
+    },
+    "inject": [
+        "karm-base"
+    ]
+}

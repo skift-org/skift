@@ -5,3 +5,5 @@
 
 using ExitCode = Karm::Cli::Result;
 using CliArgs = Karm::Cli::Args;
+
+ExitCode entryPoint(CliArgs const &args);

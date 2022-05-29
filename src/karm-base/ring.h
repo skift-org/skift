@@ -62,7 +62,7 @@ struct Ring {
 
     void push(T &&value) {
         if (_len == _cap) {
-            Debug::panic("push on full ring");
+            panic("push on full ring");
         }
 
         _buf[_tail].ctor(std::move(value));
@@ -72,7 +72,7 @@ struct Ring {
 
     T pop() {
         if (_len == 0) {
-            Debug::panic("pop on empty ring");
+            panic("pop on empty ring");
         }
 
         T value = _buf[_head].take();
@@ -83,7 +83,7 @@ struct Ring {
 
     T dequeue() {
         if (_len == 0) {
-            Debug::panic("dequeue on empty ring");
+            panic("dequeue on empty ring");
         }
 
         T value = _buf[_tail].take();
@@ -104,7 +104,7 @@ struct Ring {
 
     T &peek(size_t index) {
         if (index >= _len) {
-            Debug::panic("peek on empty ring");
+            panic("peek on empty ring");
         }
 
         return _buf[(_tail + index) % _cap];
@@ -112,7 +112,7 @@ struct Ring {
 
     T const &peek(size_t index) const {
         if (index >= _len) {
-            Debug::panic("peek on empty ring");
+            panic("peek on empty ring");
         }
 
         return _buf[(_tail + index) % _cap];

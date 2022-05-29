@@ -1,7 +1,0 @@
-{
-    "id": "karm-embed",
-    "type": "lib",
-    "deps": [
-        "karm-base"
-    ]
-}

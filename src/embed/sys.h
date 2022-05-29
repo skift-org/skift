@@ -3,7 +3,7 @@
 #include <karm-base/cons.h>
 #include <karm-sys/fd.h>
 
-namespace Karm::Embed {
+namespace Embed {
 
 Result<Strong<Sys::Fd>> openFile(Sys::Path path);
 
@@ -17,4 +17,4 @@ Result<Strong<Sys::Fd>> createOut();
 
 Result<Strong<Sys::Fd>> createErr();
 
-} // namespace Karm::Embed
+} // namespace Embed

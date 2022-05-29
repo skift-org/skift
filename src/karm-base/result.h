@@ -13,8 +13,10 @@ struct [[nodiscard]] Result {
     Error _error;
     Opt<Value> _value = NONE;
 
+    constexpr Result(Error::Code code) noexcept : _error{code} {}
     constexpr Result(Error error) : _error(error) {}
     constexpr Result(Value &&value) : _error(), _value(value) {}
+    constexpr Result(Value const &value) : _error(), _value(value) {}
 
     constexpr operator bool() { return _error; }
     constexpr Error none() const { return _error; }

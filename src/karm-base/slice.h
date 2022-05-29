@@ -13,8 +13,8 @@ struct Slice {
     constexpr Slice()
         : _buf(nullptr), _len(0) {}
 
-    constexpr Slice(T const *cstr) requires(Meta::Same<T, char>)
-        : _buf(cstr), _len(strlen(cstr)) {}
+    constexpr Slice(T const *begin, T const *end)
+        : _buf(begin), _len(end - begin) {}
 
     constexpr Slice(T const *buf, size_t len)
         : _buf(buf), _len(len) {}
@@ -76,8 +76,8 @@ struct MutSlice {
     constexpr MutSlice()
         : _buf(nullptr), _len(0) {}
 
-    constexpr MutSlice(T const *cstr) requires(Meta::Same<T, char>)
-        : _buf(const_cast<T *>(cstr)), _len(strlen(cstr)) {}
+    constexpr MutSlice(T  *begin, T  *end)
+        : _buf(begin), _len(end - begin) {}
 
     constexpr MutSlice(T *buf, size_t len)
         : _buf(buf), _len(len) {}

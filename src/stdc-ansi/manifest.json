@@ -1,0 +1,15 @@
+{
+    "id": "stdc-ansi",
+    "description": "The ISO C standard library, ISO/IEC 9899",
+    "type": "lib",
+    "root-include": true,
+    "requires": {
+        "sys": [
+            "efi",
+            "kernel"
+        ]
+    },
+    "inject": [
+        "karm-base"
+    ]
+}

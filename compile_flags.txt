@@ -9,3 +9,4 @@
 -Wall
 -Wextra
 -Werror
+-D__sk_sys_linux__

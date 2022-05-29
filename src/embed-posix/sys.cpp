@@ -1,10 +1,10 @@
+#include <embed/sys.h>
 #include <fcntl.h>
-#include <karm-embed/sys.h>
 #include <unistd.h>
 
 #include "utils.h"
 
-namespace Karm::Embed {
+namespace Embed {
 
 struct PosixFd : public Sys::Fd {
     int _raw;
@@ -117,4 +117,4 @@ Result<Strong<Sys::Fd>> createErr() {
     return {makeStrong<PosixFd>(2)};
 }
 
-} // namespace Karm::Embed
+} // namespace Embed

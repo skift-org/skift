@@ -4,22 +4,12 @@
 
 #define __KARM_MAIN_INCLUDED
 
-#include <karm-fmt/fmt.h>
-#include <karm-sys/chan.h>
-
-#include "base.h"
-
-ExitCode entryPoint(CliArgs const &args);
-
-int main(int argc, char const **argv) {
-    CliArgs args{argc, argv};
-    ExitCode code = entryPoint(args);
-
-    if (!code) {
-        Karm::Error error = code.none();
-        (void)Karm::Fmt::format(Karm::Sys::err(), "{}: {}\n", args.self(), error.msg());
-        return -1;
-    }
-
-    return code.take();
-}
+#if defined(__sk_sys_linux__) || defined(__sk_sys_darwin__)
+#    define EMBED_POSIX_MAIN_IMPL
+#    include <embed-posix/main.h>
+#elif defined(__sk_sys_efi__)
+#    define EMBED_EFI_MAIN_IMPL
+#    include <embed-efi/main.h>
+#else
+#    error "Unknown system"
+#endif

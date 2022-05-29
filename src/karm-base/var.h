@@ -1,11 +1,12 @@
 #pragma once
 
-#include <karm-debug/panic.h>
 #include <karm-meta/pack.h>
 
 #include "_prelude.h"
 
 #include "clamp.h"
+#include "panic.h"
+
 
 namespace Karm {
 
@@ -82,7 +83,7 @@ struct Var {
     template <Meta::Contains<Ts...> T>
     T &unwrap() {
         if (_index != Meta::indexOf<T, Ts...>()) {
-            Debug::panic("Unwrapping wrong type");
+            panic("Unwrapping wrong type");
         }
 
         return *static_cast<T *>(_buf);
@@ -91,7 +92,7 @@ struct Var {
     template <Meta::Contains<Ts...> T>
     T take() {
         if (_index != Meta::indexOf<T, Ts...>()) {
-            Debug::panic("Taking wrong type");
+            panic("Taking wrong type");
         }
 
         return std::move(*static_cast<T *>(_buf));

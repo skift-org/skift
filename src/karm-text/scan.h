@@ -1,24 +1,29 @@
 #pragma once
 
+#include <karm-base/cursor.h>
 #include <karm-base/rune.h>
 #include <karm-base/string.h>
 #include <karm-meta/callable.h>
 
 namespace Karm::Text {
 
-struct Scan {
-    Str _str;
-    size_t _head;
-    size_t _begin;
+template <typename E>
+struct _Scan {
+    using Encoding = E;
+    using Unit = typename E::Unit;
 
-    Scan(Str str) : _str(str), _head(0) {}
+    Cursor<Unit> _cursor;
+    Cursor<Unit> _begin;
+
+    _Scan(Str str) : _cursor(str) {}
 
     bool ended() {
-        return _head >= _str.len();
+        return _cursor.ended();
     }
 
     size_t rem() {
-        return _str.len() - _head;
+        auto curr = _cursor;
+        return transcode_len<E>(curr);
     }
 
     Rune peek() {
@@ -26,21 +31,21 @@ struct Scan {
             return '\0';
         }
 
-        return rune_decode(_str.buf() + _head, rem());
+        Rune r;
+        auto curr = _cursor;
+        return E::decode(r, curr) ? r : U'�';
     }
 
     Rune peek(size_t count) {
-        char const *buf = _str.buf() + _head;
-
-        while (count-- > 0 && buf < _str.end()) {
-            buf += rune_len(*buf);
-        }
-
-        if (buf >= _str.end()) {
+        if (ended()) {
             return '\0';
         }
 
-        return rune_decode(buf, rem());
+        next(count);
+
+        Rune r;
+        auto curr = _cursor;
+        return E::decode(r, curr) ? r : U'�';
     }
 
     Rune next() {
@@ -48,9 +53,8 @@ struct Scan {
             return '\0';
         }
 
-        Rune c = rune_decode(_str.buf() + _head, rem());
-        _head += rune_len(c);
-        return c;
+        Rune r;
+        return E::decode(r, _cursor) ? r : U'�';
     }
 
     void next(size_t count) {
@@ -61,7 +65,7 @@ struct Scan {
 
     bool skip(Rune c) {
         if (peek() == c) {
-            _head++;
+            next();
             return true;
         }
 
@@ -70,7 +74,7 @@ struct Scan {
 
     bool skip(Str str) {
         size_t i = 0;
-        for (auto r : runes(str)) {
+        for (auto r : str.runes()) {
             if (peek(i++) != r) {
                 return false;
             }
@@ -114,12 +118,14 @@ struct Scan {
     }
 
     void begin() {
-        _begin = _head;
+        _begin = _cursor;
     }
 
     Str end() {
-        return _str.sub(_begin, _head - _begin);
+        return Str(_begin, _cursor);
     }
 };
+
+using Scan = _Scan<Utf8>;
 
 } // namespace Karm::Text

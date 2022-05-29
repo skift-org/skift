@@ -6,11 +6,9 @@
 
 namespace Efi {
 
-using Handle = struct {
-} *;
+using Handle = void *;
 
-using Event = struct {
-} *;
+using Event = void *;
 
 using Status = size_t;
 
@@ -65,6 +63,12 @@ struct Time {
     ERR(COMPROMISED_DATA, EFI_ERROR | 0x21)     \
     ERR(IP_ADDRESS_CONFLICT, EFI_ERROR | 0x22)  \
     ERR(HTTP_ERROR, EFI_ERROR | 0x23)
+
+enum : size_t {
+#define ERR(ERR, CODE) ERR_##ERR = CODE,
+    FOREACH_ERROR(ERR)
+#undef ERR
+};
 
 [[gnu::used]] static inline Result<size_t> from_status(Status status) {
     if ((status & EFI_ERROR) == 0) {
@@ -264,6 +268,13 @@ struct BootService : public Table {
 
 /* --- 8 Runtime Services --------------------------------------------------- */
 
+enum struct ResetType {
+    RESET_COLD,
+    RESET_WARM,
+    RESET_SHUTDOWN,
+    RESET_PLATFORM_SPECIFIC
+};
+
 struct RuntimeService : public Table {
     // Time Services
     DummyFunction getTime;
@@ -282,7 +293,7 @@ struct RuntimeService : public Table {
 
     // Miscellaneous Services
     DummyFunction getNextMonotonicCount;
-    DummyFunction resetSystem;
+    Function<ResetType, Status, size_t, void *> resetSystem;
 
     // UEFI 2.0 Capsule Services
     DummyFunction updateCapsule;
@@ -301,7 +312,7 @@ struct LoadImageProtocol {
 
     uint32_t revision;
     Handle *parentHandle;
-    SystemTable *systemTable;
+    SystemTable *st;
 
     // Source location of the image
     Handle *deviceHandle;
@@ -381,8 +392,8 @@ struct SimpleTextOutputProtocol {
     static constexpr Uuid UUID = Uuid{0x387477c2, 0x69c7, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
     Method<bool> reset;
-    Method<uint16_t *> outputString;
-    Method<uint16_t *> testString;
+    Method<uint16_t const *> outputString;
+    Method<uint16_t const *> testString;
     Method<size_t, size_t *, size_t *> queryMode;
     Method<size_t> setMode;
     Method<size_t> setAttribute;

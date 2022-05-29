@@ -1,0 +1,15 @@
+{
+    "id": "stdcpp-shim",
+    "description": "The ISO C++ Standard C++ Library shim",
+    "type": "lib",
+    "root-include": true,
+    "requires": {
+        "sys": [
+            "efi",
+            "kernel"
+        ]
+    },
+    "inject": [
+        "karm-base"
+    ]
+}

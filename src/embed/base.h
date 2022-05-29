@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Karm::Embed {
+namespace Embed {
 
 void relaxe();
 
@@ -8,4 +8,4 @@ void criticalEnter();
 
 void criticalLeave();
 
-} // namespace Karm::Embed
+} // namespace Embed

@@ -1,7 +1,7 @@
 #pragma once
 
+#include <embed/sys.h>
 #include <karm-base/rc.h>
-#include <karm-embed/sys.h>
 #include <karm-io/traits.h>
 
 #include "fd.h"

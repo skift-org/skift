@@ -130,7 +130,7 @@ struct Vec {
 
     T pop() {
         if (_len == 0) {
-            Debug::panic("pop on empty Vec");
+            panic("pop on empty Vec");
         }
 
         return remove(_len - 1);
@@ -138,7 +138,7 @@ struct Vec {
 
     void put(size_t index, T const &value) {
         if (index >= _len) {
-            Debug::panic("index out of range");
+            panic("index out of range");
         }
 
         _buf[index].dtor();
@@ -147,7 +147,7 @@ struct Vec {
 
     T &top() {
         if (_len == 0) {
-            Debug::panic("peek on empty Vec");
+            panic("peek on empty Vec");
         }
 
         return _buf[_len - 1].unwrap();
@@ -155,7 +155,7 @@ struct Vec {
 
     T const &top() const {
         if (_len == 0) {
-            Debug::panic("peek on empty Vec");
+            panic("peek on empty Vec");
         }
 
         return _buf[_len - 1].unwrap();
@@ -163,7 +163,7 @@ struct Vec {
 
     T &peek(size_t index) {
         if (index >= _len) {
-            Debug::panic("index out of range");
+            panic("index out of range");
         }
 
         return _buf[index].unwrap();
@@ -171,7 +171,7 @@ struct Vec {
 
     T const &peek(size_t index) const {
         if (index >= _len) {
-            Debug::panic("index out of range");
+            panic("index out of range");
         }
 
         return _buf[index].unwrap();

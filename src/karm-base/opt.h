@@ -6,19 +6,11 @@
 #include "_prelude.h"
 
 #include "inert.h"
+#include "keywords.h"
 #include "macros.h"
 #include "std.h"
 
 namespace Karm {
-
-struct None {};
-
-inline constexpr None NONE = None{};
-
-template <typename T>
-bool operator==(None, T *ptr) {
-    return ptr == nullptr;
-}
 
 template <typename T>
 struct Opt {

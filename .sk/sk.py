@@ -339,7 +339,7 @@ def prepare_env(environment: dict, manifests_list: dict) -> dict:
     with open(environment["dir"] + "/env.json", "w") as f:
         json.dump(environment, f, indent=4)
 
-    return environment
+    return environment, manifests
 
 
 def build_env(environment: dict):
@@ -348,25 +348,35 @@ def build_env(environment: dict):
         sys.exit(proc.returncode)
 
 
-def build_cmd():
+def run_cmd(args: list[str]):
+    manifests_list = load_manifests(find_manifests("."))
+    environment, manifests = prepare_env(ENV_HOST, manifests_list)
+    build_env(environment)
+    exe = manifests[args[0]]["out"]
+    proc = subprocess.run([exe] + args[1:])
+    if proc.returncode != 0:
+        sys.exit(proc.returncode)
+
+
+def build_cmd(args: list[str]):
     manifests_list = load_manifests(find_manifests("."))
 
-    env_efi = prepare_env(ENV_EFI, manifests_list)
+    env_efi, _ = prepare_env(ENV_EFI, manifests_list)
     build_env(env_efi)
-    env_host = prepare_env(ENV_HOST, manifests_list)
+    env_host, _ = prepare_env(ENV_HOST, manifests_list)
     build_env(env_host)
 
 
-def clean_cmd():
+def clean_cmd(args: list[str]):
     shutil.rmtree(".build", ignore_errors=True)
 
 
-def nuke_cmd():
+def nuke_cmd(args: list[str]):
     shutil.rmtree(".build", ignore_errors=True)
     shutil.rmtree(".cache", ignore_errors=True)
 
 
-def help_cmd():
+def help_cmd(args: list[str]):
     print("Usage: sk.py <command>")
     print("")
     print("Commands:")
@@ -375,6 +385,7 @@ def help_cmd():
 
 
 CMDS = {
+    "run": run_cmd,
     "build": build_cmd,
     "clean": clean_cmd,
     "nuke": nuke_cmd,
@@ -385,4 +396,4 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         help_cmd()
     else:
-        CMDS[sys.argv[1]]()
+        CMDS[sys.argv[1]](sys.argv[2:])

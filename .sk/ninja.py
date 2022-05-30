@@ -24,15 +24,15 @@ use Python.
 
 import re
 import textwrap
-from typing import Any, TextIO
+from typing import Any, TextIO, Union
 
 
 def escape_path(word: str) -> str:
     return word.replace('$ ', '$$ ').replace(' ', '$ ').replace(':', '$:')
 
 
-VarValue = int | str | list[str] | None
-VarPath = str | list[str] | None
+VarValue = Union[int, str, list[str], None]
+VarPath = Union[str, list[str], None]
 
 
 class Writer(object):
@@ -62,7 +62,7 @@ class Writer(object):
     def rule(self,
              name: str,
              command: VarValue,
-             description: str | None = None,
+             description: Union[str, None] = None,
              depfile: VarValue = None,
              generator: VarValue = False,
              pool: VarValue = None,
@@ -90,15 +90,15 @@ class Writer(object):
             self.variable('deps', deps, indent=1)
 
     def build(self,
-              outputs: str | list[str],
+              outputs: Union[str, list[str]],
               rule: str,
-              inputs: VarPath | None,
+              inputs: Union[VarPath, None],
               implicit: VarPath = None,
               order_only: VarPath = None,
-              variables: dict[str, str] | None = None,
+              variables: Union[dict[str, str], None] = None,
               implicit_outputs: VarPath = None,
-              pool: str | None = None,
-              dyndep: str | None = None) -> list[str]:
+              pool: Union[str, None] = None,
+              dyndep: Union[str, None] = None) -> list[str]:
         outputs = as_list(outputs)
         out_outputs = [escape_path(x) for x in outputs]
         all_inputs = [escape_path(x) for x in as_list(inputs)]

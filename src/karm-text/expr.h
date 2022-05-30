@@ -8,7 +8,7 @@ namespace Karm::Re {
 
 inline auto single(auto... c) {
     return [=](Text::Scan &scan) {
-        if (((scan.peek() == (Rune)c) || ...)) {
+        if (((scan.curr() == (Rune)c) || ...)) {
             scan.next();
             return true;
         } else {
@@ -25,7 +25,7 @@ inline auto word(Str word) {
 
 inline auto range(Rune start, Rune end) {
     return [=](Text::Scan &scan) {
-        return scan.peek() >= start && scan.peek() <= end;
+        return scan.curr() >= start && scan.curr() <= end;
     };
 }
 

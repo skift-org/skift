@@ -26,7 +26,7 @@ struct _Scan {
         return transcode_len<E>(curr);
     }
 
-    Rune peek() {
+    Rune curr() {
         if (ended()) {
             return '\0';
         }
@@ -64,7 +64,7 @@ struct _Scan {
     }
 
     bool skip(Rune c) {
-        if (peek() == c) {
+        if (curr() == c) {
             next();
             return true;
         }
@@ -85,7 +85,7 @@ struct _Scan {
     }
 
     bool skip(auto predicate) requires Meta::Callable<decltype(predicate), Rune> {
-        if (!ended() && predicate(peek())) {
+        if (!ended() && predicate(curr())) {
             next();
             return true;
         }

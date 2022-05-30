@@ -120,15 +120,15 @@ struct Vec {
         _len = 0;
     }
 
-    void push(T const &value) {
+    void pushBack(T const &value) {
         insert(_len, value);
     }
 
-    void push(T &&value) {
+    void pushBack(T &&value) {
         insert(_len, std::forward<T>(value));
     }
 
-    T pop() {
+    T popBack() {
         if (_len == 0) {
             panic("pop on empty Vec");
         }
@@ -136,16 +136,7 @@ struct Vec {
         return remove(_len - 1);
     }
 
-    void put(size_t index, T const &value) {
-        if (index >= _len) {
-            panic("index out of range");
-        }
-
-        _buf[index].dtor();
-        _buf[index].ctor(value);
-    }
-
-    T &top() {
+    T &peekBack() {
         if (_len == 0) {
             panic("peek on empty Vec");
         }
@@ -153,7 +144,7 @@ struct Vec {
         return _buf[_len - 1].unwrap();
     }
 
-    T const &top() const {
+    T const &peekBack() const {
         if (_len == 0) {
             panic("peek on empty Vec");
         }
@@ -197,7 +188,7 @@ struct Vec {
         });
     }
 
-    constexpr auto iter_rev() {
+    constexpr auto iterRev() {
         return Iter([&, i = _len]() mutable -> T * {
             if (i == 0) {
                 return NONE;
@@ -208,7 +199,7 @@ struct Vec {
         });
     }
 
-    constexpr auto iter_rev() const {
+    constexpr auto iterRev() const {
         return Iter([&, i = _len]() mutable -> T const * {
             if (i == 0) {
                 return NONE;
@@ -311,15 +302,15 @@ struct InlineVec {
         _len = 0;
     }
 
-    void push(T const &value) {
+    void pushBack(T const &value) {
         insert(_len, value);
     }
 
-    void push(T &&value) {
+    void pushBack(T &&value) {
         insert(_len, std::forward<T>(value));
     }
 
-    T pop() {
+    T popBack() {
         if (_len == 0) {
             Debug::panic("pop on empty Vec");
         }
@@ -336,7 +327,7 @@ struct InlineVec {
         _buf[index].ctor(value);
     }
 
-    T &top() {
+    T &peekBack() {
         if (_len == 0) {
             Debug::panic("peek on empty Vec");
         }
@@ -344,7 +335,7 @@ struct InlineVec {
         return _buf[_len - 1].unwrap();
     }
 
-    T const &top() const {
+    T const &peekBack() const {
         if (_len == 0) {
             Debug::panic("peek on empty Vec");
         }
@@ -388,7 +379,7 @@ struct InlineVec {
         });
     }
 
-    constexpr auto iter_rev() {
+    constexpr auto iterRev() {
         return Iter([&, i = _len]() mutable -> T * {
             if (i == 0) {
                 return NONE;
@@ -399,7 +390,7 @@ struct InlineVec {
         });
     }
 
-    constexpr auto iter_rev() const {
+    constexpr auto iterRev() const {
         return Iter([&, i = _len]() mutable -> T const * {
             if (i == 0) {
                 return NONE;

@@ -80,7 +80,7 @@ struct Array {
         });
     }
 
-    constexpr auto iter_rev() {
+    constexpr auto iterRev() {
         return Iter([&, i = N]() mutable -> T * {
             if (i == 0) {
                 return NONE;
@@ -91,7 +91,7 @@ struct Array {
         });
     }
 
-    constexpr auto iter_rev() const {
+    constexpr auto iterRev() const {
         return Iter([&, i = N]() mutable -> T const * {
             if (i == 0) {
                 return NONE;

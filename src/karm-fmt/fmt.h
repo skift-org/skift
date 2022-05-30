@@ -154,7 +154,7 @@ static inline Result<size_t> _format(Io::Writer &writer, Str format, _Args &args
         if (c == '{') {
             scan.begin();
             scan.skip(':');
-            while (scan.peek() != '}') {
+            while (scan.curr() != '}') {
                 scan.next();
             }
             scan.next();

@@ -80,11 +80,11 @@ struct Range {
         return range(start, end);
     }
 
-    auto iter_rev() {
+    auto iterRev() {
         return range(end, start);
     }
 
-    auto iter_rev() const {
+    auto iterRev() const {
         return range(end, start);
     }
 };
@@ -126,7 +126,7 @@ struct RangeAlloc {
                 return;
             }
         }
-        _ranges.push(range);
+        _ranges.pushBack(range);
     }
 };
 

@@ -25,7 +25,7 @@ struct Map {
             }
         }
 
-        _els.push(Cons<K, V>{key, value});
+        _els.pushBack(Cons<K, V>{key, value});
     }
 
     Opt<V> get(K const &key) {

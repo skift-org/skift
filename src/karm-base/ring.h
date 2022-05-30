@@ -60,7 +60,7 @@ struct Ring {
         return *this;
     }
 
-    void push(T &&value) {
+    void pushBack(T &&value) {
         if (_len == _cap) {
             panic("push on full ring");
         }
@@ -70,7 +70,7 @@ struct Ring {
         _len++;
     }
 
-    T pop() {
+    T popBack() {
         if (_len == 0) {
             panic("pop on empty ring");
         }
@@ -140,7 +140,7 @@ struct Ring {
         });
     }
 
-    constexpr auto iter_rev() {
+    constexpr auto iterRev() {
         return Iter([&, i = _len]() mutable -> T * {
             if (i == 0) {
                 return nullptr;
@@ -151,7 +151,7 @@ struct Ring {
         });
     }
 
-    constexpr auto iter_rev() const {
+    constexpr auto iterRev() const {
         return Iter([&, i = _len]() mutable -> T const * {
             if (i == 0) {
                 return nullptr;

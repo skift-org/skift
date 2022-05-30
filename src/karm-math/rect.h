@@ -45,9 +45,9 @@ union Rect {
         width += d;
     }
 
-    T top() const { return y; }
+    T peekBack() const { return y; }
 
-    void top(T value) {
+    void peekBack(T value) {
         T d = value - y;
         y += d;
         height -= d;

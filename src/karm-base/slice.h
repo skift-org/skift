@@ -57,7 +57,7 @@ struct Slice {
         });
     }
 
-    constexpr auto iter_rev() const {
+    constexpr auto iterRev() const {
         return Iter([&, i = _len - 1]() mutable -> T const * {
             if (i < 0) {
                 return nullptr;
@@ -76,7 +76,7 @@ struct MutSlice {
     constexpr MutSlice()
         : _buf(nullptr), _len(0) {}
 
-    constexpr MutSlice(T  *begin, T  *end)
+    constexpr MutSlice(T *begin, T *end)
         : _buf(begin), _len(end - begin) {}
 
     constexpr MutSlice(T *buf, size_t len)
@@ -128,7 +128,7 @@ struct MutSlice {
         });
     }
 
-    constexpr auto iter_rev() {
+    constexpr auto iterRev() {
         return Iter([&, i = _len - 1]() mutable -> T const * {
             if (i < 0) {
                 return NONE;

@@ -27,9 +27,9 @@ struct Cursor {
         return _end - _begin;
     }
 
-    T peek() const {
+    T curr() const {
         if (!ended()) {
-            panic("peek() called on ended cursor");
+            panic("curr() called on ended cursor");
         }
         return *_begin;
     }
@@ -72,7 +72,7 @@ struct MutCursor {
         return _end - _begin;
     }
 
-    T peek() const {
+    T curr() const {
         return *_begin;
     }
 

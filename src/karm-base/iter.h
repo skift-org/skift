@@ -234,14 +234,14 @@ struct Iter {
     template <typename C>
     constexpr auto collect(C &c) {
         forEach([&](auto v) {
-            c.push(v);
+            c.pushBack(v);
         });
     }
 
     template <typename C>
     constexpr auto collect(C &c, auto f) {
         forEach([&](auto v) {
-            c.push(f(v));
+            c.pushBack(f(v));
         });
     }
 

@@ -40,7 +40,7 @@ struct List {
         return *this;
     }
 
-    void push(T &&value) {
+    void pushBack(T &&value) {
         Strong<_Node> node = makeStrong<_Node>(std::forward(value), NONE, NONE);
 
         if (_tail) {
@@ -54,11 +54,11 @@ struct List {
         _len++;
     }
 
-    void push(T const &value) {
-        push(T{value});
+    void pushBack(T const &value) {
+        pushBack(T{value});
     }
 
-    T pop() {
+    T popBack() {
         if (!_len) {
             panic("pop from empty list");
         }
@@ -75,7 +75,7 @@ struct List {
         return node->buf;
     }
 
-    T &peek() {
+    T &peekBack() {
         if (!_len) {
             panic("peek from empty list");
         }
@@ -121,7 +121,7 @@ struct List {
         });
     }
 
-    auto iter_rev() {
+    auto iterRev() {
         return Iter([curr = _tail]() mutable -> Opt<T> {
             if (curr) {
                 auto ret = curr->buf;

@@ -36,14 +36,14 @@ struct Utf8 {
     }
 
     static bool decode(Rune &result, Cursor<Unit> &in) {
-        if (in.rem() < 1) {
+        if (in.rem() == 0) {
+            result = U'�';
             return false;
         }
 
         Unit first = in.next();
 
-        if (len(first) > in.rem()) {
-            result = U'�';
+        if (len(first) > in.rem() + 1) {
             return false;
         }
 

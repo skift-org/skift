@@ -42,20 +42,20 @@ struct Ordr {
 };
 
 template <typename T>
-concept Ordered = requires(T const &lhs, T const &rhs) {
+concept Comparable = requires(T const &lhs, T const &rhs) {
     { lhs.cmp(rhs) } -> Meta::Same<Ordr>;
 };
 
 namespace Op {
 
-    template <Ordered T>
+    template <Comparable T>
     constexpr Ordr cmp(T const &lhs, T const &rhs) {
         return lhs.cmp(rhs);
     }
 
-    // fallback for types that don't implement Ordered
+    // fallback for types that don't implement Comparable
     template <typename T>
-    requires(!Ordered<T>) constexpr Ordr cmp(T const &lhs, T const &rhs) {
+    requires(!Comparable<T>) constexpr Ordr cmp(T const &lhs, T const &rhs) {
         if (lhs < rhs) {
             return Ordr::LESS;
         } else if (lhs > rhs) {
@@ -85,27 +85,27 @@ namespace Op {
         }
     }
 
-    constexpr bool eq(Ordered auto const &lhs, Ordered auto const &rhs) {
+    constexpr bool eq(auto const &lhs, auto const &rhs) {
         return cmp(lhs, rhs).isEq();
     }
 
-    constexpr bool ne(Ordered auto const &lhs, Ordered auto const &rhs) {
+    constexpr bool ne(auto const &lhs, auto const &rhs) {
         return cmp(lhs, rhs).isNe();
     }
 
-    constexpr bool lt(Ordered auto const &lhs, Ordered auto const &rhs) {
+    constexpr bool lt(auto const &lhs, auto const &rhs) {
         return cmp(lhs, rhs).isLt();
     }
 
-    constexpr bool gt(Ordered auto const &lhs, Ordered auto const &rhs) {
+    constexpr bool gt(auto const &lhs, auto const &rhs) {
         return cmp(lhs, rhs).isGt();
     }
 
-    constexpr bool gteq(Ordered auto const &lhs, Ordered auto const &rhs) {
+    constexpr bool gteq(auto const &lhs, auto const &rhs) {
         return cmp(lhs, rhs).isGtEq();
     }
 
-    constexpr bool lteq(Ordered auto const &lhs, Ordered auto const &rhs) {
+    constexpr bool lteq(auto const &lhs, auto const &rhs) {
         return cmp(lhs, rhs).isLtEq();
     }
 

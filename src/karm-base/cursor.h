@@ -20,7 +20,7 @@ struct Cursor {
     Cursor(MutSlice<T> slice) : _begin(slice.begin()), _end(slice.end()) {}
 
     bool ended() const {
-        return _begin == _end;
+        return _begin >= _end;
     }
 
     size_t rem() const {
@@ -28,19 +28,24 @@ struct Cursor {
     }
 
     T peek() const {
+        if (!ended()) {
+            panic("peek() called on ended cursor");
+        }
         return *_begin;
     }
 
     T next() {
-        return *_begin++;
+        if (ended()) {
+            panic("next() called on ended cursor");
+        }
+        T r = *_begin;
+        _begin++;
+        return r;
     }
 
-    void skip() {
-        ++_begin;
-    }
-
-    void skip(size_t n) {
-        _begin += n;
+    void next(size_t n) {
+        for (size_t i = 0; i < n; i++)
+            next();
     }
 
     operator T const *() {

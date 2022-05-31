@@ -3,3 +3,4 @@
 __pycache__/
 .vscode/
 .ninja_log
+.DS_Store

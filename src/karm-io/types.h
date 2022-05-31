@@ -1,7 +1,7 @@
 #pragma once
 
-#include <karm-base/macros.h>
 #include <karm-base/result.h>
+#include <karm-base/try.h>
 #include <karm-meta/traits.h>
 
 namespace Karm::Io {

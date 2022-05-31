@@ -1,7 +1,7 @@
 #pragma once
 
-#include <karm-base/macros.h>
 #include <karm-base/pack.h>
+#include <karm-base/try.h>
 #include <karm-io/types.h>
 
 namespace Karm::Ipc {

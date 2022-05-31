@@ -2,7 +2,5 @@
     "id": "embed",
     "description": "Karm platform embeding layer.",
     "type": "lib",
-    "deps": [
-        "karm-base"
-    ]
+    "deps": ["karm-base"]
 }

@@ -7,6 +7,8 @@
 #include <karm-base/tuple.h>
 #include <karm-io/funcs.h>
 #include <karm-io/traits.h>
+#include <karm-meta/signess.h>
+#include <karm-meta/traits.h>
 #include <karm-text/scan.h>
 
 namespace Karm::Fmt {
@@ -67,41 +69,26 @@ template <typename T>
 struct SignedFormatter : public NumberFormater {
     Result<size_t> format(Io::Writer &writer, T const value) {
         size_t written = 0;
+        Meta::MakeUnsigned<T> unsignedValud = 0;
         if (value < 0) {
             written += try$(Io::putc(writer, '-'));
-            value = -value;
+            unsignedValud = -value;
+        } else {
+            unsignedValud = value;
         }
 
-        return written + format_unsigned(writer, value);
+        return written + format_unsigned(writer, unsignedValud);
     }
 };
 
 template <typename T>
 struct Formatter;
 
-template <>
-struct Formatter<uint8_t> : public UnsignedFormatter<uint8_t> {};
+template <Meta::UnsignedIntegral T>
+struct Formatter<T> : public UnsignedFormatter<T> {};
 
-template <>
-struct Formatter<uint16_t> : public UnsignedFormatter<uint16_t> {};
-
-template <>
-struct Formatter<uint32_t> : public UnsignedFormatter<uint32_t> {};
-
-template <>
-struct Formatter<uint64_t> : public UnsignedFormatter<uint64_t> {};
-
-template <>
-struct Formatter<int8_t> : public SignedFormatter<int8_t> {};
-
-template <>
-struct Formatter<int16_t> : public SignedFormatter<int16_t> {};
-
-template <>
-struct Formatter<int32_t> : public SignedFormatter<int32_t> {};
-
-template <>
-struct Formatter<int64_t> : public SignedFormatter<int64_t> {};
+template <Meta::SignedIntegral T>
+struct Formatter<T> : public SignedFormatter<T> {};
 
 template <>
 struct Formatter<Str> {

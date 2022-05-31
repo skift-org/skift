@@ -13,8 +13,6 @@ struct initializer_list {
 
     constexpr initializer_list() : _data(0), _size(0) {}
 
-    constexpr T const &operator[](size_t index) const { return _data[index]; }
-
     constexpr T const *begin() const { return _data; }
 
     constexpr T const *end() const { return _data + _size; }

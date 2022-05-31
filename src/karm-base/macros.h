@@ -1,43 +1,21 @@
 #pragma once
 
-#include "_prelude.h"
-
-#define try$(EXPR)                \
-    ({                            \
-        auto __expr = (EXPR);     \
-        if (!__expr) {            \
-            return __expr.none(); \
-        }                         \
-        __expr.unwrap();          \
-    })
-
 namespace Karm {
 
-template <typename T>
-concept Tryable = requires(T t) {
-    {!t};
-    {t.none()};
-    {t.unwrap()};
-};
+#define array_len$(ARR) (sizeof(ARR) / sizeof(ARR[0]))
 
-auto unwrap(Tryable auto &opt) -> decltype(opt.unwrap()) {
-    return opt.unwrap();
-}
+#define __concat$(LHS, RHS) LHS##RHS
 
-auto unwrap_or(Tryable auto &opt, auto default_value) -> decltype(opt.unwrap()) {
-    if (!opt) {
-        return default_value;
-    }
+#define concat$(LHS, RHS) __concat$(LHS, RHS)
 
-    return opt.unwrap();
-}
+#define __stringify$(SYM) #SYM
 
-auto unwrap_or_else(Tryable auto &opt, auto default_value) -> decltype(opt.unwrap()) {
-    if (!opt) {
-        return default_value();
-    }
+#define stringify$(SYM) __stringify$(SYM)
 
-    return opt.unwrap();
-}
+#define var$(NAME) concat$(NAME, __LINE__)
+
+#define defer$(BEGIN, END) for (int var$(__i) = (BEGIN, 0); !var$(__i); (var$(__i) += 1, END))
+
+#define cond_defer$(BEGIN, END) for (int var$(__i) = BEGIN; var$(__i); (var$(__i) -= 1, END))
 
 } // namespace Karm

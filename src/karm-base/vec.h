@@ -2,412 +2,163 @@
 
 #include "_prelude.h"
 
-#include "array.h"
-#include "clamp.h"
-#include "inert.h"
+#include "buf.h"
 #include "iter.h"
 #include "opt.h"
 #include "ref.h"
 
 namespace Karm {
 
+template <typename S>
+struct _Vec {
+    using T = typename S::T;
+
+    S _buf;
+
+    constexpr _Vec() = default;
+
+    _Vec(size_t cap) : _buf(cap) {}
+
+    _Vec(std::initializer_list<T> &&other) : _buf(std::forward<std::initializer_list<T>>(other)) {}
+
+    /* --- Collection --- */
+
+    void add(T const &val) {
+        pushBack(val);
+    }
+
+    void add(T &&val) {
+        pushBack(std::move(val));
+    }
+
+    bool contains(T const &val) const {
+        for (auto const &v : *this) {
+            if (v == val) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool removeAll(T const &val) {
+        bool changed = false;
+
+        for (size_t i = 0; i < _buf.len; i++) {
+            if (_buf.peek(i) == val) {
+                _buf.remove(i);
+                changed = true;
+            }
+        }
+
+        return changed;
+    }
+
+    /* --- Capacity --- */
+
+    void ensure(size_t cap) { _buf.ensure(cap); }
+
+    void truncate(size_t len) { _buf.truncate(len); }
+
+    void fit() { _buf.fit(); }
+
+    void clear() { _buf.truncate(0); }
+
+    size_t cap() const { return _buf.cap(); }
+
+    /* --- Random Access --- */
+
+    T &at(size_t index) { return _buf.at(index); }
+
+    T const &at(size_t index) const { return _buf.at(index); }
+
+    void insert(size_t index, T const &value) { _buf.insert(index, T(value)); }
+
+    T removeAt(size_t index) { return _buf.removeAt(index, 1); }
+
+    void removeAt(size_t index, size_t count) { _buf.removeAt(index, count); }
+
+    /* --- Front Access --- */
+
+    T &peekFront() { return _buf.at(0); }
+
+    T const &peekFront() const { return _buf.at(0); }
+
+    void pushFront(T const &value) { _buf.insert(T(value)); }
+
+    void pushFront(T &&value) { _buf.insert(std::forward<T>(value)); }
+
+    template <typename... Args>
+    void emplaceFront(Args &&...args) { _buf.emplace((args)...); }
+
+    T popFront() { return _buf.removeAt(0); }
+
+    /* --- Back Access --- */
+
+    T const &peekBack() const { return _buf.at(len() - 1); }
+
+    T &peekBack() { return _buf.at(len() - 1); }
+
+    void pushBack(T const &value) { insert(len(), value); }
+
+    void pushBack(T &&value) { insert(len(), std::forward<T>(value)); }
+
+    template <typename... Args>
+    void emplaceBack(Args &&...args) { insert(len(), T(std::forward<Args>(args)...)); }
+
+    T popBack() { return removeAt(len() - 1); }
+
+    /* --- Iteration --- */
+
+    static auto _iter(auto self) {
+        return Iter([self, i = 0uz]() mutable {
+            if (i >= self->len()) {
+                return nullptr;
+            }
+            return self->buf() + i;
+        });
+    }
+
+    static auto _iterRev(auto self) {
+        return Iter([self, i = self->len()]() mutable {
+            if (i == 0) {
+                return nullptr;
+            }
+
+            i--;
+            return self->buf() + i;
+        });
+    }
+
+    constexpr auto iter() { return _iter(this); }
+
+    constexpr auto iter() const { return _iter(this); }
+
+    constexpr auto iterRev() { return _iterRev(this); }
+
+    constexpr auto iterRev() const { return _iterRev(this); }
+
+    /* --- Len & Buf --- */
+
+    size_t len() const { return _buf.len(); }
+
+    T *buf() { return _buf.buf(); }
+
+    T const *buf() const { return _buf.buf(); }
+
+    T *begin() { return buf(); }
+
+    T *end() { return buf() + len(); }
+
+    T const *begin() const { return buf(); }
+
+    T const *end() const { return buf() + end(); }
+};
+
 template <typename T>
-struct Vec {
-    Inert<T> *_buf = nullptr;
-    size_t _cap = 0;
-    size_t _len = 0;
+using Vec = _Vec<Buf<T>>;
 
-    constexpr Vec() = default;
-
-    Vec(size_t cap) : _cap(cap) {
-        _buf = new Inert<T>[cap];
-    }
-
-    Vec(Vec const &other) {
-        _cap = other._cap;
-        _len = other._len;
-        _buf = new Inert<T>[_cap];
-        for (size_t i = 0; i < _len; i++) {
-            _buf[i].ctor(other.peek(i));
-        }
-    }
-
-    Vec(Vec &&other) {
-        std::swap(_buf, other._buf);
-        std::swap(_cap, other._cap);
-        std::swap(_len, other._len);
-    }
-
-    Vec(std::initializer_list<T> &&other) {
-        _cap = other._len;
-        _len = other._len;
-        _buf = new Inert<T>[_cap];
-        for (size_t i = 0; i < _len; i++) {
-            _buf[i].ctor(std::move<T>(other.peek(i)));
-        }
-    }
-
-    ~Vec() {
-        for (size_t i = 0; i < _len; i++) {
-            _buf[i].dtor();
-        }
-
-        delete[] _buf;
-    }
-
-    Vec &operator=(Vec const &other) {
-        return *this = Vec(other);
-    }
-
-    Vec &operator=(Vec &&other) {
-        std::swap(_buf, other._buf);
-        std::swap(_cap, other._cap);
-        std::swap(_len, other._len);
-
-        return *this;
-    }
-
-    void ensure(size_t cap) {
-        if (cap <= _cap)
-            return;
-
-        Inert<T> *tmp = new Inert<T>[cap];
-        for (size_t i = 0; i < _len; i++) {
-            tmp[i].ctor(_buf[i].take());
-        }
-
-        delete[] _buf;
-        _buf = tmp;
-        _cap = cap;
-    }
-
-    void insert(size_t index, T const &value) {
-        insert(index, T(value));
-    }
-
-    void insert(size_t index, T &&value) {
-        ensure(_len + 1);
-        for (size_t i = _len; i > index; i--) {
-            _buf[i].ctor(_buf[i - 1].take());
-        }
-        _buf[index].ctor(std::forward<T>(value));
-        _len++;
-    }
-
-    T remove(size_t index) {
-        T tmp = _buf[index].take();
-        for (size_t i = index; i < _len - 1; i++) {
-            _buf[i].ctor(_buf[i + 1].take());
-        }
-        _len--;
-        return tmp;
-    }
-
-    void truncate(size_t len) {
-        len = min(len, _len);
-
-        for (size_t i = len; i < _len; i++) {
-            _buf[i].dtor();
-        }
-
-        _len = len;
-    }
-
-    void clear() {
-        for (size_t i = 0; i < _len; i++) {
-            _buf[i].dtor();
-        }
-        _len = 0;
-    }
-
-    void pushBack(T const &value) {
-        insert(_len, value);
-    }
-
-    void pushBack(T &&value) {
-        insert(_len, std::forward<T>(value));
-    }
-
-    T popBack() {
-        if (_len == 0) {
-            panic("pop on empty Vec");
-        }
-
-        return remove(_len - 1);
-    }
-
-    T &peekBack() {
-        if (_len == 0) {
-            panic("peek on empty Vec");
-        }
-
-        return _buf[_len - 1].unwrap();
-    }
-
-    T const &peekBack() const {
-        if (_len == 0) {
-            panic("peek on empty Vec");
-        }
-
-        return _buf[_len - 1].unwrap();
-    }
-
-    T &peek(size_t index) {
-        if (index >= _len) {
-            panic("index out of range");
-        }
-
-        return _buf[index].unwrap();
-    }
-
-    T const &peek(size_t index) const {
-        if (index >= _len) {
-            panic("index out of range");
-        }
-
-        return _buf[index].unwrap();
-    }
-
-    constexpr auto iter() {
-        return Iter([&, i = 0uz]() mutable -> T * {
-            if (i >= _len) {
-                return nullptr;
-            }
-
-            return &_buf[i++].unwrap();
-        });
-    }
-
-    constexpr auto iter() const {
-        return Iter([&, i = 0uz]() mutable -> T const * {
-            if (i >= _len) {
-                return nullptr;
-            }
-
-            return &_buf[i++].unwrap();
-        });
-    }
-
-    constexpr auto iterRev() {
-        return Iter([&, i = _len]() mutable -> T * {
-            if (i == 0) {
-                return NONE;
-            }
-
-            i--;
-            return &_buf[i].unwrap();
-        });
-    }
-
-    constexpr auto iterRev() const {
-        return Iter([&, i = _len]() mutable -> T const * {
-            if (i == 0) {
-                return NONE;
-            }
-
-            i--;
-            return &_buf[i].unwrap();
-        });
-    }
-
-    T *buf() {
-        return &_buf[0].unwrap();
-    }
-
-    T const *buf() const { return &_buf[0].unwrap(); }
-
-    size_t len() const { return _len; }
-};
-
-template <typename T, size_t CAP>
-struct InlineVec {
-    Array<Inert<T>, CAP> _buf;
-    size_t _len;
-
-    InlineVec() : _len(0) {}
-
-    InlineVec(InlineVec const &other) {
-        _len = other._len;
-        for (size_t i = 0; i < _len; i++) {
-            _buf[i].ctor(other.peek(i));
-        }
-    }
-
-    InlineVec(InlineVec &&other) {
-        std::swap(_buf, other._buf);
-        std::swap(_len, other._len);
-    }
-
-    InlineVec(std::initializer_list<T> &&other) {
-        _len = other._len;
-        for (size_t i = 0; i < _len; i++) {
-            _buf[i].ctor(std::move<T>(other.peek(i)));
-        }
-    }
-
-    InlineVec &operator=(InlineVec const &other) {
-        return *this = InlineVec(other);
-    }
-
-    InlineVec &operator=(InlineVec &&other) {
-        std::swap(_buf, other._buf);
-        std::swap(_len, other._len);
-
-        return *this;
-    }
-
-    void ensure(size_t cap) {
-        if (cap <= CAP)
-            return;
-
-        Debug::panic("InlineVec: cap too large");
-    }
-
-    void insert(size_t index, T const &value) {
-        insert(index, T(value));
-    }
-
-    void insert(size_t index, T &&value) {
-        ensure(_len + 1);
-        for (size_t i = _len; i > index; i--) {
-            _buf[i].ctor(_buf[i - 1].take());
-        }
-        _buf[index].ctor(std::forward<T>(value));
-        _len++;
-    }
-
-    T remove(size_t index) {
-        T tmp = _buf[index].take();
-        for (size_t i = index; i < _len - 1; i++) {
-            _buf[i].ctor(_buf[i + 1].take());
-        }
-        _len--;
-        return tmp;
-    }
-
-    void truncate(size_t len) {
-        len = min(len, _len);
-
-        for (size_t i = len; i < _len; i++) {
-            _buf[i].dtor();
-        }
-
-        _len = len;
-    }
-
-    void clear() {
-        for (size_t i = 0; i < _len; i++) {
-            _buf[i].dtor();
-        }
-        _len = 0;
-    }
-
-    void pushBack(T const &value) {
-        insert(_len, value);
-    }
-
-    void pushBack(T &&value) {
-        insert(_len, std::forward<T>(value));
-    }
-
-    T popBack() {
-        if (_len == 0) {
-            Debug::panic("pop on empty Vec");
-        }
-
-        return remove(_len - 1);
-    }
-
-    void put(size_t index, T const &value) {
-        if (index >= _len) {
-            Debug::panic("index out of range");
-        }
-
-        _buf[index].dtor();
-        _buf[index].ctor(value);
-    }
-
-    T &peekBack() {
-        if (_len == 0) {
-            Debug::panic("peek on empty Vec");
-        }
-
-        return _buf[_len - 1].unwrap();
-    }
-
-    T const &peekBack() const {
-        if (_len == 0) {
-            Debug::panic("peek on empty Vec");
-        }
-
-        return _buf[_len - 1].unwrap();
-    }
-
-    T &peek(size_t index) {
-        if (index >= _len) {
-            Debug::panic("index out of range");
-        }
-
-        return _buf[index].unwrap();
-    }
-
-    T const &peek(size_t index) const {
-        if (index >= _len) {
-            Debug::panic("index out of range");
-        }
-
-        return _buf[index].unwrap();
-    }
-
-    constexpr auto iter() {
-        return Iter([&, i = 0uz]() mutable -> T * {
-            if (i >= _len) {
-                return nullptr;
-            }
-
-            return &_buf[i++].unwrap();
-        });
-    }
-
-    constexpr auto iter() const {
-        return Iter([&, i = 0uz]() mutable -> T const * {
-            if (i >= _len) {
-                return nullptr;
-            }
-
-            return &_buf[i++].unwrap();
-        });
-    }
-
-    constexpr auto iterRev() {
-        return Iter([&, i = _len]() mutable -> T * {
-            if (i == 0) {
-                return NONE;
-            }
-
-            i--;
-            return &_buf[i].unwrap();
-        });
-    }
-
-    constexpr auto iterRev() const {
-        return Iter([&, i = _len]() mutable -> T const * {
-            if (i == 0) {
-                return NONE;
-            }
-
-            i--;
-            return &_buf[i].unwrap();
-        });
-    }
-
-    T *buf() {
-        return &_buf[0].unwrap();
-    }
-
-    T const *buf() const { return &_buf[0].unwrap(); }
-
-    size_t len() const { return _len; }
-};
+template <typename T, size_t N>
+using InlineVec = _Vec<InlineBuf<T, N>>;
 
 } // namespace Karm

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef __KARM_MAIN_INCLUDED
 #    error "karm-main/main.h included twice"
 #endif

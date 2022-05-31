@@ -85,27 +85,33 @@ namespace Op {
         }
     }
 
-    constexpr bool eq(auto const &lhs, auto const &rhs) {
+    template <typename T>
+    constexpr bool eq(T const &lhs, T const &rhs) {
         return cmp(lhs, rhs).isEq();
     }
 
-    constexpr bool ne(auto const &lhs, auto const &rhs) {
+    template <typename T>
+    constexpr bool ne(T const &lhs, T const &rhs) {
         return cmp(lhs, rhs).isNe();
     }
 
-    constexpr bool lt(auto const &lhs, auto const &rhs) {
+    template <typename T>
+    constexpr bool lt(T const &lhs, T const &rhs) {
         return cmp(lhs, rhs).isLt();
     }
 
-    constexpr bool gt(auto const &lhs, auto const &rhs) {
+    template <typename T>
+    constexpr bool gt(T const &lhs, T const &rhs) {
         return cmp(lhs, rhs).isGt();
     }
 
-    constexpr bool gteq(auto const &lhs, auto const &rhs) {
+    template <typename T>
+    constexpr bool gteq(T const &lhs, T const &rhs) {
         return cmp(lhs, rhs).isGtEq();
     }
 
-    constexpr bool lteq(auto const &lhs, auto const &rhs) {
+    template <typename T>
+    constexpr bool lteq(T const &lhs, T const &rhs) {
         return cmp(lhs, rhs).isLtEq();
     }
 

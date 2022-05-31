@@ -10,6 +10,6 @@
 
 #    include <karm-meta/signess.h>
 
-using ssize_t = Karm::Meta::Signed<size_t>;
+using ssize_t = Karm::Meta::MakeSigned<size_t>;
 
 #endif

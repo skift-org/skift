@@ -2,7 +2,7 @@
 
 namespace Karm {
 
-struct Adopt {};
+struct Move {};
 
 struct Copy {};
 
@@ -11,7 +11,7 @@ struct Wrap {};
 struct None {};
 
 /* The object should take the ownership of the memory */
-constexpr inline auto ADOPT = Adopt{};
+constexpr inline auto MOVE = Move{};
 
 /* The object should make a copy of the memory */
 constexpr inline auto COPY = Copy{};

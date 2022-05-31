@@ -2,8 +2,8 @@
 
 #include "_prelude.h"
 
-#include "macros.h"
 #include "string.h"
+#include "try.h"
 
 namespace Karm {
 
@@ -67,13 +67,13 @@ struct [[nodiscard]] Error {
 
     operator bool() const { return _code == Code::OK; }
 
-    Code code() const { return _code; }
+    constexpr Code code() const { return _code; }
 
-    Error none() const { return *this; }
+    constexpr Error none() const { return *this; }
 
-    Error unwrap() const { return *this; }
+    constexpr Error unwrap() const { return *this; }
 
-    Str msg() {
+    constexpr Str msg() {
         if (_msg.len() > 0) {
             return _msg;
         }
@@ -90,7 +90,7 @@ struct [[nodiscard]] Error {
     }
 };
 
-inline constexpr Error::Code OK = Error::OK;
+static inline constexpr Error OK = {Error::OK};
 
 static_assert(Tryable<Error>);
 

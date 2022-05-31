@@ -4,9 +4,9 @@
 
 #include "inert.h"
 #include "keywords.h"
-#include "macros.h"
 #include "panic.h"
 #include "std.h"
+#include "try.h"
 
 namespace Karm {
 

@@ -7,6 +7,14 @@
 
 namespace Karm {
 
+static constexpr size_t constExprStrLen(const char *str) {
+    size_t len = 0;
+    while (*str++) {
+        len++;
+    }
+    return len;
+}
+
 template <Encoding E, typename U = typename E::Unit>
 struct _Str : public Slice<U> {
     using Encoding = E;
@@ -15,7 +23,7 @@ struct _Str : public Slice<U> {
     using Slice<U>::Slice;
 
     constexpr _Str(Unit const *cstr) requires(Meta::Same<Unit, char>)
-        : Slice<U>(cstr, strlen(cstr)) {}
+        : Slice<U>(cstr, constExprStrLen(cstr)) {}
 
     auto runes() const {
         Cursor<Unit> cursor(this->buf(), this->len());
@@ -64,7 +72,7 @@ struct _String {
 
     _String() = default;
 
-    _String(Adopt, Unit *buf, size_t len) : _buf(buf), _len(len) {}
+    _String(Move, Unit *buf, size_t len) : _buf(buf), _len(len) {}
 
     _String(Unit const *buf, size_t len) : _len(len) {
         _buf = new Unit[len + 1];
@@ -139,7 +147,7 @@ struct _String {
 
         transcode_units<Encoding, Target>(input, output);
 
-        return {ADOPT, buf, len};
+        return {MOVE, buf, len};
     }
 };
 

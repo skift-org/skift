@@ -58,6 +58,8 @@ def filter_manifests(manifests: list, env: dict) -> list:
 def list2dict(list: list) -> dict:
     result = {}
     for item in list:
+        if item["id"] in result:
+            raise Exception("Duplicate id: " + item[id])
         result[item["id"]] = item
     return result
 
@@ -82,12 +84,15 @@ def resolve_deps(manifest: dict) -> dict:
             raise Exception("Circular dependency detected: " +
                             str(stack) + " -> " + key)
 
-        stack.append(key)
+        if not key in manifest:
+            raise Exception("Unknown dependency: " + key)
+
         if "deps" in manifest[key]:
+            stack.append(key)
             result.extend(manifest[key]["deps"])
             for dep in manifest[key]["deps"]:
-                result.extend(resolve(dep, stack))
-        stack.pop()
+                result += resolve(dep, stack)
+            stack.pop()
         return result
 
     def strip_dups(l: list[str]) -> list[str]:
@@ -115,7 +120,7 @@ def find_tests_files(manifest: dict) -> list:
     if not os.path.isdir(manifest["dir"] + "/tests"):
         return []
     result = os.listdir(manifest["dir"] + "/tests")
-    return [x for x in result if x.endswith(".cpp")]
+    return [manifest["dir"] + "/tests/" + x for x in result if x.endswith(".cpp") or x.endswith(".c")]
 
 
 def find_assets_files(manifest: dict) -> list:
@@ -124,13 +129,36 @@ def find_assets_files(manifest: dict) -> list:
     return os.listdir(manifest["dir"] + "/assets")
 
 
-def find_files(manifests: dict, env) -> dict:
+def find_files(manifests: dict) -> dict:
     manifest = copy.deepcopy(manifests)
     for key in manifest:
         item = manifest[key]
         item["tests"] = find_tests_files(item)
         item["assets"] = find_assets_files(item)
         item["srcs"] = find_source_files(item)
+
+    return manifest
+
+
+def prepare_tests(manifests: dict) -> dict:
+    if not "tests" in manifests:
+        return manifests
+    manifests = copy.deepcopy(manifests)
+    tests = manifests["tests"]
+
+    for key in manifests:
+        item = manifests[key]
+        if "tests" in item and len(item["tests"]) > 0:
+            tests["deps"] += [item["id"]]
+            tests["srcs"] += item["tests"]
+
+    return manifests
+
+
+def find_objects(manifest: dict, env: dict) -> dict:
+    manifest = copy.deepcopy(manifest)
+    for key in manifest:
+        item = manifest[key]
         item["objs"] = [(x.replace("src/", env["objdir"] + "/") + ".o", x)
                         for x in item["srcs"]]
 
@@ -325,7 +353,9 @@ def prepare_env(environment: dict, manifests_list: dict) -> dict:
     manifests = inject_manifest(manifests)
     manifests = resolve_deps(manifests)
     environment = preprocess_env(environment, manifests)
-    manifests = find_files(manifests, environment)
+    manifests = find_files(manifests)
+    manifests = prepare_tests(manifests)
+    manifests = find_objects(manifests, environment)
     manifests = find_libs(manifests)
 
     environment["ninjafile"] = environment["dir"] + "/build.ninja"

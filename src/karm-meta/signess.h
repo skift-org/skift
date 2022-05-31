@@ -5,121 +5,121 @@ namespace Karm::Meta {
 /* --- Signed --------------------------------------------------------------- */
 
 template <typename T>
-struct _Signed {
+struct _MakeSigned {
     using Type = void;
 };
 
 template <>
-struct _Signed<char> {
+struct _MakeSigned<char> {
     using Type = signed char;
 };
 
 template <>
-struct _Signed<unsigned char> {
+struct _MakeSigned<unsigned char> {
     using Type = signed char;
 };
 
 template <>
-struct _Signed<short> {
+struct _MakeSigned<short> {
     using Type = short;
 };
 
 template <>
-struct _Signed<unsigned short> {
+struct _MakeSigned<unsigned short> {
     using Type = short;
 };
 
 template <>
-struct _Signed<int> {
+struct _MakeSigned<int> {
     using Type = int;
 };
 
 template <>
-struct _Signed<unsigned int> {
+struct _MakeSigned<unsigned int> {
     using Type = int;
 };
 
 template <>
-struct _Signed<long> {
+struct _MakeSigned<long> {
     using Type = long;
 };
 
 template <>
-struct _Signed<unsigned long> {
+struct _MakeSigned<unsigned long> {
     using Type = long;
 };
 
 template <>
-struct _Signed<long long> {
+struct _MakeSigned<long long> {
     using Type = long long;
 };
 
 template <>
-struct _Signed<unsigned long long> {
+struct _MakeSigned<unsigned long long> {
     using Type = long long;
 };
 
 template <typename T>
-using Signed = typename _Signed<T>::Type;
+using MakeSigned = typename _MakeSigned<T>::Type;
 
 /* ---- Unsigned ------------------------------------------------------------ */
 
 template <typename T>
-struct _Unsigned {
+struct _MakeUnsigned {
     using Type = void;
 };
 
 template <>
-struct _Unsigned<char> {
+struct _MakeUnsigned<char> {
     using Type = unsigned char;
 };
 
 template <>
-struct _Unsigned<unsigned char> {
+struct _MakeUnsigned<unsigned char> {
     using Type = unsigned char;
 };
 
 template <>
-struct _Unsigned<short> {
+struct _MakeUnsigned<short> {
     using Type = unsigned short;
 };
 
 template <>
-struct _Unsigned<unsigned short> {
+struct _MakeUnsigned<unsigned short> {
     using Type = unsigned short;
 };
 
 template <>
-struct _Unsigned<int> {
+struct _MakeUnsigned<int> {
     using Type = unsigned int;
 };
 
 template <>
-struct _Unsigned<unsigned int> {
+struct _MakeUnsigned<unsigned int> {
     using Type = unsigned int;
 };
 
 template <>
-struct _Unsigned<long> {
+struct _MakeUnsigned<long> {
     using Type = unsigned long;
 };
 
 template <>
-struct _Unsigned<unsigned long> {
+struct _MakeUnsigned<unsigned long> {
     using Type = unsigned long;
 };
 
 template <>
-struct _Unsigned<long long> {
+struct _MakeUnsigned<long long> {
     using Type = unsigned long long;
 };
 
 template <>
-struct _Unsigned<unsigned long long> {
+struct _MakeUnsigned<unsigned long long> {
     using Type = unsigned long long;
 };
 
 template <typename T>
-using Unsigned = typename _Unsigned<T>::Type;
+using MakeUnsigned = typename _MakeUnsigned<T>::Type;
 
 }; // namespace Karm::Meta

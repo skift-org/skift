@@ -12,7 +12,7 @@ namespace Karm {
 
 template <typename T>
 struct Box {
-    T *_ptr = nullptr;
+    T *_ptr{};
 
     constexpr Box() = delete;
     constexpr Box(T *ptr) : _ptr(ptr) {}

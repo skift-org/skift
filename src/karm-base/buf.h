@@ -10,9 +10,9 @@ template <typename _T>
 struct Buf {
     using T = _T;
 
-    Inert<T> *_buf = nullptr;
-    size_t _cap = 0;
-    size_t _len;
+    Inert<T> *_buf{};
+    size_t _cap{};
+    size_t _len{};
 
     Buf() = default;
 
@@ -145,23 +145,27 @@ struct Buf {
             panic("index out of bounds");
         }
 
-        T tmp = _buf[index].take();
-        removeAt(index, 1);
-        return tmp;
+        T ret = _buf[index].take();
+        for (size_t i = index; i < _len - 1; i++) {
+            _buf[i].ctor(_buf[i + 1].take());
+        }
+        _len--;
+        return ret;
     }
 
-    void removeAt(size_t index, size_t count) {
+    void removeRange(size_t index, size_t count) {
         if (index > _len) {
             panic("index out of bounds");
         }
 
-        if (index + count >= _len) {
+        if (index + count > _len) {
             panic("index + count out of bounds");
         }
 
         for (size_t i = index; i < _len - count; i++) {
             _buf[i].ctor(_buf[i + count].take());
         }
+
         _len -= count;
     }
 
@@ -212,8 +216,8 @@ template <typename _T, size_t N>
 struct InlineBuf {
     using T = _T;
 
-    Array<Inert<T>, N> _buf;
-    size_t _len;
+    Array<Inert<T>, N> _buf = {};
+    size_t _len = {};
 
     constexpr InlineBuf() = default;
 
@@ -224,12 +228,12 @@ struct InlineBuf {
     }
 
     InlineBuf(std::initializer_list<T> &&other) {
-        _len = other._len;
+        _len = other.size();
         if (_len > N) {
             panic("cap too large");
         }
         for (size_t i = 0; i < _len; i++) {
-            _buf[i] = std::move<T>(other.peek(i));
+            _buf[i].ctor(std::move(other.begin()[i]));
         }
     }
 
@@ -239,7 +243,7 @@ struct InlineBuf {
             panic("cap too large");
         }
         for (size_t i = 0; i < _len; i++) {
-            _buf[i] = other.peek(i);
+            _buf[i].ctor(other.at(i));
         }
     }
 
@@ -268,15 +272,31 @@ struct InlineBuf {
         // no-op
     }
 
+    T &at(size_t index) {
+        if (index >= _len) {
+            panic("index out of bounds");
+        }
+
+        return _buf[index].unwrap();
+    }
+
+    T const &at(size_t index) const {
+        if (index >= _len) {
+            panic("index out of bounds");
+        }
+
+        return _buf[index].unwrap();
+    }
+
     void insert(size_t index, T &&value) {
         if (_len == N) {
             panic("cap too large");
         }
 
         for (size_t i = _len; i > index; i--) {
-            _buf[i] = std::move<T>(_buf[i - 1]);
+            _buf[i].ctor(_buf[i - 1].take());
         }
-        _buf[index] = std::forward<T>(value);
+        _buf[index].ctor(std::forward<T>(value));
         _len++;
     }
 
@@ -312,10 +332,10 @@ struct InlineBuf {
         _len += count;
     }
 
-    T remove(size_t index) {
-        T tmp = _buf[index];
+    T removeAt(size_t index) {
+        T tmp = _buf[index].take();
         for (size_t i = index; i < _len - 1; i++) {
-            _buf[i] = _buf[i + 1];
+            _buf[i].ctor(_buf[i + 1].take());
         }
         _len--;
         return tmp;
@@ -341,6 +361,10 @@ struct InlineBuf {
 
     size_t len() const {
         return _len;
+    }
+
+    size_t cap() const {
+        return N;
     }
 };
 

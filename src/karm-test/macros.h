@@ -8,10 +8,10 @@
 
 namespace Karm::Test {
 
-#define test$(ID)                                                                       \
-    ::Karm::Error var$(_decribeScope)([[maybe_unused]] ::Karm::Test::Driver & _driver); \
-    ::Karm::Test::Test _testTest{ID, var$(_decribeScope)};                              \
-    ::Karm::Error var$(_decribeScope)([[maybe_unused]] ::Karm::Test::Driver & _driver)
+#define test$(ID)                                                                   \
+    ::Karm::Error var$(_testFunc)([[maybe_unused]] ::Karm::Test::Driver & _driver); \
+    ::Karm::Test::Test var$(_test){ID, var$(_testFunc)};                            \
+    ::Karm::Error var$(_testFunc)([[maybe_unused]] ::Karm::Test::Driver & _driver)
 
 #define describe$(DESCR) \
     cond_defer$(_driver.beginDescribe(DESCR), _driver.endDescribe())

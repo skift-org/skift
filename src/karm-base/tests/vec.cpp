@@ -2,18 +2,19 @@
 
 #include "../vec.h"
 
-test$("Vec") {
+template <typename V>
+Error test_vec(Driver &_driver) {
     describe$("constructor") {
         it$("should be empty when created") {
-            Vec<int> v;
+            V v;
 
             expectEq$(v.len(), 0uz);
             expectEq$(v.cap(), 0uz);
         }
 
         it$("should be copyable") {
-            Vec<int> v = {1, 2, 3};
-            Vec<int> v2 = v;
+            V v = {1, 2, 3};
+            V v2 = v;
 
             expectEq$(v2.len(), 3uz);
             expectEq$(v2.cap(), 3uz);
@@ -23,8 +24,8 @@ test$("Vec") {
         }
 
         it$("should be moveable") {
-            Vec<int> v = {1, 2, 3};
-            Vec<int> v2 = std::move(v);
+            V v = {1, 2, 3};
+            V v2 = std::move(v);
 
             expectEq$(v2.len(), 3uz);
             expectEq$(v2.cap(), 3uz);
@@ -34,21 +35,21 @@ test$("Vec") {
         }
 
         it$("should be empty when created with capacity") {
-            Vec<int> v(10);
+            V v(10);
 
             expectEq$(v.len(), 0uz);
             expectEq$(v.cap(), 10uz);
         }
 
         it$("should be empty when created with an empty initializer list") {
-            Vec<int> v = {};
+            V v = {};
 
             expectEq$(v.len(), 0uz);
             expectEq$(v.cap(), 0uz);
         }
 
         it$("should contain the elements of the initializer list") {
-            Vec<int> v = {1, 2, 3};
+            V v = {1, 2, 3};
 
             expectEq$(v.len(), 3uz);
             expectEq$(v.cap(), 3uz);
@@ -58,124 +59,189 @@ test$("Vec") {
         }
     }
 
-    describe$("pushBack") {
-        it$("should increase the length") {
-            Vec<int> v;
+    describe$("insert") {
+        it$("should insert at the end") {
+            V v = {1, 2, 3};
+            v.insert(3, 4);
 
-            v.pushBack(1);
-            v.pushBack(2);
-            v.pushBack(3);
-
-            expectEq$(v.len(), 3uz);
-            expectEq$(v.cap(), 3uz);
+            expectEq$(v.len(), 4uz);
+            expectEq$(v.cap(), 4uz);
             expectEq$(v.at(0), 1);
             expectEq$(v.at(1), 2);
             expectEq$(v.at(2), 3);
+            expectEq$(v.at(3), 4);
         }
 
-        it$("should increase the capacity") {
-            Vec<int> v;
+        it$("should insert at the beginning") {
+            V v = {1, 2, 3};
+            v.insert(0, 0);
+
+            expectEq$(v.len(), 4uz);
+            expectEq$(v.cap(), 4uz);
+            expectEq$(v.at(0), 0);
+            expectEq$(v.at(1), 1);
+            expectEq$(v.at(2), 2);
+            expectEq$(v.at(3), 3);
+        }
+
+        it$("should insert at the middle") {
+            V v = {1, 2, 3};
+            v.insert(1, 0);
+
+            expectEq$(v.len(), 4uz);
+            expectEq$(v.cap(), 4uz);
+            expectEq$(v.at(0), 1);
+            expectEq$(v.at(1), 0);
+            expectEq$(v.at(2), 2);
+            expectEq$(v.at(3), 3);
+        }
+
+        it$("should insert at the end when the vector is full") {
+            V v = {1, 2, 3};
+            v.insert(3, 4);
+            v.insert(4, 5);
+
+            expectEq$(v.len(), 5uz);
+            expectEq$(v.cap(), 5uz);
+            expectEq$(v.at(0), 1);
+            expectEq$(v.at(1), 2);
+            expectEq$(v.at(2), 3);
+            expectEq$(v.at(3), 4);
+            expectEq$(v.at(4), 5);
+        }
+    }
+
+    describe$("pushBack") {
+        it$("should increase the length and capacity") {
+            V v;
 
             size_t oldCap = v.cap();
 
             v.pushBack(1);
             v.pushBack(2);
             v.pushBack(3);
-            v.pushBack(4);
-            v.pushBack(5);
 
-            expectEq$(v.len(), 5uz);
+            expectEq$(v.len(), 3uz);
             expectGteq$(v.cap(), v.len());
             expectGt$(v.cap(), oldCap);
             expectEq$(v.at(0), 1);
             expectEq$(v.at(1), 2);
             expectEq$(v.at(2), 3);
-            expectEq$(v.at(3), 4);
-            expectEq$(v.at(4), 5);
         }
 
         it$("should not increase the capacity when the capacity is sufficient") {
-            Vec<int> v(10);
+            V v(10);
 
             size_t oldCap = v.cap();
 
             v.pushBack(1);
             v.pushBack(2);
             v.pushBack(3);
-            v.pushBack(4);
-            v.pushBack(5);
 
-            expectEq$(v.len(), 5uz);
+            expectEq$(v.len(), 3uz);
             expectEq$(v.cap(), oldCap);
             expectEq$(v.at(0), 1);
             expectEq$(v.at(1), 2);
             expectEq$(v.at(2), 3);
-            expectEq$(v.at(3), 4);
-            expectEq$(v.at(4), 5);
         }
 
-        it$("should not increase the capacity when the capacity is sufficient and the length is zero") {
-            Vec<int> v(10);
+        it$("let elements be popped") {
+            V v = {1, 2, 3};
 
-            size_t oldCap = v.cap();
-
-            v.pushBack(1);
-            v.pushBack(2);
-            v.pushBack(3);
             v.pushBack(4);
-            v.pushBack(5);
-            v.pushBack(6);
-            v.pushBack(7);
-            v.pushBack(8);
-            v.pushBack(9);
-            v.pushBack(10);
+            auto popped = v.popBack();
 
-            expectEq$(v.len(), 10uz);
-            expectEq$(v.cap(), oldCap);
+            expectEq$(v.len(), 3uz);
             expectEq$(v.at(0), 1);
             expectEq$(v.at(1), 2);
             expectEq$(v.at(2), 3);
-            expectEq$(v.at(3), 4);
-            expectEq$(v.at(4), 5);
-            expectEq$(v.at(5), 6);
-            expectEq$(v.at(6), 7);
-            expectEq$(v.at(7), 8);
-            expectEq$(v.at(8), 9);
-            expectEq$(v.at(9), 10);
+            expectEq$(popped, 4);
         }
 
-        it$("should not increase the capacity when the capacity is sufficient and the length is one") {
-            Vec<int> v(10);
+        it$("let element be peeked") {
+            V v = {1, 2};
 
-            size_t oldCap = v.cap();
-
-            v.pushBack(1);
-            v.pushBack(2);
             v.pushBack(3);
-            v.pushBack(4);
-            v.pushBack(5);
-            v.pushBack(6);
-            v.pushBack(7);
-            v.pushBack(8);
-            v.pushBack(9);
-            v.pushBack(10);
-            v.pushBack(11);
+            auto peeked = v.peekBack();
 
-            expectEq$(v.len(), 11uz);
-            expectEq$(v.cap(), oldCap);
+            expectEq$(v.len(), 3uz);
             expectEq$(v.at(0), 1);
             expectEq$(v.at(1), 2);
             expectEq$(v.at(2), 3);
-            expectEq$(v.at(3), 4);
-            expectEq$(v.at(4), 5);
-            expectEq$(v.at(5), 6);
-            expectEq$(v.at(6), 7);
-            expectEq$(v.at(7), 8);
-            expectEq$(v.at(8), 9);
-            expectEq$(v.at(9), 10);
-            expectEq$(v.at(10), 11);
+            expectEq$(peeked, 3);
         }
     }
 
+    describe$("pushFront") {
+        it$("should increase the length and capacity") {
+            V v;
+
+            size_t oldCap = v.cap();
+
+            v.pushFront(1);
+            v.pushFront(2);
+            v.pushFront(3);
+
+            expectEq$(v.len(), 3uz);
+            expectGteq$(v.cap(), v.len());
+            expectGt$(v.cap(), oldCap);
+            expectEq$(v.at(0), 3);
+            expectEq$(v.at(1), 2);
+            expectEq$(v.at(2), 1);
+        }
+
+        it$("should not increase the capacity when the capacity is sufficient") {
+            V v(10);
+
+            size_t oldCap = v.cap();
+
+            v.pushFront(1);
+            v.pushFront(2);
+            v.pushFront(3);
+
+            expectEq$(v.len(), 3uz);
+            expectEq$(v.cap(), oldCap);
+            expectEq$(v.at(0), 3);
+            expectEq$(v.at(1), 2);
+            expectEq$(v.at(2), 1);
+        }
+
+        it$("let elements be popped") {
+            V v = {1, 2, 3};
+
+            v.pushFront(4);
+            auto popped = v.popFront();
+
+            expectEq$(v.len(), 3uz);
+            expectEq$(v.at(0), 1);
+            expectEq$(v.at(1), 2);
+            expectEq$(v.at(2), 3);
+            expectEq$(popped, 4);
+        }
+
+        it$("let element be peeked") {
+            V v = {1, 2};
+
+            v.pushFront(3);
+            auto peeked = v.peekFront();
+
+            expectEq$(v.len(), 3uz);
+            expectEq$(v.at(0), 3);
+            expectEq$(v.at(1), 1);
+            expectEq$(v.at(2), 2);
+            expectEq$(peeked, 3);
+        }
+    }
+
+    return OK;
+}
+
+test$("Vec") {
+    try$(test_vec<Vec<int>>(_driver));
+    return OK;
+}
+
+test$("InlineVec") {
+    try$((test_vec<InlineVec<int, 10>>(_driver)));
     return OK;
 }

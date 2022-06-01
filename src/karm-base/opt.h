@@ -12,11 +12,10 @@ namespace Karm {
 
 template <typename T>
 struct Opt {
-    bool _present = false;
+    bool _present {};
+    Inert<T> _value{};
 
-    Inert<T> _value;
-
-    Opt(){};
+    Opt() = default;
 
     Opt(None){};
 

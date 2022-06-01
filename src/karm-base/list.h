@@ -9,8 +9,10 @@
 
 namespace Karm {
 
-template <typename T>
+template <typename _T>
 struct List {
+    using T = _T;
+
     struct _Node {
         T buf;
         Strong<_Node> next;
@@ -40,8 +42,88 @@ struct List {
         return *this;
     }
 
+    /* --- Capacity --- */
+
+    void truncate(size_t len) {
+        if (len > _len) {
+            return;
+        }
+
+        if (len == 0) {
+            _head = NONE;
+            _tail = NONE;
+            _len = 0;
+            return;
+        }
+
+        auto node = _head.unwrap();
+        for (size_t i = 0; i < len - 1; i++) {
+            node = node->next.unwrap();
+        }
+
+        node->next = NONE;
+        _tail = node;
+        _len = len;
+    }
+
+    void clear() {
+        _head = NONE;
+        _tail = NONE;
+    }
+
+    /* --- Random Access --- */
+
+    template <typename Self>
+    constexpr auto _at(Self *self, size_t index) {
+        if (index >= self->_len) {
+            panic("index out of range");
+        }
+
+        Strong<_Node> node = self->_head;
+        for (size_t i = 0; i < index; i++) {
+            node = node->next;
+        }
+        
+        return node->buf;
+    }
+
+    T &at(size_t index) { return _at(this, index); }
+
+    T const &at(size_t index) const { return _at(this, index); }
+
+    T &operator[](size_t i) { return at(i); }
+
+    T const &operator[](size_t i) const { return at(i); }
+
+    /* --- Back Access --- */
+
+    T &peekBack() {
+        if (!_len) {
+            panic("peek from empty list");
+        }
+
+        return _tail->buf;
+    }
+
+    T const &peekBack() const {
+        if (!_len) {
+            panic("peek from empty list");
+        }
+
+        return _tail->buf;
+    }
+
+    void pushBack(T const &value) {
+        pushBack(T{value});
+    }
+
     void pushBack(T &&value) {
-        Strong<_Node> node = makeStrong<_Node>(std::forward(value), NONE, NONE);
+        emplaceBack(std::forward<T>(value));
+    }
+
+    template <typename... Args>
+    void emplaceBack(Args &&...args) {
+        Strong<_Node> node = makeStrong<_Node>(std::forward(args)..., NONE, NONE);
 
         if (_tail) {
             _tail->next = node;
@@ -52,10 +134,6 @@ struct List {
 
         _tail = node;
         _len++;
-    }
-
-    void pushBack(T const &value) {
-        pushBack(T{value});
     }
 
     T popBack() {
@@ -75,42 +153,11 @@ struct List {
         return node->buf;
     }
 
-    T &peekBack() {
-        if (!_len) {
-            panic("peek from empty list");
-        }
+    /* --- Iteration --- */
 
-        return _tail->buf;
-    }
-
-    T &peek(size_t index) {
-        if (index >= _len) {
-            panic("index out of range");
-        }
-
-        Strong<_Node> node = _head;
-        for (size_t i = 0; i < index; i++) {
-            node = node->next;
-        }
-
-        return node->buf;
-    }
-
-    T const &peek(size_t index) const {
-        if (index >= _len) {
-            panic("index out of range");
-        }
-
-        Strong<_Node> node = _head;
-        for (size_t i = 0; i < index; i++) {
-            node = node->next;
-        }
-
-        return node->buf;
-    }
-
-    auto iter() {
-        return Iter([curr = _head]() mutable -> Opt<T> {
+    template <typename Self>
+    static auto iter(Self *self) {
+        return Iter([curr = self->_head]() mutable -> Opt<T> {
             if (curr) {
                 auto ret = curr->buf;
                 curr = curr->next;
@@ -121,8 +168,9 @@ struct List {
         });
     }
 
-    auto iterRev() {
-        return Iter([curr = _tail]() mutable -> Opt<T> {
+    template <typename Self>
+    static auto iterRev(Self self) {
+        return Iter([curr = self->_tail]() mutable -> Opt<T> {
             if (curr) {
                 auto ret = curr->buf;
                 curr = curr->prev;
@@ -133,12 +181,17 @@ struct List {
         });
     }
 
-    void clear() {
-        _head = NONE;
-        _tail = NONE;
-    }
+    constexpr auto iter() { return _iter(this); }
 
-    size_t len() {
+    constexpr auto iter() const { return _iter(this); }
+
+    constexpr auto iterRev() { return _iterRev(this); }
+
+    constexpr auto iterRev() const { return _iterRev(this); }
+
+    /* --- Len & Buf --- */
+
+    size_t len() const {
         return _len;
     }
 };

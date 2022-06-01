@@ -10,8 +10,8 @@ namespace Karm {
 
 template <typename Value>
 struct [[nodiscard]] Result {
-    Error _error;
-    Opt<Value> _value = NONE;
+    Error _error{};
+    Opt<Value> _value{};
 
     constexpr Result(Error::Code code) noexcept : _error{code} {}
     constexpr Result(Error error) : _error(error) {}

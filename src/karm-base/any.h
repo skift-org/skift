@@ -26,9 +26,9 @@ struct _Ops {
 };
 
 struct Any {
-    Meta::Id _type;
-    void *_buf;
-    _Ops _ops;
+    Meta::Id _type{};
+    void *_buf{};
+    _Ops _ops{};
 
     Any() = delete;
 

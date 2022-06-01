@@ -8,11 +8,11 @@ namespace Karm {
 
 template <typename T>
 struct Ring {
-    Inert<T> *_buf = nullptr;
-    size_t _cap = 0;
-    size_t _len = 0;
-    size_t _head = 0;
-    size_t _tail = 0;
+    Inert<T> *_buf{};
+    size_t _cap{};
+    size_t _len{};
+    size_t _head{};
+    size_t _tail{};
 
     constexpr Ring() = default;
 

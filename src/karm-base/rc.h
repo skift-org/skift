@@ -77,7 +77,7 @@ struct Rc : public _Rc {
 
 template <typename T>
 struct Strong {
-    _Rc *_rc = nullptr;
+    _Rc *_rc {};
 
     constexpr Strong() = delete;
 
@@ -135,7 +135,7 @@ constexpr static Strong<T> makeStrong(Args... args) {
 
 template <typename T>
 struct Weak {
-    _Rc *_rc = nullptr;
+    _Rc *_rc {};
 
     constexpr Weak() = delete;
 

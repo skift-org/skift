@@ -19,8 +19,7 @@ static void memory_barier(MemOrder order = SEQ_CST) {
 
 template <typename T>
 struct Atomic {
-
-    T _val;
+    T _val{};
 
     constexpr Atomic() = default;
 

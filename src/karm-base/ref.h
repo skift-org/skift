@@ -10,7 +10,7 @@ namespace Karm {
 
 template <typename T>
 struct Ref {
-    T *_ptr;
+    T *_ptr{};
 
     Ref() = delete;
     Ref(T &ref) : _ptr(&ref) {}

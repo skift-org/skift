@@ -4,7 +4,7 @@
 namespace Embed {
 
 [[noreturn]] void panicHandler(char const *buf) {
-    fprintf(stderr, "%s\n", buf);
+    fprintf(stderr, "PANIC: %s\n", buf);
     abort();
 }
 

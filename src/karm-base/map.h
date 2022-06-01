@@ -10,7 +10,7 @@ namespace Karm {
 
 template <typename K, typename V>
 struct Map {
-    Vec<Cons<K, V>> _els;
+    Vec<Cons<K, V>> _els{};
 
     Map() = default;
 

@@ -7,11 +7,10 @@ namespace Karm {
 
 template <typename T>
 struct Slice {
-    T const *_buf;
-    size_t _len;
+    T const *_buf{};
+    size_t _len{};
 
-    constexpr Slice()
-        : _buf(nullptr), _len(0) {}
+    constexpr Slice() = default;
 
     constexpr Slice(T const *begin, T const *end)
         : _buf(begin), _len(end - begin) {}

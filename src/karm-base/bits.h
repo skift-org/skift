@@ -6,8 +6,8 @@
 namespace Karm {
 
 struct Bits {
-    uint8_t *_buf;
-    size_t _len;
+    uint8_t *_buf{};
+    size_t _len{};
 
     bool get(size_t index) const {
         return _buf[index / 8] & (1 << (index % 8));

@@ -25,8 +25,8 @@ struct Tuple<> {
 
 template <typename Car>
 struct Tuple<Car> {
-    Car car;
-    None cdr;
+    Car car{};
+    None cdr{};
 
     constexpr Tuple(Car &&car) : car(car) {}
 
@@ -49,8 +49,8 @@ struct Tuple<Car> {
 
 template <typename Car, typename... Cdr>
 struct Tuple<Car, Cdr...> {
-    Car car;
-    Tuple<Cdr...> cdr;
+    Car car{};
+    Tuple<Cdr...> cdr{};
 
     constexpr Tuple(Car &&car, Cdr &&...cdr) : car(car), cdr(std::forward<Cdr>(cdr)...) {
     }

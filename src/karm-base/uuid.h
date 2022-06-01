@@ -6,14 +6,10 @@
 namespace Karm {
 
 struct Uuid {
-    uint32_t a;
-    uint16_t b;
-    uint16_t c;
-    uint8_t d[8];
-
-    static constexpr Uuid nil() {
-        return {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
-    }
+    uint32_t a{};
+    uint16_t b{};
+    uint16_t c{};
+    uint8_t d[8]{};
 
     Ordr cmp(Uuid const &other) const {
         return Op::cmp(a, other.a) |

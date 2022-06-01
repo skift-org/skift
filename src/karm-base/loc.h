@@ -5,10 +5,10 @@
 namespace Karm {
 
 struct Loc {
-    Str file = nullptr;
-    Str function = nullptr;
-    size_t line = 0;
-    size_t column = 0;
+    Str file{};
+    Str function{};
+    size_t line{};
+    size_t column{};
 
     static Loc current(
         Str file = __builtin_FILE(),

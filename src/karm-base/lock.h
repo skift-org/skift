@@ -19,7 +19,7 @@ struct CriticalScope : Meta::NoCopy, Meta::NoMove {
 };
 
 struct Lock {
-    Atomic<bool> _lock;
+    Atomic<bool> _lock{};
 
     bool try_acquire() {
         Embed::criticalEnter();

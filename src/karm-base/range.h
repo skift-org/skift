@@ -9,8 +9,8 @@ namespace Karm {
 
 template <typename T>
 struct Range {
-    T start;
-    T end;
+    T start{};
+    T end{};
 
     bool valid() const {
         return start <= end;

@@ -58,7 +58,7 @@ struct [[nodiscard]] Error {
         FOREACH_ERROR(ITER)
 #undef ITER
     } _code;
-    Str _msg;
+    Str _msg{};
 
     using enum Code;
 

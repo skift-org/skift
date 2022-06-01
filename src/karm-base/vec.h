@@ -72,11 +72,17 @@ struct _Vec {
 
     T const &at(size_t index) const { return _buf.at(index); }
 
+    T &operator[](size_t i) { return at(i); }
+
+    T const &operator[](size_t i) const { return at(i); }
+
     void insert(size_t index, T const &value) { _buf.insert(index, T(value)); }
 
-    T removeAt(size_t index) { return _buf.removeAt(index, 1); }
+    void insert(size_t index, T &&value) { _buf.insert(index, std::move(value)); }
 
-    void removeAt(size_t index, size_t count) { _buf.removeAt(index, count); }
+    T removeAt(size_t index) { return _buf.removeAt(index); }
+
+    void removeRange(size_t index, size_t count) { _buf.removeRange(index, count); }
 
     /* --- Front Access --- */
 
@@ -86,7 +92,7 @@ struct _Vec {
 
     void pushFront(T const &value) { _buf.insert(T(value)); }
 
-    void pushFront(T &&value) { _buf.insert(std::forward<T>(value)); }
+    void pushFront(T &&value) { _buf.insert(0, std::forward<T>(value)); }
 
     template <typename... Args>
     void emplaceFront(Args &&...args) { _buf.emplace((args)...); }
@@ -95,9 +101,9 @@ struct _Vec {
 
     /* --- Back Access --- */
 
-    T const &peekBack() const { return _buf.at(len() - 1); }
-
     T &peekBack() { return _buf.at(len() - 1); }
+
+    T const &peekBack() const { return _buf.at(len() - 1); }
 
     void pushBack(T const &value) { insert(len(), value); }
 
@@ -108,9 +114,33 @@ struct _Vec {
 
     T popBack() { return removeAt(len() - 1); }
 
+    /* --- Slicing --- */
+
+    constexpr operator MutSlice<T>() {
+        return MutSlice<T>(buf(), len());
+    }
+    constexpr operator Slice<T>() const {
+        return Slice<T>(buf(), len());
+    }
+
+    constexpr MutSlice<T> sub(size_t start, size_t end) {
+        return MutSlice<T>(buf() + start, clamp(end, start, len()));
+    }
+
+    constexpr Slice<T> sub(size_t start, size_t end) const {
+        return Slice<T>(buf() + start, clamp(end, start, len()));
+    }
+
+    /* --- Comparison --- */
+
+    constexpr Ordr cmp(Slice<T> const &other) const {
+        return Op::cmp(buf(), len(), other._buf, other._len);
+    }
+
     /* --- Iteration --- */
 
-    static auto _iter(auto self) {
+    template <typename Self>
+    static auto _iter(Self *self) {
         return Iter([self, i = 0uz]() mutable {
             if (i >= self->len()) {
                 return nullptr;
@@ -119,7 +149,8 @@ struct _Vec {
         });
     }
 
-    static auto _iterRev(auto self) {
+    template <typename Self>
+    static auto _iterRev(Self *self) {
         return Iter([self, i = self->len()]() mutable {
             if (i == 0) {
                 return nullptr;
@@ -148,9 +179,9 @@ struct _Vec {
 
     T *begin() { return buf(); }
 
-    T *end() { return buf() + len(); }
-
     T const *begin() const { return buf(); }
+
+    T *end() { return buf() + len(); }
 
     T const *end() const { return buf() + end(); }
 };

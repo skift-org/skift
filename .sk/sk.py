@@ -184,8 +184,9 @@ def find_libs(manifests: dict) -> dict:
 
 # --- Evironment ------------------------------------------------------------- #
 
+ENVS = {}
 
-ENV_HOST = {
+ENVS["host"] = {
     "toolchain": "clang",
 
     "arch": "x86",
@@ -202,12 +203,12 @@ ENV_HOST = {
     "ld": "clang++",
     "ldflags": "",
     "ar": "llvm-ar",
-    "arflags": "",
+    "arflags": "rcs",
     "as": "nasm",
     "asflags": "",
 }
 
-ENV_EFI = {
+ENVS["efi-x86_64"] = {
     "toolchain": "clang",
 
     "arch": "x86",
@@ -224,9 +225,31 @@ ENV_EFI = {
     "ld": "clang++",
     "ldflags": "-target x86_64-unknown-windows -nostdlib -Wl,-entry:efi_main -Wl,-subsystem:efi_application -fuse-ld=lld-link",
     "ar": "llvm-ar",
-    "arflags": "",
+    "arflags": "rcs",
     "as": "nasm",
     "asflags": "",
+}
+
+ENVS["hjert-x86_32"] = {
+    "toolchain": "clang",
+
+    "arch": "x86",
+    "sub": "32",
+    "vendor": "unknown",
+    "sys": "hjert",
+    "abi": "sysv",
+    "freestanding": True,
+
+    "cc": "clang",
+    "cflags": "-target i386-none-elf -ffreestanding -fno-stack-protector",
+    "cxx": "clang++",
+    "cxxflags": "-target i386-none-elf -ffreestanding -fno-stack-protector",
+    "ld": "clang++",
+    "ldflags": "-target i386-none-elf -nostdlib",
+    "ar": "llvm-ar",
+    "arflags": "rcs",
+    "as": "nasm",
+    "asflags": "-f elf32 ",
 }
 
 PASS = ["toolchain", "arch", "sub", "vendor", "sys", "abi", "freestanding"]
@@ -372,15 +395,48 @@ def prepare_env(environment: dict, manifests_list: dict) -> dict:
     return environment, manifests
 
 
+def parse_option(args: list[str]) -> dict:
+    result = {
+        'opts': {},
+        'args': []
+    }
+
+    for arg in args:
+        if arg.startswith("--"):
+            if "=" in arg:
+                key, value = arg[2:].split("=", 1)
+                result['opts'][key] = value
+            else:
+                result['opts'][arg[2:]] = True
+        else:
+            result['args'].append(arg)
+
+    return result
+
+
 def build_env(environment: dict):
     proc = subprocess.run(["ninja", "-j", "1", "-f", environment["ninjafile"]])
     if proc.returncode != 0:
         sys.exit(proc.returncode)
 
 
-def run_cmd(args: list[str]):
+def build_component(environment: dict, manifests: dict, component: str):
+    if component not in manifests:
+        print(f"Component {component} not found")
+        sys.exit(1)
+
+    manifest = manifests[component]
+
+    proc = subprocess.run(
+        ["ninja", "-j", "1", "-f", environment["ninjafile"], manifest["out"]])
+    if proc.returncode != 0:
+        sys.exit(proc.returncode)
+
+
+def run_cmd(opts: dict, args: list[str]):
+    environment = ENVS[opts.get('env', 'host')]
     manifests_list = load_manifests(find_manifests("."))
-    environment, manifests = prepare_env(ENV_HOST, manifests_list)
+    environment, manifests = prepare_env(environment, manifests_list)
     build_env(environment)
     exe = manifests[args[0]]["out"]
     proc = subprocess.run([exe] + args[1:])
@@ -388,30 +444,43 @@ def run_cmd(args: list[str]):
         sys.exit(proc.returncode)
 
 
-def build_cmd(args: list[str]):
+def build_cmd(opts: dict, args: list[str]):
+    environment = ENVS[opts.get('env', 'host')]
     manifests_list = load_manifests(find_manifests("."))
+    environment, manifets = prepare_env(environment, manifests_list)
 
-    env_efi, _ = prepare_env(ENV_EFI, manifests_list)
-    build_env(env_efi)
-    env_host, _ = prepare_env(ENV_HOST, manifests_list)
-    build_env(env_host)
+    if len(args) == 0:
+        print("Building all components")
+        build_env(environment)
+    else:
+        print("Building:")
+        for component in args:
+            print(f"  {component}")
+            build_component(environment, manifets, component)
 
 
-def clean_cmd(args: list[str]):
+def clean_cmd(opts: dict, args: list[str]):
     shutil.rmtree(".build", ignore_errors=True)
 
 
-def nuke_cmd(args: list[str]):
+def nuke_cmd(opts: dict, args: list[str]):
     shutil.rmtree(".build", ignore_errors=True)
     shutil.rmtree(".cache", ignore_errors=True)
 
 
-def help_cmd(args: list[str]):
+def help_cmd(opts: dict, args: list[str]):
     print("Usage: sk.py <command>")
     print("")
+
     print("Commands:")
     for cmd in CMDS:
         print("  " + cmd)
+    print("")
+
+    print("Enviroments:")
+    for env in ENVS:
+        print("  " + env)
+    print("")
 
 
 CMDS = {
@@ -424,6 +493,7 @@ CMDS = {
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        help_cmd()
+        help_cmd(parse_option([]))
     else:
-        CMDS[sys.argv[1]](sys.argv[2:])
+        o = parse_option(sys.argv[2:])
+        CMDS[sys.argv[1]](o['opts'], o['args'])

@@ -6,7 +6,7 @@
     "requires": {
         "sys": [
             "efi",
-            "kernel"
+            "hjert"
         ]
     },
     "inject": [

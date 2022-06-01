@@ -4,13 +4,16 @@
     "type": "lib",
     "requires": {
         "sys": [
-            "kernel"
+            "hjert"
         ],
         "arch": [
-            "i686"
+            "x86"
+        ],
+        "sub": [
+            "32"
         ]
     },
     "inject": [
-        "hjert-base"
+        "hjert"
     ]
 }

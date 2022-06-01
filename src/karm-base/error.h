@@ -10,6 +10,7 @@ namespace Karm {
 #define FOREACH_ERROR(ERROR)         \
     ERROR(OK)                        \
     ERROR(NOT_FOUND)                 \
+    ERROR(NOT_IMPLEMENTED)           \
     ERROR(PERMISSION_DENIED)         \
     ERROR(CONNECTION_REFUSED)        \
     ERROR(CONNECTION_RESET)          \

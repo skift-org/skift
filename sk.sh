@@ -4,6 +4,7 @@ set -e
 
 export MYPY_CACHE_DIR=".cache/mypy"
 export PYTHONPYCACHEPREFIX=$(pwd)/.cache/python
+export CCACHE_DIR=".cache/ccache"
 
 if [ -n "$CHECK" ];
 then

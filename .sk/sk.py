@@ -453,6 +453,10 @@ def build_component(environment: dict, manifests: dict, component: str):
 
 
 def run_cmd(opts: dict, args: list[str]):
+    if len(args) < 1:
+        print("Usage: sk run <component>")
+        sys.exit(1)
+
     environment = ENVS[opts.get('env', 'host')]
     manifests_list = load_manifests(find_manifests("."))
     environment, manifests = prepare_env(environment, manifests_list)
@@ -487,13 +491,18 @@ def nuke_cmd(opts: dict, args: list[str]):
     shutil.rmtree(".cache", ignore_errors=True)
 
 
+def id_cmd(opts: dict, args: list[str]):
+    import random
+    print(hex(random.randint(0, 2**64)))
+
+
 def help_cmd(opts: dict, args: list[str]):
     print("Usage: sk.py <command>")
     print("")
 
     print("Commands:")
     for cmd in CMDS:
-        print("  " + cmd)
+        print("  " + cmd + " - " + CMDS[cmd]["desc"])
     print("")
 
     print("Enviroments:")
@@ -503,16 +512,35 @@ def help_cmd(opts: dict, args: list[str]):
 
 
 CMDS = {
-    "run": run_cmd,
-    "build": build_cmd,
-    "clean": clean_cmd,
-    "nuke": nuke_cmd,
-    "help": help_cmd,
+    "run": {
+        "func": run_cmd,
+        "desc": "Run a component on the host",
+    },
+    "build": {
+        "func": build_cmd,
+        "desc": "Build one or more components",
+    },
+    "clean": {
+        "func": clean_cmd,
+        "desc": "Clean the build directory",
+    },
+    "nuke": {
+        "func": nuke_cmd,
+        "desc": "Clean the build directory and cache",
+    },
+    "id": {
+        "func": id_cmd,
+        "desc": "Generate a 64bit random id",
+    },
+    "help": {
+        "func": help_cmd,
+        "desc": "Show this help message",
+    },
 }
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        help_cmd(parse_option([]))
+        help_cmd({}, [])
     else:
         o = parse_option(sys.argv[2:])
-        CMDS[sys.argv[1]](o['opts'], o['args'])
+        CMDS[sys.argv[1]]["func"](o['opts'], o['args'])

@@ -86,6 +86,11 @@ union Vec2 {
     Vec2 operator/(Vec2 const &other) const {
         return {x / other.x, y / other.y};
     }
+
+    template <typename U>
+    Vec2<U> cast() const {
+        return {static_cast<U>(x), static_cast<U>(y)};
+    }
 };
 
 using Vec2i = Vec2<int>;

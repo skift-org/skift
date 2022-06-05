@@ -90,6 +90,14 @@ union Rect {
         return r.x + r.width > x && r.y + r.height > y && r.x < x + width && r.y < y + height;
     }
 
+    Rect<T> clipTo(Rect<T> const &r) const {
+        return {
+            std::max(x, r.x),
+            std::max(y, r.y),
+            std::min(x + width, r.x + r.width) - std::max(x, r.x),
+            std::min(y + height, r.y + r.height) - std::max(y, r.y)};
+    }
+
     T operator[](int i) { return _els[i]; }
 
     T operator[](int i) const { return _els[i]; }

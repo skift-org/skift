@@ -9,7 +9,7 @@ static Error handle(Api::Log &log) {
 }
 
 Error handleSyscall(Api::Id id, Api::Arg args) {
-    Error result = Error::NOT_IMPLEMENTED;
+    Error result = Error::INVALID_INPUT;
 
     Api::Syscalls::visit((void *)args, [&](auto &syscall) {
         if (id == syscall.ID) {

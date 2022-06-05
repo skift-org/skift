@@ -25,8 +25,8 @@ _kstart:
 	push eax ; Push the multiboot magic
 	push ebx ; Push the multiboot header adress.
 
-	extern kmain
-	call kmain
+	extern entryPoint
+	call entryPoint
 
 	cli
 

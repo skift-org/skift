@@ -1,6 +1,6 @@
 {
-    "id": "hjert-i686",
-    "description": "The Hjert micro-kernel platform layer for i686",
+    "id": "hjert-x86-64",
+    "description": "The Hjert micro-kernel platform layer for x86-64",
     "type": "lib",
     "requires": {
         "sys": [
@@ -10,7 +10,7 @@
             "x86"
         ],
         "sub": [
-            "32"
+            "64"
         ]
     },
     "inject": [

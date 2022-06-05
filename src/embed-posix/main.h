@@ -9,8 +9,8 @@ int main(int argc, char const **argv) {
     ExitCode code = entryPoint(args);
 
     if (!code) {
-        Karm::Error error = code.none();
-        (void)Karm::Fmt::format(Karm::Sys::err(), "{}: {}\n", args.self(), error.msg());
+        ::Karm::Error error = code.none();
+        (void)::Karm::Fmt::format(::Karm::Sys::err(), "{}: {}\n", args.self(), error.msg());
         return 1;
     }
 

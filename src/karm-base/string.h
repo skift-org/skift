@@ -99,7 +99,7 @@ struct _String {
     }
 
     _String &operator=(_String const &other) {
-        return *this = String(other);
+        return *this = _String(other);
     }
 
     _String &operator=(_String &&other) {

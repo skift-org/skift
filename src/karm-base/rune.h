@@ -5,6 +5,7 @@
 #include "_prelude.h"
 
 #include "array.h"
+#include "buf.h"
 #include "cursor.h"
 
 namespace Karm {
@@ -18,11 +19,55 @@ concept Encoding = requires(T t, Rune &r, typename T::Unit u, Cursor<typename T:
     { T::encode(Rune{}, m) } -> Meta::Same<bool>;
 };
 
+template <typename U, size_t N>
+struct _Multiple {
+    using Unit = U;
+    InlineBuf<Unit, N> _buf;
+
+    void put(Unit u) {
+        _buf.insert(u, _buf.len());
+    }
+
+    Unit *buf() { return _buf.buf(); }
+    size_t len() const { return _buf.len(); }
+    Unit const *buf() const { return _buf.buf(); }
+    Unit *begin() { return buf(); }
+    Unit const *begin() const { return buf(); }
+    Unit *end() { return buf() + len(); }
+    Unit const *end() const { return buf() + len(); }
+};
+
+template <typename U>
+struct _Single {
+    using Unit = U;
+
+    Unit _buf;
+
+    void put(Unit u) {
+        _buf = u;
+    }
+
+    operator Unit() {
+        return _buf;
+    }
+};
+
+template <typename T, typename U>
+concept EncodeOutput = requires(T t, U u) {
+    {t.put(u)};
+};
+
+template <typename T, typename U>
+concept DecodeInput = requires(T t, U u) {
+    {t.next()};
+    {t.rem()};
+};
+
 /* --- Utf8 ----------------------------------------------------------------- */
 
 struct Utf8 {
     using Unit = char;
-    static constexpr size_t MULTI_BYTE_LEN = 4;
+    using One = _Multiple<Unit, 4>;
 
     static constexpr size_t len(Unit first) {
         if ((first & 0xf8) == 0xf0)
@@ -35,7 +80,7 @@ struct Utf8 {
             return 1;
     }
 
-    static bool decode(Rune &result, Cursor<Unit> &in) {
+    static bool decode(Rune &result, DecodeInput<Unit> auto &in) {
         if (in.rem() == 0) {
             result = U'�';
             return false;
@@ -66,7 +111,7 @@ struct Utf8 {
         return true;
     }
 
-    static bool encode(Rune c, MutCursor<Unit> &out) {
+    static bool encode(Rune c, EncodeOutput<Unit> auto &out) {
         if (c <= 0x7f) {
             out.put(c);
         } else if (c <= 0x7ff) {
@@ -98,6 +143,7 @@ static_assert(Encoding<Utf8>);
 
 struct Utf16 {
     using Unit = uint16_t;
+    using One = _Multiple<Unit, 2>;
 
     static constexpr size_t len(Unit first) {
         if (first >= 0xd800 && first <= 0xdbff)
@@ -106,7 +152,7 @@ struct Utf16 {
             return 1;
     }
 
-    static bool decode(Rune &result, Cursor<Unit> &in) {
+    static bool decode(Rune &result, DecodeInput<Unit> auto &in) {
         Unit first = in.next();
 
         if (len(first) > in.rem()) {
@@ -133,7 +179,7 @@ struct Utf16 {
         return true;
     }
 
-    static bool encode(Rune c, MutCursor<Unit> &out) {
+    static bool encode(Rune c, EncodeOutput<Unit> auto &out) {
         if (c <= 0xffff) {
             out.put(c);
             return true;
@@ -155,17 +201,18 @@ static_assert(Encoding<Utf16>);
 
 struct Utf32 {
     using Unit = char32_t;
+    using One = _Single<Unit>;
 
     static constexpr size_t len(Unit) {
         return 1;
     }
 
-    static bool decode(Rune &result, Cursor<Unit> &in) {
+    static bool decode(Rune &result, DecodeInput<Unit> auto &in) {
         result = in.next();
         return true;
     }
 
-    static bool encode(Rune c, MutCursor<Unit> &out) {
+    static bool encode(Rune c, EncodeOutput<Unit> auto &out) {
         out.put(c);
         return false;
     }
@@ -179,12 +226,13 @@ static_assert(Encoding<Utf32>);
 
 struct Ascii {
     using Unit = char;
+    using One = _Single<Unit>;
 
     static constexpr size_t len(Unit) {
         return 1;
     }
 
-    static bool decode(Rune &result, Cursor<Unit> &in) {
+    static bool decode(Rune &result, DecodeInput<Unit> auto &in) {
         auto c = in.next();
         if (c >= 0) {
             result = c;
@@ -195,7 +243,7 @@ struct Ascii {
         }
     }
 
-    static bool encode(Rune c, MutCursor<Unit> &out) {
+    static bool encode(Rune c, EncodeOutput<Unit> auto &out) {
         if (c < 0) {
             out.put('?');
             return false;
@@ -215,26 +263,26 @@ static_assert(Encoding<Ascii>);
 template <typename Mapper>
 struct EAscii {
     using Unit = uint8_t;
+    using One = _Single<Unit>;
 
     static constexpr size_t len(Unit) {
         return 1;
     }
 
-    static bool decode(Rune &result, Cursor<Unit> &in) {
+    static bool decode(Rune &result, DecodeInput<Unit> auto &in) {
         Mapper mapper;
         result = mapper(in.next());
         return true;
     }
 
-    static bool encode(Rune c, MutCursor<Unit> &out) {
+    static bool encode(Rune c, EncodeOutput<Unit> auto &out) {
         Mapper mapper;
-        for (Unit i = 0; i <= 255; i++) {
+        for (size_t i = 0; i <= 255; i++) {
             if (mapper(i) == c) {
                 out.put(i);
                 return true;
             }
         }
-
         out.put('?');
         return false;
     }
@@ -290,7 +338,7 @@ static_assert(Encoding<Ibm437>);
 /* --- Latin1 --------------------------------------------------------------- */
 
 using Latin1Mapper = decltype([](uint8_t c) {
-    // FIXME: """"Unicode is a "superset" of Latin1""" (please note the quotes)
+    // HACK: """"Unicode is a "superset" of Latin1""" (please note the quotes)
     return (Rune)c;
 });
 
@@ -346,6 +394,19 @@ size_t transcode_units(Cursor<typename Source::Unit> input, MutCursor<typename T
     }
 
     return result;
+}
+
+template <Encoding T>
+using One = typename T::One;
+
+template <Encoding E>
+bool encode_one(Rune rune, One<E> &one) {
+    return E::encode(rune, one);
+}
+
+template <Encoding E>
+bool decode_one(One<E> &one, Rune &rune) {
+    return E::decode(rune, one);
 }
 
 } // namespace Karm

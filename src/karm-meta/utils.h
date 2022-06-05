@@ -14,7 +14,13 @@ struct NoMove {
     NoMove &operator=(NoMove &&) = delete;
 };
 
+struct Stone : NoCopy, NoMove {
+};
+
 template <typename T>
 T declval();
+
+template <typename T>
+T &declref();
 
 } // namespace Karm::Meta

@@ -44,10 +44,11 @@ struct _Vec {
     bool removeAll(T const &val) {
         bool changed = false;
 
-        for (size_t i = 0; i < _buf.len; i++) {
-            if (_buf.peek(i) == val) {
-                _buf.remove(i);
+        for (size_t i = 1; i < _buf.len() + 1; i++) {
+            if (Op::eq(_buf.at(i - 1), val)) {
+                _buf.removeAt(i - 1);
                 changed = true;
+                i--;
             }
         }
 

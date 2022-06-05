@@ -1,0 +1,9 @@
+{
+    "id": "karm-ui",
+    "description": "A graphical user interface library",
+    "type": "lib",
+    "deps": [
+        "karm-gfx",
+        "embed"
+    ]
+}

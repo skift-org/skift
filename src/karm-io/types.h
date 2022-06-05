@@ -6,7 +6,7 @@
 
 namespace Karm::Io {
 
-enum class Whence {
+enum struct Whence {
     BEGIN,
     CURRENT,
     END,

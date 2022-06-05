@@ -48,72 +48,72 @@ concept Comparable = requires(T const &lhs, T const &rhs) {
 
 namespace Op {
 
-    template <Comparable T>
-    constexpr Ordr cmp(T const &lhs, T const &rhs) {
-        return lhs.cmp(rhs);
-    }
+template <Comparable T>
+constexpr Ordr cmp(T const &lhs, T const &rhs) {
+    return lhs.cmp(rhs);
+}
 
-    // fallback for types that don't implement Comparable
-    template <typename T>
-    requires(!Comparable<T>) constexpr Ordr cmp(T const &lhs, T const &rhs) {
-        if (lhs < rhs) {
-            return Ordr::LESS;
-        } else if (lhs > rhs) {
-            return Ordr::GREATER;
-        } else {
-            return Ordr::EQUAL;
+// fallback for types that don't implement Comparable
+template <typename T>
+requires(!Comparable<T>) constexpr Ordr cmp(T const &lhs, T const &rhs) {
+    if (lhs < rhs) {
+        return Ordr::LESS;
+    } else if (lhs > rhs) {
+        return Ordr::GREATER;
+    } else {
+        return Ordr::EQUAL;
+    }
+}
+
+template <typename T>
+Ordr cmp(T const *lhs, size_t lhs_len, T const *rhs, size_t rhs_len) {
+    size_t len = min(lhs_len, rhs_len);
+
+    for (size_t i = 0; i < len; i++) {
+        Ordr c = cmp(lhs[i], rhs[i]);
+        if (c != Ordr::EQUAL) {
+            return c;
         }
     }
 
-    template <typename T>
-    Ordr cmp(T const *lhs, size_t lhs_len, T const *rhs, size_t rhs_len) {
-        size_t len = min(lhs_len, rhs_len);
-
-        for (size_t i = 0; i < len; i++) {
-            Ordr c = cmp(lhs[i], rhs[i]);
-            if (c != Ordr::EQUAL) {
-                return c;
-            }
-        }
-
-        if (lhs_len < rhs_len) {
-            return Ordr::LESS;
-        } else if (lhs_len > rhs_len) {
-            return Ordr::GREATER;
-        } else {
-            return Ordr::EQUAL;
-        }
+    if (lhs_len < rhs_len) {
+        return Ordr::LESS;
+    } else if (lhs_len > rhs_len) {
+        return Ordr::GREATER;
+    } else {
+        return Ordr::EQUAL;
     }
+}
 
-    template <typename T>
-    constexpr bool eq(T const &lhs, T const &rhs) {
-        return cmp(lhs, rhs).isEq();
-    }
+template <typename T>
+constexpr bool eq(T const &lhs, T const &rhs) {
+    return cmp(lhs, rhs).isEq();
+}
 
-    template <typename T>
-    constexpr bool ne(T const &lhs, T const &rhs) {
-        return cmp(lhs, rhs).isNe();
-    }
+template <typename T>
+constexpr bool ne(T const &lhs, T const &rhs) {
+    return cmp(lhs, rhs).isNe();
+}
 
-    template <typename T>
-    constexpr bool lt(T const &lhs, T const &rhs) {
-        return cmp(lhs, rhs).isLt();
-    }
+template <typename T>
+constexpr bool lt(T const &lhs, T const &rhs) {
+    return cmp(lhs, rhs).isLt();
+}
 
-    template <typename T>
-    constexpr bool gt(T const &lhs, T const &rhs) {
-        return cmp(lhs, rhs).isGt();
-    }
+template <typename T>
+constexpr bool gt(T const &lhs, T const &rhs) {
+    return cmp(lhs, rhs).isGt();
+}
 
-    template <typename T>
-    constexpr bool gteq(T const &lhs, T const &rhs) {
-        return cmp(lhs, rhs).isGtEq();
-    }
+template <typename T>
+constexpr bool gteq(T const &lhs, T const &rhs) {
+    return cmp(lhs, rhs).isGtEq();
+}
 
-    template <typename T>
-    constexpr bool lteq(T const &lhs, T const &rhs) {
-        return cmp(lhs, rhs).isLtEq();
-    }
+template <typename T>
+constexpr bool lteq(T const &lhs, T const &rhs) {
+    return cmp(lhs, rhs).isLtEq();
+}
 
 } // namespace Op
 

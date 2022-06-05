@@ -5,6 +5,7 @@
 #include "_prelude.h"
 
 #include "opt.h"
+#include "ordr.h"
 #include "panic.h"
 #include "ref.h"
 #include "std.h"
@@ -17,6 +18,7 @@ struct _Rc {
 
     virtual ~_Rc() = default;
     virtual void *_unwrap() = 0;
+    virtual Meta::Id id() = 0;
 
     bool dying() {
         return _strong == 0;
@@ -69,15 +71,17 @@ struct _Rc {
 template <typename T>
 struct Rc : public _Rc {
     T _buf;
+
     template <typename... Args>
     Rc(Args &&...args) : _buf(std::forward<Args>(args)...) {}
 
     void *_unwrap() override { return &_buf; }
+    Meta::Id id() override { return Meta::makeId<T>(); }
 };
 
 template <typename T>
 struct Strong {
-    _Rc *_rc {};
+    _Rc *_rc{};
 
     constexpr Strong() = delete;
 
@@ -116,6 +120,13 @@ struct Strong {
         return &_rc->unwrapStrong<T>();
     }
 
+    constexpr Ordr cmp(Strong const &other) const {
+        if (_rc == other._rc)
+            return Ordr::EQUAL;
+
+        return Op::cmp(unwrap(), other.unwrap());
+    }
+
     constexpr T &operator*() const {
         if (!_rc) {
             panic("Deferencing moved from Strong<T>");
@@ -123,19 +134,51 @@ struct Strong {
 
         return _rc->unwrapStrong<T>();
     }
+
+    constexpr T const &unwrap() const {
+        if (!_rc) {
+            panic("Deferencing moved from Strong<T>");
+        }
+
+        return _rc->unwrapStrong<T>();
+    }
+
+    constexpr T &unwrap() {
+        if (!_rc) {
+            panic("Deferencing moved from Strong<T>");
+        }
+
+        return _rc->unwrapStrong<T>();
+    }
+
+    template <typename U>
+    constexpr bool is() {
+        return Meta::Same<T, U> ||
+               Meta::Derive<T, U> ||
+               _rc->id() == Meta::makeId<U>();
+    }
+
+    template <typename U>
+    constexpr Opt<Strong<U>> as() {
+        if (!is<U>()) {
+            return NONE;
+        }
+
+        return Strong<U>(_rc);
+    }
 };
 
 template <typename T>
 using OptStrong = Opt<Strong<T>>;
 
 template <typename T, typename... Args>
-constexpr static Strong<T> makeStrong(Args... args) {
+constexpr static Strong<T> makeStrong(Args &&...args) {
     return {new Rc<T>(std::forward<Args>(args)...)};
 }
 
 template <typename T>
 struct Weak {
-    _Rc *_rc {};
+    _Rc *_rc{};
 
     constexpr Weak() = delete;
 

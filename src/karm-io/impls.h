@@ -68,7 +68,8 @@ struct Slice : public Writer, public Seeker {
 
     Result<size_t> seek(Seek seek) override {
         size_t pos = try$(tell(_writer));
-        pos = seek.apply(pos);
+        size_t s = size(*this);
+        pos = seek.apply(pos, s);
         pos = clamp(pos, _start, _end);
         return try$(_writer.seek(Seek::fromBegin(pos)));
     }

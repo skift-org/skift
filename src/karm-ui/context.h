@@ -22,7 +22,7 @@ struct Context;
 
 using NodePtr = Strong<_Node>;
 
-struct _Node : Meta::Stone {
+struct _Node : Meta::Static {
     Vec<NodePtr> _children;
     _Node *_parent;
 
@@ -122,13 +122,13 @@ struct _Node : Meta::Stone {
 
 /* --- Context -------------------------------------------------------------- */
 
-struct App : Meta::Stone {
+struct App : Meta::Static {
     virtual ~App() = default;
 };
 
 Strong<App> makeApp();
 
-struct Context : Meta::Stone {
+struct Context : Meta::Static {
     struct Scope {
         NodePtr parent;
         size_t child = 0;

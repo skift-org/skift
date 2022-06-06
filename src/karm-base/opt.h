@@ -12,7 +12,7 @@ namespace Karm {
 
 template <typename T>
 struct Opt {
-    bool _present {};
+    bool _present{};
     Inert<T> _value{};
 
     Opt() = default;
@@ -24,7 +24,7 @@ struct Opt {
     }
 
     Opt(T &&value) : _present(true) {
-        _value.ctor(std::forward<T>(value));
+        _value.ctor(std::move(value));
     }
 
     Opt(Opt const &other) : _present(other._present) {
@@ -57,7 +57,7 @@ struct Opt {
     Opt &operator=(T &&value) {
         release();
         _present = true;
-        _value.ctor(std::forward<T>(value));
+        _value.ctor(std::move(value));
         return *this;
     }
 

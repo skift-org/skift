@@ -11,7 +11,7 @@
 
 namespace Karm::Test {
 
-struct Test : Meta::NoCopy, Meta::NoMove {
+struct Test : Meta::Static {
     using Func = Error (*)(Driver &);
 
     Str _name;

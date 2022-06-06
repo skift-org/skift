@@ -15,7 +15,7 @@ struct [[nodiscard]] Result {
 
     constexpr Result(Error::Code code) noexcept : _error{code} {}
     constexpr Result(Error error) : _error(error) {}
-    constexpr Result(Value &&value) : _error(), _value(value) {}
+    constexpr Result(Value &&value) : _error(), _value(std::move(value)) {}
     constexpr Result(Value const &value) : _error(), _value(value) {}
 
     constexpr operator bool() { return _error; }

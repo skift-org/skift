@@ -83,7 +83,7 @@ struct List {
         for (size_t i = 0; i < index; i++) {
             node = node->next;
         }
-        
+
         return node->buf;
     }
 
@@ -118,7 +118,7 @@ struct List {
     }
 
     void pushBack(T &&value) {
-        emplaceBack(std::forward<T>(value));
+        emplaceBack(std::move(value));
     }
 
     template <typename... Args>

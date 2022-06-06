@@ -28,7 +28,7 @@ struct Seek {
         return Seek{Whence::END, offset};
     }
 
-    constexpr size_t apply(ssize_t current) const {
+    constexpr size_t apply(size_t current, size_t size) const {
         switch (whence) {
         case Whence::BEGIN:
             return offset;
@@ -37,7 +37,7 @@ struct Seek {
             return current + offset;
 
         case Whence::END:
-            return -offset;
+            return size - offset;
         }
     }
 };

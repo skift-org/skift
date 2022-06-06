@@ -8,7 +8,7 @@
 
 namespace Karm {
 
-struct CriticalScope : Meta::NoCopy, Meta::NoMove {
+struct CriticalScope : Meta::Static {
     CriticalScope() {
         Embed::criticalEnter();
     }
@@ -49,7 +49,7 @@ struct Lock {
     }
 };
 
-struct LockScope : Meta::NoCopy, Meta::NoMove {
+struct LockScope : Meta::Static {
     Lock &_lock;
 
     LockScope(Lock &lock) : _lock(lock) {

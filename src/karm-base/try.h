@@ -8,7 +8,7 @@
         if (!__expr) {            \
             return __expr.none(); \
         }                         \
-        __expr.unwrap();          \
+        __expr.take();            \
     })
 
 namespace Karm {

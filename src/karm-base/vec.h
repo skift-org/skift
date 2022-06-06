@@ -19,7 +19,7 @@ struct _Vec {
 
     _Vec(size_t cap) : _buf(cap) {}
 
-    _Vec(std::initializer_list<T> &&other) : _buf(std::forward<std::initializer_list<T>>(other)) {}
+    _Vec(std::initializer_list<T> other) : _buf(other) {}
 
     /* --- Collection --- */
 
@@ -93,7 +93,7 @@ struct _Vec {
 
     void pushFront(T const &value) { _buf.insert(T(value)); }
 
-    void pushFront(T &&value) { _buf.insert(0, std::forward<T>(value)); }
+    void pushFront(T &&value) { _buf.insert(0, std::move(value)); }
 
     template <typename... Args>
     void emplaceFront(Args &&...args) { _buf.emplace((args)...); }
@@ -108,10 +108,10 @@ struct _Vec {
 
     void pushBack(T const &value) { insert(len(), value); }
 
-    void pushBack(T &&value) { insert(len(), std::forward<T>(value)); }
+    void pushBack(T &&value) { insert(len(), std::move(value)); }
 
     template <typename... Args>
-    void emplaceBack(Args &&...args) { insert(len(), T(std::forward<Args>(args)...)); }
+    void emplaceBack(Args &&...args) { insert(len(), T(std::move(args)...)); }
 
     T popBack() { return removeAt(len() - 1); }
 

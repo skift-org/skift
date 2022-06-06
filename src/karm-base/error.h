@@ -78,6 +78,13 @@ struct [[nodiscard]] Error {
         return true;
     }
 
+    constexpr bool take() const {
+        if (_code != OK) {
+            panic("take() called on an error");
+        }
+        return true;
+    }
+
     constexpr Str msg() {
         if (_msg.len() > 0) {
             return _msg;

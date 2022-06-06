@@ -6,15 +6,15 @@ struct NoCopy {
     NoCopy() = default;
     NoCopy(NoCopy const &) = delete;
     NoCopy &operator=(NoCopy const &) = delete;
+
+    NoCopy(NoCopy &&) = default;
+    NoCopy &operator=(NoCopy &&) = default;
 };
 
-struct NoMove {
-    NoMove() = default;
-    NoMove(NoMove &&) = delete;
-    NoMove &operator=(NoMove &&) = delete;
-};
-
-struct Stone : NoCopy, NoMove {
+struct Static {
+    Static() = default;
+    Static(Static &&) = delete;
+    Static &operator=(Static &&) = delete;
 };
 
 template <typename T>

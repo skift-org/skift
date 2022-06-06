@@ -109,6 +109,10 @@ struct _String {
         return *this;
     }
 
+    Unit *begin() { return _buf; }
+
+    Unit *end() { return _buf + _len; }
+
     Unit const *begin() const { return _buf; }
 
     Unit const *end() const { return _buf + _len; }
@@ -136,21 +140,21 @@ struct _String {
     Unit const *buf() const { return _buf; }
 
     size_t len() const { return _len; }
-
-    template <::Encoding Target>
-    _String<Target> transcoded() const {
-        size_t len = transcode_len<Encoding, Target>(str());
-        typename Target::Unit *buf = new typename Target::Unit[len + 1];
-        buf[len] = 0;
-
-        Cursor<Unit> input = {_buf, _len};
-        MutCursor<typename Target::Unit> output = {buf, len};
-
-        transcode_units<Encoding, Target>(input, output);
-
-        return {MOVE, buf, len};
-    }
 };
+
+template <::Encoding Target, ::Encoding Source>
+_String<Target> transcode(_Str<Source> str) {
+    size_t len = transcode_len<Source, Target>(str);
+    typename Target::Unit *buf = new typename Target::Unit[len + 1];
+    buf[len] = '\0';
+
+    Cursor<typename Source::Unit> input = str;
+    MutCursor<typename Target::Unit> output = {buf, len};
+
+    transcode_units<Source, Target>(input, output);
+
+    return {MOVE, buf, len};
+}
 
 using Str = _Str<Utf8>;
 

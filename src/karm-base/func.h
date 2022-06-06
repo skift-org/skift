@@ -21,8 +21,8 @@ struct Func<Out(In...)> {
     template <typename F>
     struct Wrap : _Wrap {
         F _f;
-        Wrap(F &&f) : _f(std::forward<F>(f)) {}
-        Out operator()(In... in) override { return _f(std::forward<In>(in)...); }
+        Wrap(F &&f) : _f(std::move(f)) {}
+        Out operator()(In... in) override { return _f(std::move(in)...); }
     };
 
     Box<_Wrap> _wrap;

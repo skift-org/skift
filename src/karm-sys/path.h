@@ -9,6 +9,8 @@ struct Path {
 
     Path() = default;
 
+    Path(char const *str) : _str(str) {}
+
     Path(Str path) : _str(path) {}
 
     Ordr cmp(Path const &other) const {

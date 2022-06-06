@@ -3,12 +3,13 @@
 #include <karm-base/rc.h>
 #include <karm-io/types.h>
 #include <karm-meta/traits.h>
+#include <karm-meta/utils.h>
 
 #include "path.h"
 
 namespace Karm::Sys {
 
-struct Fd {
+struct Fd : Meta::NoCopy {
     virtual ~Fd() = default;
 
     virtual Result<size_t> read(void *buf, size_t size) = 0;

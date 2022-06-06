@@ -3,6 +3,7 @@
 #include <embed/sys.h>
 #include <karm-base/rc.h>
 #include <karm-io/traits.h>
+#include <karm-meta/utils.h>
 
 #include "fd.h"
 #include "path.h"
@@ -12,7 +13,8 @@ namespace Karm::Sys {
 struct File :
     public Io::Reader,
     public Io::Writer,
-    public Io::Seeker {
+    public Io::Seeker,
+    Meta::NoCopy {
 
     Strong<Fd> _fd;
     Path _path;

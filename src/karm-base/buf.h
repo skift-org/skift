@@ -20,7 +20,7 @@ struct Buf {
         _buf = new Inert<T>[cap];
     }
 
-    Buf(std::initializer_list<T> &&other) {
+    Buf(std::initializer_list<T> other) {
         _cap = other.size();
         _len = other.size();
         _buf = new Inert<T>[_cap];
@@ -108,7 +108,7 @@ struct Buf {
         for (size_t i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
         }
-        _buf[index].ctor(std::forward<T>(value));
+        _buf[index].ctor(std::move(value));
         _len++;
     }
 
@@ -179,6 +179,17 @@ struct Buf {
         _len = len;
     }
 
+    void extend(size_t len, T fill) {
+        size_t oldLen = _len;
+        size_t newLen = max(len, _len);
+        ensure(newLen);
+
+        for (size_t i = oldLen; i < newLen; i++) {
+            _buf[i].ctor(fill);
+        }
+        _len += newLen;
+    }
+
     T &at(size_t index) {
         if (index >= _len) {
             panic("index out of bounds");
@@ -227,7 +238,7 @@ struct InlineBuf {
         }
     }
 
-    InlineBuf(std::initializer_list<T> &&other) {
+    InlineBuf(std::initializer_list<T> other) {
         _len = other.size();
         if (_len > N) {
             panic("cap too large");
@@ -296,7 +307,7 @@ struct InlineBuf {
         for (size_t i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
         }
-        _buf[index].ctor(std::forward<T>(value));
+        _buf[index].ctor(std::move(value));
         _len++;
     }
 

@@ -137,7 +137,7 @@ struct ConfigurationTable {
 };
 
 struct SystemTable : public Table {
-    char16_t *firmwareVendor;
+    uint16_t *firmwareVendor;
     uint32_t firmwareRevision;
 
     Handle *consoleInHandle;
@@ -240,7 +240,7 @@ struct BootService : public Table {
     // Miscellaneous Services
     DummyFunction getNextMonotonicCount;
     DummyFunction stall;
-    Function<size_t, uint64_t, size_t, char16_t *> setWatchdogTimer;
+    Function<size_t, uint64_t, size_t, uint16_t *> setWatchdogTimer;
 
     // DriverSupport Services
     DummyFunction connectController;
@@ -248,7 +248,7 @@ struct BootService : public Table {
 
     // Open and Close Protocol Services
     Function<Handle, Uuid *, void **, Handle, Handle, uint32_t> openProtocol;
-    DummyFunction closeProtocol;
+    Function<Handle, Uuid *, Handle, Handle> closeProtocol;
     DummyFunction openProtocolInformation;
 
     // Library Services
@@ -477,7 +477,7 @@ struct FileInfo {
 #define EFI_FILE_ARCHIVE 0x0000000000000020
 #define EFI_FILE_VALID_ATTR 0x0000000000000037
     uint64_t attribute;
-    char16_t fileName[];
+    uint16_t fileName[];
 };
 
 struct FileIoToken {
@@ -490,15 +490,26 @@ struct FileIoToken {
 struct FileProtocol {
     uint64_t revision;
 
-    Method<FileProtocol **, char16_t *, uint64_t, uint64_t> open;
+#define EFI_FILE_MODE_READ 0x0000000000000001
+#define EFI_FILE_MODE_WRITE 0x0000000000000002
+#define EFI_FILE_MODE_CREATE 0x8000000000000000
+
+#define EFI_FILE_READ_ONLY 0x0000000000000001
+#define EFI_FILE_HIDDEN 0x0000000000000002
+#define EFI_FILE_SYSTEM 0x0000000000000004
+#define EFI_FILE_RESERVED 0x0000000000000008
+#define EFI_FILE_DIRECTORY 0x0000000000000010
+#define EFI_FILE_ARCHIVE 0x0000000000000020
+#define EFI_FILE_VALID_ATTR 0x0000000000000037
+    Method<FileProtocol **, uint16_t const *, uint64_t, uint64_t> open;
     Method<> close;
     Method<> del;
     Method<size_t *, void *> read;
-    Method<size_t *, void *> write;
-    Method<size_t *, uint64_t *> getPosition;
-    Method<size_t *, uint64_t> setPosition;
-    Method<size_t *, Uuid *, size_t *, FileInfo *> getInfo;
-    Method<size_t *, Uuid *, size_t *, FileInfo *> setInfo;
+    Method<size_t *, void const *> write;
+    Method<uint64_t *> getPosition;
+    Method<uint64_t> setPosition;
+    Method<Uuid const *, size_t *, FileInfo *> getInfo;
+    Method<Uuid const *, size_t *, FileInfo *> setInfo;
     Method<> flush;
 };
 

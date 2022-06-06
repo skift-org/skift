@@ -179,10 +179,10 @@ bool valid(uint32_t magic, Payload const &payload) {
 
 using EntryPoint = void (*)(uint64_t magic, Payload const *handover);
 
+} // namespace Handover
+
 void entryPoint(uint64_t magic, Handover::Payload const &payload);
 
 extern "C" void _kstart(uint64_t magic, Handover::Payload const *payload) {
     entryPoint(magic, *payload);
 }
-
-} // namespace Handover

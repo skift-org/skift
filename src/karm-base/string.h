@@ -141,6 +141,7 @@ struct _String {
     _String<Target> transcoded() const {
         size_t len = transcode_len<Encoding, Target>(str());
         typename Target::Unit *buf = new typename Target::Unit[len + 1];
+        buf[len] = 0;
 
         Cursor<Unit> input = {_buf, _len};
         MutCursor<typename Target::Unit> output = {buf, len};

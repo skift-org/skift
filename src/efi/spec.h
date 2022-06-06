@@ -70,9 +70,9 @@ enum : size_t {
 #undef ERR
 };
 
-[[gnu::used]] static inline Result<size_t> from_status(Status status) {
+[[gnu::used]] static inline Error from_status(Status status) {
     if ((status & EFI_ERROR) == 0) {
-        return status;
+        return OK;
     }
 
 #define ERR(ERR, CODE)    \
@@ -90,7 +90,7 @@ template <typename... Args>
 struct [[gnu::packed]] Method {
     Status (*func)(void *self, Args...);
 
-    Result<size_t> operator()(void *self, Args... args) {
+    Error operator()(void *self, Args... args) {
         return from_status(func(self, args...));
     }
 };
@@ -101,7 +101,7 @@ template <typename... Args>
 struct [[gnu::packed]] Function {
     Status (*func)(Args...);
 
-    Result<size_t> operator()(Args... args) {
+    Error operator()(Args... args) {
         return from_status(func(args...));
     }
 };
@@ -164,7 +164,7 @@ enum struct AllocateType : uint32_t {
     ADDRESS,
 };
 
-enum struct MemoryType : uint32_t {
+enum struct MemoryType : uint64_t {
     RESERVED_MEMORY_TYPE,
     LOADER_CODE,
     LOADER_DATA,
@@ -224,6 +224,7 @@ struct BootService : public Table {
     DummyFunction reinstallProtocolInterface;
     DummyFunction uninstallProtocolInterface;
     DummyFunction handleProtocol;
+    DummyFunction _reserved;
     DummyFunction registerProtocolNotify;
     DummyFunction locateHandle;
     DummyFunction locateDevicePath;

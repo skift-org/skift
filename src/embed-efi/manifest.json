@@ -12,6 +12,7 @@
     ],
     "deps": [
         "efi",
+        "abi-ms",
         "karm-base"
     ]
 }

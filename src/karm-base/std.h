@@ -6,7 +6,7 @@
 #include "_prelude.h"
 #include <initializer_list>
 
-#ifdef __sk_freestanding__
+#ifdef __meta_freestanding__
 
 #    include <karm-meta/signess.h>
 

@@ -22,6 +22,28 @@ struct Fd {
     virtual Result<Strong<Fd>> dup() = 0;
 };
 
+struct DummyFd : public Fd {
+    Result<size_t> read(void *, size_t) override {
+        notImplemented();
+    }
+
+    Result<size_t> write(void const *, size_t) override {
+        notImplemented();
+    }
+
+    Result<size_t> seek(Io::Seek) override {
+        notImplemented();
+    }
+
+    Result<size_t> flush() override {
+        notImplemented();
+    }
+
+    Result<Strong<Fd>> dup() override {
+        notImplemented();
+    }
+};
+
 template <typename T>
 concept AsFd = requires(T t) {
     { t.fd() } -> Meta::Same<Strong<Fd>>;

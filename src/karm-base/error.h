@@ -71,7 +71,12 @@ struct [[nodiscard]] Error {
 
     constexpr Error none() const { return *this; }
 
-    constexpr Error unwrap() const { return *this; }
+    constexpr bool unwrap() const {
+        if (_code != OK) {
+            panic("unwrap() called on an error");
+        }
+        return true;
+    }
 
     constexpr Str msg() {
         if (_msg.len() > 0) {

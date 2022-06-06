@@ -34,7 +34,7 @@ struct ConOut : public Sys::Fd {
 };
 
 Result<Strong<Sys::Fd>> createIn() {
-    notImplemented();
+    return {makeStrong<Sys::DummyFd>()};
 }
 
 Result<Strong<Sys::Fd>> createOut() {

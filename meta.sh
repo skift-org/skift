@@ -8,6 +8,6 @@ export CCACHE_DIR=".cache/ccache"
 
 if [ -n "$CHECK" ];
 then
-    mypy --config .sk/.mypyconfig --pretty .sk/sk.py
+    mypy --config meta/.mypyconfig --pretty meta/__main__.py
 fi
-/usr/bin/env python3 .sk/sk.py $@
+/usr/bin/env python3 meta $@

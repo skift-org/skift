@@ -7,7 +7,6 @@
 #include "clamp.h"
 #include "panic.h"
 
-
 namespace Karm {
 
 template <typename... Ts>
@@ -87,6 +86,15 @@ struct Var {
         }
 
         return *static_cast<T *>(_buf);
+    }
+
+    template <Meta::Contains<Ts...> T>
+    T const &unwrap() const {
+        if (_index != Meta::indexOf<T, Ts...>()) {
+            panic("Unwrapping wrong type");
+        }
+
+        return *static_cast<T const *>(_buf);
     }
 
     template <Meta::Contains<Ts...> T>

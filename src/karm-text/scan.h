@@ -37,15 +37,11 @@ struct _Scan {
     }
 
     Rune peek(size_t count) {
-        if (ended()) {
-            return '\0';
-        }
-
+        auto save = _cursor;
         next(count);
-
-        Rune r;
-        auto curr = _cursor;
-        return E::decode(r, curr) ? r : U'�';
+        auto r = curr();
+        _cursor = save;
+        return r;
     }
 
     Rune next() {
@@ -57,10 +53,13 @@ struct _Scan {
         return E::decode(r, _cursor) ? r : U'�';
     }
 
-    void next(size_t count) {
+    Rune next(size_t count) {
+        Rune r = '\0';
+
         for (size_t i = 0; i < count; i++) {
-            next();
+            r = next();
         }
+        return r;
     }
 
     bool skip(Rune c) {
@@ -73,14 +72,15 @@ struct _Scan {
     }
 
     bool skip(Str str) {
-        size_t i = 0;
+        auto save = _cursor;
+
         for (auto r : str.runes()) {
-            if (peek(i++) != r) {
+            if (next() != r) {
+                _cursor = save;
                 return false;
             }
         }
 
-        next(str.len());
         return true;
     }
 

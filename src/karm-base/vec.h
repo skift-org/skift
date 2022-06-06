@@ -184,7 +184,7 @@ struct _Vec {
 
     T *end() { return buf() + len(); }
 
-    T const *end() const { return buf() + end(); }
+    T const *end() const { return buf() + len(); }
 };
 
 template <typename T>

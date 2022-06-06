@@ -156,11 +156,9 @@ def enableColors(env: dict):
     if (env["toolchain"] == "clang"):
         env["cflags"] += " -fcolor-diagnostics"
         env["cxxflags"] += " -fcolor-diagnostics"
-        env["ldflags"] += " -fcolor-diagnostics"
     elif (env["toolchain"] == "gcc"):
-        env["cflags"] += " -fdiagnostics-color"
-        env["cxxflags"] += " -fdiagnostics-color"
-        env["ldflags"] += " -fdiagnostics-color"
+        env["cflags"] += " -fdiagnostics-color=alaways"
+        env["cxxflags"] += " -fdiagnostics-color=always"
 
     return env
 
@@ -194,5 +192,7 @@ def load(env: str) -> dict:
     result["bindir"] = f"{result['dir']}/bin"
     result["objdir"] = f"{result['dir']}/obj"
     result["ninjafile"] = result["dir"] + "/build.ninja"
+
+    result = enableColors(result)
 
     return result

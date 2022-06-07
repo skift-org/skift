@@ -3,6 +3,7 @@ import sys
 
 import build
 import utils
+from utils import Colors
 import environments
 
 
@@ -61,7 +62,6 @@ def bootCmd(opts: dict, args: list[str]):
 def buildCmd(opts: dict, args: list[str]):
     env = opts.get('env', 'host')
     if len(args) == 0:
-        print("Building all components")
         build.buildAll(env)
     else:
         print("Building:")
@@ -135,13 +135,17 @@ CMDS = {
 }
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        helpCmd({}, [])
-    else:
-        o = parseOptions(sys.argv[2:])
-        if not sys.argv[1] in CMDS:
-            print(f"Unknown command: {sys.argv[1]}")
-            print("")
-            print(f"Use '{sys.argv[0]} help' for a list of commands")
-            sys.exit(1)
-        CMDS[sys.argv[1]]["func"](o['opts'], o['args'])
+    try:
+        if len(sys.argv) < 2:
+            helpCmd({}, [])
+        else:
+            o = parseOptions(sys.argv[2:])
+            if not sys.argv[1] in CMDS:
+                print(f"Unknown command: {sys.argv[1]}")
+                print("")
+                print(f"Use '{sys.argv[0]} help' for a list of commands")
+                sys.exit(1)
+            CMDS[sys.argv[1]]["func"](o['opts'], o['args'])
+    except utils.CliException as e:
+        print()
+        print(f"{Colors.RED}{e.msg}{Colors.RESET}")

@@ -17,8 +17,9 @@ def loadJsons(basedir: str) -> list[str]:
                         manifest = json.load(f)
                         manifest["dir"] = os.path.dirname(filename)
                         result[manifest["id"]] = manifest
-                except:
-                    raise Exception("Failed to load manifest: " + filename)
+                except Exception as e:
+                    raise utils.CliException(
+                        f"Failed to load manifest {filename}: {e}")
     return result
 
 
@@ -57,11 +58,11 @@ def resolveDeps(manifests: dict) -> dict:
     def resolve(key: str, stack: list[str] = []) -> list[str]:
         result: list[str] = []
         if key in stack:
-            raise Exception("Circular dependency detected: " +
-                            str(stack) + " -> " + key)
+            raise utils.CliException("Circular dependency detected: " +
+                                     str(stack) + " -> " + key)
 
         if not key in manifests:
-            raise Exception("Unknown dependency: " + key)
+            raise utils.CliException("Unknown dependency: " + key)
 
         if "deps" in manifests[key]:
             stack.append(key)
@@ -122,7 +123,7 @@ def prepareInOut(manifests: dict, env: dict) -> dict:
         elif item["type"] == "exe":
             item["out"] = env["bindir"] + "/" + key
         else:
-            raise Exception("Unknown type: " + item["type"])
+            raise utils.CliException("Unknown type: " + item["type"])
 
     for key in manifests:
         item = manifests[key]

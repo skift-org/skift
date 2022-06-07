@@ -1,4 +1,4 @@
-import sys
+from os import environ
 from typing import TextIO
 import json
 
@@ -7,6 +7,7 @@ import manifests as m
 import environments as e
 import copy
 import utils
+from utils import Colors
 
 
 def genNinja(out: TextIO, manifests: dict, env: dict) -> None:
@@ -72,7 +73,7 @@ def prepare(envName: str):
     utils.mkdirP(env["dir"])
     genNinja(open(env["ninjafile"], "w"), manifests, env)
 
-    with open(env["dir"] + "/build.json", "w") as f:
+    with open(env["dir"] + "/meta.json", "w") as f:
         json.dump(manifests, f, indent=4)
 
     with open(env["dir"] + "/env.json", "w") as f:
@@ -83,15 +84,26 @@ def prepare(envName: str):
 
 def buildAll(envName: str):
     environment, _ = prepare(envName)
-    utils.runCmd("ninja",  "-v", "-j", "1", "-f", environment["ninjafile"])
+    print(f"{Colors.BOLD}Building all targets for {envName}{Colors.RESET}")
+    try:
+        utils.runCmd("ninja", "-j", "1", "-f", environment["ninjafile"])
+    except:
+        raise utils.CliException(
+            "Failed to build all for " + environment["key"])
 
 
 def buildOne(envName: str, target: str):
+    print(f"{Colors.BOLD}Building {target} for {envName}{Colors.RESET}")
     environment, manifests = prepare(envName)
 
     if not target in manifests:
-        raise Exception("Unknown target: " + target)
+        raise utils.CliException("Unknown target: " + target)
 
-    utils.runCmd("ninja", "-v", "-j", "1", "-f",
-                 environment["ninjafile"], manifests[target]["out"])
+    try:
+        utils.runCmd("ninja", "-j", "1", "-f",
+                     environment["ninjafile"], manifests[target]["out"])
+    except:
+        raise utils.CliException(
+            f"Failed to build {target} for {environment['key']}")
+
     return manifests[target]["out"]

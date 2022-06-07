@@ -169,7 +169,7 @@ def available():
 
 def load(env: str) -> dict:
     if not env in available():
-        raise Exception("Environment '%s' not available" % env)
+        raise utils.CliException("Environment '%s' not available" % env)
 
     result = copy.deepcopy(ENVIRONMENTS[env])
 

@@ -182,12 +182,14 @@ enum struct MemoryType : uint64_t {
     PERSISTENT_MEMORY,
 
     MAX_MEMORY_TYPE,
+
+    USER = 0x80000000,
 };
 
 struct MemoryDescriptor {
     uint32_t type;
-    uintptr_t physicalStart;
-    uintptr_t virtualStart;
+    size_t physicalStart;
+    size_t virtualStart;
     uint64_t numberOfPages;
     uint64_t attribute;
 };
@@ -205,8 +207,8 @@ struct BootService : public Table {
     DummyFunction lowerTpl;
 
     // Memory Services
-    Function<AllocateType, MemoryType, size_t, uintptr_t *> allocatePages;
-    Function<uintptr_t, size_t> freePages;
+    Function<AllocateType, MemoryType, size_t, size_t *> allocatePages;
+    Function<size_t, size_t> freePages;
     Function<size_t *, MemoryDescriptor *, size_t *, size_t *, uint32_t *> getMemoryMap;
     Function<MemoryType, size_t, void **> allocatePool;
     Function<void *> freePool;
@@ -308,7 +310,7 @@ struct RuntimeService : public Table {
 
 struct DevicePathProtocol;
 
-struct LoadImageProtocol {
+struct LoadedImageProtocol {
     static constexpr Uuid UUID = Uuid{0x5B1B31A1, 0x9562, 0x11d2, {0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B}};
 
     uint32_t revision;
@@ -435,7 +437,7 @@ struct GraphicsOutputProtocolMode {
     uint32_t mode;
     GraphicsOutputModeInformations *info;
     size_t sizeOfInfo;
-    uintptr_t frameBufferBase;
+    size_t frameBufferBase;
     size_t frameBufferSize;
 };
 

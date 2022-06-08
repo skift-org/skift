@@ -1,6 +1,7 @@
 #include <efi/base.h>
 #include <efi/spec.h>
 #include <embed/debug.h>
+#include <karm-base/string.h>
 
 namespace Embed {
 

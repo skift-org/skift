@@ -6,5 +6,10 @@
         "karm-sys",
         "karm-io",
         "karm-fmt"
-    ]
+    ],
+    "requires": {
+        "sys": [
+            "efi"
+        ]
+    }
 }

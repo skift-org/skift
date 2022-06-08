@@ -5,6 +5,9 @@
 
 namespace Handover {
 
+static inline size_t UPPER_HALF = 0xffff800000000000;
+static inline size_t KERNEL_BASE = 0xffffffff80000000;
+
 namespace Utils {
 
 static inline size_t cstrLen(const char *str) {
@@ -46,21 +49,25 @@ enum struct Tag : uint32_t {
 
 using enum Tag;
 
+char const *tagName(Tag tag) {
+    switch (tag) {
+#define ITER(NAME, VALUE) \
+    case Tag::NAME:       \
+        return #NAME;
+        FOREACH_TAG(ITER)
+#undef ITER
+    }
+    return "UNKNOWN";
+}
+
 struct Record {
     Tag tag;
     uint32_t flags;
     uint64_t start;
     uint64_t size;
 
-    char const *tagName() const {
-        switch (tag) {
-#define ITER(NAME, VALUE) \
-    case Tag::NAME:       \
-        return #NAME;
-            FOREACH_TAG(ITER)
-#undef ITER
-        }
-        return "UNKNOWN";
+    char const *name() const {
+        return tagName(tag);
     }
 
     union {
@@ -140,6 +147,10 @@ struct Request {
     Tag tag;
     uint32_t flags;
     uint64_t more;
+
+    char const *name() const {
+        return tagName(tag);
+    }
 };
 
 [[gnu::used]] static constexpr Request requestSelf() { return {Tag::SELF, 0, 0}; }
@@ -149,9 +160,6 @@ struct Request {
 [[gnu::used]] static constexpr Request requestRsdp() { return {Tag::RSDP, 0, 0}; }
 [[gnu::used]] static constexpr Request requestFdt() { return {Tag::FDT, 0, 0}; }
 [[gnu::used]] static constexpr Request requestFb(PixelFormat preferedFormat = PixelFormat::RGBX32) { return {Tag::FB, 0, (uint64_t)preferedFormat}; }
-
-#define HandoverSection$() \
-    [[gnu::used, gnu::section(".handover.requests")]]
 
 bool valid(uint32_t magic, Payload const &payload) {
     if (magic != COOLBOOT) {
@@ -165,6 +173,11 @@ bool valid(uint32_t magic, Payload const &payload) {
     return true;
 }
 
+static constexpr char const *REQUEST_SECTION = ".handover.request";
+
+#define HandoverSection$() \
+    [[gnu::used, gnu::section(".handover.request")]]
+
 // clang-format off
 
 #define HandoverRequests$(...)                          \
@@ -177,12 +190,6 @@ bool valid(uint32_t magic, Payload const &payload) {
 
 // clang-format on
 
-using EntryPoint = void (*)(uint64_t magic, Payload const *handover);
+using EntryPoint [[gnu::sysv_abi]] = void (*)(uint64_t magic, Payload const *handover);
 
 } // namespace Handover
-
-void entryPoint(uint64_t magic, Handover::Payload const &payload);
-
-extern "C" void _kstart(uint64_t magic, Handover::Payload const *payload) {
-    entryPoint(magic, *payload);
-}

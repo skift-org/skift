@@ -50,7 +50,7 @@ static inline void out32(uint16_t port, uint32_t data) {
     asm volatile("outl %0, %1" ::"a"(data), "d"(port));
 }
 
-static inline void invlpg(uintptr_t addr) {
+static inline void invlpg(size_t addr) {
     asm volatile("invlpg (%0)" ::"r"(addr)
                  : "memory");
 }

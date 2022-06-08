@@ -26,12 +26,12 @@ struct [[gnu::packed]] Page {
 
     Page() {}
 
-    Page(uintptr_t addr, uint64_t flags) {
+    Page(size_t addr, uint64_t flags) {
         this->addr(addr);
         this->flags(flags);
     }
 
-    uintptr_t addr() const { return raw & ADDR_MASK; }
+    size_t addr() const { return raw & ADDR_MASK; }
 
     uint64_t flags() const { return raw & FLAGS_MASK; }
 
@@ -54,11 +54,11 @@ struct [[gnu::packed]] Pml {
 
     const Page &operator[](size_t i) const { return pages[i]; }
 
-    size_t virt2index(uintptr_t virt) const {
+    size_t virt2index(size_t virt) const {
         return (virt >> (LEVEL * 9)) & 0x1ff;
     }
 
-    Opt<uintptr_t> virt2phys(uintptr_t virt) const {
+    Opt<size_t> virt2phys(size_t virt) const {
         Page page = pages[virt2index(virt)];
 
         if (!page.present()) {
@@ -73,7 +73,5 @@ struct [[gnu::packed]] Pml {
         return pml->virt2phys(virt);
     }
 };
-
-
 
 } // namespace x86_64

@@ -4,3 +4,6 @@ extern "C" int __cdecl _purecall() {
 
 extern "C" void __cdecl __std_terminate() {
 }
+
+extern "C" void __cdecl __chkstk() {
+}

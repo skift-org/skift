@@ -1,5 +1,7 @@
 #include <efi/base.h>
 #include <embed/sys.h>
+#include <karm-io/funcs.h>
+#include <karm-io/impls.h>
 
 namespace Embed {
 
@@ -100,14 +102,14 @@ Result<Strong<Sys::Fd>> createErr() {
 }
 
 Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
-    static Efi::LoadImageProtocol *loadImage = nullptr;
-    if (!loadImage) {
-        loadImage = try$(Efi::openProtocol<Efi::LoadImageProtocol>());
+    static Efi::LoadedImageProtocol *loadedImage = nullptr;
+    if (!loadedImage) {
+        loadedImage = try$(Efi::openProtocol<Efi::LoadedImageProtocol>());
     }
 
     static Efi::SimpleFileSystemProtocol *fileSystem = nullptr;
     if (!fileSystem) {
-        fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(loadImage->deviceHandle));
+        fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(loadedImage->deviceHandle));
     }
 
     static Efi::FileProtocol *rootDir = nullptr;
@@ -126,6 +128,30 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
     try$(rootDir->open(rootDir, &file, pathStr.buf(), EFI_FILE_MODE_READ, 0));
 
     return {makeStrong<FileProto>(file)};
+}
+
+Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options) {
+    size_t vaddr = 0;
+    try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, options.size / 4096, &vaddr));
+    return USizeRange{vaddr, options.size};
+}
+
+Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd> fd) {
+    size_t vaddr = 0;
+    try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, options.size / 4096, &vaddr));
+    USizeRange range{vaddr, options.size};
+    Io::BufWriter writer{(void *)range.start, range.len()};
+    try$(Io::copy(*fd, writer));
+    return range;
+}
+
+Error memUnmap(void const *buf, size_t len) {
+    try$(Efi::bs()->freePages((uint64_t)buf, len / 4096));
+    return OK;
+}
+
+Error memFlush(void *, size_t) {
+    return OK;
 }
 
 } // namespace Embed

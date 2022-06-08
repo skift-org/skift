@@ -8,13 +8,17 @@ Handle imageHandle();
 
 SystemTable *st();
 
+BootService *bs();
+
+RuntimeService *rt();
+
 void init(Handle handle, SystemTable *st);
 
 template <typename P>
 static inline Result<P *> openProtocol(Handle handle) {
     P *result = nullptr;
     Uuid uuid = P::UUID;
-    try$(st()->boot->openProtocol(handle, &uuid, (void **)&result, imageHandle(), nullptr, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL));
+    try$(bs()->openProtocol(handle, &uuid, (void **)&result, imageHandle(), nullptr, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL));
     return result;
 }
 
@@ -27,7 +31,7 @@ template <typename P>
 static inline Result<P> locateProtocol() {
     P *result = nullptr;
     Uuid uuid = P::UUID;
-    try$(st()->boot->locateProtocol(&uuid, nullptr, &result));
+    try$(bs()->locateProtocol(&uuid, nullptr, &result));
     return result;
 }
 

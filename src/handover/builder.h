@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/range.h>
 #include <karm-base/string.h>
 
 #include "handover.h"
@@ -11,11 +12,11 @@ struct Builder {
     size_t _size;
     char *_string;
 
-    Builder(void *buf, size_t size)
-        : _buf(buf), _size(size) {
+    Builder(MutSlice<uint8_t> slice)
+        : _buf(slice.buf()), _size(slice.len()) {
         payload() = {};
         payload().magic = COOLBOOT;
-        payload().size = size;
+        payload().size = slice.len();
     }
 
     Payload &payload() {
@@ -34,6 +35,16 @@ struct Builder {
         payload().len++;
     }
 
+    void add(Tag tag, uint32_t flags = 0, USizeRange range = {}, uint64_t more = 0) {
+        add(Record{
+            .tag = tag,
+            .flags = flags,
+            .start = range.start,
+            .size = range.len(),
+            .more = more,
+        });
+    }
+
     size_t add(Str str) {
         _string -= str.len() + 1;
         memcpy(_string, str.buf(), str.len());
@@ -43,6 +54,10 @@ struct Builder {
 
     void agent(Str str) {
         payload().agent = add(str);
+    }
+
+    Payload *finalize() {
+        return (Payload *)_buf;
     }
 };
 

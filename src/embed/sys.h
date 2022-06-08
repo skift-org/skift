@@ -1,7 +1,9 @@
 #pragma once
 
 #include <karm-base/cons.h>
+#include <karm-base/range.h>
 #include <karm-sys/fd.h>
+#include <karm-sys/types.h>
 
 namespace Embed {
 
@@ -16,5 +18,13 @@ Result<Strong<Sys::Fd>> createIn();
 Result<Strong<Sys::Fd>> createOut();
 
 Result<Strong<Sys::Fd>> createErr();
+
+Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options);
+
+Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd> fd);
+
+Error memUnmap(void const *buf, size_t len);
+
+Error memFlush(void *flush, size_t len);
 
 } // namespace Embed

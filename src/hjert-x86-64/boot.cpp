@@ -1,4 +1,5 @@
 #include <handover/handover.h>
+#include <handover/main.h>
 
 HandoverRequests$(
     Handover::requestStack(),
@@ -7,5 +8,3 @@ HandoverRequests$(
 
 void entryPoint([[maybe_unused]] uint64_t magic, [[maybe_unused]] Handover::Payload const &payload) {
 }
-
-

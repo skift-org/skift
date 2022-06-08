@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/bytes.h>
 #include <karm-base/clamp.h>
 #include <karm-base/rune.h>
 #include <karm-base/string.h>
@@ -60,6 +61,19 @@ Result<size_t> skip(Readable auto &reader, size_t n) {
 }
 
 /* --- Copy ----------------------------------------------------------------- */
+
+Result<size_t> copyInto(Readable auto &reader, MutBytes bytes) {
+    size_t readed = 0;
+    Byte *data = bytes.buf();
+
+    while (readed < bytes.len()) {
+        auto result = try$(reader.read(data, bytes.len() - readed));
+        readed += result;
+        data += result;
+    }
+
+    return readed;
+}
 
 Result<size_t> copy(Readable auto &reader, Writable auto &writer) {
     uint8_t buffer[4096];

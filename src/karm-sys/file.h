@@ -14,6 +14,7 @@ struct File :
     public Io::Reader,
     public Io::Writer,
     public Io::Seeker,
+    public Io::Flusher,
     Meta::NoCopy {
 
     Strong<Fd> _fd;
@@ -39,6 +40,14 @@ struct File :
 
     Result<size_t> seek(Io::Seek seek) override {
         return _fd->seek(seek);
+    }
+
+    Result<size_t> flush() override {
+        return _fd->flush();
+    }
+
+    Strong<Fd> asFd() {
+        return _fd;
     }
 };
 

@@ -47,7 +47,7 @@ struct DummyFd : public Fd {
 
 template <typename T>
 concept AsFd = requires(T t) {
-    { t.fd() } -> Meta::Same<Strong<Fd>>;
+    { t.asFd() } -> Meta::Same<Strong<Fd>>;
 };
 
 } // namespace Karm::Sys

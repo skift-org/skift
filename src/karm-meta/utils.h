@@ -6,7 +6,6 @@ struct NoCopy {
     NoCopy() = default;
     NoCopy(NoCopy const &) = delete;
     NoCopy &operator=(NoCopy const &) = delete;
-
     NoCopy(NoCopy &&) = default;
     NoCopy &operator=(NoCopy &&) = default;
 };

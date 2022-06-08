@@ -19,6 +19,8 @@ struct Cursor {
 
     Cursor(MutSlice<T> slice) : _begin(slice.begin()), _end(slice.end()) {}
 
+    T const &operator[](size_t i) const { return _begin[i]; }
+
     bool ended() const {
         return _begin >= _end;
     }
@@ -50,6 +52,22 @@ struct Cursor {
 
     operator T const *() {
         return _begin;
+    }
+
+    T const *begin() const {
+        return _begin;
+    }
+
+    T const *end() const {
+        return _end;
+    }
+
+    T const *buf() {
+        return _begin;
+    }
+
+    size_t len() const {
+        return _end - _begin;
     }
 };
 

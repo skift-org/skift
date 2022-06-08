@@ -2,6 +2,7 @@
 
 #include "_prelude.h"
 
+#include "error.h"
 #include "inert.h"
 #include "keywords.h"
 #include "panic.h"
@@ -116,8 +117,12 @@ struct Opt {
         }
     }
 
-    bool none() {
-        return _present;
+    Error none() {
+        if (_present) {
+            return OK;
+        } else {
+            return "unwrapping none";
+        }
     }
 
     T &unwrap() {

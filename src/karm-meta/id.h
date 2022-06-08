@@ -4,7 +4,7 @@
 
 namespace Karm::Meta {
 
-using Id = uintptr_t;
+using Id = size_t;
 
 template <typename T>
 static inline Id makeId() {

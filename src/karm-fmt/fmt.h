@@ -100,6 +100,9 @@ struct Formatter<Str> {
     }
 };
 
+template <>
+struct Formatter<char const *> : public Formatter<Str> {};
+
 struct _Args {
     virtual ~_Args() = default;
     virtual size_t len() = 0;

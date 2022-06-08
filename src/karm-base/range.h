@@ -12,6 +12,11 @@ struct Range {
     T start{};
     T end{};
 
+    Range() = default;
+
+    Range(T start, T end)
+        : start(start), end(end) {}
+
     bool valid() const {
         return start <= end;
     }
@@ -129,6 +134,12 @@ struct RangeAlloc {
         _ranges.pushBack(range);
     }
 };
+
+using I8Range = Range<int8_t>;
+using I16Range = Range<int16_t>;
+using I32Range = Range<int32_t>;
+using I64Range = Range<int64_t>;
+using ISizeRange = Range<ssize_t>;
 
 using U8Range = Range<uint8_t>;
 using U16Range = Range<uint16_t>;

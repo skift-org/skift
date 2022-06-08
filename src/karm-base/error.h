@@ -2,7 +2,7 @@
 
 #include "_prelude.h"
 
-#include "string.h"
+#include "panic.h"
 #include "try.h"
 
 namespace Karm {
@@ -57,13 +57,14 @@ struct [[nodiscard]] Error {
         FOREACH_ERROR(ITER)
 #undef ITER
     } _code;
-    Str _msg{};
+    char const *_msg = nullptr;
 
     using enum Code;
 
     constexpr Error() : _code(Code::OK) {}
     constexpr Error(Code code) : _code(code), _msg("") {}
-    constexpr Error(Code code, Str msg) : _code(code), _msg(msg) {}
+    constexpr Error(char const *msg) : _code(OTHER), _msg(msg) {}
+    constexpr Error(Code code, char const *msg) : _code(code), _msg(msg) {}
 
     operator bool() const { return _code == Code::OK; }
 
@@ -85,8 +86,8 @@ struct [[nodiscard]] Error {
         return true;
     }
 
-    constexpr Str msg() {
-        if (_msg.len() > 0) {
+    constexpr char const *msg() {
+        if (_msg != nullptr) {
             return _msg;
         }
 

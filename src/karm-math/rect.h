@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-base/clamp.h>
+
 #include "vec.h"
 
 namespace Karm::Math {
@@ -26,10 +28,6 @@ union Rect {
     Rect(Vec2<T> xy, Vec2<T> wh) : xy(xy), wh(wh) {
     }
 
-    Vec2<T> min() const { return {x, y}; }
-
-    Vec2<T> max() const { return {x + width, y + height}; }
-
     T start() const { return x; }
 
     void start(T value) {
@@ -45,9 +43,9 @@ union Rect {
         width += d;
     }
 
-    T peekBack() const { return y; }
+    T top() const { return y; }
 
-    void peekBack(T value) {
+    void top(T value) {
         T d = value - y;
         y += d;
         height -= d;
@@ -92,10 +90,10 @@ union Rect {
 
     Rect<T> clipTo(Rect<T> const &r) const {
         return {
-            std::max(x, r.x),
-            std::max(y, r.y),
-            std::min(x + width, r.x + r.width) - std::max(x, r.x),
-            std::min(y + height, r.y + r.height) - std::max(y, r.y)};
+            max(x, r.x),
+            max(y, r.y),
+            min(x + width, r.x + r.width) - max(x, r.x),
+            min(y + height, r.y + r.height) - max(y, r.y)};
     }
 
     T operator[](int i) { return _els[i]; }

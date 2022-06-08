@@ -32,8 +32,8 @@ struct Slice {
 
     constexpr T const *buf() const { return _buf; }
     constexpr size_t len() const { return _len; }
-    constexpr char const *begin() const { return buf(); }
-    constexpr char const *end() const { return buf() + len(); }
+    constexpr T const *begin() const { return buf(); }
+    constexpr T const *end() const { return buf() + len(); }
 
     constexpr auto iter() const {
         return Iter([&, i = 0uz]() mutable -> T const * {

@@ -1,7 +1,9 @@
 #pragma once
 
+#include <karm-base/bytes.h>
 #include <karm-base/clamp.h>
 #include <karm-base/result.h>
+#include <karm-base/slice.h>
 
 #include "traits.h"
 #include "types.h"
@@ -59,12 +61,12 @@ struct Limite : public Reader {
 };
 
 template <SeekableWritable Writable>
-struct Slice : public Writer, public Seeker {
+struct WriterSlice : public Writer, public Seeker {
     Writable _writer;
     size_t _start;
     size_t _end;
 
-    Slice(Writable writer, size_t start, size_t end) : _writer(writer), _start(start), _end(end) {}
+    WriterSlice(Writable writer, size_t start, size_t end) : _writer(writer), _start(start), _end(end) {}
 
     Result<size_t> seek(Seek seek) override {
         size_t pos = try$(tell(_writer));
@@ -86,6 +88,54 @@ struct Slice : public Writer, public Seeker {
         }
 
         return try$(_writer.write(data, size));
+    }
+};
+
+struct BufReader :
+    public Reader,
+    public Seeker {
+    Bytes _buf;
+    size_t _pos;
+
+    BufReader(Bytes buf) : _buf(buf), _pos(0) {}
+
+    BufReader(void *buf, size_t size) : _buf(buf, size), _pos(0) {}
+
+    Result<size_t> read(void *data, size_t size) override {
+        size_t read = min(size, _buf.len() - _pos);
+        memcpy(data, _buf.buf() + _pos, read);
+        _pos += read;
+        return read;
+    }
+
+    Result<size_t> seek(Seek seek) override {
+        _pos = seek.apply(_pos, _buf.len());
+        _pos = clamp(_pos, 0uz, _buf.len());
+        return _pos;
+    }
+};
+
+struct BufWriter :
+    public Writer,
+    public Seeker {
+    Bytes _buf;
+    size_t _pos;
+
+    BufWriter(Bytes buf) : _buf(buf), _pos(0) {}
+
+    BufWriter(void *buf, size_t len) : _buf(buf, len), _pos(0) {}
+
+    Result<size_t> seek(Seek seek) override {
+        _pos = seek.apply(_pos, _buf.len());
+        _pos = clamp(_pos, 0uz, _buf.len());
+        return _pos;
+    }
+
+    Result<size_t> write(void const *data, size_t size) override {
+        size_t write = min(size, _buf.len() - _pos);
+        memcpy((void *)(_buf.buf() + _pos), data, write);
+        _pos += write;
+        return write;
     }
 };
 

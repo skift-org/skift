@@ -7,7 +7,7 @@ namespace x86_64 {
 
 static constexpr size_t PAGE_SIZE = 0x1000;
 
-struct [[gnu::packed]] Page {
+struct [[gnu::packed]] Entry {
 
     static constexpr uint64_t PRESENT = 1;
     static constexpr uint64_t WRITE = 1 << 1;
@@ -24,14 +24,19 @@ struct [[gnu::packed]] Page {
 
     uint64_t raw;
 
-    Page() {}
+    Entry() {}
 
-    Page(size_t addr, uint64_t flags) {
+    Entry(size_t addr, uint64_t flags) {
         this->addr(addr);
         this->flags(flags);
     }
 
     size_t addr() const { return raw & ADDR_MASK; }
+
+    template <typename T>
+    T *as() {
+        return (T *)addr();
+    }
 
     uint64_t flags() const { return raw & FLAGS_MASK; }
 
@@ -48,18 +53,18 @@ template <size_t L>
 struct [[gnu::packed]] Pml {
     constexpr static size_t LEVEL = L;
 
-    Page pages[512];
+    Entry pages[512];
 
-    Page &operator[](size_t i) { return pages[i]; }
+    Entry &operator[](size_t i) { return pages[i]; }
 
-    const Page &operator[](size_t i) const { return pages[i]; }
+    const Entry &operator[](size_t i) const { return pages[i]; }
 
     size_t virt2index(size_t virt) const {
         return (virt >> (LEVEL * 9)) & 0x1ff;
     }
 
     Opt<size_t> virt2phys(size_t virt) const {
-        Page page = pages[virt2index(virt)];
+        Entry page = pages[virt2index(virt)];
 
         if (!page.present()) {
             return NONE;
@@ -71,6 +76,14 @@ struct [[gnu::packed]] Pml {
 
         auto *pml = (Pml<L - 1> *)page.addr();
         return pml->virt2phys(virt);
+    }
+
+    Entry PageAt(size_t vaddr) {
+        return pages[virt2index(vaddr)];
+    }
+
+    void putPage(size_t vaddr, Entry page) {
+        pages[virt2index(vaddr)] = page;
     }
 };
 

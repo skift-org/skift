@@ -8,7 +8,8 @@
 
 namespace Hal {
 
-enum VmmFlags : uint64_t {
+enum struct VmmFlags : uint64_t {
+    NONE = 0,
     READ = (1 << 0),
     WRITE = (1 << 1),
     EXEC = (1 << 2),

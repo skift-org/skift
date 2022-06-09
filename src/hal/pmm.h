@@ -6,10 +6,11 @@
 
 namespace Hal {
 
-enum PmmFlags : uint64_t {
+enum struct PmmFlags : uint64_t {
+    NONE = 0,
     LOWER = (1 << 0),
     UPPER = (1 << 1),
-    DMW = (1 << 2),
+    DMA = (1 << 2),
 };
 
 FlagsEnum$(PmmFlags);

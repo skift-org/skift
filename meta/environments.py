@@ -141,7 +141,7 @@ def enableCache(env: dict) -> dict:
     return env
 
 
-def enableSan(env: dict):
+def enableSan(env: dict) -> dict:
     if (env["freestanding"]):
         return env
     env = copy.deepcopy(env)
@@ -151,7 +151,7 @@ def enableSan(env: dict):
     return env
 
 
-def enableColors(env: dict):
+def enableColors(env: dict) -> dict:
     env = copy.deepcopy(env)
     if (env["toolchain"] == "clang"):
         env["cflags"] += " -fcolor-diagnostics"
@@ -163,7 +163,7 @@ def enableColors(env: dict):
     return env
 
 
-def available():
+def available() -> list:
     return list(ENVIRONMENTS.keys())
 
 

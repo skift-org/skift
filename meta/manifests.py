@@ -1,4 +1,3 @@
-from functools import cache
 import os
 import json
 import copy
@@ -6,7 +5,7 @@ import copy
 import utils
 
 
-def loadJsons(basedir: str) -> list[str]:
+def loadJsons(basedir: str) -> dict:
     result = {}
     for root, dirs, files in os.walk(basedir):
         for filename in files:
@@ -23,7 +22,7 @@ def loadJsons(basedir: str) -> list[str]:
     return result
 
 
-def filter(manifests: dict, env: dict) -> list:
+def filter(manifests: dict, env: dict) -> dict:
     result = {}
     for id in manifests:
         manifest = manifests[id]
@@ -132,7 +131,7 @@ def prepareInOut(manifests: dict, env: dict) -> dict:
     return manifests
 
 
-def cincludes(manifests: dict) -> dict:
+def cincludes(manifests: dict) -> str:
     include_paths = []
 
     for key in manifests:
@@ -149,7 +148,7 @@ def cincludes(manifests: dict) -> dict:
 cache: dict = {}
 
 
-def loadAll(basedir: str, env: dict) -> list[dict]:
+def loadAll(basedir: str, env: dict) -> dict:
     cacheKey = basedir + ":" + env["id"]
     if cacheKey in cache:
         return cache[cacheKey]

@@ -1,5 +1,5 @@
 from os import environ
-from typing import TextIO
+from typing import TextIO, Tuple
 import json
 
 import ninja
@@ -67,7 +67,7 @@ def genNinja(out: TextIO, manifests: dict, env: dict) -> None:
     writer.build("all", "phony", all)
 
 
-def prepare(envName: str):
+def prepare(envName: str) -> Tuple[dict, dict]:
     env = e.load(envName)
     manifests = m.loadAll(".", env)
     utils.mkdirP(env["dir"])
@@ -82,7 +82,7 @@ def prepare(envName: str):
     return env, manifests
 
 
-def buildAll(envName: str):
+def buildAll(envName: str) -> None:
     environment, _ = prepare(envName)
     print(f"{Colors.BOLD}Building all targets for {envName}{Colors.RESET}")
     try:
@@ -92,7 +92,7 @@ def buildAll(envName: str):
             "Failed to build all for " + environment["key"])
 
 
-def buildOne(envName: str, target: str):
+def buildOne(envName: str, target: str) -> str:
     print(f"{Colors.BOLD}Building {target} for {envName}{Colors.RESET}")
     environment, manifests = prepare(envName)
 

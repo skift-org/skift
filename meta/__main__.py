@@ -29,7 +29,7 @@ def parseOptions(args: list[str]) -> dict:
     return result
 
 
-def runCmd(opts: dict, args: list[str]):
+def runCmd(opts: dict, args: list[str]) -> None:
     if len(args) == 0:
         print("Usage: meta run <component>")
         sys.exit(1)
@@ -38,7 +38,7 @@ def runCmd(opts: dict, args: list[str]):
     utils.runCmd(out, *args[1:])
 
 
-def bootCmd(opts: dict, args: list[str]):
+def bootCmd(opts: dict, args: list[str]) -> None:
     imageDir = utils.mkdirP(".build/image")
     bootDir = utils.mkdirP(".build/image/EFI/BOOT")
 
@@ -52,6 +52,7 @@ def bootCmd(opts: dict, args: list[str]):
 
     utils.runCmd(
         "qemu-system-x86_64",
+        "-enable-kvm",
         "-serial", "mon:stdio",
         "-bios", ovmf,
         "-m", "512",
@@ -59,7 +60,7 @@ def bootCmd(opts: dict, args: list[str]):
         "-drive", f"file=fat:rw:{imageDir},media=disk,format=raw")
 
 
-def buildCmd(opts: dict, args: list[str]):
+def buildCmd(opts: dict, args: list[str]) -> None:
     env = opts.get('env', 'host')
     if len(args) == 0:
         build.buildAll(env)
@@ -70,21 +71,21 @@ def buildCmd(opts: dict, args: list[str]):
             build.buildOne(env, component)
 
 
-def cleanCmd(opts: dict, args: list[str]):
+def cleanCmd(opts: dict, args: list[str]) -> None:
     shutil.rmtree(".build", ignore_errors=True)
 
 
-def nukeCmd(opts: dict, args: list[str]):
+def nukeCmd(opts: dict, args: list[str]) -> None:
     shutil.rmtree(".build", ignore_errors=True)
     shutil.rmtree(".cache", ignore_errors=True)
 
 
-def idCmd(opts: dict, args: list[str]):
+def idCmd(opts: dict, args: list[str]) -> None:
     import random
     print(hex(random.randint(0, 2**64)))
 
 
-def helpCmd(opts: dict, args: list[str]):
+def helpCmd(opts: dict, args: list[str]) -> None:
     print(f"Usage: {sys.argv[0]} <command> [options...] [<args...>]")
     print("")
 
@@ -146,6 +147,8 @@ if __name__ == "__main__":
                 print(f"Use '{sys.argv[0]} help' for a list of commands")
                 sys.exit(1)
             CMDS[sys.argv[1]]["func"](o['opts'], o['args'])
+            sys.exit(0)
     except utils.CliException as e:
         print()
         print(f"{Colors.RED}{e.msg}{Colors.RESET}")
+        sys.exit(1)

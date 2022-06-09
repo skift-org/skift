@@ -93,7 +93,7 @@ def objKey(obj: dict, keys: list[str]) -> str:
     return "-".join(toKey)
 
 
-def mkdirP(path):
+def mkdirP(path: str) -> str:
     try:
         os.makedirs(path)
     except OSError as exc:
@@ -128,7 +128,7 @@ def downloadFile(url: str) -> str:
         raise Exception(f"Failed to download {url}")
 
 
-def runCmd(*args: list[str]) -> bool:
+def runCmd(*args: str) -> bool:
     proc = subprocess.run(args)
     if proc.returncode != 0:
         raise Exception(f"Failed to run {' '.join(args)}")

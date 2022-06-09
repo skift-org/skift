@@ -5,8 +5,8 @@
 
 namespace Handover {
 
-static inline size_t UPPER_HALF = 0xffff800000000000;
 static inline size_t KERNEL_BASE = 0xffffffff80000000;
+static inline size_t UPPER_HALF = 0xffff800000000000;
 
 namespace Utils {
 
@@ -49,7 +49,7 @@ enum struct Tag : uint32_t {
 
 using enum Tag;
 
-char const *tagName(Tag tag) {
+static char const *tagName(Tag tag) {
     switch (tag) {
 #define ITER(NAME, VALUE) \
     case Tag::NAME:       \
@@ -161,7 +161,7 @@ struct Request {
 [[gnu::used]] static constexpr Request requestFdt() { return {Tag::FDT, 0, 0}; }
 [[gnu::used]] static constexpr Request requestFb(PixelFormat preferedFormat = PixelFormat::RGBX32) { return {Tag::FB, 0, (uint64_t)preferedFormat}; }
 
-bool valid(uint32_t magic, Payload const &payload) {
+static inline bool valid(uint32_t magic, Payload const &payload) {
     if (magic != COOLBOOT) {
         return false;
     }

@@ -221,6 +221,10 @@ struct Buf {
     size_t cap() const {
         return _cap;
     }
+
+    size_t size() const {
+        return _len * sizeof(T);
+    }
 };
 
 template <typename _T, size_t N>
@@ -376,6 +380,10 @@ struct InlineBuf {
 
     size_t cap() const {
         return N;
+    }
+
+    size_t size() const {
+        return _len * sizeof(T);
     }
 };
 

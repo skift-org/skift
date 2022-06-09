@@ -62,12 +62,16 @@ struct Cursor {
         return _end;
     }
 
-    T const *buf() {
+    T const *buf() const {
         return _begin;
     }
 
     size_t len() const {
         return _end - _begin;
+    }
+
+    size_t size() const {
+        return len() * sizeof(T);
     }
 };
 
@@ -121,6 +125,38 @@ struct MutCursor {
 
     operator T const *() const {
         return _begin;
+    }
+
+    T const *begin() const {
+        return _begin;
+    }
+
+    T const *end() const {
+        return _end;
+    }
+
+    T *begin() {
+        return _begin;
+    }
+
+    T *end() {
+        return _end;
+    }
+
+    T *buf() {
+        return _begin;
+    }
+
+    T const *buf() const {
+        return _begin;
+    }
+
+    size_t len() const {
+        return _end - _begin;
+    }
+
+    size_t size() const {
+        return len() * sizeof(T);
     }
 };
 

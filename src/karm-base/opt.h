@@ -125,16 +125,16 @@ struct Opt {
         }
     }
 
-    T &unwrap() {
+    T &unwrap(const char *msg = "unwraping none") {
         if (!_present) {
-            panic("Unwrapping None");
+            panic(msg);
         }
         return _value.unwrap();
     }
 
     T take() {
         if (!_present) {
-            panic("Taking None");
+            panic("taking from none");
         }
         T v = _value.take();
         release();

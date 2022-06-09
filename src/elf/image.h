@@ -7,10 +7,11 @@
 
 namespace Elf {
 
-struct SectionHeader {
+struct [[gnu::packed]] SectionHeader {
     uint32_t name;
     uint32_t type;
     uint64_t flags;
+
     uint64_t addr;
     uint64_t offset;
     uint64_t size;
@@ -40,7 +41,7 @@ enum struct ProgramFlags : uint32_t {
 
 FlagsEnum$(ProgramFlags);
 
-struct ProgramHeader {
+struct [[gnu::packed]] ProgramHeader {
     ProgramType type;
     ProgramFlags flags;
     uint64_t offset;
@@ -51,7 +52,7 @@ struct ProgramHeader {
     uint64_t align;
 };
 
-struct Symbol {
+struct [[gnu::packed]] Symbol {
     uint32_t name;
     uint8_t info;
     uint8_t other;
@@ -60,39 +61,59 @@ struct Symbol {
     uint64_t size;
 };
 
-struct Header {
+struct [[gnu::packed]] Ident {
     uint8_t magic[4];
-    uint8_t class_;
+    uint8_t klass;
     uint8_t data;
     uint8_t version;
     uint8_t os_abi;
     uint8_t abi_version;
     uint8_t padding[7];
+};
+
+struct [[gnu::packed]] ImageHeader {
+    Ident ident;
+
     uint16_t type;
     uint16_t machine;
-    uint32_t version_;
-    uint32_t entry;
-    uint32_t phoff;
-    uint32_t shoff;
+    uint32_t version;
+
+    uint64_t entry;
+
+    uint64_t phoff;
+    uint64_t shoff;
+
     uint32_t flags;
     uint16_t ehsize;
+
     uint16_t phentsize;
     uint16_t phnum;
+
     uint16_t shentsize;
     uint16_t shnum;
+
     uint16_t shstrndx;
 
     SectionHeader *sectionAt(size_t index) {
-        return (SectionHeader *)((uint8_t const *)this + shoff + index * shentsize);
+        size_t offset = shoff + index * shentsize;
+        return (SectionHeader *)((uint8_t *)this + offset);
+    }
+
+    ProgramHeader *programAt(size_t index) {
+        size_t offset = phoff + index * phentsize;
+        return (ProgramHeader *)((uint8_t *)this + offset);
     }
 
     Str stringAt(size_t offset) {
-        return Str{(char const *)this + sectionAt(shentsize)->offset + offset};
+        if (offset == 0) {
+            return "<null>";
+        }
+        return Str{(char const *)this + sectionAt(shstrndx)->offset + offset};
     }
 };
 
 struct Section {
-    Header *_base;
+    ImageHeader *_base;
     SectionHeader *_header;
 
     Str name() {
@@ -103,7 +124,7 @@ struct Section {
         return (void *)((uint8_t const *)_base + _header->offset);
     }
 
-    size_t len() {
+    size_t size() {
         return _header->size;
     }
 
@@ -114,17 +135,17 @@ struct Section {
 
     template <typename T>
     MutSlice<T> slice() {
-        return MutSlice<T>{(T *)buf(), len()};
+        return MutSlice<T>{(T *)buf(), size() / sizeof(T)};
     }
 
     template <typename T>
     Cursor<T> cursor() {
-        return Cursor<T>{(T *)buf(), len()};
+        return Cursor<T>{(T *)buf(), size() / sizeof(T)};
     }
 };
 
 struct Program {
-    Header *_base;
+    ImageHeader *_base;
     ProgramHeader *_header;
 
     using enum ProgramType;
@@ -145,7 +166,7 @@ struct Program {
         return (void *)((uint8_t const *)_base + _header->offset);
     }
 
-    size_t len() const {
+    size_t filez() const {
         return _header->filesz;
     }
 
@@ -165,55 +186,50 @@ struct Image {
         : _cursor(cursor) {}
 
     bool valid() const {
-        return _cursor.rem() >= sizeof(Header) &&
+        return _cursor.rem() >= sizeof(ImageHeader) &&
                _cursor[0] == '\x7f' &&
                _cursor[1] == 'E' &&
                _cursor[2] == 'L' &&
                _cursor[3] == 'F';
     }
 
-    Header &header() {
-        return *(Header *)_cursor.buf();
+    ImageHeader &header() {
+        return *(ImageHeader *)_cursor.buf();
     }
 
     auto sections() {
-        size_t shentsize = header().shentsize;
-        SectionHeader *curr = (SectionHeader *)(_cursor.buf() + header().shoff);
-        SectionHeader *end = (SectionHeader *)(_cursor.buf() + header().shoff + header().shnum * header().shentsize);
-
-        return Iter([base = &header(), shentsize, curr, end]() mutable -> Opt<Section> {
-            if (curr >= end) {
+        return Iter([header = &header(), index = 0]() mutable -> Opt<Section> {
+            if (index >= header->shnum) {
                 return NONE;
             }
 
-            auto r = curr;
-            curr = (SectionHeader *)((uint8_t *)curr + shentsize);
-            return Section{base, r};
+            auto section = Section{header, header->sectionAt(index)};
+            index++;
+            return section;
         });
     }
 
     Opt<Section> sectionByName(Str name) {
         for (auto &section : sections()) {
-            if (Op::eq(section.name(), name)) {
+            Str n = section.name();
+
+            if (Op::eq(n, name)) {
                 return section;
             }
         }
+
         return NONE;
     }
 
     auto programs() {
-        size_t phentsize = header().phentsize;
-        ProgramHeader *curr = (ProgramHeader *)(_cursor.buf() + header().phoff);
-        ProgramHeader *end = (ProgramHeader *)(_cursor.buf() + header().phoff + header().phnum * header().phentsize);
-
-        return Iter([base = &header(), phentsize, curr, end]() mutable -> Opt<Program> {
-            if (curr >= end) {
+        return Iter([header = &header(), index = 0]() mutable -> Opt<Program> {
+            if (index >= header->phnum) {
                 return NONE;
             }
 
-            auto r = curr;
-            curr = (ProgramHeader *)((uint8_t *)curr + phentsize);
-            return Program{base, r};
+            auto program = Program{header, header->programAt(index)};
+            index++;
+            return program;
         });
     }
 

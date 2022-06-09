@@ -53,6 +53,9 @@ def bootCmd(opts: dict, args: list[str]) -> None:
     utils.runCmd(
         "qemu-system-x86_64",
         "-enable-kvm",
+        "-no-reboot",
+        "-no-shutdown",
+        "-d", "cpu_reset,guest_errors",
         "-serial", "mon:stdio",
         "-bios", ovmf,
         "-m", "512",

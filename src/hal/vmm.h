@@ -31,7 +31,7 @@ struct Vmm {
 
     virtual ~Vmm() = default;
 
-    virtual Error map(PmmRange paddr, VmmRange vaddr, VmmFlags flags) = 0;
+    virtual Error map(VmmRange vaddr, PmmRange paddr, VmmFlags flags) = 0;
 
     virtual Error unmap(VmmRange vaddr) = 0;
 

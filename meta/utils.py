@@ -125,12 +125,12 @@ def downloadFile(url: str) -> str:
         os.rename(tmp, dest)
         return dest
     except:
-        raise Exception(f"Failed to download {url}")
+        raise CliException(f"Failed to download {url}")
 
 
 def runCmd(*args: str) -> bool:
     proc = subprocess.run(args)
     if proc.returncode != 0:
-        raise Exception(f"Failed to run {' '.join(args)}")
+        raise CliException(f"Failed to run {' '.join(args)}")
 
     return True

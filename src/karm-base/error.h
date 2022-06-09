@@ -61,7 +61,6 @@ struct [[nodiscard]] Error {
 
     using enum Code;
 
-    constexpr Error() : _code(Code::OK) {}
     constexpr Error(Code code) : _code(code), _msg("") {}
     constexpr Error(char const *msg) : _code(OTHER), _msg(msg) {}
     constexpr Error(Code code, char const *msg) : _code(code), _msg(msg) {}
@@ -72,9 +71,9 @@ struct [[nodiscard]] Error {
 
     constexpr Error none() const { return *this; }
 
-    constexpr bool unwrap() const {
+    constexpr bool unwrap(char const *msg = "unwraping an error") const {
         if (_code != OK) {
-            panic("unwrap() called on an error");
+            panic(msg);
         }
         return true;
     }

@@ -29,7 +29,7 @@ struct Range {
         return !empty();
     }
 
-    T len() const {
+    T size() const {
         return end - start;
     }
 
@@ -100,7 +100,7 @@ struct RangeAlloc {
 
     Opt<Range<T>> alloc(T size) {
         for (auto &range : _ranges) {
-            if (range.len() >= size) {
+            if (range.size() >= size) {
                 Range result = {
                     range.start,
                     range.start + size,

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/algos.h>
 #include <karm-base/array.h>
 #include <karm-base/result.h>
 #include <karm-base/rune.h>
@@ -46,13 +47,22 @@ struct NumberFormater {
     }
 
     Result<size_t> format_unsigned(Io::Writer &writer, uint64_t value) {
+        auto digit = [](size_t v) {
+            if (v < 10) {
+                return '0' + v;
+            } else {
+                return 'a' + (v - 10);
+            }
+        };
         size_t i = 0;
         Array<uint8_t, 65> buf;
 
         do {
-            buf[i++] = value % base + '0';
+            buf[i++] = digit(value % base);
             value /= base;
         } while (value != 0);
+
+        reverse(buf.sub(0, i));
 
         return writer.write(buf.buf(), buf.len());
     }

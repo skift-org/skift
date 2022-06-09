@@ -1,5 +1,6 @@
 #include <efi/base.h>
 #include <embed/sys.h>
+#include <karm-base/align.h>
 #include <karm-io/funcs.h>
 #include <karm-io/impls.h>
 
@@ -41,7 +42,7 @@ struct FileProto : public Sys::Fd {
 
     ~FileProto() {
         if (_proto) {
-            _proto->close(_proto).unwrap();
+            _proto->close(_proto).unwrap("close() failled");
         }
     }
 
@@ -132,21 +133,21 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
 
 Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options) {
     size_t vaddr = 0;
-    try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, options.size / 4096, &vaddr));
+    try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, alignUp(options.size, 4096) / 4096, &vaddr));
     return USizeRange{vaddr, options.size};
 }
 
 Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd> fd) {
     size_t vaddr = 0;
-    try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, options.size / 4096, &vaddr));
+    try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, alignUp(try$(Io::size(*fd)), 4096) / 4096, &vaddr));
     USizeRange range{vaddr, options.size};
-    Io::BufWriter writer{(void *)range.start, range.len()};
+    Io::BufWriter writer{(void *)range.start, range.size()};
     try$(Io::copy(*fd, writer));
     return range;
 }
 
-Error memUnmap(void const *buf, size_t len) {
-    try$(Efi::bs()->freePages((uint64_t)buf, len / 4096));
+Error memUnmap(void const *buf, size_t size) {
+    try$(Efi::bs()->freePages((uint64_t)buf, size / 4096));
     return OK;
 }
 

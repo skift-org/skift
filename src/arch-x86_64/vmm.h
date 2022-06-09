@@ -2,18 +2,20 @@
 
 #include <hal/pmm.h>
 #include <hal/vmm.h>
+#include <karm-sys/chan.h>
 
-#include <arch-x86_64/asm.h>
-
+#include "asm.h"
 #include "paging.h"
 
 namespace x86_64 {
 
 struct Vmm : public Hal::Vmm {
     Hal::Pmm &_pmm;
-    Pml<4> *_pml4;
+    Pml<4> *_pml4 = nullptr;
 
-    Vmm(Hal::Pmm &pmm) : _pmm(pmm) {}
+    Vmm(Hal::Pmm &pmm, Pml<4> *pml4)
+        : _pmm(pmm),
+          _pml4(pml4) {}
 
     template <size_t L>
     Result<Pml<L> *> pml(Pml<L + 1> &upper, size_t vaddr) {
@@ -36,7 +38,7 @@ struct Vmm : public Hal::Vmm {
 
         size_t lower = try$(_pmm.alloc(PAGE_SIZE, Hal::PmmFlags::NONE)).start;
         memset((void *)lower, 0, PAGE_SIZE);
-        upper.putPage(vaddr, {lower, Entry::WRITE});
+        upper.putPage(vaddr, {lower, Entry::WRITE | Entry::PRESENT});
         return (Pml<L> *)lower;
     }
 
@@ -56,15 +58,20 @@ struct Vmm : public Hal::Vmm {
         return OK;
     }
 
-    Error map(Hal::PmmRange paddr, Hal::VmmRange vaddr, Hal::VmmFlags flags) override {
-        for (size_t page = 0; page < vaddr.len(); page += PAGE_SIZE) {
+    Error map(Hal::VmmRange vaddr, Hal::PmmRange paddr, Hal::VmmFlags flags) override {
+        if (paddr.size() != vaddr.size()) {
+            return Error::INVALID_INPUT;
+        }
+
+        Sys::println("map: paddr: {x} vaddr: {x}  size: {x}", paddr.start, vaddr.start, paddr.size());
+        for (size_t page = 0; page < vaddr.size(); page += PAGE_SIZE) {
             try$(mapPage(vaddr.start + page, paddr.start + page, flags));
         }
         return flush(vaddr);
     }
 
     Error unmap(Hal::VmmRange vaddr) override {
-        for (size_t page = 0; page < vaddr.len(); page += PAGE_SIZE) {
+        for (size_t page = 0; page < vaddr.size(); page += PAGE_SIZE) {
             try$(unmapPage(vaddr.start + page));
         }
         return flush(vaddr);
@@ -75,7 +82,7 @@ struct Vmm : public Hal::Vmm {
     }
 
     Error flush(Hal::VmmRange vaddr) override {
-        for (size_t i = 0; i < vaddr.len(); i += PAGE_SIZE) {
+        for (size_t i = 0; i < vaddr.size(); i += PAGE_SIZE) {
             x86_64::invlpg(vaddr.start + i);
         }
 

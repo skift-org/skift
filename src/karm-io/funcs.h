@@ -80,16 +80,18 @@ Result<size_t> copy(Readable auto &reader, Writable auto &writer) {
     size_t result = 0;
     while (true) {
         auto read = try$(reader.read(buffer, sizeof(buffer)));
+
         if (read == 0) {
-            break;
+            return result;
         }
+
         result += read;
         auto written = try$(writer.write(buffer, read));
+
         if (written != read) {
             return result;
         }
     }
-    return result;
 }
 
 Result<size_t> copy(Readable auto &reader, Writable auto &writer, size_t size) {

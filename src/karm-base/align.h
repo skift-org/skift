@@ -8,8 +8,7 @@ namespace Karm {
 // ex: 8 with align = 8 -> 8
 // ex: 9 with align = 8 -> 8
 // ex: 7 with align = 8 -> 0
-template <typename T>
-T align_down(T addr, size_t align) {
+static inline size_t alignDown(size_t addr, size_t align) {
     return addr & ~(align - 1);
 }
 
@@ -17,9 +16,12 @@ T align_down(T addr, size_t align) {
 // ex: 8 with align = 8 -> 8
 // ex: 9 with align = 8 -> 16
 // ex: 7 with align = 8 -> 8
-template <typename T>
-T align_up(T addr, size_t align) {
+static inline size_t alignUp(size_t addr, size_t align) {
     return (addr + align - 1) & ~(align - 1);
+}
+
+static inline bool isAlign(size_t addr, size_t align) {
+    return alignDown(addr, align) == addr;
 }
 
 } // namespace Karm

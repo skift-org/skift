@@ -17,15 +17,31 @@ struct EfiPmm : public Hal::Pmm {
     }
 
     Error free(Hal::PmmRange range) override {
-        try$(Efi::bs()->freePages((uint64_t)range.start, range.len() / 4096));
+        try$(Efi::bs()->freePages((uint64_t)range.start, range.size() / 4096));
         return OK;
     }
 };
 
 static EfiPmm pmm{};
 
-Strong<Hal::Vmm> createVmm() {
-    return makeStrong<x86_64::Vmm>(pmm);
+Result<Strong<Hal::Vmm>> createVmm() {
+    size_t upper = try$(pmm.alloc(x86_64::PAGE_SIZE, Hal::PmmFlags::NONE)).start;
+    memset((void *)upper, 0, x86_64::PAGE_SIZE);
+    return {makeStrong<x86_64::Vmm>(pmm, (x86_64::Pml<4> *)upper)};
+}
+
+Error finalizeHandover(Handover::Builder &) {
+    size_t mmapSize = 0;
+    size_t key = 0;
+    size_t descSize = 0;
+    uint32_t descVersion = 0;
+
+    // NOTE: This is expectected to fail
+    (void)Efi::bs()->getMemoryMap(&mmapSize, nullptr, &key, &descSize, &descVersion);
+
+    try$(Efi::bs()->exitBootServices(Efi::imageHandle(), key));
+
+    return OK;
 }
 
 } // namespace Loader::Fw

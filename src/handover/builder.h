@@ -40,7 +40,7 @@ struct Builder {
             .tag = tag,
             .flags = flags,
             .start = range.start,
-            .size = range.len(),
+            .size = range.size(),
             .more = more,
         });
     }

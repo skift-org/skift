@@ -57,11 +57,12 @@ struct [[nodiscard]] Error {
         FOREACH_ERROR(ITER)
 #undef ITER
     } _code;
+
     char const *_msg = nullptr;
 
     using enum Code;
 
-    constexpr Error(Code code) : _code(code), _msg("") {}
+    constexpr Error(Code code) : _code(code) {}
     constexpr Error(char const *msg) : _code(OTHER), _msg(msg) {}
     constexpr Error(Code code, char const *msg) : _code(code), _msg(msg) {}
 

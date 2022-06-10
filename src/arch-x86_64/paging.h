@@ -22,32 +22,31 @@ struct [[gnu::packed]] Entry {
     static constexpr uint64_t ADDR_MASK = 0x000ffffffffff000;
     static constexpr uint64_t FLAGS_MASK = 0xfff;
 
-    uint64_t raw;
+    uint64_t raw{};
 
     Entry() {}
 
     Entry(size_t addr, uint64_t flags) {
-        this->addr(addr);
-        this->flags(flags);
+        raw = (addr & ADDR_MASK) | (flags & FLAGS_MASK);
     }
-
-    size_t addr() const { return raw & ADDR_MASK; }
 
     template <typename T>
     T *as() {
         return (T *)addr();
     }
 
+    size_t addr() const { return raw & ADDR_MASK; }
+
+    void addr(uint64_t addr) { raw = (addr & ADDR_MASK) | raw; }
+
     uint64_t flags() const { return raw & FLAGS_MASK; }
 
-    void addr(uint64_t addr) { raw = (raw & ~ADDR_MASK) | addr; }
-
-    void flags(uint64_t flags) { raw = (raw & ~FLAGS_MASK) | flags; }
+    void flags(uint64_t flags) { raw = (flags & FLAGS_MASK) | raw; }
 
     bool present() const { return raw & PRESENT; }
-
-    void clear() { raw = 0; }
 };
+
+static_assert(sizeof(Entry) == 8);
 
 template <size_t L>
 struct [[gnu::packed]] Pml {
@@ -78,7 +77,7 @@ struct [[gnu::packed]] Pml {
         return pml->virt2phys(virt);
     }
 
-    Entry PageAt(size_t vaddr) {
+    Entry pageAt(size_t vaddr) {
         return pages[virt2index(vaddr)];
     }
 
@@ -86,5 +85,7 @@ struct [[gnu::packed]] Pml {
         pages[virt2index(vaddr)] = page;
     }
 };
+
+static_assert(sizeof(Pml<1>) == 0x1000);
 
 } // namespace x86_64

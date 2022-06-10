@@ -38,12 +38,20 @@ struct Mmap :
             Embed::memUnmap(_buf, _size).unwrap("mem-unmap failled");
     }
 
+    size_t vaddr() const {
+        return (size_t)_buf;
+    }
+
+    size_t paddr() const {
+        return _paddr;
+    }
+
     USizeRange vrange() const {
-        return {(size_t)_buf, _size};
+        return {vaddr(), vaddr() + _size};
     }
 
     USizeRange prange() const {
-        return {_paddr, _size};
+        return {_paddr, _paddr + _size};
     }
 
     Bytes bytes() const { return {_buf, _size}; }
@@ -101,11 +109,11 @@ struct MutMmap :
     }
 
     USizeRange vrange() const {
-        return {(size_t)_buf, _size};
+        return {(size_t)_buf, (size_t)_buf + _size};
     }
 
     USizeRange prange() const {
-        return {_paddr, _size};
+        return {_paddr, _paddr + _size};
     }
 
     Bytes bytes() const { return {_buf, _size}; }

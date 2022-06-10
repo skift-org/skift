@@ -9,7 +9,7 @@ struct EfiPmm : public Hal::Pmm {
     Result<Hal::PmmRange> alloc(size_t size, Hal::PmmFlags) override {
         size_t paddr;
         try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, size / 4096, &paddr));
-        return Hal::PmmRange{paddr, size};
+        return Hal::PmmRange{paddr, paddr + size};
     }
 
     Error used(Hal::PmmRange, Hal::PmmFlags) override {

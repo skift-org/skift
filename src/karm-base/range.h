@@ -15,7 +15,11 @@ struct Range {
     Range() = default;
 
     Range(T start, T end)
-        : start(start), end(end) {}
+        : start(start), end(end) {
+        if (end < start) {
+            panic("Range: end < start");
+        }
+    }
 
     bool valid() const {
         return start <= end;

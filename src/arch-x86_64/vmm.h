@@ -19,7 +19,7 @@ struct Vmm : public Hal::Vmm {
 
     template <size_t L>
     Result<Pml<L> *> pml(Pml<L + 1> &upper, size_t vaddr) {
-        auto page = upper.PageAt(vaddr);
+        auto page = upper.pageAt(vaddr);
 
         if (page.present()) {
             return page.template as<Pml<L>>();
@@ -30,7 +30,7 @@ struct Vmm : public Hal::Vmm {
 
     template <size_t L>
     Result<Pml<L> *> pmlOrAlloc(Pml<L + 1> &upper, size_t vaddr) {
-        auto page = upper.PageAt(vaddr);
+        auto page = upper.pageAt(vaddr);
 
         if (page.present()) {
             return page.template as<Pml<L>>();
@@ -38,7 +38,7 @@ struct Vmm : public Hal::Vmm {
 
         size_t lower = try$(_pmm.alloc(PAGE_SIZE, Hal::PmmFlags::NONE)).start;
         memset((void *)lower, 0, PAGE_SIZE);
-        upper.putPage(vaddr, {lower, Entry::WRITE | Entry::PRESENT});
+        upper.putPage(vaddr, {lower, Entry::WRITE | Entry::PRESENT | Entry::USER});
         return (Pml<L> *)lower;
     }
 
@@ -46,7 +46,7 @@ struct Vmm : public Hal::Vmm {
         auto pml3 = try$(pmlOrAlloc<3>(*_pml4, vaddr));
         auto pml2 = try$(pmlOrAlloc<2>(*pml3, vaddr));
         auto pml1 = try$(pmlOrAlloc<1>(*pml2, vaddr));
-        pml1->putPage(vaddr, {paddr, Entry::WRITE | Entry::PRESENT});
+        pml1->putPage(vaddr, {paddr, Entry::WRITE | Entry::PRESENT | Entry::USER});
         return OK;
     }
 
@@ -63,18 +63,23 @@ struct Vmm : public Hal::Vmm {
             return Error::INVALID_INPUT;
         }
 
-        Sys::println("map: paddr: {x} vaddr: {x}  size: {x}", paddr.start, vaddr.start, paddr.size());
+        Sys::println("map:");
+        Sys::println("vrange: {x} - {x}", vaddr.start, vaddr.end);
+        Sys::println("prange: {x} - {x}", paddr.start, paddr.end);
+        Sys::println("size: {} ", vaddr.size());
+        Sys::println("Pages: {} ", vaddr.size() / PAGE_SIZE);
+
         for (size_t page = 0; page < vaddr.size(); page += PAGE_SIZE) {
             try$(mapPage(vaddr.start + page, paddr.start + page, flags));
         }
-        return flush(vaddr);
+        return OK;
     }
 
     Error unmap(Hal::VmmRange vaddr) override {
         for (size_t page = 0; page < vaddr.size(); page += PAGE_SIZE) {
             try$(unmapPage(vaddr.start + page));
         }
-        return flush(vaddr);
+        return OK;
     }
 
     Error update(Hal::VmmRange, Hal::VmmFlags) override {

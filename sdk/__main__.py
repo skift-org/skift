@@ -47,13 +47,12 @@ def bootCmd(opts: dict, args: list[str]) -> None:
     shutil.copy(hjert, f"{bootDir}/hjert.elf")
     shutil.copy(loader, f"{bootDir}/BOOTX64.EFI")
 
-    ovmf = utils.downloadFile(
+    ovmf = utils.AdownloadFile(
         "https://retrage.github.io/edk2-nightly/bin/DEBUGX64_OVMF.fd")
 
     utils.runCmd(
         "qemu-system-x86_64",
         "-no-reboot",
-        "-no-shutdown",
         "-d", "cpu_reset,guest_errors",
         "-serial", "mon:stdio",
         "-bios", ovmf,

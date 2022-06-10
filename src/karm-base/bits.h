@@ -22,7 +22,7 @@ struct Bits {
     }
 
     void set(USizeRange range, bool value) {
-        for (size_t i = range.start(); i < range.end(); i++) {
+        for (size_t i = range.start; i < range.end; i++) {
             set(i, value);
         }
     }

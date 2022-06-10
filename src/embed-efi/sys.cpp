@@ -134,13 +134,14 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
 Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options) {
     size_t vaddr = 0;
     try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, alignUp(options.size, 4096) / 4096, &vaddr));
-    return USizeRange{vaddr, options.size};
+    return USizeRange{vaddr, vaddr + options.size};
 }
 
-Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd> fd) {
+Result<USizeRange> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> fd) {
     size_t vaddr = 0;
-    try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, alignUp(try$(Io::size(*fd)), 4096) / 4096, &vaddr));
-    USizeRange range{vaddr, options.size};
+    size_t fileSize = try$(Io::size(*fd));
+    try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, alignUp(fileSize, 4096) / 4096, &vaddr));
+    USizeRange range{vaddr, vaddr + fileSize};
     Io::BufWriter writer{(void *)range.start, range.size()};
     try$(Io::copy(*fd, writer));
     return range;

@@ -5,8 +5,6 @@
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 
-#include <arch-x86_64/com.h>
-
 #include "fw.h"
 #include "loader.h"
 
@@ -46,7 +44,7 @@ Error load(Sys::Path kernelPath) {
         memcpy((void *)paddr, prog.buf(), prog.filez());
         memset((void *)(paddr + prog.filez()), 0, remaining);
 
-        payload.add(Handover::KERNEL, 0, {paddr, prog.memsz()});
+        payload.add(Handover::KERNEL, 0, {paddr, paddr + prog.memsz()});
     }
 
     Sys::println("Handling kernel requests...");
@@ -57,25 +55,26 @@ Error load(Sys::Path kernelPath) {
     }
 
     Sys::println("Mapping kernel space...");
-    try$(vmm->map({Handover::KERNEL_BASE, Handover::KERNEL_BASE + gib(2)}, {0, gib(2)}, Hal::Vmm::READ | Hal::Vmm::WRITE | Hal::Vmm::EXEC));
+    size_t kernelSize = gib(2) - 0x1000;
+    Hal::VmmRange kernelVrange{Handover::KERNEL_BASE + 0x1000, Handover::KERNEL_BASE + kernelSize};
+    Hal::PmmRange kernelPrange{0x1000, kernelSize};
+
+    try$(vmm->map(kernelVrange, kernelPrange, Hal::Vmm::READ | Hal::Vmm::WRITE | Hal::Vmm::EXEC));
 
     Sys::println("Mapping upper space...");
-    try$(vmm->map({Handover::UPPER_HALF, Handover::UPPER_HALF + gib(4)}, {0, gib(4)}, Hal::Vmm::READ | Hal::Vmm::WRITE));
+    try$(vmm->map({Handover::UPPER_HALF + 0x1000, Handover::UPPER_HALF + gib(4)}, {0x1000, gib(4)}, Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     Sys::println("Mapping loader space...");
-    try$(vmm->map({0, mib(512)}, {0, mib(512)}, Hal::Vmm::READ | Hal::Vmm::WRITE));
+    try$(vmm->map({0x1000, mib(512)}, {0x1000, mib(512)}, Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     Sys::println("Finishing up...");
     payloadMem.leak();
     kernelMem.leak();
     stackMap.leak();
 
-    x86_64::Com com{x86_64::Com::COM1};
-
     Sys::println("Entering kernel, see on the other side...");
     try$(Fw::finalizeHandover(payload));
     vmm->activate();
-    com.write("Still alive!\n", 13);
 
     Handover::EntryPoint entryPoint = (Handover::EntryPoint)(size_t)image.header().entry;
     entryPoint(Handover::COOLBOOT, payload.finalize());

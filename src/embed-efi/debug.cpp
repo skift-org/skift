@@ -18,6 +18,7 @@ void debugHandler(char const *buf) {
     auto str = transcode<Utf16>(Str{buf});
 
     Efi::st()->conOut->outputString(Efi::st()->conOut, str.buf()).unwrap();
+    Efi::st()->conOut->outputString(Efi::st()->conOut, (uint16_t const *)L"\n").unwrap();
 
     (void)Efi::st()->runtime->resetSystem(
         Efi::ResetType::RESET_SHUTDOWN,

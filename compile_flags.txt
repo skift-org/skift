@@ -9,4 +9,4 @@
 -Wall
 -Wextra
 -Werror
--D__meta_sys_linux__
+-D__sdk_sys_linux__

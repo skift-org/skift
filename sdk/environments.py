@@ -122,7 +122,7 @@ ENVIRONMENTS["hjert-x86_64"] = {
     "cxxflags": "-ffreestanding -fno-stack-protector -fno-stack-protector -mno-80387 -mno-mmx -mno-3dnow -mno-sse -mno-sse2 -mno-red-zone -mcmodel=kernel",
 
     "ld": "ld.lld",
-    "ldflags": "-Tmeta/toolchains/hjert-x86_64.ld -z max-page-size=0x1000",
+    "ldflags": "-Tsdk/toolchains/hjert-x86_64.ld -z max-page-size=0x1000",
 
     "ar": "llvm-ar",
     "arflags": "rcs",
@@ -176,11 +176,11 @@ def load(env: str) -> dict:
     for key in PASSED_TO_BUILD:
         if isinstance(result[key], bool):
             if result[key]:
-                result["cflags"] += f" -D__meta_{key}__"
-                result["cxxflags"] += f" -D__meta_{key}__"
+                result["cflags"] += f" -D__sdk_{key}__"
+                result["cxxflags"] += f" -D__sdk_{key}__"
         else:
-            result["cflags"] += f" -D__meta_{key}_{result[key]}__"
-            result["cxxflags"] += f" -D__meta_{key}_{result[key]}__"
+            result["cflags"] += f" -D__sdk_{key}_{result[key]}__"
+            result["cxxflags"] += f" -D__sdk_{key}_{result[key]}__"
 
     result["cflags"] = "-std=gnu2x -Isrc -Wall -Wextra -Werror " + result["cflags"]
     result["cxxflags"] = "-std=gnu++2b -Isrc -Wall -Wextra -Werror -fno-exceptions -fno-rtti " + \

@@ -31,7 +31,7 @@ def parseOptions(args: list[str]) -> dict:
 
 def runCmd(opts: dict, args: list[str]) -> None:
     if len(args) == 0:
-        print("Usage: meta run <component>")
+        print(f"Usage: {sys.argv[0]} run <component>")
         sys.exit(1)
 
     out = build.buildOne(opts.get('env', 'host'), args[0])
@@ -52,7 +52,6 @@ def bootCmd(opts: dict, args: list[str]) -> None:
 
     utils.runCmd(
         "qemu-system-x86_64",
-        "-enable-kvm",
         "-no-reboot",
         "-no-shutdown",
         "-d", "cpu_reset,guest_errors",

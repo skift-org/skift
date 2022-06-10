@@ -8,6 +8,6 @@ export CCACHE_DIR=".cache/ccache"
 
 if [ -n "$CHECK" ];
 then
-    mypy --config meta/.mypyconfig --pretty meta/__main__.py
+    mypy --config sdk/.mypyconfig --pretty sdk/__main__.py
 fi
-/usr/bin/env python3 meta $@
+/usr/bin/env python3 sdk $@

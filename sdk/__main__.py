@@ -47,7 +47,7 @@ def bootCmd(opts: dict, args: list[str]) -> None:
     shutil.copy(hjert, f"{bootDir}/hjert.elf")
     shutil.copy(loader, f"{bootDir}/BOOTX64.EFI")
 
-    ovmf = utils.AdownloadFile(
+    ovmf = utils.downloadFile(
         "https://retrage.github.io/edk2-nightly/bin/DEBUGX64_OVMF.fd")
 
     utils.runCmd(

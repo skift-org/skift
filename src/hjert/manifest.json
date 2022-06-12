@@ -8,6 +8,7 @@
         ]
     },
     "deps": [
+        "embed",
         "karm-base"
     ]
 }

@@ -27,7 +27,9 @@ struct File :
     }
 
     static Result<File> open(Path path) {
-        return File{try$(Embed::openFile(path)), path};
+        auto fd = try$(Embed::openFile(path));
+        debug("ok ok");
+        return File{fd, path};
     }
 
     Result<size_t> read(void *buf, size_t size) override {

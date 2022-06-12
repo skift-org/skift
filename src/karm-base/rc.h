@@ -17,6 +17,7 @@ struct _Rc {
     int _weak = 0;
 
     virtual ~_Rc() = default;
+
     virtual void *_unwrap() = 0;
     virtual Meta::Id id() = 0;
 
@@ -35,33 +36,48 @@ struct _Rc {
 
     _Rc *refStrong() {
         _strong++;
+        if (_strong == 0) {
+            panic("refStrong() overflow");
+        }
         return this;
     }
 
     _Rc *derefStrong() {
         _strong--;
+        if (_strong < 0) {
+            panic("derefStrong() underflow");
+        }
         return collect();
     }
 
     template <typename T>
     T &unwrapStrong() {
+        if (_strong == 0) {
+            panic("unwrapStrong() called on weak");
+        }
         return *static_cast<T *>(_unwrap());
     }
 
     _Rc *refWeak() {
         _weak++;
+        if (_weak == 0) {
+            panic("refWeak() overflow");
+        }
         return this;
     }
 
     _Rc *derefWeak() {
         _weak--;
+        if (_weak < 0) {
+            panic("derefWeak() underflow");
+        }
         return collect();
     }
 
     template <typename T>
     _Rc *unwrapWeak() {
-        if (_strong == 0) {
-            panic("Dereferencing weak reference to dead object");
+        if (_weak == 0) {
+            panic("unwrapWeak()");
         }
 
         return *static_cast<T *>(_unwrap());
@@ -70,7 +86,7 @@ struct _Rc {
 
 template <typename T>
 struct Rc : public _Rc {
-    T _buf;
+    T _buf{};
 
     template <typename... Args>
     Rc(Args &&...args) : _buf(std::forward<Args>(args)...) {}

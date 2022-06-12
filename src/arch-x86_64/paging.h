@@ -9,7 +9,7 @@ static constexpr size_t PAGE_SIZE = 0x1000;
 
 struct [[gnu::packed]] Entry {
 
-    static constexpr uint64_t PRESENT = 1;
+    static constexpr uint64_t PRESENT = 1 << 0;
     static constexpr uint64_t WRITE = 1 << 1;
     static constexpr uint64_t USER = 1 << 2;
     static constexpr uint64_t WRITE_THROUGH = 1 << 3;

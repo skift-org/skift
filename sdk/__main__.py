@@ -40,23 +40,34 @@ def runCmd(opts: dict, args: list[str]) -> None:
 
 def bootCmd(opts: dict, args: list[str]) -> None:
     imageDir = utils.mkdirP(".build/image")
-    bootDir = utils.mkdirP(".build/image/EFI/BOOT")
+    efiBootDir = utils.mkdirP(".build/image/EFI/BOOT")
+    bootDir = utils.mkdirP(".build/image/boot")
 
     hjert = build.buildOne("hjert-x86_64", "hjert")
     loader = build.buildOne("efi-x86_64", "loader")
-    shutil.copy(hjert, f"{bootDir}/hjert.elf")
-    shutil.copy(loader, f"{bootDir}/BOOTX64.EFI")
-
-    ovmf = utils.AdownloadFile(
+    ovmf = utils.downloadFile(
         "https://retrage.github.io/edk2-nightly/bin/DEBUGX64_OVMF.fd")
+    limine = utils.downloadFile(
+        "https://github.com/limine-bootloader/limine/raw/v3.0-branch-binary/BOOTX64.EFI")
+    limineSys = utils.downloadFile(
+        "https://github.com/limine-bootloader/limine/raw/v3.0-branch-binary/limine.sys")
+
+    shutil.copy(hjert, f"{bootDir}/kernel.elf")
+    shutil.copy(limineSys, f"{bootDir}/limine.sys")
+    shutil.copy('sdk/images/limine-x86_64/limine.cfg',
+                f"{bootDir}/limine.cfg")
+    shutil.copy(loader, f"{bootDir}/loader.efi")
+
+    shutil.copy(limine, f"{efiBootDir}/BOOTX64.EFI")
 
     utils.runCmd(
         "qemu-system-x86_64",
+        "-enable-kvm",
         "-no-reboot",
-        "-d", "cpu_reset,guest_errors",
+        "-d", "guest_errors",
         "-serial", "mon:stdio",
         "-bios", ovmf,
-        "-m", "512",
+        "-m", "256M",
         "-smp", "4",
         "-drive", f"file=fat:rw:{imageDir},media=disk,format=raw")
 

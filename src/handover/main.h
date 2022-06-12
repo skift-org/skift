@@ -1,9 +1,18 @@
 #pragma once
 
-#include "handover.h"
+#include <karm-base/error.h>
 
-void entryPoint(uint64_t magic, Handover::Payload const &payload);
+#include "spec.h"
+
+Error entryPoint(uint64_t magic, Handover::Payload const &payload);
+
+#ifndef HANOVER_NO_KSTART
 
 extern "C" void _kstart(uint64_t magic, Handover::Payload const *payload) {
-    entryPoint(magic, *payload);
+    Error err = entryPoint(magic, *payload);
+    if (err) {
+        panic(err.msg());
+    }
 }
+
+#endif

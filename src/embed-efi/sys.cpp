@@ -35,15 +35,25 @@ struct ConOut : public Sys::Fd {
     }
 };
 
-struct FileProto : public Sys::Fd {
-    Efi::FileProtocol *_proto;
+struct FileProto : public Sys::Fd, Meta::Static {
+    Efi::FileProtocol *_proto = nullptr;
 
-    FileProto(Efi::FileProtocol *proto) : _proto(proto) {}
+    FileProto(Efi::FileProtocol *proto) : _proto(proto) {
+    }
 
     ~FileProto() {
         if (_proto) {
             _proto->close(_proto).unwrap("close() failled");
         }
+    }
+
+    FileProto(FileProto &&other) {
+        std::swap(_proto, other._proto);
+    }
+
+    FileProto &operator=(FileProto &&other) {
+        std::swap(_proto, other._proto);
+        return *this;
     }
 
     Result<size_t> read(void *buf, size_t size) override {
@@ -127,8 +137,10 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
     }
 
     try$(rootDir->open(rootDir, &file, pathStr.buf(), EFI_FILE_MODE_READ, 0));
-
-    return {makeStrong<FileProto>(file)};
+    debug("ok jsmldjf");
+    auto stronk = makeStrong<FileProto>(file);
+    debug("ok jsmldjssf");
+    return {stronk};
 }
 
 Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options) {

@@ -12,8 +12,10 @@ struct EfiPmm : public Hal::Pmm {
         return Hal::PmmRange{paddr, paddr + size};
     }
 
-    Error used(Hal::PmmRange, Hal::PmmFlags) override {
-        notImplemented();
+    Error used(Hal::PmmRange range, Hal::PmmFlags) override {
+        size_t paddr = range.size();
+        try$(Efi::bs()->allocatePages(Efi::AllocateType::ADDRESS, Efi::MemoryType::USER, paddr / 4096, &paddr));
+        return OK;
     }
 
     Error free(Hal::PmmRange range) override {

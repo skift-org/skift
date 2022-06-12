@@ -11,11 +11,10 @@
 namespace Loader {
 
 Error load(Sys::Path kernelPath) {
-    auto vmm = try$(Fw::createVmm());
-
     Sys::println("Preparing payload...");
-    auto payloadMem = try$(Sys::mmap().read().size(16 * 1024).mapMut());
+    auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
     Handover::Builder payload{payloadMem.slice<uint8_t>()};
+
     payload.agent("loader");
     payload.add(Handover::SELF, 0, payloadMem.prange());
 
@@ -26,11 +25,11 @@ Error load(Sys::Path kernelPath) {
     payload.add(Handover::FILE, 0, kernelMem.prange());
 
     if (!image.valid()) {
-        return {"invalid kernel image"};
+        return Error{Error::INVALID_DATA, "invalid kernel image"};
     }
 
     Sys::println("Setting up stack...");
-    auto stackMap = try$(Sys::mmap().stack().size(16 * 1024).mapMut());
+    auto stackMap = try$(Sys::mmap().stack().size(kib(16)).mapMut());
     payload.add(Handover::STACK, 0, stackMap.prange());
 
     Sys::println("Loading kernel image...");
@@ -55,6 +54,8 @@ Error load(Sys::Path kernelPath) {
     }
 
     Sys::println("Mapping kernel space...");
+    auto vmm = try$(Fw::createVmm());
+
     size_t kernelSize = gib(2) - 0x1000;
     Hal::VmmRange kernelVrange{Handover::KERNEL_BASE + 0x1000, Handover::KERNEL_BASE + kernelSize};
     Hal::PmmRange kernelPrange{0x1000, kernelSize};

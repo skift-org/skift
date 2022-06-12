@@ -1,0 +1,5 @@
+{
+    "id": "limine",
+    "description": "The limine boot protocol",
+    "type": "lib"
+}

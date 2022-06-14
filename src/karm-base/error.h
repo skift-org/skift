@@ -66,7 +66,7 @@ struct [[nodiscard]] Error {
     constexpr Error(char const *msg) : _code(OTHER), _msg(msg) {}
     constexpr Error(Code code, char const *msg) : _code(code), _msg(msg) {}
 
-    operator bool() const { return _code == Code::OK; }
+    constexpr explicit operator bool() const { return _code == Code::OK; }
 
     constexpr Code code() const { return _code; }
 
@@ -87,7 +87,7 @@ struct [[nodiscard]] Error {
     }
 
     constexpr char const *msg() {
-        if (_msg != nullptr) {
+        if (_msg != nullptr && strlen(_msg) > 0) {
             return _msg;
         }
 

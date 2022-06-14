@@ -222,11 +222,11 @@ struct Weak {
         return *this;
     }
 
-    operator bool() {
+    constexpr explicit operator bool() {
         return _rc && _rc->dying() && (_rc = _rc->derefWeak());
     }
 
-    operator bool() const {
+    constexpr explicit operator bool() const {
         return _rc && _rc->dying();
     }
 

@@ -56,9 +56,10 @@ def load(env: str) -> dict:
             result["cflags"] += [f"-D__sdk_{key}_{result[key]}__"]
             result["cxxflags"] += [f"-D__sdk_{key}_{result[key]}__"]
 
-    result["cflags"] += ["-std=gnu2x", "-Isrc", "-Wall", "-Wextra", "-Werror"]
-    result["cxxflags"] += [
-        "-std=gnu++2b", "-Isrc", "-Wall", "-Wextra", "-Werror", "-fno-exceptions", "-fno-rtti"]
+    result["cflags"] += ["-std=gnu2x",
+                         "-Isrc", "-Wall", "-Wextra", "-Werror"]
+    result["cxxflags"] += ["-std=gnu++2b", "-Isrc", "-Wall",
+                           "-Wextra", "-Werror", "-fno-exceptions", "-fno-rtti"]
 
     result["hash"] = utils.objSha256(result, PASSED_TO_BUILD)
     result["key"] = utils.objKey(result, PASSED_TO_BUILD)

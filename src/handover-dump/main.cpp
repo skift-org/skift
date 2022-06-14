@@ -5,13 +5,9 @@
 #include <karm-sys/mmap.h>
 
 ExitCode entryPoint(CliArgs const &args) {
-    debug("OK");
     Sys::File kernelFile = try$(Sys::File::open(args[0]));
-    debug("OK");
     auto kernelMem = try$(Sys::mmap().read().map(kernelFile));
-    debug("OK");
     Elf::Image kernelElf{kernelMem.slice<uint8_t>()};
-    debug("OK");
 
     if (!kernelElf.valid()) {
         return Error{Error::INVALID_DATA, "kernel is not a valid ELF executable"};

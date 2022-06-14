@@ -79,15 +79,16 @@ template <typename T>
 struct SignedFormatter : public NumberFormater {
     Result<size_t> format(Io::Writer &writer, T const value) {
         size_t written = 0;
-        Meta::MakeUnsigned<T> unsignedValud = 0;
+        Meta::MakeUnsigned<T> unsignedValue = 0;
+
         if (value < 0) {
             written += try$(Io::putc(writer, '-'));
-            unsignedValud = -value;
+            unsignedValue = -value;
         } else {
-            unsignedValud = value;
+            unsignedValue = value;
         }
 
-        return written + format_unsigned(writer, unsignedValud);
+        return written + try$(format_unsigned(writer, unsignedValue));
     }
 };
 

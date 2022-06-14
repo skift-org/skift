@@ -38,8 +38,7 @@ struct ConOut : public Sys::Fd {
 struct FileProto : public Sys::Fd, Meta::Static {
     Efi::FileProtocol *_proto = nullptr;
 
-    FileProto(Efi::FileProtocol *proto) : _proto(proto) {
-    }
+    FileProto(Efi::FileProtocol *proto) : _proto(proto) {}
 
     ~FileProto() {
         if (_proto) {
@@ -137,10 +136,7 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
     }
 
     try$(rootDir->open(rootDir, &file, pathStr.buf(), EFI_FILE_MODE_READ, 0));
-    debug("ok jsmldjf");
-    auto stronk = makeStrong<FileProto>(file);
-    debug("ok jsmldjssf");
-    return {stronk};
+    return {makeStrong<FileProto>(file)};
 }
 
 Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options) {

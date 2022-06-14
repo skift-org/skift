@@ -16,9 +16,9 @@ struct Opt {
     bool _present{};
     Inert<T> _value{};
 
-    Opt() = default;
+    Opt() {}
 
-    Opt(None){};
+    Opt(None) {}
 
     Opt(T const &value) : _present(true) {
         _value.ctor(value);
@@ -30,14 +30,13 @@ struct Opt {
 
     Opt(Opt const &other) : _present(other._present) {
         if (_present) {
-            _value.ctor(other._value.unwrap());
+            _value.ctor(other.unwrap());
         }
     }
 
     Opt(Opt &&other) : _present(other._present) {
         if (_present) {
-            _value.ctor(other._value.take());
-            other.release();
+            _value.ctor(other.take());
         }
     }
 
@@ -70,8 +69,7 @@ struct Opt {
         release();
         if (other._present) {
             _present = true;
-            _value.ctor(other._value.take());
-            other.release();
+            _value.ctor(other.take());
         }
         return *this;
     }
@@ -80,7 +78,7 @@ struct Opt {
         return !_present;
     }
 
-    operator bool() const { return _present; }
+    constexpr explicit operator bool() const { return _present; }
 
     T *operator->() {
         if (!_present) {
@@ -112,20 +110,27 @@ struct Opt {
 
     void release() {
         if (_present) {
-            _value.dtor();
             _present = false;
+            _value.dtor();
         }
     }
 
     Error none() {
-        if (_present) {
-            return OK;
-        } else {
+        if (!_present) {
             return "unwrapping none";
         }
+
+        return OK;
     }
 
     T &unwrap(const char *msg = "unwraping none") {
+        if (!_present) {
+            panic(msg);
+        }
+        return _value.unwrap();
+    }
+
+    T const &unwrap(const char *msg = "unwraping none") const {
         if (!_present) {
             panic(msg);
         }
@@ -137,7 +142,7 @@ struct Opt {
             panic("taking from none");
         }
         T v = _value.take();
-        release();
+        _present = false;
         return v;
     }
 

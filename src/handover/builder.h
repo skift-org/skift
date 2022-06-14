@@ -8,12 +8,12 @@
 namespace Handover {
 
 struct Builder {
-    void *_buf;
-    size_t _size;
-    char *_string;
+    void *_buf{};
+    size_t _size{};
+    char *_string{};
 
     Builder(MutSlice<uint8_t> slice)
-        : _buf(slice.buf()), _size(slice.len()) {
+        : _buf(slice.buf()), _size(slice.len()), _string((char *)slice.end()) {
         payload() = {};
         payload().magic = COOLBOOT;
         payload().size = slice.len();

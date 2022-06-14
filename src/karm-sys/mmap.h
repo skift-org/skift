@@ -12,12 +12,12 @@ struct Mmap :
     Meta::NoCopy {
     using enum MmapFlags;
 
-    size_t _paddr;
+    size_t _paddr{};
     void const *_buf{};
     size_t _size{};
 
     Mmap(void const *buf, size_t size)
-        : _paddr(0), _buf(buf), _size(size) {}
+        : _buf(buf), _size(size) {}
 
     Mmap(size_t paddr, void const *buf, size_t size)
         : _paddr(paddr), _buf(buf), _size(size) {}

@@ -1,7 +1,6 @@
 #include <embed/sys.h>
 #include <fcntl.h>
 #include <karm-io/funcs.h>
-#include <karm-sys/chan.h>
 #include <sys/mman.h>
 #include <unistd.h>
 
@@ -39,7 +38,7 @@ struct PosixFd : public Sys::Fd {
 
         switch (seek.whence) {
         case Io::Whence::BEGIN:
-            offset = 0;
+            offset = lseek(_raw, seek.offset, SEEK_SET);
             break;
         case Io::Whence::CURRENT:
             offset = lseek(_raw, seek.offset, SEEK_CUR);
@@ -142,7 +141,7 @@ Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options) {
         return Posix::fromLastErrno();
     }
 
-    return USizeRange{(size_t)addr, options.size};
+    return USizeRange{(size_t)addr, (size_t)addr + options.size};
 }
 
 Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd> maybeFd) {
@@ -150,17 +149,16 @@ Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd>
     size_t size = options.size;
 
     if (size == 0) {
-        size = Io::size(*fd);
-        Sys::println("File size {}", size);
+        size = try$(Io::size(*fd));
     }
 
-    void *addr = mmap((void *)options.vaddr, options.size, mmapOptionsToProt(options), MAP_SHARED, fd->_raw, options.offset);
+    void *addr = mmap((void *)options.vaddr, size, mmapOptionsToProt(options), MAP_SHARED, fd->_raw, options.offset);
 
     if (addr == MAP_FAILED) {
         return Posix::fromLastErrno();
     }
 
-    return USizeRange{(size_t)addr, options.size};
+    return USizeRange{(size_t)addr, (size_t)addr + size};
 }
 
 Error memUnmap(void const *buf, size_t len) {

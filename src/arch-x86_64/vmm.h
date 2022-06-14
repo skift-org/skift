@@ -63,12 +63,6 @@ struct Vmm : public Hal::Vmm {
             return Error::INVALID_INPUT;
         }
 
-        Sys::println("map:");
-        Sys::println("vrange: {x} - {x}", vaddr.start, vaddr.end);
-        Sys::println("prange: {x} - {x}", paddr.start, paddr.end);
-        Sys::println("size: {} ", vaddr.size());
-        Sys::println("Pages: {} ", vaddr.size() / PAGE_SIZE);
-
         for (size_t page = 0; page < vaddr.size(); page += PAGE_SIZE) {
             try$(mapPage(vaddr.start + page, paddr.start + page, flags));
         }

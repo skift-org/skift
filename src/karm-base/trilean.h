@@ -20,7 +20,7 @@ struct Trilean {
     constexpr bool isFalse() const { return _value == _FALSE; }
     constexpr bool isNone() const { return _value == _NONE; }
 
-    constexpr operator bool() const { return isTrue(); }
+    constexpr explicit operator bool() const { return isTrue(); }
     constexpr bool operator==(None) const { return _value == _NONE; }
     constexpr bool operator!=(None) const { return _value != _NONE; }
     constexpr bool operator==(bool value) const { return _value == (value ? _TRUE : _FALSE); }

@@ -18,7 +18,7 @@ struct [[nodiscard]] Result {
     constexpr Result(Value &&value) : _error(OK), _value(std::move(value)) {}
     constexpr Result(Value const &value) : _error(OK), _value(value) {}
 
-    constexpr operator bool() { return _error; }
+    constexpr explicit operator bool() { return bool(_error); }
     constexpr Error none() const { return _error; }
     constexpr Value &unwrap(char const *msg = "unwraping an error") { return _value.unwrap(msg); }
     constexpr Value take() { return _value.take(); }

@@ -13,6 +13,7 @@ struct Inert {
     };
 
     Inert() {}
+
     ~Inert() {}
 
     void ctor(T &&value) {

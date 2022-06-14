@@ -3,5 +3,5 @@
 #include "loader.h"
 
 ExitCode entryPoint(CliArgs const &) {
-    return Loader::load("/EFI/BOOT/hjert.elf");
+    return Loader::load("/boot/kernel.elf");
 }

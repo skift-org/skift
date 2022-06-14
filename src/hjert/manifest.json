@@ -1,7 +1,7 @@
 {
     "id": "hjert",
-    "description": "The Hjert micro-kernel",
     "type": "exe",
+    "description": "The Hjert micro-kernel",
     "requires": {
         "sys": [
             "hjert"

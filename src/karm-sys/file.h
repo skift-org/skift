@@ -28,7 +28,6 @@ struct File :
 
     static Result<File> open(Path path) {
         auto fd = try$(Embed::openFile(path));
-        debug("ok ok");
         return File{fd, path};
     }
 

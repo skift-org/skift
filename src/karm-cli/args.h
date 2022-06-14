@@ -19,6 +19,9 @@ struct Args {
     }
 
     Str operator[](size_t i) const {
+        if (i >= len()) {
+            panic("out of range");
+        }
         return _argv[i + 1];
     }
 };

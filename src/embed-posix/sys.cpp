@@ -1,5 +1,8 @@
 #include <embed/sys.h>
 #include <fcntl.h>
+#include <karm-io/funcs.h>
+#include <karm-sys/chan.h>
+#include <sys/mman.h>
 #include <unistd.h>
 
 #include "utils.h"
@@ -54,7 +57,7 @@ struct PosixFd : public Sys::Fd {
     }
 
     Result<size_t> flush() override {
-        /* NOTE: No-op */
+        // NOTE: No-op
         return 0;
     }
 
@@ -115,6 +118,65 @@ Result<Strong<Sys::Fd>> createOut() {
 
 Result<Strong<Sys::Fd>> createErr() {
     return {makeStrong<PosixFd>(2)};
+}
+
+int mmapOptionsToProt(Karm::Sys::MmapOptions const &options) {
+    int prot = 0;
+
+    if (options.flags & Karm::Sys::MmapFlags::READ)
+        prot |= PROT_READ;
+
+    if (options.flags & Karm::Sys::MmapFlags::WRITE)
+        prot |= PROT_WRITE;
+
+    if (options.flags & Karm::Sys::MmapFlags::EXEC)
+        prot |= PROT_EXEC;
+
+    return prot;
+}
+
+Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options) {
+    void *addr = mmap((void *)options.vaddr, options.size, mmapOptionsToProt(options), MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+
+    if (addr == MAP_FAILED) {
+        return Posix::fromLastErrno();
+    }
+
+    return USizeRange{(size_t)addr, options.size};
+}
+
+Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd> maybeFd) {
+    Strong<PosixFd> fd = try$(maybeFd.as<PosixFd>());
+    size_t size = options.size;
+
+    if (size == 0) {
+        size = Io::size(*fd);
+        Sys::println("File size {}", size);
+    }
+
+    void *addr = mmap((void *)options.vaddr, options.size, mmapOptionsToProt(options), MAP_SHARED, fd->_raw, options.offset);
+
+    if (addr == MAP_FAILED) {
+        return Posix::fromLastErrno();
+    }
+
+    return USizeRange{(size_t)addr, options.size};
+}
+
+Error memUnmap(void const *buf, size_t len) {
+    if (::munmap((void *)buf, len) < 0) {
+        return Posix::fromLastErrno();
+    }
+
+    return OK;
+}
+
+Error memFlush(void *flush, size_t len) {
+    if (::msync(flush, len, MS_INVALIDATE) < 0) {
+        return Posix::fromLastErrno();
+    }
+
+    return OK;
 }
 
 } // namespace Embed

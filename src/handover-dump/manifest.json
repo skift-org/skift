@@ -1,0 +1,12 @@
+{
+    "id": "handover-dump",
+    "type": "exe",
+    "description": "Dump handover information from an kernel elf executable",
+    "deps": [
+        "karm-main",
+        "karm-sys",
+        "karm-io",
+        "karm-fmt",
+        "handover"
+    ]
+}

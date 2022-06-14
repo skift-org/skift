@@ -16,5 +16,5 @@ volatile limine_entry_point_request reqEntryPoint = {
 };
 
 void _limineEntryPoint() {
-    entryPoint(0, {});
+    (void)entryPoint(0, {});
 }

@@ -10,13 +10,6 @@ static inline size_t UPPER_HALF = 0xffff800000000000;
 
 namespace Utils {
 
-static inline size_t cstrLen(const char *str) {
-    size_t len = 0;
-    while (*str++)
-        len++;
-    return len;
-}
-
 static inline bool cstrEq(const char *str1, const char *str2) {
     while (*str1 && *str2) {
         if (*str1++ != *str2++)

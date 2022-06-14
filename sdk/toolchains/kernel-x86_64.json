@@ -1,0 +1,54 @@
+{
+    "id": "hjert-x86_64",
+    "type": "toolchain",
+    "toolchain": "clang",
+    "arch": "x86",
+    "sub": "64",
+    "vendor": "unknown",
+    "sys": "hjert",
+    "abi": "sysv",
+    "freestanding": true,
+    "cc": "clang",
+    "cflags": [
+        "-target",
+        "x86_64-none-elf",
+        "-ffreestanding",
+        "-fno-stack-protector",
+        "-mno-80387",
+        "-mno-mmx",
+        "-mno-3dnow",
+        "-mno-sse",
+        "-mno-sse2",
+        "-mno-red-zone",
+        "-mcmodel=kernel"
+    ],
+    "cxx": "clang++",
+    "cxxflags": [
+        "-target",
+        "x86_64-none-elf",
+        "-ffreestanding",
+        "-fno-stack-protector",
+        "-mno-80387",
+        "-mno-mmx",
+        "-mno-3dnow",
+        "-mno-sse",
+        "-mno-sse2",
+        "-mno-red-zone",
+        "-mcmodel=kernel"
+    ],
+    "ld": "ld.lld",
+    "ldflags": [
+        "-Tsdk/toolchains/kernel-x86_64.ld",
+        "-z",
+        "max-page-size=0x1000"
+    ],
+    "ar": "llvm-ar",
+    "arflags": [
+        "rcs"
+    ],
+    "as": "nasm",
+    "asflags": [
+        "-f",
+        "elf64"
+    ]
+}

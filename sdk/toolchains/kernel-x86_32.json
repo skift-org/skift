@@ -1,0 +1,41 @@
+{
+    "id": "hjert-x86_32",
+    "type": "toolchain",
+    "toolchain": "clang",
+    "arch": "x86",
+    "sub": "32",
+    "vendor": "unknown",
+    "sys": "hjert",
+    "abi": "sysv",
+    "freestanding": true,
+    "cc": "clang",
+    "cflags": [
+        "-target",
+        "i386-none-elf",
+        "-ffreestanding",
+        "-fno-stack-protector"
+    ],
+    "cxx": "clang++",
+    "cxxflags": [
+        "-target",
+        "i386-none-elf",
+        "-ffreestanding",
+        "-fno-stack-protector"
+    ],
+    "ld": "clang++",
+    "ldflags": [
+        "-target",
+        "i386-none-elf",
+        "-ffreestanding",
+        "-no-stdlib"
+    ],
+    "ar": "llvm-ar",
+    "arflags": [
+        "rcs"
+    ],
+    "as": "nasm",
+    "asflags": [
+        "-f",
+        "elf32"
+    ]
+}

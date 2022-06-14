@@ -1,7 +1,7 @@
 {
     "id": "abi-sysv",
-    "description": "System V ABI",
     "type": "lib",
+    "description": "System V ABI",
     "requires": {
         "abi": [
             "sysv"

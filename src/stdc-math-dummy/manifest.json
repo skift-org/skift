@@ -1,7 +1,7 @@
 {
     "id": "stdc-math-dummy",
-    "description": "Dummy for the ISO C Standard Mathematical Library (ISO/IEC 9899)",
     "type": "lib",
+    "description": "Dummy for the ISO C Standard Mathematical Library (ISO/IEC 9899)",
     "root-include": true,
     "requires": {
         "sys": [

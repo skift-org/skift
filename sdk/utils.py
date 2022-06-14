@@ -1,9 +1,12 @@
+from copy import copy
 import errno
 import os
 import hashlib
 import requests
 import subprocess
 import json
+import copy
+from types import SimpleNamespace
 
 
 class Colors:
@@ -134,3 +137,39 @@ def runCmd(*args: str) -> bool:
         raise CliException(f"Failed to run {' '.join(args)}")
 
     return True
+
+
+CACHE = {}
+
+
+def processJson(e: any) -> any:
+    if isinstance(e, dict):
+        for k in e:
+            e[processJson(k)] = processJson(e[k])
+    elif isinstance(e, list):
+        for i in range(len(e)):
+            e[i] = processJson(e[i])
+    elif isinstance(e, str):
+        if e == "@sysname":
+            e = os.uname().sysname.lower()
+        elif e.startswith("@include("):
+            e = loadJson(e[9:-1])
+
+    return e
+
+
+def loadJson(filename: str) -> dict:
+    result = {}
+    if filename in CACHE:
+        result = CACHE[filename]
+    else:
+        with open(filename) as f:
+            result = json.load(f)
+
+            result["dir"] = os.path.dirname(filename)
+            result["json"] = filename
+            result = processJson(result)
+            CACHE[filename] = result
+
+    result = copy.deepcopy(result)
+    return result

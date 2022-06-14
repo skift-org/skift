@@ -1,7 +1,7 @@
 {
     "id": "efi",
-    "description": "EFI firmware",
     "type": "lib",
+    "description": "EFI firmware",
     "requires": {
         "abi": [
             "ms"

@@ -1,7 +1,7 @@
 {
     "id": "karm-gfx",
-    "description": "A graphics library",
     "type": "lib",
+    "description": "A graphics library",
     "deps": [
         "karm-math"
     ]

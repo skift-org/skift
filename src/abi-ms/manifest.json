@@ -1,7 +1,7 @@
 {
     "id": "abi-ms",
-    "description": "Microsoft ABI",
     "type": "lib",
+    "description": "Microsoft ABI",
     "requires": {
         "abi": [
             "ms"

@@ -13,8 +13,8 @@ from utils import Colors
 def genNinja(out: TextIO, manifests: dict, env: dict) -> None:
     env = copy.deepcopy(env)
 
-    env["cflags"] += m.cincludes(manifests)
-    env["cxxflags"] += m.cincludes(manifests)
+    env["cflags"] += [m.cincludes(manifests)]
+    env["cxxflags"] += [m.cincludes(manifests)]
 
     writer = ninja.Writer(out)
 
@@ -23,7 +23,10 @@ def genNinja(out: TextIO, manifests: dict, env: dict) -> None:
 
     writer.comment("Environment:")
     for key in env:
-        writer.variable(key, env[key])
+        if isinstance(env[key], list):
+            writer.variable(key, " ".join(env[key]))
+        else:
+            writer.variable(key, env[key])
     writer.newline()
 
     writer.comment("Rules:")

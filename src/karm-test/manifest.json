@@ -1,5 +1,7 @@
 {
     "id": "karm-test",
     "type": "lib",
-    "deps": ["karm-cli"]
+    "deps": [
+        "karm-cli"
+    ]
 }

@@ -1,7 +1,7 @@
 {
     "id": "embed-efi",
-    "description": "Karm platform embeding layer for EFI.",
     "type": "lib",
+    "description": "Karm platform embeding layer for EFI.",
     "requires": {
         "sys": [
             "efi"

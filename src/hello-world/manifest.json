@@ -1,7 +1,7 @@
 {
     "id": "hello-world",
-    "description": "Greets the world",
     "type": "exe",
+    "description": "Greets the world",
     "deps": [
         "karm-main",
         "karm-sys",

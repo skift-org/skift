@@ -1,7 +1,7 @@
 {
     "id": "hello-world-app",
-    "description": "A simple hello world app",
     "type": "exe",
+    "description": "A simple hello world app",
     "deps": [
         "karm-main",
         "karm-ui"

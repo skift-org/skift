@@ -1,7 +1,7 @@
 {
     "id": "stdc-ansi",
-    "description": "The ISO C standard library, ISO/IEC 9899",
     "type": "lib",
+    "description": "The ISO C standard library, ISO/IEC 9899",
     "root-include": true,
     "requires": {
         "sys": [

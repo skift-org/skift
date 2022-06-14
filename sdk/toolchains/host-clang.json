@@ -1,0 +1,23 @@
+{
+    "id": "clang",
+    "type": "toolchain",
+    "toolchain": "clang",
+    "arch": "x86",
+    "sub": "64",
+    "vendor": "unknown",
+    "sys": "@sysname",
+    "abi": "unknown",
+    "freestanding": false,
+    "cc": "clang",
+    "cflags": [],
+    "cxx": "clang++",
+    "cxxflags": [],
+    "ld": "clang++",
+    "ldflags": [],
+    "ar": "llvm-ar",
+    "arflags": [
+        "rcs"
+    ],
+    "as": "nasm",
+    "asflags": []
+}

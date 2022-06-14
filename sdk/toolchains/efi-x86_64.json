@@ -1,0 +1,46 @@
+{
+    "id": "efi-x86_64",
+    "type": "toolchain",
+    "toolchain": "clang",
+    "arch": "x86",
+    "sub": "64",
+    "vendor": "unknown",
+    "sys": "efi",
+    "abi": "ms",
+    "freestanding": true,
+    "cc": "clang",
+    "cflags": [
+        "-g",
+        "-target",
+        "x86_64-unknown-windows",
+        "-ffreestanding",
+        "-fno-stack-protector",
+        "-fshort-wchar",
+        "-mno-red-zone"
+    ],
+    "cxx": "clang++",
+    "cxxflags": [
+        "-g",
+        "-target",
+        "x86_64-unknown-windows",
+        "-ffreestanding",
+        "-fno-stack-protector",
+        "-fshort-wchar",
+        "-mno-red-zone"
+    ],
+    "ld": "clang++",
+    "ldflags": [
+        "-target",
+        "x86_64-unknown-windows",
+        "-nostdlib",
+        "-Wl,-entry:efi_main",
+        "-Wl,-subsystem:efi_application",
+        "-fuse-ld=lld-link"
+    ],
+    "ar": "llvm-ar",
+    "arflags": [
+        "rcs"
+    ],
+    "as": "nasm",
+    "asflags": []
+}

@@ -1,5 +1,5 @@
 {
     "id": "handover",
-    "description": "The handover boot protocol",
-    "type": "lib"
+    "type": "lib",
+    "description": "The handover boot protocol"
 }

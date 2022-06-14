@@ -1,7 +1,7 @@
 {
     "id": "embed-posix",
-    "description": "Karm platform embeding layer for POSIX.",
     "type": "lib",
+    "description": "Karm platform embeding layer for POSIX.",
     "requires": {
         "sys": [
             "linux",

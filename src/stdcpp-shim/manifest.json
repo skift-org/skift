@@ -1,7 +1,7 @@
 {
     "id": "stdcpp-shim",
-    "description": "The ISO C++ Standard C++ Library shim",
     "type": "lib",
+    "description": "The ISO C++ Standard C++ Library shim",
     "root-include": true,
     "requires": {
         "sys": [

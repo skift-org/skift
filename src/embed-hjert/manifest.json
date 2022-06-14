@@ -1,7 +1,7 @@
 {
     "id": "embed-hjert",
-    "description": "Karm platform embeding layer for hjert.",
     "type": "lib",
+    "description": "Karm platform embeding layer for hjert.",
     "requires": {
         "sys": [
             "hjert"

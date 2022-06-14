@@ -1,7 +1,7 @@
 {
     "id": "karm-ui",
-    "description": "A graphical user interface library",
     "type": "lib",
+    "description": "A graphical user interface library",
     "deps": [
         "karm-gfx",
         "embed"

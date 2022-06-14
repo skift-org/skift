@@ -2,6 +2,7 @@ from copy import copy
 import errno
 import os
 import hashlib
+import signal
 import requests
 import subprocess
 import json
@@ -133,8 +134,12 @@ def downloadFile(url: str) -> str:
 
 def runCmd(*args: str) -> bool:
     proc = subprocess.run(args)
+    if proc.returncode == -signal.SIGSEGV:
+        raise CliException("Segmentation fault")
+
     if proc.returncode != 0:
-        raise CliException(f"Failed to run {' '.join(args)}")
+        raise CliException(
+            f"Failed to run {' '.join(args)}: process exited with code {proc.returncode}")
 
     return True
 

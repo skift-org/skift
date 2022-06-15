@@ -4,7 +4,7 @@
 </p>
 <br/>
 
-![](doc/header.png)
+![](doc/header.svg)
 
 <br/>
 <p align="center">
@@ -43,7 +43,7 @@ Binary files should be should be as small as possible. Use:
 ## License
 
 <a href="https://opensource.org/licenses/MIT">
-  <img align="right" height="96" alt="MIT License" src="doc/mit.png" />
+  <img align="right" height="96" alt="MIT License" src="doc/mit.svg" />
 </a>
 
 The skift operating system and its core components are licensed under the **MIT License**.

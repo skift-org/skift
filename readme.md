@@ -17,11 +17,29 @@
 
 # **skiftOS**: The delightful operating system
 
-**skiftOS** is a hobby operating system created from scratch in contemporary C++ for ARM, x86, and RISC-V platforms. We built Skift on top of the _Hjert_ micro-kernel, a C++ rewrite of the _BRUTAL_ kernel to make it simpler, safer, and enhance the existing design. On top of the kernel resides _Karm_, a framework comprised of a minimal subset of the C and C++ standard library, an extensive collection of containers and utilities, a SwiftUI inspired Ui, and much more. Finally, built on top of _Karm_ is _Hideo_, a delightful desktop environment.
+**skiftOS** is a hobby operating system created from scratch in contemporary C/C++ for ARM, x86, and RISC-V platforms. We built Skift on top of the _Hjert_ micro-kernel, a C++ rewrite of the _BRUTAL_ kernel to make it simpler, safer, and enhance the existing design. On top of the kernel resides _Karm_, a framework comprised of a minimal subset of the C/C++ standard library, an extensive collection of containers and utilities, a SwiftUI inspired Ui, and much more. Finally, built on top of _Karm_ is _Hideo_, a delightful desktop environment.
 
 ## Building
 
 skiftOS is written in bleeding-edge C2x and C++23 and building it requires a modern C/C++ compiler like clang-14 or GCC-12 installed on the host machine.
+
+```sh
+# Make sure clang is the right version
+$ clang --version
+clang version 13.0.1
+Target: x86_64-pc-linux-gnu
+Thread model: posix
+InstalledDir: /usr/bin
+
+# Make sure nasm is installed
+$ nasm --version
+NASM version 2.15.05 compiled on Sep 24 2020
+
+# Make sure python3 is installed
+$ python3 --version
+Python 3.10.5
+
+```
 
 ## Contributings
 
@@ -33,7 +51,7 @@ Commit messages should be short and concise and prefixed with the name of the pa
 karm-base: Fix buffer overflow in Karm::String::reserve.
 ```
 
-Binary files should be should be as small as possible. Use:
+Binary files should be as small as possible.
 
 - SVG should be preferred over other raster images formats
 - `optipng -strip all` to reduce the size of PNG images.

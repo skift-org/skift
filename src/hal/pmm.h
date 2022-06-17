@@ -7,7 +7,7 @@
 namespace Hal {
 
 enum struct PmmFlags : uint64_t {
-    NONE = 0,
+    NIL = 0,
     LOWER = (1 << 0),
     UPPER = (1 << 1),
     DMA = (1 << 2),

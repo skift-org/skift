@@ -22,7 +22,7 @@ struct [[gnu::packed]] SectionHeader {
 };
 
 enum struct ProgramType : uint32_t {
-    NIL = 0,
+    NONE = 0,
     LOAD = 1,
     DYNAMIC = 2,
     INTERP = 3,
@@ -30,7 +30,7 @@ enum struct ProgramType : uint32_t {
 };
 
 enum struct ProgramFlags : uint32_t {
-    NONE = 0,
+    NIL = 0,
     READ = 1,
     WRITE = 2,
     EXEC = 4,

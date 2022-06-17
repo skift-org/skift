@@ -73,7 +73,9 @@ Error load(Sys::Path kernelPath) {
     kernelMem.leak();
     stackMap.leak();
 
-    Sys::println("Entering kernel, see you on the other side...");
+    Sys::println("Entering kernel, see on the other side...");
+    Sys::println("Vmm is at {x}", (size_t)&vmm.unwrap());
+    vmm->dump();
     try$(Fw::finalizeHandover(payload));
     vmm->activate();
 

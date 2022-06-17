@@ -8,7 +8,6 @@ namespace x86_64 {
 static constexpr size_t PAGE_SIZE = 0x1000;
 
 struct [[gnu::packed]] Entry {
-
     static constexpr uint64_t PRESENT = 1 << 0;
     static constexpr uint64_t WRITE = 1 << 1;
     static constexpr uint64_t USER = 1 << 2;
@@ -19,31 +18,31 @@ struct [[gnu::packed]] Entry {
     static constexpr uint64_t HUGE_PAGE = 1 << 7;
     static constexpr uint64_t GLOBAL = 1 << 8;
 
-    static constexpr uint64_t ADDR_MASK = 0x000ffffffffff000;
+    static constexpr uint64_t PADDR_MASK = 0x000ffffffffff000;
     static constexpr uint64_t FLAGS_MASK = 0xfff;
 
-    uint64_t raw{};
+    uint64_t _raw{};
 
     Entry() {}
 
-    Entry(size_t addr, uint64_t flags) {
-        raw = (addr & ADDR_MASK) | (flags & FLAGS_MASK);
+    Entry(size_t paddr, uint64_t flags) {
+        _raw = (paddr & PADDR_MASK) | (flags & FLAGS_MASK);
     }
 
     template <typename T>
     T *as() {
-        return (T *)addr();
+        return (T *)paddr();
     }
 
-    size_t addr() const { return raw & ADDR_MASK; }
+    size_t paddr() const { return _raw & PADDR_MASK; }
 
-    void addr(uint64_t addr) { raw = (addr & ADDR_MASK) | raw; }
+    uint64_t flags() const { return _raw & FLAGS_MASK; }
 
-    uint64_t flags() const { return raw & FLAGS_MASK; }
+    void paddr(uint64_t paddr) { _raw = (paddr & PADDR_MASK) | flags(); }
 
-    void flags(uint64_t flags) { raw = (flags & FLAGS_MASK) | raw; }
+    void flags(uint64_t flags) { _raw = (flags & FLAGS_MASK) | paddr(); }
 
-    bool present() const { return raw & PRESENT; }
+    bool present() const { return _raw & PRESENT; }
 };
 
 static_assert(sizeof(Entry) == 8);
@@ -59,7 +58,11 @@ struct [[gnu::packed]] Pml {
     const Entry &operator[](size_t i) const { return pages[i]; }
 
     size_t virt2index(size_t virt) const {
-        return (virt >> (LEVEL * 9)) & 0x1ff;
+        return (virt >> (12 + (LEVEL - 1) * 9)) & 0x1ff;
+    }
+
+    size_t index2virt(size_t index) const {
+        return (index) << (12 + (LEVEL - 1) * 9);
     }
 
     Opt<size_t> virt2phys(size_t virt) const {

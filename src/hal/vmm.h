@@ -9,7 +9,7 @@
 namespace Hal {
 
 enum struct VmmFlags : uint64_t {
-    NONE = 0,
+    NIL = 0,
     READ = (1 << 0),
     WRITE = (1 << 1),
     EXEC = (1 << 2),
@@ -38,6 +38,8 @@ struct Vmm {
     virtual Error update(VmmRange vaddr, VmmFlags flags) = 0;
 
     virtual Error flush(VmmRange vaddr) = 0;
+
+    virtual void dump() = 0;
 
     virtual void activate() = 0;
 };

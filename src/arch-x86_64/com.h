@@ -5,7 +5,7 @@
 namespace x86_64 {
 
 struct Com {
-    enum Ports {
+    enum Port {
         COM1 = 0x3F8,
         COM2 = 0x2F8,
         COM3 = 0x3E8,
@@ -60,9 +60,9 @@ struct Com {
         IMPENDING_ERROR = 1 << 7,
     };
 
-    Ports _port;
+    Port _port;
 
-    Com(Ports port) : _port(port) {}
+    Com(Port port) : _port(port) {}
 
     void init() {
         writeReg(INTERRUPT_IDENTIFICATOR, 0);

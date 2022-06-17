@@ -36,7 +36,8 @@ struct Vmm : public Hal::Vmm {
             return page.template as<Pml<L>>();
         }
 
-        size_t lower = try$(_pmm.alloc(PAGE_SIZE, Hal::PmmFlags::NONE)).start;
+        size_t lower = try$(_pmm.alloc(PAGE_SIZE, Hal::PmmFlags::NIL)).start;
+        Sys::println("Allocated lower page: {}", lower);
         memset((void *)lower, 0, PAGE_SIZE);
         upper.putPage(vaddr, {lower, Entry::WRITE | Entry::PRESENT | Entry::USER});
         return (Pml<L> *)lower;
@@ -90,6 +91,24 @@ struct Vmm : public Hal::Vmm {
 
     void activate() override {
         x86_64::wrcr3((uint64_t)_pml4);
+    }
+
+    template <size_t LEVEL>
+    void _dumpPml(Pml<LEVEL> &pml, size_t vaddr) {
+        for (size_t i = 0; i < 512; i++) {
+            auto page = pml.pageAt(i);
+            size_t curr = pml.index2virt(i) | vaddr;
+            if constexpr (LEVEL == 1) {
+                Sys::println("{x} {x}", curr, page._raw);
+            } else if (page.present()) {
+                auto &lower = *page.template as<Pml<LEVEL - 1>>();
+                _dumpPml(lower, curr);
+            }
+        }
+    }
+
+    void dump() override {
+        _dumpPml(*_pml4, 0);
     }
 };
 

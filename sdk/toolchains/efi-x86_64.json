@@ -42,5 +42,8 @@
         "rcs"
     ],
     "as": "nasm",
-    "asflags": []
+    "asflags": [
+        "-f",
+        "win64"
+    ]
 }

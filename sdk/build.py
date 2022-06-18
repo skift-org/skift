@@ -51,6 +51,8 @@ def genNinja(out: TextIO, manifests: dict, env: dict) -> None:
                 writer.build(obj[0], "cc", obj[1])
             elif obj[1].endswith(".cpp"):
                 writer.build(obj[0], "cxx", obj[1])
+            elif obj[1].endswith(".s"):
+                writer.build(obj[0], "as", obj[1])
 
         writer.newline()
 

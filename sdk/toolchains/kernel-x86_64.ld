@@ -4,6 +4,11 @@ SECTIONS
 {
     . = 0xffffffff80200000;
 
+    .handover : ALIGN(4K)
+    {
+        *(.handover*)
+    }
+
     .text : ALIGN(4K)
     {
         *(.text*)
@@ -12,6 +17,7 @@ SECTIONS
     .rodata : ALIGN(4K)
     {
         *(.rodata*)
+        *(.init_array)
     }
 
     .data : ALIGN(4K)

@@ -19,9 +19,9 @@ Result<Strong<Sys::Fd>> createOut();
 
 Result<Strong<Sys::Fd>> createErr();
 
-Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options);
+Result<Sys::MmapResult> memMap(Sys::MmapOptions const &options);
 
-Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd> fd);
+Result<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> fd);
 
 Error memUnmap(void const *buf, size_t len);
 

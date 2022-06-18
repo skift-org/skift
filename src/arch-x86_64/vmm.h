@@ -1,5 +1,6 @@
 #pragma once
 
+#include <hal/mem.h>
 #include <hal/pmm.h>
 #include <hal/vmm.h>
 #include <karm-sys/chan.h>
@@ -36,9 +37,8 @@ struct Vmm : public Hal::Vmm {
             return page.template as<Pml<L>>();
         }
 
-        size_t lower = try$(_pmm.alloc(PAGE_SIZE, Hal::PmmFlags::NIL)).start;
-        Sys::println("Allocated lower page: {}", lower);
-        memset((void *)lower, 0, PAGE_SIZE);
+        size_t lower = try$(_pmm.alloc(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start;
+        memset((void *)lower, 0, Hal::PAGE_SIZE);
         upper.putPage(vaddr, {lower, Entry::WRITE | Entry::PRESENT | Entry::USER});
         return (Pml<L> *)lower;
     }
@@ -64,14 +64,14 @@ struct Vmm : public Hal::Vmm {
             return Error::INVALID_INPUT;
         }
 
-        for (size_t page = 0; page < vaddr.size(); page += PAGE_SIZE) {
+        for (size_t page = 0; page < vaddr.size(); page += Hal::PAGE_SIZE) {
             try$(mapPage(vaddr.start + page, paddr.start + page, flags));
         }
         return OK;
     }
 
     Error unmap(Hal::VmmRange vaddr) override {
-        for (size_t page = 0; page < vaddr.size(); page += PAGE_SIZE) {
+        for (size_t page = 0; page < vaddr.size(); page += Hal::PAGE_SIZE) {
             try$(unmapPage(vaddr.start + page));
         }
         return OK;
@@ -82,7 +82,7 @@ struct Vmm : public Hal::Vmm {
     }
 
     Error flush(Hal::VmmRange vaddr) override {
-        for (size_t i = 0; i < vaddr.size(); i += PAGE_SIZE) {
+        for (size_t i = 0; i < vaddr.size(); i += Hal::PAGE_SIZE) {
             x86_64::invlpg(vaddr.start + i);
         }
 
@@ -96,10 +96,12 @@ struct Vmm : public Hal::Vmm {
     template <size_t LEVEL>
     void _dumpPml(Pml<LEVEL> &pml, size_t vaddr) {
         for (size_t i = 0; i < 512; i++) {
-            auto page = pml.pageAt(i);
+            auto page = pml[i];
             size_t curr = pml.index2virt(i) | vaddr;
             if constexpr (LEVEL == 1) {
-                Sys::println("{x} {x}", curr, page._raw);
+                if (page.present()) {
+                    Sys::println("{x} {x}", curr, page._raw);
+                }
             } else if (page.present()) {
                 auto &lower = *page.template as<Pml<LEVEL - 1>>();
                 _dumpPml(lower, curr);
@@ -109,6 +111,10 @@ struct Vmm : public Hal::Vmm {
 
     void dump() override {
         _dumpPml(*_pml4, 0);
+    }
+
+    size_t root() override {
+        return (size_t)_pml4;
     }
 };
 

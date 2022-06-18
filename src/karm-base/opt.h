@@ -40,7 +40,9 @@ struct Opt {
         }
     }
 
-    ~Opt() { release(); }
+    ~Opt() {
+        release();
+    }
 
     Opt &operator=(None) {
         release();
@@ -78,7 +80,9 @@ struct Opt {
         return !_present;
     }
 
-    constexpr explicit operator bool() const { return _present; }
+    constexpr explicit operator bool() const {
+        return _present;
+    }
 
     T *operator->() {
         if (!_present) {
@@ -110,12 +114,12 @@ struct Opt {
 
     void release() {
         if (_present) {
-            _present = false;
             _value.dtor();
+            _present = false;
         }
     }
 
-    Error none() {
+    Error none() const {
         if (!_present) {
             return "unwrapping none";
         }

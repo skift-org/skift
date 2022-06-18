@@ -96,6 +96,11 @@ struct Range {
     auto iterRev() const {
         return range(end, start);
     }
+
+    template <typename U>
+    auto as() {
+        return U{start, end};
+    }
 };
 
 template <typename T>

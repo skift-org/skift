@@ -1,5 +1,6 @@
 #include <efi/base.h>
 #include <embed/sys.h>
+#include <hal/mem.h>
 #include <karm-base/align.h>
 #include <karm-io/funcs.h>
 #include <karm-io/impls.h>
@@ -112,14 +113,9 @@ Result<Strong<Sys::Fd>> createErr() {
 }
 
 Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
-    static Efi::LoadedImageProtocol *loadedImage = nullptr;
-    if (!loadedImage) {
-        loadedImage = try$(Efi::openProtocol<Efi::LoadedImageProtocol>());
-    }
-
     static Efi::SimpleFileSystemProtocol *fileSystem = nullptr;
     if (!fileSystem) {
-        fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(loadedImage->deviceHandle));
+        fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(Efi::li()->deviceHandle));
     }
 
     static Efi::FileProtocol *rootDir = nullptr;
@@ -139,24 +135,37 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
     return {makeStrong<FileProto>(file)};
 }
 
-Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options) {
+Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
     size_t vaddr = 0;
-    try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, alignUp(options.size, 4096) / 4096, &vaddr));
-    return USizeRange{vaddr, vaddr + options.size};
+
+    try$(Efi::bs()->allocatePages(
+        Efi::AllocateType::ANY_PAGES,
+        Efi::MemoryType::USER,
+        Hal::pageAlignUp(options.size) / Hal::PAGE_SIZE,
+        &vaddr));
+
+    // Memory is identity mapped, so we can just return the virtual address as paddr
+    return Sys::MmapResult{vaddr, vaddr, options.size};
 }
 
-Result<USizeRange> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> fd) {
+Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> fd) {
     size_t vaddr = 0;
     size_t fileSize = try$(Io::size(*fd));
-    try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, alignUp(fileSize, 4096) / 4096, &vaddr));
-    USizeRange range{vaddr, vaddr + fileSize};
-    Io::BufWriter writer{(void *)range.start, range.size()};
+
+    try$(Efi::bs()->allocatePages(
+        Efi::AllocateType::ANY_PAGES,
+        Efi::MemoryType::USER,
+        Hal::pageAlignUp(fileSize) / Hal::PAGE_SIZE, &vaddr));
+
+    Io::BufWriter writer{(void *)vaddr, fileSize};
     try$(Io::copy(*fd, writer));
-    return range;
+
+    // Memory is identity mapped, so we can just return the virtual address as paddr
+    return Sys::MmapResult{vaddr, vaddr, Hal::pageAlignUp(fileSize)};
 }
 
 Error memUnmap(void const *buf, size_t size) {
-    try$(Efi::bs()->freePages((uint64_t)buf, size / 4096));
+    try$(Efi::bs()->freePages((uint64_t)buf, size / Hal::PAGE_SIZE));
     return OK;
 }
 

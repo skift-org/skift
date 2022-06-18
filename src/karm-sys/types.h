@@ -26,4 +26,10 @@ struct MmapOptions {
     size_t size = 0;
 };
 
+struct MmapResult {
+    size_t paddr;
+    size_t vaddr;
+    size_t size;
+};
+
 } // namespace Karm::Sys

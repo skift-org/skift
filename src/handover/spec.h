@@ -166,10 +166,10 @@ static inline bool valid(uint32_t magic, Payload const &payload) {
     return true;
 }
 
-static constexpr char const *REQUEST_SECTION = ".handover.request";
+static constexpr char const *REQUEST_SECTION = ".handover";
 
 #define HandoverSection$() \
-    [[gnu::used, gnu::section(".handover.request")]]
+    [[gnu::used, gnu::section(".handover")]]
 
 // clang-format off
 

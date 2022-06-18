@@ -1,5 +1,7 @@
 #include <elf/image.h>
+#include <hal/mem.h>
 #include <handover/builder.h>
+#include <karm-base/align.h>
 #include <karm-base/size.h>
 #include <karm-sys/chan.h>
 #include <karm-sys/file.h>
@@ -10,12 +12,13 @@
 
 namespace Loader {
 
+void enterKernel(size_t entry, size_t payload, size_t stack, size_t vmm);
+
 Error load(Sys::Path kernelPath) {
+
     Sys::println("Preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
     Handover::Builder payload{payloadMem.slice<uint8_t>()};
-
-    payload.agent("loader");
     payload.add(Handover::SELF, 0, payloadMem.prange());
 
     Sys::println("Loading kernel file...");
@@ -39,48 +42,49 @@ Error load(Sys::Path kernelPath) {
         }
 
         size_t paddr = prog.vaddr() - Handover::KERNEL_BASE;
+        size_t memsz = Hal::pageAlignUp(prog.memsz());
+
         size_t remaining = prog.memsz() - prog.filez();
         memcpy((void *)paddr, prog.buf(), prog.filez());
         memset((void *)(paddr + prog.filez()), 0, remaining);
 
-        payload.add(Handover::KERNEL, 0, {paddr, paddr + prog.memsz()});
+        payload.add(Handover::KERNEL, 0, {paddr, paddr + memsz});
     }
 
     Sys::println("Handling kernel requests...");
     auto requests = try$(image.sectionByName(Handover::REQUEST_SECTION)).slice<Handover::Request>();
 
     for (auto const &request : requests) {
-        Sys::println("Handing over {}...", request.name());
+        Sys::println(" - {}", request.name());
     }
 
-    Sys::println("Mapping kernel space...");
     auto vmm = try$(Fw::createVmm());
 
-    size_t kernelSize = gib(2) - 0x1000;
-    Hal::VmmRange kernelVrange{Handover::KERNEL_BASE + 0x1000, Handover::KERNEL_BASE + kernelSize};
-    Hal::PmmRange kernelPrange{0x1000, kernelSize};
+    Sys::println("Mapping kernel...");
+    try$(vmm->map(
+        {Handover::KERNEL_BASE + Hal::PAGE_SIZE, (Handover::KERNEL_BASE - Hal::PAGE_SIZE) + gib(2) - Hal::PAGE_SIZE},
+        {0x1000, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
+        Hal::Vmm::READ | Hal::Vmm::WRITE));
 
-    try$(vmm->map(kernelVrange, kernelPrange, Hal::Vmm::READ | Hal::Vmm::WRITE | Hal::Vmm::EXEC));
+    Sys::println("Mapping upper half...");
+    try$(vmm->map(
+        {Handover::UPPER_HALF + 0x1000, Handover::UPPER_HALF + gib(4)},
+        {0x1000, gib(4)},
+        Hal::Vmm::READ | Hal::Vmm::WRITE));
 
-    Sys::println("Mapping upper space...");
-    try$(vmm->map({Handover::UPPER_HALF + 0x1000, Handover::UPPER_HALF + gib(4)}, {0x1000, gib(4)}, Hal::Vmm::READ | Hal::Vmm::WRITE));
+    Sys::println("Mapping loader image...");
+    auto loaderImage = Fw::image();
 
-    Sys::println("Mapping loader space...");
-    try$(vmm->map({0x1000, mib(512)}, {0x1000, mib(512)}, Hal::Vmm::READ | Hal::Vmm::WRITE));
+    try$(vmm->map(
+        Hal::VmmRange::identityMapped(loaderImage),
+        loaderImage,
+        Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     Sys::println("Finishing up...");
-    payloadMem.leak();
-    kernelMem.leak();
-    stackMap.leak();
 
     Sys::println("Entering kernel, see on the other side...");
-    Sys::println("Vmm is at {x}", (size_t)&vmm.unwrap());
-    vmm->dump();
     try$(Fw::finalizeHandover(payload));
-    vmm->activate();
-
-    Handover::EntryPoint entryPoint = (Handover::EntryPoint)(size_t)image.header().entry;
-    entryPoint(Handover::COOLBOOT, payload.finalize());
+    Fw::enterKernel(image.header().entry, payload.finalize(), Handover::KERNEL_BASE + (size_t)stackMap.end(), *vmm);
     panic("unreachable");
 }
 

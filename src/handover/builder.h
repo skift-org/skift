@@ -56,8 +56,8 @@ struct Builder {
         payload().agent = add(str);
     }
 
-    Payload *finalize() {
-        return (Payload *)_buf;
+    Payload &finalize() {
+        return *(Payload *)_buf;
     }
 };
 

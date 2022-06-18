@@ -5,8 +5,6 @@
 
 namespace x86_64 {
 
-static constexpr size_t PAGE_SIZE = 0x1000;
-
 struct [[gnu::packed]] Entry {
     static constexpr uint64_t PRESENT = 1 << 0;
     static constexpr uint64_t WRITE = 1 << 1;
@@ -73,10 +71,10 @@ struct [[gnu::packed]] Pml {
         }
 
         if (LEVEL == 1) {
-            return page.addr() + (virt & 0x1ff);
+            return page.paddr() + (virt & 0x1ff);
         }
 
-        auto *pml = (Pml<L - 1> *)page.addr();
+        auto *pml = (Pml<L - 1> *)page.paddr();
         return pml->virt2phys(virt);
     }
 

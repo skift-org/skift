@@ -12,4 +12,8 @@ Result<Strong<Hal::Vmm>> createVmm();
 
 Error finalizeHandover(Handover::Builder &builder);
 
+void enterKernel(size_t entry, Handover::Payload &payload, size_t stack, Hal::Vmm &vmm);
+
+Hal::PmmRange image();
+
 } // namespace Loader::Fw

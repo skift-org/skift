@@ -12,6 +12,8 @@ extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable *st) {
     Efi::init(handle, st);
     Abi::Ms::init();
 
+    (void)Efi::st()->conOut->clearScreen(Efi::st()->conOut);
+
     char const *argv[] = {"efi-app", nullptr};
     CliArgs args{1, argv};
 

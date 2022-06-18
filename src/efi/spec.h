@@ -314,12 +314,13 @@ struct LoadedImageProtocol {
     static constexpr Uuid UUID = Uuid{0x5B1B31A1, 0x9562, 0x11d2, {0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B}};
 
     uint32_t revision;
-    Handle *parentHandle;
+    Handle parentHandle;
     SystemTable *st;
 
     // Source location of the image
     Handle *deviceHandle;
     DevicePathProtocol *devicePath;
+    void *reserved;
 
     // Image's load options
     uint32_t loadOptionsSize;

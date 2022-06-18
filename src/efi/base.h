@@ -12,6 +12,8 @@ BootService *bs();
 
 RuntimeService *rt();
 
+Efi::LoadedImageProtocol *li();
+
 void init(Handle handle, SystemTable *st);
 
 template <typename P>

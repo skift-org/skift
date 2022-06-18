@@ -16,9 +16,10 @@ struct Mmap :
     void const *_buf{};
     size_t _size{};
 
-    Mmap(void const *buf, size_t size)
-        : _buf(buf), _size(size) {}
-
+    /*
+        Mmap(void const *buf, size_t size)
+            : _paddr(-1), _buf(buf), _size(size) {}
+    */
     Mmap(size_t paddr, void const *buf, size_t size)
         : _paddr(paddr), _buf(buf), _size(size) {}
 
@@ -34,8 +35,9 @@ struct Mmap :
     }
 
     ~Mmap() {
-        if (_buf)
+        if (_buf) {
             Embed::memUnmap(_buf, _size).unwrap("mem-unmap failled");
+        }
     }
 
     size_t vaddr() const {
@@ -54,22 +56,40 @@ struct Mmap :
         return {_paddr, _paddr + _size};
     }
 
-    Bytes bytes() const { return {_buf, _size}; }
+    Bytes bytes() const {
+        return {_buf, _size};
+    }
 
     template <typename T>
-    T const *as() const { return static_cast<T const *>(_buf); }
+    T const *as() const {
+        return static_cast<T const *>(_buf);
+    }
 
     template <typename T>
-    Slice<T> slice() const { return {(T *)_buf, _size / sizeof(T)}; }
+    Slice<T> slice() const {
+        return {(T *)_buf, _size / sizeof(T)};
+    }
 
     template <typename T>
-    Cursor<T> cursor() const { return {(T *)_buf, _size / sizeof(T)}; }
+    Cursor<T> cursor() const {
+        return {(T *)_buf, _size / sizeof(T)};
+    }
 
-    void const *buf() const { return _buf; }
+    void const *buf() const {
+        return _buf;
+    }
 
-    size_t size() const { return _size; }
+    void const *begin() const {
+        return _buf;
+    }
 
-    void leak() { _buf = nullptr; }
+    void const *end() const {
+        return (void *)((size_t)_buf + _size);
+    }
+
+    size_t size() const {
+        return _size;
+    }
 };
 
 struct MutMmap :
@@ -81,9 +101,10 @@ struct MutMmap :
     void *_buf{};
     size_t _size{};
 
-    MutMmap(void *buf, size_t size)
-        : _paddr(0), _buf(buf), _size(size) {}
-
+    /*
+        MutMmap(void *buf, size_t size)
+            : _paddr(-1), _buf(buf), _size(size) {}
+    */
     MutMmap(size_t paddr, void *buf, size_t size)
         : _paddr(paddr), _buf(buf), _size(size) {}
 
@@ -108,6 +129,14 @@ struct MutMmap :
         }
     }
 
+    size_t vaddr() const {
+        return (size_t)_buf;
+    }
+
+    size_t paddr() const {
+        return _paddr;
+    }
+
     USizeRange vrange() const {
         return {(size_t)_buf, (size_t)_buf + _size};
     }
@@ -116,24 +145,55 @@ struct MutMmap :
         return {_paddr, _paddr + _size};
     }
 
-    Bytes bytes() const { return {_buf, _size}; }
+    Bytes bytes() const {
+        return {_buf, _size};
+    }
 
-    MutBytes bytes() { return {_buf, _size}; }
-
-    template <typename T>
-    T *as() { return static_cast<T *>(_buf); }
-
-    template <typename T>
-    MutSlice<T> slice() { return MutSlice<T>{(T *)_buf, _size / sizeof(T)}; }
+    MutBytes bytes() {
+        return {_buf, _size};
+    }
 
     template <typename T>
-    Cursor<T> cursor() { return Cursor<T>{(T *)_buf, _size / sizeof(T)}; }
+    T *as() {
+        return static_cast<T *>(_buf);
+    }
 
-    void *buf() { return _buf; }
-    void const *buf() const { return _buf; }
-    size_t size() const { return _size; }
+    template <typename T>
+    MutSlice<T> slice() {
+        return MutSlice<T>{(T *)_buf, _size / sizeof(T)};
+    }
 
-    void leak() { _buf = nullptr; }
+    template <typename T>
+    Cursor<T> cursor() {
+        return Cursor<T>{(T *)_buf, _size / sizeof(T)};
+    }
+
+    void *buf() {
+        return _buf;
+    }
+
+    void const *buf() const {
+        return _buf;
+    }
+
+    void *begin() {
+        return _buf;
+    }
+
+    void const *begin() const {
+        return _buf;
+    }
+
+    void *end() {
+        return (void *)((size_t)_buf + _size);
+    }
+    void const *end() const {
+        return (void *)((size_t)_buf + _size);
+    }
+
+    size_t size() const {
+        return _size;
+    }
 };
 
 struct _Mmap {
@@ -184,14 +244,14 @@ struct _Mmap {
 
     Result<Mmap> map() {
         _options.flags |= READ;
-        USizeRange range = try$(Embed::memMap(_options));
-        return Mmap{(void const *)range.start, range.size()};
+        MmapResult range = try$(Embed::memMap(_options));
+        return Mmap{range.paddr, (void const *)range.vaddr, range.size};
     }
 
     Result<Mmap> map(Strong<Fd> fd) {
         _options.flags |= READ;
-        USizeRange range = try$(Embed::memMap(_options, fd));
-        return Mmap{(void const *)range.start, range.size()};
+        MmapResult range = try$(Embed::memMap(_options, fd));
+        return Mmap{range.paddr, (void const *)range.vaddr, range.size};
     }
 
     Result<Mmap> map(AsFd auto &what) {
@@ -200,14 +260,14 @@ struct _Mmap {
 
     Result<MutMmap> mapMut() {
         _options.flags |= WRITE;
-        USizeRange range = try$(Embed::memMap(_options));
-        return MutMmap{(void *)range.start, range.size()};
+        MmapResult range = try$(Embed::memMap(_options));
+        return MutMmap{range.paddr, (void *)range.vaddr, range.size};
     }
 
     Result<MutMmap> mapMut(Strong<Fd> fd) {
         _options.flags |= WRITE;
-        USizeRange range = try$(Embed::memMap(_options, fd));
-        return MutMmap{(void *)range.start, range.size()};
+        MmapResult result = try$(Embed::memMap(_options, fd));
+        return MutMmap{result.paddr, (void *)result.vaddr, result.size};
     }
 
     Result<MutMmap> mapMut(AsFd auto &what) {

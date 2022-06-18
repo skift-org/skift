@@ -2,19 +2,28 @@
 
 namespace Efi {
 
-Handle _handle;
-SystemTable *_st;
+Handle _handle = nullptr;
+SystemTable *_st = nullptr;
+Efi::LoadedImageProtocol *_li = nullptr;
 
 Handle imageHandle() { return _handle; }
 
 SystemTable *st() { return _st; }
 
-BootService *bs(){
+BootService *bs() {
     return st()->boot;
 }
 
-RuntimeService *rt(){
+RuntimeService *rt() {
     return st()->runtime;
+}
+
+Efi::LoadedImageProtocol *li() {
+    if (!_li) {
+        _li = Efi::openProtocol<Efi::LoadedImageProtocol>().unwrap();
+    }
+
+    return _li;
 }
 
 void init(Handle handle, SystemTable *st) {

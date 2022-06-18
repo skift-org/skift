@@ -46,7 +46,7 @@ struct NumberFormater {
         }
     }
 
-    Result<size_t> format_unsigned(Io::Writer &writer, uint64_t value) {
+    Result<size_t> formatUnsigned(Io::Writer &writer, uint64_t value) {
         auto digit = [](size_t v) {
             if (v < 10) {
                 return '0' + v;
@@ -71,7 +71,7 @@ struct NumberFormater {
 template <typename T>
 struct UnsignedFormatter : public NumberFormater {
     Result<size_t> format(Io::Writer &writer, T const value) {
-        return format_unsigned(writer, value);
+        return formatUnsigned(writer, value);
     }
 };
 

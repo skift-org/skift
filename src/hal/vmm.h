@@ -22,6 +22,14 @@ FlagsEnum$(VmmFlags);
 
 struct VmmRange : public USizeRange {
     using USizeRange::USizeRange;
+
+    static VmmRange identityMapped(PmmRange range) {
+        return {range.start, range.end};
+    }
+
+    static VmmRange upperHalfMapped(PmmRange range) {
+        return {0xffffffff80000000, range.end};
+    }
 };
 
 struct Vmm {
@@ -42,6 +50,8 @@ struct Vmm {
     virtual void dump() = 0;
 
     virtual void activate() = 0;
+
+    virtual size_t root() = 0;
 };
 
 } // namespace Hal

@@ -164,7 +164,7 @@ enum struct AllocateType : uint32_t {
     ADDRESS,
 };
 
-enum struct MemoryType : uint64_t {
+enum struct MemoryType : uint32_t {
     RESERVED_MEMORY_TYPE,
     LOADER_CODE,
     LOADER_DATA,
@@ -182,12 +182,10 @@ enum struct MemoryType : uint64_t {
     PERSISTENT_MEMORY,
 
     MAX_MEMORY_TYPE,
-
-    USER = 0x80000000,
 };
 
 struct MemoryDescriptor {
-    uint32_t type;
+    MemoryType type;
     size_t physicalStart;
     size_t virtualStart;
     uint64_t numberOfPages;

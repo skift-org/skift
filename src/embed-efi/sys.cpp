@@ -140,7 +140,7 @@ Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
 
     try$(Efi::bs()->allocatePages(
         Efi::AllocateType::ANY_PAGES,
-        Efi::MemoryType::USER,
+        Efi::MemoryType::LOADER_DATA,
         Hal::pageAlignUp(options.size) / Hal::PAGE_SIZE,
         &vaddr));
 
@@ -154,7 +154,7 @@ Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> f
 
     try$(Efi::bs()->allocatePages(
         Efi::AllocateType::ANY_PAGES,
-        Efi::MemoryType::USER,
+        Efi::MemoryType::LOADER_DATA,
         Hal::pageAlignUp(fileSize) / Hal::PAGE_SIZE, &vaddr));
 
     Io::BufWriter writer{(void *)vaddr, fileSize};

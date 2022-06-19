@@ -9,13 +9,13 @@ namespace Loader::Fw {
 struct EfiPmm : public Hal::Pmm {
     Result<Hal::PmmRange> alloc(size_t size, Hal::PmmFlags) override {
         size_t paddr = 0;
-        try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::USER, size / Hal::PAGE_SIZE, &paddr));
+        try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::LOADER_DATA, size / Hal::PAGE_SIZE, &paddr));
         return Hal::PmmRange{paddr, paddr + size};
     }
 
     Error used(Hal::PmmRange range, Hal::PmmFlags) override {
         size_t paddr = range.start;
-        try$(Efi::bs()->allocatePages(Efi::AllocateType::ADDRESS, Efi::MemoryType::USER, paddr / Hal::PAGE_SIZE, &paddr));
+        try$(Efi::bs()->allocatePages(Efi::AllocateType::ADDRESS, Efi::MemoryType::LOADER_DATA, paddr / Hal::PAGE_SIZE, &paddr));
         return OK;
     }
 

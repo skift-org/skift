@@ -2,6 +2,7 @@
 #include <embed/sys.h>
 #include <hal/mem.h>
 #include <karm-base/align.h>
+#include <karm-base/macros.h>
 #include <karm-io/funcs.h>
 #include <karm-io/impls.h>
 
@@ -17,9 +18,10 @@ struct ConOut : public Sys::Fd {
     }
 
     Result<size_t> write(void const *buf, size_t size) override {
-        Str s = {(char const *)buf, size};
-        auto str = transcode<Utf16>(s);
-        try$(_proto->outputString(_proto, str.buf()));
+        static Utf16::Unit tmp[512];
+        size_t len = transcodeUnits<Utf8, Utf16>({(Utf8::Unit *)buf, size}, {tmp, arrayLen$(tmp)});
+        tmp[len] = 0;
+        try$(_proto->outputString(_proto, tmp));
         return size;
     }
 

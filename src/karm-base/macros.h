@@ -2,7 +2,7 @@
 
 namespace Karm {
 
-#define array_len$(ARR) (sizeof(ARR) / sizeof(ARR[0]))
+#define arrayLen$(ARR) (sizeof(ARR) / sizeof(ARR[0]))
 
 #define __concat$(LHS, RHS) LHS##RHS
 
@@ -16,6 +16,6 @@ namespace Karm {
 
 #define defer$(BEGIN, END) for (int var$(__i) = (BEGIN, 0); !var$(__i); (var$(__i) += 1, END))
 
-#define cond_defer$(BEGIN, END) for (int var$(__i) = BEGIN; var$(__i); (var$(__i) -= 1, END))
+#define condDefer$(BEGIN, END) for (int var$(__i) = BEGIN; var$(__i); (var$(__i) -= 1, END))
 
 } // namespace Karm

@@ -14,10 +14,10 @@ namespace Karm::Test {
     ::Karm::Error var$(_testFunc)([[maybe_unused]] ::Karm::Test::Driver & _driver)
 
 #define describe$(DESCR) \
-    cond_defer$(_driver.beginDescribe(DESCR), _driver.endDescribe())
+    condDefer$(_driver.beginDescribe(DESCR), _driver.endDescribe())
 
 #define it$(DESCR) \
-    cond_defer$(_driver.beginIt(DESCR), _driver.endIt())
+    condDefer$(_driver.beginIt(DESCR), _driver.endIt())
 
 #define __expect$(LHS, RHS, OP)                         \
     ({                                                  \

@@ -6,12 +6,12 @@ namespace std {
 
 template <typename T>
 struct initializer_list {
-    T *_data;
+    T const *_data;
     size_t _size;
 
-    constexpr initializer_list(T const *data, size_t size) : _data(data), _size(size) {}
+    constexpr initializer_list() : _data(nullptr), _size(0) {}
 
-    constexpr initializer_list() : _data(0), _size(0) {}
+    constexpr initializer_list(T const *data, size_t size) : _data(data), _size(size) {}
 
     constexpr T const *begin() const { return _data; }
 

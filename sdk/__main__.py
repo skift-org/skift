@@ -40,7 +40,8 @@ def runCmd(opts: dict, args: list[str]) -> None:
 
 
 def kvmAvailable() -> bool:
-    if os.path.exists("/dev/kvm"):
+    if os.path.exists("/dev/kvm") and \
+            os.access("/dev/kvm", os.R_OK):
         return True
     return False
 
@@ -79,7 +80,8 @@ def bootCmd(opts: dict, args: list[str]) -> None:
         "-bios", ovmf,
         "-m", "256M",
         "-smp", "4",
-        "-drive", f"file=fat:rw:{imageDir},media=disk,format=raw"]
+        "-drive", f"file=fat:rw:{imageDir},media=disk,format=raw",
+    ]
 
     if kvmAvailable():
         qemuCmd += ["-enable-kvm"]

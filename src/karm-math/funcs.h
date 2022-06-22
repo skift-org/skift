@@ -2,12 +2,14 @@
 
 namespace Karm::Math {
 
-static inline double floor(double const x) {
-    return (double)(int)x;
+template <typename T>
+constexpr static inline T floor(T const x) {
+    return (T)(int)x;
 }
 
-static inline double ceil(double const x) {
-    return (double)(int)x + 1;
+template <typename T>
+constexpr static inline T ceil(T const x) {
+    return (T)(int)x + 1;
 }
 
 } // namespace Karm::Math

@@ -10,7 +10,7 @@ HandoverRequests$(
     Handover::requestFiles());
 
 Error entryPoint([[maybe_unused]] uint64_t magic, [[maybe_unused]] Handover::Payload const &payload) {
-    try$(Arch::writeLog("hjert (v0.0.1)\n", 15));
+    try$(Arch::writeLog("hjert (v0.0.1)\n"));
 
     Arch::stopCpu();
 }

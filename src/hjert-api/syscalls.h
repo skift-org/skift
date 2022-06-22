@@ -19,7 +19,7 @@ struct Syscall {
 };
 
 struct Log : public Syscall<0xb412722092f3afc1, Log> {
-    void const *buf;
+    char const *buf;
     size_t len;
 };
 

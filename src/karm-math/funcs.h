@@ -1,15 +1,25 @@
 #pragma once
 
+#include <karm-meta/traits.h>
+#include <tgmath.h>
 namespace Karm::Math {
 
-template <typename T>
+template <Karm::Meta::Float T>
 constexpr static inline T floor(T const x) {
-    return (T)(int)x;
+    if (x != x) {
+        // handle infinities and nan
+        return x;
+    }
+    return (T)(long long)x - 1;
 }
 
-template <typename T>
+template <Karm::Meta::Float T>
 constexpr static inline T ceil(T const x) {
-    return (T)(int)x + 1;
+    if (x != x) {
+        // handle infinities and nan
+        return x;
+    }
+    return (T)(long long)x + 1;
 }
 
 } // namespace Karm::Math

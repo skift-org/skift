@@ -21,7 +21,7 @@ struct Circle {
     }
 
     template <typename V>
-    constexpr bool contains(Vec2<V> const &point) const {
+    constexpr bool contains(Vec2<V> point) const {
         return center.dist(point) <= radius;
     }
 };

@@ -34,12 +34,12 @@ union Vec2 {
         return x * other.x + y * other.y;
     }
 
-    T sq_len() const {
+    T sqLen() const {
         return dot(*this);
     }
 
     T len() const {
-        return sqrt(sq_len());
+        return sqrt(sqLen());
     }
 
     T dist(Vec2 const &other) const {
@@ -132,12 +132,12 @@ union Vec3 {
         return x * other.x + y * other.y + z * other.z;
     }
 
-    T sq_len() const {
+    T sqLen() const {
         return dot(*this);
     }
 
     T len() const {
-        return sqrt(sq_len());
+        return sqrt(sqLen());
     }
 
     T dist(Vec3 const &other) const {
@@ -226,12 +226,12 @@ union Vec4 {
         return x * other.x + y * other.y + z * other.z + w * other.w;
     }
 
-    T sq_len() const {
+    T sqLen() const {
         return dot(*this);
     }
 
     T len() const {
-        return sqrt(sq_len());
+        return sqrt(sqLen());
     }
 
     T dist(Vec4 const &other) const {

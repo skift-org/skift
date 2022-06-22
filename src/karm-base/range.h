@@ -50,6 +50,10 @@ struct Range {
         return end() == other.start() || start() == other.end();
     }
 
+    bool collide(Range other) const {
+        return start() < other.end() && other.start() < end();
+    }
+
     constexpr bool overlaps(Range other) const {
         return start() < other.end() && other.start() < end();
     }
@@ -60,7 +64,12 @@ struct Range {
             max(end(), other.end()));
     }
 
-    constexpr Pair<Range> substract(Range other) const {
+    bool touch(Range other) const {
+        return contigous(other) || collide(other);
+    }
+
+    constexpr Pair<Range>
+    substract(Range other) const {
         Range lower = fromStartEnd(
             start(),
             min(end(), other.start()));

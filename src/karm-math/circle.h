@@ -19,6 +19,11 @@ struct Circle {
     constexpr Rect<T> bound() const {
         return {center.x - radius, center.y - radius, radius * 2, radius * 2};
     }
+
+    template <typename V>
+    constexpr bool contains(Vec2<V> const &point) const {
+        return center.dist(point) <= radius;
+    }
 };
 
 using Circlei = Circle<int>;

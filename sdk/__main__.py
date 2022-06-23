@@ -36,6 +36,8 @@ def runCmd(opts: dict, args: list[str]) -> None:
         sys.exit(1)
 
     out = build.buildOne(opts.get('env', 'host-clang'), args[0])
+
+    print(f"{Colors.BOLD}Running: {args[0]}{Colors.RESET}")
     utils.runCmd(out, *args[1:])
 
 

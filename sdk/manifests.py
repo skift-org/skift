@@ -19,6 +19,7 @@ def loadJsons(basedir: str) -> dict:
                 except Exception as e:
                     raise utils.CliException(
                         f"Failed to load manifest {filename}: {e}")
+
     return result
 
 

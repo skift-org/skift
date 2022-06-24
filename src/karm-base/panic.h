@@ -4,7 +4,7 @@
 
 namespace Karm {
 
-static inline void debug(const char* msg){
+static inline void debug(const char *msg) {
     Embed::debugHandler(msg);
 }
 
@@ -14,6 +14,10 @@ static inline void debug(const char* msg){
 
 [[noreturn]] static inline void notImplemented() {
     panic("Not implemented");
+}
+
+[[noreturn]] static inline void unreachable() {
+    panic("Unreachable");
 }
 
 } // namespace Karm

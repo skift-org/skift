@@ -20,11 +20,7 @@ concept Tryable = requires(T t) {
     {t.unwrap()};
 };
 
-auto unwrap(Tryable auto &opt) -> decltype(opt.unwrap()) {
-    return opt.unwrap();
-}
-
-auto unwrap_or(Tryable auto &opt, auto default_value) -> decltype(opt.unwrap()) {
+auto try_or(Tryable auto opt, auto default_value) -> decltype(opt.unwrap()) {
     if (!opt) {
         return default_value;
     }
@@ -32,7 +28,7 @@ auto unwrap_or(Tryable auto &opt, auto default_value) -> decltype(opt.unwrap()) 
     return opt.unwrap();
 }
 
-auto unwrap_or_else(Tryable auto &opt, auto default_value) -> decltype(opt.unwrap()) {
+auto try_or_else(Tryable auto opt, auto default_value) -> decltype(opt.unwrap()) {
     if (!opt) {
         return default_value();
     }

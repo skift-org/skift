@@ -9,17 +9,19 @@
 
 namespace Karm {
 
-template <typename S>
-struct _Vec {
-    using T = typename S::T;
+template <typename S, typename T = typename S::T>
+struct _Vec :
+    public Sliceable<T> {
 
-    S _buf;
+    S _buf{};
 
     constexpr _Vec() = default;
 
     _Vec(size_t cap) : _buf(cap) {}
 
     _Vec(std::initializer_list<T> other) : _buf(other) {}
+
+    _Vec(Sliceable<T> &other) : _buf(other) {}
 
     /* --- Collection --- */
 
@@ -69,14 +71,6 @@ struct _Vec {
 
     /* --- Random Access --- */
 
-    T &at(size_t index) { return _buf.at(index); }
-
-    T const &at(size_t index) const { return _buf.at(index); }
-
-    T &operator[](size_t i) { return at(i); }
-
-    T const &operator[](size_t i) const { return at(i); }
-
     void insert(size_t index, T const &value) { _buf.insert(index, T(value)); }
 
     void insert(size_t index, T &&value) { _buf.insert(index, std::move(value)); }
@@ -86,10 +80,6 @@ struct _Vec {
     void removeRange(size_t index, size_t count) { _buf.removeRange(index, count); }
 
     /* --- Front Access --- */
-
-    T &peekFront() { return _buf.at(0); }
-
-    T const &peekFront() const { return _buf.at(0); }
 
     void pushFront(T const &value) { _buf.insert(T(value)); }
 
@@ -102,10 +92,6 @@ struct _Vec {
 
     /* --- Back Access --- */
 
-    T &peekBack() { return _buf.at(len() - 1); }
-
-    T const &peekBack() const { return _buf.at(len() - 1); }
-
     void pushBack(T const &value) { insert(len(), value); }
 
     void pushBack(T &&value) { insert(len(), std::move(value)); }
@@ -115,76 +101,13 @@ struct _Vec {
 
     T popBack() { return removeAt(len() - 1); }
 
-    /* --- Slicing --- */
+    /* --- MutSliceable --- */
 
-    constexpr operator MutSlice<T>() {
-        return MutSlice<T>(buf(), len());
-    }
-    constexpr operator Slice<T>() const {
-        return Slice<T>(buf(), len());
-    }
+    constexpr size_t len() const override { return _buf.len(); }
 
-    constexpr MutSlice<T> sub(size_t start, size_t end) {
-        return MutSlice<T>(buf() + start, clamp(end, start, len()));
-    }
+    constexpr T *buf() override { return _buf.buf(); }
 
-    constexpr Slice<T> sub(size_t start, size_t end) const {
-        return Slice<T>(buf() + start, clamp(end, start, len()));
-    }
-
-    /* --- Comparison --- */
-
-    constexpr Ordr cmp(Slice<T> const &other) const {
-        return Op::cmp(buf(), len(), other._buf, other._len);
-    }
-
-    /* --- Iteration --- */
-
-    template <typename Self>
-    static auto _iter(Self *self) {
-        return Iter([self, i = 0uz]() mutable {
-            if (i >= self->len()) {
-                return nullptr;
-            }
-            return self->buf() + i;
-        });
-    }
-
-    template <typename Self>
-    static auto _iterRev(Self *self) {
-        return Iter([self, i = self->len()]() mutable {
-            if (i == 0) {
-                return nullptr;
-            }
-
-            i--;
-            return self->buf() + i;
-        });
-    }
-
-    constexpr auto iter() { return _iter(this); }
-
-    constexpr auto iter() const { return _iter(this); }
-
-    constexpr auto iterRev() { return _iterRev(this); }
-
-    constexpr auto iterRev() const { return _iterRev(this); }
-
-    /* --- Len & Buf --- */
-
-    size_t len() const { return _buf.len(); }
-
-    T *buf() { return _buf.buf(); }
-
-    T const *buf() const { return _buf.buf(); }
-
-    T *begin() { return buf(); }
-
-    T const *begin() const { return buf(); }
-
-    T *end() { return buf() + len(); }
-
-    T const *end() const { return buf() + len(); }
+    constexpr T const *buf() const override { return _buf.buf(); }
 };
 
 template <typename T>

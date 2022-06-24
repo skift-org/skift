@@ -12,11 +12,9 @@ struct Inert {
         T _value;
     };
 
-    Inert() {
-    }
+    Inert() {}
 
-    ~Inert() {
-    }
+    ~Inert() {}
 
     void ctor(T &&value) {
         new (&_value) T(std::move(value));

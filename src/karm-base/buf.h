@@ -303,6 +303,19 @@ struct InlineBuf {
         return _buf[index].unwrap();
     }
 
+    template <typename... Args>
+    void emplace(size_t index, Args &&...args) {
+        if (_len == N) {
+            panic("cap too large");
+        }
+
+        for (size_t i = _len; i > index; i--) {
+            _buf[i].ctor(_buf[i - 1].take());
+        }
+        _buf[index].ctor(std::forward<Args>(args)...);
+        _len++;
+    }
+
     void insert(size_t index, T &&value) {
         if (_len == N) {
             panic("cap too large");
@@ -367,11 +380,11 @@ struct InlineBuf {
     }
 
     T *buf() {
-        return _buf;
+        return &_buf[0].unwrap();
     }
 
     T const *buf() const {
-        return _buf;
+        return &_buf[0].unwrap();
     }
 
     size_t len() const {
@@ -380,10 +393,6 @@ struct InlineBuf {
 
     size_t cap() const {
         return N;
-    }
-
-    size_t size() const {
-        return _len * sizeof(T);
     }
 };
 

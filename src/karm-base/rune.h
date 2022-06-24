@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-meta/id.h>
 #include <karm-meta/traits.h>
 
 #include "_prelude.h"
@@ -13,35 +14,37 @@ namespace Karm {
 using Rune = uint32_t;
 
 template <typename T>
-concept Encoding = requires(T t, Rune &r, typename T::Unit u, Cursor<typename T::Unit> &c, MutCursor<typename T::Unit> &m) {
-    { T::len(u) } -> Meta::Same<size_t>;
-    { T::decode(r, c) } -> Meta::Same<bool>;
-    { T::encode(Rune{}, m) } -> Meta::Same<bool>;
+concept StaticEncoding = requires(T t, Rune &r, typename T::Unit u, Cursor<typename T::Unit> &c, MutCursor<typename T::Unit> &m) {
+    { T::unitLen(u) } -> Meta::Same<size_t>;
+    { T::runeLen(r) } -> Meta::Same<size_t>;
+    { T::decodeUnit(r, c) } -> Meta::Same<bool>;
+    { T::encodeUnit(Rune{}, m) } -> Meta::Same<bool>;
 };
 
 template <typename U, size_t N>
-struct _Multiple {
+struct _Multiple : public MutSliceable<U> {
     using Unit = U;
-    InlineBuf<Unit, N> _buf;
+    InlineBuf<Unit, N> _buf{};
 
     void put(Unit u) {
-        _buf.insert(u, _buf.len());
+        _buf.emplace(_buf.len(), u);
     }
 
-    Unit *buf() { return _buf.buf(); }
-    size_t len() const { return _buf.len(); }
-    Unit const *buf() const { return _buf.buf(); }
-    Unit *begin() { return buf(); }
-    Unit const *begin() const { return buf(); }
-    Unit *end() { return buf() + len(); }
-    Unit const *end() const { return buf() + len(); }
+    constexpr Unit *buf() override { return _buf.buf(); }
+    constexpr Unit const *buf() const override { return _buf.buf(); }
+    constexpr size_t len() const override { return _buf.len(); }
+    constexpr size_t rem() const { return N - len(); }
 };
 
 template <typename U>
-struct _Single {
+struct _Single : public MutSliceable<U> {
     using Unit = U;
 
     Unit _buf;
+
+    _Single() = default;
+
+    _Single(Unit u) : _buf(u) {}
 
     void put(Unit u) {
         _buf = u;
@@ -50,6 +53,10 @@ struct _Single {
     operator Unit() {
         return _buf;
     }
+
+    constexpr Unit *buf() override { return &_buf; }
+    constexpr Unit const *buf() const override { return &_buf; }
+    constexpr size_t len() const override { return 1; }
 };
 
 template <typename T, typename U>
@@ -69,7 +76,7 @@ struct Utf8 {
     using Unit = char;
     using One = _Multiple<Unit, 4>;
 
-    static constexpr size_t len(Unit first) {
+    static constexpr size_t unitLen(Unit first) {
         if ((first & 0xf8) == 0xf0)
             return 4;
         else if ((first & 0xf0) == 0xe0)
@@ -80,7 +87,18 @@ struct Utf8 {
             return 1;
     }
 
-    static bool decode(Rune &result, DecodeInput<Unit> auto &in) {
+    static constexpr size_t runeLen(Rune rune) {
+        if (rune <= 0x7f)
+            return 1;
+        else if (rune <= 0x7ff)
+            return 2;
+        else if (rune <= 0xffff)
+            return 3;
+        else
+            return 4;
+    }
+
+    static bool decodeUnit(Rune &result, DecodeInput<Unit> auto &in) {
         if (in.rem() == 0) {
             result = U'�';
             return false;
@@ -88,7 +106,8 @@ struct Utf8 {
 
         Unit first = in.next();
 
-        if (len(first) > in.rem() + 1) {
+        if (unitLen(first) > in.rem() + 1) {
+            result = U'�';
             return false;
         }
 
@@ -111,7 +130,10 @@ struct Utf8 {
         return true;
     }
 
-    static bool encode(Rune c, EncodeOutput<Unit> auto &out) {
+    static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
+        if (unitLen(c) > out.rem())
+            panic("bad");
+
         if (c <= 0x7f) {
             out.put(c);
         } else if (c <= 0x7ff) {
@@ -127,8 +149,7 @@ struct Utf8 {
             out.put(0x80 | ((c >> 6) & 0x3f));
             out.put(0x80 | (c & 0x3f));
         } else {
-            encode(U'�', out);
-            return false;
+            return encodeUnit(U'�', out);
         }
 
         return true;
@@ -137,7 +158,7 @@ struct Utf8 {
 
 [[gnu::used]] static inline Utf8 UTF8;
 
-static_assert(Encoding<Utf8>);
+static_assert(StaticEncoding<Utf8>);
 
 /* --- Utf16 ---------------------------------------------------------------- */
 
@@ -145,17 +166,24 @@ struct Utf16 {
     using Unit = uint16_t;
     using One = _Multiple<Unit, 2>;
 
-    static constexpr size_t len(Unit first) {
+    static constexpr size_t unitLen(Unit first) {
         if (first >= 0xd800 && first <= 0xdbff)
             return 2;
         else
             return 1;
     }
 
-    static bool decode(Rune &result, DecodeInput<Unit> auto &in) {
+    static constexpr size_t runeLen(Rune rune) {
+        if (rune <= 0xffff)
+            return 1;
+        else
+            return 2;
+    }
+
+    static bool decodeUnit(Rune &result, DecodeInput<Unit> auto &in) {
         Unit first = in.next();
 
-        if (len(first) > in.rem()) {
+        if (unitLen(first) > in.rem()) {
             result = U'�';
             return false;
         }
@@ -179,7 +207,7 @@ struct Utf16 {
         return true;
     }
 
-    static bool encode(Rune c, EncodeOutput<Unit> auto &out) {
+    static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
         if (c <= 0xffff) {
             out.put(c);
             return true;
@@ -188,14 +216,14 @@ struct Utf16 {
             out.put(0xdc00 | ((c - 0x10000) & 0x3ff));
             return true;
         } else {
-            return encode(U'�', out);
+            return encodeUnit(U'�', out);
         }
     }
 };
 
 [[gnu::used]] static inline Utf16 UTF16;
 
-static_assert(Encoding<Utf16>);
+static_assert(StaticEncoding<Utf16>);
 
 /* --- Utf32 ---------------------------------------------------------------- */
 
@@ -203,16 +231,20 @@ struct Utf32 {
     using Unit = char32_t;
     using One = _Single<Unit>;
 
-    static constexpr size_t len(Unit) {
+    static constexpr size_t unitLen(Unit) {
         return 1;
     }
 
-    static bool decode(Rune &result, DecodeInput<Unit> auto &in) {
+    static constexpr size_t runeLen(Rune) {
+        return 1;
+    }
+
+    static bool decodeUnit(Rune &result, DecodeInput<Unit> auto &in) {
         result = in.next();
         return true;
     }
 
-    static bool encode(Rune c, EncodeOutput<Unit> auto &out) {
+    static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
         out.put(c);
         return false;
     }
@@ -220,7 +252,36 @@ struct Utf32 {
 
 [[gnu::used]] static inline Utf32 UTF32;
 
-static_assert(Encoding<Utf32>);
+static_assert(StaticEncoding<Utf32>);
+
+/* --- Pure ----------------------------------------------------------------- */
+
+struct Pure {
+    using Unit = Rune;
+    using One = _Single<Unit>;
+
+    static constexpr size_t unitLen(Unit) {
+        return 1;
+    }
+
+    static constexpr size_t runeLen(Rune) {
+        return 1;
+    }
+
+    static bool decodeUnit(Rune &result, DecodeInput<Unit> auto &in) {
+        result = in.next();
+        return true;
+    }
+
+    static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
+        out.put(c);
+        return false;
+    }
+};
+
+[[gnu::used]] static inline Pure PURE;
+
+static_assert(StaticEncoding<Pure>);
 
 /* --- Ascii ---------------------------------------------------------------- */
 
@@ -228,11 +289,15 @@ struct Ascii {
     using Unit = char;
     using One = _Single<Unit>;
 
-    static constexpr size_t len(Unit) {
+    static constexpr size_t unitLen(Unit) {
         return 1;
     }
 
-    static bool decode(Rune &result, DecodeInput<Unit> auto &in) {
+    static constexpr size_t runeLen(Rune) {
+        return 1;
+    }
+
+    static bool decodeUnit(Rune &result, DecodeInput<Unit> auto &in) {
         auto c = in.next();
         if (c >= 0) {
             result = c;
@@ -243,7 +308,7 @@ struct Ascii {
         }
     }
 
-    static bool encode(Rune c, EncodeOutput<Unit> auto &out) {
+    static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
         if (c < 0) {
             out.put('?');
             return false;
@@ -256,7 +321,7 @@ struct Ascii {
 
 [[gnu::used]] static inline Ascii ASCII;
 
-static_assert(Encoding<Ascii>);
+static_assert(StaticEncoding<Ascii>);
 
 /* --- Extended Ascii ------------------------------------------------------- */
 
@@ -265,17 +330,21 @@ struct EAscii {
     using Unit = uint8_t;
     using One = _Single<Unit>;
 
-    static constexpr size_t len(Unit) {
+    static constexpr size_t unitLen(Unit) {
         return 1;
     }
 
-    static bool decode(Rune &result, DecodeInput<Unit> auto &in) {
+    static constexpr size_t runeLen(Rune) {
+        return 1;
+    }
+
+    static bool decodeUnit(Rune &result, DecodeInput<Unit> auto &in) {
         Mapper mapper;
         result = mapper(in.next());
         return true;
     }
 
-    static bool encode(Rune c, EncodeOutput<Unit> auto &out) {
+    static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
         Mapper mapper;
         for (size_t i = 0; i <= 255; i++) {
             if (mapper(i) == c) {
@@ -291,8 +360,9 @@ struct EAscii {
 /* --- Ibm437 --------------------------------------------------------------- */
 
 // clang-format off
+
 using Ibm437Mapper = decltype([](uint8_t c) {
-    return Array<Rune, 256> {
+    Array<char32_t, 256> mappings = {
         U'\0', U'☺', U'☻', U'♥', U'♦', U'♣', U'♠', U'•',
         U'◘', U'○', U'◙', U'♂', U'♀', U'♪', U'♫', U'☼',
         U'►', U'◄', U'↕', U'‼', U'¶', U'§', U'▬', U'↨',
@@ -325,15 +395,18 @@ using Ibm437Mapper = decltype([](uint8_t c) {
         U'Φ', U'Θ', U'Ω', U'δ', U'∞', U'φ', U'ε', U'∩',
         U'≡', U'±', U'≥', U'≤', U'⌠', U'⌡', U'÷', U'≈',
         U'°', U'∙', U'·', U'√', U'ⁿ', U'²', U'■', U'\x00a0',
-    }[c];
+    };
+
+    return mappings[c];
 });
+
 // clang-format on
 
 using Ibm437 = EAscii<Ibm437Mapper>;
 
 [[gnu::used]] static inline Ibm437 IBM437;
 
-static_assert(Encoding<Ibm437>);
+static_assert(StaticEncoding<Ibm437>);
 
 /* --- Latin1 --------------------------------------------------------------- */
 
@@ -346,28 +419,25 @@ using Latin1 = EAscii<Latin1Mapper>;
 
 [[gnu::used]] static inline Latin1 LATIN1;
 
-static_assert(Encoding<Latin1>);
+static_assert(StaticEncoding<Latin1>);
 
 /* --- Utilities ------------------------------------------------------------ */
 
-template <Encoding Source, Encoding Target>
-size_t transcode_len(Cursor<typename Source::Unit> input) {
+template <StaticEncoding Source, StaticEncoding Target>
+size_t transcodeLen(Cursor<typename Source::Unit> input) {
     size_t result = 0;
 
     while (input.rem()) {
         Rune r;
-        if (Source::decode(r, input)) {
-            result += Target::len(r);
-        } else {
-            result += Target::len(U'�');
-        }
+        bool valid = Source::decodeUnit(r, input);
+        result += Target::runeLen(valid ? r : U'�');
     }
 
     return result;
 }
 
-template <Encoding Source>
-size_t transcode_len(Cursor<typename Source::Unit> input) {
+template <StaticEncoding Source>
+size_t transcodeLen(Cursor<typename Source::Unit> input) {
     size_t result = 0;
 
     while (input.rem()) {
@@ -380,32 +450,29 @@ size_t transcode_len(Cursor<typename Source::Unit> input) {
     return result;
 }
 
-template <Encoding Source, Encoding Target>
-size_t transcode_units(Cursor<typename Source::Unit> input, MutCursor<typename Target::Unit> output) {
+template <StaticEncoding Source, StaticEncoding Target>
+size_t transcodeUnits(Cursor<typename Source::Unit> input, MutCursor<typename Target::Unit> output) {
     size_t result = 0;
 
     while (input.rem()) {
         Rune r;
-        if (Source::decode(r, input)) {
-            result += Target::encode(r, output);
-        } else {
-            result += Target::encode(U'�', output);
-        }
+        bool valid = Source::decodeUnit(r, input);
+        result += Target::encodeUnit(valid ? r : U'�', output);
     }
 
     return result;
 }
 
-template <Encoding T>
+template <StaticEncoding T>
 using One = typename T::One;
 
-template <Encoding E>
-bool encode_one(Rune rune, One<E> &one) {
+template <StaticEncoding E>
+bool encodeOne(Rune rune, One<E> &one) {
     return E::encode(rune, one);
 }
 
-template <Encoding E>
-bool decode_one(One<E> &one, Rune &rune) {
+template <StaticEncoding E>
+bool encodeOne(One<E> &one, Rune &rune) {
     return E::decode(rune, one);
 }
 

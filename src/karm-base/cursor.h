@@ -5,21 +5,15 @@
 namespace Karm {
 
 template <typename T>
-struct Cursor {
+struct Cursor :
+    public Sliceable<T> {
+
     T const *_begin = nullptr;
     T const *_end = nullptr;
 
-    constexpr Cursor(){};
+    constexpr Cursor() = default;
 
-    Cursor(T const *begin, T const *end) : _begin(begin), _end(end) {}
-
-    Cursor(T const *buf, size_t len) : _begin(buf), _end(buf + len) {}
-
-    Cursor(Slice<T> slice) : _begin(slice.begin()), _end(slice.end()) {}
-
-    Cursor(MutSlice<T> slice) : _begin(slice.begin()), _end(slice.end()) {}
-
-    T const &operator[](size_t i) const { return _begin[i]; }
+    Cursor(Sliceable<T> const &slice) : _begin(slice.begin()), _end(slice.end()) {}
 
     bool ended() const {
         return _begin >= _end;
@@ -50,41 +44,22 @@ struct Cursor {
             next();
     }
 
-    operator T const *() {
+    constexpr T const *buf() const override {
         return _begin;
     }
 
-    T const *begin() const {
-        return _begin;
-    }
-
-    T const *end() const {
-        return _end;
-    }
-
-    T const *buf() const {
-        return _begin;
-    }
-
-    size_t len() const {
+    constexpr size_t len() const override {
         return _end - _begin;
-    }
-
-    size_t size() const {
-        return len() * sizeof(T);
     }
 };
 
 template <typename T>
-struct MutCursor {
+struct MutCursor : public MutSliceable<T> {
     T *_begin = nullptr;
     T *_end = nullptr;
 
-    MutCursor(T *begin, T *end) : _begin(begin), _end(end) {}
-
-    MutCursor(T *buf, size_t len) : _begin(buf), _end(buf + len) {}
-
-    MutCursor(MutSlice<T> slice) : _begin(slice.begin()), _end(slice.end()) {}
+    MutCursor(MutSliceable<T> &slice)
+        : _begin(slice.begin()), _end(slice.end()) {}
 
     bool ended() const {
         return _begin == _end;
@@ -119,44 +94,16 @@ struct MutCursor {
         _begin += n;
     }
 
-    operator T *() {
+    constexpr T *buf() override {
         return _begin;
     }
 
-    operator T const *() const {
+    constexpr T const *buf() const override {
         return _begin;
     }
 
-    T const *begin() const {
-        return _begin;
-    }
-
-    T const *end() const {
-        return _end;
-    }
-
-    T *begin() {
-        return _begin;
-    }
-
-    T *end() {
-        return _end;
-    }
-
-    T *buf() {
-        return _begin;
-    }
-
-    T const *buf() const {
-        return _begin;
-    }
-
-    size_t len() const {
+    constexpr size_t len() const override {
         return _end - _begin;
-    }
-
-    size_t size() const {
-        return len() * sizeof(T);
     }
 };
 

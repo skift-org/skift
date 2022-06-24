@@ -7,7 +7,7 @@
 
 namespace Karm {
 
-static constexpr size_t constExprStrLen(const char *str) {
+static constexpr size_t strLen(const char *str) {
     size_t len = 0;
     while (*str++) {
         len++;
@@ -15,7 +15,7 @@ static constexpr size_t constExprStrLen(const char *str) {
     return len;
 }
 
-template <Encoding E, typename U = typename E::Unit>
+template <StaticEncoding E, typename U = typename E::Unit>
 struct _Str : public Slice<U> {
     using Encoding = E;
     using Unit = U;
@@ -23,27 +23,27 @@ struct _Str : public Slice<U> {
     using Slice<U>::Slice;
 
     constexpr _Str(Unit const *cstr) requires(Meta::Same<Unit, char>)
-        : Slice<U>(cstr, constExprStrLen(cstr)) {}
+        : Slice<U>(cstr, strLen(cstr)) {}
 
     auto runes() const {
-        Cursor<Unit> cursor(this->buf(), this->len());
+        Cursor<Unit> cursor(*this);
         return Iter([cursor]() mutable -> Opt<Rune> {
             if (cursor.ended()) {
                 return NONE;
             }
 
             Rune r;
-            return E::decode(r, cursor) ? Opt<Rune>(r) : Opt<Rune>(NONE);
+            return E::decodeUnit(r, cursor) ? Opt<Rune>(r) : Opt<Rune>(NONE);
         });
     }
 };
 
-template <Encoding E, typename U = typename E::Unit>
+template <StaticEncoding E, typename U = typename E::Unit>
 struct _MutStr : public MutSlice<U> {
     using Encoding = E;
     using Unit = U;
 
-    using MutSlice<U>::Slice;
+    using MutSlice<U>::MutSlice;
 
     constexpr _MutStr(Unit *cstr) requires(Meta::Same<Unit, char>)
         : MutSlice<U>(cstr, strlen(cstr)) {}
@@ -62,7 +62,7 @@ struct _MutStr : public MutSlice<U> {
     }
 };
 
-template <Encoding E>
+template <StaticEncoding E>
 struct _String {
     using Encoding = E;
     using Unit = typename E::Unit;
@@ -142,16 +142,17 @@ struct _String {
     size_t len() const { return _len; }
 };
 
-template <::Encoding Target, ::Encoding Source>
+template <::StaticEncoding Target, ::StaticEncoding Source>
 _String<Target> transcode(_Str<Source> str) {
-    size_t len = transcode_len<Source, Target>(str);
+    size_t len = transcodeLen<Source, Target>(str);
     typename Target::Unit *buf = new typename Target::Unit[len + 1];
     buf[len] = '\0';
 
     Cursor<typename Source::Unit> input = str;
-    MutCursor<typename Target::Unit> output = {buf, len};
+    MutSlice<typename Target::Unit> slice(buf, len);
+    MutCursor<typename Target::Unit> output = slice;
 
-    transcode_units<Source, Target>(input, output);
+    transcodeUnits<Source, Target>(input, output);
 
     return {MOVE, buf, len};
 }

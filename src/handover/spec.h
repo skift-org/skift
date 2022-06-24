@@ -28,7 +28,7 @@ static constexpr uint32_t COOLBOOT = 0xc001b001;
     TAG(SELF, 0xa24f988d)   \
     TAG(STACK, 0xf65b391b)  \
     TAG(KERNEL, 0xbfc71b20) \
-    TAG(LOADER, 0x8f8f8f8f) \
+    TAG(LOADER, 0xf1f80c26) \
     TAG(FILE, 0xcbc36d3b)   \
     TAG(RSDP, 0x8d3bbb)     \
     TAG(FDT, 0xb628bbc1)    \

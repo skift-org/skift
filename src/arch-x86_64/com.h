@@ -1,10 +1,13 @@
 #pragma once
 
+#include <karm-io/traits.h>
+
 #include "asm.h"
 
 namespace x86_64 {
 
-struct Com {
+struct Com :
+    public Io::TextWriter<Utf8> {
     enum Port {
         COM1 = 0x3F8,
         COM2 = 0x2F8,
@@ -108,22 +111,23 @@ struct Com {
         }
     }
 
-    void putc(char c) {
+    Result<size_t> putByte(Byte c) {
         waitWrite();
-        writeReg(DATA, c);
+        writeReg(DATA, static_cast<uint8_t>(c));
+
+        return 1;
     }
 
-    char getc() {
+    uint8_t getByte() {
         waitRead();
         return readReg(DATA);
     }
 
-    size_t write(void const *buf, size_t size) {
-        for (size_t i = 0; i < size; i++) {
-            putc(((char const *)buf)[i]);
+    Result<size_t> write(Bytes bytes) override {
+        for (auto b : bytes) {
+            try$(putByte(b));
         }
-
-        return size;
+        return bytes.size();
     }
 };
 

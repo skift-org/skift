@@ -1,6 +1,5 @@
 #pragma once
 
-#include <karm-base/algos.h>
 #include <karm-base/array.h>
 #include <karm-base/result.h>
 #include <karm-base/rune.h>
@@ -46,7 +45,7 @@ struct NumberFormater {
         }
     }
 
-    Result<size_t> formatUnsigned(Io::Writer &writer, uint64_t value) {
+    Result<size_t> formatUnsigned(Io::_TextWriter &writer, uint64_t value) {
         auto digit = [](size_t v) {
             if (v < 10) {
                 return '0' + v;
@@ -55,40 +54,41 @@ struct NumberFormater {
             }
         };
         size_t i = 0;
-        Array<uint8_t, 65> buf;
+        Array<char, 65> buf;
 
         do {
             buf[i++] = digit(value % base);
             value /= base;
         } while (value != 0);
 
-        reverse(buf.sub(0, i));
-
-        return writer.write(buf.buf(), buf.len());
+        buf
+            .sub<MutSlice<char>>(0, i)
+            .reverse();
+        return writer.writeStr({buf.buf(), i});
     }
 };
 
 template <typename T>
 struct UnsignedFormatter : public NumberFormater {
-    Result<size_t> format(Io::Writer &writer, T const value) {
+    Result<size_t> format(Io::_TextWriter &writer, T const value) {
         return formatUnsigned(writer, value);
     }
 };
 
 template <typename T>
 struct SignedFormatter : public NumberFormater {
-    Result<size_t> format(Io::Writer &writer, T const value) {
+    Result<size_t> format(Io::_TextWriter &writer, T const value) {
         size_t written = 0;
         Meta::MakeUnsigned<T> unsignedValue = 0;
 
         if (value < 0) {
-            written += try$(Io::putc(writer, '-'));
+            written += try$(writer.writeRune(U'-'));
             unsignedValue = -value;
         } else {
             unsignedValue = value;
         }
 
-        return written + try$(format_unsigned(writer, unsignedValue));
+        return written + try$(formatUnsigned(writer, unsignedValue));
     }
 };
 
@@ -106,8 +106,8 @@ struct Formatter<Str> {
     void parse(Text::Scan &) {
     }
 
-    Result<size_t> format(Io::Writer &writer, Str const &text) {
-        return writer.write(text.buf(), text.len());
+    Result<size_t> format(Io::_TextWriter &writer, Str text) {
+        return writer.writeStr(text);
     }
 };
 
@@ -117,18 +117,18 @@ struct Formatter<char const *> : public Formatter<Str> {};
 struct _Args {
     virtual ~_Args() = default;
     virtual size_t len() = 0;
-    virtual Result<size_t> format(Text::Scan &scan, Io::Writer &writer, size_t index) = 0;
+    virtual Result<size_t> format(Text::Scan &scan, Io::_TextWriter &writer, size_t index) = 0;
 };
 
 template <typename... Ts>
 struct Args : public _Args {
-    Tuple<Ts...> _tuple;
+    Tuple<Ts...> _tuple{};
 
     Args(Ts &&...ts) : _tuple(std::forward<Ts>(ts)...) {}
 
     size_t len() override { return _tuple.len(); }
 
-    Result<size_t> format(Text::Scan &scan, Io::Writer &writer, size_t index) override {
+    Result<size_t> format(Text::Scan &scan, Io::_TextWriter &writer, size_t index) override {
         Result<size_t> result = 0;
         size_t i = 0;
         _tuple.visit([&](auto const &t) {
@@ -144,7 +144,7 @@ struct Args : public _Args {
     }
 };
 
-static inline Result<size_t> _format(Io::Writer &writer, Str format, _Args &args) {
+static inline Result<size_t> _format(Io::_TextWriter &writer, Str format, _Args &args) {
     Text::Scan scan{format};
     size_t written = 0;
     size_t index = 0;
@@ -163,7 +163,7 @@ static inline Result<size_t> _format(Io::Writer &writer, Str format, _Args &args
             written += try$(args.format(inner, writer, index));
             index++;
         } else {
-            written += try$(Io::putr(writer, c));
+            written += try$(writer.writeRune(c));
         }
     }
 
@@ -171,7 +171,7 @@ static inline Result<size_t> _format(Io::Writer &writer, Str format, _Args &args
 }
 
 template <typename... Ts>
-static inline Result<size_t> format(Io::Writer &writer, Str format, Ts &&...ts) {
+static inline Result<size_t> format(Io::_TextWriter &writer, Str format, Ts &&...ts) {
     Args<Ts...> args{std::forward<Ts>(ts)...};
     return _format(writer, format, args);
 }

@@ -7,9 +7,8 @@ namespace Karm::Meta {
 using Id = size_t;
 
 template <typename T>
-static inline Id makeId() {
-    static uint32_t _;
-    return reinterpret_cast<Id>(&_);
+static Id makeId() {
+    return reinterpret_cast<Id>(__PRETTY_FUNCTION__);
 }
 
 } // namespace Karm::Meta

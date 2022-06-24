@@ -1,7 +1,7 @@
 #pragma once
 
-#include <karm-base/bytes.h>
 #include <karm-base/clamp.h>
+#include <karm-base/cons.h>
 #include <karm-base/rune.h>
 #include <karm-base/string.h>
 
@@ -12,81 +12,73 @@ namespace Karm::Io {
 
 /* --- Read ----------------------------------------------------------------- */
 
-Result<size_t> pread(Readable auto &reader, void *data, size_t size, Seek seek) {
+static inline Result<size_t> pread(Readable auto &reader, MutBytes bytes, Seek seek) {
     auto result = try$(reader.seek(seek));
-    return try$(reader.read(data, size));
+    return try$(reader.read(bytes));
 }
 
-Result<uint8_t> getc(Readable auto &reader) {
-    uint8_t byte;
-    try$(reader.read(&byte, 1));
+static inline Result<Byte> getByte(Readable auto &reader) {
+    Byte byte;
+    try$(reader.read({&byte, 1}));
     return byte;
 }
 
 /* --- Write ---------------------------------------------------------------- */
 
-Result<size_t> pwrite(Writable auto &writer, void const *data, size_t size, Seek seek) {
+static inline Result<size_t> pwrite(Writable auto &writer, Bytes bytes, Seek seek) {
     auto result = try$(writer.seek(seek));
-    return try$(writer.write(data, size));
+    return try$(writer.write(bytes));
 }
 
-Result<size_t> putc(Writable auto &writer, uint8_t byte) {
-    return writer.write(&byte, 1);
-}
-
-Result<size_t> putr(Writable auto &writer, Rune rune) {
-    return writer.write(&rune, 1);
+static inline Result<size_t> putByte(Writable auto &writer, Byte byte) {
+    return writer.write({&byte, 1});
 }
 
 /* --- Seek ----------------------------------------------------------------- */
 
-Result<size_t> tell(Seekable auto &seeker) {
+static inline Result<size_t> tell(Seekable auto &seeker) {
     return try$(seeker.seek(Seek::fromCurrent(0)));
 }
 
-Result<size_t> size(Seekable auto &seeker) {
+static inline Result<size_t> size(Seekable auto &seeker) {
     size_t current = try$(tell(seeker));
     size_t end = try$(seeker.seek(Seek::fromEnd(0)));
     try$(seeker.seek(Seek::fromBegin(current)));
     return end;
 }
 
-Result<size_t> skip(Seekable auto &seeker, size_t n) {
+static inline Result<size_t> skip(Seekable auto &seeker, size_t n) {
     return try$(seeker.seek(Seek::fromCurrent(n)));
 }
 
-Result<size_t> skip(Readable auto &reader, size_t n) {
+static inline Result<size_t> skip(Readable auto &reader, size_t n) {
     Sink sink;
     return copy(reader, sink, n);
 }
 
 /* --- Copy ----------------------------------------------------------------- */
 
-Result<size_t> copyInto(Readable auto &reader, MutBytes bytes) {
+static inline Result<size_t> copy(Readable auto &reader, MutBytes bytes) {
     size_t readed = 0;
-    Byte *data = bytes.buf();
-
     while (readed < bytes.len()) {
-        auto result = try$(reader.read(data, bytes.len() - readed));
-        readed += result;
-        data += result;
+        readed += try$(reader.read(bytes.sub(readed)));
     }
 
     return readed;
 }
 
-Result<size_t> copy(Readable auto &reader, Writable auto &writer) {
-    uint8_t buffer[4096];
+static inline Result<size_t> copy(Readable auto &reader, Writable auto &writer) {
+    Array<Byte, 4096> buffer;
     size_t result = 0;
     while (true) {
-        auto read = try$(reader.read(buffer, sizeof(buffer)));
+        auto read = try$(reader.read(buffer.mutBytes()));
 
         if (read == 0) {
             return result;
         }
 
         result += read;
-        auto written = try$(writer.write(buffer, read));
+        auto written = try$(writer.write(buffer.sub(0, read)));
 
         if (written != read) {
             return result;
@@ -94,16 +86,16 @@ Result<size_t> copy(Readable auto &reader, Writable auto &writer) {
     }
 }
 
-Result<size_t> copy(Readable auto &reader, Writable auto &writer, size_t size) {
-    uint8_t buffer[4096];
+static inline Result<size_t> copy(Readable auto &reader, Writable auto &writer, size_t size) {
+    Array<Bytes, 4096> buffer;
     size_t result = 0;
     while (size > 0) {
-        auto read = try$(reader.read(buffer, min(size, sizeof(buffer))));
+        auto read = try$(reader.read(buffer.sub(0, size)));
         if (read == 0) {
             break;
         }
         result += read;
-        auto written = try$(writer.write(buffer, read));
+        auto written = try$(writer.write(buffer.sub(0, read)));
         if (written != read) {
             return result;
         }

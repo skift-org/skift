@@ -31,12 +31,12 @@ struct File :
         return File{fd, path};
     }
 
-    Result<size_t> read(void *buf, size_t size) override {
-        return _fd->read(buf, size);
+    Result<size_t> read(MutBytes bytes) override {
+        return _fd->read(bytes);
     }
 
-    Result<size_t> write(const void *buf, size_t size) override {
-        return _fd->write(buf, size);
+    Result<size_t> write(Bytes bytes) override {
+        return _fd->write(bytes);
     }
 
     Result<size_t> seek(Io::Seek seek) override {

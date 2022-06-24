@@ -5,6 +5,7 @@
 #include <karm-io/types.h>
 
 namespace Karm::Ipc {
+
 using Id = uint64_t;
 
 struct Header {
@@ -87,4 +88,5 @@ struct Handle {
         }
     }
 };
+
 } // namespace Karm::Ipc

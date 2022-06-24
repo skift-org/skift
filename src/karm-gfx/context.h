@@ -325,7 +325,7 @@ struct Context {
 
     void _draw(Math::Vec2i baseline, Rune rune, Color color) {
         One<Ibm437> one;
-        encode_one<Ibm437>(rune, one);
+        encodeOne<Ibm437>(rune, one);
 
         for (int y = 0; y < VGA_FONT_HEIGHT; y++) {
             for (int x = 0; x < VGA_FONT_WIDTH; x++) {

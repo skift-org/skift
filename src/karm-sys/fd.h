@@ -12,9 +12,9 @@ namespace Karm::Sys {
 struct Fd : Meta::NoCopy {
     virtual ~Fd() = default;
 
-    virtual Result<size_t> read(void *buf, size_t size) = 0;
+    virtual Result<size_t> read(MutBytes) = 0;
 
-    virtual Result<size_t> write(void const *buf, size_t size) = 0;
+    virtual Result<size_t> write(Bytes) = 0;
 
     virtual Result<size_t> seek(Io::Seek seek) = 0;
 
@@ -24,24 +24,24 @@ struct Fd : Meta::NoCopy {
 };
 
 struct DummyFd : public Fd {
-    Result<size_t> read(void *, size_t) override {
-        notImplemented();
+    Result<size_t> read(MutBytes) override {
+        return 0;
     }
 
-    Result<size_t> write(void const *, size_t) override {
-        notImplemented();
+    Result<size_t> write(Bytes) override {
+        return 0;
     }
 
     Result<size_t> seek(Io::Seek) override {
-        notImplemented();
+        return 0;
     }
 
     Result<size_t> flush() override {
-        notImplemented();
+        return 0;
     }
 
     Result<Strong<Fd>> dup() override {
-        notImplemented();
+        return {makeStrong<DummyFd>()};
     }
 };
 

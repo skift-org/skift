@@ -1,6 +1,5 @@
 #pragma once
 
-#include <karm-base/bytes.h>
 #include <karm-base/clamp.h>
 #include <karm-base/result.h>
 #include <karm-base/slice.h>
@@ -11,13 +10,14 @@
 namespace Karm::Io {
 
 struct Sink : public Writer {
-    Result<size_t> write(void const *, size_t size) override { return size; }
+    Result<size_t> write(Bytes bytes) override {
+        return bytes.size();
+    }
 };
 
 struct Zero : public Reader {
-    Result<size_t> read(void *data, size_t size) override {
-        memset(data, 0, size);
-        return size;
+    Result<size_t> read(MutBytes bytes) override {
+        return bytes.zero();
     }
 };
 
@@ -26,35 +26,31 @@ struct Repeat : public Reader {
 
     Repeat(uint8_t byte) : _byte(byte) {}
 
-    Result<size_t> read(void *data, size_t size) override {
-        memset(data, _byte, size);
-        return size;
+    Result<size_t> read(MutBytes bytes) override {
+        return bytes.fill((Byte)_byte);
     }
 };
 
 struct Empty : public Reader {
-    Result<size_t> read(void *, size_t) override {
+    Result<size_t> read(MutBytes) override {
         return 0;
     }
 };
 
 template <Readable Readable>
-struct Limite : public Reader {
+struct Limit : public Reader {
     Readable _reader;
     size_t _limit;
     size_t _read;
 
-    Limite(Readable &&reader, size_t limit)
+    Limit(Readable &&reader, size_t limit)
         : _reader(std::forward<Readable>(reader)),
           _limit(limit) {
     }
 
-    Result<size_t> read(void *data, size_t size) override {
-        if (_read + size > _limit) {
-            size = _limit - _read;
-        }
-
-        size_t read = try$(_reader.read(data, size));
+    Result<size_t> read(MutBytes bytes) override {
+        size_t size = clamp(bytes.size(), 0uz, _limit - _read);
+        size_t read = try$(_reader.read(bytes.buf(), size));
         _read += read;
         return read;
     }
@@ -76,20 +72,30 @@ struct WriterSlice : public Writer, public Seeker {
         return try$(_writer.seek(Seek::fromBegin(pos)));
     }
 
-    Result<size_t> write(void const *data, size_t size) override {
+    Result<size_t> write(Bytes bytes) override {
         size_t pos = try$(tell(_writer));
 
         if (pos < _start) {
+            try$(_writer.seek(Seek::fromBegin(_start)));
+        }
+
+        if (pos > _end) {
             return 0;
         }
 
-        if (pos + size > _end) {
-            size = _end - pos;
-        }
-
-        return try$(_writer.write(data, size));
+        size_t size = clamp(bytes.size(), 0uz, _end - pos);
+        return try$(_writer.write(bytes.sub(0, size)));
     }
 };
+
+template <SeekableWritable Writable>
+static inline Result<Slice<Writable>>
+makeSlice(Writable &&writer, size_t size) {
+    auto start = try$(writer.tell());
+    auto end = start + size;
+
+    return Slice{std::forward<Writable>(writer), start, end};
+}
 
 struct BufReader :
     public Reader,
@@ -99,18 +105,16 @@ struct BufReader :
 
     BufReader(Bytes buf) : _buf(buf), _pos(0) {}
 
-    BufReader(void *buf, size_t size) : _buf(buf, size), _pos(0) {}
-
-    Result<size_t> read(void *data, size_t size) override {
-        size_t read = min(size, _buf.len() - _pos);
-        memcpy(data, _buf.buf() + _pos, read);
+    Result<size_t> read(MutBytes bytes) override {
+        Bytes slice = _buf.sub(_pos, bytes.size());
+        size_t read = slice.copyTo(bytes);
         _pos += read;
         return read;
     }
 
     Result<size_t> seek(Seek seek) override {
-        _pos = seek.apply(_pos, _buf.len());
-        _pos = clamp(_pos, 0uz, _buf.len());
+        _pos = seek.apply(_pos, _buf.size());
+        _pos = clamp(_pos, 0uz, _buf.size());
         return _pos;
     }
 };
@@ -118,33 +122,23 @@ struct BufReader :
 struct BufWriter :
     public Writer,
     public Seeker {
-    Bytes _buf;
+    MutBytes _buf;
     size_t _pos;
 
-    BufWriter(Bytes buf) : _buf(buf), _pos(0) {}
-
-    BufWriter(void *buf, size_t len) : _buf(buf, len), _pos(0) {}
+    BufWriter(MutBytes buf) : _buf(buf), _pos(0) {}
 
     Result<size_t> seek(Seek seek) override {
-        _pos = seek.apply(_pos, _buf.len());
-        _pos = clamp(_pos, 0uz, _buf.len());
+        _pos = seek.apply(_pos, _buf.size());
+        _pos = clamp(_pos, 0uz, _buf.size());
         return _pos;
     }
 
-    Result<size_t> write(void const *data, size_t size) override {
-        size_t write = min(size, _buf.len() - _pos);
-        memcpy((void *)(_buf.buf() + _pos), data, write);
-        _pos += write;
-        return write;
+    Result<size_t> write(Bytes bytes) override {
+        MutBytes slice = _buf.sub(_pos, bytes.size());
+        size_t written = bytes.copyTo(slice);
+        _pos += written;
+        return written;
     }
 };
-
-template <SeekableWritable Writable>
-static inline Result<Slice<Writable>> makeSlice(Writable &&writer, size_t size) {
-    auto start = try$(writer.tell());
-    auto end = start + size;
-
-    return Slice{std::forward<Writable>(writer), start, end};
-}
 
 } // namespace Karm::Io

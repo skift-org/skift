@@ -13,8 +13,8 @@ struct PosixFd : public Sys::Fd {
 
     PosixFd(int raw) : _raw(raw) {}
 
-    Result<size_t> read(void *buf, size_t size) override {
-        ssize_t result = ::read(_raw, buf, size);
+    Result<size_t> read(MutBytes bytes) override {
+        ssize_t result = ::read(_raw, bytes.buf(), bytes.size());
 
         if (result < 0) {
             return Posix::fromLastErrno();
@@ -23,8 +23,8 @@ struct PosixFd : public Sys::Fd {
         return result;
     }
 
-    Result<size_t> write(void const *buf, size_t size) override {
-        ssize_t result = ::write(_raw, buf, size);
+    Result<size_t> write(Bytes bytes) override {
+        ssize_t result = ::write(_raw, bytes.buf(), bytes.size());
 
         if (result < 0) {
             return Posix::fromLastErrno();
@@ -134,17 +134,17 @@ int mmapOptionsToProt(Karm::Sys::MmapOptions const &options) {
     return prot;
 }
 
-Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options) {
+Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
     void *addr = mmap((void *)options.vaddr, options.size, mmapOptionsToProt(options), MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     if (addr == MAP_FAILED) {
         return Posix::fromLastErrno();
     }
 
-    return USizeRange{(size_t)addr, (size_t)addr + options.size};
+    return Sys::MmapResult{0, (size_t)addr, (size_t)addr + options.size};
 }
 
-Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd> maybeFd) {
+Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd> maybeFd) {
     Strong<PosixFd> fd = try$(maybeFd.as<PosixFd>());
     size_t size = options.size;
 
@@ -158,7 +158,7 @@ Result<USizeRange> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd>
         return Posix::fromLastErrno();
     }
 
-    return USizeRange{(size_t)addr, (size_t)addr + size};
+    return Sys::MmapResult{0, (size_t)addr, (size_t)addr + size};
 }
 
 Error memUnmap(void const *buf, size_t len) {

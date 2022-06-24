@@ -13,16 +13,34 @@ struct ConOut : public Sys::Fd {
 
     ConOut(Efi::SimpleTextOutputProtocol *proto) : _proto(proto) {}
 
-    Result<size_t> read(void *, size_t) override {
+    Result<size_t> read(MutBytes) override {
         notImplemented();
     }
 
-    Result<size_t> write(void const *buf, size_t size) override {
-        static Utf16::Unit tmp[512];
-        size_t len = transcodeUnits<Utf8, Utf16>({(Utf8::Unit *)buf, size}, {tmp, arrayLen$(tmp)});
-        tmp[len] = 0;
-        try$(_proto->outputString(_proto, tmp));
-        return size;
+    Result<size_t> write(Bytes bytes) override {
+        size_t writen{};
+        Array<uint16_t, 129> buf{};
+        // Some space for the null terminator.
+        auto chunkSize = buf.size() - sizeof(uint16_t);
+
+        while (!bytes.empty()) {
+            size_t toCopy = alignDown(bytes.size(), sizeof(uint16_t));
+
+            // We need to copy the bytes into to a uint16_t aligned buffer.
+            bytes
+                .sub<Bytes>(0, toCopy)
+                .copyTo(buf.mutBytes());
+
+            // If bytes.size() is not a multiple of sizeof(uint16_t),
+            // then the last byte will be ignored.
+            buf[toCopy / sizeof(uint16_t) + 1] = 0;
+
+            writen += try$(_proto->outputString(_proto, buf));
+
+            bytes = bytes.sub(chunkSize);
+        }
+
+        return writen;
     }
 
     Result<size_t> seek(Io::Seek) override {
@@ -58,13 +76,15 @@ struct FileProto : public Sys::Fd, Meta::Static {
         return *this;
     }
 
-    Result<size_t> read(void *buf, size_t size) override {
-        try$(_proto->read(_proto, &size, buf));
+    Result<size_t> read(MutBytes bytes) override {
+        size_t size = bytes.size();
+        try$(_proto->read(_proto, &size, bytes.buf()));
         return size;
     }
 
-    Result<size_t> write(void const *buf, size_t size) override {
-        try$(_proto->write(_proto, &size, buf));
+    Result<size_t> write(Bytes bytes) override {
+        size_t size = bytes.size();
+        try$(_proto->write(_proto, &size, bytes.buf()));
         return size;
     }
 
@@ -159,7 +179,8 @@ Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> f
         Efi::MemoryType::LOADER_DATA,
         Hal::pageAlignUp(fileSize) / Hal::PAGE_SIZE, &vaddr));
 
-    Io::BufWriter writer{(void *)vaddr, fileSize};
+    MutBytes bytes = {(Byte *)vaddr, fileSize};
+    Io::BufWriter writer{bytes};
     try$(Io::copy(*fd, writer));
 
     // Memory is identity mapped, so we can just return the virtual address as paddr

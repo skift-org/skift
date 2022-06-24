@@ -180,21 +180,21 @@ struct Program {
 };
 
 struct Image {
-    Cursor<uint8_t> _cursor;
+    Bytes _buf;
 
-    Image(Cursor<uint8_t> cursor)
-        : _cursor(cursor) {}
+    Image(Bytes cursor)
+        : _buf(cursor) {}
 
     bool valid() const {
-        return _cursor.rem() >= sizeof(ImageHeader) &&
-               _cursor[0] == '\x7f' &&
-               _cursor[1] == 'E' &&
-               _cursor[2] == 'L' &&
-               _cursor[3] == 'F';
+        return _buf.size() >= sizeof(ImageHeader) &&
+               _buf[0] == '\x7f' &&
+               _buf[1] == 'E' &&
+               _buf[2] == 'L' &&
+               _buf[3] == 'F';
     }
 
     ImageHeader &header() {
-        return *(ImageHeader *)_cursor.buf();
+        return *(ImageHeader *)_buf.buf();
     }
 
     auto sections() {
@@ -234,7 +234,7 @@ struct Image {
     }
 
     ProgramHeader *programAt(size_t index) {
-        return (ProgramHeader *)(_cursor.buf() + header().phoff + index * header().phentsize);
+        return (ProgramHeader *)(_buf.buf() + header().phoff + index * header().phentsize);
     }
 };
 

@@ -8,33 +8,36 @@
 
 namespace Karm::Sys {
 
-struct In : public Io::Reader {
+struct In :
+    public Io::Reader {
     Strong<Fd> _fd;
 
     In(Strong<Fd> fd) : _fd(fd) {}
 
-    Result<size_t> read(void *data, size_t size) override {
-        return _fd->read(data, size);
+    Result<size_t> read(MutBytes bytes) override {
+        return _fd->read(bytes);
     }
 };
 
-struct Out : public Io::Writer {
+struct Out :
+    public Io::TextWriter<Embed::Encoding> {
     Strong<Fd> _fd;
 
     Out(Strong<Fd> fd) : _fd(fd) {}
 
-    Result<size_t> write(void const *data, size_t size) override {
-        return _fd->write(data, size);
+    Result<size_t> write(Bytes bytes) override {
+        return _fd->write(bytes);
     }
 };
 
-struct Err : public Io::Writer {
+struct Err :
+    public Io::TextWriter<Embed::Encoding> {
     Strong<Fd> _fd;
 
     Err(Strong<Fd> fd) : _fd(fd) {}
 
-    Result<size_t> write(void const *data, size_t size) override {
-        return _fd->write(data, size);
+    Result<size_t> write(Bytes bytes) override {
+        return _fd->write(bytes);
     }
 };
 
@@ -46,12 +49,12 @@ Err &err();
 
 static inline void println(Str str, auto &&...args) {
     (void)Fmt::format(out(), str, std::forward<decltype(args)>(args)...);
-    (void)Io::putc(out(), '\n');
+    (void)out().writeRune(U'\n');
 }
 
 static inline void errln(Str str, auto &&...args) {
     (void)Fmt::format(err(), str, std::forward<decltype(args)>(args)...);
-    (void)Io::putc(err(), '\n');
+    (void)out().writeRune(U'\n');
 }
 
 } // namespace Karm::Sys

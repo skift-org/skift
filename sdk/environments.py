@@ -6,7 +6,7 @@ import utils
 
 
 PASSED_TO_BUILD = [
-    "toolchain", "arch", "sub", "vendor", "sys", "abi", "freestanding"]
+    "toolchain", "arch", "sub", "vendor", "sys", "abi", "encoding", "freestanding"]
 
 
 def enableCache(env: dict) -> dict:

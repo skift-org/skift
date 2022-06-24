@@ -23,7 +23,7 @@ struct _Scan {
 
     size_t rem() {
         auto curr = _cursor;
-        return transcode_len<E>(curr);
+        return transcodeLen<E>(curr);
     }
 
     Rune curr() {
@@ -33,7 +33,7 @@ struct _Scan {
 
         Rune r;
         auto curr = _cursor;
-        return E::decode(r, curr) ? r : U'�';
+        return E::decodeUnit(r, curr) ? r : U'�';
     }
 
     Rune peek(size_t count) {
@@ -50,7 +50,7 @@ struct _Scan {
         }
 
         Rune r;
-        return E::decode(r, _cursor) ? r : U'�';
+        return E::decodeUnit(r, _cursor) ? r : U'�';
     }
 
     Rune next(size_t count) {

@@ -12,7 +12,7 @@ struct Builder {
     size_t _size{};
     char *_string{};
 
-    Builder(MutSlice<uint8_t> slice)
+    Builder(MutSlice<Byte> slice)
         : _buf(slice.buf()), _size(slice.len()), _string((char *)slice.end()) {
         payload() = {};
         payload().magic = COOLBOOT;
@@ -36,7 +36,7 @@ struct Builder {
     }
 
     void add(Tag tag, uint32_t flags = 0, USizeRange range = {}, uint64_t more = 0) {
-        add(Record{
+        add({
             .tag = tag,
             .flags = flags,
             .start = range.start,

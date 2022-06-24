@@ -6,12 +6,13 @@ namespace Hjert::Arch {
 
 Opt<x86_64::Com> _com1;
 
-Result<size_t> writeLog(void const *buf, unsigned long size) {
+Result<size_t> writeLog(Str str) {
     if (!_com1) {
         _com1 = x86_64::Com{x86_64::Com::COM1};
+        _com1->init();
     }
-    _com1->write(buf, size);
-    return size;
+
+    return _com1->writeStr(str);
 }
 
 void stopCpu() {

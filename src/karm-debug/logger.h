@@ -50,7 +50,7 @@ struct Logger {
 
 static inline void log(Str format, auto &&...ts) {
     (void)Fmt::format(Sys::out(), format, std::forward<decltype(ts)>(ts)...);
-    (void)Io::putc(Sys::out(), '\n');
+    (void)Sys::out().writeRune(U'\n');
 }
 
 } // namespace Karm::Debug

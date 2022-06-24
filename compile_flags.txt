@@ -8,3 +8,4 @@
 -Wextra
 -Werror
 -D__sdk_sys_linux__
+-D__sdk_encoding_utf8__

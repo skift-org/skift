@@ -15,16 +15,15 @@ namespace Loader {
 void enterKernel(size_t entry, size_t payload, size_t stack, size_t vmm);
 
 Error load(Sys::Path kernelPath) {
-
     Sys::println("Preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
-    Handover::Builder payload{payloadMem.slice<uint8_t>()};
+    Handover::Builder payload{payloadMem};
     payload.add(Handover::SELF, 0, payloadMem.prange());
 
     Sys::println("Loading kernel file...");
     Sys::File kernelFile = try$(Sys::File::open(kernelPath));
     auto kernelMem = try$(Sys::mmap().map(kernelFile));
-    Elf::Image image{kernelMem.slice<uint8_t>()};
+    Elf::Image image{kernelMem};
     payload.add(Handover::FILE, 0, kernelMem.prange());
 
     if (!image.valid()) {
@@ -73,18 +72,17 @@ Error load(Sys::Path kernelPath) {
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     Sys::println("Mapping loader image...");
-    auto loaderImage = Fw::image();
+    auto loaderImage = Fw::imageRange();
 
     try$(vmm->map(
         Hal::VmmRange::identityMapped(loaderImage),
         loaderImage,
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
-    Sys::println("Finishing up...");
-
-    Sys::println("Entering kernel, see on the other side...");
+    Sys::println("Finalizing and entering kernel, see on the other side...");
     try$(Fw::finalizeHandover(payload));
     Fw::enterKernel(image.header().entry, payload.finalize(), Handover::KERNEL_BASE + (size_t)stackMap.end(), *vmm);
+
     panic("unreachable");
 }
 

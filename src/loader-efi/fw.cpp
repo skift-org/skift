@@ -33,7 +33,7 @@ Result<Strong<Hal::Vmm>> createVmm() {
     return {makeStrong<x86_64::Vmm>(pmm, (x86_64::Pml<4> *)upper)};
 }
 
-Error finalizeHandover(Handover::Builder &) {
+Error finalizeHandover(Handover::Builder &builder) {
     size_t mmapSize = 0;
     size_t key = 0;
     size_t descSize = 0;
@@ -42,12 +42,52 @@ Error finalizeHandover(Handover::Builder &) {
     // NOTE: This is expectected to fail
     (void)Efi::bs()->getMemoryMap(&mmapSize, nullptr, &key, &descSize, &descVersion);
 
+    if (descSize < sizeof(Efi::MemoryDescriptor)) {
+        return Error{Error::INVALID_DATA, "invalid memory descriptor size"};
+    }
+
+    // Allocating on the pool might creates at least one new descriptor
+    // https://stackoverflow.com/questions/39407280/uefi-simple-example-of-using-exitbootservices-with-gnu-efi
+    mmapSize += 2 * descSize;
+
+    auto *buffer = new Byte[mmapSize];
+    try$(Efi::bs()->getMemoryMap(&mmapSize, (Efi::MemoryDescriptor *)buffer, &key, &descSize, &descVersion));
+
+    size_t descLen = mmapSize / descSize;
+    for (size_t i = 0; i < descLen; i++) {
+        auto &desc = *(Efi::MemoryDescriptor *)(buffer + i * descSize);
+
+        size_t start = desc.physicalStart;
+        size_t end = desc.physicalStart + desc.numberOfPages * Hal::PAGE_SIZE;
+
+        switch (desc.type) {
+        case Efi::MemoryType::LOADER_CODE:
+        case Efi::MemoryType::LOADER_DATA:
+        case Efi::MemoryType::BOOT_SERVICES_CODE:
+        case Efi::MemoryType::BOOT_SERVICES_DATA:
+        case Efi::MemoryType::RUNTIME_SERVICES_CODE:
+        case Efi::MemoryType::RUNTIME_SERVICES_DATA:
+            builder.add(Handover::Tag::LOADER, 0, {start, end});
+            break;
+
+        case Efi::MemoryType::CONVENTIONAL_MEMORY:
+            builder.add(Handover::Tag::FREE, 0, {start, end});
+            break;
+
+        case Efi::MemoryType::RESERVED_MEMORY_TYPE:
+            break;
+
+        default:
+            break;
+        }
+    }
+
     try$(Efi::bs()->exitBootServices(Efi::imageHandle(), key));
 
     return OK;
 }
 
-Hal::PmmRange image() {
+Hal::PmmRange imageRange() {
     return {
         (size_t)Efi::li()->imageBase,
         Hal::pageAlignUp((size_t)Efi::li()->imageBase + Efi::li()->imageSize),

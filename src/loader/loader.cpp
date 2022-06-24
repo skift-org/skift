@@ -79,7 +79,7 @@ Error load(Sys::Path kernelPath) {
         loaderImage,
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
-    Sys::println("Finalizing and entering kernel, see on the other side...");
+    Sys::println("Finalizing and entering kernel, see you on the other side...\n");
     try$(Fw::finalizeHandover(payload));
     Fw::enterKernel(image.header().entry, payload.finalize(), Handover::KERNEL_BASE + (size_t)stackMap.end(), *vmm);
 

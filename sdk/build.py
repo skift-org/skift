@@ -74,7 +74,7 @@ def genNinja(out: TextIO, manifests: dict, env: dict) -> None:
 
 def prepare(envName: str) -> Tuple[dict, dict]:
     env = e.load(envName)
-    manifests = m.loadAll(".", env)
+    manifests = m.loadAll("./src", env)
     utils.mkdirP(env["dir"])
     genNinja(open(env["ninjafile"], "w"), manifests, env)
 
@@ -84,7 +84,7 @@ def prepare(envName: str) -> Tuple[dict, dict]:
     meta["components"] = manifests
     meta["toolchain"] = env
 
-    with open(env["dir"] + "/metadata.json", "w") as f:
+    with open(env["dir"] + "/manifest.json", "w") as f:
         json.dump(meta, f, indent=4)
 
     return env, manifests

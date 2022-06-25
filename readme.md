@@ -2,17 +2,25 @@
 <p align="center">
   <a  href="https://github.com/skiftOS/skift/tree/legacy">Looking for the old skiftOS? Click here</a>
 </p>
-<br/>
-
-![](doc/header.svg)
 
 <br/>
+<br/>
+<br/>
+
+<p align="center">
+  <img src="doc/logo-light.svg#gh-light-mode-only" height="96" />
+  <img src="doc/logo-dark.svg#gh-dark-mode-only" height="96" />
+</p>
+
 <p align="center">
   <a href="https://skiftos.org/">Website</a> -
   <a href="doc/readme.md">Manual</a> -
   <a href="http://discord.skiftos.org">Discord</a> -
   <a href="https://github.com/skiftOS/skift/releases">Releases</a>
 </p>
+
+<br/>
+<br/>
 <br/>
 
 # **skiftOS**: The delightful operating system

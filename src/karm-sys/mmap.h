@@ -31,9 +31,16 @@ struct Mmap :
     }
 
     ~Mmap() {
+        unmap().unwrap("unmap failed");
+    }
+
+    Error unmap() {
         if (_buf) {
-            Embed::memUnmap(_buf, _size).unwrap("mem-unmap failled");
+            try$(Embed::memUnmap(std::exchange(_buf, nullptr), _size));
+            _paddr = 0;
+            _size = 0;
         }
+        return OK;
     }
 
     size_t vaddr() const { return (size_t)_buf; }
@@ -82,9 +89,17 @@ struct MutMmap :
     }
 
     ~MutMmap() {
+        unmap().unwrap("unmap failed");
+    }
+
+    Error unmap() {
         if (_buf) {
-            Embed::memUnmap(_buf, _size).unwrap("memUnmap failled");
+            try$(Embed::memUnmap(std::exchange(_buf, nullptr), _size));
+            _paddr = 0;
+            _buf = nullptr;
+            _size = 0;
         }
+        return OK;
     }
 
     size_t vaddr() const {

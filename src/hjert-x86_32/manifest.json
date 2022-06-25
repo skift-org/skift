@@ -1,5 +1,5 @@
 {
-    "id": "hjert-x86-32",
+    "id": "hjert-x86_32",
     "type": "lib",
     "description": "The Hjert micro-kernel platform layer for i686",
     "requires": {

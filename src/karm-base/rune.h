@@ -468,12 +468,12 @@ using One = typename T::One;
 
 template <StaticEncoding E>
 bool encodeOne(Rune rune, One<E> &one) {
-    return E::encode(rune, one);
+    return E::encodeUnit(rune, one);
 }
 
 template <StaticEncoding E>
 bool encodeOne(One<E> &one, Rune &rune) {
-    return E::decode(rune, one);
+    return E::decodeUnit(rune, one);
 }
 
 } // namespace Karm

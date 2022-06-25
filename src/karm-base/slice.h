@@ -129,6 +129,8 @@ struct MutSliceable : public Sliceable<T> {
     using Sliceable<T>::buf;
     using Sliceable<T>::len;
     using Sliceable<T>::size;
+    using Sliceable<T>::peekFront;
+    using Sliceable<T>::peekBack;
 
     virtual ~MutSliceable() = default;
 

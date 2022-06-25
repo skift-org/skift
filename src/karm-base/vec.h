@@ -11,7 +11,7 @@ namespace Karm {
 
 template <typename S, typename T = typename S::T>
 struct _Vec :
-    public Sliceable<T> {
+    public MutSliceable<T> {
 
     S _buf{};
 

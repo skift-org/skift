@@ -141,7 +141,7 @@ Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
         return Posix::fromLastErrno();
     }
 
-    return Sys::MmapResult{0, (size_t)addr, (size_t)addr + options.size};
+    return Sys::MmapResult{0, (size_t)addr, (size_t)options.size};
 }
 
 Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd> maybeFd) {
@@ -158,7 +158,7 @@ Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys
         return Posix::fromLastErrno();
     }
 
-    return Sys::MmapResult{0, (size_t)addr, (size_t)addr + size};
+    return Sys::MmapResult{0, (size_t)addr, (size_t)size};
 }
 
 Error memUnmap(void const *buf, size_t len) {

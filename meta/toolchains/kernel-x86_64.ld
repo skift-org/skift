@@ -6,7 +6,7 @@ SECTIONS
 
     .handover : ALIGN(4K)
     {
-        *(.handover*)
+        KEEP(*(.handover*))
     }
 
     .text : ALIGN(4K)

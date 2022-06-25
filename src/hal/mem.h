@@ -6,7 +6,7 @@
 namespace Hal {
 
 inline constexpr size_t PAGE_SIZE = 0x1000;
-inline constexpr size_t UPPER_HALF = 0xffffffff80000000;
+inline constexpr size_t UPPER_HALF = 0xffff800000000000;
 
 static inline size_t pageAlignDown(size_t addr) {
     return alignDown(addr, PAGE_SIZE);

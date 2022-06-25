@@ -9,67 +9,65 @@ namespace Karm {
 
 template <typename T>
 struct Range {
-    T start{};
-    T end{};
+    T _start{};
+    T _size{};
 
-    Range() = default;
+    constexpr Range() = default;
 
-    Range(T start, T end)
-        : start(start), end(end) {
-        if (end < start) {
-            panic("Range: end < start");
-        }
+    constexpr Range(T start, T size)
+        : _start(start), _size(size) {
     }
 
-    bool valid() const {
-        return start <= end;
+    constexpr T start() const {
+        return _start;
     }
 
-    bool empty() const {
-        return start == end;
+    constexpr T end() const {
+        return _start + _size;
     }
 
-    bool any() const {
+    constexpr bool empty() const {
+        return _size == T{};
+    }
+
+    constexpr bool any() const {
         return !empty();
     }
 
-    T size() const {
-        return end - start;
+    constexpr T size() const {
+        return _size;
     }
 
-    bool contains(T value) const {
-        return start <= value && value < end;
+    constexpr bool contains(T value) const {
+        return start() <= value && value < end();
     }
 
-    bool contains(Range other) const {
-        return start <= other.start && other.end <= end;
+    constexpr bool contains(Range other) const {
+        return start() <= other.start() && other.end() <= end();
     }
 
-    bool contigous(Range other) const {
-        return end == other.start || start == other.end;
+    constexpr bool contigous(Range other) const {
+        return end() == other.start() || start() == other.end();
     }
 
-    bool overlaps(Range other) const {
-        return start < other.end && other.start < end;
+    constexpr bool overlaps(Range other) const {
+        return start() < other.end() && other.start() < end();
     }
 
-    Range merge(Range other) const {
-        return {
-            min(start, other.start),
-            max(end, other.end),
-        };
+    constexpr Range merge(Range other) const {
+        return fromStartEnd(
+            min(start(), other.start()),
+            max(end(), other.end()));
     }
 
-    Pair<Range> substract(Range other) const {
-        Range lower = {
-            start,
-            min(end, other.start),
-        };
+    constexpr Pair<Range> substract(Range other) const {
+        Range lower = fromStartEnd(
+            start(),
+            min(end(), other.start()));
 
-        Range upper = {
-            max(start, other.end),
-            end,
-        };
+        Range upper = fromStartEnd(
+            max(start(), other.end()),
+            end());
 
         return {
             lower.valid() ? lower : Range{},
@@ -77,29 +75,21 @@ struct Range {
         };
     }
 
-    Ordr cmp(Range other) const {
-        return Op::cmp(start, other.start);
+    constexpr Ordr cmp(Range other) const {
+        return Op::cmp(start(), other.start());
     }
 
-    auto iter() {
-        return range(start, end);
+    constexpr auto iter() const {
+        return range(start(), end());
     }
 
-    auto iter() const {
-        return range(start, end);
-    }
-
-    auto iterRev() {
-        return range(end, start);
-    }
-
-    auto iterRev() const {
-        return range(end, start);
+    constexpr auto iterRev() const {
+        return range(end(), start());
     }
 
     template <typename U>
-    auto as() {
-        return U{start, end};
+    constexpr auto as() {
+        return U{start(), size()};
     }
 };
 

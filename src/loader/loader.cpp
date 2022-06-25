@@ -47,7 +47,7 @@ Error load(Sys::Path kernelPath) {
         memcpy((void *)paddr, prog.buf(), prog.filez());
         memset((void *)(paddr + prog.filez()), 0, remaining);
 
-        payload.add(Handover::KERNEL, 0, {paddr, paddr + memsz});
+        payload.add(Handover::KERNEL, 0, {paddr, memsz});
     }
 
     Sys::println("Handling kernel requests...");
@@ -61,14 +61,14 @@ Error load(Sys::Path kernelPath) {
 
     Sys::println("Mapping kernel...");
     try$(vmm->map(
-        {Handover::KERNEL_BASE + Hal::PAGE_SIZE, (Handover::KERNEL_BASE - Hal::PAGE_SIZE) + gib(2) - Hal::PAGE_SIZE},
+        {Handover::KERNEL_BASE + Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         {0x1000, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     Sys::println("Mapping upper half...");
     try$(vmm->map(
-        {Handover::UPPER_HALF + 0x1000, Handover::UPPER_HALF + gib(4)},
-        {0x1000, gib(4)},
+        {Handover::UPPER_HALF + 0x1000, gib(4) - 0x1000},
+        {0x1000, gib(4) - 0x1000},
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     Sys::println("Mapping loader image...");

@@ -39,7 +39,7 @@ struct Builder {
         add({
             .tag = tag,
             .flags = flags,
-            .start = range.start,
+            .start = range.start(),
             .size = range.size(),
             .more = more,
         });

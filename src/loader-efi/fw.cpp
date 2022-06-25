@@ -10,17 +10,17 @@ struct EfiPmm : public Hal::Pmm {
     Result<Hal::PmmRange> alloc(size_t size, Hal::PmmFlags) override {
         size_t paddr = 0;
         try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::LOADER_DATA, size / Hal::PAGE_SIZE, &paddr));
-        return Hal::PmmRange{paddr, paddr + size};
+        return Hal::PmmRange{paddr, size};
     }
 
     Error used(Hal::PmmRange range, Hal::PmmFlags) override {
-        size_t paddr = range.start;
+        size_t paddr = range.start();
         try$(Efi::bs()->allocatePages(Efi::AllocateType::ADDRESS, Efi::MemoryType::LOADER_DATA, paddr / Hal::PAGE_SIZE, &paddr));
         return OK;
     }
 
     Error free(Hal::PmmRange range) override {
-        try$(Efi::bs()->freePages((uint64_t)range.start, range.size() / Hal::PAGE_SIZE));
+        try$(Efi::bs()->freePages((uint64_t)range.start(), range.size() / Hal::PAGE_SIZE));
         return OK;
     }
 };
@@ -28,7 +28,7 @@ struct EfiPmm : public Hal::Pmm {
 static EfiPmm pmm{};
 
 Result<Strong<Hal::Vmm>> createVmm() {
-    size_t upper = try$(pmm.alloc(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start;
+    size_t upper = try$(pmm.alloc(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start();
     memset((void *)upper, 0, Hal::PAGE_SIZE);
     return {makeStrong<x86_64::Vmm>(pmm, (x86_64::Pml<4> *)upper)};
 }
@@ -58,7 +58,7 @@ Error finalizeHandover(Handover::Builder &builder) {
         auto &desc = *(Efi::MemoryDescriptor *)(buffer + i * descSize);
 
         size_t start = desc.physicalStart;
-        size_t end = desc.physicalStart + desc.numberOfPages * Hal::PAGE_SIZE;
+        size_t size = desc.numberOfPages * Hal::PAGE_SIZE;
 
         switch (desc.type) {
         case Efi::MemoryType::LOADER_CODE:
@@ -67,11 +67,11 @@ Error finalizeHandover(Handover::Builder &builder) {
         case Efi::MemoryType::BOOT_SERVICES_DATA:
         case Efi::MemoryType::RUNTIME_SERVICES_CODE:
         case Efi::MemoryType::RUNTIME_SERVICES_DATA:
-            builder.add(Handover::Tag::LOADER, 0, {start, end});
+            builder.add(Handover::Tag::LOADER, 0, {start, size});
             break;
 
         case Efi::MemoryType::CONVENTIONAL_MEMORY:
-            builder.add(Handover::Tag::FREE, 0, {start, end});
+            builder.add(Handover::Tag::FREE, 0, {start, size});
             break;
 
         case Efi::MemoryType::RESERVED_MEMORY_TYPE:
@@ -89,16 +89,15 @@ Error finalizeHandover(Handover::Builder &builder) {
 
 Hal::PmmRange imageRange() {
     return {
-        (size_t)Efi::li()->imageBase,
-        Hal::pageAlignUp((size_t)Efi::li()->imageBase + Efi::li()->imageSize),
+        Hal::pageAlignDown((size_t)Efi::li()->imageBase),
+        Hal::pageAlignUp((size_t)Efi::li()->imageSize),
     };
 }
 
+// Implemented in kernel-entry.s
 extern "C" void __enterKernel(size_t entry, size_t payload, size_t stack, size_t vmm);
 
 void enterKernel(size_t entry, Handover::Payload &payload, size_t stack, Hal::Vmm &vmm) {
-    // Sys::println("__enterKernel: {x}", (size_t)__enterKernel);
-    // Sys::println("entry: {x} payload: {x} stack: {x} vmm: {x}", entry, (size_t)&payload + Handover::KERNEL_BASE, stack, vmm.root());
     __enterKernel(entry, (size_t)&payload + Handover::KERNEL_BASE, stack, vmm.root());
 }
 

@@ -2,7 +2,6 @@
 
 #include <karm-base/loc.h>
 #include <karm-fmt/fmt.h>
-#include <karm-sys/chan.h>
 
 namespace Karm::Debug {
 
@@ -47,10 +46,5 @@ struct Logger {
         panic("_log(FATAL) returned");
     }
 };
-
-static inline void log(Str format, auto &&...ts) {
-    (void)Fmt::format(Sys::out(), format, std::forward<decltype(ts)>(ts)...);
-    (void)Sys::out().writeRune(U'\n');
-}
 
 } // namespace Karm::Debug

@@ -4,6 +4,7 @@
 #include <karm-base/range.h>
 #include <karm-base/result.h>
 
+#include "mem.h"
 #include "pmm.h"
 
 namespace Hal {
@@ -24,11 +25,11 @@ struct VmmRange : public USizeRange {
     using USizeRange::USizeRange;
 
     static VmmRange identityMapped(PmmRange range) {
-        return {range.start, range.end};
+        return {range.start(), range.size()};
     }
 
     static VmmRange upperHalfMapped(PmmRange range) {
-        return {0xffffffff80000000, range.end};
+        return {UPPER_HALF + range.start(), range.size()};
     }
 };
 

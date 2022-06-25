@@ -37,7 +37,7 @@ struct Vmm : public Hal::Vmm {
             return page.template as<Pml<L>>();
         }
 
-        size_t lower = try$(_pmm.alloc(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start;
+        size_t lower = try$(_pmm.alloc(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start();
         memset((void *)lower, 0, Hal::PAGE_SIZE);
         upper.putPage(vaddr, {lower, Entry::WRITE | Entry::PRESENT | Entry::USER});
         return (Pml<L> *)lower;
@@ -65,14 +65,14 @@ struct Vmm : public Hal::Vmm {
         }
 
         for (size_t page = 0; page < vaddr.size(); page += Hal::PAGE_SIZE) {
-            try$(mapPage(vaddr.start + page, paddr.start + page, flags));
+            try$(mapPage(vaddr.start() + page, paddr.start() + page, flags));
         }
         return OK;
     }
 
     Error unmap(Hal::VmmRange vaddr) override {
         for (size_t page = 0; page < vaddr.size(); page += Hal::PAGE_SIZE) {
-            try$(unmapPage(vaddr.start + page));
+            try$(unmapPage(vaddr.start() + page));
         }
         return OK;
     }
@@ -83,7 +83,7 @@ struct Vmm : public Hal::Vmm {
 
     Error flush(Hal::VmmRange vaddr) override {
         for (size_t i = 0; i < vaddr.size(); i += Hal::PAGE_SIZE) {
-            x86_64::invlpg(vaddr.start + i);
+            x86_64::invlpg(vaddr.start() + i);
         }
 
         return OK;

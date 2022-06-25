@@ -51,7 +51,13 @@ Error load(Sys::Path kernelPath) {
     }
 
     Sys::println("Handling kernel requests...");
-    auto requests = try$(image.sectionByName(Handover::REQUEST_SECTION)).slice<Handover::Request>();
+    auto maybeSection = image.sectionByName(Handover::REQUEST_SECTION);
+
+    if (!maybeSection) {
+        return Error{Error::INVALID_DATA, "missing .handover section"};
+    }
+
+    auto requests = try$(maybeSection).slice<Handover::Request>();
 
     for (auto const &request : requests) {
         Sys::println(" - {}", request.name());

@@ -6,7 +6,7 @@ import utils
 
 
 PASSED_TO_BUILD = [
-    "toolchain", "arch", "sub", "vendor", "sys", "abi", "encoding", "freestanding"]
+    "toolchain", "arch", "sub", "vendor", "sys", "abi", "encoding", "freestanding", "variant"]
 
 
 def enableCache(env: dict) -> dict:
@@ -38,14 +38,33 @@ def enableColors(env: dict) -> dict:
     return env
 
 
+def enableOptimizer(env: dict, level: str) -> dict:
+    env = copy.deepcopy(env)
+    env["cflags"] += ["-O%s" % level]
+    env["cxxflags"] += ["-O%s" % level]
+    return env
+
+
 def available() -> list:
-    return [file.removesuffix(".json") for file in os.listdir("sdk/toolchains") if file.endswith(".json")]
+    return [file.removesuffix(".json") for file in os.listdir("meta/toolchains") if file.endswith(".json")]
+
+
+VARIANTS = ["debug", "devel", "release", "sanatize"]
 
 
 def load(env: str) -> dict:
+    variant = "devel"
+    if ":" in env:
+        env, variant = env.split(":")
+
     if not env in available():
-        raise utils.CliException("Environment '%s' not available" % env)
-    result = utils.loadJson(f"sdk/toolchains/{env}.json")
+        raise utils.CliException(f"Environment '{env}' not available")
+
+    if not variant in VARIANTS:
+        raise utils.CliException(f"Variant '{variant}' not available")
+
+    result = utils.loadJson(f"meta/toolchains/{env}.json")
+    result["variant"] = variant
 
     for key in PASSED_TO_BUILD:
         if isinstance(result[key], bool):
@@ -56,10 +75,23 @@ def load(env: str) -> dict:
             result["cflags"] += [f"-D__sdk_{key}_{result[key]}__"]
             result["cxxflags"] += [f"-D__sdk_{key}_{result[key]}__"]
 
-    result["cflags"] += ["-std=gnu2x",
-                         "-Isrc", "-Wall", "-Wextra", "-Werror"]
-    result["cxxflags"] += ["-std=gnu++2b", "-Isrc", "-Wall",
-                           "-Wextra", "-Werror", "-fno-exceptions", "-fno-rtti"]
+    result["cflags"] += [
+        "-std=gnu2x",
+        "-Isrc",
+        "-Wall",
+        "-Wextra",
+        "-Werror"
+    ]
+
+    result["cxxflags"] += [
+        "-std=gnu++2b",
+        "-Isrc",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fno-exceptions",
+        "-fno-rtti"
+    ]
 
     result["hash"] = utils.objSha256(result, PASSED_TO_BUILD)
     result["key"] = utils.objKey(result, PASSED_TO_BUILD)
@@ -69,5 +101,15 @@ def load(env: str) -> dict:
     result["ninjafile"] = result["dir"] + "/build.ninja"
 
     result = enableColors(result)
+
+    if variant == "debug":
+        result = enableOptimizer(result, "g")
+    elif variant == "devel":
+        result = enableOptimizer(result, "2")
+    elif variant == "release":
+        result = enableOptimizer(result, "3")
+    elif variant == "sanatize":
+        result = enableOptimizer(result, "g")
+        result = enableSan(result)
 
     return result

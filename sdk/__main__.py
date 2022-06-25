@@ -1,6 +1,8 @@
 import shutil
 import sys
 import os
+import random
+
 
 import build
 import utils
@@ -70,7 +72,7 @@ def bootCmd(opts: dict, args: list[str]) -> None:
         limineSys = utils.downloadFile(
             "https://github.com/limine-bootloader/limine/raw/v3.0-branch-binary/limine.sys")
         shutil.copy(limineSys, f"{bootDir}/limine.sys")
-        shutil.copy('sdk/images/limine-x86_64/limine.cfg',
+        shutil.copy('meta/images/limine-x86_64/limine.cfg',
                     f"{bootDir}/limine.cfg")
         shutil.copy(limine, f"{efiBootDir}/BOOTX64.EFI")
 
@@ -95,12 +97,11 @@ def bootCmd(opts: dict, args: list[str]) -> None:
 
 def buildCmd(opts: dict, args: list[str]) -> None:
     env = opts.get('env', 'host-clang')
+    
     if len(args) == 0:
         build.buildAll(env)
     else:
-        print("Building:")
         for component in args:
-            print(f"  {component}")
             build.buildOne(env, component)
 
 
@@ -114,8 +115,9 @@ def nukeCmd(opts: dict, args: list[str]) -> None:
 
 
 def idCmd(opts: dict, args: list[str]) -> None:
-    import random
-    print(hex(random.randint(0, 2**64)))
+    i = hex(random.randint(0, 2**64))
+    print("64bit: " + i)
+    print("32bit: " + i[:10])
 
 
 def helpCmd(opts: dict, args: list[str]) -> None:
@@ -134,6 +136,11 @@ def helpCmd(opts: dict, args: list[str]) -> None:
     print("Enviroments:")
     for env in environments.available():
         print("  " + env)
+    print("")
+
+    print("Variants:")
+    for var in environments.VARIANTS:
+        print("  " + var)
     print("")
 
 

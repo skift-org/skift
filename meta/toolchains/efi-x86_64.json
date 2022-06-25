@@ -11,7 +11,6 @@
     "freestanding": true,
     "cc": "clang",
     "cflags": [
-        "-g",
         "-target",
         "x86_64-unknown-windows",
         "-ffreestanding",
@@ -21,7 +20,6 @@
     ],
     "cxx": "clang++",
     "cxxflags": [
-        "-g",
         "-target",
         "x86_64-unknown-windows",
         "-ffreestanding",

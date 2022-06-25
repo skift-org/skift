@@ -78,11 +78,14 @@ def prepare(envName: str) -> Tuple[dict, dict]:
     utils.mkdirP(env["dir"])
     genNinja(open(env["ninjafile"], "w"), manifests, env)
 
-    with open(env["dir"] + "/meta.json", "w") as f:
-        json.dump(manifests, f, indent=4)
+    meta = {}
+    meta["id"] = envName
+    meta["type"] = "artifacts"
+    meta["components"] = manifests
+    meta["toolchain"] = env
 
-    with open(env["dir"] + "/env.json", "w") as f:
-        json.dump(env, f, indent=4)
+    with open(env["dir"] + "/metadata.json", "w") as f:
+        json.dump(meta, f, indent=4)
 
     return env, manifests
 

@@ -39,7 +39,7 @@
     ],
     "ld": "ld.lld",
     "ldflags": [
-        "-Tsdk/toolchains/kernel-x86_64.ld",
+        "-Tmeta/toolchains/kernel-x86_64.ld",
         "-z",
         "max-page-size=0x1000"
     ],

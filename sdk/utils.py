@@ -71,6 +71,11 @@ def findFiles(dir: str, exts: list[str] = []) -> list[str]:
     return result
 
 
+def hashFile(filename: str) -> str:
+    with open(filename, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()
+
+
 def objSha256(obj: dict, keys: list[str] = []) -> str:
     toHash = {}
     if len(keys) == 0:

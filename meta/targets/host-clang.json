@@ -1,0 +1,38 @@
+{
+    "id": "clang",
+    "type": "target",
+    "props": {
+        "toolchain": "clang",
+        "arch": "x86",
+        "sub": "64",
+        "vendor": "unknown",
+        "sys": "@sysname",
+        "abi": "unknown",
+        "encoding": "utf8",
+        "freestanding": false
+    },
+    "tools": {
+        "cc": {
+            "cmd": "clang",
+            "args": []
+        },
+        "cxx": {
+            "cmd": "clang++",
+            "args": []
+        },
+        "ld": {
+            "cmd": "clang",
+            "args": []
+        },
+        "ar": {
+            "cmd": "llvm-ar",
+            "args": [
+                "rcs"
+            ]
+        },
+        "as": {
+            "cmd": "nasm",
+            "args": []
+        }
+    }
+}

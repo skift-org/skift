@@ -1,0 +1,38 @@
+{
+    "id": "gcc",
+    "type": "target",
+    "props": {
+        "toolchain": "gcc",
+        "arch": "x86",
+        "sub": "64",
+        "vendor": "unknown",
+        "sys": "@sysname",
+        "abi": "unknown",
+        "encoding": "utf8",
+        "freestanding": false
+    },
+    "tools": {
+        "cc": {
+            "cmd": "gcc",
+            "args": []
+        },
+        "cxx": {
+            "cmd": "g++",
+            "args": []
+        },
+        "ld": {
+            "cmd": "gcc",
+            "args": []
+        },
+        "ar": {
+            "cmd": "ar",
+            "args": [
+                "rcs"
+            ]
+        },
+        "as": {
+            "cmd": "nasm",
+            "args": []
+        }
+    }
+}

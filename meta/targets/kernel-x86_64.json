@@ -1,0 +1,72 @@
+{
+    "id": "hjert-x86_64",
+    "type": "target",
+    "props": {
+        "toolchain": "clang",
+        "arch": "x86",
+        "sub": "64",
+        "vendor": "unknown",
+        "sys": "hjert",
+        "abi": "sysv",
+        "encoding": "utf8",
+        "freestanding": true
+    },
+    "tools": {
+        "cc": {
+            "cmd": "clang",
+            "args": [
+                "-target",
+                "x86_64-none-elf",
+                "-ffreestanding",
+                "-fno-stack-protector",
+                "-mno-80387",
+                "-mno-mmx",
+                "-mno-3dnow",
+                "-mno-sse",
+                "-mno-sse2",
+                "-mno-red-zone",
+                "-mcmodel=kernel"
+            ]
+        },
+        "cxx": {
+            "cmd": "clang++",
+            "args": [
+                "-target",
+                "x86_64-none-elf",
+                "-ffreestanding",
+                "-fno-stack-protector",
+                "-mno-80387",
+                "-mno-mmx",
+                "-mno-3dnow",
+                "-mno-sse",
+                "-mno-sse2",
+                "-mno-red-zone",
+                "-mcmodel=kernel"
+            ]
+        },
+        "ld": {
+            "cmd": "ld.lld",
+            "args": [
+                "-Tmeta/targets/kernel-x86_64.ld",
+                "-z",
+                "max-page-size=0x1000"
+            ],
+            "files": [
+                "meta/targets/kernel-x86_64.ld"
+            ]
+        },
+        "ar": {
+            "cmd": "llvm-ar",
+            "args": [
+                "rcs"
+            ]
+        },
+        "as": {
+            "cmd": "nasm",
+            "args": [
+                "-f",
+                "elf64"
+            ]
+        }
+    }
+}

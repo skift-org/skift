@@ -1,0 +1,56 @@
+{
+    "id": "hjert-x86_32",
+    "type": "target",
+    "props": {
+        "toolchain": "clang",
+        "arch": "x86",
+        "sub": "32",
+        "vendor": "unknown",
+        "sys": "hjert",
+        "abi": "sysv",
+        "encoding": "utf8",
+        "freestanding": true
+    },
+    "tools": {
+        "cc": {
+            "cmd": "clang",
+            "args": [
+                "-target",
+                "i386-none-elf",
+                "-ffreestanding",
+                "-fno-stack-protector"
+            ]
+        },
+        "cxx": {
+            "cmd": "clang++",
+            "args": [
+                "-target",
+                "i386-none-elf",
+                "-ffreestanding",
+                "-fno-stack-protector"
+            ]
+        },
+        "ld": {
+            "cmd": "clang++",
+            "args": [
+                "-target",
+                "i386-none-elf",
+                "-ffreestanding",
+                "-no-stdlib"
+            ]
+        },
+        "ar": {
+            "cmd": "llvm-ar",
+            "args": [
+                "rcs"
+            ]
+        },
+        "as": {
+            "cmd": "nasm",
+            "args": [
+                "-f",
+                "elf32"
+            ]
+        }
+    }
+}

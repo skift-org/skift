@@ -7,5 +7,5 @@
 -Wall
 -Wextra
 -Werror
--D__sdk_sys_linux__
--D__sdk_encoding_utf8__
+-D__osdk_sys_linux__
+-D__osdk_encoding_utf8__

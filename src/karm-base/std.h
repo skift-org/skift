@@ -6,7 +6,7 @@
 
 #include "_prelude.h"
 
-#ifdef __sdk_freestanding__
+#ifdef __osdk_freestanding__
 
 #    include <karm-meta/signess.h>
 

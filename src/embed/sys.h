@@ -27,9 +27,9 @@ Error memUnmap(void const *buf, size_t len);
 
 Error memFlush(void *flush, size_t len);
 
-#ifdef __sdk_encoding_utf8__
+#ifdef __osdk_encoding_utf8__
 using Encoding = Utf8;
-#elifdef __sdk_encoding_utf16__
+#elifdef __osdk_encoding_utf16__
 using Encoding = Utf16;
 #endif
 

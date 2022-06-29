@@ -65,7 +65,7 @@ struct Com :
 
     Port _port;
 
-    Com(Port port) : _port(port) {}
+    constexpr Com(Port port) : _port(port) {}
 
     void init() {
         writeReg(INTERRUPT_IDENTIFICATOR, 0);

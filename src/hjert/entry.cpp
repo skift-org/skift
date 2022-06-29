@@ -11,9 +11,14 @@ HandoverRequests$(
     Handover::requestFb(),
     Handover::requestFiles());
 
-Error entryPoint([[maybe_unused]] uint64_t magic, [[maybe_unused]] Handover::Payload const &payload) {
+Error entryPoint(uint64_t magic, Handover::Payload const &payload) {
+    try$(Arch::init());
+
+    if (!Handover::valid(magic, payload)) {
+        return "Invalid handover payload";
+    }
+
     try$(Arch::writeLog("hjert (v0.0.1)\n"));
-    Arch::x86_64::gdtInitialize();
 
     Arch::stopCpu();
 }

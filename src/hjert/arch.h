@@ -5,6 +5,8 @@
 
 namespace Hjert::Arch {
 
+Error init();
+
 Result<size_t> writeLog(Str str);
 
 [[noreturn]] void stopCpu();

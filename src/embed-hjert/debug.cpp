@@ -13,8 +13,7 @@ void debugHandler(char const *buf) {
     Hjert::Arch::writeLog(buf).unwrap();
     Hjert::Arch::writeLog("\n").unwrap();
 
-    while (1)
-        ;
+    Hjert::Arch::stopCpu();
 }
 
 } // namespace Embed

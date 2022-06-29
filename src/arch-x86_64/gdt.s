@@ -1,5 +1,5 @@
-global gdtUpdate
-gdtUpdate:
+global _gdtUpdate
+_gdtUpdate:
   lgdt [rdi]
   mov ax, 0x10
   mov ss, ax
@@ -12,8 +12,8 @@ gdtUpdate:
 .trampoline:
   ret
 
-global tssUpdate
-tssUpdate:
+global _tssUpdate
+_tssUpdate:
   mov ax, 0x28
   ltr ax
   ret

@@ -65,12 +65,12 @@ struct [[gnu::packed]] Gdt {
 extern "C" void _gdtLoad(void *ptr); // implemented in gdt.s
 
 struct [[gnu::packed]] GdtDesc {
-    uint64_t _base{};
     uint16_t _limit{};
+    uint64_t _base{};
 
     GdtDesc() = default;
 
-    GdtDesc(Gdt &base) : _base(reinterpret_cast<uintptr_t>(&base)), _limit(sizeof(Gdt) - 1){};
+    GdtDesc(Gdt &base) : _limit{sizeof(Gdt) - 1}, _base{reinterpret_cast<uintptr_t>(&base)} {};
 
     void load() { _gdtLoad(this); }
 };

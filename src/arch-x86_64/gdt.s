@@ -1,5 +1,5 @@
-global _gdtUpdate
-_gdtUpdate:
+global _gdtLoad
+_gdtLoad:
   lgdt [rdi]
   mov ax, 0x10
   mov ss, ax

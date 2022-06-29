@@ -17,6 +17,7 @@
         "hjert"
     ],
     "deps": [
-        "limine"
+        "limine",
+        "arch-x86-64"
     ]
 }

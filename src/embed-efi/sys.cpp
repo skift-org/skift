@@ -21,23 +21,21 @@ struct ConOut : public Sys::Fd {
         size_t writen{};
         Array<uint16_t, 129> buf{};
         // Some space for the null terminator.
-        auto chunkSize = buf.size() - sizeof(uint16_t);
+        auto chunkSize = sizeOf(buf) - sizeof(uint16_t);
 
-        while (!bytes.empty()) {
-            size_t toCopy = alignDown(bytes.size(), sizeof(uint16_t));
+        while (!isEmpty(bytes)) {
+            size_t toCopy = alignDown(sizeOf(bytes), sizeof(uint16_t));
 
             // We need to copy the bytes into to a uint16_t aligned buffer.
-            bytes
-                .sub<Bytes>(0, toCopy)
-                .copyTo(buf.mutBytes());
+            copy(sub(bytes, 0, toCopy), mutBytes(buf));
 
             // If bytes.size() is not a multiple of sizeof(uint16_t),
             // then the last byte will be ignored.
-            buf[toCopy / sizeof(uint16_t) + 1] = 0;
+            buf[(toCopy / sizeof(uint16_t)) + 1] = 0;
 
-            writen += try$(_proto->outputString(_proto, buf));
+            writen += try$(_proto->outputString(_proto, buf.buf()));
 
-            bytes = bytes.sub(chunkSize);
+            bytes = next(bytes, chunkSize);
         }
 
         return writen;
@@ -77,13 +75,13 @@ struct FileProto : public Sys::Fd, Meta::Static {
     }
 
     Result<size_t> read(MutBytes bytes) override {
-        size_t size = bytes.size();
+        size_t size = sizeOf(bytes);
         try$(_proto->read(_proto, &size, bytes.buf()));
         return size;
     }
 
     Result<size_t> write(Bytes bytes) override {
-        size_t size = bytes.size();
+        size_t size = sizeOf(bytes);
         try$(_proto->write(_proto, &size, bytes.buf()));
         return size;
     }
@@ -147,7 +145,7 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
 
     Efi::FileProtocol *file = nullptr;
     _String<Utf16> pathStr = transcode<Utf16>(path.str());
-    for (auto &u : pathStr) {
+    for (auto &u : pathStr.mutUnits()) {
         if (u == '/') {
             u = '\\';
         }

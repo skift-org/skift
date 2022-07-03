@@ -63,6 +63,10 @@ struct Buf {
         return *this;
     }
 
+    constexpr T &operator[](size_t i) { return _buf[i]; }
+
+    constexpr T const &operator[](size_t i) const { return _buf[i]; }
+
     void ensure(size_t cap) {
         if (cap <= _cap)
             return;
@@ -190,22 +194,6 @@ struct Buf {
         _len += newLen;
     }
 
-    T &at(size_t index) {
-        if (index >= _len) {
-            panic("index out of bounds");
-        }
-
-        return _buf[index].unwrap();
-    }
-
-    T const &at(size_t index) const {
-        if (index >= _len) {
-            panic("index out of bounds");
-        }
-
-        return _buf[index].unwrap();
-    }
-
     T *buf() {
         return &_buf->unwrap();
     }
@@ -279,28 +267,16 @@ struct InlineBuf {
         return *this;
     }
 
+    constexpr T &operator[](size_t i) { return _buf[i]; }
+
+    constexpr T const &operator[](size_t i) const { return _buf[i]; }
+
     void ensure(size_t) {
         // no-op
     }
 
     void fit() {
         // no-op
-    }
-
-    T &at(size_t index) {
-        if (index >= _len) {
-            panic("index out of bounds");
-        }
-
-        return _buf[index].unwrap();
-    }
-
-    T const &at(size_t index) const {
-        if (index >= _len) {
-            panic("index out of bounds");
-        }
-
-        return _buf[index].unwrap();
     }
 
     template <typename... Args>
@@ -312,6 +288,7 @@ struct InlineBuf {
         for (size_t i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
         }
+
         _buf[index].ctor(std::forward<Args>(args)...);
         _len++;
     }
@@ -324,6 +301,7 @@ struct InlineBuf {
         for (size_t i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
         }
+
         _buf[index].ctor(std::move(value));
         _len++;
     }

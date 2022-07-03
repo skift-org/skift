@@ -76,7 +76,7 @@ struct Range {
     }
 
     constexpr Ordr cmp(Range other) const {
-        return Op::cmp(start(), other.start());
+        return cmp(start(), other.start());
     }
 
     constexpr auto iter() const {

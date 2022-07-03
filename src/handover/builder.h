@@ -13,7 +13,7 @@ struct Builder {
     char *_string{};
 
     Builder(MutSlice<Byte> slice)
-        : _buf(slice.buf()), _size(slice.len()), _string((char *)slice.end()) {
+        : _buf(slice.buf()), _size(slice.len()), _string((char *)end(slice)) {
         payload() = {};
         payload().magic = COOLBOOT;
         payload().size = slice.len();

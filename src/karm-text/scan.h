@@ -122,7 +122,7 @@ struct _Scan {
     }
 
     Str end() {
-        return Str(_begin, _cursor);
+        return {_begin, _cursor};
     }
 };
 

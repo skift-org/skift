@@ -7,13 +7,13 @@
 namespace x86_64 {
 
 struct [[gnu::packed]] GdtSeg {
-    uint16_t _limitLow;
-    uint16_t _baseLow;
-    uint8_t _baseMid;
-    uint8_t _flags;
-    uint8_t _limitHigh : 4;
-    uint8_t _granularity : 4;
-    uint8_t _baseHigh;
+    uint16_t _limitLow{};
+    uint16_t _baseLow{};
+    uint8_t _baseMid{};
+    uint8_t _flags{};
+    uint8_t _limitHigh : 4 {};
+    uint8_t _granularity : 4 {};
+    uint8_t _baseHigh{};
 
     constexpr GdtSeg() = default;
 
@@ -62,17 +62,17 @@ struct [[gnu::packed]] Gdt {
     };
 };
 
-extern "C" void _gdtLoad(void *ptr); // implemented in gdt.s
+extern "C" void _gdtLoad(void const *ptr); // implemented in gdt.s
 
 struct [[gnu::packed]] GdtDesc {
     uint16_t _limit{};
     uint64_t _base{};
 
-    GdtDesc() = default;
+    constexpr GdtDesc() = default;
 
-    GdtDesc(Gdt &base) : _limit{sizeof(Gdt) - 1}, _base{reinterpret_cast<uintptr_t>(&base)} {};
+    GdtDesc(Gdt const &base) : _limit{sizeof(Gdt) - 1}, _base{reinterpret_cast<uintptr_t>(&base)} {};
 
-    void load() { _gdtLoad(this); }
+    void load() const { _gdtLoad(this); }
 };
 
 void gdtInitialize();

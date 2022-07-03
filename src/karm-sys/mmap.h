@@ -9,7 +9,6 @@
 namespace Karm::Sys {
 
 struct Mmap :
-    public Sliceable<Byte>,
     Meta::NoCopy {
     using enum MmapFlags;
 
@@ -52,17 +51,22 @@ struct Mmap :
 
     Hal::PmmRange prange() const { return {_paddr, _size}; }
 
-    virtual constexpr size_t len() const override {
-        return _size;
+    template <typename T>
+    T const *as() const {
+        return static_cast<T const *>(_buf);
     }
 
-    virtual constexpr Byte const *buf() const override {
-        return static_cast<uint8_t const *>(_buf);
+    template <typename T>
+    Cursor<T> cursor() const {
+        return Cursor<T>{(T *)_buf, _size / sizeof(T)};
+    }
+
+    Bytes bytes() const {
+        return {static_cast<Byte const *>(_buf), _size};
     }
 };
 
 struct MutMmap :
-    public MutSliceable<Byte>,
     public Io::Flusher,
     Meta::NoCopy {
     using enum MmapFlags;
@@ -120,25 +124,31 @@ struct MutMmap :
     }
 
     template <typename T>
+    T const *as() const {
+        return static_cast<T const *>(_buf);
+    }
+
+    template <typename T>
     T *as() {
         return static_cast<T *>(_buf);
     }
 
     template <typename T>
-    Cursor<T> cursor() {
+    Cursor<T> cursor() const {
         return Cursor<T>{(T *)_buf, _size / sizeof(T)};
     }
 
-    virtual constexpr Byte *buf() override {
-        return static_cast<Byte *>(_buf);
+    template <typename T>
+    MutCursor<T> mutCursor() {
+        return Cursor<T>{(T *)_buf, _size / sizeof(T)};
     }
 
-    virtual constexpr Byte const *buf() const override {
-        return static_cast<Byte const *>(_buf);
+    Bytes bytes() const {
+        return {static_cast<Byte const *>(_buf), _size};
     }
 
-    virtual constexpr size_t len() const override {
-        return _size;
+    MutBytes mutBytes() {
+        return {static_cast<Byte *>(_buf), _size};
     }
 };
 

@@ -81,7 +81,7 @@ struct TextWriter : public _TextWriter {
 
     Result<size_t> writeStr(Str str) override {
         size_t written = 0;
-        for (auto rune : str.runes()) {
+        for (auto rune : iterRunes(str)) {
             written += try$(writeRune(rune));
         }
         return written;
@@ -92,7 +92,7 @@ struct TextWriter : public _TextWriter {
         if (!E::encodeUnit(rune, one)) {
             return 0;
         }
-        return write(one.bytes());
+        return write(bytes(one));
     }
 };
 

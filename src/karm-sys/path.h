@@ -14,7 +14,7 @@ struct Path {
     Path(Str path) : _str(path) {}
 
     Ordr cmp(Path const &other) const {
-        return _str.cmp(other._str);
+        return ::cmp(_str, other._str);
     }
 
     Str str() const {

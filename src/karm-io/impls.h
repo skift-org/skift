@@ -11,23 +11,23 @@ namespace Karm::Io {
 
 struct Sink : public Writer {
     Result<size_t> write(Bytes bytes) override {
-        return bytes.size();
+        return sizeOf(bytes);
     }
 };
 
 struct Zero : public Reader {
     Result<size_t> read(MutBytes bytes) override {
-        return bytes.zero();
+        return zeroFill(bytes);
     }
 };
 
 struct Repeat : public Reader {
-    uint8_t _byte;
+    Byte _byte;
 
-    Repeat(uint8_t byte) : _byte(byte) {}
+    Repeat(Byte byte) : _byte(byte) {}
 
     Result<size_t> read(MutBytes bytes) override {
-        return bytes.fill((Byte)_byte);
+        return fill(bytes, _byte);
     }
 };
 
@@ -106,15 +106,15 @@ struct BufReader :
     BufReader(Bytes buf) : _buf(buf), _pos(0) {}
 
     Result<size_t> read(MutBytes bytes) override {
-        Bytes slice = _buf.sub(_pos, bytes.size());
-        size_t read = slice.copyTo(bytes);
+        Bytes slice = sub(_buf, _pos, sizeOf(bytes));
+        size_t read = copy(slice, bytes);
         _pos += read;
         return read;
     }
 
     Result<size_t> seek(Seek seek) override {
-        _pos = seek.apply(_pos, _buf.size());
-        _pos = clamp(_pos, 0uz, _buf.size());
+        _pos = seek.apply(_pos, sizeOf(_buf));
+        _pos = clamp(_pos, 0uz, sizeOf(_buf));
         return _pos;
     }
 };
@@ -128,14 +128,14 @@ struct BufWriter :
     BufWriter(MutBytes buf) : _buf(buf), _pos(0) {}
 
     Result<size_t> seek(Seek seek) override {
-        _pos = seek.apply(_pos, _buf.size());
-        _pos = clamp(_pos, 0uz, _buf.size());
+        _pos = seek.apply(_pos, sizeOf(_buf));
+        _pos = clamp(_pos, 0uz, sizeOf(_buf));
         return _pos;
     }
 
     Result<size_t> write(Bytes bytes) override {
-        MutBytes slice = _buf.sub(_pos, bytes.size());
-        size_t written = bytes.copyTo(slice);
+        MutBytes slice = mutSub(_buf, _pos, sizeOf(bytes));
+        size_t written = copy(bytes, slice);
         _pos += written;
         return written;
     }

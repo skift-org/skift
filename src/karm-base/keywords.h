@@ -2,25 +2,29 @@
 
 namespace Karm {
 
+/* The object should take the ownership of the memory */
+
 struct Move {};
 
-struct Copy {};
-
-struct Wrap {};
-
-struct None {};
-
-/* The object should take the ownership of the memory */
 constexpr inline auto MOVE = Move{};
 
 /* The object should make a copy of the memory */
+
+struct Copy {};
+
 constexpr inline auto COPY = Copy{};
 
 /* The object should wrap the memory without doing a copy
    nor taking the ownership */
+
+struct Wrap {};
+
 constexpr inline auto WRAP = Wrap{};
 
 /* The object should be empty initialized */
+
+struct None {};
+
 constexpr inline auto NONE = None{};
 
 template <typename T>

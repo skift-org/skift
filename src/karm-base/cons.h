@@ -15,7 +15,8 @@ struct Cons {
     Cdr cdr{};
 
     Ordr cmp(Cons const &other) const {
-        return Op::cmp(car, other.car) | Op::cmp(cdr, other.cdr);
+        return cmp(car, other.car) |
+               cmp(cdr, other.cdr);
     }
 };
 

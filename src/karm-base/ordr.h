@@ -46,7 +46,12 @@ concept Comparable = requires(T const &lhs, T const &rhs) {
     { lhs.cmp(rhs) } -> Meta::Same<Ordr>;
 };
 
-namespace Op {
+template <typename T>
+concept ComparaisonOperator = requires(T const &lhs, T const &rhs) {
+    { lhs < rhs } -> Meta::Same<bool>;
+    { lhs > rhs } -> Meta::Same<bool>;
+    { lhs == rhs } -> Meta::Same<bool>;
+};
 
 template <Comparable T>
 constexpr Ordr cmp(T const &lhs, T const &rhs) {
@@ -55,7 +60,7 @@ constexpr Ordr cmp(T const &lhs, T const &rhs) {
 
 // fallback for types that don't implement Comparable
 template <typename T>
-requires(!Comparable<T>) constexpr Ordr cmp(T const &lhs, T const &rhs) {
+requires(ComparaisonOperator<T>) constexpr Ordr cmp(T const &lhs, T const &rhs) {
     if (lhs < rhs) {
         return Ordr::LESS;
     } else if (lhs > rhs) {
@@ -84,6 +89,8 @@ Ordr cmp(T const *lhs, size_t lhs_len, T const *rhs, size_t rhs_len) {
         return Ordr::EQUAL;
     }
 }
+
+namespace Op {
 
 template <typename T>
 constexpr bool eq(T const &lhs, T const &rhs) {

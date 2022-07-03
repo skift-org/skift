@@ -5,15 +5,22 @@
 namespace Karm {
 
 template <typename T>
-struct Cursor :
-    public Sliceable<T> {
+struct Cursor {
+    using Inner = T;
 
     T const *_begin = nullptr;
     T const *_end = nullptr;
 
     constexpr Cursor() = default;
 
-    Cursor(Sliceable<T> const &slice) : _begin(slice.begin()), _end(slice.end()) {}
+    Cursor(Sliceable<T> auto &slice)
+        : _begin(begin(slice)), _end(end(slice)) {}
+
+    constexpr T const &operator[](size_t i) const {
+        return _begin[i];
+    }
+
+    constexpr operator T const *() const { return _begin; }
 
     bool ended() const {
         return _begin >= _end;
@@ -44,22 +51,34 @@ struct Cursor :
             next();
     }
 
-    constexpr T const *buf() const override {
+    constexpr T const *buf() const {
         return _begin;
     }
 
-    constexpr size_t len() const override {
+    constexpr size_t len() const {
         return _end - _begin;
     }
 };
 
 template <typename T>
-struct MutCursor : public MutSliceable<T> {
+struct MutCursor {
     T *_begin = nullptr;
     T *_end = nullptr;
 
-    MutCursor(MutSliceable<T> &slice)
-        : _begin(slice.begin()), _end(slice.end()) {}
+    MutCursor(MutSliceable<T> auto &slice)
+        : _begin(begin(slice)), _end(end(slice)) {}
+
+    constexpr T &operator[](size_t i) {
+        return _begin[i];
+    }
+
+    constexpr T const &operator[](size_t i) const {
+        return _begin[i];
+    }
+
+    constexpr operator T *() { return _begin; }
+
+    constexpr operator T const *() const { return _begin; }
 
     bool ended() const {
         return _begin == _end;
@@ -94,15 +113,15 @@ struct MutCursor : public MutSliceable<T> {
         _begin += n;
     }
 
-    constexpr T *buf() override {
+    constexpr T *buf() {
         return _begin;
     }
 
-    constexpr T const *buf() const override {
+    constexpr T const *buf() const {
         return _begin;
     }
 
-    constexpr size_t len() const override {
+    constexpr size_t len() const {
         return _end - _begin;
     }
 };

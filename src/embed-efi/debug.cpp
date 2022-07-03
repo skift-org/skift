@@ -12,23 +12,21 @@ struct DebugOut : public Io::TextWriter<Utf16> {
         size_t writen{};
         Array<uint16_t, 129> buf{};
         // Some space for the null terminator.
-        auto chunkSize = buf.size() - sizeof(uint16_t);
+        auto chunkSize = sizeOf(buf) - sizeof(uint16_t);
 
-        while (!bytes.empty()) {
-            size_t toCopy = alignDown(bytes.size(), sizeof(uint16_t));
+        while (!isEmpty(bytes)) {
+            size_t toCopy = alignDown(sizeOf(bytes), sizeof(uint16_t));
 
             // We need to copy the bytes into to a uint16_t aligned buffer.
-            bytes
-                .sub<Bytes>(0, toCopy)
-                .copyTo(buf.mutBytes());
+            copy(sub(bytes, 0, toCopy), mutBytes(buf));
 
             // If bytes.size() is not a multiple of sizeof(uint16_t),
             // then the last byte will be ignored.
             buf[toCopy / sizeof(uint16_t) + 1] = 0;
 
-            writen += try$(Efi::st()->conOut->outputString(Efi::st()->conOut, buf));
+            writen += try$(Efi::st()->conOut->outputString(Efi::st()->conOut, buf.buf()));
 
-            bytes = bytes.sub(chunkSize);
+            bytes = next(bytes, chunkSize);
         }
 
         return writen;

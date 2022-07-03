@@ -12,10 +12,10 @@ struct Uuid {
     uint8_t d[8]{};
 
     Ordr cmp(Uuid const &other) const {
-        return Op::cmp(a, other.a) |
-               Op::cmp(b, other.b) |
-               Op::cmp(c, other.c) |
-               Op::cmp(d, other.d);
+        return ::cmp(a, other.a) |
+               ::cmp(b, other.b) |
+               ::cmp(c, other.c) |
+               ::cmp(d, other.d);
     }
 };
 

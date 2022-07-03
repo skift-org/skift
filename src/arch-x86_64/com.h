@@ -124,10 +124,11 @@ struct Com :
     }
 
     Result<size_t> write(Bytes bytes) override {
-        for (auto b : bytes) {
+        for (auto b : iter(bytes)) {
             try$(putByte(b));
         }
-        return bytes.size();
+
+        return sizeOf(bytes);
     }
 };
 

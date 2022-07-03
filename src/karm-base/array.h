@@ -9,9 +9,9 @@
 
 namespace Karm {
 
-template <typename _T, size_t N>
-struct Array : public MutSliceable<_T> {
-    using T = _T;
+template <typename T, size_t N>
+struct Array {
+    using Inner = T;
 
     T _buf[N] = {};
 
@@ -24,20 +24,22 @@ struct Array : public MutSliceable<_T> {
         }
     }
 
-    constexpr Array(Sliceable<T> &other) {
+    constexpr Array(Sliceable<T> auto &other) {
         size_t i = 0;
         for (auto &elem : other) {
             _buf[i++] = elem;
         }
     }
 
-    /* --- MutSliceable --- */
+    constexpr T &operator[](size_t i) { return _buf[i]; }
 
-    constexpr size_t len() const override { return N; }
+    constexpr T const &operator[](size_t i) const { return _buf[i]; }
 
-    constexpr T *buf() override { return _buf; }
+    constexpr size_t len() const { return N; }
 
-    constexpr T const *buf() const override { return _buf; }
+    constexpr T *buf() { return _buf; }
+
+    constexpr T const *buf() const { return _buf; }
 };
 
 } // namespace Karm

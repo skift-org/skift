@@ -10,8 +10,8 @@
 namespace Karm {
 
 template <typename S, typename T = typename S::T>
-struct _Vec :
-    public MutSliceable<T> {
+struct _Vec {
+    using Inner = T;
 
     S _buf{};
 
@@ -21,7 +21,7 @@ struct _Vec :
 
     _Vec(std::initializer_list<T> other) : _buf(other) {}
 
-    _Vec(Sliceable<T> &other) : _buf(other) {}
+    _Vec(Sliceable<T> auto &other) : _buf(other) {}
 
     /* --- Collection --- */
 
@@ -103,11 +103,11 @@ struct _Vec :
 
     /* --- MutSliceable --- */
 
-    constexpr size_t len() const override { return _buf.len(); }
+    constexpr size_t len() const { return _buf.len(); }
 
-    constexpr T *buf() override { return _buf.buf(); }
+    constexpr T *buf() { return _buf.buf(); }
 
-    constexpr T const *buf() const override { return _buf.buf(); }
+    constexpr T const *buf() const { return _buf.buf(); }
 };
 
 template <typename T>

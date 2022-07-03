@@ -61,7 +61,7 @@ static inline Result<size_t> skip(Readable auto &reader, size_t n) {
 static inline Result<size_t> copy(Readable auto &reader, MutBytes bytes) {
     size_t readed = 0;
     while (readed < bytes.len()) {
-        readed += try$(reader.read(bytes.sub(readed)));
+        readed += try$(reader.read(sub(bytes, readed)));
     }
 
     return readed;
@@ -71,14 +71,14 @@ static inline Result<size_t> copy(Readable auto &reader, Writable auto &writer) 
     Array<Byte, 4096> buffer;
     size_t result = 0;
     while (true) {
-        auto read = try$(reader.read(buffer.mutBytes()));
+        auto read = try$(reader.read(mutBytes(buffer)));
 
         if (read == 0) {
             return result;
         }
 
         result += read;
-        auto written = try$(writer.write(buffer.sub(0, read)));
+        auto written = try$(writer.write(sub(buffer, 0, read)));
 
         if (written != read) {
             return result;
@@ -90,12 +90,12 @@ static inline Result<size_t> copy(Readable auto &reader, Writable auto &writer, 
     Array<Bytes, 4096> buffer;
     size_t result = 0;
     while (size > 0) {
-        auto read = try$(reader.read(buffer.sub(0, size)));
+        auto read = try$(reader.read(sub(buffer, 0, size)));
         if (read == 0) {
             break;
         }
         result += read;
-        auto written = try$(writer.write(buffer.sub(0, read)));
+        auto written = try$(writer.write(sub(buffer, 0, read)));
         if (written != read) {
             return result;
         }

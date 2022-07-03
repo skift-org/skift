@@ -22,22 +22,28 @@ concept StaticEncoding = requires(T t, Rune &r, typename T::Unit u, Cursor<typen
 };
 
 template <typename U, size_t N>
-struct _Multiple : public MutSliceable<U> {
+struct _Multiple {
+    using Inner = U;
     using Unit = U;
+
     InlineBuf<Unit, N> _buf{};
 
     void put(Unit u) {
         _buf.emplace(_buf.len(), u);
     }
 
-    constexpr Unit *buf() override { return _buf.buf(); }
-    constexpr Unit const *buf() const override { return _buf.buf(); }
-    constexpr size_t len() const override { return _buf.len(); }
+    constexpr Unit &operator[](size_t i) { return _buf[i]; }
+    constexpr Unit const &operator[](size_t i) const { return _buf[i]; }
+
+    constexpr Unit *buf() { return _buf.buf(); }
+    constexpr Unit const *buf() const { return _buf.buf(); }
+    constexpr size_t len() const { return _buf.len(); }
     constexpr size_t rem() const { return N - len(); }
 };
 
 template <typename U>
-struct _Single : public MutSliceable<U> {
+struct _Single {
+    using Inner = U;
     using Unit = U;
 
     Unit _buf;
@@ -54,9 +60,12 @@ struct _Single : public MutSliceable<U> {
         return _buf;
     }
 
-    constexpr Unit *buf() override { return &_buf; }
-    constexpr Unit const *buf() const override { return &_buf; }
-    constexpr size_t len() const override { return 1; }
+    constexpr Unit &operator[](size_t) { return _buf; }
+    constexpr Unit const &operator[](size_t) const { return _buf; }
+
+    constexpr Unit *buf() { return &_buf; }
+    constexpr Unit const *buf() const { return &_buf; }
+    constexpr size_t len() const { return 1; }
 };
 
 template <typename T, typename U>
@@ -397,7 +406,7 @@ using Ibm437Mapper = decltype([](uint8_t c) {
         U'°', U'∙', U'·', U'√', U'ⁿ', U'²', U'■', U'\x00a0',
     };
 
-    return mappings[c];
+    return at(mappings, c);
 });
 
 // clang-format on

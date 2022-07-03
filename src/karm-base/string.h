@@ -7,7 +7,7 @@
 
 namespace Karm {
 
-static constexpr size_t strLen(const char *str) {
+static constexpr size_t strLen(char const *str) {
     size_t len = 0;
     while (*str++) {
         len++;
@@ -24,18 +24,6 @@ struct _Str : public Slice<U> {
 
     constexpr _Str(Unit const *cstr) requires(Meta::Same<Unit, char>)
         : Slice<U>(cstr, strLen(cstr)) {}
-
-    auto runes() const {
-        Cursor<Unit> cursor(*this);
-        return Iter([cursor]() mutable -> Opt<Rune> {
-            if (cursor.ended()) {
-                return NONE;
-            }
-
-            Rune r;
-            return E::decodeUnit(r, cursor) ? Opt<Rune>(r) : Opt<Rune>(NONE);
-        });
-    }
 };
 
 template <StaticEncoding E, typename U = typename E::Unit>
@@ -46,43 +34,35 @@ struct _MutStr : public MutSlice<U> {
     using MutSlice<U>::MutSlice;
 
     constexpr _MutStr(Unit *cstr) requires(Meta::Same<Unit, char>)
-        : MutSlice<U>(cstr, strlen(cstr)) {}
-
-    auto runes() const {
-        Cursor<Unit> cursor(this->buf(), this->len());
-
-        return Iter([cursor]() mutable -> Opt<Rune> {
-            if (cursor.ended()) {
-                return NONE;
-            }
-
-            Rune r;
-            return E::decode(r, cursor) ? Opt<Rune>(r) : Opt<Rune>(NONE);
-        });
-    }
+        : MutSlice<U>(cstr, strLen(cstr)) {}
 };
 
 template <StaticEncoding E>
 struct _String {
     using Encoding = E;
     using Unit = typename E::Unit;
+    using Inner = Unit;
 
     Unit *_buf = nullptr;
     size_t _len = 0;
 
     _String() = default;
 
-    _String(Move, Unit *buf, size_t len) : _buf(buf), _len(len) {}
+    _String(Move, Unit *buf, size_t len)
+        : _buf(buf), _len(len) {}
 
-    _String(Unit const *buf, size_t len) : _len(len) {
+    _String(Unit const *buf, size_t len)
+        : _len(len) {
         _buf = new Unit[len + 1];
         _buf[len] = 0;
         memcpy(_buf, buf, len * sizeof(Unit));
     }
 
-    _String(_Str<E> str) : _String(str.buf(), str.len()) {}
+    _String(_Str<E> str)
+        : _String(str.buf(), str.len()) {}
 
-    _String(_String const &other) : _String(other._buf, other._len) {
+    _String(_String const &other)
+        : _String(other._buf, other._len) {
     }
 
     _String(_String &&other) {
@@ -92,10 +72,6 @@ struct _String {
 
     ~_String() {
         delete[] _buf;
-    }
-
-    operator _Str<E>() const {
-        return {_buf, _len};
     }
 
     _String &operator=(_String const &other) {
@@ -109,38 +85,38 @@ struct _String {
         return *this;
     }
 
-    Unit *begin() { return _buf; }
-
-    Unit *end() { return _buf + _len; }
-
-    Unit const *begin() const { return _buf; }
-
-    Unit const *end() const { return _buf + _len; }
-
     _Str<E> str() const { return {_buf, _len}; }
 
-    auto units() const { return Slice<Unit>(_buf, _len).iter(); }
-
-    auto runes() const {
-        Cursor<Unit> cursor(_buf, _len);
-        return Iter([cursor]() mutable -> Opt<Rune> {
-            if (cursor.ended()) {
-                return NONE;
-            }
-
-            Rune r;
-            return E::decode(r, cursor) ? Opt<Rune>(r) : Opt<Rune>(NONE);
-        });
+    Slice<Unit> units() const {
+        return {_buf, _len};
     }
 
-    auto cmp(_Str<E> const &other) const {
-        return static_cast<_Str<E>>(*this).cmp(other);
+    MutSlice<Unit> mutUnits() {
+        return {_buf, _len};
     }
 
+    Unit const &operator[](size_t i) const { return _buf[i]; }
+    Unit &operator[](size_t i) { return _buf[i]; }
     Unit const *buf() const { return _buf; }
-
+    Unit *buf() { return _buf; }
     size_t len() const { return _len; }
 };
+
+template <
+    Sliceable S,
+    typename E = typename S::Encoding,
+    typename U = typename E::Unit>
+auto iterRunes(S const &slice) {
+    Cursor<U> cursor(slice);
+    return Iter([cursor]() mutable -> Opt<Rune> {
+        if (cursor.ended()) {
+            return NONE;
+        }
+
+        Rune r;
+        return E::decodeUnit(r, cursor) ? Opt<Rune>(r) : Opt<Rune>(NONE);
+    });
+}
 
 template <::StaticEncoding Target, ::StaticEncoding Source>
 _String<Target> transcode(_Str<Source> str) {

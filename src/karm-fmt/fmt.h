@@ -61,9 +61,8 @@ struct NumberFormater {
             value /= base;
         } while (value != 0);
 
-        buf
-            .sub<MutSlice<char>>(0, i)
-            .reverse();
+        reverse(mutSub(buf, 0, i));
+
         return writer.writeStr({buf.buf(), i});
     }
 };

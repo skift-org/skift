@@ -17,13 +17,13 @@ void enterKernel(size_t entry, size_t payload, size_t stack, size_t vmm);
 Error load(Sys::Path kernelPath) {
     Sys::println("Preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
-    Handover::Builder payload{payloadMem};
+    Handover::Builder payload{payloadMem.mutBytes()};
     payload.add(Handover::SELF, 0, payloadMem.prange());
 
     Sys::println("Loading kernel file...");
     Sys::File kernelFile = try$(Sys::File::open(kernelPath));
     auto kernelMem = try$(Sys::mmap().map(kernelFile));
-    Elf::Image image{kernelMem};
+    Elf::Image image{kernelMem.bytes()};
     payload.add(Handover::FILE, 0, kernelMem.prange());
 
     if (!image.valid()) {
@@ -87,7 +87,7 @@ Error load(Sys::Path kernelPath) {
 
     Sys::println("Finalizing and entering kernel, see you on the other side...\n");
     try$(Fw::finalizeHandover(payload));
-    Fw::enterKernel(image.header().entry, payload.finalize(), Handover::KERNEL_BASE + (size_t)stackMap.end(), *vmm);
+    Fw::enterKernel(image.header().entry, payload.finalize(), Handover::KERNEL_BASE + (size_t)stackMap.mutBytes().end(), *vmm);
 
     panic("unreachable");
 }

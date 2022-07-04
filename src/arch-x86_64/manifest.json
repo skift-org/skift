@@ -1,17 +1,13 @@
 {
     "id": "arch-x86-64",
     "type": "lib",
-    "description": "The assembly layer for x86-64",
+    "description": "Definitions for x86-64 architecture",
     "requires": {
-        "sys": [
-            "hjert"
-        ],
         "arch": [
             "x86"
         ],
         "sub": [
             "64"
         ]
-    },
-    "inject": []
+    }
 }

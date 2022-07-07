@@ -29,6 +29,15 @@ struct Buf {
         }
     }
 
+    Buf(Sliceable<T> auto &other) {
+        _cap = other.len();
+        _len = other.len();
+        _buf = new Inert<T>[_cap];
+        for (size_t i = 0; i < _len; i++) {
+            _buf[i].ctor(other[i]);
+        }
+    }
+
     Buf(Buf const &other) {
         _cap = other._cap;
         _len = other._len;
@@ -63,9 +72,9 @@ struct Buf {
         return *this;
     }
 
-    constexpr T &operator[](size_t i) { return _buf[i]; }
+    constexpr T &operator[](size_t i) { return _buf[i].unwrap(); }
 
-    constexpr T const &operator[](size_t i) const { return _buf[i]; }
+    constexpr T const &operator[](size_t i) const { return _buf[i].unwrap(); }
 
     void ensure(size_t cap) {
         if (cap <= _cap)
@@ -224,7 +233,7 @@ struct InlineBuf {
 
     constexpr InlineBuf() = default;
 
-    InlineBuf(size_t cap) : _len(cap) {
+    InlineBuf(size_t cap) {
         if (cap > N) {
             panic("cap too large");
         }
@@ -237,6 +246,18 @@ struct InlineBuf {
         }
         for (size_t i = 0; i < _len; i++) {
             _buf[i].ctor(std::move(other.begin()[i]));
+        }
+    }
+
+    InlineBuf(Sliceable<T> auto &other) {
+        _len = other.len();
+
+        if (_len > N) {
+            panic("cap too large");
+        }
+
+        for (size_t i = 0; i < _len; i++) {
+            _buf[i].ctor(other[i]);
         }
     }
 
@@ -267,7 +288,7 @@ struct InlineBuf {
         return *this;
     }
 
-    constexpr T &operator[](size_t i) { return _buf[i]; }
+    constexpr T &operator[](size_t i) { return _buf[i].unwrap(); }
 
     constexpr T const &operator[](size_t i) const { return _buf[i]; }
 

@@ -26,7 +26,7 @@ bool Driver::beginDescribe(Str name, Loc) {
 void Driver::endDescribe() {}
 
 bool Driver::beginIt(Str name, Loc) {
-    Sys::errln("It {}", name);
+    Sys::errln("\tIt {}", name);
     return true;
 }
 

@@ -140,7 +140,7 @@ struct Context : Meta::Static {
     Context(App &app) : _app(app) {}
 
     Scope &current() {
-        return _stack.peekBack();
+        return first(_stack);
     }
 
     _Node &parent() {

@@ -126,11 +126,11 @@ struct Context {
     }
 
     Scope &current() {
-        return _stack.peekBack();
+        return first(_stack);
     }
 
     Scope const &current() const {
-        return _stack.peekBack();
+        return last(_stack);
     }
 
     void save() {
@@ -317,7 +317,7 @@ struct Context {
 
     Math::Vec2i mesure(Str text) {
         int width = VGA_FONT_HEIGHT;
-        for (auto rune : text.runes()) {
+        for (auto rune : iterRunes(text)) {
             width += mesure(rune).x;
         }
         return {width, VGA_FONT_HEIGHT};
@@ -347,7 +347,7 @@ struct Context {
 
     void stroke(Math::Vec2i baseline, Str text) {
         Math::Vec2i pos = baseline;
-        for (auto rune : text.runes()) {
+        for (auto rune : iterRunes(text)) {
             stroke(pos, rune);
             baseline = baseline + Math::Vec2i{VGA_FONT_WIDTH, 0};
         }
@@ -355,7 +355,7 @@ struct Context {
 
     void fill(Math::Vec2i baseline, Str text) {
         Math::Vec2i pos = baseline;
-        for (auto rune : text.runes()) {
+        for (auto rune : iterRunes(text)) {
             fill(pos, rune);
             baseline = baseline + Math::Vec2i{VGA_FONT_WIDTH, 0};
         }

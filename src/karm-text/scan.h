@@ -74,7 +74,7 @@ struct _Scan {
     bool skip(Str str) {
         auto save = _cursor;
 
-        for (auto r : str.runes()) {
+        for (auto r : iterRunes(str)) {
             if (next() != r) {
                 _cursor = save;
                 return false;

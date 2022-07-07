@@ -47,7 +47,7 @@ struct _Vec {
         bool changed = false;
 
         for (size_t i = 1; i < _buf.len() + 1; i++) {
-            if (Op::eq(_buf.at(i - 1), val)) {
+            if (Op::eq(_buf[i - 1], val)) {
                 _buf.removeAt(i - 1);
                 changed = true;
                 i--;
@@ -108,6 +108,10 @@ struct _Vec {
     constexpr T *buf() { return _buf.buf(); }
 
     constexpr T const *buf() const { return _buf.buf(); }
+
+    constexpr T &operator[](size_t i) { return _buf[i]; }
+
+    constexpr T const &operator[](size_t i) const { return _buf[i]; }
 };
 
 template <typename T>

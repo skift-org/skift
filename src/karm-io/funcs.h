@@ -61,7 +61,7 @@ static inline Result<size_t> skip(Readable auto &reader, size_t n) {
 static inline Result<size_t> copy(Readable auto &reader, MutBytes bytes) {
     size_t readed = 0;
     while (readed < bytes.len()) {
-        readed += try$(reader.read(sub(bytes, readed)));
+        readed += try$(reader.read(next(bytes, readed)));
     }
 
     return readed;

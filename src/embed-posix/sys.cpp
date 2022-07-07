@@ -14,7 +14,7 @@ struct PosixFd : public Sys::Fd {
     PosixFd(int raw) : _raw(raw) {}
 
     Result<size_t> read(MutBytes bytes) override {
-        ssize_t result = ::read(_raw, bytes.buf(), bytes.size());
+        ssize_t result = ::read(_raw, bytes.buf(), sizeOf(bytes));
 
         if (result < 0) {
             return Posix::fromLastErrno();
@@ -24,7 +24,7 @@ struct PosixFd : public Sys::Fd {
     }
 
     Result<size_t> write(Bytes bytes) override {
-        ssize_t result = ::write(_raw, bytes.buf(), bytes.size());
+        ssize_t result = ::write(_raw, bytes.buf(), sizeOf(bytes));
 
         if (result < 0) {
             return Posix::fromLastErrno();

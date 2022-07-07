@@ -140,7 +140,7 @@ struct Strong {
         if (_rc == other._rc)
             return Ordr::EQUAL;
 
-        return cmp(unwrap(), other.unwrap());
+        return ::cmp(unwrap(), other.unwrap());
     }
 
     constexpr T &operator*() const {

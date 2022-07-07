@@ -145,7 +145,7 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
 
     Efi::FileProtocol *file = nullptr;
     _String<Utf16> pathStr = transcode<Utf16>(path.str());
-    for (auto &u : pathStr.mutUnits()) {
+    for (auto &u : pathStr) {
         if (u == '/') {
             u = '\\';
         }

@@ -7,7 +7,7 @@
 ExitCode entryPoint(CliArgs const &args) {
     Sys::File kernelFile = try$(Sys::File::open(args[0]));
     auto kernelMem = try$(Sys::mmap().read().map(kernelFile));
-    Elf::Image kernelElf{kernelMem};
+    Elf::Image kernelElf{kernelMem.bytes()};
 
     if (!kernelElf.valid()) {
         return Error{Error::INVALID_DATA, "kernel is not a valid ELF executable"};

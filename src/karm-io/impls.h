@@ -49,7 +49,7 @@ struct Limit : public Reader {
     }
 
     Result<size_t> read(MutBytes bytes) override {
-        size_t size = clamp(bytes.size(), 0uz, _limit - _read);
+        size_t size = clamp(sizeOf(bytes), 0uz, _limit - _read);
         size_t read = try$(_reader.read(bytes.buf(), size));
         _read += read;
         return read;
@@ -83,8 +83,8 @@ struct WriterSlice : public Writer, public Seeker {
             return 0;
         }
 
-        size_t size = clamp(bytes.size(), 0uz, _end - pos);
-        return try$(_writer.write(bytes.sub(0, size)));
+        size_t size = clamp(sizeOf(bytes), 0uz, _end - pos);
+        return try$(_writer.write(sub(bytes, 0, size)));
     }
 };
 

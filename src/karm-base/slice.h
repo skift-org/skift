@@ -216,6 +216,22 @@ constexpr auto *end(S &slice) {
     return slice.buf() + slice.len();
 }
 
+constexpr auto const &first(Sliceable auto &slice) {
+    return slice.buf()[0];
+}
+
+constexpr auto &first(MutSliceable auto &slice) {
+    return slice.buf()[0];
+}
+
+constexpr auto const &last(Sliceable auto &slice) {
+    return slice.buf()[slice.len() - 1];
+}
+
+constexpr auto &last(MutSliceable auto &slice) {
+    return slice.buf()[slice.len() - 1];
+}
+
 constexpr auto const &at(Sliceable auto &slice, size_t i) {
     return slice.buf()[i];
 }

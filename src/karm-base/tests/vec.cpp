@@ -9,7 +9,7 @@ Error test_vec(Driver &_driver) {
             V v;
 
             expectEq$(v.len(), 0uz);
-            expectEq$(v.cap(), 0uz);
+            expectGteq$(v.cap(), 0uz);
         }
 
         it$("should be copyable") {
@@ -17,10 +17,10 @@ Error test_vec(Driver &_driver) {
             V v2 = v;
 
             expectEq$(v2.len(), 3uz);
-            expectEq$(v2.cap(), 3uz);
-            expectEq$(v2.at(0), 1);
-            expectEq$(v2.at(1), 2);
-            expectEq$(v2.at(2), 3);
+            expectGteq$(v2.cap(), 3uz);
+            expectEq$(v2[0], 1);
+            expectEq$(v2[1], 2);
+            expectEq$(v2[2], 3);
         }
 
         it$("should be moveable") {
@@ -28,34 +28,34 @@ Error test_vec(Driver &_driver) {
             V v2 = std::move(v);
 
             expectEq$(v2.len(), 3uz);
-            expectEq$(v2.cap(), 3uz);
-            expectEq$(v2.at(0), 1);
-            expectEq$(v2.at(1), 2);
-            expectEq$(v2.at(2), 3);
+            expectGteq$(v2.cap(), 3uz);
+            expectEq$(v2[0], 1);
+            expectEq$(v2[1], 2);
+            expectEq$(v2[2], 3);
         }
 
         it$("should be empty when created with capacity") {
             V v(10);
 
             expectEq$(v.len(), 0uz);
-            expectEq$(v.cap(), 10uz);
+            expectGteq$(v.cap(), 10uz);
         }
 
         it$("should be empty when created with an empty initializer list") {
             V v = {};
 
             expectEq$(v.len(), 0uz);
-            expectEq$(v.cap(), 0uz);
+            expectGteq$(v.cap(), 0uz);
         }
 
         it$("should contain the elements of the initializer list") {
             V v = {1, 2, 3};
 
             expectEq$(v.len(), 3uz);
-            expectEq$(v.cap(), 3uz);
-            expectEq$(v.at(0), 1);
-            expectEq$(v.at(1), 2);
-            expectEq$(v.at(2), 3);
+            expectGteq$(v.cap(), 3uz);
+            expectEq$(v[0], 1);
+            expectEq$(v[1], 2);
+            expectEq$(v[2], 3);
         }
     }
 
@@ -65,11 +65,11 @@ Error test_vec(Driver &_driver) {
             v.insert(3, 4);
 
             expectEq$(v.len(), 4uz);
-            expectEq$(v.cap(), 4uz);
-            expectEq$(v.at(0), 1);
-            expectEq$(v.at(1), 2);
-            expectEq$(v.at(2), 3);
-            expectEq$(v.at(3), 4);
+            expectGteq$(v.cap(), 4uz);
+            expectEq$(v[0], 1);
+            expectEq$(v[1], 2);
+            expectEq$(v[2], 3);
+            expectEq$(v[3], 4);
         }
 
         it$("should insert at the beginning") {
@@ -77,11 +77,11 @@ Error test_vec(Driver &_driver) {
             v.insert(0, 0);
 
             expectEq$(v.len(), 4uz);
-            expectEq$(v.cap(), 4uz);
-            expectEq$(v.at(0), 0);
-            expectEq$(v.at(1), 1);
-            expectEq$(v.at(2), 2);
-            expectEq$(v.at(3), 3);
+            expectGteq$(v.cap(), 4uz);
+            expectEq$(v[0], 0);
+            expectEq$(v[1], 1);
+            expectEq$(v[2], 2);
+            expectEq$(v[3], 3);
         }
 
         it$("should insert at the middle") {
@@ -89,11 +89,11 @@ Error test_vec(Driver &_driver) {
             v.insert(1, 0);
 
             expectEq$(v.len(), 4uz);
-            expectEq$(v.cap(), 4uz);
-            expectEq$(v.at(0), 1);
-            expectEq$(v.at(1), 0);
-            expectEq$(v.at(2), 2);
-            expectEq$(v.at(3), 3);
+            expectGteq$(v.cap(), 4uz);
+            expectEq$(v[0], 1);
+            expectEq$(v[1], 0);
+            expectEq$(v[2], 2);
+            expectEq$(v[3], 3);
         }
 
         it$("should insert at the end when the vector is full") {
@@ -102,12 +102,12 @@ Error test_vec(Driver &_driver) {
             v.insert(4, 5);
 
             expectEq$(v.len(), 5uz);
-            expectEq$(v.cap(), 5uz);
-            expectEq$(v.at(0), 1);
-            expectEq$(v.at(1), 2);
-            expectEq$(v.at(2), 3);
-            expectEq$(v.at(3), 4);
-            expectEq$(v.at(4), 5);
+            expectGteq$(v.cap(), 5uz);
+            expectEq$(v[0], 1);
+            expectEq$(v[1], 2);
+            expectEq$(v[2], 3);
+            expectEq$(v[3], 4);
+            expectEq$(v[4], 5);
         }
     }
 
@@ -123,10 +123,10 @@ Error test_vec(Driver &_driver) {
 
             expectEq$(v.len(), 3uz);
             expectGteq$(v.cap(), v.len());
-            expectGt$(v.cap(), oldCap);
-            expectEq$(v.at(0), 1);
-            expectEq$(v.at(1), 2);
-            expectEq$(v.at(2), 3);
+            expectGteq$(v.cap(), oldCap);
+            expectEq$(v[0], 1);
+            expectEq$(v[1], 2);
+            expectEq$(v[2], 3);
         }
 
         it$("should not increase the capacity when the capacity is sufficient") {
@@ -139,10 +139,10 @@ Error test_vec(Driver &_driver) {
             v.pushBack(3);
 
             expectEq$(v.len(), 3uz);
-            expectEq$(v.cap(), oldCap);
-            expectEq$(v.at(0), 1);
-            expectEq$(v.at(1), 2);
-            expectEq$(v.at(2), 3);
+            expectGteq$(v.cap(), oldCap);
+            expectEq$(v[0], 1);
+            expectEq$(v[1], 2);
+            expectEq$(v[2], 3);
         }
 
         it$("let elements be popped") {
@@ -152,23 +152,10 @@ Error test_vec(Driver &_driver) {
             auto popped = v.popBack();
 
             expectEq$(v.len(), 3uz);
-            expectEq$(v.at(0), 1);
-            expectEq$(v.at(1), 2);
-            expectEq$(v.at(2), 3);
+            expectEq$(v[0], 1);
+            expectEq$(v[1], 2);
+            expectEq$(v[2], 3);
             expectEq$(popped, 4);
-        }
-
-        it$("let element be peeked") {
-            V v = {1, 2};
-
-            v.pushBack(3);
-            auto peeked = v.peekBack();
-
-            expectEq$(v.len(), 3uz);
-            expectEq$(v.at(0), 1);
-            expectEq$(v.at(1), 2);
-            expectEq$(v.at(2), 3);
-            expectEq$(peeked, 3);
         }
     }
 
@@ -184,10 +171,10 @@ Error test_vec(Driver &_driver) {
 
             expectEq$(v.len(), 3uz);
             expectGteq$(v.cap(), v.len());
-            expectGt$(v.cap(), oldCap);
-            expectEq$(v.at(0), 3);
-            expectEq$(v.at(1), 2);
-            expectEq$(v.at(2), 1);
+            expectGteq$(v.cap(), oldCap);
+            expectEq$(v[0], 3);
+            expectEq$(v[1], 2);
+            expectEq$(v[2], 1);
         }
 
         it$("should not increase the capacity when the capacity is sufficient") {
@@ -200,10 +187,10 @@ Error test_vec(Driver &_driver) {
             v.pushFront(3);
 
             expectEq$(v.len(), 3uz);
-            expectEq$(v.cap(), oldCap);
-            expectEq$(v.at(0), 3);
-            expectEq$(v.at(1), 2);
-            expectEq$(v.at(2), 1);
+            expectGteq$(v.cap(), oldCap);
+            expectEq$(v[0], 3);
+            expectEq$(v[1], 2);
+            expectEq$(v[2], 1);
         }
 
         it$("let elements be popped") {
@@ -213,23 +200,10 @@ Error test_vec(Driver &_driver) {
             auto popped = v.popFront();
 
             expectEq$(v.len(), 3uz);
-            expectEq$(v.at(0), 1);
-            expectEq$(v.at(1), 2);
-            expectEq$(v.at(2), 3);
+            expectEq$(v[0], 1);
+            expectEq$(v[1], 2);
+            expectEq$(v[2], 3);
             expectEq$(popped, 4);
-        }
-
-        it$("let element be peeked") {
-            V v = {1, 2};
-
-            v.pushFront(3);
-            auto peeked = v.peekFront();
-
-            expectEq$(v.len(), 3uz);
-            expectEq$(v.at(0), 3);
-            expectEq$(v.at(1), 1);
-            expectEq$(v.at(2), 2);
-            expectEq$(peeked, 3);
         }
     }
 

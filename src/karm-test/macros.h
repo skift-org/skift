@@ -21,6 +21,7 @@ namespace Karm::Test {
 
 #define __expect$(LHS, RHS, OP)                         \
     ({                                                  \
+        /* Make sure LHS and RHS are evaluated once */  \
         auto __lhs = (LHS);                             \
         auto __rhs = (RHS);                             \
                                                         \

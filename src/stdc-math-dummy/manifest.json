@@ -4,12 +4,14 @@
     "description": "Dummy for the ISO C Standard Mathematical Library (ISO/IEC 9899)",
     "root-include": true,
     "requires": {
-        "sys": [
-            "efi",
-            "hjert"
+        "freestanding": [
+            true
+        ],
+        "host": [
+            false
         ]
     },
-    "inject": [
-        "karm-base"
-    ]
+    "provide": [
+        "stdc-math"
+    ],
 }

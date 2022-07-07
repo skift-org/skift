@@ -1,1 +1,1 @@
-"@include(meta/targets/host-clang.json)"
+"@include(meta/targets/host-@uname(machine).json)"

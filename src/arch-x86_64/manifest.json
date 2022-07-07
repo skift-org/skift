@@ -4,10 +4,7 @@
     "description": "Definitions for x86-64 architecture",
     "requires": {
         "arch": [
-            "x86"
-        ],
-        "sub": [
-            "64"
+            "x86_64"
         ]
     }
 }

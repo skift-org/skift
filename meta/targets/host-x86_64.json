@@ -3,13 +3,12 @@
     "type": "target",
     "props": {
         "toolchain": "clang",
-        "arch": "x86",
-        "sub": "64",
-        "vendor": "unknown",
-        "sys": "@sysname",
+        "arch": "x86_64",
+        "sys": "@uname(sysname)",
         "abi": "unknown",
         "encoding": "utf8",
-        "freestanding": false
+        "freestanding": false,
+        "host": true
     },
     "tools": {
         "cc": {
@@ -21,7 +20,7 @@
             "args": []
         },
         "ld": {
-            "cmd": "clang",
+            "cmd": "clang++",
             "args": []
         },
         "ar": {
@@ -32,7 +31,10 @@
         },
         "as": {
             "cmd": "nasm",
-            "args": []
+            "args": [
+                "-f",
+                "elf64"
+            ]
         }
     }
 }

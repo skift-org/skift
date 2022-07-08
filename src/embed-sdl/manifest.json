@@ -1,0 +1,19 @@
+{
+    "id": "embed-ui",
+    "type": "lib",
+    "description": "Karm UI platform embedding layer for SDL.",
+    "provide": [
+        "embed-ui"
+    ],
+    "requires": {
+        "karm-ui-backend": [
+            "sdl"
+        ]
+    },
+    "inject": [
+        "embed"
+    ],
+    "deps": [
+        "karm-base"
+    ]
+}

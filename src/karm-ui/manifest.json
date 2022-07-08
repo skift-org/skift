@@ -4,6 +4,6 @@
     "description": "A graphical user interface library",
     "deps": [
         "karm-gfx",
-        "embed"
+        "embed-ui"
     ]
 }

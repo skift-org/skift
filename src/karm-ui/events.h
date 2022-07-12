@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-math/vec.h>
 #include <karm-meta/utils.h>
 
 #include "keys.h"
@@ -33,56 +34,24 @@ struct MouseEvent : public _Event<MouseEvent, 0x5db47c5474147944> {
     enum struct Type : uint8_t {
         PRESS,
         RELEASE,
-        MOVE,
-        SCOLL,
+        SCROLL,
 
+        MOVE,
         ENTER,
         LEAVE
-    };
-
-    enum struct Button : uint8_t {
-        LEFT,
-        MIDDLE,
-        RIGHT,
-        X1,
-        X2,
-
-        _COUNT
-    };
-
-    enum struct Modifier : uint8_t {
-        NONE,
-        SHIFT,
-        CTRL,
-        ALT,
-        SUPER,
-
-        _COUNT
-    };
-
-    struct Axis {
-        int x{};
-        int y{};
-
-        int vscroll{};
-        int hscroll{};
-
-        Axis() = default;
     };
 
     using enum Type;
 
     Type type;
-    Axis screen;
-    Axis local;
-    Axis delta;
-    bool buttons[static_cast<size_t>(Button::_COUNT)]{};
-    bool modifiers[static_cast<size_t>(Modifier::_COUNT)]{};
-    Button button{};
 
-    bool hasModifiers(auto... modifier) const {
-        return (modifiers[static_cast<size_t>(modifier)] || ...);
-    }
+    Math::Vec2i pos;
+    Math::Vec2i scroll;
+    Math::Vec2i delta;
+
+    Input::Button buttons{};
+    Input::Mod mods{};
+    Input::Button button{};
 };
 
 struct KeyboardEvent : public _Event<KeyboardEvent, 0x1eb75d94f347352> {
@@ -94,7 +63,7 @@ struct KeyboardEvent : public _Event<KeyboardEvent, 0x1eb75d94f347352> {
     using enum Type;
 
     Type type;
-    Key key;
+    Input::Key key;
     Rune rune;
 };
 

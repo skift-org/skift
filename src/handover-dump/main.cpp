@@ -5,6 +5,9 @@
 #include <karm-sys/mmap.h>
 
 ExitCode entryPoint(CliArgs const &args) {
+    if (args.len() == 0) {
+        return Error{"Usage: handover-dump <elf-file>"};
+    }
     Sys::File kernelFile = try$(Sys::File::open(args[0]));
     auto kernelMem = try$(Sys::mmap().read().map(kernelFile));
     Elf::Image kernelElf{kernelMem.bytes()};

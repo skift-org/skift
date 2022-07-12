@@ -5,7 +5,7 @@
 namespace Karm::Gfx {
 
 struct Format {
-    virtual ~Format() = 0;
+    virtual ~Format() = default;
 
     virtual Color load(void const *pixel) = 0;
 
@@ -14,7 +14,7 @@ struct Format {
     virtual size_t bpp() = 0;
 };
 
-struct RGBA8888 : public Format {
+struct Rgba8888 : public Format {
     Color load(void const *pixel) override {
         uint8_t const *p = static_cast<uint8_t const *>(pixel);
         return Color::fromRgba(p[0], p[1], p[2], p[3]);
@@ -33,7 +33,9 @@ struct RGBA8888 : public Format {
     }
 };
 
-struct BGRA8888 : public Format {
+[[gnu::used]] static inline Rgba8888 RGBA8888;
+
+struct Bgra8888 : public Format {
     Color load(void const *pixel) override {
         uint8_t const *p = static_cast<uint8_t const *>(pixel);
         return Color::fromRgba(p[2], p[1], p[0], p[3]);
@@ -51,5 +53,7 @@ struct BGRA8888 : public Format {
         return 4;
     }
 };
+
+[[gnu::used]] static inline Bgra8888 BGRA8888;
 
 } // namespace Karm::Gfx

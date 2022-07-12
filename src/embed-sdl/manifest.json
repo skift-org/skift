@@ -1,5 +1,5 @@
 {
-    "id": "embed-ui",
+    "id": "embed-sdl",
     "type": "lib",
     "description": "Karm UI platform embedding layer for SDL.",
     "provide": [
@@ -10,10 +10,8 @@
             "sdl"
         ]
     },
-    "inject": [
-        "embed"
-    ],
     "deps": [
+        "sdl2",
         "karm-base"
     ]
 }

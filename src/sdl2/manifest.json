@@ -1,0 +1,15 @@
+{
+    "id": "sdl2",
+    "type": "lib",
+    "tools": {
+        "cc": {
+            "args": ["@exec", "pkg-config", "--cflags", "sdl2"]
+        },
+        "cxx": {
+            "args": ["@exec", "pkg-config", "--cflags", "sdl2"]
+        },
+        "ld": {
+            "args": ["@exec", "pkg-config", "--libs", "sdl2"]
+        }
+    }
+}

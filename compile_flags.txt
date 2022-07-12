@@ -9,3 +9,4 @@
 -Werror
 -D__osdk_sys_linux__
 -D__osdk_encoding_utf8__
+-I/usr/include/SDL2

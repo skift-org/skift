@@ -4,7 +4,7 @@
     "props": {
         "toolchain": "clang",
         "arch": "x86_64",
-        "sys": "@uname(sysname)",
+        "sys": ["@uname", "sysname"],
         "abi": "unknown",
         "encoding": "utf8",
         "freestanding": false,

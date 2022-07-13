@@ -1,6 +1,14 @@
 {
-    "id": "sdl2",
+    "id": "sdl2-host",
     "type": "lib",
+    "provide" : [
+        "sdl2"
+    ],
+    "requires": {
+        "host": [
+            true
+        ]
+    },
     "tools": {
         "cc": {
             "args": ["@exec", "pkg-config", "--cflags", "sdl2"]

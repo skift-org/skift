@@ -1,10 +1,13 @@
 #pragma once
 
+#include <embed/app.h>
+#include <karm-app/client.h>
+#include <karm-app/host.h>
 #include <karm-base/rc.h>
+#include <karm-events/events.h>
 #include <karm-gfx/context.h>
+#include <karm-main/base.h>
 #include <karm-meta/utils.h>
-
-#include "events.h"
 
 namespace Karm::Ui {
 
@@ -12,7 +15,7 @@ namespace Karm::Ui {
 
 struct Listener {
     virtual ~Listener() = default;
-    virtual void dispatch(Event const &) = 0;
+    virtual void dispatch(Events::Event const &) = 0;
 };
 
 /* --- Node ----------------------------------------------------------------- */
@@ -39,7 +42,7 @@ struct _Node : Meta::Static {
 
     virtual void onUnmount() {}
 
-    virtual void onEvent(Event const &) {
+    virtual void onEvent(Events::Event const &) {
     }
 
     virtual void onLayout(Math::Recti) {
@@ -122,22 +125,13 @@ struct _Node : Meta::Static {
 
 /* --- Context -------------------------------------------------------------- */
 
-struct App : Meta::Static {
-    virtual ~App() = default;
-};
-
-Strong<App> makeApp();
-
 struct Context : Meta::Static {
     struct Scope {
         NodePtr parent;
         size_t child = 0;
     };
 
-    App &_app;
-    Vec<Scope> _stack;
-
-    Context(App &app) : _app(app) {}
+    Vec<Scope> _stack{};
 
     Scope &current() {
         return first(_stack);
@@ -170,6 +164,7 @@ struct Context : Meta::Static {
         child->update(std::move(props));
         if (_stack.len() > 0)
             parent().mount(child);
+
         return child;
     }
 
@@ -208,7 +203,7 @@ auto Element(typename T::Props props, auto... inner) {
     return [=](Context &ctx) mutable {
         ctx.begin<T>(std::move(props));
         (inner(ctx), ...);
-        ctx.end();
+        return ctx.end();
     };
 }
 
@@ -217,7 +212,7 @@ auto Element(Decorator auto... inner) {
     return [=](Context &ctx) mutable {
         ctx.begin<T>(typename T::Props{});
         (inner(ctx), ...);
-        ctx.end();
+        return ctx.end();
     };
 }
 
@@ -225,19 +220,15 @@ auto Element(Decorator auto... inner) {
     static inline auto T(Decorator auto... inner) { return Element<_##T>(inner...); } \
     static inline auto T(typename _##T::Props props, Decorator auto... inner) { return Element<_##T>(props, inner...); }
 
-/* --- Window ---------------------------------------------------------------- */
-
-struct WindowProps {};
-
-struct _Window : public _Element<WindowProps> {
-    using _Element::_Element;
-};
-
-ElementBuilder$(Window);
-
 /* --- Widgets ---------------------------------------------------------------- */
 
-struct ButtonProps {};
+struct _View : public _Element<None> {
+};
+
+ElementBuilder$(View);
+
+struct ButtonProps {
+};
 
 struct _Button : public _Element<ButtonProps> {
     using _Element::_Element;
@@ -281,5 +272,29 @@ struct _State : public _Element<StateProps> {
 };
 
 ElementBuilder$(State);
+
+/* --- App Render ----------------------------------------------------------- */
+
+struct UiClient : public Karm::App::Client {
+    NodePtr _root;
+
+    UiClient(NodePtr root) : _root(root) {}
+
+    void paint(Gfx::Context &gfx) override {
+        gfx.clear();
+        gfx.fillStyle({Gfx::Colors::RED500});
+        gfx.fill(Math::Recti{10, 10, 64, 64});
+    }
+
+    void handle(Events::Event &) override {}
+};
+
+ExitCode render(auto tree) {
+    Context ctx{};
+    NodePtr root = tree(ctx);
+    Box<Karm::App::Client> client = makeBox<UiClient>(root);
+    auto host = try$(Embed::makeHost(std::move(client)));
+    return host->run();
+}
 
 } // namespace Karm::Ui

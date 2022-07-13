@@ -1,19 +1,17 @@
 #include <SDL.h>
-#include <embed/ui.h>
+#include <embed/app.h>
 
 namespace Embed {
 
-struct SdlApp : public Ui::App {
-    using Ui::App::dispatch;
-
-    SDL_Window *_window;
+struct SdlHost : public App::Host {
+    SDL_Window *_window{};
     Math::Vec2i _lastMousePos{};
 
-    SdlApp(SDL_Window *window)
-        : _window(window) {
+    SdlHost(Box<App::Client> &&client, SDL_Window *window)
+        : App::Host(std::move(client)), _window(window) {
     }
 
-    ~SdlApp() {
+    ~SdlHost() {
         SDL_DestroyWindow(_window);
         SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
         SDL_Quit();
@@ -45,18 +43,18 @@ struct SdlApp : public Ui::App {
             break;
 
         case SDL_KEYDOWN: {
-            Ui::KeyboardEvent event{
-                .type = Ui::KeyboardEvent::PRESS,
+            Events::KeyboardEvent event{
+                .type = Events::KeyboardEvent::PRESS,
             };
-            dispatch(event);
+            handle(event);
             break;
         }
 
         case SDL_KEYUP: {
-            Ui::KeyboardEvent event{
-                .type = Ui::KeyboardEvent::RELEASE,
+            Events::KeyboardEvent event{
+                .type = Events::KeyboardEvent::RELEASE,
             };
-            dispatch(event);
+            handle(event);
             break;
         }
 
@@ -65,20 +63,20 @@ struct SdlApp : public Ui::App {
                 return;
             }
 
-            Ui::MouseEvent event{
-                .type = Ui::MouseEvent::MOVE,
+            Events::MouseEvent event{
+                .type = Events::MouseEvent::MOVE,
 
                 .pos = {e.motion.x, e.motion.y},
                 .delta = {e.motion.xrel, e.motion.yrel},
             };
 
-            event.buttons |= (e.motion.state & SDL_BUTTON_LMASK) ? Input::Button::LEFT : Input::Button::NONE;
-            event.buttons |= (e.motion.state & SDL_BUTTON_MMASK) ? Input::Button::MIDDLE : Input::Button::NONE;
-            event.buttons |= (e.motion.state & SDL_BUTTON_RMASK) ? Input::Button::RIGHT : Input::Button::NONE;
+            event.buttons |= (e.motion.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
+            event.buttons |= (e.motion.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
+            event.buttons |= (e.motion.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
 
             _lastMousePos = event.pos;
 
-            dispatch(event);
+            handle(event);
             break;
         }
 
@@ -87,20 +85,20 @@ struct SdlApp : public Ui::App {
                 return;
             }
 
-            Ui::MouseEvent event{
-                .type = Ui::MouseEvent::RELEASE,
+            Events::MouseEvent event{
+                .type = Events::MouseEvent::RELEASE,
                 .pos = _lastMousePos,
             };
 
-            event.button = (e.button.which == SDL_BUTTON_LEFT) ? Input::Button::LEFT : Input::Button::NONE;
-            event.button = (e.button.which == SDL_BUTTON_RIGHT) ? Input::Button::MIDDLE : Input::Button::NONE;
-            event.button = (e.button.which == SDL_BUTTON_MIDDLE) ? Input::Button::RIGHT : Input::Button::NONE;
+            event.button = (e.button.which == SDL_BUTTON_LEFT) ? Events::Button::LEFT : Events::Button::NONE;
+            event.button = (e.button.which == SDL_BUTTON_RIGHT) ? Events::Button::MIDDLE : Events::Button::NONE;
+            event.button = (e.button.which == SDL_BUTTON_MIDDLE) ? Events::Button::RIGHT : Events::Button::NONE;
 
-            event.buttons |= (e.button.state & SDL_BUTTON_LMASK) ? Input::Button::LEFT : Input::Button::NONE;
-            event.buttons |= (e.button.state & SDL_BUTTON_MMASK) ? Input::Button::MIDDLE : Input::Button::NONE;
-            event.buttons |= (e.button.state & SDL_BUTTON_RMASK) ? Input::Button::RIGHT : Input::Button::NONE;
+            event.buttons |= (e.button.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
+            event.buttons |= (e.button.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
+            event.buttons |= (e.button.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
 
-            dispatch(event);
+            handle(event);
             break;
         }
 
@@ -109,20 +107,20 @@ struct SdlApp : public Ui::App {
                 return;
             }
 
-            Ui::MouseEvent event{
-                .type = Ui::MouseEvent::PRESS,
+            Events::MouseEvent event{
+                .type = Events::MouseEvent::PRESS,
                 .pos = _lastMousePos,
             };
 
-            event.button = (e.button.button == SDL_BUTTON_LEFT) ? Input::Button::LEFT : Input::Button::NONE;
-            event.button = (e.button.button == SDL_BUTTON_RIGHT) ? Input::Button::MIDDLE : Input::Button::NONE;
-            event.button = (e.button.button == SDL_BUTTON_MIDDLE) ? Input::Button::RIGHT : Input::Button::NONE;
+            event.button = (e.button.button == SDL_BUTTON_LEFT) ? Events::Button::LEFT : Events::Button::NONE;
+            event.button = (e.button.button == SDL_BUTTON_RIGHT) ? Events::Button::MIDDLE : Events::Button::NONE;
+            event.button = (e.button.button == SDL_BUTTON_MIDDLE) ? Events::Button::RIGHT : Events::Button::NONE;
 
-            event.buttons |= (e.button.state & SDL_BUTTON_LMASK) ? Input::Button::LEFT : Input::Button::NONE;
-            event.buttons |= (e.button.state & SDL_BUTTON_MMASK) ? Input::Button::MIDDLE : Input::Button::NONE;
-            event.buttons |= (e.button.state & SDL_BUTTON_RMASK) ? Input::Button::RIGHT : Input::Button::NONE;
+            event.buttons |= (e.button.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
+            event.buttons |= (e.button.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
+            event.buttons |= (e.button.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
 
-            dispatch(event);
+            handle(event);
             break;
         }
 
@@ -131,15 +129,19 @@ struct SdlApp : public Ui::App {
                 return;
             }
 
-            Ui::MouseEvent event{
-                .type = Ui::MouseEvent::SCROLL,
+            Events::MouseEvent event{
+                .type = Events::MouseEvent::SCROLL,
                 .pos = _lastMousePos,
                 .scroll = {e.wheel.x, e.wheel.y},
             };
 
-            dispatch(event);
+            handle(event);
             break;
         }
+
+        case SDL_QUIT:
+            exit();
+            break;
 
         default:
             break;
@@ -159,18 +161,18 @@ struct SdlApp : public Ui::App {
     }
 };
 
-Result<Strong<Karm::Ui::App>> makeApp() {
+Result<Strong<Karm::App::Host>> makeHost(Box<App::Client> &&client) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
     SDL_Window *window = SDL_CreateWindow(
         "Application",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
-        500,
-        700,
-        SDL_WINDOW_HIDDEN | SDL_WINDOW_ALLOW_HIGHDPI);
+        640,
+        1136,
+        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
 
-    return {makeStrong<SdlApp>(window)};
+    return {makeStrong<SdlHost>(std::move(client), window)};
 }
 
 } // namespace Embed

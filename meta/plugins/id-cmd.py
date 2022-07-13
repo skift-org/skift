@@ -2,9 +2,13 @@ import random
 
 
 def idCmd(opts: dict, args: list[str]) -> None:
-    i = hex(random.randint(0, 2**64))
-    print("64bit: " + i)
-    print("32bit: " + i[:10])
+    u = hex(random.randint(0, 2**64))
+    l = hex(random.randint(0, 2**64))
+    print("128bits : " + u + l[2:])
+    print("64bits  : " + l)
+    print("32bits  : " + l[:10])
+    print("16bits  : " + l[:6])
+    print("8bits   : " + l[:4])
 
 
 __plugin__ = {

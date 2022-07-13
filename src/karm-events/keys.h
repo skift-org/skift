@@ -3,7 +3,7 @@
 #include <karm-base/enum.h>
 #include <karm-base/string.h>
 
-namespace Karm::Input {
+namespace Karm::Events {
 
 /* --- Mouse -------------------------------------------- */
 
@@ -65,4 +65,4 @@ struct Key {
     }
 };
 
-} // namespace Karm::Input
+} // namespace Karm::Events

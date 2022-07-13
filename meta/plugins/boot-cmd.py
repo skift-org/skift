@@ -13,9 +13,9 @@ def kvmAvailable() -> bool:
 
 
 def bootCmd(opts: dict, args: list[str]) -> None:
-    imageDir = utils.mkdirP(".build/image")
-    efiBootDir = utils.mkdirP(".build/image/EFI/BOOT")
-    bootDir = utils.mkdirP(".build/image/boot")
+    imageDir = utils.mkdirP(".osdk/images/efi-x86_64/")
+    efiBootDir = utils.mkdirP(".osdk/images/efi-x86_64/EFI/BOOT")
+    bootDir = utils.mkdirP(".osdk/images/efi-x86_64/boot")
 
     ovmf = utils.downloadFile(
         "https://retrage.github.io/edk2-nightly/bin/DEBUGX64_OVMF.fd")

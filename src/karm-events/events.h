@@ -5,7 +5,7 @@
 
 #include "keys.h"
 
-namespace Karm::Ui {
+namespace Karm::Events {
 
 struct Event {
     uint64_t _id{};
@@ -49,9 +49,9 @@ struct MouseEvent : public _Event<MouseEvent, 0x5db47c5474147944> {
     Math::Vec2i scroll;
     Math::Vec2i delta;
 
-    Input::Button buttons{};
-    Input::Mod mods{};
-    Input::Button button{};
+    Button buttons{};
+    Mod mods{};
+    Button button{};
 };
 
 struct KeyboardEvent : public _Event<KeyboardEvent, 0x1eb75d94f347352> {
@@ -63,8 +63,8 @@ struct KeyboardEvent : public _Event<KeyboardEvent, 0x1eb75d94f347352> {
     using enum Type;
 
     Type type;
-    Input::Key key;
+    Key key;
     Rune rune;
 };
 
-} // namespace Karm::Ui
+} // namespace Karm::Events

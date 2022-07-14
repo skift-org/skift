@@ -22,6 +22,7 @@
 <br/>
 <br/>
 <br/>
+<br/>
 
 # **skiftOS**: The delightful operating system
 
@@ -32,6 +33,7 @@
 skiftOS is written in bleeding-edge C2x and C++23 and building it requires a modern C/C++ compiler like clang-14 or GCC-12 installed on the host machine.
 
 ```sh
+
 # Make sure clang is the right version
 $ clang --version
 clang version 13.0.1
@@ -49,6 +51,25 @@ Python 3.10.5
 
 ```
 
+Building skiftOS also requires installing [osdk](https://github.com/devse-org/osdk):
+
+```sh
+
+$ git clone https://github.com/devse-org/osdk
+
+$ cd osdk
+
+$ pip install --user -e .
+
+```
+
+Once you have installed osdk, you can build and boot skiftOS using:
+
+```sh
+
+$ osdk boot
+
+```
 ## Contributings
 
 This project practice [optimistic merging](http://hintjens.com/blog:106) meaning that pull requests are merged into the main branch as soon as possible. The objective is to keep PR as small, focused, and incremental as possible.
@@ -56,7 +77,9 @@ This project practice [optimistic merging](http://hintjens.com/blog:106) meaning
 Commit messages should be short and concise and prefixed with the name of the package. For example:
 
 ```
+
 karm-base: Fix buffer overflow in Karm::String::reserve.
+
 ```
 
 Binary files should be as small as possible.

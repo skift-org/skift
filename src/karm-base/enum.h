@@ -35,4 +35,5 @@ namespace Karm::Base {
         using U = ::Karm::Meta::UnderlyingType<T>; \
         return (T &)((U &)a ^= (U)b);              \
     }
+
 } // namespace Karm::Base

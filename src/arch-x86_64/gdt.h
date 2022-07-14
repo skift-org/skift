@@ -1,12 +1,10 @@
 #pragma once
 
-#include <karm-base/enum.h>
-#include <karm-base/result.h>
-#include <karm-base/string.h>
+#include <karm-base/array.h>
 
 namespace x86_64 {
 
-struct [[gnu::packed]] GdtSeg {
+struct [[gnu::packed]] GdtEntry {
     uint16_t _limitLow{};
     uint16_t _baseLow{};
     uint8_t _baseMid{};
@@ -15,9 +13,9 @@ struct [[gnu::packed]] GdtSeg {
     uint8_t _granularity : 4 {};
     uint8_t _baseHigh{};
 
-    constexpr GdtSeg() = default;
+    constexpr GdtEntry() = default;
 
-    constexpr GdtSeg(uint32_t base, uint32_t limit, uint8_t granularity, uint8_t flags)
+    constexpr GdtEntry(uint32_t base, uint32_t limit, uint8_t granularity, uint8_t flags)
         : _limitLow(limit & 0xffff),
           _baseLow(base & 0xffff),
           _baseMid((base >> 16) & 0xff),
@@ -26,7 +24,7 @@ struct [[gnu::packed]] GdtSeg {
           _granularity(granularity),
           _baseHigh((base >> 24) & 0xff) {}
 
-    constexpr GdtSeg(uint8_t flags, uint8_t granularity) : _flags(flags), _granularity(granularity){};
+    constexpr GdtEntry(uint8_t flags, uint8_t granularity) : _flags(flags), _granularity(granularity){};
 };
 
 struct [[gnu::packed]] Gdt {
@@ -53,7 +51,7 @@ struct [[gnu::packed]] Gdt {
         LONG_MODE = 0b10,
     };
 
-    Karm::Array<GdtSeg, Gdt::LEN> _entries = {
+    Karm::Array<GdtEntry, Gdt::LEN> entries = {
         {},
         {Gdt::Flags::PRESENT | Gdt::Flags::SEGMENT | Gdt::Flags::READ_WRITE | Gdt::Flags::EXECUTABLE, Granularity::LONG_MODE},
         {Gdt::Flags::PRESENT | Gdt::Flags::SEGMENT | Gdt::Flags::READ_WRITE, 0},
@@ -68,13 +66,9 @@ struct [[gnu::packed]] GdtDesc {
     uint16_t _limit{};
     uint64_t _base{};
 
-    constexpr GdtDesc() = default;
-
-    GdtDesc(Gdt const &base) : _limit{sizeof(Gdt) - 1}, _base{reinterpret_cast<uintptr_t>(&base)} {};
+    GdtDesc(Gdt const &base) : _limit{sizeof(Gdt) - 1}, _base{reinterpret_cast<uintptr_t>(&base)} {}
 
     void load() const { _gdtLoad(this); }
 };
-
-void gdtInitialize();
 
 } // namespace x86_64

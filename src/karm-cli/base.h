@@ -5,7 +5,8 @@
 namespace Karm::Cli {
 
 struct Success {};
-static constexpr Success SUCCESS = {};
+
+static constexpr Success SUCCESS{};
 
 using Result = Result<Success>;
 

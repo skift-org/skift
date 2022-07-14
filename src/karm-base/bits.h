@@ -5,6 +5,8 @@
 
 namespace Karm {
 
+using BitsRange = USizeRange;
+
 struct Bits {
     uint8_t *_buf{};
     size_t _len{};
@@ -21,8 +23,8 @@ struct Bits {
         }
     }
 
-    void set(USizeRange range, bool value) {
-        for (size_t i = range.start; i < range.end; i++) {
+    void set(BitsRange range, bool value) {
+        for (size_t i = range.start(); i < range.end(); i++) {
             set(i, value);
         }
     }
@@ -35,23 +37,28 @@ struct Bits {
         return _len * 8;
     }
 
-    Opt<USizeRange> alloc(size_t count) {
-        size_t start = 0;
-        size_t size = 0;
+    Opt<BitsRange> alloc(size_t count, size_t start = -1, bool upper = true) {
 
-        for (size_t i = 0; i < len(); i++) {
+        start = min(start, len());
+
+        if (_len == 0) {
+            return Opt<BitsRange>();
+        }
+
+        BitsRange range = {};
+        int offset = upper ? -1 : 1;
+
+        for (size_t i = start; (upper ? i > 0 : i < len()); i += offset) {
             if (get(i)) {
-                start = 0;
-                size = 0;
+                range = {};
             } else {
-                if (size == 0) {
-                    start = i;
+                if (range._size == 0) {
+                    range._start = i;
                 }
 
-                size++;
+                range._size++;
 
-                if (size == count) {
-                    USizeRange range{start, start + size};
+                if (range._size == count) {
                     set(range, true);
                     return range;
                 }

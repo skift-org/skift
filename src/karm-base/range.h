@@ -91,14 +91,6 @@ struct Range {
     constexpr auto as() {
         return U{start(), size()};
     }
-
-    constexpr Range operator*(const T &val) const {
-        return Range(start() * val, size() * val);
-    }
-
-    constexpr Range operator/(const T &val) const {
-        return Range(start() / val, size() / val);
-    }
 };
 
 template <typename T>

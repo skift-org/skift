@@ -146,7 +146,7 @@ constexpr Ordr cmp(S const &lhs, S const &rhs) {
 
 template <Sliceable S>
 constexpr auto iter(S &slice) {
-    return Iter([slice, i = 0uz]() mutable -> typename S::Inner const * {
+    return Iter([&slice, i = 0uz]() mutable -> typename S::Inner const * {
         if (i >= slice.len()) {
             return nullptr;
         }

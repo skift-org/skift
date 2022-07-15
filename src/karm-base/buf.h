@@ -121,6 +121,7 @@ struct Buf {
         for (size_t i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
         }
+
         _buf[index].ctor(std::move(value));
         _len++;
     }

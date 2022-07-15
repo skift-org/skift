@@ -28,17 +28,22 @@ struct Color {
 
     constexpr Color(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255) : red(red), green(green), blue(blue), alpha(alpha) {}
 
+    // (b * 255u * (255u - a) + 255u * a * f) / 65025
+    // (b * (255² - 255*a) + 255u * a * f) / 65025
+    // (b * (255² - 255*a) + 255u * a * f) / 65025
+    // (65025b - 255ab + 255af) / 65025
+
     constexpr Color blendOver(Color const background) const {
         if (alpha == 0xff) {
             return *this;
         } else if (alpha == 0) {
             return background;
-        } else if (background.alpha == 255) {
+        } else if (background.alpha == 255u) {
             return {
-                static_cast<uint8_t>((background.red * (255u - alpha) + 255u * red) / 255u),
-                static_cast<uint8_t>((background.green * (255u - alpha) + 255u * green) / 255u),
-                static_cast<uint8_t>((background.blue * (255u - alpha) + 255u * blue) / 255u),
-                static_cast<uint8_t>(255u),
+                static_cast<uint8_t>((background.red * 255u * (255u - alpha) + 255u * alpha * red) / 65025),
+                static_cast<uint8_t>((background.green * 255u * (255u - alpha) + 255u * alpha * green) / 65025),
+                static_cast<uint8_t>((background.blue * 255u * (255u - alpha) + 255u * alpha * blue) / 65025),
+                static_cast<uint8_t>(255),
             };
         } else {
             uint16_t d = 255u * (background.alpha + alpha) - background.alpha * alpha;

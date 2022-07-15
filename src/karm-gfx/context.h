@@ -60,7 +60,7 @@ struct TextStyle {
 namespace Sdf {
 
 static inline double circle(Math::Vec2f p, Math::Vec2f center, double radius) {
-    return (p - center).len() - radius;
+    return radius - (center - p).len();
 }
 
 static inline auto circle(Math::Vec2f p, Math::Vec2f center, double innerRadius, double outerRadius) {

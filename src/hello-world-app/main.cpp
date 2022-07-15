@@ -3,5 +3,12 @@
 
 ExitCode entryPoint(CliArgs const &) {
     return Ui::render(
-        Ui::Text(String{"Hello, app world!"}));
+        Ui::View(
+            Ui::View(
+                Ui::View()),
+            Ui::View(
+                Ui::View(
+                    Ui::View())),
+            Ui::View(
+                Ui::View())));
 }

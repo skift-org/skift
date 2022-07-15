@@ -8,6 +8,8 @@
 #include <karm-gfx/context.h>
 #include <karm-main/base.h>
 #include <karm-meta/utils.h>
+#include <karm-sys/chan.h>
+#include <karm-text/emit.h>
 
 namespace Karm::Ui {
 
@@ -25,20 +27,22 @@ struct Context;
 
 using NodePtr = Strong<_Node>;
 
+static int _idCounter = 0;
+
 struct _Node : Meta::Static {
+    int _id = _idCounter++;
     Vec<NodePtr> _children;
     _Node *_parent;
 
-    Math::Vec2i _orgin;
+    Math::Vec2i _scroll;
     Math::Recti _bound;
-
-    _Node(Context &){};
 
     virtual ~_Node() = default;
 
     /* --- Callbacks --- */
 
-    virtual void onMount() {}
+    virtual void onMount() {
+    }
 
     virtual void onUnmount() {}
 
@@ -73,6 +77,7 @@ struct _Node : Meta::Static {
     }
 
     void mountAt(NodePtr child, size_t index) {
+        Sys::println("Inserting {} at index {}, with currently {} children", _id, index, _children.len());
         _children.insert(index, child);
         child->_parent = this;
         child->onMount();
@@ -121,6 +126,20 @@ struct _Node : Meta::Static {
     Ordr cmp(_Node const &other) const {
         return this == &other ? Ordr::EQUAL : Ordr::LESS;
     }
+
+    void dumps(Text::Emit emit) {
+        emit("begin node {} {}", _id, len(_children));
+        emit.newline();
+
+        emit.indented([&] {
+            for (auto &child : iter(_children)) {
+                child->dumps(emit);
+            }
+        });
+
+        emit("end node");
+        emit.newline();
+    }
 };
 
 /* --- Context -------------------------------------------------------------- */
@@ -134,7 +153,7 @@ struct Context : Meta::Static {
     Vec<Scope> _stack{};
 
     Scope &current() {
-        return first(_stack);
+        return last(_stack);
     }
 
     _Node &parent() {
@@ -160,11 +179,12 @@ struct Context : Meta::Static {
             }
         }
 
-        Strong<T> child = makeStrong<T>(*this);
+        Strong<T> child = makeStrong<T>();
         child->update(std::move(props));
-        if (_stack.len() > 0)
+        if (_stack.len() > 0) {
             parent().mount(child);
-
+            current().child++;
+        }
         return child;
     }
 
@@ -185,8 +205,6 @@ template <typename _Props>
 struct _Element : public _Node {
     using Props = _Props;
     Props _props;
-
-    _Element(Context &ctx) : _Node(ctx) {}
 
     void update(Props &&props) {
         _props = props;
@@ -231,13 +249,11 @@ struct ButtonProps {
 };
 
 struct _Button : public _Element<ButtonProps> {
-    using _Element::_Element;
 };
 
 ElementBuilder$(Button);
 
 struct _Text : public _Element<String> {
-    using _Element::_Element;
 };
 
 ElementBuilder$(Text);
@@ -248,7 +264,6 @@ struct FlexProps {
 };
 
 struct _Flex : public _Element<FlexProps> {
-    using _Element::_Element;
 };
 
 ElementBuilder$(Flex);
@@ -257,7 +272,6 @@ struct StackProps {
 };
 
 struct _Stack : public _Element<StackProps> {
-    using _Element::_Element;
 };
 
 ElementBuilder$(Stack);
@@ -268,7 +282,6 @@ struct StateProps {
 };
 
 struct _State : public _Element<StateProps> {
-    using _Element::_Element;
 };
 
 ElementBuilder$(State);
@@ -281,9 +294,10 @@ struct UiClient : public Karm::App::Client {
     UiClient(NodePtr root) : _root(root) {}
 
     void paint(Gfx::Context &gfx) override {
-        gfx.clear();
+        gfx.clear(Gfx::Colors::ZINC900);
         gfx.fillStyle({Gfx::Colors::RED500});
-        gfx.fill(Math::Recti{10, 10, 64, 64});
+        // gfx.fill(Math::Recti{10, 10, 64, 64});
+        gfx.fill(Math::Circlei{64, 64, 32});
     }
 
     void handle(Events::Event &) override {}
@@ -292,6 +306,9 @@ struct UiClient : public Karm::App::Client {
 ExitCode render(auto tree) {
     Context ctx{};
     NodePtr root = tree(ctx);
+    Text::Emit emit{Sys::out()};
+    root->dumps(emit);
+
     Box<Karm::App::Client> client = makeBox<UiClient>(root);
     auto host = try$(Embed::makeHost(std::move(client)));
     return host->run();

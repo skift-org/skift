@@ -8,33 +8,72 @@
 namespace Karm::Text {
 
 struct Emit {
-    Io::Writer &_writer;
+    Io::TextWriter<Utf8> &_writer;
+    size_t _ident = 0;
     size_t _total = 0;
     Error _error = OK;
+    bool _newline = true;
 
-    void operator()(Rune c) {
+    void _try(Result<size_t> result) {
+        if (result) {
+            _total += result.unwrap();
+        } else {
+            _error = result.none();
+        }
+    }
+
+    void indent() {
+        _ident++;
+    }
+
+    void indented(auto inner) {
+        indent();
+        inner();
+        deindent();
+    }
+
+    void deindent() {
+        if (_ident == 0) {
+            panic("deident() underflow");
+        }
+        _ident--;
+    }
+
+    void newline() {
         if (!_error)
             return;
 
-        Result<size_t> res = Io::putr(_writer, c);
+        _newline = true;
+    }
 
-        if (res) {
-            _total += res.unwrap();
-        } else {
-            _error = res.none();
+    void insertNewline() {
+        if (!_error)
+            return;
+
+        _try(_writer.writeRune('\n'));
+        for (size_t i = 0; i < _ident; i++) {
+            _try(_writer.writeStr("    "));
         }
+
+        _newline = false;
+    }
+
+    void operator()(Rune r) {
+        if (!_error)
+            return;
+
+        _try(_writer.writeRune(r));
     }
 
     void operator()(Str str) {
         if (!_error)
             return;
 
-        Result<size_t> res = _writer.write(str.buf(), str.len());
-        if (res) {
-            _total += res.unwrap();
-        } else {
-            _error = res.none();
+        if (_newline) {
+            insertNewline();
         }
+
+        _try(_writer.writeStr(str));
     }
 
     template <typename... Ts>
@@ -42,12 +81,11 @@ struct Emit {
         if (!_error)
             return;
 
-        Result<size_t> res = Fmt::format(_writer, format, std::forward<Ts>(ts)...);
-        if (res) {
-            _total += res.unwrap();
-        } else {
-            _error = res.none();
+        if (_newline) {
+            insertNewline();
         }
+
+        _try(Fmt::format(_writer, format, std::forward<Ts>(ts)...));
     }
 
     size_t total() {

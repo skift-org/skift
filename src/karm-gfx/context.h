@@ -13,10 +13,6 @@
 
 namespace Karm::Gfx {
 
-struct FillStyle {
-    Color color;
-};
-
 struct Radius {
     double topLeft{};
     double topRight{};
@@ -38,33 +34,102 @@ struct Radius {
           bottomRight(bottomRight) {}
 };
 
-struct StrokeStyle {
-    enum struct Position {
-        CENTER,
-        INSIDE,
-        OUTSIDE,
-    };
+struct FillStyle {
+    Color _color{};
 
-    using enum Position;
+    FillStyle() : _color(WHITE) {}
 
-    Color color;
-    Radius radius;
-    Position position;
-    double thickness;
+    FillStyle(Color color) : _color(color) {}
+
+    Color color() const { return _color; }
+
+    FillStyle color(Color color) {
+        _color = color;
+        return *this;
+    }
 };
+
+static inline FillStyle fill(auto... args) {
+    return FillStyle(args...);
+}
+
+enum struct StrokePosition {
+    CENTER,
+    INSIDE,
+    OUTSIDE,
+};
+
+using enum StrokePosition;
+
+struct StrokeStyle {
+    Color _color{};
+    Radius _radius{};
+    StrokePosition _position{};
+    double _thickness{};
+
+    StrokeStyle() : _color(WHITE), _thickness(1) {}
+
+    StrokeStyle(Color color) : _color(color), _thickness(1) {}
+
+    Color color() const { return _color; }
+
+    StrokeStyle color(Color color) {
+        _color = color;
+        return *this;
+    }
+
+    Radius radius() const { return _radius; }
+
+    StrokeStyle radius(Radius radius) {
+        _radius = radius;
+        return *this;
+    }
+
+    StrokePosition position() const { return _position; }
+
+    StrokeStyle position(StrokePosition position) {
+        _position = position;
+        return *this;
+    }
+
+    double thickness() const { return _thickness; }
+
+    StrokeStyle thickness(double thickness) {
+        _thickness = thickness;
+        return *this;
+    }
+};
+
+static inline StrokeStyle stroke(auto... args) {
+    return StrokeStyle(args...);
+}
 
 struct TextStyle {
-    Color paint;
+    Color paint{};
+
+    TextStyle() : paint(WHITE) {}
+
+    TextStyle(Color paint) : paint(paint) {}
 };
+
+static inline TextStyle text(auto... args) {
+    return TextStyle(args...);
+}
+
+struct ShadowStyle {
+    float spread{};
+    float radius{};
+    Math::Vec2f offset{};
+};
+
+static inline ShadowStyle shadow(auto... args) {
+    return ShadowStyle(args...);
+}
 
 namespace Sdf {
 
 static inline double circle(Math::Vec2f p, Math::Vec2f center, double radius) {
     return radius - (center - p).len();
-}
-
-static inline auto circle(Math::Vec2f p, Math::Vec2f center, double innerRadius, double outerRadius) {
-    return circle(p, center, outerRadius) - circle(p, center, innerRadius);
 }
 
 static inline auto makeCircle(Math::Vec2f center, double radius) {
@@ -73,12 +138,6 @@ static inline auto makeCircle(Math::Vec2f center, double radius) {
     };
 }
 
-static inline auto makeCircle(Math::Vec2f center, double innerRadius, double outerRadius) {
-    return [center, innerRadius, outerRadius](Math::Vec2f p) {
-        return circle(p, center, innerRadius, outerRadius);
-    };
-};
-
 }; // namespace Sdf
 
 struct Context {
@@ -86,6 +145,7 @@ struct Context {
         FillStyle fillStyle{};
         StrokeStyle strokeStyle{};
         TextStyle textStyle{};
+        ShadowStyle shadowStyle{};
 
         Math::Vec2i origin{};
         Math::Recti clip{};
@@ -99,19 +159,6 @@ struct Context {
     void begin(Surface &c) {
         _Surface = &c;
         _stack.pushBack({
-            .fillStyle = {
-                .color = Colors::WHITE,
-            },
-            .strokeStyle = {
-                .color = Colors::WHITE,
-                .radius = {0, 0, 0, 0},
-                .position = StrokeStyle::Position::CENTER,
-                .thickness = 1,
-            },
-            .textStyle = {
-                .paint = Colors::WHITE,
-            },
-            .origin = {0, 0},
             .clip = Surface().bound(),
         });
     }
@@ -183,19 +230,33 @@ struct Context {
 
     TextStyle const &textStyle() { return current().textStyle; }
 
-    void fillStyle(FillStyle style) { current().fillStyle = style; }
+    ShadowStyle const &shadowStyle() { return current().shadowStyle; }
 
-    void strokeStyle(StrokeStyle style) { current().strokeStyle = style; }
+    Context &fillStyle(FillStyle style) {
+        current().fillStyle = style;
+        return *this;
+    }
 
-    void textStyle(TextStyle style) { current().textStyle = style; }
+    Context &strokeStyle(StrokeStyle style) {
+        current().strokeStyle = style;
+        return *this;
+    }
+
+    Context &textStyle(TextStyle style) {
+        current().textStyle = style;
+        return *this;
+    }
+
+    Context &shadowStyle(ShadowStyle style) {
+        current().shadowStyle = style;
+        return *this;
+    }
 
     /* --- Drawing --- */
 
-    void clear() { clear(Colors::BLACK); }
+    void clear(Color color = BLACK) { clear(Surface().bound(), color); }
 
-    void clear(Color color) { clear(Surface().bound(), color); }
-
-    void clear(Math::Recti rect, Color color) {
+    void clear(Math::Recti rect, Color color = BLACK) {
         rect = applyAll(rect);
 
         for (int y = rect.y; y < rect.y + rect.height; y++) {
@@ -222,11 +283,26 @@ struct Context {
                 double alpha = clamp(sdf(pos), 0.0, 1.0);
 
                 if (alpha > 0.01) {
-                    Color c = fillStyle().color.withOpacity(alpha);
+                    Color c = fillStyle().color().withOpacity(alpha);
                     Surface().blend({x, y}, c);
                 }
             }
         }
+    }
+
+    float _clampStroke(float d, float thickness, StrokePosition pos) {
+        float inner = 0;
+        float outer = -thickness;
+
+        if (pos == StrokePosition::OUTSIDE) {
+            inner = thickness;
+            outer = 0;
+        } else if (pos == StrokePosition::CENTER) {
+            inner = thickness / 2;
+            outer = -thickness / 2;
+        }
+
+        return clamp01(d + inner) - clamp01(d + outer);
     }
 
     void stroke(Math::Recti region, Math::Vec2i origin, auto sdf) {
@@ -236,10 +312,11 @@ struct Context {
         for (int y = region.y; y < region.y + region.height; y++) {
             for (int x = region.x; x < region.x + region.width; x++) {
                 auto pos = (Math::Vec2i{x, y} - origin).cast<double>();
-                double alpha = clamp(sdf(pos), 0.0, 1.0);
+                float d = sdf(pos);
+                double alpha = _clampStroke(d, strokeStyle().thickness(), strokeStyle().position());
 
                 if (alpha > 0.01) {
-                    Color c = strokeStyle().color.withOpacity(alpha);
+                    Color c = strokeStyle().color().withOpacity(alpha);
                     Surface().blend({x, y}, c);
                 }
             }
@@ -257,7 +334,7 @@ struct Context {
 
         for (int y = rect.y; y < rect.y + rect.height; y++) {
             for (int x = rect.x; x < rect.x + rect.width; x++) {
-                Surface().blend({x, y}, fillStyle().color);
+                Surface().blend({x, y}, fillStyle().color());
             }
         }
     }
@@ -266,18 +343,18 @@ struct Context {
         double innerRadius = circle.radius;
         double outerRadius = circle.radius;
 
-        switch (strokeStyle().position) {
-        case StrokeStyle::Position::CENTER:
-            innerRadius -= strokeStyle().thickness / 2.0f;
-            outerRadius += strokeStyle().thickness / 2.0f;
+        switch (strokeStyle().position()) {
+        case StrokePosition::CENTER:
+            innerRadius -= strokeStyle().thickness() / 2.0f;
+            outerRadius += strokeStyle().thickness() / 2.0f;
             break;
-        case StrokeStyle::Position::INSIDE:
-            innerRadius = 0.0f;
-            outerRadius += strokeStyle().thickness / 2.0f;
+
+        case StrokePosition::INSIDE:
+            innerRadius -= strokeStyle().thickness();
             break;
-        case StrokeStyle::Position::OUTSIDE:
-            innerRadius += strokeStyle().thickness / 2.0f;
-            outerRadius = circle.radius * 2.0f;
+
+        case StrokePosition::OUTSIDE:
+            outerRadius += strokeStyle().thickness();
             break;
         }
 
@@ -304,7 +381,7 @@ struct Context {
             (int)Math::ceil(outerRadius * 2.0f),
         };
 
-        stroke(region, circle.center, Sdf::makeCircle({0, 0}, innerRadius, outerRadius));
+        stroke(region, circle.center, Sdf::makeCircle({0, 0}, circle.radius));
     }
 
     void fill(Math::Circlei circle) {
@@ -338,11 +415,11 @@ struct Context {
     }
 
     void stroke(Math::Vec2i baseline, Rune rune) {
-        _draw(baseline, rune, strokeStyle().color);
+        _draw(baseline, rune, strokeStyle().color());
     }
 
     void fill(Math::Vec2i baseline, Rune rune) {
-        _draw(baseline, rune, fillStyle().color);
+        _draw(baseline, rune, fillStyle().color());
     }
 
     void stroke(Math::Vec2i baseline, Str text) {

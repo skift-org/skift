@@ -4,8 +4,6 @@
 
 namespace Karm::Gfx {
 
-namespace Colors {
-
 [[gnu::used]] static constexpr Color TRANSPARENT = {0, 0, 0, 0};
 
 [[gnu::used]] static constexpr Color BLACK = {0, 0, 0, 255};
@@ -264,7 +262,5 @@ namespace Colors {
 [[gnu::used]] static constexpr Color ROSE700 = Color::fromHex(0xffbe123c);
 [[gnu::used]] static constexpr Color ROSE800 = Color::fromHex(0xff9f1239);
 [[gnu::used]] static constexpr Color ROSE900 = Color::fromHex(0xff881337);
-
-} // namespace Colors
 
 } // namespace Karm::Gfx

@@ -294,10 +294,33 @@ struct UiClient : public Karm::App::Client {
     UiClient(NodePtr root) : _root(root) {}
 
     void paint(Gfx::Context &gfx) override {
-        gfx.clear(Gfx::Colors::ZINC900);
-        gfx.fillStyle({Gfx::Colors::RED500});
-        // gfx.fill(Math::Recti{10, 10, 64, 64});
+        gfx.clear(Gfx::ZINC900);
+
+        gfx.fillStyle(Gfx::WHITE);
+        gfx.fill(Math::Recti{10, 10, 64, 64});
+
         gfx.fill(Math::Circlei{64, 64, 32});
+
+        gfx.strokeStyle(
+            Gfx::stroke(Gfx::BLUE300)
+                .position(Gfx::INSIDE)
+                .thickness(16));
+
+        gfx.stroke(Math::Circlei{64, 64, 32});
+
+        gfx.strokeStyle(
+            Gfx::stroke(Gfx::PINK300)
+                .position(Gfx::OUTSIDE)
+                .thickness(16));
+
+        gfx.stroke(Math::Circlei{64, 64, 32});
+
+        gfx.strokeStyle(
+            Gfx::stroke(Gfx::GREEN300)
+                .position(Gfx::CENTER)
+                .thickness(16));
+
+        gfx.stroke(Math::Circlei{64, 64, 32});
     }
 
     void handle(Events::Event &) override {}

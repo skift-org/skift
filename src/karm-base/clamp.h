@@ -21,4 +21,9 @@ constexpr auto clamp(auto value, auto min, auto max) {
                                            : value;
 }
 
+constexpr auto clamp01(auto value) {
+    return value < 0 ? 0 : value > 1 ? 1
+                                     : value;
+}
+
 } // namespace Karm

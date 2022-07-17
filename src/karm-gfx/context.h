@@ -37,19 +37,19 @@ struct Radius {
 struct FillStyle {
     Color _color{};
 
-    FillStyle() : _color(WHITE) {}
+    constexpr FillStyle() : _color(WHITE) {}
 
-    FillStyle(Color color) : _color(color) {}
+    constexpr FillStyle(Color color) : _color(color) {}
 
-    Color color() const { return _color; }
+    constexpr Color color() const { return _color; }
 
-    FillStyle color(Color color) {
+    constexpr FillStyle color(Color color) {
         _color = color;
         return *this;
     }
 };
 
-static inline FillStyle fill(auto... args) {
+static inline constexpr FillStyle fill(auto... args) {
     return FillStyle(args...);
 }
 
@@ -67,49 +67,56 @@ struct StrokeStyle {
     StrokePosition _position{};
     double _thickness{};
 
-    StrokeStyle() : _color(WHITE), _thickness(1) {}
+    constexpr StrokeStyle() : _color(WHITE), _thickness(1) {}
 
-    StrokeStyle(Color color) : _color(color), _thickness(1) {}
+    constexpr StrokeStyle(Color color) : _color(color), _thickness(1) {}
 
-    Color color() const { return _color; }
+    constexpr Color color() const { return _color; }
 
-    StrokeStyle color(Color color) {
+    constexpr StrokeStyle color(Color color) {
         _color = color;
         return *this;
     }
 
-    Radius radius() const { return _radius; }
+    constexpr Radius radius() const { return _radius; }
 
-    StrokeStyle radius(Radius radius) {
+    constexpr StrokeStyle radius(Radius radius) {
         _radius = radius;
         return *this;
     }
 
-    StrokePosition position() const { return _position; }
+    constexpr StrokePosition position() const { return _position; }
 
-    StrokeStyle position(StrokePosition position) {
+    constexpr StrokeStyle position(StrokePosition position) {
         _position = position;
         return *this;
     }
 
-    double thickness() const { return _thickness; }
+    constexpr double thickness() const { return _thickness; }
 
-    StrokeStyle thickness(double thickness) {
+    constexpr StrokeStyle thickness(double thickness) {
         _thickness = thickness;
         return *this;
     }
 };
 
-static inline StrokeStyle stroke(auto... args) {
+static inline constexpr StrokeStyle stroke(auto... args) {
     return StrokeStyle(args...);
 }
 
 struct TextStyle {
-    Color paint{};
+    Color _color{};
 
-    TextStyle() : paint(WHITE) {}
+    constexpr TextStyle() : _color(WHITE) {}
 
-    TextStyle(Color paint) : paint(paint) {}
+    constexpr TextStyle(Color paint) : _color(paint) {}
+
+    constexpr Color color() const { return _color; }
+
+    constexpr TextStyle color(Color paint) {
+        _color = paint;
+        return *this;
+    }
 };
 
 static inline TextStyle text(auto... args) {
@@ -117,9 +124,42 @@ static inline TextStyle text(auto... args) {
 }
 
 struct ShadowStyle {
-    float spread{};
-    float radius{};
-    Math::Vec2f offset{};
+    Color _color{};
+    float _spread{};
+    float _radius{};
+    Math::Vec2f _offset{};
+
+    constexpr ShadowStyle() : _color(BLACK), _spread(0.0f), _radius(0.0f), _offset(0.0f) {}
+
+    constexpr ShadowStyle(Color paint) : _color(paint), _spread(0.0f), _radius(0.0f), _offset(0.0f) {}
+
+    constexpr Color color() const { return _color; }
+
+    constexpr ShadowStyle color(Color paint) {
+        _color = paint;
+        return *this;
+    }
+
+    constexpr float spread() const { return _spread; }
+
+    constexpr ShadowStyle spread(float spread) {
+        _spread = spread;
+        return *this;
+    }
+
+    constexpr float radius() const { return _radius; }
+
+    constexpr ShadowStyle radius(float radius) {
+        _radius = radius;
+        return *this;
+    }
+
+    constexpr Math::Vec2f offset() const { return _offset; }
+
+    constexpr ShadowStyle offset(Math::Vec2f offset) {
+        _offset = offset;
+        return *this;
+    }
 };
 
 static inline ShadowStyle shadow(auto... args) {

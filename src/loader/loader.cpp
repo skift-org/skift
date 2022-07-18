@@ -3,6 +3,7 @@
 #include <handover/builder.h>
 #include <karm-base/align.h>
 #include <karm-base/size.h>
+#include <karm-debug/logger.h>
 #include <karm-sys/chan.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
@@ -15,12 +16,12 @@ namespace Loader {
 void enterKernel(size_t entry, size_t payload, size_t stack, size_t vmm);
 
 Error load(Sys::Path kernelPath) {
-    Sys::println("Preparing payload...");
+    Debug::linfo("Preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
     Handover::Builder payload{payloadMem.mutBytes()};
     payload.add(Handover::SELF, 0, payloadMem.prange());
 
-    Sys::println("Loading kernel file...");
+    Debug::linfo("Loading kernel file...");
     Sys::File kernelFile = try$(Sys::File::open(kernelPath));
     auto kernelMem = try$(Sys::mmap().map(kernelFile));
     Elf::Image image{kernelMem.bytes()};
@@ -30,11 +31,11 @@ Error load(Sys::Path kernelPath) {
         return Error{Error::INVALID_DATA, "invalid kernel image"};
     }
 
-    Sys::println("Setting up stack...");
+    Debug::linfo("Setting up stack...");
     auto stackMap = try$(Sys::mmap().stack().size(kib(16)).mapMut());
     payload.add(Handover::STACK, 0, stackMap.prange());
 
-    Sys::println("Loading kernel image...");
+    Debug::linfo("Loading kernel image...");
     for (auto prog : image.programs()) {
         if (prog.type() != Elf::Program::LOAD) {
             continue;
@@ -50,7 +51,7 @@ Error load(Sys::Path kernelPath) {
         payload.add(Handover::KERNEL, 0, {paddr, memsz});
     }
 
-    Sys::println("Handling kernel requests...");
+    Debug::linfo("Handling kernel requests...");
     auto maybeSection = image.sectionByName(Handover::REQUEST_SECTION);
 
     if (!maybeSection) {
@@ -60,24 +61,24 @@ Error load(Sys::Path kernelPath) {
     auto requests = try$(maybeSection).slice<Handover::Request>();
 
     for (auto const &request : requests) {
-        Sys::println(" - {}", request.name());
+        Debug::linfo(" - {}", request.name());
     }
 
     auto vmm = try$(Fw::createVmm());
 
-    Sys::println("Mapping kernel...");
+    Debug::linfo("Mapping kernel...");
     try$(vmm->map(
         {Handover::KERNEL_BASE + Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
-        {0x1000, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
+        {Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
-    Sys::println("Mapping upper half...");
+    Debug::linfo("Mapping upper half...");
     try$(vmm->map(
-        {Handover::UPPER_HALF + 0x1000, gib(4) - 0x1000},
-        {0x1000, gib(4) - 0x1000},
+        {Handover::UPPER_HALF + Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
+        {Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
-    Sys::println("Mapping loader image...");
+    Debug::linfo("Mapping loader image...");
     auto loaderImage = Fw::imageRange();
 
     try$(vmm->map(
@@ -85,7 +86,8 @@ Error load(Sys::Path kernelPath) {
         loaderImage,
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
-    Sys::println("Finalizing and entering kernel, see you on the other side...\n");
+    Debug::linfo("Finalizing and entering kernel, see you on the other side...\n");
+    Debug::linfo("payload at {x}\n", (uintptr_t)&payload.finalize());
     try$(Fw::finalizeHandover(payload));
     Fw::enterKernel(image.header().entry, payload.finalize(), Handover::KERNEL_BASE + (size_t)stackMap.mutBytes().end(), *vmm);
 

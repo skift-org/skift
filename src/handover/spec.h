@@ -6,7 +6,7 @@
 namespace Handover {
 
 static inline size_t KERNEL_BASE = 0xffffffff80000000;
-static inline size_t UPPER_HALF  = 0xffff800000000000;
+static inline size_t UPPER_HALF = 0xffff800000000000;
 
 namespace Utils {
 

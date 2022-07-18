@@ -1,50 +1,78 @@
 #pragma once
 
+#include <embed/debug.h>
 #include <karm-base/loc.h>
+#include <karm-cli/style.h>
 #include <karm-fmt/fmt.h>
 
 namespace Karm::Debug {
 
-struct Logger {
-    enum struct Level {
-        DEBUG,
-        INFO,
-        WARN,
-        ERROR,
-        FATAL,
-    };
+struct Level {
+    int value;
+    char const *name;
+    Cli::Style style;
+};
 
-    Str _name;
+struct Format {
+    Str str;
+    Loc loc;
 
-    constexpr Logger(Str name) : _name(name) {}
-
-    void _log(Level level, Str format, Fmt::_Args &args, Loc loc);
-
-    void debug(Str format, auto &&...va, Loc loc = Loc::current()) {
-        Fmt::Args<decltype(va)...> args{std::forward<decltype(va)>(va)...};
-        _log(Level::DEBUG, format, args, loc);
+    Format(char const *str, Loc loc = Loc::current())
+        : str(str), loc(loc) {
     }
 
-    void info(Str format, auto &&...va, Loc loc = Loc::current()) {
-        Fmt::Args<decltype(va)...> args{std::forward<decltype(va)>(va)...};
-        _log(Level::INFO, format, args, loc);
-    }
-
-    void warn(Str format, auto &&...va, Loc loc = Loc::current()) {
-        Fmt::Args<decltype(va)...> args{std::forward<decltype(va)>(va)...};
-        _log(Level::WARN, format, args, loc);
-    }
-
-    void error(Str format, auto &&...va, Loc loc = Loc::current()) {
-        Fmt::Args<decltype(va)...> args{std::forward<decltype(va)>(va)...};
-        _log(Level::ERROR, format, args, loc);
-    }
-
-    [[noreturn]] void panic(Str format, auto &&...va, Loc loc = Loc::current()) {
-        Fmt::Args<decltype(va)...> args{std::forward<decltype(va)>(va)...};
-        _log(Level::FATAL, format, args, loc);
-        panic("_log(FATAL) returned");
+    Format(Str str, Loc loc = Loc::current())
+        : str(str), loc(loc) {
     }
 };
+
+static constexpr Level DEBUG = {0, "debug", Cli::BLUE};
+static constexpr Level INFO = {1, "info ", Cli::GREEN};
+static constexpr Level WARNING = {2, "warn ", Cli::YELLOW};
+static constexpr Level ERROR = {3, "error", Cli::RED};
+static constexpr Level FATAL = {4, "fatal", Cli::style(Cli::RED).bold()};
+
+static inline void _log(Level level, Format format, Fmt::_Args &args) {
+    Embed::loggerLock();
+
+    Fmt::format(Embed::loggerOut(), "{} ", Cli::styled(level.name, level.style)).unwrap();
+    Fmt::format(Embed::loggerOut(), "{}{}:{}: ", Cli::reset().fg(Cli::GRAY_DARK), format.loc.file, format.loc.line).unwrap();
+    Fmt::format(Embed::loggerOut(), "{}", Cli::reset().fg(Cli::WHITE)).unwrap();
+    Fmt::_format(Embed::loggerOut(), format.str, args).unwrap();
+    Fmt::format(Embed::loggerOut(), "{}\n", Cli::reset()).unwrap();
+
+    Embed::loggerUnlock();
+}
+
+template <typename... Args>
+static inline void ldebug(Format format, Args &&...va) {
+    Fmt::Args<Args...> args{std::forward<Args>(va)...};
+    _log(DEBUG, format, args);
+}
+
+template <typename... Args>
+static inline void linfo(Format format, Args &&...va) {
+    Fmt::Args<Args...> args{std::forward<Args>(va)...};
+    _log(INFO, format, args);
+}
+
+template <typename... Args>
+static inline void lwarn(Format format, Args &&...va) {
+    Fmt::Args<Args...> args{std::forward<Args>(va)...};
+    _log(WARNING, format, args);
+}
+
+template <typename... Args>
+static inline void lerror(Format format, Args &&...va) {
+    Fmt::Args<Args...> args{std::forward<Args>(va)...};
+    _log(ERROR, format, args);
+}
+
+template <typename... Args>
+[[noreturn]] static inline void lpanic(Format format, Args &&...va) {
+    Fmt::Args<Args...> args{std::forward<Args>(va)...};
+    _log(FATAL, format, args);
+    panic("fatal error");
+}
 
 } // namespace Karm::Debug

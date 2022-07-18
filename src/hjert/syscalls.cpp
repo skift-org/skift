@@ -5,7 +5,7 @@
 namespace Hjert {
 
 static Error handle(Api::Log &log) {
-    return Arch::writeLog({log.buf, log.len}).none();
+    return Arch::loggerOut().write({(Byte *)log.buf, log.len}).none();
 }
 
 Error handleSyscall(Api::Id id, Api::Arg args) {

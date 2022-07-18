@@ -1,19 +1,15 @@
+#include <embed/debug.h>
 #include <hjert/arch.h>
+#include <karm-sys/chan.h>
 
 namespace Embed {
 
-void debugHandler(char const *buf) {
-    Hjert::Arch::writeLog("DEBUG: ").unwrap();
-    Hjert::Arch::writeLog(buf).unwrap();
-    Hjert::Arch::writeLog("\n").unwrap();
-}
+void loggerLock() {}
 
-[[noreturn]] void panicHandler(char const *buf) {
-    Hjert::Arch::writeLog("PANIC: ").unwrap();
-    Hjert::Arch::writeLog(buf).unwrap();
-    Hjert::Arch::writeLog("\n").unwrap();
+void loggerUnlock() {}
 
-    Hjert::Arch::stopCpu();
+Io::TextWriter<Encoding> &loggerOut() {
+    return Hjert::Arch::loggerOut();
 }
 
 } // namespace Embed

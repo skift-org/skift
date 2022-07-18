@@ -1,6 +1,8 @@
 #include <hjert/arch.h>
+#include <karm-debug/logger.h>
 
 #include <arch-x86_64/com.h>
+#include <arch-x86_64/cpuid.h>
 #include <arch-x86_64/gdt.h>
 #include <arch-x86_64/idt.h>
 
@@ -19,11 +21,16 @@ Error init() {
     _gdtDesc.load();
     _idtDesc.load();
 
+    auto branding = x86_64::Cpuid::branding();
+
+    Debug::linfo("Cpu vendor: {}", branding.vendor());
+    Debug::linfo("Cpu brand: {}", branding.brand());
+
     return OK;
 }
 
-Result<size_t> writeLog(Str str) {
-    return _com1.writeStr(str);
+Io::TextWriter<Embed::Encoding> &loggerOut() {
+    return _com1;
 }
 
 void stopCpu() {

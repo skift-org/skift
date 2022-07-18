@@ -1,9 +1,15 @@
 #pragma once
 
+#include <karm-io/traits.h>
+
+#include "sys-encoding.h"
+
 namespace Embed {
 
-void debugHandler(char const *buf);
+void loggerLock();
 
-[[noreturn]] void panicHandler(char const *buf);
+void loggerUnlock();
+
+Io::TextWriter<Encoding> &loggerOut();
 
 } // namespace Embed

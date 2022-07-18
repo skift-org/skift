@@ -5,6 +5,8 @@
 #include <karm-sys/fd.h>
 #include <karm-sys/types.h>
 
+#include "sys-encoding.h"
+
 namespace Embed {
 
 Result<Strong<Sys::Fd>> openFile(Sys::Path path);
@@ -26,15 +28,5 @@ Result<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> 
 Error memUnmap(void const *buf, size_t len);
 
 Error memFlush(void *flush, size_t len);
-
-#ifdef __osdk_encoding_utf8__
-using Encoding = Utf8;
-#elifdef __osdk_encoding_utf16__
-using Encoding = Utf16;
-#elifdef __osdk_encoding_utf32__
-using Encoding = Utf32;
-#elifdef __osdk_encoding_ascii__
-using Encoding = Ascii;
-#endif
 
 } // namespace Embed

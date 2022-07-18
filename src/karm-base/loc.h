@@ -10,7 +10,7 @@ struct Loc {
     size_t line{};
     size_t column{};
 
-    static Loc current(
+    static constexpr Loc current(
         Str file = __builtin_FILE(),
         Str function = __builtin_FUNCTION(),
         size_t line = __builtin_LINE(),

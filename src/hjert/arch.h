@@ -2,12 +2,13 @@
 
 #include <karm-base/result.h>
 #include <karm-base/string.h>
+#include <karm-io/traits.h>
 
 namespace Hjert::Arch {
 
 Error init();
 
-Result<size_t> writeLog(Str str);
+Io::TextWriter<Embed::Encoding> &loggerOut();
 
 [[noreturn]] void stopCpu();
 

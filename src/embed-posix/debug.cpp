@@ -1,15 +1,14 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <embed/debug.h>
+#include <karm-sys/chan.h>
 
 namespace Embed {
 
-void debugHandler(char const *buf) {
-    fprintf(stderr, "DEBUG: %s\n", buf);
-}
+void loggerLock() {}
 
-[[noreturn]] void panicHandler(char const *buf) {
-    fprintf(stderr, "PANIC: %s\n", buf);
-    abort();
+void loggerUnlock() {}
+
+Io::TextWriter<Encoding> &loggerOut() {
+    return Sys::err();
 }
 
 } // namespace Embed

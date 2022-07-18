@@ -158,10 +158,12 @@ struct Opt {
         return false;
     }
 
-    void visit(auto visitor) {
+    auto visit(auto visitor) -> decltype(visitor(_value.unwrap())) {
         if (_present) {
-            visitor(_value.unwrap());
+            return visitor(_value.unwrap());
         }
+
+        return {};
     }
 };
 

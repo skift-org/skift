@@ -21,7 +21,7 @@ struct [[gnu::packed]] IdtEntry {
 
     IdtEntry(uintptr_t handler, uint8_t ist, uint8_t attributes)
         : _offsetLow(handler & 0xffff),
-          _codeSegment((handler >> 16) & 0xffff),
+          _codeSegment(0x8),
           _ist(ist),
           _attributes(attributes),
           _offsetMid((handler >> 16) & 0xffff),

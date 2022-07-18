@@ -4,6 +4,17 @@
 
 namespace x86_64 {
 
+struct Tss {
+    uint32_t _reserved;
+    Array<uint64_t, 3> _rsp;
+    uint64_t _reserved0;
+    Array<uint64_t, 7> _ist;
+    uint32_t _reserved1;
+    uint32_t _reserved2;
+    uint16_t _reserved3;
+    uint16_t _iopbOffset;
+};
+
 struct [[gnu::packed]] GdtEntry {
     uint16_t _limitLow{};
     uint16_t _baseLow{};
@@ -25,6 +36,29 @@ struct [[gnu::packed]] GdtEntry {
           _baseHigh((base >> 24) & 0xff) {}
 
     constexpr GdtEntry(uint8_t flags, uint8_t granularity) : _flags(flags), _granularity(granularity){};
+};
+
+struct GdtTssEntry {
+    uint16_t _len;
+    uint16_t _baseLow16;
+    uint8_t _baseMid8;
+    uint8_t _flags1;
+    uint8_t _flags2;
+    uint8_t _baseHigh8;
+    uint32_t _baseUpper32;
+    uint32_t _reserved;
+
+    constexpr GdtTssEntry() = default;
+
+    GdtTssEntry(Tss const &tss)
+        : _len(sizeof(Tss)),
+          _baseLow16((uintptr_t)&tss & 0xffff),
+          _baseMid8(((uintptr_t)&tss >> 16) & 0xff),
+          _flags1(0b10001001),
+          _flags2(0),
+          _baseHigh8(((uintptr_t)&tss >> 24) & 0xff),
+          _baseUpper32((uintptr_t)&tss >> 32),
+          _reserved() {}
 };
 
 struct [[gnu::packed]] Gdt {

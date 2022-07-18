@@ -12,7 +12,7 @@ struct Color {
             static_cast<uint8_t>((hex >> 16) & 0xFF),
             static_cast<uint8_t>((hex >> 8) & 0xFF),
             static_cast<uint8_t>(hex & 0xFF),
-            static_cast<uint8_t>((hex >> 24) & 0xFF),
+            static_cast<uint8_t>(0xFF),
         };
     }
 

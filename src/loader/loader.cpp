@@ -43,6 +43,7 @@ Error load(Sys::Path kernelPath) {
 
         size_t paddr = prog.vaddr() - Handover::KERNEL_BASE;
         size_t memsz = Hal::pageAlignUp(prog.memsz());
+        Debug::ldebug("Loading segment: paddr=0x{x}, vaddr=0x{x}, memsz=0x{x}, filesz=0x{x}", paddr, prog.vaddr(), memsz, prog.filez());
 
         size_t remaining = prog.memsz() - prog.filez();
         memcpy((void *)paddr, prog.buf(), prog.filez());
@@ -87,9 +88,14 @@ Error load(Sys::Path kernelPath) {
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     Debug::linfo("Finalizing and entering kernel, see you on the other side...");
-    Debug::linfo("payload at {x}", (uintptr_t)&payload.finalize());
+
+    uintptr_t ip = image.header().entry;
+    uintptr_t sp = Handover::KERNEL_BASE + (size_t)stackMap.mutBytes().end();
+    Debug::linfo("ip:{x} sp:{x} payload:{}", ip, sp, (uintptr_t)&payload.finalize());
+
     try$(Fw::finalizeHandover(payload));
-    Fw::enterKernel(image.header().entry, payload.finalize(), Handover::KERNEL_BASE + (size_t)stackMap.mutBytes().end(), *vmm);
+
+    Fw::enterKernel(ip, payload.finalize(), sp, *vmm);
 
     panic("unreachable");
 }

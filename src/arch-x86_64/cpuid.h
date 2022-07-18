@@ -1,66 +1,35 @@
 #pragma once
 
-#include <karm-base/opt.h>
-#include <karm-base/std.h>
+#include <karm-base/array.h>
+#include <karm-base/result.h>
+#include <karm-base/string.h>
 
 namespace x86_64 {
-struct Cpuid {
-    struct Result {
+
+union Cpuid {
+    struct {
         uint32_t eax;
         uint32_t ebx;
         uint32_t ecx;
         uint32_t edx;
     };
 
-    enum Leaf : uint32_t {
-        FEATURE_IDENTIFIER = 1,
-        EXTENDED_FEATURE_IDENTIFIER = 7,
-        PROC_EXTENDED_STATE_ENUMERATION = 13,
-        FEATURE_IDENTIFIER_EXT = 0x80000001,
-        SVM_FEATURE_IDENTIFICATION = 0x8000000A,
-    };
+    Array<uint32_t, 4> _els;
+    Array<char, 16> _str;
 
-    enum FeatureBits : uint32_t {
-        // ECX
-        SSSE3_SUPPORT = (1 << 9),
-        SSE41_SUPPORT = (1 << 19),
-        SSE42_SUPPORT = (1 << 20),
-        AES_SUPPORT = (1 << 25),
-        XSAVE_SUPPORT = (1 << 26),
-        XSAVE_ENABLED = (1 << 27),
-        AVX_SUPPORT = (1 << 28),
-    };
+    static inline Cpuid cpuid(uint32_t leaf = 0, uint32_t subleaf = 0) {
+        uint32_t maxLeaf = 0;
 
-    enum ExtendedFeatureBits : uint32_t {
-        // EBX
-        BIT_MANIPULATION_SUPPORT = (1 << 3),
-        AVX512_SUPPORT = (1 << 16),
-    };
-
-    enum ExtendedFeatureIdentifiersBits : uint32_t {
-        // ECX
-        SINGLE_CORE = (1 << 1),
-        SVM_SUPPORT = (1 << 2),
-    };
-
-    enum SvmFeatureIdentifiersBits  : uint32_t{
-        // EDX
-        SVM_NESTED_PAGING = (1 << 0),
-    };
-
-    static Opt<Cpuid::Result> cpuid(uint32_t leaf, uint32_t subleaf) {
-
-        uint32_t cpuid_max;
         asm volatile("cpuid"
-                     : "=a"(cpuid_max)
+                     : "=a"(maxLeaf)
                      : "a"(leaf & 0x80000000)
                      : "rbx", "rcx", "rdx");
 
-        if (leaf > cpuid_max) {
-            return NONE;
+        if (leaf > maxLeaf) {
+            panic("cpuid leaf out of range");
         }
 
-        Cpuid::Result result = {};
+        Cpuid result{};
 
         asm volatile("cpuid"
                      : "=a"(result.eax), "=b"(result.ebx), "=c"(result.ecx), "=d"(result.edx)
@@ -69,25 +38,66 @@ struct Cpuid {
         return result;
     }
 
-    static bool has_xsave() 
-    {
-        return cpuid(Cpuid::FEATURE_IDENTIFIER, 0).unwrap().ecx & Cpuid::XSAVE_SUPPORT;   
-    } 
+    struct Branding {
+        Array<char, 12> _vendor;
+        Array<char, 48> _brand;
 
-    static bool has_avx() 
-    {
-        return cpuid(Cpuid::FEATURE_IDENTIFIER, 0).unwrap().ecx & Cpuid::AVX_SUPPORT;   
-    } 
+        Str vendor() const {
+            return _vendor;
+        }
 
-    static bool has_avx512() 
-    {
-        return cpuid(Cpuid::EXTENDED_FEATURE_IDENTIFIER, 0).unwrap().ebx & Cpuid::AVX512_SUPPORT;   
+        Str brand() const {
+            return _brand;
+        }
+    };
+
+    static Array<char, 12> _vendor() {
+        union {
+            Array<uint32_t, 3> regs;
+            Array<char, 12> str;
+        } buf{};
+
+        Cpuid result = cpuid(0);
+        buf.regs[0] = result.ebx;
+        buf.regs[1] = result.edx;
+        buf.regs[2] = result.ecx;
+
+        return {buf.str};
     }
-    
-    static bool xsave_size() 
-    {
-        return cpuid(Cpuid::PROC_EXTENDED_STATE_ENUMERATION, 0).unwrap().ecx;   
-    }    
 
+    static Array<char, 48> _brand() {
+        union {
+            Array<Cpuid, 4> ids;
+            Array<char, 48> str;
+        } buf{};
+
+        buf.ids[0] = cpuid(0x80000002);
+        buf.ids[1] = cpuid(0x80000003);
+        buf.ids[2] = cpuid(0x80000004);
+        buf.ids[4] = cpuid(0x80000005);
+
+        return buf.str;
+    }
+
+    static Branding
+    branding() {
+        return {_vendor(), _brand()};
+    }
+
+    static bool hasXsave() {
+        return cpuid(0x01, 0x00).ecx & (1 << 26);
+    }
+
+    static bool hasAvx() {
+        return cpuid(0x01, 0x00).ecx & (1 << 28);
+    }
+
+    static bool hasAvx512() {
+        return cpuid(0x7, 0).ebx & (1 << 16);
+    }
+
+    static bool xsaveSize() {
+        return cpuid(0x0d, 0).ecx;
+    }
 };
 }; // namespace x86_64

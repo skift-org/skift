@@ -6,9 +6,12 @@
         "arch": "x86_64",
         "sys": ["@uname", "sysname"],
         "abi": "unknown",
-        "encoding": "utf8",
         "freestanding": false,
-        "host": true
+        "host": true,
+
+        "karm-sys-encoding": "utf8",
+        "karm-cli-backend": "ansi",
+        "karm-ui-backend" : "sdl"
     },
     "tools": {
         "cc": {

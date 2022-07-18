@@ -86,8 +86,8 @@ Error load(Sys::Path kernelPath) {
         loaderImage,
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
-    Debug::linfo("Finalizing and entering kernel, see you on the other side...\n");
-    Debug::linfo("payload at {x}\n", (uintptr_t)&payload.finalize());
+    Debug::linfo("Finalizing and entering kernel, see you on the other side...");
+    Debug::linfo("payload at {x}", (uintptr_t)&payload.finalize());
     try$(Fw::finalizeHandover(payload));
     Fw::enterKernel(image.header().entry, payload.finalize(), Handover::KERNEL_BASE + (size_t)stackMap.mutBytes().end(), *vmm);
 

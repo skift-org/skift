@@ -6,9 +6,10 @@
         "arch": "x86_64",
         "sys": "efi",
         "abi": "ms",
-        "encoding": "utf16",
         "freestanding": true,
-        "host": false
+        "host": false,
+
+        "karm-sys-encoding": "utf16"
     },
     "tools": {
         "cc": {

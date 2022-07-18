@@ -8,7 +8,10 @@
         "abi": "sysv",
         "encoding": "utf8",
         "freestanding": true,
-        "host": false
+        "host": false,
+
+        "karm-sys-encoding": "utf8",
+        "karm-cli-backend": "ansi"
     },
     "tools": {
         "cc": {

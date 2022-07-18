@@ -117,6 +117,8 @@ struct Formatter<Karm::Cli::Style> {
     }
 
     Result<size_t> format(Io::_TextWriter &writer, Karm::Cli::Style style) {
+#ifdef __osdk_karm_cli_backend_ansi__
+
         size_t written = 0;
 
         if (style._reset) {
@@ -152,6 +154,11 @@ struct Formatter<Karm::Cli::Style> {
         }
 
         return written;
+#else
+        (void)writer;
+        (void)style;
+        return 0;
+#endif
     }
 };
 
@@ -165,9 +172,13 @@ struct Formatter<Karm::Cli::Styled<T>> {
     }
 
     Result<size_t> format(Io::_TextWriter &writer, Karm::Cli::Styled<T> const &styled) {
+#ifdef __osdk_karm_cli_backend_ansi__
         return try$(_styleFmt.format(writer, styled._color)) +
                try$(_innerFmt.format(writer, styled._inner)) +
                try$(writer.writeStr("\x1b[0m"));
+#else
+        return _innerFmt.format(writer, styled._inner);
+#endif
     }
 };
 

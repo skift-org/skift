@@ -3,11 +3,14 @@
 #include <karm-base/string.h>
 #include <karm-base/var.h>
 #include <karm-base/vec.h>
-#include <karm-math/circle.h>
 #include <karm-math/edge.h>
+#include <karm-math/ellipse.h>
 #include <karm-math/funcs.h>
 
 #include "colors.h"
+#include "path.h"
+#include "shape.h"
+#include "style.h"
 #include "surface.h"
 #include "vga-font.h"
 
@@ -34,152 +37,6 @@ struct Radius {
           bottomRight(bottomRight) {}
 };
 
-struct FillStyle {
-    Color _color{};
-
-    constexpr FillStyle() : _color(WHITE) {}
-
-    constexpr FillStyle(Color color) : _color(color) {}
-
-    constexpr Color color() const { return _color; }
-
-    constexpr FillStyle color(Color color) {
-        _color = color;
-        return *this;
-    }
-};
-
-static inline constexpr FillStyle fill(auto... args) {
-    return FillStyle(args...);
-}
-
-enum struct StrokePosition {
-    CENTER,
-    INSIDE,
-    OUTSIDE,
-};
-
-using enum StrokePosition;
-
-struct StrokeStyle {
-    Color _color{};
-    Radius _radius{};
-    StrokePosition _position{};
-    double _thickness{};
-
-    constexpr StrokeStyle() : _color(WHITE), _thickness(1) {}
-
-    constexpr StrokeStyle(Color color) : _color(color), _thickness(1) {}
-
-    constexpr Color color() const { return _color; }
-
-    constexpr StrokeStyle color(Color color) {
-        _color = color;
-        return *this;
-    }
-
-    constexpr Radius radius() const { return _radius; }
-
-    constexpr StrokeStyle radius(Radius radius) {
-        _radius = radius;
-        return *this;
-    }
-
-    constexpr StrokePosition position() const { return _position; }
-
-    constexpr StrokeStyle position(StrokePosition position) {
-        _position = position;
-        return *this;
-    }
-
-    constexpr double thickness() const { return _thickness; }
-
-    constexpr StrokeStyle thickness(double thickness) {
-        _thickness = thickness;
-        return *this;
-    }
-};
-
-static inline constexpr StrokeStyle stroke(auto... args) {
-    return StrokeStyle(args...);
-}
-
-struct TextStyle {
-    Color _color{};
-
-    constexpr TextStyle() : _color(WHITE) {}
-
-    constexpr TextStyle(Color paint) : _color(paint) {}
-
-    constexpr Color color() const { return _color; }
-
-    constexpr TextStyle color(Color paint) {
-        _color = paint;
-        return *this;
-    }
-};
-
-static inline TextStyle text(auto... args) {
-    return TextStyle(args...);
-}
-
-struct ShadowStyle {
-    Color _color{};
-    float _spread{};
-    float _radius{};
-    Math::Vec2f _offset{};
-
-    constexpr ShadowStyle() : _color(BLACK), _spread(0.0f), _radius(0.0f), _offset(0.0f) {}
-
-    constexpr ShadowStyle(Color paint) : _color(paint), _spread(0.0f), _radius(0.0f), _offset(0.0f) {}
-
-    constexpr Color color() const { return _color; }
-
-    constexpr ShadowStyle color(Color paint) {
-        _color = paint;
-        return *this;
-    }
-
-    constexpr float spread() const { return _spread; }
-
-    constexpr ShadowStyle spread(float spread) {
-        _spread = spread;
-        return *this;
-    }
-
-    constexpr float radius() const { return _radius; }
-
-    constexpr ShadowStyle radius(float radius) {
-        _radius = radius;
-        return *this;
-    }
-
-    constexpr Math::Vec2f offset() const { return _offset; }
-
-    constexpr ShadowStyle offset(Math::Vec2f offset) {
-        _offset = offset;
-        return *this;
-    }
-};
-
-static inline ShadowStyle shadow(auto... args) {
-    return ShadowStyle(args...);
-}
-
-namespace Sdf {
-
-static inline double circle(Math::Vec2f p, Math::Vec2f center, double radius) {
-    return radius - (center - p).len();
-}
-
-static inline auto makeCircle(Math::Vec2f center, double radius) {
-    return [center, radius](Math::Vec2f p) {
-        return circle(p, center, radius);
-    };
-}
-
-}; // namespace Sdf
-
 struct Context {
     struct Scope {
         FillStyle fillStyle{};
@@ -191,10 +48,21 @@ struct Context {
         Math::Recti clip{};
     };
 
-    Surface *_Surface{};
-    Vec<Scope> _stack;
+    struct Active {
+        float x;
+        int sign;
+    };
 
-    /* --- Scope --- */
+    Surface *_Surface{};
+    Vec<Scope> _stack{};
+
+    Shape _shape{};
+    Path _path{};
+
+    Vec<Active> _active{};
+    Vec<double> _scanline;
+
+    /* --- Scope ------------------------------------------------------------ */
 
     void begin(Surface &c) {
         _Surface = &c;
@@ -228,7 +96,7 @@ struct Context {
         _stack.popBack();
     }
 
-    /* --- Orgin & Clipping --- */
+    /* --- Origin & Clipping ------------------------------------------------ */
 
     Math::Recti clip() const {
         return current().clip;
@@ -262,7 +130,7 @@ struct Context {
         current().origin = applyOrigin(pos);
     }
 
-    /* --- Fill & Stroke --- */
+    /* --- Fill & Stroke ---------------------------------------------------- */
 
     FillStyle const &fillStyle() { return current().fillStyle; }
 
@@ -292,7 +160,7 @@ struct Context {
         return *this;
     }
 
-    /* --- Drawing --- */
+    /* --- Drawing ---------------------------------------------------------- */
 
     void clear(Color color = BLACK) { clear(Surface().bound(), color); }
 
@@ -306,60 +174,12 @@ struct Context {
         }
     }
 
+    /* --- Shapes ----------------------------------------------------------- */
+
     void plot(Math::Vec2i point, Color color) {
         point = applyOrigin(point);
         if (clip().contains(point)) {
             Surface().store(point, color);
-        }
-    }
-
-    void fill(Math::Recti region, Math::Vec2i origin, auto sdf) {
-        region = applyAll(region);
-        origin = applyOrigin(origin);
-
-        for (int y = region.y; y < region.y + region.height; y++) {
-            for (int x = region.x; x < region.x + region.width; x++) {
-                auto pos = (Math::Vec2i{x, y} - origin).cast<double>();
-                double alpha = clamp(sdf(pos), 0.0, 1.0);
-
-                if (alpha > 0.01) {
-                    Color c = fillStyle().color().withOpacity(alpha);
-                    Surface().blend({x, y}, c);
-                }
-            }
-        }
-    }
-
-    float _clampStroke(float d, float thickness, StrokePosition pos) {
-        float inner = 0;
-        float outer = -thickness;
-
-        if (pos == StrokePosition::OUTSIDE) {
-            inner = thickness;
-            outer = 0;
-        } else if (pos == StrokePosition::CENTER) {
-            inner = thickness / 2;
-            outer = -thickness / 2;
-        }
-
-        return clamp01(d + inner) - clamp01(d + outer);
-    }
-
-    void stroke(Math::Recti region, Math::Vec2i origin, auto sdf) {
-        region = applyAll(region);
-        origin = applyOrigin(origin);
-
-        for (int y = region.y; y < region.y + region.height; y++) {
-            for (int x = region.x; x < region.x + region.width; x++) {
-                auto pos = (Math::Vec2i{x, y} - origin).cast<double>();
-                float d = sdf(pos);
-                double alpha = _clampStroke(d, strokeStyle().thickness(), strokeStyle().position());
-
-                if (alpha > 0.01) {
-                    Color c = strokeStyle().color().withOpacity(alpha);
-                    Surface().blend({x, y}, c);
-                }
-            }
         }
     }
 
@@ -379,54 +199,19 @@ struct Context {
         }
     }
 
-    void stroke(Math::Circlei circle) {
-        double innerRadius = circle.radius;
-        double outerRadius = circle.radius;
-
-        switch (strokeStyle().position()) {
-        case StrokePosition::CENTER:
-            innerRadius -= strokeStyle().thickness() / 2.0f;
-            outerRadius += strokeStyle().thickness() / 2.0f;
-            break;
-
-        case StrokePosition::INSIDE:
-            innerRadius -= strokeStyle().thickness();
-            break;
-
-        case StrokePosition::OUTSIDE:
-            outerRadius += strokeStyle().thickness();
-            break;
-        }
-
-        if (innerRadius < 0.0f) {
-            innerRadius = 0.0f;
-        }
-
-        if (outerRadius < 0.0f) {
-            outerRadius = 0.0f;
-        }
-
-        if (innerRadius > outerRadius) {
-            innerRadius = outerRadius;
-        }
-
-        if (innerRadius == outerRadius) {
-            return;
-        }
-
-        Math::Recti region = {
-            (int)Math::floor(circle.center.x - outerRadius),
-            (int)Math::floor(circle.center.y - outerRadius),
-            (int)Math::ceil(outerRadius * 2.0f),
-            (int)Math::ceil(outerRadius * 2.0f),
-        };
-
-        stroke(region, circle.center, Sdf::makeCircle({0, 0}, circle.radius));
+    void stroke(Math::Ellipsei e) {
+        begin();
+        ellipse(e.cast<double>());
+        stroke();
     }
 
-    void fill(Math::Circlei circle) {
-        fill(circle.bound(), circle.center, Sdf::makeCircle({0, 0}, circle.radius));
+    void fill(Math::Ellipsei e) {
+        begin();
+        ellipse(e.cast<double>());
+        fill();
     }
+
+    /* --- Text ------------------------------------------------------------- */
 
     Math::Vec2i mesure(Rune) {
         return {VGA_FONT_WIDTH, VGA_FONT_HEIGHT};
@@ -478,7 +263,74 @@ struct Context {
         }
     }
 
-    /* --- Effects --- */
+    /* --- Paths ------------------------------------------------------------ */
+
+    void begin() {
+        _path.clear();
+    }
+
+    void close() {
+        _path.close();
+    }
+
+    void moveTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT) {
+        _path.moveTo(p, flags);
+    }
+
+    void lineTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT) {
+        _path.lineTo(p, flags);
+    }
+
+    void hlineTo(double x, Path::Flags flags = Path::DEFAULT) {
+        _path.hlineTo(x, flags);
+    }
+
+    void vlineTo(double y, Path::Flags flags = Path::DEFAULT) {
+        _path.vlineTo(y, flags);
+    }
+
+    void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) {
+        _path.cubicTo(cp1, cp2, p, flags);
+    }
+
+    void quadTo(Math::Vec2f cp, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) {
+        _path.quadTo(cp, p, flags);
+    }
+
+    void arcTo(Math::Vec2f radius, float angle, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) {
+        _path.arcTo(radius, angle, p, flags);
+    }
+
+    void line(Math::Edgef line) {
+        _path.line(line);
+    }
+
+    void rect(Math::Rectf rect) {
+        _path.rect(rect);
+    }
+
+    void ellipse(Math::Ellipsef ellipse) {
+        _path.ellipse(ellipse);
+    }
+
+    void _fill() {
+    }
+
+    void fill() {
+        _shape.clear();
+        createSolid(_path, _shape);
+        _fill();
+    }
+
+    void stroke() {
+        _shape.clear();
+        createStroke(_path, _shape);
+        _fill();
+    }
+
+    void shadow() {}
+
+    /* --- Effects ---------------------------------------------------------- */
 
     void blur(Math::Recti region, double radius);
 

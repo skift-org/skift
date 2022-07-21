@@ -31,9 +31,19 @@ struct Array {
         }
     }
 
-    constexpr T &operator[](size_t i) { return _buf[i]; }
+    constexpr T &operator[](size_t i) {
+        if (i >= N) {
+            panic("index out of range");
+        }
+        return _buf[i];
+    }
 
-    constexpr T const &operator[](size_t i) const { return _buf[i]; }
+    constexpr T const &operator[](size_t i) const {
+        if (i >= N) {
+            panic("index out of range");
+        }
+        return _buf[i];
+    }
 
     constexpr size_t len() const { return N; }
 

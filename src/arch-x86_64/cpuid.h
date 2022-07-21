@@ -39,8 +39,8 @@ union Cpuid {
     }
 
     struct Branding {
-        Array<char, 12> _vendor;
-        Array<char, 48> _brand;
+        Array<char, 12> _vendor{};
+        Array<char, 48> _brand{};
 
         Str vendor() const {
             return _vendor;
@@ -66,7 +66,7 @@ union Cpuid {
     }
 
     static Array<char, 48> _brand() {
-        union {
+        union [[gnu::packed]] {
             Array<Cpuid, 4> ids;
             Array<char, 48> str;
         } buf{};
@@ -74,13 +74,11 @@ union Cpuid {
         buf.ids[0] = cpuid(0x80000002);
         buf.ids[1] = cpuid(0x80000003);
         buf.ids[2] = cpuid(0x80000004);
-        buf.ids[4] = cpuid(0x80000005);
-
+        buf.ids[3] = cpuid(0x80000005);
         return buf.str;
     }
 
-    static Branding
-    branding() {
+    static Branding branding() {
         return {_vendor(), _brand()};
     }
 

@@ -95,7 +95,7 @@ struct FileProto : public Sys::Fd, Meta::Static {
         (void)_proto->getInfo(_proto, &Efi::FileInfo::UUID, &bufSize, nullptr);
 
         Buf<uint8_t> buf;
-        buf.extend(bufSize, 0);
+        buf.resize(bufSize, 0);
 
         Efi::FileInfo *info = (Efi::FileInfo *)buf.buf();
         try$(_proto->getInfo(_proto, &Efi::FileInfo::UUID, &bufSize, info));

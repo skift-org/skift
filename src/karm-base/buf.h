@@ -209,10 +209,16 @@ struct Buf {
     }
 
     T *buf() {
+        if (_buf == nullptr)
+            return nullptr;
+        
         return &_buf->unwrap();
     }
 
     T const *buf() const {
+        if (_buf == nullptr)
+            return nullptr;
+
         return &_buf->unwrap();
     }
 

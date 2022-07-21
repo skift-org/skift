@@ -70,7 +70,7 @@ enum : size_t {
 #undef ERR
 };
 
-[[gnu::used]] static inline Error from_status(Status status) {
+[[gnu::used]] static inline Error fromStatus(Status status) {
     if ((status & EFI_ERROR) == 0) {
         return OK;
     }
@@ -91,7 +91,7 @@ struct [[gnu::packed]] Method {
     Status (*func)(void *self, Args...);
 
     Error operator()(void *self, Args... args) {
-        return from_status(func(self, args...));
+        return fromStatus(func(self, args...));
     }
 };
 
@@ -102,7 +102,7 @@ struct [[gnu::packed]] Function {
     Status (*func)(Args...);
 
     Error operator()(Args... args) {
-        return from_status(func(args...));
+        return fromStatus(func(args...));
     }
 };
 

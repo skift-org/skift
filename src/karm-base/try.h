@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-meta/cvrp.h>
+
 #include "_prelude.h"
 
 #define try$(EXPR)                \
@@ -20,7 +22,7 @@ concept Tryable = requires(T t) {
     {t.unwrap()};
 };
 
-auto try_or(Tryable auto opt, auto default_value) -> decltype(opt.unwrap()) {
+auto try_or(Tryable auto opt, auto default_value) -> Meta::RemoveRef<decltype(opt.unwrap())> {
     if (!opt) {
         return default_value;
     }

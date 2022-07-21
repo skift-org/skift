@@ -58,7 +58,17 @@ union Rect {
         height += d;
     }
 
+    constexpr Vec2<T> topLeft() const { return {x, y}; }
+    constexpr Vec2<T> topRight() const { return {x + width, y}; }
+    constexpr Vec2<T> bottomLeft() const { return {x, y + height}; }
+    constexpr Vec2<T> bottomRight() const { return {x + width, y + height}; }
+
     constexpr Vec2<T> center() const { return {x + width / 2, y + height / 2}; }
+
+    constexpr Vec2<T> topCenter() const { return {x + width / 2, y}; }
+    constexpr Vec2<T> bottomCenter() const { return {x + width / 2, y + height}; }
+    constexpr Vec2<T> leftCenter() const { return {x, y + height / 2}; }
+    constexpr Vec2<T> rightCenter() const { return {x + width, y + height / 2}; }
 
     constexpr Vec2<T> size() const { return {width, height}; }
 

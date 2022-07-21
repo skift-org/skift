@@ -47,7 +47,7 @@ union Trans2 {
         return {1, 0, 0, 1, x, y};
     }
 
-    constexpr Vec2f apply(Vec2f const &v) const {
+    constexpr Vec2f apply(Vec2f v) const {
         return {
             v.x * xx + v.y * xy,
             v.x * yx + v.y * yy,

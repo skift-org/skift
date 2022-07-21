@@ -47,8 +47,14 @@ union Vec2 {
         return {x / len, y / len};
     }
 
-    constexpr T angle(Vec2 const &other) const {
-        return atan2(other.y - y, other.x - x);
+    constexpr T angle() const {
+        return atan2(y, x);
+    }
+
+    constexpr T angleWith(Vec2 const &other) const {
+        auto r = norm().dot(other.norm());
+        auto sign = (x * other.y < y * other.x) ? -1 : 1;
+        return sign * acos(r);
     }
 
     constexpr T operator[](int i) const {

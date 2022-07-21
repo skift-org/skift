@@ -38,7 +38,8 @@ def bootCmd(opts: dict, args: list[str]) -> None:
     qemuCmd = [
         "qemu-system-x86_64",
         "-no-reboot",
-        "-d", "guest_errors",
+        "-no-shutdown",
+        "-d", "guest_errors,cpu_reset",
         "-serial", "mon:stdio",
         "-bios", ovmf,
         "-m", "256M",

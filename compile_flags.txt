@@ -8,5 +8,7 @@
 -Wextra
 -Werror
 -D__osdk_sys_linux__
--D__osdk_encoding_utf8__
+-D__osdk_karm_sys_encoding_utf8__
+-D__osdk_karm_ui_backend_utf8__
+-D__osdk_karm_cli_backend_ansi__
 -I/usr/include/SDL2

@@ -2,12 +2,10 @@
 
 #include <karm-base/string.h>
 
-#include "scan.h"
-
 namespace Karm::Re {
 
 inline auto single(auto... c) {
-    return [=](Text::Scan &scan) {
+    return [=](auto &scan) {
         if (((scan.curr() == (Rune)c) || ...)) {
             scan.next();
             return true;
@@ -18,33 +16,33 @@ inline auto single(auto... c) {
 }
 
 inline auto word(Str word) {
-    return [=](Text::Scan &scan) {
+    return [=](auto &scan) {
         return scan.skip(word);
     };
 }
 
 inline auto range(Rune start, Rune end) {
-    return [=](Text::Scan &scan) {
+    return [=](auto &scan) {
         return scan.curr() >= start && scan.curr() <= end;
     };
 }
 
 template <typename... Exprs>
 inline auto either(Exprs... exprs) {
-    return [=](Text::Scan &scan) {
+    return [=](auto &scan) {
         return (exprs(scan) || ...);
     };
 }
 
 template <typename... Exprs>
 inline auto chain(Exprs... exprs) {
-    return [=](Text::Scan &scan) {
+    return [=](auto &scan) {
         return (exprs(scan) && ...);
     };
 }
 
 inline auto negate(auto expr) {
-    return [=](Text::Scan &scan) {
+    return [=](auto &scan) {
         return !expr(scan);
     };
 }
@@ -52,7 +50,7 @@ inline auto negate(auto expr) {
 /* --- Quantifiers ---------------------------------------------------------- */
 
 inline auto zero_or_more(auto expr) {
-    return [=](Text::Scan &scan) {
+    return [=](auto &scan) {
         while (expr(scan))
             ;
         return true;
@@ -60,7 +58,7 @@ inline auto zero_or_more(auto expr) {
 }
 
 inline auto one_or_more(auto expr) {
-    return [=](Text::Scan &scan) {
+    return [=](auto &scan) {
         if (!expr(scan))
             return false;
         while (expr(scan))
@@ -70,7 +68,7 @@ inline auto one_or_more(auto expr) {
 }
 
 inline auto zero_or_one(auto expr) {
-    return [=](Text::Scan &scan) {
+    return [=](auto &scan) {
         expr(scan);
         return true;
     };

@@ -84,8 +84,8 @@ struct _Scan {
         return true;
     }
 
-    bool skip(auto predicate) requires Meta::Callable<decltype(predicate), Rune> {
-        if (!ended() && predicate(curr())) {
+    bool skip(auto predicate) requires Meta::Callable<decltype(predicate), decltype(*this)> {
+        if (!ended() && predicate(*this)) {
             next();
             return true;
         }

@@ -1,14 +1,27 @@
 #pragma once
 
+#include <karm-base/try.h>
 #include <karm-gfx/path.h>
 
 namespace Karm::Gfx {
 
-using Shape = Vec<Math::Edgef>;
+struct Shape : public Vec<Math::Edgef> {
+    Math::Rectf bound() const {
+        Opt<Math::Rectf> bound{};
+        for (auto const &edge : *this) {
+            if (bound) {
+                bound->mergeWith(edge.bound());
+            } else {
+                bound = edge.bound();
+            }
+        }
+        return tryOr(bound, Math::Rectf{});
+    }
+};
 
 static void createSolid(Path &path, Shape &shape) {
     for (auto seg : path.iterSegs()) {
-        if (!seg.close)
+        if (seg.close)
             for (size_t i = 0; i < seg.len() - 1; i++) {
                 shape.pushBack(Math::Edgef{
                     seg[i],

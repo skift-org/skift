@@ -22,7 +22,7 @@ concept Tryable = requires(T t) {
     {t.unwrap()};
 };
 
-auto try_or(Tryable auto opt, auto default_value) -> Meta::RemoveRef<decltype(opt.unwrap())> {
+auto tryOr(Tryable auto opt, auto default_value) -> Meta::RemoveRef<decltype(opt.unwrap())> {
     if (!opt) {
         return default_value;
     }
@@ -30,7 +30,7 @@ auto try_or(Tryable auto opt, auto default_value) -> Meta::RemoveRef<decltype(op
     return opt.unwrap();
 }
 
-auto try_or_else(Tryable auto opt, auto default_value) -> decltype(opt.unwrap()) {
+auto tryOrElse(Tryable auto opt, auto default_value) -> decltype(opt.unwrap()) {
     if (!opt) {
         return default_value();
     }

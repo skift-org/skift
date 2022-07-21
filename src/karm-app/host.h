@@ -45,8 +45,8 @@ struct Host : public Meta::Static {
 
         paint();
         while (_alive) {
+            wait(-1);
             pump();
-            wait(16);
             paint();
         }
 

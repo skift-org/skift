@@ -28,6 +28,15 @@ union Rect {
     constexpr Rect(Vec2<T> xy, Vec2<T> wh) : xy(xy), wh(wh) {
     }
 
+    static constexpr Rect<T> fromTwoPoint(Vec2<T> a, Vec2<T> b) {
+        return {
+            min(a.x, b.x),
+            min(a.y, b.y),
+            max(a.x, b.x) - min(a.x, b.x),
+            max(a.y, b.y) - min(a.y, b.y),
+        };
+    }
+
     constexpr T start() const { return x; }
 
     constexpr void start(T value) {
@@ -58,17 +67,17 @@ union Rect {
         height += d;
     }
 
-    constexpr Vec2<T> topLeft() const { return {x, y}; }
-    constexpr Vec2<T> topRight() const { return {x + width, y}; }
-    constexpr Vec2<T> bottomLeft() const { return {x, y + height}; }
-    constexpr Vec2<T> bottomRight() const { return {x + width, y + height}; }
+    constexpr Vec2<T> topStart() const { return {x, y}; }
+    constexpr Vec2<T> topEnd() const { return {x + width, y}; }
+    constexpr Vec2<T> bottomStart() const { return {x, y + height}; }
+    constexpr Vec2<T> bottomEnd() const { return {x + width, y + height}; }
 
     constexpr Vec2<T> center() const { return {x + width / 2, y + height / 2}; }
 
     constexpr Vec2<T> topCenter() const { return {x + width / 2, y}; }
     constexpr Vec2<T> bottomCenter() const { return {x + width / 2, y + height}; }
-    constexpr Vec2<T> leftCenter() const { return {x, y + height / 2}; }
-    constexpr Vec2<T> rightCenter() const { return {x + width, y + height / 2}; }
+    constexpr Vec2<T> startCenter() const { return {x, y + height / 2}; }
+    constexpr Vec2<T> endCenter() const { return {x + width, y + height / 2}; }
 
     constexpr Vec2<T> size() const { return {width, height}; }
 
@@ -106,9 +115,33 @@ union Rect {
             min(y + height, r.y + r.height) - max(y, r.y)};
     }
 
-    constexpr T operator[](int i) { return _els[i]; }
+    constexpr Rect<T> mergeWith(Rect<T> const &r) const {
+        return fromTwoPoint(
+            {
+                min(start(), r.start()),
+                min(top(), r.top()),
+            },
+            {
+                max(end(), r.end()),
+                max(bottom(), r.bottom()),
+            });
+    }
+
+    constexpr T operator[](int i) {
+        return _els[i];
+    }
 
     constexpr T operator[](int i) const { return _els[i]; }
+
+    template <typename U>
+    constexpr Rect<U> cast() const {
+        return {
+            static_cast<U>(x),
+            static_cast<U>(y),
+            static_cast<U>(width),
+            static_cast<U>(height),
+        };
+    }
 };
 
 using Recti = Rect<int>;

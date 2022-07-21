@@ -16,19 +16,34 @@ namespace Karm::Gfx {
 
 namespace _Impl {
 
-enum PathOpCode {
-    NOP,
+#define FOREACH_PATHOPCODE(OPCODE) \
+    OPCODE(NOP)                    \
+    OPCODE(CLEAR)                  \
+    OPCODE(CLOSE)                  \
+    OPCODE(MOVE_TO)                \
+    OPCODE(LINE_TO)                \
+    OPCODE(HLINE_TO)               \
+    OPCODE(VLINE_TO)               \
+    OPCODE(CUBIC_TO)               \
+    OPCODE(QUAD_TO)                \
+    OPCODE(ARC_TO)
 
-    CLEAR,
-    CLOSE,
-    MOVE_TO,
-    LINE_TO,
-    HLINE_TO,
-    VLINE_TO,
-    CUBIC_TO,
-    QUAD_TO,
-    ARC_TO,
+enum PathOpCode {
+#define ITER(OPCODE) OPCODE,
+    FOREACH_PATHOPCODE(ITER)
+#undef ITER
 };
+
+static inline Str opCodeName(PathOpCode opCode) {
+    switch (opCode) {
+#define ITER(OPCODE) \
+    case OPCODE:     \
+        return #OPCODE;
+        FOREACH_PATHOPCODE(ITER)
+#undef ITER
+    }
+    return "";
+}
 
 enum PathOpFlags {
     DEFAULT = 0,
@@ -51,7 +66,6 @@ struct Path {
     using enum _Impl::PathOpCode;
 
     struct Op {
-
         Code code{};
         Flags flags{};
 
@@ -78,9 +92,9 @@ struct Path {
     };
 
     struct _Seg {
-        size_t start;
-        size_t end;
-        bool close;
+        size_t start{};
+        size_t end{};
+        bool close{};
     };
 
     struct Seg : public Slice<Math::Vec2f> {
@@ -297,13 +311,13 @@ struct Path {
             break;
 
         case CLOSE:
-            _verts.pushBack(_verts[last(_segs).start]);
+            _flattenLineTo(_verts[last(_segs).start]);
             last(_segs).close = true;
             break;
 
         case MOVE_TO:
-            _verts.pushBack(op.p);
-            _segs.pushBack({_verts.len() - 1, _verts.len(), false});
+            _segs.pushBack({_verts.len(), _verts.len(), false});
+            _flattenLineTo(op.p);
             break;
 
         case LINE_TO:
@@ -339,6 +353,7 @@ struct Path {
     /* --- Primitives ------------------------------------------------------- */
 
     void clear() {
+
         evalOp({CLEAR});
     }
 
@@ -390,10 +405,10 @@ struct Path {
     }
 
     void rect(Math::Rectf rect) {
-        moveTo(rect.topLeft());
-        lineTo(rect.topRight());
-        lineTo(rect.bottomRight());
-        lineTo(rect.bottomLeft());
+        moveTo(rect.topStart());
+        lineTo(rect.topEnd());
+        lineTo(rect.bottomEnd());
+        lineTo(rect.bottomStart());
         close();
     }
 

@@ -297,30 +297,10 @@ struct UiClient : public Karm::App::Client {
         gfx.clear(Gfx::ZINC900);
 
         gfx.fillStyle(Gfx::WHITE);
-        gfx.fill(Math::Recti{10, 10, 64, 64});
 
-        gfx.fill(Math::Ellipsei{64, 64, 32});
-
-        gfx.strokeStyle(
-            Gfx::stroke(Gfx::BLUE300)
-                .position(Gfx::INSIDE)
-                .thickness(16));
-
-        gfx.stroke(Math::Ellipsei{64, 64, 32});
-
-        gfx.strokeStyle(
-            Gfx::stroke(Gfx::PINK300)
-                .position(Gfx::OUTSIDE)
-                .thickness(16));
-
-        gfx.stroke(Math::Ellipsei{64, 64, 32});
-
-        gfx.strokeStyle(
-            Gfx::stroke(Gfx::GREEN300)
-                .position(Gfx::CENTER)
-                .thickness(16));
-
-        gfx.stroke(Math::Ellipsei{64, 64, 32});
+        gfx.begin();
+        gfx.rect(Math::Rectf{10, 10, 100, 100});
+        gfx.fill();
     }
 
     void handle(Events::Event &) override {}
@@ -329,8 +309,8 @@ struct UiClient : public Karm::App::Client {
 ExitCode render(auto tree) {
     Context ctx{};
     NodePtr root = tree(ctx);
-    Text::Emit emit{Sys::out()};
-    root->dumps(emit);
+    // Text::Emit emit{Sys::out()};
+    //  root->dumps(emit);
 
     Box<Karm::App::Client> client = makeBox<UiClient>(root);
     auto host = try$(Embed::makeHost(std::move(client)));

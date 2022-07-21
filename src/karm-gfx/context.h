@@ -53,7 +53,7 @@ struct Context {
         int sign;
     };
 
-    Surface *_Surface{};
+    Surface *_surface{};
     Vec<Scope> _stack{};
 
     Shape _shape{};
@@ -65,19 +65,21 @@ struct Context {
     /* --- Scope ------------------------------------------------------------ */
 
     void begin(Surface &c) {
-        _Surface = &c;
+        _surface = &c;
         _stack.pushBack({
             .clip = Surface().bound(),
         });
+
+        _scanline.resize(c.width());
     }
 
     void end() {
         _stack.popBack();
-        _Surface = nullptr;
+        _surface = nullptr;
     }
 
     Surface &Surface() {
-        return *_Surface;
+        return *_surface;
     }
 
     Scope &current() {
@@ -314,6 +316,8 @@ struct Context {
     }
 
     void _fill() {
+        auto shapeBound = _shape.bound();
+        fill(shapeBound.cast<int>());
     }
 
     void fill() {

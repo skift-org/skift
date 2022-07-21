@@ -23,7 +23,11 @@ constexpr inline auto WRAP = Wrap{};
 
 /* The object should be empty initialized */
 
-struct None {};
+struct None {
+    operator bool() const {
+        return false;
+    }
+};
 
 constexpr inline auto NONE = None{};
 

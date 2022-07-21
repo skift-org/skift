@@ -33,26 +33,26 @@ struct Func<Out(In...)> {
     // clang-format has troubles with this
 
     template <typename F>
-    requires (Meta::RvalueRef<F &&> and !(Meta::FuncPtr<F>))
-    Func(F &&f) : _wrap(makeBox<Wrap<F>>(std::forward<F>(f))) {}
-
-    template <typename F>
     requires Meta::FuncPtr<F>
-    Func(F f) : _wrap(makeBox<Wrap<F>>(std::forward<F>(f))) {}
+    Func(F f) : _wrap(makeBox<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
     requires (Meta::RvalueRef<F &&> and !(Meta::FuncPtr<F>))
-    Func &operator=(F &&f)
-    {
-        _wrap = makeBox<Wrap<F>>(std::forward<F>(f));
-        return *this;
-    }
+    Func(F &&f) : _wrap(makeBox<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
     requires Meta::FuncPtr<F>
     Func &operator=(F f)
     {
-        _wrap = makeBox<Wrap<F>>(std::forward<F>(f));
+        _wrap = makeBox<Wrap<F>>(std::move(f));
+        return *this;
+    }
+
+    template <typename F>
+    requires (Meta::RvalueRef<F &&> and !(Meta::FuncPtr<F>))
+    Func &operator=(F &&f)
+    {
+        _wrap = makeBox<Wrap<F>>(std::move(f));
         return *this;
     }
 
@@ -64,7 +64,7 @@ struct Func<Out(In...)> {
 
     template <typename F>
     Func &operator=(F f) {
-        _wrap = makeBox(Wrap<F>{std::forward<F>(f)});
+        _wrap = makeBox(Wrap<F>{std::move(f)});
         return *this;
     }
 };

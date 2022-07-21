@@ -13,6 +13,7 @@ struct [[nodiscard]] Result {
     Error _error = OK;
     Opt<Value> _value{};
 
+    constexpr Result(None none) : _error(none) {}
     constexpr Result(Error::Code code) noexcept : _error{code} {}
     constexpr Result(Error error) : _error(error) {}
     constexpr Result(Value &&value) : _error(OK), _value(std::move(value)) {}

@@ -183,25 +183,29 @@ struct Buf {
         _len -= count;
     }
 
-    void truncate(size_t len) {
-        len = min(len, _len);
+    void resize(size_t newLen, T fill = {}) {
+        if (newLen > _len) {
+            ensure(newLen);
+            for (size_t i = _len; i < newLen; i++) {
+                _buf[i].ctor(fill);
+            }
+        } else if (newLen < _len) {
+            for (size_t i = newLen; i < _len; i++) {
+                _buf[i].dtor();
+            }
+        }
+        _len = newLen;
+    }
 
-        for (size_t i = len; i < _len; i++) {
+    void truncate(size_t newLen) {
+        if (newLen >= _len)
+            return;
+
+        for (size_t i = newLen; i < _len; i++) {
             _buf[i].dtor();
         }
 
-        _len = len;
-    }
-
-    void extend(size_t len, T fill) {
-        size_t oldLen = _len;
-        size_t newLen = max(len, _len);
-        ensure(newLen);
-
-        for (size_t i = oldLen; i < newLen; i++) {
-            _buf[i].ctor(fill);
-        }
-        _len += newLen;
+        _len = newLen;
     }
 
     T *buf() {
@@ -293,8 +297,10 @@ struct InlineBuf {
 
     constexpr T const &operator[](size_t i) const { return _buf[i]; }
 
-    void ensure(size_t) {
-        // no-op
+    void ensure(size_t len) {
+        if (len > N) {
+            panic("cap too large");
+        }
     }
 
     void fit() {
@@ -369,14 +375,29 @@ struct InlineBuf {
         return tmp;
     }
 
-    void truncate(size_t len) {
-        len = min(len, _len);
+    void resize(size_t newLen, T fill = {}) {
+        if (newLen > _len) {
+            ensure(newLen);
+            for (size_t i = _len; i < newLen; i++) {
+                _buf[i].ctor(fill);
+            }
+        } else if (newLen < _len) {
+            for (size_t i = newLen; i < _len; i++) {
+                _buf[i].dtor();
+            }
+        }
+        _len = newLen;
+    }
 
-        for (size_t i = len; i < _len; i++) {
-            _buf[i].~T();
+    void truncate(size_t newLen) {
+        if (newLen >= _len)
+            return;
+
+        for (size_t i = newLen; i < _len; i++) {
+            _buf[i].dtor();
         }
 
-        _len = len;
+        _len = newLen;
     }
 
     T *buf() {

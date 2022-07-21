@@ -2,6 +2,7 @@
 
 #include "_prelude.h"
 
+#include "keywords.h"
 #include "panic.h"
 #include "try.h"
 
@@ -62,6 +63,7 @@ struct [[nodiscard]] Error {
 
     using enum Code;
 
+    constexpr Error(None) : _code(Code::OTHER), _msg("unwraping none") {}
     constexpr Error(Code code) : _code(code) {}
     constexpr Error(char const *msg) : _code(OTHER), _msg(msg) {}
     constexpr Error(Code code, char const *msg) : _code(code), _msg(msg) {}

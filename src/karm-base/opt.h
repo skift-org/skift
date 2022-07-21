@@ -119,12 +119,8 @@ struct Opt {
         }
     }
 
-    Error none() const {
-        if (!_present) {
-            return "unwrapping none";
-        }
-
-        return OK;
+    None none() const {
+        return NONE;
     }
 
     T &unwrap(const char *msg = "unwraping none") {

@@ -63,9 +63,11 @@ struct _Vec {
 
     void truncate(size_t len) { _buf.truncate(len); }
 
+    void resize(size_t len, T fill = {}) { _buf.resize(len, fill); }
+
     void fit() { _buf.fit(); }
 
-    void clear() { _buf.truncate(0); }
+    void clear() { _buf.resize(0); }
 
     size_t cap() const { return _buf.cap(); }
 

@@ -21,6 +21,8 @@ template <typename T>
 concept FuncPtr = Ptr<T> and Meta::Func<RemovePtr<T>>;
 
 template <typename T, typename... Args>
-constexpr bool Callable = requires(T f) { t(declval<Args>()...); };
+concept Callable = requires(T f) {
+    f(declval<Args>()...);
+};
 
 } // namespace Karm::Meta

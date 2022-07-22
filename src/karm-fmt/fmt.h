@@ -102,9 +102,6 @@ struct Formatter<T> : public SignedFormatter<T> {};
 
 template <>
 struct Formatter<Str> {
-    void parse(Text::Scan &) {
-    }
-
     Result<size_t> format(Io::_TextWriter &writer, Str text) {
         return writer.writeStr(text);
     }
@@ -134,7 +131,11 @@ struct Args : public _Args {
             if (index == i) {
                 using U = Meta::RemoveConstVolatileRef<decltype(t)>;
                 Formatter<U> formatter;
-                formatter.parse(scan);
+                if constexpr (requires() {
+                                  formatter.parse(scan);
+                              }) {
+                    formatter.parse(scan);
+                }
                 result = formatter.format(writer, t);
             }
             i++;

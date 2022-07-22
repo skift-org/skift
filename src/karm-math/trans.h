@@ -1,49 +1,52 @@
 #pragma once
 
+#include <karm-fmt/fmt.h>
+
 #include "vec.h"
 
 namespace Karm::Math {
 
+template <typename T>
 union Trans2 {
     struct
     {
-        double xx;
-        double xy;
-        double yx;
-        double yy;
+        T xx;
+        T xy;
+        T yx;
+        T yy;
 
-        double ox;
-        double oy;
+        T ox;
+        T oy;
     };
 
     struct
     {
-        Vec2<double> x;
-        Vec2<double> y;
-        Vec2<double> o;
+        Vec2<T> x;
+        Vec2<T> y;
+        Vec2<T> o;
     };
 
-    double _els[6]{};
+    T _els[6]{};
 
     constexpr Trans2() : _els{1, 0, 0, 1, 0, 0} {}
 
-    constexpr Trans2(double xx, double xy, double yx, double yy, double ox, double oy) : _els{xx, xy, yx, yy, ox, oy} {}
+    constexpr Trans2(T xx, T xy, T yx, T yy, T ox, T oy) : _els{xx, xy, yx, yy, ox, oy} {}
 
-    static constexpr Trans2 rotate(double angle) {
-        double c = cos(angle);
-        double s = sin(angle);
+    static constexpr Trans2 rotate(T angle) {
+        T c = cos(angle);
+        T s = sin(angle);
         return {c, -s, s, c, 0, 0};
     }
 
-    static constexpr Trans2 skew(double x, double y) {
+    static constexpr Trans2 skew(T x, T y) {
         return {1, x, y, 1, 0, 0};
     }
 
-    static constexpr Trans2 scale(double x, double y) {
+    static constexpr Trans2 scale(T x, T y) {
         return {x, 0, 0, y, 0, 0};
     }
 
-    static constexpr Trans2 translate(double x, double y) {
+    static constexpr Trans2 translate(T x, T y) {
         return {1, 0, 0, 1, x, y};
     }
 
@@ -66,4 +69,19 @@ union Trans2 {
     }
 };
 
+using Trans2i = Trans2<int>;
+
+using Trans2f = Trans2<double>;
+
 } // namespace Karm::Math
+
+namespace Karm::Fmt {
+
+template <typename T>
+struct Formatter<Math::Trans2<T>> {
+    Result<size_t> format(Io::_TextWriter &writer, Math::Trans2<T> trans) {
+        return Fmt::format(writer, "Trans2({}, {}, {}, {}, {}, {})", trans.xx, trans.xy, trans.yx, trans.yy, trans.ox, trans.oy);
+    }
+};
+
+} // namespace Karm::Fmt

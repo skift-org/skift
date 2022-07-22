@@ -113,9 +113,6 @@ namespace Karm::Fmt {
 
 template <>
 struct Formatter<Karm::Cli::Style> {
-    void parse(Text::Scan &) {
-    }
-
     Result<size_t> format(Io::_TextWriter &writer, Karm::Cli::Style style) {
 #ifdef __osdk_karm_cli_backend_ansi__
 
@@ -168,7 +165,11 @@ struct Formatter<Karm::Cli::Styled<T>> {
     Formatter<T> _innerFmt{};
 
     void parse(Text::Scan &scan) {
-        _innerFmt.parse(scan);
+        if constexpr (requires() {
+                          _innerFmt.parse(scan);
+                      }) {
+            _innerFmt.parse(scan);
+        }
     }
 
     Result<size_t> format(Io::_TextWriter &writer, Karm::Cli::Styled<T> const &styled) {

@@ -35,3 +35,14 @@ using Ellipsei = Ellipse<int>;
 using Ellipsef = Ellipse<double>;
 
 } // namespace Karm::Math
+
+namespace Karm::Fmt {
+
+template <typename T>
+struct Formatter<Math::Ellipse<T>> {
+    Result<size_t> format(Io::_TextWriter &writer, Math::Ellipse<T> ellipse) {
+        return Fmt::format(writer, "Ellipse({}, {}, {}, {})", ellipse.center.x, ellipse.center.y, ellipse.radius.x, ellipse.radius.y);
+    }
+};
+
+} // namespace Karm::Fmt

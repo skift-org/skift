@@ -8,7 +8,6 @@
 #include <karm-gfx/context.h>
 #include <karm-main/base.h>
 #include <karm-meta/utils.h>
-#include <karm-sys/chan.h>
 #include <karm-text/emit.h>
 
 namespace Karm::Ui {
@@ -77,7 +76,7 @@ struct _Node : Meta::Static {
     }
 
     void mountAt(NodePtr child, size_t index) {
-        Sys::println("Inserting {} at index {}, with currently {} children", _id, index, _children.len());
+        Debug::linfo("Inserting {} at index {}, with currently {} children", _id, index, _children.len());
         _children.insert(index, child);
         child->_parent = this;
         child->onMount();
@@ -293,17 +292,11 @@ struct UiClient : public Karm::App::Client {
 
     UiClient(NodePtr root) : _root(root) {}
 
-    void paint(Gfx::Context &gfx) override {
-        gfx.clear(Gfx::ZINC900);
-
-        gfx.fillStyle(Gfx::WHITE);
-
-        gfx.begin();
-        gfx.rect(Math::Rectf{10, 10, 100, 100});
-        gfx.fill();
+    void paint(Gfx::Context &) override {
     }
 
-    void handle(Events::Event &) override {}
+    void handle(Events::Event &) override {
+    }
 };
 
 ExitCode render(auto tree) {

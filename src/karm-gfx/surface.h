@@ -2,6 +2,7 @@
 
 #include <karm-math/rect.h>
 
+#include "colors.h"
 #include "formats.h"
 
 namespace Karm::Gfx {
@@ -61,6 +62,14 @@ struct Surface {
 
     void blend(Math::Vec2i const pos, Color const color) {
         store(pos, color.blendOver(load(pos)));
+    }
+
+    void clear(Color color = BLACK) {
+        for (int y = 0; y < _height; ++y) {
+            for (int x = 0; x < _width; ++x) {
+                store({x, y}, color);
+            }
+        }
     }
 };
 

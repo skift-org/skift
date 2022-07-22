@@ -171,7 +171,7 @@ struct Path {
 
     void _flattenArcTo(Math::Vec2f start, Math::Vec2f radius, float angle, Flags flags, Math::Vec2f point) {
         // Ported from canvg (https://code.google.com/p/canvg/)
-        float x1 = start.x; // start point
+        float x1 = start.x;
         float y1 = start.y;
         float x2 = point.x;
         float y2 = point.y;
@@ -251,7 +251,7 @@ struct Path {
         }
 
         // Approximate the arc using cubic spline segments.
-        Math::Trans2 t = {
+        Math::Trans2f t = {
             cosrx,
             sinrx,
             -sinrx,
@@ -270,7 +270,7 @@ struct Path {
             kappa = -kappa;
         }
 
-        Math::Vec2f current{};
+        Math::Vec2f current = start;
         Math::Vec2f ptan{};
 
         for (int i = 0; i <= ndivs; i++) {
@@ -279,11 +279,11 @@ struct Path {
             dx = cosf(a);
             dy = sinf(a);
 
-            auto p = t.apply({dx * radius.x, dy * radius.y});
-            auto tan = t.apply({-dy * radius.x * kappa, dx * radius.y * kappa});
+            auto p = t.applyPoint({dx * radius.x, dy * radius.y});
+            auto tan = t.applyVector({-dy * radius.x * kappa, dx * radius.y * kappa});
 
             if (i > 0) {
-                _flattenCubicTo(current, current + ptan, p + tan, p);
+                _flattenCubicTo(current, current + ptan, p - tan, p);
             }
 
             current = p;

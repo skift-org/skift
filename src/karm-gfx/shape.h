@@ -17,8 +17,7 @@ struct Shape : public Vec<Math::Edgef> {
                 bound = edge.bound();
             }
         }
-        auto result = tryOr(bound, {}).cast<int>();
-        return result.cast<double>();
+        return tryOr(bound, {});
     }
 };
 

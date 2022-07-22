@@ -283,4 +283,18 @@ constexpr size_t zeroFill(MutSlice<T> slice) {
     return fill(slice, {});
 }
 
+template <typename T>
+constexpr void sort(MutSlice<T> slice, auto cmp) {
+    for (size_t i = 0; i < len(slice); i++) {
+        for (size_t j = i + 1; j < len(slice); j++) {
+            auto &a = at(slice, i);
+            auto &b = at(slice, j);
+
+            if (cmp(a, b).isGt()) {
+                std::swap(a, b);
+            }
+        }
+    }
+}
+
 } // namespace Karm

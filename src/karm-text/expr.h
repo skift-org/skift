@@ -9,9 +9,9 @@ inline auto single(auto... c) {
         if (((scan.curr() == (Rune)c) || ...)) {
             scan.next();
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     };
 }
 
@@ -49,7 +49,7 @@ inline auto negate(auto expr) {
 
 /* --- Quantifiers ---------------------------------------------------------- */
 
-inline auto zero_or_more(auto expr) {
+inline auto zeroOrMore(auto expr) {
     return [=](auto &scan) {
         while (expr(scan))
             ;
@@ -57,7 +57,7 @@ inline auto zero_or_more(auto expr) {
     };
 }
 
-inline auto one_or_more(auto expr) {
+inline auto oneOrMore(auto expr) {
     return [=](auto &scan) {
         if (!expr(scan))
             return false;
@@ -67,7 +67,7 @@ inline auto one_or_more(auto expr) {
     };
 }
 
-inline auto zero_or_one(auto expr) {
+inline auto zeroOrOne(auto expr) {
     return [=](auto &scan) {
         expr(scan);
         return true;
@@ -124,16 +124,16 @@ inline auto blank() {
 
 inline auto separator(Rune r) {
     return chain(
-        zero_or_more(space()),
+        zeroOrMore(space()),
         single(r),
-        zero_or_more(space()));
+        zeroOrMore(space()));
 }
 
 inline auto separator(Str w) {
     return chain(
-        zero_or_more(space()),
+        zeroOrMore(space()),
         word(w),
-        zero_or_more(space()));
+        zeroOrMore(space()));
 }
 
 } // namespace Karm::Re

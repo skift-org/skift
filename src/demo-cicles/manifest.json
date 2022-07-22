@@ -1,0 +1,9 @@
+{
+    "id": "demo-circles",
+    "type": "exe",
+    "description": "A graphical demo featuring circles",
+    "deps": [
+        "karm-main",
+        "karm-app"
+    ]
+}

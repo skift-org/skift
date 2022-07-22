@@ -43,6 +43,7 @@ struct Host : public Meta::Static {
     Error run() {
         _alive = true;
 
+        surface().clear(Gfx::ZINC900);
         paint();
         while (_alive) {
             wait(-1);
@@ -58,5 +59,7 @@ struct Host : public Meta::Static {
         _result = result;
     }
 };
+
+Result<Strong<Karm::App::Host>> makeHost(Box<App::Client> &&client);
 
 } // namespace Karm::App

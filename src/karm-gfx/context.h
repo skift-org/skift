@@ -49,7 +49,7 @@ struct Context {
     };
 
     struct Active {
-        float x;
+        double x;
         int sign;
     };
 
@@ -67,7 +67,7 @@ struct Context {
     void begin(Surface &c) {
         _surface = &c;
         _stack.pushBack({
-            .clip = Surface().bound(),
+            .clip = surface().bound(),
         });
 
         _scanline.resize(c.width());
@@ -78,7 +78,7 @@ struct Context {
         _surface = nullptr;
     }
 
-    Surface &Surface() {
+    Surface &surface() {
         return *_surface;
     }
 
@@ -164,14 +164,14 @@ struct Context {
 
     /* --- Drawing ---------------------------------------------------------- */
 
-    void clear(Color color = BLACK) { clear(Surface().bound(), color); }
+    void clear(Color color = BLACK) { clear(surface().bound(), color); }
 
     void clear(Math::Recti rect, Color color = BLACK) {
         rect = applyAll(rect);
 
         for (int y = rect.y; y < rect.y + rect.height; y++) {
             for (int x = rect.x; x < rect.x + rect.width; x++) {
-                Surface().store({x, y}, color);
+                surface().store({x, y}, color);
             }
         }
     }
@@ -181,7 +181,7 @@ struct Context {
     void plot(Math::Vec2i point, Color color) {
         point = applyOrigin(point);
         if (clip().contains(point)) {
-            Surface().store(point, color);
+            surface().store(point, color);
         }
     }
 
@@ -196,7 +196,7 @@ struct Context {
 
         for (int y = rect.y; y < rect.y + rect.height; y++) {
             for (int x = rect.x; x < rect.x + rect.width; x++) {
-                Surface().blend({x, y}, fillStyle().color());
+                surface().blend({x, y}, fillStyle().color());
             }
         }
     }
@@ -315,21 +315,72 @@ struct Context {
         _path.ellipse(ellipse);
     }
 
-    void _fill() {
-        auto shapeBound = _shape.bound();
-        fill(shapeBound.cast<int>());
+    void _fill(Color color) {
+        static constexpr auto AA = 4;
+        static constexpr auto UNIT = 1.0f / AA;
+        static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;
+
+        auto rect = applyClip(_shape.bound().ceil().cast<int>());
+
+        for (int y = rect.top(); y < rect.bottom(); y++) {
+            zeroFill<double>(_scanline);
+
+            for (double yy = y; yy < y + 1.0; yy += UNIT) {
+                _active.clear();
+                for (auto &edge : _shape) {
+                    auto sample = yy + HALF_UNIT;
+
+                    if (edge.bound().top() <= sample && sample < edge.bound().bottom()) {
+                        _active.pushBack({
+                            .x = edge.sx + (sample - edge.sy) / (edge.ey - edge.sy) * (edge.ex - edge.sx),
+                            .sign = edge.sy > edge.ey ? 1 : -1,
+                        });
+                    }
+                }
+
+                if (_active.len() == 0) {
+                    continue;
+                }
+
+                sort<Active>(_active, [](auto const &a, auto const &b) {
+                    return cmp(a.x, b.x);
+                });
+
+                int r = 0;
+                for (size_t i = 0; i + 1 < _active.len(); i++) {
+                    double x1 = _active[i].x;
+                    double x2 = _active[i + 1].x;
+                    int sign = _active[i].sign;
+
+                    r += sign;
+                    if (r == 0) {
+                        continue;
+                    }
+
+                    for (double x = max(x1, rect.start()); x <= min(x2, rect.end()); x += UNIT) {
+                        _scanline[x] += 1.0;
+                    }
+                }
+
+                for (int x = rect.start(); x < rect.end(); x++) {
+                    if (_scanline[x] > 0) {
+                        surface().blend({x, y}, color.withOpacity(_scanline[x] / (AA * AA)));
+                    }
+                }
+            }
+        }
     }
 
     void fill() {
         _shape.clear();
         createSolid(_path, _shape);
-        _fill();
+        _fill(fillStyle().color());
     }
 
     void stroke() {
         _shape.clear();
         createStroke(_path, _shape);
-        _fill();
+        _fill(strokeStyle().color());
     }
 
     void shadow() {}

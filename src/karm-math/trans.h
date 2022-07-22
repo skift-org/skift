@@ -50,11 +50,15 @@ union Trans2 {
         return {1, 0, 0, 1, x, y};
     }
 
-    constexpr Vec2f apply(Vec2f v) const {
+    constexpr Vec2<T> applyVector(Vec2<T> v) const {
         return {
             v.x * xx + v.y * xy,
             v.x * yx + v.y * yy,
         };
+    }
+
+    constexpr Vec2<T> applyPoint(Vec2<T> v) const {
+        return applyVector(v) + o;
     }
 
     constexpr Trans2 operator*(Trans2 const &other) const {

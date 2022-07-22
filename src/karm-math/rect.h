@@ -143,6 +143,24 @@ union Rect {
             static_cast<U>(height),
         };
     }
+
+    Rect<T> ceil() {
+        return {
+            ::floor(x),
+            ::floor(y),
+            ::ceil(width),
+            ::ceil(height),
+        };
+    }
+
+    Rect<T> floor() {
+        return {
+            ::ceil(x),
+            ::ceil(y),
+            ::floor(width),
+            ::floor(height),
+        };
+    }
 };
 
 using Recti = Rect<int>;

@@ -3,6 +3,7 @@
 #include <karm-base/enum.h>
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
+#include <karm-debug/logger.h>
 #include <karm-math/edge.h>
 #include <karm-math/ellipse.h>
 #include <karm-math/funcs.h>
@@ -100,7 +101,7 @@ struct Path {
     struct Seg : public Slice<Math::Vec2f> {
         bool close;
         Seg(Slice<Math::Vec2f> slice, bool close)
-            : Slice<Math::Vec2f>(&first(slice), &last(slice)), close(close) {}
+            : Slice<Math::Vec2f>(slice), close(close) {}
     };
 
     Vec<_Seg> _segs{};

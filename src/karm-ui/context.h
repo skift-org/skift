@@ -309,9 +309,6 @@ struct UiClient : public Karm::App::Client {
 ExitCode render(auto tree) {
     Context ctx{};
     NodePtr root = tree(ctx);
-    // Text::Emit emit{Sys::out()};
-    //  root->dumps(emit);
-
     Box<Karm::App::Client> client = makeBox<UiClient>(root);
     auto host = try$(Embed::makeHost(std::move(client)));
     return host->run();

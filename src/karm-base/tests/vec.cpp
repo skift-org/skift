@@ -3,7 +3,7 @@
 #include "../vec.h"
 
 template <typename V>
-Error test_vec(Driver &_driver) {
+Error testVec(Driver &_driver) {
     describe$("constructor") {
         it$("should be empty when created") {
             V v;
@@ -211,11 +211,11 @@ Error test_vec(Driver &_driver) {
 }
 
 test$("Vec") {
-    try$(test_vec<Vec<int>>(_driver));
+    try$(testVec<Vec<int>>(_driver));
     return OK;
 }
 
 test$("InlineVec") {
-    try$((test_vec<InlineVec<int, 10>>(_driver)));
+    try$((testVec<InlineVec<int, 10>>(_driver)));
     return OK;
 }

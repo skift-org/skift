@@ -315,6 +315,36 @@ struct Context {
         _path.ellipse(ellipse);
     }
 
+    void _line(Math::Edgei edge, Color color) {
+        int dx = abs(edge.ex - edge.sx), sx = edge.sx < edge.ex ? 1 : -1;
+        int dy = -abs(edge.ey - edge.sy), sy = edge.sy < edge.ey ? 1 : -1;
+        int err = dx + dy, e2;
+
+        for (;;) {
+            plot({edge.sx, edge.sy}, color);
+            if (edge.sx == edge.ex && edge.sy == edge.ey)
+                break;
+            e2 = 2 * err;
+            if (e2 >= dy) {
+                err += dy;
+                edge.sx += sx;
+            }
+            if (e2 <= dx) {
+                err += dx;
+                edge.sy += sy;
+            }
+        }
+    }
+
+    void _trace() {
+        for (auto edge : _shape) {
+            _line(edge.cast<int>(), WHITE);
+        }
+        for (auto edge : _shape) {
+            plot(edge.cast<int>().end, RED);
+        }
+    }
+
     void _fill(Color color) {
         static constexpr auto AA = 4;
         static constexpr auto UNIT = 1.0f / AA;
@@ -357,7 +387,7 @@ struct Context {
                         continue;
                     }
 
-                    for (double x = max(x1, rect.start()); x <= min(x2, rect.end()); x += UNIT) {
+                    for (double x = max(x1, rect.start()); x < min(x2, rect.end()); x += UNIT) {
                         _scanline[x] += 1.0;
                     }
                 }

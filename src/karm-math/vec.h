@@ -35,8 +35,16 @@ union Vec2 {
         return x * other.x + y * other.y;
     }
 
+    constexpr T cross(Vec2 const &other) const {
+        return x * other.y - y * other.x;
+    }
+
     constexpr T len() const {
         return sqrt(dot(*this));
+    }
+
+    constexpr T lenSq() const {
+        return dot(*this);
     }
 
     constexpr T dist(Vec2 const &other) const {

@@ -128,6 +128,10 @@ struct Path {
     /* --- Flattening ------------------------------------------------------- */
 
     void _flattenLineTo(Math::Vec2f p) {
+        if (_segs.len() == 0) {
+            panic("move to must be called before line to");
+        }
+
         _verts.pushBack(p);
         last(_segs).end++;
     }
@@ -289,8 +293,6 @@ struct Path {
             current = p;
             ptan = tan;
         }
-
-        _flattenLineTo(point);
     }
 
     /* --- Operations ------------------------------------------------------- */
@@ -312,7 +314,6 @@ struct Path {
             break;
 
         case CLOSE:
-            _flattenLineTo(_verts[last(_segs).start]);
             last(_segs).close = true;
             break;
 
@@ -417,8 +418,8 @@ struct Path {
         auto bound = ellipse.bound();
 
         moveTo(bound.topCenter());
-        arcTo(ellipse.radius, 0, bound.bottomCenter());
-        arcTo(ellipse.radius, 0, bound.topCenter());
+        arcTo(ellipse.radius, 0, bound.bottomCenter(), Gfx::Path::SWEEP);
+        arcTo(ellipse.radius, 0, bound.topCenter(), Gfx::Path::SWEEP);
         close();
     }
 

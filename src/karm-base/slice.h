@@ -40,7 +40,9 @@ struct Slice {
     constexpr Slice(Sliceable<T> auto &other)
         : Slice(other.buf(), other.len()) {}
 
-    constexpr T const &operator[](size_t i) const { return _buf[i]; }
+    constexpr T const &operator[](size_t i) const {
+        return _buf[i];
+    }
 
     constexpr T const *buf() const { return _buf; }
 

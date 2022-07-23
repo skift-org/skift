@@ -45,8 +45,8 @@ struct StrokeStyle {
     };
 
     enum struct Join {
-        MITER,
         BEVEL,
+        MITER,
         ROUND,
     };
 

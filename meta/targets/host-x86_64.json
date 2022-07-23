@@ -1,17 +1,19 @@
 {
-    "id": "clang",
+    "id": "host-x86_64",
     "type": "target",
     "props": {
         "toolchain": "clang",
         "arch": "x86_64",
-        "sys": ["@uname", "sysname"],
+        "sys": [
+            "@uname",
+            "sysname"
+        ],
         "abi": "unknown",
         "freestanding": false,
         "host": true,
-
         "karm-sys-encoding": "utf8",
         "karm-cli-backend": "ansi",
-        "karm-ui-backend" : "sdl"
+        "karm-ui-backend": "sdl"
     },
     "tools": {
         "cc": {

@@ -40,8 +40,16 @@ union Edge {
         return end - start;
     }
 
+    constexpr Vec2<T> invDir() const {
+        return start - end;
+    }
+
     constexpr T len() const {
         return dir().len();
+    }
+
+    constexpr T lenSq() const {
+        return dir().lenSq();
     }
 
     constexpr T operator[](int i) const {

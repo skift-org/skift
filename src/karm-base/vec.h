@@ -111,9 +111,13 @@ struct _Vec {
 
     constexpr T const *buf() const { return _buf.buf(); }
 
-    constexpr T &operator[](size_t i) { return _buf[i]; }
+    constexpr T &operator[](size_t i) {
+        return _buf[i];
+    }
 
-    constexpr T const &operator[](size_t i) const { return _buf[i]; }
+    constexpr T const &operator[](size_t i) const {
+        return _buf[i];
+    }
 };
 
 template <typename T>

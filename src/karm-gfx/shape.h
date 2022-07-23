@@ -27,8 +27,8 @@ static void createSolid(Path &path, Shape &shape) {
         if (!seg.close)
             continue;
 
-        for (size_t i = 0; i < seg.len() - 1; i++) {
-            shape.pushBack({seg[i], seg[i + 1]});
+        for (size_t i = 0; i < seg.len(); i++) {
+            shape.pushBack({seg[i], seg[(i + 1) % seg.len()]});
         }
     }
 }
@@ -39,21 +39,22 @@ static void createArc(Shape &shape, Math::Vec2f center, double startAngle, doubl
 */
 
 static void _createJoinBevel(Shape &shape, Math::Edgef curr, Math::Edgef next) {
-    shape.add({curr.end, next.start});
+    Math::Edgef edge{curr.end, next.start};
+    if (edge.lenSq() >= 0.01) {
+        shape.add({curr.end, next.start});
+    }
 }
 
-static void _createJoinMiter(Shape &shape, Math::Edgef curr, Math::Edgef next, float width) {
-    auto currVec = curr.end - curr.start;
-    auto nextVec = next.start - next.end;
-    auto diffVec = next.start - curr.start;
+static void _createJoinMiter(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float width) {
+    auto currVec = curr.dir();
+    auto nextVec = next.invDir();
+    auto diffVec = next.start - curr.end;
 
-    auto mitterLimit = width * 4;
-    auto j = nextVec.dot(diffVec) / currVec.dot(nextVec);
-    auto v = curr.start + (currVec.norm() * j);
+    double mitterLimit = width * 4;
+    auto j = nextVec.cross(diffVec) / nextVec.cross(currVec);
+    auto v = curr.end + (currVec * j);
 
-    Debug::ldebug("J: {}", (int)j);
-
-    if (j < 0 || j > mitterLimit) {
+    if (j < 0 || (corner - v).lenSq() > mitterLimit * mitterLimit) {
         _createJoinBevel(shape, curr, next);
         return;
     }
@@ -68,13 +69,13 @@ static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, f
 }
 */
 
-[[maybe_unused]] static void _createJoin(Shape &shape, Math::Edgef curr, Math::Edgef next, float width, StrokeStyle::Join join) {
+[[maybe_unused]] static void _createJoin(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float width, StrokeStyle::Join join) {
     switch (join) {
     case StrokeStyle::Join::BEVEL:
         _createJoinBevel(shape, curr, next);
         break;
     case StrokeStyle::Join::MITER:
-        _createJoinMiter(shape, curr, next, width);
+        _createJoinMiter(shape, curr, next, corner, width);
         break;
     /*case Stroke::Join::ROUND:
         _createJoinRound(shape, curr, next, width);
@@ -128,8 +129,8 @@ static void createStroke(Path const &path, Shape &shape, StrokeStyle stroke) {
     double innerDist = outerDist + stroke.width;
 
     for (auto seg : path.iterSegs()) {
-        for (size_t i = 0; i + 1 < seg.len(); i++) {
-            Math::Edgef curr = {seg[i], seg[i + 1]};
+        for (size_t i = 0; i < seg.len(); i++) {
+            Math::Edgef curr = {seg[i], seg[(i + 1) % seg.len()]};
 
             auto outerCurr = curr.parallel(outerDist);
             auto innerCurr = curr.parallel(innerDist).swap();
@@ -147,18 +148,19 @@ static void createStroke(Path const &path, Shape &shape, StrokeStyle stroke) {
             }
 */
 
-            if (i < seg.len() - 1) {
-                auto nextIndex = (i == seg.len() - 2) && seg.close ? 0 : i + 1;
-                Math::Edgef next = {seg[nextIndex], seg[nextIndex + 1]};
+            if (seg.close) {
+                Math::Edgef next = {
+                    seg[(i + 1) % seg.len()],
+                    seg[(i + 2) % seg.len()],
+                };
 
                 auto outerNext = next.parallel(outerDist);
                 auto innerNext = next.parallel(innerDist).swap();
 
                 if (outerDist < -0.001)
-                    _createJoin(shape, outerCurr, outerNext, stroke.width, stroke.join);
-
+                    _createJoin(shape, outerCurr, outerNext, curr.end, stroke.width, stroke.join);
                 if (innerDist > 0.001)
-                    _createJoin(shape, innerNext, innerCurr, stroke.width, stroke.join);
+                    _createJoin(shape, innerNext, innerCurr, curr.end, stroke.width, stroke.join);
             }
         }
     }

@@ -110,7 +110,7 @@ struct Path {
     Math::Vec2f _lastCp;
     Math::Vec2f _lastP;
 
-    auto iterSegs() {
+    auto iterSegs() const {
         return Iter([&, i = 0uz]() mutable -> Opt<Seg> {
             if (i >= _segs.len()) {
                 return NONE;

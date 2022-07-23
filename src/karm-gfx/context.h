@@ -242,7 +242,7 @@ struct Context {
     }
 
     void stroke(Math::Vec2i baseline, Rune rune) {
-        _draw(baseline, rune, strokeStyle().color());
+        _draw(baseline, rune, strokeStyle().color);
     }
 
     void fill(Math::Vec2i baseline, Rune rune) {
@@ -379,8 +379,8 @@ struct Context {
 
     void stroke() {
         _shape.clear();
-        createStroke(_path, _shape);
-        _fill(strokeStyle().color());
+        createStroke(_path, _shape, strokeStyle());
+        _fill(strokeStyle().color);
     }
 
     void shadow() {}

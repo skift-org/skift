@@ -27,6 +27,15 @@ union Edge {
         return Rect<T>::fromTwoPoint(start, end);
     }
 
+    constexpr Edge<T> parallel(T offset) {
+        auto d = end - start;
+        double scale = offset / d.len();
+        Vec2<T> o = {-d.y * scale, d.x * scale};
+        auto s = start + o;
+        auto e = end + o;
+        return {s, e};
+    }
+
     constexpr Vec2<T> dir() const {
         return end - start;
     }
@@ -45,6 +54,10 @@ union Edge {
             start.template cast<U>(),
             end.template cast<U>(),
         };
+    }
+
+    constexpr Edge<T> swap() const {
+        return {end, start};
     }
 };
 

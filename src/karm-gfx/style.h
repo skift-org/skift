@@ -1,5 +1,9 @@
 #pragma once
 
+#include <karm-math/vec.h>
+
+#include "colors.h"
+
 namespace Karm::Gfx {
 
 /* ---- Fill Style ---------------------------------------------------------- */
@@ -7,9 +11,11 @@ namespace Karm::Gfx {
 struct FillStyle {
     Color _color{};
 
-    constexpr FillStyle() : _color(WHITE) {}
+    constexpr FillStyle()
+        : _color(WHITE) {}
 
-    constexpr FillStyle(Color color) : _color(color) {}
+    constexpr FillStyle(Color color)
+        : _color(color) {}
 
     constexpr Color color() const { return _color; }
 
@@ -25,47 +31,65 @@ static inline constexpr FillStyle fill(auto... args) {
 
 /* --- Stroke Style --------------------------------------------------------- */
 
-enum struct StrokePosition {
-    CENTER,
-    INSIDE,
-    OUTSIDE,
-};
-
-using enum StrokePosition;
-
 struct StrokeStyle {
-    Color _color{};
-    StrokePosition _position{};
-    double _thickness{};
+    enum struct Align {
+        CENTER,
+        INSIDE,
+        OUTSIDE,
+    };
 
-    constexpr StrokeStyle() : _color(WHITE), _thickness(1) {}
+    enum struct Cap {
+        BUTT,
+        SQUARE,
+        ROUND,
+    };
 
-    constexpr StrokeStyle(Color color) : _color(color), _thickness(1) {}
+    enum struct Join {
+        MITER,
+        BEVEL,
+        ROUND,
+    };
 
-    constexpr Color color() const { return _color; }
+    Color color{};
+    double width{1};
+    Align align{};
+    Cap cap{};
+    Join join{};
 
-    constexpr StrokeStyle color(Color color) {
-        _color = color;
+    constexpr StrokeStyle()
+        : color(WHITE) {}
+
+    constexpr StrokeStyle(Color color)
+        : color(color) {}
+
+    constexpr auto with(Color c) {
+        color = c;
         return *this;
     }
 
-    constexpr StrokePosition position() const { return _position; }
-
-    constexpr StrokeStyle position(StrokePosition position) {
-        _position = position;
+    constexpr auto with(double w) {
+        width = w;
         return *this;
     }
 
-    constexpr double thickness() const { return _thickness; }
+    constexpr auto with(Align a) {
+        align = a;
+        return *this;
+    }
 
-    constexpr StrokeStyle thickness(double thickness) {
-        _thickness = thickness;
+    constexpr auto with(Cap c) {
+        cap = c;
+        return *this;
+    }
+
+    constexpr auto with(Join j) {
+        join = j;
         return *this;
     }
 };
 
 static inline constexpr StrokeStyle stroke(auto... args) {
-    return StrokeStyle(args...);
+    return {args...};
 }
 
 /* --- Text Style ----------------------------------------------------------- */
@@ -93,25 +117,17 @@ static inline TextStyle text(auto... args) {
 
 struct ShadowStyle {
     Color _color{};
-    float _spread{};
     float _radius{};
     Math::Vec2f _offset{};
 
-    constexpr ShadowStyle() : _color(BLACK), _spread(0.0f), _radius(0.0f), _offset(0.0f) {}
+    constexpr ShadowStyle() : _color(BLACK) {}
 
-    constexpr ShadowStyle(Color paint) : _color(paint), _spread(0.0f), _radius(0.0f), _offset(0.0f) {}
+    constexpr ShadowStyle(Color paint) : _color(paint) {}
 
     constexpr Color color() const { return _color; }
 
     constexpr ShadowStyle color(Color paint) {
         _color = paint;
-        return *this;
-    }
-
-    constexpr float spread() const { return _spread; }
-
-    constexpr ShadowStyle spread(float spread) {
-        _spread = spread;
         return *this;
     }
 

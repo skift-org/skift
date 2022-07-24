@@ -33,5 +33,5 @@ struct CircleClient : public Karm::App::Client {
 };
 
 ExitCode entryPoint(CliArgs const &) {
-    return try$(App::makeHost(makeBox<CircleClient>()))->run();
+    return App::run<CircleClient>();
 }

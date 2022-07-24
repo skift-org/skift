@@ -62,4 +62,9 @@ struct Host : public Meta::Static {
 
 Result<Strong<Karm::App::Host>> makeHost(Box<App::Client> &&client);
 
+template <typename T, typename... Args>
+static inline Error run(Args &&...args) {
+    return try$(makeHost(makeBox<T>(std::forward<Args>(args)...)))->run();
+}
+
 } // namespace Karm::App

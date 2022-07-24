@@ -1,10 +1,9 @@
 #include <karm-app/host.h>
 #include <karm-main/main.h>
-#include <karm-math/rand.h>
 
-struct CircleClient : public Karm::App::Client {
-    bool _trace{};
-    Math::Vec2i _mousePos{200, 300};
+struct StrokeClient : public App::Client {
+    bool _trace{true};
+    Math::Vec2i _mousePos{300, 300};
 
     void paint(Gfx::Context &g) override {
 
@@ -26,16 +25,16 @@ struct CircleClient : public Karm::App::Client {
     }
 
     void handle(Events::Event &e) override {
-        e.handle<Events::MouseEvent>([&](auto const &e) {
-            if (e.type == Events::MouseEvent::RELEASE) {
+        e.handle<Events::MouseEvent>([&](auto const &m) {
+            if (m.type == Events::MouseEvent::RELEASE) {
                 _trace = !_trace;
             }
-            _mousePos = e.pos;
+            _mousePos = m.pos;
             return true;
         });
     }
 };
 
 ExitCode entryPoint(CliArgs const &) {
-    return try$(App::makeHost(makeBox<CircleClient>()))->run();
+    return App::run<StrokeClient>();
 }

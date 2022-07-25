@@ -101,6 +101,13 @@ template <Meta::SignedIntegral T>
 struct Formatter<T> : public SignedFormatter<T> {};
 
 template <>
+struct Formatter<Rune> {
+    Result<size_t> format(Io::_TextWriter &writer, Rune rune) {
+        return writer.writeRune(rune);
+    }
+};
+
+template <>
 struct Formatter<Str> {
     Result<size_t> format(Io::_TextWriter &writer, Str text) {
         return writer.writeStr(text);

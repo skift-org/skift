@@ -2,9 +2,9 @@
 
 #include <karm-base/clamp.h>
 #include <karm-base/try.h>
-#include <karm-debug/logger.h>
 #include <karm-gfx/path.h>
 
+#include "path.h"
 #include "style.h"
 
 namespace Karm::Gfx {
@@ -64,10 +64,16 @@ static void createSolid(Path &path, Shape &shape) {
     }
 }
 
-/*
-static void createArc(Shape &shape, Math::Vec2f center, double startAngle, double endAngle, double radius) {
+static void _createArc(Shape &shape, Math::Vec2f center, double startAngle, double delta, double radius) {
+    int devision = 32;
+    double step = delta / devision;
+    for (int i = 0; i < devision; i++) {
+        double sa = startAngle + step * i;
+        double ea = startAngle + step * (i + 1);
+        shape.add({center + Math::Vec2f{radius * std::cos(sa), radius * std::sin(sa)},
+                   center + Math::Vec2f{radius * std::cos(ea), radius * std::sin(ea)}});
+    }
 }
-*/
 
 static void _createJoinBevel(Shape &shape, Math::Edgef curr, Math::Edgef next) {
     shape.add({curr.end, next.start});
@@ -97,16 +103,28 @@ static void _createJoinMiter(Shape &shape, Math::Edgef curr, Math::Edgef next, M
     shape.add({v, next.start});
 }
 
-/*
-static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, float width) {
+static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float radius) {
+    double startAngle = (curr.end - corner).angle();
+    double endAngle = (next.start - corner).angle();
 
-}
-*/
+    if (startAngle > endAngle) {
+        startAngle -= Math::TAU;
+    }
 
-[[maybe_unused]] static void _createJoin(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float width, StrokeStyle::Join join) {
-    /*if (Math::epsilonEq(curr.end, next.start, 0.001)) {
+    double delta = endAngle - startAngle;
+
+    if (delta > Math::PI) {
+        _createJoinBevel(shape, curr, next);
         return;
-    }*/
+    }
+
+    _createArc(shape, corner, startAngle, delta, radius);
+}
+
+[[maybe_unused]] static void _createJoin(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float width, float radius, StrokeStyle::Join join) {
+    if (Math::epsilonEq(curr.end, next.start, 0.001)) {
+        return;
+    }
 
     switch (join) {
     case StrokeStyle::Join::BEVEL:
@@ -115,9 +133,9 @@ static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, f
     case StrokeStyle::Join::MITER:
         _createJoinMiter(shape, curr, next, corner, width);
         break;
-    /*case Stroke::Join::ROUND:
-        _createJoinRound(shape, curr, next, width);
-        break;*/
+    case StrokeStyle::Join::ROUND:
+        _createJoinRound(shape, curr, next, corner, radius);
+        break;
     default:
         panic("unknown join type");
     }
@@ -134,12 +152,20 @@ static void _createCapSquare(Shape &shape, Math::Vec2f start, Math::Vec2f end, f
     shape.add({e.end, end});
 }
 
-/*
-static void _createCapRound(Shape &shape, Math::Vec2f start, Math::Vec2f end, float width) {
-}
-*/
+static void _createCapRound(Shape &shape, Math::Vec2f start, Math::Vec2f end, Math::Vec2f center, float width) {
+    double startAngle = (start - center).angle();
+    double endAngle = (end - center).angle();
 
-[[maybe_unused]] static void _createCap(Shape &shape, Math::Vec2f start, Math::Vec2f end, float width, StrokeStyle::Cap cap) {
+    if (startAngle > endAngle) {
+        startAngle -= Math::TAU;
+    }
+
+    double delta = endAngle - startAngle;
+
+    _createArc(shape, center, startAngle, delta, width / 2);
+}
+
+[[maybe_unused]] static void _createCap(Shape &shape, Math::Vec2f start, Math::Vec2f end, Math::Vec2f center, float width, StrokeStyle::Cap cap) {
     switch (cap) {
     case StrokeStyle::Cap::BUTT:
         _createCapButt(shape, start, end);
@@ -147,9 +173,9 @@ static void _createCapRound(Shape &shape, Math::Vec2f start, Math::Vec2f end, fl
     case StrokeStyle::Cap::SQUARE:
         _createCapSquare(shape, start, end, width);
         break;
-    /*case StrokeStyle::Cap::ROUND:
-        _createCapRound(shape, start, end, width);
-        break;*/
+    case StrokeStyle::Cap::ROUND:
+        _createCapRound(shape, start, end, center, width);
+        break;
     default:
         panic("unknown cap type");
     }
@@ -179,11 +205,13 @@ static void createStroke(Path const &path, Shape &shape, StrokeStyle stroke) {
             shape.add(innerCurr);
 
             if (i == 0 && !seg.close) {
-                _createCap(shape, innerCurr.end, outerCurr.start, stroke.width, stroke.cap);
+                auto center = (innerCurr.end + outerCurr.start) / 2;
+                _createCap(shape, innerCurr.end, outerCurr.start, center, stroke.width, stroke.cap);
             }
 
             if (i + 1 == l && !seg.close) {
-                _createCap(shape, outerCurr.end, innerCurr.start, stroke.width, stroke.cap);
+                auto center = (outerCurr.end + innerCurr.start) / 2;
+                _createCap(shape, outerCurr.end, innerCurr.start, center, stroke.width, stroke.cap);
             }
 
             if (seg.close || i + 1 != l) {
@@ -196,9 +224,10 @@ static void createStroke(Path const &path, Shape &shape, StrokeStyle stroke) {
                 auto innerNext = next.parallel(innerDist).swap();
 
                 if (outerDist < -0.001)
-                    _createJoin(shape, outerCurr, outerNext, curr.end, stroke.width, stroke.join);
+                    _createJoin(shape, outerCurr, outerNext, curr.end, stroke.width, abs(outerDist), stroke.join);
+
                 if (innerDist > 0.001)
-                    _createJoin(shape, innerNext, innerCurr, curr.end, stroke.width, stroke.join);
+                    _createJoin(shape, innerNext, innerCurr, curr.end, stroke.width, abs(innerDist), stroke.join);
             }
         }
     }

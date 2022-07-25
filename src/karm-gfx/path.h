@@ -3,7 +3,7 @@
 #include <karm-base/enum.h>
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
-#include <karm-debug/logger.h>
+#include <karm-math/const.h>
 #include <karm-math/edge.h>
 #include <karm-math/ellipse.h>
 #include <karm-math/funcs.h>

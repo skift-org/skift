@@ -161,6 +161,10 @@ union Rect {
             ::floor(height),
         };
     }
+
+    bool hasNan() const {
+        return xy.hasNan() || wh.hasNan();
+    }
 };
 
 using Recti = Rect<int>;

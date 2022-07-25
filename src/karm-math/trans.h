@@ -71,6 +71,10 @@ union Trans2 {
             ox * other.xy + oy * other.yy + other.oy,
         };
     }
+
+    bool hasNan() const {
+        return x.hasNan() || y.hasNan() || o.hasNan();
+    }
 };
 
 using Trans2i = Trans2<int>;

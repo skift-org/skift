@@ -15,10 +15,11 @@ struct StrokeClient : public App::Client {
         g.lineTo({200, 600});
         g.close();
 
-        g.strokeStyle(Gfx::stroke(Gfx::BLUE500)
-                          .with(Gfx::StrokeStyle::Align::CENTER)
-                          .with(Gfx::StrokeStyle::Join::MITER)
-                          .with(72));
+        g.strokeStyle(
+            Gfx::stroke(Gfx::BLUE500)
+                .with(Gfx::StrokeStyle::Align::CENTER)
+                .with(Gfx::StrokeStyle::Join::MITER)
+                .with(72));
         g.stroke();
         if (_trace)
             g._trace();

@@ -76,6 +76,10 @@ struct Rand {
         return nextU32() / (float)0xffffffff * max;
     }
 
+    bool nextBool() {
+        return nextU32() % 2;
+    }
+
     template <typename T>
     Vec2<T> nextVec2(Rect<T> bound) {
         return Vec2<T>(nextDouble(bound.start(), bound.end()),

@@ -28,6 +28,10 @@ struct Ellipse {
     constexpr Ellipse<U> cast() {
         return {center.template cast<U>(), radius.template cast<U>()};
     }
+
+    bool hasNan() {
+        return center.hasNan() || radius.hasNan();
+    }
 };
 
 using Ellipsei = Ellipse<int>;

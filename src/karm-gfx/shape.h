@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/clamp.h>
 #include <karm-base/try.h>
 #include <karm-debug/logger.h>
 #include <karm-gfx/path.h>
@@ -8,7 +9,9 @@
 
 namespace Karm::Gfx {
 
-struct Shape : public Vec<Math::Edgef> {
+struct Shape {
+    Vec<Math::Edgef> _edges{};
+
     Math::Rectf bound() const {
         Opt<Math::Rectf> bound{};
         for (auto const &edge : *this) {
@@ -20,6 +23,37 @@ struct Shape : public Vec<Math::Edgef> {
         }
         return tryOr(bound, {});
     }
+
+    Math::Edgef const &operator[](size_t i) const {
+        return _edges[i];
+    }
+
+    Math::Edgef const *buf() const {
+        return _edges.buf();
+    }
+
+    size_t len() const {
+        return _edges.len();
+    }
+
+    Math::Edgef const *begin() const {
+        return buf();
+    }
+
+    Math::Edgef const *end() const {
+        return buf() + len();
+    }
+
+    void add(Math::Edgef const &edge) {
+        if (edge.hasNan()) {
+            panic("NaN in edge");
+        }
+        _edges.add(edge);
+    }
+
+    void clear() {
+        _edges.clear();
+    }
 };
 
 static void createSolid(Path &path, Shape &shape) {
@@ -28,7 +62,7 @@ static void createSolid(Path &path, Shape &shape) {
             continue;
 
         for (size_t i = 0; i < seg.len(); i++) {
-            shape.pushBack({seg[i], seg[(i + 1) % seg.len()]});
+            shape.add({seg[i], seg[(i + 1) % seg.len()]});
         }
     }
 }
@@ -39,10 +73,7 @@ static void createArc(Shape &shape, Math::Vec2f center, double startAngle, doubl
 */
 
 static void _createJoinBevel(Shape &shape, Math::Edgef curr, Math::Edgef next) {
-    Math::Edgef edge{curr.end, next.start};
-    if (edge.lenSq() >= 0.01) {
-        shape.add({curr.end, next.start});
-    }
+    shape.add({curr.end, next.start});
 }
 
 static void _createJoinMiter(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float width) {
@@ -51,6 +82,12 @@ static void _createJoinMiter(Shape &shape, Math::Edgef curr, Math::Edgef next, M
     auto diffVec = next.start - curr.end;
 
     double mitterLimit = width * 4;
+    auto c = nextVec.cross(currVec);
+
+    if (abs(c) < 0.001) {
+        return;
+    }
+
     auto j = nextVec.cross(diffVec) / nextVec.cross(currVec);
     auto v = curr.end + (currVec * j);
 
@@ -70,6 +107,10 @@ static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, f
 */
 
 [[maybe_unused]] static void _createJoin(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float width, StrokeStyle::Join join) {
+    /*if (Math::epsilonEq(curr.end, next.start, 0.001)) {
+        return;
+    }*/
+
     switch (join) {
     case StrokeStyle::Join::BEVEL:
         _createJoinBevel(shape, curr, next);

@@ -127,9 +127,22 @@ struct Path {
 
     /* --- Flattening ------------------------------------------------------- */
 
+    void _flattenClose() {
+        if (Math::epsilonEq(_lastP, _verts[last(_segs).start], 0.001)) {
+            _verts.popBack();
+            last(_segs).end--;
+        }
+
+        last(_segs).close = true;
+    }
+
     void _flattenLineTo(Math::Vec2f p) {
         if (_segs.len() == 0) {
             panic("move to must be called before line to");
+        }
+
+        if (Math::epsilonEq(_lastP, p, 0.001)) {
+            return;
         }
 
         _verts.pushBack(p);
@@ -298,6 +311,13 @@ struct Path {
     /* --- Operations ------------------------------------------------------- */
 
     void evalOp(Op op) {
+        if (_segs.len() > 0 &&
+            last(_segs).close &&
+            op.code != MOVE_TO &&
+            op.code != CLEAR) {
+            panic("can't evalOp on closed path");
+        }
+
         if (op.flags & RELATIVE) {
             op.cp1 = _lastP + op.cp1;
             op.cp2 = _lastP + op.cp2;
@@ -314,7 +334,7 @@ struct Path {
             break;
 
         case CLOSE:
-            last(_segs).close = true;
+            _flattenClose();
             break;
 
         case MOVE_TO:

@@ -67,6 +67,10 @@ union Edge {
     constexpr Edge<T> swap() const {
         return {end, start};
     }
+
+    constexpr bool hasNan() const {
+        return start.hasNan() || end.hasNan();
+    }
 };
 
 using Edgei = Edge<int>;

@@ -316,8 +316,12 @@ struct Context {
     }
 
     void _line(Math::Edgei edge, Color color) {
-        int dx = abs(edge.ex - edge.sx), sx = edge.sx < edge.ex ? 1 : -1;
-        int dy = -abs(edge.ey - edge.sy), sy = edge.sy < edge.ey ? 1 : -1;
+        int dx = abs(edge.ex - edge.sx);
+        int sx = edge.sx < edge.ex ? 1 : -1;
+
+        int dy = -abs(edge.ey - edge.sy);
+        int sy = edge.sy < edge.ey ? 1 : -1;
+
         int err = dx + dy, e2;
 
         for (;;) {
@@ -337,9 +341,16 @@ struct Context {
     }
 
     void _trace() {
+        auto b = _shape.bound().cast<int>();
+        _line({b.topStart(), b.topEnd()}, MAGENTA);
+        _line({b.topEnd(), b.bottomEnd()}, MAGENTA);
+        _line({b.bottomEnd(), b.bottomStart()}, MAGENTA);
+        _line({b.bottomStart(), b.topStart()}, MAGENTA);
+
         for (auto edge : _shape) {
             _line(edge.cast<int>(), WHITE);
         }
+
         for (auto edge : _shape) {
             plot(edge.cast<int>().end, RED);
         }

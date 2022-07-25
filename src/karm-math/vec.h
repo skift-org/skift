@@ -3,6 +3,8 @@
 #include <karm-base/clamp.h>
 #include <karm-fmt/fmt.h>
 
+#include "funcs.h"
+
 namespace Karm::Math {
 
 template <typename T>
@@ -106,11 +108,21 @@ union Vec2 {
     constexpr Vec2<U> cast() const {
         return {static_cast<U>(x), static_cast<U>(y)};
     }
+
+    bool hasNan() const {
+        return std::isnan(x) || std::isnan(y);
+    }
 };
 
 using Vec2i = Vec2<int>;
 
 using Vec2f = Vec2<double>;
+
+template <typename T>
+bool epsilonEq(Vec2<T> const &lhs, Vec2<T> const &rhs, T epsilon) {
+    return epsilonEq(lhs.x, rhs.x, epsilon) &&
+           epsilonEq(lhs.y, rhs.y, epsilon);
+}
 
 template <typename T>
 union Vec3 {
@@ -191,11 +203,22 @@ union Vec3 {
     constexpr Vec3 operator/(Vec3 const &other) const {
         return {x / other.x, y / other.y, z / other.z};
     }
+
+    bool hasNan() const {
+        return std::isnan(x) || std::isnan(y) || std::isnan(z);
+    }
 };
 
 using Vec3i = Vec3<int>;
 
 using Vec3f = Vec3<double>;
+
+template <typename T>
+bool epsilonEq(Vec3<T> const &lhs, Vec3<T> const &rhs, T epsilon) {
+    return epsilonEq(lhs.x, rhs.x, epsilon) &&
+           epsilonEq(lhs.y, rhs.y, epsilon) &&
+           epsilonEq(lhs.z, rhs.z, epsilon);
+}
 
 template <typename T>
 union Vec4 {
@@ -281,11 +304,23 @@ union Vec4 {
     constexpr Vec4 operator/(Vec4 const &other) const {
         return {x / other.x, y / other.y, z / other.z, w / other.w};
     }
+
+    bool hasNan() const {
+        return std::isnan(x) || std::isnan(y) || std::isnan(z) || std::isnan(w);
+    }
 };
 
 using Vec4i = Vec4<int>;
 
 using Vec4f = Vec4<double>;
+
+template <typename T>
+bool epsilonEq(Vec4<T> const &lhs, Vec4<T> const &rhs, T epsilon) {
+    return epsilonEq(lhs.x, rhs.x, epsilon) &&
+           epsilonEq(lhs.y, rhs.y, epsilon) &&
+           epsilonEq(lhs.z, rhs.z, epsilon) &&
+           epsilonEq(lhs.w, rhs.w, epsilon);
+}
 
 } // namespace Karm::Math
 

@@ -13,12 +13,13 @@ struct StrokeClient : public App::Client {
         g.moveTo({200, 200});
         g.lineTo(_mousePos.cast<double>());
         g.lineTo({200, 600});
-        g.close();
+        g.fill();
 
         g.strokeStyle(
             Gfx::stroke(Gfx::BLUE500)
                 .with(Gfx::StrokeStyle::Align::CENTER)
                 .with(Gfx::StrokeStyle::Join::MITER)
+                .with(Gfx::StrokeStyle::Cap::SQUARE)
                 .with(72));
         g.stroke();
         if (_trace)

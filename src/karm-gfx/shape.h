@@ -58,9 +58,6 @@ struct Shape {
 
 static void createSolid(Path &path, Shape &shape) {
     for (auto seg : path.iterSegs()) {
-        if (!seg.close)
-            continue;
-
         for (size_t i = 0; i < seg.len(); i++) {
             shape.add({seg[i], seg[(i + 1) % seg.len()]});
         }
@@ -131,7 +128,7 @@ static void _createCapButt(Shape &shape, Math::Vec2f start, Math::Vec2f end) {
 }
 
 static void _createCapSquare(Shape &shape, Math::Vec2f start, Math::Vec2f end, float width) {
-    auto e = Math::Edgef{start, end}.parallel(width / 2);
+    auto e = Math::Edgef{start, end}.parallel(-width / 2);
     shape.add({start, e.start});
     shape.add(e);
     shape.add({e.end, end});
@@ -170,7 +167,9 @@ static void createStroke(Path const &path, Shape &shape, StrokeStyle stroke) {
     double innerDist = outerDist + stroke.width;
 
     for (auto seg : path.iterSegs()) {
-        for (size_t i = 0; i < seg.len(); i++) {
+        auto l = seg.close ? seg.len() : seg.len() - 1;
+
+        for (size_t i = 0; i < l; i++) {
             Math::Edgef curr = {seg[i], seg[(i + 1) % seg.len()]};
 
             auto outerCurr = curr.parallel(outerDist);
@@ -179,17 +178,15 @@ static void createStroke(Path const &path, Shape &shape, StrokeStyle stroke) {
             shape.add(outerCurr);
             shape.add(innerCurr);
 
-            /*
             if (i == 0 && !seg.close) {
-                _createCap(shape, innerCurr.start, outerCurr.start, stroke.width, stroke.cap);
+                _createCap(shape, innerCurr.end, outerCurr.start, stroke.width, stroke.cap);
             }
 
-            if (i == seg.len() - 1 && !seg.close) {
-                _createCap(shape, innerCurr.end, outerCurr.end, stroke.width, stroke.cap);
+            if (i + 1 == l && !seg.close) {
+                _createCap(shape, outerCurr.end, innerCurr.start, stroke.width, stroke.cap);
             }
-*/
 
-            if (seg.close) {
+            if (seg.close || i + 1 != l) {
                 Math::Edgef next = {
                     seg[(i + 1) % seg.len()],
                     seg[(i + 2) % seg.len()],

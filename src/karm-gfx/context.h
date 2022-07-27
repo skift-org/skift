@@ -299,8 +299,12 @@ struct Context {
         _path.quadTo(cp, p, flags);
     }
 
-    void arcTo(Math::Vec2f radius, float angle, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) {
+    void arcTo(Math::Vec2f radius, double angle, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) {
         _path.arcTo(radius, angle, p, flags);
+    }
+
+    bool evalSvg(Str path) {
+        return _path.evalSvg(path);
     }
 
     void line(Math::Edgef line) {

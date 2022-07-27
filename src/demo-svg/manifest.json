@@ -1,0 +1,9 @@
+{
+    "id": "demo-svg",
+    "type": "exe",
+    "description": "A graphical demo of the SVG library.",
+    "deps": [
+        "karm-main",
+        "karm-app"
+    ]
+}

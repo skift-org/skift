@@ -89,7 +89,7 @@ struct Path {
             : code(code), flags(flags), cp1(cp1), cp2(cp2), p(p) {}
 
         Op(Code code, Math::Vec2f radius, double angle, Math::Vec2f p, Flags flags = DEFAULT)
-            : code(code), flags(flags), radius(radius), angle(angle), cp2(p), p(p) {}
+            : code(code), flags(flags), radius(radius), angle(angle), p(p) {}
     };
 
     struct _Seg {
@@ -141,7 +141,8 @@ struct Path {
             panic("move to must be called before line to");
         }
 
-        if (Math::epsilonEq(_lastP, p, 0.001)) {
+        if (last(_segs).start != last(_segs).end &&
+            Math::epsilonEq(_lastP, p, 0.001)) {
             return;
         }
 
@@ -149,7 +150,7 @@ struct Path {
         last(_segs).end++;
     }
 
-    void _flattenCubicToImpl(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, int depth) {
+    void _flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, int depth = {}) {
         const int MAX_DEPTH = 16;
         const double TOLERANCE = 0.25;
 
@@ -157,8 +158,8 @@ struct Path {
             return;
 
         auto d1 = d - a;
-        auto d2 = abs((b.x - d.x) * d1.y - (b.y - d.y) * d1.x);
-        auto d3 = abs((c.x - d.x) * d1.y - (c.y - d.y) * d1.x);
+        auto d2 = Math::abs((b.x - d.x) * d1.y - (b.y - d.y) * d1.x);
+        auto d3 = Math::abs((c.x - d.x) * d1.y - (c.y - d.y) * d1.x);
 
         if ((d2 + d3) * (d2 + d3) < TOLERANCE * (d1.x * d1.x + d1.y * d1.y)) {
             _flattenLineTo(d);
@@ -172,12 +173,8 @@ struct Path {
         auto bcd = (bc + cd) / 2;
         auto abcd = (abc + bcd) / 2;
 
-        _flattenCubicToImpl(a, ab, abc, abcd, depth + 1);
-        _flattenCubicToImpl(abcd, bcd, cd, d, depth + 1);
-    }
-
-    void _flattenCubicTo(Math::Vec2f start, Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f point) {
-        _flattenCubicToImpl(start, cp1, cp2, point, 0);
+        _flattenCubicTo(a, ab, abc, abcd, depth + 1);
+        _flattenCubicTo(abcd, bcd, cd, d, depth + 1);
     }
 
     void _flattenQuadraticTo(Math::Vec2f start, Math::Vec2f cp, Math::Vec2f point) {
@@ -186,7 +183,7 @@ struct Path {
         _flattenCubicTo(start, cp1, cp2, point);
     }
 
-    void _flattenArcTo(Math::Vec2f start, Math::Vec2f radius, float angle, Flags flags, Math::Vec2f point) {
+    void _flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Flags flags, Math::Vec2f point) {
         // Ported from canvg (https://code.google.com/p/canvg/)
         float x1 = start.x;
         float y1 = start.y;
@@ -214,21 +211,17 @@ struct Path {
         float x1p = cosrx * dx / 2.0f + sinrx * dy / 2.0f;
         float y1p = -sinrx * dx / 2.0f + cosrx * dy / 2.0f;
 
-        d = Math::pow2(x1p) / Math::pow2(radius.x) +
-            Math::pow2(y1p) / Math::pow2(radius.y);
+        d = Math::pow2(x1p) / Math::pow2(radius.x) + Math::pow2(y1p) / Math::pow2(radius.y);
 
         if (d > 1) {
             d = sqrtf(d);
-            radius = radius * d;
+            radius.x *= d;
+            radius.y *= d;
         }
 
         // 2) Compute cx', cy'
-        float sa = Math::pow2(radius.x) * Math::pow2(radius.y) -
-                   Math::pow2(radius.x) * Math::pow2(y1p) -
-                   Math::pow2(radius.y) * Math::pow2(x1p);
-
-        float sb = Math::pow2(radius.x) * Math::pow2(y1p) +
-                   Math::pow2(radius.y) * Math::pow2(x1p);
+        float sa = Math::pow2(radius.x) * Math::pow2(radius.y) - Math::pow2(radius.x) * Math::pow2(y1p) - Math::pow2(radius.y) * Math::pow2(x1p);
+        float sb = Math::pow2(radius.x) * Math::pow2(y1p) + Math::pow2(radius.y) * Math::pow2(x1p);
 
         if (sa < 0.0f) {
             sa = 0.0f;
@@ -255,10 +248,10 @@ struct Path {
         float cy = sinrx * cxp + cosrx * cyp + (y1 + y2) / 2.0f;
 
         // 4) Calculate theta1, and delta theta.
-        auto u = Math::Vec2f{(x1p - cxp) / radius.x, (y1p - cyp) / radius.y};
-        auto v = Math::Vec2f{(-x1p - cxp) / radius.x, (-y1p - cyp) / radius.y};
+        Math::Vec2f u = {(x1p - cxp) / radius.x, (y1p - cyp) / radius.y};
+        Math::Vec2f v = {(-x1p - cxp) / radius.x, (-y1p - cyp) / radius.y};
 
-        float a1 = Math::Vec2f{1, 0}.angleWith(u); // Initial angle
+        float a1 = Math::Vec2f(1, 0).angleWith(u); // Initial angle
         float da = u.angleWith(v);
 
         if (!fs && da > 0) {
@@ -268,14 +261,7 @@ struct Path {
         }
 
         // Approximate the arc using cubic spline segments.
-        Math::Trans2f t = {
-            cosrx,
-            sinrx,
-            -sinrx,
-            cosrx,
-            cx,
-            cy,
-        };
+        Math::Trans2f t{cosrx, sinrx, -sinrx, cosrx, cx, cy};
 
         // Split arc into max 90 degree segments.
         // The loop assumes an Iter per end point (including start and end), this +1.
@@ -287,8 +273,8 @@ struct Path {
             kappa = -kappa;
         }
 
-        Math::Vec2f current = start;
-        Math::Vec2f ptan{};
+        Math::Vec2f current = {};
+        Math::Vec2f ptan = {};
 
         for (int i = 0; i <= ndivs; i++) {
             float a = a1 + da * (i / (float)ndivs);
@@ -296,8 +282,8 @@ struct Path {
             dx = cosf(a);
             dy = sinf(a);
 
-            auto p = t.applyPoint({dx * radius.x, dy * radius.y});
-            auto tan = t.applyVector({-dy * radius.x * kappa, dx * radius.y * kappa});
+            Math::Vec2f p = t.applyPoint({dx * radius.x, dy * radius.y});
+            Math::Vec2f tan = t.applyVector({-dy * radius.x * kappa, dx * radius.y * kappa});
 
             if (i > 0) {
                 _flattenCubicTo(current, current + ptan, p - tan, p);
@@ -306,6 +292,8 @@ struct Path {
             current = p;
             ptan = tan;
         }
+
+        // _flattenLineTo(point);
     }
 
     /* --- Operations ------------------------------------------------------- */
@@ -346,15 +334,25 @@ struct Path {
             _flattenLineTo(op.p);
             break;
 
+        case HLINE_TO:
+            op.p = {op.p.x, _lastP.y};
+            _flattenLineTo(op.p);
+            break;
+
+        case VLINE_TO:
+            op.p = {_lastP.x, op.p.y};
+            _flattenLineTo(op.p);
+            break;
+
         case CUBIC_TO:
-            if (op.flags & RELATIVE)
+            if (op.flags & SMOOTH)
                 op.cp1 = _lastP * 2 - _lastCp;
 
             _flattenCubicTo(_lastP, op.cp1, op.cp2, op.p);
             break;
 
         case QUAD_TO:
-            if (op.flags & RELATIVE)
+            if (op.flags & SMOOTH)
                 op.cp2 = _lastP * 2 - _lastCp;
 
             _flattenQuadraticTo(_lastP, op.cp2, op.p);
@@ -375,12 +373,11 @@ struct Path {
     /* --- Primitives ------------------------------------------------------- */
 
     void clear() {
-
-        evalOp({CLEAR});
+        evalOp(CLEAR);
     }
 
     void close() {
-        evalOp({CLOSE});
+        evalOp(CLOSE);
     }
 
     void moveTo(Math::Vec2f p, Flags flags = DEFAULT) {
@@ -415,7 +412,7 @@ struct Path {
         evalOp({QUAD_TO, {}, p, flags | SMOOTH});
     }
 
-    void arcTo(Math::Vec2f radius, float angle, Math::Vec2f p, Flags flags = DEFAULT) {
+    void arcTo(Math::Vec2f radius, double angle, Math::Vec2f p, Flags flags = DEFAULT) {
         evalOp({ARC_TO, radius, angle, p, flags});
     }
 
@@ -458,7 +455,7 @@ struct Path {
         opcode = tolower(opcode);
 
         auto nextSep = [&]() {
-            scan.skip(Re::separator(','));
+            scan.skip(Re::optSeparator(','));
         };
 
         auto nextCoord = [&]() -> Opt<double> {
@@ -467,7 +464,9 @@ struct Path {
         };
 
         auto nextCoordPair = [&]() -> Opt<Math::Vec2f> {
-            return Math::Vec2f{try$(nextCoord()), try$(nextCoord())};
+            auto r = Math::Vec2f{try$(nextCoord()), try$(nextCoord())};
+            nextSep();
+            return r;
         };
 
         switch (opcode) {
@@ -523,9 +522,11 @@ struct Path {
 
         Rune opcode{};
         while ((opcode = scan.next())) {
+            scan.skip(Re::zeroOrMore(Re::space()));
 
             do {
                 evalOp(try$(parseOp(scan, opcode)));
+                scan.skip(Re::zeroOrMore(Re::space()));
 
                 opcode = opcode == 'M' ? 'L' : opcode;
                 opcode = opcode == 'm' ? 'l' : opcode;

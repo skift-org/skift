@@ -55,7 +55,7 @@ union Vec2 {
 
     constexpr Vec2 norm() const {
         T len = this->len();
-        return {x / len, y / len};
+        return Vec2{x, y} / len;
     }
 
     constexpr T angle() const {
@@ -64,7 +64,7 @@ union Vec2 {
 
     constexpr T angleWith(Vec2 const &other) const {
         auto r = norm().dot(other.norm());
-        auto sign = (x * other.y < y * other.x) ? -1 : 1;
+        auto sign = (x * other.y < y * other.x) ? -1.0 : 1.0;
         return sign * acos(r);
     }
 

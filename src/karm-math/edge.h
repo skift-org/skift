@@ -79,13 +79,9 @@ using Edgef = Edge<double>;
 
 } // namespace Karm::Math
 
-namespace Karm::Fmt {
-
 template <typename T>
-struct Formatter<Math::Edge<T>> {
+struct Karm::Fmt::Formatter<Math::Edge<T>> {
     Result<size_t> format(Io::_TextWriter &writer, Math::Edge<T> edge) {
         return Fmt::format(writer, "Edge({}, {}, {}, {})", edge.sx, edge.sy, edge.ex, edge.ey);
     }
 };
-
-} // namespace Karm::Fmt

@@ -83,13 +83,9 @@ using Trans2f = Trans2<double>;
 
 } // namespace Karm::Math
 
-namespace Karm::Fmt {
-
 template <typename T>
-struct Formatter<Math::Trans2<T>> {
+struct Karm::Fmt::Formatter<Math::Trans2<T>> {
     Result<size_t> format(Io::_TextWriter &writer, Math::Trans2<T> trans) {
         return Fmt::format(writer, "Trans2({}, {}, {}, {}, {}, {})", trans.xx, trans.xy, trans.yx, trans.yy, trans.ox, trans.oy);
     }
 };
-
-} // namespace Karm::Fmt

@@ -109,10 +109,8 @@ static inline auto styled(auto inner, Style style) {
 
 } // namespace Karm::Cli
 
-namespace Karm::Fmt {
-
 template <>
-struct Formatter<Karm::Cli::Style> {
+struct Karm::Fmt::Formatter<Karm::Cli::Style> {
     Result<size_t> format(Io::_TextWriter &writer, Karm::Cli::Style style) {
 #ifdef __osdk_karm_cli_backend_ansi__
 
@@ -160,7 +158,7 @@ struct Formatter<Karm::Cli::Style> {
 };
 
 template <typename T>
-struct Formatter<Karm::Cli::Styled<T>> {
+struct Karm::Fmt::Formatter<Karm::Cli::Styled<T>> {
     Formatter<Karm::Cli::Style> _styleFmt{};
     Formatter<T> _innerFmt{};
 
@@ -182,5 +180,3 @@ struct Formatter<Karm::Cli::Styled<T>> {
 #endif
     }
 };
-
-} // namespace Karm::Fmt

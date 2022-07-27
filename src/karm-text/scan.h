@@ -85,12 +85,13 @@ struct _Scan {
     }
 
     bool skip(auto predicate) requires Meta::Callable<decltype(predicate), decltype(*this)> {
-        if (!ended() && predicate(*this)) {
-            next();
+        auto save = _cursor;
+        if (predicate(*this)) {
             return true;
+        } else {
+            _cursor = save;
+            return false;
         }
-
-        return false;
     }
 
     bool eat(Rune c) {
@@ -212,6 +213,7 @@ struct _Scan {
         if (peek(0) != '.' || !_parseDigit(peek(1), base)) {
             ipart = try$(nextInt(base));
         }
+
         if (skip('.')) {
             double multiplier = (1.0 / base);
             while (!ended()) {

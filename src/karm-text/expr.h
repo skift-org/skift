@@ -27,15 +27,13 @@ inline auto range(Rune start, Rune end) {
     };
 }
 
-template <typename... Exprs>
-inline auto either(Exprs... exprs) {
+inline auto either(auto... exprs) {
     return [=](auto &scan) {
         return (exprs(scan) || ...);
     };
 }
 
-template <typename... Exprs>
-inline auto chain(Exprs... exprs) {
+inline auto chain(auto... exprs) {
     return [=](auto &scan) {
         return (exprs(scan) && ...);
     };
@@ -44,6 +42,13 @@ inline auto chain(Exprs... exprs) {
 inline auto negate(auto expr) {
     return [=](auto &scan) {
         return !expr(scan);
+    };
+}
+
+inline auto opt(auto expr) {
+    return [=](auto &scan) {
+        expr(scan);
+        return true;
     };
 }
 
@@ -133,6 +138,20 @@ inline auto separator(Str w) {
     return chain(
         zeroOrMore(space()),
         word(w),
+        zeroOrMore(space()));
+}
+
+inline auto optSeparator(Rune r) {
+    return chain(
+        zeroOrMore(space()),
+        opt(single(r)),
+        zeroOrMore(space()));
+}
+
+inline auto optSeparator(Str w) {
+    return chain(
+        zeroOrMore(space()),
+        opt(word(w)),
         zeroOrMore(space()));
 }
 

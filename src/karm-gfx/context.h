@@ -1,18 +1,9 @@
 #pragma once
 
-#include <karm-base/string.h>
-#include <karm-base/var.h>
-#include <karm-base/vec.h>
-#include <karm-math/edge.h>
-#include <karm-math/ellipse.h>
-#include <karm-math/funcs.h>
-
-#include "colors.h"
 #include "path.h"
 #include "shape.h"
 #include "style.h"
 #include "surface.h"
-#include "vga-font.h"
 
 namespace Karm::Gfx {
 
@@ -40,9 +31,9 @@ struct Radius {
 struct Context {
     struct Scope {
         FillStyle fillStyle{};
-        StrokeStyle strokeStyle{};
-        TextStyle textStyle{};
-        ShadowStyle shadowStyle{};
+        Stroke strokeStyle{};
+        Text textStyle{};
+        Shadow shadowStyle{};
 
         Math::Vec2i origin{};
         Math::Recti clip{};
@@ -55,135 +46,72 @@ struct Context {
 
     Surface *_surface{};
     Vec<Scope> _stack{};
-
     Shape _shape{};
     Path _path{};
-
     Vec<Active> _active{};
     Vec<double> _scanline;
 
     /* --- Scope ------------------------------------------------------------ */
 
-    void begin(Surface &c) {
-        _surface = &c;
-        _stack.pushBack({
-            .clip = surface().bound(),
-        });
+    void begin(Surface &c);
 
-        _scanline.resize(c.width());
-    }
+    void end();
 
-    void end() {
-        _stack.popBack();
-        _surface = nullptr;
-    }
+    Surface &surface();
 
-    Surface &surface() {
-        return *_surface;
-    }
+    Scope &current();
 
-    Scope &current() {
-        return first(_stack);
-    }
+    Scope const &current() const;
 
-    Scope const &current() const {
-        return last(_stack);
-    }
+    void save();
 
-    void save() {
-        _stack.pushBack(current());
-    }
-
-    void restore() {
-        _stack.popBack();
-    }
+    void restore();
 
     /* --- Origin & Clipping ------------------------------------------------ */
 
-    Math::Recti clip() const {
-        return current().clip;
-    }
+    Math::Recti clip() const;
 
-    Math::Vec2i origin() const {
-        return current().origin;
-    }
+    Math::Vec2i origin() const;
 
-    Math::Recti applyOrigin(Math::Recti rect) const {
-        return {rect.xy + origin(), rect.wh};
-    }
+    Math::Recti applyOrigin(Math::Recti rect) const;
 
-    Math::Vec2i applyOrigin(Math::Vec2i pos) const {
-        return pos + origin();
-    }
+    Math::Vec2i applyOrigin(Math::Vec2i pos) const;
 
-    Math::Recti applyClip(Math::Recti rect) const {
-        return rect.clipTo(clip());
-    }
+    Math::Recti applyClip(Math::Recti rect) const;
 
-    Math::Recti applyAll(Math::Recti rect) const {
-        return applyClip(applyOrigin(rect));
-    }
+    Math::Recti applyAll(Math::Recti rect) const;
 
-    void clip(Math::Recti rect) {
-        current().clip = applyAll(rect);
-    }
+    void clip(Math::Recti rect);
 
-    void origin(Math::Vec2i pos) {
-        current().origin = applyOrigin(pos);
-    }
+    void origin(Math::Vec2i pos);
 
     /* --- Fill & Stroke ---------------------------------------------------- */
 
-    FillStyle const &fillStyle() { return current().fillStyle; }
+    FillStyle const &fillStyle();
 
-    StrokeStyle const &strokeStyle() { return current().strokeStyle; }
+    Stroke const &strokeStyle();
 
-    TextStyle const &textStyle() { return current().textStyle; }
+    Text const &textStyle();
 
-    ShadowStyle const &shadowStyle() { return current().shadowStyle; }
+    Shadow const &shadowStyle();
 
-    Context &fillStyle(FillStyle style) {
-        current().fillStyle = style;
-        return *this;
-    }
+    Context &fillStyle(FillStyle style);
 
-    Context &strokeStyle(StrokeStyle style) {
-        current().strokeStyle = style;
-        return *this;
-    }
+    Context &strokeStyle(Stroke style);
 
-    Context &textStyle(TextStyle style) {
-        current().textStyle = style;
-        return *this;
-    }
+    Context &textStyle(Text style);
 
-    Context &shadowStyle(ShadowStyle style) {
-        current().shadowStyle = style;
-        return *this;
-    }
+    Context &shadowStyle(Shadow style);
 
     /* --- Drawing ---------------------------------------------------------- */
 
-    void clear(Color color = BLACK) { clear(surface().bound(), color); }
+    void clear(Color color = BLACK);
 
-    void clear(Math::Recti rect, Color color = BLACK) {
-        rect = applyAll(rect);
-
-        for (int y = rect.y; y < rect.y + rect.height; y++) {
-            for (int x = rect.x; x < rect.x + rect.width; x++) {
-                surface().store({x, y}, color);
-            }
-        }
-    }
+    void clear(Math::Recti rect, Color color = BLACK);
 
     /* --- Shapes ----------------------------------------------------------- */
 
-    void plot(Math::Vec2i point, Color color) {
-        point = applyOrigin(point);
-        if (clip().contains(point)) {
-            surface().store(point, color);
-        }
-    }
+    void plot(Math::Vec2i point, Color color);
 
     void stroke(Math::Edgei edge);
 
@@ -191,244 +119,67 @@ struct Context {
 
     void stroke(Math::Recti rect);
 
-    void fill(Math::Recti rect) {
-        rect = applyAll(rect);
+    void fill(Math::Recti rect);
 
-        for (int y = rect.y; y < rect.y + rect.height; y++) {
-            for (int x = rect.x; x < rect.x + rect.width; x++) {
-                surface().blend({x, y}, fillStyle().color());
-            }
-        }
-    }
+    void stroke(Math::Ellipsei e);
 
-    void stroke(Math::Ellipsei e) {
-        begin();
-        ellipse(e.cast<double>());
-        stroke();
-    }
-
-    void fill(Math::Ellipsei e) {
-        begin();
-        ellipse(e.cast<double>());
-        fill();
-    }
+    void fill(Math::Ellipsei e);
 
     /* --- Text ------------------------------------------------------------- */
 
-    Math::Vec2i mesure(Rune) {
-        return {VGA_FONT_WIDTH, VGA_FONT_HEIGHT};
-    }
+    Math::Vec2i mesure(Rune rune);
 
-    Math::Vec2i mesure(Str text) {
-        int width = VGA_FONT_HEIGHT;
-        for (auto rune : iterRunes(text)) {
-            width += mesure(rune).x;
-        }
-        return {width, VGA_FONT_HEIGHT};
-    }
+    Math::Vec2i mesure(Str text);
 
-    void _draw(Math::Vec2i baseline, Rune rune, Color color) {
-        One<Ibm437> one;
-        encodeOne<Ibm437>(rune, one);
+    void _draw(Math::Vec2i baseline, Rune rune, Color color);
 
-        for (int y = 0; y < VGA_FONT_HEIGHT; y++) {
-            for (int x = 0; x < VGA_FONT_WIDTH; x++) {
-                uint8_t byte = VGA_FONT[one * VGA_FONT_HEIGHT + y];
-                if (byte & (1 << x)) {
-                    plot(baseline + Math::Vec2i{x, y - VGA_FONT_HEIGHT}, color);
-                }
-            }
-        }
-    }
+    void stroke(Math::Vec2i baseline, Rune rune);
 
-    void stroke(Math::Vec2i baseline, Rune rune) {
-        _draw(baseline, rune, strokeStyle().color);
-    }
+    void fill(Math::Vec2i baseline, Rune rune);
 
-    void fill(Math::Vec2i baseline, Rune rune) {
-        _draw(baseline, rune, fillStyle().color());
-    }
+    void stroke(Math::Vec2i baseline, Str text);
 
-    void stroke(Math::Vec2i baseline, Str text) {
-        Math::Vec2i pos = baseline;
-        for (auto rune : iterRunes(text)) {
-            stroke(pos, rune);
-            baseline = baseline + Math::Vec2i{VGA_FONT_WIDTH, 0};
-        }
-    }
-
-    void fill(Math::Vec2i baseline, Str text) {
-        Math::Vec2i pos = baseline;
-        for (auto rune : iterRunes(text)) {
-            fill(pos, rune);
-            baseline = baseline + Math::Vec2i{VGA_FONT_WIDTH, 0};
-        }
-    }
+    void fill(Math::Vec2i baseline, Str text);
 
     /* --- Paths ------------------------------------------------------------ */
 
-    void begin() {
-        _path.clear();
-    }
+    void _line(Math::Edgei edge, Color color);
 
-    void close() {
-        _path.close();
-    }
+    void _trace();
 
-    void moveTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT) {
-        _path.moveTo(p, flags);
-    }
+    void _fill(Color color);
 
-    void lineTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT) {
-        _path.lineTo(p, flags);
-    }
+    void begin();
 
-    void hlineTo(double x, Path::Flags flags = Path::DEFAULT) {
-        _path.hlineTo(x, flags);
-    }
+    void close();
 
-    void vlineTo(double y, Path::Flags flags = Path::DEFAULT) {
-        _path.vlineTo(y, flags);
-    }
+    void moveTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
 
-    void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) {
-        _path.cubicTo(cp1, cp2, p, flags);
-    }
+    void lineTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
 
-    void quadTo(Math::Vec2f cp, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) {
-        _path.quadTo(cp, p, flags);
-    }
+    void hlineTo(double x, Path::Flags flags = Path::DEFAULT);
 
-    void arcTo(Math::Vec2f radius, double angle, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) {
-        _path.arcTo(radius, angle, p, flags);
-    }
+    void vlineTo(double y, Path::Flags flags = Path::DEFAULT);
 
-    bool evalSvg(Str path) {
-        return _path.evalSvg(path);
-    }
+    void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
 
-    void line(Math::Edgef line) {
-        _path.line(line);
-    }
+    void quadTo(Math::Vec2f cp, Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
 
-    void rect(Math::Rectf rect) {
-        _path.rect(rect);
-    }
+    void arcTo(Math::Vec2f radius, double angle, Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
 
-    void ellipse(Math::Ellipsef ellipse) {
-        _path.ellipse(ellipse);
-    }
+    bool evalSvg(Str path);
 
-    void _line(Math::Edgei edge, Color color) {
-        int dx = abs(edge.ex - edge.sx);
-        int sx = edge.sx < edge.ex ? 1 : -1;
+    void line(Math::Edgef line);
 
-        int dy = -abs(edge.ey - edge.sy);
-        int sy = edge.sy < edge.ey ? 1 : -1;
+    void rect(Math::Rectf rect);
 
-        int err = dx + dy, e2;
+    void ellipse(Math::Ellipsef ellipse);
 
-        for (;;) {
-            plot({edge.sx, edge.sy}, color);
-            if (edge.sx == edge.ex && edge.sy == edge.ey)
-                break;
-            e2 = 2 * err;
-            if (e2 >= dy) {
-                err += dy;
-                edge.sx += sx;
-            }
-            if (e2 <= dx) {
-                err += dx;
-                edge.sy += sy;
-            }
-        }
-    }
+    void fill();
 
-    void _trace() {
-        auto b = _shape.bound().cast<int>();
-        _line({b.topStart(), b.topEnd()}, MAGENTA);
-        _line({b.topEnd(), b.bottomEnd()}, MAGENTA);
-        _line({b.bottomEnd(), b.bottomStart()}, MAGENTA);
-        _line({b.bottomStart(), b.topStart()}, MAGENTA);
+    void stroke();
 
-        for (auto edge : _shape) {
-            _line(edge.cast<int>(), WHITE);
-        }
-
-        for (auto edge : _shape) {
-            plot(edge.cast<int>().end, RED);
-        }
-    }
-
-    void _fill(Color color) {
-        static constexpr auto AA = 4;
-        static constexpr auto UNIT = 1.0f / AA;
-        static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;
-
-        auto rect = applyClip(_shape.bound().ceil().cast<int>());
-
-        for (int y = rect.top(); y < rect.bottom(); y++) {
-            zeroFill<double>(_scanline);
-
-            for (double yy = y; yy < y + 1.0; yy += UNIT) {
-                _active.clear();
-                for (auto &edge : _shape) {
-                    auto sample = yy + HALF_UNIT;
-
-                    if (edge.bound().top() <= sample && sample < edge.bound().bottom()) {
-                        _active.pushBack({
-                            .x = edge.sx + (sample - edge.sy) / (edge.ey - edge.sy) * (edge.ex - edge.sx),
-                            .sign = edge.sy > edge.ey ? 1 : -1,
-                        });
-                    }
-                }
-
-                if (_active.len() == 0) {
-                    continue;
-                }
-
-                sort<Active>(_active, [](auto const &a, auto const &b) {
-                    return cmp(a.x, b.x);
-                });
-
-                int r = 0;
-                for (size_t i = 0; i + 1 < _active.len(); i++) {
-                    double x1 = _active[i].x;
-                    double x2 = _active[i + 1].x;
-                    int sign = _active[i].sign;
-
-                    r += sign;
-                    if (r == 0) {
-                        continue;
-                    }
-
-                    for (double x = max(x1, rect.start()); x < min(x2, rect.end()); x += UNIT) {
-                        _scanline[x] += 1.0;
-                    }
-                }
-
-                for (int x = rect.start(); x < rect.end(); x++) {
-                    if (_scanline[x] > 0) {
-                        surface().blend({x, y}, color.withOpacity(_scanline[x] / (AA * AA)));
-                    }
-                }
-            }
-        }
-    }
-
-    void fill() {
-        _shape.clear();
-        createSolid(_path, _shape);
-        _fill(fillStyle().color());
-    }
-
-    void stroke() {
-        _shape.clear();
-        createStroke(_path, _shape, strokeStyle());
-        _fill(strokeStyle().color);
-    }
-
-    void shadow() {}
+    void shadow();
 
     /* --- Effects ---------------------------------------------------------- */
 

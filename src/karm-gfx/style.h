@@ -31,123 +31,107 @@ static inline constexpr FillStyle fill(auto... args) {
 
 /* --- Stroke Style --------------------------------------------------------- */
 
-struct StrokeStyle {
-    enum struct Align {
-        CENTER,
-        INSIDE,
-        OUTSIDE,
-    };
+enum StrokeAlign {
+    CENTER_ALIGN,
+    INSIDE_ALIGN,
+    OUTSIDE_ALIGN,
+};
 
-    enum struct Cap {
-        BUTT,
-        SQUARE,
-        ROUND,
-    };
+enum StrokeCap {
+    BUTT_CAP,
+    SQUARE_CAP,
+    ROUND_CAP,
+};
 
-    enum struct Join {
-        BEVEL,
-        MITER,
-        ROUND,
-    };
+enum StrokeJoin {
+    BEVEL_JOIN,
+    MITER_JOIN,
+    ROUND_JOIN,
+};
 
+struct Stroke {
     Color color{};
     double width{1};
-    Align align{};
-    Cap cap{};
-    Join join{};
+    StrokeAlign align{};
+    StrokeCap cap{};
+    StrokeJoin join{};
 
-    constexpr StrokeStyle()
-        : color(WHITE) {}
+    constexpr Stroke(Color c = WHITE) : color(c) {}
 
-    constexpr StrokeStyle(Color color)
-        : color(color) {}
-
-    constexpr auto with(Color c) {
+    constexpr auto withColor(Color c) {
         color = c;
         return *this;
     }
 
-    constexpr auto with(double w) {
+    constexpr auto withWidth(double w) {
         width = w;
         return *this;
     }
 
-    constexpr auto with(Align a) {
+    constexpr auto withAlign(StrokeAlign a) {
         align = a;
         return *this;
     }
 
-    constexpr auto with(Cap c) {
+    constexpr auto withCap(StrokeCap c) {
         cap = c;
         return *this;
     }
 
-    constexpr auto with(Join j) {
+    constexpr auto withJoin(StrokeJoin j) {
         join = j;
         return *this;
     }
 };
 
-static inline constexpr StrokeStyle stroke(auto... args) {
+static inline constexpr Stroke stroke(auto... args) {
     return {args...};
 }
 
 /* --- Text Style ----------------------------------------------------------- */
 
-struct TextStyle {
-    Color _color{};
+struct Text {
+    Color color{WHITE};
 
-    constexpr TextStyle() : _color(WHITE) {}
+    constexpr Text(Color c = WHITE) : color(c) {}
 
-    constexpr TextStyle(Color paint) : _color(paint) {}
-
-    constexpr Color color() const { return _color; }
-
-    constexpr TextStyle color(Color paint) {
-        _color = paint;
+    constexpr Text withColor(Color c) {
+        color = c;
         return *this;
     }
 };
 
-static inline TextStyle text(auto... args) {
-    return TextStyle(args...);
+static inline Text text(auto... args) {
+    return Text(args...);
 }
 
 /* --- Shadow Style --------------------------------------------------------- */
 
-struct ShadowStyle {
-    Color _color{};
-    float _radius{};
-    Math::Vec2f _offset{};
+struct Shadow {
+    Color color{};
+    float radius{};
+    Math::Vec2f offset{};
 
-    constexpr ShadowStyle() : _color(BLACK) {}
+    constexpr Shadow(Color c = BLACK) : color(c) {}
 
-    constexpr ShadowStyle(Color paint) : _color(paint) {}
-
-    constexpr Color color() const { return _color; }
-
-    constexpr ShadowStyle color(Color paint) {
-        _color = paint;
+    constexpr Shadow withColor(Color c) {
+        color = c;
         return *this;
     }
 
-    constexpr float radius() const { return _radius; }
-
-    constexpr ShadowStyle radius(float radius) {
-        _radius = radius;
+    constexpr Shadow withRadius(float r) {
+        radius = r;
         return *this;
     }
 
-    constexpr Math::Vec2f offset() const { return _offset; }
-
-    constexpr ShadowStyle offset(Math::Vec2f offset) {
-        _offset = offset;
+    constexpr Shadow withOffset(Math::Vec2f o) {
+        offset = o;
         return *this;
     }
 };
 
-static inline ShadowStyle shadow(auto... args) {
-    return ShadowStyle(args...);
+static inline Shadow shadow(auto... args) {
+    return Shadow(args...);
 }
 
 } // namespace Karm::Gfx

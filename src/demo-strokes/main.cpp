@@ -16,10 +16,10 @@ struct StrokeClient : public App::Client {
 
         g.strokeStyle(
             Gfx::stroke(Gfx::BLUE500)
-                .with(Gfx::StrokeStyle::Align::CENTER)
-                .with(Gfx::StrokeStyle::Join::ROUND)
-                .with(Gfx::StrokeStyle::Cap::ROUND)
-                .with(72));
+                .withAlign(Gfx::CENTER_ALIGN)
+                .withJoin(Gfx::ROUND_JOIN)
+                .withCap(Gfx::ROUND_CAP)
+                .withWidth(72));
         g.stroke();
 
         if (_trace)
@@ -27,10 +27,10 @@ struct StrokeClient : public App::Client {
 
         g.strokeStyle(
             Gfx::stroke(Gfx::ZINC900)
-                .with(Gfx::StrokeStyle::Align::CENTER)
-                .with(Gfx::StrokeStyle::Join::BEVEL)
-                .with(Gfx::StrokeStyle::Cap::BUTT)
-                .with(4));
+                .withAlign(Gfx::CENTER_ALIGN)
+                .withJoin(Gfx::BEVEL_JOIN)
+                .withCap(Gfx::BUTT_CAP)
+                .withWidth(4));
 
         g.stroke();
     }

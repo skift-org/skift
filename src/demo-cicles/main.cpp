@@ -21,7 +21,9 @@ struct CircleClient : public Karm::App::Client {
                 size,
             });
 
-            g.strokeStyle(Gfx::stroke(Gfx::WHITE).with(_rand.nextInt(2, size)));
+            g.strokeStyle(
+                Gfx::stroke(Gfx::WHITE)
+                    .withWidth(_rand.nextInt(2, size)));
             g.stroke();
         }
 

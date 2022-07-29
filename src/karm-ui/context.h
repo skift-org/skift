@@ -4,6 +4,7 @@
 #include <karm-app/client.h>
 #include <karm-app/host.h>
 #include <karm-base/rc.h>
+#include <karm-debug/logger.h>
 #include <karm-events/events.h>
 #include <karm-gfx/context.h>
 #include <karm-main/base.h>
@@ -303,10 +304,7 @@ struct UiClient : public Karm::App::Client {
 
 ExitCode render(auto tree) {
     Context ctx{};
-    NodePtr root = tree(ctx);
-    Box<Karm::App::Client> client = makeBox<UiClient>(root);
-    auto host = try$(Embed::makeHost(std::move(client)));
-    return host->run();
+    return Karm::App::run<UiClient>(tree(ctx));
 }
 
 } // namespace Karm::Ui

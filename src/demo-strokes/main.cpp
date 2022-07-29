@@ -5,7 +5,7 @@ struct StrokeClient : public App::Client {
     bool _trace{false};
     Math::Vec2i _mousePos{300, 300};
 
-    void paint(Gfx::Context &g) override {
+    void onPaint(Gfx::Context &g) override {
 
         g.clear(Gfx::ZINC900);
 
@@ -35,13 +35,19 @@ struct StrokeClient : public App::Client {
         g.stroke();
     }
 
-    void handle(Events::Event &e) override {
+    void onEvent(Events::Event &e) override {
         e.handle<Events::MouseEvent>([&](auto const &m) {
             if (m.type == Events::MouseEvent::RELEASE) {
                 _trace = !_trace;
+                shouldRepaint();
+                return true;
+            } else if (m.type == Events::MouseEvent::MOVE) {
+                _mousePos = m.pos;
+                shouldRepaint();
+                return true;
             }
-            _mousePos = m.pos;
-            return true;
+
+            return false;
         });
     }
 };

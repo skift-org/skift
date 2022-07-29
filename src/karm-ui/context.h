@@ -292,10 +292,12 @@ struct UiClient : public Karm::App::Client {
 
     UiClient(NodePtr root) : _root(root) {}
 
-    void paint(Gfx::Context &) override {
+    void onPaint(Gfx::Context &g) override {
+        _root->paint(g);
     }
 
-    void handle(Events::Event &) override {
+    void onEvent(Events::Event &e) override {
+        _root->onEvent(e);
     }
 };
 

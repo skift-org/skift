@@ -7,8 +7,8 @@ struct SdlHost : public App::Host {
     SDL_Window *_window{};
     Math::Vec2i _lastMousePos{};
 
-    SdlHost(Box<App::Client> &&client, SDL_Window *window)
-        : App::Host(std::move(client)), _window(window) {
+    SdlHost(SDL_Window *window)
+        : _window(window) {
     }
 
     ~SdlHost() {
@@ -161,7 +161,7 @@ struct SdlHost : public App::Host {
     }
 };
 
-Result<Strong<Karm::App::Host>> makeHost(Box<App::Client> &&client) {
+Result<Strong<Karm::App::Host>> makeHost() {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
     SDL_Window *window = SDL_CreateWindow(
@@ -172,7 +172,11 @@ Result<Strong<Karm::App::Host>> makeHost(Box<App::Client> &&client) {
         1136,
         SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
 
-    return {makeStrong<SdlHost>(std::move(client), window)};
+    if (!window) {
+        return Error{SDL_GetError()};
+    }
+
+    return {makeStrong<SdlHost>(window)};
 }
 
 } // namespace Embed

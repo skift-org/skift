@@ -7,7 +7,7 @@ struct CircleClient : public Karm::App::Client {
     Math::Vec2i _mousePos{};
     int _frame = 0;
 
-    void paint(Gfx::Context &g) override {
+    void onPaint(Gfx::Context &g) override {
         double size = _rand.nextInt(4, 10);
         size *= size;
 
@@ -35,10 +35,14 @@ struct CircleClient : public Karm::App::Client {
         _frame++;
     }
 
-    void handle(Events::Event &e) override {
+    void onEvent(Events::Event &e) override {
         e.handle<Events::MouseEvent>([&](auto &e) {
-            _mousePos = e.pos;
-            return true;
+            if (e.type == Events::MouseEvent::MOVE) {
+                _mousePos = e.pos;
+                shouldRepaint();
+                return true;
+            }
+            return false;
         });
     }
 };

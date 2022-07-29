@@ -1,0 +1,45 @@
+{
+    "id": "host-x86_64",
+    "type": "target",
+    "props": {
+        "toolchain": "clang",
+        "arch": "arm64",
+        "sys": [
+            "@uname",
+            "sysname"
+        ],
+        "abi": "unknown",
+        "freestanding": false,
+        "host": true,
+        "karm-sys-encoding": "utf8",
+        "karm-cli-backend": "ansi",
+        "karm-ui-backend": "sdl"
+    },
+    "tools": {
+        "cc": {
+            "cmd": "clang",
+            "args": []
+        },
+        "cxx": {
+            "cmd": "clang++",
+            "args": []
+        },
+        "ld": {
+            "cmd": "clang++",
+            "args": []
+        },
+        "ar": {
+            "cmd": "llvm-ar",
+            "args": [
+                "rcs"
+            ]
+        },
+        "as": {
+            "cmd": "nasm",
+            "args": [
+                "-f",
+                "elf64"
+            ]
+        }
+    }
+}

@@ -11,4 +11,7 @@
 -D__osdk_karm_sys_encoding_utf8__
 -D__osdk_karm_ui_backend_utf8__
 -D__osdk_karm_cli_backend_ansi__
+
+-D_THREAD_SAFE
 -I/usr/include/SDL2
+-I/opt/homebrew/include/SDL2

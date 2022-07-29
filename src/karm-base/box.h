@@ -15,7 +15,9 @@ struct Box {
     T *_ptr{};
 
     constexpr Box() = delete;
+
     constexpr Box(T *ptr) : _ptr(ptr) {}
+
     constexpr Box(Box const &) = delete;
 
     template <Meta::Derive<T> U>

@@ -4,6 +4,6 @@
 
 namespace Embed {
 
-Result<Strong<Karm::App::Host>> makeHost(Box<App::Client> &&client);
+Result<Strong<Karm::App::Host>> makeHost();
 
 } // namespace Embed

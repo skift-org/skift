@@ -4,8 +4,8 @@
 
 namespace Karm::App {
 
-Result<Strong<Karm::App::Host>> makeHost(Box<App::Client> &&client) {
-    return Embed::makeHost(std::move(client));
+Result<Strong<Karm::App::Host>> makeHost() {
+    return Embed::makeHost();
 }
 
 } // namespace Karm::App

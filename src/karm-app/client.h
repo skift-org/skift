@@ -6,12 +6,38 @@
 
 namespace Karm::App {
 
+struct Host;
+
 struct Client : public Meta::Static {
+    Host *_host;
+
     virtual ~Client() = default;
 
-    virtual void paint(Gfx::Context &gfx) = 0;
+    /* --- Callbacks -------------------------------------------------------- */
 
-    virtual void handle(Events::Event &event) = 0;
+    virtual void onMount() {}
+
+    virtual void onUnmount() {}
+
+    virtual void onEvent(Events::Event &) {}
+
+    virtual void onLayout(Math::Recti) {}
+
+    virtual void onPaint(Gfx::Context &) {}
+
+    /* --- Mounting / Unmounting -------------------------------------------- */
+
+    Host &host();
+
+    void mount(Host &host);
+
+    void unmount();
+
+    void shouldRepaint(Opt<Math::Recti> = NONE);
+
+    void shouldLayout();
+
+    void shouldAnimate();
 };
 
 } // namespace Karm::App

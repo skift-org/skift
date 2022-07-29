@@ -67,4 +67,7 @@ struct KeyboardEvent : public _Event<KeyboardEvent, 0x1eb75d94f347352> {
     Rune rune;
 };
 
+struct AnimationEvent : public _Event<AnimationEvent, 0xf21fe2676e487fc> {
+};
+
 } // namespace Karm::Events

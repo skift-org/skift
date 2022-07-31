@@ -205,7 +205,7 @@ struct Iter {
         return *result / count;
     }
 
-    struct _It {
+    struct It {
         Item curr;
         Iter iter;
 
@@ -223,8 +223,8 @@ struct Iter {
         }
     };
 
-    constexpr _It begin() {
-        return _It{next(), *this};
+    constexpr It begin() {
+        return It{next(), *this};
     }
 
     constexpr None end() {

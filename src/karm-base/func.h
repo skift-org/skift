@@ -37,7 +37,7 @@ struct Func<Out(In...)> {
     Func(F f) : _wrap(makeBox<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
-    requires (Meta::RvalueRef<F &&> and !(Meta::FuncPtr<F>))
+    requires (Meta::RvalueRef<F &&> && !(Meta::FuncPtr<F>))
     Func(F &&f) : _wrap(makeBox<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
@@ -49,7 +49,7 @@ struct Func<Out(In...)> {
     }
 
     template <typename F>
-    requires (Meta::RvalueRef<F &&> and !(Meta::FuncPtr<F>))
+    requires (Meta::RvalueRef<F &&> && !(Meta::FuncPtr<F>))
     Func &operator=(F &&f)
     {
         _wrap = makeBox<Wrap<F>>(std::move(f));

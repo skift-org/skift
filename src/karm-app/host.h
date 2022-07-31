@@ -55,13 +55,13 @@ struct Host : public Meta::Static {
 
     void handle(Events::Event &event) {
         _client.with([&](auto &c) {
-            c->onEvent(event);
+            c->event(event);
         });
     }
 
     void layout() {
         _client.with([&](auto &c) {
-            c->onLayout(surface().bound());
+            c->layout(surface().bound());
         });
     }
 
@@ -71,7 +71,7 @@ struct Host : public Meta::Static {
         _gfx.begin(s);
 
         _client.with([&](auto &c) {
-            c->onPaint(_gfx);
+            c->paint(_gfx);
         });
 
         _gfx.end();
@@ -84,6 +84,7 @@ struct Host : public Meta::Static {
         _alive = true;
 
         surface().clear(Gfx::ZINC900);
+        layout();
         paint();
 
         while (_alive) {

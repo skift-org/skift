@@ -5,7 +5,7 @@
 
 namespace Karm::App {
 
-Host &Client::host() {
+Host &Client::host() const {
     if (!_host) {
         panic("not mounted");
     }
@@ -14,11 +14,9 @@ Host &Client::host() {
 
 void Client::mount(Host &host) {
     _host = &host;
-    onMount();
 }
 
 void Client::unmount() {
-    onUnmount();
     _host = nullptr;
 }
 

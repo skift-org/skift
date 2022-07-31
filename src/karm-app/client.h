@@ -13,25 +13,17 @@ struct Client : public Meta::Static {
 
     virtual ~Client() = default;
 
-    /* --- Callbacks -------------------------------------------------------- */
+    Host &host() const;
 
-    virtual void onMount() {}
+    virtual void event(Events::Event &) {}
 
-    virtual void onUnmount() {}
+    virtual void layout(Math::Recti) {}
 
-    virtual void onEvent(Events::Event &) {}
+    virtual void paint(Gfx::Context &) {}
 
-    virtual void onLayout(Math::Recti) {}
+    virtual void mount(Host &host);
 
-    virtual void onPaint(Gfx::Context &) {}
-
-    /* --- Mounting / Unmounting -------------------------------------------- */
-
-    Host &host();
-
-    void mount(Host &host);
-
-    void unmount();
+    virtual void unmount();
 
     void shouldRepaint(Opt<Math::Recti> = NONE);
 

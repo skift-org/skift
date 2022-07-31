@@ -33,6 +33,14 @@ union Vec2 {
         return max(x, y);
     }
 
+    constexpr Vec2 min(Vec2 const &other) const {
+        return {min(x, other.x), min(y, other.y)};
+    }
+
+    constexpr Vec2 max(Vec2 const &other) const {
+        return {max(x, other.x), max(y, other.y)};
+    }
+
     constexpr T dot(Vec2 const &other) const {
         return x * other.x + y * other.y;
     }
@@ -151,6 +159,14 @@ union Vec3 {
         return max(x, y, z);
     }
 
+    constexpr Vec3 min(Vec3 const &other) {
+        return {min(x, other.x), min(y, other.y), min(z, other.z)};
+    }
+
+    constexpr Vec3 max(Vec3<T> const &other) {
+        return {max(x, other.x), max(y, other.y), max(z, other.z)};
+    }
+
     constexpr T dot(Vec3 const &other) const {
         return x * other.x + y * other.y + z * other.z;
     }
@@ -250,6 +266,14 @@ union Vec4 {
 
     constexpr T max() const {
         return max(x, y, z, w);
+    }
+
+    constexpr Vec4 min(Vec4 const &other) {
+        return {min(x, other.x), min(y, other.y), min(z, other.z), min(w, other.w)};
+    }
+
+    constexpr Vec4 max(Vec4 const &other) {
+        return {max(x, other.x), max(y, other.y), max(z, other.z), max(w, other.w)};
     }
 
     constexpr T dot(Vec4 const &other) const {

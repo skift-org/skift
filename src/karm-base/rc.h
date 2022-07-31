@@ -168,6 +168,32 @@ struct Strong {
     }
 
     template <typename U>
+    constexpr U &unwrap() {
+        if (!_rc) {
+            panic("Deferencing moved from Strong<T>");
+        }
+
+        if (!is<U>()) {
+            panic("Unwrapping Strong<T> as Strong<U>");
+        }
+
+        return _rc->unwrapStrong<U>();
+    }
+
+    template <typename U>
+    constexpr U const &unwrap() const {
+        if (!_rc) {
+            panic("Deferencing moved from Strong<T>");
+        }
+
+        if (!is<U>()) {
+            panic("Unwrapping Strong<T> as Strong<U>");
+        }
+
+        return _rc->unwrapStrong<U>();
+    }
+
+    template <typename U>
     constexpr bool is() {
         return Meta::Same<T, U> ||
                Meta::Derive<T, U> ||

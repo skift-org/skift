@@ -23,10 +23,16 @@ union Rect {
     constexpr Rect() : x(0), y(0), width(0), height(0) {
     }
 
+    constexpr Rect(T width, T height) : x(0), y(0), width(width), height(height) {
+    }
+
     constexpr Rect(T x, T y, T width, T height) : x(x), y(y), width(width), height(height) {
     }
 
     constexpr Rect(Vec2<T> xy, Vec2<T> wh) : xy(xy), wh(wh) {
+    }
+
+    constexpr Rect(Vec2<T> wh) : xy(0), wh(wh) {
     }
 
     static constexpr Rect<T> fromTwoPoint(Vec2<T> a, Vec2<T> b) {

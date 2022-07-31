@@ -8,15 +8,15 @@
 namespace Karm::Events {
 
 struct Event {
-    uint64_t _id{};
-    bool _accepted{};
+    uint64_t id{};
+    bool accepted{};
 
-    Event(uint64_t id) : _id{id} {}
+    Event(uint64_t id) : id{id} {}
 
     template <typename T>
     Event &handle(auto callback) {
-        if (_id == T::ID) {
-            _accepted = callback(static_cast<T const &>(*this));
+        if (id == T::ID) {
+            accepted = callback(static_cast<T const &>(*this));
         }
         return *this;
     }

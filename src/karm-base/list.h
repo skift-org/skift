@@ -13,15 +13,15 @@ template <typename _T>
 struct List {
     using T = _T;
 
-    struct _Node {
+    struct Node {
         T buf;
-        Strong<_Node> next;
-        Weak<_Node> prev;
+        Strong<Node> next;
+        Weak<Node> prev;
     };
 
     size_t _len = 0;
-    OptStrong<_Node> _head = NONE;
-    OptWeak<_Node> _tail = NONE;
+    OptStrong<Node> _head = NONE;
+    OptWeak<Node> _tail = NONE;
 
     constexpr List() = default;
 
@@ -79,7 +79,7 @@ struct List {
             panic("index out of range");
         }
 
-        Strong<_Node> node = self->_head;
+        Strong<Node> node = self->_head;
         for (size_t i = 0; i < index; i++) {
             node = node->next;
         }
@@ -123,7 +123,7 @@ struct List {
 
     template <typename... Args>
     void emplaceBack(Args &&...args) {
-        Strong<_Node> node = makeStrong<_Node>(std::forward(args)..., NONE, NONE);
+        Strong<Node> node = makeStrong<Node>(std::forward(args)..., NONE, NONE);
 
         if (_tail) {
             _tail->next = node;
@@ -141,7 +141,7 @@ struct List {
             panic("pop from empty list");
         }
 
-        Strong<_Node> node = _tail;
+        Strong<Node> node = _tail;
         _tail = node->prev;
         if (_tail) {
             _tail->next = NONE;

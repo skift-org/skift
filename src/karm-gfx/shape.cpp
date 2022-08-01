@@ -13,8 +13,8 @@ static void _createArc(Shape &shape, Math::Vec2f center, double startAngle, doub
     for (int i = 0; i < devision; i++) {
         double sa = startAngle + step * i;
         double ea = startAngle + step * (i + 1);
-        shape.add({center + Math::Vec2f{radius * std::cos(sa), radius * std::sin(sa)},
-                   center + Math::Vec2f{radius * std::cos(ea), radius * std::sin(ea)}});
+        shape.add({center + Math::Vec2f{radius * Math::cos(sa), radius * Math::sin(sa)},
+                   center + Math::Vec2f{radius * Math::cos(ea), radius * Math::sin(ea)}});
     }
 }
 

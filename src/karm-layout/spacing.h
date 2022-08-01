@@ -4,7 +4,7 @@
 
 #include "flow.h"
 
-namespace Karm::Ui {
+namespace Karm::Layout {
 
 template <typename T>
 struct Spacing {
@@ -64,4 +64,4 @@ struct Spacing {
 using Spacingi = Spacing<int>;
 using Spacingf = Spacing<float>;
 
-} // namespace Karm::Ui
+} // namespace Karm::Layout

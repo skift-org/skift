@@ -1,60 +1,54 @@
 #pragma once
 
-#include "flow.h"
+#include <karm-layout/dock.h>
+
+#include "group.h"
+#include "proxy.h"
 
 namespace Karm::Ui {
 
-struct Dock {
-    enum _Dock {
-        NONE,
-        FILL,
-        START,
-        TOP,
-        END,
-        BOTTOM,
-    };
+struct DockItem : public Proxy<DockItem> {
+    Layout::Dock _dock;
 
-    _Dock _dock;
+    DockItem(Layout::Dock dock, Child child) : Proxy(child), _dock(dock) {}
 
-    Dock(_Dock dock) : _dock(dock) {}
+    Layout::Dock dock() const { return _dock; }
+};
 
-    Flow flow() {
-        switch (_dock) {
-        default:
-        case NONE:
-        case FILL:
-            return Flow::LEFT_TO_RIGHT;
+template <typename... T>
+Child docked(T &&...args) {
+    return makeStrong<DockItem>(std::forward<T>(args)...);
+}
 
-        case START:
-            return Flow::LEFT_TO_RIGHT;
+struct DockLayout : public Group<DockLayout> {
+    using Group::Group;
 
-        case TOP:
-            return Flow::TOP_TO_BOTTOM;
+    void layout(Math::Recti bound) override {
+        _bound = bound;
+        auto outer = bound;
 
-        case END:
-            return Flow::RIGHT_TO_LEFT;
+        auto getDock = [&](auto &child) -> Layout::Dock {
+            if (child.template is<DockItem>()) {
+                return child.template unwrap<DockItem>().dock();
+            }
 
-        case BOTTOM:
-            return Flow::BOTTOM_TO_TOP;
-        }
-    }
+            return Layout::Dock::NONE;
+        };
 
-    template <typename T>
-    Math::Rect<T> apply(Math::Rect<T> inner, Math::Rect<T> &outer) {
-        switch (_dock) {
-        case NONE:
-            return inner;
-
-        case FILL:
-            return outer;
-
-        default:
-            inner = flow().setOrigin(inner, flow().getOrigin(outer));
-            inner = flow().setHeight(inner, flow().getHeight(outer));
-            outer = flow().setStart(outer, flow().getEnd(inner));
-            return inner;
+        for (auto &child : children()) {
+            Math::Recti inner = child->size(outer.size());
+            child->layout(getDock(child).apply(inner, outer));
         }
     }
 };
+
+static inline Child dock(Children children) {
+    return makeStrong<DockLayout>(children);
+}
+
+template <typename... Args>
+static inline Child dock(Args... args) {
+    return dock({std::forward<Args>(args)...});
+}
 
 } // namespace Karm::Ui

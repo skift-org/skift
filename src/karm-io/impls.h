@@ -32,7 +32,8 @@ struct Repeat : public Reader {
 };
 
 struct Empty : public Reader {
-    Result<size_t> read(MutBytes) override {
+    Result<size_t> read(MutBytes)
+    override {
         return 0;
     }
 };
@@ -139,6 +140,9 @@ struct BufWriter :
         _pos += written;
         return written;
     }
+};
+
+struct StringWriter {
 };
 
 } // namespace Karm::Io

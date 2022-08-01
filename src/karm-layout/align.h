@@ -2,7 +2,7 @@
 
 #include "flow.h"
 
-namespace Karm::Ui {
+namespace Karm::Layout {
 
 struct Align {
     static constexpr int NONE = (0);
@@ -66,4 +66,4 @@ struct Align {
     }
 };
 
-} // namespace Karm::Ui
+} // namespace Karm::Layout

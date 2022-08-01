@@ -154,7 +154,23 @@ struct Opt {
         return false;
     }
 
+    bool with(auto visitor) const {
+        if (_present) {
+            visitor(_value.unwrap());
+            return true;
+        }
+        return false;
+    }
+
     auto visit(auto visitor) -> decltype(visitor(_value.unwrap())) {
+        if (_present) {
+            return visitor(_value.unwrap());
+        }
+
+        return {};
+    }
+
+    auto visit(auto visitor) const -> decltype(visitor(_value.unwrap())) {
         if (_present) {
             return visitor(_value.unwrap());
         }

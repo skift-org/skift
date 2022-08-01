@@ -1,5 +1,9 @@
 #include <karm-main/main.h>
-#include <karm-ui/node.h>
+#include <karm-ui/box.h>
+#include <karm-ui/dock.h>
+#include <karm-ui/empty.h>
+#include <karm-ui/flow.h>
+#include <karm-ui/host.h>
 
 ExitCode entryPoint(CliArgs const &) {
     auto emptyBox = [](auto dock, auto color) {
@@ -7,7 +11,7 @@ ExitCode entryPoint(CliArgs const &) {
     };
 
     auto toolbar = [](auto... children) {
-        return Ui::docked(Ui::Dock::TOP, Ui::box(Gfx::ZINC800, Ui::flow(children...)));
+        return Ui::docked(Layout::Dock::TOP, Ui::box(Gfx::ZINC800, Ui::flow(children...)));
     };
 
     return Ui::show(
@@ -16,8 +20,8 @@ ExitCode entryPoint(CliArgs const &) {
                 Ui::box(Gfx::INDIGO500, Ui::empty(64)),
                 Ui::box(Gfx::AMBER500, Ui::empty(64)),
                 Ui::box(Gfx::CYAN500, Ui::empty(64))),
-            emptyBox(Ui::Dock::BOTTOM, Gfx::BLUE500),
-            emptyBox(Ui::Dock::START, Gfx::GREEN500),
-            emptyBox(Ui::Dock::END, Gfx::YELLOW500),
-            emptyBox(Ui::Dock::FILL, Gfx::PINK500)));
+            emptyBox(Layout::Dock::BOTTOM, Gfx::BLUE500),
+            emptyBox(Layout::Dock::START, Gfx::GREEN500),
+            emptyBox(Layout::Dock::END, Gfx::YELLOW500),
+            emptyBox(Layout::Dock::FILL, Gfx::PINK500)));
 }

@@ -183,4 +183,11 @@ static inline Result<size_t> format(Io::_TextWriter &writer, Str format, Ts &&..
     return _format(writer, format, args);
 }
 
+template <typename... Args>
+static inline String format(Str format, Args &&...args) {
+    Io::StringWriter writer;
+    format(writer, format, std::forward<Args>(args)...);
+    return writer.finalize();
+}
+
 } // namespace Karm::Fmt

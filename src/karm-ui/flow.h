@@ -13,11 +13,21 @@ struct Flow {
         BOTTOM_TO_TOP,
     };
 
-    _Flow _flow;
+    _Flow _flow{};
+
+    Flow() = default;
 
     Flow(_Flow flow) : _flow(flow) {}
 
-    Flow relative(Flow child) {
+    bool horizontal() const {
+        return _flow == LEFT_TO_RIGHT || _flow == RIGHT_TO_LEFT;
+    }
+
+    bool vertical() const {
+        return _flow == TOP_TO_BOTTOM || _flow == BOTTOM_TO_TOP;
+    }
+
+    Flow relative(Flow child) const {
         // FIXME: make sure this is correct
         Flow table[4 * 4] = {
             LEFT_TO_RIGHT,
@@ -45,7 +55,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Vec2<T> vec() {
+    Math::Vec2<T> vec() const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -63,7 +73,7 @@ struct Flow {
     }
 
     template <typename T>
-    T getStart(Math::Rect<T> rect) {
+    T getStart(Math::Rect<T> rect) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -81,7 +91,21 @@ struct Flow {
     }
 
     template <typename T>
-    T getEnd(Math::Rect<T> rect) {
+    T getX(Math::Vec2<T> vec) const {
+        switch (_flow) {
+        default:
+        case LEFT_TO_RIGHT:
+        case RIGHT_TO_LEFT:
+            return vec.x;
+
+        case TOP_TO_BOTTOM:
+        case BOTTOM_TO_TOP:
+            return vec.y;
+        }
+    }
+
+    template <typename T>
+    T getEnd(Math::Rect<T> rect) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -99,7 +123,7 @@ struct Flow {
     }
 
     template <typename T>
-    T getTop(Math::Rect<T> rect) {
+    T getTop(Math::Rect<T> rect) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -113,7 +137,21 @@ struct Flow {
     }
 
     template <typename T>
-    T getBottom(Math::Rect<T> rect) {
+    T getY(Math::Vec2<T> vec) const {
+        switch (_flow) {
+        default:
+        case LEFT_TO_RIGHT:
+        case RIGHT_TO_LEFT:
+            return vec.y;
+
+        case TOP_TO_BOTTOM:
+        case BOTTOM_TO_TOP:
+            return vec.x;
+        }
+    }
+
+    template <typename T>
+    T getBottom(Math::Rect<T> rect) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -127,7 +165,7 @@ struct Flow {
     }
 
     template <typename T>
-    T getWidth(Math::Rect<T> rect) {
+    T getWidth(Math::Rect<T> rect) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -141,7 +179,7 @@ struct Flow {
     }
 
     template <typename T>
-    T getHeight(Math::Rect<T> rect) {
+    T getHeight(Math::Rect<T> rect) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -155,22 +193,22 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Vec2<T> getOrigin(Math::Rect<T> rect) {
+    Math::Vec2<T> getOrigin(Math::Rect<T> rect) const {
         return {getStart(rect), getTop(rect)};
     }
 
     template <typename T>
-    T getHcenter(Math::Rect<T> rect) {
+    T getHcenter(Math::Rect<T> rect) const {
         return (getStart(rect) + getEnd(rect)) / 2;
     }
 
     template <typename T>
-    T getVcenter(Math::Rect<T> rect) {
+    T getVcenter(Math::Rect<T> rect) const {
         return (getTop(rect) + getBottom(rect)) / 2;
     }
 
     template <typename T>
-    Math::Rect<T> setStart(Math::Rect<T> rect, T value) {
+    Math::Rect<T> setStart(Math::Rect<T> rect, T value) const {
         T d = value - getStart(rect);
 
         switch (_flow) {
@@ -196,7 +234,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setX(Math::Rect<T> rect, T value) {
+    Math::Rect<T> setX(Math::Rect<T> rect, T value) const {
         T d = value - getStart(rect);
 
         switch (_flow) {
@@ -214,7 +252,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setEnd(Math::Rect<T> rect, T value) {
+    Math::Rect<T> setEnd(Math::Rect<T> rect, T value) const {
         T d = value - getEnd(rect);
 
         switch (_flow) {
@@ -238,7 +276,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setTop(Math::Rect<T> rect, T value) {
+    Math::Rect<T> setTop(Math::Rect<T> rect, T value) const {
         T d = value - getTop(rect);
 
         switch (_flow) {
@@ -258,7 +296,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setY(Math::Rect<T> rect, T value) {
+    Math::Rect<T> setY(Math::Rect<T> rect, T value) const {
         T d = value - getTop(rect);
 
         switch (_flow) {
@@ -276,7 +314,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setBottom(Math::Rect<T> rect, T value) {
+    Math::Rect<T> setBottom(Math::Rect<T> rect, T value) const {
         T d = value - getBottom(rect);
 
         switch (_flow) {
@@ -294,14 +332,14 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setOrigin(Math::Rect<T> rect, Math::Vec2<T> value) {
+    Math::Rect<T> setOrigin(Math::Rect<T> rect, Math::Vec2<T> value) const {
         rect = setX(rect, value.x);
         rect = setY(rect, value.y);
         return rect;
     }
 
     template <typename T>
-    Math::Rect<T> setWidth(Math::Rect<T> rect, T value) {
+    Math::Rect<T> setWidth(Math::Rect<T> rect, T value) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -317,7 +355,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setHeight(Math::Rect<T> rect, T value) {
+    Math::Rect<T> setHeight(Math::Rect<T> rect, T value) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:

@@ -183,10 +183,11 @@ static inline Result<size_t> format(Io::_TextWriter &writer, Str format, Ts &&..
     return _format(writer, format, args);
 }
 
-template <typename... Args>
-static inline String format(Str format, Args &&...args) {
-    Io::StringWriter writer;
-    format(writer, format, std::forward<Args>(args)...);
+template <typename... Ts>
+static inline String format(Str format, Ts &&...ts) {
+    Io::StringWriter writer{};
+    Args<Ts...> args{std::forward<Ts>(ts)...};
+    _format(writer, format, args).unwrap();
     return writer.finalize();
 }
 

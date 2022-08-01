@@ -33,7 +33,7 @@ struct Repeat : public Reader {
 
 struct Empty : public Reader {
     Result<size_t> read(MutBytes)
-    override {
+        override {
         return 0;
     }
 };
@@ -142,7 +142,43 @@ struct BufWriter :
     }
 };
 
-struct StringWriter {
+template <StaticEncoding E>
+struct _StringWriter : public _TextWriter {
+    Buf<typename E::Unit> _buf{};
+
+    Result<size_t> write(Bytes) override {
+        panic("can't write raw bytes to a string");
+    }
+
+    Result<size_t> writeStr(Str str) override {
+        size_t written = 0;
+        for (auto rune : iterRunes(str)) {
+            written += try$(writeRune(rune));
+        }
+        return written;
+    }
+
+    Result<size_t> writeRune(Rune rune) override {
+        typename E::One one;
+        if (!E::encodeUnit(rune, one)) {
+            return 0;
+        }
+
+        for (auto unit : iter(one)) {
+            _buf.insert(_buf.len(), std::move(unit));
+        }
+
+        return write(bytes(one));
+    }
+
+    String finalize() {
+        size_t len = _buf.size();
+        _buf.insert(len, 0);
+
+        return {MOVE, _buf.take(), len};
+    }
 };
+
+using StringWriter = _StringWriter<Utf8>;
 
 } // namespace Karm::Io

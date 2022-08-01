@@ -208,10 +208,18 @@ struct Buf {
         _len = newLen;
     }
 
+    T *take() {
+        T *ret = &_buf->unwrap();
+        _buf = nullptr;
+        _cap = 0;
+        _len = 0;
+        return ret;
+    }
+
     T *buf() {
         if (_buf == nullptr)
             return nullptr;
-        
+
         return &_buf->unwrap();
     }
 

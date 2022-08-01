@@ -42,6 +42,7 @@ concept SeekableDuplexable = Duplexable<T> && Seekable<T>;
 
 struct Writer {
     virtual ~Writer() = default;
+
     virtual Result<size_t> write(Bytes) = 0;
 };
 
@@ -49,6 +50,7 @@ static_assert(Writable<Writer>);
 
 struct Reader {
     virtual ~Reader() = default;
+
     virtual Result<size_t> read(MutBytes) = 0;
 };
 
@@ -56,6 +58,7 @@ static_assert(Readable<Reader>);
 
 struct Seeker {
     virtual ~Seeker() = default;
+
     virtual Result<size_t> seek(Seek seek) = 0;
 };
 
@@ -73,6 +76,7 @@ struct _TextWriter : public Writer {
     using Writer::write;
 
     virtual Result<size_t> writeStr(Str str) = 0;
+
     virtual Result<size_t> writeRune(Rune rune) = 0;
 };
 

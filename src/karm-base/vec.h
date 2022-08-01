@@ -3,7 +3,6 @@
 #include "_prelude.h"
 
 #include "buf.h"
-#include "iter.h"
 #include "opt.h"
 #include "ref.h"
 

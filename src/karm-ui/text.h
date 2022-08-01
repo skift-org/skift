@@ -18,9 +18,13 @@ struct Text : public View<Text> {
     }
 };
 
+static inline Child text(String text) {
+    return makeStrong<Text>(text);
+}
+
 template <typename... Args>
-Child text(Args &&...args) {
-    return makeStrong<Text>(std::forward<Args>(args)...);
+static inline Child text(Str format, Args &&...args) {
+    return makeStrong<Text>(Fmt::format(format, std::forward<Args>(args)...));
 }
 
 } // namespace Karm::Ui

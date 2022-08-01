@@ -21,7 +21,7 @@ struct StateComponent : public Component<StateComponent<T>> {
             return _s._value;
         }
 
-        auto bind(auto f) {
+        Func<void()> bind(auto f) {
             return [*this, f] mutable {
                 update(f(value()));
             };

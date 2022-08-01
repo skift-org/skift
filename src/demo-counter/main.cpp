@@ -5,7 +5,7 @@
 #include <karm-ui/state.h>
 #include <karm-ui/text.h>
 
-constexpr auto inc(auto state) {
+int inc(int state) {
     return state + 1;
 };
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdio>
+
 #include "array.h"
 #include "clamp.h"
 #include "inert.h"
@@ -42,6 +44,7 @@ struct Buf {
         _cap = other._cap;
         _len = other._len;
         _buf = new Inert<T>[_cap];
+
         for (size_t i = 0; i < _len; i++) {
             _buf[i].ctor(other.at(i));
         }
@@ -54,6 +57,9 @@ struct Buf {
     }
 
     ~Buf() {
+        if (!_buf)
+            return;
+
         for (size_t i = 0; i < _len; i++) {
             _buf[i].dtor();
         }
@@ -79,6 +85,12 @@ struct Buf {
     void ensure(size_t cap) {
         if (cap <= _cap)
             return;
+
+        if (!_buf) {
+            _buf = new Inert<T>[cap];
+            _cap = cap;
+            return;
+        }
 
         Inert<T> *tmp = new Inert<T>[cap];
         for (size_t i = 0; i < _len; i++) {
@@ -209,10 +221,11 @@ struct Buf {
     }
 
     T *take() {
-        T *ret = &_buf->unwrap();
+        T *ret = buf();
         _buf = nullptr;
         _cap = 0;
         _len = 0;
+
         return ret;
     }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdio>
+
 #include "keywords.h"
 #include "ordr.h"
 #include "rune.h"
@@ -49,7 +51,8 @@ struct _String {
     _String() = default;
 
     _String(Move, Unit *buf, size_t len)
-        : _buf(buf), _len(len) {}
+        : _buf(buf), _len(len) {
+    }
 
     _String(Unit const *buf, size_t len)
         : _len(len) {
@@ -57,9 +60,6 @@ struct _String {
         _buf[len] = 0;
         memcpy(_buf, buf, len * sizeof(Unit));
     }
-
-    _String(Unit const *cstr) requires(Meta::Same<Unit, char>)
-        : _String(cstr, strLen(cstr)) {}
 
     _String(_Str<E> str)
         : _String(str.buf(), str.len()) {}
@@ -74,7 +74,9 @@ struct _String {
     }
 
     ~_String() {
-        delete[] _buf;
+        if (_buf) {
+            delete[] _buf;
+        }
     }
 
     _String &operator=(_String const &other) {

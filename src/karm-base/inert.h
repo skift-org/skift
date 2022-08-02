@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-meta/traits.h>
+
 #include "_prelude.h"
 
 #include "std.h"
@@ -7,40 +9,37 @@
 namespace Karm {
 
 template <typename T>
-struct Inert {
-    union {
-        T _value;
-    };
-
-    Inert() {}
-
-    ~Inert() {}
+union Inert {
+    alignas(alignof(T)) char _inner[sizeof(T)];
 
     void ctor(T &&value) {
-        new (&_value) T(std::move(value));
+        new (&unwrap()) T(std::move(value));
     }
 
     template <typename... Args>
     void ctor(Args &&...args) {
-        new (&_value) T(std::forward<Args>(args)...);
+        new (&unwrap()) T(std::forward<Args>(args)...);
     }
 
     void dtor() {
-        _value.~T();
+        unwrap().~T();
     }
 
     T &unwrap() {
-        return _value;
+        return *(T *)_inner;
     }
 
     T const &unwrap() const {
-        return _value;
+        return *(T const *)_inner;
     }
 
     T take() {
-        T value = std::move(_value);
+        T value = std::move(unwrap());
         dtor();
         return value;
     }
 };
+
+static_assert(Meta::Trivial<Inert<int>>, "Inert is not trivial");
+
 }; // namespace Karm

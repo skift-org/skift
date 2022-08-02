@@ -33,7 +33,7 @@ struct Repeat : public Reader {
 
 struct Empty : public Reader {
     Result<size_t> read(MutBytes)
-        override {
+    override {
         return 0;
     }
 };
@@ -146,7 +146,10 @@ template <StaticEncoding E>
 struct _StringWriter : public _TextWriter {
     Buf<typename E::Unit> _buf{};
 
-    Result<size_t> write(Bytes) override {
+    _StringWriter(size_t cap = 16) : _buf(cap) {}
+
+    Result<size_t> write(Bytes)
+    override {
         panic("can't write raw bytes to a string");
     }
 
@@ -168,14 +171,14 @@ struct _StringWriter : public _TextWriter {
             _buf.insert(_buf.len(), std::move(unit));
         }
 
-        return write(bytes(one));
+        return 1;
     }
 
     String finalize() {
         size_t len = _buf.size();
         _buf.insert(len, 0);
 
-        return {MOVE, _buf.take(), len};
+        return String{MOVE, _buf.take(), len};
     }
 };
 

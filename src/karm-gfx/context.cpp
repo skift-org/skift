@@ -176,7 +176,7 @@ void Context::_draw(Math::Vec2i baseline, Rune rune, Color color) {
     for (int y = 0; y < VGA_FONT_HEIGHT; y++) {
         for (int x = 0; x < VGA_FONT_WIDTH; x++) {
             uint8_t byte = VGA_FONT[one * VGA_FONT_HEIGHT + y];
-            if (byte & (1 << x)) {
+            if (byte & (0x80 >> x)) {
                 plot(baseline + Math::Vec2i{x, y - VGA_FONT_HEIGHT}, color);
             }
         }
@@ -200,9 +200,8 @@ void Context::stroke(Math::Vec2i baseline, Str text) {
 }
 
 void Context::fill(Math::Vec2i baseline, Str text) {
-    Math::Vec2i pos = baseline;
     for (auto rune : iterRunes(text)) {
-        fill(pos, rune);
+        fill(baseline, rune);
         baseline = baseline + Math::Vec2i{VGA_FONT_WIDTH, 0};
     }
 }

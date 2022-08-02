@@ -18,7 +18,7 @@ struct Text : public View<Text> {
     }
 };
 
-static inline Child text(String text) {
+static inline Child text(Str text) {
     return makeStrong<Text>(text);
 }
 

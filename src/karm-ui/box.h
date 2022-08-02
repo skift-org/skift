@@ -31,7 +31,6 @@ struct Box : public Proxy<Box> {
 
         g.fillStyle(_color);
         g.fill(bound());
-        g.origin(_spacing.topStart());
         child().paint(g);
         g.restore();
     }

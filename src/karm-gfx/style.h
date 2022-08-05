@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-math/vec.h>
+#include <karm-media/font.h>
 
 #include "colors.h"
 
@@ -92,11 +93,17 @@ static inline constexpr Stroke stroke(auto... args) {
 
 struct Text {
     Color color{WHITE};
+    Strong<Media::Font> font = Media::Font::fallback();
 
-    constexpr Text(Color c = WHITE) : color(c) {}
+    Text(Color c = WHITE) : color(c) {}
 
-    constexpr Text withColor(Color c) {
+    Text withColor(Color c) {
         color = c;
+        return *this;
+    }
+
+    Text withFont(Strong<Media::Font> f) {
+        font = f;
         return *this;
     }
 };

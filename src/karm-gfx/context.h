@@ -101,6 +101,8 @@ struct Context {
 
     Context &textStyle(Text style);
 
+    Media::Font const &textFont();
+
     Context &shadowStyle(Shadow style);
 
     /* --- Drawing ---------------------------------------------------------- */
@@ -110,6 +112,8 @@ struct Context {
     void clear(Math::Recti rect, Color color = BLACK);
 
     /* --- Shapes ----------------------------------------------------------- */
+
+    void plot(Math::Vec2i point);
 
     void plot(Math::Vec2i point, Color color);
 
@@ -127,19 +131,17 @@ struct Context {
 
     /* --- Text ------------------------------------------------------------- */
 
-    Math::Vec2i mesure(Rune rune);
+    Media::FontMesure mesureRune(Rune rune);
 
-    Math::Vec2i mesure(Str text);
+    Media::FontMesure mesureStr(Str text);
 
-    void _draw(Math::Vec2i baseline, Rune rune, Color color);
+    void strokeRune(Math::Vec2i baseline, Rune rune);
 
-    void stroke(Math::Vec2i baseline, Rune rune);
+    void fillRune(Math::Vec2i baseline, Rune rune);
 
-    void fill(Math::Vec2i baseline, Rune rune);
+    void strokeStr(Math::Vec2i baseline, Str str);
 
-    void stroke(Math::Vec2i baseline, Str text);
-
-    void fill(Math::Vec2i baseline, Str text);
+    void fillStr(Math::Vec2i baseline, Str str);
 
     /* --- Paths ------------------------------------------------------------ */
 

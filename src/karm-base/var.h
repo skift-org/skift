@@ -12,6 +12,7 @@ namespace Karm {
 template <typename... Ts>
 struct Var {
     alignas(max(alignof(Ts)...)) char _buf[max(sizeof(Ts)...)];
+
     uint8_t _index;
 
     Var() = delete;

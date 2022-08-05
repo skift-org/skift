@@ -2,7 +2,6 @@
 
 #include "colors.h"
 #include "context.h"
-#include "vga-font.h"
 
 namespace Karm::Gfx {
 
@@ -76,13 +75,25 @@ void Context::origin(Math::Vec2i pos) {
 
 /* --- Fill & Stroke ---------------------------------------------------- */
 
-FillStyle const &Context::fillStyle() { return current().fillStyle; }
+FillStyle const &Context::fillStyle() {
+    return current().fillStyle;
+}
 
-Stroke const &Context::strokeStyle() { return current().strokeStyle; }
+Stroke const &Context::strokeStyle() {
+    return current().strokeStyle;
+}
 
-Text const &Context::textStyle() { return current().textStyle; }
+Text const &Context::textStyle() {
+    return current().textStyle;
+}
 
-Shadow const &Context::shadowStyle() { return current().shadowStyle; }
+Media::Font const &Context::textFont() {
+    return *current().textStyle.font;
+}
+
+Shadow const &Context::shadowStyle() {
+    return current().shadowStyle;
+}
 
 Context &Context::fillStyle(FillStyle style) {
     current().fillStyle = style;
@@ -119,6 +130,10 @@ void Context::clear(Math::Recti rect, Color color) {
 }
 
 /* --- Shapes ----------------------------------------------------------- */
+
+void Context::plot(Math::Vec2i point) {
+    plot(point, fillStyle().color());
+}
 
 void Context::plot(Math::Vec2i point, Color color) {
     point = applyOrigin(point);
@@ -157,53 +172,28 @@ void Context::fill(Math::Ellipsei e) {
 
 /* --- Text ------------------------------------------------------------- */
 
-Math::Vec2i Context::mesure(Rune) {
-    return {VGA_FONT_WIDTH, VGA_FONT_HEIGHT};
+Media::FontMesure Context::mesureRune(Rune r) {
+    return textFont().mesureRune(r);
 }
 
-Math::Vec2i Context::mesure(Str text) {
-    int width = VGA_FONT_HEIGHT;
-    for (auto rune : iterRunes(text)) {
-        width += mesure(rune).x;
-    }
-    return {width, VGA_FONT_HEIGHT};
+Media::FontMesure Context::mesureStr(Str str) {
+    return textFont().mesureStr(str);
 }
 
-void Context::_draw(Math::Vec2i baseline, Rune rune, Color color) {
-    One<Ibm437> one;
-    encodeOne<Ibm437>(rune, one);
-
-    for (int y = 0; y < VGA_FONT_HEIGHT; y++) {
-        for (int x = 0; x < VGA_FONT_WIDTH; x++) {
-            uint8_t byte = VGA_FONT[one * VGA_FONT_HEIGHT + y];
-            if (byte & (0x80 >> x)) {
-                plot(baseline + Math::Vec2i{x, y - VGA_FONT_HEIGHT}, color);
-            }
-        }
-    }
+void Context::strokeRune(Math::Vec2i baseline, Rune rune) {
+    textFont().strokeRune(*this, baseline, rune);
 }
 
-void Context::stroke(Math::Vec2i baseline, Rune rune) {
-    _draw(baseline, rune, strokeStyle().color);
+void Context::fillRune(Math::Vec2i baseline, Rune rune) {
+    textFont().fillRune(*this, baseline, rune);
 }
 
-void Context::fill(Math::Vec2i baseline, Rune rune) {
-    _draw(baseline, rune, fillStyle().color());
+void Context::strokeStr(Math::Vec2i baseline, Str str) {
+    textFont().strokeStr(*this, baseline, str);
 }
 
-void Context::stroke(Math::Vec2i baseline, Str text) {
-    Math::Vec2i pos = baseline;
-    for (auto rune : iterRunes(text)) {
-        stroke(pos, rune);
-        baseline = baseline + Math::Vec2i{VGA_FONT_WIDTH, 0};
-    }
-}
-
-void Context::fill(Math::Vec2i baseline, Str text) {
-    for (auto rune : iterRunes(text)) {
-        fill(baseline, rune);
-        baseline = baseline + Math::Vec2i{VGA_FONT_WIDTH, 0};
-    }
+void Context::fillStr(Math::Vec2i baseline, Str str) {
+    textFont().fillStr(*this, baseline, str);
 }
 
 /* --- Paths ------------------------------------------------------------ */

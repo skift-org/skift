@@ -52,8 +52,8 @@ union Trans2 {
 
     constexpr Vec2<T> applyVector(Vec2<T> v) const {
         return {
-            v.x * xx + v.y * xy,
-            v.x * yx + v.y * yy,
+            v.x * xx + v.y * yx,
+            v.x * xy + v.y * yy,
         };
     }
 

@@ -233,10 +233,6 @@ void Context::_trace() {
     for (auto edge : _shape) {
         _line(edge.cast<int>(), WHITE);
     }
-
-    for (auto edge : _shape) {
-        plot(edge.cast<int>().end, RED);
-    }
 }
 
 void Context::_fill(Color color) {

@@ -4,9 +4,8 @@
 
 struct SvgApp : public Ui::Widget<SvgApp> {
     bool _trace{false};
-    Math::Vec2i _mousePos{300, 300};
 
-    void paint(Gfx::Context &g) const override {
+    void paint(Gfx::Context &g) override {
 
         g.clear(Gfx::BLACK);
 
@@ -29,7 +28,6 @@ struct SvgApp : public Ui::Widget<SvgApp> {
                 _trace = !_trace;
                 Ui::shouldRepaint(*this);
             }
-            _mousePos = m.pos;
             return true;
         });
     }

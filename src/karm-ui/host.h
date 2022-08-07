@@ -40,6 +40,7 @@ struct Host : public Node {
     void paint() {
         auto s = surface();
         _g.begin(s);
+        _g.clear(Gfx::ZINC900);
         paint(_g);
         _g.end();
         Array<Math::Recti, 1> dirty = {s.bound()};
@@ -75,7 +76,6 @@ struct Host : public Node {
     }
 
     Error run() {
-        surface().clear(Gfx::ZINC900);
         layout(surface().bound());
         paint();
         while (!_error) {

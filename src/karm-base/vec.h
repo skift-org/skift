@@ -76,6 +76,10 @@ struct _Vec {
 
     void insert(size_t index, T &&value) { _buf.insert(index, std::move(value)); }
 
+    void replace(size_t index, T const &value) { _buf[index] = T(value); }
+
+    void replace(size_t index, T &&value) { _buf[index] = std::move(value); }
+
     T removeAt(size_t index) { return _buf.removeAt(index); }
 
     void removeRange(size_t index, size_t count) { _buf.removeRange(index, count); }

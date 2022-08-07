@@ -1,6 +1,6 @@
 #pragma once
 
-#include "node.h"
+#include "funcs.h"
 
 namespace Karm::Ui {
 
@@ -9,8 +9,15 @@ struct Component : public Widget<Crtp> {
     bool _rebuild = true;
     Opt<Child> _child;
 
+    ~Component() {
+        _child.with([&](auto &child) {
+            child->detach();
+        });
+    }
+
     void shouldRebuild() {
         _rebuild = true;
+        Ui::shouldLayout(*this);
     }
 
     virtual Child build() = 0;
@@ -34,11 +41,16 @@ struct Component : public Widget<Crtp> {
             auto newChild = build();
 
             if (!_child.with([&](auto &child) {
-                    child->reconcile(newChild);
+                    auto result = child->reconcile(newChild);
+
+                    if (result)
+                        _child = result;
                 })) {
                 _child = newChild;
             }
-
+            _child.with([&](auto &child) {
+                child->attach(this);
+            });
             _rebuild = false;
         }
 

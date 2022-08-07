@@ -37,10 +37,11 @@ struct Group : public Widget<Crtp> {
 
         for (size_t i = 0; i < them.len(); i++) {
             if (i < us.len()) {
-                us.insert(i, tryOr(us[i]->reconcile(them[i]), us[i]));
+                us.replace(i, tryOr(us[i]->reconcile(them[i]), us[i]));
             } else {
                 us.insert(i, them[i]);
             }
+            us[i]->attach(this);
         }
 
         us.truncate(them.len());

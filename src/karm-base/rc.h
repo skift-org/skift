@@ -200,6 +200,14 @@ struct Strong {
                _rc->id() == Meta::makeId<U>();
     }
 
+    Meta::Id id() const {
+        if (!_rc) {
+            panic("Deferencing moved from Strong<T>");
+        }
+
+        return _rc->id();
+    }
+
     template <typename U>
     constexpr Opt<Strong<U>> as() {
         if (!is<U>()) {

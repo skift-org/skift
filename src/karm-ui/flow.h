@@ -29,9 +29,11 @@ struct FlowLayout : public Group<FlowLayout> {
     Layout::Flow _flow{};
     int _gaps{};
 
-    FlowLayout(Children children) : Group(children), _flow(Layout::Flow::LEFT_TO_RIGHT) {}
+    FlowLayout(Children children)
+        : Group(children), _flow(Layout::Flow::LEFT_TO_RIGHT) {}
 
-    FlowLayout(Layout::Flow flow, Children children) : Group(children), _flow(flow) {}
+    FlowLayout(Layout::Flow flow, Children children)
+        : Group(children), _flow(flow) {}
 
     void layout(Math::Recti r) override {
         int total = 0;

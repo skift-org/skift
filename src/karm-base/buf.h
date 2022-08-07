@@ -138,6 +138,16 @@ struct Buf {
         _len++;
     }
 
+    void replace(size_t index, T &&value) {
+        if (index >= _len) {
+            insert(index, std::move(value));
+            return;
+        }
+
+        _buf[index].dtor();
+        _buf[index].ctor(std::move(value));
+    }
+
     void insert(Copy, size_t index, T *first, size_t count) {
         ensure(_len + count);
 

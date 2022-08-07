@@ -2,6 +2,7 @@
 
 #include <karm-base/func.h>
 #include <karm-base/rc.h>
+#include <karm-debug/logger.h>
 #include <karm-events/events.h>
 #include <karm-gfx/context.h>
 
@@ -57,9 +58,8 @@ struct Widget : public Node {
     }
 
     void bubble(Events::Event &e) override {
-        if (_parent) {
+        if (_parent)
             _parent->bubble(e);
-        }
     }
 
     Node *parent() override {

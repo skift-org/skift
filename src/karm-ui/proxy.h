@@ -9,7 +9,7 @@ struct Proxy : public Widget<Crtp> {
     Child _child;
 
     Proxy(Child child) : _child(child) {
-        child->attach(this);
+        _child->attach(this);
     }
 
     ~Proxy() {

@@ -326,7 +326,7 @@ Opt<Math::Vec2f> _nextVec2f(Text::Scan &scan) {
 }
 
 Opt<Path::Op> Path::parseOp(Text::Scan &scan, Rune opcode) {
-    Flags flags;
+    Flags flags{};
     flags |= islower(opcode) ? RELATIVE : DEFAULT;
     opcode = tolower(opcode);
 

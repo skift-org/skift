@@ -28,7 +28,7 @@ struct Proxy : public Widget<Crtp> {
         _child = tryOr(_child->reconcile(o._child), _child);
     }
 
-    void paint(Gfx::Context &g) const override {
+    void paint(Gfx::Context &g) override {
         child().paint(g);
     }
 
@@ -40,11 +40,11 @@ struct Proxy : public Widget<Crtp> {
         child().layout(r);
     }
 
-    Math::Vec2i size(Math::Vec2i s) const override {
+    Math::Vec2i size(Math::Vec2i s) override {
         return child().size(s);
     }
 
-    Math::Recti bound() const override {
+    Math::Recti bound() override {
         return _child->bound();
     }
 

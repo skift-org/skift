@@ -26,7 +26,7 @@ struct Box : public Proxy<Box> {
         Proxy<Box>::reconcile(o);
     }
 
-    void paint(Gfx::Context &g) const override {
+    void paint(Gfx::Context &g) override {
         g.save();
 
         g.fillStyle(_color);
@@ -39,11 +39,11 @@ struct Box : public Proxy<Box> {
         child().layout(_spacing.shrink(Layout::Flow::LEFT_TO_RIGHT, rect));
     }
 
-    Math::Vec2i size(Math::Vec2i s) const override {
+    Math::Vec2i size(Math::Vec2i s) override {
         return child().size(s - _spacing.all()) + _spacing.all();
     }
 
-    Math::Recti bound() const override {
+    Math::Recti bound() override {
         return _spacing.grow(Layout::Flow::LEFT_TO_RIGHT, child().bound());
     }
 };

@@ -7,7 +7,7 @@ struct CirclesApp : public Ui::Widget<CirclesApp> {
     Math::Vec2i _mousePos{};
     int _frame = 0;
 
-    void paint(Gfx::Context &g) const override {
+    void paint(Gfx::Context &g) override {
         Math::Rand rand{_frame};
         double size = rand.nextInt(4, 10);
         size *= size;

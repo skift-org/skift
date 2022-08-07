@@ -15,12 +15,12 @@ struct Text : public View<Text> {
         _text = o._text;
     }
 
-    void paint(Gfx::Context &g) const override {
+    void paint(Gfx::Context &g) override {
         auto m = g.mesureStr(_text);
         g.fillStr(bound().topStart() + m.baseline.cast<int>(), _text);
     }
 
-    Math::Vec2i size(Math::Vec2i) const override {
+    Math::Vec2i size(Math::Vec2i) override {
         return _font->mesureStr(_text).linebound.size().cast<int>();
     }
 };

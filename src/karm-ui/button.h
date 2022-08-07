@@ -19,17 +19,20 @@ struct Button : public Proxy<Button> {
     Button(Func<void()> onPress, Child child)
         : Proxy(child), _onPress(std::move(onPress)) {}
 
-    void paint(Gfx::Context &g) const override {
-        if (_state == IDLE)
-            g.fillStyle(Gfx::BLUE500);
-
-        if (_state == OVER)
-            g.fillStyle(Gfx::RED500);
-
-        if (_state == PRESS)
-            g.fillStyle(Gfx::GREEN500);
-
+    void paint(Gfx::Context &g) override {
+        g.fillStyle(Gfx::BLUE500);
         g.fill(bound());
+
+        if (_state == OVER) {
+            g.fillStyle(Gfx::BLACK.withOpacity(0.1));
+            g.fill(bound());
+        }
+
+        if (_state == PRESS) {
+            g.fillStyle(Gfx::BLACK.withOpacity(0.2));
+            g.fill(bound());
+        }
+
         child().paint(g);
     }
 

@@ -8,7 +8,7 @@ template <typename Crtp>
 struct View : public Widget<Crtp> {
     Math::Recti _bound;
 
-    Math::Recti bound() const override {
+    Math::Recti bound() override {
         return _bound;
     }
 

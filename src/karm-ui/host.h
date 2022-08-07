@@ -33,7 +33,7 @@ struct Host : public Node {
         return !_error;
     }
 
-    void paint(Gfx::Context &g) const override {
+    void paint(Gfx::Context &g) override {
         _root->paint(g);
     }
 

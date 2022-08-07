@@ -20,7 +20,7 @@ struct Node {
 
     virtual Opt<Child> reconcile(Other o) { return o; }
 
-    virtual void paint(Gfx::Context &) const {}
+    virtual void paint(Gfx::Context &) {}
 
     virtual void event(Events::Event &) {}
 
@@ -28,9 +28,9 @@ struct Node {
 
     virtual void layout(Math::Recti) {}
 
-    virtual Math::Vec2i size(Math::Vec2i s) const { return s; }
+    virtual Math::Vec2i size(Math::Vec2i s) { return s; }
 
-    virtual Math::Recti bound() const { return {}; }
+    virtual Math::Recti bound() { return {}; }
 
     virtual void visit(Visitor &) {}
 

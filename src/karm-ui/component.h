@@ -22,21 +22,7 @@ struct Component : public Widget<Crtp> {
 
     virtual Child build() = 0;
 
-    void reconcile(Crtp &) override {}
-
-    void paint(Gfx::Context &g) const override {
-        _child.with([&](auto &child) {
-            child->paint(g);
-        });
-    }
-
-    void event(Events::Event &e) override {
-        _child.with([&](auto &child) {
-            child->event(e);
-        });
-    }
-
-    void layout(Math::Recti r) override {
+    void ensureBuild() {
         if (_rebuild) {
             auto newChild = build();
 
@@ -53,19 +39,41 @@ struct Component : public Widget<Crtp> {
             });
             _rebuild = false;
         }
+    }
+
+    void reconcile(Crtp &) override {}
+
+    void paint(Gfx::Context &g) override {
+        _child.with([&](auto &child) {
+            child->paint(g);
+        });
+    }
+
+    void event(Events::Event &e) override {
+        _child.with([&](auto &child) {
+            child->event(e);
+        });
+    }
+
+    void layout(Math::Recti r) override {
+        ensureBuild();
 
         _child.with([&](auto &child) {
             child->layout(r);
         });
     }
 
-    Math::Vec2i size(Math::Vec2i s) const override {
+    Math::Vec2i size(Math::Vec2i s) override {
+        ensureBuild();
+
         return _child.visit([&](auto &child) {
             return child->size(s);
         });
     }
 
-    Math::Recti bound() const override {
+    Math::Recti bound() override {
+        ensureBuild();
+
         return _child.visit([&](auto &child) {
             return child->bound();
         });

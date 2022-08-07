@@ -70,7 +70,7 @@ struct FlowLayout : public Group<FlowLayout> {
         }
     }
 
-    Math::Vec2i size(Math::Vec2i s) const override {
+    Math::Vec2i size(Math::Vec2i s) override {
         int w{};
         int h{};
 

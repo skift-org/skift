@@ -174,12 +174,14 @@ struct SdlHost : public Ui::Host {
 Result<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
+    auto size = root->size({500, 700});
+
     SDL_Window *window = SDL_CreateWindow(
         "Application",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
-        640,
-        1136,
+        size.width,
+        size.height,
         SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
 
     if (!window) {

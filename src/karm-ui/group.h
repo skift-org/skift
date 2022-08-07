@@ -47,7 +47,7 @@ struct Group : public Widget<Crtp> {
         us.truncate(them.len());
     }
 
-    void paint(Gfx::Context &g) const override {
+    void paint(Gfx::Context &g) override {
         for (auto &child : children()) {
             child->paint(g);
         }
@@ -69,11 +69,11 @@ struct Group : public Widget<Crtp> {
         }
     }
 
-    Math::Recti bound() const override {
+    Math::Recti bound() override {
         return _bound;
     }
 
-    Math::Vec2i size(Math::Vec2i s) const override {
+    Math::Vec2i size(Math::Vec2i s) override {
         for (auto &child : children()) {
             s = child->size(s);
         }

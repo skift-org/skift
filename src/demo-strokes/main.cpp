@@ -6,7 +6,7 @@ struct StrokesApp : public Ui::Widget<StrokesApp> {
     Math::Vec2i _mousePos{};
     bool _trace = false;
 
-    void paint(Gfx::Context &g) const override {
+    void paint(Gfx::Context &g) override {
         g.clear(Gfx::ZINC900);
 
         g.begin();

@@ -2,6 +2,7 @@
 
 #include <karm-layout/flow.h>
 
+#include "empty.h"
 #include "group.h"
 #include "proxy.h"
 
@@ -11,29 +12,42 @@ struct Grow : public Proxy<Grow> {
     int _grow;
 
     Grow(Child child) : Proxy(child), _grow(1) {}
-    Grow(double grow, Child child) : Proxy(child), _grow(grow) {}
+    Grow(int grow, Child child) : Proxy(child), _grow(grow) {}
 
     int grow() const {
         return _grow;
     }
 };
 
-template <typename... T>
-Child grow(T &&...args) {
-    return makeStrong<Grow>(std::forward<T>(args)...);
+static inline Child grow(Child child) {
+    return makeStrong<Grow>(child);
+}
+
+static inline Child grow(int grow, Child child) {
+    return makeStrong<Grow>(grow, child);
+}
+
+static inline Child spacer(int g = 1) {
+    return grow(g, empty());
 }
 
 struct FlowLayout : public Group<FlowLayout> {
     using Group::Group;
 
-    Layout::Flow _flow{};
+    Layout::Flow _flow = Layout::Flow::LEFT_TO_RIGHT;
     int _gaps{};
 
     FlowLayout(Children children)
-        : Group(children), _flow(Layout::Flow::LEFT_TO_RIGHT) {}
+        : Group(children) {}
 
     FlowLayout(Layout::Flow flow, Children children)
         : Group(children), _flow(flow) {}
+
+    FlowLayout(int gaps, Children children)
+        : Group(children), _gaps(gaps) {}
+
+    FlowLayout(Layout::Flow flow, int gaps, Children children)
+        : Group(children), _flow(flow), _gaps(gaps) {}
 
     void layout(Math::Recti r) override {
         int total = 0;
@@ -87,8 +101,16 @@ static inline Child flow(Children children) {
     return makeStrong<FlowLayout>(children);
 }
 
+static inline Child flow(int gaps, Children children) {
+    return makeStrong<FlowLayout>(gaps, children);
+}
+
 static inline Child flow(Layout::Flow flow, Children children) {
     return makeStrong<FlowLayout>(flow, children);
+}
+
+static inline Child flow(Layout::Flow flow, int gaps, Children children) {
+    return makeStrong<FlowLayout>(flow, gaps, children);
 }
 
 static inline Child flow(auto... children) {
@@ -97,6 +119,14 @@ static inline Child flow(auto... children) {
 
 static inline Child flow(Layout::Flow flow, auto... children) {
     return flow(flow, {children...});
+}
+
+static inline Child flow(int gaps, auto... children) {
+    return flow(gaps, {children...});
+}
+
+static inline Child flow(Layout::Flow flow, int gaps, auto... children) {
+    return flow(flow, gaps, {children...});
 }
 
 } // namespace Karm::Ui

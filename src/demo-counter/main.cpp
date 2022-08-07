@@ -2,8 +2,6 @@
 #include <karm-ui/app.h>
 #include <karm-ui/button.h>
 #include <karm-ui/flow.h>
-#include <karm-ui/host.h>
-#include <karm-ui/text.h>
 
 int inc(int state) {
     return state + 1;

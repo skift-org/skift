@@ -17,7 +17,7 @@ extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable *st) {
     char const *argv[] = {"efi-app", nullptr};
     CliArgs args{1, argv};
 
-    ExitCode code = entryPoint(args);
+    CliResult code = entryPoint(args);
 
     if (!code) {
         Error error = code.none();

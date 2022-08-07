@@ -63,9 +63,9 @@ struct Font {
 
     virtual FontMetrics metrics() const = 0;
     virtual double advance(Rune c) const = 0;
-    virtual void fillRune(Gfx::Context &ctx, Math::Vec2i baseline, Rune rune) const = 0;
-    virtual void strokeRune(Gfx::Context &ctx, Math::Vec2i baseline, Rune rune) const {
-        fillRune(ctx, baseline, rune);
+    virtual void fillRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const = 0;
+    virtual void strokeRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const {
+        fillRune(g, baseline, rune);
     }
 
     FontMesure mesureRune(Rune r) const {
@@ -93,16 +93,16 @@ struct Font {
         };
     }
 
-    void fillStr(Gfx::Context &ctx, Math::Vec2i baseline, Str str) const {
+    void fillStr(Gfx::Context &g, Math::Vec2i baseline, Str str) const {
         for (auto r : iterRunes(str)) {
-            fillRune(ctx, baseline, r);
+            fillRune(g, baseline, r);
             baseline.x += advance(r);
         }
     }
 
-    void strokeStr(Gfx::Context &ctx, Math::Vec2i baseline, Str str) const {
+    void strokeStr(Gfx::Context &g, Math::Vec2i baseline, Str str) const {
         for (auto r : iterRunes(str)) {
-            strokeRune(ctx, baseline, r);
+            strokeRune(g, baseline, r);
             baseline.x += advance(r);
         }
     }

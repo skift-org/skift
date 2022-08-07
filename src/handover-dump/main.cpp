@@ -4,7 +4,7 @@
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 
-ExitCode entryPoint(CliArgs const &args) {
+CliResult entryPoint(CliArgs args) {
     if (args.len() == 0) {
         return Error{"Usage: handover-dump <elf-file>"};
     }

@@ -1,14 +1,14 @@
 #include <SDL.h>
-#include <embed/app.h>
+#include <embed/ui.h>
 
 namespace Embed {
 
-struct SdlHost : public App::Host {
+struct SdlHost : public Ui::Host {
     SDL_Window *_window{};
     Math::Vec2i _lastMousePos{};
 
-    SdlHost(SDL_Window *window)
-        : _window(window) {
+    SdlHost(Ui::Child root, SDL_Window *window)
+        : Ui::Host(root), _window(window) {
     }
 
     ~SdlHost() {
@@ -30,118 +30,128 @@ struct SdlHost : public App::Host {
     }
 
     void flip(Slice<Math::Recti> rects) override {
-        // Math::Recti and SDL_Rect have the same layout so this is fine
+        // Math::Recti and SDL_Rect should have the same layout so this is fine
+
+        static_assert(sizeof(Math::Recti) == sizeof(SDL_Rect), "Rects must have the same layout");
+        static_assert(offsetof(Math::Recti, x) == offsetof(SDL_Rect, x), "Rects must have the same layout");
+        static_assert(offsetof(Math::Recti, y) == offsetof(SDL_Rect, y), "Rects must have the same layout");
+        static_assert(offsetof(Math::Recti, width) == offsetof(SDL_Rect, w), "Rects must have the same layout");
+        static_assert(offsetof(Math::Recti, height) == offsetof(SDL_Rect, h), "Rects must have the same layout");
+        static_assert(Meta::Same<decltype(Math::Recti::x), decltype(SDL_Rect::x)>, "Rects must have the same layout");
+
         SDL_UpdateWindowSurfaceRects(
             _window,
             reinterpret_cast<const SDL_Rect *>(rects.buf()),
             rects.len());
     }
 
-    void dispatch(SDL_Event const &e) {
-        switch (e.type) {
+    void translate(SDL_Event const &sdlEvent) {
+        switch (sdlEvent.type) {
         case SDL_WINDOWEVENT:
             break;
 
         case SDL_KEYDOWN: {
-            Events::KeyboardEvent event{
+            Events::KeyboardEvent uiEvent{
                 .type = Events::KeyboardEvent::PRESS,
             };
-            handle(event);
+            event(uiEvent);
             break;
         }
 
         case SDL_KEYUP: {
-            Events::KeyboardEvent event{
+            Events::KeyboardEvent uiEvent{
                 .type = Events::KeyboardEvent::RELEASE,
             };
-            handle(event);
+            event(uiEvent);
             break;
         }
 
         case SDL_MOUSEMOTION: {
-            if (e.motion.which == SDL_TOUCH_MOUSEID) {
+            if (sdlEvent.motion.which == SDL_TOUCH_MOUSEID) {
                 return;
             }
 
-            Events::MouseEvent event{
+            Events::MouseEvent uiEvent{
                 .type = Events::MouseEvent::MOVE,
 
-                .pos = {e.motion.x, e.motion.y},
-                .delta = {e.motion.xrel, e.motion.yrel},
+                .pos = {sdlEvent.motion.x, sdlEvent.motion.y},
+                .delta = {sdlEvent.motion.xrel, sdlEvent.motion.yrel},
             };
 
-            event.buttons |= (e.motion.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
-            event.buttons |= (e.motion.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
-            event.buttons |= (e.motion.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
+            uiEvent.buttons |= (sdlEvent.motion.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
+            uiEvent.buttons |= (sdlEvent.motion.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
+            uiEvent.buttons |= (sdlEvent.motion.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
 
-            _lastMousePos = event.pos;
+            _lastMousePos = uiEvent.pos;
 
-            handle(event);
+            event(uiEvent);
             break;
         }
 
         case SDL_MOUSEBUTTONUP: {
-            if (e.motion.which == SDL_TOUCH_MOUSEID) {
+            if (sdlEvent.motion.which == SDL_TOUCH_MOUSEID) {
                 return;
             }
 
-            Events::MouseEvent event{
+            Events::MouseEvent uiEvent{
                 .type = Events::MouseEvent::RELEASE,
                 .pos = _lastMousePos,
             };
 
-            event.button = (e.button.which == SDL_BUTTON_LEFT) ? Events::Button::LEFT : Events::Button::NONE;
-            event.button = (e.button.which == SDL_BUTTON_RIGHT) ? Events::Button::MIDDLE : Events::Button::NONE;
-            event.button = (e.button.which == SDL_BUTTON_MIDDLE) ? Events::Button::RIGHT : Events::Button::NONE;
+            uiEvent.button = (sdlEvent.button.which == SDL_BUTTON_LEFT) ? Events::Button::LEFT : Events::Button::NONE;
+            uiEvent.button = (sdlEvent.button.which == SDL_BUTTON_RIGHT) ? Events::Button::MIDDLE : Events::Button::NONE;
+            uiEvent.button = (sdlEvent.button.which == SDL_BUTTON_MIDDLE) ? Events::Button::RIGHT : Events::Button::NONE;
 
-            event.buttons |= (e.button.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
-            event.buttons |= (e.button.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
-            event.buttons |= (e.button.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
+            uiEvent.buttons |= (sdlEvent.button.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
+            uiEvent.buttons |= (sdlEvent.button.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
+            uiEvent.buttons |= (sdlEvent.button.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
 
-            handle(event);
+            event(uiEvent);
             break;
         }
 
         case SDL_MOUSEBUTTONDOWN: {
-            if (e.motion.which == SDL_TOUCH_MOUSEID) {
+            if (sdlEvent.motion.which == SDL_TOUCH_MOUSEID) {
                 return;
             }
 
-            Events::MouseEvent event{
+            Events::MouseEvent uiEvent{
                 .type = Events::MouseEvent::PRESS,
                 .pos = _lastMousePos,
             };
 
-            event.button = (e.button.button == SDL_BUTTON_LEFT) ? Events::Button::LEFT : Events::Button::NONE;
-            event.button = (e.button.button == SDL_BUTTON_RIGHT) ? Events::Button::MIDDLE : Events::Button::NONE;
-            event.button = (e.button.button == SDL_BUTTON_MIDDLE) ? Events::Button::RIGHT : Events::Button::NONE;
+            uiEvent.button = (sdlEvent.button.button == SDL_BUTTON_LEFT) ? Events::Button::LEFT : Events::Button::NONE;
+            uiEvent.button = (sdlEvent.button.button == SDL_BUTTON_RIGHT) ? Events::Button::MIDDLE : Events::Button::NONE;
+            uiEvent.button = (sdlEvent.button.button == SDL_BUTTON_MIDDLE) ? Events::Button::RIGHT : Events::Button::NONE;
 
-            event.buttons |= (e.button.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
-            event.buttons |= (e.button.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
-            event.buttons |= (e.button.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
+            uiEvent.buttons |= (sdlEvent.button.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
+            uiEvent.buttons |= (sdlEvent.button.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
+            uiEvent.buttons |= (sdlEvent.button.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
 
-            handle(event);
+            event(uiEvent);
             break;
         }
 
         case SDL_MOUSEWHEEL: {
-            if (e.wheel.which == SDL_TOUCH_MOUSEID) {
+            if (sdlEvent.wheel.which == SDL_TOUCH_MOUSEID) {
                 return;
             }
 
-            Events::MouseEvent event{
+            Events::MouseEvent uiEvent{
                 .type = Events::MouseEvent::SCROLL,
                 .pos = _lastMousePos,
-                .scroll = {e.wheel.x, e.wheel.y},
+                .scroll = {sdlEvent.wheel.x, sdlEvent.wheel.y},
             };
 
-            handle(event);
+            event(uiEvent);
             break;
         }
 
-        case SDL_QUIT:
-            exit();
+        case SDL_QUIT: {
+            Events::ExitEvent uiEvent{OK};
+            bubble(uiEvent);
             break;
+        }
 
         default:
             break;
@@ -151,8 +161,8 @@ struct SdlHost : public App::Host {
     void pump() override {
         SDL_Event e{};
 
-        while (SDL_PollEvent(&e) != 0 && _alive) {
-            dispatch(e);
+        while (SDL_PollEvent(&e) != 0 && alive()) {
+            translate(e);
         }
     }
 
@@ -161,7 +171,7 @@ struct SdlHost : public App::Host {
     }
 };
 
-Result<Strong<Karm::App::Host>> makeHost() {
+Result<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
     SDL_Window *window = SDL_CreateWindow(
@@ -176,7 +186,7 @@ Result<Strong<Karm::App::Host>> makeHost() {
         return Error{SDL_GetError()};
     }
 
-    return {makeStrong<SdlHost>(window)};
+    return {makeStrong<SdlHost>(root, window)};
 }
 
 } // namespace Embed

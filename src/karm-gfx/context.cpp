@@ -199,10 +199,10 @@ void Context::fillStr(Math::Vec2i baseline, Str str) {
 /* --- Paths ------------------------------------------------------------ */
 
 void Context::_line(Math::Edgei edge, Color color) {
-    int dx = abs(edge.ex - edge.sx);
+    int dx = Math::abs(edge.ex - edge.sx);
     int sx = edge.sx < edge.ex ? 1 : -1;
 
-    int dy = -abs(edge.ey - edge.sy);
+    int dy = -Math::abs(edge.ey - edge.sy);
     int sy = edge.sy < edge.ey ? 1 : -1;
 
     int err = dx + dy, e2;

@@ -47,7 +47,11 @@ struct Timespan {
         return fromMonths(value * 12);
     }
 
-    uint64_t value() const {
+    constexpr Timespan() : _value(0) {}
+
+    constexpr Timespan(uint64_t value) : _value(value) {}
+
+    constexpr uint64_t value() const {
         return _value;
     }
 
@@ -97,27 +101,21 @@ struct Timespan {
         return *this;
     }
 
-    constexpr Timespan &operator*=(uint64_t value) {
-        _value *= value;
-        return *this;
-    }
-
-    constexpr Timespan &operator/=(uint64_t value) {
-        _value /= value;
-        return *this;
-    }
-
     constexpr Timespan operator+(Timespan const &other) const {
-        return Timespan{_value + other._value};
+        return _value + other._value;
     }
 
     constexpr Timespan operator-(Timespan const &other) const {
-        return Timespan{_value - other._value};
+        return _value - other._value;
     }
 };
 
 struct Timestamp {
     uint64_t _value;
+
+    static constexpr Timestamp epoch() {
+        return {0};
+    }
 };
 
 } // namespace Karm::Time

@@ -34,7 +34,7 @@ struct VgaFont : public Font {
         return 8;
     }
 
-    void fillRune(Gfx::Context &ctx, Math::Vec2i baseline, Rune rune) const override {
+    void fillRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const override {
         One<Ibm437> one;
         encodeOne<Ibm437>(rune, one);
 
@@ -42,7 +42,7 @@ struct VgaFont : public Font {
             for (int x = 0; x < WIDTH; x++) {
                 uint8_t byte = DATA[one * HEIGHT + y];
                 if (byte & (0x80 >> x)) {
-                    ctx.plot(baseline + Math::Vec2i{x, y - HEIGHT});
+                    g.plot(baseline + Math::Vec2i{x, y - HEIGHT}, g.textStyle().color);
                 }
             }
         }

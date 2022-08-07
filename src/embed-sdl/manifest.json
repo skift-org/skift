@@ -3,7 +3,7 @@
     "type": "lib",
     "description": "Karm UI platform embedding layer for SDL.",
     "provide": [
-        "embed-app"
+        "embed-ui"
     ],
     "requires": {
         "karm-ui-backend": [

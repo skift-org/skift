@@ -13,6 +13,8 @@ struct Rand {
 
     Rand() = default;
 
+    Rand(int seed) : Rand((uint64_t)seed) {}
+
     Rand(uint64_t seed)
         : _state(seed | seed << 32),
           _inc((seed | seed << 32) ^ (seed << 16)) {

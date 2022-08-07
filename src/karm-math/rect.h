@@ -152,19 +152,19 @@ union Rect {
 
     Rect<T> ceil() {
         return {
-            ::floor(x),
-            ::floor(y),
-            ::ceil(width),
-            ::ceil(height),
+            Math::floor(x),
+            Math::floor(y),
+            Math::ceil(width),
+            Math::ceil(height),
         };
     }
 
     Rect<T> floor() {
         return {
-            ::ceil(x),
-            ::ceil(y),
-            ::floor(width),
-            ::floor(height),
+            Math::ceil(x),
+            Math::ceil(y),
+            Math::floor(width),
+            Math::floor(height),
         };
     }
 

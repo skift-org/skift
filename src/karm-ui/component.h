@@ -5,7 +5,7 @@
 namespace Karm::Ui {
 
 template <typename Crtp>
-struct Component : public Node<Crtp> {
+struct Component : public Widget<Crtp> {
     bool _rebuild = true;
     Opt<Child> _child;
 

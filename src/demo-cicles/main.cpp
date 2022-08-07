@@ -1,14 +1,15 @@
-#include <karm-app/host.h>
 #include <karm-main/main.h>
 #include <karm-math/rand.h>
+#include <karm-ui/app.h>
+#include <karm-ui/funcs.h>
 
-struct CircleClient : public Karm::App::Client {
-    Math::Rand _rand{};
+struct CirclesApp : public Ui::Widget<CirclesApp> {
     Math::Vec2i _mousePos{};
     int _frame = 0;
 
-    void onPaint(Gfx::Context &g) override {
-        double size = _rand.nextInt(4, 10);
+    void paint(Gfx::Context &g) const override {
+        Math::Rand rand{_frame};
+        double size = rand.nextInt(4, 10);
         size *= size;
 
         g.fillStyle(Gfx::BLACK.withOpacity(0.01));
@@ -17,13 +18,13 @@ struct CircleClient : public Karm::App::Client {
         if (_frame % 16 == 0) {
             g.begin();
             g.ellipse({
-                _rand.nextVec2(g.clip()).cast<double>(),
+                rand.nextVec2(g.clip()).cast<double>(),
                 size,
             });
 
             g.strokeStyle(
                 Gfx::stroke(Gfx::WHITE)
-                    .withWidth(_rand.nextInt(2, size)));
+                    .withWidth(rand.nextInt(2, size)));
             g.stroke();
         }
 
@@ -31,22 +32,26 @@ struct CircleClient : public Karm::App::Client {
         g.ellipse({_mousePos.cast<double>(), 100});
         g.fillStyle(Gfx::BLUE500);
         g.fill();
-
-        _frame++;
     }
 
-    void onEvent(Events::Event &e) override {
-        e.handle<Events::MouseEvent>([&](auto &e) {
-            if (e.type == Events::MouseEvent::MOVE) {
-                _mousePos = e.pos;
-                shouldRepaint();
+    void event(Events::Event &e) override {
+        e
+            .handle<Events::MouseEvent>([&](auto &e) {
+                if (e.type == Events::MouseEvent::MOVE) {
+                    _mousePos = e.pos;
+                    Ui::shouldAnimate(*this);
+                    return true;
+                }
                 return true;
-            }
-            return false;
-        });
+            })
+            .handle<Events::AnimateEvent>([&](auto &) {
+                _frame++;
+                Ui::shouldRepaint(*this);
+                return true;
+            });
     }
 };
 
-ExitCode entryPoint(CliArgs const &) {
-    return App::run<CircleClient>();
+CliResult entryPoint(CliArgs args) {
+    return Ui::runApp<CirclesApp>(args);
 }

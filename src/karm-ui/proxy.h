@@ -5,16 +5,22 @@
 namespace Karm::Ui {
 
 template <typename Crtp>
-struct Proxy : public Node<Crtp> {
+struct Proxy : public Widget<Crtp> {
     Child _child;
 
-    Proxy(Child child) : _child(child) {}
+    Proxy(Child child) : _child(child) {
+        child->attach(this);
+    }
 
-    _Node &child() {
+    ~Proxy() {
+        _child->detach();
+    }
+
+    Node &child() {
         return *_child;
     }
 
-    _Node const &child() const {
+    Node const &child() const {
         return *_child;
     }
 

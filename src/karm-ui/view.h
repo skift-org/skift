@@ -5,7 +5,7 @@
 namespace Karm::Ui {
 
 template <typename Crtp>
-struct View : public Node<Crtp> {
+struct View : public Widget<Crtp> {
     Math::Recti _bound;
 
     Math::Recti bound() const override {

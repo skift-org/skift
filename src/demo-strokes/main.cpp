@@ -1,12 +1,12 @@
-#include <karm-app/host.h>
 #include <karm-main/main.h>
+#include <karm-ui/app.h>
+#include <karm-ui/funcs.h>
 
-struct StrokeClient : public App::Client {
-    bool _trace{false};
-    Math::Vec2i _mousePos{300, 300};
+struct StrokesApp : public Ui::Widget<StrokesApp> {
+    Math::Vec2i _mousePos{};
+    bool _trace = false;
 
-    void onPaint(Gfx::Context &g) override {
-
+    void paint(Gfx::Context &g) const override {
         g.clear(Gfx::ZINC900);
 
         g.begin();
@@ -35,23 +35,27 @@ struct StrokeClient : public App::Client {
         g.stroke();
     }
 
-    void onEvent(Events::Event &e) override {
-        e.handle<Events::MouseEvent>([&](auto const &m) {
-            if (m.type == Events::MouseEvent::RELEASE) {
-                _trace = !_trace;
-                shouldRepaint();
+    void event(Events::Event &e) override {
+        e
+            .handle<Events::MouseEvent>([&](auto &e) {
+                if (e.type == Events::MouseEvent::MOVE) {
+                    _mousePos = e.pos;
+                    Ui::shouldAnimate(*this);
+                    return true;
+                } else if (e.type == Events::MouseEvent::RELEASE) {
+                    _trace = !_trace;
+                    Ui::shouldAnimate(*this);
+                    return true;
+                }
                 return true;
-            } else if (m.type == Events::MouseEvent::MOVE) {
-                _mousePos = m.pos;
-                shouldRepaint();
+            })
+            .handle<Events::AnimateEvent>([&](auto &) {
+                Ui::shouldRepaint(*this);
                 return true;
-            }
-
-            return false;
-        });
+            });
     }
 };
 
-ExitCode entryPoint(CliArgs const &) {
-    return App::run<StrokeClient>();
+CliResult entryPoint(CliArgs args) {
+    return Ui::runApp<StrokesApp>(args);
 }

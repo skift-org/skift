@@ -32,7 +32,7 @@ static void _createJoinMiter(Shape &shape, Math::Edgef curr, Math::Edgef next, M
     double mitterLimit = width * 4;
     auto c = nextVec.cross(currVec);
 
-    if (abs(c) < 0.001) {
+    if (Math::abs(c) < 0.001) {
         // parallel
         return;
     }
@@ -178,10 +178,10 @@ void createStroke(Shape &shape, Path const &path, Stroke stroke) {
                 auto innerNext = next.parallel(innerDist).swap();
 
                 if (outerDist < -0.001)
-                    _createJoin(shape, stroke, outerCurr, outerNext, curr.end, abs(outerDist));
+                    _createJoin(shape, stroke, outerCurr, outerNext, curr.end, Math::abs(outerDist));
 
                 if (innerDist > 0.001)
-                    _createJoin(shape, stroke, innerNext, innerCurr, curr.end, abs(innerDist));
+                    _createJoin(shape, stroke, innerNext, innerCurr, curr.end, Math::abs(innerDist));
             }
         }
     }

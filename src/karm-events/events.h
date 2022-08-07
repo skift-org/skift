@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-math/rect.h>
 #include <karm-math/vec.h>
 #include <karm-meta/utils.h>
 
@@ -19,6 +20,10 @@ struct Event {
             accepted = callback(static_cast<T const &>(*this));
         }
         return *this;
+    }
+
+    void accept() {
+        accepted = true;
     }
 };
 
@@ -67,7 +72,20 @@ struct KeyboardEvent : public _Event<KeyboardEvent, 0x1eb75d94f347352> {
     Rune rune;
 };
 
-struct AnimationEvent : public _Event<AnimationEvent, 0xf21fe2676e487fc> {
+struct PaintEvent : public _Event<PaintEvent, 0xe024fcf3253d5696> {
+    Math::Recti bound;
+};
+
+struct LayoutEvent : public _Event<LayoutEvent, 0x9fb51942f16848b6> {
+};
+
+struct AnimateEvent : public _Event<AnimateEvent, 0xf21fe2676e487fc> {
+};
+
+struct ExitEvent : public _Event<ExitEvent, 0x925703d3bb8540f6> {
+    Error error;
+
+    ExitEvent(Error error) : error{error} {}
 };
 
 } // namespace Karm::Events

@@ -2,6 +2,6 @@
 
 #include "loader.h"
 
-ExitCode entryPoint(CliArgs const &) {
+CliResult entryPoint(CliArgs) {
     return Loader::load("/boot/kernel.elf");
 }

@@ -1,6 +1,6 @@
 #include <karm-main/main.h>
 
-ExitCode entryPoint(CliArgs const &) {
+CliResult entryPoint(CliArgs) {
     Sys::println("Hello, world!");
     return Cli::SUCCESS;
 }

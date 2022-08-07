@@ -4,6 +4,6 @@
     "description": "A graphical demo featuring circles",
     "deps": [
         "karm-main",
-        "karm-app"
+        "karm-ui"
     ]
 }

@@ -1,7 +1,7 @@
 #include <karm-main/main.h>
 #include <karm-ui/context.h>
 
-ExitCode entryPoint(CliArgs const &) {
+CliResult entryPoint(CliArgs) {
     return Ui::render(
         Ui::View(
             Ui::View(

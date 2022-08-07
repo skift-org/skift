@@ -1,7 +1,7 @@
 #include <karm-main/main.h>
 #include <karm-test/driver.h>
 
-ExitCode entryPoint(CliArgs const &) {
+CliResult entryPoint(CliArgs) {
     Test::driver().runAll();
     return Cli::SUCCESS;
 }

@@ -7,21 +7,23 @@
 
 namespace Karm::Ui {
 
-struct _Node;
+struct Node;
 
-using Child = Strong<_Node>;
-using Other = Strong<_Node>;
+using Child = Strong<Node>;
+using Other = Strong<Node>;
 using Children = Vec<Child>;
-using Visitor = Func<void(_Node &)>;
+using Visitor = Func<void(Node &)>;
 
-struct _Node {
-    virtual ~_Node() = default;
+struct Node {
+    virtual ~Node() = default;
 
     virtual Opt<Child> reconcile(Other o) { return o; }
 
     virtual void paint(Gfx::Context &) const {}
 
     virtual void event(Events::Event &) {}
+
+    virtual void bubble(Events::Event &) {}
 
     virtual void layout(Math::Recti) {}
 
@@ -31,17 +33,19 @@ struct _Node {
 
     virtual void visit(Visitor &) {}
 
-    virtual _Node *parent() { return nullptr; }
+    virtual Node *parent() { return nullptr; }
 
-    virtual void mount(_Node *) {}
+    virtual void attach(Node *) {}
 
-    virtual void unmount() {}
+    virtual void detach() {}
 
     virtual void *query(Meta::Id) { return nullptr; }
 };
 
 template <typename Crtp>
-struct Node : public _Node {
+struct Widget : public Node {
+    Node *_parent = nullptr;
+
     virtual void reconcile(Crtp &) {}
 
     Opt<Child> reconcile(Other o) override {
@@ -50,6 +54,32 @@ struct Node : public _Node {
         }
         reconcile(o.unwrap<Crtp>());
         return NONE;
+    }
+
+    void bubble(Events::Event &e) override {
+        if (_parent) {
+            _parent->bubble(e);
+        }
+    }
+
+    Node *parent() override {
+        return _parent;
+    }
+
+    void attach(Node *parent) override {
+        _parent = parent;
+    }
+
+    void detach() override {
+        _parent = nullptr;
+    }
+
+    void *query(Meta::Id id) override {
+        if (id == Meta::makeId<Crtp>()) {
+            return static_cast<Crtp *>(this);
+        }
+
+        return _parent ? _parent->query(id) : nullptr;
     }
 };
 

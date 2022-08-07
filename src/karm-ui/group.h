@@ -5,13 +5,23 @@
 namespace Karm::Ui {
 
 template <typename Crtp>
-struct Group : public Node<Crtp> {
+struct Group : public Widget<Crtp> {
     Children _children;
     Math::Recti _bound;
 
     Group() = default;
 
-    Group(Children children) : _children(children) {}
+    Group(Children children) : _children(children) {
+        for (auto &c : _children) {
+            c->attach(this);
+        }
+    }
+
+    ~Group() {
+        for (auto &c : _children) {
+            c->detach();
+        }
+    }
 
     Children &children() {
         return _children;

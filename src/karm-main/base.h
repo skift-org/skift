@@ -3,7 +3,7 @@
 #include <karm-base/result.h>
 #include <karm-cli/args.h>
 
-using ExitCode = Karm::Cli::Result;
+using CliResult = Karm::Cli::Result;
 using CliArgs = Karm::Cli::Args;
 
-ExitCode entryPoint(CliArgs const &args);
+CliResult entryPoint(CliArgs args);

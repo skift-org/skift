@@ -4,6 +4,6 @@
     "description": "A graphical demo featuring strokes",
     "deps": [
         "karm-main",
-        "karm-app"
+        "karm-ui"
     ]
 }

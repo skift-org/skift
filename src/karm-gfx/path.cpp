@@ -142,9 +142,9 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Fl
 
     // Split arc into max 90 degree segments.
     // The loop assumes an Iter per end point (including start and end), this +1.
-    int ndivs = (int)(fabsf(da) / (M_PI * 0.5f) + 1.0f);
+    int ndivs = (int)(Math::abs(da) / (M_PI * 0.5f) + 1.0f);
     float hda = (da / (float)ndivs) / 2.0f;
-    float kappa = fabsf(4.0f / 3.0f * (1.0f - cosf(hda)) / sinf(hda));
+    float kappa = Math::abs(4.0f / 3.0f * (1.0f - Math::cos(hda)) / Math::sin(hda));
 
     if (da < 0.0f) {
         kappa = -kappa;
@@ -156,8 +156,8 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Fl
     for (int i = 0; i <= ndivs; i++) {
         float a = a1 + da * (i / (float)ndivs);
 
-        dx = cosf(a);
-        dy = sinf(a);
+        dx = Math::cos(a);
+        dy = Math::sin(a);
 
         Math::Vec2f p = t.applyPoint({dx * radius.x, dy * radius.y});
         Math::Vec2f tan = t.applyVector({-dy * radius.x * kappa, dx * radius.y * kappa});

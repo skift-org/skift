@@ -1,9 +1,0 @@
-{
-    "id": "karm-app",
-    "type": "lib",
-    "description": "Karm application lifecyle.",
-    "deps": [
-        "karm-gfx",
-        "embed-app"
-    ]
-}

@@ -1,11 +1,12 @@
-#include <karm-app/host.h>
 #include <karm-main/main.h>
+#include <karm-ui/app.h>
+#include <karm-ui/funcs.h>
 
-struct SvgClient : public App::Client {
+struct SvgApp : public Ui::Widget<SvgApp> {
     bool _trace{false};
     Math::Vec2i _mousePos{300, 300};
 
-    void paint(Gfx::Context &g) override {
+    void paint(Gfx::Context &g) const override {
 
         g.clear(Gfx::BLACK);
 
@@ -22,10 +23,11 @@ struct SvgClient : public App::Client {
             g._trace();
     }
 
-    void handle(Events::Event &e) override {
+    void event(Events::Event &e) override {
         e.handle<Events::MouseEvent>([&](auto const &m) {
             if (m.type == Events::MouseEvent::RELEASE) {
                 _trace = !_trace;
+                Ui::shouldRepaint(*this);
             }
             _mousePos = m.pos;
             return true;
@@ -33,6 +35,6 @@ struct SvgClient : public App::Client {
     }
 };
 
-ExitCode entryPoint(CliArgs const &) {
-    return App::run<SvgClient>();
+CliResult entryPoint(CliArgs args) {
+    return Ui::runApp<SvgApp>(args);
 }

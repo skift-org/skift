@@ -12,12 +12,19 @@ constexpr auto abs(auto value) {
 
 template <typename T>
 constexpr T floor(T x) {
-    return (T)(long)x;
+    if (x < 0) {
+        return (T)(long)(x - 1);
+    } else {
+        return (T)(long)x;
+    }
 }
 
 template <typename T>
 constexpr T ceil(T x) {
-    return (T)(long)x + 1;
+    if (x < 0)
+        return x;
+    else
+        return (T)(long)(x + 1);
 }
 
 constexpr auto pow2(auto x) {
@@ -46,7 +53,7 @@ constexpr T cos(T x) {
 
 template <typename T, Precision P = PRECISE>
 constexpr T sin(T x) noexcept {
-    return cos<T, P>(x + T(.5 * PI));
+    return cos<T, P>(x - T(.5 * PI));
 }
 
 template <typename T, Precision P = PRECISE>

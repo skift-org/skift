@@ -33,11 +33,11 @@ struct Func<Out(In...)> {
     // clang-format has troubles with this
 
     template <typename F>
-    requires Meta::FuncPtr<F>
+    requires Meta::FuncPtr<F> && Meta::Callable<F, In...>
     Func(F f) : _wrap(makeBox<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
-    requires (Meta::RvalueRef<F &&> && !(Meta::FuncPtr<F>))
+    requires (Meta::RvalueRef<F &&> && !(Meta::FuncPtr<F>)) && Meta::Callable<F, In...>
     Func(F &&f) : _wrap(makeBox<Wrap<F>>(std::move(f))) {}
 
     template <typename F>

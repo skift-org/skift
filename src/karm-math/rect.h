@@ -114,6 +114,20 @@ union Rect {
         return r.x + r.width > x && r.y + r.height > y && r.x < x + width && r.y < y + height;
     }
 
+    constexpr Rect fit(Rect<T> const &r) const {
+        auto scale = (r.size() / size().template cast<double>()).min();
+        Rect result{0, 0, static_cast<T>(width * scale), static_cast<T>(height * scale)};
+        result.xy = center() - result.center();
+        return result;
+    }
+
+    constexpr Rect cover(Rect<T> const &r) const {
+        auto scale = (r.size() / size().template cast<double>()).max();
+        Rect result{0, 0, static_cast<T>(width * scale), static_cast<T>(height * scale)};
+        result.xy = center() - result.center();
+        return result;
+    }
+
     constexpr Rect<T> clipTo(Rect<T> const &r) const {
         return {
             max(x, r.x),

@@ -26,11 +26,11 @@ union Vec2 {
     constexpr Vec2(T value) : _els{value, value} {}
 
     constexpr T min() const {
-        return min(x, y);
+        return Karm::min(x, y);
     }
 
     constexpr T max() const {
-        return max(x, y);
+        return Karm::max(x, y);
     }
 
     constexpr Vec2 min(Vec2 const &other) const {
@@ -96,19 +96,23 @@ union Vec2 {
         return {x / other, y / other};
     }
 
-    constexpr Vec2 operator+(Vec2 const &other) const {
+    template <typename U>
+    constexpr auto operator+(Vec2<U> const &other) const -> Vec2<decltype(T{} + U{})> {
         return {x + other.x, y + other.y};
     }
 
-    constexpr Vec2 operator-(Vec2 const &other) const {
+    template <typename U>
+    constexpr auto operator-(Vec2<U> const &other) const -> Vec2<decltype(T{} - U{})> {
         return {x - other.x, y - other.y};
     }
 
-    constexpr Vec2 operator*(Vec2 const &other) const {
+    template <typename U>
+    constexpr auto operator*(Vec2<U> const &other) const -> Vec2<decltype(T{} * U{})> {
         return {x * other.x, y * other.y};
     }
 
-    constexpr Vec2 operator/(Vec2 const &other) const {
+    template <typename U>
+    constexpr auto operator/(Vec2<U> const &other) const -> Vec2<decltype(T{} / U{})> {
         return {x / other.x, y / other.y};
     }
 

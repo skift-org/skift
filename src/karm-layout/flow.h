@@ -6,12 +6,14 @@
 namespace Karm::Layout {
 
 struct Flow {
-    enum _Flow {
+    enum struct _Flow {
         LEFT_TO_RIGHT,
         RIGHT_TO_LEFT,
         TOP_TO_BOTTOM,
         BOTTOM_TO_TOP,
     };
+
+    using enum _Flow;
 
     _Flow _flow{};
 
@@ -51,7 +53,7 @@ struct Flow {
             RIGHT_TO_LEFT,
         };
 
-        return table[_flow * 4 + child._flow];
+        return table[(int)_flow * 4 + (int)child._flow];
     }
 
     template <typename T>

@@ -18,6 +18,7 @@ struct Align {
     static constexpr int COVER = (1 << 8);
     static constexpr int FIT = (1 << 9);
 
+    static constexpr int STRETCH = (HSTRETCH | VSTRETCH);
     static constexpr int VFILL = (VSTRETCH | TOP);
     static constexpr int HFILL = (HSTRETCH | START);
     static constexpr int CENTER = (HCENTER | VCENTER);
@@ -39,28 +40,44 @@ struct Align {
             inner = inner.fit(outer);
 
         if (_value & START)
-            inner = flow.setX(inner, flow.getStart(flow, outer));
+            inner = flow.setX(inner, flow.getStart(outer));
 
         if (_value & TOP)
-            inner = flow.setY(inner, flow.getTop(flow, outer));
+            inner = flow.setY(inner, flow.getTop(outer));
 
         if (_value & END)
-            inner = flow.setX(inner, flow.getEnd(flow, outer) - flow.getWidth(inner));
+            inner = flow.setX(inner, flow.getEnd(outer) - flow.getWidth(inner));
 
         if (_value & BOTTOM)
-            inner = flow.setY(inner, flow.getBottom(flow, outer) - flow.getHeight(inner));
+            inner = flow.setY(inner, flow.getBottom(outer) - flow.getHeight(inner));
 
         if (_value & HSTRETCH)
-            inner = flow.setWidth(inner, flow.getWidth(flow, outer));
+            inner = flow.setWidth(inner, flow.getWidth(outer));
 
         if (_value & VSTRETCH)
-            inner = flow.setHeight(inner, flow.getHeight(flow, outer));
+            inner = flow.setHeight(inner, flow.getHeight(outer));
 
         if (_value & HCENTER)
-            inner = flow.setX(inner, flow.getHcenter(flow, outer) - flow.getWidth(inner) / 2);
+            inner = flow.setX(inner, flow.getHcenter(outer) - flow.getWidth(inner) / 2);
 
         if (_value & VCENTER)
-            inner = flow.setY(inner, flow.getVcenter(flow, outer) - flow.getHeight(inner) / 2);
+            inner = flow.setY(inner, flow.getVcenter(outer) - flow.getHeight(inner) / 2);
+
+        return inner;
+    }
+
+    template <typename T>
+    Math::Vec2<T> size(Math::Vec2<T> inner, Math::Vec2<T> outer) {
+        if (_value & COVER)
+            inner = outer;
+
+        if (_value & HSTRETCH ||
+            _value & HCENTER)
+            inner.x = outer.x;
+
+        if (_value & VSTRETCH ||
+            _value & VCENTER)
+            inner.y = outer.y;
 
         return inner;
     }

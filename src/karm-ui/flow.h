@@ -113,20 +113,20 @@ static inline Child flow(Layout::Flow flow, int gaps, Children children) {
     return makeStrong<FlowLayout>(flow, gaps, children);
 }
 
-static inline Child flow(auto... children) {
+static inline Child flow(Meta::Same<Child> auto... children) {
     return flow({children...});
 }
 
-static inline Child flow(Layout::Flow flow, auto... children) {
-    return flow(flow, {children...});
+static inline Child flow(Layout::Flow f, Meta::Same<Child> auto... children) {
+    return flow(f, {children...});
 }
 
-static inline Child flow(int gaps, auto... children) {
+static inline Child flow(int gaps, Meta::Same<Child> auto... children) {
     return flow(gaps, {children...});
 }
 
-static inline Child flow(Layout::Flow flow, int gaps, auto... children) {
-    return flow(flow, gaps, {children...});
+static inline Child flow(Layout::Flow f, int gaps, Meta::Same<Child> auto... children) {
+    return flow(f, gaps, {children...});
 }
 
 } // namespace Karm::Ui

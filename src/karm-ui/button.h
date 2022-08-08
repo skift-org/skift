@@ -1,5 +1,6 @@
 #pragma once
 
+#include "box.h"
 #include "funcs.h"
 #include "proxy.h"
 #include "text.h"
@@ -40,24 +41,22 @@ struct Button : public Proxy<Button> {
         State state = _state;
 
         e.handle<Events::MouseEvent>([&](auto &m) {
-            if (bound().contains(m.pos)) {
-                if (state != PRESS)
-                    state = OVER;
-
-                if (m.type == Events::MouseEvent::PRESS) {
-                    state = PRESS;
-                    return true;
-                }
-
-                if (m.type == Events::MouseEvent::RELEASE) {
-                    state = OVER;
-                    _onPress();
-                    return true;
-                }
-            } else {
+            if (!bound().contains(m.pos)) {
                 state = IDLE;
+                return false;
             }
-            return false;
+
+            if (state != PRESS)
+                state = OVER;
+
+            if (m.type == Events::MouseEvent::PRESS) {
+                state = PRESS;
+            } else if (m.type == Events::MouseEvent::RELEASE) {
+                state = OVER;
+                _onPress();
+            }
+
+            return true;
         });
 
         if (state != _state) {
@@ -67,12 +66,12 @@ struct Button : public Proxy<Button> {
     };
 };
 
-Child button(Func<void()> onPress, Child child) {
+static inline Child button(Func<void()> onPress, Child child) {
     return makeStrong<Button>(std::move(onPress), child);
 }
 
-Child button(Func<void()> onPress, Str t) {
-    return button(std::move(onPress), text(t));
+static inline Child button(Func<void()> onPress, Str t) {
+    return button(std::move(onPress), spacing({6, 4}, text(t)));
 }
 
 } // namespace Karm::Ui

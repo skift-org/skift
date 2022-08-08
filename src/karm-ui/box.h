@@ -53,4 +53,32 @@ Child box(T &&...args) {
     return makeStrong<Box>(std::forward<T>(args)...);
 }
 
+struct Spacing : public Proxy<Spacing> {
+    Layout::Spacingi _spacing;
+
+    Spacing(Layout::Spacingi spacing, Child child)
+        : Proxy(child), _spacing(spacing) {}
+
+    void reconcile(Spacing &o) override {
+        _spacing = o._spacing;
+        Proxy<Spacing>::reconcile(o);
+    }
+
+    void layout(Math::Recti rect) override {
+        child().layout(_spacing.shrink(Layout::Flow::LEFT_TO_RIGHT, rect));
+    }
+
+    Math::Vec2i size(Math::Vec2i s) override {
+        return child().size(s - _spacing.all()) + _spacing.all();
+    }
+
+    Math::Recti bound() override {
+        return _spacing.grow(Layout::Flow::LEFT_TO_RIGHT, child().bound());
+    }
+};
+
+static inline Child spacing(Layout::Spacingi s, Child c) {
+    return makeStrong<Spacing>(s, c);
+}
+
 } // namespace Karm::Ui

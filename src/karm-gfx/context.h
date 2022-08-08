@@ -7,26 +7,7 @@
 
 namespace Karm::Gfx {
 
-struct Radius {
-    double topLeft{};
-    double topRight{};
-    double bottomLeft{};
-    double bottomRight{};
 
-    constexpr Radius() = default;
-
-    constexpr Radius(double all)
-        : topLeft(all),
-          topRight(all),
-          bottomLeft(all),
-          bottomRight(all) {}
-
-    constexpr Radius(double topLeft, double topRight, double bottomLeft, double bottomRight)
-        : topLeft(topLeft),
-          topRight(topRight),
-          bottomLeft(bottomLeft),
-          bottomRight(bottomRight) {}
-};
 
 struct Context {
     struct Scope {

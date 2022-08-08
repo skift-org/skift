@@ -174,7 +174,7 @@ struct SdlHost : public Ui::Host {
 Result<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
-    auto size = root->size({500, 700});
+    auto size = root->size({376, 668});
 
     SDL_Window *window = SDL_CreateWindow(
         "Application",

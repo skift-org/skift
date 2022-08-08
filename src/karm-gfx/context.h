@@ -7,8 +7,6 @@
 
 namespace Karm::Gfx {
 
-
-
 struct Context {
     struct Scope {
         FillStyle fillStyle{};
@@ -169,6 +167,8 @@ struct Context {
     void blur(Math::Recti region, double radius);
 
     void saturate(Math::Recti region, double saturation);
+
+    void grayscale(Math::Recti region);
 
     void contrast(Math::Recti region, double contrast);
 

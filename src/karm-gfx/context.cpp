@@ -1,4 +1,5 @@
 #include <karm-math/funcs.h>
+#include <karm-math/rand.h>
 
 #include "colors.h"
 #include "context.h"
@@ -142,11 +143,20 @@ void Context::plot(Math::Vec2i point, Color color) {
     }
 }
 
-// void Context::stroke(Math::Edgei edge) {}
+void Context::stroke(Math::Edgei edge) {
+    begin();
+    moveTo(edge.start.cast<double>());
+    lineTo(edge.end.cast<double>());
+    stroke();
+}
 
 // void Context::fill(Math::Edgei edge, double thickness = 1.0f) {}
 
-// void Context::stroke(Math::Recti rect) {}
+void Context::stroke(Math::Recti r) {
+    begin();
+    rect(r.cast<double>());
+    stroke();
+}
 
 void Context::fill(Math::Recti rect) {
     rect = applyAll(rect);
@@ -361,16 +371,97 @@ void Context::shadow() {}
 
 // void Context::blur(Math::Recti region, double radius) {}
 
-// void Context::saturate(Math::Recti region, double saturation) {}
+void Context::saturate(Math::Recti region, double value) {
+    region = applyAll(region);
+
+    for (int y = 0; y < region.height; y++) {
+        for (int x = 0; x < region.width; x++) {
+            auto color = _surface->load({region.x + x, region.y + y});
+
+            // weights from CCIR 601 spec
+            // https://stackoverflow.com/questions/13806483/increase-or-decrease-color-saturation
+            double gray = 0.2989 * color.red + 0.5870 * color.green + 0.1140 * color.blue;
+
+            uint8_t red = min(-gray * value + color.red * (1 + value), 255);
+            uint8_t green = min(-gray * value + color.green * (1 + value), 255);
+            uint8_t blue = min(-gray * value + color.blue * (1 + value), 255);
+
+            color = Color::fromRgba(red, green, blue, color.alpha);
+
+            _surface->store({region.x + x, region.y + y}, color);
+        }
+    }
+}
+
+void Context::grayscale(Math::Recti region) {
+    region = applyAll(region);
+
+    for (int y = 0; y < region.height; y++) {
+        for (int x = 0; x < region.width; x++) {
+            auto color = _surface->load({region.x + x, region.y + y});
+
+            // weights from CCIR 601 spec
+            // https://stackoverflow.com/questions/13806483/increase-or-decrease-color-saturation
+            double gray = 0.2989 * color.red + 0.5870 * color.green + 0.1140 * color.blue;
+
+            color = Color::fromRgba(gray, gray, gray, color.alpha);
+            _surface->store({region.x + x, region.y + y}, color);
+        }
+    }
+}
 
 // void Context::contrast(Math::Recti region, double contrast) {}
 
 // void Context::brightness(Math::Recti region, double brightness) {}
 
-// void Context::noise(Math::Recti region, double amount) {}
+void Context::noise(Math::Recti region, double amount) {
+    Math::Rand rand{0x12341234};
+    uint8_t alpha = 255 * amount;
 
-// void Context::sepia(Math::Recti region, double amount) {}
+    for (int y = 0; y < region.height; y++) {
+        for (int x = 0; x < region.width; x++) {
+            uint8_t noise = rand.nextU8();
+            plot(
+                {region.x + x, region.y + y},
+                Color::fromRgba(noise, noise, noise, alpha));
+        }
+    }
+}
 
-// void Context::tint(Math::Recti region, Color color) {}
+void Context::sepia(Math::Recti region, double amount) {
+    region = applyAll(region);
+
+    for (int y = 0; y < region.height; y++) {
+        for (int x = 0; x < region.width; x++) {
+            auto color = _surface->load({region.x + x, region.y + y});
+
+            auto sepiaColor = Color::fromRgba(
+                min((color.red * 0.393) + (color.green * 0.769) + (color.blue * 0.189), 255u),
+                min((color.red * 0.349) + (color.green * 0.686) + (color.blue * 0.168), 255u),
+                min((color.red * 0.272) + (color.green * 0.534) + (color.blue * 0.131), 255u),
+                color.alpha);
+
+            _surface->store({region.x + x, region.y + y}, color.lerpWith(sepiaColor, amount));
+        }
+    }
+}
+
+void Context::tint(Math::Recti region, Color tint) {
+    region = applyAll(region);
+
+    for (int y = 0; y < region.height; y++) {
+        for (int x = 0; x < region.width; x++) {
+            auto color = _surface->load({region.x + x, region.y + y});
+
+            auto tintColor = Color::fromRgba(
+                (color.red * tint.red) / 255,
+                (color.green * tint.green) / 255,
+                (color.blue * tint.blue) / 255,
+                (color.alpha * tint.alpha) / 255);
+
+            _surface->store({region.x + x, region.y + y}, tintColor);
+        }
+    }
+}
 
 } // namespace Karm::Gfx

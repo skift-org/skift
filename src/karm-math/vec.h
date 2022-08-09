@@ -34,11 +34,11 @@ union Vec2 {
     }
 
     constexpr Vec2 min(Vec2 const &other) const {
-        return {min(x, other.x), min(y, other.y)};
+        return {Karm::min(x, other.x), Karm::min(y, other.y)};
     }
 
     constexpr Vec2 max(Vec2 const &other) const {
-        return {max(x, other.x), max(y, other.y)};
+        return {Karm::max(x, other.x), Karm::max(y, other.y)};
     }
 
     constexpr T dot(Vec2 const &other) const {

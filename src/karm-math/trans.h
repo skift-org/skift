@@ -28,9 +28,11 @@ union Trans2 {
 
     T _els[6]{};
 
-    constexpr Trans2() : _els{1, 0, 0, 1, 0, 0} {}
+    constexpr Trans2()
+        : _els{1, 0, 0, 1, 0, 0} {}
 
-    constexpr Trans2(T xx, T xy, T yx, T yy, T ox, T oy) : _els{xx, xy, yx, yy, ox, oy} {}
+    constexpr Trans2(T xx, T xy, T yx, T yy, T ox, T oy)
+        : _els{xx, xy, yx, yy, ox, oy} {}
 
     static constexpr Trans2 rotate(T angle) {
         T c = cos(angle);
@@ -61,7 +63,7 @@ union Trans2 {
         return applyVector(v) + o;
     }
 
-    constexpr Trans2 operator*(Trans2 const &other) const {
+    constexpr Trans2 multiply(Trans2 const &other) const {
         return {
             xx * other.xx + xy * other.yx,
             xx * other.xy + xy * other.yy,
@@ -72,7 +74,45 @@ union Trans2 {
         };
     }
 
-    bool hasNan() const {
+    constexpr Trans2 rotated(T angle) {
+        return multiply(rotate(angle));
+    }
+
+    constexpr Trans2 skewed(T x, T y) {
+        return multiply(skew(x, y));
+    }
+
+    constexpr Trans2 scaled(T x, T y) {
+        return multiply(scale(x, y));
+    }
+
+    constexpr Trans2 scaled(T s) {
+        return scaled(s, s);
+    }
+
+    constexpr Trans2 translated(T x, T y) {
+        return multiply(translate(x, y));
+    }
+
+    constexpr Trans2 inverse() const {
+        T det = xx * yy - xy * yx;
+        return {
+            yy / det,
+            -xy / det,
+            -yx / det,
+            xx / det,
+            (oy * yy - ox * yx) / det,
+            (ox * xy - oy * xx) / det,
+        };
+    }
+
+    constexpr bool isIdentity() const {
+        return xx == 1 && xy == 0 &&
+               yx == 0 && yy == 1 &&
+               ox == 0 && oy == 0;
+    }
+
+    constexpr bool hasNan() const {
         return x.hasNan() || y.hasNan() || o.hasNan();
     }
 };

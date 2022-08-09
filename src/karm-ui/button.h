@@ -25,68 +25,75 @@ struct Button : public Proxy<Button> {
     Func<void()> _onPress;
     Style _style = DEFAULT;
     State _state = IDLE;
+    static constexpr int RADIUS = 4;
 
     Button(Func<void()> onPress, Style style, Child child)
         : Proxy(child), _onPress(std::move(onPress)), _style(style) {}
 
     void paint(Gfx::Context &g) override {
         if (_style == PRIMARY) {
-            g.fillStyle(Gfx::BLUE500);
-            g.fill(bound());
-
-            if (_state == OVER) {
-                g.fillStyle(Gfx::BLACK.withOpacity(0.1));
-                g.fill(bound());
-            }
-
-            if (_state == PRESS) {
-                g.fillStyle(Gfx::BLACK.withOpacity(0.2));
-                g.fill(bound());
+            if (_state == IDLE) {
+                g.fillStyle(Gfx::BLUE700);
+                g.fill(bound(), RADIUS);
+            } else if (_state == OVER) {
+                g.fillStyle(Gfx::BLUE600);
+                g.fill(bound(), RADIUS);
+            } else {
+                g.fillStyle(Gfx::BLUE800);
+                g.fill(bound(), RADIUS);
             }
         } else if (_style == DEFAULT) {
-            g.fillStyle(Gfx::ZINC800);
-            g.fill(bound());
+            if (_state == IDLE) {
+                g.fillStyle(Gfx::ZINC700);
+                g.fill(bound(), RADIUS);
 
-            g.strokeStyle(Gfx::stroke(Gfx::ZINC700)
-                              .withWidth(1)
-                              .withAlign(Gfx::INSIDE_ALIGN));
-            g.stroke(bound());
+                g.strokeStyle(Gfx::stroke(Gfx::ZINC600)
+                                  .withWidth(1)
+                                  .withAlign(Gfx::INSIDE_ALIGN));
+                g.stroke(bound(), RADIUS);
+            } else if (_state == OVER) {
+                g.fillStyle(Gfx::ZINC600);
+                g.fill(bound(), RADIUS);
 
-            if (_state == OVER) {
-                g.fillStyle(Gfx::BLACK.withOpacity(0.1));
-                g.fill(bound());
-            }
+                g.strokeStyle(Gfx::stroke(Gfx::ZINC500)
+                                  .withWidth(1)
+                                  .withAlign(Gfx::INSIDE_ALIGN));
+                g.stroke(bound(), RADIUS);
+            } else {
+                g.fillStyle(Gfx::ZINC800);
+                g.fill(bound(), RADIUS);
 
-            if (_state == PRESS) {
-                g.fillStyle(Gfx::BLACK.withOpacity(0.2));
-                g.fill(bound());
+                g.strokeStyle(Gfx::stroke(Gfx::ZINC700)
+                                  .withWidth(1)
+                                  .withAlign(Gfx::INSIDE_ALIGN));
+                g.stroke(bound(), RADIUS);
             }
         } else if (_style == OUTLINE) {
             if (_state == OVER) {
                 g.strokeStyle(Gfx::stroke(Gfx::ZINC600)
                                   .withWidth(1)
                                   .withAlign(Gfx::INSIDE_ALIGN));
-                g.stroke(bound());
+                g.stroke(bound(), RADIUS);
             } else {
                 g.strokeStyle(Gfx::stroke(Gfx::ZINC700)
                                   .withWidth(1)
                                   .withAlign(Gfx::INSIDE_ALIGN));
-                g.stroke(bound());
+                g.stroke(bound(), RADIUS);
             }
 
             if (_state == PRESS) {
                 g.fillStyle(Gfx::BLACK.withOpacity(0.2));
-                g.fill(bound());
+                g.fill(bound(), RADIUS);
             }
         } else if (_style == SUBTLE) {
             if (_state == OVER) {
-                g.fillStyle(Gfx::BLUE500.withOpacity(0.1));
-                g.fill(bound());
+                g.fillStyle(Gfx::BLUE500.withOpacity(0.2));
+                g.fill(bound(), RADIUS);
             }
 
             if (_state == PRESS) {
-                g.fillStyle(Gfx::BLUE500.withOpacity(0.2));
-                g.fill(bound());
+                g.fillStyle(Gfx::BLUE500.withOpacity(0.1));
+                g.fill(bound(), RADIUS);
             }
         }
 

@@ -152,19 +152,25 @@ void Context::stroke(Math::Edgei edge) {
 
 // void Context::fill(Math::Edgei edge, double thickness = 1.0f) {}
 
-void Context::stroke(Math::Recti r) {
+void Context::stroke(Math::Recti r, int radius) {
     begin();
-    rect(r.cast<double>());
+    rect(r.cast<double>(), radius);
     stroke();
 }
 
-void Context::fill(Math::Recti rect) {
-    rect = applyAll(rect);
+void Context::fill(Math::Recti r, int radius) {
+    if (radius == 0) {
+        r = applyAll(r);
 
-    for (int y = rect.y; y < rect.y + rect.height; y++) {
-        for (int x = rect.x; x < rect.x + rect.width; x++) {
-            surface().blend({x, y}, fillStyle().color());
+        for (int y = r.y; y < r.y + r.height; y++) {
+            for (int x = r.x; x < r.x + r.width; x++) {
+                surface().blend({x, y}, fillStyle().color());
+            }
         }
+    } else {
+        begin();
+        rect(r.cast<double>(), radius);
+        fill();
     }
 }
 
@@ -294,7 +300,9 @@ void Context::_fill(Color color) {
 
             for (int x = rect.start(); x < rect.end(); x++) {
                 if (_scanline[x] > 0) {
-                    surface().blend({x, y}, color.withOpacity(_scanline[x] / (AA * AA)));
+                    auto alpha = (_scanline[x]) / (AA * AA);
+                    // We square the alpha for gamma correction
+                    surface().blend({x, y}, color.withOpacity(alpha * alpha));
                 }
             }
         }
@@ -345,8 +353,8 @@ void Context::line(Math::Edgef line) {
     _path.line(line);
 }
 
-void Context::rect(Math::Rectf rect) {
-    _path.rect(rect);
+void Context::rect(Math::Rectf rect, int radius) {
+    _path.rect(rect, radius);
 }
 
 void Context::ellipse(Math::Ellipsef ellipse) {

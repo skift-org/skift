@@ -300,12 +300,32 @@ void Path::line(Math::Edgef edge) {
     lineTo(edge.end);
 }
 
-void Path::rect(Math::Rectf rect) {
-    moveTo(rect.topStart());
-    lineTo(rect.topEnd());
-    lineTo(rect.bottomEnd());
-    lineTo(rect.bottomStart());
-    close();
+void Path::rect(Math::Rectf rect, int radius) {
+    if (radius == 0) {
+        moveTo(rect.topStart());
+        lineTo(rect.topEnd());
+        lineTo(rect.bottomEnd());
+        lineTo(rect.bottomStart());
+        close();
+    } else {
+        moveTo({rect.x + radius, rect.y});
+
+        // Top edge
+        lineTo({rect.x + rect.width - radius, rect.y});
+        quadTo({rect.x + rect.width, rect.y}, {rect.x + rect.width, rect.y + radius});
+
+        // Right edge
+        lineTo({rect.x + rect.width, rect.y + rect.height - radius});
+        quadTo({rect.x + rect.width, rect.y + rect.height}, {rect.x + rect.width - radius, rect.y + rect.height});
+
+        // Bottom edge
+        lineTo({rect.x + radius, rect.y + rect.height});
+        quadTo({rect.x, rect.y + rect.height}, {rect.x, rect.y + rect.height - radius});
+
+        // Left edge
+        lineTo({rect.x, rect.y + radius});
+        quadTo({rect.x, rect.y}, {rect.x + radius, rect.y});
+    }
 }
 
 void Path::ellipse(Math::Ellipsef ellipse) {

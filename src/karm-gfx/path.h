@@ -167,7 +167,7 @@ struct Path {
 
     void line(Math::Edgef edge);
 
-    void rect(Math::Rectf rect);
+    void rect(Math::Rectf rect, int radius = 0);
 
     void ellipse(Math::Ellipsef ellipse);
 

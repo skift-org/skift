@@ -5,11 +5,11 @@
 namespace Karm::Ui {
 
 template <typename Crtp>
-struct Component : public Widget<Crtp> {
+struct React : public Widget<Crtp> {
     bool _rebuild = true;
     Opt<Child> _child;
 
-    ~Component() {
+    ~React() {
         _child.with([&](auto &child) {
             child->detach();
         });

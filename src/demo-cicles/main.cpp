@@ -4,18 +4,17 @@
 #include <karm-ui/funcs.h>
 
 struct CirclesApp : public Ui::Widget<CirclesApp> {
+
     Math::Vec2i _mousePos{};
     int _frame = 0;
 
     void paint(Gfx::Context &g) override {
-        Math::Rand rand{_frame};
-        double size = rand.nextInt(4, 10);
-        size *= size;
+        Math::Rand rand{};
 
-        g.fillStyle(Gfx::BLACK.withOpacity(0.01));
-        g.fill(g.clip());
+        for (int i = 0; i < 10; i++) {
+            double size = rand.nextInt(4, 10);
+            size *= size;
 
-        if (_frame % 16 == 0) {
             g.begin();
             g.ellipse({
                 rand.nextVec2(g.clip()).cast<double>(),
@@ -26,6 +25,9 @@ struct CirclesApp : public Ui::Widget<CirclesApp> {
                 Gfx::stroke(Gfx::WHITE)
                     .withWidth(rand.nextInt(2, size)));
             g.stroke();
+
+            g.fillStyle(Gfx::BLACK.withOpacity(0.1));
+            g.fill(g.clip());
         }
 
         g.begin();

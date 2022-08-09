@@ -77,8 +77,8 @@ struct Spacing : public Proxy<Spacing> {
     }
 };
 
-static inline Child spacing(Layout::Spacingi s, Child c) {
-    return makeStrong<Spacing>(s, c);
+static inline Child spacing(Layout::Spacingi s, Child child) {
+    return makeStrong<Spacing>(s, child);
 }
 
 } // namespace Karm::Ui

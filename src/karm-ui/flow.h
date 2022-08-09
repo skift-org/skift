@@ -99,26 +99,28 @@ struct FlowLayout : public Group<FlowLayout> {
 
         w += _gaps * (max(1uz, children().len()) - 1);
         if (grow)
-            w = _flow.getX(s);
+            w = max(_flow.getX(s), w);
 
-        return _flow.horizontal() ? Math::Vec2i{w, h} : Math::Vec2i{h, w};
+        return _flow.orien() == Layout::Orien::HORIZONTAL
+                   ? Math::Vec2i{w, h}
+                   : Math::Vec2i{h, w};
     }
 };
-
-static inline Child flow(Layout::Flow f, Children children) {
-    return makeStrong<FlowLayout>(f, children);
-}
 
 static inline Child flow(Layout::Flow f, int gaps, Children children) {
     return makeStrong<FlowLayout>(f, gaps, children);
 }
 
-static inline Child flow(Layout::Flow f, Meta::Same<Child> auto... children) {
-    return flow(f, {children...});
+static inline Child flow(Layout::Flow f, Children children) {
+    return flow(f, 0, children);
 }
 
 static inline Child flow(Layout::Flow f, int gaps, Meta::Same<Child> auto... children) {
     return flow(f, gaps, {children...});
+}
+
+static inline Child flow(Layout::Flow f, Meta::Same<Child> auto... children) {
+    return flow(f, {children...});
 }
 
 static inline Child hflow(Meta::Same<Child> auto... children) {

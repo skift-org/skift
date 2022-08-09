@@ -1,16 +1,17 @@
 #pragma once
 
-#include "component.h"
-#include "karm-base/func.h"
+#include <karm-base/func.h>
+
+#include "react.h"
 
 namespace Karm::Ui {
 
 template <typename T>
-struct StateComponent : public Component<StateComponent<T>> {
-    struct Accessor {
-        StateComponent<T> &_s;
+struct _State : public React<_State<T>> {
+    struct Wrap {
+        _State<T> &_s;
 
-        Accessor(StateComponent<T> &s) : _s(s) {}
+        Wrap(_State<T> &s) : _s(s) {}
 
         void update(T t) {
             _s._value = t;
@@ -31,22 +32,22 @@ struct StateComponent : public Component<StateComponent<T>> {
     };
 
     T _value;
-    Func<Child(Accessor)> _build;
+    Func<Child(Wrap)> _build;
 
-    StateComponent(T initial, Func<Child(Accessor)> build)
+    _State(T initial, Func<Child(Wrap)> build)
         : _value(initial), _build(std::move(build)) {}
 
     Child build() override {
-        return _build(Accessor(*this));
+        return _build(Wrap(*this));
     }
 };
 
 template <typename T>
-using State = typename StateComponent<T>::Accessor;
+using State = typename _State<T>::Wrap;
 
 template <typename T>
 Child state(T initial, Func<Child(State<T>)> build) {
-    return makeStrong<StateComponent<T>>(initial, std::move(build));
+    return makeStrong<_State<T>>(initial, std::move(build));
 }
 
 } // namespace Karm::Ui

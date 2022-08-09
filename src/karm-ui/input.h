@@ -7,9 +7,8 @@ namespace Karm::Ui {
 struct Input : public View<Input> {
 };
 
-template <typename... Args>
-Child input(Args &&...args) {
-    return makeStrong<Input>(std::forward<Args>(args)...);
+static inline Child input() {
+    return makeStrong<Input>();
 }
 
 } // namespace Karm::Ui

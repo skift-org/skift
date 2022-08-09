@@ -7,9 +7,8 @@ namespace Karm::Ui {
 struct Image : public View<Image> {
 };
 
-template <typename... Args>
-Child image(Args &&...args) {
-    return makeStrong<Image>(std::forward<Args>(args)...);
+static inline Child image() {
+    return makeStrong<Image>();
 }
 
 } // namespace Karm::Ui

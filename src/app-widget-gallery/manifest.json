@@ -1,0 +1,9 @@
+{
+    "id": "app-widget-gallery",
+    "type": "exe",
+    "description": "A gallery of widgets",
+    "deps": [
+        "karm-main",
+        "karm-ui"
+    ]
+}

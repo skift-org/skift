@@ -11,7 +11,7 @@ int inc(int state) {
 CliResult entryPoint(CliArgs args) {
     Ui::App app(0, [](auto state) {
         auto lbl = Ui::text("You clicked {} times!", state.value());
-        auto btn = Ui::button(state.bind(inc), "CLICK ME!");
+        auto btn = Ui::primaryButton(state.bind(inc), "CLICK ME!");
 
         return Ui::center(
             Ui::spacing(

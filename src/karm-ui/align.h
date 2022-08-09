@@ -47,4 +47,40 @@ static inline Child vcenterFill(Child child) {
     return align(Layout::Align::VCENTER | Layout::Align::HFILL, child);
 }
 
+struct MinSize : public Proxy<Align> {
+    Math::Vec2i _size;
+
+    MinSize(Math::Vec2i size, Child child) : Proxy(child), _size(size) {}
+
+    Math::Vec2i size(Math::Vec2i s) override {
+        return _size.max(child().size(s));
+    }
+};
+
+static inline Child minSize(Math::Vec2i size, Child child) {
+    return makeStrong<MinSize>(size, child);
+}
+
+static inline Child minSize(int size, Child child) {
+    return minSize(Math::Vec2i{size}, child);
+}
+
+struct MaxSize : public Proxy<Align> {
+    Math::Vec2i _size;
+
+    MaxSize(Math::Vec2i size, Child child) : Proxy(child), _size(size) {}
+
+    Math::Vec2i size(Math::Vec2i s) override {
+        return _size.min(child().size(s));
+    }
+};
+
+static inline Child maxSize(Math::Vec2i size, Child child) {
+    return makeStrong<MaxSize>(size, child);
+}
+
+static inline Child maxSize(int size, Child child) {
+    return maxSize(Math::Vec2i{size}, child);
+}
+
 } // namespace Karm::Ui

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "align.h"
 #include "box.h"
 #include "funcs.h"
 #include "proxy.h"
@@ -14,24 +15,79 @@ struct Button : public Proxy<Button> {
         PRESS,
     };
 
+    enum Style {
+        DEFAULT,
+        PRIMARY,
+        OUTLINE,
+        SUBTLE,
+    };
+
     Func<void()> _onPress;
+    Style _style = DEFAULT;
     State _state = IDLE;
 
-    Button(Func<void()> onPress, Child child)
-        : Proxy(child), _onPress(std::move(onPress)) {}
+    Button(Func<void()> onPress, Style style, Child child)
+        : Proxy(child), _onPress(std::move(onPress)), _style(style) {}
 
     void paint(Gfx::Context &g) override {
-        g.fillStyle(Gfx::BLUE500);
-        g.fill(bound());
-
-        if (_state == OVER) {
-            g.fillStyle(Gfx::BLACK.withOpacity(0.1));
+        if (_style == PRIMARY) {
+            g.fillStyle(Gfx::BLUE500);
             g.fill(bound());
-        }
 
-        if (_state == PRESS) {
-            g.fillStyle(Gfx::BLACK.withOpacity(0.2));
+            if (_state == OVER) {
+                g.fillStyle(Gfx::BLACK.withOpacity(0.1));
+                g.fill(bound());
+            }
+
+            if (_state == PRESS) {
+                g.fillStyle(Gfx::BLACK.withOpacity(0.2));
+                g.fill(bound());
+            }
+        } else if (_style == DEFAULT) {
+            g.fillStyle(Gfx::ZINC800);
             g.fill(bound());
+
+            g.strokeStyle(Gfx::stroke(Gfx::ZINC700)
+                              .withWidth(1)
+                              .withAlign(Gfx::INSIDE_ALIGN));
+            g.stroke(bound());
+
+            if (_state == OVER) {
+                g.fillStyle(Gfx::BLACK.withOpacity(0.1));
+                g.fill(bound());
+            }
+
+            if (_state == PRESS) {
+                g.fillStyle(Gfx::BLACK.withOpacity(0.2));
+                g.fill(bound());
+            }
+        } else if (_style == OUTLINE) {
+            if (_state == OVER) {
+                g.strokeStyle(Gfx::stroke(Gfx::ZINC600)
+                                  .withWidth(1)
+                                  .withAlign(Gfx::INSIDE_ALIGN));
+                g.stroke(bound());
+            } else {
+                g.strokeStyle(Gfx::stroke(Gfx::ZINC700)
+                                  .withWidth(1)
+                                  .withAlign(Gfx::INSIDE_ALIGN));
+                g.stroke(bound());
+            }
+
+            if (_state == PRESS) {
+                g.fillStyle(Gfx::BLACK.withOpacity(0.2));
+                g.fill(bound());
+            }
+        } else if (_style == SUBTLE) {
+            if (_state == OVER) {
+                g.fillStyle(Gfx::BLUE500.withOpacity(0.1));
+                g.fill(bound());
+            }
+
+            if (_state == PRESS) {
+                g.fillStyle(Gfx::BLUE500.withOpacity(0.2));
+                g.fill(bound());
+            }
         }
 
         child().paint(g);
@@ -66,12 +122,54 @@ struct Button : public Proxy<Button> {
     };
 };
 
+static inline Child button(Func<void()> onPress, Button::Style style, Child child) {
+    return makeStrong<Button>(std::move(onPress), style, child);
+}
+
+static inline Child button(Func<void()> onPress, Button::Style style, Str t) {
+    auto lbl = spacing(
+        {12, 6},
+        hcenter(
+            text(t)));
+
+    return button(std::move(onPress), style, lbl);
+    return makeStrong<Button>(
+        std::move(onPress),
+        style,
+        minSize({36, 36}, spacing(
+                              {16, 8}, lbl)));
+}
+
 static inline Child button(Func<void()> onPress, Child child) {
-    return makeStrong<Button>(std::move(onPress), child);
+    return button(std::move(onPress), Button::DEFAULT, child);
 }
 
 static inline Child button(Func<void()> onPress, Str t) {
-    return button(std::move(onPress), spacing({16, 8}, text(t)));
+    return button(std::move(onPress), Button::DEFAULT, t);
+}
+
+static inline Child primaryButton(Func<void()> onPress, Child child) {
+    return button(std::move(onPress), Button::PRIMARY, child);
+}
+
+static inline Child primaryButton(Func<void()> onPress, Str t) {
+    return button(std::move(onPress), Button::PRIMARY, t);
+}
+
+static inline Child outlineButton(Func<void()> onPress, Child child) {
+    return button(std::move(onPress), Button::OUTLINE, child);
+}
+
+static inline Child outlineButton(Func<void()> onPress, Str t) {
+    return button(std::move(onPress), Button::OUTLINE, t);
+}
+
+static inline Child subtleButton(Func<void()> onPress, Child child) {
+    return button(std::move(onPress), Button::SUBTLE, child);
+}
+
+static inline Child subtleButton(Func<void()> onPress, Str t) {
+    return button(std::move(onPress), Button::SUBTLE, t);
 }
 
 } // namespace Karm::Ui

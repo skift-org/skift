@@ -5,6 +5,12 @@
 
 namespace Karm::Layout {
 
+enum struct Orien {
+    NONE,
+    HORIZONTAL,
+    VERTICAL,
+};
+
 struct Flow {
     enum struct _Flow {
         LEFT_TO_RIGHT,
@@ -21,12 +27,10 @@ struct Flow {
 
     Flow(_Flow flow) : _flow(flow) {}
 
-    bool horizontal() const {
-        return _flow == LEFT_TO_RIGHT || _flow == RIGHT_TO_LEFT;
-    }
-
-    bool vertical() const {
-        return _flow == TOP_TO_BOTTOM || _flow == BOTTOM_TO_TOP;
+    Orien orien() const {
+        return (_flow == LEFT_TO_RIGHT || _flow == RIGHT_TO_LEFT)
+                   ? Orien::HORIZONTAL
+                   : Orien::VERTICAL;
     }
 
     Flow relative(Flow child) const {

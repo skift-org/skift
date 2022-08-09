@@ -18,7 +18,7 @@ struct Dock {
 
     Dock(_Dock dock) : _dock(dock) {}
 
-    Flow flow() {
+    Flow flow() const {
         switch (_dock) {
         default:
         case NONE:
@@ -37,6 +37,13 @@ struct Dock {
         case BOTTOM:
             return Flow::BOTTOM_TO_TOP;
         }
+    }
+
+    Orien orien() const {
+        if (_dock == NONE || _dock == FILL)
+            return Orien::NONE;
+        else
+            return flow().orien();
     }
 
     template <typename T>

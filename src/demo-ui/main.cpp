@@ -12,16 +12,18 @@ CliResult entryPoint(CliArgs args) {
     };
 
     auto toolbar = [](auto... children) {
-        return Ui::docked(Layout::Dock::TOP, Ui::box(Gfx::ZINC800, Ui::flow(children...)));
+        return Ui::docked(
+            Layout::Dock::TOP,
+            Ui::box(Gfx::ZINC800, Ui::hflow(children...)));
     };
-
-    return Ui::runApp(args, Ui::dock(
-                                toolbar(
-                                    Ui::box(Gfx::INDIGO500, Ui::empty(64)),
-                                    Ui::box(Gfx::AMBER500, Ui::empty(64)),
-                                    Ui::box(Gfx::CYAN500, Ui::empty(64))),
-                                emptyBox(Layout::Dock::BOTTOM, Gfx::BLUE500),
-                                emptyBox(Layout::Dock::START, Gfx::GREEN500),
-                                emptyBox(Layout::Dock::END, Gfx::YELLOW500),
-                                emptyBox(Layout::Dock::FILL, Gfx::PINK500)));
+    return Ui::runApp(args,
+                      Ui::dock(
+                          toolbar(
+                              Ui::box(Gfx::INDIGO500, Ui::empty(64)),
+                              Ui::box(Gfx::AMBER500, Ui::empty(64)),
+                              Ui::box(Gfx::CYAN500, Ui::empty(64))),
+                          emptyBox(Layout::Dock::BOTTOM, Gfx::BLUE500),
+                          emptyBox(Layout::Dock::START, Gfx::GREEN500),
+                          emptyBox(Layout::Dock::END, Gfx::YELLOW500),
+                          emptyBox(Layout::Dock::FILL, Gfx::PINK500)));
 }

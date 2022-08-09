@@ -87,11 +87,18 @@ struct FlowLayout : public Group<FlowLayout> {
     Math::Vec2i size(Math::Vec2i s) override {
         int w{};
         int h{};
+        bool grow = false;
 
         for (auto &child : children()) {
+            if (child.is<Grow>())
+                grow = true;
             w += _flow.getX(child->size(s));
             h = max(h, _flow.getY(child->size(s)));
         }
+
+        w += _gaps * (max(1uz, children().len()) - 1);
+        if (grow)
+            w = _flow.getX(s);
 
         return _flow.horizontal() ? Math::Vec2i{w, h} : Math::Vec2i{h, w};
     }

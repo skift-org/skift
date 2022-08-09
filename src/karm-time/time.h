@@ -4,14 +4,18 @@
 
 namespace Karm::Time {
 
-struct Timespan {
-    uint64_t _value;
+struct Span {
+    uint64_t value;
 
-    static constexpr Timespan zero() {
-        return Timespan{0};
+    static constexpr Span zero() {
+        return Span{0};
     }
 
-    static constexpr Timespan fromUSecs(uint64_t value) {
+    static constexpr Span infinite() {
+        return Span{~0ull};
+    }
+
+    static constexpr Span fromUSecs(uint64_t value) {
         return {value};
     }
 
@@ -47,16 +51,16 @@ struct Timespan {
         return fromMonths(value * 12);
     }
 
-    constexpr Timespan() : _value(0) {}
+    constexpr Span() : value(0) {}
 
-    constexpr Timespan(uint64_t value) : _value(value) {}
+    constexpr Span(uint64_t value) : value(value) {}
 
-    constexpr uint64_t value() const {
-        return _value;
+    constexpr bool isInfinite() const {
+        return value == ~0ull;
     }
 
     constexpr uint64_t toUSecs() const {
-        return _value;
+        return value;
     }
 
     constexpr uint64_t toMSecs() const {
@@ -91,30 +95,67 @@ struct Timespan {
         return toMonths() / 12;
     }
 
-    constexpr Timespan &operator+=(Timespan const &other) {
-        _value += other._value;
+    constexpr Span &operator+=(Span const &other) {
+        value += other.value;
         return *this;
     }
 
-    constexpr Timespan &operator-=(Timespan const &other) {
-        _value -= other._value;
+    constexpr Span &operator-=(Span const &other) {
+        value -= other.value;
         return *this;
     }
 
-    constexpr Timespan operator+(Timespan const &other) const {
-        return _value + other._value;
+    constexpr Span operator+(Span const &other) const {
+        return value + other.value;
     }
 
-    constexpr Timespan operator-(Timespan const &other) const {
-        return _value - other._value;
+    constexpr Span operator-(Span const &other) const {
+        return value - other.value;
     }
 };
 
-struct Timestamp {
-    uint64_t _value;
+struct Stamp {
+    uint64_t value;
 
-    static constexpr Timestamp epoch() {
+    static constexpr Stamp epoch() {
         return {0};
+    }
+
+    static constexpr Stamp endOfTime() {
+        return {~0ull};
+    }
+
+    constexpr Stamp(uint64_t value = 0) : value(value) {}
+
+    constexpr bool isEndOfTime() const {
+        return value == ~0ull;
+    }
+
+    constexpr Stamp &operator+=(Span const &other) {
+        *this = *this + other;
+        return *this;
+    }
+
+    constexpr Stamp &operator-=(Span const &other) {
+        *this = *this - other;
+        return *this;
+    }
+
+    constexpr Stamp operator+(Span const &other) const {
+        if (other.isInfinite()) {
+            return endOfTime();
+        }
+        if (isEndOfTime()) {
+            return *this;
+        }
+        return value + other.value;
+    }
+
+    constexpr Stamp operator-(Span const &other) const {
+        if (isEndOfTime()) {
+            return *this;
+        }
+        return value - other.value;
     }
 };
 

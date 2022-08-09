@@ -31,4 +31,20 @@ static inline Child center(Child child) {
     return align(Layout::Align::CENTER, child);
 }
 
+static inline Child hcenter(Child child) {
+    return align(Layout::Align::HCENTER | Layout::Align::TOP, child);
+}
+
+static inline Child vcenter(Child child) {
+    return align(Layout::Align::VCENTER | Layout::Align::START, child);
+}
+
+static inline Child hcenterFill(Child child) {
+    return align(Layout::Align::HCENTER | Layout::Align::VFILL, child);
+}
+
+static inline Child vcenterFill(Child child) {
+    return align(Layout::Align::VCENTER | Layout::Align::HFILL, child);
+}
+
 } // namespace Karm::Ui

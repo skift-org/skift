@@ -71,7 +71,7 @@ static inline Child button(Func<void()> onPress, Child child) {
 }
 
 static inline Child button(Func<void()> onPress, Str t) {
-    return button(std::move(onPress), spacing({6, 4}, text(t)));
+    return button(std::move(onPress), spacing({16, 8}, text(t)));
 }
 
 } // namespace Karm::Ui

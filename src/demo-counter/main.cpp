@@ -10,17 +10,15 @@ int inc(int state) {
 
 CliResult entryPoint(CliArgs args) {
     Ui::App app(0, [](auto state) {
-        auto lbl = Ui::spacing(8, Ui::text("You clicked {} times!", state.value()));
-        auto btn = Ui::button(state.bind(inc), "Click me!");
+        auto lbl = Ui::text("You clicked {} times!", state.value());
+        auto btn = Ui::button(state.bind(inc), "CLICK ME!");
 
-        return Ui::align(
-            Layout::Align::VCENTER | Layout::Align::HFILL,
-            Ui::flow(
-                Layout::Flow::TOP_TO_BOTTOM,
-                lbl,
-                Ui::align(
-                    Layout::Align::HCENTER | Layout::Align::TOP,
-                    btn)));
+        return Ui::center(
+            Ui::spacing(
+                32,
+                Ui::vflow(
+                    Ui::grow(Ui::center(lbl)),
+                    Ui::hcenter(btn))));
     });
 
     return app.run(args);

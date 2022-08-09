@@ -21,7 +21,7 @@ struct Text : public View<Text> {
     }
 
     Math::Vec2i size(Math::Vec2i) override {
-        return _font->mesureStr(_text).linebound.size().cast<int>();
+        return _font->mesureStr(_text).capbound.size().cast<int>();
     }
 };
 

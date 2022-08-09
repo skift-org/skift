@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-layout/align.h>
 #include <karm-layout/flow.h>
 
 #include "empty.h"
@@ -104,36 +105,52 @@ struct FlowLayout : public Group<FlowLayout> {
     }
 };
 
-static inline Child flow(Children children) {
-    return makeStrong<FlowLayout>(children);
+static inline Child flow(Layout::Flow f, Children children) {
+    return makeStrong<FlowLayout>(f, children);
 }
 
-static inline Child flow(int gaps, Children children) {
-    return makeStrong<FlowLayout>(gaps, children);
-}
-
-static inline Child flow(Layout::Flow flow, Children children) {
-    return makeStrong<FlowLayout>(flow, children);
-}
-
-static inline Child flow(Layout::Flow flow, int gaps, Children children) {
-    return makeStrong<FlowLayout>(flow, gaps, children);
-}
-
-static inline Child flow(Meta::Same<Child> auto... children) {
-    return flow({children...});
+static inline Child flow(Layout::Flow f, int gaps, Children children) {
+    return makeStrong<FlowLayout>(f, gaps, children);
 }
 
 static inline Child flow(Layout::Flow f, Meta::Same<Child> auto... children) {
     return flow(f, {children...});
 }
 
-static inline Child flow(int gaps, Meta::Same<Child> auto... children) {
-    return flow(gaps, {children...});
-}
-
 static inline Child flow(Layout::Flow f, int gaps, Meta::Same<Child> auto... children) {
     return flow(f, gaps, {children...});
+}
+
+static inline Child hflow(Meta::Same<Child> auto... children) {
+    return flow(Layout::Flow::LEFT_TO_RIGHT, {children...});
+}
+
+static inline Child hflow(int gaps, Meta::Same<Child> auto... children) {
+    return flow(Layout::Flow::LEFT_TO_RIGHT, gaps, {children...});
+}
+
+static inline Child hflow(Children children) {
+    return flow(Layout::Flow::LEFT_TO_RIGHT, children);
+}
+
+static inline Child hflow(int gaps, Children children) {
+    return flow(Layout::Flow::LEFT_TO_RIGHT, gaps, children);
+}
+
+static inline Child vflow(Meta::Same<Child> auto... children) {
+    return flow(Layout::Flow::TOP_TO_BOTTOM, {children...});
+}
+
+static inline Child vflow(int gaps, Meta::Same<Child> auto... children) {
+    return flow(Layout::Flow::TOP_TO_BOTTOM, gaps, {children...});
+}
+
+static inline Child vflow(Children children) {
+    return flow(Layout::Flow::TOP_TO_BOTTOM, children);
+}
+
+static inline Child vflow(int gaps, Children children) {
+    return flow(Layout::Flow::TOP_TO_BOTTOM, gaps, children);
 }
 
 } // namespace Karm::Ui

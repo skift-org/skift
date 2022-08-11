@@ -14,6 +14,7 @@
 namespace Karm::Fmt {
 
 struct NumberFormater {
+    bool isChar = false;
     int base = 10;
 
     void parse(Text::Scan &scan) {
@@ -38,6 +39,10 @@ struct NumberFormater {
 
         case 'x':
             base = 16;
+            break;
+
+        case 'c':
+            isChar = true;
             break;
 
         default:
@@ -70,6 +75,9 @@ struct NumberFormater {
 template <typename T>
 struct UnsignedFormatter : public NumberFormater {
     Result<size_t> format(Io::_TextWriter &writer, T const value) {
+        if (isChar) {
+            return writer.writeRune(value);
+        }
         return formatUnsigned(writer, value);
     }
 };
@@ -77,6 +85,10 @@ struct UnsignedFormatter : public NumberFormater {
 template <typename T>
 struct SignedFormatter : public NumberFormater {
     Result<size_t> format(Io::_TextWriter &writer, T const value) {
+        if (isChar) {
+            return writer.writeRune(value);
+        }
+
         size_t written = 0;
         Meta::MakeUnsigned<T> unsignedValue = 0;
 
@@ -99,13 +111,6 @@ struct Formatter<T> : public UnsignedFormatter<T> {};
 
 template <Meta::SignedIntegral T>
 struct Formatter<T> : public SignedFormatter<T> {};
-
-template <>
-struct Formatter<Rune> {
-    Result<size_t> format(Io::_TextWriter &writer, Rune rune) {
-        return writer.writeRune(rune);
-    }
-};
 
 template <>
 struct Formatter<Str> {

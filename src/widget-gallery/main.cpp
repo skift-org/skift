@@ -4,8 +4,7 @@
 #include <karm-ui/button.h>
 #include <karm-ui/flow.h>
 
-auto nop() {
-}
+void nop() {}
 
 Ui::Child buttons() {
     return Ui::vflow(

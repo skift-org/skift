@@ -1,5 +1,5 @@
 {
-    "id": "app-widget-gallery",
+    "id": "widget-gallery",
     "type": "exe",
     "description": "A gallery of widgets",
     "deps": [

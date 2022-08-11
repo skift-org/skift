@@ -4,7 +4,7 @@
 #include <karm-base/result.h>
 #include <karm-base/string.h>
 #include <karm-debug/logger.h>
-#include <karm-gfx/context.h>
+#include <karm-gfx/path.h>
 #include <karm-io/impls.h>
 
 #include "font.h"
@@ -48,6 +48,19 @@ struct BScan {
     }
 
     template <typename T>
+    bool peekTo(T *buf, size_t n) {
+        if (rem() < n) {
+            return false;
+        }
+
+        uint8_t *b = reinterpret_cast<uint8_t *>(buf);
+        for (size_t i = 0; i < n; i++) {
+            b[i] = _cursor.buf()[i];
+        }
+        return true;
+    }
+
+    template <typename T>
     T nextBe() {
         _Be<T> r{};
         readTo(&r, sizeof(T));
@@ -61,37 +74,59 @@ struct BScan {
         return r;
     }
 
+    template <typename T>
+    T peekBe() {
+        _Be<T> r{};
+        peekTo(&r, sizeof(T));
+        return r;
+    }
+
+    template <typename T>
+    T peekLe() {
+        _Le<T> r;
+        peekTo(&r, sizeof(T));
+        return r;
+    }
+
     uint8_t nextBeUint8() { return nextBe<uint8_t>(); }
-
     uint16_t nextBeUint16() { return nextBe<uint16_t>(); }
-
     uint32_t nextBeUint32() { return nextBe<uint32_t>(); }
-
     uint64_t nextBeUint64() { return nextBe<uint64_t>(); }
 
     uint8_t nextLeUint8() { return nextLe<uint8_t>(); }
-
     uint16_t nextLeUint16() { return nextLe<uint16_t>(); }
-
     uint32_t nextLeUint32() { return nextLe<uint32_t>(); }
-
     uint64_t nextLeUint64() { return nextLe<uint64_t>(); }
 
     int8_t nextBeInt8() { return nextBe<int8_t>(); }
-
     int16_t nextBeInt16() { return nextBe<int16_t>(); }
-
     int32_t nextBeInt32() { return nextBe<int32_t>(); }
-
     int64_t nextBeInt64() { return nextBe<int64_t>(); }
 
     int8_t nextLeInt8() { return nextLe<int8_t>(); }
-
     int16_t nextLeInt16() { return nextLe<int16_t>(); }
-
     int32_t nextLeInt32() { return nextLe<int32_t>(); }
-
     int64_t nextLeInt64() { return nextLe<int64_t>(); }
+
+    uint8_t peekBeUint8() { return peekBe<uint8_t>(); }
+    uint16_t peekBeUint16() { return peekBe<uint16_t>(); }
+    uint32_t peekBeUint32() { return peekBe<uint32_t>(); }
+    uint64_t peekBeUint64() { return peekBe<uint64_t>(); }
+
+    uint8_t peekLeUint8() { return peekLe<uint8_t>(); }
+    uint16_t peekLeUint16() { return peekLe<uint16_t>(); }
+    uint32_t peekLeUint32() { return peekLe<uint32_t>(); }
+    uint64_t peekLeUint64() { return peekLe<uint64_t>(); }
+
+    int8_t peekBeInt8() { return peekBe<int8_t>(); }
+    int16_t peekBeInt16() { return peekBe<int16_t>(); }
+    int32_t peekBeInt32() { return peekBe<int32_t>(); }
+    int64_t peekBeInt64() { return peekBe<int64_t>(); }
+
+    int8_t peekLeInt8() { return peekLe<int8_t>(); }
+    int16_t peekLeInt16() { return peekLe<int16_t>(); }
+    int32_t peekLeInt32() { return peekLe<int32_t>(); }
+    int64_t peekLeInt64() { return peekLe<int64_t>(); }
 
     Str nextStr(size_t n) {
         n = clamp(n, 0uz, rem());
@@ -156,6 +191,60 @@ struct TtfCmap : public TtfTable {
         BScan begin() const {
             return slice;
         }
+
+        size_t _glyphIdForType4(Rune r) {
+            uint16_t segCountX2 = begin().skip(6).nextBeUint16();
+            uint16_t segCount = segCountX2 / 2;
+
+            // + 2 for reserved padding
+            uint16_t idRangeStart = begin().skip(14 + segCountX2 * 3 + 2).nextBeUint16();
+
+            for (size_t i = 0; i < segCount; i++) {
+                size_t tableSize = (segCountX2);
+
+                auto s = begin().skip(14);
+
+                uint16_t endCode = s.skip((i * 2)).peekBeUint16();
+
+                if (r >= endCode) {
+                    continue;
+                }
+
+                // + 2 for reserved padding
+                uint16_t startCode = s.skip(tableSize + 2).peekBeUint16();
+
+                if (r < startCode) {
+                    break;
+                    ;
+                }
+
+                uint16_t idDelta = s.skip(tableSize).peekBeUint16();
+
+                // + 4 for idRangeStart and reserved padding
+                uint16_t idRangeOffset = s.skip(tableSize + 4).nextBeUint16();
+
+                if (idRangeOffset == 0) {
+                    return (r + idDelta) & 0xFFFF;
+                } else {
+                    auto offset =
+                        idRangeStart +
+                        i * 2 + idRangeOffset +
+                        (r - startCode) * 2;
+
+                    return (begin().skip(offset).nextBeUint16() + idDelta) & 0xFFFF;
+                }
+            }
+
+            return 0;
+        }
+
+        size_t glyphIdFor(Rune r) {
+            if (type == 4) {
+                return _glyphIdForType4(r);
+            } else {
+                return 0;
+            }
+        }
     };
 
     auto iterTables() {
@@ -177,12 +266,6 @@ struct TtfCmap : public TtfTable {
 
             return Table{platformId, encodingId, type, slice};
         }};
-    }
-
-    int glyphIdFor(Rune) {
-        // TODO
-
-        return 0;
     }
 };
 
@@ -301,7 +384,16 @@ struct TtfKern : public TtfTable {
     static constexpr Str NAME = "kern";
 };
 
-struct TtfFont : public Font {
+struct TtfMetrics {
+    int x;
+    int y;
+    int width;
+    int height;
+    int lsb;
+    int advance;
+};
+
+struct TtfFont {
     Bytes _slice;
 
     TtfHead _head;
@@ -408,31 +500,20 @@ struct TtfFont : public Font {
         return T{};
     }
 
-    /* --- Rendering API ---------------------------------------------------- */
+    TtfMetrics metrics(Rune rune) {
+        auto glyphId = _cmapTable.glyphIdFor(rune);
+        auto glyfOffset = _loca.glyfOffset(glyphId, _head);
+        auto glyf = _glyf.metrics(glyfOffset);
+        auto hmtx = _hmtx.metrics(glyphId, _hhea);
 
-    FontMetrics metrics() const override {
-        return {};
-    }
-
-    double advance(Rune) const override {
-        return {};
-    }
-
-    void traceRune(Gfx::Context &, Math::Vec2i, Rune) const {
-    }
-
-    void fillRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const override {
-        g.begin();
-        traceRune(g, baseline, rune);
-        g.end();
-        g.fill();
-    }
-
-    void strokeRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const override {
-        g.begin();
-        traceRune(g, baseline, rune);
-        g.end();
-        g.stroke();
+        return {
+            glyf.xMin,
+            glyf.yMin,
+            glyf.xMax - glyf.xMin,
+            glyf.yMax - glyf.yMin,
+            hmtx.lsb,
+            hmtx.advanceWidth,
+        };
     }
 };
 

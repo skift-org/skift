@@ -110,17 +110,14 @@ static inline Child button(Func<void()> onPress, Button::Style style, Child chil
 }
 
 static inline Child button(Func<void()> onPress, Button::Style style, Str t) {
-    auto lbl = spacing(
-        {12, 6},
-        hcenter(
-            text(t)));
-
-    return button(std::move(onPress), style, lbl);
-    return makeStrong<Button>(
+    return button(
         std::move(onPress),
         style,
-        minSize({36, 36}, spacing(
-                              {16, 8}, lbl)));
+        pinSize({Sizing::UNCONSTRAINED, 36},
+                center(
+                    spacing(
+                        {16, 0},
+                        text(t)))));
 }
 
 static inline Child button(Func<void()> onPress, Child child) {

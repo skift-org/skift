@@ -47,40 +47,69 @@ static inline Child vcenterFill(Child child) {
     return align(Layout::Align::VCENTER | Layout::Align::HFILL, child);
 }
 
-struct MinSize : public Proxy<Align> {
-    Math::Vec2i _size;
+struct Sizing : public Proxy<Align> {
+    static constexpr auto UNCONSTRAINED = -1;
 
-    MinSize(Math::Vec2i size, Child child) : Proxy(child), _size(size) {}
+    Math::Vec2i _min;
+    Math::Vec2i _max;
+    Math::Recti _rect;
+
+    Sizing(Math::Vec2i min, Math::Vec2i max, Child child) : Proxy(child), _min(min), _max(max) {}
+
+    Math::Recti bound() override {
+        return _rect;
+    }
+
+    void layout(Math::Recti bound) override {
+        _rect = bound;
+        child().layout(bound);
+    }
 
     Math::Vec2i size(Math::Vec2i s) override {
-        return _size.max(child().size(s));
+        auto result = child().size(s);
+
+        if (_min.x != UNCONSTRAINED) {
+            result.x = max(result.x, _min.x);
+        }
+
+        if (_min.y != UNCONSTRAINED) {
+            result.y = max(result.y, _min.y);
+        }
+
+        if (_max.x != UNCONSTRAINED) {
+            result.x = min(result.x, _max.x);
+        }
+
+        if (_max.y != UNCONSTRAINED) {
+            result.y = min(result.y, _max.y);
+        }
+
+        return result;
     }
 };
 
 static inline Child minSize(Math::Vec2i size, Child child) {
-    return makeStrong<MinSize>(size, child);
+    return makeStrong<Sizing>(size, Sizing::UNCONSTRAINED, child);
 }
 
 static inline Child minSize(int size, Child child) {
     return minSize(Math::Vec2i{size}, child);
 }
 
-struct MaxSize : public Proxy<Align> {
-    Math::Vec2i _size;
-
-    MaxSize(Math::Vec2i size, Child child) : Proxy(child), _size(size) {}
-
-    Math::Vec2i size(Math::Vec2i s) override {
-        return _size.min(child().size(s));
-    }
-};
-
 static inline Child maxSize(Math::Vec2i size, Child child) {
-    return makeStrong<MaxSize>(size, child);
+    return makeStrong<Sizing>(Sizing::UNCONSTRAINED, size, child);
 }
 
 static inline Child maxSize(int size, Child child) {
     return maxSize(Math::Vec2i{size}, child);
+}
+
+static inline Child pinSize(Math::Vec2i size, Child child) {
+    return makeStrong<Sizing>(size, size, child);
+}
+
+static inline Child pinSize(int size, Child child) {
+    return minSize(Math::Vec2i{size}, child);
 }
 
 } // namespace Karm::Ui

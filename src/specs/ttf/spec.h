@@ -368,6 +368,10 @@ struct Glyf : public Table {
             uint8_t flags = 0;
             uint8_t flagsRepeat = 0;
 
+            Math::Vec2f cp{};
+            Math::Vec2f startP{};
+            bool wasCp = false;
+
             for (size_t i = start; i <= end; i++) {
                 if (!flagsRepeat) {
                     flags = flagsScan.nextBeUint8();
@@ -387,13 +391,37 @@ struct Glyf : public Table {
                             : ((flags & SAME_OR_POSITIVE_Y) ? 0 : yCoordsScan.nextBeInt16());
 
                 curr = curr + Math::Vec2i{x, -y};
+                auto p = baseline + (curr.cast<double>() * size);
 
                 if (i == start) {
-                    g.moveTo(baseline + (curr.cast<double>() * size));
+                    g.moveTo(p);
+                    startP = p;
                 } else {
-                    g.lineTo(baseline + (curr.cast<double>() * size));
+                    if (flags & ON_CURVE_POINT) {
+                        if (wasCp) {
+                            g.quadTo(cp, p);
+                        } else {
+                            g.lineTo(p);
+                        }
+                        wasCp = false;
+                    } else {
+                        if (wasCp) {
+                            auto p1 = (cp + p) / 2;
+                            g.quadTo(cp, p1);
+                            cp = p;
+                            wasCp = true;
+                        } else {
+                            cp = p;
+                            wasCp = true;
+                        }
+                    }
                 }
             }
+
+            if (wasCp) {
+                g.quadTo(cp, startP);
+            }
+
             g.close();
             start = end + 1;
         }

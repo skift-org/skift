@@ -240,7 +240,7 @@ void Context::_line(Math::Edgei edge, Color color) {
 }
 
 void Context::_trace() {
-    auto b = _shape.bound().cast<int>();
+    auto b = _shape.bound().ceil().cast<int>();
     _line({b.topStart(), b.topEnd()}, MAGENTA);
     _line({b.topEnd(), b.bottomEnd()}, MAGENTA);
     _line({b.bottomEnd(), b.bottomStart()}, MAGENTA);
@@ -248,6 +248,7 @@ void Context::_trace() {
 
     for (auto edge : _shape) {
         _line(edge.cast<int>(), WHITE);
+        plot(edge.start.cast<int>(), RED);
     }
 }
 

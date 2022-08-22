@@ -46,12 +46,22 @@ struct TtfFont : public Font {
         m.height *= _scale;
         m.lsb *= _scale;
 
-        // g.fillStyle(Gfx::fill(Gfx::RED));
-        // g.fill(Math::Recti{baseline, {(int)m.width, 1}});
-
-        g.fillStyle(Gfx::fill(Gfx::WHITE));
         _ttf.glyphContour(rune, g, baseline.cast<double>(), _scale);
-        g.fill();
+        Gfx::createSolid(g._shape, g._path);
+        g._fill(g.textStyle().color);
+    }
+
+    void strokeRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const override {
+        auto m = _ttf.glyphMetrics(rune);
+
+        m.x *= _scale;
+        m.y *= _scale;
+        m.width *= _scale;
+        m.height *= _scale;
+        m.lsb *= _scale;
+
+        _ttf.glyphContour(rune, g, baseline.cast<double>(), _scale);
+        g.stroke();
     }
 };
 

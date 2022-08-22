@@ -29,7 +29,6 @@ struct FontAttrs {
 };
 
 /**
-                                                        <- lineAscend
    _____       _             _                          <- ascend
   / ____|     | |           | |                         <- captop
  | |  __ _   _| |_ ___ _ __ | |__   ___ _ __ __ _
@@ -39,14 +38,14 @@ struct FontAttrs {
                                              __/ |
                                             |___/       <- descend
  | ---- |                                               ...advance
-                                                        <- lineDescend
+
+                                                        <- line gap
 */
 struct FontMetrics {
-    double lineAscend;
     double ascend;
     double captop;
     double descend;
-    double lineDescend;
+    double linegap;
     double advance;
 };
 
@@ -73,8 +72,8 @@ struct Font {
         auto m = metrics();
 
         return {
-            .capbound = {adv, m.ascend + m.descend},
-            .linebound = {adv, m.lineAscend + m.lineDescend},
+            .capbound = {adv, m.captop + m.descend},
+            .linebound = {adv, m.ascend + m.descend},
             .baseline = {0, m.ascend},
         };
     }
@@ -87,8 +86,8 @@ struct Font {
 
         auto m = metrics();
         return {
-            .capbound = {adv, m.ascend + m.descend},
-            .linebound = {adv, m.lineAscend + m.lineDescend},
+            .capbound = {adv, m.captop + m.descend},
+            .linebound = {adv, m.ascend + m.descend},
             .baseline = {0, m.ascend},
         };
     }

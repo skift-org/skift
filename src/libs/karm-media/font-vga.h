@@ -21,11 +21,10 @@ struct VgaFont : public Font {
 
     FontMetrics metrics() const override {
         return {
-            .lineAscend = 12,
-            .ascend = 10,
+            .ascend = 12,
             .captop = 10,
-            .descend = 3,
-            .lineDescend = 4,
+            .descend = 4,
+            .linegap = 4,
             .advance = 8,
         };
     }

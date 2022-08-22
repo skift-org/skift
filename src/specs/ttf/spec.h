@@ -648,6 +648,7 @@ struct Font {
 
     GlyphMetrics glyphMetrics(Rune rune) const {
         auto glyphId = _cmapTable.glyphIdFor(rune);
+
         auto glyfOffset = _loca.glyfOffset(glyphId, _head);
         auto glyf = _glyf.metrics(glyfOffset);
         auto hmtx = _hmtx.metrics(glyphId, _hhea);
@@ -665,6 +666,10 @@ struct Font {
     void glyphContour(Rune rune, Gfx::Context &g, Math::Vec2f baseline, double size) const {
         auto glyphId = _cmapTable.glyphIdFor(rune);
         auto glyfOffset = _loca.glyfOffset(glyphId, _head);
+
+        if (glyfOffset == _loca.glyfOffset(glyphId + 1, _head))
+            return;
+
         _glyf.contour(g, glyfOffset, baseline, (1 / (double)_head.unitPerEm()) * size);
     }
 

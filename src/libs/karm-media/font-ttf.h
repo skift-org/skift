@@ -9,7 +9,7 @@
 namespace Karm::Media {
 
 struct TtfFont : public Font {
-    double _scale = 64;
+    double _scale = 18;
     Sys::Mmap _mmap;
     Ttf::Font _ttf;
 

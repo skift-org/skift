@@ -16,7 +16,7 @@ struct FontApp : public Ui::Widget<FontApp> {
         g.clear(Gfx::BLACK);
 
         g.textStyle(Gfx::text().withFont(_font));
-        g.fillStr({16, 100}, "skiftOS");
+        g.fillStr({16, 100}, "Hello, world!");
 
         if (_trace)
             g._trace();

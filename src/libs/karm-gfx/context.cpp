@@ -16,6 +16,10 @@ void Context::begin(Surface &c) {
 }
 
 void Context::end() {
+    if (_stack.len() != 1) {
+        panic("save/restore mismatch");
+    }
+
     _stack.popBack();
     _surface = nullptr;
 }
@@ -33,10 +37,17 @@ Context::Scope const &Context::current() const {
 }
 
 void Context::save() {
+    if (_stack.len() > 100) {
+        panic("save/restore stack overflow");
+    }
     _stack.pushBack(current());
 }
 
 void Context::restore() {
+    if (_stack.len() == 1) {
+        panic("restore without save");
+    }
+
     _stack.popBack();
 }
 
@@ -80,11 +91,11 @@ FillStyle const &Context::fillStyle() {
     return current().fillStyle;
 }
 
-Stroke const &Context::strokeStyle() {
+StrokeStyle const &Context::strokeStyle() {
     return current().strokeStyle;
 }
 
-Text const &Context::textStyle() {
+TextStyle const &Context::textStyle() {
     return current().textStyle;
 }
 
@@ -92,7 +103,7 @@ Media::Font const &Context::textFont() {
     return *current().textStyle.font;
 }
 
-Shadow const &Context::shadowStyle() {
+ShadowStyle const &Context::shadowStyle() {
     return current().shadowStyle;
 }
 
@@ -101,17 +112,17 @@ Context &Context::fillStyle(FillStyle style) {
     return *this;
 }
 
-Context &Context::strokeStyle(Stroke style) {
+Context &Context::strokeStyle(StrokeStyle style) {
     current().strokeStyle = style;
     return *this;
 }
 
-Context &Context::textStyle(Text style) {
+Context &Context::textStyle(TextStyle style) {
     current().textStyle = style;
     return *this;
 }
 
-Context &Context::shadowStyle(Shadow style) {
+Context &Context::shadowStyle(ShadowStyle style) {
     current().shadowStyle = style;
     return *this;
 }
@@ -363,15 +374,23 @@ void Context::ellipse(Math::Ellipsef ellipse) {
 }
 
 void Context::fill() {
+    fill(fillStyle());
+}
+
+void Context::fill(FillStyle style) {
     _shape.clear();
     createSolid(_shape, _path);
-    _fill(fillStyle().color());
+    _fill(style.color());
 }
 
 void Context::stroke() {
+    stroke(strokeStyle());
+}
+
+void Context::stroke(StrokeStyle style) {
     _shape.clear();
-    createStroke(_shape, _path, strokeStyle());
-    _fill(strokeStyle().color);
+    createStroke(_shape, _path, style);
+    _fill(style.color);
 }
 
 void Context::shadow() {}

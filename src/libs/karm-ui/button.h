@@ -73,7 +73,10 @@ struct Button : public Proxy<Button> {
             }
         }
 
+        g.save();
+        g.fillStyle(Gfx::fill(Gfx::WHITE));
         child().paint(g);
+        g.restore();
     }
 
     void event(Events::Event &e) override {

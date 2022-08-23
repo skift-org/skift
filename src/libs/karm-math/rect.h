@@ -165,21 +165,27 @@ union Rect {
     }
 
     Rect<T> ceil() {
-        return {
-            Math::floor(x),
-            Math::floor(y),
-            Math::ceil(width),
-            Math::ceil(height),
-        };
+        return fromTwoPoint(
+            {
+                Math::floor(start()),
+                Math::floor(top()),
+            },
+            {
+                Math::ceil(end()),
+                Math::ceil(bottom()),
+            });
     }
 
     Rect<T> floor() {
-        return {
-            Math::ceil(x),
-            Math::ceil(y),
-            Math::floor(width),
-            Math::floor(height),
-        };
+        return fromTwoPoint(
+            {
+                Math::ceil(start()),
+                Math::ceil(top()),
+            },
+            {
+                Math::floor(end()),
+                Math::floor(bottom()),
+            });
     }
 
     bool hasNan() const {

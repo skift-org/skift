@@ -10,9 +10,9 @@ namespace Karm::Gfx {
 struct Context {
     struct Scope {
         FillStyle fillStyle{};
-        Stroke strokeStyle{};
-        Text textStyle{};
-        Shadow shadowStyle{};
+        StrokeStyle strokeStyle{};
+        TextStyle textStyle{};
+        ShadowStyle shadowStyle{};
 
         Math::Vec2i origin{};
         Math::Recti clip{};
@@ -68,21 +68,21 @@ struct Context {
 
     FillStyle const &fillStyle();
 
-    Stroke const &strokeStyle();
+    StrokeStyle const &strokeStyle();
 
-    Text const &textStyle();
+    TextStyle const &textStyle();
 
-    Shadow const &shadowStyle();
+    ShadowStyle const &shadowStyle();
 
     Context &fillStyle(FillStyle style);
 
-    Context &strokeStyle(Stroke style);
+    Context &strokeStyle(StrokeStyle style);
 
-    Context &textStyle(Text style);
+    Context &textStyle(TextStyle style);
 
     Media::Font const &textFont();
 
-    Context &shadowStyle(Shadow style);
+    Context &shadowStyle(ShadowStyle style);
 
     /* --- Drawing ---------------------------------------------------------- */
 
@@ -158,9 +158,15 @@ struct Context {
 
     void fill();
 
+    void fill(FillStyle style);
+
     void stroke();
 
+    void stroke(StrokeStyle style);
+
     void shadow();
+
+    void shadow(ShadowStyle style);
 
     /* --- Effects ---------------------------------------------------------- */
 

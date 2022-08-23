@@ -20,7 +20,7 @@ struct FillStyle {
 
     constexpr Color color() const { return _color; }
 
-    constexpr FillStyle color(Color color) {
+    constexpr auto &withColor(Color color) {
         _color = color;
         return *this;
     }
@@ -50,95 +50,98 @@ enum StrokeJoin {
     ROUND_JOIN,
 };
 
-struct Stroke {
+struct StrokeStyle {
     Color color{};
     double width{1};
     StrokeAlign align{};
     StrokeCap cap{};
     StrokeJoin join{};
 
-    constexpr Stroke(Color c = WHITE) : color(c) {}
+    constexpr StrokeStyle(Color c = WHITE) : color(c) {}
 
-    constexpr auto withColor(Color c) {
+    constexpr auto &withColor(Color c) {
         color = c;
         return *this;
     }
 
-    constexpr auto withWidth(double w) {
+    constexpr auto &withWidth(double w) {
         width = w;
         return *this;
     }
 
-    constexpr auto withAlign(StrokeAlign a) {
+    constexpr auto &withAlign(StrokeAlign a) {
         align = a;
         return *this;
     }
 
-    constexpr auto withCap(StrokeCap c) {
+    constexpr auto &withCap(StrokeCap c) {
         cap = c;
         return *this;
     }
 
-    constexpr auto withJoin(StrokeJoin j) {
+    constexpr auto &withJoin(StrokeJoin j) {
         join = j;
         return *this;
     }
 };
 
-static inline constexpr Stroke stroke(auto... args) {
+static inline constexpr StrokeStyle stroke(auto... args) {
     return {args...};
 }
 
 /* --- Text Style ----------------------------------------------------------- */
 
-struct Text {
-    Color color{WHITE};
+struct TextStyle {
     Strong<Media::Font> font = Media::Font::fallback();
+    int size = 12;
 
-    Text(Color c = WHITE) : color(c) {}
+    TextStyle() = default;
 
-    Text withColor(Color c) {
-        color = c;
+    TextStyle(Strong<Media::Font> f, int s = 12)
+        : font(f), size(s) {}
+
+    auto &withSize(int s) {
+        size = s;
         return *this;
     }
 
-    Text withFont(Strong<Media::Font> f) {
+    auto &withFont(Strong<Media::Font> f) {
         font = f;
         return *this;
     }
 };
 
-static inline Text text(auto... args) {
-    return Text(args...);
+static inline TextStyle text(auto... args) {
+    return TextStyle(args...);
 }
 
 /* --- Shadow Style --------------------------------------------------------- */
 
-struct Shadow {
+struct ShadowStyle {
     Color color{};
     float radius{};
     Math::Vec2f offset{};
 
-    constexpr Shadow(Color c = BLACK) : color(c) {}
+    constexpr ShadowStyle(Color c = BLACK) : color(c) {}
 
-    constexpr Shadow withColor(Color c) {
+    constexpr auto &withColor(Color c) {
         color = c;
         return *this;
     }
 
-    constexpr Shadow withRadius(float r) {
+    constexpr auto &withRadius(float r) {
         radius = r;
         return *this;
     }
 
-    constexpr Shadow withOffset(Math::Vec2f o) {
+    constexpr auto &withOffset(Math::Vec2f o) {
         offset = o;
         return *this;
     }
 };
 
-static inline Shadow shadow(auto... args) {
-    return Shadow(args...);
+static inline ShadowStyle shadow(auto... args) {
+    return ShadowStyle(args...);
 }
 
 } // namespace Karm::Gfx

@@ -4,6 +4,7 @@
 #include <karm-math/rect.h>
 
 namespace Karm::Gfx {
+
 struct Context;
 };
 
@@ -21,10 +22,29 @@ enum FontWeight {
     BLACK = 900,
 };
 
+enum FontWidth {
+    ULTRA_CONDENSED = 100,
+    EXTRA_CONDENSED = 200,
+    CONDENSED = 300,
+    SEMI_CONDENSED = 400,
+    NORMAL = 500,
+    SEMI_EXPANDED = 600,
+    EXPANDED = 700,
+    EXTRA_EXPANDED = 800,
+    ULTRA_EXPANDED = 900
+};
+
+enum FontSlant {
+    UPRIGHT = 0,
+    ITALIC = 1,
+    OBLIQUE = 2,
+};
+
 struct FontAttrs {
     int size;
-    FontWeight weight;
-    bool italic;
+    FontWeight weight = REGULAR;
+    FontWidth width = NORMAL;
+    FontSlant slant = UPRIGHT;
     bool monospace;
 };
 

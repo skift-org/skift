@@ -9,7 +9,7 @@
 namespace Karm::Media {
 
 struct TtfFont : public Font {
-    double _scale = 18;
+    double _size = 18;
     Sys::Mmap _mmap;
     Ttf::Font _ttf;
 
@@ -26,41 +26,42 @@ struct TtfFont : public Font {
     FontMetrics metrics() const override {
         auto m = _ttf.metrics();
         return {
-            .ascend = m.ascend * _scale,
-            .captop = m.ascend * _scale,
-            .descend = m.descend * _scale,
-            .linegap = m.linegap * _scale,
+            .ascend = m.ascend * _size,
+            .captop = m.ascend * _size,
+            .descend = m.descend * _size,
+            .linegap = m.linegap * _size,
         };
     }
 
     double advance(Rune c) const override {
-        return _ttf.glyphMetrics(c).advance * _scale;
+        return _ttf.glyphMetrics(c).advance * _size;
     }
 
     void fillRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const override {
         auto m = _ttf.glyphMetrics(rune);
 
-        m.x *= _scale;
-        m.y *= _scale;
-        m.width *= _scale;
-        m.height *= _scale;
-        m.lsb *= _scale;
+        m.x *= _size;
+        m.y *= _size;
+        m.width *= _size;
+        m.height *= _size;
+        m.lsb *= _size;
 
-        _ttf.glyphContour(rune, g, baseline.cast<double>(), _scale);
-        Gfx::createSolid(g._shape, g._path);
-        g._fill(g.textStyle().color);
+        g.begin();
+        _ttf.glyphContour(rune, g, baseline.cast<double>(), _size);
+        g.fill();
     }
 
     void strokeRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const override {
         auto m = _ttf.glyphMetrics(rune);
 
-        m.x *= _scale;
-        m.y *= _scale;
-        m.width *= _scale;
-        m.height *= _scale;
-        m.lsb *= _scale;
+        m.x *= _size;
+        m.y *= _size;
+        m.width *= _size;
+        m.height *= _size;
+        m.lsb *= _size;
 
-        _ttf.glyphContour(rune, g, baseline.cast<double>(), _scale);
+        g.begin();
+        _ttf.glyphContour(rune, g, baseline.cast<double>(), _size);
         g.stroke();
     }
 };

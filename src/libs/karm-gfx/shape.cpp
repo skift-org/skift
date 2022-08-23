@@ -67,7 +67,7 @@ static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, M
     _createArc(shape, corner, startAngle, delta, radius);
 }
 
-[[maybe_unused]] static void _createJoin(Shape &shape, Stroke stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float radius) {
+[[maybe_unused]] static void _createJoin(Shape &shape, StrokeStyle stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float radius) {
     if (Math::epsilonEq(curr.end, next.start, 0.001)) {
         // HACK: avoid creating a degenerate edge
         return;
@@ -117,7 +117,7 @@ static void _createCapRound(Shape &shape, Math::Vec2f start, Math::Vec2f end, Ma
     _createArc(shape, center, startAngle, delta, width / 2);
 }
 
-[[maybe_unused]] static void _createCap(Shape &shape, Stroke stroke, Math::Vec2f start, Math::Vec2f end, Math::Vec2f center) {
+[[maybe_unused]] static void _createCap(Shape &shape, StrokeStyle stroke, Math::Vec2f start, Math::Vec2f end, Math::Vec2f center) {
     switch (stroke.cap) {
     case BUTT_CAP:
         _createCapButt(shape, start, end);
@@ -135,7 +135,7 @@ static void _createCapRound(Shape &shape, Math::Vec2f start, Math::Vec2f end, Ma
 
 /* --- Public Api ----------------------------------------------------------- */
 
-void createStroke(Shape &shape, Path const &path, Stroke stroke) {
+void createStroke(Shape &shape, Path const &path, StrokeStyle stroke) {
     double outerDist = 0;
 
     if (stroke.align == CENTER_ALIGN) {

@@ -54,7 +54,7 @@ struct Shape {
     }
 };
 
-void createStroke(Shape &shape, Path const &path, Stroke stroke);
+void createStroke(Shape &shape, Path const &path, StrokeStyle stroke);
 
 void createSolid(Shape &shape, Path &path);
 

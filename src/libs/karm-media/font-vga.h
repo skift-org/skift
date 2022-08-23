@@ -41,7 +41,7 @@ struct VgaFont : public Font {
             for (int x = 0; x < WIDTH; x++) {
                 uint8_t byte = DATA[one * HEIGHT + y];
                 if (byte & (0x80 >> x)) {
-                    g.plot(baseline + Math::Vec2i{x, y - HEIGHT}, g.textStyle().color);
+                    g.plot(baseline + Math::Vec2i{x, y - HEIGHT});
                 }
             }
         }

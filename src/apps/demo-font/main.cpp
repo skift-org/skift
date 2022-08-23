@@ -1,21 +1,18 @@
 #include <karm-main/main.h>
-#include <karm-media/font-ttf.h>
-#include <karm-sys/file.h>
-#include <karm-sys/mmap.h>
+#include <karm-media/loader.h>
 #include <karm-ui/app.h>
-#include <karm-ui/funcs.h>
 
 struct FontApp : public Ui::Widget<FontApp> {
     bool _trace{false};
     Strong<Media::Font> _font;
 
-    FontApp(Strong<Media::Font> font) : _font{font} {
-    }
+    FontApp(Strong<Media::Font> font)
+        : _font{font} {}
 
     void paint(Gfx::Context &g) override {
         g.clear(Gfx::BLACK);
 
-        g.textStyle(Gfx::text().withFont(_font));
+        g.textStyle(Gfx::text(_font));
         g.fillStr({16, 100}, "Hello, world!");
 
         if (_trace)
@@ -34,9 +31,9 @@ struct FontApp : public Ui::Widget<FontApp> {
 };
 
 CliResult entryPoint(CliArgs args) {
-    auto file = try$(Sys::File::open(args[0]));
-    auto map = try$(Sys::mmap().map(file));
-    auto font = try$(Media::TtfFont::load(std::move(map)));
-
+    auto font = Media::Font::fallback();
+    if (args.len() == 1) {
+        font = try$(Media::loadFont(args[0]));
+    }
     return Ui::runApp<FontApp>(args, font);
 }

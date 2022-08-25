@@ -16,6 +16,11 @@ struct Context {
 
         Math::Vec2i origin{};
         Math::Recti clip{};
+        Math::Trans2f trans = Math::Trans2f::identity();
+
+        Math::Trans2f transWithOrigin() {
+            return trans.translated(origin.x, origin.y);
+        }
     };
 
     struct Active {
@@ -63,6 +68,20 @@ struct Context {
     void clip(Math::Recti rect);
 
     void origin(Math::Vec2i pos);
+
+    /* --- Transform -------------------------------------------------------- */
+
+    void transform(Math::Trans2f trans);
+
+    void translate(Math::Vec2f pos);
+
+    void scale(Math::Vec2f pos);
+
+    void rotate(double angle);
+
+    void skew(Math::Vec2f pos);
+
+    void identity();
 
     /* --- Fill & Stroke ---------------------------------------------------- */
 

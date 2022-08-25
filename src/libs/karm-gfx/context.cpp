@@ -29,7 +29,7 @@ Surface &Context::surface() {
 }
 
 Context::Scope &Context::current() {
-    return first(_stack);
+    return last(_stack);
 }
 
 Context::Scope const &Context::current() const {
@@ -40,7 +40,8 @@ void Context::save() {
     if (_stack.len() > 100) {
         panic("save/restore stack overflow");
     }
-    _stack.pushBack(current());
+    auto copy = current();
+    _stack.pushBack(copy);
 }
 
 void Context::restore() {
@@ -83,6 +84,33 @@ void Context::clip(Math::Recti rect) {
 
 void Context::origin(Math::Vec2i pos) {
     current().origin = applyOrigin(pos);
+}
+
+/* --- Transform -------------------------------------------------------- */
+
+void Context::transform(Math::Trans2f trans) {
+    auto &t = current().trans;
+    t = t.multiply(trans);
+}
+
+void Context::translate(Math::Vec2f pos) {
+    transform(Math::Trans2f::translate(pos.x, pos.y));
+}
+
+void Context::scale(Math::Vec2f pos) {
+    transform(Math::Trans2f::scale(pos.x, pos.y));
+}
+
+void Context::rotate(double angle) {
+    transform(Math::Trans2f::rotate(angle));
+}
+
+void Context::skew(Math::Vec2f pos) {
+    transform(Math::Trans2f::skew(pos.x, pos.y));
+}
+
+void Context::identity() {
+    current().trans = Math::Trans2f::identity();
 }
 
 /* --- Fill & Stroke ---------------------------------------------------- */
@@ -170,7 +198,7 @@ void Context::stroke(Math::Recti r, int radius) {
 }
 
 void Context::fill(Math::Recti r, int radius) {
-    if (radius == 0) {
+    if (radius == 0 && current().trans.isIdentity()) {
         r = applyAll(r);
 
         for (int y = r.y; y < r.y + r.height; y++) {
@@ -379,7 +407,7 @@ void Context::fill() {
 
 void Context::fill(FillStyle style) {
     _shape.clear();
-    createSolid(_shape, _path);
+    createSolid(_shape, _path, current().transWithOrigin());
     _fill(style.color());
 }
 
@@ -389,7 +417,7 @@ void Context::stroke() {
 
 void Context::stroke(StrokeStyle style) {
     _shape.clear();
-    createStroke(_shape, _path, style);
+    createStroke(_shape, _path, style, current().transWithOrigin());
     _fill(style.color);
 }
 

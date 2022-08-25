@@ -54,8 +54,8 @@ struct Shape {
     }
 };
 
-void createStroke(Shape &shape, Path const &path, StrokeStyle stroke);
+void createStroke(Shape &shape, Path const &path, StrokeStyle stroke, Math::Trans2f trans);
 
-void createSolid(Shape &shape, Path &path);
+void createSolid(Shape &shape, Path &path, Math::Trans2f trans);
 
 } // namespace Karm::Gfx

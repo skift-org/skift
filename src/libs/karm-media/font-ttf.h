@@ -9,7 +9,7 @@
 namespace Karm::Media {
 
 struct TtfFont : public Font {
-    double _size = 18;
+    double _size = 12;
     Sys::Mmap _mmap;
     Ttf::Font _ttf;
 
@@ -26,43 +26,35 @@ struct TtfFont : public Font {
     FontMetrics metrics() const override {
         auto m = _ttf.metrics();
         return {
-            .ascend = m.ascend * _size,
-            .captop = m.ascend * _size,
-            .descend = m.descend * _size,
-            .linegap = m.linegap * _size,
+            .ascend = m.ascend * _size / _ttf.unitPerEm(),
+            .captop = m.ascend * _size / _ttf.unitPerEm(),
+            .descend = m.descend * _size / _ttf.unitPerEm(),
+            .linegap = m.linegap * _size / _ttf.unitPerEm(),
         };
     }
 
     double advance(Rune c) const override {
-        return _ttf.glyphMetrics(c).advance * _size;
+        return _ttf.glyphMetrics(c).advance * _size / _ttf.unitPerEm();
     }
 
     void fillRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const override {
-        auto m = _ttf.glyphMetrics(rune);
-
-        m.x *= _size;
-        m.y *= _size;
-        m.width *= _size;
-        m.height *= _size;
-        m.lsb *= _size;
-
+        g.save();
         g.begin();
-        _ttf.glyphContour(rune, g, baseline.cast<double>(), _size);
+        g.origin(baseline);
+        g.scale(_size / _ttf.unitPerEm());
+        _ttf.glyphContour(g, rune);
         g.fill();
+        g.restore();
     }
 
     void strokeRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const override {
-        auto m = _ttf.glyphMetrics(rune);
-
-        m.x *= _size;
-        m.y *= _size;
-        m.width *= _size;
-        m.height *= _size;
-        m.lsb *= _size;
-
+        g.save();
         g.begin();
-        _ttf.glyphContour(rune, g, baseline.cast<double>(), _size);
+        g.origin(baseline);
+        g.scale(_size / _ttf.unitPerEm());
+        _ttf.glyphContour(g, rune);
         g.stroke();
+        g.restore();
     }
 };
 

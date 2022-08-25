@@ -159,7 +159,7 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Fl
         dx = Math::cos(a);
         dy = Math::sin(a);
 
-        Math::Vec2f p = t.applyPoint({dx * radius.x, dy * radius.y});
+        Math::Vec2f p = t.apply(Math::Vec2f{dx * radius.x, dy * radius.y});
         Math::Vec2f tan = t.applyVector({-dy * radius.x * kappa, dx * radius.y * kappa});
 
         if (i > 0) {

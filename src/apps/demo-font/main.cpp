@@ -3,7 +3,6 @@
 #include <karm-ui/app.h>
 
 struct FontApp : public Ui::Widget<FontApp> {
-    bool _trace{false};
     Strong<Media::Font> _font;
 
     FontApp(Strong<Media::Font> font)
@@ -14,19 +13,6 @@ struct FontApp : public Ui::Widget<FontApp> {
 
         g.textStyle(Gfx::text(_font));
         g.fillStr({16, 100}, "Hello, world!");
-
-        if (_trace)
-            g._trace();
-    }
-
-    void event(Events::Event &e) override {
-        e.handle<Events::MouseEvent>([&](auto const &m) {
-            if (m.type == Events::MouseEvent::RELEASE) {
-                _trace = !_trace;
-                Ui::shouldRepaint(*this);
-            }
-            return true;
-        });
     }
 };
 

@@ -41,11 +41,9 @@ enum FontSlant {
 };
 
 struct FontAttrs {
-    int size;
     FontWeight weight = REGULAR;
     FontWidth width = NORMAL;
     FontSlant slant = UPRIGHT;
-    bool monospace;
 };
 
 /**
@@ -81,8 +79,11 @@ struct Font {
     virtual ~Font() = default;
 
     virtual FontMetrics metrics() const = 0;
+
     virtual double advance(Rune c) const = 0;
+
     virtual void fillRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const = 0;
+
     virtual void strokeRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const {
         fillRune(g, baseline, rune);
     }

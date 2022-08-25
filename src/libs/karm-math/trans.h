@@ -2,6 +2,7 @@
 
 #include <karm-fmt/fmt.h>
 
+#include "edge.h"
 #include "vec.h"
 
 namespace Karm::Math {
@@ -28,11 +29,12 @@ union Trans2 {
 
     T _els[6]{};
 
-    constexpr Trans2()
-        : _els{1, 0, 0, 1, 0, 0} {}
-
     constexpr Trans2(T xx, T xy, T yx, T yy, T ox, T oy)
         : _els{xx, xy, yx, yy, ox, oy} {}
+
+    static constexpr Trans2 identity() {
+        return Trans2(1, 0, 0, 1, 0, 0);
+    }
 
     static constexpr Trans2 rotate(T angle) {
         T c = cos(angle);
@@ -59,8 +61,12 @@ union Trans2 {
         };
     }
 
-    constexpr Vec2<T> applyPoint(Vec2<T> v) const {
+    constexpr Vec2<T> apply(Vec2<T> v) const {
         return applyVector(v) + o;
+    }
+
+    constexpr Edge<T> apply(Edge<T> e) const {
+        return {apply(e.start), apply(e.end)};
     }
 
     constexpr Trans2 multiply(Trans2 const &other) const {

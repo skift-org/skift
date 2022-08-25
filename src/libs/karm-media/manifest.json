@@ -3,6 +3,7 @@
     "type": "lib",
     "description": "A media loader library",
     "deps": [
-        "karm-math"
+        "karm-math",
+        "karm-sys"
     ]
 }

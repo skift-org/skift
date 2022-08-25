@@ -331,7 +331,7 @@ struct Glyf : public Table {
         int16_t y;
     };
 
-    void contourSimple(Gfx::Context &g, Metrics m, BScan &s, Math::Vec2f baseline, double size) const {
+    void contourSimple(Gfx::Context &g, Metrics m, BScan &s) const {
         auto endPtsOfContours = s;
         auto nPoints = s.peek(2 * (m.numContours - 1)).nextBeUint16() + 1u;
         uint16_t instructionLength = s.skip(m.numContours * 2).nextBeUint16();
@@ -362,7 +362,7 @@ struct Glyf : public Table {
         auto yCoordsScan = s.skip(nXCoords);
 
         size_t start = 0;
-        Math::Vec2i curr{};
+        Math::Vec2f curr{};
         for (int c = 0; c < m.numContours; c++) {
             size_t end = endPtsOfContours.nextBeUint16();
             uint8_t flags = 0;
@@ -390,28 +390,27 @@ struct Glyf : public Table {
                             ? ((flags & SAME_OR_POSITIVE_Y) ? yCoordsScan.nextBeUint8() : -yCoordsScan.nextBeUint8())
                             : ((flags & SAME_OR_POSITIVE_Y) ? 0 : yCoordsScan.nextBeInt16());
 
-                curr = curr + Math::Vec2i{x, -y};
-                auto p = baseline + (curr.cast<double>() * size);
+                curr = curr + Math::Vec2f{(double)x, (double)-y};
 
                 if (i == start) {
-                    g.moveTo(p);
-                    startP = p;
+                    g.moveTo(curr);
+                    startP = curr;
                 } else {
                     if (flags & ON_CURVE_POINT) {
                         if (wasCp) {
-                            g.quadTo(cp, p);
+                            g.quadTo(cp, curr);
                         } else {
-                            g.lineTo(p);
+                            g.lineTo(curr);
                         }
                         wasCp = false;
                     } else {
                         if (wasCp) {
-                            auto p1 = (cp + p) / 2;
+                            auto p1 = (cp + curr) / 2;
                             g.quadTo(cp, p1);
-                            cp = p;
+                            cp = curr;
                             wasCp = true;
                         } else {
-                            cp = p;
+                            cp = curr;
                             wasCp = true;
                         }
                     }
@@ -431,12 +430,12 @@ struct Glyf : public Table {
         Debug::lwarn("Glyf::strokeComposite not implemented");
     }
 
-    void contour(Gfx::Context &g, size_t glyfOffset, Math::Vec2f baseline, double size) const {
+    void contour(Gfx::Context &g, size_t glyfOffset) const {
         auto s = begin();
         auto m = metrics(s, glyfOffset);
 
         if (m.numContours > 0) {
-            contourSimple(g, m, s, baseline, size);
+            contourSimple(g, m, s);
         } else if (m.numContours < 0) {
             contourComposite(g, m, s);
         }
@@ -654,32 +653,36 @@ struct Font {
         auto hmtx = _hmtx.metrics(glyphId, _hhea);
 
         return {
-            glyf.xMin / (double)_head.unitPerEm(),
-            -glyf.yMax / (double)_head.unitPerEm(),
-            (glyf.xMax - glyf.xMin) / (double)_head.unitPerEm(),
-            (glyf.yMax - glyf.yMin) / (double)_head.unitPerEm(),
-            hmtx.lsb / (double)_head.unitPerEm(),
-            hmtx.advanceWidth / (double)_head.unitPerEm(),
+            (double)glyf.xMin,
+            (double)-glyf.yMax,
+            (double)glyf.xMax - glyf.xMin,
+            (double)glyf.yMax - glyf.yMin,
+            (double)hmtx.lsb,
+            (double)hmtx.advanceWidth,
         };
     }
 
-    void glyphContour(Rune rune, Gfx::Context &g, Math::Vec2f baseline, double size) const {
+    void glyphContour(Gfx::Context &g, Rune rune) const {
         auto glyphId = _cmapTable.glyphIdFor(rune);
         auto glyfOffset = _loca.glyfOffset(glyphId, _head);
 
         if (glyfOffset == _loca.glyfOffset(glyphId + 1, _head))
             return;
 
-        _glyf.contour(g, glyfOffset, baseline, (1 / (double)_head.unitPerEm()) * size);
+        _glyf.contour(g, glyfOffset);
     }
 
     Metrics metrics() const {
         return {
-            _hhea.ascender() / (double)_head.unitPerEm(),
-            _hhea.descender() / (double)_head.unitPerEm(),
-            _hhea.lineGap() / (double)_head.unitPerEm(),
-            _hhea.advanceWidthMax() / (double)_head.unitPerEm(),
+            (double)_hhea.ascender(),
+            (double)_hhea.descender(),
+            (double)_hhea.lineGap(),
+            (double)_hhea.advanceWidthMax(),
         };
+    }
+
+    double unitPerEm() const {
+        return _head.unitPerEm();
     }
 };
 

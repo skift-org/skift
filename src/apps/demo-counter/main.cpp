@@ -13,12 +13,11 @@ CliResult entryPoint(CliArgs args) {
         auto lbl = Ui::text("You clicked {} times!", state.value());
         auto btn = Ui::primaryButton(state.bind(inc), "CLICK ME!");
 
-        return Ui::center(
-            Ui::spacing(
-                32,
-                Ui::vflow(
-                    Ui::grow(Ui::center(lbl)),
-                    Ui::hcenter(btn))));
+        return Ui::spacing(
+            32,
+            Ui::vflow(
+                Ui::grow(Ui::center(lbl)),
+                Ui::center(btn)));
     });
 
     return app.run(args);

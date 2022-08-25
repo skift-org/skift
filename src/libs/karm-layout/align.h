@@ -1,6 +1,7 @@
 #pragma once
 
 #include "flow.h"
+#include "size.h"
 
 namespace Karm::Layout {
 
@@ -67,16 +68,18 @@ struct Align {
     }
 
     template <typename T>
-    Math::Vec2<T> size(Math::Vec2<T> inner, Math::Vec2<T> outer) {
-        if (_value & COVER)
-            inner = outer;
+    Math::Vec2<T> size(Math::Vec2<T> inner, Math::Vec2<T> outer, Layout::Hint hint) {
+        if (_value & COVER) {
+            if (hint == Layout::Hint::MIN)
+                inner = {};
+            else
+                inner = outer;
+        }
 
-        if (_value & HSTRETCH ||
-            _value & HCENTER)
+        if (_value & HSTRETCH && hint == Layout::Hint::MAX)
             inner.x = outer.x;
 
-        if (_value & VSTRETCH ||
-            _value & VCENTER)
+        if (_value & VSTRETCH && hint == Layout::Hint::MAX)
             inner.y = outer.y;
 
         return inner;

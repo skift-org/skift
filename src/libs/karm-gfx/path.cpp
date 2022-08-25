@@ -301,6 +301,8 @@ void Path::line(Math::Edgef edge) {
 }
 
 void Path::rect(Math::Rectf rect, int radius) {
+    radius = min(radius, min(rect.width, rect.height) / 2);
+
     if (radius == 0) {
         moveTo(rect.topStart());
         lineTo(rect.topEnd());

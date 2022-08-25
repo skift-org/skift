@@ -12,14 +12,16 @@ struct Align : public Proxy<Align> {
     Align(Layout::Align align, Child child) : Proxy(child), _align(align) {}
 
     void layout(Math::Recti bound) override {
-        child().layout(_align.apply<int>(
-            Layout::Flow::LEFT_TO_RIGHT,
-            child().size(bound.size()),
-            bound));
+        auto childSize = child().size(bound.size(), Layout::Hint::MIN);
+        child()
+            .layout(_align.apply<int>(
+                Layout::Flow::LEFT_TO_RIGHT,
+                childSize,
+                bound));
     };
 
-    Math::Vec2i size(Math::Vec2i s) override {
-        return _align.size(child().size(s), s);
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+        return _align.size(child().size(s, hint), s, hint);
     }
 };
 
@@ -65,8 +67,8 @@ struct Sizing : public Proxy<Align> {
         child().layout(bound);
     }
 
-    Math::Vec2i size(Math::Vec2i s) override {
-        auto result = child().size(s);
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+        auto result = child().size(s, hint);
 
         if (_min.x != UNCONSTRAINED) {
             result.x = max(result.x, _min.x);

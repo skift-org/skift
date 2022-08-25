@@ -73,13 +73,6 @@ struct Group : public Widget<Crtp> {
         return _bound;
     }
 
-    Math::Vec2i size(Math::Vec2i s) override {
-        for (auto &child : children()) {
-            s = child->size(s);
-        }
-        return s;
-    }
-
     void visit(Visitor &v) override {
         for (auto &child : children()) {
             v(*child);

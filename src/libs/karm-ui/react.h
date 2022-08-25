@@ -63,11 +63,11 @@ struct React : public Widget<Crtp> {
         });
     }
 
-    Math::Vec2i size(Math::Vec2i s) override {
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
         ensureBuild();
 
         return _child.visit([&](auto &child) {
-            return child->size(s);
+            return child->size(s, hint);
         });
     }
 

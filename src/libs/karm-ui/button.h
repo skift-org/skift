@@ -31,6 +31,7 @@ struct Button : public Proxy<Button> {
         : Proxy(child), _onPress(std::move(onPress)), _style(style) {}
 
     void paint(Gfx::Context &g) override {
+        g.save();
         if (_style == PRIMARY) {
             if (_state == OVER) {
                 g.fillStyle(Gfx::BLUE600);
@@ -73,7 +74,6 @@ struct Button : public Proxy<Button> {
             }
         }
 
-        g.save();
         g.fillStyle(Gfx::fill(Gfx::WHITE));
         child().paint(g);
         g.restore();
@@ -117,7 +117,7 @@ static inline Child button(Func<void()> onPress, Button::Style style, Str t) {
         std::move(onPress),
         style,
         pinSize({Sizing::UNCONSTRAINED, 36},
-                center(
+                vcenter(
                     spacing(
                         {16, 0},
                         text(t)))));

@@ -13,7 +13,7 @@ struct Empty : public View<Empty> {
         _size = o._size;
     }
 
-    Math::Vec2i size(Math::Vec2i) override {
+    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
         return _size;
     }
 };

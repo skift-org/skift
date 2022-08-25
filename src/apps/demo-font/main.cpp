@@ -11,15 +11,18 @@ struct FontApp : public Ui::Widget<FontApp> {
     void paint(Gfx::Context &g) override {
         g.clear(Gfx::BLACK);
 
+        g.fillStyle(Gfx::BLUE500);
         g.textFont(_font);
-        g.fillStr({16, 100}, "Hello, world!");
+
+        g.fillStr({16, 320}, "i");
+        g._trace();
     }
 };
 
 CliResult entryPoint(CliArgs args) {
     auto font = Media::Font::fallback();
     if (args.len() == 1) {
-        font = try$(Media::loadFont(22, args[0]));
+        font = try$(Media::loadFont(256, args[0]));
     }
     return Ui::runApp<FontApp>(args, font);
 }

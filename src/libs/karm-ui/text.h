@@ -29,18 +29,18 @@ struct Text : public View<Text> {
         g.restore();
     }
 
-    Math::Vec2i size(Math::Vec2i) override {
+    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
         return _font.mesureStr(_text).linebound.size().cast<int>();
     }
 };
 
 static inline Child text(Str text) {
-    return makeStrong<Text>(Media::loadFont(18, "res/fonts/inter/Inter-Regular.ttf").unwrap(), text);
+    return makeStrong<Text>(Media::loadFont(16, "res/fonts/inter/Inter-Regular.ttf").unwrap(), text);
 }
 
 template <typename... Args>
 static inline Child text(Str format, Args &&...args) {
-    return makeStrong<Text>(Media::loadFont(18, "res/fonts/inter/Inter-Regular.ttf").unwrap(), Fmt::format(format, std::forward<Args>(args)...));
+    return makeStrong<Text>(Media::loadFont(16, "res/fonts/inter/Inter-Regular.ttf").unwrap(), Fmt::format(format, std::forward<Args>(args)...));
 }
 
 static inline Child text(Media::Font font, Str text) {

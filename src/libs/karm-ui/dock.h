@@ -41,7 +41,7 @@ struct DockLayout : public Group<DockLayout> {
         auto outer = bound;
 
         for (auto &child : children()) {
-            Math::Recti inner = child->size(outer.size());
+            Math::Recti inner = child->size(outer.size(), Layout::Hint::MIN);
             child->layout(getDock(child).apply(inner, outer));
         }
     }
@@ -65,11 +65,16 @@ struct DockLayout : public Group<DockLayout> {
         return current;
     }
 
-    Math::Vec2i size(Math::Vec2i) override {
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
         Math::Vec2i currentSize{};
         for (auto &child : mutIterRev(children())) {
-            currentSize = apply(getDock(child).orien(), child->size(currentSize), currentSize);
+            currentSize = apply(getDock(child).orien(), child->size(currentSize, Layout::Hint::MIN), currentSize);
         }
+
+        if (hint == Layout::Hint::MAX) {
+            currentSize = currentSize.max(s);
+        }
+
         return currentSize;
     }
 };

@@ -58,7 +58,7 @@ struct FlowLayout : public Group<FlowLayout> {
             if (child.is<Grow>()) {
                 grows += child.unwrap<Grow>().grow();
             } else {
-                total += _flow.getX(child->size(r.size()));
+                total += _flow.getX(child->size(r.size(), Layout::Hint::MIN));
             }
         }
 
@@ -74,7 +74,7 @@ struct FlowLayout : public Group<FlowLayout> {
             if (child.is<Grow>()) {
                 inner = _flow.setWidth(inner, growUnit * child.unwrap<Grow>().grow());
             } else {
-                inner = _flow.setWidth(inner, _flow.getX(child->size(r.size())));
+                inner = _flow.setWidth(inner, _flow.getX(child->size(r.size(), Layout::Hint::MIN)));
             }
 
             inner = _flow.setTop(inner, _flow.getTop(r));
@@ -85,21 +85,24 @@ struct FlowLayout : public Group<FlowLayout> {
         }
     }
 
-    Math::Vec2i size(Math::Vec2i s) override {
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
         int w{};
-        int h{};
+        int h{hint == Layout::Hint::MAX ? _flow.getY(s) : 0};
         bool grow = false;
 
         for (auto &child : children()) {
             if (child.is<Grow>())
                 grow = true;
-            w += _flow.getX(child->size(s));
-            h = max(h, _flow.getY(child->size(s)));
+
+            auto childSize = child->size(s, Layout::Hint::MIN);
+            w += _flow.getX(childSize);
+            h = max(h, _flow.getY(childSize));
         }
 
         w += _gaps * (max(1uz, children().len()) - 1);
-        if (grow)
+        if (grow && hint == Layout::Hint::MAX) {
             w = max(_flow.getX(s), w);
+        }
 
         return _flow.orien() == Layout::Orien::HORIZONTAL
                    ? Math::Vec2i{w, h}

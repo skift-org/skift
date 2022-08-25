@@ -5,6 +5,7 @@
 #include <karm-debug/logger.h>
 #include <karm-events/events.h>
 #include <karm-gfx/context.h>
+#include <karm-layout/size.h>
 
 namespace Karm::Ui {
 
@@ -28,7 +29,7 @@ struct Node {
 
     virtual void layout(Math::Recti) {}
 
-    virtual Math::Vec2i size(Math::Vec2i s) { return s; }
+    virtual Math::Vec2i size(Math::Vec2i s, Layout::Hint) { return s; }
 
     virtual Math::Recti bound() { return {}; }
 

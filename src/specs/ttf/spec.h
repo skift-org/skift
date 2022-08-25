@@ -363,10 +363,10 @@ struct Glyf : public Table {
 
         size_t start = 0;
         Math::Vec2f curr{};
+        flags = 0;
+        flagsRepeat = 0;
         for (int c = 0; c < m.numContours; c++) {
             size_t end = endPtsOfContours.nextBeUint16();
-            uint8_t flags = 0;
-            uint8_t flagsRepeat = 0;
 
             Math::Vec2f cp{};
             Math::Vec2f startP{};

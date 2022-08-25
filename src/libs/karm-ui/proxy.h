@@ -40,8 +40,8 @@ struct Proxy : public Widget<Crtp> {
         child().layout(r);
     }
 
-    Math::Vec2i size(Math::Vec2i s) override {
-        return child().size(s);
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+        return child().size(s, hint);
     }
 
     Math::Recti bound() override {

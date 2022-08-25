@@ -39,8 +39,8 @@ struct Box : public Proxy<Box> {
         child().layout(_spacing.shrink(Layout::Flow::LEFT_TO_RIGHT, rect));
     }
 
-    Math::Vec2i size(Math::Vec2i s) override {
-        return child().size(s - _spacing.all()) + _spacing.all();
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+        return child().size(s - _spacing.all(), hint) + _spacing.all();
     }
 
     Math::Recti bound() override {
@@ -68,8 +68,8 @@ struct Spacing : public Proxy<Spacing> {
         child().layout(_spacing.shrink(Layout::Flow::LEFT_TO_RIGHT, rect));
     }
 
-    Math::Vec2i size(Math::Vec2i s) override {
-        return child().size(s - _spacing.all()) + _spacing.all();
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+        return child().size(s - _spacing.all(), hint) + _spacing.all();
     }
 
     Math::Recti bound() override {

@@ -11,7 +11,7 @@ struct Context {
     struct Scope {
         FillStyle fillStyle{};
         StrokeStyle strokeStyle{};
-        TextStyle textStyle{};
+        Media::Font textFont = Media::Font::fallback();
         ShadowStyle shadowStyle{};
 
         Math::Vec2i origin{};
@@ -89,7 +89,7 @@ struct Context {
 
     StrokeStyle const &strokeStyle();
 
-    TextStyle const &textStyle();
+    Media::Font const &textFont();
 
     ShadowStyle const &shadowStyle();
 
@@ -97,9 +97,7 @@ struct Context {
 
     Context &strokeStyle(StrokeStyle style);
 
-    Context &textStyle(TextStyle style);
-
-    Media::Font const &textFont();
+    Context &textFont(Media::Font style);
 
     Context &shadowStyle(ShadowStyle style);
 

@@ -89,32 +89,6 @@ static inline constexpr StrokeStyle stroke(auto... args) {
     return {args...};
 }
 
-/* --- Text Style ----------------------------------------------------------- */
-
-struct TextStyle {
-    Strong<Media::Font> font = Media::Font::fallback();
-    int size = 12;
-
-    TextStyle() = default;
-
-    TextStyle(Strong<Media::Font> f, int s = 12)
-        : font(f), size(s) {}
-
-    auto &withSize(int s) {
-        size = s;
-        return *this;
-    }
-
-    auto &withFont(Strong<Media::Font> f) {
-        font = f;
-        return *this;
-    }
-};
-
-static inline TextStyle text(auto... args) {
-    return TextStyle(args...);
-}
-
 /* --- Shadow Style --------------------------------------------------------- */
 
 struct ShadowStyle {

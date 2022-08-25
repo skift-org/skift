@@ -73,59 +73,41 @@ struct FontMesure {
     Math::Vec2f baseline;
 };
 
-struct Font {
-    static Strong<Font> fallback();
-
-    virtual ~Font() = default;
+struct Fontface {
+    virtual ~Fontface() = default;
 
     virtual FontMetrics metrics() const = 0;
 
     virtual double advance(Rune c) const = 0;
 
-    virtual void fillRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const = 0;
+    virtual void contour(Gfx::Context &g, Rune rune) const = 0;
 
-    virtual void strokeRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const {
-        fillRune(g, baseline, rune);
-    }
+    virtual double units() const = 0;
+};
 
-    FontMesure mesureRune(Rune r) const {
-        auto adv = advance(r);
-        auto m = metrics();
+struct Font {
+    double _size;
+    Strong<Fontface> _face;
 
-        return {
-            .capbound = {adv, m.captop + m.descend},
-            .linebound = {adv, m.ascend + m.descend},
-            .baseline = {0, m.ascend},
-        };
-    }
+    static Font fallback();
 
-    FontMesure mesureStr(Str str) const {
-        double adv = 0;
-        for (auto r : iterRunes(str)) {
-            adv += advance(r);
-        }
+    Font(double size, Strong<Fontface> face) : _size(size), _face(face) {}
 
-        auto m = metrics();
-        return {
-            .capbound = {adv, m.captop + m.descend},
-            .linebound = {adv, m.ascend + m.descend},
-            .baseline = {0, m.ascend},
-        };
-    }
+    FontMetrics metrics() const;
 
-    void fillStr(Gfx::Context &g, Math::Vec2i baseline, Str str) const {
-        for (auto r : iterRunes(str)) {
-            fillRune(g, baseline, r);
-            baseline.x += advance(r);
-        }
-    }
+    double advance(Rune c) const;
 
-    void strokeStr(Gfx::Context &g, Math::Vec2i baseline, Str str) const {
-        for (auto r : iterRunes(str)) {
-            strokeRune(g, baseline, r);
-            baseline.x += advance(r);
-        }
-    }
+    FontMesure mesureRune(Rune r) const;
+
+    FontMesure mesureStr(Str str) const;
+
+    void fillRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const;
+
+    void strokeRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const;
+
+    void fillStr(Gfx::Context &g, Math::Vec2i baseline, Str str) const;
+
+    void strokeStr(Gfx::Context &g, Math::Vec2i baseline, Str str) const;
 };
 
 } // namespace Karm::Media

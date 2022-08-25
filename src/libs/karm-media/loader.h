@@ -4,6 +4,6 @@
 
 namespace Karm::Media {
 
-Result<Strong<Font>> loadFont(Str path);
+Result<Font> loadFont(double size, Str path);
 
 } // namespace Karm::Media

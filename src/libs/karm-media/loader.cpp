@@ -7,10 +7,10 @@
 
 namespace Karm::Media {
 
-Result<Strong<Font>> loadFont(Str path) {
+Result<Font> loadFont(double size, Str path) {
     auto file = try$(Sys::File::open(path));
     auto map = try$(Sys::mmap().map(file));
-    return Strong<Font>{try$(TtfFont::load(std::move(map)))};
+    return Font{size, try$(TtfFont::load(std::move(map)))};
 }
 
 } // namespace Karm::Media

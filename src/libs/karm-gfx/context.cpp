@@ -123,12 +123,8 @@ StrokeStyle const &Context::strokeStyle() {
     return current().strokeStyle;
 }
 
-TextStyle const &Context::textStyle() {
-    return current().textStyle;
-}
-
 Media::Font const &Context::textFont() {
-    return *current().textStyle.font;
+    return current().textFont;
 }
 
 ShadowStyle const &Context::shadowStyle() {
@@ -145,8 +141,8 @@ Context &Context::strokeStyle(StrokeStyle style) {
     return *this;
 }
 
-Context &Context::textStyle(TextStyle style) {
-    current().textStyle = style;
+Context &Context::textFont(Media::Font font) {
+    current().textFont = font;
     return *this;
 }
 
@@ -236,19 +232,31 @@ Media::FontMesure Context::mesureStr(Str str) {
 }
 
 void Context::strokeRune(Math::Vec2i baseline, Rune rune) {
-    textFont().strokeRune(*this, baseline, rune);
+    // FIXME: We need to save the font before we can use it
+    // because the font might mutate the transform stack.
+    auto f = textFont();
+    f.strokeRune(*this, baseline, rune);
 }
 
 void Context::fillRune(Math::Vec2i baseline, Rune rune) {
-    textFont().fillRune(*this, baseline, rune);
+    // FIXME: We need to save the font before we can use it
+    // because the font might mutate the transform stack.
+    auto f = textFont();
+    f.fillRune(*this, baseline, rune);
 }
 
 void Context::strokeStr(Math::Vec2i baseline, Str str) {
-    textFont().strokeStr(*this, baseline, str);
+    // FIXME: We need to save the font before we can use it
+    // because the font might mutate the transform stack.
+    auto f = textFont();
+    f.strokeStr(*this, baseline, str);
 }
 
 void Context::fillStr(Math::Vec2i baseline, Str str) {
-    textFont().fillStr(*this, baseline, str);
+    // FIXME: We need to save the font before we can use it
+    // because the font might mutate the transform stack.
+    auto f = textFont();
+    f.fillStr(*this, baseline, str);
 }
 
 /* --- Paths ------------------------------------------------------------ */

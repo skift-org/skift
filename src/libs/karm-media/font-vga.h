@@ -7,7 +7,7 @@
 
 namespace Karm::Media {
 
-struct VgaFont : public Font {
+struct VgaFont : public Fontface {
     static constexpr int WIDTH = 8;
     static constexpr int HEIGHT = 8;
 
@@ -33,7 +33,7 @@ struct VgaFont : public Font {
         return 8;
     }
 
-    void fillRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const override {
+    void contour(Gfx::Context &g, Rune rune) const override {
         One<Ibm437> one;
         encodeOne<Ibm437>(rune, one);
 
@@ -41,10 +41,14 @@ struct VgaFont : public Font {
             for (int x = 0; x < WIDTH; x++) {
                 uint8_t byte = DATA[one * HEIGHT + y];
                 if (byte & (0x80 >> x)) {
-                    g.plot(baseline + Math::Vec2i{x, y - HEIGHT});
+                    g.rect(Math::Recti{x, y - 8, 1, 1}.cast<double>());
                 }
             }
         }
+    }
+
+    double units() const override {
+        return 8;
     }
 };
 

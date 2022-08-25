@@ -1,14 +1,16 @@
 #pragma once
 
+#include <karm-media/loader.h>
+
 #include "view.h"
 
 namespace Karm::Ui {
 
 struct Text : public View<Text> {
-    Strong<Media::Font> _font;
+    Media::Font _font;
     String _text;
 
-    Text(Strong<Media::Font> font, String text)
+    Text(Media::Font font, String text)
         : _font(font), _text(text) {}
 
     void reconcile(Text &o) override {
@@ -16,30 +18,37 @@ struct Text : public View<Text> {
     }
 
     void paint(Gfx::Context &g) override {
+        g.save();
+
         auto m = g.mesureStr(_text);
-        g.fillStr(bound().topStart() + m.baseline.cast<int>(), _text);
+        auto baseline = bound().topStart() + m.baseline.cast<int>();
+
+        g.textFont(_font);
+        g.fillStr(baseline, _text);
+
+        g.restore();
     }
 
     Math::Vec2i size(Math::Vec2i) override {
-        return _font->mesureStr(_text).capbound.size().cast<int>();
+        return _font.mesureStr(_text).linebound.size().cast<int>();
     }
 };
 
 static inline Child text(Str text) {
-    return makeStrong<Text>(Media::Font::fallback(), text);
+    return makeStrong<Text>(Media::loadFont(18, "res/fonts/inter/Inter-Regular.ttf").unwrap(), text);
 }
 
 template <typename... Args>
 static inline Child text(Str format, Args &&...args) {
-    return makeStrong<Text>(Media::Font::fallback(), Fmt::format(format, std::forward<Args>(args)...));
+    return makeStrong<Text>(Media::loadFont(18, "res/fonts/inter/Inter-Regular.ttf").unwrap(), Fmt::format(format, std::forward<Args>(args)...));
 }
 
-static inline Child text(Strong<Media::Font> font, Str text) {
+static inline Child text(Media::Font font, Str text) {
     return makeStrong<Text>(font, text);
 }
 
 template <typename... Args>
-static inline Child text(Strong<Media::Font> font, Str format, Args &&...args) {
+static inline Child text(Media::Font font, Str format, Args &&...args) {
     return makeStrong<Text>(font, Fmt::format(format, std::forward<Args>(args)...));
 }
 

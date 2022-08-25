@@ -26,7 +26,7 @@
 
 # **skiftOS**: The delightful operating system
 
-**skiftOS** is a hobby operating system created from scratch in contemporary C/C++ for ARM, x86, and RISC-V platforms. We built Skift on top of the _Hjert_ micro-kernel, a C++ rewrite of the _BRUTAL_ kernel to make it simpler, safer, and enhance the existing design. On top of the kernel resides _Karm_, a framework comprised of a minimal subset of the C/C++ standard library, an extensive collection of containers and utilities, a SwiftUI inspired Ui, and much more. Finally, built on top of _Karm_ is _Hideo_, a delightful desktop environment.
+**skiftOS** is a hobby operating system built from scratch in contemporary C and C++ for ARM, x86, and RISC-V architectures. We built Skift on top of the _Hjert_ micro-kernel, a C++ rewrite of the _BRUTAL_ kernel to make it simpler, safer, and enhance the existing design. On top of the kernel resides _Karm_, a framework comprised of a minimal subset of the C/C++ standard library, an extensive collection of containers and utilities, a SwiftUI inspired Ui, and much more. Finally, built on top of _Karm_ is _Hideo_, a delightful desktop environment.
 
 ## Building
 

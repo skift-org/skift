@@ -5,46 +5,69 @@
 #include "proxy.h"
 
 namespace Karm::Ui {
+struct BoxStyle {
+    Layout::Spacingi spacing{};
+    double borderRadius{};
+    double borderWidth{};
+    Gfx::Color borderColor{Gfx::TRANSPARENT};
+    Gfx::Color backgroundColor{Gfx::TRANSPARENT};
+    Gfx::Color foregroundColor{Gfx::WHITE};
+};
 
-struct Box : public Proxy<Box> {
-    Gfx::Color _color;
-    Layout::Spacingi _spacing;
+template <typename Crtp>
+struct _Box : public Proxy<Crtp> {
+    _Box(Child child)
+        : Proxy<Crtp>(child) {}
 
-    Box(Layout::Spacingi spacing, Child child)
-        : Proxy(child), _spacing(spacing) {}
-
-    Box(Gfx::Color color, Child child)
-        : Proxy(child), _color(color), _spacing{} {}
-
-    Box(Gfx::Color color, Layout::Spacingi spacing, Child child)
-        : Proxy(child), _color(color), _spacing(spacing) {}
-
-    void reconcile(Box &o) override {
-        _color = o._color;
-        _spacing = o._spacing;
-
-        Proxy<Box>::reconcile(o);
-    }
+    virtual BoxStyle &boxStyle() = 0;
 
     void paint(Gfx::Context &g) override {
         g.save();
 
-        g.fillStyle(_color);
-        g.fill(bound());
-        child().paint(g);
+        if (boxStyle().backgroundColor.alpha) {
+            g.fillStyle(boxStyle().backgroundColor);
+            g.fill(bound(), boxStyle().borderRadius);
+        }
+
+        if (boxStyle().borderWidth) {
+            g.strokeStyle(Gfx::stroke(boxStyle().borderColor)
+                              .withWidth(boxStyle().borderWidth)
+                              .withAlign(Gfx::INSIDE_ALIGN));
+            g.stroke(bound(), boxStyle().borderRadius);
+        }
+
+        g.fillStyle(boxStyle().foregroundColor);
+        Proxy<Crtp>::child().paint(g);
         g.restore();
     }
 
     void layout(Math::Recti rect) override {
-        child().layout(_spacing.shrink(Layout::Flow::LEFT_TO_RIGHT, rect));
+        Proxy<Crtp>::child().layout(boxStyle().spacing.shrink(Layout::Flow::LEFT_TO_RIGHT, rect));
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
-        return child().size(s - _spacing.all(), hint) + _spacing.all();
+        return Proxy<Crtp>::child().size(s - boxStyle().spacing.all(), hint) + boxStyle().spacing.all();
     }
 
     Math::Recti bound() override {
-        return _spacing.grow(Layout::Flow::LEFT_TO_RIGHT, child().bound());
+        return boxStyle().spacing.grow(Layout::Flow::LEFT_TO_RIGHT, Proxy<Crtp>::child().bound());
+    }
+};
+
+struct Box : public _Box<Box> {
+    using _Box<Box>::_Box;
+    BoxStyle _style;
+
+    Box(BoxStyle style, Child child)
+        : _Box(child), _style(style) {}
+
+    void reconcile(Box &o) override {
+        _style = o._style;
+        _Box<Box>::reconcile(o);
+    }
+
+    BoxStyle &boxStyle() override {
+        return _style;
     }
 };
 

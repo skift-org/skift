@@ -14,10 +14,10 @@ CliResult entryPoint(CliArgs args) {
         auto btn = Ui::primaryButton(state.bind(inc), "CLICK ME!");
 
         return Ui::spacing(
-            32,
-            Ui::vflow(
-                Ui::grow(Ui::center(lbl)),
-                Ui::center(btn)));
+            16,
+            Ui::hflow(16,
+                      Ui::minSize({256, Ui::Sizing::UNCONSTRAINED}, Ui::vcenter(lbl)),
+                      btn));
     });
 
     return app.run(args);

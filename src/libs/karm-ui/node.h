@@ -9,6 +9,8 @@
 
 namespace Karm::Ui {
 
+inline constexpr bool DEBUG = false;
+
 struct Node;
 
 using Child = Strong<Node>;

@@ -3,84 +3,144 @@
 #include "align.h"
 #include "box.h"
 #include "funcs.h"
-#include "proxy.h"
 #include "text.h"
 
 namespace Karm::Ui {
+struct ButtonStyle {
+    BoxStyle idleStyle;
+    BoxStyle hoverStyle;
+    BoxStyle pressStyle;
+};
 
-struct Button : public Proxy<Button> {
-    enum State {
-        IDLE,
-        OVER,
-        PRESS,
+enum ButtonState {
+    IDLE,
+    OVER,
+    PRESS,
+};
+
+struct Button : public _Box<Button> {
+    static constexpr int RADIUS = 4;
+
+    static constexpr ButtonStyle DEFAULT = {
+        .idleStyle = {
+            .borderRadius = RADIUS,
+            .backgroundColor = Gfx::ZINC700,
+        },
+        .hoverStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC500,
+            .backgroundColor = Gfx::ZINC600,
+        },
+        .pressStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC600,
+            .backgroundColor = Gfx::ZINC700,
+        },
     };
 
-    enum Style {
-        DEFAULT,
-        PRIMARY,
-        OUTLINE,
-        SUBTLE,
+    static constexpr ButtonStyle PRIMARY = {
+        .idleStyle = {
+            .borderRadius = RADIUS,
+            .backgroundColor = Gfx::BLUE700,
+
+        },
+        .hoverStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::BLUE500,
+            .backgroundColor = Gfx::BLUE600,
+        },
+        .pressStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::BLUE600,
+            .backgroundColor = Gfx::BLUE700,
+        },
+    };
+
+    static constexpr ButtonStyle OUTLINE = {
+        .idleStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC700,
+        },
+        .hoverStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC500,
+            .backgroundColor = Gfx::ZINC600,
+        },
+        .pressStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC600,
+            .backgroundColor = Gfx::ZINC700,
+        },
+    };
+
+    static constexpr ButtonStyle SUBTLE = {
+        .idleStyle = {},
+        .hoverStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC500,
+            .backgroundColor = Gfx::ZINC600,
+        },
+        .pressStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC600,
+            .backgroundColor = Gfx::ZINC700,
+        },
+    };
+
+    static constexpr ButtonStyle DESTRUCTIVE = {
+        .idleStyle = {
+            .borderRadius = RADIUS,
+            .foregroundColor = Gfx::RED500,
+        },
+        .hoverStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::RED500,
+            .backgroundColor = Gfx::RED600,
+        },
+        .pressStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::RED600,
+            .backgroundColor = Gfx::RED700,
+        },
     };
 
     Func<void()> _onPress;
-    Style _style = DEFAULT;
-    State _state = IDLE;
-    static constexpr int RADIUS = 4;
+    ButtonStyle _buttonStyle = DEFAULT;
+    ButtonState _state = IDLE;
 
-    Button(Func<void()> onPress, Style style, Child child)
-        : Proxy(child), _onPress(std::move(onPress)), _style(style) {}
+    Button(Func<void()> onPress, ButtonStyle style, Child child)
+        : _Box<Button>(child),
+          _onPress(std::move(onPress)),
+          _buttonStyle(style) {}
 
-    void paint(Gfx::Context &g) override {
-        g.save();
-        if (_style == PRIMARY) {
-            if (_state == OVER) {
-                g.fillStyle(Gfx::BLUE600);
-                g.fill(bound(), RADIUS);
-            } else {
-                g.fillStyle(Gfx::BLUE700);
-                g.fill(bound(), RADIUS);
-            }
-        } else if (_style == DEFAULT) {
-            if (_state == OVER) {
-                g.fillStyle(Gfx::ZINC600);
-                g.fill(bound(), RADIUS);
-            } else {
-                g.fillStyle(Gfx::ZINC700);
-                g.fill(bound(), RADIUS);
-            }
-        } else if (_style == OUTLINE) {
-            if (_state == OVER) {
-                g.strokeStyle(Gfx::stroke(Gfx::ZINC600)
-                                  .withWidth(1)
-                                  .withAlign(Gfx::INSIDE_ALIGN));
-                g.stroke(bound(), RADIUS);
-            } else {
-                g.strokeStyle(Gfx::stroke(Gfx::ZINC700)
-                                  .withWidth(1)
-                                  .withAlign(Gfx::INSIDE_ALIGN));
-                g.stroke(bound(), RADIUS);
-            }
-        } else if (_style == SUBTLE) {
-            if (_state == OVER) {
-                g.strokeStyle(Gfx::stroke(Gfx::ZINC600)
-                                  .withWidth(1)
-                                  .withAlign(Gfx::INSIDE_ALIGN));
-                g.stroke(bound(), RADIUS);
-            } else if (_state == PRESS) {
-                g.strokeStyle(Gfx::stroke(Gfx::ZINC700)
-                                  .withWidth(1)
-                                  .withAlign(Gfx::INSIDE_ALIGN));
-                g.stroke(bound(), RADIUS);
-            }
+    void reconcile(Button &o) override {
+        _buttonStyle = o._buttonStyle;
+        _Box<Button>::reconcile(o);
+    }
+
+    BoxStyle &boxStyle() override {
+        if (_state == IDLE) {
+            return _buttonStyle.idleStyle;
+        } else if (_state == OVER) {
+            return _buttonStyle.hoverStyle;
+        } else {
+            return _buttonStyle.pressStyle;
         }
-
-        g.fillStyle(Gfx::fill(Gfx::WHITE));
-        child().paint(g);
-        g.restore();
     }
 
     void event(Events::Event &e) override {
-        State state = _state;
+        ButtonState state = _state;
 
         e.handle<Events::MouseEvent>([&](auto &m) {
             if (!bound().contains(m.pos)) {
@@ -88,17 +148,20 @@ struct Button : public Proxy<Button> {
                 return false;
             }
 
-            if (state != PRESS)
+            if (state != PRESS) {
                 state = OVER;
+            }
 
             if (m.type == Events::MouseEvent::PRESS) {
                 state = PRESS;
+                return true;
             } else if (m.type == Events::MouseEvent::RELEASE) {
                 state = OVER;
                 _onPress();
+                return true;
             }
 
-            return true;
+            return false;
         });
 
         if (state != _state) {
@@ -108,18 +171,18 @@ struct Button : public Proxy<Button> {
     };
 };
 
-static inline Child button(Func<void()> onPress, Button::Style style, Child child) {
+static inline Child button(Func<void()> onPress, ButtonStyle style, Child child) {
     return makeStrong<Button>(std::move(onPress), style, child);
 }
 
-static inline Child button(Func<void()> onPress, Button::Style style, Str t) {
+static inline Child button(Func<void()> onPress, ButtonStyle style, Str t) {
     return button(
         std::move(onPress),
         style,
-        pinSize({Sizing::UNCONSTRAINED, 36},
-                vcenter(
+        minSize({Sizing::UNCONSTRAINED, 36},
+                center(
                     spacing(
-                        {16, 0},
+                        {16, 4},
                         text(t)))));
 }
 
@@ -129,30 +192,6 @@ static inline Child button(Func<void()> onPress, Child child) {
 
 static inline Child button(Func<void()> onPress, Str t) {
     return button(std::move(onPress), Button::DEFAULT, t);
-}
-
-static inline Child primaryButton(Func<void()> onPress, Child child) {
-    return button(std::move(onPress), Button::PRIMARY, child);
-}
-
-static inline Child primaryButton(Func<void()> onPress, Str t) {
-    return button(std::move(onPress), Button::PRIMARY, t);
-}
-
-static inline Child outlineButton(Func<void()> onPress, Child child) {
-    return button(std::move(onPress), Button::OUTLINE, child);
-}
-
-static inline Child outlineButton(Func<void()> onPress, Str t) {
-    return button(std::move(onPress), Button::OUTLINE, t);
-}
-
-static inline Child subtleButton(Func<void()> onPress, Child child) {
-    return button(std::move(onPress), Button::SUBTLE, child);
-}
-
-static inline Child subtleButton(Func<void()> onPress, Str t) {
-    return button(std::move(onPress), Button::SUBTLE, t);
 }
 
 } // namespace Karm::Ui

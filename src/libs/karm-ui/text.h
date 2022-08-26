@@ -18,15 +18,16 @@ struct Text : public View<Text> {
     }
 
     void paint(Gfx::Context &g) override {
-        g.save();
-
         auto m = g.mesureStr(_text);
         auto baseline = bound().topStart() + m.baseline.cast<int>();
 
         g.textFont(_font);
         g.fillStr(baseline, _text);
 
-        g.restore();
+        if (DEBUG) {
+            g._line({bound().topStart() + m.baseline.cast<int>(), bound().topEnd() + m.baseline.cast<int>()}, Gfx::MAGENTA);
+            g._rect(bound(), Gfx::CYAN);
+        }
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
@@ -35,12 +36,12 @@ struct Text : public View<Text> {
 };
 
 static inline Child text(Str text) {
-    return makeStrong<Text>(Media::loadFont(16, "res/fonts/inter/Inter-Regular.ttf").unwrap(), text);
+    return makeStrong<Text>(Media::loadFont(12, "res/fonts/inter/Inter-Medium.ttf").unwrap(), text);
 }
 
 template <typename... Args>
 static inline Child text(Str format, Args &&...args) {
-    return makeStrong<Text>(Media::loadFont(16, "res/fonts/inter/Inter-Regular.ttf").unwrap(), Fmt::format(format, std::forward<Args>(args)...));
+    return makeStrong<Text>(Media::loadFont(12, "res/fonts/inter/Inter-Medium.ttf").unwrap(), Fmt::format(format, std::forward<Args>(args)...));
 }
 
 static inline Child text(Media::Font font, Str text) {

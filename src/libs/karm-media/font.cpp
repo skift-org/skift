@@ -22,7 +22,7 @@ FontMetrics Font::metrics() const {
 }
 
 double Font::advance(Rune c) const {
-    return _face->advance(c) * _size / _face->units();
+    return _face->advance(c) * (_size / _face->units());
 }
 
 FontMesure Font::mesureRune(Rune r) const {

@@ -454,7 +454,7 @@ struct Hhea : public Table {
     int descender() const {
         auto s = begin();
         s.skip(6);
-        return s.nextBeInt16();
+        return -s.nextBeInt16();
     }
 
     int lineGap() const {

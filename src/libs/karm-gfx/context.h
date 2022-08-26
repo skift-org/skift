@@ -143,6 +143,8 @@ struct Context {
 
     void _line(Math::Edgei edge, Color color);
 
+    void _rect(Math::Recti rect, Color color);
+
     void _trace();
 
     void _fill(Color color);

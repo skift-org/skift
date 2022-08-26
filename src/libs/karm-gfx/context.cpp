@@ -286,12 +286,16 @@ void Context::_line(Math::Edgei edge, Color color) {
     }
 }
 
+void Context::_rect(Math::Recti rect, Color color) {
+    _line({rect.topStart(), rect.topEnd()}, color);
+    _line({rect.topEnd(), rect.bottomEnd()}, color);
+    _line({rect.bottomEnd(), rect.bottomStart()}, color);
+    _line({rect.bottomStart(), rect.topStart()}, color);
+}
+
 void Context::_trace() {
     auto b = _shape.bound().ceil().cast<int>();
-    _line({b.topStart(), b.topEnd()}, MAGENTA);
-    _line({b.topEnd(), b.bottomEnd()}, MAGENTA);
-    _line({b.bottomEnd(), b.bottomStart()}, MAGENTA);
-    _line({b.bottomStart(), b.topStart()}, MAGENTA);
+    _rect(b, Gfx::MAGENTA);
 
     for (auto edge : _shape) {
         _line(edge.cast<int>(), WHITE);

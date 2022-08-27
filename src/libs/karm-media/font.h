@@ -101,13 +101,13 @@ struct Font {
 
     FontMesure mesureStr(Str str) const;
 
-    void fillRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const;
+    void fillRune(Gfx::Context &g, Math::Vec2f baseline, Rune rune) const;
 
-    void strokeRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const;
+    void strokeRune(Gfx::Context &g, Math::Vec2f baseline, Rune rune) const;
 
-    void fillStr(Gfx::Context &g, Math::Vec2i baseline, Str str) const;
+    void fillStr(Gfx::Context &g, Math::Vec2f baseline, Str str) const;
 
-    void strokeStr(Gfx::Context &g, Math::Vec2i baseline, Str str) const;
+    void strokeStr(Gfx::Context &g, Math::Vec2f baseline, Str str) const;
 };
 
 } // namespace Karm::Media

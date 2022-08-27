@@ -49,34 +49,34 @@ FontMesure Font::mesureStr(Str str) const {
     };
 }
 
-void Font::fillRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const {
+void Font::fillRune(Gfx::Context &g, Math::Vec2f baseline, Rune rune) const {
     g.save();
     g.begin();
-    g.origin(baseline);
+    g.origin(baseline.cast<int>());
     g.scale(_size / _face->units());
     _face->contour(g, rune);
     g.fill();
     g.restore();
 }
 
-void Font::strokeRune(Gfx::Context &g, Math::Vec2i baseline, Rune rune) const {
+void Font::strokeRune(Gfx::Context &g, Math::Vec2f baseline, Rune rune) const {
     g.save();
     g.begin();
-    g.origin(baseline);
+    g.origin(baseline.cast<int>());
     g.scale(_size / _face->units());
     _face->contour(g, rune);
     g.stroke();
     g.restore();
 }
 
-void Font::fillStr(Gfx::Context &g, Math::Vec2i baseline, Str str) const {
+void Font::fillStr(Gfx::Context &g, Math::Vec2f baseline, Str str) const {
     for (auto r : iterRunes(str)) {
         fillRune(g, baseline, r);
         baseline.x += advance(r);
     }
 }
 
-void Font::strokeStr(Gfx::Context &g, Math::Vec2i baseline, Str str) const {
+void Font::strokeStr(Gfx::Context &g, Math::Vec2f baseline, Str str) const {
     for (auto r : iterRunes(str)) {
         strokeRune(g, baseline, r);
         baseline.x += advance(r);

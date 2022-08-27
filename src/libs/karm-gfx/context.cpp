@@ -233,28 +233,28 @@ void Context::stroke(Math::Vec2i baseline, Rune rune) {
     // FIXME: We need to save the font before we can use it
     // because the font might mutate the transform stack.
     auto f = textFont();
-    f.strokeRune(*this, baseline, rune);
+    f.strokeRune(*this, baseline.cast<double>(), rune);
 }
 
 void Context::fill(Math::Vec2i baseline, Rune rune) {
     // FIXME: We need to save the font before we can use it
     // because the font might mutate the transform stack.
     auto f = textFont();
-    f.fillRune(*this, baseline, rune);
+    f.fillRune(*this, baseline.cast<double>(), rune);
 }
 
 void Context::stroke(Math::Vec2i baseline, Str str) {
     // FIXME: We need to save the font before we can use it
     // because the font might mutate the transform stack.
     auto f = textFont();
-    f.strokeStr(*this, baseline, str);
+    f.strokeStr(*this, baseline.cast<double>(), str);
 }
 
 void Context::fill(Math::Vec2i baseline, Str str) {
     // FIXME: We need to save the font before we can use it
     // because the font might mutate the transform stack.
     auto f = textFont();
-    f.fillStr(*this, baseline, str);
+    f.fillStr(*this, baseline.cast<double>(), str);
 }
 
 /* --- Paths ------------------------------------------------------------ */

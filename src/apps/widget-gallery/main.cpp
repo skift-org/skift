@@ -47,8 +47,10 @@ Ui::Child winControls() {
 
     return Ui::hflow(
         4,
-        Ui::button(nop, SUBTLE, Media::Icons::WINDOW_MINIMIZE),
-        Ui::button(nop, SUBTLE, Media::Icons::WINDOW_MAXIMIZE),
+        Ui::button(nop, SUBTLE, Media::Icons::DUCK, "Widget Gallery"),
+        Ui::spacer(),
+        Ui::button(nop, SUBTLE, Media::Icons::MINUS),
+        Ui::button(nop, SUBTLE, Media::Icons::PLUS),
         Ui::button(nop, CLOSE, Media::Icons::WINDOW_CLOSE));
 }
 

@@ -2,6 +2,7 @@
 
 #include "align.h"
 #include "box.h"
+#include "flow.h"
 #include "funcs.h"
 #include "icon.h"
 #include "text.h"
@@ -45,7 +46,6 @@ struct Button : public _Box<Button> {
         .idleStyle = {
             .borderRadius = RADIUS,
             .backgroundColor = Gfx::BLUE700,
-
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
@@ -183,7 +183,7 @@ static inline Child button(Func<void()> onPress, ButtonStyle style, Str t) {
         minSize({Sizing::UNCONSTRAINED, 36},
                 center(
                     spacing(
-                        {16, 4},
+                        {16, 6},
                         text(t)))));
 }
 
@@ -196,6 +196,18 @@ static inline Child button(Func<void()> onPress, ButtonStyle style, Media::Icons
                     spacing(
                         {6, 6},
                         icon(i)))));
+}
+
+static inline Child button(Func<void()> onPress, ButtonStyle style, Media::Icons i, Str t) {
+    return button(
+        std::move(onPress),
+        style,
+        minSize({36, 36},
+                spacing(
+                    {12, 6, 16, 6},
+                    hflow(8,
+                          center(icon(i)),
+                          center(text(t))))));
 }
 
 static inline Child button(Func<void()> onPress, Child child) {

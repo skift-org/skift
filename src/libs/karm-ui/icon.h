@@ -18,6 +18,8 @@ struct Icon : public View<Icon> {
 
     void paint(Gfx::Context &g) override {
         g.fill(bound().topStart(), _icon);
+        if (DEBUG)
+            g._rect(bound(), Gfx::CYAN);
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {

@@ -48,6 +48,16 @@ struct SdlHost : public Ui::Host {
     void translate(SDL_Event const &sdlEvent) {
         switch (sdlEvent.type) {
         case SDL_WINDOWEVENT:
+            switch (sdlEvent.window.event) {
+
+            case SDL_WINDOWEVENT_RESIZED:
+                _shouldLayout = true;
+                break;
+
+            case SDL_WINDOWEVENT_EXPOSED:
+                _shouldRepaint = true;
+                break;
+            }
             break;
 
         case SDL_KEYDOWN: {
@@ -182,7 +192,7 @@ Result<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
         SDL_WINDOWPOS_UNDEFINED,
         size.width,
         size.height,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
 
     if (!window) {
         return Error{SDL_GetError()};

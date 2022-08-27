@@ -3,6 +3,7 @@
 #include "align.h"
 #include "box.h"
 #include "funcs.h"
+#include "icon.h"
 #include "text.h"
 
 namespace Karm::Ui {
@@ -186,12 +187,27 @@ static inline Child button(Func<void()> onPress, ButtonStyle style, Str t) {
                         text(t)))));
 }
 
+static inline Child button(Func<void()> onPress, ButtonStyle style, Media::Icons i) {
+    return button(
+        std::move(onPress),
+        style,
+        minSize({36, 36},
+                center(
+                    spacing(
+                        {6, 6},
+                        icon(i)))));
+}
+
 static inline Child button(Func<void()> onPress, Child child) {
     return button(std::move(onPress), Button::DEFAULT, child);
 }
 
 static inline Child button(Func<void()> onPress, Str t) {
     return button(std::move(onPress), Button::DEFAULT, t);
+}
+
+static inline Child button(Func<void()> onPress, Media::Icons i) {
+    return button(std::move(onPress), Button::DEFAULT, i);
 }
 
 } // namespace Karm::Ui

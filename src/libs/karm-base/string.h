@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdio>
-
 #include "keywords.h"
 #include "ordr.h"
 #include "rune.h"

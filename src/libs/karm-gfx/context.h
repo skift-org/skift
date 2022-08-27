@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-media/icon.h>
+
 #include "path.h"
 #include "shape.h"
 #include "style.h"
@@ -125,19 +127,17 @@ struct Context {
 
     void fill(Math::Ellipsei e);
 
-    /* --- Text ------------------------------------------------------------- */
+    void stroke(Math::Vec2i pos, Media::Icon icon);
 
-    Media::FontMesure mesureRune(Rune rune);
+    void fill(Math::Vec2i pos, Media::Icon icon);
 
-    Media::FontMesure mesureStr(Str text);
+    void stroke(Math::Vec2i baseline, Rune rune);
 
-    void strokeRune(Math::Vec2i baseline, Rune rune);
+    void fill(Math::Vec2i baseline, Rune rune);
 
-    void fillRune(Math::Vec2i baseline, Rune rune);
+    void stroke(Math::Vec2i baseline, Str str);
 
-    void strokeStr(Math::Vec2i baseline, Str str);
-
-    void fillStr(Math::Vec2i baseline, Str str);
+    void fill(Math::Vec2i baseline, Str str);
 
     /* --- Paths ------------------------------------------------------------ */
 

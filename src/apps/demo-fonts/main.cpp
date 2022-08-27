@@ -14,8 +14,7 @@ struct FontApp : public Ui::Widget<FontApp> {
         g.fillStyle(Gfx::BLUE500);
         g.textFont(_font);
 
-        g.fillStr({16, 320}, "i");
-        g._trace();
+        g.fillStr({32, 32}, "Hello, world!");
     }
 };
 

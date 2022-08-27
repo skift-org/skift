@@ -47,9 +47,9 @@ Ui::Child winControls() {
 
     return Ui::hflow(
         4,
-        Ui::button(nop, SUBTLE, "-"),
-        Ui::button(nop, SUBTLE, "O"),
-        Ui::button(nop, CLOSE, "X"));
+        Ui::button(nop, SUBTLE, Media::Icons::WINDOW_MINIMIZE),
+        Ui::button(nop, SUBTLE, Media::Icons::WINDOW_MAXIMIZE),
+        Ui::button(nop, CLOSE, Media::Icons::WINDOW_CLOSE));
 }
 
 Ui::Child buttons() {
@@ -78,7 +78,7 @@ Ui::Child texts() {
 CliResult entryPoint(CliArgs args) {
     Ui::App app([]() {
         return Ui::spacing(
-            12,
+            8,
             buttons());
     });
 

@@ -221,38 +221,36 @@ void Context::fill(Math::Ellipsei e) {
     fill();
 }
 
-/* --- Text ------------------------------------------------------------- */
-
-Media::FontMesure Context::mesureRune(Rune r) {
-    return textFont().mesureRune(r);
+void Context::stroke(Math::Vec2i pos, Media::Icon icon) {
+    icon.stroke(*this, pos);
 }
 
-Media::FontMesure Context::mesureStr(Str str) {
-    return textFont().mesureStr(str);
+void Context::fill(Math::Vec2i pos, Media::Icon icon) {
+    icon.fill(*this, pos);
 }
 
-void Context::strokeRune(Math::Vec2i baseline, Rune rune) {
+void Context::stroke(Math::Vec2i baseline, Rune rune) {
     // FIXME: We need to save the font before we can use it
     // because the font might mutate the transform stack.
     auto f = textFont();
     f.strokeRune(*this, baseline, rune);
 }
 
-void Context::fillRune(Math::Vec2i baseline, Rune rune) {
+void Context::fill(Math::Vec2i baseline, Rune rune) {
     // FIXME: We need to save the font before we can use it
     // because the font might mutate the transform stack.
     auto f = textFont();
     f.fillRune(*this, baseline, rune);
 }
 
-void Context::strokeStr(Math::Vec2i baseline, Str str) {
+void Context::stroke(Math::Vec2i baseline, Str str) {
     // FIXME: We need to save the font before we can use it
     // because the font might mutate the transform stack.
     auto f = textFont();
     f.strokeStr(*this, baseline, str);
 }
 
-void Context::fillStr(Math::Vec2i baseline, Str str) {
+void Context::fill(Math::Vec2i baseline, Str str) {
     // FIXME: We need to save the font before we can use it
     // because the font might mutate the transform stack.
     auto f = textFont();

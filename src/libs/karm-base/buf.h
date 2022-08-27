@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdio>
-
 #include "array.h"
 #include "clamp.h"
 #include "inert.h"

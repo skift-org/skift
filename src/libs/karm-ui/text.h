@@ -18,11 +18,11 @@ struct Text : public View<Text> {
     }
 
     void paint(Gfx::Context &g) override {
-        auto m = g.mesureStr(_text);
+        auto m = _font.mesureStr(_text);
         auto baseline = bound().topStart() + m.baseline.cast<int>();
 
         g.textFont(_font);
-        g.fillStr(baseline, _text);
+        g.fill(baseline, _text);
 
         if (DEBUG) {
             g._line({bound().topStart() + m.baseline.cast<int>(), bound().topEnd() + m.baseline.cast<int>()}, Gfx::MAGENTA);

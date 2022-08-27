@@ -1,0 +1,9 @@
+{
+    "id": "font-viewer",
+    "type": "exe",
+    "description": "View font files",
+    "deps": [
+        "karm-main",
+        "karm-ui"
+    ]
+}

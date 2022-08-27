@@ -324,9 +324,8 @@ void Context::_fill(Color color) {
                 }
             }
 
-            if (_active.len() == 0) {
+            if (_active.len() == 0)
                 continue;
-            }
 
             sort<Active>(_active, [](auto const &a, auto const &b) {
                 return cmp(a.x, b.x);

@@ -1,9 +1,0 @@
-{
-    "id": "demo-ui",
-    "type": "exe",
-    "description": "A demo of graphical user interface library.",
-    "deps": [
-        "karm-main",
-        "karm-ui"
-    ]
-}

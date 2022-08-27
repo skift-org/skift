@@ -229,12 +229,39 @@ struct Cmap : public Table {
                 }
             }
 
+            Debug::lwarn("Glyph not found for rune {x}", r);
+            return 0;
+        }
+
+        size_t _glyphForType12(Rune r) const {
+            auto s = begin().skip(12);
+            uint32_t nGroups = s.nextBeUint32();
+
+            for (uint32_t i = 0; i < nGroups; i++) {
+                uint32_t startCode = s.nextBeUint32();
+                uint32_t endCode = s.nextBeUint32();
+                uint32_t glyphOffset = s.nextBeUint32();
+
+                if (r < startCode)
+                    break;
+
+                if (r > endCode)
+                    continue;
+
+                if (r >= startCode && r <= endCode) {
+                    return (r - startCode) + glyphOffset;
+                }
+            }
+
+            Debug::lwarn("Glyph not found for rune {x}", r);
             return 0;
         }
 
         size_t glyphIdFor(Rune r) const {
             if (type == 4) {
                 return _glyphIdForType4(r);
+            } else if (type == 12) {
+                return _glyphForType12(r);
             } else {
                 return 0;
             }
@@ -545,15 +572,41 @@ struct Font {
     Kern _kern;
 
     static Result<Cmap::Table> chooseCmap(Font &font) {
+        Opt<Cmap::Table> bestCmap;
+        int bestScore = 0;
+
+        struct KnowCmap {
+            int platformId;
+            int encodingId;
+            int type;
+            int score;
+        };
+
+        Array<KnowCmap, 4> knowCmaps = {
+            {0, 3, 4, 150},
+            {3, 1, 4, 100},
+            {0, 4, 12, 1050},
+            {3, 10, 12, 1000},
+        };
+
         for (auto table : font._cmap.iterTables()) {
-            if (table.platformId == 3 &&
-                table.encodingId == 1 &&
-                table.type == 4) {
-                return table;
+
+            for (auto &knowCmap : knowCmaps) {
+                if (knowCmap.platformId == table.platformId && knowCmap.encodingId == table.encodingId && knowCmap.type == table.type) {
+                    if (knowCmap.score > bestScore) {
+                        bestCmap = table;
+                        bestScore = knowCmap.score;
+                    }
+                }
             }
         }
-        Debug::lerror("No suitable cmap table found");
-        return Error("no cmap table");
+
+        if (!bestCmap) {
+            Debug::lerror("No suitable cmap table found");
+            return Error("no cmap table");
+        }
+
+        return *bestCmap;
     }
 
     static Result<Font> load(Bytes slice) {

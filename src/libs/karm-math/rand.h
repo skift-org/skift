@@ -45,11 +45,11 @@ struct Rand {
     }
 
     int nextInt(int min, int max) {
-        return min + nextU32() % (max - min + 1);
+        return min + nextU32() % (max - min);
     }
 
     int nextInt(int max) {
-        return nextU32() % (max + 1);
+        return nextU32() % max;
     }
 
     double nextDouble() {

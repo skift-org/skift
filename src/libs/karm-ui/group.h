@@ -7,7 +7,7 @@ namespace Karm::Ui {
 template <typename Crtp>
 struct Group : public Widget<Crtp> {
     Children _children;
-    Math::Recti _bound;
+    Math::Recti _bound{};
 
     Group() = default;
 
@@ -47,9 +47,12 @@ struct Group : public Widget<Crtp> {
         us.truncate(them.len());
     }
 
-    void paint(Gfx::Context &g) override {
+    void paint(Gfx::Context &g, Math::Recti r) override {
         for (auto &child : children()) {
-            child->paint(g);
+            if (!child->bound().colide(r))
+                continue;
+
+            child->paint(g, r);
         }
     }
 

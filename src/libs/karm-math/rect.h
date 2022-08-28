@@ -103,15 +103,24 @@ union Rect {
     }
 
     constexpr bool contains(Vec2<T> const &v) const {
-        return v.x >= x && v.y >= y && v.x < x + width && v.y < y + height;
+        return v.x >= x &&
+               v.y >= y &&
+               v.x < x + width &&
+               v.y < y + height;
     }
 
     constexpr bool contains(Rect<T> const &r) const {
-        return r.x >= x && r.y >= y && r.x + r.width <= x + width && r.y + r.height <= y + height;
+        return r.x >= x &&
+               r.y >= y &&
+               r.x + r.width <= x + width &&
+               r.y + r.height <= y + height;
     }
 
     constexpr bool colide(Rect<T> const &r) const {
-        return r.x + r.width > x && r.y + r.height > y && r.x < x + width && r.y < y + height;
+        return r.x + r.width > x &&
+               r.y + r.height > y &&
+               r.x < x + width &&
+               r.y < y + height;
     }
 
     constexpr Rect fit(Rect<T> const &r) const {

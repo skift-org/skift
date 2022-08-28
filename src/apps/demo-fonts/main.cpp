@@ -8,13 +8,13 @@ struct FontApp : public Ui::Widget<FontApp> {
     FontApp(Media::Font font)
         : _font{font} {}
 
-    void paint(Gfx::Context &g) override {
+    void paint(Gfx::Context &g, Math::Recti) override {
         g.clear(Gfx::BLACK);
 
         g.fillStyle(Gfx::BLUE500);
         g.textFont(_font);
 
-        g.fillStr({32, 32}, "Hello, world!");
+        g.fill({32, 32}, "Hello, world!");
     }
 };
 

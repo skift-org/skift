@@ -51,6 +51,7 @@ struct FlowLayout : public Group<FlowLayout> {
         : Group(children), _flow(flow), _gaps(gaps) {}
 
     void layout(Math::Recti r) override {
+        _bound = r;
         int total = 0;
         int grows = 0;
 

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <karm-base/array.h>
-#include <karm-gfx/color.h>
+#include <karm-math/rand.h>
+
+#include "color.h"
 
 namespace Karm::Gfx {
 
@@ -287,5 +289,10 @@ namespace Karm::Gfx {
     FUCHSIA50, FUCHSIA100, FUCHSIA200, FUCHSIA300, FUCHSIA400, FUCHSIA500, FUCHSIA600, FUCHSIA700, FUCHSIA800, FUCHSIA900,
     PINK50, PINK100, PINK200, PINK300, PINK400, PINK500, PINK600, PINK700, PINK800, PINK900,
     ROSE50, ROSE100, ROSE200, ROSE300, ROSE400, ROSE500, ROSE600, ROSE700, ROSE800, ROSE900};
+
+static inline Color randomColor() {
+    static Math::Rand rand;
+    return COLORS[rand.nextInt(COLORS.len())];
+}
 
 } // namespace Karm::Gfx

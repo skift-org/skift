@@ -16,7 +16,7 @@ struct Icon : public View<Icon> {
         _icon = o._icon;
     }
 
-    void paint(Gfx::Context &g) override {
+    void paint(Gfx::Context &g, Math::Recti) override {
         g.fill(bound().topStart(), _icon);
         if (DEBUG)
             g._rect(bound(), Gfx::CYAN);

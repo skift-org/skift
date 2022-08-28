@@ -21,7 +21,7 @@ struct _Box : public Proxy<Crtp> {
 
     virtual BoxStyle &boxStyle() = 0;
 
-    void paint(Gfx::Context &g) override {
+    void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
 
         if (boxStyle().backgroundColor.alpha) {
@@ -37,7 +37,7 @@ struct _Box : public Proxy<Crtp> {
         }
 
         g.fillStyle(boxStyle().foregroundColor);
-        Proxy<Crtp>::child().paint(g);
+        Proxy<Crtp>::child().paint(g, r);
         g.restore();
     }
 

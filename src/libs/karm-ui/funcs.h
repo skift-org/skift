@@ -6,6 +6,7 @@ namespace Karm::Ui {
 
 static inline void shouldRepaint(Node &n) {
     Events::PaintEvent e;
+    e.bound = n.bound();
     n.bubble(e);
 }
 

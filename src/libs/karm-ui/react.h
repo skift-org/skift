@@ -43,9 +43,9 @@ struct React : public Widget<Crtp> {
 
     void reconcile(Crtp &) override {}
 
-    void paint(Gfx::Context &g) override {
+    void paint(Gfx::Context &g, Math::Recti r) override {
         _child.with([&](auto &child) {
-            child->paint(g);
+            child->paint(g, r);
         });
     }
 

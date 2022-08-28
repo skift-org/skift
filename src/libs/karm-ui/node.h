@@ -23,7 +23,7 @@ struct Node {
 
     virtual Opt<Child> reconcile(Other o) { return o; }
 
-    virtual void paint(Gfx::Context &) {}
+    virtual void paint(Gfx::Context &, Math::Recti) {}
 
     virtual void event(Events::Event &) {}
 

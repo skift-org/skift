@@ -8,8 +8,8 @@ struct Host : public Node {
     Child _root;
     Opt<Error> _error;
     Gfx::Context _g{};
+    Vec<Math::Recti> _dirty;
 
-    bool _shouldRepaint{};
     bool _shouldLayout{};
     bool _shouldAnimate{};
 
@@ -33,18 +33,32 @@ struct Host : public Node {
         return !_error;
     }
 
-    void paint(Gfx::Context &g) override {
-        _root->paint(g);
+    Math::Recti bound() override {
+        return surface().bound();
+    }
+
+    void paint(Gfx::Context &g, Math::Recti r) override {
+        g.save();
+        g.clip(r);
+        g.clear(r, Gfx::ZINC900);
+        _root->paint(g, r);
+
+        if (DEBUG) {
+            g.fillStyle(Gfx::randomColor().withOpacity(0.25));
+            g.fill(r);
+        }
+        g.restore();
     }
 
     void paint() {
         auto s = surface();
         _g.begin(s);
-        _g.clear(Gfx::ZINC900);
-        paint(_g);
+        for (auto &d : _dirty) {
+            paint(_g, d);
+        }
         _g.end();
-        Array<Math::Recti, 1> dirty = {s.bound()};
-        flip(dirty);
+        flip(_dirty);
+        _dirty.clear();
     }
 
     void event(Events::Event &e) override {
@@ -53,8 +67,8 @@ struct Host : public Node {
 
     void bubble(Events::Event &event) override {
         event
-            .handle<Events::PaintEvent>([this](auto &) {
-                _shouldRepaint = true;
+            .handle<Events::PaintEvent>([this](auto &e) {
+                _dirty.pushBack(e.bound);
                 return true;
             })
             .handle<Events::LayoutEvent>([this](auto &) {
@@ -76,28 +90,27 @@ struct Host : public Node {
     }
 
     Error run() {
-        layout(surface().bound());
+        layout(bound());
         paint();
         while (!_error) {
             wait(_shouldAnimate ? 16 : -1);
             if (_shouldAnimate) {
                 Events::AnimateEvent e;
                 event(e);
-
                 _shouldAnimate = false;
             }
 
             pump();
 
             if (_shouldLayout) {
-                layout(surface().bound());
+                layout(bound());
                 _shouldLayout = false;
-                _shouldRepaint = true;
+                _dirty.pushBack(bound());
             }
 
-            if (_shouldRepaint) {
+            if (_dirty.len() > 0) {
                 paint();
-                _shouldRepaint = false;
+                _dirty.clear();
             }
         }
 

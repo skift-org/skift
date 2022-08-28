@@ -8,7 +8,7 @@ struct FontApp : public Ui::Widget<FontApp> {
     FontApp(Media::Icon icon)
         : _icon{icon} {}
 
-    void paint(Gfx::Context &g) override {
+    void paint(Gfx::Context &g, Math::Recti) override {
         g.clear(Gfx::BLACK);
         g.fillStyle(Gfx::BLUE500);
         g.fill({0, 0}, _icon);

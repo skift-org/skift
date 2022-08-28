@@ -28,8 +28,8 @@ struct Proxy : public Widget<Crtp> {
         _child = tryOr(_child->reconcile(o._child), _child);
     }
 
-    void paint(Gfx::Context &g) override {
-        child().paint(g);
+    void paint(Gfx::Context &g, Math::Recti r) override {
+        child().paint(g, r);
     }
 
     void event(Events::Event &e) override {

@@ -5,7 +5,7 @@
 struct SvgApp : public Ui::Widget<SvgApp> {
     bool _trace{false};
 
-    void paint(Gfx::Context &g) override {
+    void paint(Gfx::Context &g, Math::Recti) override {
         g.clear(Gfx::BLACK);
         g.begin();
 

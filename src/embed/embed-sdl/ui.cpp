@@ -55,7 +55,7 @@ struct SdlHost : public Ui::Host {
                 break;
 
             case SDL_WINDOWEVENT_EXPOSED:
-                _shouldRepaint = true;
+                _dirty.pushBack(surface().bound());
                 break;
             }
             break;

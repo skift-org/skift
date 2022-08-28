@@ -6,6 +6,5 @@
 
 CliResult entryPoint(CliArgs args) {
     Ui::App app(Ui::center(Ui::text("Hello, world!")));
-
     return app.run(args);
 }

@@ -17,7 +17,7 @@ struct Text : public View<Text> {
         _text = o._text;
     }
 
-    void paint(Gfx::Context &g) override {
+    void paint(Gfx::Context &g, Math::Recti) override {
         auto m = _font.mesureStr(_text);
         auto baseline = bound().topStart() + m.baseline.cast<int>();
 

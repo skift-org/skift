@@ -47,6 +47,7 @@ struct Host : public Node {
             g.fillStyle(Gfx::randomColor().withOpacity(0.25));
             g.fill(r);
         }
+
         g.restore();
     }
 

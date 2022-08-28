@@ -97,6 +97,24 @@ struct Button : public _Box<Button> {
         },
     };
 
+    static constexpr Ui::ButtonStyle SUBTLE_ICON = {
+        .idleStyle = {
+            .foregroundColor = Gfx::ZINC400,
+        },
+        .hoverStyle = {
+            .borderRadius = Ui::Button::RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC500,
+            .backgroundColor = Gfx::ZINC600,
+        },
+        .pressStyle = {
+            .borderRadius = Ui::Button::RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC600,
+            .backgroundColor = Gfx::ZINC700,
+        },
+    };
+
     static constexpr ButtonStyle DESTRUCTIVE = {
         .idleStyle = {
             .borderRadius = RADIUS,
@@ -110,6 +128,25 @@ struct Button : public _Box<Button> {
         },
         .pressStyle = {
             .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::RED600,
+            .backgroundColor = Gfx::RED700,
+        },
+    };
+
+    static constexpr Ui::ButtonStyle DESTRUCTIVE_ICON = {
+        .idleStyle = {
+            .borderRadius = Ui::Button::RADIUS,
+            .foregroundColor = Gfx::ZINC400,
+        },
+        .hoverStyle = {
+            .borderRadius = Ui::Button::RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::RED500,
+            .backgroundColor = Gfx::RED600,
+        },
+        .pressStyle = {
+            .borderRadius = Ui::Button::RADIUS,
             .borderWidth = 1,
             .borderColor = Gfx::RED600,
             .backgroundColor = Gfx::RED700,
@@ -220,6 +257,10 @@ static inline Child button(Func<void()> onPress, Str t) {
 
 static inline Child button(Func<void()> onPress, Media::Icons i) {
     return button(std::move(onPress), Button::DEFAULT, i);
+}
+
+static inline Child button(Func<void()> onPress, Media::Icons i, Str t) {
+    return button(std::move(onPress), Button::DEFAULT, i, t);
 }
 
 } // namespace Karm::Ui

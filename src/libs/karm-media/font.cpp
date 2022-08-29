@@ -5,8 +5,12 @@
 
 namespace Karm::Media {
 
+Strong<Fontface> Fontface::fallback() {
+    return makeStrong<VgaFont>();
+}
+
 Font Font::fallback() {
-    return {8, makeStrong<VgaFont>()};
+    return {8, Fontface::fallback()};
 }
 
 FontMetrics Font::metrics() const {

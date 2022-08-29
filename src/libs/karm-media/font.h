@@ -74,6 +74,8 @@ struct FontMesure {
 };
 
 struct Fontface {
+    static Strong<Fontface> fallback();
+
     virtual ~Fontface() = default;
 
     virtual FontMetrics metrics() const = 0;

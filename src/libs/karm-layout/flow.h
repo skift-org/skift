@@ -9,6 +9,7 @@ enum struct Orien {
     NONE,
     HORIZONTAL,
     VERTICAL,
+    BOTH
 };
 
 struct Flow {

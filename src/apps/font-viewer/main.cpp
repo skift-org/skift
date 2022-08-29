@@ -4,6 +4,7 @@
 #include <karm-ui/button.h>
 #include <karm-ui/flow.h>
 #include <karm-ui/scafold.h>
+#include <karm-ui/scroll.h>
 
 static constexpr Str PANGRAM = "The quick brown fox jumps over the lazy dog";
 
@@ -17,17 +18,15 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
         size *= 1.2;
     }
 
-    return Ui::spacing(
-        8,
-        Ui::vflow(
-            8,
-            children));
+    return Ui::scroll(Ui::spacing(8, Ui::vflow(8, children)));
 }
 
 void nop() {}
 
 CliResult entryPoint(CliArgs args) {
-    auto fontface = try$(Media::loadFontface(args.len() ? args[0] : makeStrong<Vga>(Args &&args...)));
+    auto fontface = try$(args.len()
+                             ? Media::loadFontface(args[0])
+                             : Media::Fontface::fallback());
 
     auto titlebar = Ui::titlebar(
         Media::Icons::FORMAT_FONT,
@@ -38,10 +37,12 @@ CliResult entryPoint(CliArgs args) {
         Ui::spacer(),
         Ui::button(nop, Ui::Button::PRIMARY, "INSTALL"));
 
-    auto layout = Ui::vflow(
-        titlebar,
-        toolbar,
-        pangrams(fontface));
+    auto layout = Ui::minSize(
+        {700, 500},
+        Ui::vflow(
+            titlebar,
+            toolbar,
+            Ui::grow(pangrams(fontface))));
 
     return Ui::runApp(args, layout);
 }

@@ -10,7 +10,7 @@ void nop() {}
 Ui::Child buttons() {
     return Ui::vflow(
         8,
-        Ui::titlebar(Media::Icons::DUCK, String{"Widget Gallery"}),
+        Ui::titlebar(Media::Icons::DUCK, "Widget Gallery"),
         Ui::button(nop, Ui::Button::PRIMARY, "PRIMARY BUTTON"),
         Ui::button(nop, "BUTTON"),
         Ui::button(nop, Ui::Button::OUTLINE, "OUTLINE BUTTON"),

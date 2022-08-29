@@ -293,7 +293,7 @@ void Context::_rect(Math::Recti rect, Color color) {
 
 void Context::_trace() {
     auto b = _shape.bound().ceil().cast<int>();
-    _rect(b, Gfx::MAGENTA);
+    _rect(b, Gfx::PINK);
 
     for (auto edge : _shape) {
         _line(edge.cast<int>(), WHITE);

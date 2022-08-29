@@ -59,6 +59,9 @@ struct _String {
         memcpy(_buf, buf, len * sizeof(Unit));
     }
 
+    constexpr _String(Unit const *cstr) requires(Meta::Same<Unit, char>)
+        : _String(cstr, strLen(cstr)) {}
+
     _String(_Str<E> str)
         : _String(str.buf(), str.len()) {}
 

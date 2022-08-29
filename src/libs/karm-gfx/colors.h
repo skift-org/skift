@@ -7,288 +7,67 @@
 
 namespace Karm::Gfx {
 
-[[gnu::used]] static constexpr Color TRANSPARENT = {0, 0, 0, 0};
-
+[[gnu::used]] static constexpr Color ALPHA = {0, 0, 0, 0};
 [[gnu::used]] static constexpr Color BLACK = {0, 0, 0, 255};
-[[gnu::used]] static constexpr Color DARK_GRAY = {64, 64, 64, 255};
-[[gnu::used]] static constexpr Color GRAY = {128, 128, 128, 255};
-[[gnu::used]] static constexpr Color LIGHT_GRAY = {192, 192, 192, 255};
 [[gnu::used]] static constexpr Color WHITE = {255, 255, 255, 255};
 
-[[gnu::used]] static constexpr Color RED = {255, 0, 0, 255};
-[[gnu::used]] static constexpr Color GREEN = {0, 255, 0, 255};
-[[gnu::used]] static constexpr Color BLUE = {0, 0, 255, 255};
+using ColorRamp = Array<Color, 10>;
 
-[[gnu::used]] static constexpr Color YELLOW = {255, 255, 0, 255};
-[[gnu::used]] static constexpr Color CYAN = {0, 255, 255, 255};
-[[gnu::used]] static constexpr Color MAGENTA = {255, 0, 255, 255};
+#define MAKE_COLOR_RAMP(NAME, COLORS...)                                                \
+    [[gnu::used]] static constexpr ColorRamp NAME##_RAMP = [](auto... v) -> ColorRamp { \
+        return {Color::fromHex(v)...};                                                  \
+    }(COLORS);                                                                          \
+    [[gnu::used]] static constexpr Color NAME = NAME##_RAMP[5];                         \
+    [[gnu::used]] static constexpr Color NAME##50 = NAME##_RAMP[0];                     \
+    [[gnu::used]] static constexpr Color NAME##100 = NAME##_RAMP[1];                    \
+    [[gnu::used]] static constexpr Color NAME##200 = NAME##_RAMP[2];                    \
+    [[gnu::used]] static constexpr Color NAME##300 = NAME##_RAMP[3];                    \
+    [[gnu::used]] static constexpr Color NAME##400 = NAME##_RAMP[4];                    \
+    [[gnu::used]] static constexpr Color NAME##500 = NAME##_RAMP[5];                    \
+    [[gnu::used]] static constexpr Color NAME##600 = NAME##_RAMP[6];                    \
+    [[gnu::used]] static constexpr Color NAME##700 = NAME##_RAMP[7];                    \
+    [[gnu::used]] static constexpr Color NAME##800 = NAME##_RAMP[8];                    \
+    [[gnu::used]] static constexpr Color NAME##900 = NAME##_RAMP[9];
 
 // from https://tailwindcss.com/docs/customizing-colors
-[[gnu::used]] static constexpr Color SLATE50 = Color::fromHex(0xf8fafc);
-[[gnu::used]] static constexpr Color SLATE100 = Color::fromHex(0xf1f5f9);
-[[gnu::used]] static constexpr Color SLATE200 = Color::fromHex(0xe2e8f0);
-[[gnu::used]] static constexpr Color SLATE300 = Color::fromHex(0xcbd5e1);
-[[gnu::used]] static constexpr Color SLATE400 = Color::fromHex(0x94a3b8);
-[[gnu::used]] static constexpr Color SLATE500 = Color::fromHex(0x64748b);
-[[gnu::used]] static constexpr Color SLATE600 = Color::fromHex(0x475569);
-[[gnu::used]] static constexpr Color SLATE700 = Color::fromHex(0x334155);
-[[gnu::used]] static constexpr Color SLATE800 = Color::fromHex(0x1e293b);
-[[gnu::used]] static constexpr Color SLATE900 = Color::fromHex(0x0f172a);
+MAKE_COLOR_RAMP(SLATE, 0xf8fafc, 0xf1f5f9, 0xe2e8f0, 0xcbd5e1, 0x94a3b8, 0x64748b, 0x475569, 0x334155, 0x1e293b, 0x0f172a)
+MAKE_COLOR_RAMP(GRAY, 0xf9fafb, 0xf3f4f6, 0xe5e7eb, 0xd1d5db, 0x9ca3af, 0x6b7280, 0x4b5563, 0x374151, 0x1f2937, 0x111827)
+MAKE_COLOR_RAMP(ZINC, 0xfafafa, 0xf4f4f5, 0xe4e4e7, 0xd4d4d8, 0xa1a1aa, 0x71717a, 0x52525b, 0x3f3f46, 0x27272a, 0x18181b)
+MAKE_COLOR_RAMP(NEUTRAL, 0xfafafa, 0xf5f5f5, 0xe5e5e5, 0xd4d4d4, 0xa3a3a3, 0x737373, 0x525252, 0x404040, 0x262626, 0x171717)
+MAKE_COLOR_RAMP(STONE, 0xfafaf9, 0xf5f5f4, 0xe7e5e4, 0xd6d3d1, 0xa8a29e, 0x78716c, 0x57534e, 0x44403c, 0x292524, 0x1c1917)
+MAKE_COLOR_RAMP(RED, 0xfef2f2, 0xfee2e2, 0xfecaca, 0xfca5a5, 0xf87171, 0xef4444, 0xdc2626, 0xb91c1c, 0x991b1b, 0x7f1d1d)
+MAKE_COLOR_RAMP(ORANGE, 0xfff7ed, 0xffedd5, 0xfed7aa, 0xfdba74, 0xfb923c, 0xf97316, 0xea580c, 0xc2410c, 0x9a3412, 0x7c2d12)
+MAKE_COLOR_RAMP(AMBER, 0xfffbeb, 0xfef3c7, 0xfde68a, 0xfcd34d, 0xfbbf24, 0xf59e0b, 0xd97706, 0xb45309, 0x92400e, 0x78350f)
+MAKE_COLOR_RAMP(YELLOW, 0xfefce8, 0xfef9c3, 0xfef08a, 0xfde047, 0xfacc15, 0xeab308, 0xca8a04, 0xa16207, 0x854d0e, 0x713f12)
+MAKE_COLOR_RAMP(LIME, 0xf7fee7, 0xecfccb, 0xd9f99d, 0xbef264, 0xa3e635, 0x84cc16, 0x65a30d, 0x4d7c0f, 0x3f6212, 0x365314)
+MAKE_COLOR_RAMP(GREEN, 0xf0fdf4, 0xdcfce7, 0xbbf7d0, 0x86efac, 0x4ade80, 0x22c55e, 0x16a34a, 0x15803d, 0x166534, 0x14532d)
+MAKE_COLOR_RAMP(EMERALD, 0xecfdf5, 0xd1fae5, 0xa7f3d0, 0x6ee7b7, 0x34d399, 0x10b981, 0x059669, 0x047857, 0x065f46, 0x064e3b)
+MAKE_COLOR_RAMP(TEAL, 0xf0fdfa, 0xccfbf1, 0x99f6e4, 0x5eead4, 0x2dd4bf, 0x14b8a6, 0x0d9488, 0x0f766e, 0x115e59, 0x134e4a)
+MAKE_COLOR_RAMP(CYAN, 0xecfeff, 0xcffafe, 0xa5f3fc, 0x67e8f9, 0x22d3ee, 0x06b6d4, 0x0891b2, 0x0e7490, 0x155e75, 0x164e63)
+MAKE_COLOR_RAMP(SKY, 0xf0f9ff, 0xe0f2fe, 0xbae6fd, 0x7dd3fc, 0x38bdf8, 0x0ea5e9, 0x0284c7, 0x0369a1, 0x075985, 0x0c4a6e)
+MAKE_COLOR_RAMP(BLUE, 0xeff6ff, 0xdbeafe, 0xbfdbfe, 0x93c5fd, 0x60a5fa, 0x3b82f6, 0x2563eb, 0x1d4ed8, 0x1e40af, 0x1e3a8a)
+MAKE_COLOR_RAMP(INDIGO, 0xeef2ff, 0xe0e7ff, 0xc7d2fe, 0xa5b4fc, 0x818cf8, 0x6366f1, 0x4f46e5, 0x4338ca, 0x3730a3, 0x312e81)
+MAKE_COLOR_RAMP(VIOLET, 0xf5f3ff, 0xede9fe, 0xddd6fe, 0xc4b5fd, 0xa78bfa, 0x8b5cf6, 0x7c3aed, 0x6d28d9, 0x5b21b6, 0x4c1d95)
+MAKE_COLOR_RAMP(PURPLE, 0xfaf5ff, 0xf3e8ff, 0xe9d5ff, 0xd8b4fe, 0xc084fc, 0xa855f7, 0x9333ea, 0x7e22ce, 0x6b21a8, 0x581c87)
+MAKE_COLOR_RAMP(FUCHSIA, 0xfdf4ff, 0xfae8ff, 0xf5d0fe, 0xf0abfc, 0xe879f9, 0xd946ef, 0xc026d3, 0xa21caf, 0x86198f, 0x701a75)
+MAKE_COLOR_RAMP(PINK, 0xfdf2f8, 0xfce7f3, 0xfbcfe8, 0xf9a8d4, 0xf472b6, 0xec4899, 0xdb2777, 0xbe185d, 0x9d174d, 0x831843)
+MAKE_COLOR_RAMP(ROSE, 0xfff1f2, 0xffe4e6, 0xfecdd3, 0xfda4af, 0xfb7185, 0xf43f5e, 0xe11d48, 0xbe123c, 0x9f1239, 0x881337)
 
-[[gnu::used]] static constexpr Color GRAY50 = Color::fromHex(0xf9fafb);
-[[gnu::used]] static constexpr Color GRAY100 = Color::fromHex(0xf3f4f6);
-[[gnu::used]] static constexpr Color GRAY200 = Color::fromHex(0xe5e7eb);
-[[gnu::used]] static constexpr Color GRAY300 = Color::fromHex(0xd1d5db);
-[[gnu::used]] static constexpr Color GRAY400 = Color::fromHex(0x9ca3af);
-[[gnu::used]] static constexpr Color GRAY500 = Color::fromHex(0x6b7280);
-[[gnu::used]] static constexpr Color GRAY600 = Color::fromHex(0x4b5563);
-[[gnu::used]] static constexpr Color GRAY700 = Color::fromHex(0x374151);
-[[gnu::used]] static constexpr Color GRAY800 = Color::fromHex(0x1f2937);
-[[gnu::used]] static constexpr Color GRAY900 = Color::fromHex(0x111827);
+[[gnu::used]] static constexpr Array<ColorRamp, 22> RAMPS = {
+    SLATE_RAMP, GRAY_RAMP, ZINC_RAMP, NEUTRAL_RAMP,
+    STONE_RAMP, RED_RAMP, ORANGE_RAMP, AMBER_RAMP,
+    YELLOW_RAMP, LIME_RAMP, GREEN_RAMP, EMERALD_RAMP,
+    TEAL_RAMP, CYAN_RAMP, SKY_RAMP, BLUE_RAMP,
+    INDIGO_RAMP, VIOLET_RAMP, PURPLE_RAMP, FUCHSIA_RAMP,
+    PINK_RAMP, ROSE_RAMP};
 
-[[gnu::used]] static constexpr Color ZINC50 = Color::fromHex(0xfafafa);
-[[gnu::used]] static constexpr Color ZINC100 = Color::fromHex(0xf4f4f5);
-[[gnu::used]] static constexpr Color ZINC200 = Color::fromHex(0xe4e4e7);
-[[gnu::used]] static constexpr Color ZINC300 = Color::fromHex(0xd4d4d8);
-[[gnu::used]] static constexpr Color ZINC400 = Color::fromHex(0xa1a1aa);
-[[gnu::used]] static constexpr Color ZINC500 = Color::fromHex(0x71717a);
-[[gnu::used]] static constexpr Color ZINC600 = Color::fromHex(0x52525b);
-[[gnu::used]] static constexpr Color ZINC700 = Color::fromHex(0x3f3f46);
-[[gnu::used]] static constexpr Color ZINC800 = Color::fromHex(0x27272a);
-[[gnu::used]] static constexpr Color ZINC900 = Color::fromHex(0x18181b);
-
-[[gnu::used]] static constexpr Color NEUTRAL50 = Color::fromHex(0xfafafa);
-[[gnu::used]] static constexpr Color NEUTRAL100 = Color::fromHex(0xf5f5f5);
-[[gnu::used]] static constexpr Color NEUTRAL200 = Color::fromHex(0xe5e5e5);
-[[gnu::used]] static constexpr Color NEUTRAL300 = Color::fromHex(0xd4d4d4);
-[[gnu::used]] static constexpr Color NEUTRAL400 = Color::fromHex(0xa3a3a3);
-[[gnu::used]] static constexpr Color NEUTRAL500 = Color::fromHex(0x737373);
-[[gnu::used]] static constexpr Color NEUTRAL600 = Color::fromHex(0x525252);
-[[gnu::used]] static constexpr Color NEUTRAL700 = Color::fromHex(0x404040);
-[[gnu::used]] static constexpr Color NEUTRAL800 = Color::fromHex(0x262626);
-[[gnu::used]] static constexpr Color NEUTRAL900 = Color::fromHex(0x171717);
-
-[[gnu::used]] static constexpr Color STONE50 = Color::fromHex(0xfafaf9);
-[[gnu::used]] static constexpr Color STONE100 = Color::fromHex(0xf5f5f4);
-[[gnu::used]] static constexpr Color STONE200 = Color::fromHex(0xe7e5e4);
-[[gnu::used]] static constexpr Color STONE300 = Color::fromHex(0xd6d3d1);
-[[gnu::used]] static constexpr Color STONE400 = Color::fromHex(0xa8a29e);
-[[gnu::used]] static constexpr Color STONE500 = Color::fromHex(0x78716c);
-[[gnu::used]] static constexpr Color STONE600 = Color::fromHex(0x57534e);
-[[gnu::used]] static constexpr Color STONE700 = Color::fromHex(0x44403c);
-[[gnu::used]] static constexpr Color STONE800 = Color::fromHex(0x292524);
-[[gnu::used]] static constexpr Color STONE900 = Color::fromHex(0x1c1917);
-
-[[gnu::used]] static constexpr Color RED50 = Color::fromHex(0xfef2f2);
-[[gnu::used]] static constexpr Color RED100 = Color::fromHex(0xfee2e2);
-[[gnu::used]] static constexpr Color RED200 = Color::fromHex(0xfecaca);
-[[gnu::used]] static constexpr Color RED300 = Color::fromHex(0xfca5a5);
-[[gnu::used]] static constexpr Color RED400 = Color::fromHex(0xf87171);
-[[gnu::used]] static constexpr Color RED500 = Color::fromHex(0xef4444);
-[[gnu::used]] static constexpr Color RED600 = Color::fromHex(0xdc2626);
-[[gnu::used]] static constexpr Color RED700 = Color::fromHex(0xb91c1c);
-[[gnu::used]] static constexpr Color RED800 = Color::fromHex(0x991b1b);
-[[gnu::used]] static constexpr Color RED900 = Color::fromHex(0x7f1d1d);
-
-[[gnu::used]] static constexpr Color ORANGE50 = Color::fromHex(0xfff7ed);
-[[gnu::used]] static constexpr Color ORANGE100 = Color::fromHex(0xffedd5);
-[[gnu::used]] static constexpr Color ORANGE200 = Color::fromHex(0xfed7aa);
-[[gnu::used]] static constexpr Color ORANGE300 = Color::fromHex(0xfdba74);
-[[gnu::used]] static constexpr Color ORANGE400 = Color::fromHex(0xfb923c);
-[[gnu::used]] static constexpr Color ORANGE500 = Color::fromHex(0xf97316);
-[[gnu::used]] static constexpr Color ORANGE600 = Color::fromHex(0xea580c);
-[[gnu::used]] static constexpr Color ORANGE700 = Color::fromHex(0xc2410c);
-[[gnu::used]] static constexpr Color ORANGE800 = Color::fromHex(0x9a3412);
-[[gnu::used]] static constexpr Color ORANGE900 = Color::fromHex(0x7c2d12);
-
-[[gnu::used]] static constexpr Color AMBER50 = Color::fromHex(0xfffbeb);
-[[gnu::used]] static constexpr Color AMBER100 = Color::fromHex(0xfef3c7);
-[[gnu::used]] static constexpr Color AMBER200 = Color::fromHex(0xfde68a);
-[[gnu::used]] static constexpr Color AMBER300 = Color::fromHex(0xfcd34d);
-[[gnu::used]] static constexpr Color AMBER400 = Color::fromHex(0xfbbf24);
-[[gnu::used]] static constexpr Color AMBER500 = Color::fromHex(0xf59e0b);
-[[gnu::used]] static constexpr Color AMBER600 = Color::fromHex(0xd97706);
-[[gnu::used]] static constexpr Color AMBER700 = Color::fromHex(0xb45309);
-[[gnu::used]] static constexpr Color AMBER800 = Color::fromHex(0x92400e);
-[[gnu::used]] static constexpr Color AMBER900 = Color::fromHex(0x78350f);
-
-[[gnu::used]] static constexpr Color YELLOW50 = Color::fromHex(0xfefce8);
-[[gnu::used]] static constexpr Color YELLOW100 = Color::fromHex(0xfef9c3);
-[[gnu::used]] static constexpr Color YELLOW200 = Color::fromHex(0xfef08a);
-[[gnu::used]] static constexpr Color YELLOW300 = Color::fromHex(0xfde047);
-[[gnu::used]] static constexpr Color YELLOW400 = Color::fromHex(0xfacc15);
-[[gnu::used]] static constexpr Color YELLOW500 = Color::fromHex(0xeab308);
-[[gnu::used]] static constexpr Color YELLOW600 = Color::fromHex(0xca8a04);
-[[gnu::used]] static constexpr Color YELLOW700 = Color::fromHex(0xa16207);
-[[gnu::used]] static constexpr Color YELLOW800 = Color::fromHex(0x854d0e);
-[[gnu::used]] static constexpr Color YELLOW900 = Color::fromHex(0x713f12);
-
-[[gnu::used]] static constexpr Color LIME50 = Color::fromHex(0xf7fee7);
-[[gnu::used]] static constexpr Color LIME100 = Color::fromHex(0xecfccb);
-[[gnu::used]] static constexpr Color LIME200 = Color::fromHex(0xd9f99d);
-[[gnu::used]] static constexpr Color LIME300 = Color::fromHex(0xbef264);
-[[gnu::used]] static constexpr Color LIME400 = Color::fromHex(0xa3e635);
-[[gnu::used]] static constexpr Color LIME500 = Color::fromHex(0x84cc16);
-[[gnu::used]] static constexpr Color LIME600 = Color::fromHex(0x65a30d);
-[[gnu::used]] static constexpr Color LIME700 = Color::fromHex(0x4d7c0f);
-[[gnu::used]] static constexpr Color LIME800 = Color::fromHex(0x3f6212);
-[[gnu::used]] static constexpr Color LIME900 = Color::fromHex(0x365314);
-
-[[gnu::used]] static constexpr Color GREEN50 = Color::fromHex(0xf0fdf4);
-[[gnu::used]] static constexpr Color GREEN100 = Color::fromHex(0xdcfce7);
-[[gnu::used]] static constexpr Color GREEN200 = Color::fromHex(0xbbf7d0);
-[[gnu::used]] static constexpr Color GREEN300 = Color::fromHex(0x86efac);
-[[gnu::used]] static constexpr Color GREEN400 = Color::fromHex(0x4ade80);
-[[gnu::used]] static constexpr Color GREEN500 = Color::fromHex(0x22c55e);
-[[gnu::used]] static constexpr Color GREEN600 = Color::fromHex(0x16a34a);
-[[gnu::used]] static constexpr Color GREEN700 = Color::fromHex(0x15803d);
-[[gnu::used]] static constexpr Color GREEN800 = Color::fromHex(0x166534);
-[[gnu::used]] static constexpr Color GREEN900 = Color::fromHex(0x14532d);
-
-[[gnu::used]] static constexpr Color EMERALD50 = Color::fromHex(0xecfdf5);
-[[gnu::used]] static constexpr Color EMERALD100 = Color::fromHex(0xd1fae5);
-[[gnu::used]] static constexpr Color EMERALD200 = Color::fromHex(0xa7f3d0);
-[[gnu::used]] static constexpr Color EMERALD300 = Color::fromHex(0x6ee7b7);
-[[gnu::used]] static constexpr Color EMERALD400 = Color::fromHex(0x34d399);
-[[gnu::used]] static constexpr Color EMERALD500 = Color::fromHex(0x10b981);
-[[gnu::used]] static constexpr Color EMERALD600 = Color::fromHex(0x059669);
-[[gnu::used]] static constexpr Color EMERALD700 = Color::fromHex(0x047857);
-[[gnu::used]] static constexpr Color EMERALD800 = Color::fromHex(0x065f46);
-[[gnu::used]] static constexpr Color EMERALD900 = Color::fromHex(0x064e3b);
-
-[[gnu::used]] static constexpr Color TEAL50 = Color::fromHex(0xf0fdfa);
-[[gnu::used]] static constexpr Color TEAL100 = Color::fromHex(0xccfbf1);
-[[gnu::used]] static constexpr Color TEAL200 = Color::fromHex(0x99f6e4);
-[[gnu::used]] static constexpr Color TEAL300 = Color::fromHex(0x5eead4);
-[[gnu::used]] static constexpr Color TEAL400 = Color::fromHex(0x2dd4bf);
-[[gnu::used]] static constexpr Color TEAL500 = Color::fromHex(0x14b8a6);
-[[gnu::used]] static constexpr Color TEAL600 = Color::fromHex(0x0d9488);
-[[gnu::used]] static constexpr Color TEAL700 = Color::fromHex(0x0f766e);
-[[gnu::used]] static constexpr Color TEAL800 = Color::fromHex(0x115e59);
-[[gnu::used]] static constexpr Color TEAL900 = Color::fromHex(0x134e4a);
-
-[[gnu::used]] static constexpr Color CYAN50 = Color::fromHex(0xecfeff);
-[[gnu::used]] static constexpr Color CYAN100 = Color::fromHex(0xcffafe);
-[[gnu::used]] static constexpr Color CYAN200 = Color::fromHex(0xa5f3fc);
-[[gnu::used]] static constexpr Color CYAN300 = Color::fromHex(0x67e8f9);
-[[gnu::used]] static constexpr Color CYAN400 = Color::fromHex(0x22d3ee);
-[[gnu::used]] static constexpr Color CYAN500 = Color::fromHex(0x06b6d4);
-[[gnu::used]] static constexpr Color CYAN600 = Color::fromHex(0x0891b2);
-[[gnu::used]] static constexpr Color CYAN700 = Color::fromHex(0x0e7490);
-[[gnu::used]] static constexpr Color CYAN800 = Color::fromHex(0x155e75);
-[[gnu::used]] static constexpr Color CYAN900 = Color::fromHex(0x164e63);
-
-[[gnu::used]] static constexpr Color SKY50 = Color::fromHex(0xf0f9ff);
-[[gnu::used]] static constexpr Color SKY100 = Color::fromHex(0xe0f2fe);
-[[gnu::used]] static constexpr Color SKY200 = Color::fromHex(0xbae6fd);
-[[gnu::used]] static constexpr Color SKY300 = Color::fromHex(0x7dd3fc);
-[[gnu::used]] static constexpr Color SKY400 = Color::fromHex(0x38bdf8);
-[[gnu::used]] static constexpr Color SKY500 = Color::fromHex(0x0ea5e9);
-[[gnu::used]] static constexpr Color SKY600 = Color::fromHex(0x0284c7);
-[[gnu::used]] static constexpr Color SKY700 = Color::fromHex(0x0369a1);
-[[gnu::used]] static constexpr Color SKY800 = Color::fromHex(0x075985);
-[[gnu::used]] static constexpr Color SKY900 = Color::fromHex(0x0c4a6e);
-
-[[gnu::used]] static constexpr Color BLUE50 = Color::fromHex(0xeff6ff);
-[[gnu::used]] static constexpr Color BLUE100 = Color::fromHex(0xdbeafe);
-[[gnu::used]] static constexpr Color BLUE200 = Color::fromHex(0xbfdbfe);
-[[gnu::used]] static constexpr Color BLUE300 = Color::fromHex(0x93c5fd);
-[[gnu::used]] static constexpr Color BLUE400 = Color::fromHex(0x60a5fa);
-[[gnu::used]] static constexpr Color BLUE500 = Color::fromHex(0x3b82f6);
-[[gnu::used]] static constexpr Color BLUE600 = Color::fromHex(0x2563eb);
-[[gnu::used]] static constexpr Color BLUE700 = Color::fromHex(0x1d4ed8);
-[[gnu::used]] static constexpr Color BLUE800 = Color::fromHex(0x1e40af);
-[[gnu::used]] static constexpr Color BLUE900 = Color::fromHex(0x1e3a8a);
-
-[[gnu::used]] static constexpr Color INDIGO50 = Color::fromHex(0xeef2ff);
-[[gnu::used]] static constexpr Color INDIGO100 = Color::fromHex(0xe0e7ff);
-[[gnu::used]] static constexpr Color INDIGO200 = Color::fromHex(0xc7d2fe);
-[[gnu::used]] static constexpr Color INDIGO300 = Color::fromHex(0xa5b4fc);
-[[gnu::used]] static constexpr Color INDIGO400 = Color::fromHex(0x818cf8);
-[[gnu::used]] static constexpr Color INDIGO500 = Color::fromHex(0x6366f1);
-[[gnu::used]] static constexpr Color INDIGO600 = Color::fromHex(0x4f46e5);
-[[gnu::used]] static constexpr Color INDIGO700 = Color::fromHex(0x4338ca);
-[[gnu::used]] static constexpr Color INDIGO800 = Color::fromHex(0x3730a3);
-[[gnu::used]] static constexpr Color INDIGO900 = Color::fromHex(0x312e81);
-
-[[gnu::used]] static constexpr Color VIOLET50 = Color::fromHex(0xf5f3ff);
-[[gnu::used]] static constexpr Color VIOLET100 = Color::fromHex(0xede9fe);
-[[gnu::used]] static constexpr Color VIOLET200 = Color::fromHex(0xddd6fe);
-[[gnu::used]] static constexpr Color VIOLET300 = Color::fromHex(0xc4b5fd);
-[[gnu::used]] static constexpr Color VIOLET400 = Color::fromHex(0xa78bfa);
-[[gnu::used]] static constexpr Color VIOLET500 = Color::fromHex(0x8b5cf6);
-[[gnu::used]] static constexpr Color VIOLET600 = Color::fromHex(0x7c3aed);
-[[gnu::used]] static constexpr Color VIOLET700 = Color::fromHex(0x6d28d9);
-[[gnu::used]] static constexpr Color VIOLET800 = Color::fromHex(0x5b21b6);
-[[gnu::used]] static constexpr Color VIOLET900 = Color::fromHex(0x4c1d95);
-
-[[gnu::used]] static constexpr Color PURPLE50 = Color::fromHex(0xfaf5ff);
-[[gnu::used]] static constexpr Color PURPLE100 = Color::fromHex(0xf3e8ff);
-[[gnu::used]] static constexpr Color PURPLE200 = Color::fromHex(0xe9d5ff);
-[[gnu::used]] static constexpr Color PURPLE300 = Color::fromHex(0xd8b4fe);
-[[gnu::used]] static constexpr Color PURPLE400 = Color::fromHex(0xc084fc);
-[[gnu::used]] static constexpr Color PURPLE500 = Color::fromHex(0xa855f7);
-[[gnu::used]] static constexpr Color PURPLE600 = Color::fromHex(0x9333ea);
-[[gnu::used]] static constexpr Color PURPLE700 = Color::fromHex(0x7e22ce);
-[[gnu::used]] static constexpr Color PURPLE800 = Color::fromHex(0x6b21a8);
-[[gnu::used]] static constexpr Color PURPLE900 = Color::fromHex(0x581c87);
-
-[[gnu::used]] static constexpr Color FUCHSIA50 = Color::fromHex(0xfdf4ff);
-[[gnu::used]] static constexpr Color FUCHSIA100 = Color::fromHex(0xfae8ff);
-[[gnu::used]] static constexpr Color FUCHSIA200 = Color::fromHex(0xf5d0fe);
-[[gnu::used]] static constexpr Color FUCHSIA300 = Color::fromHex(0xf0abfc);
-[[gnu::used]] static constexpr Color FUCHSIA400 = Color::fromHex(0xe879f9);
-[[gnu::used]] static constexpr Color FUCHSIA500 = Color::fromHex(0xd946ef);
-[[gnu::used]] static constexpr Color FUCHSIA600 = Color::fromHex(0xc026d3);
-[[gnu::used]] static constexpr Color FUCHSIA700 = Color::fromHex(0xa21caf);
-[[gnu::used]] static constexpr Color FUCHSIA800 = Color::fromHex(0x86198f);
-[[gnu::used]] static constexpr Color FUCHSIA900 = Color::fromHex(0x701a75);
-
-[[gnu::used]] static constexpr Color PINK50 = Color::fromHex(0xfdf2f8);
-[[gnu::used]] static constexpr Color PINK100 = Color::fromHex(0xfce7f3);
-[[gnu::used]] static constexpr Color PINK200 = Color::fromHex(0xfbcfe8);
-[[gnu::used]] static constexpr Color PINK300 = Color::fromHex(0xf9a8d4);
-[[gnu::used]] static constexpr Color PINK400 = Color::fromHex(0xf472b6);
-[[gnu::used]] static constexpr Color PINK500 = Color::fromHex(0xec4899);
-[[gnu::used]] static constexpr Color PINK600 = Color::fromHex(0xdb2777);
-[[gnu::used]] static constexpr Color PINK700 = Color::fromHex(0xbe185d);
-[[gnu::used]] static constexpr Color PINK800 = Color::fromHex(0x9d174d);
-[[gnu::used]] static constexpr Color PINK900 = Color::fromHex(0x831843);
-
-[[gnu::used]] static constexpr Color ROSE50 = Color::fromHex(0xfff1f2);
-[[gnu::used]] static constexpr Color ROSE100 = Color::fromHex(0xffe4e6);
-[[gnu::used]] static constexpr Color ROSE200 = Color::fromHex(0xfecdd3);
-[[gnu::used]] static constexpr Color ROSE300 = Color::fromHex(0xfda4af);
-[[gnu::used]] static constexpr Color ROSE400 = Color::fromHex(0xfb7185);
-[[gnu::used]] static constexpr Color ROSE500 = Color::fromHex(0xf43f5e);
-[[gnu::used]] static constexpr Color ROSE600 = Color::fromHex(0xe11d48);
-[[gnu::used]] static constexpr Color ROSE700 = Color::fromHex(0xbe123c);
-[[gnu::used]] static constexpr Color ROSE800 = Color::fromHex(0x9f1239);
-[[gnu::used]] static constexpr Color ROSE900 = Color::fromHex(0x881337);
-
-[[gnu::used]] static constexpr Array<Color, 220> COLORS = {
-    SLATE50, SLATE100, SLATE200, SLATE300, SLATE400, SLATE500, SLATE600, SLATE700, SLATE800, SLATE900,
-    GRAY50, GRAY100, GRAY200, GRAY300, GRAY400, GRAY500, GRAY600, GRAY700, GRAY800, GRAY900,
-    ZINC50, ZINC100, ZINC200, ZINC300, ZINC400, ZINC500, ZINC600, ZINC700, ZINC800, ZINC900,
-    NEUTRAL50, NEUTRAL100, NEUTRAL200, NEUTRAL300, NEUTRAL400, NEUTRAL500, NEUTRAL600, NEUTRAL700, NEUTRAL800, NEUTRAL900,
-    STONE50, STONE100, STONE200, STONE300, STONE400, STONE500, STONE600, STONE700, STONE800, STONE900,
-    RED50, RED100, RED200, RED300, RED400, RED500, RED600, RED700, RED800, RED900,
-    ORANGE50, ORANGE100, ORANGE200, ORANGE300, ORANGE400, ORANGE500, ORANGE600, ORANGE700, ORANGE800, ORANGE900,
-    AMBER50, AMBER100, AMBER200, AMBER300, AMBER400, AMBER500, AMBER600, AMBER700, AMBER800, AMBER900,
-    YELLOW50, YELLOW100, YELLOW200, YELLOW300, YELLOW400, YELLOW500, YELLOW600, YELLOW700, YELLOW800, YELLOW900,
-    LIME50, LIME100, LIME200, LIME300, LIME400, LIME500, LIME600, LIME700, LIME800, LIME900,
-    GREEN50, GREEN100, GREEN200, GREEN300, GREEN400, GREEN500, GREEN600, GREEN700, GREEN800, GREEN900,
-    EMERALD50, EMERALD100, EMERALD200, EMERALD300, EMERALD400, EMERALD500, EMERALD600, EMERALD700, EMERALD800, EMERALD900,
-    TEAL50, TEAL100, TEAL200, TEAL300, TEAL400, TEAL500, TEAL600, TEAL700, TEAL800, TEAL900,
-    CYAN50, CYAN100, CYAN200, CYAN300, CYAN400, CYAN500, CYAN600, CYAN700, CYAN800, CYAN900,
-    SKY50, SKY100, SKY200, SKY300, SKY400, SKY500, SKY600, SKY700, SKY800, SKY900,
-    BLUE50, BLUE100, BLUE200, BLUE300, BLUE400, BLUE500, BLUE600, BLUE700, BLUE800, BLUE900,
-    INDIGO50, INDIGO100, INDIGO200, INDIGO300, INDIGO400, INDIGO500, INDIGO600, INDIGO700, INDIGO800, INDIGO900,
-    VIOLET50, VIOLET100, VIOLET200, VIOLET300, VIOLET400, VIOLET500, VIOLET600, VIOLET700, VIOLET800, VIOLET900,
-    PURPLE50, PURPLE100, PURPLE200, PURPLE300, PURPLE400, PURPLE500, PURPLE600, PURPLE700, PURPLE800, PURPLE900,
-    FUCHSIA50, FUCHSIA100, FUCHSIA200, FUCHSIA300, FUCHSIA400, FUCHSIA500, FUCHSIA600, FUCHSIA700, FUCHSIA800, FUCHSIA900,
-    PINK50, PINK100, PINK200, PINK300, PINK400, PINK500, PINK600, PINK700, PINK800, PINK900,
-    ROSE50, ROSE100, ROSE200, ROSE300, ROSE400, ROSE500, ROSE600, ROSE700, ROSE800, ROSE900};
+[[gnu::used]] static constexpr Array<Color, 22> COLORS = {
+    SLATE, GRAY, ZINC, NEUTRAL,
+    STONE, RED, ORANGE, AMBER,
+    YELLOW, LIME, GREEN, EMERALD,
+    TEAL, CYAN, SKY, BLUE,
+    INDIGO, VIOLET, PURPLE, FUCHSIA,
+    PINK, ROSE};
 
 static inline Color randomColor() {
     static Math::Rand rand;

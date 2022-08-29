@@ -28,8 +28,8 @@ static inline Child grow(int grow, Child child) {
     return makeStrong<Grow>(grow, child);
 }
 
-static inline Child spacer(int g = 1) {
-    return grow(g, empty());
+static inline Child spacer(int s = 0, int g = 1) {
+    return grow(g, empty(s));
 }
 
 struct FlowLayout : public Group<FlowLayout> {

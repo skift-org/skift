@@ -9,8 +9,8 @@ struct BoxStyle {
     Layout::Spacingi spacing{};
     double borderRadius{};
     double borderWidth{};
-    Gfx::Color borderColor{Gfx::TRANSPARENT};
-    Gfx::Color backgroundColor{Gfx::TRANSPARENT};
+    Gfx::Color borderColor{Gfx::ALPHA};
+    Gfx::Color backgroundColor{Gfx::ALPHA};
     Gfx::Color foregroundColor{Gfx::WHITE};
 };
 

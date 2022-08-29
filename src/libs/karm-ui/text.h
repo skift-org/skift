@@ -25,7 +25,11 @@ struct Text : public View<Text> {
         g.fill(baseline, _text);
 
         if (DEBUG) {
-            g._line({bound().topStart() + m.baseline.cast<int>(), bound().topEnd() + m.baseline.cast<int>()}, Gfx::MAGENTA);
+            g._line({
+                        bound().topStart() + m.baseline.cast<int>(),
+                        bound().topEnd() + m.baseline.cast<int>(),
+                    },
+                    Gfx::PINK);
             g._rect(bound(), Gfx::CYAN);
         }
     }
@@ -42,6 +46,15 @@ static inline Child text(Str text) {
 template <typename... Args>
 static inline Child text(Str format, Args &&...args) {
     return makeStrong<Text>(Media::loadFont(12, "res/fonts/inter/Inter-Medium.ttf").unwrap(), Fmt::format(format, std::forward<Args>(args)...));
+}
+
+static inline Child text(int size, Str text) {
+    return makeStrong<Text>(Media::loadFont(size, "res/fonts/inter/Inter-Medium.ttf").unwrap(), text);
+}
+
+template <typename... Args>
+static inline Child text(int size, Str format, Args &&...args) {
+    return makeStrong<Text>(Media::loadFont(size, "res/fonts/inter/Inter-Medium.ttf").unwrap(), Fmt::format(format, std::forward<Args>(args)...));
 }
 
 static inline Child text(Media::Font font, Str text) {

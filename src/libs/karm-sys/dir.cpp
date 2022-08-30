@@ -5,7 +5,11 @@
 namespace Karm::Sys {
 
 Result<Dir> Dir::open(Path path) {
-    return Dir{try$(Embed::readDir(path)), path};
+    auto entries = try$(Embed::readDir(path));
+    sort(entries, [](auto const &lhs, auto const &rhs) {
+        return cmp(lhs.name, rhs.name);
+    });
+    return Dir{entries, path};
 }
 
 } // namespace Karm::Sys

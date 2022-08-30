@@ -1,0 +1,9 @@
+{
+    "id": "file-manager",
+    "type": "exe",
+    "description": "Manage files and folders",
+    "deps": [
+        "karm-main",
+        "karm-ui"
+    ]
+}

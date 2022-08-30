@@ -10,9 +10,6 @@
 
 namespace Karm {
 
-
-
-
 template <typename T>
 struct Box {
     T *_ptr{};

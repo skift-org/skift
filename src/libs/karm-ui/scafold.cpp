@@ -52,8 +52,10 @@ struct Separator : public View<Separator> {
     }
 
     void paint(Gfx::Context &g, Math::Recti) override {
+        g.save();
         g.fillStyle(Gfx::ZINC700);
         g.fill(bound());
+        g.restore();
     }
 };
 

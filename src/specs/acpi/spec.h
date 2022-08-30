@@ -7,7 +7,7 @@ namespace Acpi {
 struct [[gnu::packed]] Rsdp {
     Array<char, 8> signature;
     uint8_t checksum;
-    Array<char, 6> OEM_id;
+    Array<char, 6> oemId;
     uint8_t revision;
     uint32_t rsdt;
 };
@@ -17,11 +17,11 @@ struct [[gnu::packed]] Sdth {
     uint32_t len;
     uint8_t revision;
     uint8_t checksum;
-    Array<char, 6> oem_id;
-    Array<char, 8> oem_table_id;
-    uint32_t oem_revision;
-    uint32_t creator_id;
-    uint32_t creator_revision;
+    Array<char, 6> oemId;
+    Array<char, 8> oemTableId;
+    uint32_t oemRevision;
+    uint32_t creatorId;
+    uint32_t creatorRevision;
 };
 
 struct [[gnu::packed]] Rsdt : public Sdth {
@@ -43,7 +43,7 @@ struct [[gnu::packed]] Madt : public Sdth {
     };
 
     struct [[gnu::packed]] LapicRecord : public Record {
-        uint8_t processor_id;
+        uint8_t processorId;
         uint8_t id;
         uint32_t flags;
     };
@@ -52,7 +52,7 @@ struct [[gnu::packed]] Madt : public Sdth {
         uint8_t id;
         uint8_t reserved;
         uint32_t address;
-        uint32_t interrupt_base;
+        uint32_t interruptBase;
     };
 
     struct [[gnu::packed]] IsoRecord : public Record {
@@ -72,8 +72,8 @@ struct [[gnu::packed]] Mcfg : public Sdth {
     struct Record {
         uint64_t address;
         uint16_t segment_groupe;
-        uint8_t bus_start;
-        uint8_t bus_end;
+        uint8_t busStart;
+        uint8_t busEnd;
         uint32_t reserved;
     };
 
@@ -82,17 +82,17 @@ struct [[gnu::packed]] Mcfg : public Sdth {
 };
 
 struct [[gnu::packed]] Hpet : public Sdth {
-    uint8_t hardware_rev_id;
+    uint8_t hardwareRevId;
     uint8_t info;
-    uint16_t pci_vendor_id;
-    uint8_t address_space_id;
-    uint8_t register_bit_width;
-    uint8_t register_bit_offset;
+    uint16_t pciVendorId;
+    uint8_t addressSpaceId;
+    uint8_t registerBitWidth;
+    uint8_t registerBitOffset;
     uint8_t reserved1;
     uint64_t address;
-    uint8_t hpet_number;
-    uint16_t minimum_tick;
-    uint8_t page_protection;
+    uint8_t hpetNumber;
+    uint16_t minimumTick;
+    uint8_t pageProtection;
 };
 
 } // namespace Acpi

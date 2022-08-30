@@ -1,7 +1,7 @@
 #include <hjert/arch.h>
 #include <karm-debug/logger.h>
 
-#include <arch-x86_64/asm.h>
+#include <hal-x86_64/asm.h>
 
 #include "ints.h"
 

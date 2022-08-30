@@ -2,7 +2,7 @@
 #include <karm-base/align.h>
 #include <loader/fw.h>
 
-#include <arch-x86_64/vmm.h>
+#include <hal-x86_64/vmm.h>
 
 namespace Loader::Fw {
 

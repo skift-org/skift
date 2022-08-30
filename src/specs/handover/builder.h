@@ -31,6 +31,15 @@ struct Builder {
         if (_size < sizeof(Record))
             return;
 
+        for (size_t i = 0; i < payload().len; i++) {
+            if (record(i).tag == r.tag &&
+                record(i).end() == r.start &&
+                shouldMerge(r.tag)) {
+                record(i).size += r.size;
+                return;
+            }
+        }
+
         record(payload().len) = r;
         payload().len++;
     }
@@ -54,10 +63,6 @@ struct Builder {
 
     void agent(Str str) {
         payload().agent = add(str);
-    }
-
-    Payload &finalize() {
-        return *(Payload *)_buf;
     }
 };
 

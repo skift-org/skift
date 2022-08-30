@@ -54,6 +54,16 @@ static char const *tagName(Tag tag) {
     return "UNKNOWN";
 }
 
+static inline bool shouldMerge(Tag tag) {
+    switch (tag) {
+    case Tag::FREE:
+    case Tag::LOADER:
+        return true;
+    default:
+        return false;
+    }
+}
+
 struct Record {
     Tag tag;
     uint32_t flags;

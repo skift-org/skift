@@ -1,10 +1,10 @@
 #include <hjert/arch.h>
 #include <karm-debug/logger.h>
 
-#include <arch-x86_64/com.h>
-#include <arch-x86_64/cpuid.h>
-#include <arch-x86_64/gdt.h>
-#include <arch-x86_64/idt.h>
+#include <hal-x86_64/com.h>
+#include <hal-x86_64/cpuid.h>
+#include <hal-x86_64/gdt.h>
+#include <hal-x86_64/idt.h>
 
 #include "ints.h"
 

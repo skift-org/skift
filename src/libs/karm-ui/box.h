@@ -71,9 +71,8 @@ struct Box : public _Box<Box> {
     }
 };
 
-template <typename... T>
-Child box(T &&...args) {
-    return makeStrong<Box>(std::forward<T>(args)...);
+static inline Child box(BoxStyle style, Child child) {
+    return makeStrong<Box>(style, child);
 }
 
 struct Spacing : public Proxy<Spacing> {

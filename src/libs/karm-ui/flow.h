@@ -32,23 +32,19 @@ static inline Child spacer(int s = 0, int g = 1) {
     return grow(g, empty(s));
 }
 
+struct FlowStyle {
+    Layout::Flow flow = Layout::Flow::LEFT_TO_RIGHT;
+    Layout::Align align = Layout::Align::FILL;
+    int gaps{};
+};
+
 struct FlowLayout : public Group<FlowLayout> {
     using Group::Group;
 
-    Layout::Flow _flow = Layout::Flow::LEFT_TO_RIGHT;
-    int _gaps{};
+    FlowStyle _style;
 
-    FlowLayout(Children children)
-        : Group(children) {}
-
-    FlowLayout(Layout::Flow flow, Children children)
-        : Group(children), _flow(flow) {}
-
-    FlowLayout(int gaps, Children children)
-        : Group(children), _gaps(gaps) {}
-
-    FlowLayout(Layout::Flow flow, int gaps, Children children)
-        : Group(children), _flow(flow), _gaps(gaps) {}
+    FlowLayout(FlowStyle style, Children children)
+        : Group(children), _style(style) {}
 
     void layout(Math::Recti r) override {
         _bound = r;
@@ -59,36 +55,37 @@ struct FlowLayout : public Group<FlowLayout> {
             if (child.is<Grow>()) {
                 grows += child.unwrap<Grow>().grow();
             } else {
-                total += _flow.getX(child->size(r.size(), Layout::Hint::MIN));
+                total += _style.flow.getX(child->size(r.size(), Layout::Hint::MIN));
             }
         }
 
-        int all = _flow.getWidth(r) - _gaps * (max(1uz, children().len()) - 1);
+        int all = _style.flow.getWidth(r) - _style.gaps * (max(1uz, children().len()) - 1);
         int growTotal = max(0, all - total);
         int growUnit = (growTotal) / max(1, grows);
-        int start = _flow.getStart(r);
+        int start = _style.flow.getStart(r);
 
         for (auto &child : children()) {
             Math::Recti inner = {};
+            auto childSize = child->size(r.size(), Layout::Hint::MIN);
 
-            inner = _flow.setStart(inner, start);
+            inner = _style.flow.setStart(inner, start);
             if (child.is<Grow>()) {
-                inner = _flow.setWidth(inner, growUnit * child.unwrap<Grow>().grow());
+                inner = _style.flow.setWidth(inner, growUnit * child.unwrap<Grow>().grow());
             } else {
-                inner = _flow.setWidth(inner, _flow.getX(child->size(r.size(), Layout::Hint::MIN)));
+                inner = _style.flow.setWidth(inner, _style.flow.getX(childSize));
             }
 
-            inner = _flow.setTop(inner, _flow.getTop(r));
-            inner = _flow.setBottom(inner, _flow.getBottom(r));
+            inner = _style.flow.setTop(inner, _style.flow.getTop(r));
+            inner = _style.flow.setBottom(inner, _style.flow.getBottom(r));
 
-            child->layout(inner);
-            start += _flow.getWidth(inner) + _gaps;
+            child->layout(_style.align.apply(_style.flow, Math::Recti{childSize}, inner));
+            start += _style.flow.getWidth(inner) + _style.gaps;
         }
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
         int w{};
-        int h{hint == Layout::Hint::MAX ? _flow.getY(s) : 0};
+        int h{hint == Layout::Hint::MAX ? _style.flow.getY(s) : 0};
         bool grow = false;
 
         for (auto &child : children()) {
@@ -96,67 +93,75 @@ struct FlowLayout : public Group<FlowLayout> {
                 grow = true;
 
             auto childSize = child->size(s, Layout::Hint::MIN);
-            w += _flow.getX(childSize);
-            h = max(h, _flow.getY(childSize));
+            w += _style.flow.getX(childSize);
+            h = max(h, _style.flow.getY(childSize));
         }
 
-        w += _gaps * (max(1uz, children().len()) - 1);
+        w += _style.gaps * (max(1uz, children().len()) - 1);
         if (grow && hint == Layout::Hint::MAX) {
-            w = max(_flow.getX(s), w);
+            w = max(_style.flow.getX(s), w);
         }
 
-        return _flow.orien() == Layout::Orien::HORIZONTAL
+        return _style.flow.orien() == Layout::Orien::HORIZONTAL
                    ? Math::Vec2i{w, h}
                    : Math::Vec2i{h, w};
     }
 };
 
-static inline Child flow(Layout::Flow f, int gaps, Children children) {
-    return makeStrong<FlowLayout>(f, gaps, children);
+static inline Child flow(FlowStyle style, Children children) {
+    return makeStrong<FlowLayout>(style, children);
 }
 
-static inline Child flow(Layout::Flow f, Children children) {
-    return flow(f, 0, children);
-}
-
-static inline Child flow(Layout::Flow f, int gaps, Meta::Same<Child> auto... children) {
-    return flow(f, gaps, {children...});
-}
-
-static inline Child flow(Layout::Flow f, Meta::Same<Child> auto... children) {
-    return flow(f, {children...});
+static inline Child flow(FlowStyle style, Meta::Same<Child> auto... children) {
+    return flow(style, {children...});
 }
 
 static inline Child hflow(Meta::Same<Child> auto... children) {
-    return flow(Layout::Flow::LEFT_TO_RIGHT, {children...});
+    return flow({.flow = Layout::Flow::LEFT_TO_RIGHT}, {children...});
 }
 
 static inline Child hflow(int gaps, Meta::Same<Child> auto... children) {
-    return flow(Layout::Flow::LEFT_TO_RIGHT, gaps, {children...});
+    return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .gaps = gaps}, {children...});
+}
+
+static inline Child hflow(int gaps, Layout::Align align, Meta::Same<Child> auto... children) {
+    return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, {children...});
 }
 
 static inline Child hflow(Children children) {
-    return flow(Layout::Flow::LEFT_TO_RIGHT, children);
+    return flow({.flow = Layout::Flow::LEFT_TO_RIGHT}, children);
 }
 
 static inline Child hflow(int gaps, Children children) {
-    return flow(Layout::Flow::LEFT_TO_RIGHT, gaps, children);
+    return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .gaps = gaps}, children);
+}
+
+static inline Child hflow(int gaps, Layout::Align align, Children children) {
+    return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, children);
 }
 
 static inline Child vflow(Meta::Same<Child> auto... children) {
-    return flow(Layout::Flow::TOP_TO_BOTTOM, {children...});
+    return flow({.flow = Layout::Flow::TOP_TO_BOTTOM}, {children...});
 }
 
 static inline Child vflow(int gaps, Meta::Same<Child> auto... children) {
-    return flow(Layout::Flow::TOP_TO_BOTTOM, gaps, {children...});
+    return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .gaps = gaps}, {children...});
+}
+
+static inline Child vflow(int gaps, Layout::Align align, Meta::Same<Child> auto... children) {
+    return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, {children...});
 }
 
 static inline Child vflow(Children children) {
-    return flow(Layout::Flow::TOP_TO_BOTTOM, children);
+    return flow({.flow = Layout::Flow::TOP_TO_BOTTOM}, children);
 }
 
 static inline Child vflow(int gaps, Children children) {
-    return flow(Layout::Flow::TOP_TO_BOTTOM, gaps, children);
+    return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .gaps = gaps}, children);
+}
+
+static inline Child vflow(int gaps, Layout::Align align, Children children) {
+    return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, children);
 }
 
 } // namespace Karm::Ui

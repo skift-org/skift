@@ -7,15 +7,43 @@ namespace Karm::Ui {
 
 void nop() {}
 
-Ui::Child titlebar(Media::Icons icon, String title) {
+Ui::Child titlebar(Media::Icons icon, String title, TitlebarStyle style) {
     return Ui::spacing(8,
                        Ui::hflow(
                            4,
                            Ui::button(nop, Button::SUBTLE_ICON, icon, title),
                            Ui::spacer(),
-                           Ui::button(nop, Button::SUBTLE_ICON, Media::Icons::MINUS),
-                           Ui::button(nop, Button::SUBTLE_ICON, Media::Icons::PLUS),
+                           style == TitlebarStyle::DIALOG ? empty() : Ui::button(nop, Button::SUBTLE_ICON, Media::Icons::MINUS),
+                           style == TitlebarStyle::DIALOG ? empty() : Ui::button(nop, Button::SUBTLE_ICON, Media::Icons::PLUS),
                            Ui::button(nop, Button::DESTRUCTIVE_ICON, Media::Icons::WINDOW_CLOSE)));
+}
+
+auto lookup(auto k, auto &m) {
+    for (auto &kv : m) {
+        if (kv.car == k) {
+            return kv.cdr;
+        }
+    }
+
+    panic("Key not found");
+}
+
+Child badge(BadgeStyle style, String text) {
+    Array<Cons<BadgeStyle, Gfx::Color>, 4> styleToColor{
+        {BadgeStyle::INFO, Gfx::BLUE400},
+        {BadgeStyle::SUCCESS, Gfx::LIME400},
+        {BadgeStyle::WARNING, Gfx::YELLOW400},
+        {BadgeStyle::ERROR, Gfx::RED400},
+    };
+
+    Gfx::Color color = lookup(style, styleToColor);
+
+    return Ui::box({
+                       .borderRadius = 99,
+                       .backgroundColor = color.withOpacity(0.1),
+                       .foregroundColor = color,
+                   },
+                   Ui::spacing({8, 4}, Ui::text(text)));
 }
 
 struct Separator : public View<Separator> {

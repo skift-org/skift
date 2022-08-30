@@ -4,11 +4,26 @@
 
 namespace Karm::Ui {
 
-Ui::Child titlebar(Media::Icons icon, String title);
+enum struct TitlebarStyle {
+    DEFAULT,
+    FIXED,
+    DIALOG,
+};
 
-Ui::Child separator();
+Child titlebar(Media::Icons icon, String title, TitlebarStyle style = TitlebarStyle::DEFAULT);
 
-Ui::Child toolbar(Children children);
+enum struct BadgeStyle {
+    INFO,
+    SUCCESS,
+    WARNING,
+    ERROR,
+};
+
+Child badge(BadgeStyle style, String text);
+
+Child separator();
+
+Child toolbar(Children children);
 
 static inline Ui::Child toolbar(Meta::Same<Child> auto... children) {
     return toolbar({children...});

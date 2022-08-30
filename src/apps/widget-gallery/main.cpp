@@ -8,14 +8,22 @@
 void nop() {}
 
 Ui::Child buttons() {
-    return Ui::vflow(
+    return Ui::hflow(
         8,
-        Ui::titlebar(Media::Icons::DUCK, "Widget Gallery"),
         Ui::button(nop, Ui::Button::PRIMARY, "PRIMARY BUTTON"),
         Ui::button(nop, "BUTTON"),
         Ui::button(nop, Ui::Button::OUTLINE, "OUTLINE BUTTON"),
         Ui::button(nop, Ui::Button::SUBTLE, "SUBTLE BUTTON"),
         Ui::button(nop, Ui::Button::DESTRUCTIVE, "DESTRUCTIVE BUTTON"));
+}
+
+Ui::Child badges() {
+    return Ui::hflow(
+        8,
+        Ui::badge(Ui::BadgeStyle::ERROR, "Error"),
+        Ui::badge(Ui::BadgeStyle::WARNING, "Warning"),
+        Ui::badge(Ui::BadgeStyle::SUCCESS, "Success"),
+        Ui::badge(Ui::BadgeStyle::INFO, "Info"));
 }
 
 Ui::Child texts() {
@@ -34,7 +42,7 @@ CliResult entryPoint(CliArgs args) {
     Ui::App app([]() {
         return Ui::spacing(
             8,
-            buttons());
+            Ui::vflow(8, buttons(), badges(), texts()));
     });
 
     return app.run(args);

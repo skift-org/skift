@@ -52,4 +52,7 @@ struct Array {
     constexpr T const *buf() const { return _buf; }
 };
 
+template <class T, class... U>
+Array(T, U...) -> Array<T, 1 + sizeof...(U)>;
+
 } // namespace Karm

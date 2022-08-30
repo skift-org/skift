@@ -10,7 +10,6 @@ int inc(int state) {
 };
 
 CliResult entryPoint(CliArgs args) {
-
     auto content = Ui::state(0, [](auto state) {
         auto lbl = Ui::text("You clicked {} times!", state.value());
         auto btn = Ui::button(state.bind(inc), "CLICK ME!");

@@ -1,0 +1,13 @@
+{
+    "id": "ls",
+    "type": "exe",
+    "description": "The ls coreutility",
+    "deps": [
+        "karm-test"
+    ],
+    "requires": {
+        "freestanding": [
+            false
+        ]
+    }
+}

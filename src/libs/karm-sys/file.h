@@ -1,6 +1,5 @@
 #pragma once
 
-#include <embed/sys.h>
 #include <karm-base/rc.h>
 #include <karm-io/traits.h>
 #include <karm-meta/utils.h>
@@ -22,14 +21,9 @@ struct File :
 
     File(Strong<Fd> fd, Path path) : _fd(fd), _path(path) {}
 
-    static Result<File> create(Path path) {
-        return File{try$(Embed::createFile(path)), path};
-    }
+    static Result<File> create(Path path);
 
-    static Result<File> open(Path path) {
-        auto fd = try$(Embed::openFile(path));
-        return File{fd, path};
-    }
+    static Result<File> open(Path path);
 
     Result<size_t> read(MutBytes bytes) override {
         return _fd->read(bytes);

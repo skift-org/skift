@@ -155,6 +155,10 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
     return {makeStrong<FileProto>(file)};
 }
 
+Result<Strong<Sys::Fd>> createFile(Sys::Path) {
+    notImplemented();
+}
+
 Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
     size_t vaddr = 0;
 

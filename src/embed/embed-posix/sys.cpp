@@ -1,3 +1,4 @@
+#include <dirent.h>
 #include <embed/sys.h>
 #include <fcntl.h>
 #include <karm-io/funcs.h>
@@ -80,6 +81,21 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
     }
 
     return {makeStrong<PosixFd>(fd)};
+}
+
+Result<Vec<Sys::DirEntry>> readDir(Sys::Path path) {
+    String str = path.str();
+    DIR *dir = ::opendir(str.buf());
+    if (!dir) {
+        return Posix::fromLastErrno();
+    }
+    Vec<Sys::DirEntry> entries;
+    struct dirent *entry;
+    while ((entry = ::readdir(dir))) {
+        entries.pushBack(Sys::DirEntry{entry->d_name, entry->d_type == DT_DIR});
+    }
+    ::closedir(dir);
+    return entries;
 }
 
 Result<Strong<Sys::Fd>> createFile(Sys::Path path) {

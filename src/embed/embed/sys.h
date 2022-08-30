@@ -2,6 +2,7 @@
 
 #include <karm-base/cons.h>
 #include <karm-base/range.h>
+#include <karm-sys/dir.h>
 #include <karm-sys/fd.h>
 #include <karm-sys/types.h>
 
@@ -10,6 +11,8 @@
 namespace Embed {
 
 Result<Strong<Sys::Fd>> openFile(Sys::Path path);
+
+Result<Vec<Sys::DirEntry>> readDir(Sys::Path path);
 
 Result<Strong<Sys::Fd>> createFile(Sys::Path path);
 

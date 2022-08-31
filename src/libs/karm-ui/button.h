@@ -217,34 +217,39 @@ static inline Child button(Func<void()> onPress, ButtonStyle style, Str t) {
     return button(
         std::move(onPress),
         style,
-        minSize({Sizing::UNCONSTRAINED, 36},
-                center(
-                    spacing(
-                        {16, 6},
-                        text(t)))));
+        minSize(
+            {Sizing::UNCONSTRAINED, 36},
+            center(
+                spacing(
+                    {16, 6},
+                    text(t)))));
 }
 
 static inline Child button(Func<void()> onPress, ButtonStyle style, Media::Icons i) {
     return button(
         std::move(onPress),
         style,
-        minSize({36, 36},
-                center(
-                    spacing(
-                        {6, 6},
-                        icon(i)))));
+        minSize(
+            {36, 36},
+            center(
+                spacing(
+                    {6, 6},
+                    icon(i)))));
 }
 
 static inline Child button(Func<void()> onPress, ButtonStyle style, Media::Icons i, Str t) {
     return button(
         std::move(onPress),
         style,
-        minSize({36, 36},
-                spacing(
-                    {12, 6, 16, 6},
-                    hflow(8,
-                          center(icon(i)),
-                          center(text(t))))));
+        minSize(
+            {36, 36},
+            spacing(
+                {12, 6, 16, 6},
+                hflow(
+                    8,
+                    Layout::Align::CENTER,
+                    icon(i),
+                    text(t)))));
 }
 
 static inline Child button(Func<void()> onPress, Child child) {

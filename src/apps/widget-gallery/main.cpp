@@ -4,6 +4,7 @@
 #include <karm-ui/button.h>
 #include <karm-ui/flow.h>
 #include <karm-ui/scafold.h>
+#include <karm-ui/scroll.h>
 
 void nop() {}
 
@@ -39,11 +40,20 @@ Ui::Child texts() {
 }
 
 CliResult entryPoint(CliArgs args) {
-    Ui::App app([]() {
-        return Ui::spacing(
+    auto titlebar = Ui::titlebar(Media::Icons::DUCK, "Widget Gallery");
+    auto content = Ui::spacing(
+        8,
+        Ui::vflow(
             8,
-            Ui::vflow(8, buttons(), badges(), texts()));
-    });
+            buttons(),
+            badges(),
+            texts()));
 
-    return app.run(args);
+    auto layout = Ui::minSize(
+        {700, 500},
+        Ui::vflow(titlebar,
+                  Ui::grow(
+                      Ui::scroll(content))));
+
+    return Ui::runApp(args, layout);
 }

@@ -1,0 +1,9 @@
+{
+    "id": "demo-images",
+    "type": "exe",
+    "description": "A graphical demo of the image library.",
+    "deps": [
+        "karm-main",
+        "karm-ui"
+    ]
+}

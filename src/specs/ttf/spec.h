@@ -5,7 +5,8 @@
 #include <karm-base/string.h>
 #include <karm-debug/logger.h>
 #include <karm-gfx/context.h>
-#include <karm-io/impls.h>
+
+#include "../bscan.h"
 
 // https://tchayen.github.io/posts/ttf-file-parsing
 // http://stevehanov.ca/blog/?id=143
@@ -17,151 +18,8 @@
 
 namespace Ttf {
 
-struct BScan {
-    Cursor<uint8_t> _cursor;
-
-    BScan(Bytes bytes) : _cursor(bytes) {}
-
-    bool ended() {
-        return _cursor.ended();
-    }
-
-    size_t rem() {
-        return _cursor.rem();
-    }
-
-    BScan &skip(size_t n) {
-        n = min(n, rem());
-        _cursor.next(n);
-        return *this;
-    }
-
-    BScan peek(size_t n) {
-        BScan c{*this};
-        c.skip(n);
-        return c;
-    }
-
-    template <typename T>
-    bool readTo(T *buf, size_t n) {
-        if (rem() < n) {
-            return false;
-        }
-
-        uint8_t *b = reinterpret_cast<uint8_t *>(buf);
-        for (size_t i = 0; i < n; i++) {
-            b[i] = _cursor.next();
-        }
-        return true;
-    }
-
-    template <typename T>
-    bool peekTo(T *buf, size_t n) {
-        if (rem() < n) {
-            return false;
-        }
-
-        uint8_t *b = reinterpret_cast<uint8_t *>(buf);
-        for (size_t i = 0; i < n; i++) {
-            b[i] = _cursor.buf()[i];
-        }
-        return true;
-    }
-
-    template <typename T>
-    T nextBe() {
-        _Be<T> r{};
-        readTo(&r, sizeof(T));
-        return r;
-    }
-
-    template <typename T>
-    T nextLe() {
-        _Le<T> r;
-        readTo(&r, sizeof(T));
-        return r;
-    }
-
-    template <typename T>
-    T peekBe() {
-        _Be<T> r{};
-        peekTo(&r, sizeof(T));
-        return r;
-    }
-
-    template <typename T>
-    T peekLe() {
-        _Le<T> r;
-        peekTo(&r, sizeof(T));
-        return r;
-    }
-
-    uint8_t nextBeUint8() { return nextBe<uint8_t>(); }
-    uint16_t nextBeUint16() { return nextBe<uint16_t>(); }
-    uint32_t nextBeUint32() { return nextBe<uint32_t>(); }
-    uint64_t nextBeUint64() { return nextBe<uint64_t>(); }
-
-    uint8_t nextLeUint8() { return nextLe<uint8_t>(); }
-    uint16_t nextLeUint16() { return nextLe<uint16_t>(); }
-    uint32_t nextLeUint32() { return nextLe<uint32_t>(); }
-    uint64_t nextLeUint64() { return nextLe<uint64_t>(); }
-
-    int8_t nextBeInt8() { return nextBe<int8_t>(); }
-    int16_t nextBeInt16() { return nextBe<int16_t>(); }
-    int32_t nextBeInt32() { return nextBe<int32_t>(); }
-    int64_t nextBeInt64() { return nextBe<int64_t>(); }
-
-    int8_t nextLeInt8() { return nextLe<int8_t>(); }
-    int16_t nextLeInt16() { return nextLe<int16_t>(); }
-    int32_t nextLeInt32() { return nextLe<int32_t>(); }
-    int64_t nextLeInt64() { return nextLe<int64_t>(); }
-
-    uint8_t peekBeUint8() { return peekBe<uint8_t>(); }
-    uint16_t peekBeUint16() { return peekBe<uint16_t>(); }
-    uint32_t peekBeUint32() { return peekBe<uint32_t>(); }
-    uint64_t peekBeUint64() { return peekBe<uint64_t>(); }
-
-    uint8_t peekLeUint8() { return peekLe<uint8_t>(); }
-    uint16_t peekLeUint16() { return peekLe<uint16_t>(); }
-    uint32_t peekLeUint32() { return peekLe<uint32_t>(); }
-    uint64_t peekLeUint64() { return peekLe<uint64_t>(); }
-
-    int8_t peekBeInt8() { return peekBe<int8_t>(); }
-    int16_t peekBeInt16() { return peekBe<int16_t>(); }
-    int32_t peekBeInt32() { return peekBe<int32_t>(); }
-    int64_t peekBeInt64() { return peekBe<int64_t>(); }
-
-    int8_t peekLeInt8() { return peekLe<int8_t>(); }
-    int16_t peekLeInt16() { return peekLe<int16_t>(); }
-    int32_t peekLeInt32() { return peekLe<int32_t>(); }
-    int64_t peekLeInt64() { return peekLe<int64_t>(); }
-
-    Str nextStr(size_t n) {
-        n = clamp(n, 0uz, rem());
-        Str s{(char const *)_cursor.buf(), n};
-        _cursor.next(n);
-        return s;
-    }
-};
-
-struct Table {
-    Bytes _slice{};
-
-    Table() = default;
-
-    Table(Bytes slice) : _slice(slice) {}
-
-    bool present() const {
-        return _slice.len() > 0;
-    }
-
-    BScan begin() const {
-        return _slice;
-    }
-};
-
-struct Head : public Table {
-    static constexpr Str NAME = "head";
+struct Head : public BChunk {
+    static constexpr Str SIG = "head";
 
     int unitPerEm() const {
         auto s = begin();
@@ -176,8 +34,8 @@ struct Head : public Table {
     }
 };
 
-struct Maxp : public Table {
-    static constexpr Str NAME = "maxp";
+struct Maxp : public BChunk {
+    static constexpr Str SIG = "maxp";
 
     int numGlyphs() const {
         auto s = begin();
@@ -186,8 +44,8 @@ struct Maxp : public Table {
     }
 };
 
-struct Cmap : public Table {
-    static constexpr Str NAME = "cmap";
+struct Cmap : public BChunk {
+    static constexpr Str SIG = "cmap";
 
     struct Table {
         uint16_t platformId;
@@ -290,8 +148,8 @@ struct Cmap : public Table {
     }
 };
 
-struct Loca : public Table {
-    static constexpr Str NAME = "loca";
+struct Loca : public BChunk {
+    static constexpr Str SIG = "loca";
 
     size_t glyfOffset(int glyphId, Head const &head) const {
         auto s = begin();
@@ -305,8 +163,8 @@ struct Loca : public Table {
     }
 };
 
-struct Glyf : public Table {
-    static constexpr Str NAME = "glyf";
+struct Glyf : public BChunk {
+    static constexpr Str SIG = "glyf";
 
     static constexpr uint8_t ON_CURVE_POINT = 0x01;
     static constexpr uint8_t X_SHORT_VECTOR = 0x02;
@@ -469,8 +327,8 @@ struct Glyf : public Table {
     }
 };
 
-struct Hhea : public Table {
-    static constexpr Str NAME = "hhea";
+struct Hhea : public BChunk {
+    static constexpr Str SIG = "hhea";
 
     int ascender() const {
         auto s = begin();
@@ -503,8 +361,8 @@ struct Hhea : public Table {
     }
 };
 
-struct Hmtx : public Table {
-    static constexpr Str NAME = "hmtx";
+struct Hmtx : public BChunk {
+    static constexpr Str SIG = "hmtx";
     static constexpr int LONG_RECORD_SIZE = 4;
     static constexpr int SHORT_RECORD_SIZE = 2;
 
@@ -530,16 +388,16 @@ struct Hmtx : public Table {
     }
 };
 
-struct Name : public Table {
-    static constexpr Str NAME = "name";
+struct Name : public BChunk {
+    static constexpr Str SIG = "name";
 };
 
-struct Os2 : public Table {
-    static constexpr Str NAME = "OS/2";
+struct Os2 : public BChunk {
+    static constexpr Str SIG = "OS/2";
 };
 
-struct Kern : public Table {
-    static constexpr Str NAME = "kern";
+struct Kern : public BChunk {
+    static constexpr Str SIG = "kern";
 };
 
 struct GlyphMetrics {
@@ -677,24 +535,24 @@ struct Font {
     template <typename T>
     T lookupTable() {
         for (auto table : iterTables()) {
-            if (Op::eq(table.tag, T::NAME)) {
+            if (Op::eq(table.tag, T::SIG)) {
                 return T{sub(_slice, table.offset, table.offset + table.length)};
             }
         }
 
-        Debug::lwarn("'{}' table not found", T::NAME);
+        Debug::lwarn("'{}' table not found", T::SIG);
         return T{};
     }
 
     template <typename T>
     Result<T> requireTable() {
         for (auto table : iterTables()) {
-            if (Op::eq(table.tag, T::NAME)) {
+            if (Op::eq(table.tag, T::SIG)) {
                 return T{sub(_slice, table.offset, table.offset + table.length)};
             }
         }
 
-        Debug::lerror("'{}' table not found", T::NAME);
+        Debug::lerror("'{}' table not found", T::SIG);
         return Error{"table not found"};
     }
 

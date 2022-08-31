@@ -17,7 +17,8 @@ CliResult entryPoint(CliArgs args) {
         return Ui::spacing(
             8,
             Ui::hflow(
-                Ui::minSize({256, Ui::Sizing::UNCONSTRAINED}, Ui::vcenter(lbl)),
+                Layout::Align::CENTER,
+                Ui::minSize({256, Ui::Sizing::UNCONSTRAINED}, lbl),
                 btn));
     });
 

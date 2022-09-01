@@ -31,7 +31,6 @@ struct Button : public _Box<Button> {
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::ZINC500,
             .backgroundColor = Gfx::ZINC600,
         },
         .pressStyle = {
@@ -50,7 +49,6 @@ struct Button : public _Box<Button> {
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::BLUE500,
             .backgroundColor = Gfx::BLUE600,
         },
         .pressStyle = {
@@ -70,7 +68,6 @@ struct Button : public _Box<Button> {
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::ZINC500,
             .backgroundColor = Gfx::ZINC600,
         },
         .pressStyle = {
@@ -86,7 +83,6 @@ struct Button : public _Box<Button> {
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::ZINC500,
             .backgroundColor = Gfx::ZINC600,
         },
         .pressStyle = {
@@ -104,7 +100,6 @@ struct Button : public _Box<Button> {
         .hoverStyle = {
             .borderRadius = Ui::Button::RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::ZINC500,
             .backgroundColor = Gfx::ZINC600,
         },
         .pressStyle = {
@@ -123,7 +118,6 @@ struct Button : public _Box<Button> {
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::RED500,
             .backgroundColor = Gfx::RED600,
         },
         .pressStyle = {
@@ -142,7 +136,6 @@ struct Button : public _Box<Button> {
         .hoverStyle = {
             .borderRadius = Ui::Button::RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::RED500,
             .backgroundColor = Gfx::RED600,
         },
         .pressStyle = {
@@ -164,6 +157,7 @@ struct Button : public _Box<Button> {
 
     void reconcile(Button &o) override {
         _buttonStyle = o._buttonStyle;
+        _onPress = std::move(o._onPress);
         _Box<Button>::reconcile(o);
     }
 

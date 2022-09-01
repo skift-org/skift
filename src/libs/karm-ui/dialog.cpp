@@ -195,7 +195,12 @@ Child msgDialog(String title, String msg) {
     auto titleLbl = text(16, title);
     auto msgLbl = text(msg);
     Children actions = {
-        dialogCloseButton(),
+        grow(),
+        button(
+            [](auto &n) {
+                closeDialog(n);
+            },
+            Button::PRIMARY, "OK"),
     };
 
     return dialogScafold(vflow(16, titleLbl, msgLbl), actions);

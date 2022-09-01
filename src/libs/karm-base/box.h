@@ -35,7 +35,7 @@ struct Box {
     constexpr Box &operator=(Box const &) = delete;
 
     template <Meta::Derive<T> U>
-    constexpr Box &operator=(Box &&other) {
+    constexpr Box &operator=(Box<U> &&other) {
         delete _ptr;
         _ptr = other._ptr;
         other._ptr = nullptr;

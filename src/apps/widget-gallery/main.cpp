@@ -2,6 +2,7 @@
 #include <karm-ui/align.h>
 #include <karm-ui/app.h>
 #include <karm-ui/button.h>
+#include <karm-ui/dialog.h>
 #include <karm-ui/flow.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -49,11 +50,11 @@ CliResult entryPoint(CliArgs args) {
             badges(),
             texts()));
 
-    auto layout = Ui::minSize(
+    auto layout = Ui::dialogLayer(Ui::minSize(
         {700, 500},
         Ui::vflow(titlebar,
                   Ui::grow(
-                      Ui::scroll(content))));
+                      Ui::scroll(content)))));
 
     return Ui::runApp(args, layout);
 }

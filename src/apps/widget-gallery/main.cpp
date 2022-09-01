@@ -6,7 +6,7 @@
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 
-void nop() {}
+void nop(Ui::Node &) {}
 
 Ui::Child buttons() {
     return Ui::hflow(

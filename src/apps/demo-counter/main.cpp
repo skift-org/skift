@@ -2,6 +2,7 @@
 #include <karm-ui/align.h>
 #include <karm-ui/app.h>
 #include <karm-ui/button.h>
+#include <karm-ui/dialog.h>
 #include <karm-ui/flow.h>
 #include <karm-ui/scafold.h>
 
@@ -23,12 +24,13 @@ CliResult entryPoint(CliArgs args) {
     });
 
     auto layout =
-        Ui::vflow(
-            Ui::titlebar(
-                Media::Icons::COUNTER,
-                "Counter",
-                Ui::TitlebarStyle::DIALOG),
-            Ui::grow(content));
+        Ui::dialogLayer(
+            Ui::vflow(
+                Ui::titlebar(
+                    Media::Icons::COUNTER,
+                    "Counter",
+                    Ui::TitlebarStyle::DIALOG),
+                Ui::grow(content)));
 
     return Ui::runApp(args, layout);
 }

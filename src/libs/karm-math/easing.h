@@ -3,7 +3,7 @@
 #include <karm-math/const.h>
 #include <karm-math/funcs.h>
 
-namespace Karm::Ui {
+namespace Karm::Math {
 
 struct Easing {
     double (*_inner)(double);
@@ -196,4 +196,4 @@ struct Easing {
     }
 };
 
-} // namespace Karm::Ui
+} // namespace Karm::Math

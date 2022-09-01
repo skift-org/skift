@@ -2,6 +2,7 @@
 #include <karm-ui/align.h>
 #include <karm-ui/app.h>
 #include <karm-ui/button.h>
+#include <karm-ui/dialog.h>
 #include <karm-ui/flow.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -21,7 +22,7 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
     return Ui::scroll(Ui::spacing(8, Ui::vflow(8, children)));
 }
 
-void nop() {}
+void nop(Ui::Node &) {}
 
 CliResult entryPoint(CliArgs args) {
     auto fontface = try$(args.len()
@@ -34,15 +35,15 @@ CliResult entryPoint(CliArgs args) {
 
     auto toolbar = Ui::toolbar(
         Ui::button(nop, Media::Icons::FOLDER_OPEN),
-        Ui::spacer(),
+        Ui::grow(),
         Ui::button(nop, Ui::Button::PRIMARY, "INSTALL"));
 
-    auto layout = Ui::minSize(
+    auto layout = Ui::dialogLayer(Ui::minSize(
         {700, 500},
         Ui::vflow(
             titlebar,
             toolbar,
-            Ui::grow(pangrams(fontface))));
+            Ui::grow(pangrams(fontface)))));
 
     return Ui::runApp(args, layout);
 }

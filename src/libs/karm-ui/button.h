@@ -153,11 +153,11 @@ struct Button : public _Box<Button> {
         },
     };
 
-    Func<void()> _onPress;
+    Func<void(Node &)> _onPress;
     ButtonStyle _buttonStyle = DEFAULT;
     ButtonState _state = IDLE;
 
-    Button(Func<void()> onPress, ButtonStyle style, Child child)
+    Button(Func<void(Node &)> onPress, ButtonStyle style, Child child)
         : _Box<Button>(child),
           _onPress(std::move(onPress)),
           _buttonStyle(style) {}
@@ -195,7 +195,7 @@ struct Button : public _Box<Button> {
                 return true;
             } else if (m.type == Events::MouseEvent::RELEASE) {
                 state = OVER;
-                _onPress();
+                _onPress(*this);
                 return true;
             }
 
@@ -209,11 +209,11 @@ struct Button : public _Box<Button> {
     };
 };
 
-static inline Child button(Func<void()> onPress, ButtonStyle style, Child child) {
+static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, Child child) {
     return makeStrong<Button>(std::move(onPress), style, child);
 }
 
-static inline Child button(Func<void()> onPress, ButtonStyle style, Str t) {
+static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, Str t) {
     return button(
         std::move(onPress),
         style,
@@ -225,7 +225,7 @@ static inline Child button(Func<void()> onPress, ButtonStyle style, Str t) {
                     text(t)))));
 }
 
-static inline Child button(Func<void()> onPress, ButtonStyle style, Media::Icons i) {
+static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, Media::Icons i) {
     return button(
         std::move(onPress),
         style,
@@ -237,7 +237,7 @@ static inline Child button(Func<void()> onPress, ButtonStyle style, Media::Icons
                     icon(i)))));
 }
 
-static inline Child button(Func<void()> onPress, ButtonStyle style, Media::Icons i, Str t) {
+static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, Media::Icons i, Str t) {
     return button(
         std::move(onPress),
         style,
@@ -252,19 +252,19 @@ static inline Child button(Func<void()> onPress, ButtonStyle style, Media::Icons
                     text(t)))));
 }
 
-static inline Child button(Func<void()> onPress, Child child) {
+static inline Child button(Func<void(Node &)> onPress, Child child) {
     return button(std::move(onPress), Button::DEFAULT, child);
 }
 
-static inline Child button(Func<void()> onPress, Str t) {
+static inline Child button(Func<void(Node &)> onPress, Str t) {
     return button(std::move(onPress), Button::DEFAULT, t);
 }
 
-static inline Child button(Func<void()> onPress, Media::Icons i) {
+static inline Child button(Func<void(Node &)> onPress, Media::Icons i) {
     return button(std::move(onPress), Button::DEFAULT, i);
 }
 
-static inline Child button(Func<void()> onPress, Media::Icons i, Str t) {
+static inline Child button(Func<void(Node &)> onPress, Media::Icons i, Str t) {
     return button(std::move(onPress), Button::DEFAULT, i, t);
 }
 

@@ -22,7 +22,7 @@ struct Func<Out(In...)> {
     struct Wrap : _Wrap {
         F _f;
         Wrap(F &&f) : _f(std::move(f)) {}
-        Out operator()(In... in) override { return _f(std::move(in)...); }
+        Out operator()(In... in) override { return _f(std::forward<In>(in)...); }
     };
 
     Box<_Wrap> _wrap;

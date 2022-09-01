@@ -22,8 +22,8 @@ struct _State : public React<_State<T>> {
             return _s._value;
         }
 
-        Func<void()> bind(auto f) {
-            return [*this, f] mutable {
+        Func<void(Node &)> bind(auto f) {
+            return [*this, f](Node &) mutable {
                 update(f(value()));
             };
         }

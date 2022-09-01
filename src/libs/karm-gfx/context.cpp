@@ -291,6 +291,50 @@ void Context::_rect(Math::Recti rect, Color color) {
     _line({rect.bottomStart(), rect.topStart()}, color);
 }
 
+void Context::_arrow(Math::Vec2i from, Math::Vec2i to, Color color) {
+    const int SIZE = 16;
+
+    Math::Vec2i dir = to - from;
+    Math::Vec2i perp = {-dir.y, dir.x};
+
+    double len = dir.len();
+    double scale = SIZE / len;
+
+    Math::Vec2i p1 = to - dir * scale;
+    Math::Vec2i p2 = p1 + perp * scale;
+    Math::Vec2i p3 = p1 - perp * scale;
+
+    _line({from, to}, color);
+    _line({to, p2}, color);
+    _line({to, p3}, color);
+}
+
+void Context::_doubleArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
+    const int SIZE = 8;
+
+    Math::Vec2f dir = (to - from).cast<double>();
+    Math::Vec2f perp = {-dir.y, dir.x};
+
+    double len = dir.len();
+    double scale = SIZE / len;
+
+    Math::Vec2i p1 = (to - dir * scale).cast<int>();
+    Math::Vec2i p2 = (p1 + perp * scale).cast<int>();
+    Math::Vec2i p3 = (p1 - perp * scale).cast<int>();
+
+    Math::Vec2i p4 = (from + dir * scale).cast<int>();
+    Math::Vec2i p5 = (p4 + perp * scale).cast<int>();
+    Math::Vec2i p6 = (p4 - perp * scale).cast<int>();
+
+    _line({from, to}, color);
+
+    _line({to, p2}, color);
+    _line({to, p3}, color);
+
+    _line({from, p5}, color);
+    _line({from, p6}, color);
+}
+
 void Context::_trace() {
     auto b = _shape.bound().ceil().cast<int>();
     _rect(b, Gfx::PINK);

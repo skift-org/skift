@@ -145,6 +145,10 @@ struct Context {
 
     void _rect(Math::Recti rect, Color color);
 
+    void _arrow(Math::Vec2i from, Math::Vec2i to, Color color);
+
+    void _doubleArrow(Math::Vec2i from, Math::Vec2i to, Color color);
+
     void _trace();
 
     void _fill(Color color);

@@ -16,10 +16,7 @@ struct DockItem : public Proxy<DockItem> {
     Layout::Dock dock() const { return _dock; }
 };
 
-static inline Child docked(Layout::Dock dock, Child child) {
-    return makeStrong<DockItem>(dock, child);
-}
-
+static inline Child docked(Layout::Dock dock, Child child) { return makeStrong<DockItem>(dock, child); }
 static inline Child dockTop(Child child) { return docked(Layout::Dock::TOP, child); }
 static inline Child dockBottom(Child child) { return docked(Layout::Dock::BOTTOM, child); }
 static inline Child dockStart(Child child) { return docked(Layout::Dock::START, child); }
@@ -83,9 +80,8 @@ static inline Child dock(Children children) {
     return makeStrong<DockLayout>(children);
 }
 
-template <typename... Args>
-static inline Child dock(Args... args) {
-    return dock({std::forward<Args>(args)...});
+static inline Child dock(Meta::Same<Child> auto... children) {
+    return dock({children...});
 }
 
 } // namespace Karm::Ui

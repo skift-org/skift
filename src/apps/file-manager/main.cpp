@@ -3,15 +3,12 @@
 #include <karm-ui/align.h>
 #include <karm-ui/app.h>
 #include <karm-ui/button.h>
+#include <karm-ui/dialog.h>
 #include <karm-ui/flow.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 
-int inc(int state) {
-    return state + 1;
-};
-
-void nop() {}
+static void nop(Ui::Node &) {}
 
 Ui::Child directorEntry(Sys::DirEntry const &entry) {
     return Ui::button(
@@ -55,7 +52,7 @@ Ui::Child breadcrumb() {
             breadcrumbItem("smnx"),
             breadcrumbItem("projects"),
             breadcrumbItem("skift"),
-            Ui::spacer(),
+            Ui::grow(),
             Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::BOOKMARK)));
 }
 
@@ -63,6 +60,7 @@ CliResult entryPoint(CliArgs args) {
     auto dir = try$(Sys::Dir::open("./"));
 
     auto titlebar = Ui::titlebar(Media::Icons::FOLDER, "File Manager");
+
     auto toolbar = Ui::toolbar(
         Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::ARROW_LEFT),
         Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::ARROW_RIGHT),
@@ -75,15 +73,16 @@ CliResult entryPoint(CliArgs args) {
     auto listing = directoryListing(dir);
 
     auto layout =
-        Ui::minSize(
-            {700, 500},
-            Ui::vflow(
-                titlebar,
-                toolbar,
-                Ui::separator(),
-                Ui::grow(
-                    Ui::scroll(
-                        listing))));
+        Ui::dialogLayer(
+            Ui::minSize(
+                {700, 500},
+                Ui::vflow(
+                    titlebar,
+                    toolbar,
+                    Ui::separator(),
+                    Ui::grow(
+                        Ui::scroll(
+                            listing)))));
 
     return Ui::runApp(args, layout);
 }

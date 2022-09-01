@@ -20,4 +20,13 @@ static inline void shouldAnimate(Node &n) {
     n.bubble(e);
 }
 
+template <typename T>
+static inline T &queryParent(Node &n) {
+    void *ptr = n.query(Meta::makeId<T>());
+    if (!ptr) {
+        panic("not found");
+    }
+    return *static_cast<T *>(ptr);
+}
+
 } // namespace Karm::Ui

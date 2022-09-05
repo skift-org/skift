@@ -50,11 +50,12 @@ CliResult entryPoint(CliArgs args) {
             badges(),
             texts()));
 
-    auto layout = Ui::dialogLayer(Ui::minSize(
-        {700, 500},
-        Ui::vflow(titlebar,
-                  Ui::grow(
-                      Ui::scroll(content)))));
+    auto layout = Ui::dialogLayer(
+        Ui ::minSize(
+            {700, 500},
+            Ui::vflow(titlebar,
+                      Ui::grow(
+                          Ui::scroll(content)))));
 
     return Ui::runApp(args, layout);
 }

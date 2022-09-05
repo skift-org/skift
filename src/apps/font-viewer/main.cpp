@@ -34,9 +34,13 @@ CliResult entryPoint(CliArgs args) {
         "Font Viewer");
 
     auto toolbar = Ui::toolbar(
-        Ui::button(nop, Media::Icons::FOLDER_OPEN),
-        Ui::grow(),
-        Ui::state(false, [](auto state) {
+        Ui::button(
+            [](auto &n) {
+                Ui::showDialog(n, Ui::openFileDialog());
+            },
+            Media::Icons::FOLDER_OPEN),
+            
+        Ui::grow(), Ui::state(false, [](auto state) {
             Func<void(Ui::Node &)> uninstallFont = [state](auto &n) mutable {
                 state.update(false);
                 Ui::showDialog(n, Ui::msgDialog("Font uninstalled", "The font was uninstalled successfully."));

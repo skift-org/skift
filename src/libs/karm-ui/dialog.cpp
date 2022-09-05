@@ -139,7 +139,7 @@ void closeDialog(Node &n) {
 
 /* --- Dialogs Scaffolding -------------------------------------------------- */
 
-Child dialogScafold(Child content, Children actions) {
+Child dialogScafold(Child content, Children actions, Layout::Align a) {
     BoxStyle boxStyle = {
         .borderRadius = 4,
         .borderWidth = 1,
@@ -147,17 +147,16 @@ Child dialogScafold(Child content, Children actions) {
         .backgroundColor = Gfx::ZINC800,
     };
 
-    return center(
-        box(
-            boxStyle,
-            minSize(
-                {320, Sizing::UNCONSTRAINED},
-                spacing(
-                    16,
-                    vflow(
-                        32,
-                        content,
-                        hflow(8, actions))))));
+    auto layout = minSize(
+        {320, Sizing::UNCONSTRAINED},
+        spacing(
+            16,
+            vflow(
+                32,
+                grow(content),
+                hflow(8, actions))));
+
+    return spacing(16, align(a, box(boxStyle, layout)));
 }
 
 Child dialogCloseButton() {
@@ -204,6 +203,31 @@ Child msgDialog(String title, String msg) {
     };
 
     return dialogScafold(vflow(16, titleLbl, msgLbl), actions);
+}
+
+Ui::Child openFileDialog() {
+    auto titleLbl = text(16, "Open File");
+    auto msgLbl = text("Select a file to open.");
+
+    auto openBtn = button(
+        [](auto &n) {
+            closeDialog(n);
+        },
+        Button::PRIMARY, "OPEN");
+
+    auto cancelBtn = button(
+        [](auto &n) {
+            closeDialog(n);
+        },
+        Button::SUBTLE, "CANCEL");
+
+    return dialogScafold(
+        vflow(
+            16,
+            titleLbl,
+            msgLbl,
+            grow()),
+        {grow(), cancelBtn, openBtn}, Layout::Align::FILL);
 }
 
 } // namespace Karm::Ui

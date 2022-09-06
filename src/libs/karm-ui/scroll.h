@@ -12,11 +12,21 @@ struct Scroll : public Proxy<Scroll> {
         : Proxy(child), _size(size) {}
 
     void paint(Gfx::Context &g, Math::Recti r) override {
+        g.save();
+        g.clip(_bound);
         child().paint(g, r);
+        g.restore();
     }
 
     void event(Events::Event &e) override {
-        child().event(e);
+        if (e.is<Events::MouseEvent>()) {
+            auto ee = e.unwrap<Events::MouseEvent>();
+            if (bound().contains(ee.pos)) {
+                child().event(e);
+            }
+        } else {
+            child().event(e);
+        }
     }
 
     void layout(Math::Recti r) override {

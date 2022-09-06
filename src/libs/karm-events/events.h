@@ -22,6 +22,16 @@ struct Event {
         return *this;
     }
 
+    template <typename T>
+    bool is() const {
+        return id == T::ID;
+    }
+
+    template <typename T>
+    T const &unwrap() const {
+        return static_cast<T const &>(*this);
+    }
+
     void accept() {
         accepted = true;
     }

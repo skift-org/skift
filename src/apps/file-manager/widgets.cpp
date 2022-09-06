@@ -1,14 +1,15 @@
-#include <karm-main/main.h>
-#include <karm-sys/dir.h>
-#include <karm-ui/align.h>
-#include <karm-ui/app.h>
 #include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
-#include <karm-ui/flow.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 
+#include "widgets.h"
+
+namespace FileManager {
+
 static void nop(Ui::Node &) {}
+
+/* --- Common Widgets ------------------------------------------------------- */
 
 Ui::Child directorEntry(Sys::DirEntry const &entry) {
     return Ui::button(
@@ -23,7 +24,7 @@ Ui::Child directoryListing(Sys::Dir const &dir) {
     for (auto const &entry : dir.entries()) {
         children.pushBack(directorEntry(entry));
     }
-    return Ui::spacing(8, Ui::vflow(children));
+    return Ui::grow(Ui::scroll(Ui::spacing(8, Ui::vflow(children))));
 }
 
 Ui::Child breadcrumbItem(Str text) {
@@ -56,33 +57,54 @@ Ui::Child breadcrumb() {
             Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::BOOKMARK)));
 }
 
-CliResult entryPoint(CliArgs args) {
-    auto dir = try$(Sys::Dir::open("./"));
-
-    auto titlebar = Ui::titlebar(Media::Icons::FOLDER, "File Manager");
-
-    auto toolbar = Ui::toolbar(
+Ui::Child toolbar() {
+    return Ui::toolbar(
         Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::ARROW_LEFT),
         Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::ARROW_RIGHT),
         Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::ARROW_UP),
         Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::HOME),
-        Ui::grow(breadcrumb()),
+        Ui::grow(FileManager::breadcrumb()),
         Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::REFRESH),
         Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::CONSOLE));
-
-    auto listing = directoryListing(dir);
-
-    auto layout =
-        Ui::dialogLayer(
-            Ui::minSize(
-                {700, 500},
-                Ui::vflow(
-                    titlebar,
-                    toolbar,
-                    Ui::separator(),
-                    Ui::grow(
-                        Ui::scroll(
-                            listing)))));
-
-    return Ui::runApp(args, layout);
 }
+
+/* ---  Dialogs  ------------------------------------------------------------ */
+
+Ui::Child openFileDialog() {
+    Sys::Dir dir = Sys::Dir::open("./").take();
+
+    auto titleLbl = Ui::text(16, "Open File");
+    auto msgLbl = Ui::text("Select a file to open.");
+
+    auto openBtn = Ui::button(
+        [](auto &n) {
+            Ui::closeDialog(n);
+        },
+        Ui::Button::PRIMARY, "OPEN");
+
+    auto cancelBtn = Ui::button(
+        [](auto &n) {
+            Ui::closeDialog(n);
+        },
+        Ui::Button::SUBTLE, "CANCEL");
+
+    return Ui::dialogScafold(
+        Layout::Align::FILL,
+        Ui::vflow(
+            Ui::spacing(16, Ui::vflow(8, titleLbl, msgLbl)),
+            toolbar(),
+            Ui::separator(),
+            directoryListing(dir),
+            Ui::separator()),
+        {Ui::grow(), cancelBtn, openBtn});
+}
+
+/*
+Ui::Child saveFileDialog() {
+}
+
+Ui::Child directoryDialog() {
+}
+*/
+
+} // namespace FileManager

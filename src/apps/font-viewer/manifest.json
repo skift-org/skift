@@ -3,6 +3,7 @@
     "type": "exe",
     "description": "View font files",
     "deps": [
+        "file-manager",
         "karm-main",
         "karm-ui"
     ]

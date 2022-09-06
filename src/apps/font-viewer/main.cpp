@@ -1,3 +1,4 @@
+#include <file-manager/widgets.h>
 #include <karm-main/main.h>
 #include <karm-ui/align.h>
 #include <karm-ui/app.h>
@@ -36,10 +37,10 @@ CliResult entryPoint(CliArgs args) {
     auto toolbar = Ui::toolbar(
         Ui::button(
             [](auto &n) {
-                Ui::showDialog(n, Ui::openFileDialog());
+                Ui::showDialog(n, FileManager::openFileDialog());
             },
             Media::Icons::FOLDER_OPEN),
-            
+
         Ui::grow(), Ui::state(false, [](auto state) {
             Func<void(Ui::Node &)> uninstallFont = [state](auto &n) mutable {
                 state.update(false);

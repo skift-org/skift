@@ -139,13 +139,18 @@ void closeDialog(Node &n) {
 
 /* --- Dialogs Scaffolding -------------------------------------------------- */
 
-Child dialogScafold(Child content, Children actions, Layout::Align a) {
+Child dialogScafold(Layout::Align a, Child inner) {
     BoxStyle boxStyle = {
         .borderRadius = 4,
         .borderWidth = 1,
         .borderColor = Gfx::ZINC700,
         .backgroundColor = Gfx::ZINC800,
     };
+
+    return spacing(16, align(a, box(boxStyle, inner)));
+}
+
+Child dialogScafold(Layout::Align a, Child content, Children actions) {
 
     auto layout = minSize(
         {320, Sizing::UNCONSTRAINED},
@@ -156,7 +161,7 @@ Child dialogScafold(Child content, Children actions, Layout::Align a) {
                 grow(content),
                 hflow(8, actions))));
 
-    return spacing(16, align(a, box(boxStyle, layout)));
+    return dialogScafold(a, layout);
 }
 
 Child dialogCloseButton() {
@@ -187,7 +192,10 @@ Child aboutDialog(Media::Icons i, String name) {
         dialogCloseButton(),
     };
 
-    return dialogScafold(content, actions);
+    return dialogScafold(
+        Layout::Align::CENTER,
+        content,
+        actions);
 }
 
 Child msgDialog(String title, String msg) {
@@ -202,32 +210,10 @@ Child msgDialog(String title, String msg) {
             Button::PRIMARY, "OK"),
     };
 
-    return dialogScafold(vflow(16, titleLbl, msgLbl), actions);
-}
-
-Ui::Child openFileDialog() {
-    auto titleLbl = text(16, "Open File");
-    auto msgLbl = text("Select a file to open.");
-
-    auto openBtn = button(
-        [](auto &n) {
-            closeDialog(n);
-        },
-        Button::PRIMARY, "OPEN");
-
-    auto cancelBtn = button(
-        [](auto &n) {
-            closeDialog(n);
-        },
-        Button::SUBTLE, "CANCEL");
-
     return dialogScafold(
-        vflow(
-            16,
-            titleLbl,
-            msgLbl,
-            grow()),
-        {grow(), cancelBtn, openBtn}, Layout::Align::FILL);
+        Layout::Align::CENTER,
+        vflow(16, titleLbl, msgLbl),
+        actions);
 }
 
 } // namespace Karm::Ui

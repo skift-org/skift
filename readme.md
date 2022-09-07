@@ -28,6 +28,14 @@
 
 **skiftOS** is a hobby operating system built from scratch in contemporary C and C++ for ARM, x86, and RISC-V architectures. We built Skift on top of the _Hjert_ micro-kernel, a C++ rewrite of the _BRUTAL_ kernel to make it simpler, safer, and enhance the existing design. On top of the kernel resides _Karm_, a framework comprised of a minimal subset of the C/C++ standard library, an extensive collection of containers and utilities, a SwiftUI inspired Ui, and much more. Finally, built on top of _Karm_ is _Hideo_, a delightful desktop environment.
 
+## Screenshot
+
+<p align="center">
+<img src="doc/screenshots/2022-09-07.png" />
+<br>
+skiftOS applications running on Linux
+</p>
+
 ## Building
 
 skiftOS is written in bleeding-edge C2x and C++23 and building it requires a modern C/C++ compiler like clang-14 or GCC-12 installed on the host machine.

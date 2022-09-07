@@ -92,6 +92,9 @@ Result<Vec<Sys::DirEntry>> readDir(Sys::Path path) {
     Vec<Sys::DirEntry> entries;
     struct dirent *entry;
     while ((entry = ::readdir(dir))) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
+        }
         entries.pushBack(Sys::DirEntry{entry->d_name, entry->d_type == DT_DIR});
     }
     ::closedir(dir);

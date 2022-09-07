@@ -13,7 +13,7 @@ struct Proxy : public Widget<Crtp> {
     }
 
     ~Proxy() {
-        _child->detach();
+        _child->detach(this);
     }
 
     Node &child() {
@@ -26,6 +26,8 @@ struct Proxy : public Widget<Crtp> {
 
     void reconcile(Crtp &o) override {
         _child = tryOr(_child->reconcile(o._child), _child);
+        _child->attach(this);
+        Widget<Crtp>::reconcile(o);
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {

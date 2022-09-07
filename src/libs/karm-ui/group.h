@@ -19,7 +19,7 @@ struct Group : public Widget<Crtp> {
 
     ~Group() {
         for (auto &c : _children) {
-            c->detach();
+            c->detach(this);
         }
     }
 

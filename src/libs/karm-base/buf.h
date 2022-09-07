@@ -44,7 +44,7 @@ struct Buf {
         _buf = new Inert<T>[_cap];
 
         for (size_t i = 0; i < _len; i++) {
-            _buf[i].ctor(other.at(i));
+            _buf[i].ctor(other[i]);
         }
     }
 

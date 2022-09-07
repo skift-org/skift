@@ -120,6 +120,13 @@ struct Formatter<Str> {
 };
 
 template <>
+struct Formatter<String> {
+    Result<size_t> format(Io::_TextWriter &writer, String text) {
+        return writer.writeStr(text);
+    }
+};
+
+template <>
 struct Formatter<char const *> : public Formatter<Str> {};
 
 struct _Args {

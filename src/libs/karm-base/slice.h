@@ -37,7 +37,7 @@ struct Slice {
     constexpr Slice(T const *begin, T const *end)
         : Slice(begin, end - begin) {}
 
-    constexpr Slice(Sliceable<T> auto &other)
+    constexpr Slice(Sliceable<T>  auto const &other)
         : Slice(other.buf(), other.len()) {}
 
     constexpr T const &operator[](size_t i) const {

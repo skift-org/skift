@@ -116,12 +116,12 @@ struct Var {
         return false;
     }
 
-    void visit(auto visitor) {
-        Meta::indexCast<Ts...>(_index, _buf, visitor);
+    auto visit(auto visitor) {
+        return Meta::indexCast<Ts...>(_index, _buf, visitor);
     }
 
-    void visit(auto visitor) const {
-        Meta::indexCast<Ts...>(_index, _buf, visitor);
+    auto visit(auto visitor) const {
+        return Meta::indexCast<Ts...>(_index, _buf, visitor);
     }
 
     template <Meta::Contains<Ts...> T>

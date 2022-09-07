@@ -24,10 +24,10 @@ struct DialogLayer : public Widget<DialogLayer> {
 
     ~DialogLayer() {
         if (_dialog) {
-            (*_dialog)->detach();
+            (*_dialog)->detach(this);
         }
 
-        _child->detach();
+        _child->detach(this);
     }
 
     Node &child() {
@@ -68,6 +68,7 @@ struct DialogLayer : public Widget<DialogLayer> {
 
     void reconcile(DialogLayer &o) override {
         _child = tryOr(_child->reconcile(o._child), _child);
+        _child->attach(this);
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
@@ -89,14 +90,14 @@ struct DialogLayer : public Widget<DialogLayer> {
 
     void layout(Math::Recti r) override {
         if (_shouldClose) {
-            (*_dialog)->detach();
+            (*_dialog)->detach(this);
             _dialog = NONE;
             _shouldClose = false;
         }
 
         if (_shouldShow) {
             if (_dialog) {
-                (*_dialog)->detach();
+                (*_dialog)->detach(this);
             }
             _dialog = _shouldShow;
             (*_dialog)->attach(this);

@@ -41,6 +41,24 @@ struct Button : public _Box<Button> {
         },
     };
 
+    static constexpr ButtonStyle DEFAULT_ROUND = {
+        .idleStyle = {
+            .borderRadius = 999,
+            .backgroundColor = Gfx::ZINC700,
+        },
+        .hoverStyle = {
+            .borderRadius = 999,
+            .borderWidth = 1,
+            .backgroundColor = Gfx::ZINC600,
+        },
+        .pressStyle = {
+            .borderRadius = 999,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC600,
+            .backgroundColor = Gfx::ZINC700,
+        },
+    };
+
     static constexpr ButtonStyle PRIMARY = {
         .idleStyle = {
             .borderRadius = RADIUS,
@@ -53,6 +71,24 @@ struct Button : public _Box<Button> {
         },
         .pressStyle = {
             .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::BLUE600,
+            .backgroundColor = Gfx::BLUE700,
+        },
+    };
+
+    static constexpr ButtonStyle PRIMARY_ROUND = {
+        .idleStyle = {
+            .borderRadius = 999,
+            .backgroundColor = Gfx::BLUE700,
+        },
+        .hoverStyle = {
+            .borderRadius = 999,
+            .borderWidth = 1,
+            .backgroundColor = Gfx::BLUE600,
+        },
+        .pressStyle = {
+            .borderRadius = 999,
             .borderWidth = 1,
             .borderColor = Gfx::BLUE600,
             .backgroundColor = Gfx::BLUE700,
@@ -78,6 +114,25 @@ struct Button : public _Box<Button> {
         },
     };
 
+    static constexpr ButtonStyle OUTLINE_ROUND = {
+        .idleStyle = {
+            .borderRadius = 999,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC700,
+        },
+        .hoverStyle = {
+            .borderRadius = 999,
+            .borderWidth = 1,
+            .backgroundColor = Gfx::ZINC600,
+        },
+        .pressStyle = {
+            .borderRadius = 999,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC600,
+            .backgroundColor = Gfx::ZINC700,
+        },
+    };
+
     static constexpr ButtonStyle SUBTLE = {
         .idleStyle = {},
         .hoverStyle = {
@@ -93,17 +148,34 @@ struct Button : public _Box<Button> {
         },
     };
 
-    static constexpr Ui::ButtonStyle SUBTLE_ICON = {
+    static constexpr ButtonStyle SUBTLE_ICON = {
         .idleStyle = {
             .foregroundColor = Gfx::ZINC400,
         },
         .hoverStyle = {
-            .borderRadius = Ui::Button::RADIUS,
+            .borderRadius = RADIUS,
             .borderWidth = 1,
             .backgroundColor = Gfx::ZINC600,
         },
         .pressStyle = {
-            .borderRadius = Ui::Button::RADIUS,
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC600,
+            .backgroundColor = Gfx::ZINC700,
+        },
+    };
+
+    static constexpr ButtonStyle SUBTLE_ROUND = {
+        .idleStyle = {
+            .foregroundColor = Gfx::ZINC400,
+        },
+        .hoverStyle = {
+            .borderRadius = 999,
+            .borderWidth = 1,
+            .backgroundColor = Gfx::ZINC600,
+        },
+        .pressStyle = {
+            .borderRadius = 999,
             .borderWidth = 1,
             .borderColor = Gfx::ZINC600,
             .backgroundColor = Gfx::ZINC700,
@@ -128,18 +200,18 @@ struct Button : public _Box<Button> {
         },
     };
 
-    static constexpr Ui::ButtonStyle DESTRUCTIVE_ICON = {
+    static constexpr ButtonStyle DESTRUCTIVE_ICON = {
         .idleStyle = {
-            .borderRadius = Ui::Button::RADIUS,
+            .borderRadius = RADIUS,
             .foregroundColor = Gfx::ZINC400,
         },
         .hoverStyle = {
-            .borderRadius = Ui::Button::RADIUS,
+            .borderRadius = RADIUS,
             .borderWidth = 1,
             .backgroundColor = Gfx::RED600,
         },
         .pressStyle = {
-            .borderRadius = Ui::Button::RADIUS,
+            .borderRadius = RADIUS,
             .borderWidth = 1,
             .borderColor = Gfx::RED600,
             .backgroundColor = Gfx::RED700,
@@ -198,7 +270,7 @@ struct Button : public _Box<Button> {
 
         if (state != _state) {
             _state = state;
-            Ui::shouldRepaint(*this);
+            shouldRepaint(*this);
         }
     };
 };
@@ -219,7 +291,7 @@ static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, Str t)
                     text(t)))));
 }
 
-static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, Media::Icons i) {
+static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, Media::Icon i) {
     return button(
         std::move(onPress),
         style,
@@ -231,7 +303,7 @@ static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, Media:
                     icon(i)))));
 }
 
-static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, Media::Icons i, Str t) {
+static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, Media::Icon i, Str t) {
     return button(
         std::move(onPress),
         style,

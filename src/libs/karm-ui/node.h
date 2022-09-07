@@ -41,7 +41,7 @@ struct Node {
 
     virtual void attach(Node *) {}
 
-    virtual void detach() {}
+    virtual void detach(Node *) {}
 
     virtual void *query(Meta::Id) { return nullptr; }
 };
@@ -73,8 +73,9 @@ struct Widget : public Node {
         _parent = parent;
     }
 
-    void detach() override {
-        _parent = nullptr;
+    void detach(Node *parent) override {
+        if (_parent == parent)
+            _parent = nullptr;
     }
 
     void *query(Meta::Id id) override {

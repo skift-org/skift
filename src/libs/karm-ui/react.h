@@ -11,7 +11,7 @@ struct React : public Widget<Crtp> {
 
     ~React() {
         _child.with([&](auto &child) {
-            child->detach();
+            child->detach(this);
         });
     }
 
@@ -80,6 +80,8 @@ struct React : public Widget<Crtp> {
     }
 
     void visit(Visitor &v) override {
+        ensureBuild();
+
         if (_child)
             v(**_child);
     }

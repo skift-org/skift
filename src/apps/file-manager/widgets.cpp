@@ -3,17 +3,16 @@
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 
+#include "model.h"
 #include "widgets.h"
 
 namespace FileManager {
-
-static void nop(Ui::Node &) {}
 
 /* --- Common Widgets ------------------------------------------------------- */
 
 Ui::Child directorEntry(Sys::DirEntry const &entry) {
     return Ui::button(
-        nop,
+        Model::bind<GoTo>(entry.name),
         Ui::Button::SUBTLE,
         entry.isDir ? Media::Icons::FOLDER : Media::Icons::FILE,
         entry.name);
@@ -27,9 +26,9 @@ Ui::Child directoryListing(Sys::Dir const &dir) {
     return Ui::grow(Ui::scroll(Ui::spacing(8, Ui::vflow(children))));
 }
 
-Ui::Child breadcrumbItem(Str text) {
+Ui::Child breadcrumbItem(Str text, int index) {
     return Ui::button(
-        nop,
+        Model::bind<GoParent>(index),
         Ui::Button::SUBTLE,
         Ui::spacing(
             4,
@@ -48,24 +47,23 @@ Ui::Child breadcrumb() {
             .borderColor = Gfx::ZINC700,
         },
         Ui::hflow(
-            Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::LAPTOP),
-            breadcrumbItem("home"),
-            breadcrumbItem("smnx"),
-            breadcrumbItem("projects"),
-            breadcrumbItem("skift"),
+            Ui::button(Model::bind<GoTo>("/"), Ui::Button::SUBTLE, Media::Icons::LAPTOP),
+            breadcrumbItem("home", 3),
+            breadcrumbItem("smnx", 2),
+            breadcrumbItem("projects", 1),
+            breadcrumbItem("skift", 0),
             Ui::grow(),
-            Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::BOOKMARK)));
+            Ui::button(Model::bind<AddBookmark>(), Ui::Button::SUBTLE, Media::Icons::BOOKMARK)));
 }
 
 Ui::Child toolbar() {
     return Ui::toolbar(
-        Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::ARROW_LEFT),
-        Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::ARROW_RIGHT),
-        Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::ARROW_UP),
-        Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::HOME),
+        Ui::button(Model::bind<GoBack>(), Ui::Button::SUBTLE, Media::Icons::ARROW_LEFT),
+        Ui::button(Model::bind<GoForward>(), Ui::Button::SUBTLE, Media::Icons::ARROW_RIGHT),
+        Ui::button(Model::bind<GoParent>(1), Ui::Button::SUBTLE, Media::Icons::ARROW_UP),
+        Ui::button(Model::bind<GoTo>("/home"), Ui::Button::SUBTLE, Media::Icons::HOME),
         Ui::grow(FileManager::breadcrumb()),
-        Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::REFRESH),
-        Ui::button(nop, Ui::Button::SUBTLE, Media::Icons::CONSOLE));
+        Ui::button(Model::bind<Refresh>(), Ui::Button::SUBTLE, Media::Icons::REFRESH));
 }
 
 /* ---  Dialogs  ------------------------------------------------------------ */
@@ -75,6 +73,12 @@ Ui::Child openFileDialog() {
 
     auto titleLbl = Ui::text(16, "Open File");
     auto msgLbl = Ui::text("Select a file to open.");
+    auto titleBar = Ui::spacing(
+        16,
+        Ui::vflow(
+            8,
+            titleLbl,
+            msgLbl));
 
     auto openBtn = Ui::button(
         [](auto &n) {
@@ -88,15 +92,25 @@ Ui::Child openFileDialog() {
         },
         Ui::Button::SUBTLE, "CANCEL");
 
+    auto controls = Ui::spacing(
+        16,
+        Ui::hflow(
+            8,
+            Ui::grow(),
+            cancelBtn,
+            openBtn));
+
     return Ui::dialogScafold(
         Layout::Align::FILL,
         Ui::vflow(
-            Ui::spacing(16, Ui::vflow(8, titleLbl, msgLbl)),
-            toolbar(),
-            Ui::separator(),
-            directoryListing(dir),
-            Ui::separator()),
-        {Ui::grow(), cancelBtn, openBtn});
+            Ui::grow(
+                Ui::vflow(
+                    titleBar,
+                    toolbar(),
+                    Ui::separator(),
+                    directoryListing(dir),
+                    Ui::separator())),
+            controls));
 }
 
 /*

@@ -20,10 +20,19 @@ struct _Str : public Slice<U> {
     using Encoding = E;
     using Unit = U;
 
-    using Slice<U>::Slice;
+    constexpr _Str() = default;
 
-    constexpr _Str(Unit const *cstr) requires(Meta::Same<Unit, char>)
+    constexpr _Str(U const *cstr) requires(Meta::Same<U, char>)
         : Slice<U>(cstr, strLen(cstr)) {}
+
+    constexpr _Str(U const *buf, size_t len)
+        : Slice<U>(buf, len) {}
+
+    constexpr _Str(U const *begin, U const *end)
+        : Slice<U>(begin, end - begin) {}
+
+    constexpr _Str(Sliceable<U> auto const &other)
+        : Slice<U>(other.buf(), other.len()) {}
 };
 
 template <StaticEncoding E, typename U = typename E::Unit>

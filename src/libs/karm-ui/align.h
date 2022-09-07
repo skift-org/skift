@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-layout/align.h>
+#include <karm-layout/spacing.h>
 
 #include "proxy.h"
 
@@ -49,14 +50,15 @@ static inline Child vcenterFill(Child child) {
     return align(Layout::Align::VCENTER | Layout::Align::HFILL, child);
 }
 
-struct Sizing : public Proxy<Align> {
+struct Sizing : public Proxy<Sizing> {
     static constexpr auto UNCONSTRAINED = -1;
 
     Math::Vec2i _min;
     Math::Vec2i _max;
     Math::Recti _rect;
 
-    Sizing(Math::Vec2i min, Math::Vec2i max, Child child) : Proxy(child), _min(min), _max(max) {}
+    Sizing(Math::Vec2i min, Math::Vec2i max, Child child)
+        : Proxy(child), _min(min), _max(max) {}
 
     Math::Recti bound() override {
         return _rect;
@@ -112,6 +114,41 @@ static inline Child pinSize(Math::Vec2i size, Child child) {
 
 static inline Child pinSize(int size, Child child) {
     return minSize(Math::Vec2i{size}, child);
+}
+
+struct Spacing : public Proxy<Spacing> {
+    Layout::Spacingi _spacing;
+
+    Spacing(Layout::Spacingi spacing, Child child)
+        : Proxy(child), _spacing(spacing) {}
+
+    void reconcile(Spacing &o) override {
+        _spacing = o._spacing;
+        Proxy<Spacing>::reconcile(o);
+    }
+
+    void paint(Gfx::Context &g, Math::Recti r) override {
+        child().paint(g, r);
+        if (DEBUG) {
+            g._rect(child().bound(), Gfx::LIME);
+        }
+    }
+
+    void layout(Math::Recti rect) override {
+        child().layout(_spacing.shrink(Layout::Flow::LEFT_TO_RIGHT, rect));
+    }
+
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+        return child().size(s - _spacing.all(), hint) + _spacing.all();
+    }
+
+    Math::Recti bound() override {
+        return _spacing.grow(Layout::Flow::LEFT_TO_RIGHT, child().bound());
+    }
+};
+
+static inline Child spacing(Layout::Spacingi s, Child child) {
+    return makeStrong<Spacing>(s, child);
 }
 
 } // namespace Karm::Ui

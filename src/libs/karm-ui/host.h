@@ -18,7 +18,7 @@ struct Host : public Node {
     }
 
     ~Host() {
-        _root->detach();
+        _root->detach(this);
     }
 
     virtual Gfx::Surface surface() = 0;

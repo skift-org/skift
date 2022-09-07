@@ -29,16 +29,16 @@ struct _Box : public Proxy<Crtp> {
             g.fill(bound(), boxStyle().borderRadius);
         }
 
+        g.fillStyle(boxStyle().foregroundColor);
+        Proxy<Crtp>::child().paint(g, r);
+        g.restore();
+
         if (boxStyle().borderWidth) {
             g.strokeStyle(Gfx::stroke(boxStyle().borderColor)
                               .withWidth(boxStyle().borderWidth)
                               .withAlign(Gfx::INSIDE_ALIGN));
             g.stroke(bound(), boxStyle().borderRadius);
         }
-
-        g.fillStyle(boxStyle().foregroundColor);
-        Proxy<Crtp>::child().paint(g, r);
-        g.restore();
     }
 
     void layout(Math::Recti rect) override {
@@ -73,34 +73,6 @@ struct Box : public _Box<Box> {
 
 static inline Child box(BoxStyle style, Child child) {
     return makeStrong<Box>(style, child);
-}
-
-struct Spacing : public Proxy<Spacing> {
-    Layout::Spacingi _spacing;
-
-    Spacing(Layout::Spacingi spacing, Child child)
-        : Proxy(child), _spacing(spacing) {}
-
-    void reconcile(Spacing &o) override {
-        _spacing = o._spacing;
-        Proxy<Spacing>::reconcile(o);
-    }
-
-    void layout(Math::Recti rect) override {
-        child().layout(_spacing.shrink(Layout::Flow::LEFT_TO_RIGHT, rect));
-    }
-
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
-        return child().size(s - _spacing.all(), hint) + _spacing.all();
-    }
-
-    Math::Recti bound() override {
-        return _spacing.grow(Layout::Flow::LEFT_TO_RIGHT, child().bound());
-    }
-};
-
-static inline Child spacing(Layout::Spacingi s, Child child) {
-    return makeStrong<Spacing>(s, child);
 }
 
 } // namespace Karm::Ui

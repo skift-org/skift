@@ -31,7 +31,7 @@ static inline Child icon(Media::Icon icon) {
     return makeStrong<Icon>(icon);
 }
 
-static inline Child icon(Media::Icons icon, double size = 18) {
+static inline Child icon(Media::Icons icon, double size) {
     return makeStrong<Icon>(Media::Icon{icon, size});
 }
 

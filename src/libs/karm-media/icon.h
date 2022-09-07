@@ -17,9 +17,9 @@ struct Icon {
 
     static Strong<Fontface> fontface();
 
-    static Result<Icon> byName(Str query, double size = 24);
+    static Result<Icon> byName(Str query, double size = 18);
 
-    Icon(Icons code, double size = 24)
+    Icon(Icons code, double size = 18)
         : _code(code), _size(size) {}
 
     Str name();

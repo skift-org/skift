@@ -2,6 +2,9 @@
 
 namespace Karm::Media {
 
+struct ImageData {
+};
+
 struct Image {
 };
 

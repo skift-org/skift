@@ -8,16 +8,16 @@
 
 namespace Karm::Media {
 
-struct TtfFont : public Fontface {
+struct TtfFontface : public Fontface {
     Sys::Mmap _mmap;
     Ttf::Font _ttf;
 
-    static Result<Strong<TtfFont>> load(Sys::Mmap mmap) {
+    static Result<Strong<TtfFontface>> load(Sys::Mmap mmap) {
         auto ttf = try$(Ttf::Font::load(mmap.bytes()));
-        return makeStrong<TtfFont>(std::move(mmap), ttf);
+        return makeStrong<TtfFontface>(std::move(mmap), ttf);
     }
 
-    TtfFont(Sys::Mmap mmap, Ttf::Font ttf)
+    TtfFontface(Sys::Mmap mmap, Ttf::Font ttf)
         : _mmap{std::move(mmap)},
           _ttf{std::move(ttf)} {
     }

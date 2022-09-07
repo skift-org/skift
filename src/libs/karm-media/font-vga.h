@@ -7,17 +7,13 @@
 
 namespace Karm::Media {
 
-struct VgaFont : public Fontface {
+struct VgaFontface : public Fontface {
     static constexpr int WIDTH = 8;
     static constexpr int HEIGHT = 8;
 
     static constexpr Array<uint8_t, 1024> const DATA = {
 #include "font-vga.inc"
     };
-
-    VgaFont() = default;
-
-    ~VgaFont() = default;
 
     FontMetrics metrics() const override {
         return {

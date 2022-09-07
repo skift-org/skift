@@ -6,7 +6,7 @@
 namespace Karm::Media {
 
 Strong<Fontface> Fontface::fallback() {
-    return makeStrong<VgaFont>();
+    return makeStrong<VgaFontface>();
 }
 
 Font Font::fallback() {

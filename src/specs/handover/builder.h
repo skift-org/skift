@@ -64,6 +64,10 @@ struct Builder {
     void agent(Str str) {
         payload().agent = add(str);
     }
+
+    Payload &finalize() {
+        return *(Payload *)_buf;
+    }
 };
 
 } // namespace Handover

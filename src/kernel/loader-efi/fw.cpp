@@ -74,10 +74,8 @@ Error finalizeHandover(Handover::Builder &builder) {
             builder.add(Handover::Tag::FREE, 0, {start, size});
             break;
 
-        case Efi::MemoryType::RESERVED_MEMORY_TYPE:
-            break;
-
         default:
+            builder.add(Handover::Tag::RESERVED, 0, {start, size});
             break;
         }
     }

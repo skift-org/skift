@@ -22,17 +22,18 @@ static inline bool cstrEq(const char *str1, const char *str2) {
 
 static constexpr uint32_t COOLBOOT = 0xc001b001;
 
-#define FOREACH_TAG(TAG)    \
-    TAG(FREE, 0)            \
-    TAG(MAGIC, COOLBOOT)    \
-    TAG(SELF, 0xa24f988d)   \
-    TAG(STACK, 0xf65b391b)  \
-    TAG(KERNEL, 0xbfc71b20) \
-    TAG(LOADER, 0xf1f80c26) \
-    TAG(FILE, 0xcbc36d3b)   \
-    TAG(RSDP, 0x8d3bbb)     \
-    TAG(FDT, 0xb628bbc1)    \
-    TAG(FB, 0xe2d55685)     \
+#define FOREACH_TAG(TAG)      \
+    TAG(FREE, 0)              \
+    TAG(MAGIC, COOLBOOT)      \
+    TAG(SELF, 0xa24f988d)     \
+    TAG(STACK, 0xf65b391b)    \
+    TAG(KERNEL, 0xbfc71b20)   \
+    TAG(LOADER, 0xf1f80c26)   \
+    TAG(FILE, 0xcbc36d3b)     \
+    TAG(RSDP, 0x8d3bbb)       \
+    TAG(FDT, 0xb628bbc1)      \
+    TAG(FB, 0xe2d55685)       \
+    TAG(RESERVED, 0xb8841d2d) \
     TAG(END, 0xffffffff)
 
 enum struct Tag : uint32_t {
@@ -58,6 +59,8 @@ static inline bool shouldMerge(Tag tag) {
     switch (tag) {
     case Tag::FREE:
     case Tag::LOADER:
+    case Tag::KERNEL:
+    case Tag::RESERVED:
         return true;
     default:
         return false;

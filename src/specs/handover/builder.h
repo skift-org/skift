@@ -32,6 +32,15 @@ struct Builder {
             return;
 
         for (size_t i = 0; i < payload().len; i++) {
+            if (record(i).start > r.start) {
+                for (size_t j = payload().len; j > i; j--) {
+                    record(j) = record(j - 1);
+                }
+                record(i) = r;
+                payload().len++;
+                return;
+            }
+
             if (record(i).tag == r.tag &&
                 record(i).end() == r.start &&
                 shouldMerge(r.tag)) {

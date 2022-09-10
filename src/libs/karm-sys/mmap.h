@@ -20,11 +20,13 @@ struct Mmap :
         : _paddr(paddr), _buf(buf), _size(size) {}
 
     Mmap(Mmap &&other) {
+        std::swap(_paddr, other._paddr);
         std::swap(_buf, other._buf);
         std::swap(_size, other._size);
     }
 
     Mmap &operator=(Mmap &&other) {
+        std::swap(_paddr, other._paddr);
         std::swap(_buf, other._buf);
         std::swap(_size, other._size);
         return *this;
@@ -76,18 +78,21 @@ struct MutMmap :
     size_t _size{};
 
     MutMmap(size_t paddr, void *buf, size_t size)
-        : _paddr(paddr), _buf(buf), _size(size) {}
+        : _paddr(paddr), _buf(buf), _size(size) {
+    }
 
     Result<size_t> flush() override {
         return Embed::memFlush(_buf, _size);
     }
 
     MutMmap(MutMmap &&other) {
+        std::swap(_paddr, other._paddr);
         std::swap(_buf, other._buf);
         std::swap(_size, other._size);
     }
 
     MutMmap &operator=(MutMmap &&other) {
+        std::swap(_paddr, other._paddr);
         std::swap(_buf, other._buf);
         std::swap(_size, other._size);
         return *this;

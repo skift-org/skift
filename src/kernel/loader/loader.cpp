@@ -18,6 +18,7 @@ void enterKernel(size_t entry, size_t payload, size_t stack, size_t vmm);
 Error load(Sys::Path kernelPath) {
     Debug::linfo("Preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
+    Debug::linfo("Payload at vaddr: 0x{x} paddr: 0x{x}", payloadMem.vaddr(), payloadMem.paddr());
     Handover::Builder payload{payloadMem.mutBytes()};
     payload.add(Handover::SELF, 0, payloadMem.prange());
 
@@ -26,6 +27,7 @@ Error load(Sys::Path kernelPath) {
     auto kernelMem = try$(Sys::mmap().map(kernelFile));
     Elf::Image image{kernelMem.bytes()};
     payload.add(Handover::FILE, 0, kernelMem.prange());
+    Debug::linfo("Kernel at vaddr: 0x{x} paddr: 0x{x}", kernelMem.vaddr(), kernelMem.paddr());
 
     if (!image.valid()) {
         return Error{Error::INVALID_DATA, "invalid kernel image"};
@@ -34,6 +36,7 @@ Error load(Sys::Path kernelPath) {
     Debug::linfo("Setting up stack...");
     auto stackMap = try$(Sys::mmap().stack().size(kib(16)).mapMut());
     payload.add(Handover::STACK, 0, stackMap.prange());
+    Debug::linfo("Stack at vaddr: 0x{x} paddr: 0x{x}", stackMap.vaddr(), stackMap.paddr());
 
     Debug::linfo("Loading kernel image...");
     for (auto prog : image.programs()) {

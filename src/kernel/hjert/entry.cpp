@@ -24,7 +24,8 @@ Error entryPoint(uint64_t magic, Handover::Payload const &payload) {
             "handover: entry: {} {x}-{x} ({}kib)",
             record.name(),
             record.start,
-            record.end(), record.size / 1024);
+            record.end(),
+            record.size / 1024);
     }
 
     Arch::stopCpu();

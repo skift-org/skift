@@ -11,21 +11,8 @@ namespace Calculator {
 
 Ui::Child keypad(State state) {
     Ui::GridStyle gridStyle = {
-        .rows = {
-            Ui::GridUnit::grow(),
-            Ui::GridUnit::grow(),
-            Ui::GridUnit::grow(),
-            Ui::GridUnit::grow(),
-            Ui::GridUnit::grow(),
-            Ui::GridUnit::grow(),
-            Ui::GridUnit::grow(),
-        },
-        .columns = {
-            Ui::GridUnit::grow(),
-            Ui::GridUnit::grow(),
-            Ui::GridUnit::grow(),
-            Ui::GridUnit::grow(),
-        },
+        .rows = Ui::GridUnit::grow().repeated(7),
+        .columns = Ui::GridUnit::grow().repeated(4),
         .gaps = 4,
     };
 
@@ -77,8 +64,6 @@ Ui::Child keypad(State state) {
 }
 
 Ui::Child screen(State state) {
-    // auto debug = Ui::text(12, "lhs: {} rhs:{} hasRhs:{}", state.lhs, state.rhs, state.hasRhs);
-
     auto currExpr = Ui::align(
         Layout::Align::VCENTER | Layout::Align::END,
         state.op == Operator::NONE ? Ui::text(16, "") : Ui::text(16, toFmt(state.op), state.lhs));

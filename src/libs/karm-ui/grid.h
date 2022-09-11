@@ -31,6 +31,13 @@ struct GridUnit {
     }
 
     GridUnit(_Unit unit, int value) : unit(unit), value(value) {}
+
+    Vec<GridUnit> repeated(size_t count) {
+        Vec<GridUnit> units{};
+        while (count--)
+            units.pushBack(*this);
+        return units;
+    }
 };
 
 struct Cell : public Proxy<Cell> {

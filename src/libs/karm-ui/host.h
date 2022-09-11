@@ -40,7 +40,11 @@ struct Host : public Node {
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
         g.clip(r);
-        g.clear(r, Gfx::ZINC900);
+        g.clear(r, Gfx::ALPHA);
+
+        g.fillStyle(Gfx::fill(Gfx::ZINC900));
+        g.fill(bound(), 8);
+        g.fillStyle(Gfx::fill(Gfx::WHITE));
         _root->paint(g, r);
 
         if (DEBUG) {
@@ -48,6 +52,8 @@ struct Host : public Node {
             g.fill(r);
         }
 
+        g.strokeStyle(Gfx::stroke(Gfx::ZINC800).withWidth(1).withAlign(Gfx::StrokeAlign::INSIDE_ALIGN));
+        g.stroke(bound(), 8);
         g.restore();
     }
 

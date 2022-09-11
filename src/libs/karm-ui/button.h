@@ -9,7 +9,7 @@
 
 namespace Karm::Ui {
 
-static void NOP(Node &) {}
+static inline void NOP(Node &) {}
 
 struct ButtonStyle {
     BoxStyle idleStyle;

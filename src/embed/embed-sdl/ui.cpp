@@ -192,7 +192,7 @@ Result<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
         SDL_WINDOWPOS_UNDEFINED,
         size.width,
         size.height,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
+        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS | SDL_WINDOW_UTILITY);
 
     if (!window) {
         return Error{SDL_GetError()};

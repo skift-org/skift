@@ -40,6 +40,11 @@ struct Model {
     static Func<void(Node &)> bind(Args... args) {
         return bindAction<Action>(X{std::forward<Args>(args)...});
     }
+
+    template <typename X>
+    static Func<void(Node &)> bind(X value) {
+        return bindAction<Action>(value);
+    }
 };
 
 template <typename Model>

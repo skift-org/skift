@@ -3,40 +3,56 @@
 namespace Calculator {
 
 State doOperator(State s, Operator op) {
-    if (!s.hasB)
+    if (!s.hasRhs) {
+        s.op = op;
         return s;
+    }
 
     switch (op) {
     case Operator::NONE:
-        s.regA = s.regB;
+        s.lhs = s.rhs;
         return s;
 
     case Operator::ADD:
-        s.regA += s.regB;
+        s.lhs = s.lhs + s.rhs;
         return s;
 
     case Operator::SUB:
-        s.regA -= s.regB;
+        s.lhs = s.lhs - s.rhs;
         return s;
 
     case Operator::MULT:
-        s.regA *= s.regB;
+        s.lhs = s.lhs * s.rhs;
         return s;
 
     case Operator::DIV:
-        s.regA /= s.regB;
+        s.lhs = s.lhs / s.rhs;
         return s;
 
     case Operator::MOD:
-        s.regA %= s.regB;
+        s.lhs = s.lhs % s.rhs;
+        return s;
+
+    case Operator::SQUARE:
+        s.lhs = s.lhs * s.rhs;
         return s;
 
     case Operator::SQRT:
-        s.regA = sqrt(s.regA);
+        s.lhs = s.rhs;
+        s.rhs = sqrt(s.lhs);
+        s.op = Operator::NONE;
         return s;
 
-    case Operator::POWER:
-        s.regA = pow(s.regA, s.regB);
+    case Operator::INVERT_SIGN:
+        s.lhs = s.rhs;
+        s.rhs = -s.lhs;
+        s.op = Operator::NONE;
+        return s;
+
+    case Operator::TO_PERCENT:
+        s.lhs = s.rhs;
+        s.rhs = s.lhs / 100;
+        s.op = Operator::NONE;
         return s;
     }
 }
@@ -44,41 +60,75 @@ State doOperator(State s, Operator op) {
 State reduce(State s, Actions action) {
     return action.visit(Visitor{
         [&](Operator op) {
-            s = doOperator(s, op);
-            s.lastOp = op;
-            s.regB = 0;
-            s.hasB = false;
+            s = doOperator(s, isUnary(op) ? op : s.op);
+
+            s.op = op;
+            s.rhs = isUnary(op) ? s.rhs : 0;
+            s.hasRhs = true;
 
             return s;
         },
         [&](Number n) {
-            s.regB *= 10;
-            s.regB += n;
-            s.hasB = true;
+            s.rhs *= 10;
+            s.rhs += n;
+            s.hasRhs = true;
 
+            return s;
+        },
+        [&](BackspaceAction) {
+            s.rhs /= 10;
             return s;
         },
         [&](EqualAction) {
-            s = doOperator(s, s.lastOp);
-            s.regB = 0;
-            s.hasB = false;
-
+            s = doOperator(s, s.op);
+            s.rhs = 0;
+            s.hasRhs = false;
+            s.op = Operator::NONE;
             return s;
         },
         [&](ClearAction) {
-            s.regB = 0;
-
+            s.rhs = 0;
             return s;
         },
         [&](ClearAllAction) {
-            s.lastOp = Operator::NONE;
-            s.regA = 0;
-            s.regB = 0;
-            s.hasB = false;
-
+            s.lhs = 0;
+            s.rhs = 0;
+            s.hasRhs = false;
+            s.op = Operator::NONE;
             return s;
         },
-    });
+        [&](MemClearAction) {
+            s.hasMem = false;
+            s.mem = 0;
+            return s;
+        },
+        [&](MemRecallAction) {
+            s.rhs = s.mem;
+            s.hasRhs = true;
+            return s;
+        },
+        [&](MemAddAction) {
+            if (!s.hasMem) {
+                s = reduce(s, MemStoreAction{});
+            } else {
+                s.mem += s.hasRhs ? s.rhs : s.lhs;
+            }
+            return s;
+        },
+        [&](MemSubAction) {
+            if (!s.hasMem) {
+                s = reduce(s, MemStoreAction{});
+                s.mem = -s.mem;
+            } else {
+                s.mem -= s.hasRhs ? s.rhs : s.lhs;
+            }
+            return s;
+        },
+        [&](MemStoreAction) {
+            s.mem = s.hasRhs ? s.rhs : s.lhs;
+            s.hasMem = true;
+            return s;
+        }});
 }
 
 } // namespace Calculator

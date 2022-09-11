@@ -37,9 +37,6 @@ struct Cell : public Proxy<Cell> {
     Math::Vec2i _start{};
     Math::Vec2i _end{};
 
-    Cell(Math::Vec2i pos, Child child)
-        : Proxy(child), _start(pos), _end(pos) {}
-
     Cell(Math::Vec2i start, Math::Vec2i end, Child child)
         : Proxy(child), _start(start), _end(end) {}
 
@@ -51,6 +48,14 @@ struct Cell : public Proxy<Cell> {
         return _end;
     }
 };
+
+static inline Child cell(Math::Vec2i pos, Child child) {
+    return makeStrong<Cell>(pos, pos, child);
+}
+
+static inline Child cell(Math::Vec2i start, Math::Vec2i end, Child child) {
+    return makeStrong<Cell>(start, end, child);
+}
 
 struct GridStyle {
     Vec<GridUnit> rows;
@@ -170,6 +175,7 @@ struct GridLayout : public Group<GridLayout> {
                 };
 
                 child->layout(childRect);
+                index = end.y * _columns.len() + end.x;
             } else {
                 auto row = index / _columns.len();
                 auto column = index % _columns.len();

@@ -5,11 +5,11 @@
 
 namespace FileManager {
 
-struct Data {
+struct State {
     Vec<Sys::Path> history;
     size_t currentIndex = 0;
 
-    Data(Sys::Path path)
+    State(Sys::Path path)
         : history({path}) {}
 
     Sys::Path currentPath() const {
@@ -47,8 +47,8 @@ struct AddBookmark {};
 
 using Actions = Var<GoBack, GoForward, GoParent, GoTo, Refresh, AddBookmark>;
 
-Data reduce(Data d, Actions action);
+State reduce(State d, Actions action);
 
-using Model = Ui::Model<Data, Actions>;
+using Model = Ui::Model<State, Actions>;
 
 } // namespace FileManager

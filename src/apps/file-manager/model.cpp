@@ -2,7 +2,7 @@
 
 namespace FileManager {
 
-Data reduce(Data d, Actions action) {
+State reduce(State d, Actions action) {
     return action.visit(Visitor{
         [&](GoBack) {
             if (d.currentIndex > 0) {

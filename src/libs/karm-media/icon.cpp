@@ -11,31 +11,23 @@ Strong<Fontface> Icon::fontface() {
     return f;
 }
 
-/*
-// FIXME: clang chokes on this
-Result<Icon> Icon::byName(Str query, double size) {
-#define ICON(id, name, code)            \
-    if (Op::eq(query, Str{name}) == 0) \
-        return Icon{Icons::id, size};
-#include "icons.inc"
-#undef ICON
-    return NONE;
-}
-*/
+// NOTE: Theses functions need to be implemented in C because clang choke otherwise.
 
-/*
-// FIXME: clang chokes on this
-Str Icon::name() {
-    switch (_code) {
-#define ICON(id, name, code) \
-    case Icons::id:          \
-        return #name;
-#include "icons.inc"
-#undef ICON
+extern "C" uint32_t _Karm__Media__Icon__byName(char const *query, size_t queryLen);
+
+extern "C" char const *_Karm__Media__Icon__name(uint32_t query);
+
+Result<Icon> Icon::byName(Str query, double size) {
+    auto codepoint = _Karm__Media__Icon__byName(query.buf(), query.len());
+    if (codepoint == 0) {
+        return Error("Icon not found");
     }
-    return "";
+    return Icon((Icons)codepoint, size);
 }
-*/
+
+Str Icon::name() {
+    return Str(_Karm__Media__Icon__name((uint32_t)_code));
+}
 
 void Icon::fill(Gfx::Context &g, Math::Vec2i pos) const {
     auto face = fontface();

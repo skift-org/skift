@@ -8,6 +8,9 @@
 #include "text.h"
 
 namespace Karm::Ui {
+
+static void NOP(Node &) {}
+
 struct ButtonStyle {
     BoxStyle idleStyle;
     BoxStyle hoverStyle;
@@ -38,6 +41,24 @@ struct Button : public _Box<Button> {
             .borderWidth = 1,
             .borderColor = Gfx::ZINC600,
             .backgroundColor = Gfx::ZINC700,
+        },
+    };
+
+    static constexpr ButtonStyle SECONDARY = {
+        .idleStyle = {
+            .borderRadius = RADIUS,
+            .backgroundColor = Gfx::ZINC800,
+        },
+        .hoverStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .backgroundColor = Gfx::ZINC700,
+        },
+        .pressStyle = {
+            .borderRadius = RADIUS,
+            .borderWidth = 1,
+            .borderColor = Gfx::ZINC700,
+            .backgroundColor = Gfx::ZINC800,
         },
     };
 
@@ -289,6 +310,18 @@ static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, Str t)
                 spacing(
                     {16, 6},
                     text(t)))));
+}
+
+static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, int size, Str t) {
+    return button(
+        std::move(onPress),
+        style,
+        minSize(
+            {Sizing::UNCONSTRAINED, 36},
+            center(
+                spacing(
+                    {16, 6},
+                    text(size, t)))));
 }
 
 static inline Child button(Func<void(Node &)> onPress, ButtonStyle style, Media::Icon i) {

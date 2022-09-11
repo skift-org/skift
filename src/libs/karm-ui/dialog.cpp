@@ -8,8 +8,6 @@
 
 namespace Karm::Ui {
 
-void nop(Node &) {}
-
 /* ---  Dialog Base  -------------------------------------------------------- */
 
 struct DialogLayer : public Widget<DialogLayer> {
@@ -188,7 +186,7 @@ Child aboutDialog(Media::Icons i, String name) {
         text("SMNX & contributors."));
 
     Children actions = {
-        button(nop, Button::SUBTLE, "LICENSE"),
+        button(NOP, Button::SUBTLE, "LICENSE"),
         grow(),
         dialogCloseButton(),
     };

@@ -23,8 +23,6 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
     return Ui::scroll(Ui::spacing(8, Ui::vflow(8, children)));
 }
 
-void nop(Ui::Node &) {}
-
 CliResult entryPoint(CliArgs args) {
     auto fontface = try$(args.len()
                              ? Media::loadFontface(args[0])

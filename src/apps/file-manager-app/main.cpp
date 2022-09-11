@@ -14,13 +14,14 @@ CliResult entryPoint(CliArgs args) {
         auto titlebar = Ui::titlebar(Media::Icons::FOLDER, "File Manager");
         auto listing = FileManager::directoryListing(dir);
 
-        return Ui::minSize(
-            {700, 500},
-            Ui::vflow(
-                titlebar,
-                FileManager::toolbar(),
-                Ui::separator(),
-                listing));
+        return Ui::dialogLayer(
+            Ui::minSize(
+                {700, 500},
+                Ui::vflow(
+                    titlebar,
+                    FileManager::toolbar(),
+                    Ui::separator(),
+                    listing)));
     });
 
     return Ui::runApp(args, app);

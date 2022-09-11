@@ -1,22 +1,18 @@
 #include <karm-main/main.h>
-#include <karm-ui/align.h>
 #include <karm-ui/app.h>
 #include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
-#include <karm-ui/flow.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
-
-void nop(Ui::Node &) {}
 
 Ui::Child buttons() {
     return Ui::hflow(
         8,
-        Ui::button(nop, Ui::Button::PRIMARY, "PRIMARY BUTTON"),
-        Ui::button(nop, "BUTTON"),
-        Ui::button(nop, Ui::Button::OUTLINE, "OUTLINE BUTTON"),
-        Ui::button(nop, Ui::Button::SUBTLE, "SUBTLE BUTTON"),
-        Ui::button(nop, Ui::Button::DESTRUCTIVE, "DESTRUCTIVE BUTTON"));
+        Ui::button(Ui::NOP, Ui::Button::PRIMARY, "PRIMARY BUTTON"),
+        Ui::button(Ui::NOP, "BUTTON"),
+        Ui::button(Ui::NOP, Ui::Button::OUTLINE, "OUTLINE BUTTON"),
+        Ui::button(Ui::NOP, Ui::Button::SUBTLE, "SUBTLE BUTTON"),
+        Ui::button(Ui::NOP, Ui::Button::DESTRUCTIVE, "DESTRUCTIVE BUTTON"));
 }
 
 Ui::Child badges() {
@@ -29,15 +25,14 @@ Ui::Child badges() {
 }
 
 Ui::Child texts() {
-    auto fontface = Media::loadFontface("res/fonts/inter/Inter-Regular.ttf").unwrap();
     return Ui::vflow(
         8,
-        Ui::text(Media::Font{12, fontface}, "The quick brown fox jumps over the lazy dog."),
-        Ui::text(Media::Font{14, fontface}, "The quick brown fox jumps over the lazy dog."),
-        Ui::text(Media::Font{18, fontface}, "The quick brown fox jumps over the lazy dog."),
-        Ui::text(Media::Font{22, fontface}, "The quick brown fox jumps over the lazy dog."),
-        Ui::text(Media::Font{36, fontface}, "The quick brown fox jumps over the lazy dog."),
-        Ui::text(Media::Font{48, fontface}, "The quick brown fox jumps over the lazy dog."));
+        Ui::text(12, "The quick brown fox jumps over the lazy dog."),
+        Ui::text(14, "The quick brown fox jumps over the lazy dog."),
+        Ui::text(18, "The quick brown fox jumps over the lazy dog."),
+        Ui::text(22, "The quick brown fox jumps over the lazy dog."),
+        Ui::text(36, "The quick brown fox jumps over the lazy dog."),
+        Ui::text(48, "The quick brown fox jumps over the lazy dog."));
 }
 
 CliResult entryPoint(CliArgs args) {

@@ -1,0 +1,9 @@
+{
+    "id": "calculator-app",
+    "type": "exe",
+    "description": "Calculator app",
+    "deps": [
+        "karm-ui",
+        "karm-main"
+    ]
+}

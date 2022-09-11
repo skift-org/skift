@@ -46,8 +46,7 @@ struct FlowLayout : public Group<FlowLayout> {
     FlowLayout(FlowStyle style, Children children)
         : Group(children), _style(style) {}
 
-    void layout(Math::Recti r) override {
-        _bound = r;
+    int computeGrowUnit(Math::Recti r) {
         int total = 0;
         int grows = 0;
 
@@ -61,7 +60,13 @@ struct FlowLayout : public Group<FlowLayout> {
 
         int all = _style.flow.getWidth(r) - _style.gaps * (max(1uz, children().len()) - 1);
         int growTotal = max(0, all - total);
-        int growUnit = (growTotal) / max(1, grows);
+        return (growTotal) / max(1, grows);
+    }
+
+    void layout(Math::Recti r) override {
+        _bound = r;
+
+        int growUnit = computeGrowUnit(r);
         int start = _style.flow.getStart(r);
 
         for (auto &child : children()) {

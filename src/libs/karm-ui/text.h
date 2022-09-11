@@ -39,22 +39,24 @@ struct Text : public View<Text> {
     }
 };
 
+Strong<Media::Fontface> defaultFontface();
+
 static inline Child text(Str text) {
-    return makeStrong<Text>(Media::loadFont(12, "res/fonts/inter/Inter-Medium.ttf").unwrap(), text);
+    return makeStrong<Text>(Media::Font{12, defaultFontface()}, text);
 }
 
 template <typename... Args>
 static inline Child text(Str format, Args &&...args) {
-    return makeStrong<Text>(Media::loadFont(12, "res/fonts/inter/Inter-Medium.ttf").unwrap(), Fmt::format(format, std::forward<Args>(args)...));
+    return makeStrong<Text>(Media::Font{12, defaultFontface()}, Fmt::format(format, std::forward<Args>(args)...));
 }
 
 static inline Child text(int size, Str text) {
-    return makeStrong<Text>(Media::loadFont(size, "res/fonts/inter/Inter-Medium.ttf").unwrap(), text);
+    return makeStrong<Text>(Media::Font{(double)size, defaultFontface()}, text);
 }
 
 template <typename... Args>
 static inline Child text(int size, Str format, Args &&...args) {
-    return makeStrong<Text>(Media::loadFont(size, "res/fonts/inter/Inter-Medium.ttf").unwrap(), Fmt::format(format, std::forward<Args>(args)...));
+    return makeStrong<Text>(Media::Font{(double)size, defaultFontface()}, Fmt::format(format, std::forward<Args>(args)...));
 }
 
 static inline Child text(Media::Font font, Str text) {

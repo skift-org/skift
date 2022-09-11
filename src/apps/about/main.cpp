@@ -4,8 +4,6 @@
 #include <karm-ui/dialog.h>
 #include <karm-ui/scafold.h>
 
-void nop(Ui::Node &) {}
-
 CliResult entryPoint(CliArgs args) {
     auto titlebar = Ui::titlebar(
         Media::Icons::INFORMATION,
@@ -21,21 +19,29 @@ CliResult entryPoint(CliArgs args) {
         Ui::empty(),
         Ui::badge(Ui::BadgeStyle::INFO, "v0.1.0"),
         Ui::empty(),
-        Ui::text("Copyright © 2018-2023"),
+        Ui::text("Copyright © 2018-2022"),
         Ui::text("SMNX & contributors."),
         Ui::empty());
 
-    auto controls = Ui::hflow(
-        Ui::button(nop, Ui::Button::SUBTLE, "LICENSE"),
-        Ui::grow(),
-        Ui::button(nop, Ui::Button::PRIMARY, "OK"));
+    auto licenseBtn = Ui::button(
+        Ui::NOP,
+        Ui::Button::SUBTLE_ROUND,
+        Media::Icons::LICENSE,
+        "LICENSE");
 
-    auto layout = Ui::dialogLayer(Ui::minSize(
-        320,
+    auto wrapper = Ui::spacing(
+        32,
         Ui::vflow(
-            titlebar,
-            Ui::grow(content),
-            Ui::spacing(8, controls))));
+            32,
+            Ui::grow(Ui::center(content)),
+            Ui::center(licenseBtn)));
+
+    auto layout = Ui::dialogLayer(
+        Ui::minSize(
+            420,
+            Ui::vflow(
+                titlebar,
+                Ui::grow(Ui::center(wrapper)))));
 
     return Ui::runApp(args, layout);
 }

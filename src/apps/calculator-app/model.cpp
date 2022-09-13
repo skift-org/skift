@@ -34,7 +34,9 @@ State doOperator(State s, Operator op) {
         return s;
 
     case Operator::SQUARE:
-        s.lhs = s.lhs * s.rhs;
+        s.lhs = s.rhs;
+        s.rhs = s.rhs * s.rhs;
+        s.op = Operator::NONE;
         return s;
 
     case Operator::SQRT:
@@ -60,7 +62,13 @@ State doOperator(State s, Operator op) {
 State reduce(State s, Actions action) {
     return action.visit(Visitor{
         [&](Operator op) {
-            s = doOperator(s, isUnary(op) ? op : s.op);
+            if (!isUnary(s.op))
+                s = doOperator(s, s.op);
+            if (isUnary(op)) {
+                if ((!isUnary(s.op) && s.op != Operator::NONE))
+                    s.rhs = s.lhs;
+                s = doOperator(s, op);
+            }
 
             s.op = op;
             s.rhs = isUnary(op) ? s.rhs : 0;
@@ -81,8 +89,8 @@ State reduce(State s, Actions action) {
         },
         [&](EqualAction) {
             s = doOperator(s, s.op);
-            s.rhs = 0;
-            s.hasRhs = false;
+            s.rhs = std::exchange(s.lhs, 0);
+            s.hasRhs = true;
             s.op = Operator::NONE;
             return s;
         },

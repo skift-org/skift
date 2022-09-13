@@ -2,6 +2,7 @@
 #include <karm-ui/app.h>
 #include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/drag.h>
 #include <karm-ui/grid.h>
 #include <karm-ui/scafold.h>
 
@@ -38,8 +39,8 @@ Ui::Child keypad(State state) {
             Ui::button(Model::bind<BackspaceAction>(), Ui::Button::SECONDARY, Media::Icons::BACKSPACE_OUTLINE),
 
             Ui::button(Ui::NOP, Ui::Button::SECONDARY, 18, "1/x"),
-            Ui::button(Model::bind(Operator::SQUARE), Ui::Button::SECONDARY, Media::Icons::FORMAT_SUPERSCRIPT),
-            Ui::button(Model::bind(Operator::SQRT), Ui::Button::SECONDARY, Media::Icons::SQUARE_ROOT),
+            Ui::button(Model::bind(Operator::SQUARE), Ui::Button::SECONDARY, 18, "x²"),
+            Ui::button(Model::bind(Operator::SQRT), Ui::Button::SECONDARY, 18, "√x"),
             Ui::button(Model::bind(Operator::DIV), Ui::Button::SECONDARY, Media::Icons::DIVISION),
 
             Ui::button(Model::bind<Number>(7), Ui::Button::DEFAULT, 18, "7"),
@@ -64,6 +65,8 @@ Ui::Child keypad(State state) {
 }
 
 Ui::Child screen(State state) {
+    // auto debugExpr = Ui::text("op: {}, lhs: {}, rhs: {}", toFmt(state.op), state.lhs, state.rhs);
+
     auto currExpr = Ui::align(
         Layout::Align::VCENTER | Layout::Align::END,
         state.op == Operator::NONE ? Ui::text(16, "") : Ui::text(16, toFmt(state.op), state.lhs));
@@ -73,7 +76,7 @@ Ui::Child screen(State state) {
         Ui::text(32, "{}", state.hasRhs ? state.rhs : state.lhs));
 
     return Ui::spacing(
-        {16, 8}, Ui::vflow(8, currExpr, result));
+        {16, 8}, Ui::vflow(8, /* debugExpr, */ currExpr, result));
 }
 
 Ui::Child app() {
@@ -86,7 +89,7 @@ Ui::Child app() {
                         Media::Icons::CALCULATOR,
                         "Calculator",
                         Ui::TitlebarStyle::DIALOG),
-                    screen(state),
+                    Ui::dragRegion(screen(state)),
                     Ui::grow(Calculator::keypad(state)))));
     });
 }

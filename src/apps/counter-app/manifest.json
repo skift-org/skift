@@ -1,5 +1,5 @@
 {
-    "id": "demo-counter",
+    "id": "counter-app",
     "type": "exe",
     "description": "A simple counter demo application",
     "deps": [

@@ -2,24 +2,31 @@
 
 #include "button.h"
 #include "dialog.h"
+#include "drag.h"
 #include "text.h"
 
 namespace Karm::Ui {
 
 Ui::Child titlebar(Media::Icons icon, String title, TitlebarStyle style) {
-    return Ui::spacing(
-        8,
-        Ui::hflow(
-            4,
-            Ui::button(
-                [=](auto &n) {
-                    Ui::showDialog(n, aboutDialog(icon, title));
-                },
-                Button::SUBTLE_ICON, icon, title),
-            Ui::grow(),
-            style == TitlebarStyle::DIALOG ? empty() : Ui::button(NOP, Button::SUBTLE_ICON, Media::Icons::MINUS),
-            style == TitlebarStyle::DIALOG ? empty() : Ui::button(NOP, Button::SUBTLE_ICON, Media::Icons::CROP_SQUARE),
-            Ui::button(NOP, Button::DESTRUCTIVE_ICON, Media::Icons::CLOSE)));
+    return Ui::dragRegion(
+        Ui::spacing(
+            8,
+            Ui::hflow(
+                4,
+                Ui::button(
+                    [=](auto &n) {
+                        Ui::showDialog(n, aboutDialog(icon, title));
+                    },
+                    Button::SUBTLE_ICON, icon, title),
+                Ui::grow(),
+                style == TitlebarStyle::DIALOG ? empty() : Ui::button(NOP, Button::SUBTLE_ICON, Media::Icons::MINUS),
+                style == TitlebarStyle::DIALOG ? empty() : Ui::button(NOP, Button::SUBTLE_ICON, Media::Icons::CROP_SQUARE),
+                Ui::button(
+                    [](Node &n) {
+                        Events::ExitEvent e{OK};
+                        n.bubble(e);
+                    },
+                    Button::DESTRUCTIVE_ICON, Media::Icons::CLOSE))));
 }
 
 auto lookup(auto k, auto &m) {

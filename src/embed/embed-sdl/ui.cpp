@@ -1,11 +1,16 @@
 #include <SDL.h>
 #include <embed/ui.h>
+#include <karm-ui/drag.h>
 
 namespace Embed {
 
-struct SdlHost : public Ui::Host {
+struct SdlHost :
+    public Ui::Host,
+    public Ui::Dragable {
     SDL_Window *_window{};
+
     Math::Vec2i _lastMousePos{};
+    Math::Vec2i _lastScreenMousePos{};
 
     SdlHost(Ui::Child root, SDL_Window *window)
         : Ui::Host(root), _window(window) {
@@ -81,11 +86,14 @@ struct SdlHost : public Ui::Host {
                 return;
             }
 
+            Math::Vec2i screenPos = {};
+            SDL_GetGlobalMouseState(&screenPos.x, &screenPos.y);
+
             Events::MouseEvent uiEvent{
                 .type = Events::MouseEvent::MOVE,
 
                 .pos = {sdlEvent.motion.x, sdlEvent.motion.y},
-                .delta = {sdlEvent.motion.xrel, sdlEvent.motion.yrel},
+                .delta = screenPos - _lastScreenMousePos,
             };
 
             uiEvent.buttons |= (sdlEvent.motion.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
@@ -93,6 +101,7 @@ struct SdlHost : public Ui::Host {
             uiEvent.buttons |= (sdlEvent.motion.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
 
             _lastMousePos = uiEvent.pos;
+            _lastScreenMousePos = screenPos;
 
             event(uiEvent);
             break;
@@ -178,6 +187,20 @@ struct SdlHost : public Ui::Host {
 
     void wait(size_t ms) override {
         SDL_WaitEventTimeout(nullptr, ms);
+    }
+
+    void drag(Math::Vec2i delta) override {
+        Math::Vec2i pos{};
+        SDL_GetWindowPosition(_window, &pos.x, &pos.y);
+        pos = pos + delta;
+        SDL_SetWindowPosition(_window, pos.x, pos.y);
+    }
+
+    void *query(Meta::Id id) override {
+        if (id == Meta::makeId<Ui::Dragable>()) {
+            return static_cast<Ui::Dragable *>(this);
+        }
+        return Ui::Host::query(id);
     }
 };
 

@@ -31,6 +31,24 @@ constexpr auto pow2(auto x) {
     return x * x;
 }
 
+template <typename T>
+constexpr T pow(T x, T n) {
+    if (n == 0)
+        return 1;
+
+    if (n == 1)
+        return x;
+
+    T res = 1;
+    while (n > 0) {
+        if (n & 1)
+            res *= x;
+        x *= x;
+        n >>= 1;
+    }
+    return res;
+}
+
 /* --- Trigonometry --------------------------------------------------------- */
 
 enum Precision {

@@ -40,20 +40,16 @@ struct Host : public Node {
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
         g.clip(r);
-        g.clear(r, Gfx::ALPHA);
+        g.clear(r, Gfx::ZINC900);
 
-        g.fillStyle(Gfx::fill(Gfx::ZINC900));
-        g.fill(bound(), 8);
-        g.fillStyle(Gfx::fill(Gfx::WHITE));
         _root->paint(g, r);
 
+        g.fillStyle(Gfx::fill(Gfx::WHITE));
         if (DEBUG) {
             g.fillStyle(Gfx::randomColor().withOpacity(0.25));
             g.fill(r);
         }
 
-        g.strokeStyle(Gfx::stroke(Gfx::ZINC800).withWidth(1).withAlign(Gfx::StrokeAlign::INSIDE_ALIGN));
-        g.stroke(bound(), 8);
         g.restore();
     }
 

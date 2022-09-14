@@ -2,6 +2,7 @@
 
 #include "box.h"
 #include "button.h"
+#include "drag.h"
 #include "funcs.h"
 #include "proxy.h"
 #include "scafold.h"
@@ -146,7 +147,7 @@ Child dialogScafold(Layout::Align a, Child inner) {
         .backgroundColor = Gfx::ZINC800,
     };
 
-    return spacing(16, align(a, box(boxStyle, inner)));
+    return spacing(16, align(a, dragRegion(box(boxStyle, inner))));
 }
 
 Child dialogScafold(Layout::Align a, Child content, Children actions) {
@@ -192,7 +193,7 @@ Child aboutDialog(Media::Icons i, String name) {
     };
 
     return dialogScafold(
-        Layout::Align::CENTER,
+        Layout::Align::CENTER | Layout::Align::CLAMP,
         content,
         actions);
 }

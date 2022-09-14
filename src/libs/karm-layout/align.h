@@ -18,12 +18,15 @@ struct Align {
     static constexpr int HCENTER = (1 << 7);
     static constexpr int COVER = (1 << 8);
     static constexpr int FIT = (1 << 9);
+    static constexpr int HCLAMP = (1 << 10);
+    static constexpr int VCLAMP = (1 << 11);
 
     static constexpr int STRETCH = (HSTRETCH | VSTRETCH);
     static constexpr int VFILL = (VSTRETCH | TOP);
     static constexpr int HFILL = (HSTRETCH | START);
     static constexpr int CENTER = (HCENTER | VCENTER);
     static constexpr int FILL = (VFILL | HFILL);
+    static constexpr int CLAMP = (HCLAMP | VCLAMP);
 
     int _value = 0;
 
@@ -51,6 +54,12 @@ struct Align {
 
         if (_value & BOTTOM)
             inner = flow.setY(inner, flow.getBottom(outer) - flow.getHeight(inner));
+
+        if (_value & HCLAMP)
+            inner = flow.setWidth(inner, clamp(flow.getWidth(inner), 0, flow.getWidth(outer)));
+
+        if (_value & VCLAMP)
+            inner = flow.setHeight(inner, clamp(flow.getHeight(inner), 0, flow.getHeight(outer)));
 
         if (_value & HSTRETCH)
             inner = flow.setWidth(inner, flow.getWidth(outer));

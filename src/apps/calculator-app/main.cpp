@@ -82,7 +82,7 @@ Ui::Child screen(State state) {
 Ui::Child app() {
     return Ui::reducer<Model>({}, reduce, [](auto state) {
         return Ui::maxSize(
-            {352, 500},
+            {300, 450},
             Ui::dialogLayer(
                 Ui::vflow(
                     Ui::titlebar(

@@ -26,4 +26,9 @@ struct Supplier : public Proxy<Supplier<I>> {
     }
 };
 
+template <typename I, typename U = I, typename... Args>
+static inline Child supplier(Child child, Args &&...provided) {
+    return makeStrong<Supplier<I>>(child, std::forward<Args>(provided)...);
+}
+
 } // namespace Karm::Ui

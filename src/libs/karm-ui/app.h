@@ -5,7 +5,7 @@
 
 #include "host.h"
 #include "state.h"
-#include "suplier.h"
+#include "supplier.h"
 
 namespace Karm::Ui {
 

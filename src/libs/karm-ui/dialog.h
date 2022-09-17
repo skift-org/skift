@@ -3,6 +3,7 @@
 #include <karm-layout/align.h>
 
 #include "node.h"
+#include "supplier.h"
 
 namespace Karm::Ui {
 
@@ -21,16 +22,17 @@ enum struct DialogButton {
 FlagsEnum$(DialogButton);
 
 template <typename T>
-struct DialogResult {
-    DialogButton button;
-    Opt<T> value;
+using DialogFn = Func<void(T)>;
 
-    DialogResult(DialogButton b)
-        : button(b) {}
-
-    DialogResult(DialogButton b, T v)
-        : button(b), value(v) {}
+template <typename T>
+struct Dialog {
+    DialogFn<T> fn;
 };
+
+template <typename T>
+Child dialog(DialogFn<T> fn, Child inner) {
+    return supplier<Dialog<T>>(inner, std::move(fn));
+}
 
 /* ---  Dialog Base  -------------------------------------------------------- */
 
@@ -38,7 +40,18 @@ Child dialogLayer(Child child);
 
 void showDialog(Node &n, Child child);
 
+template <typename T>
+void showDialog(Node &n, DialogFn<T> fn, Child child) {
+    showDialog(n, dialog(std::move(fn), child));
+}
+
 void closeDialog(Node &n);
+
+template <typename T>
+void closeDialog(Node &n, T value) {
+    queryParent<Dialog<T>>(n).fn(value);
+    closeDialog(n);
+}
 
 /* --- Dialogs Scaffolding -------------------------------------------------- */
 

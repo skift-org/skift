@@ -37,10 +37,12 @@ struct Scroll : public Proxy<Scroll> {
                         _scroll.x = clamp(_scroll.x, -(childBound.width - min(childBound.width, bound().width)), 0);
                         _scroll.y = clamp(_scroll.y, -(childBound.height - min(childBound.height, bound().height)), 0);
 
-                        shouldRepaint(*parent(), bound());
+                        shouldAnimate(*this);
                     }
                 }
             }
+        } else if (e.is<Events::AnimateEvent>()) {
+            shouldRepaint(*parent(), bound());
         } else {
             child().event(e);
         }

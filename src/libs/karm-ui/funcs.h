@@ -10,6 +10,12 @@ static inline void shouldRepaint(Node &n) {
     n.bubble(e);
 }
 
+static inline void shouldRepaint(Node &n, Math::Recti bound) {
+    Events::PaintEvent e;
+    e.bound = bound;
+    n.bubble(e);
+}
+
 static inline void shouldLayout(Node &n) {
     Events::LayoutEvent e;
     n.bubble(e);

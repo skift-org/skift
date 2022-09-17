@@ -23,7 +23,7 @@ Ui::Child directoryListing(Sys::Dir const &dir) {
     for (auto const &entry : dir.entries()) {
         children.pushBack(directorEntry(entry));
     }
-    return Ui::grow(Ui::scroll(Ui::spacing(8, Ui::vflow(children))));
+    return Ui::grow(Ui::scroll(Ui::spacing(8, Ui::align(Layout::Align::TOP | Layout::Align::HFILL, Ui::vflow(children)))));
 }
 
 Ui::Child breadcrumbItem(Str text, int index) {

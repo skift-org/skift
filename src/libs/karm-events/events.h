@@ -28,6 +28,11 @@ struct Event {
     }
 
     template <typename T>
+    T &unwrap() {
+        return static_cast<T &>(*this);
+    }
+
+    template <typename T>
     T const &unwrap() const {
         return static_cast<T const &>(*this);
     }

@@ -26,7 +26,9 @@
 
 # **skiftOS**: The delightful operating system
 
-**skiftOS** is a hobby operating system built from scratch in contemporary C and C++ for ARM, x86, and RISC-V architectures. We built Skift on top of the _Hjert_ micro-kernel, a C++ rewrite of the _BRUTAL_ kernel to make it simpler, safer, and enhance the existing design. On top of the kernel resides _Karm_, a framework comprised of a minimal subset of the C/C++ standard library, an extensive collection of containers and utilities, a SwiftUI inspired Ui, and much more. Finally, built on top of _Karm_ is _Hideo_, a delightful desktop environment.
+**skiftOS** is a hobby operating system built from scratch in contemporary C and C++ for ARM, x86, and RISC-V architectures.
+
+Following the 80/20 rule, **skift** tries to be a simple, yet powerful operating system that can be used for daily tasks. It is designed to be modular, extensible, and easy to use and hack on.
 
 ## Screenshot
 
@@ -41,7 +43,6 @@ skiftOS applications running on Linux
 skiftOS is written in bleeding-edge C2x and C++23 and building it requires a modern C/C++ compiler like clang-14 or GCC-12 installed on the host machine.
 
 ```sh
-
 # Make sure clang is the right version
 $ clang --version
 clang version 13.0.1
@@ -56,28 +57,30 @@ NASM version 2.15.05 compiled on Sep 24 2020
 # Make sure python3 is installed
 $ python3 --version
 Python 3.10.5
-
 ```
 
 Building skiftOS also requires installing [osdk](https://github.com/devse-org/osdk):
 
 ```sh
-
 $ git clone https://github.com/devse-org/osdk
 
 $ cd osdk
 
 $ pip install --user -e .
-
 ```
 
 Once you have installed osdk, you can build and boot skiftOS using:
 
 ```sh
-
 $ osdk boot
-
 ```
+
+Individual components can be run on the host system using:
+
+```sh
+$ osdk run <component>
+```
+
 ## Contributings
 
 This project practice [optimistic merging](http://hintjens.com/blog:106) meaning that pull requests are merged into the main branch as soon as possible. The objective is to keep PR as small, focused, and incremental as possible.

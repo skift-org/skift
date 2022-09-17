@@ -52,7 +52,7 @@ void Context::restore() {
     _stack.popBack();
 }
 
-/* --- Origin & Clipping ------------------------------------------------ */
+/* --- Origin & Clipping ---------------------------------------------------- */
 
 Math::Recti Context::clip() const {
     return current().clip;
@@ -86,7 +86,7 @@ void Context::origin(Math::Vec2i pos) {
     current().origin = applyOrigin(pos);
 }
 
-/* --- Transform -------------------------------------------------------- */
+/* --- Transform ------------------------------------------------------------ */
 
 void Context::transform(Math::Trans2f trans) {
     auto &t = current().trans;
@@ -113,7 +113,7 @@ void Context::identity() {
     current().trans = Math::Trans2f::identity();
 }
 
-/* --- Fill & Stroke ---------------------------------------------------- */
+/* --- Fill & Stroke -------------------------------------------------------- */
 
 FillStyle const &Context::fillStyle() {
     return current().fillStyle;
@@ -151,7 +151,7 @@ Context &Context::shadowStyle(ShadowStyle style) {
     return *this;
 }
 
-/* --- Drawing ---------------------------------------------------------- */
+/* --- Drawing -------------------------------------------------------------- */
 
 void Context::clear(Color color) { clear(surface().bound(), color); }
 
@@ -165,7 +165,7 @@ void Context::clear(Math::Recti rect, Color color) {
     }
 }
 
-/* --- Shapes ----------------------------------------------------------- */
+/* --- Shapes --------------------------------------------------------------- */
 
 void Context::plot(Math::Vec2i point) {
     plot(point, fillStyle().color());
@@ -257,7 +257,7 @@ void Context::fill(Math::Vec2i baseline, Str str) {
     f.fillStr(*this, baseline.cast<double>(), str);
 }
 
-/* --- Paths ------------------------------------------------------------ */
+/* --- Debug ---------------------------------------------------------------- */
 
 void Context::_line(Math::Edgei edge, Color color) {
     int dx = Math::abs(edge.ex - edge.sx);
@@ -344,6 +344,8 @@ void Context::_trace() {
         plot(edge.start.cast<int>(), RED);
     }
 }
+
+/* --- Paths ---------------------------------------------------------------- */
 
 void Context::_fill(Color color) {
     static constexpr auto AA = 4;
@@ -476,7 +478,7 @@ void Context::stroke(StrokeStyle style) {
 
 void Context::shadow() {}
 
-/* --- Effects ---------------------------------------------------------- */
+/* --- Effects -------------------------------------------------------------- */
 
 // void Context::blur(Math::Recti region, double radius) {}
 

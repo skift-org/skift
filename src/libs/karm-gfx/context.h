@@ -139,7 +139,7 @@ struct Context {
 
     void fill(Math::Vec2i baseline, Str str);
 
-    /* --- Paths ------------------------------------------------------------ */
+    /* --- Debug ------------------------------------------------------------ */
 
     void _line(Math::Edgei edge, Color color);
 
@@ -150,6 +150,8 @@ struct Context {
     void _doubleArrow(Math::Vec2i from, Math::Vec2i to, Color color);
 
     void _trace();
+
+    /* --- Paths ------------------------------------------------------------ */
 
     void _fill(Color color);
 

@@ -153,7 +153,7 @@ Child dialogScafold(Layout::Align a, Child inner) {
 Child dialogScafold(Layout::Align a, Child content, Children actions) {
 
     auto layout = minSize(
-        {320, Sizing::UNCONSTRAINED},
+        {320, UNCONSTRAINED},
         spacing(
             16,
             vflow(

@@ -3,30 +3,31 @@
 #include "button.h"
 #include "dialog.h"
 #include "drag.h"
+#include "layout.h"
 #include "text.h"
 
 namespace Karm::Ui {
 
-Ui::Child titlebar(Media::Icons icon, String title, TitlebarStyle style) {
-    return Ui::dragRegion(
-        Ui::spacing(
+Child titlebar(Media::Icons icon, String title, TitlebarStyle style) {
+    return dragRegion(
+        spacing(
             8,
-            Ui::hflow(
+            hflow(
                 4,
-                Ui::button(
+                button(
                     [=](auto &n) {
-                        Ui::showDialog(n, aboutDialog(icon, title));
+                        showDialog(n, aboutDialog(icon, title));
                     },
-                    Button::SUBTLE_ICON, icon, title),
-                Ui::grow(),
-                style == TitlebarStyle::DIALOG ? empty() : Ui::button(NOP, Button::SUBTLE_ICON, Media::Icons::MINUS),
-                style == TitlebarStyle::DIALOG ? empty() : Ui::button(NOP, Button::SUBTLE_ICON, Media::Icons::CROP_SQUARE),
-                Ui::button(
+                    Button::SUBTLE, icon, title),
+                grow(),
+                style == TitlebarStyle::DIALOG ? empty() : button(NOP, Button::SUBTLE, Media::Icons::MINUS),
+                style == TitlebarStyle::DIALOG ? empty() : button(NOP, Button::SUBTLE, Media::Icons::CROP_SQUARE),
+                button(
                     [](Node &n) {
                         Events::ExitEvent e{OK};
                         n.bubble(e);
                     },
-                    Button::DESTRUCTIVE_ICON, Media::Icons::CLOSE))));
+                    Button::SUBTLE, Media::Icons::CLOSE))));
 }
 
 auto lookup(auto k, auto &m) {
@@ -39,7 +40,7 @@ auto lookup(auto k, auto &m) {
     panic("Key not found");
 }
 
-Child badge(BadgeStyle style, String text) {
+Child badge(BadgeStyle style, String t) {
     Array<Cons<BadgeStyle, Gfx::Color>, 4> styleToColor{
         {BadgeStyle::INFO, Gfx::BLUE400},
         {BadgeStyle::SUCCESS, Gfx::LIME400},
@@ -49,12 +50,12 @@ Child badge(BadgeStyle style, String text) {
 
     Gfx::Color color = lookup(style, styleToColor);
 
-    return Ui::box({
-                       .borderRadius = 99,
-                       .backgroundColor = color.withOpacity(0.1),
-                       .foregroundColor = color,
-                   },
-                   Ui::spacing({8, 4}, Ui::text(text)));
+    return box({
+                   .borderRadius = 99,
+                   .backgroundColor = color.withOpacity(0.1),
+                   .foregroundColor = color,
+               },
+               spacing({8, 4}, text(t)));
 }
 
 struct Separator : public View<Separator> {
@@ -70,7 +71,7 @@ struct Separator : public View<Separator> {
     }
 };
 
-Ui::Child separator() {
+Child separator() {
     return makeStrong<Separator>();
 }
 
@@ -78,8 +79,8 @@ static constexpr BoxStyle TOOLBAR = {
     .backgroundColor = Gfx::ZINC800,
 };
 
-Ui::Child toolbar(Children children) {
-    return box(TOOLBAR, Ui::spacing(8, hflow(4, children)));
+Child toolbar(Children children) {
+    return box(TOOLBAR, spacing(8, hflow(4, children)));
 }
 
 } // namespace Karm::Ui

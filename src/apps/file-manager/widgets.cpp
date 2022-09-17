@@ -56,11 +56,12 @@ Ui::Child breadcrumb() {
             Ui::button(Model::bind<AddBookmark>(), Ui::Button::SUBTLE, Media::Icons::BOOKMARK)));
 }
 
-Ui::Child toolbar() {
+Ui::Child toolbar(State state) {
+
     return Ui::toolbar(
-        Ui::button(Model::bind<GoBack>(), Ui::Button::SUBTLE, Media::Icons::ARROW_LEFT),
-        Ui::button(Model::bind<GoForward>(), Ui::Button::SUBTLE, Media::Icons::ARROW_RIGHT),
-        Ui::button(Model::bind<GoParent>(1), Ui::Button::SUBTLE, Media::Icons::ARROW_UP),
+        Ui::button(Model::bind<GoBack>(), state.canGoBack() ? Ui::Button::SUBTLE : Ui::Button::DEACTIVATED, Media::Icons::ARROW_LEFT),
+        Ui::button(Model::bind<GoForward>(), state.canGoForward() ? Ui::Button::SUBTLE : Ui::Button::DEACTIVATED, Media::Icons::ARROW_RIGHT),
+        Ui::button(Model::bind<GoParent>(1), state.canGoParent() ? Ui::Button::SUBTLE : Ui::Button::DEACTIVATED, Media::Icons::ARROW_UP),
         Ui::button(Model::bind<GoTo>("/home"), Ui::Button::SUBTLE, Media::Icons::HOME),
         Ui::grow(FileManager::breadcrumb()),
         Ui::button(Model::bind<Refresh>(), Ui::Button::SUBTLE, Media::Icons::REFRESH));
@@ -69,48 +70,52 @@ Ui::Child toolbar() {
 /* ---  Dialogs  ------------------------------------------------------------ */
 
 Ui::Child openFileDialog() {
-    Sys::Dir dir = Sys::Dir::open("./").take();
+    return Ui::reducer<FileManager::Model>({"/"}, FileManager::reduce, [](auto d) {
+        Sys::Path path = d.currentPath();
 
-    auto titleLbl = Ui::text(16, "Open File");
-    auto msgLbl = Ui::text("Select a file to open.");
-    auto titleBar = Ui::spacing(
-        16,
-        Ui::vflow(
-            8,
-            titleLbl,
-            msgLbl));
+        Sys::Dir dir = Sys::Dir::open(path).take();
 
-    auto openBtn = Ui::button(
-        [](auto &n) {
-            Ui::closeDialog(n);
-        },
-        Ui::Button::PRIMARY, "OPEN");
+        auto titleLbl = Ui::text(16, "Open File");
+        auto msgLbl = Ui::text("Select a file to open.");
+        auto titleBar = Ui::spacing(
+            16,
+            Ui::vflow(
+                8,
+                titleLbl,
+                msgLbl));
 
-    auto cancelBtn = Ui::button(
-        [](auto &n) {
-            Ui::closeDialog(n);
-        },
-        Ui::Button::SUBTLE, "CANCEL");
+        auto openBtn = Ui::button(
+            [](auto &n) {
+                Ui::closeDialog(n);
+            },
+            Ui::Button::PRIMARY, "OPEN");
 
-    auto controls = Ui::spacing(
-        16,
-        Ui::hflow(
-            8,
-            Ui::grow(),
-            cancelBtn,
-            openBtn));
+        auto cancelBtn = Ui::button(
+            [](auto &n) {
+                Ui::closeDialog(n);
+            },
+            Ui::Button::SUBTLE, "CANCEL");
 
-    return Ui::dialogScafold(
-        Layout::Align::FILL,
-        Ui::vflow(
-            Ui::grow(
-                Ui::vflow(
-                    titleBar,
-                    toolbar(),
-                    Ui::separator(),
-                    directoryListing(dir),
-                    Ui::separator())),
-            controls));
+        auto controls = Ui::spacing(
+            16,
+            Ui::hflow(
+                8,
+                Ui::grow(),
+                cancelBtn,
+                openBtn));
+
+        return Ui::dialogScafold(
+            Layout::Align::FILL,
+            Ui::vflow(
+                Ui::grow(
+                    Ui::vflow(
+                        titleBar,
+                        toolbar(d),
+                        Ui::separator(),
+                        directoryListing(dir),
+                        Ui::separator())),
+                controls));
+    });
 }
 
 /*

@@ -3,7 +3,6 @@
 #include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
-#include <karm-ui/grid.h>
 #include <karm-ui/scafold.h>
 
 #include "model.h"
@@ -11,24 +10,18 @@
 namespace Calculator {
 
 Ui::Child keypad(State state) {
-    Ui::GridStyle gridStyle = {
-        .rows = Ui::GridUnit::grow().repeated(7),
-        .columns = Ui::GridUnit::grow().repeated(4),
-        .gaps = 4,
-    };
-
     return Ui::spacing(
         8,
         Ui::grid(
-            gridStyle,
+            Ui::GridStyle::simple(7, 4, 4),
 
             Ui::cell(
                 {0, 0},
                 {3, 0},
                 Ui::hflow(
                     4,
-                    Ui::button(Model::bind<MemClearAction>(), state.hasMem ? Ui::Button::SUBTLE : Ui::Button::SUBTLE_ICON, "MC"),
-                    Ui::button(Model::bind<MemRecallAction>(), state.hasMem ? Ui::Button::SUBTLE : Ui::Button::SUBTLE_ICON, "MR"),
+                    Ui::button(Model::bind<MemClearAction>(), state.hasMem ? Ui::Button::SUBTLE : Ui::Button::DEACTIVATED, "MC"),
+                    Ui::button(Model::bind<MemRecallAction>(), state.hasMem ? Ui::Button::SUBTLE : Ui::Button::DEACTIVATED, "MR"),
                     Ui::button(Model::bind<MemAddAction>(), Ui::Button::SUBTLE, "M+"),
                     Ui::button(Model::bind<MemSubAction>(), Ui::Button::SUBTLE, "M-"),
                     Ui::button(Model::bind<MemStoreAction>(), Ui::Button::SUBTLE, "MS"))),

@@ -19,7 +19,7 @@ CliResult entryPoint(CliArgs args) {
                 {700, 500},
                 Ui::vflow(
                     titlebar,
-                    FileManager::toolbar(),
+                    FileManager::toolbar(d),
                     Ui::separator(),
                     listing)));
     });

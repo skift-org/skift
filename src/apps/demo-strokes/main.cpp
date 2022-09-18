@@ -1,8 +1,9 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
 #include <karm-ui/funcs.h>
+#include <karm-ui/view.h>
 
-struct StrokesApp : public Ui::Widget<StrokesApp> {
+struct StrokesApp : public Ui::View<StrokesApp> {
     Math::Vec2i _mousePos{};
     bool _trace = false;
 

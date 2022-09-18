@@ -1,8 +1,9 @@
 #include <karm-main/main.h>
 #include <karm-media/loader.h>
 #include <karm-ui/app.h>
+#include <karm-ui/view.h>
 
-struct FontApp : public Ui::Widget<FontApp> {
+struct FontApp : public Ui::View<FontApp> {
     Media::Font _font;
 
     FontApp(Media::Font font)

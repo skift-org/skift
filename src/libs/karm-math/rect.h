@@ -137,6 +137,12 @@ union Rect {
         return result;
     }
 
+    constexpr Rect center(Rect<T> const &r) const {
+        Rect result{0, 0, width, height};
+        result.xy = center() - r.center();
+        return result;
+    }
+
     constexpr Rect<T> clipTo(Rect<T> const &r) const {
         return {
             max(x, r.x),
@@ -161,7 +167,9 @@ union Rect {
         return _els[i];
     }
 
-    constexpr T operator[](int i) const { return _els[i]; }
+    constexpr T operator[](int i) const {
+        return _els[i];
+    }
 
     template <typename U>
     constexpr Rect<U> cast() const {

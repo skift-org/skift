@@ -69,9 +69,13 @@ MAKE_COLOR_RAMP(ROSE, 0xfff1f2, 0xffe4e6, 0xfecdd3, 0xfda4af, 0xfb7185, 0xf43f5e
     INDIGO, VIOLET, PURPLE, FUCHSIA,
     PINK, ROSE};
 
+static inline Color randomColor(Math::Rand &rand) {
+    return COLORS[rand.nextInt(COLORS.len())];
+}
+
 static inline Color randomColor() {
     static Math::Rand rand;
-    return COLORS[rand.nextInt(COLORS.len())];
+    return randomColor(rand);
 }
 
 } // namespace Karm::Gfx

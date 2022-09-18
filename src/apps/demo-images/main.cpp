@@ -1,9 +1,10 @@
 #include <karm-main/main.h>
 #include <karm-media/loader.h>
 #include <karm-ui/app.h>
+#include <karm-ui/view.h>
 #include <png/spec.h>
 
-struct FontApp : public Ui::Widget<FontApp> {
+struct FontApp : public Ui::View<FontApp> {
     Media::Image _image;
 
     FontApp(Media::Image image)

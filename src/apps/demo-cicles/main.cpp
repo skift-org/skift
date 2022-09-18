@@ -2,8 +2,9 @@
 #include <karm-math/rand.h>
 #include <karm-ui/app.h>
 #include <karm-ui/funcs.h>
+#include <karm-ui/view.h>
 
-struct CirclesApp : public Ui::Widget<CirclesApp> {
+struct CirclesApp : public Ui::View<CirclesApp> {
 
     Math::Vec2i _mousePos{};
     int _frame = 0;
@@ -22,12 +23,9 @@ struct CirclesApp : public Ui::Widget<CirclesApp> {
             });
 
             g.strokeStyle(
-                Gfx::stroke(Gfx::WHITE)
+                Gfx::stroke(Gfx::randomColor(rand))
                     .withWidth(rand.nextInt(2, size)));
             g.stroke();
-
-            g.fillStyle(Gfx::BLACK.withOpacity(0.1));
-            g.fill(g.clip());
         }
 
         g.begin();

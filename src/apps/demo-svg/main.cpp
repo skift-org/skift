@@ -1,8 +1,9 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
 #include <karm-ui/funcs.h>
+#include <karm-ui/view.h>
 
-struct SvgApp : public Ui::Widget<SvgApp> {
+struct SvgApp : public Ui::View<SvgApp> {
     bool _trace{false};
 
     void paint(Gfx::Context &g, Math::Recti) override {
@@ -13,8 +14,11 @@ struct SvgApp : public Ui::Widget<SvgApp> {
             panic("Failed to parse SVG");
         }
 
-        g.fillStyle(Gfx::BLUE500);
+        g.fillStyle(Gfx::ZINC700);
         g.fill();
+
+        g.strokeStyle(Gfx::stroke(Gfx::ZINC400).withWidth(2));
+        g.stroke();
 
         if (_trace)
             g._trace();

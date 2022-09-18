@@ -1,29 +1,28 @@
 #include <karm-main/main.h>
 #include <karm-media/icon.h>
 #include <karm-ui/app.h>
+#include <karm-ui/view.h>
 
-struct FontApp : public Ui::Widget<FontApp> {
+struct FontApp : public Ui::View<FontApp> {
     Media::Icon _icon;
 
     FontApp(Media::Icon icon)
         : _icon{icon} {}
 
     void paint(Gfx::Context &g, Math::Recti) override {
-        g.clear(Gfx::BLACK);
-        g.fillStyle(Gfx::BLUE500);
-        g.fill({0, 0}, _icon);
-        g._rect(_icon.bound().cast<int>(), Gfx::RED500);
+        g.fillStyle(Gfx::ZINC700);
+        g.fill(bound().center() - _icon.bound().center().cast<int>(), _icon);
+
+        g.strokeStyle(Gfx::stroke(Gfx::ZINC400).withWidth(2).withAlign(Gfx::StrokeAlign::OUTSIDE_ALIGN));
+        g.stroke(bound().center() - _icon.bound().center().cast<int>(), _icon);
     }
 };
 
 CliResult entryPoint(CliArgs args) {
-    Media::Icon icon = {Media::Icons::CAT, 64};
+    Media::Icon icon = {Media::Icons::CAT, 256};
 
-    /*
-    // FIXME: clang chokes on Icon::byName()
     if (args.len() == 1) {
-        icon = try$(Media::Icon::byName(args[0], 64));
+        icon = try$(Media::Icon::byName(args[0], 256));
     }
-    */
     return Ui::runApp<FontApp>(args, icon);
 }

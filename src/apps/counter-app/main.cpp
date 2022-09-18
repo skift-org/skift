@@ -24,9 +24,9 @@ Ui::Child app() {
     auto content = Ui::reducer<Model>(0, reduce, [](auto state) {
         auto lbl = Ui::text(64, "{}", state);
 
-        auto decBtn = Ui::button(Model::bind<DecrementAction>(), Ui::Button::DEFAULT_ROUND, Media::Icons::MINUS_THICK);
-        auto incBtn = Ui::button(Model::bind<IncrementAction>(), Ui::Button::DEFAULT_ROUND, Media::Icons::PLUS_THICK);
-        auto resetBtn = Ui::button(Model::bind<ResetAction>(), Ui::Button::SUBTLE_ROUND, Media::Icons::REFRESH, "RESET");
+        auto decBtn = Ui::button(Model::bind<DecrementAction>(), Ui::Button::DEFAULT.withRadius(999), Media::Icons::MINUS_THICK);
+        auto incBtn = Ui::button(Model::bind<IncrementAction>(), Ui::Button::DEFAULT.withRadius(999), Media::Icons::PLUS_THICK);
+        auto resetBtn = Ui::button(Model::bind<ResetAction>(), Ui::Button::SUBTLE.withRadius(999), Media::Icons::REFRESH, "RESET");
 
         return Ui::spacing(
             32,

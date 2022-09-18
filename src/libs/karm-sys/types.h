@@ -14,6 +14,7 @@ enum MmapFlags : uint64_t {
     STACK = (1 << 4),
     LOWER = (1 << 5),
     UPPER = (1 << 6),
+    PREFETCH = (1 << 7),
 };
 
 FlagsEnum$(MmapFlags);

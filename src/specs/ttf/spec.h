@@ -183,8 +183,7 @@ struct Glyf : public BChunk {
     };
 
     Metrics metrics(BScan &s, size_t glyfOffset) const {
-        auto offset = glyfOffset;
-        s.skip(offset);
+        s.skip(glyfOffset);
         auto numContours = s.nextBeInt16();
         if (numContours == 0) {
             return {};

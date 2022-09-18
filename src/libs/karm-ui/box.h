@@ -12,6 +12,16 @@ struct BoxStyle {
     Gfx::Color borderColor{Gfx::ALPHA};
     Gfx::Color backgroundColor{Gfx::ALPHA};
     Gfx::Color foregroundColor{Gfx::WHITE};
+
+    BoxStyle withRadius(double radius) const {
+        return {
+            .borderRadius = radius,
+            .borderWidth = borderWidth,
+            .borderColor = borderColor,
+            .backgroundColor = backgroundColor,
+            .foregroundColor = foregroundColor,
+        };
+    }
 };
 
 template <typename Crtp>

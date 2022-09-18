@@ -157,12 +157,7 @@ void Context::clear(Color color) { clear(surface().bound(), color); }
 
 void Context::clear(Math::Recti rect, Color color) {
     rect = applyAll(rect);
-
-    for (int y = rect.y; y < rect.y + rect.height; y++) {
-        for (int x = rect.x; x < rect.x + rect.width; x++) {
-            surface().store({x, y}, color);
-        }
-    }
+    _surface->clearRect(rect, color);
 }
 
 /* --- Shapes --------------------------------------------------------------- */
@@ -196,12 +191,7 @@ void Context::stroke(Math::Recti r, int radius) {
 void Context::fill(Math::Recti r, int radius) {
     if (radius == 0 && current().trans.isIdentity()) {
         r = applyAll(r);
-
-        for (int y = r.y; y < r.y + r.height; y++) {
-            for (int x = r.x; x < r.x + r.width; x++) {
-                surface().blend({x, y}, fillStyle().color());
-            }
-        }
+        _surface->blendRect(r, fillStyle().color());
     } else {
         begin();
         rect(r.cast<double>(), radius);
@@ -355,7 +345,7 @@ void Context::_fill(Color color) {
     auto rect = applyClip(_shape.bound().ceil().cast<int>());
 
     for (int y = rect.top(); y < rect.bottom(); y++) {
-        zeroFill<double>(_scanline);
+        zeroFill<double>(mutSub(_scanline, rect.start(), rect.end()));
 
         for (double yy = y; yy < y + 1.0; yy += UNIT) {
             _active.clear();
@@ -393,13 +383,7 @@ void Context::_fill(Color color) {
                 }
             }
 
-            for (int x = rect.start(); x < rect.end(); x++) {
-                if (_scanline[x] > 0) {
-                    auto alpha = (_scanline[x]) / (AA * AA);
-                    // We square the alpha for gamma correction
-                    surface().blend({x, y}, color.withOpacity(alpha * alpha));
-                }
-            }
+            surface().blendScanline(_scanline.buf(), y, rect.start(), rect.end(), AA, color);
         }
     }
 }

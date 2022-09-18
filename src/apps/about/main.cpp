@@ -25,7 +25,7 @@ CliResult entryPoint(CliArgs args) {
 
     auto licenseBtn = Ui::button(
         Ui::NOP,
-        Ui::Button::SUBTLE_ROUND,
+        Ui::Button::SUBTLE.withRadius(999),
         Media::Icons::LICENSE,
         "LICENSE");
 

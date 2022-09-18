@@ -154,10 +154,15 @@ int mmapOptionsToProt(Karm::Sys::MmapOptions const &options) {
 }
 
 Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
+
     void *addr = mmap((void *)options.vaddr, options.size, mmapOptionsToProt(options), MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     if (addr == MAP_FAILED) {
         return Posix::fromLastErrno();
+    }
+
+    if (options.flags & Karm::Sys::MmapFlags::PREFETCH) {
+        madvise(addr, options.size, MADV_WILLNEED);
     }
 
     return Sys::MmapResult{0, (size_t)addr, (size_t)options.size};

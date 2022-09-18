@@ -9,16 +9,26 @@ namespace Karm::Ui {
 struct Text : public View<Text> {
     Media::Font _font;
     String _text;
+    Opt<Media::FontMesure> _mesure;
 
     Text(Media::Font font, String text)
         : _font(font), _text(text) {}
 
     void reconcile(Text &o) override {
         _text = o._text;
+        _mesure = NONE;
+    }
+
+    Media::FontMesure mesure() {
+        if (_mesure) {
+            return *_mesure;
+        }
+        _mesure = _font.mesureStr(_text);
+        return *_mesure;
     }
 
     void paint(Gfx::Context &g, Math::Recti) override {
-        auto m = _font.mesureStr(_text);
+        auto m = mesure();
         auto baseline = bound().topStart() + m.baseline.cast<int>();
 
         g.textFont(_font);
@@ -35,7 +45,7 @@ struct Text : public View<Text> {
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return _font.mesureStr(_text).linebound.size().cast<int>();
+        return mesure().linebound.size().cast<int>();
     }
 };
 

@@ -14,6 +14,14 @@ struct ButtonStyle {
     BoxStyle idleStyle;
     BoxStyle hoverStyle;
     BoxStyle pressStyle;
+
+    ButtonStyle withRadius(float radius) const {
+        return {
+            idleStyle.withRadius(radius),
+            hoverStyle.withRadius(radius),
+            pressStyle.withRadius(radius),
+        };
+    }
 };
 
 enum ButtonState {

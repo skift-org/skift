@@ -27,10 +27,12 @@ struct SdlHost :
 
         return {
             Gfx::BGRA8888,
-            s->pixels,
-            s->w,
-            s->h,
-            s->pitch,
+            {
+                s->pixels,
+                s->w,
+                s->h,
+                s->pitch,
+            },
         };
     }
 

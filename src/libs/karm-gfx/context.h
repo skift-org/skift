@@ -2,10 +2,10 @@
 
 #include <karm-media/icon.h>
 
+#include "buffer.h"
 #include "path.h"
 #include "shape.h"
 #include "style.h"
-#include "surface.h"
 
 namespace Karm::Gfx {
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/macros.h>
 #include <karm-base/std.h>
 
 #include "cvrp.h"
@@ -30,7 +31,7 @@ struct _IndexCast;
 
 template <typename Data, typename T>
 struct _IndexCast<Data, T> {
-    static auto eval(size_t, Data *ptr, auto func) {
+    ALWAYS_INLINE static auto eval(size_t, Data *ptr, auto func) {
         using U = CopyConst<Data, T>;
         return func(*reinterpret_cast<U *>(ptr));
     }
@@ -38,7 +39,7 @@ struct _IndexCast<Data, T> {
 
 template <typename Data, typename First, typename... Rest>
 struct _IndexCast<Data, First, Rest...> {
-    static auto eval(size_t index, Data *ptr, auto func) {
+    ALWAYS_INLINE static auto eval(size_t index, Data *ptr, auto func) {
         using U = CopyConst<Data, First>;
 
         return index == 0 ? func(*reinterpret_cast<U *>(ptr))
@@ -47,7 +48,7 @@ struct _IndexCast<Data, First, Rest...> {
 };
 
 template <typename... Ts>
-static auto indexCast(size_t index, auto *ptr, auto func) {
+ALWAYS_INLINE static auto indexCast(size_t index, auto *ptr, auto func) {
     return _IndexCast<RemoveRef<decltype(*ptr)>, Ts...>::eval(index, ptr, func);
 }
 

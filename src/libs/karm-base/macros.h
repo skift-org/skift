@@ -18,4 +18,6 @@ namespace Karm {
 
 #define condDefer$(BEGIN, END) for (int var$(__i) = BEGIN; var$(__i); (var$(__i) -= 1, END))
 
+#define ALWAYS_INLINE __attribute__((always_inline))
+
 } // namespace Karm

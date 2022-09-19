@@ -337,7 +337,7 @@ void Context::_trace() {
 
 /* --- Paths ---------------------------------------------------------------- */
 
-void Context::_fill(Color color) {
+[[gnu::flatten]] void Context::_fill(Color color) {
     static constexpr auto AA = 4;
     static constexpr auto UNIT = 1.0f / AA;
     static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;
@@ -369,8 +369,6 @@ void Context::_fill(Color color) {
 
             int r = 0;
             for (size_t i = 0; i + 1 < _active.len(); i++) {
-                double x1 = _active[i].x;
-                double x2 = _active[i + 1].x;
                 int sign = _active[i].sign;
 
                 r += sign;
@@ -378,13 +376,16 @@ void Context::_fill(Color color) {
                     continue;
                 }
 
-                for (double x = max(x1, rect.start()); x < min(x2, rect.end()); x += UNIT) {
+                double x1 = max(_active[i].x, rect.start());
+                double x2 = min(_active[i + 1].x, rect.end());
+
+                for (double x = x1; x < x2; x += UNIT) {
                     _scanline[x] += 1.0;
                 }
             }
-
-            surface().blendScanline(_scanline.buf(), y, rect.start(), rect.end(), AA, color);
         }
+
+        surface().blendScanline(_scanline.buf(), y, rect.start(), rect.end(), AA, color);
     }
 }
 

@@ -36,6 +36,7 @@ CliResult entryPoint(CliArgs args) {
             [](auto &n) {
                 Ui::showDialog(n, FileManager::openFileDialog());
             },
+            Ui::Button::SUBTLE,
             Media::Icons::FOLDER_OPEN),
 
         Ui::grow(), Ui::state(false, [](auto state) {

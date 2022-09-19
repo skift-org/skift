@@ -81,7 +81,7 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    T &unwrap() {
+    ALWAYS_INLINE T &unwrap() {
         if (_index != Meta::indexOf<T, Ts...>()) {
             panic("Unwrapping wrong type");
         }
@@ -90,7 +90,7 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    T const &unwrap() const {
+    ALWAYS_INLINE T const &unwrap() const {
         if (_index != Meta::indexOf<T, Ts...>()) {
             panic("Unwrapping wrong type");
         }
@@ -99,7 +99,7 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    T take() {
+    ALWAYS_INLINE T take() {
         if (_index != Meta::indexOf<T, Ts...>()) {
             panic("Taking wrong type");
         }
@@ -108,7 +108,7 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    bool with(auto visitor) {
+    ALWAYS_INLINE bool with(auto visitor) {
         if (_index == Meta::indexOf<T, Ts...>()) {
             visitor(*static_cast<T *>(_buf));
             return true;
@@ -116,20 +116,20 @@ struct Var {
         return false;
     }
 
-    auto visit(auto visitor) {
+    ALWAYS_INLINE auto visit(auto visitor) {
         return Meta::indexCast<Ts...>(_index, _buf, visitor);
     }
 
-    auto visit(auto visitor) const {
+    ALWAYS_INLINE auto visit(auto visitor) const {
         return Meta::indexCast<Ts...>(_index, _buf, visitor);
     }
 
     template <Meta::Contains<Ts...> T>
-    bool is() {
+    ALWAYS_INLINE bool is() {
         return _index == Meta::indexOf<T, Ts...>();
     }
 
-    size_t index() const { return _index; }
+    ALWAYS_INLINE size_t index() const { return _index; }
 };
 
 template <typename... Ts>

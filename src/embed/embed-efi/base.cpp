@@ -37,7 +37,7 @@ void debug(char const *buf) {
     Efi::st()->conOut->outputString(Efi::st()->conOut, (uint16_t const *)L"DEBUG: ").unwrap();
     DebugOut out{};
     (void)out.writeStr(buf);
-    Efi::st()->conOut->outputString(Efi::st()->conOut, (uint16_t const *)L"\n").unwrap();
+    Efi::st()->conOut->outputString(Efi::st()->conOut, (uint16_t const *)EMBED_SYS_LINE_ENDING_L).unwrap();
 }
 
 [[noreturn]] void panic(char const *buf) {
@@ -46,7 +46,7 @@ void debug(char const *buf) {
     DebugOut out{};
     (void)out.writeStr(buf);
 
-    Efi::st()->conOut->outputString(Efi::st()->conOut, (uint16_t const *)L"\n").unwrap();
+    Efi::st()->conOut->outputString(Efi::st()->conOut, (uint16_t const *)EMBED_SYS_LINE_ENDING_L).unwrap();
 
     (void)Efi::st()->runtime->resetSystem(
         Efi::ResetType::RESET_SHUTDOWN,

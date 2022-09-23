@@ -6,7 +6,7 @@
 #include <karm-sys/fd.h>
 #include <karm-sys/types.h>
 
-#include "sys-encoding.h"
+#include "sys-defs.h"
 
 namespace Embed {
 

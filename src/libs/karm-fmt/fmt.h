@@ -60,7 +60,7 @@ struct NumberFormater {
         };
         size_t i = 0;
         Array<char, 65> buf;
-
+#
         do {
             buf[i++] = digit(value % base);
             value /= base;
@@ -181,6 +181,9 @@ static inline Result<size_t> _format(Io::_TextWriter &writer, Str format, _Args 
             Text::Scan inner{scan.end()};
             written += try$(args.format(inner, writer, index));
             index++;
+        } else if (c == '\n') {
+            // normalize newlines
+            written += try$(writer.writeStr(EMBED_SYS_LINE_ENDING));
         } else {
             written += try$(writer.writeRune(c));
         }

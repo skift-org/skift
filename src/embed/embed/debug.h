@@ -2,7 +2,7 @@
 
 #include <karm-io/traits.h>
 
-#include "sys-encoding.h"
+#include "sys-defs.h"
 
 namespace Embed {
 

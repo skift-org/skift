@@ -1,6 +1,6 @@
 #pragma once
 
-#include <embed/sys-encoding.h>
+#include <embed/sys-defs.h>
 #include <karm-base/rune.h>
 #include <karm-base/string.h>
 

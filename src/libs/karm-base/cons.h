@@ -6,7 +6,7 @@
 
 namespace Karm {
 
-template <typename TCar, typename TCdr>
+template <typename TCar, typename TCdr = TCar>
 struct Cons {
     using Car = TCar;
     using Cdr = TCdr;

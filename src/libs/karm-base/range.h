@@ -3,6 +3,7 @@
 #include "clamp.h"
 #include "cons.h"
 #include "iter.h"
+#include "ordr.h"
 #include "vec.h"
 
 namespace Karm {
@@ -11,6 +12,10 @@ template <typename T>
 struct Range {
     T _start{};
     T _size{};
+
+    static constexpr Range fromStartEnd(T start, T end) {
+        return {start, end - start};
+    }
 
     constexpr Range() = default;
 
@@ -32,6 +37,10 @@ struct Range {
 
     constexpr bool any() const {
         return !empty();
+    }
+
+    constexpr bool valid() const {
+        return _size >= T{};
     }
 
     constexpr T size() const {
@@ -60,23 +69,24 @@ struct Range {
             max(end(), other.end()));
     }
 
-    constexpr Pair<Range> substract(Range other) const {
-        Range lower = fromStartEnd(
-            start(),
-            min(end(), other.start()));
+    constexpr Range halfUnder(Range other) {
+        if (overlaps(other) && start() < other.start()) {
+            return {start(), other.start() - start()};
+        }
 
-        Range upper = fromStartEnd(
-            max(start(), other.end()),
-            end());
-
-        return {
-            lower.valid() ? lower : Range{},
-            upper.valid() ? upper : Range{},
-        };
+        return {};
     }
 
-    constexpr Ordr cmp(Range other) const {
-        return cmp(start(), other.start());
+    constexpr Range halfOver(Range other) {
+        if (overlaps(other) && other.end() < end()) {
+            return {other.end(), end() - other.end()};
+        }
+
+        return {};
+    }
+
+    constexpr Cons<Range> split(Range other){
+        return {halfUnder(other), halfOver(other)};
     }
 
     constexpr auto iter() const {
@@ -90,6 +100,17 @@ struct Range {
     template <typename U>
     constexpr auto as() {
         return U{start(), size()};
+    }
+
+    constexpr Ordr cmp(Range<T> other) const {
+        if (start() == other.start() && size() == other.size())
+            return Ordr::EQUAL;
+
+        if (start() < other.start())
+            return Ordr::LESS;
+
+        if (start() > other.start())
+            return Ordr::GREATER;
     }
 };
 

@@ -19,14 +19,22 @@ Error entryPoint(uint64_t magic, Handover::Payload const &payload) {
 
     Debug::linfo("hjert (v0.0.1)");
 
+    size_t totalFree = 0;
+
     for (auto const &record : payload) {
         Debug::linfo(
-            "handover: entry: {} {x}-{x} ({}kib)",
+            "handover: record: {} {x}-{x} ({}kib)",
             record.name(),
             record.start,
             record.end(),
             record.size / 1024);
+
+        if (record.tag == Handover::FREE) {
+            totalFree += record.size;
+        }
     }
+
+    Debug::linfo("handover: total free: {}mib", totalFree / 1024 / 1024);
 
     Arch::stopCpu();
 }

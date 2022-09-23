@@ -22,6 +22,8 @@ struct _Vec {
 
     _Vec(Sliceable<T> auto &other) : _buf(other) {}
 
+    _Vec(S storage) : _buf(storage) {}
+
     /* --- Collection --- */
 
     void add(T const &val) {

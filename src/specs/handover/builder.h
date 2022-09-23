@@ -2,18 +2,49 @@
 
 #include <karm-base/range.h>
 #include <karm-base/string.h>
+#include <karm-debug/logger.h>
 
 #include "spec.h"
 
+template <>
+struct Karm::Fmt::Formatter<Handover::Record> {
+    Result<size_t> format(Io::_TextWriter &writer, Handover::Record record) {
+        return Fmt::format(writer, "Record({}, {x}-{x})", record.name(), record.start, record.end());
+    }
+};
+
 namespace Handover {
+
+static inline USizeRange rangeOf(Record record) {
+    return {record.start, record.size};
+}
+
+static inline bool colidesWith(Record record, Record other) {
+    return rangeOf(record).overlaps(rangeOf(other));
+}
+
+static inline Cons<Record, Record> split(Record record, Record other) {
+    auto [lower, upper] = rangeOf(record).split(rangeOf(other));
+    Record lowerRecord = record;
+    Record upperRecord = record;
+    lowerRecord.start = lower.start();
+    lowerRecord.size = lower.size();
+    upperRecord.start = upper.start();
+    upperRecord.size = upper.size();
+    return {lowerRecord, upperRecord};
+}
 
 struct Builder {
     void *_buf{};
     size_t _size{};
     char *_string{};
+    _Vec<ViewBuf<Record>> _records;
 
     Builder(MutSlice<Byte> slice)
-        : _buf(slice.buf()), _size(slice.len()), _string((char *)end(slice)) {
+        : _buf(slice.buf()),
+          _size(slice.len()),
+          _string((char *)end(slice)),
+          _records(ViewBuf<Record>{(Inert<Record> *)payload().records, _size / sizeof(Record)}) {
         payload() = {};
         payload().magic = COOLBOOT;
         payload().size = slice.len();
@@ -23,34 +54,72 @@ struct Builder {
         return *static_cast<Payload *>(_buf);
     }
 
-    Record &record(size_t index) {
-        return payload().records[index];
-    }
-
-    void add(Record r) {
-        if (_size < sizeof(Record))
+    void add(Record record) {
+        if (record.size == 0)
             return;
 
-        for (size_t i = 0; i < payload().len; i++) {
-            if (record(i).start > r.start) {
-                for (size_t j = payload().len; j > i; j--) {
-                    record(j) = record(j - 1);
-                }
-                record(i) = r;
-                payload().len++;
+        for (size_t i = 0; i < _records.len(); i++) {
+            auto other = _records[i];
+
+            // Merge with previous
+            if (other.tag == record.tag &&
+                other.end() == record.start &&
+                shouldMerge(record.tag)) {
+                Debug::linfo("handover: merge {} with {}", record, other);
+
+                _records.removeAt(i);
+                other.size += record.size;
+                add(other);
                 return;
             }
 
-            if (record(i).tag == r.tag &&
-                record(i).end() == r.start &&
-                shouldMerge(r.tag)) {
-                record(i).size += r.size;
+            // Merge with next
+            if (other.tag == record.tag &&
+                other.start == record.end() &&
+                shouldMerge(record.tag)) {
+                Debug::linfo("handover: merge {} with {}", record, other);
+                _records.removeAt(i);
+                record.size += other.size;
+                add(record);
+                return;
+            }
+
+            if (colidesWith(record, other)) {
+                if (shouldMerge(record.tag) && !shouldMerge(other.tag)) {
+                    Debug::linfo("handover: splitting record {} with {}", record, other);
+
+                    _records.removeAt(i);
+                    auto [lower, upper] = split(record, other);
+
+                    add(other);
+                    add(lower);
+                    add(upper);
+                    return;
+                } else if (!shouldMerge(record.tag) && shouldMerge(other.tag)) {
+                    Debug::linfo("handover: splitting record {} with {}", other, record);
+
+                    _records.removeAt(i);
+
+                    auto [lower, upper] = split(other, record);
+                    add(record);
+                    add(lower);
+                    add(upper);
+                    return;
+                } else {
+                    Debug::lwarn("handover: record {} colides with {}", record, other);
+                    return;
+                }
+            }
+
+            if (other.start > record.start) {
+                Debug::linfo("handover: insert {} at {}", record, i);
+                _records.insert(i, record);
                 return;
             }
         }
 
-        record(payload().len) = r;
-        payload().len++;
+        Debug::linfo("handover: append {}", record);
+        _records.pushBack(record);
     }
 
     void add(Tag tag, uint32_t flags = 0, USizeRange range = {}, uint64_t more = 0) {
@@ -75,7 +144,8 @@ struct Builder {
     }
 
     Payload &finalize() {
-        return *(Payload *)_buf;
+        payload().len = _records.len();
+        return payload();
     }
 };
 

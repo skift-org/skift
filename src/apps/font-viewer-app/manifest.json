@@ -1,5 +1,5 @@
 {
-    "id": "font-viewer",
+    "id": "font-viewer-app",
     "type": "exe",
     "description": "View font files",
     "deps": [

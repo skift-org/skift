@@ -7,19 +7,25 @@ namespace Karm::Gfx {
 
 /* --- Common --------------------------------------------------------------- */
 
-static void _createArc(Shape &shape, Math::Vec2f center, double startAngle, double delta, double radius, Math::Trans2f trans) {
+static void _createArc(Shape &shape, Math::Vec2f center, Math::Vec2f start, Math::Vec2f end, double startAngle, double delta, double radius, Math::Trans2f trans) {
     int devision = 32; // FIXME: determine this procedurally
     double step = delta / devision;
     for (int i = 0; i < devision; i++) {
         double sa = startAngle + step * i;
         double ea = startAngle + step * (i + 1);
 
-        Math::Edgef e = {
-            center + Math::Vec2f{radius * Math::cos(sa), radius * Math::sin(sa)},
-            center + Math::Vec2f{radius * Math::cos(ea), radius * Math::sin(ea)},
-        };
+        auto sp = center + Math::Vec2f{radius * Math::cos(sa), radius * Math::sin(sa)};
+        auto ep = center + Math::Vec2f{radius * Math::cos(ea), radius * Math::sin(ea)};
 
-        shape.add(trans.apply(e));
+        if (i == 0) {
+            shape.add(Math::Edgef{start, sp});
+        }
+
+        shape.add(trans.apply({sp, ep}));
+
+        if (i + 1 == devision) {
+            shape.add(trans.apply({ep, end}));
+        }
     }
 }
 
@@ -69,7 +75,7 @@ static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, M
         return;
     }
 
-    _createArc(shape, corner, startAngle, delta, radius, trans);
+    _createArc(shape, corner, curr.end, next.start, startAngle, delta, radius, trans);
 }
 
 [[maybe_unused]] static void _createJoin(Shape &shape, StrokeStyle stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float radius, Math::Trans2f trans) {
@@ -119,7 +125,7 @@ static void _createCapRound(Shape &shape, Math::Vec2f start, Math::Vec2f end, Ma
 
     double delta = endAngle - startAngle;
 
-    _createArc(shape, center, startAngle, delta, width / 2, trans);
+    _createArc(shape, center, start, end, startAngle, delta, width / 2, trans);
 }
 
 [[maybe_unused]] static void _createCap(Shape &shape, StrokeStyle stroke, Math::Vec2f start, Math::Vec2f end, Math::Vec2f center, Math::Trans2f trans) {

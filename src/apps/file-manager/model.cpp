@@ -5,20 +5,23 @@ namespace FileManager {
 State reduce(State d, Actions action) {
     return action.visit(Visitor{
         [&](GoBack) {
-            if (d.currentIndex > 0) {
+            if (d.canGoBack()) {
                 d.currentIndex--;
             }
             return d;
         },
         [&](GoForward) {
-            if (d.currentIndex + 1 < d.history.len()) {
+            if (d.canGoForward()) {
                 d.currentIndex++;
             }
             return d;
         },
         [&](GoParent p) {
-            auto parent = Sys::Path{d.currentPath()}.parent(p.index);
-            return reduce(d, GoTo{parent});
+            if (d.canGoParent()) {
+                auto parent = Sys::Path{d.currentPath()}.parent(p.index);
+                return reduce(d, GoTo{parent});
+            }
+            return d;
         },
         [&](GoTo gotTo) {
             if (Op::eq(d.currentPath(), gotTo.path)) {

@@ -107,7 +107,9 @@ struct Button : public _Box<Button> {
     };
 
     static constexpr ButtonStyle SUBTLE = {
-        .idleStyle = {},
+        .idleStyle = {
+            .foregroundColor = Gfx::ZINC300,
+        },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,

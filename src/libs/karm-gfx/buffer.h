@@ -148,13 +148,12 @@ struct Surface {
         });
     }
 
-    void blendScanline(double *alphas, int y, int start, int end, int aa, Color color) {
+    void blendScanline(double *alphas, int y, int start, int end, Color color) {
         format.visit([&](auto f) {
             auto *pixel = static_cast<uint8_t *>(buffer.pixels) + y * buffer.stride + start * f.bpp();
             for (int x = start; x < end; x++) {
                 auto c = f.load(pixel);
-                auto alpha = (alphas[x]) / (aa * aa);
-                c = color.withOpacity(alpha * alpha).blendOver(c);
+                c = color.withOpacity(alphas[x] * alphas[x]).blendOver(c);
                 f.store(pixel, c);
                 pixel += f.bpp();
             }

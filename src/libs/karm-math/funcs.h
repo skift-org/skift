@@ -27,6 +27,10 @@ constexpr T ceil(T x) {
         return (T)(long)(x + 1);
 }
 
+constexpr int round(double x) {
+    return (int)(x + 0.5);
+}
+
 constexpr auto pow2(auto x) {
     return x * x;
 }

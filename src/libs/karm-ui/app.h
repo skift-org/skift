@@ -38,11 +38,11 @@ struct App {
 };
 
 template <typename T, typename... Args>
-static inline CliResult runApp(CliArgs cliArgs, Args... args) {
+inline CliResult runApp(CliArgs cliArgs, Args... args) {
     return App{makeStrong<T>(std::forward<Args>(args)...)}.run(cliArgs);
 }
 
-static inline CliResult runApp(CliArgs args, Child root) {
+inline CliResult runApp(CliArgs args, Child root) {
     return App{root}.run(args);
 }
 

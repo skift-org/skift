@@ -47,20 +47,20 @@ Out &out();
 
 Err &err();
 
-static inline void print(Str str, auto &&...args) {
+inline void print(Str str, auto &&...args) {
     (void)Fmt::format(out(), str, std::forward<decltype(args)>(args)...);
 }
 
-static inline void err(Str str, auto &&...args) {
+inline void err(Str str, auto &&...args) {
     (void)Fmt::format(err(), str, std::forward<decltype(args)>(args)...);
 }
 
-static inline void println(Str str, auto &&...args) {
+inline void println(Str str, auto &&...args) {
     (void)Fmt::format(out(), str, std::forward<decltype(args)>(args)...);
     (void)out().writeStr(Embed::LINE_ENDING);
 }
 
-static inline void errln(Str str, auto &&...args) {
+inline void errln(Str str, auto &&...args) {
     (void)Fmt::format(err(), str, std::forward<decltype(args)>(args)...);
     (void)out().writeStr(Embed::LINE_ENDING);
 }

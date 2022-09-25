@@ -25,7 +25,7 @@ Child separator();
 
 Child toolbar(Children children);
 
-static inline Ui::Child toolbar(Meta::Same<Child> auto... children) {
+inline Ui::Child toolbar(Meta::Same<Child> auto... children) {
     return toolbar({children...});
 }
 

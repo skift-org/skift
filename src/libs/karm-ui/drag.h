@@ -48,7 +48,7 @@ struct DragRegion : public Proxy<DragRegion> {
     }
 };
 
-static inline Child dragRegion(Child child) {
+inline Child dragRegion(Child child) {
     return makeStrong<DragRegion>(child);
 }
 

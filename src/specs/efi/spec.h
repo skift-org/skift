@@ -70,7 +70,7 @@ enum : size_t {
 #undef ERR
 };
 
-[[gnu::used]] static inline Error fromStatus(Status status) {
+[[gnu::used]] inline Error fromStatus(Status status) {
     if ((status & EFI_ERROR) == 0) {
         return OK;
     }

@@ -14,7 +14,7 @@ struct Lazy : public React<Lazy> {
     }
 };
 
-static inline Child lazy(Func<Child()> build) {
+inline Child lazy(Func<Child()> build) {
     return makeStrong<Lazy>(std::move(build));
 }
 

@@ -35,7 +35,7 @@ enum PathOpCode {
 #undef ITER
 };
 
-static inline Str opCodeName(PathOpCode opCode) {
+inline Str opCodeName(PathOpCode opCode) {
     switch (opCode) {
 #define ITER(OPCODE) \
     case OPCODE:     \

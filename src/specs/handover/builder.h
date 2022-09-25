@@ -15,15 +15,15 @@ struct Karm::Fmt::Formatter<Handover::Record> {
 
 namespace Handover {
 
-static inline USizeRange rangeOf(Record record) {
+inline USizeRange rangeOf(Record record) {
     return {record.start, record.size};
 }
 
-static inline bool colidesWith(Record record, Record other) {
+inline bool colidesWith(Record record, Record other) {
     return rangeOf(record).overlaps(rangeOf(other));
 }
 
-static inline Cons<Record, Record> split(Record record, Record other) {
+inline Cons<Record, Record> split(Record record, Record other) {
     auto [lower, upper] = rangeOf(record).split(rangeOf(other));
     Record lowerRecord = record;
     Record upperRecord = record;

@@ -4,11 +4,10 @@
 #include "button.h"
 #include "drag.h"
 #include "funcs.h"
-#include "icon.h"
 #include "layout.h"
 #include "proxy.h"
 #include "scafold.h"
-#include "text.h"
+#include "view.h"
 
 namespace Karm::Ui {
 

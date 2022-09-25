@@ -1,10 +1,12 @@
 #pragma once
 
 #include "button.h"
+#include "layout.h"
+#include "view.h"
 
 namespace Karm::Ui {
 
-static inline Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Child> trailing) {
+inline Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Child> trailing) {
     auto t = subtitle
                  ? vflow(
                        8,

@@ -14,18 +14,10 @@ static void _createArc(Shape &shape, Math::Vec2f center, Math::Vec2f start, Math
         double sa = startAngle + step * i;
         double ea = startAngle + step * (i + 1);
 
-        auto sp = center + Math::Vec2f{radius * Math::cos(sa), radius * Math::sin(sa)};
-        auto ep = center + Math::Vec2f{radius * Math::cos(ea), radius * Math::sin(ea)};
-
-        if (i == 0) {
-            shape.add(Math::Edgef{start, sp});
-        }
+        auto sp = i == 0 ? start : center + Math::Vec2f{radius * Math::cos(sa), radius * Math::sin(sa)};
+        auto ep = i + 1 == devision ? end : center + Math::Vec2f{radius * Math::cos(ea), radius * Math::sin(ea)};
 
         shape.add(trans.apply({sp, ep}));
-
-        if (i + 1 == devision) {
-            shape.add(trans.apply({ep, end}));
-        }
     }
 }
 

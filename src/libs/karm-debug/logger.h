@@ -32,7 +32,7 @@ static constexpr Level WARNING = {2, "warn ", Cli::YELLOW};
 static constexpr Level ERROR = {3, "error", Cli::RED};
 static constexpr Level FATAL = {4, "fatal", Cli::style(Cli::RED).bold()};
 
-static inline void _log(Level level, Format format, Fmt::_Args &args) {
+inline void _log(Level level, Format format, Fmt::_Args &args) {
     Embed::loggerLock();
 
     Fmt::format(Embed::loggerOut(), "{} ", Cli::styled(level.name, level.style)).unwrap();
@@ -45,31 +45,31 @@ static inline void _log(Level level, Format format, Fmt::_Args &args) {
 }
 
 template <typename... Args>
-static inline void ldebug(Format format, Args &&...va) {
+inline void ldebug(Format format, Args &&...va) {
     Fmt::Args<Args...> args{std::forward<Args>(va)...};
     _log(DEBUG, format, args);
 }
 
 template <typename... Args>
-static inline void linfo(Format format, Args &&...va) {
+inline void linfo(Format format, Args &&...va) {
     Fmt::Args<Args...> args{std::forward<Args>(va)...};
     _log(INFO, format, args);
 }
 
 template <typename... Args>
-static inline void lwarn(Format format, Args &&...va) {
+inline void lwarn(Format format, Args &&...va) {
     Fmt::Args<Args...> args{std::forward<Args>(va)...};
     _log(WARNING, format, args);
 }
 
 template <typename... Args>
-static inline void lerror(Format format, Args &&...va) {
+inline void lerror(Format format, Args &&...va) {
     Fmt::Args<Args...> args{std::forward<Args>(va)...};
     _log(ERROR, format, args);
 }
 
 template <typename... Args>
-[[noreturn]] static inline void lpanic(Format format, Args &&...va) {
+[[noreturn]] inline void lpanic(Format format, Args &&...va) {
     Fmt::Args<Args...> args{std::forward<Args>(va)...};
     _log(FATAL, format, args);
     panic("fatal error");

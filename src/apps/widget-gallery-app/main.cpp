@@ -5,7 +5,7 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
-#include <karm-ui/text.h>
+#include <karm-ui/view.h>
 
 void willShowMessage(Ui::Node &n) {
     Ui::showMsgDialog(n, "Button pressed");

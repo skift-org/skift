@@ -242,6 +242,22 @@ Child aspectRatio(float ratio, Child child) {
     return makeStrong<AspectRatio>(ratio, child);
 }
 
+/* --- Stack ---------------------------------------------------------------- */
+
+struct StackLayout : public Group<StackLayout> {
+    using Group::Group;
+
+    void layout(Math::Recti r) override {
+        for (auto &child : children()) {
+            child->layout(r);
+        }
+    }
+};
+
+Child stack(Children children) {
+    return makeStrong<StackLayout>(children);
+}
+
 /* --- Dock ----------------------------------------------------------------- */
 
 struct DockItem : public Proxy<DockItem> {

@@ -93,7 +93,7 @@ struct Style {
     return style;
 };
 
-static inline constexpr Style style(auto... args) {
+inline constexpr Style style(auto... args) {
     return Style{args...};
 }
 
@@ -103,7 +103,7 @@ struct Styled {
     Style _color;
 };
 
-static inline auto styled(auto inner, Style style) {
+inline auto styled(auto inner, Style style) {
     return Styled<decltype(inner)>{inner, style};
 }
 

@@ -6,6 +6,7 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
+#include <karm-ui/view.h>
 
 static constexpr Str PANGRAM = "The quick brown fox jumps over the lazy dog";
 

@@ -236,7 +236,7 @@ struct _Mmap {
     }
 };
 
-static inline _Mmap mmap() {
+inline _Mmap mmap() {
     return {};
 }
 

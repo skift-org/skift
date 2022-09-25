@@ -60,6 +60,14 @@ Child spacing(Layout::Spacingi s, Child child);
 
 Child aspectRatio(float ratio, Child child);
 
+/* --- Stack ---------------------------------------------------------------- */
+
+Child stack(Children children);
+
+inline Child stack(auto... children) {
+    return stack(Children{children...});
+}
+
 /* --- Dock ----------------------------------------------------------------- */
 
 Child docked(Layout::Dock dock, Child child);
@@ -74,7 +82,7 @@ Child dockEnd(Child child);
 
 Child dock(Children children);
 
-static inline Child dock(Meta::Same<Child> auto... children) {
+inline Child dock(Meta::Same<Child> auto... children) {
     return dock({children...});
 }
 
@@ -96,51 +104,51 @@ struct FlowStyle {
 
 Child flow(FlowStyle style, Children children);
 
-static inline Child hflow(Meta::Same<Child> auto... children) {
+inline Child hflow(Meta::Same<Child> auto... children) {
     return flow({.flow = Layout::Flow::LEFT_TO_RIGHT}, {children...});
 }
 
-static inline Child hflow(int gaps, Meta::Same<Child> auto... children) {
+inline Child hflow(int gaps, Meta::Same<Child> auto... children) {
     return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .gaps = gaps}, {children...});
 }
 
-static inline Child hflow(int gaps, Layout::Align align, Meta::Same<Child> auto... children) {
+inline Child hflow(int gaps, Layout::Align align, Meta::Same<Child> auto... children) {
     return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, {children...});
 }
 
-static inline Child hflow(Children children) {
+inline Child hflow(Children children) {
     return flow({.flow = Layout::Flow::LEFT_TO_RIGHT}, children);
 }
 
-static inline Child hflow(int gaps, Children children) {
+inline Child hflow(int gaps, Children children) {
     return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .gaps = gaps}, children);
 }
 
-static inline Child hflow(int gaps, Layout::Align align, Children children) {
+inline Child hflow(int gaps, Layout::Align align, Children children) {
     return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, children);
 }
 
-static inline Child vflow(Meta::Same<Child> auto... children) {
+inline Child vflow(Meta::Same<Child> auto... children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM}, {children...});
 }
 
-static inline Child vflow(int gaps, Meta::Same<Child> auto... children) {
+inline Child vflow(int gaps, Meta::Same<Child> auto... children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .gaps = gaps}, {children...});
 }
 
-static inline Child vflow(int gaps, Layout::Align align, Meta::Same<Child> auto... children) {
+inline Child vflow(int gaps, Layout::Align align, Meta::Same<Child> auto... children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, {children...});
 }
 
-static inline Child vflow(Children children) {
+inline Child vflow(Children children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM}, children);
 }
 
-static inline Child vflow(int gaps, Children children) {
+inline Child vflow(int gaps, Children children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .gaps = gaps}, children);
 }
 
-static inline Child vflow(int gaps, Layout::Align align, Children children) {
+inline Child vflow(int gaps, Layout::Align align, Children children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, children);
 }
 
@@ -203,7 +211,7 @@ Child cell(Math::Vec2i start, Math::Vec2i end, Child child);
 
 Child grid(GridStyle style, Children children);
 
-static inline Child grid(GridStyle style, Meta::Same<Child> auto... children) {
+inline Child grid(GridStyle style, Meta::Same<Child> auto... children) {
     return grid(style, Children{children...});
 }
 

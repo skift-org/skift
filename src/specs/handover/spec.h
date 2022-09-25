@@ -5,12 +5,12 @@
 
 namespace Handover {
 
-static inline size_t KERNEL_BASE = 0xffffffff80000000;
-static inline size_t UPPER_HALF = 0xffff800000000000;
+inline size_t KERNEL_BASE = 0xffffffff80000000;
+inline size_t UPPER_HALF = 0xffff800000000000;
 
 namespace Utils {
 
-static inline bool cstrEq(const char *str1, const char *str2) {
+inline bool cstrEq(const char *str1, const char *str2) {
     while (*str1 && *str2) {
         if (*str1++ != *str2++)
             return false;
@@ -55,7 +55,7 @@ static char const *tagName(Tag tag) {
     return "UNKNOWN";
 }
 
-static inline bool shouldMerge(Tag tag) {
+inline bool shouldMerge(Tag tag) {
     switch (tag) {
     case Tag::FREE:
     case Tag::LOADER:
@@ -168,7 +168,7 @@ struct Request {
 [[gnu::used]] static constexpr Request requestFdt() { return {Tag::FDT, 0, 0}; }
 [[gnu::used]] static constexpr Request requestFb(PixelFormat preferedFormat = PixelFormat::RGBX32) { return {Tag::FB, 0, (uint64_t)preferedFormat}; }
 
-static inline bool valid(uint32_t magic, Payload const &payload) {
+inline bool valid(uint32_t magic, Payload const &payload) {
     if (magic != COOLBOOT) {
         return false;
     }

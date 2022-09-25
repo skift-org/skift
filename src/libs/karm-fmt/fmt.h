@@ -163,7 +163,7 @@ struct Args : public _Args {
     }
 };
 
-static inline Result<size_t> _format(Io::_TextWriter &writer, Str format, _Args &args) {
+inline Result<size_t> _format(Io::_TextWriter &writer, Str format, _Args &args) {
     Text::Scan scan{format};
     size_t written = 0;
     size_t index = 0;
@@ -193,13 +193,13 @@ static inline Result<size_t> _format(Io::_TextWriter &writer, Str format, _Args 
 }
 
 template <typename... Ts>
-static inline Result<size_t> format(Io::_TextWriter &writer, Str format, Ts &&...ts) {
+inline Result<size_t> format(Io::_TextWriter &writer, Str format, Ts &&...ts) {
     Args<Ts...> args{std::forward<Ts>(ts)...};
     return _format(writer, format, args);
 }
 
 template <typename... Ts>
-static inline String format(Str format, Ts &&...ts) {
+inline String format(Str format, Ts &&...ts) {
     Io::StringWriter writer{};
     Args<Ts...> args{std::forward<Ts>(ts)...};
     _format(writer, format, args).unwrap();

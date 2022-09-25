@@ -13,13 +13,13 @@ struct ActionDispatch {
 };
 
 template <typename Action>
-static inline void dispatchAction(Node &n, Action action) {
+inline void dispatchAction(Node &n, Action action) {
     auto &d = queryParent<ActionDispatch<Action>>(n);
     d.dispatch(action);
 }
 
 template <typename Action>
-static inline Func<void(Node &)> bindAction(Action action) {
+inline Func<void(Node &)> bindAction(Action action) {
     return [action](Node &n) {
         dispatchAction(n, action);
     };
@@ -98,12 +98,20 @@ struct Reducer :
 };
 
 template <typename Model>
-static inline Child reducer(
+inline Child reducer(
     typename Model::Data initial,
     typename Model::Reduce reducer,
     Func<Child(typename Model::Data)> build) {
 
     return makeStrong<Reducer<Model>>(initial, std::move(reducer), std::move(build));
+}
+
+template <typename Model>
+inline Child reducer(
+    typename Model::Reduce reducer,
+    Func<Child(typename Model::Data)> build) {
+
+    return makeStrong<Reducer<Model>>({}, std::move(reducer), std::move(build));
 }
 
 } // namespace Karm::Ui

@@ -4,19 +4,19 @@
 
 namespace Karm {
 
-static inline void debug(const char *msg) {
+inline void debug(const char *msg) {
     Embed::debug(msg);
 }
 
-[[noreturn]] static inline void panic(char const *msg) {
+[[noreturn]] inline void panic(char const *msg) {
     Embed::panic(msg);
 }
 
-[[noreturn]] static inline void notImplemented() {
+[[noreturn]] inline void notImplemented() {
     panic("Not implemented");
 }
 
-[[noreturn]] static inline void unreachable() {
+[[noreturn]] inline void unreachable() {
     panic("Unreachable");
 }
 

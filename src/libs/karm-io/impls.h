@@ -33,7 +33,7 @@ struct Repeat : public Reader {
 
 struct Empty : public Reader {
     Result<size_t> read(MutBytes)
-    override {
+        override {
         return 0;
     }
 };
@@ -90,7 +90,7 @@ struct WriterSlice : public Writer, public Seeker {
 };
 
 template <SeekableWritable Writable>
-static inline Result<Slice<Writable>>
+inline Result<Slice<Writable>>
 makeSlice(Writable &&writer, size_t size) {
     auto start = try$(writer.tell());
     auto end = start + size;
@@ -149,7 +149,7 @@ struct _StringWriter : public _TextWriter {
     _StringWriter(size_t cap = 16) : _buf(cap) {}
 
     Result<size_t> write(Bytes)
-    override {
+        override {
         panic("can't write raw bytes to a string");
     }
 

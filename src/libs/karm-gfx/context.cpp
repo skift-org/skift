@@ -339,6 +339,7 @@ void Context::_trace() {
 
 [[gnu::flatten]] void Context::_fill(Color color) {
     static constexpr auto AA = 4;
+    static constexpr auto UNIT = 1.0f / AA;
     static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;
 
     auto rect = applyClip(_shape.bound().ceil().cast<int>());
@@ -346,7 +347,7 @@ void Context::_trace() {
     for (int y = rect.top(); y < rect.bottom(); y++) {
         zeroFill<double>(mutSub(_scanline, rect.start(), rect.end()));
 
-        for (double yy = y; yy < y + 1.0; yy += 1.0 / AA) {
+        for (double yy = y; yy < y + 1.0; yy += UNIT) {
             _active.clear();
 
             for (auto &edge : _shape) {
@@ -380,17 +381,17 @@ void Context::_trace() {
                 double x2 = min(_active[i + 1].x, rect.end());
 
                 if (x1 < x2) {
-                    _scanline[x1] += (ceil(x1) - x1) / AA;
-                    _scanline[x2] += (x2 - floor(x2)) / AA;
+                    _scanline[x1] += (ceil(x1) - x1) * UNIT;
+                    _scanline[x2] += (x2 - floor(x2)) * UNIT;
 
                     for (int x = ceil(x1); x < floor(x2); x++) {
-                        _scanline[x] += 1.0 / AA;
+                        _scanline[x] += UNIT;
                     }
                 }
             }
-
-            surface().blendScanline(_scanline.buf(), y, rect.start(), rect.end(), color);
         }
+
+        surface().blendScanline(_scanline.buf(), y, rect.start(), rect.end(), color);
     }
 }
 

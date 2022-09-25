@@ -17,7 +17,7 @@ Efi::LoadedImageProtocol *li();
 void init(Handle handle, SystemTable *st);
 
 template <typename P>
-static inline Result<P *> openProtocol(Handle handle) {
+inline Result<P *> openProtocol(Handle handle) {
     P *result = nullptr;
     Uuid uuid = P::UUID;
     try$(bs()->openProtocol(handle, &uuid, (void **)&result, imageHandle(), nullptr, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL));
@@ -25,12 +25,12 @@ static inline Result<P *> openProtocol(Handle handle) {
 }
 
 template <typename P>
-static inline Result<P *> openProtocol() {
+inline Result<P *> openProtocol() {
     return openProtocol<P>(imageHandle());
 }
 
 template <typename P>
-static inline Result<P> locateProtocol() {
+inline Result<P> locateProtocol() {
     P *result = nullptr;
     Uuid uuid = P::UUID;
     try$(bs()->locateProtocol(&uuid, nullptr, &result));

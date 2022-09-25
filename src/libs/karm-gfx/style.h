@@ -26,7 +26,7 @@ struct FillStyle {
     }
 };
 
-static inline constexpr FillStyle fill(auto... args) {
+inline constexpr FillStyle fill(auto... args) {
     return FillStyle(args...);
 }
 
@@ -85,7 +85,7 @@ struct StrokeStyle {
     }
 };
 
-static inline constexpr StrokeStyle stroke(auto... args) {
+inline constexpr StrokeStyle stroke(auto... args) {
     return {args...};
 }
 
@@ -114,7 +114,7 @@ struct ShadowStyle {
     }
 };
 
-static inline ShadowStyle shadow(auto... args) {
+inline ShadowStyle shadow(auto... args) {
     return ShadowStyle(args...);
 }
 

@@ -4,7 +4,7 @@
 #include "dialog.h"
 #include "drag.h"
 #include "layout.h"
-#include "text.h"
+#include "view.h"
 
 namespace Karm::Ui {
 

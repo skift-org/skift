@@ -1,9 +1,8 @@
 #include "button.h"
 
 #include "funcs.h"
-#include "icon.h"
 #include "layout.h"
-#include "text.h"
+#include "view.h"
 
 namespace Karm::Ui {
 

@@ -4,17 +4,17 @@
 
 namespace x86_64 {
 
-static inline void cli(void) { asm volatile("cli"); }
+inline void cli(void) { asm volatile("cli"); }
 
-static inline void sti(void) { asm volatile("sti"); }
+inline void sti(void) { asm volatile("sti"); }
 
-static inline void hlt(void) { asm volatile("hlt"); }
+inline void hlt(void) { asm volatile("hlt"); }
 
-static inline void pause(void) { asm volatile("pause"); }
+inline void pause(void) { asm volatile("pause"); }
 
 /* --- I/O ------------------------------------------------------------------ */
 
-static inline uint8_t in8(uint16_t port) {
+inline uint8_t in8(uint16_t port) {
     uint8_t data;
     asm volatile("inb %1, %0"
                  : "=a"(data)
@@ -22,7 +22,7 @@ static inline uint8_t in8(uint16_t port) {
     return data;
 }
 
-static inline uint16_t in16(uint16_t port) {
+inline uint16_t in16(uint16_t port) {
     uint16_t data;
     asm volatile("inw %1, %0"
                  : "=a"(data)
@@ -30,7 +30,7 @@ static inline uint16_t in16(uint16_t port) {
     return data;
 }
 
-static inline uint32_t in32(uint16_t port) {
+inline uint32_t in32(uint16_t port) {
     uint32_t data;
     asm volatile("inl %1, %0"
                  : "=a"(data)
@@ -38,19 +38,19 @@ static inline uint32_t in32(uint16_t port) {
     return data;
 }
 
-static inline void out8(uint16_t port, uint8_t data) {
+inline void out8(uint16_t port, uint8_t data) {
     asm volatile("outb %0, %1" ::"a"(data), "d"(port));
 }
 
-static inline void out16(uint16_t port, uint16_t data) {
+inline void out16(uint16_t port, uint16_t data) {
     asm volatile("outw %0, %1" ::"a"(data), "d"(port));
 }
 
-static inline void out32(uint16_t port, uint32_t data) {
+inline void out32(uint16_t port, uint32_t data) {
     asm volatile("outl %0, %1" ::"a"(data), "d"(port));
 }
 
-static inline void invlpg(size_t addr) {
+inline void invlpg(size_t addr) {
     asm volatile("invlpg (%0)" ::"r"(addr)
                  : "memory");
 }
@@ -58,14 +58,14 @@ static inline void invlpg(size_t addr) {
 /* --- CRs ------------------------------------------------------------------ */
 
 #define CR(N)                                         \
-    static inline uint64_t rdcr##N(void) {            \
+    inline uint64_t rdcr##N(void) {                   \
         uint64_t value = 0;                           \
         asm volatile("mov %%cr" #N ", %0"             \
                      : "=r"(value));                  \
         return value;                                 \
     }                                                 \
                                                       \
-    static inline void wrcr##N(uint64_t value) {      \
+    inline void wrcr##N(uint64_t value) {             \
         asm volatile("mov %0, %%cr" #N ::"a"(value)); \
     }
 
@@ -78,7 +78,7 @@ CR(3)
 
 /* --- AVX/SSSE ------------------------------------------------------------- */
 
-static inline uint64_t rdxcr(uint32_t i) {
+inline uint64_t rdxcr(uint32_t i) {
     uint32_t eax, edx;
     asm volatile("xgetbv"
 
@@ -89,7 +89,7 @@ static inline uint64_t rdxcr(uint32_t i) {
     return eax | ((uint64_t)edx << 32);
 }
 
-static inline void wrxcr(uint32_t i, uint64_t value) {
+inline void wrxcr(uint32_t i, uint64_t value) {
     uint32_t edx = value >> 32;
     uint32_t eax = (uint32_t)value;
     asm volatile("xsetbv"
@@ -112,7 +112,7 @@ enum struct Msrs : uint64_t {
     KERN_GS_BASE = 0xc0000102,
 };
 
-static inline uint64_t rdmsr(Msrs msr) {
+inline uint64_t rdmsr(Msrs msr) {
 
     uint32_t low, high;
     asm volatile("rdmsr"
@@ -121,7 +121,7 @@ static inline uint64_t rdmsr(Msrs msr) {
     return ((uint64_t)high << 32) | low;
 }
 
-static inline void wrmsr(Msrs msr, uint64_t value) {
+inline void wrmsr(Msrs msr, uint64_t value) {
 
     uint32_t low = value & 0xFFFFFFFF;
     uint32_t high = value >> 32;

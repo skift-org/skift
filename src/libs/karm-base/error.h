@@ -105,7 +105,7 @@ struct [[nodiscard]] Error {
     }
 };
 
-static inline constexpr Error OK = {Error::OK};
+inline constexpr Error OK = {Error::OK};
 
 static_assert(Tryable<Error>);
 

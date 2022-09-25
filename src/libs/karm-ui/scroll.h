@@ -1,17 +1,19 @@
 #pragma once
 
+#include <karm-layout/flow.h>
+
 #include "funcs.h"
 #include "proxy.h"
 
 namespace Karm::Ui {
 
 struct Scroll : public Proxy<Scroll> {
-    Math::Vec2i _size{};
+    Layout::Orien _orient{};
     Math::Recti _bound{};
     Math::Vec2i _scroll{};
 
-    Scroll(Math::Vec2i size, Child child)
-        : Proxy(child), _size(size) {}
+    Scroll(Layout::Orien orient, Child child)
+        : Proxy(child), _orient(orient) {}
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
@@ -66,10 +68,20 @@ struct Scroll : public Proxy<Scroll> {
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
-        if (hint == Layout::Hint::MIN)
-            return _size;
-        else
-            return s;
+        auto childSize = child().size(s, hint);
+
+        if (hint == Layout::Hint::MIN) {
+            if (_orient == Layout::Orien::HORIZONTAL) {
+                childSize.x = s.x;
+            } else if (_orient == Layout::Orien::VERTICAL) {
+                childSize.y = s.y;
+            } else {
+                childSize = s;
+            }
+            return childSize;
+        } else {
+            return childSize;
+        }
     }
 
     Math::Recti bound() override {
@@ -77,12 +89,16 @@ struct Scroll : public Proxy<Scroll> {
     }
 };
 
-static inline Child scroll(Math::Vec2i size, Child child) {
-    return makeStrong<Scroll>(size, child);
+inline Child scroll(Child child) {
+    return makeStrong<Scroll>(Layout::Orien::BOTH, child);
 }
 
-static inline Child scroll(Child child) {
-    return makeStrong<Scroll>(Math::Vec2i{}, child);
+inline Child hscroll(Child child) {
+    return makeStrong<Scroll>(Layout::Orien::HORIZONTAL, child);
+}
+
+inline Child vscroll(Child child) {
+    return makeStrong<Scroll>(Layout::Orien::VERTICAL, child);
 }
 
 } // namespace Karm::Ui

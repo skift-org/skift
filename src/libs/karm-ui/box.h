@@ -81,7 +81,7 @@ struct Box : public _Box<Box> {
     }
 };
 
-static inline Child box(BoxStyle style, Child child) {
+inline Child box(BoxStyle style, Child child) {
     return makeStrong<Box>(style, child);
 }
 

@@ -26,7 +26,7 @@ struct Rgba8888 {
     }
 };
 
-[[gnu::used]] static inline Rgba8888 RGBA8888;
+[[gnu::used]] inline Rgba8888 RGBA8888;
 
 struct Bgra8888 {
     static Color load(void const *pixel) {
@@ -47,7 +47,7 @@ struct Bgra8888 {
     }
 };
 
-[[gnu::used]] static inline Bgra8888 BGRA8888;
+[[gnu::used]] inline Bgra8888 BGRA8888;
 
 using Format = Var<Rgba8888, Bgra8888>;
 
@@ -58,19 +58,19 @@ struct Buffer {
     int stride;
 };
 
-static inline Color load(Format format, void const *pixel) {
+inline Color load(Format format, void const *pixel) {
     return format.visit([&](auto f) {
         return f.load(pixel);
     });
 }
 
-static inline void store(Format format, void *pixel, Color const color) {
+inline void store(Format format, void *pixel, Color const color) {
     format.visit([&](auto f) {
         f.store(pixel, color);
     });
 }
 
-static inline size_t bpp(Format format) {
+inline size_t bpp(Format format) {
     return format.visit([&](auto f) {
         return f.bpp();
     });
@@ -153,7 +153,7 @@ struct Surface {
             auto *pixel = static_cast<uint8_t *>(buffer.pixels) + y * buffer.stride + start * f.bpp();
             for (int x = start; x < end; x++) {
                 auto c = f.load(pixel);
-                c = color.withOpacity(alphas[x] * alphas[x]).blendOver(c);
+                c = color.withOpacity(alphas[x]).blendOver(c);
                 f.store(pixel, c);
                 pixel += f.bpp();
             }

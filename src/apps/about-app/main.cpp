@@ -2,10 +2,9 @@
 #include <karm-ui/app.h>
 #include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
-#include <karm-ui/icon.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
-#include <karm-ui/text.h>
+#include <karm-ui/view.h>
 
 CliResult entryPoint(CliArgs args) {
     auto titlebar = Ui::titlebar(

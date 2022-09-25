@@ -1,7 +1,10 @@
 #include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/icon.h>
+#include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
+#include <karm-ui/text.h>
 
 #include "model.h"
 #include "widgets.h"
@@ -13,7 +16,7 @@ namespace FileManager {
 Ui::Child directorEntry(Sys::DirEntry const &entry) {
     return Ui::button(
         Model::bind<GoTo>(entry.name),
-        Ui::Button::SUBTLE,
+        Ui::ButtonStyle::subtle(),
         entry.isDir ? Media::Icons::FOLDER : Media::Icons::FILE,
         entry.name);
 }
@@ -29,7 +32,7 @@ Ui::Child directoryListing(Sys::Dir const &dir) {
 Ui::Child breadcrumbItem(Str text, int index) {
     return Ui::button(
         Model::bind<GoParent>(index),
-        Ui::Button::SUBTLE,
+        Ui::ButtonStyle::subtle(),
         Ui::spacing(
             4,
             Ui::hflow(
@@ -47,24 +50,24 @@ Ui::Child breadcrumb() {
             .borderColor = Gfx::ZINC700,
         },
         Ui::hflow(
-            Ui::button(Model::bind<GoTo>("/"), Ui::Button::SUBTLE, Media::Icons::LAPTOP),
+            Ui::button(Model::bind<GoTo>("/"), Ui::ButtonStyle::subtle(), Media::Icons::LAPTOP),
             breadcrumbItem("home", 3),
             breadcrumbItem("smnx", 2),
             breadcrumbItem("projects", 1),
             breadcrumbItem("skift", 0),
             Ui::grow(),
-            Ui::button(Model::bind<AddBookmark>(), Ui::Button::SUBTLE, Media::Icons::BOOKMARK)));
+            Ui::button(Model::bind<AddBookmark>(), Ui::ButtonStyle::subtle(), Media::Icons::BOOKMARK)));
 }
 
 Ui::Child toolbar(State state) {
 
     return Ui::toolbar(
-        Ui::button(Model::bind<GoBack>(), state.canGoBack() ? Ui::Button::SUBTLE : Ui::Button::DEACTIVATED, Media::Icons::ARROW_LEFT),
-        Ui::button(Model::bind<GoForward>(), state.canGoForward() ? Ui::Button::SUBTLE : Ui::Button::DEACTIVATED, Media::Icons::ARROW_RIGHT),
-        Ui::button(Model::bind<GoParent>(1), state.canGoParent() ? Ui::Button::SUBTLE : Ui::Button::DEACTIVATED, Media::Icons::ARROW_UP),
-        Ui::button(Model::bind<GoTo>("/home"), Ui::Button::SUBTLE, Media::Icons::HOME),
+        Ui::button(Model::bindIf<GoBack>(state.canGoBack()), Ui::ButtonStyle::subtle(), Media::Icons::ARROW_LEFT),
+        Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Media::Icons::ARROW_RIGHT),
+        Ui::button(Model::bindIf<GoParent>(state.canGoParent(), 1), Ui::ButtonStyle::subtle(), Media::Icons::ARROW_UP),
+        Ui::button(Model::bind<GoTo>("/home"), Ui::ButtonStyle::subtle(), Media::Icons::HOME),
         Ui::grow(FileManager::breadcrumb()),
-        Ui::button(Model::bind<Refresh>(), Ui::Button::SUBTLE, Media::Icons::REFRESH));
+        Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::subtle(), Media::Icons::REFRESH));
 }
 
 /* ---  Dialogs  ------------------------------------------------------------ */
@@ -85,16 +88,12 @@ Ui::Child openFileDialog() {
                 msgLbl));
 
         auto openBtn = Ui::button(
-            [](auto &n) {
-                Ui::closeDialog(n);
-            },
-            Ui::Button::PRIMARY, "OPEN");
+            Ui::OnPress{Ui::closeDialog},
+            Ui::ButtonStyle::primary(), "OPEN");
 
         auto cancelBtn = Ui::button(
-            [](auto &n) {
-                Ui::closeDialog(n);
-            },
-            Ui::Button::SUBTLE, "CANCEL");
+            Ui::closeDialog,
+            Ui::ButtonStyle::subtle(), "CANCEL");
 
         auto controls = Ui::spacing(
             16,

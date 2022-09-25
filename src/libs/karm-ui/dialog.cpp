@@ -4,8 +4,11 @@
 #include "button.h"
 #include "drag.h"
 #include "funcs.h"
+#include "icon.h"
+#include "layout.h"
 #include "proxy.h"
 #include "scafold.h"
+#include "text.h"
 
 namespace Karm::Ui {
 
@@ -166,10 +169,9 @@ Child dialogScafold(Layout::Align a, Child content, Children actions) {
 
 Child dialogCloseButton() {
     return button(
-        [](auto &n) {
-            closeDialog(n);
-        },
-        Button::PRIMARY, "CLOSE");
+        closeDialog,
+        ButtonStyle::primary(),
+        "CLOSE");
 }
 
 /* --- Dialogs -------------------------------------------------------------- */
@@ -187,7 +189,7 @@ Child aboutDialog(Media::Icons i, String name) {
         text("SMNX & contributors."));
 
     Children actions = {
-        button(NOP, Button::SUBTLE, "LICENSE"),
+        button(NONE, ButtonStyle::subtle(), "LICENSE"),
         grow(),
         dialogCloseButton(),
     };
@@ -198,22 +200,32 @@ Child aboutDialog(Media::Icons i, String name) {
         actions);
 }
 
+void showAboutDialog(Node &n, Media::Icons icon, String name) {
+    showDialog(n, aboutDialog(icon, name));
+}
+
 Child msgDialog(String title, String msg) {
     auto titleLbl = text(16, title);
     auto msgLbl = text(msg);
     Children actions = {
         grow(),
         button(
-            [](auto &n) {
-                closeDialog(n);
-            },
-            Button::PRIMARY, "OK"),
+            closeDialog,
+            ButtonStyle::primary(), "OK"),
     };
 
     return dialogScafold(
         Layout::Align::CENTER,
         vflow(16, titleLbl, msgLbl),
         actions);
+}
+
+void showMsgDialog(Node &n, String title, String msg) {
+    showDialog(n, msgDialog(title, msg));
+}
+
+void showMsgDialog(Node &n, String msg) {
+    showDialog(n, msgDialog("Message", msg));
 }
 
 } // namespace Karm::Ui

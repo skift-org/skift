@@ -3,7 +3,9 @@
 #include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
+#include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
+#include <karm-ui/text.h>
 
 #include "model.h"
 
@@ -20,41 +22,41 @@ Ui::Child keypad(State state) {
                 {3, 0},
                 Ui::hflow(
                     4,
-                    Ui::button(Model::bind<MemClearAction>(), state.hasMem ? Ui::Button::SUBTLE : Ui::Button::DEACTIVATED, "MC"),
-                    Ui::button(Model::bind<MemRecallAction>(), state.hasMem ? Ui::Button::SUBTLE : Ui::Button::DEACTIVATED, "MR"),
-                    Ui::button(Model::bind<MemAddAction>(), Ui::Button::SUBTLE, "M+"),
-                    Ui::button(Model::bind<MemSubAction>(), Ui::Button::SUBTLE, "M-"),
-                    Ui::button(Model::bind<MemStoreAction>(), Ui::Button::SUBTLE, "MS"))),
+                    Ui::button(Model::bindIf<MemClearAction>(state.hasMem), Ui::ButtonStyle::subtle(), "MC"),
+                    Ui::button(Model::bindIf<MemRecallAction>(state.hasMem), Ui::ButtonStyle::subtle(), "MR"),
+                    Ui::button(Model::bind<MemAddAction>(), Ui::ButtonStyle::subtle(), "M+"),
+                    Ui::button(Model::bind<MemSubAction>(), Ui::ButtonStyle::subtle(), "M-"),
+                    Ui::button(Model::bind<MemStoreAction>(), Ui::ButtonStyle::subtle(), "MS"))),
 
-            Ui::button(Model::bind<ClearAllAction>(), Ui::Button::SECONDARY, 18, "CE"),
-            Ui::button(Model::bind<ClearAction>(), Ui::Button::SECONDARY, 18, "C"),
-            Ui::button(Model::bind(Operator::TO_PERCENT), Ui::Button::SECONDARY, Media::Icons::PERCENT),
-            Ui::button(Model::bind<BackspaceAction>(), Ui::Button::SECONDARY, Media::Icons::BACKSPACE_OUTLINE),
+            Ui::button(Model::bind<ClearAllAction>(), Ui::ButtonStyle::secondary(), 18, "CE"),
+            Ui::button(Model::bind<ClearAction>(), Ui::ButtonStyle::secondary(), 18, "C"),
+            Ui::button(Model::bind(Operator::TO_PERCENT), Ui::ButtonStyle::secondary(), Media::Icons::PERCENT),
+            Ui::button(Model::bind<BackspaceAction>(), Ui::ButtonStyle::secondary(), Media::Icons::BACKSPACE_OUTLINE),
 
-            Ui::button(Ui::NOP, Ui::Button::SECONDARY, 18, "1/x"),
-            Ui::button(Model::bind(Operator::SQUARE), Ui::Button::SECONDARY, 18, "x²"),
-            Ui::button(Model::bind(Operator::SQRT), Ui::Button::SECONDARY, 18, "√x"),
-            Ui::button(Model::bind(Operator::DIV), Ui::Button::SECONDARY, Media::Icons::DIVISION),
+            Ui::button(NONE, Ui::ButtonStyle::secondary(), 18, "1/x"),
+            Ui::button(Model::bind(Operator::SQUARE), Ui::ButtonStyle::secondary(), 18, "x²"),
+            Ui::button(Model::bind(Operator::SQRT), Ui::ButtonStyle::secondary(), 18, "√x"),
+            Ui::button(Model::bind(Operator::DIV), Ui::ButtonStyle::secondary(), Media::Icons::DIVISION),
 
-            Ui::button(Model::bind<Number>(7), Ui::Button::DEFAULT, 18, "7"),
-            Ui::button(Model::bind<Number>(8), Ui::Button::DEFAULT, 18, "8"),
-            Ui::button(Model::bind<Number>(9), Ui::Button::DEFAULT, 18, "9"),
-            Ui::button(Model::bind(Operator::MULT), Ui::Button::SECONDARY, Media::Icons::MULTIPLICATION),
+            Ui::button(Model::bind<Number>(7), 18, "7"),
+            Ui::button(Model::bind<Number>(8), 18, "8"),
+            Ui::button(Model::bind<Number>(9), 18, "9"),
+            Ui::button(Model::bind(Operator::MULT), Ui::ButtonStyle::secondary(), Media::Icons::MULTIPLICATION),
 
-            Ui::button(Model::bind<Number>(4), Ui::Button::DEFAULT, 18, "4"),
-            Ui::button(Model::bind<Number>(5), Ui::Button::DEFAULT, 18, "5"),
-            Ui::button(Model::bind<Number>(6), Ui::Button::DEFAULT, 18, "6"),
-            Ui::button(Model::bind(Operator::SUB), Ui::Button::SECONDARY, Media::Icons::MINUS),
+            Ui::button(Model::bind<Number>(4), 18, "4"),
+            Ui::button(Model::bind<Number>(5), 18, "5"),
+            Ui::button(Model::bind<Number>(6), 18, "6"),
+            Ui::button(Model::bind(Operator::SUB), Ui::ButtonStyle::secondary(), Media::Icons::MINUS),
 
-            Ui::button(Model::bind<Number>(1), Ui::Button::DEFAULT, 18, "1"),
-            Ui::button(Model::bind<Number>(2), Ui::Button::DEFAULT, 18, "2"),
-            Ui::button(Model::bind<Number>(3), Ui::Button::DEFAULT, 18, "3"),
-            Ui::button(Model::bind(Operator::ADD), Ui::Button::SECONDARY, Media::Icons::PLUS),
+            Ui::button(Model::bind<Number>(1), 18, "1"),
+            Ui::button(Model::bind<Number>(2), 18, "2"),
+            Ui::button(Model::bind<Number>(3), 18, "3"),
+            Ui::button(Model::bind(Operator::ADD), Ui::ButtonStyle::secondary(), Media::Icons::PLUS),
 
-            Ui::button(Model::bind(Operator::INVERT_SIGN), Ui::Button::DEFAULT, 18, "+/-"),
-            Ui::button(Model::bind<Number>(0), Ui::Button::DEFAULT, 18, "0"),
-            Ui::button(Ui::NOP, Ui::Button::DEFAULT, Media::Icons::CIRCLE_SMALL),
-            Ui::button(Model::bind<EqualAction>(), Ui::Button::PRIMARY, Media::Icons::EQUAL)));
+            Ui::button(Model::bind(Operator::INVERT_SIGN), 18, "+/-"),
+            Ui::button(Model::bind<Number>(0), 18, "0"),
+            Ui::button(NONE, Media::Icons::CIRCLE_SMALL),
+            Ui::button(Model::bind<EqualAction>(), Ui::ButtonStyle::primary(), Media::Icons::EQUAL)));
 }
 
 Ui::Child screen(State state) {

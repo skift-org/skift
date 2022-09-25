@@ -2,9 +2,11 @@
 #include <karm-ui/app.h>
 #include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/icon.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
 #include <karm-ui/scafold.h>
+#include <karm-ui/text.h>
 
 #include "model.h"
 
@@ -21,12 +23,12 @@ Ui::Child rounedButton(Func<void(Ui::Node &)> onPress, Ui::ButtonStyle style, Me
 }
 
 Ui::Child app() {
-    auto content = Ui::reducer<Model>(0, reduce, [](auto state) {
-        auto lbl = Ui::text(64, "{}", state);
+    auto content = Ui::reducer<Model>(State{}, reduce, [](State state) {
+        auto lbl = Ui::text(64, "{}", state.counter);
 
-        auto decBtn = Ui::button(Model::bind<DecrementAction>(), Ui::Button::DEFAULT.withRadius(999), Media::Icons::MINUS_THICK);
-        auto incBtn = Ui::button(Model::bind<IncrementAction>(), Ui::Button::DEFAULT.withRadius(999), Media::Icons::PLUS_THICK);
-        auto resetBtn = Ui::button(Model::bind<ResetAction>(), Ui::Button::SUBTLE.withRadius(999), Media::Icons::REFRESH, "RESET");
+        auto decBtn = Ui::button(Model::bind<DecrementAction>(), Ui::ButtonStyle::regular().withRadius(999), Media::Icons::MINUS_THICK);
+        auto incBtn = Ui::button(Model::bind<IncrementAction>(), Ui::ButtonStyle::regular().withRadius(999), Media::Icons::PLUS_THICK);
+        auto resetBtn = Ui::button(Model::bindIf<ResetAction>(!state.initial), Ui::ButtonStyle::subtle().withRadius(999), Media::Icons::REFRESH, "RESET");
 
         return Ui::spacing(
             32,

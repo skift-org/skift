@@ -1,6 +1,8 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/icon.h>
+#include <karm-ui/layout.h>
 #include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/text.h>
@@ -9,8 +11,8 @@ Ui::Child settingRow(Media::Icons icon, String title, String subtitle) {
     return Ui::spacing(
         {8, 0},
         Ui::button(
-            Ui::NOP,
-            Ui::Button::SUBTLE,
+            NONE,
+            Ui::ButtonStyle::subtle(),
             Ui::row(
                 Ui::icon(
                     icon,
@@ -56,9 +58,9 @@ entryPoint(CliArgs args) {
             Ui::vflow(
                 titlebar,
                 Ui::toolbar(
-                    Ui::button(Ui::NOP, Ui::Button::SUBTLE, Media::Icons::MENU),
-                    Ui::button(Ui::NOP, Ui::Button::SUBTLE, Media::Icons::ARROW_LEFT),
-                    Ui::button(Ui::NOP, Ui::Button::SUBTLE, Media::Icons::ARROW_RIGHT)),
+                    Ui::button(NONE, Ui::ButtonStyle::subtle(), Media::Icons::MENU),
+                    Ui::button(NONE, Ui::ButtonStyle::subtle(), Media::Icons::ARROW_LEFT),
+                    Ui::button(NONE, Ui::ButtonStyle::subtle(), Media::Icons::ARROW_RIGHT)),
                 Ui::grow(Ui::hflow(sidebar(), Ui::separator(), content())))));
 
     return Ui::runApp(

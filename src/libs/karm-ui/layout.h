@@ -14,6 +14,8 @@ inline constexpr auto UNCONSTRAINED = -1;
 
 Child empty(Math::Vec2i size = {});
 
+Child cond(bool cond, Child child);
+
 /* --- Grow ----------------------------------------------------------------- */
 
 Child grow(Child child);

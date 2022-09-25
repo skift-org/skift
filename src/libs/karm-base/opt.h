@@ -20,12 +20,10 @@ struct Opt {
 
     Opt(None) {}
 
-    Opt(T const &value) : _present(true) {
-        _value.ctor(value);
-    }
-
-    Opt(T &&value) : _present(true) {
-        _value.ctor(std::move(value));
+    template <typename U = T>
+    Opt(U &&value) requires(!Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> && Meta::Constructible<T, U &&>)
+        : _present(true) {
+        _value.ctor(std::forward<U>(value));
     }
 
     Opt(Opt const &other) : _present(other._present) {

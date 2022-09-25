@@ -32,7 +32,7 @@ struct Scroll : public Proxy<Scroll> {
                 if (!ee.accepted) {
                     if (ee.type == Events::MouseEvent::SCROLL) {
                         auto childBound = child().bound();
-                        _scroll = _scroll + ee.scroll * 8;
+                        _scroll = _scroll + ee.scroll * 32;
 
                         _scroll.x = clamp(_scroll.x, -(childBound.width - min(childBound.width, bound().width)), 0);
                         _scroll.y = clamp(_scroll.y, -(childBound.height - min(childBound.height, bound().height)), 0);

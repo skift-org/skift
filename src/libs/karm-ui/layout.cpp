@@ -35,6 +35,14 @@ Child empty(Math::Vec2i size) {
     return makeStrong<Empty>(size);
 }
 
+Child cond(bool cond, Child child) {
+    if (cond) {
+        return child;
+    } else {
+        return empty();
+    }
+}
+
 /* --- Align ---------------------------------------------------------------- */
 
 struct Align : public Proxy<Align> {

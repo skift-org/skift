@@ -2,16 +2,22 @@
 
 namespace Counter {
 
-int reduce(int counter, Actions action) {
+State reduce(State state, Actions action) {
     return action.visit(Visitor{
         [&](ResetAction) {
-            return 0;
+            return State{true};
         },
         [&](IncrementAction) {
-            return counter + 1;
+            return State{
+                false,
+                state.counter + 1,
+            };
         },
         [&](DecrementAction) {
-            return counter - 1;
+            return State{
+                false,
+                state.counter - 1,
+            };
         },
     });
 }

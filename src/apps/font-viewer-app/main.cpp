@@ -36,24 +36,24 @@ CliResult entryPoint(CliArgs args) {
             [](auto &n) {
                 Ui::showDialog(n, FileManager::openFileDialog());
             },
-            Ui::Button::SUBTLE,
+            Ui::ButtonStyle::subtle(),
             Media::Icons::FOLDER_OPEN),
 
         Ui::grow(), Ui::state(false, [](auto state) {
             Func<void(Ui::Node &)> uninstallFont = [state](auto &n) mutable {
                 state.update(false);
-                Ui::showDialog(n, Ui::msgDialog("Font uninstalled", "The font was uninstalled successfully."));
+                Ui::showMsgDialog(n, "Font uninstalled", "The font was uninstalled successfully.");
             };
 
             Func<void(Ui::Node &)> installFont = [state](auto &n) mutable {
                 state.update(true);
-                Ui::showDialog(n, Ui::msgDialog("Font installed", "The font was installed successfully."));
+                Ui::showMsgDialog(n, "Font installed", "The font was installed successfully.");
             };
 
             if (state.value()) {
-                return Ui::button(std::move(uninstallFont), Ui::Button::DESTRUCTIVE, "UNSINTALL");
+                return Ui::button(std::move(uninstallFont), Ui::ButtonStyle::destructive(), "UNINSTALL");
             } else {
-                return Ui::button(std::move(installFont), Ui::Button::PRIMARY, "INSTALL");
+                return Ui::button(std::move(installFont), Ui::ButtonStyle::primary(), "INSTALL");
             }
         }));
 

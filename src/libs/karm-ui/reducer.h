@@ -45,6 +45,24 @@ struct Model {
     static Func<void(Node &)> bind(X value) {
         return bindAction<Action>(value);
     }
+
+    template <typename X, typename... Args>
+    static Opt<Func<void(Node &)>> bindIf(bool cond, Args... args) {
+        if (cond) {
+            return bindAction<Action>(X{std::forward<Args>(args)...});
+        } else {
+            return NONE;
+        }
+    }
+
+    template <typename X>
+    static Opt<Func<void(Node &)>> bindIf(bool cond, X value) {
+        if (cond) {
+            return bindAction<Action>(value);
+        } else {
+            return NONE;
+        }
+    }
 };
 
 template <typename Model>

@@ -48,7 +48,7 @@ void showDialog(Node &n, DialogFn<T> fn, Child child) {
 void closeDialog(Node &n);
 
 template <typename T>
-void closeDialog(Node &n, T value) {
+void closeDialogAndReturn(Node &n, T value) {
     queryParent<Dialog<T>>(n).fn(value);
     closeDialog(n);
 }
@@ -67,6 +67,12 @@ Child dialogButtons(DialogButton buttons, DialogButton primary);
 
 Child aboutDialog(Media::Icons icon, String name);
 
+void showAboutDialog(Node &n, Media::Icons icon, String name);
+
 Child msgDialog(String title, String msg);
+
+void showMsgDialog(Node &n, String title, String msg);
+
+void showMsgDialog(Node &n, String msg);
 
 } // namespace Karm::Ui

@@ -16,18 +16,18 @@ Child titlebar(Media::Icons icon, String title, TitlebarStyle style) {
                 4,
                 button(
                     [=](auto &n) {
-                        showDialog(n, aboutDialog(icon, title));
+                        showAboutDialog(n, icon, title);
                     },
-                    Button::SUBTLE, icon, title),
+                    ButtonStyle::subtle(), icon, title),
                 grow(),
-                style == TitlebarStyle::DIALOG ? empty() : button(NOP, Button::SUBTLE, Media::Icons::MINUS),
-                style == TitlebarStyle::DIALOG ? empty() : button(NOP, Button::SUBTLE, Media::Icons::CROP_SQUARE),
+                cond(style == TitlebarStyle::DEFAULT, button(NONE, ButtonStyle::subtle(), Media::Icons::MINUS)),
+                cond(style == TitlebarStyle::DEFAULT, button(NONE, ButtonStyle::subtle(), Media::Icons::CROP_SQUARE)),
                 button(
                     [](Node &n) {
                         Events::ExitEvent e{OK};
                         n.bubble(e);
                     },
-                    Button::SUBTLE, Media::Icons::CLOSE))));
+                    ButtonStyle::subtle(), Media::Icons::CLOSE))));
 }
 
 auto lookup(auto k, auto &m) {

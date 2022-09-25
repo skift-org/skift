@@ -1,5 +1,7 @@
 #pragma once
 
+#include "utils.h"
+
 namespace Karm::Meta {
 
 /* --- Primary type categories ---------------------------------------------- */
@@ -58,6 +60,16 @@ using UnderlyingType = __underlying_type(T);
 
 template <typename Derived, typename Base>
 concept Derive = __is_base_of(Base, Derived);
+
+template <typename T, typename... Args>
+concept Constructible = requires {
+    ::new T(declval<Args>()...);
+};
+
+template <typename From, typename To>
+concept Convertible = requires {
+    declval<void (*)(To)>()(declval<From>());
+};
 
 template <typename T, typename U>
 inline constexpr bool _Same = false;

@@ -19,6 +19,8 @@ Error entryPoint(uint64_t magic, Handover::Payload const &payload) {
 
     Debug::linfo("hjert (v0.0.1)");
 
+    Debug::linfo("handover: valid");
+    Debug::linfo("handover: agent: '{}'", payload.agentName());
     size_t totalFree = 0;
 
     for (auto const &record : payload) {

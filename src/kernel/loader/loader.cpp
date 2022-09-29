@@ -20,6 +20,8 @@ Error load(Sys::Path kernelPath) {
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
     Debug::linfo("Payload at vaddr: 0x{x} paddr: 0x{x}", payloadMem.vaddr(), payloadMem.paddr());
     Handover::Builder payload{payloadMem.mutBytes()};
+
+    payload.agent("skift loader");
     payload.add(Handover::SELF, 0, payloadMem.prange());
 
     Debug::linfo("Loading kernel file...");

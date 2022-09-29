@@ -8,8 +8,7 @@
 
 namespace Karm::Sys {
 
-struct In :
-    public Io::Reader {
+struct In : public Io::Reader {
     Strong<Fd> _fd;
 
     In(Strong<Fd> fd) : _fd(fd) {}
@@ -19,8 +18,7 @@ struct In :
     }
 };
 
-struct Out :
-    public Io::TextWriter<Embed::Encoding> {
+struct Out : public Io::TextWriter<> {
     Strong<Fd> _fd;
 
     Out(Strong<Fd> fd) : _fd(fd) {}
@@ -30,8 +28,7 @@ struct Out :
     }
 };
 
-struct Err :
-    public Io::TextWriter<Embed::Encoding> {
+struct Err : public Io::TextWriter<> {
     Strong<Fd> _fd;
 
     Err(Strong<Fd> fd) : _fd(fd) {}

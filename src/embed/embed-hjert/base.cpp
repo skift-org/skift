@@ -10,7 +10,7 @@ void debug(char const *buf) {
 [[noreturn]] void panic(char const *buf) {
     (void)Fmt::format(Hjert::Arch::loggerOut(), "PANIC: {}\n", buf);
 
-    Hjert::Arch::stopCpu();
+    Hjert::Arch::stopAll();
 }
 
 } // namespace Embed

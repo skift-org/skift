@@ -8,7 +8,7 @@
 namespace Karm::Text {
 
 struct Emit {
-    Io::TextWriter<Utf8> &_writer;
+    Io::TextWriter<> &_writer;
     size_t _ident = 0;
     size_t _total = 0;
     Error _error = OK;

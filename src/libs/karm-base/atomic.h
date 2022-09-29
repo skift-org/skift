@@ -33,11 +33,12 @@ struct Atomic {
         return __atomic_exchange_n(&_val, desired, order);
     }
 
+    /*
+        bool cmpxchg(T expected, T desired, MemOrder order = MemOrder::SEQ_CST) {
+            return cmpxchg(expected, desired, order);
+        }
+    */
     bool cmpxchg(T expected, T desired, MemOrder order = MemOrder::SEQ_CST) {
-        return cmpxchg(expected, desired, order);
-    }
-
-    bool cmpxchg(T &expected, T desired, MemOrder order = MemOrder::SEQ_CST) {
         if (order == ACQ_REL || order == RELAXED)
             return __atomic_compare_exchange_n(&_val, &expected, desired, false, RELAXED, ACQUIRE);
 

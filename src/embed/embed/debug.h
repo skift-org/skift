@@ -10,6 +10,6 @@ void loggerLock();
 
 void loggerUnlock();
 
-Io::TextWriter<Encoding> &loggerOut();
+Io::TextWriter<> &loggerOut();
 
 } // namespace Embed

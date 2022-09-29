@@ -4,12 +4,16 @@
 #include <karm-base/string.h>
 #include <karm-io/traits.h>
 
+#include "kernel.h"
+
 namespace Hjert::Arch {
 
 Error init();
 
-Io::TextWriter<Embed::Encoding> &loggerOut();
+Io::TextWriter<> &loggerOut();
 
-[[noreturn]] void stopCpu();
+[[noreturn]] void stopAll();
+
+[[noreturn]] void idleCpu();
 
 } // namespace Hjert::Arch

@@ -38,5 +38,5 @@ Error entryPoint(uint64_t magic, Handover::Payload const &payload) {
 
     Debug::linfo("handover: total free: {}mib", totalFree / 1024 / 1024);
 
-    Arch::stopCpu();
+    Arch::idleCpu();
 }

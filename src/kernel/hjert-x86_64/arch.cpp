@@ -36,15 +36,20 @@ Error init() {
     return OK;
 }
 
-Io::TextWriter<Embed::Encoding> &loggerOut() {
+Io::TextWriter<> &loggerOut() {
     return _com1;
 }
 
-void stopCpu() {
+void stopAll() {
     while (true) {
         x86_64::cli();
         x86_64::hlt();
     }
+}
+
+void idleCpu() {
+    while (true)
+        x86_64::hlt();
 }
 
 } // namespace Hjert::Arch

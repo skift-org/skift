@@ -6,8 +6,7 @@
 
 namespace x86_64 {
 
-struct Com :
-    public Io::TextWriter<Utf8> {
+struct Com : public Io::TextWriter<Utf8> {
     enum Port {
         COM1 = 0x3F8,
         COM2 = 0x2F8,
@@ -94,11 +93,11 @@ struct Com :
     }
 
     bool canRead() {
-        return (readReg(LINE_STATUS) & DATA_READY);
+        return readReg(LINE_STATUS) & DATA_READY;
     }
 
     bool canWrite() {
-        return (readReg(LINE_STATUS) & TRANSMITTER_BUF_EMPTY);
+        return readReg(LINE_STATUS) & TRANSMITTER_BUF_EMPTY;
     }
 
     void waitWrite() {

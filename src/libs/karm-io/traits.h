@@ -80,7 +80,7 @@ struct _TextWriter : public Writer {
     virtual Result<size_t> writeRune(Rune rune) = 0;
 };
 
-template <StaticEncoding E>
+template <StaticEncoding E = typename Embed::Encoding>
 struct TextWriter : public _TextWriter {
     using Writer::write;
 

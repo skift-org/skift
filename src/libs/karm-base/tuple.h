@@ -61,7 +61,7 @@ struct Tuple<Car, Cdr...> {
 
     constexpr static void visit(void *ptr, auto f) {
         f(*static_cast<Car *>(ptr));
-        Tuple<Cdr...>::visit(f, ptr);
+        Tuple<Cdr...>::visit(ptr, f);
     }
 
     constexpr void visit(auto f) {

@@ -111,7 +111,7 @@ inline Child reducer(
     typename Model::Reduce reducer,
     Func<Child(typename Model::Data)> build) {
 
-    return makeStrong<Reducer<Model>>({}, std::move(reducer), std::move(build));
+    return makeStrong<Reducer<Model>>(typename Model::Data{}, std::move(reducer), std::move(build));
 }
 
 } // namespace Karm::Ui

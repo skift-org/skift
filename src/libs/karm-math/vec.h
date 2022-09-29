@@ -9,6 +9,8 @@ namespace Karm::Math {
 
 template <typename T>
 union Vec2 {
+    using Scalar = T;
+
     struct {
         T x, y;
     };
@@ -138,6 +140,8 @@ bool epsilonEq(Vec2<T> const &lhs, Vec2<T> const &rhs, T epsilon) {
 
 template <typename T>
 union Vec3 {
+    using Scalar = T;
+
     struct {
         T x, y, z;
     };
@@ -242,6 +246,8 @@ bool epsilonEq(Vec3<T> const &lhs, Vec3<T> const &rhs, T epsilon) {
 
 template <typename T>
 union Vec4 {
+    using Scalar = T;
+
     struct {
         T x, y, z, w;
     };

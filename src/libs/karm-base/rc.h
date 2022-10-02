@@ -233,13 +233,17 @@ struct Weak {
     constexpr Weak() = delete;
 
     template <Meta::Derive<T> U>
-    constexpr Weak(Strong<U> const &other) : _rc(other._rc->refWeak()) {}
+    constexpr Weak(Strong<U> const &other)
+        : _rc(other._rc->refWeak()) {}
 
     template <Meta::Derive<T> U>
-    constexpr Weak(Weak<U> const &other) : _rc(other._rc->refWeak()) {}
+    constexpr Weak(Weak<U> const &other)
+        : _rc(other._rc->refWeak()) {}
 
     template <Meta::Derive<T> U>
-    constexpr Weak(Weak<U> &&other) { std::swap(_rc, other._rc); }
+    constexpr Weak(Weak<U> &&other) {
+        std::swap(_rc, other._rc);
+    }
 
     constexpr ~Weak() {
         if (_rc) {

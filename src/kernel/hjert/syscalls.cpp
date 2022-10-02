@@ -71,7 +71,7 @@ static Error handle(Api::Now &) {
     return Error::NOT_IMPLEMENTED;
 }
 
-Error handleSyscall(Api::Id id, Api::Arg args) {
+Error handleSyscall(Api::SyscallId id, Api::Arg args) {
     Error result = Error::INVALID_INPUT;
 
     Api::Syscalls::visit((void *)args, [&](auto &syscall) {

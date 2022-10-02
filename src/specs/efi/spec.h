@@ -132,6 +132,9 @@ struct RuntimeService;
 struct BootService;
 
 struct ConfigurationTable {
+    static constexpr Uuid ACPI_TABLE_UUID = {0xeb9d2d30, 0x2d88, 0x11d3, {0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d}};
+    static constexpr Uuid ACPI2_TABLE_UUID = {0x8868e871, 0xe4f1, 0x11d3, {0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81}};
+
     Uuid vendorGuid;
     void *table;
 };
@@ -154,6 +157,16 @@ struct SystemTable : public Table {
 
     size_t nrConfigurationTables;
     ConfigurationTable *configurationTable;
+
+    ConfigurationTable *lookupConfigurationTable(const Uuid &uuid) {
+        for (size_t i = 0; i < nrConfigurationTables; i++) {
+            if (Op::eq(configurationTable[i].vendorGuid, uuid)) {
+                return &configurationTable[i];
+            }
+        }
+
+        return nullptr;
+    }
 };
 
 /* --- 7 Boot Services ------------------------------------------------------ */

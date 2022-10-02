@@ -1,21 +1,21 @@
 #pragma once
 
-#include <karm-base/std.h>
+#include "std.h"
 
-namespace Karm::Time {
+namespace Karm {
 
-struct Span {
+struct TimeSpan {
     uint64_t value;
 
-    static constexpr Span zero() {
-        return Span{0};
+    static constexpr TimeSpan zero() {
+        return TimeSpan{0};
     }
 
-    static constexpr Span infinite() {
-        return Span{~0ull};
+    static constexpr TimeSpan infinite() {
+        return TimeSpan{~0ull};
     }
 
-    static constexpr Span fromUSecs(uint64_t value) {
+    static constexpr TimeSpan fromUSecs(uint64_t value) {
         return {value};
     }
 
@@ -51,9 +51,9 @@ struct Span {
         return fromMonths(value * 12);
     }
 
-    constexpr Span() : value(0) {}
+    constexpr TimeSpan() : value(0) {}
 
-    constexpr Span(uint64_t value) : value(value) {}
+    constexpr TimeSpan(uint64_t value) : value(value) {}
 
     constexpr bool isInfinite() const {
         return value == ~0ull;
@@ -95,53 +95,53 @@ struct Span {
         return toMonths() / 12;
     }
 
-    constexpr Span &operator+=(Span const &other) {
+    constexpr TimeSpan &operator+=(TimeSpan const &other) {
         value += other.value;
         return *this;
     }
 
-    constexpr Span &operator-=(Span const &other) {
+    constexpr TimeSpan &operator-=(TimeSpan const &other) {
         value -= other.value;
         return *this;
     }
 
-    constexpr Span operator+(Span const &other) const {
+    constexpr TimeSpan operator+(TimeSpan const &other) const {
         return value + other.value;
     }
 
-    constexpr Span operator-(Span const &other) const {
+    constexpr TimeSpan operator-(TimeSpan const &other) const {
         return value - other.value;
     }
 };
 
-struct Stamp {
+struct TimeStamp {
     uint64_t value;
 
-    static constexpr Stamp epoch() {
+    static constexpr TimeStamp epoch() {
         return {0};
     }
 
-    static constexpr Stamp endOfTime() {
+    static constexpr TimeStamp endOfTime() {
         return {~0ull};
     }
 
-    constexpr Stamp(uint64_t value = 0) : value(value) {}
+    constexpr TimeStamp(uint64_t value = 0) : value(value) {}
 
     constexpr bool isEndOfTime() const {
         return value == ~0ull;
     }
 
-    constexpr Stamp &operator+=(Span const &other) {
+    constexpr TimeStamp &operator+=(TimeSpan const &other) {
         *this = *this + other;
         return *this;
     }
 
-    constexpr Stamp &operator-=(Span const &other) {
+    constexpr TimeStamp &operator-=(TimeSpan const &other) {
         *this = *this - other;
         return *this;
     }
 
-    constexpr Stamp operator+(Span const &other) const {
+    constexpr TimeStamp operator+(TimeSpan const &other) const {
         if (other.isInfinite()) {
             return endOfTime();
         }
@@ -151,7 +151,7 @@ struct Stamp {
         return value + other.value;
     }
 
-    constexpr Stamp operator-(Span const &other) const {
+    constexpr TimeStamp operator-(TimeSpan const &other) const {
         if (isEndOfTime()) {
             return *this;
         }
@@ -159,4 +159,32 @@ struct Stamp {
     }
 };
 
-} // namespace Karm::Time
+struct Time {
+    uint8_t second;
+    uint8_t minute;
+    uint8_t hour;
+};
+
+struct Date {
+    uint8_t day;
+    uint8_t month;
+    uint16_t year;
+};
+
+union DateTime {
+    struct {
+        Date date;
+        Time time;
+    };
+
+    struct {
+        uint8_t second;
+        uint8_t minute;
+        uint8_t hour;
+        uint8_t day;
+        uint8_t month;
+        uint16_t year;
+    };
+};
+
+} // namespace Karm

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <karm-base/array.h>
 #include <karm-base/error.h>
+#include <karm-base/range.h>
 #include <karm-base/result.h>
+#include <karm-base/time.h>
 #include <karm-base/tuple.h>
-#include <karm-time/time.h>
 
 #include "types.h"
 
@@ -13,9 +15,11 @@ namespace Hjert::Api {
 
 int doSyscall(void *, size_t);
 
-template <Id _ID, typename Self>
+using SyscallId = uint64_t;
+
+template <uint64_t _ID, typename Self>
 struct Syscall {
-    static constexpr Id ID = _ID;
+    static constexpr SyscallId ID = _ID;
 
     Karm::Error call() {
         return static_cast<Karm::Error::Code>(doSyscall(this, sizeof(Self)));
@@ -35,50 +39,52 @@ struct Syscall {
 /* --- Objects & Handles ---------------------------------------------------- */
 
 struct Create : public Syscall<0x1c1c1c1c1c1c1c1c, Create> {
-    Id id;
-    Props props;
+    AnyHandle handle;
+    AnyProps props;
 };
 struct Grant : public Syscall<0x2c2c2c2c2c2c2c2c, Grant> {
-    Id target;
-    Id what;
+    Handle<Task> target;
+    AnyHandle what;
     Rights rights;
 };
 
 struct Ref : public Syscall<0x3c3c3c3c3c3c3c3c, Ref> {
-    Id id;
+    AnyHandle handle;
 };
 
 struct Deref : public Syscall<0x4c4c4c4c4c4c4c4c, Deref> {
-    Id id;
+    AnyHandle handle;
 };
 
 /* --- Tasks ---------------------------------------------------------------- */
 
 struct Start : public Syscall<0x3d3d3d3d3d3d3d3d, Start> {
-    Id id;
+    Handle<Task> task;
     size_t ip;
     size_t sp;
-    Arg args[5];
+    Array<Arg, 5> args;
 };
 
 struct Exit : public Syscall<0x3e3e3e3e3e3e3e3e, Exit> {
+    Handle<Task> handle;
     int code;
 };
 
 struct Wait : public Syscall<0x4e4e4e4e4e4e4e4e, Wait> {
-    Id id;
+    Handle<Task> handle;
     int code;
 };
 
 struct Pledge : public Syscall<0x5e5e5e5e5e5e5e5e, Pledge> {
+    Handle<Task> handle;
     Rights rights;
 };
 
 /* --- Memory --------------------------------------------------------------- */
 
 struct Map : public Syscall<0x2d2d2d2d2d2d2d2d, Map> {
-    Id mem;
-    Id space;
+    Handle<Mem> mem;
+    Handle<Space> space;
 
     size_t offset;
     size_t size;
@@ -87,7 +93,7 @@ struct Map : public Syscall<0x2d2d2d2d2d2d2d2d, Map> {
 };
 
 struct Unmap : public Syscall<0x3e3e3e3e3e3e3e3e, Unmap> {
-    Id space;
+    Handle<Space> space;
 
     size_t vaddr;
     size_t size;
@@ -131,7 +137,7 @@ struct Log : public Syscall<0xb412722092f3afc1, Log> {
 };
 
 struct Now : public Syscall<0x1b0b0b0b0b0b0b0b, Now> {
-    Time::Stamp stamp;
+    TimeStamp stamp;
 };
 
 using Syscalls = Tuple<

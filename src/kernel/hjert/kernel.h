@@ -1,6 +1,6 @@
 #pragma once
 
-#include <hal/dma.h>
+#include <hal/io.h>
 #include <hal/pmm.h>
 #include <hal/vmm.h>
 #include <hjert-api/types.h>
@@ -56,7 +56,7 @@ struct Space : public Object<Space> {
     Result<Hal::VmmRange> unmap(Hal::VmmRange);
 };
 
-struct Domain : public Object<Domain> {
+struct Domain {
     Vec<Handle> _handles;
 
     Error add(Handle);
@@ -68,20 +68,9 @@ struct Domain : public Object<Domain> {
     Result<Handle> lookup(uint64_t);
 };
 
-struct Channel : public Object<Channel> {
-    Ring<Api::Msg> _buf;
-
-    Result<Api::Msg> recv();
-
-    Error send(Api::Msg);
-};
-
-struct Context : public Object<Context> {
-};
-
 struct Cpu;
 
-struct Task : public Object<Task> {
+struct Thread {
     Cpu *_cpu;
 
     bool _inSyscall;
@@ -91,11 +80,6 @@ struct Task : public Object<Task> {
 
     size_t _timeStart;
     size_t _timeEnd;
-
-    Strong<Context> _context;
-    Strong<Space> _space;
-    Strong<Domain> _domain;
-    Strong<Channel> _channel;
 
     bool runnable() const {
         return _started && (!_blocked || (_stopped && !_inSyscall));
@@ -116,6 +100,24 @@ struct Task : public Object<Task> {
     void detach() {
         _cpu = nullptr;
     }
+};
+
+struct Channel {
+    Ring<Api::Msg> _buf;
+    Result<Api::Msg> recv();
+    Error send(Api::Msg);
+};
+
+struct Context : public Object<Context> {
+};
+
+struct Task : public Object<Task> {
+    Strong<Context> _context;
+    Strong<Space> _space;
+
+    Thread _thread;
+    Domain _domain;
+    Channel _channel;
 };
 
 struct Cpu {

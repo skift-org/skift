@@ -10,7 +10,7 @@
 
 namespace Hjert::Arch {
 
-static x86_64::Com _com1{x86_64::Com::COM1};
+static x86_64::Com _com1 = x86_64::Com::com1();
 
 static x86_64::Gdt _gdt{};
 static x86_64::GdtDesc _gdtDesc{_gdt};

@@ -82,6 +82,14 @@ Error finalizeHandover(Handover::Builder &builder) {
 
     try$(Efi::bs()->exitBootServices(Efi::imageHandle(), key));
 
+    auto *acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI_TABLE_UUID);
+    if (!acpiTable)
+        acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI2_TABLE_UUID);
+
+    if (acpiTable) {
+        builder.add(Handover::Tag::RSDP, 0, {(size_t)acpiTable->table, 0x1000});
+    }
+
     return OK;
 }
 

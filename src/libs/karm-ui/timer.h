@@ -1,7 +1,7 @@
 #pragma once
 
+#include <karm-base/time.h>
 #include <karm-sys/time.h>
-#include <karm-time/time.h>
 
 #include "react.h"
 
@@ -13,32 +13,32 @@ struct _Timer : public React<_Timer> {
 
         Wrap(_Timer &t) : _t(t) {}
 
-        void fireAt(Time::Stamp stamp) {
+        void fireAt(TimeStamp stamp) {
             _t._deadline = stamp;
-            _t._interval = Time::Span::infinite();
+            _t._interval = TimeSpan::infinite();
         }
 
         void fireNow() {
             fireAt(Sys::now());
         }
 
-        void fireOnce(Time::Span span) {
+        void fireOnce(TimeSpan span) {
             fireAt(Sys::now() + span);
         }
 
-        void fireRepeatedly(Time::Span span) {
+        void fireRepeatedly(TimeSpan span) {
             fireOnce(span);
             _t._interval = span;
         }
 
         void cancel() {
-            _t._deadline = Time::Stamp::endOfTime();
-            _t._interval = Time::Span::infinite();
+            _t._deadline = TimeStamp::endOfTime();
+            _t._interval = TimeSpan::infinite();
         }
     };
 
-    Time::Span _interval;
-    Time::Stamp _deadline;
+    TimeSpan _interval;
+    TimeStamp _deadline;
     Func<Child(Wrap)> _build;
 
     void fire() {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <hal/io.h>
 #include <karm-io/traits.h>
 
 #include "asm.h"
@@ -7,12 +8,26 @@
 namespace x86_64 {
 
 struct Com : public Io::TextWriter<Utf8> {
-    enum Port {
-        COM1 = 0x3F8,
-        COM2 = 0x2F8,
-        COM3 = 0x3E8,
-        COM4 = 0x2E8,
-    };
+    Hal::Io _io;
+
+    Com(Hal::Io io) : _io(io) {
+    }
+
+    static Com com1() {
+        return {Hal::Io::port(0x3F8, 8)};
+    }
+
+    static Com com2() {
+        return {Hal::Io::port({0x2F8, 8})};
+    }
+
+    static Com com3() {
+        return {Hal::Io::port({0x3E8, 8})};
+    }
+
+    static Com com4() {
+        return {Hal::Io::port({0x2E8, 8})};
+    }
 
     enum Regs {
         DATA = 0,
@@ -62,10 +77,6 @@ struct Com : public Io::TextWriter<Utf8> {
         IMPENDING_ERROR = 1 << 7,
     };
 
-    Port _port;
-
-    constexpr Com(Port port) : _port(port) {}
-
     void init() {
         writeReg(INTERRUPT_IDENTIFICATOR, 0);
 
@@ -85,11 +96,11 @@ struct Com : public Io::TextWriter<Utf8> {
     }
 
     void writeReg(Regs reg, uint8_t value) {
-        out8((uint16_t)_port + reg, value);
+        _io.write8(reg, value);
     }
 
     uint8_t readReg(Regs reg) {
-        return in8((uint16_t)_port + reg);
+        return _io.read8(reg);
     }
 
     bool canRead() {

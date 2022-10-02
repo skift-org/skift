@@ -62,6 +62,7 @@ inline bool shouldMerge(Tag tag) {
     case Tag::KERNEL:
     case Tag::RESERVED:
         return true;
+
     default:
         return false;
     }

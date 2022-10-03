@@ -1,9 +1,0 @@
-{
-    "id": "demo-icons",
-    "type": "exe",
-    "description": "A graphical demo of the icon library.",
-    "deps": [
-        "karm-main",
-        "karm-ui"
-    ]
-}

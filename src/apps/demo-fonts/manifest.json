@@ -1,9 +1,0 @@
-{
-    "id": "demo-fonts",
-    "type": "exe",
-    "description": "A graphical demo of the font library.",
-    "deps": [
-        "karm-main",
-        "karm-ui"
-    ]
-}

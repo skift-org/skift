@@ -1,5 +1,5 @@
 {
-    "id": "demo-app",
+    "id": "demos-app",
     "type": "exe",
     "description": "Demo application",
     "deps": [

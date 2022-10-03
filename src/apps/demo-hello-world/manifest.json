@@ -1,9 +1,0 @@
-{
-    "id": "demo-hello-world",
-    "type": "exe",
-    "description": "A simple hello world application",
-    "deps": [
-        "karm-main",
-        "karm-ui"
-    ]
-}

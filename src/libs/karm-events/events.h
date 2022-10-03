@@ -66,7 +66,8 @@ struct MouseEvent : public _Event<MouseEvent, 0x5db47c5474147944> {
     Type type;
 
     Math::Vec2i pos;
-    Math::Vec2i scroll;
+    Math::Vec2i scrollLines;
+    Math::Vec2f scrollPrecise;
     Math::Vec2i delta;
 
     Button buttons{};

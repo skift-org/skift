@@ -6,6 +6,7 @@
 #include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
+#include <karm-ui/state.h>
 #include <karm-ui/view.h>
 
 struct Demo {
@@ -45,12 +46,52 @@ static Array demos = {
             return Ui::canvas(
                 [](Gfx::Context &g, ...) {
                     g.begin();
+                    g.translate({100, 100});
                     g.moveTo({0, 0});
                     g.lineTo({100, 100});
                     g.lineTo({200, 0});
 
-                    g.strokeStyle(Gfx::stroke(Gfx::ZINC400).withWidth(2));
+                    g.strokeStyle(Gfx::stroke(Gfx::RED)
+                                      .withCap(Gfx::StrokeCap::SQUARE_CAP)
+                                      .withJoin(Gfx::StrokeJoin::MITER_JOIN)
+                                      .withWidth(64));
                     g.stroke();
+
+                    g.strokeStyle(Gfx::stroke(Gfx::BLUE)
+                                      .withCap(Gfx::StrokeCap::ROUND_CAP)
+                                      .withJoin(Gfx::StrokeJoin::ROUND_JOIN)
+                                      .withWidth(64));
+                    g.stroke();
+
+                    g.strokeStyle(Gfx::stroke(Gfx::GREEN).withWidth(64));
+                    g.stroke();
+                });
+        },
+    },
+    Demo{
+        Media::Icons::CIRCLE,
+        "Circles",
+        "Circles rendering",
+        []() {
+            return Ui::canvas(
+                [](Gfx::Context &g, Math::Vec2i size) {
+                    Math::Rand rand{};
+
+                    for (int i = 0; i < 10; i++) {
+                        double s = rand.nextInt(4, 10);
+                        s *= s;
+
+                        g.begin();
+                        g.ellipse({
+                            rand.nextVec2(size).cast<double>(),
+                            s,
+                        });
+
+                        g.strokeStyle(
+                            Gfx::stroke(Gfx::randomColor(rand))
+                                .withWidth(rand.nextInt(2, s)));
+                        g.stroke();
+                    }
                 });
         },
     },
@@ -71,7 +112,38 @@ static Array demos = {
                 });
         },
     },
-};
+    Demo{
+        Media::Icons::HAND_WAVE,
+        "Hello, world!",
+        "Hello, world!",
+        []() {
+            return Ui::text("Hello, world!");
+        },
+    },
+    Demo{
+        Media::Icons::COUNTER,
+        "Counter",
+        "Counter demo",
+        []() {
+            return Ui::state(1, [](auto state) {
+                return Ui::vflow(
+                    Ui::button(
+                        [state](Ui::Node &) mutable {
+                            state.update(state.value() + 1);
+                        },
+                        Media::Icons::PLUS),
+                    Ui::center(
+                        Ui::spacing(
+                            12,
+                            Ui::text(16, "{}", state.value()))),
+                    Ui::button(
+                        [state](Ui::Node &) mutable {
+                            state.update(state.value() - 1);
+                        },
+                        Media::Icons::MINUS));
+            });
+        },
+    }};
 
 struct State {
     size_t current = 0;
@@ -117,7 +189,12 @@ CliResult entryPoint(CliArgs args) {
             8,
             sidebar(),
             Ui::separator(),
-            Ui::spacing(8, Ui::vflow(Ui::text(16, demos[s.current].name), demos[s.current].build())));
+            Ui::spacing(
+                8,
+                Ui::vflow(
+                    Ui::text(16, demos[s.current].name),
+                    Ui::empty(8),
+                    demos[s.current].build())));
     });
 
     auto layout = Ui::dialogLayer(

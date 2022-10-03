@@ -161,7 +161,8 @@ struct SdlHost :
             Events::MouseEvent uiEvent{
                 .type = Events::MouseEvent::SCROLL,
                 .pos = _lastMousePos,
-                .scroll = {sdlEvent.wheel.x, sdlEvent.wheel.y},
+                .scrollLines = {sdlEvent.wheel.x, sdlEvent.wheel.y},
+                .scrollPrecise = {sdlEvent.wheel.preciseX, sdlEvent.wheel.preciseY},
             };
 
             event(uiEvent);

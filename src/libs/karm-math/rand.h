@@ -85,6 +85,11 @@ struct Rand {
         return Vec2<T>(nextDouble(bound.start(), bound.end()),
                        nextDouble(bound.top(), bound.bottom()));
     }
+
+    template <typename T>
+    Vec2<T> nextVec2(Vec2<T> max) {
+        return Vec2<T>(nextDouble(max.x), nextDouble(max.y));
+    }
 };
 
 } // namespace Karm::Math

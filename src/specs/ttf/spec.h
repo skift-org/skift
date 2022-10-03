@@ -440,10 +440,10 @@ struct Font {
         };
 
         Array<KnowCmap, 4> knowCmaps = {
-            {0, 3, 4, 150},
-            {3, 1, 4, 100},
-            {0, 4, 12, 1050},
-            {3, 10, 12, 1000},
+            KnowCmap{0, 3, 4, 150},
+            KnowCmap{3, 1, 4, 100},
+            KnowCmap{0, 4, 12, 1050},
+            KnowCmap{3, 10, 12, 1000},
         };
 
         for (auto table : font._cmap.iterTables()) {

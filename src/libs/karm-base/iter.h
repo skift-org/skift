@@ -14,7 +14,7 @@ struct Iter {
     constexpr Iter(Next next) : next(next) {}
 
     constexpr auto map(auto f) {
-        return Iter{[=]() mutable {
+        auto n = [=]() mutable -> Opt<decltype(f(*Meta::declval<Item>()))> {
             auto v = next();
 
             if (!v) {
@@ -22,7 +22,24 @@ struct Iter {
             }
 
             return f(*v);
-        }};
+        };
+
+        return Iter<decltype(n)>{n};
+    }
+
+    constexpr auto mapi(auto f) {
+        auto n = [=, index = 0uz]() mutable -> Opt<decltype(f(1uz, *Meta::declval<Item>()))> {
+            auto v = next();
+            index++;
+
+            if (!v) {
+                return NONE;
+            }
+
+            return f(index - 1, *v);
+        };
+
+        return Iter<decltype(n)>{n};
     }
 
     constexpr auto filter(auto f) {

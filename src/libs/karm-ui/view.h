@@ -57,4 +57,32 @@ inline Child image() {
     return makeStrong<Image>();
 }
 
+/* --- Canvas --------------------------------------------------------------- */
+
+using OnPaint = Func<void(Gfx::Context &g, Math::Vec2i size)>;
+
+struct Canvas : public View<Canvas> {
+    OnPaint _onPaint;
+
+    Canvas(OnPaint onPaint)
+        : _onPaint(std::move(onPaint)) {}
+
+    void reconcile(Canvas &o) override {
+        _onPaint = std::move(o._onPaint);
+        View<Canvas>::reconcile(o);
+    }
+
+    void paint(Gfx::Context &g, Math::Recti) override {
+        g.save();
+        g.clip(_bound);
+        g.origin(_bound.xy);
+        _onPaint(g, _bound.wh);
+        g.restore();
+    }
+};
+
+inline Child canvas(OnPaint onPaint) {
+    return makeStrong<Canvas>(std::move(onPaint));
+}
+
 } // namespace Karm::Ui

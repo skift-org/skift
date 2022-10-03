@@ -7,21 +7,6 @@
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
-Ui::Child settingRow(Media::Icons icon, String title, String subtitle) {
-    return Ui::spacing(
-        {8, 0},
-        Ui::button(
-            NONE,
-            Ui::ButtonStyle::subtle(),
-            Ui::row(
-                Ui::icon(
-                    icon,
-                    24),
-                title,
-                subtitle,
-                NONE)));
-}
-
 Ui::Child sidebar() {
     return Ui::vscroll(
         Ui::spacing(
@@ -30,16 +15,16 @@ Ui::Child sidebar() {
             Ui::vflow(
                 8,
 
-                settingRow(Media::Icons::ACCOUNT, "Accounts", "User, Online Accounts, etc."),
-                settingRow(Media::Icons::PALETTE, "Personalization", "Wallpaper, Themes, etc."),
-                settingRow(Media::Icons::WIDGETS_OUTLINE, "Applications", "Installed Apps, etc."),
+                Ui::buttonRow(Media::Icons::ACCOUNT, "Accounts", "User, Online Accounts, etc."),
+                Ui::buttonRow(Media::Icons::PALETTE, "Personalization", "Wallpaper, Themes, etc."),
+                Ui::buttonRow(Media::Icons::WIDGETS_OUTLINE, "Applications", "Installed Apps, etc."),
 
-                settingRow(Media::Icons::LAPTOP, "System", "Display, Keyboard, Mouse, etc."),
-                settingRow(Media::Icons::WIFI, "Network", "Wi-Fi, Bluetooth, etc."),
-                settingRow(Media::Icons::SECURITY, "Security & Privacy", "Firewall, Passwords, etc."),
+                Ui::buttonRow(Media::Icons::LAPTOP, "System", "Display, Keyboard, Mouse, etc."),
+                Ui::buttonRow(Media::Icons::WIFI, "Network", "Wi-Fi, Bluetooth, etc."),
+                Ui::buttonRow(Media::Icons::SECURITY, "Security & Privacy", "Firewall, Passwords, etc."),
 
-                settingRow(Media::Icons::UPDATE, "Updates", "Software, Drivers, etc."),
-                settingRow(Media::Icons::INFORMATION_OUTLINE, "About", "System Information, etc."))));
+                Ui::buttonRow(Media::Icons::UPDATE, "Updates", "Software, Drivers, etc."),
+                Ui::buttonRow(Media::Icons::INFORMATION_OUTLINE, "About", "System Information, etc."))));
 }
 
 Ui::Child content() {

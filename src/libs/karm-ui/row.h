@@ -25,4 +25,17 @@ inline Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Chi
             spacing({0, 8, 0, 8}, trailing ? *trailing : empty())));
 }
 
+inline Child buttonRow(OnPress onPress, Media::Icons i, String title, String subtitle) {
+    return spacing(
+        {8, 0},
+        button(
+            std::move(onPress),
+            ButtonStyle::subtle(),
+            row(
+                icon(i, 24),
+                title,
+                subtitle,
+                NONE)));
+}
+
 } // namespace Karm::Ui

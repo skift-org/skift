@@ -41,11 +41,13 @@ auto lookup(auto k, auto &m) {
 }
 
 Child badge(BadgeStyle style, String t) {
-    Array<Cons<BadgeStyle, Gfx::Color>, 4> styleToColor{
-        {BadgeStyle::INFO, Gfx::BLUE400},
-        {BadgeStyle::SUCCESS, Gfx::LIME400},
-        {BadgeStyle::WARNING, Gfx::YELLOW400},
-        {BadgeStyle::ERROR, Gfx::RED400},
+    using StyleToColor = Cons<BadgeStyle, Gfx::Color>;
+
+    Array styleToColor = {
+        StyleToColor{BadgeStyle::INFO, Gfx::BLUE400},
+        StyleToColor{BadgeStyle::SUCCESS, Gfx::LIME400},
+        StyleToColor{BadgeStyle::WARNING, Gfx::YELLOW400},
+        StyleToColor{BadgeStyle::ERROR, Gfx::RED400},
     };
 
     Gfx::Color color = lookup(style, styleToColor);

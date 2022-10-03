@@ -6,15 +6,17 @@ namespace Karm::Math {
 
 template <typename V, typename T = typename V::Scalar>
 struct Ray {
-    V origin;
-    V direction;
+    V o;
+    V dir;
 
     constexpr Ray() = default;
 
-    constexpr Ray(V origin, V direction) : origin(origin), direction(direction) {}
+    constexpr Ray(V o, V dir)
+        : o(o), dir(dir) {
+    }
 
     constexpr V at(T t) const {
-        return origin + direction * t;
+        return o + dir * t;
     }
 };
 

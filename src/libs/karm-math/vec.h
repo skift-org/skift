@@ -118,6 +118,10 @@ union Vec2 {
         return {x / other.x, y / other.y};
     }
 
+    constexpr Vec2 operator-() const {
+        return {-x, -y};
+    }
+
     template <typename U>
     constexpr Vec2<U> cast() const {
         return {static_cast<U>(x), static_cast<U>(y)};
@@ -127,6 +131,26 @@ union Vec2 {
         return std::isnan(x) || std::isnan(y);
     }
 };
+
+template <typename T>
+Vec2<T> operator+(T const &lhs, Vec2<T> const &rhs) {
+    return rhs + lhs;
+}
+
+template <typename T>
+Vec2<T> operator-(T const &lhs, Vec2<T> const &rhs) {
+    return rhs - lhs;
+}
+
+template <typename T>
+Vec2<T> operator*(T const &lhs, Vec2<T> const &rhs) {
+    return rhs * lhs;
+}
+
+template <typename T>
+Vec2<T> operator/(T const &lhs, Vec2<T> const &rhs) {
+    return rhs / lhs;
+}
 
 using Vec2i = Vec2<int>;
 
@@ -151,6 +175,11 @@ union Vec3 {
         T _z;
     };
 
+    struct {
+        T _x;
+        Vec2<T> yz;
+    };
+
     T _els[3];
 
     constexpr Vec3() : _els{0, 0, 0} {}
@@ -159,28 +188,36 @@ union Vec3 {
 
     constexpr Vec3(T value) : _els{value, value, value} {}
 
+    constexpr Vec2<T> xz() const {
+        return {x, y};
+    }
+
     constexpr T min() const {
-        return min(x, y, z);
+        return Karm::min(x, y, z);
     }
 
     constexpr T max() const {
-        return max(x, y, z);
+        return Karm::max(x, y, z);
     }
 
     constexpr Vec3 min(Vec3 const &other) {
-        return {min(x, other.x), min(y, other.y), min(z, other.z)};
+        return {Karm::min(x, other.x), Karm::min(y, other.y), Karm::min(z, other.z)};
     }
 
     constexpr Vec3 max(Vec3<T> const &other) {
-        return {max(x, other.x), max(y, other.y), max(z, other.z)};
+        return {Karm::max(x, other.x), Karm::max(y, other.y), Karm::max(z, other.z)};
     }
 
     constexpr T dot(Vec3 const &other) const {
         return x * other.x + y * other.y + z * other.z;
     }
 
+    constexpr T lenSq() const {
+        return dot(*this);
+    }
+
     constexpr T len() const {
-        return sqrt(dot(*this));
+        return sqrt(lenSq());
     }
 
     constexpr T dist(Vec3 const &other) const {
@@ -228,10 +265,39 @@ union Vec3 {
         return {x / other.x, y / other.y, z / other.z};
     }
 
+    constexpr Vec3 operator-() const {
+        return {-x, -y, -z};
+    }
+
     bool hasNan() const {
         return std::isnan(x) || std::isnan(y) || std::isnan(z);
     }
+
+    template <typename U>
+    constexpr Vec3<U> cast() const {
+        return {static_cast<U>(x), static_cast<U>(y), static_cast<U>(z)};
+    }
 };
+
+template <typename T>
+constexpr Vec3<T> operator+(T const &lhs, Vec3<T> const &rhs) {
+    return {lhs + rhs.x, lhs + rhs.y, lhs + rhs.z};
+}
+
+template <typename T>
+constexpr Vec3<T> operator-(T const &lhs, Vec3<T> const &rhs) {
+    return {lhs - rhs.x, lhs - rhs.y, lhs - rhs.z};
+}
+
+template <typename T>
+constexpr Vec3<T> operator*(T const &lhs, Vec3<T> const &rhs) {
+    return {lhs * rhs.x, lhs * rhs.y, lhs * rhs.z};
+}
+
+template <typename T>
+constexpr Vec3<T> operator/(T const &lhs, Vec3<T> const &rhs) {
+    return {lhs / rhs.x, lhs / rhs.y, lhs / rhs.z};
+}
 
 using Vec3i = Vec3<int>;
 
@@ -339,10 +405,34 @@ union Vec4 {
         return {x / other.x, y / other.y, z / other.z, w / other.w};
     }
 
+    constexpr Vec4 operator-() const {
+        return {-x, -y, -z, -w};
+    }
+
     bool hasNan() const {
         return std::isnan(x) || std::isnan(y) || std::isnan(z) || std::isnan(w);
     }
 };
+
+template <typename T>
+constexpr Vec4<T> operator+(T const &lhs, Vec4<T> const &rhs) {
+    return {lhs + rhs.x, lhs + rhs.y, lhs + rhs.z, lhs + rhs.w};
+}
+
+template <typename T>
+constexpr Vec4<T> operator-(T const &lhs, Vec4<T> const &rhs) {
+    return {lhs - rhs.x, lhs - rhs.y, lhs - rhs.z, lhs - rhs.w};
+}
+
+template <typename T>
+constexpr Vec4<T> operator*(T const &lhs, Vec4<T> const &rhs) {
+    return {lhs * rhs.x, lhs * rhs.y, lhs * rhs.z, lhs * rhs.w};
+}
+
+template <typename T>
+constexpr Vec4<T> operator/(T const &lhs, Vec4<T> const &rhs) {
+    return {lhs / rhs.x, lhs / rhs.y, lhs / rhs.z, lhs / rhs.w};
+}
 
 using Vec4i = Vec4<int>;
 

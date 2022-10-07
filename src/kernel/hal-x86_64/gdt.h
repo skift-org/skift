@@ -26,7 +26,9 @@ struct [[gnu::packed]] GdtEntry {
 
     constexpr GdtEntry() = default;
 
-    constexpr GdtEntry(uint32_t base, uint32_t limit, uint8_t granularity, uint8_t flags)
+    constexpr GdtEntry(uint8_t flags, uint8_t granularity) : _flags(flags), _granularity(granularity){};
+
+    constexpr GdtEntry(uint32_t base, uint32_t limit, uint8_t flags, uint8_t granularity)
         : _limitLow(limit & 0xffff),
           _baseLow(base & 0xffff),
           _baseMid((base >> 16) & 0xff),
@@ -34,8 +36,6 @@ struct [[gnu::packed]] GdtEntry {
           _limitHigh((limit >> 16) & 0x0f),
           _granularity(granularity),
           _baseHigh((base >> 24) & 0xff) {}
-
-    constexpr GdtEntry(uint8_t flags, uint8_t granularity) : _flags(flags), _granularity(granularity){};
 };
 
 struct GdtTssEntry {
@@ -86,7 +86,7 @@ struct [[gnu::packed]] Gdt {
     };
 
     Karm::Array<GdtEntry, Gdt::LEN> entries = {
-        {},
+        GdtEntry{},
         {Gdt::Flags::PRESENT | Gdt::Flags::SEGMENT | Gdt::Flags::READ_WRITE | Gdt::Flags::EXECUTABLE, Granularity::LONG_MODE},
         {Gdt::Flags::PRESENT | Gdt::Flags::SEGMENT | Gdt::Flags::READ_WRITE, 0},
         {Gdt::Flags::PRESENT | Gdt::Flags::SEGMENT | Gdt::Flags::READ_WRITE | Gdt::Flags::USER, 0},

@@ -12,7 +12,7 @@ struct Pit {
     }
 
     void init(int freq) {
-        uint16_t div = 1193182 / freq;
+        auto div = 1193182 / freq;
 
         _io.write8(0x3, 0x36);
         _io.write8(0x0, div & 0xFF);

@@ -198,6 +198,6 @@ static constexpr char const *REQUEST_SECTION = ".handover";
 
 // clang-format on
 
-using EntryPoint [[gnu::sysv_abi]] = void (*)(uint64_t magic, Payload const *handover);
+using EntryPoint = void (*)(uint64_t magic, Payload const *handover);
 
 } // namespace Handover

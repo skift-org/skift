@@ -15,23 +15,6 @@ struct Array {
 
     T _buf[N] = {};
 
-    /*
-    constexpr Array() = default;
-
-    constexpr Array(std::initializer_list<T> init) {
-        size_t i = 0;
-        for (auto &elem : init) {
-            _buf[i++] = std::move(elem);
-        }
-    }
-
-    constexpr Array(Sliceable<T> auto &other) {
-        size_t i = 0;
-        for (auto &elem : other) {
-            _buf[i++] = elem;
-        }
-    }*/
-
     constexpr T &operator[](size_t i) {
         if (i >= N) {
             panic("index out of range");

@@ -31,7 +31,7 @@ struct SdlHost :
                 s->pixels,
                 s->w,
                 s->h,
-                s->pitch,
+                (size_t)s->pitch,
             },
         };
     }

@@ -160,6 +160,33 @@ void Context::clear(Math::Recti rect, Color color) {
     _surface->clearRect(rect, color);
 }
 
+/* --- Blitting ------------------------------------------------------------- */
+
+void Context::blit(Math::Recti src, Math::Recti dest, Surface surface) {
+    auto clipDest = applyAll(dest);
+
+    for (int y = 0; y < clipDest.height; ++y) {
+        auto srcY = src.y + y * src.height / clipDest.height;
+        auto destY = clipDest.y + y;
+
+        for (int x = 0; x < clipDest.width; ++x) {
+            auto srcX = src.x + x * src.width / clipDest.width;
+            auto destX = clipDest.x + x;
+
+            auto color = surface.load({srcX, srcY});
+            _surface->store({destX, destY}, color);
+        }
+    }
+}
+
+void Context::blit(Math::Recti dest, Surface surface) {
+    blit(surface.bound(), dest, surface);
+}
+
+void Context::blit(Math::Vec2i dest, Surface surface) {
+    blit(surface.bound(), {dest, surface.bound().wh}, surface);
+}
+
 /* --- Shapes --------------------------------------------------------------- */
 
 void Context::plot(Math::Vec2i point) {

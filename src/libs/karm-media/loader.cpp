@@ -24,7 +24,7 @@ Result<Image> loadImage(Str path) {
     auto map = try$(Sys::mmap().map(file));
     try$(Png::Image::load(map.bytes()));
 
-    return Image{};
+    return Error::NOT_IMPLEMENTED;
 }
 
 } // namespace Karm::Media

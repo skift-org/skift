@@ -109,6 +109,14 @@ struct Context {
 
     void clear(Math::Recti rect, Color color = BLACK);
 
+    /* --- Blitting --------------------------------------------------------- */
+
+    void blit(Math::Recti src, Math::Recti dest, Surface surface);
+
+    void blit(Math::Recti dest, Surface surface);
+
+    void blit(Math::Vec2i dest, Surface surface);
+
     /* --- Shapes ----------------------------------------------------------- */
 
     void plot(Math::Vec2i point);

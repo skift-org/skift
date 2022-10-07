@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/rc.h>
 #include <karm-base/var.h>
 #include <karm-math/rect.h>
 
@@ -55,7 +56,7 @@ struct Buffer {
     void *pixels;
     int width;
     int height;
-    int stride;
+    size_t stride;
 };
 
 inline Color load(Format format, void const *pixel) {

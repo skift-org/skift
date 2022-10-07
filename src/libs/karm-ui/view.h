@@ -51,10 +51,25 @@ Child icon(Media::Icons icon, double size);
 /* --- Image ---------------------------------------------------------------- */
 
 struct Image : public View<Image> {
+    Media::Image image;
+
+    Image(Media::Image image)
+        : image(image) {
+    }
+
+    void paint(Gfx::Context &g, Math::Recti) override {
+        g.blit(bound(), image);
+        if (DEBUG)
+            g._rect(bound(), Gfx::CYAN);
+    }
+
+    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+        return image.bound().size().cast<int>();
+    }
 };
 
-inline Child image() {
-    return makeStrong<Image>();
+inline Child image(Media::Image image) {
+    return makeStrong<Image>(image);
 }
 
 /* --- Canvas --------------------------------------------------------------- */

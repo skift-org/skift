@@ -1,0 +1,9 @@
+{
+    "id": "ray-app",
+    "type": "exe",
+    "description": "Simple ray tracer",
+    "deps": [
+        "karm-main",
+        "karm-ui"
+    ]
+}

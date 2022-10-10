@@ -9,19 +9,28 @@ namespace Karm::Gfx {
 
 /* ---- Fill Style ---------------------------------------------------------- */
 
+enum struct FillRule {
+    NONZERO,
+    EVENODD,
+};
+
 struct FillStyle {
-    Color _color{};
+    Color color{};
+    FillRule rule = FillRule::NONZERO;
 
     constexpr FillStyle()
-        : _color(WHITE) {}
+        : color(WHITE) {}
 
-    constexpr FillStyle(Color color)
-        : _color(color) {}
-
-    constexpr Color color() const { return _color; }
+    constexpr FillStyle(Color color, FillRule rule = FillRule::NONZERO)
+        : color(color), rule(rule) {}
 
     constexpr auto &withColor(Color color) {
-        _color = color;
+        this->color = color;
+        return *this;
+    }
+
+    constexpr auto &withRule(FillRule rule) {
+        this->rule = rule;
         return *this;
     }
 };

@@ -190,7 +190,7 @@ void Context::blit(Math::Vec2i dest, Surface surface) {
 /* --- Shapes --------------------------------------------------------------- */
 
 void Context::plot(Math::Vec2i point) {
-    plot(point, fillStyle().color());
+    plot(point, fillStyle().color);
 }
 
 void Context::plot(Math::Vec2i point, Color color) {
@@ -207,7 +207,12 @@ void Context::stroke(Math::Edgei edge) {
     stroke();
 }
 
-// void Context::fill(Math::Edgei edge, double thickness = 1.0f) {}
+void Context::fill(Math::Edgei edge, double thickness) {
+    begin();
+    moveTo(edge.start.cast<double>());
+    lineTo(edge.end.cast<double>());
+    stroke(StrokeStyle().withWidth(thickness));
+}
 
 void Context::stroke(Math::Recti r, int radius) {
     begin();
@@ -218,7 +223,7 @@ void Context::stroke(Math::Recti r, int radius) {
 void Context::fill(Math::Recti r, int radius) {
     if (radius == 0 && current().trans.isIdentity()) {
         r = applyAll(r);
-        _surface->blendRect(r, fillStyle().color());
+        _surface->blendRect(r, fillStyle().color);
     } else {
         begin();
         rect(r.cast<double>(), radius);
@@ -481,7 +486,7 @@ void Context::fill() {
 void Context::fill(FillStyle style) {
     _shape.clear();
     createSolid(_shape, _path, current().transWithOrigin());
-    _fill(style.color());
+    _fill(style.color);
 }
 
 void Context::stroke() {

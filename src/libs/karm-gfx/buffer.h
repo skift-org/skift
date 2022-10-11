@@ -5,6 +5,7 @@
 #include <karm-math/rect.h>
 
 #include "color.h"
+#include "colors.h"
 
 namespace Karm::Gfx {
 
@@ -113,6 +114,10 @@ struct Surface {
         return Gfx::load(format, static_cast<uint8_t const *>(buffer.pixels) + pos.y * buffer.stride + pos.x * bpp(format));
     }
 
+    Color loadClamped(Math::Vec2i const pos) const {
+        return load({clamp(pos.x, 0, width() - 1), clamp(pos.y, 0, height() - 1)});
+    }
+
     void blend(Math::Vec2i const pos, Color const color) {
         store(pos, color.blendOver(load(pos)));
     }
@@ -154,7 +159,7 @@ struct Surface {
             auto *pixel = static_cast<uint8_t *>(buffer.pixels) + y * buffer.stride + start * f.bpp();
             for (int x = start; x < end; x++) {
                 auto c = f.load(pixel);
-                c = color.withOpacity(alphas[x]).blendOver(c);
+                c = color.withOpacity(clamp01(alphas[x])).blendOver(c);
                 f.store(pixel, c);
                 pixel += f.bpp();
             }

@@ -203,7 +203,7 @@ struct Context {
 
     /* --- Effects ---------------------------------------------------------- */
 
-    void blur(Math::Recti region, double radius);
+    void blur(Math::Recti region, int radius);
 
     void saturate(Math::Recti region, double saturation);
 

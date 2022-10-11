@@ -400,25 +400,29 @@ void Context::_trace() {
                 return cmp(a.x, b.x);
             });
 
-            int r = 0;
+            int rule = 0;
             for (size_t i = 0; i + 1 < _active.len(); i++) {
-                int sign = _active[i].sign;
+                size_t iStart = i;
+                size_t iEnd = i + 1;
 
-                r += sign;
-                if (r == 0) {
+                int sign = _active[i].sign;
+                rule += sign;
+                if (rule == 0) {
                     continue;
                 }
 
-                double x1 = max(_active[i].x, rect.start());
-                double x2 = min(_active[i + 1].x, rect.end());
+                double x1 = max(_active[iStart].x, rect.start());
+                double x2 = min(_active[iEnd].x, rect.end());
 
-                if (x1 < x2) {
-                    _scanline[x1] += (ceil(x1) - x1) * UNIT;
-                    _scanline[x2] += (x2 - floor(x2)) * UNIT;
+                if (x1 >= x2) {
+                    continue;
+                }
 
-                    for (int x = ceil(x1); x < floor(x2); x++) {
-                        _scanline[x] += UNIT;
-                    }
+                _scanline[x1] += (ceil(x1) - x1) * UNIT;
+                _scanline[x2] += (x2 - floor(x2)) * UNIT;
+
+                for (int x = ceil(x1); x < floor(x2); x++) {
+                    _scanline[x] += UNIT;
                 }
             }
         }
@@ -503,7 +507,7 @@ void Context::shadow() {}
 
 /* --- Effects -------------------------------------------------------------- */
 
-// void Context::blur(Math::Recti region, double radius) {}
+// void Context::blur(Math::Recti region, int radius) { }
 
 void Context::saturate(Math::Recti region, double value) {
     region = applyAll(region);

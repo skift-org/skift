@@ -96,20 +96,26 @@ static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, M
 
 /* --- Line Cap ------------------------------------------------------------- */
 
-static void _createCapButt(Shape &shape, Math::Vec2f start, Math::Vec2f end, Math::Trans2f trans) {
-    shape.add(trans.apply({start, end}));
+struct Cap {
+    Math::Vec2f start;
+    Math::Vec2f end;
+    Math::Vec2f center;
+};
+
+static void _createCapButt(Shape &shape, Cap cap, Math::Trans2f trans) {
+    shape.add(trans.apply({cap.start, cap.end}));
 }
 
-static void _createCapSquare(Shape &shape, Math::Vec2f start, Math::Vec2f end, float width, Math::Trans2f trans) {
-    auto e = Math::Edgef{start, end}.parallel(-width / 2);
-    shape.add(trans.apply({start, e.start}));
+static void _createCapSquare(Shape &shape, Cap cap, float width, Math::Trans2f trans) {
+    auto e = Math::Edgef{cap.start, cap.end}.parallel(-width / 2);
+    shape.add(trans.apply({cap.start, e.start}));
     shape.add(trans.apply(e));
-    shape.add(trans.apply({e.end, end}));
+    shape.add(trans.apply({e.end, cap.end}));
 }
 
-static void _createCapRound(Shape &shape, Math::Vec2f start, Math::Vec2f end, Math::Vec2f center, float width, Math::Trans2f trans) {
-    double startAngle = (start - center).angle();
-    double endAngle = (end - center).angle();
+static void _createCapRound(Shape &shape, Cap cap, float width, Math::Trans2f trans) {
+    double startAngle = (cap.start - cap.center).angle();
+    double endAngle = (cap.end - cap.center).angle();
 
     if (startAngle > endAngle) {
         startAngle -= Math::TAU;
@@ -117,19 +123,19 @@ static void _createCapRound(Shape &shape, Math::Vec2f start, Math::Vec2f end, Ma
 
     double delta = endAngle - startAngle;
 
-    _createArc(shape, center, start, end, startAngle, delta, width / 2, trans);
+    _createArc(shape, cap.center, cap.start, cap.end, startAngle, delta, width / 2, trans);
 }
 
-[[maybe_unused]] static void _createCap(Shape &shape, StrokeStyle stroke, Math::Vec2f start, Math::Vec2f end, Math::Vec2f center, Math::Trans2f trans) {
+[[maybe_unused]] static void _createCap(Shape &shape, StrokeStyle stroke, Cap cap, Math::Trans2f trans) {
     switch (stroke.cap) {
     case BUTT_CAP:
-        _createCapButt(shape, start, end, trans);
+        _createCapButt(shape, cap, trans);
         break;
     case SQUARE_CAP:
-        _createCapSquare(shape, start, end, stroke.width, trans);
+        _createCapSquare(shape, cap, stroke.width, trans);
         break;
     case ROUND_CAP:
-        _createCapRound(shape, start, end, center, stroke.width, trans);
+        _createCapRound(shape, cap, stroke.width, trans);
         break;
     default:
         panic("unknown cap type");
@@ -138,7 +144,7 @@ static void _createCapRound(Shape &shape, Math::Vec2f start, Math::Vec2f end, Ma
 
 /* --- Public Api ----------------------------------------------------------- */
 
-void createStroke(Shape &shape, Path const &path, StrokeStyle stroke, Math::Trans2f trans) {
+[[gnu::flatten]] void createStroke(Shape &shape, Path const &path, StrokeStyle stroke, Math::Trans2f trans) {
     double outerDist = 0;
 
     if (stroke.align == CENTER_ALIGN) {
@@ -163,12 +169,12 @@ void createStroke(Shape &shape, Path const &path, StrokeStyle stroke, Math::Tran
 
             if (i == 0 && !seg.close) {
                 auto center = (innerCurr.end + outerCurr.start) / 2;
-                _createCap(shape, stroke, innerCurr.end, outerCurr.start, center, trans);
+                _createCap(shape, stroke, {innerCurr.end, outerCurr.start, center}, trans);
             }
 
             if (i + 1 == l && !seg.close) {
                 auto center = (outerCurr.end + innerCurr.start) / 2;
-                _createCap(shape, stroke, outerCurr.end, innerCurr.start, center, trans);
+                _createCap(shape, stroke, {outerCurr.end, innerCurr.start, center}, trans);
             }
 
             if (seg.close || i + 1 != l) {
@@ -177,8 +183,8 @@ void createStroke(Shape &shape, Path const &path, StrokeStyle stroke, Math::Tran
                     seg[(i + 2) % seg.len()],
                 };
 
-                auto outerNext = next.parallel(outerDist);
-                auto innerNext = next.parallel(innerDist).swap();
+                auto outerNext = outerDist > -0.001 ? next : next.parallel(outerDist);
+                auto innerNext = innerDist < 0.001 ? next.swap() : next.parallel(innerDist).swap();
 
                 if (outerDist < -0.001)
                     _createJoin(shape, stroke, outerCurr, outerNext, curr.end, Math::abs(outerDist), trans);

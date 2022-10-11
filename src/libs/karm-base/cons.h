@@ -18,6 +18,10 @@ struct Cons {
         return cmp(car, other.car) |
                cmp(cdr, other.cdr);
     }
+
+    auto get(bool cdr) const {
+        return cdr ? this->cdr : this->car;
+    }
 };
 
 template <typename T>

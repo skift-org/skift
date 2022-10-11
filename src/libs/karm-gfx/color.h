@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/std.h>
+#include <karm-math/vec.h>
 
 namespace Karm::Gfx {
 
@@ -67,6 +68,15 @@ struct Color {
             static_cast<uint8_t>(green),
             static_cast<uint8_t>(blue),
             static_cast<uint8_t>(alpha * opacity),
+        };
+    }
+
+    constexpr operator Math::Vec4u() const {
+        return {
+            static_cast<uint32_t>(red),
+            static_cast<uint32_t>(green),
+            static_cast<uint32_t>(blue),
+            static_cast<uint32_t>(alpha),
         };
     }
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-meta/callable.h>
+
 #include "_prelude.h"
 
 #include "error.h"
@@ -12,7 +14,10 @@
 namespace Karm {
 
 template <typename T>
-struct Opt {
+struct Opt;
+
+template <typename T>
+struct [[nodiscard]] Opt {
     bool _present{};
     Inert<T> _value{};
 
@@ -21,7 +26,8 @@ struct Opt {
     Opt(None) {}
 
     template <typename U = T>
-    Opt(U &&value) requires(!Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> && Meta::Constructible<T, U &&>)
+    Opt(U &&value)
+        requires(!Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> && Meta::Constructible<T, U &&>)
         : _present(true) {
         _value.ctor(std::forward<U>(value));
     }
@@ -174,6 +180,26 @@ struct Opt {
         }
 
         return {};
+    }
+
+    // call operator
+    template <typename... Args>
+    auto operator()(Args &&...args) {
+        using OptRet = Opt<Meta::Ret<T, Args...>>;
+
+        if constexpr (Meta::Same<void, Meta::Ret<T, Args...>>) {
+            if (!_present) {
+                return false;
+            }
+            _value.unwrap()(std::forward<Args>(args)...);
+            return true;
+        } else {
+            if (!_present) {
+                return OptRet{NONE};
+            }
+
+            return OptRet{_value.unwrap()(std::forward<Args>(args)...)};
+        }
     }
 };
 

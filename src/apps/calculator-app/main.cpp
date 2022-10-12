@@ -1,8 +1,8 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
-#include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
+#include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/view.h>
@@ -10,6 +10,14 @@
 #include "model.h"
 
 namespace Calculator {
+
+Ui::Child textButton(Ui::OnPress onPress, Ui::ButtonStyle style, String t) {
+    return Ui::button(std::move(onPress), style, Ui::bound(Ui::center(Ui::text(Ui::TextStyle::regular().withSize(18), t))));
+}
+
+Ui::Child textButton(Ui::OnPress onPress, String t) {
+    return textButton(std::move(onPress), Ui::ButtonStyle::regular(), t);
+}
 
 Ui::Child keypad(State state) {
     return Ui::spacing(
@@ -28,34 +36,34 @@ Ui::Child keypad(State state) {
                     Ui::button(Model::bind<MemSubAction>(), Ui::ButtonStyle::subtle(), "M-"),
                     Ui::button(Model::bind<MemStoreAction>(), Ui::ButtonStyle::subtle(), "MS"))),
 
-            Ui::button(Model::bind<ClearAllAction>(), Ui::ButtonStyle::secondary(), 18, "CE"),
-            Ui::button(Model::bind<ClearAction>(), Ui::ButtonStyle::secondary(), 18, "C"),
+            textButton(Model::bind<ClearAllAction>(), Ui::ButtonStyle::secondary(), "CE"),
+            textButton(Model::bind<ClearAction>(), Ui::ButtonStyle::secondary(), "C"),
             Ui::button(Model::bind(Operator::TO_PERCENT), Ui::ButtonStyle::secondary(), Media::Icons::PERCENT),
             Ui::button(Model::bind<BackspaceAction>(), Ui::ButtonStyle::secondary(), Media::Icons::BACKSPACE_OUTLINE),
 
-            Ui::button(NONE, Ui::ButtonStyle::secondary(), 18, "1/x"),
-            Ui::button(Model::bind(Operator::SQUARE), Ui::ButtonStyle::secondary(), 18, "x²"),
-            Ui::button(Model::bind(Operator::SQRT), Ui::ButtonStyle::secondary(), 18, "√x"),
+            textButton(Model::bind(Operator::RESIPROCAL), Ui::ButtonStyle::secondary(), "1/x"),
+            textButton(Model::bind(Operator::SQUARE), Ui::ButtonStyle::secondary(), "x²"),
+            textButton(Model::bind(Operator::SQRT), Ui::ButtonStyle::secondary(), "√x"),
             Ui::button(Model::bind(Operator::DIV), Ui::ButtonStyle::secondary(), Media::Icons::DIVISION),
 
-            Ui::button(Model::bind<Number>(7), 18, "7"),
-            Ui::button(Model::bind<Number>(8), 18, "8"),
-            Ui::button(Model::bind<Number>(9), 18, "9"),
+            textButton(Model::bind<Number>(7), "7"),
+            textButton(Model::bind<Number>(8), "8"),
+            textButton(Model::bind<Number>(9), "9"),
             Ui::button(Model::bind(Operator::MULT), Ui::ButtonStyle::secondary(), Media::Icons::MULTIPLICATION),
 
-            Ui::button(Model::bind<Number>(4), 18, "4"),
-            Ui::button(Model::bind<Number>(5), 18, "5"),
-            Ui::button(Model::bind<Number>(6), 18, "6"),
+            textButton(Model::bind<Number>(4), "4"),
+            textButton(Model::bind<Number>(5), "5"),
+            textButton(Model::bind<Number>(6), "6"),
             Ui::button(Model::bind(Operator::SUB), Ui::ButtonStyle::secondary(), Media::Icons::MINUS),
 
-            Ui::button(Model::bind<Number>(1), 18, "1"),
-            Ui::button(Model::bind<Number>(2), 18, "2"),
-            Ui::button(Model::bind<Number>(3), 18, "3"),
+            textButton(Model::bind<Number>(1), "1"),
+            textButton(Model::bind<Number>(2), "2"),
+            textButton(Model::bind<Number>(3), "3"),
             Ui::button(Model::bind(Operator::ADD), Ui::ButtonStyle::secondary(), Media::Icons::PLUS),
 
-            Ui::button(Model::bind(Operator::INVERT_SIGN), 18, "+/-"),
-            Ui::button(Model::bind<Number>(0), 18, "0"),
-            Ui::button(NONE, Media::Icons::CIRCLE_SMALL),
+            textButton(Model::bind(Operator::INVERT_SIGN), "+/-"),
+            textButton(Model::bind<Number>(0), "0"),
+            Ui::button(Model::bind<EnterDecimalAction>(), Media::Icons::CIRCLE_SMALL),
             Ui::button(Model::bind<EqualAction>(), Ui::ButtonStyle::primary(), Media::Icons::EQUAL)));
 }
 
@@ -64,11 +72,11 @@ Ui::Child screen(State state) {
 
     auto currExpr = Ui::align(
         Layout::Align::VCENTER | Layout::Align::END,
-        state.op == Operator::NONE ? Ui::text(16, "") : Ui::text(16, toFmt(state.op), state.lhs));
+        state.op == Operator::NONE ? Ui::text(Ui::TextStyle::label(), "") : Ui::text(Ui::TextStyle::label(), toFmt(state.op), state.lhs));
 
     auto result = Ui::align(
         Layout::Align::VCENTER | Layout::Align::END,
-        Ui::text(32, "{}", state.hasRhs ? state.rhs : state.lhs));
+        Ui::text(Ui::TextStyle::label().withSize(32), "{}", state.hasRhs ? state.rhs : state.lhs));
 
     return Ui::spacing(
         {16, 8}, Ui::vflow(8, /* debugExpr, */ currExpr, result));

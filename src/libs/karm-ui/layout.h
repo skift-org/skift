@@ -16,6 +16,14 @@ Child empty(Math::Vec2i size = {});
 
 Child cond(bool cond, Child child);
 
+/* --- Bound ---------------------------------------------------------------- */
+
+Child bound(Child child);
+
+/* --- Separator ------------------------------------------------------------ */
+
+Child separator();
+
 /* --- Grow ----------------------------------------------------------------- */
 
 Child grow(Child child);

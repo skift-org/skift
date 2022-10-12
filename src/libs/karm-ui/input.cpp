@@ -1,10 +1,12 @@
-#include "button.h"
+#include "input.h"
 
 #include "funcs.h"
 #include "layout.h"
 #include "view.h"
 
 namespace Karm::Ui {
+
+/* --- Button ---------------------------------------------------------------- */
 
 ButtonStyle ButtonStyle::regular() {
     return {
@@ -134,17 +136,10 @@ ButtonStyle ButtonStyle::withRadius(float radius) const {
     };
 }
 
-enum ButtonState {
-    IDLE,
-    OVER,
-    PRESS,
-};
-
 struct Button : public _Box<Button> {
-
     OnPress _onPress;
     ButtonStyle _buttonStyle = ButtonStyle::regular();
-    ButtonState _state = IDLE;
+    MouseListener _mouseListener;
 
     Button(OnPress onPress, ButtonStyle style, Child child)
         : _Box<Button>(child),
@@ -162,9 +157,9 @@ struct Button : public _Box<Button> {
             return _buttonStyle.disabledStyle;
         }
 
-        if (_state == IDLE) {
+        if (_mouseListener.isIdle()) {
             return _buttonStyle.idleStyle;
-        } else if (_state == OVER) {
+        } else if (_mouseListener.isHover()) {
             return _buttonStyle.hoverStyle;
         } else {
             return _buttonStyle.pressStyle;
@@ -172,35 +167,8 @@ struct Button : public _Box<Button> {
     }
 
     void event(Events::Event &e) override {
-        ButtonState state = _state;
-
-        e.handle<Events::MouseEvent>([&](auto &m) {
-            if (!bound().contains(m.pos)) {
-                state = IDLE;
-                return false;
-            }
-
-            if (state != PRESS) {
-                state = OVER;
-            }
-
-            if (m.type == Events::MouseEvent::PRESS) {
-                state = PRESS;
-                return true;
-            } else if (m.type == Events::MouseEvent::RELEASE) {
-                state = OVER;
-                if (_onPress) {
-                    _onPress->operator()(*this);
-                }
-                return true;
-            }
-
-            return false;
-        });
-
-        if (state != _state) {
-            _state = state;
-            shouldRepaint(*this);
+        if (_mouseListener.listen(*this, e)) {
+            _onPress(*this);
         }
     };
 };
@@ -219,18 +187,6 @@ Child button(OnPress onPress, ButtonStyle style, Str t) {
                 spacing(
                     {16, 6},
                     text(t)))));
-}
-
-Child button(OnPress onPress, ButtonStyle style, int size, Str t) {
-    return button(
-        std::move(onPress),
-        style,
-        minSize(
-            {UNCONSTRAINED, 36},
-            center(
-                spacing(
-                    {16, 6},
-                    text(size, t)))));
 }
 
 Child button(OnPress onPress, ButtonStyle style, Media::Icon i) {
@@ -268,16 +224,192 @@ Child button(OnPress onPress, Str t) {
     return button(std::move(onPress), ButtonStyle::regular(), t);
 }
 
-Child button(OnPress onPress, int size, Str t) {
-    return button(std::move(onPress), ButtonStyle::regular(), size, t);
-}
-
 Child button(OnPress onPress, Media::Icons i) {
     return button(std::move(onPress), ButtonStyle::regular(), i);
 }
 
 Child button(OnPress onPress, Media::Icons i, Str t) {
     return button(std::move(onPress), ButtonStyle::regular(), i, t);
+}
+
+/* --- Toggle --------------------------------------------------------------- */
+
+struct Toggle : public View<Toggle> {
+    bool _value = false;
+    OnChange<bool> _onChange;
+    MouseListener _mouseListener;
+
+    Toggle(bool value, OnChange<bool> onChange)
+        : _value(value), _onChange(std::move(onChange)) {
+    }
+
+    void reconcile(Toggle &o) override {
+        _value = o._value;
+        _onChange = std::move(o._onChange);
+    }
+
+    void paint(Gfx::Context &g, Math::Recti) override {
+        g.save();
+
+        auto thumb = bound().hsplit(26).get(_value).shrink(_value ? 4 : 6);
+
+        if (_value) {
+            g.fillStyle(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700);
+            g.fill(bound(), 999);
+
+            g.fillStyle(Gfx::WHITE);
+            g.fill(thumb, 999);
+
+            if (_mouseListener.isPress()) {
+                g.strokeStyle(Gfx::stroke(Gfx::BLUE600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.stroke(bound(), 999);
+            }
+        } else {
+            g.fillStyle(_mouseListener.isHover() ? Gfx::ZINC600 : Gfx::ZINC700);
+            g.fill(bound(), 999);
+
+            g.fillStyle(_mouseListener.isHover() ? Gfx::ZINC400 : Gfx::ZINC500);
+            g.fill(thumb, 999);
+
+            if (_mouseListener.isPress()) {
+                g.strokeStyle(Gfx::stroke(Gfx::ZINC600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.stroke(bound(), 999);
+            }
+        }
+
+        g.restore();
+    }
+
+    void event(Events::Event &e) override {
+        if (_mouseListener.listen(*this, e)) {
+            _value = !_value;
+            _onChange(*this, _value);
+        }
+    }
+
+    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+        return {52, 26};
+    }
+};
+
+Child toggle(bool value, OnChange<bool> onChange) {
+    return makeStrong<Toggle>(value, std::move(onChange));
+}
+
+/* --- Checkbox ------------------------------------------------------------- */
+
+struct Checkbox : public View<Checkbox> {
+    bool _value = false;
+    OnChange<bool> _onChange;
+    MouseListener _mouseListener;
+
+    Checkbox(bool value, OnChange<bool> onChange)
+        : _value(value), _onChange(std::move(onChange)) {
+    }
+
+    void reconcile(Checkbox &o) override {
+        _value = o._value;
+        _onChange = std::move(o._onChange);
+    }
+
+    void paint(Gfx::Context &g, Math::Recti) override {
+        g.save();
+
+        if (_value) {
+            g.fillStyle(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700);
+            g.fill(bound(), 4);
+
+            g.fillStyle(Gfx::WHITE);
+            g.fill(bound().topStart(), Media::Icon{Media::Icons::CHECK, 26});
+
+            if (_mouseListener.isPress()) {
+                g.strokeStyle(Gfx::stroke(Gfx::BLUE600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.stroke(bound(), 4);
+            }
+        } else {
+            g.fillStyle(_mouseListener.isHover() ? Gfx::ZINC600 : Gfx::ZINC700);
+            g.fill(bound(), 4);
+
+            if (_mouseListener.isPress()) {
+                g.strokeStyle(Gfx::stroke(Gfx::ZINC600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.stroke(bound(), 4);
+            }
+        }
+
+        g.restore();
+    }
+
+    void event(Events::Event &e) override {
+        if (_mouseListener.listen(*this, e)) {
+            _value = !_value;
+            _onChange(*this, _value);
+        }
+    }
+
+    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+        return {26, 26};
+    }
+};
+
+Child checkbox(bool value, OnChange<bool> onChange) {
+    return makeStrong<Checkbox>(value, std::move(onChange));
+}
+
+/* --- Radio ----------------------------------------------------------------- */
+
+struct Radio : public View<Radio> {
+    bool _value = false;
+    OnChange<bool> _onChange;
+    MouseListener _mouseListener;
+
+    Radio(bool value, OnChange<bool> onChange)
+        : _value(value), _onChange(std::move(onChange)) {
+    }
+
+    void reconcile(Radio &o) override {
+        _value = o._value;
+        _onChange = std::move(o._onChange);
+    }
+
+    void paint(Gfx::Context &g, Math::Recti) override {
+        g.save();
+        if (_value) {
+            g.fillStyle(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700);
+            g.fill(bound(), 999);
+
+            g.fillStyle(Gfx::WHITE);
+            g.fill(bound().shrink(6), 999);
+
+            if (_mouseListener.isPress()) {
+                g.strokeStyle(Gfx::stroke(Gfx::BLUE600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.stroke(bound(), 999);
+            }
+        } else {
+            g.fillStyle(_mouseListener.isHover() ? Gfx::ZINC600 : Gfx::ZINC700);
+            g.fill(bound(), 999);
+
+            if (_mouseListener.isPress()) {
+                g.strokeStyle(Gfx::stroke(Gfx::ZINC600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.stroke(bound(), 999);
+            }
+        }
+        g.restore();
+    }
+
+    void event(Events::Event &e) override {
+        if (_mouseListener.listen(*this, e)) {
+            _value = !_value;
+            _onChange(*this, _value);
+        }
+    }
+
+    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+        return {26, 26};
+    }
+};
+
+Child radio(bool value, OnChange<bool> onChange) {
+    return makeStrong<Radio>(value, std::move(onChange));
 }
 
 } // namespace Karm::Ui

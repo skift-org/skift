@@ -1,9 +1,9 @@
 #include "dialog.h"
 
 #include "box.h"
-#include "button.h"
 #include "drag.h"
 #include "funcs.h"
+#include "input.h"
 #include "layout.h"
 #include "proxy.h"
 #include "scafold.h"
@@ -180,7 +180,7 @@ Child aboutDialog(Media::Icons i, String name) {
         8,
         Layout::Align::CENTER,
         spacing(16, icon(i, 48)),
-        text(24, name),
+        text(TextStyle::title2(), name),
         empty(),
         badge(BadgeStyle::INFO, "v0.1.0"),
         empty(),
@@ -204,7 +204,7 @@ void showAboutDialog(Node &n, Media::Icons icon, String name) {
 }
 
 Child msgDialog(String title, String msg) {
-    auto titleLbl = text(16, title);
+    auto titleLbl = text(TextStyle::title2(), title);
     auto msgLbl = text(msg);
     Children actions = {
         grow(),

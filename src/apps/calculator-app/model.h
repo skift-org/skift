@@ -30,6 +30,7 @@ enum struct Operator {
     SQRT,
     INVERT_SIGN,
     TO_PERCENT,
+    RESIPROCAL,
 };
 
 inline Str toFmt(Operator op) {
@@ -54,6 +55,8 @@ inline Str toFmt(Operator op) {
         return "-{}";
     case Operator::TO_PERCENT:
         return "{}%";
+    case Operator::RESIPROCAL:
+        return "1/{}";
     }
 }
 
@@ -63,6 +66,7 @@ inline bool isUnary(Operator op) {
     case Operator::SQRT:
     case Operator::INVERT_SIGN:
     case Operator::TO_PERCENT:
+    case Operator::RESIPROCAL:
         return true;
     default:
         return false;
@@ -89,9 +93,12 @@ struct MemSubAction {};
 
 struct MemStoreAction {};
 
+struct EnterDecimalAction {};
+
 using Actions = Var<
     Operator, Number, BackspaceAction, EqualAction, ClearAction, ClearAllAction,
-    MemClearAction, MemRecallAction, MemAddAction, MemSubAction, MemStoreAction>;
+    MemClearAction, MemRecallAction, MemAddAction, MemSubAction, MemStoreAction,
+    EnterDecimalAction>;
 
 State reduce(State, Actions);
 

@@ -56,6 +56,12 @@ State doOperator(State s, Operator op) {
         s.rhs = s.lhs / 100;
         s.op = Operator::NONE;
         return s;
+
+    case Operator::RESIPROCAL:
+        s.lhs = s.rhs;
+        s.rhs = 1 / s.lhs;
+        s.op = Operator::NONE;
+        return s;
     }
 }
 
@@ -136,7 +142,11 @@ State reduce(State s, Actions action) {
             s.mem = s.hasRhs ? s.rhs : s.lhs;
             s.hasMem = true;
             return s;
-        }});
+        },
+        [&](EnterDecimalAction) {
+            return s;
+        },
+    });
 }
 
 } // namespace Calculator

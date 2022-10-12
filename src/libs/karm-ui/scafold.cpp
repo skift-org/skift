@@ -1,8 +1,8 @@
 #include "scafold.h"
 
-#include "button.h"
 #include "dialog.h"
 #include "drag.h"
+#include "input.h"
 #include "layout.h"
 #include "view.h"
 
@@ -60,29 +60,12 @@ Child badge(BadgeStyle style, String t) {
                spacing({8, 4}, text(t)));
 }
 
-struct Separator : public View<Separator> {
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return {1};
-    }
-
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
-        g.fillStyle(Gfx::ZINC700);
-        g.fill(bound());
-        g.restore();
-    }
-};
-
-Child separator() {
-    return makeStrong<Separator>();
-}
-
 static constexpr BoxStyle TOOLBAR = {
     .backgroundColor = Gfx::ZINC800,
 };
 
 Child toolbar(Children children) {
-    return box(TOOLBAR, spacing(8, hflow(4, children)));
+    return vflow(box(TOOLBAR, spacing(8, hflow(4, children))), separator());
 }
 
 } // namespace Karm::Ui

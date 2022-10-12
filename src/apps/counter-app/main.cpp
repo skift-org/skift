@@ -1,7 +1,7 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
-#include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
 #include <karm-ui/scafold.h>
@@ -23,7 +23,7 @@ Ui::Child rounedButton(Func<void(Ui::Node &)> onPress, Ui::ButtonStyle style, Me
 
 Ui::Child app() {
     auto content = Ui::reducer<Model>(reduce, [](State state) {
-        auto lbl = Ui::text(64, "{}", state.counter);
+        auto lbl = Ui::text(Ui::TextStyle::regular().withSize(72), "{}", state.counter);
 
         auto decBtn = Ui::button(
             Model::bind<DecrementAction>(),

@@ -1,8 +1,8 @@
 #include <file-manager/widgets.h>
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
-#include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -16,11 +16,11 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
 
     for (int i = 0; i < 12; i++) {
         Media::Font font{size, fontface};
-        children.pushBack(Ui::text(font, PANGRAM));
+        children.pushBack(Ui::text(Ui::TextStyle{font}, PANGRAM));
         size *= 1.2;
     }
 
-    return Ui::scroll(Ui::spacing(8, Ui::vflow(8, children)));
+    return Ui::vhscroll(Ui::spacing(8, Ui::vflow(8, children)));
 }
 
 CliResult entryPoint(CliArgs args) {

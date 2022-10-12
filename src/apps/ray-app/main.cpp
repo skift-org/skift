@@ -338,29 +338,30 @@ void renderScene(Cam cam, Scene &scene, Gfx::Surface buf, Props props) {
 
             buf.store({x, y}, color);
         }
+
+        Debug::linfo("rendered {} of {}", y, size.y);
     }
 }
 
 CliResult entryPoint(CliArgs args) {
     srand(1);
-    double scale = 0.5;
+    double scale = 1;
 
     Media::Image image{Gfx::RGBA8888, Vec2f{1280 * scale, 720 * scale}.cast<int>()};
 
     Props props = {
         .samples = 10,
-        .bounces = 6,
+        .bounces = 4,
     };
 
     Cam cam{
-        .pos = {0, 0, 5},
+        .pos = {0, 0, 1},
         .dir = {0, 0, 1},
         .focal = 1,
         .ratio = 16.0 / 9.0,
     };
 
     Scene scene = {
-        /*
         Object{
             ObjectFlags::NONE,
             Sphere{{0, 0, -1}, 0.5},
@@ -402,7 +403,6 @@ CliResult entryPoint(CliArgs args) {
             Plane{{0, 0.9, -1}, {0, 1, 0}, 0.25},
             Emmisive{Colorf{1, 1, 1}},
         },
-        */
 
         Object{
             ObjectFlags::NONE,

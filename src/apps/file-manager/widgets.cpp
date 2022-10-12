@@ -1,5 +1,5 @@
-#include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -77,8 +77,8 @@ Ui::Child openFileDialog() {
 
         Sys::Dir dir = Sys::Dir::open(path).take();
 
-        auto titleLbl = Ui::text(16, "Open File");
-        auto msgLbl = Ui::text("Select a file to open.");
+        auto titleLbl = Ui::text(Ui::TextStyle::title1(), "Open File");
+        auto msgLbl = Ui::text(Ui::TextStyle::subtitle1(), "Select a file to open.");
         auto titleBar = Ui::spacing(
             16,
             Ui::vflow(
@@ -109,7 +109,6 @@ Ui::Child openFileDialog() {
                     Ui::vflow(
                         titleBar,
                         toolbar(d),
-                        Ui::separator(),
                         directoryListing(dir),
                         Ui::separator())),
                 controls));

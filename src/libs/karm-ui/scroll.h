@@ -7,15 +7,18 @@
 
 namespace Karm::Ui {
 
+Child vhscroll(Child child);
+
 Child hscroll(Child child);
 
 Child vscroll(Child child);
 
 using Build = Func<Child()>;
+
 using BuildItem = Func<Child(size_t)>;
 
-Child hlist(size_t count, BuildItem child);
+Child hlist(size_t len, BuildItem child);
 
-Child vlist(size_t count, BuildItem child);
+Child vlist(size_t len, BuildItem child);
 
 } // namespace Karm::Ui

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-base/std.h>
+
 #include "cvrp.h"
 #include "utils.h"
 
@@ -20,9 +22,12 @@ concept Func = _Func<RemoveConstVolatileRef<T>>;
 template <typename T>
 concept FuncPtr = Ptr<T> and Meta::Func<RemovePtr<T>>;
 
+template <typename U, typename... Args>
+using Ret = decltype(Meta::declval<U>()(std::forward<Args>(Meta::declval<Args>())...));
+
 template <typename T, typename... Args>
 concept Callable = requires(T f) {
-    f(declval<Args>()...);
-};
+                       f(declval<Args>()...);
+                   };
 
 } // namespace Karm::Meta

@@ -2,8 +2,8 @@
 #include <file-manager/widgets.h>
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
-#include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
 
@@ -21,7 +21,6 @@ CliResult entryPoint(CliArgs args) {
                 Ui::vflow(
                     titlebar,
                     FileManager::toolbar(d),
-                    Ui::separator(),
                     listing)));
     });
 

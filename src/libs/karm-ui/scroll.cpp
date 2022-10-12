@@ -7,6 +7,7 @@ namespace Karm::Ui {
 /* --- Scroll --------------------------------------------------------------- */
 
 struct Scroll : public Proxy<Scroll> {
+    bool _animated = false;
     Layout::Orien _orient{};
     Math::Recti _bound{};
     Math::Vec2i _scroll{};
@@ -20,7 +21,14 @@ struct Scroll : public Proxy<Scroll> {
         g.origin(_scroll);
         r.xy = r.xy - _scroll;
         child().paint(g, r);
+
+        if (debugShowScrollBounds)
+            g._rect(child().bound(), Gfx::PINK);
+
         g.restore();
+
+        if (debugShowScrollBounds)
+            g._rect(_bound, Gfx::CYAN);
     }
 
     void event(Events::Event &e) override {
@@ -39,11 +47,13 @@ struct Scroll : public Proxy<Scroll> {
                         _scroll.y = clamp(_scroll.y, -(childBound.height - min(childBound.height, bound().height)), 0);
 
                         shouldAnimate(*this);
+                        _animated = true;
                     }
                 }
             }
-        } else if (e.is<Events::AnimateEvent>()) {
+        } else if (e.is<Events::AnimateEvent>() && _animated) {
             shouldRepaint(*parent(), bound());
+            _animated = false;
         } else {
             child().event(e);
         }
@@ -62,6 +72,11 @@ struct Scroll : public Proxy<Scroll> {
     void layout(Math::Recti r) override {
         _bound = r;
         auto childSize = child().size(_bound.size(), Layout::Hint::MAX);
+        if (_orient == Layout::Orien::HORIZONTAL) {
+            childSize.height = r.height;
+        } else if (_orient == Layout::Orien::VERTICAL) {
+            childSize.width = r.width;
+        }
         r.wh = childSize;
         child().layout(r);
     }
@@ -87,6 +102,10 @@ struct Scroll : public Proxy<Scroll> {
         return _bound;
     }
 };
+
+Child vhscroll(Child child) {
+    return makeStrong<Scroll>(Layout::Orien::BOTH, child);
+}
 
 Child hscroll(Child child) {
     return makeStrong<Scroll>(Layout::Orien::HORIZONTAL, child);

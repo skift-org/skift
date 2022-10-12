@@ -117,7 +117,57 @@ static Array demos = {
         "Hello, world!",
         "Hello, world!",
         []() {
-            return Ui::text("Hello, world!");
+            return Ui::grow(Ui::center(Ui::text(Ui::TextStyle::title1(), "Hello, world!")));
+        },
+    },
+    Demo{
+        Media::Icons::LIST_BOX_OUTLINE,
+        "Inputs",
+        "Form inputs widgets",
+        []() {
+            auto button = Ui::buttonRow(
+                [](auto &) {
+                },
+                "Cool duck app", "Install");
+
+            auto toggle = Ui::toggleRow(true, NONE, "Some property");
+            auto toggle1 = Ui::toggleRow(true, NONE, "Some property");
+            auto toggle2 = Ui::toggleRow(true, NONE, "Some property");
+
+            auto checkbox = Ui::checkboxRow(true, NONE, "Some property");
+            auto checkbox1 = Ui::checkboxRow(false, NONE, "Some property");
+            auto checkbox2 = Ui::checkboxRow(false, NONE, "Some property");
+
+            auto radio = Ui::radioRow(true, NONE, "Some property");
+            auto radio1 = Ui::radioRow(false, NONE, "Some property");
+            auto radio2 = Ui::radioRow(false, NONE, "Some property");
+
+            auto title = Ui::textRow(Ui::TextStyle::title2(), "Some Settings");
+
+            auto list = Ui::card(
+                button,
+                Ui::separator(),
+                Ui::textRow(Ui::TextStyle::title3(), "Switches"),
+                toggle,
+                toggle1,
+                toggle2,
+                Ui::separator(),
+                Ui::textRow(Ui::TextStyle::title3(), "Checkboxs"),
+                checkbox,
+                checkbox1,
+                checkbox2,
+                Ui::separator(),
+                Ui::textRow(Ui::TextStyle::title3(), "Radio buttons"),
+                radio,
+                radio1,
+                radio2);
+
+            return Ui::vscroll(
+                Ui::hcenter(
+                    Ui::grow(
+                        Ui::maxSize(
+                            {420, Ui::UNCONSTRAINED},
+                            Ui::vflow(8, title, list)))));
         },
     },
     Demo{
@@ -135,7 +185,7 @@ static Array demos = {
                     Ui::center(
                         Ui::spacing(
                             12,
-                            Ui::text(16, "{}", state.value()))),
+                            Ui::text("{}", state.value()))),
                     Ui::button(
                         [state](Ui::Node &) mutable {
                             state.update(state.value() - 1);
@@ -164,18 +214,19 @@ State reduce(State, Actions action) {
 
 using Model = Ui::Model<State, Actions>;
 
-Ui::Child sidebar() {
+Ui::Child sidebar(State s) {
     Ui::Children items =
         iter(demos)
-            .mapi([](size_t index, Demo const &demo) {
-                return Ui::buttonRow(Model::bind<SwitchAction>(index), demo.icon, demo.name, demo.description);
+            .mapi([&](size_t index, Demo const &demo) {
+                return Ui::navRow(index == s.current, Model::bind<SwitchAction>(index), demo.icon, demo.name);
             })
             .collect<Ui::Children>();
 
     return Ui::vscroll(
-        Ui::spacing(
-            {0, 8},
-            Ui::vflow(8, items)));
+        Ui::minSize({256, Ui::UNCONSTRAINED},
+                    Ui::spacing(
+                        8,
+                        Ui::vflow(8, items))));
 }
 
 CliResult entryPoint(CliArgs args) {
@@ -186,24 +237,24 @@ CliResult entryPoint(CliArgs args) {
 
     auto content = Ui::reducer<Model>(reduce, [](State s) {
         return Ui::hflow(
-            8,
-            sidebar(),
+            sidebar(s),
             Ui::separator(),
-            Ui::spacing(
+            Ui::grow(Ui::spacing(
                 8,
                 Ui::vflow(
-                    Ui::text(16, demos[s.current].name),
+                    Ui::text(Ui::TextStyle::title1(), demos[s.current].name),
                     Ui::empty(8),
-                    demos[s.current].build())));
+                    Ui::grow(demos[s.current].build())))));
     });
 
-    auto layout = Ui::dialogLayer(
+    auto layout =
         Ui::minSize(
-            420,
-            Ui::vflow(
-                titlebar,
-                Ui::separator(),
-                content)));
+            {700, 500},
+            Ui::dialogLayer(
+                Ui::vflow(
+                    titlebar,
+                    Ui::separator(),
+                    Ui::grow(content))));
 
     return Ui::runApp(args, layout);
 }

@@ -6,21 +6,52 @@
 
 namespace Karm::Ui {
 struct BoxStyle {
-    Layout::Spacingi spacing{};
+    Layout::Spacingi margin{};
+    Layout::Spacingi padding{};
+
     double borderRadius{};
     double borderWidth{};
+
     Gfx::Color borderColor{Gfx::ALPHA};
     Gfx::Color backgroundColor{Gfx::ALPHA};
     Gfx::Color foregroundColor{Gfx::WHITE};
 
-    BoxStyle withRadius(double radius) const {
-        return {
-            .borderRadius = radius,
-            .borderWidth = borderWidth,
-            .borderColor = borderColor,
-            .backgroundColor = backgroundColor,
-            .foregroundColor = foregroundColor,
-        };
+    BoxStyle withMargin(Layout::Spacingi margin) const {
+        auto copy = *this;
+        copy.margin = margin;
+        return copy;
+    }
+
+    BoxStyle withPadding(Layout::Spacingi padding) const {
+        auto copy = *this;
+        copy.padding = padding;
+        return copy;
+    }
+
+    BoxStyle withRadius(double borderRadius) const {
+        auto copy = *this;
+        copy.borderRadius = borderRadius;
+        return copy;
+    }
+
+    void paint(Gfx::Context &g, Math::Recti bound, auto inner) {
+        g.save();
+
+        if (backgroundColor.alpha) {
+            g.fillStyle(backgroundColor);
+            g.fill(bound, borderRadius);
+        }
+
+        g.fillStyle(foregroundColor);
+        inner();
+        g.restore();
+
+        if (borderWidth) {
+            g.strokeStyle(Gfx::stroke(borderColor)
+                              .withWidth(borderWidth)
+                              .withAlign(Gfx::INSIDE_ALIGN));
+            g.stroke(bound, borderRadius);
+        }
     }
 };
 
@@ -32,35 +63,32 @@ struct _Box : public Proxy<Crtp> {
     virtual BoxStyle &boxStyle() = 0;
 
     void paint(Gfx::Context &g, Math::Recti r) override {
-        g.save();
-
-        if (boxStyle().backgroundColor.alpha) {
-            g.fillStyle(boxStyle().backgroundColor);
-            g.fill(bound(), boxStyle().borderRadius);
-        }
-
-        g.fillStyle(boxStyle().foregroundColor);
-        Proxy<Crtp>::child().paint(g, r);
-        g.restore();
-
-        if (boxStyle().borderWidth) {
-            g.strokeStyle(Gfx::stroke(boxStyle().borderColor)
-                              .withWidth(boxStyle().borderWidth)
-                              .withAlign(Gfx::INSIDE_ALIGN));
-            g.stroke(bound(), boxStyle().borderRadius);
-        }
+        boxStyle().paint(g, bound(), [&] {
+            Proxy<Crtp>::paint(g, r);
+        });
     }
 
     void layout(Math::Recti rect) override {
-        Proxy<Crtp>::child().layout(boxStyle().spacing.shrink(Layout::Flow::LEFT_TO_RIGHT, rect));
+        rect = boxStyle().margin.shrink(Layout::Flow::LEFT_TO_RIGHT, rect);
+        rect = boxStyle().padding.shrink(Layout::Flow::LEFT_TO_RIGHT, rect);
+
+        Proxy<Crtp>::child().layout(rect);
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
-        return Proxy<Crtp>::child().size(s - boxStyle().spacing.all(), hint) + boxStyle().spacing.all();
+        s = s - boxStyle().margin.all();
+        s = s - boxStyle().padding.all();
+
+        s = Proxy<Crtp>::child().size(s, hint);
+
+        s = s + boxStyle().padding.all();
+        s = s + boxStyle().margin.all();
+
+        return s;
     }
 
     Math::Recti bound() override {
-        return boxStyle().spacing.grow(Layout::Flow::LEFT_TO_RIGHT, Proxy<Crtp>::child().bound());
+        return boxStyle().padding.grow(Layout::Flow::LEFT_TO_RIGHT, Proxy<Crtp>::child().bound());
     }
 };
 
@@ -84,5 +112,6 @@ struct Box : public _Box<Box> {
 inline Child box(BoxStyle style, Child child) {
     return makeStrong<Box>(style, child);
 }
+
 
 } // namespace Karm::Ui

@@ -1,7 +1,7 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
-#include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -33,12 +33,12 @@ Ui::Child badges() {
 Ui::Child texts() {
     return Ui::vflow(
         8,
-        Ui::text(12, "The quick brown fox jumps over the lazy dog."),
-        Ui::text(14, "The quick brown fox jumps over the lazy dog."),
-        Ui::text(18, "The quick brown fox jumps over the lazy dog."),
-        Ui::text(22, "The quick brown fox jumps over the lazy dog."),
-        Ui::text(36, "The quick brown fox jumps over the lazy dog."),
-        Ui::text(48, "The quick brown fox jumps over the lazy dog."));
+        Ui::text(Ui::TextStyle::title1(), "The quick brown fox jumps over the lazy dog."),
+        Ui::text(Ui::TextStyle::title2(), "The quick brown fox jumps over the lazy dog."),
+        Ui::text(Ui::TextStyle::title3(), "The quick brown fox jumps over the lazy dog."),
+        Ui::text(Ui::TextStyle::subtitle1(), "The quick brown fox jumps over the lazy dog."),
+        Ui::text(Ui::TextStyle::subtitle2(), "The quick brown fox jumps over the lazy dog."),
+        Ui::text(Ui::TextStyle::body(), "The quick brown fox jumps over the lazy dog."));
 }
 
 CliResult entryPoint(CliArgs args) {
@@ -59,7 +59,7 @@ CliResult entryPoint(CliArgs args) {
             {700, 500},
             Ui::vflow(titlebar,
                       Ui::grow(
-                          Ui::scroll(content)))));
+                          Ui::vscroll(content)))));
 
     return Ui::runApp(args, layout);
 }

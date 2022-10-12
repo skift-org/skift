@@ -21,20 +21,35 @@ struct View : public Widget<Crtp> {
 
 /* --- Text ----------------------------------------------------------------- */
 
-Child text(Media::Font font, Str text);
+struct TextStyle {
+    Media::Font font;
 
-Child text(int size, Str text);
+    TextStyle withSize(int size) {
+        TextStyle style = *this;
+        style.font._size = size;
+        return style;
+    }
+
+    static TextStyle regular();
+    static TextStyle bold();
+    static TextStyle italic();
+
+    static TextStyle title1();
+    static TextStyle title2();
+    static TextStyle title3();
+    static TextStyle subtitle1();
+    static TextStyle subtitle2();
+    static TextStyle label();
+    static TextStyle body();
+};
+
+Child text(TextStyle style, Str text);
 
 Child text(Str text);
 
 template <typename... Args>
-inline Child text(Media::Font font, Str format, Args &&...args) {
-    return text(font, Fmt::format(format, std::forward<Args>(args)...));
-}
-
-template <typename... Args>
-inline Child text(int size, Str format, Args &&...args) {
-    return text(size, Fmt::format(format, std::forward<Args>(args)...));
+inline Child text(TextStyle style, Str format, Args &&...args) {
+    return text(style, Fmt::format(format, std::forward<Args>(args)...));
 }
 
 template <typename... Args>
@@ -50,54 +65,12 @@ Child icon(Media::Icons icon, double size);
 
 /* --- Image ---------------------------------------------------------------- */
 
-struct Image : public View<Image> {
-    Media::Image image;
-
-    Image(Media::Image image)
-        : image(image) {
-    }
-
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.blit(bound(), image);
-        if (DEBUG)
-            g._rect(bound(), Gfx::CYAN);
-    }
-
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return image.bound().size().cast<int>();
-    }
-};
-
-inline Child image(Media::Image image) {
-    return makeStrong<Image>(image);
-}
+Child image(Media::Image image);
 
 /* --- Canvas --------------------------------------------------------------- */
 
 using OnPaint = Func<void(Gfx::Context &g, Math::Vec2i size)>;
 
-struct Canvas : public View<Canvas> {
-    OnPaint _onPaint;
-
-    Canvas(OnPaint onPaint)
-        : _onPaint(std::move(onPaint)) {}
-
-    void reconcile(Canvas &o) override {
-        _onPaint = std::move(o._onPaint);
-        View<Canvas>::reconcile(o);
-    }
-
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
-        g.clip(_bound);
-        g.origin(_bound.xy);
-        _onPaint(g, _bound.wh);
-        g.restore();
-    }
-};
-
-inline Child canvas(OnPaint onPaint) {
-    return makeStrong<Canvas>(std::move(onPaint));
-}
+Child canvas(OnPaint onPaint);
 
 } // namespace Karm::Ui

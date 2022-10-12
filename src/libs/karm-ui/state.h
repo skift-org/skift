@@ -37,6 +37,11 @@ struct _State : public React<_State<T>> {
     _State(T initial, Func<Child(Wrap)> build)
         : _value(initial), _build(std::move(build)) {}
 
+    void reconcile(_State &o) override {
+        _value = o._value;
+        _build = std::move(o._build);
+    }
+
     Child build() override {
         return _build(Wrap(*this));
     }

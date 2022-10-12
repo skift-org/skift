@@ -6,6 +6,8 @@
 
 namespace Karm::Ui {
 
+struct Grow;
+
 /* --- Empty ---------------------------------------------------------------- */
 
 struct Empty : public View<Empty> {
@@ -22,11 +24,11 @@ struct Empty : public View<Empty> {
     }
 
     void paint(Gfx::Context &g, Math::Recti) override {
-        if (DEBUG) {
+        if (debugShowEmptyBounds) {
             auto b = bound();
-            g._rect(b, Gfx::WHITE.withOpacity(0.05));
-            g._line({b.topStart(), b.bottomEnd()}, Gfx::WHITE.withOpacity(0.05));
-            g._line({b.topEnd(), b.bottomStart()}, Gfx::WHITE.withOpacity(0.05));
+            g._rect(b, Gfx::WHITE.withOpacity(0.01));
+            g._line({b.topStart(), b.bottomEnd()}, Gfx::WHITE.withOpacity(0.01));
+            g._line({b.topEnd(), b.bottomStart()}, Gfx::WHITE.withOpacity(0.01));
         }
     }
 };
@@ -43,6 +45,51 @@ Child cond(bool cond, Child child) {
     }
 }
 
+/* --- Bound ---------------------------------------------------------------- */
+
+struct Bound : public Proxy<Bound> {
+    Math::Recti _bound;
+
+    Bound(Child child)
+        : Proxy(child) {}
+
+    Math::Recti bound() override {
+        return _bound;
+    }
+
+    void layout(Math::Recti bound) override {
+        _bound = bound;
+        child().layout(bound);
+    }
+
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+        return child().size(s, hint);
+    }
+};
+
+Child bound(Child child) {
+    return makeStrong<Bound>(child);
+}
+
+/* --- Separator ------------------------------------------------------------ */
+
+struct Separator : public View<Separator> {
+    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+        return {1};
+    }
+
+    void paint(Gfx::Context &g, Math::Recti) override {
+        g.save();
+        g.fillStyle(Gfx::ZINC700);
+        g.fill(bound());
+        g.restore();
+    }
+};
+
+Child separator() {
+    return makeStrong<Separator>();
+}
+
 /* --- Align ---------------------------------------------------------------- */
 
 struct Align : public Proxy<Align> {
@@ -51,7 +98,7 @@ struct Align : public Proxy<Align> {
     Align(Layout::Align align, Child child) : Proxy(child), _align(align) {}
 
     void layout(Math::Recti bound) override {
-        auto childSize = child().size(bound.size(), Layout::Hint::MIN);
+        auto childSize = child().size(bound.size(), _child.is<Grow>() ? Layout::Hint::MAX : Layout::Hint::MIN);
         child()
             .layout(_align.apply<int>(
                 Layout::Flow::LEFT_TO_RIGHT,
@@ -170,7 +217,7 @@ struct Spacing : public Proxy<Spacing> {
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         child().paint(g, r);
-        if (DEBUG) {
+        if (debugShowLayoutBounds) {
             g._rect(child().bound(), Gfx::LIME);
         }
     }
@@ -207,7 +254,7 @@ struct AspectRatio : public Proxy<AspectRatio> {
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         child().paint(g, r);
-        if (DEBUG) {
+        if (debugShowLayoutBounds) {
             g._rect(child().bound(), Gfx::INDIGO);
         }
     }
@@ -354,6 +401,7 @@ struct Grow : public Proxy<Grow> {
     int _grow;
 
     Grow(Child child) : Proxy(child), _grow(1) {}
+
     Grow(int grow, Child child) : Proxy(child), _grow(grow) {}
 
     int grow() const {

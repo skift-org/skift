@@ -1,7 +1,7 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
-#include <karm-ui/button.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/view.h>
@@ -17,7 +17,7 @@ CliResult entryPoint(CliArgs args) {
         Layout::Align::CENTER,
 
         Ui::icon(Media::Icons::SNOWFLAKE, 72),
-        Ui::text(24, "skiftOS"),
+        Ui::text(Ui::TextStyle::title1(), "skiftOS"),
         Ui::empty(),
         Ui::badge(Ui::BadgeStyle::INFO, "v0.1.0"),
         Ui::empty(),

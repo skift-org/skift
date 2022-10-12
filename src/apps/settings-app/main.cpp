@@ -48,7 +48,6 @@ CliResult entryPoint(CliArgs args) {
                     Ui::button(NONE, Ui::ButtonStyle::subtle(), Media::Icons::MENU),
                     Ui::button(NONE, Ui::ButtonStyle::subtle(), Media::Icons::ARROW_LEFT),
                     Ui::button(NONE, Ui::ButtonStyle::subtle(), Media::Icons::ARROW_RIGHT)),
-                Ui::separator(),
                 Ui::grow(
                     Ui::hflow(
                         sidebar(),

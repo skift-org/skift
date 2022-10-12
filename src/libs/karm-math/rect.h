@@ -208,6 +208,22 @@ union Rect {
     bool hasNan() const {
         return xy.hasNan() || wh.hasNan();
     }
+
+    Cons<Rect, Rect> hsplit(T v) const {
+        return {Rect{x, y, v, height}, Rect{x + v, y, width - v, height}};
+    }
+
+    Cons<Rect, Rect> vsplit(T v) const {
+        return {Rect{x, y, width, v}, Rect{x, y + v, width, height - v}};
+    }
+
+    Rect shrink(Vec2<T> v) const {
+        return {x + v.x, y + v.y, width - v.x * 2, height - v.y * 2};
+    }
+
+    Rect grow(Vec2<T> v) const {
+        return {x - v.x, y - v.y, width + v.x * 2, height + v.y * 2};
+    }
 };
 
 using Recti = Rect<int>;

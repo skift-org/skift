@@ -21,7 +21,7 @@ union Vec2 {
 
     T _els[2];
 
-    constexpr Vec2() : _els{0, 0} {}
+    constexpr Vec2() : _els{} {}
 
     constexpr Vec2(T x, T y) : _els{x, y} {}
 
@@ -154,6 +154,8 @@ Vec2<T> operator/(T const &lhs, Vec2<T> const &rhs) {
 
 using Vec2i = Vec2<int>;
 
+using Vec2u = Vec2<unsigned int>;
+
 using Vec2f = Vec2<double>;
 
 template <typename T>
@@ -182,7 +184,7 @@ union Vec3 {
 
     T _els[3];
 
-    constexpr Vec3() : _els{0, 0, 0} {}
+    constexpr Vec3() : _els{} {}
 
     constexpr Vec3(T x, T y, T z) : _els{x, y, z} {}
 
@@ -301,6 +303,8 @@ constexpr Vec3<T> operator/(T const &lhs, Vec3<T> const &rhs) {
 
 using Vec3i = Vec3<int>;
 
+using Vec3u = Vec3<unsigned int>;
+
 using Vec3f = Vec3<double>;
 
 template <typename T>
@@ -328,9 +332,9 @@ union Vec4 {
         Vec2<T> zw;
     };
 
-    T _els[4]{};
+    T _els[4];
 
-    constexpr Vec4() = default;
+    constexpr Vec4() : _els{} {}
 
     constexpr Vec4(T x, T y, T z, T w) : _els{x, y, z, w} {}
 
@@ -435,6 +439,8 @@ constexpr Vec4<T> operator/(T const &lhs, Vec4<T> const &rhs) {
 }
 
 using Vec4i = Vec4<int>;
+
+using Vec4u = Vec4<unsigned int>;
 
 using Vec4f = Vec4<double>;
 

@@ -13,6 +13,7 @@
 namespace Hjert::Arch {
 
 static x86_64::Com _com1 = x86_64::Com::com1();
+
 static x86_64::DualPic _pic = x86_64::DualPic::dualPic();
 static x86_64::Pit _pit = x86_64::Pit::pit();
 
@@ -21,6 +22,8 @@ static x86_64::GdtDesc _gdtDesc{_gdt};
 
 static x86_64::Idt _idt{};
 static x86_64::IdtDesc _idtDesc{_idt};
+
+static uint64_t _tick = 0;
 
 Error init() {
     _com1.init();
@@ -34,7 +37,7 @@ Error init() {
     _idtDesc.load();
 
     _pic.init();
-    _pit.init(100);
+    _pit.init(1000);
 
     x86_64::sti();
 
@@ -105,7 +108,16 @@ extern "C" uintptr_t _intDispatch(uintptr_t rsp) {
     if (frame->intNo < 32) {
         Debug::lpanic("{}: err:{} ip:{x} sp:{x} cr2:{x} cr3:{x}", _faultMsg[frame->intNo], frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
     } else {
-        Debug::linfo("irq: {}", frame->intNo - 32);
+        int irq = frame->intNo - 32;
+
+        if (irq == 0) {
+            _tick++;
+            if (_tick % 1000 == 0) {
+                Debug::linfo("tick: {}", _tick);
+            }
+        } else {
+            Debug::linfo("irq: {}", irq);
+        }
     }
 
     _pic.ack(frame->intNo);

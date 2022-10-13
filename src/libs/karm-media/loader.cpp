@@ -2,6 +2,7 @@
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 #include <png/spec.h>
+#include <qoi/spec.h>
 
 #include "font-ttf.h"
 #include "loader.h"
@@ -22,9 +23,11 @@ Result<Font> loadFont(double size, Str path) {
 Result<Image> loadImage(Str path) {
     auto file = try$(Sys::File::open(path));
     auto map = try$(Sys::mmap().map(file));
-    try$(Png::Image::load(map.bytes()));
+    auto qoiImage = try$(Qoi::Image::load(map.bytes()));
 
-    return Error::NOT_IMPLEMENTED;
+    Image image{Gfx::RGBA8888, {qoiImage.width(), qoiImage.height()}};
+    try$(qoiImage.decode(image));
+    return image;
 }
 
 } // namespace Karm::Media

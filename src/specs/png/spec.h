@@ -72,13 +72,13 @@ struct Image {
         Image image{slice};
 
         if (!Op::eq(image.sig(), bytes(SIG)))
-            return Error("Invalid signature");
+            return Error("invalid signature");
 
         image._ihdr = image.lookupChunk<Ihdr>();
         image._plte = image.lookupChunk<Plte>();
         image._idat = image.lookupChunk<Idat>();
 
-        Debug::ldebug("Image size: {}", image._ihdr.size());
+        Debug::ldebug("image size: {}", image._ihdr.size());
 
         return image;
     }

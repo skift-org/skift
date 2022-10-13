@@ -1,0 +1,9 @@
+{
+    "id": "shell-app",
+    "type": "exe",
+    "description": "The hideo shell",
+    "deps": [
+        "karm-main",
+        "karm-ui"
+    ]
+}

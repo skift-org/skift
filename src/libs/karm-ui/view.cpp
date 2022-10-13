@@ -133,8 +133,14 @@ struct Text : public View<Text> {
     }
 
     void paint(Gfx::Context &g, Math::Recti) override {
+        g.save();
+
         auto m = mesure();
         auto baseline = bound().topStart() + m.baseline.cast<int>();
+
+        if (_style.color) {
+            g.fillStyle(*_style.color);
+        }
 
         g.textFont(_style.font);
         g.fill(baseline, _text);
@@ -148,6 +154,8 @@ struct Text : public View<Text> {
                 Gfx::PINK);
             g._rect(bound(), Gfx::CYAN);
         }
+
+        g.restore();
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {

@@ -23,10 +23,17 @@ struct View : public Widget<Crtp> {
 
 struct TextStyle {
     Media::Font font;
+    Opt<Gfx::Color> color;
 
     TextStyle withSize(int size) {
         TextStyle style = *this;
         style.font._size = size;
+        return style;
+    }
+
+    TextStyle withColor(Gfx::Color color) {
+        TextStyle style = *this;
+        style.color = color;
         return style;
     }
 

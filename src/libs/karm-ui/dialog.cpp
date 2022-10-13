@@ -75,8 +75,10 @@ struct DialogLayer : public Widget<DialogLayer> {
     void paint(Gfx::Context &g, Math::Recti r) override {
         child().paint(g, r);
         if (visible()) {
-            g.fillStyle(Gfx::ZINC900.withOpacity(0.9));
+            g.save();
+            g.fillStyle(Gfx::BLACK.withOpacity(0.75));
             g.fill(bound());
+            g.restore();
             dialog().paint(g, r);
         }
     }

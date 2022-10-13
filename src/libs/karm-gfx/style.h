@@ -7,6 +7,27 @@
 
 namespace Karm::Gfx {
 
+/* --- Border Style -------------------------------------------------------- */
+
+struct BorderRadius {
+    double topLeft{};
+    double topRight{};
+    double bottomRight{};
+    double bottomLeft{};
+
+    bool zero() const {
+        return topLeft == 0 && topRight == 0 && bottomRight == 0 && bottomLeft == 0;
+    }
+
+    BorderRadius() = default;
+
+    BorderRadius(float radius)
+        : topLeft(radius), topRight(radius), bottomRight(radius), bottomLeft(radius) {}
+
+    BorderRadius(float topLeft, float topRight, float bottomRight, float bottomLeft)
+        : topLeft(topLeft), topRight(topRight), bottomRight(bottomRight), bottomLeft(bottomLeft) {}
+};
+
 /* ---- Fill Style ---------------------------------------------------------- */
 
 enum struct FillRule {

@@ -9,7 +9,7 @@ struct BoxStyle {
     Layout::Spacingi margin{};
     Layout::Spacingi padding{};
 
-    double borderRadius{};
+    Gfx::BorderRadius borderRadius{};
     double borderWidth{};
 
     Gfx::Color borderColor{Gfx::ALPHA};
@@ -28,7 +28,7 @@ struct BoxStyle {
         return copy;
     }
 
-    BoxStyle withRadius(double borderRadius) const {
+    BoxStyle withRadius(Gfx::BorderRadius borderRadius) const {
         auto copy = *this;
         copy.borderRadius = borderRadius;
         return copy;
@@ -36,7 +36,6 @@ struct BoxStyle {
 
     void paint(Gfx::Context &g, Math::Recti bound, auto inner) {
         g.save();
-
         if (backgroundColor.alpha) {
             g.fillStyle(backgroundColor);
             g.fill(bound, borderRadius);
@@ -112,6 +111,5 @@ struct Box : public _Box<Box> {
 inline Child box(BoxStyle style, Child child) {
     return makeStrong<Box>(style, child);
 }
-
 
 } // namespace Karm::Ui

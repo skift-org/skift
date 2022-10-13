@@ -163,14 +163,19 @@ void Context::clear(Math::Recti rect, Color color) {
 /* --- Blitting ------------------------------------------------------------- */
 
 void Context::blit(Math::Recti src, Math::Recti dest, Surface surface) {
+    dest = applyOrigin(dest);
     auto clipDest = applyAll(dest);
 
     for (int y = 0; y < clipDest.height; ++y) {
-        auto srcY = src.y + y * src.height / clipDest.height;
+        int yy = clipDest.y - dest.y + y;
+
+        auto srcY = src.y + yy * src.height / dest.height;
         auto destY = clipDest.y + y;
 
         for (int x = 0; x < clipDest.width; ++x) {
-            auto srcX = src.x + x * src.width / clipDest.width;
+            int xx = clipDest.x - dest.x + x;
+
+            auto srcX = src.x + xx * src.width / dest.width;
             auto destX = clipDest.x + x;
 
             auto color = surface.load({srcX, srcY});
@@ -214,14 +219,14 @@ void Context::fill(Math::Edgei edge, double thickness) {
     stroke(StrokeStyle().withWidth(thickness));
 }
 
-void Context::stroke(Math::Recti r, int radius) {
+void Context::stroke(Math::Recti r, BorderRadius radius) {
     begin();
     rect(r.cast<double>(), radius);
     stroke();
 }
 
-void Context::fill(Math::Recti r, int radius) {
-    if (radius == 0 && current().trans.isIdentity()) {
+void Context::fill(Math::Recti r, BorderRadius radius) {
+    if (radius.zero() && current().trans.isIdentity()) {
         r = applyAll(r);
         _surface->blendRect(r, fillStyle().color);
     } else {
@@ -418,11 +423,17 @@ void Context::_trace() {
                     continue;
                 }
 
-                _scanline[x1] += (ceil(x1) - x1) * UNIT;
-                _scanline[x2] += (x2 - floor(x2)) * UNIT;
+                // Are x1 and x2 on the same pixel?
+                if (Math::floor(x1) == Math::floor(x2)) {
+                    double x = Math::floor(x1);
+                    _scanline[x] += x2 - x1;
+                } else {
+                    _scanline[x1] += (ceil(x1) - x1) * UNIT;
+                    _scanline[x2] += (x2 - floor(x2)) * UNIT;
 
-                for (int x = ceil(x1); x < floor(x2); x++) {
-                    _scanline[x] += UNIT;
+                    for (int x = ceil(x1); x < floor(x2); x++) {
+                        _scanline[x] += UNIT;
+                    }
                 }
             }
         }
@@ -475,7 +486,7 @@ void Context::line(Math::Edgef line) {
     _path.line(line);
 }
 
-void Context::rect(Math::Rectf rect, int radius) {
+void Context::rect(Math::Rectf rect, BorderRadius radius) {
     _path.rect(rect, radius);
 }
 

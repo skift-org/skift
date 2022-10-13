@@ -127,9 +127,9 @@ struct Context {
 
     void fill(Math::Edgei edge, double thickness = 1.0f);
 
-    void stroke(Math::Recti rect, int radius = 0);
+    void stroke(Math::Recti rect, BorderRadius radius = 0);
 
-    void fill(Math::Recti rect, int radius = 0);
+    void fill(Math::Recti rect, BorderRadius radius = 0);
 
     void stroke(Math::Ellipsei e);
 
@@ -185,7 +185,7 @@ struct Context {
 
     void line(Math::Edgef line);
 
-    void rect(Math::Rectf rect, int radius = 0);
+    void rect(Math::Rectf rect, BorderRadius radius = 0);
 
     void ellipse(Math::Ellipsef ellipse);
 

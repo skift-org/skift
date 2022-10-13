@@ -131,9 +131,9 @@ union Rect {
     }
 
     constexpr Rect cover(Rect<T> const &r) const {
-        auto scale = (r.size() / size().template cast<double>()).max();
+        double scale = (r.size() / size().template cast<double>()).max();
         Rect result{0, 0, static_cast<T>(width * scale), static_cast<T>(height * scale)};
-        result.xy = center() - result.center();
+        result.xy = r.center() - result.center();
         return result;
     }
 

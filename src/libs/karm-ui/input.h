@@ -102,7 +102,7 @@ struct ButtonStyle {
 
     static ButtonStyle destructive();
 
-    ButtonStyle withRadius(float radius) const;
+    ButtonStyle withRadius(Gfx::BorderRadius radius) const;
 };
 
 using OnPress = Opt<Func<void(Node &)>>;

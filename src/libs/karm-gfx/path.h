@@ -3,6 +3,7 @@
 #include <karm-base/enum.h>
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
+#include <karm-gfx/style.h>
 #include <karm-math/const.h>
 #include <karm-math/edge.h>
 #include <karm-math/ellipse.h>
@@ -167,7 +168,7 @@ struct Path {
 
     void line(Math::Edgef edge);
 
-    void rect(Math::Rectf rect, int radius = 0);
+    void rect(Math::Rectf rect, BorderRadius radius = 0);
 
     void ellipse(Math::Ellipsef ellipse);
 

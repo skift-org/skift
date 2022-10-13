@@ -128,7 +128,7 @@ ButtonStyle ButtonStyle::destructive() {
     };
 }
 
-ButtonStyle ButtonStyle::withRadius(float radius) const {
+ButtonStyle ButtonStyle::withRadius(Gfx::BorderRadius radius) const {
     return {
         idleStyle.withRadius(radius),
         hoverStyle.withRadius(radius),
@@ -320,7 +320,7 @@ struct Checkbox : public View<Checkbox> {
             g.fill(bound(), 4);
 
             g.fillStyle(Gfx::WHITE);
-            g.fill(bound().topStart(), Media::Icon{Media::Icons::CHECK, 26});
+            g.fill(bound().topStart(), Media::Icon{Media::Icons::CHECK_BOLD, 26});
 
             if (_mouseListener.isPress()) {
                 g.strokeStyle(Gfx::stroke(Gfx::BLUE600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));

@@ -9,18 +9,6 @@
 
 /* --- Common --------------------------------------------------------------- */
 
-Ui::Child handle() {
-    return Ui::minSize(
-        {Ui::UNCONSTRAINED, 48},
-        Ui::center(
-            Ui::box(
-                Ui::BoxStyle{
-                    .borderRadius = 999,
-                    .backgroundColor = Gfx::WHITE,
-                },
-                Ui::empty({128, 8}))));
-}
-
 Ui::Child handleButton(Ui::OnPress onPress) {
     return Ui::minSize(
         {Ui::UNCONSTRAINED, 48},
@@ -34,7 +22,7 @@ Ui::Child handleButton(Ui::OnPress onPress) {
                                     .borderRadius = 999,
                                     .backgroundColor = Gfx::WHITE,
                                 },
-                                Ui::empty({128, 8}))))));
+                                Ui::empty({128, 4}))))));
 }
 
 /* --- Status Bar ----------------------------------------------------------- */
@@ -166,7 +154,7 @@ Ui::Child searchInput() {
                     Ui::spacing(
                         {12, 8},
                         Ui::hflow(
-                            Ui::grow(Ui::vcenter(Ui::text(Ui::TextStyle::label().withSize(18), "Search"))),
+                            Ui::grow(Ui::vcenter(Ui::text(Ui::TextStyle::label().withSize(18), "Search..."))),
                             Ui::center(Ui::icon(Media::Icons::MAGNIFY, 24))))));
 }
 
@@ -188,7 +176,7 @@ Ui::Child appRow(Media::Icons icon, Gfx::ColorRamp colors, String title) {
         Ui::hflow(
             12,
             appIcon(icon, colors),
-            Ui::center(Ui::text(Ui::TextStyle::label().withSize(18), title))));
+            Ui::center(Ui::text(Ui::TextStyle::label().withSize(16), title))));
 }
 
 Ui::Child applications() {

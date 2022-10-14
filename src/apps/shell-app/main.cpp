@@ -7,6 +7,11 @@
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
+struct AppIcon {
+    Media::Icons icon;
+    Gfx::ColorRamp color;
+};
+
 /* --- Common --------------------------------------------------------------- */
 
 Ui::Child handleButton(Ui::OnPress onPress) {
@@ -62,16 +67,24 @@ Ui::Child statusbarButton() {
 /* --- System Tray ---------------------------------------------------------- */
 
 Ui::Child quickSetting(Media::Icons icon) {
-    return Ui::center(
-        Ui::button(
-            [](Ui::Node &) {
+    return Ui::center(Ui::state<bool>(false, [icon](auto state) {
+        return Ui::button(
+            [state](Ui::Node &) mutable {
+                state.update(!state.value());
             },
-            Ui::ButtonStyle::subtle().withRadius(99),
-            Ui::minSize(48, Ui::center(Ui::icon(icon, 26)))));
+            (state.value()
+                 ? Ui::ButtonStyle::primary().withForegroundColor(Gfx::WHITE)
+                 : Ui::ButtonStyle::secondary().withForegroundColor(Gfx::ZINC300))
+                .withRadius(99),
+            Ui::minSize(48, Ui::center(Ui::icon(icon, 26))));
+    }));
 }
 
 Ui::Child quickSettings() {
-    return Ui::card(
+    return Ui::box(
+        Ui::BoxStyle{
+            .backgroundColor = Gfx::ZINC800,
+        },
         Ui::spacing(
             8,
             Ui::hflow(
@@ -84,34 +97,45 @@ Ui::Child quickSettings() {
                 Ui::grow(Ui::align(Layout::Align::END | Layout::Align::VFILL, quickSetting(Media::Icons::CHEVRON_DOWN))))));
 }
 
-Ui::Child notification(Media::Icons icon, String title, String subtitle) {
-    return Ui::card(
+Ui::Child notiWrapper(AppIcon app, String sumary, Ui::Child inner) {
+    return Ui::vflow(
         Ui::spacing(
-            {12, 8, 12, 8},
+            12,
             Ui::vflow(
                 8,
                 Ui::hflow(
-                    8,
-                    Ui::center(Ui::icon(icon)),
-                    Ui::vflow(
-                        4,
-                        Ui::text(Ui::TextStyle::bold(), title),
-                        Ui::text(Ui::TextStyle::body(), subtitle))))));
+                    4,
+                    Ui::box(Ui::BoxStyle{.foregroundColor = app.color[4]},
+                            Ui::icon(app.icon, 12)),
+                    Ui::text(Ui::TextStyle::regular().withColor(Gfx::ZINC400), sumary)),
+                inner)),
+        Ui::separator());
+}
+
+Ui::Child notiMsg(String title, String body) {
+    return Ui::vflow(
+        6,
+        Ui::hflow(Ui::text(Ui::TextStyle::bold(), title)),
+        Ui::text(Ui::TextStyle::regular(), body));
+}
+
+Ui::Child notification(Media::Icons icon, String title, String subtitle) {
+    return notiWrapper({icon, Gfx::BLUE_RAMP}, "Hello, world • 12:00 PM", notiMsg(title, subtitle));
 }
 
 Ui::Child notifications() {
     return Ui::vflow(
-        8,
-        Ui::hflow(
-            Ui::spacing(
-                {12, 0},
-                Ui::center(Ui::text(Ui::TextStyle::label(), "Notifications"))),
-            Ui::grow(),
-            Ui::button(
-                [](Ui::Node &) {
-                },
-                Ui::ButtonStyle::subtle(),
-                "Clear All")),
+        Ui::spacing(
+            {12, 0},
+            Ui::hflow(
+
+                Ui::center(Ui::text(Ui::TextStyle::label(), "Notifications")),
+                Ui::grow(),
+                Ui::button(
+                    [](Ui::Node &) {
+                    },
+                    Ui::ButtonStyle::subtle(),
+                    "Clear All"))),
         notification(Media::Icons::HAND_WAVE, "Hello", "Hello, world!"),
         notification(Media::Icons::HAND_WAVE, "Hello", "Hello, world!"),
         notification(Media::Icons::HAND_WAVE, "Hello", "Hello, world!"));
@@ -130,13 +154,12 @@ Ui::Child systemTray() {
                     .borderRadius = {0, 0, 16, 16},
                     .backgroundColor = Gfx::ZINC900,
                 },
-                Ui::spacing(
-                    {12, 8, 12, 0},
-                    Ui::vflow(
-                        8,
-                        quickSettings(),
-                        Ui::grow(notifications()),
-                        handleButton(Ui::closeDialog))))),
+
+                Ui::vflow(
+                    8,
+                    quickSettings(),
+                    Ui::grow(notifications()),
+                    handleButton(Ui::closeDialog)))),
         Ui::empty(16));
 }
 
@@ -166,8 +189,8 @@ Ui::Child appIcon(Media::Icons icon, Gfx::ColorRamp colors) {
             .foregroundColor = colors[6],
         },
         Ui::center(
-            Ui::spacing(12,
-                        Ui::icon(icon, 18))));
+            Ui::spacing(8,
+                        Ui::icon(icon, 22))));
 }
 
 Ui::Child appRow(Media::Icons icon, Gfx::ColorRamp colors, String title) {
@@ -179,7 +202,7 @@ Ui::Child appRow(Media::Icons icon, Gfx::ColorRamp colors, String title) {
             Ui::center(Ui::text(Ui::TextStyle::label().withSize(16), title))));
 }
 
-Ui::Child applications() {
+Ui::Child apps(Ui::Children apps) {
     return Ui::grow(
         Ui::vflow(
             searchInput(),
@@ -188,26 +211,26 @@ Ui::Child applications() {
                     Ui::spacing(
                         {0, 12},
                         Ui::vflow(
-                            appRow(Media::Icons::CALCULATOR, Gfx::ORANGE_RAMP, "Calculator"),
-                            appRow(Media::Icons::CALENDAR, Gfx::PURPLE_RAMP, "Calendar"),
-                            appRow(Media::Icons::CAMERA, Gfx::TEAL_RAMP, "Camera"),
-                            appRow(Media::Icons::CLOCK, Gfx::RED_RAMP, "Clock"),
-                            appRow(Media::Icons::COG, Gfx::LIME_RAMP, "Settings"),
-                            appRow(Media::Icons::EMAIL, Gfx::BLUE_RAMP, "Email"),
-                            appRow(Media::Icons::FACEBOOK, Gfx::PURPLE_RAMP, "Facebook"),
-                            appRow(Media::Icons::FILE, Gfx::ORANGE_RAMP, "Files"),
-                            appRow(Media::Icons::FORMAT_FONT, Gfx::YELLOW_RAMP, "Text Editor"),
-                            appRow(Media::Icons::GLOBE_LIGHT, Gfx::LIME_RAMP, "Browser"),
-                            appRow(Media::Icons::HAND_WAVE, Gfx::BLUE_RAMP, "Hello World"),
-                            appRow(Media::Icons::INSTAGRAM, Gfx::YELLOW_RAMP, "Instagram"),
-                            appRow(Media::Icons::MAP_MARKER_OUTLINE, Gfx::PINK_RAMP, "Maps"),
-                            appRow(Media::Icons::MUSIC, Gfx::YELLOW_RAMP, "Music"),
-                            appRow(Media::Icons::PHONE, Gfx::BLUE_RAMP, "Phone"),
-                            appRow(Media::Icons::TWITTER, Gfx::RED_RAMP, "Twitter"),
-                            appRow(Media::Icons::YOUTUBE, Gfx::PINK_RAMP, "YouTube")))))));
+                            apps))))));
 }
 
 Ui::Child appDrawer() {
+    Ui::Children appItems = {
+        appRow(Media::Icons::CALCULATOR, Gfx::ORANGE_RAMP, "Calculator"),
+        appRow(Media::Icons::CALENDAR, Gfx::PURPLE_RAMP, "Calendar"),
+        appRow(Media::Icons::CAMERA, Gfx::TEAL_RAMP, "Camera"),
+        appRow(Media::Icons::CLOCK, Gfx::RED_RAMP, "Clock"),
+        appRow(Media::Icons::COG, Gfx::LIME_RAMP, "Settings"),
+        appRow(Media::Icons::EMAIL, Gfx::BLUE_RAMP, "Email"),
+        appRow(Media::Icons::FILE, Gfx::ORANGE_RAMP, "Files"),
+        appRow(Media::Icons::FORMAT_FONT, Gfx::YELLOW_RAMP, "Text Editor"),
+        appRow(Media::Icons::WEB, Gfx::LIME_RAMP, "Browser"),
+        appRow(Media::Icons::HAND_WAVE, Gfx::BLUE_RAMP, "Hello World"),
+        appRow(Media::Icons::MAP_MARKER_OUTLINE, Gfx::PINK_RAMP, "Maps"),
+        appRow(Media::Icons::MUSIC, Gfx::YELLOW_RAMP, "Music"),
+        appRow(Media::Icons::PHONE, Gfx::BLUE_RAMP, "Phone"),
+    };
+
     return Ui::vflow(
         statusbar(),
         Ui::empty(24),
@@ -219,7 +242,7 @@ Ui::Child appDrawer() {
                 },
                 Ui::vflow(
                     handleButton(Ui::closeDialog),
-                    Ui::grow(Ui::spacing({12, 0}, applications()))))));
+                    Ui::grow(Ui::spacing({12, 0}, apps(appItems)))))));
 }
 
 /* --- Navigation Bar ------------------------------------------------------- */

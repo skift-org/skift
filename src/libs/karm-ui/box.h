@@ -34,6 +34,30 @@ struct BoxStyle {
         return copy;
     }
 
+    BoxStyle withBorderWidth(double borderWidth) const {
+        auto copy = *this;
+        copy.borderWidth = borderWidth;
+        return copy;
+    }
+
+    BoxStyle withBorderColor(Gfx::Color borderColor) const {
+        auto copy = *this;
+        copy.borderColor = borderColor;
+        return copy;
+    }
+
+    BoxStyle withBackgroundColor(Gfx::Color backgroundColor) const {
+        auto copy = *this;
+        copy.backgroundColor = backgroundColor;
+        return copy;
+    }
+
+    BoxStyle withForegroundColor(Gfx::Color foregroundColor) const {
+        auto copy = *this;
+        copy.foregroundColor = foregroundColor;
+        return copy;
+    }
+
     void paint(Gfx::Context &g, Math::Recti bound, auto inner) {
         g.save();
         if (backgroundColor.alpha) {

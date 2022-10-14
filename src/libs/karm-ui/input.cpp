@@ -32,18 +32,18 @@ ButtonStyle ButtonStyle::secondary() {
     return {
         .idleStyle = {
             .borderRadius = RADIUS,
-            .backgroundColor = Gfx::ZINC800,
+            .backgroundColor = Gfx::ZINC700,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundColor = Gfx::ZINC700,
+            .backgroundColor = Gfx::ZINC600,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
             .borderColor = Gfx::ZINC700,
-            .backgroundColor = Gfx::ZINC800,
+            .backgroundColor = Gfx::ZINC700,
         },
     };
 }
@@ -133,6 +133,14 @@ ButtonStyle ButtonStyle::withRadius(Gfx::BorderRadius radius) const {
         idleStyle.withRadius(radius),
         hoverStyle.withRadius(radius),
         pressStyle.withRadius(radius),
+    };
+}
+
+ButtonStyle ButtonStyle::withForegroundColor(Gfx::Color color) const {
+    return {
+        idleStyle.withForegroundColor(color),
+        hoverStyle.withForegroundColor(color),
+        pressStyle.withForegroundColor(color),
     };
 }
 

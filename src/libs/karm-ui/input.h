@@ -103,6 +103,8 @@ struct ButtonStyle {
     static ButtonStyle destructive();
 
     ButtonStyle withRadius(Gfx::BorderRadius radius) const;
+
+    ButtonStyle withForegroundColor(Gfx::Color color) const;
 };
 
 using OnPress = Opt<Func<void(Node &)>>;

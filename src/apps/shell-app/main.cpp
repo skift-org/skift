@@ -1,26 +1,47 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/drag.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
+#include <karm-ui/reducer.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
-struct AppIcon {
+/* --- Model ---------------------------------------------------------------- */
+
+struct App {
     Media::Icons icon;
     Gfx::ColorRamp color;
+    String name;
 };
+
+struct State {
+    bool locked = true;
+};
+
+struct UnlockAction {};
+
+using Actions = Var<UnlockAction>;
+
+State reduce(State state, Actions action) {
+    return action.visit(Visitor{
+        [&](UnlockAction) {
+            state.locked = false;
+            return state;
+        }});
+}
+
+using Model = Ui::Model<State, Actions>;
 
 /* --- Common --------------------------------------------------------------- */
 
-Ui::Child handleButton(Ui::OnPress onPress) {
-    return Ui::minSize(
-        {Ui::UNCONSTRAINED, 48},
-        Ui::center(
-            Ui::button(
-                std::move(onPress),
-                Ui::ButtonStyle::subtle().withRadius(99),
+Ui::Child handle() {
+    return Ui::dragRegion(
+        Ui::minSize(
+            {Ui::UNCONSTRAINED, 48},
+            Ui::center(
                 Ui::spacing(12,
                             Ui::box(
                                 Ui::BoxStyle{
@@ -28,6 +49,21 @@ Ui::Child handleButton(Ui::OnPress onPress) {
                                     .backgroundColor = Gfx::WHITE,
                                 },
                                 Ui::empty({128, 4}))))));
+}
+
+Ui::Child handleButton(Ui::OnPress press) {
+    return Ui::button(
+        std::move(press),
+        Ui::ButtonStyle{
+            .pressStyle = {
+                .borderWidth = 1,
+                .borderColor = Gfx::WHITE,
+            }},
+        Ui::minSize({Ui::UNCONSTRAINED, 48}, Ui::center(Ui::spacing(12, Ui::box(Ui::BoxStyle{
+                                                                                    .borderRadius = 999,
+                                                                                    .backgroundColor = Gfx::WHITE,
+                                                                                },
+                                                                                Ui::empty({128, 4}))))));
 }
 
 /* --- Status Bar ----------------------------------------------------------- */
@@ -97,7 +133,7 @@ Ui::Child quickSettings() {
                 Ui::grow(Ui::align(Layout::Align::END | Layout::Align::VFILL, quickSetting(Media::Icons::CHEVRON_DOWN))))));
 }
 
-Ui::Child notiWrapper(AppIcon app, String sumary, Ui::Child inner) {
+Ui::Child notiWrapper(App app, Ui::Child inner) {
     return Ui::vflow(
         Ui::spacing(
             12,
@@ -107,7 +143,7 @@ Ui::Child notiWrapper(AppIcon app, String sumary, Ui::Child inner) {
                     4,
                     Ui::box(Ui::BoxStyle{.foregroundColor = app.color[4]},
                             Ui::icon(app.icon, 12)),
-                    Ui::text(Ui::TextStyle::regular().withColor(Gfx::ZINC400), sumary)),
+                    Ui::text(Ui::TextStyle::regular().withColor(Gfx::ZINC400), app.name)),
                 inner)),
         Ui::separator());
 }
@@ -120,7 +156,7 @@ Ui::Child notiMsg(String title, String body) {
 }
 
 Ui::Child notification(Media::Icons icon, String title, String subtitle) {
-    return notiWrapper({icon, Gfx::BLUE_RAMP}, "Hello, world • 12:00 PM", notiMsg(title, subtitle));
+    return notiWrapper({icon, Gfx::BLUE_RAMP, "Hello, world"}, notiMsg(title, subtitle));
 }
 
 Ui::Child notifications() {
@@ -141,25 +177,20 @@ Ui::Child notifications() {
         notification(Media::Icons::HAND_WAVE, "Hello", "Hello, world!"));
 }
 
-Ui::Child systemTrayHandle() {
-    return handleButton(Ui::closeDialog);
-}
-
 Ui::Child systemTray() {
     return Ui::vflow(
         statusbar(),
         Ui::grow(
-            Ui::box(
-                Ui::BoxStyle{
-                    .borderRadius = {0, 0, 16, 16},
-                    .backgroundColor = Gfx::ZINC900,
-                },
+            Ui::dismisable(
+                Ui::closeDialog,
+                Ui::DismisDir::TOP,
+                0.3,
+                Ui::box(Ui::BoxStyle{
+                            .borderRadius = {0, 0, 16, 16},
+                            .backgroundColor = Gfx::ZINC900,
+                        },
 
-                Ui::vflow(
-                    8,
-                    quickSettings(),
-                    Ui::grow(notifications()),
-                    handleButton(Ui::closeDialog)))),
+                        Ui::vflow(8, quickSettings(), Ui::grow(notifications()), handle())))),
         Ui::empty(16));
 }
 
@@ -235,14 +266,15 @@ Ui::Child appDrawer() {
         statusbar(),
         Ui::empty(24),
         Ui::grow(
-            Ui::box(
-                Ui::BoxStyle{
-                    .borderRadius = {16, 16, 16, 16},
-                    .backgroundColor = Gfx::ZINC900,
-                },
-                Ui::vflow(
-                    handleButton(Ui::closeDialog),
-                    Ui::grow(Ui::spacing({12, 0}, apps(appItems)))))));
+            Ui::dismisable(Ui::closeDialog, Ui::DismisDir::DOWN, 0.3,
+                           Ui::box(
+                               Ui::BoxStyle{
+                                   .borderRadius = {16, 16, 16, 16},
+                                   .backgroundColor = Gfx::ZINC900,
+                               },
+                               Ui::vflow(
+                                   handle(),
+                                   Ui::grow(Ui::spacing({12, 0}, apps(appItems))))))));
 }
 
 /* --- Navigation Bar ------------------------------------------------------- */
@@ -256,7 +288,7 @@ Ui::Child navbar() {
 
 /* --- Home Screen ---------------------------------------------------------- */
 
-Ui::Child homescreen() {
+Ui::Child clock() {
     return Ui::spacing(
         {48, 64},
         Ui::vflow(
@@ -265,18 +297,50 @@ Ui::Child homescreen() {
             Ui::text(Ui::TextStyle::bold().withSize(26).withColor(Gfx::ZINC900), "Wed. 12 October")));
 }
 
-CliResult entryPoint(CliArgs args) {
-    auto background = Ui::align(Layout::Align::COVER, Ui::image(try$(Media::loadImage("res/images/wallpapers/nys-museum.qoi"))));
-
-    auto forground = Ui::vflow(
+Ui::Child homeScreen() {
+    return Ui::vflow(
         statusbarButton(),
-        Ui::grow(homescreen()),
+        Ui::grow(clock()),
         navbar());
+}
 
-    return Ui::runApp(
-        args,
-        Ui::dialogLayer(
+/* --- Lockscreen ----------------------------------------------------------- */
+
+Ui::Child lockscreen() {
+    return Ui::box(
+        Ui::BoxStyle{
+            .backgroundColor = Gfx::BLACK.withOpacity(0.5),
+        },
+        Ui::vflow(
+            statusbar(),
+            Ui::grow(
+                Ui::dismisable(
+                    Model::bind<UnlockAction>(),
+                    Ui::DismisDir::TOP,
+                    0.3,
+                    Ui::dragRegion(
+                        Ui::spacing(
+                            {48, 64},
+                            Ui::vflow(
+                                Ui::text(Ui::TextStyle::bold().withSize(48), "22:07"),
+                                Ui::text(Ui::TextStyle::bold().withSize(26), "Wed. 12 October"),
+                                Ui::grow(),
+                                Ui::vflow(
+                                    Ui::center(Ui::icon(Media::Icons::CHEVRON_UP, 48)),
+                                    Ui::center(Ui::text(Ui::TextStyle::regular().withSize(16), "Swipe up to unlock"))))))))));
+}
+
+Ui::Child app() {
+    return Ui::reducer<Model>({}, reduce, [](auto state) {
+        auto background = Ui::align(Layout::Align::COVER, Ui::image(Media::loadImage("res/images/wallpapers/nys-museum.qoi").unwrap()));
+        return Ui::dialogLayer(
             Ui::pinSize(
                 {411, 731},
-                Ui::stack(background, forground))));
+                Ui::stack(background, state.locked ? lockscreen() : homeScreen())));
+    });
+}
+
+CliResult entryPoint(CliArgs args) {
+    return Ui::runApp(
+        args, app());
 }

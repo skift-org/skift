@@ -98,9 +98,9 @@ struct Host : public Node {
         while (!_error) {
             wait(_shouldAnimate ? 16 : -1);
             if (_shouldAnimate) {
+                _shouldAnimate = false;
                 Events::AnimateEvent e;
                 event(e);
-                _shouldAnimate = false;
             }
 
             pump();

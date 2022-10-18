@@ -1,16 +1,21 @@
 #pragma once
 
-#include "funcs.h"
+#include "anim.h"
 #include "proxy.h"
 
 namespace Karm::Ui {
 
-/* --- Draggable ------------------------------------------------------------ */
+/* --- Drag Event ----------------------------------------------------------- */
 
-struct Dragable {
-    virtual ~Dragable() = default;
+struct DragEvent : public Events::_Event<DragEvent, 0x8614c312b36a0215> {
+    enum _Type : uint8_t {
+        START,
+        DRAG,
+        END
+    };
 
-    virtual void drag(Math::Vec2i delta) = 0;
+    _Type type;
+    Math::Vec2i delta;
 };
 
 /* --- Dismisable ----------------------------------------------------------- */
@@ -30,79 +35,78 @@ FlagsEnum$(DismisDir);
 using OnDismis = Func<void(Node &)>;
 
 struct Dismisable :
-    public Proxy<Dismisable>,
-    public Dragable {
+    public Proxy<Dismisable> {
 
     OnDismis _onDismis;
     DismisDir _dir;
     double _threshold;
-    Math::Vec2i _drag{};
+    Anim2<double> _drag{};
     bool _dismissed{};
     bool _animated{};
 
     Dismisable(OnDismis onDismis, DismisDir dir, double threshold, Ui::Child child)
         : Proxy(child), _onDismis(std::move(onDismis)), _dir(dir), _threshold(threshold) {}
 
-    void drag(Math::Vec2i delta) override {
-        auto d = _drag + delta;
-
-        d.x = clamp(
-            d.x,
-            (bool)(_dir & DismisDir::LEFT) ? -bound().width : 0,
-            (bool)(_dir & DismisDir::RIGHT) ? bound().width : 0);
-
-        d.y = clamp(
-            d.y,
-            (bool)(_dir & DismisDir::TOP) ? -bound().height : 0,
-            (bool)(_dir & DismisDir::DOWN) ? bound().height : 0);
-
-        _drag = d;
-
-        if (_dismissed)
-            return;
-
-        if ((bool)(_dir & DismisDir::HORIZONTAL)) {
-            if (std::abs(_drag.x) / (double)bound().width > _threshold) {
-                _dismissed = true;
-                _onDismis(child());
-            }
-        }
-        if ((bool)(_dir & DismisDir::VERTICAL)) {
-            if (std::abs(_drag.y) / (double)bound().height > _threshold) {
-                _dismissed = true;
-                _onDismis(child());
-            }
-        }
-
-        _animated = true;
-        Ui::shouldAnimate(*this);
-    }
-
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
 
+        auto dragi = _drag.value().cast<int>();
+
         g.clip(bound());
-        g.origin(_drag);
-        r.xy = r.xy - _drag;
+        g.origin(dragi);
+        r.xy = r.xy - dragi;
         child().paint(g, r);
 
         g.restore();
     }
 
     void event(Events::Event &e) override {
-        if (e.is<Events::AnimateEvent>() && _animated) {
-            shouldRepaint(*parent(), bound());
-            _animated = false;
-        } else {
-            Ui::Proxy<Dismisable>::event(e);
+        _drag.event(*this, e);
+        if (_dismissed && _drag.reached()) {
+            _onDismis(*this);
         }
+        Ui::Proxy<Dismisable>::event(e);
     }
 
-    void *query(Meta::Id id) override {
-        if (id == Meta::makeId<Ui::Dragable>()) {
-            return static_cast<Ui::Dragable *>(this);
+    void bubble(Events::Event &e) override {
+        if (e.is<DragEvent>()) {
+            auto &de = e.unwrap<DragEvent>();
+
+            if (de.type == DragEvent::DRAG) {
+                auto d = _drag.target() + de.delta;
+
+                d.x = clamp(
+                    d.x,
+                    (bool)(_dir & DismisDir::LEFT) ? -bound().width : 0,
+                    (bool)(_dir & DismisDir::RIGHT) ? bound().width : 0);
+
+                d.y = clamp(
+                    d.y,
+                    (bool)(_dir & DismisDir::TOP) ? -bound().height : 0,
+                    (bool)(_dir & DismisDir::DOWN) ? bound().height : 0);
+
+                _drag.set(*this, d);
+            } else if (de.type == DragEvent::END) {
+                if ((bool)(_dir & DismisDir::HORIZONTAL)) {
+                    if (std::abs(_drag.targetX()) / (double)bound().width > _threshold) {
+                        _drag.animate(*this, {bound().width * (_drag.targetX() < 0.0 ? -1.0 : 1), 0}, 0.3, Math::Easing::cubicOut);
+                        _dismissed = true;
+                    } else {
+                        _drag.animate(*this, {0, _drag.targetY()}, 0.1, Math::Easing::cubicOut);
+                    }
+                }
+                if ((bool)(_dir & DismisDir::VERTICAL)) {
+                    if (std::abs(_drag.targetY()) / (double)bound().height > _threshold) {
+                        _drag.animate(*this, {0, bound().height * (_drag.targetY() < 0.0 ? -1.0 : 1)}, 0.3, Math::Easing::cubicOut);
+                        _dismissed = true;
+                    } else {
+                        _drag.animate(*this, {_drag.targetX(), 0}, 0.1, Math::Easing::cubicOut);
+                    }
+                }
+            }
+        } else {
+            Ui::Proxy<Dismisable>::bubble(e);
         }
-        return Ui::Proxy<Dismisable>::query(id);
     }
 };
 
@@ -132,14 +136,24 @@ struct DragRegion : public Proxy<DragRegion> {
 
             if (m.type == Events::MouseEvent::PRESS) {
                 _grabbed = true;
+
+                DragEvent de = {.type = DragEvent::START};
+                bubble(de);
+
                 return true;
             } else if (m.type == Events::MouseEvent::RELEASE) {
                 _grabbed = false;
+
+                DragEvent de = {.type = DragEvent::END};
+                bubble(de);
+
                 return true;
             } else if (m.type == Events::MouseEvent::MOVE) {
                 if (_grabbed) {
-                    auto &p = queryParent<Dragable>(*this);
-                    p.drag(m.delta);
+
+                    DragEvent de = {.type = DragEvent::DRAG, .delta = m.delta};
+                    bubble(de);
+
                     return true;
                 }
             }

@@ -5,8 +5,7 @@
 namespace Embed {
 
 struct SdlHost :
-    public Ui::Host,
-    public Ui::Dragable {
+    public Ui::Host {
     SDL_Window *_window{};
 
     Math::Vec2i _lastMousePos{};
@@ -192,18 +191,22 @@ struct SdlHost :
         SDL_WaitEventTimeout(nullptr, ms);
     }
 
-    void drag(Math::Vec2i delta) override {
-        Math::Vec2i pos{};
-        SDL_GetWindowPosition(_window, &pos.x, &pos.y);
-        pos = pos + delta;
-        SDL_SetWindowPosition(_window, pos.x, pos.y);
-    }
-
-    void *query(Meta::Id id) override {
-        if (id == Meta::makeId<Ui::Dragable>()) {
-            return static_cast<Ui::Dragable *>(this);
+    void bubble(Events::Event &e) override {
+        if (e.is<Ui::DragEvent>()) {
+            auto &dragEvent = e.unwrap<Ui::DragEvent>();
+            if (dragEvent.type == Ui::DragEvent::START) {
+                SDL_CaptureMouse(SDL_TRUE);
+            } else if (dragEvent.type == Ui::DragEvent::END) {
+                SDL_CaptureMouse(SDL_FALSE);
+            } else if (dragEvent.type == Ui::DragEvent::DRAG) {
+                Math::Vec2i pos{};
+                SDL_GetWindowPosition(_window, &pos.x, &pos.y);
+                pos = pos + dragEvent.delta;
+                SDL_SetWindowPosition(_window, pos.x, pos.y);
+            }
         }
-        return Ui::Host::query(id);
+
+        Ui::Host::bubble(e);
     }
 };
 

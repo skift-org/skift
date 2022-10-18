@@ -35,6 +35,11 @@ constexpr auto pow2(auto x) {
     return x * x;
 }
 
+constexpr auto lerp(auto a, auto b, auto p) {
+    return a + (b - a) * p;
+}
+
+/*
 template <typename T>
 constexpr T pow(T x, T n) {
     if (n == 0)
@@ -51,7 +56,7 @@ constexpr T pow(T x, T n) {
         n >>= 1;
     }
     return res;
-}
+}*/
 
 /* --- Trigonometry --------------------------------------------------------- */
 

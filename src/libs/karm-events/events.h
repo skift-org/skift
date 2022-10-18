@@ -51,7 +51,7 @@ struct _Event : public Event {
 };
 
 struct MouseEvent : public _Event<MouseEvent, 0x5db47c5474147944> {
-    enum struct Type : uint8_t {
+    enum Type : uint8_t {
         PRESS,
         RELEASE,
         SCROLL,
@@ -60,8 +60,6 @@ struct MouseEvent : public _Event<MouseEvent, 0x5db47c5474147944> {
         ENTER,
         LEAVE
     };
-
-    using enum Type;
 
     Type type;
 
@@ -76,12 +74,10 @@ struct MouseEvent : public _Event<MouseEvent, 0x5db47c5474147944> {
 };
 
 struct KeyboardEvent : public _Event<KeyboardEvent, 0x1eb75d94f347352> {
-    enum struct Type {
+    enum Type {
         PRESS,
         RELEASE,
     };
-
-    using enum Type;
 
     Type type;
     Key key;

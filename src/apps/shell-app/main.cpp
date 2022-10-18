@@ -288,7 +288,7 @@ Ui::Child navbar() {
 
 /* --- Home Screen ---------------------------------------------------------- */
 
-Ui::Child clock() {
+Ui::Child clockWidget() {
     return Ui::spacing(
         {48, 64},
         Ui::vflow(
@@ -300,7 +300,7 @@ Ui::Child clock() {
 Ui::Child homeScreen() {
     return Ui::vflow(
         statusbarButton(),
-        Ui::grow(clock()),
+        Ui::grow(clockWidget()),
         navbar());
 }
 

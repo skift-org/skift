@@ -1,9 +1,6 @@
 {
-    "id": "sdl2-wrap",
+    "id": "sdl2",
     "type": "lib",
-    "provide": [
-        "sdl2"
-    ],
     "requires": {
         "host": [
             true

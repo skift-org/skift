@@ -32,18 +32,18 @@ ButtonStyle ButtonStyle::secondary() {
     return {
         .idleStyle = {
             .borderRadius = RADIUS,
-            .backgroundColor = Gfx::ZINC700,
+            .backgroundColor = Gfx::ZINC800,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundColor = Gfx::ZINC600,
+            .backgroundColor = Gfx::ZINC700,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
             .borderColor = Gfx::ZINC700,
-            .backgroundColor = Gfx::ZINC700,
+            .backgroundColor = Gfx::ZINC800,
         },
     };
 }

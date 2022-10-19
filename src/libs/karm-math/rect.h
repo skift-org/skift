@@ -126,7 +126,7 @@ union Rect {
     constexpr Rect fit(Rect<T> const &r) const {
         auto scale = (r.size() / size().template cast<double>()).min();
         Rect result{0, 0, static_cast<T>(width * scale), static_cast<T>(height * scale)};
-        result.xy = center() - result.center();
+        result.xy = r.center() - result.center();
         return result;
     }
 

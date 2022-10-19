@@ -179,7 +179,7 @@ void Context::blit(Math::Recti src, Math::Recti dest, Surface surface) {
             auto destX = clipDest.x + x;
 
             auto color = surface.load({srcX, srcY});
-            _surface->store({destX, destY}, color);
+            _surface->blend({destX, destY}, color);
         }
     }
 }

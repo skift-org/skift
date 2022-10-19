@@ -1,0 +1,10 @@
+{
+    "id": "image-viewer-app",
+    "type": "exe",
+    "description": "View image files",
+    "deps": [
+        "file-manager",
+        "karm-main",
+        "karm-ui"
+    ]
+}

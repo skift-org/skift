@@ -34,6 +34,15 @@ struct Array {
     constexpr T *buf() { return _buf; }
 
     constexpr T const *buf() const { return _buf; }
+
+    constexpr bool operator==(Array const &other) const {
+        for (size_t i = 0; i < N; i++) {
+            if (_buf[i] != other._buf[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 };
 
 template <class T, class... U>

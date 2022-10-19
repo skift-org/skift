@@ -10,10 +10,10 @@
 -Isrc/apps
 -Isrc/clis
 -Isrc/embed
+-Isrc/extern
 -Isrc/kernel
 -Isrc/libs
 -Isrc/specs
--Isrc/wrap
 
 -D__osdk_sys_linux__
 -D__osdk_karm_sys_encoding_utf8__

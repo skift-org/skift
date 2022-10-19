@@ -38,6 +38,10 @@ Child align(Layout::Align align, Child child);
 
 Child center(Child child);
 
+Child fit(Child child);
+
+Child cover(Child child);
+
 Child hcenter(Child child);
 
 Child vcenter(Child child);

@@ -31,6 +31,11 @@ struct Image {
 
     Image(Bytes slice) : _slice(slice) {}
 
+    static bool isQoi(Bytes const &slice) {
+        return slice.len() >= 4 && slice[0] == 0x71 && slice[1] == 0x6F &&
+               slice[2] == 0x69 && slice[3] == 0x66;
+    }
+
     static Result<Image> load(Bytes slice) {
         if (slice.len() < 14) {
             return Error("image too small");

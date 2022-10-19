@@ -29,6 +29,8 @@ struct Color {
 
     constexpr Color(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255) : red(red), green(green), blue(blue), alpha(alpha) {}
 
+    constexpr Color(Math::Vec4u v) : red(v.x), green(v.y), blue(v.z), alpha(v.w) {}
+
     constexpr Color blendOver(Color const background) const {
         if (alpha == 0xff) {
             return *this;

@@ -518,7 +518,40 @@ void Context::shadow() {}
 
 /* --- Effects -------------------------------------------------------------- */
 
-// void Context::blur(Math::Recti region, int radius) { }
+void Context::blur(Math::Recti region, int radius) {
+    if (radius == 0)
+        return;
+
+    auto rect = applyClip(region);
+
+    // Horizontal pass
+    for (int y = rect.top(); y < rect.bottom(); y++) {
+        for (int x = rect.start(); x < rect.end(); x++) {
+            Math::Vec4u sum = surface().loadClamped({x, y});
+
+            for (int i = 1; i <= radius; i++) {
+                sum = sum + surface().loadClamped({x + i, y});
+                sum = sum + surface().loadClamped({x - i, y});
+            }
+
+            surface().store({x, y}, sum / (radius * 2 + 1));
+        }
+    }
+
+    // Vertical pass
+    for (int y = rect.top(); y < rect.bottom(); y++) {
+        for (int x = rect.start(); x < rect.end(); x++) {
+            Math::Vec4u sum = surface().loadClamped({x, y});
+
+            for (int i = 1; i <= radius; i++) {
+                sum = sum + surface().loadClamped({x, y + i});
+                sum = sum + surface().loadClamped({x, y - i});
+            }
+
+            surface().store({x, y}, sum / (radius * 2 + 1));
+        }
+    }
+}
 
 void Context::saturate(Math::Recti region, double value) {
     region = applyAll(region);
@@ -559,9 +592,40 @@ void Context::grayscale(Math::Recti region) {
     }
 }
 
-// void Context::contrast(Math::Recti region, double contrast) {}
+void Context::contrast(Math::Recti region, double contrast) {
+    contrast *= 255;
+    double factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
 
-// void Context::brightness(Math::Recti region, double brightness) {}
+    for (int y = 0; y < region.height; y++) {
+        for (int x = 0; x < region.width; x++) {
+            auto color = _surface->load({region.x + x, region.y + y});
+
+            color = Color::fromRgba(
+                min(factor * (color.red - 128) + 128, 255),
+                min(factor * (color.green - 128) + 128, 255),
+                min(factor * (color.blue - 128) + 128, 255),
+                color.alpha);
+
+            _surface->store({region.x + x, region.y + y}, color);
+        }
+    }
+}
+
+void Context::brightness(Math::Recti region, double brightness) {
+    for (int y = 0; y < region.height; y++) {
+        for (int x = 0; x < region.width; x++) {
+            auto color = _surface->load({region.x + x, region.y + y});
+
+            color = Color::fromRgba(
+                min(color.red * brightness, 255),
+                min(color.green * brightness, 255),
+                min(color.blue * brightness, 255),
+                color.alpha);
+
+            _surface->store({region.x + x, region.y + y}, color);
+        }
+    }
+}
 
 void Context::noise(Math::Recti region, double amount) {
     Math::Rand rand{0x12341234};

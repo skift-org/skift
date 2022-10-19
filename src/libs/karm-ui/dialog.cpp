@@ -1,5 +1,6 @@
 #include "dialog.h"
 
+#include "anim.h"
 #include "box.h"
 #include "drag.h"
 #include "funcs.h"
@@ -14,6 +15,7 @@ namespace Karm::Ui {
 /* ---  Dialog Base  -------------------------------------------------------- */
 
 struct DialogLayer : public Widget<DialogLayer> {
+    Anim<double> _opacity{};
     Child _child;
     Opt<Child> _dialog;
     Opt<Child> _shouldShow;
@@ -56,6 +58,7 @@ struct DialogLayer : public Widget<DialogLayer> {
         // otherwise replacing the dialog might cause some use after free down the tree
         _shouldShow = dialog;
         shouldLayout(*this);
+        _opacity.animate(*this, 1, 0.1);
     }
 
     void close() {
@@ -64,6 +67,7 @@ struct DialogLayer : public Widget<DialogLayer> {
             // otherwise we might cause some use after free down the tree
             _shouldClose = true;
             shouldLayout(*this);
+            _opacity.animate(*this, 0, 0.1);
         }
     }
 
@@ -74,16 +78,22 @@ struct DialogLayer : public Widget<DialogLayer> {
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         child().paint(g, r);
-        if (visible()) {
+
+        if (_opacity.value() > 0.01) {
             g.save();
-            g.fillStyle(Gfx::BLACK.withOpacity(0.75));
+            g.fillStyle(Gfx::BLACK.withOpacity(0.75 * _opacity.value()));
             g.fill(bound());
             g.restore();
+        }
+
+        if (visible()) {
             dialog().paint(g, r);
         }
     }
 
     void event(Events::Event &e) override {
+        _opacity.event(*this, e);
+
         if (visible()) {
             dialog().event(e);
         } else {

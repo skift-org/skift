@@ -89,18 +89,18 @@ struct Dismisable :
             } else if (de.type == DragEvent::END) {
                 if ((bool)(_dir & DismisDir::HORIZONTAL)) {
                     if (std::abs(_drag.targetX()) / (double)bound().width > _threshold) {
-                        _drag.animate(*this, {bound().width * (_drag.targetX() < 0.0 ? -1.0 : 1), 0}, 0.3, Math::Easing::cubicOut);
+                        _drag.animate(*this, {bound().width * (_drag.targetX() < 0.0 ? -1.0 : 1), 0}, 0.25, Math::Easing::cubicOut);
                         _dismissed = true;
                     } else {
-                        _drag.animate(*this, {0, _drag.targetY()}, 0.1, Math::Easing::cubicOut);
+                        _drag.animate(*this, {0, _drag.targetY()}, 0.25, Math::Easing::exponentialOut);
                     }
                 }
                 if ((bool)(_dir & DismisDir::VERTICAL)) {
                     if (std::abs(_drag.targetY()) / (double)bound().height > _threshold) {
-                        _drag.animate(*this, {0, bound().height * (_drag.targetY() < 0.0 ? -1.0 : 1)}, 0.3, Math::Easing::cubicOut);
+                        _drag.animate(*this, {0, bound().height * (_drag.targetY() < 0.0 ? -1.0 : 1)}, 0.25, Math::Easing::cubicOut);
                         _dismissed = true;
                     } else {
-                        _drag.animate(*this, {_drag.targetX(), 0}, 0.1, Math::Easing::cubicOut);
+                        _drag.animate(*this, {_drag.targetX(), 0}, 0.25, Math::Easing::exponentialOut);
                     }
                 }
             }

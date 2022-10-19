@@ -93,4 +93,8 @@ using OnPaint = Func<void(Gfx::Context &g, Math::Vec2i size)>;
 
 Child canvas(OnPaint onPaint);
 
+/* --- Blur ----------------------------------------------------------------- */
+
+Child blur(int radius, Child child);
+
 } // namespace Karm::Ui

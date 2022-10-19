@@ -9,11 +9,12 @@ namespace Karm::Ui {
 
 template <typename T>
 struct Anim {
+    T _start{};
     T _value{};
     T _target{};
     Math::Easing _easing{};
-    double _duration{5};
     double _elapsed{0};
+    double _duration{0};
     bool _animated = false;
 
     Anim() = default;
@@ -37,6 +38,7 @@ struct Anim {
     }
 
     void animate(Node &n, T target, double duration = 1.0, Math::Easing easing = {}) {
+        _start = _value;
         _target = target;
 
         _elapsed = 0;
@@ -52,11 +54,12 @@ struct Anim {
         if (_animated) {
             _elapsed += dt;
             if (_elapsed > _duration) {
+                _elapsed = _duration;
                 _value = _target;
                 _animated = false;
             } else {
                 double p = _elapsed / _duration;
-                _value = Math::lerp(_value, _target, _easing(p));
+                _value = Math::lerp(_start, _target, _easing(p));
             }
         }
     }

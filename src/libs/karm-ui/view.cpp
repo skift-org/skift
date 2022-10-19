@@ -1,5 +1,7 @@
 #include "view.h"
 
+#include "proxy.h"
+
 namespace Karm::Ui {
 
 /* --- Text ----------------------------------------------------------------- */
@@ -258,6 +260,29 @@ struct Canvas : public View<Canvas> {
 
 Child canvas(OnPaint onPaint) {
     return makeStrong<Canvas>(std::move(onPaint));
+}
+
+/* --- Blur ----------------------------------------------------------------- */
+
+struct Blur : public Proxy<Blur> {
+    int _radius;
+
+    Blur(int radius, Child child)
+        : Proxy<Blur>(std::move(child)), _radius(radius) {}
+
+    void reconcile(Blur &o) override {
+        _radius = o._radius;
+        Proxy<Blur>::reconcile(o);
+    }
+
+    void paint(Gfx::Context &g, Math::Recti r) override {
+        g.blur(bound(), _radius);
+        Proxy<Blur>::paint(g, r);
+    }
+};
+
+Child blur(int radius, Child child) {
+    return makeStrong<Blur>(radius, std::move(child));
 }
 
 } // namespace Karm::Ui

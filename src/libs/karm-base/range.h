@@ -85,7 +85,7 @@ struct Range {
         return {};
     }
 
-    constexpr Cons<Range> split(Range other){
+    constexpr Cons<Range> split(Range other) {
         return {halfUnder(other), halfOver(other)};
     }
 

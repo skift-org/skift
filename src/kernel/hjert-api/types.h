@@ -63,14 +63,17 @@ FlagsEnum$(Rights);
 enum struct Type {
     TASK,
     MEM,
-    SPACE
+    SPACE,
+    MUTEXT,
 };
 
 /* --- Handles -------------------------------------------------------------- */
 
 struct Task;
 struct Mem;
+struct Io;
 struct Space;
+struct Mutex;
 
 using RawHandle = uint64_t;
 
@@ -111,11 +114,27 @@ struct Props<Mem> {
 };
 
 template <>
+struct Props<Io> {
+    uint16_t port;
+    size_t size;
+};
+
+template <>
+struct Props<Mutex> {
+};
+
+template <>
 struct Infos<Mem> {
     uintptr_t vaddr;
     uintptr_t paddr;
     size_t size;
     MemFlags flags;
+};
+
+template <>
+struct Infos<Io> {
+    uint16_t port;
+    size_t size;
 };
 
 template <>
@@ -128,9 +147,14 @@ struct Infos<Space> {
     SpaceFlags flags;
 };
 
+template <>
+struct Infos<Mutex> {
+    bool locked;
+};
+
 using AnyHandle = Var<Handle<Task>, Handle<Mem>, Handle<Space>>;
-using AnyProps = Var<Props<Task>, Props<Mem>, Props<Space>>;
-using AnyInfos = Var<Infos<Task>, Infos<Mem>, Infos<Space>>;
+using AnyProps = Var<Props<Task>, Props<Mem>, Props<Io>, Props<Space>, Props<Mutex>>;
+using AnyInfos = Var<Infos<Task>, Infos<Mem>, Infos<Io>, Infos<Space>, Infos<Mutex>>;
 
 using Arg = uint64_t;
 

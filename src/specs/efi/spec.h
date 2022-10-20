@@ -158,7 +158,7 @@ struct SystemTable : public Table {
     size_t nrConfigurationTables;
     ConfigurationTable *configurationTable;
 
-    ConfigurationTable *lookupConfigurationTable(const Uuid &uuid) {
+    ConfigurationTable *lookupConfigurationTable(Uuid const &uuid) {
         for (size_t i = 0; i < nrConfigurationTables; i++) {
             if (Op::eq(configurationTable[i].vendorGuid, uuid)) {
                 return &configurationTable[i];
@@ -260,14 +260,14 @@ struct BootService : public Table {
     DummyFunction disconnectController;
 
     // Open and Close Protocol Services
-    Function<Handle, Uuid *, void **, Handle, Handle, uint32_t> openProtocol;
-    Function<Handle, Uuid *, Handle, Handle> closeProtocol;
+    Function<Handle, Uuid const *, void **, Handle, Handle, uint32_t> openProtocol;
+    Function<Handle, Uuid const *, Handle, Handle> closeProtocol;
     DummyFunction openProtocolInformation;
 
     // Library Services
     DummyFunction protocolsPerHandle;
     DummyFunction locateHandleBuffer;
-    Function<Uuid *, void *, void **> locateProtocol;
+    Function<Uuid const *, void *, void **> locateProtocol;
     DummyFunction installMultipleProtocolInterfaces;
     DummyFunction uninstallMultipleProtocolInterfaces;
 
@@ -454,6 +454,8 @@ struct GraphicsOutputProtocolMode {
 };
 
 struct GraphicsOutputProtocol {
+    static constexpr Uuid UUID = Uuid{0x9042a9de, 0x23dc, 0x4a38, {0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a}};
+
     Method<uint32_t, size_t *, GraphicsOutputProtocolMode **> queryMode;
     Method<size_t> setMode;
     DummyMethod blt;

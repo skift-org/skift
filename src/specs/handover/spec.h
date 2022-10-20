@@ -68,6 +68,11 @@ inline bool shouldMerge(Tag tag) {
     }
 }
 
+enum struct PixelFormat : uint16_t {
+    RGBX8888 = 0x7451,
+    BGRX8888 = 0xd040,
+};
+
 struct Record {
     Tag tag;
     uint32_t flags;
@@ -84,7 +89,7 @@ struct Record {
             uint16_t width;
             uint16_t height;
             uint16_t pitch;
-            uint16_t format;
+            PixelFormat format;
         } fb;
 
         struct
@@ -99,11 +104,6 @@ struct Record {
     uint64_t end() const {
         return start + size;
     }
-};
-
-enum struct PixelFormat : uint16_t {
-    RGBX32 = 0x7451,
-    BGRX32 = 0xd040,
 };
 
 struct Payload {
@@ -167,7 +167,7 @@ struct Request {
 [[gnu::used]] static constexpr Request requestFiles() { return {Tag::FILE, 0, 0}; }
 [[gnu::used]] static constexpr Request requestRsdp() { return {Tag::RSDP, 0, 0}; }
 [[gnu::used]] static constexpr Request requestFdt() { return {Tag::FDT, 0, 0}; }
-[[gnu::used]] static constexpr Request requestFb(PixelFormat preferedFormat = PixelFormat::RGBX32) { return {Tag::FB, 0, (uint64_t)preferedFormat}; }
+[[gnu::used]] static constexpr Request requestFb(PixelFormat preferedFormat = PixelFormat::BGRX8888) { return {Tag::FB, 0, (uint64_t)preferedFormat}; }
 
 inline bool valid(uint32_t magic, Payload const &payload) {
     if (magic != COOLBOOT) {

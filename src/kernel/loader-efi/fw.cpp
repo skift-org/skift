@@ -33,7 +33,48 @@ Result<Strong<Hal::Vmm>> createVmm() {
     return {makeStrong<x86_64::Vmm>(pmm, (x86_64::Pml<4> *)upper)};
 }
 
-Error finalizeHandover(Handover::Builder &builder) {
+Error parseGop(Handover::Builder &builder) {
+    Efi::GraphicsOutputProtocol *gop = nullptr;
+    try$(Efi::bs()->locateProtocol(&Efi::GraphicsOutputProtocol::UUID, nullptr, (void **)&gop));
+    auto mode = gop->mode;
+
+    if (mode->info->pixelFormat != Efi::PixelFormat::BLUE_GREEN_RED_RESERVED8_BIT_PER_COLOR) {
+        return Error{"unsupported pixel format"};
+    }
+
+    Debug::linfo("gop: {}x{}, {} stride, {} modes", mode->info->horizontalResolution, mode->info->verticalResolution, mode->info->pixelsPerScanLine * 4, mode->maxMode);
+
+    Handover::Record record = {
+        .tag = Handover::FB,
+        .start = (uint64_t)mode->frameBufferBase,
+        .size = mode->info->pixelsPerScanLine * mode->info->verticalResolution * 4,
+        .fb = {
+            .width = (uint16_t)mode->info->horizontalResolution,
+            .height = (uint16_t)mode->info->verticalResolution,
+            .pitch = (uint16_t)(mode->info->pixelsPerScanLine * 4),
+            .format = Handover::PixelFormat::BGRX8888,
+        },
+    };
+
+    builder.add(record);
+
+    return OK;
+}
+
+Error parseAcpi(Handover::Builder &builder) {
+    auto *acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI_TABLE_UUID);
+    if (!acpiTable)
+        acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI2_TABLE_UUID);
+
+    if (acpiTable) {
+        builder.add(Handover::Tag::RSDP, 0, {(size_t)acpiTable->table, 0x1000});
+        Debug::linfo("acpi: rsdp at {x}", (uintptr_t)acpiTable->table);
+    }
+
+    return OK;
+}
+
+Error parseMemoryMap(Handover::Builder &builder) {
     size_t mmapSize = 0;
     size_t key = 0;
     size_t descSize = 0;
@@ -82,13 +123,13 @@ Error finalizeHandover(Handover::Builder &builder) {
 
     try$(Efi::bs()->exitBootServices(Efi::imageHandle(), key));
 
-    auto *acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI_TABLE_UUID);
-    if (!acpiTable)
-        acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI2_TABLE_UUID);
+    return OK;
+}
 
-    if (acpiTable) {
-        builder.add(Handover::Tag::RSDP, 0, {(size_t)acpiTable->table, 0x1000});
-    }
+Error finalizeHandover(Handover::Builder &builder) {
+    try$(parseGop(builder));
+    try$(parseAcpi(builder));
+    try$(parseMemoryMap(builder));
 
     return OK;
 }

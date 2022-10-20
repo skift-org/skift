@@ -65,7 +65,7 @@ struct Builder {
             if (other.tag == record.tag &&
                 other.end() == record.start &&
                 shouldMerge(record.tag)) {
-                // Debug::linfo("handover: merge {} with {}", record, other);
+                Debug::linfo("handover: merge {} with {}", record, other);
 
                 _records.removeAt(i);
                 other.size += record.size;
@@ -77,7 +77,7 @@ struct Builder {
             if (other.tag == record.tag &&
                 other.start == record.end() &&
                 shouldMerge(record.tag)) {
-                // Debug::linfo("handover: merge {} with {}", record, other);
+                Debug::linfo("handover: merge {} with {}", record, other);
                 _records.removeAt(i);
                 record.size += other.size;
                 add(record);
@@ -86,7 +86,7 @@ struct Builder {
 
             if (colidesWith(record, other)) {
                 if (shouldMerge(record.tag) && !shouldMerge(other.tag)) {
-                    // Debug::linfo("handover: splitting record {} with {}", record, other);
+                    Debug::linfo("handover: splitting record {} with {}", record, other);
 
                     _records.removeAt(i);
                     auto [lower, upper] = split(record, other);
@@ -96,7 +96,7 @@ struct Builder {
                     add(upper);
                     return;
                 } else if (!shouldMerge(record.tag) && shouldMerge(other.tag)) {
-                    // Debug::linfo("handover: splitting record {} with {}", other, record);
+                    Debug::linfo("handover: splitting record {} with {}", other, record);
 
                     _records.removeAt(i);
 
@@ -106,19 +106,19 @@ struct Builder {
                     add(upper);
                     return;
                 } else {
-                    // Debug::lwarn("handover: record {} colides with {}", record, other);
+                    Debug::lwarn("handover: record {} colides with {}", record, other);
                     return;
                 }
             }
 
             if (other.start > record.start) {
-                // Debug::linfo("handover: insert {} at {}", record, i);
+                Debug::linfo("handover: insert {} at {}", record, i);
                 _records.insert(i, record);
                 return;
             }
         }
 
-        // Debug::linfo("handover: append {}", record);
+        Debug::linfo("handover: append {}", record);
         _records.pushBack(record);
     }
 

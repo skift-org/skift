@@ -16,7 +16,7 @@
     },
     "tools": {
         "cc": {
-            "cmd": "clang",
+            "cmd": ["@latest", "clang"],
             "args": [
                 "-target",
                 "i386-none-elf",
@@ -25,7 +25,7 @@
             ]
         },
         "cxx": {
-            "cmd": "clang++",
+            "cmd": ["@latest", "clang++"],
             "args": [
                 "-target",
                 "i386-none-elf",
@@ -34,7 +34,7 @@
             ]
         },
         "ld": {
-            "cmd": "clang++",
+            "cmd":  ["@latest", "clang++"],
             "args": [
                 "-target",
                 "i386-none-elf",
@@ -43,7 +43,7 @@
             ]
         },
         "ar": {
-            "cmd": "llvm-ar",
+            "cmd":  ["@latest", "llvm-ar"],
             "args": [
                 "rcs"
             ]

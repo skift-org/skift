@@ -14,7 +14,7 @@
     },
     "tools": {
         "cc": {
-            "cmd": "clang",
+            "cmd": ["@latest", "clang"],
             "args": [
                 "-target",
                 "x86_64-unknown-windows",
@@ -25,7 +25,7 @@
             ]
         },
         "cxx": {
-            "cmd": "clang++",
+            "cmd": ["@latest", "clang++"],
             "args": [
                 "-target",
                 "x86_64-unknown-windows",
@@ -36,7 +36,7 @@
             ]
         },
         "ld": {
-            "cmd": "clang++",
+            "cmd": ["@latest", "clang++"],
             "args": [
                 "-target",
                 "x86_64-unknown-windows",
@@ -47,7 +47,7 @@
             ]
         },
         "ar": {
-            "cmd": "llvm-ar",
+            "cmd": ["@latest", "llvm-ar"],
             "args": [
                 "rcs"
             ]

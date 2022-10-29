@@ -116,7 +116,7 @@ struct Image {
                 } else if ((b1 & Chunk::MASK) == Chunk::RUN) {
                     run = b1 & (~Chunk::MASK);
                 } else {
-                    return Error("invalid chunk");
+                    return "invalid chunk";
                 }
 
                 index[hash(pixel) % index.len()] = pixel;
@@ -125,7 +125,7 @@ struct Image {
         }
 
         if (Op::ne(s.nextBytes(8), bytes(END))) {
-            return Error("missing end marker");
+            return "missing end marker";
         }
 
         return OK;

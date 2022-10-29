@@ -61,6 +61,12 @@ static void portOut(uint16_t addr, T value) {
         asm volatile("outl %0, %1"
                      :
                      : "a"(value), "d"(addr));
+    } else if constexpr ((sizeof(T) == 8)) {
+        asm volatile("outq %0, %1"
+                     :
+                     : "a"(value), "d"(addr));
+    } else {
+        static_assert(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4);
     }
 }
 

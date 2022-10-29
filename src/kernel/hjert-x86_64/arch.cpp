@@ -23,8 +23,6 @@ static x86_64::GdtDesc _gdtDesc{_gdt};
 static x86_64::Idt _idt{};
 static x86_64::IdtDesc _idtDesc{_idt};
 
-static uint64_t _tick = 0;
-
 Error init() {
     _com1.init();
 
@@ -40,13 +38,6 @@ Error init() {
     _pit.init(1000);
 
     x86_64::sti();
-
-    auto branding = x86_64::Cpuid::branding();
-
-    Debug::linfo("CPU vendor: {}", branding.vendor());
-    Debug::linfo("CPU brand: {}", branding.brand());
-
-    asm volatile("int $0x20");
 
     return OK;
 }
@@ -66,6 +57,8 @@ void idleCpu() {
     while (true)
         x86_64::hlt();
 }
+
+static uint64_t _tick = 0;
 
 static char const *_faultMsg[32] = {
     "division-by-zero",

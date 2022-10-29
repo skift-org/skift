@@ -1,7 +1,9 @@
 #include <handover/main.h>
-#include <hjert/arch.h>
+#include <karm-base/size.h>
 #include <karm-debug/logger.h>
 #include <limine/main.h>
+
+#include "arch.h"
 
 using namespace Hjert;
 
@@ -10,7 +12,7 @@ HandoverRequests$(
     Handover::requestFb(),
     Handover::requestFiles());
 
-Error entryPoint(uint64_t magic, Handover::Payload const &payload) {
+Error entryPoint(uint64_t magic, Handover::Payload &payload) {
     try$(Arch::init());
 
     if (!Handover::valid(magic, payload)) {
@@ -18,11 +20,10 @@ Error entryPoint(uint64_t magic, Handover::Payload const &payload) {
     }
 
     Debug::linfo("hjert (v0.0.1)");
-
     Debug::linfo("handover: valid");
     Debug::linfo("handover: agent: '{}'", payload.agentName());
-    size_t totalFree = 0;
 
+    size_t totalFree = 0;
     for (auto const &record : payload) {
         Debug::linfo(
             "handover: record: {} {x}-{x} ({}kib)",
@@ -36,7 +37,9 @@ Error entryPoint(uint64_t magic, Handover::Payload const &payload) {
         }
     }
 
-    Debug::linfo("handover: total free: {}mib", totalFree / 1024 / 1024);
+    Debug::linfo("handover: total free: {}mib", toMib(totalFree));
+
+    Debug::linfo("handover: usable range: {x}-{x}", payload.usableRange().start, payload.usableRange().end());
 
     Arch::idleCpu();
 }

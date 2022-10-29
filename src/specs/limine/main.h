@@ -16,5 +16,6 @@ volatile limine_entry_point_request reqEntryPoint = {
 };
 
 void _limineEntryPoint() {
-    (void)entryPoint(0, {});
+    Handover::Payload payload;
+    (void)entryPoint(0, payload);
 }

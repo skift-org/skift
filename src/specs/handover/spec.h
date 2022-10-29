@@ -104,6 +104,10 @@ struct Record {
     uint64_t end() const {
         return start + size;
     }
+
+    bool empty() const {
+        return size == 0;
+    }
 };
 
 struct Payload {
@@ -142,12 +146,66 @@ struct Payload {
         return nullptr;
     }
 
+    Record *begin() {
+        return records;
+    }
+
+    Record *end() {
+        return records + len;
+    }
+
     Record const *begin() const {
         return records;
     }
 
     Record const *end() const {
         return records + len;
+    }
+
+    size_t sum(Handover::Tag tag) {
+        size_t total = 0;
+        for (auto const &r : *this) {
+            if (r.tag == tag) {
+                total += r.size;
+            }
+        }
+        return total;
+    }
+
+    Record alloc(size_t size) {
+        Record result = {};
+
+        for (auto &r : *this) {
+            if (r.tag == Tag::FREE && r.size >= size) {
+                result.start = r.start;
+                result.size = size;
+                r.start += size;
+                r.size -= size;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    Record usableRange() const {
+        size_t start = 0, end = 0;
+
+        for (auto const &r : *this) {
+            if (r.tag == Tag::FREE) {
+                if (r.start < start || start == 0) {
+                    start = r.start;
+                }
+                if (r.end() > end) {
+                    end = r.end();
+                }
+            }
+        }
+
+        return {
+            .start = start,
+            .size = end - start,
+        };
     }
 };
 

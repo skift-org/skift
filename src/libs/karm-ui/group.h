@@ -57,6 +57,9 @@ struct Group : public Widget<Crtp> {
     }
 
     void event(Events::Event &e) override {
+        if (e.accepted)
+            return;
+
         for (auto &child : children()) {
             child->event(e);
             if (e.accepted)

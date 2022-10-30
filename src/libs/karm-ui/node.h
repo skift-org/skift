@@ -64,7 +64,7 @@ struct Widget : public Node {
     }
 
     void bubble(Events::Event &e) override {
-        if (_parent)
+        if (_parent && !e.accepted)
             _parent->bubble(e);
     }
 

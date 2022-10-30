@@ -15,28 +15,27 @@ struct React : public Widget<Crtp> {
         });
     }
 
-    void shouldRebuild() {
-        _rebuild = true;
-        Ui::shouldLayout(*this);
-    }
-
     virtual Child build() = 0;
+
+    void rebuild() {
+        auto newChild = build();
+
+        if (_child) {
+            auto tmp = (*_child)->reconcile(newChild);
+            if (tmp) {
+                (*_child)->detach(this);
+                _child = tmp;
+                (*_child)->attach(this);
+            }
+        } else {
+            _child = newChild;
+            (*_child)->attach(this);
+        }
+    }
 
     void ensureBuild() {
         if (_rebuild) {
-            auto newChild = build();
-
-            if (!_child.with([&](auto &child) {
-                    auto result = child->reconcile(newChild);
-
-                    if (result)
-                        _child = result;
-                })) {
-                _child = newChild;
-            }
-            _child.with([&](auto &child) {
-                child->attach(this);
-            });
+            rebuild();
             _rebuild = false;
         }
     }
@@ -53,6 +52,14 @@ struct React : public Widget<Crtp> {
         _child.with([&](auto &child) {
             child->event(e);
         });
+    }
+
+    void bubble(Events::Event &e) override {
+        if (e.is<Events::BuildEvent>()) {
+            _rebuild = true;
+            Ui::shouldLayout(*this);
+        } else
+            Widget<Crtp>::bubble(e);
     }
 
     void layout(Math::Recti r) override {
@@ -81,9 +88,7 @@ struct React : public Widget<Crtp> {
 
     void visit(Visitor &v) override {
         ensureBuild();
-
-        if (_child)
-            v(**_child);
+        v(**_child);
     }
 };
 

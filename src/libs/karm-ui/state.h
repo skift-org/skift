@@ -15,7 +15,7 @@ struct _State : public React<_State<T>> {
 
         void update(T t) {
             _s._value = t;
-            _s.shouldRebuild();
+            shouldRebuild(_s);
         }
 
         T const &value() const {

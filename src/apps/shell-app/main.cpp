@@ -17,6 +17,11 @@ struct App {
     String name;
 };
 
+struct Noti {
+    String title;
+    String msg;
+};
+
 struct State {
     bool locked = true;
 };
@@ -34,37 +39,6 @@ State reduce(State state, Actions action) {
 }
 
 using Model = Ui::Model<State, Actions>;
-
-/* --- Common --------------------------------------------------------------- */
-
-Ui::Child handle() {
-    return Ui::dragRegion(
-        Ui::minSize(
-            {Ui::UNCONSTRAINED, 48},
-            Ui::center(
-                Ui::spacing(12,
-                            Ui::box(
-                                Ui::BoxStyle{
-                                    .borderRadius = 999,
-                                    .backgroundColor = Gfx::WHITE,
-                                },
-                                Ui::empty({128, 4}))))));
-}
-
-Ui::Child handleButton(Ui::OnPress press) {
-    return Ui::button(
-        std::move(press),
-        Ui::ButtonStyle{
-            .pressStyle = {
-                .borderWidth = 1,
-                .borderColor = Gfx::WHITE,
-            }},
-        Ui::minSize({Ui::UNCONSTRAINED, 48}, Ui::center(Ui::spacing(12, Ui::box(Ui::BoxStyle{
-                                                                                    .borderRadius = 999,
-                                                                                    .backgroundColor = Gfx::WHITE,
-                                                                                },
-                                                                                Ui::empty({128, 4}))))));
-}
 
 /* --- Status Bar ----------------------------------------------------------- */
 
@@ -190,7 +164,7 @@ Ui::Child systemTray() {
                             .backgroundColor = Gfx::ZINC900,
                         },
 
-                        Ui::vflow(8, quickSettings(), Ui::grow(notifications()), handle())))),
+                        Ui::vflow(8, quickSettings(), Ui::grow(notifications()), Ui::dragHandle())))),
         Ui::empty(16));
 }
 
@@ -273,34 +247,24 @@ Ui::Child appDrawer() {
                                    .backgroundColor = Gfx::ZINC900,
                                },
                                Ui::vflow(
-                                   handle(),
+                                   Ui::dragHandle(),
                                    Ui::grow(Ui::spacing({12, 0}, apps(appItems))))))));
 }
 
 /* --- Navigation Bar ------------------------------------------------------- */
 
 Ui::Child navbar() {
-    return handleButton(
-        [](Ui::Node &n) {
-            Ui::showDialog(n, appDrawer());
-        });
+    return Ui::buttonHandle([](Ui::Node &n) {
+        Ui::showDialog(n, appDrawer());
+    });
 }
 
 /* --- Home Screen ---------------------------------------------------------- */
 
-Ui::Child clockWidget() {
-    return Ui::spacing(
-        {48, 64},
-        Ui::vflow(
-            16,
-            Ui::text(Ui::TextStyle::bold().withSize(48).withColor(Gfx::ZINC900), "22:07"),
-            Ui::text(Ui::TextStyle::bold().withSize(26).withColor(Gfx::ZINC900), "Wed. 12 October")));
-}
-
 Ui::Child homeScreen() {
     return Ui::vflow(
         statusbarButton(),
-        Ui::grow(clockWidget()),
+        Ui::grow(),
         navbar());
 }
 
@@ -312,7 +276,6 @@ Ui::Child lockscreen() {
             .backgroundColor = Gfx::BLACK.withOpacity(0.5),
         },
         Ui::vflow(
-            statusbar(),
             Ui::grow(
                 Ui::dismisable(
                     Model::bind<UnlockAction>(),
@@ -322,8 +285,9 @@ Ui::Child lockscreen() {
                         Ui::spacing(
                             {48, 64},
                             Ui::vflow(
-                                Ui::text(Ui::TextStyle::bold().withSize(48), "22:07"),
-                                Ui::text(Ui::TextStyle::bold().withSize(26), "Wed. 12 October"),
+                                Ui::center(Ui::text(Ui::TextStyle::regular().withSize(52), "22:07")),
+                                Ui::empty(16),
+                                Ui::center(Ui::text(Ui::TextStyle::bold().withSize(16), "Wed. 12 October")),
                                 Ui::grow(),
                                 Ui::vflow(
                                     Ui::center(Ui::icon(Media::Icons::CHEVRON_UP, 48)),
@@ -341,6 +305,5 @@ Ui::Child app() {
 }
 
 CliResult entryPoint(CliArgs args) {
-    return Ui::runApp(
-        args, app());
+    return Ui::runApp(args, app());
 }

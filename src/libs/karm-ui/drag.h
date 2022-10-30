@@ -1,7 +1,10 @@
 #pragma once
 
 #include "anim.h"
+#include "input.h"
+#include "layout.h"
 #include "proxy.h"
+#include "view.h"
 
 namespace Karm::Ui {
 
@@ -88,7 +91,7 @@ struct Dismisable :
                 _drag.set(*this, d);
             } else if (de.type == DragEvent::END) {
                 if ((bool)(_dir & DismisDir::HORIZONTAL)) {
-                    if (std::abs(_drag.targetX()) / (double)bound().width > _threshold) {
+                    if (Math::abs(_drag.targetX()) / (double)bound().width > _threshold) {
                         _drag.animate(*this, {bound().width * (_drag.targetX() < 0.0 ? -1.0 : 1), 0}, 0.25, Math::Easing::cubicOut);
                         _dismissed = true;
                     } else {
@@ -96,7 +99,7 @@ struct Dismisable :
                     }
                 }
                 if ((bool)(_dir & DismisDir::VERTICAL)) {
-                    if (std::abs(_drag.targetY()) / (double)bound().height > _threshold) {
+                    if (Math::abs(_drag.targetY()) / (double)bound().height > _threshold) {
                         _drag.animate(*this, {0, bound().height * (_drag.targetY() < 0.0 ? -1.0 : 1)}, 0.25, Math::Easing::cubicOut);
                         _dismissed = true;
                     } else {
@@ -165,6 +168,44 @@ struct DragRegion : public Proxy<DragRegion> {
 
 inline Child dragRegion(Child child) {
     return makeStrong<DragRegion>(child);
+}
+
+/* --- Handle --------------------------------------------------------------- */
+
+inline Child handle() {
+    return minSize(
+        {
+            UNCONSTRAINED,
+            48,
+        },
+        center(
+            spacing(
+                12,
+                box(
+                    BoxStyle{
+                        .borderRadius = 999,
+                        .backgroundColor = Gfx::WHITE,
+                    },
+                    empty({
+                        128,
+                        4,
+                    })))));
+}
+
+inline Child dragHandle() {
+    return dragRegion(
+        handle());
+}
+
+inline Child buttonHandle(OnPress press) {
+    return button(
+        std::move(press),
+        ButtonStyle{
+            .pressStyle = {
+                .borderWidth = 1,
+                .borderColor = Gfx::WHITE,
+            }},
+        handle());
 }
 
 } // namespace Karm::Ui

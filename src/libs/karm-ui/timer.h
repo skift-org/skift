@@ -46,7 +46,7 @@ struct _Timer : public React<_Timer> {
             return;
         }
         _deadline += _interval;
-        shouldRebuild();
+        shouldRebuild(*this);
     }
 
     Child build() override {

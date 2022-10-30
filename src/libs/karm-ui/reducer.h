@@ -83,7 +83,7 @@ struct Reducer :
 
     void dispatch(Action action) override {
         _data = _reducer(_data, action);
-        this->shouldRebuild();
+        shouldRebuild(*this);
     }
 
     Child build() override {

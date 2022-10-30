@@ -91,6 +91,9 @@ struct PaintEvent : public _Event<PaintEvent, 0xe024fcf3253d5696> {
 struct LayoutEvent : public _Event<LayoutEvent, 0x9fb51942f16848b6> {
 };
 
+struct BuildEvent : public _Event<BuildEvent, 0xabcec24916669f81> {
+};
+
 struct AnimateEvent : public _Event<AnimateEvent, 0xf21fe2676e487fc> {
 };
 

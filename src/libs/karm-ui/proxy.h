@@ -35,6 +35,9 @@ struct Proxy : public Widget<Crtp> {
     }
 
     void event(Events::Event &e) override {
+        if (e.accepted)
+            return;
+
         child().event(e);
     }
 

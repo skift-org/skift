@@ -69,10 +69,10 @@ inline void lerror(Format format, Args &&...va) {
 }
 
 template <typename... Args>
-[[noreturn]] inline void lpanic(Format format, Args &&...va) {
+[[noreturn]] inline void lfatal(Format format, Args &&...va) {
     Fmt::Args<Args...> args{std::forward<Args>(va)...};
     _log(FATAL, format, args);
-    panic("fatal error");
+    panic("fatal error occured, see logs");
 }
 
 } // namespace Karm::Debug

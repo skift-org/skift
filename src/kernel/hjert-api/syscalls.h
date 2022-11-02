@@ -80,6 +80,16 @@ struct Pledge : public Syscall<0x5e5e5e5e5e5e5e5e, Pledge> {
     Rights rights;
 };
 
+/* --- Mutexes -------------------------------------------------------------- */
+
+struct Lock : public Syscall<0x6e6e6e6e6e6e6e6e, Lock> {
+    Handle<Mutex> handle;
+};
+
+struct Unlock : public Syscall<0x7e7e7e7e7e7e7e7e, Unlock> {
+    Handle<Mutex> handle;
+};
+
 /* --- Memory --------------------------------------------------------------- */
 
 struct Map : public Syscall<0x2d2d2d2d2d2d2d2d, Map> {

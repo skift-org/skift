@@ -99,7 +99,7 @@ extern "C" uintptr_t _intDispatch(uintptr_t rsp) {
     auto frame = reinterpret_cast<Frame *>(rsp);
 
     if (frame->intNo < 32) {
-        Debug::lpanic("{}: err:{} ip:{x} sp:{x} cr2:{x} cr3:{x}", _faultMsg[frame->intNo], frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
+        Debug::lfatal("CPU Exception: {} (err={}, ip={x}, sp={x}, cr2={x}, cr3={x})", _faultMsg[frame->intNo], frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
     } else {
         int irq = frame->intNo - 32;
 

@@ -16,7 +16,10 @@
     },
     "tools": {
         "cc": {
-            "cmd": ["@latest", "clang"],
+            "cmd": [
+                "@latest",
+                "clang"
+            ],
             "args": [
                 "-target",
                 "x86_64-none-elf",
@@ -32,7 +35,10 @@
             ]
         },
         "cxx": {
-            "cmd": ["@latest", "clang++"],
+            "cmd": [
+                "@latest",
+                "clang++"
+            ],
             "args": [
                 "-target",
                 "x86_64-none-elf",
@@ -48,8 +54,13 @@
             ]
         },
         "ld": {
-            "cmd": ["@latest", "ld.lld"],
+            "cmd": [
+                "@latest",
+                "ld.lld"
+            ],
             "args": [
+                "-m",
+                "elf_x86_64",
                 "-Tmeta/targets/kernel-x86_64.ld",
                 "-z",
                 "max-page-size=0x1000"
@@ -59,7 +70,10 @@
             ]
         },
         "ar": {
-            "cmd": ["@latest", "llvm-ar"],
+            "cmd": [
+                "@latest",
+                "llvm-ar"
+            ],
             "args": [
                 "rcs"
             ]

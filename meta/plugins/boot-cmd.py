@@ -2,8 +2,6 @@ from osdk import utils, build
 import shutil
 import os
 
-BOOTAGENT = "loader"
-
 
 def kvmAvailable() -> bool:
     if os.path.exists("/dev/kvm") and \
@@ -22,18 +20,8 @@ def bootCmd(opts: dict, args: list[str]) -> None:
     hjert = build.buildOne("kernel-x86_64", "hjert")
     shutil.copy(hjert, f"{bootDir}/kernel.elf")
 
-    if BOOTAGENT == "loader":
-        loader = build.buildOne("efi-x86_64", "loader")
-        shutil.copy(loader, f"{efiBootDir}/BOOTX64.EFI")
-    elif BOOTAGENT == "limine":
-        limine = utils.downloadFile(
-            "https://github.com/limine-bootloader/limine/raw/v3.0-branch-binary/BOOTX64.EFI")
-        limineSys = utils.downloadFile(
-            "https://github.com/limine-bootloader/limine/raw/v3.0-branch-binary/limine.sys")
-        shutil.copy(limineSys, f"{bootDir}/limine.sys")
-        shutil.copy('meta/images/limine-x86_64/limine.cfg',
-                    f"{bootDir}/limine.cfg")
-        shutil.copy(limine, f"{efiBootDir}/BOOTX64.EFI")
+    loader = build.buildOne("efi-x86_64", "loader")
+    shutil.copy(loader, f"{efiBootDir}/BOOTX64.EFI")
 
     qemuCmd = [
         "qemu-system-x86_64",

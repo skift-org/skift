@@ -1,0 +1,14 @@
+{
+    "id": "hjert-core",
+    "type": "lib",
+    "description": "The Hjert micro-kernel core",
+    "requires": {
+        "sys": [
+            "hjert"
+        ]
+    },
+    "deps": [
+        "embed",
+        "karm-base"
+    ]
+}

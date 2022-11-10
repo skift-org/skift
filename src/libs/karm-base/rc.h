@@ -19,6 +19,7 @@ struct _Rc {
     virtual ~_Rc() = default;
 
     virtual void *_unwrap() = 0;
+
     virtual Meta::Id id() = 0;
 
     bool dying() {

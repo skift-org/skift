@@ -87,7 +87,7 @@ struct Style {
     }
 };
 
-[[gnu::used]] static constexpr Style reset() {
+inline constexpr Style reset() {
     Style style;
     style._reset = true;
     return style;
@@ -113,7 +113,6 @@ template <>
 struct Karm::Fmt::Formatter<Karm::Cli::Style> {
     Result<size_t> format(Io::_TextWriter &writer, Karm::Cli::Style style) {
 #ifdef __osdk_karm_cli_backend_ansi__
-
         size_t written = 0;
 
         if (style._reset) {

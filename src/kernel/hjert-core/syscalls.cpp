@@ -5,6 +5,7 @@
 namespace Hjert {
 
 static Error handle(Api::Create &) {
+
     return Error::NOT_IMPLEMENTED;
 }
 
@@ -63,7 +64,6 @@ static Error handle(Api::Io &) {
 static Error handle(Api::Log &args) {
     try$(Arch::loggerOut()
              .write({(Byte *)args.buf, args.len}));
-
     return OK;
 }
 

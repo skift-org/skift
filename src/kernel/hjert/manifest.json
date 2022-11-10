@@ -1,14 +1,10 @@
 {
     "id": "hjert",
+    "description": "The hjert micro-kernel",
     "type": "exe",
-    "description": "The Hjert micro-kernel",
-    "requires": {
-        "sys": [
-            "hjert"
-        ]
-    },
     "deps": [
-        "embed",
-        "karm-base"
+        "hjert-core",
+        "hjert-arch",
+        "hjert-api"
     ]
 }

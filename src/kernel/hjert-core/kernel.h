@@ -70,7 +70,16 @@ struct Domain {
 
 struct Cpu;
 
-struct Thread {
+struct Channel {
+    Ring<Api::Msg> _buf;
+    Result<Api::Msg> recv();
+    Error send(Api::Msg);
+};
+
+struct Context : public Object<Context> {
+};
+
+struct Task : public Object<Task> {
     Cpu *_cpu;
 
     bool _inSyscall;
@@ -80,6 +89,11 @@ struct Thread {
 
     size_t _timeStart;
     size_t _timeEnd;
+
+    Strong<Context> _context;
+    Strong<Space> _space;
+    Domain _domain;
+    Channel _channel;
 
     bool runnable() const {
         return _started && (!_blocked || (_stopped && !_inSyscall));
@@ -100,24 +114,6 @@ struct Thread {
     void detach() {
         _cpu = nullptr;
     }
-};
-
-struct Channel {
-    Ring<Api::Msg> _buf;
-    Result<Api::Msg> recv();
-    Error send(Api::Msg);
-};
-
-struct Context : public Object<Context> {
-};
-
-struct Task : public Object<Task> {
-    Strong<Context> _context;
-    Strong<Space> _space;
-
-    Thread _thread;
-    Domain _domain;
-    Channel _channel;
 };
 
 struct Cpu {

@@ -219,13 +219,33 @@ struct Request {
     }
 };
 
-[[gnu::used]] static constexpr Request requestSelf() { return {Tag::SELF, 0, 0}; }
-[[gnu::used]] static constexpr Request requestStack(uint64_t preferedSize = 64 * 1024) { return {Tag::STACK, 0, preferedSize}; }
-[[gnu::used]] static constexpr Request requestKernel() { return {Tag::KERNEL, 0, 0}; }
-[[gnu::used]] static constexpr Request requestFiles() { return {Tag::FILE, 0, 0}; }
-[[gnu::used]] static constexpr Request requestRsdp() { return {Tag::RSDP, 0, 0}; }
-[[gnu::used]] static constexpr Request requestFdt() { return {Tag::FDT, 0, 0}; }
-[[gnu::used]] static constexpr Request requestFb(PixelFormat preferedFormat = PixelFormat::BGRX8888) { return {Tag::FB, 0, (uint64_t)preferedFormat}; }
+inline constexpr Request requestSelf() {
+    return {Tag::SELF, 0, 0};
+}
+
+inline constexpr Request requestStack(uint64_t preferedSize = 64 * 1024) {
+    return {Tag::STACK, 0, preferedSize};
+}
+
+inline constexpr Request requestKernel() {
+    return {Tag::KERNEL, 0, 0};
+}
+
+inline constexpr Request requestFiles() {
+    return {Tag::FILE, 0, 0};
+}
+
+inline constexpr Request requestRsdp() {
+    return {Tag::RSDP, 0, 0};
+}
+
+inline constexpr Request requestFdt() {
+    return {Tag::FDT, 0, 0};
+}
+
+inline constexpr Request requestFb(PixelFormat preferedFormat = PixelFormat::BGRX8888) {
+    return {Tag::FB, 0, (uint64_t)preferedFormat};
+}
 
 inline bool valid(uint32_t magic, Payload const &payload) {
     if (magic != COOLBOOT) {

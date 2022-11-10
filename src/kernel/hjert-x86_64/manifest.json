@@ -10,11 +10,10 @@
             "x86_64"
         ]
     },
-    "inject": [
-        "hjert"
-    ],
     "deps": [
-        "limine",
         "hal-x86-64"
+    ],
+    "provide": [
+        "hjert-arch"
     ]
 }

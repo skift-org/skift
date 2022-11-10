@@ -1,5 +1,5 @@
 #include <embed/debug.h>
-#include <hjert/arch.h>
+#include <hjert-core/arch.h>
 #include <karm-sys/chan.h>
 
 namespace Embed {

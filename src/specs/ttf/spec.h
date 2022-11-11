@@ -219,7 +219,6 @@ struct Glyf : public BChunk {
         auto endPtsOfContours = s;
         auto nPoints = s.peek(2 * (m.numContours - 1)).nextBeUint16() + 1u;
         uint16_t instructionLength = s.skip(m.numContours * 2).nextBeUint16();
-        // auto instructions = s;
 
         auto flagsScan = s.skip(instructionLength);
 
@@ -387,18 +386,6 @@ struct Hmtx : public BChunk {
     }
 };
 
-struct Name : public BChunk {
-    static constexpr Str SIG = "name";
-};
-
-struct Os2 : public BChunk {
-    static constexpr Str SIG = "OS/2";
-};
-
-struct Kern : public BChunk {
-    static constexpr Str SIG = "kern";
-};
-
 struct GlyphMetrics {
     double x;
     double y;
@@ -425,11 +412,9 @@ struct Font {
     Loca _loca;
     Hhea _hhea;
     Hmtx _hmtx;
-    Name _name;
-    Kern _kern;
 
     static Result<Cmap::Table> chooseCmap(Font &font) {
-        Opt<Cmap::Table> bestCmap;
+        Opt<Cmap::Table> bestCmap = NONE;
         int bestScore = 0;
 
         struct KnowCmap {
@@ -447,7 +432,6 @@ struct Font {
         };
 
         for (auto table : font._cmap.iterTables()) {
-
             for (auto &knowCmap : knowCmaps) {
                 if (knowCmap.platformId == table.platformId && knowCmap.encodingId == table.encodingId && knowCmap.type == table.type) {
                     if (knowCmap.score > bestScore) {
@@ -482,8 +466,6 @@ struct Font {
         font._loca = try$(font.requireTable<Loca>());
         font._hhea = try$(font.requireTable<Hhea>());
         font._hmtx = try$(font.requireTable<Hmtx>());
-        font._name = font.lookupTable<Name>();
-        font._kern = font.lookupTable<Kern>();
 
         return font;
     }

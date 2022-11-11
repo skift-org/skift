@@ -119,6 +119,14 @@ Child center(Child child) {
     return align(Layout::Align::CENTER, child);
 }
 
+Child start(Child child) {
+    return align(Layout::Align::START | Layout::Align::VFILL, child);
+}
+
+Child end(Child child) {
+    return align(Layout::Align::END | Layout::Align::VFILL, child);
+}
+
 Child fit(Child child) {
     return align(Layout::Align::FIT, child);
 }

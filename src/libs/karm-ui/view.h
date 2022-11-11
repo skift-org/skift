@@ -35,7 +35,7 @@ enum struct TextWeight {
 
 struct TextStyle {
     Media::Font font;
-    Opt<Gfx::Color> color;
+    Opt<Gfx::Color> color = NONE;
 
     TextStyle withSize(int size) {
         TextStyle style = *this;

@@ -1,3 +1,5 @@
+#include <karm-debug/logger.h>
+
 #include "path.h"
 
 namespace Karm::Gfx {
@@ -15,7 +17,8 @@ void Path::_flattenClose() {
 
 void Path::_flattenLineTo(Math::Vec2f p) {
     if (_segs.len() == 0) {
-        panic("move to must be called before line to");
+        Debug::lerror("move to must be called before line to");
+        return;
     }
 
     if (last(_segs).start != last(_segs).end &&
@@ -180,7 +183,8 @@ void Path::evalOp(Op op) {
         last(_segs).close &&
         op.code != MOVE_TO &&
         op.code != CLEAR) {
-        panic("can't evalOp on closed path");
+        Debug::lerror("can't evalOp on closed path");
+        return;
     }
 
     if (op.flags & RELATIVE) {

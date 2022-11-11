@@ -96,6 +96,10 @@ struct Rc : public _Rc {
     Meta::Id id() override { return Meta::makeId<T>(); }
 };
 
+inline _Rc *tryRefStrong(_Rc *rc) {
+    return rc ? rc->refStrong() : nullptr;
+}
+
 template <typename T>
 struct Strong {
     _Rc *_rc{};
@@ -220,7 +224,145 @@ struct Strong {
 };
 
 template <typename T>
-using OptStrong = Opt<Strong<T>>;
+struct OptStrong {
+    _Rc *_rc{};
+
+    constexpr OptStrong() = default;
+
+    constexpr OptStrong(None) : _rc(nullptr) {}
+
+    constexpr OptStrong(_Rc *ptr) : _rc(tryRefStrong(ptr)) {}
+
+    constexpr OptStrong(OptStrong const &other) : _rc(tryRefStrong(other._rc)) {}
+
+    constexpr OptStrong(OptStrong &&other) : _rc(std::exchange(other._rc, nullptr)) {}
+
+    template <Meta::Derive<T> U>
+    constexpr OptStrong(OptStrong<U> const &other) : _rc(tryRefStrong(other._rc)) {}
+
+    template <Meta::Derive<T> U>
+    constexpr OptStrong(OptStrong<U> &&other) : _rc(std::exchange(other._rc, nullptr)) {}
+
+    constexpr OptStrong(Strong<T> const &other) : _rc(tryRefStrong(other._rc)) {}
+
+    constexpr OptStrong(Strong<T> &&other) : _rc(std::exchange(other._rc, nullptr)) {}
+
+    template <Meta::Derive<T> U>
+    constexpr OptStrong(Strong<U> const &other) : _rc(tryRefStrong(other._rc)) {}
+
+    template <Meta::Derive<T> U>
+    constexpr OptStrong(Strong<U> &&other) : _rc(std::exchange(other._rc, nullptr)) {}
+
+    constexpr ~OptStrong() {
+        if (_rc) {
+            _rc = _rc->derefStrong();
+        }
+    }
+
+    constexpr OptStrong &operator=(OptStrong const &other) {
+        return *this = Strong(other);
+    }
+
+    constexpr OptStrong &operator=(OptStrong &&other) {
+        std::swap(_rc, other._rc);
+        return *this;
+    }
+
+    constexpr operator bool() const { return _rc; }
+
+    constexpr T *operator->() const {
+        if (!_rc) {
+            panic("Deferencing moved from Strong<T>");
+        }
+
+        return &_rc->unwrapStrong<T>();
+    }
+
+    constexpr Ordr cmp(OptStrong const &other) const {
+        if (_rc == other._rc)
+            return Ordr::EQUAL;
+
+        if (!_rc || !other._rc) {
+            return Ordr::LESS;
+        }
+
+        return ::cmp(unwrap(), other.unwrap());
+    }
+
+    constexpr T &operator*() const {
+        if (!_rc) {
+            panic("Deferencing none OptStrong<T>");
+        }
+
+        return _rc->unwrapStrong<T>();
+    }
+
+    constexpr T const &unwrap() const {
+        if (!_rc) {
+            panic("Deferencing none OptStrong<T>");
+        }
+
+        return _rc->unwrapStrong<T>();
+    }
+
+    constexpr T &unwrap() {
+        if (!_rc) {
+            panic("Deferencing none OptStrong<T>");
+        }
+
+        return _rc->unwrapStrong<T>();
+    }
+
+    template <typename U>
+    constexpr U &unwrap() {
+        if (!_rc) {
+            panic("Deferencing none OptStrong<T>");
+        }
+
+        if (!is<U>()) {
+            panic("Unwrapping Strong<T> as Strong<U>");
+        }
+
+        return _rc->unwrapStrong<U>();
+    }
+
+    template <typename U>
+    constexpr U const &unwrap() const {
+        if (!_rc) {
+            panic("Deferencing none OptStrong<T>");
+        }
+
+        if (!is<U>()) {
+            panic("Unwrapping Strong<T> as Strong<U>");
+        }
+
+        return _rc->unwrapStrong<U>();
+    }
+
+    template <typename U>
+    constexpr bool is() {
+        return Meta::Same<T, U> ||
+               Meta::Derive<T, U> ||
+               _rc->id() == Meta::makeId<U>();
+    }
+
+    Meta::Id id() const {
+        if (!_rc) {
+            panic("Deferencing none OptStrong<T>");
+        }
+
+        return _rc->id();
+    }
+
+    template <typename U>
+    constexpr Opt<Strong<U>> as() {
+        if (!is<U>()) {
+            return NONE;
+        }
+
+        return Strong<U>(_rc);
+    }
+};
 
 template <typename T, typename... Args>
 constexpr static Strong<T> makeStrong(Args &&...args) {
@@ -261,26 +403,12 @@ struct Weak {
         return *this;
     }
 
-    constexpr explicit operator bool() {
-        return _rc && _rc->dying() && (_rc = _rc->derefWeak());
-    }
+    OptStrong<T> lock() const {
+        if (!_rc) {
+            return NONE;
+        }
 
-    constexpr explicit operator bool() const {
-        return _rc && _rc->dying();
-    }
-
-    T *operator->() {
-        if (!_rc)
-            panic("Deferencing moved from Weak<T>");
-
-        return _rc->unwrapWeak<T>();
-    }
-
-    T &unwrap() {
-        if (!_rc)
-            panic("Deferencing moved from Weak<T>");
-
-        return _rc->unwrapWeak<T>();
+        return Strong<T>(_rc);
     }
 
     void visit(auto visitor) {

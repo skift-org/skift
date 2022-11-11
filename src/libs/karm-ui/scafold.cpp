@@ -8,6 +8,18 @@
 
 namespace Karm::Ui {
 
+Child controls(TitlebarStyle style) {
+    return hflow(8,
+                 cond(style == TitlebarStyle::DEFAULT, button(NONE, ButtonStyle::subtle(), Media::Icons::MINUS)),
+                 cond(style == TitlebarStyle::DEFAULT, button(NONE, ButtonStyle::subtle(), Media::Icons::CROP_SQUARE)),
+                 button(
+                     [](Node &n) {
+                         Events::ExitEvent e{OK};
+                         n.bubble(e);
+                     },
+                     ButtonStyle::subtle(), Media::Icons::CLOSE));
+}
+
 Child titlebar(Media::Icons icon, String title, TitlebarStyle style) {
     return dragRegion(
         spacing(
@@ -20,14 +32,7 @@ Child titlebar(Media::Icons icon, String title, TitlebarStyle style) {
                     },
                     ButtonStyle::subtle(), icon, title),
                 grow(),
-                cond(style == TitlebarStyle::DEFAULT, button(NONE, ButtonStyle::subtle(), Media::Icons::MINUS)),
-                cond(style == TitlebarStyle::DEFAULT, button(NONE, ButtonStyle::subtle(), Media::Icons::CROP_SQUARE)),
-                button(
-                    [](Node &n) {
-                        Events::ExitEvent e{OK};
-                        n.bubble(e);
-                    },
-                    ButtonStyle::subtle(), Media::Icons::CLOSE))));
+                controls(style))));
 }
 
 auto lookup(auto k, auto &m) {

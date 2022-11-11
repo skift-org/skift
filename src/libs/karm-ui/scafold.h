@@ -12,6 +12,8 @@ enum struct TitlebarStyle {
     DIALOG,
 };
 
+Child controls(TitlebarStyle style = TitlebarStyle::DEFAULT);
+
 Child titlebar(Media::Icons icon, String title, TitlebarStyle style = TitlebarStyle::DEFAULT);
 
 enum struct BadgeStyle {

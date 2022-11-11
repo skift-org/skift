@@ -4,8 +4,6 @@
 
 #include "_prelude.h"
 
-#include "clamp.h"
-
 namespace Karm {
 
 struct Ordr {
@@ -18,7 +16,8 @@ struct Ordr {
     Value _value;
 
     constexpr static Ordr from(int cmp) {
-        return (Value)clamp(cmp, LESS, GREATER);
+        return cmp < 0 ? LESS : cmp > 0 ? GREATER
+                                        : EQUAL;
     }
 
     constexpr Ordr(Value value) : _value(value) {}
@@ -41,17 +40,17 @@ struct Ordr {
     constexpr bool isGtEq() const { return _value != LESS; }
 };
 
-template <typename T>
-concept Comparable = requires(T const &lhs, T const &rhs) {
-    { lhs.cmp(rhs) } -> Meta::Same<Ordr>;
-};
+template <typename Lhs, typename Rhs = Lhs>
+concept Comparable = requires(Lhs const &lhs, Rhs const &rhs) {
+                         { lhs.cmp(rhs) } -> Meta::Same<Ordr>;
+                     };
 
-template <typename T>
-concept ComparaisonOperator = requires(T const &lhs, T const &rhs) {
-    { lhs < rhs } -> Meta::Same<bool>;
-    { lhs > rhs } -> Meta::Same<bool>;
-    { lhs == rhs } -> Meta::Same<bool>;
-};
+template <typename Lhs, typename Rhs = Lhs>
+concept ComparaisonOperator = requires(Lhs const &lhs, Rhs const &rhs) {
+                                  { lhs < rhs } -> Meta::Same<bool>;
+                                  { lhs > rhs } -> Meta::Same<bool>;
+                                  { lhs == rhs } -> Meta::Same<bool>;
+                              };
 
 template <Comparable T>
 constexpr Ordr cmp(T const &lhs, T const &rhs) {
@@ -59,8 +58,9 @@ constexpr Ordr cmp(T const &lhs, T const &rhs) {
 }
 
 // fallback for types that don't implement Comparable
-template <typename T>
-requires(ComparaisonOperator<T>) constexpr Ordr cmp(T const &lhs, T const &rhs) {
+template <typename Lhs, typename Rhs>
+    requires(ComparaisonOperator<Lhs, Rhs>)
+constexpr Ordr cmp(Lhs const &lhs, Rhs const &rhs) {
     if (lhs < rhs) {
         return Ordr::LESS;
     } else if (lhs > rhs) {
@@ -72,7 +72,7 @@ requires(ComparaisonOperator<T>) constexpr Ordr cmp(T const &lhs, T const &rhs) 
 
 template <typename T>
 Ordr cmp(T const *lhs, size_t lhs_len, T const *rhs, size_t rhs_len) {
-    size_t len = min(lhs_len, rhs_len);
+    size_t len = lhs_len < rhs_len ? lhs_len : rhs_len;
 
     for (size_t i = 0; i < len; i++) {
         Ordr c = cmp(lhs[i], rhs[i]);
@@ -92,33 +92,33 @@ Ordr cmp(T const *lhs, size_t lhs_len, T const *rhs, size_t rhs_len) {
 
 namespace Op {
 
-template <typename T>
-constexpr bool eq(T const &lhs, T const &rhs) {
+template <typename Lhs, typename Rhs>
+constexpr bool eq(Lhs const &lhs, Rhs const &rhs) {
     return cmp(lhs, rhs).isEq();
 }
 
-template <typename T>
-constexpr bool ne(T const &lhs, T const &rhs) {
+template <typename Lhs, typename Rhs>
+constexpr bool ne(Lhs const &lhs, Rhs const &rhs) {
     return cmp(lhs, rhs).isNe();
 }
 
-template <typename T>
-constexpr bool lt(T const &lhs, T const &rhs) {
+template <typename Lhs, typename Rhs>
+constexpr bool lt(Lhs const &lhs, Rhs const &rhs) {
     return cmp(lhs, rhs).isLt();
 }
 
-template <typename T>
-constexpr bool gt(T const &lhs, T const &rhs) {
+template <typename Lhs, typename Rhs>
+constexpr bool gt(Lhs const &lhs, Rhs const &rhs) {
     return cmp(lhs, rhs).isGt();
 }
 
-template <typename T>
-constexpr bool gteq(T const &lhs, T const &rhs) {
+template <typename Lhs, typename Rhs>
+constexpr bool gteq(Lhs const &lhs, Rhs const &rhs) {
     return cmp(lhs, rhs).isGtEq();
 }
 
-template <typename T>
-constexpr bool lteq(T const &lhs, T const &rhs) {
+template <typename Lhs, typename Rhs>
+constexpr bool lteq(Lhs const &lhs, Rhs const &rhs) {
     return cmp(lhs, rhs).isLtEq();
 }
 

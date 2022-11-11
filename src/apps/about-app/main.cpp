@@ -1,6 +1,7 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/drag.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
@@ -12,18 +13,12 @@ CliResult entryPoint(CliArgs args) {
         "About",
         Ui::TitlebarStyle::DIALOG);
 
-    auto content = Ui::vflow(
-        8,
-        Layout::Align::CENTER,
-
-        Ui::icon(Media::Icons::SNOWFLAKE, 72),
-        Ui::text(Ui::TextStyle::title1(), "skiftOS"),
-        Ui::empty(),
-        Ui::badge(Ui::BadgeStyle::INFO, "v0.1.0"),
-        Ui::empty(),
-        Ui::text("Copyright © 2018-2022"),
-        Ui::text("SMNX & contributors."),
-        Ui::empty());
+    auto logo = Ui::grow(Ui::box(
+        {
+            .backgroundColor = Gfx::WHITE,
+            .foregroundColor = Gfx::BLACK,
+        },
+        Ui::bound(Ui::center(Ui::icon(Media::Icons::SNOWFLAKE, 128)))));
 
     auto licenseBtn = Ui::button(
         NONE,
@@ -31,19 +26,34 @@ CliResult entryPoint(CliArgs args) {
         Media::Icons::LICENSE,
         "LICENSE");
 
-    auto wrapper = Ui::spacing(
-        32,
-        Ui::vflow(
-            32,
-            Ui::grow(Ui::center(content)),
-            Ui::center(licenseBtn)));
+    auto closeBtn = Ui::button(
+        [](Ui::Node &n) {
+            Events::ExitEvent e{OK};
+            n.bubble(e);
+        },
+        Ui::ButtonStyle::primary(),
+        "OK");
 
-    auto layout = Ui::dialogLayer(
+    auto content = Ui::spacing(
+        16,
+        Ui::vflow(
+            8,
+            Ui::hflow(8,
+                      Ui::text(Ui::TextStyle::title1(), "skiftOS"),
+                      Ui::center(Ui::badge(Ui::BadgeStyle::INFO, "v0.1.0"))),
+            Ui::empty(),
+            Ui::text("Copyright © 2018-2022"),
+            Ui::text("SMNX & contributors."),
+            Ui::grow(),
+            Ui::hflow(8, licenseBtn, Ui::grow(), closeBtn)));
+
+    auto wrapper =
+        Ui::hflow(logo, Ui::grow(content));
+
+    auto layout = Ui::dragRegion(
         Ui::minSize(
-            420,
-            Ui::vflow(
-                titlebar,
-                Ui::grow(Ui::center(wrapper)))));
+            {500, 300},
+            wrapper));
 
     return Ui::runApp(args, layout);
 }

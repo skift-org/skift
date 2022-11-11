@@ -15,7 +15,7 @@ enum struct VmmFlags : uint64_t {
     EXEC = (1 << 2),
     USER = (1 << 3),
     GLOBAL = (1 << 4),
-    WRITETHROUGH = (1 << 5),
+    UNCACHED = (1 << 5),
 };
 
 FlagsEnum$(VmmFlags);

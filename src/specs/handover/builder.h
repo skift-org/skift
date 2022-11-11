@@ -66,7 +66,7 @@ struct Builder {
             if (other.tag == record.tag &&
                 other.end() == record.start &&
                 shouldMerge(record.tag)) {
-                Debug::ldebug("handover: merge {} with {}", record, other);
+                // Debug::ldebug("handover: merge {} with {}", record, other);
                 _records.removeAt(i);
                 other.size += record.size;
                 add(other);
@@ -77,7 +77,7 @@ struct Builder {
             if (other.tag == record.tag &&
                 other.start == record.end() &&
                 shouldMerge(record.tag)) {
-                Debug::ldebug("handover: merge {} with {}", record, other);
+                // Debug::ldebug("handover: merge {} with {}", record, other);
 
                 _records.removeAt(i);
                 record.size += other.size;
@@ -87,7 +87,7 @@ struct Builder {
 
             if (colidesWith(record, other)) {
                 if (shouldMerge(record.tag) && !shouldMerge(other.tag)) {
-                    Debug::ldebug("handover: splitting record {} with {}", record, other);
+                    // Debug::ldebug("handover: splitting record {} with {}", record, other);
 
                     _records.removeAt(i);
                     auto [lower, upper] = split(record, other);
@@ -97,7 +97,7 @@ struct Builder {
                     add(upper);
                     return;
                 } else if (!shouldMerge(record.tag) && shouldMerge(other.tag)) {
-                    Debug::ldebug("handover: splitting record {} with {}", other, record);
+                    // Debug::ldebug("handover: splitting record {} with {}", other, record);
 
                     _records.removeAt(i);
 
@@ -113,13 +113,13 @@ struct Builder {
             }
 
             if (other.start > record.start) {
-                Debug::ldebug("handover: insert {} at {}", record, i);
+                // Debug::ldebug("handover: insert {} at {}", record, i);
                 _records.insert(i, record);
                 return;
             }
         }
 
-        Debug::ldebug("handover: append {}", record);
+        // Debug::ldebug("handover: append {}", record);
         _records.pushBack(record);
     }
 

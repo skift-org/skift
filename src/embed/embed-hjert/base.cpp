@@ -14,7 +14,7 @@ void debug(char const *buf) {
 }
 
 void relaxe() {
-    Hjert::Arch::idleCpu();
+    Hjert::Arch::relaxeCpu();
 }
 
 void criticalEnter() {

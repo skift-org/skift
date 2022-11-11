@@ -17,6 +17,6 @@ Io::TextWriter<> &loggerOut();
 
 [[noreturn]] void stopAll();
 
-[[noreturn]] void idleCpu();
+void relaxeCpu();
 
 } // namespace Hjert::Arch

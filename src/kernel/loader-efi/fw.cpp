@@ -30,7 +30,7 @@ static EfiPmm pmm{};
 Result<Strong<Hal::Vmm>> createVmm() {
     size_t upper = try$(pmm.alloc(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start;
     memset((void *)upper, 0, Hal::PAGE_SIZE);
-    return {makeStrong<x86_64::Vmm<Hal::IdentityMapper>>(pmm, (x86_64::Pml<4> *)upper)};
+    return {makeStrong<x86_64::Vmm<>>(pmm, (x86_64::Pml<4> *)upper)};
 }
 
 Error parseGop(Handover::Builder &builder) {

@@ -23,7 +23,9 @@ Ui::Child rounedButton(Func<void(Ui::Node &)> onPress, Ui::ButtonStyle style, Me
 
 Ui::Child app() {
     auto content = Ui::reducer<Model>(reduce, [](State state) {
-        auto lbl = Ui::text(Ui::TextStyle::regular().withSize(72), "{}", state.counter);
+        auto lbl = Ui::text(
+            Ui::TextStyle::regular().withSize(72),
+            "{}", state.counter);
 
         auto decBtn = Ui::button(
             Model::bind<DecrementAction>(),

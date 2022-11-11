@@ -339,7 +339,8 @@ void renderScene(Cam cam, Scene &scene, Gfx::Surface buf, Props props) {
             buf.store({x, y}, color);
         }
 
-        Debug::linfo("rendered {} of {}", y, size.y);
+        if (y % 10 == 0)
+            Debug::linfo("rendered {} of {}", y, size.y);
     }
 }
 

@@ -47,5 +47,6 @@ Error entryPoint(uint64_t magic, Handover::Payload &payload) {
     Debug::linfo("Initialized memory manager...");
     try$(Hjert::Mem::init(payload));
 
-    Hjert::Arch::idleCpu();
+    while (true)
+        Hjert::Arch::relaxeCpu();
 }

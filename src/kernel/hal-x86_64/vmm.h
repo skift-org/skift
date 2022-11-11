@@ -3,7 +3,7 @@
 #include <hal/mem.h>
 #include <hal/pmm.h>
 #include <hal/vmm.h>
-#include <karm-sys/chan.h>
+#include <karm-debug/logger.h>
 
 #include "asm.h"
 #include "paging.h"
@@ -103,7 +103,7 @@ struct Vmm : public Hal::Vmm {
             size_t curr = pml.index2virt(i) | vaddr;
             if constexpr (L == 1) {
                 if (page.present()) {
-                    Sys::println("{x} {x}", curr, page._raw);
+                    Debug::linfo("{x} {x}", curr, page._raw);
                 }
             } else if (page.present()) {
                 auto &lower = *_mapper.map(page.template as<Pml<L - 1>>());

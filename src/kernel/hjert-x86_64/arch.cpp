@@ -1,4 +1,5 @@
 #include <hjert-core/arch.h>
+#include <hjert-core/mem.h>
 #include <karm-debug/logger.h>
 
 #include <hal-x86_64/com.h>
@@ -7,6 +8,7 @@
 #include <hal-x86_64/idt.h>
 #include <hal-x86_64/pic.h>
 #include <hal-x86_64/pit.h>
+#include <hal-x86_64/vmm.h>
 
 #include "ints.h"
 
@@ -53,9 +55,8 @@ void stopAll() {
     }
 }
 
-void idleCpu() {
-    while (true)
-        x86_64::hlt();
+void relaxeCpu() {
+    x86_64::hlt();
 }
 
 static uint64_t _tick = 0;
@@ -116,6 +117,24 @@ extern "C" uintptr_t _intDispatch(uintptr_t rsp) {
     _pic.ack(frame->intNo);
 
     return rsp;
+}
+
+static Opt<x86_64::Vmm<Hal::UpperHalfMapper>> _vmm = NONE;
+
+Hal::Vmm &vmm() {
+    if (_vmm == NONE) {
+        uintptr_t pml4 = Hjert::Mem::heap()
+                             .alloc(Hal::PAGE_SIZE)
+                             .unwrap("failed to allocate pml4")
+                             .start;
+
+        memset(reinterpret_cast<void *>(pml4), 0, Hal::PAGE_SIZE);
+
+        _vmm = x86_64::Vmm<Hal::UpperHalfMapper>{
+            Hjert::Mem::pmm(), reinterpret_cast<x86_64::Pml<4> *>(pml4)};
+    }
+
+    return *_vmm;
 }
 
 } // namespace Hjert::Arch

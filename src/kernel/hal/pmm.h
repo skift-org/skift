@@ -4,6 +4,8 @@
 #include <karm-base/range.h>
 #include <karm-base/result.h>
 
+#include "mem.h"
+
 namespace Hal {
 
 enum struct PmmFlags : uint64_t {
@@ -15,9 +17,7 @@ enum struct PmmFlags : uint64_t {
 
 FlagsEnum$(PmmFlags);
 
-struct PmmRange : public USizeRange {
-    using USizeRange::USizeRange;
-};
+using PmmRange = Range<size_t, struct PmmRangeTag>;
 
 struct Pmm {
     using enum PmmFlags;

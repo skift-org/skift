@@ -13,4 +13,16 @@ void debug(char const *buf) {
     Hjert::Arch::stopAll();
 }
 
+void relaxe() {
+    Hjert::Arch::idleCpu();
+}
+
+void criticalEnter() {
+    debug("todo: criticalEnter");
+}
+
+void criticalLeave() {
+    debug("todo: criticalLeave");
+}
+
 } // namespace Embed

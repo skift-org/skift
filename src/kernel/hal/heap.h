@@ -13,11 +13,13 @@ struct HeapRange : public USizeRange {
 struct Heap {
     virtual ~Heap() = default;
 
-    virtual HeapRange alloc(size_t size) = 0;
+    virtual Result<HeapRange> alloc(size_t size) = 0;
 
     virtual Error free(HeapRange range) = 0;
 
-    virtual PmmRange heapToPmm(HeapRange range) = 0;
+    virtual Result<PmmRange> heap2Pmm(HeapRange range) = 0;
+
+    virtual Result<HeapRange> pmm2Heap(PmmRange range) = 0;
 };
 
 } // namespace Hal

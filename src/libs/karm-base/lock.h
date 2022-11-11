@@ -21,8 +21,7 @@ struct CriticalScope : Meta::Static {
 struct Lock {
     Atomic<bool> _lock{};
 
-    bool try_acquire() {
-        Embed::criticalEnter();
+    bool _tryAcquire() {
         bool result = _lock.cmpxchg(false, true);
         memory_barier();
 
@@ -33,10 +32,15 @@ struct Lock {
         return result;
     }
 
+    bool tryAcquire() {
+        Embed::criticalEnter();
+        return _tryAcquire();
+    }
+
     void acquire() {
         Embed::criticalEnter();
 
-        while (!try_acquire()) {
+        while (!_tryAcquire()) {
             Embed::relaxe();
         }
     }
@@ -49,7 +53,8 @@ struct Lock {
     }
 };
 
-struct LockScope : Meta::Static {
+struct LockScope :
+    Meta::Static {
     Lock &_lock;
 
     LockScope(Lock &lock) : _lock(lock) {

@@ -23,7 +23,7 @@ static x86_64::GdtDesc _gdtDesc{_gdt};
 static x86_64::Idt _idt{};
 static x86_64::IdtDesc _idtDesc{_idt};
 
-Error init() {
+Error init(Handover::Payload &) {
     _com1.init();
 
     _gdtDesc.load();

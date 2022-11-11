@@ -4,7 +4,6 @@
 #include <karm-base/range.h>
 #include <karm-base/result.h>
 
-#include "mem.h"
 #include "pmm.h"
 
 namespace Hal {
@@ -21,17 +20,15 @@ enum struct VmmFlags : uint64_t {
 
 FlagsEnum$(VmmFlags);
 
-struct VmmRange : public USizeRange {
-    using USizeRange::USizeRange;
+using VmmRange = Range<size_t, struct VmmRangeTag>;
 
-    static VmmRange identityMapped(PmmRange range) {
-        return {range.start(), range.size()};
-    }
+inline VmmRange identityMapped(PmmRange range) {
+    return {range.start, range.size};
+}
 
-    static VmmRange upperHalfMapped(PmmRange range) {
-        return {UPPER_HALF + range.start(), range.size()};
-    }
-};
+inline VmmRange upperHalfMapped(PmmRange range) {
+    return {UPPER_HALF + range.start, range.size};
+}
 
 struct Vmm {
     using enum VmmFlags;

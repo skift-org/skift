@@ -10,9 +10,7 @@ Error entryPoint(uint64_t magic, Handover::Payload &payload);
 
 extern "C" void _kstart(uint64_t magic, Handover::Payload *payload) {
     Error err = entryPoint(magic, *payload);
-    if (err) {
-        panic(err.msg());
-    }
+    panic(err.msg());
 }
 
 #endif

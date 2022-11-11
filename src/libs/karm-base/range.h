@@ -1,17 +1,17 @@
 #pragma once
 
+#include "align.h"
 #include "clamp.h"
 #include "cons.h"
 #include "iter.h"
 #include "ordr.h"
-#include "vec.h"
 
 namespace Karm {
 
-template <typename T>
+template <typename T, typename TAG = struct _default_range_tag>
 struct Range {
-    T _start{};
-    T _size{};
+    T start{};
+    T size{};
 
     static constexpr Range fromStartEnd(T start, T end) {
         return {start, end - start};
@@ -20,19 +20,15 @@ struct Range {
     constexpr Range() = default;
 
     constexpr Range(T start, T size)
-        : _start(start), _size(size) {
-    }
-
-    constexpr T start() const {
-        return _start;
+        : start(start), size(size) {
     }
 
     constexpr T end() const {
-        return _start + _size;
+        return start + size;
     }
 
     constexpr bool empty() const {
-        return _size == T{};
+        return size == T{};
     }
 
     constexpr bool any() const {
@@ -40,38 +36,34 @@ struct Range {
     }
 
     constexpr bool valid() const {
-        return _size >= T{};
-    }
-
-    constexpr T size() const {
-        return _size;
+        return size >= T{};
     }
 
     constexpr bool contains(T value) const {
-        return start() <= value && value < end();
+        return start <= value && value < end();
     }
 
     constexpr bool contains(Range other) const {
-        return start() <= other.start() && other.end() <= end();
+        return start <= other.start && other.end() <= end();
     }
 
     constexpr bool contigous(Range other) const {
-        return end() == other.start() || start() == other.end();
+        return end() == other.start || start == other.end();
     }
 
     constexpr bool overlaps(Range other) const {
-        return start() < other.end() && other.start() < end();
+        return start < other.end() && other.start < end();
     }
 
     constexpr Range merge(Range other) const {
         return fromStartEnd(
-            min(start(), other.start()),
+            min(start, other.start),
             max(end(), other.end()));
     }
 
     constexpr Range halfUnder(Range other) {
-        if (overlaps(other) && start() < other.start()) {
-            return {start(), other.start() - start()};
+        if (overlaps(other) && start < other.start) {
+            return {start, other.start - start};
         }
 
         return {};
@@ -90,68 +82,37 @@ struct Range {
     }
 
     constexpr auto iter() const {
-        return range(start(), end());
+        return range(start, end());
     }
 
     constexpr auto iterRev() const {
-        return range(end(), start());
+        return range(end(), start);
     }
 
     template <typename U>
     constexpr auto as() {
-        return U{start(), size()};
+        return U{start, size};
     }
 
     constexpr Ordr cmp(Range<T> other) const {
-        if (start() == other.start() && size() == other.size())
+        if (start == other.start && size == other.size)
             return Ordr::EQUAL;
 
-        if (start() < other.start())
+        if (start < other.start)
             return Ordr::LESS;
 
-        if (start() > other.start())
+        if (start > other.start)
             return Ordr::GREATER;
     }
-};
 
-template <typename T>
-struct RangeAlloc {
-    Vec<Range<T>> _ranges;
+    constexpr Error ensureAligned(T alignment) const {
+        if (!isAlign(start, alignment))
+            return {Error::INVALID_DATA, "start is not aligned"};
 
-    Opt<Range<T>> alloc(T size) {
-        for (auto &range : _ranges) {
-            if (range.size() >= size) {
-                Range result = {
-                    range.start,
-                    range.start + size,
-                };
-                range.start += size;
-                return result;
-            }
-        }
-        return NONE;
-    }
+        if (!isAlign(size, alignment))
+            return {Error::INVALID_DATA, "size is not aligned"};
 
-    Opt<Range<T>> map(Range<T> range) {
-        for (auto &r : _ranges) {
-            if (r.contains(range)) {
-                auto result = r.substract(range);
-                free(result.car);
-                free(result.cdr);
-                return range;
-            }
-        }
-        return {};
-    }
-
-    void free(Range<T> range) {
-        for (auto &r : _ranges) {
-            if (r.contigous(range)) {
-                r = r.merge(range);
-                return;
-            }
-        }
-        _ranges.pushBack(range);
+        return OK;
     }
 };
 

@@ -2,6 +2,7 @@
 
 #include <karm-base/range.h>
 #include <karm-base/string.h>
+#include <karm-base/vec.h>
 #include <karm-debug/logger.h>
 
 #include "spec.h"
@@ -27,10 +28,10 @@ inline Cons<Record, Record> split(Record record, Record other) {
     auto [lower, upper] = rangeOf(record).split(rangeOf(other));
     Record lowerRecord = record;
     Record upperRecord = record;
-    lowerRecord.start = lower.start();
-    lowerRecord.size = lower.size();
-    upperRecord.start = upper.start();
-    upperRecord.size = upper.size();
+    lowerRecord.start = lower.start;
+    lowerRecord.size = lower.size;
+    upperRecord.start = upper.start;
+    upperRecord.size = upper.size;
     return {lowerRecord, upperRecord};
 }
 
@@ -65,8 +66,7 @@ struct Builder {
             if (other.tag == record.tag &&
                 other.end() == record.start &&
                 shouldMerge(record.tag)) {
-                Debug::linfo("handover: merge {} with {}", record, other);
-
+                Debug::ldebug("handover: merge {} with {}", record, other);
                 _records.removeAt(i);
                 other.size += record.size;
                 add(other);
@@ -77,7 +77,8 @@ struct Builder {
             if (other.tag == record.tag &&
                 other.start == record.end() &&
                 shouldMerge(record.tag)) {
-                Debug::linfo("handover: merge {} with {}", record, other);
+                Debug::ldebug("handover: merge {} with {}", record, other);
+
                 _records.removeAt(i);
                 record.size += other.size;
                 add(record);
@@ -86,7 +87,7 @@ struct Builder {
 
             if (colidesWith(record, other)) {
                 if (shouldMerge(record.tag) && !shouldMerge(other.tag)) {
-                    Debug::linfo("handover: splitting record {} with {}", record, other);
+                    Debug::ldebug("handover: splitting record {} with {}", record, other);
 
                     _records.removeAt(i);
                     auto [lower, upper] = split(record, other);
@@ -96,7 +97,7 @@ struct Builder {
                     add(upper);
                     return;
                 } else if (!shouldMerge(record.tag) && shouldMerge(other.tag)) {
-                    Debug::linfo("handover: splitting record {} with {}", other, record);
+                    Debug::ldebug("handover: splitting record {} with {}", other, record);
 
                     _records.removeAt(i);
 
@@ -112,13 +113,13 @@ struct Builder {
             }
 
             if (other.start > record.start) {
-                Debug::linfo("handover: insert {} at {}", record, i);
+                Debug::ldebug("handover: insert {} at {}", record, i);
                 _records.insert(i, record);
                 return;
             }
         }
 
-        Debug::linfo("handover: append {}", record);
+        Debug::ldebug("handover: append {}", record);
         _records.pushBack(record);
     }
 
@@ -126,8 +127,8 @@ struct Builder {
         add({
             .tag = tag,
             .flags = flags,
-            .start = range.start(),
-            .size = range.size(),
+            .start = range.start,
+            .size = range.size,
             .more = more,
         });
     }

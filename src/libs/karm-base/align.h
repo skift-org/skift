@@ -1,5 +1,6 @@
 #pragma once
 
+#include "error.h"
 #include "std.h"
 
 namespace Karm {
@@ -22,6 +23,10 @@ inline constexpr size_t alignUp(size_t addr, size_t align) {
 
 inline constexpr bool isAlign(size_t addr, size_t align) {
     return alignDown(addr, align) == addr;
+}
+
+inline constexpr Error ensureAlign(size_t addr, size_t align) {
+    return isAlign(addr, align) ? OK : Error{Error::INVALID_DATA, "not aligned"};
 }
 
 } // namespace Karm

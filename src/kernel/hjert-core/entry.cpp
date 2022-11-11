@@ -1,25 +1,21 @@
 #include <handover/main.h>
 #include <karm-base/size.h>
 #include <karm-debug/logger.h>
-#include <limine/main.h>
 
 #include "arch.h"
-
-using namespace Hjert;
+#include "mem.h"
 
 HandoverRequests$(
     Handover::requestStack(),
     Handover::requestFb(),
     Handover::requestFiles());
 
-Error entryPoint(uint64_t magic, Handover::Payload &payload) {
-    try$(Arch::init());
-
+Error validateAndDump(uint64_t magic, Handover::Payload &payload) {
     if (!Handover::valid(magic, payload)) {
+        Debug::linfo("handover: invalid");
         return "Invalid handover payload";
     }
 
-    Debug::linfo("hjert (v0.0.1)");
     Debug::linfo("handover: valid");
     Debug::linfo("handover: agent: '{}'", payload.agentName());
 
@@ -39,7 +35,17 @@ Error entryPoint(uint64_t magic, Handover::Payload &payload) {
 
     Debug::linfo("handover: total free: {}mib", toMib(totalFree));
 
-    Debug::linfo("handover: usable range: {x}-{x}", payload.usableRange().start, payload.usableRange().end());
+    return OK;
+}
 
-    Arch::idleCpu();
+Error entryPoint(uint64_t magic, Handover::Payload &payload) {
+    try$(Hjert::Arch::init(payload));
+
+    Debug::linfo("hjert (v0.0.1)");
+    try$(validateAndDump(magic, payload));
+
+    Debug::linfo("Initialized memory manager...");
+    try$(Hjert::Mem::init(payload));
+
+    Hjert::Arch::idleCpu();
 }

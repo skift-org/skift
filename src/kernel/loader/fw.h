@@ -2,7 +2,6 @@
 
 #include <hal/vmm.h>
 #include <handover/builder.h>
-#include <karm-base/range.h>
 #include <karm-base/rc.h>
 #include <karm-base/result.h>
 

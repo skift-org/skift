@@ -2,19 +2,16 @@
 
 #include <hal/heap.h>
 #include <hal/vmm.h>
+#include <handover/spec.h>
 #include <karm-base/result.h>
 #include <karm-base/string.h>
 #include <karm-io/traits.h>
 
 namespace Hjert::Arch {
 
-Error init();
-
-Hal::Pmm &pmm();
+Error init(Handover::Payload &);
 
 Hal::Vmm &vmm();
-
-Hal::Heap &heap();
 
 Io::TextWriter<> &loggerOut();
 

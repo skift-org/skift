@@ -4,9 +4,7 @@
 
 namespace Hal {
 
-struct PortRange : public USizeRange {
-    using USizeRange::USizeRange;
-};
+using PortRange = Range<size_t, struct PortRangeTag>;
 
 struct DmaRange : public USizeRange {
     using USizeRange::USizeRange;
@@ -71,7 +69,7 @@ static void portOut(uint16_t addr, T value) {
 }
 
 struct Io {
-    enum {
+    enum Type {
         PORT,
         DMA
     } _type;
@@ -80,7 +78,7 @@ struct Io {
     size_t _size;
 
     static Io port(PortRange range) {
-        return {PORT, range.start(), range.size()};
+        return {PORT, range.start, range.size};
     }
 
     static Io port(size_t start, size_t size) {
@@ -88,7 +86,7 @@ struct Io {
     }
 
     static Io dma(DmaRange range) {
-        return {DMA, range.start(), range.size()};
+        return {DMA, range.start, range.size};
     }
 
     static Io dma(size_t start, size_t size) {

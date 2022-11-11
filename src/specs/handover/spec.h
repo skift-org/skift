@@ -172,23 +172,18 @@ struct Payload {
         return total;
     }
 
-    Record alloc(size_t size) {
-        Record result = {};
-
+    Record find(size_t size) {
         for (auto &r : *this) {
             if (r.tag == Tag::FREE && r.size >= size) {
-                result.start = r.start;
-                result.size = size;
-                r.start += size;
-                r.size -= size;
-                break;
+                return r;
             }
         }
 
-        return result;
+        return {};
     }
 
-    Record usableRange() const {
+    template <typename R>
+    R usableRange() const {
         size_t start = 0, end = 0;
 
         for (auto const &r : *this) {
@@ -202,9 +197,9 @@ struct Payload {
             }
         }
 
-        return {
-            .start = start,
-            .size = end - start,
+        return R{
+            start,
+            end - start,
         };
     }
 };

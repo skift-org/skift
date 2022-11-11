@@ -28,7 +28,7 @@ Error load(Sys::Path kernelPath) {
     Sys::File kernelFile = try$(Sys::File::open(kernelPath));
     auto kernelMem = try$(Sys::mmap().map(kernelFile));
     Elf::Image image{kernelMem.bytes()};
-    payload.add(Handover::FILE, 0, kernelMem.prange());
+    payload.add(Handover::FILE, 0, kernelMem.prange().as<USizeRange>());
     Debug::linfo("Kernel at vaddr: 0x{x} paddr: 0x{x}", kernelMem.vaddr(), kernelMem.paddr());
 
     if (!image.valid()) {
@@ -88,7 +88,7 @@ Error load(Sys::Path kernelPath) {
     auto loaderImage = Fw::imageRange();
 
     try$(vmm->map(
-        Hal::VmmRange::identityMapped(loaderImage),
+        Hal::identityMapped(loaderImage),
         loaderImage,
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
@@ -99,7 +99,6 @@ Error load(Sys::Path kernelPath) {
     Debug::linfo("ip:{x} sp:{x} payload:{}", ip, sp, (uintptr_t)&payload.finalize());
 
     try$(Fw::finalizeHandover(payload));
-
     Fw::enterKernel(ip, payload.finalize(), sp, *vmm);
 
     panic("unreachable");

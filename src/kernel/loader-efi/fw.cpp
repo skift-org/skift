@@ -14,13 +14,13 @@ struct EfiPmm : public Hal::Pmm {
     }
 
     Error used(Hal::PmmRange range, Hal::PmmFlags) override {
-        size_t paddr = range.start();
+        size_t paddr = range.start;
         try$(Efi::bs()->allocatePages(Efi::AllocateType::ADDRESS, Efi::MemoryType::LOADER_DATA, paddr / Hal::PAGE_SIZE, &paddr));
         return OK;
     }
 
     Error free(Hal::PmmRange range) override {
-        try$(Efi::bs()->freePages((uint64_t)range.start(), range.size() / Hal::PAGE_SIZE));
+        try$(Efi::bs()->freePages((uint64_t)range.start, range.size / Hal::PAGE_SIZE));
         return OK;
     }
 };
@@ -28,9 +28,9 @@ struct EfiPmm : public Hal::Pmm {
 static EfiPmm pmm{};
 
 Result<Strong<Hal::Vmm>> createVmm() {
-    size_t upper = try$(pmm.alloc(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start();
+    size_t upper = try$(pmm.alloc(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start;
     memset((void *)upper, 0, Hal::PAGE_SIZE);
-    return {makeStrong<x86_64::Vmm>(pmm, (x86_64::Pml<4> *)upper)};
+    return {makeStrong<x86_64::Vmm<Hal::IdentityMapper>>(pmm, (x86_64::Pml<4> *)upper)};
 }
 
 Error parseGop(Handover::Builder &builder) {

@@ -1,0 +1,3 @@
+[submodule "src/extern/libheap"]
+	path = src/extern/libheap
+	url = https://github.com/devse-org/libheap

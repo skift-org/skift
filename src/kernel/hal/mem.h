@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/align.h>
+#include <karm-base/error.h>
 #include <karm-base/std.h>
 
 namespace Hal {
@@ -21,11 +22,18 @@ inline bool isPageAlign(size_t addr) {
 }
 
 struct IdentityMapper {
-    size_t map(size_t addr) { return addr; }
+    template <typename T>
+    T map(T addr) { return addr; }
+    template <typename T>
+    T unmap(T addr) { return addr; }
 };
 
 struct UpperHalfMapper {
-    size_t map(size_t addr) { return addr + UPPER_HALF; }
+    template <typename T>
+    T map(T addr) { return (T)((uintptr_t)addr + UPPER_HALF); }
+
+    template <typename T>
+    T unmap(T addr) { return (T)((uintptr_t)addr - UPPER_HALF); }
 };
 
 } // namespace Hal

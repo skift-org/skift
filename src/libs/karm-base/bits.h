@@ -2,14 +2,19 @@
 
 #include "opt.h"
 #include "range.h"
+#include "slice.h"
 
 namespace Karm {
 
-using BitsRange = USizeRange;
+using BitsRange = Range<size_t, struct BitsRangeTag>;
 
 struct Bits {
     uint8_t *_buf{};
     size_t _len{};
+
+    Bits(MutSlice<uint8_t> slice)
+        : _buf{slice.buf()}, _len{slice.len()} {
+    }
 
     bool get(size_t index) const {
         return _buf[index / 8] & (1 << (index % 8));
@@ -24,7 +29,7 @@ struct Bits {
     }
 
     void set(BitsRange range, bool value) {
-        for (size_t i = range.start(); i < range.end(); i++) {
+        for (size_t i = range.start; i < range.end(); i++) {
             set(i, value);
         }
     }
@@ -52,13 +57,13 @@ struct Bits {
             if (get(i)) {
                 range = {};
             } else {
-                if (range._size == 0) {
-                    range._start = i;
+                if (range.size == 0) {
+                    range.start = i;
                 }
 
-                range._size++;
+                range.size++;
 
-                if (range._size == count) {
+                if (range.size == count) {
                     set(range, true);
                     return range;
                 }

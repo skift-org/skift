@@ -15,7 +15,10 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
     Ui::Children children;
 
     for (int i = 0; i < 12; i++) {
-        Media::Font font{size, fontface};
+        Media::Font font{
+            .fontface = fontface,
+            .fontsize = size,
+        };
         children.pushBack(Ui::text(Ui::TextStyle{font}, PANGRAM));
         size *= 1.2;
     }

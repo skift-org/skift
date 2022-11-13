@@ -240,6 +240,72 @@ Child button(OnPress onPress, Media::Icons i, Str t) {
     return button(std::move(onPress), ButtonStyle::regular(), i, t);
 }
 
+/* --- Input ---------------------------------------------------------------- */
+
+struct TextModel {};
+
+struct Input : public View<Input> {
+    TextStyle _style;
+    String _text;
+    OnChange<String> _onChange;
+    size_t _cursor = 0;
+    Opt<Media::FontMesure> _mesure;
+
+    Input(TextStyle style, String text, OnChange<String> onChange)
+        : _style(style), _text(text), _onChange(std::move(onChange)) {}
+
+    void reconcile(Input &o) override {
+        _text = o._text;
+        _mesure = NONE;
+    }
+
+    Media::FontMesure mesure() {
+        if (_mesure) {
+            return *_mesure;
+        }
+        _mesure = _style.font.mesureStr(_text);
+        return *_mesure;
+    }
+
+    void paint(Gfx::Context &g, Math::Recti) override {
+        g.save();
+
+        auto m = mesure();
+        auto baseline = bound().topStart() + m.baseline.cast<int>();
+
+        if (_style.color) {
+            g.fillStyle(*_style.color);
+        }
+
+        g.textFont(_style.font);
+        g.fill(baseline, _text);
+
+        if (debugShowLayoutBounds) {
+            g._line(
+                {
+                    bound().topStart() + m.baseline.cast<int>(),
+                    bound().topEnd() + m.baseline.cast<int>(),
+                },
+                Gfx::PINK);
+            g._rect(bound(), Gfx::CYAN);
+        }
+
+        g.restore();
+    }
+
+    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+        return mesure().linebound.size().cast<int>();
+    }
+};
+
+Child input(TextStyle style, String text, OnChange<String> onChange) {
+    return makeStrong<Input>(style, text, std::move(onChange));
+}
+
+Child input(String text, OnChange<String> onChange) {
+    return makeStrong<Input>(TextStyle::bodyMedium(), text, std::move(onChange));
+}
+
 /* --- Toggle --------------------------------------------------------------- */
 
 struct Toggle : public View<Toggle> {

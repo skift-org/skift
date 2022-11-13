@@ -18,7 +18,10 @@ Result<Strong<Fontface>> loadFontface(Str path) {
 }
 
 Result<Font> loadFont(double size, Str path) {
-    return Font{size, try$(loadFontface(path))};
+    return Font{
+        .fontface = try$(loadFontface(path)),
+        .fontsize = size,
+    };
 }
 
 static Result<Image> loadQoi(Bytes bytes) {

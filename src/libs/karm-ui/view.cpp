@@ -1,12 +1,17 @@
 #include "view.h"
 
-#include "proxy.h"
-
 namespace Karm::Ui {
 
 /* --- Text ----------------------------------------------------------------- */
 
 Strong<Media::Fontface> regularFontface() {
+    static Strong<Media::Fontface> f = []() {
+        return Media::loadFontface("res/fonts/inter/Inter-Regular.ttf").unwrap();
+    }();
+    return f;
+}
+
+Strong<Media::Fontface> mediumFontface() {
     static Strong<Media::Fontface> f = []() {
         return Media::loadFontface("res/fonts/inter/Inter-Medium.ttf").unwrap();
     }();
@@ -27,88 +32,134 @@ Strong<Media::Fontface> italicFontface() {
     return f;
 }
 
-TextStyle TextStyle::regular() {
+TextStyle TextStyle::displayLarge() {
     return {
         .font = Media::Font{
-            12,
             regularFontface(),
+            57,
         },
     };
 }
 
-TextStyle TextStyle::bold() {
+TextStyle TextStyle::displayMedium() {
     return {
         .font = Media::Font{
-            12,
-            boldFontface(),
+            regularFontface(),
+            45,
         },
     };
 }
 
-TextStyle TextStyle::italic() {
+TextStyle TextStyle::displaySmall() {
     return {
         .font = Media::Font{
-            12,
-            italicFontface(),
+            regularFontface(),
+            36,
         },
     };
 }
 
-TextStyle TextStyle::title1() {
+TextStyle TextStyle::headlineLarge() {
     return {
         .font = Media::Font{
+            regularFontface(),
             32,
-            boldFontface(),
         },
     };
 }
 
-TextStyle TextStyle::title2() {
+TextStyle TextStyle::headlineMedium() {
     return {
         .font = Media::Font{
+            regularFontface(),
+            28,
+        },
+    };
+}
+
+TextStyle TextStyle::headlineSmall() {
+    return {
+        .font = Media::Font{
+            regularFontface(),
             24,
-            boldFontface(),
         },
     };
 }
 
-TextStyle TextStyle::title3() {
+TextStyle TextStyle::titleLarge() {
     return {
         .font = Media::Font{
-            16,
-            boldFontface(),
-        },
-    };
-}
-TextStyle TextStyle::subtitle1() {
-    return {
-        .font = Media::Font{
-            16,
             regularFontface(),
+            22,
         },
     };
 }
-TextStyle TextStyle::subtitle2() {
+
+TextStyle TextStyle::titleMedium() {
     return {
         .font = Media::Font{
+            mediumFontface(),
+            16,
+        },
+    };
+}
+
+TextStyle TextStyle::titleSmall() {
+    return {
+        .font = Media::Font{
+            mediumFontface(),
             14,
-            regularFontface(),
         },
     };
 }
-TextStyle TextStyle::label() {
+
+TextStyle TextStyle::labelLarge() {
     return {
         .font = Media::Font{
-            12,
-            regularFontface(),
+            mediumFontface(),
+            14,
         },
     };
 }
-TextStyle TextStyle::body() {
+TextStyle TextStyle::labelMedium() {
     return {
         .font = Media::Font{
+            mediumFontface(),
             12,
+        },
+    };
+}
+TextStyle TextStyle::labelSmall() {
+    return {
+        .font = Media::Font{
+            mediumFontface(),
+            11,
+        },
+    };
+}
+
+TextStyle TextStyle::bodyLarge() {
+    return {
+        .font = Media::Font{
             regularFontface(),
+            16,
+        },
+    };
+}
+
+TextStyle TextStyle::bodyMedium() {
+    return {
+        .font = Media::Font{
+            regularFontface(),
+            14,
+        },
+    };
+}
+TextStyle TextStyle::bodySmall() {
+    return {
+        .font = Media::Font{
+            regularFontface(),
+            12,
         },
     };
 }
@@ -170,7 +221,7 @@ Child text(TextStyle style, Str text) {
 }
 
 Child text(Str text) {
-    return makeStrong<Text>(TextStyle::regular(), text);
+    return makeStrong<Text>(TextStyle::labelMedium(), text);
 }
 
 /* --- Icon ----------------------------------------------------------------- */
@@ -264,20 +315,20 @@ Child canvas(OnPaint onPaint) {
 
 /* --- Blur ----------------------------------------------------------------- */
 
-struct Blur : public Proxy<Blur> {
+struct Blur : public ProxyNode<Blur> {
     int _radius;
 
     Blur(int radius, Child child)
-        : Proxy<Blur>(std::move(child)), _radius(radius) {}
+        : ProxyNode<Blur>(std::move(child)), _radius(radius) {}
 
     void reconcile(Blur &o) override {
         _radius = o._radius;
-        Proxy<Blur>::reconcile(o);
+        ProxyNode<Blur>::reconcile(o);
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.blur(bound(), _radius);
-        Proxy<Blur>::paint(g, r);
+        ProxyNode<Blur>::paint(g, r);
     }
 };
 

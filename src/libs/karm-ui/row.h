@@ -22,9 +22,9 @@ inline Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Chi
     auto t = subtitle
                  ? vflow(
                        8,
-                       text(TextStyle::label(), title),
-                       text(TextStyle::body(), *subtitle))
-                 : text(TextStyle::label(), title);
+                       text(TextStyle::labelLarge(), title),
+                       text(TextStyle::labelMedium(), *subtitle))
+                 : text(TextStyle::labelLarge(), title);
 
     auto trail = trailing
                      ? spacing({12, 0, 0, 0}, minSize(26, center(*trailing)))
@@ -118,7 +118,7 @@ inline Child navRow(bool selected, OnPress onPress, Media::Icons i, String title
         buttonStyle,
         spacing(
             {0, 8, 12, 8},
-            hflow(indicator, empty(8), icon(i, 26), empty(12), center(text(TextStyle::label(), title)))));
+            hflow(indicator, empty(8), icon(i, 26), empty(12), center(text(TextStyle::labelMedium(), title)))));
 }
 
 } // namespace Karm::Ui

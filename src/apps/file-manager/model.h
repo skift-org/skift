@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-sys/path.h>
-#include <karm-ui/reducer.h>
+#include <karm-ui/react.h>
 
 namespace FileManager {
 

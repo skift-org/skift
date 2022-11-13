@@ -12,7 +12,7 @@
 namespace Calculator {
 
 Ui::Child textButton(Ui::OnPress onPress, Ui::ButtonStyle style, String t) {
-    return Ui::button(std::move(onPress), style, Ui::bound(Ui::center(Ui::text(Ui::TextStyle::regular().withSize(18), t))));
+    return Ui::button(std::move(onPress), style, Ui::bound(Ui::center(Ui::text(Ui::TextStyle::labelLarge().withSize(18), t))));
 }
 
 Ui::Child textButton(Ui::OnPress onPress, String t) {
@@ -72,11 +72,11 @@ Ui::Child screen(State state) {
 
     auto currExpr = Ui::align(
         Layout::Align::VCENTER | Layout::Align::END,
-        state.op == Operator::NONE ? Ui::text(Ui::TextStyle::label(), "") : Ui::text(Ui::TextStyle::label(), toFmt(state.op), state.lhs));
+        state.op == Operator::NONE ? Ui::text("") : Ui::text(toFmt(state.op), state.lhs));
 
     auto result = Ui::align(
         Layout::Align::VCENTER | Layout::Align::END,
-        Ui::text(Ui::TextStyle::label().withSize(32), "{}", state.hasRhs ? state.rhs : state.lhs));
+        Ui::text(Ui::TextStyle::headlineMedium(), "{}", state.hasRhs ? state.rhs : state.lhs));
 
     return Ui::spacing(
         {16, 8}, Ui::vflow(8, /* debugExpr, */ currExpr, result));

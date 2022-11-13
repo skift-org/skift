@@ -3,7 +3,7 @@
 #include <karm-layout/flow.h>
 
 #include "funcs.h"
-#include "proxy.h"
+#include "node.h"
 
 namespace Karm::Ui {
 

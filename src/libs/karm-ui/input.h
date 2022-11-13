@@ -9,16 +9,7 @@ namespace Karm::Ui {
 template <typename T>
 using OnChange = Opt<Func<void(Node &, T value)>>;
 
-/* --- Input ----------------------------------------------------------------- */
-
-struct Input : public View<Input> {
-};
-
-inline Child input() {
-    return makeStrong<Input>();
-}
-
-/* --- Button ---------------------------------------------------------------- */
+/* --- Button --------------------------------------------------------------- */
 
 struct MouseListener {
     enum MouseState {
@@ -125,6 +116,12 @@ Child button(OnPress onPress, Media::Icons i);
 
 Child button(OnPress onPress, Media::Icons i, Str t);
 
+/* --- Input ---------------------------------------------------------------- */
+
+Child input(TextStyle style, String text, OnChange<String> onChange = NONE);
+
+Child input(String text, OnChange<String> onChange = NONE);
+
 /* --- Toggle --------------------------------------------------------------- */
 
 Child toggle(bool value, OnChange<bool> onChange);
@@ -133,12 +130,12 @@ Child toggle(bool value, OnChange<bool> onChange);
 
 Child checkbox(bool value, OnChange<bool> onChange);
 
-/* --- Radio ----------------------------------------------------------------- */
+/* --- Radio ---------------------------------------------------------------- */
 
 Child radio(bool value, OnChange<bool> onChange);
 
-/* --- Slider ---------------------------------------------------------------- */
+/* --- Slider --------------------------------------------------------------- */
 
-/* --- Select ---------------------------------------------------------------- */
+/* --- Select --------------------------------------------------------------- */
 
 } // namespace Karm::Ui

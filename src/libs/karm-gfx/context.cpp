@@ -257,31 +257,43 @@ void Context::fill(Math::Vec2i pos, Media::Icon icon) {
 }
 
 void Context::stroke(Math::Vec2i baseline, Rune rune) {
-    // FIXME: We need to save the font before we can use it
-    // because the font might mutate the transform stack.
     auto f = textFont();
-    f.strokeRune(*this, baseline.cast<double>(), rune);
+
+    save();
+    begin();
+    origin(baseline.cast<int>());
+    scale(f.fontsize / f.fontface->units());
+    f.fontface->contour(*this, rune);
+    stroke();
+    restore();
 }
 
 void Context::fill(Math::Vec2i baseline, Rune rune) {
-    // FIXME: We need to save the font before we can use it
-    // because the font might mutate the transform stack.
     auto f = textFont();
-    f.fillRune(*this, baseline.cast<double>(), rune);
+
+    save();
+    begin();
+    origin(baseline.cast<int>());
+    scale(f.fontsize / f.fontface->units());
+    f.fontface->contour(*this, rune);
+    fill();
+    restore();
 }
 
 void Context::stroke(Math::Vec2i baseline, Str str) {
-    // FIXME: We need to save the font before we can use it
-    // because the font might mutate the transform stack.
     auto f = textFont();
-    f.strokeStr(*this, baseline.cast<double>(), str);
+    for (auto r : iterRunes(str)) {
+        stroke(baseline, r);
+        baseline.x += f.advance(r);
+    }
 }
 
 void Context::fill(Math::Vec2i baseline, Str str) {
-    // FIXME: We need to save the font before we can use it
-    // because the font might mutate the transform stack.
     auto f = textFont();
-    f.fillStr(*this, baseline.cast<double>(), str);
+    for (auto r : iterRunes(str)) {
+        fill(baseline, r);
+        baseline.x += f.advance(r);
+    }
 }
 
 /* --- Debug ---------------------------------------------------------------- */

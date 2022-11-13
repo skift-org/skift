@@ -88,12 +88,11 @@ struct Fontface {
 };
 
 struct Font {
-    double _size;
-    Strong<Fontface> _face;
+    Strong<Fontface> fontface;
+    double fontsize;
+    double lineheight = 1.2;
 
     static Font fallback();
-
-    Font(double size, Strong<Fontface> face) : _size(size), _face(face) {}
 
     FontMetrics metrics() const;
 
@@ -102,14 +101,6 @@ struct Font {
     FontMesure mesureRune(Rune r) const;
 
     FontMesure mesureStr(Str str) const;
-
-    void fillRune(Gfx::Context &g, Math::Vec2f baseline, Rune rune) const;
-
-    void strokeRune(Gfx::Context &g, Math::Vec2f baseline, Rune rune) const;
-
-    void fillStr(Gfx::Context &g, Math::Vec2f baseline, Str str) const;
-
-    void strokeStr(Gfx::Context &g, Math::Vec2f baseline, Str str) const;
 };
 
 } // namespace Karm::Media

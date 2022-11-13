@@ -2,11 +2,10 @@
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
-#include <karm-ui/reducer.h>
+#include <karm-ui/react.h>
 #include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
-#include <karm-ui/state.h>
 #include <karm-ui/view.h>
 
 struct Demo {
@@ -117,7 +116,7 @@ static Array demos = {
         "Hello, world!",
         "Hello, world!",
         []() {
-            return Ui::grow(Ui::center(Ui::text(Ui::TextStyle::title1(), "Hello, world!")));
+            return Ui::grow(Ui::center(Ui::text(Ui::TextStyle::titleMedium(), "Hello, world!")));
         },
     },
     Demo{
@@ -142,22 +141,22 @@ static Array demos = {
             auto radio1 = Ui::radioRow(false, NONE, "Some property");
             auto radio2 = Ui::radioRow(false, NONE, "Some property");
 
-            auto title = Ui::textRow(Ui::TextStyle::title2(), "Some Settings");
+            auto title = Ui::textRow(Ui::TextStyle::titleMedium(), "Some Settings");
 
             auto list = Ui::card(
                 button,
                 Ui::separator(),
-                Ui::textRow(Ui::TextStyle::title3(), "Switches"),
+                Ui::textRow(Ui::TextStyle::titleMedium(), "Switches"),
                 toggle,
                 toggle1,
                 toggle2,
                 Ui::separator(),
-                Ui::textRow(Ui::TextStyle::title3(), "Checkboxs"),
+                Ui::textRow(Ui::TextStyle::titleMedium(), "Checkboxs"),
                 checkbox,
                 checkbox1,
                 checkbox2,
                 Ui::separator(),
-                Ui::textRow(Ui::TextStyle::title3(), "Radio buttons"),
+                Ui::textRow(Ui::TextStyle::titleMedium(), "Radio buttons"),
                 radio,
                 radio1,
                 radio2);
@@ -168,6 +167,33 @@ static Array demos = {
                         Ui::maxSize(
                             {420, Ui::UNCONSTRAINED},
                             Ui::vflow(8, title, list)))));
+        },
+    },
+    Demo{
+        Media::Icons::TEXT,
+        "Typography",
+        "Typography",
+        []() {
+            return Ui::vflow(
+                Ui::text(Ui::TextStyle::displayLarge(), "Display Large"),
+                Ui::text(Ui::TextStyle::displayMedium(), "Display Medium"),
+                Ui::text(Ui::TextStyle::displaySmall(), "Display Small"),
+
+                Ui::text(Ui::TextStyle::headlineLarge(), "Headline Large"),
+                Ui::text(Ui::TextStyle::headlineMedium(), "Headline Medium"),
+                Ui::text(Ui::TextStyle::headlineSmall(), "Headline Small"),
+
+                Ui::text(Ui::TextStyle::titleLarge(), "Title Large"),
+                Ui::text(Ui::TextStyle::titleMedium(), "Title Medium"),
+                Ui::text(Ui::TextStyle::titleSmall(), "Title Small"),
+
+                Ui::text(Ui::TextStyle::labelLarge(), "Label Large"),
+                Ui::text(Ui::TextStyle::labelMedium(), "Label Medium"),
+                Ui::text(Ui::TextStyle::labelSmall(), "Label Small"),
+
+                Ui::text(Ui::TextStyle::bodyLarge(), "Body Large"),
+                Ui::text(Ui::TextStyle::bodyMedium(), "Body Medium"),
+                Ui::text(Ui::TextStyle::bodySmall(), "Body Small"));
         },
     },
     Demo{
@@ -242,7 +268,7 @@ CliResult entryPoint(CliArgs args) {
             Ui::grow(Ui::spacing(
                 8,
                 Ui::vflow(
-                    Ui::text(Ui::TextStyle::title1(), demos[s.current].name),
+                    Ui::text(Ui::TextStyle::titleMedium(), demos[s.current].name),
                     Ui::empty(8),
                     Ui::grow(demos[s.current].build())))));
     });

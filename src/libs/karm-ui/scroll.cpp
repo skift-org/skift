@@ -1,19 +1,17 @@
 #include "scroll.h"
 
-#include "group.h"
-
 namespace Karm::Ui {
 
 /* --- Scroll --------------------------------------------------------------- */
 
-struct Scroll : public Proxy<Scroll> {
+struct Scroll : public ProxyNode<Scroll> {
     bool _animated = false;
     Layout::Orien _orient{};
     Math::Recti _bound{};
     Math::Vec2i _scroll{};
 
     Scroll(Layout::Orien orient, Child child)
-        : Proxy(child), _orient(orient) {}
+        : ProxyNode(child), _orient(orient) {}
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
@@ -66,7 +64,7 @@ struct Scroll : public Proxy<Scroll> {
             paintEvent.bound = paintEvent.bound.clipTo(bound());
         }
 
-        Proxy::bubble(e);
+        ProxyNode::bubble(e);
     }
 
     void layout(Math::Recti r) override {
@@ -117,7 +115,7 @@ Child vscroll(Child child) {
 
 /* --- List ----------------------------------------------------------------- */
 
-struct List : public Group<List> {
+struct List : public GroupNode<List> {
     size_t _count;
     BuildItem _builder;
 

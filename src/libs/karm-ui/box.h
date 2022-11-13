@@ -2,7 +2,7 @@
 
 #include <karm-layout/spacing.h>
 
-#include "proxy.h"
+#include "node.h"
 
 namespace Karm::Ui {
 struct BoxStyle {
@@ -79,15 +79,15 @@ struct BoxStyle {
 };
 
 template <typename Crtp>
-struct _Box : public Proxy<Crtp> {
+struct _Box : public ProxyNode<Crtp> {
     _Box(Child child)
-        : Proxy<Crtp>(child) {}
+        : ProxyNode<Crtp>(child) {}
 
     virtual BoxStyle &boxStyle() = 0;
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         boxStyle().paint(g, bound(), [&] {
-            Proxy<Crtp>::paint(g, r);
+            ProxyNode<Crtp>::paint(g, r);
         });
     }
 
@@ -95,14 +95,14 @@ struct _Box : public Proxy<Crtp> {
         rect = boxStyle().margin.shrink(Layout::Flow::LEFT_TO_RIGHT, rect);
         rect = boxStyle().padding.shrink(Layout::Flow::LEFT_TO_RIGHT, rect);
 
-        Proxy<Crtp>::child().layout(rect);
+        ProxyNode<Crtp>::child().layout(rect);
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
         s = s - boxStyle().margin.all();
         s = s - boxStyle().padding.all();
 
-        s = Proxy<Crtp>::child().size(s, hint);
+        s = ProxyNode<Crtp>::child().size(s, hint);
 
         s = s + boxStyle().padding.all();
         s = s + boxStyle().margin.all();
@@ -111,7 +111,7 @@ struct _Box : public Proxy<Crtp> {
     }
 
     Math::Recti bound() override {
-        return boxStyle().padding.grow(Layout::Flow::LEFT_TO_RIGHT, Proxy<Crtp>::child().bound());
+        return boxStyle().padding.grow(Layout::Flow::LEFT_TO_RIGHT, ProxyNode<Crtp>::child().bound());
     }
 };
 

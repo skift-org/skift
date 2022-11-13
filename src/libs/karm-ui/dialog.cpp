@@ -6,7 +6,6 @@
 #include "funcs.h"
 #include "input.h"
 #include "layout.h"
-#include "proxy.h"
 #include "scafold.h"
 #include "view.h"
 
@@ -14,7 +13,7 @@ namespace Karm::Ui {
 
 /* ---  Dialog Base  -------------------------------------------------------- */
 
-struct DialogLayer : public Widget<DialogLayer> {
+struct DialogLayer : public LeafNode<DialogLayer> {
     Anim<double> _opacity{};
     Child _child;
     Opt<Child> _dialog;
@@ -192,7 +191,7 @@ Child aboutDialog(Media::Icons i, String name) {
         8,
         Layout::Align::CENTER,
         spacing(16, icon(i, 48)),
-        text(TextStyle::title2(), name),
+        text(TextStyle::titleMedium(), name),
         empty(),
         badge(BadgeStyle::INFO, "v0.1.0"),
         empty(),
@@ -216,7 +215,7 @@ void showAboutDialog(Node &n, Media::Icons icon, String name) {
 }
 
 Child msgDialog(String title, String msg) {
-    auto titleLbl = text(TextStyle::title2(), title);
+    auto titleLbl = text(TextStyle::titleMedium(), title);
     auto msgLbl = text(msg);
     Children actions = {
         grow(),

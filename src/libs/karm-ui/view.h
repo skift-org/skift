@@ -7,7 +7,7 @@ namespace Karm::Ui {
 /* --- Base ----------------------------------------------------------------- */
 
 template <typename Crtp>
-struct View : public Widget<Crtp> {
+struct View : public LeafNode<Crtp> {
     Math::Recti _bound;
 
     Math::Recti bound() override {
@@ -21,46 +21,41 @@ struct View : public Widget<Crtp> {
 
 /* --- Text ----------------------------------------------------------------- */
 
-enum struct TextWeight {
-    THIN = 100,
-    EXTRA_LIGHT = 200,
-    LIGHT = 300,
-    NORMAL = 400,
-    MEDIUM = 500,
-    SEMI_BOLD = 600,
-    BOLD = 700,
-    EXTRA_BOLD = 800,
-    BLACK = 900,
-};
-
 struct TextStyle {
     Media::Font font;
     Opt<Gfx::Color> color = NONE;
 
-    TextStyle withSize(int size) {
+    TextStyle withSize(int size) const {
         TextStyle style = *this;
-        style.font._size = size;
+        style.font.fontsize = size;
         return style;
     }
 
-    TextStyle withColor(Gfx::Color color) {
+    TextStyle withColor(Gfx::Color color) const {
         TextStyle style = *this;
         style.color = color;
         return style;
     }
 
-    static TextStyle weight(int weight);
-    static TextStyle regular();
-    static TextStyle bold();
-    static TextStyle italic();
+    static TextStyle displayLarge();
+    static TextStyle displayMedium();
+    static TextStyle displaySmall();
 
-    static TextStyle title1();
-    static TextStyle title2();
-    static TextStyle title3();
-    static TextStyle subtitle1();
-    static TextStyle subtitle2();
-    static TextStyle label();
-    static TextStyle body();
+    static TextStyle headlineLarge();
+    static TextStyle headlineMedium();
+    static TextStyle headlineSmall();
+
+    static TextStyle titleLarge();
+    static TextStyle titleMedium();
+    static TextStyle titleSmall();
+
+    static TextStyle labelLarge();
+    static TextStyle labelMedium();
+    static TextStyle labelSmall();
+
+    static TextStyle bodyLarge();
+    static TextStyle bodyMedium();
+    static TextStyle bodySmall();
 };
 
 Child text(TextStyle style, Str text);

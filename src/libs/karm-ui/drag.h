@@ -3,7 +3,6 @@
 #include "anim.h"
 #include "input.h"
 #include "layout.h"
-#include "proxy.h"
 #include "view.h"
 
 namespace Karm::Ui {
@@ -38,7 +37,7 @@ FlagsEnum$(DismisDir);
 using OnDismis = Func<void(Node &)>;
 
 struct Dismisable :
-    public Proxy<Dismisable> {
+    public ProxyNode<Dismisable> {
 
     OnDismis _onDismis;
     DismisDir _dir;
@@ -48,7 +47,7 @@ struct Dismisable :
     bool _animated{};
 
     Dismisable(OnDismis onDismis, DismisDir dir, double threshold, Ui::Child child)
-        : Proxy(child), _onDismis(std::move(onDismis)), _dir(dir), _threshold(threshold) {}
+        : ProxyNode(child), _onDismis(std::move(onDismis)), _dir(dir), _threshold(threshold) {}
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
@@ -68,7 +67,7 @@ struct Dismisable :
         if (_dismissed && _drag.reached()) {
             _onDismis(*this);
         }
-        Ui::Proxy<Dismisable>::event(e);
+        Ui::ProxyNode<Dismisable>::event(e);
     }
 
     void bubble(Events::Event &e) override {
@@ -108,7 +107,7 @@ struct Dismisable :
                 }
             }
         } else {
-            Ui::Proxy<Dismisable>::bubble(e);
+            Ui::ProxyNode<Dismisable>::bubble(e);
         }
     }
 };
@@ -119,10 +118,10 @@ inline Child dismisable(OnDismis onDismis, DismisDir dir, double threshold, Ui::
 
 /* --- Drag Region ---------------------------------------------------------- */
 
-struct DragRegion : public Proxy<DragRegion> {
+struct DragRegion : public ProxyNode<DragRegion> {
     bool _grabbed{};
 
-    DragRegion(Child child) : Proxy(child) {}
+    DragRegion(Child child) : ProxyNode(child) {}
 
     void event(Events::Event &e) override {
         if (!_grabbed)

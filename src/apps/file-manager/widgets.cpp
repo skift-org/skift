@@ -77,8 +77,12 @@ Ui::Child openFileDialog() {
 
         Sys::Dir dir = Sys::Dir::open(path).take();
 
-        auto titleLbl = Ui::text(Ui::TextStyle::title1(), "Open File");
-        auto msgLbl = Ui::text(Ui::TextStyle::subtitle1(), "Select a file to open.");
+        auto titleLbl = Ui::text(
+            Ui::TextStyle::titleLarge(), "Open File");
+
+        auto msgLbl = Ui::text(
+            Ui::TextStyle::titleMedium(), "Select a file to open.");
+
         auto titleBar = Ui::spacing(
             16,
             Ui::vflow(

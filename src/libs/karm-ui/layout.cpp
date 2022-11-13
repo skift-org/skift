@@ -1,7 +1,5 @@
 #include "layout.h"
 
-#include "group.h"
-#include "proxy.h"
 #include "view.h"
 
 namespace Karm::Ui {
@@ -47,11 +45,11 @@ Child cond(bool cond, Child child) {
 
 /* --- Bound ---------------------------------------------------------------- */
 
-struct Bound : public Proxy<Bound> {
+struct Bound : public ProxyNode<Bound> {
     Math::Recti _bound;
 
     Bound(Child child)
-        : Proxy(child) {}
+        : ProxyNode(child) {}
 
     Math::Recti bound() override {
         return _bound;
@@ -92,10 +90,10 @@ Child separator() {
 
 /* --- Align ---------------------------------------------------------------- */
 
-struct Align : public Proxy<Align> {
+struct Align : public ProxyNode<Align> {
     Layout::Align _align;
 
-    Align(Layout::Align align, Child child) : Proxy(child), _align(align) {}
+    Align(Layout::Align align, Child child) : ProxyNode(child), _align(align) {}
 
     void layout(Math::Recti bound) override {
         auto childSize = child().size(bound.size(), _child.is<Grow>() ? Layout::Hint::MAX : Layout::Hint::MIN);
@@ -153,14 +151,14 @@ Child vcenterFill(Child child) {
 
 /* --- Sizing --------------------------------------------------------------- */
 
-struct Sizing : public Proxy<Sizing> {
+struct Sizing : public ProxyNode<Sizing> {
 
     Math::Vec2i _min;
     Math::Vec2i _max;
     Math::Recti _rect;
 
     Sizing(Math::Vec2i min, Math::Vec2i max, Child child)
-        : Proxy(child), _min(min), _max(max) {}
+        : ProxyNode(child), _min(min), _max(max) {}
 
     Math::Recti bound() override {
         return _rect;
@@ -220,15 +218,15 @@ Child pinSize(int size, Child child) {
 
 /* --- Spacing -------------------------------------------------------------- */
 
-struct Spacing : public Proxy<Spacing> {
+struct Spacing : public ProxyNode<Spacing> {
     Layout::Spacingi _spacing;
 
     Spacing(Layout::Spacingi spacing, Child child)
-        : Proxy(child), _spacing(spacing) {}
+        : ProxyNode(child), _spacing(spacing) {}
 
     void reconcile(Spacing &o) override {
         _spacing = o._spacing;
-        Proxy<Spacing>::reconcile(o);
+        ProxyNode<Spacing>::reconcile(o);
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
@@ -257,15 +255,15 @@ Child spacing(Layout::Spacingi s, Child child) {
 
 /* --- Aspect Ratio --------------------------------------------------------- */
 
-struct AspectRatio : public Proxy<AspectRatio> {
+struct AspectRatio : public ProxyNode<AspectRatio> {
     float _ratio;
 
     AspectRatio(float ratio, Child child)
-        : Proxy(child), _ratio(ratio) {}
+        : ProxyNode(child), _ratio(ratio) {}
 
     void reconcile(AspectRatio &o) override {
         _ratio = o._ratio;
-        Proxy<AspectRatio>::reconcile(o);
+        ProxyNode<AspectRatio>::reconcile(o);
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
@@ -307,8 +305,8 @@ Child aspectRatio(float ratio, Child child) {
 
 /* --- Stack ---------------------------------------------------------------- */
 
-struct StackLayout : public Group<StackLayout> {
-    using Group::Group;
+struct StackLayout : public GroupNode<StackLayout> {
+    using GroupNode::GroupNode;
 
     void layout(Math::Recti r) override {
         for (auto &child : children()) {
@@ -323,10 +321,10 @@ Child stack(Children children) {
 
 /* --- Dock ----------------------------------------------------------------- */
 
-struct DockItem : public Proxy<DockItem> {
+struct DockItem : public ProxyNode<DockItem> {
     Layout::Dock _dock;
 
-    DockItem(Layout::Dock dock, Child child) : Proxy(child), _dock(dock) {}
+    DockItem(Layout::Dock dock, Child child) : ProxyNode(child), _dock(dock) {}
 
     Layout::Dock dock() const { return _dock; }
 };
@@ -351,8 +349,8 @@ Child dockEnd(Child child) {
     return docked(Layout::Dock::END, child);
 }
 
-struct DockLayout : public Group<DockLayout> {
-    using Group::Group;
+struct DockLayout : public GroupNode<DockLayout> {
+    using GroupNode::GroupNode;
 
     static auto getDock(auto &child) -> Layout::Dock {
         if (child.template is<DockItem>()) {
@@ -413,12 +411,12 @@ Child dock(Children children) {
 
 /* --- Flow ----------------------------------------------------------------- */
 
-struct Grow : public Proxy<Grow> {
+struct Grow : public ProxyNode<Grow> {
     int _grow;
 
-    Grow(Child child) : Proxy(child), _grow(1) {}
+    Grow(Child child) : ProxyNode(child), _grow(1) {}
 
-    Grow(int grow, Child child) : Proxy(child), _grow(grow) {}
+    Grow(int grow, Child child) : ProxyNode(child), _grow(grow) {}
 
     int grow() const {
         return _grow;
@@ -437,13 +435,13 @@ Child grow(int g) {
     return grow(g, empty());
 }
 
-struct FlowLayout : public Group<FlowLayout> {
-    using Group::Group;
+struct FlowLayout : public GroupNode<FlowLayout> {
+    using GroupNode::GroupNode;
 
     FlowStyle _style;
 
     FlowLayout(FlowStyle style, Children children)
-        : Group(children), _style(style) {}
+        : GroupNode(children), _style(style) {}
 
     int computeGrowUnit(Math::Recti r) {
         int total = 0;
@@ -518,12 +516,12 @@ Child flow(FlowStyle style, Children children) {
 
 /* --- Grid ----------------------------------------------------------------- */
 
-struct Cell : public Proxy<Cell> {
+struct Cell : public ProxyNode<Cell> {
     Math::Vec2i _start{};
     Math::Vec2i _end{};
 
     Cell(Math::Vec2i start, Math::Vec2i end, Child child)
-        : Proxy(child), _start(start), _end(end) {}
+        : ProxyNode(child), _start(start), _end(end) {}
 
     Math::Vec2i start() const {
         return _start;
@@ -542,7 +540,7 @@ Child cell(Math::Vec2i start, Math::Vec2i end, Child child) {
     return makeStrong<Cell>(start, end, child);
 }
 
-struct GridLayout : public Group<GridLayout> {
+struct GridLayout : public GroupNode<GridLayout> {
     struct _Dim {
         int start;
         int size;
@@ -556,7 +554,7 @@ struct GridLayout : public Group<GridLayout> {
     Vec<_Dim> _columns;
 
     GridLayout(GridStyle style, Children children)
-        : Group(children), _style(style) {}
+        : GroupNode(children), _style(style) {}
 
     int computeGrowUnitRows(Math::Recti r) {
         int total = 0;

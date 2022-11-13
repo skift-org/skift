@@ -1,18 +1,18 @@
 #pragma once
 
-#include "proxy.h"
+#include "node.h"
 
 namespace Karm::Ui {
 
 template <typename I, typename U = I>
-struct Supplier : public Proxy<Supplier<I>> {
+struct Supplier : public ProxyNode<Supplier<I>> {
     U _provided;
 
     using Node::parent;
 
     template <typename... Args>
     Supplier(Child child, Args... args)
-        : Proxy<Supplier<I>>(child),
+        : ProxyNode<Supplier<I>>(child),
           _provided(std::forward<Args>(args)...) {
     }
 

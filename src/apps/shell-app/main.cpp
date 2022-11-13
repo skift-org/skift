@@ -4,7 +4,7 @@
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
-#include <karm-ui/reducer.h>
+#include <karm-ui/react.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
@@ -59,7 +59,7 @@ Ui::Child statusbar() {
                 {12, 0},
                 Ui::hflow(
                     4,
-                    Ui::center(Ui::text(Ui::TextStyle::bold().withSize(14), "22:07")),
+                    Ui::center(Ui::text(Ui::TextStyle::labelMedium(), "22:07")),
                     Ui::grow(),
                     indicator(Media::Icons::NETWORK_STRENGTH_4),
                     indicator(Media::Icons::WIFI_STRENGTH_4),
@@ -117,7 +117,7 @@ Ui::Child notiWrapper(App app, Ui::Child inner) {
                     4,
                     Ui::box(Ui::BoxStyle{.foregroundColor = app.color[4]},
                             Ui::icon(app.icon, 12)),
-                    Ui::text(Ui::TextStyle::regular().withColor(Gfx::ZINC400), app.name)),
+                    Ui::text(Ui::TextStyle::labelMedium().withColor(Gfx::ZINC400), app.name)),
                 inner)),
         Ui::separator());
 }
@@ -125,8 +125,8 @@ Ui::Child notiWrapper(App app, Ui::Child inner) {
 Ui::Child notiMsg(String title, String body) {
     return Ui::vflow(
         6,
-        Ui::hflow(Ui::text(Ui::TextStyle::bold(), title)),
-        Ui::text(Ui::TextStyle::regular(), body));
+        Ui::hflow(Ui::text(Ui::TextStyle::labelLarge(), title)),
+        Ui::text(Ui::TextStyle::labelMedium(), body));
 }
 
 Ui::Child notification(Media::Icons icon, String title, String subtitle) {
@@ -139,7 +139,7 @@ Ui::Child notifications() {
             {12, 0},
             Ui::hflow(
 
-                Ui::center(Ui::text(Ui::TextStyle::label(), "Notifications")),
+                Ui::center(Ui::text(Ui::TextStyle::labelMedium(), "Notifications")),
                 Ui::grow(),
                 Ui::button(
                     [](Ui::Node &) {
@@ -182,7 +182,7 @@ Ui::Child searchInput() {
                     Ui::spacing(
                         {12, 8},
                         Ui::hflow(
-                            Ui::grow(Ui::vcenter(Ui::text(Ui::TextStyle::label().withSize(18), "Search..."))),
+                            Ui::grow(Ui::vcenter(Ui::text(Ui::TextStyle::labelMedium(), "Search..."))),
                             Ui::center(Ui::icon(Media::Icons::MAGNIFY, 24))))));
 }
 
@@ -204,7 +204,7 @@ Ui::Child appRow(Media::Icons icon, Gfx::ColorRamp colors, String title) {
         Ui::hflow(
             12,
             appIcon(icon, colors),
-            Ui::center(Ui::text(Ui::TextStyle::label().withSize(16), title))));
+            Ui::center(Ui::text(Ui::TextStyle::labelMedium(), title))));
 }
 
 Ui::Child apps(Ui::Children apps) {
@@ -285,13 +285,13 @@ Ui::Child lockscreen() {
                         Ui::spacing(
                             {48, 64},
                             Ui::vflow(
-                                Ui::center(Ui::text(Ui::TextStyle::regular().withSize(52), "22:07")),
+                                Ui::center(Ui::text(Ui::TextStyle::displayMedium(), "22:07")),
                                 Ui::empty(16),
-                                Ui::center(Ui::text(Ui::TextStyle::bold().withSize(16), "Wed. 12 October")),
+                                Ui::center(Ui::text(Ui::TextStyle::titleMedium(), "Wed. 12 October")),
                                 Ui::grow(),
                                 Ui::vflow(
                                     Ui::center(Ui::icon(Media::Icons::CHEVRON_UP, 48)),
-                                    Ui::center(Ui::text(Ui::TextStyle::regular().withSize(16), "Swipe up to unlock"))))))))));
+                                    Ui::center(Ui::text(Ui::TextStyle::labelLarge(), "Swipe up to unlock"))))))))));
 }
 
 Ui::Child app() {

@@ -39,7 +39,7 @@ CliResult entryPoint(CliArgs args) {
         Ui::vflow(
             8,
             Ui::hflow(8,
-                      Ui::text(Ui::TextStyle::title1(), "skiftOS"),
+                      Ui::text(Ui::TextStyle::titleLarge(), "skiftOS"),
                       Ui::center(Ui::badge(Ui::BadgeStyle::INFO, "v0.1.0"))),
             Ui::empty(),
             Ui::text("Copyright © 2018-2022"),

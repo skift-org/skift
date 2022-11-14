@@ -18,15 +18,19 @@ struct Pmm : public Hal::Pmm {
           _bits(bits) {
     }
 
-    Result<Hal::PmmRange> alloc(size_t size, Hal::PmmFlags) override {
+    Result<Hal::PmmRange> alloc(size_t size, Hal::PmmFlags flags) override {
         LockScope guard(_lock);
+        bool upper = !!(flags & Hal::PmmFlags::UPPER);
         try$(ensureAlign(size, Hal::PAGE_SIZE));
         size /= Hal::PAGE_SIZE;
-        auto res = try$(_bits.alloc(size));
-        return bits2Pmm(res);
+        auto res = bits2Pmm(try$(_bits.alloc(size, upper ? -1 : 0, upper)));
+        return res;
     }
 
     Error used(Hal::PmmRange range, Hal::PmmFlags) override {
+        if (!range.overlaps(_usable)) {
+            return OK;
+        }
         LockScope guard(_lock);
         try$(range.ensureAligned(Hal::PAGE_SIZE));
         _bits.set(pmm2Bits(range), true);
@@ -34,6 +38,9 @@ struct Pmm : public Hal::Pmm {
     }
 
     Error free(Hal::PmmRange range) override {
+        if (!range.overlaps(_usable)) {
+            return Error{"range is not in usable memory"};
+        }
         LockScope guard(_lock);
         try$(range.ensureAligned(Hal::PAGE_SIZE));
         _bits.set(pmm2Bits(range), false);
@@ -42,7 +49,6 @@ struct Pmm : public Hal::Pmm {
 
     void clear() {
         LockScope guard(_lock);
-
         _bits.clear();
     }
 
@@ -70,7 +76,7 @@ struct Heap : public Hal::Heap {
     }
 
     Result<Hal::HeapRange> alloc(size_t size) override {
-        return pmm2Heap(try$(_pmm.alloc(size, Hal::PmmFlags::UPPER)));
+        return pmm2Heap(try$(_pmm.alloc(size, Hal::PmmFlags::NIL)));
     }
 
     Error free(Hal::HeapRange range) override {
@@ -127,6 +133,14 @@ Error init(Handover::Payload &payload) {
     try$(_pmm->used({pmmBits.start, pmmBits.size}, Hal::PmmFlags::NIL));
 
     _heap = Heap(_pmm.unwrap());
+
+    Debug::linfo("Marking kernel memory as used");
+    for (auto &record : payload) {
+        if (record.tag != Handover::Tag::FREE) {
+            Debug::ldebug("Marking {x}-{x} of type {} as used", record.start, record.end(), record.name());
+            try$(pmm().used({record.start, record.size}, Hal::PmmFlags::NIL));
+        }
+    }
 
     Debug::linfo("Mapping kernel...");
     try$(vmm().map(

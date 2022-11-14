@@ -43,7 +43,6 @@ struct Bits {
     }
 
     Opt<BitsRange> alloc(size_t count, size_t start = -1, bool upper = true) {
-
         start = min(start, len());
 
         if (_len == 0) {
@@ -71,6 +70,18 @@ struct Bits {
         }
 
         return NONE;
+    }
+
+    size_t used() const {
+        size_t res = 0;
+
+        for (size_t i = 0; i < len(); i++) {
+            if (get(i)) {
+                res++;
+            }
+        }
+
+        return res;
     }
 };
 

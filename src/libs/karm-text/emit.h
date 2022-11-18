@@ -12,7 +12,7 @@ struct Emit {
     size_t _ident = 0;
     size_t _total = 0;
     Error _error = OK;
-    bool _newline = true;
+    bool _newline = false;
 
     Emit(Io::_TextWriter &writer) : _writer(writer) {}
 

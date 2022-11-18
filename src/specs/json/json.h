@@ -260,6 +260,7 @@ template <>
 struct Karm::Fmt::Formatter<Json::Value> {
     Result<size_t> format(Io::_TextWriter &writer, Json::Value value) {
         Text::Emit emit{writer};
-        return Json::stringify(emit, value);
+        try$(Json::stringify(emit, value));
+        return emit.total();
     }
 };

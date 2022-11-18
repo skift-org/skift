@@ -1,5 +1,3 @@
-#include <karm-debug/logger.h>
-
 #include "json.h"
 
 namespace Json {
@@ -142,8 +140,6 @@ Result<Value> parse(Text::Scan &s) {
     } else if (s.peek() == '-' || (s.peek() >= '0' && s.peek() <= '9')) {
         return Value{try$(s.nextFloat())};
     }
-
-    Debug::linfo("{c}", s.peek());
 
     return Error{"unexpected character"};
 }

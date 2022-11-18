@@ -1,0 +1,9 @@
+{
+    "id": "test-app",
+    "type": "exe",
+    "deps": [
+        "karm-main",
+        "karm-ui",
+        "json"
+    ]
+}

@@ -84,7 +84,9 @@ struct _Scan {
         return true;
     }
 
-    bool skip(auto predicate) requires Meta::Callable<decltype(predicate), decltype(*this)> {
+    bool skip(auto predicate)
+        requires Meta::Callable<decltype(predicate), decltype(*this)>
+    {
         auto save = _cursor;
         if (predicate(*this)) {
             return true;
@@ -124,6 +126,16 @@ struct _Scan {
 
     Str end() {
         return {_begin, _cursor};
+    }
+
+    Opt<Str> token(auto predicate) {
+        begin();
+        if (skip(predicate)) {
+            return end();
+        } else {
+            _cursor = _begin;
+            return NONE;
+        }
     }
 
     /* --- Number parsing --------------------------------------------------- */

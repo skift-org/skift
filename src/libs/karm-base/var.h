@@ -85,7 +85,7 @@ struct Var {
             panic("Unwrapping wrong type");
         }
 
-        return *static_cast<T *>(_buf);
+        return *reinterpret_cast<T *>(_buf);
     }
 
     template <Meta::Contains<Ts...> T>
@@ -94,7 +94,7 @@ struct Var {
             panic("Unwrapping wrong type");
         }
 
-        return *static_cast<T const *>(_buf);
+        return *reinterpret_cast<T const *>(_buf);
     }
 
     template <Meta::Contains<Ts...> T>
@@ -103,13 +103,13 @@ struct Var {
             panic("Taking wrong type");
         }
 
-        return std::move(*static_cast<T *>(_buf));
+        return std::move(*reinterpret_cast<T *>(_buf));
     }
 
     template <Meta::Contains<Ts...> T>
     ALWAYS_INLINE bool with(auto visitor) {
         if (_index == Meta::indexOf<T, Ts...>()) {
-            visitor(*static_cast<T *>(_buf));
+            visitor(*reinterpret_cast<T *>(_buf));
             return true;
         }
         return false;
@@ -124,7 +124,7 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    ALWAYS_INLINE bool is() {
+    ALWAYS_INLINE bool is() const {
         return _index == Meta::indexOf<T, Ts...>();
     }
 

@@ -16,6 +16,8 @@ namespace Karm::Fmt {
 struct NumberFormater {
     bool isChar = false;
     int base = 10;
+    int width = 0;
+    bool fillZero = false;
 
     void parse(Text::Scan &scan) {
         if (scan.ended()) {
@@ -59,7 +61,7 @@ struct NumberFormater {
             }
         };
         size_t i = 0;
-        Array<char, 65> buf;
+        Array<char, 128> buf;
 #
         do {
             buf[i++] = digit(value % base);
@@ -68,7 +70,31 @@ struct NumberFormater {
 
         reverse(mutSub(buf, 0, i));
 
+        if (width > 0) {
+            size_t n = width - i;
+            if (fillZero) {
+                for (size_t j = 0; j < n; j++) {
+                    buf[i++] = '0';
+                }
+            } else {
+                for (size_t j = 0; j < n; j++) {
+                    buf[i++] = ' ';
+                }
+            }
+        }
+
         return writer.writeStr({buf.buf(), i});
+    }
+
+    Result<size_t> formatSigned(Io::_TextWriter &writer, int64_t value) {
+        size_t written = 0;
+        if (value < 0) {
+            written += try$(writer.writeRune('-'));
+            value = -value;
+        }
+
+        written += try$(formatUnsigned(writer, value));
+        return written;
     }
 };
 
@@ -89,17 +115,7 @@ struct SignedFormatter : public NumberFormater {
             return writer.writeRune(value);
         }
 
-        size_t written = 0;
-        Meta::MakeUnsigned<T> unsignedValue = 0;
-
-        if (value < 0) {
-            written += try$(writer.writeRune(U'-'));
-            unsignedValue = -value;
-        } else {
-            unsignedValue = value;
-        }
-
-        return written + try$(formatUnsigned(writer, unsignedValue));
+        return formatSigned(writer, value);
     }
 };
 
@@ -111,6 +127,25 @@ struct Formatter<T> : public UnsignedFormatter<T> {};
 
 template <Meta::SignedIntegral T>
 struct Formatter<T> : public SignedFormatter<T> {};
+
+template <>
+struct Formatter<double> {
+    Result<size_t> format(Io::_TextWriter &writer, double const value) {
+        NumberFormater formater;
+        size_t written = 0;
+        int ipart = (int)value;
+        written += try$(formater.formatSigned(writer, ipart));
+        double fpart = value - (double)ipart;
+        if (fpart != 0.0) {
+            written += try$(writer.writeRune('.'));
+            formater.width = 6;
+            formater.fillZero = true;
+            fpart *= 1000000;
+            written += try$(formater.formatUnsigned(writer, (uint64_t)fpart));
+        }
+        return written;
+    }
+};
 
 template <>
 struct Formatter<Str> {

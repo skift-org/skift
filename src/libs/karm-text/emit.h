@@ -8,11 +8,13 @@
 namespace Karm::Text {
 
 struct Emit {
-    Io::TextWriter<> &_writer;
+    Io::_TextWriter &_writer;
     size_t _ident = 0;
     size_t _total = 0;
     Error _error = OK;
     bool _newline = true;
+
+    Emit(Io::_TextWriter &writer) : _writer(writer) {}
 
     void _try(Result<size_t> result) {
         if (result) {

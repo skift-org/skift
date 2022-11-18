@@ -18,7 +18,7 @@ struct Map {
         : _els(std::move(list)) {}
 
     void put(K const &key, V const &value) {
-        for (auto &i : _els.iter()) {
+        for (auto &i : ::mutIter(_els)) {
             if (Op::eq(i.car, key)) {
                 i.cdr = value;
                 return;
@@ -28,7 +28,7 @@ struct Map {
         _els.pushBack(Cons<K, V>{key, value});
     }
 
-    Opt<V> get(K const &key) {
+    Opt<V> get(K const &key) const {
         for (auto &i : _els) {
             if (Op::eq(i.car, key)) {
                 return i.cdr;
@@ -39,14 +39,14 @@ struct Map {
     }
 
     auto iter() {
-        return _els.iter();
+        return mutIter(_els);
     }
 
     auto iter() const {
-        return _els.iter();
+        return ::iter(_els);
     }
 
-    size_t len() {
+    size_t len() const {
         return _els.len();
     }
 

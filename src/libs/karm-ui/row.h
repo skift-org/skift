@@ -2,6 +2,7 @@
 
 #include "input.h"
 #include "layout.h"
+#include "react.h"
 #include "view.h"
 
 namespace Karm::Ui {
@@ -42,8 +43,8 @@ inline Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Chi
                 trail)));
 }
 
-inline Child textRow(TextStyle style, String t) {
-    return spacing({12, 16, 12, 8}, text(style, t));
+inline Child titleRow(String t) {
+    return spacing({12, 16, 12, 8}, text(Ui::TextStyle::titleMedium(), t));
 }
 
 inline Child pressableRow(OnPress onPress, Opt<Child> leading, String title, Opt<String> subtitle, Opt<Child> trailing) {
@@ -118,7 +119,29 @@ inline Child navRow(bool selected, OnPress onPress, Media::Icons i, String title
         buttonStyle,
         spacing(
             {0, 8, 12, 8},
-            hflow(indicator, empty(8), icon(i, 26), empty(12), center(text(TextStyle::labelMedium(), title)))));
+            hflow(
+                indicator,
+                empty(8),
+                icon(i, 26),
+                empty(12),
+                center(text(TextStyle::labelMedium(), title)))));
+}
+
+inline Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Children children) {
+    return state(false, [=](State<bool> state) {
+        return vflow(
+            0,
+            pressableRow(
+                state.bindToggle(),
+                leading,
+                title,
+                subtitle,
+                icon(state.value() ? Media::Icons::CHEVRON_UP : Media::Icons::CHEVRON_DOWN, 24)),
+            state.value() ? spacing(
+                                {38, 0, 0, 0},
+                                vflow(children))
+                          : empty());
+    });
 }
 
 } // namespace Karm::Ui

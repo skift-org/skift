@@ -30,17 +30,6 @@ Ui::Child badges() {
         Ui::badge(Ui::BadgeStyle::INFO, "Info"));
 }
 
-Ui::Child texts() {
-    return Ui::vflow(
-        8,
-        Ui::text(Ui::TextStyle::title1(), "The quick brown fox jumps over the lazy dog."),
-        Ui::text(Ui::TextStyle::title2(), "The quick brown fox jumps over the lazy dog."),
-        Ui::text(Ui::TextStyle::title3(), "The quick brown fox jumps over the lazy dog."),
-        Ui::text(Ui::TextStyle::subtitle1(), "The quick brown fox jumps over the lazy dog."),
-        Ui::text(Ui::TextStyle::subtitle2(), "The quick brown fox jumps over the lazy dog."),
-        Ui::text(Ui::TextStyle::body(), "The quick brown fox jumps over the lazy dog."));
-}
-
 CliResult entryPoint(CliArgs args) {
     auto titlebar = Ui::titlebar(Media::Icons::DUCK, "Widget Gallery");
     auto content = Ui::spacing(
@@ -51,8 +40,7 @@ CliResult entryPoint(CliArgs args) {
                 Ui::showMsgDialog(n, "Button pressed");
             }),
             buttons(NONE),
-            badges(),
-            texts()));
+            badges()));
 
     auto layout = Ui::dialogLayer(
         Ui ::minSize(

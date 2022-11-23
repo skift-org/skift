@@ -134,6 +134,18 @@ struct _State : public React<_State<T>> {
             };
         }
 
+        Func<void(Node &)> bindValue(T v) {
+            return [*this, v](Node &) mutable {
+                update(v);
+            };
+        }
+
+        Func<void(Node &)> bindToggle() {
+            return [*this](Node &) mutable {
+                update(!value());
+            };
+        }
+
         void dispatch(auto f) { update(f(value())); }
     };
 

@@ -35,7 +35,6 @@ struct Flow {
     }
 
     Flow relative(Flow child) const {
-        // FIXME: make sure this is correct
         Flow table[4 * 4] = {
             LEFT_TO_RIGHT,
             RIGHT_TO_LEFT,

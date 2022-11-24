@@ -175,7 +175,7 @@ struct Button : public _Box<Button> {
     }
 
     void event(Events::Event &e) override {
-        if (_mouseListener.listen(*this, e)) {
+        if (_onPress && _mouseListener.listen(*this, e)) {
             _onPress(*this);
         }
     };

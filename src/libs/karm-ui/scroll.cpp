@@ -13,6 +13,12 @@ struct Scroll : public ProxyNode<Scroll> {
     Scroll(Layout::Orien orient, Child child)
         : ProxyNode(child), _orient(orient) {}
 
+    void scroll(Math::Vec2i s) {
+        auto childBound = child().bound();
+        _scroll.x = clamp(s.x, -(childBound.width - min(childBound.width, bound().width)), 0);
+        _scroll.y = clamp(s.y, -(childBound.height - min(childBound.height, bound().height)), 0);
+    }
+
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
         g.clip(_bound);
@@ -38,12 +44,7 @@ struct Scroll : public ProxyNode<Scroll> {
 
                 if (!ee.accepted) {
                     if (ee.type == Events::MouseEvent::SCROLL) {
-                        auto childBound = child().bound();
-                        _scroll = (_scroll + ee.scrollPrecise * 16).cast<int>();
-
-                        _scroll.x = clamp(_scroll.x, -(childBound.width - min(childBound.width, bound().width)), 0);
-                        _scroll.y = clamp(_scroll.y, -(childBound.height - min(childBound.height, bound().height)), 0);
-
+                        scroll((_scroll + ee.scrollPrecise * 16).cast<int>());
                         shouldAnimate(*this);
                         _animated = true;
                     }
@@ -77,6 +78,7 @@ struct Scroll : public ProxyNode<Scroll> {
         }
         r.wh = childSize;
         child().layout(r);
+        scroll(_scroll);
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {

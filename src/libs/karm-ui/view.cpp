@@ -258,20 +258,20 @@ Child icon(Media::Icons i, double size) {
 /* --- Image ---------------------------------------------------------------- */
 
 struct Image : public View<Image> {
-    Media::Image image;
+    Media::Image _image;
 
     Image(Media::Image image)
-        : image(image) {
+        : _image(image) {
     }
 
     void paint(Gfx::Context &g, Math::Recti) override {
-        g.blit(bound(), image);
+        g.blit(bound(), _image);
         if (debugShowLayoutBounds)
             g._rect(bound(), Gfx::CYAN);
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return image.bound().size().cast<int>();
+        return _image.bound().size().cast<int>();
     }
 };
 

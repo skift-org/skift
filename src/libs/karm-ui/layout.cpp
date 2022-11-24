@@ -152,7 +152,6 @@ Child vcenterFill(Child child) {
 /* --- Sizing --------------------------------------------------------------- */
 
 struct Sizing : public ProxyNode<Sizing> {
-
     Math::Vec2i _min;
     Math::Vec2i _max;
     Math::Recti _rect;

@@ -70,6 +70,16 @@ struct Ring {
         _len++;
     }
 
+    void pushBack(T value) {
+        if (_len == _cap) {
+            panic("push on full ring");
+        }
+
+        _buf[_head].ctor(value);
+        _head = (_head + 1) % _cap;
+        _len++;
+    }
+
     T popBack() {
         if (_len == 0) {
             panic("pop on empty ring");

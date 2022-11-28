@@ -531,63 +531,75 @@ void Context::shadow() {}
 
 /* --- Effects -------------------------------------------------------------- */
 
-[[gnu::flatten]] void Context::blur(Math::Recti region, int radius) {
-    if (radius == 0)
+struct BlurStack {
+    int _radius;
+    Ring<Math::Vec4u> _queue;
+    Math::Vec4u _stack;
+
+    BlurStack(int radius)
+        : _radius(radius), _queue(width()) {}
+
+    int width() const {
+        return _radius * 2 + 1;
+    }
+
+    void enqueue(Math::Vec4u color) {
+        _queue.pushBack(color);
+        _stack = _stack + color;
+    }
+
+    Math::Vec4u dequeue() {
+        auto res = _stack / width();
+        auto out = _queue.dequeue();
+        _stack = _stack - out;
+        return res;
+    }
+
+    void clear() {
+        _stack = {};
+        _queue.clear();
+    }
+};
+
+[[gnu::flatten]] void Context::_blur(Math::Recti region, int radius) {
+    if (radius <= 1)
         return;
 
-    auto rect = applyClip(region);
+    region = applyClip(region);
+    BlurStack stack{radius};
 
-    Ring<Math::Vec4u> stack{(size_t)radius * 2 + 1};
-
-    // Horizontal pass
-
-    for (int y = rect.top(); y < rect.bottom(); y++) {
-        Math::Vec4u sum = {};
-
-        for (int i = 0; i < (radius * 2 + 1); i++) {
-            int x = rect.start() + i - radius;
-            auto px = surface().loadClamped({x, y});
-            stack.pushBack(px);
-            sum = sum + px;
+    for (int y = region.top(); y < region.bottom(); y++) {
+        for (int i = 0; i < stack.width(); i++) {
+            int x = region.start() + i - radius;
+            stack.enqueue(surface().loadClamped({x, y}));
         }
 
-        for (int x = rect.start(); x < rect.end(); x++) {
-            surface().store({x, y}, sum / (radius * 2 + 1));
-            auto out = stack.dequeue();
-            sum = sum - out;
-
-            auto px = surface().loadClamped({x + radius + 1, y});
-            stack.pushBack(px);
-            sum = sum + px;
+        for (int x = region.start(); x < region.end(); x++) {
+            surface().store({x, y}, stack.dequeue());
+            stack.enqueue(surface().loadClamped({x + radius + 1, y}));
         }
 
         stack.clear();
     }
 
-    // Vertical pass
-
-    for (int x = rect.start(); x < rect.end(); x++) {
-        Math::Vec4u sum = {};
-
-        for (int i = 0; i < (radius * 2 + 1); i++) {
-            int y = rect.top() + i - radius;
-            auto px = surface().loadClamped({x, y});
-            stack.pushBack(px);
-            sum = sum + px;
+    for (int x = region.start(); x < region.end(); x++) {
+        for (int i = 0; i < stack.width(); i++) {
+            int y = region.top() + i - radius;
+            stack.enqueue(surface().loadClamped({x, y}));
         }
 
-        for (int y = rect.top(); y < rect.bottom(); y++) {
-            surface().store({x, y}, sum / (radius * 2 + 1));
-            auto out = stack.dequeue();
-            sum = sum - out;
-
-            auto px = surface().loadClamped({x, y + radius + 1});
-            stack.pushBack(px);
-            sum = sum + px;
+        for (int y = region.top(); y < region.bottom(); y++) {
+            surface().store({x, y}, stack.dequeue());
+            stack.enqueue(surface().loadClamped({x, y + radius + 1}));
         }
 
         stack.clear();
     }
+}
+
+void Context::blur(Math::Recti region, int radius) {
+    _blur(region, radius / 2);
+    _blur(region, radius / 2);
 }
 
 void Context::saturate(Math::Recti region, double value) {

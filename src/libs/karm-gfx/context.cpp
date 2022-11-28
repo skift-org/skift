@@ -1,3 +1,4 @@
+#include <karm-base/ring.h>
 #include <karm-math/funcs.h>
 #include <karm-math/rand.h>
 
@@ -530,38 +531,62 @@ void Context::shadow() {}
 
 /* --- Effects -------------------------------------------------------------- */
 
-void Context::blur(Math::Recti region, int radius) {
+[[gnu::flatten]] void Context::blur(Math::Recti region, int radius) {
     if (radius == 0)
         return;
 
     auto rect = applyClip(region);
 
+    Ring<Math::Vec4u> stack{(size_t)radius * 2 + 1};
+
     // Horizontal pass
+
     for (int y = rect.top(); y < rect.bottom(); y++) {
-        for (int x = rect.start(); x < rect.end(); x++) {
-            Math::Vec4u sum = surface().loadClamped({x, y});
+        Math::Vec4u sum = {};
 
-            for (int i = 1; i <= radius; i++) {
-                sum = sum + surface().loadClamped({x + i, y});
-                sum = sum + surface().loadClamped({x - i, y});
-            }
-
-            surface().store({x, y}, sum / (radius * 2 + 1));
+        for (int i = 0; i < (radius * 2 + 1); i++) {
+            int x = rect.start() + i - radius;
+            auto px = surface().loadClamped({x, y});
+            stack.pushBack(px);
+            sum = sum + px;
         }
+
+        for (int x = rect.start(); x < rect.end(); x++) {
+            surface().store({x, y}, sum / (radius * 2 + 1));
+            auto out = stack.dequeue();
+            sum = sum - out;
+
+            auto px = surface().loadClamped({x + radius + 1, y});
+            stack.pushBack(px);
+            sum = sum + px;
+        }
+
+        stack.clear();
     }
 
     // Vertical pass
-    for (int y = rect.top(); y < rect.bottom(); y++) {
-        for (int x = rect.start(); x < rect.end(); x++) {
-            Math::Vec4u sum = surface().loadClamped({x, y});
 
-            for (int i = 1; i <= radius; i++) {
-                sum = sum + surface().loadClamped({x, y + i});
-                sum = sum + surface().loadClamped({x, y - i});
-            }
+    for (int x = rect.start(); x < rect.end(); x++) {
+        Math::Vec4u sum = {};
 
-            surface().store({x, y}, sum / (radius * 2 + 1));
+        for (int i = 0; i < (radius * 2 + 1); i++) {
+            int y = rect.top() + i - radius;
+            auto px = surface().loadClamped({x, y});
+            stack.pushBack(px);
+            sum = sum + px;
         }
+
+        for (int y = rect.top(); y < rect.bottom(); y++) {
+            surface().store({x, y}, sum / (radius * 2 + 1));
+            auto out = stack.dequeue();
+            sum = sum - out;
+
+            auto px = surface().loadClamped({x, y + radius + 1});
+            stack.pushBack(px);
+            sum = sum + px;
+        }
+
+        stack.clear();
     }
 }
 

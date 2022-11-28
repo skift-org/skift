@@ -65,7 +65,7 @@ struct Ring {
             panic("push on full ring");
         }
 
-        _buf[_tail].ctor(std::move(value));
+        _buf[_head].ctor(std::move(value));
         _head = (_head + 1) % _cap;
         _len++;
     }

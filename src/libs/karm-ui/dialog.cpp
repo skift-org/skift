@@ -78,11 +78,11 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     void paint(Gfx::Context &g, Math::Recti r) override {
         child().paint(g, r);
 
-        if (_opacity.value() > 0.01) {
+        if (_opacity.value() > 0.001) {
             g.save();
-            g.fillStyle(Gfx::BLACK.withOpacity(0.25 * _opacity.value()));
+            g.fillStyle(Gfx::BLACK.withOpacity(0.1 * _opacity.value()));
             g.fill(bound());
-            g.blur(bound(), 16 * _opacity.value());
+            g.blur(bound(), 4 * _opacity.value());
             g.restore();
         }
 
@@ -154,7 +154,7 @@ void closeDialog(Node &n) {
 /* --- Dialogs Scaffolding -------------------------------------------------- */
 
 Child dialogScafold(Layout::Align a, Child inner) {
-    BoxStyle boxStyle = {
+    BoxStyle const boxStyle = {
         .borderRadius = 4,
         .borderWidth = 1,
         .borderColor = Gfx::ZINC700,

@@ -60,16 +60,6 @@ struct Ring {
         return *this;
     }
 
-    void pushBack(T &&value) {
-        if (_len == _cap) {
-            panic("push on full ring");
-        }
-
-        _buf[_head].ctor(std::move(value));
-        _head = (_head + 1) % _cap;
-        _len++;
-    }
-
     void pushBack(T value) {
         if (_len == _cap) {
             panic("push on full ring");
@@ -117,7 +107,7 @@ struct Ring {
             panic("peek on empty ring");
         }
 
-        return _buf[(_tail + index) % _cap];
+        return _buf[(_tail + index) % _cap].unwrap();
     }
 
     T const &peek(size_t index) const {
@@ -125,7 +115,7 @@ struct Ring {
             panic("peek on empty ring");
         }
 
-        return _buf[(_tail + index) % _cap];
+        return _buf[(_tail + index) % _cap].unwrap();
     }
 
     size_t len() const { return _len; }

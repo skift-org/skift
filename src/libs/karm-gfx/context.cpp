@@ -202,7 +202,7 @@ void Context::plot(Math::Vec2i point) {
 void Context::plot(Math::Vec2i point, Color color) {
     point = applyOrigin(point);
     if (clip().contains(point)) {
-        surface().store(point, color);
+        surface().blend(point, color);
     }
 }
 
@@ -534,43 +534,69 @@ void Context::shadow() {}
 struct BlurStack {
     int _radius;
     Ring<Math::Vec4u> _queue;
-    Math::Vec4u _stack;
+    Math::Vec4u _sum;
 
     BlurStack(int radius)
-        : _radius(radius), _queue(width()) {}
+        : _radius(radius), _queue(width()) {
+        clear();
+    }
+
+    Math::Vec4u outgoingSum() const {
+        Math::Vec4u sum = {};
+        for (int i = 0; i < _radius; i++) {
+            sum = sum + _queue.peek(i);
+        }
+        return sum;
+    }
+
+    Math::Vec4u incomingSum() const {
+        Math::Vec4u sum = {};
+        for (int i = 0; i < _radius; i++) {
+            sum = sum + _queue.peek(width() - i - 1);
+        }
+        return sum;
+    }
 
     int width() const {
         return _radius * 2 + 1;
     }
 
+    int denominator() const {
+        return _radius * (_radius + 2) + 1;
+    }
+
     void enqueue(Math::Vec4u color) {
         _queue.pushBack(color);
-        _stack = _stack + color;
+        _sum = _sum + incomingSum() - outgoingSum();
     }
 
     Math::Vec4u dequeue() {
-        auto res = _stack / width();
-        auto out = _queue.dequeue();
-        _stack = _stack - out;
+        auto res = _sum / denominator();
+        _queue.dequeue();
         return res;
     }
 
     void clear() {
-        _stack = {};
+        _sum = {};
         _queue.clear();
+        for (int i = 0; i < width(); i++) {
+            _queue.pushBack({});
+        }
     }
 };
 
-[[gnu::flatten]] void Context::_blur(Math::Recti region, int radius) {
-    if (radius <= 1)
+[[gnu::flatten]] void Context::blur(Math::Recti region, int radius) {
+    if (radius <= 1) {
         return;
+    }
 
     region = applyClip(region);
     BlurStack stack{radius};
 
     for (int y = region.top(); y < region.bottom(); y++) {
         for (int i = 0; i < stack.width(); i++) {
-            int x = region.start() + i - radius;
+            auto x = region.start() + i - radius;
+            stack.dequeue();
             stack.enqueue(surface().loadClamped({x, y}));
         }
 
@@ -584,7 +610,8 @@ struct BlurStack {
 
     for (int x = region.start(); x < region.end(); x++) {
         for (int i = 0; i < stack.width(); i++) {
-            int y = region.top() + i - radius;
+            int const y = region.top() + i - radius;
+            stack.dequeue();
             stack.enqueue(surface().loadClamped({x, y}));
         }
 
@@ -597,11 +624,6 @@ struct BlurStack {
     }
 }
 
-void Context::blur(Math::Recti region, int radius) {
-    _blur(region, radius / 2);
-    _blur(region, radius / 2);
-}
-
 void Context::saturate(Math::Recti region, double value) {
     region = applyAll(region);
 
@@ -611,11 +633,11 @@ void Context::saturate(Math::Recti region, double value) {
 
             // weights from CCIR 601 spec
             // https://stackoverflow.com/questions/13806483/increase-or-decrease-color-saturation
-            double gray = 0.2989 * color.red + 0.5870 * color.green + 0.1140 * color.blue;
+            auto gray = 0.2989 * color.red + 0.5870 * color.green + 0.1140 * color.blue;
 
-            uint8_t red = min(-gray * value + color.red * (1 + value), 255);
-            uint8_t green = min(-gray * value + color.green * (1 + value), 255);
-            uint8_t blue = min(-gray * value + color.blue * (1 + value), 255);
+            uint8_t red = min(gray * value + color.red * (1 - value), 255);
+            uint8_t green = min(gray * value + color.green * (1 - value), 255);
+            uint8_t blue = min(gray * value + color.blue * (1 - value), 255);
 
             color = Color::fromRgba(red, green, blue, color.alpha);
 

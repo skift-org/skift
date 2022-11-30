@@ -4,9 +4,9 @@ namespace Embed {
 
 void relaxe();
 
-void criticalEnter();
+void enterCritical();
 
-void criticalLeave();
+void leaveCritical();
 
 void debug(char const *buf);
 

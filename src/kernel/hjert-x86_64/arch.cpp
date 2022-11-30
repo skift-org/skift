@@ -55,8 +55,16 @@ void stopAll() {
     }
 }
 
-void relaxeCpu() {
+void relaxe() {
     x86_64::hlt();
+}
+
+void enterCritical() {
+    x86_64::cli();
+}
+
+void leaveCritical() {
+    x86_64::sti();
 }
 
 static uint64_t _tick = 0;

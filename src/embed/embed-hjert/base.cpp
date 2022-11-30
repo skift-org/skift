@@ -9,20 +9,13 @@ void debug(char const *buf) {
 
 [[noreturn]] void panic(char const *buf) {
     (void)Fmt::format(Hjert::Arch::loggerOut(), "PANIC: {}\n", buf);
-
     Hjert::Arch::stopAll();
 }
 
-void relaxe() {
-    Hjert::Arch::relaxeCpu();
-}
+void relaxe() { Hjert::Arch::relaxe(); }
 
-void criticalEnter() {
-    debug("todo: criticalEnter");
-}
+void enterCritical() { Hjert::Arch::enterCritical(); }
 
-void criticalLeave() {
-    debug("todo: criticalLeave");
-}
+void leaveCritical() { Hjert::Arch::leaveCritical(); }
 
 } // namespace Embed

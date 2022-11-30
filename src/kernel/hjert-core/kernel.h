@@ -118,7 +118,6 @@ struct Task : public Object<Task> {
 
 struct Cpu {
     bool _present;
-
     bool _retained;
     int _retainedCount;
 

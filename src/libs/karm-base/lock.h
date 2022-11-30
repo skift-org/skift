@@ -10,11 +10,11 @@ namespace Karm {
 
 struct CriticalScope : Meta::Static {
     CriticalScope() {
-        Embed::criticalEnter();
+        Embed::enterCritical();
     }
 
     ~CriticalScope() {
-        Embed::criticalLeave();
+        Embed::leaveCritical();
     }
 };
 
@@ -26,19 +26,19 @@ struct Lock {
         memory_barier();
 
         if (!result) {
-            Embed::criticalLeave();
+            Embed::leaveCritical();
         }
 
         return result;
     }
 
     bool tryAcquire() {
-        Embed::criticalEnter();
+        Embed::enterCritical();
         return _tryAcquire();
     }
 
     void acquire() {
-        Embed::criticalEnter();
+        Embed::enterCritical();
 
         while (!_tryAcquire()) {
             Embed::relaxe();
@@ -49,7 +49,7 @@ struct Lock {
         memory_barier();
         _lock.store(false);
 
-        Embed::criticalLeave();
+        Embed::leaveCritical();
     }
 };
 

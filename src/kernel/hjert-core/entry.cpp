@@ -48,5 +48,5 @@ Error entryPoint(uint64_t magic, Handover::Payload &payload) {
     try$(Hjert::Mem::init(payload));
 
     while (true)
-        Hjert::Arch::relaxeCpu();
+        Hjert::Arch::relaxe();
 }

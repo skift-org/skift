@@ -1,0 +1,7 @@
+{
+    "id": "device-tree",
+    "type": "lib",
+    "deps": [
+        "karm-base"
+    ]
+}

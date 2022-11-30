@@ -1,0 +1,11 @@
+{
+    "id": "dtb-dump",
+    "type": "exe",
+    "deps": [
+        "karm-main",
+        "karm-sys",
+        "karm-io",
+        "karm-fmt",
+        "device-tree"
+    ]
+}

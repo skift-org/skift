@@ -17,7 +17,7 @@ int doSyscall(void *, size_t);
 
 using SyscallId = uint64_t;
 
-template <uint64_t _ID, typename Self>
+template <uint64_t _ID, typename Crtp>
 struct Syscall {
     static constexpr SyscallId ID = _ID;
 
@@ -30,9 +30,9 @@ struct Syscall {
     }
 
     template <typename... Args>
-    static Karm::Result<Self> call(Args &&...args) {
-        Self self{std::forward<Args>(args)...};
-        return self.call();
+    static Karm::Result<Crtp> call(Args &&...args) {
+        Crtp payload{std::forward<Args>(args)...};
+        return payload.call();
     }
 };
 

@@ -104,7 +104,7 @@ struct Ring {
 
     T &peek(size_t index) {
         if (index >= _len) {
-            panic("peek on empty ring");
+            panic("peek out of bounds");
         }
 
         return _buf[(_tail + index) % _cap].unwrap();
@@ -112,7 +112,7 @@ struct Ring {
 
     T const &peek(size_t index) const {
         if (index >= _len) {
-            panic("peek on empty ring");
+            panic("peek out of bounds");
         }
 
         return _buf[(_tail + index) % _cap].unwrap();

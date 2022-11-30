@@ -130,6 +130,14 @@ struct BScan {
         return s;
     }
 
+    Str nextCStr() {
+        size_t n = 0;
+        while (n < rem() && _cursor.buf()[n] != '\0') {
+            n++;
+        }
+        return nextStr(n);
+    }
+
     Bytes nextBytes(size_t n) {
         n = clamp(n, 0uz, rem());
         Bytes b{_cursor.buf(), n};

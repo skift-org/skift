@@ -1,12 +1,21 @@
 #include <handover/main.h>
 #include <karm-base/size.h>
 #include <karm-debug/logger.h>
+#include <karm-sys/chan.h>
 
 #include "arch.h"
 #include "cpu.h"
 #include "mem.h"
 
 namespace Hjert {
+
+void splash() {
+    Debug::linfo(" _  _  _         _");
+    Debug::linfo("| || |(_)___ _ _| |_");
+    Debug::linfo("| __ || / -_) '_|  _|");
+    Debug::linfo("|_||_|/ \\___|_|  \\__|");
+    Debug::linfo("    |__/");
+}
 
 Error validateAndDump(uint64_t magic, Handover::Payload &payload) {
     if (!Handover::valid(magic, payload)) {
@@ -39,7 +48,7 @@ Error validateAndDump(uint64_t magic, Handover::Payload &payload) {
 Error start(uint64_t magic, Handover::Payload &payload) {
     try$(Arch::init(payload));
 
-    Debug::linfo("hjert (v0.0.1)");
+    splash();
     try$(validateAndDump(magic, payload));
 
     Debug::linfo("Initialized memory manager...");

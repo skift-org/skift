@@ -10,7 +10,6 @@
 CliResult entryPoint(CliArgs args) {
     auto app = Ui::reducer<FileManager::Model>({"/"}, FileManager::reduce, [](auto d) {
         Sys::Path path = d.currentPath();
-        Debug::ldebug("Current path is {}", path);
         auto dir = Sys::Dir::open(path).unwrap();
         auto titlebar = Ui::titlebar(Media::Icons::FOLDER, "File Manager");
         auto listing = FileManager::directoryListing(dir);

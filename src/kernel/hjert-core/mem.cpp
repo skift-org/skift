@@ -115,7 +115,7 @@ Error init(Handover::Payload &payload) {
         return Error{"no usable memory"};
     }
 
-    Debug::ldebug("usable range: {x}-{x}", usableRange.start, usableRange.end());
+    Debug::linfo("usable range: {x}-{x}", usableRange.start, usableRange.end());
 
     size_t bitsSize = usableRange.size / Hal::PAGE_SIZE / 8;
 
@@ -125,7 +125,7 @@ Error init(Handover::Payload &payload) {
         return Error{"no usable memory for pmm"};
     }
 
-    Debug::ldebug("Pmm bitmap range: {x}-{x}", pmmBits.start, pmmBits.end());
+    Debug::linfo("Pmm bitmap range: {x}-{x}", pmmBits.start, pmmBits.end());
 
     _pmm = Pmm(usableRange,
                MutSlice{
@@ -138,7 +138,6 @@ Error init(Handover::Payload &payload) {
     Debug::linfo("Marking kernel memory as used");
     for (auto &record : payload) {
         if (record.tag == Handover::Tag::FREE) {
-            Debug::ldebug("Marking {x}-{x} of type {} as used", record.start, record.end(), record.name());
             try$(pmm().free({record.start, record.size}));
         }
     }

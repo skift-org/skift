@@ -82,8 +82,6 @@ struct Image {
         image._plte = image.lookupChunk<Plte>();
         image._idat = image.lookupChunk<Idat>();
 
-        Debug::ldebug("image size: {}", image._ihdr.size());
-
         return image;
     }
 

@@ -48,7 +48,7 @@ Error load(Sys::Path kernelPath) {
 
         size_t paddr = prog.vaddr() - Handover::KERNEL_BASE;
         size_t memsz = Hal::pageAlignUp(prog.memsz());
-        Debug::ldebug("Loading segment: paddr=0x{x}, vaddr=0x{x}, memsz=0x{x}, filesz=0x{x}", paddr, prog.vaddr(), memsz, prog.filez());
+        Debug::linfo("Loading segment: paddr=0x{x}, vaddr=0x{x}, memsz=0x{x}, filesz=0x{x}", paddr, prog.vaddr(), memsz, prog.filez());
 
         size_t remaining = prog.memsz() - prog.filez();
         memcpy((void *)paddr, prog.buf(), prog.filez());

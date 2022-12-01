@@ -16,7 +16,8 @@ def bootCmd(opts: dict, args: list[str]) -> None:
     bootDir = utils.mkdirP(".osdk/images/efi-x86_64/boot")
 
     ovmf = utils.downloadFile(
-        "https://retrage.github.io/edk2-nightly/bin/DEBUGX64_OVMF.fd")
+        "https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd")
+
     hjert = build.buildOne("kernel-x86_64", "hjert")
     shutil.copy(hjert, f"{bootDir}/kernel.elf")
 
@@ -25,6 +26,7 @@ def bootCmd(opts: dict, args: list[str]) -> None:
 
     qemuCmd = [
         "qemu-system-x86_64",
+        "-machine", "q35",
         "-no-reboot",
         "-no-shutdown",
         "-d", "guest_errors,cpu_reset,int",

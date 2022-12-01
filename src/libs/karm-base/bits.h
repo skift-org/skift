@@ -34,19 +34,19 @@ struct Bits {
         }
     }
 
-    void clear() {
-        memset(_buf, 0, _len);
+    void fill(bool value) {
+        memset(_buf, value ? 0xff : 0x00, _len);
     }
 
     size_t len() const {
         return _len * 8;
     }
 
-    Opt<BitsRange> alloc(size_t count, size_t start = -1, bool upper = true) {
+    Opt<BitsRange> alloc(size_t count, size_t start, bool upper = true) {
         start = min(start, len());
 
         if (_len == 0) {
-            return Opt<BitsRange>();
+            return NONE;
         }
 
         BitsRange range = {};
@@ -56,16 +56,16 @@ struct Bits {
             if (get(i)) {
                 range = {};
             } else {
-                if (range.size == 0) {
+                if (range.size == 0 || upper) {
                     range.start = i;
                 }
 
                 range.size++;
+            }
 
-                if (range.size == count) {
-                    set(range, true);
-                    return range;
-                }
+            if (range.size == count) {
+                set(range, true);
+                return range;
             }
         }
 
@@ -82,6 +82,25 @@ struct Bits {
         }
 
         return res;
+    }
+
+    void visit(auto cb) {
+        BitsRange range = {};
+        for (size_t i = 0; i < len(); i++) {
+            if (get(i)) {
+                if (range.size > 0) {
+                    cb(range);
+                }
+
+                range = {};
+            } else {
+                if (range.size == 0) {
+                    range.start = i;
+                }
+
+                range.size++;
+            }
+        }
     }
 };
 

@@ -16,21 +16,23 @@ struct Pmm : public Hal::Pmm {
     Pmm(Hal::PmmRange usable, Bits bits)
         : _usable(usable),
           _bits(bits) {
+        clear();
     }
 
     Result<Hal::PmmRange> alloc(size_t size, Hal::PmmFlags flags) override {
         LockScope guard(_lock);
         bool upper = !!(flags & Hal::PmmFlags::UPPER);
+
         try$(ensureAlign(size, Hal::PAGE_SIZE));
         size /= Hal::PAGE_SIZE;
-        auto res = bits2Pmm(try$(_bits.alloc(size, upper ? -1 : 0, upper)));
-        return res;
+        return bits2Pmm(try$(_bits.alloc(size, upper ? -1 : 0, upper)));
     }
 
     Error used(Hal::PmmRange range, Hal::PmmFlags) override {
         if (!range.overlaps(_usable)) {
             return OK;
         }
+
         LockScope guard(_lock);
         try$(range.ensureAligned(Hal::PAGE_SIZE));
         _bits.set(pmm2Bits(range), true);
@@ -41,6 +43,7 @@ struct Pmm : public Hal::Pmm {
         if (!range.overlaps(_usable)) {
             return Error{"range is not in usable memory"};
         }
+
         LockScope guard(_lock);
         try$(range.ensureAligned(Hal::PAGE_SIZE));
         _bits.set(pmm2Bits(range), false);
@@ -49,7 +52,7 @@ struct Pmm : public Hal::Pmm {
 
     void clear() {
         LockScope guard(_lock);
-        _bits.clear();
+        _bits.fill(true);
     }
 
     BitsRange pmm2Bits(Hal::PmmRange range) {
@@ -122,7 +125,7 @@ Error init(Handover::Payload &payload) {
         return Error{"no usable memory for pmm"};
     }
 
-    Debug::ldebug("pmm bits: {x}-{x}", pmmBits.start, pmmBits.end());
+    Debug::ldebug("Pmm bitmap range: {x}-{x}", pmmBits.start, pmmBits.end());
 
     _pmm = Pmm(usableRange,
                MutSlice{
@@ -130,17 +133,17 @@ Error init(Handover::Payload &payload) {
                    pmmBits.size,
                });
 
-    try$(_pmm->used({pmmBits.start, pmmBits.size}, Hal::PmmFlags::NIL));
-
     _heap = Heap(_pmm.unwrap());
 
     Debug::linfo("Marking kernel memory as used");
     for (auto &record : payload) {
-        if (record.tag != Handover::Tag::FREE) {
+        if (record.tag == Handover::Tag::FREE) {
             Debug::ldebug("Marking {x}-{x} of type {} as used", record.start, record.end(), record.name());
-            try$(pmm().used({record.start, record.size}, Hal::PmmFlags::NIL));
+            try$(pmm().free({record.start, record.size}));
         }
     }
+
+    try$(_pmm->used({pmmBits.start, pmmBits.size}, Hal::PmmFlags::NIL));
 
     Debug::linfo("Mapping kernel...");
     try$(vmm().map(

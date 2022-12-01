@@ -1,4 +1,5 @@
 #include <hjert-core/arch.h>
+#include <hjert-core/cpu.h>
 #include <karm-fmt/fmt.h>
 
 namespace Embed {
@@ -12,10 +13,10 @@ void debug(char const *buf) {
     Hjert::Arch::stopAll();
 }
 
-void relaxe() { Hjert::Arch::relaxe(); }
+void relaxe() { Hjert::Arch::cpu().relaxe(); }
 
-void enterCritical() { Hjert::Arch::enterCritical(); }
+void enterCritical() { Hjert::Arch::cpu().retainInterrupts(); }
 
-void leaveCritical() { Hjert::Arch::leaveCritical(); }
+void leaveCritical() { Hjert::Arch::cpu().releaseInterrupts(); }
 
 } // namespace Embed

@@ -22,7 +22,7 @@ struct Syscall {
     static constexpr SyscallId ID = _ID;
 
     Karm::Error call() {
-        return static_cast<Karm::Error::Code>(doSyscall(this, sizeof(Self)));
+        return static_cast<Karm::Error::Code>(doSyscall(this, sizeof(Crtp)));
     }
 
     Karm::Error operator()() {

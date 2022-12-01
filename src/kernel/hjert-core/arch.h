@@ -7,7 +7,15 @@
 #include <karm-base/string.h>
 #include <karm-io/traits.h>
 
+namespace Hjert {
+
+struct Cpu;
+
+} // namespace Hjert
+
 namespace Hjert::Arch {
+
+Cpu &cpu();
 
 Error init(Handover::Payload &);
 
@@ -16,11 +24,5 @@ Hal::Vmm &vmm();
 Io::TextWriter<> &loggerOut();
 
 [[noreturn]] void stopAll();
-
-void relaxe();
-
-void enterCritical();
-
-void leaveCritical();
 
 } // namespace Hjert::Arch

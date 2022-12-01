@@ -1,4 +1,5 @@
 #include <hjert-core/arch.h>
+#include <hjert-core/cpu.h>
 #include <hjert-core/mem.h>
 #include <karm-debug/logger.h>
 
@@ -39,8 +40,6 @@ Error init(Handover::Payload &) {
     _pic.init();
     _pit.init(1000);
 
-    x86_64::sti();
-
     return OK;
 }
 
@@ -55,17 +54,29 @@ void stopAll() {
     }
 }
 
-void relaxe() {
-    x86_64::hlt();
+/* --- Cpu ------------------------------------------------------------------ */
+
+struct Cpu : public Hjert::Cpu {
+    void enableInterrupts() override {
+        x86_64::sti();
+    }
+
+    void disableInterrupts() override {
+        x86_64::cli();
+    }
+
+    void relaxe() override {
+        x86_64::hlt();
+    }
+};
+
+static Cpu _cpu{};
+
+Hjert::Cpu &cpu() {
+    return _cpu;
 }
 
-void enterCritical() {
-    x86_64::cli();
-}
-
-void leaveCritical() {
-    x86_64::sti();
-}
+/* --- Interrupts ----------------------------------------------------------- */
 
 static uint64_t _tick = 0;
 
@@ -105,7 +116,9 @@ static char const *_faultMsg[32] = {
 };
 
 extern "C" uintptr_t _intDispatch(uintptr_t rsp) {
-    auto frame = reinterpret_cast<Frame *>(rsp);
+    auto *frame = reinterpret_cast<Frame *>(rsp);
+
+    cpu().beginInterrupt();
 
     if (frame->intNo < 32) {
         Debug::lfatal("CPU Exception: {} (err={}, ip={x}, sp={x}, cr2={x}, cr3={x})", _faultMsg[frame->intNo], frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
@@ -123,6 +136,8 @@ extern "C" uintptr_t _intDispatch(uintptr_t rsp) {
     }
 
     _pic.ack(frame->intNo);
+
+    cpu().endInterrupt();
 
     return rsp;
 }

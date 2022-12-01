@@ -3,12 +3,10 @@
 #include <karm-debug/logger.h>
 
 #include "arch.h"
+#include "cpu.h"
 #include "mem.h"
 
-HandoverRequests$(
-    Handover::requestStack(),
-    Handover::requestFb(),
-    Handover::requestFiles());
+namespace Hjert {
 
 Error validateAndDump(uint64_t magic, Handover::Payload &payload) {
     if (!Handover::valid(magic, payload)) {
@@ -38,15 +36,32 @@ Error validateAndDump(uint64_t magic, Handover::Payload &payload) {
     return OK;
 }
 
-Error entryPoint(uint64_t magic, Handover::Payload &payload) {
-    try$(Hjert::Arch::init(payload));
+Error start(uint64_t magic, Handover::Payload &payload) {
+    try$(Arch::init(payload));
 
     Debug::linfo("hjert (v0.0.1)");
     try$(validateAndDump(magic, payload));
 
     Debug::linfo("Initialized memory manager...");
-    try$(Hjert::Mem::init(payload));
+    try$(Mem::init(payload));
+
+    Debug::linfo("Everything is ready, enabling interrupts...");
+    Arch::cpu().retainEnable();
+    Arch::cpu().enableInterrupts();
 
     while (true)
-        Hjert::Arch::relaxe();
+        Arch::cpu().relaxe();
+}
+
+} // namespace Hjert
+
+/* --- Handover Entry Point ------ ------------------------------------------ */
+
+HandoverRequests$(
+    Handover::requestStack(),
+    Handover::requestFb(),
+    Handover::requestFiles());
+
+Error entryPoint(uint64_t magic, Handover::Payload &payload) {
+    return Hjert::start(magic, payload);
 }

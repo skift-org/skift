@@ -330,7 +330,7 @@ struct InlineBuf {
 
     constexpr T &operator[](size_t i) { return _buf[i].unwrap(); }
 
-    constexpr T const &operator[](size_t i) const { return _buf[i]; }
+    constexpr T const &operator[](size_t i) const { return _buf[i].unwrap(); }
 
     void ensure(size_t len) {
         if (len > N) {

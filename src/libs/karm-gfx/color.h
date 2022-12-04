@@ -81,6 +81,28 @@ struct Color {
             static_cast<uint32_t>(alpha),
         };
     }
+
+    constexpr double luminance() const {
+        auto r = this->red / 255.0;
+        auto g = this->green / 255.0;
+        auto b = this->blue / 255.0;
+        return std::sqrt(0.299 * r * r + 0.587 * g * g + 0.114 * b * b);
+    }
 };
+
+struct Hsv {
+    double hue, saturation, value;
+
+    Ordr cmp(Hsv const &other) const {
+        return hue == other.hue &&
+                       saturation == other.saturation && value == other.value
+                   ? Ordr::EQUAL
+                   : Ordr::LESS;
+    }
+};
+
+Hsv rgbToHsv(Color color);
+
+Color hsvToRgb(Hsv hsv);
 
 } // namespace Karm::Gfx

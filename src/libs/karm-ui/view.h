@@ -74,9 +74,9 @@ inline Child text(Str format, Args &&...args) {
 
 /* --- Icon ----------------------------------------------------------------- */
 
-Child icon(Media::Icon icon);
+Child icon(Media::Icon icon, Opt<Gfx::Color> color = NONE);
 
-Child icon(Media::Icons icon, double size);
+Child icon(Media::Icons icon, double size, Opt<Gfx::Color> color = NONE);
 
 /* --- Image ---------------------------------------------------------------- */
 

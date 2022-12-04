@@ -7,7 +7,7 @@
 namespace Karm::Ui {
 
 template <typename T>
-using OnChange = Opt<Func<void(Node &, T value)>>;
+using OnChange = Opt<SharedFunc<void(Node &, T value)>>;
 
 /* --- Button --------------------------------------------------------------- */
 
@@ -19,6 +19,7 @@ struct MouseListener {
     };
 
     MouseState _state = IDLE;
+    Math::Vec2i _pos = {0, 0};
 
     auto state() const {
         return _state;
@@ -36,6 +37,10 @@ struct MouseListener {
         return _state == PRESS;
     }
 
+    auto pos() const {
+        return _pos;
+    }
+
     bool listen(Node &node, Events::Event &e) {
         bool result = false;
         MouseState state = _state;
@@ -49,6 +54,8 @@ struct MouseListener {
             if (state != PRESS) {
                 state = HOVER;
             }
+
+            _pos = m.pos - node.bound().topStart();
 
             if (m.type == Events::MouseEvent::PRESS) {
                 state = PRESS;
@@ -135,6 +142,8 @@ Child checkbox(bool value, OnChange<bool> onChange);
 Child radio(bool value, OnChange<bool> onChange);
 
 /* --- Slider --------------------------------------------------------------- */
+
+Child slider(double value, OnChange<double> onChange);
 
 /* --- Select --------------------------------------------------------------- */
 

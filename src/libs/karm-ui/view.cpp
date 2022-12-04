@@ -228,18 +228,23 @@ Child text(Str text) {
 
 struct Icon : public View<Icon> {
     Media::Icon _icon;
+    Opt<Gfx::Color> _color;
 
-    Icon(Media::Icon icon)
-        : _icon(icon) {}
+    Icon(Media::Icon icon, Opt<Gfx::Color> color)
+        : _icon(icon), _color(color) {}
 
     void reconcile(Icon &o) override {
         _icon = o._icon;
     }
 
     void paint(Gfx::Context &g, Math::Recti) override {
+        g.save();
+        if (_color)
+            g.fillStyle(_color.unwrap());
         g.fill(bound().topStart(), _icon);
         if (debugShowLayoutBounds)
             g._rect(bound(), Gfx::CYAN);
+        g.restore();
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
@@ -247,12 +252,12 @@ struct Icon : public View<Icon> {
     }
 };
 
-Child icon(Media::Icon icon) {
-    return makeStrong<Icon>(icon);
+Child icon(Media::Icon icon, Opt<Gfx::Color> color) {
+    return makeStrong<Icon>(icon, color);
 }
 
-Child icon(Media::Icons i, double size) {
-    return icon(Media::Icon{i, size});
+Child icon(Media::Icons i, double size, Opt<Gfx::Color> color) {
+    return icon(Media::Icon{i, size}, color);
 }
 
 /* --- Image ---------------------------------------------------------------- */

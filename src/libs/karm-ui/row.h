@@ -101,6 +101,14 @@ inline Child radioRow(bool value, OnChange<bool> onChange, String title) {
         NONE);
 }
 
+inline Child sliderRow(double value, OnChange<double> onChange, String title) {
+    return row(
+        NONE,
+        title,
+        NONE,
+        slider(value, std::move(onChange)));
+}
+
 inline Child navRow(bool selected, OnPress onPress, Media::Icons i, String title) {
     auto buttonStyle = ButtonStyle::regular();
     buttonStyle.idleStyle = {

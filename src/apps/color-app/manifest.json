@@ -1,0 +1,8 @@
+{
+    "id": "color-app",
+    "type": "exe",
+    "deps": [
+        "karm-main",
+        "karm-ui"
+    ]
+}

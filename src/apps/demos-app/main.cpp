@@ -141,6 +141,8 @@ static Array demos = {
             auto radio1 = Ui::radioRow(false, NONE, "Some property");
             auto radio2 = Ui::radioRow(false, NONE, "Some property");
 
+            auto slider = Ui::sliderRow(0.5, NONE, "Some property");
+
             auto title = Ui::titleRow("Some Settings");
 
             auto list = Ui::card(
@@ -167,7 +169,10 @@ static Array demos = {
                                 radio,
                                 radio1,
                                 radio2,
-                            }));
+                            }),
+
+                Ui::separator(),
+                slider);
 
             return Ui::vscroll(
                 Ui::hcenter(

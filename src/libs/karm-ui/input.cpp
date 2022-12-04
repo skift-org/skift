@@ -486,4 +486,65 @@ Child radio(bool value, OnChange<bool> onChange) {
     return makeStrong<Radio>(value, std::move(onChange));
 }
 
+/* --- Slider ---------------------------------------------------------------- */
+
+struct Slider : public View<Slider> {
+    double _value = 0.0f;
+    OnChange<double> _onChange;
+    MouseListener _mouseListener;
+
+    Slider(double value, OnChange<double> onChange)
+        : _value(value), _onChange(std::move(onChange)) {
+    }
+
+    void reconcile(Slider &o) override {
+        _value = o._value;
+        _onChange = std::move(o._onChange);
+    }
+
+    void paint(Gfx::Context &g, Math::Recti) override {
+        g.save();
+
+        double v = bound().width * _value;
+        auto thumbCenter = bound().startCenter().cast<double>() + Math::Vec2f{v, 0};
+
+        g.strokeStyle(Gfx::stroke(Gfx::ZINC600).withWidth(4).withAlign(Gfx::CENTER_ALIGN));
+        g.begin();
+        g.moveTo(bound().startCenter().cast<double>());
+        g.lineTo(bound().endCenter().cast<double>());
+        g.stroke();
+
+        g.strokeStyle(Gfx::stroke(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700).withWidth(4).withAlign(Gfx::CENTER_ALIGN));
+        g.begin();
+        g.moveTo(bound().startCenter().cast<double>());
+        g.lineTo(bound().startCenter().cast<double>() + Math::Vec2f{v, 0});
+        g.stroke();
+
+        g.fillStyle(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700);
+        g.fill(Math::Ellipsei{thumbCenter.cast<int>(), 8});
+
+        g.restore();
+    }
+
+    void event(Events::Event &e) override {
+        _mouseListener.listen(*this, e);
+
+        if (_mouseListener.isPress() && e.is<Events::MouseEvent>()) {
+            auto p = _mouseListener.pos();
+            _value = p.x / (double)bound().width;
+            if (_onChange)
+                _onChange(*this, _value);
+            shouldRepaint(*this);
+        }
+    }
+
+    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+        return {128, 26};
+    }
+};
+
+Child slider(double value, OnChange<double> onChange) {
+    return makeStrong<Slider>(value, std::move(onChange));
+}
+
 } // namespace Karm::Ui

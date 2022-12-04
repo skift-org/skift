@@ -45,6 +45,11 @@ struct Gradiant {
         return Gradiant{DIAMOND, {0.5, 0.5}, {1, 0.5}};
     }
 
+    Gradiant &addStop(Color color, float pos) {
+        _stops.pushBack({color, pos});
+        return *this;
+    }
+
     Color sample(float pos) const {
         if (_stops.len() == 0) {
             return BLACK;

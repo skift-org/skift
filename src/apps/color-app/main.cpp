@@ -52,13 +52,13 @@ struct HsvPicker : public Ui::View<HsvPicker> {
         auto pos = coordinates(_value);
 
         g.fillStyle(Gfx::WHITE);
-        g.fill(Math::Ellipsei{pos, 12});
+        g.fill(Math::Ellipsei{pos, 8});
 
         g.strokeStyle(Gfx::StrokeStyle{Gfx::BLACK.withOpacity(0.25)}.withWidth(1).withAlign(Gfx::OUTSIDE_ALIGN));
         g.stroke();
 
         g.fillStyle(Gfx::hsvToRgb(_value));
-        g.fill(Math::Ellipsei{pos, 8});
+        g.fill(Math::Ellipsei{pos, 6});
 
         g.restore();
     }

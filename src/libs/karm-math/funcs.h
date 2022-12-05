@@ -12,19 +12,18 @@ constexpr auto abs(auto value) {
 
 template <typename T>
 constexpr T floor(T x) {
-    if (x < 0) {
+    if (x < 0)
         return (T)(long)(x - 1);
-    } else {
-        return (T)(long)x;
-    }
+
+    return (T)(long)x;
 }
 
 template <typename T>
 constexpr T ceil(T x) {
     if (x < 0)
         return x;
-    else
-        return (T)(long)(x + 1);
+
+    return (T)(long)(x + 1);
 }
 
 constexpr int round(double x) {
@@ -81,6 +80,17 @@ constexpr T cos(T x) {
 template <typename T, Precision P = PRECISE>
 constexpr T sin(T x) noexcept {
     return cos<T, P>(x - T(.5 * PI));
+}
+
+template <typename T>
+struct SinCos {
+    T sin;
+    T cos;
+};
+
+template <typename T, Precision P = PRECISE>
+constexpr SinCos<T> sinCos(T x) noexcept {
+    return {sin<T, P>(x), cos<T, P>(x)};
 }
 
 template <typename T, Precision P = PRECISE>

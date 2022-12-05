@@ -1,3 +1,5 @@
+#include <karm-base/clamp.h>
+
 #include "color.h"
 
 namespace Karm::Gfx {
@@ -7,18 +9,18 @@ Hsv rgbToHsv(Color color) {
     float g = color.green / 255.0f;
     float b = color.blue / 255.0f;
 
-    float max = std::max(r, std::max(g, b));
-    float min = std::min(r, std::min(g, b));
+    float rgbMax = Karm::max(r, g, b);
+    float rgbMin = Karm::min(r, g, b);
 
-    float delta = max - min;
+    float delta = rgbMax - rgbMin;
 
     float hue = 0.0f;
     if (delta != 0.0f) {
-        if (max == r) {
+        if (rgbMax == r) {
             hue = (g - b) / delta;
-        } else if (max == g) {
+        } else if (rgbMax == g) {
             hue = 2.0f + (b - r) / delta;
-        } else if (max == b) {
+        } else if (rgbMax == b) {
             hue = 4.0f + (r - g) / delta;
         }
     }
@@ -28,9 +30,9 @@ Hsv rgbToHsv(Color color) {
         hue += 360.0f;
     }
 
-    float saturation = max == 0.0f ? 0.0f : delta / max;
+    float saturation = rgbMax == 0.0f ? 0.0f : delta / rgbMax;
 
-    return {hue, saturation, max};
+    return {hue, saturation, rgbMax};
 }
 
 Color hsvToRgb(Hsv hsv) {
@@ -39,7 +41,7 @@ Color hsvToRgb(Hsv hsv) {
     float v = hsv.value;
 
     float c = v * s;
-    float x = c * (1.0f - std::abs(std::fmod(h / 60.0f, 2.0f) - 1.0f));
+    float x = c * (1.0f - abs(std::fmod(h / 60.0f, 2.0f) - 1.0f));
     float m = v - c;
 
     float r = 0.0f;

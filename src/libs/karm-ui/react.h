@@ -42,7 +42,20 @@ struct React : public LeafNode<Crtp> {
         }
     }
 
-    void reconcile(Crtp &) override {}
+    void reconcile(Crtp &o) override {
+        if (_child) {
+            if (o._child) {
+                _child = (*_child)->reconcile(*o._child);
+                (*_child)->attach(this);
+            }
+        } else {
+            if (o._child) {
+                _child = o._child;
+                (*_child)->attach(this);
+            }
+        }
+        LeafNode<Crtp>::reconcile(o);
+    }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         _child.with([&](auto &child) {
@@ -156,8 +169,9 @@ struct _State : public React<_State<T>> {
         : _value(initial), _build(std::move(build)) {}
 
     void reconcile(_State &o) override {
-        _value = o._value;
         _build = std::move(o._build);
+        React<_State>::reconcile(o);
+        shouldRebuild(*this);
     }
 
     Child build() override {

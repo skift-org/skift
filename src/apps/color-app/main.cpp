@@ -85,6 +85,48 @@ Ui::Child hsvPicker(Gfx::Hsv value, Ui::OnChange<Gfx::Hsv> onChange) {
     return makeStrong<HsvPicker>(value, std::move(onChange));
 }
 
+Ui::Child hsvPicker(Ui::State<Gfx::Hsv> state) {
+    return hsvPicker(state.value(), [state](auto &, auto value) mutable {
+        state.update(value);
+    });
+}
+
+Ui::Child hsvSliders(Ui::State<Gfx::Hsv> state) {
+    return Ui::vflow(
+        Ui::sliderRow(
+            state.value().value,
+            [=](auto, auto v) mutable {
+                auto hsv = state.value();
+                hsv.value = v;
+                state.update(hsv);
+            },
+            "Value"),
+
+        Ui::sliderRow(
+            state.value().saturation,
+            [=](auto, auto v) mutable {
+                auto hsv = state.value();
+                hsv.saturation = v;
+                state.update(hsv);
+            },
+            "Saturation"),
+
+        Ui::sliderRow(
+            state.value().hue / 360.0,
+            [=](auto, auto v) mutable {
+                auto hsv = state.value();
+                hsv.hue = v * 360;
+                state.update(hsv);
+            },
+            "Hue"));
+}
+
+Ui::Child hsvPickerAndSliders(Ui::State<Gfx::Hsv> state) {
+    return Ui::vflow(
+        hsvPicker(state),
+        hsvSliders(state));
+}
+
 Gfx::Color pickColor(Gfx::Color c) {
     if (c.luminance() > 0.7) {
         return Gfx::BLACK;
@@ -134,23 +176,29 @@ Ui::Child colorRamps(Ui::State<Gfx::Hsv> state) {
 }
 
 Ui::Child colorPicker() {
-    return Ui::state(
-        Gfx::Hsv{0, 0, 0},
-        [=](Ui::State<Gfx::Hsv> state) mutable {
-            return Ui::vflow(
+    return Ui::state(Gfx::Hsv{0, 0, 0}, [=](Ui::State<Gfx::Hsv> hsvState) mutable {
+        return Ui::state(true, [=](Ui::State<bool> pageState) mutable {
+            auto selector = Ui::hflow(
+                4,
+                Ui::button(
+                    pageState.bindValue(true),
+                    (pageState.value()) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
+                    Media::Icons::EYEDROPPER, "Color Picker"),
+                Ui::button(
+                    pageState.bindValue(false),
+                    (!pageState.value()) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
+                    Media::Icons::PALETTE_SWATCH, "Palette"));
+
+            return Ui::spacing(
+                8,
                 Ui::vflow(
-                    Ui::titleRow("Color Picker"),
-                    hsvPicker(
-                        state.value(),
-                        [=](auto &, auto v) mutable {
-                            state.update(v);
-                        }),
-                    Ui::separator(),
-                    Ui::titleRow("Color Palette"),
-                    Ui::spacing(
-                        {12, 0},
-                        colorRamps(state))));
+                    8,
+                    selector,
+                    pageState.value()
+                        ? Ui::grow(hsvPickerAndSliders(hsvState))
+                        : Ui::grow(colorRamps(hsvState))));
         });
+    });
 }
 
 CliResult entryPoint(CliArgs args) {

@@ -24,9 +24,9 @@ struct Empty : public View<Empty> {
     void paint(Gfx::Context &g, Math::Recti) override {
         if (debugShowEmptyBounds) {
             auto b = bound();
-            g._rect(b, Gfx::WHITE.withOpacity(0.01));
-            g._line({b.topStart(), b.bottomEnd()}, Gfx::WHITE.withOpacity(0.01));
-            g._line({b.topEnd(), b.bottomStart()}, Gfx::WHITE.withOpacity(0.01));
+            g.debugRect(b, Gfx::WHITE.withOpacity(0.01));
+            g.debugLine({b.topStart(), b.bottomEnd()}, Gfx::WHITE.withOpacity(0.01));
+            g.debugLine({b.topEnd(), b.bottomStart()}, Gfx::WHITE.withOpacity(0.01));
         }
     }
 };
@@ -231,7 +231,7 @@ struct Spacing : public ProxyNode<Spacing> {
     void paint(Gfx::Context &g, Math::Recti r) override {
         child().paint(g, r);
         if (debugShowLayoutBounds) {
-            g._rect(child().bound(), Gfx::LIME);
+            g.debugRect(child().bound(), Gfx::LIME);
         }
     }
 
@@ -255,9 +255,9 @@ Child spacing(Layout::Spacingi s, Child child) {
 /* --- Aspect Ratio --------------------------------------------------------- */
 
 struct AspectRatio : public ProxyNode<AspectRatio> {
-    float _ratio;
+    double _ratio;
 
-    AspectRatio(float ratio, Child child)
+    AspectRatio(double ratio, Child child)
         : ProxyNode(child), _ratio(ratio) {}
 
     void reconcile(AspectRatio &o) override {
@@ -268,7 +268,7 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
     void paint(Gfx::Context &g, Math::Recti r) override {
         child().paint(g, r);
         if (debugShowLayoutBounds) {
-            g._rect(child().bound(), Gfx::INDIGO);
+            g.debugRect(child().bound(), Gfx::INDIGO);
         }
     }
 
@@ -278,7 +278,7 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
         auto childSize = child().size(s, hint);
-        auto childRatio = (float)childSize.x / (float)childSize.y;
+        auto childRatio = (double)childSize.x / (double)childSize.y;
 
         if (childRatio > _ratio) {
             return Math::Vec2i{
@@ -298,7 +298,7 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
     }
 };
 
-Child aspectRatio(float ratio, Child child) {
+Child aspectRatio(double ratio, Child child) {
     return makeStrong<AspectRatio>(ratio, child);
 }
 

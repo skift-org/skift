@@ -44,7 +44,7 @@ struct Host : public Node {
 
         _root->paint(g, r);
 
-        g.fillStyle(Gfx::fill(Gfx::WHITE));
+        g.fillStyle(Gfx::WHITE);
         if (debugShowRepaintBounds) {
             g.fillStyle(Gfx::randomColor().withOpacity(0.25));
             g.fill(r);

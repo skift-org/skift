@@ -21,44 +21,12 @@ struct BorderRadius {
 
     BorderRadius() = default;
 
-    BorderRadius(float radius)
+    BorderRadius(double radius)
         : topLeft(radius), topRight(radius), bottomRight(radius), bottomLeft(radius) {}
 
-    BorderRadius(float topLeft, float topRight, float bottomRight, float bottomLeft)
+    BorderRadius(double topLeft, double topRight, double bottomRight, double bottomLeft)
         : topLeft(topLeft), topRight(topRight), bottomRight(bottomRight), bottomLeft(bottomLeft) {}
 };
-
-/* ---- Fill Style ---------------------------------------------------------- */
-
-enum struct FillRule {
-    NONZERO,
-    EVENODD,
-};
-
-struct FillStyle {
-    Color color{};
-    FillRule rule = FillRule::NONZERO;
-
-    constexpr FillStyle()
-        : color(WHITE) {}
-
-    constexpr FillStyle(Color color, FillRule rule = FillRule::NONZERO)
-        : color(color), rule(rule) {}
-
-    constexpr auto &withColor(Color color) {
-        this->color = color;
-        return *this;
-    }
-
-    constexpr auto &withRule(FillRule rule) {
-        this->rule = rule;
-        return *this;
-    }
-};
-
-inline constexpr FillStyle fill(auto... args) {
-    return FillStyle(args...);
-}
 
 /* --- Stroke Style --------------------------------------------------------- */
 
@@ -123,7 +91,7 @@ inline constexpr StrokeStyle stroke(auto... args) {
 
 struct ShadowStyle {
     Color color{};
-    float radius{};
+    double radius{};
     Math::Vec2f offset{};
 
     constexpr ShadowStyle(Color c = BLACK) : color(c) {}
@@ -133,7 +101,7 @@ struct ShadowStyle {
         return *this;
     }
 
-    constexpr auto &withRadius(float r) {
+    constexpr auto &withRadius(double r) {
         radius = r;
         return *this;
     }

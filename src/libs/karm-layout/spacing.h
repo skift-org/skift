@@ -62,6 +62,6 @@ struct Spacing {
 };
 
 using Spacingi = Spacing<int>;
-using Spacingf = Spacing<float>;
+using Spacingf = Spacing<double>;
 
 } // namespace Karm::Layout

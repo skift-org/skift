@@ -307,7 +307,7 @@ struct InlineBuf {
             panic("cap too large");
         }
         for (size_t i = 0; i < _len; i++) {
-            _buf[i].ctor(other.at(i));
+            _buf[i].ctor(other[i]);
         }
     }
 

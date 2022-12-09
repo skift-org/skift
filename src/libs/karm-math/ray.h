@@ -22,7 +22,7 @@ struct Ray {
 
 using Rayi = Ray<int, int>;
 
-using Rayf = Ray<float, float>;
+using Rayf = Ray<double, double>;
 
 using Ray2i = Ray<Vec2i>;
 

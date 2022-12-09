@@ -72,6 +72,12 @@ union Vec2 {
         return atan2(y, x);
     }
 
+    constexpr Vec2 rotate(T angle) const {
+        T c = cos(angle);
+        T s = sin(angle);
+        return {x * c - y * s, x * s + y * c};
+    }
+
     constexpr T angleWith(Vec2 const &other) const {
         auto r = norm().dot(other.norm());
         auto sign = (x * other.y < y * other.x) ? -1.0 : 1.0;

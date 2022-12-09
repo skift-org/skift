@@ -3,15 +3,21 @@
 #include <karm-media/icon.h>
 
 #include "buffer.h"
+#include "paint.h"
 #include "path.h"
 #include "shape.h"
 #include "style.h"
 
 namespace Karm::Gfx {
 
+enum struct FillRule {
+    NONZERO,
+    EVENODD,
+};
+
 struct Context {
     struct Scope {
-        FillStyle fillStyle{};
+        Paint paint = Gfx::WHITE;
         StrokeStyle strokeStyle{};
         Media::Font textFont = Media::Font::fallback();
         ShadowStyle shadowStyle{};
@@ -87,7 +93,7 @@ struct Context {
 
     /* --- Fill & Stroke ---------------------------------------------------- */
 
-    FillStyle const &fillStyle();
+    Paint const &fillStyle();
 
     StrokeStyle const &strokeStyle();
 
@@ -95,7 +101,7 @@ struct Context {
 
     ShadowStyle const &shadowStyle();
 
-    Context &fillStyle(FillStyle style);
+    Context &fillStyle(Paint style);
 
     Context &strokeStyle(StrokeStyle style);
 
@@ -118,10 +124,6 @@ struct Context {
     void blit(Math::Vec2i dest, Surface surface);
 
     /* --- Shapes ----------------------------------------------------------- */
-
-    void plot(Math::Vec2i point);
-
-    void plot(Math::Vec2i point, Color color);
 
     void stroke(Math::Edgei edge);
 
@@ -149,19 +151,21 @@ struct Context {
 
     /* --- Debug ------------------------------------------------------------ */
 
-    void _line(Math::Edgei edge, Color color);
+    void debugPlot(Math::Vec2i point, Color color);
 
-    void _rect(Math::Recti rect, Color color);
+    void debugLine(Math::Edgei edge, Color color);
 
-    void _arrow(Math::Vec2i from, Math::Vec2i to, Color color);
+    void debugRect(Math::Recti rect, Color color);
 
-    void _doubleArrow(Math::Vec2i from, Math::Vec2i to, Color color);
+    void debugArrow(Math::Vec2i from, Math::Vec2i to, Color color);
 
-    void _trace();
+    void debugDoubleArrow(Math::Vec2i from, Math::Vec2i to, Color color);
+
+    void debugTrace(Gfx::Color color);
 
     /* --- Paths ------------------------------------------------------------ */
 
-    void _fill(Color color);
+    void _fill(Paint paint, FillRule rule = FillRule::NONZERO);
 
     void begin();
 
@@ -189,9 +193,9 @@ struct Context {
 
     void ellipse(Math::Ellipsef ellipse);
 
-    void fill();
+    void fill(FillRule rule = FillRule::NONZERO);
 
-    void fill(FillStyle style);
+    void fill(Paint paint, FillRule rule = FillRule::NONZERO);
 
     void stroke();
 

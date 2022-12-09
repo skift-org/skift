@@ -74,7 +74,7 @@ Child spacing(Layout::Spacingi s, Child child);
 
 /* --- Aspect Ratio --------------------------------------------------------- */
 
-Child aspectRatio(float ratio, Child child);
+Child aspectRatio(double ratio, Child child);
 
 /* --- Stack ---------------------------------------------------------------- */
 

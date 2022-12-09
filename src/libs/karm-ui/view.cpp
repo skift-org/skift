@@ -199,13 +199,13 @@ struct Text : public View<Text> {
         g.fill(baseline, _text);
 
         if (debugShowLayoutBounds) {
-            g._line(
+            g.debugLine(
                 {
                     bound().topStart() + m.baseline.cast<int>(),
                     bound().topEnd() + m.baseline.cast<int>(),
                 },
                 Gfx::PINK);
-            g._rect(bound(), Gfx::CYAN);
+            g.debugRect(bound(), Gfx::CYAN);
         }
 
         g.restore();
@@ -243,7 +243,7 @@ struct Icon : public View<Icon> {
             g.fillStyle(_color.unwrap());
         g.fill(bound().topStart(), _icon);
         if (debugShowLayoutBounds)
-            g._rect(bound(), Gfx::CYAN);
+            g.debugRect(bound(), Gfx::CYAN);
         g.restore();
     }
 
@@ -272,7 +272,7 @@ struct Image : public View<Image> {
     void paint(Gfx::Context &g, Math::Recti) override {
         g.blit(bound(), _image);
         if (debugShowLayoutBounds)
-            g._rect(bound(), Gfx::CYAN);
+            g.debugRect(bound(), Gfx::CYAN);
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {

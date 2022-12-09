@@ -116,8 +116,8 @@ void Context::identity() {
 
 /* --- Fill & Stroke -------------------------------------------------------- */
 
-FillStyle const &Context::fillStyle() {
-    return current().fillStyle;
+Paint const &Context::fillStyle() {
+    return current().paint;
 }
 
 StrokeStyle const &Context::strokeStyle() {
@@ -132,8 +132,8 @@ ShadowStyle const &Context::shadowStyle() {
     return current().shadowStyle;
 }
 
-Context &Context::fillStyle(FillStyle style) {
-    current().fillStyle = style;
+Context &Context::fillStyle(Paint paint) {
+    current().paint = paint;
     return *this;
 }
 
@@ -158,7 +158,7 @@ void Context::clear(Color color) { clear(surface().bound(), color); }
 
 void Context::clear(Math::Recti rect, Color color) {
     rect = applyAll(rect);
-    _surface->clearRect(rect, color);
+    _surface->clear(rect, color);
 }
 
 /* --- Blitting ------------------------------------------------------------- */
@@ -195,17 +195,6 @@ void Context::blit(Math::Vec2i dest, Surface surface) {
 
 /* --- Shapes --------------------------------------------------------------- */
 
-void Context::plot(Math::Vec2i point) {
-    plot(point, fillStyle().color);
-}
-
-void Context::plot(Math::Vec2i point, Color color) {
-    point = applyOrigin(point);
-    if (clip().contains(point)) {
-        surface().blend(point, color);
-    }
-}
-
 void Context::stroke(Math::Edgei edge) {
     begin();
     moveTo(edge.start.cast<double>());
@@ -227,14 +216,9 @@ void Context::stroke(Math::Recti r, BorderRadius radius) {
 }
 
 void Context::fill(Math::Recti r, BorderRadius radius) {
-    if (radius.zero() && current().trans.isIdentity()) {
-        r = applyAll(r);
-        _surface->blendRect(r, fillStyle().color);
-    } else {
-        begin();
-        rect(r.cast<double>(), radius);
-        fill();
-    }
+    begin();
+    rect(r.cast<double>(), radius);
+    fill();
 }
 
 void Context::stroke(Math::Ellipsei e) {
@@ -299,7 +283,14 @@ void Context::fill(Math::Vec2i baseline, Str str) {
 
 /* --- Debug ---------------------------------------------------------------- */
 
-void Context::_line(Math::Edgei edge, Color color) {
+void Context::debugPlot(Math::Vec2i point, Color color) {
+    point = applyOrigin(point);
+    if (clip().contains(point)) {
+        surface().blend(point, color);
+    }
+}
+
+void Context::debugLine(Math::Edgei edge, Color color) {
     int dx = Math::abs(edge.ex - edge.sx);
     int sx = edge.sx < edge.ex ? 1 : -1;
 
@@ -309,7 +300,7 @@ void Context::_line(Math::Edgei edge, Color color) {
     int err = dx + dy, e2;
 
     for (;;) {
-        plot({edge.sx, edge.sy}, color);
+        debugPlot({edge.sx, edge.sy}, color);
         if (edge.sx == edge.ex && edge.sy == edge.ey)
             break;
         e2 = 2 * err;
@@ -324,14 +315,14 @@ void Context::_line(Math::Edgei edge, Color color) {
     }
 }
 
-void Context::_rect(Math::Recti rect, Color color) {
-    _line({rect.topStart(), rect.topEnd()}, color);
-    _line({rect.topEnd(), rect.bottomEnd()}, color);
-    _line({rect.bottomEnd(), rect.bottomStart()}, color);
-    _line({rect.bottomStart(), rect.topStart()}, color);
+void Context::debugRect(Math::Recti rect, Color color) {
+    debugLine({rect.topStart(), rect.topEnd()}, color);
+    debugLine({rect.topEnd(), rect.bottomEnd()}, color);
+    debugLine({rect.bottomEnd(), rect.bottomStart()}, color);
+    debugLine({rect.bottomStart(), rect.topStart()}, color);
 }
 
-void Context::_arrow(Math::Vec2i from, Math::Vec2i to, Color color) {
+void Context::debugArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
     const int SIZE = 16;
 
     Math::Vec2i dir = to - from;
@@ -344,12 +335,12 @@ void Context::_arrow(Math::Vec2i from, Math::Vec2i to, Color color) {
     Math::Vec2i p2 = p1 + perp * scale;
     Math::Vec2i p3 = p1 - perp * scale;
 
-    _line({from, to}, color);
-    _line({to, p2}, color);
-    _line({to, p3}, color);
+    debugLine({from, to}, color);
+    debugLine({to, p2}, color);
+    debugLine({to, p3}, color);
 }
 
-void Context::_doubleArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
+void Context::debugDoubleArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
     const int SIZE = 8;
 
     Math::Vec2f dir = (to - from).cast<double>();
@@ -366,33 +357,28 @@ void Context::_doubleArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
     Math::Vec2i p5 = (p4 + perp * scale).cast<int>();
     Math::Vec2i p6 = (p4 - perp * scale).cast<int>();
 
-    _line({from, to}, color);
-
-    _line({to, p2}, color);
-    _line({to, p3}, color);
-
-    _line({from, p5}, color);
-    _line({from, p6}, color);
+    debugLine({from, to}, color);
+    debugLine({to, p2}, color);
+    debugLine({to, p3}, color);
+    debugLine({from, p5}, color);
+    debugLine({from, p6}, color);
 }
 
-void Context::_trace() {
-    auto b = _shape.bound().ceil().cast<int>();
-    _rect(b, Gfx::PINK);
-
+void Context::debugTrace(Gfx::Color color) {
     for (auto edge : _shape) {
-        _line(edge.cast<int>(), WHITE);
-        plot(edge.start.cast<int>(), RED);
+        debugLine(edge.cast<int>(), color);
     }
 }
 
 /* --- Paths ---------------------------------------------------------------- */
 
-[[gnu::flatten]] void Context::_fill(Color color) {
+[[gnu::flatten]] void Context::_fill(Paint paint, FillRule fillRule) {
     static constexpr auto AA = 4;
     static constexpr auto UNIT = 1.0f / AA;
     static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;
 
-    auto rect = applyClip(_shape.bound().ceil().cast<int>());
+    auto shapeBound = _shape.bound();
+    auto rect = applyClip(shapeBound.ceil().cast<int>());
 
     for (int y = rect.top(); y < rect.bottom(); y++) {
         zeroFill<double>(mutSub(_scanline, rect.start(), rect.end()));
@@ -423,10 +409,17 @@ void Context::_trace() {
                 size_t iStart = i;
                 size_t iEnd = i + 1;
 
-                int sign = _active[i].sign;
-                rule += sign;
-                if (rule == 0) {
-                    continue;
+                if (fillRule == FillRule::NONZERO) {
+                    int sign = _active[i].sign;
+                    rule += sign;
+                    if (rule == 0)
+                        continue;
+                }
+
+                if (fillRule == FillRule::EVENODD) {
+                    rule++;
+                    if (rule % 2 == 0)
+                        continue;
                 }
 
                 double x1 = max(_active[iStart].x, rect.start());
@@ -451,7 +444,21 @@ void Context::_trace() {
             }
         }
 
-        surface().blendScanline(_scanline.buf(), y, rect.start(), rect.end(), color);
+        surface().format.visit([&](auto f) {
+            auto *pixel = static_cast<uint8_t *>(surface().data()) + y * surface().stride() + rect.start() * f.bpp();
+            for (int x = rect.start(); x < rect.end(); x++) {
+                Math::Vec2f sample = {
+                    (x - shapeBound.start()) / shapeBound.width,
+                    (y - shapeBound.top()) / shapeBound.height,
+                };
+                auto color = paint.sample(sample);
+
+                auto c = f.load(pixel);
+                c = color.withOpacity(clamp01(_scanline[x])).blendOver(c);
+                f.store(pixel, c);
+                pixel += f.bpp();
+            }
+        });
     }
 }
 
@@ -507,14 +514,14 @@ void Context::ellipse(Math::Ellipsef ellipse) {
     _path.ellipse(ellipse);
 }
 
-void Context::fill() {
-    fill(fillStyle());
+void Context::fill(FillRule rule) {
+    fill(fillStyle(), rule);
 }
 
-void Context::fill(FillStyle style) {
+void Context::fill(Paint paint, FillRule rule) {
     _shape.clear();
     createSolid(_shape, _path, current().transWithOrigin());
-    _fill(style.color);
+    _fill(paint, rule);
 }
 
 void Context::stroke() {
@@ -531,12 +538,12 @@ void Context::shadow() {}
 
 /* --- Effects -------------------------------------------------------------- */
 
-struct BlurStack {
+struct StackBlur {
     int _radius;
     Ring<Math::Vec4u> _queue;
     Math::Vec4u _sum;
 
-    BlurStack(int radius)
+    StackBlur(int radius)
         : _radius(radius), _queue(width()) {
         clear();
     }
@@ -586,12 +593,11 @@ struct BlurStack {
 };
 
 [[gnu::flatten]] void Context::blur(Math::Recti region, int radius) {
-    if (radius <= 1) {
+    if (radius == 0)
         return;
-    }
 
     region = applyClip(region);
-    BlurStack stack{radius};
+    StackBlur stack{radius};
 
     for (int y = region.top(); y < region.bottom(); y++) {
         for (int i = 0; i < stack.width(); i++) {
@@ -664,6 +670,8 @@ void Context::grayscale(Math::Recti region) {
 }
 
 void Context::contrast(Math::Recti region, double contrast) {
+    region = applyAll(region);
+
     contrast *= 255;
     double factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
 
@@ -683,6 +691,8 @@ void Context::contrast(Math::Recti region, double contrast) {
 }
 
 void Context::brightness(Math::Recti region, double brightness) {
+    region = applyAll(region);
+
     for (int y = 0; y < region.height; y++) {
         for (int x = 0; x < region.width; x++) {
             auto color = _surface->load({region.x + x, region.y + y});
@@ -699,13 +709,16 @@ void Context::brightness(Math::Recti region, double brightness) {
 }
 
 void Context::noise(Math::Recti region, double amount) {
+    region = applyAll(region);
+
     Math::Rand rand{0x12341234};
     uint8_t alpha = 255 * amount;
 
     for (int y = 0; y < region.height; y++) {
         for (int x = 0; x < region.width; x++) {
             uint8_t noise = rand.nextU8();
-            plot(
+
+            _surface->blend(
                 {region.x + x, region.y + y},
                 Color::fromRgba(noise, noise, noise, alpha));
         }

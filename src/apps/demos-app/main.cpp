@@ -112,6 +112,30 @@ static Array demos = {
         },
     },
     Demo{
+        Media::Icons::GRADIENT_HORIZONTAL,
+        "Grdiants",
+        "Grdiants rendering",
+        []() {
+            return Ui::canvas(
+                [](Gfx::Context &g, Math::Vec2i) {
+                    Media::Icon icon = {Media::Icons::FLAG, 256};
+
+                    auto transFlag = Gfx::Gradiant::linear()
+                                         .addStop(Gfx::BLUE300, 0.2)
+                                         .addStop(Gfx::RED300, 0.2)
+                                         .addStop(Gfx::RED300, 0.4)
+                                         .addStop(Gfx::WHITE, 0.4)
+                                         .addStop(Gfx::WHITE, 0.6)
+                                         .addStop(Gfx::RED300, 0.6)
+                                         .addStop(Gfx::RED300, 0.8)
+                                         .addStop(Gfx::BLUE300, 0.8);
+
+                    g.fillStyle(transFlag);
+                    g.fill(0, icon);
+                });
+        },
+    },
+    Demo{
         Media::Icons::HAND_WAVE,
         "Hello, world!",
         "Hello, world!",

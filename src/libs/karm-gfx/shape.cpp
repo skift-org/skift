@@ -27,7 +27,7 @@ static void _createJoinBevel(Shape &shape, Math::Edgef curr, Math::Edgef next, M
     shape.add(trans.apply({curr.end, next.start}));
 }
 
-static void _createJoinMiter(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float width, Math::Trans2f trans) {
+static void _createJoinMiter(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, double width, Math::Trans2f trans) {
     auto currVec = curr.dir();
     auto nextVec = next.invDir();
     auto diffVec = next.start - curr.end;
@@ -52,7 +52,7 @@ static void _createJoinMiter(Shape &shape, Math::Edgef curr, Math::Edgef next, M
     shape.add(trans.apply({v, next.start}));
 }
 
-static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float radius, Math::Trans2f trans) {
+static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, double radius, Math::Trans2f trans) {
     double startAngle = (curr.end - corner).angle();
     double endAngle = (next.start - corner).angle();
 
@@ -70,7 +70,7 @@ static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, M
     _createArc(shape, corner, curr.end, next.start, startAngle, delta, radius, trans);
 }
 
-[[maybe_unused]] static void _createJoin(Shape &shape, StrokeStyle stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, float radius, Math::Trans2f trans) {
+[[maybe_unused]] static void _createJoin(Shape &shape, StrokeStyle stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, double radius, Math::Trans2f trans) {
     if (Math::epsilonEq(curr.end, next.start, 0.001)) {
         // HACK: avoid creating a degenerate edge
         return;
@@ -106,14 +106,14 @@ static void _createCapButt(Shape &shape, Cap cap, Math::Trans2f trans) {
     shape.add(trans.apply({cap.start, cap.end}));
 }
 
-static void _createCapSquare(Shape &shape, Cap cap, float width, Math::Trans2f trans) {
+static void _createCapSquare(Shape &shape, Cap cap, double width, Math::Trans2f trans) {
     auto e = Math::Edgef{cap.start, cap.end}.parallel(-width / 2);
     shape.add(trans.apply({cap.start, e.start}));
     shape.add(trans.apply(e));
     shape.add(trans.apply({e.end, cap.end}));
 }
 
-static void _createCapRound(Shape &shape, Cap cap, float width, Math::Trans2f trans) {
+static void _createCapRound(Shape &shape, Cap cap, double width, Math::Trans2f trans) {
     double startAngle = (cap.start - cap.center).angle();
     double endAngle = (cap.end - cap.center).angle();
 

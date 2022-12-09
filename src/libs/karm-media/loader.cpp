@@ -36,7 +36,7 @@ static Result<Image> loadPng(Bytes bytes) {
     Image image{Gfx::RGBA8888, {png.width(), png.height()}};
 
     Gfx::Surface surface = image;
-    surface.clearRect(surface.bound(), Gfx::PINK);
+    surface.clear(surface.bound(), Gfx::PINK);
     // try$(png.decode(image));
     return image;
 }
@@ -46,7 +46,7 @@ static Result<Image> loadJpeg(Bytes bytes) {
     Image image{Gfx::RGBA8888, {jpeg.width(), jpeg.height()}};
 
     Gfx::Surface surface = image;
-    surface.clearRect(surface.bound(), Gfx::PINK);
+    surface.clear(surface.bound(), Gfx::PINK);
     // try$(jpeg.decode(image));
     return image;
 }

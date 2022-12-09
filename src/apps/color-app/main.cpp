@@ -45,7 +45,7 @@ struct HsvPicker : public Ui::View<HsvPicker> {
 
         for (int y = 0; y < bound().height; y++) {
             for (int x = 0; x < bound().width; x++) {
-                g.plot({bound().x + x, bound().y + y}, sampleColor({x, y}));
+                g.debugPlot({bound().x + x, bound().y + y}, sampleColor({x, y}));
             }
         }
 
@@ -54,7 +54,7 @@ struct HsvPicker : public Ui::View<HsvPicker> {
         g.fillStyle(Gfx::WHITE);
         g.fill(Math::Ellipsei{pos, 8});
 
-        g.strokeStyle(Gfx::StrokeStyle{Gfx::BLACK.withOpacity(0.25)}.withWidth(1).withAlign(Gfx::OUTSIDE_ALIGN));
+        g.strokeStyle(Gfx::stroke(Gfx::BLACK.withOpacity(0.25)).withWidth(1).withAlign(Gfx::OUTSIDE_ALIGN));
         g.stroke();
 
         g.fillStyle(Gfx::hsvToRgb(_value));

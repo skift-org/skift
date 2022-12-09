@@ -281,13 +281,13 @@ struct Input : public View<Input> {
         g.fill(baseline, _text);
 
         if (debugShowLayoutBounds) {
-            g._line(
+            g.debugLine(
                 {
                     bound().topStart() + m.baseline.cast<int>(),
                     bound().topEnd() + m.baseline.cast<int>(),
                 },
                 Gfx::PINK);
-            g._rect(bound(), Gfx::CYAN);
+            g.debugRect(bound(), Gfx::CYAN);
         }
 
         g.restore();
@@ -534,7 +534,6 @@ struct Slider : public View<Slider> {
             _value = p.x / (double)bound().width;
             if (_onChange)
                 _onChange(*this, _value);
-            shouldRepaint(*this);
         }
     }
 

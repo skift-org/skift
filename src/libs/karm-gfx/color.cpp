@@ -5,16 +5,16 @@
 namespace Karm::Gfx {
 
 Hsv rgbToHsv(Color color) {
-    float r = color.red / 255.0f;
-    float g = color.green / 255.0f;
-    float b = color.blue / 255.0f;
+    double r = color.red / 255.0;
+    double g = color.green / 255.0;
+    double b = color.blue / 255.0;
 
-    float rgbMax = Karm::max(r, g, b);
-    float rgbMin = Karm::min(r, g, b);
+    double rgbMax = Karm::max(r, g, b);
+    double rgbMin = Karm::min(r, g, b);
 
-    float delta = rgbMax - rgbMin;
+    double delta = rgbMax - rgbMin;
 
-    float hue = 0.0f;
+    double hue = 0.0f;
     if (delta != 0.0f) {
         if (rgbMax == r) {
             hue = (g - b) / delta;
@@ -30,23 +30,23 @@ Hsv rgbToHsv(Color color) {
         hue += 360.0f;
     }
 
-    float saturation = rgbMax == 0.0f ? 0.0f : delta / rgbMax;
+    double saturation = rgbMax == 0.0f ? 0.0f : delta / rgbMax;
 
     return {hue, saturation, rgbMax};
 }
 
 Color hsvToRgb(Hsv hsv) {
-    float h = hsv.hue;
-    float s = hsv.saturation;
-    float v = hsv.value;
+    double h = hsv.hue;
+    double s = hsv.saturation;
+    double v = hsv.value;
 
-    float c = v * s;
-    float x = c * (1.0f - abs(std::fmod(h / 60.0f, 2.0f) - 1.0f));
-    float m = v - c;
+    double c = v * s;
+    double x = c * (1.0f - abs(std::fmod(h / 60.0f, 2.0f) - 1.0f));
+    double m = v - c;
 
-    float r = 0.0f;
-    float g = 0.0f;
-    float b = 0.0f;
+    double r = 0.0f;
+    double g = 0.0f;
+    double b = 0.0f;
 
     if (h < 60.0f) {
         r = c;

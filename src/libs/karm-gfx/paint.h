@@ -14,8 +14,13 @@ struct Gradiant {
 
     struct Stop {
         Color color;
-        float pos;
+        double pos;
     };
+
+    static Color lerp(Stop lhs, Stop rhs, double pos) {
+        double t = (pos - lhs.pos) / (rhs.pos - lhs.pos);
+        return lhs.color.lerpWith(rhs.color, t);
+    }
 
     enum Type {
         LINEAR,
@@ -45,12 +50,12 @@ struct Gradiant {
         return Gradiant{DIAMOND, {0.5, 0.5}, {1, 0.5}};
     }
 
-    Gradiant &addStop(Color color, float pos) {
+    Gradiant &addStop(Color color, double pos) {
         _stops.pushBack({color, pos});
         return *this;
     }
 
-    Color sample(float pos) const {
+    Color sample(double pos, bool wrapAround = false) const {
         if (_stops.len() == 0) {
             return BLACK;
         }
@@ -60,10 +65,23 @@ struct Gradiant {
         }
 
         if (pos <= _stops[0].pos) {
+            if (wrapAround) {
+                auto lhs = _stops[_stops.len() - 1];
+                lhs.pos -= 1;
+
+                return lerp(lhs, _stops[0], pos);
+            }
+
             return _stops[0].color;
         }
 
         if (pos >= _stops[_stops.len() - 1].pos) {
+            if (wrapAround) {
+                auto rhs = _stops[0];
+                rhs.pos += 1;
+
+                return lerp(_stops[_stops.len() - 1], rhs, pos);
+            }
             return _stops[_stops.len() - 1].color;
         }
 
@@ -72,10 +90,7 @@ struct Gradiant {
             auto jPos = _stops[i + 1].pos;
 
             if (pos >= iPos && pos <= jPos) {
-                float t = (pos - iPos) / (jPos - iPos);
-                auto iColor = _stops[i].color;
-                auto jColor = _stops[i + 1].color;
-                return iColor.lerpWith(jColor, t);
+                return lerp(_stops[i], _stops[i + 1], pos);
             }
         }
 
@@ -83,24 +98,28 @@ struct Gradiant {
     }
 
     Color sample(Math::Vec2f pos) const {
+        pos = pos - _start;
         switch (_type) {
         case LINEAR:
             return sample(pos.x);
         case RADIAL:
             return sample(pos.len());
-        case CONICAL:
-            return sample(pos.angle());
+        case CONICAL: {
+            double offset = (_end - _start).angle();
+            pos = pos.rotate(-offset);
+            return sample((pos.angle() + Math::PI) / Math::TAU, true);
+        }
         case DIAMOND:
-            return sample(pos.x + pos.y);
+            return sample((pos.x + pos.y) / 2);
         }
     }
 };
 
-struct Paint {
-    Var<Color, Gradiant, Media::Image> _inner;
+struct Paint : public Var<Color, Gradiant, Media::Image> {
+    using Var::Var;
 
     Color sample(Math::Vec2f pos) const {
-        return _inner.visit(Visitor{
+        return visit(Visitor{
             [&](Color color) {
                 return color;
             },

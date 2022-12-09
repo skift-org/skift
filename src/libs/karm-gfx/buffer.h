@@ -5,7 +5,6 @@
 #include <karm-math/rect.h>
 
 #include "color.h"
-#include "colors.h"
 
 namespace Karm::Gfx {
 
@@ -54,7 +53,7 @@ struct Bgra8888 {
 using Format = Var<Rgba8888, Bgra8888>;
 
 struct Buffer {
-    void *pixels;
+    void *data;
     int width;
     int height;
     size_t stride;
@@ -82,36 +81,30 @@ struct Surface {
     Format format;
     Buffer buffer;
 
-    int width() const {
-        return buffer.width;
-    }
+    int width() const { return buffer.width; }
 
-    int height() const {
-        return buffer.height;
-    }
+    int height() const { return buffer.height; }
 
-    void *data() {
-        return buffer.pixels;
-    }
+    size_t stride() const { return buffer.stride; }
 
-    void const *data() const {
-        return buffer.pixels;
-    }
+    void *data() { return buffer.data; }
+
+    void const *data() const { return buffer.data; }
 
     Math::Recti bound() const {
         return {0, 0, width(), height()};
     }
 
     void *scanline(size_t const y) {
-        return static_cast<uint8_t *>(buffer.pixels) + y * buffer.stride;
+        return static_cast<uint8_t *>(buffer.data) + y * buffer.stride;
     }
 
     void store(Math::Vec2i const pos, Color const color) {
-        Gfx::store(format, static_cast<uint8_t *>(buffer.pixels) + pos.y * buffer.stride + pos.x * bpp(format), color);
+        Gfx::store(format, static_cast<uint8_t *>(buffer.data) + pos.y * buffer.stride + pos.x * bpp(format), color);
     }
 
     Color load(Math::Vec2i const pos) const {
-        return Gfx::load(format, static_cast<uint8_t const *>(buffer.pixels) + pos.y * buffer.stride + pos.x * bpp(format));
+        return Gfx::load(format, static_cast<uint8_t const *>(buffer.data) + pos.y * buffer.stride + pos.x * bpp(format));
     }
 
     Color loadClamped(Math::Vec2i const pos) const {
@@ -122,46 +115,12 @@ struct Surface {
         store(pos, color.blendOver(load(pos)));
     }
 
-    void clearRect(Math::Recti rect, Color color) {
+    void clear(Math::Recti rect, Color color) {
         format.visit([&](auto f) {
             for (int y = rect.top(); y < rect.bottom(); y++) {
                 for (int x = rect.start(); x < rect.end(); x++) {
-                    f.store(static_cast<uint8_t *>(buffer.pixels) + y * buffer.stride + x * f.bpp(), color);
+                    f.store(static_cast<uint8_t *>(buffer.data) + y * buffer.stride + x * f.bpp(), color);
                 }
-            }
-        });
-    }
-
-    void blendRect(Math::Recti rect, Color color) {
-        if (color.alpha == 0) {
-            return;
-        }
-
-        if (color.alpha == 255) {
-            clearRect(rect, color);
-            return;
-        }
-
-        format.visit([&](auto f) {
-            for (int y = rect.top(); y < rect.bottom(); y++) {
-                for (int x = rect.start(); x < rect.end(); x++) {
-                    auto *pixel = static_cast<uint8_t *>(buffer.pixels) + y * buffer.stride + x * f.bpp();
-                    auto c = f.load(pixel);
-                    c = color.blendOver(c);
-                    f.store(pixel, c);
-                }
-            }
-        });
-    }
-
-    void blendScanline(double *alphas, int y, int start, int end, Color color) {
-        format.visit([&](auto f) {
-            auto *pixel = static_cast<uint8_t *>(buffer.pixels) + y * buffer.stride + start * f.bpp();
-            for (int x = start; x < end; x++) {
-                auto c = f.load(pixel);
-                c = color.withOpacity(clamp01(alphas[x])).blendOver(c);
-                f.store(pixel, c);
-                pixel += f.bpp();
             }
         });
     }

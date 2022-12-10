@@ -34,28 +34,52 @@ struct Gradiant {
     Math::Vec2f _end = {1, 1};
     InlineVec<Stop, MAX_STOPS> _stops = {};
 
-    static Gradiant linear() {
+    static constexpr Gradiant linear() {
         return Gradiant{LINEAR, {0, 0.5}, {1, 0.5}};
     }
 
-    static Gradiant radial() {
+    static constexpr Gradiant radial() {
         return Gradiant{RADIAL, {0.5, 0.5}, {1, 0.5}};
     }
 
-    static Gradiant conical() {
+    static constexpr Gradiant conical() {
         return Gradiant{CONICAL, {0.5, 0.5}, {1, 0.5}};
     }
 
-    static Gradiant diamond() {
-        return Gradiant{DIAMOND, {0.5, 0.5}, {1, 0.5}};
+    static constexpr Gradiant diamond() {
+        return Gradiant{DIAMOND, {0.5, 0.5}, {1, 1}};
     }
 
-    Gradiant &addStop(Color color, double pos) {
+    constexpr Gradiant &withStop(Color color, double pos) {
         _stops.pushBack({color, pos});
         return *this;
     }
 
-    Color sample(double pos, bool wrapAround = false) const {
+    constexpr Gradiant &withColors(Meta::Same<Color> auto... args) {
+        Array colors = {args...};
+
+        if (colors.len() == 1) {
+            return withStop(colors[0], 0.5);
+        }
+
+        for (size_t i = 0; i < colors.len(); i++) {
+            _stops.pushBack({colors[i], (double)i / (colors.len() - 1)});
+        }
+
+        return *this;
+    }
+
+    constexpr Gradiant &withStart(Math::Vec2f start) {
+        _start = start;
+        return *this;
+    }
+
+    constexpr Gradiant &withEnd(Math::Vec2f end) {
+        _end = end;
+        return *this;
+    }
+
+    constexpr Color sample(double pos, bool wrapAround = false) const {
         if (_stops.len() == 0) {
             return BLACK;
         }
@@ -97,20 +121,24 @@ struct Gradiant {
         return BLACK;
     }
 
-    Color sample(Math::Vec2f pos) const {
+    constexpr Color sample(Math::Vec2f pos) const {
         pos = pos - _start;
+        pos = pos.rotate(-(_end - _start).angle());
+        double scale = (_end - _start).len();
+        pos = pos * scale;
+
         switch (_type) {
         case LINEAR:
             return sample(pos.x);
+
         case RADIAL:
             return sample(pos.len());
-        case CONICAL: {
-            double offset = (_end - _start).angle();
-            pos = pos.rotate(-offset);
+
+        case CONICAL:
             return sample((pos.angle() + Math::PI) / Math::TAU, true);
-        }
+
         case DIAMOND:
-            return sample((pos.x + pos.y) / 2);
+            return sample(abs(pos.x) + abs(pos.y));
         }
     }
 };

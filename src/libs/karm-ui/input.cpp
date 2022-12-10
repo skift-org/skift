@@ -534,6 +534,8 @@ struct Slider : public View<Slider> {
             _value = p.x / (double)bound().width;
             if (_onChange)
                 _onChange(*this, _value);
+            else
+                Ui::shouldRepaint(*this);
         }
     }
 

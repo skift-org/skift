@@ -113,17 +113,20 @@ static Array demos = {
     },
     Demo{
         Media::Icons::GRADIENT_HORIZONTAL,
-        "Grdiants",
-        "Grdiants rendering",
+        "Gradients",
+        "Gradients rendering",
         []() {
             return Ui::canvas(
                 [](Gfx::Context &g, Math::Vec2i bound) {
-                    auto transFlag = Gfx::Gradiant::radial()
-                                         .withStop(Gfx::RED300, 0)
-                                         .withStop(Gfx::BLUE300, 1);
+                    // Red, orange, yellow, green, blue, indigo, violet
+                    auto transFlag = Gfx::Gradient::linear()
+                                         .withColors(Gfx::RED, Gfx::ORANGE, Gfx::YELLOW, Gfx::GREEN, Gfx::BLUE, Gfx::INDIGO, Gfx::VIOLET);
                     g.fillStyle(transFlag);
                     // Media::Icon icon = {Media::Icons::CAT, 256};
                     g.fill(bound);
+
+                    g.fillStyle(Gfx::WHITE);
+                    g.fill({16, 26}, "Graphic design is my passion");
                 });
         },
     },

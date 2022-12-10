@@ -9,7 +9,7 @@
 
 namespace Karm::Gfx {
 
-struct Gradiant {
+struct Gradient {
     static constexpr int MAX_STOPS = 16;
 
     struct Stop {
@@ -34,28 +34,36 @@ struct Gradiant {
     Math::Vec2f _end = {1, 1};
     InlineVec<Stop, MAX_STOPS> _stops = {};
 
-    static constexpr Gradiant linear() {
-        return Gradiant{LINEAR, {0, 0.5}, {1, 0.5}};
+    static constexpr Gradient linear() {
+        return Gradient{LINEAR, {0, 0}, {1, 1}};
     }
 
-    static constexpr Gradiant radial() {
-        return Gradiant{RADIAL, {0.5, 0.5}, {1, 0.5}};
+    static constexpr Gradient vlinear() {
+        return Gradient{LINEAR, {0.5, 0}, {0.5, 1}};
     }
 
-    static constexpr Gradiant conical() {
-        return Gradiant{CONICAL, {0.5, 0.5}, {1, 0.5}};
+    static constexpr Gradient hlinear() {
+        return Gradient{LINEAR, {0, 0.5}, {1, 0.5}};
     }
 
-    static constexpr Gradiant diamond() {
-        return Gradiant{DIAMOND, {0.5, 0.5}, {1, 1}};
+    static constexpr Gradient radial() {
+        return Gradient{RADIAL, {0.5, 0.5}, {1, 0.5}};
     }
 
-    constexpr Gradiant &withStop(Color color, double pos) {
+    static constexpr Gradient conical() {
+        return Gradient{CONICAL, {0.5, 0.5}, {1, 0.5}};
+    }
+
+    static constexpr Gradient diamond() {
+        return Gradient{DIAMOND, {0.5, 0.5}, {1, 0.5}};
+    }
+
+    constexpr Gradient &withStop(Color color, double pos) {
         _stops.pushBack({color, pos});
         return *this;
     }
 
-    constexpr Gradiant &withColors(Meta::Same<Color> auto... args) {
+    constexpr Gradient &withColors(Meta::Same<Color> auto... args) {
         Array colors = {args...};
 
         if (colors.len() == 1) {
@@ -69,12 +77,12 @@ struct Gradiant {
         return *this;
     }
 
-    constexpr Gradiant &withStart(Math::Vec2f start) {
+    constexpr Gradient &withStart(Math::Vec2f start) {
         _start = start;
         return *this;
     }
 
-    constexpr Gradiant &withEnd(Math::Vec2f end) {
+    constexpr Gradient &withEnd(Math::Vec2f end) {
         _end = end;
         return *this;
     }
@@ -125,7 +133,7 @@ struct Gradiant {
         pos = pos - _start;
         pos = pos.rotate(-(_end - _start).angle());
         double scale = (_end - _start).len();
-        pos = pos * scale;
+        pos = pos / scale;
 
         switch (_type) {
         case LINEAR:
@@ -143,7 +151,7 @@ struct Gradiant {
     }
 };
 
-struct Paint : public Var<Color, Gradiant, Media::Image> {
+struct Paint : public Var<Color, Gradient, Media::Image> {
     using Var::Var;
 
     Color sample(Math::Vec2f pos) const {
@@ -151,8 +159,8 @@ struct Paint : public Var<Color, Gradiant, Media::Image> {
             [&](Color color) {
                 return color;
             },
-            [&](Gradiant gradiant) {
-                return gradiant.sample(pos);
+            [&](Gradient gradient) {
+                return gradient.sample(pos);
             },
             [&](Media::Image image) {
                 auto w = image.width();

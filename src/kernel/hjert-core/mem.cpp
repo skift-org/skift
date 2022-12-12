@@ -21,7 +21,7 @@ struct Pmm : public Hal::Pmm {
 
     Result<Hal::PmmRange> alloc(size_t size, Hal::PmmFlags flags) override {
         LockScope guard(_lock);
-        bool upper = !!(flags & Hal::PmmFlags::UPPER);
+        bool upper = (flags & Hal::PmmFlags::UPPER) == Hal::PmmFlags::UPPER;
 
         try$(ensureAlign(size, Hal::PAGE_SIZE));
         size /= Hal::PAGE_SIZE;
@@ -164,14 +164,14 @@ Error init(Handover::Payload &payload) {
 }
 
 Hal::Pmm &pmm() {
-    if (!_pmm) {
+    if (not _pmm) {
         logFatal("mem: pmm not initialized");
     }
     return *_pmm;
 }
 
 Hal::Heap &heap() {
-    if (!_heap) {
+    if (not _heap) {
         logFatal("mem: heap not initialized");
     }
     return *_heap;

@@ -40,7 +40,7 @@ struct Lock {
     void acquire() {
         Embed::enterCritical();
 
-        while (!_tryAcquire()) {
+        while (not _tryAcquire()) {
             Embed::relaxe();
         }
     }

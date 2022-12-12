@@ -19,7 +19,7 @@ RuntimeService *rt() {
 }
 
 Efi::LoadedImageProtocol *li() {
-    if (!_li) {
+    if (not _li) {
         _li = Efi::openProtocol<Efi::LoadedImageProtocol>().unwrap();
     }
 

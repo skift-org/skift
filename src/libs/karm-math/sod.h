@@ -37,7 +37,7 @@ struct Sod {
     }
 
     T update(T x, double t) {
-        if (!_init) {
+        if (not _init) {
             _xp = x;
             _y = x;
             _yd = 0;

@@ -113,8 +113,8 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Fl
         s = sqrtf(sa / sb);
     }
 
-    bool fa = !!(flags & LARGE);
-    bool fs = !!(flags & SWEEP);
+    bool fa = flags & LARGE;
+    bool fs = flags & SWEEP;
 
     if (fa == fs) {
         s = -s;

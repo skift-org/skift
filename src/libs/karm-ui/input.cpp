@@ -161,7 +161,7 @@ struct Button : public _Box<Button> {
     }
 
     BoxStyle &boxStyle() override {
-        if (!_onPress) {
+        if (not _onPress) {
             return _buttonStyle.disabledStyle;
         }
 
@@ -356,7 +356,7 @@ struct Toggle : public View<Toggle> {
 
     void event(Events::Event &e) override {
         if (_mouseListener.listen(*this, e)) {
-            _value = !_value;
+            _value = not _value;
             _onChange(*this, _value);
         }
     }
@@ -415,7 +415,7 @@ struct Checkbox : public View<Checkbox> {
 
     void event(Events::Event &e) override {
         if (_mouseListener.listen(*this, e)) {
-            _value = !_value;
+            _value = not _value;
             _onChange(*this, _value);
         }
     }
@@ -472,7 +472,7 @@ struct Radio : public View<Radio> {
 
     void event(Events::Event &e) override {
         if (_mouseListener.listen(*this, e)) {
-            _value = !_value;
+            _value = not _value;
             _onChange(*this, _value);
         }
     }

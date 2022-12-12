@@ -98,7 +98,6 @@ struct AnimateEvent : public _Event<AnimateEvent, 0xf21fe2676e487fc> {
 
 struct ExitEvent : public _Event<ExitEvent, 0x925703d3bb8540f6> {
     Error error;
-
     ExitEvent(Error error) : error{error} {}
 };
 

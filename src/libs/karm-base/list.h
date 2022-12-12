@@ -98,7 +98,7 @@ struct List {
     /* --- Back Access --- */
 
     T &peekBack() {
-        if (!_len) {
+        if (not _len) {
             panic("peek from empty list");
         }
 
@@ -106,7 +106,7 @@ struct List {
     }
 
     T const &peekBack() const {
-        if (!_len) {
+        if (not _len) {
             panic("peek from empty list");
         }
 
@@ -137,7 +137,7 @@ struct List {
     }
 
     T popBack() {
-        if (!_len) {
+        if (not _len) {
             panic("pop from empty list");
         }
 

@@ -76,7 +76,7 @@ struct Anim {
     }
 
     bool reached() const {
-        return !_animated;
+        return not _animated;
     }
 
     operator T() const {

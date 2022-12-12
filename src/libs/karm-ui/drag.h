@@ -124,7 +124,7 @@ struct DragRegion : public ProxyNode<DragRegion> {
     DragRegion(Child child) : ProxyNode(child) {}
 
     void event(Events::Event &e) override {
-        if (!_grabbed)
+        if (not _grabbed)
             _child->event(e);
 
         if (e.accepted) {
@@ -132,7 +132,7 @@ struct DragRegion : public ProxyNode<DragRegion> {
         }
 
         e.handle<Events::MouseEvent>([&](auto &m) {
-            if (not bound().contains(m.pos) and !_grabbed) {
+            if (not bound().contains(m.pos) and not _grabbed) {
                 return false;
             }
 

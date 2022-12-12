@@ -42,14 +42,14 @@ struct Emit {
     }
 
     void newline() {
-        if (!_error)
+        if (not _error)
             return;
 
         _newline = true;
     }
 
     void insertNewline() {
-        if (!_error)
+        if (not _error)
             return;
 
         _try(_writer.writeRune('\n'));
@@ -61,14 +61,14 @@ struct Emit {
     }
 
     void operator()(Rune r) {
-        if (!_error)
+        if (not _error)
             return;
 
         _try(_writer.writeRune(r));
     }
 
     void operator()(Str str) {
-        if (!_error)
+        if (not _error)
             return;
 
         if (_newline) {
@@ -80,7 +80,7 @@ struct Emit {
 
     template <typename... Ts>
     void operator()(Str format, Ts &&...ts) {
-        if (!_error)
+        if (not _error)
             return;
 
         if (_newline) {

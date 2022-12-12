@@ -134,7 +134,7 @@ struct Strong {
     }
 
     constexpr T *operator->() const {
-        if (!_rc) {
+        if (not _rc) {
             panic("Deferencing moved from Strong<T>");
         }
 
@@ -149,7 +149,7 @@ struct Strong {
     }
 
     constexpr T &operator*() const {
-        if (!_rc) {
+        if (not _rc) {
             panic("Deferencing moved from Strong<T>");
         }
 
@@ -157,7 +157,7 @@ struct Strong {
     }
 
     constexpr T const &unwrap() const {
-        if (!_rc) {
+        if (not _rc) {
             panic("Deferencing moved from Strong<T>");
         }
 
@@ -165,7 +165,7 @@ struct Strong {
     }
 
     constexpr T &unwrap() {
-        if (!_rc) {
+        if (not _rc) {
             panic("Deferencing moved from Strong<T>");
         }
 
@@ -174,7 +174,7 @@ struct Strong {
 
     template <typename U>
     constexpr U &unwrap() {
-        if (!_rc) {
+        if (not _rc) {
             panic("Deferencing moved from Strong<T>");
         }
 
@@ -187,7 +187,7 @@ struct Strong {
 
     template <typename U>
     constexpr U const &unwrap() const {
-        if (!_rc) {
+        if (not _rc) {
             panic("Deferencing moved from Strong<T>");
         }
 
@@ -206,7 +206,7 @@ struct Strong {
     }
 
     Meta::Id id() const {
-        if (!_rc) {
+        if (not _rc) {
             panic("Deferencing moved from Strong<T>");
         }
 
@@ -404,7 +404,7 @@ struct Weak {
     }
 
     OptStrong<T> lock() const {
-        if (!_rc) {
+        if (not _rc) {
             return NONE;
         }
 

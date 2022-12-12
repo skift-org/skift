@@ -81,7 +81,7 @@ struct [[nodiscard]] Opt {
     }
 
     bool operator==(None) const {
-        return !_present;
+        return not _present;
     }
 
     constexpr explicit operator bool() const {
@@ -89,28 +89,28 @@ struct [[nodiscard]] Opt {
     }
 
     T *operator->() {
-        if (!_present) {
+        if (not _present) {
             panic("Unwrapping None");
         }
         return &_value.unwrap();
     }
 
     T &operator*() {
-        if (!_present) {
+        if (not _present) {
             panic("Unwrapping None");
         }
         return _value.unwrap();
     }
 
     T const *operator->() const {
-        if (!_present) {
+        if (not _present) {
             panic("Unwrapping None");
         }
         return &_value.unwrap();
     }
 
     T const &operator*() const {
-        if (!_present) {
+        if (not _present) {
             panic("Unwrapping None");
         }
         return _value.unwrap();
@@ -128,21 +128,21 @@ struct [[nodiscard]] Opt {
     }
 
     T &unwrap(const char *msg = "unwraping none") {
-        if (!_present) {
+        if (not _present) {
             panic(msg);
         }
         return _value.unwrap();
     }
 
     T const &unwrap(const char *msg = "unwraping none") const {
-        if (!_present) {
+        if (not _present) {
             panic(msg);
         }
         return _value.unwrap();
     }
 
     T take() {
-        if (!_present) {
+        if (not _present) {
             panic("taking from none");
         }
         T v = _value.take();
@@ -188,13 +188,13 @@ struct [[nodiscard]] Opt {
         using OptRet = Opt<Meta::Ret<T, Args...>>;
 
         if constexpr (Meta::Same<void, Meta::Ret<T, Args...>>) {
-            if (!_present) {
+            if (not _present) {
                 return false;
             }
             _value.unwrap()(std::forward<Args>(args)...);
             return true;
         } else {
-            if (!_present) {
+            if (not _present) {
                 return OptRet{NONE};
             }
 

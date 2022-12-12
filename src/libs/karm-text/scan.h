@@ -222,7 +222,7 @@ struct _Scan {
         double fpart = 0.0;
         int64_t exp = 0;
 
-        if (peek(0) != '.' or !_parseDigit(peek(1), base)) {
+        if (peek(0) != '.' or not _parseDigit(peek(1), base)) {
             ipart = try$(nextInt(base));
         }
 

@@ -30,7 +30,7 @@ struct Host : public Node {
     virtual void wait(size_t ms) = 0;
 
     bool alive() {
-        return !_error;
+        return not _error;
     }
 
     Math::Recti bound() override {
@@ -95,7 +95,7 @@ struct Host : public Node {
     Error run() {
         layout(bound());
         paint();
-        while (!_error) {
+        while (not _error) {
             wait(_shouldAnimate ? 16 : -1);
             if (_shouldAnimate) {
                 _shouldAnimate = false;

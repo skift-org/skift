@@ -7,7 +7,7 @@
 #define try$(EXPR)                \
     ({                            \
         auto __expr = (EXPR);     \
-        if (!__expr) {            \
+        if (not __expr) {         \
             return __expr.none(); \
         }                         \
         __expr.take();            \

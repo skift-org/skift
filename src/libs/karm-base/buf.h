@@ -55,7 +55,7 @@ struct Buf {
     }
 
     ~Buf() {
-        if (!_buf)
+        if (not _buf)
             return;
 
         for (size_t i = 0; i < _len; i++) {
@@ -84,7 +84,7 @@ struct Buf {
         if (cap <= _cap)
             return;
 
-        if (!_buf) {
+        if (not _buf) {
             _buf = new Inert<T>[cap];
             _cap = cap;
             return;

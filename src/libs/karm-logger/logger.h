@@ -5,7 +5,7 @@
 #include <karm-cli/style.h>
 #include <karm-fmt/fmt.h>
 
-namespace Karm::Debug {
+namespace Karm {
 
 struct Level {
     int value;
@@ -45,34 +45,38 @@ inline void _log(Level level, Format format, Fmt::_Args &args) {
 }
 
 template <typename... Args>
-inline void ldebug(Format format, Args &&...va) {
+inline void logDebug(Format format, Args &&...va) {
     Fmt::Args<Args...> args{std::forward<Args>(va)...};
     _log(DEBUG, format, args);
 }
 
 template <typename... Args>
-inline void linfo(Format format, Args &&...va) {
+inline void logInfo(Format format, Args &&...va) {
     Fmt::Args<Args...> args{std::forward<Args>(va)...};
     _log(INFO, format, args);
 }
 
 template <typename... Args>
-inline void lwarn(Format format, Args &&...va) {
+inline void logWarn(Format format, Args &&...va) {
     Fmt::Args<Args...> args{std::forward<Args>(va)...};
     _log(WARNING, format, args);
 }
 
+inline void logTodo() {
+    logWarn("todo: {}", Loc::current().function);
+}
+
 template <typename... Args>
-inline void lerror(Format format, Args &&...va) {
+inline void logError(Format format, Args &&...va) {
     Fmt::Args<Args...> args{std::forward<Args>(va)...};
     _log(ERROR, format, args);
 }
 
 template <typename... Args>
-[[noreturn]] inline void lfatal(Format format, Args &&...va) {
+[[noreturn]] inline void logFatal(Format format, Args &&...va) {
     Fmt::Args<Args...> args{std::forward<Args>(va)...};
     _log(FATAL, format, args);
     panic("fatal error occured, see logs");
 }
 
-} // namespace Karm::Debug
+} // namespace Karm

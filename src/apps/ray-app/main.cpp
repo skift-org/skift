@@ -2,8 +2,8 @@
 #include <karm-base/rc.h>
 #include <karm-base/var.h>
 #include <karm-base/vec.h>
-#include <karm-debug/logger.h>
 #include <karm-gfx/buffer.h>
+#include <karm-logger/logger.h>
 #include <karm-main/main.h>
 #include <karm-math/vec.h>
 #include <karm-ui/app.h>
@@ -340,7 +340,7 @@ void renderScene(Cam cam, Scene &scene, Gfx::Surface buf, Props props) {
         }
 
         if (y % 10 == 0)
-            Debug::linfo("rendered {} of {}", y, size.y);
+            logInfo("tay: rendered {} of {}", y, size.y);
     }
 }
 

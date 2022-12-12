@@ -1,5 +1,5 @@
 {
-    "id": "karm-debug",
+    "id": "karm-logger",
     "type": "lib",
     "deps": [
         "karm-fmt",

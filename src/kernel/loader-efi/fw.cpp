@@ -42,7 +42,7 @@ Error parseGop(Handover::Builder &builder) {
         return Error{"unsupported pixel format"};
     }
 
-    Debug::linfo("gop: {}x{}, {} stride, {} modes", mode->info->horizontalResolution, mode->info->verticalResolution, mode->info->pixelsPerScanLine * 4, mode->maxMode);
+    logInfo("efi: gop: {}x{}, {} stride, {} modes", mode->info->horizontalResolution, mode->info->verticalResolution, mode->info->pixelsPerScanLine * 4, mode->maxMode);
 
     Handover::Record record = {
         .tag = Handover::FB,
@@ -68,7 +68,7 @@ Error parseAcpi(Handover::Builder &builder) {
 
     if (acpiTable) {
         builder.add(Handover::Tag::RSDP, 0, {(size_t)acpiTable->table, 0x1000});
-        Debug::linfo("acpi: rsdp at {x}", (uintptr_t)acpiTable->table);
+        logInfo("efi: acpi: rsdp at {x}", (uintptr_t)acpiTable->table);
     }
 
     return OK;

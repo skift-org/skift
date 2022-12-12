@@ -1,7 +1,7 @@
 #include <hjert-core/arch.h>
 #include <hjert-core/cpu.h>
 #include <hjert-core/mem.h>
-#include <karm-debug/logger.h>
+#include <karm-logger/logger.h>
 
 #include <hal-x86_64/com.h>
 #include <hal-x86_64/cpuid.h>
@@ -121,17 +121,17 @@ extern "C" uintptr_t _intDispatch(uintptr_t rsp) {
     cpu().beginInterrupt();
 
     if (frame->intNo < 32) {
-        Debug::lfatal("CPU Exception: {} (err={}, ip={x}, sp={x}, cr2={x}, cr3={x})", _faultMsg[frame->intNo], frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
+        logFatal("x86_64: cpu exception: {} (err={}, ip={x}, sp={x}, cr2={x}, cr3={x})", _faultMsg[frame->intNo], frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
     } else {
         int irq = frame->intNo - 32;
 
         if (irq == 0) {
             _tick++;
             if (_tick % 1000 == 0) {
-                Debug::linfo("tick: {}", _tick);
+                logInfo("x86_64: tick: {}", _tick);
             }
         } else {
-            Debug::linfo("irq: {}", irq);
+            logInfo("x86_64: irq: {}", irq);
         }
     }
 

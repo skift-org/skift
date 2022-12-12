@@ -3,7 +3,7 @@
 #include <karm-base/range.h>
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
-#include <karm-debug/logger.h>
+#include <karm-logger/logger.h>
 
 #include "spec.h"
 
@@ -66,7 +66,7 @@ struct Builder {
             if (other.tag == record.tag and
                 other.end() == record.start and
                 shouldMerge(record.tag)) {
-                // Debug::ldebug("handover: merge {} with {}", record, other);
+                // logDebug("handover: merge {} with {}", record, other);
                 _records.removeAt(i);
                 other.size += record.size;
                 add(other);
@@ -77,7 +77,7 @@ struct Builder {
             if (other.tag == record.tag and
                 other.start == record.end() and
                 shouldMerge(record.tag)) {
-                // Debug::ldebug("handover: merge {} with {}", record, other);
+                // logDebug("handover: merge {} with {}", record, other);
 
                 _records.removeAt(i);
                 record.size += other.size;
@@ -87,7 +87,7 @@ struct Builder {
 
             if (colidesWith(record, other)) {
                 if (shouldMerge(record.tag) and not shouldMerge(other.tag)) {
-                    // Debug::ldebug("handover: splitting record {} with {}", record, other);
+                    // logDebug("handover: splitting record {} with {}", record, other);
 
                     _records.removeAt(i);
                     auto [lower, upper] = split(record, other);
@@ -97,7 +97,7 @@ struct Builder {
                     add(upper);
                     return;
                 } else if (not shouldMerge(record.tag) and shouldMerge(other.tag)) {
-                    // Debug::ldebug("handover: splitting record {} with {}", other, record);
+                    // logDebug("handover: splitting record {} with {}", other, record);
 
                     _records.removeAt(i);
 
@@ -107,19 +107,19 @@ struct Builder {
                     add(upper);
                     return;
                 } else {
-                    Debug::lwarn("handover: record {} colides with {}", record, other);
+                    logWarn("handover: record {} colides with {}", record, other);
                     return;
                 }
             }
 
             if (other.start > record.start) {
-                // Debug::ldebug("handover: insert {} at {}", record, i);
+                // logDebug("handover: insert {} at {}", record, i);
                 _records.insert(i, record);
                 return;
             }
         }
 
-        // Debug::ldebug("handover: append {}", record);
+        // logDebug("handover: append {}", record);
         _records.pushBack(record);
     }
 

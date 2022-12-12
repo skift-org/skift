@@ -1,4 +1,4 @@
-#include <karm-debug/logger.h>
+#include <karm-logger/logger.h>
 
 #include "path.h"
 
@@ -17,7 +17,7 @@ void Path::_flattenClose() {
 
 void Path::_flattenLineTo(Math::Vec2f p) {
     if (_segs.len() == 0) {
-        Debug::lerror("move to must be called before line to");
+        logError("path: move to must be called before line to");
         return;
     }
 
@@ -183,7 +183,7 @@ void Path::evalOp(Op op) {
         last(_segs).close and
         op.code != MOVE_TO and
         op.code != CLEAR) {
-        Debug::lerror("can't evalOp on closed path");
+        logError("path: can't evalOp on closed path");
         return;
     }
 

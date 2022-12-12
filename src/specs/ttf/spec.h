@@ -3,8 +3,8 @@
 #include <karm-base/endiant.h>
 #include <karm-base/result.h>
 #include <karm-base/string.h>
-#include <karm-debug/logger.h>
 #include <karm-gfx/context.h>
+#include <karm-logger/logger.h>
 
 #include "../bscan.h"
 
@@ -87,7 +87,7 @@ struct Cmap : public BChunk {
                 }
             }
 
-            Debug::lwarn("Glyph not found for rune {x}", r);
+            logWarn("ttf: Glyph not found for rune {x}", r);
             return 0;
         }
 
@@ -111,7 +111,7 @@ struct Cmap : public BChunk {
                 }
             }
 
-            Debug::lwarn("Glyph not found for rune {x}", r);
+            logWarn("ttf: glyph not found for rune {x}", r);
             return 0;
         }
 
@@ -310,7 +310,7 @@ struct Glyf : public BChunk {
     }
 
     void contourComposite(Gfx::Context &, Metrics, BScan &) const {
-        Debug::lwarn("Glyf::strokeComposite not implemented");
+        logTodo();
     }
 
     void contour(Gfx::Context &g, size_t glyfOffset) const {
@@ -443,7 +443,7 @@ struct Font {
         }
 
         if (not bestCmap) {
-            Debug::lerror("No suitable cmap table found");
+            logError("ttf: no suitable cmap table found");
             return Error("no cmap table");
         }
 
@@ -455,7 +455,7 @@ struct Font {
 
         if (font.version() != 0x00010000 and
             font.version() != 0x4F54544F) {
-            Debug::lerror("Version {x} is not supported", (uint64_t)font.version());
+            logError("ttf: version {x} is not supported", (uint64_t)font.version());
             return Error{"invalid version"};
         }
 
@@ -521,7 +521,7 @@ struct Font {
             }
         }
 
-        Debug::lwarn("'{}' table not found", T::SIG);
+        logWarn("ttf: '{}' table not found", T::SIG);
         return T{};
     }
 
@@ -533,7 +533,7 @@ struct Font {
             }
         }
 
-        Debug::lerror("'{}' table not found", T::SIG);
+        logError("ttf: '{}' table not found", T::SIG);
         return Error{"table not found"};
     }
 

@@ -2,10 +2,10 @@
 
 #include <karm-base/func.h>
 #include <karm-base/rc.h>
-#include <karm-debug/logger.h>
 #include <karm-events/events.h>
 #include <karm-gfx/context.h>
 #include <karm-layout/size.h>
+#include <karm-logger/logger.h>
 
 namespace Karm::Ui {
 

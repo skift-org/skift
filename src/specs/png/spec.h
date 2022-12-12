@@ -2,8 +2,8 @@
 
 #include <karm-base/endiant.h>
 #include <karm-base/string.h>
-#include <karm-debug/logger.h>
 #include <karm-gfx/context.h>
+#include <karm-logger/logger.h>
 
 #include "../bscan.h"
 
@@ -127,7 +127,7 @@ struct Image {
             }
         }
 
-        Debug::lwarn("'{}' chunk not found", T::SIG);
+        logWarn("png: '{}' chunk not found", T::SIG);
         return T{};
     }
 

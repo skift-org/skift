@@ -56,16 +56,16 @@ Result<Image> loadImage(Str path) {
     auto map = try$(Sys::mmap().map(file));
 
     if (Qoi::Image::isQoi(map.bytes())) {
-        Debug::linfo("Loading '{}' as QOI...", path);
+        logInfo("media: loading '{}' as QOI...", path);
         return loadQoi(map.bytes());
     } else if (Png::Image::isPng(map.bytes())) {
-        Debug::linfo("Loading '{}' as PNG...", path);
+        logInfo("media: loading '{}' as PNG...", path);
         return loadPng(map.bytes());
     } else if (Jpeg::Image::isJpeg(map.bytes())) {
-        Debug::linfo("Loading '{}' as JPEG...", path);
+        logInfo("media: loading '{}' as JPEG...", path);
         return loadJpeg(map.bytes());
     } else {
-        Debug::lerror("Unknown image format for '{}'", path);
+        logError("media: unknown image format for '{}'", path);
         return Error{"unknown image format"};
     }
 }

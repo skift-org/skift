@@ -1,7 +1,7 @@
 #include <karm-base/bits.h>
 #include <karm-base/lock.h>
 #include <karm-base/size.h>
-#include <karm-debug/logger.h>
+#include <karm-logger/logger.h>
 
 #include "arch.h"
 #include "mem.h"
@@ -112,20 +112,22 @@ Error init(Handover::Payload &payload) {
     auto usableRange = payload.usableRange<Hal::PmmRange>();
 
     if (usableRange.empty()) {
+        logError("mem: no usable memory");
         return Error{"no usable memory"};
     }
 
-    Debug::linfo("usable range: {x}-{x}", usableRange.start, usableRange.end());
+    logInfo("mem: usable range: {x}-{x}", usableRange.start, usableRange.end());
 
     size_t bitsSize = usableRange.size / Hal::PAGE_SIZE / 8;
 
     auto pmmBits = payload.find(bitsSize);
 
     if (pmmBits.empty()) {
+        logError("mem: no usable memory for pmm");
         return Error{"no usable memory for pmm"};
     }
 
-    Debug::linfo("Pmm bitmap range: {x}-{x}", pmmBits.start, pmmBits.end());
+    logInfo("mem: pmm bitmap range: {x}-{x}", pmmBits.start, pmmBits.end());
 
     _pmm = Pmm(usableRange,
                MutSlice{
@@ -135,7 +137,7 @@ Error init(Handover::Payload &payload) {
 
     _heap = Heap(_pmm.unwrap());
 
-    Debug::linfo("Marking kernel memory as used");
+    logInfo("mem: marking kernel memory as used");
     for (auto &record : payload) {
         if (record.tag == Handover::Tag::FREE) {
             try$(pmm().free({record.start, record.size}));
@@ -144,13 +146,13 @@ Error init(Handover::Payload &payload) {
 
     try$(_pmm->used({pmmBits.start, pmmBits.size}, Hal::PmmFlags::NIL));
 
-    Debug::linfo("Mapping kernel...");
+    logInfo("mem: mapping kernel...");
     try$(vmm().map(
         {Handover::KERNEL_BASE + Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         {Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
-    Debug::linfo("Mapping upper half...");
+    logInfo("mem: mapping upper half...");
     try$(vmm().map(
         {Handover::UPPER_HALF + Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
         {Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
@@ -163,14 +165,14 @@ Error init(Handover::Payload &payload) {
 
 Hal::Pmm &pmm() {
     if (!_pmm) {
-        Debug::lfatal("mem: pmm not initialized");
+        logFatal("mem: pmm not initialized");
     }
     return *_pmm;
 }
 
 Hal::Heap &heap() {
     if (!_heap) {
-        Debug::lfatal("mem: heap not initialized");
+        logFatal("mem: heap not initialized");
     }
     return *_heap;
 }

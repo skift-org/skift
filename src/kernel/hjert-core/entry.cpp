@@ -1,6 +1,6 @@
 #include <handover/main.h>
 #include <karm-base/size.h>
-#include <karm-debug/logger.h>
+#include <karm-logger/logger.h>
 #include <karm-sys/chan.h>
 
 #include "arch.h"
@@ -10,26 +10,27 @@
 namespace Hjert {
 
 void splash() {
-    Debug::linfo(" _  _  _         _");
-    Debug::linfo("| || |(_)___ _ _| |_");
-    Debug::linfo("| __ || / -_) '_|  _|");
-    Debug::linfo("|_||_|/ \\___|_|  \\__|");
-    Debug::linfo("    |__/");
+    logInfo(" _  _  _         _");
+    logInfo("| || |(_)___ _ _| |_");
+    logInfo("| __ || / -_) '_|  _|");
+    logInfo("|_||_|/ \\___|_|  \\__|");
+    logInfo("    |__/");
 }
 
 Error validateAndDump(uint64_t magic, Handover::Payload &payload) {
     if (!Handover::valid(magic, payload)) {
-        Debug::linfo("handover: invalid");
+        logInfo("entry: handover: invalid");
         return "Invalid handover payload";
     }
 
-    Debug::linfo("handover: valid");
-    Debug::linfo("handover: agent: '{}'", payload.agentName());
+    logInfo("entry: handover: valid");
+    logInfo("entry: handover: agent: '{}'", payload.agentName());
 
     size_t totalFree = 0;
+    logInfo("entry: dumpying handover records...");
     for (auto const &record : payload) {
-        Debug::linfo(
-            "handover: record: {} {x}-{x} ({}kib)",
+        logInfo(
+            " - {} {x}-{x} ({}kib)",
             record.name(),
             record.start,
             record.end(),
@@ -40,7 +41,7 @@ Error validateAndDump(uint64_t magic, Handover::Payload &payload) {
         }
     }
 
-    Debug::linfo("handover: total free: {}mib", toMib(totalFree));
+    logInfo("entry: handover: total free: {}mib", toMib(totalFree));
 
     return OK;
 }
@@ -51,10 +52,10 @@ Error start(uint64_t magic, Handover::Payload &payload) {
     splash();
     try$(validateAndDump(magic, payload));
 
-    Debug::linfo("Initialized memory manager...");
+    logInfo("entry: initialized memory manager...");
     try$(Mem::init(payload));
 
-    Debug::linfo("Everything is ready, enabling interrupts...");
+    logInfo("entry: everything is ready, enabling interrupts...");
     Arch::cpu().retainEnable();
     Arch::cpu().enableInterrupts();
 

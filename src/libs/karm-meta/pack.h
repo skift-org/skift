@@ -9,7 +9,7 @@
 namespace Karm::Meta {
 
 template <typename T, typename... List>
-concept Contains = (Same<T, List> || ...);
+concept Contains = (Same<T, List> or ...);
 
 template <typename...>
 inline constexpr size_t _indexOf = 0;
@@ -21,7 +21,7 @@ template <typename T, typename First, typename... Rest>
 inline constexpr size_t _indexOf<T, First, Rest...> = Same<T, First> ? 0 : _indexOf<T, Rest...> + 1;
 
 template <typename T, typename... Ts>
-requires Contains<T, Ts...>
+    requires Contains<T, Ts...>
 static consteval size_t indexOf() {
     return _indexOf<T, Ts...>;
 }

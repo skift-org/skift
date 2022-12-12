@@ -34,7 +34,7 @@ inline void shouldAnimate(Node &n) {
 template <typename T>
 inline T &queryParent(Node &n) {
     void *ptr = n.query(Meta::makeId<T>());
-    if (!ptr) {
+    if (not ptr) {
         panic("not found");
     }
     return *static_cast<T *>(ptr);

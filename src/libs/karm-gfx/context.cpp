@@ -301,7 +301,7 @@ void Context::debugLine(Math::Edgei edge, Color color) {
 
     for (;;) {
         debugPlot({edge.sx, edge.sy}, color);
-        if (edge.sx == edge.ex && edge.sy == edge.ey)
+        if (edge.sx == edge.ex and edge.sy == edge.ey)
             break;
         e2 = 2 * err;
         if (e2 >= dy) {
@@ -389,7 +389,7 @@ void Context::debugTrace(Gfx::Color color) {
             for (auto &edge : _shape) {
                 auto sample = yy + HALF_UNIT;
 
-                if (edge.bound().top() <= sample && sample < edge.bound().bottom()) {
+                if (edge.bound().top() <= sample and sample < edge.bound().bottom()) {
                     _active.pushBack({
                         .x = edge.sx + (sample - edge.sy) / (edge.ey - edge.sy) * (edge.ex - edge.sx),
                         .sign = edge.sy > edge.ey ? 1 : -1,

@@ -53,7 +53,7 @@ struct Image {
     }
 
     static bool isJpeg(Bytes slice) {
-        return slice.len() >= 2 && Op::eq(sub(slice, 0, 2), bytes(SOI));
+        return slice.len() >= 2 and Op::eq(sub(slice, 0, 2), bytes(SOI));
     }
 
     static Result<Image> load(Bytes slice) {

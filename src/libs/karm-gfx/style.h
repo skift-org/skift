@@ -16,7 +16,7 @@ struct BorderRadius {
     double bottomLeft{};
 
     bool zero() const {
-        return topLeft == 0 && topRight == 0 && bottomRight == 0 && bottomLeft == 0;
+        return topLeft == 0 and topRight == 0 and bottomRight == 0 and bottomLeft == 0;
     }
 
     BorderRadius() = default;

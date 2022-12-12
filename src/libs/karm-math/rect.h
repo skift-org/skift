@@ -103,23 +103,23 @@ union Rect {
     }
 
     constexpr bool contains(Vec2<T> const &v) const {
-        return v.x >= x &&
-               v.y >= y &&
-               v.x < x + width &&
+        return v.x >= x and
+               v.y >= y and
+               v.x < x + width and
                v.y < y + height;
     }
 
     constexpr bool contains(Rect<T> const &r) const {
-        return r.x >= x &&
-               r.y >= y &&
-               r.x + r.width <= x + width &&
+        return r.x >= x and
+               r.y >= y and
+               r.x + r.width <= x + width and
                r.y + r.height <= y + height;
     }
 
     constexpr bool colide(Rect<T> const &r) const {
-        return r.x + r.width > x &&
-               r.y + r.height > y &&
-               r.x < x + width &&
+        return r.x + r.width > x and
+               r.y + r.height > y and
+               r.x < x + width and
                r.y < y + height;
     }
 
@@ -206,7 +206,7 @@ union Rect {
     }
 
     bool hasNan() const {
-        return xy.hasNan() || wh.hasNan();
+        return xy.hasNan() or wh.hasNan();
     }
 
     Cons<Rect, Rect> hsplit(T v) const {

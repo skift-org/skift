@@ -34,11 +34,11 @@ struct Func<Out(In...)> {
     // clang-format has troubles with this
 
     template <typename F>
-    requires Meta::FuncPtr<F> && Meta::Callable<F, In...>
+    requires Meta::FuncPtr<F> and Meta::Callable<F, In...>
     Func(F f) : _wrap(makeBox<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
-    requires (Meta::RvalueRef<F &&> && !(Meta::FuncPtr<F>)) && Meta::Callable<F, In...>
+    requires (Meta::RvalueRef<F &&> and !(Meta::FuncPtr<F>)) and Meta::Callable<F, In...>
     Func(F &&f) : _wrap(makeBox<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
@@ -50,7 +50,7 @@ struct Func<Out(In...)> {
     }
 
     template <typename F>
-    requires (Meta::RvalueRef<F &&> && !(Meta::FuncPtr<F>))
+    requires (Meta::RvalueRef<F &&> and !(Meta::FuncPtr<F>))
     Func &operator=(F &&f)
     {
         _wrap = makeBox<Wrap<F>>(std::move(f));
@@ -95,11 +95,11 @@ struct SharedFunc<Out(In...)> {
     // clang-format has troubles with this
 
     template <typename F>
-    requires Meta::FuncPtr<F> && Meta::Callable<F, In...>
+    requires Meta::FuncPtr<F> and Meta::Callable<F, In...>
     SharedFunc(F f) : _wrap(makeStrong<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
-    requires (Meta::RvalueRef<F &&> && !(Meta::FuncPtr<F>)) && Meta::Callable<F, In...>
+    requires (Meta::RvalueRef<F &&> and !(Meta::FuncPtr<F>)) and Meta::Callable<F, In...>
     SharedFunc(F &&f) : _wrap(makeStrong<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
@@ -111,7 +111,7 @@ struct SharedFunc<Out(In...)> {
     }
 
     template <typename F>
-    requires (Meta::RvalueRef<F &&> && !(Meta::FuncPtr<F>))
+    requires (Meta::RvalueRef<F &&> and !(Meta::FuncPtr<F>))
     SharedFunc &operator=(F &&f)
     {
         _wrap = makeStrong<Wrap<F>>(std::move(f));

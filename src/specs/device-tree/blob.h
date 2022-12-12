@@ -71,7 +71,7 @@ struct Blob {
                 auto addr = s.nextBeUint64();
                 auto size = s.nextBeUint64();
 
-                if (addr == 0 && size == 0) {
+                if (addr == 0 and size == 0) {
                     return NONE;
                 }
 

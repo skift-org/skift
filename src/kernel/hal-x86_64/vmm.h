@@ -25,7 +25,7 @@ struct Vmm : public Hal::Vmm {
     Result<Pml<L - 1> *> pml(Pml<L> &upper, size_t vaddr) {
         auto page = upper.pageAt(vaddr);
 
-        if (!page.present()) {
+        if (not page.present()) {
             return Error::ADDR_NOT_AVAILABLE;
         }
 

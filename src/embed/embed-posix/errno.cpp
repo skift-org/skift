@@ -1,15 +1,15 @@
 #include <errno.h>
 
-#include "utils.h"
+#include "errno.h"
 
 namespace Embed::Posix {
 
 Error fromErrno(int error) {
-    if (EOPNOTSUPP != ENOTSUP && error == EOPNOTSUPP) {
+    if (EOPNOTSUPP != ENOTSUP and error == EOPNOTSUPP) {
         return Error(Error::UNSUPPORTED, "operation not supported on socket");
     }
 
-    if (EWOULDBLOCK != EAGAIN && error == EWOULDBLOCK) {
+    if (EWOULDBLOCK != EAGAIN and error == EWOULDBLOCK) {
         return Error(Error::WOULD_BLOCK, "operation would block");
     }
 

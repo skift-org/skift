@@ -31,7 +31,7 @@ Error load(Sys::Path kernelPath) {
     payload.add(Handover::FILE, 0, kernelMem.prange().as<USizeRange>());
     Debug::linfo("Kernel at vaddr: 0x{x} paddr: 0x{x}", kernelMem.vaddr(), kernelMem.paddr());
 
-    if (!image.valid()) {
+    if (not image.valid()) {
         return Error{Error::INVALID_DATA, "invalid kernel image"};
     }
 
@@ -60,7 +60,7 @@ Error load(Sys::Path kernelPath) {
     Debug::linfo("Handling kernel requests...");
     auto maybeSection = image.sectionByName(Handover::REQUEST_SECTION);
 
-    if (!maybeSection) {
+    if (not maybeSection) {
         return Error{Error::INVALID_DATA, "missing .handover section"};
     }
 

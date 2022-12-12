@@ -11,7 +11,7 @@ CliResult entryPoint(CliArgs args) {
     auto dtbMem = try$(Sys::mmap().read().map(dtbFile));
     DeviceTree::Blob dtb{dtbMem.bytes()};
 
-    if (!dtb.valid()) {
+    if (not dtb.valid()) {
         return Error{Error::INVALID_DATA, "dtb is not a valid device tree"};
     }
 

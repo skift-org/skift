@@ -175,7 +175,7 @@ struct Button : public _Box<Button> {
     }
 
     void event(Events::Event &e) override {
-        if (_onPress && _mouseListener.listen(*this, e)) {
+        if (_onPress and _mouseListener.listen(*this, e)) {
             _onPress(*this);
         }
     };
@@ -540,7 +540,7 @@ struct Slider : public View<Slider> {
     void event(Events::Event &e) override {
         _mouseListener.listen(*this, e);
 
-        if (_mouseListener.isPress() && e.is<Events::MouseEvent>()) {
+        if (_mouseListener.isPress() and e.is<Events::MouseEvent>()) {
             auto p = _mouseListener.pos();
             _value = (p.x - THUMP_RADIUS) / ((double)bound().width - THUMP_RADIUS * 2);
             _value = clamp01(_value);

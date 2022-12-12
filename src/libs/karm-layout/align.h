@@ -85,10 +85,10 @@ struct Align {
                 inner = outer;
         }
 
-        if (_value & HSTRETCH && hint == Layout::Hint::MAX)
+        if (_value & HSTRETCH and hint == Layout::Hint::MAX)
             inner.x = outer.x;
 
-        if (_value & VSTRETCH && hint == Layout::Hint::MAX)
+        if (_value & VSTRETCH and hint == Layout::Hint::MAX)
             inner.y = outer.y;
 
         return inner;

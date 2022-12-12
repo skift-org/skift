@@ -19,7 +19,7 @@ extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable *st) {
 
     CliResult code = entryPoint(args);
 
-    if (!code) {
+    if (not code) {
         Error error = code.none();
         (void)Fmt::format(Sys::err(), "{}: {}\n", args.self(), error.msg());
         return 1;

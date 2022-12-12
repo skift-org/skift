@@ -26,7 +26,7 @@ struct Decimal {
         curr -= 1;
 
         double epsilon = 1e-6;
-        while (value >= epsilon || curr >= 0) {
+        while (value >= epsilon or curr >= 0) {
             res._value *= 10;
             int8_t digit = (uint64_t)(value * Math::pow(0.1, (double)curr)) % 10;
             res._value += digit;

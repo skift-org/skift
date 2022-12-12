@@ -32,8 +32,8 @@ struct Image {
     Image(Bytes slice) : _slice(slice) {}
 
     static bool isQoi(Bytes const &slice) {
-        return slice.len() >= 4 && slice[0] == 0x71 && slice[1] == 0x6F &&
-               slice[2] == 0x69 && slice[3] == 0x66;
+        return slice.len() >= 4 and slice[0] == 0x71 and slice[1] == 0x6F and
+               slice[2] == 0x69 and slice[3] == 0x66;
     }
 
     static Result<Image> load(Bytes slice) {
@@ -46,11 +46,11 @@ struct Image {
             return Error("invalid magic");
         }
 
-        if (!(image.channels() == 4 || image.channels() == 3)) {
+        if (!(image.channels() == 4 or image.channels() == 3)) {
             return Error("invalid number of channels");
         }
 
-        if (!(image.colorSpace() == 0 || image.colorSpace() == 1)) {
+        if (!(image.colorSpace() == 0 or image.colorSpace() == 1)) {
             return Error("invalid color space");
         }
 

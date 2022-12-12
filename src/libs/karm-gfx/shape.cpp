@@ -43,7 +43,7 @@ static void _createJoinMiter(Shape &shape, Math::Edgef curr, Math::Edgef next, M
     auto j = nextVec.cross(diffVec) / c;
     auto v = curr.end + (currVec * j);
 
-    if (j < 0 || (corner - v).lenSq() > mitterLimit * mitterLimit) {
+    if (j < 0 or (corner - v).lenSq() > mitterLimit * mitterLimit) {
         _createJoinBevel(shape, curr, next, trans);
         return;
     }
@@ -167,17 +167,17 @@ static void _createCapRound(Shape &shape, Cap cap, double width, Math::Trans2f t
             shape.add(trans.apply(outerCurr));
             shape.add(trans.apply(innerCurr));
 
-            if (i == 0 && !seg.close) {
+            if (i == 0 and not seg.close) {
                 auto center = (innerCurr.end + outerCurr.start) / 2;
                 _createCap(shape, stroke, {innerCurr.end, outerCurr.start, center}, trans);
             }
 
-            if (i + 1 == l && !seg.close) {
+            if (i + 1 == l and not seg.close) {
                 auto center = (outerCurr.end + innerCurr.start) / 2;
                 _createCap(shape, stroke, {outerCurr.end, innerCurr.start, center}, trans);
             }
 
-            if (seg.close || i + 1 != l) {
+            if (seg.close or i + 1 != l) {
                 Math::Edgef next = {
                     seg[(i + 1) % seg.len()],
                     seg[(i + 2) % seg.len()],

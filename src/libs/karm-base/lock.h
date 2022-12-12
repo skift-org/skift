@@ -1,7 +1,7 @@
 #pragma once
 
 #include <embed/base.h>
-#include <karm-meta/utils.h>
+#include <karm-meta/nocopy.h>
 
 #include "atomic.h"
 #include "string.h"
@@ -25,7 +25,7 @@ struct Lock {
         bool result = _lock.cmpxchg(false, true);
         memory_barier();
 
-        if (!result) {
+        if (not result) {
             Embed::leaveCritical();
         }
 

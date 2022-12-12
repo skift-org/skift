@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils.h"
+#include "decl.h"
 
 namespace Karm::Meta {
 
@@ -48,10 +48,10 @@ template <typename T>
 concept Unsigned = __is_unsigned(T);
 
 template <typename T>
-concept SignedIntegral = Integral<T> && Signed<T>;
+concept SignedIntegral = Integral<T> and Signed<T>;
 
 template <typename T>
-concept UnsignedIntegral = Integral<T> && Unsigned<T>;
+concept UnsignedIntegral = Integral<T> and Unsigned<T>;
 
 template <typename T>
 using UnderlyingType = __underlying_type(T);
@@ -63,13 +63,13 @@ concept Derive = __is_base_of(Base, Derived);
 
 template <typename T, typename... Args>
 concept Constructible = requires {
-    ::new T(declval<Args>()...);
-};
+                            ::new T(declval<Args>()...);
+                        };
 
 template <typename From, typename To>
 concept Convertible = requires {
-    declval<void (*)(To)>()(declval<From>());
-};
+                          declval<void (*)(To)>()(declval<From>());
+                      };
 
 template <typename T, typename U>
 inline constexpr bool _Same = false;

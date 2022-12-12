@@ -191,14 +191,14 @@ struct Value {
     }
 
     Opt<Value> get(Str key) const {
-        if (!isObject()) {
+        if (not isObject()) {
             return NONE;
         }
         return asObject().get(key);
     }
 
     Opt<Value> get(size_t index) const {
-        if (!isArray() || asArray().len() <= index) {
+        if (not isArray() or asArray().len() <= index) {
             return NONE;
         }
         return asArray()[index];

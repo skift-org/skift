@@ -27,7 +27,7 @@ struct [[nodiscard]] Opt {
 
     template <typename U = T>
     Opt(U &&value)
-        requires(!Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> && Meta::Constructible<T, U &&>)
+        requires(!Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::Constructible<T, U &&>)
         : _present(true) {
         _value.ctor(std::forward<U>(value));
     }

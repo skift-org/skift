@@ -27,7 +27,7 @@ struct _Rc {
     }
 
     _Rc *collect() {
-        if (_strong == 0 && _weak == 0) {
+        if (_strong == 0 and _weak == 0) {
             delete this;
             return nullptr;
         }
@@ -178,7 +178,7 @@ struct Strong {
             panic("Deferencing moved from Strong<T>");
         }
 
-        if (!is<U>()) {
+        if (not is<U>()) {
             panic("Unwrapping Strong<T> as Strong<U>");
         }
 
@@ -191,7 +191,7 @@ struct Strong {
             panic("Deferencing moved from Strong<T>");
         }
 
-        if (!is<U>()) {
+        if (not is<U>()) {
             panic("Unwrapping Strong<T> as Strong<U>");
         }
 
@@ -200,8 +200,8 @@ struct Strong {
 
     template <typename U>
     constexpr bool is() {
-        return Meta::Same<T, U> ||
-               Meta::Derive<T, U> ||
+        return Meta::Same<T, U> or
+               Meta::Derive<T, U> or
                _rc->id() == Meta::makeId<U>();
     }
 
@@ -215,7 +215,7 @@ struct Strong {
 
     template <typename U>
     constexpr Opt<Strong<U>> as() {
-        if (!is<U>()) {
+        if (not is<U>()) {
             return NONE;
         }
 
@@ -282,7 +282,7 @@ struct OptStrong {
         if (_rc == other._rc)
             return Ordr::EQUAL;
 
-        if (!_rc || !other._rc) {
+        if (!_rc or not other._rc) {
             return Ordr::LESS;
         }
 
@@ -319,7 +319,7 @@ struct OptStrong {
             panic("Deferencing none OptStrong<T>");
         }
 
-        if (!is<U>()) {
+        if (not is<U>()) {
             panic("Unwrapping Strong<T> as Strong<U>");
         }
 
@@ -332,7 +332,7 @@ struct OptStrong {
             panic("Deferencing none OptStrong<T>");
         }
 
-        if (!is<U>()) {
+        if (not is<U>()) {
             panic("Unwrapping Strong<T> as Strong<U>");
         }
 
@@ -341,8 +341,8 @@ struct OptStrong {
 
     template <typename U>
     constexpr bool is() {
-        return Meta::Same<T, U> ||
-               Meta::Derive<T, U> ||
+        return Meta::Same<T, U> or
+               Meta::Derive<T, U> or
                _rc->id() == Meta::makeId<U>();
     }
 
@@ -356,7 +356,7 @@ struct OptStrong {
 
     template <typename U>
     constexpr Opt<Strong<U>> as() {
-        if (!is<U>()) {
+        if (not is<U>()) {
             return NONE;
         }
 

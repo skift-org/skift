@@ -121,7 +121,7 @@ struct Gradient {
             auto iPos = _stops[i].pos;
             auto jPos = _stops[i + 1].pos;
 
-            if (pos >= iPos && pos <= jPos) {
+            if (pos >= iPos and pos <= jPos) {
                 return lerp(_stops[i], _stops[i + 1], pos);
             }
         }

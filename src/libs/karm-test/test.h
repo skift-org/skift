@@ -3,7 +3,7 @@
 #include <karm-base/loc.h>
 #include <karm-base/result.h>
 #include <karm-base/string.h>
-#include <karm-meta/utils.h>
+#include <karm-meta/nocopy.h>
 
 #include "_prelude.h"
 

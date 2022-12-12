@@ -12,7 +12,7 @@ void Driver::add(Test *test) {
 void Driver::runAll() {
     for (auto *test : _tests) {
         auto result = test->run(*this);
-        if (!result) {
+        if (not result) {
             Sys::errln("Test {} Failled", test->_name);
         }
     }

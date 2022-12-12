@@ -5,13 +5,13 @@ namespace Json {
 Result<Value> parse(Text::Scan &s);
 
 Result<String> parseStr(Text::Scan &s) {
-    if (!s.skip('"')) {
+    if (not s.skip('"')) {
         return Error{"expected '\"'"};
     }
 
     s.begin();
 
-    while (!s.ended()) {
+    while (not s.ended()) {
         if (s.curr() == '"') {
             auto str = s.end();
             s.next();
@@ -62,7 +62,7 @@ Result<String> parseStr(Text::Scan &s) {
 
 Result<Object> parseObject(Text::Scan &s) {
     Object m;
-    if (!s.skip('{')) {
+    if (not s.skip('{')) {
         return Error{"expected '{'"};
     }
 
@@ -74,7 +74,7 @@ Result<Object> parseObject(Text::Scan &s) {
         auto key = try$(parseStr(s));
 
         s.eat(Re::space());
-        if (!s.skip(':')) {
+        if (not s.skip(':')) {
             return Error{"expected ':'"};
         }
 
@@ -88,7 +88,7 @@ Result<Object> parseObject(Text::Scan &s) {
         if (s.skip('}')) {
             return m;
         }
-        if (!s.skip(',')) {
+        if (not s.skip(',')) {
             return Error{"expected ','"};
         }
     }
@@ -96,7 +96,7 @@ Result<Object> parseObject(Text::Scan &s) {
 
 Result<Array> parseArray(Text::Scan &s) {
     Array v;
-    if (!s.skip('[')) {
+    if (not s.skip('[')) {
         return Error{"expected '['"};
     }
 
@@ -114,7 +114,7 @@ Result<Array> parseArray(Text::Scan &s) {
         if (s.skip(']')) {
             return v;
         }
-        if (!s.skip(',')) {
+        if (not s.skip(',')) {
             return Error{"expected ','"};
         }
     }
@@ -137,7 +137,7 @@ Result<Value> parse(Text::Scan &s) {
         return Value{true};
     } else if (s.skip("false")) {
         return Value{false};
-    } else if (s.peek() == '-' || (s.peek() >= '0' && s.peek() <= '9')) {
+    } else if (s.peek() == '-' or (s.peek() >= '0' and s.peek() <= '9')) {
         return Value{try$(s.nextFloat())};
     }
 

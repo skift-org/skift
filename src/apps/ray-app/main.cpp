@@ -91,9 +91,9 @@ Opt<Hit> hit(Sphere const &sphere, Ray3f ray) {
 
     auto t = (-halfB - sqrt(d)) / a;
 
-    if (t < ray.tMin || t > ray.tMax) {
+    if (t < ray.tMin or t > ray.tMax) {
         t = (-halfB + sqrt(d)) / a;
-        if (t < ray.tMin || t > ray.tMax) {
+        if (t < ray.tMin or t > ray.tMax) {
             return NONE;
         }
     }
@@ -119,13 +119,13 @@ Opt<Hit> hit(Plane const &plane, Ray3f ray) {
 
     if (denom > 1e-6) {
         auto t = (plane.pos - ray.o).dot(plane.normal) / denom;
-        if (t >= ray.tMin && t <= ray.tMax) {
+        if (t >= ray.tMin and t <= ray.tMax) {
             auto p = ray.at(t);
             auto pp = p - plane.normal * plane.normal.dot(p - plane.pos);
             auto uv = (pp - plane.pos).xy / plane.size;
 
-            if (uv.x >= -1 && uv.x <= 1 &&
-                uv.y >= -1 && uv.y <= 1) {
+            if (uv.x >= -1 and uv.x <= 1 and
+                uv.y >= -1 and uv.y <= 1) {
                 return Hit{
                     ray.dir,
                     p,
@@ -258,9 +258,9 @@ Opt<Hit> hit(Scene &scene, Ray3f ray, Props props, int depth) {
     Opt<Hit> closest;
     for (auto &object : scene) {
         auto hit = ::hit(object, ray);
-        if (hit && (!closest || hit->t < closest->t)) {
+        if (hit and (not closest or hit->t < closest->t)) {
             bool invisible = (bool)(object.flags & ObjectFlags::INVISIBLE);
-            if (depth == props.bounces && invisible) {
+            if (depth == props.bounces and invisible) {
                 continue;
             }
             closest = hit;

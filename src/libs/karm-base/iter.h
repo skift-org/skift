@@ -17,7 +17,7 @@ struct Iter {
         auto n = [=]() mutable -> Opt<decltype(f(*Meta::declval<Item>()))> {
             auto v = next();
 
-            if (!v) {
+            if (not v) {
                 return NONE;
             }
 
@@ -32,7 +32,7 @@ struct Iter {
             auto v = next();
             index++;
 
-            if (!v) {
+            if (not v) {
                 return NONE;
             }
 
@@ -46,7 +46,7 @@ struct Iter {
         return Iter{[=]() mutable {
             while (true) {
                 auto v = next();
-                if (!next) {
+                if (not next) {
                     return NONE;
                 }
 
@@ -142,7 +142,7 @@ struct Iter {
         return Iter{[start = *this, curr = *this, i = 0, n]() mutable {
             auto v = curr.next();
 
-            if (!v && i < n) {
+            if (not v and i < n) {
                 curr = start;
                 i++;
                 v = curr.next();
@@ -170,7 +170,7 @@ struct Iter {
 
     constexpr bool all(auto f) {
         for (auto item = next(); item; item = next()) {
-            if (!f(*item)) {
+            if (not f(*item)) {
                 return false;
             }
         }
@@ -182,7 +182,7 @@ struct Iter {
         Item result = NONE;
 
         for (auto item = next(); item; item = next()) {
-            if (!result || Op::lt(*item, *result)) {
+            if (not result or Op::lt(*item, *result)) {
                 result = item;
             }
         }
@@ -194,7 +194,7 @@ struct Iter {
         Item result = NONE;
 
         for (auto item = next(); item; item = next()) {
-            if (!result || Op::gt(*item, *result)) {
+            if (not result or Op::gt(*item, *result)) {
                 result = item;
             }
         }
@@ -207,7 +207,7 @@ struct Iter {
         size_t count = 0;
 
         for (auto item = next(); item; item = next()) {
-            if (!result) {
+            if (not result) {
                 result = item;
             } else {
                 result = *result + *item;

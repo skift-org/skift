@@ -12,7 +12,7 @@ CliResult entryPoint(CliArgs args) {
     auto kernelMem = try$(Sys::mmap().read().map(kernelFile));
     Elf::Image kernelElf{kernelMem.bytes()};
 
-    if (!kernelElf.valid()) {
+    if (not kernelElf.valid()) {
         return Error{Error::INVALID_DATA, "kernel is not a valid ELF executable"};
     }
 

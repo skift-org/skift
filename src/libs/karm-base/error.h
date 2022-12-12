@@ -90,7 +90,7 @@ struct [[nodiscard]] Error {
     }
 
     constexpr char const *msg() {
-        if (_msg != nullptr && strlen(_msg) > 0) {
+        if (_msg != nullptr and strlen(_msg) > 0) {
             return _msg;
         }
 

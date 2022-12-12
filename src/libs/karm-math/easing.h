@@ -127,7 +127,7 @@ struct Easing {
     }
 
     static double exponentialInOut(double p) {
-        if (p == 0.0 || p == 1.0) {
+        if (p == 0.0 or p == 1.0) {
             return p;
         }
 

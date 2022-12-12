@@ -80,7 +80,7 @@ Ui::Child quickSetting(Media::Icons icon) {
     return Ui::center(Ui::state<bool>(false, [icon](auto state) {
         return Ui::button(
             [state](Ui::Node &) mutable {
-                state.update(!state.value());
+                state.update(not state.value());
             },
             (state.value()
                  ? Ui::ButtonStyle::primary().withForegroundColor(Gfx::WHITE)

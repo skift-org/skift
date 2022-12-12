@@ -11,7 +11,7 @@ inline size_t UPPER_HALF = 0xffff800000000000;
 namespace Utils {
 
 inline bool cstrEq(const char *str1, const char *str2) {
-    while (*str1 && *str2) {
+    while (*str1 and *str2) {
         if (*str1++ != *str2++)
             return false;
     }
@@ -138,7 +138,7 @@ struct Payload {
 
     Record const *fileByName(char const *name) const {
         for (auto const &r : *this) {
-            if (r.tag == Tag::FILE && Utils::cstrEq(stringAt(r.file.name), name)) {
+            if (r.tag == Tag::FILE and Utils::cstrEq(stringAt(r.file.name), name)) {
                 return &r;
             }
         }
@@ -174,7 +174,7 @@ struct Payload {
 
     Record find(size_t size) {
         for (auto &r : *this) {
-            if (r.tag == Tag::FREE && r.size >= size) {
+            if (r.tag == Tag::FREE and r.size >= size) {
                 return r;
             }
         }
@@ -188,7 +188,7 @@ struct Payload {
 
         for (auto const &r : *this) {
             if (r.tag == Tag::FREE) {
-                if (r.start < start || start == 0) {
+                if (r.start < start or start == 0) {
                     start = r.start;
                 }
                 if (r.end() > end) {

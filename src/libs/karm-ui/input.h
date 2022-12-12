@@ -46,7 +46,7 @@ struct MouseListener {
         MouseState state = _state;
 
         e.handle<Events::MouseEvent>([&](auto &m) {
-            if (!node.bound().contains(m.pos)) {
+            if (not node.bound().contains(m.pos)) {
                 state = IDLE;
                 return false;
             }

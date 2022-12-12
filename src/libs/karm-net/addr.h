@@ -33,7 +33,7 @@ union IpAddrV4 {
 
         for (auto i = 0; i < 4; ++i) {
             auto n = s.nextUint(10);
-            if (!n) {
+            if (not n) {
                 return Error{"invalid ip address"};
             }
 
@@ -44,7 +44,7 @@ union IpAddrV4 {
             addr.bytes[i] = n.unwrap();
 
             if (i < 3) {
-                if (!s.skip('.')) {
+                if (not s.skip('.')) {
                     return Error{"invalid IP address"};
                 }
             }
@@ -87,7 +87,7 @@ union IpAddrV6 {
             addr.words[i] = try$(s.nextUint(16));
 
             if (i < 7) {
-                if (!s.skip(':')) {
+                if (not s.skip(':')) {
                     return Error("invalid IP address");
                 }
             }
@@ -137,7 +137,7 @@ struct SocketAddr {
     static Result<SocketAddr> parse(Text::Scan &s) {
         auto addr = try$(IpAddr::parse(s));
 
-        if (!s.skip(':')) {
+        if (not s.skip(':')) {
             return Error("invalid socket address");
         }
 

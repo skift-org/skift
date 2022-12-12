@@ -14,7 +14,7 @@ struct DebugOut : public Io::TextWriter<> {
         // Some space for the null terminator.
         auto chunkSize = sizeOf(buf) - sizeof(uint16_t);
 
-        while (!isEmpty(bytes)) {
+        while (not isEmpty(bytes)) {
             size_t toCopy = alignDown(sizeOf(bytes), sizeof(uint16_t));
 
             // We need to copy the bytes into to a uint16_t aligned buffer.

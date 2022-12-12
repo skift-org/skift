@@ -32,7 +32,7 @@ struct Range {
     }
 
     constexpr bool any() const {
-        return !empty();
+        return not empty();
     }
 
     constexpr bool valid() const {
@@ -40,19 +40,19 @@ struct Range {
     }
 
     constexpr bool contains(T value) const {
-        return start <= value && value < end();
+        return start <= value and value < end();
     }
 
     constexpr bool contains(Range other) const {
-        return start <= other.start && other.end() <= end();
+        return start <= other.start and other.end() <= end();
     }
 
     constexpr bool contigous(Range other) const {
-        return end() == other.start || start == other.end();
+        return end() == other.start or start == other.end();
     }
 
     constexpr bool overlaps(Range other) const {
-        return start < other.end() && other.start < end();
+        return start < other.end() and other.start < end();
     }
 
     constexpr Range merge(Range other) const {
@@ -62,7 +62,7 @@ struct Range {
     }
 
     constexpr Range halfUnder(Range other) {
-        if (overlaps(other) && start < other.start) {
+        if (overlaps(other) and start < other.start) {
             return {start, other.start - start};
         }
 
@@ -70,7 +70,7 @@ struct Range {
     }
 
     constexpr Range halfOver(Range other) {
-        if (overlaps(other) && other.end() < end()) {
+        if (overlaps(other) and other.end() < end()) {
             return {other.end(), end() - other.end()};
         }
 
@@ -95,7 +95,7 @@ struct Range {
     }
 
     constexpr Ordr cmp(Range<T> other) const {
-        if (start == other.start && size == other.size)
+        if (start == other.start and size == other.size)
             return Ordr::EQUAL;
 
         if (start < other.start)
@@ -106,10 +106,10 @@ struct Range {
     }
 
     constexpr Error ensureAligned(T alignment) const {
-        if (!isAlign(start, alignment))
+        if (not isAlign(start, alignment))
             return {Error::INVALID_DATA, "start is not aligned"};
 
-        if (!isAlign(size, alignment))
+        if (not isAlign(size, alignment))
             return {Error::INVALID_DATA, "size is not aligned"};
 
         return OK;

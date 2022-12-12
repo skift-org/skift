@@ -6,7 +6,7 @@ namespace Karm::Re {
 
 inline auto single(auto... c) {
     return [=](auto &scan) {
-        if (((scan.curr() == (Rune)c) || ...)) {
+        if (((scan.curr() == (Rune)c) or ...)) {
             scan.next();
             return true;
         }
@@ -23,25 +23,25 @@ inline auto word(Str word) {
 
 inline auto range(Rune start, Rune end) {
     return [=](auto &scan) {
-        return scan.curr() >= start && scan.curr() <= end;
+        return scan.curr() >= start and scan.curr() <= end;
     };
 }
 
 inline auto either(auto... exprs) {
     return [=](auto &scan) {
-        return (exprs(scan) || ...);
+        return (exprs(scan) or ...);
     };
 }
 
 inline auto chain(auto... exprs) {
     return [=](auto &scan) {
-        return (exprs(scan) && ...);
+        return (exprs(scan) and ...);
     };
 }
 
 inline auto negate(auto expr) {
     return [=](auto &scan) {
-        return !expr(scan);
+        return not expr(scan);
     };
 }
 
@@ -64,7 +64,7 @@ inline auto zeroOrMore(auto expr) {
 
 inline auto oneOrMore(auto expr) {
     return [=](auto &scan) {
-        if (!expr(scan))
+        if (not expr(scan))
             return false;
         while (expr(scan))
             ;

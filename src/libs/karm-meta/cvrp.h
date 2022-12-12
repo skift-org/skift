@@ -82,7 +82,7 @@ template <typename T>
 concept RvalueRef = _RvalueRef<T>;
 
 template <typename T>
-concept Ref = LvalueRef<T> || RvalueRef<T>;
+concept Ref = LvalueRef<T> or RvalueRef<T>;
 
 template <typename T>
 struct _RemoveRef {

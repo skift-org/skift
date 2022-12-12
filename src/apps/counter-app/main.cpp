@@ -38,7 +38,7 @@ Ui::Child app() {
             Media::Icons::PLUS_THICK);
 
         auto resetBtn = Ui::button(
-            Model::bindIf<ResetAction>(!state.initial),
+            Model::bindIf<ResetAction>(not state.initial),
             Ui::ButtonStyle::subtle().withRadius(999),
             Media::Icons::REFRESH, "RESET");
 

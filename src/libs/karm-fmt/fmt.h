@@ -203,7 +203,7 @@ inline Result<size_t> _format(Io::_TextWriter &writer, Str format, _Args &args) 
     size_t written = 0;
     size_t index = 0;
 
-    while (!scan.ended()) {
+    while (not scan.ended()) {
         Rune c = scan.next();
 
         if (c == '{') {

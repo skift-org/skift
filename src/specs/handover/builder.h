@@ -63,8 +63,8 @@ struct Builder {
             auto other = _records[i];
 
             // Merge with previous
-            if (other.tag == record.tag &&
-                other.end() == record.start &&
+            if (other.tag == record.tag and
+                other.end() == record.start and
                 shouldMerge(record.tag)) {
                 // Debug::ldebug("handover: merge {} with {}", record, other);
                 _records.removeAt(i);
@@ -74,8 +74,8 @@ struct Builder {
             }
 
             // Merge with next
-            if (other.tag == record.tag &&
-                other.start == record.end() &&
+            if (other.tag == record.tag and
+                other.start == record.end() and
                 shouldMerge(record.tag)) {
                 // Debug::ldebug("handover: merge {} with {}", record, other);
 
@@ -86,7 +86,7 @@ struct Builder {
             }
 
             if (colidesWith(record, other)) {
-                if (shouldMerge(record.tag) && !shouldMerge(other.tag)) {
+                if (shouldMerge(record.tag) and not shouldMerge(other.tag)) {
                     // Debug::ldebug("handover: splitting record {} with {}", record, other);
 
                     _records.removeAt(i);
@@ -96,7 +96,7 @@ struct Builder {
                     add(lower);
                     add(upper);
                     return;
-                } else if (!shouldMerge(record.tag) && shouldMerge(other.tag)) {
+                } else if (not shouldMerge(record.tag) and shouldMerge(other.tag)) {
                     // Debug::ldebug("handover: splitting record {} with {}", other, record);
 
                     _records.removeAt(i);

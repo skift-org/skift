@@ -2,7 +2,7 @@
 
 #include <karm-base/rc.h>
 #include <karm-io/traits.h>
-#include <karm-meta/utils.h>
+#include <karm-meta/nocopy.h>
 
 #include "fd.h"
 #include "path.h"

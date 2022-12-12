@@ -40,7 +40,7 @@ struct Dock {
     }
 
     Orien orien() const {
-        if (_dock == NONE || _dock == FILL)
+        if (_dock == NONE or _dock == FILL)
             return Orien::NONE;
         else
             return flow().orien();

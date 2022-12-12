@@ -63,7 +63,7 @@ Error parseGop(Handover::Builder &builder) {
 
 Error parseAcpi(Handover::Builder &builder) {
     auto *acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI_TABLE_UUID);
-    if (!acpiTable)
+    if (not acpiTable)
         acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI2_TABLE_UUID);
 
     if (acpiTable) {

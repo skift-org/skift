@@ -95,7 +95,7 @@ struct Hsv {
 
     Ordr cmp(Hsv const &other) const {
         return hue == other.hue &&
-                       saturation == other.saturation && value == other.value
+                       saturation == other.saturation and value == other.value
                    ? Ordr::EQUAL
                    : Ordr::LESS;
     }

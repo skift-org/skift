@@ -69,7 +69,7 @@ union Edge {
     }
 
     constexpr bool hasNan() const {
-        return start.hasNan() || end.hasNan();
+        return start.hasNan() or end.hasNan();
     }
 };
 

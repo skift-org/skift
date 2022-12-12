@@ -15,11 +15,11 @@ using Rune = uint32_t;
 
 template <typename T>
 concept StaticEncoding = requires(T t, Rune &r, typename T::Unit u, Cursor<typename T::Unit> &c, MutCursor<typename T::Unit> &m) {
-    { T::unitLen(u) } -> Meta::Same<size_t>;
-    { T::runeLen(r) } -> Meta::Same<size_t>;
-    { T::decodeUnit(r, c) } -> Meta::Same<bool>;
-    { T::encodeUnit(Rune{}, m) } -> Meta::Same<bool>;
-};
+                             { T::unitLen(u) } -> Meta::Same<size_t>;
+                             { T::runeLen(r) } -> Meta::Same<size_t>;
+                             { T::decodeUnit(r, c) } -> Meta::Same<bool>;
+                             { T::encodeUnit(Rune{}, m) } -> Meta::Same<bool>;
+                         };
 
 template <typename U, size_t N>
 struct _Multiple {
@@ -70,14 +70,14 @@ struct _Single {
 
 template <typename T, typename U>
 concept EncodeOutput = requires(T t, U u) {
-    {t.put(u)};
-};
+                           { t.put(u) };
+                       };
 
 template <typename T, typename U>
 concept DecodeInput = requires(T t, U u) {
-    {t.next()};
-    {t.rem()};
-};
+                          { t.next() };
+                          { t.rem() };
+                      };
 
 /* --- Utf8 ----------------------------------------------------------------- */
 
@@ -176,7 +176,7 @@ struct Utf16 {
     using One = _Multiple<Unit, 2>;
 
     static constexpr size_t unitLen(Unit first) {
-        if (first >= 0xd800 && first <= 0xdbff)
+        if (first >= 0xd800 and first <= 0xdbff)
             return 2;
         else
             return 1;
@@ -197,14 +197,14 @@ struct Utf16 {
             return false;
         }
 
-        if (first >= 0xd800 && first <= 0xdbff) {
+        if (first >= 0xd800 and first <= 0xdbff) {
             if (in.rem() < 2) {
                 return false;
             }
 
             Unit second = in.next();
 
-            if (second < 0xdc00 || second > 0xdfff) {
+            if (second < 0xdc00 or second > 0xdfff) {
                 return false;
             }
 

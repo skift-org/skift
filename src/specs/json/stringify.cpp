@@ -26,7 +26,7 @@ Error stringify(Text::Emit &emit, Value const &v) {
                 emit('{');
                 bool first = true;
                 for (auto const &kv : m.iter()) {
-                    if (!first) {
+                    if (not first) {
                         emit(',');
                     }
                     first = false;

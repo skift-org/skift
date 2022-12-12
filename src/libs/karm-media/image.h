@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-gfx/buffer.h>
+#include <karm-meta/nocopy.h>
 
 namespace Karm::Media {
 

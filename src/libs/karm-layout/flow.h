@@ -29,7 +29,7 @@ struct Flow {
     Flow(_Flow flow) : _flow(flow) {}
 
     Orien orien() const {
-        return (_flow == LEFT_TO_RIGHT || _flow == RIGHT_TO_LEFT)
+        return (_flow == LEFT_TO_RIGHT or _flow == RIGHT_TO_LEFT)
                    ? Orien::HORIZONTAL
                    : Orien::VERTICAL;
     }

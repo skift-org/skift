@@ -113,13 +113,13 @@ union Trans2 {
     }
 
     constexpr bool isIdentity() const {
-        return xx == 1 && xy == 0 &&
-               yx == 0 && yy == 1 &&
-               ox == 0 && oy == 0;
+        return xx == 1 and xy == 0 and
+               yx == 0 and yy == 1 and
+               ox == 0 and oy == 0;
     }
 
     constexpr bool hasNan() const {
-        return x.hasNan() || y.hasNan() || o.hasNan();
+        return x.hasNan() or y.hasNan() or o.hasNan();
     }
 };
 

@@ -194,7 +194,7 @@ struct SdlHost :
     void pump() override {
         SDL_Event e{};
 
-        while (SDL_PollEvent(&e) != 0 && alive()) {
+        while (SDL_PollEvent(&e) != 0 and alive()) {
             translate(e);
         }
     }
@@ -235,7 +235,7 @@ Result<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
         size.height,
         SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS | SDL_WINDOW_UTILITY);
 
-    if (!window) {
+    if (not window) {
         return Error{SDL_GetError()};
     }
 

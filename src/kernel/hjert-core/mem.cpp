@@ -29,7 +29,7 @@ struct Pmm : public Hal::Pmm {
     }
 
     Error used(Hal::PmmRange range, Hal::PmmFlags) override {
-        if (!range.overlaps(_usable)) {
+        if (not range.overlaps(_usable)) {
             return OK;
         }
 
@@ -40,7 +40,7 @@ struct Pmm : public Hal::Pmm {
     }
 
     Error free(Hal::PmmRange range) override {
-        if (!range.overlaps(_usable)) {
+        if (not range.overlaps(_usable)) {
             return Error{"range is not in usable memory"};
         }
 

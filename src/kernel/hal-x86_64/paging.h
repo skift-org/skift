@@ -66,7 +66,7 @@ struct [[gnu::packed]] Pml {
     Opt<size_t> virt2phys(size_t virt) const {
         Entry page = pages[virt2index(virt)];
 
-        if (!page.present()) {
+        if (not page.present()) {
             return NONE;
         }
 

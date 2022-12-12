@@ -106,7 +106,7 @@ struct Cmap : public BChunk {
                 if (r > endCode)
                     continue;
 
-                if (r >= startCode && r <= endCode) {
+                if (r >= startCode and r <= endCode) {
                     return (r - startCode) + glyphOffset;
                 }
             }
@@ -227,7 +227,7 @@ struct Glyf : public BChunk {
         uint8_t flagsRepeat = 0;
 
         for (size_t i = 0; i < nPoints; i++) {
-            if (!flagsRepeat) {
+            if (not flagsRepeat) {
                 flags = s.nextBeUint8();
                 if (flags & REPEAT) {
                     flagsRepeat = s.nextBeUint8();
@@ -256,7 +256,7 @@ struct Glyf : public BChunk {
             bool wasCp = false;
 
             for (size_t i = start; i <= end; i++) {
-                if (!flagsRepeat) {
+                if (not flagsRepeat) {
                     flags = flagsScan.nextBeUint8();
                     if (flags & REPEAT) {
                         flagsRepeat = flagsScan.nextBeUint8();
@@ -433,7 +433,7 @@ struct Font {
 
         for (auto table : font._cmap.iterTables()) {
             for (auto &knowCmap : knowCmaps) {
-                if (knowCmap.platformId == table.platformId && knowCmap.encodingId == table.encodingId && knowCmap.type == table.type) {
+                if (knowCmap.platformId == table.platformId and knowCmap.encodingId == table.encodingId and knowCmap.type == table.type) {
                     if (knowCmap.score > bestScore) {
                         bestCmap = table;
                         bestScore = knowCmap.score;
@@ -442,7 +442,7 @@ struct Font {
             }
         }
 
-        if (!bestCmap) {
+        if (not bestCmap) {
             Debug::lerror("No suitable cmap table found");
             return Error("no cmap table");
         }
@@ -453,7 +453,7 @@ struct Font {
     static Result<Font> load(Bytes slice) {
         Font font{slice};
 
-        if (font.version() != 0x00010000 &&
+        if (font.version() != 0x00010000 and
             font.version() != 0x4F54544F) {
             Debug::lerror("Version {x} is not supported", (uint64_t)font.version());
             return Error{"invalid version"};

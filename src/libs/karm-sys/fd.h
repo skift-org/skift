@@ -2,8 +2,8 @@
 
 #include <karm-base/rc.h>
 #include <karm-io/types.h>
+#include <karm-meta/nocopy.h>
 #include <karm-meta/traits.h>
-#include <karm-meta/utils.h>
 
 #include "path.h"
 
@@ -47,7 +47,7 @@ struct DummyFd : public Fd {
 
 template <typename T>
 concept AsFd = requires(T t) {
-    { t.asFd() } -> Meta::Same<Strong<Fd>>;
-};
+                   { t.asFd() } -> Meta::Same<Strong<Fd>>;
+               };
 
 } // namespace Karm::Sys

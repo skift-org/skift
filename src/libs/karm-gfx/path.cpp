@@ -21,7 +21,7 @@ void Path::_flattenLineTo(Math::Vec2f p) {
         return;
     }
 
-    if (last(_segs).start != last(_segs).end &&
+    if (last(_segs).start != last(_segs).end and
         Math::epsilonEq(_lastP, p, 0.001)) {
         return;
     }
@@ -74,7 +74,7 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Fl
     double dy = y1 - y2;
     double d = sqrtf(dx * dx + dy * dy);
 
-    if (d < 1e-6f || radius.x < 1e-6f || radius.y < 1e-6f) {
+    if (d < 1e-6f or radius.x < 1e-6f or radius.y < 1e-6f) {
         // The arc degenerates to a line
         _flattenLineTo(point);
         return;
@@ -134,9 +134,9 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Fl
     double a1 = Math::Vec2f(1, 0).angleWith(u); // Initial angle
     double da = u.angleWith(v);
 
-    if (!fs && da > 0) {
+    if (not fs and da > 0) {
         da -= 2 * M_PI;
-    } else if (fs && da < 0) {
+    } else if (fs and da < 0) {
         da += 2 * M_PI;
     }
 
@@ -179,9 +179,9 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Fl
 /* --- Operations ------------------------------------------------------- */
 
 void Path::evalOp(Op op) {
-    if (_segs.len() > 0 &&
-        last(_segs).close &&
-        op.code != MOVE_TO &&
+    if (_segs.len() > 0 and
+        last(_segs).close and
+        op.code != MOVE_TO and
         op.code != CLEAR) {
         Debug::lerror("can't evalOp on closed path");
         return;
@@ -452,7 +452,7 @@ bool Path::evalSvg(Str svg) {
 
             opcode = opcode == 'M' ? 'L' : opcode;
             opcode = opcode == 'm' ? 'l' : opcode;
-        } while (!scan.ended() && !isalpha(scan.curr()));
+        } while (not scan.ended() and not isalpha(scan.curr()));
     }
 
     return true;

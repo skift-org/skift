@@ -9,18 +9,18 @@ using Byte = uint8_t;
 
 template <typename T, typename U = typename T::Inner>
 concept Sliceable = requires(T const &t) {
-    typename T::Inner;
-    { t.len() } -> Meta::Same<size_t>;
-    { t.buf() } -> Meta::Same<U const *>;
-    { t[0uz] } -> Meta::Same<U const &>;
-};
+                        typename T::Inner;
+                        { t.len() } -> Meta::Same<size_t>;
+                        { t.buf() } -> Meta::Same<U const *>;
+                        { t[0uz] } -> Meta::Same<U const &>;
+                    };
 
 template <typename T, typename U = typename T::Inner>
-concept MutSliceable = Sliceable<T, U> && requires(T &t) {
-    { t.len() } -> Meta::Same<size_t>;
-    { t.buf() } -> Meta::Same<U *>;
-    { t[0uz] } -> Meta::Same<U &>;
-};
+concept MutSliceable = Sliceable<T, U> and requires(T &t) {
+                                               { t.len() } -> Meta::Same<size_t>;
+                                               { t.buf() } -> Meta::Same<U *>;
+                                               { t[0uz] } -> Meta::Same<U &>;
+                                           };
 
 template <typename T>
 struct Slice {
@@ -37,7 +37,7 @@ struct Slice {
     constexpr Slice(T const *begin, T const *end)
         : Slice(begin, end - begin) {}
 
-    constexpr Slice(Sliceable<T>  auto const &other)
+    constexpr Slice(Sliceable<T> auto const &other)
         : Slice(other.buf(), other.len()) {}
 
     constexpr T const &operator[](size_t i) const {

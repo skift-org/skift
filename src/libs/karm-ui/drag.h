@@ -64,7 +64,7 @@ struct Dismisable :
 
     void event(Events::Event &e) override {
         _drag.event(*this, e);
-        if (_dismissed && _drag.reached()) {
+        if (_dismissed and _drag.reached()) {
             _onDismis(*this);
         }
         Ui::ProxyNode<Dismisable>::event(e);
@@ -132,7 +132,7 @@ struct DragRegion : public ProxyNode<DragRegion> {
         }
 
         e.handle<Events::MouseEvent>([&](auto &m) {
-            if (!bound().contains(m.pos) && !_grabbed) {
+            if (not bound().contains(m.pos) and !_grabbed) {
                 return false;
             }
 

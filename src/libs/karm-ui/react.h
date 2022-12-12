@@ -155,7 +155,7 @@ struct _State : public React<_State<T>> {
 
         Func<void(Node &)> bindToggle() {
             return [*this](Node &) mutable {
-                update(!value());
+                update(not value());
             };
         }
 

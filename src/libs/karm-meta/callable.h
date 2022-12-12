@@ -3,7 +3,7 @@
 #include <karm-base/std.h>
 
 #include "cvrp.h"
-#include "utils.h"
+#include "decl.h"
 
 namespace Karm::Meta {
 

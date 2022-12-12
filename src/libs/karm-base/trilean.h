@@ -41,23 +41,23 @@ struct Trilean {
     }
 
     constexpr Trilean operator&&(Trilean const &other) const {
-        if (_value == _FALSE || other._value == _FALSE) {
+        if (_value == _FALSE or other._value == _FALSE) {
             return _FALSE;
         }
 
-        if (_value == _TRUE && other._value == _TRUE) {
+        if (_value == _TRUE and other._value == _TRUE) {
             return _TRUE;
         }
 
         return _NONE;
     }
 
-    constexpr Trilean operator||(Trilean const &other) const {
-        if (_value == _TRUE || other._value == _TRUE) {
+    constexpr Trilean operatoror(Trilean const &other) const {
+        if (_value == _TRUE or other._value == _TRUE) {
             return _TRUE;
         }
 
-        if (_value == _FALSE && other._value == _FALSE) {
+        if (_value == _FALSE and other._value == _FALSE) {
             return _FALSE;
         }
 

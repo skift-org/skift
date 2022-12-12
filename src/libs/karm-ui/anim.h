@@ -132,7 +132,7 @@ struct Anim2 {
     }
 
     bool reached() const {
-        return _x.reached() && _y.reached();
+        return _x.reached() and _y.reached();
     }
 
     T valueX() const {

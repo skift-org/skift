@@ -39,7 +39,7 @@ struct Atomic {
         }
     */
     bool cmpxchg(T expected, T desired, MemOrder order = MemOrder::SEQ_CST) {
-        if (order == ACQ_REL || order == RELAXED)
+        if (order == ACQ_REL or order == RELAXED)
             return __atomic_compare_exchange_n(&_val, &expected, desired, false, RELAXED, ACQUIRE);
 
         return __atomic_compare_exchange_n(&_val, &expected, desired, false, order, order);

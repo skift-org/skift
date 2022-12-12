@@ -60,7 +60,7 @@ struct LeafNode : public Node {
     virtual void reconcile(Crtp &) {}
 
     Opt<Child> reconcile(Other o) override {
-        if (!o.is<Crtp>()) {
+        if (not o.is<Crtp>()) {
             return o;
         }
         reconcile(o.unwrap<Crtp>());
@@ -68,7 +68,7 @@ struct LeafNode : public Node {
     }
 
     void bubble(Events::Event &e) override {
-        if (_parent && !e.accepted)
+        if (_parent and not e.accepted)
             _parent->bubble(e);
     }
 
@@ -141,7 +141,7 @@ struct GroupNode : public LeafNode<Crtp> {
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         for (auto &child : children()) {
-            if (!child->bound().colide(r))
+            if (not child->bound().colide(r))
                 continue;
 
             child->paint(g, r);

@@ -112,12 +112,12 @@ struct Com : public Io::TextWriter<Utf8> {
     }
 
     void waitWrite() {
-        while (!canWrite()) {
+        while (not canWrite()) {
         }
     }
 
     void waitRead() {
-        while (!canRead()) {
+        while (not canRead()) {
         }
     }
 

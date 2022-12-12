@@ -499,7 +499,7 @@ struct FlowLayout : public GroupNode<FlowLayout> {
         }
 
         w += _style.gaps * (max(1uz, children().len()) - 1);
-        if (grow && hint == Layout::Hint::MAX) {
+        if (grow and hint == Layout::Hint::MAX) {
             w = max(_style.flow.getX(s), w);
         }
 
@@ -698,11 +698,11 @@ struct GridLayout : public GroupNode<GridLayout> {
             }
         }
 
-        if (rowGrow && hint == Layout::Hint::MAX) {
+        if (rowGrow and hint == Layout::Hint::MAX) {
             row = max(_style.flow.getY(s), row);
         }
 
-        if (columnGrow && hint == Layout::Hint::MAX) {
+        if (columnGrow and hint == Layout::Hint::MAX) {
             column = max(_style.flow.getX(s), column);
         }
 

@@ -40,7 +40,7 @@ static T portIn(uint16_t addr) {
                      : "=a"(value)
                      : "d"(addr));
     } else {
-        static_assert(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4);
+        static_assert(sizeof(T) == 1 or sizeof(T) == 2 or sizeof(T) == 4);
     }
     return value;
 }
@@ -64,7 +64,7 @@ static void portOut(uint16_t addr, T value) {
                      :
                      : "a"(value), "d"(addr));
     } else {
-        static_assert(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4);
+        static_assert(sizeof(T) == 1 or sizeof(T) == 2 or sizeof(T) == 4);
     }
 }
 

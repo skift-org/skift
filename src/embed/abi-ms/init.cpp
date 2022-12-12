@@ -31,7 +31,7 @@ static int _initterm_e(_PIFV *pfbegin, _PIFV *pfend) {
     // the end is encountered.  Do not skip the first entry.  The initial
     // value of pfbegin points to the first valid entry.  Do not try to
     // execute what pfend points to.  Only entries before pfend are valid.
-    while (pfbegin < pfend && ret == 0) {
+    while (pfbegin < pfend and ret == 0) {
         // if current table entry is non-NULL, call thru it.
         if (*pfbegin != 0)
             ret = (**pfbegin)();

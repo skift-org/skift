@@ -31,7 +31,7 @@ struct Cursor {
     }
 
     T curr() const {
-        if (!ended()) {
+        if (not ended()) {
             panic("curr() called on ended cursor");
         }
         return *_begin;

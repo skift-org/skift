@@ -17,13 +17,13 @@ namespace Karm {
 
 template <typename T>
 concept Tryable = requires(T t) {
-    {!t};
-    {t.none()};
-    {t.unwrap()};
-};
+                      { not t };
+                      { t.none() };
+                      { t.unwrap() };
+                  };
 
 auto tryOr(Tryable auto opt, Meta::RemoveRef<decltype(opt.unwrap())> defaultValue) -> Meta::RemoveRef<decltype(opt.unwrap())> {
-    if (!opt) {
+    if (not opt) {
         return defaultValue;
     }
 
@@ -31,7 +31,7 @@ auto tryOr(Tryable auto opt, Meta::RemoveRef<decltype(opt.unwrap())> defaultValu
 }
 
 auto tryOrElse(Tryable auto opt, auto defaultValue) -> decltype(opt.unwrap()) {
-    if (!opt) {
+    if (not opt) {
         return defaultValue();
     }
 

@@ -3,7 +3,7 @@
 namespace Calculator {
 
 State doOperator(State s, Operator op) {
-    if (!s.hasRhs) {
+    if (not s.hasRhs) {
         s.op = op;
         return s;
     }
@@ -68,10 +68,10 @@ State doOperator(State s, Operator op) {
 State reduce(State s, Actions action) {
     return action.visit(Visitor{
         [&](Operator op) {
-            if (!isUnary(s.op))
+            if (not isUnary(s.op))
                 s = doOperator(s, s.op);
             if (isUnary(op)) {
-                if ((!isUnary(s.op) && s.op != Operator::NONE))
+                if ((not isUnary(s.op) and s.op != Operator::NONE))
                     s.rhs = s.lhs;
                 s = doOperator(s, op);
             }
@@ -122,7 +122,7 @@ State reduce(State s, Actions action) {
             return s;
         },
         [&](MemAddAction) {
-            if (!s.hasMem) {
+            if (not s.hasMem) {
                 s = reduce(s, MemStoreAction{});
             } else {
                 s.mem += s.hasRhs ? s.rhs : s.lhs;
@@ -130,7 +130,7 @@ State reduce(State s, Actions action) {
             return s;
         },
         [&](MemSubAction) {
-            if (!s.hasMem) {
+            if (not s.hasMem) {
                 s = reduce(s, MemStoreAction{});
                 s.mem = -s.mem;
             } else {

@@ -30,7 +30,7 @@ struct Ellipse {
     }
 
     bool hasNan() {
-        return center.hasNan() || radius.hasNan();
+        return center.hasNan() or radius.hasNan();
     }
 };
 

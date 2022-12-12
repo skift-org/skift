@@ -31,7 +31,7 @@ struct Path {
     }
 
     bool isRelative() const {
-        return !isAbsolute();
+        return not isAbsolute();
     }
 
     Path parent() const {

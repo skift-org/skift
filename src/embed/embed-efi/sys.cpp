@@ -23,7 +23,7 @@ struct ConOut : public Sys::Fd {
         // Some space for the null terminator.
         auto chunkSize = sizeOf(buf) - sizeof(uint16_t);
 
-        while (!isEmpty(bytes)) {
+        while (not isEmpty(bytes)) {
             size_t toCopy = alignDown(sizeOf(bytes), sizeof(uint16_t));
 
             // We need to copy the bytes into to a uint16_t aligned buffer.
@@ -134,12 +134,12 @@ Result<Strong<Sys::Fd>> createErr() {
 
 Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
     static Efi::SimpleFileSystemProtocol *fileSystem = nullptr;
-    if (!fileSystem) {
+    if (not fileSystem) {
         fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(Efi::li()->deviceHandle));
     }
 
     static Efi::FileProtocol *rootDir = nullptr;
-    if (!rootDir) {
+    if (not rootDir) {
         try$(fileSystem->openVolume(fileSystem, &rootDir));
     }
 

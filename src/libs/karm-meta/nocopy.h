@@ -16,10 +16,4 @@ struct Static {
     Static &operator=(Static &&) = delete;
 };
 
-template <typename T>
-T declval();
-
-template <typename T>
-T &declref();
-
 } // namespace Karm::Meta

@@ -186,10 +186,10 @@ struct Image {
         : _buf(cursor) {}
 
     bool valid() const {
-        return sizeOf(_buf) >= sizeof(ImageHeader) &&
-               _buf[0] == '\x7f' &&
-               _buf[1] == 'E' &&
-               _buf[2] == 'L' &&
+        return sizeOf(_buf) >= sizeof(ImageHeader) and
+               _buf[0] == '\x7f' and
+               _buf[1] == 'E' and
+               _buf[2] == 'L' and
                _buf[3] == 'F';
     }
 

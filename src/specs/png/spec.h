@@ -69,7 +69,7 @@ struct Image {
     }
 
     static bool isPng(Bytes slice) {
-        return slice.len() >= 8 && Op::eq(sub(slice, 0, 8), bytes(SIG));
+        return slice.len() >= 8 and Op::eq(sub(slice, 0, 8), bytes(SIG));
     }
 
     static Result<Image> load(Bytes slice) {

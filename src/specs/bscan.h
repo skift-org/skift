@@ -132,7 +132,7 @@ struct BScan {
 
     Str nextCStr() {
         size_t n = 0;
-        while (n < rem() && _cursor.buf()[n] != '\0') {
+        while (n < rem() and _cursor.buf()[n] != '\0') {
             n++;
         }
         return nextStr(n);

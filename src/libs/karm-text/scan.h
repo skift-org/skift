@@ -171,16 +171,16 @@ struct _Scan {
         bool isNum = false;
         uint64_t result = 0;
 
-        while (!ended()) {
+        while (not ended()) {
             auto maybeDigit = nextDigit(base);
-            if (!maybeDigit) {
+            if (not maybeDigit) {
                 break;
             }
             isNum = true;
             result = result * base + maybeDigit.unwrap();
         }
 
-        if (!isNum)
+        if (not isNum)
             return NONE;
 
         return result;
@@ -191,22 +191,22 @@ struct _Scan {
         bool isNum = false;
         int64_t result = 0;
 
-        if (peek(0) == '-' && _parseDigit(peek(1), base)) {
+        if (peek(0) == '-' and _parseDigit(peek(1), base)) {
             isNeg = true;
             isNum = true;
             next();
         }
 
-        while (!ended()) {
+        while (not ended()) {
             auto maybeDigit = nextDigit(base);
-            if (!maybeDigit) {
+            if (not maybeDigit) {
                 break;
             }
             isNum = true;
             result = result * base + maybeDigit.unwrap();
         }
 
-        if (!isNum)
+        if (not isNum)
             return NONE;
 
         if (isNeg)
@@ -222,15 +222,15 @@ struct _Scan {
         double fpart = 0.0;
         int64_t exp = 0;
 
-        if (peek(0) != '.' || !_parseDigit(peek(1), base)) {
+        if (peek(0) != '.' or !_parseDigit(peek(1), base)) {
             ipart = try$(nextInt(base));
         }
 
         if (skip('.')) {
             double multiplier = (1.0 / base);
-            while (!ended()) {
+            while (not ended()) {
                 auto maybeDigit = nextDigit(base);
-                if (!maybeDigit) {
+                if (not maybeDigit) {
                     break;
                 }
                 fpart += maybeDigit.unwrap() * multiplier;
@@ -238,7 +238,7 @@ struct _Scan {
             }
         }
 
-        if (skip('e') || skip('E')) {
+        if (skip('e') or skip('E')) {
             auto maybeExp = nextInt(base);
             if (maybeExp) {
                 exp = maybeExp.unwrap();

@@ -56,7 +56,7 @@ struct Bits {
             if (get(i)) {
                 range = {};
             } else {
-                if (range.size == 0 || upper) {
+                if (range.size == 0 or upper) {
                     range.start = i;
                 }
 

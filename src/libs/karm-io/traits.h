@@ -10,35 +10,35 @@ namespace Karm::Io {
 
 template <typename T>
 concept Writable = requires(T &writer, Bytes bytes) {
-    { writer.write(bytes) } -> Meta::Same<Result<size_t>>;
-};
+                       { writer.write(bytes) } -> Meta::Same<Result<size_t>>;
+                   };
 
 template <typename T>
 concept Readable = requires(T &reader, MutBytes bytes) {
-    { reader.read(bytes) } -> Meta::Same<Result<size_t>>;
-};
+                       { reader.read(bytes) } -> Meta::Same<Result<size_t>>;
+                   };
 
 template <typename T>
 concept Seekable = requires(T &seeker, Seek seek) {
-    { seeker.seek(seek) } -> Meta::Same<Result<size_t>>;
-};
+                       { seeker.seek(seek) } -> Meta::Same<Result<size_t>>;
+                   };
 
 template <typename T>
 concept Flushable = requires(T &flusher) {
-    { flusher.flush() } -> Meta::Same<Result<size_t>>;
-};
+                        { flusher.flush() } -> Meta::Same<Result<size_t>>;
+                    };
 
 template <typename T>
-concept Duplexable = Writable<T> && Readable<T>;
+concept Duplexable = Writable<T> and Readable<T>;
 
 template <typename T>
-concept SeekableWritable = Writable<T> && Seekable<T>;
+concept SeekableWritable = Writable<T> and Seekable<T>;
 
 template <typename T>
-concept SeekableReadable = Readable<T> && Seekable<T>;
+concept SeekableReadable = Readable<T> and Seekable<T>;
 
 template <typename T>
-concept SeekableDuplexable = Duplexable<T> && Seekable<T>;
+concept SeekableDuplexable = Duplexable<T> and Seekable<T>;
 
 struct Writer {
     virtual ~Writer() = default;

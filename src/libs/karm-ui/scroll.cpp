@@ -42,7 +42,7 @@ struct Scroll : public ProxyNode<Scroll> {
                 ee.pos = ee.pos - _scroll;
                 child().event(ee);
 
-                if (!ee.accepted) {
+                if (not ee.accepted) {
                     if (ee.type == Events::MouseEvent::SCROLL) {
                         scroll((_scroll + ee.scrollPrecise * 16).cast<int>());
                         shouldAnimate(*this);
@@ -50,7 +50,7 @@ struct Scroll : public ProxyNode<Scroll> {
                     }
                 }
             }
-        } else if (e.is<Events::AnimateEvent>() && _animated) {
+        } else if (e.is<Events::AnimateEvent>() and _animated) {
             shouldRepaint(*parent(), bound());
             _animated = false;
         } else {

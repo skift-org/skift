@@ -134,7 +134,7 @@ union Vec2 {
     }
 
     bool hasNan() const {
-        return std::isnan(x) || std::isnan(y);
+        return std::isnan(x) or std::isnan(y);
     }
 };
 
@@ -166,7 +166,7 @@ using Vec2f = Vec2<double>;
 
 template <typename T>
 bool epsilonEq(Vec2<T> const &lhs, Vec2<T> const &rhs, T epsilon) {
-    return epsilonEq(lhs.x, rhs.x, epsilon) &&
+    return epsilonEq(lhs.x, rhs.x, epsilon) and
            epsilonEq(lhs.y, rhs.y, epsilon);
 }
 
@@ -278,7 +278,7 @@ union Vec3 {
     }
 
     bool hasNan() const {
-        return std::isnan(x) || std::isnan(y) || std::isnan(z);
+        return std::isnan(x) or std::isnan(y) or std::isnan(z);
     }
 
     template <typename U>
@@ -315,8 +315,8 @@ using Vec3f = Vec3<double>;
 
 template <typename T>
 bool epsilonEq(Vec3<T> const &lhs, Vec3<T> const &rhs, T epsilon) {
-    return epsilonEq(lhs.x, rhs.x, epsilon) &&
-           epsilonEq(lhs.y, rhs.y, epsilon) &&
+    return epsilonEq(lhs.x, rhs.x, epsilon) and
+           epsilonEq(lhs.y, rhs.y, epsilon) and
            epsilonEq(lhs.z, rhs.z, epsilon);
 }
 
@@ -420,7 +420,7 @@ union Vec4 {
     }
 
     bool hasNan() const {
-        return std::isnan(x) || std::isnan(y) || std::isnan(z) || std::isnan(w);
+        return std::isnan(x) or std::isnan(y) or std::isnan(z) or std::isnan(w);
     }
 };
 
@@ -452,9 +452,9 @@ using Vec4f = Vec4<double>;
 
 template <typename T>
 bool epsilonEq(Vec4<T> const &lhs, Vec4<T> const &rhs, T epsilon) {
-    return epsilonEq(lhs.x, rhs.x, epsilon) &&
-           epsilonEq(lhs.y, rhs.y, epsilon) &&
-           epsilonEq(lhs.z, rhs.z, epsilon) &&
+    return epsilonEq(lhs.x, rhs.x, epsilon) and
+           epsilonEq(lhs.y, rhs.y, epsilon) and
+           epsilonEq(lhs.z, rhs.z, epsilon) and
            epsilonEq(lhs.w, rhs.w, epsilon);
 }
 

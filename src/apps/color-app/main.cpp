@@ -66,7 +66,7 @@ struct HsvPicker : public Ui::View<HsvPicker> {
     void event(Events::Event &e) override {
         _mouseListener.listen(*this, e);
 
-        if (_mouseListener.isPress() && e.is<Events::MouseEvent>()) {
+        if (_mouseListener.isPress() and e.is<Events::MouseEvent>()) {
             _value = sampleHsv(_mouseListener.pos());
             if (_onChange) {
                 _onChange(*this, _value);
@@ -186,7 +186,7 @@ Ui::Child colorPicker() {
                     Media::Icons::EYEDROPPER, "Color Picker"),
                 Ui::button(
                     pageState.bindValue(false),
-                    (!pageState.value()) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
+                    (not pageState.value()) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
                     Media::Icons::PALETTE_SWATCH, "Palette"));
 
             return Ui::spacing(

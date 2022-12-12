@@ -489,6 +489,8 @@ Child radio(bool value, OnChange<bool> onChange) {
 /* --- Slider ---------------------------------------------------------------- */
 
 struct Slider : public View<Slider> {
+    static constexpr auto THUMP_RADIUS = 10;
+
     double _value = 0.0f;
     OnChange<double> _onChange;
     MouseListener _mouseListener;
@@ -505,23 +507,32 @@ struct Slider : public View<Slider> {
     void paint(Gfx::Context &g, Math::Recti) override {
         g.save();
 
-        double v = bound().width * _value;
-        auto thumbCenter = bound().startCenter().cast<double>() + Math::Vec2f{v, 0};
+        double v = (bound().width - THUMP_RADIUS * 2) * _value;
+        auto thumbCenter = bound().startCenter().cast<double>() + Math::Vec2f{v + THUMP_RADIUS, 0};
 
-        g.strokeStyle(Gfx::stroke(Gfx::ZINC600).withWidth(4).withAlign(Gfx::CENTER_ALIGN));
+        g.strokeStyle(Gfx::stroke(Gfx::ZINC600)
+                          .withWidth(4)
+                          .withAlign(Gfx::CENTER_ALIGN)
+                          .withCap(Gfx::ROUND_CAP));
         g.begin();
-        g.moveTo(bound().startCenter().cast<double>());
-        g.lineTo(bound().endCenter().cast<double>());
+        g.moveTo(bound().startCenter().cast<double>() + Math::Vec2f{THUMP_RADIUS, 0});
+        g.lineTo(bound().endCenter().cast<double>() - Math::Vec2f{THUMP_RADIUS, 0});
         g.stroke();
 
-        g.strokeStyle(Gfx::stroke(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700).withWidth(4).withAlign(Gfx::CENTER_ALIGN));
+        g.strokeStyle(Gfx::stroke(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700)
+                          .withWidth(4)
+                          .withAlign(Gfx::CENTER_ALIGN)
+                          .withCap(Gfx::ROUND_CAP));
         g.begin();
-        g.moveTo(bound().startCenter().cast<double>());
-        g.lineTo(bound().startCenter().cast<double>() + Math::Vec2f{v, 0});
+        g.moveTo(bound().startCenter().cast<double>() + Math::Vec2f{THUMP_RADIUS, 0});
+        g.lineTo(bound().startCenter().cast<double>() + Math::Vec2f{THUMP_RADIUS + v, 0});
         g.stroke();
+
+        g.fillStyle(Gfx::WHITE);
+        g.fill(Math::Ellipsei{thumbCenter.cast<int>(), THUMP_RADIUS});
 
         g.fillStyle(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700);
-        g.fill(Math::Ellipsei{thumbCenter.cast<int>(), 8});
+        g.fill(Math::Ellipsei{thumbCenter.cast<int>(), 6});
 
         g.restore();
     }
@@ -531,7 +542,8 @@ struct Slider : public View<Slider> {
 
         if (_mouseListener.isPress() && e.is<Events::MouseEvent>()) {
             auto p = _mouseListener.pos();
-            _value = p.x / (double)bound().width;
+            _value = (p.x - THUMP_RADIUS) / ((double)bound().width - THUMP_RADIUS * 2);
+            _value = clamp01(_value);
             if (_onChange)
                 _onChange(*this, _value);
             else

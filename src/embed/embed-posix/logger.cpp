@@ -1,5 +1,4 @@
-#include <embed/debug.h>
-#include <hjert-core/arch.h>
+#include <embed/logger.h>
 #include <karm-sys/chan.h>
 
 namespace Embed {
@@ -9,7 +8,7 @@ void loggerLock() {}
 void loggerUnlock() {}
 
 Io::TextWriter<> &loggerOut() {
-    return Hjert::Arch::loggerOut();
+    return Sys::err();
 }
 
 } // namespace Embed

@@ -6,7 +6,9 @@
 
 #define __KARM_MAIN_INCLUDED
 
-#if defined(__osdk_sys_linux__) or defined(__osdk_sys_darwin__)
+#if defined(__osdk_sys_linux__) or  \
+    defined(__osdk_sys_darwin__) or \
+    defined(__osdk_sys_brutal__)
 #    define EMBED_POSIX_MAIN_IMPL
 #    include <embed-posix/main.h>
 #elif defined(__osdk_sys_efi__)

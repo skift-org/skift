@@ -86,7 +86,7 @@ struct Color {
         auto r = this->red / 255.0;
         auto g = this->green / 255.0;
         auto b = this->blue / 255.0;
-        return std::sqrt(0.299 * r * r + 0.587 * g * g + 0.114 * b * b);
+        return sqrt(0.299 * r * r + 0.587 * g * g + 0.114 * b * b);
     }
 };
 

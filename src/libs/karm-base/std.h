@@ -2,11 +2,11 @@
 
 #include <new>
 #include <utility>
-#include <initializer_list>
 
 #include "_prelude.h"
+#include <initializer_list>
 
-#ifdef __osdk_freestanding__
+#ifndef __ssize_t_defined
 
 #    include <karm-meta/signess.h>
 

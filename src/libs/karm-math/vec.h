@@ -134,7 +134,7 @@ union Vec2 {
     }
 
     bool hasNan() const {
-        return std::isnan(x) or std::isnan(y);
+        return isnan(x) or isnan(y);
     }
 };
 
@@ -278,7 +278,7 @@ union Vec3 {
     }
 
     bool hasNan() const {
-        return std::isnan(x) or std::isnan(y) or std::isnan(z);
+        return isnan(x) or isnan(y) or isnan(z);
     }
 
     template <typename U>
@@ -420,7 +420,7 @@ union Vec4 {
     }
 
     bool hasNan() const {
-        return std::isnan(x) or std::isnan(y) or std::isnan(z) or std::isnan(w);
+        return isnan(x) or isnan(y) or isnan(z) or isnan(w);
     }
 };
 

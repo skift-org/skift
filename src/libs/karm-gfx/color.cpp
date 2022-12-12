@@ -41,7 +41,7 @@ Color hsvToRgb(Hsv hsv) {
     double v = hsv.value;
 
     double c = v * s;
-    double x = c * (1.0f - abs(std::fmod(h / 60.0f, 2.0f) - 1.0f));
+    double x = c * (1.0f - abs(fmod(h / 60.0f, 2.0f) - 1.0f));
     double m = v - c;
 
     double r = 0.0f;

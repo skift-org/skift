@@ -1,6 +1,6 @@
 #pragma once
 
-#include <embed/debug.h>
+#include <embed/logger.h>
 #include <karm-base/loc.h>
 #include <karm-cli/style.h>
 #include <karm-fmt/fmt.h>

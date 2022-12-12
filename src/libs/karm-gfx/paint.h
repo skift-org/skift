@@ -38,6 +38,16 @@ struct Gradient {
         return Gradient{LINEAR, {0, 0}, {1, 1}};
     }
 
+    static constexpr Gradient hsv() {
+        Gradient result{LINEAR, {0, 0.5}, {1, 0.5}};
+
+        for (double i = 0; i < 360; i += 60) {
+            result.withStop(hsvToRgb({i, 1, 1}), i / 360.0);
+        }
+
+        return result;
+    }
+
     static constexpr Gradient vlinear() {
         return Gradient{LINEAR, {0.5, 0}, {0.5, 1}};
     }

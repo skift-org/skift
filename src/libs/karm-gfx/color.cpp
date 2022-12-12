@@ -63,7 +63,7 @@ Color hsvToRgb(Hsv hsv) {
     } else if (h < 300.0f) {
         r = x;
         b = c;
-    } else if (h < 360.0f) {
+    } else {
         r = c;
         b = x;
     }

@@ -15,8 +15,8 @@ CliResult entryPoint(CliArgs args) {
 
     auto logo = Ui::grow(Ui::box(
         {
-            .backgroundColor = Gfx::WHITE,
-            .foregroundColor = Gfx::BLACK,
+            .backgroundPaint = Gfx::WHITE,
+            .foregroundPaint = Gfx::BLACK,
         },
         Ui::bound(Ui::center(Ui::icon(Media::Icons::SNOWFLAKE, 128)))));
 

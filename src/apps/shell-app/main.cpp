@@ -51,7 +51,7 @@ Ui::Child indicator(Media::Icons icon) {
 Ui::Child statusbar() {
     return Ui::box(
         Ui::BoxStyle{
-            .backgroundColor = Gfx::BLACK,
+            .backgroundPaint = Gfx::BLACK,
         },
         Ui::minSize(
             {Ui::UNCONSTRAINED, 36},
@@ -83,8 +83,8 @@ Ui::Child quickSetting(Media::Icons icon) {
                 state.update(not state.value());
             },
             (state.value()
-                 ? Ui::ButtonStyle::primary().withForegroundColor(Gfx::WHITE)
-                 : Ui::ButtonStyle::secondary().withForegroundColor(Gfx::ZINC300))
+                 ? Ui::ButtonStyle::primary().withForegroundPaint(Gfx::WHITE)
+                 : Ui::ButtonStyle::secondary().withForegroundPaint(Gfx::ZINC300))
                 .withRadius(99),
             Ui::minSize(48, Ui::center(Ui::icon(icon, 26))));
     }));
@@ -93,7 +93,7 @@ Ui::Child quickSetting(Media::Icons icon) {
 Ui::Child quickSettings() {
     return Ui::box(
         Ui::BoxStyle{
-            .backgroundColor = Gfx::ZINC800,
+            .backgroundPaint = Gfx::ZINC800,
         },
         Ui::spacing(
             8,
@@ -115,7 +115,7 @@ Ui::Child notiWrapper(App app, Ui::Child inner) {
                 8,
                 Ui::hflow(
                     4,
-                    Ui::box(Ui::BoxStyle{.foregroundColor = app.color[4]},
+                    Ui::box(Ui::BoxStyle{.foregroundPaint = app.color[4]},
                             Ui::icon(app.icon, 12)),
                     Ui::text(Ui::TextStyle::labelMedium().withColor(Gfx::ZINC400), app.name)),
                 inner)),
@@ -161,7 +161,7 @@ Ui::Child systemTray() {
                 0.3,
                 Ui::box(Ui::BoxStyle{
                             .borderRadius = {0, 0, 16, 16},
-                            .backgroundColor = Gfx::ZINC900,
+                            .backgroundPaint = Gfx::ZINC900,
                         },
 
                         Ui::vflow(8, quickSettings(), Ui::grow(notifications()), Ui::dragHandle())))),
@@ -175,8 +175,8 @@ Ui::Child searchInput() {
         Ui::BoxStyle{
             .borderRadius = 4,
             .borderWidth = 1,
-            .borderColor = Gfx::ZINC700,
-            .backgroundColor = Gfx::ZINC800,
+            .borderPaint = Gfx::ZINC700,
+            .backgroundPaint = Gfx::ZINC800,
         },
         Ui::minSize({Ui::UNCONSTRAINED, 48},
                     Ui::spacing(
@@ -190,8 +190,8 @@ Ui::Child appIcon(Media::Icons icon, Gfx::ColorRamp colors) {
     return Ui::box(
         Ui::BoxStyle{
             .borderRadius = 99,
-            .backgroundColor = colors[3],
-            .foregroundColor = colors[6],
+            .backgroundPaint = colors[3],
+            .foregroundPaint = colors[6],
         },
         Ui::center(
             Ui::spacing(8,
@@ -244,7 +244,7 @@ Ui::Child appDrawer() {
                            Ui::box(
                                Ui::BoxStyle{
                                    .borderRadius = {16, 16, 16, 16},
-                                   .backgroundColor = Gfx::ZINC900,
+                                   .backgroundPaint = Gfx::ZINC900,
                                },
                                Ui::vflow(
                                    Ui::dragHandle(),
@@ -273,7 +273,9 @@ Ui::Child homeScreen() {
 Ui::Child lockscreen() {
     return Ui::box(
         Ui::BoxStyle{
-            .backgroundColor = Gfx::BLACK.withOpacity(0.5),
+            .backgroundPaint = Gfx::Gradient::vlinear()
+                                   .withColors(Gfx::BLACK.withOpacity(0.5),
+                                               Gfx::BLACK.withOpacity(0.75)),
         },
         Ui::vflow(
             Ui::grow(

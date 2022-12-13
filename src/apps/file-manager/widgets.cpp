@@ -46,7 +46,7 @@ Ui::Child breadcrumb() {
         {
             .borderRadius = 4,
             .borderWidth = 1,
-            .borderColor = Gfx::ZINC700,
+            .borderPaint = Gfx::ZINC700,
         },
         Ui::hflow(
             Ui::button(Model::bind<GoTo>("/"), Ui::ButtonStyle::subtle(), Media::Icons::LAPTOP),

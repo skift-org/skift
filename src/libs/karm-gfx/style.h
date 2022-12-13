@@ -3,7 +3,7 @@
 #include <karm-math/vec.h>
 #include <karm-media/font.h>
 
-#include "colors.h"
+#include "paint.h"
 
 namespace Karm::Gfx {
 
@@ -49,64 +49,64 @@ enum StrokeJoin {
 };
 
 struct StrokeStyle {
-    Color color{};
+    Paint paint;
     double width{1};
     StrokeAlign align{};
     StrokeCap cap{};
     StrokeJoin join{};
 
-    constexpr StrokeStyle(Color c = WHITE) : color(c) {}
+    StrokeStyle(Paint c = WHITE) : paint(c) {}
 
-    constexpr auto &withColor(Color c) {
-        color = c;
+    auto &withPaint(Paint p) {
+        paint = p;
         return *this;
     }
 
-    constexpr auto &withWidth(double w) {
+    auto &withWidth(double w) {
         width = w;
         return *this;
     }
 
-    constexpr auto &withAlign(StrokeAlign a) {
+    auto &withAlign(StrokeAlign a) {
         align = a;
         return *this;
     }
 
-    constexpr auto &withCap(StrokeCap c) {
+    auto &withCap(StrokeCap c) {
         cap = c;
         return *this;
     }
 
-    constexpr auto &withJoin(StrokeJoin j) {
+    auto &withJoin(StrokeJoin j) {
         join = j;
         return *this;
     }
 };
 
-inline constexpr StrokeStyle stroke(auto... args) {
+inline StrokeStyle stroke(auto... args) {
     return {args...};
 }
 
 /* --- Shadow Style --------------------------------------------------------- */
 
 struct ShadowStyle {
-    Color color{};
+    Paint paint;
     double radius{};
     Math::Vec2f offset{};
 
-    constexpr ShadowStyle(Color c = BLACK) : color(c) {}
+    ShadowStyle(Paint c = BLACK) : paint(c) {}
 
-    constexpr auto &withColor(Color c) {
-        color = c;
+    auto &withPaint(Paint p) {
+        paint = p;
         return *this;
     }
 
-    constexpr auto &withRadius(double r) {
+    auto &withRadius(double r) {
         radius = r;
         return *this;
     }
 
-    constexpr auto &withOffset(Math::Vec2f o) {
+    auto &withOffset(Math::Vec2f o) {
         offset = o;
         return *this;
     }

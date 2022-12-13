@@ -59,14 +59,14 @@ Child badge(BadgeStyle style, String t) {
 
     return box({
                    .borderRadius = 99,
-                   .backgroundColor = color.withOpacity(0.1),
-                   .foregroundColor = color,
+                   .backgroundPaint = color.withOpacity(0.1),
+                   .foregroundPaint = color,
                },
                spacing({8, 4}, text(t)));
 }
 
-static constexpr BoxStyle TOOLBAR = {
-    .backgroundColor = Gfx::ZINC800,
+static BoxStyle TOOLBAR = {
+    .backgroundPaint = Gfx::ZINC800,
 };
 
 Child toolbar(Children children) {

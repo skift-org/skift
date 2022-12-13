@@ -85,7 +85,7 @@ struct ButtonStyle {
     BoxStyle hoverStyle;
     BoxStyle pressStyle;
     BoxStyle disabledStyle = {
-        .foregroundColor = Gfx::ZINC600,
+        .foregroundPaint = Gfx::ZINC600,
     };
 
     static ButtonStyle regular();
@@ -102,7 +102,7 @@ struct ButtonStyle {
 
     ButtonStyle withRadius(Gfx::BorderRadius radius) const;
 
-    ButtonStyle withForegroundColor(Gfx::Color color) const;
+    ButtonStyle withForegroundPaint(Gfx::Paint paint) const;
 };
 
 using OnPress = Opt<Func<void(Node &)>>;
@@ -142,6 +142,21 @@ Child checkbox(bool value, OnChange<bool> onChange);
 Child radio(bool value, OnChange<bool> onChange);
 
 /* --- Slider --------------------------------------------------------------- */
+
+struct SliderStyle {
+    BoxStyle thumbStyle;
+    Math::Vec2i trackSize;
+    BoxStyle trackStyle;
+    Opt<BoxStyle> valueStyle;
+
+    static SliderStyle regular();
+
+    static SliderStyle hsv();
+
+    static SliderStyle gradiant(Gfx::Color from, Gfx::Color to);
+};
+
+Child slider(SliderStyle style, double value, OnChange<double> onChange);
 
 Child slider(double value, OnChange<double> onChange);
 

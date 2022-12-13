@@ -101,24 +101,28 @@ inline Child radioRow(bool value, OnChange<bool> onChange, String title) {
         NONE);
 }
 
-inline Child sliderRow(double value, OnChange<double> onChange, String title) {
+inline Child sliderRow(SliderStyle style, double value, OnChange<double> onChange, String title) {
     return row(
         NONE,
         title,
         NONE,
-        slider(value, std::move(onChange)));
+        slider(style, value, std::move(onChange)));
+}
+
+inline Child sliderRow(double value, OnChange<double> onChange, String title) {
+    return sliderRow(SliderStyle::regular(), value, std::move(onChange), title);
 }
 
 inline Child navRow(bool selected, OnPress onPress, Media::Icons i, String title) {
     auto buttonStyle = ButtonStyle::regular();
     buttonStyle.idleStyle = {
         .borderRadius = 4,
-        .backgroundColor = selected ? Gfx::ZINC800 : Gfx::ALPHA,
+        .backgroundPaint = selected ? Gfx::ZINC800 : Gfx::ALPHA,
     };
 
     auto indicator = box(BoxStyle{
                              .borderRadius = 99,
-                             .backgroundColor = selected ? Gfx::BLUE600 : Gfx::ALPHA,
+                             .backgroundPaint = selected ? Gfx::BLUE600 : Gfx::ALPHA,
                          },
                          empty(4));
 

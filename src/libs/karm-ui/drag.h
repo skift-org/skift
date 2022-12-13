@@ -183,7 +183,7 @@ inline Child handle() {
                 box(
                     BoxStyle{
                         .borderRadius = 999,
-                        .backgroundColor = Gfx::WHITE,
+                        .backgroundPaint = Gfx::WHITE,
                     },
                     empty({
                         128,
@@ -202,7 +202,7 @@ inline Child buttonHandle(OnPress press) {
         ButtonStyle{
             .pressStyle = {
                 .borderWidth = 1,
-                .borderColor = Gfx::WHITE,
+                .borderPaint = Gfx::WHITE,
             }},
         handle());
 }

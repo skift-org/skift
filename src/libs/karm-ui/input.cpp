@@ -12,18 +12,18 @@ ButtonStyle ButtonStyle::regular() {
     return {
         .idleStyle = {
             .borderRadius = RADIUS,
-            .backgroundColor = Gfx::ZINC700,
+            .backgroundPaint = Gfx::ZINC700,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundColor = Gfx::ZINC600,
+            .backgroundPaint = Gfx::ZINC600,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::ZINC600,
-            .backgroundColor = Gfx::ZINC700,
+            .borderPaint = Gfx::ZINC600,
+            .backgroundPaint = Gfx::ZINC700,
         },
     };
 }
@@ -32,18 +32,18 @@ ButtonStyle ButtonStyle::secondary() {
     return {
         .idleStyle = {
             .borderRadius = RADIUS,
-            .backgroundColor = Gfx::ZINC800,
+            .backgroundPaint = Gfx::ZINC800,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundColor = Gfx::ZINC700,
+            .backgroundPaint = Gfx::ZINC700,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::ZINC700,
-            .backgroundColor = Gfx::ZINC800,
+            .borderPaint = Gfx::ZINC700,
+            .backgroundPaint = Gfx::ZINC800,
         },
     };
 }
@@ -52,18 +52,18 @@ ButtonStyle ButtonStyle::primary() {
     return {
         .idleStyle = {
             .borderRadius = RADIUS,
-            .backgroundColor = Gfx::BLUE700,
+            .backgroundPaint = Gfx::BLUE700,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundColor = Gfx::BLUE600,
+            .backgroundPaint = Gfx::BLUE600,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::BLUE600,
-            .backgroundColor = Gfx::BLUE700,
+            .borderPaint = Gfx::BLUE600,
+            .backgroundPaint = Gfx::BLUE700,
         },
     };
 }
@@ -73,18 +73,18 @@ ButtonStyle ButtonStyle::outline() {
         .idleStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::ZINC700,
+            .borderPaint = Gfx::ZINC700,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundColor = Gfx::ZINC600,
+            .backgroundPaint = Gfx::ZINC600,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::ZINC600,
-            .backgroundColor = Gfx::ZINC700,
+            .borderPaint = Gfx::ZINC600,
+            .backgroundPaint = Gfx::ZINC700,
         },
     };
 }
@@ -92,18 +92,18 @@ ButtonStyle ButtonStyle::outline() {
 ButtonStyle ButtonStyle::subtle() {
     return {
         .idleStyle = {
-            .foregroundColor = Gfx::ZINC300,
+            .foregroundPaint = Gfx::ZINC300,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundColor = Gfx::ZINC600,
+            .backgroundPaint = Gfx::ZINC600,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::ZINC600,
-            .backgroundColor = Gfx::ZINC700,
+            .borderPaint = Gfx::ZINC600,
+            .backgroundPaint = Gfx::ZINC700,
         },
     };
 }
@@ -112,18 +112,18 @@ ButtonStyle ButtonStyle::destructive() {
     return {
         .idleStyle = {
             .borderRadius = RADIUS,
-            .foregroundColor = Gfx::RED500,
+            .foregroundPaint = Gfx::RED500,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundColor = Gfx::RED600,
+            .backgroundPaint = Gfx::RED600,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderColor = Gfx::RED600,
-            .backgroundColor = Gfx::RED700,
+            .borderPaint = Gfx::RED600,
+            .backgroundPaint = Gfx::RED700,
         },
     };
 }
@@ -136,11 +136,11 @@ ButtonStyle ButtonStyle::withRadius(Gfx::BorderRadius radius) const {
     };
 }
 
-ButtonStyle ButtonStyle::withForegroundColor(Gfx::Color color) const {
+ButtonStyle ButtonStyle::withForegroundPaint(Gfx::Paint paint) const {
     return {
-        idleStyle.withForegroundColor(color),
-        hoverStyle.withForegroundColor(color),
-        pressStyle.withForegroundColor(color),
+        idleStyle.withForegroundPaint(paint),
+        hoverStyle.withForegroundPaint(paint),
+        pressStyle.withForegroundPaint(paint),
     };
 }
 
@@ -488,53 +488,110 @@ Child radio(bool value, OnChange<bool> onChange) {
 
 /* --- Slider ---------------------------------------------------------------- */
 
-struct Slider : public View<Slider> {
-    static constexpr auto THUMP_RADIUS = 10;
+SliderStyle SliderStyle::regular() {
+    return {
+        .thumbStyle = {
+            .margin = 2,
+            .borderRadius = 999,
+            .borderWidth = 4,
+            .borderPaint = Gfx::WHITE,
+            .backgroundPaint = Gfx::BLUE700,
+        },
+        .trackSize = {128, 26},
+        .trackStyle = {
+            .margin = 8,
+            .borderRadius = 999,
+            .backgroundPaint = Gfx::ZINC700,
+        },
+        .valueStyle = BoxStyle{
+            .margin = 8,
+            .borderRadius = 999,
+            .backgroundPaint = Gfx::BLUE700,
+        },
+    };
+}
 
+SliderStyle SliderStyle::hsv() {
+    return {
+        .thumbStyle = {
+            .margin = 4,
+            .borderRadius = 999,
+            .borderWidth = 2,
+            .borderPaint = Gfx::WHITE,
+        },
+        .trackSize = {128, 26},
+        .trackStyle = {
+            .margin = 2,
+            .borderRadius = 999,
+            .backgroundPaint = Gfx::Gradient::hsv(),
+        },
+    };
+}
+
+SliderStyle SliderStyle::gradiant(Gfx::Color from, Gfx::Color to) {
+    return {
+        .thumbStyle = {
+            .margin = 4,
+            .borderRadius = 999,
+            .borderWidth = 2,
+            .borderPaint = Gfx::WHITE,
+        },
+        .trackSize = {128, 26},
+        .trackStyle = {
+            .margin = 2,
+            .borderRadius = 999,
+            .backgroundPaint = Gfx::Gradient::hlinear().withColors(from, to),
+        },
+    };
+}
+
+struct Slider : public View<Slider> {
+    SliderStyle _style;
     double _value = 0.0f;
     OnChange<double> _onChange;
     MouseListener _mouseListener;
 
-    Slider(double value, OnChange<double> onChange)
-        : _value(value), _onChange(std::move(onChange)) {
+    Slider(SliderStyle style, double value, OnChange<double> onChange)
+        : _style(style), _value(value), _onChange(std::move(onChange)) {
     }
 
     void reconcile(Slider &o) override {
+        _style = o._style;
         _value = o._value;
         _onChange = std::move(o._onChange);
     }
 
+    auto thumbRadius() {
+        return _style.trackSize.min() / 2;
+    }
+
     void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
+        if (_style.valueStyle) {
+            auto [rhs, lhs] = bound().hsplit(bound().width * _value);
 
-        double v = (bound().width - THUMP_RADIUS * 2) * _value;
-        auto thumbCenter = bound().startCenter().cast<double>() + Math::Vec2f{v + THUMP_RADIUS, 0};
+            g.save();
+            g.clip(rhs);
+            _style.valueStyle->paint(g, bound());
+            g.restore();
 
-        g.strokeStyle(Gfx::stroke(Gfx::ZINC600)
-                          .withWidth(4)
-                          .withAlign(Gfx::CENTER_ALIGN)
-                          .withCap(Gfx::ROUND_CAP));
-        g.begin();
-        g.moveTo(bound().startCenter().cast<double>() + Math::Vec2f{THUMP_RADIUS, 0});
-        g.lineTo(bound().endCenter().cast<double>() - Math::Vec2f{THUMP_RADIUS, 0});
-        g.stroke();
+            g.save();
+            g.clip(lhs);
+            _style.trackStyle.paint(g, bound());
+            g.restore();
+        } else {
+            _style.trackStyle.paint(g, bound());
+        }
 
-        g.strokeStyle(Gfx::stroke(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700)
-                          .withWidth(4)
-                          .withAlign(Gfx::CENTER_ALIGN)
-                          .withCap(Gfx::ROUND_CAP));
-        g.begin();
-        g.moveTo(bound().startCenter().cast<double>() + Math::Vec2f{THUMP_RADIUS, 0});
-        g.lineTo(bound().startCenter().cast<double>() + Math::Vec2f{THUMP_RADIUS + v, 0});
-        g.stroke();
+        auto thumbX = bound().x + ((bound().width - thumbRadius() * 2) * _value);
+        Math::Recti thumbBound = {
+            {
+                (int)thumbX,
+                bound().top(),
+            },
+            thumbRadius() * 2,
+        };
 
-        g.fillStyle(Gfx::WHITE);
-        g.fill(Math::Ellipsei{thumbCenter.cast<int>(), THUMP_RADIUS});
-
-        g.fillStyle(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700);
-        g.fill(Math::Ellipsei{thumbCenter.cast<int>(), 6});
-
-        g.restore();
+        _style.thumbStyle.paint(g, thumbBound);
     }
 
     void event(Events::Event &e) override {
@@ -542,7 +599,7 @@ struct Slider : public View<Slider> {
 
         if (_mouseListener.isPress() and e.is<Events::MouseEvent>()) {
             auto p = _mouseListener.pos();
-            _value = (p.x - THUMP_RADIUS) / ((double)bound().width - THUMP_RADIUS * 2);
+            _value = (p.x - thumbRadius()) / ((double)bound().width - thumbRadius() * 2);
             _value = clamp01(_value);
             if (_onChange)
                 _onChange(*this, _value);
@@ -552,12 +609,16 @@ struct Slider : public View<Slider> {
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return {128, 26};
+        return _style.trackSize;
     }
 };
 
+Child slider(SliderStyle style, double value, OnChange<double> onChange) {
+    return makeStrong<Slider>(style, value, std::move(onChange));
+}
+
 Child slider(double value, OnChange<double> onChange) {
-    return makeStrong<Slider>(value, std::move(onChange));
+    return makeStrong<Slider>(SliderStyle::regular(), value, std::move(onChange));
 }
 
 } // namespace Karm::Ui

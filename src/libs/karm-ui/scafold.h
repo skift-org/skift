@@ -32,7 +32,7 @@ inline Ui::Child toolbar(Meta::Same<Child> auto... children) { return toolbar({c
 inline Child card(Child child) {
     return box({
                    .borderRadius = 4,
-                   .backgroundColor = Gfx::ZINC800,
+                   .backgroundPaint = Gfx::ZINC800,
                },
                child);
 }

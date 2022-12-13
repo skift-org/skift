@@ -157,8 +157,8 @@ Child dialogScafold(Layout::Align a, Child inner) {
     BoxStyle const boxStyle = {
         .borderRadius = 4,
         .borderWidth = 1,
-        .borderColor = Gfx::ZINC700,
-        .backgroundColor = Gfx::ZINC800,
+        .borderPaint = Gfx::ZINC700,
+        .backgroundPaint = Gfx::ZINC800,
     };
 
     return spacing(16, align(a, dragRegion(box(boxStyle, inner))));

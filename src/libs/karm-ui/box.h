@@ -12,9 +12,9 @@ struct BoxStyle {
     Gfx::BorderRadius borderRadius{};
     double borderWidth{};
 
-    Gfx::Color borderColor{Gfx::ALPHA};
-    Gfx::Color backgroundColor{Gfx::ALPHA};
-    Gfx::Color foregroundColor{Gfx::WHITE};
+    Opt<Gfx::Paint> borderPaint{Gfx::ALPHA};
+    Opt<Gfx::Paint> backgroundPaint{};
+    Gfx::Paint foregroundPaint{Gfx::WHITE};
 
     BoxStyle withMargin(Layout::Spacingi margin) const {
         auto copy = *this;
@@ -40,41 +40,48 @@ struct BoxStyle {
         return copy;
     }
 
-    BoxStyle withBorderColor(Gfx::Color borderColor) const {
+    BoxStyle withBorderPaint(Gfx::Paint borderPaint) const {
         auto copy = *this;
-        copy.borderColor = borderColor;
+        copy.borderPaint = borderPaint;
         return copy;
     }
 
-    BoxStyle withBackgroundColor(Gfx::Color backgroundColor) const {
+    BoxStyle withBackgroundPaint(Gfx::Paint backgroundPaint) const {
         auto copy = *this;
-        copy.backgroundColor = backgroundColor;
+        copy.backgroundPaint = backgroundPaint;
         return copy;
     }
 
-    BoxStyle withForegroundColor(Gfx::Color foregroundColor) const {
+    BoxStyle withForegroundPaint(Gfx::Paint foregroundPaint) const {
         auto copy = *this;
-        copy.foregroundColor = foregroundColor;
+        copy.foregroundPaint = foregroundPaint;
         return copy;
     }
 
     void paint(Gfx::Context &g, Math::Recti bound, auto inner) {
+        bound = margin.shrink(Layout::Flow::LEFT_TO_RIGHT, bound);
+
         g.save();
-        if (backgroundColor.alpha) {
-            g.fillStyle(backgroundColor);
+        if (backgroundPaint) {
+            g.fillStyle(*backgroundPaint);
             g.fill(bound, borderRadius);
         }
 
-        g.fillStyle(foregroundColor);
+        g.fillStyle(foregroundPaint);
         inner();
         g.restore();
 
-        if (borderWidth) {
-            g.strokeStyle(Gfx::stroke(borderColor)
+        if (borderWidth && borderPaint) {
+            g.strokeStyle(Gfx::stroke(*borderPaint)
                               .withWidth(borderWidth)
                               .withAlign(Gfx::INSIDE_ALIGN));
             g.stroke(bound, borderRadius);
         }
+    }
+
+    void paint(Gfx::Context &g, Math::Recti bound) {
+        paint(g, bound, [&] {
+        });
     }
 };
 

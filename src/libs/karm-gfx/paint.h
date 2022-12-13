@@ -41,7 +41,7 @@ struct Gradient {
     static constexpr Gradient hsv() {
         Gradient result{LINEAR, {0, 0.5}, {1, 0.5}};
 
-        for (double i = 0; i < 360; i += 60) {
+        for (double i = 0; i <= 360; i += 60) {
             result.withStop(hsvToRgb({i, 1, 1}), i / 360.0);
         }
 

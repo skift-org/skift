@@ -531,7 +531,7 @@ void Context::stroke() {
 void Context::stroke(StrokeStyle style) {
     _shape.clear();
     createStroke(_shape, _path, style, current().transWithOrigin());
-    _fill(style.color);
+    _fill(style.paint);
 }
 
 void Context::shadow() {}

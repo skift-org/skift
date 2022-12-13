@@ -91,34 +91,63 @@ Ui::Child hsvPicker(Ui::State<Gfx::Hsv> state) {
     });
 }
 
+Ui::Child valueSlider(Ui::State<Gfx::Hsv> state) {
+    auto value0 = state.value();
+    value0.value = 0;
+
+    auto value1 = state.value();
+    value1.value = 1;
+
+    return Ui::sliderRow(
+        Ui::SliderStyle::gradiant(
+            Gfx::hsvToRgb(value0),
+            Gfx::hsvToRgb(value1)),
+        state.value().value,
+        [=](auto, auto v) mutable {
+            auto hsv = state.value();
+            hsv.value = v;
+            state.update(hsv);
+        },
+        "Value");
+}
+
+Ui::Child saturationSlider(Ui::State<Gfx::Hsv> state) {
+    auto saturation0 = state.value();
+    saturation0.saturation = 0;
+
+    auto saturation1 = state.value();
+    saturation1.saturation = 1;
+
+    return Ui::sliderRow(
+        Ui::SliderStyle::gradiant(
+            Gfx::hsvToRgb(saturation0),
+            Gfx::hsvToRgb(saturation1)),
+        state.value().saturation,
+        [=](auto, auto v) mutable {
+            auto hsv = state.value();
+            hsv.saturation = v;
+            state.update(hsv);
+        },
+        "Saturation");
+}
+
+Ui::Child hueSlider(Ui::State<Gfx::Hsv> state) {
+    return Ui::sliderRow(
+        Ui::SliderStyle::hsv(),
+        state.value().hue / 360.0,
+        [=](auto, auto v) mutable {
+            auto hsv = state.value();
+            hsv.hue = v * 360;
+            state.update(hsv);
+        },
+        "Hue");
+}
+
 Ui::Child hsvSliders(Ui::State<Gfx::Hsv> state) {
     return Ui::vflow(
-        Ui::sliderRow(
-            state.value().value,
-            [=](auto, auto v) mutable {
-                auto hsv = state.value();
-                hsv.value = v;
-                state.update(hsv);
-            },
-            "Value"),
-
-        Ui::sliderRow(
-            state.value().saturation,
-            [=](auto, auto v) mutable {
-                auto hsv = state.value();
-                hsv.saturation = v;
-                state.update(hsv);
-            },
-            "Saturation"),
-
-        Ui::sliderRow(
-            state.value().hue / 360.0,
-            [=](auto, auto v) mutable {
-                auto hsv = state.value();
-                hsv.hue = v * 360;
-                state.update(hsv);
-            },
-            "Hue"));
+        hueSlider(state),
+        saturationSlider(state),
+        valueSlider(state));
 }
 
 Ui::Child hsvPickerAndSliders(Ui::State<Gfx::Hsv> state) {
@@ -138,18 +167,22 @@ Gfx::Color pickColor(Gfx::Color c) {
 Ui::Child colorCell(Gfx::Color c, Ui::State<Gfx::Hsv> state) {
     auto cHsv = Gfx::rgbToHsv(c);
 
+    Ui::BoxStyle boxStyle = {
+        .borderRadius = 4,
+        .borderWidth = 1,
+        .borderPaint = Gfx::WHITE.withOpacity(0.1),
+        .backgroundPaint = c,
+    };
+
     return Ui::button(
         [=](auto &) mutable {
             state.update(cHsv);
         },
         Ui::box(
-            {
-                .borderRadius = 4,
-                .borderWidth = 1,
-                .borderColor = Gfx::WHITE.withOpacity(0.1),
-                .backgroundColor = c,
-            },
-            Op::eq(state.value(), cHsv) ? Ui::icon(Media::Icons::CHECK, 32, pickColor(c)) : Ui::empty(32)));
+            boxStyle,
+            Op::eq(state.value(), cHsv)
+                ? Ui::icon(Media::Icons::CHECK, 32, pickColor(c))
+                : Ui::empty(32)));
 }
 
 Ui::Child colorRamp(Gfx::ColorRamp ramp, Ui::State<Gfx::Hsv> state) {

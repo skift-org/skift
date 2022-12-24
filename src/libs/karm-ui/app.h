@@ -5,7 +5,6 @@
 
 #include "host.h"
 #include "react.h"
-#include "supplier.h"
 
 namespace Karm::Ui {
 
@@ -25,14 +24,7 @@ struct App {
         : _root(state(initial, std::move(root))) {
     }
 
-    template <typename T, typename... Args>
-    App &supply(Args... args) {
-        _root = makeStrong<Supplier<T>>(_root, std::forward<Args>(args)...);
-        return *this;
-    }
-
-    CliResult run(CliArgs args) {
-        supply<CliArgs>(args);
+    CliResult run(CliArgs) {
         return try$(Embed::makeHost(_root))->run();
     }
 };

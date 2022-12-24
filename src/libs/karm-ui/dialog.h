@@ -3,7 +3,6 @@
 #include <karm-layout/align.h>
 
 #include "node.h"
-#include "supplier.h"
 
 namespace Karm::Ui {
 
@@ -46,12 +45,6 @@ void showDialog(Node &n, DialogFn<T> fn, Child child) {
 }
 
 void closeDialog(Node &n);
-
-template <typename T>
-void closeDialogAndReturn(Node &n, T value) {
-    queryParent<Dialog<T>>(n).fn(value);
-    closeDialog(n);
-}
 
 /* --- Dialogs Scaffolding -------------------------------------------------- */
 

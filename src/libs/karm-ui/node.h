@@ -40,15 +40,11 @@ struct Node {
 
     virtual Math::Recti bound() { return {}; }
 
-    virtual void visit(Visitor &) {}
-
     virtual Node *parent() { return nullptr; }
 
     virtual void attach(Node *) {}
 
     virtual void detach(Node *) {}
-
-    virtual void *query(Meta::Id) { return nullptr; }
 };
 
 /* --- LeafNode ------------------------------------------------------------- */
@@ -83,14 +79,6 @@ struct LeafNode : public Node {
     void detach(Node *parent) override {
         if (_parent == parent)
             _parent = nullptr;
-    }
-
-    void *query(Meta::Id id) override {
-        if (id == Meta::makeId<Crtp>()) {
-            return static_cast<Crtp *>(this);
-        }
-
-        return _parent ? _parent->query(id) : nullptr;
     }
 };
 
@@ -170,12 +158,6 @@ struct GroupNode : public LeafNode<Crtp> {
     Math::Recti bound() override {
         return _bound;
     }
-
-    void visit(Visitor &v) override {
-        for (auto &child : children()) {
-            v(*child);
-        }
-    }
 };
 
 /* --- ProxyNode ------------------------------------------------------------ */
@@ -227,10 +209,6 @@ struct ProxyNode : public LeafNode<Crtp> {
 
     Math::Recti bound() override {
         return _child->bound();
-    }
-
-    void visit(Visitor &v) override {
-        v(*_child);
     }
 };
 

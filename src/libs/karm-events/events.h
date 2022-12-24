@@ -8,14 +8,14 @@
 namespace Karm::Events {
 
 struct Event {
-    uint64_t id{};
-    bool accepted{};
+    Meta::Id id{};
+    bool accepted{false};
 
-    Event(uint64_t id) : id{id} {}
+    Event(Meta::Id id) : id{id} {}
 
     template <typename T>
     Event &handle(auto callback) {
-        if (id == T::ID) {
+        if (id == Meta::makeId<T>()) {
             accepted = callback(static_cast<T const &>(*this));
         }
         return *this;
@@ -23,7 +23,7 @@ struct Event {
 
     template <typename T>
     bool is() const {
-        return id == T::ID;
+        return id == Meta::makeId<T>();
     }
 
     template <typename T>
@@ -41,15 +41,12 @@ struct Event {
     }
 };
 
-template <typename _Derived, uint64_t _ID>
+template <typename Crtp>
 struct _Event : public Event {
-    using Derived = _Derived;
-    static constexpr uint64_t ID = _ID;
-
-    _Event() : Event{ID} {}
+    _Event() : Event{Meta::makeId<Crtp>()} {}
 };
 
-struct MouseEvent : public _Event<MouseEvent, 0x5db47c5474147944> {
+struct MouseEvent : public _Event<MouseEvent> {
     enum Type : uint8_t {
         PRESS,
         RELEASE,
@@ -72,7 +69,7 @@ struct MouseEvent : public _Event<MouseEvent, 0x5db47c5474147944> {
     Button button{};
 };
 
-struct KeyboardEvent : public _Event<KeyboardEvent, 0x1eb75d94f347352> {
+struct KeyboardEvent : public _Event<KeyboardEvent> {
     enum Type {
         PRESS,
         RELEASE,
@@ -83,22 +80,24 @@ struct KeyboardEvent : public _Event<KeyboardEvent, 0x1eb75d94f347352> {
     Rune rune;
 };
 
-struct PaintEvent : public _Event<PaintEvent, 0xe024fcf3253d5696> {
+struct PaintEvent : public _Event<PaintEvent> {
     Math::Recti bound;
+
+    PaintEvent(Math::Recti bound)
+        : bound{bound} {}
 };
 
-struct LayoutEvent : public _Event<LayoutEvent, 0x9fb51942f16848b6> {
-};
+struct LayoutEvent : public _Event<LayoutEvent> {};
 
-struct BuildEvent : public _Event<BuildEvent, 0xabcec24916669f81> {
-};
+struct BuildEvent : public _Event<BuildEvent> {};
 
-struct AnimateEvent : public _Event<AnimateEvent, 0xf21fe2676e487fc> {
-};
+struct AnimateEvent : public _Event<AnimateEvent> {};
 
-struct ExitEvent : public _Event<ExitEvent, 0x925703d3bb8540f6> {
+struct ExitEvent : public _Event<ExitEvent> {
     Error error;
-    ExitEvent(Error error) : error{error} {}
+
+    ExitEvent(Error error)
+        : error{error} {}
 };
 
 } // namespace Karm::Events

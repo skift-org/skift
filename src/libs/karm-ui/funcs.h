@@ -5,14 +5,12 @@
 namespace Karm::Ui {
 
 inline void shouldRepaint(Node &n) {
-    Events::PaintEvent e;
-    e.bound = n.bound();
+    Events::PaintEvent e{n.bound()};
     n.bubble(e);
 }
 
 inline void shouldRepaint(Node &n, Math::Recti bound) {
-    Events::PaintEvent e;
-    e.bound = bound;
+    Events::PaintEvent e{bound};
     n.bubble(e);
 }
 
@@ -29,15 +27,6 @@ inline void shouldRebuild(Node &n) {
 inline void shouldAnimate(Node &n) {
     Events::AnimateEvent e;
     n.bubble(e);
-}
-
-template <typename T>
-inline T &queryParent(Node &n) {
-    void *ptr = n.query(Meta::makeId<T>());
-    if (not ptr) {
-        panic("not found");
-    }
-    return *static_cast<T *>(ptr);
 }
 
 } // namespace Karm::Ui

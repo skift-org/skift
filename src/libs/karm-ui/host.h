@@ -119,14 +119,6 @@ struct Host : public Node {
 
         return tryOr(_error, OK);
     }
-
-    void *query(Meta::Id id) override {
-        if (id == Meta::makeId<Host>()) {
-            return this;
-        }
-
-        return nullptr;
-    }
 };
 
 } // namespace Karm::Ui

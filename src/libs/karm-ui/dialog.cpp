@@ -13,6 +13,23 @@ namespace Karm::Ui {
 
 /* ---  Dialog Base  -------------------------------------------------------- */
 
+struct ShowDialogEvent : public Events::_Event<ShowDialogEvent> {
+    Child child;
+    ShowDialogEvent(Child c) : child(c) {}
+};
+
+void showDialog(Node &n, Child child) {
+    ShowDialogEvent e(child);
+    n.bubble(e);
+}
+
+struct HideDialogEvent : public Events::_Event<HideDialogEvent> {};
+
+void closeDialog(Node &n) {
+    HideDialogEvent e;
+    n.bubble(e);
+}
+
 struct DialogLayer : public LeafNode<DialogLayer> {
     Anim<double> _opacity{};
     Child _child;
@@ -101,6 +118,17 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         }
     }
 
+    void bubble(Events::Event &e) override {
+        if (e.is<ShowDialogEvent>()) {
+            auto &s = e.unwrap<ShowDialogEvent>();
+            show(s.child);
+        } else if (e.is<HideDialogEvent>()) {
+            close();
+        } else if (parent()) {
+            parent()->bubble(e);
+        }
+    }
+
     void layout(Math::Recti r) override {
         if (_shouldClose) {
             (*_dialog)->detach(this);
@@ -130,25 +158,10 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     Math::Recti bound() override {
         return _child->bound();
     }
-
-    void visit(Visitor &v) override {
-        v(*_child);
-        if (_dialog) {
-            v(**_dialog);
-        }
-    }
 };
 
 Child dialogLayer(Child child) {
     return makeStrong<DialogLayer>(child);
-}
-
-void showDialog(Node &n, Child child) {
-    queryParent<DialogLayer>(n).show(child);
-}
-
-void closeDialog(Node &n) {
-    queryParent<DialogLayer>(n).close();
 }
 
 /* --- Dialogs Scaffolding -------------------------------------------------- */

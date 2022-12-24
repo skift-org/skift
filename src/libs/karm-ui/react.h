@@ -100,11 +100,6 @@ struct React : public LeafNode<Crtp> {
             return child->bound();
         });
     }
-
-    void visit(Visitor &v) override {
-        ensureBuild();
-        v(**_child);
-    }
 };
 
 /* --- Lazy ----------------------------------------------------------------- */
@@ -190,15 +185,17 @@ Child state(T initial, Func<Child(State<T>)> build) {
 /* --- Reducer -------------------------------------------------------------- */
 
 template <typename Action>
-struct ActionDispatch {
-    virtual ~ActionDispatch() = default;
-    virtual void dispatch(Action) = 0;
+struct ActionDispatchEvent : public Events::_Event<ActionDispatchEvent<Action>> {
+    Action action;
+
+    ActionDispatchEvent(Action action)
+        : action(std::move(action)) {}
 };
 
 template <typename Action>
 inline void dispatchAction(Node &n, Action action) {
-    auto &d = queryParent<ActionDispatch<Action>>(n);
-    d.dispatch(action);
+    ActionDispatchEvent<Action> e{std::move(action)};
+    n.bubble(e);
 }
 
 template <typename Action>
@@ -233,25 +230,23 @@ struct Model {
     static Opt<Func<void(Node &)>> bindIf(bool cond, Args... args) {
         if (cond) {
             return bindAction<Action>(X{std::forward<Args>(args)...});
-        } else {
-            return NONE;
         }
+
+        return NONE;
     }
 
     template <typename X>
     static Opt<Func<void(Node &)>> bindIf(bool cond, X value) {
         if (cond) {
             return bindAction<Action>(value);
-        } else {
-            return NONE;
         }
+        return NONE;
     }
 };
 
 template <typename Model>
 struct Reducer :
-    public React<Reducer<Model>>,
-    public ActionDispatch<typename Model::Action> {
+    public React<Reducer<Model>> {
 
     using Data = typename Model::Data;
     using Action = typename Model::Action;
@@ -264,19 +259,18 @@ struct Reducer :
     Reducer(Data data, Reduce reducer, Func<Child(Data)> build)
         : _data(data), _reducer(std::move(reducer)), _build(std::move(build)) {}
 
-    void dispatch(Action action) override {
-        _data = _reducer(_data, action);
-        shouldRebuild(*this);
+    void bubble(Events::Event &e) override {
+        if (e.is<ActionDispatchEvent<Action>>()) {
+            auto action = e.unwrap<ActionDispatchEvent<Action>>().action;
+            _data = _reducer(_data, action);
+            shouldRebuild(*this);
+        } else {
+            React<Reducer>::bubble(e);
+        }
     }
 
     Child build() override {
         return _build(_data);
-    }
-
-    void *query(Meta::Id id) override {
-        if (id == Meta::makeId<ActionDispatch<Action>>())
-            return static_cast<ActionDispatch<Action> *>(this);
-        return React<Reducer<Model>>::query(id);
     }
 };
 

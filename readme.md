@@ -14,7 +14,6 @@
 
 <p align="center">
   <a href="https://skiftos.org/">Website</a> -
-  <a href="../../blob/legacy/manual/readme.md">Manual</a> -
   <a href="http://discord.skiftos.org">Discord</a> -
   <a href="https://github.com/skiftOS/skift/releases">Releases</a>
 </p>

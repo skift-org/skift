@@ -8,7 +8,8 @@ namespace Karm::Math {
 struct Easing {
     double (*_inner)(double);
 
-    Easing() : _inner{linear} {}
+    Easing()
+        : _inner(linear) {}
 
     Easing(double (*inner)(double)) : _inner(inner) {}
 

@@ -13,9 +13,9 @@ struct Anim {
     T _value{};
     T _target{};
     Math::Easing _easing{};
-    double _elapsed{0};
-    double _duration{0};
-    bool _animated = false;
+    double _elapsed{};
+    double _duration{};
+    bool _animated{};
 
     Anim() = default;
 

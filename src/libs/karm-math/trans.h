@@ -30,7 +30,7 @@ union Trans2 {
     T _els[6]{};
 
     constexpr Trans2(T xx, T xy, T yx, T yy, T ox, T oy)
-        : _els{xx, xy, yx, yy, ox, oy} {}
+        : _els(xx, xy, yx, yy, ox, oy) {}
 
     static constexpr Trans2 identity() {
         return Trans2(1, 0, 0, 1, 0, 0);

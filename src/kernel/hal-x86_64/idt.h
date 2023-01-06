@@ -42,7 +42,8 @@ struct [[gnu::packed]] IdtDesc {
     uint64_t _base;
 
     IdtDesc(Idt const &base)
-        : _limit{sizeof(Idt) - 1}, _base{reinterpret_cast<uintptr_t>(&base)} {}
+        : _limit(sizeof(Idt) - 1),
+          _base(reinterpret_cast<uintptr_t>(&base)) {}
 
     void load() const { _idtLoad(this); }
 };

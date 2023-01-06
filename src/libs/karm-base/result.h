@@ -13,15 +13,15 @@ struct [[nodiscard]] Result {
     Error _error = OK;
     Opt<Value> _value{};
 
-    constexpr Result(None) : _error{NONE}, _value{NONE} {}
+    constexpr Result(None) : _error(NONE), _value(NONE) {}
 
-    constexpr Result(Error::Code code) : _error{code} {}
+    constexpr Result(Error::Code code) : _error(code) {}
 
     constexpr Result(Error error) : _error(error) {}
 
-    constexpr Result(Value &&value) : _error(OK), _value(std::move(value)) {}
-
-    constexpr Result(Value const &value) : _error(OK), _value(value) {}
+    template <typename U = Value>
+        requires(!Meta::Same<Meta::RemoveConstVolatileRef<U>, Result<Value>> and Meta::Constructible<Value, U &&>)
+    constexpr Result(U &&value) : _error(OK), _value(std::forward<U>(value)) {}
 
     constexpr explicit operator bool() { return bool(_error); }
 

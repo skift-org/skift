@@ -33,16 +33,28 @@ struct Any {
     Any() = delete;
 
     template <typename T>
-    Any(T const &value) : _type(Meta::makeId<T>()), _buf(new T(value)), _ops(_Ops::make<T>()) {}
+    Any(T const &value)
+        : _type(Meta::makeId<T>()),
+          _buf(new T(value)),
+          _ops(_Ops::make<T>()) {}
 
     template <typename T>
-    Any(T &&value) : _type(Meta::makeId<T>()), _buf(new T(std::move(value))), _ops(_Ops::make<T>()) {}
+    Any(T &&value)
+        : _type(Meta::makeId<T>()),
+          _buf(new T(std::move(value))),
+          _ops(_Ops::make<T>()) {}
 
-    Any(Any const &other) : _type(other._type), _buf(other._buf), _ops(other._ops) {
+    Any(Any const &other)
+        : _type(other._type),
+          _buf(other._buf),
+          _ops(other._ops) {
         _ops.copy(_buf, other._buf);
     }
 
-    Any(Any &&other) : _type(other._type), _buf(other._buf), _ops(other._ops) {
+    Any(Any &&other)
+        : _type(other._type),
+          _buf(other._buf),
+          _ops(other._ops) {
         other._buf = nullptr;
     }
 

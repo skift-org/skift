@@ -26,7 +26,9 @@ struct [[gnu::packed]] GdtEntry {
 
     constexpr GdtEntry() = default;
 
-    constexpr GdtEntry(uint8_t flags, uint8_t granularity) : _flags(flags), _granularity(granularity){};
+    constexpr GdtEntry(uint8_t flags, uint8_t granularity)
+        : _flags(flags),
+          _granularity(granularity){};
 
     constexpr GdtEntry(uint32_t base, uint32_t limit, uint8_t flags, uint8_t granularity)
         : _limitLow(limit & 0xffff),
@@ -97,10 +99,12 @@ struct [[gnu::packed]] Gdt {
 extern "C" void _gdtLoad(void const *ptr); // implemented in gdt.s
 
 struct [[gnu::packed]] GdtDesc {
-    uint16_t _limit{};
-    uint64_t _base{};
+    uint16_t _limit;
+    uint64_t _base;
 
-    GdtDesc(Gdt const &base) : _limit{sizeof(Gdt) - 1}, _base{reinterpret_cast<uintptr_t>(&base)} {}
+    GdtDesc(Gdt const &base)
+        : _limit(sizeof(Gdt) - 1),
+          _base(reinterpret_cast<uintptr_t>(&base)) {}
 
     void load() const { _gdtLoad(this); }
 };

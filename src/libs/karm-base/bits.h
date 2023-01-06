@@ -13,8 +13,8 @@ struct Bits {
     size_t _len{};
 
     Bits(MutSlice<uint8_t> slice)
-        : _buf{slice.buf()}, _len{slice.len()} {
-    }
+        : _buf(slice.buf()),
+          _len(slice.len()) {}
 
     bool get(size_t index) const {
         return _buf[index / 8] & (1 << (index % 8));

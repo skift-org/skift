@@ -17,11 +17,14 @@ union Edge {
 
     T _els[4];
 
-    constexpr Edge() : _els{0, 0, 0, 0} {};
+    constexpr Edge()
+        : _els(0, 0, 0, 0){};
 
-    constexpr Edge(Vec2<T> start, Vec2<T> end) : start(start), end(end) {}
+    constexpr Edge(Vec2<T> start, Vec2<T> end)
+        : start(start), end(end) {}
 
-    constexpr Edge(T x1, T y1, T x2, T y2) : start(x1, y1), end(x2, y2) {}
+    constexpr Edge(T x1, T y1, T x2, T y2)
+        : start(x1, y1), end(x2, y2) {}
 
     constexpr Rect<T> bound() const {
         return Rect<T>::fromTwoPoint(start, end);

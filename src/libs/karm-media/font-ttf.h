@@ -18,8 +18,8 @@ struct TtfFontface : public Fontface {
     }
 
     TtfFontface(Sys::Mmap mmap, Ttf::Font ttf)
-        : _mmap{std::move(mmap)},
-          _ttf{std::move(ttf)} {
+        : _mmap(std::move(mmap)),
+          _ttf(std::move(ttf)) {
     }
 
     FontMetrics metrics() const override {

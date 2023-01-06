@@ -99,9 +99,9 @@ struct Anim2 {
 
     Anim2() = default;
 
-    Anim2(T x, T y) : _x{x}, _y{y} {}
+    Anim2(T x, T y) : _x(x), _y(y) {}
 
-    Anim2(Math::Vec2<T> v) : _x{v.x}, _y{v.y} {}
+    Anim2(Math::Vec2<T> v) : _x(v.x), _y(v.y) {}
 
     void set(Node &n, Math::Vec2<T> v) {
         _x.set(n, v.x);

@@ -7,7 +7,7 @@ namespace Karm::Ui {
 struct Host : public Node {
     Child _root;
     Opt<Error> _error;
-    Gfx::Context _g{};
+    Gfx::Context _g;
     Vec<Math::Recti> _dirty;
 
     bool _shouldLayout{};

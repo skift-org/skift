@@ -7,7 +7,7 @@
 namespace Loader::Fw {
 
 struct EfiPmm : public Hal::Pmm {
-    Result<Hal::PmmRange> alloc(size_t size, Hal::PmmFlags) override {
+    Result<Hal::PmmRange> allocRange(size_t size, Hal::PmmFlags) override {
         size_t paddr = 0;
         try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::LOADER_DATA, size / Hal::PAGE_SIZE, &paddr));
         return Hal::PmmRange{paddr, size};
@@ -28,7 +28,7 @@ struct EfiPmm : public Hal::Pmm {
 static EfiPmm pmm{};
 
 Result<Strong<Hal::Vmm>> createVmm() {
-    size_t upper = try$(pmm.alloc(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start;
+    size_t upper = try$(pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start;
     memset((void *)upper, 0, Hal::PAGE_SIZE);
     return {makeStrong<x86_64::Vmm<>>(pmm, (x86_64::Pml<4> *)upper)};
 }

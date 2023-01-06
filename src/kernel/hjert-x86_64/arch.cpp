@@ -147,7 +147,7 @@ static Opt<x86_64::Vmm<Hal::UpperHalfMapper>> _vmm = NONE;
 Hal::Vmm &vmm() {
     if (_vmm == NONE) {
         uintptr_t pml4 = Hjert::Mem::heap()
-                             .alloc(Hal::PAGE_SIZE)
+                             .allocRange(Hal::PAGE_SIZE)
                              .unwrap("failed to allocate pml4")
                              .start;
 

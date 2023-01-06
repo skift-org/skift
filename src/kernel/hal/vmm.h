@@ -8,6 +8,8 @@
 
 namespace Hal {
 
+struct Vmm;
+
 enum struct VmmFlags : uint64_t {
     NIL = 0,
     READ = (1 << 0),
@@ -30,16 +32,20 @@ inline VmmRange upperHalfMapped(PmmRange range) {
     return {UPPER_HALF + range.start, range.size};
 }
 
+using VmmMem = Mem<Vmm, VmmRange>;
+
 struct Vmm {
     using enum VmmFlags;
-    using Flags = VmmFlags;
-    using Range = VmmRange;
 
     virtual ~Vmm() = default;
 
-    virtual Error map(VmmRange vaddr, PmmRange paddr, VmmFlags flags) = 0;
+    virtual Result<VmmRange> allocRange(VmmRange vaddr, PmmRange paddr, VmmFlags flags) = 0;
 
-    virtual Error unmap(VmmRange vaddr) = 0;
+    Result<VmmMem> mapOwned(VmmRange vaddr, PmmRange paddr, VmmFlags flags) {
+        return VmmMem{*this, try$(allocRange(vaddr, paddr, flags))};
+    }
+
+    virtual Error free(VmmRange vaddr) = 0;
 
     virtual Error update(VmmRange vaddr, VmmFlags flags) = 0;
 

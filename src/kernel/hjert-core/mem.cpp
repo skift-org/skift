@@ -19,7 +19,7 @@ struct Pmm : public Hal::Pmm {
         clear();
     }
 
-    Result<Hal::PmmRange> alloc(size_t size, Hal::PmmFlags flags) override {
+    Result<Hal::PmmRange> allocRange(size_t size, Hal::PmmFlags flags) override {
         LockScope guard(_lock);
         bool upper = (flags & Hal::PmmFlags::UPPER) == Hal::PmmFlags::UPPER;
 
@@ -78,8 +78,8 @@ struct Heap : public Hal::Heap {
     Heap(Hal::Pmm &pmm) : _pmm(pmm) {
     }
 
-    Result<Hal::HeapRange> alloc(size_t size) override {
-        return pmm2Heap(try$(_pmm.alloc(size, Hal::PmmFlags::NIL)));
+    Result<Hal::HeapRange> allocRange(size_t size) override {
+        return pmm2Heap(try$(_pmm.allocRange(size, Hal::PmmFlags::NIL)));
     }
 
     Error free(Hal::HeapRange range) override {
@@ -147,13 +147,13 @@ Error init(Handover::Payload &payload) {
     try$(_pmm->used({pmmBits.start, pmmBits.size}, Hal::PmmFlags::NIL));
 
     logInfo("mem: mapping kernel...");
-    try$(vmm().map(
+    try$(vmm().allocRange(
         {Handover::KERNEL_BASE + Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         {Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     logInfo("mem: mapping upper half...");
-    try$(vmm().map(
+    try$(vmm().allocRange(
         {Handover::UPPER_HALF + Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
         {Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
         Hal::Vmm::READ | Hal::Vmm::WRITE));

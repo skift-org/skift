@@ -56,6 +56,8 @@ Child vcenterFill(Child child);
 
 /* --- Sizing --------------------------------------------------------------- */
 
+Child sizing(Math::Vec2i min, Math::Vec2i max, Child child);
+
 Child minSize(Math::Vec2i size, Child child);
 
 Child minSize(int size, Child child);

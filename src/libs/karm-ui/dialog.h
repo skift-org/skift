@@ -46,6 +46,10 @@ void showDialog(Node &n, DialogFn<T> fn, Child child) {
 
 void closeDialog(Node &n);
 
+/* --- Popover Base --------------------------------------------------------- */
+
+void showPopover(Node &n, Math::Vec2i at, Child child);
+
 /* --- Dialogs Scaffolding -------------------------------------------------- */
 
 Child dialogScafold(Layout::Align a, Child inner);

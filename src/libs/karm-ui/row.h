@@ -17,7 +17,7 @@ inline Child row(Child child) {
 
 inline Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Child> trailing) {
     auto lead = leading
-                    ? spacing({0, 0, 12, 0}, minSize(26, center(*leading)))
+                    ? spacing({0, 0, 12, 0}, sizing(26, {UNCONSTRAINED, 26}, *leading))
                     : empty();
 
     auto t = subtitle
@@ -28,7 +28,7 @@ inline Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Chi
                  : text(TextStyle::labelLarge(), title);
 
     auto trail = trailing
-                     ? spacing({12, 0, 0, 0}, minSize(26, center(*trailing)))
+                     ? spacing({12, 0, 0, 0}, sizing(26, {UNCONSTRAINED, 26}, *trailing))
                      : empty();
 
     return minSize(

@@ -191,6 +191,10 @@ struct Sizing : public ProxyNode<Sizing> {
     }
 };
 
+Child sizing(Math::Vec2i min, Math::Vec2i max, Child child) {
+    return makeStrong<Sizing>(min, max, child);
+}
+
 Child minSize(Math::Vec2i size, Child child) {
     return makeStrong<Sizing>(size, UNCONSTRAINED, child);
 }

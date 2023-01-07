@@ -3,11 +3,9 @@
     "type": "exe",
     "description": "The ls coreutility",
     "deps": [
-        "karm-test"
-    ],
-    "requires": {
-        "freestanding": [
-            false
-        ]
-    }
+        "karm-main",
+        "karm-sys",
+        "karm-io",
+        "karm-fmt"
+    ]
 }

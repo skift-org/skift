@@ -1,12 +1,12 @@
 {
-    "id": "dtb-dump",
+    "id": "sysfetch",
     "type": "exe",
-    "description": "Dump a device tree blob",
+    "description": "Fetches system information",
     "deps": [
         "karm-main",
         "karm-sys",
         "karm-io",
         "karm-fmt",
-        "device-tree"
+        "karm-cli"
     ]
 }

@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <karm-io/funcs.h>
 #include <sys/mman.h>
+#include <sys/utsname.h>
 #include <unistd.h>
 
 #include "errno.h"
@@ -138,16 +139,16 @@ Result<Strong<Sys::Fd>> createErr() {
     return {makeStrong<PosixFd>(2)};
 }
 
-int mmapOptionsToProt(Karm::Sys::MmapOptions const &options) {
+int mmapOptionsToProt(Sys::MmapOptions const &options) {
     int prot = 0;
 
-    if (options.flags & Karm::Sys::MmapFlags::READ)
+    if (options.flags & Sys::MmapFlags::READ)
         prot |= PROT_READ;
 
-    if (options.flags & Karm::Sys::MmapFlags::WRITE)
+    if (options.flags & Sys::MmapFlags::WRITE)
         prot |= PROT_WRITE;
 
-    if (options.flags & Karm::Sys::MmapFlags::EXEC)
+    if (options.flags & Sys::MmapFlags::EXEC)
         prot |= PROT_EXEC;
 
     return prot;
@@ -161,14 +162,14 @@ Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
         return Posix::fromLastErrno();
     }
 
-    if (options.flags & Karm::Sys::MmapFlags::PREFETCH) {
+    if (options.flags & Sys::MmapFlags::PREFETCH) {
         madvise(addr, options.size, MADV_WILLNEED);
     }
 
     return Sys::MmapResult{0, (size_t)addr, (size_t)options.size};
 }
 
-Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options, Strong<Sys::Fd> maybeFd) {
+Result<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> maybeFd) {
     Strong<PosixFd> fd = try$(maybeFd.as<PosixFd>());
     size_t size = options.size;
 
@@ -198,6 +199,44 @@ Error memFlush(void *flush, size_t len) {
         return Posix::fromLastErrno();
     }
 
+    return OK;
+}
+
+Error populate(Sys::SysInfo &infos) {
+    struct utsname uts;
+    if (uname(&uts) < 0) {
+        return Posix::fromLastErrno();
+    }
+
+    infos.sysName = "Posix";
+    infos.sysVersion = Fmt::format("{}", _POSIX_VERSION);
+
+    infos.kernelName = uts.sysname;
+    infos.kernelVersion = uts.release;
+
+    infos.hostname = uts.nodename;
+
+    return OK;
+}
+
+Error populate(Sys::MemInfo &) {
+    return Error::NOT_IMPLEMENTED;
+}
+
+Error populate(Vec<Sys::CpuInfo> &) {
+    return Error::NOT_IMPLEMENTED;
+}
+
+Error populate(Sys::UserInfo &infos) {
+    infos.name = getenv("USER");
+    infos.home = getenv("HOME");
+    infos.shell = getenv("SHELL");
+
+    return OK;
+}
+
+Error populate(Vec<Sys::UserInfo> &infos) {
+    infos.pushBack(try$(Sys::userinfo()));
     return OK;
 }
 

@@ -26,6 +26,23 @@ enum Color {
     WHITE = 67,
 };
 
+// clang-format off
+
+inline constexpr Array LIGHT_COLORS = {
+    GRAY_DARK,RED_LIGHT,GREEN_LIGHT,YELLOW_LIGHT,BLUE_LIGHT,MAGENTA_LIGHT,CYAN_LIGHT,WHITE,
+};
+
+inline constexpr Array DARK_COLORS = {
+    BLACK,RED,GREEN,YELLOW,BLUE,MAGENTA,CYAN,GRAY_LIGHT,
+};
+
+inline constexpr Array COLORS = {
+    BLACK,RED,GREEN,YELLOW,BLUE,MAGENTA,CYAN,GRAY_LIGHT,
+    GRAY_DARK,RED_LIGHT,GREEN_LIGHT,YELLOW_LIGHT,BLUE_LIGHT,MAGENTA_LIGHT,CYAN_LIGHT,WHITE,
+};
+
+// clang-format on
+
 struct Style {
     bool _reset{};
     Color _fg{_COLOR_UNDEF};

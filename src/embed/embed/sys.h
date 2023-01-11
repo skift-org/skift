@@ -4,6 +4,7 @@
 #include <karm-base/range.h>
 #include <karm-sys/dir.h>
 #include <karm-sys/fd.h>
+#include <karm-sys/info.h>
 #include <karm-sys/types.h>
 
 #include "sys-defs.h"
@@ -24,6 +25,8 @@ Result<Strong<Sys::Fd>> createOut();
 
 Result<Strong<Sys::Fd>> createErr();
 
+/* --- Memory Managment ----------------------------------------------------- */
+
 Result<Sys::MmapResult> memMap(Sys::MmapOptions const &options);
 
 Result<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> fd);
@@ -31,5 +34,17 @@ Result<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> 
 Error memUnmap(void const *buf, size_t len);
 
 Error memFlush(void *flush, size_t len);
+
+/* --- System Informations -------------------------------------------------- */
+
+Error populate(Sys::SysInfo &);
+
+Error populate(Sys::MemInfo &);
+
+Error populate(Vec<Sys::CpuInfo> &);
+
+Error populate(Sys::UserInfo &);
+
+Error populate(Vec<Sys::UserInfo> &);
 
 } // namespace Embed

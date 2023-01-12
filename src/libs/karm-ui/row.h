@@ -17,7 +17,7 @@ inline Child row(Child child) {
 
 inline Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Child> trailing) {
     auto lead = leading
-                    ? spacing({0, 0, 12, 0}, sizing(26, {UNCONSTRAINED, 26}, *leading))
+                    ? spacing({0, 0, 12, 0}, sizing(26, {UNCONSTRAINED, 26}, center(*leading)))
                     : empty();
 
     auto t = subtitle
@@ -28,7 +28,7 @@ inline Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Chi
                  : text(TextStyle::labelLarge(), title);
 
     auto trail = trailing
-                     ? spacing({12, 0, 0, 0}, sizing(26, {UNCONSTRAINED, 26}, *trailing))
+                     ? spacing({12, 0, 0, 0}, sizing(26, {UNCONSTRAINED, 26}, center(*trailing)))
                      : empty();
 
     return minSize(
@@ -139,7 +139,7 @@ inline Child navRow(bool selected, OnPress onPress, Media::Icons i, String title
                 center(text(TextStyle::labelMedium(), title)))));
 }
 
-inline Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Children children) {
+inline Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Child child) {
     return state(false, [=](State<bool> state) {
         return vflow(
             0,
@@ -151,9 +151,13 @@ inline Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Chi
                 icon(state.value() ? Media::Icons::CHEVRON_UP : Media::Icons::CHEVRON_DOWN, 24)),
             state.value() ? spacing(
                                 {38, 0, 0, 0},
-                                vflow(children))
+                                child)
                           : empty());
     });
+}
+
+inline Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Children children) {
+    return treeRow(leading, title, subtitle, vflow(children));
 }
 
 } // namespace Karm::Ui

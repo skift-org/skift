@@ -4,21 +4,116 @@
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
+#include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
+#include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
-CliResult entryPoint(CliArgs args) {
-    auto titlebar = Ui::titlebar(
-        Media::Icons::INFORMATION,
-        "About",
-        Ui::TitlebarStyle::DIALOG);
+Ui::Child errorScope(auto callback) {
+    Result<Ui::Child> child = callback();
 
-    auto logo = Ui::grow(Ui::box(
+    if (child) {
+        return child.unwrap();
+    }
+
+    return Ui::box(
         {
+            .padding = 12,
+            .borderRadius = 6,
+            .borderWidth = 1,
+            .borderPaint = Gfx::RED700,
+            .backgroundPaint = Gfx::RED900,
+            .foregroundPaint = Gfx::RED100,
+        },
+        Ui::hflow(6, Ui::center(Ui::icon(Media::Icons::ALERT_DECAGRAM_OUTLINE, 26)), Ui::vflow(4, Ui::text(Ui::TextStyle::titleMedium().withColor(Gfx::WHITE), "Something went wrong"), Ui::text(child.none().msg()))));
+}
+
+Ui::Child userInfos() {
+    return Ui::treeRow(
+        Ui::icon(Media::Icons::ACCOUNT),
+        "User",
+        NONE,
+        errorScope([&] -> Result<Ui::Child> {
+            auto userinfo = try$(Sys::userinfo());
+            return Ui::vflow(
+                Ui::row(NONE, "Username", NONE, Ui::text(userinfo.name)),
+                Ui::row(NONE, "Home", NONE, Ui::text(userinfo.home)),
+                Ui::row(NONE, "Shell", NONE, Ui::text(userinfo.shell)));
+        }));
+}
+
+Ui::Child sysInfos() {
+    return Ui::treeRow(
+        Ui::icon(Media::Icons::INFORMATION_OUTLINE),
+        "System",
+        NONE,
+        errorScope([&] -> Result<Ui::Child> {
+            auto sysinfo = try$(Sys::sysinfo());
+            return Ui::vflow(
+                Ui::row(NONE, "System", NONE, Ui::text(sysinfo.sysName)),
+                Ui::row(NONE, "System Version", NONE, Ui::text(sysinfo.sysVersion)),
+                Ui::row(NONE, "Kernel", NONE, Ui::text(sysinfo.kernelName)),
+                Ui::row(NONE, "Kernel Version", NONE, Ui::text(sysinfo.kernelVersion)));
+        }));
+}
+
+Ui::Child memInfos() {
+    return Ui::treeRow(
+        Ui::icon(Media::Icons::MEMORY),
+        "Memory",
+        NONE,
+        errorScope([&] -> Result<Ui::Child> {
+            auto meminfo = try$(Sys::meminfo());
+            return vflow(
+                Ui::row(NONE, "Physical", NONE, Ui::text("{}bytes", meminfo.physicalUsed)),
+                Ui::row(NONE, "Swap", NONE, Ui::text("{}bytes", meminfo.swapUsed)));
+        }));
+}
+
+Ui::Child cpuInfos() {
+    return Ui::treeRow(
+        Ui::icon(Media::Icons::CPU_64_BIT),
+        "CPU",
+        NONE,
+        errorScope([&] -> Result<Ui::Child> {
+            auto cpusinfo = try$(Sys::cpusinfo());
+
+            Ui::Children children;
+
+            for (auto &cpu : cpusinfo) {
+                children.pushBack(Ui::row(
+                    NONE,
+                    "CPU",
+                    NONE,
+                    Ui::text("{} {} {} MHz", cpu.name, cpu.brand, cpu.freq)));
+            }
+
+            return Ui::vflow(children);
+        }));
+}
+
+Ui::Child details() {
+    return Ui::grow(
+        Ui::vscroll(
+            Ui::card(
+                Ui::vflow(
+                    userInfos(),
+                    Ui::separator(),
+                    sysInfos(),
+                    Ui::separator(),
+                    memInfos(),
+                    Ui::separator(),
+                    cpuInfos()))));
+}
+
+CliResult entryPoint(CliArgs args) {
+    auto logo = Ui::box(
+        {
+            .padding = 32,
             .backgroundPaint = Gfx::WHITE,
             .foregroundPaint = Gfx::BLACK,
         },
-        Ui::bound(Ui::center(Ui::icon(Media::Icons::SNOWFLAKE, 128)))));
+        Ui::bound(Ui::center(Ui::icon(Media::Icons::SNOWFLAKE, 64))));
 
     auto licenseBtn = Ui::button(
         NONE,
@@ -44,16 +139,21 @@ CliResult entryPoint(CliArgs args) {
             Ui::empty(),
             Ui::text("Copyright © 2018-2022"),
             Ui::text("SMNX & contributors."),
-            Ui::grow(),
+            details(),
             Ui::hflow(8, licenseBtn, Ui::grow(), closeBtn)));
 
+    auto titlebar = Ui::titlebar(
+        Media::Icons::INFORMATION,
+        "About",
+        Ui::TitlebarStyle::DIALOG);
+
     auto wrapper =
-        Ui::hflow(logo, Ui::grow(content));
+        Ui::vflow(titlebar, logo, Ui::grow(content));
 
     auto layout = Ui::dragRegion(
-        Ui::minSize(
-            {500, 300},
+        Ui::pinSize(
+            {400, 550},
             wrapper));
 
-    return Ui::runApp(args, layout);
+    return Ui::runApp(args, Ui::dialogLayer(layout));
 }

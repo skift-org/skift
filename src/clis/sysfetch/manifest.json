@@ -1,7 +1,7 @@
 {
     "id": "sysfetch",
     "type": "exe",
-    "description": "Fetches system information",
+    "description": "Fetches system informations",
     "deps": [
         "karm-main",
         "karm-sys",

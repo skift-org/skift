@@ -127,9 +127,8 @@ struct DragRegion : public ProxyNode<DragRegion> {
         if (not _grabbed)
             _child->event(e);
 
-        if (e.accepted) {
+        if (e.accepted)
             return;
-        }
 
         e.handle<Events::MouseEvent>([&](auto &m) {
             if (not bound().contains(m.pos) and not _grabbed) {
@@ -143,14 +142,18 @@ struct DragRegion : public ProxyNode<DragRegion> {
                 bubble(de);
 
                 return true;
-            } else if (m.type == Events::MouseEvent::RELEASE) {
+            }
+
+            if (m.type == Events::MouseEvent::RELEASE) {
                 _grabbed = false;
 
                 DragEvent de = {.type = DragEvent::END};
                 bubble(de);
 
                 return true;
-            } else if (m.type == Events::MouseEvent::MOVE) {
+            }
+
+            if (m.type == Events::MouseEvent::MOVE) {
                 if (_grabbed) {
 
                     DragEvent de = {.type = DragEvent::DRAG, .delta = m.delta};

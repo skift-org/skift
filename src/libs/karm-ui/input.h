@@ -60,7 +60,9 @@ struct MouseListener {
             if (m.type == Events::MouseEvent::PRESS) {
                 state = PRESS;
                 return true;
-            } else if (m.type == Events::MouseEvent::RELEASE) {
+            }
+
+            if (m.type == Events::MouseEvent::RELEASE) {
                 state = HOVER;
                 result = true;
                 return true;

@@ -50,6 +50,7 @@ struct Scroll : public ProxyNode<Scroll> {
                     }
                 }
             }
+            e.accepted = ee.accepted;
         } else if (e.is<Events::AnimateEvent>() and _animated) {
             shouldRepaint(*parent(), bound());
             _animated = false;
@@ -122,7 +123,8 @@ struct List : public GroupNode<List> {
     BuildItem _builder;
 
     List(size_t count, BuildItem builder)
-        : _count(count), _builder(std::move(builder)) {}
+        : _count(count),
+          _builder(std::move(builder)) {}
 };
 
 } // namespace Karm::Ui

@@ -15,10 +15,10 @@ union Edge {
         T sx, sy, ex, ey;
     };
 
-    T _els[4];
+    Array<T, 4> _els;
 
     constexpr Edge()
-        : _els(0, 0, 0, 0){};
+        : _els{} {};
 
     constexpr Edge(Vec2<T> start, Vec2<T> end)
         : start(start), end(end) {}

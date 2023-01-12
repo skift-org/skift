@@ -19,16 +19,16 @@ union Vec2 {
         T width, height;
     };
 
-    T _els[2];
+    Array<T, 2> _els;
 
     constexpr Vec2()
-        : _els() {}
+        : _els{} {}
 
     constexpr Vec2(T x, T y)
-        : _els(x, y) {}
+        : _els{x, y} {}
 
     constexpr Vec2(T value)
-        : _els(value, value) {}
+        : _els{value, value} {}
 
     constexpr T min() const {
         return Karm::min(x, y);
@@ -191,16 +191,16 @@ union Vec3 {
         Vec2<T> yz;
     };
 
-    T _els[3];
+    Array<T, 3> _els;
 
     constexpr Vec3()
-        : _els() {}
+        : _els{} {}
 
     constexpr Vec3(T x, T y, T z)
-        : _els(x, y, z) {}
+        : _els{x, y, z} {}
 
     constexpr Vec3(T value)
-        : _els(value, value, value) {}
+        : _els{value, value, value} {}
 
     constexpr Vec2<T> xz() const {
         return {x, y};
@@ -344,16 +344,16 @@ union Vec4 {
         Vec2<T> zw;
     };
 
-    T _els[4];
+    Array<T, 4> _els;
 
     constexpr Vec4()
-        : _els() {}
+        : _els{} {}
 
     constexpr Vec4(T x, T y, T z, T w)
-        : _els(x, y, z, w) {}
+        : _els{x, y, z, w} {}
 
     constexpr Vec4(T value)
-        : _els(value, value, value, value) {}
+        : _els{value, value, value, value} {}
 
     constexpr T min() const {
         return min(x, y, z, w);

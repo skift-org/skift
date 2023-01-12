@@ -12,6 +12,7 @@
     ],
     "deps": [
         "abi-sysv",
-        "karm-base"
+        "karm-base",
+        "libheap"
     ]
 }

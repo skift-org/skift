@@ -1,6 +1,7 @@
 #include <hjert-core/arch.h>
 #include <hjert-core/cpu.h>
 #include <hjert-core/mem.h>
+#include <hjert-core/sched.h>
 #include <karm-logger/logger.h>
 
 #include <hal-x86_64/com.h>
@@ -78,8 +79,6 @@ Hjert::Cpu &cpu() {
 
 /* --- Interrupts ----------------------------------------------------------- */
 
-static uint64_t _tick = 0;
-
 static char const *_faultMsg[32] = {
     "division-by-zero",
     "debug",
@@ -126,10 +125,9 @@ extern "C" uintptr_t _intDispatch(uintptr_t rsp) {
         int irq = frame->intNo - 32;
 
         if (irq == 0) {
-            _tick++;
-            if (_tick % 1000 == 0) {
-                logInfo("x86_64: tick: {}", _tick);
-            }
+            Sched::self().stack().saveSp(rsp);
+            Sched::sched().schedule();
+            rsp = Sched::self().stack().loadSp();
         } else {
             logInfo("x86_64: irq: {}", irq);
         }

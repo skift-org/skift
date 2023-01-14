@@ -20,7 +20,7 @@ struct Pmm : public Hal::Pmm {
     }
 
     Result<Hal::PmmRange> allocRange(size_t size, Hal::PmmFlags flags) override {
-        LockScope guard(_lock);
+        LockScope scope(_lock);
         bool upper = (flags & Hal::PmmFlags::UPPER) == Hal::PmmFlags::UPPER;
 
         try$(ensureAlign(size, Hal::PAGE_SIZE));
@@ -33,7 +33,7 @@ struct Pmm : public Hal::Pmm {
             return OK;
         }
 
-        LockScope guard(_lock);
+        LockScope scope(_lock);
         try$(range.ensureAligned(Hal::PAGE_SIZE));
         _bits.set(pmm2Bits(range), true);
         return OK;
@@ -44,14 +44,14 @@ struct Pmm : public Hal::Pmm {
             return Error{"range is not in usable memory"};
         }
 
-        LockScope guard(_lock);
+        LockScope scope(_lock);
         try$(range.ensureAligned(Hal::PAGE_SIZE));
         _bits.set(pmm2Bits(range), false);
         return OK;
     }
 
     void clear() {
-        LockScope guard(_lock);
+        LockScope scope(_lock);
         _bits.fill(true);
     }
 

@@ -29,7 +29,7 @@ def bootCmd(opts: dict, args: list[str]) -> None:
         "-machine", "q35",
         "-no-reboot",
         "-no-shutdown",
-        "-d", "guest_errors,cpu_reset,int",
+        # "-d", "guest_errors,cpu_reset,int",
         "-serial", "mon:stdio",
         "-bios", ovmf,
         "-m", "256M",

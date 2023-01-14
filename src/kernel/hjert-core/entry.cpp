@@ -6,6 +6,7 @@
 #include "arch.h"
 #include "cpu.h"
 #include "mem.h"
+#include "sched.h"
 
 namespace Hjert {
 
@@ -52,8 +53,8 @@ Error start(uint64_t magic, Handover::Payload &payload) {
     splash();
     try$(validateAndDump(magic, payload));
 
-    logInfo("entry: initialized memory manager...");
     try$(Mem::init(payload));
+    try$(Sched::init(payload));
 
     logInfo("entry: everything is ready, enabling interrupts...");
     Arch::cpu().retainEnable();

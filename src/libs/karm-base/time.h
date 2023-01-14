@@ -4,6 +4,10 @@
 
 namespace Karm {
 
+using Tick = uint64_t;
+
+static constexpr Tick TICKS_PER_SECOND = 1000;
+
 struct TimeSpan {
     uint64_t value;
 

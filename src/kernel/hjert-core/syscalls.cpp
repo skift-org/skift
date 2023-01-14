@@ -1,6 +1,7 @@
 #include <hjert-api/syscalls.h>
 
 #include "arch.h"
+#include "sched.h"
 
 namespace Hjert {
 

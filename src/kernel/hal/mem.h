@@ -69,7 +69,7 @@ struct Mem {
         return *this;
     }
 
-    USizeRange range() const {
+    Range range() const {
         return _range;
     }
 };

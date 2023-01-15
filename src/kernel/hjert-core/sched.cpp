@@ -1,5 +1,6 @@
 #include <karm-logger/logger.h>
 
+#include "arch.h"
 #include "mem.h"
 #include "sched.h"
 
@@ -26,7 +27,7 @@ Result<Strong<Task>> Task::create() {
 Error Sched::start(Strong<Task> task, uintptr_t ip, uintptr_t sp) {
     logInfo("sched: starting task (ip: {x}, sp: {x})...", ip, sp);
     LockScope scope(_lock);
-
+    Arch::start(*task, ip, sp, {});
     _tasks.pushBack(std::move(task));
     return OK;
 }

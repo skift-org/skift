@@ -24,6 +24,11 @@ struct Stack {
         memcpy((void *)_sp, bytes.buf(), bytes.len());
     }
 
+    template <typename T>
+    void push(T t) {
+        push(Bytes{reinterpret_cast<uint8_t *>(&t), sizeof(t)});
+    }
+
     static constexpr size_t DEFAULT_SIZE = kib(16);
 
     static Result<Stack> create();

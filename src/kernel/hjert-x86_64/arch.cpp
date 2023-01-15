@@ -158,4 +158,32 @@ Hal::Vmm &vmm() {
     return *_vmm;
 }
 
+void start(Sched::Task &task, uintptr_t ip, uintptr_t sp, Array<uintptr_t, 5> args) {
+    Frame frame{
+        .r8 = args[4],
+        .rdi = args[0],
+        .rsi = args[1],
+        .rdx = args[2],
+        .rcx = args[3],
+
+        .rip = ip,
+        .rsp = sp,
+    };
+
+    /* if (task.isUser()) {
+        frame.cs = x86_64::Gdt::UCODE * 8 | 3; // 3 = user mode
+        frame.ss = x86_64::Gdt::UDATA * 8 | 3;
+        frame.rflags = 0x202;
+    } else */
+    {
+        frame.cs = x86_64::Gdt::KCODE * 8;
+        frame.ss = x86_64::Gdt::KDATA * 8;
+        frame.rflags = 0x202;
+    }
+
+    task
+        .stack()
+        .push(frame);
+}
+
 } // namespace Hjert::Arch

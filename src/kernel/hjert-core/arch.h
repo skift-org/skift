@@ -11,6 +11,12 @@ namespace Hjert {
 
 struct Cpu;
 
+namespace Sched {
+
+struct Task;
+
+} // namespace Sched
+
 } // namespace Hjert
 
 namespace Hjert::Arch {
@@ -24,5 +30,7 @@ Hal::Vmm &vmm();
 Io::TextWriter<> &loggerOut();
 
 [[noreturn]] void stopAll();
+
+void start(Sched::Task &, uintptr_t ip, uintptr_t sp, Array<uintptr_t, 5> args);
 
 } // namespace Hjert::Arch

@@ -218,7 +218,7 @@ inline Result<size_t> _format(Io::_TextWriter &writer, Str format, _Args &args) 
             index++;
         } else if (c == '\n') {
             // normalize newlines
-            written += try$(writer.writeStr(EMBED_SYS_LINE_ENDING));
+            written += try$(writer.writeStr(Embed::LINE_ENDING));
         } else {
             written += try$(writer.writeRune(c));
         }

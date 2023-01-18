@@ -12,8 +12,8 @@ def kvmAvailable() -> bool:
 
 def bootCmd(opts: dict, args: list[str]) -> None:
     imageDir = utils.mkdirP(".osdk/images/efi-x86_64/")
-    efiBootDir = utils.mkdirP(".osdk/images/efi-x86_64/EFI/BOOT")
-    bootDir = utils.mkdirP(".osdk/images/efi-x86_64/boot")
+    efiBootDir = utils.mkdirP(f"{imageDir}/EFI/BOOT")
+    bootDir = utils.mkdirP(f"{imageDir}/boot")
 
     ovmf = utils.downloadFile(
         "https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd")
@@ -23,6 +23,9 @@ def bootCmd(opts: dict, args: list[str]) -> None:
 
     loader = build.buildOne("efi-x86_64", "loader")
     shutil.copy(loader, f"{efiBootDir}/BOOTX64.EFI")
+
+    # systemSrv = build.buildOne("skift-x86_64", "system-srv")
+    # shutil.copy(systemSrv, f"{imageDir}/system-srv")
 
     qemuCmd = [
         "qemu-system-x86_64",

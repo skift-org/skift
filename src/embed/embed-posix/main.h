@@ -1,6 +1,5 @@
 #pragma once
 
-#include <karm-fmt/fmt.h>
 #include <karm-main/base.h>
 #include <karm-sys/chan.h>
 

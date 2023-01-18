@@ -1,0 +1,13 @@
+{
+    "id": "crts-x86_64",
+    "type": "lib",
+    "description": "CRTS for x86_64",
+    "requires": {
+        "sys": [
+            "skift"
+        ]
+    },
+    "provide": [
+        "crts"
+    ]
+}

@@ -1,0 +1,17 @@
+{
+    "id": "embed-skift",
+    "type": "lib",
+    "description": "Karm platform embedding layer for skift.",
+    "requires": {
+        "sys": [
+            "skift"
+        ]
+    },
+    "inject": [
+        "embed"
+    ],
+    "deps": [
+        "karm-base",
+        "crts,"
+    ]
+}

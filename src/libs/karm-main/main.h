@@ -11,6 +11,9 @@
     defined(__osdk_sys_brutal__)
 #    define EMBED_POSIX_MAIN_IMPL
 #    include <embed-posix/main.h>
+#elif defined(__osdk_sys_skift__)
+// Nothing to do, skift uses the entryPoint directly.
+#    include "base.h"
 #elif defined(__osdk_sys_efi__)
 #    define EMBED_EFI_MAIN_IMPL
 #    include <embed-efi/main.h>

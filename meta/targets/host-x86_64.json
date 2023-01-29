@@ -19,19 +19,31 @@
     },
     "tools": {
         "cc": {
-            "cmd": ["@latest", "clang"],
+            "cmd": [
+                "@latest",
+                "clang"
+            ],
             "args": []
         },
         "cxx": {
-            "cmd": ["@latest", "clang++"],
+            "cmd": [
+                "@latest",
+                "clang++"
+            ],
             "args": []
         },
         "ld": {
-            "cmd": ["@latest", "clang++"],
+            "cmd": [
+                "@latest",
+                "clang++"
+            ],
             "args": []
         },
         "ar": {
-            "cmd": ["@latest", "llvm-ar"],
+            "cmd": [
+                "@latest",
+                "llvm-ar"
+            ],
             "args": [
                 "rcs"
             ]

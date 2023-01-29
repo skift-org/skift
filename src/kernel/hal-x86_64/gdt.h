@@ -64,7 +64,7 @@ struct GdtTssEntry {
 };
 
 struct [[gnu::packed]] Gdt {
-    static constexpr int LEN = 5;
+    static constexpr int LEN = 6;
 
     enum Selector {
         ZERO = 0,
@@ -87,13 +87,18 @@ struct [[gnu::packed]] Gdt {
         LONG_MODE = 0b10,
     };
 
-    Karm::Array<GdtEntry, Gdt::LEN> entries = {
+    Karm::Array<GdtEntry, Gdt::LEN - 1> entries = {
         GdtEntry{},
         {Gdt::Flags::PRESENT | Gdt::Flags::SEGMENT | Gdt::Flags::READ_WRITE | Gdt::Flags::EXECUTABLE, Granularity::LONG_MODE},
         {Gdt::Flags::PRESENT | Gdt::Flags::SEGMENT | Gdt::Flags::READ_WRITE, 0},
         {Gdt::Flags::PRESENT | Gdt::Flags::SEGMENT | Gdt::Flags::READ_WRITE | Gdt::Flags::USER, 0},
         {Gdt::Flags::PRESENT | Gdt::Flags::SEGMENT | Gdt::Flags::READ_WRITE | Gdt::Flags::EXECUTABLE | Gdt::Flags::USER, Granularity::LONG_MODE},
     };
+
+    GdtTssEntry tssEntry;
+
+    Gdt(Tss const &tss)
+        : tssEntry(tss) {}
 };
 
 extern "C" void _gdtLoad(void const *ptr); // implemented in gdt.s

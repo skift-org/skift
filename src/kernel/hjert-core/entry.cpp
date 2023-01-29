@@ -47,6 +47,13 @@ Error validateAndDump(uint64_t magic, Handover::Payload &payload) {
     return OK;
 }
 
+void taskBody() {
+    while (true) {
+        Arch::loggerOut().writeRune('B').unwrap();
+        Arch::cpu().relaxe();
+    }
+}
+
 Error start(uint64_t magic, Handover::Payload &payload) {
     try$(Arch::init(payload));
 
@@ -56,9 +63,17 @@ Error start(uint64_t magic, Handover::Payload &payload) {
     try$(Mem::init(payload));
     try$(Sched::init(payload));
 
+    auto taskB = try$(Sched::Task::create());
+    try$(Sched::sched().start(taskB, (uintptr_t)taskBody));
+
     logInfo("entry: everything is ready, enabling interrupts...");
     Arch::cpu().retainEnable();
     Arch::cpu().enableInterrupts();
+
+    while (true) {
+        Arch::loggerOut().writeRune('A').unwrap();
+        Arch::cpu().relaxe();
+    }
 
     while (true)
         Arch::cpu().relaxe();

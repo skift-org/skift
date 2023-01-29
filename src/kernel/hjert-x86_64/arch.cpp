@@ -21,7 +21,9 @@ static x86_64::Com _com1 = x86_64::Com::com1();
 static x86_64::DualPic _pic = x86_64::DualPic::dualPic();
 static x86_64::Pit _pit = x86_64::Pit::pit();
 
-static x86_64::Gdt _gdt{};
+static x86_64::Tss _tss{};
+
+static x86_64::Gdt _gdt{_tss};
 static x86_64::GdtDesc _gdtDesc{_gdt};
 
 static x86_64::Idt _idt{};

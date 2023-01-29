@@ -25,7 +25,15 @@ Ui::Child errorScope(auto callback) {
             .backgroundPaint = Gfx::RED900,
             .foregroundPaint = Gfx::RED100,
         },
-        Ui::hflow(6, Ui::center(Ui::icon(Media::Icons::ALERT_DECAGRAM_OUTLINE, 26)), Ui::vflow(4, Ui::text(Ui::TextStyle::titleMedium().withColor(Gfx::WHITE), "Something went wrong"), Ui::text(child.none().msg()))));
+        Ui::hflow(
+            6,
+            Ui::center(
+                Ui::icon(
+                    Media::Icons::ALERT_DECAGRAM_OUTLINE, 26)),
+            Ui::vflow(
+                4,
+                Ui::text(Ui::TextStyle::titleMedium().withColor(Gfx::WHITE), "Something went wrong"),
+                Ui::text(child.none().msg()))));
 }
 
 Ui::Child userInfos() {

@@ -1,7 +1,7 @@
 {
     "id": "karm-text",
     "type": "lib",
-    "deps": [
+    "requires": [
         "karm-base"
     ]
 }

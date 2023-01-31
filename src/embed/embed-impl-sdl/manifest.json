@@ -2,16 +2,16 @@
     "id": "embed-sdl",
     "type": "lib",
     "description": "Karm UI platform embedding layer for SDL.",
-    "provide": [
-        "embed-ui"
-    ],
-    "requires": {
+    "enableIf": {
         "karm-ui-backend": [
             "sdl"
         ]
     },
-    "deps": [
+    "requires": [
         "sdl2",
         "karm-base"
+    ],
+    "provides": [
+        "embed-ui-impl"
     ]
 }

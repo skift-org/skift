@@ -2,7 +2,7 @@
     "id": "hal-x86-64",
     "type": "lib",
     "description": "Definitions for x86-64 architecture",
-    "requires": {
+    "enableIf": {
         "arch": [
             "x86_64"
         ]

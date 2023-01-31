@@ -2,7 +2,7 @@
     "id": "karm-events",
     "type": "lib",
     "description": "Events definitions",
-    "deps": [
+    "requires": [
         "karm-base"
     ]
 }

@@ -1,13 +1,13 @@
 {
     "id": "loader-efi",
     "type": "lib",
-    "deps": [],
-    "requires": {
+    "requires": [],
+    "enableIf": {
         "sys": [
             "efi"
         ]
     },
-    "inject": [
-        "loader"
+    "provides": [
+        "loader-impl"
     ]
 }

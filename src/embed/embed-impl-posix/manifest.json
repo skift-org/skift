@@ -2,16 +2,18 @@
     "id": "embed-posix",
     "type": "lib",
     "description": "Karm platform embedding layer for POSIX.",
-    "requires": {
+    "enableIf": {
         "sys": [
             "linux",
             "darwin"
         ]
     },
-    "inject": [
-        "embed"
-    ],
-    "deps": [
+    "requires": [
         "karm-base"
+    ],
+    "provides": [
+        "embed-sys-impl",
+        "embed-base-impl",
+        "embed-logger-impl"
     ]
 }

@@ -2,7 +2,7 @@
     "id": "demos-app",
     "type": "exe",
     "description": "Demo application",
-    "deps": [
+    "requires": [
         "karm-main",
         "karm-ui"
     ]

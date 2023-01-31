@@ -1,7 +1,7 @@
 {
     "id": "karm-main",
     "type": "lib",
-    "deps": [
+    "requires": [
         "karm-cli",
         "karm-sys"
     ]

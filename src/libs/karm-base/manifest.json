@@ -1,7 +1,7 @@
 {
     "id": "karm-base",
     "type": "lib",
-    "deps": [
+    "requires": [
         "stdc-math"
     ]
 }

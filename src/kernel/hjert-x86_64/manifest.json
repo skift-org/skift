@@ -1,8 +1,8 @@
 {
-    "id": "hjert-x86-64",
+    "id": "kernel-x86-64",
     "type": "lib",
     "description": "The Hjert micro-kernel platform layer for x86-64",
-    "requires": {
+    "enableIf": {
         "sys": [
             "hjert"
         ],
@@ -10,10 +10,10 @@
             "x86_64"
         ]
     },
-    "deps": [
+    "requires": [
         "hal-x86-64"
     ],
-    "provide": [
+    "provides": [
         "hjert-arch"
     ]
 }

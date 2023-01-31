@@ -1,7 +1,7 @@
 {
     "id": "sdl2",
     "type": "lib",
-    "requires": {
+    "enableIf": {
         "host": [
             true
         ]

@@ -2,7 +2,7 @@
     "id": "settings-app",
     "type": "exe",
     "description": "Edit and manage settings for your computer",
-    "deps": [
+    "requires": [
         "karm-main",
         "karm-ui"
     ]

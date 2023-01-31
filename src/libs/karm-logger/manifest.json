@@ -1,7 +1,7 @@
 {
     "id": "karm-logger",
     "type": "lib",
-    "deps": [
+    "requires": [
         "karm-fmt",
         "karm-io"
     ]

@@ -2,17 +2,18 @@
     "id": "embed-hjert",
     "type": "lib",
     "description": "Karm platform embedding layer for hjert.",
-    "requires": {
+    "enableIf": {
         "sys": [
             "hjert"
         ]
     },
-    "inject": [
-        "embed"
-    ],
-    "deps": [
+    "requires": [
         "abi-sysv",
         "karm-base",
         "libheap"
+    ],
+    "provides": [
+        "embed-base-impl",
+        "embed-logger-impl"
     ]
 }

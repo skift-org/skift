@@ -2,17 +2,19 @@
     "id": "embed-efi",
     "type": "lib",
     "description": "Karm platform embedding layer for EFI.",
-    "requires": {
+    "enableIf": {
         "sys": [
             "efi"
         ]
     },
-    "inject": [
-        "embed"
-    ],
-    "deps": [
+    "requires": [
         "efi",
         "abi-ms",
         "karm-base"
+    ],
+    "provides": [
+        "embed-sys-impl",
+        "embed-base-impl",
+        "embed-logger-impl"
     ]
 }

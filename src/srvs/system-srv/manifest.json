@@ -2,7 +2,7 @@
     "id": "system-srv",
     "type": "exe",
     "description": "Main system service responsible for managing other services",
-    "deps": [
+    "requires": [
         "karm-main"
     ]
 }

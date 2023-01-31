@@ -2,7 +2,7 @@
     "id": "karm-ui",
     "type": "lib",
     "description": "A graphical user interface library",
-    "deps": [
+    "requires": [
         "karm-gfx",
         "embed-ui"
     ]

@@ -2,12 +2,12 @@
     "id": "efi",
     "type": "lib",
     "description": "EFI firmware",
-    "requires": {
+    "enableIf": {
         "abi": [
             "ms"
         ]
     },
-    "deps": [
+    "requires": [
         "karm-base"
     ]
 }

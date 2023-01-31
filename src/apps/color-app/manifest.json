@@ -1,7 +1,7 @@
 {
     "id": "color-app",
     "type": "exe",
-    "deps": [
+    "requires": [
         "karm-main",
         "karm-ui"
     ]

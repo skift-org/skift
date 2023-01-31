@@ -1,5 +1,5 @@
 {
-    "id": "hjert-x86_64",
+    "id": "kernel-x86_64",
     "type": "target",
     "props": {
         "toolchain": "clang",
@@ -13,6 +13,9 @@
         "karm-sys-line-ending": "lf",
         "karm-sys-path-separator": "slash",
         "karm-cli-backend": "ansi"
+    },
+    "routing": {
+        "stdc-math": "stdc-math-dummy"
     },
     "tools": {
         "cc": {

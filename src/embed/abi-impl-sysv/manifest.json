@@ -2,12 +2,12 @@
     "id": "abi-sysv",
     "type": "lib",
     "description": "System V ABI",
-    "requires": {
+    "enableIf": {
         "abi": [
             "sysv"
         ]
     },
-    "inject": [
-        "embed"
+    "provides": [
+        "abi"
     ]
 }

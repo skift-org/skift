@@ -2,8 +2,10 @@
     "id": "stdcpp-shim",
     "type": "lib",
     "description": "The ISO C++ Standard C++ Library shim",
-    "root-include": true,
-    "requires": {
+    "props": {
+        "cpp-root-include": true
+    },
+    "enableIf": {
         "sys": [
             "efi",
             "hjert",
@@ -11,7 +13,7 @@
             "brutal"
         ]
     },
-    "inject": [
-        "karm-base"
+    "provides": [
+        "stdcpp-impl"
     ]
 }

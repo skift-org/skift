@@ -2,7 +2,7 @@
     "id": "hello-world",
     "type": "exe",
     "description": "Greets the world",
-    "deps": [
+    "requires": [
         "karm-main",
         "karm-sys",
         "karm-io",

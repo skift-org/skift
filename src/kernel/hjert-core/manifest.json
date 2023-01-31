@@ -2,12 +2,12 @@
     "id": "hjert-core",
     "type": "lib",
     "description": "The Hjert micro-kernel core",
-    "requires": {
+    "enableIf": {
         "sys": [
             "hjert"
         ]
     },
-    "deps": [
+    "requires": [
         "embed",
         "karm-base"
     ]

@@ -1,7 +1,7 @@
 {
     "id": "karm-sys",
     "type": "lib",
-    "deps": [
+    "requires": [
         "embed"
     ]
 }

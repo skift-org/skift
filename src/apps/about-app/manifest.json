@@ -2,7 +2,7 @@
     "id": "about-app",
     "type": "exe",
     "description": "About the skift operating system",
-    "deps": [
+    "requires": [
         "karm-main",
         "karm-ui"
     ]

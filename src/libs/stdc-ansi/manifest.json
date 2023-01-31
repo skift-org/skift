@@ -2,15 +2,17 @@
     "id": "stdc-ansi",
     "type": "lib",
     "description": "The ISO C standard library, ISO/IEC 9899",
-    "root-include": true,
-    "requires": {
+    "props": {
+        "cpp-root-include": true
+    },
+    "enableIf": {
         "sys": [
             "efi",
             "hjert",
             "skift"
         ]
     },
-    "inject": [
-        "karm-base"
+    "provides": [
+        "stdc-ansi-impl"
     ]
 }

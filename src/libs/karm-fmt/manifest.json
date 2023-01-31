@@ -1,7 +1,7 @@
 {
     "id": "karm-fmt",
     "type": "lib",
-    "deps": [
+    "requires": [
         "karm-io"
     ]
 }

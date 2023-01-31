@@ -1,11 +1,8 @@
 {
-    "id": "stdc-math",
+    "id": "stdc-math-musl",
     "type": "lib",
     "description": "The ISO C standard math library, ISO/IEC 9899",
-    "root-include": true,
-    "requires": {
-        "sys": [
-            "skift"
-        ]
+    "props": {
+        "cpp-root-include": true
     }
 }

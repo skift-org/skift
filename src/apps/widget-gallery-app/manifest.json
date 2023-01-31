@@ -2,7 +2,7 @@
     "id": "widget-gallery-app",
     "type": "exe",
     "description": "A gallery of widgets",
-    "deps": [
+    "requires": [
         "karm-main",
         "karm-ui"
     ]

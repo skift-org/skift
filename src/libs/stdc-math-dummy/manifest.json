@@ -2,16 +2,15 @@
     "id": "stdc-math-dummy",
     "type": "lib",
     "description": "Dummy for the ISO C Standard Mathematical Library (ISO/IEC 9899)",
-    "root-include": true,
-    "requires": {
+    "props": {
+        "cpp-root-include": true
+    },
+    "enableIf": {
         "freestanding": [
             true
         ],
         "host": [
             false
         ]
-    },
-    "provide": [
-        "stdc-math"
-    ]
+    }
 }

@@ -2,7 +2,7 @@
     "id": "calculator-app",
     "type": "exe",
     "description": "Calculator app",
-    "deps": [
+    "requires": [
         "karm-ui",
         "karm-main"
     ]

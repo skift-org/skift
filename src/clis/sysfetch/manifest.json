@@ -2,7 +2,7 @@
     "id": "sysfetch",
     "type": "exe",
     "description": "Fetches system informations",
-    "deps": [
+    "requires": [
         "karm-main",
         "karm-sys",
         "karm-io",

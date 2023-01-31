@@ -2,7 +2,7 @@
     "id": "ray-app",
     "type": "exe",
     "description": "Simple ray tracer",
-    "deps": [
+    "requires": [
         "karm-main",
         "karm-ui"
     ]

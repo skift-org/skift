@@ -2,16 +2,19 @@
     "id": "embed-skift",
     "type": "lib",
     "description": "Karm platform embedding layer for skift.",
-    "requires": {
+    "enableIf": {
         "sys": [
             "skift"
         ]
     },
-    "inject": [
-        "embed"
-    ],
-    "deps": [
+    "requires": [
         "karm-base",
-        "crts,"
+        "crts"
+    ],
+    "provides": [
+        "embed-sys-impl",
+        "embed-ui-impl",
+        "embed-base-impl",
+        "embed-logger-impl"
     ]
 }

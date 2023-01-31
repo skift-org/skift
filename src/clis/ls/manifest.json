@@ -2,7 +2,7 @@
     "id": "ls",
     "type": "exe",
     "description": "The ls coreutility",
-    "deps": [
+    "requires": [
         "karm-main",
         "karm-sys",
         "karm-io",

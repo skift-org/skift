@@ -2,7 +2,7 @@
     "id": "file-manager-app",
     "type": "exe",
     "description": "Manage files and folders",
-    "deps": [
+    "requires": [
         "file-manager",
         "karm-main"
     ]

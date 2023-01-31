@@ -2,7 +2,7 @@
     "id": "counter-app",
     "type": "exe",
     "description": "A simple counter demo application",
-    "deps": [
+    "requires": [
         "karm-main",
         "karm-ui"
     ]

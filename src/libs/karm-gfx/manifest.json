@@ -2,7 +2,7 @@
     "id": "karm-gfx",
     "type": "lib",
     "description": "A graphics library",
-    "deps": [
+    "requires": [
         "karm-media",
         "karm-math"
     ]

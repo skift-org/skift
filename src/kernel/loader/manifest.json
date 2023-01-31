@@ -1,15 +1,15 @@
 {
     "id": "loader",
     "type": "exe",
-    "deps": [
+    "enableIf": {
+        "sys": [
+            "efi"
+        ]
+    },
+    "requires": [
         "karm-main",
         "karm-sys",
         "karm-io",
         "karm-fmt"
-    ],
-    "requires": {
-        "sys": [
-            "efi"
-        ]
-    }
+    ]
 }

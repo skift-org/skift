@@ -2,7 +2,7 @@
     "id": "dtb-dump",
     "type": "exe",
     "description": "Dump a device tree blob",
-    "deps": [
+    "requires": [
         "karm-main",
         "karm-sys",
         "karm-io",

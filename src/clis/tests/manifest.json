@@ -2,12 +2,12 @@
     "id": "tests",
     "type": "exe",
     "description": "Test suite runner",
-    "deps": [
-        "karm-test"
-    ],
-    "requires": {
+    "enableIf": {
         "freestanding": [
             false
         ]
-    }
+    },
+    "requires": [
+        "karm-test"
+    ]
 }

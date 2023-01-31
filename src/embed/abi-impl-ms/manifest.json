@@ -2,12 +2,12 @@
     "id": "abi-ms",
     "type": "lib",
     "description": "Microsoft ABI",
-    "requires": {
+    "enableIf": {
         "abi": [
             "ms"
         ]
     },
-    "inject": [
-        "embed"
+    "provides": [
+        "abi"
     ]
 }

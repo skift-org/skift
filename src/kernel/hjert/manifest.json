@@ -2,7 +2,7 @@
     "id": "hjert",
     "description": "The hjert micro-kernel",
     "type": "exe",
-    "deps": [
+    "requires": [
         "hjert-core",
         "hjert-arch",
         "hjert-api"

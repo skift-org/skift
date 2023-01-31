@@ -2,7 +2,7 @@
     "id": "font-viewer-app",
     "type": "exe",
     "description": "View font files",
-    "deps": [
+    "requires": [
         "file-manager",
         "karm-main",
         "karm-ui"

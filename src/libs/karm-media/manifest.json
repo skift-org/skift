@@ -2,7 +2,7 @@
     "id": "karm-media",
     "type": "lib",
     "description": "A media loader library",
-    "deps": [
+    "requires": [
         "karm-math",
         "karm-sys"
     ]

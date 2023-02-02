@@ -2,6 +2,7 @@
     "id": "karm-base",
     "type": "lib",
     "requires": [
-        "stdc-math"
+        "stdc-math",
+        "embed-base"
     ]
 }

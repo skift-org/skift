@@ -1,6 +1,6 @@
 #pragma once
 
-#include <embed/base.h>
+#include <embed-base/base.h>
 
 namespace Karm {
 

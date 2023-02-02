@@ -1,4 +1,4 @@
-#include <embed/logger.h>
+#include <embed-logger/logger.h>
 #include <karm-sys/chan.h>
 
 namespace Embed {

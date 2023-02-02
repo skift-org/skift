@@ -8,7 +8,5 @@
         ]
     },
     "requires": [
-        "embed",
-        "karm-base"
     ]
 }

@@ -9,8 +9,7 @@
     },
     "requires": [
         "efi",
-        "abi-ms",
-        "karm-base"
+        "abi-ms"
     ],
     "provides": [
         "embed-sys-impl",

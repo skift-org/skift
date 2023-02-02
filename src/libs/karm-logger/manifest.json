@@ -3,6 +3,7 @@
     "type": "lib",
     "requires": [
         "karm-fmt",
-        "karm-io"
+        "karm-io",
+        "embed-logger"
     ]
 }

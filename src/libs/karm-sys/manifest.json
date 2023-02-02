@@ -2,6 +2,6 @@
     "id": "karm-sys",
     "type": "lib",
     "requires": [
-        "embed"
+        "embed-sys"
     ]
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <embed/ui.h>
+#include <embed-ui/ui.h>
 #include <karm-main/base.h>
 
 #include "host.h"

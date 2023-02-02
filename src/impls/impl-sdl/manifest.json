@@ -8,8 +8,7 @@
         ]
     },
     "requires": [
-        "sdl2",
-        "karm-base"
+        "sdl2"
     ],
     "provides": [
         "embed-ui-impl"

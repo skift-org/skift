@@ -1,6 +1,6 @@
 #pragma once
 
-#include <embed/sys.h>
+#include <embed-sys/sys.h>
 #include <hal/vmm.h>
 #include <karm-io/traits.h>
 

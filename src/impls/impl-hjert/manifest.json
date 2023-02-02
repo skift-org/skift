@@ -9,7 +9,6 @@
     },
     "requires": [
         "abi-sysv",
-        "karm-base",
         "libheap"
     ],
     "provides": [

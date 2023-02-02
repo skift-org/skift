@@ -1,6 +1,6 @@
 #include <efi/base.h>
 #include <efi/spec.h>
-#include <embed/base.h>
+#include <embed-base/base.h>
 #include <karm-base/align.h>
 #include <karm-base/string.h>
 #include <karm-io/traits.h>

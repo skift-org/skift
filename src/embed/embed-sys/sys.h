@@ -7,7 +7,7 @@
 #include <karm-sys/info.h>
 #include <karm-sys/types.h>
 
-#include "sys-defs.h"
+#include "defs.h"
 
 namespace Embed {
 

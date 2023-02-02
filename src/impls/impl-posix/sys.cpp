@@ -1,5 +1,5 @@
 #include <dirent.h>
-#include <embed/sys.h>
+#include <embed-sys/sys.h>
 #include <fcntl.h>
 #include <karm-io/funcs.h>
 #include <sys/mman.h>

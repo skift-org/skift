@@ -1,5 +1,5 @@
 #include <efi/base.h>
-#include <embed/sys.h>
+#include <embed-sys/sys.h>
 #include <hal/mem.h>
 #include <karm-base/align.h>
 #include <karm-base/macros.h>

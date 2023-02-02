@@ -8,7 +8,6 @@
         ]
     },
     "requires": [
-        "karm-base",
         "crts"
     ],
     "provides": [

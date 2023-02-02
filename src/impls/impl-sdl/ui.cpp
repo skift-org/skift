@@ -1,5 +1,5 @@
 #include <SDL.h>
-#include <embed/ui.h>
+#include <embed-ui/ui.h>
 #include <karm-ui/drag.h>
 
 namespace Embed {

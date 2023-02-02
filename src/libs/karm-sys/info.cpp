@@ -1,4 +1,4 @@
-#include <embed/sys.h>
+#include <embed-sys/sys.h>
 
 #include "info.h"
 

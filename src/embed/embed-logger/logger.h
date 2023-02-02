@@ -2,8 +2,6 @@
 
 #include <karm-io/traits.h>
 
-#include "sys-defs.h"
-
 namespace Embed {
 
 void loggerLock();

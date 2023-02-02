@@ -1,7 +1,7 @@
 {
-    "id": "hal-x86-64",
+    "id": "hal-x86_64",
     "type": "lib",
-    "description": "Definitions for x86-64 architecture",
+    "description": "Definitions for x86_64 architecture",
     "enableIf": {
         "arch": [
             "x86_64"

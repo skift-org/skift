@@ -17,6 +17,9 @@
         "karm-cli-backend": "ansi",
         "karm-ui-backend": "sdl"
     },
+    "routing": {
+        "stdc-math": "stdc-math-host"
+    },
     "tools": {
         "cc": {
             "cmd": [

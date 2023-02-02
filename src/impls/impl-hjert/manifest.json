@@ -1,19 +1,18 @@
 {
-    "id": "embed-skift",
+    "id": "impl-hjert",
     "type": "lib",
-    "description": "Karm platform embedding layer for skift.",
+    "description": "Karm platform embedding layer for hjert.",
     "enableIf": {
         "sys": [
-            "skift"
+            "hjert"
         ]
     },
     "requires": [
+        "abi-sysv",
         "karm-base",
-        "crts"
+        "libheap"
     ],
     "provides": [
-        "embed-sys-impl",
-        "embed-ui-impl",
         "embed-base-impl",
         "embed-logger-impl"
     ]

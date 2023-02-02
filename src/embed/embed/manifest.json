@@ -1,8 +1,0 @@
-{
-    "id": "embed",
-    "type": "lib",
-    "description": "Karm platform embedding layer.",
-    "requires": [
-        "karm-base"
-    ]
-}

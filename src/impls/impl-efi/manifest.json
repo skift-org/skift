@@ -1,14 +1,15 @@
 {
-    "id": "embed-posix",
+    "id": "impl-efi",
     "type": "lib",
-    "description": "Karm platform embedding layer for POSIX.",
+    "description": "Karm platform embedding layer for EFI.",
     "enableIf": {
         "sys": [
-            "linux",
-            "darwin"
+            "efi"
         ]
     },
     "requires": [
+        "efi",
+        "abi-ms",
         "karm-base"
     ],
     "provides": [

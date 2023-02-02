@@ -1,7 +1,7 @@
 {
     "id": "shell-app",
     "type": "exe",
-    "description": "The hideo shell",
+    "description": "Graphical user interface",
     "requires": [
         "karm-main",
         "karm-ui"

@@ -1,0 +1,10 @@
+{
+    "id": "hal",
+    "type": "lib",
+    "description": "Hardware Abstraction Layer",
+    "requires": [
+        "hal-impl",
+        "karm-meta",
+        "karm-base"
+    ]
+}

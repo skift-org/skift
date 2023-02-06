@@ -3,10 +3,6 @@
     "type": "exe",
     "description": "Fetches system informations",
     "requires": [
-        "karm-main",
-        "karm-sys",
-        "karm-io",
-        "karm-fmt",
-        "karm-cli"
+        "karm-main"
     ]
 }

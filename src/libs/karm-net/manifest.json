@@ -1,0 +1,8 @@
+{
+    "id": "karm-net",
+    "type": "lib",
+    "description": "Network library",
+    "requires": [
+        "karm-fmt"
+    ]
+}

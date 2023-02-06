@@ -3,9 +3,6 @@
     "type": "exe",
     "description": "Greets the world",
     "requires": [
-        "karm-main",
-        "karm-sys",
-        "karm-io",
-        "karm-fmt"
+        "karm-main"
     ]
 }

@@ -4,6 +4,7 @@
     "description": "A graphical user interface library",
     "requires": [
         "karm-gfx",
+        "karm-events",
         "embed-ui"
     ]
 }

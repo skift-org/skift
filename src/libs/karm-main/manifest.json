@@ -1,8 +1,8 @@
 {
     "id": "karm-main",
     "type": "lib",
+    "description": "A friendlier main()",
     "requires": [
-        "karm-cli",
-        "karm-sys"
+        "karm-cli"
     ]
 }

@@ -1,0 +1,10 @@
+{
+    "id": "karm",
+    "type": "lib",
+    "description": "A framework for building beautiful, natively compiled, multi-platform applications from a single codebase.",
+    "requires": [
+        "karm-cli",
+        "karm-ui",
+        "karm-main"
+    ]
+}

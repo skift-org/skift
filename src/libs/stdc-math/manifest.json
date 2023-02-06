@@ -4,5 +4,13 @@
     "description": "The ISO C standard math library, ISO/IEC 9899",
     "props": {
         "cpp-root-include": true
-    }
+    },
+    "enableIf": {
+        "host": [
+            false
+        ]
+    },
+    "provides": [
+        "stdc-math"
+    ]
 }

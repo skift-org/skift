@@ -8,9 +8,9 @@
     "enableIf": {
         "freestanding": [
             true
-        ],
-        "host": [
-            false
         ]
-    }
+    },
+    "provides": [
+        "stdc-math"
+    ]
 }

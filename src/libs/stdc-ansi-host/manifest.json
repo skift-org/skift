@@ -1,13 +1,13 @@
 {
-    "id": "stdc-math-host",
+    "id": "stdc-ansi-host",
     "type": "lib",
-    "description": "Place holder for the host stdc math library",
+    "description": "Placeholder for the host stdc library",
     "enableIf": {
         "host": [
             true
         ]
     },
     "provides": [
-        "stdc-math"
+        "stdc-ansi"
     ]
 }

@@ -1,6 +1,7 @@
 {
-    "id": "device-tree",
+    "id": "device-tree-spec",
     "type": "lib",
+    "description": "Device Tree Specification",
     "requires": [
         "karm-base"
     ]

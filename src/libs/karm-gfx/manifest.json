@@ -4,6 +4,8 @@
     "description": "A graphics library",
     "requires": [
         "karm-media",
-        "karm-math"
+        "karm-math",
+        "karm-text"
+    
     ]
 }

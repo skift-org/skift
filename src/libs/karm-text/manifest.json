@@ -1,7 +1,8 @@
 {
     "id": "karm-text",
     "type": "lib",
+    "description": "Text parsing and formatting",
     "requires": [
-        "karm-base"
+        "karm-io"
     ]
 }

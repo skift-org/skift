@@ -1,0 +1,8 @@
+{
+    "id": "qoi-spec",
+    "type": "lib",
+    "description": "QOI image format specification",
+    "requires": [
+        "karm-base"
+    ]
+}

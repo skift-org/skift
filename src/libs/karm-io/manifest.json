@@ -1,6 +1,7 @@
 {
     "id": "karm-io",
     "type": "lib",
+    "description": "Base traits for text and binary IO",
     "requires": [
         "karm-base"
     ]

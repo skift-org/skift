@@ -1,8 +1,12 @@
 {
     "id": "karm-base",
     "type": "lib",
+    "description": "Base data types and functions",
     "requires": [
         "stdc-math",
-        "embed-base"
+        "stdc-ansi",
+        "stdcpp",
+        "embed-base",
+        "karm-meta"
     ]
 }

@@ -1,6 +1,7 @@
 {
     "id": "karm-test",
     "type": "lib",
+    "description": "Unit testing framework",
     "requires": [
         "karm-cli"
     ]

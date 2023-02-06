@@ -4,9 +4,6 @@
     "description": "Dump a device tree blob",
     "requires": [
         "karm-main",
-        "karm-sys",
-        "karm-io",
-        "karm-fmt",
-        "device-tree"
+        "device-tree-spec"
     ]
 }

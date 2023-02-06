@@ -156,7 +156,7 @@ struct Gradient {
             return sample((pos.angle() + Math::PI) / Math::TAU, true);
 
         case DIAMOND:
-            return sample(abs(pos.x) + abs(pos.y));
+            return sample(Math::abs(pos.x) + Math::abs(pos.y));
         }
     }
 };

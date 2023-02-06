@@ -2,6 +2,7 @@
 #include <embed-sys/sys.h>
 #include <fcntl.h>
 #include <karm-io/funcs.h>
+#include <stdlib.h>
 #include <sys/mman.h>
 #include <sys/utsname.h>
 #include <unistd.h>

@@ -1,5 +1,8 @@
 {
     "id": "handover",
     "type": "lib",
-    "description": "The handover boot protocol"
+    "description": "The handover boot protocol",
+    "requires": [
+        "karm-base"
+    ]
 }

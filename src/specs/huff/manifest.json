@@ -1,0 +1,8 @@
+{
+    "id": "huff-spec",
+    "type": "lib",
+    "description": "Huffman coding",
+    "requires": [
+        "karm-base"
+    ]
+}

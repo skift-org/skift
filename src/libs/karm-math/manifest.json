@@ -1,6 +1,7 @@
 {
     "id": "karm-math",
     "type": "lib",
+    "description": "Mathematical functions",
     "requires": [
         "karm-base"
     ]

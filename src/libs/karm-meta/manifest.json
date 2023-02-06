@@ -1,4 +1,5 @@
 {
     "id": "karm-meta",
-    "type": "lib"
+    "type": "lib",
+    "description": "C++ template meta programming library"
 }

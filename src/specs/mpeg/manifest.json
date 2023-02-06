@@ -1,0 +1,8 @@
+{
+    "id": "mpeg-spec",
+    "type": "lib",
+    "description": "MPEG-2 specifications",
+    "requires": [
+        "karm-base"
+    ]
+}

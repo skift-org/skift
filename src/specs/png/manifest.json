@@ -1,0 +1,8 @@
+{
+    "id": "png-spec",
+    "type": "lib",
+    "description": "PNG Specification",
+    "requires": [
+        "karm-base"
+    ]
+}

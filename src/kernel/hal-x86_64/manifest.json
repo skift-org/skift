@@ -7,6 +7,9 @@
             "x86_64"
         ]
     },
+    "requires": [
+        "karm-io"
+    ],
     "provides": [
         "hal-impl"
     ]

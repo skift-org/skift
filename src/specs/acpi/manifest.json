@@ -1,0 +1,8 @@
+{
+    "id": "acpi-spec",
+    "type": "lib",
+    "description": "ACPI Specification",
+    "requires": [
+        "karm-base"
+    ]
+}

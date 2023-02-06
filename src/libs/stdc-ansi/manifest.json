@@ -1,5 +1,5 @@
 {
-    "id": "stdc-ansi",
+    "id": "stdc-ansi-skift",
     "type": "lib",
     "description": "The ISO C standard library, ISO/IEC 9899",
     "props": {
@@ -13,6 +13,6 @@
         ]
     },
     "provides": [
-        "stdc-ansi-impl"
+        "stdc-ansi"
     ]
 }

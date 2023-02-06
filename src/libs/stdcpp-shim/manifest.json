@@ -1,7 +1,7 @@
 {
     "id": "stdcpp-shim",
     "type": "lib",
-    "description": "The ISO C++ Standard C++ Library shim",
+    "description": "The ISO C++ Standard Library, ISO/IEC 14882",
     "props": {
         "cpp-root-include": true
     },
@@ -9,11 +9,10 @@
         "sys": [
             "efi",
             "hjert",
-            "skift",
-            "brutal"
+            "skift"
         ]
     },
     "provides": [
-        "stdcpp-impl"
+        "stdcpp"
     ]
 }

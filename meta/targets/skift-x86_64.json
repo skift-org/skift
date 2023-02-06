@@ -9,11 +9,15 @@
         "encoding": "utf8",
         "freestanding": false,
         "host": false,
+
         "karm-sys-encoding": "utf8",
         "karm-sys-line-ending": "lf",
         "karm-sys-path-separator": "slash",
         "karm-cli-backend": "ansi",
         "stdc-math": "dummy"
+    },
+    "routing": {
+        "stdc-math": "stdc-math-musl"
     },
     "tools": {
         "cc": {

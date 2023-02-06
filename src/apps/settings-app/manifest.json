@@ -3,7 +3,6 @@
     "type": "exe",
     "description": "Edit and manage settings for your computer",
     "requires": [
-        "karm-main",
-        "karm-ui"
+        "karm"
     ]
 }

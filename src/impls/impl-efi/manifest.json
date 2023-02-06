@@ -9,7 +9,7 @@
     },
     "requires": [
         "efi",
-        "abi-ms"
+        "abi"
     ],
     "provides": [
         "embed-sys-impl",

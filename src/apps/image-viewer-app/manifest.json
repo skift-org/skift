@@ -4,7 +4,6 @@
     "description": "View image files",
     "requires": [
         "file-manager",
-        "karm-main",
-        "karm-ui"
+        "karm-main"
     ]
 }

@@ -1,4 +1,8 @@
 {
-    "id": "json",
-    "type": "lib"
+    "id": "json-spec",
+    "type": "lib",
+    "description": "JSON parser and serializer",
+    "requires": [
+        "karm-base"
+    ]
 }

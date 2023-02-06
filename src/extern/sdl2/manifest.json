@@ -1,6 +1,7 @@
 {
     "id": "sdl2",
     "type": "lib",
+    "description": "A cross-platform development library designed to provide low level access to hardware",
     "enableIf": {
         "host": [
             true

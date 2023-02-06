@@ -8,7 +8,10 @@
         ]
     },
     "requires": [
-        "crts"
+        "crts",
+        "abi",
+        "hjert-api",
+        "libheap"
     ],
     "provides": [
         "embed-sys-impl",

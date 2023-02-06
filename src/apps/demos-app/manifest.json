@@ -3,7 +3,6 @@
     "type": "exe",
     "description": "Demo application",
     "requires": [
-        "karm-main",
-        "karm-ui"
+        "karm"
     ]
 }

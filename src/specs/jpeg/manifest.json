@@ -1,0 +1,8 @@
+{
+    "id": "jpeg-spec",
+    "type": "lib",
+    "description": "JPEG image format specification",
+    "requires": [
+        "karm-base"
+    ]
+}

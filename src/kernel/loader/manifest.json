@@ -1,5 +1,6 @@
 {
     "id": "loader",
+    "description": "A simple and configurable bootloader",
     "type": "exe",
     "enableIf": {
         "sys": [
@@ -8,8 +9,6 @@
     },
     "requires": [
         "karm-main",
-        "karm-sys",
-        "karm-io",
-        "karm-fmt"
+        "loader-impl"
     ]
 }

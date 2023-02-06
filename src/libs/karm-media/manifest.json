@@ -4,6 +4,12 @@
     "description": "A media loader library",
     "requires": [
         "karm-math",
-        "karm-sys"
+        "karm-sys",
+        "karm-logger",
+        "jpeg-spec",
+        "mpeg-spec",
+        "png-spec",
+        "qoi-spec",
+        "ttf-spec"
     ]
 }

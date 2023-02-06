@@ -1,6 +1,7 @@
 {
     "id": "karm-cli",
     "type": "lib",
+    "description": "Command line arguments and formatting",
     "requires": [
         "karm-sys"
     ]

@@ -3,7 +3,6 @@
     "type": "exe",
     "description": "About the skift operating system",
     "requires": [
-        "karm-main",
-        "karm-ui"
+        "karm"
     ]
 }

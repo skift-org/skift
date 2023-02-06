@@ -1,0 +1,8 @@
+{
+    "id": "ttf-spec",
+    "type": "lib",
+    "description": "TrueType font specification",
+    "requires": [
+        "karm-base"
+    ]
+}

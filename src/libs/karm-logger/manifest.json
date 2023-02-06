@@ -1,9 +1,9 @@
 {
     "id": "karm-logger",
     "type": "lib",
+    "description": "A simple logger",
     "requires": [
         "karm-fmt",
-        "karm-io",
         "embed-logger"
     ]
 }

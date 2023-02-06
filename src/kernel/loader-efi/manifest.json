@@ -1,12 +1,16 @@
 {
     "id": "loader-efi",
     "type": "lib",
-    "requires": [],
+    "description": "Efi implementation of kernel loading",
     "enableIf": {
         "sys": [
             "efi"
         ]
     },
+    "requires": [
+        "hal",
+        "karm-logger"
+    ],
     "provides": [
         "loader-impl"
     ]

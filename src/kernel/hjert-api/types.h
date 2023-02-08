@@ -61,6 +61,8 @@ FlagsEnum$(SpaceFlags)
 FlagsEnum$(Rights);
 
 enum struct Type {
+    NONE,
+
     TASK,
     MEM,
     SPACE,
@@ -77,15 +79,13 @@ struct Mutex;
 
 using RawHandle = uint64_t;
 
+static const RawHandle SELF = 0xffffffffffffffff;
+
 template <typename T>
 struct Handle {
     RawHandle _handle;
 
-    Handle(RawHandle);
-
-    Handle(Handle &);
-
-    Handle(Handle &&);
+    Handle(RawHandle handle) : _handle(handle) {}
 };
 
 template <typename T>

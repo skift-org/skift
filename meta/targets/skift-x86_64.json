@@ -9,7 +9,6 @@
         "encoding": "utf8",
         "freestanding": false,
         "host": false,
-
         "karm-sys-encoding": "utf8",
         "karm-sys-line-ending": "lf",
         "karm-sys-path-separator": "slash",

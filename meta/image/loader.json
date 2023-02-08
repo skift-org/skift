@@ -1,0 +1,14 @@
+{
+    "entries": [
+        {
+            "name": "skiftOS",
+            "kernel": "/boot/kernel.elf",
+            "files": [
+                {
+                    "name": "System Server",
+                    "path": "/servers/system"
+                }
+            ]
+        }
+    ]
+}

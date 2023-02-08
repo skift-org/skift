@@ -113,9 +113,8 @@ struct DialogLayer : public LeafNode<DialogLayer> {
 
         if (_opacity.value() > 0.001) {
             g.save();
-            g.fillStyle(Gfx::BLACK.withOpacity(0.1 * _opacity.value()));
+            g.fillStyle(Gfx::BLACK.withOpacity(0.25 * _opacity.value()));
             g.fill(bound());
-            g.blur(bound(), 4 * _opacity.value());
             g.restore();
         }
 

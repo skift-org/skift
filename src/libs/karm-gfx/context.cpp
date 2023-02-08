@@ -569,7 +569,7 @@ struct StackBlur {
     }
 
     int denominator() const {
-        return _radius * (_radius + 2) + 1;
+        return _radius * (_radius + 2) - 1;
     }
 
     void enqueue(Math::Vec4u color) {

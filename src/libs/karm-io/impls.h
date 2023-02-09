@@ -142,6 +142,37 @@ struct BufWriter :
     }
 };
 
+struct BitReader {
+    Reader &_reader;
+    uint8_t _bits;
+    uint8_t _len;
+
+    BitReader(Reader &reader)
+        : _reader(reader), _bits(0), _len(0) {}
+
+    Result<uint8_t> readBit() {
+        if (_len == 0) {
+            try$(_reader.read(MutBytes{&_bits, 1}));
+            _len = 8;
+        }
+
+        uint8_t bit = _bits & 1;
+        _bits >>= 1;
+        _len -= 1;
+
+        return bit;
+    }
+
+    template <typename T>
+    Result<T> readBits(size_t len) {
+        T bits = 0;
+        for (size_t i = 0; i < len; i++) {
+            bits |= try$(readBit()) << i;
+        }
+        return bits;
+    }
+};
+
 template <StaticEncoding E>
 struct _StringWriter : public _TextWriter {
     Buf<typename E::Unit> _buf{};

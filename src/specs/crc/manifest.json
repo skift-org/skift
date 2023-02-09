@@ -1,0 +1,8 @@
+{
+    "id": "crc-spec",
+    "type": "lib",
+    "description": "Cyclic redundancy check (CRC) specification",
+    "requires": [
+        "karm-base"
+    ]
+}

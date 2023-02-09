@@ -8,7 +8,7 @@
 
 namespace Karm {
 
-template <typename S, typename T = typename S::T>
+template <typename S, typename T = typename S::Inner>
 struct _Vec {
     using Inner = T;
 

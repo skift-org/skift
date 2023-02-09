@@ -238,7 +238,7 @@ inline String format(Str format, Ts &&...ts) {
     Io::StringWriter writer{};
     Args<Ts...> args{std::forward<Ts>(ts)...};
     _format(writer, format, args).unwrap();
-    return writer.finalize();
+    return writer.take();
 }
 
 } // namespace Karm::Fmt

@@ -6,9 +6,9 @@
 
 namespace Karm {
 
-template <typename _T>
+template <typename T>
 struct Buf {
-    using T = _T;
+    using Inner = T;
 
     Inert<T> *_buf{};
     size_t _cap{};
@@ -264,9 +264,9 @@ struct Buf {
     }
 };
 
-template <typename _T, size_t N>
+template <typename T, size_t N>
 struct InlineBuf {
-    using T = _T;
+    using Inner = T;
 
     Array<Inert<T>, N> _buf = {};
     size_t _len = {};
@@ -452,9 +452,9 @@ struct InlineBuf {
     }
 };
 
-template <typename _T>
+template <typename T>
 struct ViewBuf {
-    using T = _T;
+    using Inner = T;
 
     Inert<T> *_buf{};
     size_t _cap{};

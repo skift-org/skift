@@ -1,3 +1,5 @@
+#include <karm-io/funcs.h>
+
 #include "json.h"
 
 namespace Json {
@@ -138,7 +140,11 @@ Result<Value> parse(Text::Scan &s) {
     } else if (s.skip("false")) {
         return Value{false};
     } else if (s.peek() == '-' or (s.peek() >= '0' and s.peek() <= '9')) {
+#ifdef __osdk_freestanding__
+        return Value{(Number)try$(s.nextInt())};
+#else
         return Value{try$(s.nextFloat())};
+#endif
     }
 
     return Error{"unexpected character"};
@@ -147,6 +153,12 @@ Result<Value> parse(Text::Scan &s) {
 Result<Value> parse(Str s) {
     Text::Scan scan{s};
     return parse(scan);
+}
+
+Result<Value> parse(Io::Reader &r) {
+    Io::StringWriter str;
+    try$(Io::copy(r, str));
+    return parse(str.str());
 }
 
 } // namespace Json

@@ -14,9 +14,11 @@ struct Emit {
     Error _error = OK;
     bool _newline = false;
 
-    Emit(Io::_TextWriter &writer) : _writer(writer) {}
+    Emit(Io::_TextWriter &writer)
+        : _writer(writer) {
+    }
 
-    void _try(Result<size_t> result) {
+    void _tryWrapper(Result<size_t> result) {
         if (result) {
             _total += result.unwrap();
         } else {
@@ -52,9 +54,9 @@ struct Emit {
         if (not _error)
             return;
 
-        _try(_writer.writeRune('\n'));
+        _tryWrapper(_writer.writeRune('\n'));
         for (size_t i = 0; i < _ident; i++) {
-            _try(_writer.writeStr("    "));
+            _tryWrapper(_writer.writeStr("    "));
         }
 
         _newline = false;
@@ -64,7 +66,7 @@ struct Emit {
         if (not _error)
             return;
 
-        _try(_writer.writeRune(r));
+        _tryWrapper(_writer.writeRune(r));
     }
 
     void operator()(Str str) {
@@ -75,7 +77,7 @@ struct Emit {
             insertNewline();
         }
 
-        _try(_writer.writeStr(str));
+        _tryWrapper(_writer.writeStr(str));
     }
 
     template <typename... Ts>
@@ -87,7 +89,7 @@ struct Emit {
             insertNewline();
         }
 
-        _try(Fmt::format(_writer, format, std::forward<Ts>(ts)...));
+        _tryWrapper(Fmt::format(_writer, format, std::forward<Ts>(ts)...));
     }
 
     size_t total() {

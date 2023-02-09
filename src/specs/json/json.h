@@ -17,7 +17,13 @@ using Array = Vec<Value>;
 
 using Object = Map<String, Value>;
 
-using Store = Var<None, Array, Object, String, double, bool>;
+#ifdef __osdk_freestanding__
+using Number = int;
+#else
+using Number = double;
+#endif
+
+using Store = Var<None, Array, Object, String, Number, bool>;
 
 struct Value {
     Store _store;
@@ -27,7 +33,7 @@ struct Value {
     Value(Array v) : _store(v) {}
     Value(Object m) : _store(m) {}
     Value(String s) : _store(s) {}
-    Value(double d) : _store(d) {}
+    Value(Number d) : _store(d) {}
     Value(bool b) : _store(b) {}
 
     Value &operator=(None) {
@@ -50,7 +56,7 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(double d) {
+    Value &operator=(Number d) {
         _store = d;
         return *this;
     }
@@ -77,7 +83,7 @@ struct Value {
     }
 
     bool isFloat() const {
-        return _store.is<double>();
+        return _store.is<Number>();
     }
 
     bool isBool() const {
@@ -115,10 +121,7 @@ struct Value {
                 [](String s) {
                     return s;
                 },
-                [](int i) {
-                    return Fmt::format("{}", i);
-                },
-                [](double d) {
+                [](Number d) {
                     return Fmt::format("{}", d);
                 },
                 [](bool b) {
@@ -130,10 +133,7 @@ struct Value {
     int asInt() const {
         return _store.visit(
             Visitor{
-                [](int i) {
-                    return i;
-                },
-                [](double d) {
+                [](Number d) {
                     return (int)d;
                 },
                 [](bool b) {
@@ -145,20 +145,17 @@ struct Value {
             });
     }
 
-    double asFloat() const {
+    Number asFloat() const {
         return _store.visit(
             Visitor{
-                [](int i) {
-                    return (double)i;
-                },
-                [](double d) {
+                [](Number d) {
                     return d;
                 },
                 [](bool b) {
-                    return b ? 1.0 : 0.0;
+                    return b ? (Number)1.0 : (Number)0.0;
                 },
                 [](auto) {
-                    return 0.0;
+                    return (Number)0.0;
                 },
             });
     }
@@ -178,11 +175,8 @@ struct Value {
                 [](String s) {
                     return s.len() > 0;
                 },
-                [](int i) {
-                    return i != 0;
-                },
-                [](double d) {
-                    return d != 0.0;
+                [](Number d) {
+                    return d != (Number)0.0;
                 },
                 [](bool b) {
                     return b;
@@ -219,10 +213,7 @@ struct Value {
                 [](String s) {
                     return s.len();
                 },
-                [](int) {
-                    return 0;
-                },
-                [](double) {
+                [](Number) {
                     return 0;
                 },
                 [](bool) {
@@ -249,6 +240,8 @@ struct Value {
 Result<Value> parse(Text::Scan &s);
 
 Result<Value> parse(Str s);
+
+Result<Value> parse(Io::Reader &r);
 
 Error stringify(Text::Emit &emit, Value const &v);
 

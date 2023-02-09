@@ -67,7 +67,7 @@ Error stringify(Text::Emit &emit, Value const &v) {
                 emit('"');
                 return OK;
             },
-            [&](double d) {
+            [&](Number d) {
                 emit("{}", d);
                 return OK;
             },
@@ -82,7 +82,7 @@ Result<String> stringify(Value const &v) {
     Io::StringWriter sw;
     Text::Emit emit{sw};
     try$(stringify(emit, v));
-    return sw.finalize();
+    return sw.take();
 }
 
 } // namespace Json

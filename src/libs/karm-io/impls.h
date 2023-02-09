@@ -205,7 +205,11 @@ struct _StringWriter : public _TextWriter {
         return 1;
     }
 
-    String finalize() {
+    Str str() {
+        return _buf;
+    }
+
+    String take() {
         size_t len = _buf.size();
         _buf.insert(len, 0);
 

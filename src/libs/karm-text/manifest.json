@@ -3,6 +3,7 @@
     "type": "lib",
     "description": "Text parsing and formatting",
     "requires": [
-        "karm-io"
+        "karm-io",
+        "stdc-ansi"
     ]
 }

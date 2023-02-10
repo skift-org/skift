@@ -44,14 +44,14 @@ class Image:
         shell.wget(url, f"{self.root}/{dest}")
 
 
-class Machine(Protocol):
+class Machine():
     logger: Logger
 
     def __init__(self, id: str):
         self.logger = Logger(f"machine:{id}")
 
     def boot(self, image: Image) -> None:
-        ...
+        pass
 
 
 class QemuSystemAmd64(Machine):

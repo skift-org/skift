@@ -11,7 +11,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Toolchains
-        run: brew install llvm python git ninja sdl2 &&
+        run: brew install llvm python git ninja sdl2 nasm &&
              python3 -m ensurepip && git clone https://github.com/cute-engineering/osdk && sudo python3 -m pip install -e osdk/
 
       - name: Build Kernel (x86_64)
@@ -32,7 +32,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Toolchains
-        run: sudo apt-get install clang lld llvm python3 git ninja-build libsdl2-dev &&
+        run: sudo apt-get install clang lld llvm python3 git ninja-build libsdl2-dev nasm &&
              git clone https://github.com/cute-engineering/osdk && sudo pip install -e osdk/
 
       - name: Build Kernel (x86_64)

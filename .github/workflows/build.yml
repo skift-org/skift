@@ -15,13 +15,13 @@ jobs:
              python3 -m ensurepip && git clone https://github.com/cute-engineering/osdk && sudo python3 -m pip install -e osdk/
 
       - name: Build Kernel (x86_64)
-        run: osdk b --target=kernel-x86_64
+        run: .github/workflows/darwin-wrapper.sh osdk b --target=kernel-x86_64
 
       - name: Build EFI (x86_64)
-        run: osdk b --target=efi-x86_64
+        run: .github/workflows/darwin-wrapper.sh osdk b --target=efi-x86_64
 
       - name: Build Host
-        run: osdk b
+        run: .github/workflows/darwin-wrapper.sh osdk b
 
   ubuntu:
     runs-on: ubuntu-latest

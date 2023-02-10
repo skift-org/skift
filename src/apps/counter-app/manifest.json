@@ -3,6 +3,7 @@
     "type": "exe",
     "description": "A simple counter demo application",
     "requires": [
-        "karm"
+        "karm-ui",
+        "karm-main  "
     ]
 }

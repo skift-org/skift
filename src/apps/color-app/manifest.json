@@ -2,6 +2,7 @@
     "id": "color-app",
     "type": "exe",
     "requires": [
-        "karm"
+        "karm-ui",
+        "karm-main  "
     ]
 }

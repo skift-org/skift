@@ -3,6 +3,7 @@
     "type": "exe",
     "description": "A gallery of widgets",
     "requires": [
-        "karm"
+        "karm-ui",
+        "karm-main  "
     ]
 }

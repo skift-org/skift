@@ -3,6 +3,7 @@
     "type": "exe",
     "description": "Graphical user interface",
     "requires": [
-        "karm"
+        "karm-ui",
+        "karm-main  "
     ]
 }

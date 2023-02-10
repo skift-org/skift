@@ -3,6 +3,7 @@
     "type": "exe",
     "description": "Simple ray tracer",
     "requires": [
-        "karm"
+        "karm-ui",
+        "karm-main  "
     ]
 }

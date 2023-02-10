@@ -1,11 +1,10 @@
 import os
 
-from osdk import utils, shell, builder, const
+from osdk import shell, builder, const
 from osdk.cmds import Cmd, append
 from osdk.args import Args
 from osdk.logger import Logger
 from pathlib import Path
-from typing import Protocol
 
 
 def kvmAvailable() -> bool:

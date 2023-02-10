@@ -4,6 +4,6 @@
     "description": "Simple ray tracer",
     "requires": [
         "karm-ui",
-        "karm-main  "
+        "karm-main"
     ]
 }

@@ -4,6 +4,6 @@
     "description": "Calculator app",
     "requires": [
         "karm-ui",
-        "karm-main  "
+        "karm-main"
     ]
 }

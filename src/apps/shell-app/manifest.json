@@ -4,6 +4,6 @@
     "description": "Graphical user interface",
     "requires": [
         "karm-ui",
-        "karm-main  "
+        "karm-main"
     ]
 }

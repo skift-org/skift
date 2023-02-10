@@ -4,6 +4,6 @@
     "description": "A gallery of widgets",
     "requires": [
         "karm-ui",
-        "karm-main  "
+        "karm-main"
     ]
 }

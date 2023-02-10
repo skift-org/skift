@@ -4,6 +4,6 @@
     "description": "About the skift operating system",
     "requires": [
         "karm-ui",
-        "karm-main  "
+        "karm-main"
     ]
 }

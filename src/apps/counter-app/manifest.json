@@ -4,6 +4,6 @@
     "description": "A simple counter demo application",
     "requires": [
         "karm-ui",
-        "karm-main  "
+        "karm-main"
     ]
 }

@@ -155,8 +155,12 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
     return {makeStrong<FileProto>(file)};
 }
 
+Result<Vec<Sys::DirEntry>> readDir(Sys::Path) {
+    return Error::NOT_IMPLEMENTED;
+}
+
 Result<Strong<Sys::Fd>> createFile(Sys::Path) {
-    notImplemented();
+    return Error::NOT_IMPLEMENTED;
 }
 
 Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
@@ -196,6 +200,26 @@ Error memUnmap(void const *buf, size_t size) {
 
 Error memFlush(void *, size_t) {
     return OK;
+}
+
+Error populate(Sys::SysInfo &) {
+    return Error::NOT_IMPLEMENTED;
+}
+
+Error populate(Sys::MemInfo &) {
+    return Error::NOT_IMPLEMENTED;
+}
+
+Error populate(Vec<Sys::CpuInfo> &) {
+    return Error::NOT_IMPLEMENTED;
+}
+
+Error populate(Sys::UserInfo &) {
+    return Error::NOT_IMPLEMENTED;
+}
+
+Error populate(Vec<Sys::UserInfo> &) {
+    return Error::NOT_IMPLEMENTED;
 }
 
 } // namespace Embed

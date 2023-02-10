@@ -25,6 +25,12 @@
 
 # **skiftOS**: The delightful operating system
 
+[![Build](https://github.com/skift-org/skift/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/skift-org/skift/actions/workflows/build.yml)
+[![License](https://img.shields.io/github/license/skift-org/skift)](https://opensource.org/licenses/MIT)
+[![Discord](https://img.shields.io/discord/555284858180730888?label=discord)](http://discord.skiftos.org)
+
+
+
 **skiftOS** is a hobby operating system built from scratch in contemporary C and C++ for ARM, x86, and RISC-V architectures.
 
 Following the 80/20 rule, **skift** tries to be a simple, yet powerful operating system that can be used for daily tasks. It is designed to be modular, extensible, and easy to use and hack on.

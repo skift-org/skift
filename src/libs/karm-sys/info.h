@@ -53,7 +53,7 @@ Result<UserInfo> userinfo();
 Result<Vec<UserInfo>> usersinfo();
 
 inline bool isSkift() {
-#ifdef D__osdk_sys_skift__
+#ifdef __osdk_sys_skift__
     return true;
 #else
     return false;

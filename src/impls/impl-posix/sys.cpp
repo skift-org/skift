@@ -237,7 +237,9 @@ Error populate(Sys::UserInfo &infos) {
 }
 
 Error populate(Vec<Sys::UserInfo> &infos) {
-    infos.pushBack(try$(Sys::userinfo()));
+    Sys::UserInfo info;
+    try$(populate(info));
+    infos.pushBack(info);
     return OK;
 }
 

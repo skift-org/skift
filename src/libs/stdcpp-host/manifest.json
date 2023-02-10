@@ -1,5 +1,5 @@
 {
-    "id": "stdc-host",
+    "id": "stdcpp-host",
     "type": "lib",
     "description": "Placeholder for the host stdc library",
     "enableIf": {

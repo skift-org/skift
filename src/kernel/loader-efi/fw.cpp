@@ -91,12 +91,12 @@ Error parseMemoryMap(Handover::Builder &builder) {
     // https://stackoverflow.com/questions/39407280/uefi-simple-example-of-using-exitbootservices-with-gnu-efi
     mmapSize += 2 * descSize;
 
-    auto *buffer = new Byte[mmapSize];
-    try$(Efi::bs()->getMemoryMap(&mmapSize, (Efi::MemoryDescriptor *)buffer, &key, &descSize, &descVersion));
+    auto buf = Buf<Byte>::init(mmapSize);
+    try$(Efi::bs()->getMemoryMap(&mmapSize, (Efi::MemoryDescriptor *)buf.buf(), &key, &descSize, &descVersion));
 
     size_t descLen = mmapSize / descSize;
     for (size_t i = 0; i < descLen; i++) {
-        auto &desc = *(Efi::MemoryDescriptor *)(buffer + i * descSize);
+        auto &desc = *(Efi::MemoryDescriptor *)(buf.buf() + i * descSize);
 
         size_t start = desc.physicalStart;
         size_t size = desc.numberOfPages * Hal::PAGE_SIZE;

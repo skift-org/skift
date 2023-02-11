@@ -6,6 +6,8 @@
 
 namespace Karm {
 
+/// A dynamically sized array of elements.
+/// Often used as a backing store for other data structures. (e.g. `Vec`)
 template <typename T>
 struct Buf {
     using Inner = T;
@@ -13,6 +15,17 @@ struct Buf {
     Inert<T> *_buf{};
     size_t _cap{};
     size_t _len{};
+
+    static Buf init(size_t len, T fill = {}) {
+        Buf buf;
+        buf._cap = len;
+        buf._len = len;
+        buf._buf = new Inert<T>[len];
+        for (size_t i = 0; i < len; i++) {
+            buf._buf[i].ctor(fill);
+        }
+        return buf;
+    }
 
     Buf() = default;
 
@@ -264,6 +277,7 @@ struct Buf {
     }
 };
 
+/// A buffer that uses inline storage, great for small buffers.
 template <typename T, size_t N>
 struct InlineBuf {
     using Inner = T;
@@ -452,6 +466,7 @@ struct InlineBuf {
     }
 };
 
+/// A buffer that does not own its backing storage.
 template <typename T>
 struct ViewBuf {
     using Inner = T;

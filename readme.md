@@ -86,7 +86,7 @@ Individual components can be run on the host system using:
 $ osdk run <component>
 ```
 
-## Contributings
+## Contributing
 
 This project practice [optimistic merging](http://hintjens.com/blog:106) meaning that pull requests are merged into the main branch as soon as possible. The objective is to keep PR as small, focused, and incremental as possible.
 

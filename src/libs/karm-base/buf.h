@@ -275,6 +275,12 @@ struct Buf {
     size_t size() const {
         return _len * sizeof(T);
     }
+
+    void leak() {
+        _buf = nullptr;
+        _cap = 0;
+        _len = 0;
+    }
 };
 
 /// A buffer that uses inline storage, great for small buffers.

@@ -5,6 +5,7 @@
 #include "_prelude.h"
 
 #include "clamp.h"
+#include "opt.h"
 #include "panic.h"
 
 namespace Karm {
@@ -98,12 +99,21 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    ALWAYS_INLINE T take() {
+    ALWAYS_INLINE Opt<T> take() {
         if (_index != Meta::indexOf<T, Ts...>()) {
-            panic("Taking wrong type");
+            return NONE;
         }
 
         return std::move(*reinterpret_cast<T *>(_buf));
+    }
+
+    template <Meta::Contains<Ts...> T>
+    ALWAYS_INLINE Opt<T> take() const {
+        if (_index != Meta::indexOf<T, Ts...>()) {
+            return NONE;
+        }
+
+        return *reinterpret_cast<T const *>(_buf);
     }
 
     template <Meta::Contains<Ts...> T>
@@ -129,6 +139,35 @@ struct Var {
     }
 
     ALWAYS_INLINE size_t index() const { return _index; }
+
+    template <Meta::Contains<Ts...> T>
+    ALWAYS_INLINE bool operator==(T const &other) const {
+        return is<T>() && unwrap<T>() == other;
+    }
+
+    template <Meta::Contains<Ts...> T>
+    ALWAYS_INLINE bool operator!=(T const &other) const {
+        return !(*this == other);
+    }
+
+    template <Meta::Contains<Ts...> T>
+    ALWAYS_INLINE Ordr cmp(T const &other) const {
+        if (is<T>()) {
+            return ::cmp(unwrap<T>(), other);
+        }
+
+        return Ordr::LESS;
+    }
+
+    ALWAYS_INLINE Ordr cmp(Var const &other) const {
+        if (_index == other._index) {
+            return visit([&]<typename T>(T const &ptr) {
+                return ::cmp(ptr, other.unwrap<T>());
+            });
+        }
+
+        return Ordr::LESS;
+    }
 };
 
 template <typename... Ts>

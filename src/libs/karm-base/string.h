@@ -7,7 +7,7 @@
 
 namespace Karm {
 
-static constexpr size_t strLen(char const *str) {
+inline constexpr size_t strLen(char const *str) {
     size_t len = 0;
     while (*str++) {
         len++;
@@ -22,7 +22,8 @@ struct _Str : public Slice<U> {
 
     constexpr _Str() = default;
 
-    constexpr _Str(U const *cstr) requires(Meta::Same<U, char>)
+    constexpr _Str(U const *cstr)
+        requires(Meta::Same<U, char>)
         : Slice<U>(cstr, strLen(cstr)) {}
 
     constexpr _Str(U const *buf, size_t len)
@@ -42,7 +43,8 @@ struct _MutStr : public MutSlice<U> {
 
     using MutSlice<U>::MutSlice;
 
-    constexpr _MutStr(Unit *cstr) requires(Meta::Same<Unit, char>)
+    constexpr _MutStr(Unit *cstr)
+        requires(Meta::Same<Unit, char>)
         : MutSlice<U>(cstr, strLen(cstr)) {}
 };
 
@@ -68,7 +70,8 @@ struct _String {
         memcpy(_buf, buf, len * sizeof(Unit));
     }
 
-    constexpr _String(Unit const *cstr) requires(Meta::Same<Unit, char>)
+    constexpr _String(Unit const *cstr)
+        requires(Meta::Same<Unit, char>)
         : _String(cstr, strLen(cstr)) {}
 
     _String(_Str<E> str)

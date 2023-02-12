@@ -2,11 +2,14 @@
     "entries": [
         {
             "name": "skiftOS",
-            "kernel": "/boot/kernel.elf",
+            "kernel": {
+                "path": "/boot/kernel.elf",
+                "props": {}
+            },
             "files": [
                 {
-                    "name": "System Server",
-                    "path": "/servers/system"
+                    "path": "/servers/system",
+                    "props": {}
                 }
             ]
         }

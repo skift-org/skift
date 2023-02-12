@@ -179,8 +179,7 @@ struct _StringWriter : public _TextWriter {
 
     _StringWriter(size_t cap = 16) : _buf(cap) {}
 
-    Result<size_t> write(Bytes)
-        override {
+    Result<size_t> write(Bytes) override {
         panic("can't write raw bytes to a string");
     }
 

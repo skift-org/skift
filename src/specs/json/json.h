@@ -28,13 +28,26 @@ using Store = Var<None, Array, Object, String, Number, bool>;
 struct Value {
     Store _store;
 
-    Value() : _store(NONE) {}
-    Value(None) : _store(NONE) {}
-    Value(Array v) : _store(v) {}
-    Value(Object m) : _store(m) {}
-    Value(String s) : _store(s) {}
-    Value(Number d) : _store(d) {}
-    Value(bool b) : _store(b) {}
+    Value()
+        : _store(NONE) {}
+
+    Value(None)
+        : _store(NONE) {}
+
+    Value(Array v)
+        : _store(v) {}
+
+    Value(Object m)
+        : _store(m) {}
+
+    Value(String s)
+        : _store(s) {}
+
+    Value(Number d)
+        : _store(d) {}
+
+    Value(bool b)
+        : _store(b) {}
 
     Value &operator=(None) {
         _store = NONE;
@@ -140,7 +153,7 @@ struct Value {
                     return b ? 1 : 0;
                 },
                 [](auto) {
-                    return 0.0;
+                    return 0;
                 },
             });
     }
@@ -155,7 +168,7 @@ struct Value {
                     return b ? (Number)1.0 : (Number)0.0;
                 },
                 [](auto) {
-                    return (Number)0.0;
+                    return (Number)0;
                 },
             });
     }
@@ -176,7 +189,7 @@ struct Value {
                     return s.len() > 0;
                 },
                 [](Number d) {
-                    return d != (Number)0.0;
+                    return d != (Number)0;
                 },
                 [](bool b) {
                     return b;
@@ -184,14 +197,14 @@ struct Value {
             });
     }
 
-    Opt<Value> get(Str key) const {
+    Value get(Str key) const {
         if (not isObject()) {
             return NONE;
         }
-        return asObject().get(key);
+        return try$(asObject().get(key));
     }
 
-    Opt<Value> get(size_t index) const {
+    Value get(size_t index) const {
         if (not isArray() or asArray().len() <= index) {
             return NONE;
         }
@@ -234,6 +247,16 @@ struct Value {
 
     auto visit(auto visitor) const {
         return _store.visit(visitor);
+    }
+
+    template <typename T>
+    Opt<T> take() {
+        return _store.take<T>();
+    }
+
+    template <typename T>
+    Opt<T> take() const {
+        return _store.take<T>();
     }
 };
 

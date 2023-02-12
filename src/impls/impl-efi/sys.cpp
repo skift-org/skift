@@ -145,6 +145,8 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
 
     Efi::FileProtocol *file = nullptr;
     _String<Utf16> pathStr = transcode<Utf16>(path.str());
+
+    // NOTE: Convert '/' to '\' as EFI uses '\' as path separator
     for (auto &u : pathStr) {
         if (u == '/') {
             u = '\\';

@@ -87,7 +87,7 @@ Error parseMemoryMap(Handover::Builder &builder) {
         return Error{Error::INVALID_DATA, "invalid memory descriptor size"};
     }
 
-    // Allocating on the pool might creates at least one new descriptor
+    // NOTE: Allocating on the pool might creates at least one new descriptor
     // https://stackoverflow.com/questions/39407280/uefi-simple-example-of-using-exitbootservices-with-gnu-efi
     mmapSize += 2 * descSize;
 
@@ -122,6 +122,9 @@ Error parseMemoryMap(Handover::Builder &builder) {
     }
 
     try$(Efi::bs()->exitBootServices(Efi::imageHandle(), key));
+
+    // NOTE: At this point we can't free the buffer since we're not in boot services anymore
+    buf.leak();
 
     return OK;
 }

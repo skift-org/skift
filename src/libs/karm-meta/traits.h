@@ -2,6 +2,10 @@
 
 #include "decl.h"
 
+namespace Karm {
+struct Bool;
+} // namespace Karm
+
 namespace Karm::Meta {
 
 /* --- Primary type categories ---------------------------------------------- */
@@ -17,6 +21,18 @@ inline constexpr bool _Nullptr<decltype(nullptr)> = true;
 
 template <typename T>
 concept Nullptr = _Nullptr<T>;
+
+template <typename T>
+inline constexpr bool _Boolean = false;
+
+template <>
+inline constexpr bool _Boolean<bool> = true;
+
+template <>
+inline constexpr bool _Boolean<Karm::Bool> = true;
+
+template <typename T>
+concept Boolean = _Boolean<T>;
 
 template <typename T>
 concept Float = __is_floating_point(T);

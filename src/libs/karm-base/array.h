@@ -43,6 +43,14 @@ struct Array {
         }
         return true;
     }
+
+    Bytes bytes() const {
+        return {reinterpret_cast<Byte const *>(buf()), len() * sizeof(T)};
+    }
+
+    MutBytes mutBytes() {
+        return {reinterpret_cast<Byte *>(buf()), len() * sizeof(T)};
+    }
 };
 
 template <class T, class... U>

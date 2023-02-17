@@ -23,6 +23,19 @@ inline Result<Byte> getByte(Readable auto &reader) {
     return byte;
 }
 
+inline Result<String> readAllUtf8(Readable auto &reader) {
+    StringWriter writer;
+    Array<Utf8::Unit, 512> buf;
+    while (true) {
+        size_t read = try$(reader.read(buf.mutBytes()));
+        if (read == 0) {
+            break;
+        }
+        try$(writer.writeUnit({buf.buf(), read}));
+    }
+    return writer.take();
+}
+
 /* --- Write ---------------------------------------------------------------- */
 
 inline Result<size_t> pwrite(Writable auto &writer, Bytes bytes, Seek seek) {

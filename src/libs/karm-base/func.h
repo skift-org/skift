@@ -42,7 +42,7 @@ struct Func<Out(In...)> {
     Func(F &&f) : _wrap(makeBox<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
-    requires Meta::FuncPtr<F>
+    requires Meta::FuncPtr<F> and Meta::Callable<F, In...>
     Func &operator=(F f)
     {
         _wrap = makeBox<Wrap<F>>(std::move(f));

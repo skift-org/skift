@@ -204,6 +204,11 @@ struct _StringWriter : public _TextWriter {
         return 1;
     }
 
+    Result<size_t> writeUnit(Slice<typename E::Unit> unit) {
+        _buf.insert(COPY, _buf.len(), unit.buf(), unit.len());
+        return unit.len();
+    }
+
     Str str() {
         return _buf;
     }

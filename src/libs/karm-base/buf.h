@@ -159,7 +159,7 @@ struct Buf {
         _buf[index].ctor(std::move(value));
     }
 
-    void insert(Copy, size_t index, T *first, size_t count) {
+    void insert(Copy, size_t index, T const *first, size_t count) {
         ensure(_len + count);
 
         for (size_t i = _len; i > index; i--) {

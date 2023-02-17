@@ -46,8 +46,6 @@ Error stringify(Text::Emit &emit, Value const &v) {
                         emit("\\\"");
                     } else if (c == '\\') {
                         emit("\\\\");
-                    } else if (c == '/') {
-                        emit("\\/");
                     } else if (c == '\b') {
                         emit("\\b");
                     } else if (c == '\f') {

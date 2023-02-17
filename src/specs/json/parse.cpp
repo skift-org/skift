@@ -155,10 +155,4 @@ Result<Value> parse(Str s) {
     return parse(scan);
 }
 
-Result<Value> parse(Io::Reader &r) {
-    Io::StringWriter str;
-    try$(Io::copy(r, str));
-    return parse(str.str());
-}
-
 } // namespace Json

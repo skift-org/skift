@@ -264,8 +264,6 @@ Result<Value> parse(Text::Scan &s);
 
 Result<Value> parse(Str s);
 
-Result<Value> parse(Io::Reader &r);
-
 Error stringify(Text::Emit &emit, Value const &v);
 
 Result<String> stringify(Value const &v);

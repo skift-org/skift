@@ -42,7 +42,8 @@ struct Task {
     Tick _sliceStart = 0;
     Tick _sliceEnd = 0;
 
-    Task(Stack stack) : _stack(std::move(stack)) {
+    Task(Stack stack)
+        : _stack(std::move(stack)) {
     }
 
     Stack &stack() { return _stack; }

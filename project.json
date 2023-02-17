@@ -1,0 +1,11 @@
+{
+    "id": "skift-org/skift",
+    "type": "project",
+    "description": "The Skift Operating System",
+    "extern": {
+        "cute-engineering/libheap": {
+            "git": "https://github.com/cute-engineering/libheap.git",
+            "tag": "v1.0.0"
+        }
+    }
+}

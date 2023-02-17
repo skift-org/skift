@@ -15,7 +15,7 @@ namespace Loader {
 
 void enterKernel(size_t entry, size_t payload, size_t stack, size_t vmm);
 
-Error load(Sys::Path kernelPath) {
+Error load(Sys::Path kernelPath, Entry const &entry) {
     logInfo("loader: preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
     logInfo("loader: payload at vaddr: 0x{x} paddr: 0x{x}", payloadMem.vaddr(), payloadMem.paddr());
@@ -56,6 +56,33 @@ Error load(Sys::Path kernelPath) {
         memset((void *)(paddr + prog.filez()), 0, remaining);
 
         payload.add(Handover::KERNEL, 0, {paddr, memsz});
+    }
+
+    logInfo("loader: loading additional files...");
+    for (auto const &file : entry.files) {
+        logInfo("loader: loading file: {}", file.path);
+
+        auto fileFile = try$(Sys::File::open(file.path));
+        auto fileMem = try$(Sys::mmap().map(fileFile));
+        auto fileRange = fileMem.prange();
+
+        auto strId = payload.add(file.path);
+        auto propStr = try$(Json::stringify(file.props));
+        auto propsId = payload.add(propStr);
+
+        payload.add(Handover::Record{
+            .tag = Handover::FILE,
+            .start = fileRange.start,
+            .size = fileRange.size,
+            .file = {
+                .name = (uint32_t)strId,
+                .meta = (uint32_t)propsId,
+            },
+        });
+
+        // NOTE: We leak the file memory here because we don't want to
+        //       want raii to unmap the file before we enter the kernel.
+        fileMem.leak();
     }
 
     logInfo("loader: handling kernel requests...");

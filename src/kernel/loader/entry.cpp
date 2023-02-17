@@ -3,7 +3,6 @@
 #include <karm-main/main.h>
 #include <karm-sys/file.h>
 
-#include "configs.h"
 #include "loader.h"
 
 CliResult entryPoint(CliArgs) {
@@ -22,12 +21,13 @@ CliResult entryPoint(CliArgs) {
     auto file = try$(Sys::File::open("/boot/loader.json"));
 
     logInfo("Parsing configs...");
-    auto json = try$(Json::parse(file));
+    auto fileStr = try$(Io::readAllUtf8(file));
+    auto json = try$(Json::parse(fileStr));
 
     logInfo("Validating configs...");
     logInfo("Configs: {}", json);
 
     auto configs = try$(Loader::Configs::fromJson(json));
 
-    return Loader::load("/boot/kernel.elf");
+    return Loader::load("/boot/kernel.elf", configs.entries[0]);
 }

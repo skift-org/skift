@@ -66,6 +66,11 @@ struct Mmap :
     Bytes bytes() const {
         return {static_cast<Byte const *>(_buf), _size};
     }
+
+    void leak() {
+        _buf = nullptr;
+        _size = 0;
+    }
 };
 
 struct MutMmap :
@@ -154,6 +159,11 @@ struct MutMmap :
 
     MutBytes mutBytes() {
         return {static_cast<Byte *>(_buf), _size};
+    }
+
+    void leak() {
+        _buf = nullptr;
+        _size = 0;
     }
 };
 

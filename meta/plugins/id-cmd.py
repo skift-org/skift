@@ -13,4 +13,4 @@ def idCmd(args: Args):
     print("8bits   : " + l[:4])
 
 
-append(Cmd("i", "id", "Generate a 64bit random id", idCmd))
+append(Cmd(None, "id", "Generate a 64bit random id", idCmd))

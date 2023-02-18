@@ -56,10 +56,10 @@ struct Image {
         return slice.len() >= 2 and Op::eq(sub(slice, 0, 2), bytes(SOI));
     }
 
-    static Result<Image> load(Bytes slice) {
+    static Res<Image> load(Bytes slice) {
         Image image{slice};
 
-        return image;
+        return Ok(image);
     }
 
     Image(Bytes slice) : _slice(slice) {

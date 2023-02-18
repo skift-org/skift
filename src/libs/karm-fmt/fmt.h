@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/array.h>
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 #include <karm-base/rune.h>
 #include <karm-base/string.h>
 #include <karm-base/tuple.h>
@@ -52,7 +52,7 @@ struct NumberFormater {
         }
     }
 
-    Result<size_t> formatUnsigned(Io::_TextWriter &writer, uint64_t value) {
+    Res<size_t> formatUnsigned(Io::_TextWriter &writer, uint64_t value) {
         auto digit = [](size_t v) {
             if (v < 10) {
                 return '0' + v;
@@ -86,7 +86,7 @@ struct NumberFormater {
         return writer.writeStr({buf.buf(), i});
     }
 
-    Result<size_t> formatSigned(Io::_TextWriter &writer, int64_t value) {
+    Res<size_t> formatSigned(Io::_TextWriter &writer, int64_t value) {
         size_t written = 0;
         if (value < 0) {
             written += try$(writer.writeRune('-'));
@@ -94,13 +94,13 @@ struct NumberFormater {
         }
 
         written += try$(formatUnsigned(writer, value));
-        return written;
+        return Ok(written);
     }
 };
 
 template <typename T>
 struct UnsignedFormatter : public NumberFormater {
-    Result<size_t> format(Io::_TextWriter &writer, T const value) {
+    Res<size_t> format(Io::_TextWriter &writer, T const value) {
         if (isChar) {
             return writer.writeRune(value);
         }
@@ -110,7 +110,7 @@ struct UnsignedFormatter : public NumberFormater {
 
 template <typename T>
 struct SignedFormatter : public NumberFormater {
-    Result<size_t> format(Io::_TextWriter &writer, T const value) {
+    Res<size_t> format(Io::_TextWriter &writer, T const value) {
         if (isChar) {
             return writer.writeRune(value);
         }
@@ -130,7 +130,7 @@ struct Formatter<T> : public SignedFormatter<T> {};
 
 template <>
 struct Formatter<double> {
-    Result<size_t> format(Io::_TextWriter &writer, double const value) {
+    Res<size_t> format(Io::_TextWriter &writer, double const value) {
         NumberFormater formater;
         size_t written = 0;
         int ipart = (int)value;
@@ -143,20 +143,20 @@ struct Formatter<double> {
             fpart *= 1000000;
             written += try$(formater.formatUnsigned(writer, (uint64_t)fpart));
         }
-        return written;
+        return Ok(written);
     }
 };
 
 template <>
 struct Formatter<Str> {
-    Result<size_t> format(Io::_TextWriter &writer, Str text) {
+    Res<size_t> format(Io::_TextWriter &writer, Str text) {
         return writer.writeStr(text);
     }
 };
 
 template <>
 struct Formatter<String> {
-    Result<size_t> format(Io::_TextWriter &writer, String text) {
+    Res<size_t> format(Io::_TextWriter &writer, String text) {
         return writer.writeStr(text);
     }
 };
@@ -167,7 +167,7 @@ struct Formatter<char const *> : public Formatter<Str> {};
 struct _Args {
     virtual ~_Args() = default;
     virtual size_t len() = 0;
-    virtual Result<size_t> format(Text::Scan &scan, Io::_TextWriter &writer, size_t index) = 0;
+    virtual Res<size_t> format(Text::Scan &scan, Io::_TextWriter &writer, size_t index) = 0;
 };
 
 template <typename... Ts>
@@ -178,8 +178,8 @@ struct Args : public _Args {
 
     size_t len() override { return _tuple.len(); }
 
-    Result<size_t> format(Text::Scan &scan, Io::_TextWriter &writer, size_t index) override {
-        Result<size_t> result = 0;
+    Res<size_t> format(Text::Scan &scan, Io::_TextWriter &writer, size_t index) override {
+        Res<size_t> result = Ok();
         size_t i = 0;
         _tuple.visit([&](auto const &t) {
             if (index == i) {
@@ -198,7 +198,7 @@ struct Args : public _Args {
     }
 };
 
-inline Result<size_t> _format(Io::_TextWriter &writer, Str format, _Args &args) {
+inline Res<size_t> _format(Io::_TextWriter &writer, Str format, _Args &args) {
     Text::Scan scan{format};
     size_t written = 0;
     size_t index = 0;
@@ -224,21 +224,21 @@ inline Result<size_t> _format(Io::_TextWriter &writer, Str format, _Args &args) 
         }
     }
 
-    return written;
+    return Ok(written);
 }
 
 template <typename... Ts>
-inline Result<size_t> format(Io::_TextWriter &writer, Str format, Ts &&...ts) {
+inline Res<size_t> format(Io::_TextWriter &writer, Str format, Ts &&...ts) {
     Args<Ts...> args{std::forward<Ts>(ts)...};
     return _format(writer, format, args);
 }
 
 template <typename... Ts>
-inline String format(Str format, Ts &&...ts) {
+inline Res<String> format(Str format, Ts &&...ts) {
     Io::StringWriter writer{};
     Args<Ts...> args{std::forward<Ts>(ts)...};
-    _format(writer, format, args).unwrap();
-    return writer.take();
+    try$(_format(writer, format, args));
+    return Ok(writer.take());
 }
 
 } // namespace Karm::Fmt

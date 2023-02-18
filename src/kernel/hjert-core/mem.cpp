@@ -19,27 +19,27 @@ struct Pmm : public Hal::Pmm {
         clear();
     }
 
-    Result<Hal::PmmRange> allocRange(size_t size, Hal::PmmFlags flags) override {
+    Res<Hal::PmmRange> allocRange(size_t size, Hal::PmmFlags flags) override {
         LockScope scope(_lock);
         bool upper = (flags & Hal::PmmFlags::UPPER) == Hal::PmmFlags::UPPER;
 
         try$(ensureAlign(size, Hal::PAGE_SIZE));
         size /= Hal::PAGE_SIZE;
-        return bits2Pmm(try$(_bits.alloc(size, upper ? -1 : 0, upper)));
+        return Ok(bits2Pmm(try$(_bits.alloc(size, upper ? -1 : 0, upper))));
     }
 
-    Error used(Hal::PmmRange range, Hal::PmmFlags) override {
+    Res<> used(Hal::PmmRange range, Hal::PmmFlags) override {
         if (not range.overlaps(_usable)) {
-            return OK;
+            return Ok();
         }
 
         LockScope scope(_lock);
         try$(range.ensureAligned(Hal::PAGE_SIZE));
         _bits.set(pmm2Bits(range), true);
-        return OK;
+        return Ok();
     }
 
-    Error free(Hal::PmmRange range) override {
+    Res<> free(Hal::PmmRange range) override {
         if (not range.overlaps(_usable)) {
             return Error{"range is not in usable memory"};
         }
@@ -47,7 +47,7 @@ struct Pmm : public Hal::Pmm {
         LockScope scope(_lock);
         try$(range.ensureAligned(Hal::PAGE_SIZE));
         _bits.set(pmm2Bits(range), false);
-        return OK;
+        return Ok();
     }
 
     void clear() {
@@ -78,37 +78,37 @@ struct Heap : public Hal::Heap {
     Heap(Hal::Pmm &pmm) : _pmm(pmm) {
     }
 
-    Result<Hal::HeapRange> allocRange(size_t size) override {
+    Res<Hal::HeapRange> allocRange(size_t size) override {
         return pmm2Heap(try$(_pmm.allocRange(size, Hal::PmmFlags::NIL)));
     }
 
-    Error free(Hal::HeapRange range) override {
+    Res<> free(Hal::HeapRange range) override {
         return _pmm.free(try$(heap2Pmm(range)));
     }
 
-    Result<Hal::PmmRange> heap2Pmm(Hal::HeapRange range) override {
+    Res<Hal::PmmRange> heap2Pmm(Hal::HeapRange range) override {
         if (range.start < Hal::UPPER_HALF) {
             return Error{"Invalid heap range"};
         }
 
-        return Hal::PmmRange{
+        return Ok(Hal::PmmRange{
             range.start - Hal::UPPER_HALF,
             range.size,
-        };
+        });
     }
 
-    Result<Hal::HeapRange> pmm2Heap(Hal::PmmRange range) override {
-        return Hal::HeapRange{
+    Res<Hal::HeapRange> pmm2Heap(Hal::PmmRange range) override {
+        return Ok(Hal::HeapRange{
             range.start + Hal::UPPER_HALF,
             range.size,
-        };
+        });
     }
 };
 
 static Opt<Pmm> _pmm = NONE;
 static Opt<Heap> _heap = NONE;
 
-Error init(Handover::Payload &payload) {
+Res<> init(Handover::Payload &payload) {
     auto usableRange = payload.usableRange<Hal::PmmRange>();
 
     if (usableRange.empty()) {
@@ -160,7 +160,7 @@ Error init(Handover::Payload &payload) {
 
     vmm().activate();
 
-    return OK;
+    return Ok();
 }
 
 Hal::Pmm &pmm() {

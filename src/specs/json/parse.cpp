@@ -4,9 +4,9 @@
 
 namespace Json {
 
-Result<Value> parse(Text::Scan &s);
+Res<Value> parse(Text::Scan &s);
 
-Result<String> parseStr(Text::Scan &s) {
+Res<String> parseStr(Text::Scan &s) {
     if (not s.skip('"')) {
         return Error{"expected '\"'"};
     }
@@ -17,7 +17,7 @@ Result<String> parseStr(Text::Scan &s) {
         if (s.curr() == '"') {
             auto str = s.end();
             s.next();
-            return String{str};
+            return Ok(String{str});
         }
 
         if (s.skip('\\')) {
@@ -62,15 +62,16 @@ Result<String> parseStr(Text::Scan &s) {
     return Error{"expected '\"'"};
 }
 
-Result<Object> parseObject(Text::Scan &s) {
+Res<Object> parseObject(Text::Scan &s) {
     Object m;
     if (not s.skip('{')) {
         return Error{"expected '{'"};
     }
 
     if (s.skip('}')) {
-        return m;
+        return Ok(m);
     }
+
     while (true) {
         s.eat(Re::space());
         auto key = try$(parseStr(s));
@@ -88,7 +89,7 @@ Result<Object> parseObject(Text::Scan &s) {
         s.eat(Re::space());
 
         if (s.skip('}')) {
-            return m;
+            return Ok(m);
         }
         if (not s.skip(',')) {
             return Error{"expected ','"};
@@ -96,14 +97,14 @@ Result<Object> parseObject(Text::Scan &s) {
     }
 }
 
-Result<Array> parseArray(Text::Scan &s) {
+Res<Array> parseArray(Text::Scan &s) {
     Array v;
     if (not s.skip('[')) {
         return Error{"expected '['"};
     }
 
     if (s.skip(']')) {
-        return v;
+        return Ok(v);
     }
     while (true) {
         s.eat(Re::space());
@@ -114,7 +115,7 @@ Result<Array> parseArray(Text::Scan &s) {
         s.eat(Re::space());
 
         if (s.skip(']')) {
-            return v;
+            return Ok(v);
         }
         if (not s.skip(',')) {
             return Error{"expected ','"};
@@ -122,35 +123,35 @@ Result<Array> parseArray(Text::Scan &s) {
     }
 }
 
-Result<Value> parse(Text::Scan &s) {
+Res<Value> parse(Text::Scan &s) {
     s.eat(Re::space());
 
     if (s.ended()) {
         return Error{"unexpected end of input"};
     } else if (s.peek() == '{') {
-        return Value{try$(parseObject(s))};
+        return Ok(Value{try$(parseObject(s))});
     } else if (s.peek() == '[') {
-        return Value{try$(parseArray(s))};
+        return Ok(Value{try$(parseArray(s))});
     } else if (s.peek() == '"') {
-        return Value{try$(parseStr(s))};
+        return Ok(Value{try$(parseStr(s))});
     } else if (s.skip("null")) {
-        return Value{NONE};
+        return Ok(Value{NONE});
     } else if (s.skip("true")) {
-        return Value{true};
+        return Ok(Value{true});
     } else if (s.skip("false")) {
-        return Value{false};
+        return Ok(Value{false});
     } else if (s.peek() == '-' or (s.peek() >= '0' and s.peek() <= '9')) {
 #ifdef __osdk_freestanding__
-        return Value{(Number)try$(s.nextInt())};
+        return Ok(Value{(Number)try$(s.nextInt())});
 #else
-        return Value{try$(s.nextFloat())};
+        return Ok(Value{try$(s.nextFloat())});
 #endif
     }
 
     return Error{"unexpected character"};
 }
 
-Result<Value> parse(Str s) {
+Res<Value> parse(Str s) {
     Text::Scan scan{s};
     return parse(scan);
 }

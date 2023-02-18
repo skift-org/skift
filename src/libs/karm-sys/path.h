@@ -62,7 +62,7 @@ struct Path {
 
 template <>
 struct Karm::Fmt::Formatter<Sys::Path> {
-    Result<size_t> format(Io::_TextWriter &writer, Sys::Path path) {
+    Res<size_t> format(Io::_TextWriter &writer, Sys::Path path) {
         return Fmt::format(writer, "{}", path.str());
     }
 };

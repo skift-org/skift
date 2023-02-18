@@ -5,7 +5,7 @@
 #include <karm-ui/scafold.h>
 #include <karm-ui/view.h>
 
-CliResult entryPoint(CliArgs args) {
+Res<> entryPoint(CliArgs args) {
     auto titlebar = Ui::titlebar(Media::Icons::IMAGE, "Image Viewer");
 
     auto content = Ui::image(try$(Media::loadImage(args[0])));

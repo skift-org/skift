@@ -5,7 +5,7 @@
 
 #include "loader.h"
 
-CliResult entryPoint(CliArgs) {
+Res<> entryPoint(CliArgs) {
     //
     //
     //

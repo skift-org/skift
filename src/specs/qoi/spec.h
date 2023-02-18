@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 #include <karm-gfx/buffer.h>
 
 #include "../bscan.h"
@@ -36,7 +36,7 @@ struct Image {
                slice[2] == 0x69 and slice[3] == 0x66;
     }
 
-    static Result<Image> load(Bytes slice) {
+    static Res<Image> load(Bytes slice) {
         if (slice.len() < 14) {
             return Error("image too small");
         }
@@ -54,7 +54,7 @@ struct Image {
             return Error("invalid color space");
         }
 
-        return image;
+        return Ok(image);
     }
 
     enum Chunk : uint8_t {
@@ -72,7 +72,7 @@ struct Image {
         return c.red * 3 + c.green * 5 + c.blue * 7 + c.alpha * 11;
     }
 
-    [[gnu::flatten]] Error decode(Gfx::Surface dest) {
+    [[gnu::flatten]] Res<> decode(Gfx::Surface dest) {
         size_t run = 0;
         Array<Gfx::Color, 64> index{};
         Gfx::Color pixel = Gfx::BLACK;
@@ -82,7 +82,7 @@ struct Image {
         for (int y = 0; y < height(); y++) {
             for (int x = 0; x < width(); x++) {
                 if (s.ended()) {
-                    return Error("unexpected end of file");
+                    return Error{"unexpected end of file"};
                 }
 
                 if (run > 0) {
@@ -116,7 +116,7 @@ struct Image {
                 } else if ((b1 & Chunk::MASK) == Chunk::RUN) {
                     run = b1 & (~Chunk::MASK);
                 } else {
-                    return "invalid chunk";
+                    return Error{"invalid chunk"};
                 }
 
                 index[hash(pixel) % index.len()] = pixel;
@@ -125,10 +125,10 @@ struct Image {
         }
 
         if (Op::ne(s.nextBytes(8), bytes(END))) {
-            return "missing end marker";
+            return Error{"missing end marker"};
         }
 
-        return OK;
+        return Ok();
     }
 };
 

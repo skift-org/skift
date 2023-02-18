@@ -26,8 +26,4 @@ struct Args {
     }
 };
 
-struct Cli {
-    Result eval(Args const &args);
-};
-
 } // namespace Karm::Cli

@@ -11,7 +11,7 @@ struct File {
     String path;
     Json::Value props;
 
-    static Result<File> fromJson(Json::Value const &json) {
+    static Res<File> fromJson(Json::Value const &json) {
         if (not json.isObject()) {
             return Error{"expected object"};
         }
@@ -21,7 +21,7 @@ struct File {
         file.path = try$(json.get("path").take<String>());
         file.props = json.get("props");
 
-        return file;
+        return Ok(file);
     }
 };
 
@@ -30,7 +30,7 @@ struct Entry {
     File kernel;
     Vec<File> files;
 
-    static Result<Entry> fromJson(Json::Value const &json) {
+    static Res<Entry> fromJson(Json::Value const &json) {
         if (not json.isObject()) {
             return Error{"expected object"};
         }
@@ -47,14 +47,14 @@ struct Entry {
             entry.files.pushBack(file);
         }
 
-        return entry;
+        return Ok(entry);
     }
 };
 
 struct Configs {
     Vec<Entry> entries;
 
-    static Result<Configs> fromJson(Json::Value const &json) {
+    static Res<Configs> fromJson(Json::Value const &json) {
         if (not json.isObject()) {
             return Error{"expected array"};
         }
@@ -67,10 +67,10 @@ struct Configs {
             configs.entries.pushBack(entry);
         }
 
-        return configs;
+        return Ok(configs);
     }
 };
 
-Error load(Sys::Path kernelPath, Entry const &entry);
+Res<> load(Sys::Path kernelPath, Entry const &entry);
 
 } // namespace Loader

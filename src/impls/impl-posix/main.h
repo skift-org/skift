@@ -5,7 +5,7 @@
 
 int main(int argc, char const **argv) {
     CliArgs args{argc, argv};
-    CliResult code = entryPoint(args);
+    Res<> code = entryPoint(args);
 
     if (not code) {
         ::Karm::Error error = code.none();

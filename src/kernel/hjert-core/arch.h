@@ -17,7 +17,7 @@ namespace Hjert::Arch {
 
 Core::Cpu &cpu();
 
-Error init(Handover::Payload &);
+Res<> init(Handover::Payload &);
 
 Hal::Vmm &vmm();
 

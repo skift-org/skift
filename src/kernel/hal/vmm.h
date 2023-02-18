@@ -2,7 +2,7 @@
 
 #include <karm-base/enum.h>
 #include <karm-base/range.h>
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 
 #include "pmm.h"
 
@@ -39,17 +39,18 @@ struct Vmm {
 
     virtual ~Vmm() = default;
 
-    virtual Result<VmmRange> allocRange(VmmRange vaddr, PmmRange paddr, VmmFlags flags) = 0;
+    virtual Res<VmmRange> allocRange(VmmRange vaddr, PmmRange paddr, VmmFlags flags) = 0;
 
-    Result<VmmMem> mapOwned(VmmRange vaddr, PmmRange paddr, VmmFlags flags) {
-        return VmmMem{*this, try$(allocRange(vaddr, paddr, flags))};
+    Res<VmmMem> mapOwned(VmmRange vaddr, PmmRange paddr, VmmFlags flags) {
+        auto range = try$(allocRange(vaddr, paddr, flags));
+        return Ok(VmmMem{*this, range});
     }
 
-    virtual Error free(VmmRange vaddr) = 0;
+    virtual Res<> free(VmmRange vaddr) = 0;
 
-    virtual Error update(VmmRange vaddr, VmmFlags flags) = 0;
+    virtual Res<> update(VmmRange vaddr, VmmFlags flags) = 0;
 
-    virtual Error flush(VmmRange vaddr) = 0;
+    virtual Res<> flush(VmmRange vaddr) = 0;
 
     virtual void dump() = 0;
 

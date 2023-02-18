@@ -10,7 +10,7 @@
 #include <karm-ui/view.h>
 
 Ui::Child errorScope(auto callback) {
-    Result<Ui::Child> child = callback();
+    Res<Ui::Child> child = callback();
 
     if (child) {
         return child.unwrap();
@@ -41,7 +41,7 @@ Ui::Child userInfos() {
         Ui::icon(Media::Icons::ACCOUNT),
         "User",
         NONE,
-        errorScope([&] -> Result<Ui::Child> {
+        errorScope([&] -> Res<Ui::Child> {
             auto userinfo = try$(Sys::userinfo());
             return Ui::vflow(
                 Ui::row(NONE, "Username", NONE, Ui::text(userinfo.name)),
@@ -55,7 +55,7 @@ Ui::Child sysInfos() {
         Ui::icon(Media::Icons::INFORMATION_OUTLINE),
         "System",
         NONE,
-        errorScope([&] -> Result<Ui::Child> {
+        errorScope([&] -> Res<Ui::Child> {
             auto sysinfo = try$(Sys::sysinfo());
             return Ui::vflow(
                 Ui::row(NONE, "System", NONE, Ui::text(sysinfo.sysName)),
@@ -70,7 +70,7 @@ Ui::Child memInfos() {
         Ui::icon(Media::Icons::MEMORY),
         "Memory",
         NONE,
-        errorScope([&] -> Result<Ui::Child> {
+        errorScope([&] -> Res<Ui::Child> {
             auto meminfo = try$(Sys::meminfo());
             return vflow(
                 Ui::row(NONE, "Physical", NONE, Ui::text("{}bytes", meminfo.physicalUsed)),
@@ -83,7 +83,7 @@ Ui::Child cpuInfos() {
         Ui::icon(Media::Icons::CPU_64_BIT),
         "CPU",
         NONE,
-        errorScope([&] -> Result<Ui::Child> {
+        errorScope([&] -> Res<Ui::Child> {
             auto cpusinfo = try$(Sys::cpusinfo());
 
             Ui::Children children;
@@ -114,7 +114,7 @@ Ui::Child details() {
                     cpuInfos()))));
 }
 
-CliResult entryPoint(CliArgs args) {
+Res<> entryPoint(CliArgs args) {
     auto logo = Ui::box(
         {
             .padding = 32,
@@ -131,7 +131,7 @@ CliResult entryPoint(CliArgs args) {
 
     auto closeBtn = Ui::button(
         [](Ui::Node &n) {
-            Events::ExitEvent e{OK};
+            Events::ExitEvent e{Ok()};
             n.bubble(e);
         },
         Ui::ButtonStyle::primary(),

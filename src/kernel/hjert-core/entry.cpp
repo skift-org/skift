@@ -18,10 +18,10 @@ void splash() {
     logInfo("    |__/");
 }
 
-Error validateAndDump(uint64_t magic, Handover::Payload &payload) {
+Res<> validateAndDump(uint64_t magic, Handover::Payload &payload) {
     if (!Handover::valid(magic, payload)) {
         logInfo("entry: handover: invalid");
-        return "Invalid handover payload";
+        return Error{"Invalid handover payload"};
     }
 
     logInfo("entry: handover: valid");
@@ -44,7 +44,7 @@ Error validateAndDump(uint64_t magic, Handover::Payload &payload) {
 
     logInfo("entry: handover: total free: {}mib", toMib(totalFree));
 
-    return OK;
+    return Ok();
 }
 
 void taskBody() {
@@ -54,7 +54,7 @@ void taskBody() {
     }
 }
 
-Error init(uint64_t magic, Handover::Payload &payload) {
+Res<> init(uint64_t magic, Handover::Payload &payload) {
     try$(Arch::init(payload));
 
     splash();
@@ -88,6 +88,6 @@ HandoverRequests$(
     Handover::requestFb(),
     Handover::requestFiles());
 
-Error entryPoint(uint64_t magic, Handover::Payload &payload) {
+Res<> entryPoint(uint64_t magic, Handover::Payload &payload) {
     return Hjert::Core::init(magic, payload);
 }

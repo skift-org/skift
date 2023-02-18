@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/endiant.h>
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 #include <karm-base/string.h>
 #include <karm-gfx/context.h>
 #include <karm-logger/logger.h>
@@ -413,7 +413,7 @@ struct Font {
     Hhea _hhea;
     Hmtx _hmtx;
 
-    static Result<Cmap::Table> chooseCmap(Font &font) {
+    static Res<Cmap::Table> chooseCmap(Font &font) {
         Opt<Cmap::Table> bestCmap = NONE;
         int bestScore = 0;
 
@@ -447,10 +447,10 @@ struct Font {
             return Error("no cmap table");
         }
 
-        return *bestCmap;
+        return Ok(*bestCmap);
     }
 
-    static Result<Font> load(Bytes slice) {
+    static Res<Font> load(Bytes slice) {
         Font font{slice};
 
         if (font.version() != 0x00010000 and
@@ -467,7 +467,7 @@ struct Font {
         font._hhea = try$(font.requireTable<Hhea>());
         font._hmtx = try$(font.requireTable<Hmtx>());
 
-        return font;
+        return Ok(font);
     }
 
     Font(Bytes slice) : _slice(slice) {}
@@ -526,10 +526,10 @@ struct Font {
     }
 
     template <typename T>
-    Result<T> requireTable() {
+    Res<T> requireTable() {
         for (auto table : iterTables()) {
             if (Op::eq(table.tag, T::SIG)) {
-                return T{sub(_slice, table.offset, table.offset + table.length)};
+                return Ok(T{sub(_slice, table.offset, table.offset + table.length)});
             }
         }
 

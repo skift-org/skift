@@ -12,18 +12,18 @@ namespace Karm::Io {
 
 /* --- Read ----------------------------------------------------------------- */
 
-inline Result<size_t> pread(Readable auto &reader, MutBytes bytes, Seek seek) {
+inline Res<size_t> pread(Readable auto &reader, MutBytes bytes, Seek seek) {
     auto result = try$(reader.seek(seek));
-    return try$(reader.read(bytes));
+    return reader.read(bytes);
 }
 
-inline Result<Byte> getByte(Readable auto &reader) {
+inline Res<Byte> getByte(Readable auto &reader) {
     Byte byte;
     try$(reader.read({&byte, 1}));
-    return byte;
+    return Ok(byte);
 }
 
-inline Result<String> readAllUtf8(Readable auto &reader) {
+inline Res<String> readAllUtf8(Readable auto &reader) {
     StringWriter writer;
     Array<Utf8::Unit, 512> buf;
     while (true) {
@@ -33,88 +33,88 @@ inline Result<String> readAllUtf8(Readable auto &reader) {
         }
         try$(writer.writeUnit({buf.buf(), read}));
     }
-    return writer.take();
+    return Ok(writer.take());
 }
 
 /* --- Write ---------------------------------------------------------------- */
 
-inline Result<size_t> pwrite(Writable auto &writer, Bytes bytes, Seek seek) {
+inline Res<size_t> pwrite(Writable auto &writer, Bytes bytes, Seek seek) {
     auto result = try$(writer.seek(seek));
-    return try$(writer.write(bytes));
+    return writer.write(bytes);
 }
 
-inline Result<size_t> putByte(Writable auto &writer, Byte byte) {
+inline Res<size_t> putByte(Writable auto &writer, Byte byte) {
     return writer.write({&byte, 1});
 }
 
 /* --- Seek ----------------------------------------------------------------- */
 
-inline Result<size_t> tell(Seekable auto &seeker) {
-    return try$(seeker.seek(Seek::fromCurrent(0)));
+inline Res<size_t> tell(Seekable auto &seeker) {
+    return seeker.seek(Seek::fromCurrent(0));
 }
 
-inline Result<size_t> size(Seekable auto &seeker) {
+inline Res<size_t> size(Seekable auto &seeker) {
     size_t current = try$(tell(seeker));
     size_t end = try$(seeker.seek(Seek::fromEnd(0)));
     try$(seeker.seek(Seek::fromBegin(current)));
-    return end;
+    return Ok(end);
 }
 
-inline Result<size_t> skip(Seekable auto &seeker, size_t n) {
-    return try$(seeker.seek(Seek::fromCurrent(n)));
+inline Res<size_t> skip(Seekable auto &seeker, size_t n) {
+    return seeker.seek(Seek::fromCurrent(n));
 }
 
-inline Result<size_t> skip(Readable auto &reader, size_t n) {
+inline Res<size_t> skip(Readable auto &reader, size_t n) {
     Sink sink;
     return copy(reader, sink, n);
 }
 
 /* --- Copy ----------------------------------------------------------------- */
 
-inline Result<size_t> copy(Readable auto &reader, MutBytes bytes) {
+inline Res<size_t> copy(Readable auto &reader, MutBytes bytes) {
     size_t readed = 0;
     while (readed < bytes.len()) {
         readed += try$(reader.read(next(bytes, readed)));
     }
-
-    return readed;
+    return Ok(readed);
 }
 
-inline Result<size_t> copy(Readable auto &reader, Writable auto &writer) {
+inline Res<size_t> copy(Readable auto &reader, Writable auto &writer) {
     Array<Byte, 4096> buffer;
     size_t result = 0;
     while (true) {
         auto read = try$(reader.read(mutBytes(buffer)));
-
         if (read == 0) {
-            return result;
+            return Ok(result);
         }
 
         result += read;
-        auto written = try$(writer.write(sub(buffer, 0, read)));
 
+        auto written = try$(writer.write(sub(buffer, 0, read)));
         if (written != read) {
-            return result;
+            return Ok(result);
         }
     }
 }
 
-inline Result<size_t> copy(Readable auto &reader, Writable auto &writer, size_t size) {
+inline Res<size_t> copy(Readable auto &reader, Writable auto &writer, size_t size) {
     Array<Bytes, 4096> buffer;
     size_t result = 0;
     while (size > 0) {
         auto read = try$(reader.read(sub(buffer, 0, size)));
         if (read == 0) {
-            break;
+            return Ok(result);
         }
+
         result += read;
+
         auto written = try$(writer.write(sub(buffer, 0, read)));
         if (written != read) {
-            return result;
+            return Ok(result);
         }
         size -= read;
     }
-    return result;
+    return Ok(result);
 }
 
 } // namespace Karm::Io

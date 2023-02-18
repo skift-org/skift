@@ -13,7 +13,7 @@ struct In : public Io::Reader {
 
     In(Strong<Fd> fd) : _fd(fd) {}
 
-    Result<size_t> read(MutBytes bytes) override {
+    Res<size_t> read(MutBytes bytes) override {
         return _fd->read(bytes);
     }
 };
@@ -23,7 +23,7 @@ struct Out : public Io::TextWriter<> {
 
     Out(Strong<Fd> fd) : _fd(fd) {}
 
-    Result<size_t> write(Bytes bytes) override {
+    Res<size_t> write(Bytes bytes) override {
         return _fd->write(bytes);
     }
 };
@@ -33,7 +33,7 @@ struct Err : public Io::TextWriter<> {
 
     Err(Strong<Fd> fd) : _fd(fd) {}
 
-    Result<size_t> write(Bytes bytes) override {
+    Res<size_t> write(Bytes bytes) override {
         return _fd->write(bytes);
     }
 };

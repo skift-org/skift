@@ -21,23 +21,23 @@ struct File :
 
     File(Strong<Fd> fd, Path path) : _fd(fd), _path(path) {}
 
-    static Result<File> create(Path path);
+    static Res<File> create(Path path);
 
-    static Result<File> open(Path path);
+    static Res<File> open(Path path);
 
-    Result<size_t> read(MutBytes bytes) override {
+    Res<size_t> read(MutBytes bytes) override {
         return _fd->read(bytes);
     }
 
-    Result<size_t> write(Bytes bytes) override {
+    Res<size_t> write(Bytes bytes) override {
         return _fd->write(bytes);
     }
 
-    Result<size_t> seek(Io::Seek seek) override {
+    Res<size_t> seek(Io::Seek seek) override {
         return _fd->seek(seek);
     }
 
-    Result<size_t> flush() override {
+    Res<size_t> flush() override {
         return _fd->flush();
     }
 

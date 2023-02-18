@@ -36,13 +36,13 @@ struct Mmap :
         unmap().unwrap("unmap failed");
     }
 
-    Error unmap() {
+    Res<> unmap() {
         if (_buf) {
             try$(Embed::memUnmap(std::exchange(_buf, nullptr), _size));
             _paddr = 0;
             _size = 0;
         }
-        return OK;
+        return Ok();
     }
 
     size_t vaddr() const { return (size_t)_buf; }
@@ -86,8 +86,9 @@ struct MutMmap :
         : _paddr(paddr), _buf(buf), _size(size) {
     }
 
-    Result<size_t> flush() override {
-        return Embed::memFlush(_buf, _size);
+    Res<size_t> flush() override {
+        try$(Embed::memFlush(_buf, _size));
+        return Ok(_size);
     }
 
     MutMmap(MutMmap &&other) {
@@ -107,14 +108,14 @@ struct MutMmap :
         unmap().unwrap("unmap failed");
     }
 
-    Error unmap() {
+    Res<> unmap() {
         if (_buf) {
             try$(Embed::memUnmap(std::exchange(_buf, nullptr), _size));
             _paddr = 0;
             _buf = nullptr;
             _size = 0;
         }
-        return OK;
+        return Ok();
     }
 
     size_t vaddr() const {
@@ -213,35 +214,35 @@ struct _Mmap {
         return *this;
     }
 
-    Result<Mmap> map() {
+    Res<Mmap> map() {
         _options.flags |= READ;
         MmapResult range = try$(Embed::memMap(_options));
-        return Mmap{range.paddr, (void const *)range.vaddr, range.size};
+        return Ok(Mmap{range.paddr, (void const *)range.vaddr, range.size});
     }
 
-    Result<Mmap> map(Strong<Fd> fd) {
+    Res<Mmap> map(Strong<Fd> fd) {
         _options.flags |= READ;
         MmapResult range = try$(Embed::memMap(_options, fd));
-        return Mmap{range.paddr, (void const *)range.vaddr, range.size};
+        return Ok(Mmap{range.paddr, (void const *)range.vaddr, range.size});
     }
 
-    Result<Mmap> map(AsFd auto &what) {
+    Res<Mmap> map(AsFd auto &what) {
         return map(what.asFd());
     }
 
-    Result<MutMmap> mapMut() {
+    Res<MutMmap> mapMut() {
         _options.flags |= WRITE;
         MmapResult range = try$(Embed::memMap(_options));
-        return MutMmap{range.paddr, (void *)range.vaddr, range.size};
+        return Ok(MutMmap{range.paddr, (void *)range.vaddr, range.size});
     }
 
-    Result<MutMmap> mapMut(Strong<Fd> fd) {
+    Res<MutMmap> mapMut(Strong<Fd> fd) {
         _options.flags |= WRITE;
         MmapResult result = try$(Embed::memMap(_options, fd));
-        return MutMmap{result.paddr, (void *)result.vaddr, result.size};
+        return Ok(MutMmap{result.paddr, (void *)result.vaddr, result.size});
     }
 
-    Result<MutMmap> mapMut(AsFd auto &what) {
+    Res<MutMmap> mapMut(AsFd auto &what) {
         return mapMut(what.asFd());
     }
 };

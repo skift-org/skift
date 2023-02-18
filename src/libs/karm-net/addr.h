@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 #include <karm-base/var.h>
 #include <karm-fmt/fmt.h>
 #include <karm-text/scan.h>
@@ -28,7 +28,7 @@ union IpAddrV4 {
         return IpAddrV4{{127, 0, 0, 1}};
     }
 
-    static Result<IpAddrV4> parse(Text::Scan &s) {
+    static Res<IpAddrV4> parse(Text::Scan &s) {
         auto addr = unspecified();
 
         for (auto i = 0; i < 4; ++i) {
@@ -53,7 +53,7 @@ union IpAddrV4 {
         return addr;
     }
 
-    static Result<IpAddrV4> parse(Str str) {
+    static Res<IpAddrV4> parse(Str str) {
         auto s = Text::Scan(str);
         return parse(s);
     }
@@ -80,7 +80,7 @@ union IpAddrV6 {
         return IpAddrV6{0, 0, 0, 0, 0, 0, 0, 1};
     }
 
-    static Result<IpAddrV6> parse(Text::Scan &s) {
+    static Res<IpAddrV6> parse(Text::Scan &s) {
         auto addr = unspecified();
 
         for (auto i = 0; i < 8; i++) {
@@ -96,7 +96,7 @@ union IpAddrV6 {
         return addr;
     }
 
-    static Result<IpAddrV6> parse(Str str) {
+    static Res<IpAddrV6> parse(Str str) {
         auto s = Text::Scan(str);
         return parse(s);
     }
@@ -105,7 +105,7 @@ union IpAddrV6 {
 struct IpAddr : public Var<IpAddrV4, IpAddrV6> {
     using Var<IpAddrV4, IpAddrV6>::Var;
 
-    static Result<IpAddr> parse(Text::Scan &s) {
+    static Res<IpAddr> parse(Text::Scan &s) {
         auto maybeV6 = IpAddrV6::parse(s);
 
         if (maybeV6) {
@@ -121,7 +121,7 @@ struct IpAddr : public Var<IpAddrV4, IpAddrV6> {
         return Error("invalid IP address");
     }
 
-    static Result<IpAddr> parse(Str str) {
+    static Res<IpAddr> parse(Str str) {
         auto s = Text::Scan(str);
         return parse(s);
     }
@@ -134,7 +134,7 @@ struct SocketAddr {
     SocketAddr(IpAddr addr, uint16_t port)
         : addr(addr), port(port) {}
 
-    static Result<SocketAddr> parse(Text::Scan &s) {
+    static Res<SocketAddr> parse(Text::Scan &s) {
         auto addr = try$(IpAddr::parse(s));
 
         if (not s.skip(':')) {
@@ -155,21 +155,21 @@ struct SocketAddr {
 
 template <>
 struct Karm::Fmt::Formatter<Net::IpAddrV4> {
-    Result<size_t> format(Io::_TextWriter &writer, Net::IpAddrV4 addr) {
+    Res<size_t> format(Io::_TextWriter &writer, Net::IpAddrV4 addr) {
         return Fmt::format(writer, "{}.{}.{}.{}", addr.a, addr.b, addr.c, addr.d);
     }
 };
 
 template <>
 struct Karm::Fmt::Formatter<Net::IpAddrV6> {
-    Result<size_t> format(Io::_TextWriter &writer, Net::IpAddrV6 addr) {
+    Res<size_t> format(Io::_TextWriter &writer, Net::IpAddrV6 addr) {
         return Fmt::format(writer, "{}:{}:{}:{}:{}:{}:{}:{}", addr.a, addr.b, addr.c, addr.d, addr.e, addr.f, addr.g, addr.h);
     }
 };
 
 template <>
 struct Karm::Fmt::Formatter<Net::IpAddr> {
-    Result<size_t> format(Io::_TextWriter &writer, Net::IpAddr addr) {
+    Res<size_t> format(Io::_TextWriter &writer, Net::IpAddr addr) {
         return addr.visit([&](auto addr) {
             return Fmt::format(writer, "{}", addr);
         });
@@ -178,7 +178,7 @@ struct Karm::Fmt::Formatter<Net::IpAddr> {
 
 template <>
 struct Karm::Fmt::Formatter<Net::SocketAddr> {
-    Result<size_t> format(Io::_TextWriter &writer, Net::SocketAddr addr) {
+    Res<size_t> format(Io::_TextWriter &writer, Net::SocketAddr addr) {
         return Fmt::format(writer, "{}:{}", addr.addr, addr.port);
     }
 };

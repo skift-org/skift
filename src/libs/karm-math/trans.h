@@ -131,7 +131,7 @@ using Trans2f = Trans2<double>;
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Trans2<T>> {
-    Result<size_t> format(Io::_TextWriter &writer, Math::Trans2<T> trans) {
+    Res<size_t> format(Io::_TextWriter &writer, Math::Trans2<T> trans) {
         return Fmt::format(writer, "Trans2({}, {}, {}, {}, {}, {})", trans.xx, trans.xy, trans.yx, trans.yy, trans.ox, trans.oy);
     }
 };

@@ -1,12 +1,12 @@
 #pragma once
 
 #include <karm-base/rc.h>
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 
 namespace Karm::Sys {
 
 struct Mutext {
-    Result<Strong<Mutext>> create();
+    Res<Strong<Mutext>> create();
 
     virtual ~Mutext() = default;
 
@@ -18,7 +18,7 @@ struct Mutext {
 };
 
 struct Sema {
-    Result<Strong<Sema>> create();
+    Res<Strong<Sema>> create();
 
     virtual ~Sema() = default;
 
@@ -32,7 +32,7 @@ struct Sema {
 };
 
 struct CondVar {
-    Result<Strong<CondVar>> create();
+    Res<Strong<CondVar>> create();
 
     virtual ~CondVar() = default;
 

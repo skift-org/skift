@@ -17,24 +17,24 @@ Efi::LoadedImageProtocol *li();
 void init(Handle handle, SystemTable *st);
 
 template <typename P>
-inline Result<P *> openProtocol(Handle handle) {
+inline Res<P *> openProtocol(Handle handle) {
     P *result = nullptr;
     Uuid uuid = P::UUID;
     try$(bs()->openProtocol(handle, &uuid, (void **)&result, imageHandle(), nullptr, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL));
-    return result;
+    return Ok(result);
 }
 
 template <typename P>
-inline Result<P *> openProtocol() {
+inline Res<P *> openProtocol() {
     return openProtocol<P>(imageHandle());
 }
 
 template <typename P>
-inline Result<P> locateProtocol() {
+inline Res<P> locateProtocol() {
     P *result = nullptr;
     Uuid uuid = P::UUID;
     try$(bs()->locateProtocol(&uuid, nullptr, &result));
-    return result;
+    return Ok(result);
 }
 
 } // namespace Efi

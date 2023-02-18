@@ -9,7 +9,7 @@
 
 template <>
 struct Karm::Fmt::Formatter<Handover::Record> {
-    Result<size_t> format(Io::_TextWriter &writer, Handover::Record record) {
+    Res<size_t> format(Io::_TextWriter &writer, Handover::Record record) {
         return Fmt::format(writer, "Record({}, {x}-{x})", record.name(), record.start, record.end());
     }
 };

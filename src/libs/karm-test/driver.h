@@ -23,9 +23,9 @@ struct Driver {
 
     void runAll();
 
-    Error unexpect(auto const &__lhs, auto const &__rhs, Str op, Loc = Loc::current()) {
+    Res<> unexpect(auto const &__lhs, auto const &__rhs, Str op, Loc = Loc::current()) {
         Sys::errln("Test Failled: {} {} {}", __lhs, op, __rhs);
-        return Error::OTHER;
+        return Error{Error::OTHER};
     }
 };
 

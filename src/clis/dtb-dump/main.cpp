@@ -3,7 +3,7 @@
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 
-CliResult entryPoint(CliArgs args) {
+Res<> entryPoint(CliArgs args) {
     if (args.len() == 0) {
         return Error{"Usage: dtb-dump <dtb-file>"};
     }
@@ -16,5 +16,5 @@ CliResult entryPoint(CliArgs args) {
     }
 
     Sys::println("dtb is valid");
-    return Cli::SUCCESS;
+    return Ok();
 }

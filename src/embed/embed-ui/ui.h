@@ -4,6 +4,6 @@
 
 namespace Embed {
 
-Result<Strong<Karm::Ui::Host>> makeHost(Karm::Ui::Child root);
+Res<Strong<Karm::Ui::Host>> makeHost(Karm::Ui::Child root);
 
 } // namespace Embed

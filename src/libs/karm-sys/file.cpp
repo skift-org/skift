@@ -4,13 +4,13 @@
 
 namespace Karm::Sys {
 
-Result<File> File::create(Path path) {
-    return File{try$(Embed::createFile(path)), path};
+Res<File> File::create(Path path) {
+    return Ok(File{try$(Embed::createFile(path)), path});
 }
 
-Result<File> File::open(Path path) {
+Res<File> File::open(Path path) {
     auto fd = try$(Embed::openFile(path));
-    return File{fd, path};
+    return Ok(File{fd, path});
 }
 
 } // namespace Karm::Sys

@@ -11,7 +11,7 @@ struct Pipe {
     Strong<Fd> in() { return _in; }
     Strong<Fd> out() { return _out; }
 
-    static Result<Pipe> create();
+    static Res<Pipe> create();
 };
 
 } // namespace Karm::Sys

@@ -24,40 +24,40 @@ auto title(Str text) {
     return Cli::styled(text, Cli::style().bold());
 }
 
-Error dumpUserInfo() {
+Res<> dumpUserInfo() {
     auto userinfo = try$(Sys::userinfo());
     Sys::println("{}: {} {}", title("User"), userinfo.name);
     Sys::println("{}: {} {}", title("Home"), userinfo.home);
     Sys::println("{}: {} {}", title("Shell"), userinfo.shell);
-    return OK;
+    return Ok();
 }
 
-Error dumpSysInfo() {
+Res<> dumpSysInfo() {
     auto sysinfo = try$(Sys::sysinfo());
     Sys::println("{}: {} {}", title("System"), sysinfo.sysName, sysinfo.sysVersion);
     Sys::println("{}: {} {}", title("Kernel"), sysinfo.kernelName, sysinfo.kernelVersion);
     Sys::println("{}: {}", title("Hostname"), sysinfo.hostname);
-    return OK;
+    return Ok();
 }
 
-Error dumpMemInfo() {
+Res<> dumpMemInfo() {
     auto meminfo = try$(Sys::meminfo());
     Sys::println("{}: {} / {}", title("Memory"), meminfo.physicalUsed, meminfo.physicalTotal);
     Sys::println("{}: {} / {}", title("Swap"), meminfo.swapUsed, meminfo.swapTotal);
-    return OK;
+    return Ok();
 }
 
-Error dumpCpusInfo() {
+Res<> dumpCpusInfo() {
     auto cpusinfo = try$(Sys::cpusinfo());
 
     for (auto &cpu : cpusinfo) {
         Sys::println("{}: {} {} {} MHz", title("CPU"), cpu.name, cpu.brand, cpu.freq);
     }
 
-    return OK;
+    return Ok();
 }
 
-Error testAnsi() {
+Res<> testAnsi() {
     for (auto const c : Cli::DARK_COLORS) {
         Sys::print("{}", Cli::styled(BLOCK, c));
     }
@@ -70,30 +70,30 @@ Error testAnsi() {
 
     Sys::println("");
 
-    return OK;
+    return Ok();
 }
 
 } // namespace Sysfetch
 
-CliResult entryPoint(CliArgs) {
-    Error res = OK;
+Res<> entryPoint(CliArgs) {
+    Res<> res = Ok();
 
     Sys::println("{}", Cli::styled(ART, Cli::BLUE));
 
     if (!(res = Sysfetch::dumpUserInfo())) {
-        Sys::errln("{}: {}", Sysfetch::title("User"), Cli::styled(res.msg(), Cli::RED_LIGHT));
+        Sys::errln("{}: {}", Sysfetch::title("User"), Cli::styled(res.none().msg(), Cli::RED_LIGHT));
     }
 
     if (!(res = Sysfetch::dumpSysInfo())) {
-        Sys::errln("{} {}", Sysfetch::title("System"), Cli::styled(res.msg(), Cli::RED_LIGHT));
+        Sys::errln("{} {}", Sysfetch::title("System"), Cli::styled(res.none().msg(), Cli::RED_LIGHT));
     }
 
     if (!(res = Sysfetch::dumpMemInfo())) {
-        Sys::errln("{}: {}", Sysfetch::title("Memory"), Cli::styled(res.msg(), Cli::RED_LIGHT));
+        Sys::errln("{}: {}", Sysfetch::title("Memory"), Cli::styled(res.none().msg(), Cli::RED_LIGHT));
     }
 
     if (!(res = Sysfetch::dumpCpusInfo())) {
-        Sys::errln("{}: {}", Sysfetch::title("CPUs"), Cli::styled(res.msg(), Cli::RED_LIGHT));
+        Sys::errln("{}: {}", Sysfetch::title("CPUs"), Cli::styled(res.none().msg(), Cli::RED_LIGHT));
     }
 
     Sys::println("");

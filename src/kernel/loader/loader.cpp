@@ -15,7 +15,7 @@ namespace Loader {
 
 void enterKernel(size_t entry, size_t payload, size_t stack, size_t vmm);
 
-Error load(Sys::Path kernelPath, Entry const &entry) {
+Res<> load(Sys::Path kernelPath, Entry const &entry) {
     logInfo("loader: preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
     logInfo("loader: payload at vaddr: 0x{x} paddr: 0x{x}", payloadMem.vaddr(), payloadMem.paddr());

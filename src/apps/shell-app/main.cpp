@@ -306,6 +306,6 @@ Ui::Child app() {
     });
 }
 
-CliResult entryPoint(CliArgs args) {
+Res<> entryPoint(CliArgs args) {
     return Ui::runApp(args, app());
 }

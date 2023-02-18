@@ -295,7 +295,7 @@ Ui::Child sidebar(State s) {
                         Ui::vflow(8, items))));
 }
 
-CliResult entryPoint(CliArgs args) {
+Res<> entryPoint(CliArgs args) {
     auto titlebar = Ui::titlebar(
         Media::Icons::DUCK,
         "Demos",

@@ -33,7 +33,7 @@ Ui::Child content() {
             Ui::text("Content")));
 }
 
-CliResult entryPoint(CliArgs args) {
+Res<> entryPoint(CliArgs args) {
     auto titlebar = Ui::titlebar(
         Media::Icons::COG,
         "Settings",

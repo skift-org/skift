@@ -10,48 +10,48 @@
 
 namespace Karm::Media {
 
-Result<Strong<Fontface>> loadFontface(Str path) {
+Res<Strong<Fontface>> loadFontface(Str path) {
     auto file = try$(Sys::File::open(path));
     auto map = try$(Sys::mmap().map(file));
     Strong<Fontface> face = try$(TtfFontface::load(std::move(map)));
-    return face;
+    return Ok(face);
 }
 
-Result<Font> loadFont(double size, Str path) {
-    return Font{
+Res<Font> loadFont(double size, Str path) {
+    return Ok(Font{
         .fontface = try$(loadFontface(path)),
         .fontsize = size,
-    };
+    });
 }
 
-static Result<Image> loadQoi(Bytes bytes) {
+static Res<Image> loadQoi(Bytes bytes) {
     auto qoi = try$(Qoi::Image::load(bytes));
     Image image{Gfx::RGBA8888, {qoi.width(), qoi.height()}};
     try$(qoi.decode(image));
-    return image;
+    return Ok(image);
 }
 
-static Result<Image> loadPng(Bytes bytes) {
+static Res<Image> loadPng(Bytes bytes) {
     auto png = try$(Png::Image::load(bytes));
     Image image{Gfx::RGBA8888, {png.width(), png.height()}};
 
     Gfx::Surface surface = image;
     surface.clear(surface.bound(), Gfx::PINK);
     // try$(png.decode(image));
-    return image;
+    return Ok(image);
 }
 
-static Result<Image> loadJpeg(Bytes bytes) {
+static Res<Image> loadJpeg(Bytes bytes) {
     auto jpeg = try$(Jpeg::Image::load(bytes));
     Image image{Gfx::RGBA8888, {jpeg.width(), jpeg.height()}};
 
     Gfx::Surface surface = image;
     surface.clear(surface.bound(), Gfx::PINK);
     // try$(jpeg.decode(image));
-    return image;
+    return Ok(image);
 }
 
-Result<Image> loadImage(Str path) {
+Res<Image> loadImage(Str path) {
     auto file = try$(Sys::File::open(path));
     auto map = try$(Sys::mmap().map(file));
 

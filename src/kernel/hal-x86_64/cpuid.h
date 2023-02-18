@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/array.h>
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 #include <karm-base/string.h>
 
 namespace x86_64 {

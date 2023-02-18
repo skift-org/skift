@@ -6,7 +6,7 @@ namespace Karm::Ui {
 
 struct Host : public Node {
     Child _root;
-    Opt<Error> _error;
+    Opt<Res<>> _res;
     Gfx::Context _g;
     Vec<Math::Recti> _dirty;
 
@@ -30,7 +30,7 @@ struct Host : public Node {
     virtual void wait(size_t ms) = 0;
 
     bool alive() {
-        return not _error;
+        return not _res;
     }
 
     Math::Recti bound() override {
@@ -83,7 +83,7 @@ struct Host : public Node {
                 return true;
             })
             .handle<Events::ExitEvent>([this](auto &e) {
-                _error = e.error;
+                _res = e.res;
                 return true;
             });
     }
@@ -92,10 +92,10 @@ struct Host : public Node {
         _root->layout(r);
     }
 
-    Error run() {
+    Res<> run() {
         layout(bound());
         paint();
-        while (not _error) {
+        while (not _res) {
             wait(_shouldAnimate ? 16 : -1);
             if (_shouldAnimate) {
                 _shouldAnimate = false;
@@ -117,7 +117,7 @@ struct Host : public Node {
             }
         }
 
-        return tryOr(_error, OK);
+        return _res.unwrap();
     }
 };
 

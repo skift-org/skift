@@ -30,7 +30,7 @@ Ui::Child badges() {
         Ui::badge(Ui::BadgeStyle::INFO, "Info"));
 }
 
-CliResult entryPoint(CliArgs args) {
+Res<> entryPoint(CliArgs args) {
     auto titlebar = Ui::titlebar(Media::Icons::DUCK, "Widget Gallery");
     auto content = Ui::spacing(
         8,

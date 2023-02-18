@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 #include <karm-base/try.h>
 #include <karm-meta/traits.h>
 

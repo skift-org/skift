@@ -9,7 +9,7 @@
 namespace Karm {
 
 #define FOREACH_ERROR(ERROR)         \
-    ERROR(OK)                        \
+    ERROR(_OK)                       \
     ERROR(NOT_IMPLEMENTED)           \
     ERROR(NOT_FOUND)                 \
     ERROR(PERMISSION_DENIED)         \
@@ -64,30 +64,17 @@ struct [[nodiscard]] Error {
 
     using enum Code;
 
-    constexpr Error(None) : _code(Code::OTHER), _msg("unwraping none") {}
-    constexpr Error(Code code) : _code(code) {}
-    constexpr Error(char const *msg) : _code(OTHER), _msg(msg) {}
-    constexpr Error(Code code, char const *msg) : _code(code), _msg(msg) {}
+    constexpr Error() : _code(Code::OTHER) {}
 
-    constexpr explicit operator bool() const { return _code == Code::OK; }
+    constexpr Error(Code code) : _code(code) {}
+
+    constexpr Error(char const *msg) : _code(OTHER), _msg(msg) {}
+
+    constexpr Error(Code code, char const *msg) : _code(code), _msg(msg) {}
 
     constexpr Code code() const { return _code; }
 
     constexpr Error none() const { return *this; }
-
-    constexpr bool unwrap(char const *msg = "unwraping an error") const {
-        if (_code != OK) {
-            panic(msg);
-        }
-        return true;
-    }
-
-    constexpr bool take() const {
-        if (_code != OK) {
-            panic("take() called on an error");
-        }
-        return true;
-    }
 
     constexpr char const *msg() {
         if (_msg != nullptr and strlen(_msg) > 0) {
@@ -105,10 +92,6 @@ struct [[nodiscard]] Error {
         }
     }
 };
-
-inline constexpr Error OK = {Error::OK};
-
-static_assert(Tryable<Error>);
 
 #undef FOREACH_ERROR
 

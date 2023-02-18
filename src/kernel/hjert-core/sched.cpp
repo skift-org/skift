@@ -10,18 +10,18 @@ static Opt<Sched> _sched;
 
 /* --- Stack ----------------------------------------------------------------- */
 
-Result<Stack> Stack::create() {
+Res<Stack> Stack::create() {
     logInfo("sched: creating stack...");
     auto mem = try$(Mem::heap().allocOwned(DEFAULT_SIZE));
     auto base = mem.range().end();
-    return Stack{std::move(mem), base};
+    return Ok(Stack{std::move(mem), base});
 }
 
 /* --- Task ----------------------------------------------------------------- */
 
-Result<Strong<Task>> Task::create() {
+Res<Strong<Task>> Task::create() {
     logInfo("sched: creating task...");
-    return makeStrong<Task>(try$(Stack::create()));
+    return Ok(makeStrong<Task>(try$(Stack::create())));
 }
 
 Task &Task::self() {
@@ -30,12 +30,12 @@ Task &Task::self() {
 
 /* --- Sched ---------------------------------------------------------------- */
 
-Error Sched::start(Strong<Task> task, uintptr_t ip, uintptr_t sp) {
+Res<> Sched::start(Strong<Task> task, uintptr_t ip, uintptr_t sp) {
     logInfo("sched: starting task (ip: {x}, sp: {x})...", ip, sp);
     LockScope scope(_lock);
     Arch::start(*task, ip, sp, {});
     _tasks.pushBack(std::move(task));
-    return OK;
+    return Ok();
 }
 
 void Sched::schedule() {
@@ -56,10 +56,10 @@ void Sched::schedule() {
     _curr->_sliceStart = _tick;
 }
 
-Error Sched::init(Handover::Payload &) {
+Res<> Sched::init(Handover::Payload &) {
     logInfo("sched: initializing...");
     _sched = Sched{try$(Task::create())};
-    return OK;
+    return Ok();
 }
 
 Sched &Sched::self() {

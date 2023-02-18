@@ -4,34 +4,34 @@
 
 namespace Karm::Sys {
 
-Result<SysInfo> sysinfo() {
+Res<SysInfo> sysinfo() {
     SysInfo infos;
     try$(Embed::populate(infos));
-    return infos;
+    return Ok(infos);
 }
 
-Result<MemInfo> meminfo() {
+Res<MemInfo> meminfo() {
     MemInfo infos;
     try$(Embed::populate(infos));
-    return infos;
+    return Ok(infos);
 }
 
-Result<Vec<CpuInfo>> cpusinfo() {
+Res<Vec<CpuInfo>> cpusinfo() {
     Vec<CpuInfo> infos;
     try$(Embed::populate(infos));
-    return infos;
+    return Ok(infos);
 }
 
-Result<UserInfo> userinfo() {
+Res<UserInfo> userinfo() {
     UserInfo infos;
     try$(Embed::populate(infos));
-    return infos;
+    return Ok(infos);
 }
 
-Result<Vec<UserInfo>> usersinfo() {
+Res<Vec<UserInfo>> usersinfo() {
     Vec<UserInfo> infos;
     try$(Embed::populate(infos));
-    return infos;
+    return Ok(infos);
 }
 
 } // namespace Karm::Sys

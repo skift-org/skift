@@ -344,7 +344,7 @@ void renderScene(Cam cam, Scene &scene, Gfx::Surface buf, Props props) {
     }
 }
 
-CliResult entryPoint(CliArgs args) {
+Res<> entryPoint(CliArgs args) {
     srand(1);
     double scale = 1;
 

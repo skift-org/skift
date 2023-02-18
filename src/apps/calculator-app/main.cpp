@@ -99,6 +99,6 @@ Ui::Child app() {
 
 } // namespace Calculator
 
-CliResult entryPoint(CliArgs args) {
+Res<> entryPoint(CliArgs args) {
     return Ui::runApp(args, Calculator::app());
 }

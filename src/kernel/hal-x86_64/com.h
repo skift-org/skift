@@ -121,11 +121,11 @@ struct Com : public Io::TextWriter<> {
         }
     }
 
-    Result<size_t> putByte(Byte c) {
+    Res<size_t> putByte(Byte c) {
         waitWrite();
         writeReg(DATA, static_cast<uint8_t>(c));
 
-        return 1;
+        return Ok(1uz);
     }
 
     uint8_t getByte() {
@@ -133,12 +133,12 @@ struct Com : public Io::TextWriter<> {
         return readReg(DATA);
     }
 
-    Result<size_t> write(Bytes bytes) override {
+    Res<size_t> write(Bytes bytes) override {
         for (auto b : iter(bytes)) {
             try$(putByte(b));
         }
 
-        return sizeOf(bytes);
+        return Ok(sizeOf(bytes));
     }
 };
 

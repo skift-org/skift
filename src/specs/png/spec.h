@@ -72,7 +72,7 @@ struct Image {
         return slice.len() >= 8 and Op::eq(sub(slice, 0, 8), bytes(SIG));
     }
 
-    static Result<Image> load(Bytes slice) {
+    static Res<Image> load(Bytes slice) {
         Image image{slice};
 
         if (!Op::eq(image.sig(), bytes(SIG)))
@@ -82,7 +82,7 @@ struct Image {
         image._plte = image.lookupChunk<Plte>();
         image._idat = image.lookupChunk<Idat>();
 
-        return image;
+        return Ok(image);
     }
 
     Image(Bytes slice)

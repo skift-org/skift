@@ -105,14 +105,14 @@ struct Range {
             return Ordr::GREATER;
     }
 
-    constexpr Error ensureAligned(T alignment) const {
+    Res<> ensureAligned(T alignment) const {
         if (not isAlign(start, alignment))
-            return {Error::INVALID_DATA, "start is not aligned"};
+            return Error{Error::INVALID_DATA, "start is not aligned"};
 
         if (not isAlign(size, alignment))
-            return {Error::INVALID_DATA, "size is not aligned"};
+            return Error{Error::INVALID_DATA, "size is not aligned"};
 
-        return OK;
+        return Ok();
     }
 };
 

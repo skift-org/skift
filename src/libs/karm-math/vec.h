@@ -471,21 +471,21 @@ bool epsilonEq(Vec4<T> const &lhs, Vec4<T> const &rhs, T epsilon) {
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Vec2<T>> {
-    Result<size_t> format(Io::_TextWriter &writer, Math::Vec2<T> vec) {
+    Res<size_t> format(Io::_TextWriter &writer, Math::Vec2<T> vec) {
         return Fmt::format(writer, "Vec2({}, {})", vec.x, vec.y);
     }
 };
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Vec3<T>> {
-    Result<size_t> format(Io::_TextWriter &writer, Math::Vec3<T> vec) {
+    Res<size_t> format(Io::_TextWriter &writer, Math::Vec3<T> vec) {
         return Fmt::format(writer, "Vec3({}, {}, {})", vec.x, vec.y, vec.z);
     }
 };
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Vec4<T>> {
-    Result<size_t> format(Io::_TextWriter &writer, Math::Vec4<T> vec) {
+    Res<size_t> format(Io::_TextWriter &writer, Math::Vec4<T> vec) {
         return Fmt::format(writer, "Vec4({}, {}, {}, {})", vec.x, vec.y, vec.z);
     }
 };

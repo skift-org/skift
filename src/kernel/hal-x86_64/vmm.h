@@ -22,74 +22,74 @@ struct Vmm : public Hal::Vmm {
           _mapper(mapper) {}
 
     template <size_t L>
-    Result<Pml<L - 1> *> pml(Pml<L> &upper, size_t vaddr) {
+    Res<Pml<L - 1> *> pml(Pml<L> &upper, size_t vaddr) {
         auto page = upper.pageAt(vaddr);
 
         if (not page.present()) {
-            return Error::ADDR_NOT_AVAILABLE;
+            return Error{Error::ADDR_NOT_AVAILABLE};
         }
 
-        return _mapper.map(page.template as<Pml<L - 1>>());
+        return Ok(_mapper.map(page.template as<Pml<L - 1>>()));
     }
 
     template <size_t L>
-    Result<Pml<L - 1> *> pmlOrAlloc(Pml<L> &upper, size_t vaddr) {
+    Res<Pml<L - 1> *> pmlOrAlloc(Pml<L> &upper, size_t vaddr) {
         auto page = upper.pageAt(vaddr);
 
         if (page.present()) {
-            return _mapper.map(page.template as<Pml<L - 1>>());
+            return Ok(_mapper.map(page.template as<Pml<L - 1>>()));
         }
 
         size_t lower = try$(_pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start;
         memset(_mapper.map((void *)lower), 0, Hal::PAGE_SIZE);
         upper.putPage(vaddr, {lower, Entry::WRITE | Entry::PRESENT | Entry::USER});
-        return _mapper.map((Pml<L - 1> *)lower);
+        return Ok(_mapper.map((Pml<L - 1> *)lower));
     }
 
-    Error freePage(size_t vaddr, size_t paddr, Hal::VmmFlags) {
+    Res<> freePage(size_t vaddr, size_t paddr, Hal::VmmFlags) {
         auto pml3 = try$(pmlOrAlloc(*_pml4, vaddr));
         auto pml2 = try$(pmlOrAlloc(*pml3, vaddr));
         auto pml1 = try$(pmlOrAlloc(*pml2, vaddr));
         pml1->putPage(vaddr, {paddr, Entry::WRITE | Entry::PRESENT | Entry::USER});
-        return OK;
+        return Ok();
     }
 
-    Error freePage(size_t vaddr) {
+    Res<> freePage(size_t vaddr) {
         auto pml3 = try$(pml(*_pml4, vaddr));
         auto pml2 = try$(pml(*pml3, vaddr));
         auto pml1 = try$(pml(*pml2, vaddr));
         pml1->putPage(vaddr, {});
-        return OK;
+        return Ok();
     }
 
-    Result<Hal::VmmRange> allocRange(Hal::VmmRange vaddr, Hal::PmmRange paddr, Hal::VmmFlags flags) override {
+    Res<Hal::VmmRange> allocRange(Hal::VmmRange vaddr, Hal::PmmRange paddr, Hal::VmmFlags flags) override {
         if (paddr.size != vaddr.size) {
-            return Error::INVALID_INPUT;
+            return Error{Error::INVALID_INPUT};
         }
 
         for (size_t page = 0; page < vaddr.size; page += Hal::PAGE_SIZE) {
             try$(freePage(vaddr.start + page, paddr.start + page, flags));
         }
-        return vaddr;
+        return Ok(vaddr);
     }
 
-    Error free(Hal::VmmRange vaddr) override {
+    Res<> free(Hal::VmmRange vaddr) override {
         for (size_t page = 0; page < vaddr.size; page += Hal::PAGE_SIZE) {
             try$(freePage(vaddr.start + page));
         }
-        return OK;
+        return Ok();
     }
 
-    Error update(Hal::VmmRange, Hal::VmmFlags) override {
+    Res<> update(Hal::VmmRange, Hal::VmmFlags) override {
         notImplemented();
     }
 
-    Error flush(Hal::VmmRange vaddr) override {
+    Res<> flush(Hal::VmmRange vaddr) override {
         for (size_t i = 0; i < vaddr.size; i += Hal::PAGE_SIZE) {
             x86_64::invlpg(vaddr.start + i);
         }
 
-        return OK;
+        return Ok();
     }
 
     void activate() override {

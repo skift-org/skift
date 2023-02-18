@@ -7,7 +7,7 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
 
-CliResult entryPoint(CliArgs args) {
+Res<> entryPoint(CliArgs args) {
     auto app = Ui::reducer<FileManager::Model>({"/"}, FileManager::reduce, [](auto d) {
         Sys::Path path = d.currentPath();
         auto dir = Sys::Dir::open(path).unwrap();

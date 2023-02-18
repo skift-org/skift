@@ -31,7 +31,7 @@ struct Stack {
 
     static constexpr size_t DEFAULT_SIZE = kib(16);
 
-    static Result<Stack> create();
+    static Res<Stack> create();
 };
 
 /* --- Task ----------------------------------------------------------------- */
@@ -42,7 +42,7 @@ struct Task {
     Tick _sliceStart = 0;
     Tick _sliceEnd = 0;
 
-    static Result<Strong<Task>> create();
+    static Res<Strong<Task>> create();
 
     static Task &self();
 
@@ -63,7 +63,7 @@ struct Sched {
     Strong<Task> _curr;
     Strong<Task> _next;
 
-    static Error init(Handover::Payload &);
+    static Res<> init(Handover::Payload &);
 
     static Sched &self();
 
@@ -71,11 +71,11 @@ struct Sched {
         : _tasks{bootTask}, _curr(bootTask), _next(bootTask) {
     }
 
-    Error start(Strong<Task> task, uintptr_t ip) {
+    Res<> start(Strong<Task> task, uintptr_t ip) {
         return start(task, ip, task->stack().loadSp());
     }
 
-    Error start(Strong<Task> task, uintptr_t ip, uintptr_t sp);
+    Res<> start(Strong<Task> task, uintptr_t ip, uintptr_t sp);
 
     void schedule();
 };

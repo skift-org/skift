@@ -181,7 +181,7 @@ struct SdlHost :
         }
 
         case SDL_QUIT: {
-            Events::ExitEvent uiEvent{OK};
+            Events::ExitEvent uiEvent{Ok()};
             bubble(uiEvent);
             break;
         }
@@ -222,7 +222,7 @@ struct SdlHost :
     }
 };
 
-Result<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
+Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
     auto size = root->size({700, 500}, Layout::Hint::MIN);
@@ -239,7 +239,7 @@ Result<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
         return Error{SDL_GetError()};
     }
 
-    return {makeStrong<SdlHost>(root, window)};
+    return Ok(makeStrong<SdlHost>(root, window));
 }
 
 } // namespace Embed

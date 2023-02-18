@@ -17,12 +17,12 @@ extern "C" uint32_t _Karm__Media__Icon__byName(char const *query, size_t queryLe
 
 extern "C" char const *_Karm__Media__Icon__name(uint32_t query);
 
-Result<Icon> Icon::byName(Str query, double size) {
+Res<Icon> Icon::byName(Str query, double size) {
     auto codepoint = _Karm__Media__Icon__byName(query.buf(), query.len());
     if (codepoint == 0) {
         return Error("Icon not found");
     }
-    return Icon((Icons)codepoint, size);
+    return Ok(Icon((Icons)codepoint, size));
 }
 
 Str Icon::name() {

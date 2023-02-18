@@ -14,7 +14,7 @@ Child controls(TitlebarStyle style) {
                  cond(style == TitlebarStyle::DEFAULT, button(NONE, ButtonStyle::subtle(), Media::Icons::CROP_SQUARE)),
                  button(
                      [](Node &n) {
-                         Events::ExitEvent e{OK};
+                         Events::ExitEvent e{Ok()};
                          n.bubble(e);
                      },
                      ButtonStyle::subtle(), Media::Icons::CLOSE));

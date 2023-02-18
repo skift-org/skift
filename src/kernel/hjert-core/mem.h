@@ -7,7 +7,7 @@
 
 namespace Hjert::Mem {
 
-Error init(Handover::Payload &);
+Res<> init(Handover::Payload &);
 
 Hal::Heap &heap();
 

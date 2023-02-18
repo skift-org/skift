@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
 
@@ -16,7 +16,7 @@ struct SysInfo {
     String hostname;
 };
 
-Result<SysInfo> sysinfo();
+Res<SysInfo> sysinfo();
 
 struct MemInfo {
     size_t physicalTotal;
@@ -29,7 +29,7 @@ struct MemInfo {
     size_t swapUsed;
 };
 
-Result<MemInfo> meminfo();
+Res<MemInfo> meminfo();
 
 struct CpuInfo {
     String name;
@@ -40,7 +40,7 @@ struct CpuInfo {
     size_t freq;
 };
 
-Result<Vec<CpuInfo>> cpusinfo();
+Res<Vec<CpuInfo>> cpusinfo();
 
 struct UserInfo {
     String name;
@@ -48,9 +48,9 @@ struct UserInfo {
     String shell;
 };
 
-Result<UserInfo> userinfo();
+Res<UserInfo> userinfo();
 
-Result<Vec<UserInfo>> usersinfo();
+Res<Vec<UserInfo>> usersinfo();
 
 inline bool isSkift() {
 #ifdef __osdk_sys_skift__

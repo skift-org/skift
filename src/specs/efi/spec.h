@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 #include <karm-base/std.h>
 #include <karm-base/uuid.h>
 
@@ -70,9 +70,9 @@ enum : size_t {
 #undef ERR
 };
 
-[[gnu::used]] inline Error fromStatus(Status status) {
+[[gnu::used]] inline Res<> fromStatus(Status status) {
     if ((status & EFI_ERROR) == 0) {
-        return OK;
+        return Ok();
     }
 
 #define ERR(ERR, CODE)    \
@@ -90,7 +90,7 @@ template <typename... Args>
 struct [[gnu::packed]] Method {
     Status (*func)(void *self, Args...);
 
-    Error operator()(void *self, Args... args) {
+    Res<> operator()(void *self, Args... args) {
         return fromStatus(func(self, args...));
     }
 };
@@ -101,7 +101,7 @@ template <typename... Args>
 struct [[gnu::packed]] Function {
     Status (*func)(Args...);
 
-    Error operator()(Args... args) {
+    Res<> operator()(Args... args) {
         return fromStatus(func(args...));
     }
 };

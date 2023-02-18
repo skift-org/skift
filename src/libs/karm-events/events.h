@@ -94,10 +94,13 @@ struct BuildEvent : public _Event<BuildEvent> {};
 struct AnimateEvent : public _Event<AnimateEvent> {};
 
 struct ExitEvent : public _Event<ExitEvent> {
-    Error error;
+    Res<> res;
 
-    ExitEvent(Error error)
-        : error{error} {}
+    ExitEvent()
+        : res{Ok()} {}
+
+    ExitEvent(Res<> res)
+        : res{res} {}
 };
 
 } // namespace Karm::Events

@@ -24,17 +24,17 @@ struct App {
         : _root(state(initial, std::move(root))) {
     }
 
-    CliResult run(CliArgs) {
+    Res<> run(CliArgs) {
         return try$(Embed::makeHost(_root))->run();
     }
 };
 
 template <typename T, typename... Args>
-inline CliResult runApp(CliArgs cliArgs, Args... args) {
+inline Res<> runApp(CliArgs cliArgs, Args... args) {
     return App{makeStrong<T>(std::forward<Args>(args)...)}.run(cliArgs);
 }
 
-inline CliResult runApp(CliArgs args, Child root) {
+inline Res<> runApp(CliArgs args, Child root) {
     return App{root}.run(args);
 }
 

@@ -8,7 +8,7 @@
 namespace Embed {
 
 struct DebugOut : public Io::TextWriter<> {
-    Result<size_t> write(Bytes bytes) override {
+    Res<size_t> write(Bytes bytes) override {
         size_t writen{};
         Array<uint16_t, 129> buf{};
         // Some space for the null terminator.
@@ -29,7 +29,7 @@ struct DebugOut : public Io::TextWriter<> {
             bytes = next(bytes, chunkSize);
         }
 
-        return writen;
+        return Ok(writen);
     }
 };
 

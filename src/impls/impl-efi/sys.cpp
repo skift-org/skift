@@ -13,11 +13,11 @@ struct ConOut : public Sys::Fd {
 
     ConOut(Efi::SimpleTextOutputProtocol *proto) : _proto(proto) {}
 
-    Result<size_t> read(MutBytes) override {
+    Res<size_t> read(MutBytes) override {
         notImplemented();
     }
 
-    Result<size_t> write(Bytes bytes) override {
+    Res<size_t> write(Bytes bytes) override {
         size_t writen{};
         Array<uint16_t, 129> buf{};
         // Some space for the null terminator.
@@ -38,18 +38,18 @@ struct ConOut : public Sys::Fd {
             bytes = next(bytes, chunkSize);
         }
 
-        return writen;
+        return Ok(writen);
     }
 
-    Result<size_t> seek(Io::Seek) override {
+    Res<size_t> seek(Io::Seek) override {
         notImplemented();
     }
 
-    Result<size_t> flush() override {
-        return 0;
+    Res<size_t> flush() override {
+        return Ok(0uz);
     }
 
-    Result<Strong<Fd>> dup() override {
+    Res<Strong<Fd>> dup() override {
         notImplemented();
     }
 };
@@ -74,19 +74,19 @@ struct FileProto : public Sys::Fd, Meta::Static {
         return *this;
     }
 
-    Result<size_t> read(MutBytes bytes) override {
+    Res<size_t> read(MutBytes bytes) override {
         size_t size = sizeOf(bytes);
         try$(_proto->read(_proto, &size, bytes.buf()));
-        return size;
+        return Ok(size);
     }
 
-    Result<size_t> write(Bytes bytes) override {
+    Res<size_t> write(Bytes bytes) override {
         size_t size = sizeOf(bytes);
         try$(_proto->write(_proto, &size, bytes.buf()));
-        return size;
+        return Ok(size);
     }
 
-    Result<size_t> seek(Io::Seek seek) override {
+    Res<size_t> seek(Io::Seek seek) override {
         uint64_t current = 0;
         try$(_proto->getPosition(_proto, &current));
 
@@ -103,36 +103,37 @@ struct FileProto : public Sys::Fd, Meta::Static {
         size_t pos = seek.apply(current, info->fileSize);
 
         if (pos == current) {
-            return current;
+            return Ok(current);
         }
 
         try$(_proto->setPosition(_proto, pos));
 
-        return pos;
+        return Ok(pos);
     }
 
-    Result<size_t> flush() override {
-        return _proto->flush(_proto);
+    Res<size_t> flush() override {
+        try$(_proto->flush(_proto));
+        return Ok(0uz);
     }
 
-    Result<Strong<Fd>> dup() override {
+    Res<Strong<Fd>> dup() override {
         notImplemented();
     }
 };
 
-Result<Strong<Sys::Fd>> createIn() {
-    return {makeStrong<Sys::DummyFd>()};
+Res<Strong<Sys::Fd>> createIn() {
+    return Ok(makeStrong<Sys::DummyFd>());
 }
 
-Result<Strong<Sys::Fd>> createOut() {
-    return {makeStrong<ConOut>(Efi::st()->conOut)};
+Res<Strong<Sys::Fd>> createOut() {
+    return Ok(makeStrong<ConOut>(Efi::st()->conOut));
 }
 
-Result<Strong<Sys::Fd>> createErr() {
-    return {makeStrong<ConOut>(Efi::st()->stdErr)};
+Res<Strong<Sys::Fd>> createErr() {
+    return Ok(makeStrong<ConOut>(Efi::st()->stdErr));
 }
 
-Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
+Res<Strong<Sys::Fd>> openFile(Sys::Path path) {
     static Efi::SimpleFileSystemProtocol *fileSystem = nullptr;
     if (not fileSystem) {
         fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(Efi::li()->deviceHandle));
@@ -154,18 +155,18 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
     }
 
     try$(rootDir->open(rootDir, &file, pathStr.buf(), EFI_FILE_MODE_READ, 0));
-    return {makeStrong<FileProto>(file)};
+    return Ok(makeStrong<FileProto>(file));
 }
 
-Result<Vec<Sys::DirEntry>> readDir(Sys::Path) {
-    return Error::NOT_IMPLEMENTED;
+Res<Vec<Sys::DirEntry>> readDir(Sys::Path) {
+    return Error{Error::NOT_IMPLEMENTED};
 }
 
-Result<Strong<Sys::Fd>> createFile(Sys::Path) {
-    return Error::NOT_IMPLEMENTED;
+Res<Strong<Sys::Fd>> createFile(Sys::Path) {
+    return Error{Error::NOT_IMPLEMENTED};
 }
 
-Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
+Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
     size_t vaddr = 0;
 
     try$(Efi::bs()->allocatePages(
@@ -175,10 +176,10 @@ Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
         &vaddr));
 
     // Memory is identity mapped, so we can just return the virtual address as paddr
-    return Sys::MmapResult{vaddr, vaddr, options.size};
+    return Ok(Sys::MmapResult{vaddr, vaddr, options.size});
 }
 
-Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> fd) {
+Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> fd) {
     size_t vaddr = 0;
     size_t fileSize = try$(Io::size(*fd));
 
@@ -192,36 +193,36 @@ Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> f
     try$(Io::copy(*fd, writer));
 
     // Memory is identity mapped, so we can just return the virtual address as paddr
-    return Sys::MmapResult{vaddr, vaddr, Hal::pageAlignUp(fileSize)};
+    return Ok(Sys::MmapResult{vaddr, vaddr, Hal::pageAlignUp(fileSize)});
 }
 
-Error memUnmap(void const *buf, size_t size) {
+Res<> memUnmap(void const *buf, size_t size) {
     try$(Efi::bs()->freePages((uint64_t)buf, size / Hal::PAGE_SIZE));
-    return OK;
+    return Ok();
 }
 
-Error memFlush(void *, size_t) {
-    return OK;
+Res<> memFlush(void *, size_t) {
+    return Ok();
 }
 
-Error populate(Sys::SysInfo &) {
-    return Error::NOT_IMPLEMENTED;
+Res<> populate(Sys::SysInfo &) {
+    return Error{Error::NOT_IMPLEMENTED};
 }
 
-Error populate(Sys::MemInfo &) {
-    return Error::NOT_IMPLEMENTED;
+Res<> populate(Sys::MemInfo &) {
+    return Error{Error::NOT_IMPLEMENTED};
 }
 
-Error populate(Vec<Sys::CpuInfo> &) {
-    return Error::NOT_IMPLEMENTED;
+Res<> populate(Vec<Sys::CpuInfo> &) {
+    return Error{Error::NOT_IMPLEMENTED};
 }
 
-Error populate(Sys::UserInfo &) {
-    return Error::NOT_IMPLEMENTED;
+Res<> populate(Sys::UserInfo &) {
+    return Error{Error::NOT_IMPLEMENTED};
 }
 
-Error populate(Vec<Sys::UserInfo> &) {
-    return Error::NOT_IMPLEMENTED;
+Res<> populate(Vec<Sys::UserInfo> &) {
+    return Error{Error::NOT_IMPLEMENTED};
 }
 
 } // namespace Embed

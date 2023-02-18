@@ -4,7 +4,7 @@
 #include <karm-base/func.h>
 #include <karm-base/lock.h>
 #include <karm-base/rc.h>
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 #include <karm-base/ring.h>
 
 namespace Karm::Sys {
@@ -17,7 +17,7 @@ struct Channel {
     Channel(size_t capacity)
         : _ring(capacity) {}
 
-    Result<T> recv() {
+    Res<T> recv() {
         LockScope guard(_lock);
 
         if (_ring.empty()) {
@@ -27,15 +27,15 @@ struct Channel {
         return _ring.pop();
     }
 
-    Error send(T value) {
+    Res<> send(T value) {
         LockScope guard(_lock);
 
         if (_ring.full()) {
-            return Error::WOULD_BLOCK;
+            return Error{Error::WOULD_BLOCK};
         }
 
         _ring.push(value);
-        return OK;
+        return Ok();
     }
 };
 
@@ -45,7 +45,7 @@ struct Tx {
 
     Strong<Channel<T>> _channel;
 
-    Result<void> send(T const &value);
+    Res<void> send(T const &value);
 };
 
 template <typename T>
@@ -54,7 +54,7 @@ struct Rx {
 
     Strong<Channel<T>> _channel;
 
-    Result<T> receive();
+    Res<T> receive();
 };
 
 template <typename T>
@@ -68,7 +68,7 @@ Cons<Tx<T>, Rx<T>> makeChannel() {
 }
 
 struct Thread {
-    Result<Thread> spawn(Func<void(void)>);
+    Res<Thread> spawn(Func<void(void)>);
 
     void join();
 

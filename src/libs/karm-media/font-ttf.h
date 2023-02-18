@@ -12,9 +12,9 @@ struct TtfFontface : public Fontface {
     Sys::Mmap _mmap;
     Ttf::Font _ttf;
 
-    static Result<Strong<TtfFontface>> load(Sys::Mmap mmap) {
+    static Res<Strong<TtfFontface>> load(Sys::Mmap mmap) {
         auto ttf = try$(Ttf::Font::load(mmap.bytes()));
-        return makeStrong<TtfFontface>(std::move(mmap), ttf);
+        return Ok(makeStrong<TtfFontface>(std::move(mmap), ttf));
     }
 
     TtfFontface(Sys::Mmap mmap, Ttf::Font ttf)

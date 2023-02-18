@@ -4,7 +4,7 @@
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 
-CliResult entryPoint(CliArgs args) {
+Res<> entryPoint(CliArgs args) {
     if (args.len() == 0) {
         return Error{"Usage: handover-dump <elf-file>"};
     }
@@ -25,5 +25,5 @@ CliResult entryPoint(CliArgs args) {
     }
 
     Sys::println("Kernel is valid");
-    return Cli::SUCCESS;
+    return Ok();
 }

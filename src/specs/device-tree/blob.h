@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 
 #include "../bscan.h"
 
@@ -29,7 +29,7 @@ struct Blob {
 
     Bytes _slice;
 
-    static Result<Blob> load(void *ptr) {
+    static Res<Blob> load(void *ptr) {
         BScan scan{Bytes{static_cast<Byte *>(ptr), sizeof(Header)}};
         auto magic = scan.nextBeUint32();
 

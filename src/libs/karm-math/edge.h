@@ -84,7 +84,7 @@ using Edgef = Edge<double>;
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Edge<T>> {
-    Result<size_t> format(Io::_TextWriter &writer, Math::Edge<T> edge) {
+    Res<size_t> format(Io::_TextWriter &writer, Math::Edge<T> edge) {
         return Fmt::format(writer, "Edge({}, {}, {}, {})", edge.sx, edge.sy, edge.ex, edge.ey);
     }
 };

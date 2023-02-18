@@ -11,40 +11,40 @@
 
 namespace Embed {
 
-Result<Strong<Sys::Fd>> openFile(Sys::Path path);
+Res<Strong<Sys::Fd>> openFile(Sys::Path path);
 
-Result<Vec<Sys::DirEntry>> readDir(Sys::Path path);
+Res<Vec<Sys::DirEntry>> readDir(Sys::Path path);
 
-Result<Strong<Sys::Fd>> createFile(Sys::Path path);
+Res<Strong<Sys::Fd>> createFile(Sys::Path path);
 
-Result<Cons<Strong<Sys::Fd>, Strong<Sys::Fd>>> createPipe();
+Res<Cons<Strong<Sys::Fd>, Strong<Sys::Fd>>> createPipe();
 
-Result<Strong<Sys::Fd>> createIn();
+Res<Strong<Sys::Fd>> createIn();
 
-Result<Strong<Sys::Fd>> createOut();
+Res<Strong<Sys::Fd>> createOut();
 
-Result<Strong<Sys::Fd>> createErr();
+Res<Strong<Sys::Fd>> createErr();
 
 /* --- Memory Managment ----------------------------------------------------- */
 
-Result<Sys::MmapResult> memMap(Sys::MmapOptions const &options);
+Res<Sys::MmapResult> memMap(Sys::MmapOptions const &options);
 
-Result<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> fd);
+Res<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> fd);
 
-Error memUnmap(void const *buf, size_t len);
+Res<> memUnmap(void const *buf, size_t len);
 
-Error memFlush(void *flush, size_t len);
+Res<> memFlush(void *flush, size_t len);
 
 /* --- System Informations -------------------------------------------------- */
 
-Error populate(Sys::SysInfo &);
+Res<> populate(Sys::SysInfo &);
 
-Error populate(Sys::MemInfo &);
+Res<> populate(Sys::MemInfo &);
 
-Error populate(Vec<Sys::CpuInfo> &);
+Res<> populate(Vec<Sys::CpuInfo> &);
 
-Error populate(Sys::UserInfo &);
+Res<> populate(Sys::UserInfo &);
 
-Error populate(Vec<Sys::UserInfo> &);
+Res<> populate(Vec<Sys::UserInfo> &);
 
 } // namespace Embed

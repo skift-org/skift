@@ -5,10 +5,10 @@
 
 namespace Karm::Media {
 
-Result<Strong<Fontface>> loadFontface(Str path);
+Res<Strong<Fontface>> loadFontface(Str path);
 
-Result<Font> loadFont(double size, Str path);
+Res<Font> loadFont(double size, Str path);
 
-Result<Image> loadImage(Str path);
+Res<Image> loadImage(Str path);
 
 } // namespace Karm::Media

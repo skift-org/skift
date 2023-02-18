@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/loc.h>
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 #include <karm-base/string.h>
 #include <karm-meta/nocopy.h>
 
@@ -12,7 +12,7 @@
 namespace Karm::Test {
 
 struct Test : Meta::Static {
-    using Func = Error (*)(Driver &);
+    using Func = Res<> (*)(Driver &);
 
     Str _name;
     Func _func;
@@ -22,7 +22,7 @@ struct Test : Meta::Static {
         driver().add(this);
     }
 
-    Error run(Driver &driver) {
+    Res<> run(Driver &driver) {
         return _func(driver);
     }
 };

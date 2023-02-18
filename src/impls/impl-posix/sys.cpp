@@ -16,27 +16,27 @@ struct PosixFd : public Sys::Fd {
 
     PosixFd(int raw) : _raw(raw) {}
 
-    Result<size_t> read(MutBytes bytes) override {
+    Res<size_t> read(MutBytes bytes) override {
         ssize_t result = ::read(_raw, bytes.buf(), sizeOf(bytes));
 
         if (result < 0) {
             return Posix::fromLastErrno();
         }
 
-        return result;
+        return Ok(static_cast<size_t>(result));
     }
 
-    Result<size_t> write(Bytes bytes) override {
+    Res<size_t> write(Bytes bytes) override {
         ssize_t result = ::write(_raw, bytes.buf(), sizeOf(bytes));
 
         if (result < 0) {
             return Posix::fromLastErrno();
         }
 
-        return result;
+        return Ok(static_cast<size_t>(result));
     }
 
-    Result<size_t> seek(Io::Seek seek) override {
+    Res<size_t> seek(Io::Seek seek) override {
         off_t offset = 0;
 
         switch (seek.whence) {
@@ -55,26 +55,26 @@ struct PosixFd : public Sys::Fd {
             return Posix::fromLastErrno();
         }
 
-        return offset;
+        return Ok(static_cast<size_t>(offset));
     }
 
-    Result<size_t> flush() override {
+    Res<size_t> flush() override {
         // NOTE: No-op
-        return 0;
+        return Ok(0uz);
     }
 
-    Result<Strong<Fd>> dup() override {
+    Res<Strong<Fd>> dup() override {
         int duped = ::dup(_raw);
 
         if (duped < 0) {
             return Posix::fromLastErrno();
         }
 
-        return {makeStrong<PosixFd>(duped)};
+        return Ok(makeStrong<PosixFd>(duped));
     }
 };
 
-Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
+Res<Strong<Sys::Fd>> openFile(Sys::Path path) {
     String str = path.str();
     int fd = ::open(str.buf(), O_RDONLY);
 
@@ -82,10 +82,10 @@ Result<Strong<Sys::Fd>> openFile(Sys::Path path) {
         return Posix::fromLastErrno();
     }
 
-    return {makeStrong<PosixFd>(fd)};
+    return Ok(makeStrong<PosixFd>(fd));
 }
 
-Result<Vec<Sys::DirEntry>> readDir(Sys::Path path) {
+Res<Vec<Sys::DirEntry>> readDir(Sys::Path path) {
     String str = path.str();
     DIR *dir = ::opendir(str.buf());
     if (not dir) {
@@ -100,10 +100,10 @@ Result<Vec<Sys::DirEntry>> readDir(Sys::Path path) {
         entries.pushBack(Sys::DirEntry{entry->d_name, entry->d_type == DT_DIR});
     }
     ::closedir(dir);
-    return entries;
+    return Ok(entries);
 }
 
-Result<Strong<Sys::Fd>> createFile(Sys::Path path) {
+Res<Strong<Sys::Fd>> createFile(Sys::Path path) {
     String str = path.str();
 
     int fd = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
@@ -112,32 +112,32 @@ Result<Strong<Sys::Fd>> createFile(Sys::Path path) {
         return Posix::fromLastErrno();
     }
 
-    return {makeStrong<PosixFd>(fd)};
+    return Ok(makeStrong<PosixFd>(fd));
 }
 
-Result<Pair<Strong<Sys::Fd>>> createPipe() {
+Res<Pair<Strong<Sys::Fd>>> createPipe() {
     int fds[2];
 
     if (::pipe(fds) < 0) {
         return Posix::fromLastErrno();
     }
 
-    return Pair<Strong<Sys::Fd>>{
+    return Ok(Pair<Strong<Sys::Fd>>{
         makeStrong<PosixFd>(fds[0]),
         makeStrong<PosixFd>(fds[1]),
-    };
+    });
 }
 
-Result<Strong<Sys::Fd>> createIn() {
-    return {makeStrong<PosixFd>(0)};
+Res<Strong<Sys::Fd>> createIn() {
+    return Ok(makeStrong<PosixFd>(0));
 }
 
-Result<Strong<Sys::Fd>> createOut() {
-    return {makeStrong<PosixFd>(1)};
+Res<Strong<Sys::Fd>> createOut() {
+    return Ok(makeStrong<PosixFd>(1));
 }
 
-Result<Strong<Sys::Fd>> createErr() {
-    return {makeStrong<PosixFd>(2)};
+Res<Strong<Sys::Fd>> createErr() {
+    return Ok(makeStrong<PosixFd>(2));
 }
 
 int mmapOptionsToProt(Sys::MmapOptions const &options) {
@@ -155,7 +155,7 @@ int mmapOptionsToProt(Sys::MmapOptions const &options) {
     return prot;
 }
 
-Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
+Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
 
     void *addr = mmap((void *)options.vaddr, options.size, mmapOptionsToProt(options), MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
@@ -167,10 +167,10 @@ Result<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
         madvise(addr, options.size, MADV_WILLNEED);
     }
 
-    return Sys::MmapResult{0, (size_t)addr, (size_t)options.size};
+    return Ok(Sys::MmapResult{0, (size_t)addr, (size_t)options.size});
 }
 
-Result<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> maybeFd) {
+Res<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> maybeFd) {
     Strong<PosixFd> fd = try$(maybeFd.as<PosixFd>());
     size_t size = options.size;
 
@@ -184,63 +184,63 @@ Result<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> 
         return Posix::fromLastErrno();
     }
 
-    return Sys::MmapResult{0, (size_t)addr, (size_t)size};
+    return Ok(Sys::MmapResult{0, (size_t)addr, (size_t)size});
 }
 
-Error memUnmap(void const *buf, size_t len) {
+Res<> memUnmap(void const *buf, size_t len) {
     if (::munmap((void *)buf, len) < 0) {
         return Posix::fromLastErrno();
     }
 
-    return OK;
+    return Ok();
 }
 
-Error memFlush(void *flush, size_t len) {
+Res<> memFlush(void *flush, size_t len) {
     if (::msync(flush, len, MS_INVALIDATE) < 0) {
         return Posix::fromLastErrno();
     }
 
-    return OK;
+    return Ok();
 }
 
-Error populate(Sys::SysInfo &infos) {
+Res<> populate(Sys::SysInfo &infos) {
     struct utsname uts;
     if (uname(&uts) < 0) {
         return Posix::fromLastErrno();
     }
 
     infos.sysName = "Posix";
-    infos.sysVersion = Fmt::format("{}", _POSIX_VERSION);
+    infos.sysVersion = try$(Fmt::format("{}", _POSIX_VERSION));
 
     infos.kernelName = uts.sysname;
     infos.kernelVersion = uts.release;
 
     infos.hostname = uts.nodename;
 
-    return OK;
+    return Ok();
 }
 
-Error populate(Sys::MemInfo &) {
-    return Error::NOT_IMPLEMENTED;
+Res<> populate(Sys::MemInfo &) {
+    return Error{Error::NOT_IMPLEMENTED};
 }
 
-Error populate(Vec<Sys::CpuInfo> &) {
-    return Error::NOT_IMPLEMENTED;
+Res<> populate(Vec<Sys::CpuInfo> &) {
+    return Error{Error::NOT_IMPLEMENTED};
 }
 
-Error populate(Sys::UserInfo &infos) {
+Res<> populate(Sys::UserInfo &infos) {
     infos.name = getenv("USER");
     infos.home = getenv("HOME");
     infos.shell = getenv("SHELL");
 
-    return OK;
+    return Ok();
 }
 
-Error populate(Vec<Sys::UserInfo> &infos) {
+Res<> populate(Vec<Sys::UserInfo> &infos) {
     Sys::UserInfo info;
     try$(populate(info));
     infos.pushBack(info);
-    return OK;
+    return Ok();
 }
 
 } // namespace Embed

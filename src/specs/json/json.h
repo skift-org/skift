@@ -123,7 +123,7 @@ struct Value {
         return _store.visit(
             Visitor{
                 [](None) {
-                    return "<null>";
+                    return "null";
                 },
                 [](Vec<Value>) {
                     return "<array>";
@@ -135,7 +135,7 @@ struct Value {
                     return s;
                 },
                 [](Number d) {
-                    return Fmt::format("{}", d);
+                    return Fmt::format("{}", d).unwrap();
                 },
                 [](bool b) {
                     return b ? "true" : "false";
@@ -260,21 +260,21 @@ struct Value {
     }
 };
 
-Result<Value> parse(Text::Scan &s);
+Res<Value> parse(Text::Scan &s);
 
-Result<Value> parse(Str s);
+Res<Value> parse(Str s);
 
-Error stringify(Text::Emit &emit, Value const &v);
+Res<> stringify(Text::Emit &emit, Value const &v);
 
-Result<String> stringify(Value const &v);
+Res<String> stringify(Value const &v);
 
 } // namespace Json
 
 template <>
 struct Karm::Fmt::Formatter<Json::Value> {
-    Result<size_t> format(Io::_TextWriter &writer, Json::Value value) {
+    Res<size_t> format(Io::_TextWriter &writer, Json::Value value) {
         Text::Emit emit{writer};
         try$(Json::stringify(emit, value));
-        return emit.total();
+        return Ok(emit.total());
     }
 };

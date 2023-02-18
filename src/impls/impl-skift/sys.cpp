@@ -2,16 +2,16 @@
 
 namespace Embed {
 
-Result<Strong<Sys::Fd>> createIn() {
-    return {makeStrong<Sys::DummyFd>()};
+Res<Strong<Sys::Fd>> createIn() {
+    return Ok(makeStrong<Sys::DummyFd>());
 }
 
-Result<Strong<Sys::Fd>> createOut() {
-    return {makeStrong<Sys::DummyFd>()};
+Res<Strong<Sys::Fd>> createOut() {
+    return Ok(makeStrong<Sys::DummyFd>());
 }
 
-Result<Strong<Sys::Fd>> createErr() {
-    return {makeStrong<Sys::DummyFd>()};
+Res<Strong<Sys::Fd>> createErr() {
+    return Ok(makeStrong<Sys::DummyFd>());
 }
 
 } // namespace Embed

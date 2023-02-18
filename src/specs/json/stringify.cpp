@@ -2,15 +2,14 @@
 
 namespace Json {
 
-Error stringify(Text::Emit &emit, Value const &v) {
+Res<> stringify(Text::Emit &emit, Value const &v) {
     return v.visit(
         Visitor{
-            [&](None) {
+            [&](None) -> Res<> {
                 emit("null");
-
-                return OK;
+                return Ok();
             },
-            [&](Vec<Value> const &v) {
+            [&](Vec<Value> const &v) -> Res<> {
                 emit('[');
                 for (size_t i = 0; i < v.len(); ++i) {
                     if (i > 0) {
@@ -20,9 +19,9 @@ Error stringify(Text::Emit &emit, Value const &v) {
                 }
                 emit(']');
 
-                return OK;
+                return Ok();
             },
-            [&](Map<String, Value> const &m) {
+            [&](Map<String, Value> const &m) -> Res<> {
                 emit('{');
                 bool first = true;
                 for (auto const &kv : m.iter()) {
@@ -37,9 +36,9 @@ Error stringify(Text::Emit &emit, Value const &v) {
                     try$(stringify(emit, kv.cdr));
                 }
                 emit('}');
-                return OK;
+                return Ok();
             },
-            [&](String const &s) {
+            [&](String const &s) -> Res<> {
                 emit('"');
                 for (auto c : s) {
                     if (c == '"') {
@@ -63,24 +62,24 @@ Error stringify(Text::Emit &emit, Value const &v) {
                     }
                 }
                 emit('"');
-                return OK;
+                return Ok();
             },
-            [&](Number d) {
+            [&](Number d) -> Res<> {
                 emit("{}", d);
-                return OK;
+                return Ok();
             },
-            [&](bool b) {
+            [&](bool b) -> Res<> {
                 emit(b ? "true" : "false");
-                return OK;
+                return Ok();
             },
         });
 }
 
-Result<String> stringify(Value const &v) {
+Res<String> stringify(Value const &v) {
     Io::StringWriter sw;
     Text::Emit emit{sw};
     try$(stringify(emit, v));
-    return sw.take();
+    return Ok(sw.take());
 }
 
 } // namespace Json

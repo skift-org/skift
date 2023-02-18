@@ -1,6 +1,6 @@
 #include <karm-main/main.h>
 
-CliResult entryPoint(CliArgs) {
+Res<> entryPoint(CliArgs) {
     Sys::println("Hello, world!");
-    return Cli::SUCCESS;
+    return Ok();
 }

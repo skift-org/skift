@@ -7,33 +7,33 @@
 namespace Loader::Fw {
 
 struct EfiPmm : public Hal::Pmm {
-    Result<Hal::PmmRange> allocRange(size_t size, Hal::PmmFlags) override {
+    Res<Hal::PmmRange> allocRange(size_t size, Hal::PmmFlags) override {
         size_t paddr = 0;
         try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::LOADER_DATA, size / Hal::PAGE_SIZE, &paddr));
-        return Hal::PmmRange{paddr, size};
+        return Ok(Hal::PmmRange{paddr, size});
     }
 
-    Error used(Hal::PmmRange range, Hal::PmmFlags) override {
+    Res<> used(Hal::PmmRange range, Hal::PmmFlags) override {
         size_t paddr = range.start;
         try$(Efi::bs()->allocatePages(Efi::AllocateType::ADDRESS, Efi::MemoryType::LOADER_DATA, paddr / Hal::PAGE_SIZE, &paddr));
-        return OK;
+        return Ok();
     }
 
-    Error free(Hal::PmmRange range) override {
+    Res<> free(Hal::PmmRange range) override {
         try$(Efi::bs()->freePages((uint64_t)range.start, range.size / Hal::PAGE_SIZE));
-        return OK;
+        return Ok();
     }
 };
 
 static EfiPmm pmm{};
 
-Result<Strong<Hal::Vmm>> createVmm() {
+Res<Strong<Hal::Vmm>> createVmm() {
     size_t upper = try$(pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start;
     memset((void *)upper, 0, Hal::PAGE_SIZE);
-    return {makeStrong<x86_64::Vmm<>>(pmm, (x86_64::Pml<4> *)upper)};
+    return Ok(makeStrong<x86_64::Vmm<>>(pmm, (x86_64::Pml<4> *)upper));
 }
 
-Error parseGop(Handover::Builder &builder) {
+Res<> parseGop(Handover::Builder &builder) {
     Efi::GraphicsOutputProtocol *gop = nullptr;
     try$(Efi::bs()->locateProtocol(&Efi::GraphicsOutputProtocol::UUID, nullptr, (void **)&gop));
     auto mode = gop->mode;
@@ -58,10 +58,10 @@ Error parseGop(Handover::Builder &builder) {
 
     builder.add(record);
 
-    return OK;
+    return Ok();
 }
 
-Error parseAcpi(Handover::Builder &builder) {
+Res<> parseAcpi(Handover::Builder &builder) {
     auto *acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI_TABLE_UUID);
     if (not acpiTable)
         acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI2_TABLE_UUID);
@@ -71,10 +71,10 @@ Error parseAcpi(Handover::Builder &builder) {
         logInfo("efi: acpi: rsdp at {x}", (uintptr_t)acpiTable->table);
     }
 
-    return OK;
+    return Ok();
 }
 
-Error parseMemoryMap(Handover::Builder &builder) {
+Res<> parseMemoryMap(Handover::Builder &builder) {
     size_t mmapSize = 0;
     size_t key = 0;
     size_t descSize = 0;
@@ -126,15 +126,15 @@ Error parseMemoryMap(Handover::Builder &builder) {
     // NOTE: At this point we can't free the buffer since we're not in boot services anymore
     buf.leak();
 
-    return OK;
+    return Ok();
 }
 
-Error finalizeHandover(Handover::Builder &builder) {
+Res<> finalizeHandover(Handover::Builder &builder) {
     try$(parseGop(builder));
     try$(parseAcpi(builder));
     try$(parseMemoryMap(builder));
 
-    return OK;
+    return Ok();
 }
 
 Hal::PmmRange imageRange() {

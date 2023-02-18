@@ -11,14 +11,14 @@ struct Emit {
     Io::_TextWriter &_writer;
     size_t _ident = 0;
     size_t _total = 0;
-    Error _error = OK;
+    Res<> _error = Ok();
     bool _newline = false;
 
     Emit(Io::_TextWriter &writer)
         : _writer(writer) {
     }
 
-    void _tryWrapper(Result<size_t> result) {
+    void _tryWrapper(Res<size_t> result) {
         if (result) {
             _total += result.unwrap();
         } else {

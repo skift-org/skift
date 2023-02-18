@@ -3,13 +3,13 @@
 #include <hal/vmm.h>
 #include <handover/builder.h>
 #include <karm-base/rc.h>
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 
 namespace Loader::Fw {
 
-Result<Strong<Hal::Vmm>> createVmm();
+Res<Strong<Hal::Vmm>> createVmm();
 
-Error finalizeHandover(Handover::Builder &builder);
+Res<> finalizeHandover(Handover::Builder &builder);
 
 void enterKernel(size_t entry, Handover::Payload &payload, size_t stack, Hal::Vmm &vmm);
 

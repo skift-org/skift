@@ -16,17 +16,17 @@ using HeapMem = Mem<Heap, HeapRange>;
 struct Heap {
     virtual ~Heap() = default;
 
-    virtual Result<HeapRange> allocRange(size_t size) = 0;
+    virtual Res<HeapRange> allocRange(size_t size) = 0;
 
-    Result<HeapMem> allocOwned(size_t size) {
-        return HeapMem{*this, try$(allocRange(size))};
+    Res<HeapMem> allocOwned(size_t size) {
+        return Ok(HeapMem{*this, try$(allocRange(size))});
     }
 
-    virtual Error free(HeapRange range) = 0;
+    virtual Res<> free(HeapRange range) = 0;
 
-    virtual Result<PmmRange> heap2Pmm(HeapRange range) = 0;
+    virtual Res<PmmRange> heap2Pmm(HeapRange range) = 0;
 
-    virtual Result<HeapRange> pmm2Heap(PmmRange range) = 0;
+    virtual Res<HeapRange> pmm2Heap(PmmRange range) = 0;
 };
 
 } // namespace Hal

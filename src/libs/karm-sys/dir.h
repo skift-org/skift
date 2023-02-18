@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/result.h>
+#include <karm-base/res.h>
 #include <karm-base/vec.h>
 
 #include "path.h"
@@ -16,7 +16,7 @@ struct Dir {
     Vec<DirEntry> _entries;
     Path _path;
 
-    static Result<Dir> open(Path path);
+    static Res<Dir> open(Path path);
 
     auto const &entries() const { return _entries; }
 

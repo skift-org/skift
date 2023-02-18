@@ -26,7 +26,7 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
     return Ui::vhscroll(Ui::spacing(8, Ui::vflow(8, children)));
 }
 
-CliResult entryPoint(CliArgs args) {
+Res<> entryPoint(CliArgs args) {
     auto fontface = try$(args.len()
                              ? Media::loadFontface(args[0])
                              : Media::Fontface::fallback());

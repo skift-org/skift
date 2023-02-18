@@ -3,7 +3,7 @@
 #include <hal/io.h>
 #include <hal/pmm.h>
 #include <hal/vmm.h>
-#include <hjert-api/types.h>
+#include <hjert-api/api.h>
 #include <karm-base/lock.h>
 #include <karm-base/rc.h>
 #include <karm-base/ring.h>
@@ -12,7 +12,7 @@
 
 #include "arch.h"
 
-namespace Hjert {
+namespace Hjert::Core {
 
 struct Cpu {
     bool _retainEnabled = false;
@@ -67,4 +67,4 @@ struct InterruptRetainer : public Meta::Static {
     }
 };
 
-} // namespace Hjert
+} // namespace Hjert::Core

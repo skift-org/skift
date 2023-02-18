@@ -1,5 +1,5 @@
 #include <embed-logger/logger.h>
-#include <hjert-api/syscalls.h>
+#include <hjert-api/api.h>
 #include <karm-sys/chan.h>
 
 namespace Embed {
@@ -10,7 +10,7 @@ void loggerUnlock() {}
 
 struct LoggerOut : public Io::TextWriter<> {
     Result<size_t> write(Bytes bytes) override {
-        Hjert::Api::Log::call((char const *)bytes.buf(), bytes.len()).unwrap();
+        Hj::log((char const *)bytes.buf(), bytes.len()).unwrap();
         return bytes.len();
     }
 };

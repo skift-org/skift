@@ -59,7 +59,7 @@ void stopAll() {
 
 /* --- Cpu ------------------------------------------------------------------ */
 
-struct Cpu : public Hjert::Cpu {
+struct Cpu : public Core::Cpu {
     void enableInterrupts() override {
         x86_64::sti();
     }
@@ -75,7 +75,7 @@ struct Cpu : public Hjert::Cpu {
 
 static Cpu _cpu{};
 
-Hjert::Cpu &cpu() {
+Core::Cpu &cpu() {
     return _cpu;
 }
 
@@ -127,9 +127,9 @@ extern "C" uintptr_t _intDispatch(uintptr_t rsp) {
         int irq = frame->intNo - 32;
 
         if (irq == 0) {
-            Sched::self().stack().saveSp(rsp);
-            Sched::sched().schedule();
-            rsp = Sched::self().stack().loadSp();
+            Core::Task::self().stack().saveSp(rsp);
+            Core::Sched::self().schedule();
+            rsp = Core::Task::self().stack().loadSp();
         } else {
             logInfo("x86_64: irq: {}", irq);
         }
@@ -160,7 +160,7 @@ Hal::Vmm &vmm() {
     return *_vmm;
 }
 
-void start(Sched::Task &task, uintptr_t ip, uintptr_t sp, Array<uintptr_t, 5> args) {
+void start(Core::Task &task, uintptr_t ip, uintptr_t sp, Hj::Args args) {
     Frame frame{
         .r8 = args[4],
         .rdi = args[0],

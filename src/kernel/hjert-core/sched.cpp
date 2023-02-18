@@ -4,7 +4,9 @@
 #include "mem.h"
 #include "sched.h"
 
-namespace Hjert::Sched {
+namespace Hjert::Core {
+
+static Opt<Sched> _sched;
 
 /* --- Stack ----------------------------------------------------------------- */
 
@@ -20,6 +22,10 @@ Result<Stack> Stack::create() {
 Result<Strong<Task>> Task::create() {
     logInfo("sched: creating task...");
     return makeStrong<Task>(try$(Stack::create()));
+}
+
+Task &Task::self() {
+    return *_sched->_curr;
 }
 
 /* --- Sched ---------------------------------------------------------------- */
@@ -50,20 +56,14 @@ void Sched::schedule() {
     _curr->_sliceStart = _tick;
 }
 
-static Opt<Sched> _sched;
-
-Error init(Handover::Payload &) {
+Error Sched::init(Handover::Payload &) {
     logInfo("sched: initializing...");
     _sched = Sched{try$(Task::create())};
     return OK;
 }
 
-Sched &sched() {
+Sched &Sched::self() {
     return *_sched;
 }
 
-Task &self() {
-    return *_sched->_curr;
-}
-
-} // namespace Hjert::Sched
+} // namespace Hjert::Core

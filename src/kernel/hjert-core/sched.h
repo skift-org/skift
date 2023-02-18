@@ -8,7 +8,7 @@
 #include <karm-base/time.h>
 #include <karm-base/vec.h>
 
-namespace Hjert::Sched {
+namespace Hjert::Core {
 
 /* --- Stack ----------------------------------------------------------------- */
 
@@ -42,13 +42,15 @@ struct Task {
     Tick _sliceStart = 0;
     Tick _sliceEnd = 0;
 
+    static Result<Strong<Task>> create();
+
+    static Task &self();
+
     Task(Stack stack)
         : _stack(std::move(stack)) {
     }
 
     Stack &stack() { return _stack; }
-
-    static Result<Strong<Task>> create();
 };
 
 /* --- Sched ---------------------------------------------------------------- */
@@ -60,6 +62,10 @@ struct Sched {
     Vec<Strong<Task>> _tasks;
     Strong<Task> _curr;
     Strong<Task> _next;
+
+    static Error init(Handover::Payload &);
+
+    static Sched &self();
 
     Sched(Strong<Task> bootTask)
         : _tasks{bootTask}, _curr(bootTask), _next(bootTask) {
@@ -74,10 +80,4 @@ struct Sched {
     void schedule();
 };
 
-Error init(Handover::Payload &);
-
-Sched &sched();
-
-Task &self();
-
-} // namespace Hjert::Sched
+} // namespace Hjert::Core

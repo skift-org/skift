@@ -1,10 +1,9 @@
 #pragma once
 
-#include <hjert-api/syscalls.h>
-#include <karm-base/error.h>
+#include <hjert-api/api.h>
 
-namespace Hjert {
+namespace Hjert::Core {
 
-Error handleSyscall(Api::SyscallId id, Api::Arg args);
+Hj::Code dispatchSyscall(Hj::Syscall id, Hj::Args args);
 
-} // namespace Hjert
+} // namespace Hjert::Core

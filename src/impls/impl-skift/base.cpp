@@ -1,14 +1,14 @@
-#include <hjert-api/syscalls.h>
+#include <hjert-api/api.h>
 
 namespace Embed {
 
 void debug(char const *buf) {
-    Hjert::Api::Log::call(buf, strlen(buf)).unwrap();
+    Hj::log(buf, strlen(buf)).unwrap();
 }
 
 [[noreturn]] void panic(char const *buf) {
-    Hjert::Api::Log::call(buf, strlen(buf)).unwrap();
-    Hjert::Api::Exit::call(Hjert::Api::SELF, -1).unwrap();
+    Hj::log(buf, strlen(buf)).unwrap();
+    Hj::ret(Hj::SELF, -1).unwrap();
     __builtin_unreachable();
 }
 

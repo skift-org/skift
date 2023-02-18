@@ -8,7 +8,7 @@
 #include "mem.h"
 #include "sched.h"
 
-namespace Hjert {
+namespace Hjert::Core {
 
 void splash() {
     logInfo(" _  _  _         _");
@@ -54,7 +54,7 @@ void taskBody() {
     }
 }
 
-Error start(uint64_t magic, Handover::Payload &payload) {
+Error init(uint64_t magic, Handover::Payload &payload) {
     try$(Arch::init(payload));
 
     splash();
@@ -63,8 +63,8 @@ Error start(uint64_t magic, Handover::Payload &payload) {
     try$(Mem::init(payload));
     try$(Sched::init(payload));
 
-    auto taskB = try$(Sched::Task::create());
-    try$(Sched::sched().start(taskB, (uintptr_t)taskBody));
+    auto taskB = try$(Task::create());
+    try$(Sched::self().start(taskB, (uintptr_t)taskBody));
 
     logInfo("entry: everything is ready, enabling interrupts...");
     Arch::cpu().retainEnable();
@@ -79,7 +79,7 @@ Error start(uint64_t magic, Handover::Payload &payload) {
         Arch::cpu().relaxe();
 }
 
-} // namespace Hjert
+} // namespace Hjert::Core
 
 /* --- Handover Entry Point ------ ------------------------------------------ */
 
@@ -89,5 +89,5 @@ HandoverRequests$(
     Handover::requestFiles());
 
 Error entryPoint(uint64_t magic, Handover::Payload &payload) {
-    return Hjert::start(magic, payload);
+    return Hjert::Core::init(magic, payload);
 }

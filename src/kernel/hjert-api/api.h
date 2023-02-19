@@ -3,7 +3,7 @@
 #include <karm-base/array.h>
 #include <karm-base/enum.h>
 #include <karm-base/macros.h>
-#include <karm-base/panic.h>
+#include <karm-base/res.h>
 
 namespace Hj {
 
@@ -44,40 +44,20 @@ enum struct Syscall {
 };
 
 enum struct [[nodiscard]] Code {
-    OK,
+    _OK,
 
     BAD_SYSCALL,
     BAD_CAP,
     BAD_TYPE,
+    BAD_ADDR,
     NOT_IMPLEMENTED,
 
     _LEN,
 };
 
-struct [[nodiscard]] Res {
-    Code _code;
-
-    constexpr Res(Code code) : _code(code) {}
-
-    constexpr explicit operator bool() const { return _code == Code::OK; }
-
-    constexpr Code code() const { return _code; }
-
-    constexpr Res none() const { return *this; }
-
-    constexpr bool unwrap(char const *msg = "unwraping an error") const {
-        if (_code != Code::OK) {
-            Karm::panic(msg);
-        }
-        return true;
-    }
-
-    constexpr bool take() const {
-        if (_code != Code::OK) {
-            Karm::panic("take() called on an error");
-        }
-        return true;
-    }
+template <typename T = None>
+struct [[nodiscard]] Res : public Karm::Res<T, Hj::Code> {
+    using Karm::Res<T, Hj::Code>::Res;
 };
 
 using Arg = uintptr_t;
@@ -116,7 +96,7 @@ inline constexpr Cap SELF = Cap{0};
 
 // clang-format off
 
-#define SYSCALL(name) static inline __attribute__((always_inline, used)) Res name
+#define SYSCALL(name) static inline __attribute__((always_inline, used)) Res<> name
 
 SYSCALL(syscall) (Syscall syscall, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4 = 0, Arg a5 = 0);
 
@@ -131,7 +111,11 @@ SYSCALL(syscall) (Syscall s, Arg a0, Arg a1, Arg a2, Arg a3, Arg a4, Arg a5) {
         : "=a"(c)
         : "a"(s), "D"(a0), "S"(a1), "d"(a2), "r"(a3), "r"(a4), "r"(a5)
         : "rcx", "r11", "memory");
-    return c;
+
+    if (c != Code::_OK)
+        return c;
+
+    return Ok();
 }
 
 #else
@@ -170,6 +154,7 @@ FlagsEnum$(MemFlags);
 SYSCALL(createMem) (Cap* cap, uintptr_t phys, size_t len, MemFlags flags = MemFlags::NONE) {
     return create(Type::MEM, cap, phys, len, (Arg)flags);
 }
+
 
 SYSCALL(createMem) (Cap* cap, size_t len, MemFlags flags = MemFlags::NONE) {
     return create(Type::MEM, cap, -1, len, (Arg)flags);
@@ -210,8 +195,8 @@ enum struct MapFlags : Arg {
 
 FlagsEnum$(MapFlags);
 
-SYSCALL(map) (Cap cap, uintptr_t virt, Cap mem, uintptr_t off, size_t len, MapFlags flags = MapFlags::NONE) {
-    return syscall(Syscall::MAP, cap.raw(), virt, mem.raw(), off, len, (Arg)flags);
+SYSCALL(map) (Cap cap, uintptr_t* virt, Cap mem, uintptr_t off, size_t len, MapFlags flags = MapFlags::NONE) {
+    return syscall(Syscall::MAP, cap.raw(), (Arg)virt, mem.raw(), off, len, (Arg)flags);
 }
 
 SYSCALL(unmap) (Cap cap, uintptr_t virt, size_t len) {

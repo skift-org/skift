@@ -79,7 +79,7 @@ struct Heap : public Hal::Heap {
     }
 
     Res<Hal::HeapRange> allocRange(size_t size) override {
-        return pmm2Heap(try$(_pmm.allocRange(size, Hal::PmmFlags::NIL)));
+        return pmm2Heap(try$(_pmm.allocRange(size, Hal::PmmFlags::NONE)));
     }
 
     Res<> free(Hal::HeapRange range) override {
@@ -144,7 +144,7 @@ Res<> init(Handover::Payload &payload) {
         }
     }
 
-    try$(_pmm->used({pmmBits.start, pmmBits.size}, Hal::PmmFlags::NIL));
+    try$(_pmm->used({pmmBits.start, pmmBits.size}, Hal::PmmFlags::NONE));
 
     logInfo("mem: mapping kernel...");
     try$(vmm().allocRange(

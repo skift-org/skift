@@ -1,52 +1,48 @@
 #pragma once
 
+#include <hal/io.h>
 #include <hal/vmm.h>
-#include <karm-base/array.h>
+#include <hjert-api/api.h>
+#include <hjert-core/mem.h>
+#include <karm-base/lock.h>
+#include <karm-base/range-alloc.h>
 #include <karm-base/rc.h>
+#include <karm-base/vec.h>
 
 namespace Hjert::Core {
 
-struct Object {
-    size_t _id = 0;
+struct VNode {
+    using _Mem = Var<Hal::PmmMem, Hal::DmaRange>;
+    _Mem _mem;
 
-    size_t id() const { return _id; }
+    VNode(_Mem mem);
 
-    virtual ~Object() = default;
+    static Res<Strong<VNode>> alloc(size_t size, Hj::MemFlags);
+
+    static Res<Strong<VNode>> makeDma(Hal::DmaRange prange);
+
+    Hal::PmmRange range();
 };
 
-template <typename Crtp>
-struct _Object : public Object {};
+struct Space {
+    struct Map {
+        Hal::VmmRange vrange;
+        size_t off;
+        Strong<VNode> mem;
+    };
 
-using Slot = Opt<Strong<Object>>;
+    Lock _lock;
+    RangeAlloc<Hal::VmmRange> _alloc;
+    Vec<Map> _maps;
+    virtual Hal::Vmm &vmm() = 0;
 
-struct Node : public _Object<Node> {
-};
+    static Res<Strong<Space>> create();
 
-template <size_t B>
-struct _Node : public Node {
-    Array<Slot, (1 << B) - 1> _slots;
-};
+    Res<size_t> _lookup(Hal::VmmRange vrange);
 
-struct Mem : public Object {
-};
+    Res<Hal::VmmRange> map(Hal::VmmRange vrange, Strong<VNode> mem, size_t off, Hj::MapFlags flags);
 
-struct Map {
-    Hal::VmmRange vrange;
-    size_t off;
-    Strong<Mem> mem;
-};
-
-struct Space : public Object {
-
-    virtual void switchTo() = 0;
-};
-
-struct Io : public Object {
-};
-
-struct Task : public Object {
-    Strong<Space> _space;
-    Strong<Node> _root;
+    Res<> unmap(Hal::VmmRange vrange);
 };
 
 } // namespace Hjert::Core

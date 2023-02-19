@@ -8,6 +8,8 @@
 #include <karm-base/time.h>
 #include <karm-base/vec.h>
 
+#include "space.h"
+
 namespace Hjert::Core {
 
 /* --- Stack ----------------------------------------------------------------- */
@@ -38,16 +40,17 @@ struct Stack {
 
 struct Task {
     Stack _stack;
+    Strong<Space> _space;
 
     Tick _sliceStart = 0;
     Tick _sliceEnd = 0;
 
-    static Res<Strong<Task>> create();
+    static Res<Strong<Task>> create(Strong<Space> space);
 
     static Task &self();
 
-    Task(Stack stack)
-        : _stack(std::move(stack)) {
+    Task(Stack stack, Strong<Space> space)
+        : _stack(std::move(stack)), _space(space) {
     }
 
     Stack &stack() { return _stack; }

@@ -63,7 +63,7 @@ Res<> init(uint64_t magic, Handover::Payload &payload) {
     try$(Mem::init(payload));
     try$(Sched::init(payload));
 
-    auto taskB = try$(Task::create());
+    auto taskB = try$(Task::create(try$(Space::create())));
     try$(Sched::self().start(taskB, (uintptr_t)taskBody));
 
     logInfo("entry: everything is ready, enabling interrupts...");

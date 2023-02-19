@@ -11,7 +11,7 @@ namespace Hal {
 struct Vmm;
 
 enum struct VmmFlags : uint64_t {
-    NIL = 0,
+    NONE = 0,
     READ = (1 << 0),
     WRITE = (1 << 1),
     EXEC = (1 << 2),

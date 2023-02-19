@@ -28,7 +28,7 @@ struct EfiPmm : public Hal::Pmm {
 static EfiPmm pmm{};
 
 Res<Strong<Hal::Vmm>> createVmm() {
-    size_t upper = try$(pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start;
+    size_t upper = try$(pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NONE)).start;
     memset((void *)upper, 0, Hal::PAGE_SIZE);
     return Ok(makeStrong<x86_64::Vmm<>>(pmm, (x86_64::Pml<4> *)upper));
 }

@@ -19,9 +19,11 @@ Res<Stack> Stack::create() {
 
 /* --- Task ----------------------------------------------------------------- */
 
-Res<Strong<Task>> Task::create() {
+Res<Strong<Task>> Task::create(Strong<Space> space) {
     logInfo("sched: creating task...");
-    return Ok(makeStrong<Task>(try$(Stack::create())));
+    auto stack = try$(Stack::create());
+    auto task = makeStrong<Task>(std::move(stack), space);
+    return Ok(task);
 }
 
 Task &Task::self() {
@@ -58,7 +60,7 @@ void Sched::schedule() {
 
 Res<> Sched::init(Handover::Payload &) {
     logInfo("sched: initializing...");
-    _sched = Sched{try$(Task::create())};
+    _sched = Sched{try$(Task::create(try$(Space::create())))};
     return Ok();
 }
 

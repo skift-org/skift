@@ -40,7 +40,7 @@ struct Vmm : public Hal::Vmm {
             return Ok(_mapper.map(page.template as<Pml<L - 1>>()));
         }
 
-        size_t lower = try$(_pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NIL)).start;
+        size_t lower = try$(_pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NONE)).start;
         memset(_mapper.map((void *)lower), 0, Hal::PAGE_SIZE);
         upper.putPage(vaddr, {lower, Entry::WRITE | Entry::PRESENT | Entry::USER});
         return Ok(_mapper.map((Pml<L - 1> *)lower));

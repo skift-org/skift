@@ -69,6 +69,14 @@ struct Range {
         return {};
     }
 
+    constexpr Range slice(T start, T size) const {
+        return {this->start + start, size};
+    }
+
+    constexpr Range slice(T start) const {
+        return slice(start, size - start);
+    }
+
     constexpr Range halfOver(Range other) {
         if (overlaps(other) and other.end() < end()) {
             return {other.end(), end() - other.end()};
@@ -90,19 +98,18 @@ struct Range {
     }
 
     template <typename U>
-    constexpr auto as() {
+    constexpr auto as() const {
         return U{start, size};
     }
 
-    constexpr Ordr cmp(Range<T> other) const {
+    constexpr Ordr cmp(Range const &other) const {
         if (start == other.start and size == other.size)
             return Ordr::EQUAL;
 
         if (start < other.start)
             return Ordr::LESS;
 
-        if (start > other.start)
-            return Ordr::GREATER;
+        return Ordr::GREATER;
     }
 
     Res<> ensureAligned(T alignment) const {

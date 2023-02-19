@@ -29,7 +29,7 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
 Res<> entryPoint(CliArgs args) {
     auto fontface = try$(args.len()
                              ? Media::loadFontface(args[0])
-                             : Media::Fontface::fallback());
+                             : Ok(Media::Fontface::fallback()));
 
     auto titlebar = Ui::titlebar(
         Media::Icons::FORMAT_FONT,

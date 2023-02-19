@@ -26,7 +26,7 @@ struct Vmm : public Hal::Vmm {
         auto page = upper.pageAt(vaddr);
 
         if (not page.present()) {
-            return Error{Error::ADDR_NOT_AVAILABLE};
+            return Error::invalidInput("page not present");
         }
 
         return Ok(_mapper.map(page.template as<Pml<L - 1>>()));
@@ -64,7 +64,7 @@ struct Vmm : public Hal::Vmm {
 
     Res<Hal::VmmRange> allocRange(Hal::VmmRange vaddr, Hal::PmmRange paddr, Hal::VmmFlags flags) override {
         if (paddr.size != vaddr.size) {
-            return Error{Error::INVALID_INPUT};
+            return Error::invalidInput();
         }
 
         for (size_t page = 0; page < vaddr.size; page += Hal::PAGE_SIZE) {

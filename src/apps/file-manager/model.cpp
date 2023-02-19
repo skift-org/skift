@@ -30,7 +30,7 @@ State reduce(State d, Actions action) {
 
             Sys::Path dest = gotTo.path.isAbsolute()
                                  ? gotTo.path
-                                 : Fmt::format("{}/{}", d.currentPath(), gotTo.path);
+                                 : Fmt::format("{}/{}", d.currentPath(), gotTo.path).unwrap();
 
             d.history.truncate(d.currentIndex + 1);
             d.history.pushBack(dest);

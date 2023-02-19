@@ -20,7 +20,7 @@ extern "C" char const *_Karm__Media__Icon__name(uint32_t query);
 Res<Icon> Icon::byName(Str query, double size) {
     auto codepoint = _Karm__Media__Icon__byName(query.buf(), query.len());
     if (codepoint == 0) {
-        return Error("Icon not found");
+        return Error::notFound("icon not found");
     }
     return Ok(Icon((Icons)codepoint, size));
 }

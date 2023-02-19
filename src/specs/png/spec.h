@@ -76,7 +76,7 @@ struct Image {
         Image image{slice};
 
         if (!Op::eq(image.sig(), bytes(SIG)))
-            return Error("invalid signature");
+            return Error::invalidData("invalid signature");
 
         image._ihdr = image.lookupChunk<Ihdr>();
         image._plte = image.lookupChunk<Plte>();

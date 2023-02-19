@@ -31,7 +31,7 @@ struct Channel {
         LockScope guard(_lock);
 
         if (_ring.full()) {
-            return Error{Error::WOULD_BLOCK};
+            return Error::wouldBlock();
         }
 
         _ring.push(value);

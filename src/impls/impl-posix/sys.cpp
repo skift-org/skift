@@ -221,11 +221,11 @@ Res<> populate(Sys::SysInfo &infos) {
 }
 
 Res<> populate(Sys::MemInfo &) {
-    return Error{Error::NOT_IMPLEMENTED};
+    return Error::notImplemented();
 }
 
 Res<> populate(Vec<Sys::CpuInfo> &) {
-    return Error{Error::NOT_IMPLEMENTED};
+    return Error::notImplemented();
 }
 
 Res<> populate(Sys::UserInfo &infos) {

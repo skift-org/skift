@@ -38,20 +38,20 @@ struct Image {
 
     static Res<Image> load(Bytes slice) {
         if (slice.len() < 14) {
-            return Error("image too small");
+            return Error::invalidData("image too small");
         }
 
         auto image = Image(slice);
         if (Op::ne(image.magic(), bytes(MAGIC))) {
-            return Error("invalid magic");
+            return Error::invalidData("invalid magic");
         }
 
         if (!(image.channels() == 4 or image.channels() == 3)) {
-            return Error("invalid number of channels");
+            return Error::invalidData("invalid number of channels");
         }
 
         if (!(image.colorSpace() == 0 or image.colorSpace() == 1)) {
-            return Error("invalid color space");
+            return Error::invalidData("invalid color space");
         }
 
         return Ok(image);
@@ -82,7 +82,7 @@ struct Image {
         for (int y = 0; y < height(); y++) {
             for (int x = 0; x < width(); x++) {
                 if (s.ended()) {
-                    return Error{"unexpected end of file"};
+                    return Error::invalidData("unexpected end of file");
                 }
 
                 if (run > 0) {
@@ -116,7 +116,7 @@ struct Image {
                 } else if ((b1 & Chunk::MASK) == Chunk::RUN) {
                     run = b1 & (~Chunk::MASK);
                 } else {
-                    return Error{"invalid chunk"};
+                    return Error::invalidData("invalid chunk");
                 }
 
                 index[hash(pixel) % index.len()] = pixel;
@@ -125,7 +125,7 @@ struct Image {
         }
 
         if (Op::ne(s.nextBytes(8), bytes(END))) {
-            return Error{"missing end marker"};
+            return Error::invalidData("missing end marker");
         }
 
         return Ok();

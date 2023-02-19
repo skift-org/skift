@@ -66,7 +66,7 @@ Res<Image> loadImage(Str path) {
         return loadJpeg(map.bytes());
     } else {
         logError("media: unknown image format for '{}'", path);
-        return Error{"unknown image format"};
+        return Error::invalidData("unknown image format");
     }
 }
 

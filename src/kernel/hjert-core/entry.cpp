@@ -21,7 +21,7 @@ void splash() {
 Res<> validateAndDump(uint64_t magic, Handover::Payload &payload) {
     if (!Handover::valid(magic, payload)) {
         logInfo("entry: handover: invalid");
-        return Error{"Invalid handover payload"};
+        return Error::invalidInput("Invalid handover payload");
     }
 
     logInfo("entry: handover: valid");

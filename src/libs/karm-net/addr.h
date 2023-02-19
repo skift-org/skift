@@ -34,23 +34,23 @@ union IpAddrV4 {
         for (auto i = 0; i < 4; ++i) {
             auto n = s.nextUint(10);
             if (not n) {
-                return Error{"invalid ip address"};
+                return Error::invalidInput("invalid ip address");
             }
 
             if (n.unwrap() > 255) {
-                return Error{"invalid IP address"};
+                return Error::invalidInput("invalid IP address");
             }
 
             addr.bytes[i] = n.unwrap();
 
             if (i < 3) {
                 if (not s.skip('.')) {
-                    return Error{"invalid IP address"};
+                    return Error::invalidInput("invalid IP address");
                 }
             }
         }
 
-        return addr;
+        return Ok(addr);
     }
 
     static Res<IpAddrV4> parse(Str str) {
@@ -88,12 +88,12 @@ union IpAddrV6 {
 
             if (i < 7) {
                 if (not s.skip(':')) {
-                    return Error("invalid IP address");
+                    return Error::invalidInput("invalid IP address");
                 }
             }
         }
 
-        return addr;
+        return Ok(addr);
     }
 
     static Res<IpAddrV6> parse(Str str) {
@@ -109,16 +109,16 @@ struct IpAddr : public Var<IpAddrV4, IpAddrV6> {
         auto maybeV6 = IpAddrV6::parse(s);
 
         if (maybeV6) {
-            return IpAddr(maybeV6.unwrap());
+            return Ok(IpAddr(maybeV6.unwrap()));
         }
 
         auto maybeV4 = IpAddrV4::parse(s);
 
         if (maybeV4) {
-            return IpAddr(maybeV4.unwrap());
+            return Ok(IpAddr(maybeV4.unwrap()));
         }
 
-        return Error("invalid IP address");
+        return Error::invalidInput("invalid IP address");
     }
 
     static Res<IpAddr> parse(Str str) {
@@ -138,16 +138,16 @@ struct SocketAddr {
         auto addr = try$(IpAddr::parse(s));
 
         if (not s.skip(':')) {
-            return Error("invalid socket address");
+            return Error::invalidInput("invalid socket address");
         }
 
         auto port = try$(s.nextUint(10));
 
         if (port > 65535) {
-            return Error("invalid socket address");
+            return Error::invalidInput("invalid socket address");
         }
 
-        return SocketAddr(addr, port);
+        return Ok(SocketAddr(addr, port));
     }
 };
 

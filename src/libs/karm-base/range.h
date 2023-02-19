@@ -107,10 +107,10 @@ struct Range {
 
     Res<> ensureAligned(T alignment) const {
         if (not isAlign(start, alignment))
-            return Error{Error::INVALID_DATA, "start is not aligned"};
+            return Error::invalidInput("start is not aligned");
 
         if (not isAlign(size, alignment))
-            return Error{Error::INVALID_DATA, "size is not aligned"};
+            return Error::invalidInput("size is not aligned");
 
         return Ok();
     }

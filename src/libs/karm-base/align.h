@@ -27,7 +27,7 @@ inline constexpr bool isAlign(size_t addr, size_t align) {
 
 static inline Res<> ensureAlign(size_t addr, size_t align) {
     if (!isAlign(addr, align)) {
-        return Error{Error::INVALID_DATA, "not aligned"};
+        return Error::invalidInput("not aligned");
     }
 
     return Ok();

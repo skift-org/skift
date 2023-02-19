@@ -6,164 +6,164 @@ namespace Embed::Posix {
 
 Error fromErrno(int error) {
     if (EOPNOTSUPP != ENOTSUP and error == EOPNOTSUPP) {
-        return Error(Error::UNSUPPORTED, "operation not supported on socket");
+        return Error::unsupported("operation not supported on socket");
     }
 
     if (EWOULDBLOCK != EAGAIN and error == EWOULDBLOCK) {
-        return Error(Error::WOULD_BLOCK, "operation would block");
+        return Error::wouldBlock("operation would block");
     }
 
     switch (error) {
     case E2BIG:
-        return Error(Error::ARGUMENT_LIST_TOO_LONG, "argument list too long");
+        return Error::argumentListTooLong("argument list too long");
     case EACCES:
-        return Error(Error::PERMISSION_DENIED, "permission denied");
+        return Error::permissionDenied("permission denied");
     case EADDRINUSE:
-        return Error(Error::ADDR_IN_USE, "address in use");
+        return Error::addrInUse("address in use");
     case EADDRNOTAVAIL:
-        return Error(Error::ADDR_NOT_AVAILABLE, "address not available");
+        return Error::addrNotAvailable("address not available");
     case EAFNOSUPPORT:
-        return Error(Error::UNSUPPORTED, "address family not supported");
+        return Error::unsupported("address family not supported");
     case EAGAIN:
-        return Error(Error::RESOURCE_BUSY, "resource unavailable, try again");
+        return Error::resourceBusy("resource unavailable, try again");
     case EALREADY:
-        return Error(Error::RESOURCE_BUSY, "connection already in progress");
+        return Error::resourceBusy("connection already in progress");
     case EBADF:
-        return Error(Error::INVALID_INPUT, "bad file descriptor");
+        return Error::invalidInput("bad file descriptor");
     case EBADMSG:
-        return Error(Error::INVALID_DATA, "bad message");
+        return Error::invalidData("bad message");
     case EBUSY:
-        return Error(Error::RESOURCE_BUSY, "device or resource busy");
+        return Error::resourceBusy("device or resource busy");
     case ECANCELED:
-        return Error(Error::OTHER, "operation canceled");
+        return Error::interrupted("operation canceled");
     case ECHILD:
-        return Error(Error::OTHER, "no child processes");
+        return Error::other("no child processes");
     case ECONNABORTED:
-        return Error(Error::CONNECTION_ABORTED, "connection aborted");
+        return Error::connectionAborted("connection aborted");
     case ECONNREFUSED:
-        return Error(Error::CONNECTION_REFUSED, "connection refused");
+        return Error::connectionRefused("connection refused");
     case ECONNRESET:
-        return Error(Error::CONNECTION_RESET, "connection reset");
+        return Error::connectionReset("connection reset");
     case EDEADLK:
-        return Error(Error::DEADLOCK, "resource deadlock would occur");
+        return Error::deadlock("resource deadlock would occur");
     case EDESTADDRREQ:
-        return Error(Error::INVALID_INPUT, "destination address required");
+        return Error::invalidInput("destination address required");
     case EDOM:
-        return Error(Error::INVALID_INPUT, "mathematics argument out of domain of function");
+        return Error::invalidInput("mathematics argument out of domain of function");
     case EEXIST:
-        return Error(Error::ALREADY_EXISTS, "file exists");
+        return Error::alreadyExists("file exists");
     case EFAULT:
-        return Error(Error::INVALID_INPUT, "bad address");
+        return Error::invalidInput("bad address");
     case EFBIG:
-        return Error(Error::FILE_TOO_LARGE, "file too large");
+        return Error::fileTooLarge("file too large");
     case EHOSTUNREACH:
-        return Error(Error::HOST_UNREACHABLE, "host is unreachable");
+        return Error::hostUnreachable("host is unreachable");
     case EIDRM:
-        return Error(Error::INVALID_INPUT, "identifier removed");
+        return Error::invalidInput("identifier removed");
     case EILSEQ:
-        return Error(Error::INVALID_INPUT, "illegal byte sequence");
+        return Error::invalidInput("illegal byte sequence");
     case EINPROGRESS:
-        return Error(Error::RESOURCE_BUSY, "operation in progress");
+        return Error::resourceBusy("operation in progress");
     case EINTR:
-        return Error(Error::INTERRUPTED, "interrupted function");
+        return Error::interrupted("interrupted function");
     case EINVAL:
-        return Error(Error::INVALID_INPUT, "invalid argument");
+        return Error::invalidInput("invalid argument");
     case EIO:
-        return Error(Error::INVALID_INPUT, "i/o error");
+        return Error::invalidInput("i/o error");
     case EISCONN:
-        return Error(Error::OTHER, "socket is connected");
+        return Error::other("socket is connected");
     case EISDIR:
-        return Error(Error::IS_A_DIRECTORY, "is a directory");
+        return Error::isADirectory("is a directory");
     case ELOOP:
-        return Error(Error::FILESYSTEM_LOOP, "too many levels of symbolic links");
+        return Error::filesystemLoop("too many levels of symbolic links");
     case EMFILE:
-        return Error(Error::INVALID_INPUT, "file descriptor value too large");
+        return Error::invalidInput("file descriptor value too large");
     case EMLINK:
-        return Error(Error::TOO_MANY_LINKS, "too many links");
+        return Error::tooManyLinks("too many links");
     case EMSGSIZE:
-        return Error(Error::INVALID_INPUT, "message too large");
+        return Error::invalidInput("message too large");
     case ENAMETOOLONG:
-        return Error(Error::INVALID_INPUT, "filename too long");
+        return Error::invalidInput("filename too long");
     case ENETDOWN:
-        return Error(Error::NETWORK_DOWN, "network is down");
+        return Error::networkDown("network is down");
     case ENETRESET:
-        return Error(Error::CONNECTION_RESET, "connection aborted by network");
+        return Error::connectionReset("connection aborted by network");
     case ENETUNREACH:
-        return Error(Error::NETWORK_UNREACHABLE, "network unreachable");
+        return Error::networkUnreachable("network unreachable");
     case ENFILE:
-        return Error(Error::LIMIT_REACHED, "too many files open in system");
+        return Error::limitReached("too many files open in system");
     case ENOBUFS:
-        return Error(Error::LIMIT_REACHED, "no buffer space available");
+        return Error::limitReached("no buffer space available");
     case ENODATA:
-        return Error(Error::OTHER, "no message is available on the STREAM head read queue");
+        return Error::other("no message is available on the STREAM head read queue");
     case ENODEV:
-        return Error(Error::NOT_FOUND, "no such device");
+        return Error::notFound("no such device");
     case ENOENT:
-        return Error(Error::NOT_FOUND, "no such file or directory");
+        return Error::notFound("no such file or directory");
     case ENOEXEC:
-        return Error(Error::INVALID_DATA, "executable file format error");
+        return Error::invalidData("executable file format error");
     case ENOLCK:
-        return Error(Error::LIMIT_REACHED, "no locks available");
+        return Error::limitReached("no locks available");
     case ENOMEM:
-        return Error(Error::OUT_OF_MEMORY, "not enough space");
+        return Error::outOfMemory("not enough space");
     case ENOMSG:
-        return Error(Error::OTHER, "no message of the desired type");
+        return Error::other("no message of the desired type");
     case ENOPROTOOPT:
-        return Error(Error::INVALID_INPUT, "protocol not available");
+        return Error::invalidInput("protocol not available");
     case ENOSPC:
-        return Error(Error::STORAGE_FULL, "no space left on device");
+        return Error::storageFull("no space left on device");
     case ENOSR:
-        return Error(Error::LIMIT_REACHED, "no STREAM resources");
+        return Error::limitReached("no STREAM resources");
     case ENOSTR:
-        return Error(Error::INVALID_INPUT, "not a STREAM");
+        return Error::invalidInput("not a STREAM");
     case ENOSYS:
-        return Error(Error::UNSUPPORTED, "functionality not supported");
+        return Error::unsupported("functionality not supported");
     case ENOTCONN:
-        return Error(Error::NOT_CONNECTED, "the socket is not connected");
+        return Error::notConnected("the socket is not connected");
     case ENOTDIR:
-        return Error(Error::INVALID_INPUT, "not a directory or a symbolic link to a directory");
+        return Error::invalidInput("not a directory");
     case ENOTEMPTY:
-        return Error(Error::DIRECTORY_NOT_EMPTY, "directory not empty");
+        return Error::directoryNotEmpty("directory not empty");
     case ENOTRECOVERABLE:
-        return Error(Error::OTHER, "state not recoverable");
+        return Error::other("state not recoverable");
     case ENOTSOCK:
-        return Error(Error::INVALID_INPUT, "not a socket");
+        return Error::invalidInput("not a socket");
     case ENOTSUP:
-        return Error(Error::UNSUPPORTED, "not supported");
+        return Error::unsupported("operation not supported");
     case ENOTTY:
-        return Error(Error::INVALID_INPUT, "inappropriate i/o control operation");
+        return Error::invalidInput("inappropriate i/o control operation");
     case ENXIO:
-        return Error(Error::NOT_FOUND, "no such device or address");
+        return Error::notFound("no such device or address");
     case EOVERFLOW:
-        return Error(Error::OTHER, "value too large to be stored in data type");
+        return Error::other("value too large to be stored in data type");
     case EOWNERDEAD:
-        return Error(Error::OTHER, "previous owner died");
+        return Error::other("previous owner died");
     case EPERM:
-        return Error(Error::PERMISSION_DENIED, "operation not permitted");
+        return Error::permissionDenied("operation not permitted");
     case EPIPE:
-        return Error(Error::INVALID_DATA, "broken pipe");
+        return Error::brokenPipe("broken pipe");
     case EPROTO:
-        return Error(Error::OTHER, "protocol error");
+        return Error::other("protocol error");
     case EPROTONOSUPPORT:
-        return Error(Error::UNSUPPORTED, "protocol not supported");
+        return Error::unsupported("protocol not supported");
     case EPROTOTYPE:
-        return Error(Error::INVALID_INPUT, "protocol wrong type for socket");
+        return Error::invalidInput("protocol wrong type for socket");
     case ERANGE:
-        return Error(Error::INVALID_INPUT, "result too large");
+        return Error::invalidInput("result too large");
     case EROFS:
-        return Error(Error::READ_ONLY_FILESYSTEM, "read-only file system");
+        return Error::readOnlyFilesystem("read-only file system");
     case ESPIPE:
-        return Error(Error::INVALID_INPUT, "invalid seek");
+        return Error::invalidInput("invalid seek");
     case ESRCH:
-        return Error(Error::NOT_FOUND, "no such process");
+        return Error::notFound("no such process");
     case ETIME:
-        return Error(Error::TIMED_OUT, "stream ioctl() timeout");
+        return Error::timedOut("stream ioctl() timeout");
     case ETIMEDOUT:
-        return Error(Error::TIMED_OUT, "connection timed out");
+        return Error::timedOut("connection timed out");
     case ETXTBSY:
-        return Error(Error::RESOURCE_BUSY, "text file busy");
+        return Error::resourceBusy("text file busy");
     case EXDEV:
-        return Error(Error::INVALID_INPUT, "cross-device link");
+        return Error::invalidInput("cross-device link");
     default:
         return Error::OTHER;
     }

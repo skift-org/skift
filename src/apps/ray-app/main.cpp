@@ -47,7 +47,8 @@ struct Sample {
 };
 
 double randf() {
-    return (double)rand() / (double)RAND_MAX;
+    static Math::Rand rand;
+    return rand.nextFloat();
 }
 
 double randf(double min, double max) {
@@ -345,7 +346,6 @@ void renderScene(Cam cam, Scene &scene, Gfx::Surface buf, Props props) {
 }
 
 Res<> entryPoint(CliArgs args) {
-    srand(1);
     double scale = 1;
 
     Media::Image image{Gfx::RGBA8888, Vec2f{1280 * scale, 720 * scale}.cast<int>()};

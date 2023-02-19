@@ -8,7 +8,7 @@ Res<Value> parse(Text::Scan &s);
 
 Res<String> parseStr(Text::Scan &s) {
     if (not s.skip('"')) {
-        return Error{"expected '\"'"};
+        return Error::invalidData("expected '\"'");
     }
 
     s.begin();
@@ -56,16 +56,16 @@ Res<String> parseStr(Text::Scan &s) {
             continue;
         }
 
-        return Error{"invalid string"};
+        return Error::invalidData("invalid string");
     }
 
-    return Error{"expected '\"'"};
+    return Error::invalidData("expected '\"'");
 }
 
 Res<Object> parseObject(Text::Scan &s) {
     Object m;
     if (not s.skip('{')) {
-        return Error{"expected '{'"};
+        return Error::invalidData("expected '{'");
     }
 
     if (s.skip('}')) {
@@ -78,7 +78,7 @@ Res<Object> parseObject(Text::Scan &s) {
 
         s.eat(Re::space());
         if (not s.skip(':')) {
-            return Error{"expected ':'"};
+            return Error::invalidData("expected ':'");
         }
 
         s.eat(Re::space());
@@ -92,7 +92,7 @@ Res<Object> parseObject(Text::Scan &s) {
             return Ok(m);
         }
         if (not s.skip(',')) {
-            return Error{"expected ','"};
+            return Error::invalidData("expected ','");
         }
     }
 }
@@ -100,7 +100,7 @@ Res<Object> parseObject(Text::Scan &s) {
 Res<Array> parseArray(Text::Scan &s) {
     Array v;
     if (not s.skip('[')) {
-        return Error{"expected '['"};
+        return Error::invalidData("expected '['");
     }
 
     if (s.skip(']')) {
@@ -118,7 +118,7 @@ Res<Array> parseArray(Text::Scan &s) {
             return Ok(v);
         }
         if (not s.skip(',')) {
-            return Error{"expected ','"};
+            return Error::invalidData("expected ','");
         }
     }
 }
@@ -127,7 +127,7 @@ Res<Value> parse(Text::Scan &s) {
     s.eat(Re::space());
 
     if (s.ended()) {
-        return Error{"unexpected end of input"};
+        return Error::invalidData("unexpected end of input");
     } else if (s.peek() == '{') {
         return Ok(Value{try$(parseObject(s))});
     } else if (s.peek() == '[') {
@@ -148,7 +148,7 @@ Res<Value> parse(Text::Scan &s) {
 #endif
     }
 
-    return Error{"unexpected character"};
+    return Error::invalidData("unexpected character");
 }
 
 Res<Value> parse(Str s) {

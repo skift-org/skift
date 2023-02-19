@@ -1,4 +1,5 @@
 #include <karm-main/main.h>
+#include <karm-sys/info.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
@@ -43,10 +44,10 @@ Ui::Child userInfos() {
         NONE,
         errorScope([&] -> Res<Ui::Child> {
             auto userinfo = try$(Sys::userinfo());
-            return Ui::vflow(
+            return Ok(Ui::vflow(
                 Ui::row(NONE, "Username", NONE, Ui::text(userinfo.name)),
                 Ui::row(NONE, "Home", NONE, Ui::text(userinfo.home)),
-                Ui::row(NONE, "Shell", NONE, Ui::text(userinfo.shell)));
+                Ui::row(NONE, "Shell", NONE, Ui::text(userinfo.shell))));
         }));
 }
 
@@ -57,11 +58,11 @@ Ui::Child sysInfos() {
         NONE,
         errorScope([&] -> Res<Ui::Child> {
             auto sysinfo = try$(Sys::sysinfo());
-            return Ui::vflow(
+            return Ok(Ui::vflow(
                 Ui::row(NONE, "System", NONE, Ui::text(sysinfo.sysName)),
                 Ui::row(NONE, "System Version", NONE, Ui::text(sysinfo.sysVersion)),
                 Ui::row(NONE, "Kernel", NONE, Ui::text(sysinfo.kernelName)),
-                Ui::row(NONE, "Kernel Version", NONE, Ui::text(sysinfo.kernelVersion)));
+                Ui::row(NONE, "Kernel Version", NONE, Ui::text(sysinfo.kernelVersion))));
         }));
 }
 
@@ -72,9 +73,9 @@ Ui::Child memInfos() {
         NONE,
         errorScope([&] -> Res<Ui::Child> {
             auto meminfo = try$(Sys::meminfo());
-            return vflow(
+            return Ok(vflow(
                 Ui::row(NONE, "Physical", NONE, Ui::text("{}bytes", meminfo.physicalUsed)),
-                Ui::row(NONE, "Swap", NONE, Ui::text("{}bytes", meminfo.swapUsed)));
+                Ui::row(NONE, "Swap", NONE, Ui::text("{}bytes", meminfo.swapUsed))));
         }));
 }
 
@@ -96,7 +97,7 @@ Ui::Child cpuInfos() {
                     Ui::text("{} {} {} MHz", cpu.name, cpu.brand, cpu.freq)));
             }
 
-            return Ui::vflow(children);
+            return Ok(Ui::vflow(children));
         }));
 }
 

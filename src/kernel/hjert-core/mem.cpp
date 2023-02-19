@@ -41,7 +41,7 @@ struct Pmm : public Hal::Pmm {
 
     Res<> free(Hal::PmmRange range) override {
         if (not range.overlaps(_usable)) {
-            return Error{"range is not in usable memory"};
+            return Error::invalidInput("range is not in usable memory");
         }
 
         LockScope scope(_lock);
@@ -88,7 +88,7 @@ struct Heap : public Hal::Heap {
 
     Res<Hal::PmmRange> heap2Pmm(Hal::HeapRange range) override {
         if (range.start < Hal::UPPER_HALF) {
-            return Error{"Invalid heap range"};
+            return Error::invalidInput("Invalid heap range");
         }
 
         return Ok(Hal::PmmRange{
@@ -113,7 +113,7 @@ Res<> init(Handover::Payload &payload) {
 
     if (usableRange.empty()) {
         logError("mem: no usable memory");
-        return Error{"no usable memory"};
+        return Error::outOfMemory("no usable memory");
     }
 
     logInfo("mem: usable range: {x}-{x}", usableRange.start, usableRange.end());
@@ -124,7 +124,7 @@ Res<> init(Handover::Payload &payload) {
 
     if (pmmBits.empty()) {
         logError("mem: no usable memory for pmm");
-        return Error{"no usable memory for pmm"};
+        return Error::outOfMemory("no usable memory for pmm");
     }
 
     logInfo("mem: pmm bitmap range: {x}-{x}", pmmBits.start, pmmBits.end());

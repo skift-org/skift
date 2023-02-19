@@ -444,7 +444,7 @@ struct Font {
 
         if (not bestCmap) {
             logError("ttf: no suitable cmap table found");
-            return Error("no cmap table");
+            return Error::other("no cmap table");
         }
 
         return Ok(*bestCmap);
@@ -456,7 +456,7 @@ struct Font {
         if (font.version() != 0x00010000 and
             font.version() != 0x4F54544F) {
             logError("ttf: version {x} is not supported", (uint64_t)font.version());
-            return Error{"invalid version"};
+            return Error::other("invalid version");
         }
 
         font._head = try$(font.requireTable<Head>());
@@ -534,7 +534,7 @@ struct Font {
         }
 
         logError("ttf: '{}' table not found", T::SIG);
-        return Error{"table not found"};
+        return Error::other("table not found");
     }
 
     GlyphMetrics glyphMetrics(Rune rune) const {

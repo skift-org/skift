@@ -77,11 +77,11 @@ enum : size_t {
 
 #define ERR(ERR, CODE)    \
     if (status == (CODE)) \
-        return Error{Error::OTHER, #ERR};
+        return Error::other(#ERR);
 
     FOREACH_ERROR(ERR)
 
-    return Error{Error::OTHER, "Unknown error"};
+    return Error::other("unknown error");
 
 #undef ERR
 }

@@ -39,7 +39,7 @@ Res<> parseGop(Handover::Builder &builder) {
     auto mode = gop->mode;
 
     if (mode->info->pixelFormat != Efi::PixelFormat::BLUE_GREEN_RED_RESERVED8_BIT_PER_COLOR) {
-        return Error{"unsupported pixel format"};
+        return Error::invalidInput("unsupported pixel format");
     }
 
     logInfo("efi: gop: {}x{}, {} stride, {} modes", mode->info->horizontalResolution, mode->info->verticalResolution, mode->info->pixelsPerScanLine * 4, mode->maxMode);
@@ -84,7 +84,7 @@ Res<> parseMemoryMap(Handover::Builder &builder) {
     (void)Efi::bs()->getMemoryMap(&mmapSize, nullptr, &key, &descSize, &descVersion);
 
     if (descSize < sizeof(Efi::MemoryDescriptor)) {
-        return Error{Error::INVALID_DATA, "invalid memory descriptor size"};
+        return Error::invalidInput("invalid memory descriptor size");
     }
 
     // NOTE: Allocating on the pool might creates at least one new descriptor

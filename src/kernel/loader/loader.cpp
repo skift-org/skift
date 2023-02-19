@@ -33,7 +33,7 @@ Res<> load(Sys::Path kernelPath, Entry const &entry) {
 
     if (not image.valid()) {
         logError("loader: invalid kernel image");
-        return Error{Error::INVALID_DATA, "invalid kernel image"};
+        return Error::invalidData("invalid kernel image");
     }
 
     logInfo("loader: setting up stack...");
@@ -90,7 +90,7 @@ Res<> load(Sys::Path kernelPath, Entry const &entry) {
 
     if (not maybeSection) {
         logError("loader: missing .handover section");
-        return Error{Error::INVALID_DATA, "missing .handover section"};
+        return Error::invalidData("missing .handover section");
     }
 
     auto requests = try$(maybeSection).slice<Handover::Request>();

@@ -34,16 +34,16 @@ struct Blob {
         auto magic = scan.nextBeUint32();
 
         if (magic != Blob::magic) {
-            return Error{"invalid magic"};
+            return Error::invalidData("invalid magic");
         }
 
         auto size = scan.nextBeUint32();
 
         if (size < sizeof(Header)) {
-            return Error{"invalid size"};
+            return Error::invalidData("invalid size");
         }
 
-        return Blob{Bytes{static_cast<Byte *>(ptr), size}};
+        return Ok(Blob{Bytes{static_cast<Byte *>(ptr), size}});
     }
 
     BScan begin() const { return _slice; }

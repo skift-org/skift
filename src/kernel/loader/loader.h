@@ -13,7 +13,7 @@ struct File {
 
     static Res<File> fromJson(Json::Value const &json) {
         if (not json.isObject()) {
-            return Error{"expected object"};
+            return Error::invalidInput("expected object");
         }
 
         File file = {};
@@ -32,7 +32,7 @@ struct Entry {
 
     static Res<Entry> fromJson(Json::Value const &json) {
         if (not json.isObject()) {
-            return Error{"expected object"};
+            return Error::invalidInput("expected object");
         }
 
         Entry entry = {};
@@ -56,7 +56,7 @@ struct Configs {
 
     static Res<Configs> fromJson(Json::Value const &json) {
         if (not json.isObject()) {
-            return Error{"expected array"};
+            return Error::invalidInput("expected array");
         }
 
         Configs configs = {};

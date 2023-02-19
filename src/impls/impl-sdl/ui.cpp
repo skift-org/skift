@@ -236,7 +236,7 @@ Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
         SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS | SDL_WINDOW_UTILITY);
 
     if (not window) {
-        return Error{SDL_GetError()};
+        return Error::other(SDL_GetError());
     }
 
     return Ok(makeStrong<SdlHost>(root, window));

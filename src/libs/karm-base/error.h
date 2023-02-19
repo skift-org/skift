@@ -8,54 +8,54 @@
 
 namespace Karm {
 
-#define FOREACH_ERROR(ERROR)         \
-    ERROR(_OK)                       \
-    ERROR(NOT_IMPLEMENTED)           \
-    ERROR(NOT_FOUND)                 \
-    ERROR(PERMISSION_DENIED)         \
-    ERROR(CONNECTION_REFUSED)        \
-    ERROR(CONNECTION_RESET)          \
-    ERROR(HOST_UNREACHABLE)          \
-    ERROR(NETWORK_UNREACHABLE)       \
-    ERROR(CONNECTION_ABORTED)        \
-    ERROR(NOT_CONNECTED)             \
-    ERROR(ADDR_IN_USE)               \
-    ERROR(ADDR_NOT_AVAILABLE)        \
-    ERROR(NETWORK_DOWN)              \
-    ERROR(BROKEN_PIPE)               \
-    ERROR(ALREADY_EXISTS)            \
-    ERROR(WOULD_BLOCK)               \
-    ERROR(NOT_A_DIRECTORY)           \
-    ERROR(IS_A_DIRECTORY)            \
-    ERROR(DIRECTORY_NOT_EMPTY)       \
-    ERROR(READ_ONLY_FILESYSTEM)      \
-    ERROR(FILESYSTEM_LOOP)           \
-    ERROR(STALE_NETWORK_FILE_HANDLE) \
-    ERROR(INVALID_INPUT)             \
-    ERROR(INVALID_DATA)              \
-    ERROR(TIMED_OUT)                 \
-    ERROR(WRITE_ZERO)                \
-    ERROR(STORAGE_FULL)              \
-    ERROR(NOT_SEEKABLE)              \
-    ERROR(FILESYSTEM_QUOTA_EXCEEDED) \
-    ERROR(FILE_TOO_LARGE)            \
-    ERROR(RESOURCE_BUSY)             \
-    ERROR(EXECUTABLE_FILE_BUSY)      \
-    ERROR(DEADLOCK)                  \
-    ERROR(CROSSES_DEVICES)           \
-    ERROR(TOO_MANY_LINKS)            \
-    ERROR(INVALID_FILENAME)          \
-    ERROR(ARGUMENT_LIST_TOO_LONG)    \
-    ERROR(INTERRUPTED)               \
-    ERROR(UNSUPPORTED)               \
-    ERROR(UNEXPECTED_EOF)            \
-    ERROR(OUT_OF_MEMORY)             \
-    ERROR(LIMIT_REACHED)             \
-    ERROR(OTHER)
+#define FOREACH_ERROR(ERROR)                                  \
+    ERROR(_OK, _ok)                                           \
+    ERROR(NOT_IMPLEMENTED, notImplemented)                    \
+    ERROR(NOT_FOUND, notFound)                                \
+    ERROR(PERMISSION_DENIED, permissionDenied)                \
+    ERROR(CONNECTION_REFUSED, connectionRefused)              \
+    ERROR(CONNECTION_RESET, connectionReset)                  \
+    ERROR(HOST_UNREACHABLE, hostUnreachable)                  \
+    ERROR(NETWORK_UNREACHABLE, networkUnreachable)            \
+    ERROR(CONNECTION_ABORTED, connectionAborted)              \
+    ERROR(NOT_CONNECTED, notConnected)                        \
+    ERROR(ADDR_IN_USE, addrInUse)                             \
+    ERROR(ADDR_NOT_AVAILABLE, addrNotAvailable)               \
+    ERROR(NETWORK_DOWN, networkDown)                          \
+    ERROR(BROKEN_PIPE, brokenPipe)                            \
+    ERROR(ALREADY_EXISTS, alreadyExists)                      \
+    ERROR(WOULD_BLOCK, wouldBlock)                            \
+    ERROR(NOT_A_DIRECTORY, notADirectory)                     \
+    ERROR(IS_A_DIRECTORY, isADirectory)                       \
+    ERROR(DIRECTORY_NOT_EMPTY, directoryNotEmpty)             \
+    ERROR(READ_ONLY_FILESYSTEM, readOnlyFilesystem)           \
+    ERROR(FILESYSTEM_LOOP, filesystemLoop)                    \
+    ERROR(STALE_NETWORK_FILE_HANDLE, staleNetworkFileHandle)  \
+    ERROR(INVALID_INPUT, invalidInput)                        \
+    ERROR(INVALID_DATA, invalidData)                          \
+    ERROR(TIMED_OUT, timedOut)                                \
+    ERROR(WRITE_ZERO, writeZero)                              \
+    ERROR(STORAGE_FULL, storageFull)                          \
+    ERROR(NOT_SEEKABLE, notSeekable)                          \
+    ERROR(FILESYSTEM_QUOTA_EXCEEDED, filesystemQuotaExceeded) \
+    ERROR(FILE_TOO_LARGE, fileTooLarge)                       \
+    ERROR(RESOURCE_BUSY, resourceBusy)                        \
+    ERROR(EXECUTABLE_FILE_BUSY, executableFileBusy)           \
+    ERROR(DEADLOCK, deadlock)                                 \
+    ERROR(CROSSES_DEVICES, crossesDevices)                    \
+    ERROR(TOO_MANY_LINKS, tooManyLinks)                       \
+    ERROR(INVALID_FILENAME, invalidFilename)                  \
+    ERROR(ARGUMENT_LIST_TOO_LONG, argumentListTooLong)        \
+    ERROR(INTERRUPTED, interrupted)                           \
+    ERROR(UNSUPPORTED, unsupported)                           \
+    ERROR(UNEXPECTED_EOF, unexpectedEof)                      \
+    ERROR(OUT_OF_MEMORY, outOfMemory)                         \
+    ERROR(LIMIT_REACHED, limitReached)                        \
+    ERROR(OTHER, other)
 
 struct [[nodiscard]] Error {
     enum struct Code {
-#define ITER(NAME) NAME,
+#define ITER(NAME, _) NAME,
         FOREACH_ERROR(ITER)
 #undef ITER
     } _code;
@@ -63,6 +63,11 @@ struct [[nodiscard]] Error {
     char const *_msg = nullptr;
 
     using enum Code;
+
+#define ITER(CODE, NAME) \
+    static constexpr Error NAME(char const *msg = "") { return Error(CODE, msg); }
+    FOREACH_ERROR(ITER)
+#undef ITER
 
     constexpr Error() : _code(Code::OTHER) {}
 
@@ -82,8 +87,8 @@ struct [[nodiscard]] Error {
         }
 
         switch (_code) {
-#define ITER(NAME) \
-    case NAME:     \
+#define ITER(NAME, _) \
+    case NAME:        \
         return #NAME;
             FOREACH_ERROR(ITER)
 #undef ITER

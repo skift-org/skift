@@ -142,19 +142,20 @@ extern "C" uintptr_t _intDispatch(uintptr_t rsp) {
     return rsp;
 }
 
+static x86_64::Pml<4> *_pml4 = nullptr;
 static Opt<x86_64::Vmm<Hal::UpperHalfMapper>> _vmm = NONE;
 
 Hal::Vmm &vmm() {
     if (_vmm == NONE) {
-        uintptr_t pml4 = Hjert::Mem::heap()
-                             .allocRange(Hal::PAGE_SIZE)
-                             .unwrap("failed to allocate pml4")
-                             .start;
+        uintptr_t paddr = Hjert::Mem::heap()
+                              .allocRange(Hal::PAGE_SIZE)
+                              .unwrap("failed to allocate pml4")
+                              .start;
 
-        memset(reinterpret_cast<void *>(pml4), 0, Hal::PAGE_SIZE);
-
+        memset(reinterpret_cast<void *>(paddr), 0, Hal::PAGE_SIZE);
+        _pml4 = reinterpret_cast<x86_64::Pml<4> *>(paddr);
         _vmm = x86_64::Vmm<Hal::UpperHalfMapper>{
-            Hjert::Mem::pmm(), reinterpret_cast<x86_64::Pml<4> *>(pml4)};
+            Hjert::Mem::pmm(), _pml4};
     }
 
     return *_vmm;
@@ -186,6 +187,68 @@ void start(Core::Task &task, uintptr_t ip, uintptr_t sp, Hj::Args args) {
     task
         .stack()
         .push(frame);
+}
+
+template <typename L, typename M>
+Res<> destroyPml(Hal::Pmm &pmm, L *pml, M mapper = {}) {
+    auto range = Hal::PmmRange{mapper.unmap((uintptr_t)pml), Hal::PAGE_SIZE};
+
+    // NOTE: we only need to free the first half of the pml4 since hupper is for the kernel
+    for (size_t i = 0; i < L::LEN / (L::LEVEL == 4 ? 2 : 1); i++) {
+        if (pml->pages[i].present()) {
+            if constexpr (L::LEVEL == 1) {
+                auto page = Hal::PmmRange{mapper.map(pml->pages[i].paddr()), Hal::PAGE_SIZE};
+                try$(pmm.free(page));
+            } else {
+                try$(destroyPml(pmm, (typename L::Lower *)mapper.map(pml->pages[i].paddr()), mapper));
+            }
+        }
+    }
+
+    try$(pmm.free(range));
+
+    return Ok();
+}
+
+struct Space :
+    public Core::Space {
+
+    x86_64::Vmm<Hal::UpperHalfMapper> _vmm;
+    x86_64::Pml<4> *_pml4;
+
+    Space(x86_64::Pml<4> *pml4)
+        : _vmm{Hjert::Mem::pmm(), pml4}, _pml4() {}
+
+    Space(Space &&other)
+        : _vmm(other._vmm),
+          _pml4(std::exchange(other._pml4, nullptr)) {
+    }
+
+    ~Space() {
+        destroyPml(Hjert::Mem::pmm(), _pml4, Hal::UpperHalfMapper{})
+            .unwrap("failed to destroy pml4");
+    }
+
+    Hal::Vmm &vmm() override {
+        return _vmm;
+    }
+};
+
+Res<Strong<Core::Space>> createSpace() {
+    uintptr_t paddr = Hjert::Mem::heap()
+                          .allocRange(Hal::PAGE_SIZE)
+                          .unwrap("failed to allocate pml4")
+                          .start;
+
+    auto *pml4 = reinterpret_cast<x86_64::Pml<4> *>(paddr);
+    memset(pml4, 0, Hal::PAGE_SIZE);
+
+    // Copy the kernel part of the pml4
+    for (size_t i = _pml4->LEN / 2; i < _pml4->LEN; i++) {
+        pml4->pages[i] = _pml4->pages[i];
+    }
+
+    return Ok(makeStrong<Space>(pml4));
 }
 
 } // namespace Hjert::Arch

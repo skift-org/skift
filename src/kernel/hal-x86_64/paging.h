@@ -48,8 +48,11 @@ static_assert(sizeof(Entry) == 8);
 template <size_t L>
 struct [[gnu::packed]] Pml {
     constexpr static size_t LEVEL = L;
+    constexpr static size_t LEN = 512;
 
-    Entry pages[512];
+    using Lower = Pml<L - 1>;
+
+    Entry pages[LEN];
 
     Entry &operator[](size_t i) { return pages[i]; }
 
@@ -74,7 +77,7 @@ struct [[gnu::packed]] Pml {
             return page.paddr() + (virt & 0x1ff);
         }
 
-        auto *pml = (Pml<L - 1> *)page.paddr();
+        auto *pml = (Lower *)page.paddr();
         return pml->virt2phys(virt);
     }
 

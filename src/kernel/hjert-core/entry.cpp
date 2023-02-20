@@ -1,3 +1,4 @@
+#include <elf/image.h>
 #include <handover/main.h>
 #include <karm-base/size.h>
 #include <karm-logger/logger.h>
@@ -47,11 +48,53 @@ Res<> validateAndDump(uint64_t magic, Handover::Payload &payload) {
     return Ok();
 }
 
-void taskBody() {
-    while (true) {
-        Arch::loggerOut().writeRune('B').unwrap();
-        Arch::cpu().relaxe();
+Res<> enterUserspace(Handover::Payload &payload) {
+    auto const *record = payload.fileByName("/servers/system");
+    if (!record) {
+        logInfo("entry: handover: no init file");
+        return Error::invalidInput("No init file");
     }
+
+    debug("ok");
+
+    auto space = try$(Space::create());
+
+    auto elfMem = try$(VNode::makeDma(record->range<Hal::DmaRange>()));
+    auto elfRange = try$(Mem::heap().pmm2Heap(elfMem->range()));
+    Elf::Image image{elfRange.bytes()};
+
+    debug("ok");
+    for (auto prog : image.programs()) {
+        if (prog.type() != Elf::Program::LOAD) {
+            continue;
+        }
+
+        size_t size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
+
+        if (!!(prog.flags() & Elf::ProgramFlags::WRITE)) {
+            auto sectionMem = try$(VNode::alloc(size, Hj::MemFlags::NONE));
+            auto sectionRange = try$(Mem::heap().pmm2Heap(sectionMem->range()));
+            debug("copy");
+            copy(prog.bytes(), sectionRange.mutBytes());
+            debug("map");
+            try$(space->map({prog.vaddr(), size}, sectionMem, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+        } else {
+            debug("map");
+            try$(space->map({prog.vaddr(), size}, elfMem, prog.offset(), Hj::MapFlags::READ | Hj::MapFlags::EXEC));
+        }
+    }
+
+    debug("ok");
+    auto STACK_SIZE = kib(16);
+    auto stackMem = try$(VNode::alloc(STACK_SIZE, Hj::MemFlags::NONE));
+    auto stackRange = try$(space->map({}, stackMem, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+
+    auto task = try$(Task::create(space));
+
+    debug("ok");
+    try$(Sched::self().start(task, image.header().entry, stackRange.end() - 8));
+
+    return Ok();
 }
 
 Res<> init(uint64_t magic, Handover::Payload &payload) {
@@ -63,17 +106,12 @@ Res<> init(uint64_t magic, Handover::Payload &payload) {
     try$(Mem::init(payload));
     try$(Sched::init(payload));
 
-    auto taskB = try$(Task::create(try$(Space::create())));
-    try$(Sched::self().start(taskB, (uintptr_t)taskBody));
-
     logInfo("entry: everything is ready, enabling interrupts...");
     Arch::cpu().retainEnable();
     Arch::cpu().enableInterrupts();
 
-    while (true) {
-        Arch::loggerOut().writeRune('A').unwrap();
-        Arch::cpu().relaxe();
-    }
+    logInfo("entry: entering userspace...");
+    try$(enterUserspace(payload));
 
     while (true)
         Arch::cpu().relaxe();

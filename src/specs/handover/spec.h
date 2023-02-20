@@ -108,6 +108,14 @@ struct Record {
     bool empty() const {
         return size == 0;
     }
+
+    template <typename R>
+    R range() const {
+        return R{
+            start,
+            size,
+        };
+    }
 };
 
 struct Payload {

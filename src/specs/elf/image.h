@@ -162,8 +162,20 @@ struct Program {
         return _header->flags;
     }
 
+    size_t offset() const {
+        return _header->offset;
+    }
+
     void *buf() {
-        return (void *)((uint8_t const *)_base + _header->offset);
+        return (void *)((uint8_t *)_base + _header->offset);
+    }
+
+    void const *buf() const {
+        return (void const *)((uint8_t const *)_base + _header->offset);
+    }
+
+    Bytes bytes() const {
+        return Bytes{(Byte *)buf(), _header->filesz};
     }
 
     size_t filez() const {

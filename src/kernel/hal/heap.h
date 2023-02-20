@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/range.h>
+#include <karm-base/slice.h>
 #include <karm-meta/nocopy.h>
 
 #include "pmm.h"
@@ -9,7 +10,17 @@ namespace Hal {
 
 struct Heap;
 
-using HeapRange = Range<size_t, struct HeapRangeTag>;
+struct HeapRange : public Range<size_t, struct HeapRangeTag> {
+    using Range::Range;
+
+    Bytes bytes() const {
+        return Bytes{(Byte const *)start, size};
+    }
+
+    MutBytes mutBytes() {
+        return MutBytes{(Byte *)start, size};
+    }
+};
 
 using HeapMem = Mem<Heap, HeapRange>;
 

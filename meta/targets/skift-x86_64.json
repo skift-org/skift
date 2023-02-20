@@ -12,8 +12,7 @@
         "karm-sys-encoding": "utf8",
         "karm-sys-line-ending": "lf",
         "karm-sys-path-separator": "slash",
-        "karm-cli-backend": "ansi",
-        "stdc-math": "dummy"
+        "karm-cli-backend": "ansi"
     },
     "routing": {
         "stdc-math": "stdc-math-musl"

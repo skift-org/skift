@@ -1,4 +1,5 @@
 {
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
     "id": "font-viewer-app",
     "type": "exe",
     "description": "View font files",

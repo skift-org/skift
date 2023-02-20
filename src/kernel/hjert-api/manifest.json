@@ -1,6 +1,6 @@
 {
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
     "id": "hjert-api",
     "type": "lib",
-    "description": "The Hjert micro-kernel APIs",
-    "requires": []
+    "description": "The Hjert micro-kernel APIs"
 }

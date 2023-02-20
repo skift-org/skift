@@ -1,4 +1,5 @@
 {
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.target.v1",
     "id": "host-arm64",
     "type": "target",
     "props": {

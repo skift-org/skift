@@ -1,4 +1,5 @@
 {
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.project.v1",
     "id": "skift-org/skift",
     "type": "project",
     "description": "The Skift Operating System",

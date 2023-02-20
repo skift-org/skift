@@ -1,4 +1,5 @@
 {
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
     "id": "sdl2",
     "type": "lib",
     "description": "A cross-platform development library designed to provide low level access to hardware",

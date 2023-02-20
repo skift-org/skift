@@ -1,4 +1,5 @@
 {
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
     "id": "file-manager",
     "type": "lib",
     "description": "Manage files and folders",

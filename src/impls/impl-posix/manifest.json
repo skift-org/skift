@@ -1,4 +1,5 @@
 {
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
     "id": "impl-posix",
     "type": "lib",
     "description": "Karm platform embedding layer for POSIX.",
@@ -8,8 +9,7 @@
             "darwin"
         ]
     },
-    "requires": [
-    ],
+    "requires": [],
     "provides": [
         "embed-sys-impl",
         "embed-base-impl",

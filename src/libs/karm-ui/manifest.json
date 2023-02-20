@@ -1,4 +1,5 @@
 {
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
     "id": "karm-ui",
     "type": "lib",
     "description": "A graphical user interface library",

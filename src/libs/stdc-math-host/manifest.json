@@ -1,4 +1,5 @@
 {
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
     "id": "stdc-math-host",
     "type": "lib",
     "description": "Place holder for the host stdc math library",

@@ -1,4 +1,5 @@
 {
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
     "id": "png-spec",
     "type": "lib",
     "description": "PNG Specification",

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <hal/vmm.h>
 #include <karm-base/array.h>
 #include <karm-base/enum.h>
 #include <karm-base/macros.h>
@@ -184,16 +185,7 @@ SYSCALL(ret) (Cap cap, Arg ret) {
     return syscall(Syscall::RET, cap.raw(), ret);
 }
 
-enum struct MapFlags : Arg {
-    NONE = 0,
-    READ = 1 << 0,
-    WRITE = 1 << 1,
-    EXEC = 1 << 2,
-    USER = 1 << 3,
-    GLOBAL = 1 << 4,
-};
-
-FlagsEnum$(MapFlags);
+using MapFlags = Hal::VmmFlags;
 
 SYSCALL(map) (Cap cap, uintptr_t* virt, Cap mem, uintptr_t off, size_t len, MapFlags flags = MapFlags::NONE) {
     return syscall(Syscall::MAP, cap.raw(), (Arg)virt, mem.raw(), off, len, (Arg)flags);

@@ -72,7 +72,7 @@ Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> mem, size_t of
 
     auto map = Map{vrange, off, std::move(mem)};
 
-    try$(vmm().allocRange(map.vrange, {map.mem->range().start + map.off, vrange.size}, Hal::VmmFlags::NONE));
+    try$(vmm().allocRange(map.vrange, {map.mem->range().start + map.off, vrange.size}, flags | Hal::VmmFlags::USER));
     _maps.pushBack(std::move(map));
 
     return Ok(vrange);

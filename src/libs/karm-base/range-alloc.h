@@ -41,14 +41,14 @@ struct RangeAlloc {
             if (_r[i].size == size) {
                 R result = _r[i];
                 _r.removeAt(i);
-                return result;
+                return Ok(result);
             }
 
             if (_r[i].size > size) {
                 R result = {_r[i].start, size};
                 _r[i].start += size;
                 _r[i].size -= size;
-                return result;
+                return Ok(result);
             }
         }
 

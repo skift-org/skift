@@ -65,7 +65,9 @@ Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> mem, size_t of
     }
 
     if (vrange.start == 0) {
+        debug("allocating vrange of size");
         vrange = try$(_alloc.alloc(vrange.size));
+        debug("ok");
     } else {
         _alloc.used(vrange);
     }

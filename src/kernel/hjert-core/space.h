@@ -34,6 +34,13 @@ struct Space {
     Lock _lock;
     RangeAlloc<Hal::VmmRange> _alloc;
     Vec<Map> _maps;
+
+    Space() {
+        _alloc.unused(Hal::VmmRange{0x400000, 0x800000000000});
+    }
+
+    virtual ~Space() = default;
+
     virtual Hal::Vmm &vmm() = 0;
 
     static Res<Strong<Space>> create();

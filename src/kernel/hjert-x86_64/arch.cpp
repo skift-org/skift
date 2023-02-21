@@ -191,6 +191,8 @@ void start(Core::Task &task, uintptr_t ip, uintptr_t sp, Hj::Args args) {
 
 template <typename L, typename M>
 Res<> destroyPml(Hal::Pmm &pmm, L *pml, M mapper = {}) {
+    logInfo("x86_64: destroying pml{} at {x}", L::LEVEL, (uintptr_t)pml);
+
     auto range = Hal::PmmRange{mapper.unmap((uintptr_t)pml), Hal::PAGE_SIZE};
 
     // NOTE: we only need to free the first half of the pml4 since hupper is for the kernel
@@ -217,7 +219,7 @@ struct Space :
     x86_64::Pml<4> *_pml4;
 
     Space(x86_64::Pml<4> *pml4)
-        : _vmm{Hjert::Mem::pmm(), pml4}, _pml4() {}
+        : _vmm{Hjert::Mem::pmm(), pml4}, _pml4(pml4) {}
 
     Space(Space &&other)
         : _vmm(other._vmm),

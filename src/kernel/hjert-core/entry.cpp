@@ -55,16 +55,21 @@ Res<> enterUserspace(Handover::Payload &payload) {
         return Error::invalidInput("No init file");
     }
 
-    debug("ok");
-
     auto space = try$(Space::create());
 
+    logInfo("entry: mapping elf...");
     auto elfMem = try$(VNode::makeDma(record->range<Hal::DmaRange>()));
     auto elfRange = try$(Mem::heap().pmm2Heap(elfMem->range()));
     Elf::Image image{elfRange.bytes()};
 
-    debug("ok");
+    if (!image.valid()) {
+        logInfo("entry: invalid elf");
+        return Error::invalidInput("Invalid elf");
+    }
+
     for (auto prog : image.programs()) {
+        logInfo("entry: program: {x} {x} {x} {x}", prog.offset(), prog.vaddr(), prog.memsz(), prog.filez());
+
         if (prog.type() != Elf::Program::LOAD) {
             continue;
         }
@@ -74,24 +79,20 @@ Res<> enterUserspace(Handover::Payload &payload) {
         if (!!(prog.flags() & Elf::ProgramFlags::WRITE)) {
             auto sectionMem = try$(VNode::alloc(size, Hj::MemFlags::NONE));
             auto sectionRange = try$(Mem::heap().pmm2Heap(sectionMem->range()));
-            debug("copy");
             copy(prog.bytes(), sectionRange.mutBytes());
-            debug("map");
             try$(space->map({prog.vaddr(), size}, sectionMem, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
         } else {
-            debug("map");
             try$(space->map({prog.vaddr(), size}, elfMem, prog.offset(), Hj::MapFlags::READ | Hj::MapFlags::EXEC));
         }
     }
 
-    debug("ok");
+    logInfo("entry: mapping stack...");
     auto STACK_SIZE = kib(16);
-    auto stackMem = try$(VNode::alloc(STACK_SIZE, Hj::MemFlags::NONE));
+    auto stackMem = try$(VNode::alloc(STACK_SIZE, Hj::MemFlags::HIGH));
     auto stackRange = try$(space->map({}, stackMem, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
 
+    logInfo("entry: creating task...");
     auto task = try$(Task::create(space));
-
-    debug("ok");
     try$(Sched::self().start(task, image.header().entry, stackRange.end() - 8));
 
     return Ok();

@@ -257,8 +257,9 @@ template <typename T>
 constexpr size_t copy(Slice<T> src, MutSlice<T> dest) {
     size_t copied = 0;
 
-    for (auto &elem : iter(src)) {
-        at(dest, copied++) = elem;
+    for (size_t i = 0; i < min(len(src), len(dest)); i++) {
+        at(dest, i) = at(src, i);
+        copied++;
     }
 
     return copied;

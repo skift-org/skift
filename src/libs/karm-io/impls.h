@@ -133,7 +133,7 @@ struct BufWriter :
     }
 
     Res<size_t> write(Bytes bytes) override {
-        MutBytes slice = mutSub(_buf, _pos, sizeOf(bytes));
+        MutBytes slice = mutNext(_buf, _pos);
         size_t written = copy(bytes, slice);
         _pos += written;
         return Ok(written);

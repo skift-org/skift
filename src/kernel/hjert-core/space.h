@@ -50,6 +50,8 @@ struct Space {
     Res<Hal::VmmRange> map(Hal::VmmRange vrange, Strong<VNode> mem, size_t off, Hj::MapFlags flags);
 
     Res<> unmap(Hal::VmmRange vrange);
+
+    void activate();
 };
 
 } // namespace Hjert::Core

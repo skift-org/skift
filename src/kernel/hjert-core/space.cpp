@@ -65,9 +65,7 @@ Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> mem, size_t of
     }
 
     if (vrange.start == 0) {
-        debug("allocating vrange of size");
         vrange = try$(_alloc.alloc(vrange.size));
-        debug("ok");
     } else {
         _alloc.used(vrange);
     }
@@ -91,6 +89,10 @@ Res<> Space::unmap(Hal::VmmRange vrange) {
     _alloc.unused(map.vrange);
     _maps.removeAt(id);
     return Ok();
+}
+
+void Space::activate() {
+    vmm().activate();
 }
 
 } // namespace Hjert::Core

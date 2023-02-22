@@ -1,0 +1,69 @@
+#pragma once
+
+#include "asm.h"
+#include "cpuid.h"
+
+namespace x86_64 {
+
+inline void simdInit() {
+    wrcr0(rdcr0() & ~((uint64_t)CR0_EMULATION));
+    wrcr0(rdcr0() | CR0_MONITOR_CO_PROCESSOR);
+    wrcr0(rdcr0() | CR0_NUMERIC_ERROR_ENABLE);
+
+    wrcr4(rdcr4() | CR4_FXSR_ENABLE);
+    wrcr4(rdcr4() | CR4_SIMD_EXCEPTION_SUPPORT);
+
+    if (Cpuid::hasXsave()) {
+        wrcr4(rdcr4() | CR4_XSAVE_ENABLE);
+
+        uint64_t xcr0 = 0;
+
+        xcr0 |= XCR0_XSAVE_SAVE_X87;
+        xcr0 |= XCR0_XSAVE_SAVE_SSE;
+
+        if (Cpuid::hasAvx()) {
+            xcr0 |= XCR0_AVX_ENABLE;
+        }
+
+        if (Cpuid::hasAvx512()) {
+            xcr0 |= XCR0_AVX512_ENABLE;
+            xcr0 |= XCR0_ZMM0_15_ENABLE;
+            xcr0 |= XCR0_ZMM16_32_ENABLE;
+        }
+
+        wrxcr(0, xcr0);
+    }
+
+    fninit();
+}
+
+inline size_t simdCtxSize() {
+    if (Cpuid::hasXsave()) {
+        return Cpuid::xsaveSize();
+    }
+
+    return 512;
+}
+
+inline void simdSaveCtx(void *ptr) {
+    if (Cpuid::hasXsave()) {
+        xsave(ptr);
+    } else {
+        fxsave(ptr);
+    }
+}
+
+inline void simdLoadCtx(void *ptr) {
+    if (Cpuid::hasXsave()) {
+        xrstor(ptr);
+    } else {
+        fxrstor(ptr);
+    }
+}
+
+inline void simdInitCtx(void *ptr) {
+    fninit();
+    simdSaveCtx(ptr);
+}
+
+} // namespace x86_64

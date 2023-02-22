@@ -8,6 +8,10 @@ namespace Hjert::Core {
 
 static Opt<Sched> _sched;
 
+Res<Box<Ctx>> Ctx::create() {
+    return Arch::createCtx();
+}
+
 /* --- Stack ----------------------------------------------------------------- */
 
 Res<Stack> Stack::create() {
@@ -21,8 +25,9 @@ Res<Stack> Stack::create() {
 
 Res<Strong<Task>> Task::create(Strong<Space> space) {
     logInfo("sched: creating task...");
+    auto ctx = try$(Ctx::create());
     auto stack = try$(Stack::create());
-    auto task = makeStrong<Task>(std::move(stack), space);
+    auto task = makeStrong<Task>(std::move(stack), space, std::move(ctx));
     return Ok(task);
 }
 

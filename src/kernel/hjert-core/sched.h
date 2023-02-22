@@ -2,6 +2,7 @@
 
 #include <hal/heap.h>
 #include <handover/spec.h>
+#include <karm-base/box.h>
 #include <karm-base/lock.h>
 #include <karm-base/rc.h>
 #include <karm-base/size.h>
@@ -11,6 +12,14 @@
 #include "space.h"
 
 namespace Hjert::Core {
+
+struct Ctx {
+    static Res<Box<Ctx>> create();
+
+    virtual ~Ctx() = default;
+    virtual void save() = 0;
+    virtual void load() = 0;
+};
 
 /* --- Stack ----------------------------------------------------------------- */
 
@@ -41,6 +50,7 @@ struct Stack {
 struct Task {
     Stack _stack;
     Strong<Space> _space;
+    Box<Ctx> _ctx;
 
     Tick _sliceStart = 0;
     Tick _sliceEnd = 0;
@@ -49,11 +59,22 @@ struct Task {
 
     static Task &self();
 
-    Task(Stack stack, Strong<Space> space)
-        : _stack(std::move(stack)), _space(space) {
+    Task(Stack stack, Strong<Space> space, Box<Ctx> ctx)
+        : _stack(std::move(stack)), _space(space), _ctx(std::move(ctx)) {
     }
 
     Stack &stack() { return _stack; }
+
+    void saveCtx(uintptr_t sp) {
+        _stack.saveSp(sp);
+        _ctx->save();
+    }
+
+    uintptr_t loadCtx() {
+        _space->activate();
+        _ctx->load();
+        return _stack.loadSp();
+    }
 };
 
 /* --- Sched ---------------------------------------------------------------- */

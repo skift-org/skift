@@ -35,4 +35,8 @@ extern "C" Array<uintptr_t, 256> _intVec;
 
 extern "C" uintptr_t _intDispatch(uintptr_t rsp);
 
+extern "C" void _sysHandler();
+
+extern "C" uintptr_t _sysDispatch(uintptr_t rsp);
+
 } // namespace Hjert::Arch

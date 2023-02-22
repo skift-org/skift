@@ -2,6 +2,7 @@
 #include <hjert-core/cpu.h>
 #include <hjert-core/mem.h>
 #include <hjert-core/sched.h>
+#include <hjert-core/syscalls.h>
 #include <karm-logger/logger.h>
 
 #include <hal-x86_64/com.h>
@@ -10,6 +11,8 @@
 #include <hal-x86_64/idt.h>
 #include <hal-x86_64/pic.h>
 #include <hal-x86_64/pit.h>
+#include <hal-x86_64/simd.h>
+#include <hal-x86_64/sys.h>
 #include <hal-x86_64/vmm.h>
 
 #include "ints.h"
@@ -30,6 +33,7 @@ static x86_64::Idt _idt{};
 static x86_64::IdtDesc _idtDesc{_idt};
 
 Res<> init(Handover::Payload &) {
+
     _com1.init();
 
     _gdtDesc.load();
@@ -42,6 +46,9 @@ Res<> init(Handover::Payload &) {
 
     _pic.init();
     _pit.init(1000);
+
+    x86_64::simdInit();
+    x86_64::sysInit(_sysHandler);
 
     return Ok();
 }
@@ -116,8 +123,8 @@ static char const *_faultMsg[32] = {
     "reserved",
 };
 
-extern "C" uintptr_t _intDispatch(uintptr_t rsp) {
-    auto *frame = reinterpret_cast<Frame *>(rsp);
+extern "C" uintptr_t _intDispatch(uintptr_t sp) {
+    auto *frame = reinterpret_cast<Frame *>(sp);
 
     cpu().beginInterrupt();
 
@@ -127,9 +134,9 @@ extern "C" uintptr_t _intDispatch(uintptr_t rsp) {
         int irq = frame->intNo - 32;
 
         if (irq == 0) {
-            Core::Task::self().stack().saveSp(rsp);
+            Core::Task::self().saveCtx(sp);
             Core::Sched::self().schedule();
-            rsp = Core::Task::self().stack().loadSp();
+            sp = Core::Task::self().loadCtx();
         } else {
             logInfo("x86_64: irq: {}", irq);
         }
@@ -139,7 +146,14 @@ extern "C" uintptr_t _intDispatch(uintptr_t rsp) {
 
     cpu().endInterrupt();
 
-    return rsp;
+    return sp;
+}
+
+extern "C" uintptr_t _sysDispatch(uintptr_t sp) {
+    auto *frame = reinterpret_cast<Frame *>(sp);
+    return (uintptr_t)Core::dispatchSyscall(
+        (Hj::Syscall)frame->rax,
+        {frame->rdi, frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9});
 }
 
 static x86_64::Pml<4> *_pml4 = nullptr;
@@ -210,6 +224,29 @@ Res<> destroyPml(Hal::Pmm &pmm, L *pml, M mapper = {}) {
     try$(pmm.free(range));
 
     return Ok();
+}
+
+struct Ctx : public Core::Ctx {
+    uintptr_t ksp;
+    uintptr_t usp;
+    Array<Byte, Hal::PAGE_SIZE> simd __attribute__((aligned(16)));
+
+    Ctx() : ksp(0), usp(0) {
+        x86_64::simdInitCtx(simd.buf());
+    }
+
+    virtual void save() {
+        x86_64::simdSaveCtx(simd.buf());
+        x86_64::sysSetGs((uintptr_t)&ksp);
+    }
+
+    virtual void load() {
+        x86_64::simdLoadCtx(simd.buf());
+    }
+};
+
+Res<Box<Core::Ctx>> createCtx() {
+    return Ok<Box<Core::Ctx>>(makeBox<Ctx>());
 }
 
 struct Space :

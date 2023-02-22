@@ -4,7 +4,7 @@
 #include "arch.h"
 #include "sched.h"
 
-namespace Hjert {
+namespace Hjert::Core {
 
 Hj::Code sysLog(char const *msg, size_t len) {
     (void)msg;
@@ -138,4 +138,4 @@ Hj::Code dispatchSyscall(Hj::Syscall id, Hj::Args args) {
     }
 }
 
-} // namespace Hjert
+} // namespace Hjert::Core

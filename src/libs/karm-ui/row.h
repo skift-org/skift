@@ -58,7 +58,7 @@ inline Child pressableRow(OnPress onPress, Opt<Child> leading, String title, Opt
             trailing));
 }
 
-inline Child buttonRow(OnPress onPress, Media::Icons i, String title, String subtitle) {
+inline Child buttonRow(OnPress onPress, Mdi::Icon i, String title, String subtitle) {
     return button(
         std::move(onPress),
         ButtonStyle::subtle(),
@@ -113,7 +113,7 @@ inline Child sliderRow(double value, OnChange<double> onChange, String title) {
     return sliderRow(SliderStyle::regular(), value, std::move(onChange), title);
 }
 
-inline Child navRow(bool selected, OnPress onPress, Media::Icons i, String title) {
+inline Child navRow(bool selected, OnPress onPress, Mdi: i, String title) {
     auto buttonStyle = ButtonStyle::regular();
     buttonStyle.idleStyle = {
         .borderRadius = 4,
@@ -148,7 +148,7 @@ inline Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Chi
                 leading,
                 title,
                 subtitle,
-                icon(state.value() ? Media::Icons::CHEVRON_UP : Media::Icons::CHEVRON_DOWN, 24)),
+                icon(state.value() ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 24)),
             state.value() ? spacing(
                                 {38, 0, 0, 0},
                                 child)

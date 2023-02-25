@@ -30,7 +30,7 @@ Ui::Child errorScope(auto callback) {
             6,
             Ui::center(
                 Ui::icon(
-                    Media::Icons::ALERT_DECAGRAM_OUTLINE, 26)),
+                    Mdi::ALERT_DECAGRAM_OUTLINE, 26)),
             Ui::vflow(
                 4,
                 Ui::text(Ui::TextStyle::titleMedium().withColor(Gfx::WHITE), "Something went wrong"),
@@ -39,7 +39,7 @@ Ui::Child errorScope(auto callback) {
 
 Ui::Child userInfos() {
     return Ui::treeRow(
-        Ui::icon(Media::Icons::ACCOUNT),
+        Ui::icon(Mdi::ACCOUNT),
         "User",
         NONE,
         errorScope([&] -> Res<Ui::Child> {
@@ -53,7 +53,7 @@ Ui::Child userInfos() {
 
 Ui::Child sysInfos() {
     return Ui::treeRow(
-        Ui::icon(Media::Icons::INFORMATION_OUTLINE),
+        Ui::icon(Mdi::INFORMATION_OUTLINE),
         "System",
         NONE,
         errorScope([&] -> Res<Ui::Child> {
@@ -68,7 +68,7 @@ Ui::Child sysInfos() {
 
 Ui::Child memInfos() {
     return Ui::treeRow(
-        Ui::icon(Media::Icons::MEMORY),
+        Ui::icon(Mdi::MEMORY),
         "Memory",
         NONE,
         errorScope([&] -> Res<Ui::Child> {
@@ -81,7 +81,7 @@ Ui::Child memInfos() {
 
 Ui::Child cpuInfos() {
     return Ui::treeRow(
-        Ui::icon(Media::Icons::CPU_64_BIT),
+        Ui::icon(Mdi::CPU_64_BIT),
         "CPU",
         NONE,
         errorScope([&] -> Res<Ui::Child> {
@@ -102,32 +102,34 @@ Ui::Child cpuInfos() {
 }
 
 Ui::Child details() {
-    return Ui::grow(
-        Ui::vscroll(
-            Ui::card(
-                Ui::vflow(
-                    userInfos(),
-                    Ui::separator(),
-                    sysInfos(),
-                    Ui::separator(),
-                    memInfos(),
-                    Ui::separator(),
-                    cpuInfos()))));
+    return Ui::vflow(
+               userInfos(),
+               Ui::separator(),
+               sysInfos(),
+               Ui::separator(),
+               memInfos(),
+               Ui::separator(),
+               cpuInfos()) |
+           Ui::card() |
+           Ui::vscroll();
 }
 
 Res<> entryPoint(CliArgs args) {
-    auto logo = Ui::box(
-        {
-            .padding = 32,
-            .backgroundPaint = Gfx::WHITE,
-            .foregroundPaint = Gfx::BLACK,
-        },
-        Ui::bound(Ui::center(Ui::icon(Media::Icons::SNOWFLAKE, 64))));
+
+    auto logo = Ui::icon(Mdi::SNOWFLAKE, 64) |
+                Ui::center() |
+                Ui::bound() |
+                Ui::box(
+                    {
+                        .padding = 32,
+                        .backgroundPaint = Gfx::WHITE,
+                        .foregroundPaint = Gfx::BLACK,
+                    });
 
     auto licenseBtn = Ui::button(
         NONE,
         Ui::ButtonStyle::subtle().withRadius(999),
-        Media::Icons::LICENSE,
+        Mdi::LICENSE,
         "LICENSE");
 
     auto closeBtn = Ui::button(
@@ -144,25 +146,26 @@ Res<> entryPoint(CliArgs args) {
             8,
             Ui::hflow(8,
                       Ui::text(Ui::TextStyle::titleLarge(), "skiftOS"),
-                      Ui::center(Ui::badge(Ui::BadgeStyle::INFO, "v0.1.0"))),
+                      Ui::badge(Ui::BadgeStyle::INFO, "v0.1.0") | Ui::center()),
             Ui::empty(),
             Ui::text("Copyright © 2018-2022"),
             Ui::text("SMNX & contributors."),
             details(),
-            Ui::hflow(8, licenseBtn, Ui::grow(), closeBtn)));
+            Ui::hflow(
+                8,
+                licenseBtn,
+                Ui::grow(NONE),
+                closeBtn)));
 
     auto titlebar = Ui::titlebar(
-        Media::Icons::INFORMATION,
+        Mdi::INFORMATION,
         "About",
         Ui::TitlebarStyle::DIALOG);
 
     auto wrapper =
-        Ui::vflow(titlebar, logo, Ui::grow(content));
+        Ui::vflow(titlebar, logo, content | Ui::grow()) |
+        Ui::pinSize({400, 550}) |
+        Ui::dialogLayer();
 
-    auto layout = Ui::dragRegion(
-        Ui::pinSize(
-            {400, 550},
-            wrapper));
-
-    return Ui::runApp(args, Ui::dialogLayer(layout));
+    return Ui::runApp(args, wrapper);
 }

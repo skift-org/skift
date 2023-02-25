@@ -11,7 +11,7 @@
 
 namespace Counter {
 
-Ui::Child rounedButton(Func<void(Ui::Node &)> onPress, Ui::ButtonStyle style, Media::Icons i) {
+Ui::Child rounedButton(Func<void(Ui::Node &)> onPress, Ui::ButtonStyle style, Media::Icon i) {
     return Ui::button(
         std::move(onPress),
         style,
@@ -30,17 +30,17 @@ Ui::Child app() {
         auto decBtn = Ui::button(
             Model::bind<DecrementAction>(),
             Ui::ButtonStyle::regular().withRadius(999),
-            Media::Icons::MINUS_THICK);
+            Mdi::MINUS_THICK);
 
         auto incBtn = Ui::button(
             Model::bind<IncrementAction>(),
             Ui::ButtonStyle::regular().withRadius(999),
-            Media::Icons::PLUS_THICK);
+            Mdi::PLUS_THICK);
 
         auto resetBtn = Ui::button(
             Model::bindIf<ResetAction>(not state.initial),
             Ui::ButtonStyle::subtle().withRadius(999),
-            Media::Icons::REFRESH, "RESET");
+            Mdi::REFRESH, "RESET");
 
         return Ui::spacing(
             32,
@@ -60,7 +60,7 @@ Ui::Child app() {
             420,
             Ui::vflow(
                 Ui::titlebar(
-                    Media::Icons::COUNTER,
+                    Mdi::COUNTER,
                     "Counter",
                     Ui::TitlebarStyle::DIALOG),
                 Ui::grow(content))));

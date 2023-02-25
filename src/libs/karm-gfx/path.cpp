@@ -447,7 +447,13 @@ bool Path::evalSvg(Str svg) {
         scan.skip(Re::zeroOrMore(Re::space()));
 
         do {
-            evalOp(try$(parseOp(scan, opcode)));
+            auto maybeOp = parseOp(scan, opcode);
+
+            if (not maybeOp) {
+                return false;
+            }
+
+            evalOp(maybeOp.unwrap());
             scan.skip(Re::zeroOrMore(Re::space()));
 
             opcode = opcode == 'M' ? 'L' : opcode;

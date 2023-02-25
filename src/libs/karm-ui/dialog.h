@@ -33,9 +33,22 @@ Child dialog(DialogFn<T> fn, Child inner) {
     return supplier<Dialog<T>>(inner, std::move(fn));
 }
 
+template <typename T>
+inline auto dialog(DialogFn<T> fn) {
+    return [fn = std::move(fn)](Child inner) {
+        return dialog(std::move(fn), inner);
+    };
+}
+
 /* ---  Dialog Base  -------------------------------------------------------- */
 
 Child dialogLayer(Child child);
+
+inline auto dialogLayer() {
+    return [](Child child) {
+        return dialogLayer(child);
+    };
+}
 
 void showDialog(Node &n, Child child);
 
@@ -54,7 +67,19 @@ void showPopover(Node &n, Math::Vec2i at, Child child);
 
 Child dialogScafold(Layout::Align a, Child inner);
 
+inline auto dialogScafold(Layout::Align a) {
+    return [a](Child inner) {
+        return dialogScafold(a, inner);
+    };
+}
+
 Child dialogScafold(Layout::Align a, Child content, Children actions);
+
+inline auto dialogScafold(Layout::Align a, Children content) {
+    return [a, content = std::move(content)](Child inner) {
+        return dialogScafold(a, inner, content);
+    };
+}
 
 Child dialogButton(DialogButton result, bool primary = false);
 
@@ -62,9 +87,9 @@ Child dialogButtons(DialogButton buttons, DialogButton primary);
 
 /* --- Dialogs -------------------------------------------------------------- */
 
-Child aboutDialog(Media::Icons icon, String name);
+Child aboutDialog(Mdi::Icon icon, String name);
 
-void showAboutDialog(Node &n, Media::Icons icon, String name);
+void showAboutDialog(Node &n, Mdi::Icon icon, String name);
 
 Child msgDialog(String title, String msg);
 

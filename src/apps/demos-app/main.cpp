@@ -9,7 +9,7 @@
 #include <karm-ui/view.h>
 
 struct Demo {
-    Media::Icons icon;
+    Media::Icon icon;
     Str name;
     Str description;
     Ui::Build build;
@@ -17,7 +17,7 @@ struct Demo {
 
 static Array demos = {
     Demo{
-        Media::Icons::SVG,
+        Mdi::SVG,
         "SVG",
         "SVG rendering",
         []() {
@@ -38,7 +38,7 @@ static Array demos = {
         },
     },
     Demo{
-        Media::Icons::VECTOR_LINE,
+        Mdi::VECTOR_LINE,
         "Strokes",
         "Strokes styling and rendering",
         []() {
@@ -68,7 +68,7 @@ static Array demos = {
         },
     },
     Demo{
-        Media::Icons::CIRCLE,
+        Mdi::CIRCLE,
         "Circles",
         "Circles rendering",
         []() {
@@ -95,13 +95,13 @@ static Array demos = {
         },
     },
     Demo{
-        Media::Icons::COFFEE,
+        Mdi::COFFEE,
         "Icons",
         "Icons rendering",
         []() {
             return Ui::canvas(
                 [](Gfx::Context &g, Math::Vec2i) {
-                    Media::Icon icon = {Media::Icons::COFFEE, 256};
+                    Media::Icon icon = {Mdi::COFFEE, 256};
 
                     g.fillStyle(Gfx::ZINC700);
                     g.fill(0, icon);
@@ -112,7 +112,7 @@ static Array demos = {
         },
     },
     Demo{
-        Media::Icons::GRADIENT_HORIZONTAL,
+        Mdi::GRADIENT_HORIZONTAL,
         "Gradients",
         "Gradients rendering",
         []() {
@@ -122,7 +122,7 @@ static Array demos = {
                     auto transFlag = Gfx::Gradient::linear()
                                          .withColors(Gfx::RED, Gfx::ORANGE, Gfx::YELLOW, Gfx::GREEN, Gfx::BLUE, Gfx::INDIGO, Gfx::VIOLET);
                     g.fillStyle(transFlag);
-                    // Media::Icon icon = {Media::Icons::CAT, 256};
+                    // Media::Icon icon = {Mdi::CAT, 256};
                     g.fill(bound);
 
                     g.fillStyle(Gfx::WHITE);
@@ -131,7 +131,7 @@ static Array demos = {
         },
     },
     Demo{
-        Media::Icons::HAND_WAVE,
+        Mdi::HAND_WAVE,
         "Hello, world!",
         "Hello, world!",
         []() {
@@ -139,7 +139,7 @@ static Array demos = {
         },
     },
     Demo{
-        Media::Icons::LIST_BOX_OUTLINE,
+        Mdi::LIST_BOX_OUTLINE,
         "Inputs",
         "Form inputs widgets",
         []() {
@@ -167,7 +167,7 @@ static Array demos = {
             auto list = Ui::card(
                 button,
                 Ui::separator(),
-                Ui::treeRow(Ui::icon(Media::Icons::TOGGLE_SWITCH), "Switches", NONE,
+                Ui::treeRow(Ui::icon(Mdi::TOGGLE_SWITCH), "Switches", NONE,
                             {
                                 toggle,
                                 toggle1,
@@ -175,7 +175,7 @@ static Array demos = {
                             }),
 
                 Ui::separator(),
-                Ui::treeRow(Ui::icon(Media::Icons::CHECKBOX_MARKED), "Checkboxs", NONE,
+                Ui::treeRow(Ui::icon(Mdi::CHECKBOX_MARKED), "Checkboxs", NONE,
                             {
                                 checkbox,
                                 checkbox1,
@@ -183,7 +183,7 @@ static Array demos = {
                             }),
 
                 Ui::separator(),
-                Ui::treeRow(Ui::icon(Media::Icons::RADIOBOX_MARKED), "Radios", NONE,
+                Ui::treeRow(Ui::icon(Mdi::RADIOBOX_MARKED), "Radios", NONE,
                             {
                                 radio,
                                 radio1,
@@ -202,33 +202,33 @@ static Array demos = {
         },
     },
     Demo{
-        Media::Icons::TEXT,
+        Mdi::TEXT,
         "Typography",
         "Typography",
         []() {
             return Ui::vflow(
-                Ui::treeRow(Ui::icon(Media::Icons::TEXT), "Display", NONE,
+                Ui::treeRow(Ui::icon(Mdi::TEXT), "Display", NONE,
                             {
                                 Ui::text(Ui::TextStyle::displayLarge(), "Display Large"),
                                 Ui::text(Ui::TextStyle::displayMedium(), "Display Medium"),
                                 Ui::text(Ui::TextStyle::displaySmall(), "Display Small"),
                             }),
 
-                Ui::treeRow(Ui::icon(Media::Icons::TEXT), "Headlines", NONE,
+                Ui::treeRow(Ui::icon(Mdi::TEXT), "Headlines", NONE,
                             {
                                 Ui::text(Ui::TextStyle::headlineLarge(), "Headline Large"),
                                 Ui::text(Ui::TextStyle::headlineMedium(), "Headline Medium"),
                                 Ui::text(Ui::TextStyle::headlineSmall(), "Headline Small"),
                             }),
 
-                Ui::treeRow(Ui::icon(Media::Icons::TEXT), "Titles", NONE,
+                Ui::treeRow(Ui::icon(Mdi::TEXT), "Titles", NONE,
                             {
                                 Ui::text(Ui::TextStyle::titleLarge(), "Title Large"),
                                 Ui::text(Ui::TextStyle::titleMedium(), "Title Medium"),
                                 Ui::text(Ui::TextStyle::titleSmall(), "Title Small"),
                             }),
 
-                Ui::treeRow(Ui::icon(Media::Icons::TEXT), "Body", NONE,
+                Ui::treeRow(Ui::icon(Mdi::TEXT), "Body", NONE,
                             {
                                 Ui::text(Ui::TextStyle::bodyLarge(), "Body Large"),
                                 Ui::text(Ui::TextStyle::bodyMedium(), "Body Medium"),
@@ -237,7 +237,7 @@ static Array demos = {
         },
     },
     Demo{
-        Media::Icons::COUNTER,
+        Mdi::COUNTER,
         "Counter",
         "Counter demo",
         []() {
@@ -247,7 +247,7 @@ static Array demos = {
                         [state](Ui::Node &) mutable {
                             state.update(state.value() + 1);
                         },
-                        Media::Icons::PLUS),
+                        Mdi::PLUS),
                     Ui::center(
                         Ui::spacing(
                             12,
@@ -256,7 +256,7 @@ static Array demos = {
                         [state](Ui::Node &) mutable {
                             state.update(state.value() - 1);
                         },
-                        Media::Icons::MINUS));
+                        Mdi::MINUS));
             });
         },
     }};
@@ -297,7 +297,7 @@ Ui::Child sidebar(State s) {
 
 Res<> entryPoint(CliArgs args) {
     auto titlebar = Ui::titlebar(
-        Media::Icons::DUCK,
+        Mdi::DUCK,
         "Demos",
         Ui::TitlebarStyle::DEFAULT);
 

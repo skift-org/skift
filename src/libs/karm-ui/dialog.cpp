@@ -252,7 +252,7 @@ Child dialogCloseButton() {
 
 /* --- Dialogs -------------------------------------------------------------- */
 
-Child aboutDialog(Media::Icons i, String name) {
+Child aboutDialog(Mdi::Icon i, String name) {
     auto content = vflow(
         8,
         Layout::Align::CENTER,
@@ -266,7 +266,7 @@ Child aboutDialog(Media::Icons i, String name) {
 
     Children actions = {
         button(NONE, ButtonStyle::subtle(), "LICENSE"),
-        grow(),
+        grow(NONE),
         dialogCloseButton(),
     };
 
@@ -276,7 +276,7 @@ Child aboutDialog(Media::Icons i, String name) {
         actions);
 }
 
-void showAboutDialog(Node &n, Media::Icons icon, String name) {
+void showAboutDialog(Node &n, Mdi::Icon icon, String name) {
     showDialog(n, aboutDialog(icon, name));
 }
 
@@ -284,7 +284,7 @@ Child msgDialog(String title, String msg) {
     auto titleLbl = text(TextStyle::titleMedium(), title);
     auto msgLbl = text(msg);
     Children actions = {
-        grow(),
+        grow(NONE),
         button(
             closeDialog,
             ButtonStyle::primary(), "OK"),

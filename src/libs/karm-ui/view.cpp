@@ -256,7 +256,7 @@ Child icon(Media::Icon icon, Opt<Gfx::Color> color) {
     return makeStrong<Icon>(icon, color);
 }
 
-Child icon(Media::Icons i, double size, Opt<Gfx::Color> color) {
+Child icon(Mdi::Icon i, double size, Opt<Gfx::Color> color) {
     return icon(Media::Icon{i, size}, color);
 }
 

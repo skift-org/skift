@@ -179,7 +179,7 @@ struct Args : public _Args {
     size_t len() override { return _tuple.len(); }
 
     Res<size_t> format(Text::Scan &scan, Io::_TextWriter &writer, size_t index) override {
-        Res<size_t> result = Ok();
+        Res<size_t> result = Error("format index out of range");
         size_t i = 0;
         _tuple.visit([&](auto const &t) {
             if (index == i) {

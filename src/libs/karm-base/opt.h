@@ -18,7 +18,7 @@ struct Opt;
 
 template <typename T>
 struct [[nodiscard]] Opt {
-    bool _present{};
+    bool _present = false;
     Inert<T> _value{};
 
     Opt() {}
@@ -27,12 +27,14 @@ struct [[nodiscard]] Opt {
 
     template <typename U = T>
     Opt(U &&value)
-        requires(!Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::Constructible<T, U &&>)
+        requires(!Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::MoveConstructible<T, U>)
         : _present(true) {
         _value.ctor(std::forward<U>(value));
     }
 
-    Opt(Opt const &other) : _present(other._present) {
+    Opt(Opt const &other)
+        requires(Meta::CopyConstructible<T>)
+        : _present(other._present) {
         if (_present) {
             _value.ctor(other.unwrap());
         }
@@ -84,7 +86,7 @@ struct [[nodiscard]] Opt {
         return not _present;
     }
 
-    constexpr explicit operator bool() const {
+    operator bool() const {
         return _present;
     }
 

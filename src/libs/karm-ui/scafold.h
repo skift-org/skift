@@ -14,7 +14,7 @@ enum struct TitlebarStyle {
 
 Child controls(TitlebarStyle style = TitlebarStyle::DEFAULT);
 
-Child titlebar(Media::Icons icon, String title, TitlebarStyle style = TitlebarStyle::DEFAULT);
+Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style = TitlebarStyle::DEFAULT);
 
 enum struct BadgeStyle {
     INFO,
@@ -37,8 +37,14 @@ inline Child card(Child child) {
                child);
 }
 
+inline auto card() {
+    return [](Child child) {
+        return card(child);
+    };
+}
+
 inline Child card(Children children) { return card(vflow(children)); }
 
-inline Child card(Meta::Same<Child> auto... children) { return card({children...}); }
+inline Child card(Child child, Meta::Same<Child> auto... children) { return card({child, children...}); }
 
 } // namespace Karm::Ui

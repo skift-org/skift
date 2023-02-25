@@ -139,8 +139,14 @@ struct Box : public _Box<Box> {
     }
 };
 
-inline Child box(BoxStyle style, Child child) {
-    return makeStrong<Box>(style, child);
+inline Child box(BoxStyle style, Child inner) {
+    return makeStrong<Box>(style, inner);
+}
+
+inline auto box(BoxStyle style) {
+    return [=](Child inner) {
+        return box(style, inner);
+    };
 }
 
 } // namespace Karm::Ui

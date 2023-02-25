@@ -32,7 +32,7 @@ Res<> entryPoint(CliArgs args) {
                              : Ok(Media::Fontface::fallback()));
 
     auto titlebar = Ui::titlebar(
-        Media::Icons::FORMAT_FONT,
+        Mdi::FORMAT_FONT,
         "Font Viewer");
 
     auto toolbar = Ui::toolbar(
@@ -41,9 +41,9 @@ Res<> entryPoint(CliArgs args) {
                 Ui::showDialog(n, FileManager::openFileDialog());
             },
             Ui::ButtonStyle::subtle(),
-            Media::Icons::FOLDER_OPEN),
+            Mdi::FOLDER_OPEN),
 
-        Ui::grow(), Ui::state(false, [](auto state) {
+        Ui::grow(NONE), Ui::state(false, [](auto state) {
             Func<void(Ui::Node &)> uninstallFont = [state](auto &n) mutable {
                 state.update(false);
                 Ui::showMsgDialog(n, "Font uninstalled", "The font was uninstalled successfully.");

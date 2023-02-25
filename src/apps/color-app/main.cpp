@@ -181,7 +181,7 @@ Ui::Child colorCell(Gfx::Color c, Ui::State<Gfx::Hsv> state) {
         Ui::box(
             boxStyle,
             Op::eq(state.value(), cHsv)
-                ? Ui::icon(Media::Icons::CHECK, 32, pickColor(c))
+                ? Ui::icon(Mdi::CHECK, 32, pickColor(c))
                 : Ui::empty(32)));
 }
 
@@ -216,11 +216,11 @@ Ui::Child colorPicker() {
                 Ui::button(
                     pageState.bindValue(true),
                     (pageState.value()) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
-                    Media::Icons::EYEDROPPER, "Color Picker"),
+                    Mdi::EYEDROPPER, "Color Picker"),
                 Ui::button(
                     pageState.bindValue(false),
                     (not pageState.value()) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
-                    Media::Icons::PALETTE_SWATCH, "Palette"));
+                    Mdi::PALETTE_SWATCH, "Palette"));
 
             return Ui::spacing(
                 8,

@@ -426,16 +426,22 @@ struct Grow : public ProxyNode<Grow> {
     }
 };
 
-Child grow(Child child) {
-    return makeStrong<Grow>(child);
+Child grow(Opt<Child> child) {
+    return makeStrong<Grow>(tryOrElse(
+        child,
+        []() {
+            return empty();
+        }));
 }
 
-Child grow(int grow, Child child) {
-    return makeStrong<Grow>(grow, child);
-}
-
-Child grow(int g) {
-    return grow(g, empty());
+Child grow(int grow, Opt<Child> child) {
+    return makeStrong<Grow>(
+        grow,
+        tryOrElse(
+            child,
+            []() {
+                return empty();
+            }));
 }
 
 struct FlowLayout : public GroupNode<FlowLayout> {

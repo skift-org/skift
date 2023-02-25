@@ -10,29 +10,28 @@ namespace Karm::Ui {
 
 Child controls(TitlebarStyle style) {
     return hflow(8,
-                 cond(style == TitlebarStyle::DEFAULT, button(NONE, ButtonStyle::subtle(), Media::Icons::MINUS)),
-                 cond(style == TitlebarStyle::DEFAULT, button(NONE, ButtonStyle::subtle(), Media::Icons::CROP_SQUARE)),
+                 button(NONE, ButtonStyle::subtle(), Mdi::MINUS) | cond(style == TitlebarStyle::DEFAULT),
+                 button(NONE, ButtonStyle::subtle(), Mdi::CROP_SQUARE) | cond(style == TitlebarStyle::DEFAULT),
                  button(
                      [](Node &n) {
                          Events::ExitEvent e{Ok()};
                          n.bubble(e);
                      },
-                     ButtonStyle::subtle(), Media::Icons::CLOSE));
+                     ButtonStyle::subtle(), Mdi::CLOSE));
 }
 
-Child titlebar(Media::Icons icon, String title, TitlebarStyle style) {
-    return dragRegion(
-        spacing(
-            8,
-            hflow(
-                4,
-                button(
-                    [=](auto &n) {
-                        showAboutDialog(n, icon, title);
-                    },
-                    ButtonStyle::subtle(), icon, title),
-                grow(),
-                controls(style))));
+Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {
+    return hflow(
+               4,
+               button(
+                   [=](auto &n) {
+                       showAboutDialog(n, icon, title);
+                   },
+                   ButtonStyle::subtle(), icon, title),
+               grow(NONE),
+               controls(style)) |
+           spacing(8) |
+           dragRegion();
 }
 
 auto lookup(auto k, auto &m) {
@@ -57,12 +56,13 @@ Child badge(BadgeStyle style, String t) {
 
     Gfx::Color color = lookup(style, styleToColor);
 
-    return box({
-                   .borderRadius = 99,
-                   .backgroundPaint = color.withOpacity(0.1),
-                   .foregroundPaint = color,
-               },
-               spacing({8, 4}, text(t)));
+    return text(t) |
+           box({
+               .padding = {8, 4},
+               .borderRadius = 99,
+               .backgroundPaint = color.withOpacity(0.1),
+               .foregroundPaint = color,
+           });
 }
 
 static BoxStyle TOOLBAR = {
@@ -70,7 +70,11 @@ static BoxStyle TOOLBAR = {
 };
 
 Child toolbar(Children children) {
-    return vflow(box(TOOLBAR, spacing(8, hflow(4, children))), separator());
+    return vflow(
+        hflow(4, children) |
+            spacing(8) |
+            box(TOOLBAR),
+        separator());
 }
 
 } // namespace Karm::Ui

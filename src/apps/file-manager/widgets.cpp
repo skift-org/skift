@@ -16,7 +16,7 @@ Ui::Child directorEntry(Sys::DirEntry const &entry) {
     return Ui::button(
         Model::bind<GoTo>(entry.name),
         Ui::ButtonStyle::subtle(),
-        entry.isDir ? Media::Icons::FOLDER : Media::Icons::FILE,
+        entry.isDir ? Mdi::FOLDER : Mdi::FILE,
         entry.name);
 }
 
@@ -37,7 +37,7 @@ Ui::Child breadcrumbItem(Str text, int index) {
             Ui::hflow(
                 4,
                 Layout::Align::CENTER,
-                Ui::icon(Media::Icons::CHEVRON_RIGHT),
+                Ui::icon(Mdi::CHEVRON_RIGHT),
                 Ui::text(text))));
 }
 
@@ -49,24 +49,24 @@ Ui::Child breadcrumb() {
             .borderPaint = Gfx::ZINC700,
         },
         Ui::hflow(
-            Ui::button(Model::bind<GoTo>("/"), Ui::ButtonStyle::subtle(), Media::Icons::LAPTOP),
+            Ui::button(Model::bind<GoTo>("/"), Ui::ButtonStyle::subtle(), Mdi::LAPTOP),
             breadcrumbItem("home", 3),
             breadcrumbItem("smnx", 2),
             breadcrumbItem("projects", 1),
             breadcrumbItem("skift", 0),
-            Ui::grow(),
-            Ui::button(Model::bind<AddBookmark>(), Ui::ButtonStyle::subtle(), Media::Icons::BOOKMARK)));
+            Ui::grow(NONE),
+            Ui::button(Model::bind<AddBookmark>(), Ui::ButtonStyle::subtle(), Mdi::BOOKMARK)));
 }
 
 Ui::Child toolbar(State state) {
 
     return Ui::toolbar(
-        Ui::button(Model::bindIf<GoBack>(state.canGoBack()), Ui::ButtonStyle::subtle(), Media::Icons::ARROW_LEFT),
-        Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Media::Icons::ARROW_RIGHT),
-        Ui::button(Model::bindIf<GoParent>(state.canGoParent(), 1), Ui::ButtonStyle::subtle(), Media::Icons::ARROW_UP),
-        Ui::button(Model::bind<GoTo>("/home"), Ui::ButtonStyle::subtle(), Media::Icons::HOME),
+        Ui::button(Model::bindIf<GoBack>(state.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
+        Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
+        Ui::button(Model::bindIf<GoParent>(state.canGoParent(), 1), Ui::ButtonStyle::subtle(), Mdi::ARROW_UP),
+        Ui::button(Model::bind<GoTo>("/home"), Ui::ButtonStyle::subtle(), Mdi::HOME),
         Ui::grow(FileManager::breadcrumb()),
-        Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::subtle(), Media::Icons::REFRESH));
+        Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH));
 }
 
 /* ---  Dialogs  ------------------------------------------------------------ */
@@ -102,7 +102,7 @@ Ui::Child openFileDialog() {
             16,
             Ui::hflow(
                 8,
-                Ui::grow(),
+                Ui::grow(NONE),
                 cancelBtn,
                 openBtn));
 

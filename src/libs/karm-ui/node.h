@@ -47,6 +47,15 @@ struct Node {
     virtual void detach(Node *) {}
 };
 
+template <typename T>
+concept Decorator = requires(T &t, Child &c) {
+                        { t(c) } -> Meta::Same<Child>;
+                    };
+
+ALWAYS_INLINE Child operator|(Child child, Decorator auto decorator) {
+    return decorator(child);
+}
+
 /* --- LeafNode ------------------------------------------------------------- */
 
 template <typename Crtp>

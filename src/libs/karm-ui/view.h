@@ -72,11 +72,36 @@ inline Child text(Str format, Args &&...args) {
     return text(Fmt::format(format, std::forward<Args>(args)...).unwrap());
 }
 
+#define DEF_STYLE(STYLE)                                                              \
+    inline Child STYLE(Str text) { return Karm::Ui::text(TextStyle::STYLE(), text); } \
+    template <typename... Args>                                                       \
+    inline Child STYLE(Str format, Args &&...args) {                                  \
+        return text(TextStyle::STYLE(), format, std::forward<Args>(args)...);         \
+    }
+
+DEF_STYLE(displayLarge)
+DEF_STYLE(displayMedium)
+DEF_STYLE(displaySmall)
+DEF_STYLE(headlineLarge)
+DEF_STYLE(headlineMedium)
+DEF_STYLE(headlineSmall)
+DEF_STYLE(titleLarge)
+DEF_STYLE(titleMedium)
+DEF_STYLE(titleSmall)
+DEF_STYLE(labelLarge)
+DEF_STYLE(labelMedium)
+DEF_STYLE(labelSmall)
+DEF_STYLE(bodyLarge)
+DEF_STYLE(bodyMedium)
+DEF_STYLE(bodySmall)
+
+#undef DEF_STYLE
+
 /* --- Icon ----------------------------------------------------------------- */
 
 Child icon(Media::Icon icon, Opt<Gfx::Color> color = NONE);
 
-Child icon(Media::Icons icon, double size, Opt<Gfx::Color> color = NONE);
+Child icon(Mdi::Icon icon, double size, Opt<Gfx::Color> color = NONE);
 
 /* --- Image ---------------------------------------------------------------- */
 

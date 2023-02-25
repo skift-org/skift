@@ -255,7 +255,7 @@ struct Utf32 {
 
     static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
         out.put(c);
-        return false;
+        return true;
     }
 };
 
@@ -284,7 +284,7 @@ struct Pure {
 
     static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
         out.put(c);
-        return false;
+        return true;
     }
 };
 

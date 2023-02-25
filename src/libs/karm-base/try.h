@@ -4,20 +4,22 @@
 
 #include "_prelude.h"
 
-#define try$(EXPR)                \
-    ({                            \
-        auto __expr = (EXPR);     \
-        if (not __expr) {         \
-            return __expr.none(); \
-        }                         \
-        __expr.take();            \
+#include "bool.h"
+
+#define try$(EXPR)                           \
+    ({                                       \
+        auto __expr = (EXPR);                \
+        if (not static_cast<bool>(__expr)) { \
+            return __expr.none();            \
+        }                                    \
+        __expr.take();                       \
     })
 
 namespace Karm {
 
 template <typename T>
 concept Tryable = requires(T t) {
-                      { not t };
+                      { not static_cast<bool>(t) };
                       { t.none() };
                       { t.unwrap() };
                   };
@@ -30,7 +32,7 @@ auto tryOr(Tryable auto opt, Meta::RemoveRef<decltype(opt.unwrap())> defaultValu
     return opt.unwrap();
 }
 
-auto tryOrElse(Tryable auto opt, auto defaultValue) -> decltype(opt.unwrap()) {
+auto tryOrElse(Tryable auto opt, auto defaultValue) -> Meta::RemoveRef<decltype(opt.unwrap())> {
     if (not opt) {
         return defaultValue();
     }

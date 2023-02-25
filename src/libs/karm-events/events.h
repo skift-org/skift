@@ -94,7 +94,7 @@ struct BuildEvent : public _Event<BuildEvent> {};
 struct AnimateEvent : public _Event<AnimateEvent> {};
 
 struct ExitEvent : public _Event<ExitEvent> {
-    Res<> res;
+    Res<> res = Ok();
 
     ExitEvent()
         : res{Ok()} {}

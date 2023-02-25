@@ -80,7 +80,7 @@ struct WriterSlice : public Writer, public Seeker {
         }
 
         if (pos > _end) {
-            return Ok();
+            return Ok(0uz);
         }
 
         size_t size = clamp(sizeOf(bytes), 0uz, _end - pos);
@@ -192,7 +192,7 @@ struct _StringWriter : public _TextWriter {
     Res<size_t> writeRune(Rune rune) override {
         typename E::One one;
         if (!E::encodeUnit(rune, one)) {
-            return Ok();
+            return Error::invalidInput("invalid rune");
         }
 
         for (auto unit : iter(one)) {

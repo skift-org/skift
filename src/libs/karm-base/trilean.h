@@ -52,7 +52,7 @@ struct Trilean {
         return _NONE;
     }
 
-    constexpr Trilean operatoror(Trilean const &other) const {
+    constexpr Trilean operator||(Trilean const &other) const {
         if (_value == _TRUE or other._value == _TRUE) {
             return _TRUE;
         }

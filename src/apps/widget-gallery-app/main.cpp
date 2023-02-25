@@ -31,7 +31,7 @@ Ui::Child badges() {
 }
 
 Res<> entryPoint(CliArgs args) {
-    auto titlebar = Ui::titlebar(Media::Icons::DUCK, "Widget Gallery");
+    auto titlebar = Ui::titlebar(Mdi::DUCK, "Widget Gallery");
     auto content = Ui::spacing(
         8,
         Ui::vflow(

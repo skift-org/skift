@@ -5,7 +5,7 @@ int strEq(const char *a, size_t aLen, const char *b) {
     return aLen == strlen(b) && memcmp(a, b, aLen) == 0;
 }
 
-uint32_t _Karm__Media__Icon__byName(char const *query, size_t queryLen) {
+uint32_t _Mdi__byName(char const *query, size_t queryLen) {
 #define ICON(id, name, code)          \
     if (strEq(query, queryLen, name)) \
         return code;
@@ -14,7 +14,7 @@ uint32_t _Karm__Media__Icon__byName(char const *query, size_t queryLen) {
     return 0;
 }
 
-char const *_Karm__Media__Icon__name(uint32_t query) {
+char const *_Mdi__name(uint32_t query) {
 #define ICON(id, name, code) \
     if (code == query)       \
         return name;

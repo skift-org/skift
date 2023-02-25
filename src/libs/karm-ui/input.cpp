@@ -186,42 +186,26 @@ Child button(OnPress onPress, ButtonStyle style, Child child) {
 }
 
 Child button(OnPress onPress, ButtonStyle style, Str t) {
-    return button(
-        std::move(onPress),
-        style,
-        minSize(
-            {UNCONSTRAINED, 36},
-            center(
-                spacing(
-                    {16, 6},
-                    text(t)))));
+    return text(t) |
+           spacing({16, 6}) |
+           center() |
+           minSize({UNCONSTRAINED, 36}) |
+           button(std::move(onPress), style);
 }
 
 Child button(OnPress onPress, ButtonStyle style, Media::Icon i) {
-    return button(
-        std::move(onPress),
-        style,
-        minSize(
-            {36, 36},
-            center(
-                spacing(
-                    {6, 6},
-                    icon(i)))));
+    return icon(i) |
+           spacing({6, 6}) |
+           center() |
+           minSize({36, 36}) |
+           button(std::move(onPress), style);
 }
 
 Child button(OnPress onPress, ButtonStyle style, Media::Icon i, Str t) {
-    return button(
-        std::move(onPress),
-        style,
-        minSize(
-            {36, 36},
-            spacing(
-                {12, 6, 16, 6},
-                hflow(
-                    8,
-                    Layout::Align::CENTER,
-                    icon(i),
-                    text(t)))));
+    return hflow(8, Layout::Align::CENTER, icon(i), text(t)) |
+           spacing({12, 6, 16, 6}) |
+           minSize({UNCONSTRAINED, 36}) |
+           button(std::move(onPress), style);
 }
 
 Child button(OnPress onPress, Child child) {
@@ -232,11 +216,11 @@ Child button(OnPress onPress, Str t) {
     return button(std::move(onPress), ButtonStyle::regular(), t);
 }
 
-Child button(OnPress onPress, Media::Icons i) {
+Child button(OnPress onPress, Mdi::Icon i) {
     return button(std::move(onPress), ButtonStyle::regular(), i);
 }
 
-Child button(OnPress onPress, Media::Icons i, Str t) {
+Child button(OnPress onPress, Mdi::Icon i, Str t) {
     return button(std::move(onPress), ButtonStyle::regular(), i, t);
 }
 
@@ -394,7 +378,7 @@ struct Checkbox : public View<Checkbox> {
             g.fill(bound(), 4);
 
             g.fillStyle(Gfx::WHITE);
-            g.fill(bound().topStart(), Media::Icon{Media::Icons::CHECK_BOLD, 26});
+            g.fill(bound().topStart(), Media::Icon{Mdi::CHECK_BOLD, 26});
 
             if (_mouseListener.isPress()) {
                 g.strokeStyle(Gfx::stroke(Gfx::BLUE600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));

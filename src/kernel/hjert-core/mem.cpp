@@ -21,7 +21,7 @@ struct Pmm : public Hal::Pmm {
 
     Res<Hal::PmmRange> allocRange(size_t size, Hal::PmmFlags flags) override {
         LockScope scope(_lock);
-        bool upper = (flags & Hal::PmmFlags::UPPER) == Hal::PmmFlags::UPPER;
+        auto upper = (flags & Hal::PmmFlags::UPPER) == Hal::PmmFlags::UPPER;
 
         try$(ensureAlign(size, Hal::PAGE_SIZE));
         size /= Hal::PAGE_SIZE;

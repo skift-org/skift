@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bool.h"
+
 namespace Karm {
 
 /* The object should take the ownership of the memory */
@@ -24,7 +26,9 @@ constexpr inline auto WRAP = Wrap{};
 /* The object should be empty initialized */
 
 struct None {
-    operator bool() const {
+    constexpr None() {}
+
+    explicit operator bool() const {
         return false;
     }
 };

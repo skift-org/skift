@@ -82,6 +82,15 @@ concept Constructible = requires {
                             ::new T(declval<Args>()...);
                         };
 
+template <typename T>
+concept DefaultConstructible = Constructible<T>;
+
+template <typename T, typename U = T>
+concept CopyConstructible = Constructible<T, U const &>;
+
+template <typename T, typename U = T>
+concept MoveConstructible = Constructible<T, U &&>;
+
 template <typename From, typename To>
 concept Convertible = requires {
                           declval<void (*)(To)>()(declval<From>());

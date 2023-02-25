@@ -111,6 +111,12 @@ using OnPress = Opt<Func<void(Node &)>>;
 
 Child button(OnPress onPress, ButtonStyle style, Child child);
 
+inline auto button(OnPress onPress, ButtonStyle style) {
+    return [=, onPress = std::move(onPress)](Child child) mutable {
+        return button(std::move(onPress), style, child);
+    };
+}
+
 Child button(OnPress onPress, ButtonStyle style, Str t);
 
 Child button(OnPress onPress, ButtonStyle style, Media::Icon i);
@@ -119,11 +125,17 @@ Child button(OnPress onPress, ButtonStyle style, Media::Icon i, Str t);
 
 Child button(OnPress onPress, Child child);
 
+inline auto button(OnPress onPress) {
+    return [onPress = std::move(onPress)](Child child) mutable {
+        return button(std::move(onPress), child);
+    };
+}
+
 Child button(OnPress onPress, Str t);
 
-Child button(OnPress onPress, Media::Icons i);
+Child button(OnPress onPress, Mdi::Icon i);
 
-Child button(OnPress onPress, Media::Icons i, Str t);
+Child button(OnPress onPress, Mdi::Icon i, Str t);
 
 /* --- Input ---------------------------------------------------------------- */
 

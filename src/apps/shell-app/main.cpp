@@ -12,7 +12,7 @@
 /* --- Model ---------------------------------------------------------------- */
 
 struct App {
-    Media::Icons icon;
+    Mdi::Icon icon;
     Gfx::ColorRamp color;
     String name;
 };
@@ -44,7 +44,7 @@ using Model = Ui::Model<State, Actions>;
 
 Ui::Child systemTray();
 
-Ui::Child indicator(Media::Icons icon) {
+Ui::Child indicator(Media::Icon icon) {
     return Ui::spacing({4}, Ui::center(Ui::icon(icon)));
 }
 
@@ -60,10 +60,10 @@ Ui::Child statusbar() {
                 Ui::hflow(
                     4,
                     Ui::center(Ui::text(Ui::TextStyle::labelMedium(), "22:07")),
-                    Ui::grow(),
-                    indicator(Media::Icons::NETWORK_STRENGTH_4),
-                    indicator(Media::Icons::WIFI_STRENGTH_4),
-                    indicator(Media::Icons::BATTERY)))));
+                    Ui::grow(NONE),
+                    indicator(Mdi::NETWORK_STRENGTH_4),
+                    indicator(Mdi::WIFI_STRENGTH_4),
+                    indicator(Mdi::BATTERY)))));
 }
 
 Ui::Child statusbarButton() {
@@ -76,7 +76,7 @@ Ui::Child statusbarButton() {
 
 /* --- System Tray ---------------------------------------------------------- */
 
-Ui::Child quickSetting(Media::Icons icon) {
+Ui::Child quickSetting(Mdi::Icon icon) {
     return Ui::center(Ui::state<bool>(false, [icon](auto state) {
         return Ui::button(
             [state](Ui::Node &) mutable {
@@ -99,12 +99,12 @@ Ui::Child quickSettings() {
             8,
             Ui::hflow(
                 12,
-                quickSetting(Media::Icons::SWAP_VERTICAL),
-                quickSetting(Media::Icons::WIFI_STRENGTH_4),
-                quickSetting(Media::Icons::BLUETOOTH),
-                quickSetting(Media::Icons::MAP_MARKER_OUTLINE),
-                quickSetting(Media::Icons::FLASHLIGHT),
-                Ui::grow(Ui::align(Layout::Align::END | Layout::Align::VFILL, quickSetting(Media::Icons::CHEVRON_DOWN))))));
+                quickSetting(Mdi::SWAP_VERTICAL),
+                quickSetting(Mdi::WIFI_STRENGTH_4),
+                quickSetting(Mdi::BLUETOOTH),
+                quickSetting(Mdi::MAP_MARKER_OUTLINE),
+                quickSetting(Mdi::FLASHLIGHT),
+                Ui::grow(Ui::align(Layout::Align::END | Layout::Align::VFILL, quickSetting(Mdi::CHEVRON_DOWN))))));
 }
 
 Ui::Child notiWrapper(App app, Ui::Child inner) {
@@ -129,7 +129,7 @@ Ui::Child notiMsg(String title, String body) {
         Ui::text(Ui::TextStyle::labelMedium(), body));
 }
 
-Ui::Child notification(Media::Icons icon, String title, String subtitle) {
+Ui::Child notification(Mdi::Icon icon, String title, String subtitle) {
     return notiWrapper({icon, Gfx::BLUE_RAMP, "Hello, world"}, notiMsg(title, subtitle));
 }
 
@@ -140,15 +140,15 @@ Ui::Child notifications() {
             Ui::hflow(
 
                 Ui::center(Ui::text(Ui::TextStyle::labelMedium(), "Notifications")),
-                Ui::grow(),
+                Ui::grow(NONE),
                 Ui::button(
                     [](Ui::Node &) {
                     },
                     Ui::ButtonStyle::subtle(),
                     "Clear All"))),
-        notification(Media::Icons::HAND_WAVE, "Hello", "Hello, world!"),
-        notification(Media::Icons::HAND_WAVE, "Hello", "Hello, world!"),
-        notification(Media::Icons::HAND_WAVE, "Hello", "Hello, world!"));
+        notification(Mdi::HAND_WAVE, "Hello", "Hello, world!"),
+        notification(Mdi::HAND_WAVE, "Hello", "Hello, world!"),
+        notification(Mdi::HAND_WAVE, "Hello", "Hello, world!"));
 }
 
 Ui::Child systemTray() {
@@ -163,8 +163,7 @@ Ui::Child systemTray() {
                             .borderRadius = {0, 0, 16, 16},
                             .backgroundPaint = Gfx::ZINC900,
                         },
-
-                        Ui::vflow(8, quickSettings(), Ui::grow(notifications()), Ui::dragHandle())))),
+                        Ui::vflow(8, quickSettings(), notifications() | Ui::grow(), Ui::dragHandle())))),
         Ui::empty(16));
 }
 
@@ -183,10 +182,10 @@ Ui::Child searchInput() {
                         {12, 8},
                         Ui::hflow(
                             Ui::grow(Ui::vcenter(Ui::text(Ui::TextStyle::labelMedium(), "Search..."))),
-                            Ui::center(Ui::icon(Media::Icons::MAGNIFY, 24))))));
+                            Ui::center(Ui::icon(Mdi::MAGNIFY, 24))))));
 }
 
-Ui::Child appIcon(Media::Icons icon, Gfx::ColorRamp colors) {
+Ui::Child appIcon(Mdi::Icon icon, Gfx::ColorRamp colors) {
     return Ui::box(
         Ui::BoxStyle{
             .borderRadius = 99,
@@ -198,7 +197,7 @@ Ui::Child appIcon(Media::Icons icon, Gfx::ColorRamp colors) {
                         Ui::icon(icon, 22))));
 }
 
-Ui::Child appRow(Media::Icons icon, Gfx::ColorRamp colors, String title) {
+Ui::Child appRow(Mdi::Icon icon, Gfx::ColorRamp colors, String title) {
     return Ui::spacing(
         {12, 8, 12, 8},
         Ui::hflow(
@@ -221,19 +220,19 @@ Ui::Child apps(Ui::Children apps) {
 
 Ui::Child appDrawer() {
     Ui::Children appItems = {
-        appRow(Media::Icons::CALCULATOR, Gfx::ORANGE_RAMP, "Calculator"),
-        appRow(Media::Icons::CALENDAR, Gfx::PURPLE_RAMP, "Calendar"),
-        appRow(Media::Icons::CAMERA, Gfx::TEAL_RAMP, "Camera"),
-        appRow(Media::Icons::CLOCK, Gfx::RED_RAMP, "Clock"),
-        appRow(Media::Icons::COG, Gfx::LIME_RAMP, "Settings"),
-        appRow(Media::Icons::EMAIL, Gfx::BLUE_RAMP, "Email"),
-        appRow(Media::Icons::FILE, Gfx::ORANGE_RAMP, "Files"),
-        appRow(Media::Icons::FORMAT_FONT, Gfx::YELLOW_RAMP, "Text Editor"),
-        appRow(Media::Icons::WEB, Gfx::LIME_RAMP, "Browser"),
-        appRow(Media::Icons::HAND_WAVE, Gfx::BLUE_RAMP, "Hello World"),
-        appRow(Media::Icons::MAP_MARKER_OUTLINE, Gfx::PINK_RAMP, "Maps"),
-        appRow(Media::Icons::MUSIC, Gfx::YELLOW_RAMP, "Music"),
-        appRow(Media::Icons::PHONE, Gfx::BLUE_RAMP, "Phone"),
+        appRow(Mdi::CALCULATOR, Gfx::ORANGE_RAMP, "Calculator"),
+        appRow(Mdi::CALENDAR, Gfx::PURPLE_RAMP, "Calendar"),
+        appRow(Mdi::CAMERA, Gfx::TEAL_RAMP, "Camera"),
+        appRow(Mdi::CLOCK, Gfx::RED_RAMP, "Clock"),
+        appRow(Mdi::COG, Gfx::LIME_RAMP, "Settings"),
+        appRow(Mdi::EMAIL, Gfx::BLUE_RAMP, "Email"),
+        appRow(Mdi::FILE, Gfx::ORANGE_RAMP, "Files"),
+        appRow(Mdi::FORMAT_FONT, Gfx::YELLOW_RAMP, "Text Editor"),
+        appRow(Mdi::WEB, Gfx::LIME_RAMP, "Browser"),
+        appRow(Mdi::HAND_WAVE, Gfx::BLUE_RAMP, "Hello World"),
+        appRow(Mdi::MAP_MARKER_OUTLINE, Gfx::PINK_RAMP, "Maps"),
+        appRow(Mdi::MUSIC, Gfx::YELLOW_RAMP, "Music"),
+        appRow(Mdi::PHONE, Gfx::BLUE_RAMP, "Phone"),
     };
 
     return Ui::vflow(
@@ -264,7 +263,7 @@ Ui::Child navbar() {
 Ui::Child homeScreen() {
     return Ui::vflow(
         statusbarButton(),
-        Ui::grow(),
+        Ui::grow(NONE),
         navbar());
 }
 
@@ -277,23 +276,22 @@ Ui::Child lockscreen() {
                                    .withColors(Gfx::BLACK.withOpacity(0.5),
                                                Gfx::BLACK.withOpacity(0.75)),
         },
-        Ui::vflow(
-            Ui::grow(
-                Ui::dismisable(
-                    Model::bind<UnlockAction>(),
-                    Ui::DismisDir::TOP,
-                    0.3,
-                    Ui::dragRegion(
-                        Ui::spacing(
-                            {48, 64},
-                            Ui::vflow(
-                                Ui::center(Ui::text(Ui::TextStyle::displayMedium(), "22:07")),
-                                Ui::empty(16),
-                                Ui::center(Ui::text(Ui::TextStyle::titleMedium(), "Wed. 12 October")),
-                                Ui::grow(),
-                                Ui::vflow(
-                                    Ui::center(Ui::icon(Media::Icons::CHEVRON_UP, 48)),
-                                    Ui::center(Ui::text(Ui::TextStyle::labelLarge(), "Swipe up to unlock"))))))))));
+
+        Ui::dismisable(
+            Model::bind<UnlockAction>(),
+            Ui::DismisDir::TOP,
+            0.3,
+            Ui::dragRegion(
+                Ui::spacing(
+                    {48, 64},
+                    Ui::vflow(
+                        Ui::center(Ui::text(Ui::TextStyle::displayMedium(), "22:07")),
+                        Ui::empty(16),
+                        Ui::center(Ui::text(Ui::TextStyle::titleMedium(), "Wed. 12 October")),
+                        Ui::grow(NONE),
+                        Ui::vflow(
+                            Ui::center(Ui::icon(Mdi::CHEVRON_UP, 48)),
+                            Ui::center(Ui::text(Ui::TextStyle::labelLarge(), "Swipe up to unlock"))))))));
 }
 
 Ui::Child app() {

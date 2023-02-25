@@ -11,7 +11,7 @@ Res<> entryPoint(CliArgs args) {
     auto app = Ui::reducer<FileManager::Model>({"/"}, FileManager::reduce, [](auto d) {
         Sys::Path path = d.currentPath();
         auto dir = Sys::Dir::open(path).unwrap();
-        auto titlebar = Ui::titlebar(Media::Icons::FOLDER, "File Manager");
+        auto titlebar = Ui::titlebar(Mdi::FOLDER, "File Manager");
         auto listing = FileManager::directoryListing(dir);
 
         return Ui::dialogLayer(

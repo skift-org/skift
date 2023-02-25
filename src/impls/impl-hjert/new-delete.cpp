@@ -3,20 +3,20 @@
 #include <karm-logger/logger.h>
 #include <libheap/libheap.h>
 
-/* --- Heap Implementation -------------------------------------------------- */
+/* --- Kmm Implementation -------------------------------------------------- */
 
 static Lock _heapLock;
 static Heap _heapImpl = {
     .alloc = [](void *, size_t size) -> void * {
-        uintptr_t start = Hjert::Mem::heap()
+        uintptr_t start = Hjert::Core::kmm()
                               .allocRange(size)
                               .unwrap("heap: failed to allocate block")
                               .start;
         return reinterpret_cast<void *>(start);
     },
     .free = [](void *, void *ptr, size_t size) {
-        Hjert::Mem::heap()
-            .free(Hal::HeapRange(reinterpret_cast<uintptr_t>(ptr), size))
+        Hjert::Core::kmm()
+            .free(Hal::KmmRange(reinterpret_cast<uintptr_t>(ptr), size))
             .unwrap("heap: failed to free block");
     },
     .log = [](void *, enum HeapLogType type, const char *msg, va_list) {

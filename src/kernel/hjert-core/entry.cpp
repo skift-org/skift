@@ -59,7 +59,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
 
     logInfo("entry: mapping elf...");
     auto elfMem = try$(VNode::makeDma(record->range<Hal::DmaRange>()));
-    auto elfRange = try$(Mem::heap().pmm2Heap(elfMem->range()));
+    auto elfRange = try$(kmm().pmm2Kmm(elfMem->range()));
     Elf::Image image{elfRange.bytes()};
 
     if (!image.valid()) {
@@ -78,7 +78,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
 
         if (!!(prog.flags() & Elf::ProgramFlags::WRITE)) {
             auto sectionMem = try$(VNode::alloc(size, Hj::MemFlags::NONE));
-            auto sectionRange = try$(Mem::heap().pmm2Heap(sectionMem->range()));
+            auto sectionRange = try$(kmm().pmm2Kmm(sectionMem->range()));
             copy(prog.bytes(), sectionRange.mutBytes());
             try$(space->map({prog.vaddr(), size}, sectionMem, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
         } else {

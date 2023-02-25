@@ -161,15 +161,13 @@ static Opt<x86_64::Vmm<Hal::UpperHalfMapper>> _vmm = NONE;
 
 Hal::Vmm &vmm() {
     if (_vmm == NONE) {
-        uintptr_t paddr = Hjert::Mem::heap()
-                              .allocRange(Hal::PAGE_SIZE)
-                              .unwrap("failed to allocate pml4")
-                              .start;
-
-        memset(reinterpret_cast<void *>(paddr), 0, Hal::PAGE_SIZE);
-        _pml4 = reinterpret_cast<x86_64::Pml<4> *>(paddr);
+        auto pml4Mem = Core::kmm()
+                           .allocRange(Hal::PAGE_SIZE)
+                           .unwrap("failed to allocate pml4");
+        zeroFill(pml4Mem.mutBytes());
+        _pml4 = pml4Mem.as<x86_64::Pml<4>>();
         _vmm = x86_64::Vmm<Hal::UpperHalfMapper>{
-            Hjert::Mem::pmm(), _pml4};
+            Core::pmm(), _pml4};
     }
 
     return *_vmm;
@@ -256,7 +254,7 @@ struct Space :
     x86_64::Pml<4> *_pml4;
 
     Space(x86_64::Pml<4> *pml4)
-        : _vmm{Hjert::Mem::pmm(), pml4}, _pml4(pml4) {}
+        : _vmm{Core::pmm(), pml4}, _pml4(pml4) {}
 
     Space(Space &&other)
         : _vmm(other._vmm),
@@ -264,7 +262,7 @@ struct Space :
     }
 
     ~Space() {
-        destroyPml(Hjert::Mem::pmm(), _pml4, Hal::UpperHalfMapper{})
+        destroyPml(Core::pmm(), _pml4, Hal::UpperHalfMapper{})
             .unwrap("failed to destroy pml4");
     }
 
@@ -274,13 +272,12 @@ struct Space :
 };
 
 Res<Strong<Core::Space>> createSpace() {
-    uintptr_t paddr = Hjert::Mem::heap()
-                          .allocRange(Hal::PAGE_SIZE)
-                          .unwrap("failed to allocate pml4")
-                          .start;
+    auto pml4Mem = Core::kmm()
+                       .allocRange(Hal::PAGE_SIZE)
+                       .unwrap("failed to allocate pml4");
 
-    auto *pml4 = reinterpret_cast<x86_64::Pml<4> *>(paddr);
-    memset(pml4, 0, Hal::PAGE_SIZE);
+    zeroFill(pml4Mem.mutBytes());
+    auto *pml4 = pml4Mem.as<x86_64::Pml<4>>();
 
     // Copy the kernel part of the pml4
     for (size_t i = _pml4->LEN / 2; i < _pml4->LEN; i++) {

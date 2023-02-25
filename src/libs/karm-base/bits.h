@@ -35,7 +35,7 @@ struct Bits {
     }
 
     void fill(bool value) {
-        memset(_buf, value ? 0xff : 0x00, _len);
+        ::fill(mutBytes(), value ? 0xff_byte : 0x00_byte);
     }
 
     size_t len() const {
@@ -101,6 +101,14 @@ struct Bits {
                 range.size++;
             }
         }
+    }
+
+    Bytes bytes() const {
+        return Bytes(_buf, _len);
+    }
+
+    MutBytes mutBytes() {
+        return MutBytes(_buf, _len);
     }
 };
 

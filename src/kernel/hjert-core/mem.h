@@ -1,18 +1,20 @@
 #pragma once
 
-#include <hal/heap.h>
+#include <hal/kmm.h>
 #include <hal/pmm.h>
 #include <hal/vmm.h>
 #include <handover/spec.h>
 
-namespace Hjert::Mem {
+namespace Hjert::Core {
 
+namespace Mem {
 Res<> init(Handover::Payload &);
+} // namespace Mem
 
-Hal::Heap &heap();
+Hal::Kmm &kmm();
 
 Hal::Pmm &pmm();
 
 Hal::Vmm &vmm();
 
-} // namespace Hjert::Mem
+} // namespace Hjert::Core

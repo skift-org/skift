@@ -16,7 +16,7 @@ Res<Box<Ctx>> Ctx::create() {
 
 Res<Stack> Stack::create() {
     logInfo("sched: creating stack...");
-    auto mem = try$(Mem::heap().allocOwned(DEFAULT_SIZE));
+    auto mem = try$(kmm().allocOwned(DEFAULT_SIZE));
     auto base = mem.range().end();
     return Ok(Stack{std::move(mem), base});
 }

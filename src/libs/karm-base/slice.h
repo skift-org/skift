@@ -7,6 +7,10 @@ namespace Karm {
 
 using Byte = uint8_t;
 
+inline constexpr Byte operator"" _byte(unsigned long long arg) noexcept {
+    return static_cast<Byte>(arg);
+}
+
 template <typename T, typename U = typename T::Inner>
 concept Sliceable = requires(T const &t) {
                         typename T::Inner;

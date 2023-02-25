@@ -1,6 +1,6 @@
 #pragma once
 
-#include <hal/heap.h>
+#include <hal/kmm.h>
 #include <handover/spec.h>
 #include <karm-base/box.h>
 #include <karm-base/lock.h>
@@ -24,7 +24,7 @@ struct Ctx {
 /* --- Stack ----------------------------------------------------------------- */
 
 struct Stack {
-    Hal::HeapMem _mem;
+    Hal::KmmMem _mem;
     uintptr_t _sp;
 
     void saveSp(uintptr_t sp) { _sp = sp; }

@@ -6,7 +6,7 @@
 #include "arch.h"
 #include "mem.h"
 
-namespace Hjert::Mem {
+namespace Hjert::Core {
 
 struct Pmm : public Hal::Pmm {
     Hal::PmmRange _usable;
@@ -72,21 +72,21 @@ struct Pmm : public Hal::Pmm {
     }
 };
 
-struct Heap : public Hal::Heap {
+struct Kmm : public Hal::Kmm {
     Hal::Pmm &_pmm;
 
-    Heap(Hal::Pmm &pmm) : _pmm(pmm) {
+    Kmm(Hal::Pmm &pmm) : _pmm(pmm) {
     }
 
-    Res<Hal::HeapRange> allocRange(size_t size) override {
-        return pmm2Heap(try$(_pmm.allocRange(size, Hal::PmmFlags::NONE)));
+    Res<Hal::KmmRange> allocRange(size_t size) override {
+        return pmm2Kmm(try$(_pmm.allocRange(size, Hal::PmmFlags::NONE)));
     }
 
-    Res<> free(Hal::HeapRange range) override {
-        return _pmm.free(try$(heap2Pmm(range)));
+    Res<> free(Hal::KmmRange range) override {
+        return _pmm.free(try$(kmm2Pmm(range)));
     }
 
-    Res<Hal::PmmRange> heap2Pmm(Hal::HeapRange range) override {
+    Res<Hal::PmmRange> kmm2Pmm(Hal::KmmRange range) override {
         if (range.start < Hal::UPPER_HALF) {
             return Error::invalidInput("Invalid heap range");
         }
@@ -97,8 +97,8 @@ struct Heap : public Hal::Heap {
         });
     }
 
-    Res<Hal::HeapRange> pmm2Heap(Hal::PmmRange range) override {
-        return Ok(Hal::HeapRange{
+    Res<Hal::KmmRange> pmm2Kmm(Hal::PmmRange range) override {
+        return Ok(Hal::KmmRange{
             range.start + Hal::UPPER_HALF,
             range.size,
         });
@@ -106,7 +106,9 @@ struct Heap : public Hal::Heap {
 };
 
 static Opt<Pmm> _pmm = NONE;
-static Opt<Heap> _heap = NONE;
+static Opt<Kmm> _kmm = NONE;
+
+namespace Mem {
 
 Res<> init(Handover::Payload &payload) {
     auto usableRange = payload.usableRange<Hal::PmmRange>();
@@ -135,7 +137,7 @@ Res<> init(Handover::Payload &payload) {
                    pmmBits.size,
                });
 
-    _heap = Heap(_pmm.unwrap());
+    _kmm = Kmm(_pmm.unwrap());
 
     logInfo("mem: marking kernel memory as used");
     for (auto &record : payload) {
@@ -163,6 +165,8 @@ Res<> init(Handover::Payload &payload) {
     return Ok();
 }
 
+} // namespace Mem
+
 Hal::Pmm &pmm() {
     if (not _pmm) {
         logFatal("mem: pmm not initialized");
@@ -170,15 +174,15 @@ Hal::Pmm &pmm() {
     return *_pmm;
 }
 
-Hal::Heap &heap() {
-    if (not _heap) {
+Hal::Kmm &kmm() {
+    if (not _kmm) {
         logFatal("mem: heap not initialized");
     }
-    return *_heap;
+    return *_kmm;
 }
 
 Hal::Vmm &vmm() {
     return Arch::vmm();
 }
 
-} // namespace Hjert::Mem
+} // namespace Hjert::Core

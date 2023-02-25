@@ -10,7 +10,7 @@ namespace Hjert::Core {
 VNode::VNode(_Mem mem) : _mem(std::move(mem)) {}
 
 Res<Strong<VNode>> VNode::alloc(size_t size, Hj::MemFlags) {
-    auto mem = try$(Mem::pmm().allocOwned(size, Hal::PmmFlags::UPPER));
+    auto mem = try$(pmm().allocOwned(size, Hal::PmmFlags::UPPER));
     return Ok(makeStrong<VNode>(std::move(mem)));
 }
 

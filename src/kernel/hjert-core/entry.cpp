@@ -92,8 +92,8 @@ Res<> enterUserspace(Handover::Payload &payload) {
     auto stackRange = try$(space->map({}, stackMem, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
 
     logInfo("entry: creating task...");
-    auto task = try$(Task::create(space));
-    try$(Sched::self().start(task, image.header().entry, stackRange.end() - 8));
+    auto task = try$(Task::create(TaskType::USER, space));
+    try$(Sched::self().start(task, image.header().entry, stackRange.end()));
 
     return Ok();
 }

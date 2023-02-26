@@ -4,7 +4,7 @@
 
 namespace x86_64 {
 
-struct Tss {
+struct [[gnu::packed]] Tss {
     uint32_t _reserved;
     Array<uint64_t, 3> _rsp;
     uint64_t _reserved0;
@@ -40,7 +40,7 @@ struct [[gnu::packed]] GdtEntry {
           _baseHigh((base >> 24) & 0xff) {}
 };
 
-struct GdtTssEntry {
+struct [[gnu::packed]] GdtTssEntry {
     uint16_t _len;
     uint16_t _baseLow16;
     uint8_t _baseMid8;
@@ -72,7 +72,7 @@ struct [[gnu::packed]] Gdt {
         KDATA = 2,
         UDATA = 3,
         UCODE = 4,
-        TSS = 5, /* not implemented */
+        TSS = 5,
     };
 
     enum Flags : uint32_t {
@@ -102,6 +102,8 @@ struct [[gnu::packed]] Gdt {
 };
 
 extern "C" void _gdtLoad(void const *ptr); // implemented in gdt.s
+
+extern "C" void _tssUpdate();
 
 struct [[gnu::packed]] GdtDesc {
     uint16_t _limit;

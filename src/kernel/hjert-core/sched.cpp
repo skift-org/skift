@@ -8,8 +8,8 @@ namespace Hjert::Core {
 
 static Opt<Sched> _sched;
 
-Res<Box<Ctx>> Ctx::create() {
-    return Arch::createCtx();
+Res<Box<Ctx>> Ctx::create(uintptr_t ksp) {
+    return Arch::createCtx(ksp);
 }
 
 /* --- Stack ----------------------------------------------------------------- */
@@ -23,11 +23,11 @@ Res<Stack> Stack::create() {
 
 /* --- Task ----------------------------------------------------------------- */
 
-Res<Strong<Task>> Task::create(Strong<Space> space) {
+Res<Strong<Task>> Task::create(TaskType type, Strong<Space> space) {
     logInfo("sched: creating task...");
-    auto ctx = try$(Ctx::create());
     auto stack = try$(Stack::create());
-    auto task = makeStrong<Task>(std::move(stack), space, std::move(ctx));
+    auto ctx = try$(Ctx::create(stack.loadSp()));
+    auto task = makeStrong<Task>(type, std::move(stack), space, std::move(ctx));
     return Ok(task);
 }
 
@@ -47,6 +47,7 @@ Res<> Sched::start(Strong<Task> task, uintptr_t ip, uintptr_t sp) {
 
 void Sched::schedule() {
     LockScope scope(_lock);
+
     _tick++;
 
     _curr->_sliceEnd = _tick;
@@ -65,7 +66,7 @@ void Sched::schedule() {
 
 Res<> Sched::init(Handover::Payload &) {
     logInfo("sched: initializing...");
-    _sched = Sched{try$(Task::create(try$(Space::create())))};
+    _sched = Sched{try$(Task::create(TaskType::KERNEL, try$(Space::create())))};
     return Ok();
 }
 

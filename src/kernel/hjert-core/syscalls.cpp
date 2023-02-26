@@ -1,15 +1,15 @@
 
-#include "syscalls.h"
+#include <karm-logger/logger.h>
 
 #include "arch.h"
 #include "sched.h"
+#include "syscalls.h"
 
 namespace Hjert::Core {
 
 Hj::Code sysLog(char const *msg, size_t len) {
-    (void)msg;
-    (void)len;
-    return Hj::Code::NOT_IMPLEMENTED;
+    logInfo("sysLog: '{}'", Str{msg, len});
+    return Hj::OK;
 }
 
 Hj::Code sysCreate(Hj::Type type, Hj::Cap *cap, Hj::Arg a0, Hj::Arg a1, Hj::Arg a2, Hj::Arg a3) {

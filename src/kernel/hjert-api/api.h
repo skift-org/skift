@@ -56,6 +56,8 @@ enum struct [[nodiscard]] Code {
     _LEN,
 };
 
+constexpr inline auto OK = Code::_OK;
+
 template <typename T = None>
 struct [[nodiscard]] Res : public Karm::Res<T, Hj::Code> {
     using Karm::Res<T, Hj::Code>::Res;

@@ -7,7 +7,7 @@ namespace x86_64 {
 
 inline void sysInit(void (*handler)()) {
     wrmsr(Msrs::EFER, rdmsr(Msrs::EFER) | 1);
-    wrmsr(Msrs::STAR, ((uint64_t)(Gdt::KCODE * 8) << 32) | ((uint64_t)(((Gdt::UCODE - 1) * 8) | 3) << 48));
+    wrmsr(Msrs::STAR, ((uint64_t)(Gdt::KCODE * 8) << 32) | ((uint64_t)(((Gdt::UDATA - 1) * 8) | 3) << 48));
     wrmsr(Msrs::LSTAR, (uint64_t)handler);
     wrmsr(Msrs::SYSCALL_FLAG_MASK, 0xfffffffe);
 }

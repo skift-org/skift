@@ -1,16 +1,9 @@
-#include <karm-main/base.h>
-
-#include <hal-x86_64/com.h>
+#include <hjert-api/api.h>
 
 extern "C" void __entryPoint() {
-    x86_64::Com com = x86_64::Com::com1();
-
-    (void)com.writeStr("Hello, world!\n");
-    (void)com.writeStr("Hello, world!\n");
-    (void)com.writeStr("Hello, world!\n");
-    (void)com.writeStr("Hello, world!\n");
+    (void)Hj::log("Hello, world!", 13);
 
     while (true) {
-        asm("hlt");
+        asm("pause");
     }
 }

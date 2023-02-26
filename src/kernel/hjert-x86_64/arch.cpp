@@ -24,6 +24,8 @@ static x86_64::Com _com1 = x86_64::Com::com1();
 static x86_64::DualPic _pic = x86_64::DualPic::dualPic();
 static x86_64::Pit _pit = x86_64::Pit::pit();
 
+static Array<Byte, Hal::PAGE_SIZE> _kstackRsp{};
+static Array<Byte, Hal::PAGE_SIZE> _kstackIst{};
 static x86_64::Tss _tss{};
 
 static x86_64::Gdt _gdt{_tss};
@@ -37,6 +39,10 @@ Res<> init(Handover::Payload &) {
     _com1.init();
 
     _gdtDesc.load();
+    _tss = {};
+    _tss._rsp[0] = (uint64_t)_kstackRsp.bytes().end();
+    _tss._ist[0] = (uint64_t)_kstackIst.bytes().end();
+    x86_64::_tssUpdate();
 
     for (size_t i = 0; i < x86_64::Idt::LEN; i++) {
         _idt.entries[i] = x86_64::IdtEntry{_intVec[i], 0, x86_64::IdtEntry::GATE};
@@ -182,18 +188,16 @@ void start(Core::Task &task, uintptr_t ip, uintptr_t sp, Hj::Args args) {
         .rcx = args[3],
 
         .rip = ip,
+        .rflags = 0x202,
         .rsp = sp,
     };
 
-    /* if (task.isUser()) {
+    if (task.type() == Core::TaskType::USER) {
         frame.cs = x86_64::Gdt::UCODE * 8 | 3; // 3 = user mode
         frame.ss = x86_64::Gdt::UDATA * 8 | 3;
-        frame.rflags = 0x202;
-    } else */
-    {
+    } else {
         frame.cs = x86_64::Gdt::KCODE * 8;
         frame.ss = x86_64::Gdt::KDATA * 8;
-        frame.rflags = 0x202;
     }
 
     task
@@ -225,17 +229,17 @@ Res<> destroyPml(Hal::Pmm &pmm, L *pml, M mapper = {}) {
 }
 
 struct Ctx : public Core::Ctx {
-    uintptr_t ksp;
-    uintptr_t usp;
+    uintptr_t _ksp;
+    uintptr_t _usp;
     Array<Byte, Hal::PAGE_SIZE> simd __attribute__((aligned(16)));
 
-    Ctx() : ksp(0), usp(0) {
+    Ctx(uintptr_t ksp) : _ksp(ksp), _usp(0) {
         x86_64::simdInitCtx(simd.buf());
     }
 
     virtual void save() {
         x86_64::simdSaveCtx(simd.buf());
-        x86_64::sysSetGs((uintptr_t)&ksp);
+        x86_64::sysSetGs((uintptr_t)&_ksp);
     }
 
     virtual void load() {
@@ -243,8 +247,8 @@ struct Ctx : public Core::Ctx {
     }
 };
 
-Res<Box<Core::Ctx>> createCtx() {
-    return Ok<Box<Core::Ctx>>(makeBox<Ctx>());
+Res<Box<Core::Ctx>> createCtx(uintptr_t ksp) {
+    return Ok<Box<Core::Ctx>>(makeBox<Ctx>(ksp));
 }
 
 struct Space :

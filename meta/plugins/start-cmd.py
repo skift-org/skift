@@ -65,8 +65,11 @@ class QemuSystemAmd64(Machine):
     def boot(self, image: Image) -> None:
         self.logger.log("Booting...")
 
-        ovmf = shell.wget(
-            "https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd")
+        ovmf = "/usr/share/edk2/x64/OVMF.fd"
+
+        if not os.path.exists(ovmf):
+            ovmf = shell.wget(
+                "https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd")
 
         qemuCmd: list[str] = [
             "qemu-system-x86_64",
@@ -81,7 +84,7 @@ class QemuSystemAmd64(Machine):
         ]
 
         if self.logError:
-            qemuCmd += ["-d", "guest_errors,cpu_reset,int"]
+            qemuCmd += ["-d", "guest_errors,cpu_reset"]
 
         if self.useDebug:
             qemuCmd += ["-s", "-S"]

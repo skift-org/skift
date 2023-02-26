@@ -14,7 +14,7 @@
 namespace Hjert::Core {
 
 struct Ctx {
-    static Res<Box<Ctx>> create();
+    static Res<Box<Ctx>> create(uintptr_t ksp);
 
     virtual ~Ctx() = default;
     virtual void save() = 0;
@@ -47,7 +47,14 @@ struct Stack {
 
 /* --- Task ----------------------------------------------------------------- */
 
+enum struct TaskType : uint8_t {
+    IDLE,
+    USER,
+    KERNEL
+};
+
 struct Task {
+    TaskType _type;
     Stack _stack;
     Strong<Space> _space;
     Box<Ctx> _ctx;
@@ -55,13 +62,18 @@ struct Task {
     Tick _sliceStart = 0;
     Tick _sliceEnd = 0;
 
-    static Res<Strong<Task>> create(Strong<Space> space);
+    static Res<Strong<Task>> create(TaskType type, Strong<Space> space);
 
     static Task &self();
 
-    Task(Stack stack, Strong<Space> space, Box<Ctx> ctx)
-        : _stack(std::move(stack)), _space(space), _ctx(std::move(ctx)) {
+    Task(TaskType type, Stack stack, Strong<Space> space, Box<Ctx> ctx)
+        : _type(type),
+          _stack(std::move(stack)),
+          _space(space),
+          _ctx(std::move(ctx)) {
     }
+
+    auto type() const { return _type; }
 
     Stack &stack() { return _stack; }
 

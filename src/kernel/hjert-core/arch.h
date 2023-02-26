@@ -33,7 +33,7 @@ Io::TextWriter<> &loggerOut();
 
 void start(Core::Task &, uintptr_t ip, uintptr_t sp, Hj::Args args);
 
-Res<Box<Core::Ctx>> createCtx();
+Res<Box<Core::Ctx>> createCtx(uintptr_t ksp);
 
 Res<Strong<Core::Space>> createSpace();
 

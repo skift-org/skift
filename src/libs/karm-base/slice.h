@@ -291,16 +291,35 @@ constexpr size_t zeroFill(MutSlice<T> slice) {
 }
 
 constexpr void sort(MutSliceable auto &slice, auto cmp) {
-    for (size_t i = 0; i < len(slice); i++) {
-        for (size_t j = i + 1; j < len(slice); j++) {
-            auto &a = at(slice, i);
-            auto &b = at(slice, j);
+    if (len(slice) <= 1) {
+        return;
+    }
 
-            if (cmp(a, b).isGt()) {
-                std::swap(a, b);
-            }
+    auto pivot = at(slice, len(slice) / 2);
+    auto left = 0uz;
+    auto right = len(slice) - 1;
+
+    while (left <= right) {
+        while (cmp(at(slice, left), pivot).isLt()) {
+            left++;
+        }
+
+        while (cmp(at(slice, right), pivot).isGt()) {
+            right--;
+        }
+
+        if (left <= right) {
+            std::swap(at(slice, left), at(slice, right));
+            left++;
+            right--;
         }
     }
+
+    auto rightSlice = mutSub(slice, 0, right + 1);
+    sort(rightSlice, cmp);
+
+    auto leftSlice = mutSub(slice, left, len(slice));
+    sort(leftSlice, cmp);
 }
 
 } // namespace Karm

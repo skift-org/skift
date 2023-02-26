@@ -9,7 +9,7 @@
 #include <karm-ui/view.h>
 
 struct Demo {
-    Media::Icon icon;
+    Mdi::Icon icon;
     Str name;
     Str description;
     Ui::Build build;
@@ -193,12 +193,11 @@ static Array demos = {
                 Ui::separator(),
                 slider);
 
-            return Ui::vscroll(
-                Ui::hcenter(
-                    Ui::grow(
-                        Ui::maxSize(
-                            {420, Ui::UNCONSTRAINED},
-                            Ui::vflow(8, title, list)))));
+            return Ui::vflow(8, title, list) |
+                Ui::maxSize({420, Ui::UNCONSTRAINED}) |
+                Ui::grow() |
+                Ui::hcenter() |
+                Ui::vscroll();
         },
     },
     Demo{

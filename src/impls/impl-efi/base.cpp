@@ -24,7 +24,8 @@ struct DebugOut : public Io::TextWriter<> {
             // then the last byte will be ignored.
             buf[toCopy / sizeof(uint16_t) + 1] = 0;
 
-            writen += try$(Efi::st()->conOut->outputString(Efi::st()->conOut, buf.buf()));
+            try$(Efi::st()->conOut->outputString(Efi::st()->conOut, buf.buf()));
+            writen += toCopy;
 
             bytes = next(bytes, chunkSize);
         }

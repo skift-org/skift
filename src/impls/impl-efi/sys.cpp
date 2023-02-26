@@ -33,7 +33,8 @@ struct ConOut : public Sys::Fd {
             // then the last byte will be ignored.
             buf[(toCopy / sizeof(uint16_t)) + 1] = 0;
 
-            writen += try$(_proto->outputString(_proto, buf.buf()));
+            try$(_proto->outputString(_proto, buf.buf()));
+            writen += toCopy;
 
             bytes = next(bytes, chunkSize);
         }

@@ -36,10 +36,8 @@ Res<> entryPoint(CliArgs args) {
         8,
         Ui::vflow(
             8,
-            buttons([](Ui::Node &n) {
-                Ui::showMsgDialog(n, "Button pressed");
-            }),
-            buttons(NONE),
+            buttons(true),
+            buttons(false),
             badges()));
 
     auto layout = Ui::dialogLayer(

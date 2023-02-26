@@ -113,7 +113,7 @@ inline Child sliderRow(double value, OnChange<double> onChange, String title) {
     return sliderRow(SliderStyle::regular(), value, std::move(onChange), title);
 }
 
-inline Child navRow(bool selected, OnPress onPress, Mdi: i, String title) {
+inline Child navRow(bool selected, OnPress onPress, Mdi::Icon i, String title) {
     auto buttonStyle = ButtonStyle::regular();
     buttonStyle.idleStyle = {
         .borderRadius = 4,

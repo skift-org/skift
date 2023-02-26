@@ -97,7 +97,7 @@ inline constexpr Cap SELF = Cap{0};
 
 // clang-format off
 
-#define SYSCALL(name) static inline __attribute__((always_inline, used)) Res<> name
+#define SYSCALL(name) [[gnu::always_inline, gnu::used]] static inline Res<> name
 
 SYSCALL(syscall) (Syscall syscall, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4 = 0, Arg a5 = 0);
 

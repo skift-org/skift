@@ -19,7 +19,6 @@ struct Ok {
         : inner(std::move(value)) {}
 };
 
-
 template <typename V = None, typename E = Error>
 struct [[nodiscard]] Res {
     Var<Ok<V>, E> inner;
@@ -71,6 +70,38 @@ struct [[nodiscard]] Res {
             panic("take() called on an error");
         }
         return std::move(inner.template unwrap<Ok<V>>().inner);
+    }
+
+    template <typename U>
+    constexpr Res<V, U> mapErr(auto f) {
+        if (inner.template is<Ok<V>>()) {
+            return inner.template unwrap<Ok<V>>();
+        }
+        return f(inner.template unwrap<E>());
+    }
+
+    template <typename U>
+    constexpr Res<V, U> mapErr() {
+        if (inner.template is<Ok<V>>()) {
+            return inner.template unwrap<Ok<V>>();
+        }
+        return U{};
+    }
+
+    template <typename U>
+    constexpr Res<U, E> mapValue(auto f) {
+        if (inner.template is<Ok<V>>()) {
+            return f(inner.template unwrap<Ok<V>>().inner);
+        }
+        return inner.template unwrap<E>();
+    }
+
+    template <typename U>
+    constexpr Res<U, E> mapValue() {
+        if (inner.template is<Ok<V>>()) {
+            return inner.template unwrap<Ok<V>>().inner;
+        }
+        return inner.template unwrap<E>();
     }
 };
 

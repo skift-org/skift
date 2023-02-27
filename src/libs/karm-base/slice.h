@@ -12,19 +12,22 @@ inline constexpr Byte operator"" _byte(unsigned long long arg) noexcept {
 }
 
 template <typename T, typename U = typename T::Inner>
-concept Sliceable = requires(T const &t) {
-                        typename T::Inner;
-                        { t.len() } -> Meta::Same<size_t>;
-                        { t.buf() } -> Meta::Same<U const *>;
-                        { t[0uz] } -> Meta::Same<U const &>;
-                    };
+concept Sliceable =
+    requires(T const &t) {
+        typename T::Inner;
+        { t.len() } -> Meta::Same<size_t>;
+        { t.buf() } -> Meta::Same<U const *>;
+        { t[0uz] } -> Meta::Same<U const &>;
+    };
 
 template <typename T, typename U = typename T::Inner>
-concept MutSliceable = Sliceable<T, U> and requires(T &t) {
-                                               { t.len() } -> Meta::Same<size_t>;
-                                               { t.buf() } -> Meta::Same<U *>;
-                                               { t[0uz] } -> Meta::Same<U &>;
-                                           };
+concept MutSliceable =
+    Sliceable<T, U> and
+    requires(T &t) {
+        { t.len() } -> Meta::Same<size_t>;
+        { t.buf() } -> Meta::Same<U *>;
+        { t[0uz] } -> Meta::Same<U &>;
+    };
 
 template <typename T>
 struct Slice {

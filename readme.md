@@ -37,6 +37,7 @@
 - [Getting Started](#getting-started)
   - [Building](#building)
   - [Contributing](#contributing)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 # Introduction
@@ -148,6 +149,27 @@ Binary files should be as small as possible.
 - `optipng -strip all` to reduce the size of PNG images.
 - `gifsicle -O3` to reduce the size of GIF images.
 - `jpegoptim -m90` to reduce the size of JPEG images.
+
+# Acknowledgements
+
+I (sleepy-monax) would like to thank the following people for their help and support:
+ - [Cyp](https://cyp.sh), [Keyboard Slayer](https://github.com/keyboard-slayer), and [D0p1](https://github.com/d0p1s4m4) for being great friends giving me a lot of support and motivation.
+ - [Feliwir](https://github.com/feliwir) for all the work he did on the past skiftOS and BRUTAL project. I learned a lot from his work and I am very grateful for his help.
+ - And all the people who have contributed to the project and send me money on [Github Sponsors](https://github.com/sponsors/sleepy-monax)
+
+## Contributors
+
+<a href="https://github.com/skiftOS/skift/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=skiftOS/skift" />
+</a>
+
+## Projects
+
+- [The OSDev Wiki](https://wiki.osdev.org/Main_Page)
+- [The DEVSE Community](https://devse.wiki)
+- [The Limine Project](https://limine-bootloader.org/)
+- [The BRUTAL Project](https://brutal.smnx.sh)
+- [The SerenityOS Project](https://serenityos.org/)
 
 # License
 

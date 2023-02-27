@@ -180,3 +180,15 @@ I (sleepy-monax) would like to thank the following people for their help and sup
 The skift operating system and its core components are licensed under the **MIT License**.
 
 The full text of the license can be accessed via [this link](https://opensource.org/licenses/MIT) and is also included in the [license.md](license.md) file of this software package.
+
+<br>
+<br>
+<br>
+<br>
+<p align="center">
+  <img width="48" src="https://brutal.smnx.sh/scafold/glider.svg" />
+</p>
+<br>
+<br>
+<br>
+<br>

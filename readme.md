@@ -1,8 +1,5 @@
 <br/>
-<p align="center">
-  <a  href="https://github.com/skiftOS/skift/tree/legacy">Looking for the old skiftOS? Click here</a>
-</p>
-
+<br/>
 <br/>
 <br/>
 <br/>
@@ -22,6 +19,7 @@
 <br/>
 <br/>
 <br/>
+<br/>
 
 # **skiftOS**: The delightful operating system
 
@@ -29,11 +27,39 @@
 [![License](https://img.shields.io/github/license/skift-org/skift)](https://opensource.org/licenses/MIT)
 [![Discord](https://img.shields.io/discord/555284858180730888?label=discord)](http://discord.skiftos.org)
 
+# Table of Contents
 
+- [Table of Contents](#table-of-contents)
+- [Introduction](#introduction)
+  - [Values](#values)
+  - [Features](#features)
+  - [Screenshot](#screenshot)
+- [Getting Started](#getting-started)
+  - [Building](#building)
+  - [Contributing](#contributing)
+- [License](#license)
+
+# Introduction
 
 **skiftOS** is a hobby operating system built from scratch in contemporary C and C++ for ARM, x86, and RISC-V architectures.
 
 Following the 80/20 rule, **skift** tries to be a simple, yet powerful operating system that can be used for daily tasks. It is designed to be modular, extensible, and easy to use and hack on.
+
+## Values
+
+As a hobby operating system, skiftOS is built with the following values in mind:
+
+- **Simple**: skiftOS is designed to be simple and easy to use. It is not meant to be a full-featured operating system, but rather a simple, yet powerful operating system that can be used for daily tasks.
+- **Modern**: skiftOS is built using modern C++ and C standards and is designed to be extensible and hackable.
+- **Modular**: skiftOS is designed to be modular and extensible. It is possible to add new features to the operating system without having to modify the core components.
+- **Open**: skiftOS is open-source and licensed under the MIT license. It is free to use, modify, and redistribute.
+- **Inclusive**: skiftOS is built by a diverse group of people from all around the world. It is designed to be inclusive and welcoming to everyone.
+
+## Features
+
+- **Modern C++ Core Library**: skiftOS is built using [karm](src/libs/) a modern C++ core library build by taking the best of the Rust and C++ worlds.
+- **Modern Reactive UI**: Applications are built using [karm-ui](src/libs/karm-ui) a modern reactive UI library build around unidirectional data flow inspired by [React](https://reactjs.org/) and [Flutter](https://flutter.dev/).
+- **Capability-based Microkernel**: skiftOS is built around a capability-based microkernel that provides a secure and modular environment for applications.
 
 ## Screenshot
 
@@ -43,9 +69,11 @@ Following the 80/20 rule, **skift** tries to be a simple, yet powerful operating
 skiftOS applications running on Linux
 </p>
 
+# Getting Started
+
 ## Building
 
-skiftOS is written in bleeding-edge C2x and C++23 and building it requires a modern C/C++ compiler like clang-14 or GCC-12 installed on the host machine.
+skiftOS is written in bleeding-edge C23 and C++23 and building it requires a modern C/C++ compiler like clang-14 or GCC-12 installed on the host machine.
 
 ```sh
 # Make sure clang is the right version
@@ -66,6 +94,8 @@ Python 3.10.5
 
 Building skiftOS also requires installing [osdk](https://github.com/devse-org/osdk):
 
+> OSDK is a package manager and build system for C/C++/ASM/RUST projects. It is designed to meet the needs of hobby operating systems and other low-level projects.
+
 ```sh
 $ git clone https://github.com/devse-org/osdk
 
@@ -74,11 +104,21 @@ $ cd osdk
 $ pip install --user -e .
 ```
 
-Once you have installed osdk, you can build and boot skiftOS using:
+Once you have installed osdk, you can install the dependencies and build the operating system:
 
 ```sh
-$ osdk boot
+$ osdk install
+
+$ osdk build --all
 ```
+
+Finally, you can run the operating system using:
+
+```sh
+$ osdk start
+```
+
+> After pulling new changes, you can run `osdk clean` to remove the build artifacts and `osdk build --all` to rebuild the operating system.
 
 Individual components can be run on the host system using:
 
@@ -86,7 +126,11 @@ Individual components can be run on the host system using:
 $ osdk run <component>
 ```
 
+> Use `osdk help` to get more information about the available commands.
+
 ## Contributing
+
+Contributions are welcome and encouraged!
 
 This project practice [optimistic merging](http://hintjens.com/blog:106) meaning that pull requests are merged into the main branch as soon as possible. The objective is to keep PR as small, focused, and incremental as possible.
 
@@ -105,7 +149,7 @@ Binary files should be as small as possible.
 - `gifsicle -O3` to reduce the size of GIF images.
 - `jpegoptim -m90` to reduce the size of JPEG images.
 
-## License
+# License
 
 <a href="https://opensource.org/licenses/MIT">
   <img align="right" height="96" alt="MIT License" src="doc/mit.svg" />

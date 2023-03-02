@@ -2,139 +2,180 @@
 #include <karm-logger/logger.h>
 
 #include "arch.h"
+#include "io.h"
 #include "sched.h"
 #include "syscalls.h"
 
 namespace Hjert::Core {
 
-Hj::Code sysLog(char const *msg, size_t len) {
-    logInfo("sysLog: '{}'", Str{msg, len});
-    return Hj::OK;
+Res<> doLog(char const *msg, size_t len) {
+    logInfo("doLog: '{}'", Str{msg, len});
+    return Ok();
 }
 
-Hj::Code sysCreate(Hj::Type type, Hj::Cap *cap, Hj::Arg a0, Hj::Arg a1, Hj::Arg a2, Hj::Arg a3) {
-    (void)type;
+Res<> doCreateDomain(Hj::Cap dest, Hj::Cap *cap, size_t len) {
+    (void)dest;
     (void)cap;
-    (void)a0;
-    (void)a1;
-    (void)a2;
-    (void)a3;
-    return Hj::Code::NOT_IMPLEMENTED;
+    (void)len;
+    return Error::notImplemented();
 }
 
-Hj::Code sysDrop(Hj::Cap cap) {
+Res<> doCreateTask(Hj::Cap dest, Hj::Cap *cap, Hj::Cap domain, Hj::Cap space) {
+    (void)dest;
     (void)cap;
-    return Hj::Code::NOT_IMPLEMENTED;
+    (void)domain;
+    (void)space;
+    return Error::notImplemented();
 }
 
-Hj::Code sysDup(Hj::Cap node, Hj::Cap *dst, Hj::Cap src) {
+Res<> doCreateSpace(Hj::Cap dest, Hj::Cap *cap) {
+    (void)dest;
+    (void)cap;
+    return Error::notImplemented();
+}
+
+Res<> doCreateMem(Hj::Cap dest, Hj::Cap *cap, uintptr_t phys, size_t len, Hj::MemFlags flags) {
+    (void)dest;
+    (void)cap;
+    (void)phys;
+    (void)len;
+    (void)flags;
+    return Error::notImplemented();
+}
+
+Res<> doCreateIo(Hj::Cap dest, Hj::Cap *cap, uintptr_t base, size_t len) {
+    (void)dest;
+    (void)cap;
+    (void)base;
+    (void)len;
+    return Error::notImplemented();
+}
+
+Res<> doDrop(Hj::Cap cap) {
+    (void)cap;
+    return Error::notImplemented();
+}
+
+Res<> doDup(Hj::Cap node, Hj::Cap *dst, Hj::Cap src) {
     (void)node;
     (void)dst;
     (void)src;
-    return Hj::Code::NOT_IMPLEMENTED;
+    return Error::notImplemented();
 }
 
-Hj::Code sysStart(Hj::Cap cap, uintptr_t ip, uintptr_t sp, Hj::Args const *args) {
+Res<> doStart(Hj::Cap cap, uintptr_t ip, uintptr_t sp, Hj::Args const *args) {
     (void)cap;
     (void)ip;
     (void)sp;
     (void)args;
-    return Hj::Code::NOT_IMPLEMENTED;
+    return Error::notImplemented();
 }
 
-Hj::Code sysWait(Hj::Cap cap, Hj::Arg *ret) {
+Res<> doWait(Hj::Cap cap, Hj::Arg *ret) {
     (void)cap;
     (void)ret;
-    return Hj::Code::NOT_IMPLEMENTED;
+    return Error::notImplemented();
 }
 
-Hj::Code sysRet(Hj::Cap cap, Hj::Arg ret) {
+Res<> doRet(Hj::Cap cap, Hj::Arg ret) {
     (void)cap;
     (void)ret;
-    return Hj::Code::NOT_IMPLEMENTED;
+    return Error::notImplemented();
 }
 
-Hj::Code sysMap(Hj::Cap cap, uintptr_t virt, Hj::Cap mem, uintptr_t off, size_t len, Hj::MapFlags flags) {
+Res<> doMap(Hj::Cap cap, uintptr_t virt, Hj::Cap mem, uintptr_t off, size_t len, Hj::MapFlags flags) {
     (void)cap;
     (void)virt;
     (void)mem;
     (void)off;
     (void)len;
     (void)flags;
-    return Hj::Code::NOT_IMPLEMENTED;
+    return Error::notImplemented();
 }
 
-Hj::Code sysUnmap(Hj::Cap cap, uintptr_t virt, size_t len) {
+Res<> doUnmap(Hj::Cap cap, uintptr_t virt, size_t len) {
     (void)cap;
     (void)virt;
     (void)len;
-    return Hj::Code::NOT_IMPLEMENTED;
+    return Error::notImplemented();
 }
 
-Hj::Code sysIn(Hj::Cap cap, Hj::IoLen len, uintptr_t port, Hj::Arg *val) {
+Res<> doIn(Hj::Cap cap, Hj::IoLen len, uintptr_t port, Hj::Arg *val) {
     (void)cap;
     (void)len;
     (void)port;
     (void)val;
-    return Hj::Code::NOT_IMPLEMENTED;
+    return Error::notImplemented();
 }
 
-Hj::Code sysOut(Hj::Cap cap, Hj::IoLen len, uintptr_t port, Hj::Arg val) {
+Res<> doOut(Hj::Cap cap, Hj::IoLen len, uintptr_t port, Hj::Arg val) {
     (void)cap;
     (void)len;
     (void)port;
     (void)val;
-    return Hj::Code::NOT_IMPLEMENTED;
+    return Error::notImplemented();
 }
 
-Hj::Code sysIpc(Hj::Cap *cap, Hj::Cap dst, Hj::Msg *msg, Hj::IpcFlags flags) {
+Res<> doIpc(Hj::Cap *cap, Hj::Cap dst, Hj::Msg *msg, Hj::IpcFlags flags) {
     (void)cap;
     (void)dst;
     (void)msg;
     (void)flags;
-    return Hj::Code::NOT_IMPLEMENTED;
+    return Error::notImplemented();
 }
 
-Hj::Code dispatchSyscall(Hj::Syscall id, Hj::Args args) {
+Res<> dispatchSyscall(Hj::Syscall id, Hj::Args args) {
     switch (id) {
     case Hj::Syscall::LOG:
-        return sysLog((char const *)args[0], args[1]);
+        return doLog((char const *)args[0], args[1]);
 
-    case Hj::Syscall::CREATE:
-        return sysCreate((Hj::Type)args[0], (Hj::Cap *)args[1], args[2], args[3], args[4], args[5]);
+    case Hj::Syscall::CREATE_DOMAIN:
+        return doCreateDomain(Hj::Cap{args[0]}, (Hj::Cap *)args[1], args[2]);
+
+    case Hj::Syscall::CREATE_TASK:
+        return doCreateTask(Hj::Cap{args[0]}, (Hj::Cap *)args[1], Hj::Cap{args[2]}, Hj::Cap{args[3]});
+
+    case Hj::Syscall::CREATE_SPACE:
+        return doCreateSpace(Hj::Cap{args[0]}, (Hj::Cap *)args[1]);
+
+    case Hj::Syscall::CREATE_MEM:
+        return doCreateMem(Hj::Cap{args[0]}, (Hj::Cap *)args[1], args[2], args[3], Hj::MemFlags{args[4]});
+
+    case Hj::Syscall::CREATE_IO:
+        return doCreateIo(Hj::Cap{args[0]}, (Hj::Cap *)args[1], args[2], args[3]);
 
     case Hj::Syscall::DROP:
-        return sysDrop(Hj::Cap{args[0]});
+        return doDrop(Hj::Cap{args[0]});
 
     case Hj::Syscall::DUP:
-        return sysDup(Hj::Cap{args[0]}, (Hj::Cap *)args[1], Hj::Cap{args[2]});
+        return doDup(Hj::Cap{args[0]}, (Hj::Cap *)args[1], Hj::Cap{args[2]});
 
     case Hj::Syscall::START:
-        return sysStart(Hj::Cap{args[0]}, args[1], args[2], (Hj::Args const *)args[3]);
+        return doStart(Hj::Cap{args[0]}, args[1], args[2], (Hj::Args const *)args[3]);
 
     case Hj::Syscall::WAIT:
-        return sysWait(Hj::Cap{args[0]}, (Hj::Arg *)args[1]);
+        return doWait(Hj::Cap{args[0]}, (Hj::Arg *)args[1]);
 
     case Hj::Syscall::RET:
-        return sysRet(Hj::Cap{args[0]}, args[1]);
+        return doRet(Hj::Cap{args[0]}, args[1]);
 
     case Hj::Syscall::MAP:
-        return sysMap(Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]}, args[3], args[4], (Hj::MapFlags)args[5]);
+        return doMap(Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]}, args[3], args[4], (Hj::MapFlags)args[5]);
 
     case Hj::Syscall::UNMAP:
-        return sysUnmap(Hj::Cap{args[0]}, args[1], args[2]);
+        return doUnmap(Hj::Cap{args[0]}, args[1], args[2]);
 
     case Hj::Syscall::IN:
-        return sysIn(Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], (Hj::Arg *)args[3]);
+        return doIn(Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], (Hj::Arg *)args[3]);
 
     case Hj::Syscall::OUT:
-        return sysOut(Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], args[3]);
+        return doOut(Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], args[3]);
 
     case Hj::Syscall::IPC:
-        return sysIpc((Hj::Cap *)args[0], Hj::Cap{args[1]}, (Hj::Msg *)args[2], (Hj::IpcFlags)args[3]);
+        return doIpc((Hj::Cap *)args[0], Hj::Cap{args[1]}, (Hj::Msg *)args[2], (Hj::IpcFlags)args[3]);
 
     default:
-        return Hj::Code::BAD_SYSCALL;
+        return Error::invalidInput("invalid syscall id");
     }
 }
 

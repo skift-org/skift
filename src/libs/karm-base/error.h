@@ -45,6 +45,7 @@ namespace Karm {
     ERROR(CROSSES_DEVICES, crossesDevices)                    \
     ERROR(TOO_MANY_LINKS, tooManyLinks)                       \
     ERROR(INVALID_FILENAME, invalidFilename)                  \
+    ERROR(INVALID_HANDLE, invalidHandle)                      \
     ERROR(ARGUMENT_LIST_TOO_LONG, argumentListTooLong)        \
     ERROR(INTERRUPTED, interrupted)                           \
     ERROR(UNSUPPORTED, unsupported)                           \

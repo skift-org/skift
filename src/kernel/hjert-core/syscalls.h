@@ -4,6 +4,6 @@
 
 namespace Hjert::Core {
 
-Hj::Code dispatchSyscall(Hj::Syscall id, Hj::Args args);
+Res<> dispatchSyscall(Hj::Syscall id, Hj::Args args);
 
 } // namespace Hjert::Core

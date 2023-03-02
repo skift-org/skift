@@ -9,9 +9,11 @@
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
 
+#include "object.h"
+
 namespace Hjert::Core {
 
-struct VNode {
+struct VNode : public Object<VNode> {
     using _Mem = Var<Hal::PmmMem, Hal::DmaRange>;
     _Mem _mem;
 
@@ -24,7 +26,7 @@ struct VNode {
     Hal::PmmRange range();
 };
 
-struct Space {
+struct Space : public Object<Space> {
     struct Map {
         Hal::VmmRange vrange;
         size_t off;

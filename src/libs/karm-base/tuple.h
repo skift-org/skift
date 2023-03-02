@@ -21,6 +21,10 @@ struct Tuple<> {
     constexpr static void visit(void *, auto) {}
 
     constexpr void visit(auto) {}
+
+    constexpr auto apply(auto f, auto &&...args) {
+        return f(std::forward<decltype(args)>(args)...);
+    }
 };
 
 template <typename Car>
@@ -44,6 +48,10 @@ struct Tuple<Car> {
 
     constexpr Cons<Car, None> cons() {
         return {car, None{}};
+    }
+
+    constexpr auto apply(auto f, auto &&...args) {
+        return f(car, std::forward<decltype(args)>(args)...);
     }
 };
 
@@ -71,6 +79,10 @@ struct Tuple<Car, Cdr...> {
 
     constexpr Cons<Car, Tuple<Cdr...>> cons() {
         return {car, cdr.cons()};
+    }
+
+    constexpr auto apply(auto f, auto &&...args) {
+        return apply(f, car, std::forward<decltype(args)>(args)...);
     }
 };
 

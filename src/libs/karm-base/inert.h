@@ -2,8 +2,6 @@
 
 #include <karm-meta/traits.h>
 
-#include "_prelude.h"
-
 #include "std.h"
 
 namespace Karm {
@@ -40,6 +38,6 @@ union Inert {
     }
 };
 
-static_assert(Meta::Trivial<Inert<int>>, "Inert is not trivial");
+static_assert(Meta::Trivial<Inert<isize>>);
 
 }; // namespace Karm

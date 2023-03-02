@@ -13,25 +13,25 @@ struct ConOut : public Sys::Fd {
 
     ConOut(Efi::SimpleTextOutputProtocol *proto) : _proto(proto) {}
 
-    Res<size_t> read(MutBytes) override {
+    Res<usize> read(MutBytes) override {
         notImplemented();
     }
 
-    Res<size_t> write(Bytes bytes) override {
-        size_t writen{};
-        Array<uint16_t, 129> buf{};
+    Res<usize> write(Bytes bytes) override {
+        usize writen{};
+        Array<u16, 129> buf{};
         // Some space for the null terminator.
-        auto chunkSize = sizeOf(buf) - sizeof(uint16_t);
+        auto chunkSize = sizeOf(buf) - sizeof(u16);
 
         while (not isEmpty(bytes)) {
-            size_t toCopy = alignDown(sizeOf(bytes), sizeof(uint16_t));
+            usize toCopy = alignDown(sizeOf(bytes), sizeof(u16));
 
-            // We need to copy the bytes into to a uint16_t aligned buffer.
+            // We need to copy the bytes into to a u16 aligned buffer.
             copy(sub(bytes, 0, toCopy), mutBytes(buf));
 
-            // If bytes.size() is not a multiple of sizeof(uint16_t),
+            // If bytes.size() is not a multiple of sizeof(u16),
             // then the last byte will be ignored.
-            buf[(toCopy / sizeof(uint16_t)) + 1] = 0;
+            buf[(toCopy / sizeof(u16)) + 1] = 0;
 
             try$(_proto->outputString(_proto, buf.buf()));
             writen += toCopy;
@@ -42,11 +42,11 @@ struct ConOut : public Sys::Fd {
         return Ok(writen);
     }
 
-    Res<size_t> seek(Io::Seek) override {
+    Res<usize> seek(Io::Seek) override {
         notImplemented();
     }
 
-    Res<size_t> flush() override {
+    Res<usize> flush() override {
         return Ok(0uz);
     }
 
@@ -75,33 +75,33 @@ struct FileProto : public Sys::Fd, Meta::Static {
         return *this;
     }
 
-    Res<size_t> read(MutBytes bytes) override {
-        size_t size = sizeOf(bytes);
+    Res<usize> read(MutBytes bytes) override {
+        usize size = sizeOf(bytes);
         try$(_proto->read(_proto, &size, bytes.buf()));
         return Ok(size);
     }
 
-    Res<size_t> write(Bytes bytes) override {
-        size_t size = sizeOf(bytes);
+    Res<usize> write(Bytes bytes) override {
+        usize size = sizeOf(bytes);
         try$(_proto->write(_proto, &size, bytes.buf()));
         return Ok(size);
     }
 
-    Res<size_t> seek(Io::Seek seek) override {
-        uint64_t current = 0;
+    Res<usize> seek(Io::Seek seek) override {
+        u64 current = 0;
         try$(_proto->getPosition(_proto, &current));
 
-        size_t bufSize;
+        usize bufSize;
         // NOTE: This is expectected to fail
         (void)_proto->getInfo(_proto, &Efi::FileInfo::UUID, &bufSize, nullptr);
 
-        Buf<uint8_t> buf;
+        Buf<u8> buf;
         buf.resize(bufSize, 0);
 
         Efi::FileInfo *info = (Efi::FileInfo *)buf.buf();
         try$(_proto->getInfo(_proto, &Efi::FileInfo::UUID, &bufSize, info));
 
-        size_t pos = seek.apply(current, info->fileSize);
+        usize pos = seek.apply(current, info->fileSize);
 
         if (pos == current) {
             return Ok(current);
@@ -112,7 +112,7 @@ struct FileProto : public Sys::Fd, Meta::Static {
         return Ok(pos);
     }
 
-    Res<size_t> flush() override {
+    Res<usize> flush() override {
         try$(_proto->flush(_proto));
         return Ok(0uz);
     }
@@ -168,7 +168,7 @@ Res<Strong<Sys::Fd>> createFile(Sys::Path) {
 }
 
 Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
-    size_t vaddr = 0;
+    usize vaddr = 0;
 
     try$(Efi::bs()->allocatePages(
         Efi::AllocateType::ANY_PAGES,
@@ -181,8 +181,8 @@ Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
 }
 
 Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> fd) {
-    size_t vaddr = 0;
-    size_t fileSize = try$(Io::size(*fd));
+    usize vaddr = 0;
+    usize fileSize = try$(Io::size(*fd));
 
     try$(Efi::bs()->allocatePages(
         Efi::AllocateType::ANY_PAGES,
@@ -197,12 +197,12 @@ Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> fd) 
     return Ok(Sys::MmapResult{vaddr, vaddr, Hal::pageAlignUp(fileSize)});
 }
 
-Res<> memUnmap(void const *buf, size_t size) {
-    try$(Efi::bs()->freePages((uint64_t)buf, size / Hal::PAGE_SIZE));
+Res<> memUnmap(void const *buf, usize size) {
+    try$(Efi::bs()->freePages((u64)buf, size / Hal::PAGE_SIZE));
     return Ok();
 }
 
-Res<> memFlush(void *, size_t) {
+Res<> memFlush(void *, usize) {
     return Ok();
 }
 

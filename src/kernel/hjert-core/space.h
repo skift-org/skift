@@ -19,7 +19,7 @@ struct VNode : public Object<VNode> {
 
     VNode(_Mem mem);
 
-    static Res<Strong<VNode>> alloc(size_t size, Hj::MemFlags);
+    static Res<Strong<VNode>> alloc(usize size, Hj::MemFlags);
 
     static Res<Strong<VNode>> makeDma(Hal::DmaRange prange);
 
@@ -29,7 +29,7 @@ struct VNode : public Object<VNode> {
 struct Space : public Object<Space> {
     struct Map {
         Hal::VmmRange vrange;
-        size_t off;
+        usize off;
         Strong<VNode> mem;
     };
 
@@ -47,9 +47,9 @@ struct Space : public Object<Space> {
 
     static Res<Strong<Space>> create();
 
-    Res<size_t> _lookup(Hal::VmmRange vrange);
+    Res<usize> _lookup(Hal::VmmRange vrange);
 
-    Res<Hal::VmmRange> map(Hal::VmmRange vrange, Strong<VNode> mem, size_t off, Hj::MapFlags flags);
+    Res<Hal::VmmRange> map(Hal::VmmRange vrange, Strong<VNode> mem, usize off, Hj::MapFlags flags);
 
     Res<> unmap(Hal::VmmRange vrange);
 

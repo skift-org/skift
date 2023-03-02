@@ -10,7 +10,7 @@ namespace Hal {
 
 struct Kmm;
 
-struct KmmRange : public Range<size_t, struct KmmRangeTag> {
+struct KmmRange : public Range<usize, struct KmmRangeTag> {
     using Range::Range;
 
     Bytes bytes() const {
@@ -37,9 +37,9 @@ using KmmMem = Mem<Kmm, KmmRange>;
 struct Kmm {
     virtual ~Kmm() = default;
 
-    virtual Res<KmmRange> allocRange(size_t size) = 0;
+    virtual Res<KmmRange> allocRange(usize size) = 0;
 
-    Res<KmmMem> allocOwned(size_t size) {
+    Res<KmmMem> allocOwned(usize size) {
         return Ok(KmmMem{*this, try$(allocRange(size))});
     }
 

@@ -189,7 +189,7 @@ struct Text : public View<Text> {
         g.save();
 
         auto m = mesure();
-        auto baseline = bound().topStart() + m.baseline.cast<int>();
+        auto baseline = bound().topStart() + m.baseline.cast<isize>();
 
         if (_style.color) {
             g.fillStyle(*_style.color);
@@ -201,8 +201,8 @@ struct Text : public View<Text> {
         if (debugShowLayoutBounds) {
             g.debugLine(
                 {
-                    bound().topStart() + m.baseline.cast<int>(),
-                    bound().topEnd() + m.baseline.cast<int>(),
+                    bound().topStart() + m.baseline.cast<isize>(),
+                    bound().topEnd() + m.baseline.cast<isize>(),
                 },
                 Gfx::PINK);
             g.debugRect(bound(), Gfx::CYAN);
@@ -212,7 +212,7 @@ struct Text : public View<Text> {
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return mesure().linebound.size().cast<int>();
+        return mesure().linebound.size().cast<isize>();
     }
 };
 
@@ -248,7 +248,7 @@ struct Icon : public View<Icon> {
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return _icon.bound().size().cast<int>();
+        return _icon.bound().size().cast<isize>();
     }
 };
 
@@ -256,7 +256,7 @@ Child icon(Media::Icon icon, Opt<Gfx::Color> color) {
     return makeStrong<Icon>(icon, color);
 }
 
-Child icon(Mdi::Icon i, double size, Opt<Gfx::Color> color) {
+Child icon(Mdi::Icon i, f64 size, Opt<Gfx::Color> color) {
     return icon(Media::Icon{i, size}, color);
 }
 
@@ -276,7 +276,7 @@ struct Image : public View<Image> {
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return _image.bound().size().cast<int>();
+        return _image.bound().size().cast<isize>();
     }
 };
 
@@ -321,9 +321,9 @@ Child canvas(OnPaint onPaint) {
 /* --- Blur ----------------------------------------------------------------- */
 
 struct Blur : public ProxyNode<Blur> {
-    int _radius;
+    isize _radius;
 
-    Blur(int radius, Child child)
+    Blur(isize radius, Child child)
         : ProxyNode<Blur>(std::move(child)), _radius(radius) {}
 
     void reconcile(Blur &o) override {
@@ -337,7 +337,7 @@ struct Blur : public ProxyNode<Blur> {
     }
 };
 
-Child blur(int radius, Child child) {
+Child blur(isize radius, Child child) {
     return makeStrong<Blur>(radius, std::move(child));
 }
 

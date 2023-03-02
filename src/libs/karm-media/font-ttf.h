@@ -32,7 +32,7 @@ struct TtfFontface : public Fontface {
         };
     }
 
-    double advance(Rune c) const override {
+    f64 advance(Rune c) const override {
         return _ttf.glyphMetrics(c).advance;
     }
 
@@ -40,7 +40,7 @@ struct TtfFontface : public Fontface {
         _ttf.glyphContour(g, rune);
     }
 
-    double units() const override {
+    f64 units() const override {
         return _ttf.unitPerEm();
     }
 };

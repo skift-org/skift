@@ -5,7 +5,7 @@
 
 namespace Karm::Sys {
 
-enum MmapFlags : uint64_t {
+enum MmapFlags : u64 {
     NONE = 0,
     READ = (1 << 0),
     WRITE = (1 << 1),
@@ -21,16 +21,16 @@ FlagsEnum$(MmapFlags);
 
 struct MmapOptions {
     MmapFlags flags = NONE;
-    size_t vaddr = 0;
-    size_t paddr = 0;
-    size_t offset = 0;
-    size_t size = 0;
+    usize vaddr = 0;
+    usize paddr = 0;
+    usize offset = 0;
+    usize size = 0;
 };
 
 struct MmapResult {
-    size_t paddr;
-    size_t vaddr;
-    size_t size;
+    usize paddr;
+    usize vaddr;
+    usize size;
 };
 
 } // namespace Karm::Sys

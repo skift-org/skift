@@ -10,12 +10,12 @@
 namespace Jpeg {
 
 struct YCbCr {
-    double y;
-    double cb;
-    double cr;
+    f64 y;
+    f64 cb;
+    f64 cr;
 };
 
-static constexpr Array<uint8_t, 8 * 8> ZIG_ZAG = {
+static constexpr Array<u8, 8 * 8> ZIG_ZAG = {
     0, 1, 8, 16, 9, 2, 3, 10,
     17, 24, 32, 25, 18, 11, 4, 5,
     12, 19, 26, 33, 40, 48, 41, 34,
@@ -34,21 +34,21 @@ struct Jfxx : public BChunk {
 };
 
 struct Image {
-    static constexpr Array<uint8_t, 2> SOI = {0xFF, 0xD8};
-    static constexpr Array<uint8_t, 2> SOS = {0xFF, 0xDA};
-    static constexpr Array<uint8_t, 2> EOI = {0xFF, 0xD9};
+    static constexpr Array<u8, 2> SOI = {0xFF, 0xD8};
+    static constexpr Array<u8, 2> SOS = {0xFF, 0xDA};
+    static constexpr Array<u8, 2> EOI = {0xFF, 0xD9};
 
     Bytes _slice;
     Bytes _imageData;
 
-    int _width;
-    int _height;
+    isize _width;
+    isize _height;
 
-    int width() {
+    isize width() {
         return 16;
     }
 
-    int height() {
+    isize height() {
         return 16;
     }
 
@@ -76,7 +76,7 @@ struct Image {
         };
 
         auto s = begin();
-        s.nextBeInt16(); // SOI
+        s.nextI16be(); // SOI
 
         return Iter{[s]() mutable -> Opt<Seg> {
             Seg seg;

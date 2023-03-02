@@ -9,7 +9,7 @@ namespace Hjert::Core {
 
 VNode::VNode(_Mem mem) : _mem(std::move(mem)) {}
 
-Res<Strong<VNode>> VNode::alloc(size_t size, Hj::MemFlags) {
+Res<Strong<VNode>> VNode::alloc(usize size, Hj::MemFlags) {
     auto mem = try$(pmm().allocOwned(size, Hal::PmmFlags::UPPER));
     return Ok(makeStrong<VNode>(std::move(mem)));
 }
@@ -38,8 +38,8 @@ Res<Strong<Space>> Space::create() {
     return Arch::createSpace();
 }
 
-Res<size_t> Space::_lookup(Hal::VmmRange vrange) {
-    for (size_t i = 0; i < _maps.len(); i++) {
+Res<usize> Space::_lookup(Hal::VmmRange vrange) {
+    for (usize i = 0; i < _maps.len(); i++) {
         auto &map = _maps[i];
         if (Op::eq(map.vrange, vrange)) {
             return Ok(i);
@@ -49,7 +49,7 @@ Res<size_t> Space::_lookup(Hal::VmmRange vrange) {
     return Error::invalidInput("no such mapping");
 }
 
-Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> mem, size_t off, Hj::MapFlags flags) {
+Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> mem, usize off, Hj::MapFlags flags) {
     LockScope scope{_lock};
 
     try$(vrange.ensureAligned(Hal::PAGE_SIZE));

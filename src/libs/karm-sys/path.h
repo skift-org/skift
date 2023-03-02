@@ -35,7 +35,7 @@ struct Path {
     }
 
     Path parent() const {
-        for (size_t i = _str.len(); i > 0; --i) {
+        for (usize i = _str.len(); i > 0; --i) {
             if (_str[i - 1] == SEPARATOR) {
                 Str p = sub(_str, 0, i - 1);
                 return Path(p);
@@ -45,9 +45,9 @@ struct Path {
         return Path();
     }
 
-    Path parent(size_t index) {
+    Path parent(usize index) {
         Path p = *this;
-        for (size_t i = 0; i < index; ++i) {
+        for (usize i = 0; i < index; ++i) {
             p = p.parent();
         }
         return p;
@@ -62,7 +62,7 @@ struct Path {
 
 template <>
 struct Karm::Fmt::Formatter<Sys::Path> {
-    Res<size_t> format(Io::_TextWriter &writer, Sys::Path path) {
+    Res<usize> format(Io::_TextWriter &writer, Sys::Path path) {
         return Fmt::format(writer, "{}", path.str());
     }
 };

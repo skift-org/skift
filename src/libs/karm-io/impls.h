@@ -10,13 +10,13 @@
 namespace Karm::Io {
 
 struct Sink : public Writer {
-    Res<size_t> write(Bytes bytes) override {
+    Res<usize> write(Bytes bytes) override {
         return Ok(sizeOf(bytes));
     }
 };
 
 struct Zero : public Reader {
-    Res<size_t> read(MutBytes bytes) override {
+    Res<usize> read(MutBytes bytes) override {
         return Ok(zeroFill(bytes));
     }
 };
@@ -26,13 +26,13 @@ struct Repeat : public Reader {
 
     Repeat(Byte byte) : _byte(byte) {}
 
-    Res<size_t> read(MutBytes bytes) override {
+    Res<usize> read(MutBytes bytes) override {
         return Ok(fill(bytes, _byte));
     }
 };
 
 struct Empty : public Reader {
-    Res<size_t> read(MutBytes) override {
+    Res<usize> read(MutBytes) override {
         return Ok(0uz);
     }
 };
@@ -40,17 +40,17 @@ struct Empty : public Reader {
 template <Readable Readable>
 struct Limit : public Reader {
     Readable _reader;
-    size_t _limit;
-    size_t _read;
+    usize _limit;
+    usize _read;
 
-    Limit(Readable &&reader, size_t limit)
+    Limit(Readable &&reader, usize limit)
         : _reader(std::forward<Readable>(reader)),
           _limit(limit) {
     }
 
-    Res<size_t> read(MutBytes bytes) override {
-        size_t size = clamp(sizeOf(bytes), 0uz, _limit - _read);
-        size_t read = try$(_reader.read(bytes.buf(), size));
+    Res<usize> read(MutBytes bytes) override {
+        usize size = clamp(sizeOf(bytes), 0uz, _limit - _read);
+        usize read = try$(_reader.read(bytes.buf(), size));
         _read += read;
         return Ok(read);
     }
@@ -59,21 +59,21 @@ struct Limit : public Reader {
 template <SeekableWritable Writable>
 struct WriterSlice : public Writer, public Seeker {
     Writable _writer;
-    size_t _start;
-    size_t _end;
+    usize _start;
+    usize _end;
 
-    WriterSlice(Writable writer, size_t start, size_t end) : _writer(writer), _start(start), _end(end) {}
+    WriterSlice(Writable writer, usize start, usize end) : _writer(writer), _start(start), _end(end) {}
 
-    Res<size_t> seek(Seek seek) override {
-        size_t pos = try$(tell(_writer));
-        size_t s = size(*this);
+    Res<usize> seek(Seek seek) override {
+        usize pos = try$(tell(_writer));
+        usize s = size(*this);
         pos = seek.apply(pos, s);
         pos = clamp(pos, _start, _end);
         return _writer.seek(Seek::fromBegin(pos));
     }
 
-    Res<size_t> write(Bytes bytes) override {
-        size_t pos = try$(tell(_writer));
+    Res<usize> write(Bytes bytes) override {
+        usize pos = try$(tell(_writer));
 
         if (pos < _start) {
             try$(_writer.seek(Seek::fromBegin(_start)));
@@ -83,13 +83,13 @@ struct WriterSlice : public Writer, public Seeker {
             return Ok(0uz);
         }
 
-        size_t size = clamp(sizeOf(bytes), 0uz, _end - pos);
+        usize size = clamp(sizeOf(bytes), 0uz, _end - pos);
         return _writer.write(sub(bytes, 0, size));
     }
 };
 
 template <SeekableWritable Writable>
-inline Res<Slice<Writable>> makeSlice(Writable &&writer, size_t size) {
+inline Res<Slice<Writable>> makeSlice(Writable &&writer, usize size) {
     auto start = try$(writer.tell());
     auto end = start + size;
 
@@ -100,18 +100,18 @@ struct BufReader :
     public Reader,
     public Seeker {
     Bytes _buf;
-    size_t _pos;
+    usize _pos;
 
     BufReader(Bytes buf) : _buf(buf), _pos(0) {}
 
-    Res<size_t> read(MutBytes bytes) override {
+    Res<usize> read(MutBytes bytes) override {
         Bytes slice = sub(_buf, _pos, sizeOf(bytes));
-        size_t read = copy(slice, bytes);
+        usize read = copy(slice, bytes);
         _pos += read;
         return Ok(read);
     }
 
-    Res<size_t> seek(Seek seek) override {
+    Res<usize> seek(Seek seek) override {
         _pos = seek.apply(_pos, sizeOf(_buf));
         _pos = clamp(_pos, 0uz, sizeOf(_buf));
         return Ok(_pos);
@@ -122,19 +122,19 @@ struct BufWriter :
     public Writer,
     public Seeker {
     MutBytes _buf;
-    size_t _pos;
+    usize _pos;
 
     BufWriter(MutBytes buf) : _buf(buf), _pos(0) {}
 
-    Res<size_t> seek(Seek seek) override {
+    Res<usize> seek(Seek seek) override {
         _pos = seek.apply(_pos, sizeOf(_buf));
         _pos = clamp(_pos, 0uz, sizeOf(_buf));
         return Ok(_pos);
     }
 
-    Res<size_t> write(Bytes bytes) override {
+    Res<usize> write(Bytes bytes) override {
         MutBytes slice = mutNext(_buf, _pos);
-        size_t written = copy(bytes, slice);
+        usize written = copy(bytes, slice);
         _pos += written;
         return Ok(written);
     }
@@ -142,19 +142,19 @@ struct BufWriter :
 
 struct BitReader {
     Reader &_reader;
-    uint8_t _bits;
-    uint8_t _len;
+    u8 _bits;
+    u8 _len;
 
     BitReader(Reader &reader)
         : _reader(reader), _bits(0), _len(0) {}
 
-    Res<uint8_t> readBit() {
+    Res<u8> readBit() {
         if (_len == 0) {
             try$(_reader.read(MutBytes{&_bits, 1}));
             _len = 8;
         }
 
-        uint8_t bit = _bits & 1;
+        u8 bit = _bits & 1;
         _bits >>= 1;
         _len -= 1;
 
@@ -162,9 +162,9 @@ struct BitReader {
     }
 
     template <typename T>
-    Res<T> readBits(size_t len) {
+    Res<T> readBits(usize len) {
         T bits = 0;
-        for (size_t i = 0; i < len; i++) {
+        for (usize i = 0; i < len; i++) {
             bits |= try$(readBit()) << i;
         }
         return Ok(bits);
@@ -175,21 +175,21 @@ template <StaticEncoding E>
 struct _StringWriter : public _TextWriter {
     Buf<typename E::Unit> _buf{};
 
-    _StringWriter(size_t cap = 16) : _buf(cap) {}
+    _StringWriter(usize cap = 16) : _buf(cap) {}
 
-    Res<size_t> write(Bytes) override {
+    Res<usize> write(Bytes) override {
         panic("can't write raw bytes to a string");
     }
 
-    Res<size_t> writeStr(Str str) override {
-        size_t written = 0;
+    Res<usize> writeStr(Str str) override {
+        usize written = 0;
         for (auto rune : iterRunes(str)) {
             written += try$(writeRune(rune));
         }
         return Ok(written);
     }
 
-    Res<size_t> writeRune(Rune rune) override {
+    Res<usize> writeRune(Rune rune) override {
         typename E::One one;
         if (!E::encodeUnit(rune, one)) {
             return Error::invalidInput("invalid rune");
@@ -202,7 +202,7 @@ struct _StringWriter : public _TextWriter {
         return Ok(1uz);
     }
 
-    Res<size_t> writeUnit(Slice<typename E::Unit> unit) {
+    Res<usize> writeUnit(Slice<typename E::Unit> unit) {
         _buf.insert(COPY, _buf.len(), unit.buf(), unit.len());
         return Ok(unit.len());
     }
@@ -212,7 +212,7 @@ struct _StringWriter : public _TextWriter {
     }
 
     String take() {
-        size_t len = _buf.size();
+        usize len = _buf.size();
         _buf.insert(len, 0);
 
         return String{MOVE, _buf.take(), len};

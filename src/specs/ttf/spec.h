@@ -21,26 +21,26 @@ namespace Ttf {
 struct Head : public BChunk {
     static constexpr Str SIG = "head";
 
-    int unitPerEm() const {
+    u16 unitPerEm() const {
         auto s = begin();
         s.skip(18);
-        return s.nextBeUint16();
+        return s.nextU16be();
     }
 
-    int locaFormat() const {
+    u16 locaFormat() const {
         auto s = begin();
         s.skip(50);
-        return s.nextBeUint16();
+        return s.nextU16be();
     }
 };
 
 struct Maxp : public BChunk {
     static constexpr Str SIG = "maxp";
 
-    int numGlyphs() const {
+    u16 numGlyphs() const {
         auto s = begin();
         s.skip(4);
-        return s.nextBeUint16();
+        return s.nextU16be();
     }
 };
 
@@ -48,9 +48,9 @@ struct Cmap : public BChunk {
     static constexpr Str SIG = "cmap";
 
     struct Table {
-        uint16_t platformId;
-        uint16_t encodingId;
-        uint16_t type;
+        u16 platformId;
+        u16 encodingId;
+        u16 type;
 
         Bytes slice;
 
@@ -58,32 +58,32 @@ struct Cmap : public BChunk {
             return slice;
         }
 
-        size_t _glyphIdForType4(Rune r) const {
-            uint16_t segCountX2 = begin().skip(6).nextBeUint16();
-            uint16_t segCount = segCountX2 / 2;
+        usize _glyphIdForType4(Rune r) const {
+            u16 segCountX2 = begin().skip(6).nextU16be();
+            u16 segCount = segCountX2 / 2;
 
-            for (size_t i = 0; i < segCount; i++) {
+            for (usize i = 0; i < segCount; i++) {
                 auto s = begin().skip(14);
 
-                uint16_t endCode = s.skip(i * 2).peekBeUint16();
+                u16 endCode = s.skip(i * 2).peekU16be();
 
                 if (r >= endCode)
                     continue;
 
                 // + 2 for reserved padding
-                uint16_t startCode = s.skip(segCountX2 + 2).peekBeUint16();
+                u16 startCode = s.skip(segCountX2 + 2).peekU16be();
 
                 if (r < startCode)
                     break;
 
-                uint16_t idDelta = s.skip(segCountX2).peekBeInt16();
-                uint16_t idRangeOffset = s.skip(segCountX2).peekBeUint16();
+                u16 idDelta = s.skip(segCountX2).peekI16be();
+                u16 idRangeOffset = s.skip(segCountX2).peekU16be();
 
                 if (idRangeOffset == 0) {
                     return (r + idDelta) & 0xFFFF;
                 } else {
                     auto offset = idRangeOffset + (r - startCode) * 2;
-                    return s.skip(offset).nextBeUint16();
+                    return s.skip(offset).nextU16be();
                 }
             }
 
@@ -91,14 +91,14 @@ struct Cmap : public BChunk {
             return 0;
         }
 
-        size_t _glyphForType12(Rune r) const {
+        usize _glyphForType12(Rune r) const {
             auto s = begin().skip(12);
-            uint32_t nGroups = s.nextBeUint32();
+            u32 nGroups = s.nextU32be();
 
-            for (uint32_t i = 0; i < nGroups; i++) {
-                uint32_t startCode = s.nextBeUint32();
-                uint32_t endCode = s.nextBeUint32();
-                uint32_t glyphOffset = s.nextBeUint32();
+            for (u32 i = 0; i < nGroups; i++) {
+                u32 startCode = s.nextU32be();
+                u32 endCode = s.nextU32be();
+                u32 glyphOffset = s.nextU32be();
 
                 if (r < startCode)
                     break;
@@ -115,7 +115,7 @@ struct Cmap : public BChunk {
             return 0;
         }
 
-        size_t glyphIdFor(Rune r) const {
+        usize glyphIdFor(Rune r) const {
             if (type == 4) {
                 return _glyphIdForType4(r);
             } else if (type == 12) {
@@ -129,18 +129,18 @@ struct Cmap : public BChunk {
     auto iterTables() {
         auto s = begin();
         s.skip(2);
-        size_t numTables = s.nextBeUint16();
+        usize numTables = s.nextU16be();
 
         return Iter{[this, s, i = 0uz, numTables]() mutable -> Opt<Table> {
             if (i == numTables) {
                 return NONE;
             }
 
-            uint16_t platformId = s.nextBeUint16();
-            uint16_t encodingId = s.nextBeUint16();
-            uint32_t offset = s.nextBeUint32();
+            u16 platformId = s.nextU16be();
+            u16 encodingId = s.nextU16be();
+            u32 offset = s.nextU32be();
             auto slice = sub(_slice, offset, _slice.len());
-            uint16_t type = BScan{slice}.nextBeUint16();
+            u16 type = BScan{slice}.nextU16be();
             i++;
 
             return Table{platformId, encodingId, type, slice};
@@ -151,14 +151,14 @@ struct Cmap : public BChunk {
 struct Loca : public BChunk {
     static constexpr Str SIG = "loca";
 
-    size_t glyfOffset(int glyphId, Head const &head) const {
+    usize glyfOffset(isize glyphId, Head const &head) const {
         auto s = begin();
         if (head.locaFormat() == 0) {
             s.skip(glyphId * 2);
-            return s.nextBeUint16();
+            return s.nextU16be();
         } else {
             s.skip(glyphId * 4);
-            return s.nextBeUint32();
+            return s.nextU32be();
         }
     }
 };
@@ -166,36 +166,36 @@ struct Loca : public BChunk {
 struct Glyf : public BChunk {
     static constexpr Str SIG = "glyf";
 
-    static constexpr uint8_t ON_CURVE_POINT = 0x01;
-    static constexpr uint8_t X_SHORT_VECTOR = 0x02;
-    static constexpr uint8_t Y_SHORT_VECTOR = 0x04;
-    static constexpr uint8_t REPEAT = 0x08;
-    static constexpr uint8_t SAME_OR_POSITIVE_X = 0x10;
-    static constexpr uint8_t SAME_OR_POSITIVE_Y = 0x20;
-    static constexpr uint8_t OVERLAY_SIMPLE = 0x40;
+    static constexpr u8 ON_CURVE_POINT = 0x01;
+    static constexpr u8 X_SHORT_VECTOR = 0x02;
+    static constexpr u8 Y_SHORT_VECTOR = 0x04;
+    static constexpr u8 REPEAT = 0x08;
+    static constexpr u8 SAME_OR_POSITIVE_X = 0x10;
+    static constexpr u8 SAME_OR_POSITIVE_Y = 0x20;
+    static constexpr u8 OVERLAY_SIMPLE = 0x40;
 
     struct Metrics {
-        int numContours;
-        int xMin;
-        int yMin;
-        int xMax;
-        int yMax;
+        i16 numContours;
+        i16 xMin;
+        i16 yMin;
+        i16 xMax;
+        i16 yMax;
     };
 
-    Metrics metrics(BScan &s, size_t glyfOffset) const {
+    Metrics metrics(BScan &s, usize glyfOffset) const {
         s.skip(glyfOffset);
-        auto numContours = s.nextBeInt16();
+        auto numContours = s.nextI16be();
         if (numContours == 0) {
             return {};
         }
-        auto xMin = s.nextBeInt16();
-        auto yMin = s.nextBeInt16();
-        auto xMax = s.nextBeInt16();
-        auto yMax = s.nextBeInt16();
+        auto xMin = s.nextI16be();
+        auto yMin = s.nextI16be();
+        auto xMax = s.nextI16be();
+        auto yMax = s.nextI16be();
         return {numContours, xMin, yMin, xMax, yMax};
     }
 
-    Metrics metrics(size_t glyfOffset) const {
+    Metrics metrics(usize glyfOffset) const {
         auto s = begin();
         return metrics(s, glyfOffset);
     }
@@ -210,27 +210,27 @@ struct Glyf : public BChunk {
             Y_SAME_OR_POSITIVE_Y_SHORT_VECTOR = 0x20,
             OVERLAP_SIMPLE = 0x40,
         };
-        uint8_t flags;
-        int16_t x;
-        int16_t y;
+        u8 flags;
+        i16 x;
+        i16 y;
     };
 
     void contourSimple(Gfx::Context &g, Metrics m, BScan &s) const {
         auto endPtsOfContours = s;
-        auto nPoints = s.peek(2 * (m.numContours - 1)).nextBeUint16() + 1u;
-        uint16_t instructionLength = s.skip(m.numContours * 2).nextBeUint16();
+        auto nPoints = s.peek(2 * (m.numContours - 1)).nextU16be() + 1u;
+        u16 instructionLength = s.skip(m.numContours * 2).nextU16be();
 
         auto flagsScan = s.skip(instructionLength);
 
-        size_t nXCoords = 0;
-        uint8_t flags = 0;
-        uint8_t flagsRepeat = 0;
+        usize nXCoords = 0;
+        u8 flags = 0;
+        u8 flagsRepeat = 0;
 
-        for (size_t i = 0; i < nPoints; i++) {
+        for (usize i = 0; i < nPoints; i++) {
             if (not flagsRepeat) {
-                flags = s.nextBeUint8();
+                flags = s.nextU8be();
                 if (flags & REPEAT) {
-                    flagsRepeat = s.nextBeUint8();
+                    flagsRepeat = s.nextU8be();
                 }
             } else {
                 flagsRepeat--;
@@ -244,36 +244,36 @@ struct Glyf : public BChunk {
         auto xCoordsScan = s;
         auto yCoordsScan = s.skip(nXCoords);
 
-        size_t start = 0;
+        usize start = 0;
         Math::Vec2f curr{};
         flags = 0;
         flagsRepeat = 0;
-        for (int c = 0; c < m.numContours; c++) {
-            size_t end = endPtsOfContours.nextBeUint16();
+        for (isize c = 0; c < m.numContours; c++) {
+            usize end = endPtsOfContours.nextU16be();
 
             Math::Vec2f cp{};
             Math::Vec2f startP{};
             bool wasCp = false;
 
-            for (size_t i = start; i <= end; i++) {
+            for (usize i = start; i <= end; i++) {
                 if (not flagsRepeat) {
-                    flags = flagsScan.nextBeUint8();
+                    flags = flagsScan.nextU8be();
                     if (flags & REPEAT) {
-                        flagsRepeat = flagsScan.nextBeUint8();
+                        flagsRepeat = flagsScan.nextU8be();
                     }
                 } else {
                     flagsRepeat--;
                 }
 
-                int x = (flags & X_SHORT_VECTOR)
-                            ? ((flags & SAME_OR_POSITIVE_X) ? xCoordsScan.nextBeUint8() : -xCoordsScan.nextBeUint8())
-                            : ((flags & SAME_OR_POSITIVE_X) ? 0 : xCoordsScan.nextBeInt16());
+                isize x = (flags & X_SHORT_VECTOR)
+                              ? ((flags & SAME_OR_POSITIVE_X) ? xCoordsScan.nextU8be() : -xCoordsScan.nextU8be())
+                              : ((flags & SAME_OR_POSITIVE_X) ? 0 : xCoordsScan.nextI16be());
 
-                int y = (flags & Y_SHORT_VECTOR)
-                            ? ((flags & SAME_OR_POSITIVE_Y) ? yCoordsScan.nextBeUint8() : -yCoordsScan.nextBeUint8())
-                            : ((flags & SAME_OR_POSITIVE_Y) ? 0 : yCoordsScan.nextBeInt16());
+                isize y = (flags & Y_SHORT_VECTOR)
+                              ? ((flags & SAME_OR_POSITIVE_Y) ? yCoordsScan.nextU8be() : -yCoordsScan.nextU8be())
+                              : ((flags & SAME_OR_POSITIVE_Y) ? 0 : yCoordsScan.nextI16be());
 
-                curr = curr + Math::Vec2f{(double)x, (double)-y};
+                curr = curr + Math::Vec2f{(f64)x, (f64)-y};
 
                 if (i == start) {
                     g.moveTo(curr);
@@ -313,7 +313,7 @@ struct Glyf : public BChunk {
         logTodo();
     }
 
-    void contour(Gfx::Context &g, size_t glyfOffset) const {
+    void contour(Gfx::Context &g, usize glyfOffset) const {
         auto s = begin();
         auto m = metrics(s, glyfOffset);
 
@@ -328,58 +328,58 @@ struct Glyf : public BChunk {
 struct Hhea : public BChunk {
     static constexpr Str SIG = "hhea";
 
-    int ascender() const {
+    isize ascender() const {
         auto s = begin();
         s.skip(4);
-        return s.nextBeInt16();
+        return s.nextI16be();
     }
 
-    int descender() const {
+    isize descender() const {
         auto s = begin();
         s.skip(6);
-        return -s.nextBeInt16();
+        return -s.nextI16be();
     }
 
-    int lineGap() const {
+    isize lineGap() const {
         auto s = begin();
         s.skip(8);
-        return s.nextBeInt16();
+        return s.nextI16be();
     }
 
-    int advanceWidthMax() const {
+    isize advanceWidthMax() const {
         auto s = begin();
         s.skip(10);
-        return s.nextBeUint16();
+        return s.nextU16be();
     }
 
-    int numberOfHMetrics() const {
+    isize numberOfHMetrics() const {
         auto s = begin();
         s.skip(34);
-        return s.nextBeUint16();
+        return s.nextU16be();
     }
 };
 
 struct Hmtx : public BChunk {
     static constexpr Str SIG = "hmtx";
-    static constexpr int LONG_RECORD_SIZE = 4;
-    static constexpr int SHORT_RECORD_SIZE = 2;
+    static constexpr isize LONG_RECORD_SIZE = 4;
+    static constexpr isize SHORT_RECORD_SIZE = 2;
 
     struct Metrics {
-        int advanceWidth;
-        int lsb;
+        isize advanceWidth;
+        isize lsb;
     };
 
-    Metrics metrics(int glyphId, Hhea const &hhea) const {
+    Metrics metrics(isize glyphId, Hhea const &hhea) const {
         if (glyphId < hhea.numberOfHMetrics()) {
             auto s = begin().skip(glyphId * 4);
-            return {s.nextBeUint16(), s.nextBeInt16()};
+            return {s.nextU16be(), s.nextI16be()};
         } else {
-            size_t advOffset = (hhea.numberOfHMetrics() - 1) * LONG_RECORD_SIZE;
-            size_t lsbOffset = hhea.numberOfHMetrics() * LONG_RECORD_SIZE +
-                               (glyphId - hhea.numberOfHMetrics()) * SHORT_RECORD_SIZE;
+            usize advOffset = (hhea.numberOfHMetrics() - 1) * LONG_RECORD_SIZE;
+            usize lsbOffset = hhea.numberOfHMetrics() * LONG_RECORD_SIZE +
+                              (glyphId - hhea.numberOfHMetrics()) * SHORT_RECORD_SIZE;
 
-            int adv = begin().skip(advOffset).nextBeUint16();
-            int lsb = begin().skip(lsbOffset).nextBeUint16();
+            isize adv = begin().skip(advOffset).nextU16be();
+            isize lsb = begin().skip(lsbOffset).nextU16be();
 
             return {adv, lsb};
         }
@@ -387,19 +387,19 @@ struct Hmtx : public BChunk {
 };
 
 struct GlyphMetrics {
-    double x;
-    double y;
-    double width;
-    double height;
-    double lsb;
-    double advance;
+    f64 x;
+    f64 y;
+    f64 width;
+    f64 height;
+    f64 lsb;
+    f64 advance;
 };
 
 struct Metrics {
-    double ascend;
-    double descend;
-    double linegap;
-    double maxWidth;
+    f64 ascend;
+    f64 descend;
+    f64 linegap;
+    f64 maxWidth;
 };
 
 struct Font {
@@ -415,13 +415,13 @@ struct Font {
 
     static Res<Cmap::Table> chooseCmap(Font &font) {
         Opt<Cmap::Table> bestCmap = NONE;
-        int bestScore = 0;
+        isize bestScore = 0;
 
         struct KnowCmap {
-            int platformId;
-            int encodingId;
-            int type;
-            int score;
+            isize platformId;
+            isize encodingId;
+            isize type;
+            isize score;
         };
 
         Array<KnowCmap, 4> knowCmaps = {
@@ -455,7 +455,7 @@ struct Font {
 
         if (font.version() != 0x00010000 and
             font.version() != 0x4F54544F) {
-            logError("ttf: version {x} is not supported", (uint64_t)font.version());
+            logError("ttf: version {x} is not supported", (u64)font.version());
             return Error::other("invalid version");
         }
 
@@ -478,23 +478,23 @@ struct Font {
         return _slice;
     }
 
-    uint32_t version() {
-        return begin().nextBeUint32();
+    u32 version() {
+        return begin().nextU32be();
     }
 
     auto iterTables() {
         auto scan = begin();
-        /* auto version = */ scan.nextBeUint32();
-        auto numTables = scan.nextBeUint16();
-        /* auto searchRange = */ scan.nextBeUint16();
-        /* auto entrySelector = */ scan.nextBeUint16();
-        /* auto rangeShift = */ scan.nextBeUint16();
+        /* auto version = */ scan.nextU32be();
+        auto numTables = scan.nextU16be();
+        /* auto searchRange = */ scan.nextU16be();
+        /* auto entrySelector = */ scan.nextU16be();
+        /* auto rangeShift = */ scan.nextU16be();
 
         struct Table {
             Str tag;
-            uint32_t checkSum;
-            uint32_t offset;
-            uint32_t length;
+            u32 checkSum;
+            u32 offset;
+            u32 length;
         };
 
         return Iter{[scan, i = 0uz, numTables]() mutable -> Opt<Table> {
@@ -504,9 +504,9 @@ struct Font {
 
             Table table{};
             table.tag = scan.nextStr(4);
-            table.checkSum = scan.nextBeUint32();
-            table.offset = scan.nextBeUint32();
-            table.length = scan.nextBeUint32();
+            table.checkSum = scan.nextU32be();
+            table.offset = scan.nextU32be();
+            table.length = scan.nextU32be();
 
             i++;
             return table;
@@ -545,12 +545,12 @@ struct Font {
         auto hmtx = _hmtx.metrics(glyphId, _hhea);
 
         return {
-            (double)glyf.xMin,
-            (double)-glyf.yMax,
-            (double)glyf.xMax - glyf.xMin,
-            (double)glyf.yMax - glyf.yMin,
-            (double)hmtx.lsb,
-            (double)hmtx.advanceWidth,
+            (f64)glyf.xMin,
+            (f64)-glyf.yMax,
+            (f64)glyf.xMax - glyf.xMin,
+            (f64)glyf.yMax - glyf.yMin,
+            (f64)hmtx.lsb,
+            (f64)hmtx.advanceWidth,
         };
     }
 
@@ -566,14 +566,14 @@ struct Font {
 
     Metrics metrics() const {
         return {
-            (double)_hhea.ascender(),
-            (double)_hhea.descender(),
-            (double)_hhea.lineGap(),
-            (double)_hhea.advanceWidthMax(),
+            (f64)_hhea.ascender(),
+            (f64)_hhea.descender(),
+            (f64)_hhea.lineGap(),
+            (f64)_hhea.advanceWidthMax(),
         };
     }
 
-    double unitPerEm() const {
+    f64 unitPerEm() const {
         return _head.unitPerEm();
     }
 };

@@ -12,11 +12,11 @@ struct Mmap :
     Meta::NoCopy {
     using enum MmapFlags;
 
-    size_t _paddr{};
+    usize _paddr{};
     void const *_buf{};
-    size_t _size{};
+    usize _size{};
 
-    Mmap(size_t paddr, void const *buf, size_t size)
+    Mmap(usize paddr, void const *buf, usize size)
         : _paddr(paddr), _buf(buf), _size(size) {}
 
     Mmap(Mmap &&other) {
@@ -45,9 +45,9 @@ struct Mmap :
         return Ok();
     }
 
-    size_t vaddr() const { return (size_t)_buf; }
+    usize vaddr() const { return (usize)_buf; }
 
-    size_t paddr() const { return _paddr; }
+    usize paddr() const { return _paddr; }
 
     Hal::VmmRange vrange() const { return {vaddr(), _size}; }
 
@@ -78,15 +78,15 @@ struct MutMmap :
     Meta::NoCopy {
     using enum MmapFlags;
 
-    size_t _paddr{};
+    usize _paddr{};
     void *_buf{};
-    size_t _size{};
+    usize _size{};
 
-    MutMmap(size_t paddr, void *buf, size_t size)
+    MutMmap(usize paddr, void *buf, usize size)
         : _paddr(paddr), _buf(buf), _size(size) {
     }
 
-    Res<size_t> flush() override {
+    Res<usize> flush() override {
         try$(Embed::memFlush(_buf, _size));
         return Ok(_size);
     }
@@ -118,16 +118,16 @@ struct MutMmap :
         return Ok();
     }
 
-    size_t vaddr() const {
-        return (size_t)_buf;
+    usize vaddr() const {
+        return (usize)_buf;
     }
 
-    size_t paddr() const {
+    usize paddr() const {
         return _paddr;
     }
 
     USizeRange vrange() const {
-        return {(size_t)_buf, _size};
+        return {(usize)_buf, _size};
     }
 
     USizeRange prange() const {
@@ -172,7 +172,7 @@ struct _Mmap {
     using enum MmapFlags;
 
     MmapOptions _options{};
-    OptStrong<Fd> _fd;
+    OptStrong<Fd> _fd = Karm::NONE;
 
     _Mmap &read() {
         _options.flags |= READ;
@@ -194,22 +194,22 @@ struct _Mmap {
         return *this;
     }
 
-    _Mmap &paddr(size_t paddr) {
+    _Mmap &paddr(usize paddr) {
         _options.paddr = paddr;
         return *this;
     }
 
-    _Mmap &vaddr(size_t paddr) {
+    _Mmap &vaddr(usize paddr) {
         _options.vaddr = paddr;
         return *this;
     }
 
-    _Mmap &offset(size_t offset) {
+    _Mmap &offset(usize offset) {
         _options.offset = offset;
         return *this;
     }
 
-    _Mmap &size(size_t size) {
+    _Mmap &size(usize size) {
         _options.size = size;
         return *this;
     }

@@ -8,12 +8,12 @@
 
 namespace Hjert::Core {
 
-Res<> doLog(char const *msg, size_t len) {
+Res<> doLog(char const *msg, usize len) {
     logInfo("doLog: '{}'", Str{msg, len});
     return Ok();
 }
 
-Res<> doCreateDomain(Hj::Cap dest, Hj::Cap *cap, size_t len) {
+Res<> doCreateDomain(Hj::Cap dest, Hj::Cap *cap, usize len) {
     (void)dest;
     (void)cap;
     (void)len;
@@ -34,7 +34,7 @@ Res<> doCreateSpace(Hj::Cap dest, Hj::Cap *cap) {
     return Error::notImplemented();
 }
 
-Res<> doCreateMem(Hj::Cap dest, Hj::Cap *cap, uintptr_t phys, size_t len, Hj::MemFlags flags) {
+Res<> doCreateMem(Hj::Cap dest, Hj::Cap *cap, usize phys, usize len, Hj::MemFlags flags) {
     (void)dest;
     (void)cap;
     (void)phys;
@@ -43,7 +43,7 @@ Res<> doCreateMem(Hj::Cap dest, Hj::Cap *cap, uintptr_t phys, size_t len, Hj::Me
     return Error::notImplemented();
 }
 
-Res<> doCreateIo(Hj::Cap dest, Hj::Cap *cap, uintptr_t base, size_t len) {
+Res<> doCreateIo(Hj::Cap dest, Hj::Cap *cap, usize base, usize len) {
     (void)dest;
     (void)cap;
     (void)base;
@@ -63,7 +63,7 @@ Res<> doDup(Hj::Cap node, Hj::Cap *dst, Hj::Cap src) {
     return Error::notImplemented();
 }
 
-Res<> doStart(Hj::Cap cap, uintptr_t ip, uintptr_t sp, Hj::Args const *args) {
+Res<> doStart(Hj::Cap cap, usize ip, usize sp, Hj::Args const *args) {
     (void)cap;
     (void)ip;
     (void)sp;
@@ -83,7 +83,7 @@ Res<> doRet(Hj::Cap cap, Hj::Arg ret) {
     return Error::notImplemented();
 }
 
-Res<> doMap(Hj::Cap cap, uintptr_t virt, Hj::Cap mem, uintptr_t off, size_t len, Hj::MapFlags flags) {
+Res<> doMap(Hj::Cap cap, usize virt, Hj::Cap mem, usize off, usize len, Hj::MapFlags flags) {
     (void)cap;
     (void)virt;
     (void)mem;
@@ -93,14 +93,14 @@ Res<> doMap(Hj::Cap cap, uintptr_t virt, Hj::Cap mem, uintptr_t off, size_t len,
     return Error::notImplemented();
 }
 
-Res<> doUnmap(Hj::Cap cap, uintptr_t virt, size_t len) {
+Res<> doUnmap(Hj::Cap cap, usize virt, usize len) {
     (void)cap;
     (void)virt;
     (void)len;
     return Error::notImplemented();
 }
 
-Res<> doIn(Hj::Cap cap, Hj::IoLen len, uintptr_t port, Hj::Arg *val) {
+Res<> doIn(Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg *val) {
     (void)cap;
     (void)len;
     (void)port;
@@ -108,7 +108,7 @@ Res<> doIn(Hj::Cap cap, Hj::IoLen len, uintptr_t port, Hj::Arg *val) {
     return Error::notImplemented();
 }
 
-Res<> doOut(Hj::Cap cap, Hj::IoLen len, uintptr_t port, Hj::Arg val) {
+Res<> doOut(Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg val) {
     (void)cap;
     (void)len;
     (void)port;

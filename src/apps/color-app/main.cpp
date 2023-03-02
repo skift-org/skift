@@ -24,8 +24,8 @@ struct HsvPicker : public Ui::View<HsvPicker> {
     Gfx::Hsv sampleHsv(Math::Vec2i pos) {
         return {
             _value.hue,
-            (pos.x / (double)bound().width),
-            1 - (pos.y / (double)bound().height),
+            (pos.x / (f64)bound().width),
+            1 - (pos.y / (f64)bound().height),
         };
     }
 
@@ -43,8 +43,8 @@ struct HsvPicker : public Ui::View<HsvPicker> {
         g.save();
         g.clip(bound());
 
-        for (int y = 0; y < bound().height; y++) {
-            for (int x = 0; x < bound().width; x++) {
+        for (isize y = 0; y < bound().height; y++) {
+            for (isize x = 0; x < bound().width; x++) {
                 g.debugPlot({bound().x + x, bound().y + y}, sampleColor({x, y}));
             }
         }

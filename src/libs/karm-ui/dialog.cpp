@@ -51,7 +51,7 @@ void closePopover(Node &n) {
 }
 
 struct DialogLayer : public LeafNode<DialogLayer> {
-    Anim<double> _opacity{};
+    Anim<f64> _opacity{};
     Child _child;
 
     Opt<Child> _dialog;

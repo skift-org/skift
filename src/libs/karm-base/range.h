@@ -123,16 +123,16 @@ struct Range {
     }
 };
 
-using I8Range = Range<int8_t>;
-using I16Range = Range<int16_t>;
-using I32Range = Range<int32_t>;
-using I64Range = Range<int64_t>;
-using ISizeRange = Range<ssize_t>;
+using I8Range = Range<i8>;
+using I16Range = Range<i16>;
+using I32Range = Range<i32>;
+using I64Range = Range<i64>;
+using ISizeRange = Range<isize>;
 
-using U8Range = Range<uint8_t>;
-using U16Range = Range<uint16_t>;
-using U32Range = Range<uint32_t>;
-using U64Range = Range<uint64_t>;
-using USizeRange = Range<size_t>;
+using U8Range = Range<u8>;
+using U16Range = Range<u16>;
+using U32Range = Range<u32>;
+using U64Range = Range<u64>;
+using USizeRange = Range<usize>;
 
 } // namespace Karm

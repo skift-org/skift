@@ -8,10 +8,10 @@
 namespace Karm::Media {
 
 struct VgaFontface : public Fontface {
-    static constexpr int WIDTH = 8;
-    static constexpr int HEIGHT = 8;
+    static constexpr isize WIDTH = 8;
+    static constexpr isize HEIGHT = 8;
 
-    static constexpr Array<uint8_t, 1024> const DATA = {
+    static constexpr Array<u8, 1024> const DATA = {
 #include "font-vga.inc"
     };
 
@@ -25,7 +25,7 @@ struct VgaFontface : public Fontface {
         };
     }
 
-    double advance(Rune) const override {
+    f64 advance(Rune) const override {
         return 8;
     }
 
@@ -33,17 +33,17 @@ struct VgaFontface : public Fontface {
         One<Ibm437> one;
         encodeOne<Ibm437>(rune, one);
 
-        for (int y = 0; y < HEIGHT; y++) {
-            for (int x = 0; x < WIDTH; x++) {
-                uint8_t byte = DATA[one * HEIGHT + y];
+        for (isize y = 0; y < HEIGHT; y++) {
+            for (isize x = 0; x < WIDTH; x++) {
+                u8 byte = DATA[one * HEIGHT + y];
                 if (byte & (0x80 >> x)) {
-                    g.rect(Math::Recti{x, y - 8, 1, 1}.cast<double>());
+                    g.rect(Math::Recti{x, y - 8, 1, 1}.cast<f64>());
                 }
             }
         }
     }
 
-    double units() const override {
+    f64 units() const override {
         return 8;
     }
 };

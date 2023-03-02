@@ -32,8 +32,8 @@ struct Context {
     };
 
     struct Active {
-        double x;
-        int sign;
+        f64 x;
+        isize sign;
     };
 
     Surface *_surface{};
@@ -41,7 +41,7 @@ struct Context {
     Shape _shape{};
     Path _path{};
     Vec<Active> _active{};
-    Vec<double> _scanline;
+    Vec<f64> _scanline;
 
     /* --- Scope ------------------------------------------------------------ */
 
@@ -85,7 +85,7 @@ struct Context {
 
     void scale(Math::Vec2f pos);
 
-    void rotate(double angle);
+    void rotate(f64 angle);
 
     void skew(Math::Vec2f pos);
 
@@ -127,7 +127,7 @@ struct Context {
 
     void stroke(Math::Edgei edge);
 
-    void fill(Math::Edgei edge, double thickness = 1.0f);
+    void fill(Math::Edgei edge, f64 thickness = 1.0f);
 
     void stroke(Math::Recti rect, BorderRadius radius = 0);
 
@@ -175,15 +175,15 @@ struct Context {
 
     void lineTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
 
-    void hlineTo(double x, Path::Flags flags = Path::DEFAULT);
+    void hlineTo(f64 x, Path::Flags flags = Path::DEFAULT);
 
-    void vlineTo(double y, Path::Flags flags = Path::DEFAULT);
+    void vlineTo(f64 y, Path::Flags flags = Path::DEFAULT);
 
     void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
 
     void quadTo(Math::Vec2f cp, Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
 
-    void arcTo(Math::Vec2f radius, double angle, Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
+    void arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
 
     bool evalSvg(Str path);
 
@@ -207,19 +207,19 @@ struct Context {
 
     /* --- Effects ---------------------------------------------------------- */
 
-    void blur(Math::Recti region, int radius);
+    void blur(Math::Recti region, isize radius);
 
-    void saturate(Math::Recti region, double saturation);
+    void saturate(Math::Recti region, f64 saturation);
 
     void grayscale(Math::Recti region);
 
-    void contrast(Math::Recti region, double contrast);
+    void contrast(Math::Recti region, f64 contrast);
 
-    void brightness(Math::Recti region, double brightness);
+    void brightness(Math::Recti region, f64 brightness);
 
-    void noise(Math::Recti region, double amount);
+    void noise(Math::Recti region, f64 amount);
 
-    void sepia(Math::Recti region, double amount);
+    void sepia(Math::Recti region, f64 amount);
 
     void tint(Math::Recti region, Color color);
 };

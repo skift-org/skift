@@ -16,7 +16,7 @@ namespace Hjert::Core {
 
 struct Cpu {
     bool _retainEnabled = false;
-    int _depth = 0;
+    isize _depth = 0;
 
     void beginInterrupt() {
         _retainEnabled = false;

@@ -7,20 +7,20 @@
 namespace Loader::Fw {
 
 struct EfiPmm : public Hal::Pmm {
-    Res<Hal::PmmRange> allocRange(size_t size, Hal::PmmFlags) override {
-        size_t paddr = 0;
+    Res<Hal::PmmRange> allocRange(usize size, Hal::PmmFlags) override {
+        usize paddr = 0;
         try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::LOADER_DATA, size / Hal::PAGE_SIZE, &paddr));
         return Ok(Hal::PmmRange{paddr, size});
     }
 
     Res<> used(Hal::PmmRange range, Hal::PmmFlags) override {
-        size_t paddr = range.start;
+        usize paddr = range.start;
         try$(Efi::bs()->allocatePages(Efi::AllocateType::ADDRESS, Efi::MemoryType::LOADER_DATA, paddr / Hal::PAGE_SIZE, &paddr));
         return Ok();
     }
 
     Res<> free(Hal::PmmRange range) override {
-        try$(Efi::bs()->freePages((uint64_t)range.start, range.size / Hal::PAGE_SIZE));
+        try$(Efi::bs()->freePages((u64)range.start, range.size / Hal::PAGE_SIZE));
         return Ok();
     }
 };
@@ -28,7 +28,7 @@ struct EfiPmm : public Hal::Pmm {
 static EfiPmm pmm{};
 
 Res<Strong<Hal::Vmm>> createVmm() {
-    size_t upper = try$(pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NONE)).start;
+    usize upper = try$(pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NONE)).start;
     memset((void *)upper, 0, Hal::PAGE_SIZE);
     return Ok(makeStrong<x86_64::Vmm<>>(pmm, (x86_64::Pml<4> *)upper));
 }
@@ -46,12 +46,12 @@ Res<> parseGop(Handover::Builder &builder) {
 
     Handover::Record record = {
         .tag = Handover::FB,
-        .start = (uint64_t)mode->frameBufferBase,
+        .start = (u64)mode->frameBufferBase,
         .size = mode->info->pixelsPerScanLine * mode->info->verticalResolution * 4,
         .fb = {
-            .width = (uint16_t)mode->info->horizontalResolution,
-            .height = (uint16_t)mode->info->verticalResolution,
-            .pitch = (uint16_t)(mode->info->pixelsPerScanLine * 4),
+            .width = (u16)mode->info->horizontalResolution,
+            .height = (u16)mode->info->verticalResolution,
+            .pitch = (u16)(mode->info->pixelsPerScanLine * 4),
             .format = Handover::PixelFormat::BGRX8888,
         },
     };
@@ -67,18 +67,18 @@ Res<> parseAcpi(Handover::Builder &builder) {
         acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI2_TABLE_UUID);
 
     if (acpiTable) {
-        builder.add(Handover::Tag::RSDP, 0, {(size_t)acpiTable->table, 0x1000});
-        logInfo("efi: acpi: rsdp at {x}", (uintptr_t)acpiTable->table);
+        builder.add(Handover::Tag::RSDP, 0, {(usize)acpiTable->table, 0x1000});
+        logInfo("efi: acpi: rsdp at {x}", (usize)acpiTable->table);
     }
 
     return Ok();
 }
 
 Res<> parseMemoryMap(Handover::Builder &builder) {
-    size_t mmapSize = 0;
-    size_t key = 0;
-    size_t descSize = 0;
-    uint32_t descVersion = 0;
+    usize mmapSize = 0;
+    usize key = 0;
+    usize descSize = 0;
+    u32 descVersion = 0;
 
     // NOTE: This is expectected to fail
     (void)Efi::bs()->getMemoryMap(&mmapSize, nullptr, &key, &descSize, &descVersion);
@@ -94,12 +94,12 @@ Res<> parseMemoryMap(Handover::Builder &builder) {
     auto buf = Buf<Byte>::init(mmapSize);
     try$(Efi::bs()->getMemoryMap(&mmapSize, (Efi::MemoryDescriptor *)buf.buf(), &key, &descSize, &descVersion));
 
-    size_t descLen = mmapSize / descSize;
-    for (size_t i = 0; i < descLen; i++) {
+    usize descLen = mmapSize / descSize;
+    for (usize i = 0; i < descLen; i++) {
         auto &desc = *(Efi::MemoryDescriptor *)(buf.buf() + i * descSize);
 
-        size_t start = desc.physicalStart;
-        size_t size = desc.numberOfPages * Hal::PAGE_SIZE;
+        usize start = desc.physicalStart;
+        usize size = desc.numberOfPages * Hal::PAGE_SIZE;
 
         switch (desc.type) {
         case Efi::MemoryType::LOADER_CODE:
@@ -139,16 +139,16 @@ Res<> finalizeHandover(Handover::Builder &builder) {
 
 Hal::PmmRange imageRange() {
     return {
-        Hal::pageAlignDown((size_t)Efi::li()->imageBase),
-        Hal::pageAlignUp((size_t)Efi::li()->imageSize),
+        Hal::pageAlignDown((usize)Efi::li()->imageBase),
+        Hal::pageAlignUp((usize)Efi::li()->imageSize),
     };
 }
 
 // Implemented in kernel-entry.s
-extern "C" void __enterKernel(size_t entry, size_t payload, size_t stack, size_t vmm);
+extern "C" void __enterKernel(usize entry, usize payload, usize stack, usize vmm);
 
-void enterKernel(size_t entry, Handover::Payload &payload, size_t stack, Hal::Vmm &vmm) {
-    __enterKernel(entry, (size_t)&payload + Handover::KERNEL_BASE, stack, vmm.root());
+void enterKernel(usize entry, Handover::Payload &payload, usize stack, Hal::Vmm &vmm) {
+    __enterKernel(entry, (usize)&payload + Handover::KERNEL_BASE, stack, vmm.root());
 }
 
 } // namespace Loader::Fw

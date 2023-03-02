@@ -9,22 +9,22 @@ namespace Karm::Media {
 
 struct Icon {
     Mdi::Icon _code;
-    double _size;
+    f64 _size;
 
     static Strong<Fontface> fontface();
 
-    static Res<Icon> byName(Str query, double size = 18){
+    static Res<Icon> byName(Str query, f64 size = 18) {
         return Ok(Icon(try$(Mdi::byName(query)), size));
     }
 
-    Icon(Mdi::Icon code, double size = 18)
+    Icon(Mdi::Icon code, f64 size = 18)
         : _code(code), _size(size) {}
 
     Str name() {
         return Mdi::name(_code);
     }
 
-    double size() {
+    f64 size() {
         return _size;
     }
 

@@ -31,9 +31,9 @@ Io::TextWriter<> &loggerOut();
 
 [[noreturn]] void stopAll();
 
-void start(Core::Task &, uintptr_t ip, uintptr_t sp, Hj::Args args);
+void start(Core::Task &, usize ip, usize sp, Hj::Args args);
 
-Res<Box<Core::Ctx>> createCtx(uintptr_t ksp);
+Res<Box<Core::Ctx>> createCtx(usize ksp);
 
 Res<Strong<Core::Space>> createSpace();
 

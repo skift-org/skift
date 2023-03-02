@@ -40,11 +40,11 @@ Res<> init(Handover::Payload &) {
 
     _gdtDesc.load();
     _tss = {};
-    _tss._rsp[0] = (uint64_t)_kstackRsp.bytes().end();
-    _tss._ist[0] = (uint64_t)_kstackIst.bytes().end();
+    _tss._rsp[0] = (u64)_kstackRsp.bytes().end();
+    _tss._ist[0] = (u64)_kstackIst.bytes().end();
     x86_64::_tssUpdate();
 
-    for (size_t i = 0; i < x86_64::Idt::LEN; i++) {
+    for (usize i = 0; i < x86_64::Idt::LEN; i++) {
         _idt.entries[i] = x86_64::IdtEntry{_intVec[i], 0, x86_64::IdtEntry::GATE};
     }
 
@@ -129,7 +129,7 @@ static char const *_faultMsg[32] = {
     "reserved",
 };
 
-extern "C" uintptr_t _intDispatch(uintptr_t sp) {
+extern "C" usize _intDispatch(usize sp) {
     auto *frame = reinterpret_cast<Frame *>(sp);
 
     cpu().beginInterrupt();
@@ -137,7 +137,7 @@ extern "C" uintptr_t _intDispatch(uintptr_t sp) {
     if (frame->intNo < 32) {
         logFatal("x86_64: cpu exception: {} (err={}, ip={x}, sp={x}, cr2={x}, cr3={x})", _faultMsg[frame->intNo], frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
     } else {
-        int irq = frame->intNo - 32;
+        isize irq = frame->intNo - 32;
 
         if (irq == 0) {
             Core::Task::self().saveCtx(sp);
@@ -155,9 +155,9 @@ extern "C" uintptr_t _intDispatch(uintptr_t sp) {
     return sp;
 }
 
-extern "C" uintptr_t _sysDispatch(uintptr_t sp) {
+extern "C" usize _sysDispatch(usize sp) {
     auto *frame = reinterpret_cast<Frame *>(sp);
-    return (uintptr_t)Core::dispatchSyscall(
+    return (usize)Core::dispatchSyscall(
         (Hj::Syscall)frame->rax,
         {frame->rdi, frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9});
 }
@@ -179,7 +179,7 @@ Hal::Vmm &vmm() {
     return *_vmm;
 }
 
-void start(Core::Task &task, uintptr_t ip, uintptr_t sp, Hj::Args args) {
+void start(Core::Task &task, usize ip, usize sp, Hj::Args args) {
     Frame frame{
         .r8 = args[4],
         .rdi = args[0],
@@ -207,12 +207,12 @@ void start(Core::Task &task, uintptr_t ip, uintptr_t sp, Hj::Args args) {
 
 template <typename L, typename M>
 Res<> destroyPml(Hal::Pmm &pmm, L *pml, M mapper = {}) {
-    logInfo("x86_64: destroying pml{} at {x}", L::LEVEL, (uintptr_t)pml);
+    logInfo("x86_64: destroying pml{} at {x}", L::LEVEL, (usize)pml);
 
-    auto range = Hal::PmmRange{mapper.unmap((uintptr_t)pml), Hal::PAGE_SIZE};
+    auto range = Hal::PmmRange{mapper.unmap((usize)pml), Hal::PAGE_SIZE};
 
     // NOTE: we only need to free the first half of the pml4 since hupper is for the kernel
-    for (size_t i = 0; i < L::LEN / (L::LEVEL == 4 ? 2 : 1); i++) {
+    for (usize i = 0; i < L::LEN / (L::LEVEL == 4 ? 2 : 1); i++) {
         if (pml->pages[i].present()) {
             if constexpr (L::LEVEL == 1) {
                 auto page = Hal::PmmRange{mapper.map(pml->pages[i].paddr()), Hal::PAGE_SIZE};
@@ -229,17 +229,17 @@ Res<> destroyPml(Hal::Pmm &pmm, L *pml, M mapper = {}) {
 }
 
 struct Ctx : public Core::Ctx {
-    uintptr_t _ksp;
-    uintptr_t _usp;
+    usize _ksp;
+    usize _usp;
     Array<Byte, Hal::PAGE_SIZE> simd __attribute__((aligned(16)));
 
-    Ctx(uintptr_t ksp) : _ksp(ksp), _usp(0) {
+    Ctx(usize ksp) : _ksp(ksp), _usp(0) {
         x86_64::simdInitCtx(simd.buf());
     }
 
     virtual void save() {
         x86_64::simdSaveCtx(simd.buf());
-        x86_64::sysSetGs((uintptr_t)&_ksp);
+        x86_64::sysSetGs((usize)&_ksp);
     }
 
     virtual void load() {
@@ -247,7 +247,7 @@ struct Ctx : public Core::Ctx {
     }
 };
 
-Res<Box<Core::Ctx>> createCtx(uintptr_t ksp) {
+Res<Box<Core::Ctx>> createCtx(usize ksp) {
     return Ok<Box<Core::Ctx>>(makeBox<Ctx>(ksp));
 }
 
@@ -284,7 +284,7 @@ Res<Strong<Core::Space>> createSpace() {
     auto *pml4 = pml4Mem.as<x86_64::Pml<4>>();
 
     // Copy the kernel part of the pml4
-    for (size_t i = _pml4->LEN / 2; i < _pml4->LEN; i++) {
+    for (usize i = _pml4->LEN / 2; i < _pml4->LEN; i++) {
         pml4->pages[i] = _pml4->pages[i];
     }
 

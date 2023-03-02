@@ -8,17 +8,17 @@ namespace x86_64 {
 
 union Cpuid {
     struct {
-        uint32_t eax;
-        uint32_t ebx;
-        uint32_t ecx;
-        uint32_t edx;
+        u32 eax;
+        u32 ebx;
+        u32 ecx;
+        u32 edx;
     };
 
-    Array<uint32_t, 4> _els;
+    Array<u32, 4> _els;
     Array<char, 16> _str;
 
-    static inline Cpuid cpuid(uint32_t leaf = 0, uint32_t subleaf = 0) {
-        uint32_t maxLeaf = 0;
+    static inline Cpuid cpuid(u32 leaf = 0, u32 subleaf = 0) {
+        u32 maxLeaf = 0;
 
         asm volatile("cpuid"
                      : "=a"(maxLeaf)
@@ -53,7 +53,7 @@ union Cpuid {
 
     static Array<char, 12> _vendor() {
         union {
-            Array<uint32_t, 3> regs;
+            Array<u32, 3> regs;
             Array<char, 12> str;
         } buf{};
 

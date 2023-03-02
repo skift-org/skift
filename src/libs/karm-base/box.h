@@ -2,8 +2,6 @@
 
 #include <karm-meta/traits.h>
 
-#include "_prelude.h"
-
 #include "opt.h"
 #include "panic.h"
 #include "std.h"

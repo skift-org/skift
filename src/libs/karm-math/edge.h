@@ -32,7 +32,7 @@ union Edge {
 
     constexpr Edge<T> parallel(T offset) {
         auto d = end - start;
-        double scale = offset / d.len();
+        f64 scale = offset / d.len();
         Vec2<T> o = {-d.y * scale, d.x * scale};
         auto s = start + o;
         auto e = end + o;
@@ -55,7 +55,7 @@ union Edge {
         return dir().lenSq();
     }
 
-    constexpr T operator[](int i) const {
+    constexpr T operator[](isize i) const {
         return _els[i];
     }
 
@@ -76,15 +76,15 @@ union Edge {
     }
 };
 
-using Edgei = Edge<int>;
+using Edgei = Edge<isize>;
 
-using Edgef = Edge<double>;
+using Edgef = Edge<f64>;
 
 } // namespace Karm::Math
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Edge<T>> {
-    Res<size_t> format(Io::_TextWriter &writer, Math::Edge<T> edge) {
+    Res<usize> format(Io::_TextWriter &writer, Math::Edge<T> edge) {
         return Fmt::format(writer, "Edge({}, {}, {}, {})", edge.sx, edge.sy, edge.ex, edge.ey);
     }
 };

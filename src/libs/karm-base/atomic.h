@@ -13,7 +13,7 @@ enum MemOrder {
     SEQ_CST = __ATOMIC_SEQ_CST
 };
 
-static void memory_barier(MemOrder order = SEQ_CST) {
+inline void memory_barier(MemOrder order = SEQ_CST) {
     __atomic_thread_fence(order);
 }
 

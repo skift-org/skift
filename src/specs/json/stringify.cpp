@@ -11,7 +11,7 @@ Res<> stringify(Text::Emit &emit, Value const &v) {
             },
             [&](Vec<Value> const &v) -> Res<> {
                 emit('[');
-                for (size_t i = 0; i < v.len(); ++i) {
+                for (usize i = 0; i < v.len(); ++i) {
                     if (i > 0) {
                         emit(',');
                     }

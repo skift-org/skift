@@ -5,21 +5,21 @@
 namespace x86_64 {
 
 struct [[gnu::packed]] IdtEntry {
-    uint16_t _offsetLow{};
-    uint16_t _codeSegment{};
-    uint8_t _ist{};
-    uint8_t _attributes{};
-    uint16_t _offsetMid{};
-    uint32_t _offsetHigh{};
-    uint32_t _zero{};
+    u16 _offsetLow{};
+    u16 _codeSegment{};
+    u8 _ist{};
+    u8 _attributes{};
+    u16 _offsetMid{};
+    u32 _offsetHigh{};
+    u32 _zero{};
 
-    static constexpr uint8_t TRAP = 0xeF;
-    static constexpr uint8_t USER = 0x60;
-    static constexpr uint8_t GATE = 0x8e;
+    static constexpr u8 TRAP = 0xeF;
+    static constexpr u8 USER = 0x60;
+    static constexpr u8 GATE = 0x8e;
 
     IdtEntry() = default;
 
-    IdtEntry(uintptr_t handler, uint8_t ist, uint8_t attributes)
+    IdtEntry(usize handler, u8 ist, u8 attributes)
         : _offsetLow(handler & 0xffff),
           _codeSegment(0x8),
           _ist(ist),
@@ -30,7 +30,7 @@ struct [[gnu::packed]] IdtEntry {
 };
 
 struct [[gnu::packed]] Idt {
-    static constexpr int LEN = 256;
+    static constexpr isize LEN = 256;
 
     Karm::Array<IdtEntry, LEN> entries{};
 };
@@ -38,12 +38,12 @@ struct [[gnu::packed]] Idt {
 extern "C" void _idtLoad(void const *ptr);
 
 struct [[gnu::packed]] IdtDesc {
-    uint16_t _limit;
-    uint64_t _base;
+    u16 _limit;
+    u64 _base;
 
     IdtDesc(Idt const &base)
         : _limit(sizeof(Idt) - 1),
-          _base(reinterpret_cast<uintptr_t>(&base)) {}
+          _base(reinterpret_cast<usize>(&base)) {}
 
     void load() const { _idtLoad(this); }
 };

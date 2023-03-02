@@ -4,12 +4,12 @@
 
 namespace Karm {
 
-using Tick = uint64_t;
+using Tick = u64;
 
 static constexpr Tick TICKS_PER_SECOND = 1000;
 
 struct TimeSpan {
-    uint64_t value;
+    u64 value;
 
     static constexpr TimeSpan zero() {
         return TimeSpan{0};
@@ -19,83 +19,83 @@ struct TimeSpan {
         return TimeSpan{~0ull};
     }
 
-    static constexpr TimeSpan fromUSecs(uint64_t value) {
+    static constexpr TimeSpan fromUSecs(u64 value) {
         return {value};
     }
 
-    static constexpr auto fromMSecs(uint64_t value) {
+    static constexpr auto fromMSecs(u64 value) {
         return fromUSecs(value * 1000);
     }
 
-    static constexpr auto fromSecs(uint64_t value) {
+    static constexpr auto fromSecs(u64 value) {
         return fromMSecs(value * 1000);
     }
 
-    static constexpr auto fromMinutes(uint64_t value) {
+    static constexpr auto fromMinutes(u64 value) {
         return fromSecs(value * 60);
     }
 
-    static constexpr auto fromHours(uint64_t value) {
+    static constexpr auto fromHours(u64 value) {
         return fromMinutes(value * 60);
     }
 
-    static constexpr auto fromDays(uint64_t value) {
+    static constexpr auto fromDays(u64 value) {
         return fromHours(value * 24);
     }
 
-    static constexpr auto fromWeeks(uint64_t value) {
+    static constexpr auto fromWeeks(u64 value) {
         return fromDays(value * 7);
     }
 
-    static constexpr auto fromMonths(uint64_t value) {
+    static constexpr auto fromMonths(u64 value) {
         return fromWeeks(value * 4);
     }
 
-    static constexpr auto fromYears(uint64_t value) {
+    static constexpr auto fromYears(u64 value) {
         return fromMonths(value * 12);
     }
 
     constexpr TimeSpan() : value(0) {}
 
-    constexpr TimeSpan(uint64_t value) : value(value) {}
+    constexpr TimeSpan(u64 value) : value(value) {}
 
     constexpr bool isInfinite() const {
         return value == ~0ull;
     }
 
-    constexpr uint64_t toUSecs() const {
+    constexpr u64 toUSecs() const {
         return value;
     }
 
-    constexpr uint64_t toMSecs() const {
+    constexpr u64 toMSecs() const {
         return toUSecs() / 1000;
     }
 
-    constexpr uint64_t toSecs() const {
+    constexpr u64 toSecs() const {
         return toMSecs() / 1000;
     }
 
-    constexpr uint64_t toMinutes() const {
+    constexpr u64 toMinutes() const {
         return toSecs() / 60;
     }
 
-    constexpr uint64_t toHours() const {
+    constexpr u64 toHours() const {
         return toMinutes() / 60;
     }
 
-    constexpr uint64_t toDays() const {
+    constexpr u64 toDays() const {
         return toHours() / 24;
     }
 
-    constexpr uint64_t toWeeks() const {
+    constexpr u64 toWeeks() const {
         return toDays() / 7;
     }
 
-    constexpr uint64_t toMonths() const {
+    constexpr u64 toMonths() const {
         return toWeeks() / 4;
     }
 
-    constexpr uint64_t toYears() const {
+    constexpr u64 toYears() const {
         return toMonths() / 12;
     }
 
@@ -119,7 +119,7 @@ struct TimeSpan {
 };
 
 struct TimeStamp {
-    uint64_t value;
+    u64 value;
 
     static constexpr TimeStamp epoch() {
         return {0};
@@ -129,7 +129,7 @@ struct TimeStamp {
         return {~0ull};
     }
 
-    constexpr TimeStamp(uint64_t value = 0) : value(value) {}
+    constexpr TimeStamp(u64 value = 0) : value(value) {}
 
     constexpr bool isEndOfTime() const {
         return value == ~0ull;
@@ -164,15 +164,15 @@ struct TimeStamp {
 };
 
 struct Time {
-    uint8_t second;
-    uint8_t minute;
-    uint8_t hour;
+    u8 second;
+    u8 minute;
+    u8 hour;
 };
 
 struct Date {
-    uint8_t day;
-    uint8_t month;
-    uint16_t year;
+    u8 day;
+    u8 month;
+    u16 year;
 };
 
 union DateTime {
@@ -182,12 +182,12 @@ union DateTime {
     };
 
     struct {
-        uint8_t second;
-        uint8_t minute;
-        uint8_t hour;
-        uint8_t day;
-        uint8_t month;
-        uint16_t year;
+        u8 second;
+        u8 minute;
+        u8 hour;
+        u8 day;
+        u8 month;
+        u16 year;
     };
 };
 

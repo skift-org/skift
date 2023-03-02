@@ -14,21 +14,21 @@ enum struct Whence {
 
 struct Seek {
     Whence whence;
-    ssize_t offset;
+    isize offset;
 
-    static constexpr Seek fromBegin(ssize_t offset) {
+    static constexpr Seek fromBegin(isize offset) {
         return Seek{Whence::BEGIN, offset};
     }
 
-    static constexpr Seek fromCurrent(ssize_t offset) {
+    static constexpr Seek fromCurrent(isize offset) {
         return Seek{Whence::CURRENT, offset};
     }
 
-    static constexpr Seek fromEnd(ssize_t offset) {
+    static constexpr Seek fromEnd(isize offset) {
         return Seek{Whence::END, offset};
     }
 
-    constexpr size_t apply(size_t current, size_t size) const {
+    constexpr usize apply(usize current, usize size) const {
         switch (whence) {
         case Whence::BEGIN:
             return offset;

@@ -11,7 +11,7 @@ namespace Hal {
 
 struct Pmm;
 
-enum struct PmmFlags : uint64_t {
+enum struct PmmFlags : u64 {
     NONE = 0,
     LOWER = (1 << 0),
     UPPER = (1 << 1),
@@ -20,7 +20,7 @@ enum struct PmmFlags : uint64_t {
 
 FlagsEnum$(PmmFlags);
 
-using PmmRange = Range<size_t, struct PmmRangeTag>;
+using PmmRange = Range<usize, struct PmmRangeTag>;
 using PmmMem = Mem<Pmm, PmmRange>;
 
 struct Pmm {
@@ -28,9 +28,9 @@ struct Pmm {
 
     virtual ~Pmm() = default;
 
-    virtual Res<PmmRange> allocRange(size_t size, PmmFlags flags) = 0;
+    virtual Res<PmmRange> allocRange(usize size, PmmFlags flags) = 0;
 
-    Res<PmmMem> allocOwned(size_t size, PmmFlags flags) {
+    Res<PmmMem> allocOwned(usize size, PmmFlags flags) {
         return Ok(PmmMem{*this, try$(allocRange(size, flags))});
     }
 

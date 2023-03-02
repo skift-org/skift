@@ -81,8 +81,8 @@ struct Iter {
         return NONE;
     }
 
-    constexpr size_t len() {
-        size_t result = 0;
+    constexpr usize len() {
+        usize result = 0;
         forEach([&](auto) {
             result++;
         });
@@ -131,14 +131,14 @@ struct Iter {
         return result;
     }
 
-    constexpr auto skip(size_t n) {
-        for (size_t i = 0; i < n; i++) {
+    constexpr auto skip(usize n) {
+        for (usize i = 0; i < n; i++) {
             next();
         }
         return *this;
     }
 
-    constexpr auto cycle(size_t n) {
+    constexpr auto cycle(usize n) {
         return Iter{[start = *this, curr = *this, i = 0, n]() mutable {
             auto v = curr.next();
 
@@ -152,7 +152,7 @@ struct Iter {
         }};
     }
 
-    constexpr auto take(size_t n) {
+    constexpr auto take(usize n) {
         return Iter{[=]() mutable {
             if (n == 0) {
                 return NONE;
@@ -204,7 +204,7 @@ struct Iter {
 
     constexpr auto avg() -> Item {
         Item result = NONE;
-        size_t count = 0;
+        usize count = 0;
 
         for (auto item = next(); item; item = next()) {
             if (not result) {
@@ -290,7 +290,7 @@ constexpr auto single(T value) {
 }
 
 template <typename T>
-constexpr auto repeat(T value, size_t count) {
+constexpr auto repeat(T value, usize count) {
     return Iter{[value, count]() mutable -> Opt<T> {
         if (count == 0) {
             return NONE;

@@ -1,9 +1,8 @@
 #pragma once
 
-#include "_prelude.h"
-
 #include "cons.h"
 #include "opt.h"
+#include "std.h"
 
 namespace Karm {
 
@@ -12,11 +11,11 @@ struct Tuple;
 
 template <>
 struct Tuple<> {
-    static constexpr size_t size = 0;
+    static constexpr usize size = 0;
 
     constexpr Tuple() {}
 
-    constexpr size_t len() { return 0; }
+    constexpr usize len() { return 0; }
 
     constexpr static void visit(void *, auto) {}
 
@@ -34,7 +33,7 @@ struct Tuple<Car> {
 
     constexpr Tuple(Car &&car) : car(car) {}
 
-    constexpr size_t len() {
+    constexpr usize len() {
         return 1;
     }
 
@@ -63,7 +62,7 @@ struct Tuple<Car, Cdr...> {
     constexpr Tuple(Car &&car, Cdr &&...cdr) : car(car), cdr(std::forward<Cdr>(cdr)...) {
     }
 
-    constexpr size_t len() {
+    constexpr usize len() {
         return 1 + cdr.len();
     }
 

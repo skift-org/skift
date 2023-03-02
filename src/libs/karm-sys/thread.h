@@ -14,7 +14,7 @@ struct Channel {
     Lock _lock;
     Ring<T> _ring;
 
-    Channel(size_t capacity)
+    Channel(usize capacity)
         : _ring(capacity) {}
 
     Res<T> recv() {
@@ -76,7 +76,7 @@ struct Thread {
 
     void exit();
 
-    void sleep(int ms);
+    void sleep(isize ms);
 };
 
 } // namespace Karm::Sys

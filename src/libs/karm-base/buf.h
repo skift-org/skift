@@ -13,15 +13,15 @@ struct Buf {
     using Inner = T;
 
     Inert<T> *_buf{};
-    size_t _cap{};
-    size_t _len{};
+    usize _cap{};
+    usize _len{};
 
-    static Buf init(size_t len, T fill = {}) {
+    static Buf init(usize len, T fill = {}) {
         Buf buf;
         buf._cap = len;
         buf._len = len;
         buf._buf = new Inert<T>[len];
-        for (size_t i = 0; i < len; i++) {
+        for (usize i = 0; i < len; i++) {
             buf._buf[i].ctor(fill);
         }
         return buf;
@@ -29,7 +29,7 @@ struct Buf {
 
     Buf() = default;
 
-    Buf(size_t cap) : _cap(cap) {
+    Buf(usize cap) : _cap(cap) {
         _buf = new Inert<T>[cap];
     }
 
@@ -37,7 +37,7 @@ struct Buf {
         _cap = other.size();
         _len = other.size();
         _buf = new Inert<T>[_cap];
-        for (size_t i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++) {
             _buf[i].ctor(std::move(other.begin()[i]));
         }
     }
@@ -46,7 +46,7 @@ struct Buf {
         _cap = other.len();
         _len = other.len();
         _buf = new Inert<T>[_cap];
-        for (size_t i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++) {
             _buf[i].ctor(other[i]);
         }
     }
@@ -56,7 +56,7 @@ struct Buf {
         _len = other._len;
         _buf = new Inert<T>[_cap];
 
-        for (size_t i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++) {
             _buf[i].ctor(other[i]);
         }
     }
@@ -71,7 +71,7 @@ struct Buf {
         if (not _buf)
             return;
 
-        for (size_t i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++) {
             _buf[i].dtor();
         }
 
@@ -79,7 +79,8 @@ struct Buf {
     }
 
     Buf &operator=(Buf const &other) {
-        return *this = Buf(other);
+        *this = Buf(other);
+        return *this;
     }
 
     Buf &operator=(Buf &&other) {
@@ -89,11 +90,11 @@ struct Buf {
         return *this;
     }
 
-    constexpr T &operator[](size_t i) { return _buf[i].unwrap(); }
+    constexpr T &operator[](usize i) { return _buf[i].unwrap(); }
 
-    constexpr T const &operator[](size_t i) const { return _buf[i].unwrap(); }
+    constexpr T const &operator[](usize i) const { return _buf[i].unwrap(); }
 
-    void ensure(size_t cap) {
+    void ensure(usize cap) {
         if (cap <= _cap)
             return;
 
@@ -104,7 +105,7 @@ struct Buf {
         }
 
         Inert<T> *tmp = new Inert<T>[cap];
-        for (size_t i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++) {
             tmp[i].ctor(_buf[i].take());
         }
 
@@ -118,7 +119,7 @@ struct Buf {
             return;
 
         Inert<T> *tmp = new Inert<T>[_len];
-        for (size_t i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++) {
             tmp[i].ctor(_buf[i].take());
         }
 
@@ -128,20 +129,20 @@ struct Buf {
     }
 
     template <typename... Args>
-    void emplace(size_t index, Args &&...args) {
+    void emplace(usize index, Args &&...args) {
         ensure(_len + 1);
 
-        for (size_t i = _len; i > index; i--) {
+        for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
         }
         _buf[index].ctor(std::forward<Args>(args)...);
         _len++;
     }
 
-    void insert(size_t index, T &&value) {
+    void insert(usize index, T &&value) {
         ensure(_len + 1);
 
-        for (size_t i = _len; i > index; i--) {
+        for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
         }
 
@@ -149,7 +150,7 @@ struct Buf {
         _len++;
     }
 
-    void replace(size_t index, T &&value) {
+    void replace(usize index, T &&value) {
         if (index >= _len) {
             insert(index, std::move(value));
             return;
@@ -159,48 +160,48 @@ struct Buf {
         _buf[index].ctor(std::move(value));
     }
 
-    void insert(Copy, size_t index, T const *first, size_t count) {
+    void insert(Copy, usize index, T const *first, usize count) {
         ensure(_len + count);
 
-        for (size_t i = _len; i > index; i--) {
+        for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - count].take());
         }
 
-        for (size_t i = 0; i < count; i++) {
+        for (usize i = 0; i < count; i++) {
             _buf[index + i].ctor(first[i]);
         }
 
         _len += count;
     }
 
-    void insert(Move, size_t index, T *first, size_t count) {
+    void insert(Move, usize index, T *first, usize count) {
         ensure(_len + count);
 
-        for (size_t i = _len; i > index; i--) {
+        for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - count].take());
         }
 
-        for (size_t i = 0; i < count; i++) {
+        for (usize i = 0; i < count; i++) {
             _buf[index + i].ctor(std::move(first[i]));
         }
 
         _len += count;
     }
 
-    T removeAt(size_t index) {
+    T removeAt(usize index) {
         if (index >= _len) {
             panic("index out of bounds");
         }
 
         T ret = _buf[index].take();
-        for (size_t i = index; i < _len - 1; i++) {
+        for (usize i = index; i < _len - 1; i++) {
             _buf[i].ctor(_buf[i + 1].take());
         }
         _len--;
         return ret;
     }
 
-    void removeRange(size_t index, size_t count) {
+    void removeRange(usize index, usize count) {
         if (index > _len) {
             panic("index out of bounds");
         }
@@ -209,32 +210,32 @@ struct Buf {
             panic("index + count out of bounds");
         }
 
-        for (size_t i = index; i < _len - count; i++) {
+        for (usize i = index; i < _len - count; i++) {
             _buf[i].ctor(_buf[i + count].take());
         }
 
         _len -= count;
     }
 
-    void resize(size_t newLen, T fill = {}) {
+    void resize(usize newLen, T fill = {}) {
         if (newLen > _len) {
             ensure(newLen);
-            for (size_t i = _len; i < newLen; i++) {
+            for (usize i = _len; i < newLen; i++) {
                 _buf[i].ctor(fill);
             }
         } else if (newLen < _len) {
-            for (size_t i = newLen; i < _len; i++) {
+            for (usize i = newLen; i < _len; i++) {
                 _buf[i].dtor();
             }
         }
         _len = newLen;
     }
 
-    void truncate(size_t newLen) {
+    void truncate(usize newLen) {
         if (newLen >= _len)
             return;
 
-        for (size_t i = newLen; i < _len; i++) {
+        for (usize i = newLen; i < _len; i++) {
             _buf[i].dtor();
         }
 
@@ -264,15 +265,15 @@ struct Buf {
         return &_buf->unwrap();
     }
 
-    size_t len() const {
+    usize len() const {
         return _len;
     }
 
-    size_t cap() const {
+    usize cap() const {
         return _cap;
     }
 
-    size_t size() const {
+    usize size() const {
         return _len * sizeof(T);
     }
 
@@ -284,16 +285,16 @@ struct Buf {
 };
 
 /// A buffer that uses inline storage, great for small buffers.
-template <typename T, size_t N>
+template <typename T, usize N>
 struct InlineBuf {
     using Inner = T;
 
     Array<Inert<T>, N> _buf = {};
-    size_t _len = {};
+    usize _len = {};
 
     constexpr InlineBuf() = default;
 
-    InlineBuf(size_t cap) {
+    InlineBuf(usize cap) {
         if (cap > N) {
             panic("cap too large");
         }
@@ -304,7 +305,7 @@ struct InlineBuf {
         if (_len > N) {
             panic("cap too large");
         }
-        for (size_t i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++) {
             _buf[i].ctor(std::move(other.begin()[i]));
         }
     }
@@ -316,7 +317,7 @@ struct InlineBuf {
             panic("cap too large");
         }
 
-        for (size_t i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++) {
             _buf[i].ctor(other[i]);
         }
     }
@@ -326,7 +327,7 @@ struct InlineBuf {
         if (_len > N) {
             panic("cap too large");
         }
-        for (size_t i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++) {
             _buf[i].ctor(other[i]);
         }
     }
@@ -339,7 +340,8 @@ struct InlineBuf {
     ~InlineBuf() = default;
 
     InlineBuf &operator=(InlineBuf const &other) {
-        return *this = InlineBuf(other);
+        *this = InlineBuf(other);
+        return *this;
     }
 
     InlineBuf &operator=(InlineBuf &&other) {
@@ -348,11 +350,11 @@ struct InlineBuf {
         return *this;
     }
 
-    constexpr T &operator[](size_t i) { return _buf[i].unwrap(); }
+    constexpr T &operator[](usize i) { return _buf[i].unwrap(); }
 
-    constexpr T const &operator[](size_t i) const { return _buf[i].unwrap(); }
+    constexpr T const &operator[](usize i) const { return _buf[i].unwrap(); }
 
-    void ensure(size_t len) {
+    void ensure(usize len) {
         if (len > N) {
             panic("cap too large");
         }
@@ -363,12 +365,12 @@ struct InlineBuf {
     }
 
     template <typename... Args>
-    void emplace(size_t index, Args &&...args) {
+    void emplace(usize index, Args &&...args) {
         if (_len == N) {
             panic("cap too large");
         }
 
-        for (size_t i = _len; i > index; i--) {
+        for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
         }
 
@@ -376,12 +378,12 @@ struct InlineBuf {
         _len++;
     }
 
-    void insert(size_t index, T &&value) {
+    void insert(usize index, T &&value) {
         if (_len == N) {
             panic("cap too large");
         }
 
-        for (size_t i = _len; i > index; i--) {
+        for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
         }
 
@@ -389,66 +391,66 @@ struct InlineBuf {
         _len++;
     }
 
-    void insert(Copy, size_t index, T *first, size_t count) {
+    void insert(Copy, usize index, T *first, usize count) {
         if (_len + count > N) {
             panic("cap too large");
         }
 
-        for (size_t i = _len; i > index; i--) {
+        for (usize i = _len; i > index; i--) {
             _buf[i] = _buf[i - count];
         }
 
-        for (size_t i = 0; i < count; i++) {
+        for (usize i = 0; i < count; i++) {
             _buf[index + i] = first[i];
         }
 
         _len += count;
     }
 
-    void insert(Move, size_t index, T *first, size_t count) {
+    void insert(Move, usize index, T *first, usize count) {
         if (_len + count > N) {
             panic("cap too large");
         }
 
-        for (size_t i = _len; i > index; i--) {
+        for (usize i = _len; i > index; i--) {
             _buf[i] = std::move<T>(_buf[i - count]);
         }
 
-        for (size_t i = 0; i < count; i++) {
+        for (usize i = 0; i < count; i++) {
             _buf[index + i] = std::move(first[i]);
         }
 
         _len += count;
     }
 
-    T removeAt(size_t index) {
+    T removeAt(usize index) {
         T tmp = _buf[index].take();
-        for (size_t i = index; i < _len - 1; i++) {
+        for (usize i = index; i < _len - 1; i++) {
             _buf[i].ctor(_buf[i + 1].take());
         }
         _len--;
         return tmp;
     }
 
-    void resize(size_t newLen, T fill = {}) {
+    void resize(usize newLen, T fill = {}) {
         if (newLen > _len) {
             ensure(newLen);
-            for (size_t i = _len; i < newLen; i++) {
+            for (usize i = _len; i < newLen; i++) {
                 _buf[i].ctor(fill);
             }
         } else if (newLen < _len) {
-            for (size_t i = newLen; i < _len; i++) {
+            for (usize i = newLen; i < _len; i++) {
                 _buf[i].dtor();
             }
         }
         _len = newLen;
     }
 
-    void truncate(size_t newLen) {
+    void truncate(usize newLen) {
         if (newLen >= _len)
             return;
 
-        for (size_t i = newLen; i < _len; i++) {
+        for (usize i = newLen; i < _len; i++) {
             _buf[i].dtor();
         }
 
@@ -463,11 +465,11 @@ struct InlineBuf {
         return &_buf[0].unwrap();
     }
 
-    size_t len() const {
+    usize len() const {
         return _len;
     }
 
-    size_t cap() const {
+    usize cap() const {
         return N;
     }
 };
@@ -478,12 +480,12 @@ struct ViewBuf {
     using Inner = T;
 
     Inert<T> *_buf{};
-    size_t _cap{};
-    size_t _len{};
+    usize _cap{};
+    usize _len{};
 
     ViewBuf() = default;
 
-    ViewBuf(Inert<T> *buf, size_t cap)
+    ViewBuf(Inert<T> *buf, usize cap)
         : _buf(buf), _cap(cap) {
     }
 
@@ -502,7 +504,8 @@ struct ViewBuf {
     ~ViewBuf() {}
 
     ViewBuf &operator=(ViewBuf const &other) {
-        return *this = ViewBuf(other);
+        *this = ViewBuf(other);
+        return *this;
     }
 
     ViewBuf &operator=(ViewBuf &&other) {
@@ -512,39 +515,39 @@ struct ViewBuf {
         return *this;
     }
 
-    constexpr T &operator[](size_t i) {
+    constexpr T &operator[](usize i) {
         return _buf[i].unwrap();
     }
 
-    constexpr T const &operator[](size_t i) const {
+    constexpr T const &operator[](usize i) const {
         return _buf[i].unwrap();
     }
 
-    void ensure(size_t cap) {
+    void ensure(usize cap) {
         if (cap <= _cap)
             return;
-        else
-            panic("cap too large");
+
+        panic("cap too large");
     }
 
     void fit() {
     }
 
     template <typename... Args>
-    void emplace(size_t index, Args &&...args) {
+    void emplace(usize index, Args &&...args) {
         ensure(_len + 1);
 
-        for (size_t i = _len; i > index; i--) {
+        for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
         }
         _buf[index].ctor(std::forward<Args>(args)...);
         _len++;
     }
 
-    void insert(size_t index, T &&value) {
+    void insert(usize index, T &&value) {
         ensure(_len + 1);
 
-        for (size_t i = _len; i > index; i--) {
+        for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
         }
 
@@ -552,7 +555,7 @@ struct ViewBuf {
         _len++;
     }
 
-    void replace(size_t index, T &&value) {
+    void replace(usize index, T &&value) {
         if (index >= _len) {
             insert(index, std::move(value));
             return;
@@ -562,48 +565,48 @@ struct ViewBuf {
         _buf[index].ctor(std::move(value));
     }
 
-    void insert(Copy, size_t index, T *first, size_t count) {
+    void insert(Copy, usize index, T *first, usize count) {
         ensure(_len + count);
 
-        for (size_t i = _len; i > index; i--) {
+        for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - count].take());
         }
 
-        for (size_t i = 0; i < count; i++) {
+        for (usize i = 0; i < count; i++) {
             _buf[index + i].ctor(first[i]);
         }
 
         _len += count;
     }
 
-    void insert(Move, size_t index, T *first, size_t count) {
+    void insert(Move, usize index, T *first, usize count) {
         ensure(_len + count);
 
-        for (size_t i = _len; i > index; i--) {
+        for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - count].take());
         }
 
-        for (size_t i = 0; i < count; i++) {
+        for (usize i = 0; i < count; i++) {
             _buf[index + i].ctor(std::move(first[i]));
         }
 
         _len += count;
     }
 
-    T removeAt(size_t index) {
+    T removeAt(usize index) {
         if (index >= _len) {
             panic("index out of bounds");
         }
 
         T ret = _buf[index].take();
-        for (size_t i = index; i < _len - 1; i++) {
+        for (usize i = index; i < _len - 1; i++) {
             _buf[i].ctor(_buf[i + 1].take());
         }
         _len--;
         return ret;
     }
 
-    void removeRange(size_t index, size_t count) {
+    void removeRange(usize index, usize count) {
         if (index > _len) {
             panic("index out of bounds");
         }
@@ -612,32 +615,32 @@ struct ViewBuf {
             panic("index + count out of bounds");
         }
 
-        for (size_t i = index; i < _len - count; i++) {
+        for (usize i = index; i < _len - count; i++) {
             _buf[i].ctor(_buf[i + count].take());
         }
 
         _len -= count;
     }
 
-    void resize(size_t newLen, T fill = {}) {
+    void resize(usize newLen, T fill = {}) {
         if (newLen > _len) {
             ensure(newLen);
-            for (size_t i = _len; i < newLen; i++) {
+            for (usize i = _len; i < newLen; i++) {
                 _buf[i].ctor(fill);
             }
         } else if (newLen < _len) {
-            for (size_t i = newLen; i < _len; i++) {
+            for (usize i = newLen; i < _len; i++) {
                 _buf[i].dtor();
             }
         }
         _len = newLen;
     }
 
-    void truncate(size_t newLen) {
+    void truncate(usize newLen) {
         if (newLen >= _len)
             return;
 
-        for (size_t i = newLen; i < _len; i++) {
+        for (usize i = newLen; i < _len; i++) {
             _buf[i].dtor();
         }
 
@@ -667,15 +670,15 @@ struct ViewBuf {
         return &_buf->unwrap();
     }
 
-    size_t len() const {
+    usize len() const {
         return _len;
     }
 
-    size_t cap() const {
+    usize cap() const {
         return _cap;
     }
 
-    size_t size() const {
+    usize size() const {
         return _len * sizeof(T);
     }
 };

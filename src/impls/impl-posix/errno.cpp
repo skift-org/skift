@@ -4,7 +4,7 @@
 
 namespace Embed::Posix {
 
-Error fromErrno(int error) {
+Error fromErrno(isize error) {
     if (EOPNOTSUPP != ENOTSUP and error == EOPNOTSUPP) {
         return Error::unsupported("operation not supported on socket");
     }

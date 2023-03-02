@@ -6,10 +6,10 @@
 namespace Karm {
 
 struct Uuid {
-    uint32_t a{};
-    uint16_t b{};
-    uint16_t c{};
-    uint8_t d[8]{};
+    u32 a{};
+    u16 b{};
+    u16 c{};
+    u8 d[8]{};
 
     Ordr cmp(Uuid const &other) const {
         return ::cmp(a, other.a) |

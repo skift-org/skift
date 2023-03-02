@@ -87,7 +87,7 @@ union Vec2 {
         return sign * acos(r);
     }
 
-    constexpr T operator[](int i) const {
+    constexpr T operator[](isize i) const {
         return _els[i];
     }
 
@@ -161,11 +161,11 @@ Vec2<T> operator/(T const &lhs, Vec2<T> const &rhs) {
     return rhs / lhs;
 }
 
-using Vec2i = Vec2<int>;
+using Vec2i = Vec2<isize>;
 
-using Vec2u = Vec2<unsigned int>;
+using Vec2u = Vec2<usize>;
 
-using Vec2f = Vec2<double>;
+using Vec2f = Vec2<f64>;
 
 template <typename T>
 bool epsilonEq(Vec2<T> const &lhs, Vec2<T> const &rhs, T epsilon) {
@@ -243,7 +243,7 @@ union Vec3 {
         return {x / len, y / len, z / len};
     }
 
-    constexpr T operator[](int i) {
+    constexpr T operator[](isize i) {
         return _els[i];
     }
 
@@ -313,11 +313,11 @@ constexpr Vec3<T> operator/(T const &lhs, Vec3<T> const &rhs) {
     return {lhs / rhs.x, lhs / rhs.y, lhs / rhs.z};
 }
 
-using Vec3i = Vec3<int>;
+using Vec3i = Vec3<isize>;
 
-using Vec3u = Vec3<unsigned int>;
+using Vec3u = Vec3<usize>;
 
-using Vec3f = Vec3<double>;
+using Vec3f = Vec3<f64>;
 
 template <typename T>
 bool epsilonEq(Vec3<T> const &lhs, Vec3<T> const &rhs, T epsilon) {
@@ -388,7 +388,7 @@ union Vec4 {
         return {x / len, y / len, z / len, w / len};
     }
 
-    constexpr T operator[](int i) {
+    constexpr T operator[](isize i) {
         return _els[i];
     }
 
@@ -453,11 +453,11 @@ constexpr Vec4<T> operator/(T const &lhs, Vec4<T> const &rhs) {
     return {lhs / rhs.x, lhs / rhs.y, lhs / rhs.z, lhs / rhs.w};
 }
 
-using Vec4i = Vec4<int>;
+using Vec4i = Vec4<isize>;
 
-using Vec4u = Vec4<unsigned int>;
+using Vec4u = Vec4<usize>;
 
-using Vec4f = Vec4<double>;
+using Vec4f = Vec4<f64>;
 
 template <typename T>
 bool epsilonEq(Vec4<T> const &lhs, Vec4<T> const &rhs, T epsilon) {
@@ -471,21 +471,21 @@ bool epsilonEq(Vec4<T> const &lhs, Vec4<T> const &rhs, T epsilon) {
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Vec2<T>> {
-    Res<size_t> format(Io::_TextWriter &writer, Math::Vec2<T> vec) {
+    Res<usize> format(Io::_TextWriter &writer, Math::Vec2<T> vec) {
         return Fmt::format(writer, "Vec2({}, {})", vec.x, vec.y);
     }
 };
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Vec3<T>> {
-    Res<size_t> format(Io::_TextWriter &writer, Math::Vec3<T> vec) {
+    Res<usize> format(Io::_TextWriter &writer, Math::Vec3<T> vec) {
         return Fmt::format(writer, "Vec3({}, {}, {})", vec.x, vec.y, vec.z);
     }
 };
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Vec4<T>> {
-    Res<size_t> format(Io::_TextWriter &writer, Math::Vec4<T> vec) {
+    Res<usize> format(Io::_TextWriter &writer, Math::Vec4<T> vec) {
         return Fmt::format(writer, "Vec4({}, {}, {}, {})", vec.x, vec.y, vec.z);
     }
 };

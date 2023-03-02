@@ -124,7 +124,7 @@ struct GroupNode : public LeafNode<Crtp> {
         auto &us = children();
         auto &them = o.children();
 
-        for (size_t i = 0; i < them.len(); i++) {
+        for (usize i = 0; i < them.len(); i++) {
             if (i < us.len()) {
                 us.replace(i, tryOr(us[i]->reconcile(them[i]), us[i]));
             } else {

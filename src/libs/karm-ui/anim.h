@@ -13,8 +13,8 @@ struct Anim {
     T _value{};
     T _target{};
     Math::Easing _easing{};
-    double _elapsed{};
-    double _duration{};
+    f64 _elapsed{};
+    f64 _duration{};
     bool _animated{};
 
     Anim() = default;
@@ -37,7 +37,7 @@ struct Anim {
         Ui::shouldAnimate(n);
     }
 
-    void animate(Node &n, T target, double duration = 1.0, Math::Easing easing = {}) {
+    void animate(Node &n, T target, f64 duration = 1.0, Math::Easing easing = {}) {
         _start = _value;
         _target = target;
 
@@ -50,7 +50,7 @@ struct Anim {
         Ui::shouldAnimate(n);
     }
 
-    void update(double dt) {
+    void update(f64 dt) {
         if (_animated) {
             _elapsed += dt;
             if (_elapsed > _duration) {
@@ -58,7 +58,7 @@ struct Anim {
                 _value = _target;
                 _animated = false;
             } else {
-                double p = _elapsed / _duration;
+                f64 p = _elapsed / _duration;
                 _value = Math::lerp(_start, _target, _easing(p));
             }
         }
@@ -108,12 +108,12 @@ struct Anim2 {
         _y.set(n, v.y);
     }
 
-    void animate(Node &n, Math::Vec2<T> target, double duration = 1.0, Math::Easing easing = {}) {
+    void animate(Node &n, Math::Vec2<T> target, f64 duration = 1.0, Math::Easing easing = {}) {
         _x.animate(n, target.x, duration, easing);
         _y.animate(n, target.y, duration, easing);
     }
 
-    void update(double dt) {
+    void update(f64 dt) {
         _x.update(dt);
         _y.update(dt);
     }
@@ -152,8 +152,8 @@ struct Anim2 {
     }
 };
 
-using Anim2i = Anim2<int>;
+using Anim2i = Anim2<isize>;
 
-using Anim2f = Anim2<double>;
+using Anim2f = Anim2<f64>;
 
 } // namespace Karm::Ui

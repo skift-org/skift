@@ -2,18 +2,17 @@
 
 #include <karm-meta/pack.h>
 
-#include "_prelude.h"
-
 #include "clamp.h"
 #include "opt.h"
 #include "panic.h"
+#include "std.h"
 
 namespace Karm {
 
 template <typename... Ts>
 struct Var {
     alignas(max(alignof(Ts)...)) char _buf[max(sizeof(Ts)...)];
-    uint8_t _index;
+    u8 _index;
 
     Var() = delete;
 
@@ -49,7 +48,8 @@ struct Var {
 
     template <Meta::Contains<Ts...> T>
     Var &operator=(T const &value) {
-        return *this = Var(value);
+        *this = Var(value);
+        return *this;
     }
 
     template <Meta::Contains<Ts...> T>
@@ -64,7 +64,10 @@ struct Var {
         return *this;
     }
 
-    Var &operator=(Var const &other) { return *this = Var(other); }
+    Var &operator=(Var const &other) {
+        *this = Var(other);
+        return *this;
+    }
 
     Var &operator=(Var &&other) {
         Meta::indexCast<Ts...>(_index, _buf, []<typename T>(T &ptr) {
@@ -138,7 +141,7 @@ struct Var {
         return _index == Meta::indexOf<T, Ts...>();
     }
 
-    ALWAYS_INLINE size_t index() const { return _index; }
+    ALWAYS_INLINE usize index() const { return _index; }
 
     template <Meta::Contains<Ts...> T>
     ALWAYS_INLINE bool operator==(T const &other) const {

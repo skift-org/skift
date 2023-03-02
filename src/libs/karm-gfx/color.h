@@ -6,28 +6,28 @@
 namespace Karm::Gfx {
 
 struct Color {
-    uint8_t red, green, blue, alpha;
+    u8 red, green, blue, alpha;
 
-    static constexpr Color fromHex(uint32_t hex) {
+    static constexpr Color fromHex(u32 hex) {
         return {
-            static_cast<uint8_t>((hex >> 16) & 0xFF),
-            static_cast<uint8_t>((hex >> 8) & 0xFF),
-            static_cast<uint8_t>(hex & 0xFF),
-            static_cast<uint8_t>(0xFF),
+            static_cast<u8>((hex >> 16) & 0xFF),
+            static_cast<u8>((hex >> 8) & 0xFF),
+            static_cast<u8>(hex & 0xFF),
+            static_cast<u8>(0xFF),
         };
     }
 
-    static constexpr Color fromRgb(uint8_t red, uint8_t green, uint8_t blue) {
+    static constexpr Color fromRgb(u8 red, u8 green, u8 blue) {
         return {red, green, blue, 255};
     }
 
-    static constexpr Color fromRgba(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {
+    static constexpr Color fromRgba(u8 red, u8 green, u8 blue, u8 alpha) {
         return {red, green, blue, alpha};
     }
 
     constexpr Color() : red(0), green(0), blue(0), alpha(0) {}
 
-    constexpr Color(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255) : red(red), green(green), blue(blue), alpha(alpha) {}
+    constexpr Color(u8 red, u8 green, u8 blue, u8 alpha = 255) : red(red), green(green), blue(blue), alpha(alpha) {}
 
     constexpr Color(Math::Vec4u v) : red(v.x), green(v.y), blue(v.z), alpha(v.w) {}
 
@@ -38,51 +38,51 @@ struct Color {
             return background;
         } else if (background.alpha == 255u) {
             return {
-                static_cast<uint8_t>((background.red * 255u * (255u - alpha) + 255u * alpha * red) / 65025),
-                static_cast<uint8_t>((background.green * 255u * (255u - alpha) + 255u * alpha * green) / 65025),
-                static_cast<uint8_t>((background.blue * 255u * (255u - alpha) + 255u * alpha * blue) / 65025),
-                static_cast<uint8_t>(255),
+                static_cast<u8>((background.red * 255u * (255u - alpha) + 255u * alpha * red) / 65025),
+                static_cast<u8>((background.green * 255u * (255u - alpha) + 255u * alpha * green) / 65025),
+                static_cast<u8>((background.blue * 255u * (255u - alpha) + 255u * alpha * blue) / 65025),
+                static_cast<u8>(255),
             };
         } else {
-            uint16_t d = 255u * (background.alpha + alpha) - background.alpha * alpha;
+            u16 d = 255u * (background.alpha + alpha) - background.alpha * alpha;
 
             return {
-                static_cast<uint8_t>((background.red * background.alpha * (255u - alpha) + 255u * alpha * red) / d),
-                static_cast<uint8_t>((background.green * background.alpha * (255u - alpha) + 255u * alpha * green) / d),
-                static_cast<uint8_t>((background.blue * background.alpha * (255u - alpha) + 255u * alpha * blue) / d),
-                static_cast<uint8_t>(d / 255u),
+                static_cast<u8>((background.red * background.alpha * (255u - alpha) + 255u * alpha * red) / d),
+                static_cast<u8>((background.green * background.alpha * (255u - alpha) + 255u * alpha * green) / d),
+                static_cast<u8>((background.blue * background.alpha * (255u - alpha) + 255u * alpha * blue) / d),
+                static_cast<u8>(d / 255u),
             };
         }
     }
 
-    constexpr Color lerpWith(Color const other, double const t) const {
+    constexpr Color lerpWith(Color const other, f64 const t) const {
         return {
-            static_cast<uint8_t>(red + (other.red - red) * t),
-            static_cast<uint8_t>(green + (other.green - green) * t),
-            static_cast<uint8_t>(blue + (other.blue - blue) * t),
-            static_cast<uint8_t>(alpha + (other.alpha - alpha) * t),
+            static_cast<u8>(red + (other.red - red) * t),
+            static_cast<u8>(green + (other.green - green) * t),
+            static_cast<u8>(blue + (other.blue - blue) * t),
+            static_cast<u8>(alpha + (other.alpha - alpha) * t),
         };
     }
 
-    constexpr Color withOpacity(double const opacity) const {
+    constexpr Color withOpacity(f64 const opacity) const {
         return {
-            static_cast<uint8_t>(red),
-            static_cast<uint8_t>(green),
-            static_cast<uint8_t>(blue),
-            static_cast<uint8_t>(alpha * opacity),
+            static_cast<u8>(red),
+            static_cast<u8>(green),
+            static_cast<u8>(blue),
+            static_cast<u8>(alpha * opacity),
         };
     }
 
     constexpr operator Math::Vec4u() const {
         return {
-            static_cast<uint32_t>(red),
-            static_cast<uint32_t>(green),
-            static_cast<uint32_t>(blue),
-            static_cast<uint32_t>(alpha),
+            static_cast<u32>(red),
+            static_cast<u32>(green),
+            static_cast<u32>(blue),
+            static_cast<u32>(alpha),
         };
     }
 
-    constexpr double luminance() const {
+    constexpr f64 luminance() const {
         auto r = this->red / 255.0;
         auto g = this->green / 255.0;
         auto b = this->blue / 255.0;
@@ -91,7 +91,7 @@ struct Color {
 };
 
 struct Hsv {
-    double hue, saturation, value;
+    f64 hue, saturation, value;
 
     Ordr cmp(Hsv const &other) const {
         return hue == other.hue &&

@@ -21,7 +21,7 @@ struct _Scan {
         return _cursor.ended();
     }
 
-    size_t rem() {
+    usize rem() {
         auto curr = _cursor;
         return transcodeLen<E>(curr);
     }
@@ -36,7 +36,7 @@ struct _Scan {
         return E::decodeUnit(r, curr) ? r : U'�';
     }
 
-    Rune peek(size_t count = 0) {
+    Rune peek(usize count = 0) {
         auto save = _cursor;
         next(count);
         auto r = curr();
@@ -53,10 +53,10 @@ struct _Scan {
         return E::decodeUnit(r, _cursor) ? r : U'�';
     }
 
-    Rune next(size_t count) {
+    Rune next(usize count) {
         Rune r = '\0';
 
-        for (size_t i = 0; i < count; i++) {
+        for (usize i = 0; i < count; i++) {
             r = next();
         }
         return r;
@@ -140,9 +140,9 @@ struct _Scan {
 
     /* --- Number parsing --------------------------------------------------- */
 
-    Opt<uint8_t> _parseDigit(Rune rune, size_t base = 10) {
+    Opt<u8> _parseDigit(Rune rune, usize base = 10) {
         rune = tolower(rune);
-        uint8_t result = 255;
+        u8 result = 255;
 
         if (isalpha(rune))
             result = rune - 'a' + 10;
@@ -155,7 +155,7 @@ struct _Scan {
         return result;
     }
 
-    Opt<uint8_t> nextDigit(size_t base = 10) {
+    Opt<u8> nextDigit(usize base = 10) {
         if (ended())
             return NONE;
 
@@ -167,9 +167,9 @@ struct _Scan {
         return d;
     }
 
-    Opt<uint64_t> nextUint(size_t base = 10) {
+    Opt<u64> nextUint(usize base = 10) {
         bool isNum = false;
-        uint64_t result = 0;
+        u64 result = 0;
 
         while (not ended()) {
             auto maybeDigit = nextDigit(base);
@@ -186,10 +186,10 @@ struct _Scan {
         return result;
     }
 
-    Opt<int64_t> nextInt(size_t base = 10) {
+    Opt<i64> nextInt(usize base = 10) {
         bool isNeg = false;
         bool isNum = false;
-        int64_t result = 0;
+        i64 result = 0;
 
         if (peek(0) == '-' and _parseDigit(peek(1), base)) {
             isNeg = true;
@@ -217,17 +217,17 @@ struct _Scan {
 
 #ifndef __osdk_freestanding__
 
-    Opt<double> nextFloat(size_t base = 10) {
-        int64_t ipart = 0.0;
-        double fpart = 0.0;
-        int64_t exp = 0;
+    Opt<f64> nextFloat(usize base = 10) {
+        i64 ipart = 0.0;
+        f64 fpart = 0.0;
+        i64 exp = 0;
 
         if (peek(0) != '.' or not _parseDigit(peek(1), base)) {
             ipart = try$(nextInt(base));
         }
 
         if (skip('.')) {
-            double multiplier = (1.0 / base);
+            f64 multiplier = (1.0 / base);
             while (not ended()) {
                 auto maybeDigit = nextDigit(base);
                 if (not maybeDigit) {

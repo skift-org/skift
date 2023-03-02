@@ -5,8 +5,8 @@
 
 namespace Handover {
 
-inline size_t KERNEL_BASE = 0xffffffff80000000;
-inline size_t UPPER_HALF = 0xffff800000000000;
+inline usize KERNEL_BASE = 0xffffffff80000000;
+inline usize UPPER_HALF = 0xffff800000000000;
 
 namespace Utils {
 
@@ -20,7 +20,7 @@ inline bool cstrEq(const char *str1, const char *str2) {
 
 } // namespace Utils
 
-static constexpr uint32_t COOLBOOT = 0xc001b001;
+static constexpr u32 COOLBOOT = 0xc001b001;
 
 #define FOREACH_TAG(TAG)      \
     TAG(FREE, 0)              \
@@ -36,7 +36,7 @@ static constexpr uint32_t COOLBOOT = 0xc001b001;
     TAG(RESERVED, 0xb8841d2d) \
     TAG(END, 0xffffffff)
 
-enum struct Tag : uint32_t {
+enum struct Tag : u32 {
 #define ITER(NAME, VALUE) NAME = VALUE,
     FOREACH_TAG(ITER)
 #undef ITER
@@ -68,16 +68,16 @@ inline bool shouldMerge(Tag tag) {
     }
 }
 
-enum struct PixelFormat : uint16_t {
+enum struct PixelFormat : u16 {
     RGBX8888 = 0x7451,
     BGRX8888 = 0xd040,
 };
 
 struct Record {
     Tag tag;
-    uint32_t flags;
-    uint64_t start;
-    uint64_t size;
+    u32 flags;
+    u64 start;
+    u64 size;
 
     char const *name() const {
         return tagName(tag);
@@ -86,22 +86,22 @@ struct Record {
     union {
         struct
         {
-            uint16_t width;
-            uint16_t height;
-            uint16_t pitch;
+            u16 width;
+            u16 height;
+            u16 pitch;
             PixelFormat format;
         } fb;
 
         struct
         {
-            uint32_t name;
-            uint32_t meta;
+            u32 name;
+            u32 meta;
         } file;
 
-        uint64_t more;
+        u64 more;
     };
 
-    uint64_t end() const {
+    u64 end() const {
         return start + size;
     }
 
@@ -119,10 +119,10 @@ struct Record {
 };
 
 struct Payload {
-    uint32_t magic, agent, size, len;
+    u32 magic, agent, size, len;
     Record records[];
 
-    char const *stringAt(uint64_t offset) const {
+    char const *stringAt(u64 offset) const {
         if (offset == 0) {
             return "";
         }
@@ -170,8 +170,8 @@ struct Payload {
         return records + len;
     }
 
-    size_t sum(Handover::Tag tag) {
-        size_t total = 0;
+    usize sum(Handover::Tag tag) {
+        usize total = 0;
         for (auto const &r : *this) {
             if (r.tag == tag) {
                 total += r.size;
@@ -180,7 +180,7 @@ struct Payload {
         return total;
     }
 
-    Record find(size_t size) {
+    Record find(usize size) {
         for (auto &r : *this) {
             if (r.tag == Tag::FREE and r.size >= size) {
                 return r;
@@ -192,7 +192,7 @@ struct Payload {
 
     template <typename R>
     R usableRange() const {
-        size_t start = 0, end = 0;
+        usize start = 0, end = 0;
 
         for (auto const &r : *this) {
             if (r.tag == Tag::FREE) {
@@ -214,8 +214,8 @@ struct Payload {
 
 struct Request {
     Tag tag;
-    uint32_t flags;
-    uint64_t more;
+    u32 flags;
+    u64 more;
 
     char const *name() const {
         return tagName(tag);
@@ -226,7 +226,7 @@ inline constexpr Request requestSelf() {
     return {Tag::SELF, 0, 0};
 }
 
-inline constexpr Request requestStack(uint64_t preferedSize = 64 * 1024) {
+inline constexpr Request requestStack(u64 preferedSize = 64 * 1024) {
     return {Tag::STACK, 0, preferedSize};
 }
 
@@ -247,10 +247,10 @@ inline constexpr Request requestFdt() {
 }
 
 inline constexpr Request requestFb(PixelFormat preferedFormat = PixelFormat::BGRX8888) {
-    return {Tag::FB, 0, (uint64_t)preferedFormat};
+    return {Tag::FB, 0, (u64)preferedFormat};
 }
 
-inline bool valid(uint32_t magic, Payload const &payload) {
+inline bool valid(u32 magic, Payload const &payload) {
     if (magic != COOLBOOT) {
         return false;
     }
@@ -279,6 +279,6 @@ static constexpr char const *REQUEST_SECTION = ".handover";
 
 // clang-format on
 
-using EntryPoint = void (*)(uint64_t magic, Payload const *handover);
+using EntryPoint = void (*)(u64 magic, Payload const *handover);
 
 } // namespace Handover

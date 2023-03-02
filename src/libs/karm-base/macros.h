@@ -16,9 +16,9 @@ namespace Karm {
 
 #define var$(NAME) concat$(NAME, __LINE__)
 
-#define defer$(BEGIN, END) for (int var$(__i) = (BEGIN, 0); not var$(__i); (var$(__i) += 1, END))
+#define defer$(BEGIN, END) for (isize var$(__i) = (BEGIN, 0); not var$(__i); (var$(__i) += 1, END))
 
-#define condDefer$(BEGIN, END) for (int var$(__i) = BEGIN; var$(__i); (var$(__i) -= 1, END))
+#define condDefer$(BEGIN, END) for (isize var$(__i) = BEGIN; var$(__i); (var$(__i) -= 1, END))
 
 #define ALWAYS_INLINE __attribute__((always_inline))
 

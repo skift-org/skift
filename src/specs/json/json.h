@@ -18,9 +18,9 @@ using Array = Vec<Value>;
 using Object = Map<String, Value>;
 
 #ifdef __osdk_freestanding__
-using Number = int;
+using Number = isize;
 #else
-using Number = double;
+using Number = f64;
 #endif
 
 using Store = Var<None, Array, Object, String, Number, bool>;
@@ -143,11 +143,11 @@ struct Value {
             });
     }
 
-    int asInt() const {
+    isize asInt() const {
         return _store.visit(
             Visitor{
                 [](Number d) {
-                    return (int)d;
+                    return (isize)d;
                 },
                 [](bool b) {
                     return b ? 1 : 0;
@@ -158,7 +158,8 @@ struct Value {
             });
     }
 
-    Number asFloat() const {
+#ifdef __osdk_freestanding__
+    f64 asFloat() const {
         return _store.visit(
             Visitor{
                 [](Number d) {
@@ -172,6 +173,7 @@ struct Value {
                 },
             });
     }
+#endif
 
     bool asBool() const {
         return _store.visit(
@@ -204,14 +206,14 @@ struct Value {
         return try$(asObject().get(key));
     }
 
-    Value get(size_t index) const {
+    Value get(usize index) const {
         if (not isArray() or asArray().len() <= index) {
             return NONE;
         }
         return asArray()[index];
     }
 
-    size_t len() const {
+    usize len() const {
         return _store.visit(
             Visitor{
                 [](None) {
@@ -272,7 +274,7 @@ Res<String> stringify(Value const &v);
 
 template <>
 struct Karm::Fmt::Formatter<Json::Value> {
-    Res<size_t> format(Io::_TextWriter &writer, Json::Value value) {
+    Res<usize> format(Io::_TextWriter &writer, Json::Value value) {
         Text::Emit emit{writer};
         try$(Json::stringify(emit, value));
         return Ok(emit.total());

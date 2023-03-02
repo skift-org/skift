@@ -1,9 +1,8 @@
 #pragma once
 
-#include "_prelude.h"
-
 #include "cons.h"
 #include "ordr.h"
+#include "std.h"
 #include "vec.h"
 
 namespace Karm {
@@ -46,7 +45,7 @@ struct Map {
         return ::iter(_els);
     }
 
-    size_t len() const {
+    usize len() const {
         return _els.len();
     }
 

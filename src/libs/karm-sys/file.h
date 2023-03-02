@@ -25,19 +25,19 @@ struct File :
 
     static Res<File> open(Path path);
 
-    Res<size_t> read(MutBytes bytes) override {
+    Res<usize> read(MutBytes bytes) override {
         return _fd->read(bytes);
     }
 
-    Res<size_t> write(Bytes bytes) override {
+    Res<usize> write(Bytes bytes) override {
         return _fd->write(bytes);
     }
 
-    Res<size_t> seek(Io::Seek seek) override {
+    Res<usize> seek(Io::Seek seek) override {
         return _fd->seek(seek);
     }
 
-    Res<size_t> flush() override {
+    Res<usize> flush() override {
         return _fd->flush();
     }
 

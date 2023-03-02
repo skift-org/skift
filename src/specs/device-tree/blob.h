@@ -8,36 +8,36 @@ namespace DeviceTree {
 
 struct Blob {
     struct Header {
-        be_uint32_t magic;
-        be_uint32_t totalsize;
-        be_uint32_t offDtStruct;
-        be_uint32_t offDtStrings;
-        be_uint32_t offMemRsvmap;
-        be_uint32_t version;
-        be_uint32_t lastCompVersion;
-        be_uint32_t bootCpuidPhys;
-        be_uint32_t sizeDtStrings;
-        be_uint32_t sizeDtStruct;
+        u32be magic;
+        u32be totalsize;
+        u32be offDtStruct;
+        u32be offDtStrings;
+        u32be offMemRsvmap;
+        u32be version;
+        u32be lastCompVersion;
+        u32be bootCpuidPhys;
+        u32be sizeDtStrings;
+        u32be sizeDtStruct;
     };
 
     struct Reserved {
-        uintptr_t address;
-        size_t size;
+        usize address;
+        usize size;
     };
 
-    static constexpr uint32_t magic = 0xd00dfeed;
+    static constexpr u32 magic = 0xd00dfeed;
 
     Bytes _slice;
 
     static Res<Blob> load(void *ptr) {
         BScan scan{Bytes{static_cast<Byte *>(ptr), sizeof(Header)}};
-        auto magic = scan.nextBeUint32();
+        auto magic = scan.nextU32be();
 
         if (magic != Blob::magic) {
             return Error::invalidData("invalid magic");
         }
 
-        auto size = scan.nextBeUint32();
+        auto size = scan.nextU32be();
 
         if (size < sizeof(Header)) {
             return Error::invalidData("invalid size");
@@ -68,8 +68,8 @@ struct Blob {
                     return NONE;
                 }
 
-                auto addr = s.nextBeUint64();
-                auto size = s.nextBeUint64();
+                auto addr = s.nextU64be();
+                auto size = s.nextU64be();
 
                 if (addr == 0 and size == 0) {
                     return NONE;

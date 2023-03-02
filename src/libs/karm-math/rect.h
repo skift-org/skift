@@ -129,14 +129,14 @@ union Rect {
     }
 
     constexpr Rect fit(Rect<T> const &r) const {
-        auto scale = (r.size() / size().template cast<double>()).min();
+        auto scale = (r.size() / size().template cast<f64>()).min();
         Rect result{0, 0, static_cast<T>(width * scale), static_cast<T>(height * scale)};
         result.xy = r.center() - result.center();
         return result;
     }
 
     constexpr Rect cover(Rect<T> const &r) const {
-        double scale = (r.size() / size().template cast<double>()).max();
+        f64 scale = (r.size() / size().template cast<f64>()).max();
         Rect result{0, 0, static_cast<T>(width * scale), static_cast<T>(height * scale)};
         result.xy = r.center() - result.center();
         return result;
@@ -168,11 +168,11 @@ union Rect {
             });
     }
 
-    constexpr T operator[](int i) {
+    constexpr T operator[](isize i) {
         return _els[i];
     }
 
-    constexpr T operator[](int i) const {
+    constexpr T operator[](isize i) const {
         return _els[i];
     }
 
@@ -231,15 +231,17 @@ union Rect {
     }
 };
 
-using Recti = Rect<int>;
+using Recti = Rect<isize>;
 
-using Rectf = Rect<double>;
+using Rectu = Rect<usize>;
+
+using Rectf = Rect<f64>;
 
 } // namespace Karm::Math
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Rect<T>> {
-    Res<size_t> format(Io::_TextWriter &writer, Math::Rect<T> rect) {
+    Res<usize> format(Io::_TextWriter &writer, Math::Rect<T> rect) {
         return Fmt::format(writer, "Rect({}, {}, {}, {})", rect.x, rect.y, rect.width, rect.height);
     }
 };

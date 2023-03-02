@@ -10,7 +10,7 @@ namespace Hal {
 
 struct Vmm;
 
-enum struct VmmFlags : uint64_t {
+enum struct VmmFlags : u64 {
     NONE = 0,
     READ = (1 << 0),
     WRITE = (1 << 1),
@@ -22,7 +22,7 @@ enum struct VmmFlags : uint64_t {
 
 FlagsEnum$(VmmFlags);
 
-using VmmRange = Range<size_t, struct VmmRangeTag>;
+using VmmRange = Range<usize, struct VmmRangeTag>;
 
 inline VmmRange identityMapped(PmmRange range) {
     return {range.start, range.size};
@@ -56,7 +56,7 @@ struct Vmm {
 
     virtual void activate() = 0;
 
-    virtual size_t root() = 0;
+    virtual usize root() = 0;
 };
 
 } // namespace Hal

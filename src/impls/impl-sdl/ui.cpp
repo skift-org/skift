@@ -30,25 +30,13 @@ struct SdlHost :
                 s->pixels,
                 s->w,
                 s->h,
-                (size_t)s->pitch,
+                (usize)s->pitch,
             },
         };
     }
 
-    void flip(Slice<Math::Recti> rects) override {
-        // Math::Recti and SDL_Rect should have the same layout so this is fine
-
-        static_assert(sizeof(Math::Recti) == sizeof(SDL_Rect), "Rects must have the same layout");
-        static_assert(offsetof(Math::Recti, x) == offsetof(SDL_Rect, x), "Rects must have the same layout");
-        static_assert(offsetof(Math::Recti, y) == offsetof(SDL_Rect, y), "Rects must have the same layout");
-        static_assert(offsetof(Math::Recti, width) == offsetof(SDL_Rect, w), "Rects must have the same layout");
-        static_assert(offsetof(Math::Recti, height) == offsetof(SDL_Rect, h), "Rects must have the same layout");
-        static_assert(Meta::Same<decltype(Math::Recti::x), decltype(SDL_Rect::x)>, "Rects must have the same layout");
-
-        SDL_UpdateWindowSurfaceRects(
-            _window,
-            reinterpret_cast<const SDL_Rect *>(rects.buf()),
-            rects.len());
+    void flip(Slice<Math::Recti>) override {
+        SDL_UpdateWindowSurface(_window);
     }
 
     void translate(SDL_Event const &sdlEvent) {
@@ -87,7 +75,7 @@ struct SdlHost :
                 return;
             }
 
-            Math::Vec2i screenPos = {};
+            Math::Vec2<i32> screenPos = {};
             SDL_GetGlobalMouseState(&screenPos.x, &screenPos.y);
 
             Events::MouseEvent uiEvent{
@@ -102,7 +90,7 @@ struct SdlHost :
             uiEvent.buttons |= (sdlEvent.motion.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
 
             _lastMousePos = uiEvent.pos;
-            _lastScreenMousePos = screenPos;
+            _lastScreenMousePos = screenPos.cast<isize>();
 
             event(uiEvent);
             break;
@@ -169,8 +157,8 @@ struct SdlHost :
                     sdlEvent.wheel.preciseX,
                     sdlEvent.wheel.preciseY,
 #else
-                    (double)sdlEvent.wheel.x,
-                    (double)sdlEvent.wheel.y,
+                    (f64)sdlEvent.wheel.x,
+                    (f64)sdlEvent.wheel.y,
 #endif
                 },
             };
@@ -199,7 +187,7 @@ struct SdlHost :
         }
     }
 
-    void wait(size_t ms) override {
+    void wait(usize ms) override {
         SDL_WaitEventTimeout(nullptr, ms);
     }
 
@@ -211,9 +199,9 @@ struct SdlHost :
             } else if (dragEvent.type == Ui::DragEvent::END) {
                 SDL_CaptureMouse(SDL_FALSE);
             } else if (dragEvent.type == Ui::DragEvent::DRAG) {
-                Math::Vec2i pos{};
+                Math::Vec2<i32> pos{};
                 SDL_GetWindowPosition(_window, &pos.x, &pos.y);
-                pos = pos + dragEvent.delta;
+                pos = pos + dragEvent.delta.cast<i32>();
                 SDL_SetWindowPosition(_window, pos.x, pos.y);
             }
         }

@@ -12,31 +12,31 @@
 namespace Embed {
 
 struct PosixFd : public Sys::Fd {
-    int _raw;
+    isize _raw;
 
-    PosixFd(int raw) : _raw(raw) {}
+    PosixFd(isize raw) : _raw(raw) {}
 
-    Res<size_t> read(MutBytes bytes) override {
-        ssize_t result = ::read(_raw, bytes.buf(), sizeOf(bytes));
-
-        if (result < 0) {
-            return Posix::fromLastErrno();
-        }
-
-        return Ok(static_cast<size_t>(result));
-    }
-
-    Res<size_t> write(Bytes bytes) override {
-        ssize_t result = ::write(_raw, bytes.buf(), sizeOf(bytes));
+    Res<usize> read(MutBytes bytes) override {
+        isize result = ::read(_raw, bytes.buf(), sizeOf(bytes));
 
         if (result < 0) {
             return Posix::fromLastErrno();
         }
 
-        return Ok(static_cast<size_t>(result));
+        return Ok(static_cast<usize>(result));
     }
 
-    Res<size_t> seek(Io::Seek seek) override {
+    Res<usize> write(Bytes bytes) override {
+        isize result = ::write(_raw, bytes.buf(), sizeOf(bytes));
+
+        if (result < 0) {
+            return Posix::fromLastErrno();
+        }
+
+        return Ok(static_cast<usize>(result));
+    }
+
+    Res<usize> seek(Io::Seek seek) override {
         off_t offset = 0;
 
         switch (seek.whence) {
@@ -55,16 +55,16 @@ struct PosixFd : public Sys::Fd {
             return Posix::fromLastErrno();
         }
 
-        return Ok(static_cast<size_t>(offset));
+        return Ok(static_cast<usize>(offset));
     }
 
-    Res<size_t> flush() override {
+    Res<usize> flush() override {
         // NOTE: No-op
         return Ok(0uz);
     }
 
     Res<Strong<Fd>> dup() override {
-        int duped = ::dup(_raw);
+        isize duped = ::dup(_raw);
 
         if (duped < 0) {
             return Posix::fromLastErrno();
@@ -76,7 +76,7 @@ struct PosixFd : public Sys::Fd {
 
 Res<Strong<Sys::Fd>> openFile(Sys::Path path) {
     String str = path.str();
-    int fd = ::open(str.buf(), O_RDONLY);
+    isize fd = ::open(str.buf(), O_RDONLY);
 
     if (fd < 0) {
         return Posix::fromLastErrno();
@@ -106,7 +106,7 @@ Res<Vec<Sys::DirEntry>> readDir(Sys::Path path) {
 Res<Strong<Sys::Fd>> createFile(Sys::Path path) {
     String str = path.str();
 
-    int fd = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
+    isize fd = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
 
     if (fd < 0) {
         return Posix::fromLastErrno();
@@ -140,8 +140,8 @@ Res<Strong<Sys::Fd>> createErr() {
     return Ok(makeStrong<PosixFd>(2));
 }
 
-int mmapOptionsToProt(Sys::MmapOptions const &options) {
-    int prot = 0;
+isize mmapOptionsToProt(Sys::MmapOptions const &options) {
+    isize prot = 0;
 
     if (options.flags & Sys::MmapFlags::READ)
         prot |= PROT_READ;
@@ -167,12 +167,12 @@ Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
         madvise(addr, options.size, MADV_WILLNEED);
     }
 
-    return Ok(Sys::MmapResult{0, (size_t)addr, (size_t)options.size});
+    return Ok(Sys::MmapResult{0, (usize)addr, (usize)options.size});
 }
 
 Res<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> maybeFd) {
-    Strong<PosixFd> fd = try$(maybeFd.as<PosixFd>());
-    size_t size = options.size;
+    Strong<PosixFd> fd = try$(maybeFd.cast<PosixFd>());
+    usize size = options.size;
 
     if (size == 0) {
         size = try$(Io::size(*fd));
@@ -184,10 +184,10 @@ Res<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> may
         return Posix::fromLastErrno();
     }
 
-    return Ok(Sys::MmapResult{0, (size_t)addr, (size_t)size});
+    return Ok(Sys::MmapResult{0, (usize)addr, (usize)size});
 }
 
-Res<> memUnmap(void const *buf, size_t len) {
+Res<> memUnmap(void const *buf, usize len) {
     if (::munmap((void *)buf, len) < 0) {
         return Posix::fromLastErrno();
     }
@@ -195,7 +195,7 @@ Res<> memUnmap(void const *buf, size_t len) {
     return Ok();
 }
 
-Res<> memFlush(void *flush, size_t len) {
+Res<> memFlush(void *flush, usize len) {
     if (::msync(flush, len, MS_INVALIDATE) < 0) {
         return Posix::fromLastErrno();
     }

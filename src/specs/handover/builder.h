@@ -9,7 +9,7 @@
 
 template <>
 struct Karm::Fmt::Formatter<Handover::Record> {
-    Res<size_t> format(Io::_TextWriter &writer, Handover::Record record) {
+    Res<usize> format(Io::_TextWriter &writer, Handover::Record record) {
         return Fmt::format(writer, "Record({}, {x}-{x})", record.name(), record.start, record.end());
     }
 };
@@ -37,7 +37,7 @@ inline Cons<Record, Record> split(Record record, Record other) {
 
 struct Builder {
     void *_buf{};
-    size_t _size{};
+    usize _size{};
     char *_string{};
     _Vec<ViewBuf<Record>> _records;
 
@@ -59,7 +59,7 @@ struct Builder {
         if (record.size == 0)
             return;
 
-        for (size_t i = 0; i < _records.len(); i++) {
+        for (usize i = 0; i < _records.len(); i++) {
             auto other = _records[i];
 
             // Merge with previous
@@ -123,7 +123,7 @@ struct Builder {
         _records.pushBack(record);
     }
 
-    void add(Tag tag, uint32_t flags = 0, USizeRange range = {}, uint64_t more = 0) {
+    void add(Tag tag, u32 flags = 0, USizeRange range = {}, u64 more = 0) {
         add({
             .tag = tag,
             .flags = flags,
@@ -133,7 +133,7 @@ struct Builder {
         });
     }
 
-    size_t add(Str str) {
+    usize add(Str str) {
         _string -= str.len() + 1;
         memcpy(_string, str.buf(), str.len());
         _string[str.len()] = '\0';

@@ -1,14 +1,13 @@
 #pragma once
 
-#include "keywords.h"
 #include "ordr.h"
 #include "rune.h"
 #include "std.h"
 
 namespace Karm {
 
-inline constexpr size_t strLen(char const *str) {
-    size_t len = 0;
+inline constexpr usize strLen(char const *str) {
+    usize len = 0;
     while (*str++) {
         len++;
     }
@@ -26,7 +25,7 @@ struct _Str : public Slice<U> {
         requires(Meta::Same<U, char>)
         : Slice<U>(cstr, strLen(cstr)) {}
 
-    constexpr _Str(U const *buf, size_t len)
+    constexpr _Str(U const *buf, usize len)
         : Slice<U>(buf, len) {}
 
     constexpr _Str(U const *begin, U const *end)
@@ -55,15 +54,15 @@ struct _String {
     using Inner = Unit;
 
     Unit *_buf = nullptr;
-    size_t _len = 0;
+    usize _len = 0;
 
     _String() = default;
 
-    _String(Move, Unit *buf, size_t len)
+    _String(Move, Unit *buf, usize len)
         : _buf(buf), _len(len) {
     }
 
-    _String(Unit const *buf, size_t len)
+    _String(Unit const *buf, usize len)
         : _len(len) {
         _buf = new Unit[len + 1];
         _buf[len] = 0;
@@ -93,7 +92,8 @@ struct _String {
     }
 
     _String &operator=(_String const &other) {
-        return *this = _String(other);
+        *this = _String(other);
+        return *this;
     }
 
     _String &operator=(_String &&other) {
@@ -113,11 +113,11 @@ struct _String {
         return {_buf, _len};
     }
 
-    Unit const &operator[](size_t i) const { return _buf[i]; }
-    Unit &operator[](size_t i) { return _buf[i]; }
+    Unit const &operator[](usize i) const { return _buf[i]; }
+    Unit &operator[](usize i) { return _buf[i]; }
     Unit const *buf() const { return _buf; }
     Unit *buf() { return _buf; }
-    size_t len() const { return _len; }
+    usize len() const { return _len; }
 };
 
 template <
@@ -138,7 +138,7 @@ auto iterRunes(S const &slice) {
 
 template <::StaticEncoding Target, ::StaticEncoding Source>
 _String<Target> transcode(_Str<Source> str) {
-    size_t len = transcodeLen<Source, Target>(str);
+    usize len = transcodeLen<Source, Target>(str);
     typename Target::Unit *buf = new typename Target::Unit[len + 1];
     buf[len] = '\0';
 

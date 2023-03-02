@@ -8,29 +8,29 @@
 namespace Karm::Math {
 
 struct Decimal {
-    int64_t _value;
-    uint8_t _decimals;
+    isize _value;
+    u8 _decimals;
 
-    static Decimal from(double value) {
+    static Decimal from(f64 value) {
         Decimal res = {};
-        int sign = +1;
+        i8 sign = +1;
 
         if (value < 0) {
             sign = -1;
             value = -value;
         }
 
-        uint8_t curr = 0;
-        while (Math::pow(10.0, curr) <= value)
+        u8 curr = 0;
+        while (::pow(10.0, curr) <= value)
             curr += 1;
         curr -= 1;
 
-        double epsilon = 1e-6;
+        f64 epsilon = 1e-6;
         while (value >= epsilon or curr >= 0) {
             res._value *= 10;
-            int8_t digit = (uint64_t)(value * Math::pow(0.1, (double)curr)) % 10;
+            i8 digit = (u64)(value * ::pow(0.1, (f64)curr)) % 10;
             res._value += digit;
-            value -= digit * Math::pow(10.0, (double)curr);
+            value -= digit * ::pow(10.0, (f64)curr);
 
             if (curr < 0)
                 res._decimals += 1;
@@ -48,18 +48,18 @@ struct Decimal {
     Decimal()
         : _value(0), _decimals(0) {}
 
-    Decimal(int64_t value)
+    Decimal(isize value)
         : _value(value), _decimals(0) {}
 
-    Decimal(int64_t value, uint8_t decimals)
+    Decimal(isize value, u8 decimals)
         : _value(value), _decimals(value == 0 ? 0 : decimals) {}
 
     static Cons<Decimal, Decimal> align(Decimal car, Decimal cdr) {
         bool carIsLess = car._decimals < cdr._decimals;
-        uint8_t decimals = carIsLess ? cdr._decimals : car._decimals;
+        u8 decimals = carIsLess ? cdr._decimals : car._decimals;
 
-        Decimal carAligned = {Math::pow<int64_t>(10, decimals - car._decimals) * car._value, decimals};
-        Decimal cdrAligned = {Math::pow<int64_t>(10, decimals - cdr._decimals) * cdr._value, decimals};
+        Decimal carAligned = {(isize)::pow(10, decimals - car._decimals) * car._value, decimals};
+        Decimal cdrAligned = {(isize)::pow(10, decimals - cdr._decimals) * cdr._value, decimals};
 
         return {carAligned, cdrAligned};
     }
@@ -78,14 +78,14 @@ struct Decimal {
 
     Decimal operator*(Decimal const &rhs) {
         auto [car, cdr] = align(*this, rhs);
-        return {car._value * cdr._value, (uint8_t)(_decimals + rhs._decimals)};
+        return {car._value * cdr._value, (u8)(_decimals + rhs._decimals)};
     }
     Decimal operator/(Decimal const &rhs) {
-        return from(cast<double>() / rhs.cast<double>());
+        return from(cast<f64>() / rhs.cast<f64>());
     }
 
     Decimal sqrt() const {
-        return from(::sqrt(cast<double>()));
+        return from(::sqrt(cast<f64>()));
     }
 
     Decimal invert() const {
@@ -94,7 +94,7 @@ struct Decimal {
 
     template <typename T>
     T cast() const {
-        return (T)_value / Math::pow<T>(10, _decimals);
+        return (T)_value / ::pow<T>(10, _decimals);
     }
 };
 
@@ -102,7 +102,7 @@ struct Decimal {
 
 template <>
 struct Karm::Fmt::Formatter<Karm::Math::Decimal> {
-    Res<size_t> format(Io::_TextWriter &writer, Karm::Math::Decimal dec) {
-        return Fmt::format(writer, "{}", dec.cast<int>());
+    Res<usize> format(Io::_TextWriter &writer, Karm::Math::Decimal dec) {
+        return Fmt::format(writer, "{}", dec.cast<isize>());
     }
 };

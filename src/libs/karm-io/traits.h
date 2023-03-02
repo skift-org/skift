@@ -10,22 +10,22 @@ namespace Karm::Io {
 
 template <typename T>
 concept Writable = requires(T &writer, Bytes bytes) {
-                       { writer.write(bytes) } -> Meta::Same<Res<size_t>>;
+                       { writer.write(bytes) } -> Meta::Same<Res<usize>>;
                    };
 
 template <typename T>
 concept Readable = requires(T &reader, MutBytes bytes) {
-                       { reader.read(bytes) } -> Meta::Same<Res<size_t>>;
+                       { reader.read(bytes) } -> Meta::Same<Res<usize>>;
                    };
 
 template <typename T>
 concept Seekable = requires(T &seeker, Seek seek) {
-                       { seeker.seek(seek) } -> Meta::Same<Res<size_t>>;
+                       { seeker.seek(seek) } -> Meta::Same<Res<usize>>;
                    };
 
 template <typename T>
 concept Flushable = requires(T &flusher) {
-                        { flusher.flush() } -> Meta::Same<Res<size_t>>;
+                        { flusher.flush() } -> Meta::Same<Res<usize>>;
                     };
 
 template <typename T>
@@ -43,7 +43,7 @@ concept SeekableDuplexable = Duplexable<T> and Seekable<T>;
 struct Writer {
     virtual ~Writer() = default;
 
-    virtual Res<size_t> write(Bytes) = 0;
+    virtual Res<usize> write(Bytes) = 0;
 };
 
 static_assert(Writable<Writer>);
@@ -51,7 +51,7 @@ static_assert(Writable<Writer>);
 struct Reader {
     virtual ~Reader() = default;
 
-    virtual Res<size_t> read(MutBytes) = 0;
+    virtual Res<usize> read(MutBytes) = 0;
 };
 
 static_assert(Readable<Reader>);
@@ -59,7 +59,7 @@ static_assert(Readable<Reader>);
 struct Seeker {
     virtual ~Seeker() = default;
 
-    virtual Res<size_t> seek(Seek seek) = 0;
+    virtual Res<usize> seek(Seek seek) = 0;
 };
 
 static_assert(Seekable<Seeker>);
@@ -67,7 +67,7 @@ static_assert(Seekable<Seeker>);
 struct Flusher {
     virtual ~Flusher() = default;
 
-    virtual Res<size_t> flush() = 0;
+    virtual Res<usize> flush() = 0;
 };
 
 static_assert(Flushable<Flusher>);
@@ -75,24 +75,24 @@ static_assert(Flushable<Flusher>);
 struct _TextWriter : public Writer {
     using Writer::write;
 
-    virtual Res<size_t> writeStr(Str str) = 0;
+    virtual Res<usize> writeStr(Str str) = 0;
 
-    virtual Res<size_t> writeRune(Rune rune) = 0;
+    virtual Res<usize> writeRune(Rune rune) = 0;
 };
 
 template <StaticEncoding E = typename Embed::Encoding>
 struct TextWriter : public _TextWriter {
     using Writer::write;
 
-    Res<size_t> writeStr(Str str) override {
-        size_t written = 0;
+    Res<usize> writeStr(Str str) override {
+        usize written = 0;
         for (auto rune : iterRunes(str)) {
             written += try$(writeRune(rune));
         }
         return Ok(written);
     }
 
-    Res<size_t> writeRune(Rune rune) override {
+    Res<usize> writeRune(Rune rune) override {
         typename E::One one;
         if (!E::encodeUnit(rune, one)) {
             return Ok(0uz);

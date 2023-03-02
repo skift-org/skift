@@ -6,7 +6,7 @@ namespace Counter {
 
 struct State {
     bool initial = true;
-    int counter = 0;
+    isize counter = 0;
 };
 
 struct ResetAction {};

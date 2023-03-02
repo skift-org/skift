@@ -42,8 +42,8 @@ struct Radius {
     }
 };
 
-using Radiusi = Radius<int>;
+using Radiusi = Radius<isize>;
 
-using Radiusf = Radius<double>;
+using Radiusf = Radius<f64>;
 
 } // namespace Karm::Layout

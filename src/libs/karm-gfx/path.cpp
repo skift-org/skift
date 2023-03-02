@@ -30,9 +30,9 @@ void Path::_flattenLineTo(Math::Vec2f p) {
     last(_segs).end++;
 }
 
-void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, int depth) {
-    const int MAX_DEPTH = 16;
-    const double TOLERANCE = 0.25;
+void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, isize depth) {
+    const isize MAX_DEPTH = 16;
+    const f64 TOLERANCE = 0.25;
 
     if (depth > MAX_DEPTH)
         return;
@@ -63,16 +63,16 @@ void Path::_flattenQuadraticTo(Math::Vec2f start, Math::Vec2f cp, Math::Vec2f po
     _flattenCubicTo(start, cp1, cp2, point);
 }
 
-void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Flags flags, Math::Vec2f point) {
+void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, f64 angle, Flags flags, Math::Vec2f point) {
     // Ported from canvg (https://code.google.com/p/canvg/)
-    double x1 = start.x;
-    double y1 = start.y;
-    double x2 = point.x;
-    double y2 = point.y;
+    f64 x1 = start.x;
+    f64 y1 = start.y;
+    f64 x2 = point.x;
+    f64 y2 = point.y;
 
-    double dx = x1 - x2;
-    double dy = y1 - y2;
-    double d = sqrtf(dx * dx + dy * dy);
+    f64 dx = x1 - x2;
+    f64 dy = y1 - y2;
+    f64 d = sqrtf(dx * dx + dy * dy);
 
     if (d < 1e-6f or radius.x < 1e-6f or radius.y < 1e-6f) {
         // The arc degenerates to a line
@@ -80,16 +80,16 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Fl
         return;
     }
 
-    double rotx = angle / 180.0f * M_PI; // x rotation angle
-    double sinrx = sinf(rotx);
-    double cosrx = cosf(rotx);
+    f64 rotx = angle / 180.0f * M_PI; // x rotation angle
+    f64 sinrx = sinf(rotx);
+    f64 cosrx = cosf(rotx);
 
     // Convert to center point parameterization.
     // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
 
     // 1) Compute x1', y1'
-    double x1p = cosrx * dx / 2.0f + sinrx * dy / 2.0f;
-    double y1p = -sinrx * dx / 2.0f + cosrx * dy / 2.0f;
+    f64 x1p = cosrx * dx / 2.0f + sinrx * dy / 2.0f;
+    f64 y1p = -sinrx * dx / 2.0f + cosrx * dy / 2.0f;
 
     d = Math::pow2(x1p) / Math::pow2(radius.x) + Math::pow2(y1p) / Math::pow2(radius.y);
 
@@ -100,14 +100,14 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Fl
     }
 
     // 2) Compute cx', cy'
-    double sa = Math::pow2(radius.x) * Math::pow2(radius.y) - Math::pow2(radius.x) * Math::pow2(y1p) - Math::pow2(radius.y) * Math::pow2(x1p);
-    double sb = Math::pow2(radius.x) * Math::pow2(y1p) + Math::pow2(radius.y) * Math::pow2(x1p);
+    f64 sa = Math::pow2(radius.x) * Math::pow2(radius.y) - Math::pow2(radius.x) * Math::pow2(y1p) - Math::pow2(radius.y) * Math::pow2(x1p);
+    f64 sb = Math::pow2(radius.x) * Math::pow2(y1p) + Math::pow2(radius.y) * Math::pow2(x1p);
 
     if (sa < 0.0f) {
         sa = 0.0f;
     }
 
-    double s = 0.0f;
+    f64 s = 0.0f;
 
     if (sb > 0.0f) {
         s = sqrtf(sa / sb);
@@ -120,19 +120,19 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Fl
         s = -s;
     }
 
-    double cxp = s * radius.x * y1p / radius.y;
-    double cyp = s * -radius.y * x1p / radius.x;
+    f64 cxp = s * radius.x * y1p / radius.y;
+    f64 cyp = s * -radius.y * x1p / radius.x;
 
     // 3) Compute cx,cy from cx',cy'
-    double cx = cosrx * cxp - sinrx * cyp + (x1 + x2) / 2.0f;
-    double cy = sinrx * cxp + cosrx * cyp + (y1 + y2) / 2.0f;
+    f64 cx = cosrx * cxp - sinrx * cyp + (x1 + x2) / 2.0f;
+    f64 cy = sinrx * cxp + cosrx * cyp + (y1 + y2) / 2.0f;
 
     // 4) Calculate theta1, and delta theta.
     Math::Vec2f u = {(x1p - cxp) / radius.x, (y1p - cyp) / radius.y};
     Math::Vec2f v = {(-x1p - cxp) / radius.x, (-y1p - cyp) / radius.y};
 
-    double a1 = Math::Vec2f(1, 0).angleWith(u); // Initial angle
-    double da = u.angleWith(v);
+    f64 a1 = Math::Vec2f(1, 0).angleWith(u); // Initial angle
+    f64 da = u.angleWith(v);
 
     if (not fs and da > 0) {
         da -= 2 * M_PI;
@@ -145,9 +145,9 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Fl
 
     // Split arc into max 90 degree segments.
     // The loop assumes an Iter per end point (including start and end), this +1.
-    int ndivs = (int)(Math::abs(da) / (M_PI * 0.5f) + 1.0f);
-    double hda = (da / (double)ndivs) / 2.0f;
-    double kappa = Math::abs(4.0f / 3.0f * (1.0f - Math::cos(hda)) / Math::sin(hda));
+    isize ndivs = (isize)(Math::abs(da) / (M_PI * 0.5f) + 1.0f);
+    f64 hda = (da / (f64)ndivs) / 2.0f;
+    f64 kappa = Math::abs(4.0f / 3.0f * (1.0f - Math::cos(hda)) / Math::sin(hda));
 
     if (da < 0.0f) {
         kappa = -kappa;
@@ -156,8 +156,8 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Fl
     Math::Vec2f current = {};
     Math::Vec2f ptan = {};
 
-    for (int i = 0; i <= ndivs; i++) {
-        double a = a1 + da * (i / (double)ndivs);
+    for (isize i = 0; i <= ndivs; i++) {
+        f64 a = a1 + da * (i / (f64)ndivs);
 
         dx = Math::cos(a);
         dy = Math::sin(a);
@@ -269,11 +269,11 @@ void Path::lineTo(Math::Vec2f p, Flags flags) {
     evalOp({LINE_TO, p, flags});
 }
 
-void Path::hlineTo(double x, Flags flags) {
+void Path::hlineTo(f64 x, Flags flags) {
     evalOp({HLINE_TO, {x, 0}, flags});
 }
 
-void Path::vlineTo(double y, Flags flags) {
+void Path::vlineTo(f64 y, Flags flags) {
     evalOp({VLINE_TO, {0, y}, flags});
 }
 
@@ -293,7 +293,7 @@ void Path::smoothQuadTo(Math::Vec2f p, Flags flags) {
     evalOp({QUAD_TO, {}, p, flags | SMOOTH});
 }
 
-void Path::arcTo(Math::Vec2f radius, double angle, Math::Vec2f p, Flags flags) {
+void Path::arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Flags flags) {
     evalOp({ARC_TO, radius, angle, p, flags});
 }
 
@@ -319,10 +319,10 @@ void Path::rect(Math::Rectf rect, BorderRadius radius) {
         radius.bottomRight = min(radius.bottomRight, maxRadius);
         radius.bottomLeft = min(radius.bottomLeft, maxRadius);
 
-        double cpTopLeft = radius.topLeft - (radius.topLeft * 0.5522847498);
-        double cpTopRight = radius.topRight - (radius.topRight * 0.5522847498);
-        double cpBottomRight = radius.bottomRight - (radius.bottomRight * 0.5522847498);
-        double cpBottomLeft = radius.bottomLeft - (radius.bottomLeft * 0.5522847498);
+        f64 cpTopLeft = radius.topLeft - (radius.topLeft * 0.5522847498);
+        f64 cpTopRight = radius.topRight - (radius.topRight * 0.5522847498);
+        f64 cpBottomRight = radius.bottomRight - (radius.bottomRight * 0.5522847498);
+        f64 cpBottomLeft = radius.bottomLeft - (radius.bottomLeft * 0.5522847498);
 
         moveTo({rect.x + radius.topLeft, rect.y});
 
@@ -380,7 +380,7 @@ Opt<Path::Op> Path::parseOp(Text::Scan &scan, Rune opcode) {
         scan.skip(Re::optSeparator(','));
     };
 
-    auto nextCoord = [&]() -> Opt<double> {
+    auto nextCoord = [&]() -> Opt<f64> {
         nextSep();
         return try$(scan.nextFloat());
     };

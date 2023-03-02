@@ -2,12 +2,12 @@
 
 #include <karm-meta/traits.h>
 
-#include "_prelude.h"
+#include "std.h"
 
 namespace Karm {
 
 struct Ordr {
-    enum Value : int8_t {
+    enum Value : i8 {
         LESS = -128,
         EQUAL = 0,
         GREATER = 127,
@@ -15,7 +15,7 @@ struct Ordr {
 
     Value _value;
 
-    constexpr static Ordr from(int cmp) {
+    constexpr static Ordr from(isize cmp) {
         return cmp < 0 ? LESS : cmp > 0 ? GREATER
                                         : EQUAL;
     }
@@ -71,10 +71,10 @@ constexpr Ordr cmp(Lhs const &lhs, Rhs const &rhs) {
 }
 
 template <typename T>
-Ordr cmp(T const *lhs, size_t lhs_len, T const *rhs, size_t rhs_len) {
-    size_t len = lhs_len < rhs_len ? lhs_len : rhs_len;
+Ordr cmp(T const *lhs, usize lhs_len, T const *rhs, usize rhs_len) {
+    usize len = lhs_len < rhs_len ? lhs_len : rhs_len;
 
-    for (size_t i = 0; i < len; i++) {
+    for (usize i = 0; i < len; i++) {
         Ordr c = cmp(lhs[i], rhs[i]);
         if (c != Ordr::EQUAL) {
             return c;

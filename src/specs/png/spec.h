@@ -15,29 +15,29 @@ struct Ihdr : public BChunk {
     Math::Vec2i size() {
         auto s = begin();
         return {
-            (int)s.nextBeUint32(),
-            (int)s.nextBeUint32(),
+            (isize)s.nextU32be(),
+            (isize)s.nextU32be(),
         };
     }
 
-    uint8_t bitDepth() {
-        return begin().skip(8).nextBeUint8();
+    u8 bitDepth() {
+        return begin().skip(8).nextU8be();
     }
 
-    uint8_t colorType() {
-        return begin().skip(9).nextBeUint8();
+    u8 colorType() {
+        return begin().skip(9).nextU8be();
     }
 
-    uint8_t compressionMethod() {
-        return begin().skip(10).nextBeUint8();
+    u8 compressionMethod() {
+        return begin().skip(10).nextU8be();
     }
 
-    uint8_t filterMethod() {
-        return begin().skip(11).nextBeUint8();
+    u8 filterMethod() {
+        return begin().skip(11).nextU8be();
     }
 
-    uint8_t interlaceMethod() {
-        return begin().skip(12).nextBeUint8();
+    u8 interlaceMethod() {
+        return begin().skip(12).nextU8be();
     }
 };
 
@@ -54,7 +54,7 @@ struct Iend : public BChunk {
 };
 
 struct Image {
-    static constexpr Array<uint8_t, 8> SIG = {
+    static constexpr Array<u8, 8> SIG = {
         0x89, 0x50, 0x4E, 0x47,
         0x0D, 0x0A, 0x1A, 0x0A};
 
@@ -98,18 +98,18 @@ struct Image {
 
         struct Chunk {
             Str sig;
-            size_t len;
+            usize len;
             Bytes data;
-            uint32_t crc32;
+            u32 crc32;
         };
 
         return Iter{[s]() mutable -> Opt<Chunk> {
             Chunk c;
 
-            c.len = s.nextBeInt32();
+            c.len = s.nextI32be();
             c.sig = s.nextStr(4);
             c.data = s.nextBytes(c.len);
-            c.crc32 = s.nextBeInt32();
+            c.crc32 = s.nextI32be();
 
             if (Op::eq(c.sig, Iend::SIG)) {
                 return NONE;
@@ -131,11 +131,11 @@ struct Image {
         return T{};
     }
 
-    int width() {
+    isize width() {
         return _ihdr.size().x;
     }
 
-    int height() {
+    isize height() {
         return _ihdr.size().y;
     }
 };

@@ -16,14 +16,14 @@ struct Sod {
     T _y = {};
     T _yd = {};
 
-    double _w;
-    double _z;
-    double _d;
-    double _k1;
-    double _k2;
-    double _k3;
+    f64 _w;
+    f64 _z;
+    f64 _d;
+    f64 _k1;
+    f64 _k2;
+    f64 _k3;
 
-    Sod(double f, double z, double r) {
+    Sod(f64 f, f64 z, f64 r) {
         _w = 2 * PI * f;
         _z = z;
         _d = _w * sqrt(abs(z * z - 1));
@@ -36,7 +36,7 @@ struct Sod {
         _init = false;
     }
 
-    T update(T x, double t) {
+    T update(T x, f64 t) {
         if (not _init) {
             _xp = x;
             _y = x;
@@ -48,18 +48,18 @@ struct Sod {
         _xp = x;
 
         // Clamp k1 and k2 to guarantee stability without jitter
-        double k1Stable;
-        double k2Stable;
+        f64 k1Stable;
+        f64 k2Stable;
 
         if (_w * t < _z) {
             k1Stable = _k1;
             k2Stable = max(_k2, t * t / 2 + t * _k1 / 2, t * _k1);
         } else {
             // Use pole matching when the system is very fast
-            double t1 = exp(-_z * _w * t);
-            double alpha = 2 * t1 * (_z <= 1 ? cos(t * _d) : cosh(t * _d));
-            double beta = t1 * t1;
-            double t2 = t / (1 + beta - alpha);
+            f64 t1 = exp(-_z * _w * t);
+            f64 alpha = 2 * t1 * (_z <= 1 ? cos(t * _d) : cosh(t * _d));
+            f64 beta = t1 * t1;
+            f64 t2 = t / (1 + beta - alpha);
             k1Stable = (1 - beta) * t2;
             k2Stable = t * t2;
         }

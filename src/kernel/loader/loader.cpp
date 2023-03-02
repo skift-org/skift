@@ -13,7 +13,7 @@
 
 namespace Loader {
 
-void enterKernel(size_t entry, size_t payload, size_t stack, size_t vmm);
+void enterKernel(usize entry, usize payload, usize stack, usize vmm);
 
 Res<> load(Sys::Path kernelPath, Entry const &entry) {
     logInfo("loader: preparing payload...");
@@ -47,11 +47,11 @@ Res<> load(Sys::Path kernelPath, Entry const &entry) {
             continue;
         }
 
-        size_t paddr = prog.vaddr() - Handover::KERNEL_BASE;
-        size_t memsz = Hal::pageAlignUp(prog.memsz());
+        usize paddr = prog.vaddr() - Handover::KERNEL_BASE;
+        usize memsz = Hal::pageAlignUp(prog.memsz());
         logInfo("loader: loading segment: paddr=0x{x}, vaddr=0x{x}, memsz=0x{x}, filesz=0x{x}", paddr, prog.vaddr(), memsz, prog.filez());
 
-        size_t remaining = prog.memsz() - prog.filez();
+        usize remaining = prog.memsz() - prog.filez();
         memcpy((void *)paddr, prog.buf(), prog.filez());
         memset((void *)(paddr + prog.filez()), 0, remaining);
 
@@ -75,8 +75,8 @@ Res<> load(Sys::Path kernelPath, Entry const &entry) {
             .start = fileRange.start,
             .size = fileRange.size,
             .file = {
-                .name = (uint32_t)strId,
-                .meta = (uint32_t)propsId,
+                .name = (u32)strId,
+                .meta = (u32)propsId,
             },
         });
 
@@ -123,9 +123,9 @@ Res<> load(Sys::Path kernelPath, Entry const &entry) {
 
     logInfo("loader: finalizing and entering kernel, see you on the other side...");
 
-    uintptr_t ip = image.header().entry;
-    uintptr_t sp = Handover::KERNEL_BASE + (size_t)stackMap.mutBytes().end();
-    logInfo("loader: ip:{x} sp:{x} payload:{}", ip, sp, (uintptr_t)&payload.finalize());
+    usize ip = image.header().entry;
+    usize sp = Handover::KERNEL_BASE + (usize)stackMap.mutBytes().end();
+    logInfo("loader: ip:{x} sp:{x} payload:{}", ip, sp, (usize)&payload.finalize());
 
     try$(Fw::finalizeHandover(payload));
     Fw::enterKernel(ip, payload.finalize(), sp, *vmm);

@@ -8,72 +8,72 @@
 namespace Karm::Math {
 
 struct Rand {
-    uint64_t _state{};
-    uint64_t _inc{};
+    u64 _state{};
+    u64 _inc{};
 
     Rand() = default;
 
-    Rand(uint64_t seed)
+    Rand(u64 seed)
         : _state(seed | seed << 32),
           _inc((seed | seed << 32) ^ (seed << 16)) {
     }
 
-    uint64_t nextU64() {
-        return nextU32() | (uint64_t)nextU32() << 32;
+    u64 nextU64() {
+        return nextU32() | (u64)nextU32() << 32;
     }
 
-    uint32_t nextU32() {
-        uint64_t oldstate = _state;
+    u32 nextU32() {
+        u64 oldstate = _state;
 
         _state = oldstate * 6364136223846793005ULL + (_inc | 1);
-        uint32_t xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
-        uint32_t rot = oldstate >> 59u;
+        u32 xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
+        u32 rot = oldstate >> 59u;
 
         return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
     }
 
-    uint16_t nextU16() {
+    u16 nextU16() {
         return nextU32();
     }
 
-    uint8_t nextU8() {
+    u8 nextU8() {
         return nextU32();
     }
 
-    int nextInt() {
+    isize nextInt() {
         return nextU32();
     }
 
-    int nextInt(int min, int max) {
+    isize nextInt(isize min, isize max) {
         return min + nextU32() % (max - min);
     }
 
-    int nextInt(int max) {
+    isize nextInt(isize max) {
         return nextU32() % max;
     }
 
-    double nextDouble() {
-        return nextU32() / (double)0xffffffff;
+    f64 nextDouble() {
+        return nextU32() / (f64)0xffffffff;
     }
 
-    double nextDouble(double min, double max) {
-        return min + nextU32() / (double)0xffffffff * (max - min);
+    f64 nextDouble(f64 min, f64 max) {
+        return min + nextU32() / (f64)0xffffffff * (max - min);
     }
 
-    double nextDouble(double max) {
-        return nextU32() / (double)0xffffffff * max;
+    f64 nextDouble(f64 max) {
+        return nextU32() / (f64)0xffffffff * max;
     }
 
-    float nextFloat() {
-        return nextU32() / (float)0xffffffff;
+    f32 nextFloat() {
+        return nextU32() / (f32)0xffffffff;
     }
 
-    float nextFloat(float min, float max) {
-        return min + nextU32() / (float)0xffffffff * (max - min);
+    f32 nextFloat(f32 min, f32 max) {
+        return min + nextU32() / (f32)0xffffffff * (max - min);
     }
 
-    float nextFloat(float max) {
-        return nextU32() / (float)0xffffffff * max;
+    f32 nextFloat(f32 max) {
+        return nextU32() / (f32)0xffffffff * max;
     }
 
     bool nextBool() {

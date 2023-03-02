@@ -45,41 +45,41 @@ T _swapBe(T value) {
 #endif
 
 template <typename T>
-struct [[gnu::packed]] _Be {
+struct [[gnu::packed]] _be {
     T _value;
 
-    constexpr _Be() = default;
-    constexpr _Be(T value) : _value(_swapBe(value)) {}
+    constexpr _be() = default;
+    constexpr _be(T value) : _value(_swapBe(value)) {}
     constexpr operator T() const { return _swapBe(_value); }
 };
 
 template <typename T>
-struct [[gnu::packed]] _Le {
+struct [[gnu::packed]] _le {
     T _value;
 
-    constexpr _Le() = default;
-    constexpr _Le(T value) : _value(_swapLe(value)) {}
+    constexpr _le() = default;
+    constexpr _le(T value) : _value(_swapLe(value)) {}
     constexpr operator T() const { return _swapLe(_value); }
 };
 
-using be_uint8_t = _Be<uint8_t>;
-using be_uint16_t = _Be<uint16_t>;
-using be_uint32_t = _Be<uint32_t>;
-using be_uint64_t = _Be<uint64_t>;
+using u8be = _be<u8>;
+using u16be = _be<u16>;
+using u32be = _be<u32>;
+using u64be = _be<u64>;
 
-using be_int8_t = _Be<int8_t>;
-using be_int16_t = _Be<int16_t>;
-using be_int32_t = _Be<int32_t>;
-using be_int64_t = _Be<int64_t>;
+using i8be = _be<i8>;
+using i16be = _be<i16>;
+using i32be = _be<i32>;
+using i64be = _be<i64>;
 
-using le_uint8_t = _Le<uint8_t>;
-using le_uint16_t = _Le<uint16_t>;
-using le_uint32_t = _Le<uint32_t>;
-using le_uint64_t = _Le<uint64_t>;
+using u8le = _le<u8>;
+using u16le = _le<u16>;
+using u32le = _le<u32>;
+using u64le = _le<u64>;
 
-using le_int8_t = _Le<int8_t>;
-using le_int16_t = _Le<int16_t>;
-using le_int32_t = _Le<int32_t>;
-using le_int64_t = _Le<int64_t>;
+using i8le = _le<i8>;
+using i16le = _le<i16>;
+using i32le = _le<i32>;
+using i64le = _le<i64>;
 
 } // namespace Karm

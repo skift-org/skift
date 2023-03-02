@@ -4,9 +4,9 @@
 #include <karm-base/string.h>
 
 // NOTE: Theses functions need to be implemented in C because clang choke otherwise.
-extern "C" uint32_t _Mdi__byName(char const *query, size_t queryLen);
+extern "C" u32 _Mdi__byName(char const *query, usize queryLen);
 
-extern "C" char const *_Mdi__name(uint32_t query);
+extern "C" char const *_Mdi__name(u32 query);
 
 namespace Mdi {
 
@@ -27,7 +27,7 @@ inline Res<Icon> byName(Str query) {
 }
 
 inline Str name(Icon icon) {
-    return Str(_Mdi__name((uint32_t)icon));
+    return Str(_Mdi__name((u32)icon));
 }
 
 } // namespace Mdi

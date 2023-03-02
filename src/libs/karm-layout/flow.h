@@ -57,7 +57,7 @@ struct Flow {
             RIGHT_TO_LEFT,
         };
 
-        return table[(int)_flow * 4 + (int)child._flow];
+        return table[(isize)_flow * 4 + (isize)child._flow];
     }
 
     template <typename T>

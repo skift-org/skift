@@ -10,10 +10,10 @@ namespace Karm::Gfx {
 /* --- Border Style -------------------------------------------------------- */
 
 struct BorderRadius {
-    double topLeft{};
-    double topRight{};
-    double bottomRight{};
-    double bottomLeft{};
+    f64 topLeft{};
+    f64 topRight{};
+    f64 bottomRight{};
+    f64 bottomLeft{};
 
     bool zero() const {
         return topLeft == 0 and topRight == 0 and bottomRight == 0 and bottomLeft == 0;
@@ -21,10 +21,10 @@ struct BorderRadius {
 
     BorderRadius() = default;
 
-    BorderRadius(double radius)
+    BorderRadius(f64 radius)
         : topLeft(radius), topRight(radius), bottomRight(radius), bottomLeft(radius) {}
 
-    BorderRadius(double topLeft, double topRight, double bottomRight, double bottomLeft)
+    BorderRadius(f64 topLeft, f64 topRight, f64 bottomRight, f64 bottomLeft)
         : topLeft(topLeft), topRight(topRight), bottomRight(bottomRight), bottomLeft(bottomLeft) {}
 };
 
@@ -50,7 +50,7 @@ enum StrokeJoin {
 
 struct StrokeStyle {
     Paint paint;
-    double width{1};
+    f64 width{1};
     StrokeAlign align{};
     StrokeCap cap{};
     StrokeJoin join{};
@@ -62,7 +62,7 @@ struct StrokeStyle {
         return *this;
     }
 
-    auto &withWidth(double w) {
+    auto &withWidth(f64 w) {
         width = w;
         return *this;
     }
@@ -91,7 +91,7 @@ inline StrokeStyle stroke(auto... args) {
 
 struct ShadowStyle {
     Paint paint;
-    double radius{};
+    f64 radius{};
     Math::Vec2f offset{};
 
     ShadowStyle(Paint c = BLACK) : paint(c) {}
@@ -101,7 +101,7 @@ struct ShadowStyle {
         return *this;
     }
 
-    auto &withRadius(double r) {
+    auto &withRadius(f64 r) {
         radius = r;
         return *this;
     }

@@ -28,7 +28,7 @@ FontMetrics Font::metrics() const {
     return m;
 }
 
-double Font::advance(Rune c) const {
+f64 Font::advance(Rune c) const {
     return fontface->advance(c) * (fontsize / fontface->units());
 }
 
@@ -44,7 +44,7 @@ FontMesure Font::mesureRune(Rune r) const {
 }
 
 FontMesure Font::mesureStr(Str str) const {
-    double adv = 0;
+    f64 adv = 0;
     for (auto r : iterRunes(str)) {
         adv += advance(r);
     }

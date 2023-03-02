@@ -9,14 +9,14 @@ namespace Karm {
 template <typename T>
 struct Ring {
     Inert<T> *_buf{};
-    size_t _cap{};
-    size_t _len{};
-    size_t _head{};
-    size_t _tail{};
+    usize _cap{};
+    usize _len{};
+    usize _head{};
+    usize _tail{};
 
     constexpr Ring() = default;
 
-    Ring(size_t cap) : _cap(cap) {
+    Ring(usize cap) : _cap(cap) {
         _buf = new Inert<T>[cap];
     }
 
@@ -26,7 +26,7 @@ struct Ring {
         _head = other._head;
         _tail = other._tail;
         _buf = new Inert<T>[_cap];
-        for (size_t i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++) {
             _buf[i].ctor(other.peek(i));
         }
     }
@@ -40,7 +40,7 @@ struct Ring {
     }
 
     ~Ring() {
-        for (size_t i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++) {
             _buf[(_tail + i) % _cap].dtor();
         }
 
@@ -48,7 +48,8 @@ struct Ring {
     }
 
     Ring &operator=(Ring const &other) {
-        return *this = Ring(other);
+        *this = Ring(other);
+        return *this;
     }
 
     Ring &operator=(Ring &&other) {
@@ -93,7 +94,7 @@ struct Ring {
     }
 
     void clear() {
-        for (size_t i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++) {
             _buf[(_tail + i) % _cap].dtor();
         }
 
@@ -102,7 +103,7 @@ struct Ring {
         _len = 0;
     }
 
-    T &peek(size_t index) {
+    T &peek(usize index) {
         if (index >= _len) {
             panic("peek out of bounds");
         }
@@ -110,7 +111,7 @@ struct Ring {
         return _buf[(_tail + index) % _cap].unwrap();
     }
 
-    T const &peek(size_t index) const {
+    T const &peek(usize index) const {
         if (index >= _len) {
             panic("peek out of bounds");
         }
@@ -118,7 +119,7 @@ struct Ring {
         return _buf[(_tail + index) % _cap].unwrap();
     }
 
-    size_t len() const { return _len; }
+    usize len() const { return _len; }
 
     constexpr auto iter() {
         return Iter([&, i = 0uz]() mutable -> T * {

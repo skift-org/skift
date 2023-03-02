@@ -25,18 +25,18 @@ struct Pit {
         return {Hal::Io::port({0x40, 4})};
     }
 
-    void init(int freq) {
-        uint16_t div = FREQ / freq;
+    void init(isize freq) {
+        u16 div = FREQ / freq;
 
         _io.write8(CMD, CHANNEL1 | LOWBYTE | SQUARE_WAVE);
         _io.write8(PORT0, div & 0xFF);
         _io.write8(PORT0, (div >> 8) & 0xFF);
     }
 
-    uint32_t readCount() {
+    u32 readCount() {
         _io.write8(CMD, 0x00);
-        uint32_t low = _io.read8(PORT0);
-        uint32_t high = _io.read8(PORT0);
+        u32 low = _io.read8(PORT0);
+        u32 high = _io.read8(PORT0);
         return (high << 8) | low;
     }
 };

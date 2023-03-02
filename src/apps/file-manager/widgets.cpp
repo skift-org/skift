@@ -28,7 +28,7 @@ Ui::Child directoryListing(Sys::Dir const &dir) {
     return Ui::grow(Ui::vscroll(Ui::spacing(8, Ui::align(Layout::Align::TOP | Layout::Align::HFILL, Ui::vflow(children)))));
 }
 
-Ui::Child breadcrumbItem(Str text, int index) {
+Ui::Child breadcrumbItem(Str text, isize index) {
     return Ui::button(
         Model::bind<GoParent>(index),
         Ui::ButtonStyle::subtle(),

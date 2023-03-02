@@ -6,26 +6,26 @@ namespace Acpi {
 
 struct [[gnu::packed]] Rsdp {
     Array<char, 8> signature;
-    uint8_t checksum;
+    u8 checksum;
     Array<char, 6> oemId;
-    uint8_t revision;
-    uint32_t rsdt;
+    u8 revision;
+    u32 rsdt;
 };
 
 struct [[gnu::packed]] Sdth {
     Array<char, 4> signature;
-    uint32_t len;
-    uint8_t revision;
-    uint8_t checksum;
+    u32 len;
+    u8 revision;
+    u8 checksum;
     Array<char, 6> oemId;
     Array<char, 8> oemTableId;
-    uint32_t oemRevision;
-    uint32_t creatorId;
-    uint32_t creatorRevision;
+    u32 oemRevision;
+    u32 creatorId;
+    u32 creatorRevision;
 };
 
 struct [[gnu::packed]] Rsdt : public Sdth {
-    uint32_t children[];
+    u32 children[];
 };
 
 struct [[gnu::packed]] Madt : public Sdth {
@@ -38,61 +38,61 @@ struct [[gnu::packed]] Madt : public Sdth {
     };
 
     struct [[gnu::packed]] Record {
-        uint8_t type;
-        uint8_t len;
+        u8 type;
+        u8 len;
     };
 
     struct [[gnu::packed]] LapicRecord : public Record {
-        uint8_t processorId;
-        uint8_t id;
-        uint32_t flags;
+        u8 processorId;
+        u8 id;
+        u32 flags;
     };
 
     struct [[gnu::packed]] IoapicRecord : public Record {
-        uint8_t id;
-        uint8_t reserved;
-        uint32_t address;
-        uint32_t interruptBase;
+        u8 id;
+        u8 reserved;
+        u32 address;
+        u32 interruptBase;
     };
 
     struct [[gnu::packed]] IsoRecord : public Record {
-        uint8_t bus;
-        uint8_t irq;
-        uint32_t gsi;
-        uint16_t flags;
+        u8 bus;
+        u8 irq;
+        u32 gsi;
+        u16 flags;
     };
 
-    uint32_t lapic;
-    uint32_t flags;
+    u32 lapic;
+    u32 flags;
 
     Record records[];
 };
 
 struct [[gnu::packed]] Mcfg : public Sdth {
     struct Record {
-        uint64_t address;
-        uint16_t segment_groupe;
-        uint8_t busStart;
-        uint8_t busEnd;
-        uint32_t reserved;
+        u64 address;
+        u16 segment_groupe;
+        u8 busStart;
+        u8 busEnd;
+        u32 reserved;
     };
 
-    uint64_t reserved;
+    u64 reserved;
     Record records[];
 };
 
 struct [[gnu::packed]] Hpet : public Sdth {
-    uint8_t hardwareRevId;
-    uint8_t info;
-    uint16_t pciVendorId;
-    uint8_t addressSpaceId;
-    uint8_t registerBitWidth;
-    uint8_t registerBitOffset;
-    uint8_t reserved1;
-    uint64_t address;
-    uint8_t hpetNumber;
-    uint16_t minimumTick;
-    uint8_t pageProtection;
+    u8 hardwareRevId;
+    u8 info;
+    u16 pciVendorId;
+    u8 addressSpaceId;
+    u8 registerBitWidth;
+    u8 registerBitOffset;
+    u8 reserved1;
+    u64 address;
+    u8 hpetNumber;
+    u16 minimumTick;
+    u8 pageProtection;
 };
 
 } // namespace Acpi

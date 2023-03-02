@@ -19,14 +19,14 @@ struct SysInfo {
 Res<SysInfo> sysinfo();
 
 struct MemInfo {
-    size_t physicalTotal;
-    size_t physicalUsed;
+    usize physicalTotal;
+    usize physicalUsed;
 
-    size_t virtualTotal;
-    size_t virtualUsed;
+    usize virtualTotal;
+    usize virtualUsed;
 
-    size_t swapTotal;
-    size_t swapUsed;
+    usize swapTotal;
+    usize swapUsed;
 };
 
 Res<MemInfo> meminfo();
@@ -36,8 +36,8 @@ struct CpuInfo {
     String brand;
     String vendor;
 
-    size_t usage;
-    size_t freq;
+    usize usage;
+    usize freq;
 };
 
 Res<Vec<CpuInfo>> cpusinfo();

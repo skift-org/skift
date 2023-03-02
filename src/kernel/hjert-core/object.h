@@ -15,7 +15,7 @@ struct Object : public _Object {
     using _Crtp = Crtp;
 };
 
-using Slot = Opt<Strong<_Object>>;
+using Slot = OptStrong<_Object>;
 
 struct Domain : public Object<Domain> {
     Array<Slot, 4096> _slots;

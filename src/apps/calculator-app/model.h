@@ -8,11 +8,11 @@ enum struct Operator;
 
 struct State {
     Operator op;
-    int lhs;
-    int rhs;
+    isize lhs;
+    isize rhs;
     bool hasRhs;
 
-    int mem;
+    isize mem;
     bool hasMem;
 };
 
@@ -73,7 +73,7 @@ inline bool isUnary(Operator op) {
     }
 }
 
-using Number = int;
+using Number = isize;
 
 struct BackspaceAction {};
 

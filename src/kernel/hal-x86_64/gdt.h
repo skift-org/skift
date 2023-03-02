@@ -5,32 +5,32 @@
 namespace x86_64 {
 
 struct [[gnu::packed]] Tss {
-    uint32_t _reserved;
-    Array<uint64_t, 3> _rsp;
-    uint64_t _reserved0;
-    Array<uint64_t, 7> _ist;
-    uint32_t _reserved1;
-    uint32_t _reserved2;
-    uint16_t _reserved3;
-    uint16_t _iopbOffset;
+    u32 _reserved;
+    Array<u64, 3> _rsp;
+    u64 _reserved0;
+    Array<u64, 7> _ist;
+    u32 _reserved1;
+    u32 _reserved2;
+    u16 _reserved3;
+    u16 _iopbOffset;
 };
 
 struct [[gnu::packed]] GdtEntry {
-    uint16_t _limitLow{};
-    uint16_t _baseLow{};
-    uint8_t _baseMid{};
-    uint8_t _flags{};
-    uint8_t _limitHigh : 4 {};
-    uint8_t _granularity : 4 {};
-    uint8_t _baseHigh{};
+    u16 _limitLow{};
+    u16 _baseLow{};
+    u8 _baseMid{};
+    u8 _flags{};
+    u8 _limitHigh : 4 {};
+    u8 _granularity : 4 {};
+    u8 _baseHigh{};
 
     constexpr GdtEntry() = default;
 
-    constexpr GdtEntry(uint8_t flags, uint8_t granularity)
+    constexpr GdtEntry(u8 flags, u8 granularity)
         : _flags(flags),
           _granularity(granularity){};
 
-    constexpr GdtEntry(uint32_t base, uint32_t limit, uint8_t flags, uint8_t granularity)
+    constexpr GdtEntry(u32 base, u32 limit, u8 flags, u8 granularity)
         : _limitLow(limit & 0xffff),
           _baseLow(base & 0xffff),
           _baseMid((base >> 16) & 0xff),
@@ -41,30 +41,30 @@ struct [[gnu::packed]] GdtEntry {
 };
 
 struct [[gnu::packed]] GdtTssEntry {
-    uint16_t _len;
-    uint16_t _baseLow16;
-    uint8_t _baseMid8;
-    uint8_t _flags1;
-    uint8_t _flags2;
-    uint8_t _baseHigh8;
-    uint32_t _baseUpper32;
-    uint32_t _reserved;
+    u16 _len;
+    u16 _baseLow16;
+    u8 _baseMid8;
+    u8 _flags1;
+    u8 _flags2;
+    u8 _baseHigh8;
+    u32 _baseUpper32;
+    u32 _reserved;
 
     constexpr GdtTssEntry() = default;
 
     GdtTssEntry(Tss const &tss)
         : _len(sizeof(Tss)),
-          _baseLow16((uintptr_t)&tss & 0xffff),
-          _baseMid8(((uintptr_t)&tss >> 16) & 0xff),
+          _baseLow16((usize)&tss & 0xffff),
+          _baseMid8(((usize)&tss >> 16) & 0xff),
           _flags1(0b10001001),
           _flags2(0),
-          _baseHigh8(((uintptr_t)&tss >> 24) & 0xff),
-          _baseUpper32((uintptr_t)&tss >> 32),
+          _baseHigh8(((usize)&tss >> 24) & 0xff),
+          _baseUpper32((usize)&tss >> 32),
           _reserved() {}
 };
 
 struct [[gnu::packed]] Gdt {
-    static constexpr int LEN = 6;
+    static constexpr usize LEN = 6;
 
     enum Selector {
         ZERO = 0,
@@ -75,7 +75,7 @@ struct [[gnu::packed]] Gdt {
         TSS = 5,
     };
 
-    enum Flags : uint32_t {
+    enum Flags : u32 {
         SEGMENT = 0b00010000,
         PRESENT = 0b10000000,
         USER = 0b01100000,
@@ -106,12 +106,12 @@ extern "C" void _gdtLoad(void const *ptr); // implemented in gdt.s
 extern "C" void _tssUpdate();
 
 struct [[gnu::packed]] GdtDesc {
-    uint16_t _limit;
-    uint64_t _base;
+    u16 _limit;
+    u64 _base;
 
     GdtDesc(Gdt const &base)
         : _limit(sizeof(Gdt) - 1),
-          _base(reinterpret_cast<uintptr_t>(&base)) {}
+          _base(reinterpret_cast<usize>(&base)) {}
 
     void load() const { _gdtLoad(this); }
 };

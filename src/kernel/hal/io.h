@@ -4,24 +4,24 @@
 
 namespace Hal {
 
-using PortRange = Range<size_t, struct PortRangeTag>;
+using PortRange = Range<usize, struct PortRangeTag>;
 
 struct DmaRange : public USizeRange {
     using USizeRange::USizeRange;
 };
 
 template <typename T>
-static T dmaIn(size_t addr) {
+static T dmaIn(usize addr) {
     return *((volatile T *)(addr));
 }
 
 template <typename T>
-static void dmaOut(size_t addr, T value) {
+static void dmaOut(usize addr, T value) {
     *((volatile T *)(addr)) = value;
 }
 
 template <typename T>
-static T portIn(uint16_t addr) {
+static T portIn(u16 addr) {
     T value = 0;
     if constexpr (sizeof(T) == 1) {
         asm volatile("inb %1, %0"
@@ -46,7 +46,7 @@ static T portIn(uint16_t addr) {
 }
 
 template <typename T>
-static void portOut(uint16_t addr, T value) {
+static void portOut(u16 addr, T value) {
     if constexpr (sizeof(T) == 1) {
         asm volatile("outb %0, %1"
                      :
@@ -74,14 +74,14 @@ struct Io {
         DMA
     } _type;
 
-    size_t _start;
-    size_t _size;
+    usize _start;
+    usize _size;
 
     static Io port(PortRange range) {
         return {PORT, range.start, range.size};
     }
 
-    static Io port(size_t start, size_t size) {
+    static Io port(usize start, usize size) {
         return {PORT, start, size};
     }
 
@@ -89,12 +89,12 @@ struct Io {
         return {DMA, range.start, range.size};
     }
 
-    static Io dma(size_t start, size_t size) {
+    static Io dma(usize start, usize size) {
         return {DMA, start, size};
     }
 
     template <typename T>
-    T read(size_t offset) {
+    T read(usize offset) {
         if (_type == PORT) {
             return portIn<T>(_start + offset);
         } else {
@@ -103,7 +103,7 @@ struct Io {
     }
 
     template <typename T>
-    void write(size_t offset, T value) {
+    void write(usize offset, T value) {
         if (_type == PORT) {
             portOut<T>(_start + offset, value);
         } else {
@@ -111,36 +111,36 @@ struct Io {
         }
     }
 
-    uint8_t read8(size_t offset) {
-        return read<uint8_t>(offset);
+    u8 read8(usize offset) {
+        return read<u8>(offset);
     }
 
-    void write8(size_t offset, uint8_t value) {
-        write<uint8_t>(offset, value);
+    void write8(usize offset, u8 value) {
+        write<u8>(offset, value);
     }
 
-    uint16_t read16(size_t offset) {
-        return read<uint16_t>(offset);
+    u16 read16(usize offset) {
+        return read<u16>(offset);
     }
 
-    void write16(size_t offset, uint16_t value) {
-        write<uint16_t>(offset, value);
+    void write16(usize offset, u16 value) {
+        write<u16>(offset, value);
     }
 
-    uint32_t read32(size_t offset) {
-        return read<uint32_t>(offset);
+    u32 read32(usize offset) {
+        return read<u32>(offset);
     }
 
-    void write32(size_t offset, uint32_t value) {
-        write<uint32_t>(offset, value);
+    void write32(usize offset, u32 value) {
+        write<u32>(offset, value);
     }
 
-    uint64_t read64(size_t offset) {
-        return read<uint64_t>(offset);
+    u64 read64(usize offset) {
+        return read<u64>(offset);
     }
 
-    void write64(size_t offset, uint64_t value) {
-        write<uint64_t>(offset, value);
+    void write64(usize offset, u64 value) {
+        write<u64>(offset, value);
     }
 };
 

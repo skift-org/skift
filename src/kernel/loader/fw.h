@@ -11,7 +11,7 @@ Res<Strong<Hal::Vmm>> createVmm();
 
 Res<> finalizeHandover(Handover::Builder &builder);
 
-void enterKernel(size_t entry, Handover::Payload &payload, size_t stack, Hal::Vmm &vmm);
+void enterKernel(usize entry, Handover::Payload &payload, usize stack, Hal::Vmm &vmm);
 
 Hal::PmmRange imageRange();
 

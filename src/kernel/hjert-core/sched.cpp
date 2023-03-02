@@ -8,36 +8,7 @@ namespace Hjert::Core {
 
 static Opt<Sched> _sched;
 
-Res<Box<Ctx>> Ctx::create(uintptr_t ksp) {
-    return Arch::createCtx(ksp);
-}
-
-/* --- Stack ----------------------------------------------------------------- */
-
-Res<Stack> Stack::create() {
-    logInfo("sched: creating stack...");
-    auto mem = try$(kmm().allocOwned(DEFAULT_SIZE));
-    auto base = mem.range().end();
-    return Ok(Stack{std::move(mem), base});
-}
-
-/* --- Task ----------------------------------------------------------------- */
-
-Res<Strong<Task>> Task::create(TaskType type, Strong<Space> space) {
-    logInfo("sched: creating task...");
-    auto stack = try$(Stack::create());
-    auto ctx = try$(Ctx::create(stack.loadSp()));
-    auto task = makeStrong<Task>(type, std::move(stack), space, std::move(ctx));
-    return Ok(task);
-}
-
-Task &Task::self() {
-    return *_sched->_curr;
-}
-
-/* --- Sched ---------------------------------------------------------------- */
-
-Res<> Sched::start(Strong<Task> task, uintptr_t ip, uintptr_t sp) {
+Res<> Sched::start(Strong<Task> task, usize ip, usize sp) {
     logInfo("sched: starting task (ip: {x}, sp: {x})...", ip, sp);
     LockScope scope(_lock);
     Arch::start(*task, ip, sp, {});

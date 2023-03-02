@@ -4,13 +4,13 @@
 
 namespace Crc {
 
-using Table32 = Array<uint32_t, 256>;
+using Table32 = Array<u32, 256>;
 
-static constexpr Table32 makeTable32(uint32_t polynomial = 0xEDB88320) {
+static constexpr Table32 makeTable32(u32 polynomial = 0xEDB88320) {
     Table32 table;
-    for (uint32_t i = 0; i < table.len(); ++i) {
-        uint32_t crc = i;
-        for (uint32_t j = 0; j < 8; ++j) {
+    for (u32 i = 0; i < table.len(); ++i) {
+        u32 crc = i;
+        for (u32 j = 0; j < 8; ++j) {
             if (crc & 1) {
                 crc = (crc >> 1) ^ polynomial;
             } else {
@@ -25,15 +25,15 @@ static constexpr Table32 makeTable32(uint32_t polynomial = 0xEDB88320) {
 static constexpr Table32 TABLE32 = makeTable32();
 
 struct CRC {
-    uint32_t _value = 0xFFFFFFFF;
+    u32 _value = 0xFFFFFFFF;
 
     void sum(Bytes bytes) {
-        for (uint8_t byte : bytes) {
+        for (u8 byte : bytes) {
             _value = TABLE32[(_value ^ byte) & 0xFF] ^ (_value >> 8);
         }
     }
 
-    uint32_t value() const {
+    u32 value() const {
         return _value ^ 0xFFFFFFFF;
     }
 };

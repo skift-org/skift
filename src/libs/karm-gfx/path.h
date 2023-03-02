@@ -72,7 +72,7 @@ struct Path {
         Flags flags{};
 
         Math::Vec2f radius{};
-        double angle{};
+        f64 angle{};
         Math::Vec2f cp1{};
         Math::Vec2f cp2{};
         Math::Vec2f p{};
@@ -89,13 +89,13 @@ struct Path {
         Op(Code code, Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Flags flags = DEFAULT)
             : code(code), flags(flags), cp1(cp1), cp2(cp2), p(p) {}
 
-        Op(Code code, Math::Vec2f radius, double angle, Math::Vec2f p, Flags flags = DEFAULT)
+        Op(Code code, Math::Vec2f radius, f64 angle, Math::Vec2f p, Flags flags = DEFAULT)
             : code(code), flags(flags), radius(radius), angle(angle), p(p) {}
     };
 
     struct _Seg {
-        size_t start{};
-        size_t end{};
+        usize start{};
+        usize end{};
         bool close{};
     };
 
@@ -132,11 +132,11 @@ struct Path {
 
     void _flattenLineTo(Math::Vec2f p);
 
-    void _flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, int depth = {});
+    void _flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, isize depth = {});
 
     void _flattenQuadraticTo(Math::Vec2f start, Math::Vec2f cp, Math::Vec2f point);
 
-    void _flattenArcTo(Math::Vec2f start, Math::Vec2f radius, double angle, Flags flags, Math::Vec2f point);
+    void _flattenArcTo(Math::Vec2f start, Math::Vec2f radius, f64 angle, Flags flags, Math::Vec2f point);
 
     /* --- Operations ------------------------------------------------------- */
 
@@ -150,9 +150,9 @@ struct Path {
 
     void lineTo(Math::Vec2f p, Flags flags = DEFAULT);
 
-    void hlineTo(double x, Flags flags = DEFAULT);
+    void hlineTo(f64 x, Flags flags = DEFAULT);
 
-    void vlineTo(double y, Flags flags = DEFAULT);
+    void vlineTo(f64 y, Flags flags = DEFAULT);
 
     void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Flags flags = DEFAULT);
 
@@ -162,7 +162,7 @@ struct Path {
 
     void smoothQuadTo(Math::Vec2f p, Flags flags = DEFAULT);
 
-    void arcTo(Math::Vec2f radius, double angle, Math::Vec2f p, Flags flags = DEFAULT);
+    void arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Flags flags = DEFAULT);
 
     /* --- Shapes ----------------------------------------------------------- */
 

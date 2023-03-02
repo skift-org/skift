@@ -23,4 +23,31 @@ Res<T> checkedAdd(T op1, T op2) {
     return {op1 + op2};
 }
 
+template <typename T>
+Res<T> checkedSub(T op1, T op2) {
+    if (op1 > 0 && op2 < 0 && op1 > MAX<T> + op2) {
+        return Error::other("numeric overflow");
+    }
+    if (op1 < 0 && op2 > 0 && op1 < MIN<T> + op2) {
+        return Error::other("numeric underflow");
+    }
+    return {op1 - op2};
+}
+
+template <typename T>
+Res<T> checkedInc(T op) {
+    if (op == MAX<T>) {
+        return Error::other("numeric overflow");
+    }
+    return {op + 1};
+}
+
+template <typename T>
+Res<T> checkedDec(T op) {
+    if (op == MIN<T>) {
+        return Error::other("numeric underflow");
+    }
+    return {op - 1};
+}
+
 } // namespace Karm

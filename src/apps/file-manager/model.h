@@ -7,7 +7,7 @@ namespace FileManager {
 
 struct State {
     Vec<Sys::Path> history;
-    size_t currentIndex = 0;
+    usize currentIndex = 0;
 
     State(Sys::Path path)
         : history({path}) {}
@@ -34,7 +34,7 @@ struct GoBack {};
 struct GoForward {};
 
 struct GoParent {
-    int index;
+    isize index;
 };
 
 struct GoTo {

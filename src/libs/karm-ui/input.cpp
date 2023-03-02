@@ -232,7 +232,7 @@ struct Input : public View<Input> {
     TextStyle _style;
     String _text;
     OnChange<String> _onChange;
-    size_t _cursor = 0;
+    usize _cursor = 0;
     Opt<Media::FontMesure> _mesure;
 
     Input(TextStyle style, String text, OnChange<String> onChange)
@@ -255,7 +255,7 @@ struct Input : public View<Input> {
         g.save();
 
         auto m = mesure();
-        auto baseline = bound().topStart() + m.baseline.cast<int>();
+        auto baseline = bound().topStart() + m.baseline.cast<isize>();
 
         if (_style.color) {
             g.fillStyle(*_style.color);
@@ -267,8 +267,8 @@ struct Input : public View<Input> {
         if (debugShowLayoutBounds) {
             g.debugLine(
                 {
-                    bound().topStart() + m.baseline.cast<int>(),
-                    bound().topEnd() + m.baseline.cast<int>(),
+                    bound().topStart() + m.baseline.cast<isize>(),
+                    bound().topEnd() + m.baseline.cast<isize>(),
                 },
                 Gfx::PINK);
             g.debugRect(bound(), Gfx::CYAN);
@@ -278,7 +278,7 @@ struct Input : public View<Input> {
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return mesure().linebound.size().cast<int>();
+        return mesure().linebound.size().cast<isize>();
     }
 };
 
@@ -531,11 +531,11 @@ SliderStyle SliderStyle::gradiant(Gfx::Color from, Gfx::Color to) {
 
 struct Slider : public View<Slider> {
     SliderStyle _style;
-    double _value = 0.0f;
-    OnChange<double> _onChange;
+    f64 _value = 0.0f;
+    OnChange<f64> _onChange;
     MouseListener _mouseListener;
 
-    Slider(SliderStyle style, double value, OnChange<double> onChange)
+    Slider(SliderStyle style, f64 value, OnChange<f64> onChange)
         : _style(style), _value(value), _onChange(std::move(onChange)) {
     }
 
@@ -569,7 +569,7 @@ struct Slider : public View<Slider> {
         auto thumbX = bound().x + ((bound().width - thumbRadius() * 2) * _value);
         Math::Recti thumbBound = {
             {
-                (int)thumbX,
+                (isize)thumbX,
                 bound().top(),
             },
             thumbRadius() * 2,
@@ -583,7 +583,7 @@ struct Slider : public View<Slider> {
 
         if (_mouseListener.isPress() and e.is<Events::MouseEvent>()) {
             auto p = _mouseListener.pos();
-            _value = (p.x - thumbRadius()) / ((double)bound().width - thumbRadius() * 2);
+            _value = (p.x - thumbRadius()) / ((f64)bound().width - thumbRadius() * 2);
             _value = clamp01(_value);
             if (_onChange)
                 _onChange(*this, _value);
@@ -597,11 +597,11 @@ struct Slider : public View<Slider> {
     }
 };
 
-Child slider(SliderStyle style, double value, OnChange<double> onChange) {
+Child slider(SliderStyle style, f64 value, OnChange<f64> onChange) {
     return makeStrong<Slider>(style, value, std::move(onChange));
 }
 
-Child slider(double value, OnChange<double> onChange) {
+Child slider(f64 value, OnChange<f64> onChange) {
     return makeStrong<Slider>(SliderStyle::regular(), value, std::move(onChange));
 }
 

@@ -21,8 +21,8 @@ struct Vmm : public Hal::Vmm {
           _pml4(pml4),
           _mapper(mapper) {}
 
-    template <size_t L>
-    Res<Pml<L - 1> *> pml(Pml<L> &upper, size_t vaddr) {
+    template <usize L>
+    Res<Pml<L - 1> *> pml(Pml<L> &upper, usize vaddr) {
         auto page = upper.pageAt(vaddr);
 
         if (not page.present()) {
@@ -32,21 +32,21 @@ struct Vmm : public Hal::Vmm {
         return Ok(_mapper.map(page.template as<Pml<L - 1>>()));
     }
 
-    template <size_t L>
-    Res<Pml<L - 1> *> pmlOrAlloc(Pml<L> &upper, size_t vaddr) {
+    template <usize L>
+    Res<Pml<L - 1> *> pmlOrAlloc(Pml<L> &upper, usize vaddr) {
         auto page = upper.pageAt(vaddr);
 
         if (page.present()) {
             return Ok(_mapper.map(page.template as<Pml<L - 1>>()));
         }
 
-        size_t lower = try$(_pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NONE)).start;
+        usize lower = try$(_pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NONE)).start;
         memset(_mapper.map((void *)lower), 0, Hal::PAGE_SIZE);
         upper.putPage(vaddr, {lower, Entry::WRITE | Entry::PRESENT | Entry::USER});
         return Ok(_mapper.map((Pml<L - 1> *)lower));
     }
 
-    Res<> freePage(size_t vaddr, size_t paddr, Hal::VmmFlags) {
+    Res<> freePage(usize vaddr, usize paddr, Hal::VmmFlags) {
         auto pml3 = try$(pmlOrAlloc(*_pml4, vaddr));
         auto pml2 = try$(pmlOrAlloc(*pml3, vaddr));
         auto pml1 = try$(pmlOrAlloc(*pml2, vaddr));
@@ -54,7 +54,7 @@ struct Vmm : public Hal::Vmm {
         return Ok();
     }
 
-    Res<> freePage(size_t vaddr) {
+    Res<> freePage(usize vaddr) {
         auto pml3 = try$(pml(*_pml4, vaddr));
         auto pml2 = try$(pml(*pml3, vaddr));
         auto pml1 = try$(pml(*pml2, vaddr));
@@ -67,14 +67,14 @@ struct Vmm : public Hal::Vmm {
             return Error::invalidInput();
         }
 
-        for (size_t page = 0; page < vaddr.size; page += Hal::PAGE_SIZE) {
+        for (usize page = 0; page < vaddr.size; page += Hal::PAGE_SIZE) {
             try$(freePage(vaddr.start + page, paddr.start + page, flags));
         }
         return Ok(vaddr);
     }
 
     Res<> free(Hal::VmmRange vaddr) override {
-        for (size_t page = 0; page < vaddr.size; page += Hal::PAGE_SIZE) {
+        for (usize page = 0; page < vaddr.size; page += Hal::PAGE_SIZE) {
             try$(freePage(vaddr.start + page));
         }
         return Ok();
@@ -85,7 +85,7 @@ struct Vmm : public Hal::Vmm {
     }
 
     Res<> flush(Hal::VmmRange vaddr) override {
-        for (size_t i = 0; i < vaddr.size; i += Hal::PAGE_SIZE) {
+        for (usize i = 0; i < vaddr.size; i += Hal::PAGE_SIZE) {
             x86_64::invlpg(vaddr.start + i);
         }
 
@@ -96,11 +96,11 @@ struct Vmm : public Hal::Vmm {
         x86_64::wrcr3(root());
     }
 
-    template <size_t L>
-    void _dumpPml(Pml<L> &pml, size_t vaddr) {
-        for (size_t i = 0; i < 512; i++) {
+    template <usize L>
+    void _dumpPml(Pml<L> &pml, usize vaddr) {
+        for (usize i = 0; i < 512; i++) {
             auto page = pml[i];
-            size_t curr = pml.index2virt(i) | vaddr;
+            usize curr = pml.index2virt(i) | vaddr;
             if constexpr (L == 1) {
                 if (page.present()) {
                     logInfo("x86_64: vmm: {x} {x}", curr, page._raw);
@@ -116,8 +116,8 @@ struct Vmm : public Hal::Vmm {
         _dumpPml(*_pml4, 0);
     }
 
-    size_t root() override {
-        return _mapper.unmap((size_t)_pml4);
+    usize root() override {
+        return _mapper.unmap((usize)_pml4);
     }
 };
 

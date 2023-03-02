@@ -2,11 +2,8 @@
 
 #include <karm-meta/callable.h>
 
-#include "_prelude.h"
-
 #include "error.h"
 #include "inert.h"
-#include "keywords.h"
 #include "panic.h"
 #include "std.h"
 #include "try.h"
@@ -70,7 +67,8 @@ struct [[nodiscard]] Opt {
     }
 
     Opt &operator=(Opt const &other) {
-        return *this = Opt(other);
+        *this = Opt(other);
+        return *this;
     }
 
     Opt &operator=(Opt &&other) {
@@ -205,6 +203,6 @@ struct [[nodiscard]] Opt {
     }
 };
 
-static_assert(Tryable<Opt<int>>);
+static_assert(Tryable<Opt<isize>>);
 
 } // namespace Karm

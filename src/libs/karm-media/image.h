@@ -7,13 +7,13 @@ namespace Karm::Media {
 
 struct ImageBuffer :
     public Meta::NoCopy {
-    Buf<uint8_t> data;
-    int width;
-    int height;
-    size_t stride;
+    Buf<u8> data;
+    isize width;
+    isize height;
+    usize stride;
 
-    ImageBuffer(int width, int height, size_t stride)
-        : data(Buf<uint8_t>::init(height * stride)), width(width), height(height), stride(stride) {
+    ImageBuffer(isize width, isize height, usize stride)
+        : data(Buf<u8>::init(height * stride)), width(width), height(height), stride(stride) {
     }
 
     operator Gfx::Buffer() {
@@ -33,11 +33,11 @@ struct Image {
         return {format, *buffer};
     }
 
-    int width() const {
+    isize width() const {
         return buffer->width;
     }
 
-    int height() const {
+    isize height() const {
         return buffer->height;
     }
 

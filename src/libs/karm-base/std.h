@@ -2,19 +2,27 @@
 
 // clang-format off
 
-#include <new>
-#include <utility>
+#include <ctype.h>
 #include <initializer_list>
+#include <limits.h>
+#include <math.h>
+#include <new>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+#include <utility>
 
-#include "_prelude.h"
 #include "bool.h"
+#include "ints.h"
+#include "keywords.h"
 
 // clang-format on
 
-#ifndef __ssize_t_defined
+#ifndef KARM_NO_TOP_LEVEL_USING
 
-#    include <karm-meta/signess.h>
+namespace Karm {
+}; // namespace Karm
 
-using ssize_t = Karm::Meta::MakeSigned<size_t>;
+using namespace Karm;
 
 #endif

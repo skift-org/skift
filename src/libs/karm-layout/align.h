@@ -6,31 +6,31 @@
 namespace Karm::Layout {
 
 struct Align {
-    static constexpr int NONE = (0);
+    static constexpr u16 NONE = (0);
 
-    static constexpr int START = (1 << 0);
-    static constexpr int TOP = (1 << 1);
-    static constexpr int END = (1 << 2);
-    static constexpr int BOTTOM = (1 << 3);
-    static constexpr int VSTRETCH = (1 << 4);
-    static constexpr int HSTRETCH = (1 << 5);
-    static constexpr int VCENTER = (1 << 6);
-    static constexpr int HCENTER = (1 << 7);
-    static constexpr int COVER = (1 << 8);
-    static constexpr int FIT = (1 << 9);
-    static constexpr int HCLAMP = (1 << 10);
-    static constexpr int VCLAMP = (1 << 11);
+    static constexpr u16 START = (1 << 0);
+    static constexpr u16 TOP = (1 << 1);
+    static constexpr u16 END = (1 << 2);
+    static constexpr u16 BOTTOM = (1 << 3);
+    static constexpr u16 VSTRETCH = (1 << 4);
+    static constexpr u16 HSTRETCH = (1 << 5);
+    static constexpr u16 VCENTER = (1 << 6);
+    static constexpr u16 HCENTER = (1 << 7);
+    static constexpr u16 COVER = (1 << 8);
+    static constexpr u16 FIT = (1 << 9);
+    static constexpr u16 HCLAMP = (1 << 10);
+    static constexpr u16 VCLAMP = (1 << 11);
 
-    static constexpr int STRETCH = (HSTRETCH | VSTRETCH);
-    static constexpr int VFILL = (VSTRETCH | TOP);
-    static constexpr int HFILL = (HSTRETCH | START);
-    static constexpr int CENTER = (HCENTER | VCENTER);
-    static constexpr int FILL = (VFILL | HFILL);
-    static constexpr int CLAMP = (HCLAMP | VCLAMP);
+    static constexpr u16 STRETCH = (HSTRETCH | VSTRETCH);
+    static constexpr u16 VFILL = (VSTRETCH | TOP);
+    static constexpr u16 HFILL = (HSTRETCH | START);
+    static constexpr u16 CENTER = (HCENTER | VCENTER);
+    static constexpr u16 FILL = (VFILL | HFILL);
+    static constexpr u16 CLAMP = (HCLAMP | VCLAMP);
 
-    int _value = 0;
+    u16 _value = 0;
 
-    Align(int value = 0) : _value(value) {}
+    Align(u16 value = 0) : _value(value) {}
 
     template <typename T>
     Math::Rect<T> apply(Flow flow, Math::Rect<T> inner, Math::Rect<T> outer) {

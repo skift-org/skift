@@ -9,8 +9,8 @@ namespace Karm::Text {
 
 struct Emit {
     Io::_TextWriter &_writer;
-    size_t _ident = 0;
-    size_t _total = 0;
+    usize _ident = 0;
+    usize _total = 0;
     Res<> _error = Ok();
     bool _newline = false;
 
@@ -18,7 +18,7 @@ struct Emit {
         : _writer(writer) {
     }
 
-    void _tryWrapper(Res<size_t> result) {
+    void _tryWrapper(Res<usize> result) {
         if (result) {
             _total += result.unwrap();
         } else {
@@ -55,7 +55,7 @@ struct Emit {
             return;
 
         _tryWrapper(_writer.writeRune('\n'));
-        for (size_t i = 0; i < _ident; i++) {
+        for (usize i = 0; i < _ident; i++) {
             _tryWrapper(_writer.writeStr("    "));
         }
 
@@ -92,7 +92,7 @@ struct Emit {
         _tryWrapper(Fmt::format(_writer, format, std::forward<Ts>(ts)...));
     }
 
-    size_t total() {
+    usize total() {
         return _total;
     }
 };

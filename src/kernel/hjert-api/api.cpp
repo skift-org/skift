@@ -24,11 +24,11 @@ Res<> syscall(Syscall s, Arg a0, Arg a1, Arg a2, Arg a3, Arg a4, Arg a5) {
 #    error "Unsupported architecture"
 #endif
 
-Res<> log(char const *msg, size_t len) {
+Res<> log(char const *msg, usize len) {
     return syscall(Syscall::LOG, (Arg)msg, len);
 }
 
-Res<> createDomain(Cap dest, Cap *cap, size_t len) {
+Res<> createDomain(Cap dest, Cap *cap, usize len) {
     return syscall(Syscall::CREATE_DOMAIN, dest.raw(), (Arg)cap, len);
 }
 
@@ -40,11 +40,11 @@ Res<> createSpace(Cap dest, Cap *cap) {
     return syscall(Syscall::CREATE_SPACE, dest.raw(), (Arg)cap);
 }
 
-Res<> createMem(Cap dest, Cap *cap, uintptr_t phys, size_t len, MemFlags flags) {
+Res<> createMem(Cap dest, Cap *cap, usize phys, usize len, MemFlags flags) {
     return syscall(Syscall::CREATE_MEM, dest.raw(), (Arg)cap, phys, len, (Arg)flags);
 }
 
-Res<> createIo(Cap dest, Cap *cap, uintptr_t base, size_t len) {
+Res<> createIo(Cap dest, Cap *cap, usize base, usize len) {
     return syscall(Syscall::CREATE_IO, dest.raw(), (Arg)cap, base, len);
 }
 
@@ -56,7 +56,7 @@ Res<> dup(Cap node, Cap *dst, Cap src) {
     return syscall(Syscall::DUP, node.raw(), (Arg)dst, src.raw());
 }
 
-Res<> start(Cap cap, uintptr_t ip, uintptr_t sp, Args const *args) {
+Res<> start(Cap cap, usize ip, usize sp, Args const *args) {
     return syscall(Syscall::START, cap.raw(), ip, sp, (Arg)args);
 }
 
@@ -70,19 +70,19 @@ Res<> ret(Cap cap, Arg ret) {
 
 using MapFlags = Hal::VmmFlags;
 
-Res<> map(Cap cap, uintptr_t *virt, Cap mem, uintptr_t off, size_t len, MapFlags flags = MapFlags::NONE) {
+Res<> map(Cap cap, usize *virt, Cap mem, usize off, usize len, MapFlags flags) {
     return syscall(Syscall::MAP, cap.raw(), (Arg)virt, mem.raw(), off, len, (Arg)flags);
 }
 
-Res<> unmap(Cap cap, uintptr_t virt, size_t len) {
+Res<> unmap(Cap cap, usize virt, usize len) {
     return syscall(Syscall::UNMAP, cap.raw(), virt, len);
 }
 
-Res<> in(Cap cap, IoLen len, uintptr_t port, Arg *val) {
+Res<> in(Cap cap, IoLen len, usize port, Arg *val) {
     return syscall(Syscall::IN, cap.raw(), (Arg)len, port, (Arg)val);
 }
 
-Res<> out(Cap cap, IoLen len, uintptr_t port, Arg val) {
+Res<> out(Cap cap, IoLen len, usize port, Arg val) {
     return syscall(Syscall::OUT, cap.raw(), (Arg)len, port, val);
 }
 

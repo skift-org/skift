@@ -12,31 +12,31 @@ namespace Karm::Sys {
 struct Fd : Meta::NoCopy {
     virtual ~Fd() = default;
 
-    virtual Res<size_t> read(MutBytes) = 0;
+    virtual Res<usize> read(MutBytes) = 0;
 
-    virtual Res<size_t> write(Bytes) = 0;
+    virtual Res<usize> write(Bytes) = 0;
 
-    virtual Res<size_t> seek(Io::Seek seek) = 0;
+    virtual Res<usize> seek(Io::Seek seek) = 0;
 
-    virtual Res<size_t> flush() = 0;
+    virtual Res<usize> flush() = 0;
 
     virtual Res<Strong<Fd>> dup() = 0;
 };
 
 struct DummyFd : public Fd {
-    Res<size_t> read(MutBytes) override {
+    Res<usize> read(MutBytes) override {
         return Ok(0uz);
     }
 
-    Res<size_t> write(Bytes) override {
+    Res<usize> write(Bytes) override {
         return Ok(0uz);
     }
 
-    Res<size_t> seek(Io::Seek) override {
+    Res<usize> seek(Io::Seek) override {
         return Ok(0uz);
     }
 
-    Res<size_t> flush() override {
+    Res<usize> flush() override {
         return Ok(0uz);
     }
 

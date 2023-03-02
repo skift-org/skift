@@ -9,18 +9,18 @@ struct Dismisable :
 
     OnDismis _onDismis;
     DismisDir _dir;
-    double _threshold;
-    Anim2<double> _drag{};
+    f64 _threshold;
+    Anim2<f64> _drag{};
     bool _dismissed{};
     bool _animated{};
 
-    Dismisable(OnDismis onDismis, DismisDir dir, double threshold, Ui::Child child)
+    Dismisable(OnDismis onDismis, DismisDir dir, f64 threshold, Ui::Child child)
         : ProxyNode(child), _onDismis(std::move(onDismis)), _dir(dir), _threshold(threshold) {}
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
 
-        auto dragi = _drag.value().cast<int>();
+        auto dragi = _drag.value().cast<isize>();
 
         g.clip(bound());
         g.origin(dragi);
@@ -58,7 +58,7 @@ struct Dismisable :
                 _drag.set(*this, d);
             } else if (de.type == DragEvent::END) {
                 if ((bool)(_dir & DismisDir::HORIZONTAL)) {
-                    if (Math::abs(_drag.targetX()) / (double)bound().width > _threshold) {
+                    if (Math::abs(_drag.targetX()) / (f64)bound().width > _threshold) {
                         _drag.animate(*this, {bound().width * (_drag.targetX() < 0.0 ? -1.0 : 1), 0}, 0.25, Math::Easing::cubicOut);
                         _dismissed = true;
                     } else {
@@ -66,7 +66,7 @@ struct Dismisable :
                     }
                 }
                 if ((bool)(_dir & DismisDir::VERTICAL)) {
-                    if (Math::abs(_drag.targetY()) / (double)bound().height > _threshold) {
+                    if (Math::abs(_drag.targetY()) / (f64)bound().height > _threshold) {
                         _drag.animate(*this, {0, bound().height * (_drag.targetY() < 0.0 ? -1.0 : 1)}, 0.25, Math::Easing::cubicOut);
                         _dismissed = true;
                     } else {
@@ -80,7 +80,7 @@ struct Dismisable :
     }
 };
 
-Child dismisable(OnDismis onDismis, DismisDir dir, double threshold, Ui::Child child) {
+Child dismisable(OnDismis onDismis, DismisDir dir, f64 threshold, Ui::Child child) {
     return makeStrong<Dismisable>(std::move(onDismis), dir, threshold, std::move(child));
 }
 

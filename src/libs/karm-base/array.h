@@ -1,7 +1,5 @@
 #pragma once
 
-#include "_prelude.h"
-
 #include "clamp.h"
 #include "iter.h"
 #include "slice.h"
@@ -9,34 +7,34 @@
 
 namespace Karm {
 
-template <typename T, size_t N>
+template <typename T, usize N>
 struct Array {
     using Inner = T;
 
     T _buf[N] = {};
 
-    constexpr T &operator[](size_t i) {
+    constexpr T &operator[](usize i) {
         if (i >= N) {
             panic("index out of range");
         }
         return _buf[i];
     }
 
-    constexpr T const &operator[](size_t i) const {
+    constexpr T const &operator[](usize i) const {
         if (i >= N) {
             panic("index out of range");
         }
         return _buf[i];
     }
 
-    constexpr size_t len() const { return N; }
+    constexpr usize len() const { return N; }
 
     constexpr T *buf() { return _buf; }
 
     constexpr T const *buf() const { return _buf; }
 
     constexpr bool operator==(Array const &other) const {
-        for (size_t i = 0; i < N; i++) {
+        for (usize i = 0; i < N; i++) {
             if (_buf[i] != other._buf[i]) {
                 return false;
             }

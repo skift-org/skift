@@ -2,9 +2,8 @@
 
 #include <karm-meta/cvrp.h>
 
-#include "_prelude.h"
-
 #include "bool.h"
+#include "std.h"
 
 #define try$(EXPR)                           \
     ({                                       \
@@ -22,6 +21,7 @@ concept Tryable = requires(T t) {
                       { not static_cast<bool>(t) };
                       { t.none() };
                       { t.unwrap() };
+                      { t.take() };
                   };
 
 auto tryOr(Tryable auto opt, Meta::RemoveRef<decltype(opt.unwrap())> defaultValue) -> Meta::RemoveRef<decltype(opt.unwrap())> {

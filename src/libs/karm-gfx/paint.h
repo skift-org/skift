@@ -10,15 +10,15 @@
 namespace Karm::Gfx {
 
 struct Gradient {
-    static constexpr int MAX_STOPS = 16;
+    static constexpr isize MAX_STOPS = 16;
 
     struct Stop {
         Color color;
-        double pos;
+        f64 pos;
     };
 
-    static Color lerp(Stop lhs, Stop rhs, double pos) {
-        double t = (pos - lhs.pos) / (rhs.pos - lhs.pos);
+    static Color lerp(Stop lhs, Stop rhs, f64 pos) {
+        f64 t = (pos - lhs.pos) / (rhs.pos - lhs.pos);
         return lhs.color.lerpWith(rhs.color, t);
     }
 
@@ -41,7 +41,7 @@ struct Gradient {
     static constexpr Gradient hsv() {
         Gradient result{LINEAR, {0, 0.5}, {1, 0.5}};
 
-        for (double i = 0; i <= 360; i += 60) {
+        for (f64 i = 0; i <= 360; i += 60) {
             result.withStop(hsvToRgb({i, 1, 1}), i / 360.0);
         }
 
@@ -68,7 +68,7 @@ struct Gradient {
         return Gradient{DIAMOND, {0.5, 0.5}, {1, 0.5}};
     }
 
-    constexpr Gradient &withStop(Color color, double pos) {
+    constexpr Gradient &withStop(Color color, f64 pos) {
         _stops.pushBack({color, pos});
         return *this;
     }
@@ -80,8 +80,8 @@ struct Gradient {
             return withStop(colors[0], 0.5);
         }
 
-        for (size_t i = 0; i < colors.len(); i++) {
-            _stops.pushBack({colors[i], (double)i / (colors.len() - 1)});
+        for (usize i = 0; i < colors.len(); i++) {
+            _stops.pushBack({colors[i], (f64)i / (colors.len() - 1)});
         }
 
         return *this;
@@ -97,7 +97,7 @@ struct Gradient {
         return *this;
     }
 
-    constexpr Color sample(double pos, bool wrapAround = false) const {
+    constexpr Color sample(f64 pos, bool wrapAround = false) const {
         if (_stops.len() == 0) {
             return BLACK;
         }
@@ -127,7 +127,7 @@ struct Gradient {
             return _stops[_stops.len() - 1].color;
         }
 
-        for (size_t i = 0; i < _stops.len() - 1; i++) {
+        for (usize i = 0; i < _stops.len() - 1; i++) {
             auto iPos = _stops[i].pos;
             auto jPos = _stops[i + 1].pos;
 
@@ -142,7 +142,7 @@ struct Gradient {
     constexpr Color sample(Math::Vec2f pos) const {
         pos = pos - _start;
         pos = pos.rotate(-(_end - _start).angle());
-        double scale = (_end - _start).len();
+        f64 scale = (_end - _start).len();
         pos = pos / scale;
 
         switch (_type) {

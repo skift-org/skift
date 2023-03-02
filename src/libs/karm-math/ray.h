@@ -20,9 +20,9 @@ struct Ray {
     }
 };
 
-using Rayi = Ray<int, int>;
+using Rayi = Ray<isize, isize>;
 
-using Rayf = Ray<double, double>;
+using Rayf = Ray<f64, f64>;
 
 using Ray2i = Ray<Vec2i>;
 

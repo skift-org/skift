@@ -26,7 +26,7 @@ struct Sema {
 
     virtual void tryWait() = 0;
 
-    virtual void signal(size_t n = 1) = 0;
+    virtual void signal(usize n = 1) = 0;
 
     virtual void count() = 0;
 };

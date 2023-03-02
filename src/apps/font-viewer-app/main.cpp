@@ -11,10 +11,10 @@
 static constexpr Str PANGRAM = "The quick brown fox jumps over the lazy dog";
 
 Ui::Child pangrams(Strong<Media::Fontface> fontface) {
-    double size = 12;
+    f64 size = 12;
     Ui::Children children;
 
-    for (int i = 0; i < 12; i++) {
+    for (isize i = 0; i < 12; i++) {
         Media::Font font{
             .fontface = fontface,
             .fontsize = size,

@@ -6,7 +6,7 @@
 namespace x86_64 {
 
 inline void simdInit() {
-    wrcr0(rdcr0() & ~((uint64_t)CR0_EMULATION));
+    wrcr0(rdcr0() & ~((u64)CR0_EMULATION));
     wrcr0(rdcr0() | CR0_MONITOR_CO_PROCESSOR);
     wrcr0(rdcr0() | CR0_NUMERIC_ERROR_ENABLE);
 
@@ -16,7 +16,7 @@ inline void simdInit() {
     if (Cpuid::hasXsave()) {
         wrcr4(rdcr4() | CR4_XSAVE_ENABLE);
 
-        uint64_t xcr0 = 0;
+        u64 xcr0 = 0;
 
         xcr0 |= XCR0_XSAVE_SAVE_X87;
         xcr0 |= XCR0_XSAVE_SAVE_SSE;
@@ -37,7 +37,7 @@ inline void simdInit() {
     fninit();
 }
 
-inline size_t simdCtxSize() {
+inline usize simdCtxSize() {
     if (Cpuid::hasXsave()) {
         return Cpuid::xsaveSize();
     }

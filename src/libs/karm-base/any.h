@@ -64,7 +64,8 @@ struct Any {
 
     template <typename T>
     Any &operator=(T const &value) {
-        return *this = Any(value);
+        *this = Any(value);
+        return *this;
     }
 
     template <typename T>
@@ -79,7 +80,8 @@ struct Any {
     }
 
     Any &operator=(Any const &other) {
-        return *this = Any(other);
+        *this = Any(other);
+        return *this;
     }
 
     Any &operator=(Any &&other) {

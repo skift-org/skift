@@ -61,11 +61,11 @@ struct FontAttrs {
                                                         <- line gap
 */
 struct FontMetrics {
-    double ascend;
-    double captop;
-    double descend;
-    double linegap;
-    double advance;
+    f64 ascend;
+    f64 captop;
+    f64 descend;
+    f64 linegap;
+    f64 advance;
 };
 
 struct FontMesure {
@@ -81,23 +81,23 @@ struct Fontface {
 
     virtual FontMetrics metrics() const = 0;
 
-    virtual double advance(Rune c) const = 0;
+    virtual f64 advance(Rune c) const = 0;
 
     virtual void contour(Gfx::Context &g, Rune rune) const = 0;
 
-    virtual double units() const = 0;
+    virtual f64 units() const = 0;
 };
 
 struct Font {
     Strong<Fontface> fontface;
-    double fontsize;
-    double lineheight = 1.2;
+    f64 fontsize;
+    f64 lineheight = 1.2;
 
     static Font fallback();
 
     FontMetrics metrics() const;
 
-    double advance(Rune c) const;
+    f64 advance(Rune c) const;
 
     FontMesure mesureRune(Rune r) const;
 

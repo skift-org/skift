@@ -19,7 +19,7 @@ struct Pmm : public Hal::Pmm {
         clear();
     }
 
-    Res<Hal::PmmRange> allocRange(size_t size, Hal::PmmFlags flags) override {
+    Res<Hal::PmmRange> allocRange(usize size, Hal::PmmFlags flags) override {
         LockScope scope(_lock);
         auto upper = (flags & Hal::PmmFlags::UPPER) == Hal::PmmFlags::UPPER;
 
@@ -78,7 +78,7 @@ struct Kmm : public Hal::Kmm {
     Kmm(Hal::Pmm &pmm) : _pmm(pmm) {
     }
 
-    Res<Hal::KmmRange> allocRange(size_t size) override {
+    Res<Hal::KmmRange> allocRange(usize size) override {
         return pmm2Kmm(try$(_pmm.allocRange(size, Hal::PmmFlags::NONE)));
     }
 
@@ -120,7 +120,7 @@ Res<> init(Handover::Payload &payload) {
 
     logInfo("mem: usable range: {x}-{x}", usableRange.start, usableRange.end());
 
-    size_t bitsSize = usableRange.size / Hal::PAGE_SIZE / 8;
+    usize bitsSize = usableRange.size / Hal::PAGE_SIZE / 8;
 
     auto pmmBits = payload.find(bitsSize);
 
@@ -133,7 +133,7 @@ Res<> init(Handover::Payload &payload) {
 
     _pmm = Pmm(usableRange,
                MutSlice{
-                   reinterpret_cast<uint8_t *>(pmmBits.start + Hal::UPPER_HALF),
+                   reinterpret_cast<u8 *>(pmmBits.start + Hal::UPPER_HALF),
                    pmmBits.size,
                });
 

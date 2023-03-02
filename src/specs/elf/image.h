@@ -8,20 +8,20 @@
 namespace Elf {
 
 struct [[gnu::packed]] SectionHeader {
-    uint32_t name;
-    uint32_t type;
-    uint64_t flags;
+    u32 name;
+    u32 type;
+    u64 flags;
 
-    uint64_t addr;
-    uint64_t offset;
-    uint64_t size;
-    uint32_t link;
-    uint32_t info;
-    uint64_t addralign;
-    uint64_t entsize;
+    u64 addr;
+    u64 offset;
+    u64 size;
+    u32 link;
+    u32 info;
+    u64 addralign;
+    u64 entsize;
 };
 
-enum struct ProgramType : uint32_t {
+enum struct ProgramType : u32 {
     NONE = 0,
     LOAD = 1,
     DYNAMIC = 2,
@@ -29,7 +29,7 @@ enum struct ProgramType : uint32_t {
     NOTE = 4,
 };
 
-enum struct ProgramFlags : uint32_t {
+enum struct ProgramFlags : u32 {
     NIL = 0,
     READ = 1,
     WRITE = 2,
@@ -44,67 +44,67 @@ FlagsEnum$(ProgramFlags);
 struct [[gnu::packed]] ProgramHeader {
     ProgramType type;
     ProgramFlags flags;
-    uint64_t offset;
-    uint64_t vaddr;
-    uint64_t paddr;
-    uint64_t filesz;
-    uint64_t memsz;
-    uint64_t align;
+    u64 offset;
+    u64 vaddr;
+    u64 paddr;
+    u64 filesz;
+    u64 memsz;
+    u64 align;
 };
 
 struct [[gnu::packed]] Symbol {
-    uint32_t name;
-    uint8_t info;
-    uint8_t other;
-    uint16_t shndx;
-    uint64_t value;
-    uint64_t size;
+    u32 name;
+    u8 info;
+    u8 other;
+    u16 shndx;
+    u64 value;
+    u64 size;
 };
 
 struct [[gnu::packed]] Ident {
-    uint8_t magic[4];
-    uint8_t klass;
-    uint8_t data;
-    uint8_t version;
-    uint8_t os_abi;
-    uint8_t abi_version;
-    uint8_t padding[7];
+    u8 magic[4];
+    u8 klass;
+    u8 data;
+    u8 version;
+    u8 os_abi;
+    u8 abi_version;
+    u8 padding[7];
 };
 
 struct [[gnu::packed]] ImageHeader {
     Ident ident;
 
-    uint16_t type;
-    uint16_t machine;
-    uint32_t version;
+    u16 type;
+    u16 machine;
+    u32 version;
 
-    uint64_t entry;
+    u64 entry;
 
-    uint64_t phoff;
-    uint64_t shoff;
+    u64 phoff;
+    u64 shoff;
 
-    uint32_t flags;
-    uint16_t ehsize;
+    u32 flags;
+    u16 ehsize;
 
-    uint16_t phentsize;
-    uint16_t phnum;
+    u16 phentsize;
+    u16 phnum;
 
-    uint16_t shentsize;
-    uint16_t shnum;
+    u16 shentsize;
+    u16 shnum;
 
-    uint16_t shstrndx;
+    u16 shstrndx;
 
-    SectionHeader *sectionAt(size_t index) {
-        size_t offset = shoff + index * shentsize;
-        return (SectionHeader *)((uint8_t *)this + offset);
+    SectionHeader *sectionAt(usize index) {
+        usize offset = shoff + index * shentsize;
+        return (SectionHeader *)((u8 *)this + offset);
     }
 
-    ProgramHeader *programAt(size_t index) {
-        size_t offset = phoff + index * phentsize;
-        return (ProgramHeader *)((uint8_t *)this + offset);
+    ProgramHeader *programAt(usize index) {
+        usize offset = phoff + index * phentsize;
+        return (ProgramHeader *)((u8 *)this + offset);
     }
 
-    Str stringAt(size_t offset) {
+    Str stringAt(usize offset) {
         if (offset == 0) {
             return "<null>";
         }
@@ -121,10 +121,10 @@ struct Section {
     }
 
     void *buf() {
-        return (void *)((uint8_t const *)_base + _header->offset);
+        return (void *)((u8 const *)_base + _header->offset);
     }
 
-    size_t size() {
+    usize size() {
         return _header->size;
     }
 
@@ -162,31 +162,31 @@ struct Program {
         return _header->flags;
     }
 
-    size_t offset() const {
+    usize offset() const {
         return _header->offset;
     }
 
     void *buf() {
-        return (void *)((uint8_t *)_base + _header->offset);
+        return (void *)((u8 *)_base + _header->offset);
     }
 
     void const *buf() const {
-        return (void const *)((uint8_t const *)_base + _header->offset);
+        return (void const *)((u8 const *)_base + _header->offset);
     }
 
     Bytes bytes() const {
         return Bytes{(Byte *)buf(), _header->filesz};
     }
 
-    size_t filez() const {
+    usize filez() const {
         return _header->filesz;
     }
 
-    size_t vaddr() const {
+    usize vaddr() const {
         return _header->vaddr;
     }
 
-    size_t memsz() const {
+    usize memsz() const {
         return _header->memsz;
     }
 };
@@ -245,7 +245,7 @@ struct Image {
         });
     }
 
-    ProgramHeader *programAt(size_t index) {
+    ProgramHeader *programAt(usize index) {
         return (ProgramHeader *)(_buf.buf() + header().phoff + index * header().phentsize);
     }
 };

@@ -10,20 +10,20 @@ using Handle = void *;
 
 using Event = void *;
 
-using Status = size_t;
+using Status = usize;
 
 struct Time {
-    uint16_t Year;
-    uint8_t Month;
-    uint8_t Day;
-    uint8_t Hour;
-    uint8_t Minute;
-    uint8_t Second;
-    uint8_t Pad1;
-    uint32_t Nanosecond;
-    int16_t TimeZone;
-    uint8_t Daylight;
-    uint8_t Pad2;
+    u16 Year;
+    u8 Month;
+    u8 Day;
+    u8 Hour;
+    u8 Minute;
+    u8 Second;
+    u8 Pad1;
+    u32 Nanosecond;
+    i16 TimeZone;
+    u8 Daylight;
+    u8 Pad2;
 };
 
 #define EFI_SUCCESS 0
@@ -64,7 +64,7 @@ struct Time {
     ERR(IP_ADDRESS_CONFLICT, EFI_ERROR | 0x22)  \
     ERR(HTTP_ERROR, EFI_ERROR | 0x23)
 
-enum : size_t {
+enum : usize {
 #define ERR(ERR, CODE) ERR_##ERR = CODE,
     FOREACH_ERROR(ERR)
 #undef ERR
@@ -113,11 +113,11 @@ static_assert(sizeof(Method<>) == sizeof(void *), "Method must be packed");
 /* --- 4 System Table ------------------------------------------------------- */
 
 struct TableHeader {
-    uint64_t signature;
-    uint32_t revision;
-    uint32_t headerSize;
-    uint32_t crc32;
-    uint32_t reserved;
+    u64 signature;
+    u32 revision;
+    u32 headerSize;
+    u32 crc32;
+    u32 reserved;
 };
 
 struct Table {
@@ -140,8 +140,8 @@ struct ConfigurationTable {
 };
 
 struct SystemTable : public Table {
-    uint16_t *firmwareVendor;
-    uint32_t firmwareRevision;
+    u16 *firmwareVendor;
+    u32 firmwareRevision;
 
     Handle *consoleInHandle;
     SimpleTextInputProtocol *conIn;
@@ -155,11 +155,11 @@ struct SystemTable : public Table {
     RuntimeService *runtime;
     BootService *boot;
 
-    size_t nrConfigurationTables;
+    usize nrConfigurationTables;
     ConfigurationTable *configurationTable;
 
     ConfigurationTable *lookupConfigurationTable(Uuid const &uuid) {
-        for (size_t i = 0; i < nrConfigurationTables; i++) {
+        for (usize i = 0; i < nrConfigurationTables; i++) {
             if (Op::eq(configurationTable[i].vendorGuid, uuid)) {
                 return &configurationTable[i];
             }
@@ -171,13 +171,13 @@ struct SystemTable : public Table {
 
 /* --- 7 Boot Services ------------------------------------------------------ */
 
-enum struct AllocateType : uint32_t {
+enum struct AllocateType : u32 {
     ANY_PAGES,
     MAX_ADDRESS,
     ADDRESS,
 };
 
-enum struct MemoryType : uint32_t {
+enum struct MemoryType : u32 {
     RESERVED_MEMORY_TYPE,
     LOADER_CODE,
     LOADER_DATA,
@@ -199,10 +199,10 @@ enum struct MemoryType : uint32_t {
 
 struct MemoryDescriptor {
     MemoryType type;
-    size_t physicalStart;
-    size_t virtualStart;
-    uint64_t numberOfPages;
-    uint64_t attribute;
+    usize physicalStart;
+    usize virtualStart;
+    u64 numberOfPages;
+    u64 attribute;
 };
 
 #define EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL 0x00000001
@@ -218,16 +218,16 @@ struct BootService : public Table {
     DummyFunction lowerTpl;
 
     // Memory Services
-    Function<AllocateType, MemoryType, size_t, size_t *> allocatePages;
-    Function<size_t, size_t> freePages;
-    Function<size_t *, MemoryDescriptor *, size_t *, size_t *, uint32_t *> getMemoryMap;
-    Function<MemoryType, size_t, void **> allocatePool;
+    Function<AllocateType, MemoryType, usize, usize *> allocatePages;
+    Function<usize, usize> freePages;
+    Function<usize *, MemoryDescriptor *, usize *, usize *, u32 *> getMemoryMap;
+    Function<MemoryType, usize, void **> allocatePool;
     Function<void *> freePool;
 
     // Event & Timer Services
     DummyFunction createEvent;
     DummyFunction setTimer;
-    Function<size_t, Event *, size_t *> waitForEvent;
+    Function<usize, Event *, usize *> waitForEvent;
     DummyFunction signalEvent;
     DummyFunction closeEvent;
     DummyFunction checkEvent;
@@ -248,19 +248,19 @@ struct BootService : public Table {
     DummyFunction startImage;
     DummyFunction exit;
     DummyFunction unloadImage;
-    Function<Handle, size_t> exitBootServices;
+    Function<Handle, usize> exitBootServices;
 
     // Miscellaneous Services
     DummyFunction getNextMonotonicCount;
     DummyFunction stall;
-    Function<size_t, uint64_t, size_t, uint16_t *> setWatchdogTimer;
+    Function<usize, u64, usize, u16 *> setWatchdogTimer;
 
     // DriverSupport Services
     DummyFunction connectController;
     DummyFunction disconnectController;
 
     // Open and Close Protocol Services
-    Function<Handle, Uuid const *, void **, Handle, Handle, uint32_t> openProtocol;
+    Function<Handle, Uuid const *, void **, Handle, Handle, u32> openProtocol;
     Function<Handle, Uuid const *, Handle, Handle> closeProtocol;
     DummyFunction openProtocolInformation;
 
@@ -307,7 +307,7 @@ struct RuntimeService : public Table {
 
     // Miscellaneous Services
     DummyFunction getNextMonotonicCount;
-    Function<ResetType, Status, size_t, void *> resetSystem;
+    Function<ResetType, Status, usize, void *> resetSystem;
 
     // UEFI 2.0 Capsule Services
     DummyFunction updateCapsule;
@@ -324,7 +324,7 @@ struct DevicePathProtocol;
 struct LoadedImageProtocol {
     static constexpr Uuid UUID = Uuid{0x5B1B31A1, 0x9562, 0x11d2, {0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B}};
 
-    uint32_t revision;
+    u32 revision;
     Handle parentHandle;
     SystemTable *st;
 
@@ -334,12 +334,12 @@ struct LoadedImageProtocol {
     void *reserved;
 
     // Image's load options
-    uint32_t loadOptionsSize;
+    u32 loadOptionsSize;
     void *loadOptions;
 
     // Location where image was loaded
     void *imageBase;
-    uint64_t imageSize;
+    u64 imageSize;
     MemoryType imageCodeType;
     MemoryType imageDataType;
     Function<Handle> unload;
@@ -350,16 +350,16 @@ struct LoadedImageProtocol {
 struct DevicePathProtocol {
     static constexpr Uuid UUID = Uuid{0x09576e91, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
-    uint8_t type;
-    uint8_t subType;
-    uint8_t length[2];
+    u8 type;
+    u8 subType;
+    u8 length[2];
 };
 
 /* --- 12.3 Simple Text Input Protocol -------------------------------------- */
 
 struct Key {
-    uint16_t scanCode;
-    uint16_t unicodeChar;
+    u16 scanCode;
+    u16 unicodeChar;
 };
 
 struct SimpleTextInputProtocol {
@@ -395,11 +395,11 @@ struct SimpleTextInputProtocol {
     ((Foreground) | ((Background) << 4))
 
 struct SimpleTextOutputMode {
-    uint32_t maxMode;
-    uint32_t mode;
-    uint32_t attribute;
-    uint32_t cursorColumn;
-    uint32_t cursorRow;
+    u32 maxMode;
+    u32 mode;
+    u32 attribute;
+    u32 cursorColumn;
+    u32 cursorRow;
     bool cursorVisible;
 };
 
@@ -407,13 +407,13 @@ struct SimpleTextOutputProtocol {
     static constexpr Uuid UUID = Uuid{0x387477c2, 0x69c7, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
     Method<bool> reset;
-    Method<uint16_t const *> outputString;
-    Method<uint16_t const *> testString;
-    Method<size_t, size_t *, size_t *> queryMode;
-    Method<size_t> setMode;
-    Method<size_t> setAttribute;
+    Method<u16 const *> outputString;
+    Method<u16 const *> testString;
+    Method<usize, usize *, usize *> queryMode;
+    Method<usize> setMode;
+    Method<usize> setAttribute;
     Method<> clearScreen;
-    Method<size_t, size_t> setCursorPosition;
+    Method<usize, usize> setCursorPosition;
     Method<bool> enableCursor;
     SimpleTextOutputMode *mode;
 };
@@ -421,13 +421,13 @@ struct SimpleTextOutputProtocol {
 /* --- 12.9 Graphics Output Protocol ---------------------------------------- */
 
 struct PixelBitmask {
-    uint32_t redMask;
-    uint32_t greenMask;
-    uint32_t blueMask;
-    uint32_t reservedMask;
+    u32 redMask;
+    u32 greenMask;
+    u32 blueMask;
+    u32 reservedMask;
 };
 
-enum struct PixelFormat : uint32_t {
+enum struct PixelFormat : u32 {
     RED_GREEN_BLUE_RESERVED8_BIT_PER_COLOR,
     BLUE_GREEN_RED_RESERVED8_BIT_PER_COLOR,
     BIT_MASK,
@@ -436,28 +436,28 @@ enum struct PixelFormat : uint32_t {
 };
 
 struct GraphicsOutputModeInformations {
-    uint32_t version;
-    uint32_t horizontalResolution;
-    uint32_t verticalResolution;
+    u32 version;
+    u32 horizontalResolution;
+    u32 verticalResolution;
     PixelFormat pixelFormat;
     PixelBitmask pixelInformation;
-    uint32_t pixelsPerScanLine;
+    u32 pixelsPerScanLine;
 };
 
 struct GraphicsOutputProtocolMode {
-    uint32_t maxMode;
-    uint32_t mode;
+    u32 maxMode;
+    u32 mode;
     GraphicsOutputModeInformations *info;
-    size_t sizeOfInfo;
-    size_t frameBufferBase;
-    size_t frameBufferSize;
+    usize sizeOfInfo;
+    usize frameBufferBase;
+    usize frameBufferSize;
 };
 
 struct GraphicsOutputProtocol {
     static constexpr Uuid UUID = Uuid{0x9042a9de, 0x23dc, 0x4a38, {0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a}};
 
-    Method<uint32_t, size_t *, GraphicsOutputProtocolMode **> queryMode;
-    Method<size_t> setMode;
+    Method<u32, usize *, GraphicsOutputProtocolMode **> queryMode;
+    Method<usize> setMode;
     DummyMethod blt;
     GraphicsOutputProtocolMode *mode;
 };
@@ -469,7 +469,7 @@ struct FileProtocol;
 struct SimpleFileSystemProtocol {
     static constexpr Uuid UUID = Uuid{0x0964e5b22, 0x6459, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
-    uint64_t revision;
+    u64 revision;
     Method<FileProtocol **> openVolume;
 };
 
@@ -478,9 +478,9 @@ struct SimpleFileSystemProtocol {
 struct FileInfo {
     static constexpr Uuid UUID = Uuid{0x09576e92, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
-    uint64_t size;
-    uint64_t fileSize;
-    uint64_t physicalSize;
+    u64 size;
+    u64 fileSize;
+    u64 physicalSize;
     Time createTime;
     Time lastAccessTime;
     Time modificationTime;
@@ -492,19 +492,19 @@ struct FileInfo {
 #define EFI_FILE_DIRECTORY 0x0000000000000010
 #define EFI_FILE_ARCHIVE 0x0000000000000020
 #define EFI_FILE_VALID_ATTR 0x0000000000000037
-    uint64_t attribute;
-    uint16_t fileName[];
+    u64 attribute;
+    u16 fileName[];
 };
 
 struct FileIoToken {
     Event Event;
     Status Status;
-    size_t BufferSize;
+    usize BufferSize;
     void *Buffer;
 };
 
 struct FileProtocol {
-    uint64_t revision;
+    u64 revision;
 
 #define EFI_FILE_MODE_READ 0x0000000000000001
 #define EFI_FILE_MODE_WRITE 0x0000000000000002
@@ -517,15 +517,15 @@ struct FileProtocol {
 #define EFI_FILE_DIRECTORY 0x0000000000000010
 #define EFI_FILE_ARCHIVE 0x0000000000000020
 #define EFI_FILE_VALID_ATTR 0x0000000000000037
-    Method<FileProtocol **, uint16_t const *, uint64_t, uint64_t> open;
+    Method<FileProtocol **, u16 const *, u64, u64> open;
     Method<> close;
     Method<> del;
-    Method<size_t *, void *> read;
-    Method<size_t *, void const *> write;
-    Method<uint64_t *> getPosition;
-    Method<uint64_t> setPosition;
-    Method<Uuid const *, size_t *, FileInfo *> getInfo;
-    Method<Uuid const *, size_t *, FileInfo *> setInfo;
+    Method<usize *, void *> read;
+    Method<usize *, void const *> write;
+    Method<u64 *> getPosition;
+    Method<u64> setPosition;
+    Method<Uuid const *, usize *, FileInfo *> getInfo;
+    Method<Uuid const *, usize *, FileInfo *> setInfo;
     Method<> flush;
 };
 

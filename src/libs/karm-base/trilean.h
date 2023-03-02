@@ -1,12 +1,11 @@
 #pragma once
 
-#include "keywords.h"
 #include "std.h"
 
 namespace Karm {
 
 struct Trilean {
-    enum : uint8_t {
+    enum : u8 {
         _FALSE,
         _NONE,
         _TRUE,

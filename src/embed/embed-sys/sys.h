@@ -31,9 +31,9 @@ Res<Sys::MmapResult> memMap(Sys::MmapOptions const &options);
 
 Res<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> fd);
 
-Res<> memUnmap(void const *buf, size_t len);
+Res<> memUnmap(void const *buf, usize len);
 
-Res<> memFlush(void *flush, size_t len);
+Res<> memFlush(void *flush, usize len);
 
 /* --- System Informations -------------------------------------------------- */
 

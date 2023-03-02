@@ -81,7 +81,7 @@ struct MouseListener {
 };
 
 struct ButtonStyle {
-    static constexpr int RADIUS = 4;
+    static constexpr isize RADIUS = 4;
 
     BoxStyle idleStyle;
     BoxStyle hoverStyle;
@@ -170,9 +170,9 @@ struct SliderStyle {
     static SliderStyle gradiant(Gfx::Color from, Gfx::Color to);
 };
 
-Child slider(SliderStyle style, double value, OnChange<double> onChange);
+Child slider(SliderStyle style, f64 value, OnChange<f64> onChange);
 
-Child slider(double value, OnChange<double> onChange);
+Child slider(f64 value, OnChange<f64> onChange);
 
 /* --- Select --------------------------------------------------------------- */
 

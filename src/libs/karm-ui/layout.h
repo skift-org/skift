@@ -46,9 +46,9 @@ inline auto grow() {
     };
 }
 
-Child grow(int grow, Opt<Child> child);
+Child grow(isize grow, Opt<Child> child);
 
-inline auto grow(int g) {
+inline auto grow(isize g) {
     return [g](Child child) {
         return grow(g, child);
     };
@@ -154,9 +154,9 @@ inline auto minSize(Math::Vec2i size) {
     };
 }
 
-Child minSize(int size, Child child);
+Child minSize(isize size, Child child);
 
-inline auto minSize(int size) {
+inline auto minSize(isize size) {
     return [size](Child child) {
         return minSize(size, child);
     };
@@ -170,9 +170,9 @@ inline auto maxSize(Math::Vec2i size) {
     };
 }
 
-Child maxSize(int size, Child child);
+Child maxSize(isize size, Child child);
 
-inline auto maxSize(int size) {
+inline auto maxSize(isize size) {
     return [size](Child child) {
         return maxSize(size, child);
     };
@@ -186,9 +186,9 @@ inline auto pinSize(Math::Vec2i size) {
     };
 }
 
-Child pinSize(int size, Child child);
+Child pinSize(isize size, Child child);
 
-inline auto pinSize(int size) {
+inline auto pinSize(isize size) {
     return [size](Child child) {
         return pinSize(size, child);
     };
@@ -206,9 +206,9 @@ inline auto spacing(Layout::Spacingi s) {
 
 /* --- Aspect Ratio --------------------------------------------------------- */
 
-Child aspectRatio(double ratio, Child child);
+Child aspectRatio(f64 ratio, Child child);
 
-inline auto aspectRatio(double ratio) {
+inline auto aspectRatio(f64 ratio) {
     return [ratio](Child child) {
         return aspectRatio(ratio, child);
     };
@@ -275,13 +275,13 @@ inline Child dock(Meta::Same<Child> auto... children) {
 struct FlowStyle {
     Layout::Flow flow = Layout::Flow::LEFT_TO_RIGHT;
     Layout::Align align = Layout::Align::FILL;
-    int gaps{};
+    isize gaps{};
 
-    static FlowStyle horizontal(int gaps = 0, Layout::Align align = Layout::Align::FILL) {
+    static FlowStyle horizontal(isize gaps = 0, Layout::Align align = Layout::Align::FILL) {
         return FlowStyle{Layout::Flow::LEFT_TO_RIGHT, align, gaps};
     }
 
-    static FlowStyle vertical(int gaps = 0, Layout::Align align = Layout::Align::FILL) {
+    static FlowStyle vertical(isize gaps = 0, Layout::Align align = Layout::Align::FILL) {
         return FlowStyle{Layout::Flow::TOP_TO_BOTTOM, align, gaps};
     }
 };
@@ -292,11 +292,11 @@ inline Child hflow(Meta::Same<Child> auto... children) {
     return flow({.flow = Layout::Flow::LEFT_TO_RIGHT}, {children...});
 }
 
-inline Child hflow(int gaps, Meta::Same<Child> auto... children) {
+inline Child hflow(isize gaps, Meta::Same<Child> auto... children) {
     return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .gaps = gaps}, {children...});
 }
 
-inline Child hflow(int gaps, Layout::Align align, Meta::Same<Child> auto... children) {
+inline Child hflow(isize gaps, Layout::Align align, Meta::Same<Child> auto... children) {
     return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, {children...});
 }
 
@@ -304,11 +304,11 @@ inline Child hflow(Children children) {
     return flow({.flow = Layout::Flow::LEFT_TO_RIGHT}, children);
 }
 
-inline Child hflow(int gaps, Children children) {
+inline Child hflow(isize gaps, Children children) {
     return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .gaps = gaps}, children);
 }
 
-inline Child hflow(int gaps, Layout::Align align, Children children) {
+inline Child hflow(isize gaps, Layout::Align align, Children children) {
     return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, children);
 }
 
@@ -316,11 +316,11 @@ inline Child vflow(Meta::Same<Child> auto... children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM}, {children...});
 }
 
-inline Child vflow(int gaps, Meta::Same<Child> auto... children) {
+inline Child vflow(isize gaps, Meta::Same<Child> auto... children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .gaps = gaps}, {children...});
 }
 
-inline Child vflow(int gaps, Layout::Align align, Meta::Same<Child> auto... children) {
+inline Child vflow(isize gaps, Layout::Align align, Meta::Same<Child> auto... children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, {children...});
 }
 
@@ -328,11 +328,11 @@ inline Child vflow(Children children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM}, children);
 }
 
-inline Child vflow(int gaps, Children children) {
+inline Child vflow(isize gaps, Children children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .gaps = gaps}, children);
 }
 
-inline Child vflow(int gaps, Layout::Align align, Children children) {
+inline Child vflow(isize gaps, Layout::Align align, Children children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, children);
 }
 
@@ -346,23 +346,23 @@ struct GridUnit {
     };
 
     _Unit unit;
-    int value;
+    isize value;
 
     static GridUnit auto_() {
         return {AUTO, 0};
     }
 
-    static GridUnit fixed(int value) {
+    static GridUnit fixed(isize value) {
         return GridUnit{FIXED, value};
     }
 
-    static GridUnit grow(int value = 1) {
+    static GridUnit grow(isize value = 1) {
         return GridUnit{GROW, value};
     }
 
-    GridUnit(_Unit unit, int value) : unit(unit), value(value) {}
+    GridUnit(_Unit unit, isize value) : unit(unit), value(value) {}
 
-    Vec<GridUnit> repeated(size_t count) {
+    Vec<GridUnit> repeated(usize count) {
         Vec<GridUnit> units{};
         while (count--)
             units.pushBack(*this);
@@ -378,7 +378,7 @@ struct GridStyle {
     Layout::Flow flow = Layout::Flow::LEFT_TO_RIGHT;
     Layout::Align align = Layout::Align::FILL;
 
-    static GridStyle simple(int rows, int columns, Math::Vec2i gaps = 0) {
+    static GridStyle simple(isize rows, isize columns, Math::Vec2i gaps = 0) {
         return GridStyle{
             GridUnit::grow().repeated(rows),
             GridUnit::grow().repeated(columns),

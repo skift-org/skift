@@ -1,9 +1,7 @@
 #pragma once
 
-#include "_prelude.h"
-
-#include "keywords.h"
 #include "panic.h"
+#include "std.h"
 #include "try.h"
 
 namespace Karm {
@@ -47,6 +45,7 @@ namespace Karm {
     ERROR(INVALID_FILENAME, invalidFilename)                  \
     ERROR(INVALID_HANDLE, invalidHandle)                      \
     ERROR(ARGUMENT_LIST_TOO_LONG, argumentListTooLong)        \
+    ERROR(ARITHMETIC, arithmetic)                             \
     ERROR(INTERRUPTED, interrupted)                           \
     ERROR(UNSUPPORTED, unsupported)                           \
     ERROR(UNEXPECTED_EOF, unexpectedEof)                      \

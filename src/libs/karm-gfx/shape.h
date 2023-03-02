@@ -22,7 +22,7 @@ struct Shape {
         return tryOr(bound, {});
     }
 
-    Math::Edgef const &operator[](size_t i) const {
+    Math::Edgef const &operator[](usize i) const {
         return _edges[i];
     }
 
@@ -30,7 +30,7 @@ struct Shape {
         return _edges.buf();
     }
 
-    size_t len() const {
+    usize len() const {
         return _edges.len();
     }
 

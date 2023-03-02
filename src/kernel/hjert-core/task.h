@@ -9,7 +9,7 @@
 namespace Hjert::Core {
 
 struct Ctx {
-    static Res<Box<Ctx>> create(uintptr_t ksp);
+    static Res<Box<Ctx>> create(usize ksp);
 
     virtual ~Ctx() = default;
     virtual void save() = 0;
@@ -19,18 +19,18 @@ struct Ctx {
 /* --- Stack ----------------------------------------------------------------- */
 
 struct Stack {
-    static constexpr size_t DEFAULT_SIZE = kib(16);
+    static constexpr usize DEFAULT_SIZE = kib(16);
 
     static Res<Stack> create();
 
     Hal::KmmMem _mem;
-    uintptr_t _sp;
+    usize _sp;
 
-    void saveSp(uintptr_t sp) {
+    void saveSp(usize sp) {
         _sp = sp;
     }
 
-    uintptr_t loadSp() {
+    usize loadSp() {
         return _sp;
     }
 
@@ -41,13 +41,13 @@ struct Stack {
 
     template <typename T>
     void push(T t) {
-        push(Bytes{reinterpret_cast<uint8_t *>(&t), sizeof(t)});
+        push(Bytes{reinterpret_cast<u8 *>(&t), sizeof(t)});
     }
 };
 
 /* --- Task ----------------------------------------------------------------- */
 
-enum struct TaskType : uint8_t {
+enum struct TaskType : u8 {
     IDLE,
     USER,
     KERNEL
@@ -56,43 +56,46 @@ enum struct TaskType : uint8_t {
 struct Task : public Object<Task> {
     TaskType _type;
     Stack _stack;
-    Strong<Space> _space;
-    Strong<Domain> _domain;
     Box<Ctx> _ctx;
+
+    OptStrong<Space> _space;
+    OptStrong<Domain> _domain;
 
     Tick _sliceStart = 0;
     Tick _sliceEnd = 0;
 
-    static Res<Strong<Task>> create(TaskType type, Strong<Space> space);
+    static Res<Strong<Task>> create(TaskType type, OptStrong<Space> space = NONE, OptStrong<Domain> domain = NONE);
 
     static Task &self();
 
-    Task(TaskType type, Stack stack, Strong<Space> space, Strong<Domain> domain, Box<Ctx> ctx)
+    Task(TaskType type, Stack stack, Box<Ctx> ctx, OptStrong<Space> space = NONE, OptStrong<Domain> domain = NONE)
         : _type(type),
           _stack(std::move(stack)),
+          _ctx(std::move(ctx)),
           _space(space),
-          _domain(domain),
-          _ctx(std::move(ctx)) {
+          _domain(domain) {
     }
 
     auto type() const { return _type; }
 
     Stack &stack() { return _stack; }
 
-    Space &space() { return *_space; }
-
-    Domain &domain() { return *_domain; }
-
-    void saveCtx(uintptr_t sp) {
+    void saveCtx(usize sp) {
         _stack.saveSp(sp);
         _ctx->save();
     }
 
-    uintptr_t loadCtx() {
-        _space->activate();
+    usize loadCtx() {
+        if (_space)
+            (_space.unwrap()).activate();
+
         _ctx->load();
         return _stack.loadSp();
     }
+
+    Space &space() { return _space.unwrap("task has no space"); }
+
+    Domain &domain() { return _domain.unwrap("task has no domain"); }
 };
 
 } // namespace Hjert::Core

@@ -2,13 +2,9 @@
 
 #include <karm-meta/traits.h>
 
-#include "_prelude.h"
-
 #include "opt.h"
 #include "ordr.h"
-#include "panic.h"
 #include "ref.h"
-#include "std.h"
 
 namespace Karm {
 
@@ -214,7 +210,7 @@ struct Strong {
     }
 
     template <typename U>
-    constexpr Opt<Strong<U>> as() {
+    constexpr Opt<Strong<U>> cast() {
         if (not is<U>()) {
             return NONE;
         }

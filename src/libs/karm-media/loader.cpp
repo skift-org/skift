@@ -17,7 +17,7 @@ Res<Strong<Fontface>> loadFontface(Str path) {
     return Ok(face);
 }
 
-Res<Font> loadFont(double size, Str path) {
+Res<Font> loadFont(f64 size, Str path) {
     return Ok(Font{
         .fontface = try$(loadFontface(path)),
         .fontsize = size,

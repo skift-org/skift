@@ -27,7 +27,7 @@ struct Host : public Node {
 
     virtual void pump() = 0;
 
-    virtual void wait(size_t ms) = 0;
+    virtual void wait(usize ms) = 0;
 
     bool alive() {
         return not _res;

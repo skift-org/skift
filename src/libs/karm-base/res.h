@@ -1,7 +1,5 @@
 #pragma once
 
-#include "_prelude.h"
-
 #include "error.h"
 #include "std.h"
 #include "var.h"
@@ -105,6 +103,6 @@ struct [[nodiscard]] Res {
     }
 };
 
-static_assert(Tryable<Res<int, Error>>);
+static_assert(Tryable<Res<isize, Error>>);
 
 } // namespace Karm

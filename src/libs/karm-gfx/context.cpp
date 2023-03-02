@@ -102,7 +102,7 @@ void Context::scale(Math::Vec2f pos) {
     transform(Math::Trans2f::scale(pos.x, pos.y));
 }
 
-void Context::rotate(double angle) {
+void Context::rotate(f64 angle) {
     transform(Math::Trans2f::rotate(angle));
 }
 
@@ -167,14 +167,14 @@ void Context::blit(Math::Recti src, Math::Recti dest, Surface surface) {
     dest = applyOrigin(dest);
     auto clipDest = applyAll(dest);
 
-    for (int y = 0; y < clipDest.height; ++y) {
-        int yy = clipDest.y - dest.y + y;
+    for (isize y = 0; y < clipDest.height; ++y) {
+        isize yy = clipDest.y - dest.y + y;
 
         auto srcY = src.y + yy * src.height / dest.height;
         auto destY = clipDest.y + y;
 
-        for (int x = 0; x < clipDest.width; ++x) {
-            int xx = clipDest.x - dest.x + x;
+        for (isize x = 0; x < clipDest.width; ++x) {
+            isize xx = clipDest.x - dest.x + x;
 
             auto srcX = src.x + xx * src.width / dest.width;
             auto destX = clipDest.x + x;
@@ -197,39 +197,39 @@ void Context::blit(Math::Vec2i dest, Surface surface) {
 
 void Context::stroke(Math::Edgei edge) {
     begin();
-    moveTo(edge.start.cast<double>());
-    lineTo(edge.end.cast<double>());
+    moveTo(edge.start.cast<f64>());
+    lineTo(edge.end.cast<f64>());
     stroke();
 }
 
-void Context::fill(Math::Edgei edge, double thickness) {
+void Context::fill(Math::Edgei edge, f64 thickness) {
     begin();
-    moveTo(edge.start.cast<double>());
-    lineTo(edge.end.cast<double>());
+    moveTo(edge.start.cast<f64>());
+    lineTo(edge.end.cast<f64>());
     stroke(StrokeStyle().withWidth(thickness));
 }
 
 void Context::stroke(Math::Recti r, BorderRadius radius) {
     begin();
-    rect(r.cast<double>(), radius);
+    rect(r.cast<f64>(), radius);
     stroke();
 }
 
 void Context::fill(Math::Recti r, BorderRadius radius) {
     begin();
-    rect(r.cast<double>(), radius);
+    rect(r.cast<f64>(), radius);
     fill();
 }
 
 void Context::stroke(Math::Ellipsei e) {
     begin();
-    ellipse(e.cast<double>());
+    ellipse(e.cast<f64>());
     stroke();
 }
 
 void Context::fill(Math::Ellipsei e) {
     begin();
-    ellipse(e.cast<double>());
+    ellipse(e.cast<f64>());
     fill();
 }
 
@@ -246,7 +246,7 @@ void Context::stroke(Math::Vec2i baseline, Rune rune) {
 
     save();
     begin();
-    origin(baseline.cast<int>());
+    origin(baseline.cast<isize>());
     scale(f.fontsize / f.fontface->units());
     f.fontface->contour(*this, rune);
     stroke();
@@ -258,7 +258,7 @@ void Context::fill(Math::Vec2i baseline, Rune rune) {
 
     save();
     begin();
-    origin(baseline.cast<int>());
+    origin(baseline.cast<isize>());
     scale(f.fontsize / f.fontface->units());
     f.fontface->contour(*this, rune);
     fill();
@@ -291,13 +291,13 @@ void Context::debugPlot(Math::Vec2i point, Color color) {
 }
 
 void Context::debugLine(Math::Edgei edge, Color color) {
-    int dx = Math::abs(edge.ex - edge.sx);
-    int sx = edge.sx < edge.ex ? 1 : -1;
+    isize dx = Math::abs(edge.ex - edge.sx);
+    isize sx = edge.sx < edge.ex ? 1 : -1;
 
-    int dy = -Math::abs(edge.ey - edge.sy);
-    int sy = edge.sy < edge.ey ? 1 : -1;
+    isize dy = -Math::abs(edge.ey - edge.sy);
+    isize sy = edge.sy < edge.ey ? 1 : -1;
 
-    int err = dx + dy, e2;
+    isize err = dx + dy, e2;
 
     for (;;) {
         debugPlot({edge.sx, edge.sy}, color);
@@ -323,13 +323,13 @@ void Context::debugRect(Math::Recti rect, Color color) {
 }
 
 void Context::debugArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
-    const int SIZE = 16;
+    const isize SIZE = 16;
 
     Math::Vec2i dir = to - from;
     Math::Vec2i perp = {-dir.y, dir.x};
 
-    double len = dir.len();
-    double scale = SIZE / len;
+    f64 len = dir.len();
+    f64 scale = SIZE / len;
 
     Math::Vec2i p1 = to - dir * scale;
     Math::Vec2i p2 = p1 + perp * scale;
@@ -341,21 +341,21 @@ void Context::debugArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
 }
 
 void Context::debugDoubleArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
-    const int SIZE = 8;
+    const isize SIZE = 8;
 
-    Math::Vec2f dir = (to - from).cast<double>();
+    Math::Vec2f dir = (to - from).cast<f64>();
     Math::Vec2f perp = {-dir.y, dir.x};
 
-    double len = dir.len();
-    double scale = SIZE / len;
+    f64 len = dir.len();
+    f64 scale = SIZE / len;
 
-    Math::Vec2i p1 = (to - dir * scale).cast<int>();
-    Math::Vec2i p2 = (p1 + perp * scale).cast<int>();
-    Math::Vec2i p3 = (p1 - perp * scale).cast<int>();
+    Math::Vec2i p1 = (to - dir * scale).cast<isize>();
+    Math::Vec2i p2 = (p1 + perp * scale).cast<isize>();
+    Math::Vec2i p3 = (p1 - perp * scale).cast<isize>();
 
-    Math::Vec2i p4 = (from + dir * scale).cast<int>();
-    Math::Vec2i p5 = (p4 + perp * scale).cast<int>();
-    Math::Vec2i p6 = (p4 - perp * scale).cast<int>();
+    Math::Vec2i p4 = (from + dir * scale).cast<isize>();
+    Math::Vec2i p5 = (p4 + perp * scale).cast<isize>();
+    Math::Vec2i p6 = (p4 - perp * scale).cast<isize>();
 
     debugLine({from, to}, color);
     debugLine({to, p2}, color);
@@ -366,7 +366,7 @@ void Context::debugDoubleArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
 
 void Context::debugTrace(Gfx::Color color) {
     for (auto edge : _shape) {
-        debugLine(edge.cast<int>(), color);
+        debugLine(edge.cast<isize>(), color);
     }
 }
 
@@ -378,12 +378,12 @@ void Context::debugTrace(Gfx::Color color) {
     static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;
 
     auto shapeBound = _shape.bound();
-    auto rect = applyClip(shapeBound.ceil().cast<int>());
+    auto rect = applyClip(shapeBound.ceil().cast<isize>());
 
-    for (int y = rect.top(); y < rect.bottom(); y++) {
-        zeroFill<double>(mutSub(_scanline, rect.start(), rect.end()));
+    for (isize y = rect.top(); y < rect.bottom(); y++) {
+        zeroFill<f64>(mutSub(_scanline, rect.start(), rect.end()));
 
-        for (double yy = y; yy < y + 1.0; yy += UNIT) {
+        for (f64 yy = y; yy < y + 1.0; yy += UNIT) {
             _active.clear();
 
             for (auto &edge : _shape) {
@@ -404,13 +404,13 @@ void Context::debugTrace(Gfx::Color color) {
                 return cmp(a.x, b.x);
             });
 
-            int rule = 0;
-            for (size_t i = 0; i + 1 < _active.len(); i++) {
-                size_t iStart = i;
-                size_t iEnd = i + 1;
+            isize rule = 0;
+            for (usize i = 0; i + 1 < _active.len(); i++) {
+                usize iStart = i;
+                usize iEnd = i + 1;
 
                 if (fillRule == FillRule::NONZERO) {
-                    int sign = _active[i].sign;
+                    isize sign = _active[i].sign;
                     rule += sign;
                     if (rule == 0)
                         continue;
@@ -422,8 +422,8 @@ void Context::debugTrace(Gfx::Color color) {
                         continue;
                 }
 
-                double x1 = max(_active[iStart].x, rect.start());
-                double x2 = min(_active[iEnd].x, rect.end());
+                f64 x1 = max(_active[iStart].x, rect.start());
+                f64 x2 = min(_active[iEnd].x, rect.end());
 
                 if (x1 >= x2) {
                     continue;
@@ -431,13 +431,13 @@ void Context::debugTrace(Gfx::Color color) {
 
                 // Are x1 and x2 on the same pixel?
                 if (Math::floor(x1) == Math::floor(x2)) {
-                    double x = Math::floor(x1);
+                    f64 x = Math::floor(x1);
                     _scanline[x] += x2 - x1;
                 } else {
                     _scanline[x1] += (ceil(x1) - x1) * UNIT;
                     _scanline[x2] += (x2 - floor(x2)) * UNIT;
 
-                    for (int x = ceil(x1); x < floor(x2); x++) {
+                    for (isize x = ceil(x1); x < floor(x2); x++) {
                         _scanline[x] += UNIT;
                     }
                 }
@@ -445,8 +445,8 @@ void Context::debugTrace(Gfx::Color color) {
         }
 
         surface().format.visit([&](auto f) {
-            auto *pixel = static_cast<uint8_t *>(surface().data()) + y * surface().stride() + rect.start() * f.bpp();
-            for (int x = rect.start(); x < rect.end(); x++) {
+            auto *pixel = static_cast<u8 *>(surface().data()) + y * surface().stride() + rect.start() * f.bpp();
+            for (isize x = rect.start(); x < rect.end(); x++) {
                 Math::Vec2f sample = {
                     (x - shapeBound.start()) / shapeBound.width,
                     (y - shapeBound.top()) / shapeBound.height,
@@ -478,11 +478,11 @@ void Context::lineTo(Math::Vec2f p, Path::Flags flags) {
     _path.lineTo(p, flags);
 }
 
-void Context::hlineTo(double x, Path::Flags flags) {
+void Context::hlineTo(f64 x, Path::Flags flags) {
     _path.hlineTo(x, flags);
 }
 
-void Context::vlineTo(double y, Path::Flags flags) {
+void Context::vlineTo(f64 y, Path::Flags flags) {
     _path.vlineTo(y, flags);
 }
 
@@ -494,7 +494,7 @@ void Context::quadTo(Math::Vec2f cp, Math::Vec2f p, Path::Flags flags) {
     _path.quadTo(cp, p, flags);
 }
 
-void Context::arcTo(Math::Vec2f radius, double angle, Math::Vec2f p, Path::Flags flags) {
+void Context::arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Path::Flags flags) {
     _path.arcTo(radius, angle, p, flags);
 }
 
@@ -539,18 +539,18 @@ void Context::shadow() {}
 /* --- Effects -------------------------------------------------------------- */
 
 struct StackBlur {
-    int _radius;
+    isize _radius;
     Ring<Math::Vec4u> _queue;
     Math::Vec4u _sum;
 
-    StackBlur(int radius)
+    StackBlur(isize radius)
         : _radius(radius), _queue(width()) {
         clear();
     }
 
     Math::Vec4u outgoingSum() const {
         Math::Vec4u sum = {};
-        for (int i = 0; i < _radius; i++) {
+        for (isize i = 0; i < _radius; i++) {
             sum = sum + _queue.peek(i);
         }
         return sum;
@@ -558,17 +558,17 @@ struct StackBlur {
 
     Math::Vec4u incomingSum() const {
         Math::Vec4u sum = {};
-        for (int i = 0; i < _radius; i++) {
+        for (isize i = 0; i < _radius; i++) {
             sum = sum + _queue.peek(width() - i - 1);
         }
         return sum;
     }
 
-    int width() const {
+    isize width() const {
         return _radius * 2 + 1;
     }
 
-    int denominator() const {
+    isize denominator() const {
         return _radius * (_radius + 2) - 1;
     }
 
@@ -586,27 +586,27 @@ struct StackBlur {
     void clear() {
         _sum = {};
         _queue.clear();
-        for (int i = 0; i < width(); i++) {
+        for (isize i = 0; i < width(); i++) {
             _queue.pushBack({});
         }
     }
 };
 
-[[gnu::flatten]] void Context::blur(Math::Recti region, int radius) {
+[[gnu::flatten]] void Context::blur(Math::Recti region, isize radius) {
     if (radius == 0)
         return;
 
     region = applyClip(region);
     StackBlur stack{radius};
 
-    for (int y = region.top(); y < region.bottom(); y++) {
-        for (int i = 0; i < stack.width(); i++) {
+    for (isize y = region.top(); y < region.bottom(); y++) {
+        for (isize i = 0; i < stack.width(); i++) {
             auto x = region.start() + i - radius;
             stack.dequeue();
             stack.enqueue(surface().loadClamped({x, y}));
         }
 
-        for (int x = region.start(); x < region.end(); x++) {
+        for (isize x = region.start(); x < region.end(); x++) {
             surface().store({x, y}, stack.dequeue());
             stack.enqueue(surface().loadClamped({x + radius + 1, y}));
         }
@@ -614,14 +614,14 @@ struct StackBlur {
         stack.clear();
     }
 
-    for (int x = region.start(); x < region.end(); x++) {
-        for (int i = 0; i < stack.width(); i++) {
-            int const y = region.top() + i - radius;
+    for (isize x = region.start(); x < region.end(); x++) {
+        for (isize i = 0; i < stack.width(); i++) {
+            isize const y = region.top() + i - radius;
             stack.dequeue();
             stack.enqueue(surface().loadClamped({x, y}));
         }
 
-        for (int y = region.top(); y < region.bottom(); y++) {
+        for (isize y = region.top(); y < region.bottom(); y++) {
             surface().store({x, y}, stack.dequeue());
             stack.enqueue(surface().loadClamped({x, y + radius + 1}));
         }
@@ -630,20 +630,20 @@ struct StackBlur {
     }
 }
 
-void Context::saturate(Math::Recti region, double value) {
+void Context::saturate(Math::Recti region, f64 value) {
     region = applyAll(region);
 
-    for (int y = 0; y < region.height; y++) {
-        for (int x = 0; x < region.width; x++) {
+    for (isize y = 0; y < region.height; y++) {
+        for (isize x = 0; x < region.width; x++) {
             auto color = _surface->load({region.x + x, region.y + y});
 
             // weights from CCIR 601 spec
             // https://stackoverflow.com/questions/13806483/increase-or-decrease-color-saturation
             auto gray = 0.2989 * color.red + 0.5870 * color.green + 0.1140 * color.blue;
 
-            uint8_t red = min(gray * value + color.red * (1 - value), 255);
-            uint8_t green = min(gray * value + color.green * (1 - value), 255);
-            uint8_t blue = min(gray * value + color.blue * (1 - value), 255);
+            u8 red = min(gray * value + color.red * (1 - value), 255);
+            u8 green = min(gray * value + color.green * (1 - value), 255);
+            u8 blue = min(gray * value + color.blue * (1 - value), 255);
 
             color = Color::fromRgba(red, green, blue, color.alpha);
 
@@ -655,13 +655,13 @@ void Context::saturate(Math::Recti region, double value) {
 void Context::grayscale(Math::Recti region) {
     region = applyAll(region);
 
-    for (int y = 0; y < region.height; y++) {
-        for (int x = 0; x < region.width; x++) {
+    for (isize y = 0; y < region.height; y++) {
+        for (isize x = 0; x < region.width; x++) {
             auto color = _surface->load({region.x + x, region.y + y});
 
             // weights from CCIR 601 spec
             // https://stackoverflow.com/questions/13806483/increase-or-decrease-color-saturation
-            double gray = 0.2989 * color.red + 0.5870 * color.green + 0.1140 * color.blue;
+            f64 gray = 0.2989 * color.red + 0.5870 * color.green + 0.1140 * color.blue;
 
             color = Color::fromRgba(gray, gray, gray, color.alpha);
             _surface->store({region.x + x, region.y + y}, color);
@@ -669,14 +669,14 @@ void Context::grayscale(Math::Recti region) {
     }
 }
 
-void Context::contrast(Math::Recti region, double contrast) {
+void Context::contrast(Math::Recti region, f64 contrast) {
     region = applyAll(region);
 
     contrast *= 255;
-    double factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+    f64 factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
 
-    for (int y = 0; y < region.height; y++) {
-        for (int x = 0; x < region.width; x++) {
+    for (isize y = 0; y < region.height; y++) {
+        for (isize x = 0; x < region.width; x++) {
             auto color = _surface->load({region.x + x, region.y + y});
 
             color = Color::fromRgba(
@@ -690,11 +690,11 @@ void Context::contrast(Math::Recti region, double contrast) {
     }
 }
 
-void Context::brightness(Math::Recti region, double brightness) {
+void Context::brightness(Math::Recti region, f64 brightness) {
     region = applyAll(region);
 
-    for (int y = 0; y < region.height; y++) {
-        for (int x = 0; x < region.width; x++) {
+    for (isize y = 0; y < region.height; y++) {
+        for (isize x = 0; x < region.width; x++) {
             auto color = _surface->load({region.x + x, region.y + y});
 
             color = Color::fromRgba(
@@ -708,15 +708,15 @@ void Context::brightness(Math::Recti region, double brightness) {
     }
 }
 
-void Context::noise(Math::Recti region, double amount) {
+void Context::noise(Math::Recti region, f64 amount) {
     region = applyAll(region);
 
     Math::Rand rand{0x12341234};
-    uint8_t alpha = 255 * amount;
+    u8 alpha = 255 * amount;
 
-    for (int y = 0; y < region.height; y++) {
-        for (int x = 0; x < region.width; x++) {
-            uint8_t noise = rand.nextU8();
+    for (isize y = 0; y < region.height; y++) {
+        for (isize x = 0; x < region.width; x++) {
+            u8 noise = rand.nextU8();
 
             _surface->blend(
                 {region.x + x, region.y + y},
@@ -725,11 +725,11 @@ void Context::noise(Math::Recti region, double amount) {
     }
 }
 
-void Context::sepia(Math::Recti region, double amount) {
+void Context::sepia(Math::Recti region, f64 amount) {
     region = applyAll(region);
 
-    for (int y = 0; y < region.height; y++) {
-        for (int x = 0; x < region.width; x++) {
+    for (isize y = 0; y < region.height; y++) {
+        for (isize x = 0; x < region.width; x++) {
             auto color = _surface->load({region.x + x, region.y + y});
 
             auto sepiaColor = Color::fromRgba(
@@ -746,8 +746,8 @@ void Context::sepia(Math::Recti region, double amount) {
 void Context::tint(Math::Recti region, Color tint) {
     region = applyAll(region);
 
-    for (int y = 0; y < region.height; y++) {
-        for (int x = 0; x < region.width; x++) {
+    for (isize y = 0; y < region.height; y++) {
+        for (isize x = 0; x < region.width; x++) {
             auto color = _surface->load({region.x + x, region.y + y});
 
             auto tintColor = Color::fromRgba(

@@ -7,18 +7,18 @@
 namespace Karm::Cli {
 
 struct Args {
-    int _argc;
+    isize _argc;
     char const **_argv;
 
     Str self() const {
         return _argv[0];
     }
 
-    size_t len() const {
+    usize len() const {
         return _argc - 1;
     }
 
-    Str operator[](size_t i) const {
+    Str operator[](usize i) const {
         if (i >= len()) {
             panic("out of range");
         }

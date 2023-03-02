@@ -9,10 +9,10 @@ namespace Qoi {
 
 struct Image {
     // magic "qoif"
-    static constexpr Array<uint8_t, 4> MAGIC = {
+    static constexpr Array<u8, 4> MAGIC = {
         0x71, 0x6F, 0x69, 0x66};
 
-    static constexpr Array<uint8_t, 8> END = {
+    static constexpr Array<u8, 8> END = {
         0, 0, 0, 0, 0, 0, 0, 1};
 
     Bytes _slice;
@@ -21,13 +21,13 @@ struct Image {
 
     Bytes magic() const { return begin().nextBytes(4); }
 
-    int width() const { return begin().skip(4).nextBeInt32(); }
+    isize width() const { return begin().skip(4).nextI32be(); }
 
-    int height() const { return begin().skip(8).nextBeInt32(); }
+    isize height() const { return begin().skip(8).nextI32be(); }
 
-    int channels() const { return begin().skip(12).nextBeUint8(); }
+    u8 channels() const { return begin().skip(12).nextU8be(); }
 
-    int colorSpace() const { return begin().skip(13).nextBeUint8(); }
+    u8 colorSpace() const { return begin().skip(13).nextU8be(); }
 
     Image(Bytes slice) : _slice(slice) {}
 
@@ -57,7 +57,7 @@ struct Image {
         return Ok(image);
     }
 
-    enum Chunk : uint8_t {
+    enum Chunk : u8 {
         RGB = 0b11111110,
         RGBA = 0b11111111,
         INDEX = 0b00000000,
@@ -68,19 +68,19 @@ struct Image {
         MASK = 0b11000000,
     };
 
-    size_t hash(Gfx::Color c) {
+    usize hash(Gfx::Color c) {
         return c.red * 3 + c.green * 5 + c.blue * 7 + c.alpha * 11;
     }
 
     [[gnu::flatten]] Res<> decode(Gfx::Surface dest) {
-        size_t run = 0;
+        usize run = 0;
         Array<Gfx::Color, 64> index{};
         Gfx::Color pixel = Gfx::BLACK;
 
         auto s = begin().skip(14);
 
-        for (int y = 0; y < height(); y++) {
-            for (int x = 0; x < width(); x++) {
+        for (isize y = 0; y < height(); y++) {
+            for (isize x = 0; x < width(); x++) {
                 if (s.ended()) {
                     return Error::invalidData("unexpected end of file");
                 }
@@ -91,16 +91,16 @@ struct Image {
                     continue;
                 }
 
-                auto b1 = s.nextBeUint8();
+                auto b1 = s.nextU8be();
                 if (b1 == Chunk::RGB) {
-                    pixel.red = s.nextBeUint8();
-                    pixel.green = s.nextBeUint8();
-                    pixel.blue = s.nextBeUint8();
+                    pixel.red = s.nextU8be();
+                    pixel.green = s.nextU8be();
+                    pixel.blue = s.nextU8be();
                 } else if (b1 == Chunk::RGBA) {
-                    pixel.red = s.nextBeUint8();
-                    pixel.green = s.nextBeUint8();
-                    pixel.blue = s.nextBeUint8();
-                    pixel.alpha = s.nextBeUint8();
+                    pixel.red = s.nextU8be();
+                    pixel.green = s.nextU8be();
+                    pixel.blue = s.nextU8be();
+                    pixel.alpha = s.nextU8be();
                 } else if ((b1 & Chunk::MASK) == Chunk::INDEX) {
                     pixel = index[b1];
                 } else if ((b1 & Chunk::MASK) == Chunk::DIFF) {
@@ -108,7 +108,7 @@ struct Image {
                     pixel.green += ((b1 >> 2) & 0x03) - 2;
                     pixel.blue += (b1 & 0x03) - 2;
                 } else if ((b1 & Chunk::MASK) == Chunk::LUMA) {
-                    auto b2 = s.nextBeUint8();
+                    auto b2 = s.nextU8be();
                     auto vg = (b1 & 0x3f) - 32;
                     pixel.red += vg - 8 + ((b2 >> 4) & 0x0f);
                     pixel.green += vg;

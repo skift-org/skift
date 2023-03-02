@@ -101,7 +101,7 @@ inline Child radioRow(bool value, OnChange<bool> onChange, String title) {
         NONE);
 }
 
-inline Child sliderRow(SliderStyle style, double value, OnChange<double> onChange, String title) {
+inline Child sliderRow(SliderStyle style, f64 value, OnChange<f64> onChange, String title) {
     return row(
         NONE,
         title,
@@ -109,7 +109,7 @@ inline Child sliderRow(SliderStyle style, double value, OnChange<double> onChang
         slider(style, value, std::move(onChange)));
 }
 
-inline Child sliderRow(double value, OnChange<double> onChange, String title) {
+inline Child sliderRow(f64 value, OnChange<f64> onChange, String title) {
     return sliderRow(SliderStyle::regular(), value, std::move(onChange), title);
 }
 

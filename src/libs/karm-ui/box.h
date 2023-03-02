@@ -10,7 +10,7 @@ struct BoxStyle {
     Layout::Spacingi padding{};
 
     Gfx::BorderRadius borderRadius{};
-    double borderWidth{};
+    f64 borderWidth{};
 
     Opt<Gfx::Paint> borderPaint{Gfx::ALPHA};
     Opt<Gfx::Paint> backgroundPaint{};
@@ -34,7 +34,7 @@ struct BoxStyle {
         return copy;
     }
 
-    BoxStyle withBorderWidth(double borderWidth) const {
+    BoxStyle withBorderWidth(f64 borderWidth) const {
         auto copy = *this;
         copy.borderWidth = borderWidth;
         return copy;

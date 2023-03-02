@@ -24,11 +24,11 @@ struct Sched {
         : _tasks{bootTask}, _curr(bootTask), _next(bootTask) {
     }
 
-    Res<> start(Strong<Task> task, uintptr_t ip) {
+    Res<> start(Strong<Task> task, usize ip) {
         return start(task, ip, task->stack().loadSp());
     }
 
-    Res<> start(Strong<Task> task, uintptr_t ip, uintptr_t sp);
+    Res<> start(Strong<Task> task, usize ip, usize sp);
 
     void schedule();
 };

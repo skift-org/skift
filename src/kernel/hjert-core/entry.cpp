@@ -19,7 +19,7 @@ void splash() {
     logInfo("    |__/");
 }
 
-Res<> validateAndDump(uint64_t magic, Handover::Payload &payload) {
+Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
     if (!Handover::valid(magic, payload)) {
         logInfo("entry: handover: invalid");
         return Error::invalidInput("Invalid handover payload");
@@ -28,7 +28,7 @@ Res<> validateAndDump(uint64_t magic, Handover::Payload &payload) {
     logInfo("entry: handover: valid");
     logInfo("entry: handover: agent: '{}'", payload.agentName());
 
-    size_t totalFree = 0;
+    usize totalFree = 0;
     logInfo("entry: dumpying handover records...");
     for (auto const &record : payload) {
         logInfo(
@@ -74,7 +74,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
             continue;
         }
 
-        size_t size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
+        usize size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
 
         if (!!(prog.flags() & Elf::ProgramFlags::WRITE)) {
             auto sectionMem = try$(VNode::alloc(size, Hj::MemFlags::NONE));
@@ -98,7 +98,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
     return Ok();
 }
 
-Res<> init(uint64_t magic, Handover::Payload &payload) {
+Res<> init(u64 magic, Handover::Payload &payload) {
     try$(Arch::init(payload));
 
     splash();
@@ -127,6 +127,6 @@ HandoverRequests$(
     Handover::requestFb(),
     Handover::requestFiles());
 
-Res<> entryPoint(uint64_t magic, Handover::Payload &payload) {
+Res<> entryPoint(u64 magic, Handover::Payload &payload) {
     return Hjert::Core::init(magic, payload);
 }

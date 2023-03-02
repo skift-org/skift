@@ -12,7 +12,7 @@ namespace Karm::Io {
 
 /* --- Read ----------------------------------------------------------------- */
 
-inline Res<size_t> pread(Readable auto &reader, MutBytes bytes, Seek seek) {
+inline Res<usize> pread(Readable auto &reader, MutBytes bytes, Seek seek) {
     auto result = try$(reader.seek(seek));
     return reader.read(bytes);
 }
@@ -27,7 +27,7 @@ inline Res<String> readAllUtf8(Readable auto &reader) {
     StringWriter writer;
     Array<Utf8::Unit, 512> buf;
     while (true) {
-        size_t read = try$(reader.read(buf.mutBytes()));
+        usize read = try$(reader.read(buf.mutBytes()));
         if (read == 0) {
             break;
         }
@@ -38,50 +38,50 @@ inline Res<String> readAllUtf8(Readable auto &reader) {
 
 /* --- Write ---------------------------------------------------------------- */
 
-inline Res<size_t> pwrite(Writable auto &writer, Bytes bytes, Seek seek) {
+inline Res<usize> pwrite(Writable auto &writer, Bytes bytes, Seek seek) {
     auto result = try$(writer.seek(seek));
     return writer.write(bytes);
 }
 
-inline Res<size_t> putByte(Writable auto &writer, Byte byte) {
+inline Res<usize> putByte(Writable auto &writer, Byte byte) {
     return writer.write({&byte, 1});
 }
 
 /* --- Seek ----------------------------------------------------------------- */
 
-inline Res<size_t> tell(Seekable auto &seeker) {
+inline Res<usize> tell(Seekable auto &seeker) {
     return seeker.seek(Seek::fromCurrent(0));
 }
 
-inline Res<size_t> size(Seekable auto &seeker) {
-    size_t current = try$(tell(seeker));
-    size_t end = try$(seeker.seek(Seek::fromEnd(0)));
+inline Res<usize> size(Seekable auto &seeker) {
+    usize current = try$(tell(seeker));
+    usize end = try$(seeker.seek(Seek::fromEnd(0)));
     try$(seeker.seek(Seek::fromBegin(current)));
     return Ok(end);
 }
 
-inline Res<size_t> skip(Seekable auto &seeker, size_t n) {
+inline Res<usize> skip(Seekable auto &seeker, usize n) {
     return seeker.seek(Seek::fromCurrent(n));
 }
 
-inline Res<size_t> skip(Readable auto &reader, size_t n) {
+inline Res<usize> skip(Readable auto &reader, usize n) {
     Sink sink;
     return copy(reader, sink, n);
 }
 
 /* --- Copy ----------------------------------------------------------------- */
 
-inline Res<size_t> copy(Readable auto &reader, MutBytes bytes) {
-    size_t readed = 0;
+inline Res<usize> copy(Readable auto &reader, MutBytes bytes) {
+    usize readed = 0;
     while (readed < bytes.len()) {
         readed += try$(reader.read(next(bytes, readed)));
     }
     return Ok(readed);
 }
 
-inline Res<size_t> copy(Readable auto &reader, Writable auto &writer) {
+inline Res<usize> copy(Readable auto &reader, Writable auto &writer) {
     Array<Byte, 4096> buffer;
-    size_t result = 0;
+    usize result = 0;
     while (true) {
         auto read = try$(reader.read(mutBytes(buffer)));
         if (read == 0) {
@@ -97,9 +97,9 @@ inline Res<size_t> copy(Readable auto &reader, Writable auto &writer) {
     }
 }
 
-inline Res<size_t> copy(Readable auto &reader, Writable auto &writer, size_t size) {
+inline Res<usize> copy(Readable auto &reader, Writable auto &writer, usize size) {
     Array<Bytes, 4096> buffer;
-    size_t result = 0;
+    usize result = 0;
     while (size > 0) {
         auto read = try$(reader.read(sub(buffer, 0, size)));
         if (read == 0) {

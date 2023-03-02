@@ -1,11 +1,10 @@
 #pragma once
 
-#include "_prelude.h"
-
 #include "cons.h"
 #include "iter.h"
 #include "opt.h"
 #include "rc.h"
+#include "std.h"
 
 namespace Karm {
 
@@ -19,7 +18,7 @@ struct List {
         Weak<Node> prev;
     };
 
-    size_t _len = 0;
+    usize _len = 0;
     OptStrong<Node> _head = NONE;
     OptWeak<Node> _tail = NONE;
 
@@ -44,7 +43,7 @@ struct List {
 
     /* --- Capacity --- */
 
-    void truncate(size_t len) {
+    void truncate(usize len) {
         if (len > _len) {
             return;
         }
@@ -57,7 +56,7 @@ struct List {
         }
 
         auto node = _head.unwrap();
-        for (size_t i = 0; i < len - 1; i++) {
+        for (usize i = 0; i < len - 1; i++) {
             node = node->next.unwrap();
         }
 
@@ -74,26 +73,26 @@ struct List {
     /* --- Random Access --- */
 
     template <typename Self>
-    constexpr auto _at(Self *self, size_t index) {
+    constexpr auto _at(Self *self, usize index) {
         if (index >= self->_len) {
             panic("index out of range");
         }
 
         Strong<Node> node = self->_head;
-        for (size_t i = 0; i < index; i++) {
+        for (usize i = 0; i < index; i++) {
             node = node->next;
         }
 
         return node->buf;
     }
 
-    T &at(size_t index) { return _at(this, index); }
+    T &at(usize index) { return _at(this, index); }
 
-    T const &at(size_t index) const { return _at(this, index); }
+    T const &at(usize index) const { return _at(this, index); }
 
-    T &operator[](size_t i) { return at(i); }
+    T &operator[](usize i) { return at(i); }
 
-    T const &operator[](size_t i) const { return at(i); }
+    T const &operator[](usize i) const { return at(i); }
 
     /* --- Back Access --- */
 
@@ -162,9 +161,8 @@ struct List {
                 auto ret = curr->buf;
                 curr = curr->next;
                 return ret;
-            } else {
-                return NONE;
             }
+            return NONE;
         });
     }
 
@@ -175,9 +173,8 @@ struct List {
                 auto ret = curr->buf;
                 curr = curr->prev;
                 return ret;
-            } else {
-                return NONE;
             }
+            return NONE;
         });
     }
 
@@ -191,7 +188,7 @@ struct List {
 
     /* --- Len & Buf --- */
 
-    size_t len() const {
+    usize len() const {
         return _len;
     }
 };

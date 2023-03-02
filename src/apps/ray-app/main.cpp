@@ -16,17 +16,17 @@ using Colorf = Vec3f;
 struct Object;
 
 struct Props {
-    int samples = 1;
-    int bounces = 1;
+    isize samples = 1;
+    isize bounces = 1;
 };
 
 struct Ray3f {
     Vec3f o;
     Vec3f dir;
-    double tMin = 0.001;
-    double tMax = INFINITY;
+    f64 tMin = 0.001;
+    f64 tMax = INFINITY;
 
-    constexpr Vec3f at(double t) const {
+    constexpr Vec3f at(f64 t) const {
         return o + dir * t;
     }
 };
@@ -35,7 +35,7 @@ struct Hit {
     Vec3f in;
     Vec3f pos;
     Vec3f normal;
-    double t;
+    f64 t;
     Object *what = nullptr;
 };
 
@@ -43,15 +43,15 @@ struct Sample {
     Vec3f out{};
     Colorf att{1};
     Colorf emit{0};
-    double pdf{};
+    f64 pdf{};
 };
 
-double randf() {
+f64 randf() {
     static Math::Rand rand;
     return rand.nextFloat();
 }
 
-double randf(double min, double max) {
+f64 randf(f64 min, f64 max) {
     return min + (max - min) * randf();
 }
 
@@ -76,7 +76,7 @@ Vec3f reflect(Vec3f ray, Vec3f surface) {
 
 struct Sphere {
     Vec3f center;
-    double size;
+    f64 size;
 };
 
 Opt<Hit> hit(Sphere const &sphere, Ray3f ray) {
@@ -160,8 +160,8 @@ Colorf sample(Colorf &albedo) {
 
 struct Perlin {
     Vec2f scale;
-    double octaves;
-    double persistence;
+    f64 octaves;
+    f64 persistence;
 };
 
 Colorf sample(Perlin &) {
@@ -185,7 +185,7 @@ Colorf sample(Texture texture) {
 
 struct Roughness {
     Texture albedo;
-    double roughness = 0.0;
+    f64 roughness = 0.0;
 };
 
 Sample eval(Roughness &mat, Hit hit) {
@@ -232,7 +232,7 @@ Sample eval(Material &material, Hit hit) {
 
 /* --- Scene ---------------------------------------------------------------- */
 
-enum struct ObjectFlags : uint32_t {
+enum struct ObjectFlags : u32 {
     NONE = 0,
     INVISIBLE = 1 << 0,
 };
@@ -255,7 +255,7 @@ Opt<Hit> hit(Object const &object, Ray3f ray) {
 
 using Scene = Vec<Object>;
 
-Opt<Hit> hit(Scene &scene, Ray3f ray, Props props, int depth) {
+Opt<Hit> hit(Scene &scene, Ray3f ray, Props props, isize depth) {
     Opt<Hit> closest;
     for (auto &object : scene) {
         auto hit = ::hit(object, ray);
@@ -276,11 +276,11 @@ Opt<Hit> hit(Scene &scene, Ray3f ray, Props props, int depth) {
 struct Cam {
     Math::Vec3f pos;
     Math::Vec3f dir;
-    double focal;
-    double ratio;
+    f64 focal;
+    f64 ratio;
 };
 
-[[gnu::flatten]] Colorf castRay(Ray3f ray, Scene &scene, Props props, int depth) {
+[[gnu::flatten]] Colorf castRay(Ray3f ray, Scene &scene, Props props, isize depth) {
     if (depth == 0) {
         return 0;
     }
@@ -298,26 +298,26 @@ struct Cam {
     return 0;
 
     Vec3f unitDir = ray.dir.norm();
-    double t = 0.5 * (unitDir.y + 1.0);
+    f64 t = 0.5 * (unitDir.y + 1.0);
     return (1.0 - t) * Colorf(1.0) + t * Colorf(0.5, 0.7, 1.0);
 }
 
 Colorf acesTonemap(Colorf color) {
-    double a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14;
+    f64 a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14;
     return (color * (a * color + b)) / (color * (c * color + d) + e);
 }
 
 void renderScene(Cam cam, Scene &scene, Gfx::Surface buf, Props props) {
     auto size = buf.bound().size();
 
-    for (int y = 0; y < size.y; y++) {
-        for (int x = 0; x < size.x; x++) {
+    for (isize y = 0; y < size.y; y++) {
+        for (isize x = 0; x < size.x; x++) {
             // NOTE: size.y - y  because the image is flipped
-            auto uv = (Vec2i{x, size.y - y} / size.cast<double>() - Vec2f{0.5, 0.5});
+            auto uv = (Vec2i{x, size.y - y} / size.cast<f64>() - Vec2f{0.5, 0.5});
 
             Colorf colorf(0.0);
-            for (int i = 0; i < props.samples; i++) {
-                auto uuvv = uv + Vec2f{randf(), randf()} / size.cast<double>();
+            for (isize i = 0; i < props.samples; i++) {
+                auto uuvv = uv + Vec2f{randf(), randf()} / size.cast<f64>();
                 auto dir = Vec3f{uuvv.x * cam.ratio, uuvv.y, -cam.focal}.norm();
                 auto ray = Ray3f{cam.pos, dir};
 
@@ -346,9 +346,9 @@ void renderScene(Cam cam, Scene &scene, Gfx::Surface buf, Props props) {
 }
 
 Res<> entryPoint(CliArgs args) {
-    double scale = 1;
+    f64 scale = 1;
 
-    Media::Image image{Gfx::RGBA8888, Vec2f{1280 * scale, 720 * scale}.cast<int>()};
+    Media::Image image{Gfx::RGBA8888, Vec2f{1280 * scale, 720 * scale}.cast<isize>()};
 
     Props props = {
         .samples = 10,

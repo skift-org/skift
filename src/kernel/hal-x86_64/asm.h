@@ -12,7 +12,7 @@ inline void hlt(void) { asm volatile("hlt"); }
 
 inline void pause(void) { asm volatile("pause"); }
 
-inline void invlpg(size_t addr) {
+inline void invlpg(usize addr) {
     asm volatile("invlpg (%0)" ::"r"(addr)
                  : "memory");
 }
@@ -60,14 +60,14 @@ enum cr4_bit {
 };
 
 #define CR(N)                                         \
-    inline uint64_t rdcr##N(void) {                   \
-        uint64_t value = 0;                           \
+    inline u64 rdcr##N(void) {                        \
+        u64 value = 0;                                \
         asm volatile("mov %%cr" #N ", %0"             \
                      : "=r"(value));                  \
         return value;                                 \
     }                                                 \
                                                       \
-    inline void wrcr##N(uint64_t value) {             \
+    inline void wrcr##N(u64 value) {                  \
         asm volatile("mov %0, %%cr" #N ::"a"(value)); \
     }
 
@@ -93,20 +93,20 @@ enum xcr0_bit {
     XCR0_PKRU_ENABLE = (1 << 9),
 };
 
-inline uint64_t rdxcr(uint32_t i) {
-    uint32_t eax, edx;
+inline u64 rdxcr(u32 i) {
+    u32 eax, edx;
     asm volatile("xgetbv"
 
                  : "=a"(eax), "=d"(edx)
                  : "c"(i)
                  : "memory");
 
-    return eax | ((uint64_t)edx << 32);
+    return eax | ((u64)edx << 32);
 }
 
-inline void wrxcr(uint32_t i, uint64_t value) {
-    uint32_t edx = value >> 32;
-    uint32_t eax = (uint32_t)value;
+inline void wrxcr(u32 i, u64 value) {
+    u32 edx = value >> 32;
+    u32 eax = (u32)value;
     asm volatile("xsetbv"
                  :
                  : "a"(eax), "d"(edx), "c"(i)
@@ -135,7 +135,7 @@ inline void fxrstor(void const *region) {
 
 /* --- Msrs ----------------------------------------------------------------- */
 
-enum struct Msrs : uint64_t {
+enum struct Msrs : u64 {
     APIC = 0x1B,
     EFER = 0xC0000080,
     STAR = 0xC0000081,
@@ -147,22 +147,22 @@ enum struct Msrs : uint64_t {
     KERN_GS_BASE = 0xc0000102,
 };
 
-inline uint64_t rdmsr(Msrs msr) {
+inline u64 rdmsr(Msrs msr) {
 
-    uint32_t low, high;
+    u32 low, high;
     asm volatile("rdmsr"
                  : "=a"(low), "=d"(high)
-                 : "c"((uint64_t)msr));
-    return ((uint64_t)high << 32) | low;
+                 : "c"((u64)msr));
+    return ((u64)high << 32) | low;
 }
 
-inline void wrmsr(Msrs msr, uint64_t value) {
+inline void wrmsr(Msrs msr, u64 value) {
 
-    uint32_t low = value & 0xFFFFFFFF;
-    uint32_t high = value >> 32;
+    u32 low = value & 0xFFFFFFFF;
+    u32 high = value >> 32;
     asm volatile("wrmsr"
                  :
-                 : "c"((uint64_t)msr), "a"(low), "d"(high));
+                 : "c"((u64)msr), "a"(low), "d"(high));
 }
 
 } // namespace x86_64

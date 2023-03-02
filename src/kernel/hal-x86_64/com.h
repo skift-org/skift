@@ -95,11 +95,11 @@ struct Com : public Io::TextWriter<> {
         writeReg(INTERRUPT, WHEN_DATA_AVAILABLE);
     }
 
-    void writeReg(Regs reg, uint8_t value) {
+    void writeReg(Regs reg, u8 value) {
         _io.write8(reg, value);
     }
 
-    uint8_t readReg(Regs reg) {
+    u8 readReg(Regs reg) {
         return _io.read8(reg);
     }
 
@@ -121,19 +121,19 @@ struct Com : public Io::TextWriter<> {
         }
     }
 
-    Res<size_t> putByte(Byte c) {
+    Res<usize> putByte(Byte c) {
         waitWrite();
-        writeReg(DATA, static_cast<uint8_t>(c));
+        writeReg(DATA, static_cast<u8>(c));
 
         return Ok(1uz);
     }
 
-    uint8_t getByte() {
+    u8 getByte() {
         waitRead();
         return readReg(DATA);
     }
 
-    Res<size_t> write(Bytes bytes) override {
+    Res<usize> write(Bytes bytes) override {
         for (auto b : iter(bytes)) {
             try$(putByte(b));
         }

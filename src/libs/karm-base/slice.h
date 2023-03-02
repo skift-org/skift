@@ -5,7 +5,7 @@
 
 namespace Karm {
 
-using Byte = uint8_t;
+using Byte = u8;
 
 inline constexpr Byte operator"" _byte(unsigned long long arg) noexcept {
     return static_cast<Byte>(arg);
@@ -15,7 +15,7 @@ template <typename T, typename U = typename T::Inner>
 concept Sliceable =
     requires(T const &t) {
         typename T::Inner;
-        { t.len() } -> Meta::Same<size_t>;
+        { t.len() } -> Meta::Same<usize>;
         { t.buf() } -> Meta::Same<U const *>;
         { t[0uz] } -> Meta::Same<U const &>;
     };
@@ -24,7 +24,7 @@ template <typename T, typename U = typename T::Inner>
 concept MutSliceable =
     Sliceable<T, U> and
     requires(T &t) {
-        { t.len() } -> Meta::Same<size_t>;
+        { t.len() } -> Meta::Same<usize>;
         { t.buf() } -> Meta::Same<U *>;
         { t[0uz] } -> Meta::Same<U &>;
     };
@@ -34,11 +34,11 @@ struct Slice {
     using Inner = T;
 
     T const *_buf{};
-    size_t _len{};
+    usize _len{};
 
     constexpr Slice() = default;
 
-    constexpr Slice(T const *buf, size_t len)
+    constexpr Slice(T const *buf, usize len)
         : _buf(buf), _len(len) {}
 
     constexpr Slice(T const *begin, T const *end)
@@ -47,7 +47,7 @@ struct Slice {
     constexpr Slice(Sliceable<T> auto const &other)
         : Slice(other.buf(), other.len()) {}
 
-    constexpr T const &operator[](size_t i) const {
+    constexpr T const &operator[](usize i) const {
         return _buf[i];
     }
 
@@ -57,7 +57,7 @@ struct Slice {
 
     constexpr T const *end() const { return _buf + _len; }
 
-    constexpr size_t len() const { return _len; }
+    constexpr usize len() const { return _len; }
 };
 
 template <typename T>
@@ -65,11 +65,11 @@ struct MutSlice {
     using Inner = T;
 
     T *_buf{};
-    size_t _len{};
+    usize _len{};
 
     constexpr MutSlice() = default;
 
-    constexpr MutSlice(T *buf, size_t len)
+    constexpr MutSlice(T *buf, usize len)
         : _buf(buf), _len(len) {}
 
     constexpr MutSlice(T *begin, T *end)
@@ -78,9 +78,9 @@ struct MutSlice {
     constexpr MutSlice(MutSliceable<T> auto &other)
         : MutSlice(other.buf(), other.len()) {}
 
-    constexpr T &operator[](size_t i) { return _buf[i]; }
+    constexpr T &operator[](usize i) { return _buf[i]; }
 
-    constexpr T const &operator[](size_t i) const { return _buf[i]; }
+    constexpr T const &operator[](usize i) const { return _buf[i]; }
 
     constexpr T *buf() { return _buf; }
 
@@ -94,7 +94,7 @@ struct MutSlice {
 
     constexpr T const *end() const { return _buf + _len; }
 
-    constexpr size_t len() const { return _len; }
+    constexpr usize len() const { return _len; }
 };
 
 using Bytes = Slice<Byte>;
@@ -102,7 +102,7 @@ using Bytes = Slice<Byte>;
 using MutBytes = MutSlice<Byte>;
 
 template <Sliceable S, typename T = typename S::Inner>
-Slice<T> sub(S &slice, size_t start, size_t end) {
+Slice<T> sub(S &slice, usize start, usize end) {
     return {
         slice.buf() + start,
         clamp(end, start, slice.len()) - start,
@@ -110,12 +110,12 @@ Slice<T> sub(S &slice, size_t start, size_t end) {
 }
 
 template <Sliceable S, typename T = typename S::Inner>
-Slice<T> next(S &slice, size_t start) {
+Slice<T> next(S &slice, usize start) {
     return sub(slice, start, slice.len());
 }
 
 template <MutSliceable S, typename T = typename S::Inner>
-MutSlice<T> mutSub(S &slice, size_t start, size_t end) {
+MutSlice<T> mutSub(S &slice, usize start, usize end) {
     return {
         slice.buf() + start,
         clamp(end, start, slice.len()) - start,
@@ -123,7 +123,7 @@ MutSlice<T> mutSub(S &slice, size_t start, size_t end) {
 }
 
 template <MutSliceable S, typename T = typename S::Inner>
-MutSlice<T> mutNext(S &slice, size_t start) {
+MutSlice<T> mutNext(S &slice, usize start) {
     return mutSub(slice, start, slice.len());
 }
 
@@ -144,7 +144,7 @@ MutBytes mutBytes(S &slice) {
 }
 
 template <Sliceable S>
-size_t sizeOf(S &slice) {
+usize sizeOf(S &slice) {
     return slice.len() * sizeof(typename S::Inner);
 }
 
@@ -197,7 +197,7 @@ constexpr auto mutIterRev(S &slice) {
     });
 }
 
-constexpr size_t len(Sliceable auto &slice) {
+constexpr usize len(Sliceable auto &slice) {
     return slice.len();
 }
 
@@ -241,19 +241,19 @@ constexpr auto &last(MutSliceable auto &slice) {
     return slice.buf()[slice.len() - 1];
 }
 
-constexpr auto const &at(Sliceable auto &slice, size_t i) {
+constexpr auto const &at(Sliceable auto &slice, usize i) {
     return slice.buf()[i];
 }
 
-constexpr auto &at(MutSliceable auto &slice, size_t i) {
+constexpr auto &at(MutSliceable auto &slice, usize i) {
     return slice.buf()[i];
 }
 
 template <typename T>
-constexpr size_t move(MutSlice<T> src, MutSlice<T> dest) {
-    size_t l = min(len(src), len(dest));
+constexpr usize move(MutSlice<T> src, MutSlice<T> dest) {
+    usize l = min(len(src), len(dest));
 
-    for (size_t i = 0; i < l; i++) {
+    for (usize i = 0; i < l; i++) {
         at(dest, i) = std::move(at(src, i));
     }
 
@@ -261,10 +261,10 @@ constexpr size_t move(MutSlice<T> src, MutSlice<T> dest) {
 }
 
 template <typename T>
-constexpr size_t copy(Slice<T> src, MutSlice<T> dest) {
-    size_t copied = 0;
+constexpr usize copy(Slice<T> src, MutSlice<T> dest) {
+    usize copied = 0;
 
-    for (size_t i = 0; i < min(len(src), len(dest)); i++) {
+    for (usize i = 0; i < min(len(src), len(dest)); i++) {
         at(dest, i) = at(src, i);
         copied++;
     }
@@ -274,14 +274,14 @@ constexpr size_t copy(Slice<T> src, MutSlice<T> dest) {
 
 template <typename T>
 constexpr void reverse(MutSlice<T> slice) {
-    for (size_t i = 0; i < len(slice) / 2; i++) {
+    for (usize i = 0; i < len(slice) / 2; i++) {
         std::swap(at(slice, i), at(slice, len(slice) - i - 1));
     }
 }
 
 template <typename T>
-constexpr size_t fill(MutSlice<T> slice, T value) {
-    for (size_t i = 0; i < len(slice); i++) {
+constexpr usize fill(MutSlice<T> slice, T value) {
+    for (usize i = 0; i < len(slice); i++) {
         at(slice, i) = value;
     }
 
@@ -289,7 +289,7 @@ constexpr size_t fill(MutSlice<T> slice, T value) {
 }
 
 template <typename T>
-constexpr size_t zeroFill(MutSlice<T> slice) {
+constexpr usize zeroFill(MutSlice<T> slice) {
     return fill(slice, {});
 }
 

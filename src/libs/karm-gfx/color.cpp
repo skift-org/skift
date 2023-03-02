@@ -5,16 +5,16 @@
 namespace Karm::Gfx {
 
 Hsv rgbToHsv(Color color) {
-    double r = color.red / 255.0;
-    double g = color.green / 255.0;
-    double b = color.blue / 255.0;
+    f64 r = color.red / 255.0;
+    f64 g = color.green / 255.0;
+    f64 b = color.blue / 255.0;
 
-    double rgbMax = Karm::max(r, g, b);
-    double rgbMin = Karm::min(r, g, b);
+    f64 rgbMax = Karm::max(r, g, b);
+    f64 rgbMin = Karm::min(r, g, b);
 
-    double delta = rgbMax - rgbMin;
+    f64 delta = rgbMax - rgbMin;
 
-    double hue = 0.0f;
+    f64 hue = 0.0f;
     if (delta != 0.0f) {
         if (rgbMax == r) {
             hue = (g - b) / delta;
@@ -30,23 +30,23 @@ Hsv rgbToHsv(Color color) {
         hue += 360.0f;
     }
 
-    double saturation = rgbMax == 0.0f ? 0.0f : delta / rgbMax;
+    f64 saturation = rgbMax == 0.0f ? 0.0f : delta / rgbMax;
 
     return {hue, saturation, rgbMax};
 }
 
 Color hsvToRgb(Hsv hsv) {
-    double h = hsv.hue;
-    double s = hsv.saturation;
-    double v = hsv.value;
+    f64 h = hsv.hue;
+    f64 s = hsv.saturation;
+    f64 v = hsv.value;
 
-    double c = v * s;
-    double x = c * (1.0f - Math::abs(fmod(h / 60.0f, 2.0f) - 1.0f));
-    double m = v - c;
+    f64 c = v * s;
+    f64 x = c * (1.0f - Math::abs(fmod(h / 60.0f, 2.0f) - 1.0f));
+    f64 m = v - c;
 
-    double r = 0.0f;
-    double g = 0.0f;
-    double b = 0.0f;
+    f64 r = 0.0f;
+    f64 g = 0.0f;
+    f64 b = 0.0f;
 
     if (h < 60.0f) {
         r = c;
@@ -69,9 +69,9 @@ Color hsvToRgb(Hsv hsv) {
     }
 
     return {
-        static_cast<uint8_t>((r + m) * 255.0f),
-        static_cast<uint8_t>((g + m) * 255.0f),
-        static_cast<uint8_t>((b + m) * 255.0f),
+        static_cast<u8>((r + m) * 255.0f),
+        static_cast<u8>((g + m) * 255.0f),
+        static_cast<u8>((b + m) * 255.0f),
         255,
     };
 }

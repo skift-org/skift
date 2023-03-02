@@ -5,7 +5,7 @@
 #include <karm-base/string.h>
 
 struct BScan {
-    Cursor<uint8_t> _cursor;
+    Cursor<u8> _cursor;
 
     BScan(Bytes bytes) : _cursor(bytes) {}
 
@@ -13,43 +13,43 @@ struct BScan {
         return _cursor.ended();
     }
 
-    size_t rem() {
+    usize rem() {
         return _cursor.rem();
     }
 
-    BScan &skip(size_t n) {
+    BScan &skip(usize n) {
         n = min(n, rem());
         _cursor.next(n);
         return *this;
     }
 
-    BScan peek(size_t n) {
+    BScan peek(usize n) {
         BScan c{*this};
         c.skip(n);
         return c;
     }
 
     template <typename T>
-    bool readTo(T *buf, size_t n) {
+    bool readTo(T *buf, usize n) {
         if (rem() < n) {
             return false;
         }
 
-        uint8_t *b = reinterpret_cast<uint8_t *>(buf);
-        for (size_t i = 0; i < n; i++) {
+        u8 *b = reinterpret_cast<u8 *>(buf);
+        for (usize i = 0; i < n; i++) {
             b[i] = _cursor.next();
         }
         return true;
     }
 
     template <typename T>
-    bool peekTo(T *buf, size_t n) {
+    bool peekTo(T *buf, usize n) {
         if (rem() < n) {
             return false;
         }
 
-        uint8_t *b = reinterpret_cast<uint8_t *>(buf);
-        for (size_t i = 0; i < n; i++) {
+        u8 *b = reinterpret_cast<u8 *>(buf);
+        for (usize i = 0; i < n; i++) {
             b[i] = _cursor.buf()[i];
         }
         return true;
@@ -57,73 +57,73 @@ struct BScan {
 
     template <typename T>
     T nextBe() {
-        _Be<T> r{};
+        _be<T> r{};
         readTo(&r, sizeof(T));
         return r;
     }
 
     template <typename T>
     T nextLe() {
-        _Le<T> r;
+        _le<T> r;
         readTo(&r, sizeof(T));
         return r;
     }
 
     template <typename T>
     T peekBe() {
-        _Be<T> r{};
+        _be<T> r{};
         peekTo(&r, sizeof(T));
         return r;
     }
 
     template <typename T>
     T peekLe() {
-        _Le<T> r;
+        _be<T> r;
         peekTo(&r, sizeof(T));
         return r;
     }
 
-    uint8_t nextBeUint8() { return nextBe<uint8_t>(); }
-    uint16_t nextBeUint16() { return nextBe<uint16_t>(); }
-    uint32_t nextBeUint32() { return nextBe<uint32_t>(); }
-    uint64_t nextBeUint64() { return nextBe<uint64_t>(); }
+    u8 nextU8be() { return nextBe<u8>(); }
+    u16 nextU16be() { return nextBe<u16>(); }
+    u32 nextU32be() { return nextBe<u32>(); }
+    u64 nextU64be() { return nextBe<u64>(); }
 
-    uint8_t nextLeUint8() { return nextLe<uint8_t>(); }
-    uint16_t nextLeUint16() { return nextLe<uint16_t>(); }
-    uint32_t nextLeUint32() { return nextLe<uint32_t>(); }
-    uint64_t nextLeUint64() { return nextLe<uint64_t>(); }
+    u8 nextU8le() { return nextLe<u8>(); }
+    u16 nextU16le() { return nextLe<u16>(); }
+    u32 nextU32le() { return nextLe<u32>(); }
+    u64 nextU64le() { return nextLe<u64>(); }
 
-    int8_t nextBeInt8() { return nextBe<int8_t>(); }
-    int16_t nextBeInt16() { return nextBe<int16_t>(); }
-    int32_t nextBeInt32() { return nextBe<int32_t>(); }
-    int64_t nextBeInt64() { return nextBe<int64_t>(); }
+    i8 nextI8be() { return nextBe<i8>(); }
+    i16 nextI16be() { return nextBe<i16>(); }
+    i32 nextI32be() { return nextBe<i32>(); }
+    i64 nextI64be() { return nextBe<i64>(); }
 
-    int8_t nextLeInt8() { return nextLe<int8_t>(); }
-    int16_t nextLeInt16() { return nextLe<int16_t>(); }
-    int32_t nextLeInt32() { return nextLe<int32_t>(); }
-    int64_t nextLeInt64() { return nextLe<int64_t>(); }
+    i8 nextI8le() { return nextLe<i8>(); }
+    i16 nextI16le() { return nextLe<i16>(); }
+    i32 nextI32le() { return nextLe<i32>(); }
+    i64 nextI64le() { return nextLe<i64>(); }
 
-    uint8_t peekBeUint8() { return peekBe<uint8_t>(); }
-    uint16_t peekBeUint16() { return peekBe<uint16_t>(); }
-    uint32_t peekBeUint32() { return peekBe<uint32_t>(); }
-    uint64_t peekBeUint64() { return peekBe<uint64_t>(); }
+    u8 peekU8be() { return peekBe<u8>(); }
+    u16 peekU16be() { return peekBe<u16>(); }
+    u32 peekU32be() { return peekBe<u32>(); }
+    u64 peekU64be() { return peekBe<u64>(); }
 
-    uint8_t peekLeUint8() { return peekLe<uint8_t>(); }
-    uint16_t peekLeUint16() { return peekLe<uint16_t>(); }
-    uint32_t peekLeUint32() { return peekLe<uint32_t>(); }
-    uint64_t peekLeUint64() { return peekLe<uint64_t>(); }
+    u8 peekU8le() { return peekLe<u8>(); }
+    u16 peekU16le() { return peekLe<u16>(); }
+    u32 peekU32le() { return peekLe<u32>(); }
+    u64 peekU64le() { return peekLe<u64>(); }
 
-    int8_t peekBeInt8() { return peekBe<int8_t>(); }
-    int16_t peekBeInt16() { return peekBe<int16_t>(); }
-    int32_t peekBeInt32() { return peekBe<int32_t>(); }
-    int64_t peekBeInt64() { return peekBe<int64_t>(); }
+    i8 peekI8be() { return peekBe<i8>(); }
+    i16 peekI16be() { return peekBe<i16>(); }
+    i32 peekI32be() { return peekBe<i32>(); }
+    i64 peekI64be() { return peekBe<i64>(); }
 
-    int8_t peekLeInt8() { return peekLe<int8_t>(); }
-    int16_t peekLeInt16() { return peekLe<int16_t>(); }
-    int32_t peekLeInt32() { return peekLe<int32_t>(); }
-    int64_t peekLeInt64() { return peekLe<int64_t>(); }
+    i8 peekI8le() { return peekLe<i8>(); }
+    i16 peekI16le() { return peekLe<i16>(); }
+    i32 peekI32le() { return peekLe<i32>(); }
+    i64 peekI64le() { return peekLe<i64>(); }
 
-    Str nextStr(size_t n) {
+    Str nextStr(usize n) {
         n = clamp(n, 0uz, rem());
         Str s{(char const *)_cursor.buf(), n};
         _cursor.next(n);
@@ -131,14 +131,14 @@ struct BScan {
     }
 
     Str nextCStr() {
-        size_t n = 0;
+        usize n = 0;
         while (n < rem() and _cursor.buf()[n] != '\0') {
             n++;
         }
         return nextStr(n);
     }
 
-    Bytes nextBytes(size_t n) {
+    Bytes nextBytes(usize n) {
         n = clamp(n, 0uz, rem());
         Bytes b{_cursor.buf(), n};
         _cursor.next(n);

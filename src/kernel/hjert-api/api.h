@@ -49,7 +49,7 @@ enum struct Syscall {
     _LEN,
 };
 
-using Arg = uintptr_t;
+using Arg = usize;
 
 using Args = Array<Arg, 6>;
 
@@ -85,9 +85,9 @@ inline constexpr Cap SELF = Cap{0};
 
 Res<> syscall(Syscall syscall, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4 = 0, Arg a5 = 0);
 
-Res<> log(char const *msg, size_t len);
+Res<> log(char const *msg, usize len);
 
-Res<> createDomain(Cap dest, Cap *cap, size_t len = 512);
+Res<> createDomain(Cap dest, Cap *cap, usize len = 512);
 
 Res<> createTask(Cap dest, Cap *cap, Cap node, Cap space);
 
@@ -102,15 +102,15 @@ enum struct MemFlags : Arg {
 
 FlagsEnum$(MemFlags);
 
-Res<> createMem(Cap dest, Cap *cap, uintptr_t phys, size_t len, MemFlags flags = MemFlags::NONE);
+Res<> createMem(Cap dest, Cap *cap, usize phys, usize len, MemFlags flags = MemFlags::NONE);
 
-Res<> createIo(Cap dest, Cap *cap, uintptr_t base, size_t len);
+Res<> createIo(Cap dest, Cap *cap, usize base, usize len);
 
 Res<> drop(Cap cap);
 
 Res<> dup(Cap node, Cap *dst, Cap src);
 
-Res<> start(Cap cap, uintptr_t ip, uintptr_t sp, Args const *args);
+Res<> start(Cap cap, usize ip, usize sp, Args const *args);
 
 Res<> wait(Cap cap, Arg *ret);
 
@@ -118,9 +118,9 @@ Res<> ret(Cap cap, Arg ret);
 
 using MapFlags = Hal::VmmFlags;
 
-Res<> map(Cap cap, uintptr_t *virt, Cap mem, uintptr_t off, size_t len, MapFlags flags = MapFlags::NONE);
+Res<> map(Cap cap, usize *virt, Cap mem, usize off, usize len, MapFlags flags = MapFlags::NONE);
 
-Res<> unmap(Cap cap, uintptr_t virt, size_t len);
+Res<> unmap(Cap cap, usize virt, usize len);
 
 enum struct IoLen : Arg {
     U8,
@@ -129,9 +129,9 @@ enum struct IoLen : Arg {
     U64,
 };
 
-Res<> in(Cap cap, IoLen len, uintptr_t port, Arg *val);
+Res<> in(Cap cap, IoLen len, usize port, Arg *val);
 
-Res<> out(Cap cap, IoLen len, uintptr_t port, Arg val);
+Res<> out(Cap cap, IoLen len, usize port, Arg val);
 
 enum IpcFlags : Arg {
     NONE = 0,

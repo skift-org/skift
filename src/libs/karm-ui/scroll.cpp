@@ -44,7 +44,7 @@ struct Scroll : public ProxyNode<Scroll> {
 
                 if (not ee.accepted) {
                     if (ee.type == Events::MouseEvent::SCROLL) {
-                        scroll((_scroll + ee.scrollPrecise * 16).cast<int>());
+                        scroll((_scroll + ee.scrollPrecise * 16).cast<isize>());
                         shouldAnimate(*this);
                         _animated = true;
                     }
@@ -119,10 +119,10 @@ Child vscroll(Child child) {
 /* --- List ----------------------------------------------------------------- */
 
 struct List : public GroupNode<List> {
-    size_t _count;
+    usize _count;
     BuildItem _builder;
 
-    List(size_t count, BuildItem builder)
+    List(usize count, BuildItem builder)
         : _count(count),
           _builder(std::move(builder)) {}
 };

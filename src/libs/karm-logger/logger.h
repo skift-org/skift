@@ -8,7 +8,7 @@
 namespace Karm {
 
 struct Level {
-    int value;
+    isize value;
     char const *name;
     Cli::Style style;
 };

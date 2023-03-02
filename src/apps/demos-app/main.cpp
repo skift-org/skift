@@ -76,13 +76,13 @@ static Array demos = {
                 [](Gfx::Context &g, Math::Vec2i size) {
                     Math::Rand rand{};
 
-                    for (int i = 0; i < 10; i++) {
-                        double s = rand.nextInt(4, 10);
+                    for (isize i = 0; i < 10; i++) {
+                        f64 s = rand.nextInt(4, 10);
                         s *= s;
 
                         g.begin();
                         g.ellipse({
-                            rand.nextVec2(size).cast<double>(),
+                            rand.nextVec2(size).cast<f64>(),
                             s,
                         });
 
@@ -194,10 +194,10 @@ static Array demos = {
                 slider);
 
             return Ui::vflow(8, title, list) |
-                Ui::maxSize({420, Ui::UNCONSTRAINED}) |
-                Ui::grow() |
-                Ui::hcenter() |
-                Ui::vscroll();
+                   Ui::maxSize({420, Ui::UNCONSTRAINED}) |
+                   Ui::grow() |
+                   Ui::hcenter() |
+                   Ui::vscroll();
         },
     },
     Demo{
@@ -261,11 +261,11 @@ static Array demos = {
     }};
 
 struct State {
-    size_t current = 0;
+    usize current = 0;
 };
 
 struct SwitchAction {
-    size_t index;
+    usize index;
 };
 
 using Actions = Var<SwitchAction>;
@@ -282,7 +282,7 @@ using Model = Ui::Model<State, Actions>;
 Ui::Child sidebar(State s) {
     Ui::Children items =
         iter(demos)
-            .mapi([&](size_t index, Demo const &demo) {
+            .mapi([&](usize index, Demo const &demo) {
                 return Ui::navRow(index == s.current, Model::bind<SwitchAction>(index), demo.icon, demo.name);
             })
             .collect<Ui::Children>();

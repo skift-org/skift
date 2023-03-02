@@ -16,7 +16,7 @@ struct Cursor {
     Cursor(Sliceable<T> auto &slice)
         : _begin(begin(slice)), _end(end(slice)) {}
 
-    constexpr T const &operator[](size_t i) const {
+    constexpr T const &operator[](usize i) const {
         return _begin[i];
     }
 
@@ -26,7 +26,7 @@ struct Cursor {
         return _begin >= _end;
     }
 
-    size_t rem() const {
+    usize rem() const {
         return _end - _begin;
     }
 
@@ -46,8 +46,8 @@ struct Cursor {
         return r;
     }
 
-    void next(size_t n) {
-        for (size_t i = 0; i < n; i++)
+    void next(usize n) {
+        for (usize i = 0; i < n; i++)
             next();
     }
 
@@ -55,7 +55,7 @@ struct Cursor {
         return _begin;
     }
 
-    constexpr size_t len() const {
+    constexpr usize len() const {
         return _end - _begin;
     }
 };
@@ -68,11 +68,11 @@ struct MutCursor {
     MutCursor(MutSliceable<T> auto &slice)
         : _begin(begin(slice)), _end(end(slice)) {}
 
-    constexpr T &operator[](size_t i) {
+    constexpr T &operator[](usize i) {
         return _begin[i];
     }
 
-    constexpr T const &operator[](size_t i) const {
+    constexpr T const &operator[](usize i) const {
         return _begin[i];
     }
 
@@ -84,7 +84,7 @@ struct MutCursor {
         return _begin == _end;
     }
 
-    size_t rem() const {
+    usize rem() const {
         return _end - _begin;
     }
 
@@ -109,7 +109,7 @@ struct MutCursor {
         ++_begin;
     }
 
-    void skip(size_t n) {
+    void skip(usize n) {
         _begin += n;
     }
 
@@ -121,7 +121,7 @@ struct MutCursor {
         return _begin;
     }
 
-    constexpr size_t len() const {
+    constexpr usize len() const {
         return _end - _begin;
     }
 };

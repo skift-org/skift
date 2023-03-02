@@ -98,7 +98,7 @@ struct Align : public ProxyNode<Align> {
     void layout(Math::Recti bound) override {
         auto childSize = child().size(bound.size(), _child.is<Grow>() ? Layout::Hint::MAX : Layout::Hint::MIN);
         child()
-            .layout(_align.apply<int>(
+            .layout(_align.apply<isize>(
                 Layout::Flow::LEFT_TO_RIGHT,
                 childSize,
                 bound));
@@ -199,7 +199,7 @@ Child minSize(Math::Vec2i size, Child child) {
     return makeStrong<Sizing>(size, UNCONSTRAINED, child);
 }
 
-Child minSize(int size, Child child) {
+Child minSize(isize size, Child child) {
     return minSize(Math::Vec2i{size}, child);
 }
 
@@ -207,7 +207,7 @@ Child maxSize(Math::Vec2i size, Child child) {
     return makeStrong<Sizing>(UNCONSTRAINED, size, child);
 }
 
-Child maxSize(int size, Child child) {
+Child maxSize(isize size, Child child) {
     return maxSize(Math::Vec2i{size}, child);
 }
 
@@ -215,7 +215,7 @@ Child pinSize(Math::Vec2i size, Child child) {
     return makeStrong<Sizing>(size, size, child);
 }
 
-Child pinSize(int size, Child child) {
+Child pinSize(isize size, Child child) {
     return minSize(Math::Vec2i{size}, child);
 }
 
@@ -259,9 +259,9 @@ Child spacing(Layout::Spacingi s, Child child) {
 /* --- Aspect Ratio --------------------------------------------------------- */
 
 struct AspectRatio : public ProxyNode<AspectRatio> {
-    double _ratio;
+    f64 _ratio;
 
-    AspectRatio(double ratio, Child child)
+    AspectRatio(f64 ratio, Child child)
         : ProxyNode(child), _ratio(ratio) {}
 
     void reconcile(AspectRatio &o) override {
@@ -282,17 +282,17 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
         auto childSize = child().size(s, hint);
-        auto childRatio = (double)childSize.x / (double)childSize.y;
+        auto childRatio = (f64)childSize.x / (f64)childSize.y;
 
         if (childRatio > _ratio) {
             return Math::Vec2i{
-                (int)(s.y * _ratio),
+                (isize)(s.y * _ratio),
                 s.y,
             };
         } else {
             return Math::Vec2i{
                 s.x,
-                (int)(s.x / _ratio),
+                (isize)(s.x / _ratio),
             };
         }
     }
@@ -302,7 +302,7 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
     }
 };
 
-Child aspectRatio(double ratio, Child child) {
+Child aspectRatio(f64 ratio, Child child) {
     return makeStrong<AspectRatio>(ratio, child);
 }
 
@@ -415,13 +415,13 @@ Child dock(Children children) {
 /* --- Flow ----------------------------------------------------------------- */
 
 struct Grow : public ProxyNode<Grow> {
-    int _grow;
+    isize _grow;
 
     Grow(Child child) : ProxyNode(child), _grow(1) {}
 
-    Grow(int grow, Child child) : ProxyNode(child), _grow(grow) {}
+    Grow(isize grow, Child child) : ProxyNode(child), _grow(grow) {}
 
-    int grow() const {
+    isize grow() const {
         return _grow;
     }
 };
@@ -434,7 +434,7 @@ Child grow(Opt<Child> child) {
         }));
 }
 
-Child grow(int grow, Opt<Child> child) {
+Child grow(isize grow, Opt<Child> child) {
     return makeStrong<Grow>(
         grow,
         tryOrElse(
@@ -452,9 +452,9 @@ struct FlowLayout : public GroupNode<FlowLayout> {
     FlowLayout(FlowStyle style, Children children)
         : GroupNode(children), _style(style) {}
 
-    int computeGrowUnit(Math::Recti r) {
-        int total = 0;
-        int grows = 0;
+    isize computeGrowUnit(Math::Recti r) {
+        isize total = 0;
+        isize grows = 0;
 
         for (auto &child : children()) {
             if (child.is<Grow>()) {
@@ -464,16 +464,16 @@ struct FlowLayout : public GroupNode<FlowLayout> {
             }
         }
 
-        int all = _style.flow.getWidth(r) - _style.gaps * (max(1uz, children().len()) - 1);
-        int growTotal = max(0, all - total);
+        isize all = _style.flow.getWidth(r) - _style.gaps * (max(1uz, children().len()) - 1);
+        isize growTotal = max(0, all - total);
         return (growTotal) / max(1, grows);
     }
 
     void layout(Math::Recti r) override {
         _bound = r;
 
-        int growUnit = computeGrowUnit(r);
-        int start = _style.flow.getStart(r);
+        isize growUnit = computeGrowUnit(r);
+        isize start = _style.flow.getStart(r);
 
         for (auto &child : children()) {
             Math::Recti inner = {};
@@ -495,8 +495,8 @@ struct FlowLayout : public GroupNode<FlowLayout> {
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
-        int w{};
-        int h{hint == Layout::Hint::MAX ? _style.flow.getY(s) : 0};
+        isize w{};
+        isize h{hint == Layout::Hint::MAX ? _style.flow.getY(s) : 0};
         bool grow = false;
 
         for (auto &child : children()) {
@@ -551,9 +551,9 @@ Child cell(Math::Vec2i start, Math::Vec2i end, Child child) {
 
 struct GridLayout : public GroupNode<GridLayout> {
     struct _Dim {
-        int start;
-        int size;
-        int end() const {
+        isize start;
+        isize size;
+        isize end() const {
             return start + size;
         }
     };
@@ -565,9 +565,9 @@ struct GridLayout : public GroupNode<GridLayout> {
     GridLayout(GridStyle style, Children children)
         : GroupNode(children), _style(style) {}
 
-    int computeGrowUnitRows(Math::Recti r) {
-        int total = 0;
-        int grows = 0;
+    isize computeGrowUnitRows(Math::Recti r) {
+        isize total = 0;
+        isize grows = 0;
 
         for (auto &row : _style.rows) {
             if (row.unit == GridUnit::GROW) {
@@ -577,14 +577,14 @@ struct GridLayout : public GroupNode<GridLayout> {
             }
         }
 
-        int all = _style.flow.getHeight(r) - _style.gaps.y * (max(1uz, _style.rows.len()) - 1);
-        int growTotal = max(0, all - total);
+        isize all = _style.flow.getHeight(r) - _style.gaps.y * (max(1uz, _style.rows.len()) - 1);
+        isize growTotal = max(0, all - total);
         return (growTotal) / max(1, grows);
     }
 
-    int computeGrowUnitColumns(Math::Recti r) {
-        int total = 0;
-        int grows = 0;
+    isize computeGrowUnitColumns(Math::Recti r) {
+        isize total = 0;
+        isize grows = 0;
 
         for (auto &column : _style.columns) {
             if (column.unit == GridUnit::GROW) {
@@ -594,8 +594,8 @@ struct GridLayout : public GroupNode<GridLayout> {
             }
         }
 
-        int all = _style.flow.getWidth(r) - _style.gaps.x * (max(1uz, _style.columns.len()) - 1);
-        int growTotal = max(0, all - total);
+        isize all = _style.flow.getWidth(r) - _style.gaps.x * (max(1uz, _style.columns.len()) - 1);
+        isize growTotal = max(0, all - total);
         return (growTotal) / max(1, grows);
     }
 
@@ -606,11 +606,11 @@ struct GridLayout : public GroupNode<GridLayout> {
         _rows.clear();
         _columns.clear();
 
-        int growUnitRows = computeGrowUnitRows(r);
-        int growUnitColumns = computeGrowUnitColumns(r);
+        isize growUnitRows = computeGrowUnitRows(r);
+        isize growUnitColumns = computeGrowUnitColumns(r);
 
-        int row = _style.flow.getTop(r);
-        int column = _style.flow.getStart(r);
+        isize row = _style.flow.getTop(r);
+        isize column = _style.flow.getStart(r);
 
         for (auto &r : _style.rows) {
             if (r.unit == GridUnit::GROW) {
@@ -637,7 +637,7 @@ struct GridLayout : public GroupNode<GridLayout> {
         }
 
         // layout the children
-        int index = 0;
+        isize index = 0;
         for (auto &child : children()) {
             if (child.is<Cell>()) {
                 auto &cell = child.unwrap<Cell>();
@@ -681,13 +681,13 @@ struct GridLayout : public GroupNode<GridLayout> {
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
-        int growUnitRows = computeGrowUnitRows(Math::Recti{0, s});
-        int growUnitColumns = computeGrowUnitColumns(Math::Recti{0, s});
+        isize growUnitRows = computeGrowUnitRows(Math::Recti{0, s});
+        isize growUnitColumns = computeGrowUnitColumns(Math::Recti{0, s});
 
-        int row = 0;
+        isize row = 0;
         bool rowGrow = false;
 
-        int column = 0;
+        isize column = 0;
         bool columnGrow = false;
 
         for (auto &r : _style.rows) {

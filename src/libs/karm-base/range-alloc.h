@@ -11,7 +11,7 @@ struct RangeAlloc {
     Vec<R> _r;
 
     void used(R range) {
-        for (size_t i = 0; i < _r.len(); i++) {
+        for (usize i = 0; i < _r.len(); i++) {
             R curr = _r[i];
 
             if (Op::eq(curr, range)) {
@@ -36,8 +36,8 @@ struct RangeAlloc {
         }
     }
 
-    Res<R> alloc(size_t size) {
-        for (size_t i = 0; i < _r.len(); i++) {
+    Res<R> alloc(usize size) {
+        for (usize i = 0; i < _r.len(); i++) {
             if (_r[i].size == size) {
                 R result = _r[i];
                 _r.removeAt(i);
@@ -55,7 +55,7 @@ struct RangeAlloc {
         return Error::outOfMemory();
     }
 
-    void compress(size_t start) {
+    void compress(usize start) {
         while (start + 1 < _r.len() && _r[start].contigous(_r[start + 1])) {
             _r[start] = _r[start].merge(_r[start + 1]);
             _r.removeAt(start + 1);
@@ -68,7 +68,7 @@ struct RangeAlloc {
     }
 
     void unused(R range) {
-        for (size_t i = 0; i < _r.len(); i++) {
+        for (usize i = 0; i < _r.len(); i++) {
             if (_r[i].contigous(range)) {
                 _r[i] = _r[i].merge(range);
                 compress(i);

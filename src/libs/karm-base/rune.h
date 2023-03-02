@@ -3,25 +3,24 @@
 #include <karm-meta/id.h>
 #include <karm-meta/traits.h>
 
-#include "_prelude.h"
-
 #include "array.h"
 #include "buf.h"
 #include "cursor.h"
+#include "std.h"
 
 namespace Karm {
 
-using Rune = uint32_t;
+using Rune = u32;
 
 template <typename T>
 concept StaticEncoding = requires(T t, Rune &r, typename T::Unit u, Cursor<typename T::Unit> &c, MutCursor<typename T::Unit> &m) {
-                             { T::unitLen(u) } -> Meta::Same<size_t>;
-                             { T::runeLen(r) } -> Meta::Same<size_t>;
+                             { T::unitLen(u) } -> Meta::Same<usize>;
+                             { T::runeLen(r) } -> Meta::Same<usize>;
                              { T::decodeUnit(r, c) } -> Meta::Same<bool>;
                              { T::encodeUnit(Rune{}, m) } -> Meta::Same<bool>;
                          };
 
-template <typename U, size_t N>
+template <typename U, usize N>
 struct _Multiple {
     using Inner = U;
     using Unit = U;
@@ -32,13 +31,13 @@ struct _Multiple {
         _buf.emplace(_buf.len(), u);
     }
 
-    constexpr Unit &operator[](size_t i) { return _buf[i]; }
-    constexpr Unit const &operator[](size_t i) const { return _buf[i]; }
+    constexpr Unit &operator[](usize i) { return _buf[i]; }
+    constexpr Unit const &operator[](usize i) const { return _buf[i]; }
 
     constexpr Unit *buf() { return _buf.buf(); }
     constexpr Unit const *buf() const { return _buf.buf(); }
-    constexpr size_t len() const { return _buf.len(); }
-    constexpr size_t rem() const { return N - len(); }
+    constexpr usize len() const { return _buf.len(); }
+    constexpr usize rem() const { return N - len(); }
 };
 
 template <typename U>
@@ -60,12 +59,12 @@ struct _Single {
         return _buf;
     }
 
-    constexpr Unit &operator[](size_t) { return _buf; }
-    constexpr Unit const &operator[](size_t) const { return _buf; }
+    constexpr Unit &operator[](usize) { return _buf; }
+    constexpr Unit const &operator[](usize) const { return _buf; }
 
     constexpr Unit *buf() { return &_buf; }
     constexpr Unit const *buf() const { return &_buf; }
-    constexpr size_t len() const { return 1; }
+    constexpr usize len() const { return 1; }
 };
 
 template <typename T, typename U>
@@ -85,7 +84,7 @@ struct Utf8 {
     using Unit = char;
     using One = _Multiple<Unit, 4>;
 
-    static constexpr size_t unitLen(Unit first) {
+    static constexpr usize unitLen(Unit first) {
         if ((first & 0xf8) == 0xf0)
             return 4;
         else if ((first & 0xf0) == 0xe0)
@@ -96,7 +95,7 @@ struct Utf8 {
             return 1;
     }
 
-    static constexpr size_t runeLen(Rune rune) {
+    static constexpr usize runeLen(Rune rune) {
         if (rune <= 0x7f)
             return 1;
         else if (rune <= 0x7ff)
@@ -172,17 +171,17 @@ static_assert(StaticEncoding<Utf8>);
 /* --- Utf16 ---------------------------------------------------------------- */
 
 struct Utf16 {
-    using Unit = uint16_t;
+    using Unit = u16;
     using One = _Multiple<Unit, 2>;
 
-    static constexpr size_t unitLen(Unit first) {
+    static constexpr usize unitLen(Unit first) {
         if (first >= 0xd800 and first <= 0xdbff)
             return 2;
         else
             return 1;
     }
 
-    static constexpr size_t runeLen(Rune rune) {
+    static constexpr usize runeLen(Rune rune) {
         if (rune <= 0xffff)
             return 1;
         else
@@ -240,11 +239,11 @@ struct Utf32 {
     using Unit = char32_t;
     using One = _Single<Unit>;
 
-    static constexpr size_t unitLen(Unit) {
+    static constexpr usize unitLen(Unit) {
         return 1;
     }
 
-    static constexpr size_t runeLen(Rune) {
+    static constexpr usize runeLen(Rune) {
         return 1;
     }
 
@@ -269,11 +268,11 @@ struct Pure {
     using Unit = Rune;
     using One = _Single<Unit>;
 
-    static constexpr size_t unitLen(Unit) {
+    static constexpr usize unitLen(Unit) {
         return 1;
     }
 
-    static constexpr size_t runeLen(Rune) {
+    static constexpr usize runeLen(Rune) {
         return 1;
     }
 
@@ -298,11 +297,11 @@ struct Ascii {
     using Unit = char;
     using One = _Single<Unit>;
 
-    static constexpr size_t unitLen(Unit) {
+    static constexpr usize unitLen(Unit) {
         return 1;
     }
 
-    static constexpr size_t runeLen(Rune) {
+    static constexpr usize runeLen(Rune) {
         return 1;
     }
 
@@ -336,14 +335,14 @@ static_assert(StaticEncoding<Ascii>);
 
 template <typename Mapper>
 struct EAscii {
-    using Unit = uint8_t;
+    using Unit = u8;
     using One = _Single<Unit>;
 
-    static constexpr size_t unitLen(Unit) {
+    static constexpr usize unitLen(Unit) {
         return 1;
     }
 
-    static constexpr size_t runeLen(Rune) {
+    static constexpr usize runeLen(Rune) {
         return 1;
     }
 
@@ -355,7 +354,7 @@ struct EAscii {
 
     static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
         Mapper mapper;
-        for (size_t i = 0; i <= 255; i++) {
+        for (usize i = 0; i <= 255; i++) {
             if (mapper(i) == c) {
                 out.put(i);
                 return true;
@@ -370,7 +369,7 @@ struct EAscii {
 
 // clang-format off
 
-using Ibm437Mapper = decltype([](uint8_t c) {
+using Ibm437Mapper = decltype([](u8 c) {
     Array<char32_t, 256> mappings = {
         U'\0', U'☺', U'☻', U'♥', U'♦', U'♣', U'♠', U'•',
         U'◘', U'○', U'◙', U'♂', U'♀', U'♪', U'♫', U'☼',
@@ -419,7 +418,7 @@ static_assert(StaticEncoding<Ibm437>);
 
 /* --- Latin1 --------------------------------------------------------------- */
 
-using Latin1Mapper = decltype([](uint8_t c) {
+using Latin1Mapper = decltype([](u8 c) {
     // HACK: """"Unicode is a "superset" of Latin1""" (please note the quotes)
     return (Rune)c;
 });
@@ -433,8 +432,8 @@ static_assert(StaticEncoding<Latin1>);
 /* --- Utilities ------------------------------------------------------------ */
 
 template <StaticEncoding Source, StaticEncoding Target>
-size_t transcodeLen(Cursor<typename Source::Unit> input) {
-    size_t result = 0;
+usize transcodeLen(Cursor<typename Source::Unit> input) {
+    usize result = 0;
 
     while (input.rem()) {
         Rune r;
@@ -446,8 +445,8 @@ size_t transcodeLen(Cursor<typename Source::Unit> input) {
 }
 
 template <StaticEncoding Source>
-size_t transcodeLen(Cursor<typename Source::Unit> input) {
-    size_t result = 0;
+usize transcodeLen(Cursor<typename Source::Unit> input) {
+    usize result = 0;
 
     while (input.rem()) {
         Rune r;
@@ -460,8 +459,8 @@ size_t transcodeLen(Cursor<typename Source::Unit> input) {
 }
 
 template <StaticEncoding Source, StaticEncoding Target>
-size_t transcodeUnits(Cursor<typename Source::Unit> input, MutCursor<typename Target::Unit> output) {
-    size_t result = 0;
+usize transcodeUnits(Cursor<typename Source::Unit> input, MutCursor<typename Target::Unit> output) {
+    usize result = 0;
 
     while (input.rem()) {
         Rune r;

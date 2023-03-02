@@ -47,7 +47,7 @@ struct _Event : public Event {
 };
 
 struct MouseEvent : public _Event<MouseEvent> {
-    enum Type : uint8_t {
+    enum Type : u8 {
         PRESS,
         RELEASE,
         SCROLL,

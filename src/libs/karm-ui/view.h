@@ -25,7 +25,7 @@ struct TextStyle {
     Media::Font font;
     Opt<Gfx::Color> color = NONE;
 
-    TextStyle withSize(int size) const {
+    TextStyle withSize(isize size) const {
         TextStyle style = *this;
         style.font.fontsize = size;
         return style;
@@ -101,7 +101,7 @@ DEF_STYLE(bodySmall)
 
 Child icon(Media::Icon icon, Opt<Gfx::Color> color = NONE);
 
-Child icon(Mdi::Icon icon, double size, Opt<Gfx::Color> color = NONE);
+Child icon(Mdi::Icon icon, f64 size, Opt<Gfx::Color> color = NONE);
 
 /* --- Image ---------------------------------------------------------------- */
 
@@ -115,6 +115,6 @@ Child canvas(OnPaint onPaint);
 
 /* --- Blur ----------------------------------------------------------------- */
 
-Child blur(int radius, Child child);
+Child blur(isize radius, Child child);
 
 } // namespace Karm::Ui

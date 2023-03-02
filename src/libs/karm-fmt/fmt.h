@@ -15,8 +15,8 @@ namespace Karm::Fmt {
 
 struct NumberFormater {
     bool isChar = false;
-    int base = 10;
-    int width = 0;
+    isize base = 10;
+    isize width = 0;
     bool fillZero = false;
 
     void parse(Text::Scan &scan) {
@@ -52,15 +52,15 @@ struct NumberFormater {
         }
     }
 
-    Res<size_t> formatUnsigned(Io::_TextWriter &writer, uint64_t value) {
-        auto digit = [](size_t v) {
+    Res<usize> formatUnsigned(Io::_TextWriter &writer, u64 value) {
+        auto digit = [](usize v) {
             if (v < 10) {
                 return '0' + v;
             } else {
                 return 'a' + (v - 10);
             }
         };
-        size_t i = 0;
+        usize i = 0;
         Array<char, 128> buf;
 #
         do {
@@ -71,13 +71,13 @@ struct NumberFormater {
         reverse(mutSub(buf, 0, i));
 
         if (width > 0) {
-            size_t n = width - i;
+            usize n = width - i;
             if (fillZero) {
-                for (size_t j = 0; j < n; j++) {
+                for (usize j = 0; j < n; j++) {
                     buf[i++] = '0';
                 }
             } else {
-                for (size_t j = 0; j < n; j++) {
+                for (usize j = 0; j < n; j++) {
                     buf[i++] = ' ';
                 }
             }
@@ -86,8 +86,8 @@ struct NumberFormater {
         return writer.writeStr({buf.buf(), i});
     }
 
-    Res<size_t> formatSigned(Io::_TextWriter &writer, int64_t value) {
-        size_t written = 0;
+    Res<usize> formatSigned(Io::_TextWriter &writer, i64 value) {
+        usize written = 0;
         if (value < 0) {
             written += try$(writer.writeRune('-'));
             value = -value;
@@ -100,7 +100,7 @@ struct NumberFormater {
 
 template <typename T>
 struct UnsignedFormatter : public NumberFormater {
-    Res<size_t> format(Io::_TextWriter &writer, T const value) {
+    Res<usize> format(Io::_TextWriter &writer, T const value) {
         if (isChar) {
             return writer.writeRune(value);
         }
@@ -110,7 +110,7 @@ struct UnsignedFormatter : public NumberFormater {
 
 template <typename T>
 struct SignedFormatter : public NumberFormater {
-    Res<size_t> format(Io::_TextWriter &writer, T const value) {
+    Res<usize> format(Io::_TextWriter &writer, T const value) {
         if (isChar) {
             return writer.writeRune(value);
         }
@@ -129,19 +129,19 @@ template <Meta::SignedIntegral T>
 struct Formatter<T> : public SignedFormatter<T> {};
 
 template <>
-struct Formatter<double> {
-    Res<size_t> format(Io::_TextWriter &writer, double const value) {
+struct Formatter<f64> {
+    Res<usize> format(Io::_TextWriter &writer, f64 const value) {
         NumberFormater formater;
-        size_t written = 0;
-        int ipart = (int)value;
+        usize written = 0;
+        isize ipart = (isize)value;
         written += try$(formater.formatSigned(writer, ipart));
-        double fpart = value - (double)ipart;
+        f64 fpart = value - (f64)ipart;
         if (fpart != 0.0) {
             written += try$(writer.writeRune('.'));
             formater.width = 6;
             formater.fillZero = true;
             fpart *= 1000000;
-            written += try$(formater.formatUnsigned(writer, (uint64_t)fpart));
+            written += try$(formater.formatUnsigned(writer, (u64)fpart));
         }
         return Ok(written);
     }
@@ -149,14 +149,14 @@ struct Formatter<double> {
 
 template <>
 struct Formatter<Str> {
-    Res<size_t> format(Io::_TextWriter &writer, Str text) {
+    Res<usize> format(Io::_TextWriter &writer, Str text) {
         return writer.writeStr(text);
     }
 };
 
 template <>
 struct Formatter<String> {
-    Res<size_t> format(Io::_TextWriter &writer, String text) {
+    Res<usize> format(Io::_TextWriter &writer, String text) {
         return writer.writeStr(text);
     }
 };
@@ -166,8 +166,8 @@ struct Formatter<char const *> : public Formatter<Str> {};
 
 struct _Args {
     virtual ~_Args() = default;
-    virtual size_t len() = 0;
-    virtual Res<size_t> format(Text::Scan &scan, Io::_TextWriter &writer, size_t index) = 0;
+    virtual usize len() = 0;
+    virtual Res<usize> format(Text::Scan &scan, Io::_TextWriter &writer, usize index) = 0;
 };
 
 template <typename... Ts>
@@ -176,11 +176,11 @@ struct Args : public _Args {
 
     Args(Ts &&...ts) : _tuple(std::forward<Ts>(ts)...) {}
 
-    size_t len() override { return _tuple.len(); }
+    usize len() override { return _tuple.len(); }
 
-    Res<size_t> format(Text::Scan &scan, Io::_TextWriter &writer, size_t index) override {
-        Res<size_t> result = Error("format index out of range");
-        size_t i = 0;
+    Res<usize> format(Text::Scan &scan, Io::_TextWriter &writer, usize index) override {
+        Res<usize> result = Error("format index out of range");
+        usize i = 0;
         _tuple.visit([&](auto const &t) {
             if (index == i) {
                 using U = Meta::RemoveConstVolatileRef<decltype(t)>;
@@ -198,10 +198,10 @@ struct Args : public _Args {
     }
 };
 
-inline Res<size_t> _format(Io::_TextWriter &writer, Str format, _Args &args) {
+inline Res<usize> _format(Io::_TextWriter &writer, Str format, _Args &args) {
     Text::Scan scan{format};
-    size_t written = 0;
-    size_t index = 0;
+    usize written = 0;
+    usize index = 0;
 
     while (not scan.ended()) {
         Rune c = scan.next();
@@ -228,7 +228,7 @@ inline Res<size_t> _format(Io::_TextWriter &writer, Str format, _Args &args) {
 }
 
 template <typename... Ts>
-inline Res<size_t> format(Io::_TextWriter &writer, Str format, Ts &&...ts) {
+inline Res<usize> format(Io::_TextWriter &writer, Str format, Ts &&...ts) {
     Args<Ts...> args{std::forward<Ts>(ts)...};
     return _format(writer, format, args);
 }

@@ -7,18 +7,18 @@
 
 namespace Hal {
 
-inline constexpr size_t PAGE_SIZE = 0x1000;
-inline constexpr size_t UPPER_HALF = 0xffff800000000000;
+inline constexpr usize PAGE_SIZE = 0x1000;
+inline constexpr usize UPPER_HALF = 0xffff800000000000;
 
-inline size_t pageAlignDown(size_t addr) {
+inline usize pageAlignDown(usize addr) {
     return alignDown(addr, PAGE_SIZE);
 }
 
-inline size_t pageAlignUp(size_t addr) {
+inline usize pageAlignUp(usize addr) {
     return alignUp(addr, PAGE_SIZE);
 }
 
-inline bool isPageAlign(size_t addr) {
+inline bool isPageAlign(usize addr) {
     return isAlign(addr, PAGE_SIZE);
 }
 
@@ -31,10 +31,10 @@ struct IdentityMapper {
 
 struct UpperHalfMapper {
     template <typename T>
-    T map(T addr) { return (T)((uintptr_t)addr + UPPER_HALF); }
+    T map(T addr) { return (T)((usize)addr + UPPER_HALF); }
 
     template <typename T>
-    T unmap(T addr) { return (T)((uintptr_t)addr - UPPER_HALF); }
+    T unmap(T addr) { return (T)((usize)addr - UPPER_HALF); }
 };
 
 template <typename Owner, typename Range>

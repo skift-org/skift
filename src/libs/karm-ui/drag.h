@@ -10,7 +10,7 @@ namespace Karm::Ui {
 /* --- Drag Event ----------------------------------------------------------- */
 
 struct DragEvent : public Events::_Event<DragEvent> {
-    enum _Type : uint8_t {
+    enum _Type : u8 {
         START,
         DRAG,
         END
@@ -36,9 +36,9 @@ FlagsEnum$(DismisDir);
 
 using OnDismis = Func<void(Node &)>;
 
-Child dismisable(OnDismis onDismis, DismisDir dir, double threshold, Ui::Child child);
+Child dismisable(OnDismis onDismis, DismisDir dir, f64 threshold, Ui::Child child);
 
-inline auto dismisable(OnDismis onDismis, DismisDir dir, double threshold) {
+inline auto dismisable(OnDismis onDismis, DismisDir dir, f64 threshold) {
     return [=, onDismis = std::move(onDismis)](Ui::Child child) mutable {
         return dismisable(std::move(onDismis), dir, threshold, child);
     };

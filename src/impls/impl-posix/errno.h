@@ -4,7 +4,7 @@
 
 namespace Embed::Posix {
 
-Error fromErrno(int error);
+Error fromErrno(isize error);
 
 Error fromLastErrno();
 

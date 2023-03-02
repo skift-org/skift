@@ -6,21 +6,21 @@
 
 namespace Karm {
 
-using BitsRange = Range<size_t, struct BitsRangeTag>;
+using BitsRange = Range<usize, struct BitsRangeTag>;
 
 struct Bits {
-    uint8_t *_buf{};
-    size_t _len{};
+    u8 *_buf{};
+    usize _len{};
 
-    Bits(MutSlice<uint8_t> slice)
+    Bits(MutSlice<u8> slice)
         : _buf(slice.buf()),
           _len(slice.len()) {}
 
-    bool get(size_t index) const {
+    bool get(usize index) const {
         return _buf[index / 8] & (1 << (index % 8));
     }
 
-    void set(size_t index, bool value) {
+    void set(usize index, bool value) {
         if (value) {
             _buf[index / 8] |= (1 << (index % 8));
         } else {
@@ -29,7 +29,7 @@ struct Bits {
     }
 
     void set(BitsRange range, bool value) {
-        for (size_t i = range.start; i < range.end(); i++) {
+        for (usize i = range.start; i < range.end(); i++) {
             set(i, value);
         }
     }
@@ -38,11 +38,11 @@ struct Bits {
         ::fill(mutBytes(), value ? 0xff_byte : 0x00_byte);
     }
 
-    size_t len() const {
+    usize len() const {
         return _len * 8;
     }
 
-    Opt<BitsRange> alloc(size_t count, size_t start, bool upper = true) {
+    Opt<BitsRange> alloc(usize count, usize start, bool upper = true) {
         start = min(start, len());
 
         if (_len == 0) {
@@ -50,9 +50,9 @@ struct Bits {
         }
 
         BitsRange range = {};
-        int offset = upper ? -1 : 1;
+        isize offset = upper ? -1 : 1;
 
-        for (size_t i = start; (upper ? i > 0 : i < len()); i += offset) {
+        for (usize i = start; (upper ? i > 0 : i < len()); i += offset) {
             if (get(i)) {
                 range = {};
             } else {
@@ -72,10 +72,10 @@ struct Bits {
         return NONE;
     }
 
-    size_t used() const {
-        size_t res = 0;
+    usize used() const {
+        usize res = 0;
 
-        for (size_t i = 0; i < len(); i++) {
+        for (usize i = 0; i < len(); i++) {
             if (get(i)) {
                 res++;
             }
@@ -86,7 +86,7 @@ struct Bits {
 
     void visit(auto cb) {
         BitsRange range = {};
-        for (size_t i = 0; i < len(); i++) {
+        for (usize i = 0; i < len(); i++) {
             if (get(i)) {
                 if (range.size > 0) {
                     cb(range);

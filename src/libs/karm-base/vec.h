@@ -1,10 +1,9 @@
 #pragma once
 
-#include "_prelude.h"
-
 #include "buf.h"
 #include "opt.h"
 #include "ref.h"
+#include "std.h"
 
 namespace Karm {
 
@@ -16,7 +15,7 @@ struct _Vec {
 
     constexpr _Vec() = default;
 
-    _Vec(size_t cap) : _buf(cap) {}
+    _Vec(usize cap) : _buf(cap) {}
 
     _Vec(std::initializer_list<T> other) : _buf(other) {}
 
@@ -47,7 +46,7 @@ struct _Vec {
     bool removeAll(T const &val) {
         bool changed = false;
 
-        for (size_t i = 1; i < _buf.len() + 1; i++) {
+        for (usize i = 1; i < _buf.len() + 1; i++) {
             if (Op::eq(_buf[i - 1], val)) {
                 _buf.removeAt(i - 1);
                 changed = true;
@@ -60,31 +59,31 @@ struct _Vec {
 
     /* --- Capacity --- */
 
-    void ensure(size_t cap) { _buf.ensure(cap); }
+    void ensure(usize cap) { _buf.ensure(cap); }
 
-    void truncate(size_t len) { _buf.truncate(len); }
+    void truncate(usize len) { _buf.truncate(len); }
 
-    void resize(size_t len, T fill = {}) { _buf.resize(len, fill); }
+    void resize(usize len, T fill = {}) { _buf.resize(len, fill); }
 
     void fit() { _buf.fit(); }
 
     void clear() { _buf.resize(0); }
 
-    size_t cap() const { return _buf.cap(); }
+    usize cap() const { return _buf.cap(); }
 
     /* --- Random Access --- */
 
-    void insert(size_t index, T const &value) { _buf.insert(index, T(value)); }
+    void insert(usize index, T const &value) { _buf.insert(index, T(value)); }
 
-    void insert(size_t index, T &&value) { _buf.insert(index, std::move(value)); }
+    void insert(usize index, T &&value) { _buf.insert(index, std::move(value)); }
 
-    void replace(size_t index, T const &value) { _buf[index] = T(value); }
+    void replace(usize index, T const &value) { _buf[index] = T(value); }
 
-    void replace(size_t index, T &&value) { _buf[index] = std::move(value); }
+    void replace(usize index, T &&value) { _buf[index] = std::move(value); }
 
-    T removeAt(size_t index) { return _buf.removeAt(index); }
+    T removeAt(usize index) { return _buf.removeAt(index); }
 
-    void removeRange(size_t index, size_t count) { _buf.removeRange(index, count); }
+    void removeRange(usize index, usize count) { _buf.removeRange(index, count); }
 
     /* --- Front Access --- */
 
@@ -110,17 +109,17 @@ struct _Vec {
 
     /* --- MutSliceable --- */
 
-    constexpr size_t len() const { return _buf.len(); }
+    constexpr usize len() const { return _buf.len(); }
 
     constexpr T *buf() { return _buf.buf(); }
 
     constexpr T const *buf() const { return _buf.buf(); }
 
-    constexpr T &operator[](size_t i) {
+    constexpr T &operator[](usize i) {
         return _buf[i];
     }
 
-    constexpr T const &operator[](size_t i) const {
+    constexpr T const &operator[](usize i) const {
         return _buf[i];
     }
 };
@@ -128,7 +127,7 @@ struct _Vec {
 template <typename T>
 using Vec = _Vec<Buf<T>>;
 
-template <typename T, size_t N>
+template <typename T, usize N>
 using InlineVec = _Vec<InlineBuf<T, N>>;
 
 } // namespace Karm

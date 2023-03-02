@@ -7,16 +7,16 @@ namespace x86_64 {
 struct Pic {
     Hal::Io _io;
 
-    static constexpr size_t PIC1 = 0x20;
-    static constexpr size_t PIC2 = 0xA0;
-    static constexpr size_t CMD = 0;
-    static constexpr size_t DATA = 1;
+    static constexpr usize PIC1 = 0x20;
+    static constexpr usize PIC2 = 0xA0;
+    static constexpr usize CMD = 0;
+    static constexpr usize DATA = 1;
 
-    static constexpr size_t PIC1_OFFSET = 0x20;
-    static constexpr size_t PIC2_OFFSET = 0x28;
+    static constexpr usize PIC1_OFFSET = 0x20;
+    static constexpr usize PIC2_OFFSET = 0x28;
 
-    static constexpr size_t ICW1_ICW4 = 0x01;
-    static constexpr size_t ICW1_INIT = 0x10;
+    static constexpr usize ICW1_ICW4 = 0x01;
+    static constexpr usize ICW1_INIT = 0x10;
 
     static Pic pic1() {
         return {Hal::Io::port({PIC1, 2})};
@@ -38,12 +38,12 @@ struct Pic {
         asm volatile("jmp 1f; 1: jmp 1f; 1:");
     }
 
-    void cmd(uint8_t cmd) {
+    void cmd(u8 cmd) {
         _io.write8(CMD, cmd);
         wait();
     }
 
-    void data(uint8_t data) {
+    void data(u8 data) {
         _io.write8(DATA, data);
         wait();
     }
@@ -74,7 +74,7 @@ struct DualPic {
         _pic2.data(0x0);
     }
 
-    void ack(int intno) {
+    void ack(isize intno) {
         if (intno >= 40) {
             _pic2.ack();
         }

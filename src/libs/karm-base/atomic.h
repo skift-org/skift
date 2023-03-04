@@ -13,7 +13,7 @@ enum MemOrder {
     SEQ_CST = __ATOMIC_SEQ_CST
 };
 
-inline void memory_barier(MemOrder order = SEQ_CST) {
+inline void memoryBarier(MemOrder order = SEQ_CST) {
     __atomic_thread_fence(order);
 }
 
@@ -42,19 +42,19 @@ struct Atomic {
         return __atomic_compare_exchange_n(&_val, &expected, desired, false, order, order);
     }
 
-    T fetch_add(T desired, MemOrder order = MemOrder::SEQ_CST) {
+    T fetchAdd(T desired, MemOrder order = MemOrder::SEQ_CST) {
         return __atomic_fetch_add(&_val, desired, order);
     }
 
-    T fetch_sub(T desired, MemOrder order = MemOrder::SEQ_CST) {
+    T fetchSub(T desired, MemOrder order = MemOrder::SEQ_CST) {
         return __atomic_fetch_sub(&_val, desired, order);
     }
 
-    T fetch_inc(MemOrder order = MemOrder::SEQ_CST) {
+    T fetchInc(MemOrder order = MemOrder::SEQ_CST) {
         return __atomic_fetch_add(&_val, 1, order);
     }
 
-    T fetch_dec(MemOrder order = MemOrder::SEQ_CST) {
+    T fetchDec(MemOrder order = MemOrder::SEQ_CST) {
         return __atomic_fetch_sub(&_val, 1, order);
     }
 
@@ -66,7 +66,7 @@ struct Atomic {
         __atomic_store_n(&_val, desired, order);
     }
 
-    bool lock_free() {
+    bool lockFree() {
         return __atomic_is_lock_free(&_val);
     }
 };

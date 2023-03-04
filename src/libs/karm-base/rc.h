@@ -8,21 +8,27 @@
 
 namespace Karm {
 
-struct _Rc {
+struct _Cell {
+    bool _clear = false;
     int _strong = 0;
     int _weak = 0;
 
-    virtual ~_Rc() = default;
+    virtual ~_Cell() = default;
 
     virtual void *_unwrap() = 0;
-
+    virtual void clear() = 0;
     virtual Meta::Id id() = 0;
 
     bool dying() {
         return _strong == 0;
     }
 
-    _Rc *collect() {
+    _Cell *collect() {
+        if (_strong == 0 and not _clear) {
+            clear();
+            _clear = true;
+        }
+
         if (_strong == 0 and _weak == 0) {
             delete this;
             return nullptr;
@@ -31,7 +37,11 @@ struct _Rc {
         return this;
     }
 
-    _Rc *refStrong() {
+    _Cell *refStrong() {
+        if (_clear) {
+            panic("refStrong() called on cleared cell");
+        }
+
         _strong++;
         if (_strong == 0) {
             panic("refStrong() overflow");
@@ -39,7 +49,7 @@ struct _Rc {
         return this;
     }
 
-    _Rc *derefStrong() {
+    _Cell *derefStrong() {
         _strong--;
         if (_strong < 0) {
             panic("derefStrong() underflow");
@@ -55,7 +65,7 @@ struct _Rc {
         return *static_cast<T *>(_unwrap());
     }
 
-    _Rc *refWeak() {
+    _Cell *refWeak() {
         _weak++;
         if (_weak == 0) {
             panic("refWeak() overflow");
@@ -63,7 +73,7 @@ struct _Rc {
         return this;
     }
 
-    _Rc *derefWeak() {
+    _Cell *derefWeak() {
         _weak--;
         if (_weak < 0) {
             panic("derefWeak() underflow");
@@ -72,7 +82,7 @@ struct _Rc {
     }
 
     template <typename T>
-    _Rc *unwrapWeak() {
+    _Cell *unwrapWeak() {
         if (_weak == 0) {
             panic("unwrapWeak()");
         }
@@ -82,42 +92,61 @@ struct _Rc {
 };
 
 template <typename T>
-struct Rc : public _Rc {
-    T _buf{};
+struct Cell : public _Cell {
+    Inert<T> _buf{};
 
     template <typename... Args>
-    Rc(Args &&...args) : _buf(std::forward<Args>(args)...) {}
+    Cell(Args &&...args) {
+        _buf.ctor(std::forward<Args>(args)...);
+    }
 
-    void *_unwrap() override { return &_buf; }
+    void *_unwrap() override { return &_buf.unwrap(); }
+
     Meta::Id id() override { return Meta::makeId<T>(); }
+
+    void clear() override { _buf.dtor(); }
 };
 
-inline _Rc *tryRefStrong(_Rc *rc) {
-    return rc ? rc->refStrong() : nullptr;
+inline _Cell *tryRefStrong(_Cell *cell) {
+    return cell ? cell->refStrong()
+                : nullptr;
+}
+
+inline _Cell *tryDerefStrong(_Cell *cell) {
+    return cell ? cell->derefStrong()
+                : nullptr;
 }
 
 template <typename T>
 struct Strong {
-    _Rc *_rc{};
+    _Cell *_cell{};
 
     constexpr Strong() = delete;
 
-    constexpr Strong(_Rc *ptr) : _rc(ptr->refStrong()) {}
+    constexpr Strong(_Cell *ptr)
+        : _cell(tryRefStrong(ptr)) {
+    }
 
-    constexpr Strong(Strong const &other) : _rc(other._rc->refStrong()) {}
+    constexpr Strong(Strong const &other)
+        : _cell(tryRefStrong(other._cell)) {
+    }
 
-    constexpr Strong(Strong &&other) : _rc(std::exchange(other._rc, nullptr)) {}
+    constexpr Strong(Strong &&other)
+        : _cell(std::exchange(other._cell, nullptr)) {
+    }
 
     template <Meta::Derive<T> U>
-    constexpr Strong(Strong<U> const &other) : _rc(other._rc->refStrong()) {}
+    constexpr Strong(Strong<U> const &other)
+        : _cell(tryRefStrong(other._cell)) {
+    }
 
     template <Meta::Derive<T> U>
-    constexpr Strong(Strong<U> &&other) : _rc(std::exchange(other._rc, nullptr)) {}
+    constexpr Strong(Strong<U> &&other)
+        : _cell(std::exchange(other._cell, nullptr)) {
+    }
 
     constexpr ~Strong() {
-        if (_rc) {
-            _rc = _rc->derefStrong();
-        }
+        _cell = tryDerefStrong(_cell);
     }
 
     constexpr Strong &operator=(Strong const &other) {
@@ -125,52 +154,52 @@ struct Strong {
     }
 
     constexpr Strong &operator=(Strong &&other) {
-        std::swap(_rc, other._rc);
+        std::swap(_cell, other._cell);
         return *this;
     }
 
     constexpr T *operator->() const {
-        if (not _rc) {
+        if (not _cell) {
             panic("Deferencing moved from Strong<T>");
         }
 
-        return &_rc->unwrapStrong<T>();
+        return &_cell->unwrapStrong<T>();
     }
 
     constexpr Ordr cmp(Strong const &other) const {
-        if (_rc == other._rc)
+        if (_cell == other._cell)
             return Ordr::EQUAL;
 
         return ::cmp(unwrap(), other.unwrap());
     }
 
     constexpr T &operator*() const {
-        if (not _rc) {
+        if (not _cell) {
             panic("Deferencing moved from Strong<T>");
         }
 
-        return _rc->unwrapStrong<T>();
+        return _cell->unwrapStrong<T>();
     }
 
     constexpr T const &unwrap() const {
-        if (not _rc) {
+        if (not _cell) {
             panic("Deferencing moved from Strong<T>");
         }
 
-        return _rc->unwrapStrong<T>();
+        return _cell->unwrapStrong<T>();
     }
 
     constexpr T &unwrap() {
-        if (not _rc) {
+        if (not _cell) {
             panic("Deferencing moved from Strong<T>");
         }
 
-        return _rc->unwrapStrong<T>();
+        return _cell->unwrapStrong<T>();
     }
 
     template <typename U>
     constexpr U &unwrap() {
-        if (not _rc) {
+        if (not _cell) {
             panic("Deferencing moved from Strong<T>");
         }
 
@@ -178,12 +207,12 @@ struct Strong {
             panic("Unwrapping Strong<T> as Strong<U>");
         }
 
-        return _rc->unwrapStrong<U>();
+        return _cell->unwrapStrong<U>();
     }
 
     template <typename U>
     constexpr U const &unwrap() const {
-        if (not _rc) {
+        if (not _cell) {
             panic("Deferencing moved from Strong<T>");
         }
 
@@ -191,22 +220,22 @@ struct Strong {
             panic("Unwrapping Strong<T> as Strong<U>");
         }
 
-        return _rc->unwrapStrong<U>();
+        return _cell->unwrapStrong<U>();
     }
 
     template <typename U>
     constexpr bool is() {
         return Meta::Same<T, U> or
                Meta::Derive<T, U> or
-               _rc->id() == Meta::makeId<U>();
+               _cell->id() == Meta::makeId<U>();
     }
 
     Meta::Id id() const {
-        if (not _rc) {
+        if (not _cell) {
             panic("Deferencing moved from Strong<T>");
         }
 
-        return _rc->id();
+        return _cell->id();
     }
 
     template <typename U>
@@ -215,44 +244,38 @@ struct Strong {
             return NONE;
         }
 
-        return Strong<U>(_rc);
+        return Strong<U>(_cell);
     }
 };
 
 template <typename T>
 struct OptStrong {
-    _Rc *_rc{};
+    _Cell *_cell{};
 
     constexpr OptStrong() = default;
 
-    constexpr OptStrong(None) : _rc(nullptr) {}
+    constexpr OptStrong(None) : _cell(nullptr) {}
 
-    constexpr OptStrong(_Rc *ptr) : _rc(tryRefStrong(ptr)) {}
+    constexpr OptStrong(_Cell *ptr) : _cell(tryRefStrong(ptr)) {}
 
-    constexpr OptStrong(OptStrong const &other) : _rc(tryRefStrong(other._rc)) {}
+    constexpr OptStrong(OptStrong const &other) : _cell(tryRefStrong(other._cell)) {}
 
-    constexpr OptStrong(OptStrong &&other) : _rc(std::exchange(other._rc, nullptr)) {}
-
-    template <Meta::Derive<T> U>
-    constexpr OptStrong(OptStrong<U> const &other) : _rc(tryRefStrong(other._rc)) {}
+    constexpr OptStrong(OptStrong &&other) : _cell(std::exchange(other._cell, nullptr)) {}
 
     template <Meta::Derive<T> U>
-    constexpr OptStrong(OptStrong<U> &&other) : _rc(std::exchange(other._rc, nullptr)) {}
-
-    constexpr OptStrong(Strong<T> const &other) : _rc(tryRefStrong(other._rc)) {}
-
-    constexpr OptStrong(Strong<T> &&other) : _rc(std::exchange(other._rc, nullptr)) {}
+    constexpr OptStrong(OptStrong<U> const &other) : _cell(tryRefStrong(other._cell)) {}
 
     template <Meta::Derive<T> U>
-    constexpr OptStrong(Strong<U> const &other) : _rc(tryRefStrong(other._rc)) {}
+    constexpr OptStrong(OptStrong<U> &&other) : _cell(std::exchange(other._cell, nullptr)) {}
 
     template <Meta::Derive<T> U>
-    constexpr OptStrong(Strong<U> &&other) : _rc(std::exchange(other._rc, nullptr)) {}
+    constexpr OptStrong(Strong<U> const &other) : _cell(tryRefStrong(other._cell)) {}
+
+    template <Meta::Derive<T> U>
+    constexpr OptStrong(Strong<U> &&other) : _cell(std::exchange(other._cell, nullptr)) {}
 
     constexpr ~OptStrong() {
-        if (_rc) {
-            _rc = _rc->derefStrong();
-        }
+        _cell = tryDerefStrong(_cell);
     }
 
     constexpr OptStrong &operator=(OptStrong const &other) {
@@ -260,25 +283,25 @@ struct OptStrong {
     }
 
     constexpr OptStrong &operator=(OptStrong &&other) {
-        std::swap(_rc, other._rc);
+        std::swap(_cell, other._cell);
         return *this;
     }
 
-    constexpr operator bool() const { return _rc; }
+    constexpr operator bool() const { return _cell; }
 
     constexpr T *operator->() const {
-        if (!_rc) {
+        if (!_cell) {
             panic("Deferencing moved from Strong<T>");
         }
 
-        return &_rc->unwrapStrong<T>();
+        return &_cell->unwrapStrong<T>();
     }
 
     constexpr Ordr cmp(OptStrong const &other) const {
-        if (_rc == other._rc)
+        if (_cell == other._cell)
             return Ordr::EQUAL;
 
-        if (!_rc or not other._rc) {
+        if (!_cell or not other._cell) {
             return Ordr::LESS;
         }
 
@@ -286,32 +309,32 @@ struct OptStrong {
     }
 
     constexpr T &operator*() const {
-        if (!_rc) {
+        if (!_cell) {
             panic("Deferencing none OptStrong<T>");
         }
 
-        return _rc->unwrapStrong<T>();
+        return _cell->unwrapStrong<T>();
     }
 
     constexpr T const &unwrap() const {
-        if (!_rc) {
+        if (!_cell) {
             panic("Deferencing none OptStrong<T>");
         }
 
-        return _rc->unwrapStrong<T>();
+        return _cell->unwrapStrong<T>();
     }
 
     constexpr T &unwrap() {
-        if (!_rc) {
+        if (!_cell) {
             panic("Deferencing none OptStrong<T>");
         }
 
-        return _rc->unwrapStrong<T>();
+        return _cell->unwrapStrong<T>();
     }
 
     template <typename U>
     constexpr U &unwrap() {
-        if (!_rc) {
+        if (!_cell) {
             panic("Deferencing none OptStrong<T>");
         }
 
@@ -319,12 +342,12 @@ struct OptStrong {
             panic("Unwrapping Strong<T> as Strong<U>");
         }
 
-        return _rc->unwrapStrong<U>();
+        return _cell->unwrapStrong<U>();
     }
 
     template <typename U>
     constexpr U const &unwrap() const {
-        if (!_rc) {
+        if (!_cell) {
             panic("Deferencing none OptStrong<T>");
         }
 
@@ -332,22 +355,22 @@ struct OptStrong {
             panic("Unwrapping Strong<T> as Strong<U>");
         }
 
-        return _rc->unwrapStrong<U>();
+        return _cell->unwrapStrong<U>();
     }
 
     template <typename U>
     constexpr bool is() {
         return Meta::Same<T, U> or
                Meta::Derive<T, U> or
-               _rc->id() == Meta::makeId<U>();
+               _cell->id() == Meta::makeId<U>();
     }
 
     Meta::Id id() const {
-        if (!_rc) {
+        if (!_cell) {
             panic("Deferencing none OptStrong<T>");
         }
 
-        return _rc->id();
+        return _cell->id();
     }
 
     template <typename U>
@@ -356,37 +379,37 @@ struct OptStrong {
             return NONE;
         }
 
-        return Strong<U>(_rc);
+        return Strong<U>(_cell);
     }
 };
 
 template <typename T, typename... Args>
 constexpr static Strong<T> makeStrong(Args &&...args) {
-    return {new Rc<T>(std::forward<Args>(args)...)};
+    return {new Cell<T>(std::forward<Args>(args)...)};
 }
 
 template <typename T>
 struct Weak {
-    _Rc *_rc{};
+    _Cell *_cell{};
 
     constexpr Weak() = delete;
 
     template <Meta::Derive<T> U>
     constexpr Weak(Strong<U> const &other)
-        : _rc(other._rc->refWeak()) {}
+        : _cell(other._cell->refWeak()) {}
 
     template <Meta::Derive<T> U>
     constexpr Weak(Weak<U> const &other)
-        : _rc(other._rc->refWeak()) {}
+        : _cell(other._cell->refWeak()) {}
 
     template <Meta::Derive<T> U>
     constexpr Weak(Weak<U> &&other) {
-        std::swap(_rc, other._rc);
+        std::swap(_cell, other._cell);
     }
 
     constexpr ~Weak() {
-        if (_rc) {
-            _rc->derefWeak();
+        if (_cell) {
+            _cell->derefWeak();
         }
     }
 
@@ -395,16 +418,16 @@ struct Weak {
     }
 
     constexpr Weak &operator=(Weak &&other) {
-        std::swap(_rc, other._rc);
+        std::swap(_cell, other._cell);
         return *this;
     }
 
-    OptStrong<T> lock() const {
-        if (not _rc) {
+    Opt<Strong<T>> upgrade() const {
+        if (not _cell) {
             return NONE;
         }
 
-        return Strong<T>(_rc);
+        return Strong<T>(_cell);
     }
 
     void visit(auto visitor) {

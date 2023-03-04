@@ -18,12 +18,12 @@ struct CriticalScope : Meta::Static {
     }
 };
 
-struct Lock {
+struct Lock : Meta::Static {
     Atomic<bool> _lock{};
 
     bool _tryAcquire() {
         bool result = _lock.cmpxchg(false, true);
-        memory_barier();
+        memoryBarier();
 
         if (not result) {
             Embed::leaveCritical();
@@ -46,18 +46,37 @@ struct Lock {
     }
 
     void release() {
-        memory_barier();
+        memoryBarier();
         _lock.store(false);
-
         Embed::leaveCritical();
     }
 };
 
+struct NoLock : Meta::Static {
+    bool tryAcquire() {
+        return true;
+    }
+
+    void acquire() {}
+
+    void release() {}
+};
+
+template <typename T>
+concept Lockable =
+    requires(T &lockable) {
+        lockable.tryAcquire();
+        lockable.acquire();
+        lockable.release();
+    };
+
+template <Lockable L>
 struct LockScope :
     Meta::Static {
-    Lock &_lock;
+    L &_lock;
 
-    LockScope(Lock &lock) : _lock(lock) {
+    LockScope(L &lock)
+        : _lock(lock) {
         _lock.acquire();
     }
 

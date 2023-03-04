@@ -1,10 +1,7 @@
 #pragma once
 
 #include "align.h"
-#include "clamp.h"
 #include "cons.h"
-#include "iter.h"
-#include "ordr.h"
 
 namespace Karm {
 

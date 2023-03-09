@@ -341,7 +341,7 @@ void renderScene(Cam cam, Scene &scene, Gfx::Surface buf, Props props) {
         }
 
         if (y % 10 == 0)
-            logInfo("tay: rendered {} of {}", y, size.y);
+            logInfo("ray: rendered {} of {}", y, size.y);
     }
 }
 

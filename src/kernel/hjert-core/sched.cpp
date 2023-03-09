@@ -37,7 +37,7 @@ void Sched::schedule() {
 
 Res<> Sched::init(Handover::Payload &) {
     logInfo("sched: initializing...");
-    _sched = Sched{try$(Task::create(TaskType::KERNEL, try$(Space::create())))};
+    _sched.emplace(try$(Task::create(TaskType::KERNEL, try$(Space::create()))));
     return Ok();
 }
 

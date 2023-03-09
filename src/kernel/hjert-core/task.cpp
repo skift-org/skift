@@ -22,12 +22,12 @@ Res<Stack> Stack::create() {
 /* --- Task ----------------------------------------------------------------- */
 
 Res<Strong<Task>> Task::create(
-    TaskType type, Strong<Space> space, Strong<Domain> domain) {
+    TaskType type, OptStrong<Space> space, OptStrong<Domain> domain) {
 
     logInfo("sched: creating task...");
     auto stack = try$(Stack::create());
     auto ctx = try$(Ctx::create(stack.loadSp()));
-    auto task = makeStrong<Task>(type, std::move(stack), space, domain, std::move(ctx));
+    auto task = makeStrong<Task>(type, std::move(stack), std::move(ctx), space, domain);
     return Ok(task);
 }
 

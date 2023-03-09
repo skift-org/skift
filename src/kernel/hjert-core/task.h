@@ -16,7 +16,7 @@ struct Ctx {
     virtual void load() = 0;
 };
 
-/* --- Stack ----------------------------------------------------------------- */
+/* --- Stack ---------------------------------------------------------------- */
 
 struct Stack {
     static constexpr usize DEFAULT_SIZE = kib(16);
@@ -64,11 +64,13 @@ struct Task : public Object<Task> {
     Tick _sliceStart = 0;
     Tick _sliceEnd = 0;
 
-    static Res<Strong<Task>> create(TaskType type, OptStrong<Space> space = NONE, OptStrong<Domain> domain = NONE);
+    static Res<Strong<Task>> create(
+        TaskType type, OptStrong<Space> space = NONE, OptStrong<Domain> domain = NONE);
 
     static Task &self();
 
-    Task(TaskType type, Stack stack, Box<Ctx> ctx, OptStrong<Space> space = NONE, OptStrong<Domain> domain = NONE)
+    Task(
+        TaskType type, Stack stack, Box<Ctx> ctx, OptStrong<Space> space = NONE, OptStrong<Domain> domain = NONE)
         : _type(type),
           _stack(std::move(stack)),
           _ctx(std::move(ctx)),
@@ -93,9 +95,9 @@ struct Task : public Object<Task> {
         return _stack.loadSp();
     }
 
-    Space &space() { return _space.unwrap("task has no space"); }
+    Space &space() { return _space.unwrap(); }
 
-    Domain &domain() { return _domain.unwrap("task has no domain"); }
+    Domain &domain() { return _domain.unwrap(); }
 };
 
 } // namespace Hjert::Core

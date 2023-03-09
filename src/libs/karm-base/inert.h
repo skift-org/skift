@@ -10,10 +10,6 @@ template <typename T>
 union Inert {
     alignas(alignof(T)) char _inner[sizeof(T)];
 
-    void ctor(T &&value) {
-        new (&unwrap()) T(std::move(value));
-    }
-
     template <typename... Args>
     void ctor(Args &&...args) {
         new (&unwrap()) T(std::forward<Args>(args)...);

@@ -13,20 +13,21 @@ template <typename... Ts>
 struct Var {
     alignas(max(alignof(Ts)...)) char _buf[max(sizeof(Ts)...)];
     u8 _index;
+    static_assert(sizeof...(Ts) <= 255, "Var can only hold up to 255 types");
 
-    Var() = delete;
+    ALWAYS_INLINE Var() = delete;
 
     template <Meta::Contains<Ts...> T>
-    Var(T const &value) : _index(Meta::indexOf<T, Ts...>()) {
+    ALWAYS_INLINE Var(T const &value) : _index(Meta::indexOf<T, Ts...>()) {
         new (_buf) T(value);
     }
 
     template <Meta::Contains<Ts...> T>
-    Var(T &&value) : _index(Meta::indexOf<T, Ts...>()) {
+    ALWAYS_INLINE Var(T &&value) : _index(Meta::indexOf<T, Ts...>()) {
         new (_buf) T(std::move(value));
     }
 
-    Var(Var const &other) : _index(other._index) {
+    ALWAYS_INLINE Var(Var const &other) : _index(other._index) {
         Meta::indexCast<Ts...>(
             _index, other._buf,
             [this]<typename T>(T const &ptr) {
@@ -34,26 +35,26 @@ struct Var {
             });
     }
 
-    Var(Var &&other) : _index(other._index) {
+    ALWAYS_INLINE Var(Var &&other) : _index(other._index) {
         Meta::indexCast<Ts...>(_index, other._buf, [this]<typename T>(T &ptr) {
             new (_buf) T(std::move(ptr));
         });
     }
 
-    ~Var() {
+    ALWAYS_INLINE ~Var() {
         Meta::indexCast<Ts...>(_index, _buf, []<typename T>(T &ptr) {
             ptr.~T();
         });
     }
 
     template <Meta::Contains<Ts...> T>
-    Var &operator=(T const &value) {
+    ALWAYS_INLINE Var &operator=(T const &value) {
         *this = Var(value);
         return *this;
     }
 
     template <Meta::Contains<Ts...> T>
-    Var &operator=(T &&value) {
+    ALWAYS_INLINE Var &operator=(T &&value) {
         Meta::indexCast<Ts...>(_index, _buf, []<typename U>(U &ptr) {
             ptr.~U();
         });
@@ -64,12 +65,12 @@ struct Var {
         return *this;
     }
 
-    Var &operator=(Var const &other) {
+    ALWAYS_INLINE Var &operator=(Var const &other) {
         *this = Var(other);
         return *this;
     }
 
-    Var &operator=(Var &&other) {
+    ALWAYS_INLINE Var &operator=(Var &&other) {
         Meta::indexCast<Ts...>(_index, _buf, []<typename T>(T &ptr) {
             ptr.~T();
         });
@@ -99,6 +100,19 @@ struct Var {
         }
 
         return *reinterpret_cast<T const *>(_buf);
+    }
+
+    template <typename T, typename... Args>
+    ALWAYS_INLINE T &emplace(Args &&...args) {
+        if (_index != Meta::indexOf<T, Ts...>()) {
+            Meta::indexCast<Ts...>(_index, _buf, []<typename U>(U &ptr) {
+                ptr.~U();
+            });
+
+            _index = Meta::indexOf<T, Ts...>();
+        }
+
+        return *new (_buf) T(std::forward<Args>(args)...);
     }
 
     template <Meta::Contains<Ts...> T>

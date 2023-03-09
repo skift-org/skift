@@ -131,13 +131,13 @@ Res<> init(Handover::Payload &payload) {
 
     logInfo("mem: pmm bitmap range: {x}-{x}", pmmBits.start, pmmBits.end());
 
-    _pmm = Pmm(usableRange,
-               MutSlice{
-                   reinterpret_cast<u8 *>(pmmBits.start + Hal::UPPER_HALF),
-                   pmmBits.size,
-               });
+    _pmm.emplace(usableRange,
+                 MutSlice{
+                     reinterpret_cast<u8 *>(pmmBits.start + Hal::UPPER_HALF),
+                     pmmBits.size,
+                 });
 
-    _kmm = Kmm(_pmm.unwrap());
+    _kmm.emplace(_pmm.unwrap());
 
     logInfo("mem: marking kernel memory as used");
     for (auto &record : payload) {

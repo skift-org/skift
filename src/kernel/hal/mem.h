@@ -3,6 +3,7 @@
 #include <karm-base/align.h>
 #include <karm-base/error.h>
 #include <karm-base/range.h>
+#include <karm-base/ref.h>
 #include <karm-base/std.h>
 
 namespace Hal {
@@ -39,33 +40,34 @@ struct UpperHalfMapper {
 
 template <typename Owner, typename Range>
 struct Mem {
-    Owner &_owner;
-    bool _owned;
+    Owner *_owner;
     Range _range;
 
+    Mem(Range range)
+        : _owner(nullptr),
+          _range(range) {}
+
     Mem(Owner &owner, Range range)
-        : _owner(owner),
-          _owned(true),
+        : _owner(&owner),
           _range(range) {}
 
     ~Mem() {
-        if (_owned)
-            _owner.free(_range).unwrap("Failed to free memory");
+        if (_owner)
+            _owner->free(_range).unwrap("Failed to free memory");
     }
 
     Mem(const Mem &) = delete;
 
     Mem(Mem &&other)
-        : _owner(other._owner),
-          _owned(other._owned),
-          _range(other._range) {
-        other._owned = false;
+        : _owner(std::exchange(other._owner, nullptr)),
+          _range(std::move(other._range)) {
     }
 
     Mem &operator=(const Mem &) = delete;
 
     Mem &operator=(Mem &&other) {
-        *this = std::move(other);
+        _owner = std::exchange(other._owner, nullptr);
+        _range = std::move(other._range);
         return *this;
     }
 

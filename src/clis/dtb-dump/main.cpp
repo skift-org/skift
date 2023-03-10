@@ -7,9 +7,10 @@ Res<> entryPoint(CliArgs args) {
     if (args.len() == 0) {
         return Error::invalidInput("Usage: dtb-dump <dtb-file>");
     }
-    Sys::File dtbFile = try$(Sys::File::open(args[0]));
+
+    auto dtbFile = try$(Sys::File::open(args[0]));
     auto dtbMem = try$(Sys::mmap().read().map(dtbFile));
-    DeviceTree::Blob dtb{dtbMem.bytes()};
+    auto dtb = try$(DeviceTree::Blob::load(dtbMem.bytes()));
 
     if (not dtb.valid()) {
         return Error::invalidData("dtb is not a valid device tree");

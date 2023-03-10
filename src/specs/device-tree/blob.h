@@ -3,6 +3,7 @@
 #include <karm-base/res.h>
 
 #include "../bscan.h"
+#include "karm-base/slice.h"
 
 namespace DeviceTree {
 
@@ -25,15 +26,15 @@ struct Blob {
         usize size;
     };
 
-    static constexpr u32 magic = 0xd00dfeed;
+    static constexpr u32 MAGIC = 0xd00dfeed;
 
     Bytes _slice;
 
-    static Res<Blob> load(void *ptr) {
-        BScan scan{Bytes{static_cast<Byte *>(ptr), sizeof(Header)}};
+    static Res<Blob> load(Bytes bytes) {
+        BScan scan{bytes};
         auto magic = scan.nextU32be();
 
-        if (magic != Blob::magic) {
+        if (magic != MAGIC) {
             return Error::invalidData("invalid magic");
         }
 
@@ -43,7 +44,7 @@ struct Blob {
             return Error::invalidData("invalid size");
         }
 
-        return Ok(Blob{Bytes{static_cast<Byte *>(ptr), size}});
+        return Ok(Blob{bytes});
     }
 
     BScan begin() const { return _slice; }

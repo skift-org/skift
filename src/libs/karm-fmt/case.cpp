@@ -19,21 +19,17 @@ Res<String> toCamelCase(Str str) {
 }
 
 Res<String> toCapitalCase(Str str) {
-    auto s = try$(toNoCase(str));
-
-    if (s.len() > 0) {
-        s[0] = toupper(s[0]);
-    }
-
-    return Ok(s);
+    return toTitleCase(str);
 }
 
 Res<String> toConstantCase(Str str) {
-    auto s = try$(toCapitalCase(str));
+    auto s = try$(toNoCase(str));
 
     for (auto &c : s) {
         if (c == ' ') {
             c = '_';
+        } else {
+            c = toupper(c);
         }
     }
 
@@ -71,13 +67,20 @@ static auto sep() {
 Res<String> toNoCase(Str str) {
     Io::StringWriter writer;
     Text::Scan scan{str};
+    bool wasLower = false;
 
     scan.eat(sep());
 
     while (not scan.ended()) {
         if (scan.skip(sep())) {
             try$(writer.writeRune(' '));
+            wasLower = false;
         } else {
+            if (wasLower and isupper(scan.curr())) {
+                try$(writer.writeRune(' '));
+            }
+
+            wasLower = islower(scan.curr()) and isalpha(scan.curr());
             try$(writer.writeRune(tolower(scan.next())));
         }
     }

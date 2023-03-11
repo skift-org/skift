@@ -57,7 +57,7 @@ struct Blob {
 
     bool valid() const {
         auto h = header();
-        return h.magic == magic;
+        return h.magic == MAGIC;
     }
 
     auto iterReserved() const {
@@ -77,7 +77,8 @@ struct Blob {
                 }
 
                 return Reserved{addr, size};
-            }};
+            },
+        };
     }
 };
 

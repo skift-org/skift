@@ -18,7 +18,8 @@ struct Test : Meta::Static {
     Func _func;
     Loc _loc;
 
-    Test(Str name, Func func, Loc loc = Loc::current()) : _name(name), _func(func), _loc(loc) {
+    Test(Str name, Func func, Loc loc = Loc::current())
+        : _name(name), _func(func), _loc(loc) {
         driver().add(this);
     }
 

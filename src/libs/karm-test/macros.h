@@ -8,16 +8,10 @@
 
 namespace Karm::Test {
 
-#define test$(ID)                                                                   \
-    ::Karm::Error var$(_testFunc)([[maybe_unused]] ::Karm::Test::Driver & _driver); \
-    ::Karm::Test::Test var$(_test){ID, var$(_testFunc)};                            \
-    ::Karm::Error var$(_testFunc)([[maybe_unused]] ::Karm::Test::Driver & _driver)
-
-#define describe$(DESCR) \
-    condDefer$(_driver.beginDescribe(DESCR), _driver.endDescribe())
-
-#define it$(DESCR) \
-    condDefer$(_driver.beginIt(DESCR), _driver.endIt())
+#define test$(ID)                                                            \
+    ::Karm::Res<> var$(ID)([[maybe_unused]] ::Karm::Test::Driver & _driver); \
+    ::Karm::Test::Test var$(_test){#ID, var$(ID)};                           \
+    ::Karm::Res<> var$(ID)([[maybe_unused]] ::Karm::Test::Driver & _driver)
 
 #define __expect$(LHS, RHS, OP)                         \
     ({                                                  \

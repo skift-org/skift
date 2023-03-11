@@ -18,20 +18,6 @@ void Driver::runAll() {
     }
 }
 
-bool Driver::beginDescribe(Str name, Loc) {
-    Sys::errln("Describe {}", name);
-    return true;
-}
-
-void Driver::endDescribe() {}
-
-bool Driver::beginIt(Str name, Loc) {
-    Sys::errln("\tIt {}", name);
-    return true;
-}
-
-void Driver::endIt() {}
-
 Driver &driver() {
     static Driver driver;
     return driver;

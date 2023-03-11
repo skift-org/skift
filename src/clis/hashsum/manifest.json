@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
+    "id": "hashsum",
+    "type": "exe",
+    "description": "Compute checksums and hashes of files",
+    "requires": [
+        "karm-main"
+    ]
+}

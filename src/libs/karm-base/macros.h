@@ -20,6 +20,20 @@ namespace Karm {
 
 #define condDefer$(BEGIN, END) for (isize var$(__i) = BEGIN; var$(__i); (var$(__i) -= 1, END))
 
-#define ALWAYS_INLINE __attribute__((always_inline))
+#define ALWAYS_INLINE [[gnu::always_inline]]
+
+/* --- Utilities ------------------------------------------------------------ */
+
+template <typename T, typename U>
+ALWAYS_INLINE static inline T unionCast(U value)
+    requires(sizeof(T) == sizeof(U))
+{
+    union X {
+        U u;
+        T t;
+    };
+
+    return X{value}.t;
+}
 
 } // namespace Karm

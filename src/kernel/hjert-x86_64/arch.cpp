@@ -135,7 +135,7 @@ extern "C" usize _intDispatch(usize sp) {
     cpu().beginInterrupt();
 
     if (frame->intNo < 32) {
-        logFatal("x86_64: cpu exception: {} (err={}, ip={x}, sp={x}, cr2={x}, cr3={x})", _faultMsg[frame->intNo], frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
+        logFatal("x86_64: cpu exception: {} (err={}, ip={p}, sp={p}, cr2={p}, cr3={p})", _faultMsg[frame->intNo], frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
     } else {
         isize irq = frame->intNo - 32;
 
@@ -207,7 +207,7 @@ void start(Core::Task &task, usize ip, usize sp, Hj::Args args) {
 
 template <typename L, typename M>
 Res<> destroyPml(Hal::Pmm &pmm, L *pml, M mapper = {}) {
-    logInfo("x86_64: destroying pml{} at {x}", L::LEVEL, (usize)pml);
+    logInfo("x86_64: destroying pml{} at {p}", L::LEVEL, (usize)pml);
 
     auto range = Hal::PmmRange{mapper.unmap((usize)pml), Hal::PAGE_SIZE};
 

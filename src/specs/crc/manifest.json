@@ -1,9 +1,0 @@
-{
-    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
-    "id": "crc-spec",
-    "type": "lib",
-    "description": "Cyclic redundancy check (CRC) specification",
-    "requires": [
-        "karm-base"
-    ]
-}

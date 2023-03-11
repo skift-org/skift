@@ -24,6 +24,17 @@ struct NumberFormater {
             return;
         }
 
+        if (scan.peek() == '0') {
+            scan.next();
+            fillZero = true;
+        }
+
+        if (scan.ended()) {
+            return;
+        }
+
+        width = tryOr(scan.nextInt(), 0);
+
         Rune c = scan.next();
 
         switch (c) {
@@ -41,6 +52,12 @@ struct NumberFormater {
 
         case 'x':
             base = 16;
+            break;
+
+        case 'p':
+            base = 16;
+            fillZero = true;
+            width = sizeof(usize) * 2;
             break;
 
         case 'c':
@@ -238,6 +255,28 @@ inline Res<String> format(Str format, Ts &&...ts) {
     Io::StringWriter writer{};
     Args<Ts...> args{std::forward<Ts>(ts)...};
     try$(_format(writer, format, args));
+    return Ok(writer.take());
+}
+
+template <typename T>
+inline Res<String> toStr(Str format, T const &t) {
+    Io::StringWriter writer{};
+    Formatter<T> formatter;
+    if constexpr (requires(Text::Scan & scan) {
+                      formatter.parse(scan);
+                  }) {
+        Text::Scan scan{format};
+        formatter.parse(scan);
+    }
+    try$(formatter.format(writer, t));
+    return Ok(writer.take());
+}
+
+template <typename T>
+inline Res<String> toStr(T const &t) {
+    Io::StringWriter writer{};
+    Formatter<T> formatter;
+    try$(formatter.format(writer, t));
     return Ok(writer.take());
 }
 

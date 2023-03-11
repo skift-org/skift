@@ -136,6 +136,35 @@ auto iterRunes(S const &slice) {
     });
 }
 
+template <StaticEncoding E>
+bool eqCi(_Str<E> a, _Str<E> b) {
+    if (a.len() != b.len()) {
+        return false;
+    }
+
+    Cursor<typename E::Unit> aCursor(a);
+    Cursor<typename E::Unit> bCursor(b);
+
+    while (!aCursor.ended()) {
+        Rune aRune;
+        Rune bRune;
+
+        if (!E::decodeUnit(aRune, aCursor)) {
+            return false;
+        }
+
+        if (!E::decodeUnit(bRune, bCursor)) {
+            return false;
+        }
+
+        if (aRune != bRune && tolower(aRune) != tolower(bRune)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 template <::StaticEncoding Target, ::StaticEncoding Source>
 _String<Target> transcode(_Str<Source> str) {
     usize len = transcodeLen<Source, Target>(str);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "slice.h"
 #include "std.h"
 
 namespace Karm {
@@ -45,22 +46,29 @@ T _swapBe(T value) {
 #endif
 
 template <typename T>
-struct [[gnu::packed]] _be {
+struct _be {
     T _value;
 
     constexpr _be() = default;
     constexpr _be(T value) : _value(_swapBe(value)) {}
     constexpr operator T() const { return _swapBe(_value); }
+
+    constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
 };
 
 template <typename T>
-struct [[gnu::packed]] _le {
+struct _le {
     T _value;
 
     constexpr _le() = default;
     constexpr _le(T value) : _value(_swapLe(value)) {}
     constexpr operator T() const { return _swapLe(_value); }
+
+    constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
 };
+
+static_assert(sizeof(_be<u32>) == sizeof(u32));
+static_assert(sizeof(_le<u32>) == sizeof(u32));
 
 using u8be = _be<u8>;
 using u16be = _be<u16>;

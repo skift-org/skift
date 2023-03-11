@@ -25,7 +25,7 @@ template <typename T>
 using HashDigest = typename T::Digest;
 
 template <typename T>
-using HashSum = decltype(std::declval<T>().sum());
+using HashSum = decltype(Meta::declval<T>().sum());
 
 template <usize bits, typename TAG>
 struct Digest : public Array<u8, bits / 8> {

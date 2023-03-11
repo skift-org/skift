@@ -80,19 +80,19 @@ Res<> entryPoint(CliArgs) {
 
     Sys::println("{}", Cli::styled(ART, Cli::BLUE));
 
-    if (!(res = Sysfetch::dumpUserInfo())) {
+    if (not(res = Sysfetch::dumpUserInfo())) {
         Sys::errln("{}: {}", Sysfetch::title("User"), Cli::styled(res.none().msg(), Cli::RED_LIGHT));
     }
 
-    if (!(res = Sysfetch::dumpSysInfo())) {
+    if (not(res = Sysfetch::dumpSysInfo())) {
         Sys::errln("{} {}", Sysfetch::title("System"), Cli::styled(res.none().msg(), Cli::RED_LIGHT));
     }
 
-    if (!(res = Sysfetch::dumpMemInfo())) {
+    if (not(res = Sysfetch::dumpMemInfo())) {
         Sys::errln("{}: {}", Sysfetch::title("Memory"), Cli::styled(res.none().msg(), Cli::RED_LIGHT));
     }
 
-    if (!(res = Sysfetch::dumpCpusInfo())) {
+    if (not(res = Sysfetch::dumpCpusInfo())) {
         Sys::errln("{}: {}", Sysfetch::title("CPUs"), Cli::styled(res.none().msg(), Cli::RED_LIGHT));
     }
 

@@ -71,7 +71,7 @@ struct BoxStyle {
         inner();
         g.restore();
 
-        if (borderWidth && borderPaint) {
+        if (borderWidth and borderPaint) {
             g.strokeStyle(Gfx::stroke(*borderPaint)
                               .withWidth(borderWidth)
                               .withAlign(Gfx::INSIDE_ALIGN));

@@ -20,7 +20,7 @@ void splash() {
 }
 
 Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
-    if (!Handover::valid(magic, payload)) {
+    if (not Handover::valid(magic, payload)) {
         logInfo("entry: handover: invalid");
         return Error::invalidInput("Invalid handover payload");
     }
@@ -50,7 +50,7 @@ Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
 
 Res<> enterUserspace(Handover::Payload &payload) {
     auto const *record = payload.fileByName("/servers/system");
-    if (!record) {
+    if (not record) {
         logInfo("entry: handover: no init file");
         return Error::invalidInput("No init file");
     }
@@ -62,7 +62,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
     auto elfRange = try$(kmm().pmm2Kmm(elfMem->range()));
     Elf::Image image{elfRange.bytes()};
 
-    if (!image.valid()) {
+    if (not image.valid()) {
         logInfo("entry: invalid elf");
         return Error::invalidInput("Invalid elf");
     }
@@ -76,7 +76,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
 
         usize size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
 
-        if (!!(prog.flags() & Elf::ProgramFlags::WRITE)) {
+        if ((prog.flags() & Elf::ProgramFlags::WRITE) == Elf::ProgramFlags::WRITE) {
             auto sectionMem = try$(VNode::alloc(size, Hj::MemFlags::NONE));
             auto sectionRange = try$(kmm().pmm2Kmm(sectionMem->range()));
             copy(prog.bytes(), sectionRange.mutBytes());

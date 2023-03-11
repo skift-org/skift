@@ -24,7 +24,7 @@ struct Bool {
     }
 
     constexpr Bool operator!() const {
-        return Bool(!_val);
+        return Bool(not _val);
     }
 };
 

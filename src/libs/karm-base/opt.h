@@ -25,7 +25,7 @@ struct [[nodiscard]] Opt {
 
     template <typename U = T>
     ALWAYS_INLINE Opt(U &&value)
-        requires(!Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::MoveConstructible<T, U>)
+        requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::MoveConstructible<T, U>)
         : _present(true) {
         _value.ctor(std::forward<U>(value));
     }

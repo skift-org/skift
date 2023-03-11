@@ -26,7 +26,7 @@ inline constexpr bool isAlign(usize addr, usize align) {
 }
 
 static inline Res<> ensureAlign(usize addr, usize align) {
-    if (!isAlign(addr, align)) {
+    if (not isAlign(addr, align)) {
         return Error::invalidInput("not aligned");
     }
 

@@ -16,7 +16,7 @@ struct Event {
     template <typename T>
     Event &handle(auto callback) {
         if (id == Meta::makeId<T>()) {
-            accepted = accepted || callback(static_cast<T const &>(*this));
+            accepted = accepted or callback(static_cast<T const &>(*this));
         }
         return *this;
     }

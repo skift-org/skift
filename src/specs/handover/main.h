@@ -13,7 +13,7 @@ extern "C" void _kstart(u64 magic, Handover::Payload *payload) {
     Abi::SysV::init();
     Res<> res = entryPoint(magic, *payload);
 
-    if (!res) {
+    if (not res) {
         panic(res.none().msg());
     }
 

@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
+    "id": "mdi",
+    "type": "lib",
+    "description": "Material Design Icons",
+    "requires": [
+        "karm-base"
+    ]
+}

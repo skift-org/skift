@@ -75,7 +75,7 @@ struct Image {
     static Res<Image> load(Bytes slice) {
         Image image{slice};
 
-        if (!Op::eq(image.sig(), bytes(SIG)))
+        if (not Op::eq(image.sig(), bytes(SIG)))
             return Error::invalidData("invalid signature");
 
         image._ihdr = image.lookupChunk<Ihdr>();

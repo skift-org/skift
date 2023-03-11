@@ -94,7 +94,7 @@ struct TextWriter : public _TextWriter {
 
     Res<usize> writeRune(Rune rune) override {
         typename E::One one;
-        if (!E::encodeUnit(rune, one)) {
+        if (not E::encodeUnit(rune, one)) {
             return Ok(0uz);
         }
         return write(bytes(one));

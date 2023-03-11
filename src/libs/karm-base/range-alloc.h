@@ -56,12 +56,12 @@ struct RangeAlloc {
     }
 
     void compress(usize start) {
-        while (start + 1 < _r.len() && _r[start].contigous(_r[start + 1])) {
+        while (start + 1 < _r.len() and _r[start].contigous(_r[start + 1])) {
             _r[start] = _r[start].merge(_r[start + 1]);
             _r.removeAt(start + 1);
         }
 
-        while (start > 0 && _r[start].contigous(_r[start - 1])) {
+        while (start > 0 and _r[start].contigous(_r[start - 1])) {
             _r[start] = _r[start].merge(_r[start - 1]);
             _r.removeAt(start - 1);
         }

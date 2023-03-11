@@ -19,7 +19,7 @@ namespace Karm::Test {
         auto __lhs = (LHS);                             \
         auto __rhs = (RHS);                             \
                                                         \
-        if (!Op::OP(__lhs, __rhs)) {                    \
+        if (not Op::OP(__lhs, __rhs)) {                 \
             return _driver.unexpect(__lhs, __rhs, #OP); \
         }                                               \
     })

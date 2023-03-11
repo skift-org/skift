@@ -159,12 +159,12 @@ struct Var {
 
     template <Meta::Contains<Ts...> T>
     ALWAYS_INLINE bool operator==(T const &other) const {
-        return is<T>() && unwrap<T>() == other;
+        return is<T>() and unwrap<T>() == other;
     }
 
     template <Meta::Contains<Ts...> T>
     ALWAYS_INLINE bool operator!=(T const &other) const {
-        return !(*this == other);
+        return not(*this == other);
     }
 
     template <Meta::Contains<Ts...> T>

@@ -46,11 +46,11 @@ struct Image {
             return Error::invalidData("invalid magic");
         }
 
-        if (!(image.channels() == 4 or image.channels() == 3)) {
+        if (not(image.channels() == 4 or image.channels() == 3)) {
             return Error::invalidData("invalid number of channels");
         }
 
-        if (!(image.colorSpace() == 0 or image.colorSpace() == 1)) {
+        if (not(image.colorSpace() == 0 or image.colorSpace() == 1)) {
             return Error::invalidData("invalid color space");
         }
 

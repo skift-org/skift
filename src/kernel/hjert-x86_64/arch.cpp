@@ -157,9 +157,14 @@ extern "C" usize _intDispatch(usize sp) {
 
 extern "C" usize _sysDispatch(usize sp) {
     auto *frame = reinterpret_cast<Frame *>(sp);
-    return (usize)Core::dispatchSyscall(
+    auto result = Core::dispatchSyscall(
         (Hj::Syscall)frame->rax,
         {frame->rdi, frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9});
+
+    if (not result) {
+        return (usize)result.none().code();
+    }
+    return (usize)Error::_OK;
 }
 
 static x86_64::Pml<4> *_pml4 = nullptr;

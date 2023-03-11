@@ -290,7 +290,7 @@ struct OptStrong {
     constexpr operator bool() const { return _cell; }
 
     constexpr T *operator->() const {
-        if (!_cell) {
+        if (not _cell) {
             panic("Deferencing moved from Strong<T>");
         }
 
@@ -301,7 +301,7 @@ struct OptStrong {
         if (_cell == other._cell)
             return Ordr::EQUAL;
 
-        if (!_cell or not other._cell) {
+        if (not _cell or not other._cell) {
             return Ordr::LESS;
         }
 
@@ -309,7 +309,7 @@ struct OptStrong {
     }
 
     constexpr T &operator*() const {
-        if (!_cell) {
+        if (not _cell) {
             panic("Deferencing none OptStrong<T>");
         }
 
@@ -317,7 +317,7 @@ struct OptStrong {
     }
 
     constexpr T const &unwrap() const {
-        if (!_cell) {
+        if (not _cell) {
             panic("Deferencing none OptStrong<T>");
         }
 
@@ -325,7 +325,7 @@ struct OptStrong {
     }
 
     constexpr T &unwrap() {
-        if (!_cell) {
+        if (not _cell) {
             panic("Deferencing none OptStrong<T>");
         }
 
@@ -334,7 +334,7 @@ struct OptStrong {
 
     template <typename U>
     constexpr U &unwrap() {
-        if (!_cell) {
+        if (not _cell) {
             panic("Deferencing none OptStrong<T>");
         }
 
@@ -347,7 +347,7 @@ struct OptStrong {
 
     template <typename U>
     constexpr U const &unwrap() const {
-        if (!_cell) {
+        if (not _cell) {
             panic("Deferencing none OptStrong<T>");
         }
 
@@ -366,7 +366,7 @@ struct OptStrong {
     }
 
     Meta::Id id() const {
-        if (!_cell) {
+        if (not _cell) {
             panic("Deferencing none OptStrong<T>");
         }
 

@@ -503,11 +503,11 @@ SliderStyle SliderStyle::hsv() {
             .borderWidth = 2,
             .borderPaint = Gfx::WHITE,
         },
-        .trackSize = {128, 26},
+        .trackSize = {256, 26},
         .trackStyle = {
             .margin = 2,
             .borderRadius = 999,
-            .backgroundPaint = Gfx::Gradient::hsv(),
+            .backgroundPaint = Gfx::Gradient::hsv().bake(),
         },
     };
 }
@@ -524,7 +524,7 @@ SliderStyle SliderStyle::gradiant(Gfx::Color from, Gfx::Color to) {
         .trackStyle = {
             .margin = 2,
             .borderRadius = 999,
-            .backgroundPaint = Gfx::Gradient::hlinear().withColors(from, to),
+            .backgroundPaint = Gfx::Gradient::hlinear().withColors(from, to).bake(),
         },
     };
 }

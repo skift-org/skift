@@ -102,6 +102,14 @@ using Bytes = Slice<Byte>;
 using MutBytes = MutSlice<Byte>;
 
 template <Sliceable S, typename T = typename S::Inner>
+Slice<T> sub(S &slice) {
+    return {
+        slice.buf(),
+        slice.len(),
+    };
+}
+
+template <Sliceable S, typename T = typename S::Inner>
 Slice<T> sub(S &slice, usize start, usize end) {
     return {
         slice.buf() + start,
@@ -119,6 +127,14 @@ MutSlice<T> mutSub(S &slice, usize start, usize end) {
     return {
         slice.buf() + start,
         clamp(end, start, slice.len()) - start,
+    };
+}
+
+template <MutSliceable S, typename T = typename S::Inner>
+MutSlice<T> mutSub(S &slice) {
+    return {
+        slice.buf(),
+        slice.len(),
     };
 }
 

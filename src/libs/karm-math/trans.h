@@ -121,6 +121,10 @@ union Trans2 {
     constexpr bool hasNan() const {
         return x.hasNan() or y.hasNan() or o.hasNan();
     }
+
+    constexpr Vec2<T> delta() const {
+        return {xx, xy};
+    }
 };
 
 using Trans2i = Trans2<isize>;

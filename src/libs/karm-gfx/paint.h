@@ -2,6 +2,7 @@
 
 #include <karm-base/var.h>
 #include <karm-base/vec.h>
+#include <karm-math/trans.h>
 #include <karm-media/image.h>
 
 #include "color.h"
@@ -10,18 +11,6 @@
 namespace Karm::Gfx {
 
 struct Gradient {
-    static constexpr isize MAX_STOPS = 16;
-
-    struct Stop {
-        Color color;
-        f64 pos;
-    };
-
-    static Color lerp(Stop lhs, Stop rhs, f64 pos) {
-        f64 t = (pos - lhs.pos) / (rhs.pos - lhs.pos);
-        return lhs.color.lerpWith(rhs.color, t);
-    }
-
     enum Type {
         LINEAR,
         RADIAL,
@@ -29,117 +18,151 @@ struct Gradient {
         DIAMOND,
     };
 
+    using Buf = Array<Color, 256>;
+
     Type _type = LINEAR;
     Math::Vec2f _start = {0.5, 0.5};
     Math::Vec2f _end = {1, 1};
-    InlineVec<Stop, MAX_STOPS> _stops = {};
+    Strong<Buf> _buf;
 
-    static constexpr Gradient linear() {
-        return Gradient{LINEAR, {0, 0}, {1, 1}};
-    }
+    struct _Builder {
+        static constexpr isize LIMIT = 16;
+        using Stop = Cons<Color, f64>;
 
-    static constexpr Gradient hsv() {
-        Gradient result{LINEAR, {0, 0.5}, {1, 0.5}};
+        Type _type = LINEAR;
+        Math::Vec2f _start = {0.5, 0.5};
+        Math::Vec2f _end = {1, 1};
+        InlineVec<Stop, LIMIT> _stops;
 
-        for (f64 i = 0; i <= 360; i += 60) {
-            result.withStop(hsvToRgb({i, 1, 1}), i / 360.0);
+        _Builder(Type type) : _type(type) {}
+
+        _Builder(Type type, Math::Vec2f start, Math::Vec2f end)
+            : _type(type), _start(start), _end(end) {}
+
+        _Builder &withStop(Color color, f64 pos) {
+            _stops.pushBack({color, pos});
+            return *this;
         }
 
-        return result;
-    }
-
-    static constexpr Gradient vlinear() {
-        return Gradient{LINEAR, {0.5, 0}, {0.5, 1}};
-    }
-
-    static constexpr Gradient hlinear() {
-        return Gradient{LINEAR, {0, 0.5}, {1, 0.5}};
-    }
-
-    static constexpr Gradient radial() {
-        return Gradient{RADIAL, {0.5, 0.5}, {1, 0.5}};
-    }
-
-    static constexpr Gradient conical() {
-        return Gradient{CONICAL, {0.5, 0.5}, {1, 0.5}};
-    }
-
-    static constexpr Gradient diamond() {
-        return Gradient{DIAMOND, {0.5, 0.5}, {1, 0.5}};
-    }
-
-    constexpr Gradient &withStop(Color color, f64 pos) {
-        _stops.pushBack({color, pos});
-        return *this;
-    }
-
-    constexpr Gradient &withColors(Meta::Same<Color> auto... args) {
-        Array colors = {args...};
-
-        if (colors.len() == 1) {
-            return withStop(colors[0], 0.5);
+        _Builder &withStart(Math::Vec2f start) {
+            _start = start;
+            return *this;
         }
 
-        for (usize i = 0; i < colors.len(); i++) {
-            _stops.pushBack({colors[i], (f64)i / (colors.len() - 1)});
+        _Builder &withEnd(Math::Vec2f end) {
+            _end = end;
+            return *this;
         }
 
-        return *this;
-    }
-
-    constexpr Gradient &withStart(Math::Vec2f start) {
-        _start = start;
-        return *this;
-    }
-
-    constexpr Gradient &withEnd(Math::Vec2f end) {
-        _end = end;
-        return *this;
-    }
-
-    constexpr Color sample(f64 pos, bool wrapAround = false) const {
-        if (_stops.len() == 0) {
-            return BLACK;
+        _Builder &withHsv() {
+            for (f64 i = 0; i <= 360; i += 60) {
+                withStop(hsvToRgb({i, 1, 1}), i / 360.0);
+            }
+            return *this;
         }
 
-        if (_stops.len() == 1) {
-            return _stops[0].color;
-        }
+        _Builder &withColors(Meta::Same<Color> auto... args) {
+            Array colors = {args...};
 
-        if (pos <= _stops[0].pos) {
-            if (wrapAround) {
-                auto lhs = _stops[_stops.len() - 1];
-                lhs.pos -= 1;
-
-                return lerp(lhs, _stops[0], pos);
+            if (colors.len() == 1) {
+                return withStop(colors[0], 0.5);
             }
 
-            return _stops[0].color;
-        }
-
-        if (pos >= _stops[_stops.len() - 1].pos) {
-            if (wrapAround) {
-                auto rhs = _stops[0];
-                rhs.pos += 1;
-
-                return lerp(_stops[_stops.len() - 1], rhs, pos);
+            for (usize i = 0; i < colors.len(); i++) {
+                withStop(colors[i], (f64)i / (colors.len() - 1));
             }
-            return _stops[_stops.len() - 1].color;
+
+            return *this;
         }
 
-        for (usize i = 0; i < _stops.len() - 1; i++) {
-            auto iPos = _stops[i].pos;
-            auto jPos = _stops[i + 1].pos;
+        static Color lerp(Stop lhs, Stop rhs, f64 pos) {
+            f64 t = (pos - lhs.cdr) / (rhs.cdr - lhs.cdr);
+            return lhs.car.lerpWith(rhs.car, t);
+        }
 
-            if (pos >= iPos and pos <= jPos) {
-                return lerp(_stops[i], _stops[i + 1], pos);
+        Strong<Buf> bakeStops() {
+            auto buf = makeStrong<Buf>();
+
+            fill(mutSub(*buf), Gfx::BLACK);
+            if (_stops.len() == 0) {
+                return buf;
             }
+
+            if (_stops.len() == 1) {
+                fill(mutSub(*buf), _stops[0].car);
+                return buf;
+            }
+
+            for (float j = 0; j < _stops[0].cdr * 256; j++) {
+                if (_type == CONICAL) {
+                    auto lhs = _stops[_stops.len() - 1];
+                    lhs.cdr -= 1;
+                    (*buf)[j] = lerp(lhs, _stops[0], j / 256.0);
+                } else {
+                    (*buf)[j] = _stops[0].car;
+                }
+            }
+
+            for (usize i = 0; i < _stops.len() - 1; i++) {
+                auto iPos = _stops[i].cdr;
+                auto jPos = _stops[i + 1].cdr;
+
+                for (f64 j = iPos * 256; j < jPos * 256; j++) {
+                    (*buf)[j] = lerp(_stops[i], _stops[i + 1], j / 256.0);
+                }
+            }
+
+            for (f64 j = _stops[_stops.len() - 1].cdr * 256; j < 256; j++) {
+                if (_type == CONICAL) {
+                    auto rhs = _stops[0];
+                    rhs.cdr += 1;
+                    (*buf)[j] = lerp(_stops[_stops.len() - 1], rhs, j / 256.0);
+                } else {
+                    (*buf)[j] = _stops[_stops.len() - 1].car;
+                }
+            }
+
+            return buf;
         }
 
-        return BLACK;
+        Gradient bake() {
+            return {_type, _start, _end, bakeStops()};
+        }
+    };
+
+    static _Builder linear() {
+        return _Builder{LINEAR, {0, 0}, {1, 1}};
     }
 
-    constexpr Color sample(Math::Vec2f pos) const {
+    static _Builder hsv() {
+        return hlinear()
+            .withHsv();
+    }
+
+    static _Builder vlinear() {
+        return _Builder{LINEAR, {0.5, 0}, {0.5, 1}};
+    }
+
+    static _Builder hlinear() {
+        return _Builder{LINEAR, {0, 0.5}, {1, 0.5}};
+    }
+
+    static _Builder radial() {
+        return _Builder{RADIAL, {0.5, 0.5}, {1, 0.5}};
+    }
+
+    static _Builder conical() {
+        return _Builder{CONICAL, {0.5, 0.5}, {1, 0.5}};
+    }
+
+    static _Builder diamond() {
+        return _Builder{DIAMOND, {0.5, 0.5}, {1, 0.5}};
+    }
+
+    Gradient(Type type, Math::Vec2f start, Math::Vec2f end, Strong<Buf> buf)
+        : _type(type), _start(start), _end(end), _buf(buf) {}
+
+    ALWAYS_INLINE f64 transform(Math::Vec2f pos) const {
         pos = pos - _start;
         pos = pos.rotate(-(_end - _start).angle());
         f64 scale = (_end - _start).len();
@@ -147,24 +170,29 @@ struct Gradient {
 
         switch (_type) {
         case LINEAR:
-            return sample(pos.x);
+            return pos.x;
 
         case RADIAL:
-            return sample(pos.len());
+            return pos.len();
 
         case CONICAL:
-            return sample((pos.angle() + Math::PI) / Math::TAU, true);
+            return (pos.angle() + Math::PI) / Math::TAU;
 
         case DIAMOND:
-            return sample(Math::abs(pos.x) + Math::abs(pos.y));
+            return Math::abs(pos.x) + Math::abs(pos.y);
         }
+    }
+
+    ALWAYS_INLINE Color sample(Math::Vec2f pos) const {
+        auto p = transform(pos);
+        return (*_buf)[clamp(usize(p * 255), 0uz, 255uz)];
     }
 };
 
 struct Paint : public Var<Color, Gradient, Media::Image> {
     using Var::Var;
 
-    Color sample(Math::Vec2f pos) const {
+    ALWAYS_INLINE Color sample(Math::Vec2f pos) const {
         return visit(Visitor{
             [&](Color color) {
                 return color;

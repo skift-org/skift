@@ -119,9 +119,11 @@ static Array demos = {
             return Ui::canvas(
                 [](Gfx::Context &g, Math::Vec2i bound) {
                     // Red, orange, yellow, green, blue, indigo, violet
-                    auto transFlag = Gfx::Gradient::linear()
-                                         .withColors(Gfx::RED, Gfx::ORANGE, Gfx::YELLOW, Gfx::GREEN, Gfx::BLUE, Gfx::INDIGO, Gfx::VIOLET);
-                    g.fillStyle(transFlag);
+                    auto colors = Gfx::Gradient::linear()
+                                      .withColors(Gfx::RED, Gfx::ORANGE, Gfx::YELLOW, Gfx::GREEN, Gfx::BLUE, Gfx::INDIGO, Gfx::VIOLET)
+                                      .bake();
+
+                    g.fillStyle(colors);
                     // Media::Icon icon = {Mdi::CAT, 256};
                     g.fill(bound);
 

@@ -274,7 +274,8 @@ Ui::Child lockscreen() {
         Ui::BoxStyle{
             .backgroundPaint = Gfx::Gradient::vlinear()
                                    .withColors(Gfx::BLACK.withOpacity(0.5),
-                                               Gfx::BLACK.withOpacity(0.75)),
+                                               Gfx::BLACK.withOpacity(0.75))
+                                   .bake(),
         },
 
         Ui::dismisable(

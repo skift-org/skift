@@ -95,23 +95,23 @@ struct Surface {
         return {0, 0, width(), height()};
     }
 
-    void *scanline(usize const y) {
+    void *scanline(usize y) {
         return static_cast<u8 *>(buffer.data) + y * buffer.stride;
     }
 
-    void store(Math::Vec2i const pos, Color const color) {
+    void store(Math::Vec2i pos, Color color) {
         Gfx::store(format, static_cast<u8 *>(buffer.data) + pos.y * buffer.stride + pos.x * bpp(format), color);
     }
 
-    Color load(Math::Vec2i const pos) const {
+    Color load(Math::Vec2i pos) const {
         return Gfx::load(format, static_cast<u8 const *>(buffer.data) + pos.y * buffer.stride + pos.x * bpp(format));
     }
 
-    Color loadClamped(Math::Vec2i const pos) const {
+    Color loadClamped(Math::Vec2i pos) const {
         return load({clamp(pos.x, 0, width() - 1), clamp(pos.y, 0, height() - 1)});
     }
 
-    void blend(Math::Vec2i const pos, Color const color) {
+    void blend(Math::Vec2i pos, Color color) {
         store(pos, color.blendOver(load(pos)));
     }
 

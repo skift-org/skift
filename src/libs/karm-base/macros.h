@@ -33,7 +33,7 @@ ALWAYS_INLINE static inline T unionCast(U value)
         T t;
     };
 
-    return X{value}.t;
+    return X{.u = value}.t;
 }
 
 } // namespace Karm

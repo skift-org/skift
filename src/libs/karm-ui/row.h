@@ -17,15 +17,18 @@ inline Child row(Child child) {
 
 inline Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Child> trailing) {
     auto lead = leading
-                    ? spacing({0, 0, 12, 0}, sizing(26, {UNCONSTRAINED, 26}, center(*leading)))
+                    ? *leading |
+                          center() |
+                          sizing(26, {UNCONSTRAINED, 26}) |
+                          spacing({0, 0, 12, 0})
                     : empty();
 
     auto t = subtitle
                  ? vflow(
                        8,
-                       text(TextStyle::labelLarge(), title),
-                       text(TextStyle::labelMedium(), *subtitle))
-                 : text(TextStyle::labelLarge(), title);
+                       labelLarge(title),
+                       labelMedium(*subtitle))
+                 : labelLarge(title);
 
     auto trail = trailing
                      ? spacing({12, 0, 0, 0}, sizing(26, {UNCONSTRAINED, 26}, center(*trailing)))
@@ -39,7 +42,7 @@ inline Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Chi
                 0,
                 Layout::Align::VCENTER | Layout::Align::HFILL,
                 lead,
-                grow(t),
+                t | grow(),
                 trail)));
 }
 

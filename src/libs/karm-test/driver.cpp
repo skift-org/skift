@@ -19,8 +19,11 @@ void Driver::runAll() {
 }
 
 Driver &driver() {
-    static Driver driver;
-    return driver;
+    static Opt<Driver> driver;
+    if (not driver) {
+        driver = Driver();
+    }
+    return *driver;
 }
 
 } // namespace Karm::Test

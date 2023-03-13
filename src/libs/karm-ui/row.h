@@ -139,7 +139,7 @@ inline Child navRow(bool selected, OnPress onPress, Mdi::Icon i, String title) {
                 empty(8),
                 icon(i, 26),
                 empty(12),
-                center(text(TextStyle::labelMedium(), title)))));
+                labelMedium(title) | center())));
 }
 
 inline Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Child child) {

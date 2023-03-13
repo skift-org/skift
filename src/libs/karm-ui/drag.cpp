@@ -161,7 +161,7 @@ Child dragHandle() {
 
 Child buttonHandle(OnPress press) {
     return handle() |
-           button(std::move(press));
+           button(std::move(press), Ui::ButtonStyle::none());
 }
 
 } // namespace Karm::Ui

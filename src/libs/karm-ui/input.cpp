@@ -8,6 +8,10 @@ namespace Karm::Ui {
 
 /* --- Button ---------------------------------------------------------------- */
 
+ButtonStyle ButtonStyle::none() {
+    return {};
+}
+
 ButtonStyle ButtonStyle::regular() {
     return {
         .idleStyle = {

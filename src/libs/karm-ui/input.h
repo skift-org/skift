@@ -90,6 +90,8 @@ struct ButtonStyle {
         .foregroundPaint = Gfx::ZINC600,
     };
 
+    static ButtonStyle none();
+
     static ButtonStyle regular();
 
     static ButtonStyle secondary();

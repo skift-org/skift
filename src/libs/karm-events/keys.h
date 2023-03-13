@@ -47,7 +47,8 @@ struct Key {
 
     Key() = default;
 
-    Key(Code code) : _code(code) {}
+    Key(Code code)
+        : _code(code) {}
 
     Str name() const {
         switch (_code) {

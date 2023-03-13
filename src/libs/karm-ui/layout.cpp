@@ -1,5 +1,7 @@
 #include "layout.h"
 
+#include "karm-math/rect.h"
+#include "karm-ui/node.h"
 #include "view.h"
 
 namespace Karm::Ui {
@@ -565,6 +567,14 @@ struct GridLayout : public GroupNode<GridLayout> {
     GridLayout(GridStyle style, Children children)
         : GroupNode(children), _style(style) {}
 
+    isize computeGapsRows() {
+        return _style.gaps.y * (max(1uz, _style.rows.len()) - 1);
+    }
+
+    isize computeGapsColumns() {
+        return _style.gaps.x * (max(1uz, _style.columns.len()) - 1);
+    }
+
     isize computeGrowUnitRows(Math::Recti r) {
         isize total = 0;
         isize grows = 0;
@@ -577,7 +587,7 @@ struct GridLayout : public GroupNode<GridLayout> {
             }
         }
 
-        isize all = _style.flow.getHeight(r) - _style.gaps.y * (max(1uz, _style.rows.len()) - 1);
+        isize all = _style.flow.getHeight(r) - computeGapsRows();
         isize growTotal = max(0, all - total);
         return (growTotal) / max(1, grows);
     }
@@ -594,9 +604,14 @@ struct GridLayout : public GroupNode<GridLayout> {
             }
         }
 
-        isize all = _style.flow.getWidth(r) - _style.gaps.x * (max(1uz, _style.columns.len()) - 1);
+        isize all = _style.flow.getWidth(r) - computeGapsColumns();
         isize growTotal = max(0, all - total);
         return (growTotal) / max(1, grows);
+    }
+
+    void paint(Gfx::Context &g, Math::Recti hint) override {
+        GroupNode::paint(g, hint);
+        g.debugRect(bound(), Gfx::RED);
     }
 
     void layout(Math::Recti r) override {
@@ -707,6 +722,9 @@ struct GridLayout : public GroupNode<GridLayout> {
                 column += c.value;
             }
         }
+
+        row += computeGapsRows();
+        column += computeGapsColumns();
 
         if (rowGrow and hint == Layout::Hint::MAX) {
             row = max(_style.flow.getY(s), row);

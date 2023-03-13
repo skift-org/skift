@@ -378,10 +378,30 @@ struct GridStyle {
     Layout::Flow flow = Layout::Flow::LEFT_TO_RIGHT;
     Layout::Align align = Layout::Align::FILL;
 
-    static GridStyle simple(isize rows, isize columns, Math::Vec2i gaps = 0) {
+    static GridStyle simpleGrow(isize rows, isize columns, Math::Vec2i gaps = 0) {
         return GridStyle{
             GridUnit::grow().repeated(rows),
             GridUnit::grow().repeated(columns),
+            gaps,
+            Layout::Flow::LEFT_TO_RIGHT,
+            Layout::Align::FILL,
+        };
+    }
+
+    static GridStyle simpleFixed(Cons<isize, isize> rows, Cons<isize, isize> columns, Math::Vec2i gaps = {}) {
+        return GridStyle{
+            GridUnit::fixed(rows.cdr).repeated(rows.car),
+            GridUnit::fixed(columns.cdr).repeated(columns.car),
+            gaps,
+            Layout::Flow::LEFT_TO_RIGHT,
+            Layout::Align::FILL,
+        };
+    }
+
+    static GridStyle simpleAuto(isize rows, isize columns, Math::Vec2i gaps = 0) {
+        return GridStyle{
+            GridUnit::auto_().repeated(rows),
+            GridUnit::auto_().repeated(columns),
             gaps,
             Layout::Flow::LEFT_TO_RIGHT,
             Layout::Align::FILL,

@@ -26,7 +26,7 @@ Ui::Child keypad(State state) {
     return Ui::spacing(
         8,
         Ui::grid(
-            Ui::GridStyle::simple(7, 4, 4),
+            Ui::GridStyle::simpleGrow(7, 4, 4),
 
             Ui::cell(
                 {0, 0},

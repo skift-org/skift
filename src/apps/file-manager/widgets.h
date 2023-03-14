@@ -9,11 +9,11 @@ namespace FileManager {
 
 /* --- Common Widgets ------------------------------------------------------- */
 
-Ui::Child directoryListing(Sys::Dir const &dir);
+Ui::Child directoryListing(Sys::Dir const &);
 
-Ui::Child breadcrumb();
+Ui::Child breadcrumb(State const &);
 
-Ui::Child toolbar(State state);
+Ui::Child toolbar(State const &);
 
 /* ---  Dialogs  ------------------------------------------------------------ */
 

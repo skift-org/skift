@@ -41,31 +41,33 @@ Ui::Child breadcrumbItem(Str text, isize index) {
                 Ui::text(text))));
 }
 
-Ui::Child breadcrumb() {
+Ui::Child breadcrumb(State const &state) {
     return Ui::box(
         {
             .borderRadius = 4,
             .borderWidth = 1,
-            .borderPaint = Gfx::ZINC700,
+            .backgroundPaint = Gfx::ZINC900,
         },
         Ui::hflow(
-            Ui::button(Model::bind<GoTo>("/"), Ui::ButtonStyle::subtle(), Mdi::LAPTOP),
-            breadcrumbItem("home", 3),
-            breadcrumbItem("smnx", 2),
-            breadcrumbItem("projects", 1),
-            breadcrumbItem("skift", 0),
+            Ui::button(Model::bind<GoRoot>(), Ui::ButtonStyle::subtle(), Mdi::LAPTOP),
+
+            Ui::hflow(state
+                          .currentPath()
+                          .iterParts()
+                          .mapi(breadcrumbItem)
+                          .collect<Ui::Children>()),
+
             Ui::grow(NONE),
             Ui::button(Model::bind<AddBookmark>(), Ui::ButtonStyle::subtle(), Mdi::BOOKMARK)));
 }
 
-Ui::Child toolbar(State state) {
-
+Ui::Child toolbar(State const &state) {
     return Ui::toolbar(
         Ui::button(Model::bindIf<GoBack>(state.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
         Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
         Ui::button(Model::bindIf<GoParent>(state.canGoParent(), 1), Ui::ButtonStyle::subtle(), Mdi::ARROW_UP),
-        Ui::button(Model::bind<GoTo>("/home"), Ui::ButtonStyle::subtle(), Mdi::HOME),
-        Ui::grow(FileManager::breadcrumb()),
+        Ui::button(Model::bind<GoHome>(), Ui::ButtonStyle::subtle(), Mdi::HOME),
+        Ui::grow(FileManager::breadcrumb(state)),
         Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH));
 }
 

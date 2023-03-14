@@ -213,6 +213,100 @@ constexpr auto mutIterRev(S &slice) {
     });
 }
 
+template <Sliceable S>
+constexpr auto iterSplit(S &slice, typename S::Inner const &sep) {
+    return Iter([&slice, sep, i = 0uz]() mutable -> Opt<Slice<typename S::Inner>> {
+        if (i >= slice.len()) {
+            return NONE;
+        }
+
+        usize start = i;
+        while (i < slice.len() && slice.buf()[i] != sep) {
+            i++;
+        }
+
+        usize end = i;
+        if (i < slice.len()) {
+            i++;
+        }
+
+        return Slice{
+            slice.buf() + start,
+            end - start,
+        };
+    });
+}
+
+template <Sliceable S>
+constexpr auto iterLevelSplit(S &slice, typename S::Inner const &sep) {
+    return Iter([&slice, sep, i = 0uz]() mutable -> Opt<Slice<typename S::Inner>> {
+        if (i >= slice.len()) {
+            return NONE;
+        }
+
+        while (i < slice.len() && slice.buf()[i] != sep) {
+            i++;
+        }
+
+        usize end = i;
+        if (i < slice.len()) {
+            i++;
+        }
+
+        return Slice{
+            slice.buf(),
+            end,
+        };
+    });
+}
+
+template <Sliceable S>
+constexpr auto iterSplitRev(S &slice, typename S::Inner const &sep) {
+    return Iter([&slice, sep, i = slice.len()]() mutable -> Opt<Slice<typename S::Inner>> {
+        if (i == 0) {
+            return NONE;
+        }
+
+        usize end = i;
+        while (i > 0 && slice.buf()[i - 1] != sep) {
+            i--;
+        }
+
+        usize start = i;
+        if (i > 0) {
+            i--;
+        }
+
+        return Slice{
+            slice.buf() + start,
+            end - start,
+        };
+    });
+}
+
+template <Sliceable S>
+constexpr auto iterLevelSplitRev(S &slice, typename S::Inner const &sep) {
+    return Iter([&slice, sep, i = slice.len()]() mutable -> Opt<Slice<typename S::Inner>> {
+        if (i == 0) {
+            return NONE;
+        }
+
+        usize end = i;
+        while (i > 0 && slice.buf()[i - 1] != sep) {
+            i--;
+        }
+
+        if (i > 0) {
+            i--;
+        }
+
+        return Slice{
+            slice.buf(),
+            end,
+        };
+    });
+}
+
 constexpr usize len(Sliceable auto &slice) {
     return slice.len();
 }

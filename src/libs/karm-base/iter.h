@@ -14,7 +14,7 @@ struct Iter {
     constexpr Iter(Next next) : next(next) {}
 
     constexpr auto map(auto f) {
-        auto n = [=]() mutable -> Opt<decltype(f(*Meta::declval<Item>()))> {
+        auto n = [=, *this]() mutable -> Opt<decltype(f(*Meta::declval<Item>()))> {
             auto v = next();
 
             if (not v) {
@@ -28,7 +28,7 @@ struct Iter {
     }
 
     constexpr auto mapi(auto f) {
-        auto n = [=, index = 0uz]() mutable -> Opt<decltype(f(1uz, *Meta::declval<Item>()))> {
+        auto n = [=, *this, index = 0uz]() mutable -> Opt<decltype(f(*Meta::declval<Item>(), 1uz))> {
             auto v = next();
             index++;
 
@@ -36,25 +36,30 @@ struct Iter {
                 return NONE;
             }
 
-            return f(index - 1, *v);
+            return f(*v, index - 1);
         };
 
         return Iter<decltype(n)>{n};
     }
 
     constexpr auto filter(auto f) {
-        return Iter{[=]() mutable {
-            while (true) {
-                auto v = next();
-                if (not next) {
+        auto n = [=, *this]() mutable -> Item {
+            auto v = next();
+            if (not v) {
+                return NONE;
+            }
+
+            while (not f(*v)) {
+                v = next();
+                if (not v) {
                     return NONE;
                 }
-
-                if (f(*v)) {
-                    return *v;
-                }
             }
-        }};
+
+            return v;
+        };
+
+        return Iter<decltype(n)>{n};
     }
 
     constexpr auto reduce(auto init, auto f) {
@@ -153,7 +158,7 @@ struct Iter {
     }
 
     constexpr auto take(usize n) {
-        return Iter{[=]() mutable {
+        return Iter{[=, *this]() mutable {
             if (n == 0) {
                 return NONE;
             }
@@ -162,6 +167,34 @@ struct Iter {
             n--;
             return v;
         }};
+    }
+
+    constexpr auto prepend(auto v) {
+        return Iter{
+            [=, *this, first = true]() mutable -> Item {
+                if (first)
+                    return Item{v};
+
+                return next();
+            }};
+    }
+
+    constexpr auto append(auto v) {
+        return Iter{
+            [=, *this, last = true]() mutable -> Item {
+                auto result = next();
+
+                if (not result and last) {
+                    last = false;
+                    return Item{v};
+                }
+
+                return result;
+            }};
+    }
+
+    constexpr auto at(usize n) {
+        return skip(n).first();
     }
 
     constexpr bool any(auto f) {

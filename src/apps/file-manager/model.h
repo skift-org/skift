@@ -25,9 +25,13 @@ struct State {
     }
 
     bool canGoParent() const {
-        return currentPath().parent().str().len() > 0;
+        return currentPath().hasParent();
     }
 };
+
+struct GoRoot {};
+
+struct GoHome {};
 
 struct GoBack {};
 
@@ -45,7 +49,7 @@ struct Refresh {};
 
 struct AddBookmark {};
 
-using Actions = Var<GoBack, GoForward, GoParent, GoTo, Refresh, AddBookmark>;
+using Actions = Var<GoRoot, GoHome, GoBack, GoForward, GoParent, GoTo, Refresh, AddBookmark>;
 
 State reduce(State d, Actions action);
 

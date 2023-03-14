@@ -609,11 +609,6 @@ struct GridLayout : public GroupNode<GridLayout> {
         return (growTotal) / max(1, grows);
     }
 
-    void paint(Gfx::Context &g, Math::Recti hint) override {
-        GroupNode::paint(g, hint);
-        g.debugRect(bound(), Gfx::RED);
-    }
-
     void layout(Math::Recti r) override {
         _bound = r;
 

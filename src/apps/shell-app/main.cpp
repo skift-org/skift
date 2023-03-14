@@ -160,7 +160,7 @@ Ui::Child systemTray() {
                 Ui::DismisDir::TOP,
                 0.3,
                 Ui::box(Ui::BoxStyle{
-                            .borderRadius = {0, 0, 16, 16},
+                            .borderRadius = {0, 0, 8, 8},
                             .backgroundPaint = Gfx::ZINC900,
                         },
                         Ui::vflow(8, quickSettings(), notifications() | Ui::grow(), Ui::dragHandle())))),
@@ -174,7 +174,6 @@ Ui::Child searchInput() {
         Ui::BoxStyle{
             .borderRadius = 4,
             .borderWidth = 1,
-            .borderPaint = Gfx::ZINC700,
             .backgroundPaint = Gfx::ZINC800,
         },
         Ui::minSize({Ui::UNCONSTRAINED, 48},
@@ -207,15 +206,12 @@ Ui::Child appRow(Mdi::Icon icon, Gfx::ColorRamp colors, String title) {
 }
 
 Ui::Child apps(Ui::Children apps) {
-    return Ui::grow(
-        Ui::vflow(
-            searchInput(),
-            Ui::grow(
-                Ui::vscroll(
-                    Ui::spacing(
-                        {0, 12},
-                        Ui::vflow(
-                            apps))))));
+    return Ui::vflow(
+        searchInput(),
+        Ui::vflow(apps) |
+            Ui::spacing({0, 12}) |
+            Ui::vscroll() |
+            Ui::grow());
 }
 
 Ui::Child appDrawer() {
@@ -236,18 +232,25 @@ Ui::Child appDrawer() {
     };
 
     return Ui::vflow(
-        statusbar(),
-        Ui::empty(24),
+        // statusbar(),
+        Ui::empty(64),
         Ui::grow(
-            Ui::dismisable(Ui::closeDialog, Ui::DismisDir::DOWN, 0.3,
-                           Ui::box(
-                               Ui::BoxStyle{
-                                   .borderRadius = {16, 16, 16, 16},
-                                   .backgroundPaint = Gfx::ZINC900,
-                               },
-                               Ui::vflow(
-                                   Ui::dragHandle(),
-                                   Ui::grow(Ui::spacing({12, 0}, apps(appItems))))))));
+            Ui::dismisable(
+                Ui::closeDialog,
+                Ui::DismisDir::DOWN,
+                0.3,
+                Ui::box(
+                    Ui::BoxStyle{
+                        .borderRadius = 8,
+                        .backgroundPaint = Gfx::ZINC900,
+                    },
+                    Ui::vflow(
+                        Ui::dragHandle(),
+                        Ui::grow(
+                            Ui::spacing(
+                                {12, 0},
+                                apps(appItems))))) |
+                    Ui::spacing(8))));
 }
 
 /* --- Navigation Bar ------------------------------------------------------- */

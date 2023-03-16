@@ -4,6 +4,10 @@ extern "C" int _tls_index;
 extern "C" int _Init_thread_epoch;
 extern "C" int _Init_global_epoch;
 
+int _tls_index = 0;
+int _Init_thread_epoch = 0;
+int _Init_global_epoch = 0;
+
 /*
     This function tries to acquire a lock on the initialization for the static
     variable by changing the value saved in *ptss to -1. If *ptss is 0, the

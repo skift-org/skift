@@ -5,8 +5,7 @@
     "description": "Karm platform embedding layer for POSIX.",
     "enableIf": {
         "sys": [
-            "linux",
-            "darwin"
+            "linux"
         ]
     },
     "requires": [],

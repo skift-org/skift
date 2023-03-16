@@ -2,30 +2,6 @@ name: Build
 on: [push, pull_request]
 
 jobs:
-  macos:
-    runs-on: macos-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Setup Toolchains
-        run: brew install llvm python git ninja sdl2 nasm pkg-config &&
-             python3 -m ensurepip && git clone https://github.com/cute-engineering/osdk && sudo python3 -m pip install -e osdk/
-
-      - name: Install Packages
-        run: .github/workflows/darwin-wrapper.sh osdk i
-
-      - name: Build Kernel (x86_64)
-        run: .github/workflows/darwin-wrapper.sh osdk b --target=kernel-x86_64
-
-      - name: Build EFI (x86_64)
-        run: .github/workflows/darwin-wrapper.sh osdk b --target=efi-x86_64
-
-      - name: Build Host
-        run: .github/workflows/darwin-wrapper.sh osdk b
-
   ubuntu:
     runs-on: ubuntu-latest
     steps:

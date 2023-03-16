@@ -284,7 +284,7 @@ using Model = Ui::Model<State, Actions>;
 Ui::Child sidebar(State s) {
     Ui::Children items =
         iter(demos)
-            .mapi([&](usize index, Demo const &demo) {
+            .mapi([&](Demo const &demo, usize index) {
                 return Ui::navRow(index == s.current, Model::bind<SwitchAction>(index), demo.icon, demo.name);
             })
             .collect<Ui::Children>();

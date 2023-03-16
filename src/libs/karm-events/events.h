@@ -42,19 +42,16 @@ struct Event {
 };
 
 template <typename Crtp>
-struct _Event : public Event {
-    _Event() : Event{Meta::makeId<Crtp>()} {}
+struct BaseEvent : public Event {
+    BaseEvent() : Event{Meta::makeId<Crtp>()} {}
 };
 
-struct MouseEvent : public _Event<MouseEvent> {
+struct MouseEvent : public BaseEvent<MouseEvent> {
     enum Type : u8 {
         PRESS,
         RELEASE,
         SCROLL,
-
         MOVE,
-        ENTER,
-        LEAVE
     };
 
     Type type;
@@ -69,7 +66,11 @@ struct MouseEvent : public _Event<MouseEvent> {
     Button button{};
 };
 
-struct KeyboardEvent : public _Event<KeyboardEvent> {
+struct MouseLeaveEvent : public BaseEvent<MouseLeaveEvent> {};
+
+struct MouseEnterEvent : public BaseEvent<MouseLeaveEvent> {};
+
+struct KeyboardEvent : public BaseEvent<KeyboardEvent> {
     enum Type {
         PRESS,
         RELEASE,
@@ -80,20 +81,20 @@ struct KeyboardEvent : public _Event<KeyboardEvent> {
     Rune rune;
 };
 
-struct PaintEvent : public _Event<PaintEvent> {
+struct PaintEvent : public BaseEvent<PaintEvent> {
     Math::Recti bound;
 
     PaintEvent(Math::Recti bound)
         : bound{bound} {}
 };
 
-struct LayoutEvent : public _Event<LayoutEvent> {};
+struct LayoutEvent : public BaseEvent<LayoutEvent> {};
 
-struct BuildEvent : public _Event<BuildEvent> {};
+struct BuildEvent : public BaseEvent<BuildEvent> {};
 
-struct AnimateEvent : public _Event<AnimateEvent> {};
+struct AnimateEvent : public BaseEvent<AnimateEvent> {};
 
-struct ExitEvent : public _Event<ExitEvent> {
+struct ExitEvent : public BaseEvent<ExitEvent> {
     Res<> res = Ok();
 
     ExitEvent()

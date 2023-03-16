@@ -287,16 +287,10 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
         auto childRatio = (f64)childSize.x / (f64)childSize.y;
 
         if (childRatio > _ratio) {
-            return Math::Vec2i{
-                (isize)(s.y * _ratio),
-                s.y,
-            };
-        } else {
-            return Math::Vec2i{
-                s.x,
-                (isize)(s.x / _ratio),
-            };
+            return {(isize)(s.y * _ratio), s.y};
         }
+
+        return {s.x, (isize)(s.x / _ratio)};
     }
 
     Math::Recti bound() override {
@@ -329,7 +323,8 @@ Child stack(Children children) {
 struct DockItem : public ProxyNode<DockItem> {
     Layout::Dock _dock;
 
-    DockItem(Layout::Dock dock, Child child) : ProxyNode(child), _dock(dock) {}
+    DockItem(Layout::Dock dock, Child child)
+        : ProxyNode(child), _dock(dock) {}
 
     Layout::Dock dock() const { return _dock; }
 };
@@ -419,9 +414,11 @@ Child dock(Children children) {
 struct Grow : public ProxyNode<Grow> {
     isize _grow;
 
-    Grow(Child child) : ProxyNode(child), _grow(1) {}
+    Grow(Child child)
+        : ProxyNode(child), _grow(1) {}
 
-    Grow(isize grow, Child child) : ProxyNode(child), _grow(grow) {}
+    Grow(isize grow, Child child)
+        : ProxyNode(child), _grow(grow) {}
 
     isize grow() const {
         return _grow;
@@ -589,6 +586,7 @@ struct GridLayout : public GroupNode<GridLayout> {
 
         isize all = _style.flow.getHeight(r) - computeGapsRows();
         isize growTotal = max(0, all - total);
+
         return (growTotal) / max(1, grows);
     }
 
@@ -606,7 +604,29 @@ struct GridLayout : public GroupNode<GridLayout> {
 
         isize all = _style.flow.getWidth(r) - computeGapsColumns();
         isize growTotal = max(0, all - total);
+
         return (growTotal) / max(1, grows);
+    }
+
+    void place(Child child, Math::Vec2i pos) {
+        place(child, pos, pos);
+    }
+
+    void place(Child child, Math::Vec2i start, Math::Vec2i end) {
+        auto startRow = _rows[start.y];
+        auto startColumn = _columns[start.x];
+
+        auto endRow = _rows[end.y];
+        auto endColumn = _columns[end.x];
+
+        auto childRect = Math::Recti{
+            startColumn.start,
+            startRow.start,
+            endColumn.end() - startColumn.start,
+            endRow.end() - startRow.start,
+        };
+
+        child->layout(childRect);
     }
 
     void layout(Math::Recti r) override {
@@ -614,14 +634,8 @@ struct GridLayout : public GroupNode<GridLayout> {
 
         // compute the dimensions of the grid
         _rows.clear();
-        _columns.clear();
-
         isize growUnitRows = computeGrowUnitRows(r);
-        isize growUnitColumns = computeGrowUnitColumns(r);
-
         isize row = _style.flow.getTop(r);
-        isize column = _style.flow.getStart(r);
-
         for (auto &r : _style.rows) {
             if (r.unit == GridUnit::GROW) {
                 _rows.pushBack({_Dim{row, growUnitRows * r.value}});
@@ -634,6 +648,9 @@ struct GridLayout : public GroupNode<GridLayout> {
             row += _style.gaps.y;
         }
 
+        _columns.clear();
+        isize growUnitColumns = computeGrowUnitColumns(r);
+        isize column = _style.flow.getStart(r);
         for (auto &c : _style.columns) {
             if (c.unit == GridUnit::GROW) {
                 _columns.pushBack({_Dim{column, growUnitColumns * c.value}});
@@ -651,55 +668,23 @@ struct GridLayout : public GroupNode<GridLayout> {
         for (auto &child : children()) {
             if (child.is<Cell>()) {
                 auto &cell = child.unwrap<Cell>();
-
                 auto start = cell.start();
                 auto end = cell.end();
-
-                auto startRow = _rows[start.y];
-                auto startColumn = _columns[start.x];
-
-                auto endRow = _rows[end.y];
-                auto endColumn = _columns[end.x];
-
-                auto childRect = Math::Recti{
-                    startColumn.start,
-                    startRow.start,
-                    endColumn.end() - startColumn.start,
-                    endRow.end() - startRow.start,
-                };
-
-                child->layout(childRect);
+                place(child, start, end);
                 index = end.y * _columns.len() + end.x;
             } else {
-                auto row = index / _columns.len();
-                auto column = index % _columns.len();
-
-                auto startRow = _rows[row];
-                auto startColumn = _columns[column];
-
-                auto childRect = Math::Recti{
-                    startColumn.start,
-                    startRow.start,
-                    startColumn.size,
-                    startRow.size,
-                };
-
-                child->layout(childRect);
+                isize row = index / _columns.len();
+                isize column = index % _columns.len();
+                place(child, {row, column});
             }
             index++;
         }
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
-        isize growUnitRows = computeGrowUnitRows(Math::Recti{0, s});
-        isize growUnitColumns = computeGrowUnitColumns(Math::Recti{0, s});
-
         isize row = 0;
         bool rowGrow = false;
-
-        isize column = 0;
-        bool columnGrow = false;
-
+        isize growUnitRows = computeGrowUnitRows(Math::Recti{0, s});
         for (auto &r : _style.rows) {
             if (r.unit == GridUnit::GROW) {
                 row += growUnitRows * r.value;
@@ -709,6 +694,15 @@ struct GridLayout : public GroupNode<GridLayout> {
             }
         }
 
+        row += computeGapsRows();
+
+        if (rowGrow and hint == Layout::Hint::MAX) {
+            row = max(_style.flow.getY(s), row);
+        }
+
+        isize column = 0;
+        bool columnGrow = false;
+        isize growUnitColumns = computeGrowUnitColumns(Math::Recti{0, s});
         for (auto &c : _style.columns) {
             if (c.unit == GridUnit::GROW) {
                 column += growUnitColumns * c.value;
@@ -718,12 +712,7 @@ struct GridLayout : public GroupNode<GridLayout> {
             }
         }
 
-        row += computeGapsRows();
         column += computeGapsColumns();
-
-        if (rowGrow and hint == Layout::Hint::MAX) {
-            row = max(_style.flow.getY(s), row);
-        }
 
         if (columnGrow and hint == Layout::Hint::MAX) {
             column = max(_style.flow.getX(s), column);

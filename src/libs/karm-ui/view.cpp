@@ -308,9 +308,9 @@ struct Canvas : public View<Canvas> {
     Math::Vec2i size(Math::Vec2i, Layout::Hint hint) override {
         if (hint == Layout::Hint::MIN) {
             return 0;
-        } else {
-            return _bound.wh;
         }
+
+        return _bound.wh;
     }
 };
 

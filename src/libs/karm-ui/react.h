@@ -185,7 +185,7 @@ Child state(T initial, Func<Child(State<T>)> build) {
 /* --- Reducer -------------------------------------------------------------- */
 
 template <typename Action>
-struct ActionDispatchEvent : public Events::_Event<ActionDispatchEvent<Action>> {
+struct ActionDispatchEvent : public Events::BaseEvent<ActionDispatchEvent<Action>> {
     Action action;
 
     ActionDispatchEvent(Action action)

@@ -29,4 +29,15 @@ inline void shouldAnimate(Node &n) {
     n.bubble(e);
 }
 
+inline void mouseLeave(Node &n) {
+    Events::MouseLeaveEvent e{};
+    n.event(e);
+}
+
+inline void mouseLeave(Children &children) {
+    for (auto &c : children) {
+        mouseLeave(*c);
+    }
+}
+
 } // namespace Karm::Ui

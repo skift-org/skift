@@ -13,7 +13,7 @@ namespace Karm::Ui {
 
 /* ---  Dialog Base  -------------------------------------------------------- */
 
-struct ShowDialogEvent : public Events::_Event<ShowDialogEvent> {
+struct ShowDialogEvent : public Events::BaseEvent<ShowDialogEvent> {
     Child child;
     ShowDialogEvent(Child c) : child(c) {}
 };
@@ -23,14 +23,14 @@ void showDialog(Node &n, Child child) {
     n.bubble(e);
 }
 
-struct CloseDialogEvent : public Events::_Event<CloseDialogEvent> {};
+struct CloseDialogEvent : public Events::BaseEvent<CloseDialogEvent> {};
 
 void closeDialog(Node &n) {
     CloseDialogEvent e;
     n.bubble(e);
 }
 
-struct ShowPopoverEvent : public Events::_Event<ShowPopoverEvent> {
+struct ShowPopoverEvent : public Events::BaseEvent<ShowPopoverEvent> {
     Math::Vec2i at;
     Child child;
 
@@ -43,7 +43,7 @@ void showPopover(Node &n, Math::Vec2i at, Child child) {
     n.bubble(e);
 }
 
-struct ClosePopoverEvent : public Events::_Event<ClosePopoverEvent> {};
+struct ClosePopoverEvent : public Events::BaseEvent<ClosePopoverEvent> {};
 
 void closePopover(Node &n) {
     ClosePopoverEvent e;
@@ -140,6 +140,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
             // otherwise replacing the dialog might cause some use after free down the tree
             auto &s = e.unwrap<ShowDialogEvent>();
             _shouldShow = s.child;
+            mouseLeave(*_child);
             shouldLayout(*this);
             _opacity.animate(*this, 1, 0.1);
         } else if (e.is<ShowPopoverEvent>()) {
@@ -148,6 +149,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
             auto &s = e.unwrap<ShowPopoverEvent>();
             _shouldPopover = s.child;
             _popoverAt = s.at;
+            mouseLeave(*_child);
             shouldLayout(*this);
         } else if (e.is<CloseDialogEvent>()) {
             // We need to defer closing the dialog until the next frame,

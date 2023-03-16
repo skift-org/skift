@@ -71,6 +71,11 @@ struct MouseListener {
             return false;
         });
 
+        e.handle<Events::MouseLeaveEvent>([&](auto) {
+            state = IDLE;
+            return false;
+        });
+
         if (state != _state) {
             _state = state;
             shouldRepaint(node);

@@ -161,6 +161,12 @@ struct Button : public _Box<Button> {
     void reconcile(Button &o) override {
         _buttonStyle = o._buttonStyle;
         _onPress = std::move(o._onPress);
+
+        if (!_onPress) {
+            // Reset the mouse listener if the button is disabled.
+            _mouseListener = {};
+        }
+
         _Box<Button>::reconcile(o);
     }
 

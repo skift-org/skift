@@ -5,6 +5,7 @@ namespace Karm::Ui {
 /* --- Scroll --------------------------------------------------------------- */
 
 struct Scroll : public ProxyNode<Scroll> {
+    bool _mouseIn = false;
     bool _animated = false;
     Layout::Orien _orient{};
     Math::Recti _bound{};
@@ -39,6 +40,8 @@ struct Scroll : public ProxyNode<Scroll> {
         if (e.is<Events::MouseEvent>()) {
             auto ee = e.unwrap<Events::MouseEvent>();
             if (bound().contains(ee.pos)) {
+                _mouseIn = true;
+
                 ee.pos = ee.pos - _scroll;
                 child().event(ee);
 
@@ -49,6 +52,8 @@ struct Scroll : public ProxyNode<Scroll> {
                         _animated = true;
                     }
                 }
+            } else if (_mouseIn) {
+                mouseLeave(*_child);
             }
             e.accepted = ee.accepted;
         } else if (e.is<Events::AnimateEvent>() and _animated) {

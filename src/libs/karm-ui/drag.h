@@ -9,7 +9,7 @@ namespace Karm::Ui {
 
 /* --- Drag Event ----------------------------------------------------------- */
 
-struct DragEvent : public Events::_Event<DragEvent> {
+struct DragEvent : public Events::BaseEvent<DragEvent> {
     enum _Type : u8 {
         START,
         DRAG,

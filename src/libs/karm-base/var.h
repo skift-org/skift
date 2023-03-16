@@ -11,23 +11,27 @@ namespace Karm {
 
 template <typename... Ts>
 struct Var {
+    static_assert(sizeof...(Ts) <= 255, "Var can only hold up to 255 types");
+
     alignas(max(alignof(Ts)...)) char _buf[max(sizeof(Ts)...)];
     u8 _index;
-    static_assert(sizeof...(Ts) <= 255, "Var can only hold up to 255 types");
 
     ALWAYS_INLINE Var() = delete;
 
     template <Meta::Contains<Ts...> T>
-    ALWAYS_INLINE Var(T const &value) : _index(Meta::indexOf<T, Ts...>()) {
+    ALWAYS_INLINE Var(T const &value)
+        : _index(Meta::indexOf<T, Ts...>()) {
         new (_buf) T(value);
     }
 
     template <Meta::Contains<Ts...> T>
-    ALWAYS_INLINE Var(T &&value) : _index(Meta::indexOf<T, Ts...>()) {
+    ALWAYS_INLINE Var(T &&value)
+        : _index(Meta::indexOf<T, Ts...>()) {
         new (_buf) T(std::move(value));
     }
 
-    ALWAYS_INLINE Var(Var const &other) : _index(other._index) {
+    ALWAYS_INLINE Var(Var const &other)
+        : _index(other._index) {
         Meta::indexCast<Ts...>(
             _index, other._buf,
             [this]<typename T>(T const &ptr) {
@@ -35,7 +39,8 @@ struct Var {
             });
     }
 
-    ALWAYS_INLINE Var(Var &&other) : _index(other._index) {
+    ALWAYS_INLINE Var(Var &&other)
+        : _index(other._index) {
         Meta::indexCast<Ts...>(_index, other._buf, [this]<typename T>(T &ptr) {
             new (_buf) T(std::move(ptr));
         });
@@ -142,6 +147,15 @@ struct Var {
         return false;
     }
 
+    template <Meta::Contains<Ts...> T>
+    ALWAYS_INLINE bool with(auto visitor) const {
+        if (_index == Meta::indexOf<T, Ts...>()) {
+            visitor(*reinterpret_cast<T const *>(_buf));
+            return true;
+        }
+        return false;
+    }
+
     ALWAYS_INLINE auto visit(auto visitor) {
         return Meta::indexCast<Ts...>(_index, _buf, visitor);
     }
@@ -183,7 +197,7 @@ struct Var {
             });
         }
 
-        return Ordr::LESS;
+        return cmp(_index, other._index);
     }
 };
 

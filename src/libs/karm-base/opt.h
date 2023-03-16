@@ -174,7 +174,9 @@ struct [[nodiscard]] Opt {
         return false;
     }
 
-    ALWAYS_INLINE auto visit(auto visitor) -> decltype(visitor(_value.unwrap())) {
+    ALWAYS_INLINE auto visit(auto visitor)
+        -> decltype(visitor(_value.unwrap())) {
+
         if (_present) {
             return visitor(_value.unwrap());
         }
@@ -182,7 +184,9 @@ struct [[nodiscard]] Opt {
         return {};
     }
 
-    ALWAYS_INLINE auto visit(auto visitor) const -> decltype(visitor(_value.unwrap())) {
+    ALWAYS_INLINE auto visit(auto visitor) const
+        -> decltype(visitor(_value.unwrap())) {
+
         if (_present) {
             return visitor(_value.unwrap());
         }

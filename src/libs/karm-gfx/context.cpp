@@ -163,7 +163,7 @@ void Context::clear(Math::Recti rect, Color color) {
 
 /* --- Blitting ------------------------------------------------------------- */
 
-void Context::blit(Math::Recti src, Math::Recti dest, Surface surface) {
+[[gnu::flatten]] void Context::blit(Math::Recti src, Math::Recti dest, Surface surface) {
     dest = applyOrigin(dest);
     auto clipDest = applyAll(dest);
 
@@ -372,7 +372,8 @@ void Context::debugTrace(Gfx::Color color) {
 
 /* --- Paths ---------------------------------------------------------------- */
 
-[[gnu::flatten]] void Context::_fill(Paint paint, FillRule fillRule) {
+[[gnu::flatten]] void Context::_fillImpl(auto paint, auto format, FillRule fillRule) {
+
     static constexpr auto AA = 4;
     static constexpr auto UNIT = 1.0f / AA;
     static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;
@@ -444,22 +445,28 @@ void Context::debugTrace(Gfx::Color color) {
             }
         }
 
-        surface().format.visit([&](auto f) {
-            auto *pixel = static_cast<u8 *>(surface().data()) + y * surface().stride() + rect.start() * f.bpp();
-            for (isize x = rect.start(); x < rect.end(); x++) {
-                Math::Vec2f sample = {
-                    (x - shapeBound.start()) / shapeBound.width,
-                    (y - shapeBound.top()) / shapeBound.height,
-                };
-                auto color = paint.sample(sample);
+        auto *pixel = static_cast<u8 *>(surface().data()) + y * surface().stride() + rect.start() * format.bpp();
+        for (isize x = rect.start(); x < rect.end(); x++) {
+            Math::Vec2f sample = {
+                (x - shapeBound.start()) / shapeBound.width,
+                (y - shapeBound.top()) / shapeBound.height,
+            };
+            auto color = paint.sample(sample);
 
-                auto c = f.load(pixel);
-                c = color.withOpacity(clamp01(_scanline[x])).blendOver(c);
-                f.store(pixel, c);
-                pixel += f.bpp();
-            }
-        });
+            auto c = format.load(pixel);
+            c = color.withOpacity(clamp01(_scanline[x])).blendOver(c);
+            format.store(pixel, c);
+            pixel += format.bpp();
+        }
     }
+}
+
+void Context::_fill(Paint paint, FillRule fillRule) {
+    paint.visit([&](auto p) {
+        surface().format.visit([&](auto f) {
+            _fillImpl(p, f, fillRule);
+        });
+    });
 }
 
 void Context::begin() {

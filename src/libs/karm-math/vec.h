@@ -72,7 +72,7 @@ union Vec2 {
     }
 
     constexpr T angle() const {
-        return atan2(y, x);
+        return Math::atan2(y, x);
     }
 
     constexpr Vec2 rotate(T angle) const {

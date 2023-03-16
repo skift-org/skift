@@ -7,30 +7,30 @@
 struct BScan {
     Cursor<u8> _cursor;
 
-    BScan(Bytes bytes) : _cursor(bytes) {}
+    ALWAYS_INLINE constexpr BScan(Bytes bytes) : _cursor(bytes) {}
 
-    bool ended() {
+    ALWAYS_INLINE constexpr bool ended() {
         return _cursor.ended();
     }
 
-    usize rem() {
+    ALWAYS_INLINE constexpr usize rem() {
         return _cursor.rem();
     }
 
-    BScan &skip(usize n) {
+    ALWAYS_INLINE constexpr BScan &skip(usize n) {
         n = min(n, rem());
         _cursor.next(n);
         return *this;
     }
 
-    BScan peek(usize n) {
+    ALWAYS_INLINE constexpr BScan peek(usize n) {
         BScan c{*this};
         c.skip(n);
         return c;
     }
 
     template <typename T>
-    bool readTo(T *buf, usize n) {
+    ALWAYS_INLINE constexpr bool readTo(T *buf, usize n) {
         if (rem() < n) {
             return false;
         }
@@ -43,7 +43,7 @@ struct BScan {
     }
 
     template <typename T>
-    bool peekTo(T *buf, usize n) {
+    ALWAYS_INLINE constexpr bool peekTo(T *buf, usize n) {
         if (rem() < n) {
             return false;
         }
@@ -56,81 +56,81 @@ struct BScan {
     }
 
     template <typename T>
-    T nextBe() {
+    ALWAYS_INLINE constexpr T nextBe() {
         _be<T> r{};
         readTo(&r, sizeof(T));
         return r;
     }
 
     template <typename T>
-    T nextLe() {
+    ALWAYS_INLINE constexpr T nextLe() {
         _le<T> r;
         readTo(&r, sizeof(T));
         return r;
     }
 
     template <typename T>
-    T peekBe() {
+    ALWAYS_INLINE constexpr T peekBe() {
         _be<T> r{};
         peekTo(&r, sizeof(T));
         return r;
     }
 
     template <typename T>
-    T peekLe() {
+    ALWAYS_INLINE constexpr T peekLe() {
         _be<T> r;
         peekTo(&r, sizeof(T));
         return r;
     }
 
-    u8 nextU8be() { return nextBe<u8>(); }
-    u16 nextU16be() { return nextBe<u16>(); }
-    u32 nextU32be() { return nextBe<u32>(); }
-    u64 nextU64be() { return nextBe<u64>(); }
+    ALWAYS_INLINE constexpr u8 nextU8be() { return nextBe<u8>(); }
+    ALWAYS_INLINE constexpr u16 nextU16be() { return nextBe<u16>(); }
+    ALWAYS_INLINE constexpr u32 nextU32be() { return nextBe<u32>(); }
+    ALWAYS_INLINE constexpr u64 nextU64be() { return nextBe<u64>(); }
 
-    u8 nextU8le() { return nextLe<u8>(); }
-    u16 nextU16le() { return nextLe<u16>(); }
-    u32 nextU32le() { return nextLe<u32>(); }
-    u64 nextU64le() { return nextLe<u64>(); }
+    ALWAYS_INLINE constexpr u8 nextU8le() { return nextLe<u8>(); }
+    ALWAYS_INLINE constexpr u16 nextU16le() { return nextLe<u16>(); }
+    ALWAYS_INLINE constexpr u32 nextU32le() { return nextLe<u32>(); }
+    ALWAYS_INLINE constexpr u64 nextU64le() { return nextLe<u64>(); }
 
-    i8 nextI8be() { return nextBe<i8>(); }
-    i16 nextI16be() { return nextBe<i16>(); }
-    i32 nextI32be() { return nextBe<i32>(); }
-    i64 nextI64be() { return nextBe<i64>(); }
+    ALWAYS_INLINE constexpr i8 nextI8be() { return nextBe<i8>(); }
+    ALWAYS_INLINE constexpr i16 nextI16be() { return nextBe<i16>(); }
+    ALWAYS_INLINE constexpr i32 nextI32be() { return nextBe<i32>(); }
+    ALWAYS_INLINE constexpr i64 nextI64be() { return nextBe<i64>(); }
 
-    i8 nextI8le() { return nextLe<i8>(); }
-    i16 nextI16le() { return nextLe<i16>(); }
-    i32 nextI32le() { return nextLe<i32>(); }
-    i64 nextI64le() { return nextLe<i64>(); }
+    ALWAYS_INLINE constexpr i8 nextI8le() { return nextLe<i8>(); }
+    ALWAYS_INLINE constexpr i16 nextI16le() { return nextLe<i16>(); }
+    ALWAYS_INLINE constexpr i32 nextI32le() { return nextLe<i32>(); }
+    ALWAYS_INLINE constexpr i64 nextI64le() { return nextLe<i64>(); }
 
-    u8 peekU8be() { return peekBe<u8>(); }
-    u16 peekU16be() { return peekBe<u16>(); }
-    u32 peekU32be() { return peekBe<u32>(); }
-    u64 peekU64be() { return peekBe<u64>(); }
+    ALWAYS_INLINE constexpr u8 peekU8be() { return peekBe<u8>(); }
+    ALWAYS_INLINE constexpr u16 peekU16be() { return peekBe<u16>(); }
+    ALWAYS_INLINE constexpr u32 peekU32be() { return peekBe<u32>(); }
+    ALWAYS_INLINE constexpr u64 peekU64be() { return peekBe<u64>(); }
 
-    u8 peekU8le() { return peekLe<u8>(); }
-    u16 peekU16le() { return peekLe<u16>(); }
-    u32 peekU32le() { return peekLe<u32>(); }
-    u64 peekU64le() { return peekLe<u64>(); }
+    ALWAYS_INLINE constexpr u8 peekU8le() { return peekLe<u8>(); }
+    ALWAYS_INLINE constexpr u16 peekU16le() { return peekLe<u16>(); }
+    ALWAYS_INLINE constexpr u32 peekU32le() { return peekLe<u32>(); }
+    ALWAYS_INLINE constexpr u64 peekU64le() { return peekLe<u64>(); }
 
-    i8 peekI8be() { return peekBe<i8>(); }
-    i16 peekI16be() { return peekBe<i16>(); }
-    i32 peekI32be() { return peekBe<i32>(); }
-    i64 peekI64be() { return peekBe<i64>(); }
+    ALWAYS_INLINE constexpr i8 peekI8be() { return peekBe<i8>(); }
+    ALWAYS_INLINE constexpr i16 peekI16be() { return peekBe<i16>(); }
+    ALWAYS_INLINE constexpr i32 peekI32be() { return peekBe<i32>(); }
+    ALWAYS_INLINE constexpr i64 peekI64be() { return peekBe<i64>(); }
 
-    i8 peekI8le() { return peekLe<i8>(); }
-    i16 peekI16le() { return peekLe<i16>(); }
-    i32 peekI32le() { return peekLe<i32>(); }
-    i64 peekI64le() { return peekLe<i64>(); }
+    ALWAYS_INLINE constexpr i8 peekI8le() { return peekLe<i8>(); }
+    ALWAYS_INLINE constexpr i16 peekI16le() { return peekLe<i16>(); }
+    ALWAYS_INLINE constexpr i32 peekI32le() { return peekLe<i32>(); }
+    ALWAYS_INLINE constexpr i64 peekI64le() { return peekLe<i64>(); }
 
-    Str nextStr(usize n) {
+    ALWAYS_INLINE constexpr Str nextStr(usize n) {
         n = clamp(n, 0uz, rem());
         Str s{(char const *)_cursor.buf(), n};
         _cursor.next(n);
         return s;
     }
 
-    Str nextCStr() {
+    ALWAYS_INLINE constexpr Str nextCStr() {
         usize n = 0;
         while (n < rem() and _cursor.buf()[n] != '\0') {
             n++;
@@ -138,7 +138,7 @@ struct BScan {
         return nextStr(n);
     }
 
-    Bytes nextBytes(usize n) {
+    ALWAYS_INLINE constexpr Bytes nextBytes(usize n) {
         n = clamp(n, 0uz, rem());
         Bytes b{_cursor.buf(), n};
         _cursor.next(n);
@@ -149,15 +149,15 @@ struct BScan {
 struct BChunk {
     Bytes _slice;
 
-    BChunk() = default;
+    ALWAYS_INLINE constexpr BChunk() = default;
 
-    BChunk(Bytes slice) : _slice(slice) {}
+    ALWAYS_INLINE constexpr BChunk(Bytes slice) : _slice(slice) {}
 
-    bool present() const {
+    ALWAYS_INLINE constexpr bool present() const {
         return _slice.len() > 0;
     }
 
-    BScan begin() const {
+    ALWAYS_INLINE constexpr BScan begin() const {
         return _slice;
     }
 };

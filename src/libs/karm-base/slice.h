@@ -403,7 +403,7 @@ constexpr usize zeroFill(MutSlice<T> slice) {
     return fill(slice, {});
 }
 
-constexpr void sort(MutSliceable auto &slice, auto cmp) {
+ALWAYS_INLINE constexpr void sort(MutSliceable auto &slice, auto cmp) {
     if (len(slice) <= 1) {
         return;
     }

@@ -182,7 +182,7 @@ struct Glyf : public BChunk {
         i16 yMax;
     };
 
-    Metrics metrics(BScan &s, usize glyfOffset) const {
+    ALWAYS_INLINE Metrics metrics(BScan &s, usize glyfOffset) const {
         s.skip(glyfOffset);
         auto numContours = s.nextI16be();
         if (numContours == 0) {
@@ -195,7 +195,7 @@ struct Glyf : public BChunk {
         return {numContours, xMin, yMin, xMax, yMax};
     }
 
-    Metrics metrics(usize glyfOffset) const {
+    ALWAYS_INLINE Metrics metrics(usize glyfOffset) const {
         auto s = begin();
         return metrics(s, glyfOffset);
     }

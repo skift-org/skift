@@ -115,6 +115,49 @@ constexpr T cot(T x) noexcept {
     return T(1.) / tan<T, P>(x);
 }
 
+constexpr double atan(double x) {
+    double y;
+
+    if (isnan(x))
+        return (x);
+    if (x == 0.0)
+        return (0.0);
+    else if (x > 0.0) {
+        if (x > 1.0)
+            return (M_PI / 2 - atan(1.0 / x));
+        else {
+            y = (x * x);
+            return (x * (1.0 -
+                         y * (0.33333333333333333 - y * (0.20000000000000000 -
+                                                         y * (0.14285714285714285 - y * (0.11111111111111111 -
+                                                                                         y * (0.09090909090909091 - y * (0.07692307692307693))))))));
+        }
+    } else
+        return (-atan(-x));
+}
+
+constexpr double atan2(double y, double x) {
+    if (isnan(x) || isnan(y))
+        return (0.0 / 0.0);
+    if (x == 0) {
+        if (y > 0)
+            return (M_PI_2);
+        if (y < 0)
+            return (-M_PI_2);
+        return (0);
+    }
+    if (!(isinf(y) && isinf(x)))
+        return (atan(y / x));
+    if (x > 0) {
+        if (y > 0)
+            return (M_PI_4);
+        return (-M_PI_4);
+    }
+    if (y > 0)
+        return (3 * M_PI_4);
+    return (-3 * M_PI_4);
+}
+
 /* --- Comparison ----------------------------------------------------------- */
 
 template <typename T>

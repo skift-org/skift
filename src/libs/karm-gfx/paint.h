@@ -193,19 +193,9 @@ struct Paint : public Var<Color, Gradient, Media::Image> {
     using Var::Var;
 
     ALWAYS_INLINE Color sample(Math::Vec2f pos) const {
-        return visit(Visitor{
-            [&](Color color) {
-                return color;
-            },
-            [&](Gradient gradient) {
-                return gradient.sample(pos);
-            },
-            [&](Media::Image image) {
-                auto w = image.width();
-                auto h = image.height();
-                Surface s = image;
-                return s.loadClamped(Math::Vec2i(pos.x * w, pos.y * h));
-            }});
+        return visit([&](auto const &p) {
+            return p.sample(pos);
+        });
     }
 };
 

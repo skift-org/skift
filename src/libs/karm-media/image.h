@@ -29,7 +29,7 @@ struct Image {
         : format(format), buffer(makeStrong<ImageBuffer>(size.x, size.y, size.x * bpp(format))) {
     }
 
-    operator Gfx::Surface() {
+    operator Gfx::Surface() const {
         return {format, *buffer};
     }
 
@@ -43,6 +43,11 @@ struct Image {
 
     Math::Recti bound() const {
         return {0, 0, width(), height()};
+    }
+
+    ALWAYS_INLINE Gfx::Color sample(Math::Vec2f pos) const {
+        Gfx::Surface s = *this;
+        return s.loadClamped(Math::Vec2i(pos.x * height(), pos.y * width()));
     }
 };
 

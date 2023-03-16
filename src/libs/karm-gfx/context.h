@@ -165,6 +165,8 @@ struct Context {
 
     /* --- Paths ------------------------------------------------------------ */
 
+    void _fillImpl(auto paint, auto format, FillRule fillRule);
+
     void _fill(Paint paint, FillRule rule = FillRule::NONZERO);
 
     void begin();

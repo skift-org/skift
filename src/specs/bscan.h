@@ -144,6 +144,16 @@ struct BScan {
         _cursor.next(n);
         return b;
     }
+
+    ALWAYS_INLINE constexpr Bytes restBytes() {
+        return nextBytes(rem());
+    }
+};
+
+template <typename T, usize Offset>
+struct BField {
+    using Type = T;
+    static constexpr usize offset = Offset;
 };
 
 struct BChunk {
@@ -159,5 +169,14 @@ struct BChunk {
 
     ALWAYS_INLINE constexpr BScan begin() const {
         return _slice;
+    }
+
+    template <typename T>
+    ALWAYS_INLINE constexpr typename T::Type get() const {
+        typename T::Type r{};
+        begin()
+            .skip(T::offset)
+            .readTo(&r, sizeof(typename T::Type));
+        return r;
     }
 };

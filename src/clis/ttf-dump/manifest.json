@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
+    "id": "ttf-dump",
+    "type": "exe",
+    "description": "Dump a TrueType font file to stdout",
+    "requires": [
+        "karm-main",
+        "karm-media"
+    ]
+}

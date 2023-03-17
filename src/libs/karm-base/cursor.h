@@ -58,6 +58,14 @@ struct Cursor {
     ALWAYS_INLINE constexpr usize len() const {
         return _end - _begin;
     }
+
+    ALWAYS_INLINE constexpr Bytes bytes() const {
+        return Bytes{_begin, _end};
+    }
+
+    ALWAYS_INLINE constexpr MutBytes bytes() {
+        return MutBytes{_begin, _end};
+    }
 };
 
 template <typename T>

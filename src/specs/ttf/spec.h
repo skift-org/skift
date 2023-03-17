@@ -1,8 +1,5 @@
 #pragma once
 
-#include <karm-base/endiant.h>
-#include <karm-base/res.h>
-#include <karm-base/string.h>
 #include <karm-gfx/context.h>
 #include <karm-logger/logger.h>
 
@@ -386,6 +383,241 @@ struct Hmtx : public BChunk {
     }
 };
 
+struct LangTable : public BChunk {
+    using LookupOrderOffset = BField<u16be, 0>;
+    using ReqFeatureIndex = BField<u16be, 2>;
+    using FeatureCount = BField<u16be, 4>;
+
+    Str tag;
+
+    LangTable(Str tag, Bytes bytes)
+        : BChunk{bytes}, tag(tag) {}
+
+    auto iterFeatures() const {
+        auto s = begin().skip(6);
+        return range((usize)get<FeatureCount>())
+            .map([s](auto) mutable {
+                return s.nextU16be();
+            });
+    }
+};
+
+struct ScriptTable : public BChunk {
+    using DefaultLangSysOffset = BField<u16be, 0>;
+    using LangSysCount = BField<u16be, 2>;
+
+    Str tag;
+
+    ScriptTable(Str tag, Bytes bytes)
+        : BChunk{bytes}, tag(tag) {}
+
+    LangTable defaultLangSys() const {
+        return {"DFLT", begin().skip(get<DefaultLangSysOffset>()).restBytes()};
+    }
+
+    usize len() const {
+        return get<LangSysCount>();
+    }
+
+    LangTable at(usize i) const {
+        auto s = begin().skip(4 + i * 6);
+        return {s.nextStr(4), begin().skip(s.nextU16be()).restBytes()};
+    }
+
+    auto iter() const {
+        return range(len())
+            .map([&](auto i) mutable {
+                return at(i);
+            });
+    }
+};
+
+struct ScriptList : public BChunk {
+    using ScriptCount = BField<u16be, 0>;
+
+    usize len() const {
+        return get<ScriptCount>();
+    }
+
+    ScriptTable at(usize i) const {
+        auto s = begin().skip(2 + i * 6);
+        auto tag = s.nextStr(4);
+        auto off = s.nextU16be();
+        return ScriptTable{tag, begin().skip(off).restBytes()};
+    }
+
+    auto iter() const {
+        return range(len())
+            .map([&](auto i) mutable {
+                return at(i);
+            });
+    }
+};
+
+struct FeatureTable : public BChunk {
+    using FeatureParamsOffset = BField<u16be, 0>;
+    using LookupCount = BField<u16be, 2>;
+
+    Str tag;
+
+    FeatureTable(Str tag, Bytes bytes)
+        : BChunk{bytes}, tag(tag) {}
+
+    auto iterLookups() const {
+        auto s = begin().skip(4);
+        return range((usize)get<LookupCount>())
+            .map([s](auto) mutable {
+                return s.nextU16be();
+            });
+    }
+};
+
+struct FeatureList : public BChunk {
+    using featureCount = BField<u16be, 0>;
+
+    usize len() const {
+        return get<featureCount>();
+    }
+
+    FeatureTable at(usize i) const {
+        auto s = begin().skip(2 + i * 6);
+        auto tag = s.nextStr(4);
+        auto off = s.nextU16be();
+        return FeatureTable{tag, begin().skip(off).restBytes()};
+    }
+
+    auto iter() const {
+        return range(len())
+            .map([&](auto i) mutable {
+                return at(i);
+            });
+    }
+};
+
+struct LookupTable : public BChunk {
+    using LookupType = BField<u16be, 0>;
+    using LookupFlag = BField<u16be, 2>;
+    using SubTableCount = BField<u16be, 4>;
+
+    enum LookupFlags : u16 {
+        RIGHT_TO_LEFT = 1 << 0,
+        IGNORE_BASE_GLYPHS = 1 << 1,
+        IGNORE_LIGATURES = 1 << 2,
+        IGNORE_MARKS = 1 << 3,
+        USE_MARK_FILTERING_SET = 1 << 4,
+        MARK_ATTACHMENT_TYPE = 1 << 5,
+    };
+
+    u16 lookupType() const { return get<LookupType>(); }
+
+    u16 lookupFlag() const { return get<LookupFlag>(); }
+
+    u16 markFilteringSet() const {
+        return lookupFlag() & USE_MARK_FILTERING_SET
+                   ? begin().skip(6 + get<SubTableCount>() * 2).nextU16be()
+                   : 0;
+    }
+
+    usize len() const { return get<SubTableCount>(); }
+};
+
+struct LookupList : public BChunk {
+    using LookupCount = BField<u16be, 0>;
+
+    usize len() const { return get<LookupCount>(); }
+
+    LookupTable at(usize i) const {
+        auto s = begin().skip(2 + i * 2);
+        auto off = s.nextU16be();
+        return LookupTable{begin().skip(off).restBytes()};
+    }
+
+    auto iter() const {
+        return range(len())
+            .map([&](auto i) mutable {
+                return at(i);
+            });
+    }
+};
+
+enum struct GposLookupType : u16 {
+    SINGLE_ADJUSTMENT = 1,
+    PAIR_ADJUSTMENT = 2,
+    CURSIVE_ATTACHMENT = 3,
+    MARK_TO_BASE_ATTACHMENT = 4,
+    MARK_TO_LIGATURE_ATTACHMENT = 5,
+    MARK_TO_MARK_ATTACHMENT = 6,
+    CONTEXT_POSITIONING = 7,
+    CHAIN_CONTEXT_POSITIONING = 8,
+    EXTENSION_POSITIONING = 9,
+};
+
+struct Gpos : public BChunk {
+    static constexpr Str SIG = "GPOS";
+
+    using ScriptListOffset = BField<u16be, 4>;
+    using FeatureListOffset = BField<u16be, 6>;
+    using LookupListOffset = BField<u16be, 8>;
+
+    ScriptList scriptList() const {
+        return ScriptList{begin().skip(get<ScriptListOffset>()).restBytes()};
+    }
+
+    FeatureList featureList() const {
+        return FeatureList{begin().skip(get<FeatureListOffset>()).restBytes()};
+    }
+
+    LookupList lookupList() const {
+        return LookupList{begin().skip(get<LookupListOffset>()).restBytes()};
+    }
+
+    // Positioning
+
+    /*
+    Res<Math::Vec2i> positione(usize prev, usize curr) const {
+        (void)lhs;
+        (void)rhs;
+        // 1. Locate the current script in the GPOS ScriptList table.
+
+        // 2. If the language system is known, search the script for the correct LangSys table; otherwise, use the script’s default LangSys table.
+
+        // FIXME: hard-coded to latin
+        auto scriptOff = try$(findScript("latn"));
+        (void)scriptOff;
+
+        // 3. The LangSys table provides index numbers into the GPOS FeatureList table to access a required feature and a number of additional features.
+
+        // 4. Inspect the featureTag of each feature, and select the feature tables to apply to an input glyph string.
+
+        // 5. If a Feature Variation table is present, evaluate conditions in the Feature Variation table to determine if any of the initially-selected feature tables should be substituted by an alternate feature table.
+
+        // 6. Each feature provides an array of index numbers into the GPOS LookupList table. Assemble all lookups from the set of chosen feature tables, and apply the lookups in the order given in the LookupList table.
+
+        return Ok(Math::Vec2i{0, 0});
+    }
+*/
+};
+
+struct Gsub : public BChunk {
+    static constexpr Str SIG = "GSUB";
+
+    using ScriptListOffset = BField<u16be, 4>;
+    using FeatureListOffset = BField<u16be, 6>;
+    using LookupListOffset = BField<u16be, 8>;
+
+    ScriptList scriptList() const {
+        return ScriptList{begin().skip(get<ScriptListOffset>()).restBytes()};
+    }
+
+    FeatureList featureList() const {
+        return FeatureList{begin().skip(get<FeatureListOffset>()).restBytes()};
+    }
+
+    LookupList lookupList() const {
+        return LookupList{begin().skip(get<LookupListOffset>()).restBytes()};
+    }
+};
+
 struct GlyphMetrics {
     f64 x;
     f64 y;
@@ -412,6 +644,8 @@ struct Font {
     Loca _loca;
     Hhea _hhea;
     Hmtx _hmtx;
+    Gpos _gpos;
+    Gsub _gsub;
 
     static Res<Cmap::Table> chooseCmap(Font &font) {
         Opt<Cmap::Table> bestCmap = NONE;
@@ -433,11 +667,13 @@ struct Font {
 
         for (auto table : font._cmap.iterTables()) {
             for (auto &knowCmap : knowCmaps) {
-                if (knowCmap.platformId == table.platformId and knowCmap.encodingId == table.encodingId and knowCmap.type == table.type) {
-                    if (knowCmap.score > bestScore) {
-                        bestCmap = table;
-                        bestScore = knowCmap.score;
-                    }
+                if (knowCmap.platformId == table.platformId and
+                    knowCmap.encodingId == table.encodingId and
+                    knowCmap.type == table.type and
+                    knowCmap.score > bestScore) {
+
+                    bestCmap = table;
+                    bestScore = knowCmap.score;
                 }
             }
         }
@@ -466,6 +702,8 @@ struct Font {
         font._loca = try$(font.requireTable<Loca>());
         font._hhea = try$(font.requireTable<Hhea>());
         font._hmtx = try$(font.requireTable<Hmtx>());
+        font._gpos = font.lookupTable<Gpos>();
+        font._gsub = font.lookupTable<Gsub>();
 
         return Ok(font);
     }

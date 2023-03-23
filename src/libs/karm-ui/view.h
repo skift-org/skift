@@ -117,6 +117,20 @@ Child canvas(OnPaint onPaint);
 
 /* --- Blur ----------------------------------------------------------------- */
 
-Child blur(isize radius, Child child);
+Child backgroundFilter(Gfx::Filter f, Child child);
+
+inline auto backgroundFilter(Gfx::Filter f) {
+    return [=](Child child) {
+        return backgroundFilter(f, child);
+    };
+}
+
+Child foregroundFilter(Gfx::Filter f, Child child);
+
+inline auto foregroundFilter(Gfx::Filter f) {
+    return [=](Child child) {
+        return foregroundFilter(f, child);
+    };
+}
 
 } // namespace Karm::Ui

@@ -205,15 +205,16 @@ inline Func<void(Node &)> bindAction(Action action) {
     };
 }
 
-template <typename D, typename A>
+template <typename D, typename A, D (*R)(D, A)>
 struct Model {
     using Data = D;
     using Action = A;
-    using Reduce = Func<Data(Data, Action)>;
+    using Reduce = decltype(R);
+    static constexpr auto reduce = R;
 
     template <typename X, typename... Args>
     static void dispatch(Node &n, Args... args) {
-        dispatchAction<Action>(n, {std::forward<Args>(args)...});
+        dispatchAction<Action>(n, X{std::forward<Args>(args)...});
     }
 
     template <typename X, typename... Args>
@@ -250,19 +251,17 @@ struct Reducer :
 
     using Data = typename Model::Data;
     using Action = typename Model::Action;
-    using Reduce = typename Model::Reduce;
 
     Data _data;
-    Reduce _reducer;
     Func<Child(Data)> _build;
 
-    Reducer(Data data, Reduce reducer, Func<Child(Data)> build)
-        : _data(data), _reducer(std::move(reducer)), _build(std::move(build)) {}
+    Reducer(Data data, Func<Child(Data)> build)
+        : _data(data), _build(std::move(build)) {}
 
     void bubble(Events::Event &e) override {
         if (e.is<ActionDispatchEvent<Action>>()) {
             auto action = e.unwrap<ActionDispatchEvent<Action>>().action;
-            _data = _reducer(_data, action);
+            _data = Model::reduce(_data, action);
             shouldRebuild(*this);
         } else {
             React<Reducer>::bubble(e);
@@ -277,18 +276,15 @@ struct Reducer :
 template <typename Model>
 inline Child reducer(
     typename Model::Data initial,
-    typename Model::Reduce reducer,
     Func<Child(typename Model::Data)> build) {
 
-    return makeStrong<Reducer<Model>>(initial, std::move(reducer), std::move(build));
+    return makeStrong<Reducer<Model>>(initial, std::move(build));
 }
 
 template <typename Model>
-inline Child reducer(
-    typename Model::Reduce reducer,
-    Func<Child(typename Model::Data)> build) {
+inline Child reducer(Func<Child(typename Model::Data)> build) {
 
-    return makeStrong<Reducer<Model>>(typename Model::Data{}, std::move(reducer), std::move(build));
+    return makeStrong<Reducer<Model>>(typename Model::Data{}, std::move(build));
 }
 
 } // namespace Karm::Ui

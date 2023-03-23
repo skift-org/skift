@@ -116,6 +116,8 @@ struct ButtonStyle {
 
 using OnPress = Opt<Func<void(Node &)>>;
 
+[[gnu::used]] static auto NOP(Ui::Node &) {}
+
 Child button(OnPress onPress, ButtonStyle style, Child child);
 
 inline auto button(OnPress onPress, ButtonStyle style) {
@@ -180,6 +182,13 @@ struct SliderStyle {
 Child slider(SliderStyle style, f64 value, OnChange<f64> onChange);
 
 Child slider(f64 value, OnChange<f64> onChange);
+
+template <typename T>
+Child slider(SliderStyle style, T value, Range<T> range, OnChange<T> onChange) {
+    return slider(style, (value - range.start) / (f64)(range.end() - range.start), [=](Node &n, f64 v) mutable {
+        onChange(n, range.start + v * (range.end() - range.start));
+    });
+}
 
 /* --- Select --------------------------------------------------------------- */
 

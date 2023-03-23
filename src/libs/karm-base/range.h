@@ -124,12 +124,18 @@ using I8Range = Range<i8>;
 using I16Range = Range<i16>;
 using I32Range = Range<i32>;
 using I64Range = Range<i64>;
+using I128Range = Range<i128>;
 using ISizeRange = Range<isize>;
 
 using U8Range = Range<u8>;
 using U16Range = Range<u16>;
 using U32Range = Range<u32>;
 using U64Range = Range<u64>;
+using U128Range = Range<u128>;
 using USizeRange = Range<usize>;
+
+using F32Range = Range<f32>;
+using F64Range = Range<f64>;
+using F128Range = Range<f128>;
 
 } // namespace Karm

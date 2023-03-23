@@ -164,6 +164,10 @@ struct Var {
         return Meta::indexCast<Ts...>(_index, _buf, visitor);
     }
 
+    ALWAYS_INLINE static auto foreach(auto visitor) {
+        return Meta::foreach<Ts...>(visitor);
+    }
+
     template <Meta::Contains<Ts...> T>
     ALWAYS_INLINE bool is() const {
         return _index == Meta::indexOf<T, Ts...>();

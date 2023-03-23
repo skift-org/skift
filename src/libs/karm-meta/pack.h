@@ -4,12 +4,13 @@
 #include <karm-base/std.h>
 
 #include "cvrp.h"
+#include "id.h"
 #include "traits.h"
 
 namespace Karm::Meta {
 
-template <typename T, typename... List>
-concept Contains = (Same<T, List> or ...);
+template <typename T, typename... Ts>
+concept Contains = (Same<T, Ts> or ...);
 
 template <typename...>
 inline constexpr usize _indexOf = 0;
@@ -37,19 +38,42 @@ struct _IndexCast<Data, T> {
     }
 };
 
-template <typename Data, typename First, typename... Rest>
-struct _IndexCast<Data, First, Rest...> {
+template <typename Data, typename T, typename... Ts>
+struct _IndexCast<Data, T, Ts...> {
     ALWAYS_INLINE static auto eval(usize index, Data *ptr, auto func) {
-        using U = CopyConst<Data, First>;
+        using U = CopyConst<Data, T>;
 
         return index == 0 ? func(*reinterpret_cast<U *>(ptr))
-                          : _IndexCast<Data, Rest...>::eval(index - 1, ptr, func);
+                          : _IndexCast<Data, Ts...>::eval(index - 1, ptr, func);
     }
 };
 
 template <typename... Ts>
 ALWAYS_INLINE static auto indexCast(usize index, auto *ptr, auto func) {
     return _IndexCast<RemoveRef<decltype(*ptr)>, Ts...>::eval(index, ptr, func);
+}
+
+template <typename...>
+struct _ForEach;
+
+template <typename T>
+struct _ForEach<T> {
+    ALWAYS_INLINE static void eval(auto func) {
+        func(Type<T>{});
+    }
+};
+
+template <typename T, typename... Ts>
+struct _ForEach<T, Ts...> {
+    ALWAYS_INLINE static void eval(auto func) {
+        func(Type<T>{});
+        _ForEach<Ts...>::eval(func);
+    }
+};
+
+template <typename... Ts>
+ALWAYS_INLINE static auto foreach(auto func) {
+    return _ForEach<Ts...>::eval(func);
 }
 
 } // namespace Karm::Meta

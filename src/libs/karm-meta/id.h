@@ -17,4 +17,17 @@ static char *makeName() {
     return __PRETTY_FUNCTION__ + 40;
 }
 
+template <typename T>
+struct Type {
+    using TYPE = T;
+
+    static Id id() {
+        return makeId<T>();
+    }
+
+    static char *name() {
+        return makeName<T>();
+    }
+};
+
 } // namespace Karm::Meta

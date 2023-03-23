@@ -27,6 +27,6 @@ struct GoTo {
 
 using Actions = Var<ToggleSidebar, GoTo>;
 
-State reduce(State d, Actions action);
+State reduce(State s, Actions action);
 
-using Model = Ui::Model<State, Actions>;
+using Model = Ui::Model<State, Actions, reduce>;

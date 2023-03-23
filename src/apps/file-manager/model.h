@@ -53,6 +53,6 @@ using Actions = Var<GoRoot, GoHome, GoBack, GoForward, GoParent, GoTo, Refresh, 
 
 State reduce(State d, Actions action);
 
-using Model = Ui::Model<State, Actions>;
+using Model = Ui::Model<State, Actions, reduce>;
 
 } // namespace FileManager

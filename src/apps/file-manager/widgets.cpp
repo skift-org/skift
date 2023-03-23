@@ -74,51 +74,53 @@ Ui::Child toolbar(State const &state) {
 /* ---  Dialogs  ------------------------------------------------------------ */
 
 Ui::Child openFileDialog() {
-    return Ui::reducer<FileManager::Model>({"/"}, FileManager::reduce, [](auto d) {
-        Sys::Path path = d.currentPath();
+    return Ui::reducer<FileManager::Model>(
+        {"/"},
+        [](auto d) {
+            Sys::Path path = d.currentPath();
 
-        Sys::Dir dir = Sys::Dir::open(path).take();
+            Sys::Dir dir = Sys::Dir::open(path).take();
 
-        auto titleLbl = Ui::text(
-            Ui::TextStyle::titleLarge(), "Open File");
+            auto titleLbl = Ui::text(
+                Ui::TextStyle::titleLarge(), "Open File");
 
-        auto msgLbl = Ui::text(
-            Ui::TextStyle::titleMedium(), "Select a file to open.");
+            auto msgLbl = Ui::text(
+                Ui::TextStyle::titleMedium(), "Select a file to open.");
 
-        auto titleBar = Ui::spacing(
-            16,
-            Ui::vflow(
-                8,
-                titleLbl,
-                msgLbl));
+            auto titleBar = Ui::spacing(
+                16,
+                Ui::vflow(
+                    8,
+                    titleLbl,
+                    msgLbl));
 
-        auto openBtn = Ui::button(
-            Ui::OnPress{Ui::closeDialog},
-            Ui::ButtonStyle::primary(), "OPEN");
+            auto openBtn = Ui::button(
+                Ui::OnPress{Ui::closeDialog},
+                Ui::ButtonStyle::primary(), "OPEN");
 
-        auto cancelBtn = Ui::button(
-            Ui::closeDialog,
-            Ui::ButtonStyle::subtle(), "CANCEL");
+            auto cancelBtn = Ui::button(
+                Ui::closeDialog,
+                Ui::ButtonStyle::subtle(), "CANCEL");
 
-        auto controls = Ui::spacing(
-            16,
-            Ui::hflow(
-                8,
-                Ui::grow(NONE),
-                cancelBtn,
-                openBtn));
+            auto controls = Ui::spacing(
+                16,
+                Ui::hflow(
+                    8,
+                    Ui::grow(NONE),
+                    cancelBtn,
+                    openBtn));
 
-        return Ui::dialogScafold(
-            Layout::Align::FILL,
-            Ui::vflow(
-                Ui::grow(
-                    Ui::vflow(
-                        titleBar,
-                        toolbar(d),
-                        directoryListing(dir),
-                        Ui::separator())),
-                controls));
-    });
+            return Ui::dialogScafold(
+                Layout::Align::FILL,
+                Ui::vflow(
+                    Ui::grow(
+                        Ui::vflow(
+                            titleBar,
+                            toolbar(d),
+                            directoryListing(dir),
+                            Ui::separator())),
+                    controls));
+        });
 }
 
 /*

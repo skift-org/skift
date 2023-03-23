@@ -14,7 +14,8 @@ struct Box {
 
     constexpr Box() = delete;
 
-    constexpr Box(T *ptr) : _ptr(ptr) {}
+    constexpr Box(T *ptr)
+        : _ptr(ptr) {}
 
     constexpr Box(Box const &) = delete;
 

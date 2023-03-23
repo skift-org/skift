@@ -60,6 +60,10 @@ struct StackBlur {
 };
 
 [[gnu::flatten]] void BlurFilter::apply(Surface s) const {
+    if (amount == 0) {
+        return;
+    }
+
     StackBlur stack{amount};
     auto b = s.bound();
 
@@ -134,16 +138,17 @@ void GrayscaleFilter::apply(Surface s) const {
 
 void ContrastFilter::apply(Surface s) const {
     auto b = s.bound();
-    f64 factor = (259 * ((amount * 255) + 255)) / (255 * (259 - (amount * 255)));
+
+    f64 const factor = (259 * ((amount * 255) + 255)) / (255 * (259 - (amount * 255)));
 
     for (isize y = 0; y < b.height; y++) {
         for (isize x = 0; x < b.width; x++) {
             auto color = s.load({b.x + x, b.y + y});
 
             color = Color::fromRgba(
-                min(factor * (color.red - 128) + 128, 255),
-                min(factor * (color.green - 128) + 128, 255),
-                min(factor * (color.blue - 128) + 128, 255),
+                clamp(factor * (color.red - 128) + 128, 0, 255),
+                clamp(factor * (color.green - 128) + 128, 0, 255),
+                clamp(factor * (color.blue - 128) + 128, 0, 255),
                 color.alpha);
 
             s.store({b.x + x, b.y + y}, color);
@@ -211,10 +216,10 @@ void TintFilter::apply(Surface s) const {
             auto color = s.load({b.x + x, b.y + y});
 
             auto tintColor = Color::fromRgba(
-                (color.red * tint.red) / 255,
-                (color.green * tint.green) / 255,
-                (color.blue * tint.blue) / 255,
-                (color.alpha * tint.alpha) / 255);
+                (color.red * amount.red) / 255,
+                (color.green * amount.green) / 255,
+                (color.blue * amount.blue) / 255,
+                (color.alpha * amount.alpha) / 255);
 
             s.store({b.x + x, b.y + y}, tintColor);
         }
@@ -228,7 +233,7 @@ void OverlayFilter::apply(Surface s) const {
         for (isize x = 0; x < b.width; x++) {
             s.blend(
                 {b.x + x, b.y + y},
-                color);
+                amount);
         }
     }
 }

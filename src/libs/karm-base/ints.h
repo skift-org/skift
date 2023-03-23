@@ -22,6 +22,7 @@ using i128 = __int128_t;
 
 using f32 = float;
 using f64 = double;
+using f128 = long double;
 
 inline constexpr auto rol(auto x, auto n) {
     return (x << n) | (x >> (sizeof(x) * 8 - n));

@@ -62,8 +62,8 @@ inline void logWarn(Format format, Args &&...va) {
     _log(WARNING, format, args);
 }
 
-inline void logTodo() {
-    logWarn("todo: {}", Loc::current().function);
+inline void logTodo(Loc loc = Loc::current()) {
+    logWarn("todo: {}", loc.func);
 }
 
 template <typename... Args>

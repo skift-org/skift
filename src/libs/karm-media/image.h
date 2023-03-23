@@ -33,6 +33,10 @@ struct Image {
         return {format, *buffer};
     }
 
+    Gfx::Surface surface() const {
+        return *this;
+    }
+
     isize width() const {
         return buffer->width;
     }

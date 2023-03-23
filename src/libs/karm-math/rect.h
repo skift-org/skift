@@ -95,60 +95,60 @@ union Rect {
 
     constexpr Vec2<T> xw() const { return {x, x + width}; }
 
-    constexpr void xw(Vec2<T> const &v) {
+    constexpr void xw(Vec2<T> v) {
         x = v.x;
         width = v.y - v.x;
     }
 
     constexpr Vec2<T> yh() const { return {y, y + height}; }
 
-    constexpr void yh(Vec2<T> const &v) {
+    constexpr void yh(Vec2<T> v) {
         y = v.x;
         height = v.y - v.x;
     }
 
-    constexpr bool contains(Vec2<T> const &v) const {
+    constexpr bool contains(Vec2<T> v) const {
         return v.x >= x and
                v.y >= y and
                v.x < x + width and
                v.y < y + height;
     }
 
-    constexpr bool contains(Rect<T> const &r) const {
+    constexpr bool contains(Rect<T> r) const {
         return r.x >= x and
                r.y >= y and
                r.x + r.width <= x + width and
                r.y + r.height <= y + height;
     }
 
-    constexpr bool colide(Rect<T> const &r) const {
+    constexpr bool colide(Rect<T> r) const {
         return r.x + r.width > x and
                r.y + r.height > y and
                r.x < x + width and
                r.y < y + height;
     }
 
-    constexpr Rect fit(Rect<T> const &r) const {
+    constexpr Rect fit(Rect<T> r) const {
         auto scale = (r.size() / size().template cast<f64>()).min();
         Rect result{0, 0, static_cast<T>(width * scale), static_cast<T>(height * scale)};
         result.xy = r.center() - result.center();
         return result;
     }
 
-    constexpr Rect cover(Rect<T> const &r) const {
+    constexpr Rect cover(Rect<T> r) const {
         f64 scale = (r.size() / size().template cast<f64>()).max();
         Rect result{0, 0, static_cast<T>(width * scale), static_cast<T>(height * scale)};
         result.xy = r.center() - result.center();
         return result;
     }
 
-    constexpr Rect center(Rect<T> const &r) const {
+    constexpr Rect center(Rect<T> r) const {
         Rect result{0, 0, width, height};
         result.xy = center() - r.center();
         return result;
     }
 
-    constexpr Rect<T> clipTo(Rect<T> const &r) const {
+    constexpr Rect<T> clipTo(Rect<T> r) const {
         return {
             max(x, r.x),
             max(y, r.y),
@@ -156,7 +156,7 @@ union Rect {
             min(y + height, r.y + r.height) - max(y, r.y)};
     }
 
-    constexpr Rect<T> mergeWith(Rect<T> const &r) const {
+    constexpr Rect<T> mergeWith(Rect<T> r) const {
         return fromTwoPoint(
             {
                 min(start(), r.start()),

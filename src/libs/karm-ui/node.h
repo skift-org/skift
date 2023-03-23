@@ -56,6 +56,10 @@ ALWAYS_INLINE Child operator|(Child child, Decorator auto decorator) {
     return decorator(child);
 }
 
+ALWAYS_INLINE Child &operator|=(Child &child, Decorator auto decorator) {
+    return child = decorator(child);
+}
+
 /* --- LeafNode ------------------------------------------------------------- */
 
 template <typename Crtp>

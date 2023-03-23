@@ -318,27 +318,50 @@ Child canvas(OnPaint onPaint) {
     return makeStrong<Canvas>(std::move(onPaint));
 }
 
-/* --- Blur ----------------------------------------------------------------- */
+/* --- Filter --------------------------------------------------------------- */
 
-struct Blur : public ProxyNode<Blur> {
-    isize _radius;
+struct BackgroundFilter : public ProxyNode<BackgroundFilter> {
+    Gfx::Filter _filter;
 
-    Blur(isize radius, Child child)
-        : ProxyNode<Blur>(std::move(child)), _radius(radius) {}
+    BackgroundFilter(Gfx::Filter radius, Child child)
+        : ProxyNode<BackgroundFilter>(std::move(child)),
+          _filter(radius) {}
 
-    void reconcile(Blur &o) override {
-        _radius = o._radius;
-        ProxyNode<Blur>::reconcile(o);
+    void reconcile(BackgroundFilter &o) override {
+        _filter = o._filter;
+        ProxyNode<BackgroundFilter>::reconcile(o);
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
-        g.blur(bound(), _radius);
-        ProxyNode<Blur>::paint(g, r);
+        g.apply(_filter, bound());
+        ProxyNode<BackgroundFilter>::paint(g, r);
     }
 };
 
-Child blur(isize radius, Child child) {
-    return makeStrong<Blur>(radius, std::move(child));
+Child backgroundFilter(Gfx::Filter f, Child child) {
+    return makeStrong<BackgroundFilter>(f, std::move(child));
+}
+
+struct ForegroundFilter : public ProxyNode<ForegroundFilter> {
+    Gfx::Filter _filter;
+
+    ForegroundFilter(Gfx::Filter radius, Child child)
+        : ProxyNode<ForegroundFilter>(std::move(child)),
+          _filter(radius) {}
+
+    void reconcile(ForegroundFilter &o) override {
+        _filter = o._filter;
+        ProxyNode<ForegroundFilter>::reconcile(o);
+    }
+
+    void paint(Gfx::Context &g, Math::Recti r) override {
+        ProxyNode<ForegroundFilter>::paint(g, r);
+        g.apply(_filter, bound());
+    }
+};
+
+Child foregroundFilter(Gfx::Filter f, Child child) {
+    return makeStrong<ForegroundFilter>(f, std::move(child));
 }
 
 } // namespace Karm::Ui

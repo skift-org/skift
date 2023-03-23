@@ -85,6 +85,8 @@ struct Surface {
 
     isize height() const { return buffer.height; }
 
+    Math::Vec2i size() const { return {width(), height()}; }
+
     usize stride() const { return buffer.stride; }
 
     void *data() { return buffer.data; }
@@ -123,6 +125,22 @@ struct Surface {
                 }
             }
         });
+    }
+
+    Surface clip(Math::Recti rect) {
+        rect = rect.clipTo(bound());
+
+        return {
+            format,
+            {
+                static_cast<u8 *>(buffer.data) +
+                    rect.top() * buffer.stride +
+                    rect.start() * bpp(format),
+                rect.width,
+                rect.height,
+                buffer.stride,
+            },
+        };
     }
 };
 

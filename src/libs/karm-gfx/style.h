@@ -90,9 +90,9 @@ inline StrokeStyle stroke(auto... args) {
 /* --- Shadow Style --------------------------------------------------------- */
 
 struct ShadowStyle {
-    Paint paint;
-    f64 radius{};
-    Math::Vec2f offset{};
+    Paint paint = Gfx::BLACK;
+    f64 radius{8};
+    Math::Vec2i offset{};
 
     ShadowStyle(Paint c = BLACK) : paint(c) {}
 
@@ -106,7 +106,7 @@ struct ShadowStyle {
         return *this;
     }
 
-    auto &withOffset(Math::Vec2f o) {
+    auto &withOffset(Math::Vec2i o) {
         offset = o;
         return *this;
     }

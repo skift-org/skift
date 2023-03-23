@@ -189,8 +189,13 @@ struct Gradient {
     }
 };
 
-struct Paint : public Var<Color, Gradient, Media::Image> {
-    using Var::Var;
+using _Paints = Var<
+    Color,
+    Gradient,
+    Media::Image>;
+
+struct Paint : public _Paints {
+    using _Paints::_Paints;
 
     ALWAYS_INLINE Color sample(Math::Vec2f pos) const {
         return visit([&](auto const &p) {

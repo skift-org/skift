@@ -110,7 +110,10 @@ struct Surface {
     }
 
     Color loadClamped(Math::Vec2i pos) const {
-        return load({clamp(pos.x, 0, width() - 1), clamp(pos.y, 0, height() - 1)});
+        return load({
+            clamp(pos.x, 0, width() - 1),
+            clamp(pos.y, 0, height() - 1),
+        });
     }
 
     void blend(Math::Vec2i pos, Color color) {

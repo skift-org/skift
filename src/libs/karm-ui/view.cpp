@@ -264,13 +264,22 @@ Child icon(Mdi::Icon i, f64 size, Opt<Gfx::Color> color) {
 
 struct Image : public View<Image> {
     Media::Image _image;
+    Opt<Gfx::BorderRadius> _radius;
 
     Image(Media::Image image)
-        : _image(image) {
-    }
+        : _image(image) {}
+
+    Image(Media::Image image, Gfx::BorderRadius radius)
+        : _image(image), _radius(radius) {}
 
     void paint(Gfx::Context &g, Math::Recti) override {
-        g.blit(bound(), _image);
+        if (_radius) {
+            g.fillStyle(_image);
+            g.fill(bound(), *_radius);
+        } else {
+            g.blit(bound(), _image);
+        }
+
         if (debugShowLayoutBounds)
             g.debugRect(bound(), Gfx::CYAN);
     }
@@ -282,6 +291,10 @@ struct Image : public View<Image> {
 
 Child image(Media::Image image) {
     return makeStrong<Image>(image);
+}
+
+Child image(Media::Image image, Gfx::BorderRadius radius) {
+    return makeStrong<Image>(image, radius);
 }
 
 /* --- Canvas --------------------------------------------------------------- */

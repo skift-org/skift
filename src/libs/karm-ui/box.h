@@ -15,6 +15,7 @@ struct BoxStyle {
     Opt<Gfx::Paint> borderPaint{Gfx::ALPHA};
     Opt<Gfx::Paint> backgroundPaint{};
     Gfx::Paint foregroundPaint{Gfx::WHITE};
+    Opt<Gfx::ShadowStyle> shadowStyle{};
 
     BoxStyle withMargin(Layout::Spacingi margin) const {
         auto copy = *this;
@@ -58,13 +59,25 @@ struct BoxStyle {
         return copy;
     }
 
+    BoxStyle withShadowStyle(Gfx::ShadowStyle shadowStyle) const {
+        auto copy = *this;
+        copy.shadowStyle = shadowStyle;
+        return copy;
+    }
+
     void paint(Gfx::Context &g, Math::Recti bound, auto inner) {
         bound = padding.grow(Layout::Flow::LEFT_TO_RIGHT, bound);
 
         g.save();
         if (backgroundPaint) {
-            g.fillStyle(*backgroundPaint);
-            g.fill(bound, borderRadius);
+            g.begin();
+            g.rect(bound.cast<f64>(), borderRadius);
+
+            if (shadowStyle) {
+                g.shadow(*shadowStyle);
+            }
+
+            g.fill(*backgroundPaint);
         }
 
         g.fillStyle(foregroundPaint);

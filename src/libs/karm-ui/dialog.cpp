@@ -229,7 +229,11 @@ Child dialogScafold(Layout::Align a, Child inner) {
         .backgroundPaint = Gfx::ZINC800,
     };
 
-    return spacing(16, align(a, dragRegion(box(boxStyle, inner))));
+    return inner |
+           box(boxStyle) |
+           dragRegion() |
+           align(a) |
+           spacing(16);
 }
 
 Child dialogScafold(Layout::Align a, Child content, Children actions) {

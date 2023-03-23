@@ -94,7 +94,13 @@ struct ShadowStyle {
     f64 radius{8};
     Math::Vec2i offset{};
 
-    ShadowStyle(Paint c = BLACK) : paint(c) {}
+    static ShadowStyle elevated(f64 v) {
+        return {
+            Gfx::BLACK.withOpacity(0.7),
+            v * 2,
+            {0, (int)v},
+        };
+    }
 
     auto &withPaint(Paint p) {
         paint = p;

@@ -51,7 +51,7 @@ struct Image {
 
     ALWAYS_INLINE Gfx::Color sample(Math::Vec2f pos) const {
         Gfx::Surface s = *this;
-        return s.loadClamped(Math::Vec2i(pos.x * height(), pos.y * width()));
+        return s.loadClamped(Math::Vec2i(pos.x * width(), pos.y * height()));
     }
 };
 

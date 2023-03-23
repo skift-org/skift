@@ -308,6 +308,7 @@ struct StackLayout : public GroupNode<StackLayout> {
     using GroupNode::GroupNode;
 
     void layout(Math::Recti r) override {
+        _bound = r;
         for (auto &child : children()) {
             child->layout(r);
         }

@@ -6,16 +6,16 @@ namespace Karm {
 
 struct Loc {
     Str file{};
-    Str function{};
+    Str func{};
     usize line{};
     usize column{};
 
     static constexpr Loc current(
         Str file = __builtin_FILE(),
-        Str function = __builtin_FUNCTION(),
+        Str func = __builtin_FUNCTION(),
         usize line = __builtin_LINE(),
         usize column = __builtin_COLUMN()) {
-        return {file, function, line, column};
+        return {file, func, line, column};
     }
 };
 

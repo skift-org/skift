@@ -13,13 +13,23 @@ struct Cons {
     Car car;
     Cdr cdr;
 
-    Ordr cmp(Cons const &other) const {
+    constexpr Ordr cmp(Cons const &other) const {
         return cmp(car, other.car) |
                cmp(cdr, other.cdr);
     }
 
-    auto get(bool cdr) const {
+    constexpr auto get(bool cdr) const {
         return cdr ? this->cdr : this->car;
+    }
+
+    constexpr void visit(auto f) {
+        f(car);
+        f(cdr);
+    }
+
+    constexpr void visit(auto f) const {
+        f(car);
+        f(cdr);
     }
 };
 

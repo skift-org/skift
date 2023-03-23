@@ -59,7 +59,8 @@ struct Tuple<Car, Cdr...> {
     Car car{};
     Tuple<Cdr...> cdr{};
 
-    constexpr Tuple(Car &&car, Cdr &&...cdr) : car(car), cdr(std::forward<Cdr>(cdr)...) {
+    constexpr Tuple(Car &&car, Cdr &&...cdr)
+        : car(car), cdr(std::forward<Cdr>(cdr)...) {
     }
 
     constexpr usize len() {

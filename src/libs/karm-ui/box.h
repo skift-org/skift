@@ -59,7 +59,7 @@ struct BoxStyle {
     }
 
     void paint(Gfx::Context &g, Math::Recti bound, auto inner) {
-        bound = margin.shrink(Layout::Flow::LEFT_TO_RIGHT, bound);
+        bound = padding.grow(Layout::Flow::LEFT_TO_RIGHT, bound);
 
         g.save();
         if (backgroundPaint) {
@@ -93,7 +93,7 @@ struct _Box : public ProxyNode<Crtp> {
     virtual BoxStyle &boxStyle() = 0;
 
     void paint(Gfx::Context &g, Math::Recti r) override {
-        boxStyle().paint(g, bound(), [&] {
+        boxStyle().paint(g, ProxyNode<Crtp>::_child->bound(), [&] {
             ProxyNode<Crtp>::paint(g, r);
         });
     }

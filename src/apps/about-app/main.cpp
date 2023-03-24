@@ -8,7 +8,9 @@
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
-Res<> entryPoint(CliArgs args) {
+namespace About {
+
+Ui::Child app() {
     auto logo = Ui::icon(Mdi::SNOWFLAKE, 64) |
                 Ui::center() |
                 Ui::bound() |
@@ -54,10 +56,13 @@ Res<> entryPoint(CliArgs args) {
         "About",
         Ui::TitlebarStyle::DIALOG);
 
-    auto wrapper =
-        Ui::vflow(titlebar, logo, content | Ui::grow()) |
-        Ui::pinSize({350, 400}) |
-        Ui::dialogLayer();
+    return Ui::vflow(titlebar, logo, content | Ui::grow()) |
+           Ui::pinSize({350, 400}) |
+           Ui::dialogLayer();
+}
 
-    return Ui::runApp(args, wrapper);
+} // namespace About
+
+Res<> entryPoint(CliArgs args) {
+    return Ui::runApp(args, About::app());
 }

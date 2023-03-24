@@ -8,8 +8,9 @@
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
-#include "model.h"
-#include "pages.h"
+#include "app.h"
+
+namespace Settings {
 
 Ui::Child sidebar(State const &state) {
     return Ui::vscroll(
@@ -60,10 +61,8 @@ Ui::Child appBody(State const &state) {
     return pageContent(state);
 }
 
-/* --- Entry Point ---------------------------------------------------------- */
-
-Res<> entryPoint(CliArgs args) {
-    auto inner = Ui::reducer<Model>({}, [](State const &state) {
+Ui::Child app() {
+    return Ui::reducer<Model>({}, [](State const &state) {
         auto titlebar = Ui::titlebar(
             Mdi::COG,
             "Settings",
@@ -81,7 +80,10 @@ Res<> entryPoint(CliArgs args) {
                         Ui::button(NONE, Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT)),
                     appBody(state) | Ui::grow())));
     });
+}
 
-    return Ui::runApp(
-        args, inner);
+} // namespace Settings
+
+Res<> entryPoint(CliArgs args) {
+    return Ui::runApp(args, Settings::app());
 }

@@ -3,11 +3,19 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/view.h>
 
-Res<> entryPoint(CliArgs args) {
-    auto content = Ui::vflow(
-        16,
-        Ui::icon(Mdi::Icon::EMOTICON_HAPPY_OUTLINE, 64) | Ui::center(),
-        Ui::titleLarge("Hello, world!") | Ui::center());
+namespace Hello {
 
-    return Ui::runApp(args, content | Ui::spacing(16));
+Ui::Child app() {
+    return Ui::vflow(
+               16,
+               Layout::Align::CENTER,
+               Ui::icon(Mdi::Icon::EMOTICON_HAPPY_OUTLINE, 64),
+               Ui::titleLarge("Hello, world!")) |
+           Ui::spacing(16);
+}
+
+} // namespace Hello
+
+Res<> entryPoint(CliArgs args) {
+    return Ui::runApp(args, Hello::app());
 }

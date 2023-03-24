@@ -1,9 +1,7 @@
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
-#include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
-#include <karm-ui/view.h>
 
 #include "model.h"
 #include "widgets.h"
@@ -95,7 +93,7 @@ Ui::Child openFileDialog() {
                     msgLbl));
 
             auto openBtn = Ui::button(
-                Ui::OnPress{Ui::closeDialog},
+                Ui::closeDialog,
                 Ui::ButtonStyle::primary(), "OPEN");
 
             auto cancelBtn = Ui::button(

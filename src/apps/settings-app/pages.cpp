@@ -1,7 +1,9 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
 
-#include "pages.h"
+#include "app.h"
+
+namespace Settings {
 
 Ui::Child pageScafold(Ui::Child inner) {
     return inner |
@@ -12,3 +14,5 @@ Ui::Child pageScafold(Ui::Child inner) {
            Ui::vscroll() |
            Ui::grow();
 }
+
+} // namespace Settings

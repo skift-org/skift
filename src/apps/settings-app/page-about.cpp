@@ -3,8 +3,9 @@
 #include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
 
-#include "model.h"
-#include "pages.h"
+#include "app.h"
+
+namespace Settings {
 
 Ui::Child userInfos() {
     return Ui::treeRow(
@@ -80,3 +81,5 @@ Ui::Child pageAbout(State const &) {
                cpuInfos() | Ui::card()) |
            pageScafold;
 }
+
+} // namespace Settings

@@ -9,6 +9,8 @@
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
+namespace Shell {
+
 /* --- Model ---------------------------------------------------------------- */
 
 struct App {
@@ -308,6 +310,8 @@ Ui::Child app() {
     });
 }
 
+} // namespace Shell
+
 Res<> entryPoint(CliArgs args) {
-    return Ui::runApp(args, app());
+    return Ui::runApp(args, Shell::app());
 }

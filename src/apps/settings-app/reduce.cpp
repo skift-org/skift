@@ -1,4 +1,6 @@
-#include "model.h"
+#include "app.h"
+
+namespace Settings {
 
 State reduce(State d, Actions action) {
     return action.visit(Visitor{
@@ -11,3 +13,5 @@ State reduce(State d, Actions action) {
             return d;
         }});
 }
+
+} // namespace Settings

@@ -8,6 +8,8 @@
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
+namespace ColorPicker {
+
 struct HsvPicker : public Ui::View<HsvPicker> {
     Gfx::Hsv _value;
     Ui::OnChange<Gfx::Hsv> _onChange;
@@ -208,7 +210,7 @@ Ui::Child colorRamps(Ui::State<Gfx::Hsv> state) {
                     .collect<Ui::Children>())));
 }
 
-Ui::Child colorPicker() {
+Ui::Child app() {
     return Ui::state(Gfx::Hsv{0, 0, 0}, [=](Ui::State<Gfx::Hsv> hsvState) mutable {
         return Ui::state(true, [=](Ui::State<bool> pageState) mutable {
             auto selector = Ui::hflow(
@@ -234,6 +236,8 @@ Ui::Child colorPicker() {
     });
 }
 
+} // namespace ColorPicker
+
 Res<> entryPoint(CliArgs args) {
-    return Ui::runApp(args, colorPicker());
+    return Ui::runApp(args, ColorPicker::app());
 }

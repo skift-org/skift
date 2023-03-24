@@ -1,7 +1,9 @@
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 
-#include "pages.h"
+#include "app.h"
+
+namespace Settings {
 
 Ui::Child tileButton(Mdi::Icon icon, String text) {
     return Ui::vflow(
@@ -31,3 +33,5 @@ Ui::Child pageHome(State const &) {
                }) |
            Ui::spacing(8) | Ui::center() | Ui::bound() | Ui::grow();
 }
+
+} // namespace Settings

@@ -22,7 +22,7 @@ Ui::Child rounedButton(Func<void(Ui::Node &)> onPress, Ui::ButtonStyle style, Me
 }
 
 Ui::Child app() {
-    auto content = Ui::reducer<Model>(reduce, [](State state) {
+    auto content = Ui::reducer<Model>([](State state) {
         auto lbl = Ui::text(
             Ui::TextStyle::displayMedium(),
             "{}", state.counter);

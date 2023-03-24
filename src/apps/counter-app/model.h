@@ -19,6 +19,6 @@ using Actions = Var<ResetAction, IncrementAction, DecrementAction>;
 
 State reduce(State state, Actions action);
 
-using Model = Ui::Model<State, Actions>;
+using Model = Ui::Model<State, Actions, reduce>;
 
 } // namespace Counter

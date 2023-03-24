@@ -102,6 +102,6 @@ using Actions = Var<
 
 State reduce(State, Actions);
 
-using Model = Ui::Model<State, Actions>;
+using Model = Ui::Model<State, Actions, reduce>;
 
 } // namespace Calculator

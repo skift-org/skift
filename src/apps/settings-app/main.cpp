@@ -55,15 +55,15 @@ Ui::Child appBody(State const &state) {
             sidebar(state),
             Ui::separator(),
             pageContent(state));
-    } else {
-        return pageContent(state);
     }
+
+    return pageContent(state);
 }
 
 /* --- Entry Point ---------------------------------------------------------- */
 
 Res<> entryPoint(CliArgs args) {
-    auto inner = Ui::reducer<Model>({}, reduce, [](State const &state) {
+    auto inner = Ui::reducer<Model>({}, [](State const &state) {
         auto titlebar = Ui::titlebar(
             Mdi::COG,
             "Settings",

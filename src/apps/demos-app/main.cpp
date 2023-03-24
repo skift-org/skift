@@ -279,7 +279,7 @@ State reduce(State, Actions action) {
         });
 }
 
-using Model = Ui::Model<State, Actions>;
+using Model = Ui::Model<State, Actions, reduce>;
 
 Ui::Child sidebar(State s) {
     Ui::Children items =
@@ -302,7 +302,7 @@ Res<> entryPoint(CliArgs args) {
         "Demos",
         Ui::TitlebarStyle::DEFAULT);
 
-    auto content = Ui::reducer<Model>(reduce, [](State s) {
+    auto content = Ui::reducer<Model>([](State s) {
         return Ui::hflow(
             sidebar(s),
             Ui::separator(),

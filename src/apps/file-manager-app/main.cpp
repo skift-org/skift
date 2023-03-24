@@ -8,7 +8,7 @@
 #include <karm-ui/scafold.h>
 
 Res<> entryPoint(CliArgs args) {
-    auto app = Ui::reducer<FileManager::Model>({"/"}, FileManager::reduce, [](auto d) {
+    auto app = Ui::reducer<FileManager::Model>({"/"}, [](auto d) {
         Sys::Path path = d.currentPath();
         auto dir = Sys::Dir::open(path).unwrap();
         auto titlebar = Ui::titlebar(Mdi::FOLDER, "File Manager");

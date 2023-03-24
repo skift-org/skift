@@ -86,7 +86,7 @@ Ui::Child screen(State state) {
 }
 
 Ui::Child app() {
-    return Ui::reducer<Model>({}, reduce, [](auto state) {
+    return Ui::reducer<Model>({}, [](auto state) {
         return Ui::maxSize(
             {300, 450},
             Ui::dialogLayer(

@@ -38,7 +38,7 @@ State reduce(State state, Actions action) {
         }});
 }
 
-using Model = Ui::Model<State, Actions>;
+using Model = Ui::Model<State, Actions, reduce>;
 
 /* --- Status Bar ----------------------------------------------------------- */
 
@@ -299,7 +299,7 @@ Ui::Child lockscreen() {
 }
 
 Ui::Child app() {
-    return Ui::reducer<Model>({}, reduce, [](auto state) {
+    return Ui::reducer<Model>({}, [](auto state) {
         auto background = Ui::align(Layout::Align::COVER, Ui::image(Media::loadImage("res/images/wallpapers/nys-museum.qoi").unwrap()));
         return Ui::dialogLayer(
             Ui::pinSize(

@@ -7,160 +7,32 @@
 
 namespace Karm::Ui {
 
-inline Child row(Child child) {
-    return minSize(
-        {UNCONSTRAINED, 64},
-        spacing(
-            {16},
-            Ui::vcenter(child)));
-}
+Child row(Child child);
 
-inline Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Child> trailing) {
-    auto lead = leading
-                    ? *leading |
-                          center() |
-                          sizing(26, {UNCONSTRAINED, 26}) |
-                          spacing({0, 0, 12, 0})
-                    : empty();
+Child row(Opt<Child> leading, String title, Opt<String> subtitle, Opt<Child> trailing);
 
-    auto t = subtitle
-                 ? vflow(
-                       8,
-                       labelLarge(title),
-                       labelMedium(*subtitle))
-                 : labelLarge(title);
+Child titleRow(String t);
 
-    auto trail = trailing
-                     ? spacing({12, 0, 0, 0}, sizing(26, {UNCONSTRAINED, 26}, center(*trailing)))
-                     : empty();
+Child pressableRow(OnPress onPress, Opt<Child> leading, String title, Opt<String> subtitle, Opt<Child> trailing);
 
-    return minSize(
-        {UNCONSTRAINED, 48},
-        spacing(
-            {12, 0},
-            hflow(
-                0,
-                Layout::Align::VCENTER | Layout::Align::HFILL,
-                lead,
-                t | grow(),
-                trail)));
-}
+Child buttonRow(OnPress onPress, Mdi::Icon i, String title, String subtitle);
 
-inline Child titleRow(String t) {
-    return spacing({12, 16, 12, 8}, text(Ui::TextStyle::titleMedium(), t));
-}
+Child buttonRow(OnPress onPress, String title, String text);
 
-inline Child pressableRow(OnPress onPress, Opt<Child> leading, String title, Opt<String> subtitle, Opt<Child> trailing) {
-    return button(
-        std::move(onPress),
-        ButtonStyle::subtle(),
-        row(
-            leading,
-            title,
-            subtitle,
-            trailing));
-}
+Child toggleRow(bool value, OnChange<bool> onChange, String title);
 
-inline Child buttonRow(OnPress onPress, Mdi::Icon i, String title, String subtitle) {
-    return button(
-        std::move(onPress),
-        ButtonStyle::subtle(),
-        row(
-            icon(i, 24),
-            title,
-            subtitle,
-            NONE));
-}
+Child checkboxRow(bool value, OnChange<bool> onChange, String title);
 
-inline Child buttonRow(OnPress onPress, String title, String text) {
-    return row(
-        NONE,
-        title,
-        NONE,
-        button(std::move(onPress), ButtonStyle::primary(), text));
-}
+Child radioRow(bool value, OnChange<bool> onChange, String title);
 
-inline Child toggleRow(bool value, OnChange<bool> onChange, String title) {
-    return row(
-        NONE,
-        title,
-        NONE,
-        toggle(value, std::move(onChange)));
-}
+Child sliderRow(SliderStyle style, f64 value, OnChange<f64> onChange, String title);
 
-inline Child checkboxRow(bool value, OnChange<bool> onChange, String title) {
-    return row(
-        NONE,
-        title,
-        NONE,
-        checkbox(value, std::move(onChange)));
-}
+Child sliderRow(f64 value, OnChange<f64> onChange, String title);
 
-inline Child radioRow(bool value, OnChange<bool> onChange, String title) {
-    return row(
-        radio(value, std::move(onChange)),
-        title,
-        NONE,
-        NONE);
-}
+Child navRow(bool selected, OnPress onPress, Mdi::Icon i, String title);
 
-inline Child sliderRow(SliderStyle style, f64 value, OnChange<f64> onChange, String title) {
-    return row(
-        NONE,
-        title,
-        NONE,
-        slider(style, value, std::move(onChange)));
-}
+Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Child child);
 
-inline Child sliderRow(f64 value, OnChange<f64> onChange, String title) {
-    return sliderRow(SliderStyle::regular(), value, std::move(onChange), title);
-}
-
-inline Child navRow(bool selected, OnPress onPress, Mdi::Icon i, String title) {
-    auto buttonStyle = ButtonStyle::regular();
-    buttonStyle.idleStyle = {
-        .borderRadius = 4,
-        .backgroundPaint = selected ? Gfx::ZINC800 : Gfx::ALPHA,
-    };
-
-    auto indicator = box(BoxStyle{
-                             .borderRadius = 99,
-                             .backgroundPaint = selected ? Gfx::BLUE600 : Gfx::ALPHA,
-                         },
-                         empty(4));
-
-    return button(
-        std::move(onPress),
-        buttonStyle,
-        spacing(
-            {0, 8, 12, 8},
-            hflow(
-                indicator,
-                empty(8),
-                icon(i, 26),
-                empty(12),
-                labelMedium(title) | center())));
-}
-
-inline Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Child child) {
-    return state(false, [=](State<bool> state) {
-        return vflow(
-            0,
-            pressableRow(
-                state.bindToggle(),
-                leading,
-                title,
-                subtitle,
-                icon(state.value() ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 24)),
-            state.value() ? spacing(
-                                {38, 0, 0, 0},
-                                child)
-                          : empty());
-    });
-}
-
-inline Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Children children) {
-    return treeRow(leading, title, subtitle, vflow(children));
-}
+Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Children children);
 
 } // namespace Karm::Ui

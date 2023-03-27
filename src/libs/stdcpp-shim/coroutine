@@ -1,0 +1,88 @@
+#pragma once
+
+namespace std {
+
+template <typename ReturnType, typename... Args>
+struct coroutine_traits {
+    using promise_type = typename ReturnType::promise_type;
+};
+
+template <typename Promise = void>
+struct coroutine_handle;
+
+template <>
+struct coroutine_handle<void> {
+
+    template <typename Promise>
+    friend struct coroutine_handle;
+
+    static coroutine_handle<> from_address(void *frame) noexcept {
+        return coroutine_handle<>{frame};
+    }
+
+    coroutine_handle()
+        : _frame{nullptr} {}
+
+    explicit operator bool() {
+        return _frame;
+    }
+
+    void *address() {
+        return _frame;
+    }
+
+    bool done() {
+        return __builtin_coro_done(_frame);
+    }
+
+    void resume() {
+        __builtin_coro_resume(_frame);
+    }
+
+    void destroy() {
+        __builtin_coro_destroy(_frame);
+    }
+
+    void operator()() {
+        resume();
+    }
+
+private:
+    explicit coroutine_handle(void *frame)
+        : _frame{frame} {}
+
+    void *_frame;
+};
+
+template <typename Promise>
+struct coroutine_handle : coroutine_handle<> {
+    coroutine_handle() = default;
+
+    static coroutine_handle<Promise> from_promise(Promise &p) {
+        auto frame = __builtin_coro_promise(&p, alignof(Promise), true);
+        return coroutine_handle{frame};
+    }
+
+    Promise &promise() {
+        auto p_ptr = __builtin_coro_promise(_frame, alignof(Promise), false);
+        return *static_cast<Promise *>(p_ptr);
+    }
+
+private:
+    explicit coroutine_handle(void *frame)
+        : coroutine_handle<>{frame} {}
+};
+
+struct suspend_never {
+    bool await_ready() const noexcept { return true; }
+    void await_suspend(coroutine_handle<>) const noexcept {}
+    void await_resume() const noexcept {}
+};
+
+struct suspend_always {
+    bool await_ready() const noexcept { return false; }
+    void await_suspend(coroutine_handle<>) const noexcept {}
+    void await_resume() const noexcept {}
+};
+
+} // namespace std

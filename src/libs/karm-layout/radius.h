@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-base/std.h>
+
 namespace Karm::Layout {
 
 template <typename T>

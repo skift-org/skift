@@ -8,4 +8,4 @@ enum Hint {
     MAX,
 };
 
-}
+} // namespace Karm::Layout

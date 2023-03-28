@@ -2,3 +2,4 @@
 __pycache__/
 .vscode/
 .DS_Store
+.python-version

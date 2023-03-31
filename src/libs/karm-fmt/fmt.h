@@ -15,8 +15,9 @@ namespace Karm::Fmt {
 
 struct NumberFormater {
     bool isChar = false;
-    isize base = 10;
-    isize width = 0;
+    usize base = 10;
+    usize width = 0;
+    usize precision = 6;
     bool fillZero = false;
 
     void parse(Text::Scan &scan) {
@@ -83,7 +84,7 @@ struct NumberFormater {
         do {
             buf[i++] = digit(value % base);
             value /= base;
-        } while (value != 0);
+        } while (value != 0 && i < precision && i < buf.len());
 
         reverse(mutSub(buf, 0, i));
 

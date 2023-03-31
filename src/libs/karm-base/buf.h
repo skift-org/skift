@@ -29,7 +29,8 @@ struct Buf {
 
     Buf() = default;
 
-    Buf(usize cap) : _cap(cap) {
+    Buf(usize cap)
+        : _cap(cap) {
         _buf = new Inert<T>[cap];
     }
 

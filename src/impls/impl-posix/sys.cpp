@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <sys/utsname.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "errno.h"
@@ -140,6 +141,22 @@ Res<Strong<Sys::Fd>> createErr() {
     return Ok(makeStrong<PosixFd>(2));
 }
 
+/* --- Time ----------------------------------------------------------------- */
+
+TimeStamp now() {
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    return TimeStamp{static_cast<u64>(ts.tv_sec * 1000000000 + ts.tv_nsec)};
+}
+
+TimeSpan uptime() {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return TimeSpan{static_cast<u64>(ts.tv_sec * 1000000000 + ts.tv_nsec)};
+}
+
+/* --- Memory Managment ----------------------------------------------------- */
+
 isize mmapOptionsToProt(Sys::MmapOptions const &options) {
     isize prot = 0;
 
@@ -240,6 +257,23 @@ Res<> populate(Vec<Sys::UserInfo> &infos) {
     Sys::UserInfo info;
     try$(populate(info));
     infos.pushBack(info);
+    return Ok();
+}
+
+/* --- Process Managment ---------------------------------------------------- */
+
+Res<> sleep(TimeSpan span) {
+    struct timespec ts;
+    ts.tv_sec = span.toSecs();
+    ts.tv_nsec = span.toUSecs() % 1000000000;
+    if (nanosleep(&ts, nullptr) < 0) {
+        return Posix::fromLastErrno();
+    }
+    return Ok();
+}
+
+Res<> exit(i32 res) {
+    ::exit(res);
     return Ok();
 }
 

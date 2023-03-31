@@ -29,6 +29,10 @@ Child toolbar(Children children);
 
 inline Ui::Child toolbar(Meta::Same<Child> auto... children) { return toolbar({children...}); }
 
+Ui::Child bottombar(Children children);
+
+inline Ui::Child bottombar(Meta::Same<Child> auto... children) { return bottombar({children...}); }
+
 inline Child card(Child child) {
     return box({
                    .borderRadius = 4,

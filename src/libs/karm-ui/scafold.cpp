@@ -71,10 +71,18 @@ static BoxStyle TOOLBAR = {
 
 Child toolbar(Children children) {
     return vflow(
-        hflow(4, children) |
+        hflow(0, children) |
             spacing(8) |
             box(TOOLBAR),
         separator());
+}
+
+Ui::Child bottombar(Children children) {
+    return vflow(
+        separator(),
+        hflow(4, children) |
+            spacing(8) |
+            box(TOOLBAR));
 }
 
 } // namespace Karm::Ui

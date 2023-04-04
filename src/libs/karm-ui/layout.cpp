@@ -676,7 +676,8 @@ struct GridLayout : public GroupNode<GridLayout> {
             } else {
                 isize row = index / _columns.len();
                 isize column = index % _columns.len();
-                place(child, {row, column});
+
+                place(child, {column, row});
             }
             index++;
         }

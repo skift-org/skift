@@ -34,13 +34,13 @@ struct Any {
 
     template <typename T>
     Any(T const &value)
-        : _type(Meta::makeId<T>()),
+        : _type(Meta::idOf<T>()),
           _buf(new T(value)),
           _ops(_Ops::make<T>()) {}
 
     template <typename T>
     Any(T &&value)
-        : _type(Meta::makeId<T>()),
+        : _type(Meta::idOf<T>()),
           _buf(new T(std::move(value))),
           _ops(_Ops::make<T>()) {}
 
@@ -72,7 +72,7 @@ struct Any {
     Any &operator=(T &&value) {
         _ops.dtor(_buf);
 
-        _type = Meta::makeId<T>();
+        _type = Meta::idOf<T>();
         _buf = new T(std::move(value));
         _ops = _Ops::make<T>();
 
@@ -98,7 +98,7 @@ struct Any {
 
     template <typename T>
     T &unwrap() {
-        if (_type != Meta::makeId<T>()) {
+        if (_type != Meta::idOf<T>()) {
             panic("Unwrapping wrong type");
         }
         return *static_cast<T *>(_buf);
@@ -106,7 +106,7 @@ struct Any {
 
     template <typename T>
     T const &unwrap() const {
-        if (_type != Meta::makeId<T>()) {
+        if (_type != Meta::idOf<T>()) {
             panic("Unwrapping wrong type");
         }
         return *static_cast<T *>(_buf);
@@ -114,7 +114,7 @@ struct Any {
 
     template <typename T>
     bool is() const {
-        return _type == Meta::makeId<T>();
+        return _type == Meta::idOf<T>();
     }
 };
 

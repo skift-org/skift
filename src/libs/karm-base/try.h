@@ -14,6 +14,15 @@
         __expr.take();                       \
     })
 
+#define co_try$(EXPR)                        \
+    ({                                       \
+        auto __expr = (EXPR);                \
+        if (not static_cast<bool>(__expr)) { \
+            co_return __expr.none();         \
+        }                                    \
+        __expr.take();                       \
+    })
+
 namespace Karm {
 
 template <typename T>

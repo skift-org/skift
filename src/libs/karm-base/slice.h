@@ -435,4 +435,39 @@ ALWAYS_INLINE constexpr void sort(MutSliceable auto &slice, auto cmp) {
     sort(leftSlice, cmp);
 }
 
+ALWAYS_INLINE Opt<usize> search(Sliceable auto const &slice, auto cmp) {
+    if (len(slice) == 0) {
+        return NONE;
+    }
+
+    if (cmp(slice[0]).isGt()) {
+        return NONE;
+    }
+
+    if (cmp(slice[len(slice) - 1]).isLt()) {
+        return NONE;
+    }
+
+    usize left = 0;
+    usize right = len(slice) - 1;
+
+    while (left <= right) {
+        usize mid = (left + right) / 2;
+
+        auto result = cmp(at(slice, mid));
+
+        if (result.isEq()) {
+            return mid;
+        }
+
+        if (result.isLt()) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return NONE;
+}
+
 } // namespace Karm

@@ -14,7 +14,7 @@ namespace Karm {
 
 #define stringify$(SYM) __stringify$(SYM)
 
-#define var$(NAME) concat$(NAME, __LINE__)
+#define var$(NAME) concat$(_MACRO_VAR_##NAME##__, __LINE__)
 
 #define defer$(BEGIN, END) for (isize var$(__i) = (BEGIN, 0); not var$(__i); (var$(__i) += 1, END))
 

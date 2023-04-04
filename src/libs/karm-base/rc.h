@@ -102,7 +102,7 @@ struct Cell : public _Cell {
 
     void *_unwrap() override { return &_buf.unwrap(); }
 
-    Meta::Id id() override { return Meta::makeId<T>(); }
+    Meta::Id id() override { return Meta::idOf<T>(); }
 
     void clear() override { _buf.dtor(); }
 };
@@ -227,7 +227,7 @@ struct Strong {
     constexpr bool is() {
         return Meta::Same<T, U> or
                Meta::Derive<T, U> or
-               _cell->id() == Meta::makeId<U>();
+               _cell->id() == Meta::idOf<U>();
     }
 
     Meta::Id id() const {
@@ -362,7 +362,7 @@ struct OptStrong {
     constexpr bool is() {
         return Meta::Same<T, U> or
                Meta::Derive<T, U> or
-               _cell->id() == Meta::makeId<U>();
+               _cell->id() == Meta::idOf<U>();
     }
 
     Meta::Id id() const {

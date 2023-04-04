@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ordr.h"
 #include "std.h"
 
 namespace Karm {
@@ -9,7 +10,7 @@ using Tick = u64;
 static constexpr Tick TICKS_PER_SECOND = 1000;
 
 struct TimeSpan {
-    u64 value;
+    u64 _value; // us
 
     static constexpr TimeSpan zero() {
         return TimeSpan{0};
@@ -55,16 +56,18 @@ struct TimeSpan {
         return fromMonths(value * 12);
     }
 
-    constexpr TimeSpan() : value(0) {}
+    constexpr TimeSpan()
+        : _value(0) {}
 
-    constexpr TimeSpan(u64 value) : value(value) {}
+    constexpr TimeSpan(u64 value)
+        : _value(value) {}
 
     constexpr bool isInfinite() const {
-        return value == ~0ull;
+        return _value == ~0ull;
     }
 
     constexpr u64 toUSecs() const {
-        return value;
+        return _value;
     }
 
     constexpr u64 toMSecs() const {
@@ -99,27 +102,37 @@ struct TimeSpan {
         return toMonths() / 12;
     }
 
-    constexpr TimeSpan &operator+=(TimeSpan const &other) {
-        value += other.value;
+    constexpr Tick toTicks() {
+        return _value / (1000 * 1000 / TICKS_PER_SECOND);
+    }
+
+    constexpr TimeSpan &operator+=(TimeSpan other) {
+        _value += other._value;
         return *this;
     }
 
-    constexpr TimeSpan &operator-=(TimeSpan const &other) {
-        value -= other.value;
+    constexpr TimeSpan &operator-=(TimeSpan other) {
+        _value -= other._value;
         return *this;
     }
 
-    constexpr TimeSpan operator+(TimeSpan const &other) const {
-        return value + other.value;
+    constexpr TimeSpan operator+(TimeSpan other) const {
+        return _value + other._value;
     }
 
-    constexpr TimeSpan operator-(TimeSpan const &other) const {
-        return value - other.value;
+    constexpr TimeSpan operator-(TimeSpan other) const {
+        return _value - other._value;
+    }
+
+    constexpr Ordr cmp(TimeSpan other) const {
+        return ::Karm::cmp(_value, other._value);
     }
 };
 
 struct TimeStamp {
-    u64 value;
+    u64 _value;
+
+    static constexpr u64 END_OF_TIME = {~0ull};
 
     static constexpr TimeStamp epoch() {
         return {0};
@@ -129,37 +142,49 @@ struct TimeStamp {
         return {~0ull};
     }
 
-    constexpr TimeStamp(u64 value = 0) : value(value) {}
+    constexpr TimeStamp(u64 value = 0)
+        : _value(value) {}
 
     constexpr bool isEndOfTime() const {
-        return value == ~0ull;
+        return _value == ~0ull;
     }
 
-    constexpr TimeStamp &operator+=(TimeSpan const &other) {
+    constexpr TimeStamp &operator+=(TimeSpan other) {
         *this = *this + other;
         return *this;
     }
 
-    constexpr TimeStamp &operator-=(TimeSpan const &other) {
+    constexpr TimeStamp &operator-=(TimeSpan other) {
         *this = *this - other;
         return *this;
     }
 
-    constexpr TimeStamp operator+(TimeSpan const &other) const {
+    constexpr TimeStamp operator+(TimeSpan other) const {
         if (other.isInfinite()) {
             return endOfTime();
         }
         if (isEndOfTime()) {
             return *this;
         }
-        return value + other.value;
+        return _value + other._value;
     }
 
-    constexpr TimeStamp operator-(TimeSpan const &other) const {
+    constexpr TimeStamp operator-(TimeSpan other) const {
         if (isEndOfTime()) {
             return *this;
         }
-        return value - other.value;
+        return _value - other._value;
+    }
+
+    constexpr TimeSpan operator-(TimeStamp other) const {
+        if (isEndOfTime() || other.isEndOfTime()) {
+            return TimeSpan::infinite();
+        }
+        return _value - other._value;
+    }
+
+    constexpr Ordr cmp(TimeStamp other) const {
+        return ::Karm::cmp(_value, other._value);
     }
 };
 

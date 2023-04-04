@@ -138,24 +138,6 @@ struct Var {
         return *reinterpret_cast<T const *>(_buf);
     }
 
-    template <Meta::Contains<Ts...> T>
-    ALWAYS_INLINE bool with(auto visitor) {
-        if (_index == Meta::indexOf<T, Ts...>()) {
-            visitor(*reinterpret_cast<T *>(_buf));
-            return true;
-        }
-        return false;
-    }
-
-    template <Meta::Contains<Ts...> T>
-    ALWAYS_INLINE bool with(auto visitor) const {
-        if (_index == Meta::indexOf<T, Ts...>()) {
-            visitor(*reinterpret_cast<T const *>(_buf));
-            return true;
-        }
-        return false;
-    }
-
     ALWAYS_INLINE auto visit(auto visitor) {
         return Meta::indexCast<Ts...>(_index, _buf, visitor);
     }

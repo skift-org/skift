@@ -1,6 +1,5 @@
 #pragma once
 
-#include "cons.h"
 #include "iter.h"
 #include "opt.h"
 #include "rc.h"
@@ -14,8 +13,14 @@ struct List {
 
     struct Node {
         T buf;
-        Strong<Node> next;
-        Weak<Node> prev;
+        OptStrong<Node> next;
+        OptWeak<Node> prev;
+
+        template <typename... Args>
+        constexpr Node(Args &&...args)
+            : buf{std::forward<Args>(args)...},
+              next(NONE),
+              prev(NONE) {}
     };
 
     usize _len = 0;
@@ -65,6 +70,30 @@ struct List {
         _len = len;
     }
 
+    void remove(T const &elem) {
+        auto node = _head.unwrap();
+        for (usize i = 0; i < _len; i++) {
+            if (node->buf == elem) {
+                if (i == 0) {
+                    _head = node->next;
+                } else {
+                    node->prev.unwrap()->next = node->next;
+                }
+
+                if (i == _len - 1) {
+                    _tail = node->prev;
+                } else {
+                    node->next.unwrap()->prev = node->prev;
+                }
+
+                _len--;
+                return;
+            }
+
+            node = node->next.unwrap();
+        }
+    }
+
     void clear() {
         _head = NONE;
         _tail = NONE;
@@ -94,6 +123,63 @@ struct List {
 
     T const &operator[](usize i) const { return at(i); }
 
+    /* -- Front Access --- */
+
+    T &peekFront() {
+        if (not _len) {
+            panic("peek from empty list");
+        }
+
+        return _head->buf;
+    }
+
+    T const &peekFront() const {
+        if (not _len) {
+            panic("peek from empty list");
+        }
+
+        return _head->buf;
+    }
+
+    void pushFront(T const &value) {
+        pushFront(T{value});
+    }
+
+    void pushFront(T &&value) {
+        emplaceFront(std::move(value));
+    }
+
+    template <typename... Args>
+    void emplaceFront(Args &&...args) {
+        Strong<Node> node = makeStrong<Node>(std::forward<Args>(args)...);
+
+        if (_head) {
+            _head->prev = node;
+            node->next = _head;
+        } else {
+            _tail = node;
+        }
+
+        _head = node;
+        _len++;
+    }
+
+    T popFront() {
+        if (not _len) {
+            panic("pop from empty list");
+        }
+
+        auto node = _head;
+        _head = node->next;
+        _len--;
+
+        if (not _len) {
+            _tail = NONE;
+        }
+
+        return std::move(node->buf);
+    }
+
     /* --- Back Access --- */
 
     T &peekBack() {
@@ -122,7 +208,7 @@ struct List {
 
     template <typename... Args>
     void emplaceBack(Args &&...args) {
-        Strong<Node> node = makeStrong<Node>(std::forward(args)..., NONE, NONE);
+        Strong<Node> node = makeStrong<Node>(std::forward<Args>(args)...);
 
         if (_tail) {
             _tail->next = node;
@@ -149,42 +235,65 @@ struct List {
         }
 
         _len--;
-        return node->buf;
+        return std::move(node->buf);
+    }
+
+    /* --- Queue --- */
+
+    void requeue() {
+        if (_len < 2) {
+            return;
+        }
+
+        auto node = _head;
+        _head = node->next;
+        _tail->next = node;
+        node->next = NONE;
+        node->prev = _tail;
+        _tail = node;
     }
 
     /* --- Iteration --- */
 
     template <typename Self>
-    static auto iter(Self *self) {
-        return Iter([curr = self->_head]() mutable -> Opt<T> {
+    static auto _iter(Self *self) {
+        return Iter([curr = self->_head]() mutable -> T * {
             if (curr) {
-                auto ret = curr->buf;
+                auto &ret = curr->buf;
                 curr = curr->next;
-                return ret;
+                return &ret;
             }
-            return NONE;
+            return nullptr;
         });
     }
 
     template <typename Self>
-    static auto iterRev(Self self) {
-        return Iter([curr = self->_tail]() mutable -> Opt<T> {
+    static auto _iterRev(Self *self) {
+        return Iter([curr = self->_tail]() mutable -> T * {
             if (curr) {
-                auto ret = curr->buf;
+                auto &ret = curr->buf;
                 curr = curr->prev;
-                return ret;
+                return &ret;
             }
-            return NONE;
+            return nullptr;
         });
     }
 
-    constexpr auto iter() { return _iter(this); }
+    constexpr auto iter() {
+        return _iter(this);
+    }
 
-    constexpr auto iter() const { return _iter(this); }
+    constexpr auto iter() const {
+        return _iter(this);
+    }
 
-    constexpr auto iterRev() { return _iterRev(this); }
+    constexpr auto iterRev() {
+        return _iterRev(this);
+    }
 
-    constexpr auto iterRev() const { return _iterRev(this); }
+    constexpr auto iterRev() const {
+        return _iterRev(this);
+    }
 
     /* --- Len & Buf --- */
 

@@ -158,22 +158,6 @@ struct [[nodiscard]] Opt {
         return v;
     }
 
-    ALWAYS_INLINE bool with(auto visitor) {
-        if (_present) {
-            visitor(_value.unwrap());
-            return true;
-        }
-        return false;
-    }
-
-    ALWAYS_INLINE bool with(auto visitor) const {
-        if (_present) {
-            visitor(_value.unwrap());
-            return true;
-        }
-        return false;
-    }
-
     ALWAYS_INLINE auto visit(auto visitor)
         -> decltype(visitor(_value.unwrap())) {
 

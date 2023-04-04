@@ -1,89 +1,103 @@
 #pragma once
 
-#include "cons.h"
-#include "opt.h"
-#include "std.h"
+#include <karm-meta/id.h>
+
 
 namespace Karm {
 
-template <typename... Ts>
-struct Tuple;
+template <usize I, typename T>
+struct _T;
 
-template <>
-struct Tuple<> {
-    static constexpr usize size = 0;
-
-    constexpr Tuple() {}
-
-    constexpr usize len() { return 0; }
-
-    constexpr static void visit(void *, auto) {}
-
-    constexpr void visit(auto) {}
-
-    constexpr auto apply(auto f, auto &&...args) {
-        return f(std::forward<decltype(args)>(args)...);
+#define _TN(N)            \
+    template <typename T> \
+    struct _T<N, T> {     \
+        using T##N = T;   \
     }
+
+// clang-format off
+_TN(0);  _TN(1);  _TN(2);  _TN(3);  _TN(4);  _TN(5);  _TN(6);  _TN(7);
+_TN(8);  _TN(9); _TN(10); _TN(11); _TN(12); _TN(13); _TN(14); _TN(15);
+// Do we need more than 16?
+// clang-format on
+
+template <usize I, typename T>
+struct _V;
+
+#define _VN(N)                                            \
+    template <typename T>                                 \
+    struct _V<N, T> : public _T<N, T> {                   \
+        T v##N;                                           \
+        constexpr _V(T &&v) : v##N{std::forward<T>(v)} {} \
+        auto visit(auto f) { return f(v##N); }            \
+    }
+
+// clang-format off
+_VN(0);  _VN(1);  _VN(2);  _VN(3);  _VN(4);  _VN(5);  _VN(6);  _VN(7);
+_VN(8);  _VN(9); _VN(10); _VN(11); _VN(12); _VN(13); _VN(14); _VN(15);
+// Do we need more than 16?
+// clang-format on
+
+template <usize I, typename... Ts>
+struct _Tuple;
+
+template <usize I>
+struct _Tuple<I> {
+    constexpr _Tuple() {}
+
+    constexpr static usize len() { return 0; }
+
+    constexpr static auto inspect(auto) {}
+
+    constexpr auto visit(auto) {}
 };
 
-template <typename Car>
-struct Tuple<Car> {
-    Car car{};
-    None cdr{};
+template <usize I, typename T>
+struct _Tuple<I, T> :
+    public _V<I, T> {
 
-    constexpr Tuple(Car &&car) : car(car) {}
+    constexpr _Tuple(T &&v)
+        : _V<I, T>{std::forward<T>(v)} {}
 
-    constexpr usize len() {
+    constexpr static usize len() {
         return 1;
     }
 
-    constexpr static auto visit(void *ptr, auto f) {
-        f(*static_cast<Car *>(ptr));
+    constexpr static auto inspect(auto f) {
+        return f(Meta::Type<T>{});
     }
 
-    constexpr void visit(auto f) {
-        f(car);
-    }
-
-    constexpr Cons<Car, None> cons() {
-        return {car, None{}};
-    }
-
-    constexpr auto apply(auto f, auto &&...args) {
-        return f(car, std::forward<decltype(args)>(args)...);
+    constexpr auto visit(auto f) {
+        return _V<I, T>::visit(f);
     }
 };
 
-template <typename Car, typename... Cdr>
-struct Tuple<Car, Cdr...> {
-    Car car{};
-    Tuple<Cdr...> cdr{};
+template <usize I, typename T, typename... Ts>
+struct _Tuple<I, T, Ts...> :
+    public _V<I, T>,
+    public _Tuple<I + 1, Ts...> {
 
-    constexpr Tuple(Car &&car, Cdr &&...cdr)
-        : car(car), cdr(std::forward<Cdr>(cdr)...) {
+    constexpr _Tuple(T &&v, Ts &&...vs)
+        : _V<I, T>{std::forward<T>(v)},
+          _Tuple<I + 1, Ts...>{std::forward<Ts>(vs)...} {}
+
+    static constexpr usize len() {
+        return sizeof...(Ts) + 1;
     }
 
-    constexpr usize len() {
-        return 1 + cdr.len();
+    constexpr static auto inspect(auto f) {
+        f(Meta::Type<T>{});
+        return _Tuple<I + 1, Ts...>::inspect(f);
     }
 
-    constexpr static void visit(void *ptr, auto f) {
-        f(*static_cast<Car *>(ptr));
-        Tuple<Cdr...>::visit(ptr, f);
+    constexpr auto visit(auto f) {
+        _V<I, T>::visit(f);
+        return _Tuple<I + 1, Ts...>::visit(f);
     }
+};
 
-    constexpr void visit(auto f) {
-        f(car);
-        cdr.visit(f);
-    }
-
-    constexpr Cons<Car, Tuple<Cdr...>> cons() {
-        return {car, cdr.cons()};
-    }
-
-    constexpr auto apply(auto f, auto &&...args) {
-        return apply(f, car, std::forward<decltype(args)>(args)...);
-    }
+template <typename... Ts>
+struct Tuple : public _Tuple<0, Ts...> {
+    using _Tuple<0, Ts...>::_Tuple;
 };
 
 } // namespace Karm

@@ -70,12 +70,11 @@ concept Lockable =
         lockable.release();
     };
 
-template <Lockable L>
 struct LockScope :
     Meta::Static {
-    L &_lock;
+    Lock &_lock;
 
-    LockScope(L &lock)
+    LockScope(Lock &lock)
         : _lock(lock) {
         _lock.acquire();
     }

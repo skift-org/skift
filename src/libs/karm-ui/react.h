@@ -242,9 +242,9 @@ struct Reducer :
     using Action = typename Model::Action;
 
     Data _data;
-    Func<Child(Data)> _build;
+    Func<Child(Data const &)> _build;
 
-    Reducer(Data data, Func<Child(Data)> build)
+    Reducer(Data data, Func<Child(Data const &)> build)
         : _data(data), _build(std::move(build)) {}
 
     void bubble(Events::Event &e) override {
@@ -265,13 +265,13 @@ struct Reducer :
 template <typename Model>
 inline Child reducer(
     typename Model::Data initial,
-    Func<Child(typename Model::Data)> build) {
+    Func<Child(typename Model::Data const &)> build) {
 
     return makeStrong<Reducer<Model>>(initial, std::move(build));
 }
 
 template <typename Model>
-inline Child reducer(Func<Child(typename Model::Data)> build) {
+inline Child reducer(Func<Child(typename Model::Data const &)> build) {
 
     return makeStrong<Reducer<Model>>(typename Model::Data{}, std::move(build));
 }

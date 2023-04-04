@@ -8,6 +8,14 @@
 
 namespace Karm::Ui {
 
+Child aboutButton(Mdi::Icon icon, String title) {
+    return button(
+        [=](auto &n) {
+            showAboutDialog(n, icon, title);
+        },
+        ButtonStyle::subtle(), icon, title);
+}
+
 Child controls(TitlebarStyle style) {
     return hflow(8,
                  button(NONE, ButtonStyle::subtle(), Mdi::MINUS) | cond(style == TitlebarStyle::DEFAULT),
@@ -23,12 +31,18 @@ Child controls(TitlebarStyle style) {
 Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {
     return hflow(
                4,
-               button(
-                   [=](auto &n) {
-                       showAboutDialog(n, icon, title);
-                   },
-                   ButtonStyle::subtle(), icon, title),
+               aboutButton(icon, title),
                grow(NONE),
+               controls(style)) |
+           spacing(8) |
+           dragRegion();
+}
+
+Child titlebar(Mdi::Icon icon, String title, Child tabs, TitlebarStyle style) {
+    return hflow(
+               4,
+               aboutButton(icon, title),
+               tabs | Ui::grow(),
                controls(style)) |
            spacing(8) |
            dragRegion();

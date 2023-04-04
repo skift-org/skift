@@ -16,6 +16,8 @@ Child controls(TitlebarStyle style = TitlebarStyle::DEFAULT);
 
 Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style = TitlebarStyle::DEFAULT);
 
+Child titlebar(Mdi::Icon icon, String title, Child tabs, TitlebarStyle style = TitlebarStyle::DEFAULT);
+
 enum struct BadgeStyle {
     INFO,
     SUCCESS,

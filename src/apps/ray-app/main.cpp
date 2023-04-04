@@ -307,7 +307,7 @@ Colorf acesTonemap(Colorf color) {
     return (color * (a * color + b)) / (color * (c * color + d) + e);
 }
 
-void renderScene(Cam cam, Scene &scene, Gfx::Surface buf, Props props) {
+void renderScene(Cam cam, Scene &scene, Gfx::MutPixels buf, Props props) {
     auto size = buf.bound().size();
 
     for (isize y = 0; y < size.y; y++) {
@@ -348,7 +348,7 @@ void renderScene(Cam cam, Scene &scene, Gfx::Surface buf, Props props) {
 Res<> entryPoint(CliArgs args) {
     f64 scale = 1;
 
-    Media::Image image{Gfx::RGBA8888, Vec2f{1280 * scale, 720 * scale}.cast<isize>()};
+    auto image = Media::Image::alloc(Math::Vec2f{1280 * scale, 720 * scale}.cast<isize>());
 
     Props props = {
         .samples = 10,
@@ -420,7 +420,7 @@ Res<> entryPoint(CliArgs args) {
                 */
     };
 
-    renderScene(cam, scene, image, props);
+    renderScene(cam, scene, image.mutPixels(), props);
 
     return Ui::runApp(args, Ui::minSize({1920, 1080}, Ui::image(image)));
 }

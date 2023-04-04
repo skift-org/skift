@@ -2,6 +2,7 @@
 
 #include <karm-base/res.h>
 #include <karm-gfx/buffer.h>
+#include <karm-gfx/colors.h>
 
 #include "../bscan.h"
 
@@ -72,7 +73,7 @@ struct Image {
         return c.red * 3 + c.green * 5 + c.blue * 7 + c.alpha * 11;
     }
 
-    [[gnu::flatten]] Res<> decode(Gfx::Surface dest) {
+    [[gnu::flatten]] Res<> decode(Gfx::MutPixels dest) {
         usize run = 0;
         Array<Gfx::Color, 64> index{};
         Gfx::Color pixel = Gfx::BLACK;

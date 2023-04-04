@@ -21,7 +21,11 @@ struct Host : public Node {
         _root->detach(this);
     }
 
-    virtual Gfx::Surface surface() = 0;
+    virtual Gfx::MutPixels mutPixels() = 0;
+
+    Gfx::Pixels pixels() {
+        return mutPixels();
+    }
 
     virtual void flip(Slice<Math::Recti> regions) = 0;
 
@@ -34,7 +38,7 @@ struct Host : public Node {
     }
 
     Math::Recti bound() override {
-        return surface().bound();
+        return pixels().bound();
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
@@ -54,8 +58,7 @@ struct Host : public Node {
     }
 
     void paint() {
-        auto s = surface();
-        _g.begin(s);
+        _g.begin(mutPixels());
         for (auto &d : _dirty) {
             paint(_g, d);
         }

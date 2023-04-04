@@ -26,29 +26,35 @@ Res<Font> loadFont(f64 size, Str path) {
 
 static Res<Image> loadQoi(Bytes bytes) {
     auto qoi = try$(Qoi::Image::load(bytes));
-    Image image{Gfx::RGBA8888, {qoi.width(), qoi.height()}};
-    try$(qoi.decode(image));
-    return Ok(image);
+    auto img = Image::alloc({qoi.width(), qoi.height()});
+    try$(qoi.decode(img.mutPixels()));
+    return Ok(img);
 }
 
 static Res<Image> loadPng(Bytes bytes) {
     auto png = try$(Png::Image::load(bytes));
-    Image image{Gfx::RGBA8888, {png.width(), png.height()}};
+    auto img = Image::alloc({png.width(), png.height()});
 
-    Gfx::Surface surface = image;
-    surface.clear(surface.bound(), Gfx::PINK);
-    // try$(png.decode(image));
-    return Ok(image);
+    img
+        .mutPixels()
+        .clip(img.bound())
+        .clear(Gfx::PINK);
+
+    // try$(png.decode(img));
+    return Ok(img);
 }
 
 static Res<Image> loadJpeg(Bytes bytes) {
     auto jpeg = try$(Jpeg::Image::load(bytes));
-    Image image{Gfx::RGBA8888, {jpeg.width(), jpeg.height()}};
+    auto img = Image::alloc({jpeg.width(), jpeg.height()});
 
-    Gfx::Surface surface = image;
-    surface.clear(surface.bound(), Gfx::PINK);
-    // try$(jpeg.decode(image));
-    return Ok(image);
+    img
+        .mutPixels()
+        .clip(img.bound())
+        .clear(Gfx::PINK);
+
+    // try$(jpeg.decode(img));
+    return Ok(img);
 }
 
 Res<Image> loadImage(Str path) {

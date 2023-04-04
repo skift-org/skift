@@ -37,7 +37,7 @@ struct Context {
         isize sign;
     };
 
-    Opt<Surface> _surface{};
+    Opt<MutPixels> _pixels{};
     Vec<Scope> _stack{};
     Shape _shape{};
     Path _path{};
@@ -46,14 +46,17 @@ struct Context {
 
     /* --- Scope ------------------------------------------------------------ */
 
-    // Begin drawing operations on the given surface.
-    void begin(Surface c);
+    // Begin drawing operations on the given pixels.
+    void begin(MutPixels p);
 
     // End drawing operations.
     void end();
 
-    // Get the surface being drawn on.
-    Surface &surface();
+    // Get the pixels being drawn on.
+    MutPixels mutPixels();
+
+    // Get the pxeils being drawn on.
+    Pixels pixels() const;
 
     // Get the current scope.
     Scope &current();
@@ -67,23 +70,26 @@ struct Context {
     // Pop the current scope.
     void restore();
 
+    // A closure that receives a new Context as input.This context represents a
+    // new transparency layer that you can draw into.When the closure returns,
+    // karm-ui draws the new layer into the current context.
     void layer(auto inner) {
         layer({}, inner);
     }
 
+    // A closure that receives a new Context as input.This context represents a
+    // new transparency layer that you can draw into.When the closure returns,
+    // karm-ui draws the new layer into the current context.
     void layer(Math::Vec2i offset, auto inner) {
-        save();
-        Media::Image img = {
-            surface().format,
-            surface().size(),
-        };
+        auto old = mutPixels();
+        auto layer = Media::Image::alloc(
+            pixels().size(),
+            pixels().fmt());
 
-        auto old = surface();
-        _surface = img.surface();
+        _pixels = layer.mutPixels();
         inner(*this);
-        _surface = old;
-        blit(offset - origin(), img.surface());
-        restore();
+        _pixels = old;
+        blit(offset - origin(), layer.pixels());
     }
 
     /* --- Origin & Clipping ------------------------------------------------ */
@@ -160,7 +166,7 @@ struct Context {
 
     /* --- Drawing ---------------------------------------------------------- */
 
-    // Clear the entire surface with respect to the current origin and clip.
+    // Clear all pixels with respect to the current origin and clip.
     void clear(Color color = BLACK);
 
     // Clear the given rectangle with respect to the current origin and clip.
@@ -168,16 +174,16 @@ struct Context {
 
     /* --- Blitting --------------------------------------------------------- */
 
-    // Blit the given surface to the current surface
+    // Blit the given pixels to the current pixels
     // using the given source and destination rectangles.
-    void blit(Math::Recti src, Math::Recti dest, Surface surface);
+    void blit(Math::Recti src, Math::Recti dest, Pixels pixels);
 
-    // Blit the given surface to the current surface.
-    // The source rectangle is the entire surface.
-    void blit(Math::Recti dest, Surface surface);
+    // Blit the given pixels to the current pixels.
+    // The source rectangle is the entire piels.
+    void blit(Math::Recti dest, Pixels pixels);
 
-    // Blit the given surface to the current surface at the given position.
-    void blit(Math::Vec2i dest, Surface surface);
+    // Blit the given pixels to the current pixels at the given position.
+    void blit(Math::Vec2i dest, Pixels pixels);
 
     /* --- Shapes ----------------------------------------------------------- */
 
@@ -305,10 +311,10 @@ struct Context {
 
     /* --- Filters ---------------------------------------------------------- */
 
-    // Apply the given filter to the current surface.
+    // Apply the given filter to the current pixels.
     void apply(Filter filter);
 
-    // Apply the given filter to the given region of the current surface.
+    // Apply the given filter to the given region of the current pixels.
     void apply(Filter filter, Math::Recti region);
 };
 

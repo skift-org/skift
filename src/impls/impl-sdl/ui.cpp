@@ -21,17 +21,14 @@ struct SdlHost :
         SDL_Quit();
     }
 
-    Gfx::Surface surface() override {
+    Gfx::MutPixels mutPixels() override {
         SDL_Surface *s = SDL_GetWindowSurface(_window);
 
         return {
+            s->pixels,
+            {s->w, s->h},
+            (usize)s->pitch,
             Gfx::BGRA8888,
-            {
-                s->pixels,
-                s->w,
-                s->h,
-                (usize)s->pitch,
-            },
         };
     }
 
@@ -49,7 +46,7 @@ struct SdlHost :
                 break;
 
             case SDL_WINDOWEVENT_EXPOSED:
-                _dirty.pushBack(surface().bound());
+                _dirty.pushBack(pixels().bound());
                 break;
             }
             break;

@@ -59,24 +59,24 @@ struct StackBlur {
     }
 };
 
-[[gnu::flatten]] void BlurFilter::apply(Surface s) const {
+[[gnu::flatten]] void BlurFilter::apply(MutPixels p) const {
     if (amount == 0) {
         return;
     }
 
     StackBlur stack{amount};
-    auto b = s.bound();
+    auto b = p.bound();
 
     for (isize y = b.top(); y < b.bottom(); y++) {
         for (isize i = 0; i < stack.width(); i++) {
             auto x = b.start() + i - amount;
             stack.dequeue();
-            stack.enqueue(s.loadClamped({x, y}));
+            stack.enqueue(p.load({x, y}));
         }
 
         for (isize x = b.start(); x < b.end(); x++) {
-            s.store({x, y}, stack.dequeue());
-            stack.enqueue(s.loadClamped({x + amount + 1, y}));
+            p.store({x, y}, stack.dequeue());
+            stack.enqueue(p.load({x + amount + 1, y}));
         }
 
         stack.clear();
@@ -86,24 +86,24 @@ struct StackBlur {
         for (isize i = 0; i < stack.width(); i++) {
             isize const y = b.top() + i - amount;
             stack.dequeue();
-            stack.enqueue(s.loadClamped({x, y}));
+            stack.enqueue(p.load({x, y}));
         }
 
         for (isize y = b.top(); y < b.bottom(); y++) {
-            s.store({x, y}, stack.dequeue());
-            stack.enqueue(s.loadClamped({x, y + amount + 1}));
+            p.store({x, y}, stack.dequeue());
+            stack.enqueue(p.load({x, y + amount + 1}));
         }
 
         stack.clear();
     }
 }
 
-void SaturationFilter::apply(Surface s) const {
-    auto b = s.bound();
+void SaturationFilter::apply(MutPixels p) const {
+    auto b = p.bound();
 
     for (isize y = 0; y < b.height; y++) {
         for (isize x = 0; x < b.width; x++) {
-            auto color = s.load({b.x + x, b.y + y});
+            auto color = p.load({b.x + x, b.y + y});
 
             // weights from CCIR 601 spec
             // https://stackoverflow.com/questions/13806483/increase-or-decrease-color-saturation
@@ -115,35 +115,35 @@ void SaturationFilter::apply(Surface s) const {
 
             color = Color::fromRgba(red, green, blue, color.alpha);
 
-            s.store({b.x + x, b.y + y}, color);
+            p.store({b.x + x, b.y + y}, color);
         }
     }
 }
 
-void GrayscaleFilter::apply(Surface s) const {
-    auto b = s.bound();
+void GrayscaleFilter::apply(MutPixels p) const {
+    auto b = p.bound();
 
     for (isize y = 0; y < b.height; y++) {
         for (isize x = 0; x < b.width; x++) {
-            auto color = s.load({b.x + x, b.y + y});
+            auto color = p.load({b.x + x, b.y + y});
 
             // weights from CCIR 601 spec
             // https://stackoverflow.com/questions/13806483/increase-or-decrease-color-saturation
             f64 gray = 0.2989 * color.red + 0.5870 * color.green + 0.1140 * color.blue;
             color = Color::fromRgba(gray, gray, gray, color.alpha);
-            s.store({b.x + x, b.y + y}, color);
+            p.store({b.x + x, b.y + y}, color);
         }
     }
 }
 
-void ContrastFilter::apply(Surface s) const {
-    auto b = s.bound();
+void ContrastFilter::apply(MutPixels p) const {
+    auto b = p.bound();
 
     f64 const factor = (259 * ((amount * 255) + 255)) / (255 * (259 - (amount * 255)));
 
     for (isize y = 0; y < b.height; y++) {
         for (isize x = 0; x < b.width; x++) {
-            auto color = s.load({b.x + x, b.y + y});
+            auto color = p.load({b.x + x, b.y + y});
 
             color = Color::fromRgba(
                 clamp(factor * (color.red - 128) + 128, 0, 255),
@@ -151,17 +151,17 @@ void ContrastFilter::apply(Surface s) const {
                 clamp(factor * (color.blue - 128) + 128, 0, 255),
                 color.alpha);
 
-            s.store({b.x + x, b.y + y}, color);
+            p.store({b.x + x, b.y + y}, color);
         }
     }
 }
 
-void BrightnessFilter::apply(Surface s) const {
-    auto b = s.bound();
+void BrightnessFilter::apply(MutPixels p) const {
+    auto b = p.bound();
 
     for (isize y = 0; y < b.height; y++) {
         for (isize x = 0; x < b.width; x++) {
-            auto color = s.load({b.x + x, b.y + y});
+            auto color = p.load({b.x + x, b.y + y});
 
             color = Color::fromRgba(
                 min(color.red * amount, 255),
@@ -169,33 +169,33 @@ void BrightnessFilter::apply(Surface s) const {
                 min(color.blue * amount, 255),
                 color.alpha);
 
-            s.store({b.x + x, b.y + y}, color);
+            p.store({b.x + x, b.y + y}, color);
         }
     }
 }
 
-void NoiseFilter::apply(Surface s) const {
+void NoiseFilter::apply(MutPixels p) const {
     Math::Rand rand{0x12341234};
     u8 alpha = 255 * amount;
-    auto b = s.bound();
+    auto b = p.bound();
 
     for (isize y = 0; y < b.height; y++) {
         for (isize x = 0; x < b.width; x++) {
             u8 noise = rand.nextU8();
 
-            s.blend(
+            p.blend(
                 {b.x + x, b.y + y},
                 Color::fromRgba(noise, noise, noise, alpha));
         }
     }
 }
 
-void SepiaFilter::apply(Surface s) const {
-    auto b = s.bound();
+void SepiaFilter::apply(MutPixels p) const {
+    auto b = p.bound();
 
     for (isize y = 0; y < b.height; y++) {
         for (isize x = 0; x < b.width; x++) {
-            auto color = s.load({b.x + x, b.y + y});
+            auto color = p.load({b.x + x, b.y + y});
 
             auto sepiaColor = Color::fromRgba(
                 min((color.red * 0.393) + (color.green * 0.769) + (color.blue * 0.189), 255u),
@@ -203,17 +203,17 @@ void SepiaFilter::apply(Surface s) const {
                 min((color.red * 0.272) + (color.green * 0.534) + (color.blue * 0.131), 255u),
                 color.alpha);
 
-            s.store({b.x + x, b.y + y}, color.lerpWith(sepiaColor, amount));
+            p.store({b.x + x, b.y + y}, color.lerpWith(sepiaColor, amount));
         }
     }
 }
 
-void TintFilter::apply(Surface s) const {
-    auto b = s.bound();
+void TintFilter::apply(MutPixels p) const {
+    auto b = p.bound();
 
     for (isize y = 0; y < b.height; y++) {
         for (isize x = 0; x < b.width; x++) {
-            auto color = s.load({b.x + x, b.y + y});
+            auto color = p.load({b.x + x, b.y + y});
 
             auto tintColor = Color::fromRgba(
                 (color.red * amount.red) / 255,
@@ -221,26 +221,26 @@ void TintFilter::apply(Surface s) const {
                 (color.blue * amount.blue) / 255,
                 (color.alpha * amount.alpha) / 255);
 
-            s.store({b.x + x, b.y + y}, tintColor);
+            p.store({b.x + x, b.y + y}, tintColor);
         }
     }
 }
 
-void OverlayFilter::apply(Surface s) const {
-    auto b = s.bound();
+void OverlayFilter::apply(MutPixels p) const {
+    auto b = p.bound();
 
     for (isize y = 0; y < b.height; y++) {
         for (isize x = 0; x < b.width; x++) {
-            s.blend(
+            p.blend(
                 {b.x + x, b.y + y},
                 amount);
         }
     }
 }
 
-void FilterChain::apply(Surface s) const {
+void FilterChain::apply(MutPixels p) const {
     filters.visit([&](auto &f) {
-        f->apply(s);
+        f->apply(p);
     });
 }
 

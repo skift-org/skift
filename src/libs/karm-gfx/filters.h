@@ -12,7 +12,7 @@ namespace Karm::Gfx {
 struct Unfiltered {
     static constexpr auto NAME = "unfiltered";
 
-    void apply(Surface) const {}
+    void apply(MutPixels) const {}
 };
 
 struct BlurFilter {
@@ -21,7 +21,7 @@ struct BlurFilter {
     static constexpr f64 DEFAULT = 16;
 
     isize amount = DEFAULT;
-    void apply(Surface) const;
+    void apply(MutPixels) const;
 };
 
 struct SaturationFilter {
@@ -30,12 +30,12 @@ struct SaturationFilter {
     static constexpr f64 DEFAULT = 1;
 
     f64 amount = DEFAULT;
-    void apply(Surface) const;
+    void apply(MutPixels) const;
 };
 
 struct GrayscaleFilter {
     static constexpr auto NAME = "grayscale";
-    void apply(Surface) const;
+    void apply(MutPixels) const;
 };
 
 struct ContrastFilter {
@@ -44,7 +44,7 @@ struct ContrastFilter {
     static constexpr f64 DEFAULT = 0;
 
     f64 amount = DEFAULT;
-    void apply(Surface) const;
+    void apply(MutPixels) const;
 };
 
 struct BrightnessFilter {
@@ -53,7 +53,7 @@ struct BrightnessFilter {
     static constexpr f64 DEFAULT = 1;
 
     f64 amount = DEFAULT;
-    void apply(Surface) const;
+    void apply(MutPixels) const;
 };
 
 struct NoiseFilter {
@@ -62,7 +62,7 @@ struct NoiseFilter {
     static constexpr f64 DEFAULT = 0.5;
 
     f64 amount = DEFAULT;
-    void apply(Surface) const;
+    void apply(MutPixels) const;
 };
 
 struct SepiaFilter {
@@ -71,7 +71,7 @@ struct SepiaFilter {
     static constexpr f64 DEFAULT = 0.5;
 
     f64 amount = DEFAULT;
-    void apply(Surface) const;
+    void apply(MutPixels) const;
 };
 
 struct TintFilter {
@@ -79,7 +79,7 @@ struct TintFilter {
     static constexpr Color DEFAULT = Color::fromHex(0xffffff);
 
     Color amount = DEFAULT;
-    void apply(Surface) const;
+    void apply(MutPixels) const;
 };
 
 struct OverlayFilter {
@@ -87,7 +87,7 @@ struct OverlayFilter {
     static constexpr Color DEFAULT{};
 
     Color amount = DEFAULT;
-    void apply(Surface) const;
+    void apply(MutPixels) const;
 };
 
 struct Filter;
@@ -96,7 +96,7 @@ struct FilterChain {
     static constexpr auto NAME = "chain";
 
     Cons<Box<Filter>> filters;
-    void apply(Surface) const;
+    void apply(MutPixels) const;
 };
 
 using _Filters = Var<
@@ -113,7 +113,7 @@ using _Filters = Var<
 
 struct Filter : public _Filters {
     using _Filters::_Filters;
-    void apply(Surface s) const {
+    void apply(MutPixels s) const {
         visit([&](auto const &filter) {
             filter.apply(s);
         });

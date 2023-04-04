@@ -5,53 +5,47 @@
 
 namespace Karm::Media {
 
-struct ImageBuffer :
-    public Meta::NoCopy {
-    Buf<u8> data;
-    isize width;
-    isize height;
-    usize stride;
-
-    ImageBuffer(isize width, isize height, usize stride)
-        : data(Buf<u8>::init(height * stride)), width(width), height(height), stride(stride) {
-    }
-
-    operator Gfx::Buffer() {
-        return {data.buf(), width, height, stride};
-    }
-};
-
 struct Image {
-    Gfx::Format format;
-    Strong<ImageBuffer> buffer;
+    Strong<Buf<u8>> _buf;
+    Math::Vec2i _size;
+    usize _stride;
+    Gfx::Fmt _fmt;
 
-    Image(Gfx::Format format, Math::Vec2i size)
-        : format(format), buffer(makeStrong<ImageBuffer>(size.x, size.y, size.x * bpp(format))) {
+    static Image alloc(Math::Vec2i size, Gfx::Fmt fmt = Gfx::RGBA8888) {
+        auto buf = makeStrong<Buf<u8>>(Buf<u8>::init(size.x * size.y * fmt.bpp()));
+        return {std::move(buf), size, size.x * fmt.bpp(), fmt};
     }
 
-    operator Gfx::Surface() const {
-        return {format, *buffer};
+    ALWAYS_INLINE operator Gfx::Pixels() const {
+        return pixels();
     }
 
-    Gfx::Surface surface() const {
-        return *this;
+    ALWAYS_INLINE operator Gfx::MutPixels() {
+        return mutPixels();
     }
 
-    isize width() const {
-        return buffer->width;
+    ALWAYS_INLINE Gfx::Pixels pixels() const {
+        return {_buf->buf(), _size, _stride, _fmt};
     }
 
-    isize height() const {
-        return buffer->height;
+    ALWAYS_INLINE Gfx::MutPixels mutPixels() {
+        return {_buf->buf(), _size, _stride, _fmt};
     }
 
-    Math::Recti bound() const {
+    ALWAYS_INLINE isize width() const {
+        return _size.x;
+    }
+
+    ALWAYS_INLINE isize height() const {
+        return _size.y;
+    }
+
+    ALWAYS_INLINE Math::Recti bound() const {
         return {0, 0, width(), height()};
     }
 
     ALWAYS_INLINE Gfx::Color sample(Math::Vec2f pos) const {
-        Gfx::Surface s = *this;
-        return s.loadClamped(Math::Vec2i(pos.x * width(), pos.y * height()));
+        return pixels().sample(pos);
     }
 };
 

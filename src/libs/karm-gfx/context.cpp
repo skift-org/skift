@@ -6,13 +6,13 @@
 
 namespace Karm::Gfx {
 
-void Context::begin(Surface c) {
-    _surface = c;
+void Context::begin(MutPixels p) {
+    _pixels = p;
     _stack.pushBack({
-        .clip = surface().bound(),
+        .clip = pixels().bound(),
     });
 
-    _scanline.resize(c.width());
+    _scanline.resize(p.width());
 }
 
 void Context::end() {
@@ -21,11 +21,16 @@ void Context::end() {
     }
 
     _stack.popBack();
-    _surface = NONE;
+    _pixels = NONE;
 }
 
-Surface &Context::surface() {
-    return _surface.unwrap("no surface");
+MutPixels Context::mutPixels() {
+    return _pixels.unwrap("no pixels");
+}
+
+// Get the pxeils being drawn on.
+Pixels Context::pixels() const {
+    return _pixels.unwrap("no pixels");
 }
 
 Context::Scope &Context::current() {
@@ -153,16 +158,18 @@ Context &Context::shadowStyle(ShadowStyle style) {
 
 /* --- Drawing -------------------------------------------------------------- */
 
-void Context::clear(Color color) { clear(surface().bound(), color); }
+void Context::clear(Color color) { clear(pixels().bound(), color); }
 
 void Context::clear(Math::Recti rect, Color color) {
     rect = applyAll(rect);
-    surface().clear(rect, color);
+    mutPixels()
+        .clip(rect)
+        .clear(color);
 }
 
 /* --- Blitting ------------------------------------------------------------- */
 
-[[gnu::flatten]] void Context::blit(Math::Recti src, Math::Recti dest, Surface s) {
+[[gnu::flatten]] void Context::blit(Math::Recti src, Math::Recti dest, Pixels p) {
     dest = applyOrigin(dest);
     auto clipDest = applyAll(dest);
 
@@ -178,18 +185,18 @@ void Context::clear(Math::Recti rect, Color color) {
             auto srcX = src.x + xx * src.width / dest.width;
             auto destX = clipDest.x + x;
 
-            auto color = s.load({srcX, srcY});
-            surface().blend({destX, destY}, color);
+            auto color = p.load({srcX, srcY});
+            mutPixels().blend({destX, destY}, color);
         }
     }
 }
 
-void Context::blit(Math::Recti dest, Surface surface) {
-    blit(surface.bound(), dest, surface);
+void Context::blit(Math::Recti dest, Pixels pixels) {
+    blit(pixels.bound(), dest, pixels);
 }
 
-void Context::blit(Math::Vec2i dest, Surface surface) {
-    blit(surface.bound(), {dest, surface.bound().wh}, surface);
+void Context::blit(Math::Vec2i dest, Pixels pixels) {
+    blit(pixels.bound(), {dest, pixels.bound().wh}, pixels);
 }
 
 /* --- Shapes --------------------------------------------------------------- */
@@ -285,7 +292,7 @@ void Context::fill(Math::Vec2i baseline, Str str) {
 void Context::debugPlot(Math::Vec2i point, Color color) {
     point = applyOrigin(point);
     if (clip().contains(point)) {
-        surface().blend(point, color);
+        mutPixels().blend(point, color);
     }
 }
 
@@ -315,6 +322,7 @@ void Context::debugLine(Math::Edgei edge, Color color) {
 }
 
 void Context::debugRect(Math::Recti rect, Color color) {
+    rect = {rect.xy, rect.wh - 1};
     debugLine({rect.topStart(), rect.topEnd()}, color);
     debugLine({rect.topEnd(), rect.bottomEnd()}, color);
     debugLine({rect.bottomEnd(), rect.bottomStart()}, color);
@@ -372,7 +380,6 @@ void Context::debugTrace(Gfx::Color color) {
 /* --- Paths ---------------------------------------------------------------- */
 
 [[gnu::flatten]] void Context::_fillImpl(auto paint, auto format, FillRule fillRule) {
-
     static constexpr auto AA = 4;
     static constexpr auto UNIT = 1.0f / AA;
     static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;
@@ -406,8 +413,8 @@ void Context::debugTrace(Gfx::Color color) {
 
             isize rule = 0;
             for (usize i = 0; i + 1 < _active.len(); i++) {
-                usize iStart = i;
-                usize iEnd = i + 1;
+                usize si = i;
+                usize ei = i + 1;
 
                 if (fillRule == FillRule::NONZERO) {
                     isize sign = _active[i].sign;
@@ -422,8 +429,8 @@ void Context::debugTrace(Gfx::Color color) {
                         continue;
                 }
 
-                f64 x1 = max(_active[iStart].x, rect.start());
-                f64 x2 = min(_active[iEnd].x, rect.end());
+                f64 x1 = max(_active[si].x, rect.start());
+                f64 x2 = min(_active[ei].x, rect.end(), (f64)_scanline.len() - 1);
 
                 if (x1 >= x2) {
                     continue;
@@ -444,7 +451,7 @@ void Context::debugTrace(Gfx::Color color) {
             }
         }
 
-        auto *pixel = static_cast<u8 *>(surface().data()) + y * surface().stride() + rect.start() * format.bpp();
+        u8 *pixel = static_cast<u8 *>(mutPixels().pixel({rect.start(), y}));
         for (isize x = rect.start(); x < rect.end(); x++) {
             Math::Vec2f sample = {
                 (x - shapeBound.start()) / shapeBound.width,
@@ -462,7 +469,7 @@ void Context::debugTrace(Gfx::Color color) {
 
 void Context::_fill(Paint paint, FillRule fillRule) {
     paint.visit([&](auto p) {
-        surface().format.visit([&](auto f) {
+        pixels().fmt().visit([&](auto f) {
             _fillImpl(p, f, fillRule);
         });
     });
@@ -554,11 +561,11 @@ void Context::shadow(ShadowStyle style) {
 /* --- Effects -------------------------------------------------------------- */
 
 void Context::apply(Filter filter) {
-    apply(filter, surface().bound());
+    apply(filter, pixels().bound());
 }
 
 void Context::apply(Filter filter, Math::Recti r) {
-    filter.apply(surface().clip(applyAll(r)));
+    filter.apply(mutPixels().clip(applyAll(r)));
 }
 
 } // namespace Karm::Gfx

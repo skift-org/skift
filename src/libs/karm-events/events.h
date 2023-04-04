@@ -15,7 +15,7 @@ struct Event {
 
     template <typename T>
     Event &handle(auto callback) {
-        if (id == Meta::makeId<T>()) {
+        if (id == Meta::idOf<T>()) {
             accepted = accepted or callback(static_cast<T const &>(*this));
         }
         return *this;
@@ -23,7 +23,7 @@ struct Event {
 
     template <typename T>
     bool is() const {
-        return id == Meta::makeId<T>();
+        return id == Meta::idOf<T>();
     }
 
     template <typename T>
@@ -43,7 +43,7 @@ struct Event {
 
 template <typename Crtp>
 struct BaseEvent : public Event {
-    BaseEvent() : Event{Meta::makeId<Crtp>()} {}
+    BaseEvent() : Event{Meta::idOf<Crtp>()} {}
 };
 
 struct MouseEvent : public BaseEvent<MouseEvent> {

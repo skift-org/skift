@@ -9,12 +9,12 @@
 namespace Karm::Gfx {
 
 struct Rgba8888 {
-    static Color load(void const *pixel) {
+    ALWAYS_INLINE static Color load(void const *pixel) {
         u8 const *p = static_cast<u8 const *>(pixel);
         return Color::fromRgba(p[0], p[1], p[2], p[3]);
     }
 
-    static void store(void *pixel, Color const color) {
+    ALWAYS_INLINE static void store(void *pixel, Color color) {
         u8 *p = static_cast<u8 *>(pixel);
         p[0] = color.red;
         p[1] = color.green;
@@ -22,7 +22,7 @@ struct Rgba8888 {
         p[3] = color.alpha;
     }
 
-    static usize bpp() {
+    ALWAYS_INLINE static usize bpp() {
         return 4;
     }
 };
@@ -30,12 +30,12 @@ struct Rgba8888 {
 [[gnu::used]] inline Rgba8888 RGBA8888;
 
 struct Bgra8888 {
-    static Color load(void const *pixel) {
+    ALWAYS_INLINE static Color load(void const *pixel) {
         u8 const *p = static_cast<u8 const *>(pixel);
         return Color::fromRgba(p[2], p[1], p[0], p[3]);
     }
 
-    static void store(void *pixel, Color const color) {
+    ALWAYS_INLINE static void store(void *pixel, Color color) {
         u8 *p = static_cast<u8 *>(pixel);
         p[0] = color.blue;
         p[1] = color.green;
@@ -43,108 +43,192 @@ struct Bgra8888 {
         p[3] = color.alpha;
     }
 
-    static usize bpp() {
+    ALWAYS_INLINE static usize bpp() {
         return 4;
     }
 };
 
 [[gnu::used]] inline Bgra8888 BGRA8888;
 
-using Format = Var<Rgba8888, Bgra8888>;
+using _Fmts = Var<Rgba8888, Bgra8888>;
 
-struct Buffer {
-    void *data;
-    isize width;
-    isize height;
-    usize stride;
+struct Fmt : public _Fmts {
+    using _Fmts::_Fmts;
+
+    ALWAYS_INLINE Color load(void const *pixel) const {
+        return visit([&](auto f) {
+            return f.load(pixel);
+        });
+    }
+
+    ALWAYS_INLINE void store(void *pixel, Color color) const {
+        visit([&](auto f) {
+            f.store(pixel, color);
+        });
+    }
+
+    ALWAYS_INLINE usize bpp() const {
+        return visit([&](auto f) {
+            return f.bpp();
+        });
+    }
 };
 
-inline Color load(Format format, void const *pixel) {
-    return format.visit([&](auto f) {
-        return f.load(pixel);
-    });
-}
+template <bool MUT>
+struct _Pixels {
+    Meta::Cond<MUT, void *, void const *> _buf;
+    Math::Vec2i _size;
+    usize _stride;
+    Fmt _fmt;
 
-inline void store(Format format, void *pixel, Color const color) {
-    format.visit([&](auto f) {
-        f.store(pixel, color);
-    });
-}
-
-inline usize bpp(Format format) {
-    return format.visit([&](auto f) {
-        return f.bpp();
-    });
-}
-
-struct Surface {
-    Format format;
-    Buffer buffer;
-
-    isize width() const { return buffer.width; }
-
-    isize height() const { return buffer.height; }
-
-    Math::Vec2i size() const { return {width(), height()}; }
-
-    usize stride() const { return buffer.stride; }
-
-    void *data() { return buffer.data; }
-
-    void const *data() const { return buffer.data; }
-
-    Math::Recti bound() const {
-        return {0, 0, width(), height()};
+    operator _Pixels<false>() const {
+        return {_buf, _size, _stride, _fmt};
     }
 
-    void *scanline(usize y) {
-        return static_cast<u8 *>(buffer.data) + y * buffer.stride;
+    /* --- Geometry --------------------------------------------------------- */
+
+    ALWAYS_INLINE Math::Recti bound() const {
+        return {0, 0, _size.x, _size.y};
     }
 
-    void store(Math::Vec2i pos, Color color) {
-        Gfx::store(format, static_cast<u8 *>(buffer.data) + pos.y * buffer.stride + pos.x * bpp(format), color);
+    ALWAYS_INLINE Math::Vec2i size() const {
+        return _size;
     }
 
-    Color load(Math::Vec2i pos) const {
-        return Gfx::load(format, static_cast<u8 const *>(buffer.data) + pos.y * buffer.stride + pos.x * bpp(format));
+    ALWAYS_INLINE isize width() const {
+        return _size.x;
     }
 
-    Color loadClamped(Math::Vec2i pos) const {
-        return load({
+    ALWAYS_INLINE isize height() const {
+        return _size.y;
+    }
+
+    ALWAYS_INLINE usize stride() const {
+        return _stride;
+    }
+
+    /* --- Buffer Access ---------------------------------------------------- */
+
+    ALWAYS_INLINE Fmt fmt() const {
+        return _fmt;
+    }
+
+    ALWAYS_INLINE void const *scanline(usize y) const {
+        return static_cast<u8 const *>(_buf) + y * _stride;
+    }
+
+    ALWAYS_INLINE void *scanline(usize y)
+        requires(MUT)
+    {
+        return static_cast<u8 *>(_buf) + y * _stride;
+    }
+
+    ALWAYS_INLINE void const *pixel(Math::Vec2i pos) const {
+        return static_cast<u8 const *>(_buf) + pos.y * _stride + pos.x * _fmt.bpp();
+    }
+
+    ALWAYS_INLINE void *pixel(Math::Vec2i pos)
+        requires(MUT)
+    {
+        return static_cast<u8 *>(_buf) + pos.y * _stride + pos.x * _fmt.bpp();
+    }
+
+    ALWAYS_INLINE Bytes bytes() const {
+        return {static_cast<Byte const *>(_buf), _stride * _size.y};
+    }
+
+    ALWAYS_INLINE MutBytes bytes()
+        requires(MUT)
+    {
+        return {static_cast<Byte *>(_buf), _stride * _size.y};
+    }
+
+    ALWAYS_INLINE _Pixels clip(Math::Recti rect) const {
+        rect = rect.clipTo(bound());
+
+        return {
+            pixel(rect.xy),
+            {rect.width, rect.height},
+            _stride,
+            _fmt,
+        };
+    }
+
+    ALWAYS_INLINE _Pixels<MUT> clip(Math::Recti rect)
+        requires(MUT)
+    {
+        rect = rect.clipTo(bound());
+
+        return {
+            pixel(rect.xy),
+            {rect.width, rect.height},
+            _stride,
+            _fmt,
+        };
+    }
+
+    /* --- Load/Store ------------------------------------------------------- */
+
+    ALWAYS_INLINE Color loadUnsafe(Math::Vec2i pos) const {
+        return _fmt.load(pixel(pos));
+    }
+
+    ALWAYS_INLINE void storeUnsafe(Math::Vec2i pos, Color color)
+        requires(MUT)
+    {
+        _fmt.store(pixel(pos), color);
+    }
+
+    ALWAYS_INLINE void blendUnsafe(Math::Vec2i pos, Color color)
+        requires(MUT)
+    {
+        storeUnsafe(pos, color.blendOver(loadUnsafe(pos)));
+    }
+
+    ALWAYS_INLINE Color load(Math::Vec2i pos) const {
+        return loadUnsafe({
             clamp(pos.x, 0, width() - 1),
             clamp(pos.y, 0, height() - 1),
         });
     }
 
-    void blend(Math::Vec2i pos, Color color) {
-        store(pos, color.blendOver(load(pos)));
+    ALWAYS_INLINE void store(Math::Vec2i pos, Color color)
+        requires(MUT)
+    {
+        storeUnsafe({
+                        clamp(pos.x, 0, width() - 1),
+                        clamp(pos.y, 0, height() - 1),
+                    },
+                    color);
     }
 
-    void clear(Math::Recti rect, Color color) {
-        format.visit([&](auto f) {
-            for (isize y = rect.top(); y < rect.bottom(); y++) {
-                for (isize x = rect.start(); x < rect.end(); x++) {
-                    f.store(static_cast<u8 *>(buffer.data) + y * buffer.stride + x * f.bpp(), color);
-                }
+    ALWAYS_INLINE void blend(Math::Vec2i pos, Color color)
+        requires(MUT)
+    {
+        blendUnsafe({
+                        clamp(pos.x, 0, width() - 1),
+                        clamp(pos.y, 0, height() - 1),
+                    },
+                    color);
+    }
+
+    ALWAYS_INLINE Color sample(Math::Vec2f pos) const {
+        return load(Math::Vec2i(pos.x * width(), pos.y * height()));
+    }
+
+    ALWAYS_INLINE void clear(Color color)
+        requires(MUT)
+    {
+        for (isize y = 0; y < height(); y++) {
+            for (isize x = 0; x < width(); x++) {
+                storeUnsafe({x, y}, color);
             }
-        });
-    }
-
-    Surface clip(Math::Recti rect) {
-        rect = rect.clipTo(bound());
-
-        return {
-            format,
-            {
-                static_cast<u8 *>(buffer.data) +
-                    rect.top() * buffer.stride +
-                    rect.start() * bpp(format),
-                rect.width,
-                rect.height,
-                buffer.stride,
-            },
-        };
+        }
     }
 };
+
+using Pixels = _Pixels<false>;
+
+using MutPixels = _Pixels<true>;
 
 } // namespace Karm::Gfx

@@ -17,7 +17,6 @@ inline constexpr bool debugShowScrollBounds = false;
 struct Node;
 
 using Child = Strong<Node>;
-using Other = Strong<Node>;
 using Children = Vec<Child>;
 using Visitor = Func<void(Node &)>;
 
@@ -26,7 +25,7 @@ using Visitor = Func<void(Node &)>;
 struct Node {
     virtual ~Node() = default;
 
-    virtual Opt<Child> reconcile(Other o) { return o; }
+    virtual Opt<Child> reconcile(Child other) { return other; }
 
     virtual void paint(Gfx::Context &, Math::Recti) {}
 
@@ -68,11 +67,11 @@ struct LeafNode : public Node {
 
     virtual void reconcile(Crtp &) {}
 
-    Opt<Child> reconcile(Other o) override {
-        if (not o.is<Crtp>()) {
-            return o;
+    Opt<Child> reconcile(Child other) override {
+        if (not other.is<Crtp>()) {
+            return other;
         }
-        reconcile(o.unwrap<Crtp>());
+        reconcile(other.unwrap<Crtp>());
         return NONE;
     }
 

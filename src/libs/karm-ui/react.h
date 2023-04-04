@@ -12,9 +12,8 @@ struct React : public LeafNode<Crtp> {
     Opt<Child> _child;
 
     ~React() {
-        _child.with([&](auto &child) {
-            child->detach(this);
-        });
+        if (_child)
+            (*_child)->detach(this);
     }
 
     virtual Child build() = 0;
@@ -58,15 +57,13 @@ struct React : public LeafNode<Crtp> {
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
-        _child.with([&](auto &child) {
-            child->paint(g, r);
-        });
+        ensureBuild();
+        (*_child)->paint(g, r);
     }
 
     void event(Events::Event &e) override {
-        _child.with([&](auto &child) {
-            child->event(e);
-        });
+        ensureBuild();
+        (*_child)->event(e);
     }
 
     void bubble(Events::Event &e) override {
@@ -79,26 +76,17 @@ struct React : public LeafNode<Crtp> {
 
     void layout(Math::Recti r) override {
         ensureBuild();
-
-        _child.with([&](auto &child) {
-            child->layout(r);
-        });
+        (*_child)->layout(r);
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
         ensureBuild();
-
-        return _child.visit([&](auto &child) {
-            return child->size(s, hint);
-        });
+        return (*_child)->size(s, hint);
     }
 
     Math::Recti bound() override {
         ensureBuild();
-
-        return _child.visit([&](auto &child) {
-            return child->bound();
-        });
+        return (*_child)->bound();
     }
 };
 
@@ -185,7 +173,8 @@ Child state(T initial, Func<Child(State<T>)> build) {
 /* --- Reducer -------------------------------------------------------------- */
 
 template <typename Action>
-struct ActionDispatchEvent : public Events::BaseEvent<ActionDispatchEvent<Action>> {
+struct ActionDispatchEvent :
+    public Events::BaseEvent<ActionDispatchEvent<Action>> {
     Action action;
 
     ActionDispatchEvent(Action action)

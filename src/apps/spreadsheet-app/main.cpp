@@ -2,193 +2,26 @@
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
+#include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
+#include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
 #include "app.h"
 
 namespace Spreadsheet {
 
-struct SheetView : public Ui::View<SheetView> {
-    Sheet _sheet;
-    Range _sel = {{3, 3}, {6, 5}};
-    Math::Vec2i _scroll;
-    Ui::MouseListener _mouseListener;
-
-    SheetView(Sheet const &sheet)
-        : _sheet(sheet) {}
-
-    void reconcile(SheetView &o) override {
-        _sheet = o._sheet;
-    }
-
-    /* --- Geometry --- */
-
-    Math::Recti colHeaderBound(usize col) {
-        return {
-            _sheet.cols[col].x,
-            0,
-            _sheet.cols[col].width,
-            CELL_HEIGHT,
-        };
-    }
-
-    Math::Recti rowHeaderBound(usize row) {
-        return {
-            0,
-            _sheet.rows[row].y,
-            CELL_WIDTH,
-            _sheet.rows[row].height,
-        };
-    }
-
-    Math::Recti cellBound(usize row, usize col) {
-        return {
-            _sheet.cols[col].x + CELL_WIDTH,
-            _sheet.rows[row].y + CELL_HEIGHT,
-            _sheet.cols[col].width,
-            _sheet.rows[row].height,
-        };
-    }
-
-    /* --- Events --- */
-
-    void event(Events::Event &e) override {
-        e.handle<Events::MouseEvent>([&](Events::MouseEvent const &m) {
-            auto pos = m.pos - bound().topStart();
-            if (bound().contains(m.pos)) {
-                if (m.type == Events::MouseEvent::PRESS) {
-                    auto cell = _sheet.cellAt(pos - Math::Vec2i{CELL_WIDTH, CELL_HEIGHT});
-                    debug("press");
-                    if (cell) {
-                        _sel = *cell;
-                        Ui::shouldRepaint(*this);
-                    }
-                } else if (m.type == Events::MouseEvent::MOVE && ((m.buttons & Events::Button::LEFT) == Events::Button::LEFT)) {
-                    auto cell = _sheet.cellAt(pos - Math::Vec2i{CELL_WIDTH, CELL_HEIGHT});
-                    debug("move");
-                    if (cell) {
-                        _sel.end = *cell;
-                        Ui::shouldRepaint(*this);
-                    }
-                }
-
-                return true;
-            }
-
-            return false;
-        });
-    }
-
-    /* --- Painting --- */
-
-    void paintCell(Gfx::Context &g, Cell const &, Math::Recti bound) {
-        g.rect(bound.cast<f64>());
-    }
-
-    void paintColHeader(Gfx::Context &g, usize idx) {
-        auto col = _sheet.cols[idx];
-        auto bound = colHeaderBound(idx);
-        auto sep = Math::Edgei{
-            col.x + col.width - 1,
-            0,
-            col.x + col.width - 1,
-            _bound.height,
-        };
-
-        g.fillStyle(Gfx::ZINC800);
-        g.fill(bound);
-        g.debugLine(sep, Gfx::WHITE.withOpacity(0.05));
-    }
-
-    void paintRowHeader(Gfx::Context &g, usize idx) {
-        auto row = _sheet.rows[idx];
-        Math::Recti bound = {0, row.y, CELL_WIDTH, row.height};
-        Math::Edgei sep = {
-            0,
-            row.y + row.height - 1,
-            _bound.width,
-            row.y + row.height - 1,
-        };
-
-        g.fillStyle(Gfx::ZINC800);
-        g.fill(bound);
-        g.debugLine(sep, Gfx::WHITE.withOpacity(0.05));
-    }
-
-    void paintSelection(Gfx::Context &g, Range r) {
-        auto start = cellBound(r.start.row, r.start.col);
-        auto end = cellBound(r.end.row, r.end.col);
-        auto all = start.mergeWith(end);
-
-        g.fillStyle(Gfx::BLUE600.withOpacity(0.2));
-        g.begin();
-        g.rect(all.cast<f64>().grow(3), 4);
-        g.rect(start.cast<f64>().grow(3), 4);
-        g.fill(Gfx::FillRule::EVENODD);
-
-        g.strokeStyle(Gfx::stroke(Gfx::BLUE500).withAlign(Gfx::OUTSIDE_ALIGN).withWidth(2));
-        g.stroke(all.grow(3), 4);
-
-        auto handle = all.bottomEnd() + 3;
-        g.fillStyle(Gfx::WHITE);
-        g.fill(Math::Ellipsei{handle, 4});
-
-        g.strokeStyle(Gfx::stroke(Gfx::ZINC900).withAlign(Gfx::OUTSIDE_ALIGN).withWidth(1));
-        g.stroke();
-    }
-
-    void paint(Gfx::Context &g, Math::Recti) override {
-        _sheet.recompute(); // TODO: Only recompute when needed.
-
-        g.save();
-        g.origin(bound().xy);
-
-        // Draw columns.
-        isize headerX = CELL_WIDTH;
-        usize index = 0;
-        while (headerX < _bound.width &&
-               index < _sheet.cols.len()) {
-
-            auto col = _sheet.cols[index];
-            Math::Recti colBound = {headerX, 0, col.width, CELL_HEIGHT};
-
-            g.fillStyle(Gfx::ZINC800);
-            g.fill(colBound);
-
-            g.debugLine(Math::Edgei{headerX + col.width - 1, 0, headerX + col.width - 1, _bound.height}, Gfx::WHITE.withOpacity(0.05));
-
-            headerX += col.width;
-            index++;
-        }
-
-        // Draw rows.
-        isize headerY = CELL_HEIGHT;
-        index = 0;
-        while (headerY < _bound.height &&
-               index < _sheet.rows.len()) {
-
-            auto row = _sheet.rows[index];
-            Math::Recti rowBound = {0, headerY, CELL_WIDTH, row.height};
-
-            g.fillStyle(Gfx::ZINC800);
-            g.fill(rowBound);
-
-            g.debugLine(Math::Edgei{0, headerY + row.height - 1, _bound.width, headerY + row.height - 1}, Gfx::WHITE.withOpacity(0.05));
-
-            headerY += row.height;
-            index++;
-        }
-
-        paintSelection(g, _sel);
-
-        g.restore();
-    }
-
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return {100, 100};
-    }
-};
+Ui::Child formula() {
+    return Ui::box(
+        {
+            .borderRadius = 4,
+            .borderWidth = 1,
+            .backgroundPaint = Gfx::ZINC900,
+        },
+        Ui::hflow(
+            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FUNCTION),
+            Ui::grow(NONE)));
+}
 
 Ui::Child toolbar() {
     return Ui::toolbar(
@@ -202,27 +35,94 @@ Ui::Child toolbar() {
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_PAINT),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_CLEAR),
         Ui::separator(),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_BOLD),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_ITALIC),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_UNDERLINE),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_STRIKETHROUGH),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_COLOR_TEXT),
-        Ui::separator(),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_COLOR_FILL),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_ALL),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::TABLE_MERGE_CELLS),
-        Ui::separator(),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::ALIGN_HORIZONTAL_LEFT),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::ALIGN_VERTICAL_CENTER),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::WRAP),
-        Ui::separator(),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::TABLE_HEADERS_EYE),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FILTER),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::SIGMA));
+        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::SIGMA),
+        Ui::separator(),
+        Ui::empty(4),
+        formula() | Ui::grow(),
+        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BRUSH_VARIANT));
 }
 
-Ui::Child sheet(Sheet const &sheet) {
-    return makeStrong<SheetView>(sheet);
+Ui::Child properties() {
+    return Ui::vscroll(
+        Ui::vflow(
+            Ui::titleRow("Text Properties"),
+
+            Ui::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Color"),
+
+            Ui::row(
+                NONE,
+                "Format",
+                NONE,
+                Ui::hflow(
+                    4,
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_BOLD),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_ITALIC),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_UNDERLINE),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_STRIKETHROUGH))),
+
+            Ui::row(
+                NONE,
+                "Wrapping",
+                NONE,
+                Ui::hflow(
+                    4,
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::WRAP),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::WRAP_DISABLED))),
+
+            Ui::row(
+                NONE,
+                "Horizontal Align",
+                NONE,
+                Ui::hflow(
+                    4,
+                    Ui::button(Model::bind<UpdateStyleHalign>(Align::START), Ui::ButtonStyle::subtle(), Mdi::ALIGN_HORIZONTAL_LEFT),
+                    Ui::button(Model::bind<UpdateStyleHalign>(Align::CENTER), Ui::ButtonStyle::subtle(), Mdi::ALIGN_HORIZONTAL_CENTER),
+                    Ui::button(Model::bind<UpdateStyleHalign>(Align::END), Ui::ButtonStyle::subtle(), Mdi::ALIGN_HORIZONTAL_RIGHT))),
+
+            Ui::row(
+                NONE,
+                "Vertical Align",
+                NONE,
+                Ui::hflow(
+                    4,
+                    Ui::button(Model::bind<UpdateStyleValign>(Align::START), Ui::ButtonStyle::subtle(), Mdi::ALIGN_VERTICAL_TOP),
+                    Ui::button(Model::bind<UpdateStyleValign>(Align::CENTER), Ui::ButtonStyle::subtle(), Mdi::ALIGN_VERTICAL_CENTER),
+                    Ui::button(Model::bind<UpdateStyleValign>(Align::END), Ui::ButtonStyle::subtle(), Mdi::ALIGN_VERTICAL_BOTTOM))),
+
+            Ui::separator(),
+
+            Ui::titleRow("Cell Properties"),
+            Ui::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Background Color"),
+            Ui::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Border Color"),
+
+            Ui::row(
+                NONE,
+                "Borders",
+                NONE,
+                Ui::hflow(
+                    4,
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_ALL),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_NONE),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_VERTICAL),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_HORIZONTAL))),
+
+            Ui::row(
+                NONE,
+                "",
+                NONE,
+                Ui::hflow(
+                    4,
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_TOP),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_BOTTOM),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_LEFT),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_RIGHT))),
+
+            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::TABLE_MERGE_CELLS, "Merge Cells"),
+
+            Ui::separator(),
+
+            Ui::titleRow("Sheet Properties")));
 }
 
 Ui::Child tab(bool selected, String title) {
@@ -232,25 +132,50 @@ Ui::Child tab(bool selected, String title) {
                              },
                              Ui::empty(4));
 
-    return Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Ui::vflow(Ui::labelMedium(title) | Ui::center() | Ui::spacing({16, 0}) | Ui::grow(), indicator) | Ui::spacing({6, 6}));
+    return Ui::button(
+        Ui::NOP,
+        Ui::ButtonStyle::subtle(),
+        Ui::vflow(
+            Ui::labelMedium(title) | Ui::center() | Ui::spacing({16, 0}) | Ui::grow(), indicator) |
+            Ui::spacing({6, 6}));
 }
 
-Ui::Child bottombar() {
-    return Ui::bottombar(
-        Ui::button(Ui::NOP, Ui::ButtonStyle::regular(), "Sheet 1"),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), "Sheet 2"),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), "Sheet 3"),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::PLUS));
+Ui::Child tabItem(State const &state, Sheet const &sheet, usize index) {
+    return Ui::button(
+        Model::bind<SwitchSheet>(index),
+        state.active == index
+            ? Ui::ButtonStyle::regular()
+            : Ui::ButtonStyle::subtle(),
+        sheet.name);
+}
+
+Ui::Child tabs(State const &state) {
+    return Ui::hflow(
+        4,
+        Ui::separator(),
+
+        Ui::hflow(
+            iter(state.book.sheets)
+                .mapi([&](auto const &s, usize i) {
+                    return tabItem(state, s, i);
+                })
+                .collect<Ui::Children>()),
+
+        Ui::button(
+            Ui::NOP,
+            Ui::ButtonStyle::subtle(),
+            Mdi::PLUS));
 }
 
 Ui::Child app() {
     return Ui::reducer<Model>({}, [](auto const &s) {
+        auto tb = Ui::titlebar(Mdi::TABLE, "Spreadsheet", tabs(s));
+        auto body = hflow(table(s) | Ui::grow(), Ui::separator(), properties());
         return Ui::vflow(
-                   Ui::titlebar(Mdi::TABLE, "Spreadsheet"),
+                   tb,
                    toolbar(),
-                   sheet(s.activeSheet()) | Ui::grow(),
-                   bottombar()) |
-               Ui::minSize({800, 600}) | Ui::dialogLayer();
+                   body | Ui::grow()) |
+               Ui::minSize({1280, 720}) | Ui::dialogLayer();
     });
 }
 

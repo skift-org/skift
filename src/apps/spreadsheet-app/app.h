@@ -101,15 +101,11 @@ struct Sheet {
     }
 
     Opt<Pos> cellAt(Math::Vec2i p) const {
-        logDebug("p: {}", p);
         auto row = rowAt(p.y);
         auto col = colAt(p.x);
         if (row && col) {
-            logDebug("row: {}, col: {}", *row, *col);
             return Pos{*row, *col};
         }
-
-        logDebug("row: none, col: none");
         return NONE;
     }
 
@@ -170,13 +166,25 @@ struct Range {
 
 struct Book {
     String name;
-    Vec<Sheet> sheets = {{}};
+    Vec<Sheet> sheets = {
+        {"Sheet 1"},
+        {"Sheet 2"},
+        {"Sheet 3"},
+    };
 };
 
 struct State {
     Book book;
     usize active = 0;
-    Range selection = {{3, 3}, {6, 6}};
+    Opt<Range> selection = NONE;
+
+    State() {
+        activeSheet().recompute();
+    }
+
+    Sheet &activeSheet() {
+        return book.sheets[active];
+    }
 
     Sheet const &activeSheet() const {
         return book.sheets[active];
@@ -184,6 +192,10 @@ struct State {
 };
 
 /* --- Actions -------------------------------------------------------------- */
+
+struct UpdateSelection {
+    Opt<Range> range;
+};
 
 // Cells
 
@@ -194,7 +206,6 @@ struct UpdateValue {
 
 template <typename TAG, typename T>
 struct UpdateStyleField {
-    Range range;
     T value;
 };
 
@@ -223,13 +234,18 @@ struct SwitchSheet {
 };
 
 using Actions = Var<
+    UpdateSelection,
+
     UpdateValue,
+
     UpdateStyleFg,
     UpdateStyleBg,
     UpdateStyleHalign,
     UpdateStyleValign,
     UpdateStyleFont,
-    UpdateStyleBorders>;
+    UpdateStyleBorders,
+
+    SwitchSheet>;
 
 State reduce(State s, Actions a);
 
@@ -240,5 +256,7 @@ Res<> save(Model const &model, Io::Writer &writer);
 Res<Model> load(Io::Reader &reader);
 
 /* --- Views ---------------------------------------------------------------- */
+
+Ui::Child table(State const &s);
 
 } // namespace Spreadsheet

@@ -110,6 +110,14 @@ Child sliderRow(f64 value, OnChange<f64> onChange, String title) {
     return sliderRow(SliderStyle::regular(), value, std::move(onChange), title);
 }
 
+Child colorRow(Gfx::Color c, OnChange<Gfx::Color> onChange, String title) {
+    return row(
+        NONE,
+        title,
+        NONE,
+        color(c, std::move(onChange)));
+}
+
 Child navRow(bool selected, OnPress onPress, Mdi::Icon i, String title) {
     auto buttonStyle = ButtonStyle::regular();
 

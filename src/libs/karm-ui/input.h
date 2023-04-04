@@ -9,6 +9,9 @@ namespace Karm::Ui {
 template <typename T>
 using OnChange = Opt<SharedFunc<void(Node &, T value)>>;
 
+template <typename T>
+[[gnu::used]] static auto IGNORE(Ui::Node &, T) {}
+
 /* --- Button --------------------------------------------------------------- */
 
 struct MouseListener {
@@ -191,5 +194,9 @@ Child slider(SliderStyle style, T value, Range<T> range, OnChange<T> onChange) {
 }
 
 /* --- Select --------------------------------------------------------------- */
+
+/* --- Color ---------------------------------------------------------------- */
+
+Child color(Gfx::Color color, OnChange<Gfx::Color> onChange);
 
 } // namespace Karm::Ui

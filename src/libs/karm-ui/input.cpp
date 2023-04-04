@@ -615,4 +615,21 @@ Child slider(f64 value, OnChange<f64> onChange) {
     return makeStrong<Slider>(SliderStyle::regular(), value, std::move(onChange));
 }
 
+/* --- Color ---------------------------------------------------------------- */
+
+Child color(Gfx::Color color, OnChange<Gfx::Color>) {
+    return button(
+        NOP,
+        ButtonStyle::regular(),
+        empty({32, 16}) |
+            box({
+                .margin = 4,
+                .borderRadius = 2,
+                .borderWidth = 1,
+                .borderPaint = Gfx::WHITE.withOpacity(0.1),
+                .backgroundPaint = color,
+            }) |
+            Ui::center() | Ui::bound());
+}
+
 } // namespace Karm::Ui

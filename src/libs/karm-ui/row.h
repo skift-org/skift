@@ -29,6 +29,8 @@ Child sliderRow(SliderStyle style, f64 value, OnChange<f64> onChange, String tit
 
 Child sliderRow(f64 value, OnChange<f64> onChange, String title);
 
+Child colorRow(Gfx::Color color, OnChange<Gfx::Color> onChange, String title);
+
 Child navRow(bool selected, OnPress onPress, Mdi::Icon i, String title);
 
 Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Child child);

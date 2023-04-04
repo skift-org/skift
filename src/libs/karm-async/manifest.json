@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
+    "id": "karm-async",
+    "type": "lib",
+    "description": "Coroutine-based asynchronous programming library",
+    "requires": [
+        "karm-base"
+    ]
+}

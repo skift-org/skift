@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
+    "id": "karm-async-tests",
+    "type": "exe",
+    "requires": [
+        "karm-async",
+        "karm-test"
+    ]
+}

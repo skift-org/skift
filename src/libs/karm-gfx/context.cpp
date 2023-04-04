@@ -221,10 +221,38 @@ void Context::stroke(Math::Recti r, BorderRadius radius) {
     stroke();
 }
 
+[[gnu::flatten]] void Context::_fillRect(Math::Recti r, Gfx::Color color) {
+    r = applyAll(r);
+    if (color.alpha == 255) {
+        mutPixels()
+            .clip(r)
+            .clear(color);
+    } else {
+        pixels().fmt().visit([&](auto f) {
+            for (isize y = r.y; y < r.y + r.height; ++y) {
+                for (isize x = r.x; x < r.x + r.width; ++x) {
+                    auto blended = color.blendOver(f.load(mutPixels().pixelUnsafe({x, y})));
+                    f.store(mutPixels().pixelUnsafe({x, y}), blended);
+                }
+            }
+        });
+    }
+}
+
 void Context::fill(Math::Recti r, BorderRadius radius) {
     begin();
     rect(r.cast<f64>(), radius);
-    fill();
+
+    bool isSuitableForFastFill =
+        radius.zero() and
+        current().paint.is<Color>() and
+        current().trans.isIdentity();
+
+    if (isSuitableForFastFill) {
+        _fillRect(r, current().paint.unwrap<Color>());
+    } else {
+        fill();
+    }
 }
 
 void Context::stroke(Math::Ellipsei e) {
@@ -380,6 +408,7 @@ void Context::debugTrace(Gfx::Color color) {
 /* --- Paths ---------------------------------------------------------------- */
 
 [[gnu::flatten]] void Context::_fillImpl(auto paint, auto format, FillRule fillRule) {
+
     static constexpr auto AA = 4;
     static constexpr auto UNIT = 1.0f / AA;
     static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;
@@ -451,7 +480,7 @@ void Context::debugTrace(Gfx::Color color) {
             }
         }
 
-        u8 *pixel = static_cast<u8 *>(mutPixels().pixel({rect.start(), y}));
+        u8 *pixel = static_cast<u8 *>(mutPixels().pixelUnsafe({rect.start(), y}));
         for (isize x = rect.start(); x < rect.end(); x++) {
             Math::Vec2f sample = {
                 (x - shapeBound.start()) / shapeBound.width,

@@ -196,6 +196,9 @@ struct Context {
     // Stroke a rectangle.
     void stroke(Math::Recti rect, BorderRadius radius = 0);
 
+    // Fast path for filling simple rectangles without a border radius.
+    void _fillRect(Math::Recti r, Gfx::Color color);
+
     // Fill a rectangle.
     void fill(Math::Recti rect, BorderRadius radius = 0);
 

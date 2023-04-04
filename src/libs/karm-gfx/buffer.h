@@ -123,11 +123,11 @@ struct _Pixels {
         return static_cast<u8 *>(_buf) + y * _stride;
     }
 
-    ALWAYS_INLINE void const *pixel(Math::Vec2i pos) const {
+    ALWAYS_INLINE void const *pixelUnsafe(Math::Vec2i pos) const {
         return static_cast<u8 const *>(_buf) + pos.y * _stride + pos.x * _fmt.bpp();
     }
 
-    ALWAYS_INLINE void *pixel(Math::Vec2i pos)
+    ALWAYS_INLINE void *pixelUnsafe(Math::Vec2i pos)
         requires(MUT)
     {
         return static_cast<u8 *>(_buf) + pos.y * _stride + pos.x * _fmt.bpp();
@@ -143,11 +143,11 @@ struct _Pixels {
         return {static_cast<Byte *>(_buf), _stride * _size.y};
     }
 
-    ALWAYS_INLINE _Pixels clip(Math::Recti rect) const {
+    ALWAYS_INLINE _Pixels<false> clip(Math::Recti rect) const {
         rect = rect.clipTo(bound());
 
         return {
-            pixel(rect.xy),
+            pixelUnsafe(rect.xy),
             {rect.width, rect.height},
             _stride,
             _fmt,
@@ -160,7 +160,7 @@ struct _Pixels {
         rect = rect.clipTo(bound());
 
         return {
-            pixel(rect.xy),
+            pixelUnsafe(rect.xy),
             {rect.width, rect.height},
             _stride,
             _fmt,
@@ -170,13 +170,13 @@ struct _Pixels {
     /* --- Load/Store ------------------------------------------------------- */
 
     ALWAYS_INLINE Color loadUnsafe(Math::Vec2i pos) const {
-        return _fmt.load(pixel(pos));
+        return _fmt.load(pixelUnsafe(pos));
     }
 
     ALWAYS_INLINE void storeUnsafe(Math::Vec2i pos, Color color)
         requires(MUT)
     {
-        _fmt.store(pixel(pos), color);
+        _fmt.store(pixelUnsafe(pos), color);
     }
 
     ALWAYS_INLINE void blendUnsafe(Math::Vec2i pos, Color color)
@@ -219,11 +219,34 @@ struct _Pixels {
     ALWAYS_INLINE void clear(Color color)
         requires(MUT)
     {
-        for (isize y = 0; y < height(); y++) {
-            for (isize x = 0; x < width(); x++) {
-                storeUnsafe({x, y}, color);
+        _fmt.visit([&](auto f) {
+            for (isize y = 0; y < height(); y++) {
+                for (isize x = 0; x < width(); x++) {
+                    f.store(pixelUnsafe({x, y}), color);
+                }
             }
-        }
+        });
+    }
+
+    ALWAYS_INLINE void clear()
+        requires(MUT)
+    {
+        clear({});
+    }
+
+    ALWAYS_INLINE void blit(Math::Vec2i pos, _Pixels<false> src)
+        requires(MUT)
+    {
+        _fmt.visit([&](auto fd) {
+            _fmt.visit([&](auto fs) {
+                for (isize y = 0; y < src.height(); y++) {
+                    for (isize x = 0; x < src.width(); x++) {
+                        fd.store(pixelUnsafe({pos.x + x, pos.y + y}),
+                                 fs.load(src.pixelUnsafe({x, y})));
+                    }
+                }
+            });
+        });
     }
 };
 

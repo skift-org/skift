@@ -129,6 +129,20 @@ enum struct IoLen : Arg {
     U64,
 };
 
+inline usize ioLen2Bytes(IoLen len) {
+    switch (len) {
+    case IoLen::U8:
+        return 1;
+    case IoLen::U16:
+        return 2;
+    case IoLen::U32:
+        return 4;
+    case IoLen::U64:
+        return 8;
+    }
+    return 0;
+}
+
 Res<> in(Cap cap, IoLen len, usize port, Arg *val);
 
 Res<> out(Cap cap, IoLen len, usize port, Arg val);

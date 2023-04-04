@@ -32,7 +32,7 @@ Res<Strong<Task>> Task::create(
 }
 
 Task &Task::self() {
-    return *Sched::self()._curr;
+    return *Sched::instance()._curr;
 }
 
 } // namespace Hjert::Core

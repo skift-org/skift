@@ -8,115 +8,102 @@
 
 namespace Hjert::Core {
 
-Res<> doLog(char const *msg, usize len) {
+Res<> doLog(Task &self, char const *msg, usize len) {
+    (void)self;
     logInfo("doLog: '{}'", Str{msg, len});
     return Ok();
 }
 
-Res<> doCreateDomain(Hj::Cap dest, Hj::Cap *cap, usize len) {
-    (void)dest;
-    (void)cap;
-    (void)len;
-    return Error::notImplemented();
+Res<> doCreateDomain(Task &self, Hj::Cap dest, Hj::Cap *cap, usize len) {
+    auto obj = try$(Domain::create(len));
+    *cap = try$(self.domain().add(dest, obj));
+    return Ok();
 }
 
-Res<> doCreateTask(Hj::Cap dest, Hj::Cap *cap, Hj::Cap domain, Hj::Cap space) {
-    (void)dest;
-    (void)cap;
-    (void)domain;
-    (void)space;
-    return Error::notImplemented();
+Res<> doCreateTask(Task &self, Hj::Cap dest, Hj::Cap *cap, Hj::Cap domain, Hj::Cap space) {
+    auto dom = try$(self.domain().get<Domain>(domain));
+    auto spa = try$(self.domain().get<Space>(space));
+    auto obj = try$(Task::create(TaskType::USER, std::move(spa), std::move(dom)));
+    *cap = try$(self.domain().add(dest, obj));
+    return Ok();
 }
 
-Res<> doCreateSpace(Hj::Cap dest, Hj::Cap *cap) {
-    (void)dest;
-    (void)cap;
-    return Error::notImplemented();
+Res<> doCreateSpace(Task &self, Hj::Cap dest, Hj::Cap *cap) {
+    auto obj = try$(Space::create());
+    *cap = try$(self.domain().add(dest, obj));
+    return Ok();
 }
 
-Res<> doCreateMem(Hj::Cap dest, Hj::Cap *cap, usize phys, usize len, Hj::MemFlags flags) {
-    (void)dest;
-    (void)cap;
-    (void)phys;
-    (void)len;
-    (void)flags;
-    return Error::notImplemented();
+Res<> doCreateMem(Task &self, Hj::Cap dest, Hj::Cap *cap, usize phys, usize len, Hj::MemFlags flags) {
+    bool isDma = (flags & Hj::MemFlags::DMA) == Hj::MemFlags::DMA;
+    auto obj = try$(isDma
+                        ? VNode::makeDma({phys, len})
+                        : VNode::alloc(len, flags));
+    *cap = try$(self.domain().add(dest, obj));
+    return Ok();
 }
 
-Res<> doCreateIo(Hj::Cap dest, Hj::Cap *cap, usize base, usize len) {
-    (void)dest;
-    (void)cap;
-    (void)base;
-    (void)len;
-    return Error::notImplemented();
+Res<> doCreateIo(Task &self, Hj::Cap dest, Hj::Cap *cap, usize base, usize len) {
+    auto obj = try$(IoNode::create({base, len}));
+    *cap = try$(self.domain().add(dest, obj));
+    return Ok();
 }
 
-Res<> doDrop(Hj::Cap cap) {
-    (void)cap;
-    return Error::notImplemented();
+Res<> doDrop(Task &self, Hj::Cap cap) {
+    return self.domain().drop(cap);
 }
 
-Res<> doDup(Hj::Cap node, Hj::Cap *dst, Hj::Cap src) {
-    (void)node;
-    (void)dst;
-    (void)src;
-    return Error::notImplemented();
+Res<> doDup(Task &self, Hj::Cap node, Hj::Cap *dst, Hj::Cap src) {
+    auto obj = try$(self.domain().get(src));
+    *dst = try$(self.domain().add(node, obj));
+    return Ok();
 }
 
-Res<> doStart(Hj::Cap cap, usize ip, usize sp, Hj::Args const *args) {
-    (void)cap;
-    (void)ip;
-    (void)sp;
+Res<> doStart(Task &self, Hj::Cap cap, usize ip, usize sp, Hj::Args const *args) {
     (void)args;
-    return Error::notImplemented();
+    auto obj = try$(self.domain().get<Task>(cap));
+    try$(Sched::instance().start(obj, ip, sp));
+    return Ok();
 }
 
-Res<> doWait(Hj::Cap cap, Hj::Arg *ret) {
-    (void)cap;
-    (void)ret;
-    return Error::notImplemented();
+Res<> doWait(Task &self, Hj::Cap cap, Hj::Arg *ret) {
+    auto obj = try$(self.domain().get<Task>(cap));
+    *ret = try$(self.wait(obj));
+    return Ok();
 }
 
-Res<> doRet(Hj::Cap cap, Hj::Arg ret) {
-    (void)cap;
-    (void)ret;
-    return Error::notImplemented();
+Res<> doRet(Task &self, Hj::Cap cap, Hj::Arg ret) {
+    auto task = try$(self.domain().get<Task>(cap));
+    task->ret(ret);
+    return Ok();
 }
 
-Res<> doMap(Hj::Cap cap, usize virt, Hj::Cap mem, usize off, usize len, Hj::MapFlags flags) {
-    (void)cap;
-    (void)virt;
-    (void)mem;
-    (void)off;
-    (void)len;
-    (void)flags;
-    return Error::notImplemented();
+Res<> doMap(Task &self, Hj::Cap cap, usize *virt, Hj::Cap mem, usize off, usize len, Hj::MapFlags flags) {
+    auto memObj = try$(self.domain().get<VNode>(mem));
+    auto spaceObj = try$(self.domain().get<Space>(cap));
+    *virt = try$(spaceObj->map({*virt, len}, memObj, off, flags)).start;
+    return Ok();
 }
 
-Res<> doUnmap(Hj::Cap cap, usize virt, usize len) {
-    (void)cap;
-    (void)virt;
-    (void)len;
-    return Error::notImplemented();
+Res<> doUnmap(Task &self, Hj::Cap cap, usize virt, usize len) {
+    auto spaceObj = try$(self.domain().get<Space>(cap));
+    try$(spaceObj->unmap({virt, len}));
+    return Ok();
 }
 
-Res<> doIn(Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg *val) {
-    (void)cap;
-    (void)len;
-    (void)port;
-    (void)val;
-    return Error::notImplemented();
+Res<> doIn(Task &self, Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg *val) {
+    auto obj = try$(self.domain().get<IoNode>(cap));
+    *val = try$(obj->in(port, Hj::ioLen2Bytes(len)));
+    return Ok();
 }
 
-Res<> doOut(Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg val) {
-    (void)cap;
-    (void)len;
-    (void)port;
-    (void)val;
-    return Error::notImplemented();
+Res<> doOut(Task &self, Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg val) {
+    auto obj = try$(self.domain().get<IoNode>(cap));
+    return obj->out(port, Hj::ioLen2Bytes(len), val);
 }
 
-Res<> doIpc(Hj::Cap *cap, Hj::Cap dst, Hj::Msg *msg, Hj::IpcFlags flags) {
+Res<> doIpc(Task &self, Hj::Cap *cap, Hj::Cap dst, Hj::Msg *msg, Hj::IpcFlags flags) {
+    (void)self;
     (void)cap;
     (void)dst;
     (void)msg;
@@ -124,59 +111,67 @@ Res<> doIpc(Hj::Cap *cap, Hj::Cap dst, Hj::Msg *msg, Hj::IpcFlags flags) {
     return Error::notImplemented();
 }
 
-Res<> dispatchSyscall(Hj::Syscall id, Hj::Args args) {
+Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
     switch (id) {
     case Hj::Syscall::LOG:
-        return doLog((char const *)args[0], args[1]);
+        return doLog(self, (char const *)args[0], args[1]);
 
     case Hj::Syscall::CREATE_DOMAIN:
-        return doCreateDomain(Hj::Cap{args[0]}, (Hj::Cap *)args[1], args[2]);
+        return doCreateDomain(self, Hj::Cap{args[0]}, (Hj::Cap *)args[1], args[2]);
 
     case Hj::Syscall::CREATE_TASK:
-        return doCreateTask(Hj::Cap{args[0]}, (Hj::Cap *)args[1], Hj::Cap{args[2]}, Hj::Cap{args[3]});
+        return doCreateTask(self, Hj::Cap{args[0]}, (Hj::Cap *)args[1], Hj::Cap{args[2]}, Hj::Cap{args[3]});
 
     case Hj::Syscall::CREATE_SPACE:
-        return doCreateSpace(Hj::Cap{args[0]}, (Hj::Cap *)args[1]);
+        return doCreateSpace(self, Hj::Cap{args[0]}, (Hj::Cap *)args[1]);
 
     case Hj::Syscall::CREATE_MEM:
-        return doCreateMem(Hj::Cap{args[0]}, (Hj::Cap *)args[1], args[2], args[3], Hj::MemFlags{args[4]});
+        return doCreateMem(self, Hj::Cap{args[0]}, (Hj::Cap *)args[1], args[2], args[3], Hj::MemFlags{args[4]});
 
     case Hj::Syscall::CREATE_IO:
-        return doCreateIo(Hj::Cap{args[0]}, (Hj::Cap *)args[1], args[2], args[3]);
+        return doCreateIo(self, Hj::Cap{args[0]}, (Hj::Cap *)args[1], args[2], args[3]);
 
     case Hj::Syscall::DROP:
-        return doDrop(Hj::Cap{args[0]});
+        return doDrop(self, Hj::Cap{args[0]});
 
     case Hj::Syscall::DUP:
-        return doDup(Hj::Cap{args[0]}, (Hj::Cap *)args[1], Hj::Cap{args[2]});
+        return doDup(self, Hj::Cap{args[0]}, (Hj::Cap *)args[1], Hj::Cap{args[2]});
 
     case Hj::Syscall::START:
-        return doStart(Hj::Cap{args[0]}, args[1], args[2], (Hj::Args const *)args[3]);
+        return doStart(self, Hj::Cap{args[0]}, args[1], args[2], (Hj::Args const *)args[3]);
 
     case Hj::Syscall::WAIT:
-        return doWait(Hj::Cap{args[0]}, (Hj::Arg *)args[1]);
+        return doWait(self, Hj::Cap{args[0]}, (Hj::Arg *)args[1]);
 
     case Hj::Syscall::RET:
-        return doRet(Hj::Cap{args[0]}, args[1]);
+        return doRet(self, Hj::Cap{args[0]}, args[1]);
 
     case Hj::Syscall::MAP:
-        return doMap(Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]}, args[3], args[4], (Hj::MapFlags)args[5]);
+        return doMap(self, Hj::Cap{args[0]}, (usize *)args[1], Hj::Cap{args[2]}, args[3], args[4], (Hj::MapFlags)args[5]);
 
     case Hj::Syscall::UNMAP:
-        return doUnmap(Hj::Cap{args[0]}, args[1], args[2]);
+        return doUnmap(self, Hj::Cap{args[0]}, args[1], args[2]);
 
     case Hj::Syscall::IN:
-        return doIn(Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], (Hj::Arg *)args[3]);
+        return doIn(self, Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], (Hj::Arg *)args[3]);
 
     case Hj::Syscall::OUT:
-        return doOut(Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], args[3]);
+        return doOut(self, Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], args[3]);
 
     case Hj::Syscall::IPC:
-        return doIpc((Hj::Cap *)args[0], Hj::Cap{args[1]}, (Hj::Msg *)args[2], (Hj::IpcFlags)args[3]);
+        return doIpc(self, (Hj::Cap *)args[0], Hj::Cap{args[1]}, (Hj::Msg *)args[2], (Hj::IpcFlags)args[3]);
 
     default:
         return Error::invalidInput("invalid syscall id");
     }
+}
+
+Res<> doSyscall(Hj::Syscall id, Hj::Args args) {
+    auto &self = Task::self();
+    self.enterSupervisorMode();
+    auto res = dispatchSyscall(self, id, args);
+    self.leaveSupervisorMode();
+    return res;
 }
 
 } // namespace Hjert::Core

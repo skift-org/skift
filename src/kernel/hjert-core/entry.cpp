@@ -93,7 +93,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
 
     logInfo("entry: creating task...");
     auto task = try$(Task::create(TaskType::USER, space));
-    try$(Sched::self().start(task, image.header().entry, stackRange.end()));
+    try$(Sched::instance().start(task, image.header().entry, stackRange.end()));
 
     return Ok();
 }

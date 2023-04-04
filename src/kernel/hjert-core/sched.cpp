@@ -37,11 +37,11 @@ void Sched::schedule() {
 
 Res<> Sched::init(Handover::Payload &) {
     logInfo("sched: initializing...");
-    _sched.emplace(try$(Task::create(TaskType::KERNEL, try$(Space::create()))));
+    _sched.emplace(try$(Task::create(TaskType::SUPER, try$(Space::create()))));
     return Ok();
 }
 
-Sched &Sched::self() {
+Sched &Sched::instance() {
     return *_sched;
 }
 

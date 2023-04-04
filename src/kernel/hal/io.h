@@ -111,6 +111,32 @@ struct Io {
         }
     }
 
+    usize readSized(usize offset, usize size) {
+        if (size == 1) {
+            return read8(offset);
+        } else if (size == 2) {
+            return read16(offset);
+        } else if (size == 4) {
+            return read32(offset);
+        } else if (size == 8) {
+            return read64(offset);
+        } else {
+            return 0;
+        }
+    }
+
+    void writeSized(usize offset, usize size, usize value) {
+        if (size == 1) {
+            write8(offset, value);
+        } else if (size == 2) {
+            write16(offset, value);
+        } else if (size == 4) {
+            write32(offset, value);
+        } else if (size == 8) {
+            write64(offset, value);
+        }
+    }
+
     u8 read8(usize offset) {
         return read<u8>(offset);
     }

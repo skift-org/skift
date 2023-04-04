@@ -2,27 +2,38 @@
 
 #include <hjert-api/api.h>
 #include <karm-base/array.h>
+#include <karm-base/lock.h>
 #include <karm-base/rc.h>
 #include <karm-base/res.h>
 
 namespace Hjert::Core {
 
-struct _Object {
+struct Object {
+    Lock _lock;
+
+    virtual ~Object() = default;
 };
 
 template <typename Crtp>
-struct Object : public _Object {
+struct BaseObject : public Object {
     using _Crtp = Crtp;
 };
 
-using Slot = OptStrong<_Object>;
+using Slot = OptStrong<Object>;
 
-struct Domain : public Object<Domain> {
+struct Domain : public BaseObject<Domain> {
     Array<Slot, 4096> _slots;
 
-    static Res<Strong<Domain>> create();
+    static Res<Strong<Domain>> create(usize len);
 
-    Res<Hj::Cap> add(Hj::Cap dest, Strong<_Object> obj);
+    Res<Hj::Cap> add(Hj::Cap dest, Strong<Object> obj);
+
+    Res<Strong<Object>> get(Hj::Cap cap);
+
+    template <typename T>
+    Res<Strong<T>> get(Hj::Cap cap);
+
+    Res<> drop(Hj::Cap cap);
 };
 
 } // namespace Hjert::Core

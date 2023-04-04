@@ -13,7 +13,7 @@
 
 namespace Hjert::Core {
 
-struct VNode : public Object<VNode> {
+struct VNode : public BaseObject<VNode> {
     using _Mem = Var<Hal::PmmMem, Hal::DmaRange>;
     _Mem _mem;
 
@@ -26,7 +26,7 @@ struct VNode : public Object<VNode> {
     Hal::PmmRange range();
 };
 
-struct Space : public Object<Space> {
+struct Space : public BaseObject<Space> {
     struct Map {
         Hal::VmmRange vrange;
         usize off;

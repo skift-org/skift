@@ -18,7 +18,11 @@ struct Sched {
 
     static Res<> init(Handover::Payload &);
 
-    static Sched &self();
+    static Sched &instance();
+
+    static Lock &lock() {
+        return instance()._lock;
+    }
 
     Sched(Strong<Task> bootTask)
         : _tasks{bootTask}, _curr(bootTask), _next(bootTask) {
@@ -31,6 +35,16 @@ struct Sched {
     Res<> start(Strong<Task> task, usize ip, usize sp);
 
     void schedule();
+
+    void yield();
+};
+
+struct SchedLockScope {
+    LockScope _scope;
+
+    SchedLockScope()
+        : _scope(Sched::lock()) {
+    }
 };
 
 } // namespace Hjert::Core

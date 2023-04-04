@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/box.h>
+#include <karm-base/func.h>
 #include <karm-base/size.h>
 #include <karm-base/time.h>
 
@@ -48,29 +49,47 @@ struct Stack {
 /* --- Task ----------------------------------------------------------------- */
 
 enum struct TaskType : u8 {
-    IDLE,
-    USER,
-    KERNEL
+    IDLE, // The idle task that runs when there is no other task to run
+    USER, // A user task
+    SUPER // A a task that is running in supervisor mode
 };
 
-struct Task : public Object<Task> {
+enum struct TaskMode : u8 {
+    SUPER, // The task is running in supervisor mode propably serving a syscall
+    USER   // The task is running in user mode
+};
+
+struct Blocker : public Meta::NoCopy {
+    Func<bool()> predicat;
+    Tick deadline;
+};
+
+struct Task : public BaseObject<Task> {
     TaskType _type;
+    TaskMode _mode;
     Stack _stack;
     Box<Ctx> _ctx;
 
     OptStrong<Space> _space;
     OptStrong<Domain> _domain;
+    Opt<Blocker> _block;
 
     Tick _sliceStart = 0;
     Tick _sliceEnd = 0;
+    Opt<Hj::Arg> _ret;
 
     static Res<Strong<Task>> create(
-        TaskType type, OptStrong<Space> space = NONE, OptStrong<Domain> domain = NONE);
+        TaskType type,
+        OptStrong<Space> space = NONE,
+        OptStrong<Domain> domain = NONE);
 
     static Task &self();
 
-    Task(
-        TaskType type, Stack stack, Box<Ctx> ctx, OptStrong<Space> space = NONE, OptStrong<Domain> domain = NONE)
+    Task(TaskType type,
+         Stack stack,
+         Box<Ctx> ctx,
+         OptStrong<Space> space,
+         OptStrong<Domain> domain)
         : _type(type),
           _stack(std::move(stack)),
           _ctx(std::move(ctx)),
@@ -81,6 +100,12 @@ struct Task : public Object<Task> {
     auto type() const { return _type; }
 
     Stack &stack() { return _stack; }
+
+    Space &space() { return _space.unwrap(); }
+
+    Domain &domain() { return _domain.unwrap(); }
+
+    bool blocked() const { return _block; }
 
     void saveCtx(usize sp) {
         _stack.saveSp(sp);
@@ -95,9 +120,27 @@ struct Task : public Object<Task> {
         return _stack.loadSp();
     }
 
-    Space &space() { return _space.unwrap(); }
+    void block() {
+        LockScope scope(_lock);
+    }
 
-    Domain &domain() { return _domain.unwrap(); }
+    void crash() {
+        LockScope scope(_lock);
+    }
+
+    void ret(Hj::Arg arg) {
+        LockScope scope(_lock);
+    }
+
+    Res<Hj::Arg> wait(Strong<Task> task);
+
+    void enterSupervisorMode() {
+        _mode = TaskMode::SUPER;
+    }
+
+    void leaveSupervisorMode() {
+        _mode = TaskMode::USER;
+    }
 };
 
 } // namespace Hjert::Core

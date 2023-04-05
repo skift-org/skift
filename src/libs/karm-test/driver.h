@@ -16,8 +16,8 @@ struct Driver {
     void runAll();
 
     Res<> unexpect(auto const &__lhs, auto const &__rhs, Str op, Loc = Loc::current()) {
-        Sys::errln("Test Failled: '{}' {} '{}'", __lhs, op, __rhs);
-        return Error::other("test Failled");
+        Sys::errln("unexpected: '{}' {} '{}'", __lhs, op, __rhs);
+        return Error::other("unexpected");
     }
 };
 

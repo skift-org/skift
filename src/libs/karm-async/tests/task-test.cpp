@@ -4,7 +4,7 @@
 
 namespace Karm::Async::Tests {
 
-Task<Ok<>> helloWorld() {
+Task<> helloWorld() {
     logInfo("Hello, ");
     co_await Async::sleep(TimeSpan::fromSecs(1));
     logInfo("world!");
@@ -18,7 +18,7 @@ test$(taskSleep) {
     return Ok();
 }
 
-Task<Ok<>> taskA() {
+Task<> taskA() {
     for (int i = 0; i < 10; ++i) {
         logInfo("A: {}", i);
         co_await Async::yield();
@@ -27,7 +27,7 @@ Task<Ok<>> taskA() {
     co_return Ok();
 }
 
-Task<Ok<>> taskB() {
+Task<> taskB() {
     for (int i = 0; i < 10; ++i) {
         logInfo("B: {}", i);
         co_await Async::yield();
@@ -42,14 +42,14 @@ test$(taskYield) {
     return Sched::instance().run();
 }
 
-Task<Ok<>> taskInner() {
+Task<> taskInner() {
     logInfo("inner A");
     co_await Async::sleep(TimeSpan::fromSecs(1));
     logInfo("inner B");
     co_return Ok();
 }
 
-Task<Ok<>> taskOuter() {
+Task<> taskOuter() {
     logInfo("outer A");
     co_await taskInner();
     logInfo("outer B");
@@ -62,13 +62,11 @@ test$(taskNested) {
     return Ok();
 }
 
-/*
 test$(testAll) {
     auto tA = taskA();
     auto tB = taskB();
-    Async::all(tA, tB).runSync();
+    try$(Async::all(tA, tB).runSync());
     return Ok();
 }
-*/
 
 } // namespace Karm::Async::Tests

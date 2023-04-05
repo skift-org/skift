@@ -165,8 +165,8 @@ inline auto yield() {
 }
 
 template <typename... Args>
-inline Task<Tuple<typename Task<Args>::Res...>> all(Args &...tasks) {
-    co_return Tuple<typename Task<Args>::Res...>{co_await tasks...};
+inline Task<Tuple<typename Args::Res...>> all(Args &...tasks) {
+    co_return {co_await tasks...};
 }
 
 } // namespace Karm::Async

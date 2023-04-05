@@ -9,7 +9,7 @@ namespace Hjert::Core {
 /* --- Sched ---------------------------------------------------------------- */
 
 struct Sched {
-    Tick _tick{};
+    TimeStamp _stamp{};
     Lock _lock{};
 
     Vec<Strong<Task>> _tasks;
@@ -34,7 +34,7 @@ struct Sched {
 
     Res<> start(Strong<Task> task, usize ip, usize sp);
 
-    void schedule();
+    void schedule(TimeSpan span);
 
     void yield();
 };

@@ -141,7 +141,7 @@ extern "C" usize _intDispatch(usize sp) {
 
         if (irq == 0) {
             Core::Task::self().saveCtx(sp);
-            Core::Sched::instance().schedule();
+            Core::Sched::instance().schedule(TimeSpan::fromMSecs(1));
             sp = Core::Task::self().loadCtx();
         } else {
             logInfo("x86_64: irq: {}", irq);

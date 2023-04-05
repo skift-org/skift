@@ -16,23 +16,23 @@ Res<> Sched::start(Strong<Task> task, usize ip, usize sp) {
     return Ok();
 }
 
-void Sched::schedule() {
+void Sched::schedule(TimeSpan span) {
     LockScope scope(_lock);
 
-    _tick++;
+    _stamp += span;
 
-    _curr->_sliceEnd = _tick;
+    _curr->_sliceEnd = _stamp;
     auto next = _curr;
 
     for (auto &t : _tasks) {
-        if (t->_sliceEnd < _tick) {
+        if (Op::lt(t->_sliceEnd, _stamp)) {
             next = t;
             break;
         }
     }
 
     _curr = next;
-    _curr->_sliceStart = _tick;
+    _curr->_sliceStart = _stamp;
 }
 
 Res<> Sched::init(Handover::Payload &) {

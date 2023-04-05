@@ -61,7 +61,7 @@ enum struct TaskMode : u8 {
 
 struct Blocker : public Meta::NoCopy {
     Func<bool()> predicat;
-    Tick deadline;
+    TimeStamp deadline;
 };
 
 struct Task : public BaseObject<Task> {
@@ -74,8 +74,8 @@ struct Task : public BaseObject<Task> {
     Opt<Strong<Domain>> _domain;
     Opt<Blocker> _block;
 
-    Tick _sliceStart = 0;
-    Tick _sliceEnd = 0;
+    TimeStamp _sliceStart = 0;
+    TimeStamp _sliceEnd = 0;
     Opt<Hj::Arg> _ret;
 
     static Res<Strong<Task>> create(
@@ -101,9 +101,9 @@ struct Task : public BaseObject<Task> {
 
     Stack &stack() { return _stack; }
 
-    Space &space() { return _space.unwrap(); }
+    Space &space() { return *_space.unwrap(); }
 
-    Domain &domain() { return _domain.unwrap(); }
+    Domain &domain() { return *_domain.unwrap(); }
 
     bool blocked() const { return _block; }
 
@@ -114,7 +114,7 @@ struct Task : public BaseObject<Task> {
 
     usize loadCtx() {
         if (_space)
-            (_space.unwrap()).activate();
+            (*_space)->activate();
 
         _ctx->load();
         return _stack.loadSp();
@@ -128,7 +128,7 @@ struct Task : public BaseObject<Task> {
         LockScope scope(_lock);
     }
 
-    void ret(Hj::Arg arg) {
+    void ret(Hj::Arg) {
         LockScope scope(_lock);
     }
 

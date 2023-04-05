@@ -29,7 +29,7 @@ Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
     logInfo("entry: handover: agent: '{}'", payload.agentName());
 
     usize totalFree = 0;
-    logInfo("entry: dumpying handover records...");
+    logInfo("entry: dumping handover records...");
     for (auto const &record : payload) {
         logInfo(
             " - {} {x}-{x} ({}kib)",

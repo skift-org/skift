@@ -70,8 +70,8 @@ struct Task : public BaseObject<Task> {
     Stack _stack;
     Box<Ctx> _ctx;
 
-    OptStrong<Space> _space;
-    OptStrong<Domain> _domain;
+    Opt<Strong<Space>> _space;
+    Opt<Strong<Domain>> _domain;
     Opt<Blocker> _block;
 
     Tick _sliceStart = 0;
@@ -80,16 +80,16 @@ struct Task : public BaseObject<Task> {
 
     static Res<Strong<Task>> create(
         TaskType type,
-        OptStrong<Space> space = NONE,
-        OptStrong<Domain> domain = NONE);
+        Opt<Strong<Space>> space = NONE,
+        Opt<Strong<Domain>> domain = NONE);
 
     static Task &self();
 
     Task(TaskType type,
          Stack stack,
          Box<Ctx> ctx,
-         OptStrong<Space> space,
-         OptStrong<Domain> domain)
+         Opt<Strong<Space>> space,
+         Opt<Strong<Domain>> domain)
         : _type(type),
           _stack(std::move(stack)),
           _ctx(std::move(ctx)),

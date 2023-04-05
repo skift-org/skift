@@ -22,7 +22,7 @@ Res<Stack> Stack::create() {
 /* --- Task ----------------------------------------------------------------- */
 
 Res<Strong<Task>> Task::create(
-    TaskType type, OptStrong<Space> space, OptStrong<Domain> domain) {
+    TaskType type, Opt<Strong<Space>> space, Opt<Strong<Domain>> domain) {
 
     logInfo("sched: creating task...");
     auto stack = try$(Stack::create());

@@ -9,7 +9,7 @@ struct CCap {
     virtual ~CCap() = default;
 };
 
-using CSlot = OptStrong<CCap>;
+using CSlot = Opt<Strong<CCap>>;
 
 struct CNode : public CCap {
     Array<CSlot, 512> _slots;

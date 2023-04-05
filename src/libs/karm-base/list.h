@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cons.h"
 #include "iter.h"
 #include "opt.h"
 #include "rc.h"
@@ -7,29 +8,58 @@
 
 namespace Karm {
 
-template <typename _T>
+template <typename T>
 struct List {
-    using T = _T;
-
     struct Node {
         T buf;
-        OptStrong<Node> next;
-        OptWeak<Node> prev;
+        Node *next = nullptr;
+        Node *prev = nullptr;
 
         template <typename... Args>
         constexpr Node(Args &&...args)
-            : buf{std::forward<Args>(args)...},
-              next(NONE),
-              prev(NONE) {}
+            : buf{std::forward<Args>(args)...} {}
+
+        Cons<Node *, Node *> clone() const {
+            auto *n = new Node(buf);
+
+            if (next) {
+                auto [head, tail] = next->clone();
+                n->next = head;
+                n->next->prev = n;
+                return {n, tail};
+            }
+            return {n, n};
+        }
+
+        void remove() {
+            if (prev) {
+                prev->next = next;
+            }
+
+            if (next) {
+                next->prev = prev;
+            }
+
+            delete this;
+        }
     };
 
     usize _len = 0;
-    OptStrong<Node> _head = NONE;
-    OptWeak<Node> _tail = NONE;
+    Node *_head = nullptr;
+    Node *_tail = nullptr;
 
     constexpr List() = default;
 
-    List(List const &other) = delete;
+    List(List const &other) {
+        if (other._len == 0) {
+            return;
+        }
+
+        auto [head, tail] = other._head->clone();
+        _head = head;
+        _tail = tail;
+        _len = other._len;
+    }
 
     List(List &&other) {
         std::swap(_len, other._len);
@@ -37,7 +67,10 @@ struct List {
         std::swap(_tail, other._tail);
     }
 
-    List &operator=(List const &other) = delete;
+    List &operator=(List const &other) {
+        *this = List(other);
+        return *this;
+    }
 
     List &operator=(List &&other) {
         std::swap(_len, other._len);
@@ -46,78 +79,182 @@ struct List {
         return *this;
     }
 
-    /* --- Capacity --- */
-
-    void truncate(usize len) {
-        if (len > _len) {
-            return;
-        }
-
-        if (len == 0) {
-            _head = NONE;
-            _tail = NONE;
-            _len = 0;
-            return;
-        }
-
-        auto node = _head.unwrap();
-        for (usize i = 0; i < len - 1; i++) {
-            node = node->next.unwrap();
-        }
-
-        node->next = NONE;
-        _tail = node;
-        _len = len;
+    ~List() {
+        clear();
     }
 
-    void remove(T const &elem) {
-        auto node = _head.unwrap();
-        for (usize i = 0; i < _len; i++) {
-            if (node->buf == elem) {
-                if (i == 0) {
-                    _head = node->next;
-                } else {
-                    node->prev.unwrap()->next = node->next;
-                }
+    /* --- Indexing --- */
 
-                if (i == _len - 1) {
-                    _tail = node->prev;
-                } else {
-                    node->next.unwrap()->prev = node->prev;
-                }
-
-                _len--;
-                return;
-            }
-
-            node = node->next.unwrap();
-        }
-    }
-
-    void clear() {
-        _head = NONE;
-        _tail = NONE;
-    }
-
-    /* --- Random Access --- */
-
-    template <typename Self>
-    constexpr auto _at(Self *self, usize index) {
-        if (index >= self->_len) {
+    Node *_at(usize i) const {
+        if (i >= _len) {
             panic("index out of range");
         }
 
-        Strong<Node> node = self->_head;
-        for (usize i = 0; i < index; i++) {
-            node = node->next;
+        if (i < _len / 2) {
+            auto n = _head;
+            for (usize j = 0; j < i; j++) {
+                n = n->next;
+            }
+            return n;
+        } else {
+            auto n = _tail;
+            for (usize j = _len - 1; j > i; j--) {
+                n = n->prev;
+            }
+            return n;
         }
-
-        return node->buf;
     }
 
-    T &at(usize index) { return _at(this, index); }
+    void insert(usize i, T el) {
+        emplace(i, el);
+    }
 
-    T const &at(usize index) const { return _at(this, index); }
+    template <typename... Args>
+    void emplace(usize i, Args &&...args) {
+        auto *node = new Node(std::forward<Args>(args)...);
+
+        if (i == 0) {
+            if (_head) {
+                _head->prev = node;
+            } else {
+                _tail = node;
+            }
+            node->next = _head;
+            _head = node;
+        } else if (i == _len) {
+            if (_tail) {
+                _tail->next = node;
+            } else {
+                _head = node;
+            }
+            node->prev = _tail;
+            _tail = node;
+        } else {
+            auto *n = _at(i);
+            node->next = n;
+            node->prev = n->prev;
+            n->prev = node;
+            node->prev->next = node;
+        }
+
+        _len++;
+    }
+
+    void removeAt(usize i) {
+        if (i >= _len) {
+            panic("index out of range");
+        }
+
+        if (i == 0) {
+            auto *n = _head;
+            _head = _head->next;
+            if (_head) {
+                _head->prev = nullptr;
+            } else {
+                _tail = nullptr;
+            }
+            delete n;
+        } else if (i == _len - 1) {
+            auto *n = _tail;
+            _tail = _tail->prev;
+            if (_tail) {
+                _tail->next = nullptr;
+            } else {
+                _head = nullptr;
+            }
+            delete n;
+        } else {
+            auto *n = _at(i);
+            n->prev->next = n->next;
+            n->next->prev = n->prev;
+            delete n;
+        }
+
+        _len--;
+    }
+
+    void remove(T const &elem) {
+        if (_len == 0) {
+            return;
+        }
+
+        auto *n = _head;
+        while (n) {
+            if (Op::eq(n->buf, elem)) {
+                if (n == _head) {
+                    _head = _head->next;
+                    if (_head) {
+                        _head->prev = nullptr;
+                    } else {
+                        _tail = nullptr;
+                    }
+                } else if (n == _tail) {
+                    _tail = _tail->prev;
+                    if (_tail) {
+                        _tail->next = nullptr;
+                    } else {
+                        _head = nullptr;
+                    }
+                } else {
+                    n->prev->next = n->next;
+                    n->next->prev = n->prev;
+                }
+
+                auto *next = n->next;
+                delete n;
+                n = next;
+                _len--;
+            } else {
+                n = n->next;
+            }
+        }
+    }
+
+    void truncate(usize len) {
+        if (len >= _len) {
+            return;
+        }
+        if (len == 0) {
+            clear();
+            return;
+        }
+
+        auto *n = _at(len);
+        _tail = n->prev;
+        _tail->next = nullptr;
+
+        while (n) {
+            auto *next = n->next;
+            delete n;
+            n = next;
+        }
+
+        _len = len;
+    }
+
+    T &at(usize i) {
+        if (i >= _len)
+            panic("index out of range");
+        return _at(i)->buf;
+    }
+
+    T const &at(usize i) const {
+        if (i >= _len)
+            panic("index out of range");
+        return _at(i)->buf;
+    }
+
+    void clear() {
+        while (_head) {
+            auto *next = _head->next;
+            delete _head;
+            _head = next;
+        }
+        _tail = nullptr;
+        _len = 0;
+    }
+
+    /* --- Random Access --- */
 
     T &operator[](usize i) { return at(i); }
 
@@ -151,33 +288,14 @@ struct List {
 
     template <typename... Args>
     void emplaceFront(Args &&...args) {
-        Strong<Node> node = makeStrong<Node>(std::forward<Args>(args)...);
-
-        if (_head) {
-            _head->prev = node;
-            node->next = _head;
-        } else {
-            _tail = node;
-        }
-
-        _head = node;
-        _len++;
+        emplace(0, std::forward<Args>(args)...);
     }
 
     T popFront() {
-        if (not _len) {
-            panic("pop from empty list");
-        }
-
-        auto node = _head;
-        _head = node->next;
-        _len--;
-
-        if (not _len) {
-            _tail = NONE;
-        }
-
-        return std::move(node->buf);
+        auto *n = _at(0);
+        T buf = std::move(n->buf);
+        removeAt(0);
+        return buf;
     }
 
     /* --- Back Access --- */
@@ -208,34 +326,14 @@ struct List {
 
     template <typename... Args>
     void emplaceBack(Args &&...args) {
-        Strong<Node> node = makeStrong<Node>(std::forward<Args>(args)...);
-
-        if (_tail) {
-            _tail->next = node;
-            node->prev = _tail;
-        } else {
-            _head = node;
-        }
-
-        _tail = node;
-        _len++;
+        emplace(_len, std::forward<Args>(args)...);
     }
 
     T popBack() {
-        if (not _len) {
-            panic("pop from empty list");
-        }
-
-        Strong<Node> node = _tail;
-        _tail = node->prev;
-        if (_tail) {
-            _tail->next = NONE;
-        } else {
-            _head = NONE;
-        }
-
-        _len--;
-        return std::move(node->buf);
+        auto *n = _at(_len - 1);
+        T buf = std::move(n->buf);
+        removeAt(_len - 1);
+        return buf;
     }
 
     /* --- Queue --- */
@@ -245,12 +343,12 @@ struct List {
             return;
         }
 
-        auto node = _head;
-        _head = node->next;
-        _tail->next = node;
-        node->next = NONE;
-        node->prev = _tail;
-        _tail = node;
+        auto *n = _head;
+        _head = _head->next;
+        _tail->next = n;
+        n->prev = _tail;
+        n->next = nullptr;
+        _tail = n;
     }
 
     /* --- Iteration --- */

@@ -5,10 +5,6 @@
 
 namespace Karm {
 
-using Tick = u64;
-
-static constexpr Tick TICKS_PER_SECOND = 1000;
-
 struct TimeSpan {
     u64 _value; // us
 
@@ -102,10 +98,6 @@ struct TimeSpan {
         return toMonths() / 12;
     }
 
-    constexpr Tick toTicks() {
-        return _value / (1000 * 1000 / TICKS_PER_SECOND);
-    }
-
     constexpr TimeSpan &operator+=(TimeSpan other) {
         _value += other._value;
         return *this;
@@ -127,26 +119,30 @@ struct TimeSpan {
     constexpr Ordr cmp(TimeSpan other) const {
         return ::Karm::cmp(_value, other._value);
     }
+
+    constexpr auto val() const {
+        return _value;
+    }
 };
 
 struct TimeStamp {
-    u64 _value;
+    u64 _value{};
 
-    static constexpr u64 END_OF_TIME = {~0ull};
+    static constexpr u64 END_OF_TIME = ~0ull;
 
     static constexpr TimeStamp epoch() {
         return {0};
     }
 
     static constexpr TimeStamp endOfTime() {
-        return {~0ull};
+        return {END_OF_TIME};
     }
 
     constexpr TimeStamp(u64 value = 0)
         : _value(value) {}
 
     constexpr bool isEndOfTime() const {
-        return _value == ~0ull;
+        return _value == END_OF_TIME;
     }
 
     constexpr TimeStamp &operator+=(TimeSpan other) {
@@ -185,6 +181,10 @@ struct TimeStamp {
 
     constexpr Ordr cmp(TimeStamp other) const {
         return ::Karm::cmp(_value, other._value);
+    }
+
+    constexpr auto val() const {
+        return _value;
     }
 };
 

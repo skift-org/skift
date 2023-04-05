@@ -143,16 +143,21 @@ Res<Strong<Sys::Fd>> createErr() {
 
 /* --- Time ----------------------------------------------------------------- */
 
+TimeSpan fromTimeSpec(struct timespec const &ts) {
+    auto usecs = (u64)ts.tv_sec * 1000000 + (u64)ts.tv_nsec / 1000;
+    return TimeSpan::fromUSecs(usecs);
+}
+
 TimeStamp now() {
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
-    return TimeStamp{static_cast<u64>(ts.tv_sec * 1000000000 + ts.tv_nsec)};
+    return TimeStamp::epoch() + fromTimeSpec(ts);
 }
 
 TimeSpan uptime() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    return TimeSpan{static_cast<u64>(ts.tv_sec * 1000000000 + ts.tv_nsec)};
+    return fromTimeSpec(ts);
 }
 
 /* --- Memory Managment ----------------------------------------------------- */
@@ -265,7 +270,7 @@ Res<> populate(Vec<Sys::UserInfo> &infos) {
 Res<> sleep(TimeSpan span) {
     struct timespec ts;
     ts.tv_sec = span.toSecs();
-    ts.tv_nsec = span.toUSecs() % 1000000000;
+    ts.tv_nsec = span.toUSecs() % 1000000 * 1000;
     if (nanosleep(&ts, nullptr) < 0) {
         return Posix::fromLastErrno();
     }

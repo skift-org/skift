@@ -2,7 +2,6 @@
 
 #include <karm-meta/id.h>
 
-
 namespace Karm {
 
 template <usize I, typename T>

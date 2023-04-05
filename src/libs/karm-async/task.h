@@ -1,6 +1,5 @@
 #pragma once
 
-#include <coroutine>
 #include <karm-base/func.h>
 #include <karm-base/list.h>
 #include <karm-base/res.h>
@@ -45,11 +44,11 @@ struct Sched {
                 return now;
             }
 
-            _queue.requeue();
-
             if (Op::lt(evaled, soon)) {
                 soon = evaled;
             }
+
+            _queue.requeue();
         }
 
         return soon;
@@ -63,7 +62,9 @@ struct Sched {
                 now = Sys::now();
                 soon = schedule(now);
             }
-            try$(Sys::sleepUntil(soon));
+
+            if (_queue.len() > 0)
+                try$(Sys::sleepUntil(soon));
         }
 
         return Ok();
@@ -72,7 +73,7 @@ struct Sched {
 
 template <typename Task>
 struct Promise {
-    typename Task::Res _res;
+    Opt<typename Task::Res> _res = NONE;
     Task get_return_object() { return {Coro<Promise>::from_promise(*this)}; }
     std::suspend_never initial_suspend() { return {}; }
     std::suspend_always final_suspend() noexcept { return {}; }
@@ -102,37 +103,30 @@ struct Task : public Meta::NoCopy {
         }
     }
 
-    /* --- Await --- */
+    /* --- Awaitable -------------------------------------------------------- */
 
-    struct Awaitable {
-        Task &task;
-
-        constexpr bool await_ready() const noexcept {
-            return false;
-        }
-
-        void await_suspend(Coro<> coro) const noexcept {
-            Sched::instance().queue(coro, [c = task._coro]() {
-                return c.done() ? TimeStamp::endOfTime() : TimeStamp::epoch();
-            });
-        }
-
-        Res await_resume() const noexcept {
-            return task._coro.promise()._res;
-        }
-    };
-
-    Awaitable operator co_await() {
-        return Awaitable{*this};
+    bool await_ready() const noexcept {
+        return false;
     }
 
-    /* --- Run --- */
+    void await_suspend(Coro<> coro) const noexcept {
+        Sched::instance().queue(coro, [&]() {
+            return _coro.done() ? TimeStamp::epoch() : TimeStamp::endOfTime();
+        });
+    }
 
-    Res runSync() {
+    Res await_resume() const noexcept {
+        return _coro.promise()._res.unwrap();
+    }
+
+    /* --- Run -------------------------------------------------------------- */
+
+    Karm::Res<Res> runSync() {
         while (!_coro.done()) {
-            Sched::instance().schedule(Sys::now());
+            auto until = Sched::instance().schedule(Sys::now());
+            try$(Sys::sleepUntil(until));
         }
-        return std::move(_coro.promise()._res);
+        return Ok(_coro.promise()._res.take());
     }
 };
 

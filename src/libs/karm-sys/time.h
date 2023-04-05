@@ -5,8 +5,12 @@
 
 namespace Karm::Sys {
 
-inline TimeStamp now() { return Embed::now(); }
+inline TimeStamp now() {
+    return Embed::now();
+}
 
-inline TimeSpan uptime() { return Embed::uptime(); }
+inline TimeSpan uptime() {
+    return Embed::uptime();
+}
 
 } // namespace Karm::Sys

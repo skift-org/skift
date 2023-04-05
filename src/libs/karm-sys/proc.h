@@ -14,7 +14,11 @@ inline Res<> sleep(TimeSpan span) {
 }
 
 inline Res<> sleepUntil(TimeStamp stamp) {
-    return sleep(stamp - now());
+    auto n = now();
+    if (Op::lt(stamp, n)) {
+        return Ok();
+    }
+    return sleep(stamp - n);
 }
 
 } // namespace Karm::Sys

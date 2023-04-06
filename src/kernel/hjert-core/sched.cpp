@@ -10,17 +10,17 @@ static Opt<Sched> _sched;
 
 Res<> Sched::start(Strong<Task> task, usize ip, usize sp) {
     logInfo("sched: starting task (ip: {x}, sp: {x})...", ip, sp);
-    LockScope scope(_lock);
+
+    SchedLockScope scope;
     Arch::start(*task, ip, sp, {});
     _tasks.pushBack(std::move(task));
     return Ok();
 }
 
 void Sched::schedule(TimeSpan span) {
-    LockScope scope(_lock);
+    SchedLockScope scope;
 
     _stamp += span;
-
     _curr->_sliceEnd = _stamp;
     auto next = _curr;
 
@@ -30,7 +30,6 @@ void Sched::schedule(TimeSpan span) {
             break;
         }
     }
-
     _curr = next;
     _curr->_sliceStart = _stamp;
 }
@@ -43,6 +42,13 @@ Res<> Sched::init(Handover::Payload &) {
 
 Sched &Sched::instance() {
     return *_sched;
+}
+
+void Sched::yield() {
+    {
+        SchedLockScope scope;
+    }
+    Arch::yield();
 }
 
 } // namespace Hjert::Core

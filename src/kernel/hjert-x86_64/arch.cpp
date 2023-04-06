@@ -136,6 +136,10 @@ extern "C" usize _intDispatch(usize sp) {
 
     if (frame->intNo < 32) {
         logFatal("x86_64: cpu exception: {} (err={}, ip={p}, sp={p}, cr2={p}, cr3={p})", _faultMsg[frame->intNo], frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
+    } else if (frame->intNo == 100) {
+        Core::Task::self().saveCtx(sp);
+        Core::Sched::instance().schedule(TimeSpan::fromMSecs(0));
+        sp = Core::Task::self().loadCtx();
     } else {
         isize irq = frame->intNo - 32;
 
@@ -294,6 +298,10 @@ Res<Strong<Core::Space>> createSpace() {
     }
 
     return Ok(makeStrong<Space>(pml4));
+}
+
+void yield() {
+    asm volatile("int $100");
 }
 
 } // namespace Hjert::Arch

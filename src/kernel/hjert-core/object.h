@@ -42,4 +42,11 @@ struct Domain : public BaseObject<Domain> {
     Res<> drop(Hj::Cap cap);
 };
 
+struct ObjectLockScope : public LockScope {
+
+    ObjectLockScope(Object &obj)
+        : LockScope(obj._lock) {
+    }
+};
+
 } // namespace Hjert::Core

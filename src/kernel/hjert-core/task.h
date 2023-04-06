@@ -59,10 +59,7 @@ enum struct TaskMode : u8 {
     USER   // The task is running in user mode
 };
 
-struct Blocker : public Meta::NoCopy {
-    Func<bool()> predicat;
-    TimeStamp deadline;
-};
+using Blocker = Func<TimeStamp()>;
 
 struct Task : public BaseObject<Task> {
     TaskType _type;
@@ -120,27 +117,17 @@ struct Task : public BaseObject<Task> {
         return _stack.loadSp();
     }
 
-    void block() {
-        LockScope scope(_lock);
-    }
+    Res<> block(Blocker blocker);
 
-    void crash() {
-        LockScope scope(_lock);
-    }
+    void crash();
 
-    void ret(Hj::Arg) {
-        LockScope scope(_lock);
-    }
+    void ret(Hj::Arg val);
 
     Res<Hj::Arg> wait(Strong<Task> task);
 
-    void enterSupervisorMode() {
-        _mode = TaskMode::SUPER;
-    }
+    void enterSupervisorMode();
 
-    void leaveSupervisorMode() {
-        _mode = TaskMode::USER;
-    }
+    void leaveSupervisorMode();
 };
 
 } // namespace Hjert::Core

@@ -7,7 +7,8 @@ namespace Hjert::Core {
 
 /* --- VNone ---------------------------------------------------------------- */
 
-VNode::VNode(_Mem mem) : _mem(std::move(mem)) {}
+VNode::VNode(_Mem mem)
+    : _mem(std::move(mem)) {}
 
 Res<Strong<VNode>> VNode::alloc(usize size, Hj::MemFlags) {
     auto mem = try$(pmm().allocOwned(size, Hal::PmmFlags::UPPER));
@@ -50,7 +51,7 @@ Res<usize> Space::_lookup(Hal::VmmRange vrange) {
 }
 
 Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> mem, usize off, Hj::MapFlags flags) {
-    LockScope scope{_lock};
+    ObjectLockScope scope(*this);
 
     try$(vrange.ensureAligned(Hal::PAGE_SIZE));
 
@@ -79,7 +80,7 @@ Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> mem, usize off
 }
 
 Res<> Space::unmap(Hal::VmmRange vrange) {
-    LockScope scope{_lock};
+    ObjectLockScope scope(*this);
 
     try$(vrange.ensureAligned(Hal::PAGE_SIZE));
 

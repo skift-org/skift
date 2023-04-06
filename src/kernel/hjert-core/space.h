@@ -33,7 +33,6 @@ struct Space : public BaseObject<Space> {
         Strong<VNode> mem;
     };
 
-    Lock _lock;
     RangeAlloc<Hal::VmmRange> _alloc;
     Vec<Map> _maps;
 

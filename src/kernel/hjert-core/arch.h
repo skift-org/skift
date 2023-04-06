@@ -37,4 +37,6 @@ Res<Box<Core::Ctx>> createCtx(usize ksp);
 
 Res<Strong<Core::Space>> createSpace();
 
+void yield();
+
 } // namespace Hjert::Arch

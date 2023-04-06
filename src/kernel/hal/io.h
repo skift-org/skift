@@ -36,9 +36,10 @@ static T portIn(u16 addr) {
                      : "=a"(value)
                      : "d"(addr));
     } else if constexpr ((sizeof(T) == 8)) {
-        asm volatile("inq %1, %0"
-                     : "=a"(value)
-                     : "d"(addr));
+        // x86_64 doesn't support 64bit I/O operation so we emulate it
+        u64 res = portIn<u32>(addr);
+        res |= (u64)portIn<u32>(addr + 4) << 32;
+        return res;
     } else {
         static_assert(sizeof(T) == 1 or sizeof(T) == 2 or sizeof(T) == 4);
     }
@@ -60,9 +61,9 @@ static void portOut(u16 addr, T value) {
                      :
                      : "a"(value), "d"(addr));
     } else if constexpr ((sizeof(T) == 8)) {
-        asm volatile("outq %0, %1"
-                     :
-                     : "a"(value), "d"(addr));
+        // x86_64 doesn't support 64bit I/O operation so we emulate it
+        portOut<u32>(addr, value);
+        portOut<u32>(addr + 4, value >> 32);
     } else {
         static_assert(sizeof(T) == 1 or sizeof(T) == 2 or sizeof(T) == 4);
     }

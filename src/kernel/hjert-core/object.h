@@ -31,7 +31,13 @@ struct Domain : public BaseObject<Domain> {
     Res<Strong<Object>> get(Hj::Cap cap);
 
     template <typename T>
-    Res<Strong<T>> get(Hj::Cap cap);
+    Res<Strong<T>> get(Hj::Cap cap) {
+        auto obj = try$(get(cap));
+        if (not obj.is<T>()) {
+            return Error::invalidHandle("type missmatch");
+        }
+        return Ok(try$(obj.cast<T>()));
+    }
 
     Res<> drop(Hj::Cap cap);
 };

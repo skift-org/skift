@@ -11,6 +11,9 @@ struct IoNode : public BaseObject<IoNode> {
 
     static Res<Strong<IoNode>> create(Hal::PortRange range);
 
+    IoNode(Hal::PortRange range)
+        : _range(range) {}
+
     Res<Hj::Arg> in(usize offset, usize size);
 
     Res<> out(usize offset, usize size, Hj::Arg arg);

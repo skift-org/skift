@@ -157,7 +157,7 @@ extern "C" usize _intDispatch(usize sp) {
 
 extern "C" usize _sysDispatch(usize sp) {
     auto *frame = reinterpret_cast<Frame *>(sp);
-    auto result = Core::dispatchSyscall(
+    auto result = Core::doSyscall(
         (Hj::Syscall)frame->rax,
         {frame->rdi, frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9});
 

@@ -16,11 +16,17 @@ SECTIONS
 
     .rodata : ALIGN(4K)
     {
-        *(.rodata*)
-
         __init_array_start = .;
+        *(.ctors)
         *(.init_array)
         __init_array_end = .;
+
+        __fini_array_start = .;
+		*(.fini_array)
+        *(.dtors)
+		__fini_array_end = .;
+
+        *(.rodata*)
     }
 
     .data : ALIGN(4K)

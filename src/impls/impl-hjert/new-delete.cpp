@@ -19,7 +19,7 @@ static Heap _heapImpl = {
             .free(Hal::KmmRange(reinterpret_cast<usize>(ptr), size))
             .unwrap("heap: failed to free block");
     },
-    .log = [](void *, enum HeapLogType type, const char *msg, va_list) {
+    .log = [](void *, enum HeapLogType type, char const *msg, va_list) {
         if (type == HEAP_ERROR) {
             logError("heap: {}", msg);
         }

@@ -12,7 +12,7 @@ static Heap _heapImpl = {
     .free = [](void *, void *, usize) -> void {
         notImplemented();
     },
-    .log = [](void *, enum HeapLogType type, const char *msg, va_list) -> void {
+    .log = [](void *, enum HeapLogType type, char const *msg, va_list) -> void {
         if (type == HEAP_ERROR) {
             logError("heap: {}", msg);
         }

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <stddef.h>
-#include <stdint.h>
+#include <karm-base/std.h>
 
 namespace Handover {
 
@@ -10,7 +9,7 @@ inline usize UPPER_HALF = 0xffff800000000000;
 
 namespace Utils {
 
-inline bool cstrEq(const char *str1, const char *str2) {
+inline bool cstrEq(char const *str1, char const *str2) {
     while (*str1 and *str2) {
         if (*str1++ != *str2++)
             return false;

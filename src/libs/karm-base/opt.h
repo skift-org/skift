@@ -135,14 +135,14 @@ struct [[nodiscard]] Opt {
         return NONE;
     }
 
-    ALWAYS_INLINE T &unwrap(const char *msg = "unwraping none") {
+    ALWAYS_INLINE T &unwrap(char const *msg = "unwraping none") {
         if (not _present) {
             panic(msg);
         }
         return _value.unwrap();
     }
 
-    ALWAYS_INLINE T const &unwrap(const char *msg = "unwraping none") const {
+    ALWAYS_INLINE T const &unwrap(char const *msg = "unwraping none") const {
         if (not _present) {
             panic(msg);
         }

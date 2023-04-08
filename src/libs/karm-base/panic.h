@@ -4,7 +4,7 @@
 
 namespace Karm {
 
-inline void debug(const char *msg) {
+inline void debug(char const *msg) {
     Embed::debug(msg);
 }
 

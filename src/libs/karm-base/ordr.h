@@ -22,7 +22,7 @@ struct Ordr {
 
     constexpr Ordr(Value value) : _value(value) {}
 
-    constexpr Ordr operator|(const Ordr &other) const {
+    constexpr Ordr operator|(Ordr const &other) const {
         if (_value != EQUAL) {
             return other;
         }
@@ -30,7 +30,7 @@ struct Ordr {
         return EQUAL;
     }
 
-    constexpr bool operator==(const Ordr &other) const = default;
+    constexpr bool operator==(Ordr const &other) const = default;
 
     constexpr bool isEq() const { return _value == EQUAL; }
     constexpr bool isNe() const { return _value != EQUAL; }

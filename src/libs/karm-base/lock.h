@@ -8,7 +8,9 @@
 
 namespace Karm {
 
-struct CriticalScope : Meta::Static {
+struct CriticalScope :
+    Meta::Static {
+
     CriticalScope() {
         Embed::enterCritical();
     }
@@ -18,7 +20,9 @@ struct CriticalScope : Meta::Static {
     }
 };
 
-struct Lock : Meta::Static {
+struct Lock :
+    Meta::Static {
+
     Atomic<bool> _lock{};
 
     bool _tryAcquire() {
@@ -81,6 +85,23 @@ struct LockScope :
 
     ~LockScope() {
         _lock.release();
+    }
+};
+
+template <typename T>
+struct LockProtected {
+    Lock _lock;
+    T _value;
+
+    LockProtected() = default;
+
+    template <typename... Args>
+    LockProtected(Args &&...args)
+        : _value(std::forward<Args>(args)...) {}
+
+    auto with(auto f) {
+        LockScope scope(_lock);
+        return f(_value);
     }
 };
 

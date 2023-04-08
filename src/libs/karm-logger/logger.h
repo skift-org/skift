@@ -26,6 +26,7 @@ struct Format {
     }
 };
 
+static constexpr Level PRINT = {-1, "print", Cli::BLUE};
 static constexpr Level DEBUG = {0, "debug", Cli::BLUE};
 static constexpr Level INFO = {1, "info ", Cli::GREEN};
 static constexpr Level WARNING = {2, "warn ", Cli::YELLOW};
@@ -35,13 +36,22 @@ static constexpr Level FATAL = {4, "fatal", Cli::style(Cli::RED).bold()};
 inline void _log(Level level, Format format, Fmt::_Args &args) {
     Embed::loggerLock();
 
-    Fmt::format(Embed::loggerOut(), "{} ", Cli::styled(level.name, level.style)).unwrap();
-    Fmt::format(Embed::loggerOut(), "{}{}:{}: ", Cli::reset().fg(Cli::GRAY_DARK), format.loc.file, format.loc.line).unwrap();
-    Fmt::format(Embed::loggerOut(), "{}", Cli::reset().fg(Cli::WHITE)).unwrap();
+    if (level.value != -1) {
+        Fmt::format(Embed::loggerOut(), "{} ", Cli::styled(level.name, level.style)).unwrap();
+        Fmt::format(Embed::loggerOut(), "{}{}:{}: ", Cli::reset().fg(Cli::GRAY_DARK), format.loc.file, format.loc.line).unwrap();
+    }
+
+    Fmt::format(Embed::loggerOut(), "{}", Cli::reset()).unwrap();
     Fmt::_format(Embed::loggerOut(), format.str, args).unwrap();
     Fmt::format(Embed::loggerOut(), "{}\n", Cli::reset()).unwrap();
 
     Embed::loggerUnlock();
+}
+
+template <typename... Args>
+inline void logPrint(Format format, Args &&...va) {
+    Fmt::Args<Args...> args{std::forward<Args>(va)...};
+    _log(PRINT, format, args);
 }
 
 template <typename... Args>

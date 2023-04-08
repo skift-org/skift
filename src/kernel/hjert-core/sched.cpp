@@ -11,27 +11,34 @@ static Opt<Sched> _sched;
 Res<> Sched::start(Strong<Task> task, usize ip, usize sp) {
     logInfo("sched: starting task (ip: {x}, sp: {x})...", ip, sp);
 
-    SchedLockScope scope;
+    LockScope scope{_lock};
     Arch::start(*task, ip, sp, {});
     _tasks.pushBack(std::move(task));
     return Ok();
 }
 
 void Sched::schedule(TimeSpan span) {
-    SchedLockScope scope;
+    LockScope scope{_lock};
 
     _stamp += span;
     _curr->_sliceEnd = _stamp;
-    auto next = _curr;
+    auto next = _idle;
 
-    for (auto &t : _tasks) {
-        if (Op::lt(t->_sliceEnd, _stamp)) {
+    for (usize i = 0; i < _tasks.len(); ++i) {
+        auto &t = _tasks[i];
+
+        if (t->hasRet()) {
+            logInfo("sched: {} has returned", *t);
+            _tasks.removeAt(i--);
+            continue;
+        }
+
+        if (Op::lteq(t->_sliceEnd, _stamp)) {
             next = t;
-            break;
         }
     }
+
     _curr = next;
-    _curr->_sliceStart = _stamp;
 }
 
 Res<> Sched::init(Handover::Payload &) {
@@ -45,9 +52,6 @@ Sched &Sched::instance() {
 }
 
 void Sched::yield() {
-    {
-        SchedLockScope scope;
-    }
     Arch::yield();
 }
 

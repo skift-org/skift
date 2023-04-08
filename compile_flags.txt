@@ -14,6 +14,7 @@
 -Isrc/libs
 -Isrc/specs
 -Isrc/impls
+-I.osdk/extern/cute-engineering
 
 -D__osdk_sys_linux__
 -D__osdk_arch_x86_64__

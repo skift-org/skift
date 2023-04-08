@@ -55,6 +55,7 @@ enum struct TaskType : u8 {
 };
 
 enum struct TaskMode : u8 {
+    IDLE,  // The task is only run when there is no other task to run
     SUPER, // The task is running in supervisor mode propably serving a syscall
     USER   // The task is running in user mode
 };
@@ -71,9 +72,22 @@ struct Task : public BaseObject<Task> {
     Opt<Strong<Domain>> _domain;
     Opt<Blocker> _block;
 
-    TimeStamp _sliceStart = 0;
     TimeStamp _sliceEnd = 0;
     Opt<Hj::Arg> _ret;
+
+    bool _hasRetUnlock() {
+        return _ret and _mode == TaskMode::USER;
+    }
+
+    bool hasRet() {
+        ObjectLockScope scope(*this);
+        return _hasRetUnlock();
+    }
+
+    bool runable() {
+        ObjectLockScope scope(*this);
+        return not _block and not _hasRetUnlock();
+    }
 
     static Res<Strong<Task>> create(
         TaskType type,
@@ -87,7 +101,8 @@ struct Task : public BaseObject<Task> {
          Box<Ctx> ctx,
          Opt<Strong<Space>> space,
          Opt<Strong<Domain>> domain)
-        : _type(type),
+        : BaseObject(Hj::Type::TASK),
+          _type(type),
           _stack(std::move(stack)),
           _ctx(std::move(ctx)),
           _space(space),
@@ -119,6 +134,8 @@ struct Task : public BaseObject<Task> {
 
     Res<> block(Blocker blocker);
 
+    bool unblock(TimeStamp now);
+
     void crash();
 
     void ret(Hj::Arg val);
@@ -128,6 +145,8 @@ struct Task : public BaseObject<Task> {
     void enterSupervisorMode();
 
     void leaveSupervisorMode();
+
+    void enterIdleMode();
 };
 
 } // namespace Hjert::Core

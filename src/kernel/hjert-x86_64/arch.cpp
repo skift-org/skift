@@ -4,6 +4,7 @@
 #include <hjert-core/sched.h>
 #include <hjert-core/syscalls.h>
 #include <karm-logger/logger.h>
+#include <karm-text/witty.h>
 
 #include <hal-x86_64/com.h>
 #include <hal-x86_64/cpuid.h>
@@ -129,13 +130,48 @@ static char const *_faultMsg[32] = {
     "reserved",
 };
 
+void backtrace(usize rbp) {
+    usize *frame = reinterpret_cast<usize *>(rbp);
+
+    while (frame) {
+        usize ip = frame[1];
+        usize sp = frame[0];
+
+        logPrint("    ip={p}, sp={p}", ip, sp);
+
+        frame = reinterpret_cast<usize *>(sp);
+    }
+}
+
+const auto *CLOSE_LINE = "-----------------------------------------------------------";
+
 extern "C" usize _intDispatch(usize sp) {
     auto *frame = reinterpret_cast<Frame *>(sp);
 
     cpu().beginInterrupt();
 
     if (frame->intNo < 32) {
-        logFatal("x86_64: cpu exception: {} (err={}, ip={p}, sp={p}, cr2={p}, cr3={p})", _faultMsg[frame->intNo], frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
+        logPrint("{}--- {} {}----------------------------------------------------", Cli::style(Cli::YELLOW_LIGHT), Cli::styled("!!!", Cli::Style(Cli::Color::RED).bold()), Cli::style(Cli::YELLOW_LIGHT));
+        logPrint("");
+        logPrint("    {}", Cli::styled("Kernel Panic", Cli::style(Cli::RED).bold()));
+        logPrint("    CPU EXCEPTION : '{}'", _faultMsg[frame->intNo]);
+        logPrint("    {}", Cli::styled(Text::witty(frame->rsp + frame->rip), Cli::GRAY_DARK));
+        logPrint("");
+        logPrint("    {}", Cli::styled("Registers", Cli::WHITE));
+        logPrint("    int={}", frame->intNo);
+        logPrint("    err={}", frame->errNo);
+        logPrint("    rip={p}", frame->rip);
+        logPrint("    rsp={p}", frame->rsp);
+        logPrint("    cr2={p}", x86_64::rdcr2());
+        logPrint("    cr3={p}", x86_64::rdcr3());
+        logPrint("");
+        logPrint("    {}", Cli::styled("Backtrace", Cli::WHITE));
+        backtrace(frame->rbp);
+        logPrint("");
+        logPrint("    {}", Cli::styled("System halted", Cli::WHITE));
+        logPrint("");
+        logPrint("{}", Cli::styled("-----------------------------------------------------------", Cli::YELLOW_LIGHT));
+        panic("cpu exception");
     } else if (frame->intNo == 100) {
         Core::Task::self().saveCtx(sp);
         Core::Sched::instance().schedule(TimeSpan::fromMSecs(0));
@@ -214,29 +250,6 @@ void start(Core::Task &task, usize ip, usize sp, Hj::Args args) {
         .push(frame);
 }
 
-template <typename L, typename M>
-Res<> destroyPml(Hal::Pmm &pmm, L *pml, M mapper = {}) {
-    logInfo("x86_64: destroying pml{} at {p}", L::LEVEL, (usize)pml);
-
-    auto range = Hal::PmmRange{mapper.unmap((usize)pml), Hal::PAGE_SIZE};
-
-    // NOTE: we only need to free the first half of the pml4 since hupper is for the kernel
-    for (usize i = 0; i < L::LEN / (L::LEVEL == 4 ? 2 : 1); i++) {
-        if (pml->pages[i].present()) {
-            if constexpr (L::LEVEL == 1) {
-                auto page = Hal::PmmRange{mapper.map(pml->pages[i].paddr()), Hal::PAGE_SIZE};
-                try$(pmm.free(page));
-            } else {
-                try$(destroyPml(pmm, (typename L::Lower *)mapper.map(pml->pages[i].paddr()), mapper));
-            }
-        }
-    }
-
-    try$(pmm.free(range));
-
-    return Ok();
-}
-
 struct Ctx : public Core::Ctx {
     usize _ksp;
     usize _usp;
@@ -260,31 +273,20 @@ Res<Box<Core::Ctx>> createCtx(usize ksp) {
     return Ok<Box<Core::Ctx>>(makeBox<Ctx>(ksp));
 }
 
-struct Space :
-    public Core::Space {
+struct ManagedVmm : public x86_64::Vmm<Hal::UpperHalfMapper> {
+    ManagedVmm(x86_64::Pml<4> *pml4)
+        : x86_64::Vmm<Hal::UpperHalfMapper>{Core::pmm(), pml4} {}
 
-    x86_64::Vmm<Hal::UpperHalfMapper> _vmm;
-    x86_64::Pml<4> *_pml4;
-
-    Space(x86_64::Pml<4> *pml4)
-        : _vmm{Core::pmm(), pml4}, _pml4(pml4) {}
-
-    Space(Space &&other)
-        : _vmm(other._vmm),
-          _pml4(std::exchange(other._pml4, nullptr)) {
-    }
-
-    ~Space() {
-        destroyPml(Core::pmm(), _pml4, Hal::UpperHalfMapper{})
-            .unwrap("failed to destroy pml4");
-    }
-
-    Hal::Vmm &vmm() override {
-        return _vmm;
+    ~ManagedVmm() {
+        // NOTE: We expect the user to already have unmapped all the pages
+        //       before destroying the vmm
+        logInfo("x86_64: freeing pml4 {p}", (usize)_pml4);
+        auto range = Hal::PmmRange{_mapper.unmap((usize)_pml4), Hal::PAGE_SIZE};
+        _pmm.free(range).unwrap();
     }
 };
 
-Res<Strong<Core::Space>> createSpace() {
+Res<Strong<Hal::Vmm>> createVmm() {
     auto pml4Mem = Core::kmm()
                        .allocRange(Hal::PAGE_SIZE)
                        .unwrap("failed to allocate pml4");
@@ -292,12 +294,12 @@ Res<Strong<Core::Space>> createSpace() {
     zeroFill(pml4Mem.mutBytes());
     auto *pml4 = pml4Mem.as<x86_64::Pml<4>>();
 
-    // Copy the kernel part of the pml4
+    // NOTE: Copy the kernel part of the pml4
     for (usize i = _pml4->LEN / 2; i < _pml4->LEN; i++) {
         pml4->pages[i] = _pml4->pages[i];
     }
 
-    return Ok(makeStrong<Space>(pml4));
+    return Ok(makeStrong<ManagedVmm>(pml4));
 }
 
 void yield() {

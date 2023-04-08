@@ -102,13 +102,13 @@ Res<> load(Sys::Path kernelPath, Entry const &entry) {
     auto vmm = try$(Fw::createVmm());
 
     logInfo("loader: mapping kernel...");
-    try$(vmm->allocRange(
+    try$(vmm->mapRange(
         {Handover::KERNEL_BASE + Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         {Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     logInfo("loader: mapping upper half...");
-    try$(vmm->allocRange(
+    try$(vmm->mapRange(
         {Handover::UPPER_HALF + Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
         {Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
         Hal::Vmm::READ | Hal::Vmm::WRITE));
@@ -116,7 +116,7 @@ Res<> load(Sys::Path kernelPath, Entry const &entry) {
     logInfo("loader: mapping loader image...");
     auto loaderImage = Fw::imageRange();
 
-    try$(vmm->allocRange(
+    try$(vmm->mapRange(
         Hal::identityMapped(loaderImage),
         loaderImage,
         Hal::Vmm::READ | Hal::Vmm::WRITE));

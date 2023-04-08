@@ -20,40 +20,39 @@ static Heap _heapImpl = {
             .unwrap("heap: failed to free block");
     },
     .log = [](void *, enum HeapLogType type, char const *msg, va_list) {
-        if (type == HEAP_ERROR) {
+        if (type == HEAP_ERROR)
             logError("heap: {}", msg);
-        }
     },
 };
 
 /* --- New/Delete Implementation -------------------------------------------- */
 
-void *__attribute__((weak)) operator new(usize size) {
+void *operator new(usize size) {
     LockScope scope(_heapLock);
     return heap_calloc(&_heapImpl, size, 1);
 }
 
-void *__attribute__((weak)) operator new[](usize size) {
+void *operator new[](usize size) {
     LockScope scope(_heapLock);
     return heap_calloc(&_heapImpl, size, 1);
 }
 
-void __attribute__((weak)) operator delete(void *ptr) {
+void operator delete(void *ptr) {
     LockScope scope(_heapLock);
     heap_free(&_heapImpl, ptr);
 }
 
-void __attribute__((weak)) operator delete[](void *ptr) {
+void operator delete[](void *ptr) {
     LockScope scope(_heapLock);
     heap_free(&_heapImpl, ptr);
 }
 
-void __attribute__((weak)) operator delete(void *ptr, usize) {
+void operator delete(void *ptr, usize) {
     LockScope scope(_heapLock);
     heap_free(&_heapImpl, ptr);
 }
 
-void __attribute__((weak)) operator delete[](void *ptr, usize) {
+void operator delete[](void *ptr, usize) {
     LockScope scope(_heapLock);
     heap_free(&_heapImpl, ptr);
 }

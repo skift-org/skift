@@ -36,32 +36,41 @@ Task &Task::self() {
 }
 
 Res<> Task::block(Blocker blocker) {
-    ObjectLockScope scope(*this);
-
+    // NOTE: Can't use ObjectLockScope here because we need to yield
+    //       outside of the lock.
+    _lock.acquire();
     _block = std::move(blocker);
+    _lock.release();
     Sched::instance().yield();
     return Ok();
 }
 
-void Task::crash() {
+bool Task::unblock(TimeStamp now) {
     ObjectLockScope scope(*this);
 
+    if (_block) {
+        if (Op::gt((*_block)(), now)) {
+            return false;
+        }
+        _block = NONE;
+    }
+
+    return false;
+}
+
+void Task::crash() {
     logError("task: crashed");
+    ObjectLockScope scope(*this);
     _ret = -1;
-    Sched::instance().yield();
 }
 
 void Task::ret(Hj::Arg val) {
-    ObjectLockScope scope(*this);
-
     logInfo("task: returning from task");
+    ObjectLockScope scope(*this);
     _ret = val;
-    Sched::instance().yield();
 }
 
 Res<Hj::Arg> Task::wait(Strong<Task> task) {
-    ObjectLockScope scope(*this);
-
     Hj::Arg ret;
     try$(block([&]() {
         if (not task->_ret)
@@ -74,11 +83,25 @@ Res<Hj::Arg> Task::wait(Strong<Task> task) {
 }
 
 void Task::enterSupervisorMode() {
+    ObjectLockScope scope(*this);
     _mode = TaskMode::SUPER;
 }
 
 void Task::leaveSupervisorMode() {
+    // NOTE: Can't use ObjectLockScope here because we need to yield
+    //       outside of the lock.
+    _lock.acquire();
     _mode = TaskMode::USER;
+    bool shouldYield = _ret;
+    _lock.release();
+
+    if (shouldYield)
+        Sched::instance().yield();
+}
+
+void Task::enterIdleMode() {
+    ObjectLockScope scope(*this);
+    _mode = TaskMode::IDLE;
 }
 
 } // namespace Hjert::Core

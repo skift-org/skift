@@ -39,10 +39,10 @@ struct Vmm {
 
     virtual ~Vmm() = default;
 
-    virtual Res<VmmRange> allocRange(VmmRange vaddr, PmmRange paddr, VmmFlags flags) = 0;
+    virtual Res<VmmRange> mapRange(VmmRange vaddr, PmmRange paddr, VmmFlags flags) = 0;
 
     Res<VmmMem> mapOwned(VmmRange vaddr, PmmRange paddr, VmmFlags flags) {
-        auto range = try$(allocRange(vaddr, paddr, flags));
+        auto range = try$(mapRange(vaddr, paddr, flags));
         return Ok(VmmMem{*this, range});
     }
 

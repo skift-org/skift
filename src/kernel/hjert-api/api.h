@@ -1,161 +1,182 @@
 #pragma once
 
-#include <hal/vmm.h>
-#include <karm-base/array.h>
-#include <karm-base/enum.h>
-#include <karm-base/macros.h>
-#include <karm-base/res.h>
+#include <karm-base/string.h>
+
+#include "raw.h"
 
 namespace Hj {
 
-/* --- Basic Data Types ----------------------------------------------------- */
-
-enum struct Type {
-    NONE,
-
-    DOMAIN,
-    TASK,
-    SPACE,
-    MEM,
-    IO,
-};
-
-enum struct Syscall {
-    NONE,
-
-    LOG,
-
-    CREATE_DOMAIN,
-    CREATE_TASK,
-    CREATE_SPACE,
-    CREATE_MEM,
-    CREATE_IO,
-
-    DROP,
-    DUP,
-
-    START,
-    WAIT,
-    RET,
-
-    MAP,
-    UNMAP,
-
-    IN,
-    OUT,
-
-    IPC,
-
-    _LEN,
-};
-
-using Arg = usize;
-
-using Args = Array<Arg, 6>;
-
-enum struct MsgFlags {
-    NONE = 0,
-
-    CAP0 = 1 << 0,
-    CAP1 = 1 << 1,
-    CAP2 = 1 << 2,
-    CAP3 = 1 << 3,
-    CAP4 = 1 << 4,
-    CAP5 = 1 << 5,
-};
-
-struct Msg {
-    Arg label;
-    MsgFlags flags{};
-    Args args{};
-
-    constexpr Msg(Arg label)
-        : label(label) {}
-};
-
-struct Cap {
-    Arg _raw;
-
-    constexpr Arg raw() const { return _raw; }
-};
-
-inline constexpr Cap SELF = Cap{0};
-
-/* --- Syscall Interface ---------------------------------------------------- */
-
-Res<> syscall(Syscall syscall, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4 = 0, Arg a5 = 0);
-
-Res<> log(char const *msg, usize len);
-
-Res<> createDomain(Cap dest, Cap *cap, usize len = 512);
-
-Res<> createTask(Cap dest, Cap *cap, Cap node, Cap space);
-
-Res<> createSpace(Cap dest, Cap *cap);
-
-enum struct MemFlags : Arg {
-    NONE = 0,
-    LOW = 1 << 0,
-    HIGH = 1 << 1,
-    DMA = 1 << 2,
-};
-
-FlagsEnum$(MemFlags);
-
-Res<> createMem(Cap dest, Cap *cap, usize phys, usize len, MemFlags flags = MemFlags::NONE);
-
-Res<> createIo(Cap dest, Cap *cap, usize base, usize len);
-
-Res<> drop(Cap cap);
-
-Res<> dup(Cap node, Cap *dst, Cap src);
-
-Res<> start(Cap cap, usize ip, usize sp, Args const *args);
-
-Res<> wait(Cap cap, Arg *ret);
-
-Res<> ret(Cap cap, Arg ret);
-
-using MapFlags = Hal::VmmFlags;
-
-Res<> map(Cap cap, usize *virt, Cap mem, usize off, usize len, MapFlags flags = MapFlags::NONE);
-
-Res<> unmap(Cap cap, usize virt, usize len);
-
-enum struct IoLen : Arg {
-    U8,
-    U16,
-    U32,
-    U64,
-};
-
-inline usize ioLen2Bytes(IoLen len) {
-    switch (len) {
-    case IoLen::U8:
-        return 1;
-    case IoLen::U16:
-        return 2;
-    case IoLen::U32:
-        return 4;
-    case IoLen::U64:
-        return 8;
-    }
-    return 0;
+inline Res<usize> log(Str msg) {
+    try$(_log(msg.buf(), msg.len()));
+    return Ok(msg.len());
 }
 
-Res<> in(Cap cap, IoLen len, usize port, Arg *val);
+struct RaiiCap {
+    Cap _cap;
 
-Res<> out(Cap cap, IoLen len, usize port, Arg val);
+    RaiiCap(Cap cap)
+        : _cap(cap) {}
 
-enum IpcFlags : Arg {
-    NONE = 0,
-    SEND = 1 << 0,
-    RECV = 1 << 1,
-    BLOCK = 1 << 2,
+    RaiiCap(RaiiCap &&other)
+        : _cap(std::exchange(other._cap, {})) {
+    }
+
+    RaiiCap(RaiiCap const &) = delete;
+
+    ~RaiiCap() {
+        if (not _cap.isSpecial())
+            _drop(_cap).unwrap();
+    }
+
+    Res<> drop() {
+        try$(_drop(_cap));
+        _cap = {};
+        return Ok();
+    }
+
+    operator Cap() const {
+        return _cap;
+    }
 };
 
-FlagsEnum$(IpcFlags);
+struct Domain {
+    RaiiCap _cap;
 
-Res<> ipc(Cap *cap, Cap dst, Msg *msg, IpcFlags flags = IpcFlags::NONE);
+    static Domain self() {
+        return Domain{CSELF};
+    }
+
+    Res<> drop() {
+        return _drop(_cap);
+    }
+
+    operator Cap() const {
+        return _cap;
+    }
+};
+
+inline Res<Domain> createDomain(Cap dest, usize len) {
+    Cap cap;
+    try$(_createDomain(dest, &cap, len));
+    return Ok(Domain{cap});
+}
+
+struct Task {
+    RaiiCap _cap;
+
+    static Task self() {
+        return Task{CSELF};
+    }
+
+    Res<> drop() {
+        return _cap.drop();
+    }
+
+    Res<> start(usize ip, usize sp, Args args) {
+        return _start(_cap, ip, sp, &args);
+    }
+
+    Res<Arg> wait() {
+        Arg arg;
+        try$(_wait(_cap, &arg));
+        return Ok(arg);
+    }
+
+    Res<> ret(Arg ret = 0) {
+        return _ret(_cap, ret);
+    }
+
+    operator Cap() const {
+        return _cap;
+    }
+};
+
+inline Res<Task> createTask(Cap dest, Cap node, Cap space) {
+    Cap cap;
+    try$(_createTask(dest, &cap, node, space));
+    return Ok(Task{cap});
+}
+
+struct Space {
+    RaiiCap _cap;
+
+    static Space self() {
+        return Space{CSELF};
+    }
+
+    Res<> drop() {
+        return _cap.drop();
+    }
+
+    Res<> map(usize *virt, Cap mem, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+        return _map(_cap, virt, mem, off, len, flags);
+    }
+
+    Res<usize> map(Cap mem, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+        usize virt = 0;
+        try$(_map(_cap, &virt, mem, off, len, flags));
+        return Ok(virt);
+    }
+
+    Res<> unmap(usize virt, usize len) {
+        return _unmap(_cap, virt, len);
+    }
+
+    operator Cap() const {
+        return _cap;
+    }
+};
+
+inline Res<Space> createSpace(Cap dest) {
+    Cap cap;
+    try$(_createSpace(dest, &cap));
+    return Ok(Space{cap});
+}
+
+struct Mem {
+    RaiiCap _cap;
+
+    Res<> drop() {
+        return _cap.drop();
+    }
+
+    operator Cap() const {
+        return _cap;
+    }
+};
+
+inline Res<Mem> createMem(Cap dest, usize phys, usize len, MemFlags flags = MemFlags::NONE) {
+    Cap cap;
+    try$(_createMem(dest, &cap, phys, len, flags));
+    return Ok(Mem{cap});
+}
+
+struct Io {
+    RaiiCap _cap;
+
+    Res<> drop() {
+        return _cap.drop();
+    }
+
+    Res<Arg> in(IoLen len, usize port) {
+        Arg val;
+        try$(_in(_cap, len, port, &val));
+        return Ok(val);
+    }
+
+    Res<> out(IoLen len, usize port, Arg val) {
+        return _out(_cap, len, port, val);
+    }
+
+    operator Cap() const {
+        return _cap;
+    }
+};
+
+inline Res<Io> createIo(Cap dest, usize base, usize len) {
+    Cap cap;
+    try$(_createIo(dest, &cap, base, len));
+    return Ok(Io{cap});
+}
 
 } // namespace Hj

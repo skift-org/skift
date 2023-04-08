@@ -56,9 +56,11 @@ Res<> enterUserspace(Handover::Payload &payload) {
     }
 
     auto space = try$(Space::create());
+    space->label("init-space");
 
     logInfo("entry: mapping elf...");
     auto elfMem = try$(VNode::makeDma(record->range<Hal::DmaRange>()));
+    elfMem->label("elf");
     auto elfRange = try$(kmm().pmm2Kmm(elfMem->range()));
     Elf::Image image{elfRange.bytes()};
 
@@ -68,8 +70,6 @@ Res<> enterUserspace(Handover::Payload &payload) {
     }
 
     for (auto prog : image.programs()) {
-        logInfo("entry: program: {x} {x} {x} {x}", prog.offset(), prog.vaddr(), prog.memsz(), prog.filez());
-
         if (prog.type() != Elf::Program::LOAD) {
             continue;
         }
@@ -77,7 +77,8 @@ Res<> enterUserspace(Handover::Payload &payload) {
         usize size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
 
         if ((prog.flags() & Elf::ProgramFlags::WRITE) == Elf::ProgramFlags::WRITE) {
-            auto sectionMem = try$(VNode::alloc(size, Hj::MemFlags::NONE));
+            auto sectionMem = try$(VNode::alloc(size, Hj::MemFlags::HIGH));
+            sectionMem->label("elf-section");
             auto sectionRange = try$(kmm().pmm2Kmm(sectionMem->range()));
             copy(prog.bytes(), sectionRange.mutBytes());
             try$(space->map({prog.vaddr(), size}, sectionMem, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
@@ -89,10 +90,14 @@ Res<> enterUserspace(Handover::Payload &payload) {
     logInfo("entry: mapping stack...");
     auto STACK_SIZE = kib(16);
     auto stackMem = try$(VNode::alloc(STACK_SIZE, Hj::MemFlags::HIGH));
+    stackMem->label("stack");
     auto stackRange = try$(space->map({}, stackMem, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
 
     logInfo("entry: creating task...");
-    auto task = try$(Task::create(TaskType::USER, space));
+    auto domain = try$(Domain::create(4096));
+    domain->label("init-domain");
+    auto task = try$(Task::create(TaskType::USER, space, domain));
+    task->label("init-task");
     try$(Sched::instance().start(task, image.header().entry, stackRange.end()));
 
     return Ok();
@@ -114,6 +119,9 @@ Res<> init(u64 magic, Handover::Payload &payload) {
     logInfo("entry: entering userspace...");
     try$(enterUserspace(payload));
 
+    logInfo("entry: entering idle loop...");
+    Task::self().label("idle");
+    Task::self().enterIdleMode();
     while (true)
         Arch::cpu().relaxe();
 }

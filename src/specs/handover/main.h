@@ -17,6 +17,7 @@ extern "C" void _kstart(u64 magic, Handover::Payload *payload) {
         panic(res.none().msg());
     }
 
+    Abi::SysV::fini();
     panic("handover: entryPoint returned ok");
 }
 

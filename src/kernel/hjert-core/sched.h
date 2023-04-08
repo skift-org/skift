@@ -14,7 +14,7 @@ struct Sched {
 
     Vec<Strong<Task>> _tasks;
     Strong<Task> _curr;
-    Strong<Task> _next;
+    Strong<Task> _idle;
 
     static Res<> init(Handover::Payload &);
 
@@ -25,7 +25,9 @@ struct Sched {
     }
 
     Sched(Strong<Task> bootTask)
-        : _tasks{bootTask}, _curr(bootTask), _next(bootTask) {
+        : _tasks{bootTask},
+          _curr(bootTask),
+          _idle(bootTask) {
     }
 
     Res<> start(Strong<Task> task, usize ip) {
@@ -37,14 +39,6 @@ struct Sched {
     void schedule(TimeSpan span);
 
     void yield();
-};
-
-struct SchedLockScope {
-    LockScope _scope;
-
-    SchedLockScope()
-        : _scope(Sched::lock()) {
-    }
 };
 
 } // namespace Hjert::Core

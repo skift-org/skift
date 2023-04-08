@@ -2,7 +2,7 @@
 
 #include <hal/vmm.h>
 #include <handover/spec.h>
-#include <hjert-api/api.h>
+#include <hjert-api/raw.h>
 #include <karm-base/box.h>
 #include <karm-base/rc.h>
 #include <karm-io/traits.h>
@@ -35,7 +35,7 @@ void start(Core::Task &, usize ip, usize sp, Hj::Args args);
 
 Res<Box<Core::Ctx>> createCtx(usize ksp);
 
-Res<Strong<Core::Space>> createSpace();
+Res<Strong<Hal::Vmm>> createVmm();
 
 void yield();
 

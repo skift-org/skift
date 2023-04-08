@@ -3,7 +3,7 @@
 #include <hal/io.h>
 #include <hal/pmm.h>
 #include <hal/vmm.h>
-#include <hjert-api/api.h>
+#include <hjert-api/raw.h>
 #include <karm-base/lock.h>
 #include <karm-base/rc.h>
 #include <karm-base/ring.h>

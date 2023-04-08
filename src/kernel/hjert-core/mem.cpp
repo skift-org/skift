@@ -149,13 +149,13 @@ Res<> init(Handover::Payload &payload) {
     try$(_pmm->used({pmmBits.start, pmmBits.size}, Hal::PmmFlags::NONE));
 
     logInfo("mem: mapping kernel...");
-    try$(vmm().allocRange(
+    try$(vmm().mapRange(
         {Handover::KERNEL_BASE + Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         {Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     logInfo("mem: mapping upper half...");
-    try$(vmm().allocRange(
+    try$(vmm().mapRange(
         {Handover::UPPER_HALF + Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
         {Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
         Hal::Vmm::READ | Hal::Vmm::WRITE));
@@ -169,14 +169,14 @@ Res<> init(Handover::Payload &payload) {
 
 Hal::Pmm &pmm() {
     if (not _pmm) {
-        logFatal("mem: pmm not initialized");
+        logFatal("mem: pmm not initialized yet");
     }
     return *_pmm;
 }
 
 Hal::Kmm &kmm() {
     if (not _kmm) {
-        logFatal("mem: heap not initialized");
+        logFatal("mem: heap not initialized yet");
     }
     return *_kmm;
 }

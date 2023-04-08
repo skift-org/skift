@@ -2,12 +2,13 @@
 
 #include <hal/io.h>
 #include <hal/vmm.h>
-#include <hjert-api/api.h>
+#include <hjert-api/raw.h>
 #include <hjert-core/mem.h>
 #include <karm-base/lock.h>
 #include <karm-base/range-alloc.h>
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
+#include <karm-logger/logger.h>
 
 #include "object.h"
 
@@ -17,13 +18,19 @@ struct VNode : public BaseObject<VNode> {
     using _Mem = Var<Hal::PmmMem, Hal::DmaRange>;
     _Mem _mem;
 
-    VNode(_Mem mem);
+    VNode(_Mem mem)
+        : BaseObject(Hj::Type::MEM),
+          _mem(std::move(mem)) {}
 
     static Res<Strong<VNode>> alloc(usize size, Hj::MemFlags);
 
     static Res<Strong<VNode>> makeDma(Hal::DmaRange prange);
 
     Hal::PmmRange range();
+
+    bool isDma() {
+        return _mem.is<Hal::DmaRange>();
+    }
 };
 
 struct Space : public BaseObject<Space> {
@@ -33,16 +40,22 @@ struct Space : public BaseObject<Space> {
         Strong<VNode> mem;
     };
 
+    Strong<Hal::Vmm> _vmm;
     RangeAlloc<Hal::VmmRange> _alloc;
     Vec<Map> _maps;
 
-    Space() {
+    Space(Strong<Hal::Vmm> vmm)
+        : BaseObject(Hj::Type::SPACE),
+          _vmm(vmm) {
         _alloc.unused(Hal::VmmRange{0x400000, 0x800000000000});
     }
 
-    virtual ~Space() = default;
-
-    virtual Hal::Vmm &vmm() = 0;
+    ~Space() {
+        while (_maps.len()) {
+            unmap(_maps.peekFront().vrange)
+                .unwrap("unmap failed");
+        }
+    }
 
     static Res<Strong<Space>> create();
 

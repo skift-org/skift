@@ -1,4 +1,5 @@
 
+#include <karm-cli/style.h>
 #include <karm-logger/logger.h>
 
 #include "arch.h"
@@ -10,7 +11,9 @@ namespace Hjert::Core {
 
 Res<> doLog(Task &self, char const *msg, usize len) {
     (void)self;
-    logInfo("doLog: '{}'", Str{msg, len});
+
+    auto styledLabel = Cli::styled(self.label(), Cli::style(Cli::random(self.id())).bold());
+    logInfo("{}#{}: {}", styledLabel, self.id(), Str{msg, len});
     return Ok();
 }
 
@@ -49,6 +52,12 @@ Res<> doCreateIo(Task &self, Hj::Cap dest, Hj::Cap *cap, usize base, usize len) 
     return Ok();
 }
 
+Res<> doLabel(Task &self, Hj::Cap cap, char const *label, usize len) {
+    auto obj = try$(self.domain().get(cap));
+    obj->label({label, len});
+    return Ok();
+}
+
 Res<> doDrop(Task &self, Hj::Cap cap) {
     return self.domain().drop(cap);
 }
@@ -73,8 +82,13 @@ Res<> doWait(Task &self, Hj::Cap cap, Hj::Arg *ret) {
 }
 
 Res<> doRet(Task &self, Hj::Cap cap, Hj::Arg ret) {
-    auto task = try$(self.domain().get<Task>(cap));
-    task->ret(ret);
+    if (cap.isSelf()) {
+        self.ret(ret);
+    } else {
+        auto task = try$(self.domain().get<Task>(cap));
+        task->ret(ret);
+    }
+    
     return Ok();
 }
 
@@ -131,6 +145,9 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
     case Hj::Syscall::CREATE_IO:
         return doCreateIo(self, Hj::Cap{args[0]}, (Hj::Cap *)args[1], args[2], args[3]);
 
+    case Hj::Syscall::LABEL:
+        return doLabel(self, Hj::Cap{args[0]}, (char const *)args[1], args[2]);
+
     case Hj::Syscall::DROP:
         return doDrop(self, Hj::Cap{args[0]});
 
@@ -167,9 +184,15 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
 }
 
 Res<> doSyscall(Hj::Syscall id, Hj::Args args) {
+
     auto &self = Task::self();
     self.enterSupervisorMode();
     auto res = dispatchSyscall(self, id, args);
+    if (not res) {
+        logError("Syscall {}({}) failed: {}", Hj::toStr(id), (Hj::Arg)id, res.none().msg());
+        for (auto i = 0; i < 6; ++i)
+            logDebug("    arg{}: {p} {}", i, (usize)args[i], (isize)args[i]);
+    }
     self.leaveSupervisorMode();
     return res;
 }

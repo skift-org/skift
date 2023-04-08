@@ -88,6 +88,16 @@ struct [[gnu::packed]] Pml {
     void putPage(usize vaddr, Entry page) {
         pages[virt2index(vaddr)] = page;
     }
+
+    bool empty() const {
+        for (usize i = 0; i < LEN; i++) {
+            if (pages[i].present()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 };
 
 static_assert(sizeof(Pml<1>) == 0x1000);

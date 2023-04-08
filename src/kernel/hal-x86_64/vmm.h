@@ -46,11 +46,13 @@ struct Vmm : public Hal::Vmm {
         return Ok(_mapper.map((Pml<L - 1> *)lower));
     }
 
-    Res<> freePage(usize vaddr, usize paddr, Hal::VmmFlags) {
+    Res<> allocPage(usize vaddr, usize paddr, Hal::VmmFlags) {
         auto pml3 = try$(pmlOrAlloc(*_pml4, vaddr));
         auto pml2 = try$(pmlOrAlloc(*pml3, vaddr));
         auto pml1 = try$(pmlOrAlloc(*pml2, vaddr));
+
         pml1->putPage(vaddr, {paddr, Entry::WRITE | Entry::PRESENT | Entry::USER});
+
         return Ok();
     }
 
@@ -59,16 +61,32 @@ struct Vmm : public Hal::Vmm {
         auto pml2 = try$(pml(*pml3, vaddr));
         auto pml1 = try$(pml(*pml2, vaddr));
         pml1->putPage(vaddr, {});
+
+        if (pml1->empty()) {
+            pml2->putPage(vaddr, {});
+            try$(_pmm.free({_mapper.unmap((usize)pml1), Hal::PAGE_SIZE}));
+        }
+
+        if (pml2->empty()) {
+            pml3->putPage(vaddr, {});
+            try$(_pmm.free({_mapper.unmap((usize)pml2), Hal::PAGE_SIZE}));
+        }
+
+        if (pml3->empty()) {
+            _pml4->putPage(vaddr, {});
+            try$(_pmm.free({_mapper.unmap((usize)pml3), Hal::PAGE_SIZE}));
+        }
+
         return Ok();
     }
 
-    Res<Hal::VmmRange> allocRange(Hal::VmmRange vaddr, Hal::PmmRange paddr, Hal::VmmFlags flags) override {
+    Res<Hal::VmmRange> mapRange(Hal::VmmRange vaddr, Hal::PmmRange paddr, Hal::VmmFlags flags) override {
         if (paddr.size != vaddr.size) {
             return Error::invalidInput();
         }
 
         for (usize page = 0; page < vaddr.size; page += Hal::PAGE_SIZE) {
-            try$(freePage(vaddr.start + page, paddr.start + page, flags));
+            try$(allocPage(vaddr.start + page, paddr.start + page, flags));
         }
         return Ok(vaddr);
     }

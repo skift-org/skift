@@ -87,6 +87,8 @@ struct _Vec {
 
     /* --- Front Access --- */
 
+    T const &peekFront() const { return _buf[0]; }
+
     void pushFront(T const &value) { _buf.insert(T(value)); }
 
     void pushFront(T &&value) { _buf.insert(0, std::move(value)); }
@@ -97,6 +99,8 @@ struct _Vec {
     T popFront() { return _buf.removeAt(0); }
 
     /* --- Back Access --- */
+
+    T const &peekBack() const { return _buf[_buf.len() - 1]; }
 
     void pushBack(T const &value) { insert(len(), value); }
 

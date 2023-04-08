@@ -3,18 +3,25 @@
 namespace Embed {
 
 void debug(char const *buf) {
-    Hj::log(buf, strlen(buf)).unwrap();
+    Hj::log(buf).unwrap();
 }
 
 [[noreturn]] void panic(char const *buf) {
-    Hj::log(buf, strlen(buf)).unwrap();
-    Hj::ret(Hj::SELF, -1).unwrap();
+    Hj::log(buf).unwrap();
+    Hj::Task::self().ret(-1).unwrap();
     __builtin_unreachable();
 }
 
-void relaxe() {}
+void relaxe() {
+#if defined(__x86_64__)
+    asm volatile("pause");
+#else
+#    error "Unsupported architecture"
+#endif
+}
 
-void enterCritical() {}
+void enterCritical() {
+}
 
 void leaveCritical() {}
 

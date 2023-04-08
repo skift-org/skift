@@ -2,6 +2,7 @@
 
 #include <karm-meta/traits.h>
 
+#include "lock.h"
 #include "opt.h"
 #include "ordr.h"
 #include "ref.h"
@@ -9,6 +10,7 @@
 namespace Karm {
 
 struct _Cell {
+    Lock _lock;
     bool _clear = false;
     isize _strong = 0;
     isize _weak = 0;
@@ -32,6 +34,8 @@ struct _Cell {
     }
 
     _Cell *refStrong() {
+        LockScope scope{_lock};
+        
         if (_clear)
             panic("refStrong() called on cleared cell");
         _strong++;
@@ -41,6 +45,8 @@ struct _Cell {
     }
 
     _Cell *derefStrong() {
+        LockScope scope{_lock};
+
         _strong--;
         if (_strong < 0)
             panic("derefStrong() underflow");
@@ -48,6 +54,8 @@ struct _Cell {
     }
 
     _Cell *refWeak() {
+        LockScope scope{_lock};
+
         _weak++;
         if (_weak < 0)
             panic("refWeak() overflow");
@@ -55,6 +63,8 @@ struct _Cell {
     }
 
     _Cell *derefWeak() {
+        LockScope scope{_lock};
+
         _weak--;
         if (_weak < 0)
             panic("derefWeak() underflow");

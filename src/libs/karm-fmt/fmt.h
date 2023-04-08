@@ -85,8 +85,6 @@ struct NumberFormater {
             value /= base;
         } while (value != 0 && i < buf.len());
 
-        reverse(mutSub(buf, 0, i));
-
         if (width > 0) {
             usize n = width - i;
             if (fillZero) {
@@ -100,6 +98,7 @@ struct NumberFormater {
             }
         }
 
+        reverse(mutSub(buf, 0, i));
         return writer.writeStr({buf.buf(), i});
     }
 

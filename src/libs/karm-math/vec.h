@@ -108,22 +108,26 @@ union Vec2 {
     }
 
     template <typename U>
-    constexpr auto operator+(Vec2<U> const &other) const -> Vec2<decltype(T{} + U{})> {
+    constexpr auto operator+(Vec2<U> const &other) const
+        -> Vec2<decltype(T{} + U{})> {
         return {x + other.x, y + other.y};
     }
 
     template <typename U>
-    constexpr auto operator-(Vec2<U> const &other) const -> Vec2<decltype(T{} - U{})> {
+    constexpr auto operator-(Vec2<U> const &other) const
+        -> Vec2<decltype(T{} - U{})> {
         return {x - other.x, y - other.y};
     }
 
     template <typename U>
-    constexpr auto operator*(Vec2<U> const &other) const -> Vec2<decltype(T{} * U{})> {
+    constexpr auto operator*(Vec2<U> const &other) const
+        -> Vec2<decltype(T{} * U{})> {
         return {x * other.x, y * other.y};
     }
 
     template <typename U>
-    constexpr auto operator/(Vec2<U> const &other) const -> Vec2<decltype(T{} / U{})> {
+    constexpr auto operator/(Vec2<U> const &other) const
+        -> Vec2<decltype(T{} / U{})> {
         return {x / other.x, y / other.y};
     }
 
@@ -215,11 +219,19 @@ union Vec3 {
     }
 
     constexpr Vec3 min(Vec3 const &other) {
-        return {Karm::min(x, other.x), Karm::min(y, other.y), Karm::min(z, other.z)};
+        return {
+            Karm::min(x, other.x),
+            Karm::min(y, other.y),
+            Karm::min(z, other.z),
+        };
     }
 
     constexpr Vec3 max(Vec3<T> const &other) {
-        return {Karm::max(x, other.x), Karm::max(y, other.y), Karm::max(z, other.z)};
+        return {
+            Karm::max(x, other.x),
+            Karm::max(y, other.y),
+            Karm::max(z, other.z),
+        };
     }
 
     constexpr T dot(Vec3 const &other) const {
@@ -263,19 +275,27 @@ union Vec3 {
         return {x / other, y / other, z / other};
     }
 
-    constexpr Vec3 operator+(Vec3 const &other) const {
+    template <typename U>
+    constexpr auto operator+(Vec3 const &other) const
+        -> Vec3<decltype(T{} + U{})> {
         return {x + other.x, y + other.y, z + other.z};
     }
 
-    constexpr Vec3 operator-(Vec3 const &other) const {
+    template <typename U>
+    constexpr auto operator-(Vec3 const &other) const
+        -> Vec3<decltype(T{} - U{})> {
         return {x - other.x, y - other.y, z - other.z};
     }
 
-    constexpr Vec3 operator*(Vec3 const &other) const {
+    template <typename U>
+    constexpr auto operator*(Vec3 const &other) const
+        -> Vec3<decltype(T{} * U{})> {
         return {x * other.x, y * other.y, z * other.z};
     }
 
-    constexpr Vec3 operator/(Vec3 const &other) const {
+    template <typename U>
+    constexpr auto operator/(Vec3 const &other) const
+        -> Vec3<decltype(T{} / U{})> {
         return {x / other.x, y / other.y, z / other.z};
     }
 
@@ -289,7 +309,11 @@ union Vec3 {
 
     template <typename U>
     constexpr Vec3<U> cast() const {
-        return {static_cast<U>(x), static_cast<U>(y), static_cast<U>(z)};
+        return {
+            static_cast<U>(x),
+            static_cast<U>(y),
+            static_cast<U>(z),
+        };
     }
 };
 
@@ -364,11 +388,21 @@ union Vec4 {
     }
 
     constexpr Vec4 min(Vec4 const &other) {
-        return {min(x, other.x), min(y, other.y), min(z, other.z), min(w, other.w)};
+        return {
+            min(x, other.x),
+            min(y, other.y),
+            min(z, other.z),
+            min(w, other.w),
+        };
     }
 
     constexpr Vec4 max(Vec4 const &other) {
-        return {max(x, other.x), max(y, other.y), max(z, other.z), max(w, other.w)};
+        return {
+            max(x, other.x),
+            max(y, other.y),
+            max(z, other.z),
+            max(w, other.w),
+        };
     }
 
     constexpr T dot(Vec4 const &other) const {
@@ -408,19 +442,27 @@ union Vec4 {
         return {x / other, y / other, z / other, w / other};
     }
 
-    constexpr Vec4 operator+(Vec4 const &other) const {
+    template <typename U>
+    constexpr auto operator+(Vec4<U> const &other) const
+        -> Vec4<decltype(T{} + U{})> {
         return {x + other.x, y + other.y, z + other.z, w + other.w};
     }
 
-    constexpr Vec4 operator-(Vec4 const &other) const {
+    template <typename U>
+    constexpr auto operator-(Vec4<U> const &other) const
+        -> Vec4<decltype(T{} - U{})> {
         return {x - other.x, y - other.y, z - other.z, w - other.w};
     }
 
-    constexpr Vec4 operator*(Vec4 const &other) const {
+    template <typename U>
+    constexpr auto operator*(Vec4<U> const &other) const
+        -> Vec4<decltype(T{} * U{})> {
         return {x * other.x, y * other.y, z * other.z, w * other.w};
     }
 
-    constexpr Vec4 operator/(Vec4 const &other) const {
+    template <typename U>
+    constexpr auto operator/(Vec4<U> const &other) const
+        -> Vec4<decltype(T{} / U{})> {
         return {x / other.x, y / other.y, z / other.z, w / other.w};
     }
 
@@ -430,6 +472,16 @@ union Vec4 {
 
     bool hasNan() const {
         return isnan(x) or isnan(y) or isnan(z) or isnan(w);
+    }
+
+    template <typename U>
+    constexpr Vec4<U> cast() const {
+        return {
+            static_cast<U>(x),
+            static_cast<U>(y),
+            static_cast<U>(z),
+            static_cast<U>(w),
+        };
     }
 };
 

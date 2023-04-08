@@ -54,6 +54,14 @@ struct Atomic {
         return __atomic_fetch_add(&_val, 1, order);
     }
 
+    void inc(MemOrder order = MemOrder::SEQ_CST) {
+        __atomic_add_fetch(&_val, 1, order);
+    }
+
+    void dec(MemOrder order = MemOrder::SEQ_CST) {
+        __atomic_sub_fetch(&_val, 1, order);
+    }
+
     T fetchDec(MemOrder order = MemOrder::SEQ_CST) {
         return __atomic_fetch_sub(&_val, 1, order);
     }

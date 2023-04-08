@@ -105,4 +105,101 @@ struct LockProtected {
     }
 };
 
+struct RwLock : Meta::Static {
+    Lock _lock;
+    Atomic<isize> _pendings{};
+    isize _readers{};
+    isize _writers{};
+
+    void acquireRead() {
+        Embed::enterCritical();
+
+        while (not tryAcquireRead()) {
+            Embed::relaxe();
+            memoryBarier();
+        }
+    }
+
+    bool tryAcquireRead() {
+        LockScope scope{_lock};
+
+        if (_pendings.load())
+            return false;
+
+        if (_writers)
+            return false;
+
+        ++_readers;
+
+        Embed::enterCritical();
+
+        return true;
+    }
+
+    void releaseRead() {
+        LockScope scope{_lock};
+        --_readers;
+        Embed::leaveCritical();
+    }
+
+    void acquireWrite() {
+        Embed::enterCritical();
+
+        _pendings.inc();
+
+        while (not tryAcquireWrite()) {
+            Embed::relaxe();
+            memoryBarier();
+        }
+
+        _pendings.dec();
+    }
+
+    bool tryAcquireWrite() {
+        LockScope scope{_lock};
+
+        if (_readers)
+            return false;
+
+        if (_writers)
+            return false;
+
+        ++_writers;
+        Embed::enterCritical();
+        return true;
+    }
+
+    void releaseWrite() {
+        LockScope scope{_lock};
+        --_writers;
+        Embed::leaveCritical();
+    }
+};
+
+struct ReadLockScope : Meta::Static {
+    RwLock &_lock;
+
+    ReadLockScope(RwLock &lock)
+        : _lock(lock) {
+        _lock.acquireRead();
+    }
+
+    ~ReadLockScope() {
+        _lock.releaseRead();
+    }
+};
+
+struct WriteLockScope : Meta::Static {
+    RwLock &_lock;
+
+    WriteLockScope(RwLock &lock)
+        : _lock(lock) {
+        _lock.acquireWrite();
+    }
+
+    ~WriteLockScope() {
+        _lock.releaseWrite();
+    }
+};
+
 } // namespace Karm

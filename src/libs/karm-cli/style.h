@@ -26,6 +26,14 @@ enum Color {
     WHITE = 67,
 };
 
+static inline Color random(usize seed) {
+    if (seed & 1) {
+        return (Color)((seed >> 1) % 8);
+    } else {
+        return (Color)(((seed >> 1) % 8) + 60);
+    }
+}
+
 // clang-format off
 
 inline constexpr Array LIGHT_COLORS = {

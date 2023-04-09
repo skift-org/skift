@@ -27,15 +27,19 @@ struct _Cell {
             _clear = true;
         }
 
-        if (_strong == 0 and _weak == 0)
+        if (_strong == 0 and _weak == 0) {
+            _lock.release();
             delete this;
-
-        return nullptr;
+            return nullptr;
+        } else {
+            _lock.release();
+            return nullptr;
+        }
     }
 
     _Cell *refStrong() {
         LockScope scope{_lock};
-        
+
         if (_clear)
             panic("refStrong() called on cleared cell");
         _strong++;
@@ -45,7 +49,7 @@ struct _Cell {
     }
 
     _Cell *derefStrong() {
-        LockScope scope{_lock};
+        _lock.acquire();
 
         _strong--;
         if (_strong < 0)
@@ -63,7 +67,7 @@ struct _Cell {
     }
 
     _Cell *derefWeak() {
-        LockScope scope{_lock};
+        _lock.acquire();
 
         _weak--;
         if (_weak < 0)

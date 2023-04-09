@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/clamp.h>
+#include <karm-base/cons.h>
 #include <karm-fmt/fmt.h>
 
 #include "vec.h"

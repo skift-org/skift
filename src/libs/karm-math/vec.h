@@ -38,19 +38,19 @@ union Vec2 {
         return Karm::max(x, y);
     }
 
-    constexpr Vec2 min(Vec2 const &other) const {
+    constexpr Vec2 min(Vec2 other) const {
         return {Karm::min(x, other.x), Karm::min(y, other.y)};
     }
 
-    constexpr Vec2 max(Vec2 const &other) const {
+    constexpr Vec2 max(Vec2 other) const {
         return {Karm::max(x, other.x), Karm::max(y, other.y)};
     }
 
-    constexpr T dot(Vec2 const &other) const {
+    constexpr T dot(Vec2 other) const {
         return x * other.x + y * other.y;
     }
 
-    constexpr T cross(Vec2 const &other) const {
+    constexpr T cross(Vec2 other) const {
         return x * other.y - y * other.x;
     }
 
@@ -62,7 +62,7 @@ union Vec2 {
         return dot(*this);
     }
 
-    constexpr T dist(Vec2 const &other) const {
+    constexpr T dist(Vec2 other) const {
         return (*this - other).len();
     }
 
@@ -81,7 +81,7 @@ union Vec2 {
         return {x * c - y * s, x * s + y * c};
     }
 
-    constexpr T angleWith(Vec2 const &other) const {
+    constexpr T angleWith(Vec2 other) const {
         auto r = norm().dot(other.norm());
         auto sign = (x * other.y < y * other.x) ? -1.0 : 1.0;
         return sign * acos(r);
@@ -276,25 +276,25 @@ union Vec3 {
     }
 
     template <typename U>
-    constexpr auto operator+(Vec3 const &other) const
+    constexpr auto operator+(Vec3<U> const &other) const
         -> Vec3<decltype(T{} + U{})> {
         return {x + other.x, y + other.y, z + other.z};
     }
 
     template <typename U>
-    constexpr auto operator-(Vec3 const &other) const
+    constexpr auto operator-(Vec3<U> const &other) const
         -> Vec3<decltype(T{} - U{})> {
         return {x - other.x, y - other.y, z - other.z};
     }
 
     template <typename U>
-    constexpr auto operator*(Vec3 const &other) const
+    constexpr auto operator*(Vec3<U> const &other) const
         -> Vec3<decltype(T{} * U{})> {
         return {x * other.x, y * other.y, z * other.z};
     }
 
     template <typename U>
-    constexpr auto operator/(Vec3 const &other) const
+    constexpr auto operator/(Vec3<U> const &other) const
         -> Vec3<decltype(T{} / U{})> {
         return {x / other.x, y / other.y, z / other.z};
     }

@@ -13,4 +13,16 @@ inline TimeSpan uptime() {
     return Embed::uptime();
 }
 
+inline DateTime dateTime() {
+    return DateTime::fromTimeStamp(now());
+}
+
+inline Date date() {
+    return dateTime().date;
+}
+
+inline Time time() {
+    return dateTime().time;
+}
+
 } // namespace Karm::Sys

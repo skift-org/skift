@@ -55,7 +55,7 @@ struct ConOut : public Sys::Fd {
     }
 };
 
-struct FileProto : public Sys::Fd, Meta::Static {
+struct FileProto : public Sys::Fd {
     Efi::FileProtocol *_proto = nullptr;
 
     FileProto(Efi::FileProtocol *proto) : _proto(proto) {}
@@ -224,6 +224,44 @@ Res<> populate(Sys::UserInfo &) {
 
 Res<> populate(Vec<Sys::UserInfo> &) {
     return Error::notImplemented();
+}
+
+TimeStamp now() {
+    Efi::Time t;
+    Efi::rt()->getTime(&t, nullptr).unwrap();
+
+    Date date = {
+        t.day,
+        t.month,
+        t.year,
+    };
+
+    Karm::Time time = {
+        t.hour,
+        t.minute,
+        t.second,
+    };
+
+    return DateTime{date, time}.toTimeStamp() +
+           TimeSpan::fromUSecs(t.nanosecond / 1000);
+}
+
+Res<> sleep(TimeSpan) {
+    return Error::notImplemented();
+}
+
+Res<> exit(i32) {
+    Efi::st()
+        ->runtime
+        ->resetSystem(
+            Efi::ResetType::RESET_SHUTDOWN,
+            Efi::ERR_ABORTED,
+            0,
+            nullptr)
+        .unwrap();
+
+    while (1)
+        ;
 }
 
 } // namespace Embed

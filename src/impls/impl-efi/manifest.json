@@ -13,6 +13,7 @@
         "abi"
     ],
     "provides": [
+        "embed-ui-impl",
         "embed-sys-impl",
         "embed-base-impl",
         "embed-logger-impl"

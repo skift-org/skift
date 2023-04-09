@@ -11,6 +11,7 @@
         "mpeg-spec",
         "png-spec",
         "qoi-spec",
-        "ttf-spec"
+        "ttf-spec",
+        "mdi-spec"
     ]
 }

@@ -15,7 +15,7 @@ namespace Loader {
 
 void enterKernel(usize entry, usize payload, usize stack, usize vmm);
 
-Res<> load(Sys::Path kernelPath, Entry const &entry) {
+Res<> load(Entry const &entry) {
     logInfo("loader: preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
     logInfo("loader: payload at vaddr: 0x{x} paddr: 0x{x}", payloadMem.vaddr(), payloadMem.paddr());
@@ -25,7 +25,7 @@ Res<> load(Sys::Path kernelPath, Entry const &entry) {
     payload.add(Handover::SELF, 0, payloadMem.prange());
 
     logInfo("loader: loading kernel file...");
-    Sys::File kernelFile = try$(Sys::File::open(kernelPath));
+    Sys::File kernelFile = try$(Sys::File::open(entry.kernel.path));
     auto kernelMem = try$(Sys::mmap().map(kernelFile));
     Elf::Image image{kernelMem.bytes()};
     payload.add(Handover::FILE, 0, kernelMem.prange().as<USizeRange>());

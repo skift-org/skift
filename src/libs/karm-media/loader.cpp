@@ -11,6 +11,8 @@
 namespace Karm::Media {
 
 Res<Strong<Fontface>> loadFontface(Str path) {
+    logInfo("media: loading '{}' as fontface...", path);
+
     auto file = try$(Sys::File::open(path));
     auto map = try$(Sys::mmap().map(file));
     Strong<Fontface> face = try$(TtfFontface::load(std::move(map)));
@@ -18,6 +20,8 @@ Res<Strong<Fontface>> loadFontface(Str path) {
 }
 
 Res<Font> loadFont(f64 size, Str path) {
+    logInfo("media: loading '{}' as font...", path);
+
     return Ok(Font{
         .fontface = try$(loadFontface(path)),
         .fontsize = size,

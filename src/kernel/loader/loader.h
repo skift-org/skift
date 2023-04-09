@@ -26,6 +26,7 @@ struct File {
 };
 
 struct Entry {
+    String icon;
     String name;
     File kernel;
     Vec<File> files;
@@ -37,6 +38,7 @@ struct Entry {
 
         Entry entry = {};
 
+        entry.icon = try$(json.get("icon").take<String>());
         entry.name = try$(json.get("name").take<String>());
         auto kernelJson = try$(json.get("kernel").take<Json::Object>());
         entry.kernel = try$(File::fromJson(kernelJson));
@@ -71,6 +73,6 @@ struct Configs {
     }
 };
 
-Res<> load(Sys::Path kernelPath, Entry const &entry);
+Res<> load(Entry const &entry);
 
 } // namespace Loader

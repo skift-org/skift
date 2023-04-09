@@ -1,0 +1,36 @@
+{
+    "entries": [
+        {
+            "icon": "boot/icons/skift.qoi",
+            "name": "skiftOS",
+            "kernel": {
+                "path": "/boot/kernel.elf",
+                "props": {}
+            },
+            "files": [
+                {
+                    "path": "/servers/system",
+                    "props": {}
+                }
+            ]
+        },
+        {
+            "icon": "boot/icons/lyre.qoi",
+            "name": "Lyre",
+            "kernel": {
+                "path": "/boot/linux.elf",
+                "props": {}
+            },
+            "files": []
+        },
+        {
+            "icon": "boot/icons/managarm.qoi",
+            "name": "Managarm",
+            "kernel": {
+                "path": "/boot/win.elf",
+                "props": {}
+            },
+            "files": []
+        }
+    ]
+}

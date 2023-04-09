@@ -33,6 +33,11 @@ class Image:
         shell.mkdir(Path(f"{self.root}/{dest}").parent)
         shell.cp(src, f"{self.root}/{dest}")
 
+    def cpTree(self, src: str, dest: str):
+        self.logger.log(f"Copying {src} to {dest}...")
+        shell.mkdir(Path(f"{self.root}/{dest}").parent)
+        shell.cpTree(src, f"{self.root}/{dest}")
+
     def mkdir(self, path: str):
         self.logger.log(f"Creating directory {path}...")
         shell.mkdir(f"{self.root}/{path}")
@@ -103,7 +108,8 @@ def bootCmd(args: Args) -> None:
     image.install("hjert", "kernel-x86_64", "boot/kernel.elf")
     image.install("loader", "efi-x86_64", "EFI/BOOT/BOOTX64.EFI")
     image.install("system-srv", "skift-x86_64", "servers/system")
-    image.cp("meta/image/loader.json", "boot/loader.json")
+    image.cpTree("meta/image/boot", "boot/")
+    image.cpTree("res/", "res/")
 
     machine = QemuSystemAmd64()
     machine.boot(image)

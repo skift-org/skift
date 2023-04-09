@@ -13,7 +13,8 @@ struct Grow;
 struct Empty : public View<Empty> {
     Math::Vec2i _size;
 
-    Empty(Math::Vec2i size) : _size(size) {}
+    Empty(Math::Vec2i size)
+        : _size(size) {}
 
     void reconcile(Empty &o) override {
         _size = o._size;
@@ -26,9 +27,9 @@ struct Empty : public View<Empty> {
     void paint(Gfx::Context &g, Math::Recti) override {
         if (debugShowEmptyBounds) {
             auto b = bound();
-            g.debugRect(b, Gfx::WHITE.withOpacity(0.01));
-            g.debugLine({b.topStart(), b.bottomEnd()}, Gfx::WHITE.withOpacity(0.01));
-            g.debugLine({b.topEnd(), b.bottomStart()}, Gfx::WHITE.withOpacity(0.01));
+            g.debugRect(b, Gfx::WHITE.withOpacity(0.2));
+            g.debugLine({b.topStart(), b.bottomEnd()}, Gfx::WHITE.withOpacity(0.2));
+            g.debugLine({b.topEnd(), b.bottomStart()}, Gfx::WHITE.withOpacity(0.2));
         }
     }
 };

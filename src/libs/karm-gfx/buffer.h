@@ -248,6 +248,19 @@ struct _Pixels {
             });
         });
     }
+
+    ALWAYS_INLINE void blit(Math::Recti dst, _Pixels<false> src) {
+        _fmt.visit([&](auto fd) {
+            _fmt.visit([&](auto fs) {
+                for (isize y = 0; y < dst.height; y++) {
+                    for (isize x = 0; x < dst.width; x++) {
+                        fd.store(pixelUnsafe({dst.x + x, dst.y + y}),
+                                 fs.load(src.pixelUnsafe({x, y})));
+                    }
+                }
+            });
+        });
+    }
 };
 
 using Pixels = _Pixels<false>;

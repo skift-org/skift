@@ -4,38 +4,67 @@
 #include <karm-main/base.h>
 
 #include "host.h"
+#include "input.h"
+#include "layout.h"
 #include "react.h"
 
 namespace Karm::Ui {
 
-struct App {
-    Child _root;
-
-    App(Child root)
-        : _root(root) {
-    }
-
-    App(Func<Child()> root)
-        : _root(root()) {
-    }
-
-    template <typename T>
-    App(T initial, Func<Child(State<T>)> root)
-        : _root(state(initial, std::move(root))) {
-    }
-
-    Res<> run(CliArgs) {
-        return try$(Embed::makeHost(_root))->run();
-    }
-};
-
-template <typename T, typename... Args>
-inline Res<> runApp(CliArgs cliArgs, Args... args) {
-    return App{makeStrong<T>(std::forward<Args>(args)...)}.run(cliArgs);
+Child inspector(Child child) {
+    return hflow(
+        child | Ui::grow(),
+        separator(),
+        vflow(
+            4,
+            icon(Mdi::FLASK, 24, Gfx::ZINC600) | Ui::spacing(6) | Ui::center(),
+            separator(),
+            button(
+                [](auto &n) {
+                    debugShowLayoutBounds = !debugShowLayoutBounds;
+                    Ui::shouldLayout(n);
+                },
+                ButtonStyle::subtle(),
+                Mdi::RULER_SQUARE),
+            button(
+                [](auto &n) {
+                    debugShowRepaintBounds = !debugShowRepaintBounds;
+                    Ui::shouldLayout(n);
+                },
+                ButtonStyle::subtle(),
+                Mdi::BRUSH),
+            button(
+                [](auto &n) {
+                    debugShowEmptyBounds = !debugShowEmptyBounds;
+                    Ui::shouldLayout(n);
+                },
+                ButtonStyle::subtle(),
+                Mdi::BORDER_NONE_VARIANT),
+            button(
+                [](auto &n) {
+                    debugShowScrollBounds = !debugShowScrollBounds;
+                    Ui::shouldLayout(n);
+                },
+                ButtonStyle::subtle(),
+                Mdi::ARROW_UP_DOWN),
+            button(
+                [](auto &n) {
+                    debugShowPerfGraph = !debugShowPerfGraph;
+                    Ui::shouldLayout(n);
+                },
+                ButtonStyle::subtle(),
+                Mdi::CHART_HISTOGRAM)) |
+            Ui::spacing(4) |
+            Ui::box({
+                .backgroundPaint = Gfx::ZINC800,
+            }));
 }
 
 inline Res<> runApp(CliArgs args, Child root) {
-    return App{root}.run(args);
+    if (args.has("+debug")) {
+        root = inspector(root);
+    }
+    auto host = try$(Embed::makeHost(root));
+    return host->run();
 }
 
 } // namespace Karm::Ui

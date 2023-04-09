@@ -9,11 +9,11 @@
 
 namespace Karm::Ui {
 
-inline constexpr bool debugShowLayoutBounds = false;
-inline constexpr bool debugShowRepaintBounds = false;
-inline constexpr bool debugShowEmptyBounds = false;
-inline constexpr bool debugShowScrollBounds = false;
-inline constexpr bool debugShowPerfGraph = false;
+extern bool debugShowLayoutBounds;
+extern bool debugShowRepaintBounds;
+extern bool debugShowEmptyBounds;
+extern bool debugShowScrollBounds;
+extern bool debugShowPerfGraph;
 
 struct Node;
 

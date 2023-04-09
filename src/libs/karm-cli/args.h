@@ -24,6 +24,15 @@ struct Args {
         }
         return _argv[i + 1];
     }
+
+    bool has(Str arg) const {
+        for (usize i = 0; i < len(); ++i) {
+            if (Op::eq(this->operator[](i), arg)) {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 } // namespace Karm::Cli

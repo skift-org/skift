@@ -31,7 +31,7 @@ struct coroutine_handle<void> {
         return _frame;
     }
 
-    bool done() {
+    bool done() const {
         return __builtin_coro_done(_frame);
     }
 
@@ -66,6 +66,11 @@ struct coroutine_handle : coroutine_handle<> {
     Promise &promise() {
         auto p_ptr = __builtin_coro_promise(_frame, alignof(Promise), false);
         return *static_cast<Promise *>(p_ptr);
+    }
+
+    Promise const &promise() const {
+        auto p_ptr = __builtin_coro_promise(_frame, alignof(Promise), false);
+        return *static_cast<Promise const *>(p_ptr);
     }
 
 private:

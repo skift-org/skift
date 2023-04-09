@@ -13,17 +13,23 @@ using Event = void *;
 using Status = usize;
 
 struct Time {
-    u16 Year;
-    u8 Month;
-    u8 Day;
-    u8 Hour;
-    u8 Minute;
-    u8 Second;
-    u8 Pad1;
-    u32 Nanosecond;
-    i16 TimeZone;
-    u8 Daylight;
-    u8 Pad2;
+    u16 year;
+    u8 month;
+    u8 day;
+    u8 hour;
+    u8 minute;
+    u8 second;
+    u8 pad1;
+    u32 nanosecond;
+    i16 timeZone;
+    u8 daylight;
+    u8 pad2;
+};
+
+struct TimeCapabilities {
+    u32 resolution;
+    u32 accuracy;
+    bool setsToZero;
 };
 
 #define EFI_SUCCESS 0
@@ -291,8 +297,8 @@ enum struct ResetType {
 
 struct RuntimeService : public Table {
     // Time Services
-    DummyFunction getTime;
-    DummyFunction setTime;
+    Function<Time *, TimeCapabilities *> getTime;
+    Function<Time *> setTime;
     DummyFunction getWakeupTime;
     DummyFunction setWakeupTime;
 

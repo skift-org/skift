@@ -24,10 +24,10 @@ struct Ordr {
 
     constexpr Ordr operator|(Ordr const &other) const {
         if (_value != EQUAL) {
-            return other;
+            return _value;
         }
 
-        return EQUAL;
+        return other;
     }
 
     constexpr bool operator==(Ordr const &other) const = default;

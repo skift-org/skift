@@ -19,6 +19,10 @@ using Value = Var<None, String, f64, bool>;
 struct Pos {
     usize row;
     usize col;
+
+    Ordr cmp(Pos const &o) const {
+        return Karm::cmp(row, o.row) | Karm::cmp(col, o.col);
+    }
 };
 
 enum struct Wheight {
@@ -161,6 +165,10 @@ struct Range {
     usize cols() const {
         auto n = normalised();
         return n.end.col - n.start.col + 1;
+    }
+
+    Ordr cmp(Range const &other) const {
+        return start.cmp(other.start) | end.cmp(other.end);
     }
 };
 

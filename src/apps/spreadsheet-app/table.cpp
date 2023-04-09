@@ -64,8 +64,12 @@ struct Table : public Ui::View<Table> {
                 } else if (m.type == Events::MouseEvent::MOVE && ((m.buttons & Events::Button::LEFT) == Events::Button::LEFT)) {
                     auto cell = sheet().cellAt(pos - Math::Vec2i{CELL_WIDTH, CELL_HEIGHT});
                     if (cell) {
-                        auto sel = _state->selection;
-                        Model::dispatch<UpdateSelection>(*this, Range{sel->start, *cell});
+                        auto sel = *_state->selection;
+                        sel.end = *cell;
+
+                        if (Op::ne(*_state->selection, sel)) {
+                            Model::dispatch<UpdateSelection>(*this, sel);
+                        }
                     }
                 }
 

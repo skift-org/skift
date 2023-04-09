@@ -60,13 +60,24 @@ struct PerfGraph {
     }
 
     void paint(Gfx::Context &g) {
+        g.save();
+        g.clip(bound());
+        g.fillStyle(Gfx::GREEN900.withOpacity(0.5));
+        g.fill(bound());
+
+        g.strokeStyle(Gfx::stroke(Gfx::GREEN.withOpacity(0.5)).withAlign(Gfx::INSIDE_ALIGN));
+        g.stroke();
+        g.strokeStyle(Gfx::stroke(Gfx::WHITE.withOpacity(0.5)).withAlign(Gfx::INSIDE_ALIGN));
+        g.stroke(Math::Edgei{0, 32, 256, 32});
+
         for (usize i = 0; i < 256; ++i) {
             auto e = _records[(_index + i) % 256];
 
             g.debugRect(
-                {(isize)i, 0, 1, (isize)e.duration().toMSecs()},
+                {(isize)i, 0, 1, (isize)e.duration().toMSecs() * 2},
                 e.color());
         }
+        g.restore();
     }
 };
 

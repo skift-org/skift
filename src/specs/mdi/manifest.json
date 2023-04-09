@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
-    "id": "mdi",
+    "id": "mdi-spec",
     "type": "lib",
     "description": "Material Design Icons",
     "requires": [

@@ -1,13 +1,17 @@
 #include <stdint.h>
 #include <string.h>
 
-int strEq(const char *a, size_t aLen, const char *b, size_t bLen) {
-    return aLen == bLen && memcmp(a, b, aLen) == 0;
+bool cstrEq(char const *str1, char const *str2) {
+    while (*str1 && *str2) {
+        if (*str1++ != *str2++)
+            return false;
+    }
+    return *str1 == *str2;
 }
 
-uint32_t _Mdi__byName(char const *query, size_t queryLen) {
-#define ICON(id, name, code)                            \
-    if (strEq(query, queryLen, name, sizeof(name) - 1)) \
+uint32_t _Mdi__byName(char const *query, size_t) {
+#define ICON(id, name, code) \
+    if (cstrEq(query, name)) \
         return code;
 #include "icons.inc"
 #undef ICON

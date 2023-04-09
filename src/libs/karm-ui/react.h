@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-sys/time.h>
+
 #include "funcs.h"
 
 namespace Karm::Ui {
@@ -19,6 +21,8 @@ struct React : public LeafNode<Crtp> {
     virtual Child build() = 0;
 
     void rebuild() {
+        auto start = Sys::now();
+
         auto newChild = build();
 
         if (_child) {
@@ -32,6 +36,10 @@ struct React : public LeafNode<Crtp> {
             _child = newChild;
             (*_child)->attach(this);
         }
+
+        auto elapsed = Sys::now() - start;
+        if (elapsed.toMSecs() > 1)
+            logWarn("Rebuild took {}ms", elapsed.toMSecs());
     }
 
     void ensureBuild() {
@@ -57,7 +65,8 @@ struct React : public LeafNode<Crtp> {
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
-        ensureBuild();
+        if (_rebuild)
+            panic("paint() called on React node before build");
         (*_child)->paint(g, r);
     }
 

@@ -1,10 +1,10 @@
 #include <stdint.h>
 #include <string.h>
 
-bool cstrEq(char const *str1, char const *str2) {
+int cstrEq(char const *str1, char const *str2) {
     while (*str1 && *str2) {
         if (*str1++ != *str2++)
-            return false;
+            return 0;
     }
     return *str1 == *str2;
 }

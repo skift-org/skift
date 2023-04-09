@@ -5,31 +5,55 @@ namespace Karm::Ui {
 /* --- Text ----------------------------------------------------------------- */
 
 Strong<Media::Fontface> regularFontface() {
+#ifdef __osdk_sys_efi__
+    // NOTE: This is a workaround for a bug in ms-abi where static variables
+    //       are not initialized properly.
+    return Media::loadFontface("res/fonts/inter/Inter-Regular.ttf").unwrap();
+#else
     static Strong<Media::Fontface> f = []() {
         return Media::loadFontface("res/fonts/inter/Inter-Regular.ttf").unwrap();
     }();
     return f;
+#endif
 }
 
 Strong<Media::Fontface> mediumFontface() {
+#ifdef __osdk_sys_efi__
+    // NOTE: This is a workaround for a bug in ms-abi where static variables
+    //       are not initialized properly.
+    return Media::loadFontface("res/fonts/inter/Inter-Medium.ttf").unwrap();
+#else
     static Strong<Media::Fontface> f = []() {
         return Media::loadFontface("res/fonts/inter/Inter-Medium.ttf").unwrap();
     }();
     return f;
+#endif
 }
 
 Strong<Media::Fontface> boldFontface() {
+#ifdef __osdk_sys_efi__
+    // NOTE: This is a workaround for a bug in ms-abi where static variables
+    //       are not initialized properly.
+    return Media::loadFontface("res/fonts/inter/Inter-Bold.ttf").unwrap();
+#else
     static Strong<Media::Fontface> f = []() {
         return Media::loadFontface("res/fonts/inter/Inter-Bold.ttf").unwrap();
     }();
     return f;
+#endif
 }
 
 Strong<Media::Fontface> italicFontface() {
+#ifdef __osdk_sys_efi__
+    // NOTE: This is a workaround for a bug in ms-abi where static variables
+    //       are not initialized properly.
+    return Media::loadFontface("res/fonts/inter/Inter-Italic.ttf").unwrap();
+#else
     static Strong<Media::Fontface> f = []() {
         return Media::loadFontface("res/fonts/inter/Inter-Italic.ttf").unwrap();
     }();
     return f;
+#endif
 }
 
 TextStyle TextStyle::displayLarge() {

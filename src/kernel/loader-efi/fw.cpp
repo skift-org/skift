@@ -34,9 +34,8 @@ Res<Strong<Hal::Vmm>> createVmm() {
 }
 
 Res<> parseGop(Handover::Builder &builder) {
-    Efi::GraphicsOutputProtocol *gop = nullptr;
-    try$(Efi::bs()->locateProtocol(&Efi::GraphicsOutputProtocol::UUID, nullptr, (void **)&gop));
-    auto mode = gop->mode;
+    auto *gop = try$(Efi::locateProtocol<Efi::GraphicsOutputProtocol>());
+    auto *mode = gop->mode;
 
     if (mode->info->pixelFormat != Efi::PixelFormat::BLUE_GREEN_RED_RESERVED8_BIT_PER_COLOR) {
         return Error::invalidInput("unsupported pixel format");

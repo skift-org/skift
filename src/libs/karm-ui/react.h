@@ -71,6 +71,9 @@ struct React : public LeafNode<Crtp> {
     }
 
     void event(Events::Event &e) override {
+        if (e.accepted)
+            return;
+
         ensureBuild();
         (*_child)->event(e);
     }
@@ -203,12 +206,14 @@ inline Func<void(Node &)> bindAction(Action action) {
     };
 }
 
-template <typename D, typename A, D (*R)(D, A)>
+template <typename D, typename A, D (*R)(D, A), void (*I)(Node &, Events::Event &) = nullptr>
 struct Model {
     using Data = D;
     using Action = A;
     using Reduce = decltype(R);
+    using Intent = decltype(I);
     static constexpr auto reduce = R;
+    static constexpr auto intent = I;
 
     template <typename X, typename... Args>
     static void dispatch(Node &n, Args... args) {
@@ -264,6 +269,13 @@ struct Reducer :
         } else {
             React<Reducer>::bubble(e);
         }
+    }
+
+    void event(Events::Event &e) override {
+        if constexpr (Model::intent) {
+            Model::intent(*this, e);
+        }
+        React<Reducer>::event(e);
     }
 
     Child build() override {

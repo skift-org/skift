@@ -4,56 +4,36 @@ namespace Karm::Ui {
 
 /* --- Text ----------------------------------------------------------------- */
 
+static Opt<Strong<Media::Fontface>> _regularFontface = NONE;
 Strong<Media::Fontface> regularFontface() {
-#ifdef __osdk_sys_efi__
-    // NOTE: This is a workaround for a bug in ms-abi where static variables
-    //       are not initialized properly.
-    return Media::loadFontface("res/fonts/inter/Inter-Regular.ttf").unwrap();
-#else
-    static Strong<Media::Fontface> f = []() {
-        return Media::loadFontface("res/fonts/inter/Inter-Regular.ttf").unwrap();
-    }();
-    return f;
-#endif
+    if (!_regularFontface) {
+        _regularFontface = Media::loadFontface("res/fonts/inter/Inter-Regular.ttf").unwrap();
+    }
+    return *_regularFontface;
 }
 
+static Opt<Strong<Media::Fontface>> _mediumFontface = NONE;
 Strong<Media::Fontface> mediumFontface() {
-#ifdef __osdk_sys_efi__
-    // NOTE: This is a workaround for a bug in ms-abi where static variables
-    //       are not initialized properly.
-    return Media::loadFontface("res/fonts/inter/Inter-Medium.ttf").unwrap();
-#else
-    static Strong<Media::Fontface> f = []() {
-        return Media::loadFontface("res/fonts/inter/Inter-Medium.ttf").unwrap();
-    }();
-    return f;
-#endif
+    if (!_mediumFontface) {
+        _mediumFontface = Media::loadFontface("res/fonts/inter/Inter-Medium.ttf").unwrap();
+    }
+    return *_mediumFontface;
 }
 
+static Opt<Strong<Media::Fontface>> _boldFontface = NONE;
 Strong<Media::Fontface> boldFontface() {
-#ifdef __osdk_sys_efi__
-    // NOTE: This is a workaround for a bug in ms-abi where static variables
-    //       are not initialized properly.
-    return Media::loadFontface("res/fonts/inter/Inter-Bold.ttf").unwrap();
-#else
-    static Strong<Media::Fontface> f = []() {
-        return Media::loadFontface("res/fonts/inter/Inter-Bold.ttf").unwrap();
-    }();
-    return f;
-#endif
+    if (!_boldFontface) {
+        _boldFontface = Media::loadFontface("res/fonts/inter/Inter-Bold.ttf").unwrap();
+    }
+    return *_boldFontface;
 }
 
+static Opt<Strong<Media::Fontface>> _italicFontface = NONE;
 Strong<Media::Fontface> italicFontface() {
-#ifdef __osdk_sys_efi__
-    // NOTE: This is a workaround for a bug in ms-abi where static variables
-    //       are not initialized properly.
-    return Media::loadFontface("res/fonts/inter/Inter-Italic.ttf").unwrap();
-#else
-    static Strong<Media::Fontface> f = []() {
-        return Media::loadFontface("res/fonts/inter/Inter-Italic.ttf").unwrap();
-    }();
-    return f;
-#endif
+    if (!_italicFontface) {
+        _italicFontface = Media::loadFontface("res/fonts/inter/Inter-Italic.ttf").unwrap();
+    }
+    return *_italicFontface;
 }
 
 TextStyle TextStyle::displayLarge() {

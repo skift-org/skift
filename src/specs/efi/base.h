@@ -30,10 +30,10 @@ inline Res<P *> openProtocol() {
 }
 
 template <typename P>
-inline Res<P> locateProtocol() {
+inline Res<P *> locateProtocol() {
     P *result = nullptr;
     Uuid uuid = P::UUID;
-    try$(bs()->locateProtocol(&uuid, nullptr, &result));
+    try$(bs()->locateProtocol(&uuid, nullptr, (void **)&result));
     return Ok(result);
 }
 

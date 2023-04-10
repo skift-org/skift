@@ -15,7 +15,7 @@ namespace Loader {
 
 void enterKernel(usize entry, usize payload, usize stack, usize vmm);
 
-Res<> load(Entry const &entry) {
+Res<> loadEntry(Entry const &entry) {
     logInfo("loader: preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
     logInfo("loader: payload at vaddr: 0x{x} paddr: 0x{x}", payloadMem.vaddr(), payloadMem.paddr());

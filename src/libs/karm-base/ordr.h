@@ -52,8 +52,9 @@ concept ComparaisonOperator = requires(Lhs const &lhs, Rhs const &rhs) {
                                   { lhs == rhs } -> Meta::Same<bool>;
                               };
 
-template <Comparable T>
-constexpr Ordr cmp(T const &lhs, T const &rhs) {
+template <typename T, typename U>
+    requires Comparable<T, U>
+constexpr Ordr cmp(T const &lhs, U const &rhs) {
     return lhs.cmp(rhs);
 }
 

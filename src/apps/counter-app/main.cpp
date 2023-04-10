@@ -42,17 +42,13 @@ Ui::Child app() {
             Ui::ButtonStyle::subtle().withRadius(999),
             Mdi::REFRESH, "RESET");
 
-        return Ui::spacing(
-            32,
-            Ui::vflow(
-                32,
-                Layout::Align::CENTER,
-                Ui::grow(lbl),
-                Ui::hflow(
-                    16,
-                    decBtn,
-                    incBtn),
-                resetBtn));
+        return Ui::vflow(
+                   32,
+                   Layout::Align::CENTER,
+                   Ui::grow(lbl),
+                   Ui::hflow(16, decBtn, incBtn),
+                   resetBtn) |
+               Ui::spacing(32);
     });
 
     return Ui::dialogLayer(

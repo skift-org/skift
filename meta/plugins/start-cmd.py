@@ -86,6 +86,7 @@ class QemuSystemAmd64(Machine):
             "-m", "256M",
             "-smp", "4",
             "-drive", f"file=fat:rw:{image.root},media=disk,format=raw",
+            "-display", "sdl",
         ]
 
         if self.logError:
@@ -106,7 +107,7 @@ def bootCmd(args: Args) -> None:
     image = Image("efi-x86_64")
 
     image.install("hjert", "kernel-x86_64", "boot/kernel.elf")
-    image.install("loader", "efi-x86_64", "EFI/BOOT/BOOTX64.EFI")
+    image.install("loader", "efi-x86_64:o3", "EFI/BOOT/BOOTX64.EFI")
     image.install("system-srv", "skift-x86_64", "servers/system")
     image.cpTree("meta/image/boot", "boot/")
     image.cpTree("res/", "res/")

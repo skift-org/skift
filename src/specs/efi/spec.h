@@ -3,6 +3,7 @@
 #include <karm-base/res.h>
 #include <karm-base/std.h>
 #include <karm-base/uuid.h>
+#include <karm-events/events.h>
 
 namespace Efi {
 
@@ -363,9 +364,140 @@ struct DevicePathProtocol {
 
 /* --- 12.3 Simple Text Input Protocol -------------------------------------- */
 
+enum ScanCode : u16 {
+    NONE = 0x00,
+    UP = 0x01,
+    DOWN = 0x02,
+    RIGHT = 0x03,
+    LEFT = 0x04,
+    HOME = 0x05,
+    END = 0x06,
+    INSERT = 0x07,
+    DELETE = 0x08,
+    PGUP = 0x09,
+    PGDOWN = 0x0a,
+    F1 = 0x0b,
+    F2 = 0x0c,
+    F3 = 0x0d,
+    F4 = 0x0e,
+    F5 = 0x0f,
+    F6 = 0x10,
+    F7 = 0x11,
+    F8 = 0x12,
+    F9 = 0x13,
+    F10 = 0x14,
+    ESC = 0x17,
+    F11 = 0x15,
+    F12 = 0x16,
+    F13 = 0x68,
+    F14 = 0x69,
+    F15 = 0x6A,
+    F16 = 0x6B,
+    F17 = 0x6C,
+    F18 = 0x6D,
+    F19 = 0x6E,
+    F20 = 0x6F,
+    F21 = 0x70,
+    F22 = 0x71,
+    F23 = 0x72,
+    F24 = 0x73,
+    MUTE = 0x7F,
+    VOLUP = 0x80,
+    VOLDOWN = 0x81,
+    BRIGHTNESSUP = 0x100,
+    BRIGHTNESSDOWN = 0x101,
+    SUSPEND = 0x102,
+    HIBERNATE = 0x103,
+    TOGGLE_DISPLAY = 0x104,
+    RECOVERY = 0x105,
+    EJECT = 0x106,
+};
+
 struct Key {
-    u16 scanCode;
+    ScanCode scanCode;
     u16 unicodeChar;
+
+    Events::KeyboardEvent toKeyEvent() const {
+        Events::Key key;
+
+        switch (scanCode) {
+        case NONE:
+            switch (unicodeChar) {
+            case u'\r':
+                key = Events::Key::ENTER;
+                break;
+            default:
+                key = Events::Key::INVALID;
+                break;
+            }
+            break;
+        case UP:
+            key = Events::Key::UP;
+            break;
+        case DOWN:
+            key = Events::Key::DOWN;
+            break;
+
+        case RIGHT:
+            key = Events::Key::RIGHT;
+            break;
+
+        case LEFT:
+            key = Events::Key::LEFT;
+            break;
+
+        case HOME:
+        case END:
+        case INSERT:
+        case DELETE:
+        case PGUP:
+        case PGDOWN:
+        case F1:
+        case F2:
+        case F3:
+        case F4:
+        case F5:
+        case F6:
+        case F7:
+        case F8:
+        case F9:
+        case F10:
+        case ESC:
+        case F11:
+        case F12:
+        case F13:
+        case F14:
+        case F15:
+        case F16:
+        case F17:
+        case F18:
+        case F19:
+        case F20:
+        case F21:
+        case F22:
+        case F23:
+        case F24:
+        case MUTE:
+        case VOLUP:
+        case VOLDOWN:
+        case BRIGHTNESSUP:
+        case BRIGHTNESSDOWN:
+        case SUSPEND:
+        case HIBERNATE:
+        case TOGGLE_DISPLAY:
+        case RECOVERY:
+        case EJECT:
+        default:
+            key = Events::Key::INVALID;
+            break;
+        }
+
+        return {
+            .type = Events::KeyboardEvent::PRESS,
+            .key = key,
+            .rune = unicodeChar,
+        };
+    }
 };
 
 struct SimpleTextInputProtocol {

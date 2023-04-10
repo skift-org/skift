@@ -6,11 +6,19 @@ namespace Embed {
 
 struct EfiHost :
     public Ui::Host {
+    Efi::SimpleTextInputProtocol *_stip = nullptr;
     Gfx::MutPixels _front;
     Media::Image _back;
 
-    EfiHost(Ui::Child root, Gfx::MutPixels front, Media::Image back)
-        : Ui::Host(root), _front(front), _back(back) {
+    EfiHost(
+        Ui::Child root,
+        Efi::SimpleTextInputProtocol *stip,
+        Gfx::MutPixels front,
+        Media::Image back)
+        : Ui::Host(root),
+          _stip(stip),
+          _front(front),
+          _back(back) {
         _dirty.pushBack(front.bound());
     }
 
@@ -24,7 +32,11 @@ struct EfiHost :
     }
 
     void pump() override {
-        
+        Efi::bs()->waitForEvent(1, &_stip->waitForKey, nullptr).unwrap();
+        Efi::Key key;
+        _stip->readKeyStroke(_stip, &key).unwrap();
+        auto e = key.toKeyEvent();
+        event(e);
     }
 
     void wait(usize) override {
@@ -36,12 +48,11 @@ struct EfiHost :
 };
 
 Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
-    Efi::GraphicsOutputProtocol *gop = nullptr;
-    Efi::bs()->locateProtocol(&Efi::GraphicsOutputProtocol::UUID, nullptr, (void **)&gop).unwrap();
-    auto mode = gop->mode;
+    auto *stip = try$(Efi::locateProtocol<Efi::SimpleTextInputProtocol>());
+    auto *gop = try$(Efi::locateProtocol<Efi::GraphicsOutputProtocol>());
+    auto *mode = gop->mode;
 
     logInfo("efi: gop: {}x{}, {} stride, {} modes", mode->info->horizontalResolution, mode->info->verticalResolution, mode->info->pixelsPerScanLine * 4, mode->maxMode);
-
     Gfx::MutPixels front = {
         (void *)mode->frameBufferBase,
         {(u16)mode->info->horizontalResolution, (u16)mode->info->verticalResolution},
@@ -51,7 +62,7 @@ Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
 
     auto back = Media::Image::alloc({front.width(), front.height()}, Gfx::BGRA8888);
 
-    return Ok(makeStrong<EfiHost>(root, front, back));
+    return Ok(makeStrong<EfiHost>(root, stip, front, back));
 }
 
 } // namespace Embed

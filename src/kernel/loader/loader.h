@@ -1,9 +1,7 @@
 #pragma once
 
 #include <json/json.h>
-#include <karm-base/string.h>
-#include <karm-base/vec.h>
-#include <karm-sys/path.h>
+#include <karm-main/base.h>
 
 namespace Loader {
 
@@ -73,6 +71,8 @@ struct Configs {
     }
 };
 
-Res<> load(Entry const &entry);
+Res<> showMenu(CliArgs args, Configs const &c);
+
+Res<> loadEntry(Entry const &);
 
 } // namespace Loader

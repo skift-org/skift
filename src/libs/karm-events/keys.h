@@ -61,6 +61,14 @@ struct Key {
         return "INVALID";
     }
 
+    Ordr cmp(Key const &other) const {
+        return Karm::cmp(_code, other._code);
+    }
+
+    Ordr cmp(Code const &other) const {
+        return Karm::cmp(_code, other);
+    }
+
     Code code() {
         return _code;
     }

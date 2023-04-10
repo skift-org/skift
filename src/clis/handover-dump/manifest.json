@@ -5,6 +5,6 @@
     "description": "Dump handover information from an kernel elf executable",
     "requires": [
         "karm-main",
-        "handover"
+        "handover-spec"
     ]
 }

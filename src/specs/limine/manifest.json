@@ -1,8 +1,8 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
-    "id": "handover-spec",
+    "id": "limine-spec",
     "type": "lib",
-    "description": "The handover boot protocol",
+    "description": "The limine boot protocol",
     "requires": [
         "karm-base"
     ]

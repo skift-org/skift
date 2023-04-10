@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
+    "id": "limine-tests",
+    "type": "exe",
+    "description": "The Hjert micro-kernel core",
+    "enableIf": {
+        "sys": [
+            "hjert"
+        ]
+    },
+    "requires": [
+        "hal",
+        "limine-spec"
+    ]
+}

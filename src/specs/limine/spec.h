@@ -35,6 +35,20 @@ struct Ptr<void> {
     operator bool() const {
         return _raw;
     }
+
+    template <typename T>
+    operator T *() volatile {
+        return reinterpret_cast<T *>(_raw);
+    }
+
+    template <typename T>
+    operator T const *() const volatile {
+        return reinterpret_cast<T const *>(_raw);
+    }
+
+    operator bool() const volatile {
+        return _raw;
+    }
 };
 
 template <typename T>
@@ -67,6 +81,22 @@ struct Ptr {
 
     operator bool() const {
         return _raw;
+    }
+
+    operator bool() const volatile {
+        return _raw;
+    }
+
+    operator T *() {
+        return reinterpret_cast<T *>(_raw);
+    }
+
+    operator T const *() const {
+        return reinterpret_cast<T const *>(_raw);
+    }
+
+    operator T *() volatile {
+        return reinterpret_cast<T *>(_raw);
     }
 };
 
@@ -111,12 +141,28 @@ struct Request {
     u64 revision;
     Ptr<Response> response;
 
+    Response *operator->() {
+        return (Response *)response;
+    }
+
+    Response const *operator->() const {
+        return (Response *)response;
+    }
+
+    Response &operator*() {
+        return *response;
+    }
+
+    Response const &operator*() const {
+        return *response;
+    }
+
     Response *operator->() volatile {
-        return response;
+        return (Response *)response;
     }
 
     Response const *operator->() const volatile {
-        return response;
+        return (Response *)response;
     }
 
     Response &operator*() volatile {
@@ -127,8 +173,12 @@ struct Request {
         return *response;
     }
 
+    operator bool() const {
+        return (bool)response;
+    }
+
     operator bool() const volatile {
-        return response;
+        return (bool)response;
     }
 };
 

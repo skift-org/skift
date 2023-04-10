@@ -16,18 +16,9 @@
         },
         {
             "icon": "boot/icons/lyre.qoi",
-            "name": "Lyre",
+            "name": "Limine Test",
             "kernel": {
-                "path": "/boot/linux.elf",
-                "props": {}
-            },
-            "files": []
-        },
-        {
-            "icon": "boot/icons/managarm.qoi",
-            "name": "Managarm",
-            "kernel": {
-                "path": "/boot/win.elf",
+                "path": "/boot/limine-tests.elf",
                 "props": {}
             },
             "files": []

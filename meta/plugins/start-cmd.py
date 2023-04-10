@@ -107,6 +107,7 @@ def bootCmd(args: Args) -> None:
     image = Image("efi-x86_64")
 
     image.install("hjert", "kernel-x86_64", "boot/kernel.elf")
+    image.install("limine-tests", "kernel-x86_64", "boot/limine-tests.elf")
     image.install("loader", "efi-x86_64:o3", "EFI/BOOT/BOOTX64.EFI")
     image.install("system-srv", "skift-x86_64", "servers/system")
     image.cpTree("meta/image/boot", "boot/")

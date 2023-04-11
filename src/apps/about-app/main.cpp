@@ -42,7 +42,7 @@ Ui::Child app() {
                       Ui::text(Ui::TextStyle::titleLarge(), "skiftOS"),
                       Ui::badge(Ui::BadgeStyle::INFO, "v0.1.0") | Ui::center()),
             Ui::empty(),
-            Ui::text("Copyright © 2018-2022"),
+            Ui::text("Copyright © 2018-2023"),
             Ui::text("SMNX & contributors."),
             Ui::grow(NONE),
             Ui::hflow(

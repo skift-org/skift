@@ -2,6 +2,9 @@
 
 #include <karm-base/array.h>
 
+#include "karm-base/string.h"
+#include "karm-meta/traits.h"
+
 namespace Acpi {
 
 struct [[gnu::packed]] Rsdp {
@@ -25,50 +28,15 @@ struct [[gnu::packed]] Sdth {
 };
 
 struct [[gnu::packed]] Rsdt : public Sdth {
+    static constexpr Str _sdth_signature = "RSDT";
+
     u32 children[];
 };
 
-struct [[gnu::packed]] Madt : public Sdth {
-    enum struct Type {
-        LAPIC = 0,
-        IOAPIC = 1,
-        ISO = 2,
-        NMI = 4,
-        LAPIC_OVERRIDE = 5
-    };
-
-    struct [[gnu::packed]] Record {
-        u8 type;
-        u8 len;
-    };
-
-    struct [[gnu::packed]] LapicRecord : public Record {
-        u8 processorId;
-        u8 id;
-        u32 flags;
-    };
-
-    struct [[gnu::packed]] IoapicRecord : public Record {
-        u8 id;
-        u8 reserved;
-        u32 address;
-        u32 interruptBase;
-    };
-
-    struct [[gnu::packed]] IsoRecord : public Record {
-        u8 bus;
-        u8 irq;
-        u32 gsi;
-        u16 flags;
-    };
-
-    u32 lapic;
-    u32 flags;
-
-    Record records[];
-};
-
 struct [[gnu::packed]] Mcfg : public Sdth {
+    static constexpr Str _sdth_signature = "MCFG";
+
+    
     struct Record {
         u64 address;
         u16 segment_groupe;
@@ -82,6 +50,8 @@ struct [[gnu::packed]] Mcfg : public Sdth {
 };
 
 struct [[gnu::packed]] Hpet : public Sdth {
+
+    static constexpr Str _sdth_signature = "HPET";
     u8 hardwareRevId;
     u8 info;
     u16 pciVendorId;
@@ -94,5 +64,15 @@ struct [[gnu::packed]] Hpet : public Sdth {
     u16 minimumTick;
     u8 pageProtection;
 };
+
+template <typename T>
+concept SdthEntry =
+    requires {
+        { T::_sdth_signature } -> Meta::Convertible<const Str>;
+    } and Meta::Convertible<T, Sdth>;
+
+static_assert(SdthEntry<Hpet>);
+static_assert(SdthEntry<Mcfg>);
+static_assert(SdthEntry<Rsdt>);
 
 } // namespace Acpi

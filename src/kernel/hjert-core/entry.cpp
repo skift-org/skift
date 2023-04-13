@@ -87,6 +87,13 @@ Res<> enterUserspace(Handover::Payload &payload) {
         }
     }
 
+    logInfo("entry: mapping handover...");
+    auto handoverBase = ((usize)&payload) - Handover::KERNEL_BASE;
+    auto handoverSize = payload.size;
+    auto handoverMem = try$(VNode::makeDma({handoverBase, handoverSize}));
+    handoverMem->label("handover");
+    auto handoverRange = try$(space->map({}, handoverMem, 0, Hj::MapFlags::READ));
+
     logInfo("entry: mapping stack...");
     auto STACK_SIZE = kib(16);
     auto stackMem = try$(VNode::alloc(STACK_SIZE, Hj::MemFlags::HIGH));
@@ -98,7 +105,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
     domain->label("init-domain");
     auto task = try$(Task::create(TaskType::USER, space, domain));
     task->label("init-task");
-    try$(Sched::instance().start(task, image.header().entry, stackRange.end(), {}));
+    try$(Sched::instance().start(task, image.header().entry, stackRange.end(), {handoverRange.start}));
 
     return Ok();
 }

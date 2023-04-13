@@ -3,6 +3,5 @@
 
 Res<> entryPoint(CliArgs) {
     logInfo("Hello from system server!");
-
     return Ok();
 }

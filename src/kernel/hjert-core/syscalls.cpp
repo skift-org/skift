@@ -202,14 +202,11 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
 Res<> doSyscall(Hj::Syscall id, Hj::Args args) {
     auto &self = Task::self();
     self.enterSupervisorMode();
-    logDebug("Syscall {}({})", Hj::toStr(id), (Hj::Arg)id);
     auto res = dispatchSyscall(self, id, args);
     if (not res) {
         logError("Syscall {}({}) failed: {}", Hj::toStr(id), (Hj::Arg)id, res.none().msg());
         for (auto i = 0; i < 6; ++i)
             logDebug("    arg{}: {p} {}", i, (usize)args[i], (isize)args[i]);
-    } else {
-        logDebug("Syscall {}({}) succeeded", Hj::toStr(id), (Hj::Arg)id);
     }
     self.leaveSupervisorMode();
     return res;

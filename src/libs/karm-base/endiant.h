@@ -9,7 +9,7 @@ namespace Karm {
 // clang-format has trouble with the following code
 template <typename T>
 requires(sizeof(T) <= 8)
-T bswap(T value) {
+ALWAYS_INLINE T bswap(T value) {
     if (sizeof(T) == 8)
         return __builtin_bswap64(value);
     if (sizeof(T) == 4)
@@ -23,24 +23,24 @@ T bswap(T value) {
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 template <typename T>
-T _swapLe(T value) {
+ALWAYS_INLINE T _swapLe(T value) {
     return value;
 }
 #else
 template <typename T>
-T _swapLe(T value) {
+ALWAYS_INLINE T _swapLe(T value) {
     return bswap(value);
 }
 #endif
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 template <typename T>
-T _swapBe(T value) {
+ALWAYS_INLINE T _swapBe(T value) {
     return bswap(value);
 }
 #else
 template <typename T>
-T _swapBe(T value) {
+ALWAYS_INLINE T _swapBe(T value) {
     return value;
 }
 #endif
@@ -49,22 +49,22 @@ template <typename T>
 struct _be {
     T _value;
 
-    constexpr _be() = default;
-    constexpr _be(T value) : _value(_swapBe(value)) {}
-    constexpr operator T() const { return _swapBe(_value); }
+    ALWAYS_INLINE constexpr _be() = default;
+    ALWAYS_INLINE constexpr _be(T value) : _value(_swapBe(value)) {}
+    ALWAYS_INLINE constexpr operator T() const { return _swapBe(_value); }
 
-    constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
+    ALWAYS_INLINE constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
 };
 
 template <typename T>
 struct _le {
     T _value;
 
-    constexpr _le() = default;
-    constexpr _le(T value) : _value(_swapLe(value)) {}
-    constexpr operator T() const { return _swapLe(_value); }
+    ALWAYS_INLINE constexpr _le() = default;
+    ALWAYS_INLINE constexpr _le(T value) : _value(_swapLe(value)) {}
+    ALWAYS_INLINE constexpr operator T() const { return _swapLe(_value); }
 
-    constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
+    ALWAYS_INLINE constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
 };
 
 static_assert(sizeof(_be<u32>) == sizeof(u32));

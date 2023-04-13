@@ -145,7 +145,11 @@ struct Host : public Node {
         for (auto &d : _dirty) {
             paint(_g, d);
         }
-        _perf.end();
+        auto elapsed = _perf.end();
+
+        if (elapsed.toMSecs() > 32) {
+            logWarn("Paint took {} ms for {} nodes alive", elapsed.toMSecs(), debugNodeCount);
+        }
 
         if (debugShowPerfGraph)
             _perf.paint(_g);
@@ -162,6 +166,7 @@ struct Host : public Node {
         auto elapsed = _perf.end();
         if (elapsed.toMSecs() > 1) {
             logWarn("Event took {}ms", elapsed.toMSecs());
+            logDebug("There is {} nodes alive", debugNodeCount);
         }
     }
 
@@ -191,6 +196,7 @@ struct Host : public Node {
         auto elapsed = _perf.end();
         if (elapsed.toMSecs() > 1) {
             logWarn("Layout took {}ms", elapsed.toMSecs());
+            logDebug("There is {} nodes alive", debugNodeCount);
         }
     }
 

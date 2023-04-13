@@ -110,6 +110,7 @@ struct Path {
 
     Math::Vec2f _lastCp;
     Math::Vec2f _lastP;
+    Math::Trans2f _trans = Math::Trans2f::identity();
 
     auto iterSegs() const {
         return Iter([&, i = 0uz]() mutable -> Opt<Seg> {
@@ -132,11 +133,25 @@ struct Path {
 
     void _flattenLineTo(Math::Vec2f p);
 
-    void _flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, isize depth = {});
+    void _flattenLineToNoTrans(Math::Vec2f p);
+
+    void _flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d);
+
+    void _flattenCubicToNoTrans(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, isize depth);
 
     void _flattenQuadraticTo(Math::Vec2f start, Math::Vec2f cp, Math::Vec2f point);
 
     void _flattenArcTo(Math::Vec2f start, Math::Vec2f radius, f64 angle, Flags flags, Math::Vec2f point);
+
+    /* --- Transform -------------------------------------------------------- */
+
+    void transform(Math::Trans2f trans) {
+        _trans = trans;
+    }
+
+    Math::Trans2f transform() {
+        return _trans;
+    }
 
     /* --- Operations ------------------------------------------------------- */
 

@@ -74,6 +74,10 @@ union Edge {
     constexpr bool hasNan() const {
         return start.hasNan() or end.hasNan();
     }
+
+    constexpr bool degenerated() const {
+        return Op::eq(start, end);
+    }
 };
 
 using Edgei = Edge<isize>;

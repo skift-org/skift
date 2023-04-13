@@ -1,4 +1,5 @@
 #include <karm-base/ring.h>
+#include <karm-logger/logger.h>
 #include <karm-math/funcs.h>
 
 #include "colors.h"
@@ -11,8 +12,8 @@ void Context::begin(MutPixels p) {
     _stack.pushBack({
         .clip = pixels().bound(),
     });
-
     _scanline.resize(p.width());
+    _updateTransform();
 }
 
 void Context::end() {
@@ -45,8 +46,7 @@ void Context::save() {
     if (_stack.len() > 100) {
         panic("save/restore stack overflow");
     }
-    auto copy = current();
-    _stack.pushBack(copy);
+    _stack.pushBack(current());
 }
 
 void Context::restore() {
@@ -55,6 +55,7 @@ void Context::restore() {
     }
 
     _stack.popBack();
+    _updateTransform();
 }
 
 /* --- Origin & Clipping ---------------------------------------------------- */
@@ -89,6 +90,7 @@ void Context::clip(Math::Recti rect) {
 
 void Context::origin(Math::Vec2i pos) {
     current().origin = applyOrigin(pos);
+    _updateTransform();
 }
 
 /* --- Transform ------------------------------------------------------------ */
@@ -96,6 +98,7 @@ void Context::origin(Math::Vec2i pos) {
 void Context::transform(Math::Trans2f trans) {
     auto &t = current().trans;
     t = t.multiply(trans);
+    _updateTransform();
 }
 
 void Context::translate(Math::Vec2f pos) {
@@ -408,7 +411,6 @@ void Context::debugTrace(Gfx::Color color) {
 /* --- Paths ---------------------------------------------------------------- */
 
 [[gnu::flatten]] void Context::_fillImpl(auto paint, auto format, FillRule fillRule) {
-
     static constexpr auto AA = 4;
     static constexpr auto UNIT = 1.0f / AA;
     static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;
@@ -562,7 +564,7 @@ void Context::fill(FillRule rule) {
 
 void Context::fill(Paint paint, FillRule rule) {
     _shape.clear();
-    createSolid(_shape, _path, current().transWithOrigin());
+    createSolid(_shape, _path);
     _fill(paint, rule);
 }
 
@@ -572,7 +574,7 @@ void Context::stroke() {
 
 void Context::stroke(StrokeStyle style) {
     _shape.clear();
-    createStroke(_shape, _path, style, current().transWithOrigin());
+    createStroke(_shape, _path, style);
     _fill(style.paint);
 }
 

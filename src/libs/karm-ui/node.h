@@ -14,6 +14,7 @@ extern bool debugShowRepaintBounds;
 extern bool debugShowEmptyBounds;
 extern bool debugShowScrollBounds;
 extern bool debugShowPerfGraph;
+extern int debugNodeCount;
 
 struct Node;
 
@@ -24,7 +25,13 @@ using Visitor = Func<void(Node &)>;
 /* --- Node ----------------------------------------------------------------- */
 
 struct Node {
-    virtual ~Node() = default;
+    Node() {
+        debugNodeCount++;
+    }
+
+    virtual ~Node() {
+        debugNodeCount--;
+    }
 
     virtual Opt<Child> reconcile(Child other) { return other; }
 

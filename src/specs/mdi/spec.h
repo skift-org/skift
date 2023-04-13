@@ -8,6 +8,10 @@ extern "C" uint32_t _Mdi__byName(char const *query, usize queryLen);
 
 extern "C" char const *_Mdi__name(uint32_t query);
 
+extern "C" uint32_t *_Mdi__codepointsStart();
+
+extern "C" uint32_t *_Mdi__codepointsEnd();
+
 namespace Mdi {
 
 enum struct Icon {
@@ -17,6 +21,13 @@ enum struct Icon {
 };
 
 using enum Icon;
+
+inline auto codepoints() {
+    return Slice{
+        _Mdi__codepointsStart(),
+        _Mdi__codepointsEnd(),
+    };
+}
 
 inline Res<Icon> byName(Str query) {
     auto codepoint = _Mdi__byName(query.buf(), query.len());

@@ -7,22 +7,27 @@ namespace Karm::Gfx {
 /* --- Flattening ------------------------------------------------------- */
 
 void Path::_flattenClose() {
-    if (Math::epsilonEq(_lastP, _verts[last(_segs).start], 0.001)) {
-        _verts.popBack();
-        last(_segs).end--;
-    }
+    // if (Math::epsilonEq(_lastP, _verts[last(_segs).start], 0.001)) {
+    //     _verts.popBack();
+    //     last(_segs).end--;
+    // }
 
     last(_segs).close = true;
 }
 
-void Path::_flattenLineTo(Math::Vec2f p) {
+[[gnu::flatten]] void Path::_flattenLineTo(Math::Vec2f p) {
+    p = _trans.apply(p);
+    _flattenLineToNoTrans(p);
+}
+
+void Path::_flattenLineToNoTrans(Math::Vec2f p) {
     if (_segs.len() == 0) {
         logError("path: move to must be called before line to");
         return;
     }
 
     if (last(_segs).start != last(_segs).end and
-        Math::epsilonEq(_lastP, p, 0.001)) {
+        Math::epsilonEq(_verts.peekBack(), p, 0.001)) {
         return;
     }
 
@@ -30,7 +35,16 @@ void Path::_flattenLineTo(Math::Vec2f p) {
     last(_segs).end++;
 }
 
-void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, isize depth) {
+[[gnu::flatten]] void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d) {
+    a = _trans.apply(a);
+    b = _trans.apply(b);
+    c = _trans.apply(c);
+    d = _trans.apply(d);
+
+    _flattenCubicToNoTrans(a, b, c, d, 0);
+}
+
+void Path::_flattenCubicToNoTrans(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, isize depth) {
     const isize MAX_DEPTH = 16;
     const f64 TOLERANCE = 0.25;
 
@@ -42,7 +56,7 @@ void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Ve
     auto d3 = Math::abs((c.x - d.x) * d1.y - (c.y - d.y) * d1.x);
 
     if ((d2 + d3) * (d2 + d3) < TOLERANCE * (d1.x * d1.x + d1.y * d1.y)) {
-        _flattenLineTo(d);
+        _flattenLineToNoTrans(d);
         return;
     }
 
@@ -53,17 +67,17 @@ void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Ve
     auto bcd = (bc + cd) / 2;
     auto abcd = (abc + bcd) / 2;
 
-    _flattenCubicTo(a, ab, abc, abcd, depth + 1);
-    _flattenCubicTo(abcd, bcd, cd, d, depth + 1);
+    _flattenCubicToNoTrans(a, ab, abc, abcd, depth + 1);
+    _flattenCubicToNoTrans(abcd, bcd, cd, d, depth + 1);
 }
 
-void Path::_flattenQuadraticTo(Math::Vec2f start, Math::Vec2f cp, Math::Vec2f point) {
+[[gnu::flatten]] void Path::_flattenQuadraticTo(Math::Vec2f start, Math::Vec2f cp, Math::Vec2f point) {
     auto cp1 = start + ((cp - start) * (2.0f / 3.0f));
     auto cp2 = point + ((cp - point) * (2.0f / 3.0f));
     _flattenCubicTo(start, cp1, cp2, point);
 }
 
-void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, f64 angle, Flags flags, Math::Vec2f point) {
+[[gnu::flatten]] void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, f64 angle, Flags flags, Math::Vec2f point) {
     // Ported from canvg (https://code.google.com/p/canvg/)
     f64 x1 = start.x;
     f64 y1 = start.y;

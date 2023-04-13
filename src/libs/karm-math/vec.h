@@ -140,6 +140,10 @@ union Vec2 {
         return {static_cast<U>(x), static_cast<U>(y)};
     }
 
+    constexpr Ordr cmp(Vec2 other) const {
+        return ::cmp(x, other.x) | ::cmp(y, other.y);
+    }
+
     bool hasNan() const {
         return isnan(x) or isnan(y);
     }
@@ -303,10 +307,6 @@ union Vec3 {
         return {-x, -y, -z};
     }
 
-    bool hasNan() const {
-        return isnan(x) or isnan(y) or isnan(z);
-    }
-
     template <typename U>
     constexpr Vec3<U> cast() const {
         return {
@@ -314,6 +314,14 @@ union Vec3 {
             static_cast<U>(y),
             static_cast<U>(z),
         };
+    }
+
+    constexpr Ordr cmp(Vec3 other) const {
+        return ::cmp(x, other.x) | ::cmp(y, other.y) | ::cmp(z, other.z);
+    }
+
+    bool hasNan() const {
+        return isnan(x) or isnan(y) or isnan(z);
     }
 };
 
@@ -470,10 +478,6 @@ union Vec4 {
         return {-x, -y, -z, -w};
     }
 
-    bool hasNan() const {
-        return isnan(x) or isnan(y) or isnan(z) or isnan(w);
-    }
-
     template <typename U>
     constexpr Vec4<U> cast() const {
         return {
@@ -482,6 +486,14 @@ union Vec4 {
             static_cast<U>(z),
             static_cast<U>(w),
         };
+    }
+
+    bool hasNan() const {
+        return isnan(x) or isnan(y) or isnan(z) or isnan(w);
+    }
+
+    Ordr cmp(Vec4 other) const {
+        return ::cmp(x, other.x) | ::cmp(y, other.y) | ::cmp(z, other.z) | ::cmp(w, other.w);
     }
 };
 

@@ -120,6 +120,10 @@ struct Context {
 
     /* --- Transform -------------------------------------------------------- */
 
+    void _updateTransform() {
+        _path.transform(current().transWithOrigin());
+    }
+
     // Transform subsequent drawing operations using the given matrix.
     void transform(Math::Trans2f trans);
 

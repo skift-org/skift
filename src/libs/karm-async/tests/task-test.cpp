@@ -1,4 +1,4 @@
-#include <karm-async/task.h>
+#include <karm-async/async.h>
 #include <karm-logger/logger.h>
 #include <karm-test/macros.h>
 

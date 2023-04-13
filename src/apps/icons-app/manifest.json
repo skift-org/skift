@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
+    "id": "icons-app",
+    "description": "A material design icon browser",
+    "type": "exe",
+    "requires": [
+        "karm-ui",
+        "karm-main"
+    ]
+}

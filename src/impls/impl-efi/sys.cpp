@@ -93,13 +93,13 @@ struct FileProto : public Sys::Fd {
 
         usize bufSize;
         // NOTE: This is expectected to fail
-        (void)_proto->getInfo(_proto, &Efi::FileInfo::UUID, &bufSize, nullptr);
+        (void)_proto->getInfo(_proto, &Efi::FileInfo::GUID, &bufSize, nullptr);
 
         Buf<u8> buf;
         buf.resize(bufSize, 0);
 
         Efi::FileInfo *info = (Efi::FileInfo *)buf.buf();
-        try$(_proto->getInfo(_proto, &Efi::FileInfo::UUID, &bufSize, info));
+        try$(_proto->getInfo(_proto, &Efi::FileInfo::GUID, &bufSize, info));
 
         usize pos = seek.apply(current, info->fileSize);
 

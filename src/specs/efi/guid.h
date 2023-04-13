@@ -1,17 +1,16 @@
 #pragma once
 
-#include "ordr.h"
-#include "std.h"
+#include <karm-base/ordr.h>
 
-namespace Karm {
+namespace Efi {
 
-struct Uuid {
+struct Guid {
     u32 a{};
     u16 b{};
     u16 c{};
     u8 d[8]{};
 
-    Ordr cmp(Uuid const &other) const {
+    Ordr cmp(Guid const &other) const {
         return ::cmp(a, other.a) |
                ::cmp(b, other.b) |
                ::cmp(c, other.c) |
@@ -19,4 +18,4 @@ struct Uuid {
     }
 };
 
-}; // namespace Karm
+} // namespace Efi

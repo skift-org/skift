@@ -1,8 +1,8 @@
 #pragma once
 
+#include <efi/guid.h>
 #include <karm-base/array.h>
 #include <karm-base/std.h>
-#include <karm-base/uuid.h>
 
 namespace Limine {
 
@@ -130,9 +130,9 @@ struct File {
     uint32_t tftpPort;
     uint32_t partitionIndex;
     uint32_t mbrDiskId;
-    Uuid gptDiskUuid;
-    Uuid gptPartUuid;
-    Uuid partUuid;
+    Efi::Guid gptDiskGuid;
+    Efi::Guid gptPartGuid;
+    Efi::Guid partGuid;
 };
 
 template <typename Response>

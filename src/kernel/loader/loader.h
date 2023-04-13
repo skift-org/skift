@@ -2,6 +2,8 @@
 
 #include <json/json.h>
 #include <karm-main/base.h>
+#include <karm-media/icon.h>
+#include <karm-media/image.h>
 
 namespace Loader {
 
@@ -24,7 +26,7 @@ struct File {
 };
 
 struct Entry {
-    String icon;
+    Var<None, Mdi::Icon, Media::Image> icon = NONE;
     String name;
     File kernel;
     Vec<File> files;
@@ -36,7 +38,16 @@ struct Entry {
 
         Entry entry = {};
 
-        entry.icon = try$(json.get("icon").take<String>());
+        auto maybeIcon = json.get("icon").take<String>();
+        if (maybeIcon) {
+            auto maybeImage = Media::loadImage(*maybeIcon);
+            if (not maybeImage) {
+                entry.icon = Mdi::byName(*maybeIcon).unwrap();
+            } else {
+                entry.icon = maybeImage.unwrap();
+            }
+        }
+
         entry.name = try$(json.get("name").take<String>());
         auto kernelJson = try$(json.get("kernel").take<Json::Object>());
         entry.kernel = try$(File::fromJson(kernelJson));

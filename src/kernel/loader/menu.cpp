@@ -1,3 +1,4 @@
+#include <karm-fmt/case.h>
 #include <karm-ui/app.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
@@ -71,11 +72,16 @@ using Model = Ui::Model<State, Actions, reduce, intent>;
 /* --- Views ---------------------------------------------------------------- */
 
 Ui::Child icon(Entry const &e) {
-    auto maybeImage = Media::loadImage(e.icon);
-    if (maybeImage) {
-        return Ui::pinSize(64, Ui::image(maybeImage.unwrap()));
-    }
-    return Ui::icon(Mdi::byName(e.icon).unwrap(), 64);
+    return e.icon.visit(Visitor{
+        [&](Mdi::Icon i) {
+            return Ui::icon(i, 64);
+        },
+        [&](Media::Image i) {
+            return Ui::pinSize(64, Ui::image(i));
+        },
+        [&](None) {
+            return Ui::empty();
+        }});
 }
 
 Ui::Child entry(State const &s, Entry const &e, usize i) {
@@ -115,7 +121,7 @@ Ui::Child alert(String title, String subtitle) {
                       Layout::Align::CENTER,
                       Ui::icon(Mdi::ALERT_DECAGRAM, 48),
                       Ui::titleLarge(title),
-                      Ui::bodyMedium(subtitle)) |
+                      Ui::bodyMedium(Fmt::toSentenceCase(subtitle).unwrap())) |
                   Ui::box(Ui::BoxStyle{
                       .foregroundPaint = Gfx::ZINC500,
                   }) |
@@ -125,7 +131,7 @@ Ui::Child alert(String title, String subtitle) {
                16,
                Layout::Align::CENTER,
                dialog | Ui::grow(),
-               Ui::bodyMedium("Press enter to continue.")) |
+               Ui::bodyMedium("Press ENTER to continue.")) |
            Ui::spacing(64);
 }
 

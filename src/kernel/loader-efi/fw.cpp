@@ -61,9 +61,9 @@ Res<> parseGop(Handover::Builder &builder) {
 }
 
 Res<> parseAcpi(Handover::Builder &builder) {
-    auto *acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI_TABLE_UUID);
+    auto *acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI_TABLE_GUID);
     if (not acpiTable)
-        acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI2_TABLE_UUID);
+        acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI2_TABLE_GUID);
 
     if (acpiTable) {
         builder.add(Handover::Tag::RSDP, 0, {(usize)acpiTable->table, 0x1000});

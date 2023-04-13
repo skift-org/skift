@@ -2,8 +2,9 @@
 
 #include <karm-base/res.h>
 #include <karm-base/std.h>
-#include <karm-base/uuid.h>
 #include <karm-events/events.h>
+
+#include "guid.h"
 
 namespace Efi {
 
@@ -139,10 +140,10 @@ struct RuntimeService;
 struct BootService;
 
 struct ConfigurationTable {
-    static constexpr Uuid ACPI_TABLE_UUID = {0xeb9d2d30, 0x2d88, 0x11d3, {0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d}};
-    static constexpr Uuid ACPI2_TABLE_UUID = {0x8868e871, 0xe4f1, 0x11d3, {0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81}};
+    static constexpr Guid ACPI_TABLE_GUID = {0xeb9d2d30, 0x2d88, 0x11d3, {0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d}};
+    static constexpr Guid ACPI2_TABLE_GUID = {0x8868e871, 0xe4f1, 0x11d3, {0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81}};
 
-    Uuid vendorGuid;
+    Guid vendorGuid;
     void *table;
 };
 
@@ -165,9 +166,9 @@ struct SystemTable : public Table {
     usize nrConfigurationTables;
     ConfigurationTable *configurationTable;
 
-    ConfigurationTable *lookupConfigurationTable(Uuid const &uuid) {
+    ConfigurationTable *lookupConfigurationTable(Guid const &guid) {
         for (usize i = 0; i < nrConfigurationTables; i++) {
-            if (Op::eq(configurationTable[i].vendorGuid, uuid)) {
+            if (Op::eq(configurationTable[i].vendorGuid, guid)) {
                 return &configurationTable[i];
             }
         }
@@ -267,14 +268,14 @@ struct BootService : public Table {
     DummyFunction disconnectController;
 
     // Open and Close Protocol Services
-    Function<Handle, Uuid const *, void **, Handle, Handle, u32> openProtocol;
-    Function<Handle, Uuid const *, Handle, Handle> closeProtocol;
+    Function<Handle, Guid const *, void **, Handle, Handle, u32> openProtocol;
+    Function<Handle, Guid const *, Handle, Handle> closeProtocol;
     DummyFunction openProtocolInformation;
 
     // Library Services
     DummyFunction protocolsPerHandle;
     DummyFunction locateHandleBuffer;
-    Function<Uuid const *, void *, void **> locateProtocol;
+    Function<Guid const *, void *, void **> locateProtocol;
     DummyFunction installMultipleProtocolInterfaces;
     DummyFunction uninstallMultipleProtocolInterfaces;
 
@@ -329,7 +330,7 @@ struct RuntimeService : public Table {
 struct DevicePathProtocol;
 
 struct LoadedImageProtocol {
-    static constexpr Uuid UUID = Uuid{0x5B1B31A1, 0x9562, 0x11d2, {0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B}};
+    static constexpr Guid GUID = Guid{0x5B1B31A1, 0x9562, 0x11d2, {0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B}};
 
     u32 revision;
     Handle parentHandle;
@@ -355,7 +356,7 @@ struct LoadedImageProtocol {
 /* --- 10 Device Path Protocol ---------------------------------------------- */
 
 struct DevicePathProtocol {
-    static constexpr Uuid UUID = Uuid{0x09576e91, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
+    static constexpr Guid GUID = Guid{0x09576e91, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
     u8 type;
     u8 subType;
@@ -501,7 +502,7 @@ struct Key {
 };
 
 struct SimpleTextInputProtocol {
-    static constexpr Uuid UUID = Uuid{0x387477c1, 0x69c7, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
+    static constexpr Guid GUID = Guid{0x387477c1, 0x69c7, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
     Method<bool> reset;
     Method<Key *> readKeyStroke;
@@ -542,7 +543,7 @@ struct SimpleTextOutputMode {
 };
 
 struct SimpleTextOutputProtocol {
-    static constexpr Uuid UUID = Uuid{0x387477c2, 0x69c7, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
+    static constexpr Guid GUID = Guid{0x387477c2, 0x69c7, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
     Method<bool> reset;
     Method<u16 const *> outputString;
@@ -592,7 +593,7 @@ struct GraphicsOutputProtocolMode {
 };
 
 struct GraphicsOutputProtocol {
-    static constexpr Uuid UUID = Uuid{0x9042a9de, 0x23dc, 0x4a38, {0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a}};
+    static constexpr Guid GUID = Guid{0x9042a9de, 0x23dc, 0x4a38, {0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a}};
 
     Method<u32, usize *, GraphicsOutputProtocolMode **> queryMode;
     Method<usize> setMode;
@@ -605,7 +606,7 @@ struct GraphicsOutputProtocol {
 struct FileProtocol;
 
 struct SimpleFileSystemProtocol {
-    static constexpr Uuid UUID = Uuid{0x0964e5b22, 0x6459, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
+    static constexpr Guid GUID = Guid{0x0964e5b22, 0x6459, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
     u64 revision;
     Method<FileProtocol **> openVolume;
@@ -614,7 +615,7 @@ struct SimpleFileSystemProtocol {
 /* --- 13.5 File Protocol --------------------------------------------------- */
 
 struct FileInfo {
-    static constexpr Uuid UUID = Uuid{0x09576e92, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
+    static constexpr Guid GUID = Guid{0x09576e92, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
     u64 size;
     u64 fileSize;
@@ -662,8 +663,8 @@ struct FileProtocol {
     Method<usize *, void const *> write;
     Method<u64 *> getPosition;
     Method<u64> setPosition;
-    Method<Uuid const *, usize *, FileInfo *> getInfo;
-    Method<Uuid const *, usize *, FileInfo *> setInfo;
+    Method<Guid const *, usize *, FileInfo *> getInfo;
+    Method<Guid const *, usize *, FileInfo *> setInfo;
     Method<> flush;
 };
 

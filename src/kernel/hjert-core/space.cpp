@@ -80,21 +80,24 @@ Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> mem, usize off
     auto map = Map{vrange, off, std::move(mem)};
 
     try$(vmm().mapRange(map.vrange, {map.mem->range().start + map.off, vrange.size}, flags | Hal::VmmFlags::USER));
+    try$(vmm().flush(map.vrange));
+
     _maps.pushBack(std::move(map));
 
     return Ok(vrange);
 }
 
 Res<> Space::unmap(Hal::VmmRange vrange) {
-    logInfo("unmap: {x} - {x}", vrange.start, vrange.end());
-
     ObjectLockScope scope(*this);
 
     try$(vrange.ensureAligned(Hal::PAGE_SIZE));
 
     auto id = try$(_lookup(vrange));
     auto &map = _maps[id];
+
     try$(vmm().free(map.vrange));
+    try$(vmm().flush(map.vrange));
+
     _alloc.unused(map.vrange);
     _maps.removeAt(id);
     return Ok();

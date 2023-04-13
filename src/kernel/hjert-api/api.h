@@ -11,6 +11,11 @@ inline Res<usize> log(Str msg) {
     return Ok(msg.len());
 }
 
+inline Res<usize> log(Bytes bytes) {
+    try$(_log((char const *)bytes.buf(), bytes.len()));
+    return Ok(bytes.len());
+}
+
 struct RaiiCap {
     Cap _cap;
 
@@ -24,7 +29,7 @@ struct RaiiCap {
     RaiiCap(RaiiCap const &) = delete;
 
     ~RaiiCap() {
-        if (not _cap.isSpecial())
+        if (_cap)
             _drop(_cap).unwrap();
     }
 
@@ -43,7 +48,7 @@ struct Domain {
     RaiiCap _cap;
 
     static Domain self() {
-        return Domain{CSELF};
+        return Domain{ROOT};
     }
 
     Res<> drop() {
@@ -55,9 +60,9 @@ struct Domain {
     }
 };
 
-inline Res<Domain> createDomain(Cap dest, usize len) {
+inline Res<Domain> createDomain(Cap dest) {
     Cap cap;
-    try$(_createDomain(dest, &cap, len));
+    try$(_createDomain(dest, &cap));
     return Ok(Domain{cap});
 }
 
@@ -65,7 +70,7 @@ struct Task {
     RaiiCap _cap;
 
     static Task self() {
-        return Task{CSELF};
+        return Task{ROOT};
     }
 
     Res<> drop() {
@@ -101,7 +106,7 @@ struct Space {
     RaiiCap _cap;
 
     static Space self() {
-        return Space{CSELF};
+        return Space{ROOT};
     }
 
     Res<> drop() {

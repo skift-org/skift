@@ -10,6 +10,8 @@
 
 namespace Hjert::Core {
 
+/* --- Object --------------------------------------------------------------- */
+
 struct Object : Meta::Static {
     static Atomic<usize> _counter;
 
@@ -50,16 +52,20 @@ struct BaseObject : public Object {
     using Object::Object;
 };
 
+/* --- Domain --------------------------------------------------------------- */
+
 using Slot = Opt<Strong<Object>>;
 
 struct Domain : public BaseObject<Domain> {
-    Array<Slot, 4096> _slots;
+    static constexpr usize LEN = 4096;
+    static constexpr usize MASK = LEN - 1;
+    static constexpr usize SHIFT = 12;
 
-    static Res<Strong<Domain>> create(usize len);
+    Array<Slot, LEN> _slots;
+
+    static Res<Strong<Domain>> create();
 
     Domain() : BaseObject(Hj::Type::DOMAIN) {}
-
-    Res<> _set(Hj::Cap cap, Strong<Object> obj);
 
     Res<Hj::Cap> add(Hj::Cap dest, Strong<Object> obj);
 

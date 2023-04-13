@@ -9,9 +9,15 @@ void loggerLock() {}
 void loggerUnlock() {}
 
 struct LoggerOut : public Io::TextWriter<> {
+    Io::BufferWriter _buf;
+
     Res<usize> write(Bytes bytes) override {
-        Hj::log({(char const *)bytes.buf(), bytes.len()}).unwrap();
-        return Ok(bytes.len());
+        return _buf.write(bytes);
+    }
+
+    Res<usize> flush() override {
+        try$(Hj::log(_buf.bytes()));
+        return _buf.flush();
     }
 };
 

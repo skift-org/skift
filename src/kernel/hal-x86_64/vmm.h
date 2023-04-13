@@ -106,7 +106,6 @@ struct Vmm : public Hal::Vmm {
         for (usize i = 0; i < vaddr.size; i += Hal::PAGE_SIZE) {
             x86_64::invlpg(vaddr.start + i);
         }
-
         return Ok();
     }
 

@@ -94,11 +94,11 @@ Res<> enterUserspace(Handover::Payload &payload) {
     auto stackRange = try$(space->map({}, stackMem, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
 
     logInfo("entry: creating task...");
-    auto domain = try$(Domain::create(4096));
+    auto domain = try$(Domain::create());
     domain->label("init-domain");
     auto task = try$(Task::create(TaskType::USER, space, domain));
     task->label("init-task");
-    try$(Sched::instance().start(task, image.header().entry, stackRange.end()));
+    try$(Sched::instance().start(task, image.header().entry, stackRange.end(), {}));
 
     return Ok();
 }

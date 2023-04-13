@@ -81,7 +81,7 @@ struct _TextWriter : public Writer {
 };
 
 template <StaticEncoding E = typename Embed::Encoding>
-struct TextWriter : public _TextWriter {
+struct TextWriter : public _TextWriter, public Flusher {
     using Writer::write;
 
     Res<usize> writeStr(Str str) override {
@@ -98,6 +98,10 @@ struct TextWriter : public _TextWriter {
             return Ok(0uz);
         }
         return write(bytes(one));
+    }
+
+    Res<usize> flush() override {
+        return Ok(0uz);
     }
 };
 

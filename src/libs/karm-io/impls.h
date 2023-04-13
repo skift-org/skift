@@ -140,6 +140,31 @@ struct BufWriter :
     }
 };
 
+struct BufferWriter : public Writer, public Flusher {
+    Buf<Byte> _buf;
+
+    BufferWriter(usize cap = 16) : _buf(cap) {}
+
+    Res<usize> write(Bytes bytes) override {
+        usize written = 0;
+        for (auto byte : iter(bytes)) {
+            _buf.insert(_buf.len(), std::move(byte));
+            written += 1;
+        }
+        return Ok(written);
+    }
+
+    Bytes bytes() const {
+        return _buf;
+    }
+
+    Res<usize> flush() override {
+        auto l = _buf.len();
+        _buf.truncate(0);
+        return Ok(l);
+    }
+};
+
 struct BitReader {
     Reader &_reader;
     u8 _bits;

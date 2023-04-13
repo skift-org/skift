@@ -44,6 +44,7 @@ inline void _log(Level level, Format format, Fmt::_Args &args) {
     Fmt::format(Embed::loggerOut(), "{}", Cli::reset()).unwrap();
     Fmt::_format(Embed::loggerOut(), format.str, args).unwrap();
     Fmt::format(Embed::loggerOut(), "{}\n", Cli::reset()).unwrap();
+    Embed::loggerOut().flush().unwrap();
 
     Embed::loggerUnlock();
 }

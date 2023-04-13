@@ -90,7 +90,7 @@ class QemuSystemAmd64(Machine):
         ]
 
         if self.logError:
-            qemuCmd += ["-d", "guest_errors,cpu_reset"]
+            qemuCmd += ["-d", "int,guest_errors,cpu_reset"]
 
         if self.useDebug:
             qemuCmd += ["-s", "-S"]
@@ -110,10 +110,11 @@ def bootCmd(args: Args) -> None:
     image.install("limine-tests", "kernel-x86_64", "boot/limine-tests.elf")
     image.install("loader", "efi-x86_64:o3", "EFI/BOOT/BOOTX64.EFI")
     image.install("system-srv", "skift-x86_64", "servers/system")
+    # image.install("shell-app", "skift-x86_64", "apps/shell")
     image.cpTree("meta/image/boot", "boot/")
     image.cpTree("res/", "res/")
 
-    machine = QemuSystemAmd64()
+    machine = QemuSystemAmd64(logError=False, useDebug=False)
     machine.boot(image)
 
 

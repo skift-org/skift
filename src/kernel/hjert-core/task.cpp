@@ -65,7 +65,7 @@ void Task::crash() {
 }
 
 void Task::ret(Hj::Arg val) {
-    logInfo("task: returning from task");
+    logInfo("task: returning {} from task", val);
     ObjectLockScope scope(*this);
     _ret = val;
 }

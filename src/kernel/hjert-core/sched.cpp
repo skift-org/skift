@@ -8,11 +8,11 @@ namespace Hjert::Core {
 
 static Opt<Sched> _sched;
 
-Res<> Sched::start(Strong<Task> task, usize ip, usize sp) {
+Res<> Sched::start(Strong<Task> task, usize ip, usize sp, Hj::Args args) {
     logInfo("sched: starting task (ip: {x}, sp: {x})...", ip, sp);
 
     LockScope scope{_lock};
-    Arch::start(*task, ip, sp, {});
+    Arch::start(*task, ip, sp, args);
     _tasks.pushBack(std::move(task));
     return Ok();
 }

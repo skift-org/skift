@@ -5,11 +5,11 @@
 
 /* --- Heap Implementation -------------------------------------------------- */
 
-static Lock _heapLock;
-static Heap _heapImpl = {
+static constinit Lock _heapLock;
+static constinit Heap _heapImpl = {
     .alloc = [](void *, usize size) -> void * {
         auto space = Hj::Space::self();
-        auto mem = Hj::createMem(Hj::CSELF, 0, size).take();
+        auto mem = Hj::createMem(Hj::ROOT, 0, size).take();
         return (void *)space.map(mem, 0, size, Hj::MapFlags::READ | Hj::MapFlags::WRITE).unwrap();
     },
     .free = [](void *, void *ptr, usize size) -> void {

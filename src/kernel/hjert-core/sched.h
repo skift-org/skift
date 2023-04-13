@@ -30,11 +30,11 @@ struct Sched {
           _idle(bootTask) {
     }
 
-    Res<> start(Strong<Task> task, usize ip) {
-        return start(task, ip, task->stack().loadSp());
+    Res<> start(Strong<Task> task, usize ip, Hj::Args args) {
+        return start(task, ip, task->stack().loadSp(), args);
     }
 
-    Res<> start(Strong<Task> task, usize ip, usize sp);
+    Res<> start(Strong<Task> task, usize ip, usize sp, Hj::Args args);
 
     void schedule(TimeSpan span);
 

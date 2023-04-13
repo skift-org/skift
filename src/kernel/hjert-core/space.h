@@ -47,7 +47,7 @@ struct Space : public BaseObject<Space> {
     Space(Strong<Hal::Vmm> vmm)
         : BaseObject(Hj::Type::SPACE),
           _vmm(vmm) {
-        _alloc.unused(Hal::VmmRange{0x400000, 0x800000000000});
+        _alloc.unused({0x400000, 0x800000000000});
     }
 
     ~Space() {
@@ -61,11 +61,85 @@ struct Space : public BaseObject<Space> {
 
     Res<usize> _lookup(Hal::VmmRange vrange);
 
+    Res<> _validate(Hal::VmmRange vrange) {
+        for (auto &map : _maps) {
+            if (map.vrange.contains(vrange)) {
+                return Ok();
+            }
+        }
+
+        return Error::invalidInput("bad address");
+    }
+
     Res<Hal::VmmRange> map(Hal::VmmRange vrange, Strong<VNode> mem, usize off, Hj::MapFlags flags);
 
     Res<> unmap(Hal::VmmRange vrange);
 
     void activate();
+};
+
+template <typename T>
+struct User {
+    usize _addr;
+
+    User(Hj::Arg addr)
+        : _addr(addr) {
+    }
+
+    Hal::VmmRange vrange() {
+        return Hal::VmmRange{_addr, sizeof(T)};
+    }
+
+    Res<T> load(Space &space) {
+        if (_addr == 0) {
+            return Error::invalidInput("null pointer");
+        }
+
+        ObjectLockScope scope(space);
+        try$(space._validate(vrange()));
+        return Ok(*reinterpret_cast<T *>(_addr));
+    }
+
+    Res<> store(Space &space, T const &val) {
+        if (_addr == 0) {
+            return Error::invalidInput("null pointer");
+        }
+
+        ObjectLockScope scope(space);
+        try$(space._validate(vrange()));
+        *reinterpret_cast<T *>(_addr) = val;
+        return Ok();
+    }
+};
+
+template <typename T>
+struct UserSlice {
+    usize _addr;
+    usize _len;
+
+    UserSlice(Hj::Arg addr, usize len)
+        : _addr(addr),
+          _len(len) {
+    }
+
+    Hal::VmmRange vrange() {
+        return Hal::VmmRange{_addr, sizeof(T) * _len};
+    }
+
+    template <typename R>
+    Res<> with(Space &space, auto f) {
+        if (_addr == 0) {
+            return Error::invalidInput("null pointer");
+        }
+
+        ObjectLockScope scope(space);
+        try$(space._validate(vrange()));
+        return f(R{reinterpret_cast<T *>(_addr), _len});
+    }
+
+    Res<> store(T const &val);
+
+    Res<T> load() const;
 };
 
 } // namespace Hjert::Core

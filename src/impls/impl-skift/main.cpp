@@ -2,11 +2,6 @@
 #include <hjert-api/api.h>
 #include <karm-main/base.h>
 
-static int a = []() {
-    debug("Hello from static");
-    return 0;
-}();
-
 extern "C" void __entryPoint() {
     Abi::SysV::init();
 
@@ -14,8 +9,8 @@ extern "C" void __entryPoint() {
 
     auto self = Hj::Task::self();
 
-    if (res) {
-        (void)self.ret((Hj::Arg)res.none().code());
+    if (not res) {
+        (void)self.ret(-(isize)res.none().code());
     }
 
     Abi::SysV::fini();

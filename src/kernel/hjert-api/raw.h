@@ -84,7 +84,7 @@ using Arg = usize;
 
 using Args = Array<Arg, 6>;
 
-enum struct MsgFlags {
+enum MsgFlags : Arg {
     NONE = 0,
 
     CAP0 = 1 << 0,
@@ -95,54 +95,49 @@ enum struct MsgFlags {
     CAP5 = 1 << 5,
 };
 
-struct Msg {
-    Arg label;
-    MsgFlags flags{};
-    Args args{};
-
-    constexpr Msg(Arg label)
-        : label(label) {}
-};
-
-enum struct SpecialCap {
-    CNONE = 0,  ///< A capability that represents no capability
-    CERR = -1,  ///< An error capability
-    CSELF = -2, ///< A capability that represents the current capability depending on context (e.g. the current task, space or domain)
-};
+FlagsEnum$(MsgFlags);
 
 struct Cap {
     Arg _raw;
 
+    constexpr Cap() = default;
+
     constexpr Cap(Arg raw)
         : _raw(raw) {}
-
-    constexpr Cap(SpecialCap special = SpecialCap::CNONE)
-        : _raw((Arg)special) {}
-
-    constexpr bool isErr() const {
-        return _raw == (Arg)SpecialCap::CERR;
-    }
-
-    constexpr bool isNone() const {
-        return _raw == (Arg)SpecialCap::CNONE;
-    }
-
-    constexpr bool isSelf() const {
-        return _raw == (Arg)SpecialCap::CSELF;
-    }
-
-    constexpr bool isSpecial() const {
-        return isErr() || isNone() || isSelf();
-    }
 
     constexpr Arg raw() const {
         return _raw;
     }
+
+    constexpr bool isRoot() const {
+        return _raw == 0;
+    }
+
+    operator bool() const {
+        return _raw != 0;
+    }
 };
 
-inline constexpr Cap CERR = Cap(SpecialCap::CERR);
-inline constexpr Cap CNONE = Cap(SpecialCap::CNONE);
-inline constexpr Cap CSELF = Cap(SpecialCap::CSELF);
+inline constexpr Cap ROOT = {};
+
+struct Msg {
+    Arg label;
+    Arg flags{};
+    Args args{};
+
+    constexpr Msg(Arg label)
+        : label(label) {}
+
+    void store(usize idx, Arg arg) {
+        flags &= ~(1 << idx);
+        args[idx] = arg;
+    }
+
+    void store(usize idx, Cap cap) {
+        flags |= 1 << idx;
+        args[idx] = cap.raw();
+    }
+};
 
 /* --- Syscall Interface ---------------------------------------------------- */
 
@@ -150,7 +145,7 @@ Res<> _syscall(Syscall syscall, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, 
 
 Res<> _log(char const *msg, usize len);
 
-Res<> _createDomain(Cap dest, Cap *cap, usize len = 512);
+Res<> _createDomain(Cap dest, Cap *cap);
 
 Res<> _createTask(Cap dest, Cap *cap, Cap node, Cap space);
 
@@ -212,7 +207,7 @@ Res<> _in(Cap cap, IoLen len, usize port, Arg *val);
 
 Res<> _out(Cap cap, IoLen len, usize port, Arg val);
 
-enum IpcFlags : Arg {
+enum struct IpcFlags : u32 {
     NONE = 0,
     SEND = 1 << 0,
     RECV = 1 << 1,

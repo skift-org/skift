@@ -30,8 +30,8 @@ Res<> _log(char const *msg, usize len) {
     return _syscall(Syscall::LOG, (Arg)msg, len);
 }
 
-Res<> _createDomain(Cap dest, Cap *cap, usize len) {
-    return _syscall(Syscall::CREATE_DOMAIN, dest.raw(), (Arg)cap, len);
+Res<> _createDomain(Cap dest, Cap *cap) {
+    return _syscall(Syscall::CREATE_DOMAIN, dest.raw(), (Arg)cap);
 }
 
 Res<> _createTask(Cap dest, Cap *cap, Cap node, Cap space) {

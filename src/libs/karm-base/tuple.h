@@ -99,4 +99,7 @@ struct Tuple : public _Tuple<0, Ts...> {
     using _Tuple<0, Ts...>::_Tuple;
 };
 
+template <typename... Ts>
+Tuple(Ts &&...) -> Tuple<Ts...>;
+
 } // namespace Karm

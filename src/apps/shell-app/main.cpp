@@ -312,6 +312,6 @@ Ui::Child app() {
 
 } // namespace Shell
 
-Res<> entryPoint(CliArgs args) {
-    return Ui::runApp(args, Shell::app());
+Res<> entryPoint(Ctx &ctx) {
+    return Ui::runApp(ctx, Shell::app());
 }

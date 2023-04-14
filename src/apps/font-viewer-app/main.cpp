@@ -26,7 +26,9 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
     return Ui::vhscroll(Ui::spacing(8, Ui::vflow(8, children)));
 }
 
-Res<> entryPoint(CliArgs args) {
+Res<> entryPoint(Ctx &ctx) {
+    auto &args = useArgs(ctx);
+
     auto fontface = try$(args.len()
                              ? Media::loadFontface(args[0])
                              : Ok(Media::Fontface::fallback()));
@@ -68,5 +70,5 @@ Res<> entryPoint(CliArgs args) {
             toolbar,
             Ui::grow(pangrams(fontface)))));
 
-    return Ui::runApp(args, layout);
+    return Ui::runApp(ctx, layout);
 }

@@ -16,6 +16,6 @@ Ui::Child app() {
 
 } // namespace Hello
 
-Res<> entryPoint(CliArgs args) {
-    return Ui::runApp(args, Hello::app());
+Res<> entryPoint(Ctx &ctx) {
+    return Ui::runApp(ctx, Hello::app());
 }

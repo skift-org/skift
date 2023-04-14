@@ -4,7 +4,7 @@
 
 #include "loader.h"
 
-Res<> entryPoint(CliArgs args) {
+Res<> entryPoint(Ctx &ctx) {
     logInfo("");
     logInfo("  _                 _");
     logInfo(" | |   ___  __ _ __| |___ _ _");
@@ -25,7 +25,7 @@ Res<> entryPoint(CliArgs args) {
     auto configs = try$(Loader::Configs::fromJson(json));
 
     if (configs.entries.len() > 1 || configs.entries.len() == 0)
-        return Loader::showMenu(args, configs);
+        return Loader::showMenu(ctx, configs);
 
     return Loader::loadEntry(configs.entries[0]);
 }

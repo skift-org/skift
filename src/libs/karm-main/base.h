@@ -1,8 +1,66 @@
 #pragma once
 
+#include <karm-base/rc.h>
 #include <karm-base/res.h>
-#include <karm-cli/args.h>
+#include <karm-base/vec.h>
+struct Hook {
+    virtual ~Hook() = default;
+};
 
-using CliArgs = Karm::Cli::Args;
+struct Ctx {
+    Vec<Strong<Hook>> _hooks;
 
-Res<> entryPoint(CliArgs args);
+    template <typename T>
+    T &use() {
+        for (auto &hook : _hooks) {
+            if (hook.is<T>()) {
+                return hook.unwrap<T>();
+            }
+        }
+
+        panic("no such hook");
+    }
+
+    template <typename T, typename... Args>
+    void add(Args &&...args) {
+        _hooks.pushBack(makeStrong<T>(std::forward<Args>(args)...));
+    }
+};
+
+struct _ArgsHook : public Hook {
+    isize _argc;
+    char const **_argv;
+
+    _ArgsHook(isize argc, char const **argv)
+        : _argc(argc), _argv(argv) {}
+
+    Str self() const {
+        return _argv[0];
+    }
+
+    usize len() const {
+        return _argc - 1;
+    }
+
+    Str operator[](usize i) const {
+        if (i >= len()) {
+            panic("out of range");
+        }
+        return _argv[i + 1];
+    }
+
+    bool has(Str arg) const {
+        for (usize i = 0; i < len(); ++i) {
+            if (Op::eq(this->operator[](i), arg)) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+inline auto &useArgs(Ctx &ctx) {
+    return ctx.use<_ArgsHook>();
+}
+
+Res<> entryPoint(Ctx &ctx);

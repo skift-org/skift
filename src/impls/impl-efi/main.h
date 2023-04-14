@@ -14,14 +14,16 @@ extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable *st) {
 
     (void)Efi::st()->conOut->clearScreen(Efi::st()->conOut);
 
-    char const *argv[] = {"efi-app", nullptr};
-    CliArgs args{1, argv};
+    Ctx ctx;
+    char const *self = "efi-app";
+    char const *argv[] = {self, nullptr};
+    ctx.add<_ArgsHook>(1, argv);
 
-    Res<> code = entryPoint(args);
+    Res<> code = entryPoint(ctx);
 
     if (not code) {
         Error error = code.none();
-        (void)Fmt::format(Sys::err(), "{}: {}\n", args.self(), error.msg());
+        (void)Fmt::format(Sys::err(), "{}: {}\n", self, error.msg());
         return 1;
     }
 

@@ -64,6 +64,6 @@ Ui::Child app() {
 
 } // namespace Counter
 
-Res<> entryPoint(CliArgs args) {
-    return Ui::runApp(args, Counter::app());
+Res<> entryPoint(Ctx &ctx) {
+    return Ui::runApp(ctx, Counter::app());
 }

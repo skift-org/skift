@@ -155,8 +155,8 @@ Ui::Child menu(Configs const &c) {
         });
 }
 
-Res<> showMenu(CliArgs args, Configs const &c) {
-    return Ui::runApp(args, Loader::menu(c));
+Res<> showMenu(Ctx &ctx, Configs const &c) {
+    return Ui::runApp(ctx, Loader::menu(c));
 }
 
 } // namespace Loader

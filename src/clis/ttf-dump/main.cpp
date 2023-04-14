@@ -42,7 +42,9 @@ void dumpGpos(Ttf::Gpos const &gpos) {
     }
 }
 
-Res<> entryPoint(CliArgs args) {
+Res<> entryPoint(Ctx &ctx) {
+    auto &args = useArgs(ctx);
+
     if (args.len() == 0) {
         return Error::invalidInput("Usage: dtb-dump <dtb-file>");
     }

@@ -10,6 +10,7 @@ static constinit Heap _heapImpl = {
     .alloc = [](void *, usize size) -> void * {
         auto space = Hj::Space::self();
         auto mem = Hj::createMem(Hj::ROOT, 0, size).take();
+        mem.label("reserve").unwrap();
         return (void *)space.map(mem, 0, size, Hj::MapFlags::READ | Hj::MapFlags::WRITE).unwrap();
     },
     .free = [](void *, void *ptr, usize size) -> void {

@@ -84,6 +84,6 @@ Ui::Child app() {
 
 } // namespace Settings
 
-Res<> entryPoint(CliArgs args) {
-    return Ui::runApp(args, Settings::app());
+Res<> entryPoint(Ctx &ctx) {
+    return Ui::runApp(ctx, Settings::app());
 }

@@ -4,6 +4,7 @@
     "type": "exe",
     "description": "Main system service responsible for managing other services",
     "requires": [
-        "karm-main"
+        "karm-main",
+        "karm-gfx"
     ]
 }

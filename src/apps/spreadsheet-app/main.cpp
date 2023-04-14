@@ -181,6 +181,6 @@ Ui::Child app() {
 
 } // namespace Spreadsheet
 
-Res<> entryPoint(CliArgs args) {
-    return Ui::runApp(args, Spreadsheet::app());
+Res<> entryPoint(Ctx &ctx) {
+    return Ui::runApp(ctx, Spreadsheet::app());
 }

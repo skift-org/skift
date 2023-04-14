@@ -25,6 +25,6 @@ Ui::Child app() {
 
 } // namespace MdiGallery
 
-Res<> entryPoint(CliArgs args) {
-    return Ui::runApp(args, MdiGallery::app() | Ui::maxSize({700, 500}));
+Res<> entryPoint(Ctx &ctx) {
+    return Ui::runApp(ctx, MdiGallery::app() | Ui::maxSize({700, 500}));
 }

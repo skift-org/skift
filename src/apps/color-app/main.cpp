@@ -238,6 +238,6 @@ Ui::Child app() {
 
 } // namespace ColorPicker
 
-Res<> entryPoint(CliArgs args) {
-    return Ui::runApp(args, ColorPicker::app());
+Res<> entryPoint(Ctx &ctx) {
+    return Ui::runApp(ctx, ColorPicker::app());
 }

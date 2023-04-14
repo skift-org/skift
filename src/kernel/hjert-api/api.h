@@ -55,6 +55,10 @@ struct Domain {
         return _drop(_cap);
     }
 
+    Res<> label(Str l) {
+        return _label(_cap, l.buf(), l.len());
+    }
+
     operator Cap() const {
         return _cap;
     }
@@ -75,6 +79,10 @@ struct Task {
 
     Res<> drop() {
         return _cap.drop();
+    }
+
+    Res<> label(Str l) {
+        return _label(_cap, l.buf(), l.len());
     }
 
     Res<> start(usize ip, usize sp, Args args) {
@@ -102,6 +110,9 @@ inline Res<Task> createTask(Cap dest, Cap node, Cap space) {
     return Ok(Task{cap});
 }
 
+struct Mapping {
+};
+
 struct Space {
     RaiiCap _cap;
 
@@ -111,6 +122,10 @@ struct Space {
 
     Res<> drop() {
         return _cap.drop();
+    }
+
+    Res<> label(Str l) {
+        return _label(_cap, l.buf(), l.len());
     }
 
     Res<> map(usize *virt, Cap mem, usize off, usize len, MapFlags flags = MapFlags::NONE) {
@@ -145,6 +160,10 @@ struct Mem {
         return _cap.drop();
     }
 
+    Res<> label(Str l) {
+        return _label(_cap, l.buf(), l.len());
+    }
+
     operator Cap() const {
         return _cap;
     }
@@ -161,6 +180,10 @@ struct Io {
 
     Res<> drop() {
         return _cap.drop();
+    }
+
+    Res<> label(Str l) {
+        return _label(_cap, l.buf(), l.len());
     }
 
     Res<Arg> in(IoLen len, usize port) {

@@ -345,7 +345,7 @@ void renderScene(Cam cam, Scene &scene, Gfx::MutPixels buf, Props props) {
     }
 }
 
-Res<> entryPoint(CliArgs args) {
+Res<> entryPoint(Ctx &ctx) {
     f64 scale = 1;
 
     auto image = Media::Image::alloc(Math::Vec2f{1280 * scale, 720 * scale}.cast<isize>());
@@ -422,5 +422,5 @@ Res<> entryPoint(CliArgs args) {
 
     renderScene(cam, scene, image.mutPixels(), props);
 
-    return Ui::runApp(args, Ui::minSize({1920, 1080}, Ui::image(image)));
+    return Ui::runApp(ctx, Ui::minSize({1920, 1080}, Ui::image(image)));
 }

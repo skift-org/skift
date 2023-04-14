@@ -82,7 +82,7 @@ struct Configs {
     }
 };
 
-Res<> showMenu(CliArgs args, Configs const &c);
+Res<> showMenu(Ctx &ctx, Configs const &c);
 
 Res<> loadEntry(Entry const &);
 

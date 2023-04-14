@@ -28,6 +28,6 @@ Ui::Child app() {
 
 } // namespace FileManager
 
-Res<> entryPoint(CliArgs args) {
-    return Ui::runApp(args, FileManager::app());
+Res<> entryPoint(Ctx &ctx) {
+    return Ui::runApp(ctx, FileManager::app());
 }

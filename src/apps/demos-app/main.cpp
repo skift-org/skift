@@ -297,7 +297,7 @@ Ui::Child sidebar(State s) {
                         Ui::vflow(8, items))));
 }
 
-Res<> entryPoint(CliArgs args) {
+Res<> entryPoint(Ctx &ctx) {
     auto titlebar = Ui::titlebar(
         Mdi::DUCK,
         "Demos",
@@ -319,5 +319,5 @@ Res<> entryPoint(CliArgs args) {
                     Ui::separator(),
                     Ui::grow(content))));
 
-    return Ui::runApp(args, layout);
+    return Ui::runApp(ctx, layout);
 }

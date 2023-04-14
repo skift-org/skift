@@ -63,9 +63,13 @@ Res<> doCreateIo(Task &self, Hj::Cap dest, User<Hj::Cap> cap, usize base, usize 
 }
 
 Res<> doLabel(Task &self, Hj::Cap cap, UserSlice<char const> label) {
+
     return label.with<Str>(self.space(), [&](Str str) -> Res<> {
-        auto obj = try$(self.domain().get(cap));
-        obj->label(str);
+        if (cap.isRoot())
+            self.label(str);
+        else
+            try$(self.domain().get(cap))->label(str);
+
         return Ok();
     });
 }

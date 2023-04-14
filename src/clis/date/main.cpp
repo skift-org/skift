@@ -1,7 +1,7 @@
 #include <karm-main/main.h>
 #include <karm-sys/time.h>
 
-Res<> entryPoint(CliArgs) {
+Res<> entryPoint(Ctx &) {
     Sys::println("{}", Sys::dateTime());
     return Ok();
 }

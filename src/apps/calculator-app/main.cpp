@@ -102,6 +102,6 @@ Ui::Child app() {
 
 } // namespace Calculator
 
-Res<> entryPoint(CliArgs args) {
-    return Ui::runApp(args, Calculator::app());
+Res<> entryPoint(Ctx &ctx) {
+    return Ui::runApp(ctx, Calculator::app());
 }

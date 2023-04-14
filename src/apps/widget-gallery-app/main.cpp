@@ -30,7 +30,7 @@ Ui::Child badges() {
         Ui::badge(Ui::BadgeStyle::INFO, "Info"));
 }
 
-Res<> entryPoint(CliArgs args) {
+Res<> entryPoint(Ctx &ctx) {
     auto titlebar = Ui::titlebar(Mdi::DUCK, "Widget Gallery");
     auto content = Ui::spacing(
         8,
@@ -47,5 +47,5 @@ Res<> entryPoint(CliArgs args) {
                       Ui::grow(
                           Ui::vscroll(content)))));
 
-    return Ui::runApp(args, layout);
+    return Ui::runApp(ctx, layout);
 }

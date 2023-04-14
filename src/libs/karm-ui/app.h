@@ -59,7 +59,8 @@ Child inspector(Child child) {
             }));
 }
 
-inline Res<> runApp(CliArgs args, Child root) {
+inline Res<> runApp(Ctx &ctx, Child root) {
+    auto &args = useArgs(ctx);
     if (args.has("+debug")) {
         root = inspector(root);
     }

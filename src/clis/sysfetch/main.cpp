@@ -75,7 +75,7 @@ Res<> testAnsi() {
 
 } // namespace Sysfetch
 
-Res<> entryPoint(CliArgs) {
+Res<> entryPoint(Ctx &) {
     Res<> res = Ok();
 
     Sys::println("{}", Cli::styled(ART, Cli::BLUE));

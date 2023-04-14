@@ -25,7 +25,8 @@ Ui::Child app(State initial) {
 
 } // namespace ImageViewer
 
-Res<> entryPoint(CliArgs args) {
+Res<> entryPoint(Ctx &ctx) {
+    auto &args = useArgs(ctx);
     auto image = try$(Media::loadImage(args[0]));
-    return Ui::runApp(args, ImageViewer::app(image));
+    return Ui::runApp(ctx, ImageViewer::app(image));
 }

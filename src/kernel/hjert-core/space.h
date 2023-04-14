@@ -122,8 +122,12 @@ struct UserSlice {
           _len(len) {
     }
 
-    Hal::VmmRange vrange() {
+    Hal::VmmRange vrange() const {
         return Hal::VmmRange{_addr, sizeof(T) * _len};
+    }
+
+    usize len() const {
+        return _len;
     }
 
     template <typename R>

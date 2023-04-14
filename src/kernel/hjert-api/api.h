@@ -128,13 +128,20 @@ struct Space {
         return _label(_cap, l.buf(), l.len());
     }
 
-    Res<> map(usize *virt, Cap mem, usize off, usize len, MapFlags flags = MapFlags::NONE) {
-        return _map(_cap, virt, mem, off, len, flags);
+    Res<usize> map(usize virt, Cap vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+        try$(_map(_cap, &virt, vmo, off, len, flags));
+        return Ok(virt);
     }
 
-    Res<usize> map(Cap mem, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+    Res<usize> map(Cap vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
         usize virt = 0;
-        try$(_map(_cap, &virt, mem, off, len, flags));
+        try$(_map(_cap, &virt, vmo, off, len, flags));
+        return Ok(virt);
+    }
+
+    Res<usize> map(Cap vmo, MapFlags flags = MapFlags::NONE) {
+        usize virt = 0;
+        try$(_map(_cap, &virt, vmo, 0, 0, flags));
         return Ok(virt);
     }
 
@@ -153,7 +160,7 @@ inline Res<Space> createSpace(Cap dest) {
     return Ok(Space{cap});
 }
 
-struct Mem {
+struct Vmo {
     RaiiCap _cap;
 
     Res<> drop() {
@@ -169,10 +176,10 @@ struct Mem {
     }
 };
 
-inline Res<Mem> createMem(Cap dest, usize phys, usize len, MemFlags flags = MemFlags::NONE) {
+inline Res<Vmo> createVmo(Cap dest, usize phys, usize len, VmoFlags flags = VmoFlags::NONE) {
     Cap cap;
-    try$(_createMem(dest, &cap, phys, len, flags));
-    return Ok(Mem{cap});
+    try$(_createVmo(dest, &cap, phys, len, flags));
+    return Ok(Vmo{cap});
 }
 
 struct Io {

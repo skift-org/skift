@@ -19,10 +19,10 @@ struct VNode : public BaseObject<VNode> {
     _Mem _mem;
 
     VNode(_Mem mem)
-        : BaseObject(Hj::Type::MEM),
+        : BaseObject(Hj::Type::VMO),
           _mem(std::move(mem)) {}
 
-    static Res<Strong<VNode>> alloc(usize size, Hj::MemFlags);
+    static Res<Strong<VNode>> alloc(usize size, Hj::VmoFlags);
 
     static Res<Strong<VNode>> makeDma(Hal::DmaRange prange);
 
@@ -37,7 +37,7 @@ struct Space : public BaseObject<Space> {
     struct Map {
         Hal::VmmRange vrange;
         usize off;
-        Strong<VNode> mem;
+        Strong<VNode> vmo;
     };
 
     Strong<Hal::Vmm> _vmm;
@@ -71,7 +71,7 @@ struct Space : public BaseObject<Space> {
         return Error::invalidInput("bad address");
     }
 
-    Res<Hal::VmmRange> map(Hal::VmmRange vrange, Strong<VNode> mem, usize off, Hj::MapFlags flags);
+    Res<Hal::VmmRange> map(Hal::VmmRange vrange, Strong<VNode> vmo, usize off, Hj::MapFlags flags);
 
     Res<> unmap(Hal::VmmRange vrange);
 

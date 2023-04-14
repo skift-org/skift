@@ -49,8 +49,8 @@ Res<> doCreateSpace(Task &self, Hj::Cap dest, User<Hj::Cap> cap) {
     return cap.store(self.space(), try$(self.domain().add(dest, obj)));
 }
 
-Res<> doCreateMem(Task &self, Hj::Cap dest, User<Hj::Cap> cap, usize phys, usize len, Hj::MemFlags flags) {
-    bool isDma = (flags & Hj::MemFlags::DMA) == Hj::MemFlags::DMA;
+Res<> doCreateVmo(Task &self, Hj::Cap dest, User<Hj::Cap> cap, usize phys, usize len, Hj::VmoFlags flags) {
+    bool isDma = (flags & Hj::VmoFlags::DMA) == Hj::VmoFlags::DMA;
     auto obj = try$(isDma
                         ? VNode::makeDma({phys, len})
                         : VNode::alloc(len, flags));
@@ -108,13 +108,13 @@ Res<> doRet(Task &self, Hj::Cap cap, Hj::Arg ret) {
     return Ok();
 }
 
-Res<> doMap(Task &self, Hj::Cap cap, User<usize> virt, Hj::Cap mem, usize off, usize len, Hj::MapFlags flags) {
-    auto memObj = try$(self.domain().get<VNode>(mem));
+Res<> doMap(Task &self, Hj::Cap cap, User<usize> virt, Hj::Cap vmo, usize off, usize len, Hj::MapFlags flags) {
+    auto vmoObj = try$(self.domain().get<VNode>(vmo));
     auto spaceObj = cap.isRoot()
                         ? try$(self._space)
                         : try$(self.domain().get<Space>(cap));
 
-    auto vaddr = try$(spaceObj->map({try$(virt.load(self.space())), len}, memObj, off, flags)).start;
+    auto vaddr = try$(spaceObj->map({try$(virt.load(self.space())), len}, vmoObj, off, flags)).start;
     return virt.store(self.space(), vaddr);
 }
 
@@ -159,8 +159,8 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
     case Hj::Syscall::CREATE_SPACE:
         return doCreateSpace(self, Hj::Cap{args[0]}, args[1]);
 
-    case Hj::Syscall::CREATE_MEM:
-        return doCreateMem(self, Hj::Cap{args[0]}, args[1], args[2], args[3], Hj::MemFlags{args[4]});
+    case Hj::Syscall::CREATE_VMO:
+        return doCreateVmo(self, Hj::Cap{args[0]}, args[1], args[2], args[3], Hj::VmoFlags{args[4]});
 
     case Hj::Syscall::CREATE_IO:
         return doCreateIo(self, Hj::Cap{args[0]}, args[1], args[2], args[3]);

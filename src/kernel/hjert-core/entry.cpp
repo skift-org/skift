@@ -59,9 +59,9 @@ Res<> enterUserspace(Handover::Payload &payload) {
     space->label("init-space");
 
     logInfo("entry: mapping elf...");
-    auto elfMem = try$(VNode::makeDma(record->range<Hal::DmaRange>()));
-    elfMem->label("elf");
-    auto elfRange = try$(kmm().pmm2Kmm(elfMem->range()));
+    auto elfVmo = try$(VNode::makeDma(record->range<Hal::DmaRange>()));
+    elfVmo->label("elf-readonly");
+    auto elfRange = try$(kmm().pmm2Kmm(elfVmo->range()));
     Elf::Image image{elfRange.bytes()};
 
     if (not image.valid()) {
@@ -77,28 +77,28 @@ Res<> enterUserspace(Handover::Payload &payload) {
         usize size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
 
         if ((prog.flags() & Elf::ProgramFlags::WRITE) == Elf::ProgramFlags::WRITE) {
-            auto sectionMem = try$(VNode::alloc(size, Hj::MemFlags::HIGH));
-            sectionMem->label("elf-section");
-            auto sectionRange = try$(kmm().pmm2Kmm(sectionMem->range()));
+            auto sectionVmo = try$(VNode::alloc(size, Hj::VmoFlags::HIGH));
+            sectionVmo->label("elf-writeable");
+            auto sectionRange = try$(kmm().pmm2Kmm(sectionVmo->range()));
             copy(prog.bytes(), sectionRange.mutBytes());
-            try$(space->map({prog.vaddr(), size}, sectionMem, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+            try$(space->map({prog.vaddr(), size}, sectionVmo, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
         } else {
-            try$(space->map({prog.vaddr(), size}, elfMem, prog.offset(), Hj::MapFlags::READ | Hj::MapFlags::EXEC));
+            try$(space->map({prog.vaddr(), size}, elfVmo, prog.offset(), Hj::MapFlags::READ | Hj::MapFlags::EXEC));
         }
     }
 
     logInfo("entry: mapping handover...");
     auto handoverBase = ((usize)&payload) - Handover::KERNEL_BASE;
     auto handoverSize = payload.size;
-    auto handoverMem = try$(VNode::makeDma({handoverBase, handoverSize}));
-    handoverMem->label("handover");
-    auto handoverRange = try$(space->map({}, handoverMem, 0, Hj::MapFlags::READ));
+    auto handoverVmo = try$(VNode::makeDma({handoverBase, handoverSize}));
+    handoverVmo->label("handover");
+    auto handoverRange = try$(space->map({}, handoverVmo, 0, Hj::MapFlags::READ));
 
     logInfo("entry: mapping stack...");
     auto STACK_SIZE = kib(16);
-    auto stackMem = try$(VNode::alloc(STACK_SIZE, Hj::MemFlags::HIGH));
-    stackMem->label("stack");
-    auto stackRange = try$(space->map({}, stackMem, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+    auto stackVmo = try$(VNode::alloc(STACK_SIZE, Hj::VmoFlags::HIGH));
+    stackVmo->label("stack");
+    auto stackRange = try$(space->map({}, stackVmo, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
 
     logInfo("entry: creating task...");
     auto domain = try$(Domain::create());

@@ -10,12 +10,12 @@ Res<> entryPoint(Ctx &ctx) {
     auto &handover = useHandover(ctx);
 
     auto *fb = handover.findTag(Handover::Tag::FB);
-    Hj::Mem fbMem = Hj::createMem(Hj::ROOT, fb->start, fb->size, Hj::MemFlags::DMA).take();
-    fbMem.label("framebuffer").unwrap();
-    auto fbAddr = Hj::Space::self().map(fbMem, 0, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE).take();
+    auto fbVmo = Hj::createVmo(Hj::ROOT, fb->start, fb->size, Hj::VmoFlags::DMA).take();
+    fbVmo.label("framebuffer").unwrap();
+    auto fbAddr = Hj::Space::self().map(fbVmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE).take();
 
     Gfx::MutPixels pixels = {(void *)fbAddr, {fb->fb.width, fb->fb.height}, fb->fb.pitch, Gfx::BGRA8888};
-    pixels.clear(Gfx::ZINC800);
+    pixels.clear(Gfx::GREEN);
     pixels.clip(pixels.bound().shrink(10)).clear(Gfx::ZINC900);
 
     logInfo("Hello from system server!");

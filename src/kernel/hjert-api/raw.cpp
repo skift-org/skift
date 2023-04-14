@@ -42,8 +42,8 @@ Res<> _createSpace(Cap dest, Cap *cap) {
     return _syscall(Syscall::CREATE_SPACE, dest.raw(), (Arg)cap);
 }
 
-Res<> _createMem(Cap dest, Cap *cap, usize phys, usize len, MemFlags flags) {
-    return _syscall(Syscall::CREATE_MEM, dest.raw(), (Arg)cap, phys, len, (Arg)flags);
+Res<> _createVmo(Cap dest, Cap *cap, usize phys, usize len, VmoFlags flags) {
+    return _syscall(Syscall::CREATE_VMO, dest.raw(), (Arg)cap, phys, len, (Arg)flags);
 }
 
 Res<> _createIo(Cap dest, Cap *cap, usize base, usize len) {

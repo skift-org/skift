@@ -15,7 +15,7 @@ namespace Hj {
     TYPE(DOMAIN)           \
     TYPE(TASK)             \
     TYPE(SPACE)            \
-    TYPE(MEM)              \
+    TYPE(VMO)              \
     TYPE(IO)
 
 // clang-format off
@@ -45,7 +45,7 @@ static inline char const *toStr(Type type) {
     SYSCALL(CREATE_DOMAIN)       \
     SYSCALL(CREATE_TASK)         \
     SYSCALL(CREATE_SPACE)        \
-    SYSCALL(CREATE_MEM)          \
+    SYSCALL(CREATE_VMO)          \
     SYSCALL(CREATE_IO)           \
     SYSCALL(LABEL)               \
     SYSCALL(DROP)                \
@@ -151,16 +151,16 @@ Res<> _createTask(Cap dest, Cap *cap, Cap node, Cap space);
 
 Res<> _createSpace(Cap dest, Cap *cap);
 
-enum struct MemFlags : Arg {
+enum struct VmoFlags : Arg {
     NONE = 0,
     LOW = 1 << 0,
     HIGH = 1 << 1,
     DMA = 1 << 2,
 };
 
-FlagsEnum$(MemFlags);
+FlagsEnum$(VmoFlags);
 
-Res<> _createMem(Cap dest, Cap *cap, usize phys, usize len, MemFlags flags = MemFlags::NONE);
+Res<> _createVmo(Cap dest, Cap *cap, usize phys, usize len, VmoFlags flags = VmoFlags::NONE);
 
 Res<> _createIo(Cap dest, Cap *cap, usize base, usize len);
 
@@ -178,7 +178,7 @@ Res<> _ret(Cap cap, Arg ret);
 
 using MapFlags = Hal::VmmFlags;
 
-Res<> _map(Cap cap, usize *virt, Cap mem, usize off, usize len, MapFlags flags = MapFlags::NONE);
+Res<> _map(Cap cap, usize *virt, Cap vmo, usize off, usize len, MapFlags flags = MapFlags::NONE);
 
 Res<> _unmap(Cap cap, usize virt, usize len);
 

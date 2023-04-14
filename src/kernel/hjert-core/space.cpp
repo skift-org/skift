@@ -8,7 +8,7 @@ namespace Hjert::Core {
 
 /* --- VNone ---------------------------------------------------------------- */
 
-Res<Strong<VNode>> VNode::alloc(usize size, Hj::MemFlags) {
+Res<Strong<VNode>> VNode::alloc(usize size, Hj::VmoFlags) {
     if (size == 0) {
         return Error::invalidInput("size is zero");
     }
@@ -56,18 +56,18 @@ Res<usize> Space::_lookup(Hal::VmmRange vrange) {
     return Error::invalidInput("no such mapping");
 }
 
-Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> mem, usize off, Hj::MapFlags flags) {
+Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> vmo, usize off, Hj::MapFlags flags) {
     ObjectLockScope scope(*this);
 
     try$(vrange.ensureAligned(Hal::PAGE_SIZE));
 
     if (vrange.size == 0) {
-        vrange.size = mem->range().size;
+        vrange.size = vmo->range().size;
     }
 
     auto end = try$(checkedAdd(off, vrange.size));
 
-    if (end > mem->range().size) {
+    if (end > vmo->range().size) {
         return Error::invalidInput("mapping too large");
     }
 
@@ -77,9 +77,9 @@ Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> mem, usize off
         _alloc.used(vrange);
     }
 
-    auto map = Map{vrange, off, std::move(mem)};
+    auto map = Map{vrange, off, std::move(vmo)};
 
-    try$(vmm().mapRange(map.vrange, {map.mem->range().start + map.off, vrange.size}, flags | Hal::VmmFlags::USER));
+    try$(vmm().mapRange(map.vrange, {map.vmo->range().start + map.off, vrange.size}, flags | Hal::VmmFlags::USER));
     try$(vmm().flush(map.vrange));
 
     _maps.pushBack(std::move(map));

@@ -3,6 +3,7 @@
 #include <hjert-core/mem.h>
 #include <hjert-core/sched.h>
 #include <hjert-core/syscalls.h>
+#include <hjert-core/task.h>
 #include <karm-logger/logger.h>
 #include <karm-text/witty.h>
 
@@ -145,50 +146,58 @@ void backtrace(usize rbp) {
 
 const auto *CLOSE_LINE = "-----------------------------------------------------------";
 
+usize switchTask(TimeSpan span, usize sp) {
+    Core::Task::self().saveCtx(sp);
+    Core::Sched::instance().schedule(span);
+    return Core::Task::self().loadCtx();
+}
+
 extern "C" usize _intDispatch(usize sp) {
     auto *frame = reinterpret_cast<Frame *>(sp);
 
     cpu().beginInterrupt();
 
     if (frame->intNo < 32) {
-        logPrint("{}--- {} {}----------------------------------------------------", Cli::style(Cli::YELLOW_LIGHT), Cli::styled("!!!", Cli::Style(Cli::Color::RED).bold()), Cli::style(Cli::YELLOW_LIGHT));
-        logPrint("");
-        logPrint("    {}", Cli::styled("Kernel Panic", Cli::style(Cli::RED).bold()));
-        logPrint("    CPU EXCEPTION : '{}'", _faultMsg[frame->intNo]);
-        logPrint("    {}", Cli::styled(Text::witty(frame->rsp + frame->rip), Cli::GRAY_DARK));
-        logPrint("");
-        logPrint("    {}", Cli::styled("Registers", Cli::WHITE));
-        logPrint("    int={}", frame->intNo);
-        logPrint("    err={}", frame->errNo);
-        logPrint("    rip={p}", frame->rip);
-        logPrint("    rsp={p}", frame->rsp);
-        logPrint("    cr2={p}", x86_64::rdcr2());
-        logPrint("    cr3={p}", x86_64::rdcr3());
-        logPrint("");
-        logPrint("    {}", Cli::styled("Backtrace", Cli::WHITE));
-        backtrace(frame->rbp);
-        logPrint("");
-        logPrint("    {}", Cli::styled("System halted", Cli::WHITE));
-        logPrint("");
-        logPrint("{}", Cli::styled("-----------------------------------------------------------", Cli::YELLOW_LIGHT));
-        panic("cpu exception");
+        if (frame->cs == (x86_64::Gdt::UCODE * 8 | 3)) {
+            logPrint("userspace fault:'{}'", _faultMsg[frame->intNo]);
+            Core::Task::self().crash();
+            sp = switchTask(TimeSpan::fromMSecs(0), sp);
+        } else {
+            logPrint("{}--- {} {}----------------------------------------------------", Cli::style(Cli::YELLOW_LIGHT), Cli::styled("!!!", Cli::Style(Cli::Color::RED).bold()), Cli::style(Cli::YELLOW_LIGHT));
+            logPrint("");
+            logPrint("    {}", Cli::styled("Kernel Panic", Cli::style(Cli::RED).bold()));
+            logPrint("    CPU EXCEPTION : '{}'", _faultMsg[frame->intNo]);
+            logPrint("    {}", Cli::styled(Text::witty(frame->rsp + frame->rip), Cli::GRAY_DARK));
+            logPrint("");
+            logPrint("    {}", Cli::styled("Registers", Cli::WHITE));
+            logPrint("    int={}", frame->intNo);
+            logPrint("    err={}", frame->errNo);
+            logPrint("    rip={p}", frame->rip);
+            logPrint("    rsp={p}", frame->rsp);
+            logPrint("    cr2={p}", x86_64::rdcr2());
+            logPrint("    cr3={p}", x86_64::rdcr3());
+            logPrint("");
+            logPrint("    {}", Cli::styled("Backtrace", Cli::WHITE));
+            backtrace(frame->rbp);
+            logPrint("");
+            logPrint("    {}", Cli::styled("System halted", Cli::WHITE));
+            logPrint("");
+            logPrint("{}", Cli::styled("-----------------------------------------------------------", Cli::YELLOW_LIGHT));
+            panic("cpu exception");
+        }
     } else if (frame->intNo == 100) {
-        Core::Task::self().saveCtx(sp);
-        Core::Sched::instance().schedule(TimeSpan::fromMSecs(0));
-        sp = Core::Task::self().loadCtx();
+        sp = switchTask(TimeSpan::fromMSecs(0), sp);
     } else {
         isize irq = frame->intNo - 32;
 
         if (irq == 0) {
-            Core::Task::self().saveCtx(sp);
-            Core::Sched::instance().schedule(TimeSpan::fromMSecs(1));
-            sp = Core::Task::self().loadCtx();
+            sp = switchTask(TimeSpan::fromMSecs(1), sp);
         } else {
             logInfo("x86_64: irq: {}", irq);
         }
-    }
 
-    _pic.ack(frame->intNo);
+        _pic.ack(frame->intNo);
+    }
 
     cpu().endInterrupt();
 

@@ -7,8 +7,17 @@ struct Hook {
     virtual ~Hook() = default;
 };
 
-struct Ctx {
+struct Ctx :
+    public Meta::Static {
     Vec<Strong<Hook>> _hooks;
+    static Ctx *_ctx;
+    static Ctx &instance() {
+        return *_ctx;
+    }
+
+    Ctx() {
+        _ctx = this;
+    }
 
     template <typename T>
     T &use() {
@@ -27,11 +36,13 @@ struct Ctx {
     }
 };
 
-struct _ArgsHook : public Hook {
+struct ArgsHook :
+    public Hook {
+
     isize _argc;
     char const **_argv;
 
-    _ArgsHook(isize argc, char const **argv)
+    ArgsHook(isize argc, char const **argv)
         : _argc(argc), _argv(argv) {}
 
     Str self() const {
@@ -59,8 +70,8 @@ struct _ArgsHook : public Hook {
     }
 };
 
-inline auto &useArgs(Ctx &ctx) {
-    return ctx.use<_ArgsHook>();
+inline auto &useArgs(Ctx &ctx = Ctx::instance()) {
+    return ctx.use<ArgsHook>();
 }
 
 Res<> entryPoint(Ctx &ctx);

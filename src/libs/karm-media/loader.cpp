@@ -10,13 +10,15 @@
 
 namespace Karm::Media {
 
+Res<Strong<Fontface>> loadFontface(Sys::Mmap &&map) {
+    return Ok(try$(TtfFontface::load(std::move(map))));
+}
+
 Res<Strong<Fontface>> loadFontface(Str path) {
     logInfo("media: loading '{}' as fontface...", path);
-
     auto file = try$(Sys::File::open(path));
     auto map = try$(Sys::mmap().map(file));
-    Strong<Fontface> face = try$(TtfFontface::load(std::move(map)));
-    return Ok(face);
+    return loadFontface(std::move(map));
 }
 
 Res<Font> loadFont(f64 size, Str path) {
@@ -61,23 +63,22 @@ static Res<Image> loadJpeg(Bytes bytes) {
     return Ok(img);
 }
 
+Res<Image> loadImage(Sys::Mmap &&map) {
+    if (Qoi::Image::isQoi(map.bytes())) {
+        return loadQoi(map.bytes());
+    } else if (Png::Image::isPng(map.bytes())) {
+        return loadPng(map.bytes());
+    } else if (Jpeg::Image::isJpeg(map.bytes())) {
+        return loadJpeg(map.bytes());
+    } else {
+        return Error::invalidData("unknown image format");
+    }
+}
+
 Res<Image> loadImage(Str path) {
     auto file = try$(Sys::File::open(path));
     auto map = try$(Sys::mmap().map(file));
-
-    if (Qoi::Image::isQoi(map.bytes())) {
-        logInfo("media: loading '{}' as QOI...", path);
-        return loadQoi(map.bytes());
-    } else if (Png::Image::isPng(map.bytes())) {
-        logInfo("media: loading '{}' as PNG...", path);
-        return loadPng(map.bytes());
-    } else if (Jpeg::Image::isJpeg(map.bytes())) {
-        logInfo("media: loading '{}' as JPEG...", path);
-        return loadJpeg(map.bytes());
-    } else {
-        logError("media: unknown image format for '{}'", path);
-        return Error::invalidData("unknown image format");
-    }
+    return loadImage(std::move(map));
 }
 
 } // namespace Karm::Media

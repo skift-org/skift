@@ -4,13 +4,13 @@
 
 #include "spec.h"
 
-struct _HandoverHook : public Hook {
+struct HandoverHook : public Hook {
     Handover::Payload *payload;
 
-    _HandoverHook(Handover::Payload *payload)
+    HandoverHook(Handover::Payload *payload)
         : payload(payload) {}
 };
 
-inline Handover::Payload &useHandover(Ctx &ctx) {
-    return *ctx.use<_HandoverHook>().payload;
+inline Handover::Payload &useHandover(Ctx &ctx = Ctx::instance()) {
+    return *ctx.use<HandoverHook>().payload;
 }

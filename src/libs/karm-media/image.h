@@ -16,6 +16,12 @@ struct Image {
         return {std::move(buf), size, size.x * fmt.bpp(), fmt};
     }
 
+    static Image fallback() {
+        auto img = alloc({2, 2}, Gfx::RGBA8888);
+        img.mutPixels().clear(Gfx::Color::fromHex(0xFF00FF));
+        return img;
+    }
+
     ALWAYS_INLINE operator Gfx::Pixels() const {
         return pixels();
     }

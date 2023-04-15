@@ -6,6 +6,8 @@
     "requires": [
         "karm-gfx",
         "karm-events",
-        "embed-ui"
+        "embed-ui",
+        "fira-code-font",
+        "inter-font"
     ]
 }

@@ -1,0 +1,5 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
+    "id": "skift-branding",
+    "type": "lib"
+}

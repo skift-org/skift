@@ -12,6 +12,8 @@
 
 namespace Embed {
 
+/* --- File I/O ------------------------------------------------------------- */
+
 Res<Strong<Sys::Fd>> openFile(Sys::Path path);
 
 Res<Vec<Sys::DirEntry>> readDir(Sys::Path path);

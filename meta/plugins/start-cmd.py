@@ -5,6 +5,9 @@ from osdk.cmds import Cmd, append
 from osdk.args import Args
 from osdk.logger import Logger
 from pathlib import Path
+from typing import Callable
+import json
+import magic
 
 
 def kvmAvailable() -> bool:
@@ -22,11 +25,42 @@ class Image:
         self.logger = Logger(f"image:{id}")
         self.root = f".osdk/images/{id}"
 
-    def install(self, componentSpec: str, targetSpec: str, dest: str):
+    def withPak(self, id: str, f: Callable[[dict], None]):
+        jsonPath = f"{self.root}/bundles/{id}.json"
+        pakJson = {
+            "id": id,
+            "objects": {}}
+        if os.path.exists(jsonPath):
+            pakJson = json.load(open(jsonPath))
+        f(pakJson)
+        json.dump(pakJson, open(jsonPath, "w+"), indent=4)
+
+    def cpRef(self, pak: str, src: str, id: str) -> str:
+        sha256 = shell.sha256sum(src)
+        dest = f"objects/{sha256}"
+
+        if not os.path.exists(f"{self.root}/{dest}"):
+            self.cp(src, dest)
+
+        mime = magic.from_file(f"{self.root}/{dest}", mime=True)
+
+        def addToRefs(pakJson: dict):
+            pakJson["objects"][id] = {"mime": mime, "ref": dest}
+
+        self.withPak(pak, addToRefs)
+
+        return dest
+
+    def installTo(self, componentSpec: str, targetSpec: str, dest: str):
         self.logger.log(f"Installing {componentSpec} to {dest}...")
         component = builder.build(componentSpec, targetSpec)
         shell.mkdir(Path(f"{self.root}/{dest}").parent)
-        shell.cp(component, f"{self.root}/{dest}")
+        shell.cp(component.outfile(), f"{self.root}/{dest}")
+
+    def install(self, componentSpec: str, targetSpec: str):
+        self.logger.log(f"Installing {componentSpec}...")
+        component = builder.build(componentSpec, targetSpec)
+        self.cpRef(componentSpec, component.outfile(), f"{componentSpec}/_bin")
 
     def cp(self, src: str, dest: str):
         self.logger.log(f"Copying {src} to {dest}...")
@@ -106,13 +140,16 @@ class QemuSystemAmd64(Machine):
 def bootCmd(args: Args) -> None:
     image = Image("efi-x86_64")
 
-    image.install("hjert", "kernel-x86_64", "boot/kernel.elf")
-    image.install("limine-tests", "kernel-x86_64", "boot/limine-tests.elf")
-    image.install("loader", "efi-x86_64:o3", "EFI/BOOT/BOOTX64.EFI")
-    image.install("system-srv", "skift-x86_64", "servers/system")
-    # image.install("shell-app", "skift-x86_64", "apps/shell")
+    image.mkdir("objects")
+    image.mkdir("bundles")
+
+    image.installTo("loader", "efi-x86_64:o3", "EFI/BOOT/BOOTX64.EFI")
+
+    image.install("hjert", "kernel-x86_64")
+    image.install("limine-tests", "kernel-x86_64")
+    image.install("system-srv", "skift-x86_64")
+    image.install("shell-app", "skift-x86_64")
     image.cpTree("meta/image/boot", "boot/")
-    image.cpTree("res/", "res/")
 
     machine = QemuSystemAmd64(logError=False, useDebug=False)
     machine.boot(image)

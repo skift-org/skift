@@ -15,9 +15,14 @@ struct Mmap :
     usize _paddr{};
     void const *_buf{};
     usize _size{};
+    bool _owned{true};
 
-    Mmap(usize paddr, void const *buf, usize size)
-        : _paddr(paddr), _buf(buf), _size(size) {}
+    static Res<Mmap> createUnowned(void const *buf, usize size) {
+        return Ok(Mmap{0, buf, size, false});
+    }
+
+    Mmap(usize paddr, void const *buf, usize size, bool owned = true)
+        : _paddr(paddr), _buf(buf), _size(size), _owned(owned) {}
 
     Mmap(Mmap &&other) {
         std::swap(_paddr, other._paddr);
@@ -37,7 +42,7 @@ struct Mmap :
     }
 
     Res<> unmap() {
-        if (_buf) {
+        if (_buf and _owned) {
             try$(Embed::memUnmap(std::exchange(_buf, nullptr), _size));
             _paddr = 0;
             _size = 0;
@@ -81,9 +86,14 @@ struct MutMmap :
     usize _paddr{};
     void *_buf{};
     usize _size{};
+    bool _owned{true};
 
-    MutMmap(usize paddr, void *buf, usize size)
-        : _paddr(paddr), _buf(buf), _size(size) {
+    static Res<MutMmap> createUnowned(void *buf, usize size) {
+        return Ok(MutMmap{0, buf, size, false});
+    }
+
+    MutMmap(usize paddr, void *buf, usize size, bool owned = true)
+        : _paddr(paddr), _buf(buf), _size(size), _owned(owned) {
     }
 
     Res<usize> flush() override {
@@ -109,7 +119,7 @@ struct MutMmap :
     }
 
     Res<> unmap() {
-        if (_buf) {
+        if (_buf and _owned) {
             try$(Embed::memUnmap(std::exchange(_buf, nullptr), _size));
             _paddr = 0;
             _buf = nullptr;

@@ -9,8 +9,8 @@ extern "C" void __entryPoint(usize ho) {
     Handover::Payload *payload = (Handover::Payload *)ho;
 
     Ctx ctx;
-    ctx.add<_ArgsHook>(0, nullptr);
-    ctx.add<_HandoverHook>(payload);
+    ctx.add<ArgsHook>(0, nullptr);
+    ctx.add<HandoverHook>(payload);
 
     auto res = entryPoint(ctx);
 

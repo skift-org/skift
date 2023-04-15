@@ -58,9 +58,8 @@ Res<> entryPoint(Ctx &ctx) {
 
             if (state.value()) {
                 return Ui::button(std::move(uninstallFont), Ui::ButtonStyle::destructive(), "UNINSTALL");
-            } else {
-                return Ui::button(std::move(installFont), Ui::ButtonStyle::primary(), "INSTALL");
             }
+            return Ui::button(std::move(installFont), Ui::ButtonStyle::primary(), "INSTALL");
         }));
 
     auto layout = Ui::dialogLayer(Ui::minSize(

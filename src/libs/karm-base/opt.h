@@ -199,6 +199,13 @@ struct [[nodiscard]] Opt {
             return OptRet{_value.unwrap()(std::forward<Args>(args)...)};
         }
     }
+
+    auto mapValue(auto f) -> Opt<decltype(f(unwrap()))> {
+        if (_present) {
+            return {f(unwrap())};
+        }
+        return {NONE};
+    }
 };
 
 static_assert(Tryable<Opt<isize>>);

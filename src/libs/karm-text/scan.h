@@ -128,14 +128,12 @@ struct _Scan {
         return {_begin, _cursor};
     }
 
-    Opt<Str> token(auto predicate) {
+    Str token(auto predicate) {
         begin();
-        if (skip(predicate)) {
-            return end();
-        } else {
+        if (not skip(predicate)) {
             _cursor = _begin;
-            return NONE;
         }
+        return end();
     }
 
     /* --- Number parsing --------------------------------------------------- */

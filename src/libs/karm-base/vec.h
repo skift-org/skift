@@ -93,6 +93,12 @@ struct _Vec {
 
     void pushFront(T &&value) { _buf.insert(0, std::move(value)); }
 
+    void pushFront(Sliceable<T> auto &other) {
+        for (auto &v : other) {
+            pushFront(v);
+        }
+    }
+
     template <typename... Args>
     void emplaceFront(Args &&...args) { _buf.emplace((args)...); }
 
@@ -105,6 +111,12 @@ struct _Vec {
     void pushBack(T const &value) { insert(len(), value); }
 
     void pushBack(T &&value) { insert(len(), std::move(value)); }
+
+    void pushBack(Sliceable<T> auto &other) {
+        for (auto &v : other) {
+            pushBack(v);
+        }
+    }
 
     template <typename... Args>
     void emplaceBack(Args &&...args) { insert(len(), T(std::move(args)...)); }

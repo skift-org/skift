@@ -113,6 +113,14 @@ struct _String {
         return {_buf, _len};
     }
 
+    Ordr cmp(_Str<E> other) const {
+        return ::cmp(str(), other);
+    }
+
+    Ordr cmp(char const *other) const {
+        return ::cmp(str(), _Str<E>{other});
+    }
+
     Unit const &operator[](usize i) const { return _buf[i]; }
     Unit &operator[](usize i) { return _buf[i]; }
     Unit const *buf() const { return _buf; }

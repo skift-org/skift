@@ -4,6 +4,18 @@
 
 namespace Karm::Re {
 
+inline auto nil() {
+    return [](auto &) {
+        return false;
+    };
+}
+
+inline auto any() {
+    return [](auto &) {
+        return true;
+    };
+}
+
 inline auto single(auto... c) {
     return [=](auto &scan) {
         if (((scan.curr() == (Rune)c) or ...)) {
@@ -12,6 +24,12 @@ inline auto single(auto... c) {
         }
 
         return false;
+    };
+}
+
+inline auto eof() {
+    return [](auto &scan) {
+        return scan.ended();
     };
 }
 
@@ -48,6 +66,14 @@ inline auto negate(auto expr) {
 inline auto opt(auto expr) {
     return [=](auto &scan) {
         expr(scan);
+        return true;
+    };
+}
+
+inline auto until(auto expr) {
+    return [=](auto &scan) {
+        while (not expr(scan) and not scan.ended())
+            scan.next();
         return true;
     };
 }

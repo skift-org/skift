@@ -1,0 +1,96 @@
+{
+    "type": "font",
+    "name": "Inter",
+    "fonts": [
+        {
+            "style": "normal",
+            "weight": 100,
+            "url": "bundle://inter-font/fonts/Inter-Thin.ttf"
+        },
+        {
+            "style": "italic",
+            "weight": 100,
+            "url": "bundle://inter-font/fonts/Inter-ThinItalic.ttf"
+        },
+        {
+            "style": "normal",
+            "weight": 200,
+            "url": "bundle://inter-font/fonts/Inter-ExtraLight.ttf"
+        },
+        {
+            "style": "italic",
+            "weight": 200,
+            "url": "bundle://inter-font/fonts/Inter-ExtraLightItalic.ttf"
+        },
+        {
+            "style": "normal",
+            "weight": 300,
+            "url": "bundle://inter-font/fonts/Inter-Light.ttf"
+        },
+        {
+            "style": "italic",
+            "weight": 300,
+            "url": "bundle://inter-font/fonts/Inter-LightItalic.ttf"
+        },
+        {
+            "style": "normal",
+            "weight": 400,
+            "url": "bundle://inter-font/fonts/Inter-Regular.ttf"
+        },
+        {
+            "style": "italic",
+            "weight": 400,
+            "url": "bundle://inter-font/fonts/Inter-Italic.ttf"
+        },
+        {
+            "style": "normal",
+            "weight": 500,
+            "url": "bundle://inter-font/fonts/Inter-Medium.ttf"
+        },
+        {
+            "style": "italic",
+            "weight": 500,
+            "url": "bundle://inter-font/fonts/Inter-MediumItalic.ttf"
+        },
+        {
+            "style": "normal",
+            "weight": 600,
+            "url": "bundle://inter-font/fonts/Inter-SemiBold.ttf"
+        },
+        {
+            "style": "italic",
+            "weight": 600,
+            "url": "bundle://inter-font/fonts/Inter-SemiBoldItalic.ttf"
+        },
+        {
+            "style": "normal",
+            "weight": 700,
+            "url": "bundle://inter-font/fonts/Inter-Bold.ttf"
+        },
+        {
+            "style": "italic",
+            "weight": 700,
+            "url": "bundle://inter-font/fonts/Inter-BoldItalic.ttf"
+        },
+        {
+            "style": "normal",
+            "weight": 800,
+            "url": "bundle://inter-font/fonts/Inter-ExtraBold.ttf"
+        },
+        {
+            "style": "italic",
+            "weight": 800,
+            "url": "bundle://inter-font/fonts/Inter-ExtraBoldItalic.ttf"
+        },
+        {
+            "style": "normal",
+            "weight": 900,
+            "url": "bundle://inter-font/fonts/Inter-Black.ttf"
+        },
+        {
+            "style": "italic",
+            "weight": 900,
+            "url": "bundle://inter-font/fonts/Inter-BlackItalic.ttf"
+        }
+    ]
+}

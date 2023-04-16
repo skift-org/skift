@@ -1,0 +1,31 @@
+{
+    "type": "font",
+    "name": "FiraCode",
+    "fonts": [
+        {
+            "style": "normal",
+            "weight": 300,
+            "url": "bundle://fira-code-font/fonts/FiraCode-Light.ttf"
+        },
+        {
+            "style": "normal",
+            "weight": 400,
+            "url": "bundle://fira-code-font/fonts/FiraCode-Regular.ttf"
+        },
+        {
+            "style": "normal",
+            "weight": 500,
+            "url": "bundle://fira-code-font/fonts/FiraCode-Medium.ttf"
+        },
+        {
+            "style": "normal",
+            "weight": 600,
+            "url": "bundle://fira-code-font/fonts/FiraCode-SemiBold.ttf"
+        },
+        {
+            "style": "normal",
+            "weight": 700,
+            "url": "bundle://fira-code-font/fonts/FiraCode-Bold.ttf"
+        }
+    ]
+}

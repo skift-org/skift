@@ -56,7 +56,7 @@ struct [[gnu::packed]] Pml {
 
     Entry &operator[](usize i) { return pages[i]; }
 
-    const Entry &operator[](usize i) const { return pages[i]; }
+    Entry const &operator[](usize i) const { return pages[i]; }
 
     usize virt2index(usize virt) const {
         return (virt >> (12 + (LEVEL - 1) * 9)) & 0x1ff;

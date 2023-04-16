@@ -15,6 +15,7 @@ BreakInheritanceList: AfterColon
 IndentPPDirectives: AfterHash
 ForEachMacros: ["__dummy_foreach"]
 SpaceBeforeParens: ControlStatementsExceptForEachMacros
+QualifierAlignment: Right
 
 IncludeBlocks: Regroup
 IncludeCategories:

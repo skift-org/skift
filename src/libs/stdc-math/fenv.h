@@ -71,11 +71,11 @@ int fegetexceptflag(fexcept_t *, int);
 int fegetround(void);
 int feholdexcept(fenv_t *);
 int feraiseexcept(int);
-int fesetenv(const fenv_t *);
-int fesetexceptflag(const fexcept_t *, int);
+int fesetenv(fenv_t const *);
+int fesetexceptflag(fexcept_t const *, int);
 int fesetround(int);
 int fetestexcept(int);
-int feupdateenv(const fenv_t *);
+int feupdateenv(fenv_t const *);
 
 #ifdef __cplusplus
 }

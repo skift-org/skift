@@ -144,7 +144,7 @@ void backtrace(usize rbp) {
     }
 }
 
-const auto *CLOSE_LINE = "-----------------------------------------------------------";
+auto const *CLOSE_LINE = "-----------------------------------------------------------";
 
 usize switchTask(TimeSpan span, usize sp) {
     Core::Task::self().saveCtx(sp);

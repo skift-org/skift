@@ -10,7 +10,7 @@ template <typename T>
 inline constexpr bool _Const = false;
 
 template <typename T>
-inline constexpr bool _Const<const T> = true;
+inline constexpr bool _Const<T const> = true;
 
 template <typename T>
 concept Const = _Const<T>;

@@ -301,7 +301,7 @@ struct Smp {
     using Goto = void (*)(struct Info *);
 
 #if defined(__x86_64__) || defined(__i386__)
-    static const auto X2APIC = (1 << 0);
+    static auto const X2APIC = (1 << 0);
 
     struct Info {
         u32 processorId;
@@ -350,14 +350,14 @@ struct Mmap {
 
     static constexpr u64 REV = 0;
 
-    static const auto USABLE = 0;
-    static const auto RESERVED = 1;
-    static const auto ACPI_RECLAIMABLE = 2;
-    static const auto ACPI_NVS = 3;
-    static const auto BAD_MEMORY = 4;
-    static const auto BOOTLOADER_RECLAIMABLE = 5;
-    static const auto KERNEL_AND_MODULES = 6;
-    static const auto FRAMEBUFFER = 7;
+    static auto const USABLE = 0;
+    static auto const RESERVED = 1;
+    static auto const ACPI_RECLAIMABLE = 2;
+    static auto const ACPI_NVS = 3;
+    static auto const BAD_MEMORY = 4;
+    static auto const BOOTLOADER_RECLAIMABLE = 5;
+    static auto const KERNEL_AND_MODULES = 6;
+    static auto const FRAMEBUFFER = 7;
 
     struct Entry {
         u64 base;
@@ -416,7 +416,7 @@ struct Module {
 
     static constexpr u64 REV = 1;
 
-    static const auto REQUIRED = (1 << 0);
+    static auto const REQUIRED = (1 << 0);
 
     struct Internal {
         Ptr<char> path;

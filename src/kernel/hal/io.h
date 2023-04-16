@@ -12,12 +12,12 @@ struct DmaRange : public USizeRange {
 
 template <typename T>
 static T dmaIn(usize addr) {
-    return *((volatile T *)(addr));
+    return *((T volatile *)(addr));
 }
 
 template <typename T>
 static void dmaOut(usize addr, T value) {
-    *((volatile T *)(addr)) = value;
+    *((T volatile *)(addr)) = value;
 }
 
 template <typename T>

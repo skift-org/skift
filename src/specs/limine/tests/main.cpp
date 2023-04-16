@@ -2,7 +2,7 @@
 
 #include <hal-x86_64/asm.h>
 
-static volatile auto framebufferRequest =
+static auto volatile framebufferRequest =
     Limine::ask<Limine::Framebuffer>();
 
 static void haltAndCatchFire() {

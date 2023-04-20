@@ -7,11 +7,11 @@ namespace FileManager {
 State reduce(State d, Actions action) {
     return action.visit(Visitor{
         [&](GoRoot) {
-            return reduce(d, GoTo{Sys::Path{"/"}});
+            return reduce(d, GoTo{Sys::Url::parse("/")});
         },
         [&](GoHome) {
             auto user = Sys::userinfo().unwrap();
-            return reduce(d, GoTo{user.home});
+            return reduce(d, GoTo{Sys::Path::parse(user.home)});
         },
         [&](GoBack) {
             if (d.canGoBack()) {
@@ -26,23 +26,24 @@ State reduce(State d, Actions action) {
             return d;
         },
         [&](GoParent p) {
-            auto parent = d.currentPath().down(p.index);
+            auto parent = d.currentUrl().parent(p.index);
             return reduce(d, GoTo{parent});
         },
+        [&](Navigate navigate) {
+            Sys::Url dest = d.currentUrl();
+            dest.append(navigate.item);
+            return reduce(d, GoTo{dest});
+        },
         [&](GoTo gotTo) {
-            if (Op::eq(d.currentPath(), gotTo.path)) {
+            if (Op::eq(d.currentUrl(), gotTo.url)) {
                 return d;
             }
 
-            Sys::Path dest = gotTo.path.isAbsolute()
-                                 ? gotTo.path
-                                 : Fmt::format("{}/{}", d.currentPath(), gotTo.path).unwrap();
-
             d.history.truncate(d.currentIndex + 1);
-            d.history.pushBack(dest);
+            d.history.pushBack(gotTo.url);
             d.currentIndex++;
 
-            return reduce(d, Refresh{});
+            return d;
         },
         [&](Refresh) {
             return d;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/cursor.h>
-#include <karm-base/endiant.h>
+#include <karm-base/endian.h>
 #include <karm-base/string.h>
 
 struct BScan {
@@ -57,28 +57,28 @@ struct BScan {
 
     template <typename T>
     ALWAYS_INLINE constexpr T nextBe() {
-        _be<T> r{};
+        Be<T> r{};
         readTo(&r, sizeof(T));
         return r;
     }
 
     template <typename T>
     ALWAYS_INLINE constexpr T nextLe() {
-        _le<T> r;
+        Le<T> r;
         readTo(&r, sizeof(T));
         return r;
     }
 
     template <typename T>
     ALWAYS_INLINE constexpr T peekBe() {
-        _be<T> r{};
+        Be<T> r{};
         peekTo(&r, sizeof(T));
         return r;
     }
 
     template <typename T>
     ALWAYS_INLINE constexpr T peekLe() {
-        _be<T> r;
+        Le<T> r;
         peekTo(&r, sizeof(T));
         return r;
     }

@@ -46,48 +46,48 @@ ALWAYS_INLINE T _swapBe(T value) {
 #endif
 
 template <typename T>
-struct _be {
+struct Be {
     T _value;
 
-    ALWAYS_INLINE constexpr _be() = default;
-    ALWAYS_INLINE constexpr _be(T value) : _value(_swapBe(value)) {}
+    ALWAYS_INLINE constexpr Be() = default;
+    ALWAYS_INLINE constexpr Be(T value) : _value(_swapBe(value)) {}
     ALWAYS_INLINE constexpr operator T() const { return _swapBe(_value); }
 
     ALWAYS_INLINE constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
 };
 
 template <typename T>
-struct _le {
+struct Le {
     T _value;
 
-    ALWAYS_INLINE constexpr _le() = default;
-    ALWAYS_INLINE constexpr _le(T value) : _value(_swapLe(value)) {}
+    ALWAYS_INLINE constexpr Le() = default;
+    ALWAYS_INLINE constexpr Le(T value) : _value(_swapLe(value)) {}
     ALWAYS_INLINE constexpr operator T() const { return _swapLe(_value); }
 
     ALWAYS_INLINE constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
 };
 
-static_assert(sizeof(_be<u32>) == sizeof(u32));
-static_assert(sizeof(_le<u32>) == sizeof(u32));
+static_assert(sizeof(Be<u32>) == sizeof(u32));
+static_assert(sizeof(Le<u32>) == sizeof(u32));
 
-using u8be = _be<u8>;
-using u16be = _be<u16>;
-using u32be = _be<u32>;
-using u64be = _be<u64>;
+using u8be = Be<u8>;
+using u16be = Be<u16>;
+using u32be = Be<u32>;
+using u64be = Be<u64>;
 
-using i8be = _be<i8>;
-using i16be = _be<i16>;
-using i32be = _be<i32>;
-using i64be = _be<i64>;
+using i8be = Be<i8>;
+using i16be = Be<i16>;
+using i32be = Be<i32>;
+using i64be = Be<i64>;
 
-using u8le = _le<u8>;
-using u16le = _le<u16>;
-using u32le = _le<u32>;
-using u64le = _le<u64>;
+using u8le = Le<u8>;
+using u16le = Le<u16>;
+using u32le = Le<u32>;
+using u64le = Le<u64>;
 
-using i8le = _le<i8>;
-using i16le = _le<i16>;
-using i32le = _le<i32>;
-using i64le = _le<i64>;
+using i8le = Le<i8>;
+using i16le = Le<i16>;
+using i32le = Le<i32>;
+using i64le = Le<i64>;
 
 } // namespace Karm

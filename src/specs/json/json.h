@@ -272,9 +272,13 @@ Res<String> stringify(Value const &v);
 
 } // namespace Json
 
+inline auto operator""_json(char const *str, usize len) {
+    return Json::parse({str, len}).unwrap();
+}
+
 template <>
 struct Karm::Fmt::Formatter<Json::Value> {
-    Res<usize> format(Io::_TextWriter &writer, Json::Value value) {
+    Res<usize> format(Io::TextWriter &writer, Json::Value value) {
         Text::Emit emit{writer};
         try$(Json::stringify(emit, value));
         return Ok(emit.total());

@@ -14,11 +14,11 @@ namespace Embed {
 
 /* --- File I/O ------------------------------------------------------------- */
 
-Res<Strong<Sys::Fd>> openFile(Sys::Path path);
+Res<Strong<Sys::Fd>> openFile(Sys::Url url);
 
-Res<Vec<Sys::DirEntry>> readDir(Sys::Path path);
+Res<Vec<Sys::DirEntry>> readDir(Sys::Url url);
 
-Res<Strong<Sys::Fd>> createFile(Sys::Path path);
+Res<Strong<Sys::Fd>> createFile(Sys::Url url);
 
 Res<Cons<Strong<Sys::Fd>, Strong<Sys::Fd>>> createPipe();
 

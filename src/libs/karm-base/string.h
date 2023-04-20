@@ -53,13 +53,15 @@ struct _String {
     using Unit = typename E::Unit;
     using Inner = Unit;
 
-    Unit *_buf = nullptr;
-    usize _len = 0;
+    Unit *_buf;
+    usize _len;
 
-    _String() = default;
+    _String()
+        : _String("", 0) {}
 
     _String(Move, Unit *buf, usize len)
-        : _buf(buf), _len(len) {
+        : _buf(buf),
+          _len(len) {
     }
 
     _String(Unit const *buf, usize len)
@@ -69,7 +71,7 @@ struct _String {
         memcpy(_buf, buf, len * sizeof(Unit));
     }
 
-    constexpr _String(Unit const *cstr)
+    _String(Unit const *cstr)
         requires(Meta::Same<Unit, char>)
         : _String(cstr, strLen(cstr)) {}
 
@@ -80,9 +82,9 @@ struct _String {
         : _String(other._buf, other._len) {
     }
 
-    _String(_String &&other) {
-        std::swap(_buf, other._buf);
-        std::swap(_len, other._len);
+    _String(_String &&other)
+        : _buf(std::exchange(other._buf, nullptr)),
+          _len(std::exchange(other._len, 0)) {
     }
 
     ~_String() {

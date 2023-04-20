@@ -10,9 +10,9 @@
 namespace FileManager {
 
 Ui::Child app() {
-    return Ui::reducer<FileManager::Model>({"/"}, [](auto d) {
-        Sys::Path path = d.currentPath();
-        auto dir = Sys::Dir::open(path).unwrap();
+    return Ui::reducer<FileManager::Model>("file:/"_url, [](auto d) {
+        auto url = d.currentUrl();
+        auto dir = Sys::Dir::open(url).unwrap();
         auto titlebar = Ui::titlebar(Mdi::FOLDER, "File Manager");
         auto listing = FileManager::directoryListing(dir);
 

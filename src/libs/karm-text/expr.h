@@ -4,47 +4,6 @@
 
 namespace Karm::Re {
 
-inline auto nil() {
-    return [](auto &) {
-        return false;
-    };
-}
-
-inline auto any() {
-    return [](auto &) {
-        return true;
-    };
-}
-
-inline auto single(auto... c) {
-    return [=](auto &scan) {
-        if (((scan.curr() == (Rune)c) or ...)) {
-            scan.next();
-            return true;
-        }
-
-        return false;
-    };
-}
-
-inline auto eof() {
-    return [](auto &scan) {
-        return scan.ended();
-    };
-}
-
-inline auto word(Str word) {
-    return [=](auto &scan) {
-        return scan.skip(word);
-    };
-}
-
-inline auto range(Rune start, Rune end) {
-    return [=](auto &scan) {
-        return scan.curr() >= start and scan.curr() <= end;
-    };
-}
-
 inline auto either(auto... exprs) {
     return [=](auto &scan) {
         return (exprs(scan) or ...);
@@ -53,20 +12,19 @@ inline auto either(auto... exprs) {
 
 inline auto chain(auto... exprs) {
     return [=](auto &scan) {
-        return (exprs(scan) and ...);
+        auto saved = scan;
+        if ((exprs(scan) and ...)) {
+            return true;
+        }
+
+        scan = saved;
+        return false;
     };
 }
 
 inline auto negate(auto expr) {
     return [=](auto &scan) {
         return not expr(scan);
-    };
-}
-
-inline auto opt(auto expr) {
-    return [=](auto &scan) {
-        expr(scan);
-        return true;
     };
 }
 
@@ -90,11 +48,12 @@ inline auto zeroOrMore(auto expr) {
 
 inline auto oneOrMore(auto expr) {
     return [=](auto &scan) {
-        if (not expr(scan))
+        auto saved = scan;
+        if (not expr(scan)) {
+            scan = saved;
             return false;
-        while (expr(scan))
-            ;
-        return true;
+        }
+        return zeroOrMore(expr)(scan);
     };
 }
 
@@ -102,6 +61,52 @@ inline auto zeroOrOne(auto expr) {
     return [=](auto &scan) {
         expr(scan);
         return true;
+    };
+}
+
+/* --- Tokens --------------------------------------------------------------- */
+
+inline auto nil() {
+    return [](auto &) {
+        return false;
+    };
+}
+
+inline auto any() {
+    return [](auto &) {
+        return true;
+    };
+}
+
+inline auto eof() {
+    return [](auto &scan) {
+        return scan.ended();
+    };
+}
+
+inline auto word(Str word) {
+    return [=](auto &scan) {
+        return scan.skip(word);
+    };
+}
+
+inline auto single(auto... c) {
+    return [=](auto &scan) {
+        if (((scan.curr() == (Rune)c) or ...)) {
+            scan.next();
+            return true;
+        }
+        return false;
+    };
+}
+
+inline auto range(Rune start, Rune end) {
+    return [=](auto &scan) {
+        if (scan.curr() >= start and scan.curr() <= end) {
+            scan.next();
+            return true;
+        }
+        return false;
     };
 }
 
@@ -170,14 +175,14 @@ inline auto separator(Str w) {
 inline auto optSeparator(Rune r) {
     return chain(
         zeroOrMore(space()),
-        opt(single(r)),
+        zeroOrOne(single(r)),
         zeroOrMore(space()));
 }
 
 inline auto optSeparator(Str w) {
     return chain(
         zeroOrMore(space()),
-        opt(word(w)),
+        zeroOrOne(word(w)),
         zeroOrMore(space()));
 }
 

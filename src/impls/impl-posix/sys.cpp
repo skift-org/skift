@@ -1,7 +1,10 @@
-#include <dirent.h>
 #include <embed-sys/sys.h>
-#include <fcntl.h>
 #include <karm-io/funcs.h>
+#include <karm-logger/logger.h>
+
+/* Posix Stuff*/
+#include <dirent.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <sys/utsname.h>
@@ -75,8 +78,39 @@ struct PosixFd : public Sys::Fd {
     }
 };
 
-Res<Strong<Sys::Fd>> openFile(Sys::Path path) {
-    String str = path.str();
+Res<Sys::Path> resolve(Sys::Url url) {
+    logInfo("Resolving url: {}", url);
+
+    Sys::Path resolved;
+    if (Op::eq(url.scheme, "file")) {
+        logInfo("Resolving file: {}", url.path);
+        resolved = url.path;
+    } else if (Op::eq(url.scheme, "bundle")) {
+        auto *maybeRepo = getenv("OSDK_BUILDDIR");
+
+        if (not maybeRepo)
+            maybeRepo = getenv("SKIFT_BUNDLES");
+
+        if (not maybeRepo)
+            return Error::notFound("SKIFT_BUNDLES not set");
+
+        auto path = url.path;
+        path.rooted = false;
+
+        resolved = Sys::Path::parse(maybeRepo)
+                       .join(url.host)
+                       .join("res")
+                       .join(path);
+    } else {
+        return Error::notFound("unknown url scheme");
+    }
+
+    logInfo("Resolved to: {}", resolved);
+    return Ok(resolved);
+}
+
+Res<Strong<Sys::Fd>> openFile(Sys::Url url) {
+    String str = try$(try$(resolve(url)).str());
     isize fd = ::open(str.buf(), O_RDONLY);
 
     if (fd < 0) {
@@ -86,8 +120,9 @@ Res<Strong<Sys::Fd>> openFile(Sys::Path path) {
     return Ok(makeStrong<PosixFd>(fd));
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Sys::Path path) {
-    String str = path.str();
+Res<Vec<Sys::DirEntry>> readDir(Sys::Url url) {
+    String str = try$(try$(resolve(url)).str());
+
     DIR *dir = ::opendir(str.buf());
     if (not dir) {
         return Posix::fromLastErrno();
@@ -104,10 +139,10 @@ Res<Vec<Sys::DirEntry>> readDir(Sys::Path path) {
     return Ok(entries);
 }
 
-Res<Strong<Sys::Fd>> createFile(Sys::Path path) {
-    String str = path.str();
+Res<Strong<Sys::Fd>> createFile(Sys::Url url) {
+    String str = try$(try$(resolve(url)).str());
 
-    isize fd = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
+    auto fd = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
 
     if (fd < 0) {
         return Posix::fromLastErrno();

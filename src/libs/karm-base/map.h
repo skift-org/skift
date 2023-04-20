@@ -37,6 +37,10 @@ struct Map {
         return NONE;
     }
 
+    Opt<V> get(K key) const {
+        return get(key);
+    }
+
     auto iter() {
         return mutIter(_els);
     }

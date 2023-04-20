@@ -134,7 +134,7 @@ Res<Strong<Sys::Fd>> createErr() {
     return Ok(makeStrong<ConOut>(Efi::st()->stdErr));
 }
 
-Res<Strong<Sys::Fd>> openFile(Sys::Path path) {
+Res<Strong<Sys::Fd>> openFile(Sys::Url url) {
     static Efi::SimpleFileSystemProtocol *fileSystem = nullptr;
     if (not fileSystem) {
         fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(Efi::li()->deviceHandle));
@@ -146,7 +146,7 @@ Res<Strong<Sys::Fd>> openFile(Sys::Path path) {
     }
 
     Efi::FileProtocol *file = nullptr;
-    _String<Utf16> pathStr = transcode<Utf16>(path.str());
+    _String<Utf16> pathStr = transcode<Utf16, Utf8>(try$(url.str()));
 
     // NOTE: Convert '/' to '\' as EFI uses '\' as path separator
     for (auto &u : pathStr) {
@@ -159,11 +159,11 @@ Res<Strong<Sys::Fd>> openFile(Sys::Path path) {
     return Ok(makeStrong<FileProto>(file));
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Sys::Path) {
+Res<Vec<Sys::DirEntry>> readDir(Sys::Url) {
     return Error::notImplemented();
 }
 
-Res<Strong<Sys::Fd>> createFile(Sys::Path) {
+Res<Strong<Sys::Fd>> createFile(Sys::Url) {
     return Error::notImplemented();
 }
 

@@ -15,6 +15,22 @@ namespace Loader {
 
 void enterKernel(usize entry, usize payload, usize stack, usize vmm);
 
+Res<Sys::File> openUrl(Sys::Url const &url) {
+    // load the bundle's json
+    auto bundlePath = try$(Fmt::format("/bundles/{}.json", url.host));
+    auto bundleFile = try$(Sys::File::open(bundlePath));
+    auto bundleStr = try$(Io::readAllUtf8(bundleFile));
+    auto bundleJson = try$(Json::parse(bundleStr));
+
+    // lookup the object ref
+    auto objects = bundleJson.get("objects");
+
+    auto objectRef = try$(objects.get(url.path.str()).take<String>());
+
+    // open the object
+    return Sys::File::open(objectRef);
+}
+
 Res<> loadEntry(Entry const &entry) {
     logInfo("loader: preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
@@ -25,7 +41,7 @@ Res<> loadEntry(Entry const &entry) {
     payload.add(Handover::SELF, 0, payloadMem.prange());
 
     logInfo("loader: loading kernel file...");
-    Sys::File kernelFile = try$(Sys::File::open(entry.kernel.path));
+    Sys::File kernelFile = try$(openUrl(entry.kernel.url));
     auto kernelMem = try$(Sys::mmap().map(kernelFile));
     Elf::Image image{kernelMem.bytes()};
     payload.add(Handover::FILE, 0, kernelMem.prange().as<USizeRange>());
@@ -60,13 +76,13 @@ Res<> loadEntry(Entry const &entry) {
 
     logInfo("loader: loading additional files...");
     for (auto const &file : entry.files) {
-        logInfo("loader: loading file: {}", file.path);
+        logInfo("loader: loading file: {}", file.url);
 
-        auto fileFile = try$(Sys::File::open(file.path));
+        auto fileFile = try$(openUrl(file.url));
         auto fileMem = try$(Sys::mmap().map(fileFile));
         auto fileRange = fileMem.prange();
 
-        auto strId = payload.add(file.path);
+        auto strId = payload.add(file.url.path.str());
         auto propStr = try$(Json::stringify(file.props));
         auto propsId = payload.add(propStr);
 

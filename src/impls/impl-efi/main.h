@@ -4,7 +4,6 @@
 #include <efi/base.h>
 #include <karm-fmt/fmt.h>
 #include <karm-main/base.h>
-#include <karm-media/bundle.h>
 #include <karm-sys/chan.h>
 
 #ifdef EMBED_EFI_MAIN_IMPL
@@ -19,7 +18,6 @@ extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable *st) {
     char const *self = "efi-app";
     char const *argv[] = {self, nullptr};
     ctx.add<ArgsHook>(1, argv);
-    ctx.add<Media::BundleHook>(makeStrong<Media::DummyBundle>());
 
     Res<> code = entryPoint(ctx);
 

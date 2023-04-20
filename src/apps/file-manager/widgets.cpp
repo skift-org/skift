@@ -12,7 +12,7 @@ namespace FileManager {
 
 Ui::Child directorEntry(Sys::DirEntry const &entry) {
     return Ui::button(
-        Model::bind<GoTo>(entry.name),
+        Model::bind<Navigate>(entry.name),
         Ui::ButtonStyle::subtle(),
         entry.isDir ? Mdi::FOLDER : Mdi::FILE,
         entry.name);
@@ -23,7 +23,12 @@ Ui::Child directoryListing(Sys::Dir const &dir) {
     for (auto const &entry : dir.entries()) {
         children.pushBack(directorEntry(entry));
     }
-    return Ui::grow(Ui::vscroll(Ui::spacing(8, Ui::align(Layout::Align::TOP | Layout::Align::HFILL, Ui::vflow(children)))));
+
+    return Ui::vflow(children) |
+           Ui::align(Layout::Align::TOP | Layout::Align::HFILL) |
+           Ui::spacing(8) |
+           Ui::vscroll() |
+           Ui::grow();
 }
 
 Ui::Child breadcrumbItem(Str text, isize index) {
@@ -50,8 +55,8 @@ Ui::Child breadcrumb(State const &state) {
             Ui::button(Model::bind<GoRoot>(), Ui::ButtonStyle::subtle(), Mdi::LAPTOP),
 
             Ui::hflow(state
-                          .currentPath()
-                          .iterParts()
+                          .currentUrl()
+                          .iter()
                           .mapi(breadcrumbItem)
                           .collect<Ui::Children>()),
 
@@ -73,11 +78,9 @@ Ui::Child toolbar(State const &state) {
 
 Ui::Child openFileDialog() {
     return Ui::reducer<FileManager::Model>(
-        {"/"},
+        {"file:/"_url},
         [](auto d) {
-            Sys::Path path = d.currentPath();
-
-            Sys::Dir dir = Sys::Dir::open(path).take();
+            Sys::Dir dir = Sys::Dir::open(d.currentUrl()).take();
 
             auto titleLbl = Ui::text(
                 Ui::TextStyle::titleLarge(), "Open File");
@@ -85,12 +88,9 @@ Ui::Child openFileDialog() {
             auto msgLbl = Ui::text(
                 Ui::TextStyle::titleMedium(), "Select a file to open.");
 
-            auto titleBar = Ui::spacing(
-                16,
-                Ui::vflow(
-                    8,
-                    titleLbl,
-                    msgLbl));
+            auto titleBar =
+                Ui::vflow(8, titleLbl, msgLbl) |
+                Ui::spacing(16);
 
             auto openBtn = Ui::button(
                 Ui::closeDialog,
@@ -120,13 +120,5 @@ Ui::Child openFileDialog() {
                     controls));
         });
 }
-
-/*
-Ui::Child saveFileDialog() {
-}
-
-Ui::Child directoryDialog() {
-}
-*/
 
 } // namespace FileManager

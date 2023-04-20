@@ -6,13 +6,13 @@
 namespace FileManager {
 
 struct State {
-    Vec<Sys::Path> history;
+    Vec<Sys::Url> history;
     usize currentIndex = 0;
 
-    State(Sys::Path path)
+    State(Sys::Url path)
         : history({path}) {}
 
-    Sys::Path currentPath() const {
+    Sys::Url currentUrl() const {
         return history[currentIndex];
     }
 
@@ -25,7 +25,7 @@ struct State {
     }
 
     bool canGoParent() const {
-        return currentPath().hasParent();
+        return currentUrl().path.len() > 0;
     }
 };
 
@@ -42,14 +42,19 @@ struct GoParent {
 };
 
 struct GoTo {
-    Sys::Path path;
+    Sys::Url url;
 };
 
-struct Refresh {};
+struct Navigate {
+    String item;
+};
+
+struct Refresh {
+};
 
 struct AddBookmark {};
 
-using Actions = Var<GoRoot, GoHome, GoBack, GoForward, GoParent, GoTo, Refresh, AddBookmark>;
+using Actions = Var<GoRoot, GoHome, GoBack, GoForward, GoParent, Navigate, GoTo, Refresh, AddBookmark>;
 
 State reduce(State d, Actions action);
 

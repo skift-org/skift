@@ -14,13 +14,13 @@ struct DirEntry {
 
 struct Dir {
     Vec<DirEntry> _entries;
-    Path _path;
+    Url _url;
 
-    static Res<Dir> open(Path path);
+    static Res<Dir> open(Url url);
 
     auto const &entries() const { return _entries; }
 
-    auto const &path() const { return _path; }
+    auto const &path() const { return _url; }
 };
 
 } // namespace Karm::Sys

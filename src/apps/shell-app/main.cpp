@@ -1,5 +1,4 @@
 #include <karm-main/main.h>
-#include <karm-media/bundle.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
@@ -303,7 +302,7 @@ Ui::Child lockscreen() {
 
 Ui::Child app() {
     return Ui::reducer<Model>({}, [](auto state) {
-        auto wallpapers = useBundle().loadImageOrFallback("skift-wallpapers/brutal.qoi").unwrap();
+        auto wallpapers = Media::loadImageOrFallback("bundle://skift-wallpapers/images/brutal.qoi"_url).unwrap();
         auto background = Ui::align(Layout::Align::COVER, Ui::image(wallpapers));
         return Ui::dialogLayer(
             Ui::pinSize(

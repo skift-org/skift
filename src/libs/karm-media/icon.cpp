@@ -1,5 +1,4 @@
 #include <karm-gfx/context.h>
-#include <karm-media/bundle.h>
 
 #include "icon.h"
 
@@ -8,7 +7,7 @@ namespace Karm::Media {
 static Opt<Strong<Fontface>> _fontface = NONE;
 Strong<Fontface> Icon::fontface() {
     if (!_fontface) {
-        _fontface = useBundle().loadFontfaceOrFallback("mdi-font/Material-Design-Icons.ttf").unwrap();
+        _fontface = Media::loadFontfaceOrFallback("bundle://mdi-font/Material-Design-Icons.ttf"_url).unwrap();
     }
     return *_fontface;
 }

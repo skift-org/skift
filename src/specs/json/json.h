@@ -262,9 +262,50 @@ struct Value {
     }
 };
 
-Res<Value> parse(Text::Scan &s);
+enum struct Features : u16 {
+    NIL = 0,
 
-Res<Value> parse(Str s);
+    /* Fatures */
+    OBJECT_UNQUOTED_KEYS = 1 << 0,
+    OBJECT_TRAILING_COMMA = 1 << 1,
+
+    ARRAY_TRAILING_COMMA = 1 << 2,
+
+    STRING_SINGLE_QUOTES = 1 << 3,
+    STRING_MULTILINE = 1 << 4,
+    STRING_ESCAPE_SLASH = 1 << 5,
+
+    NUMBER_HEX = 1 << 6,
+    NUMBER_DECIMAL_POINT = 1 << 7,
+    NUMBER_INF_NAN = 1 << 8,
+    NUMBER_PLUS_SIGN = 1 << 9,
+
+    COMMENT_C_STYLE = 1 << 10,
+    COMMENT_CXX_STYLE = 1 << 11,
+
+    /* Flavors */
+    JSON = NIL,
+
+    JSONC = JSON |
+            COMMENT_C_STYLE |
+            COMMENT_CXX_STYLE,
+
+    JSON5 = JSONC |
+            OBJECT_UNQUOTED_KEYS |
+            OBJECT_TRAILING_COMMA |
+            ARRAY_TRAILING_COMMA |
+            STRING_SINGLE_QUOTES |
+            STRING_MULTILINE |
+            STRING_ESCAPE_SLASH |
+            NUMBER_HEX |
+            NUMBER_DECIMAL_POINT |
+            NUMBER_INF_NAN |
+            NUMBER_PLUS_SIGN,
+};
+
+Res<Value> parse(Text::Scan &s, Features features = Features::JSON);
+
+Res<Value> parse(Str s, Features features = Features::JSON);
 
 Res<> stringify(Text::Emit &emit, Value const &v);
 
@@ -274,6 +315,14 @@ Res<String> stringify(Value const &v);
 
 inline auto operator""_json(char const *str, usize len) {
     return Json::parse({str, len}).unwrap();
+}
+
+inline auto operator""_jsonc(char const *str, usize len) {
+    return Json::parse({str, len}, Json::Features::JSONC).unwrap();
+}
+
+inline auto operator""_json5(char const *str, usize len) {
+    return Json::parse({str, len}, Json::Features::JSON5).unwrap();
 }
 
 template <>

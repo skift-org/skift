@@ -1,24 +1,23 @@
 {
     "entries": [
         {
-            "icon": "boot/icons/skift.qoi",
+            "icon": "bundle://skift-branding/images/icon.qoi",
             "name": "skiftOS",
             "kernel": {
-                "path": "/boot/kernel.elf",
+                "url": "bundle://hjert/_bin",
                 "props": {}
             },
             "files": [
                 {
-                    "path": "/servers/system",
+                    "url": "bundle://system-srv/_bin",
                     "props": {}
                 }
             ]
         },
         {
-            "icon": "boot/icons/lyre.qoi",
             "name": "Limine Test",
             "kernel": {
-                "path": "/boot/limine-tests.elf",
+                "url": "bundle://limine-tests/_bin",
                 "props": {}
             },
             "files": []

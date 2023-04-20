@@ -4,23 +4,23 @@
 #include <karm-main/base.h>
 #include <karm-media/icon.h>
 #include <karm-media/image.h>
+#include <karm-sys/file.h>
 
 namespace Loader {
 
+Res<Sys::File> openUrl(Sys::Url const &url);
+
 struct File {
-    String path;
+    Sys::Url url;
     Json::Value props;
 
     static Res<File> fromJson(Json::Value const &json) {
-        if (not json.isObject()) {
+        if (not json.isObject())
             return Error::invalidInput("expected object");
-        }
 
         File file = {};
-
-        file.path = try$(json.get("path").take<String>());
+        file.url = Sys::Url::parse(try$(json.get("path").take<String>()));
         file.props = json.get("props");
-
         return Ok(file);
     }
 };
@@ -32,14 +32,14 @@ struct Entry {
     Vec<File> files;
 
     static Res<Entry> fromJson(Json::Value const &json) {
-        if (not json.isObject()) {
+        if (not json.isObject())
             return Error::invalidInput("expected object");
-        }
 
         Entry entry = {};
 
         auto maybeIcon = json.get("icon").take<String>();
         if (maybeIcon) {
+            auto maybeImageFile = try$(openUrl(Sys::Url::parse(*maybeIcon)));
             auto maybeImage = Media::loadImage(*maybeIcon);
             if (not maybeImage) {
                 entry.icon = Mdi::byName(*maybeIcon).unwrap();

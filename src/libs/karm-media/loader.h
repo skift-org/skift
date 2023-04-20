@@ -9,12 +9,18 @@ namespace Karm::Media {
 
 Res<Strong<Fontface>> loadFontface(Sys::Mmap &&map);
 
-Res<Strong<Fontface>> loadFontface(Str path);
+Res<Strong<Fontface>> loadFontface(Sys::Url url);
 
-Res<Font> loadFont(f64 size, Str path);
+Res<Strong<Fontface>> loadFontfaceOrFallback(Sys::Url url);
+
+Res<Font> loadFont(f64 size, Sys::Url url);
+
+Res<Font> loadFontOrFallback(f64 size, Sys::Url url);
 
 Res<Image> loadImage(Sys::Mmap &&map);
 
-Res<Image> loadImage(Str path);
+Res<Image> loadImage(Sys::Url url);
+
+Res<Image> loadImageOrFallback(Sys::Url url);
 
 } // namespace Karm::Media

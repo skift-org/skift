@@ -14,20 +14,34 @@ Res<Strong<Fontface>> loadFontface(Sys::Mmap &&map) {
     return Ok(try$(TtfFontface::load(std::move(map))));
 }
 
-Res<Strong<Fontface>> loadFontface(Str path) {
-    logInfo("media: loading '{}' as fontface...", path);
-    auto file = try$(Sys::File::open(path));
+Res<Strong<Fontface>> loadFontface(Sys::Url url) {
+    logInfo("media: loading '{}' as fontface...", url);
+    auto file = try$(Sys::File::open(url));
     auto map = try$(Sys::mmap().map(file));
     return loadFontface(std::move(map));
 }
 
-Res<Font> loadFont(f64 size, Str path) {
-    logInfo("media: loading '{}' as font...", path);
+Res<Strong<Fontface>> loadFontfaceOrFallback(Sys::Url url) {
+    if (auto result = loadFontface(url); result) {
+        return result;
+    }
+    return Ok(Fontface::fallback());
+}
+
+Res<Font> loadFont(f64 size, Sys::Url url) {
+    logInfo("media: loading '{}' as font...", url);
 
     return Ok(Font{
-        .fontface = try$(loadFontface(path)),
+        .fontface = try$(loadFontface(url)),
         .fontsize = size,
     });
+}
+
+Res<Font> loadFontOrFallback(f64 size, Sys::Url url) {
+    if (auto result = loadFont(size, url); result) {
+        return result;
+    }
+    return Ok(Font::fallback());
 }
 
 static Res<Image> loadQoi(Bytes bytes) {
@@ -43,7 +57,6 @@ static Res<Image> loadPng(Bytes bytes) {
 
     img
         .mutPixels()
-        .clip(img.bound())
         .clear(Gfx::PINK);
 
     // try$(png.decode(img));
@@ -56,7 +69,6 @@ static Res<Image> loadJpeg(Bytes bytes) {
 
     img
         .mutPixels()
-        .clip(img.bound())
         .clear(Gfx::PINK);
 
     // try$(jpeg.decode(img));
@@ -75,10 +87,17 @@ Res<Image> loadImage(Sys::Mmap &&map) {
     }
 }
 
-Res<Image> loadImage(Str path) {
-    auto file = try$(Sys::File::open(path));
+Res<Image> loadImage(Sys::Url url) {
+    auto file = try$(Sys::File::open(url));
     auto map = try$(Sys::mmap().map(file));
     return loadImage(std::move(map));
+}
+
+Res<Image> loadImageOrFallback(Sys::Url url) {
+    if (auto result = loadImage(url); result) {
+        return result;
+    }
+    return Ok(Image::fallback());
 }
 
 } // namespace Karm::Media

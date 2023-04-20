@@ -17,13 +17,31 @@ struct File :
     Meta::NoCopy {
 
     Strong<Fd> _fd;
-    Path _path;
+    Url _url;
 
-    File(Strong<Fd> fd, Path path) : _fd(fd), _path(path) {}
+    File(Strong<Fd> fd, Url url) : _fd(fd), _url(url) {}
 
-    static Res<File> create(Path path);
+    static Res<File> create(Url url);
 
-    static Res<File> open(Path path);
+    static Res<File> create(Path path) {
+        Url url{.scheme = "file", .path = path};
+        return create(url);
+    }
+
+    static Res<File> create(Str path) {
+        return create(Url::parse(path));
+    }
+
+    static Res<File> open(Url url);
+
+    static Res<File> open(Path path) {
+        Url url{.scheme = "file", .path = path};
+        return open(url);
+    }
+
+    static Res<File> open(Str path) {
+        return open(Path::parse(path));
+    }
 
     Res<usize> read(MutBytes bytes) override {
         return _fd->read(bytes);

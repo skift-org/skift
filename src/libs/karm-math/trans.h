@@ -135,7 +135,7 @@ using Trans2f = Trans2<f64>;
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Trans2<T>> {
-    Res<usize> format(Io::_TextWriter &writer, Math::Trans2<T> trans) {
+    Res<usize> format(Io::TextWriter &writer, Math::Trans2<T> trans) {
         return Fmt::format(writer, "Trans2({}, {}, {}, {}, {}, {})", trans.xx, trans.xy, trans.yx, trans.yy, trans.ox, trans.oy);
     }
 };

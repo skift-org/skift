@@ -7,7 +7,7 @@
 
 namespace x86_64 {
 
-struct Com : public Io::TextWriter<> {
+struct Com : public Io::TextWriterBase<> {
     Hal::Io _io;
 
     Com(Hal::Io io) : _io(io) {

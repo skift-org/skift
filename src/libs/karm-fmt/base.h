@@ -13,7 +13,7 @@ struct Formatter;
 struct _Args {
     virtual ~_Args() = default;
     virtual usize len() = 0;
-    virtual Res<usize> format(Text::Scan &scan, Io::_TextWriter &writer, usize index) = 0;
+    virtual Res<usize> format(Text::Scan &scan, Io::TextWriter &writer, usize index) = 0;
 };
 
 template <typename... Ts>
@@ -24,7 +24,7 @@ struct Args : public _Args {
 
     usize len() override { return _tuple.len(); }
 
-    Res<usize> format(Text::Scan &scan, Io::_TextWriter &writer, usize index) override {
+    Res<usize> format(Text::Scan &scan, Io::TextWriter &writer, usize index) override {
         Res<usize> result = Error("format index out of range");
         usize i = 0;
         _tuple.visit([&](auto const &t) {
@@ -44,7 +44,7 @@ struct Args : public _Args {
     }
 };
 
-inline Res<usize> _format(Io::_TextWriter &writer, Str format, _Args &args) {
+inline Res<usize> _format(Io::TextWriter &writer, Str format, _Args &args) {
     Text::Scan scan{format};
     usize written = 0;
     usize index = 0;
@@ -74,7 +74,7 @@ inline Res<usize> _format(Io::_TextWriter &writer, Str format, _Args &args) {
 }
 
 template <typename... Ts>
-inline Res<usize> format(Io::_TextWriter &writer, Str format, Ts &&...ts) {
+inline Res<usize> format(Io::TextWriter &writer, Str format, Ts &&...ts) {
     Args<Ts...> args{std::forward<Ts>(ts)...};
     return _format(writer, format, args);
 }

@@ -7,7 +7,7 @@
 
 namespace Embed {
 
-struct DebugOut : public Io::TextWriter<> {
+struct DebugOut : public Io::TextWriterBase<> {
     Res<usize> write(Bytes bytes) override {
         usize writen{};
         Array<u16, 129> buf{};

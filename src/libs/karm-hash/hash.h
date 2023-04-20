@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/endiant.h>
+#include <karm-base/endian.h>
 #include <karm-base/slice.h>
 #include <karm-fmt/case.h>
 #include <karm-fmt/fmt.h>
@@ -520,7 +520,7 @@ static inline Res<HashDigest<H>> digest(Io::Reader &reader, H h = {}) {
 
 template <>
 struct Karm::Fmt::Formatter<Karm::Hash::AnyDigest> {
-    Res<usize> format(Io::_TextWriter &writer, Karm::Hash::AnyDigest digest) {
+    Res<usize> format(Io::TextWriter &writer, Karm::Hash::AnyDigest digest) {
         usize writen = 0;
         writen += try$(Fmt::format(writer, "{}:", Fmt::cased(Karm::Hash::name(digest._type), Fmt::Case::LOWER)));
         for (auto byte : digest.bytes()) {

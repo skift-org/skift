@@ -90,7 +90,7 @@ struct Karm::Fmt::Formatter<Karm::Fmt::Cased<T>> {
         }
     }
 
-    Res<usize> format(Io::_TextWriter &writer, Karm::Fmt::Cased<T> cased) {
+    Res<usize> format(Io::TextWriter &writer, Karm::Fmt::Cased<T> cased) {
         auto result = try$(changeCase(cased._inner, cased._case));
         return writer.writeStr(result);
     }

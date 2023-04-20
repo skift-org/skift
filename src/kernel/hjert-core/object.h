@@ -93,7 +93,7 @@ struct ObjectLockScope : public LockScope {
 
 template <Meta::Derive<Hjert::Core::Object> T>
 struct Karm::Fmt::Formatter<T> {
-    Res<usize> format(Io::_TextWriter &writer, Hjert::Core::Object const &obj) {
+    Res<usize> format(Io::TextWriter &writer, Hjert::Core::Object const &obj) {
         return Fmt::format(writer, "{}({}, '{}')", Fmt::toPascalCase(Hj::toStr(obj._type)).unwrap(), obj.id(), obj.label());
     }
 };

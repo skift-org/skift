@@ -72,16 +72,22 @@ struct Flusher {
 
 static_assert(Flushable<Flusher>);
 
-struct _TextWriter : public Writer {
+struct TextWriter :
+    public Writer,
+    public Flusher {
     using Writer::write;
 
     virtual Res<usize> writeStr(Str str) = 0;
 
     virtual Res<usize> writeRune(Rune rune) = 0;
+
+    Res<usize> flush() override { return Ok(0uz); }
 };
 
 template <StaticEncoding E = typename Embed::Encoding>
-struct TextWriter : public _TextWriter, public Flusher {
+struct TextWriterBase :
+    public TextWriter {
+
     using Writer::write;
 
     Res<usize> writeStr(Str str) override {
@@ -98,10 +104,6 @@ struct TextWriter : public _TextWriter, public Flusher {
             return Ok(0uz);
         }
         return write(bytes(one));
-    }
-
-    Res<usize> flush() override {
-        return Ok(0uz);
     }
 };
 

@@ -27,7 +27,7 @@ Res<> init(Handover::Payload &);
 
 Hal::Vmm &vmm();
 
-Io::TextWriter<> &loggerOut();
+Io::TextWriter &loggerOut();
 
 [[noreturn]] void stopAll();
 

@@ -8,6 +8,6 @@ void loggerLock();
 
 void loggerUnlock();
 
-Io::TextWriter<> &loggerOut();
+Io::TextWriter &loggerOut();
 
 } // namespace Embed

@@ -197,7 +197,7 @@ struct BitReader {
 };
 
 template <StaticEncoding E>
-struct _StringWriter : public _TextWriter {
+struct _StringWriter : public TextWriter {
     Buf<typename E::Unit> _buf{};
 
     _StringWriter(usize cap = 16) : _buf(cap) {}

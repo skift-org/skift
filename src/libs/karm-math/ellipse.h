@@ -42,7 +42,7 @@ using Ellipsef = Ellipse<f64>;
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Ellipse<T>> {
-    Res<usize> format(Io::_TextWriter &writer, Math::Ellipse<T> ellipse) {
+    Res<usize> format(Io::TextWriter &writer, Math::Ellipse<T> ellipse) {
         return Fmt::format(writer, "Ellipse({}, {}, {}, {})", ellipse.center.x, ellipse.center.y, ellipse.radius.x, ellipse.radius.y);
     }
 };

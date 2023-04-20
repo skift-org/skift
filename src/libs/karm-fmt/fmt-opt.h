@@ -16,7 +16,7 @@ struct Formatter<Opt<T>> {
         }
     }
 
-    Res<usize> format(Io::_TextWriter &writer, Opt<T> opt) {
+    Res<usize> format(Io::TextWriter &writer, Opt<T> opt) {
         if (opt) {
             return formatter.format(writer, *opt);
         }

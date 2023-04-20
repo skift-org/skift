@@ -102,7 +102,7 @@ struct Decimal {
 
 template <>
 struct Karm::Fmt::Formatter<Karm::Math::Decimal> {
-    Res<usize> format(Io::_TextWriter &writer, Karm::Math::Decimal dec) {
+    Res<usize> format(Io::TextWriter &writer, Karm::Math::Decimal dec) {
         return Fmt::format(writer, "{}", dec.cast<isize>());
     }
 };

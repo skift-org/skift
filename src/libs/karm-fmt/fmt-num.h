@@ -62,7 +62,7 @@ struct NumberFormater {
         }
     }
 
-    Res<usize> formatUnsigned(Io::_TextWriter &writer, u64 value) {
+    Res<usize> formatUnsigned(Io::TextWriter &writer, u64 value) {
         auto digit = [](usize v) {
             if (v < 10) {
                 return '0' + v;
@@ -95,7 +95,7 @@ struct NumberFormater {
         return writer.writeStr({buf.buf(), i});
     }
 
-    Res<usize> formatSigned(Io::_TextWriter &writer, i64 value) {
+    Res<usize> formatSigned(Io::TextWriter &writer, i64 value) {
         usize written = 0;
         if (value < 0) {
             written += try$(writer.writeRune('-'));
@@ -109,7 +109,7 @@ struct NumberFormater {
 
 template <typename T>
 struct UnsignedFormatter : public NumberFormater {
-    Res<usize> format(Io::_TextWriter &writer, T const value) {
+    Res<usize> format(Io::TextWriter &writer, T const value) {
         if (isChar) {
             return writer.writeRune(value);
         }
@@ -119,7 +119,7 @@ struct UnsignedFormatter : public NumberFormater {
 
 template <typename T>
 struct SignedFormatter : public NumberFormater {
-    Res<usize> format(Io::_TextWriter &writer, T const value) {
+    Res<usize> format(Io::TextWriter &writer, T const value) {
         if (isChar) {
             return writer.writeRune(value);
         }
@@ -136,7 +136,7 @@ struct Formatter<T> : public SignedFormatter<T> {};
 
 template <>
 struct Formatter<f64> {
-    Res<usize> format(Io::_TextWriter &writer, f64 const value) {
+    Res<usize> format(Io::TextWriter &writer, f64 const value) {
         NumberFormater formater;
         usize written = 0;
         isize ipart = (isize)value;

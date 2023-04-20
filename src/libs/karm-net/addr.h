@@ -155,21 +155,21 @@ struct SocketAddr {
 
 template <>
 struct Karm::Fmt::Formatter<Net::Ip4> {
-    Res<usize> format(Io::_TextWriter &writer, Net::Ip4 addr) {
+    Res<usize> format(Io::TextWriter &writer, Net::Ip4 addr) {
         return Fmt::format(writer, "{}.{}.{}.{}", addr.a, addr.b, addr.c, addr.d);
     }
 };
 
 template <>
 struct Karm::Fmt::Formatter<Net::Ip6> {
-    Res<usize> format(Io::_TextWriter &writer, Net::Ip6 addr) {
+    Res<usize> format(Io::TextWriter &writer, Net::Ip6 addr) {
         return Fmt::format(writer, "{}:{}:{}:{}:{}:{}:{}:{}", addr.a, addr.b, addr.c, addr.d, addr.e, addr.f, addr.g, addr.h);
     }
 };
 
 template <>
 struct Karm::Fmt::Formatter<Net::Ip> {
-    Res<usize> format(Io::_TextWriter &writer, Net::Ip addr) {
+    Res<usize> format(Io::TextWriter &writer, Net::Ip addr) {
         return addr.visit([&](auto addr) {
             return Fmt::format(writer, "{}", addr);
         });
@@ -178,7 +178,7 @@ struct Karm::Fmt::Formatter<Net::Ip> {
 
 template <>
 struct Karm::Fmt::Formatter<Net::SocketAddr> {
-    Res<usize> format(Io::_TextWriter &writer, Net::SocketAddr addr) {
+    Res<usize> format(Io::TextWriter &writer, Net::SocketAddr addr) {
         return Fmt::format(writer, "{}:{}", addr.addr, addr.port);
     }
 };

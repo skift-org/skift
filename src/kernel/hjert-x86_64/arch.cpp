@@ -61,7 +61,7 @@ Res<> init(Handover::Payload &) {
     return Ok();
 }
 
-Io::TextWriter<> &loggerOut() {
+Io::TextWriter &loggerOut() {
     return _com1;
 }
 

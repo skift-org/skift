@@ -8,7 +8,7 @@ void loggerLock() {}
 
 void loggerUnlock() {}
 
-struct LoggerOut : public Io::TextWriter<> {
+struct LoggerOut : public Io::TextWriterBase<> {
     Io::BufferWriter _buf;
 
     Res<usize> write(Bytes bytes) override {
@@ -21,7 +21,7 @@ struct LoggerOut : public Io::TextWriter<> {
     }
 };
 
-Io::TextWriter<> &loggerOut() {
+Io::TextWriter &loggerOut() {
     static LoggerOut _loggerOut{};
     return _loggerOut;
 }

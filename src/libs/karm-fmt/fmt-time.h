@@ -8,21 +8,21 @@ namespace Karm::Fmt {
 
 template <>
 struct Karm::Fmt::Formatter<Time> {
-    Res<usize> format(Io::_TextWriter &writer, Time time) {
+    Res<usize> format(Io::TextWriter &writer, Time time) {
         return Fmt::format(writer, "{02}:{02}:{02}", time.hour, time.minute, time.second);
     }
 };
 
 template <>
 struct Karm::Fmt::Formatter<Date> {
-    Res<usize> format(Io::_TextWriter &writer, Date date) {
+    Res<usize> format(Io::TextWriter &writer, Date date) {
         return Fmt::format(writer, "{04}-{02}-{02}", (isize)date.year, (usize)date.month + 1, (usize)date.day + 1);
     }
 };
 
 template <>
 struct Karm::Fmt::Formatter<DateTime> {
-    Res<usize> format(Io::_TextWriter &writer, DateTime dateTime) {
+    Res<usize> format(Io::TextWriter &writer, DateTime dateTime) {
         return Fmt::format(writer, "{} {}", dateTime.date, dateTime.time);
     }
 };

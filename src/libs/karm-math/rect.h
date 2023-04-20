@@ -242,7 +242,7 @@ using Rectf = Rect<f64>;
 
 template <typename T>
 struct Karm::Fmt::Formatter<Math::Rect<T>> {
-    Res<usize> format(Io::_TextWriter &writer, Math::Rect<T> rect) {
+    Res<usize> format(Io::TextWriter &writer, Math::Rect<T> rect) {
         return Fmt::format(writer, "Rect({}, {}, {}, {})", rect.x, rect.y, rect.width, rect.height);
     }
 };

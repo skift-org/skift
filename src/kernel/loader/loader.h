@@ -1,6 +1,7 @@
 #pragma once
 
 #include <json/json.h>
+#include <karm-logger/logger.h>
 #include <karm-main/base.h>
 #include <karm-media/icon.h>
 #include <karm-media/image.h>
@@ -18,10 +19,10 @@ struct File {
         if (not json.isObject())
             return Error::invalidInput("expected object");
 
-        File file = {};
-        file.url = Sys::Url::parse(try$(json.get("path").take<String>()));
-        file.props = json.get("props");
-        return Ok(file);
+        return Ok(File{
+            .url = Sys::Url::parse(try$(json.get("url").take<String>())),
+            .props = json.get("props"),
+        });
     }
 };
 
@@ -39,8 +40,7 @@ struct Entry {
 
         auto maybeIcon = json.get("icon").take<String>();
         if (maybeIcon) {
-            auto maybeImageFile = try$(openUrl(Sys::Url::parse(*maybeIcon)));
-            auto maybeImage = Media::loadImage(*maybeIcon);
+            auto maybeImage = Media::loadImage(Sys::Url::parse(*maybeIcon));
             if (not maybeImage) {
                 entry.icon = Mdi::byName(*maybeIcon).unwrap();
             } else {

@@ -183,7 +183,6 @@ Res<usize> Url::write(Io::TextWriter &writer) const {
     if (port)
         written += try$(Fmt::format(writer, ":{}", port.unwrap()));
 
-    written += try$(writer.writeRune('/'));
     written += try$(path.write(writer));
 
     if (query.len() > 0)

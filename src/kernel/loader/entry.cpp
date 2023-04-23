@@ -12,15 +12,15 @@ Res<> entryPoint(Ctx &ctx) {
     logInfo(" |____\\___/\\__,_\\__,_\\___|_|");
     logInfo("");
 
-    logInfo("Loading configs...");
-    auto file = try$(Sys::File::open("/boot/loader.json"));
+    logInfo("loading configs...");
+    auto file = try$(Sys::File::open("file:/boot/loader.json"_url));
 
-    logInfo("Parsing configs...");
+    logInfo("parsing configs...");
     auto fileStr = try$(Io::readAllUtf8(file));
     auto json = try$(Json::parse(fileStr));
 
-    logInfo("Validating configs...");
-    logInfo("Configs: {}", json);
+    logInfo("validating configs...");
+    logInfo("configs: {}", json);
 
     auto configs = try$(Loader::Configs::fromJson(json));
 

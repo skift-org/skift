@@ -79,7 +79,7 @@ struct PosixFd : public Sys::Fd {
 };
 
 Res<Sys::Path> resolve(Sys::Url url) {
-    logInfo("Resolving url: {}", url);
+    logInfo("resolving url: {}", url);
 
     Sys::Path resolved;
     if (Op::eq(url.scheme, "file")) {

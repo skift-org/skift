@@ -1,10 +1,13 @@
 #include <efi/base.h>
 #include <embed-sys/sys.h>
 #include <hal/mem.h>
+#include <json/json.h>
 #include <karm-base/align.h>
 #include <karm-base/macros.h>
 #include <karm-io/funcs.h>
 #include <karm-io/impls.h>
+#include <karm-logger/logger.h>
+#include <karm-sys/file.h>
 
 namespace Embed {
 
@@ -134,6 +137,61 @@ Res<Strong<Sys::Fd>> createErr() {
     return Ok(makeStrong<ConOut>(Efi::st()->stdErr));
 }
 
+static Opt<Json::Value> _index = NONE;
+
+static Res<Sys::Path> resolve(Sys::Url url) {
+    if (Op::eq(url.scheme, "file")) {
+        return Ok(url.path);
+    } else if (Op::eq(url.scheme, "bundle")) {
+        logInfo("resolving bundle url: {}", url);
+        if (not _index) {
+            logInfo("no index, loading");
+
+            auto indexFile = try$(Sys::File::open("file:/bundles/_index.json"_url));
+            auto indexStr = try$(Io::readAllUtf8(indexFile));
+            auto indexJson = try$(Json::parse(indexStr));
+
+            _index = indexJson.get("objects");
+
+            logInfo("index loaded, might not be valid will check later");
+        }
+
+        if (not _index->isObject()) {
+            logError("invalid index");
+            return Error::invalidData();
+        }
+
+        auto path = url.path;
+        path.rooted = false;
+
+        auto key = try$(url.str());
+        auto object = _index->get(key);
+
+        if (not object.isObject()) {
+            logError("invalid object");
+            return Error::invalidData();
+        }
+
+        auto ref = object.get("ref");
+
+        if (not ref.isStr()) {
+            logError("invalid ref");
+            return Error::invalidData();
+        }
+
+        auto refStr = ref.asStr();
+
+        auto refUrl = Sys::Url::parse(refStr);
+
+        Sys::Path resolved = try$(resolve(refUrl));
+        logInfo("resolved to: {}", resolved);
+        return Ok(resolved);
+    } else {
+        logError("unsupported scheme: {}", url.scheme);
+        return Error::notImplemented();
+    }
+}
+
 Res<Strong<Sys::Fd>> openFile(Sys::Url url) {
     static Efi::SimpleFileSystemProtocol *fileSystem = nullptr;
     if (not fileSystem) {
@@ -146,7 +204,8 @@ Res<Strong<Sys::Fd>> openFile(Sys::Url url) {
     }
 
     Efi::FileProtocol *file = nullptr;
-    _String<Utf16> pathStr = transcode<Utf16, Utf8>(try$(url.str()));
+    auto resolved = try$(resolve(url));
+    _String<Utf16> pathStr = transcode<Utf16, Utf8>(try$(resolved.str()));
 
     // NOTE: Convert '/' to '\' as EFI uses '\' as path separator
     for (auto &u : pathStr) {

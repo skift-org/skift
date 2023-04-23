@@ -41,6 +41,11 @@ Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
         if (record.tag == Handover::FREE) {
             totalFree += record.size;
         }
+
+        if (record.tag == Handover::FILE) {
+            auto name = payload.stringAt(record.file.name);
+            logInfo("   - file: '{}'", name);
+        }
     }
 
     logInfo("entry: handover: total free: {}mib", toMib(totalFree));
@@ -49,7 +54,7 @@ Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
 }
 
 Res<> enterUserspace(Handover::Payload &payload) {
-    auto const *record = payload.fileByName("/servers/system");
+    auto const *record = payload.fileByName("bundle://system-srv/_bin");
     if (not record) {
         logInfo("entry: handover: no init file");
         return Error::invalidInput("No init file");

@@ -91,7 +91,7 @@ Ui::Child entry(State const &s, Entry const &e, usize i) {
             : Ui::ButtonStyle::secondary();
 
     auto tile = Ui::vflow(
-        8,
+        12,
         Layout::Align::CENTER,
         icon(e),
         Ui::titleMedium(e.name));
@@ -99,7 +99,7 @@ Ui::Child entry(State const &s, Entry const &e, usize i) {
     return tile |
            Ui::center() |
            Ui::pinSize({192, 128}) |
-           Ui::spacing(16) |
+           Ui::spacing(12) |
            Ui::button(Ui::NOP, style);
 }
 
@@ -131,7 +131,7 @@ Ui::Child alert(String title, String subtitle) {
                16,
                Layout::Align::CENTER,
                dialog | Ui::grow(),
-               Ui::bodyMedium("Press ENTER to continue.")) |
+               Ui::bodyMedium("Press [ENTER] to continue.")) |
            Ui::spacing(64);
 }
 
@@ -148,9 +148,11 @@ Ui::Child menu(Configs const &c) {
             return Ui::vflow(
                        16,
                        Layout::Align::CENTER,
-                       Ui::titleLarge("Select an operating system"),
+                       Ui::headlineLarge(s.configs.title ? *s.configs.title : "Welcome!"),
+                       Ui::titleLarge(Gfx::ZINC400, s.configs.subtitle ? *s.configs.subtitle : "Select an operating system"),
                        list(s) | Ui::grow(4),
-                       Ui::bodyMedium("Use the arrow keys to navigate, and press enter to select an entry.")) |
+                       Ui::labelMedium("Use the [ARROW KEYS] to navigate, and press [ENTER] to select an entry."),
+                       Ui::labelLarge(Gfx::ZINC500, "Powered by opstart")) |
                    Ui::spacing(64);
         });
 }

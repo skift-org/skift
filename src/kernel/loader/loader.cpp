@@ -15,7 +15,6 @@ namespace Loader {
 
 void enterKernel(usize entry, usize payload, usize stack, usize vmm);
 
-
 Res<> loadEntry(Entry const &entry) {
     logInfo("loader: preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
@@ -59,31 +58,31 @@ Res<> loadEntry(Entry const &entry) {
         payload.add(Handover::KERNEL, 0, {paddr, memsz});
     }
 
-    logInfo("loader: loading additional files...");
-    for (auto const &file : entry.files) {
-        logInfo("loader: loading file: {}", file.url);
+    logInfo("loader: loading additional blobs...");
+    for (auto const &blob : entry.blobs) {
+        logInfo("loader: loading blob: {}", blob.url);
 
-        auto fileFile = try$(Sys::File::open(file.url));
-        auto fileMem = try$(Sys::mmap().map(fileFile));
-        auto fileRange = fileMem.prange();
+        auto blobFile = try$(Sys::File::open(blob.url));
+        auto blobMem = try$(Sys::mmap().map(blobFile));
+        auto blobRange = blobMem.prange();
 
-        auto strId = payload.add(file.url.basename());
-        auto propStr = try$(Json::stringify(file.props));
+        auto strId = payload.add(try$(blob.url.str()));
+        auto propStr = try$(Json::stringify(blob.props));
         auto propsId = payload.add(propStr);
 
         payload.add(Handover::Record{
             .tag = Handover::FILE,
-            .start = fileRange.start,
-            .size = fileRange.size,
+            .start = blobRange.start,
+            .size = blobRange.size,
             .file = {
                 .name = (u32)strId,
                 .meta = (u32)propsId,
             },
         });
 
-        // NOTE: We leak the file memory here because we don't want to
-        //       want raii to unmap the file before we enter the kernel.
-        fileMem.leak();
+        // NOTE: We leak the blob memory here because we don't want to
+        //       want raii to unmap the blob before we enter the kernel.
+        blobMem.leak();
     }
 
     logInfo("loader: handling kernel requests...");

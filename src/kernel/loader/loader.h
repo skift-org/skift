@@ -11,15 +11,20 @@ namespace Loader {
 
 Res<Sys::File> openUrl(Sys::Url const &url);
 
-struct File {
+struct Blob {
     Sys::Url url;
     Json::Value props;
 
-    static Res<File> fromJson(Json::Value const &json) {
+    static Res<Blob> fromJson(Json::Value const &json) {
+        if (json.isStr())
+            return Ok(Blob{
+                .url = Sys::Url::parse(json.asStr()),
+            });
+
         if (not json.isObject())
             return Error::invalidInput("expected object");
 
-        return Ok(File{
+        return Ok(Blob{
             .url = Sys::Url::parse(try$(json.get("url").take<String>())),
             .props = json.get("props"),
         });
@@ -29,8 +34,8 @@ struct File {
 struct Entry {
     Var<None, Mdi::Icon, Media::Image> icon = NONE;
     String name;
-    File kernel;
-    Vec<File> files;
+    Blob kernel;
+    Vec<Blob> blobs;
 
     static Res<Entry> fromJson(Json::Value const &json) {
         if (not json.isObject())
@@ -50,12 +55,12 @@ struct Entry {
 
         entry.name = try$(json.get("name").take<String>());
         auto kernelJson = try$(json.get("kernel").take<Json::Object>());
-        entry.kernel = try$(File::fromJson(kernelJson));
+        entry.kernel = try$(Blob::fromJson(kernelJson));
 
-        auto filesJson = try$(json.get("files").take<Json::Array>());
-        for (auto const &fileJson : filesJson) {
-            auto file = try$(File::fromJson(fileJson));
-            entry.files.pushBack(file);
+        auto blobsJson = try$(json.get("blobs").take<Json::Array>());
+        for (auto const &blobJson : blobsJson) {
+            auto blob = try$(Blob::fromJson(blobJson));
+            entry.blobs.pushBack(blob);
         }
 
         return Ok(entry);
@@ -63,6 +68,8 @@ struct Entry {
 };
 
 struct Configs {
+    Opt<String> title;
+    Opt<String> subtitle;
     Vec<Entry> entries;
 
     static Res<Configs> fromJson(Json::Value const &json) {
@@ -71,6 +78,9 @@ struct Configs {
         }
 
         Configs configs = {};
+
+        configs.title = json.get("title").take<String>();
+        configs.subtitle = json.get("subtitle").take<String>();
 
         auto entriesJson = try$(json.get("entries").take<Json::Array>());
         for (auto const &entryJson : entriesJson) {

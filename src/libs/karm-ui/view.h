@@ -72,11 +72,16 @@ inline Child text(Str format, Args &&...args) {
     return text(Fmt::format(format, std::forward<Args>(args)...).unwrap());
 }
 
-#define DEF_STYLE(STYLE)                                                              \
-    inline Child STYLE(Str text) { return Karm::Ui::text(TextStyle::STYLE(), text); } \
-    template <typename... Args>                                                       \
-    inline Child STYLE(Str format, Args &&...args) {                                  \
-        return text(TextStyle::STYLE(), format, std::forward<Args>(args)...);         \
+#define DEF_STYLE(STYLE)                                                                                                 \
+    inline Child STYLE(Str text) { return Karm::Ui::text(TextStyle::STYLE(), text); }                                    \
+    inline Child STYLE(Gfx::Color color, Str text) { return Karm::Ui::text(TextStyle::STYLE().withColor(color), text); } \
+    template <typename... Args>                                                                                          \
+    inline Child STYLE(Str format, Args &&...args) {                                                                     \
+        return text(TextStyle::STYLE(), format, std::forward<Args>(args)...);                                            \
+    }                                                                                                                    \
+    template <typename... Args>                                                                                          \
+    inline Child STYLE(Gfx::Color color, Str format, Args &&...args) {                                                   \
+        return text(TextStyle::STYLE().withColor(color), format, std::forward<Args>(args)...);                           \
     }
 
 DEF_STYLE(displayLarge)

@@ -160,6 +160,7 @@ extern "C" usize _intDispatch(usize sp) {
     if (frame->intNo < 32) {
         if (frame->cs == (x86_64::Gdt::UCODE * 8 | 3)) {
             logPrint("userspace fault:'{}'", _faultMsg[frame->intNo]);
+            logPrint("int={} err={} rip={p} rsp={p} cr2={p} cr3={p}", frame->intNo, frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
             Core::Task::self().crash();
             sp = switchTask(TimeSpan::fromMSecs(0), sp);
         } else {

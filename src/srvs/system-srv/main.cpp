@@ -5,16 +5,22 @@
 #include <karm-main/main.h>
 
 Res<> entryPoint(Ctx &ctx) {
-    Hj::Task::self().label("system").unwrap();
+    try$(Hj::Task::self().label("system"));
 
     auto &handover = useHandover(ctx);
 
     auto *fb = handover.findTag(Handover::Tag::FB);
-    auto fbVmo = Hj::createVmo(Hj::ROOT, fb->start, fb->size, Hj::VmoFlags::DMA).take();
-    fbVmo.label("framebuffer").unwrap();
-    auto fbAddr = Hj::Space::self().map(fbVmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE).take();
+    auto fbVmo = try$(Hj::createVmo(Hj::ROOT, fb->start, fb->size, Hj::VmoFlags::DMA));
+    try$(fbVmo.label("framebuffer"));
+    auto fbAddr = try$(Hj::Space::self().map(fbVmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
 
-    Gfx::MutPixels pixels = {(void *)fbAddr, {fb->fb.width, fb->fb.height}, fb->fb.pitch, Gfx::BGRA8888};
+    Gfx::MutPixels pixels = {
+        (void *)fbAddr,
+        {fb->fb.width, fb->fb.height},
+        fb->fb.pitch,
+        Gfx::BGRA8888,
+    };
+
     pixels.clear(Gfx::GREEN);
     pixels.clip(pixels.bound().shrink(10)).clear(Gfx::ZINC900);
 

@@ -11,7 +11,7 @@ State reduce(State d, Actions action) {
         },
         [&](GoHome) {
             auto user = Sys::userinfo().unwrap();
-            return reduce(d, GoTo{Sys::Path::parse(user.home)});
+            return reduce(d, GoTo{Sys::Url::parse(user.home)});
         },
         [&](GoBack) {
             if (d.canGoBack()) {

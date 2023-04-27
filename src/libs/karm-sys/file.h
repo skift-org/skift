@@ -5,7 +5,6 @@
 #include <karm-meta/nocopy.h>
 
 #include "fd.h"
-#include "path.h"
 
 namespace Karm::Sys {
 

@@ -42,25 +42,37 @@
 
 # Introduction
 
-**skiftOS** is a hobby operating system built from scratch in contemporary C and C++ for ARM, x86, and RISC-V architectures.
-
-Following the 80/20 rule, **skift** tries to be a simple, yet powerful operating system that can be used for daily tasks. It is designed to be modular, extensible, and easy to use and hack on.
+**skiftOS** is a hobby operating system built from scratch using contemporary C and C++ for ARM, x86, and RISC-V architectures. It is designed to be simple, modern, modular, open, and inclusive. skiftOS features a modern C++ core library, modern reactive UI, and a capability-based microkernel for security and modularity.
 
 ## Values
 
 As a hobby operating system, skiftOS is built with the following values in mind:
 
-- **Simple**: skiftOS is designed to be simple and easy to use. It is not meant to be a full-featured operating system, but rather a simple, yet powerful operating system that can be used for daily tasks.
-- **Modern**: skiftOS is built using modern C++ and C standards and is designed to be extensible and hackable.
-- **Modular**: skiftOS is designed to be modular and extensible. It is possible to add new features to the operating system without having to modify the core components.
-- **Open**: skiftOS is open-source and licensed under the MIT license. It is free to use, modify, and redistribute.
-- **Inclusive**: skiftOS is built by a diverse group of people from all around the world. It is designed to be inclusive and welcoming to everyone.
+- **Simple**: skiftOS aims to be simple and easy to use, without being overly complex or difficult to understand. It prioritizes user-friendliness over feature bloat.
+
+- **Modern**: skiftOS is built using modern C++ and C standards, and is designed to be extensible and hackable. It leverages modern programming techniques and technologies to provide a robust and efficient operating system.
+
+- **Modular**: skiftOS is designed to be modular and extensible. It is built around a microkernel architecture, which allows for the addition of new features without having to modify the core components of the operating system.
+
+- **Open**: skiftOS is an open-source project and is licensed under the MIT license. This means that anyone can use, modify, and redistribute the code without any restrictions.
+
+- **Inclusive**: skiftOS is built by a diverse group of people from all around the world. It is designed to be inclusive and welcoming to everyone, regardless of their background or experience level. The project encourages contributions from all members of the community.
 
 ## Features
 
-- **Modern C++ Core Library**: skiftOS is built using [karm](src/libs/) a modern C++ core library build by taking the best of the Rust and C++ worlds.
-- **Modern Reactive UI**: Applications are built using [karm-ui](src/libs/karm-ui) a modern reactive UI library build around unidirectional data flow inspired by [React](https://reactjs.org/) and [Flutter](https://flutter.dev/).
-- **Capability-based Microkernel**: skiftOS is built around a capability-based microkernel that provides a secure and modular environment for applications.
+skiftOS has several notable features:
+
+- **Modern C++ Core Library**: skiftOS is built using karm, a modern C++ core library that provides essential functionality like memory management, file I/O, and networking. karm takes inspiration from Rust and C++ to create a powerful and efficient library.
+
+- **Modern Reactive UI**: skiftOS uses karm-ui, a modern reactive UI library that is based on unidirectional data flow. It takes inspiration from popular UI frameworks like React and Flutter, and enables developers to create powerful and responsive user interfaces.
+
+- **Capability-based Microkernel**: skiftOS is built around a microkernel architecture that uses capability-based security. This means that each process has only the permissions it needs to perform its tasks, which makes the operating system more secure and easier to maintain.
+
+- **Multi-architecture Support**: skiftOS can run on multiple architectures, including ARM, x86, and RISC-V. This makes it highly versatile and allows it to run on a variety of devices.
+
+- **Easy to Hack On**: skiftOS is designed to be easy to hack on, with a focus on simplicity and modularity. This means that developers can easily contribute to the project and add new features without having to understand the entire codebase.
+
+- **Free and Open-Source**: skiftOS is licensed under the MIT license and is free to use, modify, and redistribute. This makes it accessible to everyone and encourages collaboration and innovation.
 
 ## Screenshot
 

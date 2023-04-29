@@ -7,10 +7,13 @@ namespace Karm::Gfx {
 /* --- Flattening ------------------------------------------------------- */
 
 void Path::_flattenClose() {
-    // if (Math::epsilonEq(_lastP, _verts[last(_segs).start], 0.001)) {
-    //     _verts.popBack();
-    //     last(_segs).end--;
-    // }
+    auto end = _verts[last(_segs).end - 1];
+    auto start = _verts[last(_segs).start];
+
+    if (Math::epsilonEq(start, end, 0.001)) {
+        _verts.popBack();
+        last(_segs).end--;
+    }
 
     last(_segs).close = true;
 }

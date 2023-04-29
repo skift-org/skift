@@ -105,7 +105,7 @@ Ui::Child valueSlider(Ui::State<Gfx::Hsv> state) {
             Gfx::hsvToRgb(value0),
             Gfx::hsvToRgb(value1)),
         state.value().value,
-        [=](auto, auto v) mutable {
+        [=](auto &, auto v) mutable {
             auto hsv = state.value();
             hsv.value = v;
             state.update(hsv);
@@ -125,7 +125,7 @@ Ui::Child saturationSlider(Ui::State<Gfx::Hsv> state) {
             Gfx::hsvToRgb(saturation0),
             Gfx::hsvToRgb(saturation1)),
         state.value().saturation,
-        [=](auto, auto v) mutable {
+        [=](auto &, auto v) mutable {
             auto hsv = state.value();
             hsv.saturation = v;
             state.update(hsv);
@@ -137,7 +137,7 @@ Ui::Child hueSlider(Ui::State<Gfx::Hsv> state) {
     return Ui::sliderRow(
         Ui::SliderStyle::hsv(),
         state.value().hue / 360.0,
-        [=](auto, auto v) mutable {
+        [=](auto &, auto v) mutable {
             auto hsv = state.value();
             hsv.hue = v * 360;
             state.update(hsv);

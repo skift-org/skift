@@ -24,7 +24,7 @@ using Visitor = Func<void(Node &)>;
 
 /* --- Node ----------------------------------------------------------------- */
 
-struct Node {
+struct Node : public Meta::Static {
     Node() {
         debugNodeCount++;
     }

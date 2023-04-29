@@ -12,7 +12,7 @@ void Context::begin(MutPixels p) {
     _stack.pushBack({
         .clip = pixels().bound(),
     });
-    _scanline.resize(p.width());
+    _scanline.resize(p.width() + 1);
     _updateTransform();
 }
 
@@ -461,7 +461,7 @@ void Context::debugTrace(Gfx::Color color) {
                 }
 
                 f64 x1 = max(_active[si].x, rect.start());
-                f64 x2 = min(_active[ei].x, rect.end(), (f64)_scanline.len() - 1);
+                f64 x2 = min(_active[ei].x, rect.end());
 
                 if (x1 >= x2) {
                     continue;

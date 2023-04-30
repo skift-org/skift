@@ -30,7 +30,7 @@ static Array demos = {
                     g.begin();
                     g.evalSvg(CAT);
 
-                    g.fillStyle(Gfx::ZINC700);
+                    g.fillStyle(Ui::GRAY700);
                     g.fill();
 
                     g.strokeStyle(Gfx::stroke(Gfx::BLUE).withWidth(1).withAlign(Gfx::OUTSIDE_ALIGN));
@@ -104,10 +104,10 @@ static Array demos = {
                 [](Gfx::Context &g, Math::Vec2i) {
                     Media::Icon icon = {Mdi::COFFEE, 256};
 
-                    g.fillStyle(Gfx::ZINC700);
+                    g.fillStyle(Ui::GRAY700);
                     g.fill(0, icon);
 
-                    g.strokeStyle(Gfx::stroke(Gfx::ZINC400).withWidth(2).withAlign(Gfx::StrokeAlign::OUTSIDE_ALIGN));
+                    g.strokeStyle(Gfx::stroke(Ui::GRAY400).withWidth(2).withAlign(Gfx::StrokeAlign::OUTSIDE_ALIGN));
                     g.stroke(0, icon);
                 });
         },

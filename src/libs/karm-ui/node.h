@@ -7,6 +7,8 @@
 #include <karm-layout/size.h>
 #include <karm-logger/logger.h>
 
+#include "theme.h"
+
 namespace Karm::Ui {
 
 extern bool debugShowLayoutBounds;

@@ -14,7 +14,7 @@ struct BoxStyle {
 
     Opt<Gfx::Paint> borderPaint{Gfx::ALPHA};
     Opt<Gfx::Paint> backgroundPaint{};
-    Gfx::Paint foregroundPaint{Gfx::WHITE};
+    Gfx::Paint foregroundPaint{GRAY50};
     Opt<Gfx::ShadowStyle> shadowStyle{};
 
     BoxStyle withMargin(Layout::Spacingi margin) const {

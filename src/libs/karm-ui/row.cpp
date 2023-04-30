@@ -123,12 +123,12 @@ Child navRow(bool selected, OnPress onPress, Mdi::Icon i, String title) {
 
     buttonStyle.idleStyle = {
         .borderRadius = 4,
-        .backgroundPaint = selected ? Gfx::ZINC800 : Gfx::ALPHA,
+        .backgroundPaint = selected ? GRAY800 : Gfx::ALPHA,
     };
 
     auto indicator = box(BoxStyle{
                              .borderRadius = 99,
-                             .backgroundPaint = selected ? Gfx::BLUE600 : Gfx::ALPHA,
+                             .backgroundPaint = selected ? ACCENT600 : Gfx::ALPHA,
                          },
                          empty(4));
 

@@ -38,7 +38,7 @@ inline Ui::Child bottombar(Meta::Same<Child> auto... children) { return bottomba
 inline Child card(Child child) {
     return box({
                    .borderRadius = 4,
-                   .backgroundPaint = Gfx::ZINC800,
+                   .backgroundPaint = GRAY900,
                },
                child);
 }

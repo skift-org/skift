@@ -145,7 +145,7 @@ Child dragRegion(Child child) {
 Child handle() {
     BoxStyle STYLE = {
         .borderRadius = 999,
-        .backgroundPaint = Gfx::WHITE,
+        .backgroundPaint = GRAY50,
     };
 
     return empty({128, 4}) |

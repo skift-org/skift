@@ -104,4 +104,10 @@ struct ExitEvent : public BaseEvent<ExitEvent> {
         : res{res} {}
 };
 
+struct RequestMinimizeEvent :
+    public BaseEvent<RequestMinimizeEvent> {};
+
+struct RequestMaximizeEvent :
+    public BaseEvent<RequestMaximizeEvent> {};
+
 } // namespace Karm::Events

@@ -123,7 +123,7 @@ Ui::Child alert(String title, String subtitle) {
                       Ui::titleLarge(title),
                       Ui::bodyMedium(Fmt::toSentenceCase(subtitle).unwrap())) |
                   Ui::box(Ui::BoxStyle{
-                      .foregroundPaint = Gfx::ZINC500,
+                      .foregroundPaint = Ui::GRAY500,
                   }) |
                   Ui::center();
 
@@ -149,10 +149,10 @@ Ui::Child menu(Configs const &c) {
                        16,
                        Layout::Align::CENTER,
                        Ui::headlineLarge(s.configs.title ? *s.configs.title : "Welcome!"),
-                       Ui::titleLarge(Gfx::ZINC400, s.configs.subtitle ? *s.configs.subtitle : "Select an operating system"),
+                       Ui::titleLarge(Ui::GRAY400, s.configs.subtitle ? *s.configs.subtitle : "Select an operating system"),
                        list(s) | Ui::grow(4),
                        Ui::labelMedium("Use the [ARROW KEYS] to navigate, and press [ENTER] to select an entry."),
-                       Ui::labelLarge(Gfx::ZINC500, "Powered by opstart")) |
+                       Ui::labelLarge(Ui::GRAY500, "Powered by opstart")) |
                    Ui::spacing(64);
         });
 }

@@ -8,24 +8,23 @@
 
 namespace Karm::Ui {
 
+static BoxStyle TOOLBAR = {
+    .backgroundPaint = GRAY900,
+};
+
 Child aboutButton(Mdi::Icon icon, String title) {
     return button(
-        [=](auto &n) {
-            showAboutDialog(n, icon, title);
-        },
+        rbind(showAboutDialog, icon, title),
         ButtonStyle::subtle(), icon, title);
 }
 
 Child controls(TitlebarStyle style) {
-    return hflow(8,
-                 button(NONE, ButtonStyle::subtle(), Mdi::MINUS) | cond(style == TitlebarStyle::DEFAULT),
-                 button(NONE, ButtonStyle::subtle(), Mdi::CROP_SQUARE) | cond(style == TitlebarStyle::DEFAULT),
-                 button(
-                     [](Node &n) {
-                         Events::ExitEvent e{Ok()};
-                         n.bubble(e);
-                     },
-                     ButtonStyle::subtle(), Mdi::CLOSE));
+    return hflow(12,
+                 button(bindBubble<Events::RequestMinimizeEvent>(), ButtonStyle::subtle(), Mdi::MINUS) |
+                     cond(style == TitlebarStyle::DEFAULT),
+                 button(bindBubble<Events::RequestMaximizeEvent>(), ButtonStyle::subtle(), Mdi::CROP_SQUARE) |
+                     cond(style == TitlebarStyle::DEFAULT),
+                 button(bindBubble<Events::ExitEvent>(Ok()), ButtonStyle::subtle(), Mdi::CLOSE));
 }
 
 Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {
@@ -35,7 +34,7 @@ Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {
                grow(NONE),
                controls(style)) |
            spacing(8) |
-           dragRegion();
+           dragRegion() | box(TOOLBAR);
 }
 
 Child titlebar(Mdi::Icon icon, String title, Child tabs, TitlebarStyle style) {
@@ -45,7 +44,7 @@ Child titlebar(Mdi::Icon icon, String title, Child tabs, TitlebarStyle style) {
                tabs | Ui::grow(),
                controls(style)) |
            spacing(8) |
-           dragRegion();
+           dragRegion() | box(TOOLBAR);
 }
 
 auto lookup(auto k, auto &m) {
@@ -78,10 +77,6 @@ Child badge(BadgeStyle style, String t) {
                .foregroundPaint = color,
            });
 }
-
-static BoxStyle TOOLBAR = {
-    .backgroundPaint = Gfx::ZINC800,
-};
 
 Child toolbar(Children children) {
     return vflow(

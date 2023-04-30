@@ -130,4 +130,18 @@ struct SharedFunc<Out(In...)> {
     }
 };
 
+template <typename... Args>
+auto bind(auto f, Args... args) {
+    return [f = std::move(f), args...](auto &&...in) {
+        return f(args..., std::forward<decltype(in)>(in)...);
+    };
+}
+
+template <typename... Args>
+auto rbind(auto f, Args... args) {
+    return [f = std::move(f), args...](auto &&...in) {
+        return f(std::forward<decltype(in)>(in)..., args...);
+    };
+}
+
 } // namespace Karm

@@ -96,7 +96,7 @@ struct Table : public Ui::View<Table> {
             _bound.height,
         };
 
-        g.fillStyle(Gfx::ZINC800);
+        g.fillStyle(Ui::GRAY800);
         g.fill(bound);
         g.debugLine(sep, Gfx::WHITE.withOpacity(0.05));
     }
@@ -111,7 +111,7 @@ struct Table : public Ui::View<Table> {
             row.y + row.height - 1,
         };
 
-        g.fillStyle(Gfx::ZINC800);
+        g.fillStyle(Ui::GRAY800);
         g.fill(bound);
         g.debugLine(sep, Gfx::WHITE.withOpacity(0.05));
     }
@@ -121,20 +121,20 @@ struct Table : public Ui::View<Table> {
         auto end = cellBound(r.end.row, r.end.col);
         auto all = start.mergeWith(end);
 
-        g.fillStyle(Gfx::BLUE600.withOpacity(0.2));
+        g.fillStyle(Ui::ACCENT600.withOpacity(0.2));
         g.begin();
         g.rect(all.cast<f64>().grow(3), 4);
         g.rect(start.cast<f64>().grow(3), 4);
         g.fill(Gfx::FillRule::EVENODD);
 
-        g.strokeStyle(Gfx::stroke(Gfx::BLUE500).withAlign(Gfx::OUTSIDE_ALIGN).withWidth(2));
+        g.strokeStyle(Gfx::stroke(Ui::ACCENT500).withAlign(Gfx::OUTSIDE_ALIGN).withWidth(2));
         g.stroke(all.grow(3), 4);
 
         auto handle = all.bottomEnd() + 3;
         g.fillStyle(Gfx::WHITE);
         g.fill(Math::Ellipsei{handle, 4});
 
-        g.strokeStyle(Gfx::stroke(Gfx::ZINC900).withAlign(Gfx::OUTSIDE_ALIGN).withWidth(1));
+        g.strokeStyle(Gfx::stroke(Ui::GRAY950).withAlign(Gfx::OUTSIDE_ALIGN).withWidth(1));
         g.stroke();
     }
 
@@ -152,7 +152,7 @@ struct Table : public Ui::View<Table> {
             auto col = sheet().cols[index];
             Math::Recti colBound = {headerX, 0, col.width, CELL_HEIGHT};
 
-            g.fillStyle(Gfx::ZINC800);
+            g.fillStyle(Ui::GRAY800);
             g.fill(colBound);
 
             g.debugLine(Math::Edgei{headerX + col.width - 1, 0, headerX + col.width - 1, _bound.height}, Gfx::WHITE.withOpacity(0.05));
@@ -170,7 +170,7 @@ struct Table : public Ui::View<Table> {
             auto row = sheet().rows[index];
             Math::Recti rowBound = {0, headerY, CELL_WIDTH, row.height};
 
-            g.fillStyle(Gfx::ZINC800);
+            g.fillStyle(Ui::GRAY800);
             g.fill(rowBound);
 
             g.debugLine(Math::Edgei{0, headerY + row.height - 1, _bound.width, headerY + row.height - 1}, Gfx::WHITE.withOpacity(0.05));

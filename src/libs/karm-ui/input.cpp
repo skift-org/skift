@@ -12,22 +12,22 @@ ButtonStyle ButtonStyle::none() {
     return {};
 }
 
-ButtonStyle ButtonStyle::regular() {
+ButtonStyle ButtonStyle::regular(Gfx::ColorRamp ramp) {
     return {
         .idleStyle = {
             .borderRadius = RADIUS,
-            .backgroundPaint = Gfx::ZINC700,
+            .backgroundPaint = ramp[6],
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = Gfx::ZINC600,
+            .backgroundPaint = ramp[5],
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderPaint = Gfx::ZINC600,
-            .backgroundPaint = Gfx::ZINC700,
+            .borderPaint = ramp[5],
+            .backgroundPaint = ramp[6],
         },
     };
 }
@@ -36,18 +36,18 @@ ButtonStyle ButtonStyle::secondary() {
     return {
         .idleStyle = {
             .borderRadius = RADIUS,
-            .backgroundPaint = Gfx::ZINC800,
+            .backgroundPaint = GRAY800,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = Gfx::ZINC700,
+            .backgroundPaint = GRAY700,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderPaint = Gfx::ZINC700,
-            .backgroundPaint = Gfx::ZINC800,
+            .borderPaint = GRAY700,
+            .backgroundPaint = GRAY800,
         },
     };
 }
@@ -56,18 +56,18 @@ ButtonStyle ButtonStyle::primary() {
     return {
         .idleStyle = {
             .borderRadius = RADIUS,
-            .backgroundPaint = Gfx::BLUE700,
+            .backgroundPaint = ACCENT700,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = Gfx::BLUE600,
+            .backgroundPaint = ACCENT600,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderPaint = Gfx::BLUE600,
-            .backgroundPaint = Gfx::BLUE700,
+            .borderPaint = ACCENT600,
+            .backgroundPaint = ACCENT700,
         },
     };
 }
@@ -77,18 +77,18 @@ ButtonStyle ButtonStyle::outline() {
         .idleStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderPaint = Gfx::ZINC700,
+            .borderPaint = GRAY700,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = Gfx::ZINC600,
+            .backgroundPaint = GRAY600,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderPaint = Gfx::ZINC600,
-            .backgroundPaint = Gfx::ZINC700,
+            .borderPaint = GRAY600,
+            .backgroundPaint = GRAY700,
         },
     };
 }
@@ -96,18 +96,18 @@ ButtonStyle ButtonStyle::outline() {
 ButtonStyle ButtonStyle::subtle() {
     return {
         .idleStyle = {
-            .foregroundPaint = Gfx::ZINC300,
+            .foregroundPaint = GRAY300,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = Gfx::ZINC600,
+            .backgroundPaint = GRAY600,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderPaint = Gfx::ZINC600,
-            .backgroundPaint = Gfx::ZINC700,
+            .borderPaint = GRAY600,
+            .backgroundPaint = GRAY700,
         },
     };
 }
@@ -145,6 +145,22 @@ ButtonStyle ButtonStyle::withForegroundPaint(Gfx::Paint paint) const {
         idleStyle.withForegroundPaint(paint),
         hoverStyle.withForegroundPaint(paint),
         pressStyle.withForegroundPaint(paint),
+    };
+}
+
+ButtonStyle ButtonStyle::withPadding(Layout::Spacingi spacing) const {
+    return {
+        idleStyle.withPadding(spacing),
+        hoverStyle.withPadding(spacing),
+        pressStyle.withPadding(spacing),
+    };
+}
+
+ButtonStyle ButtonStyle::withMargin(Layout::Spacingi spacing) const {
+    return {
+        idleStyle.withMargin(spacing),
+        hoverStyle.withMargin(spacing),
+        pressStyle.withMargin(spacing),
     };
 }
 
@@ -322,25 +338,25 @@ struct Toggle : public View<Toggle> {
         auto thumb = bound().hsplit(26).get(_value).shrink(_value ? 4 : 6);
 
         if (_value) {
-            g.fillStyle(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700);
+            g.fillStyle(_mouseListener.isHover() ? ACCENT600 : ACCENT700);
             g.fill(bound(), 999);
 
-            g.fillStyle(Gfx::WHITE);
+            g.fillStyle(GRAY50);
             g.fill(thumb, 999);
 
             if (_mouseListener.isPress()) {
-                g.strokeStyle(Gfx::stroke(Gfx::BLUE600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.strokeStyle(Gfx::stroke(ACCENT600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
                 g.stroke(bound(), 999);
             }
         } else {
-            g.fillStyle(_mouseListener.isHover() ? Gfx::ZINC600 : Gfx::ZINC700);
+            g.fillStyle(_mouseListener.isHover() ? GRAY600 : GRAY700);
             g.fill(bound(), 999);
 
-            g.fillStyle(_mouseListener.isHover() ? Gfx::ZINC400 : Gfx::ZINC500);
+            g.fillStyle(_mouseListener.isHover() ? GRAY400 : GRAY500);
             g.fill(thumb, 999);
 
             if (_mouseListener.isPress()) {
-                g.strokeStyle(Gfx::stroke(Gfx::ZINC600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.strokeStyle(Gfx::stroke(GRAY600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
                 g.stroke(bound(), 999);
             }
         }
@@ -384,22 +400,22 @@ struct Checkbox : public View<Checkbox> {
         g.save();
 
         if (_value) {
-            g.fillStyle(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700);
+            g.fillStyle(_mouseListener.isHover() ? ACCENT600 : ACCENT700);
             g.fill(bound(), 4);
 
-            g.fillStyle(Gfx::WHITE);
+            g.fillStyle(Gfx::GRAY50);
             g.fill(bound().topStart(), Media::Icon{Mdi::CHECK_BOLD, 26});
 
             if (_mouseListener.isPress()) {
-                g.strokeStyle(Gfx::stroke(Gfx::BLUE600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.strokeStyle(Gfx::stroke(ACCENT600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
                 g.stroke(bound(), 4);
             }
         } else {
-            g.fillStyle(_mouseListener.isHover() ? Gfx::ZINC600 : Gfx::ZINC700);
+            g.fillStyle(_mouseListener.isHover() ? GRAY600 : GRAY700);
             g.fill(bound(), 4);
 
             if (_mouseListener.isPress()) {
-                g.strokeStyle(Gfx::stroke(Gfx::ZINC600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.strokeStyle(Gfx::stroke(GRAY600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
                 g.stroke(bound(), 4);
             }
         }
@@ -442,22 +458,22 @@ struct Radio : public View<Radio> {
     void paint(Gfx::Context &g, Math::Recti) override {
         g.save();
         if (_value) {
-            g.fillStyle(_mouseListener.isHover() ? Gfx::BLUE600 : Gfx::BLUE700);
+            g.fillStyle(_mouseListener.isHover() ? ACCENT600 : ACCENT700);
             g.fill(bound(), 999);
 
-            g.fillStyle(Gfx::WHITE);
+            g.fillStyle(Gfx::GRAY50);
             g.fill(bound().shrink(6), 999);
 
             if (_mouseListener.isPress()) {
-                g.strokeStyle(Gfx::stroke(Gfx::BLUE600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.strokeStyle(Gfx::stroke(ACCENT600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
                 g.stroke(bound(), 999);
             }
         } else {
-            g.fillStyle(_mouseListener.isHover() ? Gfx::ZINC600 : Gfx::ZINC700);
+            g.fillStyle(_mouseListener.isHover() ? GRAY600 : GRAY700);
             g.fill(bound(), 999);
 
             if (_mouseListener.isPress()) {
-                g.strokeStyle(Gfx::stroke(Gfx::ZINC600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.strokeStyle(Gfx::stroke(GRAY600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
                 g.stroke(bound(), 999);
             }
         }
@@ -488,19 +504,19 @@ SliderStyle SliderStyle::regular() {
             .margin = 2,
             .borderRadius = 999,
             .borderWidth = 4,
-            .borderPaint = Gfx::WHITE,
-            .backgroundPaint = Gfx::BLUE700,
+            .borderPaint = Gfx::GRAY50,
+            .backgroundPaint = ACCENT700,
         },
         .trackSize = {128, 26},
         .trackStyle = {
             .margin = 8,
             .borderRadius = 999,
-            .backgroundPaint = Gfx::ZINC700,
+            .backgroundPaint = GRAY700,
         },
         .valueStyle = BoxStyle{
             .margin = 8,
             .borderRadius = 999,
-            .backgroundPaint = Gfx::BLUE700,
+            .backgroundPaint = ACCENT700,
         },
     };
 }
@@ -511,7 +527,7 @@ SliderStyle SliderStyle::hsv() {
             .margin = 4,
             .borderRadius = 999,
             .borderWidth = 2,
-            .borderPaint = Gfx::WHITE,
+            .borderPaint = Gfx::GRAY50,
         },
         .trackSize = {256, 26},
         .trackStyle = {
@@ -528,7 +544,7 @@ SliderStyle SliderStyle::gradiant(Gfx::Color from, Gfx::Color to) {
             .margin = 4,
             .borderRadius = 999,
             .borderWidth = 2,
-            .borderPaint = Gfx::WHITE,
+            .borderPaint = Gfx::GRAY50,
         },
         .trackSize = {128, 26},
         .trackStyle = {
@@ -626,7 +642,7 @@ Child color(Gfx::Color color, OnChange<Gfx::Color>) {
                 .margin = 4,
                 .borderRadius = 2,
                 .borderWidth = 1,
-                .borderPaint = Gfx::WHITE.withOpacity(0.1),
+                .borderPaint = Gfx::GRAY50.withOpacity(0.1),
                 .backgroundPaint = color,
             }) |
             Ui::center() | Ui::bound());

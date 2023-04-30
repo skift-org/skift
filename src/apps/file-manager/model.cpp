@@ -7,11 +7,11 @@ namespace FileManager {
 State reduce(State d, Actions action) {
     return action.visit(Visitor{
         [&](GoRoot) {
-            return reduce(d, GoTo{Sys::Url::parse("/")});
+            return reduce(d, GoTo{"file:/"_url});
         },
         [&](GoHome) {
             auto user = Sys::userinfo().unwrap();
-            return reduce(d, GoTo{Sys::Url::parse(user.home)});
+            return reduce(d, GoTo{user.home});
         },
         [&](GoBack) {
             if (d.canGoBack()) {

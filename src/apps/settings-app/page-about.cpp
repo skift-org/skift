@@ -16,8 +16,8 @@ Ui::Child userInfos() {
             auto userinfo = try$(Sys::userinfo());
             return Ok(Ui::vflow(
                 Ui::row(NONE, "Username", NONE, Ui::text(userinfo.name)),
-                Ui::row(NONE, "Home", NONE, Ui::text(userinfo.home)),
-                Ui::row(NONE, "Shell", NONE, Ui::text(userinfo.shell))));
+                Ui::row(NONE, "Home", NONE, Ui::text(try$(userinfo.home.str()))),
+                Ui::row(NONE, "Shell", NONE, Ui::text(try$(userinfo.shell.str())))));
         }));
 }
 

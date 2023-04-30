@@ -16,7 +16,7 @@ Ui::Child formula() {
         {
             .borderRadius = 4,
             .borderWidth = 1,
-            .backgroundPaint = Gfx::ZINC900,
+            .backgroundPaint = Ui::GRAY800,
         },
         Ui::hflow(
             Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FUNCTION),
@@ -128,7 +128,7 @@ Ui::Child properties() {
 Ui::Child tab(bool selected, String title) {
     auto indicator = Ui::box(Ui::BoxStyle{
                                  .borderRadius = 99,
-                                 .backgroundPaint = selected ? Gfx::BLUE600 : Gfx::ALPHA,
+                                 .backgroundPaint = selected ? Ui::ACCENT600 : Gfx::ALPHA,
                              },
                              Ui::empty(4));
 

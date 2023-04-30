@@ -86,7 +86,7 @@ Ui::Child quickSetting(Mdi::Icon icon) {
             },
             (state.value()
                  ? Ui::ButtonStyle::primary().withForegroundPaint(Gfx::WHITE)
-                 : Ui::ButtonStyle::secondary().withForegroundPaint(Gfx::ZINC300))
+                 : Ui::ButtonStyle::secondary().withForegroundPaint(Ui::GRAY300))
                 .withRadius(99),
             Ui::minSize(48, Ui::center(Ui::icon(icon, 26))));
     }));
@@ -95,7 +95,7 @@ Ui::Child quickSetting(Mdi::Icon icon) {
 Ui::Child quickSettings() {
     return Ui::box(
         Ui::BoxStyle{
-            .backgroundPaint = Gfx::ZINC800,
+            .backgroundPaint = Ui::GRAY800,
         },
         Ui::spacing(
             8,
@@ -119,7 +119,7 @@ Ui::Child notiWrapper(App app, Ui::Child inner) {
                     4,
                     Ui::box(Ui::BoxStyle{.foregroundPaint = app.color[4]},
                             Ui::icon(app.icon, 12)),
-                    Ui::text(Ui::TextStyle::labelMedium().withColor(Gfx::ZINC400), app.name)),
+                    Ui::text(Ui::TextStyle::labelMedium().withColor(Ui::GRAY400), app.name)),
                 inner)),
         Ui::separator());
 }
@@ -163,7 +163,7 @@ Ui::Child systemTray() {
                 0.3,
                 Ui::box(Ui::BoxStyle{
                             .borderRadius = {0, 0, 8, 8},
-                            .backgroundPaint = Gfx::ZINC900,
+                            .backgroundPaint = Ui::GRAY900,
                         },
                         Ui::vflow(8, quickSettings(), notifications() | Ui::grow(), Ui::dragHandle())))),
         Ui::empty(16));
@@ -176,7 +176,7 @@ Ui::Child searchInput() {
         Ui::BoxStyle{
             .borderRadius = 4,
             .borderWidth = 1,
-            .backgroundPaint = Gfx::ZINC800,
+            .backgroundPaint = Ui::GRAY800,
         },
         Ui::minSize({Ui::UNCONSTRAINED, 48},
                     Ui::spacing(
@@ -244,7 +244,7 @@ Ui::Child appDrawer() {
                 Ui::box(
                     Ui::BoxStyle{
                         .borderRadius = 8,
-                        .backgroundPaint = Gfx::ZINC900,
+                        .backgroundPaint = Ui::GRAY900,
                     },
                     Ui::vflow(
                         Ui::dragHandle(),

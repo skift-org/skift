@@ -225,8 +225,8 @@ Child dialogScafold(Layout::Align a, Child inner) {
     BoxStyle const boxStyle = {
         .borderRadius = 4,
         .borderWidth = 1,
-        .borderPaint = Gfx::ZINC700,
-        .backgroundPaint = Gfx::ZINC800,
+        .borderPaint = GRAY800,
+        .backgroundPaint = GRAY900,
     };
 
     return inner |

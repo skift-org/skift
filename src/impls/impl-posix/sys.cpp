@@ -213,7 +213,6 @@ isize mmapOptionsToProt(Sys::MmapOptions const &options) {
 }
 
 Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
-
     void *addr = mmap((void *)options.vaddr, options.size, mmapOptionsToProt(options), MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     if (addr == MAP_FAILED) {
@@ -287,8 +286,11 @@ Res<> populate(Vec<Sys::CpuInfo> &) {
 
 Res<> populate(Sys::UserInfo &infos) {
     infos.name = getenv("USER");
-    infos.home = getenv("HOME");
-    infos.shell = getenv("SHELL");
+    infos.home.scheme = "file";
+    infos.home.path = Sys::Path::parse(getenv("HOME"));
+
+    infos.shell.scheme = "file";
+    infos.shell.path = Sys::Path::parse(getenv("SHELL"));
 
     return Ok();
 }

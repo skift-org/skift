@@ -95,12 +95,12 @@ struct ButtonStyle {
     BoxStyle hoverStyle;
     BoxStyle pressStyle;
     BoxStyle disabledStyle = {
-        .foregroundPaint = Gfx::ZINC600,
+        .foregroundPaint = GRAY600,
     };
 
     static ButtonStyle none();
 
-    static ButtonStyle regular();
+    static ButtonStyle regular(Gfx::ColorRamp ramp = GRAYS);
 
     static ButtonStyle secondary();
 
@@ -115,6 +115,10 @@ struct ButtonStyle {
     ButtonStyle withRadius(Gfx::BorderRadius radius) const;
 
     ButtonStyle withForegroundPaint(Gfx::Paint paint) const;
+
+    ButtonStyle withPadding(Layout::Spacingi spacing) const;
+
+    ButtonStyle withMargin(Layout::Spacingi spacing) const;
 };
 
 using OnPress = Opt<Func<void(Node &)>>;

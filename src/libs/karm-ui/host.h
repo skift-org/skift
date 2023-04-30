@@ -122,16 +122,18 @@ struct Host : public Node {
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
         g.clip(r);
-        g.clear(r, Gfx::ZINC900);
+        g.clear(r, GRAY950);
+        g.fillStyle(GRAY50);
 
         _root->paint(g, r);
 
-        g.fillStyle(Gfx::WHITE);
         if (debugShowRepaintBounds) {
             g.fillStyle(Gfx::randomColor().withOpacity(0.25));
             g.fill(r);
         }
 
+        g.strokeStyle(Gfx::stroke(GRAY800).withAlign(Gfx::INSIDE_ALIGN));
+        g.stroke(Math::Recti{bound().size()}, 8);
         g.restore();
     }
 

@@ -40,4 +40,12 @@ inline void mouseLeave(Children &children) {
     }
 }
 
+template <typename E, typename... Args>
+inline auto bindBubble(Args &&...args) {
+    return [args...](Node &n) {
+        E e{args...};
+        return n.bubble(e);
+    };
+}
+
 } // namespace Karm::Ui

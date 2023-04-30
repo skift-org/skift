@@ -49,7 +49,7 @@ Ui::Child breadcrumb(State const &state) {
         {
             .borderRadius = 4,
             .borderWidth = 1,
-            .backgroundPaint = Gfx::ZINC900,
+            .backgroundPaint = Ui::GRAY800,
         },
         Ui::hflow(
             Ui::button(Model::bind<GoRoot>(), Ui::ButtonStyle::subtle(), Mdi::LAPTOP),

@@ -18,7 +18,7 @@ Ui::Child app(State initial) {
                                : viewer(state);
 
             return Ui::vflow(titlebar, content | Ui::grow()) |
-                   Ui::maxSize({700, 500}) |
+                   Ui::maxSize({800, 600}) |
                    Ui::dialogLayer();
         });
 }
@@ -27,6 +27,9 @@ Ui::Child app(State initial) {
 
 Res<> entryPoint(Ctx &ctx) {
     auto &args = useArgs(ctx);
-    auto image = try$(Media::loadImage(args[0]));
+    Sys::Url url;
+    url.scheme = "file";
+    url.path = Sys::Path::parse(args[0]);
+    auto image = try$(Media::loadImage(url));
     return Ui::runApp(ctx, ImageViewer::app(image));
 }

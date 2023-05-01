@@ -11,18 +11,18 @@
 namespace About {
 
 Ui::Child app() {
-    auto logo = Ui::icon(Mdi::SNOWFLAKE, 64) |
+    auto logo = Ui::icon(Mdi::SNOWFLAKE, 96) |
                 Ui::center() |
                 Ui::bound() |
                 Ui::box({
-                    .padding = 32,
-                    .backgroundPaint = Gfx::WHITE,
-                    .foregroundPaint = Gfx::BLACK,
+                    .padding = 64,
+                    .backgroundPaint = Ui::GRAY900,
+                    .foregroundPaint = Ui::GRAY50,
                 });
 
     auto licenseBtn = Ui::button(
         NONE,
-        Ui::ButtonStyle::subtle().withRadius(999),
+        Ui::ButtonStyle::subtle(),
         Mdi::LICENSE,
         "LICENSE");
 
@@ -39,11 +39,12 @@ Ui::Child app() {
         Ui::vflow(
             8,
             Ui::hflow(8,
-                      Ui::text(Ui::TextStyle::titleLarge(), "skiftOS"),
+                      Ui::headlineMedium("skiftOS"),
                       Ui::badge(Ui::BadgeStyle::INFO, "v0.1.0") | Ui::center()),
             Ui::empty(),
             Ui::text("Copyright © 2018-2023"),
-            Ui::text("SMNX & contributors."),
+            Ui::text("SMNX Research & contributors."),
+            Ui::text("All rights reserved."),
             Ui::grow(NONE),
             Ui::hflow(
                 8,
@@ -56,8 +57,7 @@ Ui::Child app() {
         "About",
         Ui::TitlebarStyle::DIALOG);
 
-    return Ui::vflow(titlebar, logo, content | Ui::grow()) |
-           Ui::pinSize({350, 400}) |
+    return Ui::vflow(titlebar, Ui::separator(), Ui::hflow(logo, Ui::separator(), content | Ui::grow()) | Ui::grow()) | Ui::pinSize({560, 360}) |
            Ui::dialogLayer();
 }
 

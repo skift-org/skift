@@ -33,6 +33,10 @@ Child colorRow(Gfx::Color color, OnChange<Gfx::Color> onChange, String title);
 
 Child navRow(bool selected, OnPress onPress, Mdi::Icon i, String title);
 
+Child navList(Children children);
+
+Child navTree(Mdi::Icon icon, String title, Child child);
+
 Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Child child);
 
 Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Children children);

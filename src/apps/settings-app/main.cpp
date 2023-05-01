@@ -13,22 +13,20 @@
 namespace Settings {
 
 Ui::Child sidebar(State const &state) {
-    return Ui::vscroll(
-        Ui::spacing(
-            8,
-            Ui::vflow(
-                8,
+    Ui::Children items = {
+        Ui::navRow(state.page == Page::ACCOUNT, Model::bind<GoTo>(Page::ACCOUNT), Mdi::ACCOUNT, "Accounts"),
+        Ui::navRow(state.page == Page::PERSONALIZATION, Model::bind<GoTo>(Page::PERSONALIZATION), Mdi::PALETTE, "Personalization"),
+        Ui::navRow(state.page == Page::APPLICATIONS, Model::bind<GoTo>(Page::APPLICATIONS), Mdi::WIDGETS_OUTLINE, "Applications"),
 
-                Ui::navRow(state.page == Page::ACCOUNT, Model::bind<GoTo>(Page::ACCOUNT), Mdi::ACCOUNT, "Accounts"),
-                Ui::navRow(state.page == Page::PERSONALIZATION, Model::bind<GoTo>(Page::PERSONALIZATION), Mdi::PALETTE, "Personalization"),
-                Ui::navRow(state.page == Page::APPLICATIONS, Model::bind<GoTo>(Page::APPLICATIONS), Mdi::WIDGETS_OUTLINE, "Applications"),
+        Ui::navRow(state.page == Page::SYSTEM, Model::bind<GoTo>(Page::SYSTEM), Mdi::LAPTOP, "System"),
+        Ui::navRow(state.page == Page::NETWORK, Model::bind<GoTo>(Page::NETWORK), Mdi::WIFI, "Network"),
+        Ui::navRow(state.page == Page::SECURITY, Model::bind<GoTo>(Page::SECURITY), Mdi::SECURITY, "Security & Privacy"),
 
-                Ui::navRow(state.page == Page::SYSTEM, Model::bind<GoTo>(Page::SYSTEM), Mdi::LAPTOP, "System"),
-                Ui::navRow(state.page == Page::NETWORK, Model::bind<GoTo>(Page::NETWORK), Mdi::WIFI, "Network"),
-                Ui::navRow(state.page == Page::SECURITY, Model::bind<GoTo>(Page::SECURITY), Mdi::SECURITY, "Security & Privacy"),
+        Ui::navRow(state.page == Page::UPDATES, Model::bind<GoTo>(Page::UPDATES), Mdi::UPDATE, "Updates"),
+        Ui::navRow(state.page == Page::ABOUT, Model::bind<GoTo>(Page::ABOUT), Mdi::INFORMATION_OUTLINE, "About"),
+    };
 
-                Ui::navRow(state.page == Page::UPDATES, Model::bind<GoTo>(Page::UPDATES), Mdi::UPDATE, "Updates"),
-                Ui::navRow(state.page == Page::ABOUT, Model::bind<GoTo>(Page::ABOUT), Mdi::INFORMATION_OUTLINE, "About"))));
+    return Ui::navList(items);
 }
 
 /* --- Pages ---------------------------------------------------------------- */
@@ -69,15 +67,15 @@ Ui::Child app() {
             Ui::TitlebarStyle::DEFAULT);
 
         return Ui::dialogLayer(
-            Ui::minSize(
-                {700, 500},
+            Ui::pinSize(
+                {800, 600},
                 Ui::vflow(
                     titlebar,
                     Ui::toolbar(
                         Ui::button(Model::bind<ToggleSidebar>(), Ui::ButtonStyle::subtle(), state.sidebarOpen ? Mdi::MENU_OPEN : Mdi::MENU),
-                        Ui::button(Model::bind<GoTo>(Page::HOME), Ui::ButtonStyle::subtle(), Mdi::HOME),
                         Ui::button(NONE, Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
-                        Ui::button(NONE, Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT)),
+                        Ui::button(NONE, Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
+                        Ui::button(Model::bind<GoTo>(Page::HOME), Ui::ButtonStyle::subtle(), Mdi::HOME)),
                     appBody(state) | Ui::grow())));
     });
 }

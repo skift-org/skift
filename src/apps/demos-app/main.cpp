@@ -290,11 +290,7 @@ Ui::Child sidebar(State s) {
             })
             .collect<Ui::Children>();
 
-    return Ui::vscroll(
-        Ui::minSize({256, Ui::UNCONSTRAINED},
-                    Ui::spacing(
-                        8,
-                        Ui::vflow(8, items))));
+    return Ui::navList(items);
 }
 
 Res<> entryPoint(Ctx &ctx) {

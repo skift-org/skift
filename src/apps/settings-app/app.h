@@ -19,7 +19,7 @@ enum struct Page {
 };
 
 struct State {
-    bool sidebarOpen = true;
+    bool sidebarOpen = false;
     Page page = Page::HOME;
 };
 

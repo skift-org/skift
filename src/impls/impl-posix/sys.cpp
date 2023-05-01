@@ -4,6 +4,7 @@
 
 /* Posix Stuff*/
 #include <dirent.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/mman.h>
@@ -23,9 +24,8 @@ struct PosixFd : public Sys::Fd {
     Res<usize> read(MutBytes bytes) override {
         isize result = ::read(_raw, bytes.buf(), sizeOf(bytes));
 
-        if (result < 0) {
+        if (result < 0)
             return Posix::fromLastErrno();
-        }
 
         return Ok(static_cast<usize>(result));
     }
@@ -33,9 +33,8 @@ struct PosixFd : public Sys::Fd {
     Res<usize> write(Bytes bytes) override {
         isize result = ::write(_raw, bytes.buf(), sizeOf(bytes));
 
-        if (result < 0) {
+        if (result < 0)
             return Posix::fromLastErrno();
-        }
 
         return Ok(static_cast<usize>(result));
     }
@@ -55,9 +54,8 @@ struct PosixFd : public Sys::Fd {
             break;
         }
 
-        if (offset < 0) {
+        if (offset < 0)
             return Posix::fromLastErrno();
-        }
 
         return Ok(static_cast<usize>(offset));
     }
@@ -70,9 +68,8 @@ struct PosixFd : public Sys::Fd {
     Res<Strong<Fd>> dup() override {
         isize duped = ::dup(_raw);
 
-        if (duped < 0) {
+        if (duped < 0)
             return Posix::fromLastErrno();
-        }
 
         return Ok(makeStrong<PosixFd>(duped));
     }
@@ -113,9 +110,8 @@ Res<Strong<Sys::Fd>> openFile(Sys::Url url) {
     String str = try$(try$(resolve(url)).str());
     isize fd = ::open(str.buf(), O_RDONLY);
 
-    if (fd < 0) {
+    if (fd < 0)
         return Posix::fromLastErrno();
-    }
 
     return Ok(makeStrong<PosixFd>(fd));
 }
@@ -124,18 +120,27 @@ Res<Vec<Sys::DirEntry>> readDir(Sys::Url url) {
     String str = try$(try$(resolve(url)).str());
 
     DIR *dir = ::opendir(str.buf());
-    if (not dir) {
+    if (not dir)
         return Posix::fromLastErrno();
-    }
+
     Vec<Sys::DirEntry> entries;
     struct dirent *entry;
+    errno = 0;
     while ((entry = ::readdir(dir))) {
-        if (strcmp(entry->d_name, ".") == 0 or strcmp(entry->d_name, "..") == 0) {
+        try$(Posix::consumeErrno());
+
+        if (strcmp(entry->d_name, ".") == 0 or
+            strcmp(entry->d_name, "..") == 0 or
+            (strLen(entry->d_name) >= 1 and entry->d_name[0] == '.')) {
             continue;
         }
+
         entries.pushBack(Sys::DirEntry{entry->d_name, entry->d_type == DT_DIR});
     }
-    ::closedir(dir);
+
+    if (::closedir(dir) < 0)
+        return Posix::fromLastErrno();
+
     return Ok(entries);
 }
 
@@ -154,9 +159,8 @@ Res<Strong<Sys::Fd>> createFile(Sys::Url url) {
 Res<Pair<Strong<Sys::Fd>>> createPipe() {
     int fds[2];
 
-    if (::pipe(fds) < 0) {
+    if (::pipe(fds) < 0)
         return Posix::fromLastErrno();
-    }
 
     return Ok(Pair<Strong<Sys::Fd>>{
         makeStrong<PosixFd>(fds[0]),
@@ -215,12 +219,12 @@ isize mmapOptionsToProt(Sys::MmapOptions const &options) {
 Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
     void *addr = mmap((void *)options.vaddr, options.size, mmapOptionsToProt(options), MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
-    if (addr == MAP_FAILED) {
+    if (addr == MAP_FAILED)
         return Posix::fromLastErrno();
-    }
 
     if (options.flags & Sys::MmapFlags::PREFETCH) {
-        madvise(addr, options.size, MADV_WILLNEED);
+        if (madvise(addr, options.size, MADV_WILLNEED) < 0)
+            return Posix::fromLastErrno();
     }
 
     return Ok(Sys::MmapResult{0, (usize)addr, (usize)options.size});
@@ -230,40 +234,35 @@ Res<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> may
     Strong<PosixFd> fd = try$(maybeFd.cast<PosixFd>());
     usize size = options.size;
 
-    if (size == 0) {
+    if (size == 0)
         size = try$(Io::size(*fd));
-    }
 
     void *addr = mmap((void *)options.vaddr, size, mmapOptionsToProt(options), MAP_SHARED, fd->_raw, options.offset);
 
-    if (addr == MAP_FAILED) {
+    if (addr == MAP_FAILED)
         return Posix::fromLastErrno();
-    }
 
     return Ok(Sys::MmapResult{0, (usize)addr, (usize)size});
 }
 
 Res<> memUnmap(void const *buf, usize len) {
-    if (::munmap((void *)buf, len) < 0) {
+    if (::munmap((void *)buf, len) < 0)
         return Posix::fromLastErrno();
-    }
 
     return Ok();
 }
 
 Res<> memFlush(void *flush, usize len) {
-    if (::msync(flush, len, MS_INVALIDATE) < 0) {
+    if (::msync(flush, len, MS_INVALIDATE) < 0)
         return Posix::fromLastErrno();
-    }
 
     return Ok();
 }
 
 Res<> populate(Sys::SysInfo &infos) {
     struct utsname uts;
-    if (uname(&uts) < 0) {
+    if (uname(&uts) < 0)
         return Posix::fromLastErrno();
-    }
 
     infos.sysName = "Posix";
     infos.sysVersion = try$(Fmt::format("{}", _POSIX_VERSION));

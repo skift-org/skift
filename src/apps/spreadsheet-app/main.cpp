@@ -175,7 +175,7 @@ Ui::Child app() {
                    tb,
                    toolbar(),
                    body | Ui::grow()) |
-               Ui::minSize({1280, 720}) | Ui::dialogLayer();
+               Ui::pinSize({800, 600}) | Ui::dialogLayer();
     });
 }
 

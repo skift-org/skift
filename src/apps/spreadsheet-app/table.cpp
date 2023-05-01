@@ -131,10 +131,10 @@ struct Table : public Ui::View<Table> {
         g.stroke(all.grow(3), 4);
 
         auto handle = all.bottomEnd() + 3;
-        g.fillStyle(Gfx::WHITE);
+        g.fillStyle(Ui::ACCENT500);
         g.fill(Math::Ellipsei{handle, 4});
 
-        g.strokeStyle(Gfx::stroke(Ui::GRAY950).withAlign(Gfx::OUTSIDE_ALIGN).withWidth(1));
+        g.strokeStyle(Gfx::stroke(Ui::GRAY950).withAlign(Gfx::OUTSIDE_ALIGN).withWidth(2));
         g.stroke();
     }
 

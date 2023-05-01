@@ -16,18 +16,18 @@ ButtonStyle ButtonStyle::regular(Gfx::ColorRamp ramp) {
     return {
         .idleStyle = {
             .borderRadius = RADIUS,
-            .backgroundPaint = ramp[6],
+            .backgroundPaint = ramp[8],
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = ramp[5],
+            .backgroundPaint = ramp[7],
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderPaint = ramp[5],
-            .backgroundPaint = ramp[6],
+            .borderPaint = ramp[7],
+            .backgroundPaint = ramp[8],
         },
     };
 }
@@ -36,18 +36,18 @@ ButtonStyle ButtonStyle::secondary() {
     return {
         .idleStyle = {
             .borderRadius = RADIUS,
-            .backgroundPaint = GRAY800,
+            .backgroundPaint = GRAY900,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = GRAY700,
+            .backgroundPaint = GRAY800,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderPaint = GRAY700,
-            .backgroundPaint = GRAY800,
+            .borderPaint = GRAY800,
+            .backgroundPaint = GRAY900,
         },
     };
 }
@@ -77,18 +77,18 @@ ButtonStyle ButtonStyle::outline() {
         .idleStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderPaint = GRAY700,
+            .borderPaint = GRAY800,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = GRAY600,
+            .backgroundPaint = GRAY700,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderPaint = GRAY600,
-            .backgroundPaint = GRAY700,
+            .borderPaint = GRAY700,
+            .backgroundPaint = GRAY800,
         },
     };
 }
@@ -101,13 +101,13 @@ ButtonStyle ButtonStyle::subtle() {
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = GRAY600,
+            .backgroundPaint = GRAY700,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
-            .borderPaint = GRAY600,
-            .backgroundPaint = GRAY700,
+            .borderPaint = GRAY700,
+            .backgroundPaint = GRAY800,
         },
     };
 }

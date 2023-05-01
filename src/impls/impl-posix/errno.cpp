@@ -173,4 +173,14 @@ Error fromLastErrno() {
     return fromErrno(errno);
 }
 
+Res<> consumeErrno() {
+    if (errno == 0) {
+        return Ok();
+    } else {
+        auto err = fromLastErrno();
+        errno = 0;
+        return err;
+    }
+}
+
 } // namespace Embed::Posix

@@ -1,5 +1,7 @@
 #include "row.h"
 
+#include "scroll.h"
+
 namespace Karm::Ui {
 
 Child row(Child child) {
@@ -123,14 +125,14 @@ Child navRow(bool selected, OnPress onPress, Mdi::Icon i, String title) {
 
     buttonStyle.idleStyle = {
         .borderRadius = 4,
-        .backgroundPaint = selected ? GRAY800 : Gfx::ALPHA,
+        .backgroundPaint = selected ? GRAY900 : Gfx::ALPHA,
     };
 
     auto indicator = box(BoxStyle{
                              .borderRadius = 99,
                              .backgroundPaint = selected ? ACCENT600 : Gfx::ALPHA,
                          },
-                         empty(4));
+                         empty(2));
 
     return button(
         std::move(onPress),
@@ -140,9 +142,37 @@ Child navRow(bool selected, OnPress onPress, Mdi::Icon i, String title) {
             hflow(
                 indicator,
                 empty(8),
-                icon(i, 26),
+                icon(i, 18),
                 empty(12),
                 labelMedium(title) | center())));
+}
+
+Child navList(Children children) {
+    return Ui::vflow(8, children) |
+           Ui::spacing(8) |
+           Ui::vscroll() |
+           Ui::minSize({198, Ui::UNCONSTRAINED});
+}
+
+Child navTree(Mdi::Icon i, String title, Child child) {
+    return state(true, [=](State<bool> state) {
+        return vflow(
+            button(
+                state.bindToggle(),
+                ButtonStyle::subtle(),
+                spacing(
+                    {0, 8, 12, 8},
+                    hflow(
+                        empty(8),
+                        icon(i, 18),
+                        empty(12),
+                        labelMedium(title) | vcenter() | grow(),
+                        icon(state.value() ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 18)))),
+
+            state.value()
+                ? child | spacing({32, 0, 0, 0})
+                : empty());
+    });
 }
 
 Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Child child) {

@@ -268,7 +268,7 @@ Child aboutDialog(Mdi::Icon i, String name) {
         badge(BadgeStyle::INFO, "v0.1.0"),
         empty(),
         text("Copyright © 2018-2023"),
-        text("SMNX & contributors."));
+        text("SMNX Research & contributors."));
 
     Children actions = {
         button(NONE, ButtonStyle::subtle(), "LICENSE"),

@@ -118,10 +118,11 @@ struct [[nodiscard]] Opt {
     }
 
     template <typename... Args>
-    ALWAYS_INLINE void emplace(Args &&...args) {
+    ALWAYS_INLINE T &emplace(Args &&...args) {
         clear();
         _present = true;
         _value.ctor(std::forward<Args>(args)...);
+        return _value.unwrap();
     }
 
     ALWAYS_INLINE void clear() {

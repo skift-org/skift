@@ -7,7 +7,7 @@
 
 namespace Karm::Text {
 
-struct Emit {
+struct Emit : public Io::TextWriterBase<> {
     Io::TextWriter &_writer;
     usize _ident = 0;
     usize _total = 0;
@@ -28,6 +28,11 @@ struct Emit {
 
     void indent() {
         _ident++;
+    }
+
+    void indentNewline() {
+        indent();
+        newline();
     }
 
     void indented(auto inner) {
@@ -62,10 +67,27 @@ struct Emit {
         _newline = false;
     }
 
+    virtual Res<usize> write(Bytes bytes) override {
+        return _writer.write(bytes);
+    }
+
+    Res<usize> writeRune(Rune r) override {
+        if (r == '\n') {
+            newline();
+        } else {
+            _tryWrapper(_writer.writeRune(r));
+        }
+        return Ok(1uz);
+    }
+
     void operator()(Rune r) {
         if (not _error)
             return;
 
+        if (r == '\n') {
+            newline();
+            return;
+        }
         _tryWrapper(_writer.writeRune(r));
     }
 
@@ -89,7 +111,7 @@ struct Emit {
             insertNewline();
         }
 
-        _tryWrapper(Fmt::format(_writer, format, std::forward<Ts>(ts)...));
+        _tryWrapper(Fmt::format(*this, format, std::forward<Ts>(ts)...));
     }
 
     usize total() {

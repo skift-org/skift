@@ -164,8 +164,8 @@ usize sizeOf(S &slice) {
     return slice.len() * sizeof(typename S::Inner);
 }
 
-template <Sliceable S>
-constexpr Ordr cmp(S const &lhs, S const &rhs) {
+template <Sliceable LHS, Sliceable RHS>
+constexpr Ordr cmp(LHS const &lhs, RHS const &rhs) {
     return cmp(lhs.buf(), lhs.len(), rhs.buf(), rhs.len());
 }
 

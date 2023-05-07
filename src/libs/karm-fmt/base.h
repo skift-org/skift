@@ -53,8 +53,8 @@ inline Res<usize> _format(Io::TextWriter &writer, Str format, _Args &args) {
         Rune c = scan.next();
 
         if (c == '{') {
-            scan.begin();
             scan.skip(':');
+            scan.begin();
             while (scan.curr() != '}') {
                 scan.next();
             }

@@ -109,4 +109,18 @@ Hsv rgbToHsv(Color color);
 
 Color hsvToRgb(Hsv hsv);
 
+struct YCbCr {
+    f64 y, cb, cr;
+
+    ALWAYS_INLINE Ordr cmp(YCbCr const &other) const {
+        return y == other.y and cb == other.cb and cr == other.cr
+                   ? Ordr::EQUAL
+                   : Ordr::LESS;
+    }
+};
+
+YCbCr rgbToYCbCr(Color color);
+
+Color yCbCrToRgb(YCbCr yCbCr);
+
 } // namespace Karm::Gfx

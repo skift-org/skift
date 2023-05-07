@@ -54,4 +54,6 @@ struct Array {
 template <class T, class... U>
 Array(T, U...) -> Array<T, 1 + sizeof...(U)>;
 
+static_assert(MutSliceable<Array<u8, 16>>);
+
 } // namespace Karm

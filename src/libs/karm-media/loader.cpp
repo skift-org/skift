@@ -1,5 +1,6 @@
 
 #include <jpeg/spec.h>
+#include <karm-sys/chan.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 #include <png/spec.h>
@@ -65,13 +66,12 @@ static Res<Image> loadPng(Bytes bytes) {
 
 static Res<Image> loadJpeg(Bytes bytes) {
     auto jpeg = try$(Jpeg::Image::load(bytes));
+
+    Text::Emit e = Sys::out();
+    jpeg.dump(e);
+
     auto img = Image::alloc({jpeg.width(), jpeg.height()});
-
-    img
-        .mutPixels()
-        .clear(Gfx::PINK);
-
-    // try$(jpeg.decode(img));
+    try$(jpeg.decode(img));
     return Ok(img);
 }
 

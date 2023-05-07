@@ -6,6 +6,8 @@
 
 struct BScan {
     Cursor<u8> _cursor;
+    u8 _bits;
+    u8 _bitsLen;
 
     ALWAYS_INLINE constexpr BScan(Bytes bytes) : _cursor(bytes) {}
 
@@ -83,6 +85,82 @@ struct BScan {
         return r;
     }
 
+    ALWAYS_INLINE constexpr void alignBits() {
+        _bitsLen = 0;
+    }
+
+    /// Read bits in most significant bit first order.
+    ALWAYS_INLINE constexpr u8 nextBitbe() {
+        if (_bitsLen == 0) {
+            _bits = nextU8be();
+            _bitsLen = 8;
+        }
+        u8 r = _bits >> 7;
+        _bits <<= 1;
+        _bitsLen--;
+        return r;
+    }
+
+    ALWAYS_INLINE constexpr u8 peekBitbe() {
+        BScan c{*this};
+        return c.nextBitbe();
+    }
+
+    ALWAYS_INLINE constexpr usize nextBitsbe(usize n) {
+        usize r = 0;
+        for (usize i = 0; i < n; i++) {
+            r |= nextBitbe() << i;
+        }
+        return r;
+    }
+
+    ALWAYS_INLINE constexpr usize peekBitsbe(usize n) {
+        BScan c{*this};
+        return c.nextBitsbe(n);
+    }
+
+    ALWAYS_INLINE constexpr void skipBitsbe(usize n) {
+        for (usize i = 0; i < n; i++) {
+            nextBitbe();
+        }
+    }
+
+    /// Read bits in least significant bit first order.
+    ALWAYS_INLINE constexpr u8 nextBitle() {
+        if (_bitsLen == 0) {
+            _bits = nextU8le();
+            _bitsLen = 8;
+        }
+        u8 r = _bits & 1;
+        _bits >>= 1;
+        _bitsLen--;
+        return r;
+    }
+
+    ALWAYS_INLINE constexpr u8 peekBitle() {
+        BScan c{*this};
+        return c.nextBitle();
+    }
+
+    ALWAYS_INLINE constexpr usize nextBitsle(usize n) {
+        usize r = 0;
+        for (usize i = 0; i < n; i++) {
+            r |= nextBitle() << i;
+        }
+        return r;
+    }
+
+    ALWAYS_INLINE constexpr usize peekBitsle(usize n) {
+        BScan c{*this};
+        return c.nextBitsle(n);
+    }
+
+    ALWAYS_INLINE constexpr void skipBitsle(usize n) {
+        for (usize i = 0; i < n; i++) {
+            nextBitle();
+        }
+    }
+
     ALWAYS_INLINE constexpr u8 nextU8be() { return nextBe<u8>(); }
     ALWAYS_INLINE constexpr u16 nextU16be() { return nextBe<u16>(); }
     ALWAYS_INLINE constexpr u32 nextU32be() { return nextBe<u32>(); }
@@ -145,6 +223,17 @@ struct BScan {
         return b;
     }
 
+    ALWAYS_INLINE constexpr bool copyTo(MutBytes dst) {
+        if (dst.len() < rem()) {
+            return false;
+        }
+
+        for (usize i = 0; i < rem(); i++) {
+            dst[i] = _cursor.buf()[i];
+        }
+        return true;
+    }
+
     ALWAYS_INLINE constexpr Bytes restBytes() {
         return nextBytes(rem());
     }
@@ -157,7 +246,7 @@ struct BField {
 };
 
 struct BChunk {
-    Bytes _slice;
+    Bytes _slice{};
 
     ALWAYS_INLINE constexpr BChunk() = default;
 

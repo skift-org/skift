@@ -115,10 +115,6 @@ struct _String {
         return {_buf, _len};
     }
 
-    Ordr cmp(_Str<E> other) const {
-        return ::cmp(str(), other);
-    }
-
     Ordr cmp(char const *other) const {
         return ::cmp(str(), _Str<E>{other});
     }

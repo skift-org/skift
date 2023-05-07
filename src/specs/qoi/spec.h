@@ -8,7 +8,7 @@
 
 namespace Qoi {
 
-struct Image {
+struct Image : public BChunk {
     // magic "qoif"
     static constexpr Array<u8, 4> MAGIC = {
         0x71, 0x6F, 0x69, 0x66};
@@ -16,23 +16,24 @@ struct Image {
     static constexpr Array<u8, 8> END = {
         0, 0, 0, 0, 0, 0, 0, 1};
 
-    Bytes _slice;
-
-    BScan begin() const { return _slice; }
+    using Width = BField<i32be, 4>;
+    using Height = BField<i32be, 8>;
+    using Channels = BField<u8be, 12>;
+    using ColorSpace = BField<u8be, 13>;
 
     Bytes magic() const { return begin().nextBytes(4); }
 
-    isize width() const { return begin().skip(4).nextI32be(); }
+    isize width() const { return get<Width>(); }
 
-    isize height() const { return begin().skip(8).nextI32be(); }
+    isize height() const { return get<Height>(); }
 
-    u8 channels() const { return begin().skip(12).nextU8be(); }
+    u8 channels() const { return get<Channels>(); }
 
-    u8 colorSpace() const { return begin().skip(13).nextU8be(); }
+    u8 colorSpace() const { return get<ColorSpace>(); }
 
-    Image(Bytes slice) : _slice(slice) {}
+    Image(Bytes slice) : BChunk(slice) {}
 
-    static bool isQoi(Bytes const &slice) {
+    static bool isQoi(Bytes slice) {
         return slice.len() >= 4 and slice[0] == 0x71 and slice[1] == 0x6F and
                slice[2] == 0x69 and slice[3] == 0x66;
     }

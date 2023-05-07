@@ -14,6 +14,10 @@ Ui::Child viewer(State const &state) {
 
 Ui::Child viewerPreview(State const &state) {
     return Ui::image(state.image) |
+           Ui::box(Ui::BoxStyle{
+               .borderWidth = 1,
+               .borderPaint = Ui::GRAY50.withOpacity(0.1),
+           }) |
            Ui::spacing(8) |
            Ui::fit();
 }

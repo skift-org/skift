@@ -66,10 +66,6 @@ static Res<Image> loadPng(Bytes bytes) {
 
 static Res<Image> loadJpeg(Bytes bytes) {
     auto jpeg = try$(Jpeg::Image::load(bytes));
-
-    Text::Emit e = Sys::out();
-    jpeg.dump(e);
-
     auto img = Image::alloc({jpeg.width(), jpeg.height()});
     try$(jpeg.decode(img));
     return Ok(img);

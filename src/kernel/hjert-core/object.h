@@ -1,6 +1,6 @@
 #pragma once
 
-#include <hjert-api/raw.h>
+#include <hjert-api/types.h>
 #include <karm-base/array.h>
 #include <karm-base/lock.h>
 #include <karm-base/rc.h>
@@ -15,18 +15,26 @@ namespace Hjert::Core {
 struct Object : Meta::Static {
     static Atomic<usize> _counter;
 
+    Lock _lock;
+
     usize _id;
     Hj::Type _type;
     Opt<String> _label;
-    Lock _lock;
+
+    Hj::Signals _signals;
+    Array<u64, 32> _data;
+
+    Object(Hj::Type type)
+        : _id(_counter.fetchAdd(1)),
+          _type(type) {
+    }
 
     usize id() const {
         return _id;
     }
 
-    Object(Hj::Type type)
-        : _id(_counter.fetchAdd(1)),
-          _type(type) {
+    Hj::Type type() {
+        return _type;
     }
 
     void label(Str label) {
@@ -57,9 +65,9 @@ struct BaseObject : public Object {
 using Slot = Opt<Strong<Object>>;
 
 struct Domain : public BaseObject<Domain> {
-    static constexpr usize LEN = 4096;
+    static constexpr usize SHIFT = 11;
+    static constexpr usize LEN = 2 << 11;
     static constexpr usize MASK = LEN - 1;
-    static constexpr usize SHIFT = 12;
 
     Array<Slot, LEN> _slots;
 

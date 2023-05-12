@@ -1,4 +1,4 @@
-#include "raw.h"
+#include "syscalls.h"
 
 namespace Hj {
 
@@ -50,6 +50,14 @@ Res<> _createIo(Cap dest, Cap *cap, usize base, usize len) {
     return _syscall(Syscall::CREATE_IO, dest.raw(), (Arg)cap, base, len);
 }
 
+Res<> _createChannel(Cap dest, Cap *cap, usize len) {
+    return _syscall(Syscall::CREATE_CHANNEL, dest.raw(), (Arg)cap, len);
+}
+
+Res<> _createIrq(Cap dest, Cap *cap, usize irq) {
+    return _syscall(Syscall::CREATE_IRQ, dest.raw(), (Arg)cap, irq);
+}
+
 Res<> _label(Cap cap, char const *label, usize len) {
     return _syscall(Syscall::LABEL, cap.raw(), (Arg)label, len);
 }
@@ -64,14 +72,6 @@ Res<> _dup(Cap node, Cap *dst, Cap src) {
 
 Res<> _start(Cap cap, usize ip, usize sp, Args const *args) {
     return _syscall(Syscall::START, cap.raw(), ip, sp, (Arg)args);
-}
-
-Res<> _wait(Cap cap, Arg *ret) {
-    return _syscall(Syscall::WAIT, cap.raw(), (Arg)ret);
-}
-
-Res<> _ret(Cap cap, Arg ret) {
-    return _syscall(Syscall::RET, cap.raw(), ret);
 }
 
 using MapFlags = Hal::VmmFlags;
@@ -92,8 +92,24 @@ Res<> _out(Cap cap, IoLen len, usize port, Arg val) {
     return _syscall(Syscall::OUT, cap.raw(), (Arg)len, port, val);
 }
 
-Res<> _ipc(Cap *cap, Cap dst, Msg *msg, IpcFlags flags) {
-    return _syscall(Syscall::IPC, (Arg)cap, dst.raw(), (Arg)msg, (Arg)flags);
+Res<> _send(Cap cap, Msg const *msg, Cap from) {
+    return _syscall(Syscall::SEND, cap.raw(), (Arg)msg, from.raw());
+}
+
+Res<> _recv(Cap cap, Msg *msg, Cap to) {
+    return _syscall(Syscall::RECV, cap.raw(), (Arg)msg, to.raw());
+}
+
+Res<> _close(Cap cap) {
+    return _syscall(Syscall::CLOSE, cap.raw());
+}
+
+Res<> _signal(Cap cap, Signals set, Signals unset, Arg value) {
+    return _syscall(Syscall::SIGNAL, cap.raw(), (Arg)set, (Arg)unset, value);
+}
+
+Res<> _wait(Cond const *conds, usize condLen, Event *ev, usize *evLen, Karm::TimeStamp deadline) {
+    return _syscall(Syscall::WAIT, (Arg)conds, condLen, (Arg)ev, (Arg)evLen, deadline.val());
 }
 
 } //  namespace Hj

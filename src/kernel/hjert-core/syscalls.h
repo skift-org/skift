@@ -1,6 +1,6 @@
 #pragma once
 
-#include <hjert-api/raw.h>
+#include <hjert-api/types.h>
 
 namespace Hjert::Core {
 

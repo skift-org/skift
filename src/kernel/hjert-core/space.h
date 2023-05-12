@@ -2,7 +2,7 @@
 
 #include <hal/io.h>
 #include <hal/vmm.h>
-#include <hjert-api/raw.h>
+#include <hjert-api/types.h>
 #include <hjert-core/mem.h>
 #include <karm-base/lock.h>
 #include <karm-base/range-alloc.h>
@@ -18,13 +18,13 @@ struct VNode : public BaseObject<VNode> {
     using _Mem = Var<Hal::PmmMem, Hal::DmaRange>;
     _Mem _mem;
 
-    VNode(_Mem mem)
-        : BaseObject(Hj::Type::VMO),
-          _mem(std::move(mem)) {}
-
     static Res<Strong<VNode>> alloc(usize size, Hj::VmoFlags);
 
     static Res<Strong<VNode>> makeDma(Hal::DmaRange prange);
+
+    VNode(_Mem mem)
+        : BaseObject(Hj::Type::VMO),
+          _mem(std::move(mem)) {}
 
     Hal::PmmRange range();
 

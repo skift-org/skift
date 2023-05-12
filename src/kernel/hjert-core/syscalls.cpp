@@ -93,21 +93,6 @@ Res<> doStart(Task &self, Hj::Cap cap, usize ip, usize sp, User<Hj::Args const> 
     return Ok();
 }
 
-Res<> doWait(Task &self, Hj::Cap cap, User<Hj::Arg> ret) {
-    auto obj = try$(self.domain().get<Task>(cap));
-    return ret.store(self.space(), try$(self.wait(obj)));
-}
-
-Res<> doRet(Task &self, Hj::Cap cap, Hj::Arg ret) {
-    if (cap.isRoot()) {
-        self.ret(ret);
-    } else {
-        auto task = try$(self.domain().get<Task>(cap));
-        task->ret(ret);
-    }
-    return Ok();
-}
-
 Res<> doMap(Task &self, Hj::Cap cap, User<usize> virt, Hj::Cap vmo, usize off, usize len, Hj::MapFlags flags) {
     auto vmoObj = try$(self.domain().get<VNode>(vmo));
     auto spaceObj = cap.isRoot()
@@ -134,15 +119,6 @@ Res<> doIn(Task &self, Hj::Cap cap, Hj::IoLen len, usize port, User<Hj::Arg> val
 Res<> doOut(Task &self, Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg val) {
     auto obj = try$(self.domain().get<IoNode>(cap));
     return obj->out(port, Hj::ioLen2Bytes(len), val);
-}
-
-Res<> doIpc(Task &self, User<Hj::Cap> cap, Hj::Cap dst, User<Hj::Msg> msg, Hj::IpcFlags flags) {
-    (void)self;
-    (void)cap;
-    (void)dst;
-    (void)msg;
-    (void)flags;
-    return Error::notImplemented();
 }
 
 Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
@@ -177,12 +153,6 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
     case Hj::Syscall::START:
         return doStart(self, Hj::Cap{args[0]}, args[1], args[2], args[3]);
 
-    case Hj::Syscall::WAIT:
-        return doWait(self, Hj::Cap{args[0]}, args[1]);
-
-    case Hj::Syscall::RET:
-        return doRet(self, Hj::Cap{args[0]}, args[1]);
-
     case Hj::Syscall::MAP:
         return doMap(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]}, args[3], args[4], (Hj::MapFlags)args[5]);
 
@@ -194,9 +164,6 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
 
     case Hj::Syscall::OUT:
         return doOut(self, Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], args[3]);
-
-    case Hj::Syscall::IPC:
-        return doIpc(self, args[0], Hj::Cap{args[1]}, args[2], (Hj::IpcFlags)args[3]);
 
     default:
         return Error::invalidInput("invalid syscall id");

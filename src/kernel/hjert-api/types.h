@@ -2,13 +2,9 @@
 
 #include <hal/vmm.h>
 #include <karm-base/array.h>
-#include <karm-base/enum.h>
-#include <karm-base/macros.h>
-#include <karm-base/res.h>
+#include <karm-base/time.h>
 
 namespace Hj {
-
-/* --- Basic Data Types ----------------------------------------------------- */
 
 #define FOREACH_TYPE(TYPE) \
     TYPE(NONE)             \
@@ -16,7 +12,9 @@ namespace Hj {
     TYPE(TASK)             \
     TYPE(SPACE)            \
     TYPE(VMO)              \
-    TYPE(IO)
+    TYPE(IO)               \
+    TYPE(CHANNEL)          \
+    TYPE(IRQ)
 
 // clang-format off
 enum struct Type {
@@ -47,23 +45,27 @@ static inline char const *toStr(Type type) {
     SYSCALL(CREATE_SPACE)        \
     SYSCALL(CREATE_VMO)          \
     SYSCALL(CREATE_IO)           \
+    SYSCALL(CREATE_CHANNEL)      \
+    SYSCALL(CREATE_IRQ)          \
     SYSCALL(LABEL)               \
     SYSCALL(DROP)                \
     SYSCALL(DUP)                 \
     SYSCALL(START)               \
-    SYSCALL(WAIT)                \
-    SYSCALL(RET)                 \
     SYSCALL(MAP)                 \
     SYSCALL(UNMAP)               \
     SYSCALL(IN)                  \
     SYSCALL(OUT)                 \
-    SYSCALL(IPC)
+    SYSCALL(SEND)                \
+    SYSCALL(RECV)                \
+    SYSCALL(CLOSE)               \
+    SYSCALL(SIGNAL)              \
+    SYSCALL(WAIT)
 
-// clang-format off
+// clang-format offR
 enum struct Syscall {
 #define ITER(NAME) NAME,
     FOREACH_SYSCALL(ITER)
-    _LEN,
+        _LEN,
 #undef ITER
 };
 // clang-format on
@@ -83,19 +85,6 @@ static inline char const *toStr(Syscall syscall) {
 using Arg = usize;
 
 using Args = Array<Arg, 6>;
-
-enum MsgFlags : Arg {
-    NONE = 0,
-
-    CAP0 = 1 << 0,
-    CAP1 = 1 << 1,
-    CAP2 = 1 << 2,
-    CAP3 = 1 << 3,
-    CAP4 = 1 << 4,
-    CAP5 = 1 << 5,
-};
-
-FlagsEnum$(MsgFlags);
 
 struct Cap {
     Arg _raw;
@@ -120,6 +109,19 @@ struct Cap {
 
 inline constexpr Cap ROOT = {};
 
+enum struct MsgFlags : Arg {
+    NONE = 0,
+
+    CAP0 = 1 << 0,
+    CAP1 = 1 << 1,
+    CAP2 = 1 << 2,
+    CAP3 = 1 << 3,
+    CAP4 = 1 << 4,
+    CAP5 = 1 << 5,
+};
+
+FlagsEnum$(MsgFlags);
+
 struct Msg {
     Arg label;
     Arg flags{};
@@ -139,48 +141,40 @@ struct Msg {
     }
 };
 
-/* --- Syscall Interface ---------------------------------------------------- */
-
-Res<> _syscall(Syscall syscall, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4 = 0, Arg a5 = 0);
-
-Res<> _log(char const *msg, usize len);
-
-Res<> _createDomain(Cap dest, Cap *cap);
-
-Res<> _createTask(Cap dest, Cap *cap, Cap node, Cap space);
-
-Res<> _createSpace(Cap dest, Cap *cap);
-
-enum struct VmoFlags : Arg {
+enum struct Signals : Arg {
     NONE = 0,
-    LOW = 1 << 0,
-    HIGH = 1 << 1,
-    DMA = 1 << 2,
+
+    READABLE = 1uz << 0,
+    WRITABLE = 1uz << 1,
+    CLOSED = 1uz << 2,
+    EXITED = 1uz << 3,
+
+    // User defined signals.
+
+    USER0 = 1uz << 24,
+    USER1 = 1uz << 25,
+    USER2 = 1uz << 26,
+    USER3 = 1uz << 27,
+    USER4 = 1uz << 28,
+    USER5 = 1uz << 29,
+    USER6 = 1uz << 30,
+    USER7 = 1uz << 31,
 };
 
-FlagsEnum$(VmoFlags);
+FlagsEnum$(Signals);
 
-Res<> _createVmo(Cap dest, Cap *cap, usize phys, usize len, VmoFlags flags = VmoFlags::NONE);
+struct Cond {
+    Cap cap;
+    Signals set;
+    Signals unset;
+};
 
-Res<> _createIo(Cap dest, Cap *cap, usize base, usize len);
-
-Res<> _label(Cap cap, char const *label, usize len);
-
-Res<> _drop(Cap cap);
-
-Res<> _dup(Cap node, Cap *dst, Cap src);
-
-Res<> _start(Cap cap, usize ip, usize sp, Args const *args);
-
-Res<> _wait(Cap cap, Arg *ret);
-
-Res<> _ret(Cap cap, Arg ret);
-
-using MapFlags = Hal::VmmFlags;
-
-Res<> _map(Cap cap, usize *virt, Cap vmo, usize off, usize len, MapFlags flags = MapFlags::NONE);
-
-Res<> _unmap(Cap cap, usize virt, usize len);
+struct Event {
+    Cap cap;
+    Signals set;
+    Signals unset;
+    Arg val;
+};
 
 enum struct IoLen : Arg {
     U8,
@@ -203,19 +197,7 @@ inline usize ioLen2Bytes(IoLen len) {
     return 0;
 }
 
-Res<> _in(Cap cap, IoLen len, usize port, Arg *val);
-
-Res<> _out(Cap cap, IoLen len, usize port, Arg val);
-
-enum struct IpcFlags : u32 {
-    NONE = 0,
-    SEND = 1 << 0,
-    RECV = 1 << 1,
-    BLOCK = 1 << 2,
-};
-
-FlagsEnum$(IpcFlags);
-
-Res<> _ipc(Cap *cap, Cap dst, Msg *msg, IpcFlags flags = IpcFlags::NONE);
+using VmoFlags = Hal::PmmFlags;
+using MapFlags = Hal::VmmFlags;
 
 } // namespace Hj

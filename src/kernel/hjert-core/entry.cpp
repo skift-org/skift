@@ -82,7 +82,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
         usize size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
 
         if ((prog.flags() & Elf::ProgramFlags::WRITE) == Elf::ProgramFlags::WRITE) {
-            auto sectionVmo = try$(VNode::alloc(size, Hj::VmoFlags::HIGH));
+            auto sectionVmo = try$(VNode::alloc(size, Hj::VmoFlags::UPPER));
             sectionVmo->label("elf-writeable");
             auto sectionRange = try$(kmm().pmm2Kmm(sectionVmo->range()));
             copy(prog.bytes(), sectionRange.mutBytes());
@@ -101,7 +101,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
 
     logInfo("entry: mapping stack...");
     auto STACK_SIZE = kib(16);
-    auto stackVmo = try$(VNode::alloc(STACK_SIZE, Hj::VmoFlags::HIGH));
+    auto stackVmo = try$(VNode::alloc(STACK_SIZE, Hj::VmoFlags::UPPER));
     stackVmo->label("stack");
     auto stackRange = try$(space->map({}, stackVmo, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
 

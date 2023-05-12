@@ -2,7 +2,7 @@
 
 #include <karm-base/string.h>
 
-#include "raw.h"
+#include "syscalls.h"
 
 namespace Hj {
 
@@ -16,19 +16,19 @@ inline Res<usize> log(Bytes bytes) {
     return Ok(bytes.len());
 }
 
-struct RaiiCap {
+struct Object {
     Cap _cap;
 
-    RaiiCap(Cap cap)
+    Object(Cap cap)
         : _cap(cap) {}
 
-    RaiiCap(RaiiCap &&other)
+    Object(Object &&other)
         : _cap(std::exchange(other._cap, {})) {
     }
 
-    RaiiCap(RaiiCap const &) = delete;
+    Object(Object const &) = delete;
 
-    ~RaiiCap() {
+    ~Object() {
         if (_cap)
             _drop(_cap).unwrap();
     }
@@ -39,50 +39,50 @@ struct RaiiCap {
         return Ok();
     }
 
-    operator Cap() const {
-        return _cap;
-    }
-};
-
-struct Domain {
-    RaiiCap _cap;
-
-    static Domain self() {
-        return Domain{ROOT};
-    }
-
-    Res<> drop() {
-        return _drop(_cap);
-    }
-
     Res<> label(Str l) {
         return _label(_cap, l.buf(), l.len());
     }
 
+    Res<> signal(Signals set, Signals unset, Arg value) {
+        return _signal(_cap, set, unset, value);
+    }
+
+    Res<Arg> wait(Signals set, Signals unset) {
+        Cond cond{_cap, set, unset};
+        Event event{};
+        usize evLen = 1;
+        try$(_wait(&cond, 1, &event, &evLen, TimeStamp::endOfTime()));
+        return Ok(event.val);
+    }
+
     operator Cap() const {
         return _cap;
     }
 };
 
-inline Res<Domain> createDomain(Cap dest) {
-    Cap cap;
-    try$(_createDomain(dest, &cap));
-    return Ok(Domain{cap});
-}
+struct Domain : public Object {
+    static Domain self() {
+        return Domain{ROOT};
+    }
 
-struct Task {
-    RaiiCap _cap;
+    static Res<Domain> create(Cap dest) {
+        Cap cap;
+        try$(_createDomain(dest, &cap));
+        return Ok(Domain{cap});
+    }
+};
+
+struct Task : public Object {
+    using Object::wait;
 
     static Task self() {
         return Task{ROOT};
     }
 
-    Res<> drop() {
-        return _cap.drop();
-    }
-
-    Res<> label(Str l) {
-        return _label(_cap, l.buf(), l.len());
+    static Res<Task> create(Cap dest, Cap node, Cap space) {
+        Cap cap;
+        try$(_createTask(dest, &cap, node, space));
+        return Ok(Task{cap});
     }
 
     Res<> start(usize ip, usize sp, Args args) {
@@ -90,42 +90,31 @@ struct Task {
     }
 
     Res<Arg> wait() {
-        Arg arg;
-        try$(_wait(_cap, &arg));
-        return Ok(arg);
+        return wait(Signals::EXITED, Signals::NONE);
     }
 
     Res<> ret(Arg ret = 0) {
-        return _ret(_cap, ret);
-    }
-
-    operator Cap() const {
-        return _cap;
+        return signal(Signals::EXITED, Signals::NONE, ret);
     }
 };
 
-inline Res<Task> createTask(Cap dest, Cap node, Cap space) {
-    Cap cap;
-    try$(_createTask(dest, &cap, node, space));
-    return Ok(Task{cap});
-}
-
-struct Mapping {
+struct Vmo : public Object {
+    static Res<Vmo> create(Cap dest, usize phys, usize len, VmoFlags flags = VmoFlags::NONE) {
+        Cap cap;
+        try$(_createVmo(dest, &cap, phys, len, flags));
+        return Ok(Vmo{cap});
+    }
 };
 
-struct Space {
-    RaiiCap _cap;
-
+struct Space : public Object {
     static Space self() {
         return Space{ROOT};
     }
 
-    Res<> drop() {
-        return _cap.drop();
-    }
-
-    Res<> label(Str l) {
-        return _label(_cap, l.buf(), l.len());
+    static Res<Space> create(Cap dest) {
+        Cap cap;
+        try$(_createSpace(dest, &cap));
+        return Ok(Space{cap});
     }
 
     Res<usize> map(usize virt, Cap vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
@@ -133,13 +122,13 @@ struct Space {
         return Ok(virt);
     }
 
-    Res<usize> map(Cap vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+    Res<usize> map(Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
         usize virt = 0;
         try$(_map(_cap, &virt, vmo, off, len, flags));
         return Ok(virt);
     }
 
-    Res<usize> map(Cap vmo, MapFlags flags = MapFlags::NONE) {
+    Res<usize> map(Vmo &vmo, MapFlags flags = MapFlags::NONE) {
         usize virt = 0;
         try$(_map(_cap, &virt, vmo, 0, 0, flags));
         return Ok(virt);
@@ -148,49 +137,13 @@ struct Space {
     Res<> unmap(usize virt, usize len) {
         return _unmap(_cap, virt, len);
     }
-
-    operator Cap() const {
-        return _cap;
-    }
 };
 
-inline Res<Space> createSpace(Cap dest) {
-    Cap cap;
-    try$(_createSpace(dest, &cap));
-    return Ok(Space{cap});
-}
-
-struct Vmo {
-    RaiiCap _cap;
-
-    Res<> drop() {
-        return _cap.drop();
-    }
-
-    Res<> label(Str l) {
-        return _label(_cap, l.buf(), l.len());
-    }
-
-    operator Cap() const {
-        return _cap;
-    }
-};
-
-inline Res<Vmo> createVmo(Cap dest, usize phys, usize len, VmoFlags flags = VmoFlags::NONE) {
-    Cap cap;
-    try$(_createVmo(dest, &cap, phys, len, flags));
-    return Ok(Vmo{cap});
-}
-
-struct Io {
-    RaiiCap _cap;
-
-    Res<> drop() {
-        return _cap.drop();
-    }
-
-    Res<> label(Str l) {
-        return _label(_cap, l.buf(), l.len());
+struct Io : public Object {
+    static Res<Io> create(Cap dest, usize base, usize len) {
+        Cap cap;
+        try$(_createIo(dest, &cap, base, len));
+        return Ok(Io{cap});
     }
 
     Res<Arg> in(IoLen len, usize port) {
@@ -202,16 +155,6 @@ struct Io {
     Res<> out(IoLen len, usize port, Arg val) {
         return _out(_cap, len, port, val);
     }
-
-    operator Cap() const {
-        return _cap;
-    }
 };
-
-inline Res<Io> createIo(Cap dest, usize base, usize len) {
-    Cap cap;
-    try$(_createIo(dest, &cap, base, len));
-    return Ok(Io{cap});
-}
 
 } // namespace Hj

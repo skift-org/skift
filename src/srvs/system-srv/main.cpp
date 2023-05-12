@@ -10,7 +10,7 @@ Res<> entryPoint(Ctx &ctx) {
     auto &handover = useHandover(ctx);
 
     auto *fb = handover.findTag(Handover::Tag::FB);
-    auto fbVmo = try$(Hj::createVmo(Hj::ROOT, fb->start, fb->size, Hj::VmoFlags::DMA));
+    auto fbVmo = try$(Hj::Vmo::create(Hj::ROOT, fb->start, fb->size, Hj::VmoFlags::DMA));
     try$(fbVmo.label("framebuffer"));
     auto fbAddr = try$(Hj::Space::self().map(fbVmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
 

@@ -4,6 +4,10 @@ namespace ImageViewer {
 
 State reduce(State s, Actions action) {
     return action.visit(Visitor{
+        [&](Refresh) {
+            debug("Refresh");
+            return s;
+        },
         [&](ToggleEditor) {
             s.filter = Gfx::Unfiltered{};
             s.isEditor = !s.isEditor;

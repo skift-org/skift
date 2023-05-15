@@ -17,7 +17,7 @@ Ui::Child app() {
         auto titlebar = Ui::titlebar(Mdi::FOLDER, "File Manager");
         auto listing = dir
                            ? FileManager::directoryListing(d, dir.unwrap())
-                           : FileManager::alert(d, "Can't access location", url.str().unwrap());
+                           : FileManager::alert(d, "Can't access this location", url.str().unwrap());
 
         Ui::Children items = {
             Ui::navTree(

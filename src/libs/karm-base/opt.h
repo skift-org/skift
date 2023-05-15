@@ -89,6 +89,10 @@ struct [[nodiscard]] Opt {
         return _present;
     }
 
+    ALWAYS_INLINE bool has() const {
+        return _present;
+    }
+
     ALWAYS_INLINE T *operator->() {
         if (not _present) {
             panic("Unwrapping None");

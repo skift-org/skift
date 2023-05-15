@@ -1,8 +1,10 @@
 
+#include <bmp/spec.h>
 #include <jpeg/spec.h>
 #include <karm-sys/chan.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
+#include <karm-sys/time.h>
 #include <png/spec.h>
 #include <qoi/spec.h>
 
@@ -10,6 +12,8 @@
 #include "loader.h"
 
 namespace Karm::Media {
+
+/* --- Font loading --------------------------------------------------------- */
 
 Res<Strong<Fontface>> loadFontface(Sys::Mmap &&map) {
     return Ok(try$(TtfFontface::load(std::move(map))));
@@ -45,6 +49,18 @@ Res<Font> loadFontOrFallback(f64 size, Sys::Url url) {
     return Ok(Font::fallback());
 }
 
+/* --- Image loading -------------------------------------------------------- */
+
+static Res<Image> loadBmp(Bytes bytes) {
+    auto bmp = try$(Bmp::Image::load(bytes));
+    Text::Emit e{Sys::out()};
+    bmp.dump(e);
+    auto img = Image::alloc({bmp.width(), bmp.height()});
+    try$(bmp.decode(img));
+
+    return Ok(img);
+}
+
 static Res<Image> loadQoi(Bytes bytes) {
     auto qoi = try$(Qoi::Image::load(bytes));
     auto img = Image::alloc({qoi.width(), qoi.height()});
@@ -55,12 +71,7 @@ static Res<Image> loadQoi(Bytes bytes) {
 static Res<Image> loadPng(Bytes bytes) {
     auto png = try$(Png::Image::load(bytes));
     auto img = Image::alloc({png.width(), png.height()});
-
-    img
-        .mutPixels()
-        .clear(Gfx::PINK);
-
-    // try$(png.decode(img));
+    try$(png.decode(img));
     return Ok(img);
 }
 
@@ -72,7 +83,9 @@ static Res<Image> loadJpeg(Bytes bytes) {
 }
 
 Res<Image> loadImage(Sys::Mmap &&map) {
-    if (Qoi::Image::isQoi(map.bytes())) {
+    if (Bmp::Image::isBmp(map.bytes())) {
+        return loadBmp(map.bytes());
+    } else if (Qoi::Image::isQoi(map.bytes())) {
         return loadQoi(map.bytes());
     } else if (Png::Image::isPng(map.bytes())) {
         return loadPng(map.bytes());

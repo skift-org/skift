@@ -18,7 +18,7 @@ Ui::Child app(State initial) {
                                : viewer(state);
 
             return Ui::vflow(titlebar, content | Ui::grow()) |
-                   Ui::maxSize({800, 600}) |
+                   Ui::pinSize({800, 600}) |
                    Ui::dialogLayer();
         });
 }
@@ -27,9 +27,16 @@ Ui::Child app(State initial) {
 
 Res<> entryPoint(Ctx &ctx) {
     auto &args = useArgs(ctx);
-    Sys::Url url;
-    url.scheme = "file";
-    url.path = Sys::Path::parse(args[0]);
-    auto image = try$(Media::loadImage(url));
+
+    Res<Media::Image> image = Error::invalidInput("No image provided");
+
+    if (args.len() > 0) {
+        Sys::Url url;
+        url.scheme = "file";
+        url.path = Sys::Path::parse(args[0]);
+
+        image = Media::loadImage(url);
+    }
+
     return Ui::runApp(ctx, ImageViewer::app(image));
 }

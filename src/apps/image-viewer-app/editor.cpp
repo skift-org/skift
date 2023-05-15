@@ -16,7 +16,7 @@ Ui::Child editor(State const &state) {
 }
 
 Ui::Child editorPreview(State const &state) {
-    return Ui::image(state.image) |
+    return Ui::image(state.image.unwrap()) |
            Ui::foregroundFilter(state.filter) |
            Ui::spacing(8) |
            Ui::fit();

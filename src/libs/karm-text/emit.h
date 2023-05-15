@@ -114,6 +114,19 @@ struct Emit : public Io::TextWriterBase<> {
         _tryWrapper(Fmt::format(*this, format, std::forward<Ts>(ts)...));
     }
 
+    template <typename... Ts>
+    void ln(Ts &&...ts) {
+        if (not _error)
+            return;
+
+        if (_newline) {
+            insertNewline();
+        }
+
+        _tryWrapper(Fmt::format(*this, std::forward<Ts>(ts)...));
+        newline();
+    }
+
     usize total() {
         return _total;
     }

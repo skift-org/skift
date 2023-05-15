@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
+    "id": "bmp-spec",
+    "type": "lib",
+    "description": "BMP image format specification",
+    "requires": [
+        "karm-base"
+    ]
+}

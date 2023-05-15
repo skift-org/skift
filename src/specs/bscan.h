@@ -3,13 +3,30 @@
 #include <karm-base/cursor.h>
 #include <karm-base/endian.h>
 #include <karm-base/string.h>
+#include <karm-io/traits.h>
 
 struct BScan {
+    Cursor<u8> _start;
     Cursor<u8> _cursor;
-    u8 _bits;
-    u8 _bitsLen;
+    u8 _bits = 0;
+    u8 _bitsLen = 0;
 
-    ALWAYS_INLINE constexpr BScan(Bytes bytes) : _cursor(bytes) {}
+    ALWAYS_INLINE constexpr BScan(Bytes bytes)
+        : _start(bytes),
+          _cursor(bytes) {}
+
+    ALWAYS_INLINE constexpr void rewind() {
+        _cursor = _start;
+    }
+
+    ALWAYS_INLINE constexpr BScan &seek(usize n) {
+        rewind();
+        return skip(n);
+    }
+
+    ALWAYS_INLINE constexpr usize tell() {
+        return _cursor - _start;
+    }
 
     ALWAYS_INLINE constexpr bool ended() {
         return _cursor.ended();
@@ -267,5 +284,89 @@ struct BChunk {
             .skip(T::offset)
             .readTo(&r, sizeof(typename T::Type));
         return r;
+    }
+};
+
+struct BEmit {
+    Io::Writer &_writer;
+
+    ALWAYS_INLINE constexpr BEmit(Io::Writer &writer)
+        : _writer(writer) {}
+
+    ALWAYS_INLINE constexpr void writeU8be(u8be v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeU16be(u16be v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeU32be(u32be v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeU64be(u64be v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeU8le(u8le v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeU16le(u16le v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeU32le(u32le v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeU64le(u64le v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeI8be(i8be v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeI16be(i16be v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeI32be(i32be v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeI64be(i64be v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeI8le(i8le v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeI16le(i16le v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeI32le(i32le v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeI64le(i64le v) {
+        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    ALWAYS_INLINE constexpr void writeStr(Str s) {
+        (void)_writer.write(Bytes{(Byte const *)s.buf(), s.len()});
+    }
+
+    ALWAYS_INLINE constexpr void writeCStr(Str s) {
+        (void)_writer.write(Bytes{(Byte const *)s.buf(), s.len()});
+        (void)_writer.write(Bytes{(Byte const *)"\0", 1});
+    }
+
+    ALWAYS_INLINE constexpr void writeBytes(Bytes b) {
+        (void)_writer.write(b);
     }
 };

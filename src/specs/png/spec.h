@@ -137,6 +137,10 @@ struct Image {
     isize height() {
         return _ihdr.size().y;
     }
+
+    Res<> decode(Gfx::MutPixels) {
+        return Ok();
+    }
 };
 
 } // namespace Png

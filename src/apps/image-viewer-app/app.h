@@ -8,11 +8,13 @@ namespace ImageViewer {
 
 struct State {
     bool isEditor = false;
-    Media::Image image;
+    Res<Media::Image> image;
     Gfx::Filter filter = Gfx::Unfiltered{};
 
-    State(Media::Image i) : image(i) {}
+    State(Res<Media::Image> i) : image(i) {}
 };
+
+struct Refresh {};
 
 struct ToggleEditor {};
 
@@ -25,6 +27,7 @@ struct ApplyFilter {};
 struct SaveImage {};
 
 using Actions = Var<
+    Refresh,
     ToggleEditor,
     SetFilter,
     ApplyFilter,

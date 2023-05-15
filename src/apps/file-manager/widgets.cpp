@@ -196,7 +196,7 @@ Ui::Child openFileDialog() {
                             toolbar(d),
                             maybeDir
                                 ? directoryListing(d, maybeDir.unwrap())
-                                : alert(d, "Error", "Failed to open directory."),
+                                : alert(d, "Can't access location", "Failed to open directory."),
                             Ui::separator())),
                     controls));
         });

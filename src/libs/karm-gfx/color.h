@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/std.h>
+#include <karm-fmt/fmt.h>
 #include <karm-math/vec.h>
 
 namespace Karm::Gfx {
@@ -110,7 +111,7 @@ Hsv rgbToHsv(Color color);
 Color hsvToRgb(Hsv hsv);
 
 struct YCbCr {
-    f64 y, cb, cr;
+    f32 y, cb, cr;
 
     ALWAYS_INLINE Ordr cmp(YCbCr const &other) const {
         return y == other.y and cb == other.cb and cr == other.cr
@@ -119,8 +120,30 @@ struct YCbCr {
     }
 };
 
-YCbCr rgbToYCbCr(Color color);
+static inline YCbCr rgbToYCbCr(Color color) {
+    YCbCr yCbCr;
+    yCbCr.y = 0.299 * color.red + 0.587 * color.green + 0.114 * color.blue;
+    yCbCr.cb = 128 - 0.168736 * color.red - 0.331264 * color.green + 0.5 * color.blue;
+    yCbCr.cr = 128 + 0.5 * color.red - 0.418688 * color.green - 0.081312 * color.blue;
+    return yCbCr;
+}
 
-Color yCbCrToRgb(YCbCr yCbCr);
+static inline Color yCbCrToRgb(YCbCr yCbCr) {
+    float r = yCbCr.y + 1.402f * yCbCr.cr + 128;
+    float g = yCbCr.y - 0.344f * yCbCr.cb - 0.714f * yCbCr.cr + 128;
+    float b = yCbCr.y + 1.772f * yCbCr.cb + 128;
+
+    r = clamp(r, 0.0f, 255.0f);
+    g = clamp(g, 0.0f, 255.0f);
+    b = clamp(b, 0.0f, 255.0f);
+    return Gfx::Color::fromRgba(r, g, b, 255);
+}
 
 } // namespace Karm::Gfx
+
+template <>
+struct Karm::Fmt::Formatter<Gfx::Color> {
+    Res<usize> format(Io::TextWriter &writer, Gfx::Color color) {
+        return Fmt::format(writer, "Color({}, {}, {}, {})", color.red, color.green, color.blue, color.alpha);
+    }
+};

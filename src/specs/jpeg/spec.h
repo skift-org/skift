@@ -120,39 +120,6 @@ inline constexpr Array<usize, 64> ZIGZAG = {
     58, 59, 52, 45, 38, 31, 39, 46,
     53, 60, 61, 54, 47, 55, 62, 63};
 
-static constexpr float COS[8][8] = {
-    {0.35355339059, 0.35355339059, 0.35355339059, 0.35355339059, 0.35355339059, 0.35355339059, 0.35355339059, 0.35355339059},
-    {0.490392640202, 0.415734806151, 0.27778511651, 0.0975451610081, -0.0975451610081, -0.27778511651, -0.415734806151, -0.490392640202},
-    {0.461939766256, 0.191341716183, -0.191341716183, -0.461939766256, -0.461939766256, -0.191341716183, 0.191341716183, 0.461939766256},
-    {0.415734806151, -0.0975451610081, -0.490392640202, -0.27778511651, 0.27778511651, 0.490392640202, 0.0975451610081, -0.415734806151},
-    {0.353553390593, -0.353553390593, -0.353553390593, 0.353553390593, 0.353553390593, -0.353553390593, -0.353553390593, 0.353553390593},
-    {0.27778511651, -0.490392640202, 0.0975451610081, 0.415734806151, -0.415734806151, -0.0975451610081, 0.490392640202, -0.27778511651},
-    {0.191341716183, -0.461939766256, 0.461939766256, -0.191341716183, -0.191341716183, 0.461939766256, -0.461939766256, 0.191341716183},
-    {0.0975451610081, -0.27778511651, 0.415734806151, -0.490392640202, 0.490392640202, -0.415734806151, 0.27778511651, -0.0975451610081},
-};
-
-struct Idct {
-    f32 buf[8][8][8][8];
-
-    constexpr Idct() {
-        for (int n = 0; n < 8; ++n) {
-            for (int m = 0; m < 8; ++m) {
-                for (int y = 0; y < 8; ++y) {
-                    for (int x = 0; x < 8; ++x) {
-                        buf[n][m][y][x] = COS[n][x] * COS[m][y];
-                    }
-                }
-            }
-        }
-    }
-
-    constexpr auto operator[](usize i) const {
-        return buf[i];
-    }
-};
-
-static constexpr Idct IDCT;
-
 /* --- Bit Stream ----------------------------------------------------------- */
 
 struct BitStream {
@@ -161,14 +128,14 @@ struct BitStream {
     u8 _buf = 0x0;
     u8 _len = 0x0;
 
-    BitStream(BScan &s) : s(s) {}
+    ALWAYS_INLINE BitStream(BScan &s) : s(s) {}
 
-    void reset() {
+    ALWAYS_INLINE void reset() {
         _buf = 0x0;
         _len = 0x0;
     }
 
-    Res<> fill() {
+    ALWAYS_INLINE Res<> fill() {
         if (_len)
             return Ok();
 
@@ -197,7 +164,7 @@ struct BitStream {
         return Ok();
     }
 
-    Res<u8> nextBit() {
+    ALWAYS_INLINE Res<u8> nextBit() {
         try$(fill());
         u8 bit = _buf >> 7;
         _buf <<= 1;
@@ -205,7 +172,7 @@ struct BitStream {
         return Ok(bit);
     }
 
-    Res<usize> nextBits(u8 n) {
+    ALWAYS_INLINE Res<usize> nextBits(u8 n) {
         usize res = 0;
         while (n--) {
             res = (res << 1) | try$(nextBit());
@@ -263,7 +230,6 @@ struct Image {
             } else if (marker == SOS) {
                 try$(image.startOfScan(s));
                 try$(image.decodeHuffman(s));
-                return Ok(image);
             } else if (marker == EOI) {
                 reachedEoi = true;
             } else if (marker == TEM) {
@@ -301,7 +267,7 @@ struct Image {
     bool _quirkZeroBased = false;
 
     Res<> defineQuantizationTable(BScan &x) {
-        logDebug("jpeg: defining quantization table");
+        // logDebug("jpeg: defining quantization table");
 
         u16 len = x.nextU16be();
         BScan s = x.nextBytes(len - 2);
@@ -310,7 +276,7 @@ struct Image {
             Byte infos = s.nextU8be();
             u8 id = infos & 0x0F;
 
-            logDebug("jpeg: quantization table id: {}", id);
+            // logDebug("jpeg: quantization table id: {}", id);
 
             if (id > 3) {
                 logError("jpeg: invalid quantization table id: {}", id);
@@ -350,7 +316,7 @@ struct Image {
     usize _componentCount = 0;
 
     Res<> startOfFrame(BScan &x) {
-        logDebug("jpeg: start of frame");
+        // logDebug("jpeg: start of frame");
 
         u16 len = x.nextU16be();
         BScan s = x.nextBytes(len - 2);
@@ -412,7 +378,7 @@ struct Image {
     usize _restartInterval = 0;
 
     Res<> defineRestartInterval(BScan &x) {
-        logDebug("jpeg: defining restart interval");
+        // logDebug("jpeg: defining restart interval");
 
         u16 len = x.nextU16be();
         BScan s = x.nextBytes(len - 2);
@@ -469,7 +435,7 @@ struct Image {
     Array<Opt<HuffmanTable>, 4> _acHuff;
 
     Res<> defineHuffmanTable(BScan &x) {
-        logDebug("jpeg: defining huffman table");
+        // logDebug("jpeg: defining huffman table");
 
         u16 len = x.nextU16be();
         BScan s = x.nextBytes(len - 2);
@@ -519,7 +485,7 @@ struct Image {
     u8 _al = 0;
 
     Res<> startOfScan(BScan &x) {
-        logDebug("jpeg: start of scan");
+        // logDebug("jpeg: start of scan");
 
         if (_componentCount == 0) {
             logError("jpeg: start of scan before start of frame");
@@ -667,9 +633,6 @@ struct Image {
                 Byte sym = try$(acHuff.next(bs));
 
                 if (sym == 0) {
-                    for (; k < 64; ++k) {
-                        mcu[k] = 0;
-                    }
                     break;
                 }
 
@@ -684,9 +647,7 @@ struct Image {
                     return Error::invalidData("zero run length exceeds block size");
                 }
 
-                for (Byte i = 0; i < numZeroes; ++i) {
-                    mcu[ZIGZAG[k++]] = 0;
-                }
+                k += numZeroes;
 
                 Byte len = sym & 0xF;
 
@@ -712,16 +673,168 @@ struct Image {
 
     /* --- Decoding --------------------------------------------------------- */
 
+    void idtc(Array<short, 64> &mcu) {
+        float const m0 = 2.0 * Math::cos(1.0 / 16.0 * 2.0 * M_PI);
+        float const m1 = 2.0 * Math::cos(2.0 / 16.0 * 2.0 * M_PI);
+        float const m3 = 2.0 * Math::cos(2.0 / 16.0 * 2.0 * M_PI);
+        float const m5 = 2.0 * Math::cos(3.0 / 16.0 * 2.0 * M_PI);
+        float const m2 = m0 - m5;
+        float const m4 = m0 + m5;
+
+        float const s0 = Math::cos(0.0 / 16.0 * M_PI) / std::sqrt(8);
+        float const s1 = Math::cos(1.0 / 16.0 * M_PI) / 2.0;
+        float const s2 = Math::cos(2.0 / 16.0 * M_PI) / 2.0;
+        float const s3 = Math::cos(3.0 / 16.0 * M_PI) / 2.0;
+        float const s4 = Math::cos(4.0 / 16.0 * M_PI) / 2.0;
+        float const s5 = Math::cos(5.0 / 16.0 * M_PI) / 2.0;
+        float const s6 = Math::cos(6.0 / 16.0 * M_PI) / 2.0;
+        float const s7 = Math::cos(7.0 / 16.0 * M_PI) / 2.0;
+
+        for (usize i = 0; i < 8; ++i) {
+            float const g0 = mcu[0 * 8 + i] * s0;
+            float const g1 = mcu[4 * 8 + i] * s4;
+            float const g2 = mcu[2 * 8 + i] * s2;
+            float const g3 = mcu[6 * 8 + i] * s6;
+            float const g4 = mcu[5 * 8 + i] * s5;
+            float const g5 = mcu[1 * 8 + i] * s1;
+            float const g6 = mcu[7 * 8 + i] * s7;
+            float const g7 = mcu[3 * 8 + i] * s3;
+
+            float const f0 = g0;
+            float const f1 = g1;
+            float const f2 = g2;
+            float const f3 = g3;
+            float const f4 = g4 - g7;
+            float const f5 = g5 + g6;
+            float const f6 = g5 - g6;
+            float const f7 = g4 + g7;
+
+            float const e0 = f0;
+            float const e1 = f1;
+            float const e2 = f2 - f3;
+            float const e3 = f2 + f3;
+            float const e4 = f4;
+            float const e5 = f5 - f7;
+            float const e6 = f6;
+            float const e7 = f5 + f7;
+            float const e8 = f4 + f6;
+
+            float const d0 = e0;
+            float const d1 = e1;
+            float const d2 = e2 * m1;
+            float const d3 = e3;
+            float const d4 = e4 * m2;
+            float const d5 = e5 * m3;
+            float const d6 = e6 * m4;
+            float const d7 = e7;
+            float const d8 = e8 * m5;
+
+            float const c0 = d0 + d1;
+            float const c1 = d0 - d1;
+            float const c2 = d2 - d3;
+            float const c3 = d3;
+            float const c4 = d4 + d8;
+            float const c5 = d5 + d7;
+            float const c6 = d6 - d8;
+            float const c7 = d7;
+            float const c8 = c5 - c6;
+
+            float const b0 = c0 + c3;
+            float const b1 = c1 + c2;
+            float const b2 = c1 - c2;
+            float const b3 = c0 - c3;
+            float const b4 = c4 - c8;
+            float const b5 = c8;
+            float const b6 = c6 - c7;
+            float const b7 = c7;
+
+            mcu[0 * 8 + i] = b0 + b7;
+            mcu[1 * 8 + i] = b1 + b6;
+            mcu[2 * 8 + i] = b2 + b5;
+            mcu[3 * 8 + i] = b3 + b4;
+            mcu[4 * 8 + i] = b3 - b4;
+            mcu[5 * 8 + i] = b2 - b5;
+            mcu[6 * 8 + i] = b1 - b6;
+            mcu[7 * 8 + i] = b0 - b7;
+        }
+
+        for (usize i = 0; i < 8; ++i) {
+            float const g0 = mcu[i * 8 + 0] * s0;
+            float const g1 = mcu[i * 8 + 4] * s4;
+            float const g2 = mcu[i * 8 + 2] * s2;
+            float const g3 = mcu[i * 8 + 6] * s6;
+            float const g4 = mcu[i * 8 + 5] * s5;
+            float const g5 = mcu[i * 8 + 1] * s1;
+            float const g6 = mcu[i * 8 + 7] * s7;
+            float const g7 = mcu[i * 8 + 3] * s3;
+
+            float const f0 = g0;
+            float const f1 = g1;
+            float const f2 = g2;
+            float const f3 = g3;
+            float const f4 = g4 - g7;
+            float const f5 = g5 + g6;
+            float const f6 = g5 - g6;
+            float const f7 = g4 + g7;
+
+            float const e0 = f0;
+            float const e1 = f1;
+            float const e2 = f2 - f3;
+            float const e3 = f2 + f3;
+            float const e4 = f4;
+            float const e5 = f5 - f7;
+            float const e6 = f6;
+            float const e7 = f5 + f7;
+            float const e8 = f4 + f6;
+
+            float const d0 = e0;
+            float const d1 = e1;
+            float const d2 = e2 * m1;
+            float const d3 = e3;
+            float const d4 = e4 * m2;
+            float const d5 = e5 * m3;
+            float const d6 = e6 * m4;
+            float const d7 = e7;
+            float const d8 = e8 * m5;
+
+            float const c0 = d0 + d1;
+            float const c1 = d0 - d1;
+            float const c2 = d2 - d3;
+            float const c3 = d3;
+            float const c4 = d4 + d8;
+            float const c5 = d5 + d7;
+            float const c6 = d6 - d8;
+            float const c7 = d7;
+            float const c8 = c5 - c6;
+
+            float const b0 = c0 + c3;
+            float const b1 = c1 + c2;
+            float const b2 = c1 - c2;
+            float const b3 = c0 - c3;
+            float const b4 = c4 - c8;
+            float const b5 = c8;
+            float const b6 = c6 - c7;
+            float const b7 = c7;
+
+            mcu[i * 8 + 0] = b0 + b7;
+            mcu[i * 8 + 1] = b1 + b6;
+            mcu[i * 8 + 2] = b2 + b5;
+            mcu[i * 8 + 3] = b3 + b4;
+            mcu[i * 8 + 4] = b3 - b4;
+            mcu[i * 8 + 5] = b2 - b5;
+            mcu[i * 8 + 6] = b1 - b6;
+            mcu[i * 8 + 7] = b0 - b7;
+        }
+    }
+
     Res<> decode(Gfx::MutPixels pixels) {
         for (usize i = 0; i < _mcus.len(); i += _componentCount) {
             usize x = (i / _componentCount) % mcuWidth();
             usize y = (i / _componentCount) / mcuWidth();
 
-            Array<Array<f32, 64>, 3> blocks = {};
             for (usize j = 0; j < _componentCount; j++) {
                 auto &mcu = _mcus[i + j];
 
-                // Apply quantization table
                 if (not _quant[_components[j]->quantId]) {
                     logError("jpeg: undefined quantization table id: {}", _components[j]->quantId);
                     return Error::invalidData("undefined quantization table id");
@@ -732,28 +845,19 @@ struct Image {
                     mcu[k] *= quant[k];
                 }
 
-                // Apply inverse DCT
-                for (usize k = 0; k < 64; k++) {
-                    int n = k % 8, m = k / 8;
-
-                    for (int y = 0; y < 8; ++y) {
-                        for (int x = 0; x < 8; ++x) {
-                            blocks[j][y * 8 + x] += IDCT[n][m][y][x] * mcu[k];
-                        }
-                    }
-                }
+                idtc(mcu);
             }
 
-            auto &yMcu = blocks[0];
-            auto &cbMcu = blocks[1];
-            auto &crMcu = blocks[2];
+            auto &yMcu = _mcus[i + 0];
+            auto &cbMcu = _mcus[i + 1];
+            auto &crMcu = _mcus[i + 2];
 
             for (usize k = 0; k < 64; ++k) {
                 isize px = x * 8 + k % 8;
                 isize py = y * 8 + k / 8;
 
-                auto c = Gfx::YCbCr{yMcu[k], cbMcu[k], crMcu[k]};
-                pixels.store({px, py}, Gfx::yCbCrToRgb(c));
+                Gfx::YCbCr ycbcr{(float)yMcu[k], (float)cbMcu[k], (float)crMcu[k]};
+                pixels.storeUnsafe({px, py}, Gfx::yCbCrToRgb(ycbcr));
             }
         }
 

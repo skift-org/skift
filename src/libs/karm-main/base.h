@@ -62,7 +62,7 @@ struct ArgsHook :
 
     bool has(Str arg) const {
         for (usize i = 0; i < len(); ++i) {
-            if (Op::eq(this->operator[](i), arg)) {
+            if (Op::eq(operator[](i), arg)) {
                 return true;
             }
         }

@@ -18,8 +18,8 @@ struct Cons {
                cmp(cdr, other.cdr);
     }
 
-    constexpr auto get(bool cdr) const {
-        return cdr ? this->cdr : this->car;
+    constexpr auto const &get(bool cond) const {
+        return cond ? cdr : car;
     }
 
     constexpr void visit(auto f) {

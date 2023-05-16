@@ -66,12 +66,12 @@ struct Range {
         return {};
     }
 
-    constexpr Range slice(T start, T size) const {
-        return {this->start + start, size};
+    constexpr Range slice(T off, T size) const {
+        return {start + off, size};
     }
 
-    constexpr Range slice(T start) const {
-        return slice(start, size - start);
+    constexpr Range slice(T off) const {
+        return slice(off, size - off);
     }
 
     constexpr Range halfOver(Range other) {

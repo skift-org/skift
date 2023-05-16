@@ -84,10 +84,10 @@ struct Color {
     }
 
     ALWAYS_INLINE constexpr f64 luminance() const {
-        auto r = this->red / 255.0;
-        auto g = this->green / 255.0;
-        auto b = this->blue / 255.0;
-        return sqrt(0.299 * r * r + 0.587 * g * g + 0.114 * b * b);
+        auto r = red / 255.0;
+        auto g = green / 255.0;
+        auto b = blue / 255.0;
+        return Math::sqrt(0.299 * r * r + 0.587 * g * g + 0.114 * b * b);
     }
 
     ALWAYS_INLINE constexpr Color sample(Math::Vec2f) const {

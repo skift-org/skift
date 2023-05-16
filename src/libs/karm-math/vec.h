@@ -67,12 +67,11 @@ union Vec2 {
     }
 
     constexpr Vec2 norm() const {
-        T len = this->len();
-        return Vec2{x, y} / len;
+        return Vec2{x, y} / len();
     }
 
     constexpr T angle() const {
-        return atan2(y, x);
+        return Math::atan2(y, x);
     }
 
     constexpr Vec2 rotate(T angle) const {
@@ -145,7 +144,7 @@ union Vec2 {
     }
 
     bool hasNan() const {
-        return isnan(x) or isnan(y);
+        return isNan(x) or isNan(y);
     }
 };
 
@@ -255,8 +254,8 @@ union Vec3 {
     }
 
     constexpr Vec3 norm() const {
-        T len = this->len();
-        return {x / len, y / len, z / len};
+        T l = len();
+        return {x / l, y / l, z / l};
     }
 
     constexpr T operator[](isize i) {
@@ -321,7 +320,7 @@ union Vec3 {
     }
 
     bool hasNan() const {
-        return isnan(x) or isnan(y) or isnan(z);
+        return isNan(x) or isNan(y) or isNan(z);
     }
 };
 
@@ -426,8 +425,8 @@ union Vec4 {
     }
 
     constexpr Vec4 norm() const {
-        T len = this->len();
-        return {x / len, y / len, z / len, w / len};
+        T l = len();
+        return {x / l, y / l, z / l, w / l};
     }
 
     constexpr T operator[](isize i) {
@@ -489,7 +488,7 @@ union Vec4 {
     }
 
     bool hasNan() const {
-        return isnan(x) or isnan(y) or isnan(z) or isnan(w);
+        return isNan(x) or isNan(y) or isNan(z) or isNan(w);
     }
 
     Ordr cmp(Vec4 other) const {

@@ -14,16 +14,16 @@ namespace Settings {
 
 Ui::Child sidebar(State const &state) {
     Ui::Children items = {
-        Ui::navRow(state.page == Page::ACCOUNT, Model::bind<GoTo>(Page::ACCOUNT), Mdi::ACCOUNT, "Accounts"),
-        Ui::navRow(state.page == Page::PERSONALIZATION, Model::bind<GoTo>(Page::PERSONALIZATION), Mdi::PALETTE, "Personalization"),
-        Ui::navRow(state.page == Page::APPLICATIONS, Model::bind<GoTo>(Page::APPLICATIONS), Mdi::WIDGETS_OUTLINE, "Applications"),
+        Ui::navRow(state.page() == Page::ACCOUNT, Model::bind<GoTo>(Page::ACCOUNT), Mdi::ACCOUNT, "Accounts"),
+        Ui::navRow(state.page() == Page::PERSONALIZATION, Model::bind<GoTo>(Page::PERSONALIZATION), Mdi::PALETTE, "Personalization"),
+        Ui::navRow(state.page() == Page::APPLICATIONS, Model::bind<GoTo>(Page::APPLICATIONS), Mdi::WIDGETS_OUTLINE, "Applications"),
 
-        Ui::navRow(state.page == Page::SYSTEM, Model::bind<GoTo>(Page::SYSTEM), Mdi::LAPTOP, "System"),
-        Ui::navRow(state.page == Page::NETWORK, Model::bind<GoTo>(Page::NETWORK), Mdi::WIFI, "Network"),
-        Ui::navRow(state.page == Page::SECURITY, Model::bind<GoTo>(Page::SECURITY), Mdi::SECURITY, "Security & Privacy"),
+        Ui::navRow(state.page() == Page::SYSTEM, Model::bind<GoTo>(Page::SYSTEM), Mdi::LAPTOP, "System"),
+        Ui::navRow(state.page() == Page::NETWORK, Model::bind<GoTo>(Page::NETWORK), Mdi::WIFI, "Network"),
+        Ui::navRow(state.page() == Page::SECURITY, Model::bind<GoTo>(Page::SECURITY), Mdi::SECURITY, "Security & Privacy"),
 
-        Ui::navRow(state.page == Page::UPDATES, Model::bind<GoTo>(Page::UPDATES), Mdi::UPDATE, "Updates"),
-        Ui::navRow(state.page == Page::ABOUT, Model::bind<GoTo>(Page::ABOUT), Mdi::INFORMATION_OUTLINE, "About"),
+        Ui::navRow(state.page() == Page::UPDATES, Model::bind<GoTo>(Page::UPDATES), Mdi::UPDATE, "Updates"),
+        Ui::navRow(state.page() == Page::ABOUT, Model::bind<GoTo>(Page::ABOUT), Mdi::INFORMATION_OUTLINE, "About"),
     };
 
     return Ui::navList(items);
@@ -32,7 +32,7 @@ Ui::Child sidebar(State const &state) {
 /* --- Pages ---------------------------------------------------------------- */
 
 Ui::Child pageContent(State const &state) {
-    switch (state.page) {
+    switch (state.page()) {
     case Page::HOME:
         return pageHome(state);
 
@@ -73,8 +73,8 @@ Ui::Child app() {
                     titlebar,
                     Ui::toolbar(
                         Ui::button(Model::bind<ToggleSidebar>(), Ui::ButtonStyle::subtle(), state.sidebarOpen ? Mdi::MENU_OPEN : Mdi::MENU),
-                        Ui::button(NONE, Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
-                        Ui::button(NONE, Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
+                        Ui::button(Model::bindIf<GoBack>(state.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
+                        Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
                         Ui::button(Model::bind<GoTo>(Page::HOME), Ui::ButtonStyle::subtle(), Mdi::HOME)),
                     appBody(state) | Ui::grow())));
     });

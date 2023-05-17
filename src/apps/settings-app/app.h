@@ -20,7 +20,21 @@ enum struct Page {
 
 struct State {
     bool sidebarOpen = false;
-    Page page = Page::HOME;
+
+    Vec<Page> history = {Page::HOME};
+    usize historyIndex = 0;
+
+    Page page() const {
+        return history[historyIndex];
+    }
+
+    bool canGoBack() const {
+        return historyIndex > 0;
+    }
+
+    bool canGoForward() const {
+        return historyIndex < history.len() - 1;
+    }
 };
 
 struct ToggleSidebar {};

@@ -109,15 +109,15 @@ Res<String> Path::str() const {
 
 /* --- Url ------------------------------------------------------------------ */
 
+static auto const COMPONENT = Re::chain(
+    Re::alpha(),
+    Re::zeroOrMore(
+        Re::either(
+            Re::alnum(),
+            Re::single('+', '.', '-'))));
+
 Url Url::parse(Text::Scan &s) {
     Url url;
-
-    auto const COMPONENT = Re::chain(
-        Re::alpha(),
-        Re::zeroOrMore(
-            Re::either(
-                Re::alnum(),
-                Re::single('+', '.', '-'))));
 
     url.scheme = s.token(COMPONENT);
     s.skip(':');
@@ -153,6 +153,13 @@ Url Url::parse(Text::Scan &s) {
 Url Url::parse(Str str) {
     Text::Scan s{str};
     return parse(s);
+}
+
+bool Url::isUrl(Str str) {
+    Text::Scan s{str};
+
+    return s.skip(COMPONENT) and
+           s.skip(':');
 }
 
 Str Url::basename() const {
@@ -198,6 +205,17 @@ Res<String> Url::str() const {
     Io::StringWriter writer;
     try$(write(writer));
     return Ok(writer.str());
+}
+
+Res<Url> parseUrlOrPath(Str str) {
+    if (Url::isUrl(str)) {
+        return Ok(Url::parse(str));
+    }
+
+    Sys::Url url;
+    url.scheme = "file";
+    url.path = Sys::Path::parse(str);
+    return Ok(url);
 }
 
 } // namespace Karm::Sys

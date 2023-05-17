@@ -2,25 +2,25 @@
 #include <karm-test/macros.h>
 
 test$(pathUpDown) {
-    Sys::Path path = "/a/b/c/d/e/f";
+    auto path = Sys::Path::parse("/a/b/c/d/e/f");
 
-    auto up1 = path.up();
-    expectEq$(up1.str(), Str{"/a/b/c/d/e"});
+    auto up1 = path.parent();
+    expectEq$(try$(up1.str()), Str{"/a/b/c/d/e"});
 
-    auto up2 = path.up(2);
-    expectEq$(up2.str(), Str{"/a/b/c/d"});
+    auto up2 = path.parent(2);
+    expectEq$(try$(up2.str()), Str{"/a/b/c/d"});
 
-    auto up3 = path.up(3);
-    expectEq$(up3.str(), Str{"/a/b/c"});
+    auto up3 = path.parent(3);
+    expectEq$(try$(up3.str()), Str{"/a/b/c"});
 
-    auto up4 = path.up(4);
-    expectEq$(up4.str(), Str{"/a/b"});
+    auto up4 = path.parent(4);
+    expectEq$(try$(up4.str()), Str{"/a/b"});
 
-    auto up5 = path.up(5);
-    expectEq$(up5.str(), Str{"/a"});
+    auto up5 = path.parent(5);
+    expectEq$(try$(up5.str()), Str{"/a"});
 
-    auto up6 = path.up(6);
-    expectEq$(up6.str(), Str{"/"});
+    auto up6 = path.parent(6);
+    expectEq$(try$(up6.str()), Str{"/"});
 
     return Ok();
 }

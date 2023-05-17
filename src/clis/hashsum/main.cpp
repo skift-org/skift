@@ -6,7 +6,8 @@
 Res<> entryPoint(Ctx &ctx) {
     auto &args = useArgs(ctx);
 
-    auto file = try$(Sys::File::open(args[1]));
+    auto url = try$(Sys::parseUrlOrPath(args[0]));
+    auto file = try$(Sys::File::open(url));
     auto hash = try$(Hash::fromName(args[0]));
     auto digest = try$(Hash::digest(file, hash));
 

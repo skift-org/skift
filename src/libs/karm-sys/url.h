@@ -68,6 +68,8 @@ struct Url {
 
     static Url parse(Str str);
 
+    static bool isUrl(Str str);
+
     bool rooted() const {
         return path.rooted;
     }
@@ -102,6 +104,8 @@ struct Url {
         return path.len();
     }
 };
+
+ Res<Url> parseUrlOrPath(Str str) ;
 
 } // namespace Karm::Sys
 

@@ -29,7 +29,11 @@ struct GoTo {
     Page page;
 };
 
-using Actions = Var<ToggleSidebar, GoTo>;
+struct GoBack {};
+
+struct GoForward {};
+
+using Actions = Var<ToggleSidebar, GoTo, GoBack, GoForward>;
 
 State reduce(State s, Actions action);
 

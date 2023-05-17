@@ -17,6 +17,7 @@
 namespace Bmp {
 
 struct Image {
+
     /* --- Loading ---------------------------------------------------------- */
 
     static bool isBmp(Bytes slice) {
@@ -62,11 +63,11 @@ struct Image {
     isize _bpp;
 
     isize width() const {
-        return abs(_width);
+        return Math::abs(_width);
     }
 
     isize height() const {
-        return abs(_height);
+        return Math::abs(_height);
     }
 
     enum Compression {

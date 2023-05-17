@@ -10,7 +10,9 @@ Res<> entryPoint(Ctx &ctx) {
     if (args.len() == 0) {
         return Error::invalidInput("Usage: handover-dump <elf-file>");
     }
-    Sys::File kernelFile = try$(Sys::File::open(args[0]));
+
+    auto url = try$(Sys::parseUrlOrPath(args[0]));
+    Sys::File kernelFile = try$(Sys::File::open(url));
     auto kernelMem = try$(Sys::mmap().read().map(kernelFile));
     Elf::Image kernelElf{kernelMem.bytes()};
 

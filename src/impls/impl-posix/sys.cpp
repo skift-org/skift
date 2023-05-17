@@ -76,11 +76,8 @@ struct PosixFd : public Sys::Fd {
 };
 
 Res<Sys::Path> resolve(Sys::Url url) {
-    logInfo("resolving url: {}", url);
-
     Sys::Path resolved;
     if (Op::eq(url.scheme, "file")) {
-        logInfo("Resolving file: {}", url.path);
         resolved = url.path;
     } else if (Op::eq(url.scheme, "bundle")) {
         auto *maybeRepo = getenv("OSDK_BUILDDIR");
@@ -102,7 +99,6 @@ Res<Sys::Path> resolve(Sys::Url url) {
         return Error::notFound("unknown url scheme");
     }
 
-    logInfo("Resolved to: {}", resolved);
     return Ok(resolved);
 }
 

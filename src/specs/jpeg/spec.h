@@ -869,8 +869,8 @@ struct Image {
     void dump(Text::Emit &e) {
         e("JPEG image");
         e.indentNewline();
-        e("width: {}\n", width());
-        e("height: {}\n", height());
+        e.ln("width: {}", width());
+        e.ln("height: {}", height());
 
         e("quantization tables:");
         e.indentNewline();
@@ -878,7 +878,7 @@ struct Image {
         e("zero-based (quirk): {}\n", _quirkZeroBased);
         for (usize i = 0; i < _quant.len(); ++i) {
             if (_quant[i]) {
-                e("table {}:\n", i);
+                e.ln("table {}:", i);
                 e.indent();
                 for (usize j = 0; j < 64; ++j) {
                     e("{02} ", (*_quant[i])[j]);
@@ -897,11 +897,11 @@ struct Image {
         e.indentNewline();
         for (usize i = 0; i < _components.len(); ++i) {
             if (_components[i]) {
-                e("component {}:\n", i);
-                e.indent();
-                e("hFactor: {}\n", (*_components[i]).hFactor);
-                e("vFactor: {}\n", (*_components[i]).vFactor);
-                e("quantId: {}\n", (*_components[i]).quantId);
+                e("component {}:", i);
+                e.indentNewline();
+                e.ln("hFactor: {}", (*_components[i]).hFactor);
+                e.ln("vFactor: {}", (*_components[i]).vFactor);
+                e.ln("quantId: {}", (*_components[i]).quantId);
                 e.deindent();
             } else {
                 e("component {}: none\n", i);
@@ -935,7 +935,7 @@ struct Image {
         for (usize i = 0; i < 4; i++) {
             if (_acHuff[i]) {
                 auto table = (*_acHuff[i]);
-                e("AC table {}:\n", i);
+                e.ln("AC table {}:", i);
                 e.indent();
                 for (usize j = 0; j < 16; ++j) {
                     e("{02x}:", table.offs[j]);
@@ -946,7 +946,7 @@ struct Image {
                 }
                 e.deindent();
             } else {
-                e("AC table {}: none\n", i);
+                e.ln("AC table {}: none", i);
             }
         }
 
@@ -956,20 +956,20 @@ struct Image {
         e.indentNewline();
         for (usize i = 0; i < _scanComponents.len(); ++i) {
             if (_scanComponents[i]) {
-                e("component {}:\n", i);
+                e.ln("component {}:", i);
                 e.indent();
-                e("dcHuffId: {}\n", (*_scanComponents[i]).dcHuffId);
-                e("acHuffId: {}\n", (*_scanComponents[i]).acHuffId);
+                e.ln("dcHuffId: {}", (*_scanComponents[i]).dcHuffId);
+                e.ln("acHuffId: {}", (*_scanComponents[i]).acHuffId);
                 e.deindent();
             } else {
-                e("component {}: none\n", i);
+                e.ln("component {}: none", i);
             }
         }
 
-        e("ss: {}\n", _ss);
-        e("se: {}\n", _se);
-        e("ah: {}\n", _ah);
-        e("al: {}\n", _al);
+        e.ln("ss: {}", _ss);
+        e.ln("se: {}", _se);
+        e.ln("ah: {}", _ah);
+        e.ln("al: {}", _al);
 
         e.deindent();
     }

@@ -29,10 +29,7 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
 Res<> entryPoint(Ctx &ctx) {
     auto &args = useArgs(ctx);
 
-    Sys::Url url;
-    url.scheme = "file";
-    url.path = Sys::Path::parse(args[0]);
-
+    auto url = try$(Sys::parseUrlOrPath(args[0]));
     auto fontface = try$(args.len()
                              ? Media::loadFontface(url)
                              : Ok(Media::Fontface::fallback()));

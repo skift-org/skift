@@ -25,16 +25,24 @@ struct Noti {
 };
 
 struct State {
+    bool isTablet = true;
     bool locked = true;
 };
 
-struct UnlockAction {};
+struct ToggleTablet {};
 
-using Actions = Var<UnlockAction>;
+struct Unlock {};
+
+using Actions = Var<ToggleTablet, Unlock>;
 
 State reduce(State state, Actions action) {
     return action.visit(Visitor{
-        [&](UnlockAction) {
+        [&](ToggleTablet) {
+            debug("toggle tablet");
+            state.isTablet = not state.isTablet;
+            return state;
+        },
+        [&](Unlock) {
             state.locked = false;
             return state;
         }});
@@ -44,7 +52,7 @@ using Model = Ui::Model<State, Actions, reduce>;
 
 /* --- Status Bar ----------------------------------------------------------- */
 
-Ui::Child systemTray();
+Ui::Child systemTray(State const &);
 
 Ui::Child indicator(Media::Icon icon) {
     return Ui::spacing({4}, Ui::center(Ui::icon(icon)));
@@ -53,7 +61,7 @@ Ui::Child indicator(Media::Icon icon) {
 Ui::Child statusbar() {
     return Ui::box(
         Ui::BoxStyle{
-            .backgroundPaint = Gfx::BLACK,
+            .backgroundPaint = Gfx::ZINC900,
         },
         Ui::minSize(
             {Ui::UNCONSTRAINED, 36},
@@ -68,10 +76,10 @@ Ui::Child statusbar() {
                     indicator(Mdi::BATTERY)))));
 }
 
-Ui::Child statusbarButton() {
+Ui::Child statusbarButton(State const &state) {
     return Ui::button(
-        [](Ui::Node &n) {
-            Ui::showDialog(n, systemTray());
+        [&](Ui::Node &n) {
+            Ui::showDialog(n, systemTray(state));
         },
         statusbar());
 }
@@ -92,10 +100,10 @@ Ui::Child quickSetting(Mdi::Icon icon) {
     }));
 }
 
-Ui::Child quickSettings() {
+Ui::Child quickSettings(State const &state) {
     return Ui::box(
         Ui::BoxStyle{
-            .backgroundPaint = Ui::GRAY800,
+            .backgroundPaint = Ui::GRAY900,
         },
         Ui::spacing(
             8,
@@ -106,7 +114,10 @@ Ui::Child quickSettings() {
                 quickSetting(Mdi::BLUETOOTH),
                 quickSetting(Mdi::MAP_MARKER_OUTLINE),
                 quickSetting(Mdi::FLASHLIGHT),
-                Ui::grow(Ui::align(Layout::Align::END | Layout::Align::VFILL, quickSetting(Mdi::CHEVRON_DOWN))))));
+                Ui::button(Model::bind<ToggleTablet>(), Ui::ButtonStyle::secondary(), state.isTablet ? Mdi::CELLPHONE : Mdi::TABLET),
+                quickSetting(Mdi::CHEVRON_DOWN) |
+                    Ui::end() |
+                    Ui::grow())));
 }
 
 Ui::Child notiWrapper(App app, Ui::Child inner) {
@@ -140,12 +151,10 @@ Ui::Child notifications() {
         Ui::spacing(
             {12, 0},
             Ui::hflow(
-
                 Ui::center(Ui::text(Ui::TextStyle::labelMedium(), "Notifications")),
                 Ui::grow(NONE),
                 Ui::button(
-                    [](Ui::Node &) {
-                    },
+                    Ui::NOP,
                     Ui::ButtonStyle::subtle(),
                     "Clear All"))),
         notification(Mdi::HAND_WAVE, "Hello", "Hello, world!"),
@@ -153,7 +162,7 @@ Ui::Child notifications() {
         notification(Mdi::HAND_WAVE, "Hello", "Hello, world!"));
 }
 
-Ui::Child systemTray() {
+Ui::Child systemTray(State const &state) {
     return Ui::vflow(
         statusbar(),
         Ui::grow(
@@ -163,9 +172,9 @@ Ui::Child systemTray() {
                 0.3,
                 Ui::box(Ui::BoxStyle{
                             .borderRadius = {0, 0, 8, 8},
-                            .backgroundPaint = Ui::GRAY900,
+                            .backgroundPaint = Ui::GRAY950,
                         },
-                        Ui::vflow(8, quickSettings(), notifications() | Ui::grow(), Ui::dragHandle())))),
+                        Ui::vflow(quickSettings(state), Ui::separator(), notifications() | Ui::grow(), Ui::dragHandle())))),
         Ui::empty(16));
 }
 
@@ -176,7 +185,7 @@ Ui::Child searchInput() {
         Ui::BoxStyle{
             .borderRadius = 4,
             .borderWidth = 1,
-            .backgroundPaint = Ui::GRAY800,
+            .backgroundPaint = Ui::GRAY900,
         },
         Ui::minSize({Ui::UNCONSTRAINED, 48},
                     Ui::spacing(
@@ -186,16 +195,18 @@ Ui::Child searchInput() {
                             Ui::center(Ui::icon(Mdi::MAGNIFY, 24))))));
 }
 
-Ui::Child appIcon(Mdi::Icon icon, Gfx::ColorRamp colors) {
+Ui::Child appIcon(Mdi::Icon icon, Gfx::ColorRamp colors, isize size = 22) {
     return Ui::box(
         Ui::BoxStyle{
-            .borderRadius = 99,
-            .backgroundPaint = colors[3],
-            .foregroundPaint = colors[6],
+            .borderRadius = size * 0.25,
+            .borderWidth = 1,
+            .borderPaint = colors[6],
+            .backgroundPaint = Gfx::Gradient::linear().withColors(colors[6], colors[7]).withStart({0, 0}).withEnd({0, 1}).bake(),
+            .foregroundPaint = colors[1],
         },
         Ui::center(
             Ui::spacing(8,
-                        Ui::icon(icon, 22))));
+                        Ui::icon(icon, size))));
 }
 
 Ui::Child appRow(Mdi::Icon icon, Gfx::ColorRamp colors, String title) {
@@ -216,7 +227,7 @@ Ui::Child apps(Ui::Children apps) {
             Ui::grow());
 }
 
-Ui::Child appDrawer() {
+Ui::Child appsDrawer() {
     Ui::Children appItems = {
         appRow(Mdi::CALCULATOR, Gfx::ORANGE_RAMP, "Calculator"),
         appRow(Mdi::CALENDAR, Gfx::PURPLE_RAMP, "Calendar"),
@@ -233,48 +244,55 @@ Ui::Child appDrawer() {
         appRow(Mdi::PHONE, Gfx::BLUE_RAMP, "Phone"),
     };
 
+    return Ui::box(
+               Ui::BoxStyle{
+                   .borderRadius = 8,
+                   .borderWidth = 1,
+                   .borderPaint = Ui::GRAY800,
+                   .backgroundPaint = Ui::GRAY950,
+               },
+               Ui::vflow(
+                   Ui::dragHandle(),
+                   Ui::grow(
+                       Ui::spacing(
+                           {12, 0},
+                           apps(appItems))))) |
+           Ui::spacing(8);
+}
+
+Ui::Child appsDialog() {
     return Ui::vflow(
-        // statusbar(),
         Ui::empty(64),
         Ui::grow(
             Ui::dismisable(
                 Ui::closeDialog,
                 Ui::DismisDir::DOWN,
                 0.3,
-                Ui::box(
-                    Ui::BoxStyle{
-                        .borderRadius = 8,
-                        .backgroundPaint = Ui::GRAY900,
-                    },
-                    Ui::vflow(
-                        Ui::dragHandle(),
-                        Ui::grow(
-                            Ui::spacing(
-                                {12, 0},
-                                apps(appItems))))) |
-                    Ui::spacing(8))));
+                appsDrawer())));
+}
+
+Ui::Child appsFlyout() {
+    return Ui::vflow(
+        Ui::empty(64),
+        Ui::grow(
+            Ui::dismisable(
+                Ui::closeDialog,
+                Ui::DismisDir::DOWN,
+                0.3,
+                appsDrawer() | Ui::pinSize({500, 500}) | Ui::align(Layout::Align::BOTTOM | Layout::Align::START))));
 }
 
 /* --- Navigation Bar ------------------------------------------------------- */
 
 Ui::Child navbar() {
     return Ui::buttonHandle([](Ui::Node &n) {
-        Ui::showDialog(n, appDrawer());
+        Ui::showDialog(n, appsDialog());
     });
-}
-
-/* --- Home Screen ---------------------------------------------------------- */
-
-Ui::Child homeScreen() {
-    return Ui::vflow(
-        statusbarButton(),
-        Ui::grow(NONE),
-        navbar());
 }
 
 /* --- Lockscreen ----------------------------------------------------------- */
 
-Ui::Child lockscreen() {
+Ui::Child lockscreen(State const &state) {
     return Ui::box(
         Ui::BoxStyle{
             .backgroundPaint = Gfx::Gradient::vlinear()
@@ -284,12 +302,12 @@ Ui::Child lockscreen() {
         },
 
         Ui::dismisable(
-            Model::bind<UnlockAction>(),
+            Model::bind<Unlock>(),
             Ui::DismisDir::TOP,
             0.3,
             Ui::dragRegion(
                 Ui::spacing(
-                    {48, 64},
+                    state.isTablet ? 64 : 128,
                     Ui::vflow(
                         Ui::center(Ui::text(Ui::TextStyle::displayMedium(), "22:07")),
                         Ui::empty(16),
@@ -297,22 +315,88 @@ Ui::Child lockscreen() {
                         Ui::grow(NONE),
                         Ui::vflow(
                             Ui::center(Ui::icon(Mdi::CHEVRON_UP, 48)),
-                            Ui::center(Ui::text(Ui::TextStyle::labelLarge(), "Swipe up to unlock"))))))));
+                            Ui::center(Ui::text(
+                                Ui::TextStyle::labelLarge(),
+                                state.isTablet ? "Swipe up to unlock"
+                                               : "Swipe up or press any key to unlock"))))))));
 }
 
-Ui::Child app() {
-    return Ui::reducer<Model>({}, [](auto state) {
-        auto wallpapers = Media::loadImageOrFallback("bundle://skift-wallpapers/images/brutal.qoi"_url).unwrap();
+/* --- Taskbar -------------------------------------------------------------- */
+
+Ui::Child taskbar(State const &state) {
+    auto appsButton = Ui::button(
+        [](Ui::Node &n) {
+            Ui::showDialog(n, appsFlyout());
+        },
+        Ui::ButtonStyle::subtle(),
+        Mdi::APPS, "Applications");
+
+    auto calButton = Ui::button(
+        Ui::NOP,
+        Ui::ButtonStyle::subtle(),
+        Mdi::CALENDAR, "Jan. 12 2021, 22:07");
+
+    auto trayButton = Ui::button(
+        [&](Ui::Node &n) {
+            Ui::showDialog(n, systemTray(state));
+        },
+        Ui::ButtonStyle::subtle(),
+        Ui::hflow(
+            6,
+            Layout::Align::CENTER,
+            Ui::icon(Mdi::WIFI_STRENGTH_4),
+            Ui::icon(Mdi::VOLUME_HIGH),
+            Ui::icon(Mdi::BATTERY),
+            Ui::labelMedium("100%")) |
+
+            Ui::center() |
+            Ui::spacing({12, 6}) |
+            Ui::bound());
+
+    return Ui::hflow(
+               6,
+               appsButton,
+               calButton | Ui::center() | Ui::grow(),
+               trayButton) |
+           Ui::box(Ui::BoxStyle{
+               .padding = 6,
+               .backgroundPaint = Ui::GRAY950.withOpacity(0.95),
+           });
+}
+
+/* --- Shells --------------------------------------------------------------- */
+
+Ui::Child tablet(State const &state) {
+    return Ui::vflow(
+        statusbarButton(state),
+        Ui::grow(NONE),
+        navbar());
+}
+
+Ui::Child desktop(State const &state) {
+    return Ui::vflow(taskbar(state), Ui::separator(), Ui::grow(NONE));
+}
+
+Ui::Child app(bool isTablet) {
+    return Ui::reducer<Model>({.isTablet = isTablet}, [](auto state) {
+        auto wallpapers = Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap();
         auto background = Ui::align(Layout::Align::COVER, Ui::image(wallpapers));
+
         return Ui::dialogLayer(
             Ui::pinSize(
-                {411, 731},
-                Ui::stack(background, state.locked ? lockscreen() : homeScreen())));
+                state.isTablet ? Math::Vec2i{411, 731} : Math::Vec2i{1280, 1024},
+                Ui::stack(
+                    background,
+                    state.locked ? lockscreen(state)
+                                 : (state.isTablet ? tablet(state)
+                                                   : desktop(state)))));
     });
 }
 
 } // namespace Shell
 
 Res<> entryPoint(Ctx &ctx) {
-    return Ui::runApp(ctx, Shell::app());
+    auto args = useArgs(ctx);
+    bool isTablet = args.has("+tablet");
+    return Ui::runApp(ctx, Shell::app(isTablet));
 }

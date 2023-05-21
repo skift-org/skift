@@ -8,7 +8,7 @@ void debug(char const *buf) {
 
 [[noreturn]] void panic(char const *buf) {
     Hj::log(buf).unwrap();
-    Hj::Task::self().ret(-1).unwrap();
+    Hj::Task::self().crash().unwrap();
     __builtin_unreachable();
 }
 
@@ -23,6 +23,7 @@ void relaxe() {
 void enterCritical() {
 }
 
-void leaveCritical() {}
+void leaveCritical() {
+}
 
 } // namespace Embed

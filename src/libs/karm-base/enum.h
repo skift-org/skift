@@ -6,28 +6,28 @@
 
 namespace Karm {
 
-template <typename T>
+template <Meta::Enum E>
 struct Flags {
-    T _value = {};
+    E _value = {};
 
     Flags() = default;
 
-    Flags(T value)
+    Flags(E value)
         : _value(value) {}
 
-    bool has(T value) const {
+    bool has(E value) const {
         return (_value & value) == value;
     }
 
-    void set(T value) {
+    void set(E value) {
         _value |= value;
     }
 
-    void unset(T value) {
+    void unset(E value) {
         _value &= ~value;
     }
 
-    void toggle(T value) {
+    void toggle(E value) {
         _value ^= value;
     }
 
@@ -35,12 +35,79 @@ struct Flags {
         _value = {};
     }
 
-    T value() const {
+    bool empty() const {
+        return _value == (E)0;
+    }
+
+    E val() const {
         return _value;
     }
 
-    operator T() const {
+    operator E() const {
         return _value;
+    }
+
+    operator bool() const {
+        return _value != (E)0;
+    }
+
+    Flags operator~() const {
+        return Flags(~_value);
+    }
+
+    Flags operator|(Flags other) const {
+        return Flags(_value | other._value);
+    }
+
+    Flags operator&(Flags other) const {
+        return Flags(_value & other._value);
+    }
+
+    Flags operator^(Flags other) const {
+        return Flags(_value ^ other._value);
+    }
+
+    Flags &operator|=(Flags other) {
+        _value |= other._value;
+        return *this;
+    }
+
+    Flags &operator&=(Flags other) {
+        _value &= other._value;
+        return *this;
+    }
+
+    Flags &operator^=(Flags other) {
+        _value ^= other._value;
+        return *this;
+    }
+
+    bool operator!() const {
+        return !_value;
+    }
+
+    bool operator==(Flags other) const {
+        return _value == other._value;
+    }
+
+    bool operator!=(Flags other) const {
+        return _value != other._value;
+    }
+
+    bool operator<(Flags other) const {
+        return _value < other._value;
+    }
+
+    bool operator>(Flags other) const {
+        return _value > other._value;
+    }
+
+    bool operator<=(Flags other) const {
+        return _value <= other._value;
+    }
+
+    bool operator>=(Flags other) const {
+        return _value >= other._value;
     }
 };
 
@@ -77,5 +144,10 @@ struct Flags {
         using U = ::Karm::Meta::UnderlyingType<T>; \
         return (T &)((U &)a ^= (U)b);              \
     }
+
+template <Meta::Enum E, typename U = Meta::UnderlyingType<E>>
+U toUnderlyingType(E value) {
+    return (U)value;
+};
 
 } // namespace Karm

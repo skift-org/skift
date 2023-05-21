@@ -3,7 +3,6 @@
 #include <hjert-core/mem.h>
 #include <hjert-core/sched.h>
 #include <hjert-core/syscalls.h>
-#include <hjert-core/task.h>
 #include <karm-logger/logger.h>
 #include <karm-text/witty.h>
 
@@ -197,6 +196,7 @@ extern "C" usize _intDispatch(usize sp) {
             logInfo("x86_64: irq: {}", irq);
         }
 
+        Core::Irq::trigger(irq);
         _pic.ack(frame->intNo);
     }
 
@@ -247,7 +247,7 @@ void start(Core::Task &task, usize ip, usize sp, Hj::Args args) {
         .rsp = sp,
     };
 
-    if (task.type() == Core::TaskType::USER) {
+    if (task.mode() == Core::TaskMode::USER) {
         frame.cs = x86_64::Gdt::UCODE * 8 | 3; // 3 = user mode
         frame.ss = x86_64::Gdt::UDATA * 8 | 3;
     } else {

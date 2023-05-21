@@ -108,7 +108,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
     logInfo("entry: creating task...");
     auto domain = try$(Domain::create());
     domain->label("init-domain");
-    auto task = try$(Task::create(TaskType::USER, space, domain));
+    auto task = try$(Task::create(TaskMode::USER, space, domain));
     task->label("init-task");
     try$(Sched::instance().start(task, image.header().entry, stackRange.end(), {handoverRange.start}));
 

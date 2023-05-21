@@ -17,7 +17,7 @@ extern "C" void __entryPoint(usize ho) {
     auto self = Hj::Task::self();
 
     if (not res) {
-        (void)self.ret(-(isize)res.none().code());
+        (void)self.crash();
     }
 
     Abi::SysV::fini();

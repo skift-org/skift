@@ -14,15 +14,18 @@ namespace Hj {
     TYPE(VMO)              \
     TYPE(IO)               \
     TYPE(CHANNEL)          \
-    TYPE(IRQ)
+    TYPE(IRQ)              \
+    TYPE(LISTENER)
 
 // clang-format off
+
 enum struct Type {
 #define ITER(NAME) NAME,
     FOREACH_TYPE(ITER)
-    _LEN,
 #undef ITER
+    _LEN,
 };
+
 // clang-format on
 
 static inline char const *toStr(Type type) {
@@ -32,6 +35,7 @@ static inline char const *toStr(Type type) {
         return #NAME;
         FOREACH_TYPE(ITER)
 #undef ITER
+
     default:
         panic("invalid type");
     }
@@ -40,13 +44,7 @@ static inline char const *toStr(Type type) {
 #define FOREACH_SYSCALL(SYSCALL) \
     SYSCALL(NONE)                \
     SYSCALL(LOG)                 \
-    SYSCALL(CREATE_DOMAIN)       \
-    SYSCALL(CREATE_TASK)         \
-    SYSCALL(CREATE_SPACE)        \
-    SYSCALL(CREATE_VMO)          \
-    SYSCALL(CREATE_IO)           \
-    SYSCALL(CREATE_CHANNEL)      \
-    SYSCALL(CREATE_IRQ)          \
+    SYSCALL(CREATE)              \
     SYSCALL(LABEL)               \
     SYSCALL(DROP)                \
     SYSCALL(DUP)                 \
@@ -59,18 +57,21 @@ static inline char const *toStr(Type type) {
     SYSCALL(RECV)                \
     SYSCALL(CLOSE)               \
     SYSCALL(SIGNAL)              \
-    SYSCALL(WAIT)
+    SYSCALL(WATCH)               \
+    SYSCALL(LISTEN)
 
-// clang-format offR
+// clang-format off
+
 enum struct Syscall {
 #define ITER(NAME) NAME,
     FOREACH_SYSCALL(ITER)
-        _LEN,
 #undef ITER
+    _LEN,
 };
+
 // clang-format on
 
-static inline char const *toStr(Syscall syscall) {
+static inline Str toStr(Syscall syscall) {
     switch (syscall) {
 #define ITER(NAME)      \
     case Syscall::NAME: \
@@ -123,7 +124,7 @@ enum struct MsgFlags : Arg {
 FlagsEnum$(MsgFlags);
 
 struct Msg {
-    Arg label;
+    Arg label{};
     Arg flags{};
     Args args{};
 
@@ -139,15 +140,35 @@ struct Msg {
         flags |= 1 << idx;
         args[idx] = cap.raw();
     }
+
+    Res<Arg> loadVal(usize idx) const {
+        if (not(flags & (1 << idx))) {
+            return Ok(args[idx]);
+        }
+        return Error::invalidData("not-a-value");
+    }
+
+    Res<Cap> loadCap(usize idx) const {
+        if (flags & (1 << idx)) {
+            return Ok(Cap(args[idx]));
+        }
+        return Error::invalidData("not-a-capability");
+    }
+
+    bool isCap(usize idx) const {
+        return flags & (1 << idx);
+    }
 };
 
-enum struct Signals : Arg {
+enum struct Sigs : u32 {
     NONE = 0,
 
     READABLE = 1uz << 0,
     WRITABLE = 1uz << 1,
     CLOSED = 1uz << 2,
     EXITED = 1uz << 3,
+    CRASHED = 1uz << 4,
+    TRIGGERED = 1uz << 5,
 
     // User defined signals.
 
@@ -161,19 +182,12 @@ enum struct Signals : Arg {
     USER7 = 1uz << 31,
 };
 
-FlagsEnum$(Signals);
-
-struct Cond {
-    Cap cap;
-    Signals set;
-    Signals unset;
-};
+FlagsEnum$(Sigs);
 
 struct Event {
     Cap cap;
-    Signals set;
-    Signals unset;
-    Arg val;
+    Sigs sig;
+    bool set;
 };
 
 enum struct IoLen : Arg {
@@ -199,5 +213,71 @@ inline usize ioLen2Bytes(IoLen len) {
 
 using VmoFlags = Hal::PmmFlags;
 using MapFlags = Hal::VmmFlags;
+
+struct DomainProps {
+    static constexpr Type TYPE = Type::DOMAIN;
+    usize size = 4096;
+};
+
+struct TaskProps {
+    static constexpr Type TYPE = Type::TASK;
+    Cap domain;
+    Cap space;
+};
+
+struct SpaceProps {
+    static constexpr Type TYPE = Type::SPACE;
+};
+
+struct VmoProps {
+    static constexpr Type TYPE = Type::VMO;
+    usize phys;
+    usize len;
+    VmoFlags flags;
+};
+
+struct IoProps {
+    static constexpr Type TYPE = Type::IO;
+    usize base;
+    usize len;
+};
+
+struct ChannelProps {
+    static constexpr Type TYPE = Type::CHANNEL;
+    usize cap;
+};
+
+struct IrqProps {
+    static constexpr Type TYPE = Type::IRQ;
+    usize irq;
+};
+
+struct ListenerProps {
+    static constexpr Type TYPE = Type::LISTENER;
+};
+
+using _Props = Var<
+    DomainProps,
+    TaskProps,
+    SpaceProps,
+    VmoProps,
+    IoProps,
+    ChannelProps,
+    IrqProps,
+    ListenerProps>;
+
+struct Props : public _Props {
+    using _Props::_Props;
+
+    Type type() const {
+        return visit([](auto const &props) {
+            return props.TYPE;
+        });
+    }
+
+    Str typeStr() const {
+        return toStr(type());
+    }
+};
 
 } // namespace Hj

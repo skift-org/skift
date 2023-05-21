@@ -4,23 +4,9 @@
 
 namespace Hj {
 
-Res<> _syscall(Syscall syscall, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4 = 0, Arg a5 = 0);
-
 Res<> _log(char const *msg, usize len);
 
-Res<> _createDomain(Cap dest, Cap *cap);
-
-Res<> _createTask(Cap dest, Cap *cap, Cap node, Cap space);
-
-Res<> _createSpace(Cap dest, Cap *cap);
-
-Res<> _createVmo(Cap dest, Cap *cap, usize phys, usize len, VmoFlags flags = VmoFlags::NONE);
-
-Res<> _createIo(Cap dest, Cap *cap, usize base, usize len);
-
-Res<> _createChannel(Cap dest, Cap *cap, usize len);
-
-Res<> _createIrq(Cap dest, Cap *cap, usize irq);
+Res<> _create(Cap dest, Cap *cap, Props const *props);
 
 Res<> _label(Cap cap, char const *label, usize len);
 
@@ -40,12 +26,14 @@ Res<> _out(Cap cap, IoLen len, usize port, Arg val);
 
 Res<> _send(Cap cap, Msg const *msg, Cap from);
 
-Res<> _recv(Cap cap, Msg *msg, Cap to);
+Res<> _recv(Cap cap, Msg *msg, Cap fo);
 
 Res<> _close(Cap cap);
 
-Res<> _signal(Cap cap, Signals set, Signals unset, Arg val);
+Res<> _signal(Cap cap, Flags<Sigs> set, Flags<Sigs> unset);
 
-Res<> _wait(Cond const *conds, usize condLen, Event *ev, usize *evLen, Karm::TimeStamp deadline);
+Res<> _watch(Cap cap, Cap target, Flags<Sigs> set, Flags<Sigs> unset);
+
+Res<> _listen(Cap cap, Event *ev, usize evLen, TimeStamp deadline);
 
 } // namespace Hj

@@ -8,6 +8,16 @@ namespace Hjert::Core {
 
 static Opt<Sched> _sched;
 
+Res<> Sched::init(Handover::Payload &) {
+    logInfo("sched: initializing...");
+    _sched.emplace(try$(Task::create(TaskMode::SUPER, try$(Space::create()))));
+    return Ok();
+}
+
+Sched &Sched::instance() {
+    return *_sched;
+}
+
 Res<> Sched::start(Strong<Task> task, usize ip, usize sp, Hj::Args args) {
     logInfo("sched: starting task (ip: {x}, sp: {x})...", ip, sp);
 
@@ -39,16 +49,6 @@ void Sched::schedule(TimeSpan span) {
     }
 
     _curr = next;
-}
-
-Res<> Sched::init(Handover::Payload &) {
-    logInfo("sched: initializing...");
-    _sched.emplace(try$(Task::create(TaskType::SUPER, try$(Space::create()))));
-    return Ok();
-}
-
-Sched &Sched::instance() {
-    return *_sched;
 }
 
 void Sched::yield() {

@@ -56,4 +56,14 @@ Array(T, U...) -> Array<T, 1 + sizeof...(U)>;
 
 static_assert(MutSliceable<Array<u8, 16>>);
 
+template <typename T, usize... Is>
+constexpr Array<T, sizeof...(Is)> _makeArray(T value, std::index_sequence<Is...>) {
+    return {{(static_cast<void>(Is), value)...}};
+}
+
+template <typename T, usize N>
+constexpr Array<T, N> makeArray(T value) {
+    return _makeArray(value, std::make_index_sequence<N>());
+}
+
 } // namespace Karm

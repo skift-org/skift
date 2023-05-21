@@ -16,6 +16,15 @@ inline Res<usize> log(Bytes bytes) {
     return Ok(bytes.len());
 }
 
+template <typename O, typename... Args>
+inline Res<O> create(Cap dest, Args &&...args) {
+    Cap c;
+    typename O::PROPS props{std::forward<Args>(args)...};
+    Props p = props;
+    try$(_create(dest, &c, &p));
+    return Ok(O{c});
+}
+
 struct Object {
     Cap _cap;
 
@@ -43,16 +52,8 @@ struct Object {
         return _label(_cap, l.buf(), l.len());
     }
 
-    Res<> signal(Signals set, Signals unset, Arg value) {
-        return _signal(_cap, set, unset, value);
-    }
-
-    Res<Arg> wait(Signals set, Signals unset) {
-        Cond cond{_cap, set, unset};
-        Event event{};
-        usize evLen = 1;
-        try$(_wait(&cond, 1, &event, &evLen, TimeStamp::endOfTime()));
-        return Ok(event.val);
+    Res<> signal(Flags<Sigs> set, Flags<Sigs> unset) {
+        return _signal(_cap, set, unset);
     }
 
     operator Cap() const {
@@ -61,60 +62,63 @@ struct Object {
 };
 
 struct Domain : public Object {
+    using PROPS = DomainProps;
+
     static Domain self() {
         return Domain{ROOT};
     }
 
     static Res<Domain> create(Cap dest) {
-        Cap cap;
-        try$(_createDomain(dest, &cap));
-        return Ok(Domain{cap});
+        return Hj::create<Domain>(dest);
+    }
+
+    template <typename O, typename... Args>
+    Res<O> create(Args &&...args) {
+        return Hj::create<O>(_cap, std::forward<Args>(args)...);
     }
 };
 
 struct Task : public Object {
-    using Object::wait;
+    using PROPS = TaskProps;
 
     static Task self() {
         return Task{ROOT};
     }
 
     static Res<Task> create(Cap dest, Cap node, Cap space) {
-        Cap cap;
-        try$(_createTask(dest, &cap, node, space));
-        return Ok(Task{cap});
+        return create<Task>(dest, node, space);
     }
 
     Res<> start(usize ip, usize sp, Args args) {
         return _start(_cap, ip, sp, &args);
     }
 
-    Res<Arg> wait() {
-        return wait(Signals::EXITED, Signals::NONE);
+    Res<> ret() {
+        return signal(Sigs::EXITED, Sigs::NONE);
     }
 
-    Res<> ret(Arg ret = 0) {
-        return signal(Signals::EXITED, Signals::NONE, ret);
+    Res<> crash() {
+        return signal(Sigs::EXITED | Sigs::CRASHED, Sigs::NONE);
     }
 };
 
 struct Vmo : public Object {
+    using PROPS = VmoProps;
+
     static Res<Vmo> create(Cap dest, usize phys, usize len, VmoFlags flags = VmoFlags::NONE) {
-        Cap cap;
-        try$(_createVmo(dest, &cap, phys, len, flags));
-        return Ok(Vmo{cap});
+        return create<Vmo>(dest, phys, len, flags);
     }
 };
 
 struct Space : public Object {
+    using PROPS = SpaceProps;
+
     static Space self() {
         return Space{ROOT};
     }
 
     static Res<Space> create(Cap dest) {
-        Cap cap;
-        try$(_createSpace(dest, &cap));
-        return Ok(Space{cap});
+        return create<Space>(dest);
     }
 
     Res<usize> map(usize virt, Cap vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
@@ -140,10 +144,10 @@ struct Space : public Object {
 };
 
 struct Io : public Object {
+    using PROPS = IoProps;
+
     static Res<Io> create(Cap dest, usize base, usize len) {
-        Cap cap;
-        try$(_createIo(dest, &cap, base, len));
-        return Ok(Io{cap});
+        return create<Io>(dest, base, len);
     }
 
     Res<Arg> in(IoLen len, usize port) {
@@ -154,6 +158,68 @@ struct Io : public Object {
 
     Res<> out(IoLen len, usize port, Arg val) {
         return _out(_cap, len, port, val);
+    }
+};
+
+struct Channel : public Object {
+    using PROPS = ChannelProps;
+
+    static Res<Channel> create(Cap dest, usize len) {
+        return create<Channel>(dest, len);
+    }
+
+    Res<> send(Msg const *msg, Domain &from) {
+        return _send(_cap, msg, from);
+    }
+
+    Res<> send(Msg *msg, Domain &fo) {
+        return _send(_cap, msg, fo);
+    }
+};
+
+struct Irq : public Object {
+    using PROPS = IrqProps;
+
+    static Res<Irq> create(Cap dest, usize irq) {
+        return create<Irq>(dest, irq);
+    }
+};
+
+struct Listener : public Object {
+    using PROPS = ListenerProps;
+
+    Buf<Event> _events;
+
+    Listener(Cap cap)
+        : Object(cap) {}
+
+    static Res<Listener> create(Cap dest) {
+        return create<Listener>(dest);
+    }
+
+    Res<> watch(Cap cap, Flags<Sigs> set, Flags<Sigs> unset) {
+        return _watch(_cap, cap, set, unset);
+    }
+
+    Res<> unwatch(Cap cap) {
+        return _watch(_cap, cap, Sigs::NONE, Sigs::NONE);
+    }
+
+    Res<> listen(TimeStamp deadline) {
+        _events.resize(256);
+        return _listen(_cap, _events.buf(), _events.len(), deadline);
+    }
+
+    Opt<Event> poll() {
+        for (usize i = 0; i < _events.len(); ++i) {
+            if (_events[i].sig != Sigs::NONE) {
+                auto ev = _events[i];
+                _events[i] = {};
+                return ev;
+            }
+        }
+
+        return NONE;
     }
 };
 

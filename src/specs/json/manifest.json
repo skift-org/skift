@@ -2,8 +2,5 @@
     "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.component.v1",
     "id": "json-spec",
     "type": "lib",
-    "description": "JSON parser and serializer",
-    "requires": [
-        "karm-base"
-    ]
+    "description": "JSON parser and serializer"
 }

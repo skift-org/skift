@@ -10,7 +10,8 @@
     },
     "requires": [
         "efi",
-        "abi"
+        "abi",
+        "json-spec"
     ],
     "provides": [
         "embed-ui-impl",

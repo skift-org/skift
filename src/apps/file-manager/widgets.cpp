@@ -18,7 +18,7 @@ Ui::Child alert(State const &state, String title, String subtitle) {
                       Ui::icon(Mdi::ALERT_DECAGRAM, 48),
                       Ui::titleLarge(title),
                       Ui::bodyMedium(subtitle)) |
-                  Ui::box(Ui::BoxStyle{
+                  Ui::box({
                       .foregroundPaint = Ui::GRAY500,
                   }) |
                   Ui::center();

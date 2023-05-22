@@ -58,8 +58,8 @@ struct Node : public Meta::Static {
 
 template <typename T>
 concept Decorator = requires(T &t, Child &c) {
-                        { t(c) } -> Meta::Same<Child>;
-                    };
+    { t(c) } -> Meta::Same<Child>;
+};
 
 ALWAYS_INLINE Child operator|(Child child, Decorator auto decorator) {
     return decorator(child);
@@ -67,6 +67,12 @@ ALWAYS_INLINE Child operator|(Child child, Decorator auto decorator) {
 
 ALWAYS_INLINE Child &operator|=(Child &child, Decorator auto decorator) {
     return child = decorator(child);
+}
+
+ALWAYS_INLINE auto operator|(Decorator auto decorator, Decorator auto decorator2) {
+    return [=](Child child) {
+        return decorator2(decorator(child));
+    };
 }
 
 /* --- LeafNode ------------------------------------------------------------- */

@@ -12,7 +12,7 @@ Ui::Child alert(String title, String subtitle) {
                Ui::icon(Mdi::ALERT_DECAGRAM, 48),
                Ui::titleLarge(title),
                Ui::bodyMedium(subtitle)) |
-           Ui::box(Ui::BoxStyle{
+           Ui::box({
                .foregroundPaint = Ui::GRAY500,
            }) |
            Ui::center();
@@ -31,7 +31,7 @@ Ui::Child viewerPreview(State const &state) {
     }
 
     return Ui::image(state.image.unwrap()) |
-           Ui::box(Ui::BoxStyle{
+           Ui::box({
                .borderWidth = 1,
                .borderPaint = Ui::GRAY50.withOpacity(0.1),
            }) |

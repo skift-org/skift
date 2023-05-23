@@ -178,6 +178,15 @@ struct Context {
 
     /* --- Blitting --------------------------------------------------------- */
 
+    void _blit(
+        Pixels src,
+        Math::Recti srcRect,
+        auto srcFmt,
+
+        MutPixels dest,
+        Math::Recti destRect,
+        auto destFmt);
+
     // Blit the given pixels to the current pixels
     // using the given source and destination rectangles.
     void blit(Math::Recti src, Math::Recti dest, Pixels pixels);

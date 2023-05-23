@@ -172,26 +172,43 @@ void Context::clear(Math::Recti rect, Color color) {
 
 /* --- Blitting ------------------------------------------------------------- */
 
-[[gnu::flatten]] void Context::blit(Math::Recti src, Math::Recti dest, Pixels p) {
-    dest = applyOrigin(dest);
-    auto clipDest = applyAll(dest);
+[[gnu::flatten]] void Context::_blit(Pixels src, Math::Recti srcRect, auto srcFmt,
+                                     MutPixels dest, Math::Recti destRect, auto destFmt) {
+
+    destRect = applyOrigin(destRect);
+    auto clipDest = applyClip(destRect);
+
+    auto hratio = srcRect.height / destRect.height;
+    auto wratio = srcRect.width / destRect.width;
 
     for (isize y = 0; y < clipDest.height; ++y) {
-        isize yy = clipDest.y - dest.y + y;
+        isize yy = clipDest.y - destRect.y + y;
 
-        auto srcY = src.y + yy * src.height / dest.height;
+        auto srcY = srcRect.y + yy * hratio;
         auto destY = clipDest.y + y;
 
         for (isize x = 0; x < clipDest.width; ++x) {
-            isize xx = clipDest.x - dest.x + x;
+            isize xx = clipDest.x - destRect.x + x;
 
-            auto srcX = src.x + xx * src.width / dest.width;
+            auto srcX = srcRect.x + xx * wratio;
             auto destX = clipDest.x + x;
 
-            auto color = p.load({srcX, srcY});
-            mutPixels().blend({destX, destY}, color);
+            u8 const *srcPx = static_cast<u8 const *>(src.pixelUnsafe({srcX, srcY}));
+            u8 *destPx = static_cast<u8 *>(dest.pixelUnsafe({destX, destY}));
+            auto srcC = srcFmt.load(srcPx);
+            auto destC = destFmt.load(destPx);
+            destFmt.store(destPx, srcC.blendOver(destC));
         }
     }
+}
+
+void Context::blit(Math::Recti src, Math::Recti dest, Pixels p) {
+    auto d = mutPixels();
+    d.fmt().visit([&](auto dfmt) {
+        p.fmt().visit([&](auto pfmt) {
+            _blit(p, src, pfmt, d, dest, dfmt);
+        });
+    });
 }
 
 void Context::blit(Math::Recti dest, Pixels pixels) {

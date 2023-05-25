@@ -3,6 +3,7 @@
 #include <karm-base/rc.h>
 #include <karm-base/res.h>
 #include <karm-base/vec.h>
+
 struct Hook {
     virtual ~Hook() = default;
 };

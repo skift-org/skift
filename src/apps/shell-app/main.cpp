@@ -13,125 +13,28 @@ namespace Shell {
 
 /* --- Status Bar ----------------------------------------------------------- */
 
-Ui::Child systemTray(State const &);
-
 Ui::Child indicator(Media::Icon icon) {
     return Ui::spacing({4}, Ui::center(Ui::icon(icon)));
 }
 
 Ui::Child statusbar() {
-    return Ui::box(
-        {
-            .backgroundPaint = Gfx::ZINC900,
-        },
-        Ui::minSize({Ui::UNCONSTRAINED, 36}, Ui::spacing({12, 0}, Ui::hflow(4, Ui::center(Ui::text(Ui::TextStyle::labelMedium(), "22:07")), Ui::grow(NONE), indicator(Mdi::NETWORK_STRENGTH_4), indicator(Mdi::WIFI_STRENGTH_4), indicator(Mdi::BATTERY)))));
+    return Ui::hflow(
+               4,
+               Ui::text(Ui::TextStyle::labelMedium(), "22:07") | Ui::center(),
+               Ui::grow(NONE),
+               indicator(Mdi::NETWORK_STRENGTH_4),
+               indicator(Mdi::WIFI_STRENGTH_4),
+               indicator(Mdi::BATTERY)) |
+           Ui::minSize({Ui::UNCONSTRAINED, 36}) |
+           Ui::box({.padding = {12, 0}, .backgroundPaint = Gfx::ZINC900});
 }
 
 Ui::Child statusbarButton(State const &state) {
     return Ui::button(
         [&](Ui::Node &n) {
-            Ui::showDialog(n, systemTray(state));
+            Ui::showDialog(n, sysFlyout(state));
         },
         statusbar());
-}
-
-/* --- System Tray ---------------------------------------------------------- */
-
-Ui::Child quickSetting(Mdi::Icon icon) {
-    return Ui::center(Ui::state<bool>(false, [icon](auto state) {
-        return Ui::button(
-            [state](Ui::Node &) mutable {
-                state.update(not state.value());
-            },
-            (state.value()
-                 ? Ui::ButtonStyle::primary().withForegroundPaint(Gfx::WHITE)
-                 : Ui::ButtonStyle::secondary().withForegroundPaint(Ui::GRAY300))
-                .withRadius(99),
-            Ui::minSize(48, Ui::center(Ui::icon(icon, 26))));
-    }));
-}
-
-Ui::Child quickSettings(State const &state) {
-    return Ui::box(
-        {
-            .backgroundPaint = Ui::GRAY900,
-        },
-        Ui::spacing(
-            8,
-            Ui::hflow(
-                12,
-                quickSetting(Mdi::SWAP_VERTICAL),
-                quickSetting(Mdi::WIFI_STRENGTH_4),
-                quickSetting(Mdi::BLUETOOTH),
-                quickSetting(Mdi::MAP_MARKER_OUTLINE),
-                quickSetting(Mdi::FLASHLIGHT),
-                Ui::button(Model::bind<ToggleTablet>(), Ui::ButtonStyle::secondary(), state.isTablet ? Mdi::CELLPHONE : Mdi::TABLET),
-                quickSetting(Mdi::CHEVRON_DOWN) |
-                    Ui::end() |
-                    Ui::grow())));
-}
-
-Ui::Child notiWrapper(App app, Ui::Child inner) {
-    return Ui::vflow(
-        Ui::spacing(
-            12,
-            Ui::vflow(
-                8,
-                Ui::hflow(
-                    4,
-                    Ui::box({.foregroundPaint = app.color[4]},
-                            Ui::icon(app.icon, 12)),
-                    Ui::text(Ui::TextStyle::labelMedium().withColor(Ui::GRAY400), app.name)),
-                inner)),
-        Ui::separator());
-}
-
-Ui::Child notiMsg(String title, String body) {
-    return Ui::vflow(
-        6,
-        Ui::hflow(Ui::text(Ui::TextStyle::labelLarge(), title)),
-        Ui::text(Ui::TextStyle::labelMedium(), body));
-}
-
-Ui::Child notification(Mdi::Icon icon, String title, String subtitle) {
-    return notiWrapper({icon, Gfx::BLUE_RAMP, "Hello, world"}, notiMsg(title, subtitle));
-}
-
-Ui::Child notifications() {
-    return Ui::vflow(
-        Ui::spacing(
-            {12, 0},
-            Ui::hflow(
-                Ui::center(Ui::text(Ui::TextStyle::labelMedium(), "Notifications")),
-                Ui::grow(NONE),
-                Ui::button(
-                    Ui::NOP,
-                    Ui::ButtonStyle::subtle(),
-                    "Clear All"))),
-        notification(Mdi::HAND_WAVE, "Hello", "Hello, world!"),
-        notification(Mdi::HAND_WAVE, "Hello", "Hello, world!"),
-        notification(Mdi::HAND_WAVE, "Hello", "Hello, world!"));
-}
-
-Ui::Child systemTray(State const &state) {
-    return Ui::vflow(
-        statusbar(),
-        Ui::grow(
-            Ui::dismisable(
-                Ui::closeDialog,
-                Ui::DismisDir::TOP,
-                0.3,
-                Ui::box(
-                    {
-                        .borderRadius = {0, 0, 8, 8},
-                        .backgroundPaint = Ui::GRAY950,
-                    },
-                    Ui::vflow(
-                        quickSettings(state),
-                        Ui::separator(),
-                        notifications() | Ui::grow(),
-                        Ui::dragHandle())))),
-        Ui::empty(16));
 }
 
 /* --- Navigation Bar ------------------------------------------------------- */
@@ -178,16 +81,15 @@ Ui::Child taskbar(State const &) {
            Ui::box(Ui::BoxStyle{
                .padding = 6,
                .backgroundPaint = Ui::GRAY950.withOpacity(0.8),
-           }) |
-           Ui::backgroundFilter(Gfx::BlurFilter{64});
+           });
 }
 
 Ui::Child panels(State const &state) {
     return Ui::stack(
                state.activePanel == Panel::APPS ? appsPanel() | Ui::align(Layout::Align::START | Layout::Align::TOP) : Ui::empty(),
                state.activePanel == Panel::CALENDAR ? Ui::empty() | panel() | Ui::align(Layout::Align::HCENTER | Layout::Align::TOP) : Ui::empty(),
-               state.activePanel == Panel::NOTIS ? Ui::empty() | panel() | Ui::align(Layout::Align::END | Layout::Align::TOP) : Ui::empty()) |
-           Ui::spacing({16, 38});
+               state.activePanel == Panel::NOTIS ? sysPanel(state) | Ui::align(Layout::Align::END | Layout::Align::TOP) : Ui::empty()) |
+           Ui::spacing({8, 38});
 }
 
 /* --- Shells --------------------------------------------------------------- */
@@ -195,6 +97,7 @@ Ui::Child panels(State const &state) {
 Ui::Child tablet(State const &state) {
     return Ui::vflow(
         statusbarButton(state),
+        Ui::separator(),
         Ui::grow(NONE),
         navbar());
 }

@@ -6,6 +6,7 @@ State reduce(State state, Actions action) {
     return action.visit(Visitor{
         [&](ToggleTablet) {
             state.isTablet = not state.isTablet;
+            state.activePanel = Panel::NIL;
             return state;
         },
         [&](Unlock) {

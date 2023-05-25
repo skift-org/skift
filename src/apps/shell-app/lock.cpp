@@ -22,7 +22,8 @@ Ui::Child lock(State const &state) {
     return Ui::vflow(clock, Ui::grow(NONE), hintText) |
            Ui::spacing(state.isTablet ? 64 : 128) |
            Ui::dragRegion() |
-           Ui::dismisable(Model::bind<Unlock>(), Ui::DismisDir::TOP, 0.3);
+           Ui::dismisable(Model::bind<Unlock>(), Ui::DismisDir::TOP, 0.3) |
+           Ui::align(Layout::Align::VFILL | Layout::Align::HCENTER);
 }
 
 } // namespace Shell

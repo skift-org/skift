@@ -49,8 +49,8 @@ using Model = Ui::Model<State, Actions, reduce>;
 
 /* --- Views ---------------------------------------------------------------- */
 
-inline auto panel() {
-    return Ui::pinSize({500, 400}) |
+inline auto panel(Math::Vec2i size = {500, 400}) {
+    return Ui::pinSize(size) |
            Ui::box({
                .padding = 8,
                .borderRadius = 8,
@@ -65,5 +65,9 @@ Ui::Child lock(State const &state);
 Ui::Child appsPanel();
 
 Ui::Child appsFlyout();
+
+Ui::Child sysPanel(State const &state);
+
+Ui::Child sysFlyout(State const &state);
 
 } // namespace Shell

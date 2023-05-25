@@ -16,7 +16,6 @@ Ui::Child searchInput() {
                Ui::labelMedium("Search...") | Ui::grow(),
                Ui::icon(Mdi::MAGNIFY, 24)) |
            Ui::spacing({12, 8}) |
-           Ui::minSize({Ui::UNCONSTRAINED, 48}) |
            Ui::box({
                .borderRadius = 4,
                .borderWidth = 1,
@@ -51,7 +50,11 @@ Ui::Child appRow(Mdi::Icon icon, Gfx::ColorRamp colors, String title) {
 
 Ui::Child apps(Ui::Children apps) {
     return Ui::vflow(
-        searchInput(),
+        Ui::hflow(
+            4,
+            searchInput() | Ui::grow(),
+            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::VIEW_GRID),
+            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_LIST_BULLETED_SQUARE)),
         Ui::vflow(0, apps) |
             Ui::spacing({0, 12}) |
             Ui::vscroll() |
@@ -74,7 +77,6 @@ Ui::Child appsList() {
         appRow(Mdi::COG, Gfx::ZINC_RAMP, "Settings"),
         appRow(Mdi::TABLE, Gfx::GREEN_RAMP, "Spreadsheet"),
         appRow(Mdi::WIDGETS, Gfx::BLUE_RAMP, "Widget Gallery"),
-
     };
 
     return apps(appItems);
@@ -88,16 +90,14 @@ Ui::Child appsFlyout() {
     return Ui::vflow(
                Ui::dragHandle(),
                appsList() | Ui::grow()) |
-           Ui::grow() |
            Ui::box({
-               .margin = 8,
+               .margin = {8, 8 + 64, 8, 8},
                .padding = {12, 0},
                .borderRadius = 8,
                .borderWidth = 1,
                .borderPaint = Ui::GRAY800,
                .backgroundPaint = Ui::GRAY950,
            }) |
-           Ui::spacing({0, 64, 0, 0}) |
            Ui::bound() |
            Ui::dismisable(
                Ui::closeDialog,

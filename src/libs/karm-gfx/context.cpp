@@ -178,8 +178,8 @@ void Context::clear(Math::Recti rect, Color color) {
     destRect = applyOrigin(destRect);
     auto clipDest = applyClip(destRect);
 
-    auto hratio = srcRect.height / destRect.height;
-    auto wratio = srcRect.width / destRect.width;
+    auto hratio = srcRect.height / (f64)destRect.height;
+    auto wratio = srcRect.width / (f64)destRect.width;
 
     for (isize y = 0; y < clipDest.height; ++y) {
         isize yy = clipDest.y - destRect.y + y;
@@ -193,7 +193,7 @@ void Context::clear(Math::Recti rect, Color color) {
             auto srcX = srcRect.x + xx * wratio;
             auto destX = clipDest.x + x;
 
-            u8 const *srcPx = static_cast<u8 const *>(src.pixelUnsafe({srcX, srcY}));
+            u8 const *srcPx = static_cast<u8 const *>(src.pixelUnsafe({(isize)srcX, (isize)srcY}));
             u8 *destPx = static_cast<u8 *>(dest.pixelUnsafe({destX, destY}));
             auto srcC = srcFmt.load(srcPx);
             auto destC = destFmt.load(destPx);

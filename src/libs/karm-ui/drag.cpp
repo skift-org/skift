@@ -10,28 +10,39 @@ struct Dismisable :
     OnDismis _onDismis;
     DismisDir _dir;
     f64 _threshold;
-    Anim2<f64> _drag{};
+    Eased2f _drag{};
+    Math::Vec2i _last{};
     bool _dismissed{};
-    bool _animated{};
 
     Dismisable(OnDismis onDismis, DismisDir dir, f64 threshold, Ui::Child child)
-        : ProxyNode(child), _onDismis(std::move(onDismis)), _dir(dir), _threshold(threshold) {}
+        : ProxyNode(child),
+          _onDismis(std::move(onDismis)),
+          _dir(dir),
+          _threshold(threshold) {}
+
+    Math::Vec2i drag() const {
+        return _drag.value().cast<isize>();
+    }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
 
-        auto dragi = _drag.value().cast<isize>();
-
         g.clip(bound());
-        g.origin(dragi);
-        r.xy = r.xy - dragi;
+        g.origin(drag());
+        r.xy = r.xy - drag();
         child().paint(g, r);
 
         g.restore();
     }
 
     void event(Events::Event &e) override {
-        _drag.event(*this, e);
+        auto oldBound = bound().clipTo(child().bound().offset(_last));
+        if (_drag.needRepaint(*this, e)) {
+            auto newBound = bound().clipTo(child().bound().offset(drag()));
+            _last = drag();
+            Ui::shouldRepaint(*this, oldBound.mergeWith(newBound));
+        }
+
         if (_dismissed and _drag.reached()) {
             _onDismis(*this);
         }
@@ -143,13 +154,11 @@ Child dragRegion(Child child) {
 /* --- Handle --------------------------------------------------------------- */
 
 Child handle() {
-    BoxStyle STYLE = {
-        .borderRadius = 999,
-        .backgroundPaint = GRAY50,
-    };
-
     return empty({128, 4}) |
-           box(STYLE) |
+           box({
+               .borderRadius = 999,
+               .backgroundPaint = GRAY50,
+           }) |
            spacing(12) |
            center() |
            minSize({UNCONSTRAINED, 48});

@@ -25,7 +25,7 @@ inline void shouldRebuild(Node &n) {
 }
 
 inline void shouldAnimate(Node &n) {
-    Events::AnimateEvent e;
+    Events::AnimateEvent e{0};
     n.bubble(e);
 }
 

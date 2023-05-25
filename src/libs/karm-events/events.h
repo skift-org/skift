@@ -92,7 +92,12 @@ struct LayoutEvent : public BaseEvent<LayoutEvent> {};
 
 struct BuildEvent : public BaseEvent<BuildEvent> {};
 
-struct AnimateEvent : public BaseEvent<AnimateEvent> {};
+struct AnimateEvent : public BaseEvent<AnimateEvent> {
+    f64 dt;
+
+    AnimateEvent(f64 dt)
+        : dt{dt} {}
+};
 
 struct ExitEvent : public BaseEvent<ExitEvent> {
     Res<> res = Ok();

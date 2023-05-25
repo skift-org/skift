@@ -7,6 +7,9 @@
 
 namespace Karm::Ui {
 
+static constexpr auto FRAME_RATE = 60;
+static constexpr auto FRAME_TIME = 1.0 / FRAME_RATE;
+
 enum struct PerfEvent {
     NONE,
     PAINT,
@@ -43,6 +46,7 @@ struct PerfRecord {
 struct PerfGraph {
     usize _index{};
     Array<PerfRecord, 256> _records{};
+    f64 _frameTime = 0;
 
     void record(PerfEvent e) {
         _records[_index % 256] = PerfRecord{e, Sys::now(), 0};
@@ -50,9 +54,18 @@ struct PerfGraph {
 
     auto end() {
         auto n = Sys::now();
-        auto elapsed = n - _records[_index % 256].start;
+        auto rec = _records[_index % 256];
+        auto elapsed = n - rec.start;
         _records[_index++ % 256].end = n;
+
+        if (rec.event == PerfEvent::PAINT) {
+            _frameTime = (_frameTime * 0.9) + (elapsed.toMSecs() * 0.1);
+        }
         return elapsed;
+    }
+
+    f64 fps() {
+        return 1000.0 / _frameTime;
     }
 
     Math::Recti bound() {
@@ -68,7 +81,7 @@ struct PerfGraph {
         g.strokeStyle(Gfx::stroke(Gfx::GREEN.withOpacity(0.5)).withAlign(Gfx::INSIDE_ALIGN));
         g.stroke();
         g.strokeStyle(Gfx::stroke(Gfx::WHITE.withOpacity(0.5)).withAlign(Gfx::INSIDE_ALIGN));
-        g.stroke(Math::Edgei{0, 32, 256, 32});
+        g.stroke(Math::Edgei{0, (isize)(FRAME_TIME * 1000 * 2), 256, (isize)(FRAME_TIME * 1000 * 2)});
 
         for (usize i = 0; i < 256; ++i) {
             auto e = _records[(_index + i) % 256];
@@ -77,11 +90,17 @@ struct PerfGraph {
                 {(isize)i, 0, 1, (isize)e.duration().toMSecs() * 2},
                 e.color());
         }
+
+        auto text = Fmt::format("FPS: {}", (isize)fps()).take();
+        g.fillStyle(Gfx::WHITE);
+        g.fill({8, 16}, text);
+
         g.restore();
     }
 };
 
 struct Host : public Node {
+
     Child _root;
     Opt<Res<>> _res;
     Gfx::Context _g;
@@ -205,11 +224,22 @@ struct Host : public Node {
     Res<> run() {
         layout(bound());
         paint();
+        auto lastFrame = Sys::now();
         while (not _res) {
-            wait(_shouldAnimate ? 16 : -1);
+            isize waitTime = -1;
+            if (_shouldAnimate) {
+                auto elapsed = Sys::now() - lastFrame;
+                waitTime = ((FRAME_TIME * 1000) - elapsed.toMSecs());
+                if (waitTime < 0)
+                    waitTime = 0;
+            }
+
+            wait(waitTime);
+            lastFrame = Sys::now();
+
             if (_shouldAnimate) {
                 _shouldAnimate = false;
-                Events::AnimateEvent e;
+                Events::AnimateEvent e{FRAME_TIME};
                 event(e);
             }
 

@@ -9,22 +9,23 @@ struct Scroll : public ProxyNode<Scroll> {
     bool _animated = false;
     Layout::Orien _orient{};
     Math::Recti _bound{};
-    Math::Vec2i _scroll{};
+    Math::Vec2f _scroll{};
+    Math::Vec2f _targetScroll{};
 
     Scroll(Layout::Orien orient, Child child)
         : ProxyNode(child), _orient(orient) {}
 
     void scroll(Math::Vec2i s) {
         auto childBound = child().bound();
-        _scroll.x = clamp(s.x, -(childBound.width - min(childBound.width, bound().width)), 0);
-        _scroll.y = clamp(s.y, -(childBound.height - min(childBound.height, bound().height)), 0);
+        _targetScroll.x = clamp(s.x, -(childBound.width - min(childBound.width, bound().width)), 0);
+        _targetScroll.y = clamp(s.y, -(childBound.height - min(childBound.height, bound().height)), 0);
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
         g.clip(_bound);
-        g.origin(_scroll);
-        r.xy = r.xy - _scroll;
+        g.origin(_scroll.cast<isize>());
+        r.xy = r.xy - _scroll.cast<isize>();
         child().paint(g, r);
 
         if (debugShowScrollBounds)
@@ -42,12 +43,12 @@ struct Scroll : public ProxyNode<Scroll> {
             if (bound().contains(ee.pos)) {
                 _mouseIn = true;
 
-                ee.pos = ee.pos - _scroll;
+                ee.pos = ee.pos - _scroll.cast<isize>();
                 child().event(ee);
 
                 if (not ee.accepted) {
                     if (ee.type == Events::MouseEvent::SCROLL) {
-                        scroll((_scroll + ee.scrollPrecise * 16).cast<isize>());
+                        scroll((_scroll + ee.scrollPrecise * 128).cast<isize>());
                         shouldAnimate(*this);
                         _animated = true;
                     }
@@ -58,7 +59,16 @@ struct Scroll : public ProxyNode<Scroll> {
             e.accepted = ee.accepted;
         } else if (e.is<Events::AnimateEvent>() and _animated) {
             shouldRepaint(*parent(), bound());
-            _animated = false;
+
+            // Same as _scroll = _scroll + (_targetScroll - _scroll) * 0.2; but frame rate independent
+            _scroll = _scroll + (_targetScroll - _scroll) * (e.unwrap<Events::AnimateEvent>().dt * 20);
+
+            if (_scroll.dist(_targetScroll) < 0.5) {
+                _scroll = _targetScroll;
+                _animated = false;
+            } else
+                shouldAnimate(*this);
+
         } else {
             child().event(e);
         }
@@ -67,7 +77,7 @@ struct Scroll : public ProxyNode<Scroll> {
     void bubble(Events::Event &e) override {
         if (e.is<Events::PaintEvent>()) {
             auto &paintEvent = e.unwrap<Events::PaintEvent>();
-            paintEvent.bound.xy = paintEvent.bound.xy + _scroll;
+            paintEvent.bound.xy = paintEvent.bound.xy + _scroll.cast<isize>();
             paintEvent.bound = paintEvent.bound.clipTo(bound());
         }
 
@@ -84,7 +94,7 @@ struct Scroll : public ProxyNode<Scroll> {
         }
         r.wh = childSize;
         child().layout(r);
-        scroll(_scroll);
+        scroll(_scroll.cast<isize>());
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {

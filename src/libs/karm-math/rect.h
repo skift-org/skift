@@ -230,6 +230,10 @@ union Rect {
     ALWAYS_INLINE Rect grow(Vec2<T> v) const {
         return {x - v.x, y - v.y, width + v.x * 2, height + v.y * 2};
     }
+
+    ALWAYS_INLINE Rect offset(Vec2<T> v) const {
+        return {x + v.x, y + v.y, width, height};
+    }
 };
 
 using Recti = Rect<isize>;

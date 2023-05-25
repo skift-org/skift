@@ -51,7 +51,7 @@ void closePopover(Node &n) {
 }
 
 struct DialogLayer : public LeafNode<DialogLayer> {
-    Anim<f64> _opacity{};
+    Easedf _opacity{};
     Child _child;
 
     Opt<Child> _dialog;
@@ -124,7 +124,10 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     }
 
     void event(Events::Event &e) override {
-        _opacity.event(*this, e);
+        if (_opacity.needRepaint(*this, e)) {
+            Ui::shouldRepaint(*this);
+        }
+
         if (popoverVisible()) {
             popover().event(e);
         } else if (dialogVisible()) {

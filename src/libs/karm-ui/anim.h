@@ -8,7 +8,7 @@
 namespace Karm::Ui {
 
 template <typename T>
-struct Anim {
+struct Eased {
     T _start{};
     T _value{};
     T _target{};
@@ -17,7 +17,7 @@ struct Anim {
     f64 _duration{};
     bool _animated{};
 
-    Anim() = default;
+    Eased() = default;
 
     T value() const {
         return _value;
@@ -50,29 +50,28 @@ struct Anim {
         Ui::shouldAnimate(n);
     }
 
-    void update(f64 dt) {
-        if (_animated) {
-            _elapsed += dt;
-            if (_elapsed > _duration) {
-                _elapsed = _duration;
-                _value = _target;
-                _animated = false;
-            } else {
-                f64 p = _elapsed / _duration;
-                _value = Math::lerp(_start, _target, _easing(p));
-            }
-        }
-    }
+    bool needRepaint(Node &n, Events::Event &e) {
+        bool shouldRepaint = false;
 
-    void event(Node &n, Events::Event &e) {
-        e.handle<Events::AnimateEvent>([&](auto &) {
+        e.handle<Events::AnimateEvent>([&](auto &a) {
             if (_animated) {
                 Ui::shouldAnimate(n);
-                Ui::shouldRepaint(n);
+                shouldRepaint = true;
+
+                _elapsed += a.dt;
+                if (_elapsed > _duration) {
+                    _elapsed = _duration;
+                    _value = _target;
+                    _animated = false;
+                } else {
+                    f64 p = _elapsed / _duration;
+                    _value = Math::lerp(_start, _target, _easing(p));
+                }
             }
-            update(1 / 60.0);
             return false;
         });
+
+        return shouldRepaint;
     }
 
     bool reached() const {
@@ -92,16 +91,20 @@ struct Anim {
     }
 };
 
+using Easedi = Eased<isize>;
+
+using Easedf = Eased<f64>;
+
 template <typename T>
-struct Anim2 {
-    Anim<T> _x;
-    Anim<T> _y;
+struct Eased2 {
+    Eased<T> _x;
+    Eased<T> _y;
 
-    Anim2() = default;
+    Eased2() = default;
 
-    Anim2(T x, T y) : _x(x), _y(y) {}
+    Eased2(T x, T y) : _x(x), _y(y) {}
 
-    Anim2(Math::Vec2<T> v) : _x(v.x), _y(v.y) {}
+    Eased2(Math::Vec2<T> v) : _x(v.x), _y(v.y) {}
 
     void set(Node &n, Math::Vec2<T> v) {
         _x.set(n, v.x);
@@ -113,14 +116,10 @@ struct Anim2 {
         _y.animate(n, target.y, duration, easing);
     }
 
-    void update(f64 dt) {
-        _x.update(dt);
-        _y.update(dt);
-    }
-
-    void event(Node &n, Events::Event &e) {
-        _x.event(n, e);
-        _y.event(n, e);
+    bool needRepaint(Node &n, Events::Event &e) {
+        bool sx = _x.needRepaint(n, e);
+        bool sy = _y.needRepaint(n, e);
+        return sx or sy;
     }
 
     Math::Vec2<T> value() const {
@@ -152,8 +151,12 @@ struct Anim2 {
     }
 };
 
-using Anim2i = Anim2<isize>;
+using Eased2i = Eased2<isize>;
 
-using Anim2f = Anim2<f64>;
+using Eased2f = Eased2<f64>;
+
+struct Layer : public ProxyNode<Layer> {
+    Opt<Media::Image> _buffer;
+};
 
 } // namespace Karm::Ui

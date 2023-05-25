@@ -8,7 +8,8 @@
 namespace Karm::Math {
 
 template <typename T>
-struct Sod {
+struct _Sod {
+    // Second Order Dynamic
     // Based on code from https://youtu.be/KPoeNZZ6H4s?t=856
 
     bool _init = false;
@@ -23,7 +24,7 @@ struct Sod {
     f64 _k2;
     f64 _k3;
 
-    Sod(f64 f, f64 z, f64 r) {
+    _Sod(f64 f, f64 z, f64 r) {
         _w = 2 * PI * f;
         _z = z;
         _d = _w * sqrt(abs(z * z - 1));
@@ -73,5 +74,7 @@ struct Sod {
         return _y;
     }
 };
+
+using Sodf = _Sod<f64>;
 
 } // namespace Karm::Math

@@ -1,13 +1,14 @@
 import os
+import json
+import magic
+import logging
+from pathlib import Path
+
 
 from osdk import shell, builder, const
 from osdk.cmds import Cmd, append
 from osdk.args import Args
-from osdk.logger import Logger
-from pathlib import Path
 from typing import Callable
-import json
-import magic
 
 
 def kvmAvailable() -> bool:
@@ -18,11 +19,11 @@ def kvmAvailable() -> bool:
 
 
 class Image:
-    logger: Logger
+    logger: logging.Logger
     root: str
 
     def __init__(self, id: str):
-        self.logger = Logger(f"image:{id}")
+        self.logger = logging.getLogger(f"Image({id})")
         self.root = f".osdk/images/{id}"
 
     def withPak(self, id: str, f: Callable[[dict], None]):
@@ -52,10 +53,8 @@ class Image:
 
         return dest
 
-
-
     def installTo(self, componentSpec: str, targetSpec: str, dest: str):
-        self.logger.log(f"Installing {componentSpec} to {dest}...")
+        self.logger.info(f"Installing {componentSpec} to {dest}...")
         component = builder.build(componentSpec, targetSpec)
 
         context = component.context
@@ -76,7 +75,7 @@ class Image:
         shell.cp(component.outfile(), f"{self.root}/{dest}")
 
     def install(self, componentSpec: str, targetSpec: str):
-        self.logger.log(f"Installing {componentSpec}...")
+        self.logger.info(f"Installing {componentSpec}...")
         component = builder.build(componentSpec, targetSpec)
         context = component.context
 
@@ -96,30 +95,30 @@ class Image:
         self.cpRef(componentSpec, component.outfile(), f"{componentSpec}/_bin")
 
     def cp(self, src: str, dest: str):
-        self.logger.log(f"Copying {src} to {dest}...")
+        self.logger.info(f"Copying {src} to {dest}...")
         shell.mkdir(Path(f"{self.root}/{dest}").parent)
         shell.cp(src, f"{self.root}/{dest}")
 
     def cpTree(self, src: str, dest: str):
-        self.logger.log(f"Copying {src} to {dest}...")
+        self.logger.info(f"Copying {src} to {dest}...")
         shell.mkdir(Path(f"{self.root}/{dest}").parent)
         shell.cpTree(src, f"{self.root}/{dest}")
 
     def mkdir(self, path: str):
-        self.logger.log(f"Creating directory {path}...")
+        self.logger.info(f"Creating directory {path}...")
         shell.mkdir(f"{self.root}/{path}")
 
     def wget(self, url: str, dest: str):
-        self.logger.log(f"Downloading {url} to {dest}...")
+        self.logger.info(f"Downloading {url} to {dest}...")
         shell.mkdir(Path(f"{self.root}/{dest}").parent)
         shell.wget(url, f"{self.root}/{dest}")
 
 
 class Machine():
-    logger: Logger
+    logger: logging.Logger
 
     def __init__(self, id: str):
-        self.logger = Logger(f"machine:{id}")
+        self.logger = logging.getLogger(f"Machine({id})")
 
     def boot(self, image: Image) -> None:
         pass
@@ -135,7 +134,7 @@ class QemuSystemAmd64(Machine):
         self.useDebug = useDebug
 
     def boot(self, image: Image) -> None:
-        self.logger.log("Booting...")
+        self.logger.info("Booting...")
 
         ovmf = "/usr/share/edk2/x64/OVMF.fd"
 

@@ -453,9 +453,9 @@ struct FlowLayout : public GroupNode<FlowLayout> {
     FlowLayout(FlowStyle style, Children children)
         : GroupNode(children), _style(style) {}
 
-    isize computeGrowUnit(Math::Recti r) {
-        isize total = 0;
-        isize grows = 0;
+    f64 computeGrowUnit(Math::Recti r) {
+        f64 total = 0;
+        f64 grows = 0;
 
         for (auto &child : children()) {
             if (child.is<Grow>()) {
@@ -465,24 +465,24 @@ struct FlowLayout : public GroupNode<FlowLayout> {
             }
         }
 
-        isize all = _style.flow.getWidth(r) - _style.gaps * (max(1uz, children().len()) - 1);
-        isize growTotal = max(0, all - total);
+        f64 all = _style.flow.getWidth(r) - _style.gaps * (max(1uz, children().len()) - 1);
+        f64 growTotal = max(0, all - total);
         return (growTotal) / max(1, grows);
     }
 
     void layout(Math::Recti r) override {
         _bound = r;
 
-        isize growUnit = computeGrowUnit(r);
-        isize start = _style.flow.getStart(r);
+        f64 growUnit = computeGrowUnit(r);
+        f64 start = _style.flow.getStart(r);
 
         for (auto &child : children()) {
             Math::Recti inner = {};
             auto childSize = child->size(r.size(), Layout::Hint::MIN);
 
-            inner = _style.flow.setStart(inner, start);
+            inner = _style.flow.setStart(inner, (isize)start);
             if (child.is<Grow>()) {
-                inner = _style.flow.setWidth(inner, growUnit * child.unwrap<Grow>().grow());
+                inner = _style.flow.setWidth(inner, (isize)(growUnit * child.unwrap<Grow>().grow()));
             } else {
                 inner = _style.flow.setWidth(inner, _style.flow.getX(childSize));
             }

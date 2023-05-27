@@ -170,6 +170,7 @@ class QemuSystemAmd64(Machine):
 
 
 def bootCmd(args: Args) -> None:
+    isDebug = args.consumeOpt("debug", False)
     image = Image("efi-x86_64")
 
     image.mkdir("objects")
@@ -177,14 +178,17 @@ def bootCmd(args: Args) -> None:
 
     image.installTo("loader", "efi-x86_64:o3", "EFI/BOOT/BOOTX64.EFI")
 
-    image.install("hjert", "kernel-x86_64")
-    image.install("limine-tests", "kernel-x86_64")
-    image.install("system-srv", "skift-x86_64")
-    image.install("shell-app", "skift-x86_64")
-    image.install("skift-branding", "skift-x86_64")
+    image.install("hjert", "kernel-x86_64" + (":debug" if isDebug else ""))
+    image.install("limine-tests", "kernel-x86_64" +
+                  (":debug" if isDebug else ""))
+    image.install("system-srv", "skift-x86_64" + (":debug" if isDebug else ""))
+    image.install("shell-app", "skift-x86_64" + (":debug" if isDebug else ""))
+    image.install("skift-branding", "skift-x86_64" +
+                  (":debug" if isDebug else ""))
     image.cpTree("meta/image/boot", "boot/")
 
-    machine = QemuSystemAmd64(logError=False, useDebug=args.consumeOpt("debug", False))
+    machine = QemuSystemAmd64(
+        logError=False, useDebug=isDebug)
     machine.boot(image)
 
 

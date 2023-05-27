@@ -184,7 +184,7 @@ def bootCmd(args: Args) -> None:
     image.install("skift-branding", "skift-x86_64")
     image.cpTree("meta/image/boot", "boot/")
 
-    machine = QemuSystemAmd64(logError=False, useDebug=False)
+    machine = QemuSystemAmd64(logError=False, useDebug=args.consumeOpt("debug", False))
     machine.boot(image)
 
 

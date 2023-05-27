@@ -11,7 +11,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Toolchains
-        run: sudo apt-get install clang lld llvm python3 git ninja-build libsdl2-dev nasm gcc-multilib &&
+        run: sudo apt install clang lld llvm python3 git ninja-build libsdl2-dev nasm gcc-multilib &&
              git clone https://github.com/cute-engineering/osdk && sudo pip install -e osdk/
 
       - name: Install Packages

@@ -20,6 +20,9 @@ Ui::Child searchInput() {
                .borderRadius = 4,
                .borderWidth = 1,
                .backgroundPaint = Ui::GRAY900,
+           }) |
+           Ui::button([](auto &n) {
+               Ui::showDialog(n, keyboardFlyout());
            });
 }
 

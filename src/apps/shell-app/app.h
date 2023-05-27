@@ -70,4 +70,6 @@ Ui::Child sysPanel(State const &state);
 
 Ui::Child sysFlyout(State const &state);
 
+Ui::Child keyboardFlyout();
+
 } // namespace Shell

@@ -5,9 +5,9 @@ import logging
 from pathlib import Path
 
 
-from osdk import shell, builder, const
-from osdk.cmds import Cmd, append
-from osdk.args import Args
+from cutekit import shell, builder, const, project
+from cutekit.cmds import Cmd, append
+from cutekit.args import Args
 from typing import Callable
 
 
@@ -24,7 +24,7 @@ class Image:
 
     def __init__(self, id: str):
         self.logger = logging.getLogger(f"Image({id})")
-        self.root = f".osdk/images/{id}"
+        self.root = f"{const.PROJECT_CK_DIR}/images/{id}"
 
     def withPak(self, id: str, f: Callable[[dict], None]):
         jsonPath = f"{self.root}/bundles/{id}.json"
@@ -170,6 +170,8 @@ class QemuSystemAmd64(Machine):
 
 
 def bootCmd(args: Args) -> None:
+    project.chdir()
+
     isDebug = args.consumeOpt("debug", False)
     image = Image("efi-x86_64")
 

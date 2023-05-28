@@ -17,7 +17,7 @@ using Array = Vec<Value>;
 
 using Object = Map<String, Value>;
 
-#ifdef __osdk_freestanding__
+#ifdef __ck_freestanding__
 using Number = isize;
 #else
 using Number = f64;
@@ -158,7 +158,7 @@ struct Value {
             });
     }
 
-#ifdef __osdk_freestanding__
+#ifdef __ck_freestanding__
     f64 asFloat() const {
         return _store.visit(
             Visitor{

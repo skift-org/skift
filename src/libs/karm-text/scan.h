@@ -213,7 +213,7 @@ struct _Scan {
         return result;
     }
 
-#ifndef __osdk_freestanding__
+#ifndef __ck_freestanding__
 
     Opt<f64> nextFloat(usize base = 10) {
         i64 ipart = 0.0;

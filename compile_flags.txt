@@ -14,15 +14,15 @@
 -Isrc/libs
 -Isrc/specs
 -Isrc/impls
--I.osdk/extern/cute-engineering
+-I.ck/extern/cute-engineering
 
--D__osdk_sys_linux__
--D__osdk_arch_x86_64__
--D__osdk_karm_sys_encoding_utf8__
--D__osdk_karm_sys_line_ending_lf__
--D__osdk_karm_sys_path_separator_slash__
--D__osdk_karm_ui_backend_utf8__
--D__osdk_karm_cli_backend_ansi__
+-D__ck_sys_linux__
+-D__ck_arch_x86_64__
+-D__ck_karm_sys_encoding_utf8__
+-D__ck_karm_sys_line_ending_lf__
+-D__ck_karm_sys_path_separator_slash__
+-D__ck_karm_ui_backend_utf8__
+-D__ck_karm_cli_backend_ansi__
 
 -D_THREAD_SAFE
 -I/usr/include/SDL2

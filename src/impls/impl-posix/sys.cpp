@@ -80,7 +80,7 @@ Res<Sys::Path> resolve(Sys::Url url) {
     if (Op::eq(url.scheme, "file")) {
         resolved = url.path;
     } else if (Op::eq(url.scheme, "bundle")) {
-        auto *maybeRepo = getenv("OSDK_BUILDDIR");
+        auto *maybeRepo = getenv("CK_BUILDDIR");
 
         if (not maybeRepo)
             maybeRepo = getenv("SKIFT_BUNDLES");

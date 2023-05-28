@@ -29,6 +29,7 @@
 
 # Table of Contents
 
+- [**skiftOS**: The delightful operating system](#skiftos-the-delightful-operating-system)
 - [Table of Contents](#table-of-contents)
 - [Introduction](#introduction)
   - [Values](#values)
@@ -38,6 +39,8 @@
   - [Building](#building)
   - [Contributing](#contributing)
 - [Acknowledgements](#acknowledgements)
+  - [Contributors](#contributors)
+  - [Projects](#projects)
 - [License](#license)
 
 # Introduction
@@ -105,41 +108,41 @@ $ python3 --version
 Python 3.10.5
 ```
 
-Building skiftOS also requires installing [osdk](https://github.com/devse-org/osdk):
+Building skiftOS also requires installing [CuteKit](https://github.com/cute-enginnering/cutekit)
 
-> OSDK is a package manager and build system for C/C++/ASM/RUST projects. It is designed to meet the needs of hobby operating systems and other low-level projects.
+> CuteKit is a package manager and build system for C/C++/ASM/RUST projects. It is designed to meet the needs of hobby operating systems and other low-level projects.
 
 ```sh
-$ git clone https://github.com/devse-org/osdk
+$ git clone https://github.com/cute-enginnering/cutekit
 
-$ cd osdk
+$ cd cutekit
 
 $ pip install --user -e .
 ```
 
-Once you have installed osdk, you can install the dependencies and build the operating system:
+Once you have installed CuteKit, you can install the dependencies and build the operating system:
 
 ```sh
-$ osdk install
+$ ck install
 
-$ osdk build --all
+$ ck build --all
 ```
 
 Finally, you can run the operating system using:
 
 ```sh
-$ osdk start
+$ ck start
 ```
 
-> After pulling new changes, you can run `osdk clean` to remove the build artifacts and `osdk build --all` to rebuild the operating system.
+> After pulling new changes, you can run `ck clean` to remove the build artifacts and `ck build --all` to rebuild the operating system.
 
 Individual components can be run on the host system using:
 
 ```sh
-$ osdk run <component>
+$ ck run <component>
 ```
 
-> Use `osdk help` to get more information about the available commands.
+> Use `ck help` to get more information about the available commands.
 
 ## Contributing
 

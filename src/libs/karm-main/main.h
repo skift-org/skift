@@ -6,16 +6,16 @@
 
 #define __KARM_MAIN_INCLUDED
 
-#if defined(__osdk_sys_linux__)
+#if defined(__ck_sys_linux__)
 #    define EMBED_POSIX_MAIN_IMPL
 #    include <impl-posix/main.h>
-#elif defined(__osdk_sys_skift__)
+#elif defined(__ck_sys_skift__)
 // Nothing to do, skift uses the entryPoint directly.
 #    include "base.h"
 
 // Some code expect the karm-sys/chan.h to be included.
 #    include <karm-sys/chan.h>
-#elif defined(__osdk_sys_efi__)
+#elif defined(__ck_sys_efi__)
 #    define EMBED_EFI_MAIN_IMPL
 #    include <impl-efi/main.h>
 #else

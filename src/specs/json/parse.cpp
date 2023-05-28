@@ -141,7 +141,7 @@ Res<Value> parse(Text::Scan &s) {
     } else if (s.skip("false")) {
         return Ok(Value{false});
     } else if (s.peek() == '-' or (s.peek() >= '0' and s.peek() <= '9')) {
-#ifdef __osdk_freestanding__
+#ifdef __ck_freestanding__
         return Ok(Value{(Number)try$(s.nextInt())});
 #else
         return Ok(Value{try$(s.nextFloat())});

@@ -1,5 +1,5 @@
-from osdk.cmds import Cmd, append
-from osdk.args import Args
+from cutekit.cmds import Cmd, append
+from cutekit.args import Args
 import random
 
 

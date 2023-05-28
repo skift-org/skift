@@ -2,7 +2,7 @@
 
 namespace Hj {
 
-#ifdef __osdk_arch_x86_64__
+#ifdef __ck_arch_x86_64__
 
 Res<> _syscall(Syscall s, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4 = 0, Arg a5 = 0) {
     // s : rax, arg1 : rdi, arg2 : rsi, arg3 : rdx, arg4 : r10, arg5 : r8, arg6 : r9

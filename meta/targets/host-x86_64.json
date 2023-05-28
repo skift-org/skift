@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schemas.cute.engineering/stable/osdk.manifest.target.v1",
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.target.v1",
     "id": "host-x86_64",
     "type": "target",
     "props": {

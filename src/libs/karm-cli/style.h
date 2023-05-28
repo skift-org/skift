@@ -137,7 +137,7 @@ inline auto styled(auto inner, Style style) {
 template <>
 struct Karm::Fmt::Formatter<Karm::Cli::Style> {
     Res<usize> format(Io::TextWriter &writer, Karm::Cli::Style style) {
-#ifdef __osdk_karm_cli_backend_ansi__
+#ifdef __ck_karm_cli_backend_ansi__
         usize written = 0;
 
         if (style._reset) {
@@ -195,7 +195,7 @@ struct Karm::Fmt::Formatter<Karm::Cli::Styled<T>> {
     }
 
     Res<usize> format(Io::TextWriter &writer, Karm::Cli::Styled<T> const &styled) {
-#ifdef __osdk_karm_cli_backend_ansi__
+#ifdef __ck_karm_cli_backend_ansi__
         return Ok(try$(_styleFmt.format(writer, styled._color)) +
                   try$(_innerFmt.format(writer, styled._inner)) +
                   try$(writer.writeStr("\x1b[0m")));

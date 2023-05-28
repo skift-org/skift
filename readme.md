@@ -125,26 +125,26 @@ $ pip install --user -e .
 Once you have installed CuteKit, you can install the dependencies and build the operating system:
 
 ```sh
-$ ck install
+$ cutekit install
 
-$ ck build --all
+$ cutekit build --all
 ```
 
 Finally, you can run the operating system using:
 
 ```sh
-$ ck start
+$ cutekit start
 ```
 
-> After pulling new changes, you can run `ck clean` to remove the build artifacts and `ck build --all` to rebuild the operating system.
+> After pulling new changes, you can run `cutekit clean` to remove the build artifacts and `cutekit build` to rebuild the operating system.
 
 Individual components can be run on the host system using:
 
 ```sh
-$ ck run <component>
+$ cutekit run <component>
 ```
 
-> Use `ck help` to get more information about the available commands.
+> Use `cutekit help` to get more information about the available commands.
 
 ## Contributing
 

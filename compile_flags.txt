@@ -9,12 +9,13 @@
 
 -Isrc/apps
 -Isrc/clis
+-Isrc/srvs
 -Isrc/embed
 -Isrc/kernel
 -Isrc/libs
 -Isrc/specs
 -Isrc/impls
--I.ck/extern/cute-engineering
+-I.cutekit/extern/cute-engineering
 
 -D__ck_sys_linux__
 -D__ck_arch_x86_64__

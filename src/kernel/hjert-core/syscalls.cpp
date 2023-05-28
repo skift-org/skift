@@ -101,14 +101,23 @@ Res<> doStart(Task &self, Hj::Cap cap, usize ip, usize sp, User<Hj::Args const> 
     return Ok();
 }
 
-Res<> doMap(Task &self, Hj::Cap cap, User<usize> virt, Hj::Cap vmo, usize off, usize len, Hj::MapFlags flags) {
+Res<> doMap(Task &self, Hj::Cap cap, User<usize> virt, Hj::Cap vmo, usize off, User<usize> len, Hj::MapFlags flags) {
     auto vmoObj = try$(self.domain().get<VNode>(vmo));
     auto spaceObj = cap.isRoot()
                         ? try$(self._space)
                         : try$(self.domain().get<Space>(cap));
 
-    auto vaddr = try$(spaceObj->map({try$(virt.load(self.space())), len}, vmoObj, off, flags)).start;
-    return virt.store(self.space(), vaddr);
+    auto vrange = Hal::VmmRange{
+        try$(virt.load(self.space())),
+        try$(len.load(self.space())),
+    };
+
+    vrange = try$(spaceObj->map(vrange, vmoObj, off, flags));
+
+    try$(virt.store(self.space(), vrange.start));
+    try$(len.store(self.space(), vrange.size));
+
+    return Ok();
 }
 
 Res<> doUnmap(Task &self, Hj::Cap cap, usize virt, usize len) {
@@ -192,46 +201,46 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
         return doLog(self, {args[0], args[1]});
 
     case Hj::Syscall::CREATE:
-        return doCreate(self, Hj::Cap{args[0]}, args[1], args[2]);
+        return doCreate(self, args[0], args[1], args[2]);
 
     case Hj::Syscall::LABEL:
-        return doLabel(self, Hj::Cap{args[0]}, {args[1], args[2]});
+        return doLabel(self, args[0], {args[1], args[2]});
 
     case Hj::Syscall::DROP:
-        return doDrop(self, Hj::Cap{args[0]});
+        return doDrop(self, args[0]);
 
     case Hj::Syscall::DUP:
-        return doDup(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]});
+        return doDup(self, args[0], args[1], args[2]);
 
     case Hj::Syscall::START:
-        return doStart(self, Hj::Cap{args[0]}, args[1], args[2], args[3]);
+        return doStart(self, args[0], args[1], args[2], args[3]);
 
     case Hj::Syscall::MAP:
-        return doMap(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]}, args[3], args[4], (Hj::MapFlags)args[5]);
+        return doMap(self, args[0], args[1], args[2], args[3], args[4], (Hj::MapFlags)args[5]);
 
     case Hj::Syscall::UNMAP:
-        return doUnmap(self, Hj::Cap{args[0]}, args[1], args[2]);
+        return doUnmap(self, args[0], args[1], args[2]);
 
     case Hj::Syscall::IN:
-        return doIn(self, Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], args[3]);
+        return doIn(self, args[0], (Hj::IoLen)args[1], args[2], args[3]);
 
     case Hj::Syscall::OUT:
-        return doOut(self, Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], args[3]);
+        return doOut(self, args[0], (Hj::IoLen)args[1], args[2], args[3]);
 
     case Hj::Syscall::SEND:
-        return doSend(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]});
+        return doSend(self, args[0], args[1], args[2]);
 
     case Hj::Syscall::RECV:
-        return doRecv(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]});
+        return doRecv(self, args[0], args[1], args[2]);
 
     case Hj::Syscall::CLOSE:
-        return doClose(self, Hj::Cap{args[0]});
+        return doClose(self, args[0]);
 
     case Hj::Syscall::SIGNAL:
-        return doSignal(self, Hj::Cap{args[0]}, (Hj::Sigs)args[1], (Hj::Sigs)args[2]);
+        return doSignal(self, args[0], (Hj::Sigs)args[1], (Hj::Sigs)args[2]);
 
     case Hj::Syscall::WATCH:
-        return doWatch(self, Hj::Cap{args[0]}, Hj::Cap{args[1]}, (Hj::Sigs)args[2], (Hj::Sigs)args[3]);
+        return doWatch(self, args[0], args[1], (Hj::Sigs)args[2], (Hj::Sigs)args[3]);
 
     case Hj::Syscall::LISTEN:
         return doListen(self, args[0], {args[1], args[2]}, args[3]);
@@ -244,6 +253,7 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
 Res<> doSyscall(Hj::Syscall id, Hj::Args args) {
     auto &self = Task::self();
     self.enterSupervisorMode();
+    logDebug("Syscall {}({}) params: {}", Hj::toStr(id), (Hj::Arg)id, args);
     auto res = dispatchSyscall(self, id, args);
     if (not res) {
         logError("Syscall {}({}) failed: {}", Hj::toStr(id), (Hj::Arg)id, res.none().msg());

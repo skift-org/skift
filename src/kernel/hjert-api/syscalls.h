@@ -16,7 +16,7 @@ Res<> _dup(Cap node, Cap *dst, Cap src);
 
 Res<> _start(Cap cap, usize ip, usize sp, Args const *args);
 
-Res<> _map(Cap cap, usize *virt, Cap vmo, usize off, usize len, MapFlags flags = MapFlags::NONE);
+Res<> _map(Cap cap, usize *virt, Cap vmo, usize off, usize *len, MapFlags flags = MapFlags::NONE);
 
 Res<> _unmap(Cap cap, usize virt, usize len);
 

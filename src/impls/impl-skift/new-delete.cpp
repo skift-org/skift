@@ -12,11 +12,11 @@ static constinit Heap _heapImpl = {
         vmo.label("reserve").unwrap();
 
         auto space = Hj::Space::self();
-        return (void *)space.map(vmo, 0, size, Hj::MapFlags::READ | Hj::MapFlags::WRITE).unwrap();
+        return (void *)space.map(vmo, 0, size, Hj::MapFlags::READ | Hj::MapFlags::WRITE).unwrap().start;
     },
     .free = [](void *, void *ptr, usize size) -> void {
         auto space = Hj::Space::self();
-        space.unmap((usize)ptr, size).unwrap();
+        space.unmap({(usize)ptr, size}).unwrap();
     },
     .log = [](void *, enum HeapLogType type, char const *msg, va_list) -> void {
         if (type == HEAP_ERROR)

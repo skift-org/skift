@@ -121,27 +121,72 @@ struct Space : public Object {
         return create<Space>(dest);
     }
 
-    Res<usize> map(usize virt, Cap vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
-        try$(_map(_cap, &virt, vmo, off, len, flags));
-        return Ok(virt);
+    Res<USizeRange> map(usize virt, Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+        try$(_map(_cap, &virt, vmo, off, &len, flags));
+        return Ok(USizeRange{virt, len});
     }
 
-    Res<usize> map(Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+    Res<USizeRange> map(Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
         usize virt = 0;
-        try$(_map(_cap, &virt, vmo, off, len, flags));
-        return Ok(virt);
+        try$(_map(_cap, &virt, vmo, off, &len, flags));
+        return Ok(USizeRange{virt, len});
     }
 
-    Res<usize> map(Vmo &vmo, MapFlags flags = MapFlags::NONE) {
+    Res<USizeRange> map(Vmo &vmo, MapFlags flags = MapFlags::NONE) {
         usize virt = 0;
-        try$(_map(_cap, &virt, vmo, 0, 0, flags));
-        return Ok(virt);
+        usize len = 0;
+        try$(_map(_cap, &virt, vmo, 0, &len, flags));
+        return Ok(USizeRange{virt, len});
     }
 
-    Res<> unmap(usize virt, usize len) {
-        return _unmap(_cap, virt, len);
+    Res<> unmap(USizeRange range) {
+        return _unmap(_cap, range.start, range.size);
     }
 };
+
+struct Mapped {
+    usize _addr;
+    usize _len;
+
+    Mapped(usize addr, usize len)
+        : _addr(addr), _len(len) {}
+
+    Mapped(Mapped const &) = delete;
+
+    Mapped(Mapped &&other)
+        : _addr(std::exchange(other._addr, {})),
+          _len(std::exchange(other._len, {})) {
+    }
+
+    ~Mapped() {
+        if (_addr)
+            Space::self().unmap(range()).unwrap();
+    }
+
+    USizeRange range() const { return {_addr, _len}; }
+
+    MutBytes mutBytes() { return {reinterpret_cast<u8 *>(_addr), _len}; }
+
+    Bytes bytes() const { return {reinterpret_cast<u8 const *>(_addr), _len}; }
+};
+
+static inline Res<Mapped> map(usize virt, Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+    try$(_map(Space::self(), &virt, vmo, off, &len, flags));
+    return Ok(Mapped{virt, len});
+}
+
+static inline Res<Mapped> map(Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+    usize virt = 0;
+    try$(_map(Space::self(), &virt, vmo, off, &len, flags));
+    return Ok(Mapped{virt, len});
+}
+
+static inline Res<Mapped> map(Vmo &vmo, MapFlags flags = MapFlags::NONE) {
+    usize virt = 0;
+    usize len = 0;
+    try$(_map(Space::self(), &virt, vmo, 0, &len, flags));
+    return Ok(Mapped{virt, len});
+}
 
 struct Io : public Object {
     using PROPS = IoProps;

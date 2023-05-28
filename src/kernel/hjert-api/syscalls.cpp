@@ -50,8 +50,8 @@ Res<> _start(Cap cap, usize ip, usize sp, Args const *args) {
     return _syscall(Syscall::START, cap.raw(), ip, sp, (Arg)args);
 }
 
-Res<> _map(Cap cap, usize *virt, Cap mem, usize off, usize len, MapFlags flags) {
-    return _syscall(Syscall::MAP, cap.raw(), (Arg)virt, mem.raw(), off, len, (Arg)flags);
+Res<> _map(Cap cap, usize *virt, Cap vmo, usize off, usize *len, MapFlags flags) {
+    return _syscall(Syscall::MAP, cap.raw(), (Arg)virt, vmo.raw(), off, (Arg)len, (Arg)flags);
 }
 
 Res<> _unmap(Cap cap, usize virt, usize len) {

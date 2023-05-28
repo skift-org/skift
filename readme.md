@@ -108,14 +108,16 @@ $ python3 --version
 Python 3.10.5
 ```
 
-Building skiftOS also requires installing [CuteKit](https://github.com/cute-enginnering/cutekit)
+Building skiftOS also requires installing [CuteKit](https://github.com/cute-engineering/cutekit)
 
 > CuteKit is a package manager and build system for C/C++/ASM/RUST projects. It is designed to meet the needs of hobby operating systems and other low-level projects.
 
 ```sh
-$ git clone https://github.com/cute-enginnering/cutekit
+$ git clone https://github.com/cute-engineering/cutekit
 
 $ cd cutekit
+
+$ git switch dev
 
 $ pip install --user -e .
 ```

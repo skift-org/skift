@@ -1,13 +1,13 @@
 <br/>
 <br/>
 <br/>
-<br/>
-<br/>
 
 <p align="center">
-  <img src="doc/logo-light.svg#gh-light-mode-only" height="96" />
-  <img src="doc/logo-dark.svg#gh-dark-mode-only" height="96" />
+  <img src="doc/logo-light.svg#gh-light-mode-only" height="64" />
+  <img src="doc/logo-dark.svg#gh-dark-mode-only" height="64" />
 </p>
+
+<br/>
 
 <p align="center">
   <a href="https://skiftos.org/">Website</a> -
@@ -15,8 +15,6 @@
   <a href="https://github.com/skiftOS/skift/releases">Releases</a>
 </p>
 
-<br/>
-<br/>
 <br/>
 <br/>
 <br/>

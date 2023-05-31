@@ -19,11 +19,10 @@ Ui::Child indicator(Media::Icon icon) {
 
 Ui::Child statusbar() {
     return Ui::hflow(
-               4,
-               Ui::text(Ui::TextStyle::labelMedium(), "22:07") | Ui::center(),
+               Ui::text(Ui::TextStyle::labelLarge(), "22:07") | Ui::center(),
                Ui::grow(NONE),
-               indicator(Mdi::NETWORK_STRENGTH_4),
                indicator(Mdi::WIFI_STRENGTH_4),
+               indicator(Mdi::NETWORK_STRENGTH_4),
                indicator(Mdi::BATTERY)) |
            Ui::minSize({Ui::UNCONSTRAINED, 36}) |
            Ui::box({.padding = {12, 0}, .backgroundPaint = Gfx::ZINC900});

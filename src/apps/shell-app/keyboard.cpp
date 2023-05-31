@@ -6,6 +6,27 @@
 
 namespace Shell {
 
+struct Keyboard {
+    bool shift = true;
+};
+
+struct ToggleShift {
+};
+
+using KeyboardAction = Var<ToggleShift>;
+
+Keyboard reduce(Keyboard k, KeyboardAction a) {
+    return a.visit(
+        Visitor{
+            [&](ToggleShift) {
+                k.shift = !k.shift;
+                return k;
+            },
+        });
+}
+
+using KeyboardModel = Ui::Model<Keyboard, KeyboardAction, reduce>;
+
 static Ui::Child toolbar() {
     return Ui::hflow(
                Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::EMOTICON),
@@ -24,44 +45,44 @@ static Ui::Child key(auto icon) {
     return Ui::button(Ui::NOP, Ui::titleMedium(icon) | Ui::center() | Ui::pinSize(32));
 }
 
-static Ui::Child keyboard() {
+static Ui::Child keyboard(Keyboard const &k) {
     auto firstRow = Ui::hflow(
         8,
-        key("Q"),
-        key("W"),
-        key("E"),
-        key("R"),
-        key("T"),
-        key("Y"),
-        key("U"),
-        key("I"),
-        key("O"),
-        key("P"));
+        key(k.shift ? "Q" : "q"),
+        key(k.shift ? "W" : "w"),
+        key(k.shift ? "E" : "e"),
+        key(k.shift ? "R" : "r"),
+        key(k.shift ? "T" : "t"),
+        key(k.shift ? "Y" : "y"),
+        key(k.shift ? "U" : "u"),
+        key(k.shift ? "I" : "i"),
+        key(k.shift ? "O" : "o"),
+        key(k.shift ? "P" : "p"));
 
     auto secondRow = Ui::hflow(
         8,
         Ui::grow(NONE),
-        key("A"),
-        key("S"),
-        key("D"),
-        key("F"),
-        key("G"),
-        key("H"),
-        key("J"),
-        key("K"),
-        key("L"),
+        key(k.shift ? "A" : "a"),
+        key(k.shift ? "S" : "s"),
+        key(k.shift ? "D" : "d"),
+        key(k.shift ? "F" : "f"),
+        key(k.shift ? "G" : "g"),
+        key(k.shift ? "H" : "h"),
+        key(k.shift ? "J" : "j"),
+        key(k.shift ? "K" : "k"),
+        key(k.shift ? "L" : "l"),
         Ui::grow(NONE));
 
     auto thirdRow = Ui::hflow(
         8,
-        Ui::button(Ui::NOP, Ui::ButtonStyle::secondary(), Mdi::APPLE_KEYBOARD_SHIFT) | Ui::grow(),
-        key("Z"),
-        key("X"),
-        key("C"),
-        key("V"),
-        key("B"),
-        key("N"),
-        key("M"),
+        Ui::button(KeyboardModel::bind<ToggleShift>(), Ui::ButtonStyle::secondary(), k.shift ? Mdi::ARROW_UP_BOLD : Mdi::ARROW_UP_BOLD_OUTLINE) | Ui::grow(),
+        key(k.shift ? "Z" : "z"),
+        key(k.shift ? "X" : "x"),
+        key(k.shift ? "C" : "c"),
+        key(k.shift ? "V" : "v"),
+        key(k.shift ? "B" : "b"),
+        key(k.shift ? "N" : "n"),
+        key(k.shift ? "M" : "m"),
         Ui::button(Ui::NOP, Ui::ButtonStyle::secondary(), Mdi::BACKSPACE_OUTLINE) | Ui::grow());
 
     auto fourthRow = Ui::hflow(
@@ -82,23 +103,25 @@ static Ui::Child keyboard() {
 }
 
 Ui::Child keyboardFlyout() {
-    return Ui::vflow(
-               Ui::grow(NONE),
-               Ui::separator(),
-               Ui::vflow(
-                   8,
-                   toolbar(),
-                   keyboard() | Ui::grow()) |
-                   Ui::hcenterFill() |
-                   Ui::minSize({Ui::UNCONSTRAINED, 280}) |
-                   Ui::box({
-                       .padding = 8,
-                       .backgroundPaint = Ui::GRAY950,
-                   })) |
-           Ui::dismisable(
-               Ui::closeDialog,
-               Ui::DismisDir::DOWN,
-               0.15);
+    return Ui::reducer<KeyboardModel>({}, [](auto &k) {
+        return Ui::vflow(
+                   Ui::grow(NONE),
+                   Ui::separator(),
+                   Ui::vflow(
+                       8,
+                       toolbar(),
+                       keyboard(k) | Ui::grow()) |
+                       Ui::hcenterFill() |
+                       Ui::minSize({Ui::UNCONSTRAINED, 280}) |
+                       Ui::box({
+                           .padding = 8,
+                           .backgroundPaint = Ui::GRAY950,
+                       })) |
+               Ui::dismisable(
+                   Ui::closeDialog,
+                   Ui::DismisDir::DOWN,
+                   0.15);
+    });
 }
 
 } // namespace Shell

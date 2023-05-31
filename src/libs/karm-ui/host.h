@@ -100,7 +100,6 @@ struct PerfGraph {
 };
 
 struct Host : public Node {
-
     Child _root;
     Opt<Res<>> _res;
     Gfx::Context _g;

@@ -60,7 +60,6 @@ struct Scroll : public ProxyNode<Scroll> {
         } else if (e.is<Events::AnimateEvent>() and _animated) {
             shouldRepaint(*parent(), bound());
 
-            // Same as _scroll = _scroll + (_targetScroll - _scroll) * 0.2; but frame rate independent
             _scroll = _scroll + (_targetScroll - _scroll) * (e.unwrap<Events::AnimateEvent>().dt * 20);
 
             if (_scroll.dist(_targetScroll) < 0.5) {

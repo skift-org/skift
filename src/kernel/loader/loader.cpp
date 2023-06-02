@@ -21,7 +21,7 @@ Res<> loadEntry(Entry const &entry) {
     logInfo("loader: payload at vaddr: 0x{x} paddr: 0x{x}", payloadMem.vaddr(), payloadMem.paddr());
     Handover::Builder payload{payloadMem.mutBytes()};
 
-    payload.agent("skift loader");
+    payload.agent("opstart");
     payload.add(Handover::SELF, 0, payloadMem.prange());
 
     logInfo("loader: loading kernel file...");
@@ -37,7 +37,7 @@ Res<> loadEntry(Entry const &entry) {
     }
 
     logInfo("loader: setting up stack...");
-    auto stackMap = try$(Sys::mmap().stack().size(kib(16)).mapMut());
+    auto stackMap = try$(Sys::mmap().stack().size(Hal::PAGE_SIZE * 16).mapMut());
     payload.add(Handover::STACK, 0, stackMap.prange());
     logInfo("loader: stack at vaddr: 0x{x} paddr: 0x{x}", stackMap.vaddr(), stackMap.paddr());
 

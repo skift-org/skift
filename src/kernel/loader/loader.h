@@ -54,7 +54,7 @@ struct Entry {
         }
 
         entry.name = try$(json.get("name").take<String>());
-        auto kernelJson = try$(json.get("kernel").take<Json::Object>());
+        auto kernelJson = json.get("kernel");
         entry.kernel = try$(Blob::fromJson(kernelJson));
 
         auto blobsJson = try$(json.get("blobs").take<Json::Array>());

@@ -5,10 +5,7 @@
         {
             "icon": "cellphone",
             "name": "Mobile",
-            "kernel": {
-                "url": "bundle://hjert/_bin",
-                "props": {}
-            },
+            "kernel": "bundle://hjert/_bin",
             "blobs": [
                 "bundle://system-srv/_bin",
                 {
@@ -22,10 +19,7 @@
         {
             "icon": "laptop",
             "name": "Desktop",
-            "kernel": {
-                "url": "bundle://hjert/_bin",
-                "props": {}
-            },
+            "kernel": "bundle://hjert/_bin",
             "blobs": [
                 "bundle://system-srv/_bin",
                 {
@@ -39,9 +33,7 @@
         {
             "icon": "console",
             "name": "Headless",
-            "kernel": {
-                "url": "bundle://hjert/_bin"
-            },
+            "kernel": "bundle://hjert/_bin",
             "blobs": [
                 "bundle://system-srv/_bin"
             ]

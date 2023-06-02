@@ -152,7 +152,7 @@ Ui::Child menu(Configs const &c) {
                        Ui::titleLarge(Ui::GRAY400, s.configs.subtitle ? *s.configs.subtitle : "Select an operating system"),
                        list(s) | Ui::grow(4),
                        Ui::labelMedium("Use the [ARROW KEYS] to navigate, and press [ENTER] to select an entry."),
-                       Ui::labelLarge(Ui::GRAY500, "Powered by opstart")) |
+                       Ui::labelSmall(Ui::GRAY500, "Powered by Opstart ►")) |
                    Ui::spacing(64);
         });
 }

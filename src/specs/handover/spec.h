@@ -58,7 +58,6 @@ inline bool shouldMerge(Tag tag) {
     switch (tag) {
     case Tag::FREE:
     case Tag::LOADER:
-    case Tag::KERNEL:
     case Tag::RESERVED:
         return true;
 

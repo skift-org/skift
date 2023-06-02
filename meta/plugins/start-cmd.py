@@ -162,7 +162,8 @@ class QemuSystemAmd64(Machine):
             qemuCmd += ["-s", "-S"]
 
         if kvmAvailable():
-            qemuCmd += ["-enable-kvm"]
+            if not self.logError:
+                qemuCmd += ["-enable-kvm"]
         else:
             print("KVM not available, using QEMU-TCG")
 
@@ -173,6 +174,7 @@ def bootCmd(args: Args) -> None:
     project.chdir()
 
     isDebug = args.consumeOpt("debug", False)
+    isErrorLog = args.consumeOpt("dint", False)
     image = Image("efi-x86_64")
 
     image.mkdir("objects")
@@ -190,7 +192,7 @@ def bootCmd(args: Args) -> None:
     image.cpTree("meta/image/boot", "boot/")
 
     machine = QemuSystemAmd64(
-        logError=False, useDebug=isDebug)
+        logError=isErrorLog, useDebug=isDebug)
     machine.boot(image)
 
 

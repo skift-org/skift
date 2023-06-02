@@ -6,6 +6,12 @@
 
 namespace Hj {
 
+inline Res<TimeStamp> now() {
+    TimeStamp ts;
+    try$(_now(&ts));
+    return Ok(ts);
+}
+
 inline Res<usize> log(Str msg) {
     try$(_log(msg.buf(), msg.len()));
     return Ok(msg.len());
@@ -145,8 +151,8 @@ struct Space : public Object {
 };
 
 struct Mapped {
-    usize _addr;
-    usize _len;
+    usize _addr{};
+    usize _len{};
 
     Mapped(usize addr, usize len)
         : _addr(addr), _len(len) {}

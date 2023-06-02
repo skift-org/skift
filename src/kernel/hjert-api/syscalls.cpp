@@ -24,6 +24,10 @@ Res<> _syscall(Syscall s, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4
 #    error "Unsupported architecture"
 #endif
 
+Res<> _now(TimeStamp *ts) {
+    return _syscall(Syscall::NOW, (Arg)ts);
+}
+
 Res<> _log(char const *msg, usize len) {
     return _syscall(Syscall::LOG, (Arg)msg, len);
 }

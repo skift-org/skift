@@ -10,6 +10,10 @@
 
 namespace Hjert::Core {
 
+Res<> doNow(Task &self, User<TimeStamp> ts) {
+    return ts.store(self.space(), Sched::instance()._stamp);
+}
+
 Res<> doLog(Task &self, UserSlice<char const> msg) {
     return msg.with<Str>(self.space(), [&](Str str) -> Res<> {
         struct LoggerScope {
@@ -197,6 +201,9 @@ Res<> doListen(Task &self, Hj::Cap cap, UserSlice<Hj::Event> events, TimeStamp d
 
 Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
     switch (id) {
+    case Hj::Syscall::NOW:
+        return doNow(self, args[0]);
+
     case Hj::Syscall::LOG:
         return doLog(self, {args[0], args[1]});
 

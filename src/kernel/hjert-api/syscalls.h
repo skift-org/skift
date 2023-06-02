@@ -4,6 +4,8 @@
 
 namespace Hj {
 
+Res<> _now(TimeStamp *ts);
+
 Res<> _log(char const *msg, usize len);
 
 Res<> _create(Cap dest, Cap *cap, Props const *props);

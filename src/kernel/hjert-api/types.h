@@ -43,6 +43,7 @@ static inline char const *toStr(Type type) {
 
 #define FOREACH_SYSCALL(SYSCALL) \
     SYSCALL(NONE)                \
+    SYSCALL(NOW)                 \
     SYSCALL(LOG)                 \
     SYSCALL(CREATE)              \
     SYSCALL(LABEL)               \

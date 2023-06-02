@@ -222,6 +222,7 @@ struct Host : public Node {
 
     Res<> run() {
         layout(bound());
+        _dirty.pushBack(bound());
         paint();
         auto lastFrame = Sys::now();
         while (not _res) {

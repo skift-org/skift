@@ -193,7 +193,7 @@ struct Text : public View<Text> {
         g.save();
 
         auto m = mesure();
-        auto baseline = bound().topStart() + m.baseline.cast<isize>();
+        auto baseline = bound().topStart() + m.baseline;
 
         if (_style.color) {
             g.fillStyle(*_style.color);

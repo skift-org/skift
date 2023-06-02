@@ -295,7 +295,7 @@ void Context::fill(Math::Vec2i pos, Media::Icon icon) {
     icon.fill(*this, pos);
 }
 
-void Context::stroke(Math::Vec2i baseline, Rune rune) {
+void Context::stroke(Math::Vec2f baseline, Rune rune) {
     auto f = textFont();
 
     save();
@@ -307,7 +307,7 @@ void Context::stroke(Math::Vec2i baseline, Rune rune) {
     restore();
 }
 
-void Context::fill(Math::Vec2i baseline, Rune rune) {
+void Context::fill(Math::Vec2f baseline, Rune rune) {
     auto f = textFont();
 
     save();
@@ -319,7 +319,7 @@ void Context::fill(Math::Vec2i baseline, Rune rune) {
     restore();
 }
 
-void Context::stroke(Math::Vec2i baseline, Str str) {
+void Context::stroke(Math::Vec2f baseline, Str str) {
     auto f = textFont();
     for (auto r : iterRunes(str)) {
         stroke(baseline, r);
@@ -327,7 +327,7 @@ void Context::stroke(Math::Vec2i baseline, Str str) {
     }
 }
 
-void Context::fill(Math::Vec2i baseline, Str str) {
+void Context::fill(Math::Vec2f baseline, Str str) {
     auto f = textFont();
     for (auto r : iterRunes(str)) {
         fill(baseline, r);

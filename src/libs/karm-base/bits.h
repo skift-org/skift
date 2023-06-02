@@ -50,9 +50,11 @@ struct Bits {
         }
 
         BitsRange range = {};
-        isize offset = upper ? -1 : 1;
 
-        for (usize i = start; (upper ? i > 0 : i < len()); i += offset) {
+        for (usize i = start;
+             upper ? i > 0 : i < len();
+             i += upper ? -1 : 1) {
+
             if (get(i)) {
                 range = {};
             } else {

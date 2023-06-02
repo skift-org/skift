@@ -48,6 +48,10 @@ struct Path {
         return ::iter(_parts);
     }
 
+    auto operator[](usize i) const {
+        return _parts[i];
+    }
+
     auto len() const {
         return _parts.len();
     }

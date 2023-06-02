@@ -189,6 +189,12 @@ def bootCmd(args: Args) -> None:
     image.install("shell-app", "skift-x86_64" + (":debug" if isDebug else ""))
     image.install("skift-branding", "skift-x86_64" +
                   (":debug" if isDebug else ""))
+    image.install("skift-wallpapers", "skift-x86_64" +
+                  (":debug" if isDebug else ""))
+    image.install("inter-font", "skift-x86_64" +
+                  (":debug" if isDebug else ""))
+    image.install("mdi-font", "skift-x86_64" +
+                  (":debug" if isDebug else ""))
     image.cpTree("meta/image/boot", "boot/")
 
     machine = QemuSystemAmd64(

@@ -40,10 +40,10 @@ struct Ctx :
 struct ArgsHook :
     public Hook {
 
-    isize _argc;
+    usize _argc;
     char const **_argv;
 
-    ArgsHook(isize argc, char const **argv)
+    ArgsHook(usize argc, char const **argv)
         : _argc(argc), _argv(argv) {}
 
     Str self() const {

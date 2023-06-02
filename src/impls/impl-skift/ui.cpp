@@ -1,32 +1,67 @@
 #include <embed-ui/ui.h>
-
+#include <handover/hook.h>
+#include <hjert-api/api.h>
 namespace Embed {
 
-struct EfiHost :
+struct Host :
     public Ui::Host {
+    Gfx::MutPixels _front;
+    Media::Image _back;
 
-    EfiHost(Ui::Child root)
-        : Ui::Host(root) {
+    Host(Ui::Child root, Gfx::MutPixels front, Media::Image back)
+        : Ui::Host(root),
+          _front(front),
+          _back(back) {
     }
 
     Gfx::MutPixels mutPixels() override {
-        panic("not implemented");
+        return _back;
     }
 
-    void flip(Slice<Math::Recti>) override {
-        panic("not implemented");
+    void flip(Slice<Math::Recti> dirty) override {
+        for (auto d : dirty) {
+            logInfo("flip {}", d);
+            _front.blit(d, _back.pixels());
+        }
     }
 
     void pump() override {
-        panic("not implemented");
     }
 
     void wait(usize) override {
     }
+
+    void bubble(Events::Event &e) override {
+        Ui::Host::bubble(e);
+    }
 };
 
-Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child) {
-    panic("not implemented");
+Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
+    auto &handover = useHandover();
+
+    auto *fb = handover.findTag(Handover::Tag::FB);
+    auto fbVmo = try$(Hj::Vmo::create(Hj::ROOT, fb->start, fb->size, Hj::VmoFlags::DMA));
+    try$(fbVmo.label("framebuffer"));
+    static auto fbRange = try$(Hj::map(fbVmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+
+    logInfo("fb: {x}-{x} {}x{}, {} stride",
+            fbRange.range().start,
+            fbRange.range().end(),
+            fb->fb.width,
+            fb->fb.height,
+            fb->fb.pitch);
+
+    Gfx::MutPixels front = {
+        fbRange.mutBytes().buf(),
+        {fb->fb.width, fb->fb.height},
+        fb->fb.pitch,
+        Gfx::BGRA8888,
+    };
+
+    auto back = Media::Image::alloc(
+        front.size(), Gfx::BGRA8888);
+
+    return Ok(makeStrong<Host>(std::move(root), front, back));
 }
 
 } // namespace Embed

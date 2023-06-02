@@ -9,8 +9,9 @@
 Res<> loadService(Ctx &ctx, Sys::Url url) {
     logInfo("system: loading service '{}'...", url);
 
+    auto &handover = useHandover(ctx);
     auto urlStr = try$(url.str());
-    auto *elf = useHandover(ctx).fileByName(urlStr.buf());
+    auto *elf = handover.fileByName(urlStr.buf());
     if (not elf) {
         logError("system: service '{}' not found", url);
         return Error::invalidFilename();
@@ -60,11 +61,17 @@ Res<> loadService(Ctx &ctx, Sys::Url url) {
     auto domain = try$(Hj::Domain::create(Hj::ROOT));
     auto task = try$(Hj::Task::create(Hj::ROOT, domain, elfSpace));
 
+    logInfo("system: mapping handover...");
+    auto const *handoverRecord = handover.findTag(Handover::Tag::SELF);
+    auto handoverVmo = try$(Hj::Vmo::create(Hj::ROOT, handoverRecord->start, handoverRecord->end(), Hj::VmoFlags::DMA));
+    try$(handoverVmo.label("handover"));
+    auto handoverVrange = try$(elfSpace.map(0, handoverVmo, 0, 0, Hj::MapFlags::READ));
+
     // NOTE: -2 because we want the name of the service, not the binary
     try$(task.label(url.host));
 
     logInfo("system: starting the task...");
-    try$(task.start(image.header().entry, stackRange.end(), {}));
+    try$(task.start(image.header().entry, stackRange.end(), {handoverVrange.start}));
 
     return Ok();
 }

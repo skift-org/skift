@@ -228,16 +228,16 @@ struct Context {
     void fill(Math::Vec2i pos, Media::Icon icon);
 
     // Stroke a text rune
-    void stroke(Math::Vec2i baseline, Rune rune);
+    void stroke(Math::Vec2f baseline, Rune rune);
 
     // Fill a text rune
-    void fill(Math::Vec2i baseline, Rune rune);
+    void fill(Math::Vec2f baseline, Rune rune);
 
     // Stroke a text string
-    void stroke(Math::Vec2i baseline, Str str);
+    void stroke(Math::Vec2f baseline, Str str);
 
     // Fill a text string
-    void fill(Math::Vec2i baseline, Str str);
+    void fill(Math::Vec2f baseline, Str str);
 
     /* --- Debug ------------------------------------------------------------ */
     // These functions are mostly for debugging purposes. They let you draw

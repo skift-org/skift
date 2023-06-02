@@ -72,7 +72,7 @@ struct NumberFormater {
         };
         usize i = 0;
         Array<char, 128> buf;
-#
+
         do {
             buf[i++] = digit(value % base);
             value /= base;

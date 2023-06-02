@@ -9,7 +9,8 @@ extern "C" void __entryPoint(usize ho) {
     Handover::Payload *payload = (Handover::Payload *)ho;
 
     Ctx ctx;
-    ctx.add<ArgsHook>(0, nullptr);
+    char const *argv[] = {"service", nullptr};
+    ctx.add<ArgsHook>(1, argv);
     ctx.add<HandoverHook>(payload);
 
     auto res = entryPoint(ctx);

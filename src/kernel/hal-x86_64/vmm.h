@@ -88,6 +88,7 @@ struct Vmm : public Hal::Vmm {
         for (usize page = 0; page < vaddr.size; page += Hal::PAGE_SIZE) {
             try$(allocPage(vaddr.start + page, paddr.start + page, flags));
         }
+
         return Ok(vaddr);
     }
 
@@ -113,24 +114,61 @@ struct Vmm : public Hal::Vmm {
         x86_64::wrcr3(root());
     }
 
+    struct Ctx {
+        usize vstart = -1;
+        usize vend = 0;
+
+        usize pstart = 0;
+        usize pend = 0;
+
+        void next(usize vaddr, usize paddr) {
+            if (vstart == (usize)-1) {
+                vstart = vaddr;
+                vend = vaddr;
+
+                pstart = paddr;
+                pend = paddr;
+                return;
+            }
+
+            if ((vend + Hal::PAGE_SIZE != vaddr) or
+                (pend + Hal::PAGE_SIZE != paddr)) {
+
+                logInfo("x86_64: vmm: {x}-{x} {x}-{x}", vstart, vend, pstart, pend);
+                vstart = vaddr;
+                vend = vaddr;
+
+                pstart = paddr;
+                pend = paddr;
+            } else {
+                vend += Hal::PAGE_SIZE;
+                pend += Hal::PAGE_SIZE;
+            }
+        }
+    };
+
     template <usize L>
-    void _dumpPml(Pml<L> &pml, usize vaddr) {
+    void _dumpPml(Ctx &ctx, Pml<L> &pml, usize vaddr) {
         for (usize i = 0; i < 512; i++) {
             auto page = pml[i];
             usize curr = pml.index2virt(i) | vaddr;
+
             if constexpr (L == 1) {
                 if (page.present()) {
-                    logInfo("x86_64: vmm: {x} {x}", curr, page._raw);
+                    ctx.next(curr, page.paddr());
                 }
             } else if (page.present()) {
                 auto &lower = *_mapper.map(page.template as<Pml<L - 1>>());
-                _dumpPml(lower, curr);
+                _dumpPml(ctx, lower, curr);
             }
         }
     }
 
     void dump() override {
-        _dumpPml(*_pml4, 0);
+        logInfo("x86_64: vmm: dump pml4 {x}", (usize)_pml4);
+        Ctx ctx{};
+        _dumpPml(ctx, *_pml4, 0);
+        ctx.next(0, 0);
     }
 
     usize root() override {

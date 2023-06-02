@@ -5,16 +5,14 @@ namespace Hj {
 #ifdef __ck_arch_x86_64__
 
 Res<> _syscall(Syscall s, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4 = 0, Arg a5 = 0) {
-    // s : rax, arg1 : rdi, arg2 : rsi, arg3 : rdx, arg4 : r10, arg5 : r8, arg6 : r9
     Error::Code c = {};
     register Arg r3 asm("r10") = a3;
     register Arg r4 asm("r8") = a4;
     register Arg r5 asm("r9") = a5;
     asm volatile("syscall"
                  : "=a"(c)
-                 : "a"(s), "D"(a0), "S"(a1), "d"(a2),
-                   "r"(r3), "r"(r4), "r"(r5)
-                 : "rcx", "r11", "memory");
+                 : "a"(s), "D"(a0), "S"(a1), "d"(a2), "r"(r3), "r"(r4), "r"(r5)
+                 : "memory", "r11", "rcx");
 
     if (c != Error::Code::_OK)
         return Error(c);

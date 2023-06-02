@@ -18,7 +18,7 @@ struct Ctx {
 /* --- Stack ---------------------------------------------------------------- */
 
 struct Stack {
-    static constexpr usize DEFAULT_SIZE = kib(16);
+    static constexpr usize DEFAULT_SIZE = kib(64);
 
     static Res<Stack> create();
 

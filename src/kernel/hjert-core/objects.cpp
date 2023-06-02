@@ -15,7 +15,7 @@ void Object::label(Str label) {
     _label = String(label);
 }
 
-Str Object::label() const {
+String Object::label() const {
     return _label ? *_label : "<no label>";
 }
 
@@ -93,26 +93,26 @@ Res<> Domain::drop(Hj::Cap cap) {
 
 /* --- Vmo ------------------------------------------------------------------ */
 
-Res<Strong<VNode>> VNode::alloc(usize size, Hj::VmoFlags) {
+Res<Strong<Vmo>> Vmo::alloc(usize size, Hj::VmoFlags flags) {
     if (size == 0) {
         return Error::invalidInput("size is zero");
     }
 
     try$(ensureAlign(size, Hal::PAGE_SIZE));
-    Hal::PmmMem mem = try$(pmm().allocOwned(size, Hal::PmmFlags::UPPER));
-    return Ok(makeStrong<VNode>(std::move(mem)));
+    Hal::PmmMem mem = try$(pmm().allocOwned(size, flags | Hal::PmmFlags::UPPER));
+    return Ok(makeStrong<Vmo>(std::move(mem)));
 }
 
-Res<Strong<VNode>> VNode::makeDma(Hal::DmaRange prange) {
+Res<Strong<Vmo>> Vmo::makeDma(Hal::DmaRange prange) {
     if (prange.size == 0) {
         return Error::invalidInput("size is zero");
     }
 
     try$(prange.ensureAligned(Hal::PAGE_SIZE));
-    return Ok(makeStrong<VNode>(prange));
+    return Ok(makeStrong<Vmo>(prange));
 }
 
-Hal::PmmRange VNode::range() {
+Hal::PmmRange Vmo::range() {
     return _mem.visit(
         Visitor{
             [](Hal::PmmMem const &mem) {
@@ -131,7 +131,7 @@ Res<Strong<Space>> Space::create() {
 }
 
 Space::Space(Strong<Hal::Vmm> vmm) : _vmm(vmm) {
-    _alloc.unused({0x400000, 0x800000000000});
+    _alloc.unused({Hal::PAGE_SIZE, 0x800000000000});
 }
 
 Space::~Space() {
@@ -152,7 +152,18 @@ Res<usize> Space::_lookup(Hal::VmmRange vrange) {
     return Error::invalidInput("no such mapping");
 }
 
-Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> vmo, usize off, Hj::MapFlags flags) {
+bool Space::_alreadyMapped(Hal::VmmRange vrange) {
+    for (usize i = 0; i < _maps.len(); i++) {
+        auto &map = _maps[i];
+        if (map.vrange.overlaps(vrange)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<Vmo> vmo, usize off, Hj::MapFlags flags) {
     ObjectLockScope scope(*this);
 
     try$(vrange.ensureAligned(Hal::PAGE_SIZE));
@@ -170,13 +181,17 @@ Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<VNode> vmo, usize off
     if (vrange.start == 0) {
         vrange = try$(_alloc.alloc(vrange.size));
     } else {
+        if (_alreadyMapped(vrange)) {
+            return Error::invalidInput("already mapped");
+        }
         _alloc.used(vrange);
     }
 
-    auto map = Map{vrange, off, std::move(vmo)};
+    Map map = {vrange, off, std::move(vmo)};
 
-    try$(vmm().mapRange(map.vrange, {map.vmo->range().start + map.off, vrange.size}, flags | Hal::VmmFlags::USER));
-    try$(vmm().flush(map.vrange));
+    Hal::PmmRange prange = {map.vmo->range().start + map.off, vrange.size};
+    try$(_vmm->mapRange(map.vrange, prange, flags | Hal::VmmFlags::USER));
+    try$(_vmm->flush(map.vrange));
 
     _maps.pushBack(std::move(map));
 
@@ -191,8 +206,8 @@ Res<> Space::unmap(Hal::VmmRange vrange) {
     auto id = try$(_lookup(vrange));
     auto &map = _maps[id];
 
-    try$(vmm().free(map.vrange));
-    try$(vmm().flush(map.vrange));
+    try$(_vmm->free(map.vrange));
+    try$(_vmm->flush(map.vrange));
 
     _alloc.unused(map.vrange);
     _maps.removeAt(id);
@@ -200,7 +215,7 @@ Res<> Space::unmap(Hal::VmmRange vrange) {
 }
 
 void Space::activate() {
-    vmm().activate();
+    _vmm->activate();
 }
 
 /* --- Channel -------------------------------------------------------------- */

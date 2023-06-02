@@ -35,7 +35,7 @@ struct Object : public Meta::Static {
 
     void label(Str label);
 
-    Str label() const;
+    String label() const;
 
     void _signalUnlock(Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset);
 
@@ -94,15 +94,15 @@ struct Domain : public BaseObject<Domain, Hj::Type::DOMAIN> {
 
 /* --- Vmo ------------------------------------------------------------------ */
 
-struct VNode : public BaseObject<VNode, Hj::Type::VMO> {
+struct Vmo : public BaseObject<Vmo, Hj::Type::VMO> {
     using _Mem = Var<Hal::PmmMem, Hal::DmaRange>;
     _Mem _mem;
 
-    static Res<Strong<VNode>> alloc(usize size, Hj::VmoFlags);
+    static Res<Strong<Vmo>> alloc(usize size, Hj::VmoFlags);
 
-    static Res<Strong<VNode>> makeDma(Hal::DmaRange prange);
+    static Res<Strong<Vmo>> makeDma(Hal::DmaRange prange);
 
-    VNode(_Mem mem) : _mem(std::move(mem)) {}
+    Vmo(_Mem mem) : _mem(std::move(mem)) {}
 
     Hal::PmmRange range();
 
@@ -117,7 +117,7 @@ struct Space : public BaseObject<Space, Hj::Type::SPACE> {
     struct Map {
         Hal::VmmRange vrange;
         usize off;
-        Strong<VNode> vmo;
+        Strong<Vmo> vmo;
     };
 
     Strong<Hal::Vmm> _vmm;
@@ -132,6 +132,8 @@ struct Space : public BaseObject<Space, Hj::Type::SPACE> {
 
     Res<usize> _lookup(Hal::VmmRange vrange);
 
+    bool _alreadyMapped(Hal::VmmRange vrange);
+
     Res<> _validate(Hal::VmmRange vrange) {
         for (auto &map : _maps) {
             if (map.vrange.contains(vrange)) {
@@ -142,7 +144,7 @@ struct Space : public BaseObject<Space, Hj::Type::SPACE> {
         return Error::invalidInput("bad address");
     }
 
-    Res<Hal::VmmRange> map(Hal::VmmRange vrange, Strong<VNode> vmo, usize off, Hj::MapFlags flags);
+    Res<Hal::VmmRange> map(Hal::VmmRange vrange, Strong<Vmo> vmo, usize off, Hj::MapFlags flags);
 
     Res<> unmap(Hal::VmmRange vrange);
 

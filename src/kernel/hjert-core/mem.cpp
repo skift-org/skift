@@ -22,37 +22,47 @@ struct Pmm : public Hal::Pmm {
     Res<Hal::PmmRange> allocRange(usize size, Hal::PmmFlags flags) override {
         LockScope scope(_lock);
         auto upper = (flags & Hal::PmmFlags::UPPER) == Hal::PmmFlags::UPPER;
+        upper = false;
 
         try$(ensureAlign(size, Hal::PAGE_SIZE));
         size /= Hal::PAGE_SIZE;
-        return Ok(bits2Pmm(try$(_bits.alloc(size, upper ? -1 : 0, upper))));
+        auto prange = bits2Pmm(try$(_bits.alloc(size, upper ? -1 : 0, upper)));
+        return Ok(prange);
     }
 
-    Res<> used(Hal::PmmRange range, Hal::PmmFlags) override {
-        if (not range.overlaps(_usable)) {
-            return Ok();
-        }
-
-        LockScope scope(_lock);
-        try$(range.ensureAligned(Hal::PAGE_SIZE));
-        _bits.set(pmm2Bits(range), true);
-        return Ok();
-    }
-
-    Res<> free(Hal::PmmRange range) override {
-        if (not range.overlaps(_usable)) {
+    Res<> used(Hal::PmmRange prange, Hal::PmmFlags) override {
+        if (not prange.overlaps(_usable)) {
             return Error::invalidInput("range is not in usable memory");
         }
 
         LockScope scope(_lock);
-        try$(range.ensureAligned(Hal::PAGE_SIZE));
-        _bits.set(pmm2Bits(range), false);
+        try$(prange.ensureAligned(Hal::PAGE_SIZE));
+        _bits.set(pmm2Bits(prange), true);
+        return Ok();
+    }
+
+    Res<> free(Hal::PmmRange prange) override {
+        if (not prange.overlaps(_usable)) {
+            return Error::invalidInput("range is not in usable memory");
+        }
+
+        LockScope scope(_lock);
+        try$(prange.ensureAligned(Hal::PAGE_SIZE));
+        _bits.set(pmm2Bits(prange), false);
         return Ok();
     }
 
     void clear() {
         LockScope scope(_lock);
         _bits.fill(true);
+    }
+
+    void dump() {
+        logInfo(" mem: physical memory layout:");
+        _bits.visit([this](auto range) {
+            auto prange = bits2Pmm(range);
+            logInfo("    {x} - {x} ({}kib)", prange.start, prange.end(), prange.size / kib(1));
+        });
     }
 
     BitsRange pmm2Bits(Hal::PmmRange range) {
@@ -79,7 +89,8 @@ struct Kmm : public Hal::Kmm {
     }
 
     Res<Hal::KmmRange> allocRange(usize size) override {
-        return pmm2Kmm(try$(_pmm.allocRange(size, Hal::PmmFlags::NONE)));
+        auto range = try$(pmm2Kmm(try$(_pmm.allocRange(size, Hal::PmmFlags::NONE))));
+        return Ok(range);
     }
 
     Res<> free(Hal::KmmRange range) override {
@@ -139,14 +150,17 @@ Res<> init(Handover::Payload &payload) {
 
     _kmm.emplace(_pmm.unwrap());
 
-    logInfo("mem: marking kernel memory as used");
+    logInfo("mem: marking free memory as free...");
     for (auto &record : payload) {
         if (record.tag == Handover::Tag::FREE) {
+            logInfo("mem: free memory at {x} {x} ({}kib)", record.start, record.start + record.size, record.size / kib(1));
             try$(pmm().free({record.start, record.size}));
         }
     }
 
     try$(_pmm->used({pmmBits.start, pmmBits.size}, Hal::PmmFlags::NONE));
+
+    _pmm->dump();
 
     logInfo("mem: mapping kernel...");
     try$(vmm().mapRange(

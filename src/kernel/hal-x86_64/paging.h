@@ -63,7 +63,7 @@ struct [[gnu::packed]] Pml {
     }
 
     usize index2virt(usize index) const {
-        return (index) << (12 + (LEVEL - 1) * 9);
+        return index << (12 + (LEVEL - 1) * 9);
     }
 
     Opt<usize> virt2phys(usize virt) const {
@@ -90,8 +90,8 @@ struct [[gnu::packed]] Pml {
     }
 
     bool empty() const {
-        for (usize i = 0; i < LEN; i++) {
-            if (pages[i].present()) {
+        for (auto page : pages) {
+            if (page.present()) {
                 return false;
             }
         }

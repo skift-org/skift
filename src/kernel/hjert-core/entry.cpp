@@ -64,7 +64,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
     space->label("init-space");
 
     logInfo("entry: mapping elf...");
-    auto elfVmo = try$(VNode::makeDma(record->range<Hal::DmaRange>()));
+    auto elfVmo = try$(Vmo::makeDma(record->range<Hal::DmaRange>()));
     elfVmo->label("elf-readonly");
     auto elfRange = try$(kmm().pmm2Kmm(elfVmo->range()));
     Elf::Image image{elfRange.bytes()};
@@ -82,9 +82,10 @@ Res<> enterUserspace(Handover::Payload &payload) {
         usize size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
 
         if ((prog.flags() & Elf::ProgramFlags::WRITE) == Elf::ProgramFlags::WRITE) {
-            auto sectionVmo = try$(VNode::alloc(size, Hj::VmoFlags::UPPER));
+            auto sectionVmo = try$(Vmo::alloc(size, Hj::VmoFlags::UPPER));
             sectionVmo->label("elf-writeable");
             auto sectionRange = try$(kmm().pmm2Kmm(sectionVmo->range()));
+            logInfo("entry: mapping section: {x}-{x}", sectionRange.start, sectionRange.end());
             copy(prog.bytes(), sectionRange.mutBytes());
             try$(space->map({prog.vaddr(), size}, sectionVmo, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
         } else {
@@ -95,21 +96,23 @@ Res<> enterUserspace(Handover::Payload &payload) {
     logInfo("entry: mapping handover...");
     auto handoverBase = ((usize)&payload) - Handover::KERNEL_BASE;
     auto handoverSize = payload.size;
-    auto handoverVmo = try$(VNode::makeDma({handoverBase, handoverSize}));
+    auto handoverVmo = try$(Vmo::makeDma({handoverBase, handoverSize}));
     handoverVmo->label("handover");
     auto handoverRange = try$(space->map({}, handoverVmo, 0, Hj::MapFlags::READ));
 
     logInfo("entry: mapping stack...");
     auto STACK_SIZE = kib(16);
-    auto stackVmo = try$(VNode::alloc(STACK_SIZE, Hj::VmoFlags::UPPER));
+    auto stackVmo = try$(Vmo::alloc(STACK_SIZE * 4, Hj::VmoFlags::UPPER));
     stackVmo->label("stack");
     auto stackRange = try$(space->map({}, stackVmo, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+    logInfo("entry: stack: {x}-{x}", stackRange.start, stackRange.end());
 
     logInfo("entry: creating task...");
     auto domain = try$(Domain::create());
     domain->label("init-domain");
     auto task = try$(Task::create(TaskMode::USER, space, domain));
     task->label("init-task");
+
     try$(Sched::instance().start(task, image.header().entry, stackRange.end(), {handoverRange.start}));
 
     return Ok();

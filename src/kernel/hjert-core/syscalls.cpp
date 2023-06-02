@@ -51,8 +51,8 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> cap, User<Hj::Props> p) {
             [&](Hj::VmoProps &props) -> Res<Strong<Object>> {
                 bool isDma = (props.flags & Hj::VmoFlags::DMA) == Hj::VmoFlags::DMA;
                 return Ok(try$(isDma
-                                   ? VNode::makeDma({props.phys, props.len})
-                                   : VNode::alloc(props.len, props.flags)));
+                                   ? Vmo::makeDma({props.phys, props.len})
+                                   : Vmo::alloc(props.len, props.flags)));
             },
             [&](Hj::IoProps &props) -> Res<Strong<Object>> {
                 return Ok(try$(IoNode::create({props.base, props.len})));
@@ -102,7 +102,7 @@ Res<> doStart(Task &self, Hj::Cap cap, usize ip, usize sp, User<Hj::Args const> 
 }
 
 Res<> doMap(Task &self, Hj::Cap cap, User<usize> virt, Hj::Cap vmo, usize off, User<usize> len, Hj::MapFlags flags) {
-    auto vmoObj = try$(self.domain().get<VNode>(vmo));
+    auto vmoObj = try$(self.domain().get<Vmo>(vmo));
     auto spaceObj = cap.isRoot()
                         ? try$(self._space)
                         : try$(self.domain().get<Space>(cap));
@@ -253,7 +253,6 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
 Res<> doSyscall(Hj::Syscall id, Hj::Args args) {
     auto &self = Task::self();
     self.enterSupervisorMode();
-    logDebug("Syscall {}({}) params: {}", Hj::toStr(id), (Hj::Arg)id, args);
     auto res = dispatchSyscall(self, id, args);
     if (not res) {
         logError("Syscall {}({}) failed: {}", Hj::toStr(id), (Hj::Arg)id, res.none().msg());

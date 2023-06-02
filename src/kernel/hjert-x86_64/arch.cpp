@@ -25,8 +25,8 @@ static x86_64::Com _com1 = x86_64::Com::com1();
 static x86_64::DualPic _pic = x86_64::DualPic::dualPic();
 static x86_64::Pit _pit = x86_64::Pit::pit();
 
-static Array<Byte, Hal::PAGE_SIZE> _kstackRsp{};
-static Array<Byte, Hal::PAGE_SIZE> _kstackIst{};
+static Array<Byte, Hal::PAGE_SIZE * 16> _kstackRsp{};
+static Array<Byte, Hal::PAGE_SIZE * 16> _kstackIst{};
 static x86_64::Tss _tss{};
 
 static x86_64::Gdt _gdt{_tss};
@@ -158,8 +158,8 @@ extern "C" usize _intDispatch(usize sp) {
 
     if (frame->intNo < 32) {
         if (frame->cs == (x86_64::Gdt::UCODE * 8 | 3)) {
-            logPrint("userspace fault:'{}'", _faultMsg[frame->intNo]);
-            logPrint("int={} err={} rip={p} rsp={p} cr2={p} cr3={p}", frame->intNo, frame->errNo, frame->rip, frame->rsp, x86_64::rdcr2(), x86_64::rdcr3());
+            logError("userspace fault:'{}'", _faultMsg[frame->intNo]);
+            logError("int={} err={} rip={p} rsp={p} rbp={p} cr2={p} cr3={p}", frame->intNo, frame->errNo, frame->rip, frame->rsp, frame->rbp, x86_64::rdcr2(), x86_64::rdcr3());
             Core::Task::self().crash();
             sp = switchTask(TimeSpan::fromMSecs(0), sp);
         } else {
@@ -207,17 +207,26 @@ extern "C" usize _intDispatch(usize sp) {
 
 extern "C" usize _sysDispatch(usize sp) {
     auto *frame = reinterpret_cast<Frame *>(sp);
+
     auto result = Core::doSyscall(
         (Hj::Syscall)frame->rax,
-        {frame->rdi, frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9});
+        {
+            frame->rdi,
+            frame->rsi,
+            frame->rdx,
+            frame->r10,
+            frame->r8,
+            frame->r9,
+        });
 
     if (not result) {
         return (usize)result.none().code();
     }
+
     return (usize)Error::_OK;
 }
 
-static x86_64::Pml<4> *_pml4 = nullptr;
+static x86_64::Pml<4> *_kpml4 = nullptr;
 static Opt<x86_64::Vmm<Hal::UpperHalfMapper>> _vmm = NONE;
 
 Hal::Vmm &vmm() {
@@ -226,9 +235,9 @@ Hal::Vmm &vmm() {
                            .allocRange(Hal::PAGE_SIZE)
                            .unwrap("failed to allocate pml4");
         zeroFill(pml4Mem.mutBytes());
-        _pml4 = pml4Mem.as<x86_64::Pml<4>>();
+        _kpml4 = pml4Mem.as<x86_64::Pml<4>>();
         _vmm = x86_64::Vmm<Hal::UpperHalfMapper>{
-            Core::pmm(), _pml4};
+            Core::pmm(), _kpml4};
     }
 
     return *_vmm;
@@ -263,6 +272,7 @@ void start(Core::Task &task, usize ip, usize sp, Hj::Args args) {
 struct Ctx : public Core::Ctx {
     usize _ksp;
     usize _usp;
+
     Array<Byte, Hal::PAGE_SIZE> simd __attribute__((aligned(16)));
 
     Ctx(usize ksp) : _ksp(ksp), _usp(0) {
@@ -271,11 +281,11 @@ struct Ctx : public Core::Ctx {
 
     virtual void save() {
         x86_64::simdSaveCtx(simd.buf());
-        x86_64::sysSetGs((usize)&_ksp);
     }
 
     virtual void load() {
         x86_64::simdLoadCtx(simd.buf());
+        x86_64::sysSetGs((usize)&_ksp);
     }
 };
 
@@ -283,11 +293,11 @@ Res<Box<Core::Ctx>> createCtx(usize ksp) {
     return Ok<Box<Core::Ctx>>(makeBox<Ctx>(ksp));
 }
 
-struct ManagedVmm : public x86_64::Vmm<Hal::UpperHalfMapper> {
-    ManagedVmm(x86_64::Pml<4> *pml4)
+struct UserVmm : public x86_64::Vmm<Hal::UpperHalfMapper> {
+    UserVmm(x86_64::Pml<4> *pml4)
         : x86_64::Vmm<Hal::UpperHalfMapper>{Core::pmm(), pml4} {}
 
-    ~ManagedVmm() {
+    ~UserVmm() {
         // NOTE: We expect the user to already have unmapped all the pages
         //       before destroying the vmm
         logInfo("x86_64: freeing pml4 {p}", (usize)_pml4);
@@ -305,11 +315,11 @@ Res<Strong<Hal::Vmm>> createVmm() {
     auto *pml4 = pml4Mem.as<x86_64::Pml<4>>();
 
     // NOTE: Copy the kernel part of the pml4
-    for (usize i = _pml4->LEN / 2; i < _pml4->LEN; i++) {
-        pml4->pages[i] = _pml4->pages[i];
+    for (usize i = _kpml4->LEN / 2; i < _kpml4->LEN; i++) {
+        pml4->pages[i] = _kpml4->pages[i];
     }
 
-    return Ok(makeStrong<ManagedVmm>(pml4));
+    return Ok(makeStrong<UserVmm>(pml4));
 }
 
 void yield() {

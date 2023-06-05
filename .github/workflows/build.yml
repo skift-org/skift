@@ -15,13 +15,13 @@ jobs:
              git clone https://github.com/cute-engineering/cutekit && sudo pip install -e cutekit/
 
       - name: Install Packages
-        run: cutekit i
+        run: osdk i
 
       - name: Build Kernel (x86_64)
-        run: cutekit b --target=kernel-x86_64
+        run: osdk b --target=kernel-x86_64
 
       - name: Build EFI (x86_64)
-        run: cutekit b --target=efi-x86_64
+        run: osdk b --target=efi-x86_64
 
       - name: Build Host
-        run: cutekit b
+        run: osdk b

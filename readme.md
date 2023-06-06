@@ -19,31 +19,16 @@
 <br/>
 <br/>
 
-# **skiftOS**: The delightful operating system
 
-[![Build](https://github.com/skift-org/skift/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/skift-org/skift/actions/workflows/build.yml)
-[![License](https://img.shields.io/github/license/skift-org/skift)](https://opensource.org/licenses/MIT)
-[![Discord](https://img.shields.io/discord/555284858180730888?label=discord)](http://discord.skiftos.org)
+## About
 
-# Table of Contents
+**skiftOS** is a hobby operating system built from scratch using contemporary C and C++ for ARM, x86, and RISC-V architectures. It is designed to be simple, modern, and modular. skiftOS features a modern C++ core library, modern reactive UI, and a capability-based microkernel for security and modularity.
 
-- [**skiftOS**: The delightful operating system](#skiftos-the-delightful-operating-system)
-- [Table of Contents](#table-of-contents)
-- [Introduction](#introduction)
-  - [Values](#values)
-  - [Features](#features)
-  - [Screenshot](#screenshot)
-- [Getting Started](#getting-started)
-  - [Building](#building)
-  - [Contributing](#contributing)
-- [Acknowledgements](#acknowledgements)
-  - [Contributors](#contributors)
-  - [Projects](#projects)
-- [License](#license)
-
-# Introduction
-
-**skiftOS** is a hobby operating system built from scratch using contemporary C and C++ for ARM, x86, and RISC-V architectures. It is designed to be simple, modern, modular, open, and inclusive. skiftOS features a modern C++ core library, modern reactive UI, and a capability-based microkernel for security and modularity.
+<p align="center">
+<img src="doc/screenshots/2023-06-06.png" />
+<br>
+skiftOS applications running on Linux
+</p>
 
 ## Values
 
@@ -55,15 +40,11 @@ As a hobby operating system, skiftOS is built with the following values in mind:
 
 - **Modular**: skiftOS is designed to be modular and extensible. It is built around a microkernel architecture, which allows for the addition of new features without having to modify the core components of the operating system.
 
-- **Open**: skiftOS is an open-source project and is licensed under the MIT license. This means that anyone can use, modify, and redistribute the code without any restrictions.
-
-- **Inclusive**: skiftOS is built by a diverse group of people from all around the world. It is designed to be inclusive and welcoming to everyone, regardless of their background or experience level. The project encourages contributions from all members of the community.
-
 ## Features
 
 skiftOS has several notable features:
 
-- **Modern C++ Core Library**: skiftOS is built using karm, a modern C++ core library that provides essential functionality like memory management, file I/O, and networking. karm takes inspiration from Rust and C++ to create a powerful and efficient library.
+- **Modern C++ Core Library**: skiftOS is built using karm, a modern C++ core library that provides essential functionality like memory management, file I/O, and networking. karm takes inspiration from [The Rust Standard Library](https://doc.rust-lang.org/std/) to create a powerful and safe library.
 
 - **Modern Reactive UI**: skiftOS uses karm-ui, a modern reactive UI library that is based on unidirectional data flow. It takes inspiration from popular UI frameworks like React and Flutter, and enables developers to create powerful and responsive user interfaces.
 
@@ -75,15 +56,6 @@ skiftOS has several notable features:
 
 - **Free and Open-Source**: skiftOS is licensed under the MIT license and is free to use, modify, and redistribute. This makes it accessible to everyone and encourages collaboration and innovation.
 
-## Screenshot
-
-<p align="center">
-<img src="doc/screenshots/2022-09-07.png" />
-<br>
-skiftOS applications running on Linux
-</p>
-
-# Getting Started
 
 ## Building
 
@@ -165,28 +137,14 @@ Binary files should be as small as possible.
 - `gifsicle -O3` to reduce the size of GIF images.
 - `jpegoptim -m90` to reduce the size of JPEG images.
 
-# Acknowledgements
+## Acknowledgements
 
 I (sleepy-monax) would like to thank the following people for their help and support:
  - [Cyp](https://cyp.sh), [Keyboard Slayer](https://github.com/keyboard-slayer), and [D0p1](https://github.com/d0p1s4m4) for being great friends giving me a lot of support and motivation.
  - [Feliwir](https://github.com/feliwir) for all the work he did on the past skiftOS and BRUTAL project. I learned a lot from his work and I am very grateful for his help.
  - And all the people who have contributed to the project and send me money on [Github Sponsors](https://github.com/sponsors/sleepy-monax)
 
-## Contributors
-
-<a href="https://github.com/skiftOS/skift/graphs/contributors">
-  <img src="https://contributors-img.web.app/image?repo=skiftOS/skift" />
-</a>
-
-## Projects
-
-- [The OSDev Wiki](https://wiki.osdev.org/Main_Page)
-- [The DEVSE Community](https://devse.wiki)
-- [The Limine Project](https://limine-bootloader.org/)
-- [The BRUTAL Project](https://brutal.smnx.sh)
-- [The SerenityOS Project](https://serenityos.org/)
-
-# License
+## License
 
 <a href="https://opensource.org/licenses/MIT">
   <img align="right" height="96" alt="MIT License" src="doc/mit.svg" />
@@ -195,15 +153,3 @@ I (sleepy-monax) would like to thank the following people for their help and sup
 The skift operating system and its core components are licensed under the **MIT License**.
 
 The full text of the license can be accessed via [this link](https://opensource.org/licenses/MIT) and is also included in the [license.md](license.md) file of this software package.
-
-<br>
-<br>
-<br>
-<br>
-<p align="center">
-  <img width="48" src="https://brutal.smnx.sh/scafold/glider.svg" />
-</p>
-<br>
-<br>
-<br>
-<br>

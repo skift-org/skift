@@ -28,7 +28,7 @@ enum struct Panel {
 };
 
 struct State {
-    bool isTablet = true;
+    bool isMobile = true;
     bool locked = true;
     Panel activePanel = Panel::NIL;
 };

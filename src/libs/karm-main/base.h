@@ -75,4 +75,16 @@ inline auto &useArgs(Ctx &ctx = Ctx::instance()) {
     return ctx.use<ArgsHook>();
 }
 
+enum struct FormFactor {
+    DESKTOP,
+    MOBILE,
+};
+
+inline FormFactor useFormFactor(Ctx &ctx = Ctx::instance()) {
+    if (useArgs(ctx).has("+mobile")) {
+        return FormFactor::MOBILE;
+    }
+    return FormFactor::DESKTOP;
+}
+
 Res<> entryPoint(Ctx &ctx);

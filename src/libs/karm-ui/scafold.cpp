@@ -1,9 +1,10 @@
-#include "scafold.h"
+#include <karm-main/base.h>
 
 #include "dialog.h"
 #include "drag.h"
 #include "input.h"
 #include "layout.h"
+#include "scafold.h"
 #include "view.h"
 
 namespace Karm::Ui {
@@ -28,6 +29,12 @@ Child controls(TitlebarStyle style) {
 }
 
 Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {
+    auto isMobile = useFormFactor() == FormFactor::MOBILE;
+
+    if (isMobile) {
+        return empty();
+    }
+
     return hflow(
                4,
                aboutButton(icon, title),

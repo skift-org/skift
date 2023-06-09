@@ -108,18 +108,18 @@ Ui::Child desktop(State const &state) {
         Ui::grow(NONE));
 }
 
-Ui::Child app(bool isTablet) {
-    return Ui::reducer<Model>({.isTablet = isTablet}, [](auto state) {
+Ui::Child app(bool isMobile) {
+    return Ui::reducer<Model>({.isMobile = isMobile}, [](auto state) {
         auto wallpapers = Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap();
         auto background = Ui::align(Layout::Align::COVER, Ui::image(wallpapers));
 
         return Ui::dialogLayer(
             Ui::pinSize(
-                state.isTablet ? Math::Vec2i{411, 731} : Math::Vec2i{1280, 1024},
+                state.isMobile ? Math::Vec2i{411, 731} : Math::Vec2i{1280, 1024},
                 Ui::stack(
                     background,
                     state.locked ? lock(state)
-                                 : (state.isTablet ? tablet(state)
+                                 : (state.isMobile ? tablet(state)
                                                    : desktop(state)),
                     panels(state))));
     });
@@ -129,6 +129,6 @@ Ui::Child app(bool isTablet) {
 
 Res<> entryPoint(Ctx &ctx) {
     auto args = useArgs(ctx);
-    bool isTablet = args.has("+tablet");
-    return Ui::runApp(ctx, Shell::app(isTablet));
+    bool isMobile = useFormFactor() == FormFactor::MOBILE;
+    return Ui::runApp(ctx, Shell::app(isMobile));
 }

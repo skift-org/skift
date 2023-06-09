@@ -15,12 +15,12 @@ Ui::Child lock(State const &state) {
         Ui::center(Ui::icon(Mdi::CHEVRON_UP, 48)),
         Ui::center(Ui::text(
             Ui::TextStyle::labelLarge(),
-            state.isTablet
+            state.isMobile
                 ? "Swipe up to unlock"
                 : "Swipe up or press any key to unlock")));
 
     return Ui::vflow(clock, Ui::grow(NONE), hintText) |
-           Ui::spacing(state.isTablet ? 64 : 128) |
+           Ui::spacing(state.isMobile ? 64 : 128) |
            Ui::dragRegion() |
            Ui::dismisable(Model::bind<Unlock>(), Ui::DismisDir::TOP, 0.3) |
            Ui::align(Layout::Align::VFILL | Layout::Align::HCENTER);

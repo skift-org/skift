@@ -5,7 +5,7 @@ namespace Shell {
 State reduce(State state, Actions action) {
     return action.visit(Visitor{
         [&](ToggleTablet) {
-            state.isTablet = not state.isTablet;
+            state.isMobile = not state.isMobile;
             state.activePanel = Panel::NIL;
             return state;
         },

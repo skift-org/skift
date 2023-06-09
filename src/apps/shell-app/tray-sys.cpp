@@ -37,7 +37,7 @@ Ui::Child quickSettings(State const &state) {
                 quickSetting(Mdi::BLUETOOTH),
                 quickSetting(Mdi::MAP_MARKER_OUTLINE),
                 quickSetting(Mdi::FLASHLIGHT),
-                Ui::button(Model::bind<ToggleTablet>(), Ui::ButtonStyle::secondary(), state.isTablet ? Mdi::CELLPHONE : Mdi::TABLET),
+                Ui::button(Model::bind<ToggleTablet>(), Ui::ButtonStyle::secondary(), state.isMobile ? Mdi::CELLPHONE : Mdi::TABLET),
                 quickSetting(Mdi::CHEVRON_DOWN) |
                     Ui::end() |
                     Ui::grow())));

@@ -11,15 +11,6 @@
 namespace About {
 
 Ui::Child app() {
-    auto logo = Ui::icon(Mdi::SNOWFLAKE, 96) |
-                Ui::center() |
-                Ui::bound() |
-                Ui::box({
-                    .padding = 64,
-                    .backgroundPaint = Ui::GRAY900,
-                    .foregroundPaint = Ui::GRAY50,
-                });
-
     auto licenseBtn = Ui::button(
         NONE,
         Ui::ButtonStyle::subtle(),
@@ -57,7 +48,11 @@ Ui::Child app() {
         "About",
         Ui::TitlebarStyle::DIALOG);
 
-    return Ui::vflow(titlebar, Ui::separator(), Ui::hflow(logo, Ui::separator(), content | Ui::grow()) | Ui::grow()) | Ui::pinSize({560, 360}) |
+    return Ui::vflow(
+               titlebar,
+               Ui::separator(),
+               content | Ui::grow()) |
+           Ui::pinSize({560, 360}) |
            Ui::dialogLayer();
 }
 

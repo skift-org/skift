@@ -24,7 +24,7 @@ void Path::_flattenClose() {
 }
 
 void Path::_flattenLineToNoTrans(Math::Vec2f p) {
-    if (_segs.len() == 0) {
+    if (not _segs.len()) {
         logError("path: move to must be called before line to");
         return;
     }

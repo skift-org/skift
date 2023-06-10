@@ -1,6 +1,6 @@
 #pragma once
 
-#include <hal/io.h>
+#include <hal/raw.h>
 #include <karm-io/traits.h>
 
 #include "asm.h"
@@ -8,25 +8,25 @@
 namespace x86_64 {
 
 struct Com : public Io::TextWriterBase<> {
-    Hal::Io _io;
+    Hal::RawPortIo _io;
 
-    Com(Hal::Io io) : _io(io) {
+    Com(Hal::RawPortIo io) : _io(io) {
     }
 
     static Com com1() {
-        return {Hal::Io::port(0x3F8, 8)};
+        return {Hal::RawPortIo({0x3F8, 8})};
     }
 
     static Com com2() {
-        return {Hal::Io::port({0x2F8, 8})};
+        return {Hal::RawPortIo({0x2F8, 8})};
     }
 
     static Com com3() {
-        return {Hal::Io::port({0x3E8, 8})};
+        return {Hal::RawPortIo({0x3E8, 8})};
     }
 
     static Com com4() {
-        return {Hal::Io::port({0x2E8, 8})};
+        return {Hal::RawPortIo({0x2E8, 8})};
     }
 
     enum Regs {
@@ -77,59 +77,63 @@ struct Com : public Io::TextWriterBase<> {
         IMPENDING_ERROR = 1 << 7,
     };
 
-    void init() {
-        writeReg(INTERRUPT_IDENTIFICATOR, 0);
+    Res<> init() {
+        try$(writeReg(INTERRUPT_IDENTIFICATOR, 0));
 
         // Turn on dlab for setting baud rate
-        writeReg(LINE_CONTROL, DLAB_STATUS);
+        try$(writeReg(LINE_CONTROL, DLAB_STATUS));
 
         // Set bauds
-        writeReg(BAUD_RATE_LOW, 115200 / 9600);
-        writeReg(BAUD_RATE_HIGH, 0);
+        try$(writeReg(BAUD_RATE_LOW, 115200 / 9600));
+        try$(writeReg(BAUD_RATE_HIGH, 0));
 
         // we want 8bit caracters + clear dlab
-        writeReg(LINE_CONTROL, DATA_SIZE_8);
+        try$(writeReg(LINE_CONTROL, DATA_SIZE_8));
 
         // turn on communication + redirect UART interrupt into ICU
-        writeReg(MODEM_CONTROL, MODEM_DTR | MODEM_RTS | MODEM_OUT2);
-        writeReg(INTERRUPT, WHEN_DATA_AVAILABLE);
+        try$(writeReg(MODEM_CONTROL, MODEM_DTR | MODEM_RTS | MODEM_OUT2));
+        try$(writeReg(INTERRUPT, WHEN_DATA_AVAILABLE));
+
+        return Ok();
     }
 
-    void writeReg(Regs reg, u8 value) {
-        _io.write8(reg, value);
+    Res<> writeReg(Regs reg, u8 value) {
+        return _io.out8(reg, value);
     }
 
-    u8 readReg(Regs reg) {
-        return _io.read8(reg);
+    Res<u8> readReg(Regs reg) {
+        return _io.in8(reg);
     }
 
-    bool canRead() {
-        return readReg(LINE_STATUS) & DATA_READY;
+    Res<bool> canRead() {
+        return Ok<bool>(try$(readReg(LINE_STATUS)) & DATA_READY);
     }
 
-    bool canWrite() {
-        return readReg(LINE_STATUS) & TRANSMITTER_BUF_EMPTY;
+    Res<bool> canWrite() {
+        return Ok<bool>(try$(readReg(LINE_STATUS)) & TRANSMITTER_BUF_EMPTY);
     }
 
-    void waitWrite() {
-        while (not canWrite()) {
+    Res<> waitWrite() {
+        while (not try$(canWrite())) {
         }
+        return Ok();
     }
 
-    void waitRead() {
-        while (not canRead()) {
+    Res<> waitRead() {
+        while (not try$(canRead())) {
         }
+        return Ok();
     }
 
     Res<usize> putByte(Byte c) {
-        waitWrite();
-        writeReg(DATA, static_cast<u8>(c));
+        try$(waitWrite());
+        try$(writeReg(DATA, static_cast<u8>(c)));
 
         return Ok(1uz);
     }
 
-    u8 getByte() {
-        waitRead();
+    Res<u8> getByte() {
+        try$(waitRead());
         return readReg(DATA);
     }
 

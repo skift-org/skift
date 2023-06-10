@@ -1,11 +1,11 @@
 #pragma once
 
-#include <hal/io.h>
+#include <hal/raw.h>
 
 namespace x86_64 {
 
 struct Pit {
-    Hal::Io _io;
+    Hal::RawPortIo _io;
 
     // Constants
     static constexpr auto USEC = 1000;
@@ -22,22 +22,24 @@ struct Pit {
     static constexpr auto SQUARE_WAVE = 6;
 
     static Pit pit() {
-        return {Hal::Io::port({0x40, 4})};
+        return {Hal::RawPortIo({0x40, 4})};
     }
 
-    void init(isize freq) {
+    Res<> init(isize freq) {
         u16 div = FREQ / freq;
 
-        _io.write8(CMD, CHANNEL1 | LOWBYTE | SQUARE_WAVE);
-        _io.write8(PORT0, div & 0xFF);
-        _io.write8(PORT0, (div >> 8) & 0xFF);
+        try$(_io.out8(CMD, CHANNEL1 | LOWBYTE | SQUARE_WAVE));
+        try$(_io.out8(PORT0, div & 0xFF));
+        try$(_io.out8(PORT0, (div >> 8) & 0xFF));
+
+        return Ok();
     }
 
-    u32 readCount() {
-        _io.write8(CMD, 0x00);
-        u32 low = _io.read8(PORT0);
-        u32 high = _io.read8(PORT0);
-        return (high << 8) | low;
+    Res<u32> readCount() {
+        try$(_io.out8(CMD, 0x00));
+        u32 low = try$(_io.in8(PORT0));
+        u32 high = try$(_io.in8(PORT0));
+        return Ok((high << 8) | low);
     }
 };
 

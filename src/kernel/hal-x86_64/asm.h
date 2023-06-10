@@ -19,7 +19,7 @@ inline void invlpg(usize addr) {
 
 /* --- CRs ------------------------------------------------------------------ */
 
-enum cr0_bit {
+enum Cr0Bit {
     CR0_PROTECTED_MODE_ENABLE = (1 << 0),
     CR0_MONITOR_CO_PROCESSOR = (1 << 1),
     CR0_EMULATION = (1 << 2),
@@ -33,7 +33,7 @@ enum cr0_bit {
     CR0_PAGING_ENABLE = (1 << 31),
 };
 
-enum cr4_bit {
+enum Cr4Bit {
     CR4_VIRTUAL_8086_MODE_EXT = (1 << 0),
     CR4_PROTECTED_MODE_VIRTUAL_INT = (1 << 1),
     CR4_TIME_STAMP_DISABLE = (1 << 2), // disable it only for ring != 0 for RDTSC instruction
@@ -81,7 +81,7 @@ CR(4)
 
 /* --- AVX/SSSE ------------------------------------------------------------- */
 
-enum xcr0_bit {
+enum Xcr0Bit {
     XCR0_XSAVE_SAVE_X87 = (1 << 0),
     XCR0_XSAVE_SAVE_SSE = (1 << 1),
     XCR0_AVX_ENABLE = (1 << 2),

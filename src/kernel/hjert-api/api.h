@@ -202,7 +202,7 @@ struct Io : public Object {
     }
 
     Res<Arg> in(IoLen len, usize port) {
-        Arg val;
+        Arg val = 0;
         try$(_in(_cap, len, port, &val));
         return Ok(val);
     }
@@ -248,20 +248,20 @@ struct Listener : public Object {
         return create<Listener>(dest);
     }
 
-    Res<> watch(Cap cap, Flags<Sigs> set, Flags<Sigs> unset) {
+    Res<> listen(Cap cap, Flags<Sigs> set, Flags<Sigs> unset) {
         return _watch(_cap, cap, set, unset);
     }
 
-    Res<> unwatch(Cap cap) {
+    Res<> mute(Cap cap) {
         return _watch(_cap, cap, Sigs::NONE, Sigs::NONE);
     }
 
-    Res<> listen(TimeStamp deadline) {
+    Res<> wait(TimeStamp deadline) {
         _events.resize(256);
         return _listen(_cap, _events.buf(), _events.len(), deadline);
     }
 
-    Opt<Event> poll() {
+    Opt<Event> next() {
         for (usize i = 0; i < _events.len(); ++i) {
             if (_events[i].sig != Sigs::NONE) {
                 auto ev = _events[i];

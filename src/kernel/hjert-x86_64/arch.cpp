@@ -37,7 +37,7 @@ static x86_64::IdtDesc _idtDesc{_idt};
 
 Res<> init(Handover::Payload &) {
 
-    _com1.init();
+    try$(_com1.init());
 
     _gdtDesc.load();
     _tss = {};
@@ -51,8 +51,8 @@ Res<> init(Handover::Payload &) {
 
     _idtDesc.load();
 
-    _pic.init();
-    _pit.init(1000);
+    try$(_pic.init());
+    try$(_pit.init(1000));
 
     x86_64::simdInit();
     x86_64::sysInit(_sysHandler);
@@ -197,7 +197,8 @@ extern "C" usize _intDispatch(usize sp) {
         }
 
         Core::Irq::trigger(irq);
-        _pic.ack(frame->intNo);
+        _pic.ack(frame->intNo)
+            .unwrap("pic ack failed");
     }
 
     cpu().endInterrupt();

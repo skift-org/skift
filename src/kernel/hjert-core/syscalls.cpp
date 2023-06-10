@@ -24,7 +24,7 @@ Res<> doLog(Task &self, UserSlice<char const> msg) {
                 Embed::loggerUnlock();
             }
         } scope;
-        auto styledLabel = Cli::styled(self.label(), Cli::style(Cli::random(self.id())).bold());
+        auto styledLabel = Cli::styled(self.label(), Cli::style(Cli::random(self.id())));
         try$(Fmt::format(Hjert::Arch::loggerOut(), "{}({}) ", styledLabel, self.id()));
         try$(Hjert::Arch::loggerOut().writeStr(str));
         return Ok();

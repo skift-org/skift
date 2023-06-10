@@ -442,12 +442,13 @@ IoNode::IoNode(Hal::PortRange range)
     : _range(range) {}
 
 Res<Hj::Arg> IoNode::in(usize offset, usize size) {
-    return Ok(Hal::Io::port(_range).readSized(offset, size));
+    return Hal::RawPortIo(_range)
+        .in(offset, size);
 }
 
 Res<> IoNode::out(usize offset, usize size, Hj::Arg arg) {
-    Hal::Io::port(_range).writeSized(offset, size, arg);
-    return Ok();
+    return Hal::RawPortIo(_range)
+        .out(offset, size, arg);
 }
 
 /* --- IRQ ------------------------------------------------------------------ */

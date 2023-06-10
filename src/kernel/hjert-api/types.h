@@ -212,6 +212,20 @@ inline usize ioLen2Bytes(IoLen len) {
     return 0;
 }
 
+inline IoLen bytes2IoLen(usize bytes) {
+    switch (bytes) {
+    case 1:
+        return IoLen::U8;
+    case 2:
+        return IoLen::U16;
+    case 4:
+        return IoLen::U32;
+    case 8:
+        return IoLen::U64;
+    }
+    return IoLen::U8;
+}
+
 using VmoFlags = Hal::PmmFlags;
 using MapFlags = Hal::VmmFlags;
 

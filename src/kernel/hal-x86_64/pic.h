@@ -1,11 +1,11 @@
 #pragma once
 
-#include <hal/io.h>
+#include <hal/raw.h>
 
 namespace x86_64 {
 
 struct Pic {
-    Hal::Io _io;
+    Hal::RawPortIo _io;
 
     static constexpr usize PIC1 = 0x20;
     static constexpr usize PIC2 = 0xA0;
@@ -19,33 +19,37 @@ struct Pic {
     static constexpr usize ICW1_INIT = 0x10;
 
     static Pic pic1() {
-        return {Hal::Io::port({PIC1, 2})};
+        return {Hal::RawPortIo({PIC1, 2})};
     }
 
     static Pic pic2() {
-        return {Hal::Io::port({PIC2, 2})};
+        return {Hal::RawPortIo({PIC2, 2})};
     }
 
-    void ack() {
-        _io.write8(CMD, 0x20);
+    Res<> ack() {
+        try$(_io.out8(CMD, 0x20));
+        return Ok();
     }
 
-    void disable() {
-        _io.write8(DATA, 0xFF);
+    Res<> disable() {
+        try$(_io.out8(DATA, 0xFF));
+        return Ok();
     }
 
     static void wait() {
         asm volatile("jmp 1f; 1: jmp 1f; 1:");
     }
 
-    void cmd(u8 cmd) {
-        _io.write8(CMD, cmd);
+    Res<> cmd(u8 cmd) {
+        try$(_io.out8(CMD, cmd));
         wait();
+        return Ok();
     }
 
-    void data(u8 data) {
-        _io.write8(DATA, data);
+    Res<> data(u8 data) {
+        try$(_io.out8(DATA, data));
         wait();
+        return Ok();
     }
 };
 
@@ -57,34 +61,38 @@ struct DualPic {
         return {Pic::pic1(), Pic::pic2()};
     }
 
-    void init() {
-        _pic1.cmd(Pic::ICW1_INIT | Pic::ICW1_ICW4);
-        _pic2.cmd(Pic::ICW1_INIT | Pic::ICW1_ICW4);
+    Res<> init() {
+        try$(_pic1.cmd(Pic::ICW1_INIT | Pic::ICW1_ICW4));
+        try$(_pic2.cmd(Pic::ICW1_INIT | Pic::ICW1_ICW4));
 
-        _pic1.data(Pic::PIC1_OFFSET);
-        _pic2.data(Pic::PIC2_OFFSET);
+        try$(_pic1.data(Pic::PIC1_OFFSET));
+        try$(_pic2.data(Pic::PIC2_OFFSET));
 
-        _pic1.data(4);
-        _pic2.data(2);
+        try$(_pic1.data(4));
+        try$(_pic2.data(2));
 
-        _pic1.data(0x01);
-        _pic2.data(0x01);
+        try$(_pic1.data(0x01));
+        try$(_pic2.data(0x01));
 
-        _pic1.data(0x0);
-        _pic2.data(0x0);
+        try$(_pic1.data(0x0));
+        try$(_pic2.data(0x0));
+
+        return Ok();
     }
 
-    void ack(isize intno) {
+    Res<> ack(isize intno) {
         if (intno >= 40) {
-            _pic2.ack();
+            try$(_pic2.ack());
         }
 
-        _pic1.ack();
+        try$(_pic1.ack());
+        return Ok();
     };
 
-    void disable() {
-        _pic1.disable();
-        _pic2.disable();
+    Res<> disable() {
+        try$(_pic1.disable());
+        try$(_pic2.disable());
+        return Ok();
     }
 };
 

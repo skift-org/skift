@@ -22,8 +22,13 @@ struct Event {
     }
 
     template <typename T>
-    bool is() const {
-        return id == Meta::idOf<T>();
+    T const *is() const {
+        return id == Meta::idOf<T>() ? &unwrap<T>() : nullptr;
+    }
+
+    template <typename T>
+    T *is() {
+        return id == Meta::idOf<T>() ? &unwrap<T>() : nullptr;
     }
 
     template <typename T>

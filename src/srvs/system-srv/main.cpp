@@ -111,6 +111,7 @@ Res<> entryPoint(Ctx &ctx) {
     try$(Hj::Task::self().label("system"));
 
     try$(displayBootscreen(ctx));
+    try$(loadService(ctx, "bundle://device-srv/_bin"_url));
     try$(loadService(ctx, "bundle://shell-app/_bin"_url));
 
     return Ok();

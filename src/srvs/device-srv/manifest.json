@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "device-srv",
+    "type": "exe",
+    "description": "Device managment service",
+    "enableIf": {
+        "sys": [
+            "skift"
+        ]
+    },
+    "requires": [
+        "karm-main",
+        "hal"
+    ]
+}

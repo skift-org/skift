@@ -28,9 +28,9 @@ enum Color {
 
 static inline Color random(usize seed) {
     if (seed & 1) {
-        return (Color)((seed >> 1) % 8);
+        return (Color)(((seed >> 1) % 7) + 1);
     } else {
-        return (Color)(((seed >> 1) % 8) + 60);
+        return (Color)((((seed >> 1) % 7) + 1) + 60);
     }
 }
 

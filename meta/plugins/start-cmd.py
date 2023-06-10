@@ -186,7 +186,9 @@ def bootCmd(args: Args) -> None:
     image.install("limine-tests", "kernel-x86_64" +
                   (":debug" if isDebug else ""))
     image.install("system-srv", "skift-x86_64" + (":debug" if isDebug else ""))
+    image.install("device-srv", "skift-x86_64" + (":debug" if isDebug else ""))
     image.install("shell-app", "skift-x86_64" + (":debug" if isDebug else ""))
+
     image.install("skift-branding", "skift-x86_64" +
                   (":debug" if isDebug else ""))
     image.install("skift-wallpapers", "skift-x86_64" +

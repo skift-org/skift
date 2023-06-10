@@ -16,10 +16,6 @@ namespace Karm {
 
 #define var$(NAME) concat$(_MACRO_VAR_##NAME##__, __LINE__)
 
-#define defer$(BEGIN, END) for (isize var$(__i) = (BEGIN, 0); not var$(__i); (var$(__i) += 1, END))
-
-#define condDefer$(BEGIN, END) for (isize var$(__i) = BEGIN; var$(__i); (var$(__i) -= 1, END))
-
 #define ALWAYS_INLINE [[gnu::always_inline]]
 
 /* --- Utilities ------------------------------------------------------------ */

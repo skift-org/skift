@@ -1,6 +1,7 @@
 #include <abi-sysv/abi.h>
 #include <handover/hook.h>
 #include <hjert-api/api.h>
+#include <karm-logger/logger.h>
 #include <karm-main/base.h>
 
 extern "C" void __entryPoint(usize ho) {
@@ -18,12 +19,11 @@ extern "C" void __entryPoint(usize ho) {
     auto self = Hj::Task::self();
 
     if (not res) {
+        logError("{}: {}", argv[0], res.none().msg());
         (void)self.crash();
     }
 
     Abi::SysV::fini();
     (void)self.ret();
-
-    while (true)
-        asm volatile("pause");
+    asm volatile("ud2");
 }

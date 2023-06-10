@@ -1,0 +1,15 @@
+module Shell
+
+include "karm-math/rect.h"
+include "karm-events/base.h"
+include "protos/shell-types.h"
+
+Client {
+    event (ClientEvent e) -> Res<>
+}
+
+Host {
+    bubble (HostEvent e) -> Res<>
+
+    flip (Vec<Math::Recti> r) -> Res<>
+}

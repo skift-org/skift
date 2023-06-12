@@ -11,17 +11,12 @@ struct Cmos;
 struct Device : public Node {
     Cmos &_cmos;
 
-    Cmos &cmos() {
-        return _cmos;
-    }
+    Cmos &cmos() { return _cmos; }
 
-    Device(Cmos &cmos)
-        : _cmos(cmos) {}
+    Device(Cmos &cmos) : _cmos(cmos) {}
 };
 
-struct Rtc : public Device {
-    using Device::Device;
-};
+/* --- CMOS ----------------------------------------------------------------- */
 
 struct Cmos : public Node {
     using AddrReg = Hal::Reg<u8, 0x0>;
@@ -41,6 +36,26 @@ struct Cmos : public Node {
     };
 
     Strong<Hal::Io> _io;
+
+    Cmos(Strong<Hal::Io> io);
+
+    Res<> init() override;
+
+    Res<u8> read(Addr addr);
+
+    Res<> write(Addr addr, u8 data);
+
+    Res<> waitUpdate();
+};
+
+/* --- RTC ------------------------------------------------------------------ */
+
+struct Rtc : public Device {
+    using Device::Device;
+
+    Res<> init() override;
+
+    Res<TimeStamp> now();
 };
 
 } // namespace Dev::Cmos

@@ -322,7 +322,7 @@ Res<Strong<Listener>> Listener::create() {
     return Ok(makeStrong<Listener>());
 }
 
-Res<> Listener::watch(Hj::Cap cap, Strong<Object> obj, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {
+Res<> Listener::listen(Hj::Cap cap, Strong<Object> obj, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {
     ObjectLockScope scope{*this};
 
     for (usize i = 0; i < _listened.len(); ++i) {
@@ -334,18 +334,16 @@ Res<> Listener::watch(Hj::Cap cap, Strong<Object> obj, Flags<Hj::Sigs> set, Flag
             if (listened.set.empty() and
                 listened.unset.empty()) {
                 _listened.removeAt(i);
-                logInfo("listener: stopped listening to cap {}", cap.raw());
                 return Ok();
             }
         }
     }
 
     _listened.pushBack(Listened{cap, obj, set, unset});
-    logInfo("listener: started listening to cap {}", cap.raw());
     return Ok();
 }
 
-Slice<Hj::Event> Listener::listen() {
+Slice<Hj::Event> Listener::poll() {
     ObjectLockScope scope{*this};
     _events.clear();
 
@@ -401,7 +399,7 @@ bool Task::unblock(TimeStamp now) {
         _block = NONE;
     }
 
-    return false;
+    return true;
 }
 
 void Task::crash() {

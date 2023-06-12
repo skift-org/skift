@@ -33,6 +33,8 @@ void Sched::schedule(TimeSpan span) {
     _stamp += span;
     _curr->_sliceEnd = _stamp;
     auto next = _idle;
+    // HACK: to make sure the idle task is always scheduled last
+    _idle->_sliceEnd = _stamp;
 
     for (usize i = 0; i < _tasks.len(); ++i) {
         auto &t = _tasks[i];
@@ -43,7 +45,9 @@ void Sched::schedule(TimeSpan span) {
             continue;
         }
 
-        if (Op::lteq(t->_sliceEnd, _stamp)) {
+        bool isUnblocked = not t->blocked() or t->unblock(_stamp);
+
+        if (isUnblocked and Op::lteq(t->_sliceEnd, next->_sliceEnd)) {
             next = t;
         }
     }

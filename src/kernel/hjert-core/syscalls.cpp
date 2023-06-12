@@ -170,29 +170,30 @@ Res<> doSignal(Task &self, Hj::Cap cap, Hj::Sigs set, Hj::Sigs unset) {
     return Ok();
 }
 
-Res<> doWatch(Task &self, Hj::Cap cap, Hj::Cap target, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {
+Res<> doListen(Task &self, Hj::Cap cap, Hj::Cap target, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {
     auto obj = try$(self.domain().get<Listener>(cap));
     auto targetObj = try$(self.domain().get(target));
-    return obj->watch(target, targetObj, set, unset);
+    return obj->listen(target, targetObj, set, unset);
 }
 
-Res<> doListen(Task &self, Hj::Cap cap, UserSlice<Hj::Event> events, TimeStamp deadline) {
+Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<Hj::Event> events, User<usize> evLen, TimeStamp deadline) {
     auto obj = try$(self.domain().get<Listener>(cap));
 
     try$(self.block([&]() {
-        auto events = obj->listen();
-
-        if (events.len() > 0) {
+        auto events = obj->poll();
+        if (events.len() > 0)
             return TimeStamp::epoch();
-        }
-
         return deadline;
     }));
 
+    ObjectLockScope lock{*obj};
+    auto l = min(events.len(), obj->events().len());
+    try$(evLen.store(self.space(), l));
     try$(events.with<MutSlice<Hj::Event>>(self.space(), [&](auto events) {
-        for (usize i = 0; i < events.len(); ++i) {
-            events[i] = obj->listen()[i];
+        for (usize i = 0; i < l; ++i) {
+            events[i] = obj->events()[i];
         }
+        obj->flush();
         return Ok();
     }));
 
@@ -246,11 +247,11 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
     case Hj::Syscall::SIGNAL:
         return doSignal(self, args[0], (Hj::Sigs)args[1], (Hj::Sigs)args[2]);
 
-    case Hj::Syscall::WATCH:
-        return doWatch(self, args[0], args[1], (Hj::Sigs)args[2], (Hj::Sigs)args[3]);
-
     case Hj::Syscall::LISTEN:
-        return doListen(self, args[0], {args[1], args[2]}, args[3]);
+        return doListen(self, args[0], args[1], (Hj::Sigs)args[2], (Hj::Sigs)args[3]);
+
+    case Hj::Syscall::POLL:
+        return doPoll(self, args[0], {args[1], args[2]}, args[3], args[4]);
 
     default:
         return Error::invalidInput("invalid syscall id");

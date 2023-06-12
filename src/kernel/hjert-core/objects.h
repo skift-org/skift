@@ -208,12 +208,16 @@ struct Listener :
 
     static Res<Strong<Listener>> create();
 
-    Res<> watch(Hj::Cap cap, Strong<Object> obj, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset);
+    Res<> listen(Hj::Cap cap, Strong<Object> obj, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset);
 
-    Slice<Hj::Event> listen();
+    Slice<Hj::Event> poll();
 
     Slice<Hj::Event> events() {
         return _events;
+    }
+
+    void flush() {
+        _events.clear();
     }
 };
 

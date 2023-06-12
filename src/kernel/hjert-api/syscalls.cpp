@@ -84,12 +84,12 @@ Res<> _signal(Cap cap, Flags<Sigs> set, Flags<Sigs> unset) {
     return _syscall(Syscall::SIGNAL, cap.raw(), (Arg)set.val(), (Arg)unset.val());
 }
 
-Res<> _watch(Cap cap, Cap target, Flags<Sigs> set, Flags<Sigs> unset) {
-    return _syscall(Syscall::WATCH, cap.raw(), target.raw(), (Arg)set.val(), (Arg)unset.val());
+Res<> _listen(Cap cap, Cap target, Flags<Sigs> set, Flags<Sigs> unset) {
+    return _syscall(Syscall::LISTEN, cap.raw(), target.raw(), (Arg)set.val(), (Arg)unset.val());
 }
 
-Res<> _listen(Cap cap, Event *ev, usize evLen, TimeStamp deadline) {
-    return _syscall(Syscall::LISTEN, cap.raw(), (Arg)ev, evLen, deadline.val());
+Res<> _poll(Cap cap, Event *ev, usize evCap, usize *evLen, TimeStamp deadline) {
+    return _syscall(Syscall::POLL, cap.raw(), (Arg)ev, evCap, (usize)evLen, deadline.val());
 }
 
 } //  namespace Hj

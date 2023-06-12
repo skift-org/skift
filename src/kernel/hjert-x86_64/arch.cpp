@@ -194,9 +194,9 @@ extern "C" usize _intDispatch(usize sp) {
             sp = switchTask(TimeSpan::fromMSecs(1), sp);
         } else {
             logInfo("x86_64: irq: {}", irq);
+            Core::Irq::trigger(irq);
         }
 
-        Core::Irq::trigger(irq);
         _pic.ack(frame->intNo)
             .unwrap("pic ack failed");
     }

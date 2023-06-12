@@ -239,35 +239,31 @@ struct Irq : public Object {
 struct Listener : public Object {
     using PROPS = ListenerProps;
 
-    Buf<Event> _events;
-
-    Listener(Cap cap)
-        : Object(cap) {}
+    Buf<Event> _evs = {};
+    usize _len = {};
 
     static Res<Listener> create(Cap dest) {
         return create<Listener>(dest);
     }
 
     Res<> listen(Cap cap, Flags<Sigs> set, Flags<Sigs> unset) {
-        return _watch(_cap, cap, set, unset);
+        return _listen(_cap, cap, set, unset);
     }
 
     Res<> mute(Cap cap) {
-        return _watch(_cap, cap, Sigs::NONE, Sigs::NONE);
+        return _listen(_cap, cap, Sigs::NONE, Sigs::NONE);
     }
 
-    Res<> wait(TimeStamp deadline) {
-        _events.resize(256);
-        return _listen(_cap, _events.buf(), _events.len(), deadline);
+    Res<> poll(TimeStamp deadline) {
+        _evs.resize(256);
+        return _poll(_cap, _evs.buf(), _evs.len(), &_len, deadline);
     }
 
     Opt<Event> next() {
-        for (usize i = 0; i < _events.len(); ++i) {
-            if (_events[i].sig != Sigs::NONE) {
-                auto ev = _events[i];
-                _events[i] = {};
-                return ev;
-            }
+        if (_len) {
+            auto ev = _evs[_len - 1];
+            _len--;
+            return ev;
         }
 
         return NONE;

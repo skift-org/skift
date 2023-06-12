@@ -219,7 +219,7 @@ struct Day {
     // NOTE: 0-based
     usize _raw;
 
-    constexpr Day(usize raw)
+    constexpr Day(usize raw = 0)
         : _raw(raw) {}
 
     constexpr operator usize() const {
@@ -255,7 +255,7 @@ struct Month {
     // NOTE: 0-based
     usize _raw;
 
-    constexpr Month(isize raw)
+    constexpr Month(isize raw = 0)
         : _raw(raw) {}
 
     constexpr Month(_Name name)
@@ -288,7 +288,7 @@ struct Month {
 struct Year {
     isize _raw;
 
-    constexpr Year(isize raw)
+    constexpr Year(isize raw = 0)
         : _raw(raw) {}
 
     constexpr bool isLeap() const {

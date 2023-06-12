@@ -58,8 +58,8 @@ static inline char const *toStr(Type type) {
     SYSCALL(RECV)                \
     SYSCALL(CLOSE)               \
     SYSCALL(SIGNAL)              \
-    SYSCALL(WATCH)               \
-    SYSCALL(LISTEN)
+    SYSCALL(LISTEN)              \
+    SYSCALL(POLL)
 
 // clang-format off
 
@@ -106,6 +106,10 @@ struct Cap {
 
     operator bool() const {
         return _raw != 0;
+    }
+
+    bool operator==(Cap other) const {
+        return _raw == other._raw;
     }
 };
 

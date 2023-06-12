@@ -15,6 +15,8 @@ struct Ok {
 
     ALWAYS_INLINE constexpr Ok(T value)
         : inner(std::move(value)) {}
+
+    operator bool() const = delete;
 };
 
 template <typename V = None, typename E = Error>

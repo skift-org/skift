@@ -1,4 +1,5 @@
 #include <hjert-api/api.h>
+#include <karm-base/map.h>
 #include <karm-logger/logger.h>
 #include <karm-main/main.h>
 
@@ -28,14 +29,34 @@ Res<> entryPoint(Ctx &) {
 
     logInfo("devices: binding IRQs...");
     auto listener = try$(Hj::Listener::create(Hj::ROOT));
-    Vec<Cons<usize, Hj::Irq>> irqs = {};
-    for (usize i = 0; i < 16; ++i) {
-        irqs.pushBack({i, try$(Hj::Irq::create(Hj::ROOT, i))});
-        try$(listener.listen(irqs[i].cdr, Hj::Sigs::TRIGGERED, Hj::Sigs::NONE));
+
+    Map<Hj::Cap, usize> cap2irq = {};
+    Vec<Hj::Irq> irqs = {};
+
+    for (usize i = 0; i < 16; i++) {
+        auto irq = try$(Hj::Irq::create(Hj::ROOT, i));
+        try$(listener.listen(irq, Hj::Sigs::TRIGGERED, Hj::Sigs::NONE));
+        logInfo("devices: bound IRQ {} to {}", i, irq._cap.raw());
+        cap2irq.put(irq._cap, i);
+        irqs.pushBack(std::move(irq));
     }
 
-    while (try$(listener.poll(try$(Hj::now()) + TimeSpan::fromSecs(1)))) {
-        logInfo("devices: timeout");
+    try$(listener.poll(try$(Hj::now()) + TimeSpan::fromSecs(1)));
+    while (true) {
+        auto ev = listener.next();
+        while (ev) {
+            logInfo("devices: got an event from {}", ev->cap.raw());
+            try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::TRIGGERED));
+
+            auto irq = cap2irq.get(ev->cap);
+            if (not irq) {
+                logWarn("devices: got an event from an unknown IRQ cap {}", ev->cap.raw());
+            } else {
+                logInfo("devices: irq {} triggered", *irq);
+            }
+            ev = listener.next();
+        }
+        try$(listener.poll(try$(Hj::now()) + TimeSpan::fromSecs(1)));
     }
 
     return Ok();

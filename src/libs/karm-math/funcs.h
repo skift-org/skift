@@ -118,61 +118,6 @@ constexpr T cot(T x) noexcept {
     return T(1.) / tan<T, P>(x);
 }
 
-template <typename T, Precision P = PRECISE>
-T atan(T x) {
-    double result = 0.0;
-    double sign = 1.0;
-    double y = 1.0;
-
-    if (x < 0) {
-        x = -x;
-        sign = -1.0;
-    }
-
-    while (x > 1.0) {
-        x = x - 1.0;
-        y = y + 1.0;
-    }
-
-    double x2 = x * x;
-    double term = x;
-    double denom = 1.0;
-
-    for (int i = 1; i <= (P == PRECISE ? 50 : 25); i++) {
-        term = term * x2;
-        denom = 2 * i + 1;
-        double frac = term / denom;
-        if (i % 2 == 0) {
-            result += frac;
-        } else {
-            result -= frac;
-        }
-    }
-
-    return sign * result;
-}
-
-template <typename T, Precision P = PRECISE>
-T atan2(T y, T x) {
-    if (x > 0)
-        return atan<T, P>(y / x);
-
-    if (x < 0) {
-        if (y >= 0)
-            return atan<T, P>(y / x) + PI;
-
-        return atan<T, P>(y / x) - PI;
-    }
-
-    if (y > 0)
-        return PI / 2;
-
-    if (y < 0)
-        return -PI / 2;
-
-    return 0;
-}
-
 /* --- Exponentials --------------------------------------------------------- */
 
 template <typename T>

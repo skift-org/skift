@@ -143,12 +143,43 @@ void backtrace(usize rbp) {
     }
 }
 
-auto const *CLOSE_LINE = "-----------------------------------------------------------";
-
 usize switchTask(TimeSpan span, usize sp) {
     Core::Task::self().saveCtx(sp);
     Core::Sched::instance().schedule(span);
     return Core::Task::self().loadCtx();
+}
+
+usize uPanic(Frame const *frame, usize sp) {
+    logError("userspace fault:'{}'", _faultMsg[frame->intNo]);
+    logError("int={} err={} rip={p} rsp={p} rbp={p} cr2={p} cr3={p}", frame->intNo, frame->errNo, frame->rip, frame->rsp, frame->rbp, x86_64::rdcr2(), x86_64::rdcr3());
+    Core::Task::self().crash();
+    return switchTask(TimeSpan::fromMSecs(0), sp);
+}
+
+void kPanic(Frame const *frame) {
+    logPrint("{}--- {} {}----------------------------------------------------", Cli::style(Cli::YELLOW_LIGHT), Cli::styled("!!!", Cli::Style(Cli::Color::RED).bold()), Cli::style(Cli::YELLOW_LIGHT));
+    logPrint("");
+    logPrint("    {}", Cli::styled("Kernel Panic", Cli::style(Cli::RED).bold()));
+    logPrint("    CPU EXCEPTION : '{}'", _faultMsg[frame->intNo]);
+    logPrint("    {}", Cli::styled(Text::witty(frame->rsp + frame->rip), Cli::GRAY_DARK));
+    logPrint("");
+    logPrint("    {}", Cli::styled("Registers", Cli::WHITE));
+    logPrint("    int={}", frame->intNo);
+    logPrint("    err={}", frame->errNo);
+    logPrint("    rip={p}", frame->rip);
+    logPrint("    rbp={p}", frame->rbp);
+    logPrint("    rsp={p}", frame->rsp);
+    logPrint("    cr2={p}", x86_64::rdcr2());
+    logPrint("    cr3={p}", x86_64::rdcr3());
+    logPrint("");
+    logPrint("    {}", Cli::styled("Backtrace", Cli::WHITE));
+    backtrace(frame->rbp);
+    logPrint("");
+    logPrint("    {}", Cli::styled("System halted", Cli::WHITE));
+    logPrint("");
+    logPrint("{}", Cli::styled("-----------------------------------------------------------", Cli::YELLOW_LIGHT));
+
+    panic("cpu exception");
 }
 
 extern "C" usize _intDispatch(usize sp) {
@@ -157,45 +188,20 @@ extern "C" usize _intDispatch(usize sp) {
     cpu().beginInterrupt();
 
     if (frame->intNo < 32) {
-        if (frame->cs == (x86_64::Gdt::UCODE * 8 | 3)) {
-            logError("userspace fault:'{}'", _faultMsg[frame->intNo]);
-            logError("int={} err={} rip={p} rsp={p} rbp={p} cr2={p} cr3={p}", frame->intNo, frame->errNo, frame->rip, frame->rsp, frame->rbp, x86_64::rdcr2(), x86_64::rdcr3());
-            Core::Task::self().crash();
-            sp = switchTask(TimeSpan::fromMSecs(0), sp);
-        } else {
-            logPrint("{}--- {} {}----------------------------------------------------", Cli::style(Cli::YELLOW_LIGHT), Cli::styled("!!!", Cli::Style(Cli::Color::RED).bold()), Cli::style(Cli::YELLOW_LIGHT));
-            logPrint("");
-            logPrint("    {}", Cli::styled("Kernel Panic", Cli::style(Cli::RED).bold()));
-            logPrint("    CPU EXCEPTION : '{}'", _faultMsg[frame->intNo]);
-            logPrint("    {}", Cli::styled(Text::witty(frame->rsp + frame->rip), Cli::GRAY_DARK));
-            logPrint("");
-            logPrint("    {}", Cli::styled("Registers", Cli::WHITE));
-            logPrint("    int={}", frame->intNo);
-            logPrint("    err={}", frame->errNo);
-            logPrint("    rip={p}", frame->rip);
-            logPrint("    rsp={p}", frame->rsp);
-            logPrint("    cr2={p}", x86_64::rdcr2());
-            logPrint("    cr3={p}", x86_64::rdcr3());
-            logPrint("");
-            logPrint("    {}", Cli::styled("Backtrace", Cli::WHITE));
-            backtrace(frame->rbp);
-            logPrint("");
-            logPrint("    {}", Cli::styled("System halted", Cli::WHITE));
-            logPrint("");
-            logPrint("{}", Cli::styled("-----------------------------------------------------------", Cli::YELLOW_LIGHT));
-            panic("cpu exception");
-        }
+        if (frame->cs == (x86_64::Gdt::UCODE * 8 | 3))
+            sp = uPanic(frame, sp);
+        else
+            kPanic(frame);
+
     } else if (frame->intNo == 100) {
         sp = switchTask(TimeSpan::fromMSecs(0), sp);
     } else {
         isize irq = frame->intNo - 32;
 
-        if (irq == 0) {
+        if (irq == 0)
             sp = switchTask(TimeSpan::fromMSecs(1), sp);
-        } else {
-            logInfo("x86_64: irq: {}", irq);
+        else
             Core::Irq::trigger(irq);
-        }
 
         _pic.ack(frame->intNo)
             .unwrap("pic ack failed");
@@ -205,6 +211,12 @@ extern "C" usize _intDispatch(usize sp) {
 
     return sp;
 }
+
+void yield() {
+    asm volatile("int $100");
+}
+
+/* --- Syscalls ------------------------------------------------------------- */
 
 extern "C" usize _sysDispatch(usize sp) {
     auto *frame = reinterpret_cast<Frame *>(sp);
@@ -227,6 +239,8 @@ extern "C" usize _sysDispatch(usize sp) {
     return (usize)Error::_OK;
 }
 
+/* --- Vmm ------------------------------------------------------------------ */
+
 static x86_64::Pml<4> *_kpml4 = nullptr;
 static Opt<x86_64::Vmm<Hal::UpperHalfMapper>> _vmm = NONE;
 
@@ -242,56 +256,6 @@ Hal::Vmm &vmm() {
     }
 
     return *_vmm;
-}
-
-void start(Core::Task &task, usize ip, usize sp, Hj::Args args) {
-    Frame frame{
-        .r8 = args[4],
-        .rdi = args[0],
-        .rsi = args[1],
-        .rdx = args[2],
-        .rcx = args[3],
-
-        .rip = ip,
-        .rflags = 0x202,
-        .rsp = sp,
-    };
-
-    if (task.mode() == Core::TaskMode::USER) {
-        frame.cs = x86_64::Gdt::UCODE * 8 | 3; // 3 = user mode
-        frame.ss = x86_64::Gdt::UDATA * 8 | 3;
-    } else {
-        frame.cs = x86_64::Gdt::KCODE * 8;
-        frame.ss = x86_64::Gdt::KDATA * 8;
-    }
-
-    task
-        .stack()
-        .push(frame);
-}
-
-struct Ctx : public Core::Ctx {
-    usize _ksp;
-    usize _usp;
-
-    Array<Byte, Hal::PAGE_SIZE> simd __attribute__((aligned(16)));
-
-    Ctx(usize ksp) : _ksp(ksp), _usp(0) {
-        x86_64::simdInitCtx(simd.buf());
-    }
-
-    virtual void save() {
-        x86_64::simdSaveCtx(simd.buf());
-    }
-
-    virtual void load() {
-        x86_64::simdLoadCtx(simd.buf());
-        x86_64::sysSetGs((usize)&_ksp);
-    }
-};
-
-Res<Box<Core::Ctx>> createCtx(usize ksp) {
-    return Ok<Box<Core::Ctx>>(makeBox<Ctx>(ksp));
 }
 
 struct UserVmm : public x86_64::Vmm<Hal::UpperHalfMapper> {
@@ -323,8 +287,57 @@ Res<Strong<Hal::Vmm>> createVmm() {
     return Ok(makeStrong<UserVmm>(pml4));
 }
 
-void yield() {
-    asm volatile("int $100");
+/* --- Tasking -------------------------------------------------------------- */
+
+void start(Core::Task &task, usize ip, usize sp, Hj::Args args) {
+    Frame frame{
+        .r8 = args[4],
+        .rdi = args[0],
+        .rsi = args[1],
+        .rdx = args[2],
+        .rcx = args[3],
+
+        .rip = ip,
+        .rflags = 0x202,
+        .rsp = sp,
+    };
+
+    if (task.mode() == Core::TaskMode::USER) {
+        frame.cs = x86_64::Gdt::UCODE * 8 | 3; // 3 = user mode
+        frame.ss = x86_64::Gdt::UDATA * 8 | 3;
+    } else {
+        frame.cs = x86_64::Gdt::KCODE * 8;
+        frame.ss = x86_64::Gdt::KDATA * 8;
+    }
+
+    task
+        .stack()
+        .push(frame);
+}
+
+struct Ctx : public Core::Ctx {
+    usize _ksp;
+    usize _usp;
+
+    Array<Byte, Hal::PAGE_SIZE> _simd __attribute__((aligned(16)));
+
+    Ctx(usize ksp)
+        : _ksp(ksp), _usp(0) {
+        x86_64::simdInitCtx(_simd.buf());
+    }
+
+    virtual void save() {
+        x86_64::simdSaveCtx(_simd.buf());
+    }
+
+    virtual void load() {
+        x86_64::simdLoadCtx(_simd.buf());
+        x86_64::sysSetGs((usize)&_ksp);
+    }
+};
+
+Res<Box<Core::Ctx>> createCtx(usize ksp) {
+    return Ok<Box<Core::Ctx>>(makeBox<Ctx>(ksp));
 }
 
 } // namespace Hjert::Arch

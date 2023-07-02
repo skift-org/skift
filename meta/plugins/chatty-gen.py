@@ -10,5 +10,5 @@ idlFiles = shell.find('src/', ['*.idl'])
 for idlFile in idlFiles:
     headerFile = idlFile.replace('.idl', '.h')
     if utils.isNewer(idlFile, headerFile):
-        shell.exec('chatty', idlFile, headerFile)
+        shell.exec('cute-engineering-chatty', idlFile, headerFile)
         shell.exec('clang-format', '-i', headerFile)

@@ -21,7 +21,7 @@ struct _Cell {
     virtual void clear() = 0;
     virtual Meta::Type<> inspect() = 0;
 
-    _Cell *collect() {
+    _Cell *collectAndRelease() {
         if (_strong == 0 and not _clear) {
             clear();
             _clear = true;
@@ -38,7 +38,7 @@ struct _Cell {
     }
 
     _Cell *refStrong() {
-        LockScope scope{_lock};
+        LockScope scope(_lock);
 
         if (_clear)
             panic("refStrong() called on cleared cell");
@@ -54,11 +54,11 @@ struct _Cell {
         _strong--;
         if (_strong < 0)
             panic("derefStrong() underflow");
-        return collect();
+        return collectAndRelease();
     }
 
     _Cell *refWeak() {
-        LockScope scope{_lock};
+        LockScope scope(_lock);
 
         _weak++;
         if (_weak < 0)
@@ -72,7 +72,7 @@ struct _Cell {
         _weak--;
         if (_weak < 0)
             panic("derefWeak() underflow");
-        return collect();
+        return collectAndRelease();
     }
 
     template <typename T>

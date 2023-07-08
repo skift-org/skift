@@ -121,7 +121,7 @@ struct RwLock : Meta::Static {
     }
 
     bool tryAcquireRead() {
-        LockScope scope{_lock};
+        LockScope scope(_lock);
 
         if (_pendings.load())
             return false;
@@ -137,7 +137,7 @@ struct RwLock : Meta::Static {
     }
 
     void releaseRead() {
-        LockScope scope{_lock};
+        LockScope scope(_lock);
         --_readers;
         Embed::leaveCritical();
     }
@@ -156,7 +156,7 @@ struct RwLock : Meta::Static {
     }
 
     bool tryAcquireWrite() {
-        LockScope scope{_lock};
+        LockScope scope(_lock);
 
         if (_readers)
             return false;
@@ -170,7 +170,7 @@ struct RwLock : Meta::Static {
     }
 
     void releaseWrite() {
-        LockScope scope{_lock};
+        LockScope scope(_lock);
         --_writers;
         Embed::leaveCritical();
     }

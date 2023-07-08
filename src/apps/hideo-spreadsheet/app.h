@@ -185,6 +185,7 @@ struct State {
     Book book;
     usize active = 0;
     Opt<Range> selection = NONE;
+    bool propertiesVisible = false;
 
     State() {
         activeSheet().recompute();
@@ -241,6 +242,8 @@ struct SwitchSheet {
     usize index;
 };
 
+struct ToggleProperties {};
+
 using Actions = Var<
     UpdateSelection,
 
@@ -253,6 +256,7 @@ using Actions = Var<
     UpdateStyleFont,
     UpdateStyleBorders,
 
+    ToggleProperties,
     SwitchSheet>;
 
 State reduce(State s, Actions a);

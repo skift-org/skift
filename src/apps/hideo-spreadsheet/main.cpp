@@ -23,7 +23,7 @@ Ui::Child formula() {
             Ui::grow(NONE)));
 }
 
-Ui::Child toolbar() {
+Ui::Child toolbar(State const &state) {
     return Ui::toolbar(
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FILE),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FOLDER),
@@ -40,7 +40,8 @@ Ui::Child toolbar() {
         Ui::separator(),
         Ui::empty(4),
         formula() | Ui::grow(),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BRUSH_VARIANT));
+        Ui::empty(4),
+        Ui::button(Model::bind<ToggleProperties>(), state.propertiesVisible ? Ui::ButtonStyle::regular() : Ui::ButtonStyle::subtle(), Mdi::BRUSH_VARIANT));
 }
 
 Ui::Child properties() {
@@ -170,10 +171,14 @@ Ui::Child tabs(State const &state) {
 Ui::Child app() {
     return Ui::reducer<Model>({}, [](auto const &s) {
         auto tb = Ui::titlebar(Mdi::TABLE, "Spreadsheet", tabs(s));
-        auto body = hflow(table(s) | Ui::grow(), Ui::separator(), properties());
+        auto body = table(s) | Ui::grow();
+        if (s.propertiesVisible) {
+            body = hflow(body, Ui::separator(), properties());
+        }
+
         return Ui::vflow(
                    tb,
-                   toolbar(),
+                   toolbar(s),
                    body | Ui::grow()) |
                Ui::pinSize({800, 600}) | Ui::dialogLayer();
     });

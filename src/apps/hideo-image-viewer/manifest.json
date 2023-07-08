@@ -4,7 +4,7 @@
     "type": "exe",
     "description": "View and edit images",
     "requires": [
-        "file-manager",
+        "hideo-file-manager-base",
         "karm-main"
     ]
 }

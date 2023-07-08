@@ -4,7 +4,7 @@
     "type": "exe",
     "description": "Manage files and folders",
     "requires": [
-        "file-manager-base",
+        "hideo-file-manager-base",
         "karm-main"
     ]
 }

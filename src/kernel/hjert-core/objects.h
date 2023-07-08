@@ -118,6 +118,10 @@ struct Space : public BaseObject<Space, Hj::Type::SPACE> {
         Hal::VmmRange vrange;
         usize off;
         Strong<Vmo> vmo;
+
+        Hal::PmmRange prange() {
+            return vmo->range().slice(off, vrange.size);
+        }
     };
 
     Strong<Hal::Vmm> _vmm;
@@ -132,7 +136,7 @@ struct Space : public BaseObject<Space, Hj::Type::SPACE> {
 
     Res<usize> _lookup(Hal::VmmRange vrange);
 
-    bool _alreadyMapped(Hal::VmmRange vrange);
+    Res<> _ensureNotMapped(Hal::VmmRange vrange);
 
     Res<> _validate(Hal::VmmRange vrange) {
         for (auto &map : _maps) {
@@ -149,6 +153,17 @@ struct Space : public BaseObject<Space, Hj::Type::SPACE> {
     Res<> unmap(Hal::VmmRange vrange);
 
     void activate();
+
+    void dump() {
+        ObjectLockScope scope(*this);
+        for (auto &map : _maps) {
+            auto vrange = map.vrange;
+            auto prange = map.prange();
+            auto size = vrange.size / 1024;
+            logDebug("space {}: map: {x}-{x} -> {x}-{x} {} {}kib", id(), vrange.start, vrange.end(), prange.start, prange.end(), map.vmo->label(), size);
+        }
+        _vmm->dump();
+    }
 };
 
 /* --- Channel -------------------------------------------------------------- */

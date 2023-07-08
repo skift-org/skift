@@ -163,18 +163,30 @@ Res<> init(Handover::Payload &payload) {
     _pmm->dump();
 
     logInfo("mem: mapping kernel...");
-    try$(vmm().mapRange(
-        {Handover::KERNEL_BASE + Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
-        {Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
+    try$(Arch::vmm().mapRange(
+        {
+            Handover::KERNEL_BASE + Hal::PAGE_SIZE,
+            gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
+        },
+        {
+            Hal::PAGE_SIZE,
+            gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
+        },
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     logInfo("mem: mapping upper half...");
-    try$(vmm().mapRange(
-        {Handover::UPPER_HALF + Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
-        {Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
+    try$(Arch::vmm().mapRange(
+        {
+            Handover::UPPER_HALF + Hal::PAGE_SIZE,
+            gib(4) - Hal::PAGE_SIZE,
+        },
+        {
+            Hal::PAGE_SIZE,
+            gib(4) - Hal::PAGE_SIZE,
+        },
         Hal::Vmm::READ | Hal::Vmm::WRITE));
 
-    vmm().activate();
+    Arch::vmm().activate();
 
     return Ok();
 }
@@ -193,10 +205,6 @@ Hal::Kmm &kmm() {
         logFatal("mem: heap not initialized yet");
     }
     return *_kmm;
-}
-
-Hal::Vmm &vmm() {
-    return Arch::vmm();
 }
 
 } // namespace Hjert::Core

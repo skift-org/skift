@@ -8,13 +8,13 @@
 namespace Hjert::Core {
 
 namespace Mem {
+
 Res<> init(Handover::Payload &);
+
 } // namespace Mem
 
 Hal::Kmm &kmm();
 
 Hal::Pmm &pmm();
-
-Hal::Vmm &vmm();
 
 } // namespace Hjert::Core

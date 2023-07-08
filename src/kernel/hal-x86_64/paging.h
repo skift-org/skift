@@ -1,5 +1,6 @@
 #pragma once
 
+#include <hal/vmm.h>
 #include <karm-base/opt.h>
 #include <karm-base/std.h>
 
@@ -20,6 +21,29 @@ struct [[gnu::packed]] Entry {
     static constexpr u64 FLAGS_MASK = 0xfff;
 
     u64 _raw{};
+
+    static u64 makeFlags(Flags<Hal::VmmFlags> flags) {
+        u64 res = 0;
+        if (flags.has(Hal::VmmFlags::READ)) {
+            res |= WRITE;
+        }
+        if (flags.has(Hal::VmmFlags::WRITE)) {
+            res |= WRITE;
+        }
+        if (flags.has(Hal::VmmFlags::EXEC)) {
+            res |= 0;
+        }
+        if (flags.has(Hal::VmmFlags::USER)) {
+            res |= USER;
+        }
+        if (flags.has(Hal::VmmFlags::GLOBAL)) {
+            res |= GLOBAL;
+        }
+        if (flags.has(Hal::VmmFlags::UNCACHED)) {
+            res |= NO_CACHE;
+        }
+        return res;
+    }
 
     Entry() {}
 

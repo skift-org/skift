@@ -152,15 +152,15 @@ Res<usize> Space::_lookup(Hal::VmmRange vrange) {
     return Error::invalidInput("no such mapping");
 }
 
-bool Space::_alreadyMapped(Hal::VmmRange vrange) {
+Res<> Space::_ensureNotMapped(Hal::VmmRange vrange) {
     for (usize i = 0; i < _maps.len(); i++) {
         auto &map = _maps[i];
         if (map.vrange.overlaps(vrange)) {
-            return true;
+            return Error::invalidInput("already mapped");
         }
     }
 
-    return false;
+    return Ok();
 }
 
 Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<Vmo> vmo, usize off, Hj::MapFlags flags) {
@@ -181,9 +181,7 @@ Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<Vmo> vmo, usize off, 
     if (vrange.start == 0) {
         vrange = try$(_alloc.alloc(vrange.size));
     } else {
-        if (_alreadyMapped(vrange)) {
-            return Error::invalidInput("already mapped");
-        }
+        try$(_ensureNotMapped(vrange));
         _alloc.used(vrange);
     }
 

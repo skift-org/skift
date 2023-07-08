@@ -46,12 +46,12 @@ struct Vmm : public Hal::Vmm {
         return Ok(_mapper.map((Pml<L - 1> *)lower));
     }
 
-    Res<> allocPage(usize vaddr, usize paddr, Hal::VmmFlags) {
+    Res<> allocPage(usize vaddr, usize paddr, Hal::VmmFlags flags) {
         auto pml3 = try$(pmlOrAlloc(*_pml4, vaddr));
         auto pml2 = try$(pmlOrAlloc(*pml3, vaddr));
         auto pml1 = try$(pmlOrAlloc(*pml2, vaddr));
 
-        pml1->putPage(vaddr, {paddr, Entry::WRITE | Entry::PRESENT | Entry::USER});
+        pml1->putPage(vaddr, {paddr, Entry::makeFlags(flags) | Entry::PRESENT});
 
         return Ok();
     }
@@ -134,7 +134,7 @@ struct Vmm : public Hal::Vmm {
             if ((vend + Hal::PAGE_SIZE != vaddr) or
                 (pend + Hal::PAGE_SIZE != paddr)) {
 
-                logInfo("x86_64: vmm: {x}-{x} {x}-{x}", vstart, vend, pstart, pend);
+                logInfo("x86_64: vmm: {x}-{x} {x}-{x}", vstart, vend + Hal::PAGE_SIZE, pstart, pend + Hal::PAGE_SIZE);
                 vstart = vaddr;
                 vend = vaddr;
 

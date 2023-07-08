@@ -11,7 +11,7 @@
                 "bundle://system-srv/_bin",
                 "bundle://device-srv/_bin",
                 {
-                    "url": "bundle://shell-app/_bin",
+                    "url": "bundle://hideo-shell/_bin",
                     "props": {
                         "form-factor": "mobile"
                     }
@@ -30,7 +30,7 @@
                 "bundle://system-srv/_bin",
                 "bundle://device-srv/_bin",
                 {
-                    "url": "bundle://shell-app/_bin",
+                    "url": "bundle://hideo-shell/_bin",
                     "props": {
                         "form-factor": "desktop"
                     }

@@ -112,7 +112,7 @@ Res<> entryPoint(Ctx &ctx) {
 
     try$(displayBootscreen(ctx));
     try$(loadService(ctx, "bundle://device-srv/_bin"_url));
-    try$(loadService(ctx, "bundle://shell-app/_bin"_url));
+    try$(loadService(ctx, "bundle://hideo-shell/_bin"_url));
 
     return Ok();
 }

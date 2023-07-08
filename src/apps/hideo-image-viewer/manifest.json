@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-image-viewer",
+    "type": "exe",
+    "description": "View and edit images",
+    "requires": [
+        "file-manager",
+        "karm-main"
+    ]
+}

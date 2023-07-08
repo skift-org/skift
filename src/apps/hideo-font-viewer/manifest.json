@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-font-viewer",
+    "type": "exe",
+    "description": "View and manage fonts",
+    "requires": [
+        "hideo-file-manager-base",
+        "karm-main"
+    ]
+}

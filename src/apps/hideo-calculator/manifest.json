@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-calculator",
+    "type": "exe",
+    "description": "Evaluate mathematical expressions",
+    "requires": [
+        "karm-ui",
+        "karm-main"
+    ]
+}

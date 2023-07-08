@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-settings",
+    "type": "exe",
+    "description": "Edit and manage settings for your computer",
+    "requires": [
+        "karm-ui",
+        "karm-main"
+    ]
+}

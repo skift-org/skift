@@ -187,7 +187,8 @@ def bootCmd(args: Args) -> None:
                   (":debug" if isDebug else ""))
     image.install("system-srv", "skift-x86_64" + (":debug" if isDebug else ""))
     image.install("device-srv", "skift-x86_64" + (":debug" if isDebug else ""))
-    image.install("shell-app", "skift-x86_64" + (":debug" if isDebug else ""))
+    image.install("hideo-shell", "skift-x86_64" +
+                  (":debug" if isDebug else ""))
 
     image.install("skift-branding", "skift-x86_64" +
                   (":debug" if isDebug else ""))

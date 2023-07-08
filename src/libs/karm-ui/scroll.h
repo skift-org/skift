@@ -31,8 +31,6 @@ inline auto vscroll() {
     };
 }
 
-using Build = Func<Child()>;
-
 using BuildItem = Func<Child(usize)>;
 
 Child hlist(usize len, BuildItem child);

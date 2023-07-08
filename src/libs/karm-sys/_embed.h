@@ -16,8 +16,6 @@ namespace Karm::Sys::_Embed {
 
 Res<Strong<Sys::Fd>> openFile(Sys::Url url);
 
-Res<Vec<Sys::DirEntry>> readDir(Sys::Url url);
-
 Res<Strong<Sys::Fd>> createFile(Sys::Url url);
 
 Res<Cons<Strong<Sys::Fd>, Strong<Sys::Fd>>> createPipe();
@@ -27,6 +25,8 @@ Res<Strong<Sys::Fd>> createIn();
 Res<Strong<Sys::Fd>> createOut();
 
 Res<Strong<Sys::Fd>> createErr();
+
+Res<Vec<Sys::DirEntry>> readDir(Sys::Url url);
 
 /* --- Time ----------------------------------------------------------------- */
 

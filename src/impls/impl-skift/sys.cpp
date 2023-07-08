@@ -54,6 +54,10 @@ Res<Strong<Sys::Fd>> createFile(Sys::Url) {
     notImplemented();
 }
 
+Res<Cons<Strong<Sys::Fd>, Strong<Sys::Fd>>> createPipe() {
+    notImplemented();
+}
+
 Res<Strong<Sys::Fd>> createIn() {
     return Ok(makeStrong<Sys::DummyFd>());
 }
@@ -66,13 +70,25 @@ Res<Strong<Sys::Fd>> createErr() {
     return Ok(makeStrong<Sys::DummyFd>());
 }
 
+Res<Vec<Sys::DirEntry>> readDir(Sys::Url) {
+    notImplemented();
+}
+
 /* --- Time ----------------------------------------------------------------- */
 
 TimeStamp now() {
     return Hj::now().unwrap();
 }
 
+TimeSpan uptime() {
+    notImplemented();
+}
+
 /* --- Memory Managment ----------------------------------------------------- */
+
+Res<Sys::MmapResult> memMap(Sys::MmapOptions const &) {
+    notImplemented();
+}
 
 Res<Sys::MmapResult> memMap(Sys::MmapOptions const &, Strong<Sys::Fd> fd) {
     if (fd.is<VmoFd>()) {
@@ -91,6 +107,42 @@ Res<Sys::MmapResult> memMap(Sys::MmapOptions const &, Strong<Sys::Fd> fd) {
 
 Res<> memUnmap(void const *ptr, usize size) {
     return Hj::Space::self().unmap({(usize)ptr, size});
+}
+
+Res<> memFlush(void *, usize) {
+    notImplemented();
+}
+
+/* --- System Informations -------------------------------------------------- */
+
+Res<> populate(Sys::SysInfo &) {
+    notImplemented();
+}
+
+Res<> populate(Sys::MemInfo &) {
+    notImplemented();
+}
+
+Res<> populate(Vec<Sys::CpuInfo> &) {
+    notImplemented();
+}
+
+Res<> populate(Sys::UserInfo &) {
+    notImplemented();
+}
+
+Res<> populate(Vec<Sys::UserInfo> &) {
+    notImplemented();
+}
+
+/* --- Process Managment ---------------------------------------------------- */
+
+Res<> sleep(TimeSpan) {
+    notImplemented();
+}
+
+Res<> exit(i32) {
+    notImplemented();
 }
 
 } // namespace Karm::Sys::_Embed

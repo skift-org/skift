@@ -33,7 +33,7 @@ struct [[gnu::packed]] Frame {
 
 extern "C" Array<uintptr_t, 256> _intVec;
 
-extern "C" uintptr_t _intDispatch(uintptr_t rsp);
+extern "C" void _intDispatch(uintptr_t rsp);
 
 extern "C" void _sysHandler();
 

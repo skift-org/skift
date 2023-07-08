@@ -14,6 +14,7 @@ struct Sched {
     Lock _lock{};
 
     Vec<Strong<Task>> _tasks;
+    Strong<Task> _prev;
     Strong<Task> _curr;
     Strong<Task> _idle;
 
@@ -27,15 +28,12 @@ struct Sched {
 
     Sched(Strong<Task> bootTask)
         : _tasks{bootTask},
+          _prev(bootTask),
           _curr(bootTask),
           _idle(bootTask) {
     }
 
-    Res<> start(Strong<Task> task, usize ip, Hj::Args args) {
-        return start(task, ip, task->stack().loadSp(), args);
-    }
-
-    Res<> start(Strong<Task> task, usize ip, usize sp, Hj::Args args);
+    Res<> enqueue(Strong<Task> task);
 
     void schedule(TimeSpan span);
 

@@ -10,7 +10,9 @@ static Opt<Sched> _sched;
 
 Res<> Sched::init(Handover::Payload &) {
     logInfo("sched: initializing...");
-    _sched.emplace(try$(Task::create(TaskMode::SUPER, try$(Space::create()))));
+    auto bootTask = try$(Task::create(TaskMode::SUPER, try$(Space::create())));
+    try$(bootTask->ready(0, 0, {}));
+    _sched.emplace(std::move(bootTask));
     return Ok();
 }
 
@@ -18,19 +20,17 @@ Sched &Sched::instance() {
     return *_sched;
 }
 
-Res<> Sched::start(Strong<Task> task, usize ip, usize sp, Hj::Args args) {
-    logInfo("sched: starting task (ip: {x}, sp: {x})...", ip, sp);
-
-    LockScope scope{_lock};
-    Arch::start(*task, ip, sp, args);
+Res<> Sched::enqueue(Strong<Task> task) {
+    LockScope scope(_lock);
     _tasks.pushBack(std::move(task));
     return Ok();
 }
 
 void Sched::schedule(TimeSpan span) {
-    LockScope scope{_lock};
+    LockScope scope(_lock);
 
     _stamp += span;
+    _prev = _curr;
     _curr->_sliceEnd = _stamp;
     auto next = _idle;
     // HACK: to make sure the idle task is always scheduled last
@@ -40,7 +40,7 @@ void Sched::schedule(TimeSpan span) {
         auto &t = _tasks[i];
 
         if (t->hasRet()) {
-            logInfo("sched: {} has returned", *t);
+            logInfo("{}: stopped", *t);
             _tasks.removeAt(i--);
             continue;
         }

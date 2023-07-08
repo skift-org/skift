@@ -23,7 +23,6 @@ _intCommon:
 
     mov rdi, rsp
     call _intDispatch
-    mov rsp, rax
 
     pop r15
     pop r14

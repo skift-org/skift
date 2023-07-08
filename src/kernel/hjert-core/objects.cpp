@@ -368,8 +368,7 @@ Res<Strong<Task>> Task::create(
 
     logInfo("task: creating task...");
     auto stack = try$(Stack::create());
-    auto ctx = try$(Ctx::create(stack.loadSp()));
-    auto task = makeStrong<Task>(mode, std::move(stack), std::move(ctx), space, domain);
+    auto task = makeStrong<Task>(mode, std::move(stack), space, domain);
     return Ok(task);
 }
 
@@ -401,7 +400,7 @@ bool Task::unblock(TimeStamp now) {
 }
 
 void Task::crash() {
-    logError("task: crashed");
+    logError("{}: crashed", *this);
     signal(Hj::Sigs::EXITED | Hj::Sigs::CRASHED,
            Hj::Sigs::NONE);
 }
@@ -457,7 +456,7 @@ Res<Strong<Irq>> Irq::create(usize irq) {
 }
 
 void Irq::trigger(usize irqNum) {
-    LockScope scope{_irqsLock};
+    LockScope scope(_irqsLock);
     for (auto *irq : _irqs) {
         if (irq->_irq == irqNum) {
             irq->signal(Hj::Sigs::TRIGGERED, Hj::Sigs::NONE);
@@ -466,12 +465,12 @@ void Irq::trigger(usize irqNum) {
 }
 
 Irq::Irq(usize irq) : _irq(irq) {
-    LockScope scope{_irqsLock};
+    LockScope scope(_irqsLock);
     _irqs.pushBack(this);
 }
 
 Irq::~Irq() {
-    LockScope scope{_irqsLock};
+    LockScope scope(_irqsLock);
     _irqs.removeAll(this);
 }
 

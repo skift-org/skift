@@ -9,6 +9,12 @@
 
 namespace Hjert::Core {
 
+enum struct TaskMode : u8 {
+    IDLE,  // The task is only run when there is no other task to run
+    USER,  // The task is running in user mode
+    SUPER, // The task is running in supervisor mode propably serving a syscall
+};
+
 struct Cpu;
 
 struct Ctx;
@@ -21,6 +27,8 @@ struct Space;
 
 namespace Hjert::Arch {
 
+struct Frame;
+
 Core::Cpu &cpu();
 
 Res<> init(Handover::Payload &);
@@ -31,9 +39,7 @@ Io::TextWriter &loggerOut();
 
 [[noreturn]] void stopAll();
 
-void start(Core::Task &, usize ip, usize sp, Hj::Args args);
-
-Res<Box<Core::Ctx>> createCtx(usize ksp);
+Res<Box<Core::Ctx>> createCtx(Core::TaskMode mode, usize ip, usize sp, usize ksp, Hj::Args args);
 
 Res<Strong<Hal::Vmm>> createVmm();
 

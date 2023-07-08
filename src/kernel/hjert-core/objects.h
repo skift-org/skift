@@ -238,12 +238,6 @@ struct Listener :
 
 /* --- Task ----------------------------------------------------------------- */
 
-enum struct TaskMode : u8 {
-    IDLE,  // The task is only run when there is no other task to run
-    USER,  // The task is running in user mode
-    SUPER, // The task is running in supervisor mode propably serving a syscall
-};
-
 using Blocker = Func<TimeStamp()>;
 
 struct Task :
@@ -251,7 +245,7 @@ struct Task :
 
     TaskMode _mode;
     Stack _stack;
-    Box<Ctx> _ctx;
+    Opt<Box<Ctx>> _ctx;
 
     Opt<Strong<Space>> _space;
     Opt<Strong<Domain>> _domain;
@@ -283,12 +277,10 @@ struct Task :
 
     Task(TaskMode mode,
          Stack stack,
-         Box<Ctx> ctx,
          Opt<Strong<Space>> space,
          Opt<Strong<Domain>> domain)
         : _mode(mode),
           _stack(std::move(stack)),
-          _ctx(std::move(ctx)),
           _space(space),
           _domain(domain) {
     }
@@ -303,17 +295,22 @@ struct Task :
 
     bool blocked() const { return _block; }
 
-    void saveCtx(usize sp) {
-        _stack.saveSp(sp);
-        _ctx->save();
+    void saveCtx(Arch::Frame const &frame) {
+        (*_ctx)->save(frame);
     }
 
-    usize loadCtx() {
+    void loadCtx(Arch::Frame &frame) {
         if (_space)
             (*_space)->activate();
 
-        _ctx->load();
-        return _stack.loadSp();
+        (*_ctx)->load(frame);
+    }
+
+    Res<> ready(usize ip, usize sp, Hj::Args args) {
+        logInfo("{} readying for execustion (ip: {x}, sp: {x}) starting...", *this, ip, sp);
+        ObjectLockScope scope(*this);
+        _ctx = try$(Arch::createCtx(_mode, ip, sp, stack().loadSp(), args));
+        return Ok();
     }
 
     Res<> block(Blocker blocker);

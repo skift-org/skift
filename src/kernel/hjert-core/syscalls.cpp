@@ -101,7 +101,8 @@ Res<> doDup(Task &self, Hj::Cap node, User<Hj::Cap> dst, Hj::Cap src) {
 Res<> doStart(Task &self, Hj::Cap cap, usize ip, usize sp, User<Hj::Args const> args) {
     (void)args;
     auto obj = try$(self.domain().get<Task>(cap));
-    try$(Sched::instance().start(obj, ip, sp, try$(args.load(self.space()))));
+    try$(obj->ready(ip, sp, try$(args.load(self.space()))));
+    try$(Sched::instance().enqueue(obj));
     return Ok();
 }
 

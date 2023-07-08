@@ -112,7 +112,8 @@ Res<> enterUserspace(Handover::Payload &payload) {
     auto task = try$(Task::create(TaskMode::USER, space, domain));
     task->label("init-task");
 
-    try$(Sched::instance().start(task, image.header().entry, stackRange.end(), {handoverRange.start}));
+    try$(task->ready(image.header().entry, stackRange.end(), {handoverRange.start}));
+    try$(Sched::instance().enqueue(task));
 
     return Ok();
 }

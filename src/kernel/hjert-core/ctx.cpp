@@ -6,10 +6,6 @@
 
 namespace Hjert::Core {
 
-Res<Box<Ctx>> Ctx::create(usize ksp) {
-    return Arch::createCtx(ksp);
-}
-
 /* --- Stack ----------------------------------------------------------------- */
 
 Res<Stack> Stack::create() {

@@ -5,14 +5,14 @@
 #include <karm-base/res.h>
 #include <karm-base/size.h>
 
+#include "arch.h"
+
 namespace Hjert::Core {
 
 struct Ctx {
-    static Res<Box<Ctx>> create(usize ksp);
-
     virtual ~Ctx() = default;
-    virtual void save() = 0;
-    virtual void load() = 0;
+    virtual void save(Arch::Frame const &) = 0;
+    virtual void load(Arch::Frame &) = 0;
 };
 
 /* --- Stack ---------------------------------------------------------------- */

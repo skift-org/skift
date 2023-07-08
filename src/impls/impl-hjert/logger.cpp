@@ -1,9 +1,10 @@
-#include <embed-logger/logger.h>
 #include <hjert-core/arch.h>
 #include <karm-base/lock.h>
 #include <karm-sys/chan.h>
 
-namespace Embed {
+#include <karm-logger/_embed.h>
+
+namespace Karm::Logger::_Embed {
 
 static Lock _lock;
 
@@ -19,4 +20,4 @@ Io::TextWriter &loggerOut() {
     return Hjert::Arch::loggerOut();
 }
 
-} // namespace Embed
+} // namespace Karm::Logger::_Embed

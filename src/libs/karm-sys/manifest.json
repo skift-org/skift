@@ -4,7 +4,7 @@
     "type": "lib",
     "description": "System-dependent system abstraction",
     "requires": [
-        "karm-fmt",
-        "embed-sys"
+        "karm-sys-impl",
+        "karm-fmt"
     ]
 }

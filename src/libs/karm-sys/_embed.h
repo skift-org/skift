@@ -10,7 +10,7 @@
 
 #include "defs.h"
 
-namespace Embed {
+namespace Karm::Sys::_Embed {
 
 /* --- File I/O ------------------------------------------------------------- */
 
@@ -62,4 +62,4 @@ Res<> sleep(TimeSpan);
 
 Res<> exit(i32);
 
-} // namespace Embed
+} // namespace Karm::Sys::_Embed

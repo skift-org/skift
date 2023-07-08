@@ -64,7 +64,7 @@ inline Res<usize> _format(Io::TextWriter &writer, Str format, _Args &args) {
             index++;
         } else if (c == '\n') {
             // normalize newlines
-            written += try$(writer.writeStr(Embed::LINE_ENDING));
+            written += try$(writer.writeStr(Sys::LINE_ENDING));
         } else {
             written += try$(writer.writeRune(c));
         }
@@ -91,7 +91,7 @@ template <typename T>
 inline Res<String> toStr(Str format, T const &t) {
     Io::StringWriter writer{};
     Formatter<T> formatter;
-    if constexpr (requires(Text::Scan & scan) {
+    if constexpr (requires(Text::Scan &scan) {
                       formatter.parse(scan);
                   }) {
         Text::Scan scan{format};

@@ -1,16 +1,17 @@
 #pragma once
 
-#include <embed-sys/sys.h>
 #include <karm-base/time.h>
+
+#include "_embed.h"
 
 namespace Karm::Sys {
 
 inline TimeStamp now() {
-    return Embed::now();
+    return _Embed::now();
 }
 
 inline TimeSpan uptime() {
-    return Embed::uptime();
+    return _Embed::uptime();
 }
 
 inline DateTime dateTime() {

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <embed-ui/ui.h>
 #include <karm-main/base.h>
+
+#include "_embed.h"
 
 #include "host.h"
 #include "input.h"
@@ -64,7 +65,7 @@ inline Res<> runApp(Ctx &ctx, Child root) {
     if (args.has("+debug")) {
         root = inspector(root);
     }
-    auto host = try$(Embed::makeHost(root));
+    auto host = try$(_Embed::makeHost(root));
     return host->run();
 }
 

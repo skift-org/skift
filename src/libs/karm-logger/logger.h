@@ -1,9 +1,10 @@
 #pragma once
 
-#include <embed-logger/logger.h>
 #include <karm-base/loc.h>
 #include <karm-cli/style.h>
 #include <karm-fmt/fmt.h>
+
+#include "_embed.h"
 
 namespace Karm {
 
@@ -34,19 +35,19 @@ static constexpr Level ERROR = {3, "error", Cli::RED};
 static constexpr Level FATAL = {4, "fatal", Cli::style(Cli::RED).bold()};
 
 inline void _log(Level level, Format format, Fmt::_Args &args) {
-    Embed::loggerLock();
+    Logger::_Embed::loggerLock();
 
     if (level.value != -1) {
-        Fmt::format(Embed::loggerOut(), "{} ", Cli::styled(level.name, level.style)).unwrap();
-        Fmt::format(Embed::loggerOut(), "{}{}:{}: ", Cli::reset().fg(Cli::GRAY_DARK), format.loc.file, format.loc.line).unwrap();
+        Fmt::format(Logger::_Embed::loggerOut(), "{} ", Cli::styled(level.name, level.style)).unwrap();
+        Fmt::format(Logger::_Embed::loggerOut(), "{}{}:{}: ", Cli::reset().fg(Cli::GRAY_DARK), format.loc.file, format.loc.line).unwrap();
     }
 
-    Fmt::format(Embed::loggerOut(), "{}", Cli::reset()).unwrap();
-    Fmt::_format(Embed::loggerOut(), format.str, args).unwrap();
-    Fmt::format(Embed::loggerOut(), "{}\n", Cli::reset()).unwrap();
-    Embed::loggerOut().flush().unwrap();
+    Fmt::format(Logger::_Embed::loggerOut(), "{}", Cli::reset()).unwrap();
+    Fmt::_format(Logger::_Embed::loggerOut(), format.str, args).unwrap();
+    Fmt::format(Logger::_Embed::loggerOut(), "{}\n", Cli::reset()).unwrap();
+    Logger::_Embed::loggerOut().flush().unwrap();
 
-    Embed::loggerUnlock();
+    Logger::_Embed::loggerUnlock();
 }
 
 template <typename... Args>

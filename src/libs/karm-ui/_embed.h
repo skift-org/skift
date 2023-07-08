@@ -2,8 +2,8 @@
 
 #include <karm-ui/host.h>
 
-namespace Embed {
+namespace Karm::Ui::_Embed {
 
 Res<Strong<Karm::Ui::Host>> makeHost(Karm::Ui::Child root);
 
-} // namespace Embed
+} // namespace Karm::Ui::_Embed

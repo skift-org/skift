@@ -1,8 +1,8 @@
 #pragma once
 
-#include <embed-sys/defs.h>
 #include <karm-base/rune.h>
 #include <karm-base/string.h>
+#include <karm-sys/defs.h>
 
 #include "types.h"
 
@@ -10,23 +10,23 @@ namespace Karm::Io {
 
 template <typename T>
 concept Writable = requires(T &writer, Bytes bytes) {
-                       { writer.write(bytes) } -> Meta::Same<Res<usize>>;
-                   };
+    { writer.write(bytes) } -> Meta::Same<Res<usize>>;
+};
 
 template <typename T>
 concept Readable = requires(T &reader, MutBytes bytes) {
-                       { reader.read(bytes) } -> Meta::Same<Res<usize>>;
-                   };
+    { reader.read(bytes) } -> Meta::Same<Res<usize>>;
+};
 
 template <typename T>
 concept Seekable = requires(T &seeker, Seek seek) {
-                       { seeker.seek(seek) } -> Meta::Same<Res<usize>>;
-                   };
+    { seeker.seek(seek) } -> Meta::Same<Res<usize>>;
+};
 
 template <typename T>
 concept Flushable = requires(T &flusher) {
-                        { flusher.flush() } -> Meta::Same<Res<usize>>;
-                    };
+    { flusher.flush() } -> Meta::Same<Res<usize>>;
+};
 
 template <typename T>
 concept Duplexable = Writable<T> and Readable<T>;
@@ -84,7 +84,7 @@ struct TextWriter :
     Res<usize> flush() override { return Ok(0uz); }
 };
 
-template <StaticEncoding E = typename Embed::Encoding>
+template <StaticEncoding E = typename Sys::Encoding>
 struct TextWriterBase :
     public TextWriter {
 

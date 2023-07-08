@@ -1,15 +1,15 @@
 #pragma once
 
-#include <embed-base/base.h>
+#include <karm-base/_embed.h>
 
 namespace Karm {
 
 inline void debug(char const *msg) {
-    Embed::debug(msg);
+    _Embed::debug(msg);
 }
 
 [[noreturn]] inline void panic(char const *msg) {
-    Embed::panic(msg);
+    _Embed::panic(msg);
 }
 
 [[noreturn]] inline void notImplemented() {

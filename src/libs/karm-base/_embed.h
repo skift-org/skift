@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Embed {
+namespace Karm::_Embed {
 
 void relaxe();
 
@@ -12,4 +12,4 @@ void debug(char const *buf);
 
 [[noreturn]] void panic(char const *buf);
 
-} // namespace Embed
+} // namespace Karm::_Embed

@@ -1,7 +1,8 @@
-#include <embed-ui/ui.h>
 #include <handover/hook.h>
 #include <hjert-api/api.h>
-namespace Embed {
+
+#include <karm-ui/_embed.h>
+namespace Karm::Ui::_Embed {
 
 struct Host :
     public Ui::Host {
@@ -64,4 +65,4 @@ Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
     return Ok(makeStrong<Host>(std::move(root), front, back));
 }
 
-} // namespace Embed
+} // namespace Karm::Ui::_Embed

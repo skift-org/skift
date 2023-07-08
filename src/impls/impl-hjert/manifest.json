@@ -13,7 +13,7 @@
         "libheap"
     ],
     "provides": [
-        "embed-base-impl",
-        "embed-logger-impl"
+        "karm-base-impl",
+        "karm-logger-impl"
     ]
 }

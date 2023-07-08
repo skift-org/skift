@@ -14,9 +14,9 @@
         "json-spec"
     ],
     "provides": [
-        "embed-ui-impl",
-        "embed-sys-impl",
-        "embed-base-impl",
-        "embed-logger-impl"
+        "karm-base-impl",
+        "karm-logger-impl",
+        "karm-sys-impl",
+        "karm-ui-impl"
     ]
 }

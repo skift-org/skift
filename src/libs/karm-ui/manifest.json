@@ -4,9 +4,9 @@
     "type": "lib",
     "description": "A graphical user interface library",
     "requires": [
+        "karm-ui-impl",
         "karm-gfx",
         "karm-events",
-        "embed-ui",
         "fira-code-font",
         "inter-font"
     ]

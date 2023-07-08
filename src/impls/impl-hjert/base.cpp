@@ -3,7 +3,7 @@
 #include <karm-fmt/fmt.h>
 #include <karm-logger/logger.h>
 
-namespace Embed {
+namespace Karm::_Embed {
 
 void debug(char const *buf) {
     (void)Fmt::format(Hjert::Arch::loggerOut(), "DEBUG: {}\n", buf);
@@ -41,4 +41,4 @@ void enterCritical() { Hjert::Arch::cpu().retainInterrupts(); }
 
 void leaveCritical() { Hjert::Arch::cpu().releaseInterrupts(); }
 
-} // namespace Embed
+} // namespace Karm::_Embed

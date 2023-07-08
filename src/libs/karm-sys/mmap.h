@@ -1,8 +1,9 @@
 #pragma once
 
-#include <embed-sys/sys.h>
 #include <hal/vmm.h>
 #include <karm-io/traits.h>
+
+#include <karm-sys/_embed.h>
 
 #include "types.h"
 
@@ -43,7 +44,7 @@ struct Mmap :
 
     Res<> unmap() {
         if (_buf and _owned) {
-            try$(Embed::memUnmap(std::exchange(_buf, nullptr), _size));
+            try$(_Embed::memUnmap(std::exchange(_buf, nullptr), _size));
             _paddr = 0;
             _size = 0;
         }
@@ -97,7 +98,7 @@ struct MutMmap :
     }
 
     Res<usize> flush() override {
-        try$(Embed::memFlush(_buf, _size));
+        try$(_Embed::memFlush(_buf, _size));
         return Ok(_size);
     }
 
@@ -120,7 +121,7 @@ struct MutMmap :
 
     Res<> unmap() {
         if (_buf and _owned) {
-            try$(Embed::memUnmap(std::exchange(_buf, nullptr), _size));
+            try$(_Embed::memUnmap(std::exchange(_buf, nullptr), _size));
             _paddr = 0;
             _buf = nullptr;
             _size = 0;
@@ -226,13 +227,13 @@ struct _Mmap {
 
     Res<Mmap> map() {
         _options.flags |= READ;
-        MmapResult range = try$(Embed::memMap(_options));
+        MmapResult range = try$(_Embed::memMap(_options));
         return Ok(Mmap{range.paddr, (void const *)range.vaddr, range.size});
     }
 
     Res<Mmap> map(Strong<Fd> fd) {
         _options.flags |= READ;
-        MmapResult range = try$(Embed::memMap(_options, fd));
+        MmapResult range = try$(_Embed::memMap(_options, fd));
         return Ok(Mmap{range.paddr, (void const *)range.vaddr, range.size});
     }
 
@@ -242,13 +243,13 @@ struct _Mmap {
 
     Res<MutMmap> mapMut() {
         _options.flags |= WRITE;
-        MmapResult range = try$(Embed::memMap(_options));
+        MmapResult range = try$(_Embed::memMap(_options));
         return Ok(MutMmap{range.paddr, (void *)range.vaddr, range.size});
     }
 
     Res<MutMmap> mapMut(Strong<Fd> fd) {
         _options.flags |= WRITE;
-        MmapResult result = try$(Embed::memMap(_options, fd));
+        MmapResult result = try$(_Embed::memMap(_options, fd));
         return Ok(MutMmap{result.paddr, (void *)result.vaddr, result.size});
     }
 

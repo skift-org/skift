@@ -1,7 +1,8 @@
 #pragma once
 
-#include <embed-base/base.h>
 #include <karm-meta/nocopy.h>
+
+#include "_embed.h"
 
 #include "atomic.h"
 #include "string.h"
@@ -12,11 +13,11 @@ struct CriticalScope :
     Meta::Static {
 
     CriticalScope() {
-        Embed::enterCritical();
+        _Embed::enterCritical();
     }
 
     ~CriticalScope() {
-        Embed::leaveCritical();
+        _Embed::leaveCritical();
     }
 };
 
@@ -30,29 +31,29 @@ struct Lock :
         memoryBarier();
 
         if (not result) {
-            Embed::leaveCritical();
+            _Embed::leaveCritical();
         }
 
         return result;
     }
 
     bool tryAcquire() {
-        Embed::enterCritical();
+        _Embed::enterCritical();
         return _tryAcquire();
     }
 
     void acquire() {
-        Embed::enterCritical();
+        _Embed::enterCritical();
 
         while (not _tryAcquire()) {
-            Embed::relaxe();
+            _Embed::relaxe();
         }
     }
 
     void release() {
         memoryBarier();
         _lock.store(false);
-        Embed::leaveCritical();
+        _Embed::leaveCritical();
     }
 };
 
@@ -112,10 +113,10 @@ struct RwLock : Meta::Static {
     isize _writers{};
 
     void acquireRead() {
-        Embed::enterCritical();
+        _Embed::enterCritical();
 
         while (not tryAcquireRead()) {
-            Embed::relaxe();
+            _Embed::relaxe();
             memoryBarier();
         }
     }
@@ -131,24 +132,23 @@ struct RwLock : Meta::Static {
 
         ++_readers;
 
-        Embed::enterCritical();
-
+        _Embed::enterCritical();
         return true;
     }
 
     void releaseRead() {
         LockScope scope(_lock);
         --_readers;
-        Embed::leaveCritical();
+        _Embed::leaveCritical();
     }
 
     void acquireWrite() {
-        Embed::enterCritical();
+        _Embed::enterCritical();
 
         _pendings.inc();
 
         while (not tryAcquireWrite()) {
-            Embed::relaxe();
+            _Embed::relaxe();
             memoryBarier();
         }
 
@@ -165,14 +165,14 @@ struct RwLock : Meta::Static {
             return false;
 
         ++_writers;
-        Embed::enterCritical();
+        _Embed::enterCritical();
         return true;
     }
 
     void releaseWrite() {
         LockScope scope(_lock);
         --_writers;
-        Embed::leaveCritical();
+        _Embed::leaveCritical();
     }
 };
 

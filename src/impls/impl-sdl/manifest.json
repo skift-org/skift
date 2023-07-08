@@ -12,6 +12,6 @@
         "sdl2"
     ],
     "provides": [
-        "embed-ui-impl"
+        "karm-ui-impl"
     ]
 }

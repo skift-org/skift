@@ -2,7 +2,7 @@
 
 #include <karm-base/rune.h>
 
-namespace Embed {
+namespace Karm::Sys {
 
 #ifdef __ck_karm_sys_encoding_utf8__
 using Encoding = Utf8;
@@ -40,4 +40,4 @@ constexpr char const *PATH_SEPARATOR = "\\";
 #    error "Unknown path separator"
 #endif
 
-} // namespace Embed
+} // namespace Karm::Sys

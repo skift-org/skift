@@ -1,7 +1,6 @@
 #pragma once
 
-#include <embed-sys/sys.h>
-
+#include "_embed.h"
 #include "time.h"
 
 namespace Karm::Sys {
@@ -10,14 +9,13 @@ struct Proc {
 };
 
 inline Res<> sleep(TimeSpan span) {
-    return Embed::sleep(span);
+    return _Embed::sleep(span);
 }
 
 inline Res<> sleepUntil(TimeStamp stamp) {
     auto n = now();
-    if (Op::lt(stamp, n)) {
+    if (Op::lt(stamp, n))
         return Ok();
-    }
     return sleep(stamp - n);
 }
 

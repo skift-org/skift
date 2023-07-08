@@ -1,6 +1,7 @@
-#include <embed-sys/sys.h>
 #include <karm-io/funcs.h>
 #include <karm-logger/logger.h>
+
+#include <karm-sys/_embed.h>
 
 /* Posix Stuff*/
 #include <dirent.h>
@@ -14,7 +15,7 @@
 
 #include "errno.h"
 
-namespace Embed {
+namespace Karm::Sys::_Embed {
 
 struct PosixFd : public Sys::Fd {
     isize _raw;
@@ -314,4 +315,4 @@ Res<> exit(i32 res) {
     return Ok();
 }
 
-} // namespace Embed
+} // namespace Karm::Sys::_Embed

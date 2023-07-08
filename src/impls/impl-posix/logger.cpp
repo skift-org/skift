@@ -1,7 +1,8 @@
-#include <embed-logger/logger.h>
 #include <karm-sys/chan.h>
 
-namespace Embed {
+#include <karm-logger/_embed.h>
+
+namespace Karm::Logger::_Embed {
 
 void loggerLock() {}
 
@@ -11,4 +12,4 @@ Io::TextWriter &loggerOut() {
     return Sys::err();
 }
 
-} // namespace Embed
+} // namespace Karm::Logger::_Embed

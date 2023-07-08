@@ -1,9 +1,10 @@
-#include <embed-sys/sys.h>
 #include <handover/hook.h>
 #include <hjert-api/api.h>
 #include <karm-logger/logger.h>
 
-namespace Embed {
+#include <karm-sys/_embed.h>
+
+namespace Karm::Sys::_Embed {
 
 /* --- File I/O ------------------------------------------------------------- */
 
@@ -92,4 +93,4 @@ Res<> memUnmap(void const *ptr, usize size) {
     return Hj::Space::self().unmap({(usize)ptr, size});
 }
 
-} // namespace Embed
+} // namespace Karm::Sys::_Embed

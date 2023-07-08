@@ -233,7 +233,7 @@ Sample eval(Material &material, Hit hit) {
 /* --- Scene ---------------------------------------------------------------- */
 
 enum struct ObjectFlags : u32 {
-    NONE = 0,
+    NIL = 0,
     INVISIBLE = 1 << 0,
 };
 
@@ -364,56 +364,56 @@ Res<> entryPoint(Ctx &ctx) {
 
     Scene scene = {
         Object{
-            ObjectFlags::NONE,
+            ObjectFlags::NIL,
             Sphere{{0, 0, -1}, 0.5},
             Roughness{Colorf{0.5, 0.5, 0.5}, 1},
         },
 
         Object{
-            ObjectFlags::NONE,
+            ObjectFlags::NIL,
             Plane{{0, 0, -2}, {0, 0, -1}, 1},
             Roughness{Colorf{1, 1, 1}, 1},
         },
 
         Object{
-            ObjectFlags::NONE,
+            ObjectFlags::NIL,
             Plane{{-1, 0, -2}, {-1, 0, 0}, 1},
             Roughness{Colorf{1, 0, 0}, 1},
         },
 
         Object{
-            ObjectFlags::NONE,
+            ObjectFlags::NIL,
             Plane{{1, 0, -2}, {1, 0, 0}, 1},
             Roughness{Colorf{0, 1, 0}, 1},
         },
 
         Object{
-            ObjectFlags::NONE,
+            ObjectFlags::NIL,
             Plane{{0, -1, -2}, {0, -1, 0}, 1},
             Roughness{Colorf{1}, 1},
         },
 
         Object{
-            ObjectFlags::NONE,
+            ObjectFlags::NIL,
             Plane{{0, 1, -2}, {0, 1, 0}, 1},
             Roughness{Colorf{1}, 1},
         },
 
         Object{
-            ObjectFlags::NONE,
+            ObjectFlags::NIL,
             Plane{{0, 0.9, -1}, {0, 1, 0}, 0.25},
             Emmisive{Colorf{1, 1, 1}},
         },
 
         Object{
-            ObjectFlags::NONE,
+            ObjectFlags::NIL,
             Plane{{0, 1, -1}, {0, 1, 0}, 0.25},
             Emmisive{Colorf{1, 1, 1}},
         },
 
         /*
                 Object{
-                    ObjectFlags::NONE,
+                    ObjectFlags::NIL,
                     Sphere{{0, -100.5, -1}, 100},
                     Roughness{Colorf{0.5, 0.5, 0.5}, 1},
                 },

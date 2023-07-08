@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-namespace Embed {
+namespace Karm::_Embed {
 
 void debug(char const *buf) {
     fprintf(stderr, "DEBUG: %s\n", buf);
@@ -26,4 +26,4 @@ void leaveCritical() {
     // NOTE: We don't do any thread so we don't need to do anything here.
 }
 
-} // namespace Embed
+} // namespace Karm::_Embed

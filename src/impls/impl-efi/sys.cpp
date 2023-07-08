@@ -1,5 +1,4 @@
 #include <efi/base.h>
-#include <embed-sys/sys.h>
 #include <hal/mem.h>
 #include <json/json.h>
 #include <karm-base/align.h>
@@ -9,7 +8,9 @@
 #include <karm-logger/logger.h>
 #include <karm-sys/file.h>
 
-namespace Embed {
+#include <karm-sys/_embed.h>
+
+namespace Karm::Sys::_Embed {
 
 struct ConOut : public Sys::Fd {
     Efi::SimpleTextOutputProtocol *_proto;
@@ -323,4 +324,4 @@ Res<> exit(i32) {
         ;
 }
 
-} // namespace Embed
+} // namespace Karm::Sys::_Embed

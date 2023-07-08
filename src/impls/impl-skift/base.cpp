@@ -1,6 +1,6 @@
 #include <hjert-api/api.h>
 
-namespace Embed {
+namespace Karm::_Embed {
 
 void debug(char const *buf) {
     Hj::log(buf).unwrap();
@@ -26,4 +26,4 @@ void enterCritical() {
 void leaveCritical() {
 }
 
-} // namespace Embed
+} // namespace Karm::_Embed

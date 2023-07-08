@@ -2,7 +2,7 @@
 
 #include <karm-io/traits.h>
 
-namespace Embed {
+namespace Karm::Logger::_Embed {
 
 void loggerLock();
 
@@ -10,4 +10,4 @@ void loggerUnlock();
 
 Io::TextWriter &loggerOut();
 
-} // namespace Embed
+} // namespace Karm::Logger::_Embed

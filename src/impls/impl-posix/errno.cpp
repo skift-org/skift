@@ -2,7 +2,7 @@
 
 #include "errno.h"
 
-namespace Embed::Posix {
+namespace Posix {
 
 Error fromErrno(isize error) {
     if (EOPNOTSUPP != ENOTSUP and error == EOPNOTSUPP) {
@@ -183,4 +183,4 @@ Res<> consumeErrno() {
     }
 }
 
-} // namespace Embed::Posix
+} // namespace Posix

@@ -1,11 +1,11 @@
-#include <embed-sys/sys.h>
-
 #include "dir.h"
+
+#include "_embed.h"
 
 namespace Karm::Sys {
 
 Res<Dir> Dir::open(Url url) {
-    auto entries = try$(Embed::readDir(url));
+    auto entries = try$(_Embed::readDir(url));
     sort(entries, [](auto const &lhs, auto const &rhs) {
         return cmp(lhs.name, rhs.name);
     });

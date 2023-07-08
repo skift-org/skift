@@ -1,8 +1,9 @@
 #include <SDL.h>
-#include <embed-ui/ui.h>
 #include <karm-ui/drag.h>
 
-namespace Embed {
+#include <karm-ui/_embed.h>
+
+namespace Karm::Ui::_Embed {
 
 struct SdlHost :
     public Ui::Host {
@@ -227,4 +228,4 @@ Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
     return Ok(makeStrong<SdlHost>(root, window));
 }
 
-} // namespace Embed
+} // namespace Karm::Ui::_Embed

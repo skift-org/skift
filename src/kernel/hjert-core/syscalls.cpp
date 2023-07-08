@@ -18,10 +18,10 @@ Res<> doLog(Task &self, UserSlice<char const> msg) {
     return msg.with<Str>(self.space(), [&](Str str) -> Res<> {
         struct LoggerScope {
             LoggerScope() {
-                Embed::loggerLock();
+                Logger::_Embed::loggerLock();
             }
             ~LoggerScope() {
-                Embed::loggerUnlock();
+                Logger::_Embed::loggerUnlock();
             }
         } scope;
         auto styledLabel = Cli::styled(self.label(), Cli::style(Cli::random(self.id())));

@@ -1,11 +1,12 @@
 #include <efi/base.h>
 #include <efi/spec.h>
-#include <embed-base/base.h>
 #include <karm-base/align.h>
 #include <karm-base/string.h>
 #include <karm-io/traits.h>
 
-namespace Embed {
+#include <karm-base/_embed.h>
+
+namespace Karm::_Embed {
 
 struct DebugOut : public Io::TextWriterBase<> {
     Res<usize> write(Bytes bytes) override {
@@ -73,4 +74,4 @@ void leaveCritical() {
     // NOTE: We don't do any thread so we don't need to do anything here.
 }
 
-} // namespace Embed
+} // namespace Karm::_Embed

@@ -1,8 +1,9 @@
 #pragma once
 
-#include <embed-sys/sys.h>
 #include <karm-fmt/fmt.h>
 #include <karm-io/traits.h>
+
+#include <karm-sys/_embed.h>
 
 #include "fd.h"
 
@@ -57,12 +58,12 @@ inline void err(Str str, auto &&...args) {
 
 inline void println(Str str, auto &&...args) {
     (void)Fmt::format(out(), str, std::forward<decltype(args)>(args)...);
-    (void)out().writeStr(Embed::LINE_ENDING);
+    (void)out().writeStr(Sys::LINE_ENDING);
 }
 
 inline void errln(Str str, auto &&...args) {
     (void)Fmt::format(err(), str, std::forward<decltype(args)>(args)...);
-    (void)out().writeStr(Embed::LINE_ENDING);
+    (void)out().writeStr(Sys::LINE_ENDING);
 }
 
 } // namespace Karm::Sys

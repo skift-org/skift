@@ -9,7 +9,7 @@ static constinit Lock _heapLock;
 static constinit Heap _heapImpl = {
     .alloc = [](void *, usize size) -> void * {
         auto vmo = Hj::Vmo::create(Hj::ROOT, 0, size).take();
-        vmo.label("reserve").unwrap();
+        vmo.label("heap").unwrap();
 
         auto space = Hj::Space::self();
         return (void *)space.map(vmo, 0, size, Hj::MapFlags::READ | Hj::MapFlags::WRITE).unwrap().start;

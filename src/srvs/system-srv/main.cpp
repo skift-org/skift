@@ -19,7 +19,7 @@ Res<> loadService(Ctx &ctx, Sys::Url url) {
 
     logInfo("system: mapping elf...");
     auto elfVmo = try$(Hj::Vmo::create(Hj::ROOT, elf->start, elf->size, Hj::VmoFlags::DMA));
-    try$(elfVmo.label("elf"));
+    try$(elfVmo.label("elf-shared"));
     auto elfRange = try$(Hj::map(elfVmo, Hj::MapFlags::READ));
 
     logInfo("system: creating address space...");
@@ -54,7 +54,7 @@ Res<> loadService(Ctx &ctx, Sys::Url url) {
 
     logInfo("system: mapping the stack...");
     auto stackVmo = try$(Hj::Vmo::create(Hj::ROOT, 0, kib(64), Hj::VmoFlags::UPPER));
-    try$(stackVmo.label("elf-stack"));
+    try$(stackVmo.label("stack"));
     auto stackRange = try$(elfSpace.map(0, stackVmo, 0, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
 
     logInfo("system: creating the task...");
@@ -63,7 +63,7 @@ Res<> loadService(Ctx &ctx, Sys::Url url) {
 
     logInfo("system: mapping handover...");
     auto const *handoverRecord = handover.findTag(Handover::Tag::SELF);
-    auto handoverVmo = try$(Hj::Vmo::create(Hj::ROOT, handoverRecord->start, handoverRecord->end(), Hj::VmoFlags::DMA));
+    auto handoverVmo = try$(Hj::Vmo::create(Hj::ROOT, handoverRecord->start, handoverRecord->size, Hj::VmoFlags::DMA));
     try$(handoverVmo.label("handover"));
     auto handoverVrange = try$(elfSpace.map(0, handoverVmo, 0, 0, Hj::MapFlags::READ));
 

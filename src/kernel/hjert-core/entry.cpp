@@ -43,7 +43,7 @@ Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
         }
 
         if (record.tag == Handover::FILE) {
-            auto name = payload.stringAt(record.file.name);
+            auto const *name = payload.stringAt(record.file.name);
             logInfo("   - file: '{}'", name);
         }
     }
@@ -65,7 +65,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
 
     logInfo("entry: mapping elf...");
     auto elfVmo = try$(Vmo::makeDma(record->range<Hal::DmaRange>()));
-    elfVmo->label("elf-readonly");
+    elfVmo->label("elf-shared");
     auto elfRange = try$(kmm().pmm2Kmm(elfVmo->range()));
     Elf::Image image{elfRange.bytes()};
 

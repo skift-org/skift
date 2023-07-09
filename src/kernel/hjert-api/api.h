@@ -65,6 +65,14 @@ struct Object {
     operator Cap() const {
         return _cap;
     }
+
+    Arg raw() const {
+        return _cap.raw();
+    }
+
+    Cap cap() const {
+        return _cap;
+    }
 };
 
 struct Domain : public Object {

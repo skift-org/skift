@@ -19,14 +19,10 @@ struct Cpu {
     isize _depth = 0;
 
     void beginInterrupt() {
-        if (not _retainEnabled)
-            panic("nested interrupt");
         _retainEnabled = false;
     }
 
     void endInterrupt() {
-        if (_retainEnabled)
-            panic("interrupt end without begin");
         _retainEnabled = true;
     }
 

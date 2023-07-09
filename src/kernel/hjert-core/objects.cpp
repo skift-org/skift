@@ -324,7 +324,7 @@ Res<> Listener::listen(Hj::Cap cap, Strong<Object> obj, Flags<Hj::Sigs> set, Fla
     ObjectLockScope scope{*this};
 
     for (usize i = 0; i < _listened.len(); ++i) {
-        if (_listened[i].cap == cap) {
+        if (Op::eq(_listened[i].cap, cap)) {
             auto &listened = _listened[i];
             listened.set = set;
             listened.unset = unset;
@@ -437,13 +437,16 @@ IoNode::IoNode(Hal::PortRange range)
     : _range(range) {}
 
 Res<Hj::Arg> IoNode::in(usize offset, usize size) {
+    ObjectLockScope scope(*this);
     return Hal::RawPortIo(_range)
         .in(offset, size);
 }
 
 Res<> IoNode::out(usize offset, usize size, Hj::Arg arg) {
-    return Hal::RawPortIo(_range)
-        .out(offset, size, arg);
+    ObjectLockScope scope(*this);
+    auto r = Hal::RawPortIo(_range)
+                 .out(offset, size, arg);
+    return r;
 }
 
 /* --- IRQ ------------------------------------------------------------------ */

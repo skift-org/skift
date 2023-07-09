@@ -89,7 +89,7 @@ using Arg = usize;
 using Args = Array<Arg, 6>;
 
 struct Cap {
-    Arg _raw;
+    Arg _raw = 0;
 
     constexpr Cap() = default;
 
@@ -104,12 +104,12 @@ struct Cap {
         return _raw == 0;
     }
 
-    operator bool() const {
+    explicit operator bool() const {
         return _raw != 0;
     }
 
-    bool operator==(Cap other) const {
-        return _raw == other._raw;
+    Ordr cmp(Cap const &other) const {
+        return ::cmp(_raw, other._raw);
     }
 };
 

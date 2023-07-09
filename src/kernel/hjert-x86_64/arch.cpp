@@ -35,7 +35,6 @@ static x86_64::Idt _idt{};
 static x86_64::IdtDesc _idtDesc{_idt};
 
 Res<> init(Handover::Payload &) {
-
     try$(_com1.init());
 
     _gdtDesc.load();

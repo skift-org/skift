@@ -92,18 +92,28 @@ Res<> Keyboard::init() {
     auto cfgs = try$(ctrl().readConfig());
     cfgs.set(Configs::FIRST_PORT_INTERRUPT_ENABLE);
     try$(ctrl().writeConfig(cfgs));
+    try$(sendCmd(GET_SET_SCAN_CODE_SET, 0x1));
     return Ok();
 }
 
 Res<> Keyboard::event(Events::Event &e) {
     if (auto const *irq = e.is<IrqEvent>()) {
         if (irq->irq == 1) {
-            logInfo("ps2: keyboard irq %d", irq->irq);
             auto status = try$(ctrl().readStatus());
             while (status.has(Status::OUT_BUF) and
                    not status.has(Status::AUX_BUF)) {
                 auto data = try$(ctrl().readData());
-                logInfo("ps2: keyboard data %x", data);
+                logInfo("ps2: keyboard data {:02x}", data);
+                if (_esc) {
+                    Events::Key key = {Events::Key::Code((data & 0x7F) + 0x80)};
+                    logInfo("ps2: keyboard key {}", key.name());
+                    _esc = false;
+                } else if (data == 0xE0) {
+                    _esc = true;
+                } else {
+                    Events::Key key = {Events::Key::Code(data & 0x7F)};
+                    logInfo("ps2: keyboard key {}", key.name());
+                }
                 status = try$(ctrl().readStatus());
             }
         }

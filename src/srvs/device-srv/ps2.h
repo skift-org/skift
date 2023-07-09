@@ -43,6 +43,9 @@ enum struct Cmd : u8 {
     TEST_MAIN = 0xAB,
     DISABLE_MAIN = 0xAD,
     ENABLE_MAIN = 0xAE,
+    WRITE_OUT_MAIN = 0xD2,
+    WRITE_OUT_AUX = 0xD3,
+    WRITE_IN_AUX = 0xD4,
 };
 
 enum struct Configs : u8 {
@@ -95,6 +98,10 @@ struct I8042 : public Node {
 };
 
 struct Keyboard : public Device {
+    enum _Cmd : u8 {
+        GET_SET_SCAN_CODE_SET = 0xF0,
+    };
+
     bool _esc;
 
     using Device::Device;
@@ -102,6 +109,17 @@ struct Keyboard : public Device {
     Res<> init() override;
 
     Res<> event(Events::Event &e) override;
+
+    Res<> sendCmd(_Cmd cmd) {
+        try$(ctrl().writeData(cmd));
+        return Ok();
+    }
+
+    Res<> sendCmd(_Cmd cmd, Byte data) {
+        try$(ctrl().writeData(cmd));
+        try$(ctrl().writeData(data));
+        return Ok();
+    }
 };
 
 struct Mouse : public Device {

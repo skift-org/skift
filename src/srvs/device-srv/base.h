@@ -104,9 +104,9 @@ struct DmaIo : public Hal::Io {
 };
 
 struct IrqEvent : public Events::BaseEvent<IrqEvent> {
-    u8 irq;
+    usize irq;
 
-    IrqEvent(u8 irq)
+    IrqEvent(usize irq)
         : irq(irq) {}
 };
 

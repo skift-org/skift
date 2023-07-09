@@ -36,27 +36,24 @@ Res<> entryPoint(Ctx &) {
     for (usize i = 0; i < 16; i++) {
         auto irq = try$(Hj::Irq::create(Hj::ROOT, i));
         try$(listener.listen(irq, Hj::Sigs::TRIGGERED, Hj::Sigs::NONE));
-        logInfo("devices: bound IRQ {} to {}", i, irq._cap.raw());
-        cap2irq.put(irq._cap, i);
+        cap2irq.put(irq.cap(), i);
         irqs.pushBack(std::move(irq));
     }
 
-    try$(listener.poll(try$(Hj::now()) + TimeSpan::fromSecs(1)));
     while (true) {
+        try$(listener.poll(TimeStamp::endOfTime()));
+
         auto ev = listener.next();
         while (ev) {
-            logInfo("devices: got an event from {}", ev->cap.raw());
             try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::TRIGGERED));
 
             auto irq = cap2irq.get(ev->cap);
-            if (not irq) {
-                logWarn("devices: got an event from an unknown IRQ cap {}", ev->cap.raw());
-            } else {
-                logInfo("devices: irq {} triggered", *irq);
+            if (irq) {
+                Dev::IrqEvent ev = {*irq};
+                try$(root->event(ev));
             }
             ev = listener.next();
         }
-        try$(listener.poll(try$(Hj::now()) + TimeSpan::fromSecs(1)));
     }
 
     return Ok();

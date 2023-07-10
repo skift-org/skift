@@ -1,9 +1,11 @@
 #pragma once
 
-#include "objects.h"
+#include "space.h"
 
 namespace Hjert::Core {
 
+// A wrapper an userspace provided address.
+// This is used to load and store values from userspace safely.
 template <typename T>
 struct User {
     usize _addr;
@@ -17,9 +19,8 @@ struct User {
     }
 
     Res<T> load(Space &space) {
-        if (_addr == 0) {
+        if (_addr == 0)
             return Error::invalidInput("null pointer");
-        }
 
         ObjectLockScope scope(space);
         try$(space._validate(vrange()));
@@ -27,9 +28,8 @@ struct User {
     }
 
     Res<> store(Space &space, T const &val) {
-        if (_addr == 0) {
+        if (_addr == 0)
             return Error::invalidInput("null pointer");
-        }
 
         ObjectLockScope scope(space);
         try$(space._validate(vrange()));
@@ -38,6 +38,8 @@ struct User {
     }
 };
 
+// A wrapper an userspace provided array.
+// This is used to load and store values from userspace safely.
 template <typename T>
 struct UserSlice {
     usize _addr;

@@ -12,7 +12,7 @@ namespace Hj {
     TYPE(TASK)             \
     TYPE(SPACE)            \
     TYPE(VMO)              \
-    TYPE(IO)               \
+    TYPE(IOP)              \
     TYPE(CHANNEL)          \
     TYPE(IRQ)              \
     TYPE(LISTENER)
@@ -255,8 +255,8 @@ struct VmoProps {
     VmoFlags flags;
 };
 
-struct IoProps {
-    static constexpr Type TYPE = Type::IO;
+struct IopProps {
+    static constexpr Type TYPE = Type::IOP;
     usize base;
     usize len;
 };
@@ -280,7 +280,7 @@ using _Props = Var<
     TaskProps,
     SpaceProps,
     VmoProps,
-    IoProps,
+    IopProps,
     ChannelProps,
     IrqProps,
     ListenerProps>;

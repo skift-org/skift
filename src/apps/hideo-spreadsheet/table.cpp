@@ -61,7 +61,8 @@ struct Table : public Ui::View<Table> {
                     if (cell) {
                         Model::dispatch<UpdateSelection>(*this, Range{*cell});
                     }
-                } else if (m.type == Events::MouseEvent::MOVE && ((m.buttons & Events::Button::LEFT) == Events::Button::LEFT)) {
+                } else if (m.type == Events::MouseEvent::MOVE and
+                           (m.buttons & Events::Button::LEFT) == Events::Button::LEFT) {
                     auto cell = sheet().cellAt(pos - Math::Vec2i{CELL_WIDTH, CELL_HEIGHT});
                     if (cell) {
                         auto sel = *_state->selection;
@@ -146,7 +147,7 @@ struct Table : public Ui::View<Table> {
         // Draw columns.
         isize headerX = CELL_WIDTH;
         usize index = 0;
-        while (headerX < _bound.width &&
+        while (headerX < _bound.width and
                index < sheet().cols.len()) {
 
             auto col = sheet().cols[index];
@@ -164,7 +165,7 @@ struct Table : public Ui::View<Table> {
         // Draw rows.
         isize headerY = CELL_HEIGHT;
         index = 0;
-        while (headerY < _bound.height &&
+        while (headerY < _bound.height and
                index < sheet().rows.len()) {
 
             auto row = sheet().rows[index];

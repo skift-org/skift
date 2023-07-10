@@ -3,9 +3,14 @@
 #include <karm-logger/logger.h>
 
 #include "arch.h"
-#include "objects.h"
+#include "channel.h"
+#include "domain.h"
+#include "iop.h"
+#include "irq.h"
+#include "listener.h"
 #include "sched.h"
 #include "syscalls.h"
+#include "task.h"
 #include "user.h"
 
 namespace Hjert::Core {
@@ -47,7 +52,7 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> cap, User<Hj::Props> p) {
                                ? try$(self._space)
                                : try$(self.domain().get<Space>(props.space));
 
-                return Ok(try$(Task::create(TaskMode::USER, spa, dom)));
+                return Ok(try$(Task::create(Mode::USER, spa, dom)));
             },
             [&](Hj::SpaceProps &) -> Res<Strong<Object>> {
                 return Ok(try$(Space::create()));
@@ -58,8 +63,8 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> cap, User<Hj::Props> p) {
                                    ? Vmo::makeDma({props.phys, props.len})
                                    : Vmo::alloc(props.len, props.flags)));
             },
-            [&](Hj::IoProps &props) -> Res<Strong<Object>> {
-                return Ok(try$(IoNode::create({props.base, props.len})));
+            [&](Hj::IopProps &props) -> Res<Strong<Object>> {
+                return Ok(try$(Iop::create({props.base, props.len})));
             },
             [&](Hj::ChannelProps &props) -> Res<Strong<Object>> {
                 return Ok(try$(Channel::create(props.cap)));
@@ -134,12 +139,12 @@ Res<> doUnmap(Task &self, Hj::Cap cap, usize virt, usize len) {
 }
 
 Res<> doIn(Task &self, Hj::Cap cap, Hj::IoLen len, usize port, User<Hj::Arg> val) {
-    auto obj = try$(self.domain().get<IoNode>(cap));
+    auto obj = try$(self.domain().get<Iop>(cap));
     return val.store(self.space(), try$(obj->in(port, Hj::ioLen2Bytes(len))));
 }
 
 Res<> doOut(Task &self, Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg val) {
-    auto obj = try$(self.domain().get<IoNode>(cap));
+    auto obj = try$(self.domain().get<Iop>(cap));
     return obj->out(port, Hj::ioLen2Bytes(len), val);
 }
 
@@ -261,14 +266,14 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
 
 Res<> doSyscall(Hj::Syscall id, Hj::Args args) {
     auto &self = Task::self();
-    self.enterSupervisorMode();
+    self.enter(Mode::SUPER);
     auto res = dispatchSyscall(self, id, args);
     if (not res) {
         logError("Syscall {}({}) failed: {}", Hj::toStr(id), (Hj::Arg)id, res.none().msg());
         for (auto i = 0; i < 6; ++i)
             logDebug("    arg{}: {p} {}", i, (usize)args[i], (isize)args[i]);
     }
-    self.leaveSupervisorMode();
+    self.leave();
     return res;
 }
 

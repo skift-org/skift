@@ -1,0 +1,38 @@
+#pragma once
+
+#include <karm-base/vec.h>
+
+#include "object.h"
+
+namespace Hjert::Core {
+
+struct Listener :
+    public BaseObject<Listener, Hj::Type::LISTENER> {
+
+    struct Listened {
+        Hj::Cap cap;
+        Strong<Object> obj;
+
+        Flags<Hj::Sigs> set;
+        Flags<Hj::Sigs> unset;
+    };
+
+    Vec<Listened> _listened;
+    Vec<Hj::Event> _events;
+
+    static Res<Strong<Listener>> create();
+
+    Res<> listen(Hj::Cap cap, Strong<Object> obj, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset);
+
+    Slice<Hj::Event> poll();
+
+    Slice<Hj::Event> events() {
+        return _events;
+    }
+
+    void flush() {
+        _events.clear();
+    }
+};
+
+} // namespace Hjert::Core

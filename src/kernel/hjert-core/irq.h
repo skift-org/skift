@@ -1,0 +1,21 @@
+#pragma once
+
+#include "object.h"
+
+namespace Hjert::Core {
+
+struct Irq :
+    public BaseObject<Irq, Hj::Type::IRQ> {
+
+    usize _irq;
+
+    static Res<Strong<Irq>> create(usize irq);
+
+    static void trigger(usize irq);
+
+    Irq(usize irq);
+
+    ~Irq() override;
+};
+
+} // namespace Hjert::Core

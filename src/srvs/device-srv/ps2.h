@@ -1,6 +1,7 @@
 #pragma once
 
 #include <hal/io.h>
+
 #include "base.h"
 
 namespace Dev::Ps2 {
@@ -123,6 +124,13 @@ struct Keyboard : public Device {
 };
 
 struct Mouse : public Device {
+    enum _Cmd : u8 {
+        GET_DEVICE_ID = 0xF2,
+        SET_SAMPLE_RATE = 0xF3,
+        ENABLE_REPORT = 0xF4,
+        SET_DEFAULT = 0xF6,
+    };
+
     u8 _cycle;
     Array<u8, 4> _buf;
     bool _hasWheel;
@@ -132,6 +140,25 @@ struct Mouse : public Device {
     Res<> init() override;
 
     Res<> event(Events::Event &e) override;
+
+    Res<> sendCmd(_Cmd cmd) {
+        try$(ctrl().writeCmd(Cmd::WRITE_IN_AUX));
+        try$(ctrl().writeData(cmd));
+        return Ok();
+    }
+
+    Res<> sendCmd(_Cmd cmd, Byte data) {
+        try$(ctrl().writeCmd(Cmd::WRITE_IN_AUX));
+        try$(ctrl().writeData(cmd));
+        try$(ctrl().writeCmd(Cmd::WRITE_IN_AUX));
+        try$(ctrl().writeData(data));
+        return Ok();
+    }
+
+    Res<Byte> getDeiceId() {
+        try$(sendCmd(GET_DEVICE_ID));
+        return ctrl().readData();
+    }
 };
 
 } // namespace Dev::Ps2

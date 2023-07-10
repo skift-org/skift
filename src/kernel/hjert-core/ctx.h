@@ -5,17 +5,26 @@
 #include <karm-base/res.h>
 #include <karm-base/size.h>
 
-#include "arch.h"
+namespace Hjert::Arch {
+
+struct Frame;
+
+} // namespace Hjert::Arch
 
 namespace Hjert::Core {
+
+enum struct Mode : u8 {
+    EMBRYO, // The task is being created
+    IDLE,   // The task is only run when there is no other task to run
+    USER,   // The task is running in user mode
+    SUPER,  // The task is running in supervisor mode propably serving a syscall
+};
 
 struct Ctx {
     virtual ~Ctx() = default;
     virtual void save(Arch::Frame const &) = 0;
     virtual void load(Arch::Frame &) = 0;
 };
-
-/* --- Stack ---------------------------------------------------------------- */
 
 struct Stack {
     static constexpr usize DEFAULT_SIZE = kib(64);

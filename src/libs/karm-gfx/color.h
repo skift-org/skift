@@ -99,7 +99,7 @@ struct Hsv {
     f64 hue, saturation, value;
 
     ALWAYS_INLINE Ordr cmp(Hsv const &other) const {
-        return hue == other.hue &&
+        return hue == other.hue and
                        saturation == other.saturation and value == other.value
                    ? Ordr::EQUAL
                    : Ordr::LESS;

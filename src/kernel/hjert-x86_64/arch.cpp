@@ -1,8 +1,11 @@
 #include <hjert-core/arch.h>
 #include <hjert-core/cpu.h>
+#include <hjert-core/irq.h>
 #include <hjert-core/mem.h>
 #include <hjert-core/sched.h>
+#include <hjert-core/space.h>
 #include <hjert-core/syscalls.h>
+#include <hjert-core/task.h>
 #include <karm-logger/logger.h>
 #include <karm-text/witty.h>
 
@@ -141,9 +144,9 @@ void backtrace(usize rbp) {
 }
 
 void switchTask(TimeSpan span, Frame &frame) {
-    Core::Task::self().saveCtx(frame);
+    Core::Task::self().save(frame);
     Core::Sched::instance().schedule(span);
-    Core::Task::self().loadCtx(frame);
+    Core::Task::self().load(frame);
 }
 
 void uPanic(Frame &frame) {
@@ -309,7 +312,7 @@ struct Ctx : public Core::Ctx {
     }
 };
 
-Res<Box<Core::Ctx>> createCtx(Core::TaskMode mode, usize ip, usize sp, usize ksp, Hj::Args args) {
+Res<Box<Core::Ctx>> createCtx(Core::Mode mode, usize ip, usize sp, usize ksp, Hj::Args args) {
     Frame frame{
         .r8 = args[4],
         .rdi = args[0],
@@ -322,7 +325,7 @@ Res<Box<Core::Ctx>> createCtx(Core::TaskMode mode, usize ip, usize sp, usize ksp
         .rsp = sp,
     };
 
-    if (mode == Core::TaskMode::USER) {
+    if (mode == Core::Mode::USER) {
         frame.cs = x86_64::Gdt::UCODE * 8 | 3; // 3 = user mode
         frame.ss = x86_64::Gdt::UDATA * 8 | 3;
     } else {

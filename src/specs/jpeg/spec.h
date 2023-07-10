@@ -185,7 +185,7 @@ struct BitStream {
 
 struct Image {
     static bool isJpeg(Bytes slice) {
-        return slice[0] == 0xFF && slice[1] == SOI;
+        return slice[0] == 0xFF and slice[1] == SOI;
     }
 
     static Res<Image> load(Bytes slice) {

@@ -34,6 +34,11 @@ enum struct Mod : u8 {
 
 FlagsEnum$(Mod);
 
+enum struct KeyMotion {
+    RELEASED,
+    PRESSED,
+};
+
 struct Key {
     enum struct Code {
 #define KEY(name, code) name = code,

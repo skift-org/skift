@@ -6,8 +6,11 @@
 
 #include "arch.h"
 #include "cpu.h"
+#include "domain.h"
 #include "mem.h"
 #include "sched.h"
+#include "space.h"
+#include "task.h"
 
 namespace Hjert::Core {
 
@@ -109,7 +112,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
     logInfo("entry: creating task...");
     auto domain = try$(Domain::create());
     domain->label("init-domain");
-    auto task = try$(Task::create(TaskMode::USER, space, domain));
+    auto task = try$(Task::create(Mode::USER, space, domain));
     task->label("init-task");
 
     try$(task->ready(image.header().entry, stackRange.end(), {handoverRange.start}));
@@ -136,7 +139,7 @@ Res<> init(u64 magic, Handover::Payload &payload) {
 
     logInfo("entry: entering idle loop...");
     Task::self().label("idle");
-    Task::self().enterIdleMode();
+    Task::self().enter(Mode::IDLE);
     while (true)
         Arch::cpu().relaxe();
 }

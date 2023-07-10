@@ -1,11 +1,14 @@
 #pragma once
 
 #include <handover/spec.h>
+#include <karm-base/rc.h>
+#include <karm-base/res.h>
 #include <karm-base/time.h>
-
-#include "objects.h"
+#include <karm-base/vec.h>
 
 namespace Hjert::Core {
+
+struct Task;
 
 /* --- Sched ---------------------------------------------------------------- */
 
@@ -22,22 +25,11 @@ struct Sched {
 
     static Sched &instance();
 
-    static Lock &lock() {
-        return instance()._lock;
-    }
-
-    Sched(Strong<Task> bootTask)
-        : _tasks{bootTask},
-          _prev(bootTask),
-          _curr(bootTask),
-          _idle(bootTask) {
-    }
+    Sched(Strong<Task> boot);
 
     Res<> enqueue(Strong<Task> task);
 
     void schedule(TimeSpan span);
-
-    void yield();
 };
 
 } // namespace Hjert::Core

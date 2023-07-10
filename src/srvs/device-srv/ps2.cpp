@@ -103,16 +103,16 @@ Res<> Keyboard::event(Events::Event &e) {
             while (status.has(Status::OUT_BUF) and
                    not status.has(Status::AUX_BUF)) {
                 auto data = try$(ctrl().readData());
-                logInfo("ps2: keyboard data {:02x}", data);
+                // logInfo("ps2: keyboard data {:02x}", data);
                 if (_esc) {
                     Events::Key key = {Events::Key::Code((data & 0x7F) + 0x80)};
-                    logInfo("ps2: keyboard key {}", key.name());
+                    logInfo("ps2: keyboard key {} {}", key.name(), data & 0x80 ? "pressed" : "released");
                     _esc = false;
                 } else if (data == 0xE0) {
                     _esc = true;
                 } else {
                     Events::Key key = {Events::Key::Code(data & 0x7F)};
-                    logInfo("ps2: keyboard key {}", key.name());
+                    logInfo("ps2: keyboard key {} {}", key.name(), data & 0x80 ? "pressed" : "released");
                 }
                 status = try$(ctrl().readStatus());
             }
@@ -126,22 +126,43 @@ Res<> Keyboard::event(Events::Event &e) {
 
 Res<> Mouse::init() {
     logInfo("ps2: mouse initializing...");
+
     try$(ctrl().writeCmd(Cmd::ENABLE_AUX));
     auto cfgs = try$(ctrl().readConfig());
     cfgs.set(Configs::SECOND_PORT_INTERRUPT_ENABLE);
     try$(ctrl().writeConfig(cfgs));
+
+    try$(sendCmd(SET_DEFAULT));
+    try$(sendCmd(ENABLE_REPORT));
+
+    // enable scroll wheel
+    logInfo("ps2: mouse enabling scroll wheel...");
+    try$(getDeiceId());
+
+    try$(sendCmd(SET_SAMPLE_RATE, 200));
+    try$(sendCmd(SET_SAMPLE_RATE, 100));
+    try$(sendCmd(SET_SAMPLE_RATE, 80));
+
+    auto status = try$(getDeiceId());
+    if (status == 0x03) {
+        logInfo("ps2: mouse scroll wheel enabled");
+        _hasWheel = true;
+    } else {
+        logInfo("ps2: mouse scroll wheel not supported");
+        _hasWheel = false;
+    }
+
     return Ok();
 }
 
 Res<> Mouse::event(Events::Event &e) {
     if (auto const *irq = e.is<IrqEvent>()) {
         if (irq->irq == 12) {
-            logInfo("ps2: mouse irq {}", irq->irq);
             auto status = try$(ctrl().readStatus());
             while (status.has(Status::OUT_BUF) and
                    status.has(Status::AUX_BUF)) {
                 auto data = try$(ctrl().readData());
-                logInfo("ps2: mouse data {}", data);
+                logInfo("ps2: mouse data {:02x}", data);
                 status = try$(ctrl().readStatus());
             }
         }

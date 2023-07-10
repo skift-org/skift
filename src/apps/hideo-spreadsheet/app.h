@@ -107,7 +107,7 @@ struct Sheet {
     Opt<Pos> cellAt(Math::Vec2i p) const {
         auto row = rowAt(p.y);
         auto col = colAt(p.x);
-        if (row && col) {
+        if (row and col) {
             return Pos{*row, *col};
         }
         return NONE;
@@ -115,7 +115,7 @@ struct Sheet {
 
     Opt<usize> rowAt(i32 y) const {
         return search(rows, [&](auto const &row) -> Ordr {
-            if (row.y <= y && y < row.y + row.height) {
+            if (row.y <= y and y < row.y + row.height) {
                 return Ordr::EQUAL;
             }
             return cmp(row.y, y);
@@ -124,7 +124,7 @@ struct Sheet {
 
     Opt<usize> colAt(i32 x) const {
         return search(cols, [&](auto const &col) -> Ordr {
-            if (col.x <= x && x < col.x + col.width) {
+            if (col.x <= x and x < col.x + col.width) {
                 return Ordr::EQUAL;
             }
             return cmp(col.x, x);

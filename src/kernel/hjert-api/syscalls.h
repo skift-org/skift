@@ -14,6 +14,8 @@ Res<> _label(Cap cap, char const *label, usize len);
 
 Res<> _drop(Cap cap);
 
+Res<> _pledge(Cap cap, Flags<Pledge> pledges);
+
 Res<> _dup(Cap node, Cap *dst, Cap src);
 
 Res<> _start(Cap cap, usize ip, usize sp, Args const *args);

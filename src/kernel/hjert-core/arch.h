@@ -3,7 +3,6 @@
 #include <hal/vmm.h>
 #include <handover/spec.h>
 #include <hjert-api/types.h>
-#include <karm-base/box.h>
 #include <karm-base/rc.h>
 #include <karm-io/traits.h>
 

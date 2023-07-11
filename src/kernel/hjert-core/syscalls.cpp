@@ -20,6 +20,7 @@ Res<> doNow(Task &self, User<TimeStamp> ts) {
 }
 
 Res<> doLog(Task &self, UserSlice<char const> msg) {
+    try$(self.ensure(Hj::Pledge::LOG));
     return msg.with<Str>(self.space(), [&](Str str) -> Res<> {
         struct LoggerScope {
             LoggerScope() {
@@ -44,6 +45,8 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> cap, User<Hj::Props> p) {
                 return Ok(try$(Domain::create()));
             },
             [&](Hj::TaskProps &props) -> Res<Strong<Object>> {
+                try$(self.ensure(Hj::Pledge::TASK));
+
                 auto dom = props.domain.isRoot()
                                ? try$(self._domain)
                                : try$(self.domain().get<Domain>(props.domain));
@@ -52,24 +55,39 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> cap, User<Hj::Props> p) {
                                ? try$(self._space)
                                : try$(self.domain().get<Space>(props.space));
 
-                return Ok(try$(Task::create(Mode::USER, spa, dom)));
+                auto obj = try$(Task::create(Mode::USER, spa, dom));
+
+                auto pledges = self.pledges();
+                try$(obj->pledge(pledges));
+
+                return Ok(obj);
             },
             [&](Hj::SpaceProps &) -> Res<Strong<Object>> {
+                try$(self.ensure(Hj::Pledge::MEM));
+
                 return Ok(try$(Space::create()));
             },
             [&](Hj::VmoProps &props) -> Res<Strong<Object>> {
+                try$(self.ensure(Hj::Pledge::MEM));
+
                 bool isDma = (props.flags & Hj::VmoFlags::DMA) == Hj::VmoFlags::DMA;
-                return Ok(try$(isDma
-                                   ? Vmo::makeDma({props.phys, props.len})
-                                   : Vmo::alloc(props.len, props.flags)));
+
+                if (isDma) {
+                    try$(self.ensure(Hj::Pledge::HW));
+                    return Ok(try$(Vmo::makeDma({props.phys, props.len})));
+                }
+
+                return Ok(try$(Vmo::alloc(props.len, props.flags)));
             },
             [&](Hj::IopProps &props) -> Res<Strong<Object>> {
+                try$(self.ensure(Hj::Pledge::HW));
                 return Ok(try$(Iop::create({props.base, props.len})));
             },
             [&](Hj::ChannelProps &props) -> Res<Strong<Object>> {
                 return Ok(try$(Channel::create(props.cap)));
             },
             [&](Hj::IrqProps &props) -> Res<Strong<Object>> {
+                try$(self.ensure(Hj::Pledge::HW));
                 return Ok(try$(Irq::create(props.irq)));
             },
             [&](Hj::ListenerProps &) -> Res<Strong<Object>> {
@@ -95,10 +113,19 @@ Res<> doDrop(Task &self, Hj::Cap cap) {
     return self.domain().drop(cap);
 }
 
-Res<> doDup(Task &self, Hj::Cap node, User<Hj::Cap> dst, Hj::Cap src) {
-    if (src.isRoot()) {
-        return Error::invalidHandle("cannot duplicate root");
+Res<> doPledge(Task &self, Hj::Cap cap, Flags<Hj::Pledge> pledges) {
+    if (cap.isRoot()) {
+        return self.pledge(pledges);
     }
+
+    auto obj = try$(self.domain().get<Task>(cap));
+    return obj->pledge(pledges);
+}
+
+Res<> doDup(Task &self, Hj::Cap node, User<Hj::Cap> dst, Hj::Cap src) {
+    if (src.isRoot())
+        return Error::invalidHandle("cannot duplicate root");
+
     auto obj = try$(self.domain().get(src));
     return dst.store(self.space(), try$(self.domain().add(node, obj)));
 }
@@ -222,6 +249,9 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
 
     case Hj::Syscall::DROP:
         return doDrop(self, args[0]);
+
+    case Hj::Syscall::PLEDGE:
+        return doPledge(self, args[0], (Hj::Pledge)args[1]);
 
     case Hj::Syscall::DUP:
         return doDup(self, args[0], args[1], args[2]);

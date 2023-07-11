@@ -67,42 +67,9 @@ Res<> loadService(Ctx &ctx, Sys::Url url) {
     try$(handoverVmo.label("handover"));
     auto handoverVrange = try$(elfSpace.map(0, handoverVmo, 0, 0, Hj::MapFlags::READ));
 
-    // NOTE: -2 because we want the name of the service, not the binary
     try$(task.label(url.host));
-
     logInfo("system: starting the task...");
     try$(task.start(image.header().entry, stackRange.end(), {handoverVrange.start}));
-
-    return Ok();
-}
-
-Res<> displayBootscreen(Ctx &ctx) {
-    auto &handover = useHandover(ctx);
-
-    auto *fb = handover.findTag(Handover::Tag::FB);
-    auto fbVmo = try$(Hj::Vmo::create(Hj::ROOT, fb->start, fb->size, Hj::VmoFlags::DMA));
-    try$(fbVmo.label("framebuffer"));
-    auto fbRange = try$(Hj::map(fbVmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
-
-    Gfx::MutPixels pixels = {
-        (void *)fbRange.mutBytes().buf(),
-        {fb->fb.width, fb->fb.height},
-        fb->fb.pitch,
-        Gfx::BGRA8888,
-    };
-
-    Gfx::Context g;
-    g.begin(pixels);
-
-    g.clear(Gfx::ZINC950);
-    g.origin(pixels.size() / 2);
-
-    g.evalSvg(
-#include "skift.path"
-    );
-    g.fill(Gfx::WHITE);
-
-    g.end();
 
     return Ok();
 }
@@ -110,7 +77,6 @@ Res<> displayBootscreen(Ctx &ctx) {
 Res<> entryPoint(Ctx &ctx) {
     try$(Hj::Task::self().label("system"));
 
-    try$(displayBootscreen(ctx));
     try$(loadService(ctx, "bundle://device-srv/_bin"_url));
     try$(loadService(ctx, "bundle://hideo-shell/_bin"_url));
 

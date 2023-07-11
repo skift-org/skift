@@ -177,27 +177,24 @@ def bootCmd(args: Args) -> None:
     isErrorLog = args.consumeOpt("dint", False)
     image = Image("efi-x86_64")
 
+    efiTarget = "efi-x86_64" + (":debug" if isDebug else ":o3")
+    kernelTarget = "kernel-x86_64" + (":debug" if isDebug else ":o3")
+    skiftTarget = "skift-x86_64" + (":debug" if isDebug else ":o3")
+
     image.mkdir("objects")
     image.mkdir("bundles")
 
-    image.installTo("loader", "efi-x86_64:o3", "EFI/BOOT/BOOTX64.EFI")
+    image.installTo("loader", efiTarget, "EFI/BOOT/BOOTX64.EFI")
+    image.install("hjert", kernelTarget)
+    image.install("limine-tests", kernelTarget)
+    image.install("system-srv", skiftTarget)
+    image.install("device-srv", skiftTarget)
+    image.install("hideo-shell", skiftTarget)
+    image.install("skift-branding", skiftTarget)
+    image.install("skift-wallpapers", skiftTarget)
+    image.install("inter-font", skiftTarget)
+    image.install("mdi-font", skiftTarget)
 
-    image.install("hjert", "kernel-x86_64" + (":debug" if isDebug else ""))
-    image.install("limine-tests", "kernel-x86_64" +
-                  (":debug" if isDebug else ""))
-    image.install("system-srv", "skift-x86_64" + (":debug" if isDebug else ""))
-    image.install("device-srv", "skift-x86_64" + (":debug" if isDebug else ""))
-    image.install("hideo-shell", "skift-x86_64" +
-                  (":debug" if isDebug else ""))
-
-    image.install("skift-branding", "skift-x86_64" +
-                  (":debug" if isDebug else ""))
-    image.install("skift-wallpapers", "skift-x86_64" +
-                  (":debug" if isDebug else ""))
-    image.install("inter-font", "skift-x86_64" +
-                  (":debug" if isDebug else ""))
-    image.install("mdi-font", "skift-x86_64" +
-                  (":debug" if isDebug else ""))
     image.cpTree("meta/image/boot", "boot/")
 
     machine = QemuSystemAmd64(

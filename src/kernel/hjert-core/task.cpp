@@ -32,6 +32,23 @@ Task::Task(Mode mode,
       _domain(domain) {
 }
 
+Res<> Task::ensure(Hj::Pledge pledge) {
+    ObjectLockScope scope(*this);
+
+    if (not _pledges.has(pledge)) {
+        return Error::permissionDenied("task does not have pledge");
+    }
+    return Ok();
+}
+
+Res<> Task::pledge(Hj::Pledge pledge) {
+    ObjectLockScope scope(*this);
+    if (not _pledges.has(pledge))
+        return Error::permissionDenied("task does not have pledge");
+    _pledges = pledge;
+    return Ok();
+}
+
 Res<> Task::ready(usize ip, usize sp, Hj::Args args) {
     logInfo("{} readying for execustion (ip: {x}, sp: {x}) starting...", *this, ip, sp);
     ObjectLockScope scope(*this);

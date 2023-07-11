@@ -48,6 +48,7 @@ static inline char const *toStr(Type type) {
     SYSCALL(CREATE)              \
     SYSCALL(LABEL)               \
     SYSCALL(DROP)                \
+    SYSCALL(PLEDGE)              \
     SYSCALL(DUP)                 \
     SYSCALL(START)               \
     SYSCALL(MAP)                 \
@@ -81,6 +82,38 @@ static inline Str toStr(Syscall syscall) {
 #undef ITER
     default:
         panic("invalid syscall");
+    }
+}
+
+#define FOREACH_PLEDGE(PLEDGE) \
+    PLEDGE(HW, 1 << 0)         \
+    PLEDGE(TASK, 1 << 1)       \
+    PLEDGE(MEM, 1 << 2)        \
+    PLEDGE(LOG, 1 << 3)        \
+    PLEDGE(ALL, HW | TASK | MEM | LOG)
+
+// clang-format off
+
+enum struct Pledge : u32 {
+#define ITER(NAME, VAL) NAME = VAL,
+    FOREACH_PLEDGE(ITER)
+#undef ITER
+    _LEN,
+};
+
+// clang-format on
+
+FlagsEnum$(Pledge);
+
+static inline Str toStr(Pledge pledge) {
+    switch (pledge) {
+#define ITER(NAME, VAL) \
+    case Pledge::NAME:  \
+        return #NAME;
+        FOREACH_PLEDGE(ITER)
+#undef ITER
+    default:
+        panic("invalid right");
     }
 }
 

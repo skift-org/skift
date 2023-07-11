@@ -203,7 +203,7 @@ static inline Res<Mapped> map(Vmo &vmo, MapFlags flags = MapFlags::NONE) {
 }
 
 struct Io : public Object {
-    using PROPS = IoProps;
+    using PROPS = IopProps;
 
     static Res<Io> create(Cap dest, usize base, usize len) {
         return create<Io>(dest, base, len);

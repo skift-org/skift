@@ -44,6 +44,10 @@ Res<> _drop(Cap cap) {
     return _syscall(Syscall::DROP, cap.raw());
 }
 
+Res<> _pledge(Cap cap, Flags<Pledge> pledges) {
+    return _syscall(Syscall::PLEDGE, cap.raw(), (Arg)pledges.val());
+}
+
 Res<> _dup(Cap node, Cap *dst, Cap src) {
     return _syscall(Syscall::DUP, node.raw(), (Arg)dst, src.raw());
 }

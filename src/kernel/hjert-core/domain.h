@@ -22,9 +22,8 @@ struct Domain : public BaseObject<Domain, Hj::Type::DOMAIN> {
     template <typename T>
     Res<Strong<T>> get(Hj::Cap cap) {
         auto obj = try$(get(cap));
-        if (not obj.is<T>()) {
+        if (not obj.is<T>())
             return Error::invalidHandle("type missmatch");
-        }
         return Ok(try$(obj.cast<T>()));
     }
 

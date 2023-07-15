@@ -42,6 +42,14 @@ struct Array {
         return true;
     }
 
+    constexpr Array reversed() const {
+        Array res{};
+        for (usize i = 0; i < N; i++) {
+            res[i] = _buf[N - i - 1];
+        }
+        return res;
+    }
+
     Bytes bytes() const {
         return {reinterpret_cast<Byte const *>(buf()), len() * sizeof(T)};
     }

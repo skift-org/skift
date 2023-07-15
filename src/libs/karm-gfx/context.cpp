@@ -12,7 +12,6 @@ void Context::begin(MutPixels p) {
     _stack.pushBack({
         .clip = pixels().bound(),
     });
-    _scanline.resize(p.width() + 1);
     _updateTransform();
 }
 
@@ -288,16 +287,21 @@ void Context::fill(Math::Ellipsei e) {
 }
 
 void Context::stroke(Math::Vec2i pos, Media::Icon icon) {
+    _useSpaa = true;
     icon.stroke(*this, pos);
+    _useSpaa = false;
 }
 
 void Context::fill(Math::Vec2i pos, Media::Icon icon) {
+    _useSpaa = true;
     icon.fill(*this, pos);
+    _useSpaa = false;
 }
 
 void Context::stroke(Math::Vec2f baseline, Rune rune) {
     auto f = textFont();
 
+    _useSpaa = true;
     save();
     begin();
     origin(baseline.cast<isize>());
@@ -305,11 +309,13 @@ void Context::stroke(Math::Vec2f baseline, Rune rune) {
     f.fontface->contour(*this, rune);
     stroke();
     restore();
+    _useSpaa = false;
 }
 
 void Context::fill(Math::Vec2f baseline, Rune rune) {
     auto f = textFont();
 
+    _useSpaa = true;
     save();
     begin();
     origin(baseline.cast<isize>());
@@ -317,6 +323,7 @@ void Context::fill(Math::Vec2f baseline, Rune rune) {
     f.fontface->contour(*this, rune);
     fill();
     restore();
+    _useSpaa = false;
 }
 
 void Context::stroke(Math::Vec2f baseline, Str str) {
@@ -420,7 +427,7 @@ void Context::debugDoubleArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
 }
 
 void Context::debugTrace(Gfx::Color color) {
-    for (auto edge : _shape) {
+    for (auto edge : _rast.shape()) {
         debugLine(edge.cast<isize>(), color);
     }
 }
@@ -428,97 +435,41 @@ void Context::debugTrace(Gfx::Color color) {
 /* --- Paths ---------------------------------------------------------------- */
 
 [[gnu::flatten]] void Context::_fillImpl(auto paint, auto format, FillRule fillRule) {
-    static constexpr auto AA = 4;
-    static constexpr auto UNIT = 1.0f / AA;
-    static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;
+    _rast.fill(clip(), fillRule, [&](Rast::Frag frag) {
+        u8 *pixel = static_cast<u8 *>(mutPixels().pixelUnsafe(frag.xy));
+        auto color = paint.sample(frag.uv);
+        auto c = format.load(pixel);
+        c = color.withOpacity(frag.a).blendOver(c);
+        format.store(pixel, c);
+    });
+}
 
-    auto shapeBound = _shape.bound();
-    auto rect = applyClip(shapeBound.ceil().cast<isize>());
-
-    for (isize y = rect.top(); y < rect.bottom(); y++) {
-        zeroFill<f64>(mutSub(_scanline, rect.start(), rect.end()));
-
-        for (f64 yy = y; yy < y + 1.0; yy += UNIT) {
-            _active.clear();
-
-            for (auto &edge : _shape) {
-                auto sample = yy + HALF_UNIT;
-
-                if (edge.bound().top() <= sample and sample < edge.bound().bottom()) {
-                    _active.pushBack({
-                        .x = edge.sx + (sample - edge.sy) / (edge.ey - edge.sy) * (edge.ex - edge.sx),
-                        .sign = edge.sy > edge.ey ? 1 : -1,
-                    });
-                }
-            }
-
-            if (_active.len() == 0)
-                continue;
-
-            sort(_active, [](auto const &a, auto const &b) {
-                return cmp(a.x, b.x);
-            });
-
-            isize rule = 0;
-            for (usize i = 0; i + 1 < _active.len(); i++) {
-                usize si = i;
-                usize ei = i + 1;
-
-                if (fillRule == FillRule::NONZERO) {
-                    isize sign = _active[i].sign;
-                    rule += sign;
-                    if (rule == 0)
-                        continue;
-                }
-
-                if (fillRule == FillRule::EVENODD) {
-                    rule++;
-                    if (rule % 2 == 0)
-                        continue;
-                }
-
-                f64 x1 = max(_active[si].x, rect.start());
-                f64 x2 = min(_active[ei].x, rect.end());
-
-                if (x1 >= x2) {
-                    continue;
-                }
-
-                // Are x1 and x2 on the same pixel?
-                if (Math::floor(x1) == Math::floor(x2)) {
-                    f64 x = Math::floor(x1);
-                    _scanline[x] += x2 - x1;
-                } else {
-                    _scanline[x1] += (ceil(x1) - x1) * UNIT;
-                    _scanline[x2] += (x2 - floor(x2)) * UNIT;
-
-                    for (isize x = ceil(x1); x < floor(x2); x++) {
-                        _scanline[x] += UNIT;
-                    }
-                }
-            }
-        }
-
-        u8 *pixel = static_cast<u8 *>(mutPixels().pixelUnsafe({rect.start(), y}));
-        for (isize x = rect.start(); x < rect.end(); x++) {
-            Math::Vec2f sample = {
-                (x - shapeBound.start()) / shapeBound.width,
-                (y - shapeBound.top()) / shapeBound.height,
-            };
-            auto color = paint.sample(sample);
-
+[[gnu::flatten]] void Context::_FillSmoothImpl(auto paint, auto format, FillRule fillRule) {
+    Math::Vec2f last = {0, 0};
+    auto fillComponent = [&](auto comp, Math::Vec2f pos) {
+        _rast.shape().offset(pos - last);
+        last = pos;
+        _rast.fill(clip(), fillRule, [&](Rast::Frag frag) {
+            u8 *pixel = static_cast<u8 *>(mutPixels().pixelUnsafe(frag.xy));
+            auto color = paint.sample(frag.uv);
             auto c = format.load(pixel);
-            c = color.withOpacity(clamp01(_scanline[x])).blendOver(c);
+            c = color.withOpacity(frag.a).blendOverComponent(c, comp);
             format.store(pixel, c);
-            pixel += format.bpp();
-        }
-    }
+        });
+    };
+
+    fillComponent(Color::RED_COMPONENT, _lcdLayout.red);
+    fillComponent(Color::GREEN_COMPONENT, _lcdLayout.green);
+    fillComponent(Color::BLUE_COMPONENT, _lcdLayout.blue);
 }
 
 void Context::_fill(Paint paint, FillRule fillRule) {
-    paint.visit([&](auto p) {
-        pixels().fmt().visit([&](auto f) {
-            _fillImpl(p, f, fillRule);
+    paint.visit([&](auto paint) {
+        pixels().fmt().visit([&](auto format) {
+            if (_useSpaa)
+                _FillSmoothImpl(paint, format, fillRule);
+            else
+                _fillImpl(paint, format, fillRule);
         });
     });
 }
@@ -580,8 +531,8 @@ void Context::fill(FillRule rule) {
 }
 
 void Context::fill(Paint paint, FillRule rule) {
-    _shape.clear();
-    createSolid(_shape, _path);
+    _rast.clear();
+    createSolid(_rast.shape(), _path);
     _fill(paint, rule);
 }
 
@@ -590,8 +541,8 @@ void Context::stroke() {
 }
 
 void Context::stroke(StrokeStyle style) {
-    _shape.clear();
-    createStroke(_shape, _path, style);
+    _rast.clear();
+    createStroke(_rast.shape(), _path, style);
     _fill(style.paint);
 }
 

@@ -6,15 +6,21 @@
 #include "filters.h"
 #include "paint.h"
 #include "path.h"
-#include "shape.h"
+#include "rast.h"
 #include "style.h"
 
 namespace Karm::Gfx {
 
-enum struct FillRule {
-    NONZERO,
-    EVENODD,
+struct LcdLayout {
+    Math::Vec2f red;
+    Math::Vec2f green;
+    Math::Vec2f blue;
 };
+
+static LcdLayout RGB = {{+0.33, 0.0}, {0.0, 0.0}, {-0.33, 0.0}};
+static LcdLayout BGR = {{-0.33, 0.0}, {0.0, 0.0}, {+0.33, 0.0}};
+static LcdLayout VRGB = {{0.0, +0.33}, {0.0, 0.0}, {0.0, -0.33}};
+
 
 struct Context {
     struct Scope {
@@ -32,17 +38,12 @@ struct Context {
         }
     };
 
-    struct Active {
-        f64 x;
-        isize sign;
-    };
-
     Opt<MutPixels> _pixels{};
     Vec<Scope> _stack{};
-    Shape _shape{};
     Path _path{};
-    Vec<Active> _active{};
-    Vec<f64> _scanline;
+    Rast _rast{};
+    LcdLayout _lcdLayout = RGB;
+    bool _useSpaa = false;
 
     /* --- Scope ------------------------------------------------------------ */
 
@@ -266,6 +267,7 @@ struct Context {
     // (internal) Fill the current shape with the given paint.
     // NOTE: The shape must be flattened before calling this function.
     void _fillImpl(auto paint, auto format, FillRule fillRule);
+    void _FillSmoothImpl(auto paint, auto format, FillRule fillRule);
     void _fill(Paint paint, FillRule rule = FillRule::NONZERO);
 
     // Begin a new path.

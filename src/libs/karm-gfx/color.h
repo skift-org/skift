@@ -56,6 +56,32 @@ struct Color {
         }
     }
 
+    static constexpr auto RED_COMPONENT = [](auto &c) -> auto & { return c.red; };
+    static constexpr auto GREEN_COMPONENT = [](auto &c) -> auto & { return c.green; };
+    static constexpr auto BLUE_COMPONENT = [](auto &c) -> auto & { return c.blue; };
+
+    ALWAYS_INLINE constexpr Color blendOverComponent(Color const background, auto comp) const {
+        if (alpha == 0xff) {
+            Color res = background;
+            comp(res) = comp(*this);
+            res.alpha = 255;
+            return res;
+        } else if (alpha == 0) {
+            return background;
+        } else if (background.alpha == 255u) {
+            Color res = background;
+            comp(res) = static_cast<u8>((comp(background) * 255u * (255u - alpha) + 255u * alpha * comp(*this)) / 65025);
+            res.alpha = 255;
+            return res;
+        } else {
+            Color res = background;
+            u16 d = 255u * (background.alpha + alpha) - background.alpha * alpha;
+            comp(res) = static_cast<u8>((comp(background) * background.alpha * (255u - alpha) + 255u * alpha * comp(*this)) / d);
+            res.alpha = d / 255u;
+            return res;
+        }
+    }
+
     ALWAYS_INLINE constexpr Color lerpWith(Color const other, f64 const t) const {
         return {
             static_cast<u8>(red + (other.red - red) * t),

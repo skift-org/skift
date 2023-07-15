@@ -4,7 +4,7 @@
 
 namespace Karm::Ui {
 
-inline constexpr Gfx::ColorRamp GRAYS = Gfx::ZINC_RAMP;
+inline constexpr Gfx::ColorRamp GRAYS = Gfx::ZINC_RAMP.reversed();
 inline constexpr Gfx::Color GRAY = GRAYS[5];
 inline constexpr Gfx::Color GRAY50 = GRAYS[0];
 inline constexpr Gfx::Color GRAY100 = GRAYS[1];
@@ -18,7 +18,7 @@ inline constexpr Gfx::Color GRAY800 = GRAYS[8];
 inline constexpr Gfx::Color GRAY900 = GRAYS[9];
 inline constexpr Gfx::Color GRAY950 = GRAYS[10];
 
-inline constexpr Gfx::ColorRamp ACCENTS = Gfx::BLUE_RAMP;
+inline constexpr Gfx::ColorRamp ACCENTS = Gfx::BLUE_RAMP.reversed();
 inline constexpr Gfx::Color ACCENT = ACCENTS[5];
 inline constexpr Gfx::Color ACCENT50 = ACCENTS[0];
 inline constexpr Gfx::Color ACCENT100 = ACCENTS[1];

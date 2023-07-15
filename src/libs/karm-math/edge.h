@@ -59,6 +59,14 @@ union Edge {
         return _els[i];
     }
 
+    constexpr Edge operator+(Vec2<T> other) const {
+        return {start + other, end + other};
+    }
+
+    constexpr Edge operator-(Vec2<T> other) const {
+        return {start - other, end - other};
+    }
+
     template <typename U>
     constexpr Edge<U> cast() const {
         return {

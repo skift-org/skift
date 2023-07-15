@@ -91,9 +91,13 @@ struct Buf {
         return *this;
     }
 
-    constexpr T &operator[](usize i) { return _buf[i].unwrap(); }
+    constexpr T &operator[](usize i) {
+        return _buf[i].unwrap();
+    }
 
-    constexpr T const &operator[](usize i) const { return _buf[i].unwrap(); }
+    constexpr T const &operator[](usize i) const {
+        return _buf[i].unwrap();
+    }
 
     void ensure(usize cap) {
         if (cap <= _cap)

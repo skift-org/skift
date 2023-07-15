@@ -49,6 +49,12 @@ struct Shape {
         _edges.add(edge);
     }
 
+    void offset(Math::Vec2f off) {
+        for (auto &e : _edges) {
+            e = e + off;
+        }
+    }
+
     void clear() {
         _edges.clear();
     }

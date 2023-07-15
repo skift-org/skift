@@ -150,6 +150,9 @@ union Rect {
     }
 
     ALWAYS_INLINE constexpr Rect<T> clipTo(Rect<T> r) const {
+        if (not colide(r))
+            return {};
+
         return {
             max(x, r.x),
             max(y, r.y),

@@ -9,5 +9,6 @@ This directory contains the source code for the project.
  - [`impls/`](impls/) platform specific implementations
  - [`kernel/`](kernel/) kernel & bootloaders
  - [`libs/`](libs/) core system libraries
+ - [`protos/`](protos/) core system protocols
  - [`specs/`](specs/) implementation of standard interfaces/specifications
  - [`srvs/`](srvs/) core system services

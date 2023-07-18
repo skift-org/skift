@@ -29,6 +29,10 @@ struct VgaFontface : public Fontface {
         return 8;
     }
 
+    f64 kern(Rune, Rune) const override {
+        return 0;
+    }
+
     void contour(Gfx::Context &g, Rune rune) const override {
         One<Ibm437> one;
         encodeOne<Ibm437>(rune, one);

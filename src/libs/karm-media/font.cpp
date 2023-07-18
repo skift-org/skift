@@ -16,20 +16,28 @@ Font Font::fallback() {
     };
 }
 
+f64 Font::scale() const {
+    return fontsize / fontface->units();
+}
+
 FontMetrics Font::metrics() const {
     auto m = fontface->metrics();
 
-    m.advance *= fontsize / fontface->units();
-    m.ascend *= fontsize / fontface->units();
-    m.captop *= fontsize / fontface->units();
-    m.descend *= fontsize / fontface->units();
-    m.linegap *= fontsize / fontface->units();
+    m.advance *= scale();
+    m.ascend *= scale();
+    m.captop *= scale();
+    m.descend *= scale();
+    m.linegap *= scale();
 
     return m;
 }
 
 f64 Font::advance(Rune c) const {
-    return fontface->advance(c) * (fontsize / fontface->units());
+    return fontface->advance(c) * scale();
+}
+
+f64 Font::kern(Rune prev, Rune curr) const {
+    return fontface->kern(prev, curr) * scale();
 }
 
 FontMesure Font::mesureRune(Rune r) const {

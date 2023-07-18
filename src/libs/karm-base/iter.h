@@ -379,4 +379,17 @@ constexpr auto range(T start, T end, T step) {
     }};
 }
 
+template <typename T>
+concept AtLen = requires(T t) {
+    t.len();
+    t.at(0);
+};
+
+constexpr auto iter(AtLen auto &o) {
+    return range(o.len())
+        .map([&](auto i) mutable {
+            return o.at(i);
+        });
+}
+
 } // namespace Karm

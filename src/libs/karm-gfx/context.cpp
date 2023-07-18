@@ -336,9 +336,16 @@ void Context::stroke(Math::Vec2f baseline, Str str) {
 
 void Context::fill(Math::Vec2f baseline, Str str) {
     auto f = textFont();
-    for (auto r : iterRunes(str)) {
-        fill(baseline, r);
-        baseline.x += f.advance(r);
+
+    bool first = true;
+    Rune prev = 0;
+    for (auto curr : iterRunes(str)) {
+        if (not first)
+            baseline.x += f.kern(prev, curr);
+        fill(baseline, curr);
+        baseline.x += f.advance(curr);
+        first = false;
+        prev = curr;
     }
 }
 

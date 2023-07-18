@@ -83,6 +83,8 @@ struct Fontface {
 
     virtual f64 advance(Rune c) const = 0;
 
+    virtual f64 kern(Rune prev, Rune curr) const = 0;
+
     virtual void contour(Gfx::Context &g, Rune rune) const = 0;
 
     virtual f64 units() const = 0;
@@ -95,9 +97,13 @@ struct Font {
 
     static Font fallback();
 
+    f64 scale() const;
+
     FontMetrics metrics() const;
 
     f64 advance(Rune c) const;
+
+    f64 kern(Rune prev, Rune curr) const;
 
     FontMesure mesureRune(Rune r) const;
 

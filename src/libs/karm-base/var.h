@@ -151,8 +151,13 @@ struct Var {
     }
 
     template <Meta::Contains<Ts...> T>
-    ALWAYS_INLINE bool is() const {
-        return _index == Meta::indexOf<T, Ts...>();
+    ALWAYS_INLINE T const *is() const {
+        return _index == Meta::indexOf<T, Ts...>() ? (T *)_buf : nullptr;
+    }
+
+    template <Meta::Contains<Ts...> T>
+    ALWAYS_INLINE T *is() {
+        return _index == Meta::indexOf<T, Ts...>() ? (T *)_buf : nullptr;
     }
 
     ALWAYS_INLINE usize index() const { return _index; }

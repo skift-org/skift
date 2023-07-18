@@ -46,6 +46,17 @@ ALWAYS_INLINE T _swapBe(T value) {
 #endif
 
 template <typename T>
+static constexpr usize popcount(T value) {
+    usize count = 0;
+    for (usize i = 0; i < sizeof(T) * 8; i++) {
+        if (value & (1 << i)) {
+            count++;
+        }
+    }
+    return count;
+}
+
+template <typename T>
 struct Be {
     T _value;
 

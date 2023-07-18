@@ -36,6 +36,10 @@ struct TtfFontface : public Fontface {
         return _ttf.glyphMetrics(c).advance;
     }
 
+    f64 kern(Rune prev, Rune curr) const override {
+        return _ttf.glyphKern(prev, curr);
+    }
+
     void contour(Gfx::Context &g, Rune rune) const override {
         _ttf.glyphContour(g, rune);
     }

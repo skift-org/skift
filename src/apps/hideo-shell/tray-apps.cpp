@@ -22,7 +22,7 @@ Ui::Child searchInput() {
                .backgroundPaint = Ui::GRAY900,
            }) |
            Ui::button([](auto &n) {
-               Ui::showDialog(n, keyboardFlyout());
+               Ui::showDialog(n, keyboardFlyout() | Ui::slideIn(Ui::SlideFrom::BOTTOM));
            });
 }
 

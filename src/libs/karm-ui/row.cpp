@@ -1,5 +1,6 @@
 #include "row.h"
 
+#include "drag.h"
 #include "scroll.h"
 
 namespace Karm::Ui {
@@ -170,7 +171,8 @@ Child navTree(Mdi::Icon i, String title, Child child) {
                         icon(state.value() ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 18)))),
 
             state.value()
-                ? child | spacing({32, 0, 0, 0})
+                ? child | spacing({32, 0, 0, 0}) |
+                      slideIn(SlideFrom::TOP)
                 : empty());
     });
 }
@@ -187,7 +189,8 @@ Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Child chil
                 icon(state.value() ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 24)),
             state.value() ? spacing(
                                 {38, 0, 0, 0},
-                                child)
+                                child) |
+                                slideIn(SlideFrom::TOP)
                           : empty());
     });
 }

@@ -31,7 +31,7 @@ Ui::Child statusbar() {
 Ui::Child statusbarButton(State const &state) {
     return Ui::button(
         [&](Ui::Node &n) {
-            Ui::showDialog(n, sysFlyout(state));
+            Ui::showDialog(n, sysFlyout(state) | Ui::slideIn(Ui::SlideFrom::TOP));
         },
         statusbar());
 }
@@ -40,7 +40,7 @@ Ui::Child statusbarButton(State const &state) {
 
 Ui::Child navbar() {
     return Ui::buttonHandle([](Ui::Node &n) {
-        Ui::showDialog(n, appsFlyout());
+        Ui::showDialog(n, appsFlyout() | Ui::slideIn(Ui::SlideFrom::BOTTOM));
     });
 }
 
@@ -85,9 +85,9 @@ Ui::Child taskbar(State const &) {
 
 Ui::Child panels(State const &state) {
     return Ui::stack(
-               state.activePanel == Panel::APPS ? appsPanel() | Ui::align(Layout::Align::START | Layout::Align::TOP) : Ui::empty(),
-               state.activePanel == Panel::CALENDAR ? Ui::empty() | panel() | Ui::align(Layout::Align::HCENTER | Layout::Align::TOP) : Ui::empty(),
-               state.activePanel == Panel::NOTIS ? sysPanel(state) | Ui::align(Layout::Align::END | Layout::Align::TOP) : Ui::empty()) |
+               state.activePanel == Panel::APPS ? appsPanel() | Ui::align(Layout::Align::START | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
+               state.activePanel == Panel::CALENDAR ? Ui::empty() | panel() | Ui::align(Layout::Align::HCENTER | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
+               state.activePanel == Panel::NOTIS ? sysPanel(state) | Ui::align(Layout::Align::END | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty()) |
            Ui::spacing({8, 38});
 }
 
@@ -95,16 +95,20 @@ Ui::Child panels(State const &state) {
 
 Ui::Child tablet(State const &state) {
     return Ui::vflow(
-        statusbarButton(state),
-        Ui::separator(),
+        Ui::vflow(
+            statusbarButton(state),
+            Ui::separator()) |
+            Ui::slideIn(Ui::SlideFrom::TOP),
         Ui::grow(NONE),
-        navbar());
+        navbar() | Ui::slideIn(Ui::SlideFrom::BOTTOM));
 }
 
 Ui::Child desktop(State const &state) {
     return Ui::vflow(
-        taskbar(state),
-        Ui::separator(),
+        Ui::vflow(
+            taskbar(state),
+            Ui::separator()) |
+            Ui::slideIn(Ui::SlideFrom::TOP),
         Ui::grow(NONE));
 }
 

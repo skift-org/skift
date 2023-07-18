@@ -1,4 +1,5 @@
 #include <karm-fmt/case.h>
+#include <karm-ui/drag.h>
 #include <karm-ui/input.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -133,11 +134,12 @@ Ui::Child editorFilters(State const &s) {
 
 Ui::Child editorControls(State const &state) {
     return vflow(
-        4,
-        editorFilterControls(state.filter),
-        editorFilters(state) |
-            Ui::spacing({8, 0, 8, 8}) |
-            Ui::hscroll());
+               4,
+               editorFilterControls(state.filter),
+               editorFilters(state) |
+                   Ui::spacing({8, 0, 8, 8}) |
+                   Ui::hscroll()) |
+           Ui::slideIn(Ui::SlideFrom::BOTTOM);
 }
 
 } // namespace ImageViewer

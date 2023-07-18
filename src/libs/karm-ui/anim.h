@@ -155,8 +155,21 @@ using Eased2i = Eased2<isize>;
 
 using Eased2f = Eased2<f64>;
 
-struct Layer : public ProxyNode<Layer> {
-    Opt<Media::Image> _buffer;
+/* --- Slide In ------------------------------------------------------------- */
+
+enum struct SlideFrom {
+    START,
+    END,
+    TOP,
+    BOTTOM,
 };
+
+Child slideIn(SlideFrom from, Child child);
+
+inline auto slideIn(SlideFrom from) {
+    return [=](Child child) {
+        return slideIn(from, child);
+    };
+}
 
 } // namespace Karm::Ui

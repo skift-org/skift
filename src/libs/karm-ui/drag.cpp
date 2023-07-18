@@ -134,7 +134,6 @@ struct DragRegion : public ProxyNode<DragRegion> {
 
             if (m.type == Events::MouseEvent::MOVE) {
                 if (_grabbed) {
-
                     DragEvent de = {.type = DragEvent::DRAG, .delta = m.delta};
                     bubble(de);
 

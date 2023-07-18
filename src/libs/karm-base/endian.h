@@ -49,7 +49,7 @@ template <typename T>
 static constexpr usize popcount(T value) {
     usize count = 0;
     for (usize i = 0; i < sizeof(T) * 8; i++) {
-        if (value & (1 << i)) {
+        if (value & (1uz << i)) {
             count++;
         }
     }

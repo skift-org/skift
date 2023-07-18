@@ -241,7 +241,7 @@ struct GlyphPairAdjustment : public LookupSubtableBase {
         CoverageTable coverage{begin().skip(coverageOffset).restBytes()};
         auto coverageIndex = coverage.coverageIndex(prev);
 
-        if (not coverageIndex or *coverageIndex >= pairSetCount)
+        if (not coverageIndex or (*coverageIndex >= pairSetCount))
             return NONE;
 
         auto value1len = ValueRecord::len(valueFormat1);
@@ -261,7 +261,7 @@ struct GlyphPairAdjustment : public LookupSubtableBase {
                 return Pair<ValueRecord>{value1, value2};
             }
 
-            pairSetTable.skip((value1len + value2len));
+            pairSetTable.skip(value1len + value2len);
         }
 
         return NONE;
@@ -299,6 +299,7 @@ struct ClassDef : public BChunk {
     }
 };
 
+// https://learn.microsoft.com/en-us/typography/opentype/spec/gpos#pair-adjustment-positioning-format-2-class-pair-adjustment
 struct ClassPairAdjustment : public LookupSubtableBase {
     static constexpr int FORMAT = 2;
 
@@ -321,11 +322,12 @@ struct ClassPairAdjustment : public LookupSubtableBase {
         auto prevClass = try$(prevClassDef.classOf(prev));
         auto currClass = try$(currClassDef.classOf(curr));
 
-        // skip to the correct class 1 record
-        s.skip(prevClass * class2Count * 2).nextU16be();
+        auto value1len = ValueRecord::len(valueFormat1);
+        auto value2len = ValueRecord::len(valueFormat2);
 
-        // skip to the correct class 2 record
-        s.skip(currClass * 2);
+        auto class2Size = value1len + value2len;
+        auto class1Size = class2Count * class2Size;
+        s.skip((prevClass * class1Size) + (currClass * class2Size));
 
         ValueRecord value1 = ValueRecord::read(s, valueFormat1);
         ValueRecord value2 = ValueRecord::read(s, valueFormat2);

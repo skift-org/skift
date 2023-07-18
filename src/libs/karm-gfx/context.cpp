@@ -305,7 +305,7 @@ void Context::stroke(Math::Vec2f baseline, Rune rune) {
     save();
     begin();
     origin(baseline.cast<isize>());
-    scale(f.fontsize / f.fontface->units());
+    scale(f.scale());
     f.fontface->contour(*this, rune);
     stroke();
     restore();
@@ -319,7 +319,7 @@ void Context::fill(Math::Vec2f baseline, Rune rune) {
     save();
     begin();
     origin(baseline.cast<isize>());
-    scale(f.fontsize / f.fontface->units());
+    scale(f.scale());
     f.fontface->contour(*this, rune);
     fill();
     restore();

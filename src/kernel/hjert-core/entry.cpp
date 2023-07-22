@@ -14,14 +14,6 @@
 
 namespace Hjert::Core {
 
-void splash() {
-    logInfo(" _  _  _         _");
-    logInfo("| || |(_)___ _ _| |_");
-    logInfo("| __ || / -_) '_|  _|");
-    logInfo("|_||_|/ \\___|_|  \\__|");
-    logInfo("    |__/");
-}
-
 Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
     if (not Handover::valid(magic, payload)) {
         logInfo("entry: handover: invalid");
@@ -123,10 +115,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
 
 Res<> init(u64 magic, Handover::Payload &payload) {
     try$(Arch::init(payload));
-
-    splash();
     try$(validateAndDump(magic, payload));
-
     try$(Mem::init(payload));
     try$(Sched::init(payload));
 

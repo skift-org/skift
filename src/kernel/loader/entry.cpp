@@ -5,13 +5,6 @@
 #include "loader.h"
 
 Res<> entryPoint(Ctx &ctx) {
-    logInfo("");
-    logInfo("  _                 _");
-    logInfo(" | |   ___  __ _ __| |___ _ _");
-    logInfo(" | |__/ _ \\/ _` / _` / -_) '_|");
-    logInfo(" |____\\___/\\__,_\\__,_\\___|_|");
-    logInfo("");
-
     logInfo("loading configs...");
     auto file = try$(Sys::File::open("file:/boot/loader.json"_url));
 

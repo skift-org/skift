@@ -1,5 +1,6 @@
-#include "ps2.h"
 #include <karm-logger/logger.h>
+
+#include "ps2.h"
 
 namespace Dev::Ps2 {
 
@@ -126,7 +127,6 @@ Res<> Keyboard::event(Events::Event &e) {
 
 Res<> Mouse::init() {
     logInfo("ps2: mouse initializing...");
-
     try$(ctrl().writeCmd(Cmd::ENABLE_AUX));
     auto cfgs = try$(ctrl().readConfig());
     cfgs.set(Configs::SECOND_PORT_INTERRUPT_ENABLE);

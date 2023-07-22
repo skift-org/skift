@@ -1,7 +1,6 @@
 {
     "title": "Welcome to skiftOS",
     "subtitle": "Select your form factor",
-    "background": "bundle://skift-wallpapers/images/abstract.qoi",
     "entries": [
         {
             "icon": "cellphone",

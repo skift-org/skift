@@ -127,7 +127,7 @@ struct Host : public Node {
 
     virtual void pump() = 0;
 
-    virtual void wait(usize ms) = 0;
+    virtual void wait(TimeSpan) = 0;
 
     bool alive() {
         return not _res;
@@ -218,7 +218,6 @@ struct Host : public Node {
             logWarn("Layout took {}ms", elapsed.toMSecs());
             logDebug("There is {} nodes alive", debugNodeCount);
         }
-        _shouldAnimate = true;
     }
 
     Res<> run() {
@@ -235,20 +234,21 @@ struct Host : public Node {
                     waitTime = 0;
             }
 
-            wait(waitTime);
+            wait(TimeSpan::fromMSecs(waitTime));
             lastFrame = Sys::now();
+
+            if (_shouldAnimate) {
+                _shouldAnimate = false;
+                Events::AnimateEvent e{FRAME_TIME};
+                event(e);
+            }
+
             pump();
 
             if (_shouldLayout) {
                 layout(bound());
                 _shouldLayout = false;
                 _dirty.pushBack(bound());
-            }
-
-            if (_shouldAnimate) {
-                _shouldAnimate = false;
-                Events::AnimateEvent e{FRAME_TIME};
-                event(e);
             }
 
             if (_dirty.len() > 0) {

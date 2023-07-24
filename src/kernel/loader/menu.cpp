@@ -50,24 +50,7 @@ State reduce(State state, Actions a) {
     });
 }
 
-void intent(Ui::Node &n, Events::Event &e) {
-    e.handle<Events::KeyboardEvent>([&](auto &k) {
-        if (Op::eq(k.key, Events::Key::LEFT)) {
-            Ui::dispatchAction<Actions>(n, MoveSelectionAction{-1});
-            return true;
-        } else if (Op::eq(k.key, Events::Key::RIGHT)) {
-            Ui::dispatchAction<Actions>(n, MoveSelectionAction{1});
-            return true;
-        } else if (Op::eq(k.key, Events::Key::ENTER)) {
-            Ui::dispatchAction<Actions>(n, SelectAction{});
-            return true;
-        }
-
-        return false;
-    });
-}
-
-using Model = Ui::Model<State, Actions, reduce, intent>;
+using Model = Ui::Model<State, Actions, reduce>;
 
 /* --- Views ---------------------------------------------------------------- */
 
@@ -135,6 +118,21 @@ Ui::Child alert(String title, String subtitle) {
            Ui::spacing(64);
 }
 
+void intent(Ui::Node &n, Events::Event &e) {
+    if (auto *k = e.is<Events::KeyboardEvent>()) {
+        if (Op::eq(k->key, Events::Key::LEFT)) {
+            Ui::dispatchAction<Actions>(n, MoveSelectionAction{-1});
+            e.accept();
+        } else if (Op::eq(k->key, Events::Key::RIGHT)) {
+            Ui::dispatchAction<Actions>(n, MoveSelectionAction{1});
+            e.accept();
+        } else if (Op::eq(k->key, Events::Key::ENTER)) {
+            Ui::dispatchAction<Actions>(n, SelectAction{});
+            e.accept();
+        }
+    }
+}
+
 Ui::Child menu(Configs const &c) {
     if (c.entries.len() == 0)
         return alert("No entries found.", "Please add an entry to the configuration file.");
@@ -153,7 +151,8 @@ Ui::Child menu(Configs const &c) {
                        list(s) | Ui::grow(4),
                        Ui::labelMedium("Use the [ARROW KEYS] to navigate, and press [ENTER] to select an entry."),
                        Ui::labelSmall(Ui::GRAY500, "Powered by Opstart ►")) |
-                   Ui::spacing(64);
+                   Ui::spacing(64) |
+                   Ui::intent(intent);
         });
 }
 

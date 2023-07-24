@@ -1,11 +1,6 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
-#include <karm-ui/dialog.h>
-#include <karm-ui/input.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/react.h>
 #include <karm-ui/scafold.h>
-#include <karm-ui/view.h>
 
 #include "model.h"
 
@@ -51,15 +46,13 @@ Ui::Child app() {
                Ui::spacing(32);
     });
 
-    return Ui::dialogLayer(
-        Ui::minSize(
-            420,
-            Ui::vflow(
-                Ui::titlebar(
-                    Mdi::COUNTER,
-                    "Counter",
-                    Ui::TitlebarStyle::DIALOG),
-                Ui::grow(content))));
+    return Ui::scafold({
+        .icon = Mdi::COUNTER,
+        .title = "Counter",
+        .titlebar = Ui::TitlebarStyle::DIALOG,
+        .body = content,
+        .size = 420,
+    });
 }
 
 } // namespace Counter

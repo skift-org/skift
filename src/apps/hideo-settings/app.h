@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-ui/react.h>
+#include <karm-ui/reducer.h>
 
 namespace Settings {
 
@@ -19,8 +19,6 @@ enum struct Page {
 };
 
 struct State {
-    bool sidebarOpen = false;
-
     Vec<Page> history = {Page::HOME};
     usize historyIndex = 0;
 
@@ -37,8 +35,6 @@ struct State {
     }
 };
 
-struct ToggleSidebar {};
-
 struct GoTo {
     Page page;
 };
@@ -47,7 +43,7 @@ struct GoBack {};
 
 struct GoForward {};
 
-using Actions = Var<ToggleSidebar, GoTo, GoBack, GoForward>;
+using Actions = Var<GoTo, GoBack, GoForward>;
 
 State reduce(State s, Actions action);
 

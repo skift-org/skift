@@ -1,4 +1,5 @@
 #include <karm-fmt/case.h>
+#include <karm-main/base.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
 #include <karm-ui/scafold.h>
@@ -136,16 +137,45 @@ Ui::Child breadcrumb(State const &state) {
             Ui::hflow(state
                           .currentUrl()
                           .iter()
-                          .mapi(breadcrumbItem)
-                          .collect<Ui::Children>()),
-
-            Ui::grow(NONE),
+                          .mapi([&](auto const &text, usize i) {
+                              return breadcrumbItem(text, state.currentUrl().len() - i - 1);
+                          })
+                          .collect<Ui::Children>()) |
+                Ui::hscroll() |
+                Ui::grow(),
             Ui::button(Model::bind<AddBookmark>(), Ui::ButtonStyle::subtle(), Mdi::BOOKMARK)));
+}
+
+Ui::Child goBackTool(State const &state) {
+    return Ui::button(
+        Model::bindIf<GoBack>(state.canGoBack()),
+        Ui::ButtonStyle::subtle(),
+        Mdi::ARROW_LEFT);
+}
+
+Ui::Child goForwardTool(State const &state) {
+    return Ui::button(
+        Model::bindIf<GoForward>(state.canGoForward()),
+        Ui::ButtonStyle::subtle(),
+        Mdi::ARROW_RIGHT);
+}
+
+Ui::Child goParentTool(State const &state) {
+    return Ui::button(
+        Model::bindIf<GoParent>(state.canGoParent(), 1),
+        Ui::ButtonStyle::subtle(),
+        Mdi::ARROW_UP);
+}
+
+Ui::Child refreshTool() {
+    return Ui::button(
+        Model::bind<Refresh>(),
+        Ui::ButtonStyle::subtle(),
+        Mdi::REFRESH);
 }
 
 Ui::Child toolbar(State const &state) {
     return Ui::toolbar(
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::MENU_OPEN),
         Ui::button(Model::bindIf<GoBack>(state.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
         Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
         Ui::button(Model::bindIf<GoParent>(state.canGoParent(), 1), Ui::ButtonStyle::subtle(), Mdi::ARROW_UP),

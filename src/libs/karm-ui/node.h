@@ -58,8 +58,8 @@ struct Node : public Meta::Static {
 
 template <typename T>
 concept Decorator = requires(T &t, Child &c) {
-    { t(c) } -> Meta::Same<Child>;
-};
+                        { t(c) } -> Meta::Same<Child>;
+                    };
 
 ALWAYS_INLINE Child operator|(Child child, Decorator auto decorator) {
     return decorator(child);
@@ -84,9 +84,14 @@ struct LeafNode : public Node {
     virtual void reconcile(Crtp &) {}
 
     Opt<Child> reconcile(Child other) override {
-        if (not other.is<Crtp>()) {
-            return other;
+        if (this == &other.unwrap()) {
+            debug("reconcile() called on self");
+            return NONE;
         }
+
+        if (not other.is<Crtp>())
+            return other;
+
         reconcile(other.unwrap<Crtp>());
         return NONE;
     }

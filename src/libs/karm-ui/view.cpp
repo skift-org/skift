@@ -1,5 +1,7 @@
 #include "view.h"
 
+#include "box.h"
+
 namespace Karm::Ui {
 
 /* --- Text ----------------------------------------------------------------- */
@@ -226,6 +228,28 @@ Child text(TextStyle style, Str text) {
 
 Child text(Str text) {
     return makeStrong<Text>(TextStyle::labelMedium(), text);
+}
+
+/* --- Badge ---------------------------------------------------------------- */
+
+Child badge(BadgeStyle style, String t) {
+    Array COLORS = {
+        Gfx::BLUE400,
+        Gfx::LIME400,
+        Gfx::YELLOW400,
+        Gfx::RED400,
+    };
+
+    auto color = COLORS[static_cast<u8>(style)];
+
+    BoxStyle boxStyle = {
+        .padding = {8, 4},
+        .borderRadius = 99,
+        .backgroundPaint = color.withOpacity(0.1),
+        .foregroundPaint = color,
+    };
+
+    return text(t) | box(boxStyle);
 }
 
 /* --- Icon ----------------------------------------------------------------- */

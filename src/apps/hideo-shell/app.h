@@ -3,7 +3,7 @@
 #include <karm-ui/box.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/node.h>
-#include <karm-ui/react.h>
+#include <karm-ui/reducer.h>
 
 namespace Shell {
 

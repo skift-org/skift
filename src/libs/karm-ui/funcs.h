@@ -19,11 +19,6 @@ inline void shouldLayout(Node &n) {
     n.bubble(e);
 }
 
-inline void shouldRebuild(Node &n) {
-    Events::BuildEvent e;
-    n.bubble(e);
-}
-
 inline void shouldAnimate(Node &n) {
     Events::AnimateEvent e{0};
     n.bubble(e);

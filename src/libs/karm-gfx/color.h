@@ -56,9 +56,15 @@ struct Color {
         }
     }
 
-    static constexpr auto RED_COMPONENT = [](auto &c) -> auto & { return c.red; };
-    static constexpr auto GREEN_COMPONENT = [](auto &c) -> auto & { return c.green; };
-    static constexpr auto BLUE_COMPONENT = [](auto &c) -> auto & { return c.blue; };
+    static constexpr auto RED_COMPONENT = [](auto &c) -> auto & {
+        return c.red;
+    };
+    static constexpr auto GREEN_COMPONENT = [](auto &c) -> auto & {
+        return c.green;
+    };
+    static constexpr auto BLUE_COMPONENT = [](auto &c) -> auto & {
+        return c.blue;
+    };
 
     ALWAYS_INLINE constexpr Color blendOverComponent(Color const background, auto comp) const {
         if (alpha == 0xff) {
@@ -129,6 +135,18 @@ struct Hsv {
                        saturation == other.saturation and value == other.value
                    ? Ordr::EQUAL
                    : Ordr::LESS;
+    }
+
+    Hsv withHue(f64 hue) const {
+        return {hue, saturation, value};
+    }
+
+    Hsv withSaturation(f64 saturation) const {
+        return {hue, saturation, value};
+    }
+
+    Hsv withValue(f64 value) const {
+        return {hue, saturation, value};
     }
 };
 

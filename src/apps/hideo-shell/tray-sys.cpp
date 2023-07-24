@@ -10,17 +10,20 @@
 namespace Shell {
 
 Ui::Child quickSetting(Mdi::Icon icon) {
-    return Ui::center(Ui::state<bool>(false, [icon](auto state) {
-        return Ui::button(
-            [state](Ui::Node &) mutable {
-                state.update(not state.value());
-            },
-            (state.value()
-                 ? Ui::ButtonStyle::primary().withForegroundPaint(Gfx::WHITE)
-                 : Ui::ButtonStyle::secondary().withForegroundPaint(Ui::GRAY300))
-                .withRadius(99),
-            Ui::minSize(48, Ui::center(Ui::icon(icon, 26))));
-    }));
+    return Ui::state(false, [icon](auto state, auto bind) {
+               auto style = (state
+                                 ? Ui::ButtonStyle::primary().withForegroundPaint(Gfx::WHITE)
+                                 : Ui::ButtonStyle::secondary().withForegroundPaint(Ui::GRAY300))
+                                .withRadius(99);
+
+               return Ui::button(
+                   bind(not state),
+                   style,
+                   Ui::icon(icon, 26) |
+                       Ui::center() |
+                       Ui::minSize(48));
+           }) |
+           Ui::center();
 }
 
 Ui::Child quickSettings(State const &state) {

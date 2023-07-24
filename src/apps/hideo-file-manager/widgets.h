@@ -13,6 +13,14 @@ Ui::Child directoryListing(State const &, Sys::Dir const &);
 
 Ui::Child breadcrumb(State const &);
 
+Ui::Child goBackTool(State const &state);
+
+Ui::Child goForwardTool(State const &state);
+
+Ui::Child goParentTool(State const &state);
+
+Ui::Child refreshTool();
+
 Ui::Child toolbar(State const &);
 
 Ui::Child alert(State const &state, String title, String subtitle);

@@ -1,5 +1,5 @@
 #include <karm-fmt/case.h>
-#include <karm-ui/drag.h>
+#include <karm-ui/anim.h>
 #include <karm-ui/input.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -111,7 +111,7 @@ Ui::Child editorFilterControls(Gfx::Filter const &filter) {
                 f.amount,
                 T::RANGE,
                 [](auto &n, auto v) {
-                    Model::dispatch<SetFilter>(n, T{v});
+                    Model::dispatch(n, SetFilter{T{v}});
                 });
         }});
 }
@@ -122,7 +122,7 @@ Ui::Child editorFilters(State const &s) {
         tiles.pushBack(
             editorFilterTile(
                 [](auto &n) {
-                    Model::dispatch<SetFilter>(n, T{});
+                    Model::dispatch(n, SetFilter{T{}});
                 },
                 s.filter.is<T>() ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
                 editorFilterIcon<T>(),

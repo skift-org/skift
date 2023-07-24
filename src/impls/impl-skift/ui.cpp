@@ -29,7 +29,7 @@ struct Host :
     void pump() override {
     }
 
-    void wait(usize) override {
+    void wait(TimeSpan) override {
     }
 
     void bubble(Events::Event &e) override {

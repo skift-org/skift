@@ -1,8 +1,9 @@
 #include <karm-main/main.h>
+#include <karm-ui/anim.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
-#include <karm-ui/react.h>
+#include <karm-ui/reducer.h>
 #include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -48,35 +49,19 @@ Ui::Child pageContent(State const &state) {
 
 /* --- Body ----------------------------------------------------------------- */
 
-Ui::Child appBody(State const &state) {
-    if (state.sidebarOpen) {
-        return Ui::hflow(
-            sidebar(state),
-            Ui::separator(),
-            pageContent(state));
-    }
-
-    return pageContent(state);
-}
-
 Ui::Child app() {
     return Ui::reducer<Model>({}, [](State const &state) {
-        auto titlebar = Ui::titlebar(
-            Mdi::COG,
-            "Settings",
-            Ui::TitlebarStyle::DEFAULT);
-
-        return Ui::dialogLayer(
-            Ui::pinSize(
-                {800, 600},
-                Ui::vflow(
-                    titlebar,
-                    Ui::toolbar(
-                        Ui::button(Model::bind<ToggleSidebar>(), Ui::ButtonStyle::subtle(), state.sidebarOpen ? Mdi::MENU_OPEN : Mdi::MENU),
-                        Ui::button(Model::bindIf<GoBack>(state.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
-                        Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
-                        Ui::button(Model::bind<GoTo>(Page::HOME), Ui::ButtonStyle::subtle(), Mdi::HOME)),
-                    appBody(state) | Ui::grow())));
+        return Ui::scafold({
+            .icon = Mdi::COG,
+            .title = "Settings",
+            .startTools = {
+                Ui::button(Model::bindIf<GoBack>(state.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
+                Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
+                Ui::button(Model::bind<GoTo>(Page::HOME), Ui::ButtonStyle::subtle(), Mdi::HOME),
+            },
+            .sidebar = sidebar(state),
+            .body = pageContent(state) | Ui::grow(),
+        });
     });
 }
 

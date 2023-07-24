@@ -1,11 +1,8 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
-#include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
-#include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
-#include <karm-ui/view.h>
 
 #include "model.h"
 
@@ -86,17 +83,16 @@ Ui::Child screen(State state) {
 }
 
 Ui::Child app() {
-    return Ui::reducer<Model>({}, [](auto state) {
-        return Ui::maxSize(
-            {300, 450},
-            Ui::dialogLayer(
-                Ui::vflow(
-                    Ui::titlebar(
-                        Mdi::CALCULATOR,
-                        "Calculator",
-                        Ui::TitlebarStyle::DIALOG),
-                    Ui::dragRegion(screen(state)),
-                    Ui::grow(Calculator::keypad(state)))));
+    return Ui::reducer<Model>([](auto const &state) {
+        return Ui::scafold({
+            .icon = Mdi::CALCULATOR,
+            .title = "Calculator",
+            .titlebar = Ui::TitlebarStyle::DIALOG,
+            .body = Ui::vflow(
+                screen(state) | Ui::dragRegion(),
+                keypad(state) | Ui::grow()),
+            .size = {300, 450},
+        });
     });
 }
 

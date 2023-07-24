@@ -128,7 +128,7 @@ using OnPress = Opt<Func<void(Node &)>>;
 Child button(OnPress onPress, ButtonStyle style, Child child);
 
 inline auto button(OnPress onPress, ButtonStyle style) {
-    return [=, onPress = std::move(onPress)](Child child) mutable {
+    return [onPress = std::move(onPress), style](Child child) mutable {
         return button(std::move(onPress), style, child);
     };
 }
@@ -202,5 +202,15 @@ Child slider(SliderStyle style, T value, Range<T> range, OnChange<T> onChange) {
 /* --- Color ---------------------------------------------------------------- */
 
 Child color(Gfx::Color color, OnChange<Gfx::Color> onChange);
+
+/* --- Intent --------------------------------------------------------------- */
+
+Child intent(Child child, Func<void(Node &, Events::Event &e)> map);
+
+static inline auto intent(Func<void(Node &, Events::Event &e)> map) {
+    return [map = std::move(map)](Child child) mutable {
+        return intent(std::move(child), std::move(map));
+    };
+}
 
 } // namespace Karm::Ui

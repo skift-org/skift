@@ -185,8 +185,8 @@ struct SdlHost :
         }
     }
 
-    void wait(usize ms) override {
-        SDL_WaitEventTimeout(nullptr, ms);
+    void wait(TimeSpan span) override {
+        SDL_WaitEventTimeout(nullptr, span.toMSecs());
     }
 
     void bubble(Events::Event &e) override {

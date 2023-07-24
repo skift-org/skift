@@ -189,9 +189,7 @@ struct Button : public _Box<Button> {
     BoxStyle &boxStyle() override {
         if (not _onPress) {
             return _buttonStyle.disabledStyle;
-        }
-
-        if (_mouseListener.isIdle()) {
+        } else if (_mouseListener.isIdle()) {
             return _buttonStyle.idleStyle;
         } else if (_mouseListener.isHover()) {
             return _buttonStyle.hoverStyle;
@@ -646,6 +644,28 @@ Child color(Gfx::Color color, OnChange<Gfx::Color>) {
                 .backgroundPaint = color,
             }) |
             Ui::center() | Ui::bound());
+}
+
+/* --- Intent --------------------------------------------------------------- */
+
+struct Intent : public ProxyNode<Intent> {
+    Func<void(Node &, Events::Event &e)> _map;
+
+    Intent(Child child, Func<void(Node &, Events::Event &e)> map)
+        : ProxyNode<Intent>(std::move(child)), _map(std::move(map)) {}
+
+    void event(Events::Event &e) override {
+        _map(*this, e);
+
+        if (e.accepted)
+            return;
+
+        child().event(e);
+    }
+};
+
+Child intent(Child child, Func<void(Node &, Events::Event &e)> map) {
+    return makeStrong<Intent>(std::move(child), std::move(map));
 }
 
 } // namespace Karm::Ui

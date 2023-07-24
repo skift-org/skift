@@ -54,40 +54,9 @@ Child titlebar(Mdi::Icon icon, String title, Child tabs, TitlebarStyle style) {
            dragRegion() | box(TOOLBAR);
 }
 
-auto lookup(auto k, auto &m) {
-    for (auto &kv : m) {
-        if (kv.car == k) {
-            return kv.cdr;
-        }
-    }
-
-    panic("Key not found");
-}
-
-Child badge(BadgeStyle style, String t) {
-    using StyleToColor = Cons<BadgeStyle, Gfx::Color>;
-
-    Array styleToColor = {
-        StyleToColor{BadgeStyle::INFO, Gfx::BLUE400},
-        StyleToColor{BadgeStyle::SUCCESS, Gfx::LIME400},
-        StyleToColor{BadgeStyle::WARNING, Gfx::YELLOW400},
-        StyleToColor{BadgeStyle::ERROR, Gfx::RED400},
-    };
-
-    Gfx::Color color = lookup(style, styleToColor);
-
-    return text(t) |
-           box({
-               .padding = {8, 4},
-               .borderRadius = 99,
-               .backgroundPaint = color.withOpacity(0.1),
-               .foregroundPaint = color,
-           });
-}
-
 Child toolbar(Children children) {
     return vflow(
-        hflow(0, children) |
+        hflow(4, children) |
             spacing(8) |
             box(TOOLBAR),
         separator());
@@ -99,6 +68,103 @@ Ui::Child bottombar(Children children) {
         hflow(4, children) |
             spacing(8) |
             box(TOOLBAR));
+}
+
+Child scafold(Scafold scafold) {
+    auto isMobile = useFormFactor() == FormFactor::MOBILE;
+
+    Scafold::State state{
+        .sidebarOpen = not isMobile,
+        .isMobile = isMobile,
+    };
+
+    return reducer<Scafold::Model>(state, [scafold = std::move(scafold)](Scafold::State const &state) {
+        Children appBody;
+        appBody.pushBack(titlebar(scafold.icon, scafold.title, scafold.titlebar));
+
+        if (state.isMobile) {
+            if (scafold.midleTools.len())
+                appBody.pushBack(
+                    toolbar(scafold.midleTools));
+        } else {
+            Children tools;
+
+            if (scafold.sidebar)
+                tools.pushBack(
+                    button(Scafold::Model::bind<Scafold::ToggleSidebar>(), Ui::ButtonStyle::subtle(), state.sidebarOpen ? Mdi::MENU_OPEN : Mdi::MENU));
+
+            if (scafold.startTools.len())
+                tools.pushBack(
+                    hflow(4, scafold.startTools));
+
+            if (scafold.midleTools.len())
+                tools.pushBack(
+                    hflow(4, scafold.midleTools) | grow());
+
+            if (scafold.endTools.len())
+                tools.pushBack(
+                    hflow(4, scafold.endTools));
+
+            if (tools.len())
+                appBody.pushBack(
+                    toolbar(tools));
+            else
+                appBody.pushBack(
+                    separator());
+        }
+
+        if (state.isMobile) {
+            if (state.sidebarOpen and scafold.sidebar) {
+                appBody.pushBack((*scafold.sidebar) |
+                                 Ui::box({.backgroundPaint = GRAY900}) |
+                                 grow());
+            } else {
+                appBody.pushBack(scafold.body | grow());
+            }
+        } else {
+            if (state.sidebarOpen and scafold.sidebar) {
+                appBody.pushBack(hflow(
+                                     *scafold.sidebar,
+                                     separator(),
+                                     scafold.body | grow()) |
+                                 grow());
+            } else {
+                appBody.pushBack(scafold.body | grow());
+            }
+        }
+
+        if (state.isMobile) {
+            Children tools;
+
+            if (scafold.sidebar)
+                tools.pushBack(
+                    button(
+                        Scafold::Model::bind<Scafold::ToggleSidebar>(),
+                        Ui::ButtonStyle::subtle(),
+                        state.sidebarOpen
+                            ? Mdi::MENU_OPEN
+                            : Mdi::MENU));
+
+            if (scafold.startTools.len())
+                tools.pushBack(
+                    hflow(4, scafold.startTools));
+
+            if (scafold.startTools.len() and scafold.endTools.len())
+                tools.pushBack(grow(NONE));
+
+            if (scafold.endTools.len())
+                tools.pushBack(
+                    hflow(4, scafold.endTools));
+
+            if (tools.len())
+                appBody.pushBack(
+                    bottombar(tools));
+        }
+
+        return vflow(appBody) |
+               pinSize(state.isMobile ? Math::Vec2i{411, 731} : scafold.size) |
+               dialogLayer();
+    });
 }
 
 } // namespace Karm::Ui

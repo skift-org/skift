@@ -156,10 +156,10 @@ Child navList(Children children) {
 }
 
 Child navTree(Mdi::Icon i, String title, Child child) {
-    return state(true, [=](State<bool> state) {
+    return state(true, [=](bool state, auto bind) {
         return vflow(
             button(
-                state.bindToggle(),
+                bind(not state),
                 ButtonStyle::subtle(),
                 spacing(
                     {0, 8, 12, 8},
@@ -168,9 +168,9 @@ Child navTree(Mdi::Icon i, String title, Child child) {
                         icon(i, 18),
                         empty(12),
                         labelMedium(title) | vcenter() | grow(),
-                        icon(state.value() ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 18)))),
+                        icon(state ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 18)))),
 
-            state.value()
+            state
                 ? child | spacing({32, 0, 0, 0}) |
                       slideIn(SlideFrom::TOP)
                 : empty());
@@ -178,20 +178,20 @@ Child navTree(Mdi::Icon i, String title, Child child) {
 }
 
 Child treeRow(Opt<Child> leading, String title, Opt<String> subtitle, Child child) {
-    return state(false, [=](State<bool> state) {
+    return state(false, [=](bool state, auto bind) {
         return vflow(
             0,
             pressableRow(
-                state.bindToggle(),
+                bind(not state),
                 leading,
                 title,
                 subtitle,
-                icon(state.value() ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 24)),
-            state.value() ? spacing(
-                                {38, 0, 0, 0},
-                                child) |
-                                slideIn(SlideFrom::TOP)
-                          : empty());
+                icon(state ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 24)),
+            state ? spacing(
+                        {38, 0, 0, 0},
+                        child) |
+                        slideIn(SlideFrom::TOP)
+                  : empty());
     });
 }
 

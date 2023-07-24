@@ -2,6 +2,7 @@
 
 #include <karm-layout/spacing.h>
 
+#include "layout.h"
 #include "node.h"
 
 namespace Karm::Ui {
@@ -160,6 +161,31 @@ inline auto box(BoxStyle style) {
     return [=](Child inner) {
         return box(style, inner);
     };
+}
+
+/* --- Card ----------------------------------------------------------------- */
+
+inline Child card(Child child) {
+    BoxStyle style = {
+        .borderRadius = 4,
+        .backgroundPaint = GRAY900,
+    };
+
+    return box(style, child);
+}
+
+inline auto card() {
+    return [](Child child) {
+        return card(child);
+    };
+}
+
+inline Child card(Children children) {
+    return card(vflow(children));
+}
+
+inline Child card(Child child, Meta::Same<Child> auto... children) {
+    return card({child, children...});
 }
 
 } // namespace Karm::Ui

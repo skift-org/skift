@@ -1,8 +1,12 @@
 #pragma once
 
+#include <karm-main/base.h>
+
 #include "box.h"
+#include "dialog.h"
 #include "layout.h"
 #include "node.h"
+#include "reducer.h"
 
 namespace Karm::Ui {
 
@@ -18,39 +22,48 @@ Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style = TitlebarStyle
 
 Child titlebar(Mdi::Icon icon, String title, Child tabs, TitlebarStyle style = TitlebarStyle::DEFAULT);
 
-enum struct BadgeStyle {
-    INFO,
-    SUCCESS,
-    WARNING,
-    ERROR,
-};
-
-Child badge(BadgeStyle style, String text);
-
 Child toolbar(Children children);
 
-inline Ui::Child toolbar(Meta::Same<Child> auto... children) { return toolbar({children...}); }
+inline Child toolbar(Meta::Same<Child> auto... children) { return toolbar({children...}); }
 
-Ui::Child bottombar(Children children);
+Child bottombar(Children children);
 
-inline Ui::Child bottombar(Meta::Same<Child> auto... children) { return bottombar({children...}); }
+inline Child bottombar(Meta::Same<Child> auto... children) { return bottombar({children...}); }
 
-inline Child card(Child child) {
-    return box({
-                   .borderRadius = 4,
-                   .backgroundPaint = GRAY900,
-               },
-               child);
-}
+struct Scafold : public Meta::NoCopy {
+    Mdi::Icon icon;
+    String title;
+    TitlebarStyle titlebar = TitlebarStyle::DEFAULT;
 
-inline auto card() {
-    return [](Child child) {
-        return card(child);
+    Children startTools;
+    Children midleTools;
+    Children endTools;
+
+    Opt<Child> sidebar;
+    Child body;
+    Math::Vec2i size = {800, 600};
+
+    struct State {
+        bool sidebarOpen = false;
+        bool isMobile = false;
     };
-}
 
-inline Child card(Children children) { return card(vflow(children)); }
+    struct ToggleSidebar {};
 
-inline Child card(Child child, Meta::Same<Child> auto... children) { return card({child, children...}); }
+    using Action = Var<ToggleSidebar>;
+
+    static State reduce(State s, Action a) {
+        return a.visit(::Visitor{
+            [&](ToggleSidebar) {
+                s.sidebarOpen = !s.sidebarOpen;
+                return s;
+            },
+        });
+    }
+
+    using Model = Model<State, Action, reduce>;
+};
+
+Child scafold(Scafold scafold);
 
 } // namespace Karm::Ui

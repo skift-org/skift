@@ -58,5 +58,36 @@ Child slideIn(SlideFrom from, Ui::Child child) {
     return makeStrong<SlideIn>(from, std::move(child));
 }
 
+/* --- Slide In/Out --------------------------------------------------------- */
+
+struct SlideInOut : public ProxyNode<SlideInOut> {
+    enum State {
+        IDLE,
+        IN,
+        OUT,
+    };
+    bool _visible{};
+    SlideFrom _from;
+    Easedf _slide{};
+
+    State _state{};
+    Math::Rectf _oldBound{};
+
+    SlideInOut(bool visible, SlideFrom from, Ui::Child child)
+        : ProxyNode(std::move(child)),
+          _visible(visible),
+          _from(from) {
+    }
+
+    void reconcile(SlideInOut &o) override {
+        _visible = o._visible;
+        _from = o._from;
+        ProxyNode<SlideInOut>::reconcile(o);
+    }
+};
+
+Child slideInOut(bool visible, SlideFrom from, Ui::Child child) {
+    return makeStrong<SlideInOut>(visible, from, std::move(child));
+}
 
 } // namespace Karm::Ui

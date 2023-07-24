@@ -95,8 +95,6 @@ struct PaintEvent : public BaseEvent<PaintEvent> {
 
 struct LayoutEvent : public BaseEvent<LayoutEvent> {};
 
-struct BuildEvent : public BaseEvent<BuildEvent> {};
-
 struct AnimateEvent : public BaseEvent<AnimateEvent> {
     f64 dt;
 

@@ -1,13 +1,11 @@
+#include <karm-main/base.h>
+
 #include "app.h"
 
 namespace Settings {
 
 State reduce(State d, Actions action) {
     return action.visit(Visitor{
-        [&](ToggleSidebar) {
-            d.sidebarOpen = !d.sidebarOpen;
-            return d;
-        },
         [&](GoTo a) {
             if (d.page() == a.page) {
                 return d;
@@ -15,6 +13,7 @@ State reduce(State d, Actions action) {
             d.history.removeRange(d.historyIndex + 1, d.history.len() - d.historyIndex - 1);
             d.history.pushBack(a.page);
             d.historyIndex = d.history.len() - 1;
+
             return d;
         },
         [&](GoBack) {

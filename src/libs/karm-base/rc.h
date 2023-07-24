@@ -10,6 +10,9 @@
 namespace Karm {
 
 struct _Cell {
+    static constexpr u64 MAGIC = 0xCAFEBABECAFEBABE;
+
+    u64 _magic = MAGIC;
     Lock _lock;
     bool _clear = false;
     isize _strong = 0;
@@ -90,6 +93,14 @@ struct Cell : public _Cell {
     template <typename... Args>
     Cell(Args &&...args) {
         _buf.ctor(std::forward<Args>(args)...);
+    }
+
+    static Cell *from(T &ref) {
+        usize offset = offsetof(Cell, _buf);
+        auto cell = reinterpret_cast<Cell *>(reinterpret_cast<u8 *>(&ref) - offset);
+        if (cell->_magic != MAGIC)
+            panic("Cell::from() called on non-cell");
+        return cell;
     }
 
     void *_unwrap() override { return &_buf.unwrap(); }
@@ -247,6 +258,10 @@ struct Weak {
         : _cell(std::exchange(other._cell, nullptr)) {
     }
 
+    constexpr Weak(Move, _Cell *ptr)
+        : _cell(ptr->refWeak()) {
+    }
+
     constexpr Weak &operator=(Strong<T> const &other) {
         *this = Weak(other);
         return *this;
@@ -277,6 +292,11 @@ struct Weak {
 template <typename T, typename... Args>
 constexpr static Strong<T> makeStrong(Args &&...args) {
     return {MOVE, new Cell<T>(std::forward<Args>(args)...)};
+}
+
+template <typename T>
+constexpr static Weak<T> weakFromRef(T &ref) {
+    return {MOVE, Cell<T>::from(ref)};
 }
 
 } // namespace Karm

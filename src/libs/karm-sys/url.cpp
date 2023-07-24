@@ -80,8 +80,9 @@ Path Path::join(Str other) const {
 
 Path Path::parent(usize n) const {
     Path path = *this;
-    if (path._parts.len() > n) {
-        path._parts.popBack();
+    if (path._parts.len() >= n) {
+        for (usize i = 0; i < n; i++)
+            path._parts.popBack();
     }
     return path;
 }

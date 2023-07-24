@@ -1,12 +1,6 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
-#include <karm-ui/dialog.h>
-#include <karm-ui/drag.h>
-#include <karm-ui/input.h>
-#include <karm-ui/layout.h>
 #include <karm-ui/scafold.h>
-#include <karm-ui/scroll.h>
-#include <karm-ui/view.h>
 
 namespace About {
 
@@ -43,17 +37,13 @@ Ui::Child app() {
                 Ui::grow(NONE),
                 closeBtn)));
 
-    auto titlebar = Ui::titlebar(
-        Mdi::INFORMATION,
-        "About",
-        Ui::TitlebarStyle::DIALOG);
-
-    return Ui::vflow(
-               titlebar,
-               Ui::separator(),
-               content | Ui::grow()) |
-           Ui::pinSize({560, 360}) |
-           Ui::dialogLayer();
+    return Ui::scafold({
+        .icon = Mdi::INFORMATION,
+        .title = "About",
+        .titlebar = Ui::TitlebarStyle::DIALOG,
+        .body = content,
+        .size = {460, 360},
+    });
 }
 
 } // namespace About

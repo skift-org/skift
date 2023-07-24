@@ -2,7 +2,7 @@
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
-#include <karm-ui/react.h>
+#include <karm-ui/reducer.h>
 #include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -65,25 +65,14 @@ Ui::Child sidebar(State s) {
 }
 
 Ui::Child app() {
-    auto titlebar = Ui::titlebar(
-        Mdi::DUCK,
-        "Demos",
-        Ui::TitlebarStyle::DEFAULT);
-
-    auto content = Ui::reducer<Model>([](State s) {
-        return Ui::hflow(
-            sidebar(s),
-            Ui::separator(),
-            DEMOS[s.current]->build() | Ui::grow());
+    return Ui::reducer<Model>([](State s) {
+        return Ui::scafold({
+            .icon = Mdi::DUCK,
+            .title = "Demos",
+            .sidebar = sidebar(s),
+            .body = DEMOS[s.current]->build(),
+        });
     });
-
-    return Ui::minSize(
-        {700, 500},
-        Ui::dialogLayer(
-            Ui::vflow(
-                titlebar,
-                Ui::separator(),
-                content | Ui::grow())));
 }
 
 } // namespace Hideo::Demos

@@ -40,7 +40,7 @@ struct EfiHost :
         event(e);
     }
 
-    void wait(usize) override {
+    void wait(TimeSpan) override {
     }
 
     void bubble(Events::Event &e) override {

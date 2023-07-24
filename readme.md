@@ -92,21 +92,13 @@ $ git switch dev
 $ pip install --user -e .
 ```
 
-Once you have installed CuteKit, you can install the dependencies and build the operating system:
+Once you have installed CuteKit, you can install the dependencies and finally run the operating system:
 
 ```sh
 $ cutekit install
 
-$ cutekit build --all
-```
-
-Finally, you can run the operating system using:
-
-```sh
 $ cutekit start
 ```
-
-> After pulling new changes, you can run `cutekit clean` to remove the build artifacts and `cutekit build` to rebuild the operating system.
 
 Individual components can be run on the host system using:
 

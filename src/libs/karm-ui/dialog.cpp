@@ -166,16 +166,19 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     }
 
     void layout(Math::Recti r) override {
-
         if (_shouldDialogClose) {
-            (*_dialog)->detach(this);
-            _dialog = NONE;
+            if (_dialog) {
+                (*_dialog)->detach(this);
+                _dialog = NONE;
+            }
             _shouldDialogClose = false;
         }
 
         if (_shouldPopoverClose) {
-            (*_popover)->detach(this);
-            _popover = NONE;
+            if (_popover) {
+                (*_popover)->detach(this);
+                _popover = NONE;
+            }
             _shouldPopoverClose = false;
         }
 

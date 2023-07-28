@@ -197,6 +197,14 @@ Child slider(SliderStyle style, T value, Range<T> range, OnChange<T> onChange) {
     });
 }
 
+Child slider2(Child thumb, f64 value, OnChange<f64> onChange);
+
+static inline auto slider2(f64 value, OnChange<f64> onChange) {
+    return [value, onChange = std::move(onChange)](Child thumb) mutable {
+        return slider2(std::move(thumb), value, std::move(onChange));
+    };
+}
+
 /* --- Select --------------------------------------------------------------- */
 
 /* --- Color ---------------------------------------------------------------- */

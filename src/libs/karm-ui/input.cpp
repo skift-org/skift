@@ -1,5 +1,6 @@
 #include "input.h"
 
+#include "drag.h"
 #include "funcs.h"
 #include "layout.h"
 #include "view.h"
@@ -627,6 +628,49 @@ Child slider(SliderStyle style, f64 value, OnChange<f64> onChange) {
 
 Child slider(f64 value, OnChange<f64> onChange) {
     return makeStrong<Slider>(SliderStyle::regular(), value, std::move(onChange));
+}
+
+struct Slider2 : public ProxyNode<Slider2> {
+    f64 _value = 0.0f;
+    OnChange<f64> _onChange;
+    Math::Recti _bound;
+
+    Slider2(Child child, f64 value, OnChange<f64> onChange)
+        : ProxyNode<Slider2>(std::move(child)), _value(value), _onChange(std::move(onChange)) {
+    }
+
+    void layout(Math::Recti r) override {
+        _bound = r;
+        child().layout(_bound.hsplit(((r.width - r.height) * _value) + r.height).car);
+    }
+
+    Math::Recti bound() override {
+        return _bound;
+    }
+
+    void bubble(Events::Event &e) override {
+        if (auto *dv = e.is<DragEvent>()) {
+            if (dv->type == DragEvent::DRAG) {
+                auto max = bound().width - bound().height;
+                auto value = max * _value;
+                value = clamp(value + dv->delta.x, 0.0f, max);
+                _value = value / max;
+                if (_onChange) {
+                    _onChange(*this, _value);
+                } else {
+                    child().layout(_bound.hsplit(((_bound.width - _bound.height) * _value) + _bound.height).car);
+                    shouldRepaint(*this);
+                }
+            }
+            e.accept();
+        }
+
+        ProxyNode<Slider2>::bubble(e);
+    }
+};
+
+Child slider2(Child thumb, f64 value, OnChange<f64> onChange) {
+    return makeStrong<Slider2>(std::move(thumb), value, std::move(onChange));
 }
 
 /* --- Color ---------------------------------------------------------------- */

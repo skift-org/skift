@@ -34,12 +34,6 @@ void dumpGpos(Ttf::Gpos const &gpos) {
     }
 
     Sys::println("  LookupList (len:{})", gpos.lookupList().len());
-
-    int i = 0;
-    for (auto _ : gpos.lookupList().iter()) {
-        (void)_;
-        Sys::println("    {}", i++);
-    }
 }
 
 Res<> entryPoint(Ctx &ctx) {

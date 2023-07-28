@@ -3,51 +3,10 @@
 #include <karm-ui/box.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/node.h>
-#include <karm-ui/reducer.h>
+
+#include "model.h"
 
 namespace Shell {
-
-/* --- Model ---------------------------------------------------------------- */
-
-struct App {
-    Mdi::Icon icon;
-    Gfx::ColorRamp color;
-    String name;
-};
-
-struct Noti {
-    String title;
-    String msg;
-};
-
-enum struct Panel {
-    NIL,
-    APPS,
-    CALENDAR,
-    NOTIS,
-};
-
-struct State {
-    bool isMobile = true;
-    bool locked = true;
-    Panel activePanel = Panel::NIL;
-};
-
-struct ToggleTablet {};
-
-struct Unlock {};
-
-struct Activate {
-    Panel panel;
-};
-
-using Actions = Var<ToggleTablet, Unlock, Activate>;
-
-State reduce(State state, Actions action);
-
-using Model = Ui::Model<State, Actions, reduce>;
-
-/* --- Views ---------------------------------------------------------------- */
 
 inline auto panel(Math::Vec2i size = {500, 400}) {
     return Ui::pinSize(size) |
@@ -71,5 +30,7 @@ Ui::Child sysPanel(State const &state);
 Ui::Child sysFlyout(State const &state);
 
 Ui::Child keyboardFlyout();
+
+Ui::Child powerDialog();
 
 } // namespace Shell

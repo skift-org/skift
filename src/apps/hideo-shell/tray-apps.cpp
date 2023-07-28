@@ -103,9 +103,10 @@ Ui::Child appsFlyout() {
            }) |
            Ui::bound() |
            Ui::dismisable(
-               Ui::closeDialog,
+               Model::bind<Activate>(Panel::NIL),
                Ui::DismisDir::DOWN,
-               0.3);
+               0.3) |
+           Ui::slideIn(Ui::SlideFrom::BOTTOM);
 }
 
 } // namespace Shell

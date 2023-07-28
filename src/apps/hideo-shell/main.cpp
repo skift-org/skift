@@ -28,20 +28,16 @@ Ui::Child statusbar() {
            Ui::box({.padding = {12, 0}, .backgroundPaint = Gfx::ZINC900});
 }
 
-Ui::Child statusbarButton(State const &state) {
+Ui::Child statusbarButton(State const &) {
     return Ui::button(
-        [&](Ui::Node &n) {
-            Ui::showDialog(n, sysFlyout(state) | Ui::slideIn(Ui::SlideFrom::TOP));
-        },
+        Model::bind<Activate>(Panel::SYS),
         statusbar());
 }
 
 /* --- Navigation Bar ------------------------------------------------------- */
 
 Ui::Child navbar() {
-    return Ui::buttonHandle([](Ui::Node &n) {
-        Ui::showDialog(n, appsFlyout() | Ui::slideIn(Ui::SlideFrom::BOTTOM));
-    });
+    return Ui::buttonHandle(Model::bind<Activate>(Panel::APPS));
 }
 
 /* --- Taskbar -------------------------------------------------------------- */
@@ -53,12 +49,12 @@ Ui::Child taskbar(State const &) {
         Mdi::APPS, "Applications");
 
     auto calButton = Ui::button(
-        Model::bind<Activate>(Panel::CALENDAR),
+        Model::bind<Activate>(Panel::NOTIS),
         Ui::ButtonStyle::subtle(),
         Mdi::CALENDAR, "Jan. 12 2021, 22:07");
 
     auto trayButton = Ui::button(
-        Model::bind<Activate>(Panel::NOTIS),
+        Model::bind<Activate>(Panel::SYS),
         Ui::ButtonStyle::subtle(),
         Ui::hflow(
             6,
@@ -83,15 +79,13 @@ Ui::Child taskbar(State const &) {
            });
 }
 
-Ui::Child panels(State const &state) {
-    return Ui::stack(
-               state.activePanel == Panel::APPS ? appsPanel() | Ui::align(Layout::Align::START | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
-               state.activePanel == Panel::CALENDAR ? Ui::empty() | panel() | Ui::align(Layout::Align::HCENTER | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
-               state.activePanel == Panel::NOTIS ? sysPanel(state) | Ui::align(Layout::Align::END | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty()) |
-           Ui::spacing({8, 38});
-}
-
 /* --- Shells --------------------------------------------------------------- */
+
+Ui::Child tabletPanels(State const &state) {
+    return Ui::stack(
+        state.activePanel == Panel::APPS ? appsFlyout() : Ui::empty(),
+        state.activePanel == Panel::SYS ? sysFlyout(state) : Ui::empty());
+}
 
 Ui::Child tablet(State const &state) {
     return Ui::vflow(
@@ -101,6 +95,14 @@ Ui::Child tablet(State const &state) {
             Ui::slideIn(Ui::SlideFrom::TOP),
         Ui::grow(NONE),
         navbar() | Ui::slideIn(Ui::SlideFrom::BOTTOM));
+}
+
+Ui::Child desktopPanels(State const &state) {
+    return Ui::stack(
+               state.activePanel == Panel::APPS ? appsPanel() | Ui::align(Layout::Align::START | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
+               state.activePanel == Panel::NOTIS ? Ui::empty() | panel() | Ui::align(Layout::Align::HCENTER | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
+               state.activePanel == Panel::SYS ? sysPanel(state) | Ui::align(Layout::Align::END | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty()) |
+           Ui::spacing({8, 38});
 }
 
 Ui::Child desktop(State const &state) {
@@ -125,7 +127,8 @@ Ui::Child app(bool isMobile) {
                     state.locked ? lock(state)
                                  : (state.isMobile ? tablet(state)
                                                    : desktop(state)),
-                    panels(state))));
+                    state.isMobile ? tabletPanels(state)
+                                   : desktopPanels(state))));
     });
 }
 

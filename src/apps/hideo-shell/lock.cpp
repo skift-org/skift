@@ -19,7 +19,7 @@ Ui::Child lock(State const &state) {
                 ? "Swipe up to unlock"
                 : "Swipe up or press any key to unlock")));
 
-    return Ui::vflow(clock, Ui::grow(NONE), hintText) |
+    return Ui::vflow(clock, Ui::grow(NONE), hintText | Ui::slideIn(Ui::SlideFrom::BOTTOM)) |
            Ui::spacing(state.isMobile ? 64 : 128) |
            Ui::dragRegion() |
            Ui::dismisable(Model::bind<Unlock>(), Ui::DismisDir::TOP, 0.3) |

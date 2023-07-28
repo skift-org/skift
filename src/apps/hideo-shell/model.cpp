@@ -6,6 +6,10 @@ State reduce(State state, Actions action) {
     return action.visit(Visitor{
         [&](ToggleTablet) {
             state.isMobile = not state.isMobile;
+            return state;
+        },
+        [&](Lock) {
+            state.locked = true;
             state.activePanel = Panel::NIL;
             return state;
         },
@@ -19,6 +23,10 @@ State reduce(State state, Actions action) {
             } else {
                 state.activePanel = Panel::NIL;
             }
+            return state;
+        },
+        [&](ToggleSysPanel) {
+            state.isSysPanelColapsed = not state.isSysPanelColapsed;
             return state;
         },
     });

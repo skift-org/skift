@@ -17,7 +17,7 @@ Res<> entryPoint(Ctx &ctx) {
 
     auto configs = try$(Loader::Configs::fromJson(json));
 
-    if (configs.entries.len() > 1 || configs.entries.len() == 0)
+    if (configs.entries.len() > 1 or configs.entries.len() == 0)
         return Loader::showMenu(ctx, configs);
 
     return Loader::loadEntry(configs.entries[0]);

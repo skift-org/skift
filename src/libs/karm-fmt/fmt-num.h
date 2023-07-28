@@ -76,7 +76,7 @@ struct NumberFormater {
         do {
             buf[i++] = digit(value % base);
             value /= base;
-        } while (value != 0 && i < buf.len());
+        } while (value != 0 and i < buf.len());
 
         if (width > 0) {
             usize n = width - i;

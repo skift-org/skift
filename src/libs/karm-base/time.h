@@ -176,7 +176,7 @@ struct TimeStamp {
     }
 
     constexpr TimeSpan operator-(TimeStamp other) const {
-        if (isEndOfTime() || other.isEndOfTime()) {
+        if (isEndOfTime() or other.isEndOfTime()) {
             return TimeSpan::infinite();
         }
         return _value - other._value;
@@ -292,7 +292,7 @@ struct Year {
         : _raw(raw) {}
 
     constexpr bool isLeap() const {
-        return (_raw % 4 == 0 && _raw % 100 != 0) || _raw % 400 == 0;
+        return (_raw % 4 == 0 and _raw % 100 != 0) or _raw % 400 == 0;
     }
 
     constexpr operator isize() const {

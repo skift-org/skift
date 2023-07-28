@@ -27,9 +27,9 @@ using Actions = Var<MoveSelectionAction, SelectAction>;
 State reduce(State state, Actions a) {
     return a.visit(Visitor{
         [&](MoveSelectionAction a) {
-            if (state.selected == 0 && a.delta < 0)
+            if (state.selected == 0 and a.delta < 0)
                 state.selected = state.configs.entries.len() - 1;
-            else if (state.selected == state.configs.entries.len() - 1 && a.delta > 0)
+            else if (state.selected == state.configs.entries.len() - 1 and a.delta > 0)
                 state.selected = 0;
             else
                 state.selected += a.delta;

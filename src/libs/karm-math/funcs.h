@@ -161,7 +161,7 @@ auto sqrt(T x) -> T {
     if (x < 0.0)
         return NAN;
 
-    if (x == 0.0 || isNan(x) || isInf(x))
+    if (x == 0.0 or isNan(x) or isInf(x))
         return x;
 
     auto guess = x / 2;

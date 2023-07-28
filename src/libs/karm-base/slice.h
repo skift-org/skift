@@ -221,7 +221,7 @@ constexpr auto iterSplit(S &slice, typename S::Inner const &sep) {
         }
 
         usize start = i;
-        while (i < slice.len() && slice.buf()[i] != sep) {
+        while (i < slice.len() and slice.buf()[i] != sep) {
             i++;
         }
 
@@ -244,7 +244,7 @@ constexpr auto iterLevelSplit(S &slice, typename S::Inner const &sep) {
             return NONE;
         }
 
-        while (i < slice.len() && slice.buf()[i] != sep) {
+        while (i < slice.len() and slice.buf()[i] != sep) {
             i++;
         }
 
@@ -268,7 +268,7 @@ constexpr auto iterSplitRev(S &slice, typename S::Inner const &sep) {
         }
 
         usize end = i;
-        while (i > 0 && slice.buf()[i - 1] != sep) {
+        while (i > 0 and slice.buf()[i - 1] != sep) {
             i--;
         }
 
@@ -292,7 +292,7 @@ constexpr auto iterLevelSplitRev(S &slice, typename S::Inner const &sep) {
         }
 
         usize end = i;
-        while (i > 0 && slice.buf()[i - 1] != sep) {
+        while (i > 0 and slice.buf()[i - 1] != sep) {
             i--;
         }
 

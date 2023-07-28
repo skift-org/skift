@@ -215,13 +215,15 @@ struct Strong {
     }
 
     template <typename U>
-    constexpr bool is() {
+    constexpr U *is() {
         if (not _cell)
-            return false;
+            return nullptr;
 
         return Meta::Same<T, U> or
-               Meta::Derive<T, U> or
-               _cell->inspect().id() == Meta::idOf<U>();
+                       Meta::Derive<T, U> or
+                       _cell->inspect().id() == Meta::idOf<U>()
+                   ? &_cell->unwrap<U>()
+                   : nullptr;
     }
 
     Meta::Type<> inspect() const {

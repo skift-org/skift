@@ -283,15 +283,11 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
         child().layout(rect);
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
-        auto childSize = child().size(s, hint);
-        auto childRatio = (f64)childSize.x / (f64)childSize.y;
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint) override {
+        if (s.x < s.y)
+            return {s.x, (isize)(s.x * _ratio)};
 
-        if (childRatio > _ratio) {
-            return {(isize)(s.y * _ratio), s.y};
-        }
-
-        return {s.x, (isize)(s.x / _ratio)};
+        return {(isize)(s.y * _ratio), s.y};
     }
 
     Math::Recti bound() override {

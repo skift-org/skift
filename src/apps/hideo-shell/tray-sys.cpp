@@ -50,7 +50,7 @@ Ui::Child dateAndTime() {
 Ui::Child quickheader(State const &state) {
     return Ui::hflow(
         Ui::empty(6),
-        dateAndTime(),
+        dateAndTime() | Ui::center(),
         Ui::grow(NONE),
         Ui::button(
             Model::bind<ToggleSysPanel>(),
@@ -80,7 +80,7 @@ Ui::Child quickTools(State const &) {
             Mdi::COG));
 }
 
-Ui::Child colapsedQuickSettings(State const &state) {
+Ui::Child colapsedQuickSettings(State const &) {
     auto settings = Ui::grid(
         {
             .rows = Ui::GridUnit::fixed(46).repeated(2),
@@ -108,10 +108,7 @@ Ui::Child colapsedQuickSettings(State const &state) {
             .press = Ui::NOP,
         }));
 
-    return Ui::vflow(
-        8,
-        quickheader(state),
-        settings);
+    return settings;
 }
 
 Ui::Child expendedQuickSettings(State const &state) {
@@ -155,7 +152,6 @@ Ui::Child expendedQuickSettings(State const &state) {
 
     return Ui::vflow(
         8,
-        quickheader(state),
         quickSettingSlider(Mdi::BRIGHTNESS_6),
         quickSettingSlider(Mdi::VOLUME_HIGH),
         settings,
@@ -181,7 +177,7 @@ Ui::Child notiWrapper(App app, Ui::Child inner) {
                inner) |
            Ui::box({
                .padding = 12,
-               .borderRadius = 6,
+               .borderRadius = 4,
                .backgroundPaint = Ui::GRAY900,
            });
 }
@@ -206,12 +202,17 @@ Ui::Child notifications() {
 }
 
 Ui::Child sysPanel(State const &state) {
-    return quickSettings(state) | panel({320, Ui::UNCONSTRAINED});
+    return expendedQuickSettings(state) | panel({320, Ui::UNCONSTRAINED});
+}
+
+Ui::Child notiPanel(State const &) {
+    return notifications() | panel();
 }
 
 Ui::Child sysFlyout(State const &state) {
     auto box = Ui::box({
-        .margin = {8, 8, 8, 64},
+        .margin = {8, 8, 8, 32},
+        .padding = {12, 12, 12, 0},
         .borderRadius = 8,
         .borderWidth = 1,
         .borderPaint = Ui::GRAY800,
@@ -219,8 +220,10 @@ Ui::Child sysFlyout(State const &state) {
     });
 
     return Ui::vflow(
-               quickSettings(state) | Ui::spacing(12),
-               notifications() | Ui::spacing(12) | Ui::grow(),
+               8,
+               quickheader(state),
+               quickSettings(state),
+               notifications() | Ui::grow(),
                Ui::dragHandle()) |
            box |
            Ui::bound() |

@@ -150,8 +150,6 @@ struct Host : public Node {
             g.fill(r);
         }
 
-        g.strokeStyle(Gfx::stroke(GRAY800).withAlign(Gfx::INSIDE_ALIGN));
-        g.stroke(Math::Recti{bound().size()}, 8);
         g.restore();
     }
 
@@ -220,12 +218,22 @@ struct Host : public Node {
         }
     }
 
-    Res<> run() {
+    void doLayout() {
         layout(bound());
-
+        _shouldLayout = false;
         _shouldAnimate = true;
         _dirty.pushBack(bound());
+    }
+
+    void doPaint() {
         paint();
+        _dirty.clear();
+    }
+
+    Res<> run() {
+        doLayout();
+        doPaint();
+
         auto lastFrame = Sys::now();
         while (not _res) {
             isize waitTime = -1;
@@ -248,14 +256,11 @@ struct Host : public Node {
             pump();
 
             if (_shouldLayout) {
-                layout(bound());
-                _shouldLayout = false;
-                _dirty.pushBack(bound());
+                doLayout();
             }
 
             if (_dirty.len() > 0) {
-                paint();
-                _dirty.clear();
+                doPaint();
             }
         }
 

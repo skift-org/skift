@@ -26,7 +26,6 @@ struct State {
     bool locked = true;
     bool isMobile = true;
     Panel activePanel = Panel::NIL;
-
     bool isSysPanelColapsed = true;
 };
 

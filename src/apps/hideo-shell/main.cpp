@@ -1,3 +1,4 @@
+#include <hideo-keyboard/views.h>
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
@@ -19,11 +20,12 @@ Ui::Child indicator(Media::Icon icon) {
 
 Ui::Child statusbar() {
     return Ui::hflow(
-               Ui::text(Ui::TextStyle::labelLarge(), "22:07") | Ui::center(),
+               Ui::labelLarge("22:07") | Ui::center(),
                Ui::grow(NONE),
                indicator(Mdi::WIFI_STRENGTH_4),
                indicator(Mdi::NETWORK_STRENGTH_4),
-               indicator(Mdi::BATTERY)) |
+               indicator(Mdi::BATTERY),
+               Ui::labelLarge("100%") | Ui::center()) |
            Ui::minSize({Ui::UNCONSTRAINED, 36}) |
            Ui::box({.padding = {12, 0}, .backgroundPaint = Gfx::ZINC900});
 }
@@ -36,8 +38,8 @@ Ui::Child statusbarButton(State const &) {
 
 /* --- Navigation Bar ------------------------------------------------------- */
 
-Ui::Child navbar() {
-    return Ui::buttonHandle(Model::bind<Activate>(Panel::APPS));
+Ui::Child navbar(State const &state) {
+    return state.activePanel != Panel::NIL ? Ui::empty() : Ui::buttonHandle(Model::bind<Activate>(Panel::APPS)) | Ui::slideIn(Ui::SlideFrom::BOTTOM);
 }
 
 /* --- Taskbar -------------------------------------------------------------- */
@@ -72,6 +74,7 @@ Ui::Child taskbar(State const &) {
                6,
                appsButton,
                calButton | Ui::center() | Ui::grow(),
+               Ui::button(Keyboard::show, Ui::ButtonStyle::subtle(), Mdi::KEYBOARD),
                trayButton) |
            Ui::box(Ui::BoxStyle{
                .padding = 6,
@@ -94,13 +97,13 @@ Ui::Child tablet(State const &state) {
             Ui::separator()) |
             Ui::slideIn(Ui::SlideFrom::TOP),
         Ui::grow(NONE),
-        navbar() | Ui::slideIn(Ui::SlideFrom::BOTTOM));
+        navbar(state));
 }
 
 Ui::Child desktopPanels(State const &state) {
     return Ui::stack(
                state.activePanel == Panel::APPS ? appsPanel() | Ui::align(Layout::Align::START | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
-               state.activePanel == Panel::NOTIS ? Ui::empty() | panel() | Ui::align(Layout::Align::HCENTER | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
+               state.activePanel == Panel::NOTIS ? notiPanel(state) | Ui::align(Layout::Align::HCENTER | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
                state.activePanel == Panel::SYS ? sysPanel(state) | Ui::align(Layout::Align::END | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty()) |
            Ui::spacing({8, 38});
 }

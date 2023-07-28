@@ -6,6 +6,7 @@
     "requires": [
         "karm-ui",
         "karm-main",
-        "skift-wallpapers"
+        "skift-wallpapers",
+        "hideo-keyboard"
     ]
 }

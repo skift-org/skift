@@ -2,30 +2,10 @@
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
 
-#include "app.h"
+#include "model.h"
+#include "views.h"
 
-namespace Shell {
-
-struct Keyboard {
-    bool shift = true;
-};
-
-struct ToggleShift {
-};
-
-using KeyboardAction = Var<ToggleShift>;
-
-Keyboard reduce(Keyboard k, KeyboardAction a) {
-    return a.visit(
-        Visitor{
-            [&](ToggleShift) {
-                k.shift = !k.shift;
-                return k;
-            },
-        });
-}
-
-using KeyboardModel = Ui::Model<Keyboard, KeyboardAction, reduce>;
+namespace Keyboard {
 
 static Ui::Child toolbar() {
     return Ui::hflow(
@@ -45,7 +25,7 @@ static Ui::Child key(auto icon) {
     return Ui::button(Ui::NOP, Ui::titleMedium(icon) | Ui::center() | Ui::pinSize(32));
 }
 
-static Ui::Child keyboard(Keyboard const &k) {
+static Ui::Child keyboard(State const &k) {
     auto firstRow = Ui::hflow(
         8,
         key(k.shift ? "Q" : "q"),
@@ -75,7 +55,7 @@ static Ui::Child keyboard(Keyboard const &k) {
 
     auto thirdRow = Ui::hflow(
         8,
-        Ui::button(KeyboardModel::bind<ToggleShift>(), Ui::ButtonStyle::secondary(), k.shift ? Mdi::ARROW_UP_BOLD : Mdi::ARROW_UP_BOLD_OUTLINE) | Ui::grow(),
+        Ui::button(Model::bind<ToggleShift>(), Ui::ButtonStyle::secondary(), k.shift ? Mdi::ARROW_UP_BOLD : Mdi::ARROW_UP_BOLD_OUTLINE) | Ui::grow(),
         key(k.shift ? "Z" : "z"),
         key(k.shift ? "X" : "x"),
         key(k.shift ? "C" : "c"),
@@ -102,10 +82,9 @@ static Ui::Child keyboard(Keyboard const &k) {
         fourthRow | Ui::grow());
 }
 
-Ui::Child keyboardFlyout() {
-    return Ui::reducer<KeyboardModel>({}, [](auto &k) {
+Ui::Child flyout() {
+    return Ui::reducer<Model>({}, [](auto &k) {
         return Ui::vflow(
-                   Ui::grow(NONE),
                    Ui::separator(),
                    Ui::vflow(
                        8,
@@ -117,6 +96,8 @@ Ui::Child keyboardFlyout() {
                            .padding = 8,
                            .backgroundPaint = Ui::GRAY950,
                        })) |
+               Ui::align(Layout::Align::HSTRETCH | Layout::Align::BOTTOM) |
+               Ui::slideIn(Ui::SlideFrom::BOTTOM) |
                Ui::dismisable(
                    Ui::closeDialog,
                    Ui::DismisDir::DOWN,
@@ -124,4 +105,8 @@ Ui::Child keyboardFlyout() {
     });
 }
 
-} // namespace Shell
+void show(Ui::Node &n) {
+    Ui::showDialog(n, flyout());
+}
+
+} // namespace Keyboard

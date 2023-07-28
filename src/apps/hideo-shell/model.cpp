@@ -6,6 +6,8 @@ State reduce(State state, Actions action) {
     return action.visit(Visitor{
         [&](ToggleTablet) {
             state.isMobile = not state.isMobile;
+            state.activePanel = Panel::NIL;
+            state.isSysPanelColapsed = true;
             return state;
         },
         [&](Lock) {

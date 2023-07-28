@@ -46,6 +46,7 @@ struct Dismisable :
         if (_dismissed and _drag.reached()) {
             _onDismis(*this);
         }
+
         Ui::ProxyNode<Dismisable>::event(e);
     }
 

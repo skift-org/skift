@@ -1,3 +1,4 @@
+#include <hideo-keyboard/views.h>
 #include <karm-ui/box.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
@@ -21,9 +22,7 @@ Ui::Child searchInput() {
                .borderWidth = 1,
                .backgroundPaint = Ui::GRAY900,
            }) |
-           Ui::button([](auto &n) {
-               Ui::showDialog(n, keyboardFlyout() | Ui::slideIn(Ui::SlideFrom::BOTTOM));
-           });
+           Ui::button(Keyboard::show);
 }
 
 Ui::Child appIcon(Mdi::Icon icon, Gfx::ColorRamp colors, isize size = 22) {

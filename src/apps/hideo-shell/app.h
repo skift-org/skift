@@ -27,9 +27,9 @@ Ui::Child appsFlyout();
 
 Ui::Child sysPanel(State const &state);
 
-Ui::Child sysFlyout(State const &state);
+Ui::Child notiPanel(State const &state);
 
-Ui::Child keyboardFlyout();
+Ui::Child sysFlyout(State const &state);
 
 Ui::Child powerDialog();
 

@@ -1,7 +1,5 @@
 #include "layout.h"
 
-#include "karm-math/rect.h"
-#include "karm-ui/node.h"
 #include "view.h"
 
 namespace Karm::Ui {
@@ -310,6 +308,17 @@ struct StackLayout : public GroupNode<StackLayout> {
             child->layout(r);
         }
     }
+
+    void event(Events::Event &e) override {
+        if (e.accepted)
+            return;
+
+        for (auto &child : mutIterRev(children())) {
+            child->event(e);
+            if (e.accepted)
+                return;
+        }
+    }
 };
 
 Child stack(Children children) {
@@ -448,6 +457,11 @@ struct FlowLayout : public GroupNode<FlowLayout> {
 
     FlowLayout(FlowStyle style, Children children)
         : GroupNode(children), _style(style) {}
+
+    void reconcile(FlowLayout &o) override {
+        _style = o._style;
+        GroupNode::reconcile(o);
+    }
 
     f64 computeGrowUnit(Math::Recti r) {
         f64 total = 0;

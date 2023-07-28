@@ -353,11 +353,11 @@ struct GridUnit {
     }
 
     static GridUnit fixed(isize value) {
-        return GridUnit{FIXED, value};
+        return {FIXED, value};
     }
 
     static GridUnit grow(isize value = 1) {
-        return GridUnit{GROW, value};
+        return {GROW, value};
     }
 
     GridUnit(_Unit unit, isize value) : unit(unit), value(value) {}

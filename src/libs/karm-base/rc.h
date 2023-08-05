@@ -296,9 +296,4 @@ constexpr static Strong<T> makeStrong(Args &&...args) {
     return {MOVE, new Cell<T>(std::forward<Args>(args)...)};
 }
 
-template <typename T>
-constexpr static Weak<T> weakFromRef(T &ref) {
-    return {MOVE, Cell<T>::from(ref)};
-}
-
 } // namespace Karm

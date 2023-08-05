@@ -4,7 +4,7 @@
 
 #include "base.h"
 
-namespace Hideo::Demos {
+namespace Demos {
 
 static inline Demo STROKE_DEMO{
     Mdi::VECTOR_LINE,
@@ -37,4 +37,4 @@ static inline Demo STROKE_DEMO{
     },
 };
 
-} // namespace Hideo::Demos
+} // namespace Demos

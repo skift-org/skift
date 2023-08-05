@@ -7,7 +7,7 @@
 
 #include "model.h"
 
-namespace Hideo::ColorPicker {
+namespace ColorPicker {
 
 struct HsvPicker : public Ui::View<HsvPicker> {
     Gfx::Hsv _value;
@@ -272,8 +272,8 @@ Ui::Child app() {
     });
 }
 
-} // namespace Hideo::ColorPicker
+} // namespace ColorPicker
 
 Res<> entryPoint(Ctx &ctx) {
-    return Ui::runApp(ctx, Hideo::ColorPicker::app());
+    return Ui::runApp(ctx, ColorPicker::app());
 }

@@ -4,7 +4,7 @@
 
 #include "base.h"
 
-namespace Hideo::Demos {
+namespace Demos {
 
 static inline Str CAT = {
 #include "cat.path"
@@ -29,4 +29,4 @@ static inline Demo SVG_DEMO{
     },
 };
 
-} // namespace Hideo::Demos
+} // namespace Demos

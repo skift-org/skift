@@ -9,7 +9,7 @@
 
 #include "base.h"
 
-namespace Hideo::Demos {
+namespace Demos {
 
 static void willShowMessage(Ui::Node &n) {
     Ui::showMsgDialog(n, "Button pressed");
@@ -77,4 +77,4 @@ static inline Demo INPUTS_DEMO{
     },
 };
 
-} // namespace Hideo::Demos
+} // namespace Demos

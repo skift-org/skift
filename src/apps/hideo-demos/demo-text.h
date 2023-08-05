@@ -6,7 +6,7 @@
 
 #include "base.h"
 
-namespace Hideo::Demos {
+namespace Demos {
 
 static inline Demo TEXT_DEMO{
     Mdi::TEXT,
@@ -44,4 +44,4 @@ static inline Demo TEXT_DEMO{
     },
 };
 
-} // namespace Hideo::Demos
+} // namespace Demos

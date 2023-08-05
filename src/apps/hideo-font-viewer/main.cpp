@@ -3,7 +3,7 @@
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 
-namespace Hideo::FontViewer {
+namespace FontViewer {
 
 static constexpr Str PANGRAM = "The quick brown fox jumps over the lazy dog";
 
@@ -33,7 +33,7 @@ Ui::Child app(Strong<Media::Fontface> fontface) {
     });
 }
 
-} // namespace Hideo::FontViewer
+} // namespace FontViewer
 
 Res<> entryPoint(Ctx &ctx) {
     auto &args = useArgs(ctx);
@@ -42,5 +42,5 @@ Res<> entryPoint(Ctx &ctx) {
                              ? Media::loadFontface(url)
                              : Ok(Media::Fontface::fallback()));
 
-    return Ui::runApp(ctx, Hideo::FontViewer::app(fontface));
+    return Ui::runApp(ctx, FontViewer::app(fontface));
 }

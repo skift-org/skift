@@ -17,7 +17,7 @@
 #include "demo-svg.h"
 #include "demo-text.h"
 
-namespace Hideo::Demos {
+namespace Demos {
 
 static Array DEMOS = {
     &CIRCLE_DEMO,
@@ -75,8 +75,8 @@ Ui::Child app() {
     });
 }
 
-} // namespace Hideo::Demos
+} // namespace Demos
 
 Res<> entryPoint(Ctx &ctx) {
-    return Ui::runApp(ctx, Hideo::Demos::app());
+    return Ui::runApp(ctx, Demos::app());
 }

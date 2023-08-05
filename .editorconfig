@@ -10,9 +10,6 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-[makefile]
-indent_style = tab
-
 [*.mk]
 indent_style = tab
 

@@ -10,26 +10,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Toolchains
+      - name: Install Dependencies
         run: |
             sudo apt update
             sudo apt install clang lld llvm python3 git ninja-build libsdl2-dev nasm gcc-multilib
-            git clone https://github.com/cute-engineering/chatty --depth=1 --branch=main --single-branch
-            sudo pip install -e chatty/
-            git clone https://github.com/cute-engineering/cutekit --depth=1 --branch=dev --single-branch
-            sudo pip install -e cutekit/
 
-      - name: Install Packages
-        run: cutekit install
+      - name: Set up the build environment
+        run: ./skift.sh setup && ./skift.sh doctor
+
+      - name: Download third-party dependencies
+        run: ./skift.sh install
 
       - name: Build Kernel (x86_64)
-        run: cutekit build --target=kernel-x86_64
+        run: ./skift.sh build --target=kernel-x86_64
 
       - name: Build EFI (x86_64)
-        run: cutekit build --target=efi-x86_64
+        run: ./skift.sh build --target=efi-x86_64
 
       - name: Build Userspace (x86_64)
-        run: cutekit build --target=skift-x86_64
+        run: ./skift.sh build --target=skift-x86_64
 
-      - name: Build Host
-        run: cutekit build

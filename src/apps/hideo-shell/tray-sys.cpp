@@ -114,7 +114,7 @@ Ui::Child colapsedQuickSettings(State const &) {
 Ui::Child expendedQuickSettings(State const &state) {
     auto settings = Ui::grid(
         {
-            .rows = Ui::GridUnit::fixed(46).repeated(3),
+            .rows = Ui::GridUnit::fixed(46).repeated(4),
             .columns = Ui::GridUnit::grow().repeated(2),
             .gaps = 8,
         },
@@ -148,13 +148,18 @@ Ui::Child expendedQuickSettings(State const &state) {
             .name = "Tablet Mode",
             .state = state.isMobile,
             .press = Model::bind<ToggleTablet>(),
+        }),
+        quickSetting({
+            .icon = Mdi::CIRCLE_HALF_FULL,
+            .name = "Dark Mode",
+            .press = Ui::NOP,
         }));
 
     return Ui::vflow(
         8,
         quickSettingSlider(Mdi::BRIGHTNESS_6),
         quickSettingSlider(Mdi::VOLUME_HIGH),
-        settings,
+        settings | Ui::grow(),
         quickTools(state));
 }
 
@@ -219,12 +224,17 @@ Ui::Child sysFlyout(State const &state) {
         .backgroundPaint = Ui::GRAY950,
     });
 
-    return Ui::vflow(
-               8,
-               quickheader(state),
-               quickSettings(state),
-               notifications() | Ui::grow(),
-               Ui::dragHandle()) |
+    Ui::Children body;
+    body.pushBack(quickheader(state));
+    if (state.isSysPanelColapsed){
+        body.pushBack(colapsedQuickSettings(state));
+        body.pushBack(notifications() | Ui::grow());
+    }else{
+        body.pushBack(expendedQuickSettings(state) | Ui::grow());
+    }
+    body.pushBack(Ui::dragHandle());
+
+    return Ui::vflow(8,body) |
            box |
            Ui::bound() |
            Ui::dismisable(

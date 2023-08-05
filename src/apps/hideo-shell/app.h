@@ -14,8 +14,8 @@ inline auto panel(Math::Vec2i size = {500, 400}) {
                .padding = 8,
                .borderRadius = 8,
                .borderWidth = 1,
-               .borderPaint = Gfx::ZINC800,
-               .backgroundPaint = Gfx::ZINC950,
+               .borderPaint = Ui::GRAY800,
+               .backgroundPaint = Ui::GRAY950,
            });
 }
 

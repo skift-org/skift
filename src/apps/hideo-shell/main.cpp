@@ -27,7 +27,7 @@ Ui::Child statusbar() {
                indicator(Mdi::BATTERY),
                Ui::labelLarge("100%") | Ui::center()) |
            Ui::minSize({Ui::UNCONSTRAINED, 36}) |
-           Ui::box({.padding = {12, 0}, .backgroundPaint = Gfx::ZINC900});
+           Ui::box({.padding = {12, 0}, .backgroundPaint = Ui::GRAY900});
 }
 
 Ui::Child statusbarButton(State const &) {

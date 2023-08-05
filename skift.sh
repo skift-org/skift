@@ -8,6 +8,11 @@ if [ "$CUTEKIT_NOVENV" == "1" ]; then
     exec cutekit $@
 fi
 
+if [ "$1" == "nuke-tools" ]; then
+    rm -rf .cutekit/tools .cutekit/venv
+    exit 0
+fi
+
 if [ ! -f .cutekit/tools/ready ]; then
     if [ ! "$1" == "setup" ]; then
         echo "Tools not installed."
@@ -25,8 +30,11 @@ if [ ! -f .cutekit/tools/ready ]; then
 
     mkdir -p .cutekit
 
-    echo "Setting up Python virtual environment..."
-    python3 -m venv .cutekit/venv
+
+    if [ ! -d .cutekit/venv ]; then
+        echo "Setting up Python virtual environment..."
+        python3 -m venv .cutekit/venv
+    fi
     source .cutekit/venv/bin/activate
 
     echo "Downloading CuteKit & Chatty..."

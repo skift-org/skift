@@ -122,16 +122,17 @@ Ui::Child app(bool isMobile) {
         auto wallpapers = Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap();
         auto background = Ui::align(Layout::Align::COVER, Ui::image(wallpapers));
 
-        return Ui::dialogLayer(
-            Ui::pinSize(
-                state.isMobile ? Math::Vec2i{411, 731} : Math::Vec2i{1280, 1024},
-                Ui::stack(
-                    background,
-                    state.locked ? lock(state)
-                                 : (state.isMobile ? tablet(state)
-                                                   : desktop(state)),
-                    state.isMobile ? tabletPanels(state)
-                                   : desktopPanels(state))));
+        return Ui::stack(
+                   background,
+                   state.locked ? lock(state)
+                                : (state.isMobile ? tablet(state)
+                                                  : desktop(state)),
+                   state.isMobile ? tabletPanels(state)
+                                  : desktopPanels(state)) |
+               Ui::dialogLayer() |
+               Ui::pinSize(
+                   state.isMobile ? Math::Vec2i{411, 731}
+                                  : Math::Vec2i{1280, 720});
     });
 }
 

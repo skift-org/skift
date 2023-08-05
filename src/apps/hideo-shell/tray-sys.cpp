@@ -240,7 +240,12 @@ Ui::Child sysPanel(State const &state) {
 }
 
 Ui::Child notiPanel(State const &) {
-    return notifications() | panel();
+    return Ui::vflow(
+               8,
+               Ui::labelMedium("Notifications") |
+                   Ui::spacing({12, 6, 0, 0}),
+               notifications()) |
+           panel();
 }
 
 Ui::Child sysFlyout(State const &state) {

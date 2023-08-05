@@ -13,6 +13,7 @@ struct QuickSettingProps {
     Opt<String> name;
     bool state;
     Ui::OnPress press;
+    Ui::OnPress more;
 };
 
 Ui::Child quickSetting(QuickSettingProps props) {
@@ -20,11 +21,25 @@ Ui::Child quickSetting(QuickSettingProps props) {
                       ? Ui::ButtonStyle::primary()
                       : Ui::ButtonStyle::secondary());
 
-    if (props.name) {
-        return Ui::button(std::move(props.press), style, props.icon, *props.name);
-    } else {
-        return Ui::button(std::move(props.press), style, props.icon);
+    auto primaryStyle = props.more ? style.withRadius({4, 0, 0, 4}) : style;
+    auto secondaryStyle = style.withRadius({0, 4, 4, 0});
+
+    auto primary = [&] {
+        if (props.name) {
+            return Ui::button(std::move(props.press), primaryStyle, props.icon, *props.name);
+        } else {
+            return Ui::button(std::move(props.press), primaryStyle, props.icon);
+        }
+    }();
+
+    if (props.more) {
+        return Ui::hflow(
+            primary | Ui::grow(),
+            Ui::separator(),
+            Ui::button(std::move(props.more), secondaryStyle, Mdi::CHEVRON_RIGHT));
     }
+
+    return primary;
 }
 
 Ui::Child quickSettingSlider(Mdi::Icon icon) {
@@ -43,14 +58,16 @@ Ui::Child quickSettingSlider(Mdi::Icon icon) {
 
 Ui::Child dateAndTime() {
     return Ui::vflow(
-        Ui::labelLarge("22:07"),
-        Ui::labelMedium("Fri, Jul 28"));
+               Ui::labelLarge("22:07"),
+               Ui::labelMedium("Fri, Jul 28")) |
+           Ui::center() |
+           Ui::bound() |
+           Ui::button(Ui::NOP, Ui::ButtonStyle::subtle().withPadding({12, 0}));
 }
 
 Ui::Child quickheader(State const &state) {
     return Ui::hflow(
-        Ui::empty(6),
-        dateAndTime() | Ui::center(),
+        dateAndTime(),
         Ui::grow(NONE),
         Ui::button(
             Model::bind<ToggleSysPanel>(),
@@ -91,16 +108,19 @@ Ui::Child colapsedQuickSettings(State const &) {
             .icon = Mdi::SWAP_VERTICAL,
             .name = "Cellular Data",
             .press = Ui::NOP,
+            .more = Ui::NOP,
         }),
         quickSetting({
             .icon = Mdi::WIFI_STRENGTH_4,
             .name = "Wi-Fi",
             .press = Ui::NOP,
+            .more = Ui::NOP,
         }),
         quickSetting({
             .icon = Mdi::BLUETOOTH,
             .name = "Bluetooth",
             .press = Ui::NOP,
+            .more = Ui::NOP,
         }),
         quickSetting({
             .icon = Mdi::FLASHLIGHT,
@@ -122,16 +142,19 @@ Ui::Child expendedQuickSettings(State const &state) {
             .icon = Mdi::SWAP_VERTICAL,
             .name = "Cellular Data",
             .press = Ui::NOP,
+            .more = Ui::NOP,
         }),
         quickSetting({
             .icon = Mdi::WIFI_STRENGTH_4,
             .name = "Wi-Fi",
             .press = Ui::NOP,
+            .more = Ui::NOP,
         }),
         quickSetting({
             .icon = Mdi::BLUETOOTH,
             .name = "Bluetooth",
             .press = Ui::NOP,
+            .more = Ui::NOP,
         }),
         quickSetting({
             .icon = Mdi::FLASHLIGHT,
@@ -226,15 +249,16 @@ Ui::Child sysFlyout(State const &state) {
 
     Ui::Children body;
     body.pushBack(quickheader(state));
-    if (state.isSysPanelColapsed){
+    if (state.isSysPanelColapsed) {
         body.pushBack(colapsedQuickSettings(state));
+        body.pushBack(Ui::labelMedium("Notifications") | Ui::spacing({12, 6, 0, 0}));
         body.pushBack(notifications() | Ui::grow());
-    }else{
+    } else {
         body.pushBack(expendedQuickSettings(state) | Ui::grow());
     }
     body.pushBack(Ui::dragHandle());
 
-    return Ui::vflow(8,body) |
+    return Ui::vflow(8, body) |
            box |
            Ui::bound() |
            Ui::dismisable(

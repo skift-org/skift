@@ -154,7 +154,7 @@ void uPanic(Frame &frame) {
     logError("int={} err={} rip={p} rsp={p} rbp={p} cr2={p} cr3={p}", frame.intNo, frame.errNo, frame.rip, frame.rsp, frame.rbp, x86_64::rdcr2(), x86_64::rdcr3());
     Core::Task::self().space().dump();
     Core::Task::self().crash();
-    switchTask(TimeSpan::fromMSecs(0), frame);
+    switchTask(0_ms, frame);
 }
 
 void kPanic(Frame &frame) {
@@ -195,12 +195,12 @@ extern "C" void _intDispatch(usize sp) {
             kPanic(frame);
 
     } else if (frame.intNo == 100) {
-        switchTask(TimeSpan::fromMSecs(0), frame);
+        switchTask(0_ms, frame);
     } else {
         isize irq = frame.intNo - 32;
 
         if (irq == 0)
-            switchTask(TimeSpan::fromMSecs(1), frame);
+            switchTask(1_ms, frame);
         else
             Core::Irq::trigger(irq);
 

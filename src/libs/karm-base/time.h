@@ -128,6 +128,42 @@ struct TimeSpan {
     }
 };
 
+inline TimeSpan operator"" _us(unsigned long long value) {
+    return TimeSpan::fromUSecs(value);
+}
+
+inline TimeSpan operator"" _ms(unsigned long long value) {
+    return TimeSpan::fromMSecs(value);
+}
+
+inline TimeSpan operator"" _s(unsigned long long value) {
+    return TimeSpan::fromSecs(value);
+}
+
+inline TimeSpan operator"" _m(unsigned long long value) {
+    return TimeSpan::fromMinutes(value);
+}
+
+inline TimeSpan operator"" _h(unsigned long long value) {
+    return TimeSpan::fromHours(value);
+}
+
+inline TimeSpan operator"" _d(unsigned long long value) {
+    return TimeSpan::fromDays(value);
+}
+
+inline TimeSpan operator"" _w(unsigned long long value) {
+    return TimeSpan::fromWeeks(value);
+}
+
+inline TimeSpan operator"" _M(unsigned long long value) {
+    return TimeSpan::fromMonths(value);
+}
+
+inline TimeSpan operator"" _y(unsigned long long value) {
+    return TimeSpan::fromYears(value);
+}
+
 struct TimeStamp {
     usize _value{};
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/range.h>
 #include <karm-logger/logger.h>
 
 #include "path.h"
@@ -30,10 +31,30 @@ struct Rast {
 
     Shape _shape{};
     Vec<Active> _active{};
+    Vec<ISizeRange> _ranges;
     Vec<f64> _scanline{};
 
     Shape &shape() {
         return _shape;
+    }
+
+    void _appendRange(ISizeRange range) {
+        usize i = 0;
+        for (auto &r : _ranges) {
+            if (r.overlaps(range)) {
+                auto merged = r.merge(range);
+                _ranges.removeAt(i);
+                _appendRange(merged);
+                return;
+            }
+            if (range.end() > r.start) {
+                _ranges.insert(i, range);
+                return;
+            }
+            i++;
+        }
+
+        _ranges.pushBack(range);
     }
 
     void clear() {
@@ -51,6 +72,7 @@ struct Rast {
 
         for (isize y = rect.top(); y < rect.bottom(); y++) {
             zeroFill<f64>(mutSub(_scanline, 0, rect.width + 1));
+            _ranges.clear();
 
             for (f64 yy = y; yy < y + 1.0; yy += UNIT) {
                 _active.clear();
@@ -97,6 +119,8 @@ struct Rast {
                     if (x1 >= x2)
                         continue;
 
+                    _appendRange(ISizeRange::fromStartEnd(floor(x1), ceil(x2)));
+
                     // Are x1 and x2 on the same pixel?
                     if (Math::floor(x1 - rect.x) == Math::floor(x2 - rect.x)) {
                         _scanline[Math::floor(x1 - rect.x)] += (x2 - x1) * UNIT;
@@ -111,15 +135,17 @@ struct Rast {
                 }
             }
 
-            for (isize x = rect.start(); x < rect.end(); x++) {
-                auto xy = Math::Vec2i{x, y};
+            for (auto r : _ranges) {
+                for (isize x = r.start; x < r.end(); x++) {
+                    auto xy = Math::Vec2i{x, y};
 
-                auto uv = Math::Vec2f{
-                    (x - shapeBound.start()) / shapeBound.width,
-                    (y - shapeBound.top()) / shapeBound.height,
-                };
+                    auto uv = Math::Vec2f{
+                        (x - shapeBound.start()) / shapeBound.width,
+                        (y - shapeBound.top()) / shapeBound.height,
+                    };
 
-                cb(Frag{xy, uv, clamp01(_scanline[x - rect.x])});
+                    cb(Frag{xy, uv, clamp01(_scanline[x - rect.x])});
+                }
             }
         }
     }

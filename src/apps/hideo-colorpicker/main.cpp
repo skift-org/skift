@@ -1,5 +1,6 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
+#include <karm-ui/drag.h>
 #include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -93,45 +94,100 @@ Ui::Child hsvPicker(State const &state) {
     });
 }
 
+Ui::Child sliderThumb(Gfx::Color color) {
+    return Ui::empty() |
+           Ui::bound() |
+           Ui::aspectRatio(1) |
+           Ui::box({
+               .borderRadius = 99,
+               .borderWidth = 2,
+               .borderPaint = Gfx::WHITE,
+               .backgroundPaint = color,
+           }) |
+           Ui::box({
+               .padding = 1,
+               .borderRadius = 99,
+               .borderWidth = 1,
+               .borderPaint = Gfx::BLACK.withOpacity(0.25),
+           }) |
+           Ui::dragRegion();
+}
+
 Ui::Child valueSlider(State const &state) {
     auto hsv = state.hsv;
-    return Ui::sliderRow(
-        Ui::SliderStyle::gradiant(
-            Gfx::hsvToRgb(hsv.withValue(0)),
-            Gfx::hsvToRgb(hsv.withValue(1))),
-        hsv.value,
-        [hsv](auto &n, auto v) mutable {
-            Model::dispatch(n, UpdateHsv{hsv.withValue(v)});
-        },
-        "Value");
+    auto background =
+        Gfx::Gradient::hlinear()
+            .withColors(
+                Gfx::hsvToRgb(hsv.withValue(0)),
+                Gfx::hsvToRgb(hsv.withValue(1)))
+            .bake();
+
+    return sliderThumb(Gfx::hsvToRgb(hsv)) |
+           Ui::end() |
+           Ui::slider2(hsv.value, [hsv](auto &n, auto v) mutable {
+               Model::dispatch(n, UpdateHsv{hsv.withValue(v)});
+           }) |
+           Ui::box({
+               .padding = 3,
+               .borderRadius = 99,
+               .borderWidth = 1,
+               .borderPaint = Gfx::WHITE.withOpacity(0.2),
+               .backgroundPaint = background,
+           }) |
+           Ui::maxSize({Ui::UNCONSTRAINED, 26});
 }
 
 Ui::Child saturationSlider(State const &state) {
     auto hsv = state.hsv;
-    return Ui::sliderRow(
-        Ui::SliderStyle::gradiant(
-            Gfx::hsvToRgb(hsv.withSaturation(0)),
-            Gfx::hsvToRgb(hsv.withSaturation(1))),
-        hsv.saturation,
-        [hsv](auto &n, auto v) mutable {
-            Model::dispatch(n, UpdateHsv{hsv.withSaturation(v)});
-        },
-        "Saturation");
+    auto background =
+        Gfx::Gradient::hlinear()
+            .withColors(
+                Gfx::hsvToRgb(
+                    hsv
+                        .withValue(1)
+                        .withSaturation(0)),
+                Gfx::hsvToRgb(
+                    hsv
+                        .withValue(1)
+                        .withSaturation(1)))
+            .bake();
+
+    return sliderThumb(Gfx::hsvToRgb(hsv.withValue(1))) |
+           Ui::end() |
+           Ui::slider2(hsv.saturation, [hsv](auto &n, auto v) mutable {
+               Model::dispatch(n, UpdateHsv{hsv.withSaturation(v)});
+           }) |
+           Ui::box({
+               .padding = 3,
+               .borderRadius = 99,
+               .borderWidth = 1,
+               .borderPaint = Gfx::WHITE.withOpacity(0.2),
+               .backgroundPaint = background,
+           }) |
+           Ui::maxSize({Ui::UNCONSTRAINED, 26});
 }
 
 Ui::Child hueSlider(State const &state) {
     auto hsv = state.hsv;
-    return Ui::sliderRow(
-        Ui::SliderStyle::hsv(),
-        hsv.hue / 360.0,
-        [hsv](auto &n, auto v) mutable {
-            Model::dispatch(n, UpdateHsv{hsv.withHue(v * 360)});
-        },
-        "Hue");
+
+    return sliderThumb(Gfx::hsvToRgb(hsv.withSaturation(1).withValue(1))) |
+           Ui::end() |
+           Ui::slider2(hsv.hue / 360, [hsv](auto &n, auto v) mutable {
+               Model::dispatch(n, UpdateHsv{hsv.withHue(v * 360)});
+           }) |
+           Ui::box({
+               .padding = 3,
+               .borderRadius = 99,
+               .borderWidth = 1,
+               .borderPaint = Gfx::WHITE.withOpacity(0.2),
+               .backgroundPaint = Gfx::Gradient::hsv().bake(),
+           }) |
+           Ui::maxSize({Ui::UNCONSTRAINED, 26});
 }
 
 Ui::Child hsvSliders(State const &state) {
     return Ui::vflow(
+        8,
         hueSlider(state),
         saturationSlider(state),
         valueSlider(state));

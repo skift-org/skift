@@ -263,6 +263,7 @@ struct Icon : public View<Icon> {
 
     void reconcile(Icon &o) override {
         _icon = o._icon;
+        _color = o._color;
     }
 
     void paint(Gfx::Context &g, Math::Recti) override {

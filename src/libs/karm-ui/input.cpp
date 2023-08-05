@@ -639,6 +639,13 @@ struct Slider2 : public ProxyNode<Slider2> {
         : ProxyNode<Slider2>(std::move(child)), _value(value), _onChange(std::move(onChange)) {
     }
 
+    void reconcile(Slider2 &o) override {
+        _value = o._value;
+        _onChange = o._onChange;
+
+        ProxyNode<Slider2>::reconcile(o);
+    }
+
     void layout(Math::Recti r) override {
         _bound = r;
         child().layout(_bound.hsplit(((r.width - r.height) * _value) + r.height).car);

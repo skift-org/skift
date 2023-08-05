@@ -67,7 +67,7 @@ struct _Vec {
 
     void fit() { _buf.fit(); }
 
-    void clear() { _buf.resize(0); }
+    void clear() { _buf.truncate(0); }
 
     usize cap() const { return _buf.cap(); }
 
@@ -100,7 +100,7 @@ struct _Vec {
     }
 
     template <typename... Args>
-    void emplaceFront(Args &&...args) { _buf.emplace((args)...); }
+    void emplaceFront(Args &&...args) { _buf.emplace(0, std::forward<Args>(args)...); }
 
     T popFront() { return _buf.removeAt(0); }
 
@@ -119,7 +119,7 @@ struct _Vec {
     }
 
     template <typename... Args>
-    void emplaceBack(Args &&...args) { insert(len(), T(std::move(args)...)); }
+    void emplaceBack(Args &&...args) { _buf.emplace(len(), std::forward<Args>(args)...); }
 
     T popBack() { return removeAt(len() - 1); }
 

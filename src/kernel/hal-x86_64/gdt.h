@@ -101,7 +101,7 @@ struct [[gnu::packed]] Gdt {
         : tssEntry(tss) {}
 };
 
-extern "C" void _gdtLoad(void const *ptr); // implemented in gdt.s
+extern "C" void _gdtLoad(void const *ptr);
 
 extern "C" void _tssUpdate();
 

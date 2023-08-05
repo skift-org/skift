@@ -43,7 +43,13 @@ Ui::Child quickSetting(QuickSettingProps props) {
 }
 
 Ui::Child quickSettingSlider(Mdi::Icon icon) {
-    return Ui::hflow(Ui::grow(NONE), Ui::icon(icon) | Ui::center() | Ui::aspectRatio(1) | Ui::bound() | Ui::dragRegion()) |
+    return Ui::hflow(
+               Ui::grow(NONE),
+               Ui::icon(icon) |
+                   Ui::center() |
+                   Ui::aspectRatio(1) |
+                   Ui::bound() |
+                   Ui::dragRegion()) |
            Ui::box({
                .borderRadius = 6,
                .backgroundPaint = Ui::ACCENT600,

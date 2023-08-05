@@ -71,14 +71,15 @@ struct BoxStyle {
 
         g.save();
         if (backgroundPaint) {
-            g.begin();
-            g.rect(bound.cast<f64>(), borderRadius);
-
             if (shadowStyle) {
+                g.begin();
+                g.rect(bound.cast<f64>(), borderRadius);
                 g.shadow(*shadowStyle);
+                g.fill(*backgroundPaint);
+            } else {
+                g.fillStyle(*backgroundPaint);
+                g.fill(bound, borderRadius);
             }
-
-            g.fill(*backgroundPaint);
         }
 
         g.fillStyle(foregroundPaint);

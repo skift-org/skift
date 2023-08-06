@@ -21,8 +21,7 @@ struct Host :
 
     void flip(Slice<Math::Recti> dirty) override {
         for (auto d : dirty) {
-            logInfo("flip {}", d);
-            _front.blit(d, _back.pixels());
+            _front.blit(d, _back.pixels().clip(d));
         }
     }
 

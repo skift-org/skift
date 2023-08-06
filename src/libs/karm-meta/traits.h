@@ -58,6 +58,12 @@ template <typename T>
 concept Trivial = __is_trivial(T);
 
 template <typename T>
+concept IsStandardLayout = __is_standard_layout(T);
+
+template <typename T>
+concept IsPod = __is_pod(T);
+
+template <typename T>
 concept Signed = __is_signed(T);
 
 template <typename T>
@@ -79,8 +85,8 @@ concept Derive = __is_base_of(Base, Derived);
 
 template <typename T, typename... Args>
 concept Constructible = requires {
-                            ::new T(declval<Args>()...);
-                        };
+    ::new T(declval<Args>()...);
+};
 
 template <typename T>
 concept DefaultConstructible = Constructible<T>;
@@ -93,8 +99,8 @@ concept MoveConstructible = Constructible<T, U &&>;
 
 template <typename From, typename To>
 concept Convertible = requires {
-                          declval<void (*)(To)>()(declval<From>());
-                      };
+    declval<void (*)(To)>()(declval<From>());
+};
 
 template <typename T, typename U>
 inline constexpr bool _Same = false;

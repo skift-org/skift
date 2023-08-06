@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-meta/traits.h>
+
 #include "clamp.h"
 #include "iter.h"
 #include "slice.h"
@@ -11,7 +13,7 @@ template <typename T, usize N>
 struct Array {
     using Inner = T;
 
-    T _buf[N] = {};
+    T _buf[N];
 
     constexpr T &operator[](usize i) {
         if (i >= N) {
@@ -50,11 +52,11 @@ struct Array {
         return res;
     }
 
-    Bytes bytes() const {
+    constexpr Bytes bytes() const {
         return {reinterpret_cast<Byte const *>(buf()), len() * sizeof(T)};
     }
 
-    MutBytes mutBytes() {
+    constexpr MutBytes mutBytes() {
         return {reinterpret_cast<Byte *>(buf()), len() * sizeof(T)};
     }
 };
@@ -63,6 +65,7 @@ template <class T, class... U>
 Array(T, U...) -> Array<T, 1 + sizeof...(U)>;
 
 static_assert(MutSliceable<Array<u8, 16>>);
+static_assert(Meta::IsPod<Array<u8, 16>>);
 
 template <typename T, usize... Is>
 constexpr Array<T, sizeof...(Is)> _makeArray(T value, std::index_sequence<Is...>) {

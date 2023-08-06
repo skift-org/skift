@@ -165,9 +165,9 @@ struct _Scan {
         return d;
     }
 
-    Opt<u64> nextUint(usize base = 10) {
+    Opt<usize> nextUint(usize base = 10) {
         bool isNum = false;
-        u64 result = 0;
+        usize result = 0;
 
         while (not ended()) {
             auto maybeDigit = nextDigit(base);
@@ -184,10 +184,10 @@ struct _Scan {
         return result;
     }
 
-    Opt<i64> nextInt(usize base = 10) {
+    Opt<isize> nextInt(usize base = 10) {
         bool isNeg = false;
         bool isNum = false;
-        i64 result = 0;
+        isize result = 0;
 
         if (peek(0) == '-' and _parseDigit(peek(1), base)) {
             isNeg = true;

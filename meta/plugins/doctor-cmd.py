@@ -101,7 +101,8 @@ def doctorCmd(args: Args):
         "ld.lld", versionExpected=(15,))
     everythingIsOk = everythingIsOk and commandIsAvailable("nasm")
     everythingIsOk = everythingIsOk and commandIsAvailable("ninja")
-    everythingIsOk = everythingIsOk and commandIsAvailable("cutekit", versionCommand="version")
+    everythingIsOk = everythingIsOk and commandIsAvailable(
+        "cutekit", versionCommand="version")
     everythingIsOk = everythingIsOk and commandIsAvailable("chatty")
     everythingIsOk = everythingIsOk and commandIsAvailable("pkg-config")
 

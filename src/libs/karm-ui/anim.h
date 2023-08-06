@@ -38,6 +38,14 @@ struct Eased {
     }
 
     void animate(Node &n, T target, f64 duration = 1.0, Math::Easing easing = {}) {
+        if (Math::epsilonEq(_value, target, 0.1)) {
+            _value = target;
+            _target = target;
+            _elapsed = 0;
+            _duration = 0;
+            return;
+        }
+
         _start = _value;
         _target = target;
 

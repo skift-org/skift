@@ -2,23 +2,65 @@ from cutekit.cmds import Cmd, append
 from cutekit.args import Args
 from cutekit import shell, vt100
 import subprocess
+import re
 
 
-def commandIsAvailable(cmd: str) -> bool:
-    print(f"Checking if {cmd} is available...", end="")
+def isVersionAtLeastOrEqual(actualVersion: tuple[int, ...], expectedVersion: tuple[int, ...]) -> bool:
+    if len(actualVersion) < len(expectedVersion):
+        return False
+
+    for i in range(len(expectedVersion)):
+        if actualVersion[i] < expectedVersion[i]:
+            return False
+
+    return True
+
+
+def getVersionFromOutput(output: str, versionRegex: str) -> tuple[int, ...]:
+    versionMatch = re.search(versionRegex, output)
+    if versionMatch:
+        versionStr = versionMatch[0].split(".")
+        return tuple(map(int, versionStr))
+    else:
+        return ()
+
+
+def checkVersion(cmd: str, versionExpected: tuple[int, ...], versionCommand: str, versionRegex: str) -> tuple[bool, tuple[int, ...]]:
+    try:
+        result = subprocess.check_output([cmd, versionCommand]).decode("utf-8")
+        actualVersion = getVersionFromOutput(result, versionRegex)
+        return isVersionAtLeastOrEqual(actualVersion, versionExpected), actualVersion
+    except Exception as e:
+        return False, ()
+
+
+def commandIsAvailable(cmd: str, versionExpected: tuple[int, ...] = (0, 0, 0), versionCommand: str = "--version", versionRegex: str = r"\d+(\.\d+)+") -> bool:
+    print(f"Checking if {cmd} is available... ", end="")
+    result = True
+
     try:
         cmd = shell.latest(cmd)
         path = shell.which(cmd) or cmd
-        out = subprocess.check_output(
-            [cmd, "version" if cmd == "cutekit" else "--version"])
-        print(f"{vt100.GREEN} ok{vt100.RESET}")
+        versionMatch, version = checkVersion(
+            cmd, versionExpected, versionCommand, versionRegex)
+        if not versionMatch:
+            if versionExpected == (0, 0, 0):
+                print(f"{vt100.RED}not found{vt100.RESET}")
+            else:
+                print(f"{vt100.RED}too old{vt100.RESET}")
+                print(
+                    f"Expected: {'.'.join(map(str, versionExpected))}\nActual: {'.'.join(map(str, version))}")
+            result = False
+        else:
+            print(f"{vt100.GREEN}ok{vt100.RESET}")
         print(
-            f"{vt100.BRIGHT_BLACK}Command: {cmd}\nLocation: {path}\nVersion: {out.decode('utf-8').strip()}{vt100.RESET}\n")
-        return True
+            f"{vt100.BRIGHT_BLACK}Command: {cmd}\nLocation: {path}\nVersion: {'.'.join(map(str, version))}{vt100.RESET}\n")
     except Exception as e:
         print(f" {e}")
         print(f"{vt100.RED}Error: {cmd} is not available{vt100.RESET}")
-        return False
+        result = False
+
+    return result
 
 
 def moduleIsAvailable(module: str) -> bool:
@@ -51,19 +93,17 @@ def doctorCmd(args: Args):
     everythingIsOk = everythingIsOk and moduleIsAvailable("chatty")
     everythingIsOk = everythingIsOk and commandIsAvailable(
         "qemu-system-x86_64")
-    everythingIsOk = everythingIsOk and commandIsAvailable("clang")
-    everythingIsOk = everythingIsOk and commandIsAvailable("clang++")
-    everythingIsOk = everythingIsOk and commandIsAvailable("ld.lld")
+    everythingIsOk = everythingIsOk and commandIsAvailable(
+        "clang", versionExpected=(15,))
+    everythingIsOk = everythingIsOk and commandIsAvailable(
+        "clang++", versionExpected=(15,))
+    everythingIsOk = everythingIsOk and commandIsAvailable(
+        "ld.lld", versionExpected=(15,))
     everythingIsOk = everythingIsOk and commandIsAvailable("nasm")
     everythingIsOk = everythingIsOk and commandIsAvailable("ninja")
-    everythingIsOk = everythingIsOk and commandIsAvailable("cutekit")
+    everythingIsOk = everythingIsOk and commandIsAvailable("cutekit", versionCommand="version")
     everythingIsOk = everythingIsOk and commandIsAvailable("chatty")
     everythingIsOk = everythingIsOk and commandIsAvailable("pkg-config")
-
-    if everythingIsOk:
-        print(f"{vt100.GREEN}Everything is ok{vt100.RESET}")
-    else:
-        print(f"{vt100.RED}Some things are not ok{vt100.RESET}")
 
 
 append(Cmd(None, "doctor", "Check if all required commands are available", doctorCmd))

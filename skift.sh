@@ -29,8 +29,6 @@ if [ ! -f .cutekit/tools/ready ]; then
     fi
 
     mkdir -p .cutekit
-
-
     if [ ! -d .cutekit/venv ]; then
         echo "Setting up Python virtual environment..."
         python3 -m venv .cutekit/venv

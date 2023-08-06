@@ -13,6 +13,7 @@ static Opt<Sched> _sched;
 Res<> Sched::init(Handover::Payload &) {
     logInfo("sched: initializing...");
     auto bootTask = try$(Task::create(Mode::SUPER, try$(Space::create())));
+    bootTask->label("entry");
     try$(bootTask->ready(0, 0, {}));
     _sched.emplace(std::move(bootTask));
     return Ok();

@@ -668,4 +668,4 @@ struct FileProtocol {
     Method<> flush;
 };
 
-}; // namespace Efi
+} // namespace Efi

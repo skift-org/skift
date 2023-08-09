@@ -40,4 +40,4 @@ namespace Karm::Test {
 
 #define expectGteq$(LHS, RHS) __expect$(LHS, RHS, gteq)
 
-}; // namespace Karm::Test
+} // namespace Karm::Test

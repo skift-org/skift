@@ -37,4 +37,4 @@ union Inert {
 
 static_assert(Meta::Trivial<Inert<isize>>);
 
-}; // namespace Karm
+} // namespace Karm

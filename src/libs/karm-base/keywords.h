@@ -40,4 +40,4 @@ bool operator==(None, T *ptr) {
     return ptr == nullptr;
 }
 
-}; // namespace Karm
+} // namespace Karm

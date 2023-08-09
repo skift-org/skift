@@ -7,7 +7,7 @@ namespace Karm::Gfx {
 
 struct Context;
 
-}; // namespace Karm::Gfx
+} // namespace Karm::Gfx
 
 namespace Karm::Media {
 

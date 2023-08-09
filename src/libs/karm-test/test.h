@@ -28,4 +28,4 @@ struct Test : Meta::Static {
     }
 };
 
-}; // namespace Karm::Test
+} // namespace Karm::Test

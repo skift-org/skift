@@ -58,7 +58,7 @@ enum PathOpFlags {
 
 FlagsEnum$(PathOpFlags);
 
-}; // namespace _Impl
+} // namespace _Impl
 
 struct Path {
     using Code = _Impl::PathOpCode;

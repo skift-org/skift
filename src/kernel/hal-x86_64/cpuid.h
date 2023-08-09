@@ -98,4 +98,5 @@ union Cpuid {
         return cpuid(0x0d, 0).ecx;
     }
 };
-}; // namespace x86_64
+
+} // namespace x86_64

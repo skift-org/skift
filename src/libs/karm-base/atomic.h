@@ -79,4 +79,4 @@ struct Atomic {
     }
 };
 
-}; // namespace Karm
+} // namespace Karm

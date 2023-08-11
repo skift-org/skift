@@ -179,12 +179,14 @@ struct Font {
         return Error::other("table not found");
     }
 
-    GlyphMetrics glyphMetrics(Rune rune) const {
-        auto glyphId = _cmapTable.glyphIdFor(rune);
+    Media::Glyph glyph(Rune rune) const {
+        return _cmapTable.glyphIdFor(rune);
+    }
 
-        auto glyfOffset = _loca.glyfOffset(glyphId, _head);
+    GlyphMetrics glyphMetrics(Media::Glyph glyph) const {
+        auto glyfOffset = _loca.glyfOffset(glyph.value(), _head);
         auto glyf = _glyf.metrics(glyfOffset);
-        auto hmtx = _hmtx.metrics(glyphId, _hhea);
+        auto hmtx = _hmtx.metrics(glyph.value(), _hhea);
 
         return {
             (f64)glyf.xMin,
@@ -196,14 +198,11 @@ struct Font {
         };
     }
 
-    f64 glyphKern(Rune prev, Rune curr) const {
+    f64 glyphKern(Media::Glyph prev, Media::Glyph curr) const {
         if (not _gpos.present())
             return 0;
 
-        auto prevGlyphId = _cmapTable.glyphIdFor(prev);
-        auto currGlyphId = _cmapTable.glyphIdFor(curr);
-
-        auto positioning = _gpos.adjustments(prevGlyphId, currGlyphId);
+        auto positioning = _gpos.adjustments(prev.value(), curr.value());
 
         if (not positioning)
             return 0;
@@ -211,11 +210,10 @@ struct Font {
         return positioning.unwrap().car.xAdvance;
     }
 
-    void glyphContour(Gfx::Context &g, Rune rune) const {
-        auto glyphId = _cmapTable.glyphIdFor(rune);
-        auto glyfOffset = _loca.glyfOffset(glyphId, _head);
+    void glyphContour(Gfx::Context &g, Media::Glyph glyph) const {
+        auto glyfOffset = _loca.glyfOffset(glyph.value(), _head);
 
-        if (glyfOffset == _loca.glyfOffset(glyphId + 1, _head))
+        if (glyfOffset == _loca.glyfOffset(glyph.value() + 1, _head))
             return;
 
         _glyf.contour(g, glyfOffset);

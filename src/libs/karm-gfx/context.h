@@ -228,6 +228,12 @@ struct Context {
     // Fill an icon
     void fill(Math::Vec2i pos, Media::Icon icon);
 
+    // Stroke a text glyph
+    void stroke(Math::Vec2f baseline, Media::Glyph glyph);
+
+    // Fill a text glyph
+    void fill(Math::Vec2f baseline, Media::Glyph glyph);
+
     // Stroke a text rune
     void stroke(Math::Vec2f baseline, Rune rune);
 

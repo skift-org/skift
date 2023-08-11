@@ -20,7 +20,7 @@ void Icon::fill(Gfx::Context &g, Math::Vec2i pos) const {
     g.begin();
     g.origin(pos + Math::Vec2i{0, (isize)(face->metrics().ascend * scale)});
     g.scale(scale);
-    face->contour(g, (Rune)_code);
+    face->contour(g, face->glyph((Rune)_code));
     g.fill();
     g.restore();
 }
@@ -33,7 +33,7 @@ void Icon::stroke(Gfx::Context &g, Math::Vec2i pos) const {
     g.begin();
     g.origin(pos + Math::Vec2i{0, (isize)(face->metrics().ascend * scale)});
     g.scale(scale);
-    face->contour(g, (Rune)_code);
+    face->contour(g, face->glyph((Rune)_code));
     g.stroke();
     g.restore();
 }

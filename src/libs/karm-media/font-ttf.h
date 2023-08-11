@@ -32,16 +32,20 @@ struct TtfFontface : public Fontface {
         };
     }
 
-    f64 advance(Rune c) const override {
-        return _ttf.glyphMetrics(c).advance;
+    Glyph glyph(Rune rune) const override {
+        return _ttf.glyph(rune);
     }
 
-    f64 kern(Rune prev, Rune curr) const override {
+    f64 advance(Glyph glyph) const override {
+        return _ttf.glyphMetrics(glyph).advance;
+    }
+
+    f64 kern(Glyph prev, Glyph curr) const override {
         return _ttf.glyphKern(prev, curr);
     }
 
-    void contour(Gfx::Context &g, Rune rune) const override {
-        _ttf.glyphContour(g, rune);
+    void contour(Gfx::Context &g, Glyph glyph) const override {
+        _ttf.glyphContour(g, glyph);
     }
 
     f64 units() const override {

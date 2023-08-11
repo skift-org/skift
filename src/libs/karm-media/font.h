@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/distinct.h>
 #include <karm-base/rc.h>
 #include <karm-math/rect.h>
 
@@ -74,6 +75,8 @@ struct FontMesure {
     Math::Vec2f baseline;
 };
 
+using Glyph = Distinct<usize, struct _GlyphTag>;
+
 struct Fontface {
     static Strong<Fontface> fallback();
 
@@ -81,11 +84,13 @@ struct Fontface {
 
     virtual FontMetrics metrics() const = 0;
 
-    virtual f64 advance(Rune c) const = 0;
+    virtual Glyph glyph(Rune rune) const = 0;
 
-    virtual f64 kern(Rune prev, Rune curr) const = 0;
+    virtual f64 advance(Glyph glyph) const = 0;
 
-    virtual void contour(Gfx::Context &g, Rune rune) const = 0;
+    virtual f64 kern(Glyph prev, Glyph curr) const = 0;
+
+    virtual void contour(Gfx::Context &g, Glyph glyph) const = 0;
 
     virtual f64 units() const = 0;
 };
@@ -101,11 +106,13 @@ struct Font {
 
     FontMetrics metrics() const;
 
-    f64 advance(Rune c) const;
+    Glyph glyph(Rune rune) const;
 
-    f64 kern(Rune prev, Rune curr) const;
+    f64 advance(Glyph glyph) const;
 
-    FontMesure mesureRune(Rune r) const;
+    f64 kern(Glyph prev, Glyph curr) const;
+
+    FontMesure mesure(Glyph glyph) const;
 
     FontMesure mesureStr(Str str) const;
 };

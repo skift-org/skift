@@ -25,21 +25,24 @@ struct VgaFontface : public Fontface {
         };
     }
 
-    f64 advance(Rune) const override {
+    Glyph glyph(Rune rune) const override {
+        One<Ibm437> one;
+        encodeOne<Ibm437>(rune, one);
+        return Glyph(one);
+    }
+
+    f64 advance(Glyph) const override {
         return 8;
     }
 
-    f64 kern(Rune, Rune) const override {
+    f64 kern(Glyph, Glyph) const override {
         return 0;
     }
 
-    void contour(Gfx::Context &g, Rune rune) const override {
-        One<Ibm437> one;
-        encodeOne<Ibm437>(rune, one);
-
+    void contour(Gfx::Context &g, Glyph glyph) const override {
         for (isize y = 0; y < HEIGHT; y++) {
             for (isize x = 0; x < WIDTH; x++) {
-                u8 byte = DATA[one * HEIGHT + y];
+                u8 byte = DATA[glyph.value() * HEIGHT + y];
                 if (byte & (0x80 >> x)) {
                     g.rect(Math::Recti{x, y - 8, 1, 1}.cast<f64>());
                 }

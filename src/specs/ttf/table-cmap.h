@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-logger/logger.h>
+#include <karm-media/font.h>
 
 #include "../bscan.h"
 
@@ -20,7 +21,7 @@ struct Cmap : public BChunk {
             return slice;
         }
 
-        usize _glyphIdForType4(Rune r) const {
+        Media::Glyph _glyphIdForType4(Rune r) const {
             u16 segCountX2 = begin().skip(6).nextU16be();
             u16 segCount = segCountX2 / 2;
 
@@ -42,18 +43,18 @@ struct Cmap : public BChunk {
                 u16 idRangeOffset = s.skip(segCountX2).peekU16be();
 
                 if (idRangeOffset == 0) {
-                    return (r + idDelta) & 0xFFFF;
-                } else {
-                    auto offset = idRangeOffset + (r - startCode) * 2;
-                    return s.skip(offset).nextU16be();
+                    return Media::Glyph((r + idDelta) & 0xFFFF);
                 }
+
+                auto offset = idRangeOffset + (r - startCode) * 2;
+                return Media::Glyph(s.skip(offset).nextU16be());
             }
 
             logWarn("ttf: Glyph not found for rune {x}", r);
-            return 0;
+            return Media::Glyph(0);
         }
 
-        usize _glyphForType12(Rune r) const {
+        Media::Glyph _glyphForType12(Rune r) const {
             auto s = begin().skip(12);
             u32 nGroups = s.nextU32be();
 
@@ -69,21 +70,21 @@ struct Cmap : public BChunk {
                     continue;
 
                 if (r >= startCode and r <= endCode) {
-                    return (r - startCode) + glyphOffset;
+                    return Media::Glyph((r - startCode) + glyphOffset);
                 }
             }
 
             logWarn("ttf: glyph not found for rune {x}", r);
-            return 0;
+            return Media::Glyph(0);
         }
 
-        usize glyphIdFor(Rune r) const {
+        Media::Glyph glyphIdFor(Rune r) const {
             if (type == 4) {
                 return _glyphIdForType4(r);
             } else if (type == 12) {
                 return _glyphForType12(r);
             } else {
-                return 0;
+                return Media::Glyph(0);
             }
         }
     };

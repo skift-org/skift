@@ -298,7 +298,7 @@ void Context::fill(Math::Vec2i pos, Media::Icon icon) {
     _useSpaa = false;
 }
 
-void Context::stroke(Math::Vec2f baseline, Rune rune) {
+void Context::stroke(Math::Vec2f baseline, Media::Glyph rune) {
     auto f = textFont();
 
     _useSpaa = true;
@@ -312,7 +312,7 @@ void Context::stroke(Math::Vec2f baseline, Rune rune) {
     _useSpaa = false;
 }
 
-void Context::fill(Math::Vec2f baseline, Rune rune) {
+void Context::fill(Math::Vec2f baseline, Media::Glyph rune) {
     auto f = textFont();
 
     _useSpaa = true;
@@ -326,11 +326,27 @@ void Context::fill(Math::Vec2f baseline, Rune rune) {
     _useSpaa = false;
 }
 
+void Context::stroke(Math::Vec2f baseline, Rune rune) {
+    stroke(baseline, textFont().glyph(rune));
+}
+
+void Context::fill(Math::Vec2f baseline, Rune rune) {
+    fill(baseline, textFont().glyph(rune));
+}
+
 void Context::stroke(Math::Vec2f baseline, Str str) {
     auto f = textFont();
-    for (auto r : iterRunes(str)) {
-        stroke(baseline, r);
-        baseline.x += f.advance(r);
+
+    bool first = true;
+    Media::Glyph prev{0};
+    for (auto rune : iterRunes(str)) {
+        auto curr = f.glyph(rune);
+        if (not first)
+            baseline.x += f.kern(prev, curr);
+        stroke(baseline, curr);
+        baseline.x += f.advance(curr);
+        first = false;
+        prev = curr;
     }
 }
 
@@ -338,8 +354,9 @@ void Context::fill(Math::Vec2f baseline, Str str) {
     auto f = textFont();
 
     bool first = true;
-    Rune prev = 0;
-    for (auto curr : iterRunes(str)) {
+    Media::Glyph prev{0};
+    for (auto rune : iterRunes(str)) {
+        auto curr = f.glyph(rune);
         if (not first)
             baseline.x += f.kern(prev, curr);
         fill(baseline, curr);

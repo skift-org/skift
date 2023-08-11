@@ -32,15 +32,19 @@ FontMetrics Font::metrics() const {
     return m;
 }
 
-f64 Font::advance(Rune c) const {
-    return fontface->advance(c) * scale();
+Glyph Font::glyph(Rune rune) const {
+    return fontface->glyph(rune);
 }
 
-f64 Font::kern(Rune prev, Rune curr) const {
+f64 Font::advance(Glyph glyph) const {
+    return fontface->advance(glyph) * scale();
+}
+
+f64 Font::kern(Glyph prev, Glyph curr) const {
     return fontface->kern(prev, curr) * scale();
 }
 
-FontMesure Font::mesureRune(Rune r) const {
+FontMesure Font::mesure(Glyph r) const {
     auto m = metrics();
     auto adv = advance(r);
 
@@ -54,7 +58,7 @@ FontMesure Font::mesureRune(Rune r) const {
 FontMesure Font::mesureStr(Str str) const {
     f64 adv = 0;
     for (auto r : iterRunes(str)) {
-        adv += advance(r);
+        adv += advance(glyph(r));
     }
 
     auto m = metrics();

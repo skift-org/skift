@@ -8,7 +8,7 @@ struct Distinct {
 
     constexpr Distinct() = default;
 
-    constexpr Distinct(T value) : _value(value) {}
+    constexpr explicit Distinct(T value) : _value(value) {}
 
     constexpr T value() const { return _value; }
 

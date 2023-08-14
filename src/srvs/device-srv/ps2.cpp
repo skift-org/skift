@@ -159,14 +159,62 @@ Res<> Mouse::init() {
     return Ok();
 }
 
+Res<> Mouse::decode() {
+    int offx = _buf[1];
+    if (_buf[0] & 0x10)
+        offx -= 0x100;
+
+    int offy = _buf[2];
+    if (_buf[0] & 0x20)
+        offy -= 0x100;
+
+    int scroll = 0;
+    if (_hasWheel) {
+        scroll = (i8)_buf[3];
+    }
+
+    logInfo("ps2: mouse move {} {} {}", offx, offy, scroll);
+    return Ok();
+}
+
 Res<> Mouse::event(Events::Event &e) {
     if (auto const *irq = e.is<IrqEvent>()) {
         if (irq->irq == 12) {
             auto status = try$(ctrl().readStatus());
             while (status.has(Status::OUT_BUF) and
                    status.has(Status::AUX_BUF)) {
+
                 auto data = try$(ctrl().readData());
-                logInfo("ps2: mouse data {:02x}", data);
+
+                switch (_cycle) {
+                case 0:
+                    _buf[0] = data;
+                    if (data & 0x08)
+                        _cycle = 1;
+                    break;
+
+                case 1:
+                    _buf[1] = data;
+                    _cycle = 2;
+                    break;
+
+                case 2:
+                    _buf[2] = data;
+                    if (_hasWheel)
+                        _cycle++;
+                    else {
+                        _cycle = 0;
+                        try$(decode());
+                    }
+                    break;
+
+                case 3:
+                    _buf[3] = data;
+                    _cycle = 0;
+                    try$(decode());
+                    break;
+                }
+
                 status = try$(ctrl().readStatus());
             }
         }

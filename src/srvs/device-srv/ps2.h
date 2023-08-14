@@ -134,6 +134,7 @@ struct Mouse : public Device {
     u8 _cycle;
     Array<u8, 4> _buf;
     bool _hasWheel;
+    Events::MouseEvent _event;
 
     using Device::Device;
 
@@ -141,18 +142,19 @@ struct Mouse : public Device {
 
     Res<> event(Events::Event &e) override;
 
-    Res<> sendCmd(_Cmd cmd) {
+    Res<> decode();
+
+    Res<Byte> sendCmd(_Cmd cmd) {
         try$(ctrl().writeCmd(Cmd::WRITE_IN_AUX));
         try$(ctrl().writeData(cmd));
-        return Ok();
+        return Ok(try$(ctrl().readData()));
     }
 
-    Res<> sendCmd(_Cmd cmd, Byte data) {
-        try$(ctrl().writeCmd(Cmd::WRITE_IN_AUX));
-        try$(ctrl().writeData(cmd));
+    Res<Byte> sendCmd(_Cmd cmd, Byte data) {
+        try$(sendCmd(cmd));
         try$(ctrl().writeCmd(Cmd::WRITE_IN_AUX));
         try$(ctrl().writeData(data));
-        return Ok();
+        return Ok(try$(ctrl().readData()));
     }
 
     Res<Byte> getDeiceId() {

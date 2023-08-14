@@ -35,9 +35,8 @@ Res<> I8042::waitRead() {
     auto timeout = 100000;
     while (timeout--) {
         auto status = try$(readStatus());
-        if (status.has(Status::OUT_BUF)) {
+        if (status.has(Status::OUT_BUF))
             return Ok();
-        }
     }
     return Error::timedOut("waiting for read");
 }
@@ -46,9 +45,8 @@ Res<> I8042::waitWrite() {
     auto timeout = 100000;
     while (timeout--) {
         auto status = try$(readStatus());
-        if (not status.has(Status::IN_BUF)) {
+        if (not status.has(Status::IN_BUF))
             return Ok();
-        }
     }
     return Error::timedOut("waiting for write");
 }
@@ -75,7 +73,7 @@ Res<> I8042::writeCmd(Cmd cmd) {
 
 Res<> I8042::writeConfig(Flags<Configs> cfg) {
     try$(writeCmd(Cmd::WRITE_CONFIG));
-    try$(writeData(cfg));
+    try$(writeData(cfg.underlying()));
     return Ok();
 }
 
@@ -90,10 +88,13 @@ Res<Flags<Configs>> I8042::readConfig() {
 Res<> Keyboard::init() {
     logInfo("ps2: keyboard initializing...");
     try$(ctrl().writeCmd(Cmd::ENABLE_MAIN));
+
     auto cfgs = try$(ctrl().readConfig());
     cfgs.set(Configs::FIRST_PORT_INTERRUPT_ENABLE);
     try$(ctrl().writeConfig(cfgs));
-    try$(sendCmd(GET_SET_SCAN_CODE_SET, 0x1));
+
+    logInfo("ps2: keyboard initialized");
+
     return Ok();
 }
 
@@ -104,7 +105,7 @@ Res<> Keyboard::event(Events::Event &e) {
             while (status.has(Status::OUT_BUF) and
                    not status.has(Status::AUX_BUF)) {
                 auto data = try$(ctrl().readData());
-                // logInfo("ps2: keyboard data {:02x}", data);
+                logInfo("ps2: keyboard data {:02x}", data);
                 if (_esc) {
                     Events::Key key = {Events::Key::Code((data & 0x7F) + 0x80)};
                     logInfo("ps2: keyboard key {} {}", key.name(), data & 0x80 ? "pressed" : "released");
@@ -128,6 +129,7 @@ Res<> Keyboard::event(Events::Event &e) {
 Res<> Mouse::init() {
     logInfo("ps2: mouse initializing...");
     try$(ctrl().writeCmd(Cmd::ENABLE_AUX));
+
     auto cfgs = try$(ctrl().readConfig());
     cfgs.set(Configs::SECOND_PORT_INTERRUPT_ENABLE);
     try$(ctrl().writeConfig(cfgs));
@@ -151,6 +153,8 @@ Res<> Mouse::init() {
         logInfo("ps2: mouse scroll wheel not supported");
         _hasWheel = false;
     }
+
+    logInfo("ps2: mouse initialized");
 
     return Ok();
 }

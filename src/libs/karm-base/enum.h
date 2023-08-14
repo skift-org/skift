@@ -39,15 +39,23 @@ struct Flags {
         return _value == (E)0;
     }
 
+    bool any() const {
+        return _value != (E)0;
+    }
+
     E val() const {
         return _value;
+    }
+
+    auto underlying() const {
+        return (Meta::UnderlyingType<E>)_value;
     }
 
     operator E() const {
         return _value;
     }
 
-    operator bool() const {
+    explicit operator bool() const {
         return _value != (E)0;
     }
 

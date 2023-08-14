@@ -5,6 +5,7 @@
 #include "error.h"
 #include "inert.h"
 #include "macros.h"
+#include "ordr.h"
 #include "panic.h"
 #include "std.h"
 #include "try.h"
@@ -85,7 +86,7 @@ struct [[nodiscard]] Opt {
         return not _present;
     }
 
-    ALWAYS_INLINE operator bool() const {
+    ALWAYS_INLINE explicit operator bool() const {
         return _present;
     }
 
@@ -210,6 +211,22 @@ struct [[nodiscard]] Opt {
             return {f(unwrap())};
         }
         return {NONE};
+    }
+
+    ALWAYS_INLINE Ordr cmp(Opt const &other) const {
+        if (not _present and not other._present) {
+            return Ordr::EQUAL;
+        }
+
+        if (not _present) {
+            return Ordr::LESS;
+        }
+
+        if (not other._present) {
+            return Ordr::GREATER;
+        }
+
+        return ::cmp(_value.unwrap(), other._value.unwrap());
     }
 };
 

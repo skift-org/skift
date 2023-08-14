@@ -32,7 +32,7 @@ struct Ptr<void> {
         return reinterpret_cast<T const *>(_raw);
     }
 
-    operator bool() const {
+    explicit operator bool() const {
         return _raw;
     }
 
@@ -46,7 +46,7 @@ struct Ptr<void> {
         return reinterpret_cast<T const *>(_raw);
     }
 
-    operator bool() const volatile {
+    explicit operator bool() const volatile {
         return _raw;
     }
 };
@@ -79,11 +79,11 @@ struct Ptr {
         return reinterpret_cast<T const *>(_raw)[index];
     }
 
-    operator bool() const {
+    explicit operator bool() const {
         return _raw;
     }
 
-    operator bool() const volatile {
+    explicit operator bool() const volatile {
         return _raw;
     }
 
@@ -113,7 +113,7 @@ struct List {
         return *items[index];
     }
 
-    operator bool() const {
+    explicit operator bool() const {
         return count and items;
     }
 };
@@ -173,11 +173,11 @@ struct Request {
         return *response;
     }
 
-    operator bool() const {
+    explicit operator bool() const {
         return (bool)response;
     }
 
-    operator bool() const volatile {
+    explicit operator bool() const volatile {
         return (bool)response;
     }
 };

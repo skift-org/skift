@@ -246,7 +246,7 @@ struct GlyphPairAdjustment : public LookupSubtableBase {
 
         auto value1len = ValueRecord::len(valueFormat1);
         auto value2len = ValueRecord::len(valueFormat2);
-        auto pairSetOffset = s.skip(coverageIndex * 2).nextU16be();
+        auto pairSetOffset = s.skip(coverageIndex.unwrap() * 2).nextU16be();
 
         // Lookup the PairSet table for the second glyph
         auto pairSetTable = begin().skip(pairSetOffset);

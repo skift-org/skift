@@ -68,6 +68,18 @@ struct SdlHost :
             break;
         }
 
+        case SDL_TEXTINPUT: {
+            Str text = sdlEvent.text.text;
+            for (u8 c : iterRunes(text)) {
+                Events::TypedEvent uiEvent{
+                    .codepoint = c,
+                };
+                logInfo("typed: {c}", c);
+                event(uiEvent);
+            }
+            break;
+        }
+
         case SDL_MOUSEMOTION: {
             if (sdlEvent.motion.which == SDL_TOUCH_MOUSEID) {
                 return;

@@ -83,7 +83,10 @@ struct KeyboardEvent : public BaseEvent<KeyboardEvent> {
 
     Type type;
     Key key;
-    Rune rune;
+};
+
+struct TypedEvent : public BaseEvent<TypedEvent> {
+    u32 codepoint;
 };
 
 struct PaintEvent : public BaseEvent<PaintEvent> {

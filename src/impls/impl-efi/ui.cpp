@@ -33,8 +33,9 @@ struct EfiHost :
     }
 
     void pump() override {
-        Efi::bs()->waitForEvent(1, &_stip->waitForKey, nullptr).unwrap();
-        Efi::Key key;
+        usize eventIdx = {};
+        Efi::bs()->waitForEvent(1, &_stip->waitForKey, &eventIdx).unwrap();
+        Efi::Key key = {};
         _stip->readKeyStroke(_stip, &key).unwrap();
         auto e = key.toKeyEvent();
         event(e);

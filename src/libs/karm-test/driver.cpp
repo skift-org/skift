@@ -24,8 +24,9 @@ void Driver::runAll() {
     Sys::errln("");
 
     for (auto *test : _tests) {
-        auto result = test->run(*this);
+        Sys::err(" {}...\n", test->_name);
 
+        auto result = test->run(*this);
         auto label = result
                          ? Cli::styled("PASS", GREEN)
                          : Cli::styled("FAIL", RED);

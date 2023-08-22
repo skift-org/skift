@@ -1,8 +1,8 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "device-srv",
+    "id": "grund-system",
     "type": "exe",
-    "description": "Device managment service",
+    "description": "Main system service responsible for managing other services",
     "enableIf": {
         "sys": [
             "skift"
@@ -10,6 +10,6 @@
     },
     "requires": [
         "karm-main",
-        "hal"
+        "karm-gfx"
     ]
 }

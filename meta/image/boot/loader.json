@@ -7,8 +7,8 @@
             "name": "Mobile",
             "kernel": "bundle://hjert/_bin",
             "blobs": [
-                "bundle://system-srv/_bin",
-                "bundle://device-srv/_bin",
+                "bundle://grund-system/_bin",
+                "bundle://grund-device/_bin",
                 {
                     "url": "bundle://hideo-shell/_bin",
                     "props": {
@@ -26,8 +26,8 @@
             "name": "Desktop",
             "kernel": "bundle://hjert/_bin",
             "blobs": [
-                "bundle://system-srv/_bin",
-                "bundle://device-srv/_bin",
+                "bundle://grund-system/_bin",
+                "bundle://grund-device/_bin",
                 {
                     "url": "bundle://hideo-shell/_bin",
                     "props": {
@@ -41,8 +41,8 @@
             "name": "Headless",
             "kernel": "bundle://hjert/_bin",
             "blobs": [
-                "bundle://system-srv/_bin",
-                "bundle://device-srv/_bin"
+                "bundle://grund-system/_bin",
+                "bundle://grund-device/_bin"
             ]
         }
     ]

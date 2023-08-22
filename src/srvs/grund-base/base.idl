@@ -1,0 +1,7 @@
+module Grund
+
+include "karm-ipc/base.h"
+
+Locator {
+    queryInterface (u64 id) -> Ipc::AsyncRes<>
+}

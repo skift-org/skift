@@ -1,0 +1,13 @@
+module Grund::Device
+
+include "karm-ipc/base.h"
+
+Client {
+    event (ClientEvent e) -> Res<>
+}
+
+Host {
+    bubble (HostEvent e) -> Res<>
+
+    flip (Vec<Math::Recti> r) -> Res<>
+}

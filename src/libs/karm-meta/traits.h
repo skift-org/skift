@@ -58,10 +58,10 @@ template <typename T>
 concept Trivial = __is_trivial(T);
 
 template <typename T>
-concept IsStandardLayout = __is_standard_layout(T);
+concept StandardLayout = __is_standard_layout(T);
 
 template <typename T>
-concept IsPod = __is_pod(T);
+concept Pod = Trivial<T> and StandardLayout<T>;
 
 template <typename T>
 concept Signed = __is_signed(T);

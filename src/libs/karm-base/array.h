@@ -65,7 +65,7 @@ template <class T, class... U>
 Array(T, U...) -> Array<T, 1 + sizeof...(U)>;
 
 static_assert(MutSliceable<Array<u8, 16>>);
-static_assert(Meta::IsPod<Array<u8, 16>>);
+static_assert(Meta::Pod<Array<u8, 16>>);
 
 template <typename T, usize... Is>
 constexpr Array<T, sizeof...(Is)> _makeArray(T value, std::index_sequence<Is...>) {

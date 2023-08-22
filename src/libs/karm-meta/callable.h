@@ -27,7 +27,7 @@ using Ret = decltype(Meta::declval<U>()(std::forward<Args>(Meta::declval<Args>()
 
 template <typename T, typename... Args>
 concept Callable = requires(T f) {
-                       f(declval<Args>()...);
-                   };
+    f(declval<Args>()...);
+};
 
 } // namespace Karm::Meta

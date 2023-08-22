@@ -149,6 +149,7 @@ struct Cmd {
         }
 #endif
 
+        (void)writer;
         return Ok(0uz);
     }
 };

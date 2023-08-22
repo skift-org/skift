@@ -1,4 +1,7 @@
+#include <karm-cli/cursor.h>
+#include <karm-cli/spinner.h>
 #include <karm-cli/style.h>
+#include <karm-fmt/case.h>
 #include <karm-sys/chan.h>
 #include <karm-sys/time.h>
 #include <karm-text/witty.h>
@@ -19,19 +22,17 @@ static auto NOTE = Cli::Style{Cli::GRAY_DARK}.bold();
 void Driver::runAll() {
     usize passed = 0, failed = 0;
 
-    Sys::errln("Running {} tests...", _tests.len());
-
-    Sys::errln("");
+    Sys::errln("Running {} tests...\n", _tests.len());
 
     for (auto *test : _tests) {
-        Sys::err(" {}...\n", test->_name);
+        Sys::err("{}{} Running {}...{}{}", Cli::Cmd::clearLineAfter(), Cli::styled(" TEST ", Cli::style().bold().bg(Cli::CYAN)), Fmt::toNoCase(test->_name).unwrap(), Cli::Cmd::horizontal(0));
 
         auto result = test->run(*this);
         auto label = result
-                         ? Cli::styled("PASS", GREEN)
-                         : Cli::styled("FAIL", RED);
+                         ? Cli::styled(" PASS ", Cli::style(Cli::WHITE).bold().bg(Cli::GREEN_LIGHT))
+                         : Cli::styled(" FAIL ", RED);
 
-        Sys::err(" {} {}", label, test->_name);
+        Sys::err("{}{} {}", Cli::Cmd::clearLineAfter(), label, Fmt::toNoCase(test->_name).unwrap());
 
         if (not result) {
             Sys::errln(" - {}", Cli::styled(result.none().msg(), RED));
@@ -55,8 +56,6 @@ void Driver::runAll() {
                    Cli::styled(passed, GREEN),
                    Cli::styled(Text::nice(Sys::now().val()), NOTE));
     }
-
-    Sys::errln("");
 }
 
 Driver &driver() {

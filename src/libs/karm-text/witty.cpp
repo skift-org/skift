@@ -2,7 +2,7 @@
 
 namespace Karm::Text {
 
-static char const *WITTY[] = {
+static Array WITTY = {
     "Witty comment unavailable :(",
 
     "...",
@@ -29,7 +29,7 @@ static char const *WITTY[] = {
     "Get the f*** outa my room, I'm playing minecraft",
     "Greenpeace free'd the mallocs \\o/",
     "Hey, wait a minute! What if I type something wrong?",
-    "Hi. I'm BRUTAL, and I'm a crashaholic.",
+    "Hi. I'm skift, and I'm a crashaholic.",
     "Hope. It is the quintessential human delusion",
     "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     "I blame Cyp.",
@@ -46,7 +46,7 @@ static char const *WITTY[] = {
     "It's not a good surprise...",
     "Keyboard not found! Please press any key to continue...",
     "Les erreurs au fond, ce n'est qu'une construction social",
-    "Let me interject for a moment, what you call errors are in fact brutal/errors",
+    "Let me interject for a moment, what you call errors are in fact skift/errors",
     "Make it a feature",
     "Minecraft crashed!",
     "My bad.",
@@ -54,7 +54,7 @@ static char const *WITTY[] = {
     "Never gonna say goodbye",
     "Oh - I know what I did wrong!",
     "On the bright side, I brought you a teddy bear!",
-    "One day brutal will be bug free :tm:",
+    "One day skift will be bug free :tm:",
     "OOF!",
     "OoooOOoOoOF!",
     "Oops.",
@@ -68,6 +68,7 @@ static char const *WITTY[] = {
     "Quite honestly, I wouldn't worry myself about that.",
     "Remember, all I’m offering is the truth. Nothing more.",
     "RIP",
+    "RIRR",
     "skiftOS and WingOS were abandonned for this reason",
     "So, what do you think of the new error screen?",
     "Surprise! Haha. Well, this is awkward.",
@@ -117,10 +118,10 @@ static char const *WITTY[] = {
 };
 
 Str witty(usize seed) {
-    return WITTY[seed % (sizeof(WITTY) / sizeof(WITTY[0]))];
+    return WITTY[seed % WITTY.len()];
 }
 
-static char const *NICE[] = {
+static Array NICE = {
     "Nice comment unavailable :(",
 
     "*hug you real hard*",
@@ -138,7 +139,7 @@ static char const *NICE[] = {
     "Thanks copilot",
     "That's the spirit",
     "That's the way to do it",
-    "This is why BRUTAL is called the unix utopia",
+    "This is why skiftOS is the best",
     "VICTORY ROYALE",
     "skill + based + touched grass",
     "Well hello friends :^)",
@@ -152,7 +153,7 @@ static char const *NICE[] = {
 };
 
 Str nice(usize seed) {
-    return NICE[seed % (sizeof(NICE) / sizeof(NICE[0]))];
+    return NICE[seed % NICE.len()];
 }
 
 } // namespace Karm::Text

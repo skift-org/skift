@@ -6,22 +6,20 @@ namespace Karm::Async::Tests {
 
 Task<> helloWorld() {
     logInfo("Hello, ");
-    co_await Async::sleep(TimeSpan::fromSecs(1));
+    co_await after(100_ms);
     logInfo("world!");
     co_return Ok();
 }
 
 test$(taskSleep) {
     auto task = helloWorld();
-    try$(task.runSync());
-
-    return Ok();
+    return loop().run();
 }
 
 Task<> taskA() {
     for (int i = 0; i < 10; ++i) {
+        co_await after(100_ms);
         logInfo("A: {}", i);
-        co_await Async::yield();
     }
     logInfo("A: done");
     co_return Ok();
@@ -30,7 +28,7 @@ Task<> taskA() {
 Task<> taskB() {
     for (int i = 0; i < 10; ++i) {
         logInfo("B: {}", i);
-        co_await Async::yield();
+        co_await after(100_ms);
     }
     logInfo("B: done");
     co_return Ok();
@@ -38,13 +36,12 @@ Task<> taskB() {
 
 test$(taskYield) {
     auto tA = taskA();
-    auto tB = taskB();
-    return Sched::instance().run();
+    return loop().run();
 }
 
 Task<> taskInner() {
     logInfo("inner A");
-    co_await Async::sleep(TimeSpan::fromSecs(1));
+    co_await after(100_ms);
     logInfo("inner B");
     co_return Ok();
 }
@@ -58,15 +55,14 @@ Task<> taskOuter() {
 
 test$(taskNested) {
     auto task = taskOuter();
-    try$(task.runSync());
-    return Ok();
+    return loop().run();
 }
 
 test$(testAll) {
     auto tA = taskA();
     auto tB = taskB();
-    try$(Async::all(tA, tB).runSync());
-    return Ok();
+    auto tAB = all(tA, tB);
+    return loop().run();
 }
 
 } // namespace Karm::Async::Tests

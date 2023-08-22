@@ -12,6 +12,7 @@
     "provides": [
         "karm-base-impl",
         "karm-logger-impl",
-        "karm-sys-impl"
+        "karm-sys-impl",
+        "karm-async-impl"
     ]
 }

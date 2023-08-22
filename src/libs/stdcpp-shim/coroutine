@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 namespace std {
 
 template <typename ReturnType, typename... Args>
@@ -21,6 +23,9 @@ struct coroutine_handle<void> {
     }
 
     coroutine_handle()
+        : _frame{nullptr} {}
+
+    coroutine_handle(std::nullptr_t)
         : _frame{nullptr} {}
 
     explicit operator bool() {

@@ -4,6 +4,7 @@
     "type": "lib",
     "description": "Coroutine-based asynchronous programming library",
     "requires": [
-        "karm-base"
+        "karm-base",
+        "karm-async-impl"
     ]
 }

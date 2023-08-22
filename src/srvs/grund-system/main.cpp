@@ -69,7 +69,7 @@ Res<> loadService(Ctx &ctx, Sys::Url url) {
 }
 
 Res<> entryPoint(Ctx &ctx) {
-    try$(Hj::Task::self().label("system"));
+    try$(Hj::Task::self().label("grund-system"));
 
     try$(loadService(ctx, "bundle://grund-device/_bin"_url));
     try$(loadService(ctx, "bundle://hideo-shell/_bin"_url));

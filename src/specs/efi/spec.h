@@ -496,7 +496,6 @@ struct Key {
         return {
             .type = Events::KeyboardEvent::PRESS,
             .key = key,
-            .rune = unicodeChar,
         };
     }
 };

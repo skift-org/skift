@@ -673,7 +673,7 @@ struct Image {
 
     /* --- Decoding --------------------------------------------------------- */
 
-    void idtc(Array<short, 64> &mcu) {
+    void idct(Array<short, 64> &mcu) {
         f32 m0 = 2.0 * Math::cos(1.0 / 16.0 * 2.0 * Math::PI);
         f32 m1 = 2.0 * Math::cos(2.0 / 16.0 * 2.0 * Math::PI);
         f32 m3 = 2.0 * Math::cos(2.0 / 16.0 * 2.0 * Math::PI);
@@ -845,7 +845,7 @@ struct Image {
                     mcu[k] *= quant[k];
                 }
 
-                idtc(mcu);
+                idct(mcu);
             }
 
             auto &yMcu = _mcus[i + 0];

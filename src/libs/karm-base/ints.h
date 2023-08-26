@@ -20,6 +20,7 @@ using i32 = int32_t;
 using i64 = int64_t;
 using i128 = __int128_t;
 
+using f16 = __fp16;
 using f32 = float;
 using f64 = double;
 using f128 = long double;

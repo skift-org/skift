@@ -126,21 +126,6 @@ Ui::Child properties() {
             Ui::titleRow("Sheet Properties")));
 }
 
-Ui::Child tab(bool selected, String title) {
-    auto indicator = Ui::box(Ui::BoxStyle{
-                                 .borderRadius = 99,
-                                 .backgroundPaint = selected ? Ui::ACCENT600 : Gfx::ALPHA,
-                             },
-                             Ui::empty(4));
-
-    return Ui::button(
-        Ui::NOP,
-        Ui::ButtonStyle::subtle(),
-        Ui::vflow(
-            Ui::labelMedium(title) | Ui::center() | Ui::spacing({16, 0}) | Ui::grow(), indicator) |
-            Ui::spacing({6, 6}));
-}
-
 Ui::Child tabItem(State const &state, Sheet const &sheet, usize index) {
     return Ui::button(
         Model::bind<SwitchSheet>(index),

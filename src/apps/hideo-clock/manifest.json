@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-clock",
+    "type": "exe",
+    "description": "Time, clock, timer and stopwatch",
+    "requires": [
+        "karm-ui",
+        "karm-main"
+    ]
+}

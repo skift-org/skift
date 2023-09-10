@@ -12,8 +12,7 @@ from typing import Callable
 
 
 def kvmAvailable() -> bool:
-    if os.path.exists("/dev/kvm") and \
-            os.access("/dev/kvm", os.R_OK):
+    if os.path.exists("/dev/kvm") and os.access("/dev/kvm", os.R_OK):
         return True
     return False
 
@@ -28,9 +27,7 @@ class Image:
 
     def withPak(self, id: str, f: Callable[[dict], None]):
         jsonPath = f"{self.root}/bundles/{id}.json"
-        pakJson = {
-            "id": id,
-            "objects": {}}
+        pakJson = {"id": id, "objects": {}}
         if os.path.exists(jsonPath):
             pakJson = json.load(open(jsonPath))
         f(pakJson)
@@ -47,7 +44,9 @@ class Image:
 
         def addToRefs(pakJson: dict):
             pakJson["objects"][f"bundle://{id}"] = {
-                "mime": mime, "ref": f"file:/{dest}"}
+                "mime": mime,
+                "ref": f"file:/{dest}",
+            }
 
         self.withPak(pak, addToRefs)
 
@@ -65,11 +64,9 @@ class Image:
                 raise Exception(f"Component {depId} not found")
 
             for asset in dep.resfiles():
-                self.cpRef(componentSpec, asset[0],
-                           f'{depId}/{asset[2]}')
+                self.cpRef(componentSpec, asset[0], f"{depId}/{asset[2]}")
 
-                self.cpRef("_index", asset[0],
-                           f'{depId}/{asset[2]}')
+                self.cpRef("_index", asset[0], f"{depId}/{asset[2]}")
 
         shell.mkdir(Path(f"{self.root}/{dest}").parent)
         shell.cp(component.outfile(), f"{self.root}/{dest}")
@@ -85,11 +82,9 @@ class Image:
                 raise Exception(f"Component {depId} not found")
 
             for asset in dep.resfiles():
-                self.cpRef(componentSpec, asset[0],
-                           f'{depId}/{asset[2]}')
+                self.cpRef(componentSpec, asset[0], f"{depId}/{asset[2]}")
 
-                self.cpRef("_index", asset[0],
-                           f'{depId}/{asset[2]}')
+                self.cpRef("_index", asset[0], f"{depId}/{asset[2]}")
 
         self.cpRef("_index", component.outfile(), f"{componentSpec}/_bin")
         self.cpRef(componentSpec, component.outfile(), f"{componentSpec}/_bin")
@@ -114,7 +109,7 @@ class Image:
         shell.wget(url, f"{self.root}/{dest}")
 
 
-class Machine():
+class Machine:
     logger: logging.Logger
 
     def __init__(self, id: str):
@@ -140,19 +135,27 @@ class QemuSystemAmd64(Machine):
 
         if not os.path.exists(ovmf):
             ovmf = shell.wget(
-                "https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd")
+                "https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd"
+            )
 
         qemuCmd: list[str] = [
             "qemu-system-x86_64",
-            "-machine", "q35",
+            "-machine",
+            "q35",
             "-no-reboot",
             "-no-shutdown",
-            "-serial", "mon:stdio",
-            "-bios", ovmf,
-            "-m", "256M",
-            "-smp", "4",
-            "-drive", f"file=fat:rw:{image.root},media=disk,format=raw",
-            "-display", "sdl",
+            "-serial",
+            "mon:stdio",
+            "-bios",
+            ovmf,
+            "-m",
+            "256M",
+            "-smp",
+            "4",
+            "-drive",
+            f"file=fat:rw:{image.root},media=disk,format=raw",
+            "-display",
+            "sdl",
         ]
 
         if self.logError:
@@ -186,7 +189,6 @@ def bootCmd(args: Args) -> None:
 
     image.installTo("loader", efiTarget, "EFI/BOOT/BOOTX64.EFI")
     image.install("hjert", kernelTarget)
-    image.install("limine-tests", kernelTarget)
     image.install("grund-system", skiftTarget)
     image.install("grund-device", skiftTarget)
     image.install("hideo-shell", skiftTarget)
@@ -197,8 +199,7 @@ def bootCmd(args: Args) -> None:
 
     image.cpTree("meta/image/boot", "boot/")
 
-    machine = QemuSystemAmd64(
-        logError=isErrorLog, useDebug=isDebug)
+    machine = QemuSystemAmd64(logError=isErrorLog, useDebug=isDebug)
     machine.boot(image)
 
 

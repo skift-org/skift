@@ -4,8 +4,8 @@
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
 #include <karm-fmt/fmt.h>
-#include <karm-text/expr.h>
-#include <karm-text/scan.h>
+#include <karm-io/expr.h>
+#include <karm-io/sscan.h>
 
 namespace Karm::Sys {
 
@@ -17,7 +17,7 @@ struct Path {
     bool rooted = false;
     Vec<String> _parts;
 
-    static Path parse(Text::Scan &s, bool inUrl = false);
+    static Path parse(Io::SScan &s, bool inUrl = false);
 
     static Path parse(Str str, bool inUrl = false);
 
@@ -68,7 +68,7 @@ struct Url {
     String query;
     String fragment;
 
-    static Url parse(Text::Scan &s);
+    static Url parse(Io::SScan &s);
 
     static Url parse(Str str);
 
@@ -109,7 +109,7 @@ struct Url {
     }
 };
 
- Res<Url> parseUrlOrPath(Str str) ;
+Res<Url> parseUrlOrPath(Str str);
 
 } // namespace Karm::Sys
 

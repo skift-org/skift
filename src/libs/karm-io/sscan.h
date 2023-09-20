@@ -5,17 +5,17 @@
 #include <karm-base/string.h>
 #include <karm-meta/callable.h>
 
-namespace Karm::Text {
+namespace Karm::Io {
 
 template <typename E>
-struct _Scan {
+struct _SScan {
     using Encoding = E;
     using Unit = typename E::Unit;
 
     Cursor<Unit> _cursor;
     Cursor<Unit> _begin;
 
-    _Scan(Str str) : _cursor(str) {}
+    _SScan(Str str) : _cursor(str) {}
 
     bool ended() {
         return _cursor.ended();
@@ -253,6 +253,6 @@ struct _Scan {
 #endif
 };
 
-using Scan = _Scan<Utf8>;
+using SScan = _SScan<Utf8>;
 
-} // namespace Karm::Text
+} // namespace Karm::Io

@@ -82,7 +82,7 @@ template <typename T>
 struct Karm::Fmt::Formatter<Karm::Fmt::Cased<T>> {
     Formatter<T> _innerFmt{};
 
-    void parse(Text::Scan &scan) {
+    void parse(Io::SScan &scan) {
         if constexpr (requires() {
                           _innerFmt.parse(scan);
                       }) {

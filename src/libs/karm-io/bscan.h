@@ -5,6 +5,8 @@
 #include <karm-base/string.h>
 #include <karm-io/traits.h>
 
+namespace Karm::Io {
+
 struct BScan {
     Cursor<u8> _start;
     Cursor<u8> _cursor;
@@ -370,3 +372,5 @@ struct BEmit {
         (void)_writer.write(b);
     }
 };
+
+} // namespace Karm::Io

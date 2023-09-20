@@ -1,13 +1,12 @@
 #pragma once
 
+#include <karm-io/bscan.h>
 #include <karm-logger/logger.h>
 #include <karm-media/font.h>
 
-#include "../bscan.h"
-
 namespace Ttf {
 
-struct Cmap : public BChunk {
+struct Cmap : public Io::BChunk {
     static constexpr Str SIG = "cmap";
 
     struct Table {
@@ -17,7 +16,7 @@ struct Cmap : public BChunk {
 
         Bytes slice;
 
-        BScan begin() const {
+        Io::BScan begin() const {
             return slice;
         }
 
@@ -103,7 +102,7 @@ struct Cmap : public BChunk {
             u16 encodingId = s.nextU16be();
             u32 offset = s.nextU32be();
             auto slice = sub(_slice, offset, _slice.len());
-            u16 type = BScan{slice}.nextU16be();
+            u16 type = Io::BScan{slice}.nextU16be();
             i++;
 
             return Table{platformId, encodingId, type, slice};

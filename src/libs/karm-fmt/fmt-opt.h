@@ -8,7 +8,7 @@ template <typename T>
 struct Formatter<Opt<T>> {
     Formatter<T> formatter;
 
-    void parse(Text::Scan &scan) {
+    void parse(Io::SScan &scan) {
         if constexpr (requires() {
                           formatter.parse(scan);
                       }) {

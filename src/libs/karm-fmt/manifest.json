@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Type safe text formating",
     "requires": [
-        "karm-text"
+        "karm-io"
     ]
 }

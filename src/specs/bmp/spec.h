@@ -9,10 +9,9 @@
 
 #include <karm-base/vec.h>
 #include <karm-gfx/buffer.h>
+#include <karm-io/bscan.h>
+#include <karm-io/emit.h>
 #include <karm-logger/logger.h>
-#include <karm-text/emit.h>
-
-#include "../bscan.h"
 
 namespace Bmp {
 
@@ -32,7 +31,7 @@ struct Image {
         }
 
         Image image{};
-        BScan s{slice};
+        Io::BScan s{slice};
         try$(image.readHeader(s));
         try$(image.readInfoHeader(s));
         try$(image.readPalette(s));
@@ -45,7 +44,7 @@ struct Image {
 
     usize _dataOffset;
 
-    Res<> readHeader(BScan &s) {
+    Res<> readHeader(Io::BScan &s) {
         if (s.rem() < 54) {
             return Error::invalidData("image too small");
         }
@@ -78,7 +77,7 @@ struct Image {
 
     usize _numsColors;
 
-    Res<> readInfoHeader(BScan &s) {
+    Res<> readInfoHeader(Io::BScan &s) {
         s.skip(4); // header size
         _width = s.nextI32le();
         _height = s.nextI32le();
@@ -113,7 +112,7 @@ struct Image {
 
     Vec<Gfx::Color> _palette;
 
-    Res<> readPalette(BScan &s) {
+    Res<> readPalette(Io::BScan &s) {
         for (usize i = 0; i < _numsColors; ++i) {
             auto b = s.nextU8le();
             auto g = s.nextU8le();
@@ -130,7 +129,7 @@ struct Image {
 
     Bytes _pixels;
 
-    Res<> readPixels(BScan &s) {
+    Res<> readPixels(Io::BScan &s) {
         s.seek(_dataOffset);
         _pixels = s.restBytes();
         return Ok();
@@ -139,7 +138,7 @@ struct Image {
     /* --- Decoding --------------------------------------------------------- */
 
     Res<> decode(Gfx::MutPixels pixels) {
-        BScan s{_pixels};
+        Io::BScan s{_pixels};
 
         for (isize y = 0; y < height(); ++y) {
             for (isize x = 0; x < width(); ++x) {
@@ -197,7 +196,7 @@ struct Image {
 
     /* --- Dumping ---------------------------------------------------------- */
 
-    void dump(Text::Emit &e) {
+    void dump(Io::Emit &e) {
         e("BMP image");
         e.indentNewline();
 

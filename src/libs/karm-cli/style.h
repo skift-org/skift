@@ -186,7 +186,7 @@ struct Karm::Fmt::Formatter<Karm::Cli::Styled<T>> {
     Formatter<Karm::Cli::Style> _styleFmt{};
     Formatter<T> _innerFmt{};
 
-    void parse(Text::Scan &scan) {
+    void parse(Io::SScan &scan) {
         if constexpr (requires() {
                           _innerFmt.parse(scan);
                       }) {

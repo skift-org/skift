@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../bscan.h"
+#include <karm-io/bscan.h>
 
 namespace Ttf {
 
-struct Head : public BChunk {
+struct Head : public Io::BChunk {
     static constexpr Str SIG = "head";
 
     u16 unitPerEm() const {

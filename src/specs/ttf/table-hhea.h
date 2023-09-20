@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../bscan.h"
+#include <karm-io/bscan.h>
 
 namespace Ttf {
 
-struct Hhea : public BChunk {
+struct Hhea : public Io::BChunk {
     static constexpr Str SIG = "hhea";
 
     isize ascender() const {

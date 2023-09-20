@@ -5,9 +5,9 @@
 #include <karm-base/var.h>
 #include <karm-base/vec.h>
 #include <karm-fmt/fmt.h>
-#include <karm-text/emit.h>
-#include <karm-text/expr.h>
-#include <karm-text/scan.h>
+#include <karm-io/emit.h>
+#include <karm-io/expr.h>
+#include <karm-io/sscan.h>
 
 namespace Json {
 
@@ -262,11 +262,11 @@ struct Value {
     }
 };
 
-Res<Value> parse(Text::Scan &s);
+Res<Value> parse(Io::SScan &s);
 
 Res<Value> parse(Str s);
 
-Res<> stringify(Text::Emit &emit, Value const &v);
+Res<> stringify(Io::Emit &emit, Value const &v);
 
 Res<String> stringify(Value const &v);
 
@@ -279,7 +279,7 @@ inline auto operator""_json(char const *str, usize len) {
 template <>
 struct Karm::Fmt::Formatter<Json::Value> {
     Res<usize> format(Io::TextWriter &writer, Json::Value value) {
-        Text::Emit emit{writer};
+        Io::Emit emit{writer};
         try$(Json::stringify(emit, value));
         return Ok(emit.total());
     }

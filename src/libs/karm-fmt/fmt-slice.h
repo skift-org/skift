@@ -8,7 +8,7 @@ template <Sliceable T>
 struct Formatter<T> {
     Formatter<typename T::Inner> inner;
 
-    void parse(Text::Scan &scan) {
+    void parse(Io::SScan &scan) {
         if constexpr (requires() {
                           inner.parse(scan);
                       }) {

@@ -4,6 +4,8 @@
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
 #include <karm-gfx/style.h>
+#include <karm-io/expr.h>
+#include <karm-io/sscan.h>
 #include <karm-math/const.h>
 #include <karm-math/edge.h>
 #include <karm-math/ellipse.h>
@@ -11,8 +13,6 @@
 #include <karm-math/rect.h>
 #include <karm-math/trans.h>
 #include <karm-math/vec.h>
-#include <karm-text/expr.h>
-#include <karm-text/scan.h>
 
 namespace Karm::Gfx {
 
@@ -189,9 +189,9 @@ struct Path {
 
     /* --- Svg -------------------------------------------------------------- */
 
-    Opt<Math::Vec2f> _nextVec2f(Text::Scan &scan);
+    Opt<Math::Vec2f> _nextVec2f(Io::SScan &scan);
 
-    static Opt<Op> parseOp(Text::Scan &scan, Rune opcode);
+    static Opt<Op> parseOp(Io::SScan &scan, Rune opcode);
 
     bool evalSvg(Str svg);
 

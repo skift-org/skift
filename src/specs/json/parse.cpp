@@ -4,9 +4,9 @@
 
 namespace Json {
 
-Res<Value> parse(Text::Scan &s);
+Res<Value> parse(Io::SScan &s);
 
-Res<String> parseStr(Text::Scan &s) {
+Res<String> parseStr(Io::SScan &s) {
     if (not s.skip('"')) {
         return Error::invalidData("expected '\"'");
     }
@@ -62,7 +62,7 @@ Res<String> parseStr(Text::Scan &s) {
     return Error::invalidData("expected '\"'");
 }
 
-Res<Object> parseObject(Text::Scan &s) {
+Res<Object> parseObject(Io::SScan &s) {
     Object m;
     if (not s.skip('{')) {
         return Error::invalidData("expected '{'");
@@ -97,7 +97,7 @@ Res<Object> parseObject(Text::Scan &s) {
     }
 }
 
-Res<Array> parseArray(Text::Scan &s) {
+Res<Array> parseArray(Io::SScan &s) {
     Array v;
     if (not s.skip('[')) {
         return Error::invalidData("expected '['");
@@ -123,7 +123,7 @@ Res<Array> parseArray(Text::Scan &s) {
     }
 }
 
-Res<Value> parse(Text::Scan &s) {
+Res<Value> parse(Io::SScan &s) {
     s.eat(Re::space());
 
     if (s.ended()) {
@@ -152,7 +152,7 @@ Res<Value> parse(Text::Scan &s) {
 }
 
 Res<Value> parse(Str s) {
-    Text::Scan scan{s};
+    Io::SScan scan{s};
     return parse(scan);
 }
 

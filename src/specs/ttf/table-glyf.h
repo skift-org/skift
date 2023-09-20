@@ -1,13 +1,12 @@
 #pragma once
 
 #include <karm-gfx/context.h>
+#include <karm-io/bscan.h>
 #include <karm-logger/logger.h>
-
-#include "../bscan.h"
 
 namespace Ttf {
 
-struct Glyf : public BChunk {
+struct Glyf : public Io::BChunk {
     static constexpr Str SIG = "glyf";
 
     static constexpr u8 ON_CURVE_POINT = 0x01;
@@ -26,7 +25,7 @@ struct Glyf : public BChunk {
         i16 yMax;
     };
 
-    ALWAYS_INLINE Metrics metrics(BScan &s, usize glyfOffset) const {
+    ALWAYS_INLINE Metrics metrics(Io::BScan &s, usize glyfOffset) const {
         s.skip(glyfOffset);
         auto numContours = s.nextI16be();
         if (numContours == 0) {
@@ -59,7 +58,7 @@ struct Glyf : public BChunk {
         i16 y;
     };
 
-    void contourSimple(Gfx::Context &g, Metrics m, BScan &s) const {
+    void contourSimple(Gfx::Context &g, Metrics m, Io::BScan &s) const {
         auto endPtsOfContours = s;
         auto nPoints = s.peek(2 * (m.numContours - 1)).nextU16be() + 1u;
         u16 instructionLength = s.skip(m.numContours * 2).nextU16be();
@@ -153,7 +152,7 @@ struct Glyf : public BChunk {
         }
     }
 
-    void contourComposite(Gfx::Context &, Metrics, BScan &) const {
+    void contourComposite(Gfx::Context &, Metrics, Io::BScan &) const {
         logTodo();
     }
 

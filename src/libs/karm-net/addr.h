@@ -3,7 +3,7 @@
 #include <karm-base/res.h>
 #include <karm-base/var.h>
 #include <karm-fmt/fmt.h>
-#include <karm-text/scan.h>
+#include <karm-io/sscan.h>
 
 namespace Karm::Net {
 
@@ -28,7 +28,7 @@ union Ip4 {
         return Ip4{{127, 0, 0, 1}};
     }
 
-    static Res<Ip4> parse(Text::Scan &s) {
+    static Res<Ip4> parse(Io::SScan &s) {
         auto addr = unspecified();
 
         for (auto i = 0; i < 4; ++i) {
@@ -54,7 +54,7 @@ union Ip4 {
     }
 
     static Res<Ip4> parse(Str str) {
-        auto s = Text::Scan(str);
+        auto s = Io::SScan(str);
         return parse(s);
     }
 };
@@ -80,7 +80,7 @@ union Ip6 {
         return Ip6{0, 0, 0, 0, 0, 0, 0, 1};
     }
 
-    static Res<Ip6> parse(Text::Scan &s) {
+    static Res<Ip6> parse(Io::SScan &s) {
         auto addr = unspecified();
 
         for (auto i = 0; i < 8; i++) {
@@ -97,7 +97,7 @@ union Ip6 {
     }
 
     static Res<Ip6> parse(Str str) {
-        auto s = Text::Scan(str);
+        auto s = Io::SScan(str);
         return parse(s);
     }
 };
@@ -105,7 +105,7 @@ union Ip6 {
 struct Ip : public Var<Ip4, Ip6> {
     using Var<Ip4, Ip6>::Var;
 
-    static Res<Ip> parse(Text::Scan &s) {
+    static Res<Ip> parse(Io::SScan &s) {
         auto maybeV6 = Ip6::parse(s);
 
         if (maybeV6) {
@@ -122,7 +122,7 @@ struct Ip : public Var<Ip4, Ip6> {
     }
 
     static Res<Ip> parse(Str str) {
-        auto s = Text::Scan(str);
+        auto s = Io::SScan(str);
         return parse(s);
     }
 };
@@ -134,7 +134,7 @@ struct SocketAddr {
     SocketAddr(Ip addr, u16 port)
         : addr(addr), port(port) {}
 
-    static Res<SocketAddr> parse(Text::Scan &s) {
+    static Res<SocketAddr> parse(Io::SScan &s) {
         auto addr = try$(Ip::parse(s));
 
         if (not s.skip(':')) {

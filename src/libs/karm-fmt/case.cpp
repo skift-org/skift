@@ -1,4 +1,4 @@
-#include <karm-text/expr.h>
+#include <karm-io/expr.h>
 
 #include "case.h"
 
@@ -66,7 +66,7 @@ static auto sep() {
 
 Res<String> toNoCase(Str str) {
     Io::StringWriter writer;
-    Text::Scan scan{str};
+    Io::SScan scan{str};
     bool wasLower = false;
 
     scan.eat(sep());
@@ -103,7 +103,7 @@ Res<String> toParamCase(Str str) {
 Res<String> toPascalCase(Str str) {
     bool first = true;
     Io::StringWriter writer;
-    Text::Scan scan{str};
+    Io::SScan scan{str};
 
     scan.eat(sep());
 
@@ -171,7 +171,7 @@ Res<String> toTitleCase(Str str) {
 
 Res<String> toSwapCase(Str str) {
     Io::StringWriter writer;
-    Text::Scan scan{str};
+    Io::SScan scan{str};
 
     while (not scan.ended()) {
         auto c = scan.next();
@@ -190,7 +190,7 @@ Res<String> toSwapCase(Str str) {
 
 Res<String> toLowerCase(Str str) {
     Io::StringWriter writer;
-    Text::Scan scan{str};
+    Io::SScan scan{str};
 
     while (not scan.ended()) {
         auto c = scan.next();
@@ -217,7 +217,7 @@ Res<String> toLowerFirstCase(Str str) {
 
 Res<String> toUpperCase(Str str) {
     Io::StringWriter writer;
-    Text::Scan scan{str};
+    Io::SScan scan{str};
 
     while (not scan.ended()) {
         auto c = scan.next();

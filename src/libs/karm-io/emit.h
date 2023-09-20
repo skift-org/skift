@@ -5,7 +5,7 @@
 #include <karm-io/funcs.h>
 #include <karm-io/traits.h>
 
-namespace Karm::Text {
+namespace Karm::Io {
 
 struct Emit : public Io::TextWriterBase<> {
     Io::TextWriter &_writer;

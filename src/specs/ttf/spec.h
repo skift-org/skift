@@ -116,7 +116,7 @@ struct Font {
 
     /* --- Parsing Api ------------------------------------------------------ */
 
-    BScan begin() const {
+    Io::BScan begin() const {
         return _slice;
     }
 

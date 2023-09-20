@@ -12,7 +12,7 @@ struct NumberFormater {
     usize width = 0;
     bool fillZero = false;
 
-    void parse(Text::Scan &scan) {
+    void parse(Io::SScan &scan) {
         if (scan.ended()) {
             return;
         }

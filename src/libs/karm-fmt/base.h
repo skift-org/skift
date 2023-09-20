@@ -2,8 +2,8 @@
 
 #include <karm-base/tuple.h>
 #include <karm-io/impls.h>
+#include <karm-io/sscan.h>
 #include <karm-io/traits.h>
-#include <karm-text/scan.h>
 
 namespace Karm::Fmt {
 
@@ -13,7 +13,7 @@ struct Formatter;
 struct _Args {
     virtual ~_Args() = default;
     virtual usize len() = 0;
-    virtual Res<usize> format(Text::Scan &scan, Io::TextWriter &writer, usize index) = 0;
+    virtual Res<usize> format(Io::SScan &scan, Io::TextWriter &writer, usize index) = 0;
 };
 
 template <typename... Ts>
@@ -24,7 +24,7 @@ struct Args : public _Args {
 
     usize len() override { return _tuple.len(); }
 
-    Res<usize> format(Text::Scan &scan, Io::TextWriter &writer, usize index) override {
+    Res<usize> format(Io::SScan &scan, Io::TextWriter &writer, usize index) override {
         Res<usize> result = Error("format index out of range");
         usize i = 0;
         _tuple.visit([&](auto const &t) {
@@ -45,7 +45,7 @@ struct Args : public _Args {
 };
 
 inline Res<usize> _format(Io::TextWriter &writer, Str format, _Args &args) {
-    Text::Scan scan{format};
+    Io::SScan scan{format};
     usize written = 0;
     usize index = 0;
 
@@ -59,7 +59,7 @@ inline Res<usize> _format(Io::TextWriter &writer, Str format, _Args &args) {
                 scan.next();
             }
             scan.next();
-            Text::Scan inner{scan.end()};
+            Io::SScan inner{scan.end()};
             written += try$(args.format(inner, writer, index));
             index++;
         } else if (c == '\n') {
@@ -91,10 +91,10 @@ template <typename T>
 inline Res<String> toStr(Str format, T const &t) {
     Io::StringWriter writer{};
     Formatter<T> formatter;
-    if constexpr (requires(Text::Scan &scan) {
+    if constexpr (requires(Io::SScan &scan) {
                       formatter.parse(scan);
                   }) {
-        Text::Scan scan{format};
+        Io::SScan scan{format};
         formatter.parse(scan);
     }
     try$(formatter.format(writer, t));

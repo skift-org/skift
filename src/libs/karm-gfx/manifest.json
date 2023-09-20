@@ -6,6 +6,6 @@
     "requires": [
         "karm-media",
         "karm-math",
-        "karm-text"
+        "karm-io"
     ]
 }

@@ -11,10 +11,9 @@
 #include <karm-base/vec.h>
 #include <karm-gfx/buffer.h>
 #include <karm-gfx/colors.h>
+#include <karm-io/bscan.h>
+#include <karm-io/emit.h>
 #include <karm-logger/logger.h>
-#include <karm-text/emit.h>
-
-#include "../bscan.h"
 
 namespace Jpeg {
 
@@ -123,12 +122,12 @@ inline constexpr Array<usize, 64> ZIGZAG = {
 /* --- Bit Stream ----------------------------------------------------------- */
 
 struct BitStream {
-    BScan &s;
+    Io::BScan &s;
 
     u8 _buf = 0x0;
     u8 _len = 0x0;
 
-    ALWAYS_INLINE BitStream(BScan &s) : s(s) {}
+    ALWAYS_INLINE BitStream(Io::BScan &s) : s(s) {}
 
     ALWAYS_INLINE void reset() {
         _buf = 0x0;
@@ -195,7 +194,7 @@ struct Image {
         }
 
         Image image{};
-        BScan s{slice};
+        Io::BScan s{slice};
 
         bool reachedEoi = false;
         bool expectSoi = true;
@@ -255,7 +254,7 @@ struct Image {
         return Ok(image);
     };
 
-    void skipMarker(BScan &s) {
+    void skipMarker(Io::BScan &s) {
         u16 len = s.nextU16be();
         s.skip(len - 2);
     }
@@ -266,11 +265,11 @@ struct Image {
     Array<Opt<Quant>, 4> _quant;
     bool _quirkZeroBased = false;
 
-    Res<> defineQuantizationTable(BScan &x) {
+    Res<> defineQuantizationTable(Io::BScan &x) {
         // logDebug("jpeg: defining quantization table");
 
         u16 len = x.nextU16be();
-        BScan s = x.nextBytes(len - 2);
+        Io::BScan s = x.nextBytes(len - 2);
 
         while (not s.ended()) {
             Byte infos = s.nextU8be();
@@ -315,11 +314,11 @@ struct Image {
     Array<Opt<Component>, 4> _components;
     usize _componentCount = 0;
 
-    Res<> startOfFrame(BScan &x) {
+    Res<> startOfFrame(Io::BScan &x) {
         // logDebug("jpeg: start of frame");
 
         u16 len = x.nextU16be();
-        BScan s = x.nextBytes(len - 2);
+        Io::BScan s = x.nextBytes(len - 2);
 
         u8 precision = s.nextU8be();
         if (precision != 8) {
@@ -377,11 +376,11 @@ struct Image {
 
     usize _restartInterval = 0;
 
-    Res<> defineRestartInterval(BScan &x) {
+    Res<> defineRestartInterval(Io::BScan &x) {
         // logDebug("jpeg: defining restart interval");
 
         u16 len = x.nextU16be();
-        BScan s = x.nextBytes(len - 2);
+        Io::BScan s = x.nextBytes(len - 2);
 
         _restartInterval = s.nextU16be();
 
@@ -434,11 +433,11 @@ struct Image {
     Array<Opt<HuffmanTable>, 4> _dcHuff;
     Array<Opt<HuffmanTable>, 4> _acHuff;
 
-    Res<> defineHuffmanTable(BScan &x) {
+    Res<> defineHuffmanTable(Io::BScan &x) {
         // logDebug("jpeg: defining huffman table");
 
         u16 len = x.nextU16be();
-        BScan s = x.nextBytes(len - 2);
+        Io::BScan s = x.nextBytes(len - 2);
 
         while (not s.ended()) {
             Byte infos = s.nextU8be();
@@ -484,7 +483,7 @@ struct Image {
     u8 _ah = 0;
     u8 _al = 0;
 
-    Res<> startOfScan(BScan &x) {
+    Res<> startOfScan(Io::BScan &x) {
         // logDebug("jpeg: start of scan");
 
         if (_componentCount == 0) {
@@ -493,7 +492,7 @@ struct Image {
         }
 
         u16 len = x.nextU16be();
-        BScan s = x.nextBytes(len - 2);
+        Io::BScan s = x.nextBytes(len - 2);
 
         u8 componentCount = s.nextU8be();
         if (componentCount != _componentCount) {
@@ -570,7 +569,7 @@ struct Image {
 
     Vec<Mcu> _mcus;
 
-    Res<> decodeHuffman(BScan &s) {
+    Res<> decodeHuffman(Io::BScan &s) {
         _mcus.resize(mcuWidth() * mcuHeight() * _componentCount);
 
         Array<isize, 3> prevDc = {};
@@ -866,7 +865,7 @@ struct Image {
 
     /* --- Dumping ---------------------------------------------------------- */
 
-    void dump(Text::Emit &e) {
+    void dump(Io::Emit &e) {
         e("JPEG image");
         e.indentNewline();
         e.ln("width: {}", width());

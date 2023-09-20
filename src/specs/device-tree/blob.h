@@ -1,8 +1,8 @@
 #pragma once
 
 #include <karm-base/res.h>
+#include <karm-io/bscan.h>
 
-#include "../bscan.h"
 #include "karm-base/slice.h"
 
 namespace DeviceTree {
@@ -31,7 +31,7 @@ struct Blob {
     Bytes _slice;
 
     static Res<Blob> load(Bytes bytes) {
-        BScan scan{bytes};
+        Io::BScan scan{bytes};
         auto magic = scan.nextU32be();
 
         if (magic != MAGIC) {
@@ -47,7 +47,7 @@ struct Blob {
         return Ok(Blob{bytes});
     }
 
-    BScan begin() const { return _slice; }
+    Io::BScan begin() const { return _slice; }
 
     Header header() const {
         Header h{};

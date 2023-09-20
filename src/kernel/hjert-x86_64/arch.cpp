@@ -6,8 +6,8 @@
 #include <hjert-core/space.h>
 #include <hjert-core/syscalls.h>
 #include <hjert-core/task.h>
+#include <karm-base/witty.h>
 #include <karm-logger/logger.h>
-#include <karm-text/witty.h>
 
 #include <hal-x86_64/com.h>
 #include <hal-x86_64/cpuid.h>
@@ -162,7 +162,7 @@ void kPanic(Frame &frame) {
     logPrint("");
     logPrint("    {}", Cli::styled("Kernel Panic", Cli::style(Cli::RED).bold()));
     logPrint("    kernel cause a '{}'", _faultMsg[frame.intNo]);
-    logPrint("    {}", Cli::styled(Text::witty(frame.rsp + frame.rip), Cli::GRAY_DARK));
+    logPrint("    {}", Cli::styled(witty(frame.rsp + frame.rip), Cli::GRAY_DARK));
     logPrint("");
     logPrint("    {}", Cli::styled("Registers", Cli::WHITE));
     logPrint("    int={}", frame.intNo);

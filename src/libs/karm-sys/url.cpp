@@ -4,7 +4,7 @@ namespace Karm::Sys {
 
 /* --- Path ----------------------------------------------------------------- */
 
-Path Path::parse(Text::Scan &s, bool inUrl) {
+Path Path::parse(Io::SScan &s, bool inUrl) {
     Path path;
 
     if (s.skip(SEP)) {
@@ -31,7 +31,7 @@ Path Path::parse(Text::Scan &s, bool inUrl) {
 }
 
 Path Path::parse(Str str, bool inUrl) {
-    Text::Scan s{str};
+    Io::SScan s{str};
     return parse(s, inUrl);
 }
 
@@ -117,7 +117,7 @@ static auto const COMPONENT = Re::chain(
             Re::alnum(),
             Re::single('+', '.', '-'))));
 
-Url Url::parse(Text::Scan &s) {
+Url Url::parse(Io::SScan &s) {
     Url url;
 
     url.scheme = s.token(COMPONENT);
@@ -152,12 +152,12 @@ Url Url::parse(Text::Scan &s) {
 }
 
 Url Url::parse(Str str) {
-    Text::Scan s{str};
+    Io::SScan s{str};
     return parse(s);
 }
 
 bool Url::isUrl(Str str) {
-    Text::Scan s{str};
+    Io::SScan s{str};
 
     return s.skip(COMPONENT) and
            s.skip(':');

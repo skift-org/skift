@@ -2,13 +2,12 @@
 
 #include <karm-base/string.h>
 #include <karm-gfx/context.h>
+#include <karm-io/bscan.h>
 #include <karm-logger/logger.h>
-
-#include "../bscan.h"
 
 namespace Png {
 
-struct Ihdr : public BChunk {
+struct Ihdr : public Io::BChunk {
     static constexpr Str SIG = "IHDR";
 
     Math::Vec2i size() {
@@ -40,15 +39,15 @@ struct Ihdr : public BChunk {
     }
 };
 
-struct Plte : public BChunk {
+struct Plte : public Io::BChunk {
     static constexpr Str SIG = "PLTE";
 };
 
-struct Idat : public BChunk {
+struct Idat : public Io::BChunk {
     static constexpr Str SIG = "IDAT";
 };
 
-struct Iend : public BChunk {
+struct Iend : public Io::BChunk {
     static constexpr Str SIG = "IEND";
 };
 
@@ -87,7 +86,7 @@ struct Image {
     Image(Bytes slice)
         : _slice(slice) {}
 
-    BScan begin() const {
+    Io::BScan begin() const {
         return _slice;
     }
 

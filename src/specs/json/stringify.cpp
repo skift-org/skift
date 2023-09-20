@@ -2,7 +2,7 @@
 
 namespace Json {
 
-Res<> stringify(Text::Emit &emit, Value const &v) {
+Res<> stringify(Io::Emit &emit, Value const &v) {
     return v.visit(
         Visitor{
             [&](None) -> Res<> {
@@ -77,7 +77,7 @@ Res<> stringify(Text::Emit &emit, Value const &v) {
 
 Res<String> stringify(Value const &v) {
     Io::StringWriter sw;
-    Text::Emit emit{sw};
+    Io::Emit emit{sw};
     try$(stringify(emit, v));
     return Ok(sw.take());
 }

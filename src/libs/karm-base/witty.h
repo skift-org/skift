@@ -2,10 +2,10 @@
 
 #include <karm-base/string.h>
 
-namespace Karm::Text {
+namespace Karm {
 
 Str witty(usize seed);
 
 Str nice(usize seed);
 
-} // namespace Karm::Text
+} // namespace Karm

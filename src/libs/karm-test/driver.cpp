@@ -1,10 +1,10 @@
+#include <karm-base/witty.h>
 #include <karm-cli/cursor.h>
 #include <karm-cli/spinner.h>
 #include <karm-cli/style.h>
 #include <karm-fmt/case.h>
 #include <karm-sys/chan.h>
 #include <karm-sys/time.h>
-#include <karm-text/witty.h>
 
 #include "driver.h"
 #include "test.h"
@@ -48,13 +48,13 @@ void Driver::runAll() {
     if (failed) {
         Sys::errln(" ❌ {} failled - {}",
                    Cli::styled(failed, RED),
-                   Cli::styled(Text::witty(Sys::now().val()), NOTE));
+                   Cli::styled(witty(Sys::now().val()), NOTE));
         Sys::errln("    {} passed",
                    Cli::styled(passed, GREEN));
     } else {
         Sys::errln(" 🤘 {} passed - {}",
                    Cli::styled(passed, GREEN),
-                   Cli::styled(Text::nice(Sys::now().val()), NOTE));
+                   Cli::styled(nice(Sys::now().val()), NOTE));
     }
 }
 

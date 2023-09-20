@@ -3,12 +3,11 @@
 #include <karm-base/res.h>
 #include <karm-gfx/buffer.h>
 #include <karm-gfx/colors.h>
-
-#include "../bscan.h"
+#include <karm-io/bscan.h>
 
 namespace Qoi {
 
-struct Image : public BChunk {
+struct Image : public Io::BChunk {
     // magic "qoif"
     static constexpr Array<u8, 4> MAGIC = {
         0x71, 0x6F, 0x69, 0x66};
@@ -16,10 +15,10 @@ struct Image : public BChunk {
     static constexpr Array<u8, 8> END = {
         0, 0, 0, 0, 0, 0, 0, 1};
 
-    using Width = BField<i32be, 4>;
-    using Height = BField<i32be, 8>;
-    using Channels = BField<u8be, 12>;
-    using ColorSpace = BField<u8be, 13>;
+    using Width = Io::BField<i32be, 4>;
+    using Height = Io::BField<i32be, 8>;
+    using Channels = Io::BField<u8be, 12>;
+    using ColorSpace = Io::BField<u8be, 13>;
 
     Bytes magic() const { return begin().nextBytes(4); }
 

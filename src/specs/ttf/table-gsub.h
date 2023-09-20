@@ -4,12 +4,12 @@
 
 namespace Ttf {
 
-struct Gsub : public BChunk {
+struct Gsub : public Io::BChunk {
     static constexpr Str SIG = "GSUB";
 
-    using ScriptListOffset = BField<u16be, 4>;
-    using FeatureListOffset = BField<u16be, 6>;
-    using LookupListOffset = BField<u16be, 8>;
+    using ScriptListOffset = Io::BField<u16be, 4>;
+    using FeatureListOffset = Io::BField<u16be, 6>;
+    using LookupListOffset = Io::BField<u16be, 8>;
 
     ScriptList scriptList() const {
         return ScriptList{begin().skip(get<ScriptListOffset>()).restBytes()};

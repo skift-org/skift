@@ -1,6 +1,6 @@
 #include "witty.h"
 
-namespace Karm::Text {
+namespace Karm {
 
 static Array WITTY = {
     "Witty comment unavailable :(",
@@ -156,4 +156,4 @@ Str nice(usize seed) {
     return NICE[seed % NICE.len()];
 }
 
-} // namespace Karm::Text
+} // namespace Karm

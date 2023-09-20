@@ -381,14 +381,14 @@ void Path::ellipse(Math::Ellipsef ellipse) {
 
 /* --- Svg -------------------------------------------------------------- */
 
-Opt<Math::Vec2f> _nextVec2f(Text::Scan &scan) {
+Opt<Math::Vec2f> _nextVec2f(Io::SScan &scan) {
     return Math::Vec2f{
         try$(scan.nextFloat()),
         try$(scan.nextFloat()),
     };
 }
 
-Opt<Path::Op> Path::parseOp(Text::Scan &scan, Rune opcode) {
+Opt<Path::Op> Path::parseOp(Io::SScan &scan, Rune opcode) {
     Flags flags{};
     flags |= islower(opcode) ? RELATIVE : DEFAULT;
     opcode = tolower(opcode);
@@ -457,7 +457,7 @@ Opt<Path::Op> Path::parseOp(Text::Scan &scan, Rune opcode) {
 }
 
 bool Path::evalSvg(Str svg) {
-    Text::Scan scan{svg};
+    Io::SScan scan{svg};
 
     Rune opcode{};
     while ((opcode = scan.next())) {

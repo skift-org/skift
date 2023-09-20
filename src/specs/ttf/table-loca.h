@@ -4,7 +4,7 @@
 
 namespace Ttf {
 
-struct Loca : public BChunk {
+struct Loca : public Io::BChunk {
     static constexpr Str SIG = "loca";
 
     usize glyfOffset(isize glyphId, Head const &head) const {

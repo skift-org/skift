@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../bscan.h"
+#include <karm-io/bscan.h>
 
 namespace Ttf {
 
-struct Maxp : public BChunk {
+struct Maxp : public Io::BChunk {
     static constexpr Str SIG = "maxp";
 
     u16 numGlyphs() const {

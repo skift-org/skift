@@ -4,6 +4,7 @@
 #include <karm-main/main.h>
 
 #include "cmos.h"
+#include "io.h"
 #include "ps2.h"
 
 namespace Dev {

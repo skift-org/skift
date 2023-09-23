@@ -84,7 +84,7 @@ union Edge {
     }
 
     constexpr bool degenerated() const {
-        return Op::eq(start, end);
+        return start == end;
     }
 };
 

@@ -1,6 +1,5 @@
 #include <karm-io/funcs.h>
 #include <karm-logger/logger.h>
-
 #include <karm-sys/_embed.h>
 
 /* Posix Stuff*/
@@ -78,9 +77,9 @@ struct PosixFd : public Sys::Fd {
 
 Res<Sys::Path> resolve(Sys::Url url) {
     Sys::Path resolved;
-    if (Op::eq(url.scheme, "file")) {
+    if (url.scheme == "file") {
         resolved = url.path;
-    } else if (Op::eq(url.scheme, "bundle")) {
+    } else if (url.scheme == "bundle") {
         auto *maybeRepo = getenv("CK_BUILDDIR");
 
         if (not maybeRepo)

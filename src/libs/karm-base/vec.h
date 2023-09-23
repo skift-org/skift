@@ -47,7 +47,7 @@ struct _Vec {
         bool changed = false;
 
         for (usize i = 1; i < _buf.len() + 1; i++) {
-            if (Op::eq(_buf[i - 1], val)) {
+            if (_buf[i - 1] == val) {
                 _buf.removeAt(i - 1);
                 changed = true;
                 i--;

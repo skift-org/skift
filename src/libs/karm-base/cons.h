@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ordr.h"
 #include "std.h"
 
 namespace Karm {
@@ -13,10 +12,9 @@ struct Cons {
     Car car;
     Cdr cdr;
 
-    constexpr Ordr cmp(Cons const &other) const {
-        return cmp(car, other.car) |
-               cmp(cdr, other.cdr);
-    }
+    auto operator<=>(Cons const &) const
+        requires Meta::Comparable<Car> and Meta::Comparable<Cdr>
+    = default;
 
     constexpr auto const &get(bool cond) const {
         return cond ? cdr : car;

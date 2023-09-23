@@ -1,7 +1,6 @@
 #pragma once
 
 #include <karm-base/macros.h>
-#include <karm-base/ordr.h>
 
 #include "driver.h"
 #include "test.h"
@@ -19,25 +18,25 @@ namespace Karm::Test {
         auto __lhs = (LHS);                             \
         auto __rhs = (RHS);                             \
                                                         \
-        if (not Op::OP(__lhs, __rhs)) {                 \
+        if (not((__lhs)OP(__rhs))) {                    \
             return _driver.unexpect(__lhs, __rhs, #OP); \
         }                                               \
     })
 
-#define expect$(EXPR) __expect$(EXPR, true, eq)
+#define expect$(EXPR) __expect$(EXPR, true, ==)
 
-#define expectNot$(EXPR) __expect$(EXPR, true, ne)
+#define expectNot$(EXPR) __expect$(EXPR, true, !=)
 
-#define expectEq$(LHS, RHS) __expect$(LHS, RHS, eq)
+#define expectEq$(LHS, RHS) __expect$(LHS, RHS, ==)
 
-#define expectNe$(LHS, RHS) __expect$(LHS, RHS, ne)
+#define expectNe$(LHS, RHS) __expect$(LHS, RHS, !=)
 
-#define expectLt$(LHS, RHS) __expect$(LHS, RHS, lt)
+#define expectLt$(LHS, RHS) __expect$(LHS, RHS, <)
 
-#define expectGt$(LHS, RHS) __expect$(LHS, RHS, gt)
+#define expectGt$(LHS, RHS) __expect$(LHS, RHS, >)
 
-#define expectLteq$(LHS, RHS) __expect$(LHS, RHS, lteq)
+#define expectLteq$(LHS, RHS) __expect$(LHS, RHS, <=)
 
-#define expectGteq$(LHS, RHS) __expect$(LHS, RHS, gteq)
+#define expectGteq$(LHS, RHS) __expect$(LHS, RHS, >=)
 
 } // namespace Karm::Test

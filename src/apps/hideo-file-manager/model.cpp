@@ -31,7 +31,7 @@ State reduce(State d, Actions action) {
             return reduce(d, GoTo{dest});
         },
         [&](GoTo gotTo) {
-            if (Op::eq(d.currentUrl(), gotTo.url)) {
+            if (d.currentUrl() == gotTo.url) {
                 return d;
             }
 

@@ -223,11 +223,8 @@ struct Image {
 
     Opt<Section> sectionByName(Str name) {
         for (auto &section : sections()) {
-            Str n = section.name();
-
-            if (Op::eq(n, name)) {
+            if (section.name() == name)
                 return section;
-            }
         }
 
         return NONE;

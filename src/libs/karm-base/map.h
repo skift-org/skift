@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cons.h"
-#include "ordr.h"
 #include "std.h"
 #include "vec.h"
 
@@ -18,7 +17,7 @@ struct Map {
 
     void put(K const &key, V const &value) {
         for (auto &i : ::mutIter(_els)) {
-            if (Op::eq(i.car, key)) {
+            if (i.car == key) {
                 i.cdr = value;
                 return;
             }
@@ -29,7 +28,7 @@ struct Map {
 
     Opt<V> get(K const &key) const {
         for (auto &i : _els) {
-            if (Op::eq(i.car, key)) {
+            if (i.car == key) {
                 return i.cdr;
             }
         }

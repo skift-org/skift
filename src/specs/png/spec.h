@@ -67,13 +67,13 @@ struct Image {
     }
 
     static bool isPng(Bytes slice) {
-        return slice.len() >= 8 and Op::eq(sub(slice, 0, 8), bytes(SIG));
+        return slice.len() >= 8 and sub(slice, 0, 8) == SIG;
     }
 
     static Res<Image> load(Bytes slice) {
         Image image{slice};
 
-        if (not Op::eq(image.sig(), bytes(SIG)))
+        if (image.sig() == SIG)
             return Error::invalidData("invalid signature");
 
         image._ihdr = image.lookupChunk<Ihdr>();
@@ -109,7 +109,7 @@ struct Image {
             c.data = s.nextBytes(c.len);
             c.crc32 = s.nextI32be();
 
-            if (Op::eq(c.sig, Iend::SIG)) {
+            if (c.sig == Iend::SIG) {
                 return NONE;
             }
 
@@ -120,7 +120,7 @@ struct Image {
     template <typename T>
     T lookupChunk() {
         for (auto chunk : iterChunks()) {
-            if (Op::eq(chunk.sig, T::SIG)) {
+            if (chunk.sig == T::SIG) {
                 return T{chunk.data};
             }
         }

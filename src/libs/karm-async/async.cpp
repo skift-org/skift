@@ -77,7 +77,7 @@ Res<TimeStamp> Loop::poll() {
 
         auto ts = try$(source->poll(*sink));
 
-        if (Op::lt(ts, until))
+        if (ts < until)
             until = ts;
     }
 

@@ -180,7 +180,7 @@ struct List {
 
         auto *n = _head;
         while (n) {
-            if (Op::eq(n->buf, elem)) {
+            if (n->buf == elem) {
                 if (n == _head) {
                     _head = _head->next;
                     if (_head) {

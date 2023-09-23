@@ -2,7 +2,6 @@
 
 #include "clamp.h"
 #include "opt.h"
-#include "ordr.h"
 
 namespace Karm {
 
@@ -215,7 +214,7 @@ struct Iter {
         Item result = NONE;
 
         for (auto item = next(); item; item = next()) {
-            if (not result or Op::lt(*item, *result)) {
+            if (not result or (*item < *result)) {
                 result = item;
             }
         }
@@ -227,7 +226,7 @@ struct Iter {
         Item result = NONE;
 
         for (auto item = next(); item; item = next()) {
-            if (not result or Op::gt(*item, *result)) {
+            if (not result or (*item > *result)) {
                 result = item;
             }
         }

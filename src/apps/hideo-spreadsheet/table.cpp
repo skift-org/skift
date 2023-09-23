@@ -68,7 +68,7 @@ struct Table : public Ui::View<Table> {
                         auto sel = *_state->selection;
                         sel.end = *cell;
 
-                        if (Op::ne(*_state->selection, sel)) {
+                        if (*_state->selection != sel) {
                             Model::dispatch(*this, UpdateSelection{sel});
                         }
                     }

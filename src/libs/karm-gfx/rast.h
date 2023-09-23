@@ -92,7 +92,7 @@ struct Rast {
                     continue;
 
                 sort(_active, [](auto const &a, auto const &b) {
-                    return cmp(a.x, b.x);
+                    return a.x <=> b.x;
                 });
 
                 isize rule = 0;

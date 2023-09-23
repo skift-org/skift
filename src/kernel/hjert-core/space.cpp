@@ -24,7 +24,7 @@ Space::~Space() {
 Res<usize> Space::_lookup(Hal::VmmRange vrange) {
     for (usize i = 0; i < _maps.len(); i++) {
         auto &map = _maps[i];
-        if (Op::eq(map.vrange, vrange)) {
+        if (map.vrange == vrange) {
             return Ok(i);
         }
     }

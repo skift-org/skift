@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/ordr.h>
+#include <karm-base/std.h>
 
 namespace Efi {
 
@@ -10,12 +10,7 @@ struct Guid {
     u16 c{};
     u8 d[8]{};
 
-    Ordr cmp(Guid const &other) const {
-        return ::cmp(a, other.a) |
-               ::cmp(b, other.b) |
-               ::cmp(c, other.c) |
-               ::cmp(d, other.d);
-    }
+    auto operator<=>(Guid const &) const = default;
 };
 
 } // namespace Efi

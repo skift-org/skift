@@ -50,9 +50,7 @@ struct Key {
 
     Code _code;
 
-    Key() = default;
-
-    Key(Code code)
+    Key(Code code = Code::INVALID)
         : _code(code) {}
 
     Str name() const {
@@ -66,16 +64,14 @@ struct Key {
         return "INVALID";
     }
 
-    Ordr cmp(Key const &other) const {
-        return Karm::cmp(_code, other._code);
-    }
-
-    Ordr cmp(Code const &other) const {
-        return Karm::cmp(_code, other);
-    }
-
     Code code() {
         return _code;
+    }
+
+    auto operator<=>(Key const &other) const = default;
+
+    auto operator<=>(Code const &other) const {
+        return _code <=> other;
     }
 };
 

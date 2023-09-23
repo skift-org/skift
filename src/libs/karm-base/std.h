@@ -3,6 +3,7 @@
 // clang-format off
 
 #include <coroutine>
+#include <compare>
 #include <initializer_list>
 #include <new>
 #include <utility>

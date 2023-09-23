@@ -39,11 +39,6 @@ struct Path {
 
     Res<String> str() const;
 
-    Ordr cmp(Path const &other) const {
-        return ::cmp(rooted, other.rooted) |
-               ::cmp(_parts, other._parts);
-    }
-
     auto iter() const {
         return ::iter(_parts);
     }
@@ -55,6 +50,8 @@ struct Path {
     auto len() const {
         return _parts.len();
     }
+
+    auto operator<=>(Path const &) const = default;
 };
 
 /* --- Url ------------------------------------------------------------------ */
@@ -90,16 +87,6 @@ struct Url {
 
     Res<String> str() const;
 
-    Ordr cmp(Url const &other) const {
-        return ::cmp(scheme, other.scheme) |
-               ::cmp(authority, other.authority) |
-               ::cmp(host, other.host) |
-               ::cmp(port, other.port) |
-               ::cmp(path, other.path) |
-               ::cmp(query, other.query) |
-               ::cmp(fragment, other.fragment);
-    }
-
     auto iter() const {
         return path.iter();
     }
@@ -107,6 +94,8 @@ struct Url {
     auto len() const {
         return path.len();
     }
+
+    auto operator<=>(Url const &) const = default;
 };
 
 Res<Url> parseUrlOrPath(Str str);

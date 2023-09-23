@@ -79,7 +79,7 @@ State Task::eval(TimeStamp now) {
         return State::EXITED;
 
     if (_block) {
-        if (Op::gt((*_block)(), now)) {
+        if ((*_block)() == now) {
             return State::BLOCKED;
         }
         _block = NONE;

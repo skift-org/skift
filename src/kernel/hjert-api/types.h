@@ -141,9 +141,7 @@ struct Cap {
         return _raw != 0;
     }
 
-    Ordr cmp(Cap const &other) const {
-        return ::cmp(_raw, other._raw);
-    }
+    std::strong_ordering operator<=>(Cap const &other) const = default;
 };
 
 inline constexpr Cap ROOT = {};

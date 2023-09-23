@@ -130,13 +130,6 @@ struct Color {
 struct Hsv {
     f64 hue, saturation, value;
 
-    ALWAYS_INLINE Ordr cmp(Hsv const &other) const {
-        return hue == other.hue and
-                       saturation == other.saturation and value == other.value
-                   ? Ordr::EQUAL
-                   : Ordr::LESS;
-    }
-
     Hsv withHue(f64 hue) const {
         return {hue, saturation, value};
     }
@@ -148,6 +141,8 @@ struct Hsv {
     Hsv withValue(f64 value) const {
         return {hue, saturation, value};
     }
+
+    auto operator<=>(Hsv const &other) const = default;
 };
 
 Hsv rgbToHsv(Color color);
@@ -157,11 +152,7 @@ Color hsvToRgb(Hsv hsv);
 struct YCbCr {
     f32 y, cb, cr;
 
-    ALWAYS_INLINE Ordr cmp(YCbCr const &other) const {
-        return y == other.y and cb == other.cb and cr == other.cr
-                   ? Ordr::EQUAL
-                   : Ordr::LESS;
-    }
+    auto operator<=>(YCbCr const &other) const = default;
 };
 
 static inline YCbCr rgbToYCbCr(Color color) {

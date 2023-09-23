@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ordr.h"
 #include "rune.h"
 #include "std.h"
 
@@ -33,18 +32,18 @@ struct _Str : public Slice<U> {
 
     constexpr _Str(Sliceable<U> auto const &other)
         : Slice<U>(other.buf(), other.len()) {}
-};
 
-template <StaticEncoding E, typename U = typename E::Unit>
-struct _MutStr : public MutSlice<U> {
-    using Encoding = E;
-    using Unit = U;
-
-    using MutSlice<U>::MutSlice;
-
-    constexpr _MutStr(Unit *cstr)
+    auto operator<=>(Unit const *cstr) const
         requires(Meta::Same<Unit, char>)
-        : MutSlice<U>(cstr, strLen(cstr)) {}
+    {
+        return *this <=> _Str<E>(cstr);
+    }
+
+    auto operator==(Unit const *cstr) const
+        requires(Meta::Same<Unit, char>)
+    {
+        return *this == _Str<E>(cstr);
+    }
 };
 
 template <StaticEncoding E>
@@ -115,15 +114,23 @@ struct _String {
         return {_buf, _len};
     }
 
-    Ordr cmp(char const *other) const {
-        return ::cmp(str(), _Str<E>{other});
-    }
-
     Unit const &operator[](usize i) const { return _buf[i]; }
     Unit &operator[](usize i) { return _buf[i]; }
     Unit const *buf() const { return _buf; }
     Unit *buf() { return _buf; }
     usize len() const { return _len; }
+
+    auto operator<=>(Unit const *cstr) const
+        requires(Meta::Same<Unit, char>)
+    {
+        return str() <=> _Str<E>(cstr);
+    }
+
+    auto operator==(Unit const *cstr) const
+        requires(Meta::Same<Unit, char>)
+    {
+        return str() == _Str<E>(cstr);
+    }
 };
 
 template <
@@ -187,8 +194,6 @@ _String<Target> transcode(_Str<Source> str) {
 }
 
 using Str = _Str<Utf8>;
-
-using MutStr = _MutStr<Utf8>;
 
 using String = _String<Utf8>;
 

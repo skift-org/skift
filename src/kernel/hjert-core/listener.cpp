@@ -10,7 +10,7 @@ Res<> Listener::listen(Hj::Cap cap, Strong<Object> obj, Flags<Hj::Sigs> set, Fla
     ObjectLockScope scope{*this};
 
     for (usize i = 0; i < _listened.len(); ++i) {
-        if (Op::eq(_listened[i].cap, cap)) {
+        if (_listened[i].cap == cap) {
             auto &listened = _listened[i];
             listened.set = set;
             listened.unset = unset;

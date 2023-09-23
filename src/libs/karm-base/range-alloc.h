@@ -14,7 +14,7 @@ struct RangeAlloc {
         for (usize i = 0; i < _r.len(); i++) {
             R curr = _r[i];
 
-            if (Op::eq(curr, range)) {
+            if (curr == range) {
                 _r.removeAt(i);
                 break;
             }

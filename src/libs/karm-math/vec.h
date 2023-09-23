@@ -139,12 +139,16 @@ union Vec2 {
         return {static_cast<U>(x), static_cast<U>(y)};
     }
 
-    constexpr Ordr cmp(Vec2 other) const {
-        return ::cmp(x, other.x) | ::cmp(y, other.y);
-    }
-
     bool hasNan() const {
         return isNan(x) or isNan(y);
+    }
+
+    auto operator<=>(Vec2 const &other) const {
+        return _els <=> other._els;
+    }
+
+    auto operator==(Vec2 const &other) const {
+        return _els == other._els;
     }
 };
 
@@ -315,12 +319,16 @@ union Vec3 {
         };
     }
 
-    constexpr Ordr cmp(Vec3 other) const {
-        return ::cmp(x, other.x) | ::cmp(y, other.y) | ::cmp(z, other.z);
-    }
-
     bool hasNan() const {
         return isNan(x) or isNan(y) or isNan(z);
+    }
+
+    auto operator<=>(Vec3 const &other) const {
+        return _els <=> other._els;
+    }
+
+    auto operator==(Vec3 const &other) const {
+        return _els == other._els;
     }
 };
 
@@ -491,8 +499,12 @@ union Vec4 {
         return isNan(x) or isNan(y) or isNan(z) or isNan(w);
     }
 
-    Ordr cmp(Vec4 other) const {
-        return ::cmp(x, other.x) | ::cmp(y, other.y) | ::cmp(z, other.z) | ::cmp(w, other.w);
+    auto operator<=>(Vec4 const &other) const {
+        return _els <=> other._els;
+    }
+
+    auto operator==(Vec4 const &other) const {
+        return _els == other._els;
     }
 };
 

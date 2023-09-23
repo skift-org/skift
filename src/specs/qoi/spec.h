@@ -43,7 +43,7 @@ struct Image : public Io::BChunk {
         }
 
         auto image = Image(slice);
-        if (Op::ne(image.magic(), bytes(MAGIC))) {
+        if (image.magic() != MAGIC) {
             return Error::invalidData("invalid magic");
         }
 
@@ -125,7 +125,7 @@ struct Image : public Io::BChunk {
             }
         }
 
-        if (Op::ne(s.nextBytes(8), bytes(END))) {
+        if (s.nextBytes(8) != bytes(END)) {
             return Error::invalidData("missing end marker");
         }
 

@@ -99,16 +99,6 @@ struct Range {
         return U{start, size};
     }
 
-    constexpr Ordr cmp(Range const &other) const {
-        if (start == other.start and size == other.size)
-            return Ordr::EQUAL;
-
-        if (start < other.start)
-            return Ordr::LESS;
-
-        return Ordr::GREATER;
-    }
-
     Res<> ensureAligned(T alignment) const {
         if (not isAlign(start, alignment))
             return Error::invalidInput("start is not aligned");
@@ -117,6 +107,20 @@ struct Range {
             return Error::invalidInput("size is not aligned");
 
         return Ok();
+    }
+
+    std::strong_ordering operator<=>(Range const &other) const {
+        if (start == other.start and size == other.size)
+            return std::strong_ordering::equal;
+
+        if (start < other.start)
+            return std::strong_ordering::less;
+
+        return std::strong_ordering::greater;
+    }
+
+    bool operator==(Range const &other) const {
+        return start == other.start and size == other.size;
     }
 };
 

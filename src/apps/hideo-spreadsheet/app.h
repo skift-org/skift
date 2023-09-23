@@ -20,9 +20,7 @@ struct Pos {
     usize row;
     usize col;
 
-    Ordr cmp(Pos const &o) const {
-        return Karm::cmp(row, o.row) | Karm::cmp(col, o.col);
-    }
+    auto operator<=>(Pos const &) const = default;
 };
 
 enum struct Wheight {
@@ -107,27 +105,26 @@ struct Sheet {
     Opt<Pos> cellAt(Math::Vec2i p) const {
         auto row = rowAt(p.y);
         auto col = colAt(p.x);
-        if (row and col) {
+        if (row and col)
             return Pos{*row, *col};
-        }
         return NONE;
     }
 
     Opt<usize> rowAt(i32 y) const {
-        return search(rows, [&](auto const &row) -> Ordr {
+        return search(rows, [&](auto const &row) {
             if (row.y <= y and y < row.y + row.height) {
-                return Ordr::EQUAL;
+                return std::strong_ordering::equal;
             }
-            return cmp(row.y, y);
+            return row.y <=> y;
         });
     }
 
     Opt<usize> colAt(i32 x) const {
-        return search(cols, [&](auto const &col) -> Ordr {
+        return search(cols, [&](auto const &col) {
             if (col.x <= x and x < col.x + col.width) {
-                return Ordr::EQUAL;
+                return std::strong_ordering::equal;
             }
-            return cmp(col.x, x);
+            return col.x <=> x;
         });
     }
 
@@ -153,8 +150,16 @@ struct Range {
         : start(start), end(end) {}
 
     Range normalised() const {
-        return {Pos{min(start.row, end.row), min(start.col, end.col)},
-                Pos{max(start.row, end.row), max(start.col, end.col)}};
+        return {
+            Pos{
+                min(start.row, end.row),
+                min(start.col, end.col),
+            },
+            Pos{
+                max(start.row, end.row),
+                max(start.col, end.col),
+            },
+        };
     }
 
     usize rows() const {
@@ -167,9 +172,7 @@ struct Range {
         return n.end.col - n.start.col + 1;
     }
 
-    Ordr cmp(Range const &other) const {
-        return start.cmp(other.start) | end.cmp(other.end);
-    }
+    auto operator<=>(Range const &) const = default;
 };
 
 struct Book {

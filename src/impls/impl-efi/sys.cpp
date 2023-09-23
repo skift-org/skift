@@ -141,9 +141,11 @@ Res<Strong<Sys::Fd>> createErr() {
 static Opt<Json::Value> _index = NONE;
 
 static Res<Sys::Path> resolve(Sys::Url url) {
-    if (Op::eq(url.scheme, "file")) {
+    if (url.scheme == "file") {
         return Ok(url.path);
-    } else if (Op::eq(url.scheme, "bundle")) {
+    }
+
+    if (url.scheme == "bundle") {
         logInfo("resolving bundle url: {}", url);
         if (not _index) {
             logInfo("no index, loading");

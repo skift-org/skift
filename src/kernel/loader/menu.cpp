@@ -120,13 +120,13 @@ Ui::Child alert(String title, String subtitle) {
 
 void intent(Ui::Node &n, Events::Event &e) {
     if (auto *k = e.is<Events::KeyboardEvent>()) {
-        if (Op::eq(k->key, Events::Key::LEFT)) {
+        if (k->key == Events::Key::LEFT) {
             Ui::dispatchAction<Actions>(n, MoveSelectionAction{-1});
             e.accept();
-        } else if (Op::eq(k->key, Events::Key::RIGHT)) {
+        } else if (k->key == Events::Key::RIGHT) {
             Ui::dispatchAction<Actions>(n, MoveSelectionAction{1});
             e.accept();
-        } else if (Op::eq(k->key, Events::Key::ENTER)) {
+        } else if (k->key == Events::Key::ENTER) {
             Ui::dispatchAction<Actions>(n, SelectAction{});
             e.accept();
         }

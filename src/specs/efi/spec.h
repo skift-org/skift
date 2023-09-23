@@ -168,7 +168,7 @@ struct SystemTable : public Table {
 
     ConfigurationTable *lookupConfigurationTable(Guid const &guid) {
         for (usize i = 0; i < nrConfigurationTables; i++) {
-            if (Op::eq(configurationTable[i].vendorGuid, guid)) {
+            if (configurationTable[i].vendorGuid == guid) {
                 return &configurationTable[i];
             }
         }

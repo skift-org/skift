@@ -4,7 +4,6 @@
 
 #include "lock.h"
 #include "opt.h"
-#include "ordr.h"
 #include "ref.h"
 
 namespace Karm {
@@ -34,10 +33,10 @@ struct _Cell {
             _lock.release();
             delete this;
             return nullptr;
-        } else {
-            _lock.release();
-            return nullptr;
         }
+
+        _lock.release();
+        return nullptr;
     }
 
     _Cell *refStrong() {
@@ -207,13 +206,6 @@ struct Strong {
         return _cell->unwrap<U>();
     }
 
-    constexpr Ordr cmp(Strong const &other) const {
-        if (_cell == other._cell)
-            return Ordr::EQUAL;
-
-        return ::cmp(unwrap(), other.unwrap());
-    }
-
     template <typename U>
     constexpr U *is() {
         if (not _cell)
@@ -238,6 +230,22 @@ struct Strong {
         }
 
         return Strong<U>(MOVE, _cell);
+    }
+
+    auto operator<=>(Strong const &other) const
+        requires Meta::Comparable<T>
+    {
+        if (_cell == other._cell)
+            return _cell <=> other._cell;
+        return unwrap() <=> other.unwrap();
+    }
+
+    auto operator==(Strong const &other) const
+        requires Meta::Equatable<T>
+    {
+        if (_cell == other._cell)
+            return true;
+        return unwrap() == other.unwrap();
     }
 };
 

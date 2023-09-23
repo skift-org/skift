@@ -76,7 +76,7 @@ struct ScriptList : public Io::BChunk {
 
     Res<ScriptTable> lookup(Str tag) {
         for (auto const &script : iter()) {
-            if (Op::eq(script.tag, tag)) {
+            if (script.tag == tag) {
                 return Ok(script);
             }
         }

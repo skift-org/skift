@@ -221,7 +221,7 @@ Ui::Child colorCell(State const &state, Gfx::Color c) {
         Model::bind<UpdateHsv>(hsv),
         Ui::box(
             boxStyle,
-            Op::eq(state.hsv, hsv)
+            state.hsv == hsv
                 ? Ui::icon(Mdi::CHECK, 32, pickColor(c))
                 : Ui::empty(32)));
 }

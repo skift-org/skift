@@ -1,11 +1,11 @@
 #pragma once
 
 #include <karm-meta/callable.h>
+#include <karm-meta/traits.h>
 
 #include "error.h"
 #include "inert.h"
 #include "macros.h"
-#include "ordr.h"
 #include "panic.h"
 #include "std.h"
 #include "try.h"
@@ -213,20 +213,18 @@ struct [[nodiscard]] Opt {
         return {NONE};
     }
 
-    ALWAYS_INLINE Ordr cmp(Opt const &other) const {
-        if (not _present and not other._present) {
-            return Ordr::EQUAL;
-        }
+    std::partial_ordering operator<=>(Opt const &other) const {
+        if constexpr (Meta::Comparable<T>)
+            if (_present and other._present)
+                return _value.unwrap() <=> other._value.unwrap();
+        return std::partial_ordering::unordered;
+    }
 
-        if (not _present) {
-            return Ordr::LESS;
-        }
-
-        if (not other._present) {
-            return Ordr::GREATER;
-        }
-
-        return ::cmp(_value.unwrap(), other._value.unwrap());
+    bool operator==(Opt const &other) const {
+        if constexpr (Meta::Equatable<T>)
+            if (_present and other._present)
+                return _value.unwrap() == other._value.unwrap();
+        return false;
     }
 };
 

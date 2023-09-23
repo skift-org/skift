@@ -38,11 +38,11 @@ Path Path::parse(Str str, bool inUrl) {
 void Path::normalize() {
     Vec<String> parts;
     for (auto part : iter()) {
-        if (Op::eq(part, Str{"."})) {
+        if (part == ".") {
             continue;
         }
 
-        if (Op::eq(part, "..")) {
+        if (part == "..") {
             if (parts.len() > 0) {
                 parts.popBack();
             } else if (not rooted) {

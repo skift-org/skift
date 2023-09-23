@@ -74,27 +74,27 @@ Ui::Child breadcrumbItem(Str text, isize index) {
 }
 
 Mdi::Icon iconForLocation(Str loc) {
-    if (Op::eq(loc, Str{"documents"})) {
+    if (loc == "documents") {
         return Mdi::FILE_DOCUMENT;
     }
 
-    if (Op::eq(loc, Str{"images"})) {
+    if (loc == "images") {
         return Mdi::IMAGE;
     }
 
-    if (Op::eq(loc, Str{"musics"})) {
+    if (loc == "musics") {
         return Mdi::MUSIC;
     }
 
-    if (Op::eq(loc, Str{"videos"})) {
+    if (loc == "videos") {
         return Mdi::FILM;
     }
 
-    if (Op::eq(loc, Str{"downloads"})) {
+    if (loc == "downloads") {
         return Mdi::DOWNLOAD;
     }
 
-    if (Op::eq(loc, Str{"trash"})) {
+    if (loc == "trash") {
         return Mdi::TRASH_CAN;
     }
 
@@ -102,7 +102,7 @@ Mdi::Icon iconForLocation(Str loc) {
 }
 
 Ui::Child breadcrumbRoot(Sys::Url url) {
-    if (Op::eq(url.scheme, "location")) {
+    if (url.scheme == "location") {
         return Ui::button(
             Model::bind<GoRoot>(),
             Ui::ButtonStyle::subtle(),
@@ -110,7 +110,7 @@ Ui::Child breadcrumbRoot(Sys::Url url) {
             url.host);
     }
 
-    if (Op::eq(url.scheme, "device")) {
+    if (url.scheme == "device") {
         return Ui::button(
             Model::bind<GoRoot>(),
             Ui::ButtonStyle::subtle(),
@@ -226,7 +226,10 @@ Ui::Child openFileDialog() {
                             toolbar(d),
                             maybeDir
                                 ? directoryListing(d, maybeDir.unwrap())
-                                : alert(d, "Can't access location", "Failed to open directory."),
+                                : alert(
+                                      d,
+                                      "Can't access location",
+                                      "Failed to open directory."),
                             Ui::separator())),
                     controls));
         });

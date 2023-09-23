@@ -1,7 +1,6 @@
 #pragma once
 
 #include "iter.h"
-#include "ordr.h"
 
 namespace Karm {
 
@@ -28,6 +27,23 @@ concept MutSliceable =
         { t.buf() } -> Meta::Same<U *>;
         { t[0uz] } -> Meta::Same<U &>;
     };
+
+template <Sliceable T, Sliceable U>
+    requires Meta::Comparable<typename T::Inner, typename U::Inner>
+constexpr auto operator<=>(T const &lhs, U const &rhs) {
+    for (usize i = 0; i < min(len(lhs), len(rhs)); i++) {
+        auto result = lhs[i] <=> rhs[i];
+        if (result != 0)
+            return result;
+    }
+    return len(lhs) <=> len(rhs);
+}
+
+template <Sliceable T, Sliceable U>
+    requires Meta::Equatable<typename T::Inner, typename U::Inner>
+constexpr bool operator==(T const &lhs, U const &rhs) {
+    return (lhs <=> rhs) == 0;
+}
 
 template <typename T>
 struct Slice {
@@ -162,11 +178,6 @@ MutBytes mutBytes(S &slice) {
 template <Sliceable S>
 usize sizeOf(S &slice) {
     return slice.len() * sizeof(typename S::Inner);
-}
-
-template <Sliceable LHS, Sliceable RHS>
-constexpr Ordr cmp(LHS const &lhs, RHS const &rhs) {
-    return cmp(lhs.buf(), lhs.len(), rhs.buf(), rhs.len());
 }
 
 template <Sliceable S>
@@ -413,11 +424,11 @@ ALWAYS_INLINE constexpr void sort(MutSliceable auto &slice, auto cmp) {
     auto right = len(slice) - 1;
 
     while (left <= right) {
-        while (cmp(at(slice, left), pivot).isLt()) {
+        while (cmp(at(slice, left), pivot) < 0) {
             left++;
         }
 
-        while (cmp(at(slice, right), pivot).isGt()) {
+        while (cmp(at(slice, right), pivot) > 0) {
             right--;
         }
 
@@ -433,6 +444,12 @@ ALWAYS_INLINE constexpr void sort(MutSliceable auto &slice, auto cmp) {
 
     auto leftSlice = mutSub(slice, left, len(slice));
     sort(leftSlice, cmp);
+}
+
+ALWAYS_INLINE constexpr void sort(MutSliceable auto &slice) {
+    sort(slice, [](auto const &a, auto const &b) {
+        return a <=> b;
+    });
 }
 
 ALWAYS_INLINE Opt<usize> search(Sliceable auto const &slice, auto cmp) {
@@ -456,11 +473,11 @@ ALWAYS_INLINE Opt<usize> search(Sliceable auto const &slice, auto cmp) {
 
         auto result = cmp(at(slice, mid));
 
-        if (result.isEq()) {
+        if (result == 0) {
             return mid;
         }
 
-        if (result.isLt()) {
+        if (result < 0) {
             left = mid + 1;
         } else {
             right = mid - 1;

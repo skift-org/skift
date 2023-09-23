@@ -1,6 +1,7 @@
 #pragma once
 
 #include "_embed.h"
+
 #include "time.h"
 
 namespace Karm::Sys {
@@ -14,7 +15,7 @@ inline Res<> sleep(TimeSpan span) {
 
 inline Res<> sleepUntil(TimeStamp stamp) {
     auto n = now();
-    if (Op::lt(stamp, n))
+    if (stamp < n)
         return Ok();
     return sleep(stamp - n);
 }

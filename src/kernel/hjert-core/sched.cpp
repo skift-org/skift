@@ -53,7 +53,7 @@ void Sched::schedule(TimeSpan span) {
             logInfo("{}: exited", *t);
             _tasks.removeAt(i--);
         } else if (state == State::RUNNABLE and
-                   Op::lteq(t->_sliceEnd, next->_sliceEnd)) {
+                   t->_sliceEnd <= next->_sliceEnd) {
             next = t;
         }
     }

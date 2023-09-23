@@ -50,7 +50,7 @@ Res<> Rtc::init() {
     //       we can still do some sanity checks
     auto dt = DateTime::fromTimeStamp(try$(this->now()));
     logInfo("cmos: rtc date: {}", dt);
-    if (dt.date.year < 2023) {
+    if (dt.date.year < Year{2023}) {
         logWarn("cmos: rtc out of date, make sure to set the correct date");
     }
 

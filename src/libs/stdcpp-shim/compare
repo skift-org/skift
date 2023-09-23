@@ -1,0 +1,126 @@
+#pragma once
+
+#include <cstddef>
+
+namespace std {
+
+enum struct __ord {
+    equivalent = 0,
+    less = -1,
+    greater = 1,
+};
+
+enum struct __ncmp {
+    unordered = 2
+};
+
+struct partial_ordering {
+    explicit constexpr partial_ordering(__ord v)
+        : _value((int)v) {}
+    explicit constexpr partial_ordering(__ncmp v)
+        : _value((int)v) {}
+
+    static const partial_ordering less;
+    static const partial_ordering equivalent;
+    static const partial_ordering greater;
+    static const partial_ordering unordered;
+
+    friend bool operator==(partial_ordering v, nullptr_t) { return v._value == (int)__ord::equivalent; }
+    friend bool operator<(partial_ordering v, nullptr_t) { return v._value == (int)__ord::less; }
+    friend bool operator<=(partial_ordering v, nullptr_t) { return v._value <= 0; }
+    friend bool operator>(partial_ordering v, nullptr_t) { return v._value == (int)__ord::greater; }
+    friend bool operator>=(partial_ordering v, nullptr_t) { return (v._value & 1) == v._value; }
+
+    friend bool operator==(nullptr_t, partial_ordering v) { return v._value == (int)__ord::equivalent; }
+    friend bool operator<(nullptr_t, partial_ordering v) { return v._value == (int)__ord::greater; }
+    friend bool operator<=(nullptr_t, partial_ordering v) { return (v._value & 1) == v._value; }
+    friend bool operator>(nullptr_t, partial_ordering v) { return v._value == (int)__ord::less; }
+    friend bool operator>=(nullptr_t, partial_ordering v) { return v._value <= 0; }
+
+private:
+    int _value;
+};
+
+inline constexpr partial_ordering partial_ordering::less{__ord::less};
+inline constexpr partial_ordering partial_ordering::equivalent{__ord::equivalent};
+inline constexpr partial_ordering partial_ordering::greater{__ord::greater};
+inline constexpr partial_ordering partial_ordering::unordered{__ncmp::unordered};
+
+struct weak_ordering {
+    explicit constexpr weak_ordering(__ord v)
+        : _value{(int)v} {}
+
+    static const weak_ordering less;
+    static const weak_ordering equivalent;
+    static const weak_ordering greater;
+
+    operator partial_ordering() const {
+        return _value == 0  ? partial_ordering::equivalent
+               : _value < 0 ? partial_ordering::less
+                            : partial_ordering::greater;
+    }
+
+    friend bool operator==(weak_ordering v, nullptr_t) { return v._value == 0; }
+    friend bool operator<(weak_ordering v, nullptr_t) { return v._value < 0; }
+    friend bool operator<=(weak_ordering v, nullptr_t) { return v._value <= 0; }
+    friend bool operator>(weak_ordering v, nullptr_t) { return v._value > 0; }
+    friend bool operator>=(weak_ordering v, nullptr_t) { return v._value >= 0; }
+    friend bool operator==(nullptr_t, weak_ordering v) { return 0 == v._value; }
+
+    friend bool operator!=(nullptr_t, weak_ordering v) { return 0 != v._value; }
+    friend bool operator<(nullptr_t, weak_ordering v) { return 0 < v._value; }
+    friend bool operator<=(nullptr_t, weak_ordering v) { return 0 <= v._value; }
+    friend bool operator>(nullptr_t, weak_ordering v) { return 0 > v._value; }
+    friend bool operator>=(nullptr_t, weak_ordering v) { return 0 >= v._value; }
+
+private:
+    int _value;
+};
+
+inline constexpr weak_ordering weak_ordering::less{__ord::less};
+inline constexpr weak_ordering weak_ordering::equivalent{__ord::equivalent};
+inline constexpr weak_ordering weak_ordering::greater{__ord::greater};
+
+struct strong_ordering {
+    explicit constexpr strong_ordering(__ord v)
+        : _value{(int)v} {}
+
+    static const strong_ordering less;
+    static const strong_ordering equal;
+    static const strong_ordering equivalent;
+    static const strong_ordering greater;
+
+    operator partial_ordering() const {
+        return _value == 0  ? partial_ordering::equivalent
+               : _value < 0 ? partial_ordering::less
+                            : partial_ordering::greater;
+    }
+
+    operator weak_ordering() const {
+        return _value == 0  ? weak_ordering::equivalent
+               : _value < 0 ? weak_ordering::less
+                            : weak_ordering::greater;
+    }
+
+    friend bool operator<(strong_ordering v, nullptr_t) { return v._value < 0; }
+    friend bool operator==(strong_ordering v, nullptr_t) { return v._value == 0; }
+    friend bool operator<=(strong_ordering v, nullptr_t) { return v._value <= 0; }
+    friend bool operator>(strong_ordering v, nullptr_t) { return v._value > 0; }
+    friend bool operator>=(strong_ordering v, nullptr_t) { return v._value >= 0; }
+
+    friend bool operator==(nullptr_t, strong_ordering v) { return 0 == v._value; }
+    friend bool operator<(nullptr_t, strong_ordering v) { return 0 < v._value; }
+    friend bool operator<=(nullptr_t, strong_ordering v) { return 0 <= v._value; }
+    friend bool operator>(nullptr_t, strong_ordering v) { return 0 > v._value; }
+    friend bool operator>=(nullptr_t, strong_ordering v) { return 0 >= v._value; }
+
+private:
+    int _value;
+};
+
+inline constexpr strong_ordering strong_ordering::less{__ord::less};
+inline constexpr strong_ordering strong_ordering::equal{__ord::equivalent};
+inline constexpr strong_ordering strong_ordering::equivalent{__ord::equivalent};
+inline constexpr strong_ordering strong_ordering::greater{__ord::greater};
+
+} // namespace std

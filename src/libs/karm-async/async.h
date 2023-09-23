@@ -315,7 +315,7 @@ struct Timer : public Source {
         if (not _active)
             return Ok(TimeStamp::endOfTime());
 
-        if (Op::lt(_next, loop().now())) {
+        if (_next < loop().now()) {
             loop().post<Tick>(sink);
 
             if (not _repeat) {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ordr.h"
 #include "std.h"
 #include "string.h"
 
@@ -119,13 +118,11 @@ struct TimeSpan {
         return _value - other._value;
     }
 
-    constexpr Ordr cmp(TimeSpan other) const {
-        return ::Karm::cmp(_value, other._value);
-    }
-
     constexpr auto val() const {
         return _value;
     }
+
+    auto operator<=>(TimeSpan const &other) const = default;
 };
 
 inline TimeSpan operator"" _us(unsigned long long value) {
@@ -218,13 +215,11 @@ struct TimeStamp {
         return _value - other._value;
     }
 
-    constexpr Ordr cmp(TimeStamp other) const {
-        return ::Karm::cmp(_value, other._value);
-    }
-
     constexpr auto val() const {
         return _value;
     }
+
+    auto operator<=>(TimeStamp const &) const = default;
 };
 
 /* --- Time ----------------------------------------------------------------- */
@@ -262,9 +257,7 @@ struct Day {
         return _raw;
     }
 
-    Ordr cmp(Day other) const {
-        return Karm::cmp(_raw, other._raw);
-    }
+    auto operator<=>(Day const &) const = default;
 };
 
 #define FOREACH_MONTH(MONTH) \
@@ -301,10 +294,6 @@ struct Month {
         return _raw;
     }
 
-    Ordr cmp(Month other) const {
-        return Karm::cmp(_raw, other._raw);
-    }
-
     Month next() const {
         return (_raw + 1) % 12;
     }
@@ -319,6 +308,8 @@ struct Month {
         }
         return "";
     }
+
+    auto operator<=>(Month const &) const = default;
 };
 
 struct Year {
@@ -333,10 +324,6 @@ struct Year {
 
     constexpr operator isize() const {
         return _raw;
-    }
-
-    Ordr cmp(Year other) const {
-        return Karm::cmp(_raw, other._raw);
     }
 
     Year next() const {
@@ -368,6 +355,8 @@ struct Year {
             return 0;
         }
     }
+
+    auto operator<=>(Year const &) const = default;
 };
 
 /* --- Date ----------------------------------------------------------------- */
@@ -427,13 +416,13 @@ struct Date {
         auto days = span.toDays();
 
         Year year{1970};
-        while (days >= year.days()) {
+        while (days >= usize(year.days())) {
             days -= year.days();
             year = year.next();
         }
 
         Month month{0};
-        while (days >= year.daysIn(month)) {
+        while (days >= usize(year.daysIn(month))) {
             days -= year.daysIn(month);
             month = month.next();
         }
@@ -444,11 +433,11 @@ struct Date {
     TimeStamp toTimeStamp() const {
         usize days{};
 
-        for (u16 y = 1970; y < year; y++) {
+        for (isize y = 1970; y < isize(year); y++) {
             days += Year{y}.isLeap() ? 366 : 365;
         }
 
-        for (u8 m = 0; m < month; m++) {
+        for (isize m = 0; m < isize(month); m++) {
             days += year.daysIn(m);
         }
 
@@ -472,11 +461,7 @@ struct Date {
         return (toTimeStamp() - firstJan.toTimeStamp()).toDays();
     }
 
-    Ordr cmp(Date other) const {
-        return year.cmp(other.year) |
-               month.cmp(other.month) |
-               day.cmp(other.day);
-    }
+    auto operator<=>(Date const &) const = default;
 };
 
 /* --- DateTime ------------------------------------------------------------- */

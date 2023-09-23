@@ -163,32 +163,23 @@ struct Var {
     ALWAYS_INLINE usize index() const { return _index; }
 
     template <Meta::Contains<Ts...> T>
-    ALWAYS_INLINE bool operator==(T const &other) const {
-        return is<T>() and unwrap<T>() == other;
+    std::partial_ordering operator<=>(T const &other) const {
+        if constexpr (Meta::Comparable<T>)
+            if (is<T>())
+                return unwrap<T>() <=> other;
+        return std::partial_ordering::unordered;
     }
 
-    template <Meta::Contains<Ts...> T>
-    ALWAYS_INLINE bool operator!=(T const &other) const {
-        return not(*this == other);
-    }
-
-    template <Meta::Contains<Ts...> T>
-    ALWAYS_INLINE Ordr cmp(T const &other) const {
-        if (is<T>()) {
-            return ::cmp(unwrap<T>(), other);
-        }
-
-        return Ordr::LESS;
-    }
-
-    ALWAYS_INLINE Ordr cmp(Var const &other) const {
-        if (_index == other._index) {
+    std::partial_ordering operator<=>(Var const &other) const {
+        if (_index == other._index)
             return visit([&]<typename T>(T const &ptr) {
-                return ::cmp(ptr, other.unwrap<T>());
+                if constexpr (Meta::Comparable<T>) {
+                    return ptr <=> other.unwrap<T>();
+                } else {
+                    return std::partial_ordering::unordered;
+                }
             });
-        }
-
-        return cmp(_index, other._index);
+        return std::partial_ordering::unordered;
     }
 };
 

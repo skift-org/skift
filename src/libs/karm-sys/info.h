@@ -3,8 +3,7 @@
 #include <karm-base/res.h>
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
-
-#include "url.h"
+#include <url/url.h>
 
 namespace Karm::Sys {
 
@@ -46,8 +45,8 @@ Res<Vec<CpuInfo>> cpusinfo();
 
 struct UserInfo {
     String name;
-    Url home;
-    Url shell;
+    Url::Url home;
+    Url::Url shell;
 };
 
 Res<UserInfo> userinfo();

@@ -24,7 +24,7 @@ void reduce(State &s, Action a) {
             reduce(s, GoTo{parent});
         },
         [&](Navigate navigate) {
-            Sys::Url dest = s.currentUrl();
+            auto dest = s.currentUrl();
             dest.append(navigate.item);
             reduce(s, GoTo{dest});
         },

@@ -1,13 +1,14 @@
 #pragma once
 
-#include <karm-base/panic.h>
+// https://url.spec.whatwg.org/
+
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
 #include <karm-fmt/fmt.h>
 #include <karm-io/expr.h>
 #include <karm-io/sscan.h>
 
-namespace Karm::Sys {
+namespace Url {
 
 /* --- Path ----------------------------------------------------------------- */
 
@@ -100,26 +101,26 @@ struct Url {
 
 Res<Url> parseUrlOrPath(Str str);
 
-} // namespace Karm::Sys
+} // namespace Url
 
 inline auto operator""_path(char const *str, usize len) {
-    return Karm::Sys::Path::parse({str, len});
+    return Url::Path::parse({str, len});
 }
 
 inline auto operator""_url(char const *str, usize len) {
-    return Karm::Sys::Url::parse({str, len});
+    return Url::Url::parse({str, len});
 }
 
 template <>
-struct Karm::Fmt::Formatter<Sys::Path> {
-    Res<usize> format(Io::TextWriter &writer, Sys::Path path) {
+struct Karm::Fmt::Formatter<Url::Path> {
+    Res<usize> format(Io::TextWriter &writer, Url::Path path) {
         return path.write(writer);
     }
 };
 
 template <>
-struct Karm::Fmt::Formatter<Sys::Url> {
-    Res<usize> format(Io::TextWriter &writer, Sys::Url url) {
+struct Karm::Fmt::Formatter<Url::Url> {
+    Res<usize> format(Io::TextWriter &writer, Url::Url url) {
         return url.write(writer);
     }
 };

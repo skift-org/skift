@@ -3,15 +3,6 @@
 
 namespace Karm::_Embed {
 
-void debug(char const *buf) {
-    fprintf(stderr, "DEBUG: %s\n", buf);
-}
-
-[[noreturn]] void panic(char const *buf) {
-    fprintf(stderr, "PANIC: %s\n", buf);
-    abort();
-}
-
 void relaxe() {
 #if defined(__x86_64__)
     asm volatile("pause");

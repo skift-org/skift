@@ -1,4 +1,3 @@
-#include <karm-base/panic.h>
 #include <karm-base/std.h>
 
 using InitFunc = void (*)();

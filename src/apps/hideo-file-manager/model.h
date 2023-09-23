@@ -1,18 +1,18 @@
 #pragma once
 
-#include <karm-sys/url.h>
 #include <karm-ui/reducer.h>
+#include <url/url.h>
 
 namespace FileManager {
 
 struct State {
-    Vec<Sys::Url> history;
+    Vec<Url::Url> history;
     usize currentIndex = 0;
 
-    State(Sys::Url path)
+    State(Url::Url path)
         : history({path}) {}
 
-    Sys::Url currentUrl() const {
+    Url::Url currentUrl() const {
         return history[currentIndex];
     }
 
@@ -42,7 +42,7 @@ struct GoParent {
 };
 
 struct GoTo {
-    Sys::Url url;
+    Url::Url url;
 };
 
 struct Navigate {

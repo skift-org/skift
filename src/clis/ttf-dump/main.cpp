@@ -43,7 +43,7 @@ Res<> entryPoint(Ctx &ctx) {
         return Error::invalidInput("Usage: dtb-dump <dtb-file>");
     }
 
-    auto url = try$(Sys::parseUrlOrPath(args[0]));
+    auto url = try$(Url::parseUrlOrPath(args[0]));
     auto file = try$(Sys::File::open(url));
     auto map = try$(Sys::mmap().map(file));
     auto ttf = try$(Ttf::Font::load(map.bytes()));

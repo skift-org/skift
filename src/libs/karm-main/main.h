@@ -16,7 +16,6 @@
 // Some code expect the karm-sys/chan.h to be included.
 #    include <karm-sys/chan.h>
 #elif defined(__ck_sys_efi__)
-#    define EMBED_EFI_MAIN_IMPL
 #    include <impl-efi/main.h>
 #else
 #    error "Unknown system"

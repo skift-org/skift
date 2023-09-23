@@ -1,6 +1,7 @@
 #pragma once
 
-#include "panic.h"
+#include <karm-panic/panic.h>
+
 #include "std.h"
 #include "try.h"
 

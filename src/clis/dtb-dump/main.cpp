@@ -10,7 +10,7 @@ Res<> entryPoint(Ctx &ctx) {
         return Error::invalidInput("Usage: dtb-dump <dtb-file>");
     }
 
-    auto url = try$(Sys::parseUrlOrPath(args[0]));
+    auto url = try$(Url::parseUrlOrPath(args[0]));
     auto dtbFile = try$(Sys::File::open(url));
     auto dtbMem = try$(Sys::mmap().read().map(dtbFile));
     auto dtb = try$(DeviceTree::Blob::load(dtbMem.bytes()));

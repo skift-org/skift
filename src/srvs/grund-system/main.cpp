@@ -6,7 +6,7 @@
 #include <karm-logger/logger.h>
 #include <karm-main/main.h>
 
-Res<> loadService(Ctx &ctx, Sys::Url url) {
+Res<> loadService(Ctx &ctx, Url::Url url) {
     logInfo("system: loading service '{}'...", url);
 
     auto &handover = useHandover(ctx);

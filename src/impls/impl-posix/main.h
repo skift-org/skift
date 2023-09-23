@@ -3,7 +3,11 @@
 #include <karm-main/base.h>
 #include <karm-sys/chan.h>
 
+void __panicHandler(Karm::PanicKind kind, char const *msg);
+
 int main(int argc, char const **argv) {
+    Karm::registerPanicHandler(__panicHandler);
+
     Ctx ctx;
     ctx.add<ArgsHook>(argc, argv);
     Res<> code = entryPoint(ctx);

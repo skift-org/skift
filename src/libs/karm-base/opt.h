@@ -6,7 +6,6 @@
 #include "error.h"
 #include "inert.h"
 #include "macros.h"
-#include "panic.h"
 #include "std.h"
 #include "try.h"
 

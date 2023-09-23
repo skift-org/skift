@@ -1,8 +1,8 @@
-#include <karm-sys/url.h>
 #include <karm-test/macros.h>
+#include <url/url.h>
 
 test$(pathUpDown) {
-    auto path = Sys::Path::parse("/a/b/c/d/e/f");
+    auto path = Url::Path::parse("/a/b/c/d/e/f");
 
     auto up1 = path.parent();
     expectEq$(try$(up1.str()), Str{"/a/b/c/d/e"});

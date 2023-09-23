@@ -6,11 +6,12 @@
 #include <karm-main/base.h>
 #include <karm-sys/chan.h>
 
-#ifdef EMBED_EFI_MAIN_IMPL
+void __panicHandler(Karm::PanicKind kind, char const *msg);
 
 extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable *st) {
     Efi::init(handle, st);
     Abi::Ms::init();
+    Karm::registerPanicHandler(__panicHandler);
 
     (void)Efi::st()->conOut->clearScreen(Efi::st()->conOut);
 
@@ -29,5 +30,3 @@ extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable *st) {
 
     return EFI_SUCCESS;
 }
-
-#endif // EMBED_EFI_MAIN_IMPL

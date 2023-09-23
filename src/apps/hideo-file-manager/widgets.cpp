@@ -101,7 +101,7 @@ Mdi::Icon iconForLocation(Str loc) {
     return Mdi::FOLDER;
 }
 
-Ui::Child breadcrumbRoot(Sys::Url url) {
+Ui::Child breadcrumbRoot(Url::Url url) {
     if (url.scheme == "location") {
         return Ui::button(
             Model::bind<GoRoot>(),

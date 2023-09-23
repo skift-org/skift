@@ -14,7 +14,6 @@
         "json-spec"
     ],
     "provides": [
-        "karm-base-impl",
         "karm-logger-impl",
         "karm-sys-impl",
         "karm-ui-impl"

@@ -1,6 +1,6 @@
 #include "url.h"
 
-namespace Karm::Sys {
+namespace Url {
 
 /* --- Path ----------------------------------------------------------------- */
 
@@ -213,10 +213,10 @@ Res<Url> parseUrlOrPath(Str str) {
         return Ok(Url::parse(str));
     }
 
-    Sys::Url url;
+    Url url;
     url.scheme = "file";
-    url.path = Sys::Path::parse(str);
+    url.path = Path::parse(str);
     return Ok(url);
 }
 
-} // namespace Karm::Sys
+} // namespace Url

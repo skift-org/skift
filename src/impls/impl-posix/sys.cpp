@@ -1,5 +1,6 @@
 #include <karm-io/funcs.h>
 #include <karm-logger/logger.h>
+
 #include <karm-sys/_embed.h>
 
 /* Posix Stuff*/
@@ -75,8 +76,8 @@ struct PosixFd : public Sys::Fd {
     }
 };
 
-Res<Sys::Path> resolve(Sys::Url url) {
-    Sys::Path resolved;
+Res<Url::Path> resolve(Url::Url url) {
+    Url::Path resolved;
     if (url.scheme == "file") {
         resolved = url.path;
     } else if (url.scheme == "bundle") {
@@ -91,7 +92,7 @@ Res<Sys::Path> resolve(Sys::Url url) {
         auto path = url.path;
         path.rooted = false;
 
-        resolved = Sys::Path::parse(maybeRepo)
+        resolved = Url::Path::parse(maybeRepo)
                        .join(url.host)
                        .join("res")
                        .join(path);
@@ -102,7 +103,7 @@ Res<Sys::Path> resolve(Sys::Url url) {
     return Ok(resolved);
 }
 
-Res<Strong<Sys::Fd>> openFile(Sys::Url url) {
+Res<Strong<Sys::Fd>> openFile(Url::Url url) {
     String str = try$(try$(resolve(url)).str());
     isize fd = ::open(str.buf(), O_RDONLY);
 
@@ -112,7 +113,7 @@ Res<Strong<Sys::Fd>> openFile(Sys::Url url) {
     return Ok(makeStrong<PosixFd>(fd));
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Sys::Url url) {
+Res<Vec<Sys::DirEntry>> readDir(Url::Url url) {
     String str = try$(try$(resolve(url)).str());
 
     DIR *dir = ::opendir(str.buf());
@@ -140,7 +141,7 @@ Res<Vec<Sys::DirEntry>> readDir(Sys::Url url) {
     return Ok(entries);
 }
 
-Res<Strong<Sys::Fd>> createFile(Sys::Url url) {
+Res<Strong<Sys::Fd>> createFile(Url::Url url) {
     String str = try$(try$(resolve(url)).str());
 
     auto fd = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
@@ -282,10 +283,10 @@ Res<> populate(Vec<Sys::CpuInfo> &) {
 Res<> populate(Sys::UserInfo &infos) {
     infos.name = getenv("USER");
     infos.home.scheme = "file";
-    infos.home.path = Sys::Path::parse(getenv("HOME"));
+    infos.home.path = Url::Path::parse(getenv("HOME"));
 
     infos.shell.scheme = "file";
-    infos.shell.path = Sys::Path::parse(getenv("SHELL"));
+    infos.shell.path = Url::Path::parse(getenv("SHELL"));
 
     return Ok();
 }

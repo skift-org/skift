@@ -13,7 +13,6 @@
         "libheap"
     ],
     "provides": [
-        "karm-base-impl",
         "karm-logger-impl"
     ]
 }

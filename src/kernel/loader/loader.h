@@ -9,23 +9,23 @@
 
 namespace Loader {
 
-Res<Sys::File> openUrl(Sys::Url const &url);
+Res<Sys::File> openUrl(Url::Url const &url);
 
 struct Blob {
-    Sys::Url url;
+    Url::Url url;
     Json::Value props;
 
     static Res<Blob> fromJson(Json::Value const &json) {
         if (json.isStr())
             return Ok(Blob{
-                .url = Sys::Url::parse(json.asStr()),
+                .url = Url::Url::parse(json.asStr()),
             });
 
         if (not json.isObject())
             return Error::invalidInput("expected object");
 
         return Ok(Blob{
-            .url = Sys::Url::parse(try$(json.get("url").take<String>())),
+            .url = Url::Url::parse(try$(json.get("url").take<String>())),
             .props = json.get("props"),
         });
     }
@@ -45,7 +45,7 @@ struct Entry {
 
         auto maybeIcon = json.get("icon").take<String>();
         if (maybeIcon) {
-            auto maybeImage = Media::loadImage(Sys::Url::parse(*maybeIcon));
+            auto maybeImage = Media::loadImage(Url::Url::parse(*maybeIcon));
             if (not maybeImage) {
                 entry.icon = Mdi::byName(*maybeIcon).unwrap();
             } else {

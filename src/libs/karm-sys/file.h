@@ -16,13 +16,13 @@ struct File :
     Meta::NoCopy {
 
     Strong<Fd> _fd;
-    Url _url;
+    Url::Url _url;
 
-    File(Strong<Fd> fd, Url url) : _fd(fd), _url(url) {}
+    File(Strong<Fd> fd, Url::Url url) : _fd(fd), _url(url) {}
 
-    static Res<File> create(Url url);
+    static Res<File> create(Url::Url url);
 
-    static Res<File> open(Url url);
+    static Res<File> open(Url::Url url);
 
     Res<usize> read(MutBytes bytes) override {
         return _fd->read(bytes);

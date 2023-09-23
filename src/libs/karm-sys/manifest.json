@@ -5,6 +5,7 @@
     "description": "System-dependent system abstraction",
     "requires": [
         "karm-sys-impl",
-        "karm-fmt"
+        "karm-fmt",
+        "url-spec"
     ]
 }

@@ -39,7 +39,7 @@ struct VmoFd : public Sys::Fd {
     }
 };
 
-Res<Strong<Sys::Fd>> openFile(Sys::Url url) {
+Res<Strong<Sys::Fd>> openFile(Url::Url url) {
     auto urlStr = try$(url.str());
     auto *fileRecord = useHandover().fileByName(urlStr.buf());
     if (not fileRecord)
@@ -50,7 +50,7 @@ Res<Strong<Sys::Fd>> openFile(Sys::Url url) {
     return Ok(makeStrong<VmoFd>(std::move(vmo)));
 }
 
-Res<Strong<Sys::Fd>> createFile(Sys::Url) {
+Res<Strong<Sys::Fd>> createFile(Url::Url) {
     notImplemented();
 }
 
@@ -70,7 +70,7 @@ Res<Strong<Sys::Fd>> createErr() {
     return Ok(makeStrong<Sys::DummyFd>());
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Sys::Url) {
+Res<Vec<Sys::DirEntry>> readDir(Url::Url) {
     notImplemented();
 }
 

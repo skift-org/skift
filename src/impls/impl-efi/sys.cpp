@@ -140,7 +140,7 @@ Res<Strong<Sys::Fd>> createErr() {
 
 static Opt<Json::Value> _index = NONE;
 
-static Res<Sys::Path> resolve(Sys::Url url) {
+static Res<Url::Path> resolve(Url::Url url) {
     if (url.scheme == "file") {
         return Ok(url.path);
     }
@@ -184,9 +184,9 @@ static Res<Sys::Path> resolve(Sys::Url url) {
 
         auto refStr = ref.asStr();
 
-        auto refUrl = Sys::Url::parse(refStr);
+        auto refUrl = Url::Url::parse(refStr);
 
-        Sys::Path resolved = try$(resolve(refUrl));
+        Url::Path resolved = try$(resolve(refUrl));
         logInfo("resolved to: {}", resolved);
         return Ok(resolved);
     } else {
@@ -195,7 +195,7 @@ static Res<Sys::Path> resolve(Sys::Url url) {
     }
 }
 
-Res<Strong<Sys::Fd>> openFile(Sys::Url url) {
+Res<Strong<Sys::Fd>> openFile(Url::Url url) {
     static Efi::SimpleFileSystemProtocol *fileSystem = nullptr;
     if (not fileSystem) {
         fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(Efi::li()->deviceHandle));
@@ -221,11 +221,11 @@ Res<Strong<Sys::Fd>> openFile(Sys::Url url) {
     return Ok(makeStrong<FileProto>(file));
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Sys::Url) {
+Res<Vec<Sys::DirEntry>> readDir(Url::Url) {
     return Error::notImplemented();
 }
 
-Res<Strong<Sys::Fd>> createFile(Sys::Url) {
+Res<Strong<Sys::Fd>> createFile(Url::Url) {
     return Error::notImplemented();
 }
 

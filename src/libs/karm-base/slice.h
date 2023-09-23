@@ -457,11 +457,11 @@ ALWAYS_INLINE Opt<usize> search(Sliceable auto const &slice, auto cmp) {
         return NONE;
     }
 
-    if (cmp(slice[0]).isGt()) {
+    if (cmp(slice[0]) > 0) {
         return NONE;
     }
 
-    if (cmp(slice[len(slice) - 1]).isLt()) {
+    if (cmp(slice[len(slice) - 1]) < 0) {
         return NONE;
     }
 

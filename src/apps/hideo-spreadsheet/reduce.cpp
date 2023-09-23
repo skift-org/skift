@@ -2,7 +2,7 @@
 
 namespace Spreadsheet {
 
-State reduce(State s, Actions a) {
+void reduce(State &s, Action a) {
     a.visit(
         Visitor{
             [&](UpdateSelection &u) {
@@ -21,7 +21,6 @@ State reduce(State s, Actions a) {
         });
 
     s.activeSheet().recompute();
-    return s;
 }
 
 } // namespace Spreadsheet

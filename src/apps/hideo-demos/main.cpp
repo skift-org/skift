@@ -38,16 +38,16 @@ struct SwitchAction {
     usize index;
 };
 
-using Actions = Var<SwitchAction>;
+using Action = Var<SwitchAction>;
 
-State reduce(State, Actions action) {
-    return action.visit(
+void reduce(State &s, Action action) {
+    action.visit(
         [&](SwitchAction action) {
-            return State{action.index};
+            s.current = action.index;
         });
 }
 
-using Model = Ui::Model<State, Actions, reduce>;
+using Model = Ui::Model<State, Action, reduce>;
 
 Ui::Child sidebar(State s) {
     Ui::Children items =

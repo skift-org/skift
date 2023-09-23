@@ -2,34 +2,29 @@
 
 namespace Shell {
 
-State reduce(State state, Actions action) {
-    return action.visit(Visitor{
+void reduce(State &s, Action a) {
+    a.visit(Visitor{
         [&](ToggleTablet) {
-            state.isMobile = not state.isMobile;
-            state.activePanel = Panel::NIL;
-            state.isSysPanelColapsed = true;
-            return state;
+            s.isMobile = not s.isMobile;
+            s.activePanel = Panel::NIL;
+            s.isSysPanelColapsed = true;
         },
         [&](Lock) {
-            state.locked = true;
-            state.activePanel = Panel::NIL;
-            return state;
+            s.locked = true;
+            s.activePanel = Panel::NIL;
         },
         [&](Unlock) {
-            state.locked = false;
-            return state;
+            s.locked = false;
         },
         [&](Activate panel) {
-            if (state.activePanel != panel.panel) {
-                state.activePanel = panel.panel;
+            if (s.activePanel != panel.panel) {
+                s.activePanel = panel.panel;
             } else {
-                state.activePanel = Panel::NIL;
+                s.activePanel = Panel::NIL;
             }
-            return state;
         },
         [&](ToggleSysPanel) {
-            state.isSysPanelColapsed = not state.isSysPanelColapsed;
-            return state;
+            s.isSysPanelColapsed = not s.isSysPanelColapsed;
         },
     });
 }

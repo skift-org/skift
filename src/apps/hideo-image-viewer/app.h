@@ -26,16 +26,16 @@ struct ApplyFilter {};
 
 struct SaveImage {};
 
-using Actions = Var<
+using Action = Var<
     Refresh,
     ToggleEditor,
     SetFilter,
     ApplyFilter,
     SaveImage>;
 
-State reduce(State s, Actions action);
+void reduce(State &, Action);
 
-using Model = Ui::Model<State, Actions, reduce>;
+using Model = Ui::Model<State, Action, reduce>;
 
 /* --- Views ---------------------------------------------------------------- */
 

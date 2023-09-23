@@ -43,11 +43,11 @@ struct GoBack {};
 
 struct GoForward {};
 
-using Actions = Var<GoTo, GoBack, GoForward>;
+using Action = Var<GoTo, GoBack, GoForward>;
 
-State reduce(State s, Actions action);
+void reduce(State &, Action);
 
-using Model = Ui::Model<State, Actions, reduce>;
+using Model = Ui::Model<State, Action, reduce>;
 
 /* --- Views ---------------------------------------------------------------- */
 

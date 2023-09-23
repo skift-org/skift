@@ -28,7 +28,7 @@ inline Func<void(Node &)> bindAction(Action action) {
     };
 }
 
-template <typename S, typename A, S (*R)(S, A)>
+template <typename S, typename A, void (*R)(S &, A)>
 struct Model {
     using State = S;
     using Action = A;
@@ -127,7 +127,7 @@ struct Reducer :
 
     void bubble(Events::Event &e) override {
         if (auto *ad = e.is<ActionDispatchEvent<Action>>()) {
-            _state = Model::reduce(_state, ad->action);
+            Model::reduce(_state, ad->action);
             e.accept();
 
             _rebuild = true;
@@ -174,8 +174,8 @@ inline Child state(T init, auto build) {
         T val;
     };
 
-    auto reduce = [](T, UpdateState action) {
-        return action.val;
+    auto reduce = [](T &s, UpdateState action) {
+        s = action.val;
     };
 
     using M = Model<T, UpdateState, reduce>;

@@ -13,7 +13,7 @@ struct ToggleShift {
 
 using Action = Var<ToggleShift>;
 
-State reduce(State s, Action a);
+void reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 

@@ -54,10 +54,10 @@ struct Refresh {
 
 struct AddBookmark {};
 
-using Actions = Var<GoRoot, GoBack, GoForward, GoParent, Navigate, GoTo, Refresh, AddBookmark>;
+using Action = Var<GoRoot, GoBack, GoForward, GoParent, Navigate, GoTo, Refresh, AddBookmark>;
 
-State reduce(State d, Actions action);
+void reduce(State &, Action);
 
-using Model = Ui::Model<State, Actions, reduce>;
+using Model = Ui::Model<State, Action, reduce>;
 
 } // namespace FileManager

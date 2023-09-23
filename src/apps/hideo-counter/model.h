@@ -15,10 +15,10 @@ struct IncrementAction {};
 
 struct DecrementAction {};
 
-using Actions = Var<ResetAction, IncrementAction, DecrementAction>;
+using Action = Var<ResetAction, IncrementAction, DecrementAction>;
 
-State reduce(State state, Actions action);
+void reduce(State &, Action);
 
-using Model = Ui::Model<State, Actions, reduce>;
+using Model = Ui::Model<State, Action, reduce>;
 
 } // namespace Counter

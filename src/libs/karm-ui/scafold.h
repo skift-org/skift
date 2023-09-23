@@ -24,11 +24,15 @@ Child titlebar(Mdi::Icon icon, String title, Child tabs, TitlebarStyle style = T
 
 Child toolbar(Children children);
 
-inline Child toolbar(Meta::Same<Child> auto... children) { return toolbar({children...}); }
+inline Child toolbar(Meta::Same<Child> auto... children) {
+    return toolbar({children...});
+}
 
 Child bottombar(Children children);
 
-inline Child bottombar(Meta::Same<Child> auto... children) { return bottombar({children...}); }
+inline Child bottombar(Meta::Same<Child> auto... children) {
+    return bottombar({children...});
+}
 
 struct Scafold : public Meta::NoCopy {
     Mdi::Icon icon;
@@ -52,8 +56,8 @@ struct Scafold : public Meta::NoCopy {
 
     using Action = Var<ToggleSidebar>;
 
-    static State reduce(State s, Action a) {
-        return a.visit(::Visitor{
+    static void reduce(State &s, Action a) {
+        a.visit(::Visitor{
             [&](ToggleSidebar) {
                 s.sidebarOpen = !s.sidebarOpen;
                 return s;

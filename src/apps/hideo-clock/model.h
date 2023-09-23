@@ -32,10 +32,10 @@ struct State {
     Page page = Page::_DEFAULT;
 };
 
-using Actions = Var<Page>;
+using Action = Var<Page>;
 
-State reduce(State state, Actions action);
+void reduce(State &, Action);
 
-using Model = Ui::Model<State, Actions, reduce>;
+using Model = Ui::Model<State, Action, reduce>;
 
 } // namespace Clock

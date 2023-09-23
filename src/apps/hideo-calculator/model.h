@@ -95,13 +95,13 @@ struct MemStoreAction {};
 
 struct EnterDecimalAction {};
 
-using Actions = Var<
+using Action = Var<
     Operator, Number, BackspaceAction, EqualAction, ClearAction, ClearAllAction,
     MemClearAction, MemRecallAction, MemAddAction, MemSubAction, MemStoreAction,
     EnterDecimalAction>;
 
-State reduce(State, Actions);
+void reduce(State &, Action);
 
-using Model = Ui::Model<State, Actions, reduce>;
+using Model = Ui::Model<State, Action, reduce>;
 
 } // namespace Calculator

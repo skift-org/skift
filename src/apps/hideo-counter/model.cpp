@@ -2,22 +2,18 @@
 
 namespace Counter {
 
-State reduce(State state, Actions action) {
-    return action.visit(Visitor{
+void reduce(State &s, Action a) {
+    a.visit(Visitor{
         [&](ResetAction) {
-            return State{true};
+            s = State{.initial = true};
         },
         [&](IncrementAction) {
-            return State{
-                false,
-                state.counter + 1,
-            };
+            s.initial = false;
+            s.counter += 1;
         },
         [&](DecrementAction) {
-            return State{
-                false,
-                state.counter - 1,
-            };
+            s.initial = false;
+            s.counter -= 1;
         },
     });
 }

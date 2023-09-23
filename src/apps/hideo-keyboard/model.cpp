@@ -2,12 +2,11 @@
 
 namespace Keyboard {
 
-State reduce(State s, Action a) {
-    return a.visit(
+void reduce(State &s, Action a) {
+    a.visit(
         Visitor{
             [&](ToggleShift) {
                 s.shift = !s.shift;
-                return s;
             },
         });
 }

@@ -4,48 +4,41 @@
 
 namespace FileManager {
 
-State reduce(State d, Actions action) {
-    return action.visit(Visitor{
+void reduce(State &s, Action a) {
+    a.visit(Visitor{
         [&](GoRoot) {
-            return reduce(d, GoTo{"file:/"_url});
+            reduce(s, GoTo{"file:/"_url});
         },
         [&](GoBack) {
-            if (d.canGoBack()) {
-                d.currentIndex--;
+            if (s.canGoBack()) {
+                s.currentIndex--;
             }
-            return d;
         },
         [&](GoForward) {
-            if (d.canGoForward()) {
-                d.currentIndex++;
+            if (s.canGoForward()) {
+                s.currentIndex++;
             }
-            return d;
         },
         [&](GoParent p) {
-            auto parent = d.currentUrl().parent(p.index);
-            return reduce(d, GoTo{parent});
+            auto parent = s.currentUrl().parent(p.index);
+            reduce(s, GoTo{parent});
         },
         [&](Navigate navigate) {
-            Sys::Url dest = d.currentUrl();
+            Sys::Url dest = s.currentUrl();
             dest.append(navigate.item);
-            return reduce(d, GoTo{dest});
+            reduce(s, GoTo{dest});
         },
         [&](GoTo gotTo) {
-            if (d.currentUrl() == gotTo.url) {
-                return d;
-            }
+            if (s.currentUrl() == gotTo.url)
+                return;
 
-            d.history.truncate(d.currentIndex + 1);
-            d.history.pushBack(gotTo.url);
-            d.currentIndex++;
-
-            return d;
+            s.history.truncate(s.currentIndex + 1);
+            s.history.pushBack(gotTo.url);
+            s.currentIndex++;
         },
         [&](Refresh) {
-            return d;
         },
         [&](AddBookmark) {
-            return d;
         },
     });
 }

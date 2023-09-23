@@ -2,28 +2,23 @@
 
 namespace ImageViewer {
 
-State reduce(State s, Actions action) {
-    return action.visit(Visitor{
+void reduce(State &s, Action a) {
+    a.visit(Visitor{
         [&](Refresh) {
             debug("Refresh");
-            return s;
         },
         [&](ToggleEditor) {
             s.filter = Gfx::Unfiltered{};
             s.isEditor = !s.isEditor;
-            return s;
         },
         [&](SetFilter f) {
             s.filter = f.filter;
-            return s;
         },
         [&](ApplyFilter) {
             debug("Apply filter");
-            return s;
         },
         [&](SaveImage) {
             debug("Save image");
-            return s;
         },
     });
 }

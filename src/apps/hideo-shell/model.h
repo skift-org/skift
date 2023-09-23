@@ -41,10 +41,10 @@ struct Activate {
 
 struct ToggleSysPanel {};
 
-using Actions = Var<ToggleTablet, Lock, Unlock, Activate, ToggleSysPanel>;
+using Action = Var<ToggleTablet, Lock, Unlock, Activate, ToggleSysPanel>;
 
-State reduce(State state, Actions action);
+void reduce(State &, Action);
 
-using Model = Ui::Model<State, Actions, reduce>;
+using Model = Ui::Model<State, Action, reduce>;
 
 } // namespace Shell

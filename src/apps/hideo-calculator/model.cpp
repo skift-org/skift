@@ -65,8 +65,8 @@ State doOperator(State s, Operator op) {
     }
 }
 
-State reduce(State s, Actions action) {
-    return action.visit(Visitor{
+void reduce(State &s, Action action) {
+    action.visit(Visitor{
         [&](Operator op) {
             if (not isUnary(s.op))
                 s = doOperator(s, s.op);
@@ -79,72 +79,58 @@ State reduce(State s, Actions action) {
             s.op = op;
             s.rhs = isUnary(op) ? s.rhs : 0;
             s.hasRhs = true;
-
-            return s;
         },
         [&](Number n) {
             s.rhs *= 10;
             s.rhs += n;
             s.hasRhs = true;
-
-            return s;
         },
         [&](BackspaceAction) {
             s.rhs /= 10;
-            return s;
         },
         [&](EqualAction) {
             s = doOperator(s, s.op);
             s.rhs = std::exchange(s.lhs, 0);
             s.hasRhs = true;
             s.op = Operator::NONE;
-            return s;
         },
         [&](ClearAction) {
             s.rhs = 0;
-            return s;
         },
         [&](ClearAllAction) {
             s.lhs = 0;
             s.rhs = 0;
             s.hasRhs = false;
             s.op = Operator::NONE;
-            return s;
         },
         [&](MemClearAction) {
             s.hasMem = false;
             s.mem = 0;
-            return s;
         },
         [&](MemRecallAction) {
             s.rhs = s.mem;
             s.hasRhs = true;
-            return s;
         },
         [&](MemAddAction) {
             if (not s.hasMem) {
-                s = reduce(s, MemStoreAction{});
+                reduce(s, MemStoreAction{});
             } else {
                 s.mem += s.hasRhs ? s.rhs : s.lhs;
             }
-            return s;
         },
         [&](MemSubAction) {
             if (not s.hasMem) {
-                s = reduce(s, MemStoreAction{});
+                reduce(s, MemStoreAction{});
                 s.mem = -s.mem;
             } else {
                 s.mem -= s.hasRhs ? s.rhs : s.lhs;
             }
-            return s;
         },
         [&](MemStoreAction) {
             s.mem = s.hasRhs ? s.rhs : s.lhs;
             s.hasMem = true;
-            return s;
         },
         [&](EnterDecimalAction) {
-            return s;
         },
     });
 }

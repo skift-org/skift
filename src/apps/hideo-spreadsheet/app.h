@@ -247,7 +247,7 @@ struct SwitchSheet {
 
 struct ToggleProperties {};
 
-using Actions = Var<
+using Action = Var<
     UpdateSelection,
 
     UpdateValue,
@@ -262,9 +262,9 @@ using Actions = Var<
     ToggleProperties,
     SwitchSheet>;
 
-State reduce(State s, Actions a);
+void reduce(State &, Action);
 
-using Model = Ui::Model<State, Actions, reduce>;
+using Model = Ui::Model<State, Action, reduce>;
 
 Res<> save(Model const &model, Io::Writer &writer);
 

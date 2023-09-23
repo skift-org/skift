@@ -2,11 +2,10 @@
 
 namespace Clock {
 
-State reduce(State state, Actions action) {
-    return action.visit(Visitor{
+void reduce(State &s, Action a) {
+    a.visit(Visitor{
         [&](Page p) {
-            state.page = p;
-            return state;
+            s.page = p;
         },
     });
 }

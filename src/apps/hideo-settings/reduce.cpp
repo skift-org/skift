@@ -4,25 +4,21 @@
 
 namespace Settings {
 
-State reduce(State d, Actions action) {
-    return action.visit(Visitor{
+void reduce(State &s, Action action) {
+    action.visit(Visitor{
         [&](GoTo a) {
-            if (d.page() == a.page) {
-                return d;
-            }
-            d.history.removeRange(d.historyIndex + 1, d.history.len() - d.historyIndex - 1);
-            d.history.pushBack(a.page);
-            d.historyIndex = d.history.len() - 1;
+            if (s.page() == a.page)
+                return;
 
-            return d;
+            s.history.removeRange(s.historyIndex + 1, s.history.len() - s.historyIndex - 1);
+            s.history.pushBack(a.page);
+            s.historyIndex = s.history.len() - 1;
         },
         [&](GoBack) {
-            d.historyIndex = max(d.historyIndex - 1, 0uz);
-            return d;
+            s.historyIndex = max(s.historyIndex - 1, 0uz);
         },
         [&](GoForward) {
-            d.historyIndex = min(d.historyIndex + 1, d.history.len() - 1);
-            return d;
+            s.historyIndex = min(s.historyIndex + 1, s.history.len() - 1);
         },
     });
 }

@@ -11,9 +11,9 @@ struct State {
     isize lhs;
     isize rhs;
     bool hasRhs;
-
     isize mem;
     bool hasMem;
+    Opt<Str> error;
 };
 
 enum struct Operator {

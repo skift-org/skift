@@ -19,7 +19,7 @@ Ui::Child textButton(Ui::OnPress onPress, String t) {
     return textButton(std::move(onPress), Ui::ButtonStyle::regular(), t);
 }
 
-Ui::Child keypad(State state) {
+Ui::Child keypad(State const &state) {
     return Ui::spacing(
         8,
         Ui::grid(
@@ -67,7 +67,7 @@ Ui::Child keypad(State state) {
             Ui::button(Model::bind<EqualAction>(), Ui::ButtonStyle::primary(), Mdi::EQUAL)));
 }
 
-Ui::Child screen(State state) {
+Ui::Child screen(State const &state) {
     // auto debugExpr = Ui::text("op: {}, lhs: {}, rhs: {}", toFmt(state.op), state.lhs, state.rhs);
 
     auto currExpr =
@@ -75,11 +75,11 @@ Ui::Child screen(State state) {
         Ui::align(Layout::Align::VCENTER | Layout::Align::END);
 
     auto result =
-        Ui::text(Ui::TextStyle::headlineMedium(), "{}", state.hasRhs ? state.rhs : state.lhs) |
+        (state.error ? Ui::headlineMedium(*state.error)
+                     : Ui::text(Ui::TextStyle::headlineMedium(), "{}", state.hasRhs ? state.rhs : state.lhs)) |
         Ui::align(Layout::Align::VCENTER | Layout::Align::END);
 
-    return Ui::spacing(
-        {16, 8}, Ui::vflow(8, /* debugExpr, */ currExpr, result));
+    return Ui::vflow(8, /* debugExpr, */ currExpr, result) | Ui::spacing({16, 8});
 }
 
 Ui::Child app() {

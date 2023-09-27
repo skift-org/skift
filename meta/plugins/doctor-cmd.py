@@ -107,10 +107,10 @@ def doctorCmd(args: Args):
     everythingIsOk = everythingIsOk & commandIsAvailable("qemu-system-x86_64")
     everythingIsOk = everythingIsOk & commandIsAvailable("clang", versionExpected=(15,))
     everythingIsOk = everythingIsOk & commandIsAvailable(
-        "clang++", versionExpected=(15,)
+        "clang++", versionExpected=(16,)
     )
     everythingIsOk = everythingIsOk & commandIsAvailable(
-        "ld.lld", versionExpected=(15,)
+        "ld.lld", versionExpected=(16,)
     )
     everythingIsOk = everythingIsOk & commandIsAvailable("nasm")
     everythingIsOk = everythingIsOk & commandIsAvailable("ninja")

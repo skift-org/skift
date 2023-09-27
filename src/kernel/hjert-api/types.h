@@ -7,7 +7,6 @@
 namespace Hj {
 
 #define FOREACH_TYPE(TYPE) \
-    TYPE(NONE)             \
     TYPE(DOMAIN)           \
     TYPE(TASK)             \
     TYPE(SPACE)            \
@@ -124,9 +123,13 @@ using Args = Array<Arg, 6>;
 struct Cap {
     Arg _raw = 0;
 
+    static constexpr usize SHIFT = 11;
+    static constexpr usize LEN = 1 << 11;
+    static constexpr usize MASK = LEN - 1;
+
     constexpr Cap() = default;
 
-    constexpr Cap(Arg raw)
+    constexpr explicit Cap(Arg raw)
         : _raw(raw) {}
 
     constexpr Arg raw() const {
@@ -142,6 +145,16 @@ struct Cap {
     }
 
     std::strong_ordering operator<=>(Cap const &other) const = default;
+
+    usize slot() const {
+        auto curr = _raw & MASK;
+        auto upper = _raw >> SHIFT;
+        while (upper) {
+            curr = upper & MASK;
+            upper >>= SHIFT;
+        }
+        return curr;
+    }
 };
 
 inline constexpr Cap ROOT = {};
@@ -164,24 +177,26 @@ struct Msg {
     Arg flags{};
     Args args{};
 
+    constexpr Msg() = default;
+
     constexpr Msg(Arg label)
         : label(label) {}
 
-    void store(usize idx, Arg arg) {
+    void storeArg(usize idx, Arg arg) {
         flags &= ~(1 << idx);
         args[idx] = arg;
     }
 
-    void store(usize idx, Cap cap) {
-        flags |= 1 << idx;
-        args[idx] = cap.raw();
-    }
-
-    Res<Arg> loadVal(usize idx) const {
+    Res<Arg> loadArg(usize idx) const {
         if (not(flags & (1 << idx))) {
             return Ok(args[idx]);
         }
         return Error::invalidData("not-a-value");
+    }
+
+    void storeCap(usize idx, Cap cap) {
+        flags |= 1 << idx;
+        args[idx] = cap.raw();
     }
 
     Res<Cap> loadCap(usize idx) const {
@@ -266,7 +281,6 @@ using MapFlags = Hal::VmmFlags;
 
 struct DomainProps {
     static constexpr Type TYPE = Type::DOMAIN;
-    usize size = 4096;
 };
 
 struct TaskProps {

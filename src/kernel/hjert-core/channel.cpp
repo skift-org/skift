@@ -13,7 +13,7 @@ Res<Parcel> Parcel::fromMsg(Domain &dom, Hj::Msg msg) {
         if (msg.isCap(i)) {
             parcel._slots[i] = try$(dom.get(try$(msg.loadCap(i))));
         } else {
-            parcel._slots[i] = try$(msg.loadVal(i));
+            parcel._slots[i] = try$(msg.loadArg(i));
         }
     }
 
@@ -30,11 +30,11 @@ Res<Hj::Msg> Parcel::toMsg(Domain &dom) {
                     return Ok();
                 },
                 [&](Hj::Arg arg) -> Res<> {
-                    msg.store(i, arg);
+                    msg.storeArg(i, arg);
                     return Ok();
                 },
                 [&](Strong<Object> obj) -> Res<> {
-                    msg.store(i, try$(dom.add(Hj::ROOT, obj)));
+                    msg.storeCap(i, try$(dom.add(Hj::ROOT, obj)));
                     return Ok();
                 },
             }));

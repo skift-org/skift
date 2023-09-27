@@ -5,6 +5,8 @@
 #include <karm-main/base.h>
 #include <karm-panic/panic.h>
 
+#include "hooks.h"
+
 void __panicHandler(Karm::PanicKind kind, char const *msg) {
     Hj::log(msg).unwrap();
 
@@ -14,16 +16,15 @@ void __panicHandler(Karm::PanicKind kind, char const *msg) {
     }
 }
 
-extern "C" void __entryPoint(usize ho) {
+extern "C" void __entryPoint(usize rawHandover, usize rawIn, usize rawOut) {
     Abi::SysV::init();
     Karm::registerPanicHandler(__panicHandler);
-
-    Handover::Payload *payload = (Handover::Payload *)ho;
 
     Ctx ctx;
     char const *argv[] = {"service", nullptr};
     ctx.add<ArgsHook>(1, argv);
-    ctx.add<HandoverHook>(payload);
+    ctx.add<HandoverHook>((Handover::Payload *)rawHandover);
+    ctx.add<ChannelsHook>(Hj::Cap{rawIn}, Hj::Cap{rawOut});
 
     auto res = entryPoint(ctx);
 

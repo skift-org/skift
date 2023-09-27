@@ -4,7 +4,7 @@
 
 #include "node.h"
 
-namespace Dev::Pci {
+namespace Grund::Device::Pci {
 
 struct Id {
     u16 vendor;
@@ -35,4 +35,4 @@ struct Slot : public Device {
 struct Func : public Device {
 };
 
-} // namespace Dev::Pci
+} // namespace Grund::Device::Pci

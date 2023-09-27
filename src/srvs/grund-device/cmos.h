@@ -4,7 +4,7 @@
 
 #include "node.h"
 
-namespace Dev::Cmos {
+namespace Grund::Device::Cmos {
 
 struct Cmos;
 
@@ -58,4 +58,4 @@ struct Rtc : public Device {
     Res<TimeStamp> now();
 };
 
-} // namespace Dev::Cmos
+} // namespace Grund::Device::Cmos

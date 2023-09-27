@@ -8,7 +8,7 @@ Res<> _now(TimeStamp *ts);
 
 Res<> _log(char const *msg, usize len);
 
-Res<> _create(Cap dest, Cap *cap, Props const *props);
+Res<> _create(Cap dest, Cap *out, Props const *props);
 
 Res<> _label(Cap cap, char const *label, usize len);
 
@@ -16,7 +16,7 @@ Res<> _drop(Cap cap);
 
 Res<> _pledge(Cap cap, Flags<Pledge> pledges);
 
-Res<> _dup(Cap node, Cap *dst, Cap src);
+Res<> _dup(Cap dest, Cap *out, Cap cap);
 
 Res<> _start(Cap cap, usize ip, usize sp, Args const *args);
 
@@ -30,7 +30,7 @@ Res<> _out(Cap cap, IoLen len, usize port, Arg val);
 
 Res<> _send(Cap cap, Msg const *msg, Cap from);
 
-Res<> _recv(Cap cap, Msg *msg, Cap fo);
+Res<> _recv(Cap cap, Msg *msg, Cap to);
 
 Res<> _close(Cap cap);
 

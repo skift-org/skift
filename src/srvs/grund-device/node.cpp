@@ -1,6 +1,6 @@
 #include "node.h"
 
-namespace Dev {
+namespace Grund::Device {
 
 Node::Node() {
     static usize id = 0;
@@ -56,4 +56,4 @@ void Node::detach(Strong<Node> child) {
     _children.removeAll(child);
 }
 
-} // namespace Dev
+} // namespace Grund::Device

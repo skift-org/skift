@@ -4,7 +4,7 @@
 
 #include "node.h"
 
-namespace Dev::Ps2 {
+namespace Grund::Device::Ps2 {
 
 struct I8042;
 
@@ -163,4 +163,4 @@ struct Mouse : public Device {
     }
 };
 
-} // namespace Dev::Ps2
+} // namespace Grund::Device::Ps2

@@ -2,7 +2,7 @@
 
 #include "ps2.h"
 
-namespace Dev::Ps2 {
+namespace Grund::Device::Ps2 {
 
 /* --- Controller ----------------------------------------------------------- */
 
@@ -223,4 +223,4 @@ Res<> Mouse::event(Events::Event &e) {
     return Device::event(e);
 }
 
-} // namespace Dev::Ps2
+} // namespace Grund::Device::Ps2

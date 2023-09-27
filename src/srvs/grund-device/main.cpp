@@ -7,7 +7,7 @@
 #include "io.h"
 #include "ps2.h"
 
-namespace Dev {
+namespace Grund::Device {
 
 struct IsaRootBus : public Node {
     Res<> init() override {
@@ -21,11 +21,11 @@ struct IsaRootBus : public Node {
     }
 };
 
-} // namespace Dev
+} // namespace Grund::Device
 
 Res<> entryPoint(Ctx &) {
     logInfo("devices: building device tree...");
-    auto root = makeStrong<Dev::IsaRootBus>();
+    auto root = makeStrong<Grund::Device::IsaRootBus>();
     try$(root->init());
 
     logInfo("devices: binding IRQs...");
@@ -50,7 +50,7 @@ Res<> entryPoint(Ctx &) {
 
             auto irq = cap2irq.get(ev->cap);
             if (irq) {
-                Dev::IrqEvent ev = {*irq};
+                Grund::Device::IrqEvent ev = {*irq};
                 try$(root->event(ev));
             }
             ev = listener.next();

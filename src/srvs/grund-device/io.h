@@ -5,7 +5,7 @@
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
 
-namespace Dev {
+namespace Grund::Device {
 
 struct PortIo : public Hal::Io {
     Hj::Io _io;
@@ -102,4 +102,4 @@ struct DmaIo : public Hal::Io {
     }
 };
 
-} // namespace Dev
+} // namespace Grund::Device

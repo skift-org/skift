@@ -4,7 +4,7 @@
 #include <karm-base/vec.h>
 #include <karm-events/events.h>
 
-namespace Dev {
+namespace Grund::Device {
 
 struct IrqEvent : public Events::BaseEvent<IrqEvent> {
     usize irq;
@@ -41,4 +41,4 @@ struct Node : public Meta::Static {
     }
 };
 
-} // namespace Dev
+} // namespace Grund::Device

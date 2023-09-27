@@ -37,7 +37,7 @@ Res<> doLog(Task &self, UserSlice<char const> msg) {
     });
 }
 
-Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> cap, User<Hj::Props> p) {
+Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
     auto props = try$(p.load(self.space()));
     auto obj = try$(props.visit(
         Visitor{
@@ -95,7 +95,7 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> cap, User<Hj::Props> p) {
             },
         }));
 
-    return cap.store(self.space(), try$(self.domain().add(dest, obj)));
+    return out.store(self.space(), try$(self.domain().add(dest, obj)));
 }
 
 Res<> doLabel(Task &self, Hj::Cap cap, UserSlice<char const> label) {
@@ -122,12 +122,12 @@ Res<> doPledge(Task &self, Hj::Cap cap, Flags<Hj::Pledge> pledges) {
     return obj->pledge(pledges);
 }
 
-Res<> doDup(Task &self, Hj::Cap node, User<Hj::Cap> dst, Hj::Cap src) {
-    if (src.isRoot())
+Res<> doDup(Task &self, Hj::Cap dest, User<Hj::Cap> out, Hj::Cap cap) {
+    if (cap.isRoot())
         return Error::invalidHandle("cannot duplicate root");
 
-    auto obj = try$(self.domain().get(src));
-    return dst.store(self.space(), try$(self.domain().add(node, obj)));
+    auto obj = try$(self.domain().get(cap));
+    return out.store(self.space(), try$(self.domain().add(dest, obj)));
 }
 
 Res<> doStart(Task &self, Hj::Cap cap, usize ip, usize sp, User<Hj::Args const> args) {
@@ -242,52 +242,52 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
         return doLog(self, {args[0], args[1]});
 
     case Hj::Syscall::CREATE:
-        return doCreate(self, args[0], args[1], args[2]);
+        return doCreate(self, Hj::Cap{args[0]}, args[1], args[2]);
 
     case Hj::Syscall::LABEL:
-        return doLabel(self, args[0], {args[1], args[2]});
+        return doLabel(self, Hj::Cap{args[0]}, {args[1], args[2]});
 
     case Hj::Syscall::DROP:
-        return doDrop(self, args[0]);
+        return doDrop(self, Hj::Cap{args[0]});
 
     case Hj::Syscall::PLEDGE:
-        return doPledge(self, args[0], (Hj::Pledge)args[1]);
+        return doPledge(self, Hj::Cap{args[0]}, (Hj::Pledge)args[1]);
 
     case Hj::Syscall::DUP:
-        return doDup(self, args[0], args[1], args[2]);
+        return doDup(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]});
 
     case Hj::Syscall::START:
-        return doStart(self, args[0], args[1], args[2], args[3]);
+        return doStart(self, Hj::Cap{args[0]}, args[1], args[2], args[3]);
 
     case Hj::Syscall::MAP:
-        return doMap(self, args[0], args[1], args[2], args[3], args[4], (Hj::MapFlags)args[5]);
+        return doMap(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]}, args[3], args[4], (Hj::MapFlags)args[5]);
 
     case Hj::Syscall::UNMAP:
-        return doUnmap(self, args[0], args[1], args[2]);
+        return doUnmap(self, Hj::Cap{args[0]}, args[1], args[2]);
 
     case Hj::Syscall::IN:
-        return doIn(self, args[0], (Hj::IoLen)args[1], args[2], args[3]);
+        return doIn(self, Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], args[3]);
 
     case Hj::Syscall::OUT:
-        return doOut(self, args[0], (Hj::IoLen)args[1], args[2], args[3]);
+        return doOut(self, Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], args[3]);
 
     case Hj::Syscall::SEND:
-        return doSend(self, args[0], args[1], args[2]);
+        return doSend(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]});
 
     case Hj::Syscall::RECV:
-        return doRecv(self, args[0], args[1], args[2]);
+        return doRecv(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]});
 
     case Hj::Syscall::CLOSE:
-        return doClose(self, args[0]);
+        return doClose(self, Hj::Cap{args[0]});
 
     case Hj::Syscall::SIGNAL:
-        return doSignal(self, args[0], (Hj::Sigs)args[1], (Hj::Sigs)args[2]);
+        return doSignal(self, Hj::Cap{args[0]}, (Hj::Sigs)args[1], (Hj::Sigs)args[2]);
 
     case Hj::Syscall::LISTEN:
-        return doListen(self, args[0], args[1], (Hj::Sigs)args[2], (Hj::Sigs)args[3]);
+        return doListen(self, Hj::Cap{args[0]}, Hj::Cap{args[1]}, (Hj::Sigs)args[2], (Hj::Sigs)args[3]);
 
     case Hj::Syscall::POLL:
-        return doPoll(self, args[0], {args[1], args[2]}, args[3], args[4]);
+        return doPoll(self, Hj::Cap{args[0]}, {args[1], args[2]}, args[3], args[4]);
 
     default:
         return Error::invalidInput("invalid syscall id");

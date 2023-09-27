@@ -90,6 +90,12 @@ struct Domain : public Object {
     Res<O> create(Args &&...args) {
         return Hj::create<O>(_cap, std::forward<Args>(args)...);
     }
+
+    Res<Cap> attach(Object &obj) {
+        Cap out;
+        try$(_dup(_cap, &out, obj));
+        return Ok(out);
+    }
 };
 
 struct Task : public Object {
@@ -227,12 +233,12 @@ struct Channel : public Object {
         return create<Channel>(dest, len);
     }
 
-    Res<> send(Msg const *msg, Domain &from) {
-        return _send(_cap, msg, from);
+    Res<> send(Msg const &msg, Domain &from) {
+        return _send(_cap, &msg, from);
     }
 
-    Res<> send(Msg *msg, Domain &fo) {
-        return _send(_cap, msg, fo);
+    Res<> recv(Msg &msg, Domain &to) {
+        return _recv(_cap, &msg, to);
     }
 };
 

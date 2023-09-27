@@ -2,7 +2,7 @@
 
 #include "cmos.h"
 
-namespace Dev::Cmos {
+namespace Grund::Device::Cmos {
 
 /* --- CMOS ----------------------------------------------------------------- */
 
@@ -71,4 +71,4 @@ Res<TimeStamp> Rtc::now() {
     return Ok(dt.toTimeStamp());
 }
 
-} // namespace Dev::Cmos
+} // namespace Grund::Device::Cmos

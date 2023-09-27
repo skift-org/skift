@@ -5,7 +5,9 @@ import subprocess
 import re
 
 
-def isVersionAtLeastOrEqual(actualVersion: tuple[int, ...], expectedVersion: tuple[int, ...]) -> bool:
+def isVersionAtLeastOrEqual(
+    actualVersion: tuple[int, ...], expectedVersion: tuple[int, ...]
+) -> bool:
     if len(actualVersion) < len(expectedVersion):
         return False
 
@@ -25,7 +27,9 @@ def getVersionFromOutput(output: str, versionRegex: str) -> tuple[int, ...]:
         return ()
 
 
-def checkVersion(cmd: str, versionExpected: tuple[int, ...], versionCommand: str, versionRegex: str) -> tuple[bool, tuple[int, ...]]:
+def checkVersion(
+    cmd: str, versionExpected: tuple[int, ...], versionCommand: str, versionRegex: str
+) -> tuple[bool, tuple[int, ...]]:
     try:
         result = subprocess.check_output([cmd, versionCommand]).decode("utf-8")
         actualVersion = getVersionFromOutput(result, versionRegex)
@@ -34,7 +38,12 @@ def checkVersion(cmd: str, versionExpected: tuple[int, ...], versionCommand: str
         return False, ()
 
 
-def commandIsAvailable(cmd: str, versionExpected: tuple[int, ...] = (0, 0, 0), versionCommand: str = "--version", versionRegex: str = r"\d+(\.\d+)+") -> bool:
+def commandIsAvailable(
+    cmd: str,
+    versionExpected: tuple[int, ...] = (0, 0, 0),
+    versionCommand: str = "--version",
+    versionRegex: str = r"\d+(\.\d+)+",
+) -> bool:
     print(f"Checking if {cmd} is available... ", end="")
     result = True
 
@@ -42,19 +51,22 @@ def commandIsAvailable(cmd: str, versionExpected: tuple[int, ...] = (0, 0, 0), v
         cmd = shell.latest(cmd)
         path = shell.which(cmd) or cmd
         versionMatch, version = checkVersion(
-            cmd, versionExpected, versionCommand, versionRegex)
+            cmd, versionExpected, versionCommand, versionRegex
+        )
         if not versionMatch:
             if versionExpected == (0, 0, 0):
                 print(f"{vt100.RED}not found{vt100.RESET}")
             else:
                 print(f"{vt100.RED}too old{vt100.RESET}")
                 print(
-                    f"Expected: {'.'.join(map(str, versionExpected))}\nActual: {'.'.join(map(str, version))}")
+                    f"Expected: {'.'.join(map(str, versionExpected))}\nActual: {'.'.join(map(str, version))}"
+                )
             result = False
         else:
             print(f"{vt100.GREEN}ok{vt100.RESET}")
         print(
-            f"{vt100.BRIGHT_BLACK}Command: {cmd}\nLocation: {path}\nVersion: {'.'.join(map(str, version))}{vt100.RESET}\n")
+            f"{vt100.BRIGHT_BLACK}Command: {cmd}\nLocation: {path}\nVersion: {'.'.join(map(str, version))}{vt100.RESET}\n"
+        )
     except Exception as e:
         print(f" {e}")
         print(f"{vt100.RED}Error: {cmd} is not available{vt100.RESET}")
@@ -74,7 +86,8 @@ def moduleIsAvailable(module: str) -> bool:
         if hasattr(mod, "__version__"):
             version = mod.__version__
         print(
-            f"{vt100.BRIGHT_BLACK}Module: {module}\nVersion: {version}\nLocation: {path}{vt100.RESET}\n")
+            f"{vt100.BRIGHT_BLACK}Module: {module}\nVersion: {version}\nLocation: {path}{vt100.RESET}\n"
+        )
 
         return True
     except Exception as e:
@@ -86,25 +99,26 @@ def moduleIsAvailable(module: str) -> bool:
 def doctorCmd(args: Args):
     everythingIsOk = True
 
-    everythingIsOk = everythingIsOk and moduleIsAvailable("requests")
-    everythingIsOk = everythingIsOk and moduleIsAvailable("graphviz")
-    everythingIsOk = everythingIsOk and moduleIsAvailable("magic")
-    everythingIsOk = everythingIsOk and moduleIsAvailable("cutekit")
-    everythingIsOk = everythingIsOk and moduleIsAvailable("chatty")
-    everythingIsOk = everythingIsOk and commandIsAvailable(
-        "qemu-system-x86_64")
-    everythingIsOk = everythingIsOk and commandIsAvailable(
-        "clang", versionExpected=(15,))
-    everythingIsOk = everythingIsOk and commandIsAvailable(
-        "clang++", versionExpected=(15,))
-    everythingIsOk = everythingIsOk and commandIsAvailable(
-        "ld.lld", versionExpected=(15,))
-    everythingIsOk = everythingIsOk and commandIsAvailable("nasm")
-    everythingIsOk = everythingIsOk and commandIsAvailable("ninja")
-    everythingIsOk = everythingIsOk and commandIsAvailable(
-        "cutekit", versionCommand="version")
-    everythingIsOk = everythingIsOk and commandIsAvailable("chatty")
-    everythingIsOk = everythingIsOk and commandIsAvailable("pkg-config")
+    everythingIsOk = everythingIsOk & moduleIsAvailable("requests")
+    everythingIsOk = everythingIsOk & moduleIsAvailable("graphviz")
+    everythingIsOk = everythingIsOk & moduleIsAvailable("magic")
+    everythingIsOk = everythingIsOk & moduleIsAvailable("cutekit")
+    everythingIsOk = everythingIsOk & moduleIsAvailable("chatty")
+    everythingIsOk = everythingIsOk & commandIsAvailable("qemu-system-x86_64")
+    everythingIsOk = everythingIsOk & commandIsAvailable("clang", versionExpected=(15,))
+    everythingIsOk = everythingIsOk & commandIsAvailable(
+        "clang++", versionExpected=(15,)
+    )
+    everythingIsOk = everythingIsOk & commandIsAvailable(
+        "ld.lld", versionExpected=(15,)
+    )
+    everythingIsOk = everythingIsOk & commandIsAvailable("nasm")
+    everythingIsOk = everythingIsOk & commandIsAvailable("ninja")
+    everythingIsOk = everythingIsOk & commandIsAvailable(
+        "cutekit", versionCommand="version"
+    )
+    everythingIsOk = everythingIsOk & commandIsAvailable("chatty")
+    everythingIsOk = everythingIsOk & commandIsAvailable("pkg-config")
 
 
 append(Cmd(None, "doctor", "Check if all required commands are available", doctorCmd))

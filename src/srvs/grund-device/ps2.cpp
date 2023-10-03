@@ -1,3 +1,4 @@
+#include <karm-events/events.h>
 #include <karm-logger/logger.h>
 
 #include "ps2.h"
@@ -98,7 +99,7 @@ Res<> Keyboard::init() {
     return Ok();
 }
 
-Res<> Keyboard::event(Events::Event &e) {
+Res<> Keyboard::event(Async::Event &e) {
     if (auto const *irq = e.is<IrqEvent>()) {
         if (irq->irq == 1) {
             auto status = try$(ctrl().readStatus());
@@ -177,7 +178,7 @@ Res<> Mouse::decode() {
     return Ok();
 }
 
-Res<> Mouse::event(Events::Event &e) {
+Res<> Mouse::event(Async::Event &e) {
     if (auto const *irq = e.is<IrqEvent>()) {
         if (irq->irq == 12) {
             auto status = try$(ctrl().readStatus());

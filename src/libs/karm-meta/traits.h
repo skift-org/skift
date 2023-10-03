@@ -64,6 +64,9 @@ template <typename T>
 concept Pod = Trivial<T> and StandardLayout<T>;
 
 template <typename T>
+concept TrivialyCopyable = __is_trivially_copyable(T);
+
+template <typename T>
 concept Signed = __is_signed(T);
 
 template <typename T>

@@ -9,15 +9,13 @@ namespace Karm::Ui {
 
 /* --- Drag Event ----------------------------------------------------------- */
 
-struct DragEvent : public Events::BaseEvent<DragEvent> {
-    enum _Type : u8 {
+struct DragEvent {
+    enum {
         START,
         DRAG,
         END
-    };
-
-    _Type type;
-    Math::Vec2i delta;
+    } type;
+    Math::Vec2i delta{};
 };
 
 /* --- Dismisable ----------------------------------------------------------- */

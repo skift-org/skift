@@ -7,52 +7,34 @@ namespace Karm::Async {
 /* --- Sink --- */
 
 void Loop::_post(Sink &sink, Box<Event> event) {
-    _queued.emplaceBack(sink, std::move(event));
+    _queued.emplaceBack(&sink, std::move(event));
 }
 
-void Loop::_move(Sink &from, Sink &to) {
+void Loop::_move(Sink &from, Sink *to) {
     for (auto &q : _queued) {
         if (q.sink == &from) {
-            q.sink = &to;
+            q.sink = to;
         }
     }
 
     for (auto &s : _sources) {
         if (s.sink == &from) {
-            s.sink = &to;
+            s.sink = to;
         }
-    }
-}
-
-void Loop::_dtor(Sink &sink) {
-    for (auto &q : _queued) {
-        if (q.sink == &sink)
-            q.sink = nullptr;
-    }
-
-    for (auto &s : _sources) {
-        if (s.sink == &sink)
-            s.sink = nullptr;
     }
 }
 
 /* --- Source --- */
 
 void Loop::_bind(Source &source, Sink &sink) {
-    _sources.emplaceBack(source, sink);
+    _sources.emplaceBack(&source, &sink);
 }
 
-void Loop::_move(Source &from, Source &to) {
+void Loop::_move(Source &from, Source *to) {
     for (auto &s : _sources) {
-        if (s.source == &from)
-            s.source = &to;
-    }
-}
-
-void Loop::_dtor(Source *source) {
-    for (auto &s : _sources) {
-        if (s.source == source)
-            s.source = nullptr;
+        if (s.source == &from) {
+            s.source = to;
+        }
     }
 }
 

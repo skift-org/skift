@@ -9,8 +9,14 @@ namespace Karm::Meta {
 using Id = usize;
 
 template <typename T>
-static Id idOf() {
-    return reinterpret_cast<Id>(__PRETTY_FUNCTION__ + 41);
+static constexpr Id idOf() {
+    auto cstr = __PRETTY_FUNCTION__;
+    auto len = sizeof(__PRETTY_FUNCTION__);
+    auto hash = 0uz;
+    for (char const *b = cstr; b < cstr + len; b++)
+        hash = (1000003 * hash) ^ *b;
+    hash ^= len;
+    return hash;
 }
 
 template <typename T>

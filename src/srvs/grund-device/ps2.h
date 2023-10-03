@@ -1,6 +1,7 @@
 #pragma once
 
 #include <hal/io.h>
+#include <karm-base/enum.h>
 
 #include "node.h"
 
@@ -109,7 +110,7 @@ struct Keyboard : public Device {
 
     Res<> init() override;
 
-    Res<> event(Events::Event &e) override;
+    Res<> event(Async::Event &e) override;
 
     Res<> sendCmd(_Cmd cmd) {
         try$(ctrl().writeData(cmd));
@@ -134,13 +135,12 @@ struct Mouse : public Device {
     u8 _cycle;
     Array<u8, 4> _buf;
     bool _hasWheel;
-    Events::MouseEvent _event;
 
     using Device::Device;
 
     Res<> init() override;
 
-    Res<> event(Events::Event &e) override;
+    Res<> event(Async::Event &e) override;
 
     Res<> decode();
 

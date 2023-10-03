@@ -4,6 +4,8 @@
 #include <karm-main/base.h>
 #include <url/url.h>
 
+#include "api.h"
+
 namespace Grund::System {
 
 struct Unit {
@@ -14,11 +16,23 @@ struct Unit {
     static Res<Strong<Unit>> load(Ctx &ctx, Url::Url url);
 };
 
+struct Object {
+    usize _id;
+    usize _port;
+    Strong<Unit> _unit;
+
+    static Res<Strong<Object>> create(usize port, Strong<Unit> unit) {
+        static usize id = 0;
+        return Ok(makeStrong<Object>(id++, port, unit));
+    }
+};
+
 struct Bus {
     Hj::Listener _listener;
     Hj::Domain _domain;
 
-    Vec<Strong<Unit>> _units = {};
+    Vec<Strong<Unit>> _units{};
+    Vec<Strong<Object>> _objs{};
 
     static Res<Bus> create() {
         auto domain = try$(Hj::Domain::create(Hj::ROOT));
@@ -48,7 +62,9 @@ struct Bus {
                 try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::READABLE));
                 Hj::Msg msg;
                 try$(Hj::_recv(ev->cap, &msg, _domain));
-                try$(broadcast(ev->cap, msg));
+                if (msg.label == IBus::broadcast_UID) {
+                    try$(broadcast(ev->cap, msg));
+                }
                 ev = _listener.next();
             }
         }

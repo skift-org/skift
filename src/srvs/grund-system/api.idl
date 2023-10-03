@@ -1,13 +1,7 @@
-module Grund::System
+module Grund
 
-include "karm-ipc/base.h"
+include "karm-base/std.h"
 
-Client {
-    event (ClientEvent e) -> Res<>
-}
-
-Host {
-    bubble (HostEvent e) -> Res<>
-
-    flip (Vec<Math::Recti> r) -> Res<>
+Bus {
+    broadcast() -> None
 }

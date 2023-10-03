@@ -31,7 +31,7 @@ struct Host :
     void wait(TimeSpan) override {
     }
 
-    void bubble(Events::Event &e) override {
+    void bubble(Async::Event &e) override {
         Ui::Host::bubble(e);
     }
 };

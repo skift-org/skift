@@ -6,28 +6,6 @@ namespace Karm::Ui {
 
 /* --- Reducer -------------------------------------------------------------- */
 
-template <typename Action>
-struct ActionDispatchEvent :
-    public Events::BaseEvent<ActionDispatchEvent<Action>> {
-    Action action;
-
-    ActionDispatchEvent(Action action)
-        : action(std::move(action)) {}
-};
-
-template <typename Action>
-inline void dispatchAction(Node &n, Action action) {
-    ActionDispatchEvent<Action> e{std::move(action)};
-    n.bubble(e);
-}
-
-template <typename Action>
-inline Func<void(Node &)> bindAction(Action action) {
-    return [action](Node &n) {
-        dispatchAction(n, action);
-    };
-}
-
 template <typename S, typename A, void (*R)(S &, A)>
 struct Model {
     using State = S;
@@ -36,31 +14,31 @@ struct Model {
 
     template <typename X, typename... Args>
     static Func<void(Node &)> bind(Args... args) {
-        return bindAction<Action>(X{std::forward<Args>(args)...});
+        return bindBubble<Action>(X{std::forward<Args>(args)...});
     }
 
     template <typename X>
     static Func<void(Node &)> bind(X value) {
-        return bindAction<Action>(value);
+        return bindBubble<Action>(value);
     }
 
     template <typename X, typename... Args>
     static Opt<Func<void(Node &)>> bindIf(bool cond, Args... args) {
         if (not cond)
             return NONE;
-        return bindAction<Action>(X{std::forward<Args>(args)...});
+        return bindBubble<Action>(X{std::forward<Args>(args)...});
     }
 
     template <typename X>
     static Opt<Func<void(Node &)>> bindIf(bool cond, X value) {
         if (not cond)
             return NONE;
-        return bindAction<Action>(value);
+        return bindBubble<Action>(value);
     }
 
     template <typename X>
     static void dispatch(Node &n, X value) {
-        dispatchAction(n, Action{std::move(value)});
+        bubble<Action>(n, Action{std::move(value)});
     }
 };
 
@@ -120,14 +98,14 @@ struct Reducer :
         (*_child)->paint(g, r);
     }
 
-    void event(Events::Event &e) override {
+    void event(Async::Event &e) override {
         ensureBuild();
         (*_child)->event(e);
     }
 
-    void bubble(Events::Event &e) override {
-        if (auto *ad = e.is<ActionDispatchEvent<Action>>()) {
-            Model::reduce(_state, ad->action);
+    void bubble(Async::Event &e) override {
+        if (auto *a = e.is<Action>()) {
+            Model::reduce(_state, *a);
             e.accept();
 
             _rebuild = true;
@@ -170,22 +148,16 @@ inline Child reducer(Func<Child(typename Model::State const &)> build) {
 
 template <typename T>
 inline Child state(T init, auto build) {
-    struct UpdateState {
-        T val;
+    auto reduce = [](T &s, T v) {
+        s = v;
     };
 
-    auto reduce = [](T &s, UpdateState action) {
-        s = action.val;
-    };
-
-    using M = Model<T, UpdateState, reduce>;
+    using M = Model<T, T, reduce>;
 
     return reducer<M>(init, [build](T const &state) {
-        auto bind = [](T t) {
-            return bindAction<UpdateState>(UpdateState{std::move(t)});
-        };
-
-        return build(state, bind);
+        return build(state, [](T t) {
+            return bindBubble<T>(t);
+        });
     });
 }
 

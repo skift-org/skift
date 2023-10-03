@@ -69,9 +69,6 @@ struct Box {
     }
 };
 
-template <typename T>
-using OptBox = Opt<Box<T>>;
-
 template <typename T, typename... Args>
 constexpr static Box<T> makeBox(Args... args) {
     return {new T(std::forward<Args>(args)...)};

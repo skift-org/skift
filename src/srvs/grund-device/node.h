@@ -1,16 +1,13 @@
 #pragma once
 
+#include <karm-async/async.h>
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
-#include <karm-events/events.h>
 
 namespace Grund::Device {
 
-struct IrqEvent : public Events::BaseEvent<IrqEvent> {
+struct IrqEvent {
     usize irq;
-
-    IrqEvent(usize irq)
-        : irq(irq) {}
 };
 
 struct Node : public Meta::Static {
@@ -24,9 +21,9 @@ struct Node : public Meta::Static {
 
     virtual Res<> init();
 
-    virtual Res<> event(Events::Event &e);
+    virtual Res<> event(Async::Event &e);
 
-    virtual Res<> bubble(Events::Event &e);
+    virtual Res<> bubble(Async::Event &e);
 
     Res<> attach(Strong<Node> child);
 

@@ -44,7 +44,7 @@ struct MouseListener {
         return _pos;
     }
 
-    bool listen(Node &node, Events::Event &e) {
+    bool listen(Node &node, Async::Event &e) {
         bool result = false;
         MouseState state = _state;
 
@@ -213,9 +213,9 @@ Child color(Gfx::Color color, OnChange<Gfx::Color> onChange);
 
 /* --- Intent --------------------------------------------------------------- */
 
-Child intent(Child child, Func<void(Node &, Events::Event &e)> map);
+Child intent(Child child, Func<void(Node &, Async::Event &e)> map);
 
-static inline auto intent(Func<void(Node &, Events::Event &e)> map) {
+static inline auto intent(Func<void(Node &, Async::Event &e)> map) {
     return [map = std::move(map)](Child child) mutable {
         return intent(std::move(child), std::move(map));
     };

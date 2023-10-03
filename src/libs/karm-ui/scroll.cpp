@@ -12,7 +12,7 @@ struct Scroll : public ProxyNode<Scroll> {
     Math::Vec2f _scroll{};
     Math::Vec2f _targetScroll{};
 
-    Scroll(Layout::Orien orient, Child child)
+    Scroll(Child child, Layout::Orien orient)
         : ProxyNode(child), _orient(orient) {}
 
     void scroll(Math::Vec2i s) {
@@ -37,47 +37,47 @@ struct Scroll : public ProxyNode<Scroll> {
             g.debugRect(_bound, Gfx::CYAN);
     }
 
-    void event(Events::Event &e) override {
-        if (e.is<Events::MouseEvent>()) {
-            auto ee = e.unwrap<Events::MouseEvent>();
-            if (bound().contains(ee.pos)) {
+    void event(Async::Event &e) override {
+        if (auto *me = e.is<Events::MouseEvent>()) {
+            if (bound().contains(me->pos)) {
                 _mouseIn = true;
 
-                ee.pos = ee.pos - _scroll.cast<isize>();
-                child().event(ee);
+                me->pos = me->pos - _scroll.cast<isize>();
+                child().event(e);
+                me->pos = me->pos + _scroll.cast<isize>();
 
-                if (not ee.accepted) {
-                    if (ee.type == Events::MouseEvent::SCROLL) {
-                        scroll((_scroll + ee.scrollPrecise * 128).cast<isize>());
+                if (not e.accepted()) {
+                    if (me->type == Events::MouseEvent::SCROLL) {
+                        scroll((_scroll + me->scroll * 128).cast<isize>());
                         shouldAnimate(*this);
                         _animated = true;
                     }
                 }
             } else if (_mouseIn) {
+                _mouseIn = false;
                 mouseLeave(*_child);
             }
-            e.accepted = ee.accepted;
-        } else if (e.is<Events::AnimateEvent>() and _animated) {
+        } else if (e.is<Node::AnimateEvent>() and _animated) {
             shouldRepaint(*parent(), bound());
 
-            _scroll = _scroll + (_targetScroll - _scroll) * (e.unwrap<Events::AnimateEvent>().dt * 20);
+            _scroll = _scroll + (_targetScroll - _scroll) * (e.unwrap<Node::AnimateEvent>().dt * 20);
 
             if (_scroll.dist(_targetScroll) < 0.5) {
                 _scroll = _targetScroll;
                 _animated = false;
-            } else
+            } else {
                 shouldAnimate(*this);
+            }
 
         } else {
-            child().event(e);
+            ProxyNode<Scroll>::event(e);
         }
     }
 
-    void bubble(Events::Event &e) override {
-        if (e.is<Events::PaintEvent>()) {
-            auto &paintEvent = e.unwrap<Events::PaintEvent>();
-            paintEvent.bound.xy = paintEvent.bound.xy + _scroll.cast<isize>();
-            paintEvent.bound = paintEvent.bound.clipTo(bound());
+    void bubble(Async::Event &e) override {
+        if (auto *pe = e.is<Node::PaintEvent>()) {
+            pe->bound.xy = pe->bound.xy + _scroll.cast<isize>();
+            pe->bound = pe->bound.clipTo(bound());
         }
 
         ProxyNode::bubble(e);
@@ -107,10 +107,9 @@ struct Scroll : public ProxyNode<Scroll> {
             } else {
                 childSize = s;
             }
-            return childSize;
-        } else {
-            return childSize;
         }
+
+        return childSize;
     }
 
     Math::Recti bound() override {
@@ -119,26 +118,15 @@ struct Scroll : public ProxyNode<Scroll> {
 };
 
 Child vhscroll(Child child) {
-    return makeStrong<Scroll>(Layout::Orien::BOTH, child);
+    return makeStrong<Scroll>(child, Layout::Orien::BOTH);
 }
 
 Child hscroll(Child child) {
-    return makeStrong<Scroll>(Layout::Orien::HORIZONTAL, child);
+    return makeStrong<Scroll>(child, Layout::Orien::HORIZONTAL);
 }
 
 Child vscroll(Child child) {
-    return makeStrong<Scroll>(Layout::Orien::VERTICAL, child);
+    return makeStrong<Scroll>(child, Layout::Orien::VERTICAL);
 }
-
-/* --- List ----------------------------------------------------------------- */
-
-struct List : public GroupNode<List> {
-    usize _count;
-    BuildItem _builder;
-
-    List(usize count, BuildItem builder)
-        : _count(count),
-          _builder(std::move(builder)) {}
-};
 
 } // namespace Karm::Ui

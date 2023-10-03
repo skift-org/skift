@@ -13,41 +13,33 @@ namespace Karm::Ui {
 
 /* ---  Dialog Base  -------------------------------------------------------- */
 
-struct ShowDialogEvent : public Events::BaseEvent<ShowDialogEvent> {
+struct ShowDialogEvent {
     Child child;
-    ShowDialogEvent(Child c) : child(c) {}
 };
 
 void showDialog(Node &n, Child child) {
-    ShowDialogEvent e(child);
-    n.bubble(e);
+    bubble<ShowDialogEvent>(n, child);
 }
 
-struct CloseDialogEvent : public Events::BaseEvent<CloseDialogEvent> {};
+struct CloseDialogEvent {
+};
 
 void closeDialog(Node &n) {
-    CloseDialogEvent e;
-    n.bubble(e);
+    bubble<CloseDialogEvent>(n);
 }
 
-struct ShowPopoverEvent : public Events::BaseEvent<ShowPopoverEvent> {
+struct ShowPopoverEvent {
     Math::Vec2i at;
     Child child;
-
-    ShowPopoverEvent(Math::Vec2i a, Child c)
-        : at(a), child(c) {}
 };
 
 void showPopover(Node &n, Math::Vec2i at, Child child) {
-    ShowPopoverEvent e(at, child);
-    n.bubble(e);
+    bubble<ShowPopoverEvent>(n, at, child);
 }
 
-struct ClosePopoverEvent : public Events::BaseEvent<ClosePopoverEvent> {};
-
 void closePopover(Node &n) {
-    ClosePopoverEvent e;
-    n.bubble(e);
+    struct ClosePopoverEvent {};
+    bubble<ClosePopoverEvent>(n);
 }
 
 struct DialogLayer : public LeafNode<DialogLayer> {
@@ -123,7 +115,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         }
     }
 
-    void event(Events::Event &e) override {
+    void event(Async::Event &e) override {
         if (_opacity.needRepaint(*this, e)) {
             Ui::shouldRepaint(*this);
         }
@@ -137,7 +129,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         }
     }
 
-    void bubble(Events::Event &e) override {
+    void bubble(Async::Event &e) override {
         if (e.is<ShowDialogEvent>()) {
             // We need to defer showing the dialog until the next frame,
             // otherwise replacing the dialog might cause some use after free down the tree

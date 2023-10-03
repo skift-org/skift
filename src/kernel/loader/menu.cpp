@@ -112,16 +112,16 @@ Ui::Child alert(String title, String subtitle) {
            Ui::spacing(64);
 }
 
-void intent(Ui::Node &n, Events::Event &e) {
+void intent(Ui::Node &n, Async::Event &e) {
     if (auto *k = e.is<Events::KeyboardEvent>()) {
         if (k->key == Events::Key::LEFT) {
-            Ui::dispatchAction<Action>(n, MoveSelectionAction{-1});
+            Ui::bubble<Action>(n, MoveSelectionAction{-1});
             e.accept();
         } else if (k->key == Events::Key::RIGHT) {
-            Ui::dispatchAction<Action>(n, MoveSelectionAction{1});
+            Ui::bubble<Action>(n, MoveSelectionAction{1});
             e.accept();
         } else if (k->key == Events::Key::ENTER) {
-            Ui::dispatchAction<Action>(n, SelectAction{});
+            Ui::bubble<Action>(n, SelectAction{});
             e.accept();
         }
     }

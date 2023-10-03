@@ -12,10 +12,7 @@ Ui::Child app() {
         "LICENSE");
 
     auto closeBtn = Ui::button(
-        [](Ui::Node &n) {
-            Events::ExitEvent e{Ok()};
-            n.bubble(e);
-        },
+        Ui::bindBubble<Events::ExitEvent>(Ok()),
         Ui::ButtonStyle::primary(),
         "OK");
 

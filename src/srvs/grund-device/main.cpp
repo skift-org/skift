@@ -50,8 +50,8 @@ Res<> entryPoint(Ctx &) {
 
             auto irq = cap2irq.get(ev->cap);
             if (irq) {
-                Grund::Device::IrqEvent ev = {*irq};
-                try$(root->event(ev));
+                auto e = Async::makeEvent<Grund::Device::IrqEvent>(Async::Propagation::UP, *irq);
+                try$(root->event(*e));
             }
             ev = listener.next();
         }

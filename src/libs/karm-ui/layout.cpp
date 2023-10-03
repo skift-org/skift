@@ -309,13 +309,13 @@ struct StackLayout : public GroupNode<StackLayout> {
         }
     }
 
-    void event(Events::Event &e) override {
-        if (e.accepted)
+    void event(Async::Event &e) override {
+        if (e.accepted())
             return;
 
         for (auto &child : mutIterRev(children())) {
             child->event(e);
-            if (e.accepted)
+            if (e.accepted())
                 return;
         }
     }

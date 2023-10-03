@@ -20,15 +20,15 @@ Res<> Node::init() {
     return Ok();
 }
 
-Res<> Node::event(Events::Event &e) {
-    if (e.accepted) {
+Res<> Node::event(Async::Event &e) {
+    if (e.accepted()) {
         return Ok();
     }
 
     for (auto &child : _children) {
         try$(child->event(e));
 
-        if (e.accepted) {
+        if (e.accepted()) {
             return Ok();
         }
     }
@@ -36,8 +36,8 @@ Res<> Node::event(Events::Event &e) {
     return Ok();
 }
 
-Res<> Node::bubble(Events::Event &e) {
-    if (_parent and not e.accepted) {
+Res<> Node::bubble(Async::Event &e) {
+    if (_parent and not e.accepted()) {
         try$(_parent->bubble(e));
     }
 

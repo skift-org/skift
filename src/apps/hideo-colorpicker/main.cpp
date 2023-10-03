@@ -67,7 +67,7 @@ struct HsvPicker : public Ui::View<HsvPicker> {
         g.restore();
     }
 
-    void event(Events::Event &e) override {
+    void event(Async::Event &e) override {
         _mouseListener.listen(*this, e);
 
         if (_mouseListener.isPress() and e.is<Events::MouseEvent>()) {

@@ -199,7 +199,7 @@ struct Button : public _Box<Button> {
         }
     }
 
-    void event(Events::Event &e) override {
+    void event(Async::Event &e) override {
         if (_onPress and _mouseListener.listen(*this, e)) {
             _onPress(*this);
         }
@@ -363,7 +363,7 @@ struct Toggle : public View<Toggle> {
         g.restore();
     }
 
-    void event(Events::Event &e) override {
+    void event(Async::Event &e) override {
         if (_mouseListener.listen(*this, e)) {
             _value = not _value;
             _onChange(*this, _value);
@@ -422,7 +422,7 @@ struct Checkbox : public View<Checkbox> {
         g.restore();
     }
 
-    void event(Events::Event &e) override {
+    void event(Async::Event &e) override {
         if (_mouseListener.listen(*this, e)) {
             _value = not _value;
             _onChange(*this, _value);
@@ -479,7 +479,7 @@ struct Radio : public View<Radio> {
         g.restore();
     }
 
-    void event(Events::Event &e) override {
+    void event(Async::Event &e) override {
         if (_mouseListener.listen(*this, e)) {
             _value = not _value;
             _onChange(*this, _value);
@@ -603,7 +603,7 @@ struct Slider : public View<Slider> {
         _style.thumbStyle.paint(g, thumbBound);
     }
 
-    void event(Events::Event &e) override {
+    void event(Async::Event &e) override {
         _mouseListener.listen(*this, e);
 
         if (_mouseListener.isPress() and e.is<Events::MouseEvent>()) {
@@ -655,7 +655,7 @@ struct Slider2 : public ProxyNode<Slider2> {
         return _bound;
     }
 
-    void bubble(Events::Event &e) override {
+    void bubble(Async::Event &e) override {
         if (auto *dv = e.is<DragEvent>()) {
             if (dv->type == DragEvent::DRAG) {
                 auto max = bound().width - bound().height;
@@ -700,22 +700,22 @@ Child color(Gfx::Color color, OnChange<Gfx::Color>) {
 /* --- Intent --------------------------------------------------------------- */
 
 struct Intent : public ProxyNode<Intent> {
-    Func<void(Node &, Events::Event &e)> _map;
+    Func<void(Node &, Async::Event &e)> _map;
 
-    Intent(Child child, Func<void(Node &, Events::Event &e)> map)
+    Intent(Child child, Func<void(Node &, Async::Event &e)> map)
         : ProxyNode<Intent>(std::move(child)), _map(std::move(map)) {}
 
-    void event(Events::Event &e) override {
+    void event(Async::Event &e) override {
         _map(*this, e);
 
-        if (e.accepted)
+        if (e.accepted())
             return;
 
         child().event(e);
     }
 };
 
-Child intent(Child child, Func<void(Node &, Events::Event &e)> map) {
+Child intent(Child child, Func<void(Node &, Async::Event &e)> map) {
     return makeStrong<Intent>(std::move(child), std::move(map));
 }
 

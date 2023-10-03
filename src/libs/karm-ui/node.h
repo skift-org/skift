@@ -1,7 +1,7 @@
 #pragma once
 
+#include <karm-async/async.h>
 #include <karm-base/func.h>
-#include <karm-base/rc.h>
 #include <karm-events/events.h>
 #include <karm-gfx/context.h>
 #include <karm-layout/size.h>
@@ -27,6 +27,17 @@ using Visitor = Func<void(Node &)>;
 /* --- Node ----------------------------------------------------------------- */
 
 struct Node : public Meta::Static {
+    struct PaintEvent {
+        Math::Recti bound;
+    };
+
+    struct LayoutEvent {
+    };
+
+    struct AnimateEvent {
+        f64 dt;
+    };
+
     Node() {
         debugNodeCount++;
     }
@@ -39,9 +50,9 @@ struct Node : public Meta::Static {
 
     virtual void paint(Gfx::Context &, Math::Recti) {}
 
-    virtual void event(Events::Event &) {}
+    virtual void event(Async::Event &) {}
 
-    virtual void bubble(Events::Event &) {}
+    virtual void bubble(Async::Event &) {}
 
     virtual void layout(Math::Recti) {}
 
@@ -58,8 +69,8 @@ struct Node : public Meta::Static {
 
 template <typename T>
 concept Decorator = requires(T &t, Child &c) {
-                        { t(c) } -> Meta::Same<Child>;
-                    };
+    { t(c) } -> Meta::Same<Child>;
+};
 
 ALWAYS_INLINE Child operator|(Child child, Decorator auto decorator) {
     return decorator(child);
@@ -96,8 +107,8 @@ struct LeafNode : public Node {
         return NONE;
     }
 
-    void bubble(Events::Event &e) override {
-        if (_parent and not e.accepted)
+    void bubble(Async::Event &e) override {
+        if (_parent and not e.accepted())
             _parent->bubble(e);
     }
 
@@ -169,13 +180,13 @@ struct GroupNode : public LeafNode<Crtp> {
         }
     }
 
-    void event(Events::Event &e) override {
-        if (e.accepted)
+    void event(Async::Event &e) override {
+        if (e.accepted())
             return;
 
         for (auto &child : children()) {
             child->event(e);
-            if (e.accepted)
+            if (e.accepted())
                 return;
         }
     }
@@ -225,8 +236,8 @@ struct ProxyNode : public LeafNode<Crtp> {
         child().paint(g, r);
     }
 
-    void event(Events::Event &e) override {
-        if (e.accepted)
+    void event(Async::Event &e) override {
+        if (e.accepted())
             return;
 
         child().event(e);

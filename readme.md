@@ -11,8 +11,8 @@
 <br/>
 
 <p align="center">
-  <a href="https://skiftos.org/">Website</a> -
-  <a href="http://discord.skiftos.org">Discord</a> -
+  <a href="https://skift.smnx.sh/">Website</a> -
+  <a href="https://discord.com/invite/gamGsfg">Discord</a> -
   <a href="https://github.com/skift-org/skift/releases">Releases</a>
 </p>
 
@@ -31,7 +31,7 @@
 
 ## Building
 
-> 🛈 **Note:** If you are having trouble building skiftOS, feel free to ask for help in the [Discord server](http://discord.skiftos.org)
+> 🛈 **Note:** If you are having trouble building skiftOS, feel free to ask for help in the [Discord server](https://discord.com/invite/gamGsfg)
 
 To build skiftOS, you need to have a modern C/C++ compiler such as clang-16 installed on your computer. Additionally, you need to have the following tools installed: `python3`, `llvm`, `clang`, `ninja`, `nasm`, and `qemu`. Please refer to the documentation of these tools or use your package manager to install them.
 

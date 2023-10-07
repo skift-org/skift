@@ -1,7 +1,9 @@
 #pragma once
 
 #include <karm-async/async.h>
+#include <karm-base/checked.h>
 #include <karm-base/func.h>
+#include <karm-base/hash.h>
 #include <karm-events/events.h>
 #include <karm-gfx/context.h>
 #include <karm-layout/size.h>
@@ -26,7 +28,21 @@ using Visitor = Func<void(Node &)>;
 
 /* --- Node ----------------------------------------------------------------- */
 
+using Key = Opt<Hash>;
+
+inline bool match(Key lhs, Key rhs) {
+    if (not lhs.has() and not rhs.has())
+        return true;
+
+    if (lhs.has() and rhs.has())
+        return lhs == rhs;
+
+    return false;
+}
+
 struct Node : public Meta::Static {
+    Key _key = NONE;
+
     struct PaintEvent {
         Math::Recti bound;
     };
@@ -44,6 +60,10 @@ struct Node : public Meta::Static {
 
     virtual ~Node() {
         debugNodeCount--;
+    }
+
+    Key key() const {
+        return _key;
     }
 
     virtual Opt<Child> reconcile(Child other) { return other; }
@@ -66,6 +86,13 @@ struct Node : public Meta::Static {
 
     virtual void detach(Node *) {}
 };
+
+inline auto key(Hashable auto const &key) {
+    return [key](Child child) {
+        child->_key = hash(key);
+        return child;
+    };
+}
 
 template <typename T>
 concept Decorator = requires(T &t, Child &c) {

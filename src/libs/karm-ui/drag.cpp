@@ -10,6 +10,7 @@ struct Dismisable :
     OnDismis _onDismis;
     DismisDir _dir;
     f64 _threshold;
+
     Eased2f _drag{};
     Math::Vec2i _last{};
     bool _dismissed{};
@@ -20,8 +21,23 @@ struct Dismisable :
           _dir(dir),
           _threshold(threshold) {}
 
+    void reconcile(Dismisable &o) override {
+        if (not match(key(), o.key()))
+            reset();
+
+        _onDismis = std::move(o._onDismis);
+        _dir = o._dir;
+        _threshold = o._threshold;
+    }
+
     Math::Vec2i drag() const {
         return _drag.value().cast<isize>();
+    }
+
+    void reset() {
+        _drag = {};
+        _last = {};
+        _dismissed = false;
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
@@ -37,16 +53,14 @@ struct Dismisable :
 
     void event(Async::Event &e) override {
         auto oldBound = bound().clipTo(child().bound().offset(_last));
-        if (_drag.needRepaint(*this, e)) {
+        if (_dismissed and _drag.reached()) {
+            _onDismis(*this);
+            _dismissed = false;
+        } else if (_drag.needRepaint(*this, e)) {
             auto newBound = bound().clipTo(child().bound().offset(drag()));
             _last = drag();
             Ui::shouldRepaint(*this, oldBound.mergeWith(newBound));
         }
-
-        if (_dismissed and _drag.reached()) {
-            _onDismis(*this);
-        }
-
         Ui::ProxyNode<Dismisable>::event(e);
     }
 

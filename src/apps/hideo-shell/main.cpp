@@ -86,7 +86,7 @@ Ui::Child taskbar(State const &) {
 
 Ui::Child tabletPanels(State const &state) {
     return Ui::stack(
-        state.activePanel == Panel::APPS ? appsFlyout() : Ui::empty(),
+        state.activePanel == Panel::APPS ? appsFlyout(state) : Ui::empty(),
         state.activePanel == Panel::SYS ? sysFlyout(state) : Ui::empty());
 }
 
@@ -102,7 +102,7 @@ Ui::Child tablet(State const &state) {
 
 Ui::Child desktopPanels(State const &state) {
     return Ui::stack(
-               state.activePanel == Panel::APPS ? appsPanel() | Ui::align(Layout::Align::START | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
+               state.activePanel == Panel::APPS ? appsPanel(state) | Ui::align(Layout::Align::START | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
                state.activePanel == Panel::NOTIS ? notiPanel(state) | Ui::align(Layout::Align::HCENTER | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
                state.activePanel == Panel::SYS ? sysPanel(state) | Ui::align(Layout::Align::END | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty()) |
            Ui::spacing({8, 38});
@@ -118,22 +118,110 @@ Ui::Child desktop(State const &state) {
 }
 
 Ui::Child app(bool isMobile) {
-    return Ui::reducer<Model>({.isMobile = isMobile}, [](auto state) {
-        auto wallpapers = Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap();
-        auto background = Ui::align(Layout::Align::COVER, Ui::image(wallpapers));
+    return Ui::reducer<Model>(
+        {
+            .isMobile = isMobile,
+            .noti = {
+                {
+                    1,
+                    {{Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP}, "About"},
+                    "Hello",
+                    "Hello, world!",
+                },
+                {
+                    2,
+                    {{Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP}, "About"},
+                    "Hello",
+                    "Hello, world!",
+                },
+                {
+                    3,
+                    {{Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP}, "About"},
+                    "Hello",
+                    "Hello, world!",
+                },
+                {
+                    4,
+                    {{Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP}, "About"},
+                    "Hello",
+                    "Hello, world!",
+                },
+            },
+            .entries = {
+                {
+                    {Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP},
+                    "About",
+                },
+                {
+                    {Mdi::CALCULATOR, Gfx::ORANGE_RAMP},
+                    "Calculator",
+                },
+                {
+                    {Mdi::PALETTE_SWATCH, Gfx::RED_RAMP},
+                    "Color Picker",
+                },
+                {
+                    {Mdi::COUNTER, Gfx::GREEN_RAMP},
+                    "Counter",
+                },
+                {
+                    {Mdi::DUCK, Gfx::YELLOW_RAMP},
+                    "Demos",
+                },
+                {
+                    {Mdi::FILE, Gfx::ORANGE_RAMP},
+                    "Files",
+                },
+                {
+                    {Mdi::FORMAT_FONT, Gfx::BLUE_RAMP},
+                    "Fonts",
+                },
+                {
+                    {Mdi::EMOTICON, Gfx::RED_RAMP},
+                    "Hello World",
+                },
+                {
+                    {Mdi::IMAGE, Gfx::GREEN_RAMP},
+                    "Icons",
+                },
+                {
+                    {Mdi::IMAGE, Gfx::YELLOW_RAMP},
+                    "Image Viewer",
+                },
+                {
+                    {Mdi::CUBE, Gfx::BLUE_RAMP},
+                    "Ray Tracer",
+                },
+                {
+                    {Mdi::COG, Gfx::ZINC_RAMP},
+                    "Settings",
+                },
+                {
+                    {Mdi::TABLE, Gfx::GREEN_RAMP},
+                    "Spreadsheet",
+                },
+                {
+                    {Mdi::WIDGETS, Gfx::BLUE_RAMP},
+                    "Widget Gallery",
+                },
+            },
+        },
+        [](auto state) {
+            auto wallpapers = Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap();
+            auto background = Ui::align(Layout::Align::COVER, Ui::image(wallpapers));
 
-        return Ui::stack(
-                   background,
-                   state.locked ? lock(state)
-                                : (state.isMobile ? tablet(state)
-                                                  : desktop(state)),
-                   state.isMobile ? tabletPanels(state)
-                                  : desktopPanels(state)) |
-               Ui::dialogLayer() |
-               Ui::pinSize(
-                   state.isMobile ? Math::Vec2i{411, 731}
-                                  : Math::Vec2i{1280, 720});
-    });
+            return Ui::stack(
+                       background,
+                       state.locked ? lock(state)
+                                    : (state.isMobile ? tablet(state)
+                                                      : desktop(state)),
+                       state.isMobile ? tabletPanels(state)
+                                      : desktopPanels(state)) |
+                   Ui::dialogLayer() |
+                   Ui::pinSize(
+                       state.isMobile ? Math::Vec2i{411, 731}
+                                      : Math::Vec2i{1280, 720});
+        });
 }
 
 } // namespace Shell

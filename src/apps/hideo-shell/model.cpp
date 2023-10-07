@@ -16,6 +16,9 @@ void reduce(State &s, Action a) {
         [&](Unlock) {
             s.locked = false;
         },
+        [&](DimisNoti dismis) {
+            s.noti.removeAt(dismis.index);
+        },
         [&](Activate panel) {
             if (s.activePanel != panel.panel) {
                 s.activePanel = panel.panel;

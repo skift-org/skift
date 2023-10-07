@@ -4,15 +4,22 @@
 
 namespace Shell {
 
-struct App {
+struct MenuIcon {
     Mdi::Icon icon;
-    Gfx::ColorRamp color;
+    Gfx::ColorRamp colors;
+};
+
+struct MenuEntry {
+    MenuIcon icon;
     String name;
 };
 
 struct Noti {
+    usize id;
+    MenuEntry entry;
     String title;
-    String msg;
+    String body;
+    Vec<String> actions{};
 };
 
 enum struct Panel {
@@ -22,11 +29,18 @@ enum struct Panel {
     SYS,
 };
 
+struct Surface {
+};
+
 struct State {
     bool locked = true;
     bool isMobile = true;
     Panel activePanel = Panel::NIL;
     bool isSysPanelColapsed = true;
+
+    Vec<Noti> noti;
+    Vec<MenuEntry> entries;
+    Vec<Surface> surfaces;
 };
 
 struct ToggleTablet {};
@@ -35,13 +49,17 @@ struct Lock {};
 
 struct Unlock {};
 
-struct Activate {
-    Panel panel;
+struct DimisNoti {
+    usize index;
 };
 
 struct ToggleSysPanel {};
 
-using Action = Var<ToggleTablet, Lock, Unlock, Activate, ToggleSysPanel>;
+struct Activate {
+    Panel panel;
+};
+
+using Action = Var<ToggleTablet, Lock, Unlock, DimisNoti, Activate, ToggleSysPanel>;
 
 void reduce(State &, Action);
 

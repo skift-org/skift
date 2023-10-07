@@ -21,9 +21,9 @@ inline auto panel(Math::Vec2i size = {500, 400}) {
 
 Ui::Child lock(State const &state);
 
-Ui::Child appsPanel();
+Ui::Child appsPanel(State const &state);
 
-Ui::Child appsFlyout();
+Ui::Child appsFlyout(State const &state);
 
 Ui::Child sysPanel(State const &state);
 

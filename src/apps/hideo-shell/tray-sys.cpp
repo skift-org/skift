@@ -200,51 +200,56 @@ Ui::Child quickSettings(State const &state) {
     }
 }
 
-Ui::Child notiWrapper(App app, Ui::Child inner) {
+Ui::Child noti(Noti const &noti, usize i) {
+    auto const &entry = noti.entry;
     return Ui::vflow(
                8,
                Ui::hflow(
                    4,
-                   Ui::box({.foregroundPaint = app.color[4]},
-                           Ui::icon(app.icon, 12)),
-                   Ui::text(Ui::TextStyle::labelMedium().withColor(Ui::GRAY400), app.name)),
-               inner) |
+                   Ui::icon(entry.icon.icon, 12) | Ui::box({.foregroundPaint = entry.icon.colors[4]}),
+                   Ui::text(Ui::TextStyle::labelMedium().withColor(Ui::GRAY400), entry.name)),
+               Ui::vflow(
+                   6,
+                   Ui::labelLarge(noti.title),
+                   Ui::labelMedium(noti.body))) |
            Ui::box({
                .padding = 12,
                .borderRadius = 4,
                .backgroundPaint = Ui::GRAY900,
-           });
+           }) |
+           Ui::dragRegion() |
+           Ui::dismisable(
+               Model::bind<DimisNoti>(i),
+               Ui::DismisDir::HORIZONTAL,
+               0.3) |
+           Ui::key(noti.id);
 }
 
-Ui::Child notiMsg(String title, String body) {
-    return Ui::vflow(
-        6,
-        Ui::hflow(Ui::text(Ui::TextStyle::labelLarge(), title)),
-        Ui::text(Ui::TextStyle::labelMedium(), body));
-}
+Ui::Child notifications(State const &state) {
+    if (not state.noti.len()) {
+        return Ui::labelMedium("No notifications") |
+               Ui::center() |
+               Ui::grow();
+    }
 
-Ui::Child notification(Mdi::Icon icon, String title, String subtitle) {
-    return notiWrapper({icon, Gfx::BLUE_RAMP, "Hello, world"}, notiMsg(title, subtitle));
-}
-
-Ui::Child notifications() {
     return Ui::vflow(
         8,
-        notification(Mdi::HAND_WAVE, "Hello", "Hello, world!"),
-        notification(Mdi::HAND_WAVE, "Hello", "Hello, world!"),
-        notification(Mdi::HAND_WAVE, "Hello", "Hello, world!"));
+        iter(state.noti)
+            .mapi(noti)
+            .collect<Ui::Children>());
 }
 
 Ui::Child sysPanel(State const &state) {
-    return expendedQuickSettings(state) | panel({320, Ui::UNCONSTRAINED});
+    return expendedQuickSettings(state) |
+           panel({320, Ui::UNCONSTRAINED});
 }
 
-Ui::Child notiPanel(State const &) {
+Ui::Child notiPanel(State const &state) {
     return Ui::vflow(
                8,
                Ui::labelMedium("Notifications") |
                    Ui::spacing({12, 6, 0, 0}),
-               notifications()) |
+               notifications(state)) |
            panel();
 }
 
@@ -263,7 +268,7 @@ Ui::Child sysFlyout(State const &state) {
     if (state.isSysPanelColapsed) {
         body.pushBack(colapsedQuickSettings(state));
         body.pushBack(Ui::labelMedium("Notifications") | Ui::spacing({12, 6, 0, 0}));
-        body.pushBack(notifications() | Ui::grow());
+        body.pushBack(notifications(state) | Ui::grow());
     } else {
         body.pushBack(expendedQuickSettings(state) | Ui::grow());
     }

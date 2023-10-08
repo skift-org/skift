@@ -193,12 +193,6 @@ Ui::Child hsvSliders(State const &state) {
         valueSlider(state));
 }
 
-Ui::Child hsvPickerAndSliders(State const &state) {
-    return Ui::vflow(
-        hsvPicker(state),
-        hsvSliders(state));
-}
-
 Gfx::Color pickColor(Gfx::Color c) {
     if (c.luminance() > 0.7) {
         return Gfx::BLACK;
@@ -231,7 +225,7 @@ Ui::Child colorRamp(State const &state, Gfx::ColorRamp ramp) {
         4,
         iter(ramp)
             .map([=](Gfx::Color c) {
-                return colorCell(state, c);
+                return colorCell(state, c) | Ui::grow();
             })
             .collect<Ui::Children>());
 }
@@ -249,31 +243,46 @@ Ui::Child colorRamps(State const &state) {
 }
 
 Ui::Child app() {
-    return Ui::reducer<Model>({}, [](auto const &state) {
-        auto selector = Ui::hflow(
-            4,
-            Ui::button(
-                Model::bind(UpdatePage{Page::HSV}),
-                (state.page == Page::HSV) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
-                Mdi::EYEDROPPER, "Color Picker"),
-            Ui::button(
-                Model::bind(UpdatePage{Page::PALLETE}),
-                (state.page == Page::PALLETE) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
-                Mdi::PALETTE_SWATCH, "Palette"));
+    return Ui::reducer<Model>(
+        {
+            .hsv = Gfx::rgbToHsv(Gfx::BLUE),
+        },
+        [](auto const &state) {
+            auto c = Gfx::hsvToRgb(state.hsv);
 
-        return Ui::vflow(
-                   8,
-                   selector,
-                   ((state.page == Page::HSV)
-                        ? hsvPickerAndSliders(state)
-                        : colorRamps(state)) |
-                       Ui::grow()) |
-               Ui::spacing(8);
-    });
+            auto preview = Ui::empty(128) |
+                           Ui::box({
+                               .backgroundPaint = Gfx::hsvToRgb(state.hsv),
+                           });
+
+            auto toolbar = Ui::hflow(
+                4,
+                Ui::empty(4),
+                Ui::labelLarge("#{:02x}{:02x}{:02x}", c.red, c.green, c.blue) | Ui::vcenter() | Ui::grow(),
+                Ui::button(
+                    Model::bind(UpdatePage{Page::HSV}),
+                    (state.page == Page::HSV) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
+                    Mdi::TUNE_VARIANT),
+                Ui::button(
+                    Model::bind(UpdatePage{Page::PALLETE}),
+                    (state.page == Page::PALLETE) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
+                    Mdi::PALETTE_SWATCH));
+
+            return Ui::vflow(
+                preview,
+                Ui::separator(),
+                Ui::vflow(
+                    8,
+                    toolbar,
+                    hsvSliders(state),
+                    Ui::labelLarge("Palettes") | Ui::spacing({8, 8, 0, 0}),
+                    colorRamps(state) | Ui::grow()) |
+                    Ui::spacing(8) | Ui::grow());
+        });
 }
 
 } // namespace ColorPicker
 
 Res<> entryPoint(Ctx &ctx) {
-    return Ui::runApp(ctx, ColorPicker::app());
+    return Ui::runApp(ctx, ColorPicker::app() | Ui::pinSize({410, 520}));
 }

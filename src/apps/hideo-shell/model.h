@@ -30,6 +30,9 @@ enum struct Panel {
 };
 
 struct Surface {
+    usize id;
+    MenuEntry entry;
+    Gfx::Color color;
 };
 
 struct State {
@@ -38,6 +41,7 @@ struct State {
     Panel activePanel = Panel::NIL;
     bool isSysPanelColapsed = true;
 
+    Media::Image background;
     Vec<Noti> noti;
     Vec<MenuEntry> entries;
     Vec<Surface> surfaces;
@@ -53,13 +57,25 @@ struct DimisNoti {
     usize index;
 };
 
+struct StartApp {
+    usize index;
+};
+
+struct CloseApp {
+    usize index;
+};
+
+struct FocusApp {
+    usize index;
+};
+
 struct ToggleSysPanel {};
 
 struct Activate {
     Panel panel;
 };
 
-using Action = Var<ToggleTablet, Lock, Unlock, DimisNoti, Activate, ToggleSysPanel>;
+using Action = Var<ToggleTablet, Lock, Unlock, DimisNoti, StartApp, CloseApp, FocusApp, Activate, ToggleSysPanel>;
 
 void reduce(State &, Action);
 

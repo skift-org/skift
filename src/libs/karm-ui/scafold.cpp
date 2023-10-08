@@ -163,12 +163,7 @@ Child scafold(Scafold scafold) {
 
         return vflow(appBody) |
                pinSize(state.isMobile ? Math::Vec2i{411, 731} : scafold.size) |
-               dialogLayer() |
-               Ui::box(Ui::BoxStyle{
-                   .borderRadius = 6,
-                   .borderWidth = 1,
-                   .borderPaint = Ui::GRAY800,
-               });
+               dialogLayer();
     });
 }
 

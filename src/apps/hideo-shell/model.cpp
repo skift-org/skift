@@ -19,6 +19,21 @@ void reduce(State &s, Action a) {
         [&](DimisNoti dismis) {
             s.noti.removeAt(dismis.index);
         },
+        [&](StartApp start) {
+            s.activePanel = Panel::NIL;
+            s.surfaces.emplaceFront(
+                0,
+                s.entries[start.index],
+                Gfx::randomColor());
+        },
+        [&](CloseApp close) {
+            s.surfaces.removeAt(close.index);
+        },
+        [&](FocusApp focus) {
+            auto surface = s.surfaces.removeAt(focus.index);
+            s.surfaces.pushFront(surface);
+            s.activePanel = Panel::NIL;
+        },
         [&](Activate panel) {
             if (s.activePanel != panel.panel) {
                 s.activePanel = panel.panel;

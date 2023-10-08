@@ -38,8 +38,10 @@ Ui::Child statusbarButton(State const &) {
 
 /* --- Navigation Bar ------------------------------------------------------- */
 
-Ui::Child navbar(State const &state) {
-    return state.activePanel != Panel::NIL ? Ui::empty() : Ui::buttonHandle(Model::bind<Activate>(Panel::APPS)) | Ui::slideIn(Ui::SlideFrom::BOTTOM);
+Ui::Child navbar(State const &) {
+    return Ui::buttonHandle(
+               Model::bind<Activate>(Panel::APPS)) |
+           Ui::slideIn(Ui::SlideFrom::BOTTOM);
 }
 
 /* --- Taskbar -------------------------------------------------------------- */
@@ -84,20 +86,38 @@ Ui::Child taskbar(State const &) {
 
 /* --- Shells --------------------------------------------------------------- */
 
+Ui::Child background(State const &state) {
+    return Ui::image(state.background) |
+           Ui::cover() | Ui::grow();
+}
+
 Ui::Child tabletPanels(State const &state) {
     return Ui::stack(
         state.activePanel == Panel::APPS ? appsFlyout(state) : Ui::empty(),
         state.activePanel == Panel::SYS ? sysFlyout(state) : Ui::empty());
 }
 
+Ui::Child appHost(State const &state) {
+    if (state.surfaces.len() == 0) {
+        return Ui::grow(NONE);
+    }
+
+    auto &surface = state.surfaces[0];
+    return Ui::empty() |
+           Ui::box({.backgroundPaint = surface.color}) |
+           Ui::grow();
+}
+
 Ui::Child tablet(State const &state) {
-    return Ui::vflow(
+    return Ui::stack(
+        state.surfaces.len() == 0 ? background(state) : Ui::empty(),
         Ui::vflow(
-            statusbarButton(state),
-            Ui::separator()) |
-            Ui::slideIn(Ui::SlideFrom::TOP),
-        Ui::grow(NONE),
-        navbar(state));
+            Ui::vflow(
+                statusbarButton(state),
+                Ui::separator()) |
+                Ui::slideIn(Ui::SlideFrom::TOP),
+            appHost(state),
+            navbar(state)));
 }
 
 Ui::Child desktopPanels(State const &state) {
@@ -121,6 +141,7 @@ Ui::Child app(bool isMobile) {
     return Ui::reducer<Model>(
         {
             .isMobile = isMobile,
+            .background = Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap(),
             .noti = {
                 {
                     1,
@@ -207,11 +228,7 @@ Ui::Child app(bool isMobile) {
             },
         },
         [](auto state) {
-            auto wallpapers = Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap();
-            auto background = Ui::align(Layout::Align::COVER, Ui::image(wallpapers));
-
             return Ui::stack(
-                       background,
                        state.locked ? lock(state)
                                     : (state.isMobile ? tablet(state)
                                                       : desktop(state)),

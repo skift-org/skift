@@ -38,16 +38,36 @@ Ui::Child appIcon(MenuIcon const &icon, isize size = 22) {
            });
 }
 
-Ui::Child appRow(MenuEntry const &entry) {
-    return Ui::button(
-        Ui::NOP,
-        Ui::ButtonStyle::subtle(),
-        Ui::hflow(
-            12,
-            Layout::Align::START | Layout::Align::VCENTER,
-            appIcon(entry.icon),
-            Ui::labelLarge(entry.name)) |
-            Ui::spacing(6));
+Ui::Child appRow(MenuEntry const &entry, usize i) {
+    return Ui::ButtonStyle::subtle(),
+           Ui::hflow(
+               12,
+               Layout::Align::START | Layout::Align::VCENTER,
+               appIcon(entry.icon),
+               Ui::labelLarge(entry.name)) |
+               Ui::spacing(6) | Ui::button(Model::bind<StartApp>(i), Ui::ButtonStyle::subtle());
+}
+
+Ui::Child runningApp(Surface const &surface, usize i) {
+    return Ui::stack(
+               appIcon(surface.entry.icon) |
+                   Ui::bound() |
+                   Ui::button(Model::bind<FocusApp>(i)),
+               Ui::button(Model::bind<CloseApp>(i), Ui::ButtonStyle::secondary(), Mdi::CLOSE) |
+                   Ui::align(Layout::Align::TOP_END) |
+                   Ui::spacing({0, 6, 6, 0})) |
+           Ui::pinSize({120, 192});
+}
+
+Ui::Child runningApps(State const &state) {
+    if (state.surfaces.len() == 0)
+        return Ui::empty(64);
+    return Ui::hflow(
+               8,
+               iter(state.surfaces)
+                   .mapi(runningApp)
+                   .collect<Ui::Children>()) |
+           Ui::center() | Ui::spacing({0, 64, 0, 16});
 }
 
 Ui::Child apps(Ui::Children apps) {
@@ -66,7 +86,7 @@ Ui::Child apps(Ui::Children apps) {
 Ui::Child appsList(State const &state) {
     return apps(
         iter(state.entries)
-            .map(appRow)
+            .mapi(appRow)
             .collect<Ui::Children>());
 }
 
@@ -76,22 +96,24 @@ Ui::Child appsPanel(State const &state) {
 
 Ui::Child appsFlyout(State const &state) {
     return Ui::vflow(
-               Ui::dragHandle(),
-               appsList(state) | Ui::grow()) |
-           Ui::box({
-               .margin = {8, 8 + 64, 8, 8},
-               .padding = {12, 0},
-               .borderRadius = 8,
-               .borderWidth = 1,
-               .borderPaint = Ui::GRAY800,
-               .backgroundPaint = Ui::GRAY950,
-           }) |
-           Ui::bound() |
-           Ui::dismisable(
-               Model::bind<Activate>(Panel::NIL),
-               Ui::DismisDir::DOWN,
-               0.3) |
-           Ui::slideIn(Ui::SlideFrom::BOTTOM);
+        runningApps(state),
+        Ui::vflow(
+            Ui::dragHandle(),
+            appsList(state) | Ui::grow()) |
+            Ui::box({
+                .margin = {8, 8, 8, 8},
+                .padding = {12, 0},
+                .borderRadius = 8,
+                .borderWidth = 1,
+                .borderPaint = Ui::GRAY800,
+                .backgroundPaint = Ui::GRAY950,
+            }) |
+            Ui::bound() |
+            Ui::dismisable(
+                Model::bind<Activate>(Panel::NIL),
+                Ui::DismisDir::DOWN,
+                0.3) |
+            Ui::slideIn(Ui::SlideFrom::BOTTOM) | Ui::grow());
 }
 
 } // namespace Shell

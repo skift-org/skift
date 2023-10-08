@@ -28,6 +28,8 @@ struct Dismisable :
         _onDismis = std::move(o._onDismis);
         _dir = o._dir;
         _threshold = o._threshold;
+
+        ProxyNode<Dismisable>::reconcile(o);
     }
 
     Math::Vec2i drag() const {
@@ -52,16 +54,23 @@ struct Dismisable :
     }
 
     void event(Async::Event &e) override {
-        auto oldBound = bound().clipTo(child().bound().offset(_last));
-        if (_dismissed and _drag.reached()) {
+        if (auto *me = e.is<Events::MouseEvent>()) {
+            me->pos = me->pos - drag();
+            child().event(e);
+            me->pos = me->pos + drag();
+        } else if (e.is<Node::AnimateEvent>() and _dismissed and _drag.reached()) {
             _onDismis(*this);
             _dismissed = false;
+            Ui::ProxyNode<Dismisable>::event(e);
         } else if (_drag.needRepaint(*this, e)) {
+            auto oldBound = bound().clipTo(child().bound().offset(_last));
             auto newBound = bound().clipTo(child().bound().offset(drag()));
             _last = drag();
             Ui::shouldRepaint(*this, oldBound.mergeWith(newBound));
+            Ui::ProxyNode<Dismisable>::event(e);
+        } else {
+            Ui::ProxyNode<Dismisable>::event(e);
         }
-        Ui::ProxyNode<Dismisable>::event(e);
     }
 
     void bubble(Async::Event &e) override {

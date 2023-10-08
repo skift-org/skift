@@ -21,6 +21,11 @@ struct Align {
     static constexpr u16 HCLAMP = (1 << 10);
     static constexpr u16 VCLAMP = (1 << 11);
 
+    static constexpr u16 TOP_START = (TOP | START);
+    static constexpr u16 TOP_END = (TOP | END);
+    static constexpr u16 BOTTOM_START = (BOTTOM | START);
+    static constexpr u16 BOTTOM_END = (BOTTOM | END);
+
     static constexpr u16 STRETCH = (HSTRETCH | VSTRETCH);
     static constexpr u16 VFILL = (VSTRETCH | TOP);
     static constexpr u16 HFILL = (HSTRETCH | START);

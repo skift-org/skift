@@ -75,7 +75,7 @@ inline Color randomColor(Math::Rand &rand) {
 }
 
 inline Color randomColor() {
-    static Math::Rand rand;
+    static Math::Rand rand{123};
     return randomColor(rand);
 }
 

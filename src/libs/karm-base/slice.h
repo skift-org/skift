@@ -118,7 +118,7 @@ using Bytes = Slice<Byte>;
 using MutBytes = MutSlice<Byte>;
 
 template <Sliceable S, typename T = typename S::Inner>
-Slice<T> sub(S &slice) {
+constexpr Slice<T> sub(S &slice) {
     return {
         slice.buf(),
         slice.len(),
@@ -126,7 +126,7 @@ Slice<T> sub(S &slice) {
 }
 
 template <Sliceable S, typename T = typename S::Inner>
-Slice<T> sub(S &slice, usize start, usize end) {
+constexpr Slice<T> sub(S &slice, usize start, usize end) {
     return {
         slice.buf() + start,
         clamp(end, start, slice.len()) - start,
@@ -450,6 +450,14 @@ ALWAYS_INLINE constexpr void sort(MutSliceable auto &slice) {
     sort(slice, [](auto const &a, auto const &b) {
         return a <=> b;
     });
+}
+
+template <Sliceable T, typename U = T::Inner>
+ALWAYS_INLINE constexpr Opt<usize> indexOf(T const &slice, U const &needle) {
+    for (usize i = 0; i < slice.len(); i++)
+        if (slice[i] == needle)
+            return i;
+    return NONE;
 }
 
 ALWAYS_INLINE Opt<usize> search(Sliceable auto const &slice, auto cmp) {

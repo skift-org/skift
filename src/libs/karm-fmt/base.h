@@ -39,6 +39,8 @@ struct Args : public _Args {
                 result = formatter.format(writer, t);
             }
             i++;
+
+            return true;
         });
         return result;
     }

@@ -40,9 +40,8 @@ struct {
 test$(changeChase) {
     for (auto [c, input, expected] : CASES) {
         auto result = try$(Fmt::changeCase(input, c));
-
-        logInfo("input: {}, expected: {}, result: {}", input, expected, result);
-        expectEq$(result.str(), expected);
+        // logInfo("input: {}, expected: {}, result: {}", input, expected, result);
+        expectEq$(result, expected);
     }
 
     return Ok();

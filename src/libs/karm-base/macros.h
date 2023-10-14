@@ -58,15 +58,11 @@ namespace Karm {
 #define __mapList0(f, x, peek, ...) f(x) __mapListNext(peek, __mapList1)(f, peek, __VA_ARGS__)
 #define __mapList1(f, x, peek, ...) f(x) __mapListNext(peek, __mapList0)(f, peek, __VA_ARGS__)
 
-/**
- * Applies the function macro `f` to each of the remaining parameters.
- */
+// Applies the function macro `f` to each of the remaining parameters.
 #define map$(f, ...) eval$(__map1(f, __VA_ARGS__, ()()(), ()()(), ()()(), 0))
 
-/**
- * Applies the function macro `f` to each of the remaining parameters and
- * inserts commas between the results.
- */
+// Applies the function macro `f` to each of the remaining parameters and
+// inserts commas between the results.
 #define mapList$(f, ...) eval$(__mapList1(f, __VA_ARGS__, ()()(), ()()(), ()()(), 0))
 
 /* --- Utilities ------------------------------------------------------------ */

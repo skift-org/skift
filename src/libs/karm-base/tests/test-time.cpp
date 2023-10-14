@@ -68,10 +68,4 @@ test$(timestamp) {
     return Ok();
 }
 
-test$(shouldFail) {
-    expectEq$(1uz, 0uz);
-
-    return Error::notConnected();
-}
-
 } // namespace Karm::Base::Tests

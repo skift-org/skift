@@ -16,6 +16,8 @@ struct _T;
 // clang-format off
 _TN(0);  _TN(1);  _TN(2);  _TN(3);  _TN(4);  _TN(5);  _TN(6);  _TN(7);
 _TN(8);  _TN(9); _TN(10); _TN(11); _TN(12); _TN(13); _TN(14); _TN(15);
+_TN(16); _TN(17); _TN(18); _TN(19); _TN(20); _TN(21); _TN(22); _TN(23);
+_TN(24); _TN(25); _TN(26); _TN(27); _TN(28); _TN(29); _TN(30); _TN(31);
 // Do we need more than 16?
 // clang-format on
 
@@ -33,6 +35,8 @@ struct _V;
 // clang-format off
 _VN(0);  _VN(1);  _VN(2);  _VN(3);  _VN(4);  _VN(5);  _VN(6);  _VN(7);
 _VN(8);  _VN(9); _VN(10); _VN(11); _VN(12); _VN(13); _VN(14); _VN(15);
+_VN(16); _VN(17); _VN(18); _VN(19); _VN(20); _VN(21); _VN(22); _VN(23);
+_VN(24); _VN(25); _VN(26); _VN(27); _VN(28); _VN(29); _VN(30); _VN(31);
 // Do we need more than 16?
 // clang-format on
 
@@ -84,12 +88,16 @@ struct _Tuple<I, T, Ts...> :
     }
 
     constexpr static auto inspect(auto f) {
-        f(Meta::Type<T>{});
+        auto res = f(Meta::Type<T>{});
+        if (not res)
+            return res;
         return _Tuple<I + 1, Ts...>::inspect(f);
     }
 
     constexpr auto visit(auto f) {
-        _V<I, T>::visit(f);
+        auto res = _V<I, T>::visit(f);
+        if (not res)
+            return res;
         return _Tuple<I + 1, Ts...>::visit(f);
     }
 };

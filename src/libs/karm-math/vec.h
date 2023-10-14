@@ -227,17 +227,17 @@ union Vec3 {
 
     constexpr Vec3 min(Vec3 const &other) {
         return {
-            Karm::min(x, other.x),
-            Karm::min(y, other.y),
-            Karm::min(z, other.z),
+            ::min(x, other.x),
+            ::min(y, other.y),
+            ::min(z, other.z),
         };
     }
 
     constexpr Vec3 max(Vec3<T> const &other) {
         return {
-            Karm::max(x, other.x),
-            Karm::max(y, other.y),
-            Karm::max(z, other.z),
+            ::max(x, other.x),
+            ::max(y, other.y),
+            ::max(z, other.z),
         };
     }
 
@@ -545,22 +545,10 @@ bool epsilonEq(Vec4<T> const &lhs, Vec4<T> const &rhs, T epsilon) {
 } // namespace Karm::Math
 
 template <typename T>
-struct Karm::Fmt::Formatter<Math::Vec2<T>> {
-    Res<usize> format(Io::TextWriter &writer, Math::Vec2<T> vec) {
-        return Fmt::format(writer, "Vec2({}, {})", vec.x, vec.y);
-    }
-};
+ReflectableTemplate$(Math::Vec2<T>, x, y);
 
 template <typename T>
-struct Karm::Fmt::Formatter<Math::Vec3<T>> {
-    Res<usize> format(Io::TextWriter &writer, Math::Vec3<T> vec) {
-        return Fmt::format(writer, "Vec3({}, {}, {})", vec.x, vec.y, vec.z);
-    }
-};
+ReflectableTemplate$(Math::Vec3<T>, x, y, z);
 
 template <typename T>
-struct Karm::Fmt::Formatter<Math::Vec4<T>> {
-    Res<usize> format(Io::TextWriter &writer, Math::Vec4<T> vec) {
-        return Fmt::format(writer, "Vec4({}, {}, {}, {})", vec.x, vec.y, vec.z);
-    }
-};
+ReflectableTemplate$(Math::Vec4<T>, x, y, z, w);

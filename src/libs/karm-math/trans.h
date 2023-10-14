@@ -134,8 +134,4 @@ using Trans2f = Trans2<f64>;
 } // namespace Karm::Math
 
 template <typename T>
-struct Karm::Fmt::Formatter<Math::Trans2<T>> {
-    Res<usize> format(Io::TextWriter &writer, Math::Trans2<T> trans) {
-        return Fmt::format(writer, "Trans2({}, {}, {}, {}, {}, {})", trans.xx, trans.xy, trans.yx, trans.yy, trans.ox, trans.oy);
-    }
-};
+ReflectableTemplate$(Math::Trans2<T>, xx, xy, yx, yy, ox, oy);

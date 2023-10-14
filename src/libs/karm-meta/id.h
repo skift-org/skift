@@ -19,11 +19,6 @@ static constexpr Id idOf() {
     return hash;
 }
 
-template <typename T>
-static char const *nameOf() {
-    return __PRETTY_FUNCTION__ + 40;
-}
-
 template <typename T = struct __noType>
 struct Type;
 
@@ -34,27 +29,18 @@ struct Type {
     constexpr static Id id() {
         return idOf<T>();
     }
-
-    constexpr static char const *name() {
-        return nameOf<T>();
-    }
 };
 
 template <>
 struct Type<struct __noType> {
     Id _id;
-    char const *_name;
 
     template <typename T>
     constexpr Type(Type<T> type)
-        : _id(type.id()), _name(type.name()) {}
+        : _id(type.id()) {}
 
     constexpr Id id() const {
         return _id;
-    }
-
-    constexpr char const *name() const {
-        return _name;
     }
 };
 

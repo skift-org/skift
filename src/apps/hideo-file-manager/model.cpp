@@ -10,14 +10,12 @@ void reduce(State &s, Action a) {
             reduce(s, GoTo{"file:/"_url});
         },
         [&](GoBack) {
-            if (s.canGoBack()) {
+            if (s.canGoBack())
                 s.currentIndex--;
-            }
         },
         [&](GoForward) {
-            if (s.canGoForward()) {
+            if (s.canGoForward())
                 s.currentIndex++;
-            }
         },
         [&](GoParent p) {
             auto parent = s.currentUrl().parent(p.index);

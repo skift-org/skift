@@ -35,6 +35,6 @@ inline void reduce(State &s, Action action) {
     });
 }
 
-using Model = Karm::Ui::Model<State, Action, reduce>;
+using Model = Ui::Model<State, Action, reduce>;
 
 } // namespace ColorPicker

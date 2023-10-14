@@ -4,7 +4,7 @@
 test$(pathUpDown) {
     auto path = Url::Path::parse("/a/b/c/d/e/f");
 
-    auto up1 = path.parent();
+    auto up1 = path.parent(1);
     expectEq$(try$(up1.str()), Str{"/a/b/c/d/e"});
 
     auto up2 = path.parent(2);

@@ -1,0 +1,29 @@
+#pragma once
+
+#include <karm-meta/decl.h>
+#include <karm-meta/traits.h>
+#include <utility>
+
+namespace std {
+
+template <typename T>
+constexpr inline T *addressof(T &ref) noexcept {
+    return __builtin_addressof(ref);
+}
+
+template <typename T>
+constexpr inline void destroy_at(T *ptr) {
+    if constexpr (Karm::Meta::Array<T>)
+        for (auto &e : *ptr)
+            std::destroy_at(addressof(e));
+    else
+        ptr->~T();
+}
+
+template <typename T, typename... Args>
+constexpr auto construct_at(T *ptr, Args &&...__args)
+    -> decltype(::new((void *)0) T(Karm::Meta::declval<Args>()...)) {
+    return ::new ((void *)ptr) T(std::forward<Args>(__args)...);
+}
+
+} // namespace std

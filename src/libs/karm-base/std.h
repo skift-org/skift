@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include <new>
 #include <utility>
+#include <memory>
 
 #include <ctype.h>
 #include <limits.h>

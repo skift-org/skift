@@ -1,7 +1,5 @@
 #pragma once
 
-#include <karm-meta/id.h>
-
 #include "opt.h"
 #include "std.h"
 

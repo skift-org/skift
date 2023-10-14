@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "mixbox-spec",
+    "type": "lib",
+    "description": "Mixbox is a library for natural color mixing based on real pigments",
+    "requires": [
+        "karm-io"
+    ]
+}

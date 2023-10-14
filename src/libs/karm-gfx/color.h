@@ -26,11 +26,14 @@ struct Color {
         return {red, green, blue, alpha};
     }
 
-    ALWAYS_INLINE constexpr Color() : red(0), green(0), blue(0), alpha(0) {}
+    ALWAYS_INLINE constexpr Color()
+        : red(0), green(0), blue(0), alpha(0) {}
 
-    ALWAYS_INLINE constexpr Color(u8 red, u8 green, u8 blue, u8 alpha = 255) : red(red), green(green), blue(blue), alpha(alpha) {}
+    ALWAYS_INLINE constexpr Color(u8 red, u8 green, u8 blue, u8 alpha = 255)
+        : red(red), green(green), blue(blue), alpha(alpha) {}
 
-    ALWAYS_INLINE constexpr Color(Math::Vec4u v) : red(v.x), green(v.y), blue(v.z), alpha(v.w) {}
+    ALWAYS_INLINE constexpr Color(Math::Vec4u v)
+        : red(v.x), green(v.y), blue(v.z), alpha(v.w) {}
 
     ALWAYS_INLINE constexpr Color blendOver(Color const background) const {
         if (alpha == 0xff) {

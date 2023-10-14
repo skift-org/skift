@@ -140,11 +140,11 @@ enum struct Msrs : u64 {
     EFER = 0xC0000080,
     STAR = 0xC0000081,
     LSTAR = 0xC0000082,
-    COMPAT_STAR = 0xC0000083,
-    SYSCALL_FLAG_MASK = 0xC0000084,
-    FS_BASE = 0xC0000100,
-    GS_BASE = 0xC0000101,
-    KERN_GS_BASE = 0xc0000102,
+    CSTAR = 0xC0000083,
+    FMASK = 0xC0000084,
+    FSBAS = 0xC0000100,
+    UGSBAS = 0xC0000101,
+    KGSBAS = 0xc0000102,
 };
 
 inline u64 rdmsr(Msrs msr) {

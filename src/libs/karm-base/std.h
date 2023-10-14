@@ -12,6 +12,12 @@
 #include <ctype.h>
 #include <limits.h>
 #include <math.h>
+
+#ifdef __ck_sys_darwin__
+// Darwin is poluting the global namespace with unwanted macros.
+#undef UNDERFLOW
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>

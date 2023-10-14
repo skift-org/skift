@@ -6,7 +6,7 @@
 
 #define __KARM_MAIN_INCLUDED
 
-#if defined(__ck_sys_linux__)
+#if defined(__ck_sys_linux__) || defined(__ck_sys_darwin__)
 #    define EMBED_POSIX_MAIN_IMPL
 #    include <impl-posix/main.h>
 #elif defined(__ck_sys_skift__)

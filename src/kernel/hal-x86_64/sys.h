@@ -13,6 +13,7 @@ inline void sysInit(void (*handler)()) {
 }
 
 inline void sysSetGs(usize addr) {
+    wrmsr(Msrs::UGSBAS, addr);
     wrmsr(Msrs::KGSBAS, addr);
 }
 

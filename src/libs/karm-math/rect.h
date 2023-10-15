@@ -248,8 +248,4 @@ using Rectf = Rect<f64>;
 } // namespace Karm::Math
 
 template <typename T>
-struct Karm::Fmt::Formatter<Math::Rect<T>> {
-    Res<usize> format(Io::TextWriter &writer, Math::Rect<T> rect) {
-        return Fmt::format(writer, "Rect({}, {}, {}, {})", rect.x, rect.y, rect.width, rect.height);
-    }
-};
+ReflectableTemplate$(Math::Rect<T>, x, y, width, height);

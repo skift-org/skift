@@ -6,9 +6,17 @@
 namespace Karm::Math {
 
 template <typename T>
-struct Ellipse {
-    Vec2<T> center{};
-    Vec2<T> radius{};
+union Ellipse {
+    struct {
+        Vec2<T> center{};
+        Vec2<T> radius{};
+    };
+
+    struct {
+        T cx, cy, rx, ry;
+    };
+
+    Array<T, 4> _els;
 
     constexpr Ellipse() = default;
 
@@ -41,8 +49,4 @@ using Ellipsef = Ellipse<f64>;
 } // namespace Karm::Math
 
 template <typename T>
-struct Karm::Fmt::Formatter<Math::Ellipse<T>> {
-    Res<usize> format(Io::TextWriter &writer, Math::Ellipse<T> ellipse) {
-        return Fmt::format(writer, "Ellipse({}, {}, {}, {})", ellipse.center.x, ellipse.center.y, ellipse.radius.x, ellipse.radius.y);
-    }
-};
+ReflectableTemplate$(Math::Ellipse<T>, cx, cy, rx, ry);

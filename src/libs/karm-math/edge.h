@@ -95,8 +95,4 @@ using Edgef = Edge<f64>;
 } // namespace Karm::Math
 
 template <typename T>
-struct Karm::Fmt::Formatter<Math::Edge<T>> {
-    Res<usize> format(Io::TextWriter &writer, Math::Edge<T> edge) {
-        return Fmt::format(writer, "Edge({}, {}, {}, {})", edge.sx, edge.sy, edge.ex, edge.ey);
-    }
-};
+ReflectableTemplate$(Math::Edge<T>, sx, sy, ex, ey);

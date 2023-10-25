@@ -110,6 +110,9 @@ def doctorCmd(args: Args):
         "clang++", versionExpected=(16,)
     )
     everythingIsOk = everythingIsOk & commandIsAvailable(
+        "llvm-ar", versionExpected=(16,)
+    )
+    everythingIsOk = everythingIsOk & commandIsAvailable(
         "ld.lld", versionExpected=(16,)
     )
     everythingIsOk = everythingIsOk & commandIsAvailable("nasm")

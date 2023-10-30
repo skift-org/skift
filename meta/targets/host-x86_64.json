@@ -12,6 +12,10 @@
         "abi": "unknown",
         "freestanding": false,
         "host": true,
+        "version": [
+            "@include",
+            "./meta/script/version.json"
+        ],
         "karm-sys-encoding": "utf8",
         "karm-sys-line-ending": "lf",
         "karm-sys-path-separator": "slash",

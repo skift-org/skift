@@ -89,6 +89,8 @@ Child dialogButtons(DialogButton buttons, DialogButton primary);
 
 Child aboutDialog(Mdi::Icon icon, String name);
 
+Child versionBadge();
+
 void showAboutDialog(Node &n, Mdi::Icon icon, String name);
 
 Child msgDialog(String title, String msg);

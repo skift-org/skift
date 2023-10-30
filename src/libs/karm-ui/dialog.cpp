@@ -256,6 +256,18 @@ Child dialogCloseButton() {
 
 /* --- Dialogs -------------------------------------------------------------- */
 
+Child versionBadge() {
+    Children badges = {};
+    badges.pushBack(badge(BadgeStyle::INFO, stringify$(__ck_version_value)));
+#ifdef __ck_branch_nightly__
+    badges.pushBack(badge(Gfx::INDIGO400, "Nightly"));
+#elif defined(__ck_branch_stable__)
+#else
+    badges.pushBack(badge(Gfx::EMERALD, "Dev"));
+#endif
+    return hflow(4, badges);
+}
+
 Child aboutDialog(Mdi::Icon i, String name) {
     auto content = vflow(
         8,
@@ -263,10 +275,10 @@ Child aboutDialog(Mdi::Icon i, String name) {
         spacing(16, icon(i, 48)),
         text(TextStyle::titleMedium(), name),
         empty(),
-        badge(BadgeStyle::INFO, "v0.1.0"),
+        versionBadge(),
         empty(),
         text("Copyright © 2018-2023"),
-        text("SMNX Research & contributors."));
+        text("SMNX Research & Contributors."));
 
     Children actions = {
         button(NONE, ButtonStyle::subtle(), "LICENSE"),

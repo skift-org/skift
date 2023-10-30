@@ -9,6 +9,10 @@
         "abi": "ms",
         "freestanding": false,
         "host": false,
+        "version": [
+            "@include",
+            "./meta/script/version.json"
+        ],
         "karm-sys-encoding": "utf16",
         "karm-sys-line-ending": "crlf",
         "karm-sys-path-separator": "backslash"

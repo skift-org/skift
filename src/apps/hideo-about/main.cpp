@@ -20,12 +20,13 @@ Ui::Child app() {
         16,
         Ui::vflow(
             8,
-            Ui::hflow(8,
-                      Ui::headlineMedium("skiftOS"),
-                      Ui::badge(Ui::BadgeStyle::INFO, "v0.1.0") | Ui::center()),
+            Ui::hflow(
+                8,
+                Ui::headlineMedium("skiftOS"),
+                Ui::versionBadge() | Ui::center()),
             Ui::empty(),
             Ui::text("Copyright © 2018-2023"),
-            Ui::text("SMNX Research & contributors."),
+            Ui::text("SMNX Research & Contributors."),
             Ui::text("All rights reserved."),
             Ui::grow(NONE),
             Ui::hflow(

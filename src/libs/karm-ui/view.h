@@ -113,6 +113,8 @@ enum struct BadgeStyle {
     _LEN
 };
 
+Child badge(Gfx::Color color, String text);
+
 Child badge(BadgeStyle style, String text);
 
 /* --- Icon ----------------------------------------------------------------- */

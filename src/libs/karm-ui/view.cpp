@@ -232,6 +232,17 @@ Child text(Str text) {
 
 /* --- Badge ---------------------------------------------------------------- */
 
+Child badge(Gfx::Color color, String t) {
+    BoxStyle boxStyle = {
+        .padding = {8, 4},
+        .borderRadius = 99,
+        .backgroundPaint = color.withOpacity(0.2),
+        .foregroundPaint = color,
+    };
+
+    return text(t) | box(boxStyle);
+}
+
 Child badge(BadgeStyle style, String t) {
     Array COLORS = {
         Gfx::BLUE400,
@@ -240,16 +251,7 @@ Child badge(BadgeStyle style, String t) {
         Gfx::RED400,
     };
 
-    auto color = COLORS[static_cast<u8>(style)];
-
-    BoxStyle boxStyle = {
-        .padding = {8, 4},
-        .borderRadius = 99,
-        .backgroundPaint = color.withOpacity(0.1),
-        .foregroundPaint = color,
-    };
-
-    return text(t) | box(boxStyle);
+    return badge(COLORS[static_cast<u8>(style)], t);
 }
 
 /* --- Icon ----------------------------------------------------------------- */

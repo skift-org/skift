@@ -45,8 +45,7 @@ struct Limit : public Reader {
 
     Limit(Readable &&reader, usize limit)
         : _reader(std::forward<Readable>(reader)),
-          _limit(limit) {
-    }
+          _limit(limit) {}
 
     Res<usize> read(MutBytes bytes) override {
         usize size = clamp(sizeOf(bytes), 0uz, _limit - _read);
@@ -62,7 +61,8 @@ struct WriterSlice : public Writer, public Seeker {
     usize _start;
     usize _end;
 
-    WriterSlice(Writable writer, usize start, usize end) : _writer(writer), _start(start), _end(end) {}
+    WriterSlice(Writable writer, usize start, usize end)
+        : _writer(writer), _start(start), _end(end) {}
 
     Res<usize> seek(Seek seek) override {
         usize pos = try$(tell(_writer));
@@ -99,6 +99,7 @@ inline Res<Slice<Writable>> makeSlice(Writable &&writer, usize size) {
 struct BufReader :
     public Reader,
     public Seeker {
+
     Bytes _buf;
     usize _pos;
 
@@ -121,6 +122,7 @@ struct BufReader :
 struct BufWriter :
     public Writer,
     public Seeker {
+
     MutBytes _buf;
     usize _pos;
 
@@ -167,11 +169,12 @@ struct BufferWriter : public Writer, public Flusher {
 
 struct BitReader {
     Reader &_reader;
-    u8 _bits;
-    u8 _len;
+    u8 _bits{};
+    u8 _len{};
 
     BitReader(Reader &reader)
-        : _reader(reader), _bits(0), _len(0) {}
+        : _reader(reader) {
+    }
 
     Res<u8> readBit() {
         if (_len == 0) {
@@ -197,10 +200,11 @@ struct BitReader {
 };
 
 template <StaticEncoding E>
-struct _StringWriter : public TextWriter {
-    Buf<typename E::Unit> _buf{};
+struct _StringWriter :
+    public TextWriter,
+    public _StringBuilder<E> {
 
-    _StringWriter(usize cap = 16) : _buf(cap) {}
+    _StringWriter(usize cap = 16) : _StringBuilder<E>(cap) {}
 
     Res<usize> write(Bytes) override {
         panic("can't write raw bytes to a string");
@@ -208,39 +212,28 @@ struct _StringWriter : public TextWriter {
 
     Res<usize> writeStr(Str str) override {
         usize written = 0;
-        for (auto rune : iterRunes(str)) {
+        for (auto rune : iterRunes(str))
             written += try$(writeRune(rune));
-        }
+
         return Ok(written);
     }
 
     Res<usize> writeRune(Rune rune) override {
         typename E::One one;
-        if (not E::encodeUnit(rune, one)) {
+        if (not E::encodeUnit(rune, one))
             return Error::invalidInput("invalid rune");
-        }
 
-        for (auto unit : iter(one)) {
-            _buf.insert(_buf.len(), std::move(unit));
-        }
+        usize written = 0;
 
-        return Ok(1uz);
+        for (auto unit : iter(one))
+            written += try$(writeUnit(unit));
+
+        return Ok(written);
     }
 
     Res<usize> writeUnit(Slice<typename E::Unit> unit) {
-        _buf.insert(COPY, _buf.len(), unit.buf(), unit.len());
+        append(unit);
         return Ok(unit.len());
-    }
-
-    Str str() {
-        return _buf;
-    }
-
-    String take() {
-        usize len = _buf.size();
-        _buf.insert(len, 0);
-
-        return String{MOVE, _buf.take(), len};
     }
 };
 

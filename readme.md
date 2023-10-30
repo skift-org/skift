@@ -23,7 +23,8 @@
 
 ## About
 
-> 🛈 **Note:** skiftOS is currently in the early stages of development and is not yet ready for daily use. Please do not use it in production environments. Here be dragons! 🐉
+> [!WARNING]
+> skiftOS is currently in the early stages of development and is not yet ready for daily use. Please do not use it in production environments. Here be dragons! 🐉
 
 **skiftOS** is a hobby operating system built from scratch for ARM, x86, and RISC-V architectures. It is designed to be simple, modern, and modular, featuring a modern C++ core library, reactive UI, and a capability-based microkernel. skiftOS values simplicity, modernity, and modularity, and has several notable features such as multi-architecture support and easy hackability. It is free and open-source under the MIT license.
 
@@ -31,7 +32,8 @@
 
 ## Building
 
-> 🛈 **Note:** If you are having trouble building skiftOS, feel free to ask for help in the [Discord server](https://discord.com/invite/gamGsfg)
+> [!NOTE]
+> If you are having trouble building skiftOS, feel free to ask for help in the [Discord server](https://discord.com/invite/gamGsfg)
 
 To build skiftOS, you need to have a modern C/C++ compiler such as clang-16 installed on your computer. Additionally, you need to have the following tools installed: `python3`, `llvm`, `clang`, `ninja`, `nasm`, and `qemu`. Please refer to the documentation of these tools or use your package manager to install them.
 

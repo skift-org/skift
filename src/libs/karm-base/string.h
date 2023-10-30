@@ -133,6 +133,52 @@ struct _String {
     }
 };
 
+template <StaticEncoding E>
+struct _StringBuilder {
+    Buf<typename E::Unit> _buf{};
+
+    _StringBuilder(usize cap = 16)
+        : _buf(cap) {}
+
+    void append(Rune rune) {
+        typename E::One one;
+        if (not E::encodeUnit(rune, one)) {
+            return;
+        }
+
+        for (auto unit : iter(one)) {
+            _buf.insert(_buf.len(), std::move(unit));
+        }
+    }
+
+    void append(_Str<E> str) {
+        usize written = 0;
+        for (auto rune : iterRunes(str)) {
+            written += try$(append(rune));
+        }
+    }
+
+    void append(Slice<typename E::Unit> unit) {
+        _buf.insert(COPY, _buf.len(), unit.buf(), unit.len());
+    }
+
+    _Str<E> str() {
+        return _buf;
+    }
+
+    void clear() {
+        _buf.truncate(0);
+    }
+
+    _String<E> take() {
+        usize len = _buf.size();
+        _buf.insert(len, 0);
+        return {MOVE, _buf.take(), len};
+    }
+};
+
+using StringBuilder = _StringBuilder<Utf8>;
+
 template <
     Sliceable S,
     typename E = typename S::Encoding,

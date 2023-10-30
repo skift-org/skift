@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "web-base",
+    "type": "lib",
+    "description": "W3C Web Platform base",
+    "requires": [
+        "karm-base"
+    ]
+}

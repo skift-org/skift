@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "web-css",
+    "type": "lib",
+    "description": "Implementation of CSS Snapshot 2022 (https://www.w3.org/TR/css-2022/)",
+    "requires": [
+        "web-base"
+    ]
+}

@@ -10,8 +10,8 @@ Res<> entryPoint(Ctx &ctx) {
     auto task = entryPointAsync(ctx);
     struct Sink : public Async::Sink {
         Res<> post(Async::Event &e) override {
-            if (auto *ret = e.is<Async::Task<Res<>>::Ret>())
-                Async::loop().quit(ret->res);
+            if (auto *ret = e.is<Async::Task<Res<>>::Inner>())
+                Async::loop().quit(*ret);
             return Ok();
         }
     };

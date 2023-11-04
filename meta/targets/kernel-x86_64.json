@@ -12,7 +12,7 @@
         "host": false,
         "version": [
             "@include",
-            "./meta/script/version.json"
+            "./meta/scripts/version.json"
         ],
         "karm-sys-encoding": "utf8",
         "karm-sys-line-ending": "lf",

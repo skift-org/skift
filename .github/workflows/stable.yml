@@ -1,0 +1,46 @@
+name: Stable
+on:
+  schedule:
+    # Every month at 1 AM
+    - cron: '0 1 1 * *'
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Dependencies
+        run: |
+            sudo apt update
+            sudo apt install python3 git ninja-build libsdl2-dev nasm gcc-multilib qemu-system-x86
+            sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm 16
+
+      - name: Set up the build environment
+        run: ./skift.sh setup && ./skift.sh doctor
+
+      - name: Download third-party dependencies
+        run: ./skift.sh install
+
+      - name: Build System Image (efi-x86_64)
+        run: ./skift.sh image --format=hdd --prop:branch=stable
+
+      - name: Read release.md and use it as a body of new release
+        id: read_release
+        run: |
+          ./meta/scripts/dump-body.sh meta/release/stable.md >> $GITHUB_OUTPUT
+          echo "RELEASE_TAG=$(date +'%y.%m')" >> $GITHUB_ENV
+
+      - name: Upload Packages to GitHub
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: .cutekit/images/*.hdd
+          tag: v${{env.RELEASE_TAG}}
+          file_glob: true
+          overwrite: true
+          promote: true
+          prerelease: true

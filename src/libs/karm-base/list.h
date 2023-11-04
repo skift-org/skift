@@ -32,13 +32,11 @@ struct List {
         }
 
         void remove() {
-            if (prev) {
+            if (prev)
                 prev->next = next;
-            }
 
-            if (next) {
+            if (next)
                 next->prev = prev;
-            }
 
             delete this;
         }
@@ -51,9 +49,8 @@ struct List {
     constexpr List() = default;
 
     List(List const &other) {
-        if (other._len == 0) {
+        if (other._len == 0)
             return;
-        }
 
         auto [head, tail] = other._head->clone();
         _head = head;
@@ -232,18 +229,6 @@ struct List {
         _len = len;
     }
 
-    T &at(usize i) {
-        if (i >= _len)
-            panic("index out of range");
-        return _at(i)->buf;
-    }
-
-    T const &at(usize i) const {
-        if (i >= _len)
-            panic("index out of range");
-        return _at(i)->buf;
-    }
-
     void clear() {
         while (_head) {
             auto *next = _head->next;
@@ -256,27 +241,19 @@ struct List {
 
     /* --- Random Access --- */
 
-    T &operator[](usize i) { return at(i); }
+    T &operator[](usize i) {
+        if (i >= _len)
+            panic("index out of range");
+        return _at(i)->buf;
+    }
 
-    T const &operator[](usize i) const { return at(i); }
+    T const &operator[](usize i) const {
+        if (i >= _len)
+            panic("index out of range");
+        return _at(i)->buf;
+    }
 
     /* -- Front Access --- */
-
-    T &peekFront() {
-        if (not _len) {
-            panic("peek from empty list");
-        }
-
-        return _head->buf;
-    }
-
-    T const &peekFront() const {
-        if (not _len) {
-            panic("peek from empty list");
-        }
-
-        return _head->buf;
-    }
 
     void pushFront(T const &value) {
         pushFront(T{value});
@@ -299,22 +276,6 @@ struct List {
     }
 
     /* --- Back Access --- */
-
-    T &peekBack() {
-        if (not _len) {
-            panic("peek from empty list");
-        }
-
-        return _tail->buf;
-    }
-
-    T const &peekBack() const {
-        if (not _len) {
-            panic("peek from empty list");
-        }
-
-        return _tail->buf;
-    }
 
     void pushBack(T const &value) {
         pushBack(T{value});

@@ -66,7 +66,7 @@ struct UBig {
     }
 
     void _trim() {
-        while (_value.len() >= 1 and _value.peekBack() == 0)
+        while (_value.len() >= 1 and last(_value) == 0)
             _value.popBack();
     }
 

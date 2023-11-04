@@ -14,11 +14,11 @@ using Rune = u32;
 
 template <typename T>
 concept StaticEncoding = requires(T t, Rune &r, typename T::Unit u, Cursor<typename T::Unit> &c, MutCursor<typename T::Unit> &m) {
-                             { T::unitLen(u) } -> Meta::Same<usize>;
-                             { T::runeLen(r) } -> Meta::Same<usize>;
-                             { T::decodeUnit(r, c) } -> Meta::Same<bool>;
-                             { T::encodeUnit(Rune{}, m) } -> Meta::Same<bool>;
-                         };
+    { T::unitLen(u) } -> Meta::Same<usize>;
+    { T::runeLen(r) } -> Meta::Same<usize>;
+    { T::decodeUnit(r, c) } -> Meta::Same<bool>;
+    { T::encodeUnit(Rune{}, m) } -> Meta::Same<bool>;
+};
 
 template <typename U, usize N>
 struct _Multiple {
@@ -69,14 +69,14 @@ struct _Single {
 
 template <typename T, typename U>
 concept EncodeOutput = requires(T t, U u) {
-                           { t.put(u) };
-                       };
+    { t.put(u) };
+};
 
 template <typename T, typename U>
 concept DecodeInput = requires(T t, U u) {
-                          { t.next() };
-                          { t.rem() };
-                      };
+    { t.next() };
+    { t.rem() };
+};
 
 /* --- Utf8 ----------------------------------------------------------------- */
 
@@ -405,7 +405,7 @@ using Ibm437Mapper = decltype([](u8 c) {
         U'°', U'∙', U'·', U'√', U'ⁿ', U'²', U'■', U'\x00a0',
     };
 
-    return at(mappings, c);
+    return mappings[c];
 });
 
 // clang-format on

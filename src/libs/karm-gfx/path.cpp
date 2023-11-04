@@ -30,7 +30,7 @@ void Path::_flattenLineToNoTrans(Math::Vec2f p) {
     }
 
     if (last(_segs).start != last(_segs).end and
-        Math::epsilonEq(_verts.peekBack(), p, 0.001)) {
+        Math::epsilonEq(last(_verts), p, 0.001)) {
         return;
     }
 

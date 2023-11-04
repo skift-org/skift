@@ -31,12 +31,12 @@ concept MutSliceable =
 template <Sliceable T, Sliceable U>
     requires Meta::Comparable<typename T::Inner, typename U::Inner>
 constexpr auto operator<=>(T const &lhs, U const &rhs) {
-    for (usize i = 0; i < min(len(lhs), len(rhs)); i++) {
+    for (usize i = 0; i < min(lhs.len(), rhs.len()); i++) {
         auto result = lhs[i] <=> rhs[i];
         if (result != 0)
             return result;
     }
-    return len(lhs) <=> len(rhs);
+    return lhs.len() <=> rhs.len();
 }
 
 template <Sliceable T, Sliceable U>
@@ -318,10 +318,6 @@ constexpr auto iterLevelSplitRev(S &slice, typename S::Inner const &sep) {
     });
 }
 
-constexpr usize len(Sliceable auto &slice) {
-    return slice.len();
-}
-
 constexpr bool isEmpty(Sliceable auto &slice) {
     return slice.len() == 0;
 }
@@ -362,20 +358,12 @@ constexpr auto &last(MutSliceable auto &slice) {
     return slice.buf()[slice.len() - 1];
 }
 
-constexpr auto const &at(Sliceable auto &slice, usize i) {
-    return slice.buf()[i];
-}
-
-constexpr auto &at(MutSliceable auto &slice, usize i) {
-    return slice.buf()[i];
-}
-
 template <typename T>
 constexpr usize move(MutSlice<T> src, MutSlice<T> dest) {
-    usize l = min(len(src), len(dest));
+    usize l = min(src.len(), dest.len());
 
     for (usize i = 0; i < l; i++) {
-        at(dest, i) = std::move(at(src, i));
+        dest[i] = std::move(src[i]);
     }
 
     return l;
@@ -385,8 +373,8 @@ template <typename T>
 constexpr usize copy(Slice<T> src, MutSlice<T> dest) {
     usize copied = 0;
 
-    for (usize i = 0; i < min(len(src), len(dest)); i++) {
-        at(dest, i) = at(src, i);
+    for (usize i = 0; i < min(src.len(), dest.len()); i++) {
+        dest[i] = src[i];
         copied++;
     }
 
@@ -395,18 +383,17 @@ constexpr usize copy(Slice<T> src, MutSlice<T> dest) {
 
 template <typename T>
 constexpr void reverse(MutSlice<T> slice) {
-    for (usize i = 0; i < len(slice) / 2; i++) {
-        std::swap(at(slice, i), at(slice, len(slice) - i - 1));
+    for (usize i = 0; i < slice.len() / 2; i++) {
+        std::swap(slice[i], slice[slice.len() - i - 1]);
     }
 }
 
 template <typename T>
 constexpr usize fill(MutSlice<T> slice, T value) {
-    for (usize i = 0; i < len(slice); i++) {
-        at(slice, i) = value;
+    for (usize i = 0; i < slice.len(); i++) {
+        slice[i] = value;
     }
-
-    return len(slice);
+    return slice.len();
 }
 
 template <typename T>
@@ -415,25 +402,25 @@ constexpr usize zeroFill(MutSlice<T> slice) {
 }
 
 ALWAYS_INLINE constexpr void sort(MutSliceable auto &slice, auto cmp) {
-    if (len(slice) <= 1) {
+    if (slice.len() <= 1) {
         return;
     }
 
-    auto pivot = at(slice, len(slice) / 2);
+    auto pivot = slice[slice.len() / 2];
     auto left = 0uz;
-    auto right = len(slice) - 1;
+    auto right = slice.len() - 1;
 
     while (left <= right) {
-        while (cmp(at(slice, left), pivot) < 0) {
+        while (cmp(slice[left], pivot) < 0) {
             left++;
         }
 
-        while (cmp(at(slice, right), pivot) > 0) {
+        while (cmp(slice[right], pivot) > 0) {
             right--;
         }
 
         if (left <= right) {
-            std::swap(at(slice, left), at(slice, right));
+            std::swap(slice[left], slice[right]);
             left++;
             right--;
         }
@@ -442,7 +429,7 @@ ALWAYS_INLINE constexpr void sort(MutSliceable auto &slice, auto cmp) {
     auto rightSlice = mutSub(slice, 0, right + 1);
     sort(rightSlice, cmp);
 
-    auto leftSlice = mutSub(slice, left, len(slice));
+    auto leftSlice = mutSub(slice, left, slice.len());
     sort(leftSlice, cmp);
 }
 
@@ -461,7 +448,7 @@ ALWAYS_INLINE constexpr Opt<usize> indexOf(T const &slice, U const &needle) {
 }
 
 ALWAYS_INLINE Opt<usize> search(Sliceable auto const &slice, auto cmp) {
-    if (len(slice) == 0) {
+    if (slice.len() == 0) {
         return NONE;
     }
 
@@ -469,17 +456,17 @@ ALWAYS_INLINE Opt<usize> search(Sliceable auto const &slice, auto cmp) {
         return NONE;
     }
 
-    if (cmp(slice[len(slice) - 1]) < 0) {
+    if (cmp(slice[slice.len() - 1]) < 0) {
         return NONE;
     }
 
     usize left = 0;
-    usize right = len(slice) - 1;
+    usize right = slice.len() - 1;
 
     while (left <= right) {
         usize mid = (left + right) / 2;
 
-        auto result = cmp(at(slice, mid));
+        auto result = cmp(slice[mid]);
 
         if (result == 0) {
             return mid;

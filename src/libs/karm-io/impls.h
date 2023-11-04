@@ -219,20 +219,12 @@ struct _StringWriter :
     }
 
     Res<usize> writeRune(Rune rune) override {
-        typename E::One one;
-        if (not E::encodeUnit(rune, one))
-            return Error::invalidInput("invalid rune");
-
-        usize written = 0;
-
-        for (auto unit : iter(one))
-            written += try$(writeUnit(unit));
-
-        return Ok(written);
+        _StringBuilder<E>::append(rune);
+        return Ok(1uz);
     }
 
     Res<usize> writeUnit(Slice<typename E::Unit> unit) {
-        append(unit);
+        _StringBuilder<E>::append(unit);
         return Ok(unit.len());
     }
 };

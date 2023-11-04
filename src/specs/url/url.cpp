@@ -60,7 +60,7 @@ Str Path::basename() const {
     if (not _parts.len())
         return Str{};
 
-    return _parts.peekBack();
+    return last(_parts);
 }
 
 Path Path::join(Path const &other) const {
@@ -140,13 +140,11 @@ Url Url::parse(Io::SScan &s) {
 
     url.path = Path::parse(s, true);
 
-    if (s.skip('?')) {
+    if (s.skip('?'))
         url.query = s.token(Re::until(Re::single('#')));
-    }
 
-    if (s.skip('#')) {
+    if (s.skip('#'))
         url.fragment = s.token(Re::until(Re::eof()));
-    }
 
     return url;
 }

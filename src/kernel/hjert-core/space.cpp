@@ -16,7 +16,7 @@ Space::Space(Strong<Hal::Vmm> vmm) : _vmm(vmm) {
 
 Space::~Space() {
     while (_maps.len()) {
-        unmap(_maps.peekFront().vrange)
+        unmap(first(_maps).vrange)
             .unwrap("unmap failed");
     }
 }

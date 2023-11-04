@@ -197,9 +197,8 @@ auto iterRunes(S const &slice) {
 
 template <StaticEncoding E>
 bool eqCi(_Str<E> a, _Str<E> b) {
-    if (a.len() != b.len()) {
+    if (a.len() != b.len())
         return false;
-    }
 
     Cursor<typename E::Unit> aCursor(a);
     Cursor<typename E::Unit> bCursor(b);

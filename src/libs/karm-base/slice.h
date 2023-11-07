@@ -1,6 +1,7 @@
 #pragma once
 
 #include "iter.h"
+#include "range.h"
 
 namespace Karm {
 
@@ -375,6 +376,18 @@ constexpr usize copy(Slice<T> src, MutSlice<T> dest) {
 
     for (usize i = 0; i < min(src.len(), dest.len()); i++) {
         dest[i] = src[i];
+        copied++;
+    }
+
+    return copied;
+}
+
+template <typename T>
+constexpr usize copyWithin(MutSlice<T> slice, USizeRange src, usize dst) {
+    usize copied = 0;
+
+    for (usize i = src.start; i < src.end(); i++) {
+        slice[dst + copied] = slice[i];
         copied++;
     }
 

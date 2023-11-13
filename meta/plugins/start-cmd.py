@@ -4,18 +4,10 @@ import tempfile
 import magic
 import logging
 from pathlib import Path
-
-
-from cutekit import shell, builder, const, project, model
-from cutekit.cmds import Cmd, append
-from cutekit.args import Args
 from typing import Any, Protocol
+from cutekit import shell, builder, const, model, cli, ensure
 
-
-def kvmAvailable() -> bool:
-    if os.path.exists("/dev/kvm") and os.access("/dev/kvm", os.R_OK):
-        return True
-    return False
+ensure((0, 6, 0))
 
 
 class Storage(Protocol):
@@ -107,18 +99,18 @@ class HddStorage(Storage):
 
 
 class Image:
+    _registry: model.Registry
     _store: Storage
     _logger: logging.Logger
     _paks: dict[str, dict[str, Any]]
     _finalized: str | None
-    _props: model.Props
 
-    def __init__(self, store: Storage, props: model.Props):
+    def __init__(self, registry: model.Registry, store: Storage):
+        self._registry = registry
         self._store = store
         self._logger = logging.getLogger("Image")
         self._paks = {}
         self._finalized = None
-        self._props = props
 
     def ensurePak(self, id: str) -> dict[str, Any]:
         if id not in self._paks:
@@ -138,37 +130,33 @@ class Image:
         return dest
 
     def installTo(self, componentSpec: str, targetSpec: str, dest: str):
-        self._logger.info(f"Installing {componentSpec} to {dest}...")
-        component = builder.build(componentSpec, targetSpec, self._props)
-        context = component.context
+        product = self.install(componentSpec, targetSpec)
+        self.cp(str(product.path), dest=dest)
 
-        for depId in component.resolved + [componentSpec]:
-            dep = context.componentByName(depId)
-            if dep is None:
-                raise Exception(f"Component {depId} not found")
-
-            for asset in dep.resfiles():
-                self.cpRef("_index", asset[0], f"{depId}/{asset[2]}")
-                self.cpRef(componentSpec, asset[0], f"{depId}/{asset[2]}")
-
-        self.cp(component.outfile(), dest)
-
-    def install(self, componentSpec: str, targetSpec: str):
+    def install(self, componentSpec: str, targetSpec: str) -> builder.Product:
         self._logger.info(f"Installing {componentSpec}...")
-        component = builder.build(componentSpec, targetSpec, self._props)
-        context = component.context
+        component = self._registry.lookup(componentSpec, model.Component)
+        assert component is not None
 
-        for depId in component.resolved + [componentSpec]:
-            dep = context.componentByName(depId)
+        target = self._registry.lookup(targetSpec, model.Target)
+        assert target is not None
+
+        product = builder.build(target, self._registry, component)[0]
+
+        for depId in component.resolved[target.id].resolved + [componentSpec]:
+            dep = self._registry.lookup(depId, model.Component)
             if dep is None:
                 raise Exception(f"Component {depId} not found")
 
-            for asset in dep.resfiles():
-                self.cpRef("_index", asset[0], f"{depId}/{asset[2]}")
-                self.cpRef(componentSpec, asset[0], f"{depId}/{asset[2]}")
+            for res in builder.listRes(component):
+                rel = Path(res).relative_to(component.subpath("res"))
+                self.cpRef("_index", res, f"{depId}/{rel}")
+                self.cpRef(componentSpec, res, f"{depId}/{rel}")
 
-        self.cpRef("_index", component.outfile(), f"{componentSpec}/_bin")
-        self.cpRef(componentSpec, component.outfile(), f"{componentSpec}/_bin")
+        self.cpRef("_index", str(product.path), f"{componentSpec}/_bin")
+        self.cpRef(componentSpec, str(product.path), f"{componentSpec}/_bin")
+
+        return product
 
     def cp(self, src: str, dest: str):
         self._logger.info(f"Copying {src} to {dest}...")
@@ -198,6 +186,12 @@ class Machine:
 
     def boot(self, image: Image) -> None:
         pass
+
+
+def kvmAvailable() -> bool:
+    if os.path.exists("/dev/kvm") and os.access("/dev/kvm", os.R_OK):
+        return True
+    return False
 
 
 class QemuSystemAmd64(Machine):
@@ -254,59 +248,55 @@ class QemuSystemAmd64(Machine):
         shell.exec(*qemuCmd)
 
 
-def generateSystem(image: Image, debug: bool = False) -> None:
+def generateSystem(image: Image) -> None:
     image.mkdir("objects")
     image.mkdir("bundles")
 
-    efiTarget = "efi-x86_64" + (":debug" if debug else ":o3")
     image.mkdir("EFI")
     image.mkdir("EFI/BOOT")
-    image.installTo("loader", efiTarget, "EFI/BOOT/BOOTX64.EFI")
+    image.installTo("loader", "efi-x86_64", "EFI/BOOT/BOOTX64.EFI")
 
-    kernelTarget = "kernel-x86_64" + (":debug" if debug else ":o3")
-    image.install("hjert", kernelTarget)
+    image.install("hjert", "kernel-x86_64")
 
-    skiftTarget = "skift-x86_64" + (":debug" if debug else ":o3")
-    image.install("grund-system", skiftTarget)
-    image.install("grund-device", skiftTarget)
-    image.install("hideo-shell", skiftTarget)
-    image.install("skift-branding", skiftTarget)
-    image.install("skift-wallpapers", skiftTarget)
-    image.install("inter-font", skiftTarget)
-    image.install("mdi-font", skiftTarget)
+    image.install("grund-system", "skift-x86_64")
+    image.install("grund-device", "skift-x86_64")
+    image.install("hideo-shell", "skift-x86_64")
+    image.install("skift-branding", "skift-x86_64")
+    image.install("skift-wallpapers", "skift-x86_64")
+    image.install("inter-font", "skift-x86_64")
+    image.install("mdi-font", "skift-x86_64")
 
     image.cpTree("meta/image/boot", "boot")
 
 
-def imageCmd(args: Args) -> None:
-    project.chdir()
-
-    debug = args.consumeOpt("debug", False)
+@cli.command(None, "image", "Generate the boot image")
+def imageCmd(args: cli.Args) -> None:
+    debug = args.consumeOpt("debug", False) is True
     fmt = args.consumeOpt("format", "dir")
-    props = args.consumePrefix("prop:")
+    args.opts["mixins"] = "debug" if debug else "o3"
+
+    registry = model.Registry.use(args)
 
     store = (
         DirStorage("image-efi-x86_64")
         if fmt == "dir"
         else HddStorage("image-efi-x86_64", 256)
     )
-    image = Image(store, props)
-    generateSystem(image, debug)
+    image = Image(registry, store)
+    generateSystem(image)
     print(image.finalize())
 
 
-def bootCmd(args: Args) -> None:
-    project.chdir()
+@cli.command("s", "start", "Boot the system")
+def bootCmd(args: cli.Args) -> None:
+    debug = args.consumeOpt("debug", False) is True
+    args.opts["mixins"] = "debug" if debug else "o3"
 
-    debug = args.consumeOpt("debug", False)
-    logError = args.consumeOpt("dint", False)
-    props = args.consumePrefix("prop:")
+    registry = model.Registry.use(args)
 
-    image = Image(DirStorage("image-efi-x86_64"), props)
-    generateSystem(image, debug)
+    logError = args.consumeOpt("dint", False) is True
+
+    image = Image(registry, DirStorage("image-efi-x86_64"))
+    generateSystem(image)
     machine = QemuSystemAmd64(logError=logError, debugger=debug)
     machine.boot(image)
-
-
-append(Cmd(None, "image", "Generate the boot image", imageCmd))
-append(Cmd("s", "start", "Boot the system", bootCmd))

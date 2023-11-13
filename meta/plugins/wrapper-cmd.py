@@ -1,11 +1,9 @@
-from cutekit.cmds import Cmd, append
-from cutekit.args import Args
-import random
+from cutekit import cli, ensure
+
+ensure((0, 6, 0))
 
 
-def nop(args: Args):
-    print("Don't use ck directly, use ./skift.sh instead.")
-
-
-append(Cmd(None, "setup", "Setup the development environment", nop))
-append(Cmd(None, "nuke-tools", "Nuke the development tools", nop))
+@cli.command(None, "nuke-tools", "Nuke the development tools")
+@cli.command(None, "setup", "Setup the development environment")
+def nop(args: cli.Args):
+    raise RuntimeError("Don't use ck directly, use ./skift.sh instead.")

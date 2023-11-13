@@ -1,8 +1,8 @@
-from cutekit.cmds import Cmd, append
-from cutekit.args import Args
-from cutekit import shell, vt100
+from cutekit import shell, vt100, cli, ensure
 import subprocess
 import re
+
+ensure((0, 6, 0))
 
 
 def isVersionAtLeastOrEqual(
@@ -34,7 +34,7 @@ def checkVersion(
         result = subprocess.check_output([cmd, versionCommand]).decode("utf-8")
         actualVersion = getVersionFromOutput(result, versionRegex)
         return isVersionAtLeastOrEqual(actualVersion, versionExpected), actualVersion
-    except Exception as e:
+    except Exception:
         return False, ()
 
 
@@ -96,7 +96,8 @@ def moduleIsAvailable(module: str) -> bool:
         return False
 
 
-def doctorCmd(args: Args):
+@cli.command(None, "doctor", "Check if all required commands are available")
+def doctorCmd(args: cli.Args):
     everythingIsOk = True
 
     everythingIsOk = everythingIsOk & moduleIsAvailable("requests")
@@ -122,6 +123,3 @@ def doctorCmd(args: Args):
     )
     everythingIsOk = everythingIsOk & commandIsAvailable("chatty")
     everythingIsOk = everythingIsOk & commandIsAvailable("pkg-config")
-
-
-append(Cmd(None, "doctor", "Check if all required commands are available", doctorCmd))

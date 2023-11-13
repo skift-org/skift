@@ -70,7 +70,7 @@ Res<> loadEntry(Entry const &entry) {
         auto propStr = try$(Json::stringify(blob.props));
         auto propsId = payload.add(propStr);
 
-        payload.add(Handover::Record{
+        payload.add({
             .tag = Handover::FILE,
             .start = blobRange.start,
             .size = blobRange.size,

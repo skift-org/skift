@@ -37,7 +37,7 @@ if [ ! -f .cutekit/tools/ready ]; then
 
     echo "Downloading CuteKit & Chatty..."
     if [ ! -d .cutekit/tools/cutekit ]; then
-        git clone --depth 1 https://github.com/cute-engineering/cutekit .cutekit/tools/cutekit --branch "0.5.4"
+        git clone --depth 1 https://github.com/cute-engineering/cutekit .cutekit/tools/cutekit --branch "0.6.0"
     else
         echo "CuteKit already downloaded."
     fi

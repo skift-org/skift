@@ -8,5 +8,8 @@
         "karm-main",
         "skift-wallpapers",
         "hideo-keyboard"
+    ],
+    "provides": [
+        "__main__"
     ]
 }

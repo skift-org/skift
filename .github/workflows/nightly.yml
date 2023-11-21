@@ -15,7 +15,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-        run: echo ${{ github.sha }}
 
       - id: should_run
         continue-on-error: true

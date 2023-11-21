@@ -1,3 +1,5 @@
+#include <karm-math/funcs.h>
+
 #include "mixbox.h"
 
 extern "C" unsigned char const _Mixbox_LUT[];
@@ -143,7 +145,7 @@ Math::Vec3f lerp(Math::Vec3f a, Math::Vec3f b, f64 t) {
     auto lb = unmix(b);
 
     for (usize i = 0; i < LATENT_SIZE; i++) {
-        la[i] = ::lerp(la[i], lb[i], t);
+        la[i] = Math::lerp(la[i], lb[i], t);
     }
 
     return mix(la);

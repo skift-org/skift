@@ -40,7 +40,7 @@ jobs:
       - name: Install Dependencies
         run: |
             sudo apt update
-            sudo apt install git ninja-build libsdl2-dev nasm gcc-multilib qemu-system-x86
+            sudo apt install git ninja-build libsdl2-dev nasm gcc-multilib mtools
             sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm 16
 
       - name: Set up the build environment

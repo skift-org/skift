@@ -66,3 +66,4 @@ jobs:
           overwrite: true
           promote: true
           prerelease: true
+          body: ${{ steps.read_release.outputs.RELEASE_BODY }}

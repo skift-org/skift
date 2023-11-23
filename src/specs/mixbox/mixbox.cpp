@@ -12,7 +12,7 @@ Bytes const LUT = Bytes(_Mixbox_LUT, _Mixbox_LUT_size);
 static f64 srgb2linear(f64 srgb) {
     if (srgb <= 0.04045f)
         return srgb / 12.92f;
-    return ::pow((srgb + 0.055f) / 1.055f, 2.4f);
+    return pow((srgb + 0.055f) / 1.055f, 2.4f);
 }
 
 static Math::Vec3f srgb2linear(Gfx::Color color) {

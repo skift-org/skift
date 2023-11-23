@@ -3,6 +3,11 @@
     "id": "karm-math",
     "type": "lib",
     "description": "Mathematical functions",
+    "enableIf": {
+        "freestanding": [
+            false
+        ]
+    },
     "requires": [
         "karm-base"
     ]

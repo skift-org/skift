@@ -9,6 +9,9 @@
     "enableIf": {
         "host": [
             false
+        ],
+        "freestanding": [
+            false
         ]
     },
     "provides": [

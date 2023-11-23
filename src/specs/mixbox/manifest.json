@@ -4,6 +4,7 @@
     "type": "lib",
     "description": "Mixbox is a library for natural color mixing based on real pigments",
     "requires": [
-        "karm-io"
+        "karm-io",
+        "karm-math"
     ]
 }

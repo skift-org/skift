@@ -38,6 +38,8 @@ static inline Demo INPUTS_DEMO{
 
         auto slider = Ui::sliderRow(0.5, NONE, "Some property");
 
+        auto input = Ui::input("Some Property",NONE);
+
         auto title = Ui::titleRow("Some Settings");
 
         auto list = Ui::card(
@@ -67,7 +69,9 @@ static inline Demo INPUTS_DEMO{
                         }),
 
             Ui::separator(),
-            slider);
+            slider,
+            Ui::separator(),
+            input);
 
         return Ui::vflow(8, title, list) |
                Ui::maxSize({420, Ui::UNCONSTRAINED}) |

@@ -29,7 +29,7 @@ struct EfiHost :
 
     void flip(Slice<Math::Recti> dirty) override {
         for (auto d : dirty)
-            _front.blit(d, _back.pixels());
+            Gfx::blitUnsafe(_front.clip(d), _back.pixels());
     }
 
     void pump() override {

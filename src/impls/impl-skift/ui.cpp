@@ -21,7 +21,7 @@ struct Host :
 
     void flip(Slice<Math::Recti> dirty) override {
         for (auto d : dirty) {
-            _front.blit(d, _back.pixels().clip(d));
+            Gfx::blitUnsafe(_front.clip(d), _back.pixels().clip(d));
         }
     }
 

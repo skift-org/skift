@@ -233,38 +233,12 @@ struct _Pixels {
     {
         clear({});
     }
-
-    ALWAYS_INLINE void blit(Math::Vec2i pos, _Pixels<false> src)
-        requires(MUT)
-    {
-        _fmt.visit([&](auto fd) {
-            _fmt.visit([&](auto fs) {
-                for (isize y = 0; y < src.height(); y++) {
-                    for (isize x = 0; x < src.width(); x++) {
-                        fd.store(pixelUnsafe({pos.x + x, pos.y + y}),
-                                 fs.load(src.pixelUnsafe({x, y})));
-                    }
-                }
-            });
-        });
-    }
-
-    ALWAYS_INLINE void blit(Math::Recti dst, _Pixels<false> src) {
-        _fmt.visit([&](auto fd) {
-            _fmt.visit([&](auto fs) {
-                for (isize y = 0; y < dst.height; y++) {
-                    for (isize x = 0; x < dst.width; x++) {
-                        fd.store(pixelUnsafe({dst.x + x, dst.y + y}),
-                                 fs.load(src.pixelUnsafe({x, y})));
-                    }
-                }
-            });
-        });
-    }
 };
 
 using Pixels = _Pixels<false>;
 
 using MutPixels = _Pixels<true>;
+
+void blitUnsafe(MutPixels dst, Pixels src);
 
 } // namespace Karm::Gfx

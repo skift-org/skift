@@ -90,18 +90,7 @@ struct Cell : public _Cell {
     Inert<T> _buf{};
 
     template <typename... Args>
-    Cell(Args &&...args) {
-        _buf.ctor(std::forward<Args>(args)...);
-    }
-
-    static Cell *from(T &ref) {
-        usize offset = offsetof(Cell, _buf);
-        auto cell = reinterpret_cast<Cell *>(reinterpret_cast<u8 *>(&ref) - offset);
-        if (cell->_magic != MAGIC)
-            panic("Cell::from() called on non-cell");
-        return cell;
-    }
-
+    Cell(Args &&...args) { _buf.ctor(std::forward<Args>(args)...); }
     void *_unwrap() override { return &_buf.unwrap(); }
     Meta::Type<> inspect() override { return Meta::typeOf<T>(); }
     void clear() override { _buf.dtor(); }

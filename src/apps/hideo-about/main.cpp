@@ -40,7 +40,7 @@ Ui::Child app() {
         .title = "About",
         .titlebar = Ui::TitlebarStyle::DIALOG,
         .body = content,
-        .size = {460, 360},
+        .size = {460, 300},
     });
 }
 

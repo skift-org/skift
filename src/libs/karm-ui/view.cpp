@@ -38,6 +38,14 @@ Strong<Media::Fontface> italicFontface() {
     return *_italicFontface;
 }
 
+static Opt<Strong<Media::Fontface>> _codeFontface = NONE;
+Strong<Media::Fontface> codeFontface() {
+    if (!_codeFontface) {
+        _codeFontface = Media::loadFontfaceOrFallback("bundle://fira-code-font/fonts/FiraCode-Regular.ttf"_url).unwrap();
+    }
+    return *_codeFontface;
+}
+
 TextStyle TextStyle::displayLarge() {
     return {
         .font = Media::Font{
@@ -165,6 +173,32 @@ TextStyle TextStyle::bodySmall() {
     return {
         .font = Media::Font{
             regularFontface(),
+            12,
+        },
+    };
+}
+
+TextStyle TextStyle::codeLarge() {
+    return {
+        .font = Media::Font{
+            codeFontface(),
+            16,
+        },
+    };
+}
+
+TextStyle TextStyle::codeMedium() {
+    return {
+        .font = Media::Font{
+            codeFontface(),
+            14,
+        },
+    };
+}
+TextStyle TextStyle::codeSmall() {
+    return {
+        .font = Media::Font{
+            codeFontface(),
             12,
         },
     };

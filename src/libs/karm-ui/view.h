@@ -56,6 +56,10 @@ struct TextStyle {
     static TextStyle bodyLarge();
     static TextStyle bodyMedium();
     static TextStyle bodySmall();
+
+    static TextStyle codeLarge();
+    static TextStyle codeMedium();
+    static TextStyle codeSmall();
 };
 
 Child text(TextStyle style, Str text);
@@ -99,6 +103,9 @@ DEF_STYLE(labelSmall)
 DEF_STYLE(bodyLarge)
 DEF_STYLE(bodyMedium)
 DEF_STYLE(bodySmall)
+DEF_STYLE(codeLarge)
+DEF_STYLE(codeMedium)
+DEF_STYLE(codeSmall)
 
 #undef DEF_STYLE
 

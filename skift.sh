@@ -14,7 +14,7 @@ if [ "$1" == "tools" -a "$2" == "nuke" ]; then
 fi
 
 if [ ! -f .cutekit/tools/ready ]; then
-    if [ ! ( "$1" == "tools" -a "$2" == "setup" ) ]; then
+    if [ ! \( "$1" == "tools" -a "$2" == "setup" \) ]; then
         echo "Tools not installed."
         echo "This script will install the tooling required to build SkiftOS into $PWD/.cutekit"
 
@@ -58,6 +58,7 @@ if [ ! -f .cutekit/tools/ready ]; then
 fi
 
 if [ "$1" == "tools" -a "$2" == "setup" ]; then
+    echo "Tools already installed."
     exit 0
 fi
 

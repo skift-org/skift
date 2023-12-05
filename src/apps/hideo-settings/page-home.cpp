@@ -33,10 +33,9 @@ Ui::Child pageHome(State const &) {
 
     auto isMobile = useFormFactor() == FormFactor::MOBILE;
 
-    auto gridLayout = Ui::GridStyle::simpleFixed({3, 96}, {3, 120}, 8);
-    if (isMobile) {
-        gridLayout = Ui::GridStyle::simpleGrow(4, 2, 4);
-    }
+    auto gridLayout = isMobile
+                          ? Ui::GridStyle::simpleGrow(4, 2, 4)
+                          : Ui::GridStyle::simpleFixed({3, 96}, {3, 120}, 8);
 
     auto grid = Ui::grid(gridLayout, items) |
                 Ui::spacing(8);

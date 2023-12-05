@@ -44,6 +44,9 @@ void reduce(State &s, Action a) {
         [&](ToggleSysPanel) {
             s.isSysPanelColapsed = not s.isSysPanelColapsed;
         },
+        [&](ToggleAppThumbnail a) {
+            s.isAppPanelThumbnails = a.value;
+        },
     });
 }
 

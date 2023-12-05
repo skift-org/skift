@@ -129,12 +129,14 @@ Ui::Child desktopPanels(State const &state) {
 }
 
 Ui::Child desktop(State const &state) {
-    return Ui::vflow(
+    return Ui::stack(
+        background(state),
         Ui::vflow(
-            taskbar(state),
-            Ui::separator()) |
-            Ui::slideIn(Ui::SlideFrom::TOP),
-        Ui::grow(NONE));
+            Ui::vflow(
+                taskbar(state),
+                Ui::separator()) |
+                Ui::slideIn(Ui::SlideFrom::TOP),
+            Ui::grow(NONE)));
 }
 
 Ui::Child app(bool isMobile) {

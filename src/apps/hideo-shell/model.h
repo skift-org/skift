@@ -40,6 +40,7 @@ struct State {
     bool isMobile = true;
     Panel activePanel = Panel::NIL;
     bool isSysPanelColapsed = true;
+    bool isAppPanelThumbnails = false;
 
     Media::Image background;
     Vec<Noti> noti;
@@ -71,11 +72,15 @@ struct FocusApp {
 
 struct ToggleSysPanel {};
 
+struct ToggleAppThumbnail {
+    bool value;
+};
+
 struct Activate {
     Panel panel;
 };
 
-using Action = Var<ToggleTablet, Lock, Unlock, DimisNoti, StartApp, CloseApp, FocusApp, Activate, ToggleSysPanel>;
+using Action = Var<ToggleTablet, Lock, Unlock, DimisNoti, StartApp, CloseApp, FocusApp, Activate, ToggleSysPanel, ToggleAppThumbnail>;
 
 void reduce(State &, Action);
 

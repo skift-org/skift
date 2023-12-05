@@ -48,6 +48,31 @@ Ui::Child appRow(MenuEntry const &entry, usize i) {
                Ui::spacing(6) | Ui::button(Model::bind<StartApp>(i), Ui::ButtonStyle::subtle());
 }
 
+Ui::Child appsList(State const &state) {
+    return Ui::vflow(
+        iter(state.entries)
+            .mapi(appRow)
+            .collect<Ui::Children>());
+}
+
+Ui::Child appTile(MenuEntry const &entry, usize i) {
+    return Ui::vflow(
+               26,
+               appIcon(entry.icon, 26),
+               Ui::labelLarge(entry.name)) |
+           Ui::button(
+               Model::bind<StartApp>(i),
+               Ui::ButtonStyle::subtle());
+}
+
+Ui::Child appsGrid(State const &state) {
+    return Ui::grid(
+        Ui::GridStyle::simpleFixed({8, 64}, {4, 64}),
+        iter(state.entries)
+            .mapi(appTile)
+            .collect<Ui::Children>());
+}
+
 Ui::Child runningApp(Surface const &surface, usize i) {
     return Ui::stack(
                appIcon(surface.entry.icon) |
@@ -70,28 +95,33 @@ Ui::Child runningApps(State const &state) {
            Ui::center() | Ui::spacing({0, 64, 0, 16});
 }
 
-Ui::Child apps(Ui::Children apps) {
+Ui::Child apps(State const &state) {
     return Ui::vflow(
         Ui::hflow(
             4,
             searchInput() | Ui::grow(),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::VIEW_GRID),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_LIST_BULLETED_SQUARE)),
-        Ui::vflow(0, apps) |
-            Ui::spacing({0, 12}) |
-            Ui::vscroll() |
-            Ui::grow());
-}
+            Ui::button(
+                Model::bind<ToggleAppThumbnail>(true),
+                state.isAppPanelThumbnails
+                    ? Ui::ButtonStyle::secondary()
+                    : Ui::ButtonStyle::subtle(),
+                Mdi::VIEW_GRID),
 
-Ui::Child appsList(State const &state) {
-    return apps(
-        iter(state.entries)
-            .mapi(appRow)
-            .collect<Ui::Children>());
+            Ui::button(
+                Model::bind<ToggleAppThumbnail>(false),
+                state.isAppPanelThumbnails
+                    ? Ui::ButtonStyle::subtle()
+                    : Ui::ButtonStyle::secondary(),
+                Mdi::FORMAT_LIST_BULLETED_SQUARE)),
+
+        (state.isAppPanelThumbnails
+             ? appsGrid(state)
+             : appsList(state)) |
+            Ui::spacing({0, 12}) | Ui::vscroll() | Ui::grow());
 }
 
 Ui::Child appsPanel(State const &state) {
-    return appsList(state) | panel();
+    return apps(state) | panel();
 }
 
 Ui::Child appsFlyout(State const &state) {
@@ -99,7 +129,7 @@ Ui::Child appsFlyout(State const &state) {
         runningApps(state),
         Ui::vflow(
             Ui::dragHandle(),
-            appsList(state) | Ui::grow()) |
+            apps(state) | Ui::grow()) |
             Ui::box({
                 .margin = {8, 8, 8, 8},
                 .padding = {12, 0},

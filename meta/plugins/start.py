@@ -3,11 +3,10 @@ import json
 import tempfile
 import magic
 import logging
+
 from pathlib import Path
 from typing import Any, Protocol
-from cutekit import shell, builder, const, model, cli, ensure
-
-ensure((0, 6, 0))
+from cutekit import shell, builder, const, model, cli
 
 
 class Storage(Protocol):
@@ -133,7 +132,7 @@ class Image:
         product = self.install(componentSpec, targetSpec)
         self.cp(str(product.path), dest=dest)
 
-    def install(self, componentSpec: str, targetSpec: str) -> builder.Product:
+    def install(self, componentSpec: str, targetSpec: str) -> builder.ProductScope:
         self._logger.info(f"Installing {componentSpec}...")
         component = self._registry.lookup(componentSpec, model.Component)
         assert component is not None
@@ -141,9 +140,10 @@ class Image:
         target = self._registry.lookup(targetSpec, model.Target)
         assert target is not None
 
-        product = builder.build(target, self._registry, component)[0]
+        scope = builder.TargetScope(self._registry, target)
+        product = builder.build(scope, component)[0]
 
-        for depId in component.resolved[target.id].resolved + [componentSpec]:
+        for depId in component.resolved[target.id].required + [componentSpec]:
             dep = self._registry.lookup(depId, model.Component)
             if dep is None:
                 raise Exception(f"Component {depId} not found")
@@ -271,6 +271,11 @@ def generateSystem(image: Image) -> None:
 
 @cli.command(None, "image", "Generate the boot image")
 def imageCmd(args: cli.Args) -> None:
+    pass
+
+
+@cli.command("g", "image/gen", "Generate the boot image")
+def imageGenCmd(args: cli.Args) -> None:
     debug = args.consumeOpt("debug", False) is True
     fmt = args.consumeOpt("format", "dir")
     args.opts["mixins"] = "debug" if debug else "o3"
@@ -287,8 +292,8 @@ def imageCmd(args: cli.Args) -> None:
     print(image.finalize())
 
 
-@cli.command("s", "start", "Boot the system")
-def bootCmd(args: cli.Args) -> None:
+@cli.command("s", "image/start", "Boot the system")
+def imageStartCmd(args: cli.Args) -> None:
     debug = args.consumeOpt("debug", False) is True
     args.opts["mixins"] = "debug" if debug else "o3"
 

@@ -2,9 +2,8 @@
 # definition. This should be replaced by a proper generator in the future when
 # CuteKit supports more advanced rules.
 
-from cutekit import shell, utils, ensure
+from cutekit import shell, utils
 
-ensure((0, 6, 0))
 
 idlFiles = shell.find("src/", ["*.idl"])
 

@@ -1,8 +1,6 @@
-from cutekit import shell, vt100, cli, ensure
+from cutekit import shell, vt100, cli
 import subprocess
 import re
-
-ensure((0, 6, 0))
 
 
 def isVersionAtLeastOrEqual(
@@ -96,7 +94,14 @@ def moduleIsAvailable(module: str) -> bool:
         return False
 
 
-@cli.command(None, "doctor", "Check if all required commands are available")
+@cli.command("n", "tools/nuke", "Nuke the development tools")
+@cli.command("s", "tools/setup", "Setup the development environment")
+@cli.command(None, "tools", "Manage the development tools")
+def nop(args: cli.Args):
+    raise RuntimeError("Don't use ck directly, use ./skift.sh instead.")
+
+
+@cli.command("d", "tools/doctor", "Check if all required commands are available")
 def doctorCmd(args: cli.Args):
     everythingIsOk = True
 

@@ -8,13 +8,13 @@ if [ "$CUTEKIT_NOVENV" == "1" ]; then
     exec cutekit $@
 fi
 
-if [ "$1" == "nuke-tools" ]; then
+if [ "$1" == "tools" -a "$2" == "nuke" ]; then
     rm -rf .cutekit/tools .cutekit/venv
     exit 0
 fi
 
 if [ ! -f .cutekit/tools/ready ]; then
-    if [ ! "$1" == "setup" ]; then
+    if [ ! ( "$1" == "tools" -a "$2" == "setup" ) ]; then
         echo "Tools not installed."
         echo "This script will install the tooling required to build SkiftOS into $PWD/.cutekit"
 
@@ -37,7 +37,7 @@ if [ ! -f .cutekit/tools/ready ]; then
 
     echo "Downloading CuteKit & Chatty..."
     if [ ! -d .cutekit/tools/cutekit ]; then
-        git clone --depth 1 https://github.com/cute-engineering/cutekit .cutekit/tools/cutekit --branch "0.6.1"
+        git clone --depth 1 https://github.com/cute-engineering/cutekit .cutekit/tools/cutekit --branch "0.7-dev"
     else
         echo "CuteKit already downloaded."
     fi
@@ -48,18 +48,16 @@ if [ ! -f .cutekit/tools/ready ]; then
         echo "Chatty already downloaded."
     fi
 
-    echo "Installing Dependencies..."
-    pip3 install -r meta/plugins/requirements.txt
-
     echo "Installing Tools..."
     pip3 install -e .cutekit/tools/cutekit
     pip3 install -e .cutekit/tools/chatty
+    pip3 install -r meta/plugins/requirements.txt
 
     touch .cutekit/tools/ready
     echo "Done!"
 fi
 
-if [ "$1" == "setup" ]; then
+if [ "$1" == "tools" -a "$2" == "setup" ]; then
     exit 0
 fi
 

@@ -1,3 +1,1 @@
 python-magic ~= 0.4.27
-requests ~= 2.31.0
-graphviz ~= 0.20.1

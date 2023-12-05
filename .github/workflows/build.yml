@@ -22,22 +22,22 @@ jobs:
             sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm 16
 
       - name: Set up the build environment
-        run: ./skift.sh setup && ./skift.sh doctor
+        run: ./skift.sh tools setup && ./skift.sh tools doctor
 
       - name: Download third-party dependencies
-        run: ./skift.sh install
+        run: ./skift.sh model install
 
       - name: Build Kernel (x86_64)
-        run: ./skift.sh build --target=kernel-x86_64
+        run: ./skift.sh builder build --target=kernel-x86_64
 
       - name: Build EFI (x86_64)
-        run: ./skift.sh build --target=efi-x86_64
+        run: ./skift.sh builder build --target=efi-x86_64
 
       - name: Build Userspace (x86_64)
-        run: ./skift.sh build --target=skift-x86_64
+        run: ./skift.sh builder build --target=skift-x86_64
 
       - name: Build Userspace (Host)
-        run: ./skift.sh build
+        run: ./skift.sh builder build
 
       - name: Test Userspace (Host)
-        run: ./skift.sh test
+        run: ./skift.sh builder test

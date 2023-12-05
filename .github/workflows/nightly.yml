@@ -44,13 +44,13 @@ jobs:
             sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm 16
 
       - name: Set up the build environment
-        run: ./skift.sh setup && ./skift.sh doctor
+        run: ./skift.sh tools setup && ./skift.sh tools doctor
 
       - name: Download third-party dependencies
-        run: ./skift.sh install
+        run: ./skift.sh model install
 
       - name: Build System Image (efi-x86_64)
-        run: ./skift.sh image --format=hdd --prop:branch=nightly
+        run: ./skift.sh image gen --format=hdd --prop:branch=nightly
 
       - name: Read release.md and use it as a body of new release
         id: read_release

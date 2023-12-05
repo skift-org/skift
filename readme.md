@@ -42,13 +42,13 @@ To build skiftOS, you need to have a modern C/C++ compiler such as clang-16 inst
 First, set up the build environment by running the following command:
 
 ```sh
-$ ./skift.sh setup
+$ ./skift.sh tools setup
 ```
 
 Then, check that everything is working correctly by running:
 
 ```sh
-$ ./skift.sh doctor
+$ ./skift.sh tools doctor
 ```
 
 ### Step 2: Download third-party dependencies
@@ -56,7 +56,7 @@ $ ./skift.sh doctor
 After setting up the build environment, download the third-party dependencies by running the following command:
 
 ```sh
-$ ./skift.sh install
+$ ./skift.sh model install
 ```
 
 ### Step 3: Build and run skiftOS
@@ -64,7 +64,7 @@ $ ./skift.sh install
 Finally, build and run skiftOS by running the following command:
 
 ```sh
-$ ./skift.sh start
+$ ./skift.sh image start
 ```
 
 If all these steps are completed successfully, you should have a fully built and operational skiftOS ready for use. Enjoy! 😊

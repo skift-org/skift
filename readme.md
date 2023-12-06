@@ -61,11 +61,15 @@ $ ./skift.sh model install
 
 ### Step 3: Build and run skiftOS
 
+> [!NOTE]
+> Running this step requires being in a graphical environment with a build of QEMU supporting graphics either via SDL or GTK. If you are using a headless server, you can use the `./skift.sh image build --format=hdd` command to build a disk image.
+
 Finally, build and run skiftOS by running the following command:
 
 ```sh
 $ ./skift.sh image start
 ```
+
 
 If all these steps are completed successfully, you should have a fully built and operational skiftOS ready for use. Enjoy! 😊
 

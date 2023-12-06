@@ -274,7 +274,7 @@ def imageCmd(args: cli.Args) -> None:
     pass
 
 
-@cli.command("g", "image/gen", "Generate the boot image")
+@cli.command("g", "image/build", "Generate the boot image")
 def imageGenCmd(args: cli.Args) -> None:
     debug = args.consumeOpt("debug", False) is True
     fmt = args.consumeOpt("format", "dir")

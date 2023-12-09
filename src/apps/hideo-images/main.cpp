@@ -11,7 +11,7 @@ Ui::Child app(State initial) {
     return Ui::reducer<Model>(
         initial,
         [](auto const &state) {
-            auto titlebar = Ui::titlebar(Mdi::IMAGE, "Image Viewer");
+            auto titlebar = Ui::titlebar(Mdi::IMAGE, "Images");
 
             auto content = state.isEditor
                                ? editor(state)

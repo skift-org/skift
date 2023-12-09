@@ -28,7 +28,7 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
 Ui::Child app(Strong<Media::Fontface> fontface) {
     return Ui::scafold({
         .icon = Mdi::FORMAT_FONT,
-        .title = "Font Viewer",
+        .title = "Fonts",
         .body = pangrams(fontface),
     });
 }

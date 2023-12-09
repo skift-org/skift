@@ -1,9 +1,10 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "hideo-file-manager-base",
-    "type": "lib",
+    "id": "hideo-files",
+    "type": "exe",
     "description": "Manage files and folders",
     "requires": [
-        "karm-ui"
+        "hideo-files-base",
+        "karm-main"
     ]
 }

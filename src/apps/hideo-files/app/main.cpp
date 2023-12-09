@@ -55,7 +55,7 @@ Ui::Child app() {
     return Ui::reducer<FileManager::Model>("file:/"_url, [](auto state) {
         return Ui::scafold({
             .icon = Mdi::FOLDER,
-            .title = "File Manager",
+            .title = "Files",
             .startTools = {
                 goBackTool(state),
                 goForwardTool(state),

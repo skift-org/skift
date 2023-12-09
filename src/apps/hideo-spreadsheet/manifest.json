@@ -4,7 +4,7 @@
     "type": "exe",
     "description": "View and edit spreadsheets",
     "requires": [
-        "hideo-file-manager-base",
+        "hideo-files-base",
         "karm-main"
     ]
 }

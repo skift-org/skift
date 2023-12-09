@@ -2,7 +2,6 @@
 
 set -e
 
-# check for CUTEKIT_NOVENV
 if [ "$CUTEKIT_NOVENV" == "1" ]; then
     echo "CUTEKIT_NOVENV is set, skipping virtual environment setup."
     exec cutekit $@

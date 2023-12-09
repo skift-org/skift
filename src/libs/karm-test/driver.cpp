@@ -11,13 +11,17 @@
 
 namespace Karm::Test {
 
+namespace {
+
+constexpr auto GREEN = Cli::Style{Cli::GREEN}.bold();
+constexpr auto RED = Cli::Style{Cli::RED}.bold();
+constexpr auto NOTE = Cli::Style{Cli::GRAY_DARK}.bold();
+
+} // namespace
+
 void Driver::add(Test *test) {
     _tests.pushBack(test);
 }
-
-static auto GREEN = Cli::Style{Cli::GREEN}.bold();
-static auto RED = Cli::Style{Cli::RED}.bold();
-static auto NOTE = Cli::Style{Cli::GRAY_DARK}.bold();
 
 void Driver::runAll() {
     usize passed = 0, failed = 0;

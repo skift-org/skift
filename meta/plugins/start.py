@@ -270,12 +270,12 @@ def generateSystem(image: Image) -> None:
 
 
 @cli.command(None, "image", "Generate the boot image")
-def imageCmd(args: cli.Args) -> None:
+def _(args: cli.Args) -> None:
     pass
 
 
 @cli.command("g", "image/build", "Generate the boot image")
-def imageGenCmd(args: cli.Args) -> None:
+def _(args: cli.Args) -> None:
     debug = args.consumeOpt("debug", False) is True
     fmt = args.consumeOpt("format", "dir")
     args.opts["mixins"] = "debug" if debug else "o3"
@@ -293,7 +293,7 @@ def imageGenCmd(args: cli.Args) -> None:
 
 
 @cli.command("s", "image/start", "Boot the system")
-def imageStartCmd(args: cli.Args) -> None:
+def _(args: cli.Args) -> None:
     debug = args.consumeOpt("debug", False) is True
     args.opts["mixins"] = "debug" if debug else "o3"
 

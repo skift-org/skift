@@ -97,12 +97,12 @@ def moduleIsAvailable(module: str) -> bool:
 @cli.command("n", "tools/nuke", "Nuke the development tools")
 @cli.command("s", "tools/setup", "Setup the development environment")
 @cli.command(None, "tools", "Manage the development tools")
-def nop(args: cli.Args):
+def _(args: cli.Args):
     raise RuntimeError("Don't use ck directly, use ./skift.sh instead.")
 
 
 @cli.command("d", "tools/doctor", "Check if all required commands are available")
-def doctorCmd(args: cli.Args):
+def _(args: cli.Args):
     everythingIsOk = True
 
     everythingIsOk = everythingIsOk & moduleIsAvailable("requests")

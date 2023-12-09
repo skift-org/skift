@@ -1,13 +1,18 @@
 #pragma once
 
+#include <textbox/model.h>
+
 #include "box.h"
 #include "funcs.h"
 #include "view.h"
 
 namespace Karm::Ui {
 
-template <typename T>
-using OnChange = Opt<SharedFunc<void(Node &, T value)>>;
+template <typename T = None>
+using OnChange = Meta::Cond<
+    Meta::Same<T, None>,
+    Opt<SharedFunc<void(Node &)>>,
+    Opt<SharedFunc<void(Node &, T value)>>>;
 
 template <typename T>
 [[gnu::used]] static auto IGNORE(Ui::Node &, T) {}
@@ -155,9 +160,11 @@ Child button(OnPress onPress, Mdi::Icon i, Str t);
 
 /* --- Input ---------------------------------------------------------------- */
 
-Child input(TextStyle style, String text, OnChange<String> onChange = NONE);
+using Text = Textbox::Model;
 
-Child input(String text, OnChange<String> onChange = NONE);
+Child input(TextStyle style, Strong<Text> text, OnChange<> onChange = NONE);
+
+Child input(Strong<Text> text, OnChange<> onChange = NONE);
 
 /* --- Toggle --------------------------------------------------------------- */
 

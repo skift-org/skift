@@ -77,6 +77,12 @@ struct _Vec {
 
     void insert(usize index, T &&value) { _buf.insert(index, std::move(value)); }
 
+    void insertMany(usize index, Sliceable<T> auto const &other) {
+        for (auto &v : other) {
+            insert(index++, v);
+        }
+    }
+
     void replace(usize index, T const &value) { _buf[index] = T(value); }
 
     void replace(usize index, T &&value) { _buf[index] = std::move(value); }
@@ -98,7 +104,9 @@ struct _Vec {
     }
 
     template <typename... Args>
-    void emplaceFront(Args &&...args) { _buf.emplace(0, std::forward<Args>(args)...); }
+    T &emplaceFront(Args &&...args) {
+        return _buf.emplace(0, std::forward<Args>(args)...);
+    }
 
     T popFront() { return _buf.removeAt(0); }
 
@@ -109,15 +117,18 @@ struct _Vec {
     void pushBack(T &&value) { insert(len(), std::move(value)); }
 
     void pushBack(Sliceable<T> auto &other) {
-        for (auto &v : other) {
+        for (auto &v : other)
             pushBack(v);
-        }
     }
 
     template <typename... Args>
-    void emplaceBack(Args &&...args) { _buf.emplace(len(), std::forward<Args>(args)...); }
+    T &emplaceBack(Args &&...args) {
+        return _buf.emplace(len(), std::forward<Args>(args)...);
+    }
 
-    T popBack() { return removeAt(len() - 1); }
+    T popBack() {
+        return removeAt(len() - 1);
+    }
 
     /* --- MutSliceable --- */
 

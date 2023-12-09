@@ -151,6 +151,12 @@ struct _StringBuilder {
         }
     }
 
+    void append(Sliceable<Rune> auto const &runes) {
+        for (auto rune : runes) {
+            append(rune);
+        }
+    }
+
     void append(_Str<E> str) {
         usize written = 0;
         for (auto rune : iterRunes(str)) {

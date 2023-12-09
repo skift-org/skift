@@ -32,10 +32,10 @@ extern "C" void __entryPoint(usize rawHandover, usize rawIn, usize rawOut) {
 
     if (not res) {
         logError("{}: {}", argv[0], res.none().msg());
-        (void)self.crash();
+        self.crash().unwrap();
     }
 
     Abi::SysV::fini();
-    (void)self.ret();
-    asm volatile("ud2");
+    self.ret().unwrap();
+    __builtin_unreachable();
 }

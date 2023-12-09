@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "textbox-spec",
+    "type": "lib",
+    "description": "Common textbox behaviors",
+    "requires": [
+        "karm-base"
+    ]
+}

@@ -23,12 +23,18 @@ FlagsEnum$(Button);
 
 enum struct Mod : u8 {
     NONE = 0,
+
     LSHIFT = 1 << 0,
     RSHIFT = 1 << 1,
+    ANY_SHIFT = LSHIFT | RSHIFT,
+
     LCTRL = 1 << 2,
     RCTRL = 1 << 3,
+    ANY_CTR = LCTRL | RCTRL,
+
     ALT = 1 << 4,
     ALTGR = 1 << 5,
+
     SUPER = 1 << 6,
 };
 

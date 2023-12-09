@@ -43,7 +43,7 @@ struct Buf {
         }
     }
 
-    Buf(Sliceable<T> auto &other) {
+    Buf(Sliceable<T> auto const &other) {
         _cap = other.len();
         _len = other.len();
         _buf = new Inert<T>[_cap];
@@ -134,14 +134,16 @@ struct Buf {
     }
 
     template <typename... Args>
-    void emplace(usize index, Args &&...args) {
+    auto &emplace(usize index, Args &&...args) {
         ensure(_len + 1);
 
         for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
         }
+
         _buf[index].ctor(std::forward<Args>(args)...);
         _len++;
+        return _buf[index].unwrap();
     }
 
     void insert(usize index, T &&value) {
@@ -314,7 +316,7 @@ struct InlineBuf {
         }
     }
 
-    InlineBuf(Sliceable<T> auto &other) {
+    InlineBuf(Sliceable<T> auto const &other) {
         _len = other.len();
 
         if (_len > N) {

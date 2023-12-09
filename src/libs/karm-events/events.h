@@ -36,10 +36,12 @@ struct KeyboardEvent {
         RELEASE,
     } type;
     Key key;
+    Mod mods = Mod::NONE;
 };
 
 struct TypedEvent {
     u32 codepoint;
+    Mod mods = Mod::NONE;
 };
 
 struct ExitEvent {

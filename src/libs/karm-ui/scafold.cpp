@@ -100,6 +100,8 @@ Child scafold(Scafold scafold) {
             if (scafold.midleTools.len())
                 tools.pushBack(
                     hflow(4, scafold.midleTools) | grow());
+            else if (scafold.endTools.len())
+                tools.pushBack(grow(NONE));
 
             if (scafold.endTools.len())
                 tools.pushBack(

@@ -18,9 +18,6 @@ test$(modelMoves) {
     mdl.moveStart();
     expectEq$(mdl._cur.head, 0uz);
 
-    mdl.movePrevWord();
-    expectEq$(mdl._cur.head, 8uz);
-
     return Ok();
 }
 

@@ -24,10 +24,10 @@ FontMetrics Font::metrics() const {
     auto m = fontface->metrics();
 
     m.advance *= scale();
-    m.ascend *= scale();
-    m.captop *= scale();
-    m.descend *= scale();
-    m.linegap *= scale();
+    m.ascend *= scale() * lineheight;
+    m.captop *= scale() * lineheight;
+    m.descend *= scale() * lineheight;
+    m.linegap *= scale() * lineheight;
 
     return m;
 }
@@ -57,8 +57,17 @@ FontMesure Font::mesure(Glyph r) const {
 
 FontMesure Font::mesureStr(Str str) const {
     f64 adv = 0;
+
+    bool first = true;
+    Media::Glyph prev{0};
     for (auto r : iterRunes(str)) {
-        adv += advance(glyph(r));
+        auto curr = glyph(r);
+        if (not first)
+            adv += kern(prev, curr);
+        else
+            first = false;
+        adv += advance(curr);
+        prev = curr;
     }
 
     auto m = metrics();

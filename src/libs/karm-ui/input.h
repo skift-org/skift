@@ -160,11 +160,9 @@ Child button(OnPress onPress, Mdi::Icon i, Str t);
 
 /* --- Input ---------------------------------------------------------------- */
 
-using Text = Textbox::Model;
+Child input(Strong<Textbox::Model> text, OnChange<> onChange, Gfx::TextStyle style);
 
-Child input(TextStyle style, Strong<Text> text, OnChange<> onChange = NONE);
-
-Child input(Strong<Text> text, OnChange<> onChange = NONE);
+Child input(Strong<Textbox::Model> text, OnChange<> onChange);
 
 /* --- Toggle --------------------------------------------------------------- */
 
@@ -180,35 +178,11 @@ Child radio(bool value, OnChange<bool> onChange);
 
 /* --- Slider --------------------------------------------------------------- */
 
-struct SliderStyle {
-    BoxStyle thumbStyle;
-    Math::Vec2i trackSize;
-    BoxStyle trackStyle;
-    Opt<BoxStyle> valueStyle;
+Child slider(f64 value, OnChange<f64> onChange, Child child);
 
-    static SliderStyle regular();
-
-    static SliderStyle hsv();
-
-    static SliderStyle gradiant(Gfx::Color from, Gfx::Color to);
-};
-
-Child slider(SliderStyle style, f64 value, OnChange<f64> onChange);
-
-Child slider(f64 value, OnChange<f64> onChange);
-
-template <typename T>
-Child slider(SliderStyle style, T value, Range<T> range, OnChange<T> onChange) {
-    return slider(style, (value - range.start) / (f64)(range.end() - range.start), [=](Node &n, f64 v) mutable {
-        onChange(n, range.start + v * (range.end() - range.start));
-    });
-}
-
-Child slider2(Child thumb, f64 value, OnChange<f64> onChange);
-
-static inline auto slider2(f64 value, OnChange<f64> onChange) {
-    return [value, onChange = std::move(onChange)](Child thumb) mutable {
-        return slider2(std::move(thumb), value, std::move(onChange));
+static inline auto slider(f64 value, OnChange<f64> onChange) {
+    return [value, onChange = std::move(onChange)](Child child) mutable {
+        return slider(value, std::move(onChange), std::move(child));
     };
 }
 
@@ -220,11 +194,11 @@ Child color(Gfx::Color color, OnChange<Gfx::Color> onChange);
 
 /* --- Intent --------------------------------------------------------------- */
 
-Child intent(Child child, Func<void(Node &, Async::Event &e)> map);
+Child intent(Func<void(Node &, Async::Event &e)> map, Child child);
 
 static inline auto intent(Func<void(Node &, Async::Event &e)> map) {
     return [map = std::move(map)](Child child) mutable {
-        return intent(std::move(child), std::move(map));
+        return intent(std::move(map), std::move(child));
     };
 }
 

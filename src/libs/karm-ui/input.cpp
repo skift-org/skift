@@ -251,16 +251,14 @@ Child button(OnPress onPress, Mdi::Icon i, Str t) {
 
 /* --- Input ---------------------------------------------------------------- */
 
-struct TextModel {};
-
 struct Input : public View<Input> {
-    TextStyle _style;
-    String _text;
-    OnChange<String> _onChange;
+    Gfx::TextStyle _style;
+    Strong<Textbox::Model> _text;
+    OnChange<> _onChange;
     usize _cursor = 0;
     Opt<Media::FontMesure> _mesure;
 
-    Input(TextStyle style, String text, OnChange<String> onChange)
+    Input(Gfx::TextStyle style, Strong<Textbox::Model> text, OnChange<> onChange)
         : _style(style), _text(text), _onChange(std::move(onChange)) {}
 
     void reconcile(Input &o) override {
@@ -272,7 +270,7 @@ struct Input : public View<Input> {
         if (_mesure) {
             return *_mesure;
         }
-        _mesure = _style.font.mesureStr(_text);
+        //_mesure = _style.font.mesureStr(_text);
         return *_mesure;
     }
 
@@ -280,14 +278,14 @@ struct Input : public View<Input> {
         g.save();
 
         auto m = mesure();
-        auto baseline = bound().topStart() + m.baseline;
+        // auto baseline = bound().topStart() + m.baseline;
 
         if (_style.color) {
             g.fillStyle(*_style.color);
         }
 
         g.textFont(_style.font);
-        g.fill(baseline, _text);
+        // g.fill(baseline, _text);
 
         if (debugShowLayoutBounds) {
             g.debugLine(
@@ -307,12 +305,12 @@ struct Input : public View<Input> {
     }
 };
 
-Child input(TextStyle style, String text, OnChange<String> onChange) {
+Child input(Gfx::TextStyle style, Strong<Textbox::Model> text, OnChange<> onChange) {
     return makeStrong<Input>(style, text, std::move(onChange));
 }
 
-Child input(String text, OnChange<String> onChange) {
-    return makeStrong<Input>(TextStyle::bodyMedium(), text, std::move(onChange));
+Child input(Strong<Textbox::Model> text, OnChange<> onChange) {
+    return makeStrong<Input>(TextStyles::bodyMedium(), text, std::move(onChange));
 }
 
 /* --- Toggle --------------------------------------------------------------- */
@@ -497,153 +495,22 @@ Child radio(bool value, OnChange<bool> onChange) {
 
 /* --- Slider ---------------------------------------------------------------- */
 
-SliderStyle SliderStyle::regular() {
-    return {
-        .thumbStyle = {
-            .margin = 2,
-            .borderRadius = 999,
-            .borderWidth = 4,
-            .borderPaint = Gfx::GRAY50,
-            .backgroundPaint = ACCENT700,
-        },
-        .trackSize = {128, 26},
-        .trackStyle = {
-            .margin = 8,
-            .borderRadius = 999,
-            .backgroundPaint = GRAY700,
-        },
-        .valueStyle = BoxStyle{
-            .margin = 8,
-            .borderRadius = 999,
-            .backgroundPaint = ACCENT700,
-        },
-    };
-}
-
-SliderStyle SliderStyle::hsv() {
-    return {
-        .thumbStyle = {
-            .margin = 4,
-            .borderRadius = 999,
-            .borderWidth = 2,
-            .borderPaint = Gfx::GRAY50,
-        },
-        .trackSize = {256, 26},
-        .trackStyle = {
-            .margin = 2,
-            .borderRadius = 999,
-            .backgroundPaint = Gfx::Gradient::hsv().bake(),
-        },
-    };
-}
-
-SliderStyle SliderStyle::gradiant(Gfx::Color from, Gfx::Color to) {
-    return {
-        .thumbStyle = {
-            .margin = 4,
-            .borderRadius = 999,
-            .borderWidth = 2,
-            .borderPaint = Gfx::GRAY50,
-        },
-        .trackSize = {128, 26},
-        .trackStyle = {
-            .margin = 2,
-            .borderRadius = 999,
-            .backgroundPaint = Gfx::Gradient::hlinear().withColors(from, to).bake(),
-        },
-    };
-}
-
-struct Slider : public View<Slider> {
-    SliderStyle _style;
-    f64 _value = 0.0f;
-    OnChange<f64> _onChange;
-    MouseListener _mouseListener;
-
-    Slider(SliderStyle style, f64 value, OnChange<f64> onChange)
-        : _style(style), _value(value), _onChange(std::move(onChange)) {
-    }
-
-    void reconcile(Slider &o) override {
-        _style = o._style;
-        _value = o._value;
-        _onChange = std::move(o._onChange);
-    }
-
-    auto thumbRadius() {
-        return _style.trackSize.min() / 2;
-    }
-
-    void paint(Gfx::Context &g, Math::Recti) override {
-        if (_style.valueStyle) {
-            auto [rhs, lhs] = bound().hsplit(bound().width * _value);
-
-            g.save();
-            g.clip(rhs);
-            _style.valueStyle->paint(g, bound());
-            g.restore();
-
-            g.save();
-            g.clip(lhs);
-            _style.trackStyle.paint(g, bound());
-            g.restore();
-        } else {
-            _style.trackStyle.paint(g, bound());
-        }
-
-        auto thumbX = bound().x + ((bound().width - thumbRadius() * 2) * _value);
-        Math::Recti thumbBound = {
-            {
-                (isize)thumbX,
-                bound().top(),
-            },
-            thumbRadius() * 2,
-        };
-
-        _style.thumbStyle.paint(g, thumbBound);
-    }
-
-    void event(Async::Event &e) override {
-        _mouseListener.listen(*this, e);
-
-        if (_mouseListener.isPress() and e.is<Events::MouseEvent>()) {
-            auto p = _mouseListener.pos();
-            _value = (p.x - thumbRadius()) / ((f64)bound().width - thumbRadius() * 2);
-            _value = clamp01(_value);
-            if (_onChange)
-                _onChange(*this, _value);
-            else
-                Ui::shouldRepaint(*this);
-        }
-    }
-
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return _style.trackSize;
-    }
-};
-
-Child slider(SliderStyle style, f64 value, OnChange<f64> onChange) {
-    return makeStrong<Slider>(style, value, std::move(onChange));
-}
-
-Child slider(f64 value, OnChange<f64> onChange) {
-    return makeStrong<Slider>(SliderStyle::regular(), value, std::move(onChange));
-}
-
-struct Slider2 : public ProxyNode<Slider2> {
+struct Slider : public ProxyNode<Slider> {
     f64 _value = 0.0f;
     OnChange<f64> _onChange;
     Math::Recti _bound;
 
-    Slider2(Child child, f64 value, OnChange<f64> onChange)
-        : ProxyNode<Slider2>(std::move(child)), _value(value), _onChange(std::move(onChange)) {
+    Slider(f64 value, OnChange<f64> onChange, Child child)
+        : ProxyNode<Slider>(std::move(child)),
+          _value(value),
+          _onChange(std::move(onChange)) {
     }
 
-    void reconcile(Slider2 &o) override {
+    void reconcile(Slider &o) override {
         _value = o._value;
         _onChange = o._onChange;
 
-        ProxyNode<Slider2>::reconcile(o);
+        ProxyNode<Slider>::reconcile(o);
     }
 
     void layout(Math::Recti r) override {
@@ -672,12 +539,12 @@ struct Slider2 : public ProxyNode<Slider2> {
             e.accept();
         }
 
-        ProxyNode<Slider2>::bubble(e);
+        ProxyNode<Slider>::bubble(e);
     }
 };
 
-Child slider2(Child thumb, f64 value, OnChange<f64> onChange) {
-    return makeStrong<Slider2>(std::move(thumb), value, std::move(onChange));
+Child slider(f64 value, OnChange<f64> onChange, Child child) {
+    return makeStrong<Slider>(value, std::move(onChange), std::move(child));
 }
 
 /* --- Color ---------------------------------------------------------------- */
@@ -702,7 +569,7 @@ Child color(Gfx::Color color, OnChange<Gfx::Color>) {
 struct Intent : public ProxyNode<Intent> {
     Func<void(Node &, Async::Event &e)> _map;
 
-    Intent(Child child, Func<void(Node &, Async::Event &e)> map)
+    Intent(Func<void(Node &, Async::Event &e)> map, Child child)
         : ProxyNode<Intent>(std::move(child)), _map(std::move(map)) {}
 
     void event(Async::Event &e) override {
@@ -715,8 +582,8 @@ struct Intent : public ProxyNode<Intent> {
     }
 };
 
-Child intent(Child child, Func<void(Node &, Async::Event &e)> map) {
-    return makeStrong<Intent>(std::move(child), std::move(map));
+Child intent(Func<void(Node &, Async::Event &e)> map, Child child) {
+    return makeStrong<Intent>(std::move(map), std::move(child));
 }
 
 } // namespace Karm::Ui

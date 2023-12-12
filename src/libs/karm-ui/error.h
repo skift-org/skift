@@ -29,7 +29,7 @@ static inline Child errorScope(Str what, auto callback) {
             icon(Mdi::ALERT_DECAGRAM_OUTLINE, 26) | center(),
             vflow(
                 4,
-                text(TextStyle::titleMedium().withColor(Gfx::WHITE), "Can't display {}", what),
+                text(TextStyles::titleMedium().withColor(Gfx::WHITE), "Can't display {}", what),
                 text(Fmt::toSentenceCase(child.none().msg()).unwrap()))));
 }
 

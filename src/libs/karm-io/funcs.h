@@ -6,7 +6,6 @@
 #include <karm-base/string.h>
 
 #include "impls.h"
-#include "traits.h"
 
 namespace Karm::Io {
 

@@ -85,7 +85,11 @@ Child dialogButton(DialogButton result, bool primary = false);
 
 Child dialogButtons(DialogButton buttons, DialogButton primary);
 
+Child dialogCloseButton();
+
 /* --- Dialogs -------------------------------------------------------------- */
+
+Ui::Child licenseDialog();
 
 Child aboutDialog(Mdi::Icon icon, String name);
 

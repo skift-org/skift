@@ -298,7 +298,7 @@ void Context::fill(Math::Vec2i pos, Media::Icon icon) {
     _useSpaa = false;
 }
 
-void Context::stroke(Math::Vec2f baseline, Media::Glyph rune) {
+void Context::stroke(Math::Vec2f baseline, Media::Glyph glyph) {
     auto f = textFont();
 
     _useSpaa = true;
@@ -306,13 +306,13 @@ void Context::stroke(Math::Vec2f baseline, Media::Glyph rune) {
     begin();
     origin(baseline.cast<isize>());
     scale(f.scale());
-    f.fontface->contour(*this, rune);
+    f.fontface->contour(*this, glyph);
     stroke();
     restore();
     _useSpaa = false;
 }
 
-void Context::fill(Math::Vec2f baseline, Media::Glyph rune) {
+void Context::fill(Math::Vec2f baseline, Media::Glyph glyph) {
     auto f = textFont();
 
     _useSpaa = true;
@@ -320,7 +320,7 @@ void Context::fill(Math::Vec2f baseline, Media::Glyph rune) {
     begin();
     origin(baseline.cast<isize>());
     scale(f.scale());
-    f.fontface->contour(*this, rune);
+    f.fontface->contour(*this, glyph);
     fill();
     restore();
     _useSpaa = false;
@@ -343,9 +343,11 @@ void Context::stroke(Math::Vec2f baseline, Str str) {
         auto curr = f.glyph(rune);
         if (not first)
             baseline.x += f.kern(prev, curr);
+        else
+            first = false;
+
         stroke(baseline, curr);
         baseline.x += f.advance(curr);
-        first = false;
         prev = curr;
     }
 }
@@ -359,9 +361,11 @@ void Context::fill(Math::Vec2f baseline, Str str) {
         auto curr = f.glyph(rune);
         if (not first)
             baseline.x += f.kern(prev, curr);
+        else
+            first = false;
+
         fill(baseline, curr);
         baseline.x += f.advance(curr);
-        first = false;
         prev = curr;
     }
 }
@@ -409,7 +413,7 @@ void Context::debugRect(Math::Recti rect, Color color) {
 }
 
 void Context::debugArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
-    const isize SIZE = 16;
+    isize const SIZE = 16;
 
     Math::Vec2i dir = to - from;
     Math::Vec2i perp = {-dir.y, dir.x};
@@ -427,7 +431,7 @@ void Context::debugArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
 }
 
 void Context::debugDoubleArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
-    const isize SIZE = 8;
+    isize const SIZE = 8;
 
     Math::Vec2f dir = (to - from).cast<f64>();
     Math::Vec2f perp = {-dir.y, dir.x};

@@ -46,7 +46,7 @@ Strong<Media::Fontface> codeFontface() {
     return *_codeFontface;
 }
 
-TextStyle TextStyle::displayLarge() {
+Gfx::TextStyle TextStyles::displayLarge() {
     return {
         .font = Media::Font{
             regularFontface(),
@@ -55,7 +55,7 @@ TextStyle TextStyle::displayLarge() {
     };
 }
 
-TextStyle TextStyle::displayMedium() {
+Gfx::TextStyle TextStyles::displayMedium() {
     return {
         .font = Media::Font{
             regularFontface(),
@@ -64,7 +64,7 @@ TextStyle TextStyle::displayMedium() {
     };
 }
 
-TextStyle TextStyle::displaySmall() {
+Gfx::TextStyle TextStyles::displaySmall() {
     return {
         .font = Media::Font{
             regularFontface(),
@@ -73,7 +73,7 @@ TextStyle TextStyle::displaySmall() {
     };
 }
 
-TextStyle TextStyle::headlineLarge() {
+Gfx::TextStyle TextStyles::headlineLarge() {
     return {
         .font = Media::Font{
             regularFontface(),
@@ -82,7 +82,7 @@ TextStyle TextStyle::headlineLarge() {
     };
 }
 
-TextStyle TextStyle::headlineMedium() {
+Gfx::TextStyle TextStyles::headlineMedium() {
     return {
         .font = Media::Font{
             regularFontface(),
@@ -91,7 +91,7 @@ TextStyle TextStyle::headlineMedium() {
     };
 }
 
-TextStyle TextStyle::headlineSmall() {
+Gfx::TextStyle TextStyles::headlineSmall() {
     return {
         .font = Media::Font{
             regularFontface(),
@@ -100,7 +100,7 @@ TextStyle TextStyle::headlineSmall() {
     };
 }
 
-TextStyle TextStyle::titleLarge() {
+Gfx::TextStyle TextStyles::titleLarge() {
     return {
         .font = Media::Font{
             regularFontface(),
@@ -109,7 +109,7 @@ TextStyle TextStyle::titleLarge() {
     };
 }
 
-TextStyle TextStyle::titleMedium() {
+Gfx::TextStyle TextStyles::titleMedium() {
     return {
         .font = Media::Font{
             mediumFontface(),
@@ -118,7 +118,7 @@ TextStyle TextStyle::titleMedium() {
     };
 }
 
-TextStyle TextStyle::titleSmall() {
+Gfx::TextStyle TextStyles::titleSmall() {
     return {
         .font = Media::Font{
             mediumFontface(),
@@ -127,7 +127,7 @@ TextStyle TextStyle::titleSmall() {
     };
 }
 
-TextStyle TextStyle::labelLarge() {
+Gfx::TextStyle TextStyles::labelLarge() {
     return {
         .font = Media::Font{
             mediumFontface(),
@@ -135,7 +135,8 @@ TextStyle TextStyle::labelLarge() {
         },
     };
 }
-TextStyle TextStyle::labelMedium() {
+
+Gfx::TextStyle TextStyles::labelMedium() {
     return {
         .font = Media::Font{
             mediumFontface(),
@@ -143,7 +144,8 @@ TextStyle TextStyle::labelMedium() {
         },
     };
 }
-TextStyle TextStyle::labelSmall() {
+
+Gfx::TextStyle TextStyles::labelSmall() {
     return {
         .font = Media::Font{
             mediumFontface(),
@@ -152,7 +154,7 @@ TextStyle TextStyle::labelSmall() {
     };
 }
 
-TextStyle TextStyle::bodyLarge() {
+Gfx::TextStyle TextStyles::bodyLarge() {
     return {
         .font = Media::Font{
             regularFontface(),
@@ -161,7 +163,7 @@ TextStyle TextStyle::bodyLarge() {
     };
 }
 
-TextStyle TextStyle::bodyMedium() {
+Gfx::TextStyle TextStyles::bodyMedium() {
     return {
         .font = Media::Font{
             regularFontface(),
@@ -169,7 +171,8 @@ TextStyle TextStyle::bodyMedium() {
         },
     };
 }
-TextStyle TextStyle::bodySmall() {
+
+Gfx::TextStyle TextStyles::bodySmall() {
     return {
         .font = Media::Font{
             regularFontface(),
@@ -178,7 +181,7 @@ TextStyle TextStyle::bodySmall() {
     };
 }
 
-TextStyle TextStyle::codeLarge() {
+Gfx::TextStyle TextStyles::codeLarge() {
     return {
         .font = Media::Font{
             codeFontface(),
@@ -187,7 +190,7 @@ TextStyle TextStyle::codeLarge() {
     };
 }
 
-TextStyle TextStyle::codeMedium() {
+Gfx::TextStyle TextStyles::codeMedium() {
     return {
         .font = Media::Font{
             codeFontface(),
@@ -195,7 +198,8 @@ TextStyle TextStyle::codeMedium() {
         },
     };
 }
-TextStyle TextStyle::codeSmall() {
+
+Gfx::TextStyle TextStyles::codeSmall() {
     return {
         .font = Media::Font{
             codeFontface(),
@@ -205,11 +209,11 @@ TextStyle TextStyle::codeSmall() {
 }
 
 struct Text : public View<Text> {
-    TextStyle _style;
+    Gfx::TextStyle _style;
     String _text;
     Opt<Media::FontMesure> _mesure;
 
-    Text(TextStyle style, String text)
+    Text(Gfx::TextStyle style, String text)
         : _style(style), _text(text) {}
 
     void reconcile(Text &o) override {
@@ -218,9 +222,8 @@ struct Text : public View<Text> {
     }
 
     Media::FontMesure mesure() {
-        if (_mesure) {
+        if (_mesure)
             return *_mesure;
-        }
         _mesure = _style.font.mesureStr(_text);
         return *_mesure;
     }
@@ -256,12 +259,48 @@ struct Text : public View<Text> {
     }
 };
 
-Child text(TextStyle style, Str text) {
+Child text(Gfx::TextStyle style, Str text) {
     return makeStrong<Text>(style, text);
 }
 
 Child text(Str text) {
-    return makeStrong<Text>(TextStyle::labelMedium(), text);
+    return makeStrong<Text>(TextStyles::labelMedium(), text);
+}
+
+struct Text2 : public View<Text2> {
+    Gfx::Text _text;
+    Opt<Media::FontMesure> _mesure;
+
+    Text2(Gfx::TextStyle style, Str text)
+        : _text(style, text) {}
+
+    void reconcile(Text2 &o) override {
+        _text = o._text;
+        _mesure = NONE;
+    }
+
+    void paint(Gfx::Context &g, Math::Recti) override {
+        g.save();
+        g.clip(bound());
+        // g.debugRect(bound(), Gfx::PINK);
+        g.origin(bound().xy);
+        _text.paint(g);
+        g.restore();
+    }
+
+    void layout(Math::Recti bound) override {
+        _text.layout(bound.width);
+        View<Text2>::layout(bound);
+    }
+
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint) override {
+        auto size = _text.layout(s.width);
+        return size.cast<isize>();
+    }
+};
+
+Child text2(Str text) {
+    return makeStrong<Text2>(TextStyles::labelMedium(), text);
 }
 
 /* --- Badge ---------------------------------------------------------------- */

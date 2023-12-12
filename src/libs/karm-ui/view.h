@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-gfx/text.h>
+
 #include "node.h"
 
 namespace Karm::Ui {
@@ -21,53 +23,44 @@ struct View : public LeafNode<Crtp> {
 
 /* --- Text ----------------------------------------------------------------- */
 
-struct TextStyle {
-    Media::Font font;
-    Opt<Gfx::Color> color = NONE;
+struct TextStyles {
+private:
+    TextStyles() = default;
 
-    TextStyle withSize(isize size) const {
-        TextStyle style = *this;
-        style.font.fontsize = size;
-        return style;
-    }
+public:
+    static Gfx::TextStyle displayLarge();
+    static Gfx::TextStyle displayMedium();
+    static Gfx::TextStyle displaySmall();
 
-    TextStyle withColor(Gfx::Color color) const {
-        TextStyle style = *this;
-        style.color = color;
-        return style;
-    }
+    static Gfx::TextStyle headlineLarge();
+    static Gfx::TextStyle headlineMedium();
+    static Gfx::TextStyle headlineSmall();
 
-    static TextStyle displayLarge();
-    static TextStyle displayMedium();
-    static TextStyle displaySmall();
+    static Gfx::TextStyle titleLarge();
+    static Gfx::TextStyle titleMedium();
+    static Gfx::TextStyle titleSmall();
 
-    static TextStyle headlineLarge();
-    static TextStyle headlineMedium();
-    static TextStyle headlineSmall();
+    static Gfx::TextStyle labelLarge();
+    static Gfx::TextStyle labelMedium();
+    static Gfx::TextStyle labelSmall();
 
-    static TextStyle titleLarge();
-    static TextStyle titleMedium();
-    static TextStyle titleSmall();
+    static Gfx::TextStyle bodyLarge();
+    static Gfx::TextStyle bodyMedium();
+    static Gfx::TextStyle bodySmall();
 
-    static TextStyle labelLarge();
-    static TextStyle labelMedium();
-    static TextStyle labelSmall();
-
-    static TextStyle bodyLarge();
-    static TextStyle bodyMedium();
-    static TextStyle bodySmall();
-
-    static TextStyle codeLarge();
-    static TextStyle codeMedium();
-    static TextStyle codeSmall();
+    static Gfx::TextStyle codeLarge();
+    static Gfx::TextStyle codeMedium();
+    static Gfx::TextStyle codeSmall();
 };
 
-Child text(TextStyle style, Str text);
+Child text(Gfx::TextStyle style, Str text);
 
 Child text(Str text);
 
+Child text2(Str text);
+
 template <typename... Args>
-inline Child text(TextStyle style, Str format, Args &&...args) {
+inline Child text(Gfx::TextStyle style, Str format, Args &&...args) {
     return text(style, Fmt::format(format, std::forward<Args>(args)...).unwrap());
 }
 
@@ -76,16 +69,16 @@ inline Child text(Str format, Args &&...args) {
     return text(Fmt::format(format, std::forward<Args>(args)...).unwrap());
 }
 
-#define DEF_STYLE(STYLE)                                                                                                 \
-    inline Child STYLE(Str text) { return Karm::Ui::text(TextStyle::STYLE(), text); }                                    \
-    inline Child STYLE(Gfx::Color color, Str text) { return Karm::Ui::text(TextStyle::STYLE().withColor(color), text); } \
-    template <typename... Args>                                                                                          \
-    inline Child STYLE(Str format, Args &&...args) {                                                                     \
-        return text(TextStyle::STYLE(), format, std::forward<Args>(args)...);                                            \
-    }                                                                                                                    \
-    template <typename... Args>                                                                                          \
-    inline Child STYLE(Gfx::Color color, Str format, Args &&...args) {                                                   \
-        return text(TextStyle::STYLE().withColor(color), format, std::forward<Args>(args)...);                           \
+#define DEF_STYLE(STYLE)                                                                                                  \
+    inline Child STYLE(Str text) { return Karm::Ui::text(TextStyles::STYLE(), text); }                                    \
+    inline Child STYLE(Gfx::Color color, Str text) { return Karm::Ui::text(TextStyles::STYLE().withColor(color), text); } \
+    template <typename... Args>                                                                                           \
+    inline Child STYLE(Str format, Args &&...args) {                                                                      \
+        return text(TextStyles::STYLE(), format, std::forward<Args>(args)...);                                            \
+    }                                                                                                                     \
+    template <typename... Args>                                                                                           \
+    inline Child STYLE(Gfx::Color color, Str format, Args &&...args) {                                                    \
+        return text(TextStyles::STYLE().withColor(color), format, std::forward<Args>(args)...);                           \
     }
 
 DEF_STYLE(displayLarge)

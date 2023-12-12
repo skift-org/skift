@@ -294,9 +294,9 @@ void _fromF64(Frac &frac, f64 value) {
     UBig dec = 0_ubig;
     while (value >= __DBL_EPSILON__ || currPow >= 0) {
         frac._num *= TEN;
-        usize digit = (u64)(value * ::pow(0.1, (double)currPow)) % 10;
+        usize digit = (u64)(value * ::pow(0.1, (f64)currPow)) % 10;
         frac._num += IBig{digit};
-        value -= digit * ::pow(10.0, (double)currPow);
+        value -= digit * ::pow(10.0, (f64)currPow);
         if (currPow < 0) {
             ++dec;
             _pow(TEN.value(), dec, frac._den);

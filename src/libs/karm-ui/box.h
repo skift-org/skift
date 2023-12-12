@@ -2,10 +2,10 @@
 
 #include <karm-layout/spacing.h>
 
-#include "layout.h"
 #include "node.h"
 
 namespace Karm::Ui {
+
 struct BoxStyle {
     Layout::Spacingi margin{};
     Layout::Spacingi padding{};
@@ -137,56 +137,12 @@ struct _Box : public ProxyNode<Crtp> {
     }
 };
 
-struct Box : public _Box<Box> {
-    using _Box<Box>::_Box;
-    BoxStyle _style;
-
-    Box(BoxStyle style, Child child)
-        : _Box(child), _style(style) {}
-
-    void reconcile(Box &o) override {
-        _style = o._style;
-        _Box<Box>::reconcile(o);
-    }
-
-    BoxStyle &boxStyle() override {
-        return _style;
-    }
-};
-
-inline Child box(BoxStyle style, Child inner) {
-    return makeStrong<Box>(style, inner);
-}
+Child box(BoxStyle style, Child inner);
 
 inline auto box(BoxStyle style) {
     return [=](Child inner) {
         return box(style, inner);
     };
-}
-
-/* --- Card ----------------------------------------------------------------- */
-
-inline Child card(Child child) {
-    BoxStyle style = {
-        .borderRadius = 4,
-        .backgroundPaint = GRAY900,
-    };
-
-    return box(style, child);
-}
-
-inline auto card() {
-    return [](Child child) {
-        return card(child);
-    };
-}
-
-inline Child card(Children children) {
-    return card(vflow(children));
-}
-
-inline Child card(Child child, Meta::Same<Child> auto... children) {
-    return card({child, children...});
 }
 
 } // namespace Karm::Ui

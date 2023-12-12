@@ -19,6 +19,7 @@ struct Scroll : public ProxyNode<Scroll> {
         auto childBound = child().bound();
         _targetScroll.x = clamp(s.x, -(childBound.width - min(childBound.width, bound().width)), 0);
         _targetScroll.y = clamp(s.y, -(childBound.height - min(childBound.height, bound().height)), 0);
+        _animated = true;
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
@@ -43,14 +44,13 @@ struct Scroll : public ProxyNode<Scroll> {
                 _mouseIn = true;
 
                 me->pos = me->pos - _scroll.cast<isize>();
-                child().event(e);
+                ProxyNode<Scroll>::event(e);
                 me->pos = me->pos + _scroll.cast<isize>();
 
                 if (not e.accepted()) {
                     if (me->type == Events::MouseEvent::SCROLL) {
                         scroll((_scroll + me->scroll * 128).cast<isize>());
                         shouldAnimate(*this);
-                        _animated = true;
                     }
                 }
             } else if (_mouseIn) {
@@ -68,7 +68,7 @@ struct Scroll : public ProxyNode<Scroll> {
             } else {
                 shouldAnimate(*this);
             }
-
+            ProxyNode<Scroll>::event(e);
         } else {
             ProxyNode<Scroll>::event(e);
         }

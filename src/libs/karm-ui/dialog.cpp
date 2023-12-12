@@ -7,6 +7,7 @@
 #include "input.h"
 #include "layout.h"
 #include "scafold.h"
+#include "scroll.h"
 #include "view.h"
 
 namespace Karm::Ui {
@@ -268,20 +269,44 @@ Child versionBadge() {
     return hflow(4, badges);
 }
 
+static constexpr Str LICENSE = R"(Copyright © 2018-2023, the skiftOS Developers
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.)";
+
+Ui::Child licenseDialog() {
+    return Ui::dialogScafold(
+        Layout::Align::CLAMP |
+            Layout::Align::CENTER |
+            Layout::Align::TOP_START,
+        Ui::vflow(
+            8,
+            Ui::titleLarge("License"),
+            Ui::text2(LICENSE) | Ui::vscroll() | Ui::maxSize({480, 320})),
+        {Ui::grow(NONE), Ui::dialogCloseButton()});
+}
+
 Child aboutDialog(Mdi::Icon i, String name) {
     auto content = vflow(
         8,
         Layout::Align::CENTER,
         spacing(16, icon(i, 48)),
-        text(TextStyle::titleMedium(), name),
+        titleMedium(name),
         empty(),
         versionBadge(),
         empty(),
         text("Copyright © 2018-2023"),
-        text("SMNX Research & Contributors."));
+        text("The skiftOS Developers"));
 
     Children actions = {
-        button(NONE, ButtonStyle::subtle(), "LICENSE"),
+        button(
+            [](auto &n) {
+                showDialog(n, licenseDialog());
+            },
+            ButtonStyle::subtle(), Mdi::LICENSE, "LICENSE"),
         grow(NONE),
         dialogCloseButton(),
     };
@@ -297,7 +322,7 @@ void showAboutDialog(Node &n, Mdi::Icon icon, String name) {
 }
 
 Child msgDialog(String title, String msg) {
-    auto titleLbl = text(TextStyle::titleMedium(), title);
+    auto titleLbl = titleMedium(title);
     auto msgLbl = text(msg);
     Children actions = {
         grow(NONE),

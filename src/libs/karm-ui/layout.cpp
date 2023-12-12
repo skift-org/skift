@@ -97,7 +97,10 @@ struct Align : public ProxyNode<Align> {
     Align(Layout::Align align, Child child) : ProxyNode(child), _align(align) {}
 
     void layout(Math::Recti bound) override {
-        auto childSize = child().size(bound.size(), _child.is<Grow>() ? Layout::Hint::MAX : Layout::Hint::MIN);
+        auto childSize = child().size(
+            bound.size(), _child.is<Grow>() ? Layout::Hint::MAX
+                                            : Layout::Hint::MIN);
+
         child()
             .layout(_align.apply<isize>(
                 Layout::Flow::LEFT_TO_RIGHT,
@@ -170,6 +173,14 @@ struct Sizing : public ProxyNode<Sizing> {
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+        if (_max.x != UNCONSTRAINED) {
+            s.x = min(s.x, _max.x);
+        }
+
+        if (_max.y != UNCONSTRAINED) {
+            s.y = min(s.y, _max.y);
+        }
+
         auto result = child().size(s, hint);
 
         if (_min.x != UNCONSTRAINED) {
@@ -178,14 +189,6 @@ struct Sizing : public ProxyNode<Sizing> {
 
         if (_min.y != UNCONSTRAINED) {
             result.y = max(result.y, _min.y);
-        }
-
-        if (_max.x != UNCONSTRAINED) {
-            result.x = min(result.x, _max.x);
-        }
-
-        if (_max.y != UNCONSTRAINED) {
-            result.y = min(result.y, _max.y);
         }
 
         return result;

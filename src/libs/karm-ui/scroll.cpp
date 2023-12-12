@@ -101,11 +101,11 @@ struct Scroll : public ProxyNode<Scroll> {
 
         if (hint == Layout::Hint::MIN) {
             if (_orient == Layout::Orien::HORIZONTAL) {
-                childSize.x = s.x;
+                childSize.x = min(childSize.x, s.x);
             } else if (_orient == Layout::Orien::VERTICAL) {
-                childSize.y = s.y;
+                childSize.y = min(childSize.y, s.y);
             } else {
-                childSize = s;
+                childSize = childSize.min(s);
             }
         }
 

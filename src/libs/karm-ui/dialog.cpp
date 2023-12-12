@@ -241,8 +241,8 @@ Child dialogScafold(Layout::Align a, Child content, Children actions) {
         spacing(
             16,
             vflow(
-                32,
-                grow(content),
+                8,
+                content | grow(),
                 hflow(8, actions))));
 
     return dialogScafold(a, layout);
@@ -285,7 +285,7 @@ Ui::Child licenseDialog() {
         Ui::vflow(
             8,
             Ui::titleLarge("License"),
-            Ui::text2(LICENSE) | Ui::vscroll() | Ui::maxSize({480, 320})),
+            Ui::text2(LICENSE) | Ui::vscroll() | Ui::maxSize({480, Ui::UNCONSTRAINED}) | Ui::grow()),
         {Ui::grow(NONE), Ui::dialogCloseButton()});
 }
 

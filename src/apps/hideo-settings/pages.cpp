@@ -3,7 +3,7 @@
 
 #include "app.h"
 
-namespace Settings {
+namespace Hideo::Settings {
 
 Ui::Child pageScafold(Ui::Child inner) {
     return inner |
@@ -15,4 +15,4 @@ Ui::Child pageScafold(Ui::Child inner) {
            Ui::grow();
 }
 
-} // namespace Settings
+} // namespace Hideo::Settings

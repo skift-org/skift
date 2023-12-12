@@ -1,3 +1,4 @@
+#include <hideo-base/input.h>
 #include <karm-ui/box.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
@@ -6,7 +7,7 @@
 
 #include "app.h"
 
-namespace Shell {
+namespace Hideo::Shell {
 
 struct QuickSettingProps {
     Mdi::Icon icon;
@@ -25,11 +26,9 @@ Ui::Child quickSetting(QuickSettingProps props) {
     auto secondaryStyle = style.withRadius({0, 4, 4, 0});
 
     auto primary = [&] {
-        if (props.name) {
+        if (props.name)
             return Ui::button(std::move(props.press), primaryStyle, props.icon, *props.name);
-        } else {
-            return Ui::button(std::move(props.press), primaryStyle, props.icon);
-        }
+        return Ui::button(std::move(props.press), primaryStyle, props.icon);
     }();
 
     if (props.more) {
@@ -40,26 +39,6 @@ Ui::Child quickSetting(QuickSettingProps props) {
     }
 
     return primary;
-}
-
-Ui::Child quickSettingSlider(Mdi::Icon icon) {
-    return Ui::hflow(
-               Ui::grow(NONE),
-               Ui::icon(icon) |
-                   Ui::center() |
-                   Ui::aspectRatio(1) |
-                   Ui::bound() |
-                   Ui::dragRegion()) |
-           Ui::box({
-               .borderRadius = 6,
-               .backgroundPaint = Ui::ACCENT600,
-           }) |
-           Ui::slider2(0.5, NONE) |
-           Ui::box({
-               .borderRadius = 6,
-               .backgroundPaint = Ui::GRAY900,
-           }) |
-           Ui::maxSize({Ui::UNCONSTRAINED, 36});
 }
 
 Ui::Child dateAndTime() {
@@ -97,6 +76,13 @@ Ui::Child quickTools(State const &) {
             },
             Ui::ButtonStyle::secondary(), Mdi::POWER),
         Ui::grow(NONE),
+        Ui::button(
+            [](auto &n) {
+                Model::dispatch(n, Activate{Panel::NIL});
+                Ui::showDialog(n, Ui::aboutDialog(Mdi::SHIP_WHEEL, "Shell"));
+            },
+            Ui::ButtonStyle::secondary(),
+            Mdi::INFORMATION),
         Ui::button(
             Model::bind<ToggleSysPanel>(),
             Ui::ButtonStyle::secondary(),
@@ -186,18 +172,16 @@ Ui::Child expendedQuickSettings(State const &state) {
 
     return Ui::vflow(
         8,
-        quickSettingSlider(Mdi::BRIGHTNESS_6),
-        quickSettingSlider(Mdi::VOLUME_HIGH),
+        Hideo::slider(0.5, NONE, Mdi::BRIGHTNESS_6),
+        Hideo::slider(0.5, NONE, Mdi::VOLUME_HIGH),
         settings | Ui::grow(),
         quickTools(state));
 }
 
 Ui::Child quickSettings(State const &state) {
-    if (state.isSysPanelColapsed) {
+    if (state.isSysPanelColapsed)
         return colapsedQuickSettings(state);
-    } else {
-        return expendedQuickSettings(state);
-    }
+    return expendedQuickSettings(state);
 }
 
 Ui::Child noti(Noti const &noti, usize i) {
@@ -207,7 +191,7 @@ Ui::Child noti(Noti const &noti, usize i) {
                Ui::hflow(
                    4,
                    Ui::icon(entry.icon.icon, 12) | Ui::box({.foregroundPaint = entry.icon.colors[4]}),
-                   Ui::text(Ui::TextStyle::labelMedium().withColor(Ui::GRAY400), entry.name)),
+                   Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), entry.name)),
                Ui::vflow(
                    6,
                    Ui::labelLarge(noti.title),
@@ -284,4 +268,4 @@ Ui::Child sysFlyout(State const &state) {
            Ui::slideIn(Ui::SlideFrom::TOP);
 }
 
-} // namespace Shell
+} // namespace Hideo::Shell

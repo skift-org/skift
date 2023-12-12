@@ -1,9 +1,10 @@
+#include <hideo-base/alert.h>
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 
-namespace FontViewer {
+namespace Hideo::Fonts {
 
 static constexpr Str PANGRAM = "The quick brown fox jumps over the lazy dog";
 
@@ -16,7 +17,7 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
             .fontface = fontface,
             .fontsize = size,
         };
-        children.pushBack(Ui::text(Ui::TextStyle{font}, PANGRAM));
+        children.pushBack(Ui::text(Gfx::TextStyle{font}, PANGRAM));
         size *= 1.2;
     }
 
@@ -25,22 +26,26 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
            Ui::vhscroll();
 }
 
-Ui::Child app(Strong<Media::Fontface> fontface) {
+Ui::Child app(Res<Strong<Media::Fontface>> fontface) {
     return Ui::scafold({
         .icon = Mdi::FORMAT_FONT,
         .title = "Fonts",
-        .body = pangrams(fontface),
+        .body = fontface
+                    ? pangrams(fontface.unwrap())
+                    : alert("Unable to load font", fontface.none().msg()),
     });
 }
 
-} // namespace FontViewer
+} // namespace Hideo::Fonts
 
 Res<> entryPoint(Ctx &ctx) {
     auto &args = useArgs(ctx);
-    auto url = try$(Url::parseUrlOrPath(args[0]));
-    auto fontface = try$(args.len()
-                             ? Media::loadFontface(url)
-                             : Ok(Media::Fontface::fallback()));
+    Res<Strong<Media::Fontface>> fontface = Error::invalidInput("No font provided");
 
-    return Ui::runApp(ctx, FontViewer::app(fontface));
+    if (args.len()) {
+        auto url = try$(Url::parseUrlOrPath(args[0]));
+        fontface = Media::loadFontface(url);
+    }
+
+    return Ui::runApp(ctx, Hideo::Fonts::app(fontface));
 }

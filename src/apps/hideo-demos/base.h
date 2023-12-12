@@ -2,7 +2,7 @@
 
 #include <karm-ui/node.h>
 
-namespace Demos {
+namespace Hideo::Demos {
 
 struct Demo {
     Mdi::Icon icon;
@@ -11,4 +11,4 @@ struct Demo {
     Func<Ui::Child()> build;
 };
 
-} // namespace Demos
+} // namespace Hideo::Demos

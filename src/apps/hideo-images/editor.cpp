@@ -1,3 +1,4 @@
+#include <hideo-base/input.h>
 #include <karm-fmt/case.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/input.h>
@@ -7,7 +8,7 @@
 
 #include "app.h"
 
-namespace ImageViewer {
+namespace Hideo::Images {
 
 Ui::Child editor(State const &state) {
     return Ui::vflow(
@@ -77,7 +78,7 @@ Mdi::Icon editorFilterIcon() {
     }
 
     if constexpr (Meta::Same<T, Gfx::NoiseFilter>) {
-        return Mdi::MICROWAVE;
+        return Mdi::GRAIN;
     }
 
     if constexpr (Meta::Same<T, Gfx::TintFilter>) {
@@ -106,13 +107,13 @@ Ui::Child editorFilterControls(Gfx::Filter const &filter) {
             return Ui::empty();
         },
         []<typename T>(T const &f) {
-            return Ui::slider<decltype(f.amount)>(
-                Ui::SliderStyle::regular(),
+            return Hideo::slider<decltype(f.amount)>(
                 f.amount,
                 T::RANGE,
                 [](auto &n, auto v) {
                     Model::dispatch(n, SetFilter{T{v}});
-                });
+                },
+                Mdi::DRAG_VERTICAL_VARIANT);
         }});
 }
 
@@ -142,4 +143,4 @@ Ui::Child editorControls(State const &state) {
            Ui::slideIn(Ui::SlideFrom::BOTTOM);
 }
 
-} // namespace ImageViewer
+} // namespace Hideo::Images

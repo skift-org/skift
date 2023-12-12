@@ -3,7 +3,7 @@
 #include <karm-ui/reducer.h>
 #include <url/url.h>
 
-namespace FileManager {
+namespace Hideo::Files {
 
 struct State {
     Vec<Url::Url> history;
@@ -60,4 +60,4 @@ void reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 
-} // namespace FileManager
+} // namespace Hideo::Files

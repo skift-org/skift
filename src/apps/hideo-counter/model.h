@@ -2,7 +2,7 @@
 
 #include <karm-ui/reducer.h>
 
-namespace Counter {
+namespace Hideo::Counter {
 
 struct State {
     bool initial = true;
@@ -21,4 +21,4 @@ void reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 
-} // namespace Counter
+} // namespace Hideo::Counter

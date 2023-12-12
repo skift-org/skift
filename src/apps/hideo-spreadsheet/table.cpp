@@ -3,7 +3,7 @@
 
 #include "app.h"
 
-namespace Spreadsheet {
+namespace Hideo::Spreadsheet {
 
 struct Table : public Ui::View<Table> {
     State const *_state;
@@ -195,4 +195,4 @@ Ui::Child table(State const &s) {
     return makeStrong<Table>(s);
 }
 
-} // namespace Spreadsheet
+} // namespace Hideo::Spreadsheet

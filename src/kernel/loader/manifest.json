@@ -9,7 +9,7 @@
         ]
     },
     "requires": [
-        "karm-ui",
+        "hideo-base",
         "karm-main",
         "loader-impl",
         "json-spec"

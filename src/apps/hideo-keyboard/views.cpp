@@ -3,9 +3,8 @@
 #include <karm-ui/input.h>
 
 #include "model.h"
-#include "views.h"
 
-namespace Keyboard {
+namespace Hideo::Keyboard {
 
 static Ui::Child toolbar() {
     return Ui::hflow(
@@ -109,4 +108,4 @@ void show(Ui::Node &n) {
     Ui::showDialog(n, flyout());
 }
 
-} // namespace Keyboard
+} // namespace Hideo::Keyboard

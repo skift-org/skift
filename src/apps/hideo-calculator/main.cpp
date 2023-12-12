@@ -6,10 +6,10 @@
 
 #include "model.h"
 
-namespace Calculator {
+namespace Hideo::Calculator {
 
 Ui::Child textButton(Ui::OnPress onPress, Ui::ButtonStyle style, String t) {
-    return Ui::text(Ui::TextStyle::labelLarge().withSize(18), t) |
+    return Ui::text(Ui::TextStyles::labelLarge().withSize(18), t) |
            Ui::center() |
            Ui::bound() |
            Ui::button(std::move(onPress), style);
@@ -76,7 +76,7 @@ Ui::Child screen(State const &state) {
 
     auto result =
         (state.error ? Ui::headlineMedium(*state.error)
-                     : Ui::text(Ui::TextStyle::headlineMedium(), "{}", state.hasRhs ? state.rhs : state.lhs)) |
+                     : Ui::headlineMedium("{}", state.hasRhs ? state.rhs : state.lhs)) |
         Ui::align(Layout::Align::VCENTER | Layout::Align::END);
 
     return Ui::vflow(8, /* debugExpr, */ currExpr, result) | Ui::spacing({16, 8});
@@ -96,8 +96,8 @@ Ui::Child app() {
     });
 }
 
-} // namespace Calculator
+} // namespace Hideo::Calculator
 
 Res<> entryPoint(Ctx &ctx) {
-    return Ui::runApp(ctx, Calculator::app());
+    return Ui::runApp(ctx, Hideo::Calculator::app());
 }

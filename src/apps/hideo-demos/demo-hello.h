@@ -5,7 +5,7 @@
 
 #include "base.h"
 
-namespace Demos {
+namespace Hideo::Demos {
 
 static inline Demo HELLO_DEMO{
     Mdi::HAND_WAVE,
@@ -21,4 +21,4 @@ static inline Demo HELLO_DEMO{
     },
 };
 
-} // namespace Demos
+} // namespace Hideo::Demos

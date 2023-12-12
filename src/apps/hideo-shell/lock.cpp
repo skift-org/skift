@@ -3,18 +3,17 @@
 
 #include "app.h"
 
-namespace Shell {
+namespace Hideo::Shell {
 
 Ui::Child lock(State const &state) {
     auto clock = Ui::vflow(
-        Ui::center(Ui::text(Ui::TextStyle::displayMedium(), "22:07")),
+        Ui::center(Ui::displayMedium("22:07")),
         Ui::empty(16),
-        Ui::center(Ui::text(Ui::TextStyle::titleMedium(), "Wed. 12 October")));
+        Ui::center(Ui::titleMedium("Wed. 12 October")));
 
     auto hintText = Ui::vflow(
         Ui::center(Ui::icon(Mdi::CHEVRON_UP, 48)),
-        Ui::center(Ui::text(
-            Ui::TextStyle::labelLarge(),
+        Ui::center(Ui::labelLarge(
             state.isMobile
                 ? "Swipe up to unlock"
                 : "Swipe up or press any key to unlock")));
@@ -28,4 +27,4 @@ Ui::Child lock(State const &state) {
             Ui::align(Layout::Align::VFILL | Layout::Align::HCENTER));
 }
 
-} // namespace Shell
+} // namespace Hideo::Shell

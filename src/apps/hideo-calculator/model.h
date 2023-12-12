@@ -2,7 +2,7 @@
 
 #include <karm-ui/reducer.h>
 
-namespace Calculator {
+namespace Hideo::Calculator {
 
 enum struct Operator;
 
@@ -104,4 +104,4 @@ void reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 
-} // namespace Calculator
+} // namespace Hideo::Calculator

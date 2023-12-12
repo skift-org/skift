@@ -2,7 +2,7 @@
 
 #include <karm-ui/reducer.h>
 
-namespace ImageViewer {
+namespace Hideo::Images {
 
 /* --- Reducer -------------------------------------------------------------- */
 
@@ -59,4 +59,4 @@ Ui::Child editorToolbar(State const &state);
 
 Ui::Child editorControls(State const &state);
 
-} // namespace ImageViewer
+} // namespace Hideo::Images

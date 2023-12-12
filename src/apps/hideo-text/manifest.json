@@ -4,7 +4,7 @@
     "type": "exe",
     "description": "View and edit text files",
     "requires": [
-        "karm-ui",
+        "hideo-base",
         "karm-main"
     ]
 }

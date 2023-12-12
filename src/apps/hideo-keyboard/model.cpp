@@ -1,6 +1,6 @@
 #include "model.h"
 
-namespace Keyboard {
+namespace Hideo::Keyboard {
 
 void reduce(State &s, Action a) {
     a.visit(

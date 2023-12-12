@@ -4,7 +4,7 @@
 
 #include "base.h"
 
-namespace Demos {
+namespace Hideo::Demos {
 
 static inline Demo GRADIENT_DEMO{
     Mdi::GRADIENT_HORIZONTAL,
@@ -27,4 +27,4 @@ static inline Demo GRADIENT_DEMO{
     },
 };
 
-} // namespace Demos
+} // namespace Hideo::Demos

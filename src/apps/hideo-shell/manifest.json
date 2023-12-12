@@ -4,10 +4,10 @@
     "type": "exe",
     "description": "Graphical user interface for desktop and mobile devices.",
     "requires": [
-        "karm-ui",
-        "karm-main",
+        "hideo-keyboard-base",
+        "hideo-base",
         "skift-wallpapers",
-        "hideo-keyboard"
+        "karm-main"
     ],
     "provides": [
         "__main__"

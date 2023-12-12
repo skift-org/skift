@@ -2,7 +2,7 @@
 
 #include <karm-ui/reducer.h>
 
-namespace Shell {
+namespace Hideo::Shell {
 
 struct MenuIcon {
     Mdi::Icon icon;
@@ -86,4 +86,4 @@ void reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 
-} // namespace Shell
+} // namespace Hideo::Shell

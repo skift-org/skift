@@ -2,7 +2,7 @@
 
 #include <karm-ui/reducer.h>
 
-namespace Keyboard {
+namespace Hideo::Keyboard {
 
 struct State {
     bool shift = true;
@@ -17,4 +17,4 @@ void reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 
-} // namespace Keyboard
+} // namespace Hideo::Keyboard

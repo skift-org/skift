@@ -1,22 +1,10 @@
+#include <hideo-base/alert.h>
 #include <karm-ui/input.h>
 #include <karm-ui/scafold.h>
 
 #include "app.h"
 
-namespace ImageViewer {
-
-Ui::Child alert(String title, String subtitle) {
-    return Ui::vflow(
-               16,
-               Layout::Align::CENTER,
-               Ui::icon(Mdi::ALERT_DECAGRAM, 48),
-               Ui::titleLarge(title),
-               Ui::bodyMedium(subtitle)) |
-           Ui::box({
-               .foregroundPaint = Ui::GRAY500,
-           }) |
-           Ui::center();
-}
+namespace Hideo::Images {
 
 Ui::Child viewer(State const &state) {
     return Ui::vflow(
@@ -27,7 +15,7 @@ Ui::Child viewer(State const &state) {
 
 Ui::Child viewerPreview(State const &state) {
     if (not state.image) {
-        return alert("Unable to display this image", state.image.none().msg());
+        return Hideo::alert("Unable to display this image", state.image.none().msg());
     }
 
     return Ui::image(state.image.unwrap()) |
@@ -60,4 +48,4 @@ Ui::Child viewerControls(State const &) {
            Ui::center();
 }
 
-} // namespace ImageViewer
+} // namespace Hideo::Images

@@ -4,7 +4,7 @@
     "type": "exe",
     "description": "Evaluate mathematical expressions",
     "requires": [
-        "karm-ui",
+        "hideo-base",
         "karm-main"
     ]
 }

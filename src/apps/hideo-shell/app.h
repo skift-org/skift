@@ -6,7 +6,7 @@
 
 #include "model.h"
 
-namespace Shell {
+namespace Hideo::Shell {
 
 inline auto panel(Math::Vec2i size = {500, 400}) {
     return Ui::pinSize(size) |
@@ -35,4 +35,4 @@ Ui::Child sysFlyout(State const &state);
 
 Ui::Child powerDialog();
 
-} // namespace Shell
+} // namespace Hideo::Shell

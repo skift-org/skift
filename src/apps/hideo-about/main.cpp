@@ -1,12 +1,15 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scafold.h>
+#include <karm-ui/scroll.h>
 
-namespace About {
+namespace Hideo::About {
 
 Ui::Child app() {
     auto licenseBtn = Ui::button(
-        NONE,
+        [](auto &n) {
+            Ui::showDialog(n, Ui::licenseDialog());
+        },
         Ui::ButtonStyle::subtle(),
         Mdi::LICENSE,
         "LICENSE");
@@ -25,9 +28,7 @@ Ui::Child app() {
                 Ui::headlineMedium("skiftOS"),
                 Ui::versionBadge() | Ui::center()),
             Ui::empty(),
-            Ui::text("Copyright © 2018-2023"),
-            Ui::text("SMNX Research & Contributors."),
-            Ui::text("All rights reserved."),
+            Ui::text2("Copyright © 2018-2023\nThe skiftOS Developers\nAll rights reserved."),
             Ui::grow(NONE),
             Ui::hflow(
                 8,
@@ -40,12 +41,12 @@ Ui::Child app() {
         .title = "About",
         .titlebar = Ui::TitlebarStyle::DIALOG,
         .body = content,
-        .size = {460, 300},
+        .size = {460, 400},
     });
 }
 
-} // namespace About
+} // namespace Hideo::About
 
 Res<> entryPoint(Ctx &ctx) {
-    return Ui::runApp(ctx, About::app());
+    return Ui::runApp(ctx, Hideo::About::app());
 }

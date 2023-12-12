@@ -5,7 +5,7 @@
 
 #include "app.h"
 
-namespace ImageViewer {
+namespace Hideo::Images {
 
 Ui::Child app(State initial) {
     return Ui::reducer<Model>(
@@ -23,16 +23,16 @@ Ui::Child app(State initial) {
         });
 }
 
-} // namespace ImageViewer
+} // namespace Hideo::Images
 
 Res<> entryPoint(Ctx &ctx) {
     auto &args = useArgs(ctx);
     Res<Media::Image> image = Error::invalidInput("No image provided");
 
-    if (args.len() > 0) {
+    if (args.len()) {
         auto url = try$(Url::parseUrlOrPath(args[0]));
         image = Media::loadImage(url);
     }
 
-    return Ui::runApp(ctx, ImageViewer::app(image));
+    return Ui::runApp(ctx, Hideo::Images::app(image));
 }

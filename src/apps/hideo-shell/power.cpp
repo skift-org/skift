@@ -2,7 +2,7 @@
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 
-namespace Shell {
+namespace Hideo::Shell {
 
 Ui::Child powerDialog() {
     return Ui::dialogScafold(
@@ -17,4 +17,4 @@ Ui::Child powerDialog() {
             Ui::spacing(6) | Ui::minSize({320, Ui::UNCONSTRAINED}));
 }
 
-} // namespace Shell
+} // namespace Hideo::Shell

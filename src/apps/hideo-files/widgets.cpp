@@ -1,3 +1,4 @@
+#include <hideo-base/alert.h>
 #include <karm-fmt/case.h>
 #include <karm-main/base.h>
 #include <karm-ui/dialog.h>
@@ -8,26 +9,15 @@
 #include "model.h"
 #include "widgets.h"
 
-namespace FileManager {
+namespace Hideo::Files {
 
 /* --- Common Widgets ------------------------------------------------------- */
 
 Ui::Child alert(State const &state, String title, String subtitle) {
-    auto dialog = Ui::vflow(
-                      16,
-                      Layout::Align::CENTER,
-                      Ui::icon(Mdi::ALERT_DECAGRAM, 48),
-                      Ui::titleLarge(title),
-                      Ui::bodyMedium(subtitle)) |
-                  Ui::box({
-                      .foregroundPaint = Ui::GRAY500,
-                  }) |
-                  Ui::center();
-
     return Ui::vflow(
                16,
                Layout::Align::CENTER,
-               dialog,
+               Hideo::alert(title, subtitle),
                Ui::hflow(
                    16,
                    Ui::button(Model::bindIf<GoBack>(state.canGoBack()), "Go Back"),
@@ -179,23 +169,21 @@ Ui::Child toolbar(State const &state) {
         Ui::button(Model::bindIf<GoBack>(state.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
         Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
         Ui::button(Model::bindIf<GoParent>(state.canGoParent(), 1), Ui::ButtonStyle::subtle(), Mdi::ARROW_UP),
-        Ui::grow(FileManager::breadcrumb(state)),
+        Ui::grow(breadcrumb(state)),
         Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH));
 }
 
 /* ---  Dialogs  ------------------------------------------------------------ */
 
 Ui::Child openFileDialog() {
-    return Ui::reducer<FileManager::Model>(
+    return Ui::reducer<Model>(
         {"file:/"_url},
         [](auto d) {
             auto maybeDir = Sys::Dir::open(d.currentUrl());
 
-            auto titleLbl = Ui::text(
-                Ui::TextStyle::titleLarge(), "Open File");
+            auto titleLbl = Ui::titleLarge("Open File");
 
-            auto msgLbl = Ui::text(
-                Ui::TextStyle::titleMedium(), "Select a file to open.");
+            auto msgLbl = Ui::titleMedium("Select a file to open.");
 
             auto titleBar =
                 Ui::vflow(8, titleLbl, msgLbl) |
@@ -235,4 +223,4 @@ Ui::Child openFileDialog() {
         });
 }
 
-} // namespace FileManager
+} // namespace Hideo::Files

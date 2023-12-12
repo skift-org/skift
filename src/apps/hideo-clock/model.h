@@ -2,7 +2,7 @@
 
 #include <karm-ui/reducer.h>
 
-namespace Clock {
+namespace Hideo::Clock {
 
 enum struct Page {
     CLOCK,
@@ -38,4 +38,4 @@ void reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 
-} // namespace Clock
+} // namespace Hideo::Clock

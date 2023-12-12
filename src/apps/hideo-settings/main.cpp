@@ -1,33 +1,33 @@
+#include <hideo-base/sidenav.h>
 #include <karm-main/main.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
-#include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
 #include "app.h"
 
-namespace Settings {
+namespace Hideo::Settings {
 
 Ui::Child sidebar(State const &state) {
     Ui::Children items = {
-        Ui::navRow(state.page() == Page::ACCOUNT, Model::bind<GoTo>(Page::ACCOUNT), Mdi::ACCOUNT, "Accounts"),
-        Ui::navRow(state.page() == Page::PERSONALIZATION, Model::bind<GoTo>(Page::PERSONALIZATION), Mdi::PALETTE, "Personalization"),
-        Ui::navRow(state.page() == Page::APPLICATIONS, Model::bind<GoTo>(Page::APPLICATIONS), Mdi::WIDGETS_OUTLINE, "Applications"),
+        Hideo::sidenavItem(state.page() == Page::ACCOUNT, Model::bind<GoTo>(Page::ACCOUNT), Mdi::ACCOUNT, "Accounts"),
+        Hideo::sidenavItem(state.page() == Page::PERSONALIZATION, Model::bind<GoTo>(Page::PERSONALIZATION), Mdi::PALETTE, "Personalization"),
+        Hideo::sidenavItem(state.page() == Page::APPLICATIONS, Model::bind<GoTo>(Page::APPLICATIONS), Mdi::WIDGETS_OUTLINE, "Applications"),
 
-        Ui::navRow(state.page() == Page::SYSTEM, Model::bind<GoTo>(Page::SYSTEM), Mdi::LAPTOP, "System"),
-        Ui::navRow(state.page() == Page::NETWORK, Model::bind<GoTo>(Page::NETWORK), Mdi::WIFI, "Network"),
-        Ui::navRow(state.page() == Page::SECURITY, Model::bind<GoTo>(Page::SECURITY), Mdi::SECURITY, "Security & Privacy"),
+        Hideo::sidenavItem(state.page() == Page::SYSTEM, Model::bind<GoTo>(Page::SYSTEM), Mdi::LAPTOP, "System"),
+        Hideo::sidenavItem(state.page() == Page::NETWORK, Model::bind<GoTo>(Page::NETWORK), Mdi::WIFI, "Network"),
+        Hideo::sidenavItem(state.page() == Page::SECURITY, Model::bind<GoTo>(Page::SECURITY), Mdi::SECURITY, "Security & Privacy"),
 
-        Ui::navRow(state.page() == Page::UPDATES, Model::bind<GoTo>(Page::UPDATES), Mdi::UPDATE, "Updates"),
-        Ui::navRow(state.page() == Page::ABOUT, Model::bind<GoTo>(Page::ABOUT), Mdi::INFORMATION_OUTLINE, "About"),
+        Hideo::sidenavItem(state.page() == Page::UPDATES, Model::bind<GoTo>(Page::UPDATES), Mdi::UPDATE, "Updates"),
+        Hideo::sidenavItem(state.page() == Page::ABOUT, Model::bind<GoTo>(Page::ABOUT), Mdi::INFORMATION_OUTLINE, "About"),
     };
 
-    return Ui::navList(items);
+    return Hideo::sidenav(items);
 }
 
 /* --- Pages ---------------------------------------------------------------- */
@@ -65,8 +65,8 @@ Ui::Child app() {
     });
 }
 
-} // namespace Settings
+} // namespace Hideo::Settings
 
 Res<> entryPoint(Ctx &ctx) {
-    return Ui::runApp(ctx, Settings::app());
+    return Ui::runApp(ctx, Hideo::Settings::app());
 }

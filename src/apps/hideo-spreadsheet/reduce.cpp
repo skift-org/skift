@@ -1,6 +1,6 @@
 #include "app.h"
 
-namespace Spreadsheet {
+namespace Hideo::Spreadsheet {
 
 void reduce(State &s, Action a) {
     a.visit(
@@ -23,4 +23,4 @@ void reduce(State &s, Action a) {
     s.activeSheet().recompute();
 }
 
-} // namespace Spreadsheet
+} // namespace Hideo::Spreadsheet

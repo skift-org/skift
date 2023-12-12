@@ -1,6 +1,6 @@
 #include "app.h"
 
-namespace Shell {
+namespace Hideo::Shell {
 
 void reduce(State &s, Action a) {
     a.visit(Visitor{
@@ -50,4 +50,4 @@ void reduce(State &s, Action a) {
     });
 }
 
-} // namespace Shell
+} // namespace Hideo::Shell

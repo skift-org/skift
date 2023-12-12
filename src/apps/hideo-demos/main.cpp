@@ -1,9 +1,9 @@
+#include <hideo-base/sidenav.h>
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
-#include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
@@ -17,7 +17,7 @@
 #include "demo-svg.h"
 #include "demo-text.h"
 
-namespace Demos {
+namespace Hideo::Demos {
 
 static Array DEMOS = {
     &CIRCLE_DEMO,
@@ -53,7 +53,7 @@ Ui::Child sidebar(State s) {
     Ui::Children items =
         iter(DEMOS)
             .mapi([&](Demo const *demo, usize index) {
-                return Ui::navRow(
+                return Hideo::sidenavItem(
                     index == s.current,
                     Model::bind<SwitchAction>(index),
                     demo->icon,
@@ -61,7 +61,7 @@ Ui::Child sidebar(State s) {
             })
             .collect<Ui::Children>();
 
-    return Ui::navList(items);
+    return Hideo::sidenav(items);
 }
 
 Ui::Child app() {
@@ -75,8 +75,8 @@ Ui::Child app() {
     });
 }
 
-} // namespace Demos
+} // namespace Hideo::Demos
 
 Res<> entryPoint(Ctx &ctx) {
-    return Ui::runApp(ctx, Demos::app());
+    return Ui::runApp(ctx, Hideo::Demos::app());
 }

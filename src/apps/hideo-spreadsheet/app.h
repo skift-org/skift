@@ -10,7 +10,7 @@
 #include <karm-media/font.h>
 #include <karm-ui/reducer.h>
 
-namespace Spreadsheet {
+namespace Hideo::Spreadsheet {
 
 /* --- Reducer -------------------------------------------------------------- */
 
@@ -274,4 +274,4 @@ Res<Model> load(Io::Reader &reader);
 
 Ui::Child table(State const &s);
 
-} // namespace Spreadsheet
+} // namespace Hideo::Spreadsheet

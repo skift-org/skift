@@ -2,7 +2,7 @@
 
 #include "model.h"
 
-namespace FileManager {
+namespace Hideo::Files {
 
 void reduce(State &s, Action a) {
     a.visit(Visitor{
@@ -41,4 +41,4 @@ void reduce(State &s, Action a) {
     });
 }
 
-} // namespace FileManager
+} // namespace Hideo::Files

@@ -1,6 +1,6 @@
 #include "model.h"
 
-namespace Counter {
+namespace Hideo::Counter {
 
 void reduce(State &s, Action a) {
     a.visit(Visitor{
@@ -18,4 +18,4 @@ void reduce(State &s, Action a) {
     });
 }
 
-} // namespace Counter
+} // namespace Hideo::Counter

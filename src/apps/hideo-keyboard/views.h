@@ -2,10 +2,10 @@
 
 #include <karm-ui/node.h>
 
-namespace Keyboard {
+namespace Hideo::Keyboard {
 
 Ui::Child flyout();
 
- void show(Ui::Node&);
+void show(Ui::Node &);
 
-} // namespace Keyboard
+} // namespace Hideo::Keyboard

@@ -1,12 +1,13 @@
 #pragma once
 
+#include <hideo-base/row.h>
 #include <karm-ui/layout.h>
-#include <karm-ui/row.h>
+#include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
 #include "base.h"
 
-namespace Demos {
+namespace Hideo::Demos {
 
 static inline Demo TEXT_DEMO{
     Mdi::TEXT,
@@ -14,34 +15,35 @@ static inline Demo TEXT_DEMO{
     "Typography",
     []() {
         return Ui::vflow(
-            Ui::treeRow(Ui::icon(Mdi::TEXT), "Display", NONE,
-                        {
-                            Ui::text(Ui::TextStyle::displayLarge(), "Display Large"),
-                            Ui::text(Ui::TextStyle::displayMedium(), "Display Medium"),
-                            Ui::text(Ui::TextStyle::displaySmall(), "Display Small"),
-                        }),
+                   Hideo::treeRow(Ui::icon(Mdi::TEXT), "Display", NONE,
+                                  {
+                                      Ui::displayLarge("Display Large"),
+                                      Ui::displayMedium("Display Medium"),
+                                      Ui::displaySmall("Display Small"),
+                                  }),
 
-            Ui::treeRow(Ui::icon(Mdi::TEXT), "Headlines", NONE,
-                        {
-                            Ui::text(Ui::TextStyle::headlineLarge(), "Headline Large"),
-                            Ui::text(Ui::TextStyle::headlineMedium(), "Headline Medium"),
-                            Ui::text(Ui::TextStyle::headlineSmall(), "Headline Small"),
-                        }),
+                   Hideo::treeRow(Ui::icon(Mdi::TEXT), "Headlines", NONE,
+                                  {
+                                      Ui::headlineLarge("Headline Large"),
+                                      Ui::headlineMedium("Headline Medium"),
+                                      Ui::headlineSmall("Headline Small"),
+                                  }),
 
-            Ui::treeRow(Ui::icon(Mdi::TEXT), "Titles", NONE,
-                        {
-                            Ui::text(Ui::TextStyle::titleLarge(), "Title Large"),
-                            Ui::text(Ui::TextStyle::titleMedium(), "Title Medium"),
-                            Ui::text(Ui::TextStyle::titleSmall(), "Title Small"),
-                        }),
+                   Hideo::treeRow(Ui::icon(Mdi::TEXT), "Titles", NONE,
+                                  {
+                                      Ui::titleLarge("Title Large"),
+                                      Ui::titleMedium("Title Medium"),
+                                      Ui::titleSmall("Title Small"),
+                                  }),
 
-            Ui::treeRow(Ui::icon(Mdi::TEXT), "Body", NONE,
-                        {
-                            Ui::text(Ui::TextStyle::bodyLarge(), "Body Large"),
-                            Ui::text(Ui::TextStyle::bodyMedium(), "Body Medium"),
-                            Ui::text(Ui::TextStyle::bodySmall(), "Body Small"),
-                        }));
+                   Hideo::treeRow(Ui::icon(Mdi::TEXT), "Body", NONE,
+                                  {
+                                      Ui::bodyLarge("Body Large"),
+                                      Ui::bodyMedium("Body Medium"),
+                                      Ui::bodySmall("Body Small"),
+                                  })) |
+               Ui::vscroll();
     },
 };
 
-} // namespace Demos
+} // namespace Hideo::Demos

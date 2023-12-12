@@ -5,6 +5,7 @@
     "description": "View and edit images",
     "requires": [
         "hideo-files-base",
+        "hideo-base",
         "karm-main"
     ]
 }

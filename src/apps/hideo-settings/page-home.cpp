@@ -4,7 +4,7 @@
 
 #include "app.h"
 
-namespace Settings {
+namespace Hideo::Settings {
 
 Ui::Child tileButton(Ui::OnPress onPress, Mdi::Icon icon, String text) {
     return Ui::vflow(
@@ -47,4 +47,4 @@ Ui::Child pageHome(State const &) {
     return grid | Ui::center() | Ui::bound() | Ui::grow();
 }
 
-} // namespace Settings
+} // namespace Hideo::Settings

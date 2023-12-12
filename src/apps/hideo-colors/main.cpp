@@ -1,13 +1,12 @@
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
 #include <karm-ui/drag.h>
-#include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 
 #include "model.h"
 
-namespace ColorPicker {
+namespace Hideo::Colors {
 
 struct HsvPicker : public Ui::View<HsvPicker> {
     Gfx::Hsv _value;
@@ -124,14 +123,14 @@ Ui::Child valueSlider(State const &state) {
 
     return sliderThumb(Gfx::hsvToRgb(hsv)) |
            Ui::end() |
-           Ui::slider2(hsv.value, [hsv](auto &n, auto v) mutable {
+           Ui::slider(hsv.value, [hsv](auto &n, auto v) mutable {
                Model::dispatch(n, UpdateHsv{hsv.withValue(v)});
            }) |
            Ui::box({
                .padding = 3,
                .borderRadius = 99,
                .borderWidth = 1,
-               .borderPaint = Gfx::WHITE.withOpacity(0.2),
+               .borderPaint = Ui::GRAY100.withOpacity(0.2),
                .backgroundPaint = background,
            }) |
            Ui::maxSize({Ui::UNCONSTRAINED, 26});
@@ -154,14 +153,14 @@ Ui::Child saturationSlider(State const &state) {
 
     return sliderThumb(Gfx::hsvToRgb(hsv.withValue(1))) |
            Ui::end() |
-           Ui::slider2(hsv.saturation, [hsv](auto &n, auto v) mutable {
+           Ui::slider(hsv.saturation, [hsv](auto &n, auto v) mutable {
                Model::dispatch(n, UpdateHsv{hsv.withSaturation(v)});
            }) |
            Ui::box({
                .padding = 3,
                .borderRadius = 99,
                .borderWidth = 1,
-               .borderPaint = Gfx::WHITE.withOpacity(0.2),
+               .borderPaint = Ui::GRAY100.withOpacity(0.2),
                .backgroundPaint = background,
            }) |
            Ui::maxSize({Ui::UNCONSTRAINED, 26});
@@ -172,14 +171,14 @@ Ui::Child hueSlider(State const &state) {
 
     return sliderThumb(Gfx::hsvToRgb(hsv.withSaturation(1).withValue(1))) |
            Ui::end() |
-           Ui::slider2(hsv.hue / 360, [hsv](auto &n, auto v) mutable {
+           Ui::slider(hsv.hue / 360, [hsv](auto &n, auto v) mutable {
                Model::dispatch(n, UpdateHsv{hsv.withHue(v * 360)});
            }) |
            Ui::box({
                .padding = 3,
                .borderRadius = 99,
                .borderWidth = 1,
-               .borderPaint = Gfx::WHITE.withOpacity(0.2),
+               .borderPaint = Ui::GRAY100.withOpacity(0.2),
                .backgroundPaint = Gfx::Gradient::hsv().bake(),
            }) |
            Ui::maxSize({Ui::UNCONSTRAINED, 26});
@@ -204,20 +203,24 @@ Gfx::Color pickColor(Gfx::Color c) {
 Ui::Child colorCell(State const &state, Gfx::Color c) {
     auto hsv = Gfx::rgbToHsv(c);
 
-    Ui::BoxStyle boxStyle = {
-        .borderRadius = 4,
-        .borderWidth = 1,
-        .borderPaint = Gfx::WHITE.withOpacity(0.1),
-        .backgroundPaint = c,
-    };
+    Ui::ButtonStyle style = Ui::ButtonStyle::primary();
+    auto foreground = pickColor(c);
+
+    style.idleStyle.backgroundPaint = Gfx::Paint{c};
+    style.idleStyle.borderPaint = Gfx::Paint{foreground.withOpacity(0.1)};
+    style.idleStyle.borderWidth = 1;
+
+    style.hoverStyle.backgroundPaint = Gfx::Paint{foreground.withOpacity(0.2).blendOver(c)};
+
+    style.pressStyle.backgroundPaint = Gfx::Paint{foreground.withOpacity(0.01).blendOver(c)};
+    style.pressStyle.borderPaint = Gfx::Paint{foreground.withOpacity(0.1)};
 
     return Ui::button(
         Model::bind<UpdateHsv>(hsv),
-        Ui::box(
-            boxStyle,
-            state.hsv == hsv
-                ? Ui::icon(Mdi::CHECK, 32, pickColor(c))
-                : Ui::empty(32)));
+        style,
+        state.hsv == hsv
+            ? Ui::icon(Mdi::CHECK, 32, foreground) | Ui::center() | Ui::bound()
+            : Ui::empty(32));
 }
 
 Ui::Child colorRamp(State const &state, Gfx::ColorRamp ramp) {
@@ -238,6 +241,7 @@ Ui::Child colorRamps(State const &state) {
                        return colorRamp(state, ramp);
                    })
                    .collect<Ui::Children>()) |
+           Ui::spacing({0, 0, 0, 8}) |
            Ui::vscroll() |
            Ui::maxSize({Ui::UNCONSTRAINED, 256});
 }
@@ -252,13 +256,21 @@ Ui::Child app() {
 
             auto preview = Ui::empty(128) |
                            Ui::box({
+                               .borderRadius = 6,
+                               .borderWidth = 1,
+                               .borderPaint = Ui::GRAY100.withOpacity(0.1),
                                .backgroundPaint = Gfx::hsvToRgb(state.hsv),
                            });
 
             auto toolbar = Ui::hflow(
                 4,
                 Ui::empty(4),
-                Ui::labelLarge("#{:02x}{:02x}{:02x}", c.red, c.green, c.blue) | Ui::vcenter() | Ui::grow(),
+                Ui::codeLarge("#{:02x}{:02x}{:02x}", c.red, c.green, c.blue) | Ui::vcenter(),
+                Ui::button(
+                    Ui::NOP,
+                    Ui::ButtonStyle::subtle(),
+                    Mdi::CONTENT_COPY),
+                Ui::grow(NONE),
                 Ui::button(
                     Model::bind(UpdatePage{Page::HSV}),
                     (state.page == Page::HSV) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
@@ -269,20 +281,19 @@ Ui::Child app() {
                     Mdi::PALETTE_SWATCH));
 
             return Ui::vflow(
-                preview,
-                Ui::separator(),
-                Ui::vflow(
-                    8,
-                    toolbar,
-                    hsvSliders(state),
-                    Ui::labelLarge("Palettes") | Ui::spacing({8, 8, 0, 0}),
-                    colorRamps(state) | Ui::grow()) |
-                    Ui::spacing(8) | Ui::grow());
+                       8,
+                       preview,
+                       toolbar,
+                       Ui::titleMedium("Values") | Ui::spacing({2, 8, 0, 0}),
+                       hsvSliders(state),
+                       Ui::titleMedium("Palettes") | Ui::spacing({2, 8, 0, 0}),
+                       colorRamps(state) | Ui::grow()) |
+                   Ui::spacing({8, 8, 8, 0}) | Ui::grow();
         });
 }
 
-} // namespace ColorPicker
+} // namespace Hideo::Colors
 
 Res<> entryPoint(Ctx &ctx) {
-    return Ui::runApp(ctx, ColorPicker::app() | Ui::pinSize({410, 520}));
+    return Ui::runApp(ctx, Hideo::Colors::app() | Ui::pinSize({410, 520}));
 }

@@ -1,15 +1,15 @@
+#include <hideo-base/row.h>
 #include <karm-main/main.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
-#include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
 #include "app.h"
 
-namespace Spreadsheet {
+namespace Hideo::Spreadsheet {
 
 Ui::Child formula() {
     return Ui::box(
@@ -47,11 +47,11 @@ Ui::Child toolbar(State const &state) {
 Ui::Child properties() {
     return Ui::vscroll(
         Ui::vflow(
-            Ui::titleRow("Text Properties"),
+            Hideo::titleRow("Text Properties"),
 
-            Ui::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Color"),
+            Hideo::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Color"),
 
-            Ui::row(
+            Hideo::row(
                 NONE,
                 "Format",
                 NONE,
@@ -62,7 +62,7 @@ Ui::Child properties() {
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_UNDERLINE),
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_STRIKETHROUGH))),
 
-            Ui::row(
+            Hideo::row(
                 NONE,
                 "Wrapping",
                 NONE,
@@ -71,7 +71,7 @@ Ui::Child properties() {
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::WRAP),
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::WRAP_DISABLED))),
 
-            Ui::row(
+            Hideo::row(
                 NONE,
                 "Horizontal Align",
                 NONE,
@@ -81,7 +81,7 @@ Ui::Child properties() {
                     Ui::button(Model::bind<UpdateStyleHalign>(Align::CENTER), Ui::ButtonStyle::subtle(), Mdi::ALIGN_HORIZONTAL_CENTER),
                     Ui::button(Model::bind<UpdateStyleHalign>(Align::END), Ui::ButtonStyle::subtle(), Mdi::ALIGN_HORIZONTAL_RIGHT))),
 
-            Ui::row(
+            Hideo::row(
                 NONE,
                 "Vertical Align",
                 NONE,
@@ -93,11 +93,11 @@ Ui::Child properties() {
 
             Ui::separator(),
 
-            Ui::titleRow("Cell Properties"),
-            Ui::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Background Color"),
-            Ui::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Border Color"),
+            Hideo::titleRow("Cell Properties"),
+            Hideo::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Background Color"),
+            Hideo::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Border Color"),
 
-            Ui::row(
+            Hideo::row(
                 NONE,
                 "Borders",
                 NONE,
@@ -108,7 +108,7 @@ Ui::Child properties() {
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_VERTICAL),
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_HORIZONTAL))),
 
-            Ui::row(
+            Hideo::row(
                 NONE,
                 "",
                 NONE,
@@ -123,7 +123,7 @@ Ui::Child properties() {
 
             Ui::separator(),
 
-            Ui::titleRow("Sheet Properties")));
+            Hideo::titleRow("Sheet Properties")));
 }
 
 Ui::Child tabItem(State const &state, Sheet const &sheet, usize index) {
@@ -169,8 +169,8 @@ Ui::Child app() {
     });
 }
 
-} // namespace Spreadsheet
+} // namespace Hideo::Spreadsheet
 
 Res<> entryPoint(Ctx &ctx) {
-    return Ui::runApp(ctx, Spreadsheet::app());
+    return Ui::runApp(ctx, Hideo::Spreadsheet::app());
 }

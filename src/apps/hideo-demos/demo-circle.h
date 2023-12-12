@@ -4,7 +4,7 @@
 
 #include "base.h"
 
-namespace Demos {
+namespace Hideo::Demos {
 
 static inline Demo CIRCLE_DEMO{
     Mdi::CIRCLE,
@@ -34,4 +34,4 @@ static inline Demo CIRCLE_DEMO{
     },
 };
 
-} // namespace Demos
+} // namespace Hideo::Demos

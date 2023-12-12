@@ -10,7 +10,7 @@
 
 #include "app.h"
 
-namespace Shell {
+namespace Hideo::Shell {
 
 /* --- Status Bar ----------------------------------------------------------- */
 
@@ -243,10 +243,10 @@ Ui::Child app(bool isMobile) {
         });
 }
 
-} // namespace Shell
+} // namespace Hideo::Shell
 
 Res<> entryPoint(Ctx &ctx) {
     auto args = useArgs(ctx);
     bool isMobile = useFormFactor() == FormFactor::MOBILE;
-    return Ui::runApp(ctx, Shell::app(isMobile));
+    return Ui::runApp(ctx, Hideo::Shell::app(isMobile));
 }

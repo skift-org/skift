@@ -7,7 +7,7 @@
 
 #include "base.h"
 
-namespace Demos {
+namespace Hideo::Demos {
 
 static inline Demo ICONS_DEMO{
     Mdi::COFFEE,
@@ -31,4 +31,4 @@ static inline Demo ICONS_DEMO{
     },
 };
 
-} // namespace Demos
+} // namespace Hideo::Demos

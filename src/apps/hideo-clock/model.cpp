@@ -1,6 +1,6 @@
 #include "model.h"
 
-namespace Clock {
+namespace Hideo::Clock {
 
 void reduce(State &s, Action a) {
     a.visit(Visitor{

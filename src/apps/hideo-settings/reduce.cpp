@@ -2,7 +2,7 @@
 
 #include "app.h"
 
-namespace Settings {
+namespace Hideo::Settings {
 
 void reduce(State &s, Action action) {
     action.visit(Visitor{
@@ -23,4 +23,4 @@ void reduce(State &s, Action action) {
     });
 }
 
-} // namespace Settings
+} // namespace Hideo::Settings

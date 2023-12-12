@@ -1,3 +1,4 @@
+#include <hideo-base/alert.h>
 #include <karm-fmt/case.h>
 #include <karm-ui/app.h>
 #include <karm-ui/input.h>
@@ -93,21 +94,11 @@ Ui::Child list(State const &s) {
 }
 
 Ui::Child alert(String title, String subtitle) {
-    auto dialog = Ui::vflow(
-                      16,
-                      Layout::Align::CENTER,
-                      Ui::icon(Mdi::ALERT_DECAGRAM, 48),
-                      Ui::titleLarge(title),
-                      Ui::bodyMedium(Fmt::toSentenceCase(subtitle).unwrap())) |
-                  Ui::box(Ui::BoxStyle{
-                      .foregroundPaint = Ui::GRAY500,
-                  }) |
-                  Ui::center();
 
     return Ui::vflow(
                16,
                Layout::Align::CENTER,
-               dialog | Ui::grow(),
+               Hideo::alert(title, subtitle) | Ui::grow(),
                Ui::bodyMedium("Press [ENTER] to continue.")) |
            Ui::spacing(64);
 }

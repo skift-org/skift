@@ -1,6 +1,6 @@
 #include "model.h"
 
-namespace Calculator {
+namespace Hideo::Calculator {
 
 void doOperator(State &s, Operator op) {
     if (not s.hasRhs)

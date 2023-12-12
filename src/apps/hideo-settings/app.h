@@ -2,7 +2,7 @@
 
 #include <karm-ui/reducer.h>
 
-namespace Settings {
+namespace Hideo::Settings {
 
 /* --- Model ---------------------------------------------------------------- */
 

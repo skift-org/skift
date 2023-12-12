@@ -8,7 +8,7 @@
 
 #include "app.h"
 
-namespace Shell {
+namespace Hideo::Shell {
 
 Ui::Child searchInput() {
     return Ui::hflow(
@@ -146,4 +146,4 @@ Ui::Child appsFlyout(State const &state) {
             Ui::slideIn(Ui::SlideFrom::BOTTOM) | Ui::grow());
 }
 
-} // namespace Shell
+} // namespace Hideo::Shell

@@ -1,56 +1,56 @@
+#include <hideo-base/row.h>
 #include <karm-sys/info.h>
 #include <karm-ui/error.h>
-#include <karm-ui/row.h>
 #include <karm-ui/scafold.h>
 
 #include "app.h"
 
-namespace Settings {
+namespace Hideo::Settings {
 
 Ui::Child userInfos() {
-    return Ui::treeRow(
+    return Hideo::treeRow(
         Ui::icon(Mdi::ACCOUNT),
         "User",
         NONE,
         Ui::errorScope("user informations", [&] -> Res<Ui::Child> {
             auto userinfo = try$(Sys::userinfo());
             return Ok(Ui::vflow(
-                Ui::row(NONE, "Username", NONE, Ui::text(userinfo.name)),
-                Ui::row(NONE, "Home", NONE, Ui::text(try$(userinfo.home.str()))),
-                Ui::row(NONE, "Shell", NONE, Ui::text(try$(userinfo.shell.str())))));
+                Hideo::row(NONE, "Username", NONE, Ui::text(userinfo.name)),
+                Hideo::row(NONE, "Home", NONE, Ui::text(try$(userinfo.home.str()))),
+                Hideo::row(NONE, "Shell", NONE, Ui::text(try$(userinfo.shell.str())))));
         }));
 }
 
 Ui::Child sysInfos() {
-    return Ui::treeRow(
+    return Hideo::treeRow(
         Ui::icon(Mdi::INFORMATION_OUTLINE),
         "System",
         NONE,
         Ui::errorScope("system informations", [&] -> Res<Ui::Child> {
             auto sysinfo = try$(Sys::sysinfo());
             return Ok(Ui::vflow(
-                Ui::row(NONE, "System", NONE, Ui::text(sysinfo.sysName)),
-                Ui::row(NONE, "System Version", NONE, Ui::text(sysinfo.sysVersion)),
-                Ui::row(NONE, "Kernel", NONE, Ui::text(sysinfo.kernelName)),
-                Ui::row(NONE, "Kernel Version", NONE, Ui::text(sysinfo.kernelVersion))));
+                Hideo::row(NONE, "System", NONE, Ui::text(sysinfo.sysName)),
+                Hideo::row(NONE, "System Version", NONE, Ui::text(sysinfo.sysVersion)),
+                Hideo::row(NONE, "Kernel", NONE, Ui::text(sysinfo.kernelName)),
+                Hideo::row(NONE, "Kernel Version", NONE, Ui::text(sysinfo.kernelVersion))));
         }));
 }
 
 Ui::Child memInfos() {
-    return Ui::treeRow(
+    return Hideo::treeRow(
         Ui::icon(Mdi::MEMORY),
         "Memory",
         NONE,
         Ui::errorScope("memory informations", [&] -> Res<Ui::Child> {
             auto meminfo = try$(Sys::meminfo());
             return Ok(vflow(
-                Ui::row(NONE, "Physical", NONE, Ui::text("{}bytes", meminfo.physicalUsed)),
-                Ui::row(NONE, "Swap", NONE, Ui::text("{}bytes", meminfo.swapUsed))));
+                Hideo::row(NONE, "Physical", NONE, Ui::text("{}bytes", meminfo.physicalUsed)),
+                Hideo::row(NONE, "Swap", NONE, Ui::text("{}bytes", meminfo.swapUsed))));
         }));
 }
 
 Ui::Child cpuInfos() {
-    return Ui::treeRow(
+    return Hideo::treeRow(
         Ui::icon(Mdi::CPU_64_BIT),
         "CPU",
         NONE,
@@ -60,7 +60,7 @@ Ui::Child cpuInfos() {
             Ui::Children children;
 
             for (auto &cpu : cpusinfo) {
-                children.pushBack(Ui::row(
+                children.pushBack(Hideo::row(
                     NONE,
                     "CPU",
                     NONE,
@@ -74,12 +74,12 @@ Ui::Child cpuInfos() {
 Ui::Child pageAbout(State const &) {
     return Ui::vflow(
                8,
-               Ui::titleRow("About"),
-               userInfos() | Ui::card(),
-               sysInfos() | Ui::card(),
-               memInfos() | Ui::card(),
-               cpuInfos() | Ui::card()) |
+               Hideo::titleRow("About"),
+               userInfos() | Hideo::card(),
+               sysInfos() | Hideo::card(),
+               memInfos() | Hideo::card(),
+               cpuInfos() | Hideo::card()) |
            pageScafold;
 }
 
-} // namespace Settings
+} // namespace Hideo::Settings

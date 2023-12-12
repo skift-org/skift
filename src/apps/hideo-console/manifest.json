@@ -4,7 +4,7 @@
     "type": "exe",
     "description": "System console",
     "requires": [
-        "karm-ui",
+        "hideo-base",
         "karm-main"
     ]
 }

@@ -2,7 +2,7 @@
 
 #include <karm-ui/reducer.h>
 
-namespace ColorPicker {
+namespace Hideo::Colors {
 
 enum struct Page {
     HSV,
@@ -37,4 +37,4 @@ inline void reduce(State &s, Action action) {
 
 using Model = Ui::Model<State, Action, reduce>;
 
-} // namespace ColorPicker
+} // namespace Hideo::Colors

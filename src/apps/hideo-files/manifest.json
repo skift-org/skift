@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Manage files and folders",
     "requires": [
-        "karm-ui"
+        "hideo-base"
     ]
 }

@@ -1,6 +1,6 @@
 #include "app.h"
 
-namespace ImageViewer {
+namespace Hideo::Images {
 
 void reduce(State &s, Action a) {
     a.visit(Visitor{
@@ -20,4 +20,4 @@ void reduce(State &s, Action a) {
     });
 }
 
-} // namespace ImageViewer
+} // namespace Hideo::Images

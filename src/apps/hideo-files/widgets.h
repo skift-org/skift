@@ -5,7 +5,7 @@
 
 #include "model.h"
 
-namespace FileManager {
+namespace Hideo::Files {
 
 /* --- Common Widgets ------------------------------------------------------- */
 
@@ -33,4 +33,4 @@ Ui::Child saveFileDialog();
 
 Ui::Child directoryDialog();
 
-} // namespace FileManager
+} // namespace Hideo::Files

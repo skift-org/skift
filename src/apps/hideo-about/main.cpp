@@ -17,7 +17,7 @@ Ui::Child app() {
     auto closeBtn = Ui::button(
         Ui::bindBubble<Events::ExitEvent>(Ok()),
         Ui::ButtonStyle::primary(),
-        "OK");
+        "CLOSE");
 
     auto content = Ui::spacing(
         16,
@@ -41,7 +41,7 @@ Ui::Child app() {
         .title = "About",
         .titlebar = Ui::TitlebarStyle::DIALOG,
         .body = content,
-        .size = {460, 400},
+        .size = {460, 320},
     });
 }
 

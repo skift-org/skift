@@ -34,14 +34,12 @@ Ui::Child directorEntry(Sys::DirEntry const &entry) {
 }
 
 Ui::Child directoryListing(State const &, Sys::Dir const &dir) {
-    if (dir.entries().len() == 0) {
+    if (dir.entries().len() == 0)
         return Ui::bodyMedium(Ui::GRAY600, "This directory is empty.") | Ui::center();
-    }
 
     Ui::Children children;
-    for (auto const &entry : dir.entries()) {
+    for (auto const &entry : dir.entries())
         children.pushBack(directorEntry(entry));
-    }
 
     return Ui::vflow(children) |
            Ui::align(Layout::Align::TOP | Layout::Align::HFILL) |

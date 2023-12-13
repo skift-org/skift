@@ -14,7 +14,7 @@ Ui::Child alert(String title, String subtitle) {
                Layout::Align::CENTER,
                Ui::icon(Mdi::ALERT_DECAGRAM, 48),
                Ui::titleLarge(title),
-               Ui::bodyMedium(Fmt::toSentenceCase(subtitle).unwrap())) |
+               Ui::bodyMedium(subtitle)) |
            Ui::box({
                .foregroundPaint = Ui::GRAY500,
            }) |

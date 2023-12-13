@@ -57,6 +57,8 @@ Child text(Gfx::TextStyle style, Str text);
 
 Child text(Str text);
 
+Child text2(Gfx::TextStyle style, Str text);
+
 Child text2(Str text);
 
 template <typename... Args>

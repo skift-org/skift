@@ -6,7 +6,6 @@
 #include "funcs.h"
 #include "input.h"
 #include "layout.h"
-#include "scafold.h"
 #include "scroll.h"
 #include "view.h"
 
@@ -106,7 +105,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
 
         if (_opacity.value() > 0.001) {
             g.save();
-            g.fillStyle(Gfx::BLACK.withOpacity(0.25 * _opacity.value()));
+            g.fillStyle(Ui::GRAY950.withOpacity(0.75 * _opacity.value()));
             g.fill(bound());
             g.restore();
         }
@@ -236,14 +235,12 @@ Child dialogScafold(Layout::Align a, Child inner) {
 }
 
 Child dialogScafold(Layout::Align a, Child content, Children actions) {
-    auto layout = minSize(
-        {320, UNCONSTRAINED},
-        spacing(
-            16,
-            vflow(
-                8,
-                content | grow(),
-                hflow(8, actions))));
+    auto layout =
+        vflow(
+            8,
+            content | grow(),
+            hflow(8, actions)) |
+        spacing(16);
 
     return dialogScafold(a, layout);
 }
@@ -291,15 +288,18 @@ Ui::Child licenseDialog() {
 
 Child aboutDialog(Mdi::Icon i, String name) {
     auto content = vflow(
-        8,
-        Layout::Align::CENTER,
-        spacing(16, icon(i, 48)),
-        titleMedium(name),
-        empty(),
-        versionBadge(),
-        empty(),
-        text("Copyright © 2018-2023"),
-        text("The skiftOS Developers"));
+        vflow(
+            8,
+            Layout::Align::CENTER,
+            spacing(8, icon(i, 56)),
+            titleLarge(name),
+            versionBadge()),
+        text2(
+            Ui::TextStyles::labelMedium()
+                .withAlign(Gfx::TextAlign::CENTER)
+                .withColor(Ui::GRAY400),
+            "Copyright © 2018-2023\nThe skiftOS Developers\nAll rights reserved.") |
+            Ui::spacing(16));
 
     Children actions = {
         button(
@@ -313,7 +313,7 @@ Child aboutDialog(Mdi::Icon i, String name) {
 
     return dialogScafold(
         Layout::Align::CENTER | Layout::Align::CLAMP,
-        content,
+        content | minSize({280, Ui::UNCONSTRAINED}),
         actions);
 }
 

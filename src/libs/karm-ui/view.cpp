@@ -299,6 +299,10 @@ struct Text2 : public View<Text2> {
     }
 };
 
+Child text2(Gfx::TextStyle style, Str text) {
+    return makeStrong<Text2>(style, text);
+}
+
 Child text2(Str text) {
     return makeStrong<Text2>(TextStyles::labelMedium(), text);
 }
@@ -307,13 +311,13 @@ Child text2(Str text) {
 
 Child badge(Gfx::Color color, String t) {
     BoxStyle boxStyle = {
-        .padding = {8, 4},
+        .padding = {6, 2},
         .borderRadius = 99,
         .backgroundPaint = color.withOpacity(0.2),
         .foregroundPaint = color,
     };
 
-    return text(t) | box(boxStyle);
+    return labelSmall(t) | box(boxStyle);
 }
 
 Child badge(BadgeStyle style, String t) {

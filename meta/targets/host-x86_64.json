@@ -30,22 +30,20 @@
             "cmd": [
                 "@latest",
                 "clang"
-            ],
-            "args": []
+            ]
         },
         "cxx": {
             "cmd": [
                 "@latest",
                 "clang++"
-            ],
-            "args": []
+            ]
         },
         "ld": {
             "cmd": [
                 "@latest",
                 "clang++"
             ],
-            "args": []
+            "rule": "-o $out $objs -Wl,--whole-archive $wholeLibs -Wl,--no-whole-archive $libs $flags"
         },
         "ar": {
             "cmd": [

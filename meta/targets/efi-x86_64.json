@@ -61,7 +61,8 @@
                 "-Wl,-entry:efi_main",
                 "-Wl,-subsystem:efi_application",
                 "-fuse-ld=lld-link"
-            ]
+            ],
+            "rule": "-o $out $objs $wholeLibs $libs $flags"
         },
         "ar": {
             "cmd": [

@@ -9,12 +9,12 @@
 namespace Karm::Gfx {
 
 struct Rgba8888 {
-    ALWAYS_INLINE static Color load(void const *pixel) {
+    always_inline static Color load(void const *pixel) {
         u8 const *p = static_cast<u8 const *>(pixel);
         return Color::fromRgba(p[0], p[1], p[2], p[3]);
     }
 
-    ALWAYS_INLINE static void store(void *pixel, Color color) {
+    always_inline static void store(void *pixel, Color color) {
         u8 *p = static_cast<u8 *>(pixel);
         p[0] = color.red;
         p[1] = color.green;
@@ -22,7 +22,7 @@ struct Rgba8888 {
         p[3] = color.alpha;
     }
 
-    ALWAYS_INLINE static usize bpp() {
+    always_inline static usize bpp() {
         return 4;
     }
 };
@@ -30,12 +30,12 @@ struct Rgba8888 {
 [[gnu::used]] inline Rgba8888 RGBA8888;
 
 struct Bgra8888 {
-    ALWAYS_INLINE static Color load(void const *pixel) {
+    always_inline static Color load(void const *pixel) {
         u8 const *p = static_cast<u8 const *>(pixel);
         return Color::fromRgba(p[2], p[1], p[0], p[3]);
     }
 
-    ALWAYS_INLINE static void store(void *pixel, Color color) {
+    always_inline static void store(void *pixel, Color color) {
         u8 *p = static_cast<u8 *>(pixel);
         p[0] = color.blue;
         p[1] = color.green;
@@ -43,7 +43,7 @@ struct Bgra8888 {
         p[3] = color.alpha;
     }
 
-    ALWAYS_INLINE static usize bpp() {
+    always_inline static usize bpp() {
         return 4;
     }
 };
@@ -55,19 +55,19 @@ using _Fmts = Var<Rgba8888, Bgra8888>;
 struct Fmt : public _Fmts {
     using _Fmts::_Fmts;
 
-    ALWAYS_INLINE Color load(void const *pixel) const {
+    always_inline Color load(void const *pixel) const {
         return visit([&](auto f) {
             return f.load(pixel);
         });
     }
 
-    ALWAYS_INLINE void store(void *pixel, Color color) const {
+    always_inline void store(void *pixel, Color color) const {
         visit([&](auto f) {
             f.store(pixel, color);
         });
     }
 
-    ALWAYS_INLINE usize bpp() const {
+    always_inline usize bpp() const {
         return visit([&](auto f) {
             return f.bpp();
         });
@@ -87,63 +87,63 @@ struct _Pixels {
 
     /* --- Geometry --------------------------------------------------------- */
 
-    ALWAYS_INLINE Math::Recti bound() const {
+    always_inline Math::Recti bound() const {
         return {0, 0, _size.x, _size.y};
     }
 
-    ALWAYS_INLINE Math::Vec2i size() const {
+    always_inline Math::Vec2i size() const {
         return _size;
     }
 
-    ALWAYS_INLINE isize width() const {
+    always_inline isize width() const {
         return _size.x;
     }
 
-    ALWAYS_INLINE isize height() const {
+    always_inline isize height() const {
         return _size.y;
     }
 
-    ALWAYS_INLINE usize stride() const {
+    always_inline usize stride() const {
         return _stride;
     }
 
     /* --- Buffer Access ---------------------------------------------------- */
 
-    ALWAYS_INLINE Fmt fmt() const {
+    always_inline Fmt fmt() const {
         return _fmt;
     }
 
-    ALWAYS_INLINE void const *scanline(usize y) const {
+    always_inline void const *scanline(usize y) const {
         return static_cast<u8 const *>(_buf) + y * _stride;
     }
 
-    ALWAYS_INLINE void *scanline(usize y)
+    always_inline void *scanline(usize y)
         requires(MUT)
     {
         return static_cast<u8 *>(_buf) + y * _stride;
     }
 
-    ALWAYS_INLINE void const *pixelUnsafe(Math::Vec2i pos) const {
+    always_inline void const *pixelUnsafe(Math::Vec2i pos) const {
         return static_cast<u8 const *>(_buf) + pos.y * _stride + pos.x * _fmt.bpp();
     }
 
-    ALWAYS_INLINE void *pixelUnsafe(Math::Vec2i pos)
+    always_inline void *pixelUnsafe(Math::Vec2i pos)
         requires(MUT)
     {
         return static_cast<u8 *>(_buf) + pos.y * _stride + pos.x * _fmt.bpp();
     }
 
-    ALWAYS_INLINE Bytes bytes() const {
+    always_inline Bytes bytes() const {
         return {static_cast<Byte const *>(_buf), _stride * _size.y};
     }
 
-    ALWAYS_INLINE MutBytes bytes()
+    always_inline MutBytes bytes()
         requires(MUT)
     {
         return {static_cast<Byte *>(_buf), _stride * _size.y};
     }
 
-    ALWAYS_INLINE _Pixels<false> clip(Math::Recti rect) const {
+    always_inline _Pixels<false> clip(Math::Recti rect) const {
         rect = rect.clipTo(bound());
 
         return {
@@ -154,7 +154,7 @@ struct _Pixels {
         };
     }
 
-    ALWAYS_INLINE _Pixels<MUT> clip(Math::Recti rect)
+    always_inline _Pixels<MUT> clip(Math::Recti rect)
         requires(MUT)
     {
         rect = rect.clipTo(bound());
@@ -169,30 +169,30 @@ struct _Pixels {
 
     /* --- Load/Store ------------------------------------------------------- */
 
-    ALWAYS_INLINE Color loadUnsafe(Math::Vec2i pos) const {
+    always_inline Color loadUnsafe(Math::Vec2i pos) const {
         return _fmt.load(pixelUnsafe(pos));
     }
 
-    ALWAYS_INLINE void storeUnsafe(Math::Vec2i pos, Color color)
+    always_inline void storeUnsafe(Math::Vec2i pos, Color color)
         requires(MUT)
     {
         _fmt.store(pixelUnsafe(pos), color);
     }
 
-    ALWAYS_INLINE void blendUnsafe(Math::Vec2i pos, Color color)
+    always_inline void blendUnsafe(Math::Vec2i pos, Color color)
         requires(MUT)
     {
         storeUnsafe(pos, color.blendOver(loadUnsafe(pos)));
     }
 
-    ALWAYS_INLINE Color load(Math::Vec2i pos) const {
+    always_inline Color load(Math::Vec2i pos) const {
         return loadUnsafe({
             clamp(pos.x, 0, width() - 1),
             clamp(pos.y, 0, height() - 1),
         });
     }
 
-    ALWAYS_INLINE void store(Math::Vec2i pos, Color color)
+    always_inline void store(Math::Vec2i pos, Color color)
         requires(MUT)
     {
         storeUnsafe({
@@ -202,7 +202,7 @@ struct _Pixels {
                     color);
     }
 
-    ALWAYS_INLINE void blend(Math::Vec2i pos, Color color)
+    always_inline void blend(Math::Vec2i pos, Color color)
         requires(MUT)
     {
         blendUnsafe({
@@ -212,11 +212,11 @@ struct _Pixels {
                     color);
     }
 
-    ALWAYS_INLINE Color sample(Math::Vec2f pos) const {
+    always_inline Color sample(Math::Vec2f pos) const {
         return load(Math::Vec2i(pos.x * width(), pos.y * height()));
     }
 
-    ALWAYS_INLINE void clear(Color color)
+    always_inline void clear(Color color)
         requires(MUT)
     {
         _fmt.visit([&](auto f) {
@@ -228,7 +228,7 @@ struct _Pixels {
         });
     }
 
-    ALWAYS_INLINE void clear()
+    always_inline void clear()
         requires(MUT)
     {
         clear({});

@@ -12,23 +12,23 @@ union Inert {
     alignas(alignof(T)) char _inner[sizeof(T)];
 
     template <typename... Args>
-    ALWAYS_INLINE void ctor(Args &&...args) {
+    always_inline void ctor(Args &&...args) {
         new (&unwrap()) T(std::forward<Args>(args)...);
     }
 
-    ALWAYS_INLINE void dtor() {
+    always_inline void dtor() {
         unwrap().~T();
     }
 
-    ALWAYS_INLINE T &unwrap() {
+    always_inline T &unwrap() {
         return *(T *)_inner;
     }
 
-    ALWAYS_INLINE T const &unwrap() const {
+    always_inline T const &unwrap() const {
         return *(T const *)_inner;
     }
 
-    ALWAYS_INLINE T take() {
+    always_inline T take() {
         T value = std::move(unwrap());
         dtor();
         return value;

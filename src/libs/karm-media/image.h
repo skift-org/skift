@@ -22,35 +22,35 @@ struct Image {
         return img;
     }
 
-    ALWAYS_INLINE operator Gfx::Pixels() const {
+    always_inline operator Gfx::Pixels() const {
         return pixels();
     }
 
-    ALWAYS_INLINE operator Gfx::MutPixels() {
+    always_inline operator Gfx::MutPixels() {
         return mutPixels();
     }
 
-    ALWAYS_INLINE Gfx::Pixels pixels() const {
+    always_inline Gfx::Pixels pixels() const {
         return {_buf->buf(), _size, _stride, _fmt};
     }
 
-    ALWAYS_INLINE Gfx::MutPixels mutPixels() {
+    always_inline Gfx::MutPixels mutPixels() {
         return {_buf->buf(), _size, _stride, _fmt};
     }
 
-    ALWAYS_INLINE isize width() const {
+    always_inline isize width() const {
         return _size.x;
     }
 
-    ALWAYS_INLINE isize height() const {
+    always_inline isize height() const {
         return _size.y;
     }
 
-    ALWAYS_INLINE Math::Recti bound() const {
+    always_inline Math::Recti bound() const {
         return {0, 0, width(), height()};
     }
 
-    ALWAYS_INLINE Gfx::Color sample(Math::Vec2f pos) const {
+    always_inline Gfx::Color sample(Math::Vec2f pos) const {
         return pixels().sample(pos);
     }
 };

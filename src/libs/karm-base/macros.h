@@ -16,7 +16,7 @@ namespace Karm {
 
 #define var$(NAME) concat$(_MACRO_VAR_##NAME##__, __LINE__)
 
-#define ALWAYS_INLINE [[gnu::always_inline]]
+#define always_inline [[gnu::always_inline]]
 
 #define _ var$(placeholder)
 
@@ -68,7 +68,7 @@ namespace Karm {
 /* --- Utilities ------------------------------------------------------------ */
 
 template <typename T, typename U>
-ALWAYS_INLINE static inline T unionCast(U value)
+always_inline static inline T unionCast(U value)
     requires(sizeof(T) == sizeof(U))
 {
     union X {

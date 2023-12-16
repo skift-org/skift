@@ -99,15 +99,15 @@ concept Decorator = requires(T &t, Child &c) {
     { t(c) } -> Meta::Same<Child>;
 };
 
-ALWAYS_INLINE Child operator|(Child child, Decorator auto decorator) {
+always_inline Child operator|(Child child, Decorator auto decorator) {
     return decorator(child);
 }
 
-ALWAYS_INLINE Child &operator|=(Child &child, Decorator auto decorator) {
+always_inline Child &operator|=(Child &child, Decorator auto decorator) {
     return child = decorator(child);
 }
 
-ALWAYS_INLINE auto operator|(Decorator auto decorator, Decorator auto decorator2) {
+always_inline auto operator|(Decorator auto decorator, Decorator auto decorator2) {
     return [=](Child child) {
         return decorator2(decorator(child));
     };

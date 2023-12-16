@@ -5,20 +5,20 @@
 
 namespace Karm {
 
-ALWAYS_INLINE constexpr auto max(auto value) { return value; }
+always_inline constexpr auto max(auto value) { return value; }
 
-ALWAYS_INLINE constexpr auto max(auto first, auto... rest) {
+always_inline constexpr auto max(auto first, auto... rest) {
     auto rhs = max(rest...);
     return first > rhs ? first : rhs;
 }
 
-ALWAYS_INLINE constexpr auto min(auto value) { return value; }
-ALWAYS_INLINE constexpr auto min(auto first, auto... rest) {
+always_inline constexpr auto min(auto value) { return value; }
+always_inline constexpr auto min(auto first, auto... rest) {
     auto rhs = min(rest...);
     return first < rhs ? first : rhs;
 }
 
-ALWAYS_INLINE constexpr auto clamp(auto value, auto min, auto max) {
+always_inline constexpr auto clamp(auto value, auto min, auto max) {
     return value < min
                ? min
            : value > max
@@ -26,7 +26,7 @@ ALWAYS_INLINE constexpr auto clamp(auto value, auto min, auto max) {
                : value;
 }
 
-ALWAYS_INLINE constexpr auto clamp01(auto value) {
+always_inline constexpr auto clamp01(auto value) {
     return clamp(value, 0, 1);
 }
 

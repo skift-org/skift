@@ -5,77 +5,24 @@
 
 namespace Karm {
 
-// clang-format off
-// clang-format has trouble with the following code
-template <typename T>
-requires(sizeof(T) <= 8)
-ALWAYS_INLINE T bswap(T value) {
-    if (sizeof(T) == 8)
-        return __builtin_bswap64(value);
-    if (sizeof(T) == 4)
-        return __builtin_bswap32(value);
-    if (sizeof(T) == 2)
-        return __builtin_bswap16(value);
-    if (sizeof(T) == 1)
-        return value;
-}
-// clang-format on
-
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-template <typename T>
-ALWAYS_INLINE T _swapLe(T value) {
-    return value;
-}
-#else
-template <typename T>
-ALWAYS_INLINE T _swapLe(T value) {
-    return bswap(value);
-}
-#endif
-
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-template <typename T>
-ALWAYS_INLINE T _swapBe(T value) {
-    return bswap(value);
-}
-#else
-template <typename T>
-ALWAYS_INLINE T _swapBe(T value) {
-    return value;
-}
-#endif
-
-template <typename T>
-static constexpr usize popcount(T value) {
-    usize count = 0;
-    for (usize i = 0; i < sizeof(T) * 8; i++) {
-        if (value & (1uz << i)) {
-            count++;
-        }
-    }
-    return count;
-}
-
 template <typename T>
 struct Be {
     T _value;
 
-    ALWAYS_INLINE constexpr Be() = default;
-    ALWAYS_INLINE constexpr Be(T value) : _value(_swapBe(value)) {}
-    ALWAYS_INLINE constexpr operator T() const { return _swapBe(_value); }
-
-    ALWAYS_INLINE constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
+    always_inline constexpr Be() = default;
+    always_inline constexpr Be(T value) : _value(toBe(value)) {}
+    always_inline constexpr operator T() const { return toBe(_value); }
+    always_inline constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
 };
 
 template <typename T>
 struct Le {
     T _value;
 
-    ALWAYS_INLINE constexpr Le() = default;
-    ALWAYS_INLINE constexpr Le(T value) : _value(_swapLe(value)) {}
-    ALWAYS_INLINE constexpr operator T() const { return _swapLe(_value); }
-
-    ALWAYS_INLINE constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
+    always_inline constexpr Le() = default;
+    always_inline constexpr Le(T value) : _value(toLe(value)) {}
+    always_inline constexpr operator T() const { return toLe(_value); }
+    always_inline constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
 };
 
 static_assert(sizeof(Be<u32>) == sizeof(u32));
@@ -100,5 +47,4 @@ using i8le = Le<i8>;
 using i16le = Le<i16>;
 using i32le = Le<i32>;
 using i64le = Le<i64>;
-
 } // namespace Karm

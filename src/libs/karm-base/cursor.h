@@ -13,31 +13,31 @@ struct Cursor {
 
     constexpr Cursor() = default;
 
-    ALWAYS_INLINE constexpr Cursor(Sliceable<T> auto &slice)
+    always_inline constexpr Cursor(Sliceable<T> auto &slice)
         : _begin(begin(slice)), _end(end(slice)) {}
 
-    ALWAYS_INLINE constexpr T const &operator[](usize i) const {
+    always_inline constexpr T const &operator[](usize i) const {
         return _begin[i];
     }
 
-    ALWAYS_INLINE constexpr operator T const *() const { return _begin; }
+    always_inline constexpr operator T const *() const { return _begin; }
 
-    ALWAYS_INLINE constexpr bool ended() const {
+    always_inline constexpr bool ended() const {
         return _begin >= _end;
     }
 
-    ALWAYS_INLINE constexpr usize rem() const {
+    always_inline constexpr usize rem() const {
         return _end - _begin;
     }
 
-    ALWAYS_INLINE constexpr T curr() const {
+    always_inline constexpr T curr() const {
         if (not ended()) {
             panic("curr() called on ended cursor");
         }
         return *_begin;
     }
 
-    ALWAYS_INLINE constexpr T next() {
+    always_inline constexpr T next() {
         if (ended()) {
             panic("next() called on ended cursor");
         }
@@ -46,24 +46,24 @@ struct Cursor {
         return r;
     }
 
-    ALWAYS_INLINE constexpr void next(usize n) {
+    always_inline constexpr void next(usize n) {
         for (usize i = 0; i < n; i++)
             next();
     }
 
-    ALWAYS_INLINE constexpr T const *buf() const {
+    always_inline constexpr T const *buf() const {
         return _begin;
     }
 
-    ALWAYS_INLINE constexpr usize len() const {
+    always_inline constexpr usize len() const {
         return _end - _begin;
     }
 
-    ALWAYS_INLINE constexpr Bytes bytes() const {
+    always_inline constexpr Bytes bytes() const {
         return Bytes{_begin, _end};
     }
 
-    ALWAYS_INLINE constexpr MutBytes bytes() {
+    always_inline constexpr MutBytes bytes() {
         return MutBytes{_begin, _end};
     }
 };
@@ -73,38 +73,38 @@ struct MutCursor {
     T *_begin = nullptr;
     T *_end = nullptr;
 
-    ALWAYS_INLINE constexpr MutCursor(MutSliceable<T> auto &slice)
+    always_inline constexpr MutCursor(MutSliceable<T> auto &slice)
         : _begin(begin(slice)), _end(end(slice)) {}
 
-    ALWAYS_INLINE constexpr T &operator[](usize i) {
+    always_inline constexpr T &operator[](usize i) {
         return _begin[i];
     }
 
-    ALWAYS_INLINE constexpr T const &operator[](usize i) const {
+    always_inline constexpr T const &operator[](usize i) const {
         return _begin[i];
     }
 
-    ALWAYS_INLINE constexpr operator T *() { return _begin; }
+    always_inline constexpr operator T *() { return _begin; }
 
-    ALWAYS_INLINE constexpr operator T const *() const { return _begin; }
+    always_inline constexpr operator T const *() const { return _begin; }
 
-    ALWAYS_INLINE bool ended() const {
+    always_inline bool ended() const {
         return _begin == _end;
     }
 
-    ALWAYS_INLINE constexpr usize rem() const {
+    always_inline constexpr usize rem() const {
         return _end - _begin;
     }
 
-    ALWAYS_INLINE constexpr T curr() const {
+    always_inline constexpr T curr() const {
         return *_begin;
     }
 
-    ALWAYS_INLINE constexpr T next() {
+    always_inline constexpr T next() {
         return *_begin++;
     }
 
-    ALWAYS_INLINE constexpr bool put(T c) {
+    always_inline constexpr bool put(T c) {
         if (_begin == _end) {
             return true;
         }
@@ -113,23 +113,23 @@ struct MutCursor {
         return false;
     }
 
-    ALWAYS_INLINE constexpr void skip() {
+    always_inline constexpr void skip() {
         ++_begin;
     }
 
-    ALWAYS_INLINE constexpr void skip(usize n) {
+    always_inline constexpr void skip(usize n) {
         _begin += n;
     }
 
-    ALWAYS_INLINE constexpr T *buf() {
+    always_inline constexpr T *buf() {
         return _begin;
     }
 
-    ALWAYS_INLINE constexpr T const *buf() const {
+    always_inline constexpr T const *buf() const {
         return _begin;
     }
 
-    ALWAYS_INLINE constexpr usize len() const {
+    always_inline constexpr usize len() const {
         return _end - _begin;
     }
 };

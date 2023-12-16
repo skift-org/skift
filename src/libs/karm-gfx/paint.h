@@ -162,7 +162,7 @@ struct Gradient {
     Gradient(Type type, Math::Vec2f start, Math::Vec2f end, Strong<Buf> buf)
         : _type(type), _start(start), _end(end), _buf(buf) {}
 
-    ALWAYS_INLINE f64 transform(Math::Vec2f pos) const {
+    always_inline f64 transform(Math::Vec2f pos) const {
         pos = pos - _start;
         pos = pos.rotate(-(_end - _start).angle());
         f64 scale = (_end - _start).len();
@@ -183,7 +183,7 @@ struct Gradient {
         }
     }
 
-    ALWAYS_INLINE Color sample(Math::Vec2f pos) const {
+    always_inline Color sample(Math::Vec2f pos) const {
         auto p = transform(pos);
         return (*_buf)[clamp(usize(p * 255), 0uz, 255uz)];
     }
@@ -197,7 +197,7 @@ using _Paints = Var<
 struct Paint : public _Paints {
     using _Paints::_Paints;
 
-    ALWAYS_INLINE Color sample(Math::Vec2f pos) const {
+    always_inline Color sample(Math::Vec2f pos) const {
         return visit([&](auto const &p) {
             return p.sample(pos);
         });

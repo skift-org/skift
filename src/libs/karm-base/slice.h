@@ -414,7 +414,7 @@ constexpr usize zeroFill(MutSlice<T> slice) {
     return fill(slice, {});
 }
 
-ALWAYS_INLINE constexpr void sort(MutSliceable auto &slice, auto cmp) {
+always_inline constexpr void sort(MutSliceable auto &slice, auto cmp) {
     if (slice.len() <= 1) {
         return;
     }
@@ -446,21 +446,21 @@ ALWAYS_INLINE constexpr void sort(MutSliceable auto &slice, auto cmp) {
     sort(leftSlice, cmp);
 }
 
-ALWAYS_INLINE constexpr void sort(MutSliceable auto &slice) {
+always_inline constexpr void sort(MutSliceable auto &slice) {
     sort(slice, [](auto const &a, auto const &b) {
         return a <=> b;
     });
 }
 
 template <Sliceable T, typename U = T::Inner>
-ALWAYS_INLINE constexpr Opt<usize> indexOf(T const &slice, U const &needle) {
+always_inline constexpr Opt<usize> indexOf(T const &slice, U const &needle) {
     for (usize i = 0; i < slice.len(); i++)
         if (slice[i] == needle)
             return i;
     return NONE;
 }
 
-ALWAYS_INLINE Opt<usize> search(Sliceable auto const &slice, auto cmp) {
+always_inline Opt<usize> search(Sliceable auto const &slice, auto cmp) {
     if (slice.len() == 0) {
         return NONE;
     }

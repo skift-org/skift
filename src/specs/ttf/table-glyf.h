@@ -25,7 +25,7 @@ struct Glyf : public Io::BChunk {
         i16 yMax;
     };
 
-    ALWAYS_INLINE Metrics metrics(Io::BScan &s, usize glyfOffset) const {
+    always_inline Metrics metrics(Io::BScan &s, usize glyfOffset) const {
         s.skip(glyfOffset);
         auto numContours = s.nextI16be();
         if (numContours == 0) {
@@ -38,7 +38,7 @@ struct Glyf : public Io::BChunk {
         return {numContours, xMin, yMin, xMax, yMax};
     }
 
-    ALWAYS_INLINE Metrics metrics(usize glyfOffset) const {
+    always_inline Metrics metrics(usize glyfOffset) const {
         auto s = begin();
         return metrics(s, glyfOffset);
     }

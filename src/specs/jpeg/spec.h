@@ -127,14 +127,14 @@ struct BitStream {
     u8 _buf = 0x0;
     u8 _len = 0x0;
 
-    ALWAYS_INLINE BitStream(Io::BScan &s) : s(s) {}
+    always_inline BitStream(Io::BScan &s) : s(s) {}
 
-    ALWAYS_INLINE void reset() {
+    always_inline void reset() {
         _buf = 0x0;
         _len = 0x0;
     }
 
-    ALWAYS_INLINE Res<> fill() {
+    always_inline Res<> fill() {
         if (_len)
             return Ok();
 
@@ -163,7 +163,7 @@ struct BitStream {
         return Ok();
     }
 
-    ALWAYS_INLINE Res<u8> nextBit() {
+    always_inline Res<u8> nextBit() {
         try$(fill());
         u8 bit = _buf >> 7;
         _buf <<= 1;
@@ -171,7 +171,7 @@ struct BitStream {
         return Ok(bit);
     }
 
-    ALWAYS_INLINE Res<usize> nextBits(u8 n) {
+    always_inline Res<usize> nextBits(u8 n) {
         usize res = 0;
         while (n--) {
             res = (res << 1) | try$(nextBit());

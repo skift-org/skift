@@ -94,7 +94,7 @@ Res<Url::Path> resolve(Url::Url url) {
 
         resolved = Url::Path::parse(maybeRepo)
                        .join(url.host)
-                       .join("res")
+                       .join("__res__")
                        .join(path);
     } else {
         return Error::notFound("unknown url scheme");

@@ -1,21 +1,46 @@
+#include <arpa/inet.h>
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/utsname.h>
+#include <time.h>
+#include <unistd.h>
+
+//
 #include <karm-io/funcs.h>
 #include <karm-logger/logger.h>
 
 #include <karm-sys/_embed.h>
 
-/* Posix Stuff*/
-#include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <sys/mman.h>
-#include <sys/utsname.h>
-#include <time.h>
-#include <unistd.h>
-
 #include "errno.h"
 
 namespace Karm::Sys::_Embed {
+
+/* --- Utilities ------------------------------------------------------------ */
+
+static struct sockaddr_in toSockAddr(SocketAddr addr) {
+    struct sockaddr_in sockaddr;
+    auto addr4 = addr.addr.unwrap<Sys::Ip4>();
+    sockaddr.sin_family = AF_INET;
+    sockaddr.sin_port = htons(addr.port);
+    sockaddr.sin_addr.s_addr = addr4._raw._value;
+    return sockaddr;
+}
+
+static SocketAddr fromSockAddr(struct sockaddr_in sockaddr) {
+    SocketAddr addr{Ip4::unspecified(), 0};
+    addr.addr.unwrap<Sys::Ip4>()._raw._value = sockaddr.sin_addr.s_addr;
+    addr.port = ntohs(sockaddr.sin_port);
+    return addr;
+}
+
+/* --- File Descriptor ------------------------------------------------------ */
 
 struct PosixFd : public Sys::Fd {
     isize _raw;
@@ -73,6 +98,28 @@ struct PosixFd : public Sys::Fd {
             return Posix::fromLastErrno();
 
         return Ok(makeStrong<PosixFd>(duped));
+    }
+
+    Res<Cons<Strong<Fd>, SocketAddr>> accept() override {
+        struct sockaddr_in addr_;
+        socklen_t len = sizeof(addr_);
+        isize fd = ::accept(_raw, (struct sockaddr *)&addr_, &len);
+        if (fd < 0)
+            return Posix::fromLastErrno();
+
+        return Ok<Cons<Strong<Fd>, SocketAddr>>(
+            makeStrong<PosixFd>(fd),
+            fromSockAddr(addr_));
+    }
+
+    Res<Stat> stat() override {
+        struct stat buf;
+        if (fstat(_raw, &buf) < 0)
+            return Posix::fromLastErrno();
+
+        return Ok(Stat{
+            .size = (usize)buf.st_size,
+        });
     }
 };
 
@@ -175,6 +222,40 @@ Res<Strong<Sys::Fd>> createOut() {
 
 Res<Strong<Sys::Fd>> createErr() {
     return Ok(makeStrong<PosixFd>(2));
+}
+
+/* --- Sockets -------------------------------------------------------------- */
+
+Res<Strong<Sys::Fd>> connectTcp(SocketAddr addr) {
+    int fd = ::socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0)
+        return Posix::fromLastErrno();
+
+    struct sockaddr_in addr_ = toSockAddr(addr);
+    if (::connect(fd, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
+        return Posix::fromLastErrno();
+
+    return Ok(makeStrong<PosixFd>(fd));
+}
+
+Res<Strong<Sys::Fd>> listenTcp(SocketAddr addr) {
+    int fd = ::socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0)
+        return Posix::fromLastErrno();
+
+    int opt = 1;
+    if (::setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+        return Posix::fromLastErrno();
+
+    struct sockaddr_in addr_ = toSockAddr(addr);
+
+    if (::bind(fd, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
+        return Posix::fromLastErrno();
+
+    if (::listen(fd, 128) < 0)
+        return Posix::fromLastErrno();
+
+    return Ok(makeStrong<PosixFd>(fd));
 }
 
 /* --- Time ----------------------------------------------------------------- */

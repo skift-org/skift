@@ -3,12 +3,11 @@
 #include <karm-base/cons.h>
 #include <karm-base/range.h>
 #include <karm-base/time.h>
-#include <karm-sys/dir.h>
-#include <karm-sys/fd.h>
-#include <karm-sys/info.h>
-#include <karm-sys/types.h>
 
-#include "defs.h"
+#include "dir.h"
+#include "fd.h"
+#include "info.h"
+#include "types.h"
 
 namespace Karm::Sys::_Embed {
 
@@ -27,6 +26,12 @@ Res<Strong<Sys::Fd>> createOut();
 Res<Strong<Sys::Fd>> createErr();
 
 Res<Vec<Sys::DirEntry>> readDir(Url::Url url);
+
+/* --- Sockets -------------------------------------------------------------- */
+
+Res<Strong<Sys::Fd>> connectTcp(SocketAddr addr);
+
+Res<Strong<Sys::Fd>> listenTcp(SocketAddr addr);
 
 /* --- Time ----------------------------------------------------------------- */
 

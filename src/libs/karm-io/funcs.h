@@ -83,9 +83,8 @@ inline Res<usize> copy(Readable auto &reader, Writable auto &writer) {
     usize result = 0;
     while (true) {
         auto read = try$(reader.read(mutBytes(buffer)));
-        if (read == 0) {
+        if (read == 0)
             return Ok(result);
-        }
 
         result += read;
 

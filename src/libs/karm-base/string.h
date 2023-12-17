@@ -172,6 +172,10 @@ struct _StringBuilder {
         return _buf;
     }
 
+    Bytes bytes() {
+        return ::bytes(_buf);
+    }
+
     void clear() {
         _buf.truncate(0);
     }

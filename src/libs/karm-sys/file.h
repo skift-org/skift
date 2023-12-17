@@ -43,6 +43,10 @@ struct File :
     Strong<Fd> asFd() {
         return _fd;
     }
+
+    Res<Stat> stat() {
+        return _fd->stat();
+    }
 };
 
 } // namespace Karm::Sys

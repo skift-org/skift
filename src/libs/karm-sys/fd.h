@@ -6,7 +6,16 @@
 #include <karm-meta/traits.h>
 #include <url/url.h>
 
+#include "addr.h"
+
 namespace Karm::Sys {
+
+struct Stat {
+    usize size;
+    TimeStamp accessTime;
+    TimeStamp modifyTime;
+    TimeStamp changeTime;
+};
 
 struct Fd : Meta::NoCopy {
     virtual ~Fd() = default;
@@ -20,28 +29,26 @@ struct Fd : Meta::NoCopy {
     virtual Res<usize> flush() = 0;
 
     virtual Res<Strong<Fd>> dup() = 0;
+
+    virtual Res<Cons<Strong<Fd>, SocketAddr>> accept() = 0;
+
+    virtual Res<Stat> stat() = 0;
 };
 
 struct DummyFd : public Fd {
-    Res<usize> read(MutBytes) override {
-        return Ok(0uz);
-    }
+    Res<usize> read(MutBytes) override;
 
-    Res<usize> write(Bytes) override {
-        return Ok(0uz);
-    }
+    Res<usize> write(Bytes) override;
 
-    Res<usize> seek(Io::Seek) override {
-        return Ok(0uz);
-    }
+    Res<usize> seek(Io::Seek) override;
 
-    Res<usize> flush() override {
-        return Ok(0uz);
-    }
+    Res<usize> flush() override;
 
-    Res<Strong<Fd>> dup() override {
-        return Ok(makeStrong<DummyFd>());
-    }
+    Res<Strong<Fd>> dup() override;
+
+    Res<Cons<Strong<Fd>, SocketAddr>> accept() override;
+
+    Res<Stat> stat() override;
 };
 
 template <typename T>

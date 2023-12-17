@@ -1,11 +1,12 @@
 #pragma once
 
-#include <karm-base/res.h>
-#include <karm-base/var.h>
+#include <karm-base/array.h>
+#include <karm-base/endian.h>
 #include <karm-fmt/fmt.h>
-#include <karm-io/sscan.h>
 
-namespace Karm::Net {
+namespace Karm::Sys {
+
+struct SocketAddr;
 
 union Ip4 {
     struct {
@@ -13,6 +14,8 @@ union Ip4 {
     };
 
     Array<u8, 4> bytes;
+
+    Be<u32> _raw;
 
     Ip4(u8 a, u8 b, u8 c, u8 d)
         : a(a), b(b), c(c), d(d) {}
@@ -24,9 +27,13 @@ union Ip4 {
         return {0, 0, 0, 0};
     }
 
+    static SocketAddr unspecified(u16 port);
+
     static auto localhost() {
         return Ip4{{127, 0, 0, 1}};
     }
+
+    static SocketAddr localhost(u16 port);
 
     static Res<Ip4> parse(Io::SScan &s) {
         auto addr = unspecified();
@@ -64,6 +71,8 @@ union Ip6 {
         u16 a, b, c, d, e, f, g, h;
     };
 
+    Be<u64> _raw;
+
     Array<u16, 8> words;
 
     Ip6(u16 a, u16 b, u16 c, u16 d, u16 e, u16 f, u16 g, u16 h)
@@ -76,9 +85,13 @@ union Ip6 {
         return Ip6{0, 0, 0, 0, 0, 0, 0, 0};
     }
 
+    static SocketAddr unspecified(u16 port);
+
     static auto localhost() {
         return Ip6{0, 0, 0, 0, 0, 0, 0, 1};
     }
+
+    static SocketAddr localhost(u16 port);
 
     static Res<Ip6> parse(Io::SScan &s) {
         auto addr = unspecified();
@@ -151,25 +164,41 @@ struct SocketAddr {
     }
 };
 
-} // namespace Karm::Net
+inline SocketAddr Ip4::unspecified(u16 port) {
+    return SocketAddr{Ip4::unspecified(), port};
+}
+
+inline SocketAddr Ip4::localhost(u16 port) {
+    return SocketAddr{Ip4::localhost(), port};
+}
+
+inline SocketAddr Ip6::unspecified(u16 port) {
+    return SocketAddr{Ip6::unspecified(), port};
+}
+
+inline SocketAddr Ip6::localhost(u16 port) {
+    return SocketAddr{Ip6::localhost(), port};
+}
+
+} // namespace Karm::Sys
 
 template <>
-struct Karm::Fmt::Formatter<Net::Ip4> {
-    Res<usize> format(Io::TextWriter &writer, Net::Ip4 addr) {
+struct Karm::Fmt::Formatter<Karm::Sys::Ip4> {
+    Res<usize> format(Io::TextWriter &writer, Karm::Sys::Ip4 addr) {
         return Fmt::format(writer, "{}.{}.{}.{}", addr.a, addr.b, addr.c, addr.d);
     }
 };
 
 template <>
-struct Karm::Fmt::Formatter<Net::Ip6> {
-    Res<usize> format(Io::TextWriter &writer, Net::Ip6 addr) {
+struct Karm::Fmt::Formatter<Karm::Sys::Ip6> {
+    Res<usize> format(Io::TextWriter &writer, Karm::Sys::Ip6 addr) {
         return Fmt::format(writer, "{}:{}:{}:{}:{}:{}:{}:{}", addr.a, addr.b, addr.c, addr.d, addr.e, addr.f, addr.g, addr.h);
     }
 };
 
 template <>
-struct Karm::Fmt::Formatter<Net::Ip> {
-    Res<usize> format(Io::TextWriter &writer, Net::Ip addr) {
+struct Karm::Fmt::Formatter<Karm::Sys::Ip> {
+    Res<usize> format(Io::TextWriter &writer, Karm::Sys::Ip addr) {
         return addr.visit([&](auto addr) {
             return Fmt::format(writer, "{}", addr);
         });
@@ -177,8 +206,8 @@ struct Karm::Fmt::Formatter<Net::Ip> {
 };
 
 template <>
-struct Karm::Fmt::Formatter<Net::SocketAddr> {
-    Res<usize> format(Io::TextWriter &writer, Net::SocketAddr addr) {
+struct Karm::Fmt::Formatter<Karm::Sys::SocketAddr> {
+    Res<usize> format(Io::TextWriter &writer, Karm::Sys::SocketAddr addr) {
         return Fmt::format(writer, "{}:{}", addr.addr, addr.port);
     }
 };

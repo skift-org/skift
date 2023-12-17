@@ -10,18 +10,28 @@ template <typename T = None>
 struct Ok {
     T inner;
 
-    always_inline constexpr Ok()
-        : inner() {}
+    template <typename... Args>
+    static constexpr Ok emplace(Args &&...args) {
+        return Ok{std::forward<Args>(args)...};
+    }
 
-    always_inline constexpr Ok(T value)
-        : inner(std::move(value)) {}
+    template <typename... Args>
+    always_inline constexpr Ok(Args &&...args)
+        : inner(std::forward<Args>(args)...) {}
 
     operator bool() const = delete;
 
     always_inline auto operator<=>(Ok const &) const
         requires Meta::Comparable<T>
     = default;
+
+    T take() {
+        return std::move(inner);
+    }
 };
+
+template <typename... Args>
+Ok(Args &&...) -> Ok<Meta::RemoveConstVolatileRef<Args>...>;
 
 template <typename V = None, typename E = Error>
 struct [[nodiscard]] Res {
@@ -29,7 +39,10 @@ struct [[nodiscard]] Res {
 
     Inner _inner;
 
-    always_inline constexpr Res(Ok<V> ok)
+    always_inline constexpr Res(Ok<V> const &ok)
+        : _inner(ok) {}
+
+    always_inline constexpr Res(Ok<V> &&ok)
         : _inner(std::move(ok)) {}
 
     template <typename U>
@@ -55,62 +68,54 @@ struct [[nodiscard]] Res {
     }
 
     always_inline constexpr E none() const {
-        if (not _inner.template is<E>()) {
+        if (not _inner.template is<E>())
             panic("none() called on an ok");
-        }
         return _inner.template unwrap<E>();
     }
 
     always_inline constexpr V &unwrap(char const *msg = "unwraping an error") {
-        if (not _inner.template is<Ok<V>>()) {
+        if (not _inner.template is<Ok<V>>())
             panic(msg);
-        }
         return _inner.template unwrap<Ok<V>>().inner;
     }
 
     always_inline constexpr V const &unwrap(char const *msg = "unwraping an error") const {
-        if (not _inner.template is<Ok<V>>()) {
+        if (not _inner.template is<Ok<V>>())
             panic(msg);
-        }
         return _inner.template unwrap<Ok<V>>().inner;
     }
 
     always_inline constexpr V take() {
-        if (not _inner.template is<Ok<V>>()) {
+        if (not _inner.template is<Ok<V>>())
             panic("take() called on an error");
-        }
-        return std::move(_inner.template unwrap<Ok<V>>().inner);
+        return _inner.template unwrap<Ok<V>>().take();
     }
 
     template <typename U>
     always_inline constexpr Res<V, U> mapErr(auto f) {
-        if (_inner.template is<Ok<V>>()) {
+        if (_inner.template is<Ok<V>>())
             return _inner.template unwrap<Ok<V>>();
-        }
         return f(_inner.template unwrap<E>());
     }
 
     template <typename U>
     always_inline constexpr Res<V, U> mapErr() {
-        if (_inner.template is<Ok<V>>()) {
+        if (_inner.template is<Ok<V>>())
             return _inner.template unwrap<Ok<V>>();
-        }
         return U{};
     }
 
     template <typename U>
     always_inline constexpr Res<U, E> mapValue(auto f) {
-        if (_inner.template is<Ok<V>>()) {
+        if (_inner.template is<Ok<V>>())
             return f(_inner.template unwrap<Ok<V>>().inner);
-        }
         return _inner.template unwrap<E>();
     }
 
     template <typename U>
     always_inline constexpr Res<U, E> mapValue() {
-        if (_inner.template is<Ok<V>>()) {
+        if (_inner.template is<Ok<V>>())
             return _inner.template unwrap<Ok<V>>().inner;
-        }
         return _inner.template unwrap<E>();
     }
 

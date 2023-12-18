@@ -1,10 +1,12 @@
+#include <karm-base/ctype.h>
+
 #include "url.h"
 
 namespace Url {
 
 /* --- Path ----------------------------------------------------------------- */
 
-Path Path::parse(Io::SScan &s, bool inUrl) {
+Path Path::parse(Io::SScan &s, bool inUrl, bool stopAtWhitespace) {
     Path path;
 
     if (s.skip(SEP)) {
@@ -12,7 +14,8 @@ Path Path::parse(Io::SScan &s, bool inUrl) {
     }
 
     s.begin();
-    while (not s.ended() and (inUrl or (s.curr() != '?' and s.curr() != '#'))) {
+    while (not s.ended() and (inUrl or (s.curr() != '?' and s.curr() != '#')) and
+           (not stopAtWhitespace or not isAsciiSpace(s.curr()))) {
         if (s.curr() == SEP) {
             path._parts.pushBack(s.end());
             s.next();
@@ -23,24 +26,22 @@ Path Path::parse(Io::SScan &s, bool inUrl) {
     }
 
     auto last = s.end();
-    if (last.len() > 0) {
+    if (last.len() > 0)
         path._parts.pushBack(last);
-    }
 
     return path;
 }
 
-Path Path::parse(Str str, bool inUrl) {
+Path Path::parse(Str str, bool inUrl, bool stopAtWhitespace) {
     Io::SScan s{str};
-    return parse(s, inUrl);
+    return parse(s, inUrl, stopAtWhitespace);
 }
 
 void Path::normalize() {
     Vec<String> parts;
     for (auto part : iter()) {
-        if (part == ".") {
+        if (part == ".")
             continue;
-        }
 
         if (part == "..") {
             if (parts.len() > 0) {
@@ -48,9 +49,8 @@ void Path::normalize() {
             } else if (not rooted) {
                 parts.pushBack(part);
             }
-        } else {
+        } else
             parts.pushBack(part);
-        }
     }
 
     _parts = parts;
@@ -159,6 +159,16 @@ bool Url::isUrl(Str str) {
 
     return s.skip(COMPONENT) and
            s.skip(':');
+}
+
+Url Url::join(Path const &other) const {
+    Url url = *this;
+    url.path = url.path.join(other);
+    return url;
+}
+
+Url Url::join(Str other) const {
+    return join(Path::parse(other));
 }
 
 Str Url::basename() const {

@@ -37,6 +37,14 @@ struct VmoFd : public Sys::Fd {
     Res<Strong<Fd>> dup() override {
         notImplemented();
     }
+
+    Res<Cons<Strong<Fd>, SocketAddr>> accept() override {
+        notImplemented();
+    }
+
+    Res<Stat> stat() override {
+        return Ok<Stat>();
+    }
 };
 
 Res<Strong<Sys::Fd>> openFile(Url::Url url) {
@@ -71,6 +79,16 @@ Res<Strong<Sys::Fd>> createErr() {
 }
 
 Res<Vec<Sys::DirEntry>> readDir(Url::Url) {
+    notImplemented();
+}
+
+/* --- Sockets -------------------------------------------------------------- */
+
+Res<Strong<Sys::Fd>> connectTcp(SocketAddr) {
+    notImplemented();
+}
+
+Res<Strong<Sys::Fd>> listenTcp(SocketAddr) {
     notImplemented();
 }
 

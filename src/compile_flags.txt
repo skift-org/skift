@@ -10,12 +10,13 @@
 -I./
 -I./apps
 -I./clis
--I./srvs
 -I./embed
+-I./impls
 -I./kernel
 -I./libs
 -I./specs
--I./impls
+-I./srvs
+-I./web
 -I../.cutekit/extern/cute-engineering
 
 -D__ck_sys_linux__

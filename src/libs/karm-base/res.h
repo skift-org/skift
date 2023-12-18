@@ -11,11 +11,6 @@ struct Ok {
     T inner;
 
     template <typename... Args>
-    static constexpr Ok emplace(Args &&...args) {
-        return Ok{std::forward<Args>(args)...};
-    }
-
-    template <typename... Args>
     always_inline constexpr Ok(Args &&...args)
         : inner(std::forward<Args>(args)...) {}
 

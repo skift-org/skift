@@ -15,7 +15,7 @@ Ui::Child app() {
         "LICENSE");
 
     auto closeBtn = Ui::button(
-        Ui::bindBubble<Events::ExitEvent>(Ok()),
+        Ui::bindBubble<Events::ExitEvent>(),
         Ui::ButtonStyle::primary(),
         "CLOSE");
 

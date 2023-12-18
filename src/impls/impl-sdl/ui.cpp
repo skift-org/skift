@@ -185,7 +185,7 @@ struct SdlHost :
         }
 
         case SDL_QUIT: {
-            bubble<Events::ExitEvent>(*this, Ok());
+            bubble<Events::ExitEvent>(*this);
             break;
         }
 

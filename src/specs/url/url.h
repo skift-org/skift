@@ -18,9 +18,9 @@ struct Path {
     bool rooted = false;
     Vec<String> _parts;
 
-    static Path parse(Io::SScan &s, bool inUrl = false);
+    static Path parse(Io::SScan &s, bool inUrl = false, bool stopAtWhitespace = false);
 
-    static Path parse(Str str, bool inUrl = false);
+    static Path parse(Str str, bool inUrl = false, bool stopAtWhitespace = false);
 
     void normalize();
 
@@ -53,6 +53,15 @@ struct Path {
     }
 
     auto operator<=>(Path const &) const = default;
+
+    Str sufix() const {
+        if (not _parts.len())
+            return "";
+        auto dotIndex = lastIndexOf(last(_parts), '.');
+        if (not dotIndex.has())
+            return "";
+        return next(last(_parts), *dotIndex + 1);
+    }
 };
 
 /* --- Url ------------------------------------------------------------------ */
@@ -75,6 +84,10 @@ struct Url {
     bool rooted() const {
         return path.rooted;
     }
+
+    Url join(Path const &other) const;
+
+    Url join(Str other) const;
 
     Str basename() const;
 
@@ -111,16 +124,32 @@ inline auto operator""_url(char const *str, usize len) {
     return Url::Url::parse({str, len});
 }
 
+inline auto operator/(Url::Url const &url, Url::Path const &path) {
+    return url.join(path);
+}
+
+inline auto operator/(Url::Url const &url, Str path) {
+    return url.join(path);
+}
+
+inline auto operator/(Url::Path const &path, Url::Path const &other) {
+    return path.join(other);
+}
+
+inline auto operator/(Url::Path const &path, Str other) {
+    return path.join(other);
+}
+
 template <>
 struct Karm::Fmt::Formatter<Url::Path> {
-    Res<usize> format(Io::TextWriter &writer, Url::Path path) {
+    Res<usize> format(Io::TextWriter &writer, Url::Path const &path) {
         return path.write(writer);
     }
 };
 
 template <>
 struct Karm::Fmt::Formatter<Url::Url> {
-    Res<usize> format(Io::TextWriter &writer, Url::Url url) {
+    Res<usize> format(Io::TextWriter &writer, Url::Url const &url) {
         return url.write(writer);
     }
 };

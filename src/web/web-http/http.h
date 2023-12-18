@@ -3,11 +3,13 @@
 #include <karm-base/distinct.h>
 #include <karm-base/map.h>
 #include <karm-base/std.h>
+#include <karm-fmt/fmt.h>
 #include <url/url.h>
 
-namespace Http {
+namespace Web::Http {
 
 #define FOREACH_CODE(CODE)                     \
+    CODE(0, UNKNOWN)                           \
     CODE(100, CONTINUE)                        \
     CODE(101, SWITCHING_PROTOCOLS)             \
     CODE(102, PROCESSING)                      \
@@ -78,6 +80,30 @@ enum struct Code : uint16_t {
 #undef ITER
 };
 
+static inline Res<Code> parseCode(Io::SScan &s) {
+    auto code = try$(s.nextUint());
+    switch (code) {
+#define ITER(CODE, NAME) \
+    case CODE:           \
+        return Ok(Code::NAME);
+        FOREACH_CODE(ITER)
+#undef ITER
+    default:
+        return Error::invalidData("Invalid code");
+    }
+}
+
+static inline Str toStr(Code code) {
+    switch (code) {
+#define ITER(CODE, NAME) \
+    case Code::NAME:     \
+        return #NAME;
+        FOREACH_CODE(ITER)
+#undef ITER
+    }
+    return "UNKNOWN";
+}
+
 #define FOREACH_METHOD(METHOD) \
     METHOD(GET)                \
     METHOD(HEAD)               \
@@ -95,6 +121,26 @@ enum struct Method : uint8_t {
 #undef ITER
 };
 
+static inline Res<Method> parseMethod(Io::SScan &s) {
+#define ITER(NAME)     \
+    if (s.skip(#NAME)) \
+        return Ok(Method::NAME);
+    FOREACH_METHOD(ITER)
+#undef ITER
+    return Error::invalidData("Expected method");
+}
+
+static inline Str toStr(Method method) {
+    switch (method) {
+#define ITER(NAME)     \
+    case Method::NAME: \
+        return #NAME;
+        FOREACH_METHOD(ITER)
+#undef ITER
+    }
+    return "UNKNOWN";
+}
+
 struct Version {
     uint8_t major;
     uint8_t minor;
@@ -106,7 +152,65 @@ struct Request {
     Version version;
     Map<Str, Str> headers;
 
-    static Res<Request> parse(Io::SScan &s);
+    static Res<Request> parse(Io::SScan &s) {
+        Request req;
+
+        req.method = try$(parseMethod(s));
+
+        if (not s.skip(' '))
+            return Error::invalidData("Expected space");
+
+        req.path = Url::Path::parse(s, true, true);
+        req.path.rooted = true;
+        req.path.normalize();
+        req.path.rooted = false;
+
+        if (not s.skip(' '))
+            return Error::invalidData("Expected space");
+
+        if (not s.skip("HTTP/"))
+            return Error::invalidData("Expected \"HTTP/\"");
+
+        req.version.major = try$(s.nextUint());
+        s.skip('.');
+        req.version.minor = try$(s.nextUint());
+
+        if (not s.skip("\r\n"))
+            return Error::invalidData("Expected \"\\r\\n\"");
+
+        while (not s.ended()) {
+            auto key = s.token(Re::until(Re::single(':')));
+            s.skip(':');
+            auto value = s.token(Re::until(Re::single('\r')));
+            req.headers.put(key, value);
+            if (s.skip("\r\n\r\n"))
+                break;
+            s.skip("\r\n");
+        }
+
+        return Ok(req);
+    }
 };
 
-} // namespace Http
+} // namespace Web::Http
+
+template <>
+struct Karm::Fmt::Formatter<Web::Http::Code> {
+    Res<usize> format(Io::TextWriter &writer, Web::Http::Code code) {
+        return writer.writeStr(Web::Http::toStr(code));
+    }
+};
+
+template <>
+struct Karm::Fmt::Formatter<Web::Http::Method> {
+    Res<usize> format(Io::TextWriter &writer, Web::Http::Method method) {
+        return writer.writeStr(Web::Http::toStr(method));
+    }
+};
+
+template <>
+struct Karm::Fmt::Formatter<Web::Http::Version> {
+    Res<usize> format(Io::TextWriter &writer, Web::Http::Version version) {
+        return Fmt::format(writer, "HTTP/{}.{}", version.major, version.minor);
+    }
+};

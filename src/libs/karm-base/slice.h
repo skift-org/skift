@@ -460,6 +460,14 @@ always_inline constexpr Opt<usize> indexOf(T const &slice, U const &needle) {
     return NONE;
 }
 
+template <Sliceable T, typename U = T::Inner>
+always_inline constexpr Opt<usize> lastIndexOf(T const &slice, U const &needle) {
+    for (usize i = slice.len(); i > 0; i--)
+        if (slice[i - 1] == needle)
+            return i - 1;
+    return NONE;
+}
+
 always_inline Opt<usize> search(Sliceable auto const &slice, auto cmp) {
     if (slice.len() == 0) {
         return NONE;

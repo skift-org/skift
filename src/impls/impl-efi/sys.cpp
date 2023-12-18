@@ -57,6 +57,14 @@ struct ConOut : public Sys::Fd {
     Res<Strong<Fd>> dup() override {
         notImplemented();
     }
+
+    Res<Cons<Strong<Fd>, SocketAddr>> accept() override {
+        notImplemented();
+    }
+
+    Res<Stat> stat() override {
+        return Ok<Stat>();
+    }
 };
 
 struct FileProto : public Sys::Fd {
@@ -95,7 +103,7 @@ struct FileProto : public Sys::Fd {
         u64 current = 0;
         try$(_proto->getPosition(_proto, &current));
 
-        usize bufSize;
+        usize bufSize = 0;
         // NOTE: This is expectected to fail
         (void)_proto->getInfo(_proto, &Efi::FileInfo::GUID, &bufSize, nullptr);
 
@@ -124,6 +132,25 @@ struct FileProto : public Sys::Fd {
     Res<Strong<Fd>> dup() override {
         notImplemented();
     }
+
+    Res<Cons<Strong<Fd>, SocketAddr>> accept() override {
+        notImplemented();
+    }
+
+    Res<Stat> stat() override {
+        Efi::FileInfo *info = nullptr;
+        usize bufSize = 0;
+        // NOTE: This is expectected to fail
+        (void)_proto->getInfo(_proto, &Efi::FileInfo::GUID, &bufSize, nullptr);
+
+        Buf<u8> buf;
+        buf.resize(bufSize, 0);
+
+        info = (Efi::FileInfo *)buf.buf();
+        try$(_proto->getInfo(_proto, &Efi::FileInfo::GUID, &bufSize, info));
+
+        return Ok<Stat>(info->fileSize);
+    }
 };
 
 Res<Strong<Sys::Fd>> createIn() {
@@ -137,6 +164,18 @@ Res<Strong<Sys::Fd>> createOut() {
 Res<Strong<Sys::Fd>> createErr() {
     return Ok(makeStrong<ConOut>(Efi::st()->stdErr));
 }
+
+/* --- Sockets -------------------------------------------------------------- */
+
+Res<Strong<Sys::Fd>> connectTcp(SocketAddr) {
+    notImplemented();
+}
+
+Res<Strong<Sys::Fd>> listenTcp(SocketAddr) {
+    notImplemented();
+}
+
+/* --- Files ---------------------------------------------------------------- */
 
 static Opt<Json::Value> _index = NONE;
 

@@ -25,7 +25,7 @@ Child controls(TitlebarStyle style) {
                      cond(style == TitlebarStyle::DEFAULT),
                  button(bindBubble<Events::RequestMaximizeEvent>(), ButtonStyle::subtle(), Mdi::CROP_SQUARE) |
                      cond(style == TitlebarStyle::DEFAULT),
-                 button(bindBubble<Events::ExitEvent>(Ok()), ButtonStyle::subtle(), Mdi::CLOSE));
+                 button(bindBubble<Events::ExitEvent>(), ButtonStyle::subtle(), Mdi::CLOSE));
 }
 
 Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {

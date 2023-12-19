@@ -179,7 +179,7 @@ struct Md5 {
     usize _len{};
 
     auto step(Abcd abcd, Block const &input) -> Abcd {
-        uint32_t e;
+        u32 e;
 
         unsigned int j;
 

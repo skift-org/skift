@@ -39,7 +39,7 @@ Res<> Cmos::waitUpdate() {
 
 /* --- RTC ------------------------------------------------------------------ */
 
-static inline uint8_t fomBcd(uint8_t value) {
+static inline u8 fomBcd(u8 value) {
     return (value / 16) * 10 + (value & 0xf);
 }
 

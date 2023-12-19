@@ -18,6 +18,10 @@ struct In : public Io::Reader {
     Res<usize> read(MutBytes bytes) override {
         return _fd->read(bytes);
     }
+
+    Strong<Fd> underlying() {
+        return _fd;
+    }
 };
 
 struct Out : public Io::TextWriterBase<> {
@@ -39,6 +43,10 @@ struct Err : public Io::TextWriterBase<> {
 
     Res<usize> write(Bytes bytes) override {
         return _fd->write(bytes);
+    }
+
+    Strong<Fd> underlying() {
+        return _fd;
     }
 };
 

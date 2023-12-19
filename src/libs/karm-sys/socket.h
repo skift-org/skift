@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "addr.h"
 #include "fd.h"
 
@@ -28,6 +27,8 @@ struct TcpStream :
     virtual Res<usize> write(Bytes buf) override {
         return _fd->write(buf);
     }
+
+    Strong<Fd> underlying() { return _fd; }
 };
 
 struct TcpListener :
@@ -42,8 +43,8 @@ struct TcpListener :
         : _fd(std::move(fd)), _addr(addr) {}
 
     Res<TcpStream> accept();
+
+    Strong<Fd> underlying() { return _fd; }
 };
 
 } // namespace Karm::Sys
-
-

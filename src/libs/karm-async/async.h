@@ -121,85 +121,10 @@ struct Source : public Meta::NoCopy {
     virtual Res<TimeStamp> poll(Sink &) = 0;
 };
 
-/* --- Task ----------------------------------------------------------------- */
+/* --- Awaitable ------------------------------------------------------------ */
 
 template <typename T = void>
 using Coro = std::coroutine_handle<T>;
-
-template <typename T = Ok<>>
-struct Task : public Sink {
-    using Inner = T;
-
-    struct RetEvent {
-        T res;
-    };
-
-    struct Promise {
-        Sink *_sink;
-        Task get_return_object() { return {Coro<Promise>::from_promise(*this)}; }
-        std::suspend_never initial_suspend() { return {}; }
-        std::suspend_always final_suspend() noexcept { return {}; }
-        void unhandled_exception() {}
-        void return_value(T res) {
-            if (_sink)
-                loop().post<RetEvent>(*_sink, std::move(res));
-        }
-        void bind(Sink &sink) { _sink = &sink; }
-    };
-
-    Coro<Promise> _coro;
-    Coro<> _wait;
-    Opt<T> _ret;
-
-    Task(Coro<Promise> coro)
-        : _coro(coro) {}
-
-    Task(Task &&other)
-        : _coro(std::exchange(other._coro, {})) {}
-
-    ~Task() {
-        if (_coro)
-            _coro.destroy();
-    }
-
-    Promise &promise() {
-        return _coro.promise();
-    }
-
-    void bind(Sink &sink) {
-        promise().bind(sink);
-    }
-
-    Res<> post(Event &e) override {
-        _ret = std::move(e.unwrap<RetEvent>().res);
-        _wait.resume();
-        return Ok();
-    }
-
-    // Theses methods and types are required by the coroutine machinery
-
-    bool await_ready() const noexcept {
-        return false;
-    }
-
-    void await_suspend(Coro<> coro) noexcept {
-        _wait = coro;
-        bind(*this);
-    }
-
-    T await_resume() noexcept {
-        return _ret.take();
-    }
-
-    using promise_type = Promise;
-};
-
-template <typename... Args>
-inline Task<Tuple<typename Args::Inner...>> all(Args &...tasks) {
-    co_return {co_await tasks...};
-}
-
-/* --- Defer ---------------------------------------------------------------- */
 
 template <typename Source>
 struct Awaitable : public Sink {
@@ -230,6 +155,83 @@ struct Awaitable : public Sink {
         return Ok();
     }
 };
+
+/* --- Task ----------------------------------------------------------------- */
+
+template <typename T = Ok<>>
+struct [[nodiscard]] Task : public Sink {
+    using Inner = T;
+
+    struct Event {
+        T res;
+    };
+
+    struct Promise {
+        Sink *_sink;
+        Task get_return_object() { return {Coro<Promise>::from_promise(*this)}; }
+        std::suspend_never initial_suspend() { return {}; }
+        std::suspend_always final_suspend() noexcept { return {}; }
+        void unhandled_exception() {}
+        void return_value(T res) {
+            if (_sink)
+                loop().post<Event>(*_sink, std::move(res));
+        }
+        void bind(Sink &sink) { _sink = &sink; }
+    };
+
+    Coro<Promise> _coro;
+    Coro<> _wait;
+    Opt<T> _ret;
+
+    Task(Coro<Promise> coro)
+        : _coro(coro) {}
+
+    Task(Task &&other)
+        : _coro(std::exchange(other._coro, {})) {}
+
+    ~Task() {
+        if (_coro)
+            _coro.destroy();
+    }
+
+    Promise &promise() {
+        return _coro.promise();
+    }
+
+    void bind(Sink &sink) {
+        promise().bind(sink);
+    }
+
+    Res<> post(Async::Event &e) override {
+        _ret = std::move(e.template unwrap<Event>().res);
+        _wait.resume();
+        return Ok();
+    }
+
+    // Theses methods and types are required by the coroutine machinery
+
+    bool await_ready() const noexcept {
+        return false;
+    }
+
+    void await_suspend(Coro<> coro) noexcept {
+        _wait = coro;
+        bind(*this);
+    }
+
+    T await_resume() noexcept {
+        return _ret.take();
+    }
+
+    using promise_type = Promise;
+};
+
+template <typename... Args>
+inline Task<Tuple<typename Args::Inner...>> all(Args &...tasks) {
+    co_return {co_await tasks...};
+}
+
+/* --- Defer ---------------------------------------------------------------- */
 
 struct Defer : public Source {
     using Source::Source;
@@ -263,7 +265,7 @@ static inline Awaitable<Defer> defer() {
 /* --- Timer ---------------------------------------------------------------- */
 
 struct Timer : public Source {
-    struct TickEvent {
+    struct Event {
     };
 
     TimeStamp _next;
@@ -280,7 +282,7 @@ struct Timer : public Source {
             return Ok(TimeStamp::endOfTime());
 
         if (_next < loop().now()) {
-            loop().post<TickEvent>(sink);
+            loop().post<Event>(sink);
 
             if (not _repeat) {
                 _active = false;

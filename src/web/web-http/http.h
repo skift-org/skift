@@ -74,11 +74,27 @@ namespace Web::Http {
     CODE(510, NOT_EXTENDED)                    \
     CODE(511, NETWORK_AUTHENTICATION_REQUIRED)
 
-enum struct Code : uint16_t {
+enum struct Code : u16 {
 #define ITER(CODE, NAME) NAME = CODE,
     FOREACH_CODE(ITER)
 #undef ITER
 };
+
+enum struct CodeClass : u8 {
+    UNKNOWN = 0,
+    INFORMATIONAL = 1,
+    SUCCESS = 2,
+    REDIRECTION = 3,
+    CLIENT_ERROR = 4,
+    SERVER_ERROR = 5,
+};
+
+static inline CodeClass codeClass(Code code) {
+    u16 value = static_cast<u16>(code);
+    if (value < 100 or value > 599)
+        return CodeClass::UNKNOWN;
+    return static_cast<CodeClass>(value);
+}
 
 static inline Res<Code> parseCode(Io::SScan &s) {
     auto code = try$(s.nextUint());
@@ -115,7 +131,7 @@ static inline Str toStr(Code code) {
     METHOD(TRACE)              \
     METHOD(PATCH)
 
-enum struct Method : uint8_t {
+enum struct Method : u8 {
 #define ITER(NAME) NAME,
     FOREACH_METHOD(ITER)
 #undef ITER
@@ -142,8 +158,8 @@ static inline Str toStr(Method method) {
 }
 
 struct Version {
-    uint8_t major;
-    uint8_t minor;
+    u8 major;
+    u8 minor;
 };
 
 struct Request {

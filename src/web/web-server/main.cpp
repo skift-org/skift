@@ -1,6 +1,6 @@
+#include <karm-async/main.h>
 #include <karm-io/funcs.h>
 #include <karm-logger/logger.h>
-#include <karm-main/main.h>
 #include <karm-sys/file.h>
 #include <karm-sys/socket.h>
 #include <web-http/http.h>
@@ -38,26 +38,42 @@ Str contentType(Url::Path const &path) {
     return "application/octet-stream";
 }
 
-Res<> entryPoint(Ctx &) {
-    auto listener = try$(Sys::TcpListener::listen(Sys::Ip4::localhost(8080)));
+Async::Task<Res<>> entryPointAsync(Ctx &) {
+    auto listener = co_try$(Sys::TcpListener::listen(Sys::Ip4::localhost(8080)));
     logInfo("Serving on http://{}", listener._addr);
 
     while (true) {
-        auto stream = try$(listener.accept());
+        auto stream = co_try$(listener.accept());
 
         Array<char, 4096> buf;
-        auto len = try$(stream.read(mutBytes(buf)));
+        auto len = co_try$(stream.read(mutBytes(buf)));
 
         Str reqStr{buf.buf(), len};
         Io::SScan reqScan{reqStr};
-        auto req = try$(Web::Http::Request::parse(reqScan));
+        auto req = co_try$(Web::Http::Request::parse(reqScan));
         auto fileUrl = "bundle://web-server/public/"_url / req.path;
         auto ct = contentType(req.path);
-        logInfo("{}: {} {} -> {} ({})", stream._addr, req.method, req.path, fileUrl, ct);
-        auto file = try$(Sys::File::open(fileUrl));
-
+        auto maybeFile = Sys::File::open(fileUrl);
         Io::StringWriter header;
-        try$(Fmt::format(
+
+        if (not maybeFile.has()) {
+            logWarn("{}: {} {} -> 404", stream._addr, req.method, req.path);
+            co_try$(Fmt::format(
+                header,
+                "HTTP/1.1 404 Not Found\r\n"
+                "Connection: close\r\n"
+                "Content-Type: text/plain; charset=UTF-8\r\n"
+                "Content-Length: 9\r\n"
+                "X-Powered-By: Karm Web\r\n"
+                "\r\n"
+                "Not Found"));
+            co_try$(stream.write(header.bytes()));
+            continue;
+        }
+
+        logInfo("{}: {} {} -> {} ({})", stream._addr, req.method, req.path, fileUrl, ct);
+        auto &file = maybeFile.unwrap();
+        co_try$(Fmt::format(
             header,
             "HTTP/1.1 200 OK\r\n"
             "Connection: close\r\n"
@@ -66,9 +82,9 @@ Res<> entryPoint(Ctx &) {
             "X-Powered-By: Karm Web\r\n"
             "\r\n",
             ct,
-            try$(file.stat()).size));
+            co_try$(file.stat()).size));
 
-        try$(stream.write(header.bytes()));
-        try$(Io::copy(file, stream));
+        co_try$(stream.write(header.bytes()));
+        co_try$(Io::copy(file, stream));
     }
 }

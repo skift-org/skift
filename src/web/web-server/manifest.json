@@ -4,6 +4,7 @@
     "type": "exe",
     "description": "A simple HTTP server",
     "requires": [
+        "karm-async",
         "karm-main"
     ]
 }

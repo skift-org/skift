@@ -5,10 +5,10 @@
 
 namespace Karm::Sys {
 
-struct Mutext {
-    Res<Strong<Mutext>> create();
+struct Mutex {
+    Res<Strong<Mutex>> create();
 
-    virtual ~Mutext() = default;
+    virtual ~Mutex() = default;
 
     virtual void lock() = 0;
 

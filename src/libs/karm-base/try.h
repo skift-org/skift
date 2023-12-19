@@ -16,6 +16,15 @@
 
 #define co_try$(EXPR)                        \
     ({                                       \
+        auto __expr = (EXPR);                \
+        if (not static_cast<bool>(__expr)) { \
+            co_return __expr.none();         \
+        }                                    \
+        __expr.take();                       \
+    })
+
+#define co_try_await$(EXPR)                  \
+    ({                                       \
         auto __expr = co_await (EXPR);       \
         if (not static_cast<bool>(__expr)) { \
             co_return __expr.none();         \

@@ -40,12 +40,12 @@ struct File :
         return _fd->flush();
     }
 
-    Strong<Fd> asFd() {
-        return _fd;
-    }
-
     Res<Stat> stat() {
         return _fd->stat();
+    }
+
+    Strong<Fd> underlying() {
+        return _fd;
     }
 };
 

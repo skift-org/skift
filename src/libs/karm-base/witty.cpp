@@ -3,8 +3,6 @@
 namespace Karm {
 
 static Array WITTY = {
-    "Witty comment unavailable :(",
-
     "...",
     "(Give you up)",
     "[ insert a devse private joke here ]",
@@ -118,12 +116,12 @@ static Array WITTY = {
 };
 
 Str witty(usize seed) {
+    if (seed == 0)
+        return "Witty comment unavailable :(";
     return WITTY[seed % WITTY.len()];
 }
 
 static Array NICE = {
-    "Nice comment unavailable :(",
-
     "*hug you real hard*",
     "*hug*",
     "Congratulation",
@@ -153,6 +151,8 @@ static Array NICE = {
 };
 
 Str nice(usize seed) {
+    if (seed == 0)
+        return "Nice comment unavailable :(";
     return NICE[seed % NICE.len()];
 }
 

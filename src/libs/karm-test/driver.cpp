@@ -29,20 +29,20 @@ void Driver::runAll() {
     Sys::errln("Running {} tests...\n", _tests.len());
 
     for (auto *test : _tests) {
-        Sys::err("{}{} Running {}...{}{}", Cli::Cmd::clearLineAfter(), Cli::styled(" TEST ", Cli::style().bold().bg(Cli::CYAN)), Fmt::toNoCase(test->_name).unwrap(), Cli::Cmd::horizontal(0));
+        Sys::err("       Running {}: {}...",
+                 test->_loc.file, Fmt::toNoCase(test->_name).unwrap());
 
         auto result = test->run(*this);
         auto label = result
                          ? Cli::styled(" PASS ", Cli::style(Cli::WHITE).bold().bg(Cli::GREEN_LIGHT))
                          : Cli::styled(" FAIL ", RED);
 
-        Sys::err("{}{} {}", Cli::Cmd::clearLineAfter(), label, Fmt::toNoCase(test->_name).unwrap());
+        Sys::err("{}{}\n", Cli::Cmd::horizontal(0), label);
 
         if (not result) {
             Sys::errln(" - {}", Cli::styled(result.none().msg(), RED));
             failed++;
         } else {
-            Sys::errln("");
             passed++;
         }
     }
@@ -53,10 +53,10 @@ void Driver::runAll() {
         Sys::errln(" ❌ {} failled - {}",
                    Cli::styled(failed, RED),
                    Cli::styled(witty(Sys::now().val()), NOTE));
-        Sys::errln("    {} passed",
+        Sys::errln("    {} passed\n",
                    Cli::styled(passed, GREEN));
     } else {
-        Sys::errln(" 🤘 {} passed - {}",
+        Sys::errln(" 🤘 {} passed - {}\n",
                    Cli::styled(passed, GREEN),
                    Cli::styled(nice(Sys::now().val()), NOTE));
     }

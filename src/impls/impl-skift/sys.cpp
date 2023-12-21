@@ -48,7 +48,7 @@ struct VmoFd : public Sys::Fd {
 };
 
 Res<Strong<Sys::Fd>> openFile(Url::Url url) {
-    auto urlStr = try$(url.str());
+    auto urlStr = url.str();
     auto *fileRecord = useHandover().fileByName(urlStr.buf());
     if (not fileRecord)
         return Error::invalidFilename();

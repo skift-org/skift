@@ -38,7 +38,7 @@ struct Path {
 
     Res<usize> write(Io::TextWriter &writer) const;
 
-    Res<String> str() const;
+    String str() const;
 
     auto iter() const {
         return ::iter(_parts);
@@ -99,7 +99,7 @@ struct Url {
 
     Res<usize> write(Io::TextWriter &writer) const;
 
-    Res<String> str() const;
+    String str() const;
 
     auto iter() const {
         return path.iter();

@@ -16,12 +16,12 @@ struct Formatter<T> {
         }
     }
 
-    Res<usize> format(Io::TextWriter &writer, T const &slice) {
+    Res<usize> format(Io::TextWriter &writer, T const &val) {
         auto written = try$(writer.writeStr("{"));
-        for (usize i = 0; i < slice.len(); i++) {
+        for (usize i = 0; i < val.len(); i++) {
             if (i != 0)
                 written += try$(writer.writeStr(", "));
-            written += try$(inner.format(writer, slice[i]));
+            written += try$(inner.format(writer, val[i]));
         }
         return Ok(written + try$(writer.writeStr("}")));
     }

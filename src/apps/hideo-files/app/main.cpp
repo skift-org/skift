@@ -46,7 +46,7 @@ Ui::Child pageContent(State const &state) {
     auto dir = Sys::Dir::open(url);
     auto listing = dir
                        ? directoryListing(state, dir.unwrap())
-                       : alert(state, "Can't access this location", url.str().unwrap());
+                       : alert(state, "Can't access this location", url.str());
 
     return listing | Ui::grow();
 }

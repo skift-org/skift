@@ -82,7 +82,7 @@ struct [[nodiscard]] Error {
 
     constexpr Error none() const { return *this; }
 
-    constexpr char const *msg() {
+    constexpr char const *msg() const {
         if (_msg != nullptr and strlen(_msg) > 0) {
             return _msg;
         }

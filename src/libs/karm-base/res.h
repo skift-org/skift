@@ -62,7 +62,7 @@ struct [[nodiscard]] Res {
         return _inner.template is<Ok<V>>();
     }
 
-    always_inline constexpr E none() const {
+    always_inline constexpr E const &none() const {
         if (not _inner.template is<E>())
             panic("none() called on an ok");
         return _inner.template unwrap<E>();

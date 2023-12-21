@@ -151,7 +151,7 @@ Res<Url::Path> resolve(Url::Url url) {
 }
 
 Res<Strong<Sys::Fd>> openFile(Url::Url url) {
-    String str = try$(try$(resolve(url)).str());
+    String str = try$(resolve(url)).str();
     isize fd = ::open(str.buf(), O_RDONLY);
 
     if (fd < 0)
@@ -161,7 +161,7 @@ Res<Strong<Sys::Fd>> openFile(Url::Url url) {
 }
 
 Res<Vec<Sys::DirEntry>> readDir(Url::Url url) {
-    String str = try$(try$(resolve(url)).str());
+    String str = try$(resolve(url)).str();
 
     DIR *dir = ::opendir(str.buf());
     if (not dir)
@@ -189,7 +189,7 @@ Res<Vec<Sys::DirEntry>> readDir(Url::Url url) {
 }
 
 Res<Strong<Sys::Fd>> createFile(Url::Url url) {
-    String str = try$(try$(resolve(url)).str());
+    String str = try$(resolve(url)).str();
 
     auto fd = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
 

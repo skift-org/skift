@@ -206,7 +206,7 @@ static Res<Url::Path> resolve(Url::Url url) {
         auto path = url.path;
         path.rooted = false;
 
-        auto key = try$(url.str());
+        auto key = url.str();
         auto object = _index->get(key);
 
         if (not object.isObject()) {
@@ -247,7 +247,7 @@ Res<Strong<Sys::Fd>> openFile(Url::Url url) {
 
     Efi::FileProtocol *file = nullptr;
     auto resolved = try$(resolve(url));
-    _String<Utf16> pathStr = transcode<Utf16, Utf8>(try$(resolved.str()));
+    _String<Utf16> pathStr = transcode<Utf16, Utf8>(resolved.str());
 
     // NOTE: Convert '/' to '\' as EFI uses '\' as path separator
     for (auto &u : pathStr) {

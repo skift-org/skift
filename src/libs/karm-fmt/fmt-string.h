@@ -13,7 +13,7 @@ struct Formatter<Str> {
 
 template <>
 struct Formatter<String> {
-    Res<usize> format(Io::TextWriter &writer, String text) {
+    Res<usize> format(Io::TextWriter &writer, String const &text) {
         return writer.writeStr(text);
     }
 };

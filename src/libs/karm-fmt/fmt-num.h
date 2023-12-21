@@ -62,7 +62,7 @@ struct NumberFormater {
         }
     }
 
-    Res<usize> formatUnsigned(Io::TextWriter &writer, u64 value) {
+    Res<usize> formatUnsigned(Io::TextWriter &writer, usize val) {
         auto digit = [](usize v) {
             if (v < 10) {
                 return '0' + v;
@@ -74,9 +74,9 @@ struct NumberFormater {
         Array<char, 128> buf;
 
         do {
-            buf[i++] = digit(value % base);
-            value /= base;
-        } while (value != 0 and i < buf.len());
+            buf[i++] = digit(val % base);
+            val /= base;
+        } while (val != 0 and i < buf.len());
 
         if (width > 0) {
             usize n = width - i;
@@ -95,36 +95,34 @@ struct NumberFormater {
         return writer.writeStr({buf.buf(), i});
     }
 
-    Res<usize> formatSigned(Io::TextWriter &writer, i64 value) {
+    Res<usize> formatSigned(Io::TextWriter &writer, isize val) {
         usize written = 0;
-        if (value < 0) {
+        if (val < 0) {
             written += try$(writer.writeRune('-'));
-            value = -value;
+            val = -val;
         }
-
-        written += try$(formatUnsigned(writer, value));
+        written += try$(formatUnsigned(writer, val));
         return Ok(written);
     }
 };
 
 template <typename T>
 struct UnsignedFormatter : public NumberFormater {
-    Res<usize> format(Io::TextWriter &writer, T const value) {
-        if (isChar) {
-            return writer.writeRune(value);
-        }
-        return formatUnsigned(writer, value);
+    Res<usize> format(Io::TextWriter &writer, T const &val) {
+        if (isChar)
+            return writer.writeRune(val);
+        return formatUnsigned(writer, val);
     }
 };
 
 template <typename T>
 struct SignedFormatter : public NumberFormater {
-    Res<usize> format(Io::TextWriter &writer, T const value) {
+    Res<usize> format(Io::TextWriter &writer, T const &val) {
         if (isChar) {
-            return writer.writeRune(value);
+            return writer.writeRune(val);
         }
 
-        return formatSigned(writer, value);
+        return formatSigned(writer, val);
     }
 };
 
@@ -136,12 +134,12 @@ struct Formatter<T> : public SignedFormatter<T> {};
 
 template <>
 struct Formatter<f64> {
-    Res<usize> format(Io::TextWriter &writer, f64 const value) {
+    Res<usize> format(Io::TextWriter &writer, f64 const &val) {
         NumberFormater formater;
         usize written = 0;
-        isize ipart = (isize)value;
+        isize ipart = (isize)val;
         written += try$(formater.formatSigned(writer, ipart));
-        f64 fpart = value - (f64)ipart;
+        f64 fpart = val - (f64)ipart;
         if (fpart != 0.0) {
             written += try$(writer.writeRune('.'));
             formater.width = 6;

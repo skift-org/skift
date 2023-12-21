@@ -66,7 +66,7 @@ Res<> loadEntry(Entry const &entry) {
         auto blobMem = try$(Sys::mmap().map(blobFile));
         auto blobRange = blobMem.prange();
 
-        auto strId = payload.add(try$(blob.url.str()));
+        auto strId = payload.add(blob.url.str());
         auto propStr = try$(Json::stringify(blob.props));
         auto propsId = payload.add(propStr);
 

@@ -102,10 +102,10 @@ Res<usize> Path::write(Io::TextWriter &writer) const {
     return Ok(written);
 }
 
-Res<String> Path::str() const {
+String Path::str() const {
     Io::StringWriter writer;
-    try$(write(writer));
-    return Ok(writer.str());
+    write(writer).unwrap();
+    return writer.str();
 }
 
 /* --- Url ------------------------------------------------------------------ */
@@ -210,10 +210,10 @@ Res<usize> Url::write(Io::TextWriter &writer) const {
     return Ok(written);
 }
 
-Res<String> Url::str() const {
+String Url::str() const {
     Io::StringWriter writer;
-    try$(write(writer));
-    return Ok(writer.str());
+    write(writer).unwrap();
+    return writer.str();
 }
 
 Res<Url> parseUrlOrPath(Str str) {

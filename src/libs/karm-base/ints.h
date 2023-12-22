@@ -71,6 +71,14 @@ always_inline constexpr auto ror(auto x, auto n) {
     return (x >> n) | (x << (sizeof(x) * 8 - n));
 }
 
+always_inline constexpr auto rotl(auto x, auto n) {
+    return (x << n) | (x >> (sizeof(x) * 8 - n));
+}
+
+always_inline constexpr auto rotr(auto x, auto n) {
+    return (x >> n) | (x << (sizeof(x) * 8 - n));
+}
+
 /* --- Signed ---------------------------------------------------------- */
 
 using isize = ptrdiff_t;

@@ -33,7 +33,7 @@ struct Formatter<Error> {
 template <typename T, typename E>
 struct Formatter<Res<T, E>> {
     Formatter<T> _fmtOk;
-    Formatter<T> _fmtErr;
+    Formatter<E> _fmtErr;
 
     void parse(Io::SScan &scan) {
         if constexpr (requires() {
@@ -51,7 +51,7 @@ struct Formatter<Res<T, E>> {
 
     Res<usize> format(Io::TextWriter &writer, Res<T> const &val) {
         if (val)
-            return _fmtOk.format(writer, *val);
+            return _fmtOk.format(writer, val.unwrap());
         return _fmtErr.format(writer, val.none());
     }
 };

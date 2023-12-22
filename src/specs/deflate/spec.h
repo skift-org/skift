@@ -1,6 +1,5 @@
 #pragma once
 
-#include <karm-hash/hash.h>
 #include <karm-io/traits.h>
 
 // https://gist.github.com/vurtun/760a6a2a198b706a7b1a6197aa5ac747

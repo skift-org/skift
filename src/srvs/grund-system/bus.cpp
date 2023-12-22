@@ -11,7 +11,7 @@ Res<Strong<Unit>> Unit::load(Ctx &ctx, Url::Url url) {
     logInfo("system: loading service '{}'...", url);
 
     auto &handover = useHandover(ctx);
-    auto urlStr = try$(url.str());
+    auto urlStr = url.str();
     auto *elf = handover.fileByName(urlStr.buf());
     if (not elf)
         return Error::invalidFilename("service not found");

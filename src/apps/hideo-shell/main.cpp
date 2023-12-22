@@ -15,7 +15,9 @@ namespace Hideo::Shell {
 /* --- Status Bar ----------------------------------------------------------- */
 
 Ui::Child indicator(Media::Icon icon) {
-    return Ui::spacing({4}, Ui::center(Ui::icon(icon)));
+    return Ui::icon(icon) |
+           Ui::center() |
+           Ui::spacing(4);
 }
 
 Ui::Child statusbar() {
@@ -26,8 +28,14 @@ Ui::Child statusbar() {
                indicator(Mdi::NETWORK_STRENGTH_4),
                indicator(Mdi::BATTERY),
                Ui::labelLarge("100%") | Ui::center()) |
-           Ui::minSize({Ui::UNCONSTRAINED, 36}) |
-           Ui::box({.padding = {12, 0}, .backgroundPaint = Ui::GRAY900});
+           Ui::minSize({
+               Ui::UNCONSTRAINED,
+               36,
+           }) |
+           Ui::box({
+               .padding = {12, 0},
+               .backgroundPaint = Ui::GRAY900,
+           });
 }
 
 Ui::Child statusbarButton(State const &) {
@@ -75,10 +83,15 @@ Ui::Child taskbar(State const &) {
     return Ui::hflow(
                6,
                appsButton,
-               calButton | Ui::center() | Ui::grow(),
-               Ui::button(Keyboard::show, Ui::ButtonStyle::subtle(), Mdi::KEYBOARD),
+               calButton |
+                   Ui::center() |
+                   Ui::grow(),
+               Ui::button(
+                   Keyboard::show,
+                   Ui::ButtonStyle::subtle(),
+                   Mdi::KEYBOARD),
                trayButton) |
-           Ui::box(Ui::BoxStyle{
+           Ui::box({
                .padding = 6,
                .backgroundPaint = Ui::GRAY950.withOpacity(0.8),
            });
@@ -88,19 +101,23 @@ Ui::Child taskbar(State const &) {
 
 Ui::Child background(State const &state) {
     return Ui::image(state.background) |
-           Ui::cover() | Ui::grow();
+           Ui::cover() |
+           Ui::grow();
 }
 
 Ui::Child tabletPanels(State const &state) {
     return Ui::stack(
-        state.activePanel == Panel::APPS ? appsFlyout(state) : Ui::empty(),
-        state.activePanel == Panel::SYS ? sysFlyout(state) : Ui::empty());
+        state.activePanel == Panel::APPS
+            ? appsFlyout(state)
+            : Ui::empty(),
+        state.activePanel == Panel::SYS
+            ? sysFlyout(state)
+            : Ui::empty());
 }
 
 Ui::Child appHost(State const &state) {
-    if (state.surfaces.len() == 0) {
+    if (state.surfaces.len() == 0)
         return Ui::grow(NONE);
-    }
 
     auto &surface = state.surfaces[0];
     return Ui::empty() |
@@ -122,9 +139,21 @@ Ui::Child tablet(State const &state) {
 
 Ui::Child desktopPanels(State const &state) {
     return Ui::stack(
-               state.activePanel == Panel::APPS ? appsPanel(state) | Ui::align(Layout::Align::START | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
-               state.activePanel == Panel::NOTIS ? notiPanel(state) | Ui::align(Layout::Align::HCENTER | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty(),
-               state.activePanel == Panel::SYS ? sysPanel(state) | Ui::align(Layout::Align::END | Layout::Align::TOP) | Ui::slideIn(Ui::SlideFrom::TOP) : Ui::empty()) |
+               state.activePanel == Panel::APPS
+                   ? appsPanel(state) |
+                         Ui::align(Layout::Align::START | Layout::Align::TOP) |
+                         Ui::slideIn(Ui::SlideFrom::TOP)
+                   : Ui::empty(),
+               state.activePanel == Panel::NOTIS
+                   ? notiPanel(state) |
+                         Ui::align(Layout::Align::HCENTER | Layout::Align::TOP) |
+                         Ui::slideIn(Ui::SlideFrom::TOP)
+                   : Ui::empty(),
+               state.activePanel == Panel::SYS
+                   ? sysPanel(state) |
+                         Ui::align(Layout::Align::END | Layout::Align::TOP) |
+                         Ui::slideIn(Ui::SlideFrom::TOP)
+                   : Ui::empty()) |
            Ui::spacing({8, 38});
 }
 
@@ -231,11 +260,15 @@ Ui::Child app(bool isMobile) {
         },
         [](auto state) {
             return Ui::stack(
-                       state.locked ? lock(state)
-                                    : (state.isMobile ? tablet(state)
-                                                      : desktop(state)),
-                       state.isMobile ? tabletPanels(state)
-                                      : desktopPanels(state)) |
+                       state.locked
+                           ? lock(state)
+                           : (state.isMobile ? tablet(state)
+                                             : desktop(state)),
+
+                       state.isMobile
+                           ? tabletPanels(state)
+                           : desktopPanels(state)) |
+
                    Ui::dialogLayer() |
                    Ui::pinSize(
                        state.isMobile ? Math::Vec2i{411, 731}

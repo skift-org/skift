@@ -8,6 +8,21 @@
 
 To build skiftOS, you need to have a modern C/C++ compiler such as clang-16 installed on your computer. Additionally, you need to have the following tools installed: `python3`, `llvm`, `clang`, `ninja`, `nasm`, and `qemu`. Please refer to the documentation of these tools or use your package manager to install them.
 
+### Step 0: Clone the repository
+
+> [!NOTE]
+> If the following badge is red, it means that the repository is currently unstable and may not build correctly. Please refer to the [Discord server](https://discord.com/invite/gamGsfg) for more information.
+
+[![Build](https://github.com/skift-org/skift/actions/workflows/build.yml/badge.svg)](https://github.com/skift-org/skift/actions/workflows/build.yml)
+
+First, clone the repository by running the following command:
+
+```sh
+$ git clone https://github.com/skift-org/skift.git
+
+$ cd skift
+```
+
 ### Step 1: Set up the build environment
 
 First, set up the build environment by running the following command:

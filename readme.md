@@ -32,13 +32,13 @@
 
 For an overview of the project, please refer to the [doc/roadmap.md](doc/roadmap.md). For more information about the project, please refer to [doc/](doc/).
 
-## Contributing
-
-See [doc/contributing.md](doc/contributing.md)
-
 ## Building
 
 See [doc/building.md](doc/building.md)
+
+## Contributing
+
+See [doc/contributing.md](doc/contributing.md)
 
 ## Acknowledgements
 

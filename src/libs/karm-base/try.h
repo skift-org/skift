@@ -35,12 +35,26 @@
 namespace Karm {
 
 template <typename T>
+concept Takeable = requires(T t) {
+    { t.take() };
+};
+
+template <typename T>
+using TakeableType = decltype(std::declval<T>().take());
+
+template <typename T>
+concept Unwrapable = requires(T t) {
+    { t.unwrap() };
+};
+
+template <typename T>
+using UnwrapableType = Meta::RemoveRef<decltype(std::declval<T>().unwrap())>;
+
+template <typename T>
 concept Tryable = requires(T t) {
     { not static_cast<bool>(t) };
     { t.none() };
-    { t.unwrap() };
-    { t.take() };
-};
+} and Unwrapable<T> and Takeable<T>;
 
 auto tryOr(Tryable auto opt, Meta::RemoveRef<decltype(opt.unwrap())> defaultValue) -> Meta::RemoveRef<decltype(opt.unwrap())> {
     if (not opt) {

@@ -34,9 +34,13 @@ For an overview of the project, please refer to the [doc/roadmap.md](doc/roadmap
 
 ## Building
 
+Building skiftOS from source is easy.
+
 See [doc/building.md](doc/building.md)
 
 ## Contributing
+
+Contributions are welcome!
 
 See [doc/contributing.md](doc/contributing.md)
 

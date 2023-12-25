@@ -29,20 +29,15 @@ void Driver::runAll() {
     Sys::errln("Running {} tests...\n", _tests.len());
 
     for (auto *test : _tests) {
-        Sys::err("       Running {}: {}...",
+        Sys::err("Running {}: {}... ",
                  test->_loc.file, Fmt::toNoCase(test->_name).unwrap());
 
         auto result = test->run(*this);
-        auto label = result
-                         ? Cli::styled(" PASS ", Cli::style(Cli::WHITE).bold().bg(Cli::GREEN_LIGHT))
-                         : Cli::styled(" FAIL ", RED);
-
-        Sys::err("{}{}\n", Cli::Cmd::horizontal(0), label);
 
         if (not result) {
-            Sys::errln(" - {}", Cli::styled(result.none().msg(), RED));
             failed++;
         } else {
+            Sys::errln("{}", Cli::styled("PASS", Cli::style(Cli::GREEN).bold()));
             passed++;
         }
     }

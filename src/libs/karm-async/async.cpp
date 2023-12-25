@@ -89,26 +89,24 @@ Res<usize> Loop::dispatch() {
 
 Res<> Loop::run() {
     while (true) {
-        usize count = 0;
-        TimeStamp until = TimeStamp::endOfTime();
-
-        do {
-            until = try$(poll());
-            count = try$(dispatch());
-            _collect();
-        } while (count);
-
-        if (_sources.len() == 0)
-            return Ok();
-
-        if (_ret) {
-            auto ret = *_ret;
-            _ret = NONE;
-            return *_ret;
-        }
-
+        auto until = try$(runOnce());
+        if (exited())
+            return takeResult();
         try$(wait(until));
     }
+}
+
+Res<TimeStamp> Loop::runOnce() {
+    usize count = 0;
+    TimeStamp until = TimeStamp::endOfTime();
+
+    do {
+        until = try$(poll());
+        count = try$(dispatch());
+        _collect();
+    } while (count);
+
+    return Ok(until);
 }
 
 } // namespace Karm::Async

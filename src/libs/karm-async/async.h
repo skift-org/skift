@@ -20,6 +20,9 @@ namespace Karm::Async {
 struct Sink;
 struct Source;
 
+template <typename T>
+struct Task;
+
 struct Loop : public Meta::Static {
     struct Queued {
         Sink *sink;
@@ -51,6 +54,16 @@ struct Loop : public Meta::Static {
 
     /* --- Public --- */
 
+    bool exited() const {
+        return _ret.has() or _sources.len() == 0;
+    }
+
+    Res<> takeResult() {
+        if (_ret.has())
+            return _ret.take();
+        return Ok();
+    }
+
     void _collect();
 
     Res<TimeStamp> poll();
@@ -63,6 +76,8 @@ struct Loop : public Meta::Static {
 
     Res<> run();
 
+    Res<TimeStamp> runOnce();
+
     void quit(Res<> ret) { _ret = ret; }
 
     template <typename E, typename... Args>
@@ -71,25 +86,27 @@ struct Loop : public Meta::Static {
     }
 };
 
-static Loop &loop() { return _Embed::loop(); }
+static inline Loop &globalLoop() { return _Embed::loop(); }
 
 /* --- Sink ----------------------------------------------------------------- */
 
 struct Sink : public Meta::NoCopy {
+    Loop &_loop;
 
-    Sink() = default;
+    Sink(Loop &loop = globalLoop())
+        : _loop{loop} {}
 
-    Sink(Sink &&other) {
-        loop()._move(other, this);
+    Sink(Sink &&other) : _loop{other._loop} {
+        _loop._move(other, this);
     }
 
     Sink &operator=(Sink &&other) {
-        loop()._move(other, this);
+        _loop._move(other, this);
         return *this;
     }
 
     virtual ~Sink() {
-        loop()._move(*this, nullptr);
+        _loop._move(*this, nullptr);
     }
 
     // This needs to be protected to avoid Source from posting Event to a Sink directly.
@@ -101,135 +118,226 @@ protected:
 /* --- Source --------------------------------------------------------------- */
 
 struct Source : public Meta::NoCopy {
-    Source(Sink &sink) {
-        loop()._bind(*this, sink);
+    Loop &_loop;
+
+    Loop &loop() const { return _loop; }
+
+    Source(Loop &loop = globalLoop())
+        : _loop{loop} {
     }
 
-    Source(Source &&other) {
-        loop()._move(other, this);
+    Source(Source &&other) : _loop{other._loop} {
+        _loop._move(other, this);
     }
 
     Source &operator=(Source &&other) {
-        loop()._move(other, this);
+        _loop._move(other, this);
         return *this;
     }
 
+    void bind(Sink &sink) {
+        _loop._bind(*this, sink);
+    }
+
     virtual ~Source() {
-        loop()._move(*this, nullptr);
+        _loop._move(*this, nullptr);
     }
 
     virtual Res<TimeStamp> poll(Sink &) = 0;
 };
 
+template <typename T>
+struct _SourceRet;
+
+template <Takeable T>
+struct _SourceRet<T> {
+    using Type = TakeableType<T>;
+};
+
+template <typename T>
+    requires(not Takeable<T>)
+struct _SourceRet<T> {
+    using Type = Ok<>;
+};
+
+template <typename T>
+using SourceRet = typename _SourceRet<typename T::Event>::Type;
+
+template <typename T>
+using EventRet = typename _SourceRet<T>::Type;
+
 /* --- Awaitable ------------------------------------------------------------ */
 
 template <typename T = void>
-using Coro = std::coroutine_handle<T>;
+using CoroHandle = std::coroutine_handle<T>;
 
 template <typename Source>
-struct Awaitable : public Sink {
+struct Awaiter : public Sink {
     Source _source;
-    Coro<> _coro = nullptr;
+    CoroHandle<> _coro = nullptr;
+    Opt<SourceRet<Source>> _ret;
 
-    template <typename... Args>
-    Awaitable(Args... args)
-        : Sink{}, _source{*this, std::forward<Args>(args)...} {
+    template <typename T>
+    Awaiter(Loop &loop, T &&args)
+        : Sink{loop}, _source{std::forward<T>(args)} {
+        _source.bind(*this);
     }
 
     constexpr bool await_ready() const {
         return false;
     }
 
-    void await_suspend(Coro<> coro) {
+    void await_suspend(CoroHandle<> coro) {
         _coro = coro;
     }
 
-    void await_resume() const {}
+    SourceRet<Source> await_resume() {
+        return _ret.take();
+    }
 
-    Res<> post(Async::Event &) override {
+    Res<> post(Async::Event &e) override {
         if (not _coro)
             panic("no coro");
 
-        auto coro = std::exchange(_coro, nullptr);
-        coro.resume();
-        return Ok();
+        if (_ret.has())
+            panic("already resumed");
+
+        if (auto *se = e.is<typename Source::Event>()) {
+            if constexpr (Takeable<typename Source::Event>) {
+                _ret = se->take();
+            } else {
+                _ret = Ok();
+            }
+
+            auto coro = std::exchange(_coro, nullptr);
+            coro.resume();
+            return Ok();
+        }
+
+        panic("unexpected event");
     }
 };
 
 /* --- Task ----------------------------------------------------------------- */
 
 template <typename T = Ok<>>
-struct [[nodiscard]] Task : public Sink {
+struct [[nodiscard]] Task :
+    public Source {
     using Inner = T;
 
     struct Event {
         T res;
+        T take() { return std::move(res); }
     };
 
     struct Promise {
-        Sink *_sink;
-        Task get_return_object() { return {Coro<Promise>::from_promise(*this)}; }
-        std::suspend_never initial_suspend() { return {}; }
-        std::suspend_always final_suspend() noexcept { return {}; }
-        void unhandled_exception() {}
-        void return_value(T res) {
-            if (_sink)
-                loop().post<Event>(*_sink, std::move(res));
+        Opt<T> _ret = NONE;
+
+        // This is needed because by default the compiler will try to pass
+        // all the coroutine arguments to the constructor of the promise
+        Promise() {}
+
+        Task get_return_object() {
+            return {CoroHandle<Promise>::from_promise(*this)};
         }
-        void bind(Sink &sink) { _sink = &sink; }
+        std::suspend_never initial_suspend() {
+            return {};
+        }
+        std::suspend_always final_suspend() noexcept {
+            return {};
+        }
+
+        void unhandled_exception() {}
+
+        void return_value(T res) {
+            if (_ret.has())
+                panic("already returned");
+            _ret = std::move(res);
+        }
+
+        bool has() const {
+            return _ret.has();
+        }
+
+        T take() {
+            return _ret.take();
+        }
     };
 
-    Coro<Promise> _coro;
-    Coro<> _wait;
-    Opt<T> _ret;
+    using promise_type = Promise;
 
-    Task(Coro<Promise> coro)
+    CoroHandle<Promise> _coro;
+
+    Promise &promise() {
+        return _coro.promise();
+    }
+
+    Task(CoroHandle<Promise> coro)
         : _coro(coro) {}
 
     Task(Task &&other)
-        : _coro(std::exchange(other._coro, {})) {}
+        : _coro(std::exchange(other._coro, nullptr)) {}
 
     ~Task() {
         if (_coro)
             _coro.destroy();
     }
 
-    Promise &promise() {
-        return _coro.promise();
+    Res<TimeStamp> poll(Sink &sink) override {
+        if (not _coro)
+            return Ok(TimeStamp::endOfTime());
+
+        if (promise().has()) {
+            _loop.post<Event>(sink, promise().take());
+            _coro.destroy();
+            _coro = nullptr;
+            return Ok(TimeStamp::epoch());
+        }
+
+        return Ok(TimeStamp::endOfTime());
     }
 
-    void bind(Sink &sink) {
-        promise().bind(sink);
+    Awaiter<Task<T>> operator co_await() {
+        return {loop(), std::move(*this)};
     }
-
-    Res<> post(Async::Event &e) override {
-        _ret = std::move(e.template unwrap<Event>().res);
-        _wait.resume();
-        return Ok();
-    }
-
-    // Theses methods and types are required by the coroutine machinery
-
-    bool await_ready() const noexcept {
-        return false;
-    }
-
-    void await_suspend(Coro<> coro) noexcept {
-        _wait = coro;
-        bind(*this);
-    }
-
-    T await_resume() noexcept {
-        return _ret.take();
-    }
-
-    using promise_type = Promise;
 };
 
 template <typename... Args>
 inline Task<Tuple<typename Args::Inner...>> all(Args &...tasks) {
     co_return {co_await tasks...};
 }
+
+template <typename T = Ok<>>
+void runDetached(Task<T> task);
+
+template <typename T = Ok<>>
+Res<T> runSync(Task<T> task, Loop &loop = globalLoop()) {
+    Opt<T> res;
+    struct Sink : public Async::Sink {
+        Opt<T> &res;
+        Sink(Opt<T> &res) : res{res} {}
+
+        Res<> post(Async::Event &e) override {
+            if (auto *se = e.is<typename Task<T>::Event>()) {
+                res = se->take();
+                return Ok();
+            }
+            panic("unexpected event");
+        }
+    };
+
+    Sink sink{res};
+    task.bind(sink);
+    while (true) {
+        auto until = try$(loop.runOnce());
+        if (res.has())
+            return Ok(res.take());
+        try$(loop.wait(until));
+    }
+}
+
+template <typename T = None>
+using Prom = Task<Res<T>>;
 
 /* --- Defer ---------------------------------------------------------------- */
 
@@ -247,33 +355,35 @@ struct Defer : public Source {
 
     Res<TimeStamp> poll(Sink &sink) override {
         if (not _once) {
-            loop().post<Event>(sink);
+            _loop.post<Event>(sink);
             _once = true;
         }
         return Ok(TimeStamp::endOfTime());
     };
+
+    Awaiter<Defer> operator co_await() {
+        return {loop(), std::move(*this)};
+    }
 };
 
-static inline void defer(Sink &sink) {
-    loop().post<Defer::Event>(sink);
-}
-
-static inline Awaitable<Defer> defer() {
-    return {};
+static inline auto defer(Loop &loop = globalLoop()) {
+    return Defer{loop};
 }
 
 /* --- Timer ---------------------------------------------------------------- */
 
 struct Timer : public Source {
     struct Event {
+        TimeStamp now;
+        TimeStamp take() { return now; }
     };
 
     TimeStamp _next;
     Opt<TimeSpan> _repeat;
     bool _active = true;
 
-    Timer(Sink &sink, TimeStamp next, Opt<TimeSpan> repeat)
-        : Source(sink),
+    Timer(TimeStamp next, Opt<TimeSpan> repeat = NONE, Loop &loop = globalLoop())
+        : Source(loop),
           _next{next},
           _repeat{repeat} {}
 
@@ -281,8 +391,9 @@ struct Timer : public Source {
         if (not _active)
             return Ok(TimeStamp::endOfTime());
 
-        if (_next < loop().now()) {
-            loop().post<Event>(sink);
+        auto now = _loop.now();
+        if (_next < now) {
+            _loop.post<Event>(sink, now);
 
             if (not _repeat) {
                 _active = false;
@@ -294,26 +405,22 @@ struct Timer : public Source {
 
         return Ok(_next);
     };
+
+    Awaiter<Timer> operator co_await() {
+        return {loop(), std::move(*this)};
+    }
 };
 
-static inline Timer every(Sink &sink, TimeSpan span) {
-    return {sink, loop().now() + span, span};
+static inline Timer every(TimeSpan span, Loop &loop = globalLoop()) {
+    return {loop.now() + span, span, loop};
 }
 
-static inline Timer after(Sink &sink, TimeSpan span) {
-    return {sink, loop().now() + span, NONE};
+static inline Timer after(TimeSpan span, Loop &loop = globalLoop()) {
+    return {loop.now() + span, NONE, loop};
 }
 
-static inline Timer after(Sink &sink, TimeStamp stamp) {
-    return {sink, stamp, NONE};
-}
-
-static inline Awaitable<Timer> after(TimeStamp stamp) {
-    return {stamp, NONE};
-}
-
-static inline Awaitable<Timer> after(TimeSpan span) {
-    return {loop().now() + span, NONE};
+static inline Timer after(TimeStamp stamp, Loop &loop = globalLoop()) {
+    return {stamp, NONE, loop};
 }
 
 } // namespace Karm::Async

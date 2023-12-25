@@ -38,7 +38,7 @@ Str contentType(Url::Path const &path) {
     return "application/octet-stream";
 }
 
-Async::Task<Res<>> entryPointAsync(Ctx &) {
+Async::Prom<> entryPointAsync(Ctx &) {
     auto listener = co_try$(Sys::TcpListener::listen(Sys::Ip4::localhost(8080)));
     logInfo("Serving on http://{}", listener._addr);
 

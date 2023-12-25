@@ -4,18 +4,8 @@
 
 #include "async.h"
 
-Async::Task<Res<>> entryPointAsync(Ctx &);
+Async::Prom<> entryPointAsync(Ctx &);
 
 Res<> entryPoint(Ctx &ctx) {
-    auto task = entryPointAsync(ctx);
-    struct Sink : public Async::Sink {
-        Res<> post(Async::Event &e) override {
-            if (auto *ret = e.is<Async::Task<Res<>>::Inner>())
-                Async::loop().quit(*ret);
-            return Ok();
-        }
-    };
-    Sink sink;
-    task.bind(sink);
-    return Async::loop().run();
+    return try$(Async::runSync(entryPointAsync(ctx)));
 }

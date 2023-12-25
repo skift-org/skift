@@ -1,25 +1,11 @@
-<br/>
-<br/>
-<br/>
-<br/>
-
-<p align="center">
-  <img src="doc/logo-light.svg#gh-light-mode-only" height="64" />
-  <img src="doc/logo-dark.svg#gh-dark-mode-only" height="64" />
-</p>
-
-<br/>
-
-<p align="center">
+<img src="doc/logo-light.svg#gh-light-mode-only" height="36" />
+<img src="doc/logo-dark.svg#gh-dark-mode-only" height="36" />
+<p>
   <a href="https://skift.smnx.sh/">Website</a> -
   <a href="https://discord.com/invite/gamGsfg">Discord</a> -
+  <a href="https://github.com/skift-org/skift/tree/main/doc">Documentation</a> -
   <a href="https://github.com/skift-org/skift/releases">Releases</a>
 </p>
-
-<br/>
-<br/>
-<br/>
-
 
 ## About
 

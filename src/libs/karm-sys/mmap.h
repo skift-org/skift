@@ -238,7 +238,7 @@ struct _Mmap {
     }
 
     Res<Mmap> map(AsFd auto &what) {
-        return map(what.underlying());
+        return map(what.fd());
     }
 
     Res<MutMmap> mapMut() {
@@ -254,7 +254,7 @@ struct _Mmap {
     }
 
     Res<MutMmap> mapMut(AsFd auto &what) {
-        return mapMut(what.underlying());
+        return mapMut(what.fd());
     }
 };
 

@@ -4,6 +4,13 @@
 
 namespace Karm::Fmt {
 
+template <>
+struct Formatter<None> {
+    Res<usize> format(Io::TextWriter &writer, None const &) {
+        return writer.writeStr("None");
+    }
+};
+
 template <typename T>
 struct Formatter<Opt<T>> {
     Formatter<T> formatter;

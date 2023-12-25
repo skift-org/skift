@@ -154,7 +154,7 @@ struct FileProto : public Sys::Fd {
 };
 
 Res<Strong<Sys::Fd>> createIn() {
-    return Ok(makeStrong<Sys::DummyFd>());
+    return Ok(makeStrong<Sys::NullFd>());
 }
 
 Res<Strong<Sys::Fd>> createOut() {

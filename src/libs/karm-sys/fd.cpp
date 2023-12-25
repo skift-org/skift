@@ -2,34 +2,42 @@
 
 namespace Karm::Sys {
 
-Res<usize> DummyFd::read(MutBytes) {
+Res<usize> NullFd::read(MutBytes) {
     return Ok(0uz);
 }
 
-Res<usize> DummyFd::write(Bytes) {
+Res<usize> NullFd::write(Bytes) {
     return Ok(0uz);
 }
 
-Res<usize> DummyFd::seek(Io::Seek) {
+Res<usize> NullFd::seek(Io::Seek) {
     return Ok(0uz);
 }
 
-Res<usize> DummyFd::flush() {
+Res<usize> NullFd::flush() {
     return Ok(0uz);
 }
 
-Res<Strong<Fd>> DummyFd::dup() {
-    return Ok(makeStrong<DummyFd>());
+Res<Strong<Fd>> NullFd::dup() {
+    return Ok(makeStrong<NullFd>());
 }
 
-Res<Cons<Strong<Fd>, SocketAddr>> DummyFd::accept() {
+Res<Cons<Strong<Fd>, SocketAddr>> NullFd::accept() {
     return Ok<Cons<Strong<Fd>, SocketAddr>>(
-        makeStrong<DummyFd>(),
+        makeStrong<NullFd>(),
         Ip4::unspecified(0));
 }
 
-Res<Stat> DummyFd::stat() {
+Res<Stat> NullFd::stat() {
     return Ok(Stat{});
+}
+
+Res<> NullFd::sendFd(Strong<Fd>) {
+    return Ok();
+}
+
+Res<Strong<Fd>> NullFd::recvFd() {
+    return Ok(makeStrong<NullFd>());
 }
 
 } // namespace Karm::Sys

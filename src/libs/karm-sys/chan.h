@@ -19,7 +19,7 @@ struct In : public Io::Reader {
         return _fd->read(bytes);
     }
 
-    Strong<Fd> underlying() {
+    Strong<Fd> fd() {
         return _fd;
     }
 };
@@ -45,7 +45,7 @@ struct Err : public Io::TextWriterBase<> {
         return _fd->write(bytes);
     }
 
-    Strong<Fd> underlying() {
+    Strong<Fd> fd() {
         return _fd;
     }
 };

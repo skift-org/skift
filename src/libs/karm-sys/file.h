@@ -1,16 +1,15 @@
 #pragma once
 
 #include <karm-base/rc.h>
-#include <karm-io/traits.h>
-#include <karm-meta/nocopy.h>
 
 #include "fd.h"
 
 namespace Karm::Sys {
 
-struct File :
-    public Io::Reader,
-    public Io::Writer,
+struct FileReader;
+struct FileWriter;
+
+struct _File :
     public Io::Seeker,
     public Io::Flusher,
     Meta::NoCopy {
@@ -18,19 +17,8 @@ struct File :
     Strong<Fd> _fd;
     Url::Url _url;
 
-    File(Strong<Fd> fd, Url::Url url) : _fd(fd), _url(url) {}
-
-    static Res<File> create(Url::Url url);
-
-    static Res<File> open(Url::Url url);
-
-    Res<usize> read(MutBytes bytes) override {
-        return _fd->read(bytes);
-    }
-
-    Res<usize> write(Bytes bytes) override {
-        return _fd->write(bytes);
-    }
+    _File(Strong<Fd> fd, Url::Url url)
+        : _fd(fd), _url(url) {}
 
     Res<usize> seek(Io::Seek seek) override {
         return _fd->seek(seek);
@@ -44,9 +32,45 @@ struct File :
         return _fd->stat();
     }
 
-    Strong<Fd> underlying() {
+    Strong<Fd> fd() {
         return _fd;
     }
+};
+
+struct FileReader :
+    public virtual _File,
+    public Io::Reader {
+
+    using _File::_File;
+
+    Res<usize> read(MutBytes bytes) override {
+        return _fd->read(bytes);
+    }
+};
+
+struct FileWriter :
+    public virtual _File,
+    public Io::Writer {
+
+    using _File::_File;
+
+    Res<usize> write(Bytes bytes) override {
+        return _fd->write(bytes);
+    }
+};
+
+struct File :
+    public FileReader,
+    public FileWriter {
+
+    using FileReader::FileReader;
+    using FileWriter::FileWriter;
+
+    static Res<FileWriter> create(Url::Url url);
+
+    static Res<FileReader> open(Url::Url url);
+
+    static Res<File> openOrCreate(Url::Url url);
 };
 
 } // namespace Karm::Sys

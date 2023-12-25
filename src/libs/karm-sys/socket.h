@@ -5,46 +5,111 @@
 
 namespace Karm::Sys {
 
-/* --- Tcp Socket ----------------------------------------------------------- */
+/* --- Abstract Socket ------------------------------------------------------ */
 
-struct TcpStream :
+struct _Connection :
     public Io::Reader,
     public Io::Writer,
+    public Io::Flusher,
     public Meta::NoCopy {
 
     Strong<Sys::Fd> _fd;
-    SocketAddr _addr;
 
-    static Res<TcpStream> connect(SocketAddr addr);
+    _Connection(Strong<Sys::Fd> fd)
+        : _fd(std::move(fd)) {}
 
-    TcpStream(Strong<Sys::Fd> fd, SocketAddr addr)
-        : _fd(std::move(fd)), _addr(addr) {}
+    virtual ~_Connection() = default;
 
-    virtual Res<usize> read(MutBytes buf) override {
+    _Connection(_Connection &&) = default;
+
+    _Connection &operator=(_Connection &&) = default;
+
+    Res<usize> read(MutBytes buf) override {
         return _fd->read(buf);
     }
 
-    virtual Res<usize> write(Bytes buf) override {
+    Res<usize> write(Bytes buf) override {
         return _fd->write(buf);
     }
 
-    Strong<Fd> underlying() { return _fd; }
+    Res<usize> flush() override {
+        return _fd->flush();
+    }
+
+    Strong<Fd> fd() { return _fd; }
 };
 
-struct TcpListener :
+template <typename C>
+struct _Listener :
     public Meta::NoCopy {
 
     Strong<Sys::Fd> _fd;
+
+    _Listener(Strong<Sys::Fd> fd)
+        : _fd(std::move(fd)) {}
+
+    Res<C> accept() {
+        auto [fd, addr] = try$(_fd->accept());
+        return Ok(C(std::move(fd), addr));
+    }
+
+    Strong<Fd> fd() { return _fd; }
+};
+
+/* --- Tcp Socket ----------------------------------------------------------- */
+
+struct TcpConnection :
+    public _Connection {
+
+    SocketAddr _addr;
+
+    static Res<TcpConnection> connect(SocketAddr addr);
+
+    TcpConnection(Strong<Sys::Fd> fd, SocketAddr addr)
+        : _Connection(std::move(fd)), _addr(addr) {}
+};
+
+struct TcpListener :
+    public _Listener<TcpConnection> {
+
     SocketAddr _addr;
 
     static Res<TcpListener> listen(SocketAddr addr);
 
     TcpListener(Strong<Sys::Fd> fd, SocketAddr addr)
-        : _fd(std::move(fd)), _addr(addr) {}
+        : _Listener(std::move(fd)), _addr(addr) {}
+};
 
-    Res<TcpStream> accept();
+/* --- Ipc Socket ---------------------------------------------------------- */
 
-    Strong<Fd> underlying() { return _fd; }
+struct IpcConnection :
+    public _Connection {
+
+    Opt<Url::Url> _url;
+
+    static Res<IpcConnection> connect(Url::Url url);
+
+    IpcConnection(Strong<Sys::Fd> fd, Url::Url url)
+        : _Connection(std::move(fd)), _url(std::move(url)) {}
+
+    Res<> sendFd(AsFd auto &fd) {
+        return _fd->sendFd(fd.fd());
+    }
+
+    Res<Strong<Fd>> recvFd() {
+        return _fd->recvFd();
+    }
+};
+
+struct IpcListener :
+    public _Listener<TcpConnection> {
+
+    Opt<Url::Url> _url;
+
+    static Res<IpcListener> listen(Url::Url url);
+
+    IpcListener(Strong<Sys::Fd> fd, Url::Url url)
+        : _Listener(std::move(fd)), _url(std::move(url)) {}
 };
 
 } // namespace Karm::Sys

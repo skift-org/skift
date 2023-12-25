@@ -7,15 +7,9 @@
 #include <url/url.h>
 
 #include "addr.h"
+#include "stat.h"
 
 namespace Karm::Sys {
-
-struct Stat {
-    usize size;
-    TimeStamp accessTime;
-    TimeStamp modifyTime;
-    TimeStamp changeTime;
-};
 
 struct Fd : Meta::NoCopy {
     virtual ~Fd() = default;
@@ -33,9 +27,13 @@ struct Fd : Meta::NoCopy {
     virtual Res<Cons<Strong<Fd>, SocketAddr>> accept() = 0;
 
     virtual Res<Stat> stat() = 0;
+
+    virtual Res<> sendFd(Strong<Fd>) = 0;
+
+    virtual Res<Strong<Fd>> recvFd() = 0;
 };
 
-struct DummyFd : public Fd {
+struct NullFd : public Fd {
     Res<usize> read(MutBytes) override;
 
     Res<usize> write(Bytes) override;
@@ -49,11 +47,15 @@ struct DummyFd : public Fd {
     Res<Cons<Strong<Fd>, SocketAddr>> accept() override;
 
     Res<Stat> stat() override;
+
+    Res<> sendFd(Strong<Fd>) override;
+
+    Res<Strong<Fd>> recvFd() override;
 };
 
 template <typename T>
 concept AsFd = requires(T t) {
-    { t.underlying() } -> Meta::Same<Strong<Fd>>;
+    { t.fd() } -> Meta::Same<Strong<Fd>>;
 };
 
 } // namespace Karm::Sys

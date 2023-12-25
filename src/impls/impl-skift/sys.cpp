@@ -67,15 +67,15 @@ Res<Cons<Strong<Sys::Fd>, Strong<Sys::Fd>>> createPipe() {
 }
 
 Res<Strong<Sys::Fd>> createIn() {
-    return Ok(makeStrong<Sys::DummyFd>());
+    return Ok(makeStrong<Sys::NullFd>());
 }
 
 Res<Strong<Sys::Fd>> createOut() {
-    return Ok(makeStrong<Sys::DummyFd>());
+    return Ok(makeStrong<Sys::NullFd>());
 }
 
 Res<Strong<Sys::Fd>> createErr() {
-    return Ok(makeStrong<Sys::DummyFd>());
+    return Ok(makeStrong<Sys::NullFd>());
 }
 
 Res<Vec<Sys::DirEntry>> readDir(Url::Url) {

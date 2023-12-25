@@ -1,16 +1,12 @@
 #pragma once
 
-#include "fd.h"
+#include "file.h"
 
 namespace Karm::Sys {
 
 struct Pipe {
-    Strong<Fd> _in;
-    Strong<Fd> _out;
-
-    Strong<Fd> in() { return _in; }
-    Strong<Fd> out() { return _out; }
-
+    FileWriter in;
+    FileReader out;
     static Res<Pipe> create();
 };
 

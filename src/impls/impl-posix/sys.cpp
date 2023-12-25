@@ -40,6 +40,19 @@ static SocketAddr fromSockAddr(struct sockaddr_in sockaddr) {
     return addr;
 }
 
+static Stat fromStat(struct stat const &buf) {
+    Stat stat{};
+    Stat::Type type = Stat::FILE;
+    if (S_ISDIR(buf.st_mode))
+        type = Stat::DIR;
+    stat.type = type;
+    stat.size = (usize)buf.st_size;
+    stat.accessTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_atime);
+    stat.modifyTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_mtime);
+    stat.changeTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_ctime);
+    return stat;
+}
+
 /* --- File Descriptor ------------------------------------------------------ */
 
 struct PosixFd : public Sys::Fd {
@@ -116,14 +129,81 @@ struct PosixFd : public Sys::Fd {
         struct stat buf;
         if (fstat(_raw, &buf) < 0)
             return Posix::fromLastErrno();
+        return Ok(fromStat(buf));
+    }
 
-        return Ok(Stat{
-            .size = (usize)buf.st_size,
-        });
+    Res<> sendFd(Strong<Fd> fd) override {
+        auto *posixFd = fd.is<PosixFd>();
+        if (not posixFd)
+            return Error::invalidHandle("fd is not a posix fd");
+
+        struct iovec iov {};
+        // We need to send at least one byte of data
+        char data{};
+        iov.iov_base = &data;
+        iov.iov_len = sizeof(data);
+
+        struct msghdr msg {};
+        msg.msg_name = nullptr;
+        msg.msg_namelen = 0;
+        msg.msg_iov = &iov;
+        msg.msg_iovlen = 1;
+        msg.msg_controllen = CMSG_SPACE(sizeof(int));
+        Array<Byte, CMSG_SPACE(sizeof(int))> ctrl_buf{};
+        msg.msg_control = ctrl_buf.buf();
+
+        struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
+        cmsg->cmsg_level = SOL_SOCKET;
+        cmsg->cmsg_type = SCM_RIGHTS;
+        cmsg->cmsg_len = CMSG_LEN(sizeof(int));
+
+        *((int *)CMSG_DATA(cmsg)) = posixFd->_raw;
+
+        if (::sendmsg(_raw, &msg, 0) < 0)
+            return Posix::fromLastErrno();
+
+        return Ok();
+    }
+
+    Res<Strong<Fd>> recvFd() override {
+        struct iovec iov {};
+        // We need to send at least one byte of data
+        char data{};
+        iov.iov_base = &data;
+        iov.iov_len = sizeof(data);
+
+        struct msghdr msg {};
+        msg.msg_name = nullptr;
+        msg.msg_namelen = 0;
+        msg.msg_iov = &iov;
+        msg.msg_iovlen = 1;
+        msg.msg_controllen = CMSG_SPACE(sizeof(int));
+        Array<Byte, CMSG_SPACE(sizeof(int))> ctrl_buf{};
+        msg.msg_control = ctrl_buf.buf();
+
+        if (::recvmsg(_raw, &msg, 0) < 0)
+            return Posix::fromLastErrno();
+
+        struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
+        if (not cmsg)
+            return Error::invalidHandle("no cmsg");
+
+        if (cmsg->cmsg_level != SOL_SOCKET)
+            return Error::invalidHandle("invalid cmsg level");
+
+        if (cmsg->cmsg_type != SCM_RIGHTS)
+            return Error::invalidHandle("invalid cmsg type");
+
+        if (cmsg->cmsg_len != CMSG_LEN(sizeof(int)))
+            return Error::invalidHandle("invalid cmsg len");
+
+        int fd = *((int *)CMSG_DATA(cmsg));
+
+        return Ok(makeStrong<PosixFd>(fd));
     }
 };
 
-Res<Url::Path> resolve(Url::Url url) {
+Res<Url::Path> resolve(Url::Url const &url) {
     Url::Path resolved;
     if (url.scheme == "file") {
         resolved = url.path;
@@ -150,17 +230,64 @@ Res<Url::Path> resolve(Url::Url url) {
     return Ok(resolved);
 }
 
-Res<Strong<Sys::Fd>> openFile(Url::Url url) {
+Res<Strong<Sys::Fd>> openFile(Url::Url const &url) {
     String str = try$(resolve(url)).str();
-    isize fd = ::open(str.buf(), O_RDONLY);
 
-    if (fd < 0)
+    isize raw = ::open(str.buf(), O_RDONLY);
+    if (raw < 0)
         return Posix::fromLastErrno();
-
-    return Ok(makeStrong<PosixFd>(fd));
+    auto fd = makeStrong<PosixFd>(raw);
+    if (try$(fd->stat()).type == Stat::DIR)
+        return Error::isADirectory();
+    return Ok(fd);
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Url::Url url) {
+Res<Strong<Sys::Fd>> createFile(Url::Url const &url) {
+    String str = try$(resolve(url)).str();
+
+    auto raw = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
+    if (raw < 0)
+        return Posix::fromLastErrno();
+    return Ok(makeStrong<PosixFd>(raw));
+}
+
+Res<Strong<Sys::Fd>> openOrCreateFile(Url::Url const &url) {
+    String str = try$(resolve(url)).str();
+
+    auto raw = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
+    if (raw < 0)
+        return Posix::fromLastErrno();
+    auto fd = makeStrong<PosixFd>(raw);
+    if (try$(fd->stat()).type == Stat::DIR)
+        return Error::isADirectory();
+    return Ok(fd);
+}
+
+Res<Pair<Strong<Sys::Fd>>> createPipe() {
+    int fds[2];
+
+    if (::pipe(fds) < 0)
+        return Posix::fromLastErrno();
+
+    return Ok(Pair<Strong<Sys::Fd>>{
+        makeStrong<PosixFd>(fds[0]),
+        makeStrong<PosixFd>(fds[1]),
+    });
+}
+
+Res<Strong<Sys::Fd>> createIn() {
+    return Ok(makeStrong<PosixFd>(0));
+}
+
+Res<Strong<Sys::Fd>> createOut() {
+    return Ok(makeStrong<PosixFd>(1));
+}
+
+Res<Strong<Sys::Fd>> createErr() {
+    return Ok(makeStrong<PosixFd>(2));
+}
+
+Res<Vec<Sys::DirEntry>> readDir(Url::Url const &url) {
     String str = try$(resolve(url)).str();
 
     DIR *dir = ::opendir(str.buf());
@@ -188,40 +315,12 @@ Res<Vec<Sys::DirEntry>> readDir(Url::Url url) {
     return Ok(entries);
 }
 
-Res<Strong<Sys::Fd>> createFile(Url::Url url) {
+Res<Stat> stat(Url::Url const &url) {
     String str = try$(resolve(url)).str();
-
-    auto fd = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
-
-    if (fd < 0) {
+    struct stat buf;
+    if (::stat(str.buf(), &buf) < 0)
         return Posix::fromLastErrno();
-    }
-
-    return Ok(makeStrong<PosixFd>(fd));
-}
-
-Res<Pair<Strong<Sys::Fd>>> createPipe() {
-    int fds[2];
-
-    if (::pipe(fds) < 0)
-        return Posix::fromLastErrno();
-
-    return Ok(Pair<Strong<Sys::Fd>>{
-        makeStrong<PosixFd>(fds[0]),
-        makeStrong<PosixFd>(fds[1]),
-    });
-}
-
-Res<Strong<Sys::Fd>> createIn() {
-    return Ok(makeStrong<PosixFd>(0));
-}
-
-Res<Strong<Sys::Fd>> createOut() {
-    return Ok(makeStrong<PosixFd>(1));
-}
-
-Res<Strong<Sys::Fd>> createErr() {
-    return Ok(makeStrong<PosixFd>(2));
+    return Ok(fromStat(buf));
 }
 
 /* --- Sockets -------------------------------------------------------------- */

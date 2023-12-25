@@ -38,10 +38,7 @@ jobs:
             python-version: '3.11'
 
       - name: Install Dependencies
-        run: |
-            sudo apt update
-            sudo apt install git ninja-build libsdl2-dev nasm gcc-multilib mtools
-            sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm 16
+        run: sudo meta/scripts/setup-ubuntu.sh
 
       - name: Set up the build environment
         run: ./skift.sh tools setup && ./skift.sh tools doctor

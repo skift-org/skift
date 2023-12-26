@@ -119,15 +119,7 @@ using Bytes = Slice<Byte>;
 using MutBytes = MutSlice<Byte>;
 
 template <Sliceable S, typename T = typename S::Inner>
-constexpr Slice<T> sub(S &slice) {
-    return {
-        slice.buf(),
-        slice.len(),
-    };
-}
-
-template <Sliceable S, typename T = typename S::Inner>
-constexpr Slice<T> sub(S &slice, usize start, usize end) {
+constexpr Slice<T> sub(S const &slice, usize start, usize end) {
     return {
         slice.buf() + start,
         clamp(end, start, slice.len()) - start,
@@ -135,7 +127,15 @@ constexpr Slice<T> sub(S &slice, usize start, usize end) {
 }
 
 template <Sliceable S, typename T = typename S::Inner>
-Slice<T> next(S &slice, usize start = 1) {
+constexpr Slice<T> sub(S const &slice) {
+    return {
+        slice.buf(),
+        slice.len(),
+    };
+}
+
+template <Sliceable S, typename T = typename S::Inner>
+Slice<T> next(S const &slice, usize start) {
     return sub(slice, start, slice.len());
 }
 
@@ -177,12 +177,12 @@ MutBytes mutBytes(S &slice) {
 }
 
 template <Sliceable S>
-usize sizeOf(S &slice) {
+usize sizeOf(S const &slice) {
     return slice.len() * sizeof(typename S::Inner);
 }
 
 template <Sliceable S>
-constexpr auto iter(S &slice) {
+constexpr auto iter(S const &slice) {
     return Iter([&slice, i = 0uz]() mutable -> typename S::Inner const * {
         if (i >= slice.len()) {
             return nullptr;
@@ -193,7 +193,7 @@ constexpr auto iter(S &slice) {
 }
 
 template <Sliceable S>
-constexpr auto iterRev(S &slice) {
+constexpr auto iterRev(S const &slice) {
     return Iter([&slice, i = slice.len()]() mutable -> typename S::Inner const * {
         if (i == 0) {
             return nullptr;
@@ -222,100 +222,6 @@ constexpr auto mutIterRev(S &slice) {
         }
 
         return &slice.buf()[--i];
-    });
-}
-
-template <Sliceable S>
-constexpr auto iterSplit(S &slice, typename S::Inner const &sep) {
-    return Iter([&slice, sep, i = 0uz]() mutable -> Opt<Slice<typename S::Inner>> {
-        if (i >= slice.len()) {
-            return NONE;
-        }
-
-        usize start = i;
-        while (i < slice.len() and slice.buf()[i] != sep) {
-            i++;
-        }
-
-        usize end = i;
-        if (i < slice.len()) {
-            i++;
-        }
-
-        return Slice{
-            slice.buf() + start,
-            end - start,
-        };
-    });
-}
-
-template <Sliceable S>
-constexpr auto iterLevelSplit(S &slice, typename S::Inner const &sep) {
-    return Iter([&slice, sep, i = 0uz]() mutable -> Opt<Slice<typename S::Inner>> {
-        if (i >= slice.len()) {
-            return NONE;
-        }
-
-        while (i < slice.len() and slice.buf()[i] != sep) {
-            i++;
-        }
-
-        usize end = i;
-        if (i < slice.len()) {
-            i++;
-        }
-
-        return Slice{
-            slice.buf(),
-            end,
-        };
-    });
-}
-
-template <Sliceable S>
-constexpr auto iterSplitRev(S &slice, typename S::Inner const &sep) {
-    return Iter([&slice, sep, i = slice.len()]() mutable -> Opt<Slice<typename S::Inner>> {
-        if (i == 0) {
-            return NONE;
-        }
-
-        usize end = i;
-        while (i > 0 and slice.buf()[i - 1] != sep) {
-            i--;
-        }
-
-        usize start = i;
-        if (i > 0) {
-            i--;
-        }
-
-        return Slice{
-            slice.buf() + start,
-            end - start,
-        };
-    });
-}
-
-template <Sliceable S>
-constexpr auto iterLevelSplitRev(S &slice, typename S::Inner const &sep) {
-    return Iter([&slice, sep, i = slice.len()]() mutable -> Opt<Slice<typename S::Inner>> {
-        if (i == 0) {
-            return NONE;
-        }
-
-        usize end = i;
-        while (i > 0 and slice.buf()[i - 1] != sep) {
-            i--;
-        }
-
-        if (i > 0) {
-            i--;
-        }
-
-        return Slice{
-            slice.buf(),
-            end,
-        };
     });
 }
 

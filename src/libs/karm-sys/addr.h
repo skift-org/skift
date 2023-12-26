@@ -40,20 +40,17 @@ union Ip4 {
 
         for (auto i = 0; i < 4; ++i) {
             auto n = s.nextUint(10);
-            if (not n) {
+            if (not n)
                 return Error::invalidInput("invalid ip address");
-            }
 
-            if (n.unwrap() > 255) {
-                return Error::invalidInput("invalid IP address");
-            }
+            if (n.unwrap() > 255)
+                return Error::invalidInput("invalid ip address");
 
             addr.bytes[i] = n.unwrap();
 
             if (i < 3) {
-                if (not s.skip('.')) {
-                    return Error::invalidInput("invalid IP address");
-                }
+                if (not s.skip('.'))
+                    return Error::invalidInput("invalid ip address");
             }
         }
 
@@ -119,17 +116,17 @@ struct Ip : public Var<Ip4, Ip6> {
     using Var<Ip4, Ip6>::Var;
 
     static Res<Ip> parse(Io::SScan &s) {
+        auto saved = s;
         auto maybeV6 = Ip6::parse(s);
 
-        if (maybeV6) {
-            return Ok(Ip(maybeV6.unwrap()));
-        }
+        if (maybeV6)
+            return Ok(maybeV6.unwrap());
 
+        s = saved;
         auto maybeV4 = Ip4::parse(s);
 
-        if (maybeV4) {
-            return Ok(Ip(maybeV4.unwrap()));
-        }
+        if (maybeV4)
+            return Ok(maybeV4.unwrap());
 
         return Error::invalidInput("invalid IP address");
     }

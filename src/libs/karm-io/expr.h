@@ -30,8 +30,21 @@ inline auto negate(auto expr) {
 
 inline auto until(auto expr) {
     return [=](auto &scan) {
-        while (not expr(scan) and not scan.ended())
+        auto saved = scan;
+        while (not expr(scan) and not scan.ended()) {
             scan.next();
+            saved = scan;
+        }
+        scan = saved;
+        return true;
+    };
+}
+
+inline auto untilAndConsume(auto expr) {
+    return [=](auto &scan) {
+        while (not expr(scan) and not scan.ended()) {
+            scan.next();
+        }
         return true;
     };
 }
@@ -61,6 +74,17 @@ inline auto zeroOrOne(auto expr) {
     return [=](auto &scan) {
         expr(scan);
         return true;
+    };
+}
+
+inline auto token(Str &out, auto expr) {
+    return [=, &out](auto &scan) {
+        scan.begin();
+        if (expr(scan)) {
+            out = scan.end();
+            return true;
+        }
+        return false;
     };
 }
 

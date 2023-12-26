@@ -27,7 +27,7 @@ struct _SScan {
     }
 
     _Str<E> remStr() {
-        return {_cursor.begin(), _cursor.end()};
+        return {::begin(_cursor), ::end(_cursor)};
     }
 
     Rune curr() {

@@ -177,13 +177,22 @@ struct Header {
 
     Res<> _parse(Io::SScan &s) {
         while (not s.ended()) {
-            auto key = s.token(Re::until(Re::single(':')));
-            s.skip(':');
-            auto value = s.token(Re::until(Re::single('\r')));
+            Str key, value;
+
+            auto expr = Re::chain(
+                Re::token(key, Re::until(Re::separator(':'))),
+                Re::separator(':'),
+                Re::token(value, Re::until(Re::chain(Re::zeroOrMore(Re::single(' ')), Re::word("\r\n")))),
+                Re::zeroOrMore(Re::single(' ')),
+                Re::word("\r\n"));
+
+            if (not s.skip(expr))
+                return Error::invalidData("Expected header");
+
             headers.put(key, value);
-            if (s.skip("\r\n\r\n"))
+
+            if (s.skip("\r\n"))
                 break;
-            s.skip("\r\n");
         }
 
         return Ok();
@@ -238,6 +247,8 @@ struct Response : public Header {
 
         if (not s.skip(' '))
             return Error::invalidData("Expected space");
+
+        s.skip(Re::untilAndConsume(Re::word("\r\n")));
 
         try$(res._parse(s));
 

@@ -70,7 +70,7 @@ struct [[nodiscard]] Error {
     FOREACH_ERROR(ITER)
 #undef ITER
 
-    constexpr Error() : _code(Code::OTHER) {}
+    constexpr Error() : _code(Code::OTHER), _msg("unknown error") {}
 
     constexpr Error(Code code) : _code(code) {}
 

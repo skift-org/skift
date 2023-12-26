@@ -26,6 +26,10 @@ struct _SScan {
         return transcodeLen<E>(curr);
     }
 
+    _Str<E> remStr() {
+        return {_cursor.begin(), _cursor.end()};
+    }
+
     Rune curr() {
         if (ended()) {
             return '\0';
@@ -90,10 +94,9 @@ struct _SScan {
         auto save = _cursor;
         if (predicate(*this)) {
             return true;
-        } else {
-            _cursor = save;
-            return false;
         }
+        _cursor = save;
+        return false;
     }
 
     bool eat(Rune c) {
@@ -124,16 +127,16 @@ struct _SScan {
         _begin = _cursor;
     }
 
-    Str end() {
+    _Str<E> end() {
         return {_begin, _cursor};
     }
 
-    Str token(auto predicate) {
-        begin();
+    _Str<E> token(auto predicate) {
+        _begin = _cursor;
         if (not skip(predicate)) {
             _cursor = _begin;
         }
-        return end();
+        return {_begin, _cursor};
     }
 
     /* --- Number parsing --------------------------------------------------- */
@@ -254,5 +257,20 @@ struct _SScan {
 };
 
 using SScan = _SScan<Utf8>;
+
+static inline Opt<usize> parseUint(Str str) {
+    auto s = SScan(str);
+    return s.nextUint();
+}
+
+static inline Opt<isize> parseInt(Str str) {
+    auto s = SScan(str);
+    return s.nextInt();
+}
+
+static inline Opt<f64> parseFloat(Str str) {
+    auto s = SScan(str);
+    return s.nextFloat();
+}
 
 } // namespace Karm::Io

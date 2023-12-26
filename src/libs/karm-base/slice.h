@@ -135,7 +135,7 @@ constexpr Slice<T> sub(S &slice, usize start, usize end) {
 }
 
 template <Sliceable S, typename T = typename S::Inner>
-Slice<T> next(S &slice, usize start) {
+Slice<T> next(S &slice, usize start = 1) {
     return sub(slice, start, slice.len());
 }
 
@@ -161,7 +161,7 @@ MutSlice<T> mutNext(S &slice, usize start) {
 }
 
 template <Sliceable S>
-Bytes bytes(S &slice) {
+Bytes bytes(S const &slice) {
     return {
         reinterpret_cast<Byte const *>(slice.buf()),
         slice.len() * sizeof(typename S::Inner),

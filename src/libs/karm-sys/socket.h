@@ -11,18 +11,19 @@ struct _Connection :
     public Io::Reader,
     public Io::Writer,
     public Io::Flusher,
-    public Meta::NoCopy {
+    public Meta::NoCopy {};
+
+struct Connection :
+    public _Connection {
 
     Strong<Sys::Fd> _fd;
 
-    _Connection(Strong<Sys::Fd> fd)
+    Connection(Strong<Sys::Fd> fd)
         : _fd(std::move(fd)) {}
 
-    virtual ~_Connection() = default;
+    Connection(Connection &&) = default;
 
-    _Connection(_Connection &&) = default;
-
-    _Connection &operator=(_Connection &&) = default;
+    Connection &operator=(Connection &&) = default;
 
     Res<usize> read(MutBytes buf) override {
         return _fd->read(buf);
@@ -59,14 +60,18 @@ struct _Listener :
 /* --- Tcp Socket ----------------------------------------------------------- */
 
 struct TcpConnection :
-    public _Connection {
+    public Connection {
 
     SocketAddr _addr;
 
     static Res<TcpConnection> connect(SocketAddr addr);
 
     TcpConnection(Strong<Sys::Fd> fd, SocketAddr addr)
-        : _Connection(std::move(fd)), _addr(addr) {}
+        : Connection(std::move(fd)), _addr(addr) {}
+
+    SocketAddr addr() const {
+        return _addr;
+    }
 };
 
 struct TcpListener :
@@ -78,19 +83,23 @@ struct TcpListener :
 
     TcpListener(Strong<Sys::Fd> fd, SocketAddr addr)
         : _Listener(std::move(fd)), _addr(addr) {}
+
+    SocketAddr addr() const {
+        return _addr;
+    }
 };
 
 /* --- Ipc Socket ---------------------------------------------------------- */
 
 struct IpcConnection :
-    public _Connection {
+    public Connection {
 
     Opt<Url::Url> _url;
 
     static Res<IpcConnection> connect(Url::Url url);
 
     IpcConnection(Strong<Sys::Fd> fd, Url::Url url)
-        : _Connection(std::move(fd)), _url(std::move(url)) {}
+        : Connection(std::move(fd)), _url(std::move(url)) {}
 
     Res<> sendFd(AsFd auto &fd) {
         return _fd->sendFd(fd.fd());

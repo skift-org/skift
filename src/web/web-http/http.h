@@ -160,13 +160,40 @@ static inline Str toStr(Method method) {
 struct Version {
     u8 major;
     u8 minor;
+
+    static Res<Version> parse(Io::SScan &s) {
+        if (not s.skip("HTTP/"))
+            return Error::invalidData("Expected \"HTTP/\"");
+        Version v;
+        v.major = try$(s.nextUint());
+        s.skip('.');
+        v.minor = try$(s.nextUint());
+        return Ok(v);
+    }
 };
 
-struct Request {
+struct Header {
+    Map<Str, Str> headers;
+
+    Res<> _parse(Io::SScan &s) {
+        while (not s.ended()) {
+            auto key = s.token(Re::until(Re::single(':')));
+            s.skip(':');
+            auto value = s.token(Re::until(Re::single('\r')));
+            headers.put(key, value);
+            if (s.skip("\r\n\r\n"))
+                break;
+            s.skip("\r\n");
+        }
+
+        return Ok();
+    }
+};
+
+struct Request : public Header {
     Method method;
     Url::Path path;
     Version version;
-    Map<Str, Str> headers;
 
     static Res<Request> parse(Io::SScan &s) {
         Request req;
@@ -184,27 +211,37 @@ struct Request {
         if (not s.skip(' '))
             return Error::invalidData("Expected space");
 
-        if (not s.skip("HTTP/"))
-            return Error::invalidData("Expected \"HTTP/\"");
-
-        req.version.major = try$(s.nextUint());
-        s.skip('.');
-        req.version.minor = try$(s.nextUint());
+        req.version = try$(Version::parse(s));
 
         if (not s.skip("\r\n"))
             return Error::invalidData("Expected \"\\r\\n\"");
 
-        while (not s.ended()) {
-            auto key = s.token(Re::until(Re::single(':')));
-            s.skip(':');
-            auto value = s.token(Re::until(Re::single('\r')));
-            req.headers.put(key, value);
-            if (s.skip("\r\n\r\n"))
-                break;
-            s.skip("\r\n");
-        }
+        try$(req._parse(s));
 
         return Ok(req);
+    }
+};
+
+struct Response : public Header {
+    Version version;
+    Code code;
+
+    static Res<Response> parse(Io::SScan &s) {
+        Response res;
+
+        res.version = try$(Version::parse(s));
+
+        if (not s.skip(' '))
+            return Error::invalidData("Expected space");
+
+        res.code = try$(parseCode(s));
+
+        if (not s.skip(' '))
+            return Error::invalidData("Expected space");
+
+        try$(res._parse(s));
+
+        return Ok(res);
     }
 };
 

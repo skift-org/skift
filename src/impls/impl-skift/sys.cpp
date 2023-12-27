@@ -98,7 +98,7 @@ Res<Strong<Sys::Fd>> createErr() {
     return Ok(makeStrong<Sys::NullFd>());
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Url::Url) {
+Res<Vec<Sys::DirEntry>> readDir(Url::Url const &) {
     notImplemented();
 }
 
@@ -109,6 +109,10 @@ Res<Strong<Sys::Fd>> connectTcp(SocketAddr) {
 }
 
 Res<Strong<Sys::Fd>> listenTcp(SocketAddr) {
+    notImplemented();
+}
+
+Res<Strong<Sys::Fd>> listenUdp(SocketAddr) {
     notImplemented();
 }
 

@@ -210,6 +210,10 @@ Res<Strong<Sys::Fd>> listenTcp(SocketAddr) {
     notImplemented();
 }
 
+Res<Strong<Sys::Fd>> listenUdp(SocketAddr) {
+    notImplemented();
+}
+
 /* --- Files ---------------------------------------------------------------- */
 
 static Opt<Json::Value> _index = NONE;

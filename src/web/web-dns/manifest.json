@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "web-dns",
+    "type": "lib",
+    "description": "DNS Protocol implementation",
+    "requires": [
+        "karm-sys"
+    ]
+}

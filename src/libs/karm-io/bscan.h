@@ -38,6 +38,10 @@ struct BScan {
         return _cursor.rem();
     }
 
+    always_inline constexpr Bytes remBytes() {
+        return Bytes{_cursor.buf(), rem()};
+    }
+
     always_inline constexpr BScan &skip(usize n) {
         n = min(n, rem());
         _cursor.next(n);
@@ -51,56 +55,55 @@ struct BScan {
     }
 
     template <typename T>
-    always_inline constexpr bool readTo(T *buf, usize n) {
+    always_inline constexpr bool readTo(T *buf, usize n = 1) {
         if (rem() < n) {
             return false;
         }
 
         u8 *b = reinterpret_cast<u8 *>(buf);
-        for (usize i = 0; i < n; i++) {
+        for (usize i = 0; i < sizeof(T) * n; i++) {
             b[i] = _cursor.next();
         }
         return true;
     }
 
     template <typename T>
-    always_inline constexpr bool peekTo(T *buf, usize n) {
-        if (rem() < n) {
+    always_inline constexpr bool peekTo(T *buf, usize n = 1) {
+        if (rem() < n)
             return false;
-        }
 
         u8 *b = reinterpret_cast<u8 *>(buf);
-        for (usize i = 0; i < n; i++) {
+        for (usize i = 0; i < n; i++)
             b[i] = _cursor.buf()[i];
-        }
+
         return true;
     }
 
     template <typename T>
     always_inline constexpr T nextBe() {
         Be<T> r{};
-        readTo(&r, sizeof(T));
+        readTo(&r);
         return r;
     }
 
     template <typename T>
     always_inline constexpr T nextLe() {
         Le<T> r;
-        readTo(&r, sizeof(T));
+        readTo(&r);
         return r;
     }
 
     template <typename T>
     always_inline constexpr T peekBe() {
         Be<T> r{};
-        peekTo(&r, sizeof(T));
+        peekTo(&r);
         return r;
     }
 
     template <typename T>
     always_inline constexpr T peekLe() {
         Le<T> r;
-        peekTo(&r, sizeof(T));
+        peekTo(&r);
         return r;
     }
 
@@ -252,10 +255,6 @@ struct BScan {
         }
         return true;
     }
-
-    always_inline constexpr Bytes restBytes() {
-        return nextBytes(rem());
-    }
 };
 
 template <typename T, usize Offset>
@@ -284,7 +283,7 @@ struct BChunk {
         typename T::Type r{};
         begin()
             .skip(T::offset)
-            .readTo(&r, sizeof(typename T::Type));
+            .readTo(&r);
         return r;
     }
 };

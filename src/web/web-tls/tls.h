@@ -35,38 +35,38 @@ isHello(Bytes buf) {
 }
 
 struct TlsConnection : public Sys::_Connection {
-    Sys::_Connection &_con;
+    Sys::_Connection &_conn;
 
-    static Res<TlsConnection> accept(Sys::_Connection &con, Bytes hello) {
+    static Res<TlsConnection> accept(Sys::_Connection &conn, Bytes hello) {
         if (not isHello(hello))
             return Error::connectionRefused("not a tls client hello");
 
         Io::BScan s{hello};
 
-        auto tls = TlsConnection(con);
+        auto tls = TlsConnection(conn);
 
         return Ok(std::move(tls));
     }
 
-    static Res<TlsConnection> connect(Sys::TcpConnection &con) {
-        auto tls = TlsConnection(con);
+    static Res<TlsConnection> connect(Sys::TcpConnection &conn) {
+        auto tls = TlsConnection(conn);
 
         return Ok(std::move(tls));
     }
 
-    TlsConnection(Sys::_Connection &con)
-        : _con(con) {}
+    TlsConnection(Sys::_Connection &conn)
+        : _conn(conn) {}
 
     Res<usize> read(MutBytes buf) override {
-        return _con.read(buf);
+        return _conn.read(buf);
     }
 
     Res<usize> write(Bytes buf) override {
-        return _con.write(buf);
+        return _conn.write(buf);
     }
 
     Res<usize> flush() override {
-        return _con.flush();
+        return _conn.flush();
     }
 };
 

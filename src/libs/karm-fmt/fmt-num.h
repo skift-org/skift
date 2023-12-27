@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/endian.h>
 #include <karm-meta/signess.h>
 
 #include "base.h"
@@ -148,6 +149,20 @@ struct Formatter<f64> {
             written += try$(formater.formatUnsigned(writer, (u64)fpart));
         }
         return Ok(written);
+    }
+};
+
+template <typename T>
+struct Formatter<Be<T>> : public Formatter<T> {
+    Res<usize> format(Io::TextWriter &writer, Be<T> const &val) {
+        return Formatter<T>::format(writer, val.value());
+    }
+};
+
+template <typename T>
+struct Formatter<Le<T>> : public Formatter<T> {
+    Res<usize> format(Io::TextWriter &writer, Le<T> const &val) {
+        return Formatter<T>::format(writer, val.value());
     }
 };
 

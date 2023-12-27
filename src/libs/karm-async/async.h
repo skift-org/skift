@@ -90,7 +90,7 @@ static inline Loop &globalLoop() { return _Embed::loop(); }
 
 /* --- Sink ----------------------------------------------------------------- */
 
-struct Sink : public Meta::NoCopy {
+struct Sink : Meta::NoCopy {
     Loop &_loop;
 
     Sink(Loop &loop = globalLoop())
@@ -117,7 +117,7 @@ protected:
 
 /* --- Source --------------------------------------------------------------- */
 
-struct Source : public Meta::NoCopy {
+struct Source : Meta::NoCopy {
     Loop &_loop;
 
     Loop &loop() const { return _loop; }

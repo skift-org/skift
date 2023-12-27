@@ -38,7 +38,7 @@ struct ScriptTable : public Io::BChunk {
         : BChunk{bytes}, tag(tag) {}
 
     LangSys defaultLangSys() const {
-        return {"DFLT", begin().skip(get<DefaultLangSysOffset>()).restBytes()};
+        return {"DFLT", begin().skip(get<DefaultLangSysOffset>()).remBytes()};
     }
 
     usize len() const {
@@ -47,7 +47,7 @@ struct ScriptTable : public Io::BChunk {
 
     LangSys at(usize i) const {
         auto s = begin().skip(4 + i * 6);
-        return {s.nextStr(4), begin().skip(s.nextU16be()).restBytes()};
+        return {s.nextStr(4), begin().skip(s.nextU16be()).remBytes()};
     }
 
     auto iter() const {
@@ -67,7 +67,7 @@ struct ScriptList : public Io::BChunk {
         auto s = begin().skip(2 + i * 6);
         auto tag = s.nextStr(4);
         auto off = s.nextU16be();
-        return ScriptTable{tag, begin().skip(off).restBytes()};
+        return ScriptTable{tag, begin().skip(off).remBytes()};
     }
 
     auto iter() const {
@@ -116,7 +116,7 @@ struct FeatureList : public Io::BChunk {
         auto s = begin().skip(2 + i * 6);
         auto tag = s.nextStr(4);
         auto off = s.nextU16be();
-        return FeatureTable{tag, begin().skip(off).restBytes()};
+        return FeatureTable{tag, begin().skip(off).remBytes()};
     }
 
     auto iter() const {
@@ -237,7 +237,7 @@ struct GlyphPairAdjustment : public LookupSubtableBase {
         auto pairSetCount = s.nextU16be();
 
         // Lookup the coverage index for the first glyph
-        CoverageTable coverage{begin().skip(coverageOffset).restBytes()};
+        CoverageTable coverage{begin().skip(coverageOffset).remBytes()};
         auto coverageIndex = coverage.coverageIndex(prev);
 
         if (not coverageIndex or (*coverageIndex >= pairSetCount))
@@ -315,8 +315,8 @@ struct ClassPairAdjustment : public LookupSubtableBase {
         /* class1Count = */ s.nextU16be();
         auto class2Count = s.nextU16be();
 
-        ClassDef prevClassDef{begin().skip(classDef1Offset).restBytes()};
-        ClassDef currClassDef{begin().skip(classDef2Offset).restBytes()};
+        ClassDef prevClassDef{begin().skip(classDef1Offset).remBytes()};
+        ClassDef currClassDef{begin().skip(classDef2Offset).remBytes()};
 
         auto prevClass = try$(prevClassDef.classOf(prev));
         auto currClass = try$(currClassDef.classOf(curr));
@@ -371,12 +371,12 @@ struct LookupTable : public Io::BChunk {
 
         switch (format) {
         case GlyphPairAdjustment::FORMAT:
-            return GlyphPairAdjustment{subtable.restBytes()};
+            return GlyphPairAdjustment{subtable.remBytes()};
         case ClassPairAdjustment::FORMAT:
-            return ClassPairAdjustment{subtable.restBytes()};
+            return ClassPairAdjustment{subtable.remBytes()};
         default:
             logWarn("ttf: Unknown lookup subtable format {x}", format);
-            return GlyphPairAdjustment{subtable.restBytes()};
+            return GlyphPairAdjustment{subtable.remBytes()};
         }
     }
 
@@ -396,7 +396,7 @@ struct LookupList : public Io::BChunk {
     LookupTable at(usize i) const {
         auto s = begin().skip(2 + i * 2);
         auto off = s.nextU16be();
-        return LookupTable{begin().skip(off).restBytes()};
+        return LookupTable{begin().skip(off).remBytes()};
     }
 
     auto iter() const {

@@ -33,6 +33,8 @@ Res<Stat> stat(Url::Url const &url);
 
 /* --- Sockets -------------------------------------------------------------- */
 
+Res<Strong<Sys::Fd>> listenUdp(SocketAddr addr);
+
 Res<Strong<Sys::Fd>> connectTcp(SocketAddr addr);
 
 Res<Strong<Sys::Fd>> listenTcp(SocketAddr addr);

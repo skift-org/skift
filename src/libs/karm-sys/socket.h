@@ -11,7 +11,7 @@ struct _Connection :
     public Io::Reader,
     public Io::Writer,
     public Io::Flusher,
-    public Meta::NoCopy {};
+    Meta::NoCopy {};
 
 struct Connection :
     public _Connection {
@@ -42,7 +42,7 @@ struct Connection :
 
 template <typename C>
 struct _Listener :
-    public Meta::NoCopy {
+    Meta::NoCopy {
 
     Strong<Sys::Fd> _fd;
 
@@ -55,6 +55,28 @@ struct _Listener :
     }
 
     Strong<Fd> fd() { return _fd; }
+};
+
+/* --- Udp Socket ----------------------------------------------------------- */
+
+struct UdpConnection :
+    Meta::NoCopy {
+
+    SocketAddr _addr;
+    Strong<Sys::Fd> _fd;
+
+    static Res<UdpConnection> listen(SocketAddr addr);
+
+    UdpConnection(Strong<Sys::Fd> fd, SocketAddr addr)
+        : _addr(addr), _fd(std::move(fd)) {}
+
+    Res<usize> send(Bytes buf, SocketAddr addr) {
+        return _fd->sendTo(buf, addr);
+    }
+
+    Res<Cons<usize, SocketAddr>> recv(MutBytes buf) {
+        return _fd->recvFrom(buf);
+    }
 };
 
 /* --- Tcp Socket ----------------------------------------------------------- */

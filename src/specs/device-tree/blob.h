@@ -51,7 +51,7 @@ struct Blob {
 
     Header header() const {
         Header h{};
-        begin().peekTo(&h, sizeof(h));
+        begin().peekTo(&h);
         return h;
     }
 

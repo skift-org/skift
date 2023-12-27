@@ -10,9 +10,33 @@ struct Be {
     T _value;
 
     always_inline constexpr Be() = default;
-    always_inline constexpr Be(T value) : _value(toBe(value)) {}
-    always_inline constexpr operator T() const { return toBe(_value); }
-    always_inline constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
+
+    always_inline constexpr Be(T value)
+        : _value(toBe(value)) {}
+
+    always_inline constexpr operator T() const {
+        return value();
+    }
+
+    always_inline constexpr Bytes bytes() const {
+        return Bytes((Byte const *)&_value, sizeof(T));
+    }
+
+    always_inline constexpr T value() const {
+        return toBe(_value);
+    }
+
+    auto operator<=>(Be const &other) const = default;
+
+    bool operator==(Be const &other) const = default;
+
+    auto operator<=>(Meta::Integral auto const &other) const {
+        return value() <=> other;
+    }
+
+    bool operator==(Meta::Integral auto const &other) const {
+        return value() == other;
+    }
 };
 
 template <typename T>
@@ -20,9 +44,34 @@ struct Le {
     T _value;
 
     always_inline constexpr Le() = default;
-    always_inline constexpr Le(T value) : _value(toLe(value)) {}
-    always_inline constexpr operator T() const { return toLe(_value); }
-    always_inline constexpr Bytes bytes() const { return Bytes((Byte const *)&_value, sizeof(T)); }
+
+    always_inline constexpr Le(T value)
+        : _value(toLe(value)) {
+    }
+
+    always_inline constexpr operator T() const {
+        return value();
+    }
+
+    always_inline constexpr Bytes bytes() const {
+        return Bytes((Byte const *)&_value, sizeof(T));
+    }
+
+    always_inline constexpr T value() const {
+        return toLe(_value);
+    }
+
+    auto operator<=>(Le const &other) const = default;
+
+    bool operator==(Le const &other) const = default;
+
+    auto operator<=>(T const &other) const {
+        return value() <=> other;
+    }
+
+    bool operator==(T const &other) const {
+        return value() == other;
+    }
 };
 
 static_assert(sizeof(Be<u32>) == sizeof(u32));

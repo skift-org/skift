@@ -201,6 +201,29 @@ struct PosixFd : public Sys::Fd {
 
         return Ok(makeStrong<PosixFd>(fd));
     }
+
+    Res<usize> sendTo(Bytes bytes, SocketAddr addr) override {
+        struct sockaddr_in addr_ = toSockAddr(addr);
+        isize result = ::sendto(_raw, bytes.buf(), sizeOf(bytes), 0, (struct sockaddr *)&addr_, sizeof(addr_));
+
+        if (result < 0)
+            return Posix::fromLastErrno();
+
+        return Ok(static_cast<usize>(result));
+    }
+
+    Res<Cons<usize, SocketAddr>> recvFrom(MutBytes bytes) override {
+        struct sockaddr_in addr_;
+        socklen_t len = sizeof(addr_);
+        isize result = ::recvfrom(_raw, bytes.buf(), sizeOf(bytes), 0, (struct sockaddr *)&addr_, &len);
+
+        if (result < 0)
+            return Posix::fromLastErrno();
+
+        return Ok<Cons<usize, SocketAddr>>(
+            static_cast<usize>(result),
+            fromSockAddr(addr_));
+    }
 };
 
 Res<Url::Path> resolve(Url::Url const &url) {
@@ -324,6 +347,19 @@ Res<Stat> stat(Url::Url const &url) {
 }
 
 /* --- Sockets -------------------------------------------------------------- */
+
+Res<Strong<Sys::Fd>> listenUdp(SocketAddr addr) {
+    int fd = ::socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0)
+        return Posix::fromLastErrno();
+
+    struct sockaddr_in addr_ = toSockAddr(addr);
+
+    if (::bind(fd, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
+        return Posix::fromLastErrno();
+
+    return Ok(makeStrong<PosixFd>(fd));
+}
 
 Res<Strong<Sys::Fd>> connectTcp(SocketAddr addr) {
     int fd = ::socket(AF_INET, SOCK_STREAM, 0);

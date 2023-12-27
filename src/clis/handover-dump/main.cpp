@@ -12,7 +12,7 @@ Res<> entryPoint(Ctx &ctx) {
     }
 
     auto url = try$(Url::parseUrlOrPath(args[0]));
-    Sys::File kernelFile = try$(Sys::File::open(url));
+    auto kernelFile = try$(Sys::File::open(url));
     auto kernelMem = try$(Sys::mmap().read().map(kernelFile));
     Elf::Image kernelElf{kernelMem.bytes()};
 

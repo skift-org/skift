@@ -231,14 +231,12 @@ struct _StringBuilder {
             append(rune);
     }
 
-    void append(_Str<E> str) {
-        usize written = 0;
-        for (auto rune : iterRunes(str))
-            written += try$(append(rune));
+    void append(Sliceable<typename E::Unit> auto const &units) {
+        _buf.insert(COPY, _buf.len(), units.buf(), units.len());
     }
 
-    void append(Slice<typename E::Unit> unit) {
-        _buf.insert(COPY, _buf.len(), unit.buf(), unit.len());
+    usize len() const {
+        return _buf.size();
     }
 
     _Str<E> str() {

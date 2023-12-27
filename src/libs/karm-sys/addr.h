@@ -14,22 +14,21 @@ union Ip4 {
     };
 
     Array<u8, 4> bytes;
-
     Be<u32> _raw;
 
-    Ip4(u8 a, u8 b, u8 c, u8 d)
+    constexpr Ip4(u8 a, u8 b, u8 c, u8 d)
         : a(a), b(b), c(c), d(d) {}
 
-    Ip4(Array<u8, 4> bytes)
+    constexpr Ip4(Array<u8, 4> bytes)
         : bytes(bytes) {}
 
-    static auto unspecified() -> Ip4 {
+    constexpr static auto unspecified() -> Ip4 {
         return {0, 0, 0, 0};
     }
 
     static SocketAddr unspecified(u16 port);
 
-    static auto localhost() {
+    constexpr static auto localhost() {
         return Ip4{{127, 0, 0, 1}};
     }
 
@@ -60,6 +59,14 @@ union Ip4 {
     static Res<Ip4> parse(Str str) {
         auto s = Io::SScan(str);
         return parse(s);
+    }
+
+    std::strong_ordering operator<=>(Ip4 const &other) const {
+        return _raw <=> other._raw;
+    }
+
+    bool operator==(Ip4 const &other) const {
+        return _raw == other._raw;
     }
 };
 
@@ -110,6 +117,14 @@ union Ip6 {
         auto s = Io::SScan(str);
         return parse(s);
     }
+
+    std::strong_ordering operator<=>(Ip6 const &b) const {
+        return _raw <=> b._raw;
+    }
+
+    auto operator==(Ip6 const &b) const {
+        return _raw == b._raw;
+    }
 };
 
 struct Ip : public Var<Ip4, Ip6> {
@@ -159,6 +174,10 @@ struct SocketAddr {
 
         return Ok(SocketAddr(addr, port));
     }
+
+    auto operator<=>(SocketAddr const &) const = default;
+
+    bool operator==(SocketAddr const &) const = default;
 };
 
 inline SocketAddr Ip4::unspecified(u16 port) {

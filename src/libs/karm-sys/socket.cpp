@@ -4,6 +4,13 @@
 
 namespace Karm::Sys {
 
+/* --- Udp Socket ----------------------------------------------------------- */
+
+Res<UdpConnection> UdpConnection::listen(SocketAddr addr) {
+    auto fd = try$(_Embed::listenUdp(addr));
+    return Ok(UdpConnection(std::move(fd), addr));
+}
+
 /* --- Tcp Socket ----------------------------------------------------------- */
 
 Res<TcpConnection> TcpConnection::connect(SocketAddr addr) {

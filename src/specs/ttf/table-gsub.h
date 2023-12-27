@@ -12,15 +12,15 @@ struct Gsub : public Io::BChunk {
     using LookupListOffset = Io::BField<u16be, 8>;
 
     ScriptList scriptList() const {
-        return ScriptList{begin().skip(get<ScriptListOffset>()).restBytes()};
+        return ScriptList{begin().skip(get<ScriptListOffset>()).remBytes()};
     }
 
     FeatureList featureList() const {
-        return FeatureList{begin().skip(get<FeatureListOffset>()).restBytes()};
+        return FeatureList{begin().skip(get<FeatureListOffset>()).remBytes()};
     }
 
     LookupList lookupList() const {
-        return LookupList{begin().skip(get<LookupListOffset>()).restBytes()};
+        return LookupList{begin().skip(get<LookupListOffset>()).remBytes()};
     }
 
     // 1. Locate the current script in the GSUB ScriptList table.

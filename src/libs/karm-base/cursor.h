@@ -13,8 +13,11 @@ struct Cursor {
 
     constexpr Cursor() = default;
 
-    always_inline constexpr Cursor(Sliceable<T> auto &slice)
+    always_inline constexpr Cursor(Sliceable<T> auto const &slice)
         : _begin(begin(slice)), _end(end(slice)) {}
+
+    always_inline constexpr Cursor(T const *begin, T const *end)
+        : _begin(begin), _end(end) {}
 
     always_inline constexpr T const &operator[](usize i) const {
         return _begin[i];
@@ -38,17 +41,19 @@ struct Cursor {
     }
 
     always_inline constexpr T next() {
-        if (ended()) {
+        if (ended())
             panic("next() called on ended cursor");
-        }
         T r = *_begin;
         _begin++;
         return r;
     }
 
-    always_inline constexpr void next(usize n) {
-        for (usize i = 0; i < n; i++)
-            next();
+    always_inline constexpr Slice<T> next(usize n) {
+        if (n > rem())
+            panic("next() called on ended cursor");
+        auto slice = Slice<T>{_begin, n};
+        _begin += n;
+        return slice;
     }
 
     always_inline constexpr T const *buf() const {
@@ -73,8 +78,11 @@ struct MutCursor {
     T *_begin = nullptr;
     T *_end = nullptr;
 
-    always_inline constexpr MutCursor(MutSliceable<T> auto &slice)
+    always_inline constexpr MutCursor(MutSliceable<T> auto const &slice)
         : _begin(begin(slice)), _end(end(slice)) {}
+
+    always_inline constexpr MutCursor(T *begin, T *end)
+        : _begin(begin), _end(end) {}
 
     always_inline constexpr T &operator[](usize i) {
         return _begin[i];
@@ -101,7 +109,17 @@ struct MutCursor {
     }
 
     always_inline constexpr T next() {
+        if (ended())
+            panic("next() called on ended cursor");
         return *_begin++;
+    }
+
+    always_inline constexpr MutSlice<T> next(usize n) {
+        if (n > rem())
+            panic("next() called on ended cursor");
+        auto slice = MutSlice<T>{_begin, n};
+        _begin += n;
+        return slice;
     }
 
     always_inline constexpr bool put(T c) {
@@ -111,14 +129,6 @@ struct MutCursor {
 
         *_begin++ = c;
         return false;
-    }
-
-    always_inline constexpr void skip() {
-        ++_begin;
-    }
-
-    always_inline constexpr void skip(usize n) {
-        _begin += n;
     }
 
     always_inline constexpr T *buf() {

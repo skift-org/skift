@@ -3,6 +3,7 @@
 #include <karm-logger/logger.h>
 #include <karm-sys/file.h>
 #include <karm-sys/socket.h>
+#include <web-dns/dns.h>
 #include <web-http/http.h>
 #include <web-tls/tls.h>
 
@@ -16,11 +17,11 @@ Async::Prom<Sys::Ip> resolve(Str host) {
     if (host == "localhost")
         co_return Ok(Sys::Ip4::localhost());
 
-    // FIXME: Implement DNS resolution
-    co_return Error::notImplemented("dns resolution not implemented");
+    auto dns = co_try$(Dns::Client::connect(Dns::GOOGLE));
+    co_return Ok(co_try$(dns.resolve(host)));
 }
 
-Async::Prom<usize> _fetch(Url::Url const &url, Sys::_Connection &con, Io::Writer &out) {
+Async::Prom<usize> _fetch(Url::Url const &url, Sys::_Connection &conn, Io::Writer &out) {
     // Send request
     Io::StringWriter req;
     co_try$(Fmt::format(
@@ -32,11 +33,11 @@ Async::Prom<usize> _fetch(Url::Url const &url, Sys::_Connection &con, Io::Writer
                                                                "\r\n",
         url.path,
         url.host));
-    co_try$(con.write(req.bytes()));
+    co_try$(conn.write(req.bytes()));
 
     // Read response
     Array<char, 4096> buf;
-    auto len = co_try$(con.read(mutBytes(buf)));
+    auto len = co_try$(conn.read(mutBytes(buf)));
 
     Str respStr{buf.buf(), len};
 
@@ -50,7 +51,7 @@ Async::Prom<usize> _fetch(Url::Url const &url, Sys::_Connection &con, Io::Writer
     auto remData = bytes(s.remStr());
     auto written = co_try$(out.write(sub(remData, 0, contentLength)));
     if (written < contentLength)
-        co_try$(Io::copy(con, out, contentLength - written));
+        co_try$(Io::copy(conn, out, contentLength - written));
     co_return Ok(contentLength);
 }
 
@@ -63,11 +64,11 @@ Async::Prom<usize> fetch(Url::Url const &url, Io::Writer &out) {
     Sys::SocketAddr addr{ip, (u16)port};
 
     if (url.scheme == "http") {
-        auto con = co_try$(Sys::TcpConnection::connect(addr));
-        co_return co_await _fetch(url, con, out);
+        auto conn = co_try$(Sys::TcpConnection::connect(addr));
+        co_return co_await _fetch(url, conn, out);
     } else if (url.scheme == "https") {
-        auto con = co_try$(Sys::TcpConnection::connect(addr));
-        auto tls = co_try$(Web::Tls::TlsConnection::connect(con));
+        auto conn = co_try$(Sys::TcpConnection::connect(addr));
+        auto tls = co_try$(Web::Tls::TlsConnection::connect(conn));
         co_return co_await _fetch(url, tls, out);
     } else {
         co_return Error::invalidData("unsupported scheme");
@@ -77,6 +78,6 @@ Async::Prom<usize> fetch(Url::Url const &url, Io::Writer &out) {
 } // namespace Web::Client
 
 Async::Prom<> entryPointAsync(Ctx &ctx) {
-    co_try_await$(Web::Client::fetch("http://localhost:8080/"_url, Sys::out()));
+    co_try_await$(Web::Client::fetch("http://www.google.com:80/"_url, Sys::out()));
     co_return Ok();
 }

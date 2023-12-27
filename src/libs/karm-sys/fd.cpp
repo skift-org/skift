@@ -40,4 +40,12 @@ Res<Strong<Fd>> NullFd::recvFd() {
     return Ok(makeStrong<NullFd>());
 }
 
+Res<usize> NullFd::sendTo(Bytes, SocketAddr) {
+    return Ok(0uz);
+}
+
+Res<Cons<usize, SocketAddr>> NullFd::recvFrom(MutBytes) {
+    return Ok<Cons<usize, SocketAddr>>(0uz, Ip4::unspecified(0));
+}
+
 } // namespace Karm::Sys

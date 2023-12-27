@@ -106,7 +106,7 @@ struct BufReader :
     BufReader(Bytes buf) : _buf(buf), _pos(0) {}
 
     Res<usize> read(MutBytes bytes) override {
-        Bytes slice = sub(_buf, _pos, sizeOf(bytes));
+        Bytes slice = sub(_buf, _pos, _pos + sizeOf(bytes));
         usize read = copy(slice, bytes);
         _pos += read;
         return Ok(read);
@@ -164,6 +164,10 @@ struct BufferWriter : public Writer, public Flusher {
         auto l = _buf.len();
         _buf.truncate(0);
         return Ok(l);
+    }
+
+    Buf<Byte> take() {
+        return std::move(_buf);
     }
 };
 

@@ -75,6 +75,12 @@ struct Slice {
     constexpr T const *end() const { return _buf + _len; }
 
     constexpr usize len() const { return _len; }
+
+    template <typename U>
+    constexpr Slice<U> cast() const {
+        static_assert(sizeof(T) == sizeof(U));
+        return Slice<U>{(U const *)_buf, _len};
+    }
 };
 
 template <typename T>
@@ -112,6 +118,12 @@ struct MutSlice {
     constexpr T const *end() const { return _buf + _len; }
 
     constexpr usize len() const { return _len; }
+
+    template <typename U>
+    constexpr MutSlice<U> cast() const {
+        static_assert(sizeof(T) == sizeof(U));
+        return MutSlice<U>{(U *)_buf, _len};
+    }
 };
 
 using Bytes = Slice<Byte>;
@@ -222,6 +234,30 @@ constexpr auto mutIterRev(S &slice) {
         }
 
         return &slice.buf()[--i];
+    });
+}
+
+template <Sliceable S>
+constexpr auto iterSplit(S &slice, typename S::Inner const &sep) {
+    return Iter([&slice, sep, i = 0uz]() mutable -> Opt<Slice<typename S::Inner>> {
+        if (i >= slice.len()) {
+            return NONE;
+        }
+
+        usize start = i;
+        while (i < slice.len() and slice.buf()[i] != sep) {
+            i++;
+        }
+
+        usize end = i;
+        if (i < slice.len()) {
+            i++;
+        }
+
+        return Slice{
+            slice.buf() + start,
+            end - start,
+        };
     });
 }
 

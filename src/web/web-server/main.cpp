@@ -41,7 +41,7 @@ Str contentType(Url::Path const &path) {
     return "application/octet-stream";
 }
 
-Async::Prom<> respondFile(Sys::_Connection &con, Url::Url const &url, Http::Code code = Http::Code::OK) {
+Async::Prom<> respondFile(Sys::_Connection &conn, Url::Url const &url, Http::Code code = Http::Code::OK) {
     auto ct = contentType(url.path);
     auto file = co_try$(Sys::File::open(url));
     auto stat = co_try$(file.stat());
@@ -60,13 +60,13 @@ Async::Prom<> respondFile(Sys::_Connection &con, Url::Url const &url, Http::Code
         ct,
         stat.size));
 
-    co_try$(con.write(header.bytes()));
-    co_try$(Io::copy(file, con));
+    co_try$(conn.write(header.bytes()));
+    co_try$(Io::copy(file, conn));
     co_return Ok();
 }
 
-Async::Prom<> respond404(Sys::_Connection &con) {
-    auto res = co_await respondFile(con, "bundle://web-server/public/404.html"_url, Http::Code::NOT_FOUND);
+Async::Prom<> respond404(Sys::_Connection &conn) {
+    auto res = co_await respondFile(conn, "bundle://web-server/public/404.html"_url, Http::Code::NOT_FOUND);
     if (res)
         co_return Ok();
 
@@ -81,29 +81,29 @@ Async::Prom<> respond404(Sys::_Connection &con) {
         "\r\n"
         "Not Found"));
 
-    co_try$(con.write(header.bytes()));
+    co_try$(conn.write(header.bytes()));
     co_return Ok();
 }
 
-Async::Prom<> handleRequest(Sys::_Connection &con, Str request, Sys::SocketAddr addr) {
+Async::Prom<> handleRequest(Sys::_Connection &conn, Str request, Sys::SocketAddr addr) {
     Io::SScan scan{request};
     auto req = co_try$(Http::Request::parse(scan));
     auto url = "bundle://web-server/public/"_url / req.path;
 
     logInfo("{}: {} {}", addr, req.method, req.path);
 
-    Res<> firstRes = co_await respondFile(con, url, Http::Code::OK);
+    Res<> firstRes = co_await respondFile(conn, url, Http::Code::OK);
     if (firstRes) {
         co_return Ok();
     }
 
-    Res<> res = co_await respondFile(con, url / "index.html", Http::Code::OK);
+    Res<> res = co_await respondFile(conn, url / "index.html", Http::Code::OK);
     if (res) {
         co_return Ok();
     }
 
     logWarn("{}: {} {}: {}", addr, req.method, url, firstRes);
-    co_return co_await respond404(con);
+    co_return co_await respond404(conn);
 }
 
 Async::Prom<> handleConnection(Sys::TcpConnection stream) {

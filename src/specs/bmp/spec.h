@@ -131,7 +131,7 @@ struct Image {
 
     Res<> readPixels(Io::BScan &s) {
         s.seek(_dataOffset);
-        _pixels = s.restBytes();
+        _pixels = s.remBytes();
         return Ok();
     }
 

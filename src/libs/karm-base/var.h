@@ -169,6 +169,14 @@ struct Var {
         return std::partial_ordering::unordered;
     }
 
+    template <Meta::Contains<Ts...> T>
+    bool operator==(T const &other) const {
+        if constexpr (Meta::Equatable<T>)
+            if (is<T>())
+                return unwrap<T>() == other;
+        return false;
+    }
+
     std::partial_ordering operator<=>(Var const &other) const {
         if (_index == other._index)
             return visit([&]<typename T>(T const &ptr) {
@@ -179,6 +187,18 @@ struct Var {
                 }
             });
         return std::partial_ordering::unordered;
+    }
+
+    bool operator==(Var const &other) const {
+        if (_index == other._index)
+            return visit([&]<typename T>(T const &ptr) {
+                if constexpr (Meta::Equatable<T>) {
+                    return ptr == other.unwrap<T>();
+                } else {
+                    return false;
+                }
+            });
+        return false;
     }
 };
 

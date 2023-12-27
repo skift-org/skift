@@ -31,6 +31,10 @@ struct Fd : Meta::NoCopy {
     virtual Res<> sendFd(Strong<Fd>) = 0;
 
     virtual Res<Strong<Fd>> recvFd() = 0;
+
+    virtual Res<usize> sendTo(Bytes, SocketAddr) = 0;
+
+    virtual Res<Cons<usize, SocketAddr>> recvFrom(MutBytes) = 0;
 };
 
 struct NullFd : public Fd {
@@ -51,6 +55,10 @@ struct NullFd : public Fd {
     Res<> sendFd(Strong<Fd>) override;
 
     Res<Strong<Fd>> recvFd() override;
+
+    Res<usize> sendTo(Bytes, SocketAddr) override;
+
+    Res<Cons<usize, SocketAddr>> recvFrom(MutBytes) override;
 };
 
 template <typename T>

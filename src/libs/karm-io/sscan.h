@@ -268,9 +268,13 @@ static inline Opt<isize> parseInt(Str str) {
     return s.nextInt();
 }
 
+#ifndef __ck_freestanding__
+
 static inline Opt<f64> parseFloat(Str str) {
     auto s = SScan(str);
     return s.nextFloat();
 }
+
+#endif
 
 } // namespace Karm::Io

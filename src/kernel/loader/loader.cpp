@@ -25,7 +25,7 @@ Res<> loadEntry(Entry const &entry) {
     payload.add(Handover::SELF, 0, payloadMem.prange());
 
     logInfo("loader: loading kernel file...");
-    Sys::File kernelFile = try$(Sys::File::open(entry.kernel.url));
+    auto kernelFile = try$(Sys::File::open(entry.kernel.url));
     auto kernelMem = try$(Sys::mmap().map(kernelFile));
     Elf::Image image{kernelMem.bytes()};
     payload.add(Handover::FILE, 0, kernelMem.prange().as<USizeRange>());

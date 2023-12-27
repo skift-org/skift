@@ -78,7 +78,7 @@ struct MutCursor {
     T *_begin = nullptr;
     T *_end = nullptr;
 
-    always_inline constexpr MutCursor(MutSliceable<T> auto const &slice)
+    always_inline constexpr MutCursor(MutSliceable<T> auto &slice)
         : _begin(begin(slice)), _end(end(slice)) {}
 
     always_inline constexpr MutCursor(T *begin, T *end)

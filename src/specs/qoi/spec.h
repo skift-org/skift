@@ -125,7 +125,7 @@ struct Image : public Io::BChunk {
             }
         }
 
-        if (s.nextBytes(8) != bytes(END)) {
+        if (s.nextBytes(8) != END) {
             return Error::invalidData("missing end marker");
         }
 

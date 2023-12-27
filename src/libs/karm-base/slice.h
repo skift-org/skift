@@ -265,23 +265,19 @@ constexpr bool isEmpty(Sliceable auto &slice) {
     return slice.len() == 0;
 }
 
-template <Sliceable S>
-constexpr auto const *begin(S &slice) {
+constexpr auto const *begin(Sliceable auto const &slice) {
     return slice.buf();
 }
 
-template <Sliceable S>
-constexpr auto const *end(S &slice) {
+constexpr auto const *end(Sliceable auto const &slice) {
     return slice.buf() + slice.len();
 }
 
-template <MutSliceable S>
-constexpr auto *begin(S &slice) {
+constexpr auto *begin(MutSliceable auto &slice) {
     return slice.buf();
 }
 
-template <MutSliceable S>
-constexpr auto *end(S &slice) {
+constexpr auto *end(MutSliceable auto &slice) {
     return slice.buf() + slice.len();
 }
 

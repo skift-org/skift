@@ -39,7 +39,7 @@ struct BScan {
     }
 
     always_inline constexpr Bytes remBytes() {
-        return Bytes{_cursor.buf(), rem()};
+        return {_cursor.buf(), rem()};
     }
 
     always_inline constexpr BScan &skip(usize n) {
@@ -73,7 +73,7 @@ struct BScan {
             return false;
 
         u8 *b = reinterpret_cast<u8 *>(buf);
-        for (usize i = 0; i < n; i++)
+        for (usize i = 0; i < sizeof(T) * n; i++)
             b[i] = _cursor.buf()[i];
 
         return true;
@@ -275,6 +275,10 @@ struct BChunk {
     }
 
     always_inline constexpr BScan begin() const {
+        return _slice;
+    }
+
+    always_inline constexpr Bytes bytes() const {
         return _slice;
     }
 

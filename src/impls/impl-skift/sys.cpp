@@ -45,9 +45,25 @@ struct VmoFd : public Sys::Fd {
     Res<Stat> stat() override {
         return Ok<Stat>();
     }
+
+    Res<> sendFd(Strong<Fd>) override {
+        notImplemented();
+    }
+
+    Res<Strong<Fd>> recvFd() override {
+        notImplemented();
+    }
+
+    Res<usize> sendTo(Bytes, SocketAddr) override {
+        notImplemented();
+    }
+
+    Res<Cons<usize, SocketAddr>> recvFrom(MutBytes) override {
+        notImplemented();
+    }
 };
 
-Res<Strong<Sys::Fd>> openFile(Url::Url url) {
+Res<Strong<Sys::Fd>> openFile(Url::Url const &url) {
     auto urlStr = url.str();
     auto *fileRecord = useHandover().fileByName(urlStr.buf());
     if (not fileRecord)
@@ -58,7 +74,11 @@ Res<Strong<Sys::Fd>> openFile(Url::Url url) {
     return Ok(makeStrong<VmoFd>(std::move(vmo)));
 }
 
-Res<Strong<Sys::Fd>> createFile(Url::Url) {
+Res<Strong<Sys::Fd>> createFile(Url::Url const &) {
+    notImplemented();
+}
+
+Res<Strong<Sys::Fd>> openOrCreateFile(Url::Url const &) {
     notImplemented();
 }
 

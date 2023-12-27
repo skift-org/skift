@@ -65,6 +65,22 @@ struct ConOut : public Sys::Fd {
     Res<Stat> stat() override {
         return Ok<Stat>();
     }
+
+    Res<> sendFd(Strong<Fd>) override {
+        notImplemented();
+    }
+
+    Res<Strong<Fd>> recvFd() override {
+        notImplemented();
+    }
+
+    Res<usize> sendTo(Bytes, SocketAddr) override {
+        notImplemented();
+    }
+
+    Res<Cons<usize, SocketAddr>> recvFrom(MutBytes) override {
+        notImplemented();
+    }
 };
 
 struct FileProto : public Sys::Fd {
@@ -149,7 +165,26 @@ struct FileProto : public Sys::Fd {
         info = (Efi::FileInfo *)buf.buf();
         try$(_proto->getInfo(_proto, &Efi::FileInfo::GUID, &bufSize, info));
 
-        return Ok<Stat>(info->fileSize);
+        return Ok<Stat>(Stat{
+            .type = info->attribute & EFI_FILE_DIRECTORY ? Stat::DIR : Stat::FILE,
+            .size = info->fileSize,
+        });
+    }
+
+    Res<> sendFd(Strong<Fd>) override {
+        notImplemented();
+    }
+
+    Res<Strong<Fd>> recvFd() override {
+        notImplemented();
+    }
+
+    Res<usize> sendTo(Bytes, SocketAddr) override {
+        notImplemented();
+    }
+
+    Res<Cons<usize, SocketAddr>> recvFrom(MutBytes) override {
+        notImplemented();
     }
 };
 
@@ -234,7 +269,7 @@ static Res<Url::Path> resolve(Url::Url url) {
     }
 }
 
-Res<Strong<Sys::Fd>> openFile(Url::Url url) {
+Res<Strong<Sys::Fd>> openFile(Url::Url const &url) {
     static Efi::SimpleFileSystemProtocol *fileSystem = nullptr;
     if (not fileSystem) {
         fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(Efi::li()->deviceHandle));
@@ -260,11 +295,15 @@ Res<Strong<Sys::Fd>> openFile(Url::Url url) {
     return Ok(makeStrong<FileProto>(file));
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Url::Url) {
+Res<Vec<Sys::DirEntry>> readDir(Url::Url const &) {
     return Error::notImplemented();
 }
 
-Res<Strong<Sys::Fd>> createFile(Url::Url) {
+Res<Strong<Sys::Fd>> createFile(Url::Url const &) {
+    return Error::notImplemented();
+}
+
+Res<Strong<Sys::Fd>> openOrCreateFile(Url::Url const &) {
     return Error::notImplemented();
 }
 

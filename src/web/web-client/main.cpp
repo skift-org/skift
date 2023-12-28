@@ -23,6 +23,7 @@ Async::Prom<Sys::Ip> resolve(Str host) {
 
 Async::Prom<usize> _fetch(Url::Url const &url, Sys::_Connection &conn, Io::Writer &out) {
     // Send request
+    logDebug("GET {} HTTP/1.1", url.path);
     Io::StringWriter req;
     co_try$(Fmt::format(
         req,
@@ -38,6 +39,7 @@ Async::Prom<usize> _fetch(Url::Url const &url, Sys::_Connection &conn, Io::Write
     // Read response
     Array<char, 4096> buf;
     auto len = co_try$(conn.read(mutBytes(buf)));
+    logDebug("Response: {}", Str{buf.buf(), len});
 
     Str respStr{buf.buf(), len};
 

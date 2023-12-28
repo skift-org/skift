@@ -57,4 +57,4 @@ Ui::Child pageHome(State const &);
 
 Ui::Child pageAbout(State const &);
 
-} // namespace Settings
+} // namespace Hideo::Settings

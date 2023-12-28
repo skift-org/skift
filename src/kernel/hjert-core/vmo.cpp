@@ -1,4 +1,5 @@
 #include "vmo.h"
+
 #include "mem.h"
 
 namespace Hjert::Core {

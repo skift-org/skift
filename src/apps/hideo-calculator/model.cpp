@@ -139,4 +139,4 @@ void reduce(State &s, Action action) {
     });
 }
 
-} // namespace Calculator
+} // namespace Hideo::Calculator

@@ -21,7 +21,6 @@ static LcdLayout RGB = {{+0.33, 0.0}, {0.0, 0.0}, {-0.33, 0.0}};
 static LcdLayout BGR = {{-0.33, 0.0}, {0.0, 0.0}, {+0.33, 0.0}};
 static LcdLayout VRGB = {{0.0, +0.33}, {0.0, 0.0}, {0.0, -0.33}};
 
-
 struct Context {
     struct Scope {
         Paint paint = Gfx::WHITE;

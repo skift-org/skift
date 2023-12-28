@@ -334,4 +334,3 @@ void _div(Frac &lhs, Frac const &rhs) {
 }
 
 } // namespace Karm::Math
-

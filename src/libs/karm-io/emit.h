@@ -132,4 +132,4 @@ struct Emit : public Io::TextWriterBase<> {
     }
 };
 
-} // namespace Karm::Text
+} // namespace Karm::Io

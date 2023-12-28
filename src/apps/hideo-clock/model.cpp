@@ -10,4 +10,4 @@ void reduce(State &s, Action a) {
     });
 }
 
-} // namespace Clock
+} // namespace Hideo::Clock

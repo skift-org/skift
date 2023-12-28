@@ -11,4 +11,4 @@ void reduce(State &s, Action a) {
         });
 }
 
-} // namespace Keyboard
+} // namespace Hideo::Keyboard

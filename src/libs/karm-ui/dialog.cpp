@@ -266,7 +266,7 @@ Child versionBadge() {
     return hflow(4, badges);
 }
 
-static constexpr Str LICENSE = R"(Copyright © 2018-2023, the skiftOS Developers
+static constexpr Str LICENSE = R"(Copyright © 2018-2024, the skiftOS Developers
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -298,7 +298,7 @@ Child aboutDialog(Mdi::Icon i, String name) {
             Ui::TextStyles::labelMedium()
                 .withAlign(Gfx::TextAlign::CENTER)
                 .withColor(Ui::GRAY400),
-            "Copyright © 2018-2023\nThe skiftOS Developers\nAll rights reserved.") |
+            "Copyright © 2018-2024\nThe skiftOS Developers\nAll rights reserved.") |
             Ui::spacing(16));
 
     Children actions = {

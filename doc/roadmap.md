@@ -62,4 +62,8 @@ This is a list of features that are not planned for any specific milestone yet.
 - [ ] Multi-core support
 - [ ] Multi-user support
 - [ ] Porting DOOM
+- [ ] Better JPEG support
+    - [ ] Chroma subsampling
+    - [ ] Progressive mode
+    - [ ] Arithmetic coding
 

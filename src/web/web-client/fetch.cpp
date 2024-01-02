@@ -1,4 +1,3 @@
-#include <karm-async/main.h>
 #include <karm-io/funcs.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/file.h>
@@ -6,6 +5,8 @@
 #include <web-dns/dns.h>
 #include <web-http/http.h>
 #include <web-tls/tls.h>
+
+#include "fetch.h"
 
 namespace Web::Client {
 
@@ -77,9 +78,15 @@ Async::Prom<usize> fetch(Url::Url const &url, Io::Writer &out) {
     }
 }
 
-} // namespace Web::Client
-
-Async::Prom<> entryPointAsync(Ctx &ctx) {
-    co_try_await$(Web::Client::fetch("http://www.google.com:80/"_url, Sys::out()));
-    co_return Ok();
+Async::Prom<String> fetchString(Url::Url const &url) {
+    Io::StringWriter out;
+    co_try_await$(fetch(url, out));
+    co_return Ok(out.take());
 }
+
+Async::Prom<Json::Value> fetchJson(Url::Url const &url) {
+    auto str = co_try_await$(fetchString(url));
+    co_return Ok(co_try$(Json::parse(str)));
+}
+
+} // namespace Web::Client

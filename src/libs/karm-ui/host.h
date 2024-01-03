@@ -165,8 +165,10 @@ struct Host : public Node {
         }
         auto elapsed = _perf.end();
 
-        if (elapsed.toMSecs() > 32) {
-            logWarn("Paint took {} ms for {} nodes alive", elapsed.toMSecs(), debugNodeCount);
+        static usize maxStutter = 31;
+        if (elapsed.toMSecs() > maxStutter) {
+            logWarn("Stutter detected, paint took {} ms for {} nodes alive", elapsed.toMSecs(), debugNodeCount);
+            maxStutter = elapsed.toMSecs();
         }
 
         if (debugShowPerfGraph)
@@ -182,9 +184,10 @@ struct Host : public Node {
         _perf.record(PerfEvent::INPUT);
         _root->event(e);
         auto elapsed = _perf.end();
-        if (elapsed.toMSecs() > 1) {
-            logWarn("Event took {}ms", elapsed.toMSecs());
-            logDebug("There is {} nodes alive", debugNodeCount);
+        static usize maxStutter = 1;
+        if (elapsed.toMSecs() > maxStutter) {
+            logWarn("Stutter detected, event took {} ms for {} nodes alive", elapsed.toMSecs(), debugNodeCount);
+            maxStutter = elapsed.toMSecs();
         }
     }
 
@@ -212,9 +215,10 @@ struct Host : public Node {
         _perf.record(PerfEvent::LAYOUT);
         _root->layout(r);
         auto elapsed = _perf.end();
-        if (elapsed.toMSecs() > 1) {
-            logWarn("Layout took {}ms", elapsed.toMSecs());
-            logDebug("There is {} nodes alive", debugNodeCount);
+        static usize maxStutter = 1;
+        if (elapsed.toMSecs() > maxStutter) {
+            logWarn("Stutter detected, layout took {}ms for {} nodes alive", elapsed.toMSecs(), debugNodeCount);
+            maxStutter = 1;
         }
     }
 

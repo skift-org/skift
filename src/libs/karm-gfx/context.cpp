@@ -304,8 +304,8 @@ void Context::stroke(Math::Vec2f baseline, Media::Glyph glyph) {
     _useSpaa = true;
     save();
     begin();
-    origin(baseline.cast<isize>());
     scale(f.scale());
+    translate(baseline);
     f.fontface->contour(*this, glyph);
     stroke();
     restore();
@@ -318,8 +318,8 @@ void Context::fill(Math::Vec2f baseline, Media::Glyph glyph) {
     _useSpaa = true;
     save();
     begin();
-    origin(baseline.cast<isize>());
     scale(f.scale());
+    translate(baseline);
     f.fontface->contour(*this, glyph);
     fill();
     restore();

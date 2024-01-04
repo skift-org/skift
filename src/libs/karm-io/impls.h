@@ -162,7 +162,7 @@ struct BufferWriter : public Writer, public Flusher {
 
     Res<usize> flush() override {
         auto l = _buf.len();
-        _buf.truncate(0);
+        _buf.trunc(0);
         return Ok(l);
     }
 

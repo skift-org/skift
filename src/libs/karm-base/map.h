@@ -15,7 +15,7 @@ struct Map {
     Map(std::initializer_list<Cons<K, V>> &&list)
         : _els(std::move(list)) {}
 
-    void put(K const &key, V const &value) {
+    void put(K const &key, V value) {
         for (auto &i : ::mutIter(_els)) {
             if (i.car == key) {
                 i.cdr = value;

@@ -238,7 +238,7 @@ struct Buf {
         _len = newLen;
     }
 
-    void truncate(usize newLen) {
+    void trunc(usize newLen) {
         if (newLen >= _len)
             return;
 
@@ -452,7 +452,7 @@ struct InlineBuf {
         _len = newLen;
     }
 
-    void truncate(usize newLen) {
+    void trunc(usize newLen) {
         if (newLen >= _len)
             return;
 
@@ -642,7 +642,7 @@ struct ViewBuf {
         _len = newLen;
     }
 
-    void truncate(usize newLen) {
+    void trunc(usize newLen) {
         if (newLen >= _len)
             return;
 

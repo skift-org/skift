@@ -30,7 +30,7 @@ void reduce(State &s, Action a) {
             if (s.currentUrl() == gotTo.url)
                 return;
 
-            s.history.truncate(s.currentIndex + 1);
+            s.history.trunc(s.currentIndex + 1);
             s.history.pushBack(gotTo.url);
             s.currentIndex++;
         },

@@ -61,13 +61,13 @@ struct _Vec {
 
     void ensure(usize cap) { _buf.ensure(cap); }
 
-    void truncate(usize len) { _buf.truncate(len); }
+    void trunc(usize len) { _buf.trunc(len); }
 
     void resize(usize len, T fill = {}) { _buf.resize(len, fill); }
 
     void fit() { _buf.fit(); }
 
-    void clear() { _buf.truncate(0); }
+    void clear() { _buf.trunc(0); }
 
     usize cap() const { return _buf.cap(); }
 

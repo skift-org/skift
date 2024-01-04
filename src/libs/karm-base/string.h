@@ -248,7 +248,7 @@ struct _StringBuilder {
     }
 
     void clear() {
-        _buf.truncate(0);
+        _buf.trunc(0);
     }
 
     _String<E> take() {

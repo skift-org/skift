@@ -102,7 +102,7 @@ struct Model {
 
     void _push(Op op, usize pos, Rune rune) {
         if (_index != _records.len())
-            _records.truncate(_index);
+            _records.trunc(_index);
 
         auto &record = _records.emplaceBack();
         record.op = op;

@@ -195,7 +195,7 @@ struct GroupNode : public LeafNode<Crtp> {
             us[i]->attach(this);
         }
 
-        us.truncate(them.len());
+        us.trunc(them.len());
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {

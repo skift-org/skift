@@ -203,8 +203,8 @@ struct Text {
     }
 
     f64 _layoutVerticaly() {
-        f64 baseline = 0;
         auto m = _style.font.metrics();
+        f64 baseline = m.linegap / 2;
         for (auto &line : _lines) {
             baseline += m.ascend;
             line.baseline = baseline;
@@ -272,7 +272,7 @@ struct Text {
 
     void paint(Context &ctx) const {
         auto m = _style.font.metrics();
-        auto baseline = m.ascend;
+        auto baseline = m.ascend + m.linegap / 2;
 
         ctx.save();
         ctx.textFont(_style.font);

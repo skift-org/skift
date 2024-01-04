@@ -139,6 +139,18 @@ union Vec2 {
         return {static_cast<U>(x), static_cast<U>(y)};
     }
 
+    Vec2 floor() {
+        return {Math::floor(x), Math::floor(y)};
+    }
+
+    Vec2 ceil() {
+        return {Math::ceil(x), Math::ceil(y)};
+    }
+
+    Vec2 round() {
+        return {Math::round(x), Math::round(y)};
+    }
+
     bool hasNan() const {
         return isNan(x) or isNan(y);
     }
@@ -319,6 +331,18 @@ union Vec3 {
         };
     }
 
+    Vec3 floor() {
+        return {Math::floor(x), Math::floor(y), Math::floor(z)};
+    }
+
+    Vec3 ceil() {
+        return {Math::ceil(x), Math::ceil(y), Math::ceil(z)};
+    }
+
+    Vec3 round() {
+        return {Math::round(x), Math::round(y), Math::round(z)};
+    }
+
     bool hasNan() const {
         return isNan(x) or isNan(y) or isNan(z);
     }
@@ -493,6 +517,18 @@ union Vec4 {
             static_cast<U>(z),
             static_cast<U>(w),
         };
+    }
+
+    Vec4 floor() {
+        return {Math::floor(x), Math::floor(y), Math::floor(z), Math::floor(w)};
+    }
+
+    Vec4 ceil() {
+        return {Math::ceil(x), Math::ceil(y), Math::ceil(z), Math::ceil(w)};
+    }
+
+    Vec4 round() {
+        return {Math::round(x), Math::round(y), Math::round(z), Math::round(w)};
     }
 
     bool hasNan() const {

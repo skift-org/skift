@@ -24,10 +24,13 @@ FontMetrics Font::metrics() const {
     auto m = fontface->metrics();
 
     m.advance *= scale();
-    m.ascend *= scale() * lineheight;
-    m.captop *= scale() * lineheight;
-    m.descend *= scale() * lineheight;
-    m.linegap *= scale() * lineheight;
+    m.ascend *= scale();
+    m.captop *= scale();
+    m.descend *= scale();
+    m.linegap *= scale();
+
+    // Spread linegap evenly between lines
+    m.linegap += (lineheight - 1) * (m.ascend + m.descend);
 
     return m;
 }
@@ -50,7 +53,7 @@ FontMesure Font::mesure(Glyph r) const {
 
     return {
         .capbound = {adv, m.captop + m.descend},
-        .linebound = {adv, m.ascend + m.descend},
+        .linebound = {adv, m.ascend + m.descend + m.linegap},
         .baseline = {0, m.ascend},
     };
 }
@@ -73,7 +76,7 @@ FontMesure Font::mesureStr(Str str) const {
     auto m = metrics();
     return {
         .capbound = {adv, m.captop + m.descend},
-        .linebound = {adv, m.ascend + m.descend},
+        .linebound = {adv, m.ascend + m.descend + m.linegap},
         .baseline = {0, m.ascend},
     };
 }

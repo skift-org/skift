@@ -244,7 +244,7 @@ struct Text : public View<Text> {
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint) override {
         auto size = _text.layout(s.width);
-        return size.cast<isize>();
+        return size.ceil().cast<isize>();
     }
 };
 

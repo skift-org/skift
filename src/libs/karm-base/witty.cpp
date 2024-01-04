@@ -122,7 +122,7 @@ static Array WITTY = {
     "You've been pwned",
     "You've been terminated",
     "Your are a cringe fellow",
-
+    "You should run the tests again",
 };
 
 Str witty(usize seed) {
@@ -137,7 +137,7 @@ static Array NICE = {
     "Chat says you gyatt",
     "Congratulation",
     "EPIC WIN",
-    "Giga chad dialect from up state ohio",
+    "Giga chad dialect from up state Ohio",
     "Give that girl a blahaj",
     "Great job",
     "I have imagined this moment for a long time. Is it real?",
@@ -170,6 +170,8 @@ static Array NICE = {
     "You're the best",
     "Your are a legend",
     "Your rizz is rizzing",
+    "LGTM",
+    "Instant r+",
 };
 
 Str nice(usize seed) {

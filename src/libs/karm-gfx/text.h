@@ -17,7 +17,7 @@ struct TextStyle {
     TextAlign align = TextAlign::LEFT;
     Opt<Color> color = NONE;
     bool wordwrap = true;
-    bool multiline = true;
+    bool multiline = false;
 
     TextStyle withSize(f64 size) const {
         TextStyle style = *this;
@@ -175,7 +175,7 @@ struct Text {
         for (usize i = 0; i < _blocks.len(); i++) {
             auto &block = _blocks[i];
             auto fullWidth = block.fullWidth(_style);
-            if (adv + block.width > width and _style.wordwrap and not first) {
+            if (adv + block.width > width and _style.wordwrap and _style.multiline and not first) {
                 _lines.pushBack(line);
                 line = {{i, 1}};
                 adv = fullWidth;
@@ -188,7 +188,7 @@ struct Text {
             } else {
                 line.blocks.size++;
 
-                if (block.newline) {
+                if (block.newline and _style.multiline) {
                     _lines.pushBack(line);
                     line = {{i + 1, 0}};
                     adv = 0;
@@ -198,6 +198,7 @@ struct Text {
             }
             first = false;
         }
+
         _lines.pushBack(line);
     }
 
@@ -277,13 +278,13 @@ struct Text {
         ctx.textFont(_style.font);
         if (_style.color)
             ctx.fillStyle(*_style.color);
+
         for (auto const &line : _lines) {
             for (usize b = line.blocks.start; b < line.blocks.end(); b++) {
                 auto const &block = _blocks[b];
 
                 for (usize c = block.cells.start; c < block.cells.end(); c++) {
                     auto const &cell = _cells[c];
-
                     ctx.fill({block.pos + cell.pos, baseline}, cell.glyph);
                 }
             }

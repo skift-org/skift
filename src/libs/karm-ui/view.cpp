@@ -160,6 +160,7 @@ Gfx::TextStyle TextStyles::bodyLarge() {
             regularFontface(),
             16,
         },
+        .multiline = true,
     };
 }
 
@@ -169,6 +170,7 @@ Gfx::TextStyle TextStyles::bodyMedium() {
             regularFontface(),
             14,
         },
+        .multiline = true,
     };
 }
 
@@ -178,6 +180,7 @@ Gfx::TextStyle TextStyles::bodySmall() {
             regularFontface(),
             12,
         },
+        .multiline = true,
     };
 }
 
@@ -187,6 +190,7 @@ Gfx::TextStyle TextStyles::codeLarge() {
             codeFontface(),
             16,
         },
+        .multiline = true,
     };
 }
 
@@ -196,6 +200,7 @@ Gfx::TextStyle TextStyles::codeMedium() {
             codeFontface(),
             14,
         },
+        .multiline = true,
     };
 }
 
@@ -205,76 +210,18 @@ Gfx::TextStyle TextStyles::codeSmall() {
             codeFontface(),
             12,
         },
+        .multiline = true,
     };
 }
 
 struct Text : public View<Text> {
-    Gfx::TextStyle _style;
-    String _text;
-    Opt<Media::FontMesure> _mesure;
-
-    Text(Gfx::TextStyle style, String text)
-        : _style(style), _text(text) {}
-
-    void reconcile(Text &o) override {
-        _text = o._text;
-        _mesure = NONE;
-    }
-
-    Media::FontMesure mesure() {
-        if (_mesure)
-            return *_mesure;
-        _mesure = _style.font.mesureStr(_text);
-        return *_mesure;
-    }
-
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
-
-        auto m = mesure();
-        auto baseline = bound().topStart() + m.baseline;
-
-        if (_style.color) {
-            g.fillStyle(*_style.color);
-        }
-
-        g.textFont(_style.font);
-        g.fill(baseline, _text);
-
-        if (debugShowLayoutBounds) {
-            g.debugLine(
-                {
-                    bound().topStart() + m.baseline.cast<isize>(),
-                    bound().topEnd() + m.baseline.cast<isize>(),
-                },
-                Gfx::PINK);
-            g.debugRect(bound(), Gfx::CYAN);
-        }
-
-        g.restore();
-    }
-
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return mesure().linebound.size().cast<isize>();
-    }
-};
-
-Child text(Gfx::TextStyle style, Str text) {
-    return makeStrong<Text>(style, text);
-}
-
-Child text(Str text) {
-    return makeStrong<Text>(TextStyles::labelMedium(), text);
-}
-
-struct Text2 : public View<Text2> {
     Gfx::Text _text;
     Opt<Media::FontMesure> _mesure;
 
-    Text2(Gfx::TextStyle style, Str text)
+    Text(Gfx::TextStyle style, Str text)
         : _text(style, text) {}
 
-    void reconcile(Text2 &o) override {
+    void reconcile(Text &o) override {
         _text = o._text;
         _mesure = NONE;
     }
@@ -286,11 +233,13 @@ struct Text2 : public View<Text2> {
         g.origin(bound().xy);
         _text.paint(g);
         g.restore();
+        if (debugShowLayoutBounds)
+            g.debugRect(bound(), Gfx::CYAN);
     }
 
     void layout(Math::Recti bound) override {
         _text.layout(bound.width);
-        View<Text2>::layout(bound);
+        View<Text>::layout(bound);
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint) override {
@@ -299,12 +248,12 @@ struct Text2 : public View<Text2> {
     }
 };
 
-Child text2(Gfx::TextStyle style, Str text) {
-    return makeStrong<Text2>(style, text);
+Child text(Gfx::TextStyle style, Str text) {
+    return makeStrong<Text>(style, text);
 }
 
-Child text2(Str text) {
-    return makeStrong<Text2>(TextStyles::labelMedium(), text);
+Child text(Str text) {
+    return makeStrong<Text>(TextStyles::labelMedium(), text);
 }
 
 /* --- Badge ---------------------------------------------------------------- */

@@ -9,7 +9,10 @@
 namespace Hideo::Text {
 
 Ui::Child editor(Str text) {
-    return Ui::text2(text) | Ui::spacing(6) | Ui::grow() | Ui::vscroll();
+    return Ui::bodyMedium(text) |
+           Ui::spacing(6) |
+           Ui::grow() |
+           Ui::vscroll();
 }
 
 Ui::Child app(Res<String> text) {

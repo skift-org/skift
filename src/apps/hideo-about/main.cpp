@@ -28,7 +28,7 @@ Ui::Child app() {
                 Ui::headlineMedium("skiftOS"),
                 Ui::versionBadge() | Ui::center()),
             Ui::empty(),
-            Ui::text2("Copyright © 2018-2024\nThe skiftOS Developers\nAll rights reserved."),
+            Ui::bodySmall("Copyright © 2018-2024\nThe skiftOS Developers\nAll rights reserved."),
             Ui::grow(NONE),
             Ui::hflow(
                 8,

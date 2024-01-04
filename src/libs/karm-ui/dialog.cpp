@@ -282,7 +282,7 @@ Ui::Child licenseDialog() {
         Ui::vflow(
             8,
             Ui::titleLarge("License"),
-            Ui::text2(LICENSE) | Ui::vscroll() | Ui::maxSize({480, Ui::UNCONSTRAINED}) | Ui::grow()),
+            Ui::bodySmall(LICENSE) | Ui::vscroll() | Ui::maxSize({480, Ui::UNCONSTRAINED}) | Ui::grow()),
         {Ui::grow(NONE), Ui::dialogCloseButton()});
 }
 
@@ -294,8 +294,8 @@ Child aboutDialog(Mdi::Icon i, String name) {
             spacing(8, icon(i, 56)),
             titleLarge(name),
             versionBadge()),
-        text2(
-            Ui::TextStyles::labelMedium()
+        text(
+            Ui::TextStyles::bodySmall()
                 .withAlign(Gfx::TextAlign::CENTER)
                 .withColor(Ui::GRAY400),
             "Copyright © 2018-2024\nThe skiftOS Developers\nAll rights reserved.") |

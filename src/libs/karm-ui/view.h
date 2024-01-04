@@ -57,10 +57,6 @@ Child text(Gfx::TextStyle style, Str text);
 
 Child text(Str text);
 
-Child text2(Gfx::TextStyle style, Str text);
-
-Child text2(Str text);
-
 template <typename... Args>
 inline Child text(Gfx::TextStyle style, Str format, Args &&...args) {
     return text(style, Fmt::format(format, std::forward<Args>(args)...).unwrap());

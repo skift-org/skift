@@ -6,7 +6,7 @@
 > [!NOTE]
 > If you are having trouble building skiftOS, feel free to ask for help in the [Discord server](https://discord.com/invite/gamGsfg)
 
-To build skiftOS, you need to have a modern C/C++ compiler such as clang-16 installed on your computer. Additionally, you need to have the following tools installed: `python3`, `llvm`, `clang`, `ninja`, `nasm`, and `qemu`. Please refer to the documentation of these tools or use your package manager to install them.
+To build skiftOS, you need to have a modern C/C++ compiler such as the latest version of clang installed on your computer. Additionally, you need to have the following tools installed: `python3`, `llvm`, `clang`, `ninja`, `nasm`, and `qemu`. Please refer to the documentation of these tools or use your package manager to install them.
 
 ### Step 0: Clone the repository
 
@@ -26,6 +26,9 @@ $ cd skift
 ### Step 1: Set up the build environment
 
 First, set up the build environment by running the following command:
+
+> [!NOTE]
+> On ubuntu, this first step will be able to install all the required dependencies for you using `apt`. If you are not using ubuntu, you will need to install the dependencies manually using your package manager.
 
 ```sh
 $ ./skift.sh tools setup

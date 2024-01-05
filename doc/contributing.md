@@ -16,3 +16,7 @@ Binary files should be kept as small as possible. Here are some tips for reducin
 - Use `optipng -strip all` to reduce the size of PNG images.
 - Use `gifsicle -O3` to reduce the size of GIF images.
 - Use `jpegoptim -m90` to reduce the size of JPEG images.
+
+## Code Style
+
+Just configure you IDE to use the `.clang-format` file at the root of the source tree, or use `meta/scripts/style-fix.sh` to format the code.

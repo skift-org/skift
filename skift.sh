@@ -2,6 +2,14 @@
 
 set -e
 
+function is_ubuntu() {
+    if [ -f /etc/os-release ]; then
+        grep -q "ubuntu" /etc/os-release
+        return $?
+    fi
+    return 1
+}
+
 if [ "$CUTEKIT_NOVENV" == "1" ]; then
     echo "CUTEKIT_NOVENV is set, skipping virtual environment setup."
     exec cutekit $@
@@ -25,6 +33,11 @@ if [ ! -f .cutekit/tools/ready ]; then
         fi
     else
         echo "Installing tools..."
+    fi
+
+    if is_ubuntu; then
+        echo "Detected Ubuntu, installing dependencies automatically..."
+        sudo ./meta/scripts/setup-ubuntu.sh
     fi
 
     mkdir -p .cutekit

@@ -18,9 +18,6 @@ jobs:
         with:
             python-version: '3.11'
 
-      - name: Install Dependencies
-        run: sudo meta/scripts/setup-ubuntu.sh
-
       - name: Set up the build environment
         run: ./skift.sh tools setup && ./skift.sh tools doctor
 

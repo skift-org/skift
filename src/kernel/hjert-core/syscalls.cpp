@@ -31,7 +31,7 @@ Res<> doLog(Task &self, UserSlice<char const> msg) {
             }
         } scope;
         auto styledLabel = Cli::styled(self.label(), Cli::style(Cli::random(self.id())));
-        try$(Fmt::format(Hjert::Arch::loggerOut(), "{}({}) ", styledLabel, self.id()));
+        try$(Fmt::format(Hjert::Arch::loggerOut(), "{} | ", Fmt::aligned(styledLabel, Fmt::Align::LEFT, 26)));
         try$(Hjert::Arch::loggerOut().writeStr(str));
         return Ok();
     });

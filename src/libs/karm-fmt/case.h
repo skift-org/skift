@@ -76,6 +76,23 @@ inline auto cased(auto inner, Case cased) {
     return Cased<decltype(inner)>{inner, cased};
 }
 
+enum struct Align {
+    LEFT,
+    RIGHT,
+    CENTER,
+};
+
+template <typename T>
+struct Aligned {
+    T _inner;
+    Align _align;
+    usize _width;
+};
+
+inline auto aligned(auto inner, Align align, usize width) {
+    return Aligned<decltype(inner)>{inner, align, width};
+}
+
 } // namespace Karm::Fmt
 
 template <typename T>
@@ -90,8 +107,55 @@ struct Karm::Fmt::Formatter<Karm::Fmt::Cased<T>> {
         }
     }
 
-    Res<usize> format(Io::TextWriter &writer, Karm::Fmt::Cased<T> cased) {
-        auto result = try$(changeCase(cased._inner, cased._case));
+    Res<usize> format(Io::TextWriter &writer, Karm::Fmt::Cased<T> val) {
+        auto result = try$(changeCase(val._inner, val._case));
         return writer.writeStr(result);
+    }
+};
+
+template <typename T>
+struct Karm::Fmt::Formatter<Karm::Fmt::Aligned<T>> {
+    Formatter<T> _innerFmt{};
+
+    void parse(Io::SScan &scan) {
+        if constexpr (requires() {
+                          _innerFmt.parse(scan);
+                      }) {
+            _innerFmt.parse(scan);
+        }
+    }
+
+    Res<usize> format(Io::TextWriter &writer, Karm::Fmt::Aligned<T> val) {
+        Io::StringWriter buf;
+        try$(_innerFmt.format(buf, val._inner));
+        usize width = buf.len();
+        usize result = 0;
+
+        if (width < val._width) {
+            usize pad = val._width - width;
+            switch (val._align) {
+            case Align::LEFT:
+                result += try$(writer.writeStr(buf.str()));
+                for (usize i = 0; i < pad; i++)
+                    result += try$(writer.writeRune(' '));
+                break;
+            case Align::RIGHT:
+                for (usize i = 0; i < pad; i++)
+                    result += try$(writer.writeRune(' '));
+                result += try$(writer.writeStr(buf.str()));
+                break;
+            case Align::CENTER:
+                for (usize i = 0; i < pad / 2; i++)
+                    result += try$(writer.writeRune(' '));
+                result += try$(writer.writeStr(buf.str()));
+                for (usize i = 0; i < pad / 2; i++)
+                    result += try$(writer.writeRune(' '));
+                break;
+            }
+        } else {
+            result += try$(writer.writeStr(buf.str()));
+        }
+
+        return Ok(result);
     }
 };

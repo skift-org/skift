@@ -4,7 +4,7 @@
 #include <karm-base/atomic.h>
 #include <karm-base/lock.h>
 #include <karm-base/rc.h>
-#include <karm-fmt/case.h>
+#include <karm-fmt/fmt.h>
 
 namespace Hjert::Core {
 

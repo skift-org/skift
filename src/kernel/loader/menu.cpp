@@ -1,5 +1,4 @@
 #include <hideo-base/alert.h>
-#include <karm-fmt/case.h>
 #include <karm-ui/app.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
@@ -141,7 +140,7 @@ Ui::Child menu(Configs const &c) {
         });
 }
 
-Res<> showMenu(Ctx &ctx, Configs const &c) {
+Res<> showMenu(Sys::Ctx &ctx, Configs const &c) {
     return Ui::runApp(ctx, Loader::menu(c));
 }
 

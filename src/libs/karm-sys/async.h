@@ -402,7 +402,7 @@ struct [[nodiscard]] Task : public Source {
     }
 
     virtual Res<TimeStamp> poll(Sink &sink) override {
-        if (_prom->_value)
+        if (_prom->_value.has())
             _sched.post<Event>(sink, _prom->_value.take());
         return Ok(TimeStamp::endOfTime());
     }
@@ -458,6 +458,7 @@ Res<T, E> runSync(Task<T, E> task, Sched &sched = globalSched()) {
         auto until = try$(sched.runOnce());
         if (res.has())
             return res.take();
+
         try$(sched.wait(until));
     }
 }

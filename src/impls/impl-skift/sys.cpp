@@ -18,6 +18,10 @@ struct VmoFd : public Sys::Fd {
     VmoFd(Hj::Vmo vmo)
         : _vmo(std::move(vmo)) {}
 
+    usize handle() const override {
+        return (usize)&_vmo;
+    }
+
     Res<usize> read(MutBytes) override {
         notImplemented();
     }

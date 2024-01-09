@@ -3,6 +3,11 @@
     "id": "impl-uring",
     "type": "lib",
     "description": "Uring based implementation of karm-sys",
+    "enableIf": {
+        "sys": [
+            "linux"
+        ]
+    },
     "requires": [
         "uring"
     ],

@@ -1,5 +1,4 @@
 
-#include <karm-fmt/case.h>
 #include <karm-ui/box.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/view.h>

@@ -31,6 +31,9 @@ struct Cons {
     }
 };
 
+template <typename TCar, typename TCdr>
+Cons(TCar, TCdr) -> Cons<TCar, TCdr>;
+
 template <typename T>
 using Pair = Cons<T, T>;
 

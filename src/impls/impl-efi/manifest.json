@@ -16,6 +16,7 @@
     "provides": [
         "karm-logger-impl",
         "karm-sys-impl",
+        "karm-sys-async-impl",
         "karm-ui-impl"
     ]
 }

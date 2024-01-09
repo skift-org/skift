@@ -31,6 +31,10 @@ struct Tuple<> {
     constexpr auto visit(auto) {
         return true;
     }
+
+    constexpr auto visit(auto) const {
+        return true;
+    }
 };
 
 template <typename _T0>
@@ -50,7 +54,14 @@ struct Tuple<_T0> {
     constexpr auto visit(auto f) {
         return f(v0);
     }
+
+    constexpr auto visit(auto f) const {
+        return f(v0);
+    }
 };
+
+template <typename T0>
+Tuple(T0) -> Tuple<T0>;
 
 template <typename _T0, typename _T1>
 struct Tuple<_T0, _T1> {
@@ -77,7 +88,17 @@ struct Tuple<_T0, _T1> {
             return res;
         return f(v1);
     }
+
+    constexpr auto visit(auto f) const {
+        auto res = f(v0);
+        if (not res)
+            return res;
+        return f(v1);
+    }
 };
+
+template <typename _T0, typename _T1>
+Tuple(_T0, _T1) -> Tuple<_T0, _T1>;
 
 template <typename _T0, typename _T1, typename _T2>
 struct Tuple<_T0, _T1, _T2> {
@@ -112,7 +133,20 @@ struct Tuple<_T0, _T1, _T2> {
             return res;
         return f(v2);
     }
+
+    constexpr auto visit(auto f) const {
+        auto res = f(v0);
+        if (not res)
+            return res;
+        res = f(v1);
+        if (not res)
+            return res;
+        return f(v2);
+    }
 };
+
+template <typename _T0, typename _T1, typename _T2>
+Tuple(_T0, _T1, _T2) -> Tuple<_T0, _T1, _T2>;
 
 template <typename _T0, typename _T1, typename _T2, typename _T3>
 struct Tuple<_T0, _T1, _T2, _T3> {
@@ -155,7 +189,23 @@ struct Tuple<_T0, _T1, _T2, _T3> {
             return res;
         return f(v3);
     }
+
+    constexpr auto visit(auto f) const {
+        auto res = f(v0);
+        if (not res)
+            return res;
+        res = f(v1);
+        if (not res)
+            return res;
+        res = f(v2);
+        if (not res)
+            return res;
+        return f(v3);
+    }
 };
+
+template <typename _T0, typename _T1, typename _T2, typename _T3>
+Tuple(_T0, _T1, _T2, _T3) -> Tuple<_T0, _T1, _T2, _T3>;
 
 template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4>
 struct Tuple<_T0, _T1, _T2, _T3, _T4> {
@@ -206,7 +256,26 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4> {
             return res;
         return f(v4);
     }
+
+    constexpr auto visit(auto f) const {
+        auto res = f(v0);
+        if (not res)
+            return res;
+        res = f(v1);
+        if (not res)
+            return res;
+        res = f(v2);
+        if (not res)
+            return res;
+        res = f(v3);
+        if (not res)
+            return res;
+        return f(v4);
+    }
 };
+
+template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4>
+Tuple(_T0, _T1, _T2, _T3, _T4) -> Tuple<_T0, _T1, _T2, _T3, _T4>;
 
 template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5>
 struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5> {
@@ -265,7 +334,29 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5> {
             return res;
         return f(v5);
     }
+
+    constexpr auto visit(auto f) const {
+        auto res = f(v0);
+        if (not res)
+            return res;
+        res = f(v1);
+        if (not res)
+            return res;
+        res = f(v2);
+        if (not res)
+            return res;
+        res = f(v3);
+        if (not res)
+            return res;
+        res = f(v4);
+        if (not res)
+            return res;
+        return f(v5);
+    }
 };
+
+template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5>
+Tuple(_T0, _T1, _T2, _T3, _T4, _T5) -> Tuple<_T0, _T1, _T2, _T3, _T4, _T5>;
 
 template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5, typename _T6>
 struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6> {
@@ -332,7 +423,32 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6> {
             return res;
         return f(v6);
     }
+
+    constexpr auto visit(auto f) const {
+        auto res = f(v0);
+        if (not res)
+            return res;
+        res = f(v1);
+        if (not res)
+            return res;
+        res = f(v2);
+        if (not res)
+            return res;
+        res = f(v3);
+        if (not res)
+            return res;
+        res = f(v4);
+        if (not res)
+            return res;
+        res = f(v5);
+        if (not res)
+            return res;
+        return f(v6);
+    }
 };
+
+template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5, typename _T6>
+Tuple(_T0, _T1, _T2, _T3, _T4, _T5, _T6) -> Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6>;
 
 template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5, typename _T6, typename _T7>
 struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7> {
@@ -407,6 +523,34 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7> {
             return res;
         return f(v7);
     }
+
+    constexpr auto visit(auto f) const {
+        auto res = f(v0);
+        if (not res)
+            return res;
+        res = f(v1);
+        if (not res)
+            return res;
+        res = f(v2);
+        if (not res)
+            return res;
+        res = f(v3);
+        if (not res)
+            return res;
+        res = f(v4);
+        if (not res)
+            return res;
+        res = f(v5);
+        if (not res)
+            return res;
+        res = f(v6);
+        if (not res)
+            return res;
+        return f(v7);
+    }
 };
+
+template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5, typename _T6, typename _T7>
+Tuple(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7) -> Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7>;
 
 } // namespace Karm

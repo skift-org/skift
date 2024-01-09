@@ -1,6 +1,6 @@
 #include <karm-io/expr.h>
 
-#include "case.h"
+#include "fmt.h"
 
 namespace Karm::Fmt {
 

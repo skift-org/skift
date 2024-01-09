@@ -17,6 +17,10 @@ struct ConOut : public Sys::Fd {
 
     ConOut(Efi::SimpleTextOutputProtocol *proto) : _proto(proto) {}
 
+    usize handle() const override {
+        return (usize)_proto;
+    }
+
     Res<usize> read(MutBytes) override {
         notImplemented();
     }
@@ -101,6 +105,10 @@ struct FileProto : public Sys::Fd {
     FileProto &operator=(FileProto &&other) {
         std::swap(_proto, other._proto);
         return *this;
+    }
+
+    usize handle() const override {
+        return (usize)_proto;
     }
 
     Res<usize> read(MutBytes bytes) override {

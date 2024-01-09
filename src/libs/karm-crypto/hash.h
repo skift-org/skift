@@ -1,6 +1,5 @@
 #pragma once
 
-#include <karm-fmt/case.h>
 #include <karm-fmt/fmt.h>
 
 #include "adler32.h"

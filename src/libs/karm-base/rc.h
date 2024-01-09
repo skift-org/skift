@@ -282,9 +282,9 @@ struct Weak {
     }
 
     Opt<Strong<T>> upgrade() const {
-        if (not _cell)
+        if (not _cell or _cell->_clear)
             return NONE;
-        return Strong<T>(_cell);
+        return Strong<T>(MOVE, _cell);
     }
 };
 

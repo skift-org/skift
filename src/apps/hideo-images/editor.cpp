@@ -1,5 +1,4 @@
 #include <hideo-base/input.h>
-#include <karm-fmt/case.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/input.h>
 #include <karm-ui/scafold.h>

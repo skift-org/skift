@@ -1,6 +1,5 @@
 #pragma once
 
-#include <karm-fmt/case.h>
 #include <karm-ui/box.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/view.h>
@@ -25,7 +24,6 @@ static inline Child errorScope(Str what, auto callback) {
         },
         hflow(
             6,
-
             icon(Mdi::ALERT_DECAGRAM_OUTLINE, 26) | center(),
             vflow(
                 4,

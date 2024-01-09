@@ -2,7 +2,6 @@
 #include <karm-cli/cursor.h>
 #include <karm-cli/spinner.h>
 #include <karm-cli/style.h>
-#include <karm-fmt/case.h>
 #include <karm-sys/chan.h>
 #include <karm-sys/time.h>
 
@@ -36,6 +35,7 @@ void Driver::runAll() {
 
         if (not result) {
             failed++;
+            Sys::errln("{}", Cli::styled(result.none(), Cli::style(Cli::RED).bold()));
         } else {
             Sys::errln("{}", Cli::styled("PASS", Cli::style(Cli::GREEN).bold()));
             passed++;

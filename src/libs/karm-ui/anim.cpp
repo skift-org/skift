@@ -41,7 +41,7 @@ struct SlideIn : public ProxyNode<SlideIn> {
         g.restore();
     }
 
-    void event(Async::Event &e) override {
+    void event(Sys::Event &e) override {
         if (_slide.needRepaint(*this, e))
             Ui::shouldRepaint(*this, bound());
 

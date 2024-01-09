@@ -1,7 +1,7 @@
 #include <hjert-api/api.h>
 #include <karm-base/map.h>
 #include <karm-logger/logger.h>
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 
 #include "cmos.h"
 #include "io.h"
@@ -23,7 +23,7 @@ struct IsaRootBus : public Node {
 
 } // namespace Grund::Device
 
-Res<> entryPoint(Ctx &) {
+Res<> entryPoint(Sys::Ctx &) {
     logInfo("devices: building device tree...");
     auto root = makeStrong<Grund::Device::IsaRootBus>();
     try$(root->init());
@@ -50,7 +50,7 @@ Res<> entryPoint(Ctx &) {
 
             auto irq = cap2irq.get(ev->cap);
             if (irq) {
-                auto e = Async::makeEvent<Grund::Device::IrqEvent>(Async::Propagation::UP, *irq);
+                auto e = Sys::makeEvent<Grund::Device::IrqEvent>(Sys::Propagation::UP, *irq);
                 try$(root->event(*e));
             }
             ev = listener.next();

@@ -11,8 +11,15 @@
 
 namespace Karm::Sys {
 
+struct Fd;
+
+using Accepted = Cons<Strong<Fd>, SocketAddr>;
+using Received = Cons<usize, SocketAddr>;
+
 struct Fd : Meta::NoCopy {
     virtual ~Fd() = default;
+
+    virtual usize handle() const = 0;
 
     virtual Res<usize> read(MutBytes) = 0;
 
@@ -24,7 +31,7 @@ struct Fd : Meta::NoCopy {
 
     virtual Res<Strong<Fd>> dup() = 0;
 
-    virtual Res<Cons<Strong<Fd>, SocketAddr>> accept() = 0;
+    virtual Res<Accepted> accept() = 0;
 
     virtual Res<Stat> stat() = 0;
 
@@ -34,10 +41,12 @@ struct Fd : Meta::NoCopy {
 
     virtual Res<usize> sendTo(Bytes, SocketAddr) = 0;
 
-    virtual Res<Cons<usize, SocketAddr>> recvFrom(MutBytes) = 0;
+    virtual Res<Received> recvFrom(MutBytes) = 0;
 };
 
 struct NullFd : public Fd {
+    usize handle() const override { return -1; }
+
     Res<usize> read(MutBytes) override;
 
     Res<usize> write(Bytes) override;
@@ -48,7 +57,7 @@ struct NullFd : public Fd {
 
     Res<Strong<Fd>> dup() override;
 
-    Res<Cons<Strong<Fd>, SocketAddr>> accept() override;
+    Res<Accepted> accept() override;
 
     Res<Stat> stat() override;
 
@@ -58,7 +67,7 @@ struct NullFd : public Fd {
 
     Res<usize> sendTo(Bytes, SocketAddr) override;
 
-    Res<Cons<usize, SocketAddr>> recvFrom(MutBytes) override;
+    Res<Received> recvFrom(MutBytes) override;
 };
 
 template <typename T>

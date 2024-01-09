@@ -10,7 +10,7 @@
 
 namespace Web::Client {
 
-Async::Prom<Sys::Ip> resolve(Str host) {
+Sys::Task<Sys::Ip> resolve(Str host) {
     auto res = Sys::Ip::parse(host);
     if (res)
         co_return res;
@@ -22,7 +22,7 @@ Async::Prom<Sys::Ip> resolve(Str host) {
     co_return Ok(co_try$(dns.resolve(host)));
 }
 
-Async::Prom<usize> _fetch(Url::Url const &url, Sys::_Connection &conn, Io::Writer &out) {
+Sys::Task<usize> _fetch(Url::Url const &url, Sys::_Connection &conn, Io::Writer &out) {
     // Send request
     logDebug("GET {} HTTP/1.1", url.path);
     Io::StringWriter req;
@@ -58,7 +58,7 @@ Async::Prom<usize> _fetch(Url::Url const &url, Sys::_Connection &conn, Io::Write
     co_return Ok(contentLength);
 }
 
-Async::Prom<usize> fetch(Url::Url const &url, Io::Writer &out) {
+Sys::Task<usize> fetch(Url::Url const &url, Io::Writer &out) {
     auto ip = co_try_await$(resolve(url.host));
     auto port = url.port ? *url.port : 80;
     if (port > 65535)
@@ -78,13 +78,13 @@ Async::Prom<usize> fetch(Url::Url const &url, Io::Writer &out) {
     }
 }
 
-Async::Prom<String> fetchString(Url::Url const &url) {
+Sys::Task<String> fetchString(Url::Url const &url) {
     Io::StringWriter out;
     co_try_await$(fetch(url, out));
     co_return Ok(out.take());
 }
 
-Async::Prom<Json::Value> fetchJson(Url::Url const &url) {
+Sys::Task<Json::Value> fetchJson(Url::Url const &url) {
     auto str = co_try_await$(fetchString(url));
     co_return Ok(co_try$(Json::parse(str)));
 }

@@ -6,8 +6,7 @@
     "requires": [
         "hideo-keyboard-base",
         "hideo-base",
-        "skift-wallpapers",
-        "karm-main"
+        "skift-wallpapers"
     ],
     "provides": [
         "__main__"

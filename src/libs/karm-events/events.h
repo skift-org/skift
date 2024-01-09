@@ -44,7 +44,7 @@ struct TypedEvent {
     Mod mods = Mod::NONE;
 };
 
-struct ExitEvent {
+struct RequestExitEvent {
     Res<> res = Ok();
 };
 

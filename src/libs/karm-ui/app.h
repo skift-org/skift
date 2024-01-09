@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-main/base.h>
+#include <karm-sys/context.h>
 
 #include "_embed.h"
 
@@ -60,7 +60,7 @@ Child inspector(Child child) {
             }));
 }
 
-inline Res<> runApp(Ctx &ctx, Child root) {
+inline Res<> runApp(Sys::Ctx &ctx, Child root) {
     auto &args = useArgs(ctx);
     if (args.has("+debug")) {
         root = inspector(root);

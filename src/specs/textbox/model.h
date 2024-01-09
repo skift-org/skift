@@ -1,10 +1,10 @@
 #pragma once
 
-#include <karm-async/event.h>
 #include <karm-base/ctype.h>
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
 #include <karm-events/events.h>
+#include <karm-sys/async.h>
 
 namespace Textbox {
 
@@ -392,7 +392,7 @@ struct Model {
         _records.clear();
     }
 
-    void handle(Async::Event &e, auto &clipboard = DUMMY_CLIPBOARD) {
+    void handle(Sys::Event &e, auto &clipboard = DUMMY_CLIPBOARD) {
         if (auto *te = e.is<Events::TypedEvent>()) {
             insert(te->codepoint);
             e.accept();

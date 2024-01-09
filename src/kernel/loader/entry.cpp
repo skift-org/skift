@@ -1,10 +1,10 @@
 #include <karm-logger/logger.h>
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 
 #include "loader.h"
 
-Res<> entryPoint(Ctx &ctx) {
+Res<> entryPoint(Sys::Ctx &ctx) {
     logInfo("loading configs...");
     auto file = try$(Sys::File::open("file:/boot/loader.json"_url));
 

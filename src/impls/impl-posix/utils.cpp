@@ -1,6 +1,7 @@
 #include <errno.h>
 
-#include "errno.h"
+
+#include "utils.h"
 
 namespace Posix {
 
@@ -181,6 +182,35 @@ Res<> consumeErrno() {
         errno = 0;
         return err;
     }
+}
+
+struct sockaddr_in toSockAddr(Sys::SocketAddr addr) {
+    struct sockaddr_in sockaddr;
+    auto addr4 = addr.addr.unwrap<Sys::Ip4>();
+    sockaddr.sin_family = AF_INET;
+    sockaddr.sin_port = htons(addr.port);
+    sockaddr.sin_addr.s_addr = addr4._raw._value;
+    return sockaddr;
+}
+
+Sys::SocketAddr fromSockAddr(struct sockaddr_in sockaddr) {
+    Sys::SocketAddr addr{Sys::Ip4::unspecified(), 0};
+    addr.addr.unwrap<Sys::Ip4>()._raw._value = sockaddr.sin_addr.s_addr;
+    addr.port = ntohs(sockaddr.sin_port);
+    return addr;
+}
+
+Sys::Stat fromStat(struct stat const &buf) {
+    Sys::Stat stat{};
+    Sys::Stat::Type type = Sys::Stat::FILE;
+    if (S_ISDIR(buf.st_mode))
+        type = Sys::Stat::DIR;
+    stat.type = type;
+    stat.size = (usize)buf.st_size;
+    stat.accessTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_atime);
+    stat.modifyTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_mtime);
+    stat.changeTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_ctime);
+    return stat;
 }
 
 } // namespace Posix

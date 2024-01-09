@@ -1,4 +1,4 @@
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scafold.h>
 
@@ -14,6 +14,6 @@ Ui::Child app() {
 
 } // namespace Hideo::Console
 
-Res<> entryPoint(Ctx &ctx) {
+Res<> entryPoint(Sys::Ctx &ctx) {
     return Ui::runApp(ctx, Hideo::Console::app());
 }

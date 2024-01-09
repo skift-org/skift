@@ -3,7 +3,6 @@
     "id": "hideo-colors",
     "type": "exe",
     "requires": [
-        "hideo-base",
-        "karm-main"
+        "hideo-base"
     ]
 }

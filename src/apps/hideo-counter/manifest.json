@@ -4,7 +4,6 @@
     "type": "exe",
     "description": "Keeps track of a counter",
     "requires": [
-        "hideo-base",
-        "karm-main"
+        "hideo-base"
     ]
 }

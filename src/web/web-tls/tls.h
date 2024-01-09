@@ -68,6 +68,18 @@ struct TlsConnection : public Sys::_Connection {
     Res<usize> flush() override {
         return _conn.flush();
     }
+
+    Sys::Task<usize> readAsync(MutBytes buf) override {
+        return _conn.readAsync(buf);
+    }
+
+    Sys::Task<usize> writeAsync(Bytes buf) override {
+        return _conn.writeAsync(buf);
+    }
+
+    Sys::Task<usize> flushAsync() override {
+        return _conn.flushAsync();
+    }
 };
 
 } // namespace Web::Tls

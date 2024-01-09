@@ -1,4 +1,4 @@
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -15,7 +15,7 @@ Ui::Child app() {
         "LICENSE");
 
     auto closeBtn = Ui::button(
-        Ui::bindBubble<Events::ExitEvent>(),
+        Ui::bindBubble<Events::RequestExitEvent>(),
         Ui::ButtonStyle::primary(),
         "CLOSE");
 
@@ -47,6 +47,6 @@ Ui::Child app() {
 
 } // namespace Hideo::About
 
-Res<> entryPoint(Ctx &ctx) {
+Res<> entryPoint(Sys::Ctx &ctx) {
     return Ui::runApp(ctx, Hideo::About::app());
 }

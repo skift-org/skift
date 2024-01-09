@@ -1,7 +1,7 @@
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/time.h>
 
-Res<> entryPoint(Ctx &) {
+Res<> entryPoint(Sys::Ctx &) {
     Sys::println("{}", Sys::dateTime());
     return Ok();
 }

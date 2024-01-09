@@ -53,7 +53,7 @@ struct Dismisable :
         g.restore();
     }
 
-    void event(Async::Event &e) override {
+    void event(Sys::Event &e) override {
         if (auto *me = e.is<Events::MouseEvent>()) {
             me->pos = me->pos - drag();
             child().event(e);
@@ -73,7 +73,7 @@ struct Dismisable :
         }
     }
 
-    void bubble(Async::Event &e) override {
+    void bubble(Sys::Event &e) override {
         if (auto *de = e.is<DragEvent>()) {
             if (de->type == DragEvent::DRAG) {
                 auto d = _drag.target() + de->delta;
@@ -124,7 +124,7 @@ struct DragRegion : public ProxyNode<DragRegion> {
 
     using ProxyNode::ProxyNode;
 
-    void event(Async::Event &e) override {
+    void event(Sys::Event &e) override {
         if (not _grabbed)
             _child->event(e);
 

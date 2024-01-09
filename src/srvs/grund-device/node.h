@@ -1,8 +1,8 @@
 #pragma once
 
-#include <karm-async/async.h>
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
+#include <karm-sys/async.h>
 
 namespace Grund::Device {
 
@@ -21,9 +21,9 @@ struct Node : public Meta::Static {
 
     virtual Res<> init();
 
-    virtual Res<> event(Async::Event &e);
+    virtual Res<> event(Sys::Event &e);
 
-    virtual Res<> bubble(Async::Event &e);
+    virtual Res<> bubble(Sys::Event &e);
 
     Res<> attach(Strong<Node> child);
 

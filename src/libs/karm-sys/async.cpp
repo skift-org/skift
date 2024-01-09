@@ -1,16 +1,18 @@
 #include <karm-logger/logger.h>
 
+#include "_embed.h"
+
 #include "async.h"
 
-namespace Karm::Async {
+namespace Karm::Sys {
 
 /* --- Sink --- */
 
-void Loop::_post(Sink &sink, Box<Event> event) {
+void Sched::_post(Sink &sink, Box<Event> event) {
     _queued.emplaceBack(&sink, std::move(event));
 }
 
-void Loop::_move(Sink &from, Sink *to) {
+void Sched::_move(Sink &from, Sink *to) {
     for (auto &q : _queued) {
         if (q.sink == &from) {
             q.sink = to;
@@ -26,11 +28,11 @@ void Loop::_move(Sink &from, Sink *to) {
 
 /* --- Source --- */
 
-void Loop::_bind(Source &source, Sink &sink) {
+void Sched::_bind(Source &source, Sink &sink) {
     _sources.emplaceBack(&source, &sink);
 }
 
-void Loop::_move(Source &from, Source *to) {
+void Sched::_move(Source &from, Source *to) {
     for (auto &s : _sources) {
         if (s.source == &from) {
             s.source = to;
@@ -40,7 +42,7 @@ void Loop::_move(Source &from, Source *to) {
 
 /* --- Public --- */
 
-void Loop::_collect() {
+void Sched::_collect() {
     for (usize i = 0; i < _sources.len(); i++) {
         auto [source, sink] = _sources[i];
         if (not source or not sink) {
@@ -49,7 +51,7 @@ void Loop::_collect() {
     }
 }
 
-Res<TimeStamp> Loop::poll() {
+Res<TimeStamp> Sched::poll() {
     TimeStamp until = TimeStamp::endOfTime();
 
     for (usize i = 0; i < _sources.len(); i++) {
@@ -66,7 +68,7 @@ Res<TimeStamp> Loop::poll() {
     return Ok(until);
 }
 
-Res<usize> Loop::dispatch() {
+Res<usize> Sched::dispatch() {
     usize count = 0;
     for (usize i = 0; i < _queued.len(); i++) {
         count++;
@@ -87,7 +89,7 @@ Res<usize> Loop::dispatch() {
     return Ok(count);
 }
 
-Res<> Loop::run() {
+Res<> Sched::run() {
     while (true) {
         auto until = try$(runOnce());
         if (exited())
@@ -96,7 +98,7 @@ Res<> Loop::run() {
     }
 }
 
-Res<TimeStamp> Loop::runOnce() {
+Res<TimeStamp> Sched::runOnce() {
     usize count = 0;
     TimeStamp until = TimeStamp::endOfTime();
 
@@ -109,4 +111,8 @@ Res<TimeStamp> Loop::runOnce() {
     return Ok(until);
 }
 
-} // namespace Karm::Async
+Sched &globalSched() {
+    return _Embed::globalSched();
+}
+
+} // namespace Karm::Sys

@@ -58,7 +58,7 @@ struct ConOut : public Sys::Fd {
         notImplemented();
     }
 
-    Res<Cons<Strong<Fd>, SocketAddr>> accept() override {
+    Res<Accepted> accept() override {
         notImplemented();
     }
 
@@ -78,7 +78,7 @@ struct ConOut : public Sys::Fd {
         notImplemented();
     }
 
-    Res<Cons<usize, SocketAddr>> recvFrom(MutBytes) override {
+    Res<Received> recvFrom(MutBytes) override {
         notImplemented();
     }
 };
@@ -149,7 +149,7 @@ struct FileProto : public Sys::Fd {
         notImplemented();
     }
 
-    Res<Cons<Strong<Fd>, SocketAddr>> accept() override {
+    Res<Accepted> accept() override {
         notImplemented();
     }
 
@@ -183,7 +183,7 @@ struct FileProto : public Sys::Fd {
         notImplemented();
     }
 
-    Res<Cons<usize, SocketAddr>> recvFrom(MutBytes) override {
+    Res<Received> recvFrom(MutBytes) override {
         notImplemented();
     }
 };

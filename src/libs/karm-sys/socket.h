@@ -1,6 +1,7 @@
 #pragma once
 
 #include "addr.h"
+#include "async.h"
 #include "fd.h"
 
 namespace Karm::Sys {
@@ -11,7 +12,14 @@ struct _Connection :
     public Io::Reader,
     public Io::Writer,
     public Io::Flusher,
-    Meta::NoCopy {};
+    Meta::NoCopy {
+
+    virtual Task<usize> readAsync(MutBytes buf) = 0;
+
+    virtual Task<usize> writeAsync(Bytes buf) = 0;
+
+    virtual Task<usize> flushAsync() = 0;
+};
 
 struct Connection :
     public _Connection {
@@ -29,12 +37,24 @@ struct Connection :
         return _fd->read(buf);
     }
 
+    Task<usize> readAsync(MutBytes buf) override {
+        return globalSched().readAsync(_fd, buf);
+    }
+
     Res<usize> write(Bytes buf) override {
         return _fd->write(buf);
     }
 
+    Task<usize> writeAsync(Bytes buf) override {
+        return globalSched().writeAsync(_fd, buf);
+    }
+
     Res<usize> flush() override {
         return _fd->flush();
+    }
+
+    Task<usize> flushAsync() override {
+        return globalSched().flushAsync(_fd);
     }
 
     Strong<Fd> fd() { return _fd; }
@@ -52,6 +72,11 @@ struct _Listener :
     Res<C> accept() {
         auto [fd, addr] = try$(_fd->accept());
         return Ok(C(std::move(fd), addr));
+    }
+
+    Task<C> acceptAsync() {
+        auto [fd, addr] = co_try_await$(globalSched().acceptAsync(_fd));
+        co_return Ok(C(std::move(fd), addr));
     }
 
     Strong<Fd> fd() { return _fd; }
@@ -74,8 +99,16 @@ struct UdpConnection :
         return _fd->sendTo(buf, addr);
     }
 
-    Res<Cons<usize, SocketAddr>> recv(MutBytes buf) {
+    auto sendAsync(Bytes buf, SocketAddr addr) {
+        return globalSched().sendAsync(_fd, buf, addr);
+    }
+
+    Res<Received> recv(MutBytes buf) {
         return _fd->recvFrom(buf);
+    }
+
+    auto recvAsync(MutBytes buf) {
+        return globalSched().recvAsync(_fd, buf);
     }
 };
 

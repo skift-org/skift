@@ -1,5 +1,3 @@
-#include <karm-main/base.h>
-
 #include "app.h"
 
 namespace Hideo::Settings {

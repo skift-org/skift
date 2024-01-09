@@ -4,7 +4,7 @@
     "type": "exe",
     "description": "Dump a device tree blob",
     "requires": [
-        "karm-main",
+        "karm-sys",
         "device-tree-spec"
     ]
 }

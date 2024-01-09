@@ -9,6 +9,6 @@
         ]
     },
     "requires": [
-        "karm-main"
+        "karm-sys"
     ]
 }

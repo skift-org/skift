@@ -1,6 +1,5 @@
 #pragma once
 
-#include <karm-async/async.h>
 #include <karm-base/checked.h>
 #include <karm-base/func.h>
 #include <karm-base/hash.h>
@@ -8,6 +7,7 @@
 #include <karm-gfx/context.h>
 #include <karm-layout/size.h>
 #include <karm-logger/logger.h>
+#include <karm-sys/async.h>
 
 #include "theme.h"
 
@@ -70,9 +70,9 @@ struct Node : public Meta::Static {
 
     virtual void paint(Gfx::Context &, Math::Recti) {}
 
-    virtual void event(Async::Event &) {}
+    virtual void event(Sys::Event &) {}
 
-    virtual void bubble(Async::Event &) {}
+    virtual void bubble(Sys::Event &) {}
 
     virtual void layout(Math::Recti) {}
 
@@ -134,7 +134,7 @@ struct LeafNode : public Node {
         return NONE;
     }
 
-    void bubble(Async::Event &e) override {
+    void bubble(Sys::Event &e) override {
         if (_parent and not e.accepted())
             _parent->bubble(e);
     }
@@ -207,7 +207,7 @@ struct GroupNode : public LeafNode<Crtp> {
         }
     }
 
-    void event(Async::Event &e) override {
+    void event(Sys::Event &e) override {
         if (e.accepted())
             return;
 
@@ -263,7 +263,7 @@ struct ProxyNode : public LeafNode<Crtp> {
         child().paint(g, r);
     }
 
-    void event(Async::Event &e) override {
+    void event(Sys::Event &e) override {
         if (e.accepted())
             return;
 

@@ -18,213 +18,10 @@
 
 #include <karm-sys/_embed.h>
 
-#include "errno.h"
+#include "fd.h"
+#include "utils.h"
 
 namespace Karm::Sys::_Embed {
-
-/* --- Utilities ------------------------------------------------------------ */
-
-static struct sockaddr_in toSockAddr(SocketAddr addr) {
-    struct sockaddr_in sockaddr;
-    auto addr4 = addr.addr.unwrap<Sys::Ip4>();
-    sockaddr.sin_family = AF_INET;
-    sockaddr.sin_port = htons(addr.port);
-    sockaddr.sin_addr.s_addr = addr4._raw._value;
-    return sockaddr;
-}
-
-static SocketAddr fromSockAddr(struct sockaddr_in sockaddr) {
-    SocketAddr addr{Ip4::unspecified(), 0};
-    addr.addr.unwrap<Sys::Ip4>()._raw._value = sockaddr.sin_addr.s_addr;
-    addr.port = ntohs(sockaddr.sin_port);
-    return addr;
-}
-
-static Stat fromStat(struct stat const &buf) {
-    Stat stat{};
-    Stat::Type type = Stat::FILE;
-    if (S_ISDIR(buf.st_mode))
-        type = Stat::DIR;
-    stat.type = type;
-    stat.size = (usize)buf.st_size;
-    stat.accessTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_atime);
-    stat.modifyTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_mtime);
-    stat.changeTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_ctime);
-    return stat;
-}
-
-/* --- File Descriptor ------------------------------------------------------ */
-
-struct PosixFd : public Sys::Fd {
-    isize _raw;
-
-    PosixFd(isize raw) : _raw(raw) {}
-
-    Res<usize> read(MutBytes bytes) override {
-        isize result = ::read(_raw, bytes.buf(), sizeOf(bytes));
-
-        if (result < 0)
-            return Posix::fromLastErrno();
-
-        return Ok(static_cast<usize>(result));
-    }
-
-    Res<usize> write(Bytes bytes) override {
-        isize result = ::write(_raw, bytes.buf(), sizeOf(bytes));
-
-        if (result < 0)
-            return Posix::fromLastErrno();
-
-        return Ok(static_cast<usize>(result));
-    }
-
-    Res<usize> seek(Io::Seek seek) override {
-        off_t offset = 0;
-
-        switch (seek.whence) {
-        case Io::Whence::BEGIN:
-            offset = lseek(_raw, seek.offset, SEEK_SET);
-            break;
-        case Io::Whence::CURRENT:
-            offset = lseek(_raw, seek.offset, SEEK_CUR);
-            break;
-        case Io::Whence::END:
-            offset = lseek(_raw, seek.offset, SEEK_END);
-            break;
-        }
-
-        if (offset < 0)
-            return Posix::fromLastErrno();
-
-        return Ok(static_cast<usize>(offset));
-    }
-
-    Res<usize> flush() override {
-        // NOTE: No-op
-        return Ok(0uz);
-    }
-
-    Res<Strong<Fd>> dup() override {
-        isize duped = ::dup(_raw);
-
-        if (duped < 0)
-            return Posix::fromLastErrno();
-
-        return Ok(makeStrong<PosixFd>(duped));
-    }
-
-    Res<Cons<Strong<Fd>, SocketAddr>> accept() override {
-        struct sockaddr_in addr_;
-        socklen_t len = sizeof(addr_);
-        isize fd = ::accept(_raw, (struct sockaddr *)&addr_, &len);
-        if (fd < 0)
-            return Posix::fromLastErrno();
-
-        return Ok<Cons<Strong<Fd>, SocketAddr>>(
-            makeStrong<PosixFd>(fd),
-            fromSockAddr(addr_));
-    }
-
-    Res<Stat> stat() override {
-        struct stat buf;
-        if (fstat(_raw, &buf) < 0)
-            return Posix::fromLastErrno();
-        return Ok(fromStat(buf));
-    }
-
-    Res<> sendFd(Strong<Fd> fd) override {
-        auto *posixFd = fd.is<PosixFd>();
-        if (not posixFd)
-            return Error::invalidHandle("fd is not a posix fd");
-
-        struct iovec iov {};
-        // We need to send at least one byte of data
-        char data{};
-        iov.iov_base = &data;
-        iov.iov_len = sizeof(data);
-
-        struct msghdr msg {};
-        msg.msg_name = nullptr;
-        msg.msg_namelen = 0;
-        msg.msg_iov = &iov;
-        msg.msg_iovlen = 1;
-        msg.msg_controllen = CMSG_SPACE(sizeof(int));
-        Array<Byte, CMSG_SPACE(sizeof(int))> ctrl_buf{};
-        msg.msg_control = ctrl_buf.buf();
-
-        struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
-        cmsg->cmsg_level = SOL_SOCKET;
-        cmsg->cmsg_type = SCM_RIGHTS;
-        cmsg->cmsg_len = CMSG_LEN(sizeof(int));
-
-        *((int *)CMSG_DATA(cmsg)) = posixFd->_raw;
-
-        if (::sendmsg(_raw, &msg, 0) < 0)
-            return Posix::fromLastErrno();
-
-        return Ok();
-    }
-
-    Res<Strong<Fd>> recvFd() override {
-        struct iovec iov {};
-        // We need to send at least one byte of data
-        char data{};
-        iov.iov_base = &data;
-        iov.iov_len = sizeof(data);
-
-        struct msghdr msg {};
-        msg.msg_name = nullptr;
-        msg.msg_namelen = 0;
-        msg.msg_iov = &iov;
-        msg.msg_iovlen = 1;
-        msg.msg_controllen = CMSG_SPACE(sizeof(int));
-        Array<Byte, CMSG_SPACE(sizeof(int))> ctrl_buf{};
-        msg.msg_control = ctrl_buf.buf();
-
-        if (::recvmsg(_raw, &msg, 0) < 0)
-            return Posix::fromLastErrno();
-
-        struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
-        if (not cmsg)
-            return Error::invalidHandle("no cmsg");
-
-        if (cmsg->cmsg_level != SOL_SOCKET)
-            return Error::invalidHandle("invalid cmsg level");
-
-        if (cmsg->cmsg_type != SCM_RIGHTS)
-            return Error::invalidHandle("invalid cmsg type");
-
-        if (cmsg->cmsg_len != CMSG_LEN(sizeof(int)))
-            return Error::invalidHandle("invalid cmsg len");
-
-        int fd = *((int *)CMSG_DATA(cmsg));
-
-        return Ok(makeStrong<PosixFd>(fd));
-    }
-
-    Res<usize> sendTo(Bytes bytes, SocketAddr addr) override {
-        struct sockaddr_in addr_ = toSockAddr(addr);
-        isize result = ::sendto(_raw, bytes.buf(), sizeOf(bytes), 0, (struct sockaddr *)&addr_, sizeof(addr_));
-
-        if (result < 0)
-            return Posix::fromLastErrno();
-
-        return Ok(static_cast<usize>(result));
-    }
-
-    Res<Cons<usize, SocketAddr>> recvFrom(MutBytes bytes) override {
-        struct sockaddr_in addr_;
-        socklen_t len = sizeof(addr_);
-        isize result = ::recvfrom(_raw, bytes.buf(), sizeOf(bytes), 0, (struct sockaddr *)&addr_, &len);
-
-        if (result < 0)
-            return Posix::fromLastErrno();
-
-        return Ok<Cons<usize, SocketAddr>>(
-            static_cast<usize>(result),
-            fromSockAddr(addr_));
-    }
-};
 
 Res<Url::Path> resolve(Url::Url const &url) {
     Url::Path resolved;
@@ -259,7 +56,7 @@ Res<Strong<Sys::Fd>> openFile(Url::Url const &url) {
     isize raw = ::open(str.buf(), O_RDONLY);
     if (raw < 0)
         return Posix::fromLastErrno();
-    auto fd = makeStrong<PosixFd>(raw);
+    auto fd = makeStrong<Posix::Fd>(raw);
     if (try$(fd->stat()).type == Stat::DIR)
         return Error::isADirectory();
     return Ok(fd);
@@ -271,7 +68,7 @@ Res<Strong<Sys::Fd>> createFile(Url::Url const &url) {
     auto raw = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
     if (raw < 0)
         return Posix::fromLastErrno();
-    return Ok(makeStrong<PosixFd>(raw));
+    return Ok(makeStrong<Posix::Fd>(raw));
 }
 
 Res<Strong<Sys::Fd>> openOrCreateFile(Url::Url const &url) {
@@ -280,7 +77,7 @@ Res<Strong<Sys::Fd>> openOrCreateFile(Url::Url const &url) {
     auto raw = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
     if (raw < 0)
         return Posix::fromLastErrno();
-    auto fd = makeStrong<PosixFd>(raw);
+    auto fd = makeStrong<Posix::Fd>(raw);
     if (try$(fd->stat()).type == Stat::DIR)
         return Error::isADirectory();
     return Ok(fd);
@@ -293,21 +90,21 @@ Res<Pair<Strong<Sys::Fd>>> createPipe() {
         return Posix::fromLastErrno();
 
     return Ok(Pair<Strong<Sys::Fd>>{
-        makeStrong<PosixFd>(fds[0]),
-        makeStrong<PosixFd>(fds[1]),
+        makeStrong<Posix::Fd>(fds[0]),
+        makeStrong<Posix::Fd>(fds[1]),
     });
 }
 
 Res<Strong<Sys::Fd>> createIn() {
-    return Ok(makeStrong<PosixFd>(0));
+    return Ok(makeStrong<Posix::Fd>(0));
 }
 
 Res<Strong<Sys::Fd>> createOut() {
-    return Ok(makeStrong<PosixFd>(1));
+    return Ok(makeStrong<Posix::Fd>(1));
 }
 
 Res<Strong<Sys::Fd>> createErr() {
-    return Ok(makeStrong<PosixFd>(2));
+    return Ok(makeStrong<Posix::Fd>(2));
 }
 
 Res<Vec<Sys::DirEntry>> readDir(Url::Url const &url) {
@@ -343,7 +140,7 @@ Res<Stat> stat(Url::Url const &url) {
     struct stat buf;
     if (::stat(str.buf(), &buf) < 0)
         return Posix::fromLastErrno();
-    return Ok(fromStat(buf));
+    return Ok(Posix::fromStat(buf));
 }
 
 /* --- Sockets -------------------------------------------------------------- */
@@ -353,12 +150,12 @@ Res<Strong<Sys::Fd>> listenUdp(SocketAddr addr) {
     if (fd < 0)
         return Posix::fromLastErrno();
 
-    struct sockaddr_in addr_ = toSockAddr(addr);
+    struct sockaddr_in addr_ = Posix::toSockAddr(addr);
 
     if (::bind(fd, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
         return Posix::fromLastErrno();
 
-    return Ok(makeStrong<PosixFd>(fd));
+    return Ok(makeStrong<Posix::Fd>(fd));
 }
 
 Res<Strong<Sys::Fd>> connectTcp(SocketAddr addr) {
@@ -366,11 +163,11 @@ Res<Strong<Sys::Fd>> connectTcp(SocketAddr addr) {
     if (fd < 0)
         return Posix::fromLastErrno();
 
-    struct sockaddr_in addr_ = toSockAddr(addr);
+    struct sockaddr_in addr_ = Posix::toSockAddr(addr);
     if (::connect(fd, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
         return Posix::fromLastErrno();
 
-    return Ok(makeStrong<PosixFd>(fd));
+    return Ok(makeStrong<Posix::Fd>(fd));
 }
 
 Res<Strong<Sys::Fd>> listenTcp(SocketAddr addr) {
@@ -382,7 +179,7 @@ Res<Strong<Sys::Fd>> listenTcp(SocketAddr addr) {
     if (::setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
         return Posix::fromLastErrno();
 
-    struct sockaddr_in addr_ = toSockAddr(addr);
+    struct sockaddr_in addr_ = Posix::toSockAddr(addr);
 
     if (::bind(fd, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
         return Posix::fromLastErrno();
@@ -390,7 +187,7 @@ Res<Strong<Sys::Fd>> listenTcp(SocketAddr addr) {
     if (::listen(fd, 128) < 0)
         return Posix::fromLastErrno();
 
-    return Ok(makeStrong<PosixFd>(fd));
+    return Ok(makeStrong<Posix::Fd>(fd));
 }
 
 /* --- Time ----------------------------------------------------------------- */
@@ -444,7 +241,7 @@ Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
 }
 
 Res<Sys::MmapResult> memMap(Sys::MmapOptions const &options, Strong<Sys::Fd> maybeFd) {
-    Strong<PosixFd> fd = try$(maybeFd.cast<PosixFd>());
+    Strong<Posix::Fd> fd = try$(maybeFd.cast<Posix::Fd>());
     usize size = options.size;
 
     if (size == 0)

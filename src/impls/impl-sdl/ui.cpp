@@ -185,7 +185,7 @@ struct SdlHost :
         }
 
         case SDL_QUIT: {
-            bubble<Events::ExitEvent>(*this);
+            bubble<Events::RequestExitEvent>(*this);
             break;
         }
 
@@ -207,7 +207,7 @@ struct SdlHost :
         SDL_WaitEventTimeout(nullptr, span.toMSecs());
     }
 
-    void bubble(Async::Event &e) override {
+    void bubble(Sys::Event &e) override {
         if (e.is<Ui::DragEvent>()) {
             auto &dragEvent = e.unwrap<Ui::DragEvent>();
             if (dragEvent.type == Ui::DragEvent::START) {

@@ -180,7 +180,7 @@ struct Host : public Node {
         _dirty.clear();
     }
 
-    void event(Async::Event &e) override {
+    void event(Sys::Event &e) override {
         _perf.record(PerfEvent::INPUT);
         _root->event(e);
         auto elapsed = _perf.end();
@@ -191,7 +191,7 @@ struct Host : public Node {
         }
     }
 
-    void bubble(Async::Event &event) override {
+    void bubble(Sys::Event &event) override {
         event
             .handle<Node::PaintEvent>([this](auto &e) {
                 _dirty.pushBack(e.bound);
@@ -205,7 +205,7 @@ struct Host : public Node {
                 _shouldAnimate = true;
                 return true;
             })
-            .handle<Events::ExitEvent>([this](auto &e) {
+            .handle<Events::RequestExitEvent>([this](auto &e) {
                 _res = e.res;
                 return true;
             });
@@ -253,7 +253,7 @@ struct Host : public Node {
 
             if (_shouldAnimate) {
                 _shouldAnimate = false;
-                auto e = Async::makeEvent<Node::AnimateEvent>(Async::Propagation::DOWN, FRAME_TIME);
+                auto e = Sys::makeEvent<Node::AnimateEvent>(Sys::Propagation::DOWN, FRAME_TIME);
                 event(*e);
             }
 

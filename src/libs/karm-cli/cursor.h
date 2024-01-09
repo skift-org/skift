@@ -6,6 +6,9 @@ namespace Karm::Cli {
 
 struct Cmd {
     enum Type {
+        SAVE,
+        RESTORE,
+
         UP,
         DOWN,
         FORWARD,
@@ -28,6 +31,14 @@ struct Cmd {
     Type _type;
     int _row = 0;
     int _col = 0;
+
+    static Cmd save() {
+        return {SAVE};
+    }
+
+    static Cmd restore() {
+        return {RESTORE};
+    }
 
     static Cmd up(int count) {
         return {UP, count};
@@ -96,6 +107,12 @@ struct Cmd {
     Res<usize> write(Io::TextWriter &writer) const {
 #ifdef __ck_karm_cli_backend_ansi__
         switch (_type) {
+        case Cli::Cmd::SAVE:
+            return Fmt::format(writer, "\x1b[s");
+
+        case Cli::Cmd::RESTORE:
+            return Fmt::format(writer, "\x1b[u");
+
         case Cli::Cmd::UP:
             return Fmt::format(writer, "\x1b[{}A", _row);
 

@@ -1,9 +1,9 @@
 #include <karm-base/iter.h>
 #include <karm-crypto/hash.h>
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 
-Res<> entryPoint(Ctx &ctx) {
+Res<> entryPoint(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
 
     auto url = try$(Url::parseUrlOrPath(args[0]));

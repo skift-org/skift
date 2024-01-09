@@ -36,6 +36,17 @@ struct Map {
         return NONE;
     }
 
+    bool del(K const &key) {
+        for (usize i = 0; i < _els.len(); i++) {
+            if (_els[i].car == key) {
+                _els.removeAt(i);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     auto iter() {
         return mutIter(_els);
     }

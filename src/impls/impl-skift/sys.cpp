@@ -38,7 +38,7 @@ struct VmoFd : public Sys::Fd {
         notImplemented();
     }
 
-    Res<Cons<Strong<Fd>, SocketAddr>> accept() override {
+    Res<Accepted> accept() override {
         notImplemented();
     }
 
@@ -58,7 +58,7 @@ struct VmoFd : public Sys::Fd {
         notImplemented();
     }
 
-    Res<Cons<usize, SocketAddr>> recvFrom(MutBytes) override {
+    Res<Received> recvFrom(MutBytes) override {
         notImplemented();
     }
 };

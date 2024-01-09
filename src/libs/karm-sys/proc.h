@@ -6,9 +6,6 @@
 
 namespace Karm::Sys {
 
-struct Proc {
-};
-
 inline Res<> sleep(TimeSpan span) {
     return _Embed::sleep(span);
 }

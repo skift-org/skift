@@ -5,7 +5,6 @@
     "description": "View and manage fonts",
     "requires": [
         "hideo-files-base",
-        "hideo-base",
-        "karm-main"
+        "hideo-base"
     ]
 }

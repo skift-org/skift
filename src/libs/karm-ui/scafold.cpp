@@ -1,4 +1,4 @@
-#include <karm-main/base.h>
+#include <karm-sys/context.h>
 
 #include "dialog.h"
 #include "drag.h"
@@ -25,11 +25,11 @@ Child controls(TitlebarStyle style) {
                      cond(style == TitlebarStyle::DEFAULT),
                  button(bindBubble<Events::RequestMaximizeEvent>(), ButtonStyle::subtle(), Mdi::CROP_SQUARE) |
                      cond(style == TitlebarStyle::DEFAULT),
-                 button(bindBubble<Events::ExitEvent>(), ButtonStyle::subtle(), Mdi::CLOSE));
+                 button(bindBubble<Events::RequestExitEvent>(), ButtonStyle::subtle(), Mdi::CLOSE));
 }
 
 Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {
-    auto isMobile = useFormFactor() == FormFactor::MOBILE;
+    auto isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
 
     if (isMobile) {
         return empty();
@@ -71,7 +71,7 @@ Ui::Child bottombar(Children children) {
 }
 
 Child scafold(Scafold scafold) {
-    auto isMobile = useFormFactor() == FormFactor::MOBILE;
+    auto isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
 
     Scafold::State state{
         .sidebarOpen = not isMobile,

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-main/base.h>
+#include <karm-sys/context.h>
 
 #include "box.h"
 #include "dialog.h"

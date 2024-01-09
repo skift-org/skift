@@ -12,7 +12,6 @@
     "requires": [],
     "provides": [
         "karm-logger-impl",
-        "karm-sys-impl",
-        "karm-async-impl"
+        "karm-sys-impl"
     ]
 }

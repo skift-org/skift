@@ -1,6 +1,5 @@
 #include <hideo-base/alert.h>
 #include <karm-fmt/case.h>
-#include <karm-main/base.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
 #include <karm-ui/scafold.h>

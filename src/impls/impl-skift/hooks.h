@@ -1,9 +1,9 @@
 #pragma once
 
 #include <hjert-api/api.h>
-#include <karm-main/base.h>
+#include <karm-sys/context.h>
 
-struct ChannelsHook : public Hook {
+struct ChannelsHook : public Sys::Service {
     Hj::Channel _in;
     Hj::Channel _out;
 
@@ -11,6 +11,6 @@ struct ChannelsHook : public Hook {
         : _in(in), _out(out) {}
 };
 
-inline ChannelsHook &useChannel(Ctx &ctx = Ctx::instance()) {
+inline ChannelsHook &useChannel(Sys::Ctx &ctx = Sys::globalCtx()) {
     return ctx.use<ChannelsHook>();
 }

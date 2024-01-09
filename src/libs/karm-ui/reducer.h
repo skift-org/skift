@@ -98,12 +98,12 @@ struct Reducer :
         (*_child)->paint(g, r);
     }
 
-    void event(Async::Event &e) override {
+    void event(Sys::Event &e) override {
         ensureBuild();
         (*_child)->event(e);
     }
 
-    void bubble(Async::Event &e) override {
+    void bubble(Sys::Event &e) override {
         if (auto *a = e.is<Action>()) {
             Model::reduce(_state, *a);
             e.accept();

@@ -1,6 +1,6 @@
 #include <hideo-base/alert.h>
 #include <karm-io/funcs.h>
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scafold.h>
@@ -42,7 +42,7 @@ Res<String> readAllUtf8(Str urlStr) {
 
 } // namespace Hideo::Text
 
-Res<> entryPoint(Ctx &ctx) {
+Res<> entryPoint(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
     Res<String> text = Error::invalidInput("No text provided");
     if (args.len())

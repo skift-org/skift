@@ -1,7 +1,7 @@
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-test/driver.h>
 
-Res<> entryPoint(Ctx &) {
+Res<> entryPoint(Sys::Ctx &) {
     Test::driver().runAll();
     return Ok();
 }

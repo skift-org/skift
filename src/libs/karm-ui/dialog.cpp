@@ -115,7 +115,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         }
     }
 
-    void event(Async::Event &e) override {
+    void event(Sys::Event &e) override {
         if (_opacity.needRepaint(*this, e)) {
             Ui::shouldRepaint(*this);
         }
@@ -129,7 +129,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         }
     }
 
-    void bubble(Async::Event &e) override {
+    void bubble(Sys::Event &e) override {
         if (e.is<ShowDialogEvent>()) {
             // We need to defer showing the dialog until the next frame,
             // otherwise replacing the dialog might cause some use after free down the tree

@@ -44,7 +44,7 @@ struct EfiHost :
     void wait(TimeSpan) override {
     }
 
-    void bubble(Async::Event &e) override {
+    void bubble(Sys::Event &e) override {
         Ui::Host::bubble(e);
     }
 };

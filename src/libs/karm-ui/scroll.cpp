@@ -38,7 +38,7 @@ struct Scroll : public ProxyNode<Scroll> {
             g.debugRect(_bound, Gfx::CYAN);
     }
 
-    void event(Async::Event &e) override {
+    void event(Sys::Event &e) override {
         if (auto *me = e.is<Events::MouseEvent>()) {
             if (bound().contains(me->pos)) {
                 _mouseIn = true;
@@ -74,7 +74,7 @@ struct Scroll : public ProxyNode<Scroll> {
         }
     }
 
-    void bubble(Async::Event &e) override {
+    void bubble(Sys::Event &e) override {
         if (auto *pe = e.is<Node::PaintEvent>()) {
             pe->bound.xy = pe->bound.xy + _scroll.cast<isize>();
             pe->bound = pe->bound.clipTo(bound());

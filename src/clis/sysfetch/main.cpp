@@ -1,19 +1,20 @@
+#include <karm-cli/cursor.h>
 #include <karm-cli/style.h>
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/info.h>
 
 static Str const ART = R"(
-      ___
-     /\  \
-    /::\  \
-   /:/\ \  \
-  _\:\~\ \  \
- /\ \:\ \ \__\
- \:\ \:\ \/__/
-  \:\ \:\__\
-   \:\/:/  /
-    \::/  /
-     \/__/
+        ___
+       /\  \
+      /::\  \
+     /:/\ \  \
+    _\:\~\ \  \
+   /\ \:\ \ \__\
+   \:\ \:\ \/__/
+    \:\ \:\__\
+     \:\/:/  /
+      \::/  /
+       \/__/
 )";
 
 static Str const BLOCK = "███";
@@ -21,7 +22,7 @@ static Str const BLOCK = "███";
 namespace Sysfetch {
 
 auto title(Str text) {
-    return Cli::styled(text, Cli::style().bold());
+    return Fmt::format("{}{}", Cli::Cmd::forward(19), Cli::styled(text, Cli::style().bold()));
 }
 
 Res<> dumpUserInfo() {
@@ -37,6 +38,7 @@ Res<> dumpSysInfo() {
     Sys::println("{}: {} {}", title("System"), sysinfo.sysName, sysinfo.sysVersion);
     Sys::println("{}: {} {}", title("Kernel"), sysinfo.kernelName, sysinfo.kernelVersion);
     Sys::println("{}: {}", title("Hostname"), sysinfo.hostname);
+    Sys::println("{}: {}", title("Form factor"), Sys::useFormFactor() == Sys::FormFactor::DESKTOP ? "🖥️" : "📱");
     return Ok();
 }
 
@@ -58,12 +60,14 @@ Res<> dumpCpusInfo() {
 }
 
 Res<> testAnsi() {
+    Sys::print("{}", Cli::Cmd::forward(19));
     for (auto const c : Cli::DARK_COLORS) {
         Sys::print("{}", Cli::styled(BLOCK, c));
     }
 
     Sys::println("");
 
+    Sys::print("{}", Cli::Cmd::forward(19));
     for (auto const c : Cli::LIGHT_COLORS) {
         Sys::print("{}", Cli::styled(BLOCK, c));
     }
@@ -75,10 +79,11 @@ Res<> testAnsi() {
 
 } // namespace Sysfetch
 
-Res<> entryPoint(Ctx &) {
+Res<> entryPoint(Sys::Ctx &) {
     Res<> res = Ok();
 
     Sys::println("{}", Cli::styled(ART, Cli::BLUE));
+    Sys::print("{}", Cli::Cmd::up(12));
 
     if (not(res = Sysfetch::dumpUserInfo())) {
         Sys::errln("{}: {}", Sysfetch::title("User"), Cli::styled(res.none().msg(), Cli::RED_LIGHT));
@@ -97,8 +102,8 @@ Res<> entryPoint(Ctx &) {
     }
 
     Sys::println("");
-
     res = Sysfetch::testAnsi();
+    Sys::println("");
 
     return res;
 }

@@ -1,6 +1,6 @@
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 
-Res<> entryPoint(Ctx &) {
+Res<> entryPoint(Sys::Ctx &) {
     Sys::println("Hello, world!");
     return Ok();
 }

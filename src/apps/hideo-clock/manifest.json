@@ -4,7 +4,6 @@
     "type": "exe",
     "description": "Time, clock, timer and stopwatch",
     "requires": [
-        "hideo-base",
-        "karm-main"
+        "hideo-base"
     ]
 }

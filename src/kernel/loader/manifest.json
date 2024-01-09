@@ -10,7 +10,7 @@
     },
     "requires": [
         "hideo-base",
-        "karm-main",
+        "karm-sys",
         "loader-impl",
         "json-spec"
     ]

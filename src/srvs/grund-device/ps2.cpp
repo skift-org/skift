@@ -99,7 +99,7 @@ Res<> Keyboard::init() {
     return Ok();
 }
 
-Res<> Keyboard::event(Async::Event &e) {
+Res<> Keyboard::event(Sys::Event &e) {
     if (auto const *irq = e.is<IrqEvent>()) {
         if (irq->irq == 1) {
             auto status = try$(ctrl().readStatus());
@@ -178,7 +178,7 @@ Res<> Mouse::decode() {
     return Ok();
 }
 
-Res<> Mouse::event(Async::Event &e) {
+Res<> Mouse::event(Sys::Event &e) {
     if (auto const *irq = e.is<IrqEvent>()) {
         if (irq->irq == 12) {
             auto status = try$(ctrl().readStatus());

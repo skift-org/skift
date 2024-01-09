@@ -1,20 +1,19 @@
 #pragma once
 
-#ifdef __KARM_MAIN_INCLUDED
-#    error "karm-main/main.h included twice"
+#ifdef __KARM_SYS_ENTRY_INCLUDED
+#    error "karm-sys/entry.h included twice"
 #endif
 
-#define __KARM_MAIN_INCLUDED
+#define __KARM_SYS_ENTRY_INCLUDED
+
+#include "chan.h"
+#include "context.h"
 
 #if defined(__ck_sys_linux__) || defined(__ck_sys_darwin__)
 #    define EMBED_POSIX_MAIN_IMPL
 #    include <impl-posix/main.h>
 #elif defined(__ck_sys_skift__)
-// Nothing to do, skift uses the entryPoint directly.
-#    include "base.h"
-
-// Some code expect the karm-sys/chan.h to be included.
-#    include <karm-sys/chan.h>
+// Nothing to do, skift uses entryPoint by default
 #elif defined(__ck_sys_efi__)
 #    include <impl-efi/main.h>
 #else

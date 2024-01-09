@@ -1,4 +1,4 @@
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -16,6 +16,6 @@ Ui::Child app() {
 
 } // namespace Hideo::Weather
 
-Res<> entryPoint(Ctx &ctx) {
+Res<> entryPoint(Sys::Ctx &ctx) {
     return Ui::runApp(ctx, Hideo::Weather::app());
 }

@@ -1,12 +1,12 @@
 #include <hjert-api/api.h>
 #include <karm-logger/logger.h>
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 
 #include "bus.h"
 
 using namespace Grund::System;
 
-Res<> entryPoint(Ctx &ctx) {
+Res<> entryPoint(Sys::Ctx &ctx) {
     try$(Hj::Task::self().label("grund-system"));
 
     auto bus = try$(Bus::create());

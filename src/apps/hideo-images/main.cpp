@@ -1,4 +1,4 @@
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/scafold.h>
@@ -25,7 +25,7 @@ Ui::Child app(State initial) {
 
 } // namespace Hideo::Images
 
-Res<> entryPoint(Ctx &ctx) {
+Res<> entryPoint(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
     Res<Media::Image> image = Error::invalidInput("No image provided");
 

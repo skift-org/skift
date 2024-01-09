@@ -58,7 +58,7 @@ struct Eased {
         Ui::shouldAnimate(n);
     }
 
-    bool needRepaint(Node &n, Async::Event &e) {
+    bool needRepaint(Node &n, Sys::Event &e) {
         bool shouldRepaint = false;
 
         e.handle<Node::AnimateEvent>([&](auto &a) {
@@ -124,7 +124,7 @@ struct Eased2 {
         _y.animate(n, target.y, duration, easing);
     }
 
-    bool needRepaint(Node &n, Async::Event &e) {
+    bool needRepaint(Node &n, Sys::Event &e) {
         bool sx = _x.needRepaint(n, e);
         bool sy = _y.needRepaint(n, e);
         return sx or sy;

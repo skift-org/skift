@@ -1,5 +1,5 @@
 #include <hideo-keyboard/views.h>
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
@@ -278,8 +278,8 @@ Ui::Child app(bool isMobile) {
 
 } // namespace Hideo::Shell
 
-Res<> entryPoint(Ctx &ctx) {
+Res<> entryPoint(Sys::Ctx &ctx) {
     auto args = useArgs(ctx);
-    bool isMobile = useFormFactor() == FormFactor::MOBILE;
+    bool isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
     return Ui::runApp(ctx, Hideo::Shell::app(isMobile));
 }

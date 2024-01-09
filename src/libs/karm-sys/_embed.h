@@ -4,6 +4,7 @@
 #include <karm-base/range.h>
 #include <karm-base/time.h>
 
+#include "async.h"
 #include "dir.h"
 #include "fd.h"
 #include "info.h"
@@ -72,5 +73,9 @@ Res<> populate(Vec<Sys::UserInfo> &);
 Res<> sleep(TimeSpan);
 
 Res<> exit(i32);
+
+/* --- Asynchronous I/O ----------------------------------------------------- */
+
+Sched &globalSched();
 
 } // namespace Karm::Sys::_Embed

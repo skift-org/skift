@@ -1,6 +1,6 @@
-#include <karm-async/main.h>
 #include <karm-io/funcs.h>
 #include <karm-logger/logger.h>
+#include <karm-sys/entry-async.h>
 #include <karm-sys/file.h>
 #include <karm-sys/socket.h>
 #include <web-http/http.h>
@@ -41,7 +41,7 @@ Str contentType(Url::Path const &path) {
     return "application/octet-stream";
 }
 
-Async::Prom<> respondFile(Sys::_Connection &conn, Url::Url const &url, Http::Code code = Http::Code::OK) {
+Sys::Task<> respondFile(Sys::_Connection &conn, Url::Url const &url, Http::Code code = Http::Code::OK) {
     auto ct = contentType(url.path);
     auto file = co_try$(Sys::File::open(url));
     auto stat = co_try$(file.stat());
@@ -65,8 +65,8 @@ Async::Prom<> respondFile(Sys::_Connection &conn, Url::Url const &url, Http::Cod
     co_return Ok();
 }
 
-Async::Prom<> respond404(Sys::_Connection &conn) {
-    auto res = co_await respondFile(conn, "bundle://web-server/public/404.html"_url, Http::Code::NOT_FOUND);
+Sys::Task<> respond404(Sys::_Connection &conn) {
+    auto res = co_await respondFile(conn, "bundle://web-http-serv/public/404.html"_url, Http::Code::NOT_FOUND);
     if (res)
         co_return Ok();
 
@@ -81,14 +81,14 @@ Async::Prom<> respond404(Sys::_Connection &conn) {
         "\r\n"
         "Not Found"));
 
-    co_try$(conn.write(header.bytes()));
+    co_try_await$(conn.writeAsync(header.bytes()));
     co_return Ok();
 }
 
-Async::Prom<> handleRequest(Sys::_Connection &conn, Str request, Sys::SocketAddr addr) {
+Sys::Task<> handleRequest(Sys::_Connection &conn, Str request, Sys::SocketAddr addr) {
     Io::SScan scan{request};
     auto req = co_try$(Http::Request::parse(scan));
-    auto url = "bundle://web-server/public/"_url / req.path;
+    auto url = "bundle://web-http-serv/public/"_url / req.path;
 
     logInfo("{}: {} {}", addr, req.method, req.path);
 
@@ -98,40 +98,31 @@ Async::Prom<> handleRequest(Sys::_Connection &conn, Str request, Sys::SocketAddr
     }
 
     Res<> res = co_await respondFile(conn, url / "index.html", Http::Code::OK);
-    if (res) {
+    if (res)
         co_return Ok();
-    }
 
     logWarn("{}: {} {}: {}", addr, req.method, url, firstRes);
     co_return co_await respond404(conn);
 }
 
-Async::Prom<> handleConnection(Sys::TcpConnection stream) {
+Sys::Task<> handleConnection(Sys::TcpConnection stream) {
     Array<char, 4096> buf;
-    auto len = co_try$(stream.read(mutBytes(buf)));
-
+    auto len = co_try_await$(stream.readAsync(mutBytes(buf)));
     if (not Tls::isHello(bytes(buf))) {
-        co_try_await$(handleRequest(stream, Str{buf.buf(), len}, stream.addr()));
-        co_return Ok();
+        co_return co_await handleRequest(stream, Str{buf.buf(), len}, stream.addr());
+    } else {
+        logDebug("{}: wants TLS", stream.addr());
+        auto tls = co_try$(Tls::TlsConnection::accept(stream, bytes(buf)));
+        len = co_try_await$(tls.readAsync(mutBytes(buf)));
+        co_return co_await handleRequest(tls, Str{buf.buf(), len}, stream.addr());
     }
-
-    logDebug("{}: wants TLS", stream.addr());
-    auto tls = co_try$(Tls::TlsConnection::accept(stream, bytes(buf)));
-    len = co_try$(tls.read(mutBytes(buf)));
-    co_try_await$(handleRequest(tls, Str{buf.buf(), len}, stream.addr()));
-    co_return Ok();
 }
 
 } // namespace Web::Server
 
-Async::Prom<> entryPointAsync(Ctx &) {
+Sys::Task<> entryPointAsync(Sys::Ctx &) {
     auto listener = co_try$(Sys::TcpListener::listen(Sys::Ip4::localhost(8080)));
     logInfo("Serving on http://{}", listener.addr());
-
-    while (true) {
-        auto stream = co_try$(listener.accept());
-        auto res = co_await Web::Server::handleConnection(std::move(stream));
-        if (not res)
-            logError("Connection error: {}", res);
-    }
+    while (true)
+        Sys::runDetached(Web::Server::handleConnection(co_try_await$(listener.acceptAsync())));
 }

@@ -2,9 +2,9 @@
 
 #include <json/json.h>
 #include <karm-logger/logger.h>
-#include <karm-main/base.h>
 #include <karm-media/icon.h>
 #include <karm-media/image.h>
+#include <karm-sys/context.h>
 #include <karm-sys/file.h>
 
 namespace Loader {
@@ -92,7 +92,7 @@ struct Configs {
     }
 };
 
-Res<> showMenu(Ctx &ctx, Configs const &c);
+Res<> showMenu(Sys::Ctx &ctx, Configs const &c);
 
 Res<> loadEntry(Entry const &);
 

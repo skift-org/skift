@@ -2,8 +2,8 @@
 #include <handover/hook.h>
 #include <hjert-api/api.h>
 #include <karm-logger/logger.h>
-#include <karm-main/base.h>
 #include <karm-panic/panic.h>
+#include <karm-sys/context.h>
 
 #include "hooks.h"
 
@@ -20,9 +20,9 @@ extern "C" void __entryPoint(usize rawHandover, usize rawIn, usize rawOut) {
     Abi::SysV::init();
     Karm::registerPanicHandler(__panicHandler);
 
-    Ctx ctx;
+    auto &ctx = Sys::globalCtx();
     char const *argv[] = {"service", nullptr};
-    ctx.add<ArgsHook>(1, argv);
+    ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>((Handover::Payload *)rawHandover);
     ctx.add<ChannelsHook>(Hj::Cap{rawIn}, Hj::Cap{rawOut});
 

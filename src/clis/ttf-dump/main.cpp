@@ -1,4 +1,4 @@
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 #include <ttf/spec.h>
@@ -36,7 +36,7 @@ void dumpGpos(Ttf::Gpos const &gpos) {
     Sys::println("  LookupList (len:{})", gpos.lookupList().len());
 }
 
-Res<> entryPoint(Ctx &ctx) {
+Res<> entryPoint(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
 
     if (args.len() == 0) {

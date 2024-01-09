@@ -20,7 +20,7 @@ Res<> Node::init() {
     return Ok();
 }
 
-Res<> Node::event(Async::Event &e) {
+Res<> Node::event(Sys::Event &e) {
     if (e.accepted()) {
         return Ok();
     }
@@ -36,7 +36,7 @@ Res<> Node::event(Async::Event &e) {
     return Ok();
 }
 
-Res<> Node::bubble(Async::Event &e) {
+Res<> Node::bubble(Sys::Event &e) {
     if (_parent and not e.accepted()) {
         try$(_parent->bubble(e));
     }

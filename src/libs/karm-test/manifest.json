@@ -4,7 +4,6 @@
     "type": "lib",
     "description": "Unit testing framework",
     "requires": [
-        "karm-cli",
-        "karm-main"
+        "karm-cli"
     ]
 }

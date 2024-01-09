@@ -1,31 +1,30 @@
-#include <karm-async/async.h>
-#include <karm-logger/logger.h>
+#include <karm-sys/async.h>
 #include <karm-test/macros.h>
 
-namespace Karm::Async::Tests {
+namespace Karm::Sys::Tests {
 
 Task<usize> taskValue() {
-    co_return 42;
+    co_return Ok(42);
 }
 
 test$(asyncTaskValue) {
-    return try$(runSync([&]() -> Async::Prom<> {
+    return try$(runSync([&]() -> Task<> {
         auto task = taskValue();
         // Don't co_await here, because we want to test the case
         // where the task is return before it is awaited.
-        co_expectEq$(co_await task, 42uz);
+        co_expectEq$(co_try_await$(task), 42uz);
         co_return Ok();
     }()));
 }
 
 Task<usize> taskParam(usize value) {
-    co_return value;
+    co_return Ok(value);
 }
 
 test$(asyncTaskParam) {
-    return try$(runSync([&]() -> Async::Prom<> {
+    return try$(runSync([&]() -> Task<> {
         auto task = taskParam(42);
-        co_expectEq$(co_await task, 42uz);
+        co_expectEq$(co_try_await$(task), 42uz);
         co_return Ok();
     }()));
 }
@@ -58,7 +57,7 @@ test$(asyncTaskYield) {
 test$(asyncTestAll) {
     auto tA = taskA();
     auto tB = taskB();
-    try$(runSync(Async::all(tA, tB)));
+    try$(runSync(Sys::waitAll(tA, tB)));
     return Ok();
 }
 
@@ -68,7 +67,7 @@ Task<> taskInner() {
 }
 
 Task<> taskOuter() {
-    co_await taskInner();
+    co_try_await$(taskInner());
     co_return Ok();
 }
 
@@ -76,4 +75,4 @@ test$(asyncTaskNested) {
     return try$(runSync(taskOuter()));
 }
 
-} // namespace Karm::Async::Tests
+} // namespace Karm::Sys::Tests

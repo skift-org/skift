@@ -41,6 +41,7 @@ template <typename T>
 concept SeekableDuplexable = Duplexable<T> and Seekable<T>;
 
 struct Writer {
+
     virtual ~Writer() = default;
 
     virtual Res<usize> write(Bytes) = 0;

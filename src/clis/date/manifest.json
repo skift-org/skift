@@ -4,6 +4,6 @@
     "type": "exe",
     "description": "Prints the current date and time",
     "requires": [
-        "karm-main"
+        "karm-sys"
     ]
 }

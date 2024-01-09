@@ -4,6 +4,6 @@
     "type": "exe",
     "description": "The ls coreutility",
     "requires": [
-        "karm-main"
+        "karm-sys"
     ]
 }

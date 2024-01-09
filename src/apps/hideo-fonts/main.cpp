@@ -1,5 +1,5 @@
 #include <hideo-base/alert.h>
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
@@ -38,7 +38,7 @@ Ui::Child app(Res<Strong<Media::Fontface>> fontface) {
 
 } // namespace Hideo::Fonts
 
-Res<> entryPoint(Ctx &ctx) {
+Res<> entryPoint(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
     Res<Strong<Media::Fontface>> fontface = Error::invalidInput("No font provided");
 

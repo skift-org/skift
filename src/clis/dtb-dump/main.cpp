@@ -1,9 +1,9 @@
 #include <device-tree/blob.h>
-#include <karm-main/main.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 
-Res<> entryPoint(Ctx &ctx) {
+Res<> entryPoint(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
 
     if (args.len() == 0) {

@@ -1,10 +1,10 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "web-client-cli",
+    "id": "web-http-serv",
     "type": "exe",
-    "description": "A command line interface for web-dns",
+    "description": "A simple HTTP server",
     "requires": [
-        "web-client",
-        "karm-main"
+        "web-http",
+        "karm-sys"
     ]
 }

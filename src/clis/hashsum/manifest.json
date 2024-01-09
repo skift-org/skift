@@ -4,6 +4,6 @@
     "type": "exe",
     "description": "Compute checksums and hashes of files",
     "requires": [
-        "karm-main"
+        "karm-sys"
     ]
 }

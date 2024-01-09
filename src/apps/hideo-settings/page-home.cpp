@@ -1,4 +1,4 @@
-#include <karm-main/base.h>
+#include <karm-sys/context.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 
@@ -31,7 +31,7 @@ Ui::Child pageHome(State const &) {
         tileButton(Model::bind<GoTo>(Page::ABOUT), Mdi::INFORMATION_OUTLINE, "About"),
     };
 
-    auto isMobile = useFormFactor() == FormFactor::MOBILE;
+    auto isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
 
     auto gridLayout = isMobile
                           ? Ui::GridStyle::simpleGrow(4, 2, 4)

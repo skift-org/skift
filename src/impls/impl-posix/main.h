@@ -1,15 +1,15 @@
 #pragma once
 
-#include <karm-main/base.h>
 #include <karm-sys/chan.h>
+#include <karm-sys/context.h>
 
 void __panicHandler(Karm::PanicKind kind, char const *msg);
 
 int main(int argc, char const **argv) {
     Karm::registerPanicHandler(__panicHandler);
 
-    Ctx ctx;
-    ctx.add<ArgsHook>(argc, argv);
+    auto &ctx = Sys::globalCtx();
+    ctx.add<Sys::ArgsHook>(argc, argv);
     Res<> code = entryPoint(ctx);
 
     if (not code) {

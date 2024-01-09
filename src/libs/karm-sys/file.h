@@ -2,6 +2,7 @@
 
 #include <karm-base/rc.h>
 
+#include "async.h"
 #include "fd.h"
 
 namespace Karm::Sys {
@@ -28,6 +29,10 @@ struct _File :
         return _fd->flush();
     }
 
+    auto flushAsync(auto &sched = globalSched()) {
+        return sched.flushAsync(_fd);
+    }
+
     Res<Stat> stat() {
         return _fd->stat();
     }
@@ -46,6 +51,10 @@ struct FileReader :
     Res<usize> read(MutBytes bytes) override {
         return _fd->read(bytes);
     }
+
+    auto readAsync(MutBytes bytes, auto &sched = globalSched()) {
+        return sched.readAsync(_fd, bytes);
+    }
 };
 
 struct FileWriter :
@@ -56,6 +65,10 @@ struct FileWriter :
 
     Res<usize> write(Bytes bytes) override {
         return _fd->write(bytes);
+    }
+
+    auto writeAsync(Bytes bytes, auto &sched = globalSched()) {
+        return sched.writeAsync(_fd, bytes);
     }
 };
 

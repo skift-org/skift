@@ -4,7 +4,7 @@
     "type": "exe",
     "description": "Dump a TrueType font file to stdout",
     "requires": [
-        "karm-main",
+        "karm-sys",
         "karm-media"
     ]
 }

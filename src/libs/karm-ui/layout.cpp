@@ -312,7 +312,7 @@ struct StackLayout : public GroupNode<StackLayout> {
         }
     }
 
-    void event(Async::Event &e) override {
+    void event(Sys::Event &e) override {
         if (e.accepted())
             return;
 

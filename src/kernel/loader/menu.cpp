@@ -103,7 +103,7 @@ Ui::Child alert(String title, String subtitle) {
            Ui::spacing(64);
 }
 
-void intent(Ui::Node &n, Async::Event &e) {
+void intent(Ui::Node &n, Sys::Event &e) {
     if (auto *k = e.is<Events::KeyboardEvent>()) {
         if (k->key == Events::Key::LEFT) {
             Ui::bubble<Action>(n, MoveSelectionAction{-1});

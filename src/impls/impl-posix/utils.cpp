@@ -1,6 +1,5 @@
 #include <errno.h>
 
-
 #include "utils.h"
 
 namespace Posix {

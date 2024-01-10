@@ -100,16 +100,15 @@ inline Res<usize> copy(Readable auto &reader, Writable auto &writer, usize size)
     usize result = 0;
     while (size > 0) {
         auto read = try$(reader.read(mutSub(buf, 0, size)));
-        if (read == 0) {
+        if (read == 0)
             return Ok(result);
-        }
 
         result += read;
 
         auto written = try$(writer.write(sub(buf, 0, read)));
-        if (written != read) {
+        if (written != read)
             return Ok(result);
-        }
+
         size -= read;
     }
     return Ok(result);

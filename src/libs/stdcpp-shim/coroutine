@@ -21,11 +21,9 @@ struct coroutine_handle<void> {
         return coroutine_handle<>{frame};
     }
 
-    constexpr coroutine_handle()
-        : _frame{nullptr} {}
+    constexpr coroutine_handle() = default;
 
-    constexpr coroutine_handle(std::nullptr_t)
-        : _frame{nullptr} {}
+    constexpr coroutine_handle(std::nullptr_t) {}
 
     explicit operator bool() {
         return _frame;
@@ -55,12 +53,14 @@ private:
     explicit coroutine_handle(void *frame)
         : _frame{frame} {}
 
-    void *_frame;
+    void *_frame = nullptr;
 };
 
 template <typename Promise>
 struct coroutine_handle : coroutine_handle<> {
     coroutine_handle() = default;
+
+    coroutine_handle(std::nullptr_t) {}
 
     static coroutine_handle<Promise> from_promise(Promise &p) {
         auto frame = __builtin_coro_promise(&p, alignof(Promise), true);
@@ -68,13 +68,13 @@ struct coroutine_handle : coroutine_handle<> {
     }
 
     Promise &promise() {
-        auto p_ptr = __builtin_coro_promise(_frame, alignof(Promise), false);
-        return *static_cast<Promise *>(p_ptr);
+        auto p = __builtin_coro_promise(_frame, alignof(Promise), false);
+        return *static_cast<Promise *>(p);
     }
 
     Promise const &promise() const {
-        auto p_ptr = __builtin_coro_promise(_frame, alignof(Promise), false);
-        return *static_cast<Promise const *>(p_ptr);
+        auto p = __builtin_coro_promise(_frame, alignof(Promise), false);
+        return *static_cast<Promise const *>(p);
     }
 
 private:
@@ -83,15 +83,15 @@ private:
 };
 
 struct suspend_never {
-    constexpr bool await_ready() const { return true; }
-    constexpr void await_suspend(coroutine_handle<>) const {}
-    constexpr void await_resume() const {}
+    constexpr bool await_ready() const noexcept { return true; }
+    constexpr void await_suspend(coroutine_handle<>) const noexcept {}
+    constexpr void await_resume() const noexcept {}
 };
 
 struct suspend_always {
-    constexpr bool await_ready() const { return false; }
-    constexpr void await_suspend(coroutine_handle<>) const {}
-    constexpr void await_resume() const {}
+    constexpr bool await_ready() const noexcept { return false; }
+    constexpr void await_suspend(coroutine_handle<>) const noexcept {}
+    constexpr void await_resume() const noexcept {}
 };
 
 } // namespace std

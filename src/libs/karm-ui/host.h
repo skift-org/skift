@@ -91,7 +91,7 @@ struct PerfGraph {
                 e.color());
         }
 
-        auto text = Fmt::format("FPS: {}", (isize)fps()).take();
+        auto text = Io::format("FPS: {}", (isize)fps()).take();
         g.fillStyle(Gfx::WHITE);
         g.fill({8, 16}, text);
 

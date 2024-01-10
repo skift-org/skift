@@ -2,7 +2,7 @@
 
 #include <karm-base/array.h>
 #include <karm-base/endian.h>
-#include <karm-fmt/fmt.h>
+#include <karm-io/fmt.h>
 
 namespace Karm::Sys {
 
@@ -199,31 +199,31 @@ inline SocketAddr Ip6::localhost(u16 port) {
 } // namespace Karm::Sys
 
 template <>
-struct Karm::Fmt::Formatter<Karm::Sys::Ip4> {
+struct Karm::Io::Formatter<Karm::Sys::Ip4> {
     Res<usize> format(Io::TextWriter &writer, Karm::Sys::Ip4 addr) {
-        return Fmt::format(writer, "{}.{}.{}.{}", addr.a, addr.b, addr.c, addr.d);
+        return Io::format(writer, "{}.{}.{}.{}", addr.a, addr.b, addr.c, addr.d);
     }
 };
 
 template <>
-struct Karm::Fmt::Formatter<Karm::Sys::Ip6> {
+struct Karm::Io::Formatter<Karm::Sys::Ip6> {
     Res<usize> format(Io::TextWriter &writer, Karm::Sys::Ip6 addr) {
-        return Fmt::format(writer, "{}:{}:{}:{}:{}:{}:{}:{}", addr.a, addr.b, addr.c, addr.d, addr.e, addr.f, addr.g, addr.h);
+        return Io::format(writer, "{}:{}:{}:{}:{}:{}:{}:{}", addr.a, addr.b, addr.c, addr.d, addr.e, addr.f, addr.g, addr.h);
     }
 };
 
 template <>
-struct Karm::Fmt::Formatter<Karm::Sys::Ip> {
+struct Karm::Io::Formatter<Karm::Sys::Ip> {
     Res<usize> format(Io::TextWriter &writer, Karm::Sys::Ip addr) {
         return addr.visit([&](auto addr) {
-            return Fmt::format(writer, "{}", addr);
+            return Io::format(writer, "{}", addr);
         });
     }
 };
 
 template <>
-struct Karm::Fmt::Formatter<Karm::Sys::SocketAddr> {
+struct Karm::Io::Formatter<Karm::Sys::SocketAddr> {
     Res<usize> format(Io::TextWriter &writer, Karm::Sys::SocketAddr addr) {
-        return Fmt::format(writer, "{}:{}", addr.addr, addr.port);
+        return Io::format(writer, "{}:{}", addr.addr, addr.port);
     }
 };

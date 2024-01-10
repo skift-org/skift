@@ -59,12 +59,12 @@ Child text(Str text);
 
 template <typename... Args>
 inline Child text(Gfx::TextStyle style, Str format, Args &&...args) {
-    return text(style, Fmt::format(format, std::forward<Args>(args)...).unwrap());
+    return text(style, Io::format(format, std::forward<Args>(args)...).unwrap());
 }
 
 template <typename... Args>
 inline Child text(Str format, Args &&...args) {
-    return text(Fmt::format(format, std::forward<Args>(args)...).unwrap());
+    return text(Io::format(format, std::forward<Args>(args)...).unwrap());
 }
 
 #define DEF_STYLE(STYLE)                                                                                                  \

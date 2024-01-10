@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-fmt/fmt.h>
+#include <karm-io/fmt.h>
 
 #include "adler32.h"
 #include "crc32.h"
@@ -177,12 +177,12 @@ static inline Str name(HashType type) {
 } // namespace Karm::Crypto
 
 template <>
-struct Karm::Fmt::Formatter<Karm::Crypto::AnyDigest> {
+struct Karm::Io::Formatter<Karm::Crypto::AnyDigest> {
     Res<usize> format(Io::TextWriter &writer, Karm::Crypto::AnyDigest digest) {
         usize writen = 0;
-        writen += try$(Fmt::format(writer, "{}:", Fmt::toLowerCase(Karm::Crypto::name(digest._type))));
+        writen += try$(Io::format(writer, "{}:", Io::toLowerCase(Karm::Crypto::name(digest._type))));
         for (auto byte : digest.bytes())
-            writen += try$(Fmt::format(writer, "{02x}", byte));
+            writen += try$(Io::format(writer, "{02x}", byte));
         return Ok(writen);
     }
 };

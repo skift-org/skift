@@ -1,4 +1,4 @@
-#include <karm-fmt/fmt.h>
+#include <karm-io/fmt.h>
 #include <karm-logger/logger.h>
 #include <karm-test/macros.h>
 
@@ -15,7 +15,7 @@ struct Baz {
 Reflectable$(Baz, foo, qux);
 Reflectable$(Foo, bar, baz);
 
-namespace Karm::Fmt::Tests {
+namespace Karm::Io::Tests {
 
 template <typename T>
 Res<> testCase(Str expected, T const &value, Str format = "") {
@@ -98,7 +98,7 @@ test$(fmtOptionals) {
 }
 
 test$(fmtError) {
-    try$(testCase("error: test", Error::invalidData("test")));
+    try$(testCase("test", Error::invalidData("test")));
 
     return Ok();
 }
@@ -106,7 +106,7 @@ test$(fmtError) {
 test$(fmtResult) {
     try$(testCase("Ok", Ok()));
     try$(testCase("1", Ok(1)));
-    try$(testCase("error: test", Error::invalidData("test")));
+    try$(testCase("test", Error::invalidData("test")));
 
     return Ok();
 }
@@ -132,10 +132,10 @@ test$(fmtReferences) {
 /* --- Format Reflectable --------------------------------------------------- */
 
 test$(fmtReflectable) {
-    auto fooStr = try$(Fmt::format("{}", Foo{1, 2}));
+    auto fooStr = try$(Io::format("{}", Foo{1, 2}));
     expectEq$(fooStr, "Foo(bar=1, baz=2)");
 
-    auto bazStr = try$(Fmt::format("{}", Baz{{1, 2}, 3}));
+    auto bazStr = try$(Io::format("{}", Baz{{1, 2}, 3}));
     expectEq$(bazStr, "Baz(foo=Foo(bar=1, baz=2), qux=3)");
 
     return Ok();
@@ -178,4 +178,4 @@ test$(fmtTuple) {
     return Ok();
 }
 
-} // namespace Karm::Fmt::Tests
+} // namespace Karm::Io::Tests

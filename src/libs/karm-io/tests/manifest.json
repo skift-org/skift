@@ -1,12 +1,12 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "karm-fmt-tests",
+    "id": "karm-io-tests",
     "type": "lib",
     "props": {
         "cpp-excluded": true
     },
     "requires": [
-        "karm-fmt",
+        "karm-io",
         "karm-test"
     ],
     "injects": [

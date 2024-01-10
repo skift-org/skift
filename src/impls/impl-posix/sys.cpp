@@ -275,7 +275,7 @@ Res<> populate(Sys::SysInfo &infos) {
         return Posix::fromLastErrno();
 
     infos.sysName = "Posix";
-    infos.sysVersion = try$(Fmt::format("{}", _POSIX_VERSION));
+    infos.sysVersion = try$(Io::format("{}", _POSIX_VERSION));
 
     infos.kernelName = uts.sysname;
     infos.kernelVersion = uts.release;

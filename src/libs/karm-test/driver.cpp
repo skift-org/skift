@@ -29,7 +29,7 @@ void Driver::runAll() {
 
     for (auto *test : _tests) {
         Sys::err("Running {}: {}... ",
-                 test->_loc.file, Fmt::toNoCase(test->_name).unwrap());
+                 test->_loc.file, Io::toNoCase(test->_name).unwrap());
 
         auto result = test->run(*this);
 

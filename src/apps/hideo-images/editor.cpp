@@ -126,7 +126,7 @@ Ui::Child editorFilters(State const &s) {
                 },
                 s.filter.is<T>() ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
                 editorFilterIcon<T>(),
-                Fmt::toTitleCase(T::NAME).unwrap()));
+                Io::toTitleCase(T::NAME).unwrap()));
     });
 
     return Ui::hflow(8, tiles);

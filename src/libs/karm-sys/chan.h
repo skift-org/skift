@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-fmt/fmt.h>
+#include <karm-io/fmt.h>
 #include <karm-io/traits.h>
 
 #include <karm-sys/_embed.h>
@@ -57,20 +57,20 @@ Out &out();
 Err &err();
 
 inline void print(Str str, auto &&...args) {
-    (void)Fmt::format(out(), str, std::forward<decltype(args)>(args)...);
+    (void)Io::format(out(), str, std::forward<decltype(args)>(args)...);
 }
 
 inline void err(Str str, auto &&...args) {
-    (void)Fmt::format(err(), str, std::forward<decltype(args)>(args)...);
+    (void)Io::format(err(), str, std::forward<decltype(args)>(args)...);
 }
 
 inline void println(Str str, auto &&...args) {
-    (void)Fmt::format(out(), str, std::forward<decltype(args)>(args)...);
+    (void)Io::format(out(), str, std::forward<decltype(args)>(args)...);
     (void)out().writeStr(Sys::LINE_ENDING);
 }
 
 inline void errln(Str str, auto &&...args) {
-    (void)Fmt::format(err(), str, std::forward<decltype(args)>(args)...);
+    (void)Io::format(err(), str, std::forward<decltype(args)>(args)...);
     (void)out().writeStr(Sys::LINE_ENDING);
 }
 

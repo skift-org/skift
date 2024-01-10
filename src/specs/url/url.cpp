@@ -97,7 +97,7 @@ Res<usize> Path::write(Io::TextWriter &writer) const {
         written += try$(writer.writeRune(SEP));
 
     for (auto part : iter())
-        written += try$(Fmt::format(writer, "{c}{}", SEP, part));
+        written += try$(Io::format(writer, "{c}{}", SEP, part));
 
     return Ok(written);
 }
@@ -185,27 +185,27 @@ Res<usize> Url::write(Io::TextWriter &writer) const {
     usize written = 0;
 
     if (scheme.len() > 0)
-        written += try$(Fmt::format(writer, "{}:", scheme));
+        written += try$(Io::format(writer, "{}:", scheme));
 
     if (authority.len() > 0 or host.len() > 0)
         written += try$(writer.writeStr("//"));
 
     if (authority.len() > 0)
-        written += try$(Fmt::format(writer, "{}@", authority));
+        written += try$(Io::format(writer, "{}@", authority));
 
     if (host.len() > 0)
         written += try$(writer.writeStr(host));
 
     if (port)
-        written += try$(Fmt::format(writer, ":{}", port.unwrap()));
+        written += try$(Io::format(writer, ":{}", port.unwrap()));
 
     written += try$(path.write(writer));
 
     if (query.len() > 0)
-        written += try$(Fmt::format(writer, "?{}", query));
+        written += try$(Io::format(writer, "?{}", query));
 
     if (fragment.len() > 0)
-        written += try$(Fmt::format(writer, "#{}", fragment));
+        written += try$(Io::format(writer, "#{}", fragment));
 
     return Ok(written);
 }

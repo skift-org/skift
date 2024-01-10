@@ -47,7 +47,7 @@ Sys::Task<> respondFile(Sys::_Connection &conn, Url::Url const &url, Http::Code 
     auto stat = co_try$(file.stat());
 
     Io::StringWriter header;
-    co_try$(Fmt::format(
+    co_try$(Io::format(
         header,
         "HTTP/1.1 {} {}\r\n"
         "Connection: close\r\n"
@@ -71,7 +71,7 @@ Sys::Task<> respond404(Sys::_Connection &conn) {
         co_return Ok();
 
     Io::StringWriter header;
-    co_try$(Fmt::format(
+    co_try$(Io::format(
         header,
         "HTTP/1.1 404 Not Found\r\n"
         "Connection: close\r\n"

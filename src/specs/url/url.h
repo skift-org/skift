@@ -4,8 +4,8 @@
 
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
-#include <karm-fmt/fmt.h>
 #include <karm-io/expr.h>
+#include <karm-io/fmt.h>
 #include <karm-io/sscan.h>
 
 namespace Url {
@@ -141,14 +141,14 @@ inline auto operator/(Url::Path const &path, Str other) {
 }
 
 template <>
-struct Karm::Fmt::Formatter<Url::Path> {
+struct Karm::Io::Formatter<Url::Path> {
     Res<usize> format(Io::TextWriter &writer, Url::Path const &path) {
         return path.write(writer);
     }
 };
 
 template <>
-struct Karm::Fmt::Formatter<Url::Url> {
+struct Karm::Io::Formatter<Url::Url> {
     Res<usize> format(Io::TextWriter &writer, Url::Url const &url) {
         return url.write(writer);
     }

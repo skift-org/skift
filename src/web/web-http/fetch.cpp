@@ -26,7 +26,7 @@ Sys::Task<usize> _fetch(Url::Url const &url, Sys::_Connection &conn, Io::Writer 
     // Send request
     logDebug("GET {} HTTP/1.1", url.path);
     Io::StringWriter req;
-    co_try$(Fmt::format(
+    co_try$(Io::format(
         req,
         "GET {} HTTP/1.1\r\n"
         "Host: {}\r\n"

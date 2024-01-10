@@ -2,7 +2,7 @@
 
 #include <abi-ms/abi.h>
 #include <efi/base.h>
-#include <karm-fmt/fmt.h>
+#include <karm-io/fmt.h>
 #include <karm-sys/chan.h>
 #include <karm-sys/context.h>
 
@@ -21,7 +21,7 @@ extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable *st) {
     Res<> code = entryPoint(Sys::globalCtx());
     if (not code) {
         Error error = code.none();
-        (void)Fmt::format(Sys::err(), "{}: {}\n", self, error.msg());
+        (void)Io::format(Sys::err(), "{}: {}\n", self, error.msg());
         return 1;
     }
 

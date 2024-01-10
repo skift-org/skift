@@ -8,9 +8,9 @@
 #include "spec.h"
 
 template <>
-struct Karm::Fmt::Formatter<Handover::Record> {
+struct Karm::Io::Formatter<Handover::Record> {
     Res<usize> format(Io::TextWriter &writer, Handover::Record record) {
-        return Fmt::format(writer, "Record({}, {x}-{x})", record.name(), record.start, record.end());
+        return Io::format(writer, "Record({}, {x}-{x})", record.name(), record.start, record.end());
     }
 };
 

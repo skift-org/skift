@@ -22,7 +22,7 @@ static Str const BLOCK = "███";
 namespace Sysfetch {
 
 auto title(Str text) {
-    return Fmt::format("{}{}", Cli::Cmd::forward(19), Cli::styled(text, Cli::style().bold()));
+    return Io::format("{}{}", Cli::Cmd::forward(19), Cli::styled(text, Cli::style().bold()));
 }
 
 Res<> dumpUserInfo() {

@@ -4,7 +4,7 @@
 #include <karm-base/atomic.h>
 #include <karm-base/lock.h>
 #include <karm-base/rc.h>
-#include <karm-fmt/fmt.h>
+#include <karm-io/fmt.h>
 
 namespace Hjert::Core {
 
@@ -55,8 +55,8 @@ struct ObjectLockScope : public LockScope {
 } // namespace Hjert::Core
 
 template <Meta::Derive<Hjert::Core::Object> T>
-struct Karm::Fmt::Formatter<T> {
+struct Karm::Io::Formatter<T> {
     Res<usize> format(Io::TextWriter &writer, Hjert::Core::Object const &obj) {
-        return Fmt::format(writer, "{}({}, '{}')", Fmt::toPascalCase(Hj::toStr(obj.type())).unwrap(), obj.id(), obj.label());
+        return Io::format(writer, "{}({}, '{}')", Io::toPascalCase(Hj::toStr(obj.type())).unwrap(), obj.id(), obj.label());
     }
 };

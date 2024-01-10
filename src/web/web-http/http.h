@@ -3,7 +3,7 @@
 #include <karm-base/distinct.h>
 #include <karm-base/map.h>
 #include <karm-base/std.h>
-#include <karm-fmt/fmt.h>
+#include <karm-io/fmt.h>
 #include <url/url.h>
 
 namespace Web::Http {
@@ -259,22 +259,22 @@ struct Response : public Header {
 } // namespace Web::Http
 
 template <>
-struct Karm::Fmt::Formatter<Web::Http::Code> {
+struct Karm::Io::Formatter<Web::Http::Code> {
     Res<usize> format(Io::TextWriter &writer, Web::Http::Code code) {
         return writer.writeStr(Web::Http::toStr(code));
     }
 };
 
 template <>
-struct Karm::Fmt::Formatter<Web::Http::Method> {
+struct Karm::Io::Formatter<Web::Http::Method> {
     Res<usize> format(Io::TextWriter &writer, Web::Http::Method method) {
         return writer.writeStr(Web::Http::toStr(method));
     }
 };
 
 template <>
-struct Karm::Fmt::Formatter<Web::Http::Version> {
+struct Karm::Io::Formatter<Web::Http::Version> {
     Res<usize> format(Io::TextWriter &writer, Web::Http::Version version) {
-        return Fmt::format(writer, "HTTP/{}.{}", version.major, version.minor);
+        return Io::format(writer, "HTTP/{}.{}", version.major, version.minor);
     }
 };

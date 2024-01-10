@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/string.h>
-#include <karm-fmt/fmt.h>
+#include <karm-io/fmt.h>
 #include <karm-io/funcs.h>
 #include <karm-io/traits.h>
 
@@ -111,7 +111,7 @@ struct Emit : public Io::TextWriterBase<> {
             insertNewline();
         }
 
-        _tryWrapper(Fmt::format(*this, format, std::forward<Ts>(ts)...));
+        _tryWrapper(Io::format(*this, format, std::forward<Ts>(ts)...));
     }
 
     template <typename... Ts>
@@ -123,7 +123,7 @@ struct Emit : public Io::TextWriterBase<> {
             insertNewline();
         }
 
-        _tryWrapper(Fmt::format(*this, std::forward<Ts>(ts)...));
+        _tryWrapper(Io::format(*this, std::forward<Ts>(ts)...));
         newline();
     }
 

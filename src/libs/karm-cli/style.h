@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-fmt/fmt.h>
+#include <karm-io/fmt.h>
 
 namespace Karm::Cli {
 
@@ -135,7 +135,7 @@ inline auto styled(auto inner, Style style) {
 } // namespace Karm::Cli
 
 template <>
-struct Karm::Fmt::Formatter<Karm::Cli::Style> {
+struct Karm::Io::Formatter<Karm::Cli::Style> {
     Res<usize> format(Io::TextWriter &writer, Karm::Cli::Style style) {
 #ifdef __ck_karm_cli_backend_ansi__
         usize written = 0;
@@ -145,11 +145,11 @@ struct Karm::Fmt::Formatter<Karm::Cli::Style> {
         }
 
         if (style._fg != Karm::Cli::_COLOR_UNDEF) {
-            written += try$(Fmt::format(writer, "\x1b[{}m", style._fg + 30));
+            written += try$(Io::format(writer, "\x1b[{}m", style._fg + 30));
         }
 
         if (style._bg != Karm::Cli::_COLOR_UNDEF) {
-            written += try$(Fmt::format(writer, "\x1b[{}m", style._bg + 40));
+            written += try$(Io::format(writer, "\x1b[{}m", style._bg + 40));
         }
 
         if (style._bold) {
@@ -182,7 +182,7 @@ struct Karm::Fmt::Formatter<Karm::Cli::Style> {
 };
 
 template <typename T>
-struct Karm::Fmt::Formatter<Karm::Cli::Styled<T>> {
+struct Karm::Io::Formatter<Karm::Cli::Styled<T>> {
     Formatter<Karm::Cli::Style> _styleFmt{};
     Formatter<T> _innerFmt{};
 

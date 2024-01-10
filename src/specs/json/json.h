@@ -4,9 +4,9 @@
 #include <karm-base/string.h>
 #include <karm-base/var.h>
 #include <karm-base/vec.h>
-#include <karm-fmt/fmt.h>
 #include <karm-io/emit.h>
 #include <karm-io/expr.h>
+#include <karm-io/fmt.h>
 #include <karm-io/sscan.h>
 
 namespace Json {
@@ -135,7 +135,7 @@ struct Value {
                     return s;
                 },
                 [](Number d) {
-                    return Fmt::format("{}", d).unwrap();
+                    return Io::format("{}", d).unwrap();
                 },
                 [](bool b) {
                     return b ? "true" : "false";
@@ -277,7 +277,7 @@ inline auto operator""_json(char const *str, usize len) {
 }
 
 template <>
-struct Karm::Fmt::Formatter<Json::Value> {
+struct Karm::Io::Formatter<Json::Value> {
     Res<usize> format(Io::TextWriter &writer, Json::Value value) {
         Io::Emit emit{writer};
         try$(Json::stringify(emit, value));

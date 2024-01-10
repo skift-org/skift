@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-fmt/fmt.h>
+#include <karm-io/fmt.h>
 
 #include "edge.h"
 #include "vec.h"

@@ -2,7 +2,7 @@
 
 #include "fmt.h"
 
-namespace Karm::Fmt {
+namespace Karm::Io {
 
 Res<String> toDefaultCase(Str str) {
     return Ok(str);
@@ -316,4 +316,4 @@ Res<String> changeCase(Str str, Case toCase) {
     }
 }
 
-} // namespace Karm::Fmt
+} // namespace Karm::Io

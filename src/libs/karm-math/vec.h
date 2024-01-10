@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/clamp.h>
-#include <karm-fmt/fmt.h>
+#include <karm-io/fmt.h>
 
 #include "funcs.h"
 

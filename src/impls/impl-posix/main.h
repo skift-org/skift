@@ -14,7 +14,7 @@ int main(int argc, char const **argv) {
 
     if (not code) {
         ::Karm::Error error = code.none();
-        (void)::Karm::Fmt::format(::Karm::Sys::err(), "{}: {}\n", argv[0], error.msg());
+        (void)::Karm::Io::format(::Karm::Sys::err(), "{}: {}\n", argv[0], error.msg());
         return 1;
     }
 

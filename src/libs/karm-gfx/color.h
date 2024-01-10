@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/std.h>
-#include <karm-fmt/fmt.h>
+#include <karm-io/fmt.h>
 #include <karm-math/vec.h>
 
 namespace Karm::Gfx {
@@ -180,8 +180,8 @@ static inline Color yCbCrToRgb(YCbCr yCbCr) {
 } // namespace Karm::Gfx
 
 template <>
-struct Karm::Fmt::Formatter<Gfx::Color> {
+struct Karm::Io::Formatter<Gfx::Color> {
     Res<usize> format(Io::TextWriter &writer, Gfx::Color color) {
-        return Fmt::format(writer, "Color({}, {}, {}, {})", color.red, color.green, color.blue, color.alpha);
+        return Io::format(writer, "Color({}, {}, {}, {})", color.red, color.green, color.blue, color.alpha);
     }
 };

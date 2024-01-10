@@ -5,6 +5,6 @@
     "description": "A simple logger",
     "requires": [
         "karm-logger-impl",
-        "karm-fmt"
+        "karm-io"
     ]
 }

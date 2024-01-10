@@ -10,7 +10,7 @@
 #include <karm-io/traits.h>
 #include <karm-meta/signess.h>
 
-namespace Karm::Fmt {
+namespace Karm::Io {
 
 template <typename T>
 struct Formatter;
@@ -479,7 +479,6 @@ template <>
 struct Formatter<Error> {
     Res<usize> format(Io::TextWriter &writer, Error const &val) {
         usize written = 0;
-        written += try$(writer.writeStr("error: "));
         written += try$(writer.writeStr(val.msg()));
         return Ok(written);
     }
@@ -555,14 +554,14 @@ struct Formatter<Weak<T>> {
 template <Reflectable T>
 struct Formatter<T> {
     Res<usize> format(Io::TextWriter &writer, T const &val) {
-        usize written = try$(Fmt::format(writer, "{}(", nameOf<T>()));
+        usize written = try$(Io::format(writer, "{}(", nameOf<T>()));
 
         bool first = true;
         try$(iterFields(val, [&](Str name, auto const &v) -> Res<usize> {
             if (not first)
                 written += try$(writer.writeStr(", "));
             first = false;
-            written += try$(Fmt::format(writer, "{}={}", name, v));
+            written += try$(Io::format(writer, "{}={}", name, v));
             return Ok(written);
         }));
         written += try$(writer.writeRune(')'));
@@ -619,35 +618,35 @@ struct Formatter<char const *> : public Formatter<Str> {};
 template <>
 struct Formatter<TimeSpan> {
     Res<usize> format(Io::TextWriter &writer, TimeSpan const &val) {
-        return Fmt::format(writer, "{}.{03}", val.toSecs(), val.toUSecs() % 1000);
+        return Io::format(writer, "{}.{03}", val.toSecs(), val.toUSecs() % 1000);
     }
 };
 
 template <>
 struct Formatter<TimeStamp> {
     Res<usize> format(Io::TextWriter &writer, TimeStamp const &val) {
-        return Fmt::format(writer, "{}", DateTime::fromTimeStamp(val));
+        return Io::format(writer, "{}", DateTime::fromTimeStamp(val));
     }
 };
 
 template <>
 struct Formatter<Time> {
     Res<usize> format(Io::TextWriter &writer, Time const &val) {
-        return Fmt::format(writer, "{02}:{02}:{02}", val.hour, val.minute, val.second);
+        return Io::format(writer, "{02}:{02}:{02}", val.hour, val.minute, val.second);
     }
 };
 
 template <>
 struct Formatter<Date> {
     Res<usize> format(Io::TextWriter &writer, Date const &val) {
-        return Fmt::format(writer, "{04}-{02}-{02}", (isize)val.year, (usize)val.month + 1, (usize)val.day + 1);
+        return Io::format(writer, "{04}-{02}-{02}", (isize)val.year, (usize)val.month + 1, (usize)val.day + 1);
     }
 };
 
 template <>
 struct Formatter<DateTime> {
     Res<usize> format(Io::TextWriter &writer, DateTime const &val) {
-        return Fmt::format(writer, "{} {}", val.date, val.time);
+        return Io::format(writer, "{} {}", val.date, val.time);
     }
 };
 
@@ -693,4 +692,4 @@ struct Formatter<Tuple<Ts...>> {
     }
 };
 
-} // namespace Karm::Fmt
+} // namespace Karm::Io

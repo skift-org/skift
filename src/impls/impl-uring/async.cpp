@@ -156,6 +156,8 @@ struct UringSched : public Sys::Sched {
         struct Job : public _Job {
             Strong<Fd> _fd;
             Bytes _buf;
+            iovec _iov;
+            msghdr _msg;
             sockaddr_in _addr;
             Strong<Promise<usize>> _promise = makePromise<usize>();
 
@@ -163,14 +165,15 @@ struct UringSched : public Sys::Sched {
                 : _fd(fd), _buf(buf), _addr(Posix::toSockAddr(addr)) {}
 
             void submit(io_uring_sqe *sqe) override {
-                io_uring_prep_sendto(
-                    sqe,
-                    _fd->handle(),
-                    _buf.begin(),
-                    _buf.len(),
-                    0,
-                    (struct sockaddr *)&_addr,
-                    sizeof(sockaddr_in));
+                _iov.iov_base = const_cast<Byte *>(_buf.begin());
+                _iov.iov_len = _buf.len();
+
+                _msg.msg_name = &_addr;
+                _msg.msg_namelen = sizeof(sockaddr_in);
+                _msg.msg_iov = &_iov;
+                _msg.msg_iovlen = 1;
+
+                io_uring_prep_sendmsg(sqe, _fd->handle(), &_msg, 0);
             }
             void complete(io_uring_cqe *cqe) override {
                 auto res = cqe->res;

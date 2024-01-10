@@ -217,6 +217,10 @@ struct _StringBuilder {
     _StringBuilder(usize cap = 16)
         : _buf(cap) {}
 
+    void ensure(usize cap) {
+        _buf.ensure(cap);
+    }
+
     void append(Rune rune) {
         typename E::One one;
         if (not E::encodeUnit(rune, one))

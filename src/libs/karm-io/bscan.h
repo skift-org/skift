@@ -298,68 +298,73 @@ struct BEmit {
     always_inline constexpr BEmit(Io::Writer &writer)
         : _writer(writer) {}
 
-    always_inline constexpr void writeU8be(u8be v) {
+    template <Meta::TrivialyCopyable T>
+    always_inline constexpr void writeFrom(T const &v) {
         (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    }
+
+    always_inline constexpr void writeU8be(u8be v) {
+        writeFrom(v);
     }
 
     always_inline constexpr void writeU16be(u16be v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeU32be(u32be v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeU64be(u64be v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeU8le(u8le v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeU16le(u16le v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeU32le(u32le v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeU64le(u64le v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeI8be(i8be v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeI16be(i16be v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeI32be(i32be v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeI64be(i64be v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeI8le(i8le v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeI16le(i16le v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeI32le(i32le v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeI64le(i64le v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+        writeFrom(v);
     }
 
     always_inline constexpr void writeStr(Str s) {

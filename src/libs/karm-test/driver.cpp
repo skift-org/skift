@@ -22,7 +22,7 @@ void Driver::add(Test *test) {
     _tests.pushBack(test);
 }
 
-void Driver::runAll() {
+Res<> Driver::runAll() {
     usize passed = 0, failed = 0;
 
     Sys::errln("Running {} tests...\n", _tests.len());
@@ -50,10 +50,13 @@ void Driver::runAll() {
                    Cli::styled(witty(Sys::now().val()), NOTE));
         Sys::errln("    {} passed\n",
                    Cli::styled(passed, GREEN));
+
+        return Error::other("test failed");
     } else {
         Sys::errln(" 🤘 {} passed - {}\n",
                    Cli::styled(passed, GREEN),
                    Cli::styled(nice(Sys::now().val()), NOTE));
+        return Ok();
     }
 }
 

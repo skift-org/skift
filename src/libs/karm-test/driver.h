@@ -13,7 +13,7 @@ struct Driver {
 
     void add(Test *test);
 
-    void runAll();
+    Res<> runAll();
 
     Res<> unexpect(auto const &__lhs, auto const &__rhs, Str op, Loc = Loc::current()) {
         Sys::errln("unexpected: '{}' {} '{}'", __lhs, op, __rhs);

@@ -2,6 +2,5 @@
 #include <karm-test/driver.h>
 
 Res<> entryPoint(Sys::Ctx &) {
-    Test::driver().runAll();
-    return Ok();
+    return Test::driver().runAll();
 }

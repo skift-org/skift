@@ -1,0 +1,65 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.target.v1",
+    "id": "host-riscv64",
+    "type": "target",
+    "props": {
+        "toolchain": "clang",
+        "arch": "riscv64",
+        "sys": [
+            "@uname",
+            "sysname"
+        ],
+        "abi": "unknown",
+        "freestanding": false,
+        "host": true,
+        "version": [
+            "@include",
+            "./meta/scripts/version.json"
+        ],
+        "karm-sys-encoding": "utf8",
+        "karm-sys-line-ending": "lf",
+        "karm-sys-path-separator": "slash",
+        "karm-cli-backend": "ansi",
+        "karm-ui-backend": "sdl"
+    },
+    "routing": {
+        "stdc-math": "stdc-math-host"
+    },
+    "tools": {
+        "cc": {
+            "cmd": [
+                "@latest",
+                "clang"
+            ]
+        },
+        "cxx": {
+            "cmd": [
+                "@latest",
+                "clang++"
+            ]
+        },
+        "ld": {
+            "cmd": [
+                "@latest",
+                "clang++"
+            ],
+            "rule": "-o $out $objs -Wl,--whole-archive $wholeLibs -Wl,--no-whole-archive $libs $flags"
+        },
+        "ar": {
+            "cmd": [
+                "@latest",
+                "llvm-ar"
+            ],
+            "args": [
+                "rcs"
+            ]
+        },
+        "as": {
+            "cmd": "nasm",
+            "args": [
+                "-f",
+                "elf64"
+            ]
+        }
+    }
+}

@@ -41,9 +41,11 @@ Ui::Child quickSetting(QuickSettingProps props) {
     return primary;
 }
 
-Ui::Child dateAndTime() {
+Ui::Child dateAndTime(State const &state) {
+    auto [date, time] = state.dateTime;
+
     return Ui::vflow(
-               Ui::labelLarge("22:07"),
+               Ui::labelLarge("{02}:{03}", time.hour, time.minute),
                Ui::labelMedium("Fri, Jul 28")) |
            Ui::center() |
            Ui::bound() |
@@ -52,7 +54,7 @@ Ui::Child dateAndTime() {
 
 Ui::Child quickheader(State const &state) {
     return Ui::hflow(
-        dateAndTime(),
+        dateAndTime(state),
         Ui::grow(NONE),
         Ui::button(
             Model::bind<ToggleSysPanel>(),
@@ -211,7 +213,7 @@ Ui::Child noti(Noti const &noti, usize i) {
 
 Ui::Child notifications(State const &state) {
     if (not state.noti.len()) {
-        return Ui::labelMedium("No notifications") |
+        return Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), "No notifications") |
                Ui::center() |
                Ui::grow();
     }
@@ -234,7 +236,7 @@ Ui::Child notiPanel(State const &state) {
                Ui::labelMedium("Notifications") |
                    Ui::spacing({12, 6, 0, 0}),
                notifications(state)) |
-           panel();
+           panel({500, 400});
 }
 
 Ui::Child sysFlyout(State const &state) {

@@ -260,6 +260,7 @@ Child versionBadge() {
 #ifdef __ck_branch_nightly__
     badges.pushBack(badge(Gfx::INDIGO400, "Nightly"));
 #elif defined(__ck_branch_stable__)
+    // No badge for stable
 #else
     badges.pushBack(badge(Gfx::EMERALD, "Dev"));
 #endif

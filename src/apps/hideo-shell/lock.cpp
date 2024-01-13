@@ -6,10 +6,24 @@
 namespace Hideo::Shell {
 
 Ui::Child lock(State const &state) {
+    auto [date, time] = state.dateTime;
+    auto dateTime = Io::format(
+                        "{}. {} {}",
+                        date.month.abbr(),
+                        date.dayOfMonth() + 1,
+                        date.year.val())
+                        .unwrap();
+
     auto clock = Ui::vflow(
-        Ui::center(Ui::displayMedium("22:07")),
+        Ui::center(Ui::displayMedium("{02}:{02}", time.hour, time.minute)),
         Ui::empty(16),
-        Ui::center(Ui::titleMedium("Wed. 12 October")));
+        Ui::center(
+            Ui::titleMedium(
+                // Mon. 28 Jul
+                "{}. {} {}",
+                Io::toCapitalCase(date.dayOfWeek().abbr()),
+                date.dayOfMonth() + 1,
+                Io::toCapitalCase(date.month.str()))));
 
     auto hintText = Ui::vflow(
         Ui::center(Ui::icon(Mdi::CHEVRON_UP, 48)),

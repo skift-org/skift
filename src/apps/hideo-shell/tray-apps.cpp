@@ -14,7 +14,7 @@ Ui::Child searchInput() {
     return Ui::hflow(
                0,
                Layout::Align::VCENTER | Layout::Align::START,
-               Ui::labelMedium("Search...") | Ui::grow(),
+               Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), "Search…") | Ui::grow(),
                Ui::icon(Mdi::MAGNIFY, 24)) |
            Ui::spacing({12, 8}) |
            Ui::box({

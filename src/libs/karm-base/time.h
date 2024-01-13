@@ -8,7 +8,7 @@ namespace Karm {
 /* --- TimeSpan and TimeStamp ----------------------------------------------- */
 
 struct TimeSpan {
-    usize _value; // us
+    usize _value; // microseconds (us) aka 1/1,000,000th of a second
 
     static constexpr TimeSpan zero() {
         return TimeSpan{0};
@@ -261,27 +261,27 @@ struct Day {
 };
 
 #define FOREACH_MONTH(MONTH) \
-    MONTH(JANUARY)           \
-    MONTH(FEBRUARY)          \
-    MONTH(MARCH)             \
-    MONTH(APRIL)             \
-    MONTH(MAY)               \
-    MONTH(JUNE)              \
-    MONTH(JULY)              \
-    MONTH(AUGUST)            \
-    MONTH(SEPTEMBER)         \
-    MONTH(OCTOBER)           \
-    MONTH(NOVEMBER)          \
-    MONTH(DECEMBER)
+    MONTH(JANUARY, JAN)      \
+    MONTH(FEBRUARY, FEB)     \
+    MONTH(MARCH, MAR)        \
+    MONTH(APRIL, APR)        \
+    MONTH(MAY, MAY)          \
+    MONTH(JUNE, JUN)         \
+    MONTH(JULY, JUL)         \
+    MONTH(AUGUST, AUG)       \
+    MONTH(SEPTEMBER, SEP)    \
+    MONTH(OCTOBER, OCT)      \
+    MONTH(NOVEMBER, NOV)     \
+    MONTH(DECEMBER, DEC)
 
 struct Month {
     enum _Name {
-#define ITER(NAME) NAME,
+#define ITER(NAME, ...) NAME,
         FOREACH_MONTH(ITER)
 #undef ITER
     };
 
-    // NOTE: 0-based
+    // NOTE: Months are 0-based, so 0 is January
     usize _raw;
 
     constexpr Month(isize raw = 0)
@@ -300,13 +300,28 @@ struct Month {
 
     Str str() const {
         switch (_raw) {
-#define ITER(NAME) \
-    case NAME:     \
+#define ITER(NAME, ...) \
+    case NAME:          \
         return #NAME;
             FOREACH_MONTH(ITER)
 #undef ITER
         }
-        return "";
+        panic("invalid month");
+    }
+
+    Str abbr() const {
+        switch (_raw) {
+#define ITER(NAME, ABBR) \
+    case NAME:           \
+        return #ABBR;
+            FOREACH_MONTH(ITER)
+#undef ITER
+        }
+        panic("invalid month");
+    }
+
+    usize val() const {
+        return _raw;
     }
 
     auto operator<=>(Month const &) const = default;
@@ -356,23 +371,27 @@ struct Year {
         }
     }
 
+    isize val() const {
+        return _raw;
+    }
+
     auto operator<=>(Year const &) const = default;
 };
 
 /* --- Date ----------------------------------------------------------------- */
 
 #define FOREACH_DAY_OF_WEEK(DOW) \
-    DOW(SUNDAY)                  \
-    DOW(MONDAY)                  \
-    DOW(TUESDAY)                 \
-    DOW(WEDNESDAY)               \
-    DOW(THURSDAY)                \
-    DOW(FRIDAY)                  \
-    DOW(SATURDAY)
+    DOW(MONDAY, MON)             \
+    DOW(TUESDAY, TUE)            \
+    DOW(WEDNESDAY, WED)          \
+    DOW(THURSDAY, THU)           \
+    DOW(FRIDAY, FRI)             \
+    DOW(SATURDAY, SAT)           \
+    DOW(SUNDAY, SUN)
 
 struct DayOfWeek {
     enum _Raw : usize {
-#define ITER(NAME) NAME,
+#define ITER(NAME, ...) NAME,
         FOREACH_DAY_OF_WEEK(ITER)
 #undef ITER
     };
@@ -391,15 +410,29 @@ struct DayOfWeek {
 
     Str str() {
         switch (_raw) {
-#define ITER(NAME) \
-    case NAME:     \
+#define ITER(NAME, ...) \
+    case NAME:          \
         return #NAME;
             FOREACH_DAY_OF_WEEK(ITER)
 #undef ITER
         default:
-            return "INVALID";
+            panic("invalid day of week");
         }
     }
+
+    Str abbr() {
+        switch (_raw) {
+#define ITER(NAME, ABBR) \
+    case NAME:           \
+        return #ABBR;
+            FOREACH_DAY_OF_WEEK(ITER)
+#undef ITER
+        default:
+            panic("invalid day of week");
+        }
+    }
+
+    auto operator<=>(DayOfWeek const &) const = default;
 };
 
 struct Date {
@@ -446,6 +479,7 @@ struct Date {
         return TimeStamp::epoch() + TimeSpan::fromDays(days);
     }
 
+    /// Returns the day of the month, 0-based.
     u8 dayOfMonth() const {
         Date firstDay{0, month, year};
         return (toTimeStamp() - firstDay.toTimeStamp()).toDays();

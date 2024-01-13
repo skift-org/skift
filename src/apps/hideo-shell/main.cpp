@@ -20,9 +20,10 @@ Ui::Child indicator(Media::Icon icon) {
            Ui::spacing(4);
 }
 
-Ui::Child statusbar() {
+Ui::Child statusbar(State const &state) {
+    auto [_, time] = state.dateTime;
     return Ui::hflow(
-               Ui::labelLarge("22:07") | Ui::center(),
+               Ui::labelLarge("{02}:{02}", time.hour, time.minute) | Ui::center(),
                Ui::grow(NONE),
                indicator(Mdi::WIFI_STRENGTH_4),
                indicator(Mdi::NETWORK_STRENGTH_4),
@@ -38,10 +39,10 @@ Ui::Child statusbar() {
            });
 }
 
-Ui::Child statusbarButton(State const &) {
+Ui::Child statusbarButton(State const &state) {
     return Ui::button(
         Model::bind<Activate>(Panel::SYS),
-        statusbar());
+        statusbar(state));
 }
 
 /* --- Navigation Bar ------------------------------------------------------- */
@@ -54,16 +55,26 @@ Ui::Child navbar(State const &) {
 
 /* --- Taskbar -------------------------------------------------------------- */
 
-Ui::Child taskbar(State const &) {
+Ui::Child taskbar(State const &state) {
     auto appsButton = Ui::button(
         Model::bind<Activate>(Panel::APPS),
         Ui::ButtonStyle::subtle(),
         Mdi::APPS, "Applications");
 
+    auto [date, time] = state.dateTime;
+    auto dateTime = Io::format(
+                        "{}. {} {}, {02}:{02}",
+                        Io::toCapitalCase(date.month.abbr()),
+                        date.dayOfMonth() + 1,
+                        date.year.val(),
+                        time.hour,
+                        time.minute)
+                        .unwrap();
     auto calButton = Ui::button(
         Model::bind<Activate>(Panel::NOTIS),
         Ui::ButtonStyle::subtle(),
-        Mdi::CALENDAR, "Jan. 12 2021, 22:07");
+        Mdi::CALENDAR,
+        dateTime);
 
     auto trayButton = Ui::button(
         Model::bind<Activate>(Panel::SYS),
@@ -172,6 +183,7 @@ Ui::Child app(bool isMobile) {
     return Ui::reducer<Model>(
         {
             .isMobile = isMobile,
+            .dateTime = Sys::dateTime(),
             .background = Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap(),
             .noti = {
                 {

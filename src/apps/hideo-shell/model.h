@@ -42,6 +42,8 @@ struct State {
     bool isSysPanelColapsed = true;
     bool isAppPanelThumbnails = false;
 
+    DateTime dateTime;
+
     Media::Image background;
     Vec<Noti> noti;
     Vec<MenuEntry> entries;

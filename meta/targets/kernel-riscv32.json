@@ -1,13 +1,14 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.target.v1",
-    "id": "skift-x86_64",
+    "id": "kernel-riscv32",
     "type": "target",
     "props": {
         "toolchain": "clang",
-        "arch": "x86_64",
-        "sys": "skift",
+        "arch": "riscv32",
+        "bits": "32",
+        "sys": "hjert",
         "abi": "sysv",
-        "freestanding": false,
+        "freestanding": true,
         "host": false,
         "version": [
             "@include",
@@ -18,9 +19,6 @@
         "karm-sys-path-separator": "slash",
         "karm-cli-backend": "ansi"
     },
-    "routing": {
-        "stdc-math": "stdc-math-musl"
-    },
     "tools": {
         "cc": {
             "cmd": [
@@ -28,8 +26,9 @@
                 "clang"
             ],
             "args": [
-                "-target",
-                "x86_64-none-elf"
+                "--target=riscv32",
+                "-nostdlib",
+                "-ffreestanding"
             ]
         },
         "cxx": {
@@ -38,8 +37,9 @@
                 "clang++"
             ],
             "args": [
-                "-target",
-                "x86_64-none-elf"
+                "--target=riscv32",
+                "-nostdlib",
+                "-ffreestanding"
             ]
         },
         "ld": {
@@ -49,13 +49,13 @@
             ],
             "args": [
                 "-m",
-                "elf_x86_64",
-                "-Tmeta/targets/skift-x86_64.ld",
+                "elf32lriscv",
+                "-Tmeta/targets/kernel-riscv32.ld",
                 "-z",
                 "max-page-size=0x1000"
             ],
             "files": [
-                "meta/targets/skift-x86_64.ld"
+                "meta/targets/kernel-riscv32.ld"
             ]
         },
         "ar": {
@@ -68,10 +68,13 @@
             ]
         },
         "as": {
-            "cmd": "nasm",
+            "cmd": [
+                "@latest",
+                "clang"
+            ],
             "args": [
-                "-f",
-                "elf64"
+                "--target=riscv32",
+                "-c"
             ]
         }
     }

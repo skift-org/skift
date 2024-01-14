@@ -46,7 +46,7 @@ _intCommon:
 
 %macro INTERRUPT_ERR 1
 
-_intHander%1:
+_intHandler%1:
     push qword %1
     jmp _intCommon
 
@@ -54,7 +54,7 @@ _intHander%1:
 
 %macro INTERRUPT_NOERR 1
 
-_intHander%1:
+_intHandler%1:
     push qword 0    ; no error
     push qword %1
     jmp _intCommon
@@ -107,7 +107,7 @@ global _intVec
 _intVec:
 %assign i 0
 %rep 256
-    dq _intHander %+ i
+    dq _intHandler %+ i
 %assign i i+1
 %endrep
 

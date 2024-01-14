@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hjert-riscv",
+    "type": "exe",
+    "description": "The Hjert micro-kernel platform layer for riscv",
+    "enableIf": {
+        "sys": [
+            "hjert"
+        ],
+        "arch": [
+            "riscv32",
+            "riscv64"
+        ]
+    },
+    "requires": [
+        "hal-riscv"
+    ]
+}

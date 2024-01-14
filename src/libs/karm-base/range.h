@@ -128,14 +128,18 @@ using I8Range = Range<i8>;
 using I16Range = Range<i16>;
 using I32Range = Range<i32>;
 using I64Range = Range<i64>;
+#ifdef __SIZEOF_INT128__
 using I128Range = Range<i128>;
+#endif
 using ISizeRange = Range<isize>;
 
 using U8Range = Range<u8>;
 using U16Range = Range<u16>;
 using U32Range = Range<u32>;
 using U64Range = Range<u64>;
+#ifdef __SIZEOF_INT128__
 using U128Range = Range<u128>;
+#endif
 using USizeRange = Range<usize>;
 
 using F32Range = Range<f32>;

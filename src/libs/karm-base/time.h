@@ -15,7 +15,7 @@ struct TimeSpan {
     }
 
     static constexpr TimeSpan infinite() {
-        return TimeSpan{~0ull};
+        return TimeSpan{~0uz};
     }
 
     static constexpr TimeSpan fromUSecs(usize value) {
@@ -61,7 +61,7 @@ struct TimeSpan {
         : _value(value) {}
 
     constexpr bool isInfinite() const {
-        return _value == ~0ull;
+        return _value == ~0uz;
     }
 
     constexpr usize toUSecs() const {
@@ -164,7 +164,7 @@ inline TimeSpan operator"" _y(unsigned long long value) {
 struct TimeStamp {
     usize _value{};
 
-    static constexpr usize END_OF_TIME = ~0ull;
+    static constexpr usize END_OF_TIME = ~0uz;
 
     static constexpr TimeStamp epoch() {
         return {0};

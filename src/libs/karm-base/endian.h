@@ -26,15 +26,15 @@ struct Be {
         return toBe(_value);
     }
 
-    auto operator<=>(Be const &other) const = default;
+    always_inline constexpr auto operator<=>(Be const &other) const = default;
 
-    bool operator==(Be const &other) const = default;
+    always_inline constexpr bool operator==(Be const &other) const = default;
 
-    auto operator<=>(Meta::Integral auto const &other) const {
+    always_inline constexpr auto operator<=>(Meta::Integral auto const &other) const {
         return value() <=> other;
     }
 
-    bool operator==(Meta::Integral auto const &other) const {
+    always_inline constexpr bool operator==(Meta::Integral auto const &other) const {
         return value() == other;
     }
 };
@@ -61,15 +61,15 @@ struct Le {
         return toLe(_value);
     }
 
-    auto operator<=>(Le const &other) const = default;
+    always_inline constexpr auto operator<=>(Le const &other) const = default;
 
-    bool operator==(Le const &other) const = default;
+    always_inline constexpr bool operator==(Le const &other) const = default;
 
-    auto operator<=>(T const &other) const {
+    always_inline constexpr auto operator<=>(T const &other) const {
         return value() <=> other;
     }
 
-    bool operator==(T const &other) const {
+    always_inline constexpr bool operator==(T const &other) const {
         return value() == other;
     }
 };

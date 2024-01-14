@@ -25,7 +25,7 @@ struct Sha256 {
 
     Array<u32be, 8> _state{};
     Array<Byte, BLOCK_SIZE> _buf;
-    usize _len = 0;
+    usize _curr = 0;
     usize _total = 0;
 
     void reset() {
@@ -41,7 +41,6 @@ struct Sha256 {
     }
 
     void _proc() {
-
         auto const SIGN0 = [](u32 x) {
             return rotr(x, 7) ^ rotr(x, 18) ^ (x >> 3);
         };
@@ -106,26 +105,25 @@ struct Sha256 {
     }
 
     usize _step(Bytes bytes) {
-        auto n = copy(bytes, mutSub(_buf, _len, BLOCK_SIZE));
-        _len += n;
+        auto n = copy(bytes, mutSub(_buf, _curr, BLOCK_SIZE));
+        _curr += n;
         _total += n;
-        if (_len == BLOCK_SIZE) {
+        if (_curr == BLOCK_SIZE) {
             _proc();
-            _len = 0;
+            _curr = 0;
         }
         return n;
     }
 
     void _pad() {
+        auto total = _total;
         Byte pad = 0x80;
         _step({&pad, 1});
 
-        while (_len != 56) {
-            pad = 0;
-            _step({&pad, 1});
-        }
+        Array<u8, 64> zeros{};
+        _step(sub(zeros, 0, ((64 - (_total + 1 + 8)) % 64)));
 
-        u32be len = _total * 8;
+        u32be len = total * 8;
         _step(len.bytes());
     }
 

@@ -5,7 +5,7 @@
 #include "adler32.h"
 #include "crc32.h"
 #include "md5.h"
-#include "sha256.h"
+#include "sha2.h"
 
 namespace Karm::Crypto {
 
@@ -51,6 +51,10 @@ struct AnyDigest {
             },
         });
     }
+
+    auto operator<=>(AnyDigest const &other) const = default;
+
+    bool operator==(AnyDigest const &other) const = default;
 };
 
 struct AnyHash {

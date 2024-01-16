@@ -58,6 +58,6 @@ jobs:
           tag: "nightly"
           file_glob: true
           overwrite: true
-          promote: true
           prerelease: true
+          target_commit: ${{ github.sha }}
           body: ${{ steps.read_release.outputs.RELEASE_BODY }}

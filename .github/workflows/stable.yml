@@ -25,7 +25,7 @@ jobs:
         run: ./skift.sh model install
 
       - name: Build System Image (efi-x86_64)
-        run: ./skift.sh image build --format=hdd --prop:branch=stable
+        run: ./skift.sh image build --format=hdd --prop:branch=stable --dist --compress=gzip
 
       - name: Read release.md and use it as a body of new release
         id: read_release
@@ -37,7 +37,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: .cutekit/images/*.hdd
+          file: .cutekit/dist/*
           tag: v${{env.RELEASE_TAG}}
           file_glob: true
           overwrite: true

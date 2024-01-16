@@ -1,5 +1,6 @@
+from pathlib import Path
 from . import image, store, runner
-from cutekit import cli, model, shell
+from cutekit import cli, model, shell, const
 
 
 def generateSystem(img: image.Image) -> None:
@@ -32,7 +33,8 @@ def _(args: cli.Args) -> None:
 def _(args: cli.Args) -> None:
     debug = args.consumeOpt("debug", False) is True
     fmt = args.consumeOpt("format", "dir")
-    compress = args.consumeOpt("compress", "zstd") is True
+    compress = args.consumeOpt("compress", None)
+    dist = args.consumeOpt("dist", False) is True
     args.opts["mixins"] = "debug" if debug else "o3"
 
     registry = model.Registry.use(args)
@@ -44,12 +46,20 @@ def _(args: cli.Args) -> None:
     )
     img = image.Image(registry, s)
     generateSystem(img)
+
     file = img.finalize()
-    if fmt == "hdd":
-        if compress:
-            zip = shell.compress(file, format=compress)
-            shell.rmrf(file)
-            file = zip
+    if fmt == "hdd" and compress:
+        zip = shell.compress(file, format=compress)
+        shell.rmrf(file)
+        file = zip
+
+    if dist:
+        distDir = Path(const.PROJECT_CK_DIR) / "dist"
+        shell.mkdir(distDir)
+        distPath = distDir / Path(file).name
+        shell.cp(file, distPath)
+        file = distPath
+
     print(file)
 
 

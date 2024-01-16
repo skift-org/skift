@@ -71,7 +71,6 @@ class RawHdd(Storage):
     def store(self, src: str, dest: str) -> None:
         self.mkdir(Path(dest).parent)
         try:
-            print("mcopy", "-D", "s", "-n", "-s", "-i", self._hdd, src, f"::{dest}")
             shell.exec(
                 "mcopy", "-D", "s", "-n", "-s", "-i", self._hdd, src, f"::{dest}"
             )
@@ -86,7 +85,7 @@ class RawHdd(Storage):
 
     def write(self, data: bytes, dest: str) -> None:
         # create a temporary file
-        with tempfile.TemporaryFile() as tmp:
+        with tempfile.NamedTemporaryFile() as tmp:
             tmp.write(data)
             tmp.flush()
             self.store(tmp.name, dest)

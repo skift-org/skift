@@ -13,7 +13,7 @@ To build skiftOS, you need to have a modern C/C++ compiler such as the latest ve
 > [!NOTE]
 > If the following badge is red, it means that the repository is currently unstable and may not build correctly. Please refer to the [Discord server](https://discord.com/invite/gamGsfg) for more information.
 
-[![Build](https://github.com/skift-org/skift/actions/workflows/build.yml/badge.svg)](https://github.com/skift-org/skift/actions/workflows/build.yml)
+[![Build](https://github.com/skift-org/skift/actions/workflows/checks.yml/badge.svg)](https://github.com/skift-org/skift/actions/workflows/checks.yml)
 
 First, clone the repository by running the following command:
 

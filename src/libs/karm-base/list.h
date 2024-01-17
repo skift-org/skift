@@ -1,255 +1,253 @@
 #pragma once
 
-#include "cons.h"
 #include "iter.h"
-#include "opt.h"
-#include "rc.h"
-#include "std.h"
 
 namespace Karm {
 
 template <typename T>
-concept LlNode = requires(T t) {
-    { t.next } -> Meta::Convertible<T *>;
-    { t.prev } -> Meta::Convertible<T *>;
+struct LlItem {
+    T *prev = nullptr;
+    T *next = nullptr;
+
+    operator bool() const {
+        return prev or next;
+    }
 };
 
-// Base linked list implementation that allows low-level manipulation of nodes.
-// aka intrusive linked list
-template <LlNode Node>
+template <typename T, auto T::*Item = &T::item>
 struct Ll {
-    Node *head = nullptr;
-    Node *tail = nullptr;
-    usize len = 0;
+    T *_head = nullptr;
+    T *_tail = nullptr;
+    usize _len = 0;
 
     Ll() = default;
 
-    Ll(Ll const &other) {
-        if (other.len == 0)
-            return;
+    Ll(Ll &) = delete;
 
-        head = new Node(*other.head);
-        tail = head;
-
-        auto *node = other.head->next;
-        while (node) {
-            append(new Node(*node), tail);
-            node = node->next;
-        }
+    Ll(Ll &&other) {
+        _head = std::exchange(other._head, nullptr);
+        _tail = std::exchange(other._tail, nullptr);
+        _len = std::exchange(other._len, 0);
     }
 
-    Ll(Ll &&other)
-        : head(std::exchange(other.head, nullptr)),
-          tail(std::exchange(other.tail, nullptr)),
-          len(std::exchange(other.len, 0)) {}
-
-    ~Ll() {
-        clear();
-    }
-
-    Ll &operator=(Ll const &other) {
-        *this = Ll(other);
-        return *this;
-    }
+    Ll &operator=(Ll &) = delete;
 
     Ll &operator=(Ll &&other) {
-        std::swap(head, other.head);
-        std::swap(tail, other.tail);
-        std::swap(len, other.len);
+        _head = std::exchange(other._head, nullptr);
+        _tail = std::exchange(other._tail, nullptr);
+        _len = std::exchange(other._len, 0);
         return *this;
     }
 
-    Node *detach(Node *node) {
-        if (node->prev)
-            node->prev->next = node->next;
-
-        if (node->next)
-            node->next->prev = node->prev;
-
-        if (node == head)
-            head = node->next;
-
-        if (node == tail)
-            tail = node->prev;
-
-        node->prev = nullptr;
-        node->next = nullptr;
-        len--;
-        return node;
+    static auto &item(T *value) {
+        return value->*Item;
     }
 
-    Node *append(Node *node, Node *after) {
-        if (node->next or node->prev)
-            panic("node already in list");
+    static T *&prev(T *value) {
+        return (value->*Item).prev;
+    }
+
+    static T *&next(T *value) {
+        return (value->*Item).next;
+    }
+
+    T *head() { return _head; }
+    T const *head() const { return _head; }
+
+    T *tail() { return _tail; }
+    T const *tail() const { return _tail; }
+
+    usize len() const { return _len; }
+
+    T *detach(T *value) {
+        if (not value)
+            panic("value connot be null");
+
+        if (prev(value))
+            next(prev(value)) = next(value);
+
+        if (next(value))
+            prev(next(value)) = prev(value);
+
+        if (_head == value)
+            _head = next(value);
+
+        if (_tail == value)
+            _tail = prev(value);
+
+        prev(value) = nullptr;
+        next(value) = nullptr;
+        _len--;
+
+        return value;
+    }
+
+    T *append(T *value, T *after) {
+        if (not value)
+            panic("value connot be null");
+
+        if (value == after)
+            panic("cannot append a node to itself");
 
         if (after) {
-            node->next = after->next;
-            node->prev = after;
-            after->next = node;
-            if (node->next)
-                node->next->prev = node;
-            if (after == tail)
-                tail = node;
+            next(value) = next(after);
+            prev(value) = after;
+
+            if (next(after))
+                prev(next(after)) = value;
+            if (_tail == after)
+                _tail = value;
+            next(after) = value;
         } else {
-            if (tail) {
-                tail->next = node;
-                node->prev = tail;
-                tail = node;
+            if (_tail) {
+                next(_tail) = value;
+                prev(value) = _tail;
+                _tail = value;
             } else {
-                head = node;
-                tail = node;
+                _head = value;
+                _tail = value;
             }
         }
-        len++;
-        return node;
+        _len++;
+        return value;
     }
 
-    Node *prepend(Node *node, Node *before) {
-        if (node->next or node->prev)
-            panic("node already in list");
-
+    T *prepend(T *value, T *before) {
         if (before) {
-            node->next = before;
-            node->prev = before->prev;
-            before->prev = node;
-            if (node->prev)
-                node->prev->next = node;
-            if (before == head)
-                head = node;
+            prev(value) = prev(before);
+            next(value) = before;
+
+            if (prev(before))
+                next(prev(before)) = value;
+            if (_head == before)
+                _head = value;
+
+            prev(before) = value;
         } else {
-            if (head) {
-                head->prev = node;
-                node->next = head;
-                head = node;
+            if (_head) {
+                prev(_head) = value;
+                next(value) = _head;
+                _head = value;
             } else {
-                head = node;
-                tail = node;
+                _head = value;
+                _tail = value;
             }
         }
-        len++;
-        return node;
+        _len++;
+        return value;
     }
 
-    void trunc(usize len) {
-        if (len >= this->len) {
-            return;
-        }
-
-        if (len == 0) {
-            clear();
-            return;
-        }
-
-        while (this->len > len) {
-            auto node = tail;
-            detach(tail);
-            delete node;
-        }
-    }
-
-    void clear() {
-        auto *node = head;
+    void apply(auto &&f = [](T *) {
+    }) {
+        auto *node = _head;
         while (node) {
-            auto *next = node->next;
-            delete node;
-            node = next;
+            f(node);
+            node = next(node);
         }
-        head = nullptr;
-        tail = nullptr;
-        len = 0;
     }
 
-    Node *peek(usize i) {
-        if (i >= len)
-            panic("index out of range");
+    void truncApply(
+        usize len, auto &&f = [](T *) {
+        }) {
+        while (_len > len)
+            f(detach(_tail));
+    }
 
-        if (i < len / 2) {
-            auto *node = head;
-            for (usize j = 0; j < i; j++)
-                node = node->next;
-            return node;
-        }
+    void clearApply(auto &&f = [](T *) {
+    }) {
+        while (_head)
+            f(detach(_head));
+    }
 
-        auto *node = tail;
-        for (usize j = len - 1; j > i; j--)
-            node = node->prev;
+    T *peek(usize i) {
+        if (i >= _len)
+            panic("index out of bound");
+
+        auto *node = _head;
+        while (i--)
+            node = next(node);
         return node;
     }
 
-    Node const *peek(usize i) const {
-        if (i >= len)
-            panic("index out of range");
+    T const *peek(usize i) const {
+        if (i >= _len)
+            panic("index out of bound");
 
-        if (i < len / 2) {
-            auto *node = head;
-            for (usize j = 0; j < i; j++)
-                node = node->next;
-            return node;
-        }
-
-        auto *node = tail;
-        for (usize j = len - 1; j > i; j--)
-            node = node->prev;
+        auto *node = _head;
+        while (i--)
+            node = next(node);
         return node;
+    }
+
+    bool requeue() {
+        if (_len < 2)
+            return false;
+
+        auto *node = detach(_head);
+        append(node, _tail);
+        return true;
     }
 };
 
 template <typename T>
 struct List {
-    struct Node {
+    struct Item {
         T value;
-        Node *next = nullptr;
-        Node *prev = nullptr;
+        LlItem<Item> item{};
     };
 
-    Ll<Node> _ll;
+    Ll<Item> _ll;
 
-    constexpr List() = default;
+    List() = default;
 
-    ~List() {
-        clear();
-    }
+    ~List() { clear(); }
 
     /* --- Indexing --- */
 
     void insert(usize i, T el) {
-        emplace(i, std::move(el));
+        auto *node = new Item{el};
+
+        if (i == 0)
+            _ll.prepend(node, nullptr);
+        else
+            _ll.append(node, _ll.peek(i - 1));
     }
 
     template <typename... Args>
     void emplace(usize i, Args &&...args) {
-        if (i > _ll.len)
-            panic("index out of range");
-        if (i == _ll.len) {
-            _ll.append(new Node{std::forward<Args>(args)...}, _ll.tail);
-        } else {
-            _ll.prepend(new Node{std::forward<Args>(args)...}, _ll.peek(i));
-        }
+        auto *node = new Item{std::forward<Args>(args)...};
+
+        if (i == 0)
+            _ll.prepend(node, nullptr);
+        else
+            _ll.append(node, _ll.peek(i - 1));
     }
 
     void removeAt(usize i) {
-        if (i >= _ll.len)
-            panic("index out of range");
         delete _ll.detach(_ll.peek(i));
     }
 
     void remove(T const &elem) {
-        auto *node = _ll.head;
+        auto *node = _ll.head();
         while (node) {
             if (node->value == elem) {
                 delete _ll.detach(node);
                 return;
             }
-            node = node->next;
+            node = _ll.next(node);
         }
     }
 
     void trunc(usize len) {
-        _ll.trunc(len);
+        _ll.truncApply(len, [](Item *item) {
+            delete item;
+        });
     }
 
     void clear() {
-        _ll.clear();
+        _ll.clearApply([](Item *item) {
+            delete item;
+        });
     }
 
     /* --- Random Access --- */
@@ -282,13 +280,22 @@ struct List {
 
     template <typename... Args>
     void emplaceFront(Args &&...args) {
-        emplace(0, std::forward<Args>(args)...);
+        prepend(new Item{std::forward<Args>(args)...}, _ll.head());
     }
 
     T popFront() {
-        T buf = std::move(_ll.head->buf);
-        delete _ll.detach(_ll.head);
+        auto *head = _ll.head();
+        T buf = std::move(head->value);
+        delete _ll.detach(head);
         return buf;
+    }
+
+    T &peekFront() {
+        return _ll.head()->value;
+    }
+
+    T const &peekFront() const {
+        return _ll.head()->value;
     }
 
     /* --- Back Access --- */
@@ -303,33 +310,34 @@ struct List {
 
     template <typename... Args>
     void emplaceBack(Args &&...args) {
-        emplace(_ll.len, std::forward<Args>(args)...);
+        _ll.append(new Item{std::forward<Args>(args)...}, _ll.tail());
     }
 
     T popBack() {
-        auto value = std::move(_ll.tail->value);
-        delete _ll.detach(_ll.tail);
+        auto *tail = _ll.tail();
+        auto value = std::move(tail->value);
+        delete _ll.detach(tail);
         return value;
+    }
+
+    T &peekBack() {
+        return _ll.tail()->value;
     }
 
     /* --- Queue --- */
 
     bool requeue() {
-        if (_ll.len < 2)
-            return false;
-        auto *node = _ll.detach(_ll.head);
-        _ll.append(node, _ll.tail);
-        return true;
+        return _ll.requeue();
     }
 
     /* --- Iteration --- */
 
     template <typename Self>
     static auto _iter(Self *self) {
-        return Iter([curr = self->_ll.head]() mutable -> T * {
+        return Iter([curr = self->_ll.head()]() mutable -> T * {
             if (curr) {
                 auto &ret = curr->value;
-                curr = curr->next;
+                curr = curr->item.next;
                 return &ret;
             }
             return nullptr;
@@ -338,10 +346,10 @@ struct List {
 
     template <typename Self>
     static auto _iterRev(Self *self) {
-        return Iter([curr = self->_ll.tail]() mutable -> T * {
+        return Iter([curr = self->_ll.tail()]() mutable -> T * {
             if (curr) {
                 auto &ret = curr->value;
-                curr = curr->prev;
+                curr = curr->item.prev;
                 return &ret;
             }
             return nullptr;
@@ -364,10 +372,10 @@ struct List {
         return _iterRev(this);
     }
 
-    /* --- Len & Buf --- */
+    /* --- Len --- */
 
     usize len() const {
-        return _ll.len;
+        return _ll.len();
     }
 };
 

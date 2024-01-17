@@ -3,67 +3,76 @@
 // https://cachemon.github.io/SIEVE-website/
 // https://github.com/scalalang2/golang-fifo/tree/main
 
-#include <karm-base/list.h>
+#include "list.h"
 
 namespace Karm {
 
 template <typename K, typename V>
 struct Sieve {
-    struct Node {
+    struct Item {
         K key;
         V value;
         bool visited = false;
-        Node *prev = nullptr;
-        Node *next = nullptr;
+        LlItem<Item> item{};
     };
 
     usize _cap;
-    Ll<Node> _ll{};
-    Node *_hand{};
+    Ll<Item> _ll{};
+    Item *_hand{};
 
     Sieve(usize cap) : _cap(cap) {}
 
-    Node *_lookup(K const &key) {
-        Node *node = _ll.head;
-        while (node) {
-            if (node->key == key)
-                return node;
-            node = node->next;
+    ~Sieve() {
+        clear();
+    }
+
+    void clear() {
+        _ll.clearApply([](Item *item) {
+            delete item;
+        });
+    }
+
+    Item *_lookup(K const &key) {
+        auto *item = _ll.head();
+        while (item) {
+            if (item->key == key)
+                return item;
+            item = _ll.next(item);
         }
         return nullptr;
     }
 
     void _evict() {
-        auto *obj = _hand ?: _ll.tail;
-        while (obj and obj->visited) {
-            obj->visited = false;
-            obj = obj->prev ?: _ll.tail;
+        auto *item = _hand ?: _ll.tail();
+        while (item and item->visited) {
+            item->visited = false;
+            item = _ll.prev(item) ?: _ll.tail();
         }
-        _hand = obj->prev ?: _ll.tail;
-        _ll.detach(obj);
-        delete obj;
+        _hand = _ll.prev(item) ?: _ll.tail();
+        _ll.detach(item);
+        delete item;
     }
 
-    Opt<V> access(K const &key, auto const &make) {
-        auto node = _lookup(key);
-        if (node) {
-            node->visited = true;
-            return node->value;
+    V access(K const &key, auto const &make) {
+        auto item = _lookup(key);
+        if (item) {
+            item->visited = true;
+            return item->value;
         }
 
-        if (_ll.len == _cap)
+        if (_ll.len() == _cap)
             _evict();
 
         auto value = make();
-        _ll.prepend(new Node(key, value), _ll.head);
+        _ll.prepend(new Item(key, value), _ll.head());
         return value;
     }
 
     Opt<V> get(K const &key) {
-        auto node = _lookup(key);
-        if (node) {
-            node->visited = true;
-            return node->value;
+        auto item = _lookup(key);
+        if (item) {
+            item->visited = true;
+            return item->value;
         }
         return NONE;
     }
@@ -73,7 +82,7 @@ struct Sieve {
     }
 
     usize len() const {
-        return _ll.len;
+        return _ll.len();
     }
 };
 

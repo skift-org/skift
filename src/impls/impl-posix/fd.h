@@ -6,6 +6,7 @@ namespace Posix {
 
 struct Fd : public Sys::Fd {
     isize _raw;
+    bool _leak = false;
 
     Fd(isize raw);
 

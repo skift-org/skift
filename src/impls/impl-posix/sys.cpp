@@ -96,15 +96,21 @@ Res<Pair<Strong<Sys::Fd>>> createPipe() {
 }
 
 Res<Strong<Sys::Fd>> createIn() {
-    return Ok(makeStrong<Posix::Fd>(0));
+    auto fd = makeStrong<Posix::Fd>(0);
+    fd->_leak = true; // Don't close stdin when we close the fd
+    return Ok(fd);
 }
 
 Res<Strong<Sys::Fd>> createOut() {
-    return Ok(makeStrong<Posix::Fd>(1));
+    auto fd = makeStrong<Posix::Fd>(1);
+    fd->_leak = true; // Don't close stdout when we close the fd
+    return Ok(fd);
 }
 
 Res<Strong<Sys::Fd>> createErr() {
-    return Ok(makeStrong<Posix::Fd>(2));
+    auto fd = makeStrong<Posix::Fd>(2);
+    fd->_leak = true; // Don't close stderr when we close the fd
+    return Ok(fd);
 }
 
 Res<Vec<Sys::DirEntry>> readDir(Url::Url const &url) {

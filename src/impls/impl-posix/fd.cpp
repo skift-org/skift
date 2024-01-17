@@ -7,7 +7,8 @@ namespace Posix {
 Fd::Fd(isize raw) : _raw(raw) {}
 
 Fd::~Fd() {
-    ::close(_raw);
+    if (not _leak)
+        ::close(_raw);
 }
 
 usize Fd::handle() const {

@@ -256,28 +256,28 @@ struct Input : public View<Input> {
     Strong<Textbox::Model> _text;
     OnChange<> _onChange;
     usize _cursor = 0;
-    Opt<Media::FontMesure> _mesure;
+    Opt<Media::FontMeasure> _measure;
 
     Input(Gfx::TextStyle style, Strong<Textbox::Model> text, OnChange<> onChange)
         : _style(style), _text(text), _onChange(std::move(onChange)) {}
 
     void reconcile(Input &o) override {
         _text = o._text;
-        _mesure = NONE;
+        _measure = NONE;
     }
 
-    Media::FontMesure mesure() {
-        if (_mesure) {
-            return *_mesure;
+    Media::FontMeasure measure() {
+        if (_measure) {
+            return *_measure;
         }
-        //_mesure = _style.font.mesureStr(_text);
-        return *_mesure;
+        //_measure = _style.font.measureStr(_text);
+        return *_measure;
     }
 
     void paint(Gfx::Context &g, Math::Recti) override {
         g.save();
 
-        auto m = mesure();
+        auto m = measure();
         // auto baseline = bound().topStart() + m.baseline;
 
         if (_style.color) {
@@ -301,7 +301,7 @@ struct Input : public View<Input> {
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return mesure().linebound.size().cast<isize>();
+        return measure().linebound.size().cast<isize>();
     }
 };
 

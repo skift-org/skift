@@ -47,7 +47,7 @@ f64 Font::kern(Glyph prev, Glyph curr) const {
     return fontface->kern(prev, curr) * scale();
 }
 
-FontMesure Font::mesure(Glyph r) const {
+FontMeasure Font::measure(Glyph r) const {
     auto m = metrics();
     auto adv = advance(r);
 
@@ -58,7 +58,7 @@ FontMesure Font::mesure(Glyph r) const {
     };
 }
 
-FontMesure Font::mesureStr(Str str) const {
+FontMeasure Font::measureStr(Str str) const {
     f64 adv = 0;
 
     bool first = true;

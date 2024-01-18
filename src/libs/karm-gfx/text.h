@@ -88,7 +88,7 @@ struct Text {
     };
 
     Vec<Block> _blocks;
-    bool _blocksMesured = false;
+    bool _blocksMeasured = false;
 
     struct Line {
         USizeRange blocks;
@@ -134,7 +134,7 @@ struct Text {
     void clear() {
         _cells.clear();
         _blocks.clear();
-        _blocksMesured = false;
+        _blocksMeasured = false;
         _blocks.pushBack({{0, 0}});
         _lines.clear();
     }
@@ -146,7 +146,7 @@ struct Text {
         }
     }
 
-    void _mesureBlocks() {
+    void _measureBlocks() {
         for (auto &block : _blocks) {
             auto adv = 0;
             bool first = true;
@@ -259,9 +259,9 @@ struct Text {
             return {};
         }
 
-        if (not _blocksMesured) {
-            _mesureBlocks();
-            _blocksMesured = true;
+        if (not _blocksMeasured) {
+            _measureBlocks();
+            _blocksMeasured = true;
         }
 
         _wrapLines(width);

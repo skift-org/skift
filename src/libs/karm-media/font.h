@@ -69,7 +69,7 @@ struct FontMetrics {
     f64 advance;
 };
 
-struct FontMesure {
+struct FontMeasure {
     Math::Rectf capbound;
     Math::Rectf linebound;
     Math::Vec2f baseline;
@@ -112,9 +112,9 @@ struct Font {
 
     f64 kern(Glyph prev, Glyph curr) const;
 
-    FontMesure mesure(Glyph glyph) const;
+    FontMeasure measure(Glyph glyph) const;
 
-    FontMesure mesureStr(Str str) const;
+    FontMeasure measureStr(Str str) const;
 };
 
 } // namespace Karm::Media

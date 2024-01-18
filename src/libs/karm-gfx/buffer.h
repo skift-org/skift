@@ -22,7 +22,7 @@ struct Rgba8888 {
         p[3] = color.alpha;
     }
 
-    always_inline static usize bpp() {
+    always_inline static constexpr usize bpp() {
         return 4;
     }
 };
@@ -43,7 +43,7 @@ struct Bgra8888 {
         p[3] = color.alpha;
     }
 
-    always_inline static usize bpp() {
+    always_inline static constexpr usize bpp() {
         return 4;
     }
 };
@@ -67,7 +67,7 @@ struct Fmt : public _Fmts {
         });
     }
 
-    always_inline usize bpp() const {
+    always_inline constexpr usize bpp() const {
         return visit([&](auto f) {
             return f.bpp();
         });
@@ -220,11 +220,12 @@ struct _Pixels {
         requires(MUT)
     {
         _fmt.visit([&](auto f) {
-            for (isize y = 0; y < height(); y++) {
-                for (isize x = 0; x < width(); x++) {
-                    f.store(pixelUnsafe({x, y}), color);
-                }
-            }
+            Array<u8, f.bpp()> pixel{};
+            f.store(pixel.buf(), color);
+
+            for (isize y = 0; y < height(); y++)
+                for (isize x = 0; x < width(); x++)
+                    memcpy(pixelUnsafe({x, y}), pixel.buf(), f.bpp());
         });
     }
 

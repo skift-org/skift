@@ -146,8 +146,12 @@ struct Host : public Node {
         _root->paint(g, r);
 
         if (debugShowRepaintBounds) {
-            g.fillStyle(Gfx::randomColor().withOpacity(0.25));
-            g.fill(r);
+            static auto hue = 0.0;
+            g.strokeStyle(Gfx::stroke(Gfx::hsvToRgb({hue, 1, 1}).withOpacity(0.5)).withWidth(4).withAlign(Gfx::INSIDE_ALIGN));
+            hue += 1;
+            if (hue > 360)
+                hue = 0;
+            g.stroke(r);
         }
 
         g.restore();

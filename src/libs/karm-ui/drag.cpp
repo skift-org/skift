@@ -63,10 +63,14 @@ struct Dismisable :
             _dismissed = false;
             Ui::ProxyNode<Dismisable>::event(e);
         } else if (_drag.needRepaint(*this, e)) {
-            auto oldBound = bound().clipTo(child().bound().offset(_last));
-            auto newBound = bound().clipTo(child().bound().offset(drag()));
+            auto childBound = child().bound();
+            auto repaintBound =
+                bound()
+                    .clipTo(childBound
+                                .offset(_last)
+                                .mergeWith(childBound.offset(drag())));
             _last = drag();
-            Ui::shouldRepaint(*this, oldBound.mergeWith(newBound));
+            Ui::shouldRepaint(*this, repaintBound);
             Ui::ProxyNode<Dismisable>::event(e);
         } else {
             Ui::ProxyNode<Dismisable>::event(e);

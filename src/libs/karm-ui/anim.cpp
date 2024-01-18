@@ -29,21 +29,30 @@ struct SlideIn : public ProxyNode<SlideIn> {
         }
     }
 
+    auto translation() {
+        return lerp(outside(), Math::Vec2f{}, _slide.value()).cast<isize>();
+    }
+
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
 
         g.clip(bound());
-        auto anim = lerp(outside(), Math::Vec2f{}, _slide.value());
-        g.origin(anim.cast<isize>());
-        r.xy = r.xy - anim.cast<isize>();
+        auto anim = translation();
+        g.origin(anim);
+        r.xy = r.xy - anim;
         child().paint(g, r);
 
         g.restore();
     }
 
     void event(Sys::Event &e) override {
-        if (_slide.needRepaint(*this, e))
-            Ui::shouldRepaint(*this, bound());
+        if (_slide.needRepaint(*this, e)) {
+            auto repaintBound =
+                bound().clipTo(
+                    child().bound().offset(translation()));
+
+            Ui::shouldRepaint(*this, repaintBound);
+        }
 
         Ui::ProxyNode<SlideIn>::event(e);
     }

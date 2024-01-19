@@ -8,6 +8,8 @@ understand the concepts behind the project.
 
 ## Project philosophy
 
+![](feyman.jpg)
+
 - [Richard Feymann](https://en.wikipedia.org/wiki/Richard_Feynman) - "What I cannot create, I do not understand."
 - [Programmers are Tiny Gods](https://powazek.com/posts/1655) - "Programmers are the Gods of their tiny worlds. They create something out of nothing. In their command-line universe, they say when it’s sunny and when it rains. And the tiny universe complies." - Derek Powazek
 

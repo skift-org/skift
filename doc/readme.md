@@ -7,6 +7,7 @@ Welcome to the documentation of **skiftOS**! This documentation is a work in pro
 
 ## Table of contents
 
+- [Articles](articles.md) - A collection of articles, videos, or just mentions of skiftOS around the web.
 - [Building](building.md) - How to build skiftOS.
 - [Contributing](contributing.md) - How to contribute to skiftOS.
 - [History](history.md) - The history of the project and its origins.

@@ -110,15 +110,13 @@ struct DialogLayer : public LeafNode<DialogLayer> {
             g.restore();
         }
 
-        if (dialogVisible()) {
+        if (dialogVisible())
             dialog().paint(g, r);
-        }
     }
 
     void event(Sys::Event &e) override {
-        if (_opacity.needRepaint(*this, e)) {
+        if (_opacity.needRepaint(*this, e))
             Ui::shouldRepaint(*this);
-        }
 
         if (popoverVisible()) {
             popover().event(e);

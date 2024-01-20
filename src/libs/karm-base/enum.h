@@ -98,8 +98,16 @@ struct Flags {
         return _value == other._value;
     }
 
+    bool operator==(E other) const {
+        return _value == other;
+    }
+
     bool operator!=(Flags other) const {
         return _value != other._value;
+    }
+
+    bool operator!=(E other) const {
+        return _value != other;
     }
 
     bool operator<(Flags other) const {

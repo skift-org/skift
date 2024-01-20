@@ -19,7 +19,7 @@ struct _Vec {
 
     _Vec(std::initializer_list<T> other) : _buf(other) {}
 
-    _Vec(Sliceable<T> auto &other) : _buf(other) {}
+    _Vec(Sliceable<T> auto const &other) : _buf(other) {}
 
     _Vec(S storage) : _buf(storage) {}
 

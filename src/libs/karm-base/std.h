@@ -9,7 +9,6 @@
 #include <utility>
 #include <memory>
 
-#include <ctype.h>
 #include <limits.h>
 #include <math.h>
 

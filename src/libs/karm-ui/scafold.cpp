@@ -29,12 +29,6 @@ Child controls(TitlebarStyle style) {
 }
 
 Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {
-    auto isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
-
-    if (isMobile) {
-        return empty();
-    }
-
     return hflow(
                4,
                aboutButton(icon, title),
@@ -70,6 +64,98 @@ Ui::Child bottombar(Children children) {
             box(TOOLBAR));
 }
 
+Child mobileScafold(Scafold::State const &s, Scafold const &scafold) {
+    Children body;
+
+    if (scafold.midleTools.len())
+        body.pushBack(toolbar(scafold.midleTools));
+
+    if (s.sidebarOpen and scafold.sidebar) {
+        body.pushBack((*scafold.sidebar) |
+                      Ui::box({.backgroundPaint = GRAY900}) |
+                      grow());
+    } else {
+        body.pushBack(scafold.body | grow());
+    }
+
+    Children tools;
+
+    if (scafold.sidebar)
+        tools.pushBack(
+            button(
+                Scafold::Model::bind<Scafold::ToggleSidebar>(),
+                Ui::ButtonStyle::subtle(),
+                s.sidebarOpen
+                    ? Mdi::MENU_OPEN
+                    : Mdi::MENU));
+
+    if (scafold.startTools.len())
+        tools.pushBack(
+            hflow(4, scafold.startTools));
+
+    if (scafold.startTools.len() and scafold.endTools.len())
+        tools.pushBack(grow(NONE));
+
+    if (scafold.endTools.len())
+        tools.pushBack(
+            hflow(4, scafold.endTools));
+
+    if (tools.len())
+        body.pushBack(bottombar(tools));
+
+    return vflow(body) |
+           pinSize(Math::Vec2i{411, 731}) |
+           dialogLayer();
+}
+
+Child desktopScafold(Scafold::State const &s, Scafold const &scafold) {
+    Children body;
+
+    body.pushBack(titlebar(scafold.icon, scafold.title, scafold.titlebar));
+
+    Children tools;
+
+    if (scafold.sidebar)
+        tools.pushBack(
+            button(Scafold::Model::bind<Scafold::ToggleSidebar>(), Ui::ButtonStyle::subtle(), s.sidebarOpen ? Mdi::MENU_OPEN : Mdi::MENU));
+
+    if (scafold.startTools.len())
+        tools.pushBack(
+            hflow(4, scafold.startTools));
+
+    if (scafold.midleTools.len())
+        tools.pushBack(
+            hflow(4, scafold.midleTools) | grow());
+    else if (scafold.endTools.len())
+        tools.pushBack(grow(NONE));
+
+    if (scafold.endTools.len())
+        tools.pushBack(
+            hflow(4, scafold.endTools));
+
+    if (tools.len())
+        body.pushBack(
+            toolbar(tools));
+    else
+        body.pushBack(
+            separator());
+
+    if (s.sidebarOpen and scafold.sidebar) {
+        body.pushBack(
+            hflow(
+                *scafold.sidebar,
+                separator(),
+                scafold.body | grow()) |
+            grow());
+    } else {
+        body.pushBack(scafold.body | grow());
+    }
+
+    return vflow(body) |
+           pinSize(scafold.size) |
+           dialogLayer();
+}
+
 Child scafold(Scafold scafold) {
     auto isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
 
@@ -79,93 +165,9 @@ Child scafold(Scafold scafold) {
     };
 
     return reducer<Scafold::Model>(state, [scafold = std::move(scafold)](Scafold::State const &state) {
-        Children appBody;
-        appBody.pushBack(titlebar(scafold.icon, scafold.title, scafold.titlebar));
-
-        if (state.isMobile) {
-            if (scafold.midleTools.len())
-                appBody.pushBack(
-                    toolbar(scafold.midleTools));
-        } else {
-            Children tools;
-
-            if (scafold.sidebar)
-                tools.pushBack(
-                    button(Scafold::Model::bind<Scafold::ToggleSidebar>(), Ui::ButtonStyle::subtle(), state.sidebarOpen ? Mdi::MENU_OPEN : Mdi::MENU));
-
-            if (scafold.startTools.len())
-                tools.pushBack(
-                    hflow(4, scafold.startTools));
-
-            if (scafold.midleTools.len())
-                tools.pushBack(
-                    hflow(4, scafold.midleTools) | grow());
-            else if (scafold.endTools.len())
-                tools.pushBack(grow(NONE));
-
-            if (scafold.endTools.len())
-                tools.pushBack(
-                    hflow(4, scafold.endTools));
-
-            if (tools.len())
-                appBody.pushBack(
-                    toolbar(tools));
-            else
-                appBody.pushBack(
-                    separator());
-        }
-
-        if (state.isMobile) {
-            if (state.sidebarOpen and scafold.sidebar) {
-                appBody.pushBack((*scafold.sidebar) |
-                                 Ui::box({.backgroundPaint = GRAY900}) |
-                                 grow());
-            } else {
-                appBody.pushBack(scafold.body | grow());
-            }
-        } else {
-            if (state.sidebarOpen and scafold.sidebar) {
-                appBody.pushBack(hflow(
-                                     *scafold.sidebar,
-                                     separator(),
-                                     scafold.body | grow()) |
-                                 grow());
-            } else {
-                appBody.pushBack(scafold.body | grow());
-            }
-        }
-
-        if (state.isMobile) {
-            Children tools;
-
-            if (scafold.sidebar)
-                tools.pushBack(
-                    button(
-                        Scafold::Model::bind<Scafold::ToggleSidebar>(),
-                        Ui::ButtonStyle::subtle(),
-                        state.sidebarOpen
-                            ? Mdi::MENU_OPEN
-                            : Mdi::MENU));
-
-            if (scafold.startTools.len())
-                tools.pushBack(
-                    hflow(4, scafold.startTools));
-
-            if (scafold.startTools.len() and scafold.endTools.len())
-                tools.pushBack(grow(NONE));
-
-            if (scafold.endTools.len())
-                tools.pushBack(
-                    hflow(4, scafold.endTools));
-
-            if (tools.len())
-                appBody.pushBack(
-                    bottombar(tools));
-        }
-
-        return vflow(appBody) |
-               pinSize(state.isMobile ? Math::Vec2i{411, 731} : scafold.size) |
-               dialogLayer();
+        return state.isMobile
+                   ? mobileScafold(state, scafold)
+                   : desktopScafold(state, scafold);
     });
 }
 

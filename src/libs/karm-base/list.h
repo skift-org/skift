@@ -1,11 +1,13 @@
 #pragma once
 
+#include <karm-meta/nocopy.h>
+
 #include "iter.h"
 
 namespace Karm {
 
 template <typename T>
-struct LlItem {
+struct LlItem : public Meta::Static {
     T *prev = nullptr;
     T *next = nullptr;
 

@@ -30,4 +30,18 @@ inline void debug(char const *msg) {
     panic("unreachable");
 }
 
+inline void breakpoint() {
+#ifdef __ck_debug__
+#    ifdef __clang__
+    __builtin_debugtrap();
+#    elif defined(__GNUC__)
+    __builtin_trap(); // TODO: use __builtin_debugtrap() when it's available
+#    elif defined(_MSC_VER)
+    __debugbreak();
+#    else
+#        error "Unsupported compiler"
+#    endif
+#endif
+}
+
 } // namespace Karm

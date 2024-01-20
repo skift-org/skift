@@ -14,11 +14,11 @@ namespace Karm {
 
 #define stringify$(SYM) __stringify$(SYM)
 
-#define var$(NAME) concat$(_MACRO_VAR_##NAME##__, __LINE__)
+#define var$(NAME) concat$(__m_##NAME##_, __LINE__)
 
 #define always_inline [[gnu::always_inline]]
 
-#define _ var$(placeholder)
+#define _ __p_##__COUNTER__
 
 /* --- Count ---------------------------------------------------------------- */
 

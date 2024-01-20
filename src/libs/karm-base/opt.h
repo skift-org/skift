@@ -144,9 +144,8 @@ struct [[nodiscard]] Opt {
     }
 
     always_inline constexpr T &unwrap(char const *msg = "unwraping none") {
-        if (not _present) {
+        if (not _present)
             panic(msg);
-        }
         return _value;
     }
 

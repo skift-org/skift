@@ -23,7 +23,7 @@
         "karm-ui-backend": "sdl"
     },
     "routing": {
-        "stdc-math": "stdc-math-host"
+        "stdc-math": "ce-libm-host"
     },
     "tools": {
         "cc": {

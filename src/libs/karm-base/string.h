@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ctype.h"
 #include "rune.h"
 #include "std.h"
 
@@ -169,7 +170,7 @@ bool eqCi(_Str<E> a, _Str<E> b) {
             return false;
         }
 
-        if (aRune != bRune and tolower(aRune) != tolower(bRune)) {
+        if (aRune != bRune and toAsciiLower(aRune) != toAsciiLower(bRune)) {
             return false;
         }
     }

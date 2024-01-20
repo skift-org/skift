@@ -18,7 +18,7 @@
         "karm-sys-path-separator": "backslash"
     },
     "routing": {
-        "stdc-math": "stdc-math-musl"
+        "stdc-math": "ce-libm"
     },
     "tools": {
         "cc": {

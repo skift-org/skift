@@ -49,7 +49,7 @@ void reduce(State &s, Action action) {
 
 using Model = Ui::Model<State, Action, reduce>;
 
-Ui::Child sidebar(State s) {
+Ui::Child sidebar(State const &s) {
     Ui::Children items =
         iter(DEMOS)
             .mapi([&](Demo const *demo, usize index) {

@@ -1,7 +1,7 @@
+#include <ce-heap/libheap.h>
 #include <hjert-api/api.h>
 #include <karm-base/lock.h>
 #include <karm-logger/logger.h>
-#include <libheap/libheap.h>
 
 /* --- Heap Implementation -------------------------------------------------- */
 

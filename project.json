@@ -4,9 +4,13 @@
     "type": "project",
     "description": "The Skift Operating System",
     "extern": {
-        "cute-engineering/libheap": {
-            "git": "https://github.com/cute-engineering/libheap.git",
+        "cute-engineering/ce-heap": {
+            "git": "https://github.com/cute-engineering/ce-heap.git",
             "tag": "v1.1.0"
+        },
+        "cute-engineering/ce-libm": {
+            "git": "https://github.com/cute-engineering/ce-libm.git",
+            "tag": "main"
         }
     }
 }

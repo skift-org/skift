@@ -48,8 +48,8 @@ void Path::_flattenLineToNoTrans(Math::Vec2f p) {
 }
 
 void Path::_flattenCubicToNoTrans(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, isize depth) {
-    const isize MAX_DEPTH = 16;
-    const f64 TOLERANCE = 0.25;
+    isize const MAX_DEPTH = 16;
+    f64 const TOLERANCE = 0.25;
 
     if (depth > MAX_DEPTH)
         return;
@@ -390,8 +390,8 @@ Opt<Math::Vec2f> _nextVec2f(Io::SScan &scan) {
 
 Opt<Path::Op> Path::parseOp(Io::SScan &scan, Rune opcode) {
     Flags flags{};
-    flags |= islower(opcode) ? RELATIVE : DEFAULT;
-    opcode = tolower(opcode);
+    flags |= isAsciiLower(opcode) ? RELATIVE : DEFAULT;
+    opcode = toAsciiLower(opcode);
 
     auto nextSep = [&]() {
         scan.skip(Re::optSeparator(','));
@@ -475,7 +475,7 @@ bool Path::evalSvg(Str svg) {
 
             opcode = opcode == 'M' ? 'L' : opcode;
             opcode = opcode == 'm' ? 'l' : opcode;
-        } while (not scan.ended() and not isalpha(scan.curr()));
+        } while (not scan.ended() and not isAsciiAlpha(scan.curr()));
     }
 
     return true;

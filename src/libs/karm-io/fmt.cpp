@@ -12,7 +12,7 @@ Res<String> toCamelCase(Str str) {
     auto s = try$(toPascalCase(str));
 
     if (s.len() > 0) {
-        s[0] = tolower(s[0]);
+        s[0] = toAsciiLower(s[0]);
     }
 
     return Ok(s);
@@ -29,7 +29,7 @@ Res<String> toConstantCase(Str str) {
         if (c == ' ') {
             c = '_';
         } else {
-            c = toupper(c);
+            c = toAsciiUpper(c);
         }
     }
 
@@ -76,12 +76,12 @@ Res<String> toNoCase(Str str) {
             try$(writer.writeRune(' '));
             wasLower = false;
         } else {
-            if (wasLower and isupper(scan.curr())) {
+            if (wasLower and isAsciiUpper(scan.curr())) {
                 try$(writer.writeRune(' '));
             }
 
-            wasLower = islower(scan.curr()) and isalpha(scan.curr());
-            try$(writer.writeRune(tolower(scan.next())));
+            wasLower = isAsciiLower(scan.curr()) and isAsciiAlpha(scan.curr());
+            try$(writer.writeRune(toAsciiLower(scan.next())));
         }
     }
 
@@ -112,10 +112,10 @@ Res<String> toPascalCase(Str str) {
             first = true;
         } else {
             if (first) {
-                try$(writer.writeRune(toupper(scan.next())));
+                try$(writer.writeRune(toAsciiUpper(scan.next())));
                 first = false;
             } else {
-                try$(writer.writeRune(tolower(scan.next())));
+                try$(writer.writeRune(toAsciiLower(scan.next())));
             }
         }
     }
@@ -139,7 +139,7 @@ Res<String> toSentenceCase(Str str) {
     auto s = try$(toNoCase(str));
 
     if (s.len() > 0) {
-        s[0] = toupper(s[0]);
+        s[0] = toAsciiUpper(s[0]);
     }
 
     return Ok(s);
@@ -162,7 +162,7 @@ Res<String> toTitleCase(Str str) {
 
     for (usize i = 0; i < s.len(); i++) {
         if (i == 0 or s[i - 1] == ' ') {
-            s[i] = toupper(s[i]);
+            s[i] = toAsciiUpper(s[i]);
         }
     }
 
@@ -176,10 +176,10 @@ Res<String> toSwapCase(Str str) {
     while (not scan.ended()) {
         auto c = scan.next();
 
-        if (islower(c)) {
-            try$(writer.writeRune(toupper(c)));
-        } else if (isupper(c)) {
-            try$(writer.writeRune(tolower(c)));
+        if (isAsciiLower(c)) {
+            try$(writer.writeRune(toAsciiUpper(c)));
+        } else if (isAsciiUpper(c)) {
+            try$(writer.writeRune(toAsciiLower(c)));
         } else {
             try$(writer.writeRune(c));
         }
@@ -195,8 +195,8 @@ Res<String> toLowerCase(Str str) {
     while (not scan.ended()) {
         auto c = scan.next();
 
-        if (isupper(c)) {
-            try$(writer.writeRune(tolower(c)));
+        if (isAsciiUpper(c)) {
+            try$(writer.writeRune(toAsciiLower(c)));
         } else {
             try$(writer.writeRune(c));
         }
@@ -209,7 +209,7 @@ Res<String> toLowerFirstCase(Str str) {
     String s = str;
 
     if (s.len() > 0) {
-        s[0] = tolower(s[0]);
+        s[0] = toAsciiLower(s[0]);
     }
 
     return Ok(s);
@@ -222,8 +222,8 @@ Res<String> toUpperCase(Str str) {
     while (not scan.ended()) {
         auto c = scan.next();
 
-        if (islower(c)) {
-            try$(writer.writeRune(toupper(c)));
+        if (isAsciiLower(c)) {
+            try$(writer.writeRune(toAsciiUpper(c)));
         } else {
             try$(writer.writeRune(c));
         }
@@ -236,7 +236,7 @@ Res<String> toUpperFirstCase(Str str) {
     String s = str;
 
     if (s.len() > 0) {
-        s[0] = toupper(s[0]);
+        s[0] = toAsciiUpper(s[0]);
     }
 
     return Ok(s);
@@ -246,9 +246,9 @@ Res<String> toSpongeCase(Str str) {
     String s = str;
     for (usize i = 0; i < s.len(); i++) {
         if (i % 2 == 0) {
-            s[i] = toupper(s[i]);
+            s[i] = toAsciiUpper(s[i]);
         } else {
-            s[i] = tolower(s[i]);
+            s[i] = toAsciiLower(s[i]);
         }
     }
     return Ok(s);

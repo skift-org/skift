@@ -19,7 +19,7 @@
         "karm-cli-backend": "ansi"
     },
     "routing": {
-        "stdc-math": "stdc-math-musl"
+        "stdc-math": "ce-libm"
     },
     "tools": {
         "cc": {

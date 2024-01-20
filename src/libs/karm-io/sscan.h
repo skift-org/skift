@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/ctype.h>
 #include <karm-base/cursor.h>
 #include <karm-base/rune.h>
 #include <karm-base/string.h>
@@ -142,12 +143,12 @@ struct _SScan {
     /* --- Number parsing --------------------------------------------------- */
 
     Opt<u8> _parseDigit(Rune rune, usize base = 10) {
-        rune = tolower(rune);
+        rune = toAsciiLower(rune);
         u8 result = 255;
 
-        if (isalpha(rune))
+        if (isAsciiAlpha(rune))
             result = rune - 'a' + 10;
-        else if (isdigit(rune))
+        else if (isAsciiDigit(rune))
             result = rune - '0';
 
         if (result >= base)

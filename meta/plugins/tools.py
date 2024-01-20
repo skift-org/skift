@@ -94,6 +94,46 @@ def moduleIsAvailable(module: str) -> bool:
         return False
 
 
+def compileTest(what: str, code: str) -> bool:
+    print(f"Checking if {what} is available...", end="")
+    output = ""
+    try:
+        proc = subprocess.run(
+            [
+                shell.latest("clang++"),
+                "-x",
+                "c++",
+                "-std=c++20",
+                "-o",
+                "/dev/null",
+                "-",
+            ],
+            input=code.encode("utf-8"),
+            stderr=subprocess.PIPE,
+        )
+        output = proc.stderr.decode("utf-8")
+        if proc.returncode != 0:
+            print(f" {vt100.RED}Failed{vt100.RESET}")
+            print(f"{vt100.BRIGHT_BLACK}{output}{vt100.RESET}")
+            return False
+        else:
+            print(f" {vt100.GREEN}ok{vt100.RESET}")
+        return True
+    except Exception:
+        print(f" {vt100.RED}Failed{vt100.RESET}")
+        return False
+
+
+def checkForHeader(header: str) -> bool:
+    return compileTest(f"header <{header}>", f"#include <{header}>\nint main() {{}}")
+
+
+def checkForSymbol(header: str, symbol: str) -> bool:
+    return compileTest(
+        f"symbol {symbol}", f"#include <{header}>\nint main() {{ {symbol}; }}"
+    )
+
+
 @cli.command("n", "tools/nuke", "Nuke the development tools")
 @cli.command("s", "tools/setup", "Setup the development environment")
 @cli.command(None, "tools", "Manage the development tools")
@@ -128,3 +168,62 @@ def _(args: cli.Args):
     )
     everythingIsOk = everythingIsOk & commandIsAvailable("chatty")
     everythingIsOk = everythingIsOk & commandIsAvailable("pkg-config")
+
+    HEADERS = {
+        "coroutine": [
+            "std::coroutine_handle",
+        ],
+        "compare": [
+            "std::strong_ordering",
+            "std::weak_ordering",
+            "std::partial_ordering",
+        ],
+        "initializer_list": [
+            "std::initializer_list",
+        ],
+        "new": [],
+        "utility": [],
+        "memory": [],
+        "limits.h": [
+            "CHAR_BIT",
+        ],
+        "math.h": [],
+        "cstddef": [
+            "size_t",
+            "ptrdiff_t",
+            "std::nullptr_t",
+        ],
+        "stdint.h": [
+            "uint8_t",
+            "uint16_t",
+            "uint32_t",
+            "uint64_t",
+            "int8_t",
+            "int16_t",
+            "int32_t",
+            "int64_t",
+        ],
+        "string.h": [
+            "memcpy",
+            "memmove",
+            "memset",
+            "memcmp",
+        ],
+    }
+
+    headersOk = True
+
+    for header in HEADERS:
+        headersOk = headersOk & checkForHeader(header)
+
+        if not headersOk:
+            continue
+
+        for symbol in HEADERS[header]:
+            headersOk = headersOk & checkForSymbol(header, symbol)
+
+    if not headersOk:
+        print(
+            f"\n{vt100.RED}Error: Some headers are missing, please install the development packages for your distribution.{vt100.RESET}"
+        )
+        everythingIsOk = False

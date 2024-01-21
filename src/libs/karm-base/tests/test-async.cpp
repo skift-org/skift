@@ -30,10 +30,19 @@ test$(testTaskOuter) {
     return Ok();
 }
 
+test$(testTaskDetach) {
+    int res = 0xdead;
+    Async::detach(taskValue(), [&](int r) {
+        res = r;
+    });
+    expectEq$(res, 42);
+    return Ok();
+}
+
 test$(testPromiseOneFuture) {
-    Opt<Async::Future<int>> future;
+    Opt<Async::_Future<int>> future;
     {
-        Async::Promise<int> promise;
+        Async::_Promise<int> promise;
         future = promise.future();
         promise.resolve(42);
     }
@@ -43,9 +52,9 @@ test$(testPromiseOneFuture) {
 }
 
 test$(testPromiseMultipleFutures) {
-    Opt<Async::Future<int>> f1, f2, f3;
+    Opt<Async::_Future<int>> f1, f2, f3;
     {
-        Async::Promise<int> promise;
+        Async::_Promise<int> promise;
 
         f1 = promise.future();
         f2 = promise.future();

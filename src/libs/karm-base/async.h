@@ -3,10 +3,8 @@
 // Based on https://github.com/managarm/libasync
 // Copyright 2016-2020 libasync Contributors
 
-#include <karm-logger/logger.h>
-#include <karm-meta/nocopy.h>
-
 #include "list.h"
+#include "rc.h"
 #include "res.h"
 
 namespace Karm::Async {
@@ -172,6 +170,44 @@ static inline typename S::Inner run(S s) {
     panic("run() called on pending operation without a wait function");
 }
 
+template <Sender S, typename Cb>
+static inline void detach(S s, Cb cb) {
+    struct _Holder {
+        virtual void finalize(typename S::Inner) = 0;
+        virtual ~_Holder() = default;
+    };
+
+    struct Receiver {
+        _Holder *_h;
+
+        void recv(InlineOrLater, typename S::Inner r) {
+            _h->finalize(std::move(r));
+            // After this point, `_d` is invalid and `this` is dangling.
+        }
+    };
+
+    struct Holder : public _Holder {
+        using Op = OperationOf<S, Receiver>;
+        Op _op;
+        Cb _cb;
+
+        Holder(S s, Cb cb)
+            : _op{s.connect(Receiver{this})}, _cb{std::move(cb)} {}
+
+        void finalize(typename S::Inner r) override {
+            auto cb = std::move(_cb);
+            delete this;
+            cb(r);
+        }
+
+        void start() {
+            _op.start();
+        }
+    };
+
+    (new Holder(std::move(s), std::move(cb)))->start();
+}
+
 /* --- Promise -------------------------------------------------------------- */
 
 template <typename T>
@@ -217,7 +253,7 @@ struct State {
 };
 
 template <typename T>
-struct Future {
+struct _Future {
     Strong<State<T>> _state;
 
     template <Receiver<T> R>
@@ -263,11 +299,14 @@ struct Future {
     }
 };
 
+template <typename V = None, typename E = Error>
+using Future = _Future<Res<V, E>>;
+
 template <typename T>
-struct Promise : public Meta::NoCopy {
+struct _Promise : public Meta::NoCopy {
     Opt<Strong<State<T>>> _state;
 
-    Promise() : _state{makeStrong<State<T>>()} {}
+    _Promise() : _state{makeStrong<State<T>>()} {}
 
     void resolve(T value) {
         if (not _state.has())
@@ -275,10 +314,13 @@ struct Promise : public Meta::NoCopy {
         _state.take()->set(std::move(value));
     }
 
-    Future<T> future() {
-        return Future<T>{_state.unwrap()};
+    _Future<T> future() {
+        return _Future<T>{_state.unwrap()};
     }
 };
+
+template <typename V = None, typename E = Error>
+using Promise = _Promise<Res<V, E>>;
 
 /* --- Task ----------------------------------------------------------------- */
 

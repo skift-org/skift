@@ -32,7 +32,9 @@
                 "-ffreestanding",
                 "-fno-stack-protector",
                 "-fshort-wchar",
-                "-mno-red-zone"
+                "-mno-red-zone",
+                "-fno-delayed-template-parsing",
+                "-fno-ms-compatibility"
             ]
         },
         "cxx": {
@@ -46,7 +48,9 @@
                 "-ffreestanding",
                 "-fno-stack-protector",
                 "-fshort-wchar",
-                "-mno-red-zone"
+                "-mno-red-zone",
+                "-fno-delayed-template-parsing",
+                "-fno-ms-compatibility"
             ]
         },
         "ld": {

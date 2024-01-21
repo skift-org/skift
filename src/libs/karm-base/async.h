@@ -355,11 +355,9 @@ struct _Task {
                 }
 
                 void await_suspend(std::coroutine_handle<void>) noexcept {
-                    // FIXME: I don't like it, but I have to use `this` here
-                    //        when I want to use `_promise` instead.
-                    auto cfp = std::exchange(this->_promise->_cfp, Cfp::PAST_SUSPEND);
+                    auto cfp = std::exchange(_promise->_cfp, Cfp::PAST_SUSPEND);
                     if (cfp == Cfp::PAST_START)
-                        this->_promise->_resume->resume();
+                        _promise->_resume->resume();
                 }
 
                 void await_resume() noexcept {

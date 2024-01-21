@@ -41,7 +41,7 @@ Str contentType(Url::Path const &path) {
     return "application/octet-stream";
 }
 
-Sys::Task<> respondFile(Sys::_Connection &conn, Url::Url const &url, Http::Code code = Http::Code::OK) {
+Async::Task<> respondFile(Sys::_Connection &conn, Url::Url const &url, Http::Code code = Http::Code::OK) {
     auto ct = contentType(url.path);
     auto file = co_try$(Sys::File::open(url));
     auto stat = co_try$(file.stat());
@@ -65,7 +65,7 @@ Sys::Task<> respondFile(Sys::_Connection &conn, Url::Url const &url, Http::Code 
     co_return Ok();
 }
 
-Sys::Task<> respond404(Sys::_Connection &conn) {
+Async::Task<> respond404(Sys::_Connection &conn) {
     auto res = co_await respondFile(conn, "bundle://web-http-serv/public/404.html"_url, Http::Code::NOT_FOUND);
     if (res)
         co_return Ok();
@@ -85,7 +85,7 @@ Sys::Task<> respond404(Sys::_Connection &conn) {
     co_return Ok();
 }
 
-Sys::Task<> handleRequest(Sys::_Connection &conn, Str request, Sys::SocketAddr addr) {
+Async::Task<> handleRequest(Sys::_Connection &conn, Str request, Sys::SocketAddr addr) {
     Io::SScan scan{request};
     auto req = co_try$(Http::Request::parse(scan));
     auto url = "bundle://web-http-serv/public/"_url / req.path;
@@ -105,7 +105,7 @@ Sys::Task<> handleRequest(Sys::_Connection &conn, Str request, Sys::SocketAddr a
     co_return co_await respond404(conn);
 }
 
-Sys::Task<> handleConnection(Sys::TcpConnection stream) {
+Async::Task<> handleConnection(Sys::TcpConnection stream) {
     Array<char, 4096> buf;
     auto len = co_try_await$(stream.readAsync(mutBytes(buf)));
     if (not Tls::isHello(bytes(buf))) {
@@ -120,9 +120,9 @@ Sys::Task<> handleConnection(Sys::TcpConnection stream) {
 
 } // namespace Web::Server
 
-Sys::Task<> entryPointAsync(Sys::Ctx &) {
+Async::Task<> entryPointAsync(Sys::Ctx &) {
     auto listener = co_try$(Sys::TcpListener::listen(Sys::Ip4::localhost(8080)));
     logInfo("Serving on http://{}", listener.addr());
     while (true)
-        Sys::runDetached(Web::Server::handleConnection(co_try_await$(listener.acceptAsync())));
+        Async::detach(Web::Server::handleConnection(co_try_await$(listener.acceptAsync())));
 }

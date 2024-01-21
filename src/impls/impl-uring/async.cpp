@@ -44,11 +44,11 @@ struct UringSched : public Sys::Sched {
         io_uring_submit(&_ring);
     }
 
-    Task<usize> readAsync(Strong<Fd> fd, MutBytes buf) override {
+    Async::Task<usize> readAsync(Strong<Fd> fd, MutBytes buf) override {
         struct Job : public _Job {
             Strong<Fd> _fd;
             MutBytes _buf;
-            Strong<Promise<usize>> _promise = makePromise<usize>();
+            Async::Promise<usize> _promise;
 
             Job(Strong<Fd> fd, MutBytes buf)
                 : _fd(fd), _buf(buf) {}
@@ -60,22 +60,26 @@ struct UringSched : public Sys::Sched {
             void complete(io_uring_cqe *cqe) override {
                 auto res = cqe->res;
                 if (res < 0)
-                    _promise->reject(Posix::fromLastErrno());
+                    _promise.resolve(Posix::fromLastErrno());
                 else
-                    _promise->resolve(cqe->res);
+                    _promise.resolve(Ok(cqe->res));
+            }
+
+            auto future() {
+                return _promise.future();
             }
         };
 
         auto job = makeStrong<Job>(fd, buf);
         submit(job);
-        return job->_promise;
+        return Async::makeTask(job->future());
     }
 
-    Task<usize> writeAsync(Strong<Fd> fd, Bytes buf) override {
+    Async::Task<usize> writeAsync(Strong<Fd> fd, Bytes buf) override {
         struct Job : public _Job {
             Strong<Fd> _fd;
             Bytes _buf;
-            Strong<Promise<usize>> _promise = makePromise<usize>();
+            Async::Promise<usize> _promise;
 
             Job(Strong<Fd> fd, Bytes buf)
                 : _fd(fd), _buf(buf) {}
@@ -87,21 +91,25 @@ struct UringSched : public Sys::Sched {
             void complete(io_uring_cqe *cqe) override {
                 auto res = cqe->res;
                 if (res < 0)
-                    _promise->reject(Posix::fromLastErrno());
+                    _promise.resolve(Posix::fromLastErrno());
                 else
-                    _promise->resolve(cqe->res);
+                    _promise.resolve(Ok(cqe->res));
+            }
+
+            auto future() {
+                return _promise.future();
             }
         };
 
         auto job = makeStrong<Job>(fd, buf);
         submit(job);
-        return job->_promise;
+        return Async::makeTask(job->future());
     }
 
-    Task<usize> flushAsync(Strong<Fd> fd) override {
+    Async::Task<usize> flushAsync(Strong<Fd> fd) override {
         struct Job : public _Job {
             Strong<Fd> _fd;
-            Strong<Promise<usize>> _promise = makePromise<usize>();
+            Async::Promise<usize> _promise;
 
             Job(Strong<Fd> fd)
                 : _fd(fd) {}
@@ -113,23 +121,27 @@ struct UringSched : public Sys::Sched {
             void complete(io_uring_cqe *cqe) override {
                 auto res = cqe->res;
                 if (res < 0)
-                    _promise->reject(Posix::fromLastErrno());
+                    _promise.resolve(Posix::fromLastErrno());
                 else
-                    _promise->resolve(cqe->res);
+                    _promise.resolve(Ok(cqe->res));
+            }
+
+            auto future() {
+                return _promise.future();
             }
         };
 
         auto job = makeStrong<Job>(fd);
         submit(job);
-        return job->_promise;
+        return Async::makeTask(job->future());
     }
 
-    Task<Accepted> acceptAsync(Strong<Fd> fd) override {
+    Async::Task<Accepted> acceptAsync(Strong<Fd> fd) override {
         struct Job : public _Job {
             Strong<Fd> _fd;
             sockaddr_in _addr{};
             unsigned _addrLen = sizeof(sockaddr_in);
-            Strong<Promise<Accepted>> _promise = makePromise<Accepted>();
+            Async::Promise<Accepted> _promise;
 
             Job(Strong<Fd> fd)
                 : _fd(fd) {}
@@ -141,25 +153,31 @@ struct UringSched : public Sys::Sched {
             void complete(io_uring_cqe *cqe) override {
                 auto res = cqe->res;
                 if (res < 0)
-                    _promise->reject(Posix::fromLastErrno());
-                else
-                    _promise->resolve({makeStrong<Posix::Fd>(res), Posix::fromSockAddr(_addr)});
+                    _promise.resolve(Posix::fromLastErrno());
+                else {
+                    Accepted accepted = {makeStrong<Posix::Fd>(res), Posix::fromSockAddr(_addr)};
+                    _promise.resolve(Ok(accepted));
+                }
+            }
+
+            auto future() {
+                return _promise.future();
             }
         };
 
         auto job = makeStrong<Job>(fd);
         submit(job);
-        return job->_promise;
+        return Async::makeTask(job->future());
     }
 
-    Task<usize> sendAsync(Strong<Fd> fd, Bytes buf, SocketAddr addr) override {
+    Async::Task<usize> sendAsync(Strong<Fd> fd, Bytes buf, SocketAddr addr) override {
         struct Job : public _Job {
             Strong<Fd> _fd;
             Bytes _buf;
             iovec _iov;
             msghdr _msg;
             sockaddr_in _addr;
-            Strong<Promise<usize>> _promise = makePromise<usize>();
+            Async::Promise<usize> _promise;
 
             Job(Strong<Fd> fd, Bytes buf, SocketAddr addr)
                 : _fd(fd), _buf(buf), _addr(Posix::toSockAddr(addr)) {}
@@ -175,29 +193,33 @@ struct UringSched : public Sys::Sched {
 
                 io_uring_prep_sendmsg(sqe, _fd->handle(), &_msg, 0);
             }
+
             void complete(io_uring_cqe *cqe) override {
                 auto res = cqe->res;
                 if (res < 0)
-                    _promise->reject(Posix::fromLastErrno());
+                    _promise.resolve(Posix::fromLastErrno());
                 else
-                    _promise->resolve(cqe->res);
+                    _promise.resolve(Ok(cqe->res));
+            }
+
+            auto future() {
+                return _promise.future();
             }
         };
 
         auto job = makeStrong<Job>(fd, buf, addr);
         submit(job);
-        return job->_promise;
+        return Async::makeTask(job->future());
     }
 
-    Task<Received> recvAsync(Strong<Fd> fd, MutBytes buf) override {
+    Async::Task<Received> recvAsync(Strong<Fd> fd, MutBytes buf) override {
         struct Job : public _Job {
             Strong<Fd> _fd;
             MutBytes _buf;
             iovec _iov;
             msghdr _msg;
             sockaddr_in _addr;
-
-            Strong<Promise<Received>> _promise = makePromise<Received>();
+            Async::Promise<Received> _promise;
 
             Job(Strong<Fd> fd, MutBytes buf)
                 : _fd(fd), _buf(buf) {}
@@ -213,24 +235,30 @@ struct UringSched : public Sys::Sched {
 
                 io_uring_prep_recvmsg(sqe, _fd->handle(), &_msg, 0);
             }
+
             void complete(io_uring_cqe *cqe) override {
-                if (cqe->res < 0) {
-                    _promise->reject(Posix::fromLastErrno());
-                    return;
+                if (cqe->res < 0)
+                    _promise.resolve(Posix::fromLastErrno());
+                else {
+                    Received received = {(usize)cqe->res, Posix::fromSockAddr(_addr)};
+                    _promise.resolve(Ok(received));
                 }
-                _promise->resolve({(usize)cqe->res, Posix::fromSockAddr(_addr)});
+            }
+
+            auto future() {
+                return _promise.future();
             }
         };
 
         auto job = makeStrong<Job>(fd, buf);
         submit(job);
-        return job->_promise;
+        return Async::makeTask(job->future());
     }
 
-    Task<> sleepAsync(TimeStamp until) override {
+    Async::Task<> sleepAsync(TimeStamp until) override {
         struct Job : public _Job {
             TimeStamp _until;
-            Strong<Promise<>> _promise = makePromise<>();
+            Async::Promise<> _promise;
 
             Job(TimeStamp until)
                 : _until(until) {}
@@ -242,21 +270,22 @@ struct UringSched : public Sys::Sched {
                 ts.tv_nsec = timeout.toUSecs() % 1000000000;
                 io_uring_prep_timeout(sqe, &ts, 0, 0);
             }
+
             void complete(io_uring_cqe *cqe) override {
                 if (cqe->res < 0)
-                    _promise->reject(Posix::fromLastErrno());
+                    _promise.resolve(Posix::fromLastErrno());
                 else
-                    _promise->resolve(NONE);
+                    _promise.resolve(NONE);
+            }
+
+            auto future() {
+                return _promise.future();
             }
         };
 
         auto job = makeStrong<Job>(until);
         submit(job);
-        return job->_promise;
-    }
-
-    TimeStamp now() override {
-        return _now;
+        return Async::makeTask(job->future());
     }
 
     Res<> wait(TimeStamp until) override {

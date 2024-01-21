@@ -46,7 +46,7 @@ test$(testPromiseOneFuture) {
         future = promise.future();
         promise.resolve(42);
     }
-    auto res = Async::run(future->wait());
+    auto res = Async::run(*future);
     expectEq$(res, 42);
     return Ok();
 }
@@ -63,9 +63,9 @@ test$(testPromiseMultipleFutures) {
         promise.resolve(42);
     }
 
-    auto res1 = Async::run(f1->wait());
-    auto res2 = Async::run(f2->wait());
-    auto res3 = Async::run(f3->wait());
+    auto res1 = Async::run(*f1);
+    auto res2 = Async::run(*f2);
+    auto res3 = Async::run(*f3);
 
     expectEq$(res1, 42);
     expectEq$(res2, 42);

@@ -166,7 +166,6 @@ static inline typename S::Inner run(S s) {
     auto op = s.connect(Receiver{ret});
     if (op.start())
         return ret.take();
-
     panic("run() called on pending operation without a wait function");
 }
 
@@ -206,6 +205,12 @@ static inline void detach(S s, Cb cb) {
     };
 
     (new Holder(std::move(s), std::move(cb)))->start();
+}
+
+template <Sender S>
+static inline void detach(S s) {
+    detach(std::move(s), [](auto) {
+    });
 }
 
 /* --- Promise -------------------------------------------------------------- */
@@ -254,6 +259,8 @@ struct State {
 
 template <typename T>
 struct _Future {
+    using Inner = T;
+
     Strong<State<T>> _state;
 
     template <Receiver<T> R>
@@ -284,18 +291,9 @@ struct _Future {
         }
     };
 
-    struct _Sender {
-        using Inner = T;
-        Strong<State<T>> _state;
-
-        template <Receiver<T> R>
-        auto connect(R r) {
-            return _Operation<R>{_state, std::move(r)};
-        }
-    };
-
-    auto wait() {
-        return _Sender{_state};
+    template <Receiver<T> R>
+    auto connect(R r) {
+        return _Operation<R>{_state, std::move(r)};
     }
 };
 
@@ -352,7 +350,7 @@ struct _Task {
 
         template <typename U>
         void return_value(U &&value) {
-            _resume->value = std::forward<U>(value);
+            _resume->value.emplace(std::forward<U>(value));
         }
 
         std::suspend_always initial_suspend() {
@@ -437,5 +435,10 @@ struct _Task {
 
 template <typename V = None, typename E = Error>
 using Task = _Task<Res<V, E>>;
+
+template <Sender S>
+_Task<typename S::Inner> makeTask(S s) {
+    co_return co_await std::move(s);
+}
 
 } // namespace Karm::Async

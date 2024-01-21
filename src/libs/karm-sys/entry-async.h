@@ -3,8 +3,8 @@
 #include "async.h"
 #include "entry.h"
 
-Sys::Task<> entryPointAsync(Sys::Ctx &);
+Async::Task<> entryPointAsync(Sys::Ctx &);
 
 [[gnu::weak]] Res<> entryPoint(Sys::Ctx &ctx) {
-    return try$(Sys::runSync(entryPointAsync(ctx)));
+    return try$(Sys::run(entryPointAsync(ctx)));
 }

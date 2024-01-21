@@ -6,10 +6,10 @@
 
 namespace Web::Client {
 
-Sys::Task<usize> fetch(Url::Url const &url, Io::Writer &out);
+Async::Task<usize> fetch(Url::Url const &url, Io::Writer &out);
 
-Sys::Task<String> fetchString(Url::Url const &url);
+Async::Task<String> fetchString(Url::Url const &url);
 
-Sys::Task<Json::Value> fetchJson(Url::Url const &url);
+Async::Task<Json::Value> fetchJson(Url::Url const &url);
 
 } // namespace Web::Client

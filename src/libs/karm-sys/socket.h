@@ -14,11 +14,11 @@ struct _Connection :
     public Io::Flusher,
     Meta::NoCopy {
 
-    virtual Task<usize> readAsync(MutBytes buf) = 0;
+    virtual Async::Task<usize> readAsync(MutBytes buf) = 0;
 
-    virtual Task<usize> writeAsync(Bytes buf) = 0;
+    virtual Async::Task<usize> writeAsync(Bytes buf) = 0;
 
-    virtual Task<usize> flushAsync() = 0;
+    virtual Async::Task<usize> flushAsync() = 0;
 };
 
 struct Connection :
@@ -37,7 +37,7 @@ struct Connection :
         return _fd->read(buf);
     }
 
-    Task<usize> readAsync(MutBytes buf) override {
+    Async::Task<usize> readAsync(MutBytes buf) override {
         return globalSched().readAsync(_fd, buf);
     }
 
@@ -45,7 +45,7 @@ struct Connection :
         return _fd->write(buf);
     }
 
-    Task<usize> writeAsync(Bytes buf) override {
+    Async::Task<usize> writeAsync(Bytes buf) override {
         return globalSched().writeAsync(_fd, buf);
     }
 
@@ -53,7 +53,7 @@ struct Connection :
         return _fd->flush();
     }
 
-    Task<usize> flushAsync() override {
+    Async::Task<usize> flushAsync() override {
         return globalSched().flushAsync(_fd);
     }
 
@@ -74,7 +74,7 @@ struct _Listener :
         return Ok(C(std::move(fd), addr));
     }
 
-    Task<C> acceptAsync() {
+    Async::Task<C> acceptAsync() {
         auto [fd, addr] = co_try_await$(globalSched().acceptAsync(_fd));
         co_return Ok(C(std::move(fd), addr));
     }

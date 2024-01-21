@@ -66,7 +66,7 @@ struct One {
 };
 
 template <Sender S, Receiver<typename S::Inner> R>
-using OperationOf = decltype(std::declval<S>().connect(std::declval<R>()));
+using OperationOf = decltype(Meta::declval<S>().connect(Meta::declval<R>()));
 
 /* --- Basics --------------------------------------------------------------- */
 
@@ -348,16 +348,18 @@ struct _Task {
 
         auto final_suspend() noexcept {
             struct Awaiter {
-                promise_type *_prom;
+                promise_type *_promise;
 
                 bool await_ready() noexcept {
                     return false;
                 }
 
                 void await_suspend(std::coroutine_handle<void>) noexcept {
-                    auto cfp = std::exchange(_prom->_cfp, Cfp::PAST_SUSPEND);
+                    // FIXME: I don't like it, but I have to use `this` here
+                    //        when I want to use `_promise` instead.
+                    auto cfp = std::exchange(this->_promise->_cfp, Cfp::PAST_SUSPEND);
                     if (cfp == Cfp::PAST_START)
-                        _prom->_resume->resume();
+                        this->_promise->_resume->resume();
                 }
 
                 void await_resume() noexcept {

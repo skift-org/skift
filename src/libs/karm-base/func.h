@@ -15,14 +15,14 @@ template <typename Out, typename... In>
 struct Func<Out(In...)> {
     struct _Wrap {
         virtual ~_Wrap() = default;
-        virtual Out operator()(In...) = 0;
+        virtual Out operator()(In...) const = 0;
     };
 
     template <typename F>
     struct Wrap : _Wrap {
         F _f;
         Wrap(F &&f) : _f(std::move(f)) {}
-        Out operator()(In... in) override { return _f(std::forward<In>(in)...); }
+        Out operator()(In... in) const override { return _f(std::forward<In>(in)...); }
     };
 
     Box<_Wrap> _wrap;
@@ -58,7 +58,7 @@ struct Func<Out(In...)> {
 
     // clang-format on
 
-    Out operator()(In... in) {
+    Out operator()(In... in) const {
         return (*_wrap)(std::forward<In>(in)...);
     }
 
@@ -76,14 +76,14 @@ template <typename Out, typename... In>
 struct SharedFunc<Out(In...)> {
     struct _Wrap {
         virtual ~_Wrap() = default;
-        virtual Out operator()(In...) = 0;
+        virtual Out operator()(In...) const = 0;
     };
 
     template <typename F>
     struct Wrap : _Wrap {
         F _f;
         Wrap(F &&f) : _f(std::move(f)) {}
-        Out operator()(In... in) override { return _f(std::forward<In>(in)...); }
+        Out operator()(In... in) const override { return _f(std::forward<In>(in)...); }
     };
 
     Strong<_Wrap> _wrap;
@@ -119,7 +119,7 @@ struct SharedFunc<Out(In...)> {
 
     // clang-format on
 
-    Out operator()(In... in) {
+    Out operator()(In... in) const {
         return (*_wrap)(std::forward<In>(in)...);
     }
 

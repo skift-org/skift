@@ -9,7 +9,7 @@ Ui::Child app() {
     return Ui::scafold({
         .icon = Mdi::WEATHER_PARTLY_CLOUDY,
         .title = "Weather",
-        .body = Ui::image(Media::loadImage("bundle://hideo-weather/images/weather-few-clouds.jpg"_url).unwrap()) | Ui::cover(),
+        .body = slot$(Ui::image(Media::loadImage("bundle://hideo-weather/images/weather-few-clouds.jpg"_url).unwrap()) | Ui::cover()),
         .size = {460, 320},
     });
 }

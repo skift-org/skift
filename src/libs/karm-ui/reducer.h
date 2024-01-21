@@ -154,7 +154,7 @@ inline Child state(T init, auto build) {
 
     using M = Model<T, T, reduce>;
 
-    return reducer<M>(init, [build](T const &state) {
+    return reducer<M>(init, [build = std::move(build)](T const &state) {
         return build(state, [](T t) {
             return bindBubble<T>(t);
         });

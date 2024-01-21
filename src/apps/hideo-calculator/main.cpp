@@ -83,15 +83,15 @@ Ui::Child screen(State const &state) {
 }
 
 Ui::Child app() {
-    return Ui::reducer<Model>([](auto const &state) {
+    return Ui::reducer<Model>([](State const &state) {
         return Ui::scafold({
             .icon = Mdi::CALCULATOR,
             .title = "Calculator",
             .titlebar = Ui::TitlebarStyle::DIALOG,
-            .body = Ui::vflow(
+            .body = slot$(Ui::vflow(
                 screen(state) | Ui::dragRegion(),
-                keypad(state) | Ui::grow()),
-            .size = {300, 450},
+                keypad(state) | Ui::grow())),
+            .size = {300, 380},
         });
     });
 }

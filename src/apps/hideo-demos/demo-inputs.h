@@ -24,50 +24,33 @@ static inline Demo INPUTS_DEMO{
             willShowMessage,
             "Cool duck app", "Install");
 
-        auto toggle = Hideo::toggleRow(true, NONE, "Some property");
-        auto toggle1 = Hideo::toggleRow(true, NONE, "Some property");
-        auto toggle2 = Hideo::toggleRow(true, NONE, "Some property");
-
-        auto checkbox = Hideo::checkboxRow(true, NONE, "Some property");
-        auto checkbox1 = Hideo::checkboxRow(false, NONE, "Some property");
-        auto checkbox2 = Hideo::checkboxRow(false, NONE, "Some property");
-
-        auto radio = Hideo::radioRow(true, NONE, "Some property");
-        auto radio1 = Hideo::radioRow(false, NONE, "Some property");
-        auto radio2 = Hideo::radioRow(false, NONE, "Some property");
-
-        auto slider = Hideo::sliderRow(0.5, NONE, "Some property");
-
         auto title = Hideo::titleRow("Some Settings");
 
         auto list = Hideo::card(
             button,
             Ui::separator(),
-            Hideo::treeRow(Ui::icon(Mdi::TOGGLE_SWITCH), "Switches", NONE,
-                           {
-                               toggle,
-                               toggle1,
-                               toggle2,
-                           }),
+            Hideo::treeRow(
+                slot$(Ui::icon(Mdi::TOGGLE_SWITCH)), "Switches", NONE,
+                slots$(
+                    Hideo::toggleRow(true, NONE, "Some property"),
+                    Hideo::toggleRow(true, NONE, "Some property"),
+                    Hideo::toggleRow(true, NONE, "Some property"))),
 
             Ui::separator(),
-            Hideo::treeRow(Ui::icon(Mdi::CHECKBOX_MARKED), "Checkboxs", NONE,
-                           {
-                               checkbox,
-                               checkbox1,
-                               checkbox2,
-                           }),
+            Hideo::treeRow(slot$(Ui::icon(Mdi::CHECKBOX_MARKED)), "Checkboxs", NONE,
+                           slots$(
+                               Hideo::checkboxRow(true, NONE, "Some property"),
+                               Hideo::checkboxRow(false, NONE, "Some property"),
+                               Hideo::checkboxRow(false, NONE, "Some property"))),
 
             Ui::separator(),
-            Hideo::treeRow(Ui::icon(Mdi::RADIOBOX_MARKED), "Radios", NONE,
-                           {
-                               radio,
-                               radio1,
-                               radio2,
-                           }),
-
+            Hideo::treeRow(slot$(Ui::icon(Mdi::RADIOBOX_MARKED)), "Radios", NONE,
+                           slots$(
+                               Hideo::radioRow(true, NONE, "Some property"),
+                               Hideo::radioRow(false, NONE, "Some property"),
+                               Hideo::radioRow(false, NONE, "Some property"))),
             Ui::separator(),
-            slider);
+            Hideo::sliderRow(0.5, NONE, "Some property"));
 
         return Ui::vflow(8, title, list) |
                Ui::maxSize({420, Ui::UNCONSTRAINED}) |

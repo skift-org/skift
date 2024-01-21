@@ -30,9 +30,11 @@ Ui::Child app(Res<Strong<Media::Fontface>> fontface) {
     return Ui::scafold({
         .icon = Mdi::FORMAT_FONT,
         .title = "Fonts",
-        .body = fontface
-                    ? pangrams(fontface.unwrap())
-                    : alert("Unable to load font", fontface.none().msg()),
+        .body = [fontface] {
+            return fontface
+                       ? pangrams(fontface.unwrap())
+                       : alert("Unable to load font", fontface.none().msg());
+        },
     });
 }
 

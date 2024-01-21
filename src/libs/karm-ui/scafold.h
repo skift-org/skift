@@ -39,12 +39,12 @@ struct Scafold : public Meta::NoCopy {
     String title;
     TitlebarStyle titlebar = TitlebarStyle::DEFAULT;
 
-    Children startTools;
-    Children midleTools;
-    Children endTools;
+    Opt<Slots> startTools;
+    Opt<Slots> midleTools;
+    Opt<Slots> endTools;
+    Opt<Slot> sidebar;
+    Slot body;
 
-    Opt<Child> sidebar;
-    Child body;
     Math::Vec2i size = {800, 600};
 
     struct State {

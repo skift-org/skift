@@ -14,8 +14,8 @@ Ui::Child sidenav(Ui::Children children) {
            Ui::minSize({198, Ui::UNCONSTRAINED});
 }
 
-Ui::Child sidenavTree(Mdi::Icon icon, String title, Ui::Child child) {
-    return Ui::state(true, [=](bool state, auto bind) {
+Ui::Child sidenavTree(Mdi::Icon icon, String title, Ui::Slot child) {
+    return Ui::state(true, [=, child = std::move(child)](bool state, auto bind) {
         return Ui::vflow(
             Ui::button(
                 bind(not state),
@@ -31,7 +31,7 @@ Ui::Child sidenavTree(Mdi::Icon icon, String title, Ui::Child child) {
                     Ui::spacing({0, 8, 12, 8})),
 
             state
-                ? child |
+                ? child() |
                       Ui::spacing({32, 0, 0, 0}) |
                       Ui::slideIn(Ui::SlideFrom::TOP)
                 : Ui::empty());

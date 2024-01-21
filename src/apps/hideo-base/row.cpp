@@ -136,26 +136,29 @@ Ui::Child colorRow(Gfx::Color c, Ui::OnChange<Gfx::Color> onChange, String title
         color(c, std::move(onChange)));
 }
 
-Ui::Child treeRow(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Ui::Child child) {
-    return Ui::state(false, [=](bool state, auto bind) {
+Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui::Slot child) {
+    return Ui::state(false, [=, leading = std::move(leading), child = std::move(child)](bool state, auto bind) {
         return vflow(
             0,
             pressableRow(
                 bind(not state),
-                leading,
+                leading(),
                 title,
                 subtitle,
                 Ui::icon(state ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 24)),
             state ? spacing(
                         {38, 0, 0, 0},
-                        child) |
+                        child()) |
                         slideIn(Ui::SlideFrom::TOP)
                   : Ui::empty());
     });
 }
 
-Ui::Child treeRow(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Ui::Children children) {
-    return treeRow(leading, title, subtitle, vflow(children));
+Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui::Slots children) {
+    Ui::Slot slot = [children = std::move(children)] {
+        return vflow(children());
+    };
+    return treeRow(std::move(leading), title, subtitle, std::move(slot));
 }
 
 } // namespace Hideo

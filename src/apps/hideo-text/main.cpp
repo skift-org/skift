@@ -19,18 +19,18 @@ Ui::Child app(Res<String> text) {
     return Ui::scafold({
         .icon = Mdi::TEXT,
         .title = "Text",
-        .startTools = {
+        .startTools = slots$(
             Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FILE),
             Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FOLDER),
             Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE_PLUS),
-        },
-        .endTools = {
+            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE_PLUS)),
+        .endTools = slots$(
             Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::UNDO),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::REDO),
-
+            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::REDO)),
+        .body = [=] {
+            return text ? editor(text.unwrap())
+                        : alert("Unable to load text", text.none().msg());
         },
-        .body = text ? editor(text.unwrap()) : alert("Unable to load text", text.none().msg()),
     });
 }
 

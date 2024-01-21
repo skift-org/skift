@@ -67,15 +67,15 @@ Ui::Child bottombar(Children children) {
 Child mobileScafold(Scafold::State const &s, Scafold const &scafold) {
     Children body;
 
-    if (scafold.midleTools.len())
-        body.pushBack(toolbar(scafold.midleTools));
+    if (scafold.midleTools)
+        body.pushBack(toolbar(scafold.midleTools().unwrap()));
 
     if (s.sidebarOpen and scafold.sidebar) {
-        body.pushBack((*scafold.sidebar) |
+        body.pushBack((scafold.sidebar().unwrap()) |
                       Ui::box({.backgroundPaint = GRAY900}) |
                       grow());
     } else {
-        body.pushBack(scafold.body | grow());
+        body.pushBack(scafold.body() | grow());
     }
 
     Children tools;
@@ -89,16 +89,16 @@ Child mobileScafold(Scafold::State const &s, Scafold const &scafold) {
                     ? Mdi::MENU_OPEN
                     : Mdi::MENU));
 
-    if (scafold.startTools.len())
+    if (scafold.startTools)
         tools.pushBack(
-            hflow(4, scafold.startTools));
+            hflow(4, scafold.startTools().unwrap()));
 
-    if (scafold.startTools.len() and scafold.endTools.len())
+    if (scafold.startTools and scafold.endTools)
         tools.pushBack(grow(NONE));
 
-    if (scafold.endTools.len())
+    if (scafold.endTools)
         tools.pushBack(
-            hflow(4, scafold.endTools));
+            hflow(4, scafold.endTools().unwrap()));
 
     if (tools.len())
         body.pushBack(bottombar(tools));
@@ -119,19 +119,20 @@ Child desktopScafold(Scafold::State const &s, Scafold const &scafold) {
         tools.pushBack(
             button(Scafold::Model::bind<Scafold::ToggleSidebar>(), Ui::ButtonStyle::subtle(), s.sidebarOpen ? Mdi::MENU_OPEN : Mdi::MENU));
 
-    if (scafold.startTools.len())
+    if (scafold.startTools)
         tools.pushBack(
-            hflow(4, scafold.startTools));
+            hflow(4, scafold.startTools().unwrap()));
 
-    if (scafold.midleTools.len())
+    if (scafold.midleTools)
         tools.pushBack(
-            hflow(4, scafold.midleTools) | grow());
-    else if (scafold.endTools.len())
+            hflow(4, scafold.midleTools().unwrap()) | grow());
+
+    else if (scafold.endTools)
         tools.pushBack(grow(NONE));
 
-    if (scafold.endTools.len())
+    if (scafold.endTools)
         tools.pushBack(
-            hflow(4, scafold.endTools));
+            hflow(4, scafold.endTools().unwrap()));
 
     if (tools.len())
         body.pushBack(
@@ -143,12 +144,12 @@ Child desktopScafold(Scafold::State const &s, Scafold const &scafold) {
     if (s.sidebarOpen and scafold.sidebar) {
         body.pushBack(
             hflow(
-                *scafold.sidebar,
+                scafold.sidebar().unwrap(),
                 separator(),
-                scafold.body | grow()) |
+                scafold.body() | grow()) |
             grow());
     } else {
-        body.pushBack(scafold.body | grow());
+        body.pushBack(scafold.body() | grow());
     }
 
     return vflow(body) |

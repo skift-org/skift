@@ -40,8 +40,8 @@ Ui::Child sliderRow(f64 value, Ui::OnChange<f64> onChange, String title);
 
 Ui::Child colorRow(Gfx::Color color, Ui::OnChange<Gfx::Color> onChange, String title);
 
-Ui::Child treeRow(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Ui::Child child);
+Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui::Slot child);
 
-Ui::Child treeRow(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Ui::Children children);
+Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui::Slots children);
 
 } // namespace Hideo

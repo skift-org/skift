@@ -42,6 +42,7 @@ inline bool match(Key lhs, Key rhs) {
 
 struct Node : public Meta::Static {
     Key _key = NONE;
+    bool _consumed = false;
 
     struct PaintEvent {
         Math::Recti bound;
@@ -122,15 +123,18 @@ struct LeafNode : public Node {
     virtual void reconcile(Crtp &) {}
 
     Opt<Child> reconcile(Child other) override {
-        if (this == &other.unwrap()) {
-            debug("reconcile() called on self");
-            return NONE;
-        }
+        if (this == &other.unwrap())
+            panic("reconcile() called on self, did you forget to wrap the node in a slot?");
+
+        if (other->_consumed)
+            panic("reconcile() called on consumed node, did you forget to wrap the node in a slot?");
 
         if (not other.is<Crtp>())
             return other;
 
         reconcile(other.unwrap<Crtp>());
+        other->_consumed = true;
+
         return NONE;
     }
 
@@ -283,4 +287,22 @@ struct ProxyNode : public LeafNode<Crtp> {
     }
 };
 
+using Slot = Func<Child()>;
+
+using Slots = Func<Children()>;
+
 } // namespace Karm::Ui
+
+#define slot$(EXPR)      \
+    Karm::Ui::Slot {     \
+        [=]() {          \
+            return EXPR; \
+        }                \
+    }
+
+#define slots$(...)               \
+    Karm::Ui::Slots {             \
+        [=]() -> Ui::Children {   \
+            return {__VA_ARGS__}; \
+        }                         \
+    }

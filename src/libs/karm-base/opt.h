@@ -199,6 +199,28 @@ struct [[nodiscard]] Opt {
         }
     }
 
+    // call operator
+    template <typename... Args>
+    always_inline constexpr auto operator()(Args &&...args) const {
+        using OptRet = Opt<Meta::Ret<T, Args...>>;
+
+        if constexpr (Meta::Same<void, Meta::Ret<T, Args...>>) {
+            // Handle void return type
+            if (not _present) {
+                return false;
+            }
+            _value(std::forward<Args>(args)...);
+            return true;
+        } else {
+            // Handle non-void return type
+            if (not _present) {
+                return OptRet{NONE};
+            }
+
+            return OptRet{_value(std::forward<Args>(args)...)};
+        }
+    }
+
     always_inline constexpr auto mapValue(auto f) -> Opt<decltype(f(unwrap()))> {
         if (_present) {
             return {f(unwrap())};

@@ -61,39 +61,41 @@ Ui::Child page(State const &s) {
 }
 
 Ui::Child app() {
-    return Ui::scafold({
-        .icon = Mdi::CLOCK,
-        .title = "Clock",
-        .titlebar = Ui::TitlebarStyle::DIALOG,
-        .body = Ui::reducer<Model>(
-            [](State const &s) {
-                return Ui::vflow(
-                    Ui::vflow(
-                        Ui::titleLarge(toStr(s.page)) | Ui::hcenter(), page(s) | Ui::grow()) |
-                        Ui::spacing({8, 24, 8, 0}) | Ui::grow(),
-                    Hideo::navbar(
-                        Hideo::navbarItem(
-                            Mdi::ALARM,
-                            "Alarm",
-                            s.page == Page::ALARM,
-                            Model::bind(Page::ALARM)),
-                        Hideo::navbarItem(
-                            Mdi::CLOCK_OUTLINE,
-                            "Clock",
-                            s.page == Page::CLOCK,
-                            Model::bind(Page::CLOCK)),
-                        Hideo::navbarItem(
-                            Mdi::TIMER_SAND,
-                            "Timer",
-                            s.page == Page::TIMER,
-                            Model::bind(Page::TIMER)),
-                        Hideo::navbarItem(
-                            Mdi::TIMER_OUTLINE,
-                            "Stopwatch",
-                            s.page == Page::STOPWATCH,
-                            Model::bind(Page::STOPWATCH))));
-            }),
-    });
+    return Ui::reducer<Model>(
+        [](State const &s) {
+            return Ui::scafold({
+                .icon = Mdi::CLOCK,
+                .title = "Clock",
+                .titlebar = Ui::TitlebarStyle::DIALOG,
+                .body = [&] {
+                    return Ui::vflow(
+                        Ui::vflow(
+                            Ui::titleLarge(toStr(s.page)) | Ui::hcenter(), page(s) | Ui::grow()) |
+                            Ui::spacing({8, 24, 8, 0}) | Ui::grow(),
+                        Hideo::navbar(
+                            Hideo::navbarItem(
+                                Mdi::ALARM,
+                                "Alarm",
+                                s.page == Page::ALARM,
+                                Model::bind(Page::ALARM)),
+                            Hideo::navbarItem(
+                                Mdi::CLOCK_OUTLINE,
+                                "Clock",
+                                s.page == Page::CLOCK,
+                                Model::bind(Page::CLOCK)),
+                            Hideo::navbarItem(
+                                Mdi::TIMER_SAND,
+                                "Timer",
+                                s.page == Page::TIMER,
+                                Model::bind(Page::TIMER)),
+                            Hideo::navbarItem(
+                                Mdi::TIMER_OUTLINE,
+                                "Stopwatch",
+                                s.page == Page::STOPWATCH,
+                                Model::bind(Page::STOPWATCH))));
+                },
+            });
+        });
 }
 
 } // namespace Hideo::Clock

@@ -49,28 +49,26 @@ void reduce(State &s, Action action) {
 
 using Model = Ui::Model<State, Action, reduce>;
 
-Ui::Child sidebar(State const &s) {
-    Ui::Children items =
-        iter(DEMOS)
-            .mapi([&](Demo const *demo, usize index) {
-                return Hideo::sidenavItem(
-                    index == s.current,
-                    Model::bind<SwitchAction>(index),
-                    demo->icon,
-                    demo->name);
-            })
-            .collect<Ui::Children>();
-
-    return Hideo::sidenav(items);
-}
-
 Ui::Child app() {
-    return Ui::reducer<Model>([](State s) {
+    return Ui::reducer<Model>([](State const &s) {
         return Ui::scafold({
             .icon = Mdi::DUCK,
             .title = "Demos",
-            .sidebar = sidebar(s),
-            .body = DEMOS[s.current]->build(),
+            .sidebar = [&]() {
+                return Hideo::sidenav(
+                    iter(DEMOS)
+                        .mapi([&](Demo const *demo, usize index) {
+                            return Hideo::sidenavItem(
+                                index == s.current,
+                                Model::bind<SwitchAction>(index),
+                                demo->icon,
+                                demo->name);
+                        })
+                        .collect<Ui::Children>());
+            },
+            .body = [&]() {
+                return DEMOS[s.current]->build();
+            },
         });
     });
 }

@@ -9,52 +9,52 @@ namespace Hideo::Settings {
 
 Ui::Child userInfos() {
     return Hideo::treeRow(
-        Ui::icon(Mdi::ACCOUNT),
+        slot$(Ui::icon(Mdi::ACCOUNT)),
         "User",
         NONE,
-        Ui::errorScope("user informations", [&] -> Res<Ui::Child> {
+        slots$(Ui::errorScope("user informations", [&] -> Res<Ui::Child> {
             auto userinfo = try$(Sys::userinfo());
             return Ok(Ui::vflow(
                 Hideo::row(NONE, "Username", NONE, Ui::text(userinfo.name)),
                 Hideo::row(NONE, "Home", NONE, Ui::text(userinfo.home.str())),
                 Hideo::row(NONE, "Shell", NONE, Ui::text(userinfo.shell.str()))));
-        }));
+        })));
 }
 
 Ui::Child sysInfos() {
     return Hideo::treeRow(
-        Ui::icon(Mdi::INFORMATION_OUTLINE),
+        slot$(Ui::icon(Mdi::INFORMATION_OUTLINE)),
         "System",
         NONE,
-        Ui::errorScope("system informations", [&] -> Res<Ui::Child> {
+        slot$(Ui::errorScope("system informations", [] -> Res<Ui::Child> {
             auto sysinfo = try$(Sys::sysinfo());
             return Ok(Ui::vflow(
                 Hideo::row(NONE, "System", NONE, Ui::text(sysinfo.sysName)),
                 Hideo::row(NONE, "System Version", NONE, Ui::text(sysinfo.sysVersion)),
                 Hideo::row(NONE, "Kernel", NONE, Ui::text(sysinfo.kernelName)),
                 Hideo::row(NONE, "Kernel Version", NONE, Ui::text(sysinfo.kernelVersion))));
-        }));
+        })));
 }
 
 Ui::Child memInfos() {
     return Hideo::treeRow(
-        Ui::icon(Mdi::MEMORY),
+        slot$(Ui::icon(Mdi::MEMORY)),
         "Memory",
         NONE,
-        Ui::errorScope("memory informations", [&] -> Res<Ui::Child> {
+        slot$(Ui::errorScope("memory informations", [&] -> Res<Ui::Child> {
             auto meminfo = try$(Sys::meminfo());
             return Ok(vflow(
                 Hideo::row(NONE, "Physical", NONE, Ui::text("{}bytes", meminfo.physicalUsed)),
                 Hideo::row(NONE, "Swap", NONE, Ui::text("{}bytes", meminfo.swapUsed))));
-        }));
+        })));
 }
 
 Ui::Child cpuInfos() {
     return Hideo::treeRow(
-        Ui::icon(Mdi::CPU_64_BIT),
+        slot$(Ui::icon(Mdi::CPU_64_BIT)),
         "CPU",
         NONE,
-        Ui::errorScope("CPU informations", [&] -> Res<Ui::Child> {
+        slot$(Ui::errorScope("CPU informations", [&] -> Res<Ui::Child> {
             auto cpusinfo = try$(Sys::cpusinfo());
 
             Ui::Children children;
@@ -68,7 +68,7 @@ Ui::Child cpuInfos() {
             }
 
             return Ok(Ui::vflow(children));
-        }));
+        })));
 }
 
 Ui::Child pageAbout(State const &) {

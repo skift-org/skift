@@ -8,7 +8,9 @@ Ui::Child app() {
     return Ui::scafold({
         .icon = Mdi::CONSOLE_LINE,
         .title = "Console",
-        .body = Ui::codeMedium(" $ ls"),
+        .body = [] {
+            return Ui::codeMedium(" $ ls");
+        },
     });
 }
 

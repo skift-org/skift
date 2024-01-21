@@ -18,19 +18,8 @@ struct Later {};
 static constexpr Later LATER;
 
 struct InlineOrLater {
-    bool _inline;
-
-    constexpr InlineOrLater(Inline)
-        : _inline { true }
-    {}
-
-    constexpr InlineOrLater(Later)
-        : _inline { false }
-    {}
-
-    constexpr operator bool() const {
-        return _inline;
-    }
+    constexpr InlineOrLater(Inline) {}
+    constexpr InlineOrLater(Later) {}
 };
 
 template <typename T>

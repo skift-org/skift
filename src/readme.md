@@ -11,3 +11,4 @@ This directory contains the source code for the project.
  - [`libs/`](libs/) core system libraries
  - [`specs/`](specs/) implementation of standard interfaces/specifications
  - [`srvs/`](srvs/) core system services
+ - [`web/`](web/) web platform specific interfaces

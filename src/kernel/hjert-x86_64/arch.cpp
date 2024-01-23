@@ -37,7 +37,19 @@ static x86_64::GdtDesc _gdtDesc{_gdt};
 static x86_64::Idt _idt{};
 static x86_64::IdtDesc _idtDesc{_idt};
 
+void __panicHandler(PanicKind kind, char const *buf) {
+    if (kind == PanicKind::PANIC) {
+        (void)Io::format(Hjert::Arch::loggerOut(), "PANIC: {}\n", buf);
+        Hjert::Arch::stopAll();
+        __builtin_unreachable();
+    } else {
+        (void)Io::format(Hjert::Arch::loggerOut(), "DEBUG: {}\n", buf);
+    }
+}
+
 Res<> init(Handover::Payload &) {
+    Karm::registerPanicHandler(__panicHandler);
+
     try$(_com1.init());
 
     _gdtDesc.load();
@@ -193,7 +205,6 @@ extern "C" void _intDispatch(usize sp) {
             uPanic(frame);
         else
             kPanic(frame);
-
     } else if (frame.intNo == 100) {
         switchTask(0_ms, frame);
     } else {

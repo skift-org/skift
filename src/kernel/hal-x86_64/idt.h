@@ -25,8 +25,7 @@ struct [[gnu::packed]] IdtEntry {
           _ist(ist),
           _attributes(attributes),
           _offsetMid((handler >> 16) & 0xffff),
-          _offsetHigh(handler >> 32),
-          _zero(0) {}
+          _offsetHigh(handler >> 32) {}
 };
 
 struct [[gnu::packed]] Idt {

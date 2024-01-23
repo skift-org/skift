@@ -45,7 +45,7 @@ Child titlebar(Mdi::Icon icon, String title, Child tabs, TitlebarStyle style) {
                tabs | Ui::grow(),
                controls(style)) |
            spacing(8) |
-           dragRegion() | box(TOOLBAR);
+           dragRegion();
 }
 
 Child toolbar(Children children) {

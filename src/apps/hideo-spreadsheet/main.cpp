@@ -130,7 +130,7 @@ Ui::Child tabItem(State const &state, Sheet const &sheet, usize index) {
     return Ui::button(
         Model::bind<SwitchSheet>(index),
         state.active == index
-            ? Ui::ButtonStyle::regular()
+            ? Ui::ButtonStyle::secondary()
             : Ui::ButtonStyle::subtle(),
         sheet.name);
 }
@@ -138,8 +138,6 @@ Ui::Child tabItem(State const &state, Sheet const &sheet, usize index) {
 Ui::Child tabs(State const &state) {
     return Ui::hflow(
         4,
-        Ui::separator(),
-
         Ui::hflow(
             iter(state.book.sheets)
                 .mapi([&](auto const &s, usize i) {

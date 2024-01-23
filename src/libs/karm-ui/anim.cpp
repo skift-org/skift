@@ -67,36 +67,62 @@ Child slideIn(SlideFrom from, Ui::Child child) {
     return makeStrong<SlideIn>(from, std::move(child));
 }
 
-/* --- Slide In/Out --------------------------------------------------------- */
+/* --- Carousel ------------------------------------------------------------- */
 
-struct SlideInOut : public ProxyNode<SlideInOut> {
-    enum State {
-        IDLE,
-        IN,
-        OUT,
-    };
-    bool _visible{};
-    SlideFrom _from;
+struct Carousel : public GroupNode<Carousel> {
+    usize _selected;
+    Layout::Flow _flow;
     Easedf _slide{};
 
-    State _state{};
-    Math::Rectf _oldBound{};
-
-    SlideInOut(bool visible, SlideFrom from, Ui::Child child)
-        : ProxyNode(std::move(child)),
-          _visible(visible),
-          _from(from) {
+    Carousel(usize selected, Children children, Layout::Flow flow)
+        : GroupNode(children), _selected(selected), _flow(flow) {
     }
 
-    void reconcile(SlideInOut &o) override {
-        _visible = o._visible;
-        _from = o._from;
-        ProxyNode<SlideInOut>::reconcile(o);
+    void reconcile(Carousel &o) override {
+        GroupNode::reconcile(o);
+        if (_selected != o._selected) {
+            _selected = o._selected;
+            _slide.animate(*this, _selected, 0.3, Math::Easing::cubicOut);
+        }
+    }
+
+    Math::Vec2i translation() {
+        return {
+            (int)(-_slide.value() * bound().width),
+            0,
+        };
+    }
+
+    void paint(Gfx::Context &g, Math::Recti r) override {
+        g.save();
+        g.clip(bound());
+        auto anim = translation();
+        g.origin(anim);
+        for (auto &child : children()) {
+            child->paint(g, r);
+        }
+        g.restore();
+    }
+
+    void event(Sys::Event &e) override {
+        if (_slide.needRepaint(*this, e)) {
+            Ui::shouldRepaint(*this, bound());
+        }
+
+        GroupNode::event(e);
+    }
+
+    void layout(Math::Recti r) override {
+        _bound = r;
+        for (auto &child : children()) {
+            child->layout(r);
+            r = r.offset({r.width, 0});
+        }
     }
 };
 
-Child slideInOut(bool visible, SlideFrom from, Ui::Child child) {
-    return makeStrong<SlideInOut>(visible, from, std::move(child));
+Child carousel(usize selected, Children children, Layout::Flow flow) {
+    return makeStrong<Carousel>(selected, std::move(children), flow);
 }
 
 } // namespace Karm::Ui

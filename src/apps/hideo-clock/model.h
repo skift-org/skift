@@ -5,10 +5,10 @@
 namespace Hideo::Clock {
 
 enum struct Page {
-    CLOCK,
-    STOPWATCH,
-    TIMER,
     ALARM,
+    CLOCK,
+    TIMER,
+    STOPWATCH,
 
     _DEFAULT = ALARM,
 };

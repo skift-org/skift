@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-layout/flow.h>
 #include <karm-math/easing.h>
 
 #include "funcs.h"
@@ -179,5 +180,9 @@ inline auto slideIn(SlideFrom from) {
         return slideIn(from, child);
     };
 }
+
+/* --- Carousel ------------------------------------------------------------- */
+
+Child carousel(usize selected, Children children, Layout::Flow flow = Layout::Flow::LEFT_TO_RIGHT);
 
 } // namespace Karm::Ui

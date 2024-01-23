@@ -1,5 +1,6 @@
 #include <hideo-base/navbar.h>
 #include <karm-sys/entry.h>
+#include <karm-ui/anim.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scafold.h>
 
@@ -45,21 +46,6 @@ struct Clock : public Ui::View<Clock> {
     }
 };
 
-Ui::Child page(State const &s) {
-    switch (s.page) {
-    case Page::CLOCK:
-        return makeStrong<Clock>(Sys::dateTime().time);
-    case Page::STOPWATCH:
-        return Ui::labelLarge("Stopwatch");
-    case Page::TIMER:
-        return Ui::labelLarge("Timer");
-    case Page::ALARM:
-        return Ui::labelLarge("Alarm");
-    default:
-        return Ui::labelLarge("Unknown");
-    }
-}
-
 Ui::Child app() {
     return Ui::reducer<Model>(
         [](State const &s) {
@@ -68,31 +54,43 @@ Ui::Child app() {
                 .title = "Clock",
                 .titlebar = Ui::TitlebarStyle::DIALOG,
                 .body = [&] {
+                    auto navbar = Hideo::navbar(
+                        Hideo::navbarItem(
+                            Mdi::ALARM,
+                            "Alarm",
+                            s.page == Page::ALARM,
+                            Model::bind(Page::ALARM)),
+                        Hideo::navbarItem(
+                            Mdi::CLOCK_OUTLINE,
+                            "Clock",
+                            s.page == Page::CLOCK,
+                            Model::bind(Page::CLOCK)),
+                        Hideo::navbarItem(
+                            Mdi::TIMER_SAND,
+                            "Timer",
+                            s.page == Page::TIMER,
+                            Model::bind(Page::TIMER)),
+                        Hideo::navbarItem(
+                            Mdi::TIMER_OUTLINE,
+                            "Stopwatch",
+                            s.page == Page::STOPWATCH,
+                            Model::bind(Page::STOPWATCH)));
+
+                    auto body = Ui::carousel(
+                        (isize)s.page,
+                        {
+                            Ui::labelLarge("Alarm"),
+                            makeStrong<Clock>(Sys::dateTime().time),
+                            Ui::labelLarge("Timer"),
+                            Ui::labelLarge("Stopwatch"),
+                        });
+
                     return Ui::vflow(
                         Ui::vflow(
-                            Ui::titleLarge(toStr(s.page)) | Ui::hcenter(), page(s) | Ui::grow()) |
+                            Ui::titleLarge(toStr(s.page)) | Ui::hcenter(),
+                            body | Ui::grow()) |
                             Ui::spacing({8, 24, 8, 0}) | Ui::grow(),
-                        Hideo::navbar(
-                            Hideo::navbarItem(
-                                Mdi::ALARM,
-                                "Alarm",
-                                s.page == Page::ALARM,
-                                Model::bind(Page::ALARM)),
-                            Hideo::navbarItem(
-                                Mdi::CLOCK_OUTLINE,
-                                "Clock",
-                                s.page == Page::CLOCK,
-                                Model::bind(Page::CLOCK)),
-                            Hideo::navbarItem(
-                                Mdi::TIMER_SAND,
-                                "Timer",
-                                s.page == Page::TIMER,
-                                Model::bind(Page::TIMER)),
-                            Hideo::navbarItem(
-                                Mdi::TIMER_OUTLINE,
-                                "Stopwatch",
-                                s.page == Page::STOPWATCH,
-                                Model::bind(Page::STOPWATCH))));
+                        navbar);
                 },
             });
         });

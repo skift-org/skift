@@ -8,6 +8,7 @@
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
+#include "demo-carousel.h"
 #include "demo-circle.h"
 #include "demo-gradient.h"
 #include "demo-hello.h"
@@ -25,6 +26,7 @@ static Array DEMOS = {
     &HELLO_DEMO,
     &ICONS_DEMO,
     &INPUTS_DEMO,
+    &CAROUSEL_DEMO,
     &STROKE_DEMO,
     &SVG_DEMO,
     &TEXT_DEMO,

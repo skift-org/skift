@@ -466,7 +466,7 @@ struct FlowLayout : public GroupNode<FlowLayout> {
         GroupNode::reconcile(o);
     }
 
-    f64 computeGrowUnit(Math::Recti r) {
+    f64 _computeGrowUnit(Math::Recti r) {
         f64 total = 0;
         f64 grows = 0;
 
@@ -486,7 +486,7 @@ struct FlowLayout : public GroupNode<FlowLayout> {
     void layout(Math::Recti r) override {
         _bound = r;
 
-        f64 growUnit = computeGrowUnit(r);
+        f64 growUnit = _computeGrowUnit(r);
         f64 start = _style.flow.getStart(r);
 
         for (auto &child : children()) {

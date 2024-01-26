@@ -5,10 +5,31 @@ namespace Karm::Math {
 /* --- Unsigned Big Integer ------------------------------------------------- */
 
 void _add(UBig &lhs, usize rhs) {
-    // FIXME: make this more efficient, right now we are
-    //        allocating a new UBig for every increment
-    UBig rhsBig{rhs};
-    _add(lhs, rhsBig);
+    auto lhsLen = lhs._len();
+
+    usize carry = 0;
+    usize curr = 0;
+    if (willAddOverflow(rhs, lhs._value[0]))
+        curr = 1;
+
+    usize res = rhs + lhs._value[0];
+    if (willAddOverflow(res, carry))
+        curr = 1;
+
+    res += carry;
+    carry = curr;
+    lhs._value[0] = res;
+
+    for (usize i = 1; carry && lhsLen > i; i++) {
+        usize curr = 0;
+        if (willAddOverflow(lhs._value[i], carry))
+            curr = 1;
+        lhs._value[i] += carry;
+        carry = curr;
+    }
+
+    if (carry)
+        lhs._value.pushBack(carry);
 }
 
 void _add(UBig &lhs, UBig const &rhs) {
@@ -46,10 +67,38 @@ void _add(UBig &lhs, UBig const &rhs) {
 }
 
 SubResult _sub(UBig &lhs, usize rhs) {
-    // FIXME: make this more efficient, right now we are
-    //        allocating a new UBig for every subtraction
-    UBig rhsBig{rhs};
-    return _sub(lhs, rhsBig);
+    u8 borrow = 0;
+    for (size_t i = 0; i < lhs._len(); i++) {
+        usize rhsV = i < 1 ? rhs : 0;
+
+        usize lhsV = lhs._value[i];
+
+        // apply the borrow
+        if (borrow) {
+            if (lhsV == 0) {
+                lhsV = MAX<usize>;
+                borrow = 1;
+            } else {
+                lhsV--;
+                borrow = 0;
+            }
+        }
+
+        // do we need to borrow?
+        if (lhsV < rhsV) {
+            rhsV -= lhsV;
+            lhsV = (MAX<usize> - rhsV) + 1;
+            borrow = 1;
+        }
+
+        lhsV -= rhsV;
+        lhs._value[i] = lhsV;
+    }
+
+    if (borrow)
+        return SubResult::UNDERFLOW;
+
+    return SubResult::OK;
 }
 
 SubResult _sub(UBig &lhs, UBig const &rhs) {

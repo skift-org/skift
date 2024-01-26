@@ -1,4 +1,5 @@
 import os
+import subprocess
 import logging
 
 from cutekit import shell
@@ -38,6 +39,8 @@ class Qemu(Machine):
             ovmf = shell.wget(
                 "https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd"
             )
+        
+        supportsSDL = 'sdl' in str(subprocess.check_output(["qemu-system-x86_64", "-display", "help"]))
 
         qemuCmd: list[str] = [
             "qemu-system-x86_64",
@@ -45,8 +48,10 @@ class Qemu(Machine):
             "q35",
             "-no-reboot",
             "-no-shutdown",
+            "-chardev",
+            "stdio,id=char0,signal=on",
             "-serial",
-            "mon:stdio",
+            "chardev:char0",
             "-bios",
             ovmf,
             "-m",
@@ -54,10 +59,10 @@ class Qemu(Machine):
             "-smp",
             "4",
             "-drive",
-            f"file=fat:rw:{image.finalize()},media=disk,format=raw",
-            "-display",
-            "sdl",
+            f"file=fat:rw:{image.finalize()},media=disk,format=raw"
         ]
+
+        qemuCmd += ["-display", "sdl" if supportsSDL else "gtk"]
 
         if self.logError:
             qemuCmd += ["-d", "int,guest_errors,cpu_reset"]

@@ -15,7 +15,7 @@ Res<> _syscall(Syscall s, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4
                  : "memory", "r11", "rcx");
 
     if (c != Error::Code::_OK)
-        return Error(c);
+        return Error(c, nullptr);
 
     return Ok();
 }

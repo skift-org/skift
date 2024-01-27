@@ -72,10 +72,6 @@ struct [[nodiscard]] Error {
 
     constexpr Error() : _code(Code::OTHER), _msg("unknown error") {}
 
-    constexpr Error(Code code) : _code(code) {}
-
-    constexpr Error(char const *msg) : _code(OTHER), _msg(msg) {}
-
     constexpr Error(Code code, char const *msg) : _code(code), _msg(msg) {}
 
     constexpr Code code() const { return _code; }

@@ -32,7 +32,7 @@ struct Args : public _Args {
     }
 
     Res<usize> format(Io::SScan &scan, Io::TextWriter &writer, usize index) override {
-        Res<usize> result = Error("format index out of range");
+        Res<usize> result = Error::invalidData("format index out of range");
         usize i = 0;
         _tuple.visit([&](auto const &t) {
             if (index == i) {

@@ -34,16 +34,16 @@ static constexpr Level WARNING = {2, "warn ", Cli::YELLOW};
 static constexpr Level ERROR = {3, "error", Cli::RED};
 static constexpr Level FATAL = {4, "fatal", Cli::style(Cli::RED).bold()};
 
-inline void _log(Level level, Format format, Io::_Args &args) {
+inline void _log(Level level, Format fmt, Io::_Args &args) {
     Logger::_Embed::loggerLock();
 
     if (level.value != -1) {
         Io::format(Logger::_Embed::loggerOut(), "{} ", Cli::styled(level.name, level.style)).unwrap();
-        Io::format(Logger::_Embed::loggerOut(), "{}{}:{}: ", Cli::reset().fg(Cli::GRAY_DARK), format.loc.file, format.loc.line).unwrap();
+        Io::format(Logger::_Embed::loggerOut(), "{}{}:{}: ", Cli::reset().fg(Cli::GRAY_DARK), fmt.loc.file, fmt.loc.line).unwrap();
     }
 
     Io::format(Logger::_Embed::loggerOut(), "{}", Cli::reset()).unwrap();
-    Io::_format(Logger::_Embed::loggerOut(), format.str, args).unwrap();
+    Io::_format(Logger::_Embed::loggerOut(), fmt.str, args).unwrap();
     Io::format(Logger::_Embed::loggerOut(), "{}\n", Cli::reset()).unwrap();
     Logger::_Embed::loggerOut().flush().unwrap();
 

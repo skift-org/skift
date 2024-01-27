@@ -14,6 +14,8 @@ Error fromErrno(isize error) {
     }
 
     switch (error) {
+    case 0:
+        return Error::other("success");
     case E2BIG:
         return Error::argumentListTooLong("argument list too long");
     case EACCES:
@@ -165,7 +167,7 @@ Error fromErrno(isize error) {
     case EXDEV:
         return Error::invalidInput("cross-device link");
     default:
-        return Error::OTHER;
+        return Error::other("unknown errno");
     }
 }
 

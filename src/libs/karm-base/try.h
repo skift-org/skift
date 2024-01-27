@@ -5,10 +5,20 @@
 #include "bool.h"
 #include "std.h"
 
+#if defined(__ck_debug__) && !defined(KARM_DISABLE_TRY_FAIL_HOOK)
+// Give us a symbole to break one when debbuging error
+// handling.
+extern "C" void __try_failled();
+#    define __tryFail() __try_failled()
+#else
+#    define __tryFail() /* NOP */
+#endif
+
 #define try$(EXPR)                           \
     ({                                       \
         auto __expr = (EXPR);                \
         if (not static_cast<bool>(__expr)) { \
+            __tryFail();                     \
             return __expr.none();            \
         }                                    \
         __expr.take();                       \
@@ -18,6 +28,7 @@
     ({                                       \
         auto __expr = (EXPR);                \
         if (not static_cast<bool>(__expr)) { \
+            __tryFail();                     \
             co_return __expr.none();         \
         }                                    \
         __expr.take();                       \
@@ -27,6 +38,7 @@
     ({                                       \
         auto __expr = co_await (EXPR);       \
         if (not static_cast<bool>(__expr)) { \
+            __tryFail();                     \
             co_return __expr.none();         \
         }                                    \
         __expr.take();                       \

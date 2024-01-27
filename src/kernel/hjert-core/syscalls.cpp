@@ -212,7 +212,7 @@ Res<> doListen(Task &self, Hj::Cap cap, Hj::Cap target, Flags<Hj::Sigs> set, Fla
 Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<Hj::Event> events, User<usize> evLen, TimeStamp deadline) {
     auto obj = try$(self.domain().get<Listener>(cap));
 
-    try$(self.block([&]() {
+    try$(self.block([&] {
         auto events = obj->poll();
         if (events.len() > 0)
             return TimeStamp::epoch();

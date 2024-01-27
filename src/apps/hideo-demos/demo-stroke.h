@@ -10,7 +10,7 @@ static inline Demo STROKE_DEMO{
     Mdi::VECTOR_LINE,
     "Strokes",
     "Strokes styling and rendering",
-    []() {
+    [] {
         return Ui::canvas(
             [](Gfx::Context &g, ...) {
                 g.begin();

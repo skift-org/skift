@@ -93,7 +93,7 @@ struct Cmap : public Io::BChunk {
         s.skip(2);
         usize numTables = s.nextU16be();
 
-        return Iter{[this, s, i = 0uz, numTables]() mutable -> Opt<Table> {
+        return Iter{[this, s, i = 0uz, numTables] mutable -> Opt<Table> {
             if (i == numTables) {
                 return NONE;
             }

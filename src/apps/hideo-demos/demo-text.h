@@ -13,7 +13,7 @@ static inline Demo TEXT_DEMO{
     Mdi::TEXT,
     "Typography",
     "Typography",
-    []() {
+    [] {
         return Ui::vflow(
                    Hideo::treeRow(
                        slot$(Ui::icon(Mdi::TEXT)), "Display", NONE,

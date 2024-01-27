@@ -56,7 +56,7 @@ Ui::Child app() {
         return Ui::scafold({
             .icon = Mdi::DUCK,
             .title = "Demos",
-            .sidebar = [&]() {
+            .sidebar = [&] {
                 return Hideo::sidenav(
                     iter(DEMOS)
                         .mapi([&](Demo const *demo, usize index) {
@@ -68,7 +68,7 @@ Ui::Child app() {
                         })
                         .collect<Ui::Children>());
             },
-            .body = [&]() {
+            .body = [&] {
                 return DEMOS[s.current]->build();
             },
         });

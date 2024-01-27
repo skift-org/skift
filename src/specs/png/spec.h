@@ -101,7 +101,7 @@ struct Image {
             u32 crc32;
         };
 
-        return Iter{[s]() mutable -> Opt<Chunk> {
+        return Iter{[s] mutable -> Opt<Chunk> {
             Chunk c;
 
             c.len = s.nextI32be();

@@ -14,7 +14,7 @@ static inline Demo SVG_DEMO{
     Mdi::SVG,
     "SVG",
     "SVG rendering",
-    []() {
+    [] {
         return Ui::canvas(
             [](Gfx::Context &g, ...) {
                 g.begin();

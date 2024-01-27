@@ -295,14 +295,14 @@ using Slots = Func<Children()>;
 
 #define slot$(EXPR)      \
     Karm::Ui::Slot {     \
-        [=]() {          \
+        [=] {            \
             return EXPR; \
         }                \
     }
 
 #define slots$(...)               \
     Karm::Ui::Slots {             \
-        [=]() -> Ui::Children {   \
+        [=] -> Ui::Children {     \
             return {__VA_ARGS__}; \
         }                         \
     }

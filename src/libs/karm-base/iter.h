@@ -13,7 +13,7 @@ struct Iter {
     constexpr Iter(Next next) : next(next) {}
 
     constexpr auto map(auto f) {
-        auto n = [=, *this]() mutable -> Opt<decltype(f(*Meta::declval<Item>()))> {
+        auto n = [=, *this] mutable -> Opt<decltype(f(*Meta::declval<Item>()))> {
             auto v = next();
 
             if (not v) {
@@ -27,7 +27,7 @@ struct Iter {
     }
 
     constexpr auto mapi(auto f) {
-        auto n = [=, *this, index = 0uz]() mutable -> Opt<decltype(f(*Meta::declval<Item>(), 1uz))> {
+        auto n = [=, *this, index = 0uz] mutable -> Opt<decltype(f(*Meta::declval<Item>(), 1uz))> {
             auto v = next();
             index++;
 
@@ -42,7 +42,7 @@ struct Iter {
     }
 
     constexpr auto filter(auto f) {
-        auto n = [=, *this]() mutable -> Item {
+        auto n = [=, *this] mutable -> Item {
             auto v = next();
             if (not v) {
                 return NONE;
@@ -143,7 +143,7 @@ struct Iter {
     }
 
     constexpr auto cycle(usize n) {
-        return Iter{[start = *this, curr = *this, i = 0, n]() mutable {
+        return Iter{[start = *this, curr = *this, i = 0, n] mutable {
             auto v = curr.next();
 
             if (not v and i < n) {
@@ -157,7 +157,7 @@ struct Iter {
     }
 
     constexpr auto take(usize n) {
-        return Iter{[=, *this]() mutable {
+        return Iter{[=, *this] mutable {
             if (n == 0) {
                 return NONE;
             }
@@ -170,7 +170,7 @@ struct Iter {
 
     constexpr auto prepend(auto v) {
         return Iter{
-            [=, *this, first = true]() mutable -> Item {
+            [=, *this, first = true] mutable -> Item {
                 if (first)
                     return Item{v};
 
@@ -180,7 +180,7 @@ struct Iter {
 
     constexpr auto append(auto v) {
         return Iter{
-            [=, *this, last = true]() mutable -> Item {
+            [=, *this, last = true] mutable -> Item {
                 auto result = next();
 
                 if (not result and last) {
@@ -311,7 +311,7 @@ struct Iter {
 
 template <typename T>
 constexpr auto single(T value) {
-    return Iter<None>{[value, end = false]() mutable {
+    return Iter<None>{[value, end = false] mutable {
         if (end) {
             return NONE;
         }
@@ -323,7 +323,7 @@ constexpr auto single(T value) {
 
 template <typename T>
 constexpr auto repeat(T value, usize count) {
-    return Iter{[value, count]() mutable -> Opt<T> {
+    return Iter{[value, count] mutable -> Opt<T> {
         if (count == 0) {
             return NONE;
         }
@@ -335,7 +335,7 @@ constexpr auto repeat(T value, usize count) {
 
 template <typename T>
 constexpr auto range(T end) {
-    return Iter{[value = static_cast<T>(0), end]() mutable -> Opt<T> {
+    return Iter{[value = static_cast<T>(0), end] mutable -> Opt<T> {
         if (value >= end) {
             return NONE;
         }
@@ -346,7 +346,7 @@ constexpr auto range(T end) {
 
 template <typename T>
 constexpr auto range(T start, T end) {
-    return Iter{[value = start, start, end]() mutable -> Opt<T> {
+    return Iter{[value = start, start, end] mutable -> Opt<T> {
         if (value >= end) {
             return NONE;
         }
@@ -363,7 +363,7 @@ constexpr auto range(T start, T end) {
 
 template <typename T>
 constexpr auto range(T start, T end, T step) {
-    return Iter{[value = start, start, end, step]() mutable -> Opt<T> {
+    return Iter{[value = start, start, end, step] mutable -> Opt<T> {
         if (value >= end) {
             return NONE;
         }

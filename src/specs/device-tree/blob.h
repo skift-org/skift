@@ -64,7 +64,7 @@ struct Blob {
         auto s = begin();
         s.skip(header().offMemRsvmap);
         return Iter{
-            [s]() mutable -> Opt<Reserved> {
+            [s] mutable -> Opt<Reserved> {
                 if (s.ended()) {
                     return NONE;
                 }

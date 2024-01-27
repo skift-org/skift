@@ -139,7 +139,7 @@ struct Font {
             u32 length;
         };
 
-        return Iter{[scan, i = 0uz, numTables]() mutable -> Opt<Table> {
+        return Iter{[scan, i = 0uz, numTables] mutable -> Opt<Table> {
             if (i == numTables) {
                 return NONE;
             }

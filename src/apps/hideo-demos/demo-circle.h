@@ -10,7 +10,7 @@ static inline Demo CIRCLE_DEMO{
     Mdi::CIRCLE,
     "Circles",
     "Circles rendering",
-    []() {
+    [] {
         return Ui::canvas(
             [](Gfx::Context &g, Math::Vec2i size) {
                 Math::Rand rand{};

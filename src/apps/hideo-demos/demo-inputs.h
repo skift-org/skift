@@ -19,7 +19,7 @@ static inline Demo INPUTS_DEMO{
     Mdi::LIST_BOX_OUTLINE,
     "Inputs",
     "Form inputs widgets",
-    []() {
+    [] {
         auto button = Hideo::buttonRow(
             willShowMessage,
             "Cool duck app", "Install");

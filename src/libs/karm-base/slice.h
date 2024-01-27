@@ -195,7 +195,7 @@ usize sizeOf(S const &slice) {
 
 template <Sliceable S>
 constexpr auto iter(S const &slice) {
-    return Iter([&slice, i = 0uz]() mutable -> typename S::Inner const * {
+    return Iter([&slice, i = 0uz] mutable -> typename S::Inner const * {
         if (i >= slice.len()) {
             return nullptr;
         }
@@ -206,7 +206,7 @@ constexpr auto iter(S const &slice) {
 
 template <Sliceable S>
 constexpr auto iterRev(S const &slice) {
-    return Iter([&slice, i = slice.len()]() mutable -> typename S::Inner const * {
+    return Iter([&slice, i = slice.len()] mutable -> typename S::Inner const * {
         if (i == 0) {
             return nullptr;
         }
@@ -217,7 +217,7 @@ constexpr auto iterRev(S const &slice) {
 
 template <MutSliceable S>
 constexpr auto mutIter(S &slice) {
-    return Iter([&slice, i = 0uz]() mutable -> typename S::Inner * {
+    return Iter([&slice, i = 0uz] mutable -> typename S::Inner * {
         if (i >= slice.len()) {
             return nullptr;
         }
@@ -228,7 +228,7 @@ constexpr auto mutIter(S &slice) {
 
 template <MutSliceable S>
 constexpr auto mutIterRev(S &slice) {
-    return Iter([&slice, i = slice.len()]() mutable -> typename S::Inner * {
+    return Iter([&slice, i = slice.len()] mutable -> typename S::Inner * {
         if (i == 0) {
             return nullptr;
         }
@@ -239,7 +239,7 @@ constexpr auto mutIterRev(S &slice) {
 
 template <Sliceable S>
 constexpr auto iterSplit(S &slice, typename S::Inner const &sep) {
-    return Iter([&slice, sep, i = 0uz]() mutable -> Opt<Slice<typename S::Inner>> {
+    return Iter([&slice, sep, i = 0uz] mutable -> Opt<Slice<typename S::Inner>> {
         if (i >= slice.len()) {
             return NONE;
         }

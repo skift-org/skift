@@ -14,7 +14,7 @@ static inline Demo CAROUSEL_DEMO{
     Mdi::VIEW_CAROUSEL,
     "Carousel",
     "Carousel",
-    []() {
+    [] {
         return Ui::state(
             0,
             [](isize state, auto bind) {

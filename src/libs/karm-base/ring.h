@@ -122,7 +122,7 @@ struct Ring {
     usize len() const { return _len; }
 
     constexpr auto iter() {
-        return Iter([&, i = 0uz]() mutable -> T * {
+        return Iter([&, i = 0uz] mutable -> T * {
             if (i >= _len) {
                 return nullptr;
             }
@@ -132,7 +132,7 @@ struct Ring {
     }
 
     constexpr auto iter() const {
-        return Iter([&, i = 0uz]() mutable -> T const * {
+        return Iter([&, i = 0uz] mutable -> T const * {
             if (i >= _len) {
                 return nullptr;
             }
@@ -142,7 +142,7 @@ struct Ring {
     }
 
     constexpr auto iterRev() {
-        return Iter([&, i = _len]() mutable -> T * {
+        return Iter([&, i = _len] mutable -> T * {
             if (i == 0) {
                 return nullptr;
             }
@@ -153,7 +153,7 @@ struct Ring {
     }
 
     constexpr auto iterRev() const {
-        return Iter([&, i = _len]() mutable -> T const * {
+        return Iter([&, i = _len] mutable -> T const * {
             if (i == 0) {
                 return nullptr;
             }

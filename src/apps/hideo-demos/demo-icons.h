@@ -13,7 +13,7 @@ static inline Demo ICONS_DEMO{
     Mdi::COFFEE,
     "Icons",
     "Icons rendering",
-    []() {
+    [] {
         auto codepoints = Mdi::codepoints();
         auto iconLen = codepoints.len();
         Ui::GridStyle style = Ui::GridStyle::simpleFixed({((isize)iconLen / 8 + 1), 64}, {8, 64});

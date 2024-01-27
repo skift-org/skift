@@ -10,7 +10,7 @@ static inline Demo GRADIENT_DEMO{
     Mdi::GRADIENT_HORIZONTAL,
     "Gradients",
     "Gradients rendering",
-    []() {
+    [] {
         return Ui::canvas(
             [](Gfx::Context &g, Math::Vec2i bound) {
                 // Red, orange, yellow, green, blue, indigo, violet

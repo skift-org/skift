@@ -113,7 +113,7 @@ struct Path {
     Math::Trans2f _trans = Math::Trans2f::identity();
 
     auto iterSegs() const {
-        return Iter([&, i = 0uz]() mutable -> Opt<Seg> {
+        return Iter([&, i = 0uz] mutable -> Opt<Seg> {
             if (i >= _segs.len()) {
                 return NONE;
             }

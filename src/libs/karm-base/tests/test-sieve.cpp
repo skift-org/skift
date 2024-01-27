@@ -7,7 +7,7 @@ test$(sieveAccess) {
     Sieve<int, int> cache{10};
 
     for (int i = 0; i < 10; i++) {
-        (void)cache.access(i, [&]() {
+        (void)cache.access(i, [&] {
             return i * 10;
         });
     }
@@ -23,7 +23,7 @@ test$(sieveAccess) {
 test$(sieveContains) {
     Sieve<int, int> cache{10};
     expect$(not cache.contains(0));
-    (void)cache.access(0, [&]() {
+    (void)cache.access(0, [&] {
         return 0;
     });
     expect$(cache.contains(0));
@@ -33,13 +33,13 @@ test$(sieveContains) {
 test$(sieveLen) {
     Sieve<int, int> cache{10};
     expectEq$(cache.len(), 0uz);
-    (void)cache.access(0, [&]() {
+    (void)cache.access(0, [&] {
         return 0;
     });
     expectEq$(cache.len(), 1uz);
 
     for (int i = 1; i < 10; i++) {
-        (void)cache.access(i, [&]() {
+        (void)cache.access(i, [&] {
             return i * 10;
         });
     }
@@ -52,7 +52,7 @@ test$(seiveEvict) {
     Sieve<int, int> cache{10};
 
     for (int i = 0; i < 10; i++) {
-        (void)cache.access(i, [&]() {
+        (void)cache.access(i, [&] {
             return i * 10;
         });
     }
@@ -62,7 +62,7 @@ test$(seiveEvict) {
         expectEq$(val, i * 10);
     }
 
-    (void)cache.access(10, [&]() {
+    (void)cache.access(10, [&] {
         return 10 * 10;
     });
 

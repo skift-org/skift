@@ -210,11 +210,9 @@ struct Image {
     }
 
     auto sections() {
-        return Iter([header = &header(), index = 0]() mutable -> Opt<Section> {
-            if (index >= header->shnum) {
+        return Iter([header = &header(), index = 0] mutable -> Opt<Section> {
+            if (index >= header->shnum)
                 return NONE;
-            }
-
             auto section = Section{header, header->sectionAt(index)};
             index++;
             return section;
@@ -231,7 +229,7 @@ struct Image {
     }
 
     auto programs() {
-        return Iter([header = &header(), index = 0]() mutable -> Opt<Program> {
+        return Iter([header = &header(), index = 0] mutable -> Opt<Program> {
             if (index >= header->phnum) {
                 return NONE;
             }

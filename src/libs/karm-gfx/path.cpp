@@ -393,16 +393,16 @@ Opt<Path::Op> Path::parseOp(Io::SScan &scan, Rune opcode) {
     flags |= isAsciiLower(opcode) ? RELATIVE : DEFAULT;
     opcode = toAsciiLower(opcode);
 
-    auto nextSep = [&]() {
+    auto nextSep = [&] {
         scan.skip(Re::optSeparator(','));
     };
 
-    auto nextCoord = [&]() -> Opt<f64> {
+    auto nextCoord = [&] -> Opt<f64> {
         nextSep();
         return try$(scan.nextFloat());
     };
 
-    auto nextCoordPair = [&]() -> Opt<Math::Vec2f> {
+    auto nextCoordPair = [&] -> Opt<Math::Vec2f> {
         auto r = Math::Vec2f{try$(nextCoord()), try$(nextCoord())};
         nextSep();
         return r;

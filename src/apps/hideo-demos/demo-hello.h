@@ -11,7 +11,7 @@ static inline Demo HELLO_DEMO{
     Mdi::HAND_WAVE,
     "Hello, world!",
     "Hello, world!",
-    []() {
+    [] {
         return Ui::vflow(
                    16,
                    Layout::Align::CENTER,

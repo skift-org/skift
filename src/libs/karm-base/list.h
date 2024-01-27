@@ -336,7 +336,7 @@ struct List {
 
     template <typename Self>
     static auto _iter(Self *self) {
-        return Iter([curr = self->_ll.head()]() mutable -> T * {
+        return Iter([curr = self->_ll.head()] mutable -> T * {
             if (curr) {
                 auto &ret = curr->value;
                 curr = curr->item.next;
@@ -348,7 +348,7 @@ struct List {
 
     template <typename Self>
     static auto _iterRev(Self *self) {
-        return Iter([curr = self->_ll.tail()]() mutable -> T * {
+        return Iter([curr = self->_ll.tail()] mutable -> T * {
             if (curr) {
                 auto &ret = curr->value;
                 curr = curr->item.prev;

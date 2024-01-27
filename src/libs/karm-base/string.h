@@ -140,7 +140,7 @@ template <
     typename U = typename E::Unit>
 auto iterRunes(S const &slice) {
     Cursor<U> cursor(slice);
-    return Iter([cursor]() mutable -> Opt<Rune> {
+    return Iter([cursor] mutable -> Opt<Rune> {
         if (cursor.ended()) {
             return NONE;
         }

@@ -427,7 +427,7 @@ struct Grow : public ProxyNode<Grow> {
 Child grow(Opt<Child> child) {
     return makeStrong<Grow>(tryOrElse(
         child,
-        []() {
+        [] {
             return empty();
         }));
 }
@@ -437,7 +437,7 @@ Child grow(isize grow, Opt<Child> child) {
         grow,
         tryOrElse(
             child,
-            []() {
+            [] {
                 return empty();
             }));
 }

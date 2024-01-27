@@ -10,7 +10,7 @@ Ui::Child app() {
         .icon = Mdi::INFORMATION,
         .title = "About",
         .titlebar = Ui::TitlebarStyle::DIALOG,
-        .body = []() {
+        .body = [] {
             auto licenseBtn = Ui::button(
                 [](auto &n) {
                     Ui::showDialog(n, Ui::licenseDialog());

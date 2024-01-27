@@ -29,10 +29,13 @@ static inline Str toStr(Page page) {
 }
 
 struct State {
+    DateTime dateTime;
     Page page = Page::_DEFAULT;
 };
 
-using Action = Var<Page>;
+struct TimeTick {};
+
+using Action = Var<Page, TimeTick>;
 
 void reduce(State &, Action);
 

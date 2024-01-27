@@ -110,7 +110,7 @@ Ui::Child editorFilterControls(Gfx::Filter const &filter) {
                 f.amount,
                 T::RANGE,
                 [](auto &n, auto v) {
-                    Model::dispatch(n, SetFilter{T{v}});
+                    Model::bubble(n, SetFilter{T{v}});
                 },
                 Mdi::DRAG_VERTICAL_VARIANT);
         }});
@@ -122,7 +122,7 @@ Ui::Child editorFilters(State const &s) {
         tiles.pushBack(
             editorFilterTile(
                 [](auto &n) {
-                    Model::dispatch(n, SetFilter{T{}});
+                    Model::bubble(n, SetFilter{T{}});
                 },
                 s.filter.is<T>() ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
                 editorFilterIcon<T>(),

@@ -125,9 +125,7 @@ struct Host : public Node {
 
     virtual void flip(Slice<Math::Recti> regions) = 0;
 
-    virtual void pump() = 0;
-
-    virtual void wait(TimeSpan) = 0;
+    virtual Res<> wait(TimeStamp) = 0;
 
     bool alive() {
         return not _res;
@@ -184,6 +182,17 @@ struct Host : public Node {
         _dirty.clear();
     }
 
+    void layout(Math::Recti r) override {
+        _perf.record(PerfEvent::LAYOUT);
+        _root->layout(r);
+        auto elapsed = _perf.end();
+        static usize maxStutter = 1;
+        if (elapsed.toMSecs() > maxStutter) {
+            logWarn("Stutter detected, layout took {}ms for {} nodes alive", elapsed.toMSecs(), debugNodeCount);
+            maxStutter = elapsed.toMSecs();
+        }
+    }
+
     void event(Sys::Event &e) override {
         _perf.record(PerfEvent::INPUT);
         _root->event(e);
@@ -215,17 +224,6 @@ struct Host : public Node {
             });
     }
 
-    void layout(Math::Recti r) override {
-        _perf.record(PerfEvent::LAYOUT);
-        _root->layout(r);
-        auto elapsed = _perf.end();
-        static usize maxStutter = 1;
-        if (elapsed.toMSecs() > maxStutter) {
-            logWarn("Stutter detected, layout took {}ms for {} nodes alive", elapsed.toMSecs(), debugNodeCount);
-            maxStutter = 1;
-        }
-    }
-
     void doLayout() {
         layout(bound());
         _shouldLayout = false;
@@ -243,33 +241,35 @@ struct Host : public Node {
         doPaint();
 
         auto lastFrame = Sys::now();
+        auto nextFrame = lastFrame;
+
+        auto scheduleFrame = [&]() {
+            auto instant = Sys::now();
+
+            if (instant < nextFrame)
+                return false;
+
+            while (nextFrame < instant)
+                nextFrame += TimeSpan::fromMSecs(FRAME_TIME * 1000);
+
+            lastFrame = nextFrame;
+            return true;
+        };
+
         while (not _res) {
-            isize waitTime = -1;
-            if (_shouldAnimate) {
-                auto elapsed = Sys::now() - lastFrame;
-                waitTime = ((FRAME_TIME * 1000) - elapsed.toMSecs());
-                if (waitTime < 0)
-                    waitTime = 0;
-            }
+            try$(wait(nextFrame));
 
-            wait(TimeSpan::fromMSecs(waitTime));
-            lastFrame = Sys::now();
-
-            if (_shouldAnimate) {
+            if (_shouldAnimate and scheduleFrame()) {
                 _shouldAnimate = false;
                 auto e = Sys::makeEvent<Node::AnimateEvent>(Sys::Propagation::DOWN, FRAME_TIME);
                 event(*e);
             }
 
-            pump();
-
-            if (_shouldLayout) {
+            if (_shouldLayout)
                 doLayout();
-            }
 
-            if (_dirty.len() > 0) {
+            if (_dirty.len() > 0)
                 doPaint();
-            }
         }
 
         return _res.unwrap();

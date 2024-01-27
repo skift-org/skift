@@ -280,10 +280,6 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
         }
     }
 
-    void layout(Math::Recti rect) override {
-        child().layout(rect);
-    }
-
     Math::Vec2i size(Math::Vec2i s, Layout::Hint) override {
         if (s.x < s.y)
             return {s.x, (isize)(s.x * _ratio)};
@@ -304,13 +300,6 @@ Child aspectRatio(f64 ratio, Child child) {
 
 struct StackLayout : public GroupNode<StackLayout> {
     using GroupNode::GroupNode;
-
-    void layout(Math::Recti r) override {
-        _bound = r;
-        for (auto &child : children()) {
-            child->layout(r);
-        }
-    }
 
     void event(Sys::Event &e) override {
         if (e.accepted())

@@ -89,7 +89,7 @@ Ui::Child hsvPicker(Gfx::Hsv value, Ui::OnChange<Gfx::Hsv> onChange) {
 
 Ui::Child hsvPicker(State const &state) {
     return hsvPicker(state.hsv, [](auto &n, auto hsv) {
-        Model::dispatch(n, UpdateHsv{hsv});
+        Model::bubble(n, UpdateHsv{hsv});
     });
 }
 
@@ -124,7 +124,7 @@ Ui::Child valueSlider(State const &state) {
     return sliderThumb(Gfx::hsvToRgb(hsv)) |
            Ui::end() |
            Ui::slider(hsv.value, [hsv](auto &n, auto v) {
-               Model::dispatch(n, UpdateHsv{hsv.withValue(v)});
+               Model::bubble(n, UpdateHsv{hsv.withValue(v)});
            }) |
            Ui::box({
                .padding = 3,
@@ -154,7 +154,7 @@ Ui::Child saturationSlider(State const &state) {
     return sliderThumb(Gfx::hsvToRgb(hsv.withValue(1))) |
            Ui::end() |
            Ui::slider(hsv.saturation, [hsv](auto &n, auto v) {
-               Model::dispatch(n, UpdateHsv{hsv.withSaturation(v)});
+               Model::bubble(n, UpdateHsv{hsv.withSaturation(v)});
            }) |
            Ui::box({
                .padding = 3,
@@ -172,7 +172,7 @@ Ui::Child hueSlider(State const &state) {
     return sliderThumb(Gfx::hsvToRgb(hsv.withSaturation(1).withValue(1))) |
            Ui::end() |
            Ui::slider(hsv.hue / 360, [hsv](auto &n, auto v) {
-               Model::dispatch(n, UpdateHsv{hsv.withHue(v * 360)});
+               Model::bubble(n, UpdateHsv{hsv.withHue(v * 360)});
            }) |
            Ui::box({
                .padding = 3,

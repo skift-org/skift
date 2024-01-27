@@ -1,5 +1,5 @@
 #include <hideo-base/navbar.h>
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scafold.h>
@@ -96,8 +96,19 @@ Ui::Child app() {
         });
 }
 
+Async::Task<> timerTask(Ui::Child app) {
+    while (not Sys::globalSched().exited()) {
+        logInfo("tick");
+        co_try_await$(Sys::globalSched().sleepAsync(Sys::now() + TimeSpan::fromSecs(1)));
+        Model::event<TimeTick>(*app);
+    }
+    co_return Ok();
+}
+
 } // namespace Hideo::Clock
 
-Res<> entryPoint(Sys::Ctx &ctx) {
-    return Ui::runApp(ctx, Hideo::Clock::app());
+Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+    auto app = Hideo::Clock::app();
+    (void)Sys::run(Hideo::Clock::timerTask(app));
+    co_return Ui::runApp(ctx, app);
 }

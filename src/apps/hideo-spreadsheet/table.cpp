@@ -59,7 +59,7 @@ struct Table : public Ui::View<Table> {
                 if (m.type == Events::MouseEvent::PRESS) {
                     auto cell = sheet().cellAt(pos - Math::Vec2i{CELL_WIDTH, CELL_HEIGHT});
                     if (cell) {
-                        Model::dispatch(*this, UpdateSelection{Range{*cell}});
+                        Model::bubble(*this, UpdateSelection{Range{*cell}});
                     }
                 } else if (m.type == Events::MouseEvent::MOVE and
                            (m.buttons & Events::Button::LEFT) == Events::Button::LEFT) {
@@ -69,7 +69,7 @@ struct Table : public Ui::View<Table> {
                         sel.end = *cell;
 
                         if (*_state->selection != sel) {
-                            Model::dispatch(*this, UpdateSelection{sel});
+                            Model::bubble(*this, UpdateSelection{sel});
                         }
                     }
                 }

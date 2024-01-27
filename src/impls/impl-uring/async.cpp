@@ -24,16 +24,15 @@ struct UringSched : public Sys::Sched {
     io_uring _ring;
     usize _id = 0;
     Map<usize, Strong<_Job>> _jobs;
-    TimeStamp _now;
 
     UringSched(io_uring ring)
-        : _ring(ring), _now(Sys::now()) {}
+        : _ring(ring) {}
 
     ~UringSched() {
         io_uring_queue_exit(&_ring);
     }
 
-    auto submit(Strong<_Job> job) {
+    void submit(Strong<_Job> job) {
         auto id = _id++;
         auto *sqe = io_uring_get_sqe(&_ring);
         if (not sqe)
@@ -60,7 +59,7 @@ struct UringSched : public Sys::Sched {
             void complete(io_uring_cqe *cqe) override {
                 auto res = cqe->res;
                 if (res < 0)
-                    _promise.resolve(Posix::fromLastErrno());
+                    _promise.resolve(Posix::fromErrno(-cqe->res));
                 else
                     _promise.resolve(Ok(cqe->res));
             }
@@ -91,7 +90,7 @@ struct UringSched : public Sys::Sched {
             void complete(io_uring_cqe *cqe) override {
                 auto res = cqe->res;
                 if (res < 0)
-                    _promise.resolve(Posix::fromLastErrno());
+                    _promise.resolve(Posix::fromErrno(-cqe->res));
                 else
                     _promise.resolve(Ok(cqe->res));
             }
@@ -121,7 +120,7 @@ struct UringSched : public Sys::Sched {
             void complete(io_uring_cqe *cqe) override {
                 auto res = cqe->res;
                 if (res < 0)
-                    _promise.resolve(Posix::fromLastErrno());
+                    _promise.resolve(Posix::fromErrno(-cqe->res));
                 else
                     _promise.resolve(Ok(cqe->res));
             }
@@ -153,7 +152,7 @@ struct UringSched : public Sys::Sched {
             void complete(io_uring_cqe *cqe) override {
                 auto res = cqe->res;
                 if (res < 0)
-                    _promise.resolve(Posix::fromLastErrno());
+                    _promise.resolve(Posix::fromErrno(-cqe->res));
                 else {
                     Accepted accepted = {makeStrong<Posix::Fd>(res), Posix::fromSockAddr(_addr)};
                     _promise.resolve(Ok(accepted));
@@ -195,9 +194,8 @@ struct UringSched : public Sys::Sched {
             }
 
             void complete(io_uring_cqe *cqe) override {
-                auto res = cqe->res;
-                if (res < 0)
-                    _promise.resolve(Posix::fromLastErrno());
+                if (cqe->res < 0)
+                    _promise.resolve(Posix::fromErrno(-cqe->res));
                 else
                     _promise.resolve(Ok(cqe->res));
             }
@@ -238,7 +236,7 @@ struct UringSched : public Sys::Sched {
 
             void complete(io_uring_cqe *cqe) override {
                 if (cqe->res < 0)
-                    _promise.resolve(Posix::fromLastErrno());
+                    _promise.resolve(Posix::fromErrno(-cqe->res));
                 else {
                     Received received = {(usize)cqe->res, Posix::fromSockAddr(_addr)};
                     _promise.resolve(Ok(received));
@@ -259,23 +257,24 @@ struct UringSched : public Sys::Sched {
         struct Job : public _Job {
             TimeStamp _until;
             Async::Promise<> _promise;
+            struct __kernel_timespec _ts {};
 
             Job(TimeStamp until)
                 : _until(until) {}
 
             void submit(io_uring_sqe *sqe) override {
-                auto timeout = _until - Sys::now();
-                struct __kernel_timespec ts;
-                ts.tv_sec = timeout.toSecs();
-                ts.tv_nsec = timeout.toUSecs() % 1000000000;
-                io_uring_prep_timeout(sqe, &ts, 0, 0);
+                auto delta = _until - Sys::now();
+                _ts.tv_sec = _until.val() / 1000000;
+                _ts.tv_nsec = _until.val() % 1000000;
+                logDebug("sleep: {}: {} {}", delta, _ts.tv_sec, _ts.tv_nsec);
+                io_uring_prep_timeout(sqe, &_ts, 0, IORING_TIMEOUT_REALTIME | IORING_TIMEOUT_ETIME_SUCCESS);
             }
 
             void complete(io_uring_cqe *cqe) override {
                 if (cqe->res < 0)
-                    _promise.resolve(Posix::fromLastErrno());
+                    _promise.resolve(Posix::fromErrno(-cqe->res));
                 else
-                    _promise.resolve(NONE);
+                    _promise.resolve(Ok());
             }
 
             auto future() {
@@ -289,22 +288,25 @@ struct UringSched : public Sys::Sched {
     }
 
     Res<> wait(TimeStamp until) override {
-        auto timeout = until - Sys::now();
+        TimeStamp now = Sys::now();
+        TimeSpan delta = TimeSpan::zero();
+        if (now < until)
+            delta = until - now;
+
         struct __kernel_timespec ts;
-        ts.tv_sec = timeout.toSecs();
-        ts.tv_nsec = timeout.toUSecs() % 1000000000;
+        ts.tv_sec = delta.val() / 1000000000;
+        ts.tv_nsec = delta.val() % 1000000000;
+
+        logDebug("wait: {}: {} {}", delta, ts.tv_sec, ts.tv_nsec);
 
         Array<io_uring_cqe *, NCQES> cqes{};
-
-        auto res = io_uring_wait_cqes(&_ring, cqes.buf(), 1, &ts, nullptr);
-
-        _now = Sys::now();
-        if (res < 0)
-            return Posix::fromLastErrno();
+        io_uring_wait_cqes(&_ring, cqes.buf(), 1, &ts, nullptr);
 
         for (auto *cqe : cqes) {
             if (not cqe)
                 break;
+
+            debug("cqe");
             auto id = cqe->user_data;
             auto job = _jobs.get(id).unwrap("invalid job id");
             job->complete(cqe);

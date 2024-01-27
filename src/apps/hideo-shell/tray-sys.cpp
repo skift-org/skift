@@ -73,14 +73,14 @@ Ui::Child quickTools(State const &) {
             Mdi::LOCK),
         Ui::button(
             [](auto &n) {
-                Model::dispatch(n, Activate{Panel::NIL});
+                Model::bubble(n, Activate{Panel::NIL});
                 Ui::showDialog(n, powerDialog());
             },
             Ui::ButtonStyle::secondary(), Mdi::POWER),
         Ui::grow(NONE),
         Ui::button(
             [](auto &n) {
-                Model::dispatch(n, Activate{Panel::NIL});
+                Model::bubble(n, Activate{Panel::NIL});
                 Ui::showDialog(n, Ui::aboutDialog(Mdi::SHIP_WHEEL, "Shell"));
             },
             Ui::ButtonStyle::secondary(),

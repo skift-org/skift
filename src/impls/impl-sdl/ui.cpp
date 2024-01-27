@@ -194,17 +194,24 @@ struct SdlHost :
         }
     }
 
-    void
-    pump() override {
+    Res<> wait(TimeStamp ts) override {
+        // HACK: Since we don't have a lot of control onto how SDL wait for
+        //       events we can't integrate it properly with our event loop
+        //       To remedi this we will just cap how long we wait, this way
+        //       we can poll for event.
+
+        // NOTE: A better option would be to have SDL in a separeted thread
+        //       and do the communication over an inter-thread channel but
+        //       but this would require to make the Framework thread safe
+
+        auto delay = TimeSpan::fromMSecs((usize)(FRAME_TIME * 1000 * 2));
+        auto cappedWait = min(ts, Sys::now() + delay);
+        try$(Sys::globalSched().wait(cappedWait));
+
         SDL_Event e{};
-
-        while (SDL_PollEvent(&e) != 0 and alive()) {
+        while (SDL_PollEvent(&e) != 0 and alive())
             translate(e);
-        }
-    }
-
-    void wait(TimeSpan span) override {
-        SDL_WaitEventTimeout(nullptr, span.toMSecs());
+        return Ok();
     }
 
     void bubble(Sys::Event &e) override {
@@ -239,9 +246,8 @@ Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
         size.height,
         SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS | SDL_WINDOW_UTILITY);
 
-    if (not window) {
+    if (not window)
         return Error::other(SDL_GetError());
-    }
 
     return Ok(makeStrong<SdlHost>(root, window));
 }

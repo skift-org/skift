@@ -1,4 +1,3 @@
-
 #include <bmp/spec.h>
 #include <jpeg/spec.h>
 #include <karm-sys/chan.h>

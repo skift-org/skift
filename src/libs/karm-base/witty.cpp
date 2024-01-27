@@ -123,6 +123,7 @@ static Array WITTY = {
     "You've been terminated",
     "Your are a cringe fellow",
     "You should run the tests again",
+    "This text is random",
 };
 
 Str witty(usize seed) {
@@ -172,6 +173,7 @@ static Array NICE = {
     "Your rizz is rizzing",
     "LGTM",
     "Instant r+",
+    "This text is random",
 };
 
 Str nice(usize seed) {

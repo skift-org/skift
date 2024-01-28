@@ -46,6 +46,8 @@ test$(fmtUnsignedNumber) {
     try$(testCase("7b", 123u, "x"));
     try$(testCase("499602d2", 1234567890u, "x"));
 
+    try$(testCase("586524", 586524, "04"));
+
     return Ok();
 }
 

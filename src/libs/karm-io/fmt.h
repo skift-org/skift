@@ -327,6 +327,8 @@ struct NumberFormater {
     }
 
     Res<usize> formatUnsigned(Io::TextWriter &writer, usize val) {
+        usize ogVal = val;
+        (void)ogVal;
         auto digit = [](usize v) {
             if (v < 10)
                 return '0' + v;
@@ -340,7 +342,7 @@ struct NumberFormater {
             val /= base;
         } while (val != 0 and i < buf.len());
 
-        if (width > 0) {
+        if (width > 0 and width > i) {
             usize n = width - i;
             if (fillZero) {
                 for (usize j = 0; j < n; j++) {

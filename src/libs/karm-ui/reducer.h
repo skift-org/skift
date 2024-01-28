@@ -104,8 +104,15 @@ struct Reducer :
     }
 
     void event(Sys::Event &e) override {
-        ensureBuild();
-        (*_child)->event(e);
+        if (auto *a = e.is<Action>()) {
+            Model::reduce(_state, *a);
+            e.accept();
+            _rebuild = true;
+            shouldLayout(*this);
+        } else {
+            ensureBuild();
+            (*_child)->event(e);
+        }
     }
 
     void bubble(Sys::Event &e) override {
@@ -115,9 +122,9 @@ struct Reducer :
 
             _rebuild = true;
             shouldLayout(*this);
+        } else {
+            LeafNode<Reducer<Model>>::bubble(e);
         }
-
-        LeafNode<Reducer<Model>>::bubble(e);
     }
 
     void layout(Math::Recti r) override {

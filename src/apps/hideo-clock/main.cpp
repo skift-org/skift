@@ -98,7 +98,6 @@ Ui::Child app() {
 
 Async::Task<> timerTask(Ui::Child app) {
     while (not Sys::globalSched().exited()) {
-        logInfo("tick");
         co_try_await$(Sys::globalSched().sleepAsync(Sys::now() + TimeSpan::fromSecs(1)));
         Model::event<TimeTick>(*app);
     }
@@ -109,6 +108,6 @@ Async::Task<> timerTask(Ui::Child app) {
 
 Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
     auto app = Hideo::Clock::app();
-    (void)Sys::run(Hideo::Clock::timerTask(app));
+    Async::detach(Hideo::Clock::timerTask(app));
     co_return Ui::runApp(ctx, app);
 }

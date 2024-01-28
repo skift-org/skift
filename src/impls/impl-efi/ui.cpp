@@ -32,16 +32,14 @@ struct EfiHost :
             Gfx::blitUnsafe(_front.clip(d), _back.pixels());
     }
 
-    void pump() override {
+    Res<> wait(TimeStamp) override {
         usize eventIdx = {};
         Efi::bs()->waitForEvent(1, &_stip->waitForKey, &eventIdx).unwrap();
         Efi::Key key = {};
         _stip->readKeyStroke(_stip, &key).unwrap();
         auto e = key.toKeyEvent();
         event<Events::KeyboardEvent>(*this, e);
-    }
-
-    void wait(TimeSpan) override {
+        return Ok();
     }
 
     void bubble(Sys::Event &e) override {

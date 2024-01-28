@@ -12,6 +12,32 @@
 
 namespace Karm::Sys::_Embed {
 
+struct __kernel_timespec toKernelTimespec(TimeStamp ts) {
+    struct __kernel_timespec kts;
+    if (ts.isEndOfTime()) {
+        kts.tv_sec = LONG_MAX;
+        kts.tv_nsec = 0;
+        return kts;
+    } else {
+        kts.tv_sec = ts.val() / 1000000;
+        kts.tv_nsec = (ts.val() % 1000000) * 1000;
+    }
+    return kts;
+}
+
+struct __kernel_timespec toKernelTimespec(TimeSpan ts) {
+    struct __kernel_timespec kts;
+    if (ts.isInfinite()) {
+        kts.tv_sec = LONG_MAX;
+        kts.tv_nsec = 0;
+        return kts;
+    } else {
+        kts.tv_sec = ts.val() / 1000000;
+        kts.tv_nsec = (ts.val() % 1000000) * 1000;
+    }
+    return kts;
+}
+
 struct UringSched : public Sys::Sched {
     static constexpr auto NCQES = 128;
 
@@ -263,15 +289,12 @@ struct UringSched : public Sys::Sched {
                 : _until(until) {}
 
             void submit(io_uring_sqe *sqe) override {
-                auto delta = _until - Sys::now();
-                _ts.tv_sec = _until.val() / 1000000;
-                _ts.tv_nsec = _until.val() % 1000000;
-                logDebug("sleep: {}: {} {}", delta, _ts.tv_sec, _ts.tv_nsec);
-                io_uring_prep_timeout(sqe, &_ts, 0, IORING_TIMEOUT_REALTIME | IORING_TIMEOUT_ETIME_SUCCESS);
+                _ts = toKernelTimespec(_until);
+                io_uring_prep_timeout(sqe, &_ts, 0, IORING_TIMEOUT_ABS | IORING_TIMEOUT_REALTIME);
             }
 
             void complete(io_uring_cqe *cqe) override {
-                if (cqe->res < 0)
+                if (cqe->res < 0 and cqe->res != -ETIME)
                     _promise.resolve(Posix::fromErrno(-cqe->res));
                 else
                     _promise.resolve(Ok());
@@ -288,17 +311,15 @@ struct UringSched : public Sys::Sched {
     }
 
     Res<> wait(TimeStamp until) override {
+        // HACK: io_uring_wait_cqes doesn't support absolute timeout
+        //       so we have to do it ourselves
         TimeStamp now = Sys::now();
+
         TimeSpan delta = TimeSpan::zero();
         if (now < until)
             delta = until - now;
 
-        struct __kernel_timespec ts;
-        ts.tv_sec = delta.val() / 1000000000;
-        ts.tv_nsec = delta.val() % 1000000000;
-
-        logDebug("wait: {}: {} {}", delta, ts.tv_sec, ts.tv_nsec);
-
+        struct __kernel_timespec ts = toKernelTimespec(delta);
         Array<io_uring_cqe *, NCQES> cqes{};
         io_uring_wait_cqes(&_ring, cqes.buf(), 1, &ts, nullptr);
 
@@ -306,7 +327,6 @@ struct UringSched : public Sys::Sched {
             if (not cqe)
                 break;
 
-            debug("cqe");
             auto id = cqe->user_data;
             auto job = _jobs.get(id).unwrap("invalid job id");
             job->complete(cqe);
@@ -318,7 +338,7 @@ struct UringSched : public Sys::Sched {
 };
 
 Sched &globalSched() {
-    static UringSched sched = []() {
+    static UringSched sched = [] {
         io_uring ring{};
         auto res = io_uring_queue_init(UringSched::NCQES, &ring, 0);
         if (res < 0)

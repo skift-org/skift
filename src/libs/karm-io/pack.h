@@ -86,7 +86,7 @@ struct Packer<Error> {
     static void unpack(BScan &s, Error &val) {
         Error::Code code;
         Io::unpack(s, code);
-        val = code;
+        val = Error{code, nullptr};
     }
 };
 

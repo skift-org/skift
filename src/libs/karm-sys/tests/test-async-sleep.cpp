@@ -6,12 +6,10 @@
 namespace Karm::Sys::Tests {
 
 Async::Task<> sleepyBoy() {
-    auto duration = TimeSpan::fromSecs(3);
+    auto duration = TimeSpan::fromSecs(1);
     auto start = Sys::now();
     co_try_await$(globalSched().sleepAsync(start + duration));
     auto end = Sys::now();
-
-    logDebug("slept for {}", end - start);
 
     if (end - start < duration - TimeSpan::fromMSecs(100))
         co_return Error::other("sleepAsync woke up too early");

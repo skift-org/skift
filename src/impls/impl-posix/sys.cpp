@@ -322,10 +322,9 @@ Res<> populate(Vec<Sys::UserInfo> &infos) {
 Res<> sleep(TimeSpan span) {
     struct timespec ts;
     ts.tv_sec = span.toSecs();
-    ts.tv_nsec = span.toUSecs() % 1000000 * 1000;
-    if (nanosleep(&ts, nullptr) < 0) {
+    ts.tv_nsec = (span.toUSecs() % 1000000) * 1000;
+    if (nanosleep(&ts, nullptr) < 0)
         return Posix::fromLastErrno();
-    }
     return Ok();
 }
 

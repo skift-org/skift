@@ -38,12 +38,12 @@ struct Model {
 
     template <typename X>
     static void bubble(Node &n, X value = {}) {
-        bubble<Action>(n, Action{std::move(value)});
+        Ui::bubble<Action>(n, Action{std::move(value)});
     }
 
     template <typename X>
     static void event(Node &n, X value = {}) {
-        event<Action>(n, Action{std::move(value)});
+        Ui::event<Action>(n, Action{std::move(value)});
     }
 };
 

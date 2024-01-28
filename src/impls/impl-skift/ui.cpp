@@ -25,10 +25,8 @@ struct Host :
         }
     }
 
-    void pump() override {
-    }
-
-    void wait(TimeSpan) override {
+    Res<> wait(TimeStamp) override {
+        return Ok();
     }
 
     void bubble(Sys::Event &e) override {

@@ -203,7 +203,6 @@ struct SdlHost :
         // NOTE: A better option would be to have SDL in a separeted thread
         //       and do the communication over an inter-thread channel but
         //       but this would require to make the Framework thread safe
-
         auto delay = TimeSpan::fromMSecs((usize)(FRAME_TIME * 1000 * 2));
         auto cappedWait = min(ts, Sys::now() + delay);
         try$(Sys::globalSched().wait(cappedWait));
@@ -244,7 +243,7 @@ Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
         SDL_WINDOWPOS_UNDEFINED,
         size.width,
         size.height,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS | SDL_WINDOW_UTILITY);
+        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS);
 
     if (not window)
         return Error::other(SDL_GetError());

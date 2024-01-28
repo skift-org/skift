@@ -237,13 +237,13 @@ struct Host : public Node {
     }
 
     Res<> run() {
-        doLayout();
-        doPaint();
+        _shouldLayout = true;
 
         auto lastFrame = Sys::now();
         auto nextFrame = lastFrame;
+        bool nextFrameScheduled = false;
 
-        auto scheduleFrame = [&]() {
+        auto scheduleFrame = [&] {
             auto instant = Sys::now();
 
             if (instant < nextFrame)
@@ -253,12 +253,11 @@ struct Host : public Node {
                 nextFrame += TimeSpan::fromMSecs(FRAME_TIME * 1000);
 
             lastFrame = nextFrame;
+            nextFrameScheduled = true;
             return true;
         };
 
         while (not _res) {
-            try$(wait(nextFrame));
-
             if (_shouldAnimate and scheduleFrame()) {
                 _shouldAnimate = false;
                 auto e = Sys::makeEvent<Node::AnimateEvent>(Sys::Propagation::DOWN, FRAME_TIME);
@@ -270,6 +269,8 @@ struct Host : public Node {
 
             if (_dirty.len() > 0)
                 doPaint();
+
+            try$(wait(nextFrame));
         }
 
         return _res.unwrap();

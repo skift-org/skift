@@ -120,8 +120,8 @@ Res<> init(u64 magic, Handover::Payload &payload) {
     try$(Sched::init(payload));
 
     logInfo("entry: everything is ready, enabling interrupts...");
-    Arch::cpu().retainEnable();
-    Arch::cpu().enableInterrupts();
+    Arch::globalCpu().retainEnable();
+    Arch::globalCpu().enableInterrupts();
 
     logInfo("entry: entering userspace...");
     try$(enterUserspace(payload));
@@ -130,7 +130,7 @@ Res<> init(u64 magic, Handover::Payload &payload) {
     Task::self().label("idle");
     Task::self().enter(Mode::IDLE);
     while (true)
-        Arch::cpu().relaxe();
+        Arch::globalCpu().relaxe();
 }
 
 } // namespace Hjert::Core
@@ -142,6 +142,17 @@ HandoverRequests$(
     Handover::requestFb(),
     Handover::requestFiles());
 
+void __panicHandler(PanicKind kind, char const *buf) {
+    if (kind == PanicKind::PANIC) {
+        (void)Io::format(Hjert::Arch::globalOut(), "PANIC: {}\n", buf);
+        Hjert::Arch::stop();
+        __builtin_unreachable();
+    } else {
+        (void)Io::format(Hjert::Arch::globalOut(), "DEBUG: {}\n", buf);
+    }
+}
+
 Res<> entryPoint(u64 magic, Handover::Payload &payload) {
+    Karm::registerPanicHandler(__panicHandler);
     return Hjert::Core::init(magic, payload);
 }

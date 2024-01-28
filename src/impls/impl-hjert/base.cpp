@@ -5,10 +5,10 @@
 
 namespace Karm::_Embed {
 
-void relaxe() { Hjert::Arch::cpu().relaxe(); }
+void relaxe() { Hjert::Arch::globalCpu().relaxe(); }
 
-void enterCritical() { Hjert::Arch::cpu().retainInterrupts(); }
+void enterCritical() { Hjert::Arch::globalCpu().retainInterrupts(); }
 
-void leaveCritical() { Hjert::Arch::cpu().releaseInterrupts(); }
+void leaveCritical() { Hjert::Arch::globalCpu().releaseInterrupts(); }
 
 } // namespace Karm::_Embed

@@ -17,7 +17,7 @@ void loggerUnlock() {
 }
 
 Io::TextWriter &loggerOut() {
-    return Hjert::Arch::loggerOut();
+    return Hjert::Arch::globalOut();
 }
 
 } // namespace Karm::Logger::_Embed

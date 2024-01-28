@@ -37,19 +37,7 @@ static x86_64::GdtDesc _gdtDesc{_gdt};
 static x86_64::Idt _idt{};
 static x86_64::IdtDesc _idtDesc{_idt};
 
-void __panicHandler(PanicKind kind, char const *buf) {
-    if (kind == PanicKind::PANIC) {
-        (void)Io::format(Hjert::Arch::loggerOut(), "PANIC: {}\n", buf);
-        Hjert::Arch::stopAll();
-        __builtin_unreachable();
-    } else {
-        (void)Io::format(Hjert::Arch::loggerOut(), "DEBUG: {}\n", buf);
-    }
-}
-
 Res<> init(Handover::Payload &) {
-    Karm::registerPanicHandler(__panicHandler);
-
     try$(_com1.init());
 
     _gdtDesc.load();
@@ -72,11 +60,11 @@ Res<> init(Handover::Payload &) {
     return Ok();
 }
 
-Io::TextWriter &loggerOut() {
+Io::TextWriter &globalOut() {
     return _com1;
 }
 
-void stopAll() {
+void stop() {
     while (true) {
         x86_64::cli();
         x86_64::hlt();
@@ -101,7 +89,7 @@ struct Cpu : public Core::Cpu {
 
 static Cpu _cpu{};
 
-Core::Cpu &cpu() {
+Core::Cpu &globalCpu() {
     return _cpu;
 }
 
@@ -198,7 +186,7 @@ void kPanic(Frame &frame) {
 extern "C" void _intDispatch(usize sp) {
     auto &frame = *reinterpret_cast<Frame *>(sp);
 
-    cpu().beginInterrupt();
+    globalCpu().beginInterrupt();
 
     if (frame.intNo < 32) {
         if (frame.cs == (x86_64::Gdt::UCODE * 8 | 3))
@@ -219,7 +207,7 @@ extern "C" void _intDispatch(usize sp) {
             .unwrap("pic ack failed");
     }
 
-    cpu().endInterrupt();
+    globalCpu().endInterrupt();
 }
 
 void yield() {
@@ -254,7 +242,7 @@ extern "C" usize _sysDispatch(usize sp) {
 static x86_64::Pml<4> *_kpml4 = nullptr;
 static Opt<x86_64::Vmm<Hal::UpperHalfMapper>> _vmm = NONE;
 
-Hal::Vmm &vmm() {
+Hal::Vmm &globalVmm() {
     if (_vmm == NONE) {
         auto pml4Mem = Core::kmm()
                            .allocRange(Hal::PAGE_SIZE)

@@ -57,14 +57,4 @@ struct Cpu {
     virtual void relaxe() = 0;
 };
 
-struct InterruptRetainer : public Meta::Static {
-    InterruptRetainer() {
-        Arch::cpu().retainInterrupts();
-    }
-
-    ~InterruptRetainer() {
-        Arch::cpu().releaseInterrupts();
-    }
-};
-
 } // namespace Hjert::Core

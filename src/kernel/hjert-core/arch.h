@@ -22,19 +22,19 @@ namespace Hjert::Arch {
 
 struct Frame;
 
-Core::Cpu &cpu();
+Core::Cpu &globalCpu();
 
-Res<> init(Handover::Payload &);
+Hal::Vmm &globalVmm();
 
-Hal::Vmm &vmm();
-
-Io::TextWriter &loggerOut();
-
-[[noreturn]] void stopAll();
+Io::TextWriter &globalOut();
 
 Res<Box<Core::Ctx>> createCtx(Core::Mode mode, usize ip, usize sp, usize ksp, Hj::Args args);
 
 Res<Strong<Hal::Vmm>> createVmm();
+
+Res<> init(Handover::Payload &);
+
+[[noreturn]] void stop();
 
 void yield();
 

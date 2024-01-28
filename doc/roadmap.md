@@ -14,7 +14,7 @@ work withing skiftOS.
 
 - [x] Basic micro-kernel
 - [x] Basic UEFI bootloader
-- [ ] Basic system library with asynchonous I/O support
+- [x] Basic system library with asynchonous I/O support
 - [ ] Basic IPC library
 - [x] Basic graphic library with subpixel font rendering
 - [x] Basic user interface library
@@ -27,8 +27,8 @@ This milestone is about adding networking support to the system.
 - [ ] Simple virtio network driver
 - [ ] Simple TCP/IP stack
 - [ ] Simple TLS implementation
-- [ ] Simple HTTP server & client
-- [ ] Simple DNS client
+- [x] Simple HTTP server & client
+- [x] Simple DNS client
 
 ## Milestone 2 - Storage
 

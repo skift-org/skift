@@ -20,7 +20,7 @@ void _add(UBig &lhs, usize rhs) {
     carry = curr;
     lhs._value[0] = res;
 
-    for (usize i = 1; carry && lhsLen > i; i++) {
+    for (usize i = 1; carry and lhsLen > i; i++) {
         usize curr = 0;
         if (willAddOverflow(lhs._value[i], carry))
             curr = 1;
@@ -51,7 +51,7 @@ void _add(UBig &lhs, UBig const &rhs) {
         lhs._value[i] = res;
     }
 
-    while (carry && lhsLen > rhsLen) {
+    while (carry and lhsLen > rhsLen) {
         usize curr = 0;
         if (willAddOverflow(lhs._value[rhsLen], carry))
             curr = 1;
@@ -341,7 +341,7 @@ void _fromF64(Frac &frac, f64 value) {
     currPow -= 1;
 
     UBig dec = 0_ubig;
-    while (value >= __DBL_EPSILON__ || currPow >= 0) {
+    while (value >= __DBL_EPSILON__ or currPow >= 0) {
         frac._num *= TEN;
         usize digit = (u64)(value * ::pow(0.1, (f64)currPow)) % 10;
         frac._num += IBig{digit};

@@ -115,6 +115,9 @@ struct ButtonStyle {
 
     static ButtonStyle subtle();
 
+    static ButtonStyle text();
+
+
     static ButtonStyle destructive();
 
     ButtonStyle withRadius(Gfx::BorderRadius radius) const;

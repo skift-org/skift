@@ -7,13 +7,13 @@
 
 namespace Hideo {
 
-Ui::Child alert(String title, String subtitle) {
+Ui::Child alert(String title, String body) {
     return Ui::vflow(
-               16,
+               0,
                Layout::Align::CENTER,
                Ui::icon(Mdi::ALERT_DECAGRAM, 48),
                Ui::titleLarge(title),
-               Ui::bodyMedium(subtitle)) |
+               Ui::bodyMedium(body)) |
            Ui::box({
                .foregroundPaint = Ui::GRAY500,
            }) |

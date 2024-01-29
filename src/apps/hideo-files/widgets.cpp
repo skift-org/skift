@@ -11,11 +11,11 @@ namespace Hideo::Files {
 
 /* --- Common Widgets ------------------------------------------------------- */
 
-Ui::Child alert(State const &state, String title, String subtitle) {
+Ui::Child alert(State const &state, String title, String body) {
     return Ui::vflow(
                16,
                Layout::Align::CENTER,
-               Hideo::alert(title, subtitle),
+               Hideo::alert(title, body),
                Ui::hflow(
                    16,
                    Ui::button(Model::bindIf<GoBack>(state.canGoBack()), "Go Back"),
@@ -23,10 +23,29 @@ Ui::Child alert(State const &state, String title, String subtitle) {
            Ui::center();
 }
 
-Ui::Child directorEntry(Sys::DirEntry const &entry) {
+Ui::ButtonStyle itemStyle(bool odd) {
+    auto background = odd ? Ui::GRAY50.withOpacity(0.04) : Gfx::ALPHA;
+    return {
+        .idleStyle = {
+            .backgroundPaint = background,
+            .foregroundPaint = Ui::GRAY300,
+        },
+        .hoverStyle = {
+            .borderWidth = 1,
+            .backgroundPaint = Ui::ACCENT900,
+        },
+        .pressStyle = {
+            .borderWidth = 1,
+            .borderPaint = Ui::ACCENT900,
+            .backgroundPaint = Ui::ACCENT950,
+        },
+    };
+}
+
+Ui::Child directorEntry(Sys::DirEntry const &entry, bool odd) {
     return Ui::button(
         Model::bind<Navigate>(entry.name),
-        Ui::ButtonStyle::subtle(),
+        itemStyle(odd),
         entry.isDir ? Mdi::FOLDER : Mdi::FILE,
         entry.name);
 }
@@ -36,27 +55,26 @@ Ui::Child directoryListing(State const &, Sys::Dir const &dir) {
         return Ui::bodyMedium(Ui::GRAY600, "This directory is empty.") | Ui::center();
 
     Ui::Children children;
-    for (auto const &entry : dir.entries())
-        children.pushBack(directorEntry(entry));
+    bool odd = true;
+    for (auto const &entry : dir.entries()) {
+        children.pushBack(directorEntry(entry, odd));
+        odd = !odd;
+    }
 
     return Ui::vflow(children) |
            Ui::align(Layout::Align::TOP | Layout::Align::HFILL) |
-           Ui::spacing(8) |
            Ui::vscroll() |
            Ui::grow();
 }
 
 Ui::Child breadcrumbItem(Str text, isize index) {
-    return Ui::button(
-        Model::bind<GoParent>(index),
-        Ui::ButtonStyle::subtle(),
-        Ui::spacing(
-            4,
-            Ui::hflow(
-                4,
-                Layout::Align::CENTER,
-                Ui::icon(Mdi::CHEVRON_RIGHT),
-                Ui::text(text))));
+    return Ui::hflow(
+        0,
+        Layout::Align::CENTER,
+        Ui::icon(Mdi::CHEVRON_RIGHT),
+        Ui::button(Model::bind<GoParent>(index),
+                   Ui::ButtonStyle::text().withPadding({2, 0}),
+                   Ui::text(text)));
 }
 
 Mdi::Icon iconForLocation(Str loc) {
@@ -93,7 +111,7 @@ Ui::Child breadcrumbRoot(Url::Url url) {
             Model::bind<GoRoot>(),
             Ui::ButtonStyle::subtle(),
             iconForLocation(url.host),
-            url.host);
+            Io::toTitleCase(url.host).unwrap());
     }
 
     if (url.scheme == "device") {
@@ -106,8 +124,12 @@ Ui::Child breadcrumbRoot(Url::Url url) {
 
     return Ui::button(
         Model::bind<GoRoot>(),
-        Ui::ButtonStyle::subtle(),
-        Mdi::LAPTOP);
+        Ui::ButtonStyle::text(),
+        Ui::hflow(
+            8,
+            Layout::Align::CENTER,
+            Ui::icon(Mdi::LAPTOP),
+            Ui::text("This Device")));
 }
 
 Ui::Child breadcrumb(State const &state) {
@@ -118,6 +140,7 @@ Ui::Child breadcrumb(State const &state) {
             .backgroundPaint = Ui::GRAY800,
         },
         Ui::hflow(
+            Ui::empty(12),
             breadcrumbRoot(state.currentUrl()),
 
             Ui::hflow(state
@@ -213,7 +236,7 @@ Ui::Child openFileDialog() {
                                 : alert(
                                       d,
                                       "Can't access location",
-                                      "Failed to open directory."),
+                                      maybeDir.none().msg()),
                             Ui::separator())),
                     controls));
         });

@@ -4,6 +4,6 @@
 
 namespace Hideo {
 
-Ui::Child alert(String title, String subtitle);
+Ui::Child alert(String title, String body);
 
 } // namespace Hideo

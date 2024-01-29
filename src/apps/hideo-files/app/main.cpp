@@ -48,8 +48,8 @@ Ui::Child pageContent(State const &state) {
                        ? directoryListing(state, dir.unwrap())
                        : alert(
                              state,
-                             Io::format("Can't access this location: {}", dir.none().msg()).unwrap(),
-                             url.str());
+                             "Can't access this location",
+                             dir.none().msg());
 
     return listing | Ui::grow();
 }

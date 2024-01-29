@@ -113,6 +113,17 @@ ButtonStyle ButtonStyle::subtle() {
     };
 }
 
+ButtonStyle ButtonStyle::text() {
+    return {
+        .idleStyle = {
+            .foregroundPaint = GRAY300,
+        },
+        .pressStyle = {
+            .foregroundPaint = GRAY300,
+        },
+    };
+}
+
 ButtonStyle ButtonStyle::destructive() {
     return {
         .idleStyle = {

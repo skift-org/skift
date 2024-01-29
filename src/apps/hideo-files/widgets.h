@@ -23,7 +23,7 @@ Ui::Child refreshTool();
 
 Ui::Child toolbar(State const &);
 
-Ui::Child alert(State const &state, String title, String subtitle);
+Ui::Child alert(State const &state, String title, String body);
 
 /* ---  Dialogs  ------------------------------------------------------------ */
 

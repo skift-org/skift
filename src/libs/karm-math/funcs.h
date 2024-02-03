@@ -48,7 +48,7 @@ constexpr T floor(T x) {
 template <typename T>
 constexpr T ceil(T x) {
     if (x < 0)
-        return x;
+        return (T)(long)x;
 
     return (T)(long)(x + 1);
 }

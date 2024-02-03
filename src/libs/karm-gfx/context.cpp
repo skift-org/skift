@@ -130,7 +130,7 @@ StrokeStyle const &Context::strokeStyle() {
     return current().strokeStyle;
 }
 
-Media::Font const &Context::textFont() {
+Media::Font &Context::textFont() {
     return current().textFont;
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/map.h>
 #include <karm-math/rand.h>
 #include <karm-sys/mmap.h>
 #include <ttf/spec.h>
@@ -11,6 +12,8 @@ namespace Karm::Media {
 struct TtfFontface : public Fontface {
     Sys::Mmap _mmap;
     Ttf::Font _ttf;
+    Map<Rune, Media::Glyph> _cachedEntries;
+    Map<Media::Glyph, f64> _cachedAdvances;
 
     static Res<Strong<TtfFontface>> load(Sys::Mmap &&mmap) {
         auto ttf = try$(Ttf::Font::load(mmap.bytes()));
@@ -32,12 +35,22 @@ struct TtfFontface : public Fontface {
         };
     }
 
-    Glyph glyph(Rune rune) const override {
-        return _ttf.glyph(rune);
+    Glyph glyph(Rune rune) override {
+        auto glyph = _cachedEntries.get(rune);
+        if (glyph.has())
+            return glyph.unwrap();
+        auto g = _ttf.glyph(rune);
+        _cachedEntries.put(rune, g);
+        return g;
     }
 
-    f64 advance(Glyph glyph) const override {
-        return _ttf.glyphMetrics(glyph).advance;
+    f64 advance(Glyph glyph) override {
+        auto advance = _cachedAdvances.get(glyph);
+        if (advance.has())
+            return advance.unwrap();
+        auto a = _ttf.glyphMetrics(glyph).advance;
+        _cachedAdvances.put(glyph, a);
+        return a;
     }
 
     f64 kern(Glyph prev, Glyph curr) const override {

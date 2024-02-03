@@ -25,13 +25,13 @@ struct VgaFontface : public Fontface {
         };
     }
 
-    Glyph glyph(Rune rune) const override {
+    Glyph glyph(Rune rune) override {
         One<Ibm437> one;
         encodeOne<Ibm437>(rune, one);
         return Glyph(one);
     }
 
-    f64 advance(Glyph) const override {
+    f64 advance(Glyph) override {
         return 8;
     }
 

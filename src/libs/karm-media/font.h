@@ -84,9 +84,9 @@ struct Fontface {
 
     virtual FontMetrics metrics() const = 0;
 
-    virtual Glyph glyph(Rune rune) const = 0;
+    virtual Glyph glyph(Rune rune) = 0;
 
-    virtual f64 advance(Glyph glyph) const = 0;
+    virtual f64 advance(Glyph glyph) = 0;
 
     virtual f64 kern(Glyph prev, Glyph curr) const = 0;
 
@@ -106,15 +106,13 @@ struct Font {
 
     FontMetrics metrics() const;
 
-    Glyph glyph(Rune rune) const;
+    Glyph glyph(Rune rune);
 
-    f64 advance(Glyph glyph) const;
+    f64 advance(Glyph glyph);
 
     f64 kern(Glyph prev, Glyph curr) const;
 
-    FontMeasure measure(Glyph glyph) const;
-
-    FontMeasure measureStr(Str str) const;
+    FontMeasure measure(Glyph glyph);
 };
 
 } // namespace Karm::Media

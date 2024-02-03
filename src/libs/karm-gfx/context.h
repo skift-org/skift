@@ -151,7 +151,7 @@ struct Context {
     StrokeStyle const &strokeStyle();
 
     // Get the current text font.
-    Media::Font const &textFont();
+    Media::Font &textFont();
 
     // Get the current shadow style.
     ShadowStyle const &shadowStyle();

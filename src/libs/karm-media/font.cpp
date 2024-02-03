@@ -35,11 +35,11 @@ FontMetrics Font::metrics() const {
     return m;
 }
 
-Glyph Font::glyph(Rune rune) const {
+Glyph Font::glyph(Rune rune) {
     return fontface->glyph(rune);
 }
 
-f64 Font::advance(Glyph glyph) const {
+f64 Font::advance(Glyph glyph) {
     return fontface->advance(glyph) * scale();
 }
 
@@ -47,7 +47,7 @@ f64 Font::kern(Glyph prev, Glyph curr) const {
     return fontface->kern(prev, curr) * scale();
 }
 
-FontMeasure Font::measure(Glyph r) const {
+FontMeasure Font::measure(Glyph r) {
     auto m = metrics();
     auto adv = advance(r);
 
@@ -57,28 +57,4 @@ FontMeasure Font::measure(Glyph r) const {
         .baseline = {0, m.ascend},
     };
 }
-
-FontMeasure Font::measureStr(Str str) const {
-    f64 adv = 0;
-
-    bool first = true;
-    Media::Glyph prev{0};
-    for (auto r : iterRunes(str)) {
-        auto curr = glyph(r);
-        if (not first)
-            adv += kern(prev, curr);
-        else
-            first = false;
-        adv += advance(curr);
-        prev = curr;
-    }
-
-    auto m = metrics();
-    return {
-        .capbound = {adv, m.captop + m.descend},
-        .linebound = {adv, m.ascend + m.descend + m.linegap},
-        .baseline = {0, m.ascend},
-    };
-}
-
 } // namespace Karm::Media

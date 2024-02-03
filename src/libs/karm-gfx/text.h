@@ -210,7 +210,7 @@ struct Text {
             line.baseline = baseline;
             baseline += m.linegap + m.descend;
         }
-        return baseline;
+        return baseline - m.linegap / 2;
     }
 
     f64 _layoutHorizontaly(f64 width) {

@@ -47,6 +47,31 @@ struct Map {
         return false;
     }
 
+    bool removeAll(V const &value) {
+        bool changed = false;
+
+        for (usize i = 1; i < _els.len() + 1; i++) {
+            if (_els[i - 1].cdr == value) {
+                _els.removeAt(i - 1);
+                changed = true;
+                i--;
+            }
+        }
+
+        return changed;
+    }
+
+    bool removeFirst(V const &value) {
+        for (usize i = 1; i < _els.len() + 1; i++) {
+            if (_els[i - 1].cdr == value) {
+                _els.removeAt(i - 1);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     auto iter() {
         return mutIter(_els);
     }

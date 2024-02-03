@@ -1,77 +1,69 @@
 #pragma once
 
-// https://cachemon.github.io/SIEVE-website/
-// https://github.com/scalalang2/golang-fifo/tree/main
-
 #include "list.h"
+#include "map.h"
 
 namespace Karm {
 
 template <typename K, typename V>
-struct Sieve {
+struct Lru {
     struct Item {
-        K key;
         V value;
-        bool visited = false;
         LlItem<Item> item{};
     };
 
     usize _cap;
-    Ll<Item> _ll{};
-    Item *_hand{};
+    Map<K, Item *> _map;
+    Ll<Item> _ll;
 
-    Sieve(usize cap) : _cap(cap) {}
+    Lru(usize cap) : _cap(cap) {}
 
-    ~Sieve() {
+    ~Lru() {
         clear();
     }
 
     void clear() {
+        _map.clear();
         _ll.clearApply([](Item *item) {
             delete item;
         });
     }
 
     Item *_lookup(K const &key) {
-        auto *item = _ll.head();
-        while (item) {
-            if (item->key == key)
-                return item;
-            item = _ll.next(item);
+        Opt<Item *> item = _map.get(key);
+        if (item.has()) {
+            _ll.detach(*item);
+            _ll.prepend(*item, _ll.head());
+            return *item;
         }
         return nullptr;
     }
 
     void _evict() {
-        auto *item = _hand ?: _ll.tail();
-        while (item and item->visited) {
-            item->visited = false;
-            item = _ll.prev(item) ?: _ll.tail();
+        while (_ll.len() > _cap) {
+            auto *item = _ll.tail();
+            _ll.detach(item);
+            _map.removeFirst(item);
+            delete item;
         }
-        _hand = _ll.prev(item) ?: _ll.tail();
-        _ll.detach(item);
-        delete item;
     }
 
     V &access(K const &key, auto const &make) {
         auto item = _lookup(key);
         if (item) {
-            item->visited = true;
             return item->value;
         }
 
-        if (_ll.len() == _cap)
-            _evict();
-
-        item = new Item{key, make()};
+        item = new Item{make()};
         _ll.prepend(item, _ll.head());
+        _map.put(key, item);
+        _evict();
         return item->value;
     }
 
     Opt<V> get(K const &key) {
         auto item = _lookup(key);
         if (item) {
-            item->visited = true;
             return item->value;
         }
         return NONE;

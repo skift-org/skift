@@ -148,7 +148,7 @@ struct Text {
 
     void _measureBlocks() {
         for (auto &block : _blocks) {
-            auto adv = 0;
+            auto adv = 0.0f;
             bool first = true;
             Media::Glyph prev{0};
             for (usize i = block.cells.start; i < block.cells.end(); i++) {

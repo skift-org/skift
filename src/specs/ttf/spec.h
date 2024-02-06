@@ -3,6 +3,7 @@
 #include <karm-logger/logger.h>
 
 #include "table-cmap.h"
+#include "table-colr.h"
 #include "table-glyf.h"
 #include "table-gpos.h"
 #include "table-gsub.h"
@@ -50,6 +51,8 @@ struct Font {
     Hmtx _hmtx;
     Gpos _gpos;
     Gsub _gsub;
+    Cpal _cpal;
+    Colr _colr;
 
     static Res<Cmap::Table> chooseCmap(Font &font) {
         Opt<Cmap::Table> bestCmap = NONE;
@@ -108,6 +111,14 @@ struct Font {
         font._hmtx = try$(font.requireTable<Hmtx>());
         font._gpos = font.lookupTable<Gpos>();
         font._gsub = font.lookupTable<Gsub>();
+
+        font._cpal = font.lookupTable<Cpal>();
+        font._colr = font.lookupTable<Colr>();
+
+        if (font._colr.present() and not font._cpal.present()) {
+            logError("ttf: COLR table present but CPAL table missing");
+            return Error::other("missing CPAL table");
+        }
 
         return Ok(font);
     }

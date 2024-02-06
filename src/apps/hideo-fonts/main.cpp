@@ -6,7 +6,7 @@
 
 namespace Hideo::Fonts {
 
-static constexpr Str PANGRAM = "The quick brown fox jumps over the lazy dog";
+static constexpr Str PANGRAM = "🐢 Hello";
 
 Ui::Child pangrams(Strong<Media::Fontface> fontface) {
     f64 size = 12;

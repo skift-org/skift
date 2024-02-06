@@ -68,7 +68,7 @@ Ui::Child keypad(State const &state) {
 }
 
 Ui::Child screen(State const &state) {
-    // auto debugExpr = Ui::text("op: {}, lhs: {}, rhs: {}", toFmt(state.op), state.lhs, state.rhs);
+    auto debugExpr = Ui::text("op: {}, lhs: {}, rhs: {}", toFmt(state.op), state.lhs, state.rhs);
 
     auto currExpr =
         (state.op == Operator::NONE ? Ui::text("") : Ui::text(toFmt(state.op), state.lhs)) |
@@ -79,7 +79,7 @@ Ui::Child screen(State const &state) {
                      : Ui::headlineMedium("{}", state.hasRhs ? state.rhs : state.lhs)) |
         Ui::align(Layout::Align::VCENTER | Layout::Align::END);
 
-    return Ui::vflow(8, /* debugExpr, */ currExpr, result) | Ui::spacing({16, 8});
+    return Ui::vflow(8, debugExpr, currExpr, result) | Ui::spacing({16, 8});
 }
 
 Ui::Child app() {

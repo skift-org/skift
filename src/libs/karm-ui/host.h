@@ -58,9 +58,9 @@ struct PerfGraph {
         auto elapsed = n - rec.start;
         _records[_index++ % 256].end = n;
 
-        if (rec.event == PerfEvent::PAINT) {
+        if (rec.event == PerfEvent::PAINT)
             _frameTime = (_frameTime * 0.9) + (elapsed.toMSecs() * 0.1);
-        }
+
         return elapsed;
     }
 
@@ -245,15 +245,21 @@ struct Host : public Node {
         auto lastFrame = Sys::now();
         auto nextFrame = lastFrame;
         bool nextFrameScheduled = false;
+        usize frameBehind = 0;
 
-        auto scheduleFrame = [&] {
-            auto instant = Sys::now();
-
+        auto scheduleFrame = [&](TimeStamp instant) {
             if (instant < nextFrame)
                 return false;
 
-            while (nextFrame < instant)
+            frameBehind = 0;
+            while (nextFrame < instant) {
                 nextFrame += TimeSpan::fromMSecs(FRAME_TIME * 1000);
+                frameBehind++;
+            }
+
+            if (frameBehind > 1) {
+                logWarn("Where are late, running {} frame behind schedule", frameBehind);
+            }
 
             lastFrame = nextFrame;
             nextFrameScheduled = true;
@@ -261,7 +267,9 @@ struct Host : public Node {
         };
 
         while (not _res) {
-            if (_shouldAnimate and scheduleFrame()) {
+            auto instant = Sys::now();
+
+            if (_shouldAnimate and scheduleFrame(instant)) {
                 _shouldAnimate = false;
                 auto e = Sys::makeEvent<Node::AnimateEvent>(Sys::Propagation::DOWN, FRAME_TIME);
                 event(*e);

@@ -26,7 +26,7 @@ Ui::Child app() {
                 auto resetBtn = Ui::button(
                     Model::bindIf<ResetAction>(not state.initial),
                     Ui::ButtonStyle::subtle().withRadius(999),
-                    Mdi::REFRESH, "RESET");
+                    Mdi::REFRESH, "Reset");
 
                 return Ui::vflow(
                            32,

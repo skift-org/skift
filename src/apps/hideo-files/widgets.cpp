@@ -210,11 +210,11 @@ Ui::Child openFileDialog() {
 
             auto openBtn = Ui::button(
                 Ui::closeDialog,
-                Ui::ButtonStyle::primary(), "OPEN");
+                Ui::ButtonStyle::primary(), "Open");
 
             auto cancelBtn = Ui::button(
                 Ui::closeDialog,
-                Ui::ButtonStyle::subtle(), "CANCEL");
+                Ui::ButtonStyle::subtle(), "Cancel");
 
             auto controls = Ui::spacing(
                 16,

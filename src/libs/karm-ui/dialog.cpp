@@ -247,7 +247,7 @@ Child dialogCloseButton() {
     return button(
         closeDialog,
         ButtonStyle::primary(),
-        "CLOSE");
+        "Close");
 }
 
 /* --- Dialogs -------------------------------------------------------------- */
@@ -305,7 +305,7 @@ Child aboutDialog(Mdi::Icon i, String name) {
             [](auto &n) {
                 showDialog(n, licenseDialog());
             },
-            ButtonStyle::subtle(), Mdi::LICENSE, "LICENSE"),
+            ButtonStyle::subtle(), Mdi::LICENSE, "License"),
         grow(NONE),
         dialogCloseButton(),
     };
@@ -327,7 +327,7 @@ Child msgDialog(String title, String msg) {
         grow(NONE),
         button(
             closeDialog,
-            ButtonStyle::primary(), "OK"),
+            ButtonStyle::primary(), "Ok"),
     };
 
     return dialogScafold(

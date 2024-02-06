@@ -91,7 +91,7 @@ Ui::Child app() {
             .body = slot$(Ui::vflow(
                 screen(state) | Ui::dragRegion(),
                 keypad(state) | Ui::grow())),
-            .size = {300, 380},
+            .size = {300, 332},
         });
     });
 }

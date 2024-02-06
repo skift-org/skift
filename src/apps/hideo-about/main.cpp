@@ -17,12 +17,12 @@ Ui::Child app() {
                 },
                 Ui::ButtonStyle::subtle(),
                 Mdi::LICENSE,
-                "LICENSE");
+                "License");
 
             auto closeBtn = Ui::button(
                 Ui::bindBubble<Events::RequestExitEvent>(),
                 Ui::ButtonStyle::primary(),
-                "CLOSE");
+                "Close");
 
             return Ui::spacing(
                 16,

@@ -81,7 +81,7 @@ Async::Task<> respond404(Sys::_Connection &conn) {
         "\r\n"
         "Not Found"));
 
-    co_try_await$(conn.writeAsync(header.bytes()));
+    co_trya$(conn.writeAsync(header.bytes()));
     co_return Ok();
 }
 
@@ -107,13 +107,13 @@ Async::Task<> handleRequest(Sys::_Connection &conn, Str request, Sys::SocketAddr
 
 Async::Task<> handleConnection(Sys::TcpConnection stream) {
     Array<char, 4096> buf;
-    auto len = co_try_await$(stream.readAsync(mutBytes(buf)));
+    auto len = co_trya$(stream.readAsync(mutBytes(buf)));
     if (not Tls::isHello(bytes(buf))) {
         co_return co_await handleRequest(stream, Str{buf.buf(), len}, stream.addr());
     } else {
         logDebug("{}: wants TLS", stream.addr());
         auto tls = co_try$(Tls::TlsConnection::accept(stream, bytes(buf)));
-        len = co_try_await$(tls.readAsync(mutBytes(buf)));
+        len = co_trya$(tls.readAsync(mutBytes(buf)));
         co_return co_await handleRequest(tls, Str{buf.buf(), len}, stream.addr());
     }
 }
@@ -124,5 +124,5 @@ Async::Task<> entryPointAsync(Sys::Ctx &) {
     auto listener = co_try$(Sys::TcpListener::listen(Sys::Ip4::localhost(8080)));
     logInfo("Serving on http://{}", listener.addr());
     while (true)
-        Async::detach(Web::Server::handleConnection(co_try_await$(listener.acceptAsync())));
+        Async::detach(Web::Server::handleConnection(co_trya$(listener.acceptAsync())));
 }

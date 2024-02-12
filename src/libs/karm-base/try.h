@@ -14,35 +14,20 @@ extern "C" void __try_failled();
 #    define __tryFail() /* NOP */
 #endif
 
-#define try$(EXPR)                           \
-    ({                                       \
-        auto __expr = (EXPR);                \
-        if (not static_cast<bool>(__expr)) { \
-            __tryFail();                     \
-            return __expr.none();            \
-        }                                    \
-        __expr.take();                       \
-    })
+#define __try$(EXPR, RET, AWAIT) ({      \
+    auto __expr = AWAIT(EXPR);           \
+    if (not static_cast<bool>(__expr)) { \
+        __tryFail();                     \
+        RET __expr.none();               \
+    }                                    \
+    __expr.take();                       \
+})
 
-#define co_try$(EXPR)                        \
-    ({                                       \
-        auto __expr = (EXPR);                \
-        if (not static_cast<bool>(__expr)) { \
-            __tryFail();                     \
-            co_return __expr.none();         \
-        }                                    \
-        __expr.take();                       \
-    })
+#define try$(EXPR) __try$(EXPR, return, )
 
-#define co_try_await$(EXPR)                  \
-    ({                                       \
-        auto __expr = co_await (EXPR);       \
-        if (not static_cast<bool>(__expr)) { \
-            __tryFail();                     \
-            co_return __expr.none();         \
-        }                                    \
-        __expr.take();                       \
-    })
+#define co_try$(EXPR) __try$(EXPR, co_return, )
+
+#define co_trya$(EXPR) __try$(EXPR, co_return, co_await)
 
 namespace Karm {
 

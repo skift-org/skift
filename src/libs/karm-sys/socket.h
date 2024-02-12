@@ -75,7 +75,7 @@ struct _Listener :
     }
 
     Async::Task<C> acceptAsync() {
-        auto [fd, addr] = co_try_await$(globalSched().acceptAsync(_fd));
+        auto [fd, addr] = co_trya$(globalSched().acceptAsync(_fd));
         co_return Ok(C(std::move(fd), addr));
     }
 

@@ -59,7 +59,7 @@ Async::Task<usize> _fetch(Url::Url const &url, Sys::_Connection &conn, Io::Write
 }
 
 Async::Task<usize> fetch(Url::Url const &url, Io::Writer &out) {
-    auto ip = co_try_await$(resolve(url.host));
+    auto ip = co_trya$(resolve(url.host));
     auto port = url.port ? *url.port : 80;
     if (port > 65535)
         co_return Error::invalidData("port out of range");
@@ -80,12 +80,12 @@ Async::Task<usize> fetch(Url::Url const &url, Io::Writer &out) {
 
 Async::Task<String> fetchString(Url::Url const &url) {
     Io::StringWriter out;
-    co_try_await$(fetch(url, out));
+    co_trya$(fetch(url, out));
     co_return Ok(out.take());
 }
 
 Async::Task<Json::Value> fetchJson(Url::Url const &url) {
-    auto str = co_try_await$(fetchString(url));
+    auto str = co_trya$(fetchString(url));
     co_return Ok(co_try$(Json::parse(str)));
 }
 

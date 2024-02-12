@@ -1,0 +1,6 @@
+[book]
+authors = ["the skiftOS Develpers"]
+language = "en"
+multilingual = false
+src = "."
+title = "SkiftOS Developer Manual"

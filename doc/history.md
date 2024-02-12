@@ -1,9 +1,6 @@
-<img src="logo-light.svg#gh-light-mode-only" height="24" />
-<img src="logo-dark.svg#gh-dark-mode-only" height="24" />
-
 # History
 
-> [!NOTE]
+> **🛈 Note**:
 > This document is a draft for a blog post. I plan to release it in early 2024 when the first version of skiftOS reaches 10 years old
 
 In this short document, I will try to explain the history of the project. And my 10 years jurney as a operating system developer.

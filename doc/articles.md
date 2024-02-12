@@ -1,6 +1,3 @@
-<img src="logo-light.svg#gh-light-mode-only" height="24" />
-<img src="logo-dark.svg#gh-dark-mode-only" height="24" />
-
 # Articles
 
 A collection of articles, videos, or just mentions of skiftOS around the web.

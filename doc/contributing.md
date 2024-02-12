@@ -1,6 +1,3 @@
-<img src="logo-light.svg#gh-light-mode-only" height="24" />
-<img src="logo-dark.svg#gh-dark-mode-only" height="24" />
-
 # Contributing
 
 Contributions are welcome and encouraged for this project! We practice [optimistic merging](http://hintjens.com/blog:106), which means that pull requests are merged into the main branch as soon as possible. The goal is to keep pull requests small, focused, and incremental.
@@ -17,6 +14,6 @@ Binary files should be kept as small as possible. Here are some tips for reducin
 - Use `gifsicle -O3` to reduce the size of GIF images.
 - Use `jpegoptim -m90` to reduce the size of JPEG images.
 
-## Code Style
+## Coding Style
 
 Just configure you IDE to use the `.clang-format` file at the root of the source tree, or use `meta/scripts/style-fix.sh` to format the code.

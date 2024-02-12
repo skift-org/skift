@@ -1,6 +1,3 @@
-<img src="logo-light.svg#gh-light-mode-only" height="24" />
-<img src="logo-dark.svg#gh-dark-mode-only" height="24" />
-
 # Usefull links
 
 A collection of usefull links to articles, videos, etc. that might help you

@@ -7,7 +7,7 @@
 namespace Hideo::Counter {
 
 Ui::Child app() {
-    return Ui::reducer<Model>([](State const &state) {
+    return Ui::reducer<Model>([](State const &s) {
         return Ui::scafold({
             .icon = Mdi::COUNTER,
             .title = "Counter",
@@ -24,14 +24,18 @@ Ui::Child app() {
                     Mdi::PLUS_THICK);
 
                 auto resetBtn = Ui::button(
-                    Model::bindIf<ResetAction>(not state.initial),
+                    Model::bindIf<ResetAction>(not s.initial),
                     Ui::ButtonStyle::subtle().withRadius(999),
                     Mdi::REFRESH, "Reset");
 
                 return Ui::vflow(
                            32,
                            Layout::Align::CENTER,
-                           Ui::displayMedium("{}", state.counter) | Ui::grow(),
+                           Ui::text(
+                               Ui::TextStyles::codeLarge()
+                                   .withSize(48),
+                               "{}", s.counter) |
+                               Ui::grow(),
                            Ui::hflow(16, decBtn, incBtn),
                            resetBtn) |
                        Ui::spacing(32);

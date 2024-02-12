@@ -11,6 +11,14 @@ Ui::Child app() {
         .title = "About",
         .titlebar = Ui::TitlebarStyle::DIALOG,
         .body = [] {
+            auto titleText = Ui::headlineMedium(
+                "skiftOS");
+
+            auto bodyText = Ui::bodySmall(
+                "Copyright © 2018-2024\n"
+                "The skiftOS Developers\n"
+                "All rights reserved.");
+
             auto licenseBtn = Ui::button(
                 [](auto &n) {
                     Ui::showDialog(n, Ui::licenseDialog());
@@ -24,22 +32,21 @@ Ui::Child app() {
                 Ui::ButtonStyle::primary(),
                 "Close");
 
-            return Ui::spacing(
-                16,
-                Ui::vflow(
-                    8,
-                    Ui::hflow(
-                        8,
-                        Ui::headlineMedium("skiftOS"),
-                        Ui::versionBadge() | Ui::center()),
-                    Ui::empty(),
-                    Ui::bodySmall("Copyright © 2018-2024\nThe skiftOS Developers\nAll rights reserved."),
-                    Ui::grow(NONE),
-                    Ui::hflow(
-                        8,
-                        licenseBtn,
-                        Ui::grow(NONE),
-                        closeBtn)));
+            return Ui::vflow(
+                       8,
+                       Ui::hflow(
+                           8,
+                           titleText,
+                           Ui::versionBadge() | Ui::center()),
+                       Ui::empty(),
+                       bodyText,
+                       Ui::grow(NONE),
+                       Ui::hflow(
+                           8,
+                           licenseBtn,
+                           Ui::grow(NONE),
+                           closeBtn)) |
+                   Ui::spacing(16);
         },
         .size = {460, 320},
     });

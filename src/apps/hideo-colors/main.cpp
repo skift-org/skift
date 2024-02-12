@@ -193,10 +193,8 @@ Ui::Child hsvSliders(State const &state) {
 }
 
 Gfx::Color pickColor(Gfx::Color c) {
-    if (c.luminance() > 0.7) {
+    if (c.luminance() > 0.7)
         return Gfx::BLACK;
-    }
-
     return Gfx::WHITE;
 }
 

@@ -123,11 +123,14 @@ struct LeafNode : public Node {
     virtual void reconcile(Crtp &) {}
 
     Opt<Child> reconcile(Child other) override {
-        if (this == &other.unwrap())
-            panic("reconcile() called on self, did you forget to wrap the node in a slot?");
-
+        // NOTE: Nodes should never be part of a state, to
+        //       ensure this we check that nodes are not
+        //       reused accross rebuilds
         if (other->_consumed)
             panic("reconcile() called on consumed node, did you forget to wrap the node in a slot?");
+
+        if (this == &other.unwrap())
+            panic("reconcile() called on self, did you forget to wrap the node in a slot?");
 
         if (not other.is<Crtp>())
             return other;

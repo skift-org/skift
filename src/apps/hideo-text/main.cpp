@@ -34,8 +34,7 @@ Ui::Child app(Res<String> text) {
     });
 }
 
-Res<String> readAllUtf8(Str urlStr) {
-    auto url = try$(Url::parseUrlOrPath(urlStr));
+Res<String> readAllUtf8(Url::Url const &url) {
     auto file = try$(Sys::File::open(url));
     return Io::readAllUtf8(file);
 }
@@ -45,7 +44,8 @@ Res<String> readAllUtf8(Str urlStr) {
 Res<> entryPoint(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
     Res<String> text = Error::invalidInput("No text provided");
+    auto url = try$(Url::parseUrlOrPath(args[0]));
     if (args.len())
-        text = Hideo::Text::readAllUtf8(args[0]);
+        text = Hideo::Text::readAllUtf8(url);
     return Ui::runApp(ctx, Hideo::Text::app(text));
 }

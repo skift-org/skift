@@ -77,7 +77,7 @@ Ui::Child app() {
                             Model::bind(Page::STOPWATCH)));
 
                     auto body = Ui::carousel(
-                        (isize)s.page,
+                        (usize)s.page,
                         {
                             Ui::labelLarge("Alarm"),
                             makeStrong<Clock>(Sys::dateTime().time),
@@ -98,7 +98,7 @@ Ui::Child app() {
 
 Async::Task<> timerTask(Ui::Child app) {
     while (not Sys::globalSched().exited()) {
-        co_try_await$(Sys::globalSched().sleepAsync(Sys::now() + TimeSpan::fromSecs(1)));
+        co_trya$(Sys::globalSched().sleepAsync(Sys::now() + TimeSpan::fromSecs(1)));
         Model::event<TimeTick>(*app);
     }
     co_return Ok();

@@ -99,24 +99,26 @@ struct Buf {
         return _buf[i].unwrap();
     }
 
-    void ensure(usize cap) {
-        if (cap <= _cap)
+    void ensure(usize desired) {
+        if (desired <= _cap)
             return;
 
         if (not _buf) {
-            _buf = new Inert<T>[cap];
-            _cap = cap;
+            _buf = new Inert<T>[desired];
+            _cap = desired;
             return;
         }
 
-        Inert<T> *tmp = new Inert<T>[cap];
+        usize newCap = max(_cap * 2, desired);
+
+        Inert<T> *tmp = new Inert<T>[newCap];
         for (usize i = 0; i < _len; i++) {
             tmp[i].ctor(_buf[i].take());
         }
 
         delete[] _buf;
         _buf = tmp;
-        _cap = cap;
+        _cap = newCap;
     }
 
     void fit() {

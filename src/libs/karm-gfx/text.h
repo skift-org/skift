@@ -121,6 +121,8 @@ struct Text {
             last(_blocks).spaces += 4;
         } else if (rune == '\n') {
             last(_blocks).newline = true;
+        } else if (not isAsciiPrint(rune)) {
+            // ignore
         } else {
             if (last(_blocks).hasWhitespace())
                 _beginBlock();

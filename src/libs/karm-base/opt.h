@@ -98,28 +98,28 @@ struct [[nodiscard]] Opt {
 
     always_inline constexpr T *operator->() {
         if (not _present) {
-            panic("Unwrapping None");
+            panic("unwrapping None");
         }
         return &_value;
     }
 
     always_inline constexpr T &operator*() {
         if (not _present) {
-            panic("Unwrapping None");
+            panic("unwrapping None");
         }
         return _value;
     }
 
     always_inline constexpr T const *operator->() const {
         if (not _present) {
-            panic("Unwrapping None");
+            panic("unwrapping None");
         }
         return &_value;
     }
 
     always_inline constexpr T const &operator*() const {
         if (not _present) {
-            panic("Unwrapping None");
+            panic("unwrapping None");
         }
         return _value;
     }

@@ -130,7 +130,7 @@ Res<> loadEntry(Entry const &entry) {
     try$(Fw::finalizeHandover(payload));
     Fw::enterKernel(ip, payload.finalize(), sp, *vmm);
 
-    panic("unreachable");
+    unreachable();
 }
 
 } // namespace Loader

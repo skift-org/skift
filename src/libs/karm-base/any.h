@@ -98,17 +98,15 @@ struct Any {
 
     template <typename T>
     T &unwrap() {
-        if (_type != Meta::idOf<T>()) {
-            panic("Unwrapping wrong type");
-        }
+        if (_type != Meta::idOf<T>())
+            panic("unwrapping wrong type");
         return *static_cast<T *>(_buf);
     }
 
     template <typename T>
     T const &unwrap() const {
-        if (_type != Meta::idOf<T>()) {
-            panic("Unwrapping wrong type");
-        }
+        if (_type != Meta::idOf<T>())
+            panic("unwrapping wrong type");
         return *static_cast<T *>(_buf);
     }
 

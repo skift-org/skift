@@ -43,9 +43,8 @@ struct Shape {
     }
 
     void add(Math::Edgef const &edge) {
-        if (edge.hasNan()) {
-            panic("NaN in edge");
-        }
+        if (edge.hasNan())
+            panic("nan in edge");
         _edges.add(edge);
     }
 

@@ -91,7 +91,7 @@ struct Var {
     template <Meta::Contains<Ts...> T>
     always_inline T &unwrap() {
         if (_index != Meta::indexOf<T, Ts...>()) {
-            panic("Unwrapping wrong type");
+            panic("unwrapping wrong type");
         }
 
         return *reinterpret_cast<T *>(_buf);
@@ -100,7 +100,7 @@ struct Var {
     template <Meta::Contains<Ts...> T>
     always_inline T const &unwrap() const {
         if (_index != Meta::indexOf<T, Ts...>()) {
-            panic("Unwrapping wrong type");
+            panic("unwrapping wrong type");
         }
 
         return *reinterpret_cast<T const *>(_buf);

@@ -181,7 +181,7 @@ struct Strong {
     constexpr U const &unwrap() const {
         ensure();
         if (not is<U>()) {
-            panic("Unwrapping T as U");
+            panic("unwrapping T as U");
         }
         return _cell->unwrap<U>();
     }
@@ -190,7 +190,7 @@ struct Strong {
     constexpr U &unwrap() {
         ensure();
         if (not is<U>()) {
-            panic("Unwrapping T as U");
+            panic("unwrapping T as U");
         }
         return _cell->unwrap<U>();
     }

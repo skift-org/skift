@@ -37,15 +37,9 @@ concept Takeable = requires(T t) {
 };
 
 template <typename T>
-using TakeableType = decltype(Meta::declval<T>().take());
-
-template <typename T>
 concept Unwrapable = requires(T t) {
     { t.unwrap() };
 };
-
-template <typename T>
-using UnwrapableType = Meta::RemoveRef<decltype(Meta::declval<T>().unwrap())>;
 
 template <typename T>
 concept Tryable = requires(T t) {

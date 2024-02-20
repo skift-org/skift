@@ -39,7 +39,7 @@ class Qemu(Machine):
             ovmf = shell.wget(
                 "https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd"
             )
-        
+
         supportsSDL = 'sdl' in str(subprocess.check_output(["qemu-system-x86_64", "-display", "help"]))
 
         qemuCmd: list[str] = [

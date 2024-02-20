@@ -14,13 +14,13 @@ extern "C" void __try_failled();
 #    define __tryFail() /* NOP */
 #endif
 
-#define __try$(EXPR, RET, AWAIT) ({      \
-    auto __expr = AWAIT(EXPR);           \
-    if (not static_cast<bool>(__expr)) { \
-        __tryFail();                     \
-        RET __expr.none();               \
-    }                                    \
-    __expr.take();                       \
+#define __try$(EXPR, RET, AWAIT) ({                   \
+    auto __expr = AWAIT(EXPR);                        \
+    if (not static_cast<bool>(__expr)) [[unlikely]] { \
+        __tryFail();                                  \
+        RET __expr.none();                            \
+    }                                                 \
+    __expr.take();                                    \
 })
 
 #define try$(EXPR) __try$(EXPR, return, )

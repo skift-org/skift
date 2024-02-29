@@ -47,25 +47,9 @@ if [ ! -f .cutekit/tools/ready ]; then
     fi
     source .cutekit/venv/bin/activate
 
-    echo "Downloading CuteKit & Chatty..."
-    if [ ! -d .cutekit/tools/cutekit ]; then
-        git clone --depth 1 https://github.com/cute-engineering/cutekit .cutekit/tools/cutekit --branch "0.7-dev"
-    else
-        echo "CuteKit already downloaded."
-    fi
-
-    if [ ! -d .cutekit/tools/chatty ]; then
-        git clone --depth 1 https://github.com/cute-engineering/chatty .cutekit/tools/chatty
-    else
-        echo "Chatty already downloaded."
-    fi
-
     echo "Installing Tools..."
-    pip3 install -e .cutekit/tools/cutekit
-    pip3 install -e .cutekit/tools/chatty
     pip3 install -r meta/plugins/requirements.txt
 
-    touch .cutekit/tools/ready
     echo "Done!"
 fi
 

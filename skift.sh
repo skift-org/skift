@@ -20,7 +20,7 @@ if [ "$1" == "tools" -a "$2" == "nuke" ]; then
     exit 0
 fi
 
-if [ ! -f .cutekit/tools/ready ]; then
+if [ ! -f .cutekit/tools-ready ]; then
     if [ ! \( "$1" == "tools" -a "$2" == "setup" \) ]; then
         echo "Tools not installed."
         echo "This script will install the tooling required to build SkiftOS into $PWD/.cutekit"
@@ -50,6 +50,7 @@ if [ ! -f .cutekit/tools/ready ]; then
     echo "Installing Tools..."
     pip3 install -r meta/plugins/requirements.txt
 
+    touch .cutekit/tools-ready
     echo "Done!"
 fi
 

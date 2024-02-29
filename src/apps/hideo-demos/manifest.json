@@ -4,6 +4,7 @@
     "type": "exe",
     "description": "Showcase of KarmUi and KarmGfx features",
     "requires": [
-        "hideo-base"
+        "hideo-base",
+        "mixbox-spec"
     ]
 }

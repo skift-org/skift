@@ -441,4 +441,13 @@ always_inline Opt<usize> search(Sliceable auto const &slice, auto cmp) {
     return NONE;
 }
 
+always_inline bool startWith(Sliceable auto const &slice, Sliceable auto const &prefix) {
+    if (slice.len() < prefix.len())
+        return false;
+    for (usize i = 0; i < prefix.len(); i++)
+        if (slice[i] != prefix[i])
+            return false;
+    return true;
+}
+
 } // namespace Karm

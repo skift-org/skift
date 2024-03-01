@@ -42,7 +42,8 @@ struct [[nodiscard]] Opt {
             std::construct_at(&_value, other.unwrap());
     }
 
-    always_inline constexpr Opt(Opt &&other) : _present(other._present) {
+    always_inline constexpr Opt(Opt &&other)
+        : _present(other._present) {
         if (_present)
             std::construct_at(&_value, other.take());
     }

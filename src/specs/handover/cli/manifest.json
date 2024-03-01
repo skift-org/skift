@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "handover-dump",
+    "id": "handover-cli",
     "type": "exe",
     "description": "Dump handover information from an kernel elf executable",
     "requires": [

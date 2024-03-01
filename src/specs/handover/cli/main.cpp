@@ -16,9 +16,8 @@ Res<> entryPoint(Sys::Ctx &ctx) {
     auto kernelMem = try$(Sys::mmap().read().map(kernelFile));
     Elf::Image kernelElf{kernelMem.bytes()};
 
-    if (not kernelElf.valid()) {
+    if (not kernelElf.valid())
         return Error::invalidData("kernel is not a valid ELF executable");
-    }
 
     auto requests = try$(kernelElf.sectionByName(Handover::REQUEST_SECTION))
                         .slice<Handover::Request>();

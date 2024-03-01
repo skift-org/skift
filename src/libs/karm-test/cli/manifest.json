@@ -1,9 +1,12 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "hashsum",
+    "id": "karm-tests-cli",
     "type": "exe",
-    "description": "Compute checksums and hashes of files",
+    "description": "Test runner",
     "requires": [
-        "karm-sys"
+        "karm-test"
+    ],
+    "provides": [
+        "__tests__"
     ]
 }

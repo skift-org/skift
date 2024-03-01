@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "web-html",
+    "type": "lib",
+    "description": "Implementation of the HTML standard (https://html.spec.whatwg.org/multipage/)",
+    "requires": [
+        "karm-logger",
+        "web-base"
+    ]
+}

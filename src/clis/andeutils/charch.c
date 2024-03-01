@@ -3,7 +3,7 @@
 /*
 * Copyright (C) 2024 AnatoliyL.
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the Andesaurus Free Software License version 1.1 as published by AnatoliyL.
+* it under the terms of the Andesaurus Free Software License version 1.1-no-mintsuki-clause as published by AnatoliyL.
 * See COPYING file for more details.
 */
 int main(int argc, char **argv)

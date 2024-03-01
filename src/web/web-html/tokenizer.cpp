@@ -3125,7 +3125,7 @@ void Tokenizer::consume(Rune rune, bool isEof) {
 
         // ASCII alphanumeric
         // Reconsume in the named character reference state.
-        if (isalnum(rune)) {
+        if (isAsciiAlphaNum(rune)) {
             _reconsumeIn(State::NAMED_CHARACTER_REFERENCE, rune);
         }
 
@@ -3201,7 +3201,7 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // then append the current input character to the current
         // attribute's value. Otherwise, emit the current input character as
         // a character token.
-        if (isalnum(rune)) {
+        if (isAsciiAlphaNum(rune)) {
             if (_state == State::ATTRIBUTE_VALUE_DOUBLE_QUOTED ||
                 _state == State::ATTRIBUTE_VALUE_SINGLE_QUOTED ||
                 _state == State::ATTRIBUTE_VALUE_UNQUOTED) {

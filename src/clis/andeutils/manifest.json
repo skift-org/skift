@@ -1,5 +1,5 @@
 {
-    "$schema": "https://github.com/AnatoliyL2/Andesaurux",
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "andeutils",
     "type": "exe",
     "description": "some useful programs from Andesaurux OS(https://github.com/AnatoliyL2/Andesaurux)",

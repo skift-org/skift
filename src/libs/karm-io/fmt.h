@@ -82,10 +82,18 @@ inline Res<usize> _format(Io::TextWriter &writer, Str format, _Args &args) {
     return Ok(written);
 }
 
+inline Res<usize> format(Io::TextWriter &writer, Str format) {
+    return writer.writeStr(format);
+}
+
 template <typename... Ts>
 inline Res<usize> format(Io::TextWriter &writer, Str format, Ts &&...ts) {
     Args<Ts...> args{std::forward<Ts>(ts)...};
     return _format(writer, format, args);
+}
+
+inline Res<String> format(Str format) {
+    return Ok(format);
 }
 
 template <typename... Ts>

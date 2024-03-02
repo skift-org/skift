@@ -127,4 +127,7 @@ struct Distinct {
     }
 };
 
+static_assert(sizeof(Distinct<int, struct _Tag>) == sizeof(int));
+static_assert(alignof(Distinct<int, struct _Tag>) == alignof(int));
+
 } // namespace Karm

@@ -56,7 +56,7 @@
     ```sh
     ./skift.sh tools setup
     ```
-    > **🛈 Note**:<br> On Ubuntu, this step also installs dependencies.
+    > **<i class="fa fa-info-circle" aria-hidden="true"></i> Note**:<br> On Ubuntu, this step also installs dependencies.
 
 4. **Verify Setup:**
 
@@ -75,8 +75,8 @@
    ```sh
    ./skift.sh image start
    ```
-    > **🛈 Note**:<br>
-    > Requires a graphical environment and QEMU with graphics support (SDL or GTK). 
+    > **<i class="fa fa-info-circle" aria-hidden="true"></i> Note**<br>
+    > Requires a graphical environment and QEMU with graphics support (SDL or GTK).
     > For headless servers, build a disk image instead: `./skift.sh image build --format=hdd`
 
     **Enjoy!** You now have a working installation of skiftOS.

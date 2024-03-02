@@ -1,6 +1,6 @@
 # History
 
-> **🛈 Note**:
+> **<i class="fa fa-info-circle" aria-hidden="true"></i> Note**
 > This document is a draft for a blog post. I plan to release it in early 2024 when the first version of skiftOS reaches 10 years old
 
 In this short document, I will try to explain the history of the project. And my 10 years jurney as a operating system developer.
@@ -78,4 +78,4 @@ I hope to release the first version of skiftOS in 2024
 
 ## Beyond
 
-Thanks for reading this short history of the project. See [doc/roadmap.md](doc/roadmap.md) for more information about the future of the project. I so excited to see where this project will go in the future. I hope you will join me in this journey (See [doc/contributing.md](doc/contributing.md)). 😊 
+Thanks for reading this short history of the project. See [doc/roadmap](https://docs.skiftos.org/roadmap.html) for more information about the future of the project. I so excited to see where this project will go in the future. I hope you will join me in this journey (See [doc/contributing](https://docs.skiftos.org/contributing.html)). 😊

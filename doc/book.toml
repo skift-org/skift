@@ -6,5 +6,7 @@ src = "."
 title = "SkiftOS Developer Manual"
 
 [output.html]
-default-theme = "skift-light"
+default-theme = "skift-dark"
 preferred-dark-theme = "skift-dark"
+git-repository-url = "https://github.com/skift-org/skift"
+edit-url-template = "https://github.com/skift-org/skift/edit/main/doc/{path}"

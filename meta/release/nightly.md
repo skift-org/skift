@@ -3,4 +3,4 @@
 
 ## Running
 
-See [doc/running.md](doc/running.md)
+See [doc/running](https://docs.skiftos.org/running.html)

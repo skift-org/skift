@@ -1,4 +1,4 @@
-# "Hello, world!"
+# Hello, world!
 
 This is the first tutorial in the series. It will show you how to create a simple "Hello, world!" program in C++ for skiftOS.
 

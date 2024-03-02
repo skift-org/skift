@@ -4,3 +4,7 @@ language = "en"
 multilingual = false
 src = "."
 title = "SkiftOS Developer Manual"
+
+[output.html]
+default-theme = "skift-light"
+preferred-dark-theme = "skift-dark"

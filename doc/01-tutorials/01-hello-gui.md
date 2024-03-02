@@ -13,7 +13,7 @@ We will be starting from the `hello-world` project we created in the previous tu
 
 ## Add the GUI library
 
-First, we need to add the GUI library to the project. Open the `manifest.json` file in the project directory and add the `gui` library to the `requires` field:
+First, we need to add the GUI library to the project. Open the `manifest.json` file in the project directory and add the `karm-gui` library to the `requires` field:
 
 ```json
 {
@@ -81,3 +81,7 @@ If you build and run the project again, you should see the text centered in the 
 ## Conclusion
 
 Congratulations! You have created your first GUI application for skiftOS
+
+## Going further
+
+Karm UI provides many more features for creating graphical user interfaces. You can explore the [Karm UI documentation](/libraries/karm-ui) to learn more about the available components and how to use them.

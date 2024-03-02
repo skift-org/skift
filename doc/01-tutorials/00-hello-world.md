@@ -80,4 +80,12 @@ $ ./skift.sh builder run hello-world
 
 You should see "Hello, world!" printed to the console.
 
+## Conclusion
+
 Congratulations! You have created your first program for skiftOS.
+
+
+## Going further
+
+- [Next tutorial: Hello, GUI!](01-hello-gui.md)
+- src/libs/karm-sys/chan.h - The system channel API similar to stdio

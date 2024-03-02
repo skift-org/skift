@@ -1,8 +1,10 @@
-name: Nightly
+name: Nightly Build
+
 on:
   schedule:
     # Every day at 1 AM
     - cron: '0 1 * * *'
+  workflow_dispatch:
 
 jobs:
   check_date:
@@ -44,20 +46,15 @@ jobs:
         run: ./skift.sh model install
 
       - name: Build System Image (efi-x86_64)
-        run: ./skift.sh image build --format=hdd --prop:branch=nightly --dist --compress=gzip
+        run: ./skift.sh image build --format=hdd --prop:branch=nightly --dist
 
       - name: Read release.md and use it as a body of new release
         id: read_release
         run: ./meta/scripts/dump-body.sh meta/release/nightly.md >> $GITHUB_OUTPUT
 
-      - name: Upload Packages to GitHub
-        uses: svenstaro/upload-release-action@v2
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: .cutekit/dist/*
-          tag: "nightly"
-          file_glob: true
-          overwrite: true
-          prerelease: true
-          target_commit: ${{ github.sha }}
-          body: ${{ steps.read_release.outputs.RELEASE_BODY }}
+          name: image-efi-x86_64
+          path: .cutekit/dist/image-efi-x86_64.hdd
+          if-no-files-found: error

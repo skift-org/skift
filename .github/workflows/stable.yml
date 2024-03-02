@@ -1,4 +1,5 @@
-name: Stable
+name: Stable Build
+
 on:
   schedule:
     # Every month at 1 AM

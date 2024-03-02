@@ -35,6 +35,14 @@ struct Tuple<> {
     constexpr auto visit(auto) const {
         return true;
     }
+
+    constexpr auto apply(auto) {
+        return true;
+    }
+
+    constexpr auto apply(auto) const {
+        return true;
+    }
 };
 
 template <typename _T0>
@@ -56,6 +64,14 @@ struct Tuple<_T0> {
     }
 
     constexpr auto visit(auto f) const {
+        return f(v0);
+    }
+
+    constexpr auto apply(auto f) {
+        return f(v0);
+    }
+
+    constexpr auto apply(auto f) const {
         return f(v0);
     }
 };
@@ -94,6 +110,14 @@ struct Tuple<_T0, _T1> {
         if (not res)
             return res;
         return f(v1);
+    }
+
+    constexpr auto apply(auto f) {
+        return f(v0, v1);
+    }
+
+    constexpr auto apply(auto f) const {
+        return f(v0, v1);
     }
 };
 
@@ -142,6 +166,14 @@ struct Tuple<_T0, _T1, _T2> {
         if (not res)
             return res;
         return f(v2);
+    }
+
+    constexpr auto apply(auto f) {
+        return f(v0, v1, v2);
+    }
+
+    constexpr auto apply(auto f) const {
+        return f(v0, v1, v2);
     }
 };
 
@@ -201,6 +233,14 @@ struct Tuple<_T0, _T1, _T2, _T3> {
         if (not res)
             return res;
         return f(v3);
+    }
+
+    constexpr auto apply(auto f) {
+        return f(v0, v1, v2, v3);
+    }
+
+    constexpr auto apply(auto f) const {
+        return f(v0, v1, v2, v3);
     }
 };
 
@@ -271,6 +311,14 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4> {
         if (not res)
             return res;
         return f(v4);
+    }
+
+    constexpr auto apply(auto f) {
+        return f(v0, v1, v2, v3, v4);
+    }
+
+    constexpr auto apply(auto f) const {
+        return f(v0, v1, v2, v3, v4);
     }
 };
 
@@ -352,6 +400,14 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5> {
         if (not res)
             return res;
         return f(v5);
+    }
+
+    constexpr auto apply(auto f) {
+        return f(v0, v1, v2, v3, v4, v5);
+    }
+
+    constexpr auto apply(auto f) const {
+        return f(v0, v1, v2, v3, v4, v5);
     }
 };
 
@@ -444,6 +500,14 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6> {
         if (not res)
             return res;
         return f(v6);
+    }
+
+    constexpr auto apply(auto f) {
+        return f(v0, v1, v2, v3, v4, v5, v6);
+    }
+
+    constexpr auto apply(auto f) const {
+        return f(v0, v1, v2, v3, v4, v5, v6);
     }
 };
 
@@ -547,6 +611,14 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7> {
         if (not res)
             return res;
         return f(v7);
+    }
+
+    constexpr auto apply(auto f) {
+        return f(v0, v1, v2, v3, v4, v5, v6, v7);
+    }
+
+    constexpr auto apply(auto f) const {
+        return f(v0, v1, v2, v3, v4, v5, v6, v7);
     }
 };
 

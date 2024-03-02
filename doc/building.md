@@ -31,7 +31,7 @@
     <summary>Arch Linux</summary>
 
     ```sh
-    pacman -Syu git clang llvm nasm qemu-full
+    pacman -Syu git clang llvm nasm qemu-full gptfdisk mtools liburing sdl2
     ```
 
     </details>

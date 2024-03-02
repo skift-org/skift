@@ -29,7 +29,7 @@ def _() -> None:
     pass
 
 
-class BuildArgs:
+class BuildArgs(model.RegistryArgs):
     debug: bool = cli.arg(None, "debug", "Build the image in debug mode")
     fmt: str = cli.arg(None, "format", "The format of the image")
     compress: str = cli.arg(None, "compress", "Compress the image")
@@ -38,11 +38,9 @@ class BuildArgs:
 
 @cli.command("g", "image/build", "Generate the boot image")
 def _(args: BuildArgs) -> None:
+    args.mixins.append("release" if not args.debug else "debug")
 
-    rargs = cli.defaults(model.RegistryArgs)
-    rargs.mixins.append("release" if not args.debug else "debug")
-
-    registry = model.Registry.use(rargs)
+    registry = model.Registry.use(args)
 
     s = (
         store.Dir("image-efi-x86_64")
@@ -63,12 +61,12 @@ def _(args: BuildArgs) -> None:
         shell.mkdir(distDir)
         distPath = distDir / Path(file).name
         shell.cp(file, distPath)
-        file = distPath
+        file = str(distPath)
 
     print(file)
 
 
-class BuildArgs:
+class StartArgs:
     debug: bool = cli.arg(None, "debug", "Build the image in debug mode")
     arch: str = cli.arg(
         None,
@@ -80,7 +78,7 @@ class BuildArgs:
 
 
 @cli.command("s", "image/start", "Boot the system")
-def _(args: BuildArgs) -> None:
+def _(args: StartArgs) -> None:
     if args.arch not in ["x86_64", "riscv32"]:
         raise RuntimeError("Unknown arch")
     rargs = cli.defaults(model.RegistryArgs)

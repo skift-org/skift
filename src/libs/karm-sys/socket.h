@@ -87,28 +87,30 @@ struct _Listener :
 struct UdpConnection :
     Meta::NoCopy {
 
-    SocketAddr _addr;
     Strong<Sys::Fd> _fd;
+    SocketAddr _addr;
 
     static Res<UdpConnection> listen(SocketAddr addr);
 
     UdpConnection(Strong<Sys::Fd> fd, SocketAddr addr)
-        : _addr(addr), _fd(std::move(fd)) {}
+        : _fd(std::move(fd)), _addr(addr) {}
 
     Res<usize> send(Bytes buf, SocketAddr addr) {
-        return _fd->sendTo(buf, addr);
+        auto [nbytes, _] = try$(_fd->send(buf, {}, addr));
+        return Ok(nbytes);
     }
 
     auto sendAsync(Bytes buf, SocketAddr addr) {
-        return globalSched().sendAsync(_fd, buf, addr);
+        return globalSched().sendAsync(_fd, buf, {}, addr);
     }
 
-    Res<Received> recv(MutBytes buf) {
-        return _fd->recvFrom(buf);
+    Res<Cons<usize, SocketAddr>> recv(MutBytes buf) {
+        auto [nbytes, _, addr] = try$(_fd->recv(buf, {}));
+        return Ok<Cons<usize, SocketAddr>>(nbytes, addr);
     }
 
     auto recvAsync(MutBytes buf) {
-        return globalSched().recvAsync(_fd, buf);
+        return globalSched().recvAsync(_fd, buf, {});
     }
 };
 
@@ -146,34 +148,59 @@ struct TcpListener :
 
 /* --- Ipc Socket ---------------------------------------------------------- */
 
-struct IpcConnection :
-    public Connection {
-
+struct IpcConnection {
+    Strong<Sys::Fd> _fd;
     Opt<Url::Url> _url;
+
+    static constexpr usize MAX_BUF_SIZE = 4096;
+    static constexpr usize MAX_HND_SIZE = 16;
 
     static Res<IpcConnection> connect(Url::Url url);
 
-    IpcConnection(Strong<Sys::Fd> fd, Url::Url url)
-        : Connection(std::move(fd)), _url(std::move(url)) {}
+    IpcConnection(Strong<Sys::Fd> fd, Opt<Url::Url> url)
+        : _fd(std::move(fd)), _url(std::move(url)) {}
 
-    Res<> sendFd(AsFd auto &fd) {
-        return _fd->sendFd(fd.fd());
+    Res<> send(Bytes buf, Slice<Handle> hnds) {
+        try$(_fd->send(buf, hnds, {Ip4::unspecified(), 0}));
+        return Ok();
     }
 
-    Res<Strong<Fd>> recvFd() {
-        return _fd->recvFd();
+    Res<Cons<usize>> recv(MutBytes buf, MutSlice<Handle> hnds) {
+        auto [nbytes, nhnds, _] = try$(_fd->recv(buf, hnds));
+        return Ok<Cons<usize>>(nbytes, nhnds);
+    }
+
+    Async::Task<> sendAsync(Bytes buf, Slice<Handle> hnds) {
+        co_trya$(globalSched().sendAsync(_fd, buf, hnds, Ip4::unspecified(0)));
+        co_return Ok();
+    }
+
+    Async::Task<Cons<usize>> recvAsync(MutBytes buf, MutSlice<Handle> hnds) {
+        auto [nbytes, nhnds, _] = co_trya$(globalSched().recvAsync(_fd, buf, hnds));
+        co_return Ok<Cons<usize>>(nbytes, nhnds);
     }
 };
 
-struct IpcListener :
-    public _Listener<TcpConnection> {
-
+struct IpcListener {
+    Strong<Fd> _fd;
     Opt<Url::Url> _url;
 
     static Res<IpcListener> listen(Url::Url url);
 
     IpcListener(Strong<Sys::Fd> fd, Url::Url url)
-        : _Listener(std::move(fd)), _url(std::move(url)) {}
+        : _fd(fd), _url(url) {}
+
+    Res<IpcConnection> accept() {
+        auto [fd, _] = try$(_fd->accept());
+        return Ok(IpcConnection(std::move(fd), NONE));
+    }
+
+    Async::Task<IpcConnection> acceptAsync() {
+        auto [fd, _] = co_trya$(globalSched().acceptAsync(_fd));
+        co_return Ok(IpcConnection(std::move(fd), NONE));
+    }
+
+    Strong<Fd> fd() { return _fd; }
 };
 
 } // namespace Karm::Sys

@@ -22,8 +22,8 @@ Res<Strong<Fd>> NullFd::dup() {
     return Ok(makeStrong<NullFd>());
 }
 
-Res<Accepted> NullFd::accept() {
-    return Ok<Accepted>(
+Res<_Accepted> NullFd::accept() {
+    return Ok<_Accepted>(
         makeStrong<NullFd>(),
         Ip4::unspecified(0));
 }
@@ -32,20 +32,12 @@ Res<Stat> NullFd::stat() {
     return Ok(Stat{});
 }
 
-Res<> NullFd::sendFd(Strong<Fd>) {
-    return Ok();
+Res<_Sent> NullFd::send(Bytes, Slice<Handle>, SocketAddr) {
+    return Ok<_Sent>(0uz, 0uz);
 }
 
-Res<Strong<Fd>> NullFd::recvFd() {
-    return Ok(makeStrong<NullFd>());
-}
-
-Res<usize> NullFd::sendTo(Bytes, SocketAddr) {
-    return Ok(0uz);
-}
-
-Res<Received> NullFd::recvFrom(MutBytes) {
-    return Ok<Received>(0uz, Ip4::unspecified(0));
+Res<_Received> NullFd::recv(MutBytes, MutSlice<Handle>) {
+    return Ok<_Received>(0uz, 0uz, Ip4::unspecified(0));
 }
 
 } // namespace Karm::Sys

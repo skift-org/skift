@@ -40,6 +40,8 @@ Res<Strong<Sys::Fd>> connectTcp(SocketAddr addr);
 
 Res<Strong<Sys::Fd>> listenTcp(SocketAddr addr);
 
+Res<Strong<Sys::Fd>> listenIpc(Url::Url url);
+
 /* --- Time ----------------------------------------------------------------- */
 
 TimeStamp now();

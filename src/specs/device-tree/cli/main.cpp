@@ -15,9 +15,8 @@ Res<> entryPoint(Sys::Ctx &ctx) {
     auto dtbMem = try$(Sys::mmap().read().map(dtbFile));
     auto dtb = try$(DeviceTree::Blob::load(dtbMem.bytes()));
 
-    if (not dtb.valid()) {
+    if (not dtb.valid())
         return Error::invalidData("dtb is not a valid device tree");
-    }
 
     Sys::println("dtb is valid");
     return Ok();

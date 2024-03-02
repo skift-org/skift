@@ -17,8 +17,8 @@ struct ConOut : public Sys::Fd {
 
     ConOut(Efi::SimpleTextOutputProtocol *proto) : _proto(proto) {}
 
-    usize handle() const override {
-        return (usize)_proto;
+    Sys::Handle handle() const override {
+        return Handle{(usize)_proto};
     }
 
     Res<usize> read(MutBytes) override {
@@ -62,7 +62,7 @@ struct ConOut : public Sys::Fd {
         notImplemented();
     }
 
-    Res<Accepted> accept() override {
+    Res<_Accepted> accept() override {
         notImplemented();
     }
 
@@ -70,19 +70,11 @@ struct ConOut : public Sys::Fd {
         return Ok<Stat>();
     }
 
-    Res<> sendFd(Strong<Fd>) override {
+    Res<_Sent> send(Bytes, Slice<Handle>, SocketAddr) override {
         notImplemented();
     }
 
-    Res<Strong<Fd>> recvFd() override {
-        notImplemented();
-    }
-
-    Res<usize> sendTo(Bytes, SocketAddr) override {
-        notImplemented();
-    }
-
-    Res<Received> recvFrom(MutBytes) override {
+    Res<_Received> recv(MutBytes, MutSlice<Handle>) override {
         notImplemented();
     }
 };
@@ -107,8 +99,8 @@ struct FileProto : public Sys::Fd {
         return *this;
     }
 
-    usize handle() const override {
-        return (usize)_proto;
+    Handle handle() const override {
+        return Handle((usize)_proto);
     }
 
     Res<usize> read(MutBytes bytes) override {
@@ -157,7 +149,7 @@ struct FileProto : public Sys::Fd {
         notImplemented();
     }
 
-    Res<Accepted> accept() override {
+    Res<_Accepted> accept() override {
         notImplemented();
     }
 
@@ -179,19 +171,11 @@ struct FileProto : public Sys::Fd {
         });
     }
 
-    Res<> sendFd(Strong<Fd>) override {
+    Res<_Sent> send(Bytes, Slice<Handle>, SocketAddr) override {
         notImplemented();
     }
 
-    Res<Strong<Fd>> recvFd() override {
-        notImplemented();
-    }
-
-    Res<usize> sendTo(Bytes, SocketAddr) override {
-        notImplemented();
-    }
-
-    Res<Received> recvFrom(MutBytes) override {
+    Res<_Received> recv(MutBytes, MutSlice<Handle>) override {
         notImplemented();
     }
 };
@@ -219,6 +203,10 @@ Res<Strong<Sys::Fd>> listenTcp(SocketAddr) {
 }
 
 Res<Strong<Sys::Fd>> listenUdp(SocketAddr) {
+    notImplemented();
+}
+
+Res<Strong<Sys::Fd>> listenIpc(Url::Url) {
     notImplemented();
 }
 

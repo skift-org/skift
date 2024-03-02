@@ -8,44 +8,42 @@
 
 #include "addr.h"
 #include "stat.h"
+#include "types.h"
 
 namespace Karm::Sys {
 
 struct Fd;
 
-using Accepted = Cons<Strong<Fd>, SocketAddr>;
-using Received = Cons<usize, SocketAddr>;
+using _Accepted = Cons<Strong<Fd>, SocketAddr>;
+using _Sent = Cons<usize, usize>;
+using _Received = Tuple<usize, usize, SocketAddr>;
 
 struct Fd : Meta::NoCopy {
     virtual ~Fd() = default;
 
-    virtual usize handle() const = 0;
+    virtual Handle handle() const = 0;
 
     virtual Res<usize> read(MutBytes) = 0;
 
     virtual Res<usize> write(Bytes) = 0;
 
-    virtual Res<usize> seek(Io::Seek seek) = 0;
+    virtual Res<usize> seek(Io::Seek) = 0;
 
     virtual Res<usize> flush() = 0;
 
     virtual Res<Strong<Fd>> dup() = 0;
 
-    virtual Res<Accepted> accept() = 0;
+    virtual Res<_Accepted> accept() = 0;
 
     virtual Res<Stat> stat() = 0;
 
-    virtual Res<> sendFd(Strong<Fd>) = 0;
+    virtual Res<_Sent> send(Bytes, Slice<Handle>, SocketAddr) = 0;
 
-    virtual Res<Strong<Fd>> recvFd() = 0;
-
-    virtual Res<usize> sendTo(Bytes, SocketAddr) = 0;
-
-    virtual Res<Received> recvFrom(MutBytes) = 0;
+    virtual Res<_Received> recv(MutBytes, MutSlice<Handle>) = 0;
 };
 
 struct NullFd : public Fd {
-    usize handle() const override { return -1; }
+    Handle handle() const override { return INVALID; }
 
     Res<usize> read(MutBytes) override;
 
@@ -57,17 +55,13 @@ struct NullFd : public Fd {
 
     Res<Strong<Fd>> dup() override;
 
-    Res<Accepted> accept() override;
+    Res<_Accepted> accept() override;
 
     Res<Stat> stat() override;
 
-    Res<> sendFd(Strong<Fd>) override;
+    Res<_Sent> send(Bytes, Slice<Handle>, SocketAddr) override;
 
-    Res<Strong<Fd>> recvFd() override;
-
-    Res<usize> sendTo(Bytes, SocketAddr) override;
-
-    Res<Received> recvFrom(MutBytes) override;
+    Res<_Received> recv(MutBytes, MutSlice<Handle>) override;
 };
 
 template <typename T>

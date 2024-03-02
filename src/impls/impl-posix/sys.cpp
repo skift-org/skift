@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/un.h>
 #include <sys/utsname.h>
 #include <time.h>
 #include <unistd.h>
@@ -27,6 +28,17 @@ Res<Url::Path> resolve(Url::Url const &url) {
     Url::Path resolved;
     if (url.scheme == "file") {
         resolved = url.path;
+    } else if (url.scheme == "ipc") {
+        auto const *runtimeDir = getenv("XDG_RUNTIME_DIR");
+        if (not runtimeDir) {
+            runtimeDir = "/tmp/";
+            logWarn("XDG_RUNTIME_DIR not set, falling back on {}", runtimeDir);
+        }
+
+        auto path = url.path;
+        path.rooted = false;
+
+        resolved = Url::Path::parse(runtimeDir).join(path);
     } else if (url.scheme == "bundle") {
         auto *maybeRepo = getenv("CK_BUILDDIR");
 
@@ -188,6 +200,27 @@ Res<Strong<Sys::Fd>> listenTcp(SocketAddr addr) {
     struct sockaddr_in addr_ = Posix::toSockAddr(addr);
 
     if (::bind(fd, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
+        return Posix::fromLastErrno();
+
+    if (::listen(fd, 128) < 0)
+        return Posix::fromLastErrno();
+
+    return Ok(makeStrong<Posix::Fd>(fd));
+}
+
+Res<Strong<Sys::Fd>> listenIpc(Url::Url url) {
+    int fd = ::socket(AF_UNIX, SOCK_STREAM, 0);
+    if (fd < 0)
+        return Posix::fromLastErrno();
+
+    struct sockaddr_un addr = {};
+    addr.sun_family = AF_UNIX;
+    String path = try$(resolve(url)).str();
+    logDebug("Listening on {}", path);
+    auto sunPath = MutSlice(addr.sun_path, sizeof(addr.sun_path) - 1);
+    copy(sub(path), sunPath);
+
+    if (::bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
         return Posix::fromLastErrno();
 
     if (::listen(fd, 128) < 0)

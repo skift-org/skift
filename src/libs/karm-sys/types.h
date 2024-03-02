@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/distinct.h>
 #include <karm-base/enum.h>
 #include <karm-base/std.h>
 
@@ -32,5 +33,9 @@ struct MmapResult {
     usize vaddr;
     usize size;
 };
+
+using Handle = Distinct<usize, struct _HandleTag>;
+
+static constexpr Handle INVALID = Handle(-1);
 
 } // namespace Karm::Sys

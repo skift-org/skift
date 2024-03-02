@@ -12,7 +12,7 @@ struct Fd : public Sys::Fd {
 
     ~Fd() override;
 
-    usize handle() const override;
+    Sys::Handle handle() const override;
 
     Res<usize> read(MutBytes bytes) override;
 
@@ -24,17 +24,13 @@ struct Fd : public Sys::Fd {
 
     Res<Strong<Sys::Fd>> dup() override;
 
-    Res<Sys::Accepted> accept() override;
+    Res<Sys::_Accepted> accept() override;
 
     Res<Sys::Stat> stat() override;
 
-    Res<> sendFd(Strong<Sys::Fd> fd) override;
+    Res<Sys::_Sent> send(Bytes, Slice<Sys::Handle>, Sys::SocketAddr) override;
 
-    Res<Strong<Sys::Fd>> recvFd() override;
-
-    Res<usize> sendTo(Bytes bytes, Sys::SocketAddr addr) override;
-
-    Res<Cons<usize, Sys::SocketAddr>> recvFrom(MutBytes bytes) override;
+    Res<Sys::_Received> recv(MutBytes, MutSlice<Sys::Handle>) override;
 };
 
 } // namespace Posix

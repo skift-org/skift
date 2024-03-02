@@ -79,7 +79,7 @@ struct UringSched : public Sys::Sched {
                 : _fd(fd), _buf(buf) {}
 
             void submit(io_uring_sqe *sqe) override {
-                io_uring_prep_read(sqe, _fd->handle(), _buf.buf(), _buf.len(), 0);
+                io_uring_prep_read(sqe, _fd->handle().value(), _buf.buf(), _buf.len(), 0);
             }
 
             void complete(io_uring_cqe *cqe) override {
@@ -110,7 +110,7 @@ struct UringSched : public Sys::Sched {
                 : _fd(fd), _buf(buf) {}
 
             void submit(io_uring_sqe *sqe) override {
-                io_uring_prep_write(sqe, _fd->handle(), _buf.buf(), _buf.len(), 0);
+                io_uring_prep_write(sqe, _fd->handle().value(), _buf.buf(), _buf.len(), 0);
             }
 
             void complete(io_uring_cqe *cqe) override {
@@ -140,7 +140,7 @@ struct UringSched : public Sys::Sched {
                 : _fd(fd) {}
 
             void submit(io_uring_sqe *sqe) override {
-                io_uring_prep_fsync(sqe, _fd->handle(), 0);
+                io_uring_prep_fsync(sqe, _fd->handle().value(), 0);
             }
 
             void complete(io_uring_cqe *cqe) override {
@@ -161,18 +161,18 @@ struct UringSched : public Sys::Sched {
         return Async::makeTask(job->future());
     }
 
-    Async::Task<Accepted> acceptAsync(Strong<Fd> fd) override {
+    Async::Task<_Accepted> acceptAsync(Strong<Fd> fd) override {
         struct Job : public _Job {
             Strong<Fd> _fd;
             sockaddr_in _addr{};
             unsigned _addrLen = sizeof(sockaddr_in);
-            Async::Promise<Accepted> _promise;
+            Async::Promise<_Accepted> _promise;
 
             Job(Strong<Fd> fd)
                 : _fd(fd) {}
 
             void submit(io_uring_sqe *sqe) override {
-                io_uring_prep_accept(sqe, _fd->handle(), (struct sockaddr *)&_addr, &_addrLen, 0);
+                io_uring_prep_accept(sqe, _fd->handle().value(), (struct sockaddr *)&_addr, &_addrLen, 0);
             }
 
             void complete(io_uring_cqe *cqe) override {
@@ -180,7 +180,7 @@ struct UringSched : public Sys::Sched {
                 if (res < 0)
                     _promise.resolve(Posix::fromErrno(-cqe->res));
                 else {
-                    Accepted accepted = {makeStrong<Posix::Fd>(res), Posix::fromSockAddr(_addr)};
+                    _Accepted accepted = {makeStrong<Posix::Fd>(res), Posix::fromSockAddr(_addr)};
                     _promise.resolve(Ok(accepted));
                 }
             }
@@ -195,14 +195,17 @@ struct UringSched : public Sys::Sched {
         return Async::makeTask(job->future());
     }
 
-    Async::Task<usize> sendAsync(Strong<Fd> fd, Bytes buf, SocketAddr addr) override {
+    Async::Task<_Sent> sendAsync(Strong<Fd> fd, Bytes buf, Slice<Handle> handles, SocketAddr addr) override {
+        if (handles.len() > 0)
+            notImplemented(); // TODO: Implement handle passing on POSIX
+
         struct Job : public _Job {
             Strong<Fd> _fd;
             Bytes _buf;
             iovec _iov;
             msghdr _msg;
             sockaddr_in _addr;
-            Async::Promise<usize> _promise;
+            Async::Promise<_Sent> _promise;
 
             Job(Strong<Fd> fd, Bytes buf, SocketAddr addr)
                 : _fd(fd), _buf(buf), _addr(Posix::toSockAddr(addr)) {}
@@ -216,14 +219,14 @@ struct UringSched : public Sys::Sched {
                 _msg.msg_iov = &_iov;
                 _msg.msg_iovlen = 1;
 
-                io_uring_prep_sendmsg(sqe, _fd->handle(), &_msg, 0);
+                io_uring_prep_sendmsg(sqe, _fd->handle().value(), &_msg, 0);
             }
 
             void complete(io_uring_cqe *cqe) override {
                 if (cqe->res < 0)
                     _promise.resolve(Posix::fromErrno(-cqe->res));
                 else
-                    _promise.resolve(Ok(cqe->res));
+                    _promise.resolve(Ok<_Sent>(cqe->res, 0));
             }
 
             auto future() {
@@ -236,14 +239,14 @@ struct UringSched : public Sys::Sched {
         return Async::makeTask(job->future());
     }
 
-    Async::Task<Received> recvAsync(Strong<Fd> fd, MutBytes buf) override {
+    Async::Task<_Received> recvAsync(Strong<Fd> fd, MutBytes buf, MutSlice<Handle>) override {
         struct Job : public _Job {
             Strong<Fd> _fd;
             MutBytes _buf;
             iovec _iov;
             msghdr _msg;
             sockaddr_in _addr;
-            Async::Promise<Received> _promise;
+            Async::Promise<_Received> _promise;
 
             Job(Strong<Fd> fd, MutBytes buf)
                 : _fd(fd), _buf(buf) {}
@@ -257,14 +260,14 @@ struct UringSched : public Sys::Sched {
                 _msg.msg_iov = &_iov;
                 _msg.msg_iovlen = 1;
 
-                io_uring_prep_recvmsg(sqe, _fd->handle(), &_msg, 0);
+                io_uring_prep_recvmsg(sqe, _fd->handle().value(), &_msg, 0);
             }
 
             void complete(io_uring_cqe *cqe) override {
                 if (cqe->res < 0)
                     _promise.resolve(Posix::fromErrno(-cqe->res));
                 else {
-                    Received received = {(usize)cqe->res, Posix::fromSockAddr(_addr)};
+                    _Received received = {(usize)cqe->res, 0, Posix::fromSockAddr(_addr)};
                     _promise.resolve(Ok(received));
                 }
             }

@@ -18,8 +18,8 @@ struct VmoFd : public Sys::Fd {
     VmoFd(Hj::Vmo vmo)
         : _vmo(std::move(vmo)) {}
 
-    usize handle() const override {
-        return (usize)&_vmo;
+    Handle handle() const override {
+        return Handle(_vmo.raw());
     }
 
     Res<usize> read(MutBytes) override {
@@ -42,7 +42,7 @@ struct VmoFd : public Sys::Fd {
         notImplemented();
     }
 
-    Res<Accepted> accept() override {
+    Res<_Accepted> accept() override {
         notImplemented();
     }
 
@@ -50,19 +50,11 @@ struct VmoFd : public Sys::Fd {
         return Ok<Stat>();
     }
 
-    Res<> sendFd(Strong<Fd>) override {
+    Res<_Sent> send(Bytes, Slice<Handle>, SocketAddr) override {
         notImplemented();
     }
 
-    Res<Strong<Fd>> recvFd() override {
-        notImplemented();
-    }
-
-    Res<usize> sendTo(Bytes, SocketAddr) override {
-        notImplemented();
-    }
-
-    Res<Received> recvFrom(MutBytes) override {
+    Res<_Received> recv(MutBytes, MutSlice<Handle>) override {
         notImplemented();
     }
 };
@@ -117,6 +109,10 @@ Res<Strong<Sys::Fd>> listenTcp(SocketAddr) {
 }
 
 Res<Strong<Sys::Fd>> listenUdp(SocketAddr) {
+    notImplemented();
+}
+
+Res<Strong<Sys::Fd>> listenIpc(Url::Url) {
     notImplemented();
 }
 

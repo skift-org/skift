@@ -16,8 +16,8 @@ static constexpr void pack(BEmit &e, T const &val) {
 }
 
 template <typename T>
-static constexpr void unpack(BScan &s, T &val) {
-    Packer<T>::unpack(s, val);
+static constexpr T unpack(BScan &s) {
+    return Packer<T>::unpack(s);
 }
 
 /* --- Trivialy Copyable ---------------------------------------------------- */
@@ -28,8 +28,10 @@ struct Packer<T> {
         e.writeFrom(val);
     }
 
-    static void unpack(BScan &s, T &val) {
-        s.readTo(&val);
+    static T unpack(BScan &s) {
+        T res;
+        s.readTo(&res);
+        return res;
     }
 };
 
@@ -40,7 +42,8 @@ struct Packer<None> {
     static void pack(BEmit &, None const &) {
     }
 
-    static void unpack(BScan &, None &) {
+    static None unpack(BScan &) {
+        return NONE;
     }
 };
 
@@ -52,21 +55,11 @@ struct Packer<Opt<T>> {
             pack(e, val.unwrap());
     }
 
-    static void unpack(BScan &s, Opt<T> &val) {
+    static Opt<T> unpack(BScan &s) {
         bool has = s.nextU8le();
-        if (has)
-            unpack(s, val.unwrap());
-    }
-};
-
-template <typename T>
-struct Packer<Ok<T>> {
-    static void pack(BEmit &e, Ok<T> const &val) {
-        pack(e, val.inner);
-    }
-
-    static void unpack(BScan &s, Ok<T> &val) {
-        unpack(s, val.inner);
+        if (not has)
+            return NONE;
+        return unpack<T>();
     }
 };
 
@@ -83,10 +76,8 @@ struct Packer<Error> {
         Io::pack(e, (u32)val.code());
     }
 
-    static void unpack(BScan &s, Error &val) {
-        Error::Code code;
-        Io::unpack(s, code);
-        val = Error{code, nullptr};
+    static Error unpack(BScan &s) {
+        return {(Error::Code)Io::unpack<u32>(s), nullptr};
     }
 };
 
@@ -95,22 +86,17 @@ struct Packer<Res<T, E>> {
     static void pack(BEmit &e, Res<T, E> const &val) {
         e.writeU8le(val.has());
         if (val.has())
-            pack(e, val.unwrap());
+            Io::pack(e, val.unwrap());
         else
-            pack(e, val.none());
+            Io::pack(e, val.none());
     }
 
-    static void unpack(BScan &s, Res<T, E> &val) {
+    static Res<T, E> unpack(BScan &s) {
         bool has = s.nextU8le();
         if (has) {
-            T res;
-            unpack(s, res);
-            val = Ok(std::move(res));
-        } else {
-            E err;
-            unpack(s, err);
-            val = err;
+            return Ok(Io::unpack<T>(s));
         }
+        return Io::unpack<E>(s);
     }
 };
 
@@ -120,14 +106,16 @@ template <Reflectable T>
 struct Packer<T> {
     static void pack(BEmit &e, T const &val) {
         iterFields(val, [&](auto, auto const &v) {
-            pack(e, v);
+            Io::pack(e, v);
         });
     }
 
-    static void unpack(BScan &s, T &val) {
-        iterFields(val, [&](auto, auto const &v) {
-            unpack(s, v);
+    static T unpack(BScan &s) {
+        T res;
+        iterFields(res, [&](auto, auto const &v) {
+            Io::unpack(s, v);
         });
+        return res;
     }
 };
 
@@ -138,34 +126,36 @@ struct Packer<Vec<T>> {
     static void pack(BEmit &e, Vec<T> const &val) {
         e.writeU64le(val.len());
         for (auto &i : val) {
-            pack(e, i);
+            Io::pack(e, i);
         }
     }
 
-    static void unpack(BScan &s, Vec<T> &val) {
+    static void unpack(BScan &s) {
         auto len = s.nextU64le();
-        val.ensure();
+        Vec<T> res;
+        res.ensure(len);
         for (usize i = 0; i < len; i++) {
-            unpack(s, val.emplaceBack());
+            res.emplaceBack(Io::unpack<T>(s));
         }
+        return res;
     }
 };
 
 /* --- Strings -------------------------------------------------------------- */
 
-template <>
-struct Packer<String> {
-    static void pack(BEmit &e, String const &val) {
+template <StaticEncoding E>
+struct Packer<_String<E>> {
+    static void pack(BEmit &e, _String<E> const &val) {
         e.writeU64le(val.len());
         e.writeStr(val);
     }
 
-    static void unpack(BScan &s, String &val) {
+    static String unpack(BScan &s) {
         StringBuilder b;
         auto len = s.nextU64le();
         b.ensure(len);
         b.append(s.nextStr(len));
-        val = b.take();
+        return b.take();
     }
 };
 
@@ -178,9 +168,11 @@ struct Packer<Cons<Car, Cdr>> {
         pack(e, val.cdr);
     }
 
-    static void unpack(BScan &s, Cons<Car, Cdr> &val) {
-        unpack(s, val.car);
-        unpack(s, val.cdr);
+    static Cons<Car, Cdr> unpack(BScan &s) {
+        return {
+            Io::unpack<Car>(s),
+            Io::unpack<Cdr>(s),
+        };
     }
 };
 
@@ -188,16 +180,18 @@ template <typename... Ts>
 struct Packer<Tuple<Ts...>> {
     static void pack(BEmit &e, Tuple<Ts...> const &val) {
         val.visit([&](auto const &f) {
-            pack(e, f);
+            Io::pack(e, f);
             return true;
         });
     }
 
-    static void unpack(BScan &s, Tuple<Ts...> &val) {
-        val.visit([&](auto &f) {
-            unpack(s, f);
+    static Tuple<Ts...> unpack(BScan &s) {
+        Tuple<Ts...> res;
+        res.visit([&]<typename T>(T &f) {
+            f = Io::unpack<T>(s);
             return true;
         });
+        return res;
     }
 };
 

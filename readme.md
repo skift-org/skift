@@ -1,9 +1,9 @@
 <img src="doc/logo-light.svg#gh-light-mode-only" height="36" />
 <img src="doc/logo-dark.svg#gh-dark-mode-only" height="36" />
 <p>
-  <a href="https://skift.smnx.sh/">Website</a> -
-  <a href="https://discord.com/invite/gamGsfg">Discord</a> -
-  <a href="https://github.com/skift-org/skift/tree/main/doc">Documentation</a>
+  <a href="https://skiftos.org/">Website</a> -
+  <a href="https://discord.skiftos.org">Discord</a> -
+  <a href="https://docs.skiftos.org">Documentation</a>
 </p>
 
 ## About
@@ -40,7 +40,7 @@ I, Sleepy-monax, would like to express my gratitude to the following individuals
 ## License
 
 <a href="https://opensource.org/licenses/MIT">
-  <img align="right" height="96" alt="MIT License" src="doc/mit.svg" />
+  <img align="right" height="96" alt="MIT License" src="https://branding.cute.engineering/licenses/mit.svg" />
 </a>
 
 The skift operating system and its core components are licensed under the **MIT License**.

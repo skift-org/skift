@@ -18,7 +18,7 @@ namespace Karm {
 
 #define always_inline [[gnu::always_inline]]
 
-#define _ __p_##__COUNTER__
+#define _ concat$(__p_, __COUNTER__)
 
 /* --- Count ---------------------------------------------------------------- */
 

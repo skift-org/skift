@@ -1,0 +1,7 @@
+module Grund::Echo
+
+include "karm-base/async.h"
+
+Echo {
+    pingAsync(val : String) -> Async::Task<String>,
+}

@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "grund-echo",
+    "type": "exe",
+    "description": "Simple echo service",
+    "requires": [
+        "karm-sys",
+        "grund-echo-base"
+    ]
+}

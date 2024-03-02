@@ -49,7 +49,7 @@ struct One {
     using Inner = T;
     T _t;
 
-    template <typename R>
+    template <Receiver<T> R>
     auto connect(R r) {
         struct Operation {
             T _t;

@@ -53,17 +53,17 @@ enum OpCode : u16 {
     UPDATE = 5 << 1,
 };
 
-#define FOREACH_RCODE(ITER)  \
-    ITER(NO_ERROR, 0)        \
-    ITER(FORMAT_ERROR, 1)    \
-    ITER(SERVER_FAILURE, 2)  \
-    ITER(NAME_ERROR, 3)      \
-    ITER(NOT_IMPLEMENTED, 4) \
-    ITER(REFUSED, 5)         \
-    ITER(YXDOMAIN, 6)        \
-    ITER(XRRSET, 7)          \
-    ITER(NOTAUTH, 8)         \
-    ITER(NOTZONE, 9)
+#define FOREACH_RCODE(RCODE)  \
+    RCODE(NO_ERROR, 0)        \
+    RCODE(FORMAT_ERROR, 1)    \
+    RCODE(SERVER_FAILURE, 2)  \
+    RCODE(NAME_ERROR, 3)      \
+    RCODE(NOT_IMPLEMENTED, 4) \
+    RCODE(REFUSED, 5)         \
+    RCODE(YXDOMAIN, 6)        \
+    RCODE(XRRSET, 7)          \
+    RCODE(NOTAUTH, 8)         \
+    RCODE(NOTZONE, 9)
 
 enum RCode : u16 {
 #define ITER(NAME, VAL) NAME = VAL << 12,

@@ -9,17 +9,17 @@
 
 namespace Sbi {
 
-#define FOREACH_ERROR(ITER)     \
-    ITER(SUCCESS, 0)            \
-    ITER(FAILED, -1)            \
-    ITER(NOT_SUPPORTED, -2)     \
-    ITER(INVALID_PARAM, -3)     \
-    ITER(DENIED, -4)            \
-    ITER(INVALID_ADDRESS, -5)   \
-    ITER(ALREADY_AVAILABLE, -6) \
-    ITER(ALREADY_STARTED, -7)   \
-    ITER(ALREADY_STOPPED, -8)   \
-    ITER(NO_SHMEM, -9)
+#define FOREACH_ERROR(ERROR)     \
+    ERROR(SUCCESS, 0)            \
+    ERROR(FAILED, -1)            \
+    ERROR(NOT_SUPPORTED, -2)     \
+    ERROR(INVALID_PARAM, -3)     \
+    ERROR(DENIED, -4)            \
+    ERROR(INVALID_ADDRESS, -5)   \
+    ERROR(ALREADY_AVAILABLE, -6) \
+    ERROR(ALREADY_STARTED, -7)   \
+    ERROR(ALREADY_STOPPED, -8)   \
+    ERROR(NO_SHMEM, -9)
 
 struct Ret {
     usize err;
@@ -53,16 +53,16 @@ Ret baseGetSpecVersion() {
     return ecall(BASE, 0);
 }
 
-#define FOREACH_IMPL(ITER)        \
-    ITER(BERKELEY_BOOT_LOADER, 0) \
-    ITER(OPENSBI, 1)              \
-    ITER(XVISOR, 2)               \
-    ITER(KVM, 3)                  \
-    ITER(RUSTSBI, 4)              \
-    ITER(DIOSIX, 5)               \
-    ITER(COFFER, 6)               \
-    ITER(XEN, 7)                  \
-    ITER(POLARFIRE_HSS, 8)
+#define FOREACH_IMPL(ERROR)        \
+    ERROR(BERKELEY_BOOT_LOADER, 0) \
+    ERROR(OPENSBI, 1)              \
+    ERROR(XVISOR, 2)               \
+    ERROR(KVM, 3)                  \
+    ERROR(RUSTSBI, 4)              \
+    ERROR(DIOSIX, 5)               \
+    ERROR(COFFER, 6)               \
+    ERROR(XEN, 7)                  \
+    ERROR(POLARFIRE_HSS, 8)
 
 enum struct Impl : usize {
     UNKNOWN = (usize)-1,

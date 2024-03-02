@@ -3,8 +3,7 @@
 <p>
   <a href="https://skift.smnx.sh/">Website</a> -
   <a href="https://discord.com/invite/gamGsfg">Discord</a> -
-  <a href="https://github.com/skift-org/skift/tree/main/doc">Documentation</a> -
-  <a href="https://github.com/skift-org/skift/releases">Releases</a>
+  <a href="https://github.com/skift-org/skift/tree/main/doc">Documentation</a>
 </p>
 
 ## About

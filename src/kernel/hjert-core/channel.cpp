@@ -47,8 +47,7 @@ Res<Strong<Channel>> Channel::create(usize cap) {
     return Ok(makeStrong<Channel>(cap));
 }
 
-Channel::Channel(usize cap) {
-    _cap = cap;
+Channel::Channel(usize cap) : _cap(cap) {
 }
 
 Res<> Channel::_ensureNoEmpty() {

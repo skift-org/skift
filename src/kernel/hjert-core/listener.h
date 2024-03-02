@@ -24,7 +24,7 @@ struct Listener :
 
     Res<> listen(Hj::Cap cap, Strong<Object> obj, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset);
 
-    Slice<Hj::Event> poll();
+    Slice<Hj::Event> pollEvents();
 
     Slice<Hj::Event> events() {
         return _events;

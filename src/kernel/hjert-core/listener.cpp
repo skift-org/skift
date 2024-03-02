@@ -27,7 +27,7 @@ Res<> Listener::listen(Hj::Cap cap, Strong<Object> obj, Flags<Hj::Sigs> set, Fla
     return Ok();
 }
 
-Slice<Hj::Event> Listener::poll() {
+Slice<Hj::Event> Listener::pollEvents() {
     ObjectLockScope scope{*this};
     _events.clear();
 

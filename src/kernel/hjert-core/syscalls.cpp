@@ -213,7 +213,7 @@ Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<Hj::Event> events, User<usize> e
     auto obj = try$(self.domain().get<Listener>(cap));
 
     try$(self.block([&] {
-        auto events = obj->poll();
+        auto events = obj->pollEvents();
         if (events.len() > 0)
             return TimeStamp::epoch();
         return deadline;

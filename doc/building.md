@@ -1,61 +1,83 @@
 # Building
 
-> **🛈 Note**:
-> If you are having trouble building skiftOS, feel free to ask for help in the [Discord server](https://discord.com/invite/gamGsfg)
+## Prerequisites
 
-To build skiftOS, you need to have a modern C/C++ compiler such as the latest version of clang installed on your computer. Additionally, you need to have the following tools installed: `python3`, `llvm`, `clang`, `ninja`, `nasm`, and `qemu`. Please refer to the documentation of these tools or use your package manager to install them.
+* Linux or macOS
+* Clang (16 or later)
+* Python (3.11.5 or later)
+* Tools: `llvm`, `clang`, `ninja`, `nasm`, `qemu`
+* **Installation:** Use your system's package manager (e.g., `apt` on Ubuntu) to install these dependencies.
 
-### Step 0: Clone the repository
+## Instructions
 
-> **🛈 Note**:
-> If the following badge is red, it means that the repository is currently unstable and may not build correctly. Please refer to the [Discord server](https://discord.com/invite/gamGsfg) for more information.
+0. **Prerequisites:**
 
-[![Build](https://github.com/skift-org/skift/actions/workflows/checks.yml/badge.svg)](https://github.com/skift-org/skift/actions/workflows/checks.yml)
+    Verify that you have the required dependencies installed.
 
-First, clone the repository by running the following command:
+    <details>
+    <summary>Ubuntu</summary>
 
-```sh
-$ git clone https://github.com/skift-org/skift.git
+    ```sh
+    apt update
 
-$ cd skift
-```
+    apt install build-essential git ninja-build libsdl2-dev nasm gcc-multilib qemu-system-x86 mtools liburing-dev
 
-### Step 1: Set up the build environment
+    bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm 17
+    ```
 
-First, set up the build environment by running the following command:
+    </details>
 
-> **🛈 Note**:
-> On ubuntu, this first step will be able to install all the required dependencies for you using `apt`. If you are not using ubuntu, you will need to install the dependencies manually using your package manager.
+    <details>
+    <summary>Arch Linux</summary>
 
-```sh
-$ ./skift.sh tools setup
-```
+    ```sh
+    pacman -Syu git clang llvm nasm qemu-full
+    ```
 
-Then, check that everything is working correctly by running:
+    </details>
 
-```sh
-$ ./skift.sh tools doctor
-```
 
-### Step 2: Download third-party dependencies
 
-After setting up the build environment, download the third-party dependencies by running the following command:
+1. **Clone the Repository:**
+    ```sh
+    git clone https://github.com/skift-org/skift.git
 
-```sh
-$ ./skift.sh model install
-```
+    cd skift
+    ```
 
-### Step 3: Build and run skiftOS
+2. **Check Build Status (Optional):**
 
-> **🛈 Note**:
-> Running this step requires being in a graphical environment with a build of QEMU supporting graphics either via SDL or GTK. If you are using a headless server, you can use the `./skift.sh image build --format=hdd` command to build a disk image.
+    Look at the build status badge for any potential issues:
 
-Finally, build and run skiftOS by running the following command:
+    [![Build](https://github.com/skift-org/skift/actions/workflows/checks.yml/badge.svg)](https://github.com/skift-org/skift/actions/workflows/checks.yml)
 
-```sh
-$ ./skift.sh image start
-```
+3. **Set Up Build Environment:**
 
-### Step 4: Enjoy!
+    ```sh
+    ./skift.sh tools setup
+    ```
+    > **🛈 Note**: On Ubuntu, this step also installs dependencies.
 
-If all these steps are completed successfully, you should have a fully built and operational skiftOS ready for use. Enjoy! 😊
+4. **Verify Setup:**
+
+   ```sh
+   ./skift.sh tools doctor
+   ```
+
+5. **Download Dependencies:**
+
+   ```sh
+   ./skift.sh model install
+   ```
+
+6. **Build and Run:**
+
+   ```sh
+   ./skift.sh image start
+   ```
+    > **🛈 Note**:
+    >  Requires a graphical environment and QEMU with graphics support (SDL or GTK). For headless servers, build a disk image instead: `./skift.sh image build --format=hdd`
+
+    **Enjoy!** You now have a working installation of skiftOS.
+
+    **Need Help?** Join the [Discord server](https://discord.com/invite/gamGsfg) for assistance in the `#build-issues` channel.

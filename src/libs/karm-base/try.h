@@ -5,9 +5,9 @@
 #include "bool.h"
 #include "std.h"
 
+// Give us a symbole to break one when debbuging error handling.
+// This is a no-op in release mode.
 #if defined(__ck_debug__) && !defined(KARM_DISABLE_TRY_FAIL_HOOK)
-// Give us a symbole to break one when debbuging error
-// handling.
 extern "C" void __try_failled();
 #    define __tryFail() __try_failled()
 #else

@@ -4,7 +4,7 @@
 #include <web-html/tokenizer.h>
 
 Res<> entryPoint(Sys::Ctx &) {
-    auto file = try$(Sys::File::open("bundle://web-html/exemple.html"_url));
+    auto file = try$(Sys::File::open("bundle://web-html-cli/exemple.html"_url));
 
     auto buf = try$(Io::readAllUtf8(file));
 

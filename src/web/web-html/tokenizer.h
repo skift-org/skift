@@ -10,14 +10,14 @@
 
 namespace Web::Html {
 
-#define FOREACH_TOKEN(ITER) \
-    ITER(NIL)               \
-    ITER(DOCTYPE)           \
-    ITER(START_TAG)         \
-    ITER(END_TAG)           \
-    ITER(COMMENT)           \
-    ITER(CHARACTER)         \
-    ITER(END_OF_FILE)
+#define FOREACH_TOKEN(TOKEN) \
+    TOKEN(NIL)               \
+    TOKEN(DOCTYPE)           \
+    TOKEN(START_TAG)         \
+    TOKEN(END_TAG)           \
+    TOKEN(COMMENT)           \
+    TOKEN(CHARACTER)         \
+    TOKEN(END_OF_FILE)
 
 struct Token {
     enum Type {

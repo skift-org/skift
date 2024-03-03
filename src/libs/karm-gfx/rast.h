@@ -1,9 +1,7 @@
 #pragma once
 
 #include <karm-base/range.h>
-#include <karm-logger/logger.h>
 
-#include "path.h"
 #include "shape.h"
 
 namespace Karm::Gfx {
@@ -47,10 +45,12 @@ struct Rast {
                 _appendRange(merged);
                 return;
             }
+
             if (range.end() > r.start) {
                 _ranges.insert(i, range);
                 return;
             }
+
             i++;
         }
 
@@ -62,7 +62,7 @@ struct Rast {
     }
 
     void fill(Math::Recti clip, FillRule fillRule, auto cb) {
-        auto shapeBound = _shape.bound().grow(0.3);
+        auto shapeBound = _shape.bound().grow(UNIT);
         auto rect = shapeBound
                         .ceil()
                         .cast<isize>()
@@ -81,6 +81,7 @@ struct Rast {
                     auto sample = yy + HALF_UNIT;
 
                     if (edge.bound().top() <= sample and sample < edge.bound().bottom()) {
+
                         _active.pushBack({
                             .x = edge.sx + (sample - edge.sy) / (edge.ey - edge.sy) * (edge.ex - edge.sx),
                             .sign = edge.sy > edge.ey ? 1 : -1,
@@ -97,12 +98,8 @@ struct Rast {
 
                 isize rule = 0;
                 for (usize i = 0; i + 1 < _active.len(); i++) {
-                    usize si = i;
-                    usize ei = i + 1;
-
                     if (fillRule == FillRule::NONZERO) {
-                        isize sign = _active[i].sign;
-                        rule += sign;
+                        rule += _active[i].sign;
                         if (rule == 0)
                             continue;
                     }
@@ -113,25 +110,32 @@ struct Rast {
                             continue;
                     }
 
-                    f64 x1 = max(_active[si].x, rect.start());
-                    f64 x2 = min(_active[ei].x, rect.end());
+                    // Clip the range to the clip rect
+                    f64 x1 = max(_active[i].x, rect.start());
+                    f64 x2 = min(_active[i + 1].x, rect.end());
 
+                    // Skip if the range is empty
                     if (x1 >= x2)
                         continue;
 
-                    _appendRange(ISizeRange::fromStartEnd(floor(x1), ceil(x2)));
+                    isize cx1 = Math::ceil(x1), fx1 = Math::floor(x1);
+                    isize cx2 = Math::ceil(x2), fx2 = Math::floor(x2);
+
+                    _appendRange(ISizeRange::fromStartEnd(fx1, cx2));
 
                     // Are x1 and x2 on the same pixel?
-                    if (Math::floor(x1 - rect.x) == Math::floor(x2 - rect.x)) {
-                        _scanline[Math::floor(x1 - rect.x)] += (x2 - x1) * UNIT;
-                    } else {
-                        _scanline[x1 - rect.x] += (ceil(x1) - x1) * UNIT;
-                        _scanline[x2 - rect.x] += (x2 - floor(x2)) * UNIT;
-
-                        for (isize x = ceil(x1); x < floor(x2); x++) {
-                            _scanline[x - rect.x] += UNIT;
-                        }
+                    if (fx1 == fx2) {
+                        _scanline[fx1 - rect.x] += (x2 - x1) * UNIT;
+                        continue;
                     }
+
+                    // Compute the coverage for the first and last pixel
+                    _scanline[x1 - rect.x] += (cx1 - x1) * UNIT;
+                    _scanline[x2 - rect.x] += (x2 - fx2) * UNIT;
+
+                    // Fill the pixels in between
+                    for (isize x = cx1; x < fx2; x++)
+                        _scanline[x - rect.x] += UNIT;
                 }
             }
 

@@ -1,5 +1,7 @@
 # Building
 
+This guide provides instructions for building skiftOS from source.
+
 ## Prerequisites
 
 * Linux or macOS

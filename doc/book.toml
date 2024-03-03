@@ -3,7 +3,7 @@ authors = ["the skiftOS Develpers"]
 language = "en"
 multilingual = false
 src = "."
-title = "SkiftOS Developer Manual"
+title = "SkiftOS Handbook"
 
 [output.html]
 default-theme = "skift-dark"

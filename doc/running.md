@@ -1,5 +1,7 @@
 # Running
 
+This guide provides instructions for running skiftOS on QEMU or real hardware using the HDD file.
+
 ## On QEMU
 
 ### 1. Obtain OVMF firmware

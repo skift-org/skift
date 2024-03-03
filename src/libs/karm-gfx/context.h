@@ -250,22 +250,16 @@ struct Context {
     // non-antialiased shapes and lines.
 
     // Plot a point.
-    void debugPlot(Math::Vec2i point, Color color);
+    void plot(Math::Vec2i point, Color color);
 
     // Draw a line.
-    void debugLine(Math::Edgei edge, Color color);
+    void plot(Math::Edgei edge, Color color);
 
     // Draw a rectangle.
-    void debugRect(Math::Recti rect, Color color);
-
-    // Draw an arrow.
-    void debugArrow(Math::Vec2i from, Math::Vec2i to, Color color);
-
-    // Draw a double arrow.
-    void debugDoubleArrow(Math::Vec2i from, Math::Vec2i to, Color color);
+    void plot(Math::Recti rect, Color color);
 
     // Draw the current path as a polygon.
-    void debugTrace(Gfx::Color color);
+    void plot(Gfx::Color color);
 
     /* --- Paths ------------------------------------------------------------ */
 

@@ -229,12 +229,11 @@ struct Text : public View<Text> {
     void paint(Gfx::Context &g, Math::Recti) override {
         g.save();
         g.clip(bound());
-        // g.debugRect(bound(), Gfx::PINK);
         g.origin(bound().xy);
         _text.paint(g);
         g.restore();
         if (debugShowLayoutBounds)
-            g.debugRect(bound(), Gfx::CYAN);
+            g.plot(bound(), Gfx::CYAN);
     }
 
     void layout(Math::Recti bound) override {
@@ -300,7 +299,7 @@ struct Icon : public View<Icon> {
             g.fillStyle(_color.unwrap());
         g.fill(bound().topStart(), _icon);
         if (debugShowLayoutBounds)
-            g.debugRect(bound(), Gfx::CYAN);
+            g.plot(bound(), Gfx::CYAN);
         g.restore();
     }
 
@@ -338,7 +337,7 @@ struct Image : public View<Image> {
         }
 
         if (debugShowLayoutBounds)
-            g.debugRect(bound(), Gfx::CYAN);
+            g.plot(bound(), Gfx::CYAN);
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {

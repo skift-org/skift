@@ -99,7 +99,7 @@ struct Table : public Ui::View<Table> {
 
         g.fillStyle(Ui::GRAY800);
         g.fill(bound);
-        g.debugLine(sep, Gfx::WHITE.withOpacity(0.05));
+        g.plot(sep, Gfx::WHITE.withOpacity(0.05));
     }
 
     void paintRowHeader(Gfx::Context &g, usize idx) {
@@ -114,7 +114,7 @@ struct Table : public Ui::View<Table> {
 
         g.fillStyle(Ui::GRAY800);
         g.fill(bound);
-        g.debugLine(sep, Gfx::WHITE.withOpacity(0.05));
+        g.plot(sep, Gfx::WHITE.withOpacity(0.05));
     }
 
     void paintSelection(Gfx::Context &g, Range r) {
@@ -156,7 +156,7 @@ struct Table : public Ui::View<Table> {
             g.fillStyle(Ui::GRAY800);
             g.fill(colBound);
 
-            g.debugLine(Math::Edgei{headerX + col.width - 1, 0, headerX + col.width - 1, _bound.height}, Gfx::WHITE.withOpacity(0.05));
+            g.plot(Math::Edgei{headerX + col.width - 1, 0, headerX + col.width - 1, _bound.height}, Gfx::WHITE.withOpacity(0.05));
 
             headerX += col.width;
             index++;
@@ -174,7 +174,7 @@ struct Table : public Ui::View<Table> {
             g.fillStyle(Ui::GRAY800);
             g.fill(rowBound);
 
-            g.debugLine(Math::Edgei{0, headerY + row.height - 1, _bound.width, headerY + row.height - 1}, Gfx::WHITE.withOpacity(0.05));
+            g.plot(Math::Edgei{0, headerY + row.height - 1, _bound.width, headerY + row.height - 1}, Gfx::WHITE.withOpacity(0.05));
 
             headerY += row.height;
             index++;

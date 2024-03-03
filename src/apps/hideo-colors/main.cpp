@@ -45,7 +45,7 @@ struct HsvPicker : public Ui::View<HsvPicker> {
 
         for (isize y = 0; y < bound().height; y++) {
             for (isize x = 0; x < bound().width; x++) {
-                g.debugPlot({bound().x + x, bound().y + y}, sampleColor({x, y}));
+                g.plot(Math::Edgei{bound().x + x, bound().y + y}, sampleColor({x, y}));
             }
         }
 

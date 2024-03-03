@@ -299,13 +299,13 @@ struct Input : public View<Input> {
         // g.fill(baseline, _text);
 
         if (debugShowLayoutBounds) {
-            g.debugLine(
-                {
+            g.plot(
+                Math::Edgei{
                     bound().topStart() + m.baseline.cast<isize>(),
                     bound().topEnd() + m.baseline.cast<isize>(),
                 },
                 Gfx::PINK);
-            g.debugRect(bound(), Gfx::CYAN);
+            g.plot(bound(), Gfx::CYAN);
         }
 
         g.restore();

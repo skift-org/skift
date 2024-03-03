@@ -30,12 +30,12 @@ struct Scroll : public ProxyNode<Scroll> {
         child().paint(g, r);
 
         if (debugShowScrollBounds)
-            g.debugRect(child().bound(), Gfx::PINK);
+            g.plot(child().bound(), Gfx::PINK);
 
         g.restore();
 
         if (debugShowScrollBounds)
-            g.debugRect(_bound, Gfx::CYAN);
+            g.plot(_bound, Gfx::CYAN);
     }
 
     void event(Sys::Event &e) override {

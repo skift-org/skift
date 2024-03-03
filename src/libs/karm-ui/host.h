@@ -83,11 +83,11 @@ struct PerfGraph {
         g.strokeStyle(Gfx::stroke(Gfx::WHITE.withOpacity(0.5)).withAlign(Gfx::INSIDE_ALIGN));
         g.stroke(Math::Edgei{0, (isize)(FRAME_TIME * 1000 * 2), 256, (isize)(FRAME_TIME * 1000 * 2)});
 
-        for (usize i = 0; i < 256; ++i) {
+        for (isize i = 0; i < 256; ++i) {
             auto e = _records[(_index + i) % 256];
 
-            g.debugRect(
-                {(isize)i, 0, 1, (isize)e.duration().toMSecs() * 2},
+            g.plot(
+                Math::Recti{i, 0, 1, (isize)e.duration().toMSecs() * 2},
                 e.color());
         }
 

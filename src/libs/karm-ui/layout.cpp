@@ -25,9 +25,9 @@ struct Empty : public View<Empty> {
     void paint(Gfx::Context &g, Math::Recti) override {
         if (debugShowEmptyBounds) {
             auto b = bound();
-            g.debugRect(b, Gfx::WHITE.withOpacity(0.2));
-            g.debugLine({b.topStart(), b.bottomEnd()}, Gfx::WHITE.withOpacity(0.2));
-            g.debugLine({b.topEnd(), b.bottomStart()}, Gfx::WHITE.withOpacity(0.2));
+            g.plot(b, Gfx::WHITE.withOpacity(0.2));
+            g.plot(Math::Edgei{b.topStart(), b.bottomEnd()}, Gfx::WHITE.withOpacity(0.2));
+            g.plot(Math::Edgei{b.topEnd(), b.bottomStart()}, Gfx::WHITE.withOpacity(0.2));
         }
     }
 };
@@ -239,7 +239,7 @@ struct Spacing : public ProxyNode<Spacing> {
     void paint(Gfx::Context &g, Math::Recti r) override {
         child().paint(g, r);
         if (debugShowLayoutBounds) {
-            g.debugRect(child().bound(), Gfx::LIME);
+            g.plot(child().bound(), Gfx::LIME);
         }
     }
 
@@ -275,9 +275,8 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
 
     void paint(Gfx::Context &g, Math::Recti r) override {
         child().paint(g, r);
-        if (debugShowLayoutBounds) {
-            g.debugRect(child().bound(), Gfx::INDIGO);
-        }
+        if (debugShowLayoutBounds)
+            g.plot(child().bound(), Gfx::INDIGO);
     }
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint) override {

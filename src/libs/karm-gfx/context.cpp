@@ -372,14 +372,14 @@ void Context::fill(Math::Vec2f baseline, Str str) {
 
 /* --- Debug ---------------------------------------------------------------- */
 
-void Context::debugPlot(Math::Vec2i point, Color color) {
+void Context::plot(Math::Vec2i point, Color color) {
     point = applyOrigin(point);
     if (clip().contains(point)) {
         mutPixels().blend(point, color);
     }
 }
 
-void Context::debugLine(Math::Edgei edge, Color color) {
+void Context::plot(Math::Edgei edge, Color color) {
     isize dx = Math::abs(edge.ex - edge.sx);
     isize sx = edge.sx < edge.ex ? 1 : -1;
 
@@ -389,7 +389,7 @@ void Context::debugLine(Math::Edgei edge, Color color) {
     isize err = dx + dy, e2;
 
     for (;;) {
-        debugPlot({edge.sx, edge.sy}, color);
+        plot(edge.start, color);
         if (edge.sx == edge.ex and edge.sy == edge.ey)
             break;
         e2 = 2 * err;
@@ -404,59 +404,17 @@ void Context::debugLine(Math::Edgei edge, Color color) {
     }
 }
 
-void Context::debugRect(Math::Recti rect, Color color) {
+void Context::plot(Math::Recti rect, Color color) {
     rect = {rect.xy, rect.wh - 1};
-    debugLine({rect.topStart(), rect.topEnd()}, color);
-    debugLine({rect.topEnd(), rect.bottomEnd()}, color);
-    debugLine({rect.bottomEnd(), rect.bottomStart()}, color);
-    debugLine({rect.bottomStart(), rect.topStart()}, color);
+    plot(Math::Edgei{rect.topStart(), rect.topEnd()}, color);
+    plot(Math::Edgei{rect.topEnd(), rect.bottomEnd()}, color);
+    plot(Math::Edgei{rect.bottomEnd(), rect.bottomStart()}, color);
+    plot(Math::Edgei{rect.bottomStart(), rect.topStart()}, color);
 }
 
-void Context::debugArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
-    isize const SIZE = 16;
-
-    Math::Vec2i dir = to - from;
-    Math::Vec2i perp = {-dir.y, dir.x};
-
-    f64 len = dir.len();
-    f64 scale = SIZE / len;
-
-    Math::Vec2i p1 = to - dir * scale;
-    Math::Vec2i p2 = p1 + perp * scale;
-    Math::Vec2i p3 = p1 - perp * scale;
-
-    debugLine({from, to}, color);
-    debugLine({to, p2}, color);
-    debugLine({to, p3}, color);
-}
-
-void Context::debugDoubleArrow(Math::Vec2i from, Math::Vec2i to, Color color) {
-    isize const SIZE = 8;
-
-    Math::Vec2f dir = (to - from).cast<f64>();
-    Math::Vec2f perp = {-dir.y, dir.x};
-
-    f64 len = dir.len();
-    f64 scale = SIZE / len;
-
-    Math::Vec2i p1 = (to - dir * scale).cast<isize>();
-    Math::Vec2i p2 = (p1 + perp * scale).cast<isize>();
-    Math::Vec2i p3 = (p1 - perp * scale).cast<isize>();
-
-    Math::Vec2i p4 = (from + dir * scale).cast<isize>();
-    Math::Vec2i p5 = (p4 + perp * scale).cast<isize>();
-    Math::Vec2i p6 = (p4 - perp * scale).cast<isize>();
-
-    debugLine({from, to}, color);
-    debugLine({to, p2}, color);
-    debugLine({to, p3}, color);
-    debugLine({from, p5}, color);
-    debugLine({from, p6}, color);
-}
-
-void Context::debugTrace(Gfx::Color color) {
+void Context::plot(Gfx::Color color) {
     for (auto edge : _rast.shape()) {
-        debugLine(edge.cast<isize>(), color);
+        plot(edge.cast<isize>(), color);
     }
 }
 

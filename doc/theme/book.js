@@ -286,33 +286,12 @@ function playground_text(playground, hidden = true) {
 
 (function themes() {
     var html = document.querySelector('html');
-    var themeToggleButton = document.getElementById('theme-toggle');
-    var themePopup = document.getElementById('theme-list');
     var themeColorMetaTag = document.querySelector('meta[name="theme-color"]');
     var stylesheets = {
         ayuHighlight: document.querySelector("[href$='ayu-highlight.css']"),
         tomorrowNight: document.querySelector("[href$='tomorrow-night.css']"),
         highlight: document.querySelector("[href$='highlight.css']"),
     };
-
-    function showThemes() {
-        themePopup.style.display = 'block';
-        themeToggleButton.setAttribute('aria-expanded', true);
-        themePopup.querySelector("button#" + get_theme()).focus();
-    }
-
-    function updateThemeSelected() {
-        themePopup.querySelectorAll('.theme-selected').forEach(function (el) {
-            el.classList.remove('theme-selected');
-        });
-        themePopup.querySelector("button#" + get_theme()).classList.add('theme-selected');
-    }
-
-    function hideThemes() {
-        themePopup.style.display = 'none';
-        themeToggleButton.setAttribute('aria-expanded', false);
-        themeToggleButton.focus();
-    }
 
     function get_theme() {
         var theme;
@@ -324,26 +303,14 @@ function playground_text(playground, hidden = true) {
         }
     }
 
-    function set_theme(theme, store = true) {
+    function set_theme(theme) {
         let ace_theme;
 
-        if (theme == 'coal' || theme == 'skift-dark') {
-            stylesheets.ayuHighlight.disabled = true;
-            stylesheets.tomorrowNight.disabled = false;
-            stylesheets.highlight.disabled = true;
+        stylesheets.ayuHighlight.disabled = true;
+        stylesheets.tomorrowNight.disabled = false;
+        stylesheets.highlight.disabled = true;
 
-            ace_theme = "ace/theme/tomorrow_night";
-        } else if (theme == 'ayu') {
-            stylesheets.ayuHighlight.disabled = false;
-            stylesheets.tomorrowNight.disabled = true;
-            stylesheets.highlight.disabled = true;
-            ace_theme = "ace/theme/tomorrow_night";
-        } else {
-            stylesheets.ayuHighlight.disabled = true;
-            stylesheets.tomorrowNight.disabled = true;
-            stylesheets.highlight.disabled = false;
-            ace_theme = "ace/theme/dawn";
-        }
+        ace_theme = "ace/theme/tomorrow_night";
 
         setTimeout(function () {
             themeColorMetaTag.content = getComputedStyle(document.documentElement).backgroundColor;
@@ -357,87 +324,12 @@ function playground_text(playground, hidden = true) {
 
         var previousTheme = get_theme();
 
-        if (store) {
-            try { localStorage.setItem('mdbook-theme', theme); } catch (e) { }
-        }
-
         html.classList.remove(previousTheme);
         html.classList.add(theme);
-        updateThemeSelected();
     }
 
     // Set theme
-    var theme = get_theme();
-
-    set_theme(theme, false);
-
-    themeToggleButton.addEventListener('click', function () {
-        if (themePopup.style.display === 'block') {
-            hideThemes();
-        } else {
-            showThemes();
-        }
-    });
-
-    themePopup.addEventListener('click', function (e) {
-        var theme;
-        if (e.target.className === "theme") {
-            theme = e.target.id;
-        } else if (e.target.parentElement.className === "theme") {
-            theme = e.target.parentElement.id;
-        } else {
-            return;
-        }
-        set_theme(theme);
-    });
-
-    themePopup.addEventListener('focusout', function (e) {
-        // e.relatedTarget is null in Safari and Firefox on macOS (see workaround below)
-        if (!!e.relatedTarget && !themeToggleButton.contains(e.relatedTarget) && !themePopup.contains(e.relatedTarget)) {
-            hideThemes();
-        }
-    });
-
-    // Should not be needed, but it works around an issue on macOS & iOS: https://github.com/rust-lang/mdBook/issues/628
-    document.addEventListener('click', function (e) {
-        if (themePopup.style.display === 'block' && !themeToggleButton.contains(e.target) && !themePopup.contains(e.target)) {
-            hideThemes();
-        }
-    });
-
-    document.addEventListener('keydown', function (e) {
-        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) { return; }
-        if (!themePopup.contains(e.target)) { return; }
-
-        switch (e.key) {
-            case 'Escape':
-                e.preventDefault();
-                hideThemes();
-                break;
-            case 'ArrowUp':
-                e.preventDefault();
-                var li = document.activeElement.parentElement;
-                if (li && li.previousElementSibling) {
-                    li.previousElementSibling.querySelector('button').focus();
-                }
-                break;
-            case 'ArrowDown':
-                e.preventDefault();
-                var li = document.activeElement.parentElement;
-                if (li && li.nextElementSibling) {
-                    li.nextElementSibling.querySelector('button').focus();
-                }
-                break;
-            case 'Home':
-                e.preventDefault();
-                themePopup.querySelector('li:first-child button').focus();
-                break;
-            case 'End':
-                e.preventDefault();
-                themePopup.querySelector('li:last-child button').focus();
-                break;
-        }
-    });
+    set_theme('skift-dark');
 })();
 
 (function sidebar() {

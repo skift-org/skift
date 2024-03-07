@@ -4,7 +4,6 @@
 
 #include "lock.h"
 #include "opt.h"
-#include "ref.h"
 
 namespace Karm {
 
@@ -23,7 +22,7 @@ struct _Cell {
     virtual void clear() = 0;
     virtual Meta::Type<> inspect() = 0;
 
-    _Cell *collectAndRelease() {
+    void collectAndRelease() {
         if (_strong == 0 and not _clear) {
             clear();
             _clear = true;
@@ -32,11 +31,9 @@ struct _Cell {
         if (_strong == 0 and _weak == 0) {
             _lock.release();
             delete this;
-            return nullptr;
         }
 
         _lock.release();
-        return nullptr;
     }
 
     _Cell *refStrong() {
@@ -50,13 +47,13 @@ struct _Cell {
         return this;
     }
 
-    _Cell *derefStrong() {
+    void derefStrong() {
         _lock.acquire();
 
         _strong--;
         if (_strong < 0)
             panic("derefStrong() underflow");
-        return collectAndRelease();
+        collectAndRelease();
     }
 
     _Cell *refWeak() {
@@ -68,13 +65,13 @@ struct _Cell {
         return this;
     }
 
-    _Cell *derefWeak() {
+    void derefWeak() {
         _lock.acquire();
 
         _weak--;
         if (_weak < 0)
             panic("derefWeak() underflow");
-        return collectAndRelease();
+        collectAndRelease();
     }
 
     template <typename T>
@@ -127,8 +124,10 @@ struct Strong {
     }
 
     constexpr ~Strong() {
-        if (_cell)
-            _cell = _cell->derefStrong();
+        if (_cell) {
+            _cell->derefStrong();
+            _cell = nullptr;
+        }
     }
 
     constexpr Strong &operator=(Strong const &other) {
@@ -277,8 +276,10 @@ struct Weak {
     }
 
     constexpr ~Weak() {
-        if (_cell)
-            _cell = _cell->derefWeak();
+        if (_cell) {
+            _cell->derefWeak();
+            _cell = nullptr;
+        }
     }
 
     Opt<Strong<T>> upgrade() const {

@@ -18,7 +18,7 @@ void enterKernel(usize entry, usize payload, usize stack, usize vmm);
 Res<> loadEntry(Entry const &entry) {
     logInfo("loader: preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
-    logInfo("loader: payload at vaddr: 0x{x} paddr: 0x{x}", payloadMem.vaddr(), payloadMem.paddr());
+    logInfo("loader: payload at vaddr: {p} paddr: {p}", payloadMem.vaddr(), payloadMem.paddr());
     Handover::Builder payload{payloadMem.mutBytes()};
 
     payload.agent("opstart");
@@ -29,7 +29,7 @@ Res<> loadEntry(Entry const &entry) {
     auto kernelMem = try$(Sys::mmap().map(kernelFile));
     Elf::Image image{kernelMem.bytes()};
     payload.add(Handover::FILE, 0, kernelMem.prange().as<USizeRange>());
-    logInfo("loader: kernel at vaddr: 0x{x} paddr: 0x{x}", kernelMem.vaddr(), kernelMem.paddr());
+    logInfo("loader: kernel at vaddr: {p} paddr: {p}", kernelMem.vaddr(), kernelMem.paddr());
 
     if (not image.valid()) {
         logError("loader: invalid kernel image");
@@ -39,7 +39,7 @@ Res<> loadEntry(Entry const &entry) {
     logInfo("loader: setting up stack...");
     auto stackMap = try$(Sys::mmap().stack().size(Hal::PAGE_SIZE * 16).mapMut());
     payload.add(Handover::STACK, 0, stackMap.prange());
-    logInfo("loader: stack at vaddr: 0x{x} paddr: 0x{x}", stackMap.vaddr(), stackMap.paddr());
+    logInfo("loader: stack at vaddr: {p} paddr: {p}", stackMap.vaddr(), stackMap.paddr());
 
     logInfo("loader: loading kernel image...");
     for (auto prog : image.programs()) {
@@ -49,7 +49,7 @@ Res<> loadEntry(Entry const &entry) {
 
         usize paddr = prog.vaddr() - Handover::KERNEL_BASE;
         usize memsz = Hal::pageAlignUp(prog.memsz());
-        logInfo("loader: loading segment: paddr=0x{x}, vaddr=0x{x}, memsz=0x{x}, filesz=0x{x}", paddr, prog.vaddr(), memsz, prog.filez());
+        logInfo("loader: loading segment: paddr={p}, vaddr={p}, memsz={p}, filesz={p}", paddr, prog.vaddr(), memsz, prog.filez());
 
         usize remaining = prog.memsz() - prog.filez();
         memcpy((void *)paddr, prog.buf(), prog.filez());

@@ -5,6 +5,7 @@
 #include <karm-base/reflect.h>
 #include <karm-base/time.h>
 #include <karm-base/tuple.h>
+#include <karm-base/vec.h>
 #include <karm-io/impls.h>
 #include <karm-io/sscan.h>
 #include <karm-io/traits.h>
@@ -279,29 +280,38 @@ struct Formatter<Cased<T>> {
 /* --- Number Formatting ---------------------------------------------------- */
 
 struct NumberFormater {
+    bool prefix;
     bool isChar = false;
     usize base = 10;
     usize width = 0;
-    bool fillZero = false;
+    char fillChar = ' ';
+
+    Str formatPrefix() {
+        if (base == 16)
+            return "0x";
+
+        if (base == 8)
+            return "0o";
+
+        if (base == 2)
+            return "0b";
+
+        return "";
+    }
 
     void parse(Io::SScan &scan) {
-        if (scan.ended()) {
-            return;
-        }
+        if (scan.skip('#'))
+            prefix = true;
 
-        if (scan.peek() == '0') {
-            scan.next();
-            fillZero = true;
-        }
-
-        if (scan.ended()) {
-            return;
-        }
+        if (scan.skip('0'))
+            fillChar = '0';
 
         width = tryOr(scan.nextInt(), 0);
 
-        Rune c = scan.next();
+        if (scan.ended())
+            return;
 
+        Rune c = scan.next();
         switch (c) {
         case 'b':
             base = 2;
@@ -320,8 +330,9 @@ struct NumberFormater {
             break;
 
         case 'p':
+            prefix = true;
             base = 16;
-            fillZero = true;
+            fillChar = '0';
             width = sizeof(usize) * 2;
             break;
 
@@ -335,36 +346,30 @@ struct NumberFormater {
     }
 
     Res<usize> formatUnsigned(Io::TextWriter &writer, usize val) {
-        usize ogVal = val;
-        (void)ogVal;
         auto digit = [](usize v) {
             if (v < 10)
                 return '0' + v;
             return 'a' + (v - 10);
         };
-        usize i = 0;
-        Array<char, 128> buf;
+
+        InlineVec<char, 128> buf;
 
         do {
-            buf[i++] = digit(val % base);
+            buf.pushBack(digit(val % base));
             val /= base;
-        } while (val != 0 and i < buf.len());
+        } while (val != 0 and buf.len() < buf.cap());
 
-        if (width > 0 and width > i) {
-            usize n = width - i;
-            if (fillZero) {
-                for (usize j = 0; j < n; j++) {
-                    buf[i++] = '0';
-                }
-            } else {
-                for (usize j = 0; j < n; j++) {
-                    buf[i++] = ' ';
-                }
-            }
-        }
+        while (width > buf.len())
+            buf.pushBack(fillChar);
 
-        reverse(mutSub(buf, 0, i));
-        return writer.writeStr({buf.buf(), i});
+        reverse(mutSub(buf));
+
+        usize written = 0;
+        if (prefix)
+            written += try$(writer.writeStr(formatPrefix()));
+        written += try$(writer.writeStr(buf));
+
+        return Ok(written);
     }
 
     Res<usize> formatSigned(Io::TextWriter &writer, isize val) {
@@ -376,13 +381,53 @@ struct NumberFormater {
         written += try$(formatUnsigned(writer, val));
         return Ok(written);
     }
+
+    Res<usize> formatRune(Io::TextWriter &writer, Rune val) {
+        if (val == '\'')
+            return writer.writeStr("\\'");
+
+        if (val == '\"')
+            return writer.writeStr("\\\"");
+
+        if (val == '\?')
+            return writer.writeStr("\\?");
+
+        if (val == '\\')
+            return writer.writeStr("\\\\");
+
+        if (val == '\a')
+            return writer.writeStr("\\a");
+
+        if (val == '\b')
+            return writer.writeStr("\\b");
+
+        if (val == '\f')
+            return writer.writeStr("\\f");
+
+        if (val == '\n')
+            return writer.writeStr("\\n");
+
+        if (val == '\r')
+            return writer.writeStr("\\r");
+
+        if (val == '\t')
+            return writer.writeStr("\\t");
+
+        if (val == '\v')
+            return writer.writeStr("\\v");
+
+        if (not isAsciiPrint(val))
+            return Io::format(writer, "\\u{x}", val);
+
+        return writer.writeRune(val);
+    }
 };
 
 template <typename T>
 struct UnsignedFormatter : public NumberFormater {
     Res<usize> format(Io::TextWriter &writer, T const &val) {
         if (isChar)
-            return writer.writeRune(val);
+            return formatRune(writer, val);
         return formatUnsigned(writer, val);
     }
 };
@@ -390,10 +435,8 @@ struct UnsignedFormatter : public NumberFormater {
 template <typename T>
 struct SignedFormatter : public NumberFormater {
     Res<usize> format(Io::TextWriter &writer, T const &val) {
-        if (isChar) {
+        if (isChar)
             return writer.writeRune(val);
-        }
-
         return formatSigned(writer, val);
     }
 };
@@ -415,7 +458,7 @@ struct Formatter<f64> {
         if (fpart != 0.0) {
             written += try$(writer.writeRune('.'));
             formater.width = 6;
-            formater.fillZero = true;
+            formater.fillChar = '0';
             fpart *= 1000000;
             written += try$(formater.formatUnsigned(writer, (u64)fpart));
         }

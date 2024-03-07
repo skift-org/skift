@@ -50,7 +50,7 @@ struct Sink {
 struct Tokenizer {
     enum struct State {
 #define STATE(NAME) NAME,
-#include "states.inc"
+#include "defs/states.inc"
 #undef STATE
     };
 
@@ -184,7 +184,7 @@ static inline Str toStr(Tokenizer::State state) {
 #define STATE(NAME)              \
     case Tokenizer::State::NAME: \
         return #NAME;
-#include "states.inc"
+#include "defs/states.inc"
 #undef STATE
     default:
         panic("invalid state");

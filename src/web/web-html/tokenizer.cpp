@@ -1589,6 +1589,7 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // U+0020 SPACE
         // Switch to the before attribute name state.
         if (rune == '\t' or rune == '\n' or rune == '\f' or rune == ' ') {
+            _lastAttr().value = _builder.take();
             _switchTo(State::BEFORE_ATTRIBUTE_NAME);
         }
 
@@ -1603,6 +1604,7 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // U+003E GREATER-THAN SIGN (>)
         // Switch to the data state. Emit the current tag token.
         else if (rune == '>') {
+            _lastAttr().value = _builder.take();
             _switchTo(State::DATA);
             _emit();
         }
@@ -1638,7 +1640,7 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // Anything else
         // Append the current input character to the current attribute's
         // value.
-        else if (isAsciiLower(rune)) {
+        else {
             _builder.append(rune);
         }
 
@@ -3150,6 +3152,7 @@ void Tokenizer::consume(Rune rune, bool isEof) {
     }
 
     case State::NAMED_CHARACTER_REFERENCE: {
+        notImplemented();
         // 13.2.5.73 Named character reference state
 
         // Consume the maximum number of characters possible, where the
@@ -3221,7 +3224,7 @@ void Tokenizer::consume(Rune rune, bool isEof) {
 
         // Anything else
         // Reconsume in the return state.
-        else if (rune != 0) {
+        else {
             _reconsumeIn(_returnState, rune);
         }
 

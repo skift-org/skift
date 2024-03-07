@@ -7,7 +7,7 @@ struct {
 } const ENTITIES[] = {
 #define ENTITY(NAME, ...) \
     {#NAME, (unsigned int[]){__VA_ARGS__, 0}},
-#include "entities.inc"
+#include "defs/entities.inc"
 #undef ENTITY
 };
 

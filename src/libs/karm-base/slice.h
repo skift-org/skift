@@ -441,13 +441,38 @@ always_inline Opt<usize> search(Sliceable auto const &slice, auto cmp) {
     return NONE;
 }
 
-always_inline bool startWith(Sliceable auto const &slice, Sliceable auto const &prefix) {
+enum struct Match {
+    NO,
+    PARTIAL,
+    YES,
+};
+
+always_inline Match startWith(Sliceable auto const &slice, Sliceable auto const &prefix) {
     if (slice.len() < prefix.len())
-        return false;
+        return Match::NO;
+
     for (usize i = 0; i < prefix.len(); i++)
         if (slice[i] != prefix[i])
-            return false;
-    return true;
+            return Match::NO;
+
+    if (slice.len() != prefix.len())
+        return Match::PARTIAL;
+
+    return Match::YES;
+}
+
+always_inline Match endWith(Sliceable auto const &slice, Sliceable auto const &suffix) {
+    if (slice.len() < suffix.len())
+        return Match::NO;
+
+    for (usize i = 0; i < suffix.len(); i++)
+        if (slice[slice.len() - suffix.len() + i] != suffix[i])
+            return Match::NO;
+
+    if (slice.len() != suffix.len())
+        return Match::PARTIAL;
+
+    return Match::YES;
 }
 
 } // namespace Karm

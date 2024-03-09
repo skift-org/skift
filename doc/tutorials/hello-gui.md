@@ -5,7 +5,7 @@ In this tutorial, we will create a simple graphical user interface (GUI) applica
 ## Prerequisites
 
 - [skiftOS development environment](../building.md)
-- [Hello, world!](00-hello-world.md)
+- [Hello, world!](hello-world.md)
 
 ## Create a new project
 

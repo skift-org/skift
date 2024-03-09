@@ -87,5 +87,5 @@ Congratulations! You have created your first program for skiftOS.
 
 ## Going further
 
-- [Next tutorial: Hello, GUI!](01-hello-gui.md)
+- [Next tutorial: Hello, GUI!](hello-gui.md)
 - src/libs/karm-sys/chan.h - The system channel API similar to stdio

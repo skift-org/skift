@@ -5,6 +5,26 @@
 
 namespace Web::Html {
 
+struct Entity {
+    Str name;
+    Rune const *runes;
+
+    operator bool() {
+        return runes != nullptr;
+    }
+};
+
+static Entity const ENTITIES[] = {
+#define ENTITY(NAME, ...) \
+    {#NAME, (Rune[]){__VA_ARGS__ __VA_OPT__(, ) 0}},
+#include "defs/entities.inc"
+#undef ENTITY
+};
+
+void Tokenizer::_raise(Str msg) {
+    logError("{}: {}", toStr(_state), msg);
+}
+
 void Tokenizer::consume(Rune rune, bool isEof) {
     // logDebug("Consuming '{c}' {#x} in {}", rune, rune, toStr(_state));
 
@@ -39,7 +59,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // EOF
         // Emit an end-of-file token.
         else if (isEof) {
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -79,7 +100,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // EOF
         // Emit an end-of-file token.
         else if (isEof) {
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -112,7 +134,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // EOF
         // Emit an end-of-file token.
         else if (isEof) {
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -145,7 +168,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // EOF
         // Emit an end-of-file token.
         else if (isEof) {
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -172,7 +196,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // EOF
         // Emit an end-of-file token.
         else if (isEof) {
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -224,7 +249,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         else if (isEof) {
             _raise("eof-before-tag-name");
             _emit('<');
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -268,7 +294,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-before-tag-name");
             _emit('<');
             _emit('/');
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -334,7 +361,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // This is an eof-in-tag parse error. Emit an end-of-file token.
         else if (isEof) {
             _raise("eof-in-tag");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -775,7 +803,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // an end-of-file token.
         else if (isEof) {
             _raise("eof-in-script-html-comment-like-text");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -820,7 +849,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // an end-of-file token.
         else if (isEof) {
             _raise("eof-in-script-html-comment-like-text");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -873,7 +903,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // an end-of-file token.
         else if (isEof) {
             _raise("eof-in-script-html-comment-like-text");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -1094,7 +1125,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // an end-of-file token.
         else if (isEof) {
             _raise("eof-in-script-html-comment-like-text");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -1141,7 +1173,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // an end-of-file token.
         else if (isEof) {
             _raise("eof-in-script-html-comment-like-text");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -1196,7 +1229,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // an end-of-file token.
         else if (isEof) {
             _raise("eof-in-script-html-comment-like-text");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -1434,7 +1468,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // This is an eof-in-tag parse error. Emit an end-of-file token.
         else if (isEof) {
             _raise("eof-in-tag");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -1523,7 +1558,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // This is an eof-in-tag parse error. Emit an end-of-file token.
         else if (isEof) {
             _raise("eof-in-tag");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -1567,7 +1603,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // This is an eof-in-tag parse error. Emit an end-of-file token.
         else if (isEof) {
             _raise("eof-in-tag");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -1634,7 +1671,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // This is an eof-in-tag parse error. Emit an end-of-file token.
         else if (isEof) {
             _raise("eof-in-tag");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -1677,7 +1715,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // This is an eof-in-tag parse error. Emit an end-of-file token.
         else if (isEof) {
             _raise("eof-in-tag");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -1708,7 +1747,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // This is an eof-in-tag parse error. Emit an end-of-file token.
         else if (isEof) {
             _raise("eof-in-tag");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -1737,7 +1777,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // Emit the comment. Emit an end-of-file token.
         else if (isEof) {
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // U+0000 NULL
@@ -1761,12 +1802,15 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // 13.2.5.42 Markup declaration open state
         // If the next few characters are:
 
+        _temp.append(rune);
         // Two U+002D HYPHEN-MINUS characters (-)
         // Consume those two characters, create a comment token whose data
         // is the empty string, and switch to the comment start state.
-        if (auto r = _await(rune, "--")) {
-            if (r == Match::MAYBE)
+        if (auto r = startWith(Str{"--"}, _temp.str()); r != Match::NO) {
+            if (r == Match::PARTIAL)
                 return;
+
+            _temp.clear();
             _begin(Token::COMMENT);
             _switchTo(State::COMMENT_START);
         }
@@ -1774,9 +1818,11 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // ASCII case-insensitive match for the word "DOCTYPE"
         // Consume those characters and switch to the DOCTYPE state.
 
-        else if (auto r = _await(rune, "DOCTYPE")) {
-            if (r == Match::MAYBE)
+        else if (auto r = startWith(Str{"DOCTYPE"}, _temp.str()); r != Match::NO) {
+            if (r == Match::PARTIAL)
                 return;
+
+            _temp.clear();
             _switchTo(State::DOCTYPE);
         }
 
@@ -1788,11 +1834,12 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // error. Create a comment token whose data is the "[CDATA[" string.
         // Switch to the bogus comment state.
 
-        else if (auto r = _await(rune, "[CDATA[")) {
-            if (r == Match::MAYBE)
+        else if (auto r = startWith(Str{"[CDATA["}, _temp.str()); r != Match::NO) {
+            if (r == Match::PARTIAL)
                 return;
 
-            // FIXME: This is in reallity more complicated
+            // NOSPEC: This is in reallity more complicated
+            _temp.clear();
             _switchTo(State::CDATA_SECTION);
         }
 
@@ -1801,7 +1848,7 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // comment token whose data is the empty string. Switch to the bogus
         // comment state (don't consume anything in the current state).
         else {
-            _wait.clear();
+            _temp.clear();
             _raise("incorrectly-opened-comment");
             _begin(Token::COMMENT);
             _reconsumeIn(State::BOGUS_COMMENT, rune);
@@ -1862,7 +1909,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         else if (isEof) {
             _raise("eof-in-comment");
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -1908,7 +1956,9 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         else if (isEof) {
             _raise("eof-in-comment");
             _emit();
-            _emitEof();
+
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2023,7 +2073,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         else if (isEof) {
             _raise("eof-in-comment");
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2067,7 +2118,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         else if (isEof) {
             _raise("eof-in-comment");
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2112,7 +2164,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         else if (isEof) {
             _raise("eof-in-comment");
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2157,7 +2210,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _begin(Token::DOCTYPE);
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2226,7 +2280,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _begin(Token::DOCTYPE);
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2288,7 +2343,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2329,7 +2385,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2414,7 +2471,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2478,7 +2536,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2534,7 +2593,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2587,7 +2647,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2650,7 +2711,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2710,7 +2772,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2778,7 +2841,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2842,7 +2906,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2896,7 +2961,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2947,7 +3013,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -2988,7 +3055,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
             _raise("eof-in-doctype");
             _ensure(Token::DOCTYPE).forceQuirks = true;
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -3026,7 +3094,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // Emit the DOCTYPE token. Emit an end-of-file token.
         else if (isEof) {
             _emit();
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -3052,7 +3121,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // This is an eof-in-cdata parse error. Emit an end-of-file token.
         else if (isEof) {
             _raise("eof-in-cdata");
-            _emitEof();
+            _begin(Token::END_OF_FILE);
+            _emit();
         }
 
         // Anything else
@@ -3161,23 +3231,23 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // character to the temporary buffer when it's consumed.
 
         // If there is a match
-        // If the character reference was consumed as part of an attribute,
-        // and the last character matched is not a U+003B SEMICOLON
-        // character (;), and the next input character is either a U+003D
-        // EQUALS SIGN character (=) or an ASCII alphanumeric, then, for
-        // historical reasons, flush code points consumed as a character
-        // reference and switch to the return state.
+            // If the character reference was consumed as part of an attribute,
+            // and the last character matched is not a U+003B SEMICOLON
+            // character (;), and the next input character is either a U+003D
+            // EQUALS SIGN character (=) or an ASCII alphanumeric, then, for
+            // historical reasons, flush code points consumed as a character
+            // reference and switch to the return state.
 
-        // Otherwise:
+            // Otherwise:
 
-        // If the last character matched is not a U+003B SEMICOLON character
-        // (;), then this is a missing-semicolon-after-character-reference
-        // parse error.
+                // If the last character matched is not a U+003B SEMICOLON character
+                // (;), then this is a missing-semicolon-after-character-reference
+                // parse error.
 
         // Set the temporary buffer to the empty string. Append one or two
         // characters corresponding to the character reference name (as
         // given by the second column of the named character references
-        // table) to the temporary buffer.
+                // table) to the temporary buffer.
 
         // Flush code points consumed as a character reference. Switch to
         // the return state. Otherwise Flush code points consumed as a
@@ -3205,9 +3275,9 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // attribute's value. Otherwise, emit the current input character as
         // a character token.
         if (isAsciiAlphaNum(rune)) {
-            if (_state == State::ATTRIBUTE_VALUE_DOUBLE_QUOTED ||
-                _state == State::ATTRIBUTE_VALUE_SINGLE_QUOTED ||
-                _state == State::ATTRIBUTE_VALUE_UNQUOTED) {
+            if (_returnState == State::ATTRIBUTE_VALUE_DOUBLE_QUOTED ||
+                _returnState == State::ATTRIBUTE_VALUE_SINGLE_QUOTED ||
+                _returnState == State::ATTRIBUTE_VALUE_UNQUOTED) {
                 _builder.append(rune);
             } else {
                 _emit(rune);

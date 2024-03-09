@@ -4,12 +4,12 @@
 #include <web-html/tokenizer.h>
 
 Res<> entryPoint(Sys::Ctx &) {
-    auto file = try$(Sys::File::open("bundle://web-html-cli/exemple.html"_url));
+    auto file = try$(Sys::File::open("bundle://web-html-cli/index.html"_url));
 
     auto buf = try$(Io::readAllUtf8(file));
 
-    Sys::println("Orginal Source:");
-    Sys::println("{}", buf);
+    // Sys::println("Orginal Source:");
+    // Sys::println("{}", buf);
 
     struct : public Web::Html::Sink {
         void accept(Web::Html::Token const &token) override {
@@ -20,9 +20,8 @@ Res<> entryPoint(Sys::Ctx &) {
     Sys::println("Tokens:");
     Web::Html::Tokenizer tokenizer{sink};
 
-    for (auto r : iterRunes(buf)) {
+    for (auto r : iterRunes(buf))
         tokenizer.consume(r);
-    }
 
     tokenizer.consume(-1, true);
 

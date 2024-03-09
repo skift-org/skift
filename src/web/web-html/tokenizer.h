@@ -63,34 +63,28 @@ struct Tokenizer {
     Rune _currChar = 0;
     StringBuilder _builder;
     StringBuilder _temp;
-    StringBuilder _wait;
 
     Sink &_sink;
 
     Tokenizer(Sink &sink)
         : _sink(sink) {}
 
-    enum Match {
-        NO,
-        MAYBE,
-        YES,
-    };
-
-    void _begin(Token::Type type) {
+    Token &_begin(Token::Type type) {
         _token = Token{};
         _token->type = type;
+        return *_token;
     }
 
     Token &_ensure() {
         if (not _token)
-            _raise("unexpected-token");
+            panic("unexpected-token");
         return *_token;
     }
 
     Token &_ensure(Token::Type type) {
         auto &token = _ensure();
         if (token.type != type)
-            _raise("unexpected-token");
+            panic("unexpected-token");
         return token;
     }
 
@@ -100,13 +94,7 @@ struct Tokenizer {
     }
 
     void _emit(Rune rune) {
-        _begin(Token::CHARACTER);
-        _ensure().rune = rune;
-        _emit();
-    }
-
-    void _emitEof() {
-        _begin(Token::END_OF_FILE);
+        _begin(Token::CHARACTER).rune = rune;
         _emit();
     }
 
@@ -121,26 +109,6 @@ struct Tokenizer {
         return last(token.attrs);
     }
 
-    Match _await(Rune r, Str what) {
-        if (startWith(what, _wait.str())) {
-            _wait.append(r);
-
-            if (not startWith(what, _wait.str())) {
-                _wait.clear();
-                return Match::NO;
-            }
-
-            if (_wait.str().len() == what.len()) {
-                _wait.clear();
-                return Match::YES;
-            }
-
-            return Match::MAYBE;
-        }
-
-        return Match::NO;
-    }
-
     void _reconsumeIn(State state, Rune rune) {
         _switchTo(state);
         consume(rune);
@@ -150,9 +118,7 @@ struct Tokenizer {
         _state = state;
     }
 
-    void _raise(Str msg) {
-        logError("tokenizer error: {}", msg);
-    }
+    void _raise(Str msg);
 
     bool _isAppropriateEndTagToken() {
         if (not _last or not _token)

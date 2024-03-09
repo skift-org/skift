@@ -14,9 +14,9 @@ struct Entity {
     }
 };
 
-static Entity const ENTITIES[] = {
+[[maybe_unused]] static Array const ENTITIES = {
 #define ENTITY(NAME, ...) \
-    {#NAME, (Rune[]){__VA_ARGS__ __VA_OPT__(, ) 0}},
+    Entity{#NAME, (Rune[]){__VA_ARGS__ __VA_OPT__(, ) 0}},
 #include "defs/entities.inc"
 #undef ENTITY
 };
@@ -3231,23 +3231,23 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // character to the temporary buffer when it's consumed.
 
         // If there is a match
-            // If the character reference was consumed as part of an attribute,
-            // and the last character matched is not a U+003B SEMICOLON
-            // character (;), and the next input character is either a U+003D
-            // EQUALS SIGN character (=) or an ASCII alphanumeric, then, for
-            // historical reasons, flush code points consumed as a character
-            // reference and switch to the return state.
+        // If the character reference was consumed as part of an attribute,
+        // and the last character matched is not a U+003B SEMICOLON
+        // character (;), and the next input character is either a U+003D
+        // EQUALS SIGN character (=) or an ASCII alphanumeric, then, for
+        // historical reasons, flush code points consumed as a character
+        // reference and switch to the return state.
 
-            // Otherwise:
+        // Otherwise:
 
-                // If the last character matched is not a U+003B SEMICOLON character
-                // (;), then this is a missing-semicolon-after-character-reference
-                // parse error.
+        // If the last character matched is not a U+003B SEMICOLON character
+        // (;), then this is a missing-semicolon-after-character-reference
+        // parse error.
 
         // Set the temporary buffer to the empty string. Append one or two
         // characters corresponding to the character reference name (as
         // given by the second column of the named character references
-                // table) to the temporary buffer.
+        // table) to the temporary buffer.
 
         // Flush code points consumed as a character reference. Switch to
         // the return state. Otherwise Flush code points consumed as a

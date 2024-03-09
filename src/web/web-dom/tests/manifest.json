@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "web-dom-tests",
+    "type": "lib",
+    "props": {
+        "cpp-excluded": true
+    },
+    "requires": [
+        "web-dom",
+        "karm-test"
+    ],
+    "injects": [
+        "__tests__"
+    ]
+}

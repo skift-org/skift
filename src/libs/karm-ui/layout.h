@@ -1,7 +1,6 @@
 #pragma once
 
 #include <karm-layout/align.h>
-#include <karm-layout/dock.h>
 #include <karm-layout/spacing.h>
 
 #include "node.h"
@@ -220,54 +219,6 @@ Child stack(Children children);
 
 inline Child stack(auto... children) {
     return stack(Children{children...});
-}
-
-/* --- Dock ----------------------------------------------------------------- */
-
-Child docked(Layout::Dock dock, Child child);
-
-inline auto docked(Layout::Dock d) {
-    return [d](Child child) {
-        return docked(d, child);
-    };
-}
-
-Child dockTop(Child child);
-
-inline auto dockTop() {
-    return [](Child child) {
-        return dockTop(child);
-    };
-}
-
-Child dockBottom(Child child);
-
-inline auto dockBottom() {
-    return [](Child child) {
-        return dockBottom(child);
-    };
-}
-
-Child dockStart(Child child);
-
-inline auto dockStart() {
-    return [](Child child) {
-        return dockStart(child);
-    };
-}
-
-Child dockEnd(Child child);
-
-inline auto dockEnd() {
-    return [](Child child) {
-        return dockEnd(child);
-    };
-}
-
-Child dock(Children children);
-
-inline Child dock(Meta::Same<Child> auto... children) {
-    return dock({children...});
 }
 
 /* --- Flow ----------------------------------------------------------------- */

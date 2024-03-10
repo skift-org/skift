@@ -28,8 +28,7 @@ $ qemu-system-x86_64 -bios <ovmf file> -drive format=raw,file=<image file> -m 51
 
 ## On Real Hardware
 
-> [!WARNING]
-> Running skiftOS on real hardware is not recommended. It is not ready for production use and may damage your computer.
+> **⚠ Warning:** Running skiftOS on real hardware is not recommended. It is not ready for production use and may damage your computer.
 
 If still determined, flashing the HDD file to a USB drive can be attempted:
 

@@ -5,11 +5,9 @@
 namespace Web::Dom {
 
 struct Node : public Meta::Static {
-    Node *_parent;
+    Node *_parent = nullptr;
     LlItem<Node> _siblings;
     Ll<Node, &Node::_siblings> _children;
-
-    virtual ~Node() {}
 
     /* --- Parent --- */
 

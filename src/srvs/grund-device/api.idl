@@ -3,11 +3,11 @@ module Grund::Device
 include "karm-ipc/base.h"
 
 Client {
-    event (ClientEvent e) -> Res<>
+    event (e : ClientEvent) -> Res<>,
 }
 
 Host {
-    bubble (HostEvent e) -> Res<>
+    bubble (e : HostEvent) -> Res<>,
 
-    flip (Vec<Math::Recti> r) -> Res<>
+    flip (r : Vec<Math::Recti>) -> Res<>,
 }

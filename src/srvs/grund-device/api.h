@@ -11,10 +11,11 @@ struct IClient {
     template <typename T>
     struct _Client;
 
-    template <typename R>
-    auto _dispatch(R &r);
+    auto _dispatch(auto, auto, auto);
 
     virtual ~IClient() = default;
+
+    static constexpr auto event_UID = 0x4119639092e62c55;
     virtual Res<> event(ClientEvent e) = 0;
 };
 
@@ -25,11 +26,14 @@ struct IHost {
     template <typename T>
     struct _Client;
 
-    template <typename R>
-    auto _dispatch(R &r);
+    auto _dispatch(auto, auto, auto);
 
     virtual ~IHost() = default;
+
+    static constexpr auto bubble_UID = 0xa3fa9e0b6b24b1ca;
     virtual Res<> bubble(HostEvent e) = 0;
+
+    static constexpr auto flip_UID = 0xe6e5fd26daa9bca9;
     virtual Res<> flip(Vec<Math::Recti> r) = 0;
 };
 
@@ -40,7 +44,7 @@ struct IClient::_Client : public IClient {
     _Client(T t) : _t{t} {}
 
     Res<> event(ClientEvent e) {
-        return _t.template invoke<IClient, 0x4119639092e62c55, Res<>(ClientEvent)>(e);
+        return _t.template invoke<IClient, event_UID, Res<>, ClientEvent>(e);
     }
 };
 
@@ -51,41 +55,42 @@ struct IHost::_Client : public IHost {
     _Client(T t) : _t{t} {}
 
     Res<> bubble(HostEvent e) {
-        return _t.template invoke<IHost, 0xa3fa9e0b6b24b1ca, Res<>(HostEvent)>(e);
+        return _t.template invoke<IHost, bubble_UID, Res<>, HostEvent>(e);
     }
 
     Res<> flip(Vec<Math::Recti> r) {
-        return _t.template invoke<IHost, 0xe6e5fd26daa9bca9, Res<>(Vec<Math::Recti>)>(r);
+        return _t.template invoke<IHost, flip_UID, Res<>, Vec<Math::Recti>>(r);
     }
 };
 
-template <typename R>
-auto IClient::_dispatch(R &r) {
-    switch (r.id()) {
+auto IClient::_dispatch(auto mid, auto call, auto error) {
+    switch (mid) {
 
-    case 0x4119639092e62c55: {
-        return r.reply(event(r.template get<ClientEvent>()));
-    }
+    case event_UID:
+        return call<ClientEvent()>([&]<typename... Args>(Args &&...args) {
+            return event(std::forward<Args>(args)...);
+        });
 
     default:
-        return r.error();
+        return error();
     }
 }
 
-template <typename R>
-auto IHost::_dispatch(R &r) {
-    switch (r.id()) {
+auto IHost::_dispatch(auto mid, auto call, auto error) {
+    switch (mid) {
 
-    case 0xa3fa9e0b6b24b1ca: {
-        return r.reply(bubble(r.template get<HostEvent>()));
-    }
+    case bubble_UID:
+        return call<HostEvent()>([&]<typename... Args>(Args &&...args) {
+            return bubble(std::forward<Args>(args)...);
+        });
 
-    case 0xe6e5fd26daa9bca9: {
-        return r.reply(flip(r.template get<Vec<Math::Recti>>()));
-    }
+    case flip_UID:
+        return call<Vec<Math::Recti>()>([&]<typename... Args>(Args &&...args) {
+            return flip(std::forward<Args>(args)...);
+        });
 
     default:
-        return r.error();
+        return error();
     }
 }
 

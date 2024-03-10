@@ -11,7 +11,7 @@ struct IClient {
     template <typename T>
     struct _Client;
 
-    auto _dispatch(auto, auto, auto);
+    auto _dispatch(auto &);
 
     virtual ~IClient() = default;
 
@@ -26,7 +26,7 @@ struct IHost {
     template <typename T>
     struct _Client;
 
-    auto _dispatch(auto, auto, auto);
+    auto _dispatch(auto &);
 
     virtual ~IHost() = default;
 
@@ -63,34 +63,34 @@ struct IHost::_Client : public IHost {
     }
 };
 
-auto IClient::_dispatch(auto mid, auto call, auto error) {
-    switch (mid) {
+auto IClient::_dispatch(auto &o) {
+    switch (o.mid) {
 
     case event_UID:
-        return call<ClientEvent()>([&]<typename... Args>(Args &&...args) {
+        return o.template call<ClientEvent>([&]<typename... Args>(Args &&...args) {
             return event(std::forward<Args>(args)...);
         });
 
     default:
-        return error();
+        return o.error();
     }
 }
 
-auto IHost::_dispatch(auto mid, auto call, auto error) {
-    switch (mid) {
+auto IHost::_dispatch(auto &o) {
+    switch (o.mid) {
 
     case bubble_UID:
-        return call<HostEvent()>([&]<typename... Args>(Args &&...args) {
+        return o.template call<HostEvent>([&]<typename... Args>(Args &&...args) {
             return bubble(std::forward<Args>(args)...);
         });
 
     case flip_UID:
-        return call<Vec<Math::Recti>()>([&]<typename... Args>(Args &&...args) {
+        return o.template call<Vec<Math::Recti>>([&]<typename... Args>(Args &&...args) {
             return flip(std::forward<Args>(args)...);
         });
 
     default:
-        return error();
+        return o.error();
     }
 }
 

@@ -11,7 +11,7 @@ struct IBus {
     template <typename T>
     struct _Client;
 
-    auto _dispatch(auto, auto, auto);
+    auto _dispatch(auto &);
 
     virtual ~IBus() = default;
 
@@ -30,16 +30,16 @@ struct IBus::_Client : public IBus {
     }
 };
 
-auto IBus::_dispatch(auto mid, auto call, auto error) {
-    switch (mid) {
+auto IBus::_dispatch(auto &o) {
+    switch (o.mid) {
 
     case broadcast_UID:
-        return call<>([&]<typename... Args>(Args &&...args) {
+        return o.template call<>([&]<typename... Args>(Args &&...args) {
             return broadcast(std::forward<Args>(args)...);
         });
 
     default:
-        return error();
+        return o.error();
     }
 }
 

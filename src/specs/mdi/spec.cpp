@@ -14,14 +14,14 @@ Rune _codepoints[] = {
 #undef ICON
 };
 
-inline Slice<Rune> codepoints() {
+Slice<Rune> codepoints() {
     return Slice{
         _codepoints,
         sizeof(_codepoints) / sizeof(_codepoints[0]),
     };
 }
 
-inline Res<Icon> byName(Str query) {
+Res<Icon> byName(Str query) {
     for (size_t i = 0; i < sizeof(_names) / sizeof(_names[0]); ++i) {
         if (Str{_names[i]} == query)
             return Res<Icon>{Icon(_codepoints[i])};
@@ -29,7 +29,7 @@ inline Res<Icon> byName(Str query) {
     return Error::notFound("icon not found");
 }
 
-inline Str name(Icon icon) {
+Str name(Icon icon) {
     for (size_t i = 0; i < sizeof(_codepoints) / sizeof(_codepoints[0]); ++i) {
         if (_codepoints[i] == (Rune)icon)
             return Str{_names[i]};

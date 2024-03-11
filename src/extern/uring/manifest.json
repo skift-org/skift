@@ -2,7 +2,7 @@
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "uring",
     "type": "lib",
-    "description": "A cross-platform development library designed to provide low level access to hardware",
+    "description": "Linux io_uring library",
     "enableIf": {
         "host": [
             true
@@ -14,7 +14,7 @@
     "tools": {
         "cc": {
             "args": [
-                "@exec",
+                "@shell.popen",
                 "pkg-config",
                 "--cflags",
                 "liburing"
@@ -22,7 +22,7 @@
         },
         "cxx": {
             "args": [
-                "@exec",
+                "@shell.popen",
                 "pkg-config",
                 "--cflags",
                 "liburing"
@@ -30,7 +30,7 @@
         },
         "ld": {
             "args": [
-                "@exec",
+                "@shell.popen",
                 "pkg-config",
                 "--libs",
                 "liburing"

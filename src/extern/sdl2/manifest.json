@@ -11,7 +11,7 @@
     "tools": {
         "cc": {
             "args": [
-                "@exec",
+                "@shell.popen",
                 "pkg-config",
                 "--cflags",
                 "sdl2"
@@ -19,7 +19,7 @@
         },
         "cxx": {
             "args": [
-                "@exec",
+                "@shell.popen",
                 "pkg-config",
                 "--cflags",
                 "sdl2"
@@ -27,7 +27,7 @@
         },
         "ld": {
             "args": [
-                "@exec",
+                "@shell.popen",
                 "pkg-config",
                 "--libs",
                 "sdl2"

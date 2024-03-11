@@ -5,17 +5,11 @@
     "props": {
         "toolchain": "clang",
         "arch": "x86_64",
-        "sys": [
-            "@uname",
-            "sysname"
-        ],
+        "sys": "{shell.uname().sysname}",
         "abi": "unknown",
         "freestanding": false,
         "host": true,
-        "version": [
-            "@include",
-            "./meta/scripts/version.json"
-        ],
+        "version": "{jexpr.include('./meta/scripts/version.json')}",
         "karm-sys-encoding": "utf8",
         "karm-sys-line-ending": "lf",
         "karm-sys-path-separator": "slash",
@@ -27,29 +21,17 @@
     },
     "tools": {
         "cc": {
-            "cmd": [
-                "@latest",
-                "clang"
-            ]
+            "cmd": "{shell.latest('clang')}"
         },
         "cxx": {
-            "cmd": [
-                "@latest",
-                "clang++"
-            ]
+            "cmd": "{shell.latest('clang++')}"
         },
         "ld": {
-            "cmd": [
-                "@latest",
-                "clang++"
-            ],
+            "cmd": "{shell.latest('clang++')}",
             "rule": "-o $out $objs -Wl,--whole-archive $wholeLibs -Wl,--no-whole-archive $libs $flags"
         },
         "ar": {
-            "cmd": [
-                "@latest",
-                "llvm-ar"
-            ],
+            "cmd": "{shell.latest('llvm-ar')}",
             "args": [
                 "rcs"
             ]

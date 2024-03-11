@@ -9,10 +9,7 @@
         "abi": "ms",
         "freestanding": false,
         "host": false,
-        "version": [
-            "@include",
-            "./meta/scripts/version.json"
-        ],
+        "version": "{jexpr.include('./meta/scripts/version.json')}",
         "karm-sys-encoding": "utf16",
         "karm-sys-line-ending": "crlf",
         "karm-sys-path-separator": "backslash"
@@ -22,10 +19,7 @@
     },
     "tools": {
         "cc": {
-            "cmd": [
-                "@latest",
-                "clang"
-            ],
+            "cmd": "{shell.latest('clang')}",
             "args": [
                 "-target",
                 "x86_64-unknown-windows",
@@ -38,10 +32,7 @@
             ]
         },
         "cxx": {
-            "cmd": [
-                "@latest",
-                "clang++"
-            ],
+            "cmd": "{shell.latest('clang++')}",
             "args": [
                 "-target",
                 "x86_64-unknown-windows",
@@ -54,10 +45,7 @@
             ]
         },
         "ld": {
-            "cmd": [
-                "@latest",
-                "clang++"
-            ],
+            "cmd": "{shell.latest('clang++')}",
             "args": [
                 "-target",
                 "x86_64-unknown-windows",
@@ -69,10 +57,7 @@
             "rule": "-o $out $objs $wholeLibs $libs $flags"
         },
         "ar": {
-            "cmd": [
-                "@latest",
-                "llvm-ar"
-            ],
+            "cmd": "{shell.latest('llvm-ar')}",
             "args": [
                 "rcs"
             ]

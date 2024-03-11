@@ -10,10 +10,7 @@
         "abi": "sysv",
         "freestanding": true,
         "host": false,
-        "version": [
-            "@include",
-            "./meta/scripts/version.json"
-        ],
+        "version": "{jexpr.include('./meta/scripts/version.json')}",
         "karm-sys-encoding": "utf8",
         "karm-sys-line-ending": "lf",
         "karm-sys-path-separator": "slash",
@@ -21,10 +18,7 @@
     },
     "tools": {
         "cc": {
-            "cmd": [
-                "@latest",
-                "clang"
-            ],
+            "cmd": "{shell.latest('clang')}",
             "args": [
                 "--target=riscv32",
                 "-nostdlib",
@@ -32,10 +26,7 @@
             ]
         },
         "cxx": {
-            "cmd": [
-                "@latest",
-                "clang++"
-            ],
+            "cmd": "{shell.latest('clang++')}",
             "args": [
                 "--target=riscv32",
                 "-nostdlib",
@@ -43,10 +34,7 @@
             ]
         },
         "ld": {
-            "cmd": [
-                "@latest",
-                "ld.lld"
-            ],
+            "cmd": "{shell.latest('ld.lld')}",
             "args": [
                 "-m",
                 "elf32lriscv",
@@ -59,19 +47,13 @@
             ]
         },
         "ar": {
-            "cmd": [
-                "@latest",
-                "llvm-ar"
-            ],
+            "cmd": "{shell.latest('llvm-ar')}",
             "args": [
                 "rcs"
             ]
         },
         "as": {
-            "cmd": [
-                "@latest",
-                "clang"
-            ],
+            "cmd": "{shell.latest('clang')}",
             "args": [
                 "--target=riscv32",
                 "-c"

@@ -53,6 +53,13 @@ struct Slice {
     T const *_buf{};
     usize _len{};
 
+    static constexpr Slice fromNullterminated(T const *buf) {
+        usize len = 0;
+        while (buf[len])
+            len++;
+        return {buf, len};
+    }
+
     constexpr Slice() = default;
 
     constexpr Slice(T const *buf, usize len)
@@ -89,6 +96,13 @@ struct MutSlice {
 
     T *_buf{};
     usize _len{};
+
+    static constexpr MutSlice fromNullterminated(T *buf) {
+        usize len = 0;
+        while (buf[len])
+            len++;
+        return {buf, len};
+    }
 
     constexpr MutSlice() = default;
 

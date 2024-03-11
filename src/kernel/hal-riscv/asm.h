@@ -8,7 +8,7 @@ namespace Riscv {
 
 enum struct Csr : usize {
 #define CSR(NUM, _, NAME) NAME = NUM,
-#include "csr.inc"
+#include "defs/csr.inc"
 #undef CSR
 };
 
@@ -18,7 +18,7 @@ usize csrr(Csr csr) {
 #define CSR(NUM, name, NAME) \
     case Csr::NAME:          \
         __asm__ __volatile__("csrr %0, " #name : "=r"(tmp));
-#include "csr.inc"
+#include "defs/csr.inc"
 #undef CSR
     };
     return tmp;
@@ -29,7 +29,7 @@ void csrw(Csr csr, usize val) {
 #define CSR(NUM, name, NAME) \
     case Csr::NAME:          \
         __asm__ __volatile__("csrw " #name ", %0" ::"r"(val));
-#include "csr.inc"
+#include "defs/csr.inc"
 #undef CSR
     };
 }

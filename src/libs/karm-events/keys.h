@@ -48,7 +48,7 @@ enum struct KeyMotion {
 struct Key {
     enum struct Code {
 #define KEY(name, code) name = code,
-#include "keys.inc"
+#include "defs/keys.inc"
 #undef KEY
     };
 
@@ -64,7 +64,7 @@ struct Key {
 #define KEY(name, code) \
     case Code::name:    \
         return #name;
-#include "keys.inc"
+#include "defs/keys.inc"
 #undef KEY
         }
         return "INVALID";

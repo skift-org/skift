@@ -62,10 +62,10 @@ struct Parser {
     bool _hasIgnoreParams = false;
 
     static Cons<Action, State> __transition(State s, usize c) {
-#define STATE(FROM, START, END, ACTION, TO)         \
+#define STATE(FROM, START, END, ACTION, TO)           \
     if (s == State::FROM and START <= c and c <= END) \
         return {Action::ACTION, State::TO};
-#include "states.inc"
+#include "defs/states.inc"
 #undef STATE
         return {Action::NONE, State::NONE};
     }

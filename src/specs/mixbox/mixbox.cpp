@@ -2,12 +2,13 @@
 
 #include "mixbox.h"
 
-extern "C" unsigned char const _Mixbox_LUT[];
-extern "C" unsigned long long int const _Mixbox_LUT_size;
-
 namespace Mixbox {
 
-Bytes const LUT = Bytes(_Mixbox_LUT, _Mixbox_LUT_size);
+[[gnu::used]] unsigned char const _lut[] = {
+#include "defs/mixbox.inc"
+};
+
+Bytes const LUT = Bytes(_lut, sizeof(_lut));
 
 static f64 srgb2linear(f64 srgb) {
     if (srgb <= 0.04045f)

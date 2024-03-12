@@ -21,7 +21,7 @@ Dom::QuirkMode Builder::_whichQuirkMode(Token const &) {
 
 // https://html.spec.whatwg.org/multipage/parsing.html#create-an-element-for-the-token
 Strong<Dom::Element> Builder::_createElementFor(Token const &t) {
-    auto el = makeStrong<Dom::Element>(t.name);
+    auto el = makeStrong<Dom::Element>(t.name.unwrap());
     // NOSPEC
     return el;
 }
@@ -35,15 +35,14 @@ void Builder::_handleInitialMode(Token const &t) {
          t.rune == ' ')) {
         // ignore
     } else if (t.type == Token::COMMENT) {
-        _document->appendChild(makeStrong<Dom::Comment>(t.data));
+        _document->appendChild(makeStrong<Dom::Comment>(t.data.unwrap()));
     } else if (t.type == Token::DOCTYPE) {
         _document->appendChild(makeStrong<Dom::DocumentType>(
-            tryOrElse(t.name, ""),
-            tryOrElse(t.publicIdent, ""),
-            tryOrElse(t.systemIdent, "")));
+            tryOr(t.name, ""),
+            tryOr(t.publicIdent, ""),
+            tryOr(t.systemIdent, "")));
         _document->quirkMode = _whichQuirkMode(t);
         _switchTo(Mode::BEFORE_HTML);
-        accept(t);
     } else {
         _raise();
         _switchTo(Mode::BEFORE_HTML);
@@ -63,7 +62,7 @@ void Builder::_handleBeforeHtml(Token const &t) {
         // ignore
         _raise();
     } else if (t.type == Token::COMMENT) {
-        _document->appendChild(makeStrong<Dom::Comment>(t.data));
+        _document->appendChild(makeStrong<Dom::Comment>(t.data.unwrap()));
     } else if (t.type == Token::START_TAG and t.name == "html") {
         auto el = _createElementFor(t);
         _document->appendChild(el);

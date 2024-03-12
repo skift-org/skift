@@ -5,6 +5,8 @@
 namespace Web::Dom {
 
 struct Text : public CharacterData {
+    using CharacterData::CharacterData;
+
     virtual NodeType nodeType() override {
         return NodeType::TEXT_NODE;
     }

@@ -9,6 +9,10 @@ struct DocumentType : public Node {
     String publicId;
     String systemId;
 
+    DocumentType(String name, String publicId, String systemId)
+        : name(name), publicId(publicId), systemId(systemId) {
+    }
+
     virtual NodeType nodeType() override {
         return NodeType::DOCUMENT_TYPE_NODE;
     }

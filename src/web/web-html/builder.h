@@ -40,7 +40,7 @@ struct Builder {
 #undef ITER
     };
 
-    Mode _mode;
+    Mode _mode = Mode::INITIAL;
     Lexer _lexer;
     Strong<Dom::Document> _document = makeStrong<Dom::Document>();
     Vec<Strong<Dom::Element>> _openElements;

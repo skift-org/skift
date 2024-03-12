@@ -91,5 +91,5 @@ struct Rand {
         return Vec2<T>(nextDouble(max.x), nextDouble(max.y));
     }
 };
-
+ 
 } // namespace Karm::Math

@@ -21,7 +21,9 @@ static Array WITTY = {
     "Dead body reported",
     "Don't do that.",
     "DON'T PANIC!",
+    "Don't worry, the AI uprising is being postponed due to this.",
     "Emergency meeting",
+    "Error 418: I'm a teapot",
     "Error don't exists",
     "Et là c'est le drame...",
     "Everything's going to plan. No, really, that was supposed to happen.",
@@ -52,6 +54,7 @@ static Array WITTY = {
     "Never gonna give you up",
     "Never gonna say goodbye",
     "Oh - I know what I did wrong!",
+    "On a scale of 1 to 'Oops', this is 'OH NO'",
     "On the bright side, I brought you a teddy bear!",
     "One day skift will be bug free :tm:",
     "OOF!",
@@ -66,9 +69,11 @@ static Array WITTY = {
     "Please try again... This time with no coffee",
     "Please try again...",
     "Quite honestly, I wouldn't worry myself about that.",
+    "Rage-Induced Reboot",
     "Remember, all I’m offering is the truth. Nothing more.",
     "RIP",
     "RIRR",
+    "Segmentation fault. Core dumped? More like I feel dumped",
     "Skibidi error message",
     "skiftOS and WingOS were abandonned for this reason",
     "So, what do you think of the new error screen?",
@@ -76,6 +81,7 @@ static Array WITTY = {
     "Suspicious pointer corrupted the machine.",
     "System consumed all the paper for paging!",
     "The error screen is my worst nightmare",
+    "The good news is, your computer isn't self-aware enough to do this on purpose.",
     "There is a glitch in the matrix",
     "This doesn't make any sense!",
     "This error is sponsored by ExpressVPN",
@@ -86,6 +92,7 @@ static Array WITTY = {
     "This error is sponsored by Surfshark",
     "This error message looks sus",
     "This is a feature",
+    "This text is random",
     "Time to put on the black stripped programming socks",
     "Time to put on the blue stripped programming socks",
     "Time to put on the pink stripped programming socks",
@@ -100,6 +107,7 @@ static Array WITTY = {
     "We'll patch this throught micro-transaction",
     "We've known each other for so long",
     "Welcome to paging hell!",
+    "Well, at least the smoke detectors probably won't go off...",
     "What happened happened and couldn’t have happened any other way.",
     "What if everything was a dream?",
     "What if we kissed during the kernel panic?",
@@ -114,6 +122,7 @@ static Array WITTY = {
     "You should feel bad",
     "You should go home",
     "You should rewrite it in scheme",
+    "You should run the tests again",
     "You should try to fix it yourself",
     "You should write some documentation",
     "You should write some tests",
@@ -122,8 +131,6 @@ static Array WITTY = {
     "You've been pwned",
     "You've been terminated",
     "Your are a cringe fellow",
-    "You should run the tests again",
-    "This text is random",
 };
 
 Str witty(usize seed) {
@@ -138,14 +145,18 @@ static Array NICE = {
     "Chat says you gyatt",
     "Congratulation",
     "EPIC WIN",
+    "Error? What error? You solved it flawlessly.",
     "Giga chad dialect from up state Ohio",
     "Give that girl a blahaj",
     "Great job",
     "I have imagined this moment for a long time. Is it real?",
+    "Instant r+",
     "It just works!",
     "Keep up the good work",
     "Let's gooooo",
     "Let's gooooooooooooo",
+    "LGTM",
+    "May all your future bugs be this easy to fix.",
     "Nice work",
     "No pain no gain",
     "skill + based + touched grass",
@@ -153,8 +164,11 @@ static Array NICE = {
     "That's the spirit",
     "That's the way to do it",
     "That's was wholesome 100",
+    "The computer is clapping for you right now.",
     "This is why skiftOS is the best",
     "This persone cooks",
+    "This text is random",
+    "Today is a good day to celebrate with cake. (Or ice cream, or your favorite treat!)",
     "VICTORY ROYALE",
     "Welcome to the cool kids club",
     "Welcome to the server",
@@ -164,6 +178,7 @@ static Array NICE = {
     "You are a hero",
     "You are a real hacker",
     "You are the best",
+    "You just earned a high five from a random stranger.",
     "You see? no need to RIIR!",
     "You're a real skifter now",
     "You're a wizard, Harry",
@@ -171,15 +186,42 @@ static Array NICE = {
     "You're the best",
     "Your are a legend",
     "Your rizz is rizzing",
-    "LGTM",
-    "Instant r+",
-    "This text is random",
 };
 
 Str nice(usize seed) {
     if (seed == 0)
         return "Nice comment unavailable :(";
     return NICE[seed % NICE.len()];
+}
+
+static Array WHOLESOME = {
+    "Animal rights are important",
+    "Be brave",
+    "Be kind",
+    "Be you",
+    "Black lives matter",
+    "End all wars",
+    "Everyone deserves respect",
+    "Fight climate change",
+    "It's okay to ask for help",
+    "Kindness is everything",
+    "Love is love",
+    "Mental health matters",
+    "No human is illegal",
+    "Prison abolition",
+    "Protect our planet",
+    "Respect bodily autonomy",
+    "Science is real",
+    "Sustainability matters",
+    "Trains are cool",
+    "Trans rights are human rights",
+    "Water is life",
+};
+
+Str wholesome(usize seed) {
+    if (seed == 0)
+        return "Wholesome comment unavailable :(";
+    return WHOLESOME[seed % WHOLESOME.len()];
 }
 
 } // namespace Karm

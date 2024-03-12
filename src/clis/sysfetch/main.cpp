@@ -1,7 +1,9 @@
+#include <karm-base/witty.h>
 #include <karm-cli/cursor.h>
 #include <karm-cli/style.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/info.h>
+#include <karm-sys/time.h>
 
 static Str const ART = R"(
         ___
@@ -77,6 +79,14 @@ Res<> testAnsi() {
     return Ok();
 }
 
+Res<> dumpKindness() {
+    Sys::println("");
+    Sys::print("{}", Cli::Cmd::forward(19));
+    Sys::println("🏳️‍🌈{}", wholesome(Sys::now().val()));
+
+    return Ok();
+}
+
 } // namespace Sysfetch
 
 Res<> entryPoint(Sys::Ctx &) {
@@ -99,6 +109,10 @@ Res<> entryPoint(Sys::Ctx &) {
 
     if (not(res = Sysfetch::dumpCpusInfo())) {
         Sys::errln("{}: {}", Sysfetch::title("CPUs"), Cli::styled(res.none().msg(), Cli::RED_LIGHT));
+    }
+
+    if (not(res = Sysfetch::dumpKindness())) {
+        Sys::errln("{}: {}", Sysfetch::title("Kindness"), Cli::styled(res.none().msg(), Cli::RED_LIGHT));
     }
 
     Sys::println("");

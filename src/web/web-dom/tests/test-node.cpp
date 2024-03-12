@@ -1,12 +1,10 @@
 #include <karm-test/macros.h>
-#include <web-dom/node.h>
+#include <web-dom/document.h>
 
 namespace Web::Dom::Tests {
 
 test$(domTree) {
-    auto &root = *new Node();
-
-    delete &root;
+    auto doc = makeStrong<Document>();
     return Ok();
 }
 

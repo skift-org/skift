@@ -1,3 +1,4 @@
+#include <karm-base/witty.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scafold.h>
@@ -19,10 +20,18 @@ Ui::Child app() {
                 "The skiftOS Developers\n"
                 "All rights reserved.");
 
-            auto transflagText = Ui::hflow(
-                6,
-                Ui::image(Media::loadImage("bundle://hideo-about/pride.qoi"_url).unwrap(), 4),
-                Ui::bodySmall("Trans Rights are Human Rights"));
+            auto inspireMe = Ui::state(Sys::now().val(), [](auto v, auto bind) {
+                auto body = Ui::hflow(
+                    6,
+                    Layout::Align::CENTER,
+                    Ui::image(Media::loadImage("bundle://hideo-about/pride.qoi"_url).unwrap(), 4),
+                    Ui::bodySmall(wholesome(v)));
+
+                return body |
+                       Ui::spacing({12, 6, 16, 6}) |
+                       Ui::minSize({Ui::UNCONSTRAINED, 36}) |
+                       Ui::button(bind(v + 1), Ui::ButtonStyle::subtle());
+            });
 
             auto licenseBtn = Ui::button(
                 [](auto &n) {
@@ -43,7 +52,7 @@ Ui::Child app() {
                        Ui::grow(NONE),
                        Ui::hflow(
                            8,
-                           transflagText | Ui::vcenter() | Ui::grow(),
+                           inspireMe | Ui::vcenter() | Ui::grow(),
                            licenseBtn)) |
                    Ui::spacing(16);
         },

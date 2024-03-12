@@ -1,1 +1,1 @@
-"{utils.first(shell.popen('date', \"+%y.%m\"))}"
+"{utils.first(await shell.popen('date', \"+%y.%m\"))}"

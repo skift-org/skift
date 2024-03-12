@@ -1,10 +1,10 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.target.v1",
-    "id": "host-arm64",
+    "id": "host-{shell.uname().machine}",
     "type": "target",
     "props": {
         "toolchain": "clang",
-        "arch": "arm64",
+        "arch": "{shell.uname().machine}",
         "sys": "{shell.uname().sysname}",
         "abi": "unknown",
         "freestanding": false,

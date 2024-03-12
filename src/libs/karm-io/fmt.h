@@ -280,7 +280,7 @@ struct Formatter<Cased<T>> {
 /* --- Number Formatting ---------------------------------------------------- */
 
 struct NumberFormater {
-    bool prefix;
+    bool prefix = false;
     bool isChar = false;
     usize base = 10;
     usize width = 0;

@@ -1,29 +1,33 @@
 #include <karm-io/funcs.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
-#include <web-html/tokenizer.h>
+#include <web-html/builder.h>
+#include <web-html/lexer.h>
 
 Res<> entryPoint(Sys::Ctx &) {
-    auto file = try$(Sys::File::open("bundle://web-html-cli/index.html"_url));
+    auto file = try$(Sys::File::open("bundle://web-html-cli/exemple.html"_url));
 
     auto buf = try$(Io::readAllUtf8(file));
 
-    // Sys::println("Orginal Source:");
-    // Sys::println("{}", buf);
+    Sys::println("Orginal Source:");
+    Sys::println("{}", buf);
 
-    struct : public Web::Html::Sink {
-        void accept(Web::Html::Token const &token) override {
-            Sys::println("{}", token);
-        }
-    } sink;
+    Sys::println("Lexing:");
+    Web::Html::Lexer lexer;
+    for (auto r : iterRunes(buf))
+        lexer.consume(r);
+
+    lexer.consume(-1, true);
+    Sys::println("\t(no output if successful)");
 
     Sys::println("Tokens:");
-    Web::Html::Tokenizer tokenizer{sink};
+    for (auto const &t : lexer.tokens())
+        Sys::println("{}", t);
 
-    for (auto r : iterRunes(buf))
-        tokenizer.consume(r);
-
-    tokenizer.consume(-1, true);
+    Sys::println("Building:");
+    Web::Html::Builder builder;
+    for (auto const &t : lexer.tokens())
+        builder.accept(t);
 
     return Ok();
 }

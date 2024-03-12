@@ -1,13 +1,31 @@
 #pragma once
 
 #include <karm-base/list.h>
+#include <karm-base/rc.h>
+#include <karm-base/vec.h>
 
 namespace Web::Dom {
+
+enum struct NodeType {
+    ELEMENT_NODE = 1,
+    ATTRIBUTE_NODE = 2,
+    TEXT_NODE = 3,
+    CDATA_SECTION_NODE = 4,
+    PROCESSING_INSTRUCTION_NODE = 7,
+    COMMENT_NODE = 8,
+    DOCUMENT_NODE = 9,
+    DOCUMENT_TYPE_NODE = 10,
+    DOCUMENT_FRAGMENT_NODE = 11,
+};
 
 struct Node : public Meta::Static {
     Node *_parent = nullptr;
     LlItem<Node> _siblings;
-    Ll<Node, &Node::_siblings> _children;
+    Vec<Strong<Node>> _children;
+
+    virtual ~Node() = default;
+
+    virtual NodeType nodeType() = 0;
 
     /* --- Parent --- */
 
@@ -17,74 +35,67 @@ struct Node : public Meta::Static {
         return *_parent;
     }
 
-    Node const &parentNode() const {
-        if (not _parent)
-            panic("node has no parent");
-        return *_parent;
+    usize _parentIndex() {
+        return indexOf(parentNode()._children, *this).unwrap();
+    }
+
+    void _detachParent() {
+        if (_parent) {
+            _parent->_children.removeAt(_parentIndex());
+            _parent = nullptr;
+        }
     }
 
     /* --- Children --- */
 
-    bool hasChildren() const {
+    bool hasChildren() {
         return _children.len() > 0;
     }
 
-    Node &firstChild() {
-        auto *res = _children._head;
-        if (not res)
+    Strong<Node> firstChild() {
+        if (not _children.len())
             panic("node has no children");
-        return *res;
+        return first(_children);
     }
 
-    Node const &firstChild() const {
-        auto *res = _children._head;
-        if (not res)
+    Strong<Node> lastChild() {
+        if (not _children.len())
             panic("node has no children");
-        return *res;
+        return last(_children);
     }
 
-    Node &lastChild() {
-        auto *res = _children._tail;
-        if (not res)
-            panic("node has no children");
-        return *res;
+    void appendChild(Strong<Node> child) {
+        child->_detachParent();
+        _children.pushBack(child);
+        child->_parent = this;
     }
 
-    Node const &lastChild() const {
-        auto *res = _children._tail;
-        if (not res)
-            panic("node has no children");
-        return *res;
+    void removeChild(Strong<Node> child) {
+        if (child->_parent != this)
+            panic("node is not a child");
+        child->_detachParent();
     }
 
     /* --- Siblings --- */
 
-    Node &previousSibling() {
-        auto *res = _siblings.prev;
-        if (not res)
-            panic("node has no previous sibling");
-        return *res;
+    Strong<Node> previousSibling() {
+        usize index = _parentIndex();
+        return parentNode()._children[index - 1];
     }
 
-    Node const &previousSibling() const {
-        auto *res = _siblings.prev;
-        if (not res)
-            panic("node has no previous sibling");
-        return *res;
+    Strong<Node> nextSibling() {
+        usize index = _parentIndex();
+        return parentNode()._children[index + 1];
     }
 
-    Node &nextSibling() {
-        auto *res = _siblings.next;
-        if (not res)
-            panic("node has no next sibling");
-        return *res;
+    /* --- Operators --- */
+
+    bool operator==(Node const &other) const {
+        return this == &other;
     }
 
-    Node const &nextSibling() const {
-        auto *res = _siblings.next;
-        if (not res)
-            panic("node has no next sibling");
-        return *res;
+    auto operator<=>(Node const &other) const {
+        return this <=> &other;
     }
 };
 

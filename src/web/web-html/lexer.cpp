@@ -1,7 +1,7 @@
 #include <karm-base/array.h>
 #include <karm-base/cons.h>
 
-#include "tokenizer.h"
+#include "lexer.h"
 
 namespace Web::Html {
 
@@ -21,11 +21,11 @@ struct Entity {
 #undef ENTITY
 };
 
-void Tokenizer::_raise(Str msg) {
+void Lexer::_raise(Str msg) {
     logError("{}: {}", toStr(_state), msg);
 }
 
-void Tokenizer::consume(Rune rune, bool isEof) {
+Slice<Token> Lexer::consume(Rune rune, bool isEof) {
     // logDebug("Consuming '{c}' {#x} in {}", rune, rune, toStr(_state));
 
     switch (_state) {
@@ -1424,7 +1424,7 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // that gets associated with it, if any, are never subsequently used
         // by the parser, and are therefore effectively discarded. Removing
         // the attribute in this way does not change its status as the
-        // "current attribute" for the purposes of the tokenizer, however.
+        // "current attribute" for the purposes of the lexer, however.
         else if (isAsciiLower(rune)) {
             _builder.append(rune);
         }
@@ -1808,7 +1808,7 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         // is the empty string, and switch to the comment start state.
         if (auto r = startWith(Str{"--"}, _temp.str()); r != Match::NO) {
             if (r == Match::PARTIAL)
-                return;
+                break;
 
             _temp.clear();
             _begin(Token::COMMENT);
@@ -1820,7 +1820,7 @@ void Tokenizer::consume(Rune rune, bool isEof) {
 
         else if (auto r = startWith(Str{"DOCTYPE"}, _temp.str()); r != Match::NO) {
             if (r == Match::PARTIAL)
-                return;
+                break;
 
             _temp.clear();
             _switchTo(State::DOCTYPE);
@@ -1836,7 +1836,7 @@ void Tokenizer::consume(Rune rune, bool isEof) {
 
         else if (auto r = startWith(Str{"[CDATA["}, _temp.str()); r != Match::NO) {
             if (r == Match::PARTIAL)
-                return;
+                break;
 
             // NOSPEC: This is in reallity more complicated
             _temp.clear();
@@ -3574,6 +3574,8 @@ void Tokenizer::consume(Rune rune, bool isEof) {
         panic("unknown-state");
         break;
     }
+
+    return sub(_sink);
 }
 
 } // namespace Web::Html

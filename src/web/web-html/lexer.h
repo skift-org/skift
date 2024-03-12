@@ -47,7 +47,7 @@ struct Sink {
     virtual void accept(Token const &token) = 0;
 };
 
-struct Tokenizer {
+struct Lexer {
     enum struct State {
 #define STATE(NAME) NAME,
 #include "defs/states.inc"
@@ -59,15 +59,11 @@ struct Tokenizer {
 
     Opt<Token> _token;
     Opt<Token> _last;
+    Vec<Token> _sink;
 
     Rune _currChar = 0;
     StringBuilder _builder;
     StringBuilder _temp;
-
-    Sink &_sink;
-
-    Tokenizer(Sink &sink)
-        : _sink(sink) {}
 
     Token &_begin(Token::Type type) {
         _token = Token{};
@@ -89,7 +85,7 @@ struct Tokenizer {
     }
 
     void _emit() {
-        _sink.accept(_ensure());
+        _sink.pushBack(_ensure());
         _last = std::move(_token);
     }
 
@@ -130,7 +126,15 @@ struct Tokenizer {
         debug("flushing code points consumed as a character reference");
     }
 
-    void consume(Rune rune, bool isEof = false);
+    Slice<Token> consume(Rune rune, bool isEof = false);
+
+    Slice<Token> tokens() {
+        return _sink;
+    }
+
+    void flush() {
+        _sink.clear();
+    }
 };
 
 static inline Str toStr(Token::Type type) {
@@ -145,10 +149,10 @@ static inline Str toStr(Token::Type type) {
     }
 }
 
-static inline Str toStr(Tokenizer::State state) {
+static inline Str toStr(Lexer::State state) {
     switch (state) {
-#define STATE(NAME)              \
-    case Tokenizer::State::NAME: \
+#define STATE(NAME)          \
+    case Lexer::State::NAME: \
         return #NAME;
 #include "defs/states.inc"
 #undef STATE

@@ -235,6 +235,14 @@ struct Strong {
             return true;
         return unwrap() == other.unwrap();
     }
+
+    auto operator<=>(T const &other) const {
+        return unwrap() <=> other;
+    }
+
+    auto operator==(T const &other) const {
+        return unwrap() == other;
+    }
 };
 
 template <typename T>

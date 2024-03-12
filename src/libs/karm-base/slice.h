@@ -295,7 +295,7 @@ constexpr auto *end(MutSliceable auto &slice) {
     return slice.buf() + slice.len();
 }
 
-constexpr auto const &first(Sliceable auto &slice) {
+constexpr auto const &first(Sliceable auto const &slice) {
     return slice.buf()[0];
 }
 
@@ -303,7 +303,7 @@ constexpr auto &first(MutSliceable auto &slice) {
     return slice.buf()[0];
 }
 
-constexpr auto const &last(Sliceable auto &slice) {
+constexpr auto const &last(Sliceable auto const &slice) {
     return slice.buf()[slice.len() - 1];
 }
 

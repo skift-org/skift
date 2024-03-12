@@ -19,18 +19,18 @@ Ui::Child app() {
                 "The skiftOS Developers\n"
                 "All rights reserved.");
 
+            auto transflagText = Ui::hflow(
+                6,
+                Ui::image(Media::loadImage("bundle://hideo-about/pride.qoi"_url).unwrap(), 4),
+                Ui::bodySmall("Trans Rights are Human Rights"));
+
             auto licenseBtn = Ui::button(
                 [](auto &n) {
                     Ui::showDialog(n, Ui::licenseDialog());
                 },
-                Ui::ButtonStyle::subtle(),
+                Ui::ButtonStyle::outline(),
                 Mdi::LICENSE,
                 "License");
-
-            auto closeBtn = Ui::button(
-                Ui::bindBubble<Events::RequestExitEvent>(),
-                Ui::ButtonStyle::primary(),
-                "Close");
 
             return Ui::vflow(
                        8,
@@ -43,9 +43,8 @@ Ui::Child app() {
                        Ui::grow(NONE),
                        Ui::hflow(
                            8,
-                           licenseBtn,
-                           Ui::grow(NONE),
-                           closeBtn)) |
+                           transflagText | Ui::vcenter() | Ui::grow(),
+                           licenseBtn)) |
                    Ui::spacing(16);
         },
         .size = {460, 320},

@@ -138,16 +138,14 @@ struct _Vec {
     constexpr T const *buf() const { return _buf.buf(); }
 
     constexpr T &operator[](usize i) {
-        if (i >= len()) {
+        if (i >= len())
             panic("index out of bounds");
-        }
         return _buf[i];
     }
 
     constexpr T const &operator[](usize i) const {
-        if (i >= len()) {
+        if (i >= len())
             panic("index out of bounds");
-        }
         return _buf[i];
     }
 };

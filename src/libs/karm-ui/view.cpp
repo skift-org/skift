@@ -329,6 +329,7 @@ struct Image : public View<Image> {
         : _image(image), _radius(radius) {}
 
     void paint(Gfx::Context &g, Math::Recti) override {
+        g.save();
         if (_radius) {
             g.fillStyle(_image);
             g.fill(bound(), *_radius);
@@ -338,6 +339,7 @@ struct Image : public View<Image> {
 
         if (debugShowLayoutBounds)
             g.plot(bound(), Gfx::CYAN);
+        g.restore();
     }
 
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {

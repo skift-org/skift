@@ -1,7 +1,6 @@
 # History
 
-> **<i class="fa fa-info-circle" aria-hidden="true"></i> Note**
-> This document is a draft for a blog post. I plan to release it in early 2024 when the first version of skiftOS reaches 10 years old
+> **🛈 Note**<br>This document is a draft for a blog post. I plan to release it in early 2024 when the first version of skiftOS reaches 10 years old
 
 In this short document, I will try to explain the history of the project. And my 10 years jurney as a operating system developer.
 

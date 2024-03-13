@@ -58,7 +58,7 @@ This guide provides instructions for building skiftOS from source.
     ```sh
     ./skift.sh tools setup
     ```
-    > **<i class="fa fa-info-circle" aria-hidden="true"></i> Note**:<br> On Ubuntu, this step also installs dependencies.
+    > **🛈 Note**<br> On Ubuntu, this step also installs dependencies.
 
 4. **Verify Setup:**
 
@@ -74,12 +74,21 @@ This guide provides instructions for building skiftOS from source.
 
 6. **Build and Run:**
 
-   ```sh
-   ./skift.sh image start
-   ```
-    > **<i class="fa fa-info-circle" aria-hidden="true"></i> Note**<br>
-    > Requires a graphical environment and QEMU with graphics support (SDL or GTK).
-    > For headless servers, build a disk image instead: `./skift.sh image build --format=hdd`
+    - In Virtual Machine:
+        ```sh
+        ./skift.sh image start
+        ```
+        > **🛈 Note**<br> Requires a graphical environment and QEMU with graphics support (SDL or GTK).
+        > For headless servers, build a disk image instead: `./skift.sh image build --format=hdd`
+
+
+    - In simulator:
+        ```sh
+        ./skift.sh build run --mixins=release hideo-shell
+        ```
+
+        > **🛈 Note**<br> The `--mixins=release` flag is optional and can be omitted for a debug build.
+
 
     **Enjoy!** You now have a working installation of skiftOS.
 

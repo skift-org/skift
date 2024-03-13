@@ -11,20 +11,20 @@ namespace Karm::Media {
 
 Res<Strong<Fontface>> loadFontface(Sys::Mmap &&map);
 
-Res<Strong<Fontface>> loadFontface(Url::Url url);
+Res<Strong<Fontface>> loadFontface(Mime::Url url);
 
-Res<Strong<Fontface>> loadFontfaceOrFallback(Url::Url url);
+Res<Strong<Fontface>> loadFontfaceOrFallback(Mime::Url url);
 
-Res<Font> loadFont(f64 size, Url::Url url);
+Res<Font> loadFont(f64 size, Mime::Url url);
 
-Res<Font> loadFontOrFallback(f64 size, Url::Url url);
+Res<Font> loadFontOrFallback(f64 size, Mime::Url url);
 
 /* --- Image loading -------------------------------------------------------- */
 
 Res<Image> loadImage(Sys::Mmap &&map);
 
-Res<Image> loadImage(Url::Url url);
+Res<Image> loadImage(Mime::Url url);
 
-Res<Image> loadImageOrFallback(Url::Url url);
+Res<Image> loadImageOrFallback(Mime::Url url);
 
 } // namespace Karm::Media

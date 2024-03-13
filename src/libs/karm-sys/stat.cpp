@@ -4,7 +4,7 @@
 
 namespace Karm::Sys {
 
-Res<Stat> stat(Url::Url const &url) {
+Res<Stat> stat(Mime::Url const &url) {
     return _Embed::stat(url);
 }
 

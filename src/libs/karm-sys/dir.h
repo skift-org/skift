@@ -2,7 +2,7 @@
 
 #include <karm-base/res.h>
 #include <karm-base/vec.h>
-#include <url/url.h>
+#include <karm-mime/url.h>
 
 namespace Karm::Sys {
 
@@ -13,9 +13,9 @@ struct DirEntry {
 
 struct Dir {
     Vec<DirEntry> _entries;
-    Url::Url _url;
+    Mime::Url _url;
 
-    static Res<Dir> open(Url::Url url);
+    static Res<Dir> open(Mime::Url url);
 
     auto const &entries() const { return _entries; }
 

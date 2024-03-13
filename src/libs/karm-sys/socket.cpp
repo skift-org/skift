@@ -25,7 +25,7 @@ Res<TcpListener> TcpListener::listen(SocketAddr addr) {
 
 /* --- Ipc Socket ----------------------------------------------------------- */
 
-Res<IpcListener> IpcListener::listen(Url::Url url) {
+Res<IpcListener> IpcListener::listen(Mime::Url url) {
     auto fd = try$(_Embed::listenIpc(url));
     return Ok(IpcListener(std::move(fd), url));
 }

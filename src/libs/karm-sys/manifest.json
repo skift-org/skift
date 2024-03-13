@@ -7,6 +7,6 @@
         "karm-sys-impl",
         "karm-sys-async-impl",
         "karm-io",
-        "url-spec"
+        "karm-mime"
     ]
 }

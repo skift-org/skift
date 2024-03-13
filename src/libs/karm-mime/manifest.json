@@ -1,8 +1,8 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "url-spec",
+    "id": "karm-mime",
     "type": "lib",
-    "description": "URL parser and builder",
+    "description": "URL & MIME type parser",
     "requires": [
         "karm-io"
     ]

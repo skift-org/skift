@@ -1,8 +1,8 @@
 #pragma once
 
 #include <hjert-api/api.h>
+#include <karm-mime/url.h>
 #include <karm-sys/context.h>
-#include <url/url.h>
 
 #include "api.h"
 
@@ -13,7 +13,7 @@ struct Unit {
     Hj::Channel _in;
     Hj::Channel _out;
 
-    static Res<Strong<Unit>> load(Sys::Ctx &ctx, Url::Url url);
+    static Res<Strong<Unit>> load(Sys::Ctx &ctx, Mime::Url url);
 };
 
 struct Object {

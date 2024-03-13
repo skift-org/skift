@@ -45,7 +45,7 @@ Res<> entryPoint(Sys::Ctx &ctx) {
     Res<Strong<Media::Fontface>> fontface = Error::invalidInput("No font provided");
 
     if (args.len()) {
-        auto url = try$(Url::parseUrlOrPath(args[0]));
+        auto url = try$(Mime::parseUrlOrPath(args[0]));
         fontface = Media::loadFontface(url);
     }
 

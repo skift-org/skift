@@ -4,7 +4,7 @@
 #include <karm-io/types.h>
 #include <karm-meta/nocopy.h>
 #include <karm-meta/traits.h>
-#include <url/url.h>
+#include <karm-mime/url.h>
 
 #include "addr.h"
 #include "stat.h"

@@ -4,7 +4,7 @@
 #include <karm-base/map.h>
 #include <karm-base/std.h>
 #include <karm-io/fmt.h>
-#include <url/url.h>
+#include <karm-mime/url.h>
 
 namespace Web::Http {
 
@@ -201,7 +201,7 @@ struct Header {
 
 struct Request : public Header {
     Method method;
-    Url::Path path;
+    Mime::Path path;
     Version version;
 
     static Res<Request> parse(Io::SScan &s) {
@@ -212,7 +212,7 @@ struct Request : public Header {
         if (not s.skip(' '))
             return Error::invalidData("Expected space");
 
-        req.path = Url::Path::parse(s, true, true);
+        req.path = Mime::Path::parse(s, true, true);
         req.path.rooted = true;
         req.path.normalize();
         req.path.rooted = false;

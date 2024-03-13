@@ -18,21 +18,21 @@ Res<Strong<Fontface>> loadFontface(Sys::Mmap &&map) {
     return Ok(try$(TtfFontface::load(std::move(map))));
 }
 
-Res<Strong<Fontface>> loadFontface(Url::Url url) {
+Res<Strong<Fontface>> loadFontface(Mime::Url url) {
     logInfo("media: loading '{}' as fontface...", url);
     auto file = try$(Sys::File::open(url));
     auto map = try$(Sys::mmap().map(file));
     return loadFontface(std::move(map));
 }
 
-Res<Strong<Fontface>> loadFontfaceOrFallback(Url::Url url) {
+Res<Strong<Fontface>> loadFontfaceOrFallback(Mime::Url url) {
     if (auto result = loadFontface(url); result) {
         return result;
     }
     return Ok(Fontface::fallback());
 }
 
-Res<Font> loadFont(f64 size, Url::Url url) {
+Res<Font> loadFont(f64 size, Mime::Url url) {
     logInfo("media: loading '{}' as font...", url);
 
     return Ok(Font{
@@ -41,7 +41,7 @@ Res<Font> loadFont(f64 size, Url::Url url) {
     });
 }
 
-Res<Font> loadFontOrFallback(f64 size, Url::Url url) {
+Res<Font> loadFontOrFallback(f64 size, Mime::Url url) {
     if (auto result = loadFont(size, url); result) {
         return result;
     }
@@ -95,13 +95,13 @@ Res<Image> loadImage(Sys::Mmap &&map) {
     }
 }
 
-Res<Image> loadImage(Url::Url url) {
+Res<Image> loadImage(Mime::Url url) {
     auto file = try$(Sys::File::open(url));
     auto map = try$(Sys::mmap().map(file));
     return loadImage(std::move(map));
 }
 
-Res<Image> loadImageOrFallback(Url::Url url) {
+Res<Image> loadImageOrFallback(Mime::Url url) {
     if (auto result = loadImage(url); result) {
         return result;
     }

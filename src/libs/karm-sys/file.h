@@ -16,9 +16,9 @@ struct _File :
     Meta::NoCopy {
 
     Strong<Fd> _fd;
-    Url::Url _url;
+    Mime::Url _url;
 
-    _File(Strong<Fd> fd, Url::Url url)
+    _File(Strong<Fd> fd, Mime::Url url)
         : _fd(fd), _url(url) {}
 
     Res<usize> seek(Io::Seek seek) override {
@@ -79,11 +79,11 @@ struct File :
     using FileReader::FileReader;
     using FileWriter::FileWriter;
 
-    static Res<FileWriter> create(Url::Url url);
+    static Res<FileWriter> create(Mime::Url url);
 
-    static Res<FileReader> open(Url::Url url);
+    static Res<FileReader> open(Mime::Url url);
 
-    static Res<File> openOrCreate(Url::Url url);
+    static Res<File> openOrCreate(Mime::Url url);
 };
 
 } // namespace Karm::Sys

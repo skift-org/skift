@@ -30,7 +30,7 @@ Res<> entryPoint(Sys::Ctx &ctx) {
     Res<Media::Image> image = Error::invalidInput("No image provided");
 
     if (args.len()) {
-        auto url = try$(Url::parseUrlOrPath(args[0]));
+        auto url = try$(Mime::parseUrlOrPath(args[0]));
         image = Media::loadImage(url);
     }
 

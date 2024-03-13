@@ -206,7 +206,7 @@ Res<Strong<Sys::Fd>> listenUdp(SocketAddr) {
     notImplemented();
 }
 
-Res<Strong<Sys::Fd>> listenIpc(Url::Url) {
+Res<Strong<Sys::Fd>> listenIpc(Mime::Url) {
     notImplemented();
 }
 
@@ -214,7 +214,7 @@ Res<Strong<Sys::Fd>> listenIpc(Url::Url) {
 
 static Opt<Json::Value> _index = NONE;
 
-static Res<Url::Path> resolve(Url::Url url) {
+static Res<Mime::Path> resolve(Mime::Url url) {
     if (url.scheme == "file") {
         return Ok(url.path);
     }
@@ -258,9 +258,9 @@ static Res<Url::Path> resolve(Url::Url url) {
 
         auto refStr = ref.asStr();
 
-        auto refUrl = Url::Url::parse(refStr);
+        auto refUrl = Mime::Url::parse(refStr);
 
-        Url::Path resolved = try$(resolve(refUrl));
+        Mime::Path resolved = try$(resolve(refUrl));
         logInfo("resolved to: {}", resolved);
         return Ok(resolved);
     } else {
@@ -269,7 +269,7 @@ static Res<Url::Path> resolve(Url::Url url) {
     }
 }
 
-Res<Strong<Sys::Fd>> openFile(Url::Url const &url) {
+Res<Strong<Sys::Fd>> openFile(Mime::Url const &url) {
     static Efi::SimpleFileSystemProtocol *fileSystem = nullptr;
     if (not fileSystem) {
         fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(Efi::li()->deviceHandle));
@@ -295,15 +295,15 @@ Res<Strong<Sys::Fd>> openFile(Url::Url const &url) {
     return Ok(makeStrong<FileProto>(file));
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Url::Url const &) {
+Res<Vec<Sys::DirEntry>> readDir(Mime::Url const &) {
     return Error::notImplemented();
 }
 
-Res<Strong<Sys::Fd>> createFile(Url::Url const &) {
+Res<Strong<Sys::Fd>> createFile(Mime::Url const &) {
     return Error::notImplemented();
 }
 
-Res<Strong<Sys::Fd>> openOrCreateFile(Url::Url const &) {
+Res<Strong<Sys::Fd>> openOrCreateFile(Mime::Url const &) {
     return Error::notImplemented();
 }
 

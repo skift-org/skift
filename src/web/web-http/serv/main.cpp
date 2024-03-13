@@ -8,7 +8,7 @@
 
 namespace Web::Server {
 
-Str contentType(Url::Path const &path) {
+Str contentType(Mime::Path const &path) {
     auto sufix = path.sufix();
     if (sufix == "html")
         return "text/html; charset=UTF-8";
@@ -41,7 +41,7 @@ Str contentType(Url::Path const &path) {
     return "application/octet-stream";
 }
 
-Async::Task<> respondFile(Sys::_Connection &conn, Url::Url const &url, Http::Code code = Http::Code::OK) {
+Async::Task<> respondFile(Sys::_Connection &conn, Mime::Url const &url, Http::Code code = Http::Code::OK) {
     auto ct = contentType(url.path);
     auto file = co_try$(Sys::File::open(url));
     auto stat = co_try$(file.stat());

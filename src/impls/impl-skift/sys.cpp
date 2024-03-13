@@ -59,7 +59,7 @@ struct VmoFd : public Sys::Fd {
     }
 };
 
-Res<Strong<Sys::Fd>> openFile(Url::Url const &url) {
+Res<Strong<Sys::Fd>> openFile(Mime::Url const &url) {
     auto urlStr = url.str();
     auto *fileRecord = useHandover().fileByName(urlStr.buf());
     if (not fileRecord)
@@ -70,11 +70,11 @@ Res<Strong<Sys::Fd>> openFile(Url::Url const &url) {
     return Ok(makeStrong<VmoFd>(std::move(vmo)));
 }
 
-Res<Strong<Sys::Fd>> createFile(Url::Url const &) {
+Res<Strong<Sys::Fd>> createFile(Mime::Url const &) {
     notImplemented();
 }
 
-Res<Strong<Sys::Fd>> openOrCreateFile(Url::Url const &) {
+Res<Strong<Sys::Fd>> openOrCreateFile(Mime::Url const &) {
     notImplemented();
 }
 
@@ -94,7 +94,7 @@ Res<Strong<Sys::Fd>> createErr() {
     return Ok(makeStrong<Sys::NullFd>());
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Url::Url const &) {
+Res<Vec<Sys::DirEntry>> readDir(Mime::Url const &) {
     notImplemented();
 }
 
@@ -112,7 +112,7 @@ Res<Strong<Sys::Fd>> listenUdp(SocketAddr) {
     notImplemented();
 }
 
-Res<Strong<Sys::Fd>> listenIpc(Url::Url) {
+Res<Strong<Sys::Fd>> listenIpc(Mime::Url) {
     notImplemented();
 }
 

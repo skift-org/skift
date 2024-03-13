@@ -15,14 +15,14 @@ void Builder::_raise(Str msg) {
 
 // https://html.spec.whatwg.org/multipage/parsing.html#the-initial-insertion-mode
 Dom::QuirkMode Builder::_whichQuirkMode(Token const &) {
-    // NOSPEC
+    // NOSPEC: We assume no quirk mode
     return Dom::QuirkMode::NO;
 }
 
 // https://html.spec.whatwg.org/multipage/parsing.html#create-an-element-for-the-token
 Strong<Dom::Element> Builder::_createElementFor(Token const &t) {
     auto el = makeStrong<Dom::Element>(t.name.unwrap());
-    // NOSPEC
+    // NOSPEC: Keep it simple for the POC
     return el;
 }
 

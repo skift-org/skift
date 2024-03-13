@@ -24,8 +24,8 @@
 
 namespace Karm::Sys::_Embed {
 
-Res<Url::Path> resolve(Url::Url const &url) {
-    Url::Path resolved;
+Res<Mime::Path> resolve(Mime::Url const &url) {
+    Mime::Path resolved;
     if (url.scheme == "file") {
         resolved = url.path;
     } else if (url.scheme == "ipc") {
@@ -38,7 +38,7 @@ Res<Url::Path> resolve(Url::Url const &url) {
         auto path = url.path;
         path.rooted = false;
 
-        resolved = Url::Path::parse(runtimeDir).join(path);
+        resolved = Mime::Path::parse(runtimeDir).join(path);
     } else if (url.scheme == "bundle") {
         auto *maybeRepo = getenv("CK_BUILDDIR");
 
@@ -51,7 +51,7 @@ Res<Url::Path> resolve(Url::Url const &url) {
         auto path = url.path;
         path.rooted = false;
 
-        resolved = Url::Path::parse(maybeRepo)
+        resolved = Mime::Path::parse(maybeRepo)
                        .join(url.host)
                        .join("__res__")
                        .join(path);
@@ -62,7 +62,7 @@ Res<Url::Path> resolve(Url::Url const &url) {
     return Ok(resolved);
 }
 
-Res<Strong<Sys::Fd>> openFile(Url::Url const &url) {
+Res<Strong<Sys::Fd>> openFile(Mime::Url const &url) {
     String str = try$(resolve(url)).str();
 
     isize raw = ::open(str.buf(), O_RDONLY);
@@ -74,7 +74,7 @@ Res<Strong<Sys::Fd>> openFile(Url::Url const &url) {
     return Ok(fd);
 }
 
-Res<Strong<Sys::Fd>> createFile(Url::Url const &url) {
+Res<Strong<Sys::Fd>> createFile(Mime::Url const &url) {
     String str = try$(resolve(url)).str();
 
     auto raw = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
@@ -83,7 +83,7 @@ Res<Strong<Sys::Fd>> createFile(Url::Url const &url) {
     return Ok(makeStrong<Posix::Fd>(raw));
 }
 
-Res<Strong<Sys::Fd>> openOrCreateFile(Url::Url const &url) {
+Res<Strong<Sys::Fd>> openOrCreateFile(Mime::Url const &url) {
     String str = try$(resolve(url)).str();
 
     auto raw = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
@@ -125,7 +125,7 @@ Res<Strong<Sys::Fd>> createErr() {
     return Ok(fd);
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Url::Url const &url) {
+Res<Vec<Sys::DirEntry>> readDir(Mime::Url const &url) {
     String str = try$(resolve(url)).str();
 
     DIR *dir = ::opendir(str.buf());
@@ -153,7 +153,7 @@ Res<Vec<Sys::DirEntry>> readDir(Url::Url const &url) {
     return Ok(entries);
 }
 
-Res<Stat> stat(Url::Url const &url) {
+Res<Stat> stat(Mime::Url const &url) {
     String str = try$(resolve(url)).str();
     struct stat buf;
     if (::stat(str.buf(), &buf) < 0)
@@ -208,7 +208,7 @@ Res<Strong<Sys::Fd>> listenTcp(SocketAddr addr) {
     return Ok(makeStrong<Posix::Fd>(fd));
 }
 
-Res<Strong<Sys::Fd>> listenIpc(Url::Url url) {
+Res<Strong<Sys::Fd>> listenIpc(Mime::Url url) {
     int fd = ::socket(AF_UNIX, SOCK_STREAM, 0);
     if (fd < 0)
         return Posix::fromLastErrno();
@@ -335,10 +335,10 @@ Res<> populate(Vec<Sys::CpuInfo> &) {
 Res<> populate(Sys::UserInfo &infos) {
     infos.name = getenv("USER");
     infos.home.scheme = "file";
-    infos.home.path = Url::Path::parse(getenv("HOME"));
+    infos.home.path = Mime::Path::parse(getenv("HOME"));
 
     infos.shell.scheme = "file";
-    infos.shell.path = Url::Path::parse(getenv("SHELL"));
+    infos.shell.path = Mime::Path::parse(getenv("SHELL"));
 
     return Ok();
 }

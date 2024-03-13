@@ -1,18 +1,18 @@
 #pragma once
 
+#include <karm-mime/url.h>
 #include <karm-ui/reducer.h>
-#include <url/url.h>
 
 namespace Hideo::Files {
 
 struct State {
-    Vec<Url::Url> history;
+    Vec<Mime::Url> history;
     usize currentIndex = 0;
 
-    State(Url::Url path)
+    State(Mime::Url path)
         : history({path}) {}
 
-    Url::Url currentUrl() const {
+    Mime::Url currentUrl() const {
         return history[currentIndex];
     }
 
@@ -42,7 +42,7 @@ struct GoParent {
 };
 
 struct GoTo {
-    Url::Url url;
+    Mime::Url url;
 };
 
 struct Navigate {

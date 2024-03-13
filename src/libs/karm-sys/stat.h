@@ -1,6 +1,6 @@
 #pragma once
 
-#include <url/url.h>
+#include <karm-mime/url.h>
 
 namespace Karm::Sys {
 
@@ -15,13 +15,13 @@ struct Stat {
     TimeStamp changeTime;
 };
 
-Res<Stat> stat(Url::Url const &url);
+Res<Stat> stat(Mime::Url const &url);
 
-static inline Res<bool> isFile(Url::Url const &url) {
+static inline Res<bool> isFile(Mime::Url const &url) {
     return Ok(try$(stat(url)).type == Stat::FILE);
 }
 
-static inline Res<bool> isDir(Url::Url const &url) {
+static inline Res<bool> isDir(Mime::Url const &url) {
     return Ok(try$(stat(url)).type == Stat::DIR);
 }
 

@@ -73,7 +73,7 @@ enum struct FormFactor {
 };
 
 inline FormFactor useFormFactor(Ctx &ctx = globalCtx()) {
-    if (useArgs(ctx).has("+mobile"))
+    if (useArgs(ctx).has("--mobile"))
         return FormFactor::MOBILE;
     return FormFactor::DESKTOP;
 }

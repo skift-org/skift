@@ -62,7 +62,7 @@ Child inspector(Child child) {
 
 inline Res<> runApp(Sys::Ctx &ctx, Child root) {
     auto &args = useArgs(ctx);
-    if (args.has("+debug")) {
+    if (args.has("--debug")) {
         root = inspector(root);
     }
     auto host = try$(_Embed::makeHost(root));

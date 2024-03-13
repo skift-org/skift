@@ -10,6 +10,11 @@
 - [Hello, world!](tutorials/hello-world.md)
 - [Hello, GUI!](tutorials/hello-gui.md)
 
+# Tooling
+
+- [Chatty](tooling/chatty.md)
+- [CuteKit](tooling/cutekit.md)
+
 # Libraries
 
 - [Karm UI](libraries/karm-ui.md)

@@ -70,6 +70,10 @@ inline auto operator/(Karm::Mime::Url const &url, Str path) {
     return url.join(path);
 }
 
+inline auto operator/(Karm::Mime::Url const &url, Karm::Mime::Path const &path) {
+    return url.join(path);
+}
+
 template <>
 struct Karm::Io::Formatter<Karm::Mime::Url> {
     Res<usize> format(Io::TextWriter &writer, Karm::Mime::Url const &url) {

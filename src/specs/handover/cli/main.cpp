@@ -11,7 +11,7 @@ Res<> entryPoint(Sys::Ctx &ctx) {
         return Error::invalidInput("Usage: handover-dump <elf-file>");
     }
 
-    auto url = try$(Url::parseUrlOrPath(args[0]));
+    auto url = try$(Mime::parseUrlOrPath(args[0]));
     auto kernelFile = try$(Sys::File::open(url));
     auto kernelMem = try$(Sys::mmap().read().map(kernelFile));
     Elf::Image kernelElf{kernelMem.bytes()};

@@ -6,7 +6,7 @@
 Res<> entryPoint(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
 
-    auto url = try$(Url::parseUrlOrPath(args[0]));
+    auto url = try$(Mime::parseUrlOrPath(args[0]));
     auto file = try$(Sys::File::open(url));
     auto hash = try$(Crypto::fromName(args[0]));
     auto digest = try$(Crypto::digest(file, hash));

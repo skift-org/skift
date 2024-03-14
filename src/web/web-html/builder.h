@@ -31,7 +31,7 @@ namespace Web::Html {
     MODE(IN_FRAMESET)                \
     MODE(AFTER_FRAMESET)             \
     MODE(AFTER_AFTER_BODY)           \
-    ITER(AFTER_AFTER_FRAMESET)
+    MODE(AFTER_AFTER_FRAMESET)
 
 struct Builder {
     enum struct Mode {

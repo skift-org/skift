@@ -55,16 +55,15 @@ struct Emit : public Io::TextWriterBase<> {
         _newline = true;
     }
 
-    void insertNewline() {
+    Res<usize> _insertNewline() {
         if (not _error)
-            return;
+            return _error.none();
 
-        _tryWrapper(_writer.writeRune('\n'));
-        for (usize i = 0; i < _ident; i++) {
-            _tryWrapper(_writer.writeStr("    "));
-        }
-
+        usize written = try$(_writer.writeRune('\n'));
         _newline = false;
+        for (usize i = 0; i < _ident; i++)
+            written += try$(_writer.writeStr("    "));
+        return Ok(written);
     }
 
     virtual Res<usize> write(Bytes bytes) override {
@@ -74,61 +73,47 @@ struct Emit : public Io::TextWriterBase<> {
     Res<usize> writeRune(Rune r) override {
         if (r == '\n') {
             newline();
-        } else {
-            _tryWrapper(_writer.writeRune(r));
+            return Ok(0);
         }
-        return Ok(1uz);
+
+        usize written = 0;
+        if (_newline)
+            written += try$(_insertNewline());
+        written += try$(_writer.writeRune(r));
+        return Ok(written);
     }
 
     void operator()(Rune r) {
-        if (not _error)
-            return;
-
         if (r == '\n') {
             newline();
             return;
         }
-        _tryWrapper(_writer.writeRune(r));
+        _tryWrapper(writeRune(r));
     }
 
     void operator()(Str str) {
-        if (not _error)
-            return;
-
-        if (_newline) {
-            insertNewline();
-        }
-
-        _tryWrapper(_writer.writeStr(str));
+        _tryWrapper(writeStr(str));
     }
 
     template <typename... Ts>
     void operator()(Str format, Ts &&...ts) {
-        if (not _error)
-            return;
-
-        if (_newline) {
-            insertNewline();
-        }
-
         _tryWrapper(Io::format(*this, format, std::forward<Ts>(ts)...));
     }
 
     template <typename... Ts>
     void ln(Ts &&...ts) {
-        if (not _error)
-            return;
-
-        if (_newline) {
-            insertNewline();
-        }
-
         _tryWrapper(Io::format(*this, std::forward<Ts>(ts)...));
         newline();
     }
 
     usize total() {
         return _total;
+    }
+
+    Res<usize> flush() override {
+        if (_newline)
+            return _writer.writeRune('\n');
+        return Ok(0uz);
     }
 };
 

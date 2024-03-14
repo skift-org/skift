@@ -42,8 +42,12 @@ struct Builder {
 
     Mode _mode = Mode::INITIAL;
     Lexer _lexer;
-    Strong<Dom::Document> _document = makeStrong<Dom::Document>();
+    Strong<Dom::Document> _document;
     Vec<Strong<Dom::Element>> _openElements;
+
+    Builder(Strong<Dom::Document> document)
+        : _document(document) {
+    }
 
     void _switchTo(Mode mode);
 

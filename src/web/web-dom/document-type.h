@@ -14,7 +14,7 @@ struct DocumentType : public Node {
     }
 
     virtual NodeType nodeType() override {
-        return NodeType::DOCUMENT_TYPE_NODE;
+        return NodeType::DOCUMENT_TYPE;
     }
 };
 

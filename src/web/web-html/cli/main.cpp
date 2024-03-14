@@ -25,9 +25,16 @@ Res<> entryPoint(Sys::Ctx &) {
         Sys::println("{}", t);
 
     Sys::println("Building:");
-    Web::Html::Builder builder;
+    auto doc = makeStrong<Web::Dom::Document>();
+    Web::Html::Builder builder{doc};
     for (auto const &t : lexer.tokens())
         builder.accept(t);
+
+    Sys::println("Result:");
+    Io::Emit emit{Sys::out()};
+    doc->dump(emit);
+    try$(emit.flush());
+    emit("\n");
 
     return Ok();
 }

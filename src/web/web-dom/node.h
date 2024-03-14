@@ -3,20 +3,37 @@
 #include <karm-base/list.h>
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
+#include <karm-io/emit.h>
 
 namespace Web::Dom {
 
+#define FOREACH_NODE_TYPE(TYPE)     \
+    TYPE(ELEMENT, 1)                \
+    TYPE(ATTRIBUTE, 2)              \
+    TYPE(TEXT, 3)                   \
+    TYPE(CDATA_SECTION, 4)          \
+    TYPE(PROCESSING_INSTRUCTION, 7) \
+    TYPE(COMMENT, 8)                \
+    TYPE(DOCUMENT, 9)               \
+    TYPE(DOCUMENT_TYPE, 10)         \
+    TYPE(DOCUMENT_FRAGMENT, 11)
+
 enum struct NodeType {
-    ELEMENT_NODE = 1,
-    ATTRIBUTE_NODE = 2,
-    TEXT_NODE = 3,
-    CDATA_SECTION_NODE = 4,
-    PROCESSING_INSTRUCTION_NODE = 7,
-    COMMENT_NODE = 8,
-    DOCUMENT_NODE = 9,
-    DOCUMENT_TYPE_NODE = 10,
-    DOCUMENT_FRAGMENT_NODE = 11,
+#define ITER(NAME, VALUE) NAME = VALUE,
+    FOREACH_NODE_TYPE(ITER)
+#undef ITER
 };
+
+static inline Str toStr(NodeType type) {
+    switch (type) {
+#define ITER(NAME, VALUE) \
+    case NodeType::NAME:  \
+        return #NAME;
+        FOREACH_NODE_TYPE(ITER)
+#undef ITER
+    }
+    panic("unreachable");
+}
 
 struct Node : public Meta::Static {
     Node *_parent = nullptr;
@@ -86,6 +103,19 @@ struct Node : public Meta::Static {
     Strong<Node> nextSibling() {
         usize index = _parentIndex();
         return parentNode()._children[index + 1];
+    }
+
+    void dump(Io::Emit &e) {
+        e("({}", Io::toParamCase(toStr(nodeType())));
+
+        if (_children.len() > 0) {
+            e.indentNewline();
+            for (auto &child : _children) {
+                child->dump(e);
+            }
+            e.deindent();
+        }
+        e(")\n");
     }
 
     /* --- Operators --- */

@@ -14,7 +14,7 @@ struct Document : public Node {
     QuirkMode quirkMode{QuirkMode::NO};
 
     virtual NodeType nodeType() override {
-        return NodeType::DOCUMENT_NODE;
+        return NodeType::DOCUMENT;
     }
 };
 

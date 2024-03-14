@@ -8,7 +8,7 @@ struct Comment : public CharacterData {
     using CharacterData::CharacterData;
 
     virtual NodeType nodeType() override {
-        return NodeType::COMMENT_NODE;
+        return NodeType::COMMENT;
     }
 };
 

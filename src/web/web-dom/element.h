@@ -12,7 +12,7 @@ struct Element : public Node {
     }
 
     virtual NodeType nodeType() override {
-        return NodeType::ELEMENT_NODE;
+        return NodeType::ELEMENT;
     }
 };
 

@@ -2,8 +2,8 @@
 #include <karm-logger/logger.h>
 #include <karm-math/funcs.h>
 
-#include "colors.h"
 #include "context.h"
+#include "stroke.h"
 
 namespace Karm::Gfx {
 

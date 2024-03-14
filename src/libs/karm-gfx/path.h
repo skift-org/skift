@@ -101,6 +101,7 @@ struct Path {
 
     struct Seg : public Slice<Math::Vec2f> {
         bool close;
+
         Seg(Slice<Math::Vec2f> slice, bool close)
             : Slice<Math::Vec2f>(slice), close(close) {}
     };

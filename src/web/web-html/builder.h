@@ -34,6 +34,9 @@ namespace Web::Html {
     MODE(AFTER_AFTER_FRAMESET)
 
 struct Builder {
+    // 13.2.6 Tree construction
+    // https://html.spec.whatwg.org/multipage/parsing.html#tree-construction
+
     enum struct Mode {
 #define ITER(NAME) NAME,
         FOREACH_INSERTION_MODE(ITER)
@@ -44,18 +47,44 @@ struct Builder {
     Lexer _lexer;
     Strong<Dom::Document> _document;
     Vec<Strong<Dom::Element>> _openElements;
+    Opt<Strong<Dom::Element>> _headElement;
+    Opt<Strong<Dom::Element>> _formElement;
 
     Builder(Strong<Dom::Document> document)
         : _document(document) {
     }
 
-    void _switchTo(Mode mode);
+    // 13.2.2 Parse errors
+    // https://html.spec.whatwg.org/multipage/parsing.html#parse-errors
 
     void _raise(Str msg = "parse-error");
 
-    Dom::QuirkMode _whichQuirkMode(Token const &);
+    // 13.2.6.1 Creating and inserting nodes
+    // https://html.spec.whatwg.org/multipage/parsing.html#creating-and-inserting-nodes
+
+    void _apropriatePlaceForInsertingANode();
 
     Strong<Dom::Element> _createElementFor(Token const &t);
+
+    void _insertAnElementAtTheAdjustedInsertionLocation();
+
+    void _insertAForeignElement(Token const &t);
+
+    void _insertAnHtmlElement();
+
+    void _insertACharacter();
+
+    void _insertAComment();
+
+    //////////////////////////////////////////
+
+    void _switchTo(Mode mode);
+
+    // 13.2.6.4 The rules for parsing tokens in HTML content
+
+    // 13.2.6.4.1 The "initial" insertion mode
+    // https://html.spec.whatwg.org/multipage/parsing.html#the-initial-insertion-mode
+    Dom::QuirkMode _whichQuirkMode(Token const &);
 
     void _handleInitialMode(Token const &t);
 

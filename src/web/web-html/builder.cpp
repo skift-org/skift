@@ -5,18 +5,18 @@
 
 namespace Web::Html {
 
-void Builder::_switchTo(Mode mode) {
-    _mode = mode;
-}
+// 13.2.6 Tree construction
+// https://html.spec.whatwg.org/multipage/parsing.html#tree-construction
+
+// 13.2.2 Parse errors
+// https://html.spec.whatwg.org/multipage/parsing.html#parse-errors
 
 void Builder::_raise(Str msg) {
     logError("{}: {}", toStr(_mode), msg);
 }
 
-// https://html.spec.whatwg.org/multipage/parsing.html#the-initial-insertion-mode
-Dom::QuirkMode Builder::_whichQuirkMode(Token const &) {
-    // NOSPEC: We assume no quirk mode
-    return Dom::QuirkMode::NO;
+void Builder::_switchTo(Mode mode) {
+    _mode = mode;
 }
 
 // https://html.spec.whatwg.org/multipage/parsing.html#create-an-element-for-the-token
@@ -26,7 +26,16 @@ Strong<Dom::Element> Builder::_createElementFor(Token const &t) {
     return el;
 }
 
+// 13.2.6.4 The rules for parsing tokens in HTML content
+
+// 13.2.6.4.1 The "initial" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#the-initial-insertion-mode
+
+Dom::QuirkMode Builder::_whichQuirkMode(Token const &) {
+    // NOSPEC: We assume no quirk mode
+    return Dom::QuirkMode::NO;
+}
+
 void Builder::_handleInitialMode(Token const &t) {
     if (t.type == Token::CHARACTER and
         (t.rune == '\t' or
@@ -87,7 +96,21 @@ void Builder::_handleBeforeHead(Token const &t) {
          t.rune == '\n' or
          t.rune == '\f' or
          t.rune == ' ')) {
+        // Ignore the token.
+    } else if (t.type == Token::COMMENT) {
+        // Insert a comment.
+    } else if (t.type == Token::DOCTYPE) {
+        // Parse error. Ignore the token.
+        _raise();
+    } else if (t.type == Token::START_TAG and t.name == "html") {
+        // Process the token using the rules for the "in body" insertion mode.
+        _acceptIn(Mode::IN_BODY, t);
+    } else if (t.type == Token::START_TAG and t.name == "head") {
+
+    } else if (t.type == Token::END_TAG and not(t.name == "head" or t.name == "body" or t.name == "html" or t.name == "br")) {
         // ignore
+        _raise();
+    } else {
     }
 }
 

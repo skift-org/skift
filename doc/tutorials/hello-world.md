@@ -17,7 +17,7 @@ $ mkdir -p src/tutorial/hello-world
 
 $ cd src/tutorial/hello-world
 
-# Open the project directory in your favorite text editor for example VSCode
+# Open the project directory in your favorite text editor, for example VSCode
 $ code .
 ```
 
@@ -52,7 +52,7 @@ Create a `main.cpp` file in the project directory:
 ```cpp
 #include <karm-sys/entry.h>
 
-// The entry point of the program, skiftOS don't use `main` function
+// The entry point of the program, skiftOS doesn't use `main` function
 Res<> entryPoint(Sys::Ctx &) {
     // Print "Hello, world!" to the console
     Sys::println("Hello, world!");
@@ -88,4 +88,4 @@ Congratulations! You have created your first program for skiftOS.
 ## Going further
 
 - [Next tutorial: Hello, GUI!](hello-gui.md)
-- src/libs/karm-sys/chan.h - The system channel API similar to stdio
+- src/libs/karm-sys/chan.h - The system channel API is similar to stdio

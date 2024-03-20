@@ -93,7 +93,6 @@ Ui::Child list(State const &s) {
 }
 
 Ui::Child alert(String title, String subtitle) {
-
     return Ui::vflow(
                16,
                Layout::Align::CENTER,
@@ -103,7 +102,7 @@ Ui::Child alert(String title, String subtitle) {
 }
 
 void intent(Ui::Node &n, Sys::Event &e) {
-    if (auto *k = e.is<Events::KeyboardEvent>()) {
+    if (auto *k = e.is<Events::KeyboardEvent>(Sys::Propagation::DOWN)) {
         if (k->key == Events::Key::LEFT) {
             Ui::bubble<Action>(n, MoveSelectionAction{-1});
             e.accept();

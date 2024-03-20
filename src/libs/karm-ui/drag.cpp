@@ -128,6 +128,12 @@ struct DragRegion : public ProxyNode<DragRegion> {
 
     using ProxyNode::ProxyNode;
 
+    void reconcile(DragRegion &o) override {
+        logDebug("us: {}, them: {}", _grabbed, o._grabbed);
+        _grabbed = o._grabbed;
+        ProxyNode<DragRegion>::reconcile(o);
+    }
+
     void event(Sys::Event &e) override {
         if (not _grabbed)
             _child->event(e);
@@ -135,6 +141,7 @@ struct DragRegion : public ProxyNode<DragRegion> {
         if (e.accepted())
             return;
 
+        logInfo("grabbed ? {}", _grabbed);
         e.handle<Events::MouseEvent>([&](auto &m) {
             if (not bound().contains(m.pos) and not _grabbed) {
                 return false;

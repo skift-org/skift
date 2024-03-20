@@ -51,6 +51,16 @@ struct Event {
     }
 
     template <typename T>
+    T *is(Propagation p) {
+        return id() == Meta::idOf<T>() and _propagation == p ? &unwrap<T>() : nullptr;
+    }
+
+    template <typename T>
+    T const *is(Propagation p) const {
+        return id() == Meta::idOf<T>() and _propagation == p ? &unwrap<T>() : nullptr;
+    }
+
+    template <typename T>
     T &unwrap() {
         return *static_cast<T *>(_unwrap());
     }

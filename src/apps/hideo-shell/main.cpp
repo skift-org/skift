@@ -91,21 +91,23 @@ Ui::Child taskbar(State const &state) {
             Ui::spacing({12, 6}) |
             Ui::bound());
 
-    return Ui::hflow(
-               6,
-               appsButton,
-               calButton |
-                   Ui::center() |
-                   Ui::grow(),
-               Ui::button(
-                   Keyboard::show,
-                   Ui::ButtonStyle::subtle(),
-                   Mdi::KEYBOARD),
-               trayButton) |
-           Ui::box({
-               .padding = 6,
-               .backgroundPaint = Ui::GRAY950.withOpacity(0.8),
-           });
+    return Ui::vflow(
+        Ui::hflow(
+            6,
+            appsButton,
+            calButton |
+                Ui::center() |
+                Ui::grow(),
+            Ui::button(
+                Keyboard::show,
+                Ui::ButtonStyle::subtle(),
+                Mdi::KEYBOARD),
+            trayButton) |
+            Ui::box({
+                .padding = 6,
+                .backgroundPaint = Ui::GRAY950.withOpacity(0.8),
+            }),
+        Ui::separator());
 }
 
 /* --- Shells --------------------------------------------------------------- */
@@ -132,20 +134,47 @@ Ui::Child appHost(State const &state) {
 
     auto &surface = state.surfaces[0];
     return Ui::empty() |
-           Ui::box({.backgroundPaint = surface.color}) |
-           Ui::grow();
+           Ui::box({.backgroundPaint = surface.color});
 }
 
 Ui::Child tablet(State const &state) {
     return Ui::stack(
-        state.surfaces.len() == 0 ? background(state) : Ui::empty(),
+        state.surfaces.len() == 0
+            ? background(state)
+            : Ui::empty(),
         Ui::vflow(
             Ui::vflow(
                 statusbarButton(state),
                 Ui::separator()) |
                 Ui::slideIn(Ui::SlideFrom::TOP),
-            appHost(state),
+            appHost(state) | Ui::grow(),
             navbar(state)));
+}
+
+Ui::Child appStack(State const &state) {
+    Ui::Children apps;
+    usize index = 0;
+    for (auto &s : state.surfaces) {
+        apps.pushBack(
+            Ui::empty() |
+            Ui::box({
+                .borderRadius = 8,
+                .borderWidth = 1,
+                .borderPaint = Ui::GRAY800,
+                .backgroundPaint = Ui::GRAY950,
+            }) |
+            Ui::dragRegion() |
+            Ui::placed(s.bound) |
+            Ui::intent([=](Ui::Node &n, Sys::Event &e) {
+                if (auto *m = e.is<Ui::DragEvent>(Sys::Propagation::UP)) {
+                    e.accept();
+                    Model::bubble<MoveApp>(n, {index, m->delta});
+                }
+            }));
+        index++;
+    }
+
+    return Ui::stack(apps);
 }
 
 Ui::Child desktopPanels(State const &state) {
@@ -172,11 +201,8 @@ Ui::Child desktop(State const &state) {
     return Ui::stack(
         background(state),
         Ui::vflow(
-            Ui::vflow(
-                taskbar(state),
-                Ui::separator()) |
-                Ui::slideIn(Ui::SlideFrom::TOP),
-            Ui::grow(NONE)));
+            taskbar(state) | Ui::slideIn(Ui::SlideFrom::TOP),
+            appStack(state) | Ui::grow()));
 }
 
 Ui::Child app(bool isMobile) {

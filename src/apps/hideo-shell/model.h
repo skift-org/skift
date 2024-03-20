@@ -32,6 +32,7 @@ enum struct Panel {
 struct Surface {
     usize id;
     MenuEntry entry;
+    Math::Recti bound;
     Gfx::Color color;
 };
 
@@ -64,6 +65,11 @@ struct StartApp {
     usize index;
 };
 
+struct MoveApp {
+    usize index;
+    Math::Vec2i off;
+};
+
 struct CloseApp {
     usize index;
 };
@@ -82,7 +88,18 @@ struct Activate {
     Panel panel;
 };
 
-using Action = Var<ToggleTablet, Lock, Unlock, DimisNoti, StartApp, CloseApp, FocusApp, Activate, ToggleSysPanel, ToggleAppThumbnail>;
+using Action = Var<
+    ToggleTablet,
+    Lock,
+    Unlock,
+    DimisNoti,
+    StartApp,
+    MoveApp,
+    CloseApp,
+    FocusApp,
+    Activate,
+    ToggleSysPanel,
+    ToggleAppThumbnail>;
 
 void reduce(State &, Action);
 

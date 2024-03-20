@@ -117,7 +117,6 @@ struct ButtonStyle {
 
     static ButtonStyle text();
 
-
     static ButtonStyle destructive();
 
     ButtonStyle withRadius(Gfx::BorderRadius radius) const;
@@ -197,11 +196,13 @@ Child color(Gfx::Color color, OnChange<Gfx::Color> onChange);
 
 /* --- Intent --------------------------------------------------------------- */
 
-Child intent(Func<void(Node &, Sys::Event &e)> map, Child child);
+using Filter = Func<void(Node &, Sys::Event &e)>;
 
-static inline auto intent(Func<void(Node &, Sys::Event &e)> map) {
-    return [map = std::move(map)](Child child) mutable {
-        return intent(std::move(map), std::move(child));
+Child intent(Filter map, Child child);
+
+static inline auto intent(Filter filter) {
+    return [filter = std::move(filter)](Child child) mutable {
+        return intent(std::move(filter), std::move(child));
     };
 }
 

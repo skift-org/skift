@@ -583,13 +583,23 @@ struct Intent : public ProxyNode<Intent> {
     Intent(Func<void(Node &, Sys::Event &e)> map, Child child)
         : ProxyNode<Intent>(std::move(child)), _map(std::move(map)) {}
 
-    void event(Sys::Event &e) override {
-        _map(*this, e);
+    void reconcile(Intent &o) override {
+        _map = std::move(o._map);
+        ProxyNode<Intent>::reconcile(o);
+    }
 
+    void event(Sys::Event &e) override {
         if (e.accepted())
             return;
+        _map(*this, e);
+        ProxyNode<Intent>::event(e);
+    }
 
-        child().event(e);
+    void bubble(Sys::Event &e) override {
+        if (e.accepted())
+            return;
+        _map(*this, e);
+        ProxyNode<Intent>::bubble(e);
     }
 };
 

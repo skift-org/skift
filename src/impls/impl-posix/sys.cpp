@@ -140,7 +140,7 @@ Res<Vec<Sys::DirEntry>> readDir(Mime::Url const &url) {
 
         if (strcmp(entry->d_name, ".") == 0 or
             strcmp(entry->d_name, "..") == 0 or
-            (strLen(entry->d_name) >= 1 and entry->d_name[0] == '.')) {
+            (cstrLen(entry->d_name) >= 1 and entry->d_name[0] == '.')) {
             continue;
         }
 

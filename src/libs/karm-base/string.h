@@ -1,18 +1,11 @@
 #pragma once
 
+#include "cstr.h"
 #include "ctype.h"
 #include "rune.h"
 #include "std.h"
 
 namespace Karm {
-
-inline constexpr usize strLen(char const *str) {
-    usize len = 0;
-    while (*str++) {
-        len++;
-    }
-    return len;
-}
 
 template <StaticEncoding E, typename U = typename E::Unit>
 struct _Str : public Slice<U> {
@@ -23,7 +16,7 @@ struct _Str : public Slice<U> {
 
     constexpr _Str(U const *cstr)
         requires(Meta::Same<U, char>)
-        : Slice<U>(cstr, strLen(cstr)) {}
+        : Slice<U>(cstr, cstrLen(cstr)) {}
 
     constexpr _Str(U const *buf, usize len)
         : Slice<U>(buf, len) {}
@@ -73,7 +66,7 @@ struct _String {
 
     _String(Unit const *cstr)
         requires(Meta::Same<Unit, char>)
-        : _String(cstr, strLen(cstr)) {}
+        : _String(cstr, cstrLen(cstr)) {}
 
     _String(_Str<E> str)
         : _String(str.buf(), str.len()) {}

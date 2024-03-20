@@ -1,23 +1,12 @@
 #pragma once
 
+#include <karm-base/cstr.h>
 #include <karm-base/std.h>
 
 namespace Handover {
 
 inline usize KERNEL_BASE = 0xffffffff80000000;
 inline usize UPPER_HALF = 0xffff800000000000;
-
-namespace Utils {
-
-inline bool cstrEq(char const *str1, char const *str2) {
-    while (*str1 and *str2) {
-        if (*str1++ != *str2++)
-            return false;
-    }
-    return *str1 == *str2;
-}
-
-} // namespace Utils
 
 static constexpr u32 COOLBOOT = 0xc001b001;
 
@@ -144,7 +133,7 @@ struct Payload {
 
     Record const *fileByName(char const *name) const {
         for (auto const &r : *this) {
-            if (r.tag == Tag::FILE and Utils::cstrEq(stringAt(r.file.name), name)) {
+            if (r.tag == Tag::FILE and cstrEq(stringAt(r.file.name), name)) {
                 return &r;
             }
         }

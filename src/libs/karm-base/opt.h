@@ -2,11 +2,9 @@
 
 #include <karm-meta/callable.h>
 #include <karm-meta/traits.h>
+#include <karm-panic/panic.h>
 
-#include "error.h"
-#include "inert.h"
 #include "macros.h"
-#include "std.h"
 #include "try.h"
 
 namespace Karm {

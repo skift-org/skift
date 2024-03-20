@@ -2,6 +2,7 @@
 
 #include <karm-panic/panic.h>
 
+#include "cstr.h"
 #include "std.h"
 #include "try.h"
 
@@ -92,6 +93,10 @@ struct [[nodiscard]] Error {
         default:
             return "UNKNOWN";
         }
+    }
+
+    constexpr bool operator==(Error const &other) const {
+        return _code == other._code and cstrEq(_msg, other._msg);
     }
 };
 

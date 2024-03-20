@@ -9,7 +9,12 @@
 namespace Hal {
 
 inline constexpr usize PAGE_SIZE = 0x1000;
+
+#ifdef __ck_bits_64__
 inline constexpr usize UPPER_HALF = 0xffff800000000000;
+#else
+inline constexpr usize UPPER_HALF = 0xC0000000;
+#endif
 
 inline usize pageAlignDown(usize addr) {
     return alignDown(addr, PAGE_SIZE);

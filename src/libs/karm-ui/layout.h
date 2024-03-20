@@ -31,6 +31,14 @@ inline auto bound() {
     };
 }
 
+Child placed(Math::Recti bound, Child child);
+
+inline auto placed(Math::Recti bound) {
+    return [bound](Child child) {
+        return placed(bound, child);
+    };
+}
+
 /* --- Separator ------------------------------------------------------------ */
 
 Child separator();

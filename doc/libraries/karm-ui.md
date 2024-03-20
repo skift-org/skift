@@ -117,6 +117,7 @@ Here is a non exaustive list of decorators
 **Bound and Growth**
 
  - `<node> | Ui::bound()` : Give a visual bound to the node.
+ - `<node> | Ui::placed(Math::Recti place)` : Place the node at a specific location.
  - `<node> | Ui::grow(float factor)` : Expand the node to fill the available space, with a given factor.
 
 **Alignment**

@@ -39,9 +39,8 @@ Child empty(Math::Vec2i size) {
 Child cond(bool cond, Child child) {
     if (cond) {
         return child;
-    } else {
-        return empty();
     }
+    return empty();
 }
 
 /* --- Bound ---------------------------------------------------------------- */
@@ -68,6 +67,33 @@ struct Bound : public ProxyNode<Bound> {
 
 Child bound(Child child) {
     return makeStrong<Bound>(child);
+}
+
+struct Placed : public ProxyNode<Bound> {
+    Math::Recti _bound;
+    Math::Recti _place;
+
+    Placed(Math::Recti place, Child child)
+        : ProxyNode(child), _place(place) {}
+
+    Math::Recti bound() override {
+        return _bound;
+    }
+
+    void layout(Math::Recti bound) override {
+        _bound = bound;
+        auto place = _place;
+        place.xy = place.xy + _bound.xy;
+        child().layout(place);
+    }
+
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint) override {
+        return s;
+    }
+};
+
+Child placed(Math::Recti place, Child child) {
+    return makeStrong<Placed>(place, child);
 }
 
 /* --- Separator ------------------------------------------------------------ */

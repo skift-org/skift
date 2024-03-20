@@ -23,8 +23,10 @@ This guide provides instructions for running skiftOS on QEMU or real hardware us
 Execute the following command:
 
 ```bash
-$ qemu-system-x86_64 -bios <ovmf file> -drive format=raw,file=<image file> -m 512M -serial stdio -enable-kvm
+$ qemu-system-x86_64 -bios <ovmf file> -drive format=raw,file=<hdd file> -m 512M -serial stdio -enable-kvm
 ```
+
+Note: Replace `<ovmf file>` with the appropriate OVMF firmware file and `<hdd file>` with the HDD file you downloaded or builded.
 
 ## On Real Hardware
 

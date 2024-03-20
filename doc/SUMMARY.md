@@ -18,6 +18,7 @@
 # Libraries
 
 - [Karm UI](libraries/karm-ui.md)
+- [Karm GFX](libraries/karm-gfx.md)
 
 # Others
 

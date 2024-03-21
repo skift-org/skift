@@ -13,7 +13,7 @@ We will be starting from the `hello-world` project we created in the previous tu
 
 ## Add the GUI library
 
-First, we need to add the GUI library to the project. Open the `manifest.json` file in the project directory and add the `karm-gui` library to the `requires` field:
+First, we need to add the GUI library to the project. Open the `manifest.json` file in the project directory and add the `karm-ui` library to the `requires` field:
 
 ```json
 {

@@ -137,7 +137,7 @@ void Builder::_acceptInHead(Token const &t) {
                 t.rune == '\f' or
                 t.rune == ' ')) {
         // Ignore the token.
-    } else if (t.type == Token::START_TAG and t) {
+    } else if (t.type == Token::START_TAG) {
 
     } else if (t.type == Token::END_TAG and not(t.name == "head" or t.name == "body" or t.name == "html" or t.name == "br")) {
         // ignore

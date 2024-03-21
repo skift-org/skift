@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "web-tls-tests",
+    "type": "lib",
+    "props": {
+        "cpp-excluded": true
+    },
+    "requires": [
+        "web-httlstp",
+        "karm-test"
+    ],
+    "injects": [
+        "__tests__"
+    ]
+}

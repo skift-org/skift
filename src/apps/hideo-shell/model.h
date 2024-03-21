@@ -88,7 +88,7 @@ struct Activate {
     Panel panel;
 };
 
-using Action = Var<
+using Action = Union<
     ToggleTablet,
     Lock,
     Unlock,

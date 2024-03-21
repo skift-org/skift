@@ -42,7 +42,7 @@ struct SwitchAction {
     usize index;
 };
 
-using Action = Var<SwitchAction>;
+using Action = Union<SwitchAction>;
 
 void reduce(State &s, Action action) {
     action.visit(

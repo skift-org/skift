@@ -2,7 +2,7 @@
 
 #include "error.h"
 #include "std.h"
-#include "var.h"
+#include "union.h"
 
 namespace Karm {
 
@@ -30,7 +30,7 @@ Ok(Args &&...) -> Ok<Meta::RemoveConstVolatileRef<Args>...>;
 
 template <typename V = None, typename E = Error>
 struct [[nodiscard]] Res {
-    using Inner = Var<Ok<V>, E>;
+    using Inner = Union<Ok<V>, E>;
 
     Inner _inner;
 

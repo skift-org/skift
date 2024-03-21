@@ -20,6 +20,6 @@ struct CurrentColor {
 
 constexpr inline auto CURRENT_COLOR = CurrentColor{};
 
-using Color = Var<CurrentColor, Gfx::Color>;
+using Color = Union<CurrentColor, Gfx::Color>;
 
 } // namespace Web::Css

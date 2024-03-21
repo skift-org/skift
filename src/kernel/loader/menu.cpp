@@ -22,7 +22,7 @@ struct MoveSelectionAction {
 
 struct SelectAction {};
 
-using Action = Var<MoveSelectionAction, SelectAction>;
+using Action = Union<MoveSelectionAction, SelectAction>;
 
 void reduce(State &s, Action a) {
     a.visit(Visitor{

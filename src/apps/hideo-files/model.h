@@ -54,7 +54,7 @@ struct Refresh {
 
 struct AddBookmark {};
 
-using Action = Var<GoRoot, GoBack, GoForward, GoParent, Navigate, GoTo, Refresh, AddBookmark>;
+using Action = Union<GoRoot, GoBack, GoForward, GoParent, Navigate, GoTo, Refresh, AddBookmark>;
 
 void reduce(State &, Action);
 

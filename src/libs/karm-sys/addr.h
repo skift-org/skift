@@ -127,8 +127,8 @@ union Ip6 {
     }
 };
 
-struct Ip : public Var<Ip4, Ip6> {
-    using Var<Ip4, Ip6>::Var;
+struct Ip : public Union<Ip4, Ip6> {
+    using Union<Ip4, Ip6>::Union;
 
     static Res<Ip> parse(Io::SScan &s) {
         auto saved = s;

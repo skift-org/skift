@@ -27,7 +27,7 @@ using enum HashType;
 struct AnyDigest {
     HashType _type;
 
-    Var<
+    Union<
 #define ITER(NAME, TYPE) HashDigest<TYPE>,
         FOR_EACH_HASH(ITER)
 #undef ITER
@@ -61,13 +61,13 @@ struct AnyHash {
     using Digest = AnyDigest;
 
     // clang-format off
-    Var<
+    Union<
 #define ITER(NAME, TYPE) TYPE,
         FOR_EACH_HASH(ITER)
 #undef ITER
     None> _h = NONE;
 
-    using Sum = Var<
+    using Sum = Union<
 #define ITER(NAME, TYPE) HashSum<TYPE>,
         FOR_EACH_HASH(ITER)
 #undef ITER

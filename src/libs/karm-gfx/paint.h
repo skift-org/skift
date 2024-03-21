@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/var.h>
+#include <karm-base/union.h>
 #include <karm-base/vec.h>
 #include <karm-math/trans.h>
 #include <karm-media/image.h>
@@ -134,7 +134,7 @@ struct Gradient {
     }
 };
 
-using _Paints = Var<
+using _Paints = Union<
     Color,
     Gradient,
     Media::Image>;

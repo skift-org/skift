@@ -3,7 +3,7 @@
 #include <karm-base/checked.h>
 #include <karm-base/map.h>
 #include <karm-base/string.h>
-#include <karm-base/var.h>
+#include <karm-base/union.h>
 #include <karm-base/vec.h>
 #include <karm-gfx/colors.h>
 #include <karm-math/vec.h>
@@ -14,7 +14,7 @@ namespace Hideo::Spreadsheet {
 
 /* --- Reducer -------------------------------------------------------------- */
 
-using Value = Var<None, String, f64, bool>;
+using Value = Union<None, String, f64, bool>;
 
 struct Pos {
     usize row;
@@ -247,7 +247,7 @@ struct SwitchSheet {
 
 struct ToggleProperties {};
 
-using Action = Var<
+using Action = Union<
     UpdateSelection,
 
     UpdateValue,

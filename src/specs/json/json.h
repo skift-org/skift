@@ -2,7 +2,7 @@
 
 #include <karm-base/map.h>
 #include <karm-base/string.h>
-#include <karm-base/var.h>
+#include <karm-base/union.h>
 #include <karm-base/vec.h>
 #include <karm-io/emit.h>
 #include <karm-io/expr.h>
@@ -23,7 +23,7 @@ using Number = isize;
 using Number = f64;
 #endif
 
-using Store = Var<None, Array, Object, String, Number, bool>;
+using Store = Union<None, Array, Object, String, Number, bool>;
 
 struct Value {
     Store _store;

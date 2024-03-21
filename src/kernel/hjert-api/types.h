@@ -320,7 +320,7 @@ struct ListenerProps {
     static constexpr Type TYPE = Type::LISTENER;
 };
 
-using _Props = Var<
+using _Props = Union<
     DomainProps,
     TaskProps,
     SpaceProps,

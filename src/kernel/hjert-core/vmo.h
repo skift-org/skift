@@ -7,7 +7,7 @@
 namespace Hjert::Core {
 
 struct Vmo : public BaseObject<Vmo, Hj::Type::VMO> {
-    using _Mem = Var<Hal::PmmMem, Hal::DmaRange>;
+    using _Mem = Union<Hal::PmmMem, Hal::DmaRange>;
     _Mem _mem;
 
     static Res<Strong<Vmo>> alloc(usize size, Hj::VmoFlags);

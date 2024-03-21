@@ -9,7 +9,7 @@ namespace Hjert::Core {
 struct Domain;
 
 struct Parcel {
-    using Slot = Var<None, Hj::Arg, Strong<Object>>;
+    using Slot = Union<None, Hj::Arg, Strong<Object>>;
 
     Hj::Arg _label;
     Hj::Arg _flags;

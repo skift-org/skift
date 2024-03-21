@@ -43,7 +43,7 @@ struct GoBack {};
 
 struct GoForward {};
 
-using Action = Var<GoTo, GoBack, GoForward>;
+using Action = Union<GoTo, GoBack, GoForward>;
 
 void reduce(State &, Action);
 

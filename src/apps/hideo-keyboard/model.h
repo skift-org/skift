@@ -11,7 +11,7 @@ struct State {
 struct ToggleShift {
 };
 
-using Action = Var<ToggleShift>;
+using Action = Union<ToggleShift>;
 
 void reduce(State &, Action);
 

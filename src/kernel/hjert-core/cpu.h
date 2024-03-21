@@ -7,7 +7,7 @@
 #include <karm-base/lock.h>
 #include <karm-base/rc.h>
 #include <karm-base/ring.h>
-#include <karm-base/var.h>
+#include <karm-base/union.h>
 #include <karm-base/vec.h>
 
 #include "arch.h"

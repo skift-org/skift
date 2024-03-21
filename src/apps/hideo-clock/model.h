@@ -35,7 +35,7 @@ struct State {
 
 struct TimeTick {};
 
-using Action = Var<Page, TimeTick>;
+using Action = Union<Page, TimeTick>;
 
 void reduce(State &, Action);
 

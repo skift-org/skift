@@ -26,7 +26,7 @@ struct ApplyFilter {};
 
 struct SaveImage {};
 
-using Action = Var<
+using Action = Union<
     Refresh,
     ToggleEditor,
     SetFilter,

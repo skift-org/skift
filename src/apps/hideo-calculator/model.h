@@ -95,7 +95,7 @@ struct MemStoreAction {};
 
 struct EnterDecimalAction {};
 
-using Action = Var<
+using Action = Union<
     Operator, Number, BackspaceAction, EqualAction, ClearAction, ClearAllAction,
     MemClearAction, MemRecallAction, MemAddAction, MemSubAction, MemStoreAction,
     EnterDecimalAction>;

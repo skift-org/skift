@@ -9,27 +9,27 @@
 namespace Karm {
 
 template <typename... Ts>
-struct Var {
-    static_assert(sizeof...(Ts) <= 255, "Var can only hold up to 255 types");
+struct Union {
+    static_assert(sizeof...(Ts) <= 255, "Union can only hold up to 255 types");
 
     alignas(max(alignof(Ts)...)) char _buf[max(sizeof(Ts)...)];
     u8 _index;
 
-    always_inline Var() = delete;
+    always_inline Union() = delete;
 
     template <Meta::Contains<Ts...> T>
-    always_inline Var(T const &value)
+    always_inline Union(T const &value)
         : _index(Meta::indexOf<T, Ts...>()) {
         new (_buf) T(value);
     }
 
     template <Meta::Contains<Ts...> T>
-    always_inline Var(T &&value)
+    always_inline Union(T &&value)
         : _index(Meta::indexOf<T, Ts...>()) {
         new (_buf) T(std::move(value));
     }
 
-    always_inline Var(Var const &other)
+    always_inline Union(Union const &other)
         : _index(other._index) {
         Meta::indexCast<Ts...>(
             _index, other._buf,
@@ -38,27 +38,27 @@ struct Var {
             });
     }
 
-    always_inline Var(Var &&other)
+    always_inline Union(Union &&other)
         : _index(other._index) {
         Meta::indexCast<Ts...>(_index, other._buf, [this]<typename T>(T &ptr) {
             new (_buf) T(std::move(ptr));
         });
     }
 
-    always_inline ~Var() {
+    always_inline ~Union() {
         Meta::indexCast<Ts...>(_index, _buf, []<typename T>(T &ptr) {
             ptr.~T();
         });
     }
 
     template <Meta::Contains<Ts...> T>
-    always_inline Var &operator=(T const &value) {
-        *this = Var(value);
+    always_inline Union &operator=(T const &value) {
+        *this = Union(value);
         return *this;
     }
 
     template <Meta::Contains<Ts...> T>
-    always_inline Var &operator=(T &&value) {
+    always_inline Union &operator=(T &&value) {
         Meta::indexCast<Ts...>(_index, _buf, []<typename U>(U &ptr) {
             ptr.~U();
         });
@@ -69,12 +69,12 @@ struct Var {
         return *this;
     }
 
-    always_inline Var &operator=(Var const &other) {
-        *this = Var(other);
+    always_inline Union &operator=(Union const &other) {
+        *this = Union(other);
         return *this;
     }
 
-    always_inline Var &operator=(Var &&other) {
+    always_inline Union &operator=(Union &&other) {
         Meta::indexCast<Ts...>(_index, _buf, []<typename T>(T &ptr) {
             ptr.~T();
         });
@@ -177,7 +177,7 @@ struct Var {
         return false;
     }
 
-    std::partial_ordering operator<=>(Var const &other) const {
+    std::partial_ordering operator<=>(Union const &other) const {
         if (_index == other._index)
             return visit([&]<typename T>(T const &ptr) {
                 if constexpr (Meta::Comparable<T>) {
@@ -189,7 +189,7 @@ struct Var {
         return std::partial_ordering::unordered;
     }
 
-    bool operator==(Var const &other) const {
+    bool operator==(Union const &other) const {
         if (_index == other._index)
             return visit([&]<typename T>(T const &ptr) {
                 if constexpr (Meta::Equatable<T>) {

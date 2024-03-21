@@ -99,7 +99,7 @@ struct FilterChain {
     void apply(MutPixels) const;
 };
 
-using _Filters = Var<
+using _Filters = Union<
     Unfiltered,
     BlurFilter,
     SaturationFilter,

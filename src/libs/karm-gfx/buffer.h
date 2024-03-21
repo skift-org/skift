@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/rc.h>
-#include <karm-base/var.h>
+#include <karm-base/union.h>
 #include <karm-math/rect.h>
 
 #include "color.h"
@@ -50,7 +50,7 @@ struct Bgra8888 {
 
 [[gnu::used]] inline Bgra8888 BGRA8888;
 
-using _Fmts = Var<Rgba8888, Bgra8888>;
+using _Fmts = Union<Rgba8888, Bgra8888>;
 
 struct Fmt : public _Fmts {
     using _Fmts::_Fmts;

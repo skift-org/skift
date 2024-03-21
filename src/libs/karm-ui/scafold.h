@@ -54,7 +54,7 @@ struct Scafold : public Meta::NoCopy {
 
     struct ToggleSidebar {};
 
-    using Action = Var<ToggleSidebar>;
+    using Action = Union<ToggleSidebar>;
 
     static void reduce(State &s, Action a) {
         a.visit(::Visitor{

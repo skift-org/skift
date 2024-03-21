@@ -335,7 +335,7 @@ struct ClassPairAdjustment : public LookupSubtableBase {
     }
 };
 
-using LookupSubtable = Var<
+using LookupSubtable = Union<
     GlyphPairAdjustment,
     ClassPairAdjustment>;
 

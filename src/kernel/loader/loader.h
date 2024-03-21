@@ -32,7 +32,7 @@ struct Blob {
 };
 
 struct Entry {
-    Var<None, Mdi::Icon, Media::Image> icon = NONE;
+    Union<None, Mdi::Icon, Media::Image> icon = NONE;
     String name;
     Blob kernel;
     Vec<Blob> blobs;

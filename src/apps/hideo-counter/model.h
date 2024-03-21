@@ -15,7 +15,7 @@ struct IncrementAction {};
 
 struct DecrementAction {};
 
-using Action = Var<ResetAction, IncrementAction, DecrementAction>;
+using Action = Union<ResetAction, IncrementAction, DecrementAction>;
 
 void reduce(State &, Action);
 

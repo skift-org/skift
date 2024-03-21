@@ -22,7 +22,7 @@ struct UpdateHsv {
     Gfx::Hsv hsv;
 };
 
-using Action = Var<UpdatePage, UpdateHsv>;
+using Action = Union<UpdatePage, UpdateHsv>;
 
 inline void reduce(State &s, Action action) {
     action.visit(Visitor{

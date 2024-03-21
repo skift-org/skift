@@ -70,7 +70,7 @@ struct Builder {
 
     void _insertAForeignElement(Token const &t);
 
-    void _insertAnHtmlElement();
+    void _insertAnHtmlElement(Strong<Dom::Element>);
 
     void _insertACharacter();
 
@@ -88,9 +88,17 @@ struct Builder {
 
     void _handleInitialMode(Token const &t);
 
+    // 13.2.6.4.2 The "before html" insertion mode
+    // https://html.spec.whatwg.org/multipage/parsing.html#the-before-html-insertion-mode
     void _handleBeforeHtml(Token const &t);
 
+    // 13.2.6.4.3 The "before head" insertion mode
+    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-beforehead
     void _handleBeforeHead(Token const &t);
+
+    // 13.2.6.4.4 The "in head" insertion mode
+    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inhead
+    void _acceptInHead(Token const &t);
 
     void _acceptIn(Mode mode, Token const &t);
 

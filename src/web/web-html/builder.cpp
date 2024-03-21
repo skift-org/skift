@@ -99,6 +99,7 @@ void Builder::_handleBeforeHead(Token const &t) {
         // Ignore the token.
     } else if (t.type == Token::COMMENT) {
         // Insert a comment.
+        _insertAComment();
     } else if (t.type == Token::DOCTYPE) {
         // Parse error. Ignore the token.
         _raise();
@@ -106,11 +107,41 @@ void Builder::_handleBeforeHead(Token const &t) {
         // Process the token using the rules for the "in body" insertion mode.
         _acceptIn(Mode::IN_BODY, t);
     } else if (t.type == Token::START_TAG and t.name == "head") {
-
+        auto head = _createElementFor(t);
+        _insertAnHtmlElement(head);
+        _headElement = head;
     } else if (t.type == Token::END_TAG and not(t.name == "head" or t.name == "body" or t.name == "html" or t.name == "br")) {
         // ignore
         _raise();
     } else {
+        Token headToken;
+        headToken.type = Token::START_TAG;
+        headToken.name = String{"head"};
+        auto head = _createElementFor(headToken);
+        _insertAnHtmlElement(head);
+        _headElement = head;
+        _switchTo(Mode::IN_HEAD);
+        accept(t);
+    }
+}
+
+// https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inhead
+void Builder::_acceptInHead(Token const &t) {
+    if (t.type == Token::DOCTYPE) {
+        _raise();
+    } else if (t.type == Token::COMMENT) {
+        _insertAComment();
+    } else if (t.type == Token::CHARACTER and
+               (t.rune == '\t' or
+                t.rune == '\n' or
+                t.rune == '\f' or
+                t.rune == ' ')) {
+        // Ignore the token.
+    } else if (t.type == Token::START_TAG and t) {
+
+    } else if (t.type == Token::END_TAG and not(t.name == "head" or t.name == "body" or t.name == "html" or t.name == "br")) {
+        // ignore
+        _raise();
     }
 }
 

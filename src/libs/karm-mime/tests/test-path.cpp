@@ -1,6 +1,8 @@
 #include <karm-mime/path.h>
 #include <karm-test/macros.h>
 
+namespace Karm::Mime::Tests {
+
 test$(pathUpDown) {
     auto path = "/a/b/c/d/e/f"_path;
 
@@ -24,3 +26,5 @@ test$(pathUpDown) {
 
     return Ok();
 }
+
+} // namespace Karm::Mime::Tests

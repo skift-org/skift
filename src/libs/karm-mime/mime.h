@@ -28,6 +28,10 @@ struct Mime {
         s.skip(Re::until(Re::single(';')));
         return s.end();
     }
+
+    Str str() {
+        return _buf;
+    }
 };
 
 } // namespace Karm::Mime

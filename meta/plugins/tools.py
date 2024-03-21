@@ -231,3 +231,6 @@ def _():
             f"\n{vt100.RED}Error: Some headers are missing, please install the development packages for your distribution.{vt100.RESET}"
         )
         everythingIsOk = False
+
+    else:
+        print(f"\n{vt100.GREEN}Everythings looking good ​😉​👌​{vt100.RESET}\n")

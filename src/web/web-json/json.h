@@ -9,7 +9,7 @@
 #include <karm-io/fmt.h>
 #include <karm-io/sscan.h>
 
-namespace Json {
+namespace Web::Json {
 
 struct Value;
 
@@ -17,16 +17,23 @@ using Array = Vec<Value>;
 
 using Object = Map<String, Value>;
 
-#ifdef __ck_freestanding__
-using Number = isize;
-#else
+using Integer = isize;
+
+#ifndef __ck_freestanding__
 using Number = f64;
 #endif
 
-using Store = Union<None, Array, Object, String, Number, bool>;
+using _Store = Union<
+    None,
+    Array,
+    Object,
+    String,
+    Integer,
+    Number,
+    bool>;
 
 struct Value {
-    Store _store;
+    _Store _store;
 
     Value()
         : _store(NONE) {}
@@ -42,6 +49,9 @@ struct Value {
 
     Value(String s)
         : _store(s) {}
+
+    Value(Integer d)
+        : _store(d) {}
 
     Value(Number d)
         : _store(d) {}
@@ -69,10 +79,17 @@ struct Value {
         return *this;
     }
 
+    Value &operator=(Integer d) {
+        _store = d;
+        return *this;
+    }
+
+#ifndef __ck_freestanding__
     Value &operator=(Number d) {
         _store = d;
         return *this;
     }
+#endif
 
     Value &operator=(bool b) {
         _store = b;
@@ -93,6 +110,10 @@ struct Value {
 
     bool isStr() const {
         return _store.is<String>();
+    }
+
+    bool isInt() const {
+        return _store.is<Integer>();
     }
 
     bool isFloat() const {
@@ -134,9 +155,14 @@ struct Value {
                 [](String s) {
                     return s;
                 },
+                [](Integer i) {
+                    return Io::format("{}", i).unwrap();
+                },
+#ifndef __ck_freestanding__
                 [](Number d) {
                     return Io::format("{}", d).unwrap();
                 },
+#endif
                 [](bool b) {
                     return b ? "true" : "false";
                 },
@@ -147,9 +173,13 @@ struct Value {
     isize asInt() const {
         return _store.visit(
             Visitor{
+                [](Integer i) {
+                    return i;
+                },
                 [](Number d) {
                     return (isize)d;
                 },
+
                 [](bool b) {
                     return b ? 1 : 0;
                 },
@@ -160,10 +190,13 @@ struct Value {
         );
     }
 
-#ifdef __ck_freestanding__
+#ifndef __ck_freestanding__
     f64 asFloat() const {
         return _store.visit(
             Visitor{
+                [](Integer i) {
+                    return (f64)i;
+                },
                 [](Number d) {
                     return d;
                 },
@@ -193,9 +226,14 @@ struct Value {
                 [](String s) {
                     return s.len() > 0;
                 },
+                [](Integer i) {
+                    return i != 0;
+                },
+#ifndef __ck_freestanding__
                 [](Number d) {
                     return d != (Number)0;
                 },
+#endif
                 [](bool b) {
                     return b;
                 },
@@ -220,9 +258,6 @@ struct Value {
     usize len() const {
         return _store.visit(
             Visitor{
-                [](None) {
-                    return 0;
-                },
                 [](Vec<Value> v) {
                     return v.len();
                 },
@@ -232,10 +267,7 @@ struct Value {
                 [](String s) {
                     return s.len();
                 },
-                [](Number) {
-                    return 0;
-                },
-                [](bool) {
+                [](auto) {
                     return 0;
                 },
             }
@@ -277,17 +309,17 @@ Res<> stringify(Io::Emit &emit, Value const &v);
 
 Res<String> stringify(Value const &v);
 
-} // namespace Json
+} // namespace Web::Json
 
 inline auto operator""_json(char const *str, usize len) {
-    return Json::parse({str, len}).unwrap();
+    return Web::Json::parse({str, len}).unwrap();
 }
 
 template <>
-struct Karm::Io::Formatter<Json::Value> {
-    Res<usize> format(Io::TextWriter &writer, Json::Value value) {
+struct Karm::Io::Formatter<Web::Json::Value> {
+    Res<usize> format(Io::TextWriter &writer, Web::Json::Value value) {
         Io::Emit emit{writer};
-        try$(Json::stringify(emit, value));
+        try$(Web::Json::stringify(emit, value));
         return Ok(emit.total());
     }
 };

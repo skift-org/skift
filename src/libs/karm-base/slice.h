@@ -455,10 +455,11 @@ always_inline Opt<usize> search(Sliceable auto const &slice, auto cmp) {
     return NONE;
 }
 
+/// Enumerates the possible results of a match.
 enum struct Match {
-    NO,
-    PARTIAL,
-    YES,
+    NO,      //< No match.
+    PARTIAL, //< The pattern is part of the input.
+    YES,     //< The pattern is the input.
 };
 
 always_inline Match startWith(Sliceable auto const &slice, Sliceable auto const &prefix) {

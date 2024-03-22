@@ -2,14 +2,13 @@
 
 #include "json.h"
 
-namespace Json {
+namespace Web::Json {
 
 Res<Value> parse(Io::SScan &s);
 
 Res<String> parseStr(Io::SScan &s) {
-    if (not s.skip('"')) {
+    if (not s.skip('"'))
         return Error::invalidData("expected '\"'");
-    }
 
     s.begin();
 
@@ -123,6 +122,96 @@ Res<Array> parseArray(Io::SScan &s) {
     }
 }
 
+static auto const RE_NUMBER_START = Re::single('-') | Re::digit();
+
+Res<usize> parseDigits(Io::SScan &s) {
+    if (s.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (s.match(Re::digit()) == Match::NO)
+        return Error::invalidData("expected digit");
+
+    usize digits = 0;
+    while (s.match(Re::digit()) != Match::NO) {
+        s.next();
+        ++digits;
+    }
+    return Ok(digits);
+}
+
+Res<f64> parseDecimal(Io::SScan &s) {
+    if (s.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (s.match(Re::digit()) == Match::NO)
+        return Error::invalidData("expected digit");
+
+    f64 fpart = 0;
+    f64 multiplier = 0.1;
+    while (s.match(Re::digit()) != Match::NO) {
+        fpart += parseAsciiDecDigit(s.next()) * multiplier;
+        multiplier /= 10;
+    }
+    return Ok(fpart);
+}
+
+Res<isize> parseInteger(Io::SScan &s) {
+    bool sign = false;
+
+    if (s.skip('-'))
+        sign = true;
+    else
+        s.skip('+');
+
+    if (s.skip('0'))
+        return Ok(0);
+
+    if (s.ended())
+        return Error::invalidData("unexpected end of input");
+
+    isize ipart = 0;
+    ipart = parseAsciiDecDigit(s.next());
+    while (s.match(Re::digit()) != Match::NO) {
+        ipart = ipart * 10 + parseAsciiDecDigit(s.next());
+    }
+    return Ok(sign ? -ipart : ipart);
+}
+
+Res<Value> parseNumber(Io::SScan &s) {
+    isize ipart = try$(parseInteger(s));
+
+    if (s.match(Re::single('.', 'e', 'E')) == Match::NO) {
+        return Ok<Value>(ipart);
+    }
+
+// NOTE: Floating point numbers are not supported in freestanding environments.
+#ifdef __ck_freestanding__
+    return Error::invalidData("floating point numbers are not supported");
+#else
+    f64 fpart = 0.0;
+    if (s.skip('.')) {
+        fpart = try$(parseDecimal(s));
+    }
+
+    if (s.skip(Re::single('e', 'E'))) {
+        bool expSign = false;
+        if (s.skip('-'))
+            expSign = true;
+        else
+            s.skip('+');
+
+        isize exp = try$(parseDigits(s));
+
+        if (expSign)
+            exp = -exp;
+
+        return Ok<Value>(ipart + fpart * pow(10, exp));
+    }
+
+    return Ok<Value>(ipart + fpart);
+#endif
+}
+
 Res<Value> parse(Io::SScan &s) {
     s.eat(Re::space());
 
@@ -140,12 +229,8 @@ Res<Value> parse(Io::SScan &s) {
         return Ok(Value{true});
     } else if (s.skip("false")) {
         return Ok(Value{false});
-    } else if (s.peek() == '-' or (s.peek() >= '0' and s.peek() <= '9')) {
-#ifdef __ck_freestanding__
-        return Ok(Value{(Number)try$(s.nextInt())});
-#else
-        return Ok(Value{try$(s.nextFloat())});
-#endif
+    } else if (s.match(RE_NUMBER_START) != Match::NO) {
+        return parseNumber(s);
     }
 
     return Error::invalidData("unexpected character");
@@ -156,4 +241,4 @@ Res<Value> parse(Str s) {
     return parse(scan);
 }
 
-} // namespace Json
+} // namespace Web::Json

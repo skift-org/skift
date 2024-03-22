@@ -1,12 +1,12 @@
 #include <efi/base.h>
 #include <hal/mem.h>
-#include <json/json.h>
 #include <karm-base/align.h>
 #include <karm-base/macros.h>
 #include <karm-io/funcs.h>
 #include <karm-io/impls.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/file.h>
+#include <web-json/json.h>
 
 #include <karm-sys/_embed.h>
 
@@ -212,7 +212,7 @@ Res<Strong<Sys::Fd>> listenIpc(Mime::Url) {
 
 /* --- Files ---------------------------------------------------------------- */
 
-static Opt<Json::Value> _index = NONE;
+static Opt<Web::Json::Value> _index = NONE;
 
 static Res<Mime::Path> resolve(Mime::Url url) {
     if (url.scheme == "file") {
@@ -226,7 +226,7 @@ static Res<Mime::Path> resolve(Mime::Url url) {
 
             auto indexFile = try$(Sys::File::open("file:/bundles/_index.json"_url));
             auto indexStr = try$(Io::readAllUtf8(indexFile));
-            auto indexJson = try$(Json::parse(indexStr));
+            auto indexJson = try$(Web::Json::parse(indexStr));
 
             _index = indexJson.get("objects");
 

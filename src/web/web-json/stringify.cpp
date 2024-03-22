@@ -1,6 +1,6 @@
 #include "json.h"
 
-namespace Json {
+namespace Web::Json {
 
 Res<> stringify(Io::Emit &emit, Value const &v) {
     return v.visit(
@@ -40,7 +40,7 @@ Res<> stringify(Io::Emit &emit, Value const &v) {
             },
             [&](String const &s) -> Res<> {
                 emit('"');
-                for (auto c : s) {
+                for (auto c : iterRunes(s)) {
                     if (c == '"') {
                         emit("\\\"");
                     } else if (c == '\\') {
@@ -64,6 +64,10 @@ Res<> stringify(Io::Emit &emit, Value const &v) {
                 emit('"');
                 return Ok();
             },
+            [&](Integer i) -> Res<> {
+                emit("{}", i);
+                return Ok();
+            },
             [&](Number d) -> Res<> {
                 emit("{}", d);
                 return Ok();
@@ -83,4 +87,4 @@ Res<String> stringify(Value const &v) {
     return Ok(sw.take());
 }
 
-} // namespace Json
+} // namespace Web::Json

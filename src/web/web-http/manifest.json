@@ -6,6 +6,6 @@
     "requires": [
         "web-dns",
         "karm-sys",
-        "json-spec"
+        "web-json"
     ]
 }

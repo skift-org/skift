@@ -10,7 +10,7 @@ Res<> entryPoint(Sys::Ctx &ctx) {
 
     logInfo("parsing configs...");
     auto fileStr = try$(Io::readAllUtf8(file));
-    auto json = try$(Json::parse(fileStr));
+    auto json = try$(Web::Json::parse(fileStr));
 
     logInfo("validating configs...");
     logInfo("configs: {}", json);

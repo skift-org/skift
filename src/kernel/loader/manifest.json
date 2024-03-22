@@ -12,6 +12,6 @@
         "hideo-base",
         "karm-sys",
         "loader-impl",
-        "json-spec"
+        "web-json"
     ]
 }

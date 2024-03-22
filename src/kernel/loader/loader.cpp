@@ -67,7 +67,7 @@ Res<> loadEntry(Entry const &entry) {
         auto blobRange = blobMem.prange();
 
         auto strId = payload.add(blob.url.str());
-        auto propStr = try$(Json::stringify(blob.props));
+        auto propStr = try$(Web::Json::stringify(blob.props));
         auto propsId = payload.add(propStr);
 
         payload.add({

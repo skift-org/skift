@@ -179,15 +179,23 @@ struct Header {
         while (not s.ended()) {
             Str key, value;
 
-            auto expr = Re::chain(
-                Re::token(key, Re::until(Re::separator(':'))),
-                Re::separator(':'),
-                Re::token(value, Re::until(Re::chain(Re::zeroOrMore(Re::single(' ')), Re::word("\r\n")))),
-                Re::zeroOrMore(Re::single(' ')),
-                Re::word("\r\n")
-            );
+            auto RE_ENDLINE =
+                Re::zeroOrMore(Re::single(' ')) &
+                Re::word("\r\n");
 
-            if (not s.skip(expr))
+            auto RE_KEY_VALUE =
+                Re::token(
+                    key,
+                    Re::until(Re::separator(':'))
+                ) &
+                Re::separator(':') &
+                Re::token(
+                    value,
+                    Re::until(RE_ENDLINE)
+                ) &
+                RE_ENDLINE;
+
+            if (not s.skip(RE_KEY_VALUE))
                 return Error::invalidData("Expected header");
 
             headers.put(key, value);

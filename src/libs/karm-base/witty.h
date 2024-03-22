@@ -10,4 +10,8 @@ Str nice(usize seed);
 
 Str wholesome(usize seed);
 
+Str goodEmoji(usize seed);
+
+Str badEmoji(usize seed);
+
 } // namespace Karm

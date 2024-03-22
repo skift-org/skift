@@ -62,7 +62,8 @@ Res<> Driver::runAll() {
     }
 
     Sys::errln(
-        " 🤘 {} passed - {}\n",
+        " {} {} passed - {}\n",
+        goodEmoji(Sys::now().val()),
         Cli::styled(passed, GREEN),
         Cli::styled(nice(Sys::now().val()), NOTE)
     );

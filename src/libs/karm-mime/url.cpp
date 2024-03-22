@@ -4,15 +4,12 @@
 
 namespace Karm::Mime {
 
-static auto const COMPONENT = Re::chain(
-    Re::alpha(),
+static auto const COMPONENT =
+    Re::alpha() &
     Re::zeroOrMore(
-        Re::either(
-            Re::alnum(),
-            Re::single('+', '.', '-')
-        )
-    )
-);
+        Re::alnum() |
+        Re::single('+', '.', '-')
+    );
 
 Url Url::parse(Io::SScan &s) {
     Url url;

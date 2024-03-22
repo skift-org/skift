@@ -120,6 +120,21 @@ struct _SScan {
         return expr(*this);
     }
 
+    /// Check if the expression matches or not.
+    /// The cursor is restored to the original position.
+    Match match(auto expr) {
+        auto save = _cursor;
+        if (expr(*this)) {
+            Match result = _cursor == save
+                               ? Match::YES
+                               : Match::PARTIAL;
+            _cursor = save;
+            return result;
+        }
+        _cursor = save;
+        return Match::NO;
+    }
+
     bool operator()(auto expr) {
         return expr(*this);
     }

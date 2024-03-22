@@ -60,19 +60,18 @@ Res<String> toHeaderCase(Str str) {
     return Ok(s);
 }
 
-static auto sep() {
-    return Re::either(Re::blank(), Re::single('.', '_', '/', '-'));
-}
+static auto const RE_SEP =
+    Re::blank() | Re::single('.', '_', '/', '-');
 
 Res<String> toNoCase(Str str) {
     Io::StringWriter writer;
     Io::SScan scan{str};
     bool wasLower = false;
 
-    scan.eat(sep());
+    scan.eat(RE_SEP);
 
     while (not scan.ended()) {
-        if (scan.skip(sep())) {
+        if (scan.skip(RE_SEP)) {
             try$(writer.writeRune(' '));
             wasLower = false;
         } else {
@@ -105,10 +104,10 @@ Res<String> toPascalCase(Str str) {
     Io::StringWriter writer;
     Io::SScan scan{str};
 
-    scan.eat(sep());
+    scan.eat(RE_SEP);
 
     while (not scan.ended()) {
-        if (scan.skip(sep())) {
+        if (scan.skip(RE_SEP)) {
             first = true;
         } else {
             if (first) {

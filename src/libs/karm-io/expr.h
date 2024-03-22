@@ -11,9 +11,11 @@ concept Expr = requires(T expr, Io::SScan &scan) {
     { expr(scan) } -> Meta::Same<bool>;
 };
 
-bool match(Re::Expr auto expr, Str input) {
+Match match(Re::Expr auto expr, Str input) {
     Io::SScan scan(input);
-    return expr(scan);
+    if (not expr(scan))
+        return Match::NO;
+    return scan.ended() ? Match::YES : Match::PARTIAL;
 }
 
 /* --- Combinators ---------------------------------------------------------- */
@@ -25,19 +27,25 @@ inline auto either(Expr auto... exprs) {
     };
 }
 
+auto operator|(Expr auto a, Expr auto b) {
+    return either(a, b);
+}
+
 /// Returns true if all of the expressions match.
 /// The expressions are evaluated in order.
 /// If any expression fails, the scanner is rewound to the state before the first expression.
 inline auto chain(Expr auto... exprs) {
     return [=](auto &scan) {
         auto saved = scan;
-        if ((exprs(scan) and ...)) {
+        if ((exprs(scan) and ...))
             return true;
-        }
-
         scan = saved;
         return false;
     };
+}
+
+auto operator&(Expr auto a, Expr auto b) {
+    return chain(a, b);
 }
 
 /// Inverts the result of the expression.
@@ -45,6 +53,10 @@ inline auto negate(Expr auto expr) {
     return [=](auto &scan) {
         return not expr(scan);
     };
+}
+
+auto operator~(Expr auto expr) {
+    return negate(expr);
 }
 
 /// Consumes until the expression matches or the end of the input is reached.
@@ -64,14 +76,41 @@ inline auto until(Expr auto expr) {
 /// Consumes until the expression matches or the end of the input is reached.
 inline auto untilAndConsume(Expr auto expr) {
     return [=](auto &scan) {
-        while (not expr(scan) and not scan.ended()) {
+        while (not expr(scan) and not scan.ended())
             scan.next();
-        }
         return true;
     };
 }
 
 /* --- Quantifiers ---------------------------------------------------------- */
+
+/// Returns true if the expression matches exactly n times.
+inline auto exactly(usize n, Expr auto expr) {
+    return [=](auto &scan) {
+        auto saved = scan;
+        for (usize i = 0; i < n; ++i) {
+            if (not expr(scan)) {
+                scan = saved;
+                return false;
+            }
+        }
+        return true;
+    };
+}
+
+/// Returns true if the expression matches at least n times.
+inline auto atLeast(usize n, Expr auto expr) {
+    return [=](auto &scan) {
+        auto saved = scan;
+        for (usize i = 0; i < n; ++i) {
+            if (not expr(scan)) {
+                scan = saved;
+                return false;
+            }
+        }
+        return zeroOrMore(expr)(scan);
+    };
+}
 
 /// Returns true if the expression matches zero or more times.
 inline auto zeroOrMore(Expr auto expr) {
@@ -116,7 +155,7 @@ inline auto token(Str &out, Expr auto expr) {
 
 /* --- Tokens --------------------------------------------------------------- */
 
-/// Math nothing and return true.
+/// Match nothing and return true.
 inline auto nothing() {
     return [](auto &) {
         return true;
@@ -174,7 +213,7 @@ inline auto lower() {
 
 /// Match an ASCII letter and consume it.
 inline auto alpha() {
-    return either(upper(), lower());
+    return upper() | lower();
 }
 
 /// Match an ASCII digit and consume it.
@@ -184,17 +223,17 @@ inline auto digit() {
 
 /// Match an ASCII hexadecimal digit and consume it.
 inline auto xdigit() {
-    return either(digit(), range('a', 'f'), range('A', 'F'));
+    return digit() | range('a', 'f') | range('A', 'F');
 }
 
 /// Match an ASCII alphanumeric character and consume it.
 inline auto alnum() {
-    return either(alpha(), digit());
+    return alpha() | digit();
 }
 
 /// Match a work made of ASCII letters and underscores and consume it.
 inline auto word() {
-    return either(alnum(), single('_'));
+    return alnum() | single('_');
 }
 
 /// Match punctuation and consume it.
@@ -222,21 +261,17 @@ inline auto blank() {
 /// Match a separator and consume it.
 /// A separator is a rune surrounded by spaces.
 inline auto separator(Rune r) {
-    return chain(
-        zeroOrMore(space()),
-        single(r),
-        zeroOrMore(space())
-    );
+    return zeroOrMore(space()) &
+           single(r) &
+           zeroOrMore(space());
 }
 
 /// Match a separator and consume it.
 /// A separator is a word surrounded by spaces.
 inline auto separator(Str w) {
-    return chain(
-        zeroOrMore(space()),
-        word(w),
-        zeroOrMore(space())
-    );
+    return zeroOrMore(space()) &
+           word(w) &
+           zeroOrMore(space());
 }
 
 /// Match an optional separator and consume it.
@@ -244,11 +279,9 @@ inline auto separator(Str w) {
 /// If the separator is not found, the expression still matches.
 /// And whitespaces are consumed.
 inline auto optSeparator(Rune r) {
-    return chain(
-        zeroOrMore(space()),
-        zeroOrOne(single(r)),
-        zeroOrMore(space())
-    );
+    return zeroOrMore(space()) &
+           zeroOrOne(single(r)) &
+           zeroOrMore(space());
 }
 
 /// Match an optional separator and consume it.
@@ -256,11 +289,9 @@ inline auto optSeparator(Rune r) {
 /// If the separator is not found, the expression still matches.
 /// And whitespaces are consumed.
 inline auto optSeparator(Str w) {
-    return chain(
-        zeroOrMore(space()),
-        zeroOrOne(word(w)),
-        zeroOrMore(space())
-    );
+    return zeroOrMore(space()) &
+           zeroOrOne(word(w)) &
+           zeroOrMore(space());
 }
 
 } // namespace Karm::Re

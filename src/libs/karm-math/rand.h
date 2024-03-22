@@ -90,6 +90,11 @@ struct Rand {
     Vec2<T> nextVec2(Vec2<T> max) {
         return Vec2<T>(nextDouble(max.x), nextDouble(max.y));
     }
+
+    template <typename T>
+    T pick(Slice<T> vals) {
+        return vals[nextInt(vals.len())];
+    }
 };
- 
+
 } // namespace Karm::Math

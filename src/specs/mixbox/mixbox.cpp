@@ -118,13 +118,21 @@ Latent unmix(Math::Vec3f rgb) {
 
     auto mixrgb = evalPolynomial(c0, c1, c2, c3);
 
-    return {c0, c1, c2, c3,
-            r01 - mixrgb[0], g01 - mixrgb[1], b01 - mixrgb[2]};
+    return {
+        c0,
+        c1,
+        c2,
+        c3,
+        r01 - mixrgb[0],
+        g01 - mixrgb[1],
+        b01 - mixrgb[2]
+    };
 }
 
 Math::Vec3f mix(Latent latent) {
     auto rgb = evalPolynomial(
-        latent[0], latent[1], latent[2], latent[3]);
+        latent[0], latent[1], latent[2], latent[3]
+    );
 
     return {
         clamp01(rgb[0] + latent[4]),
@@ -156,7 +164,9 @@ Gfx::Color lerpColor(Gfx::Color a, Gfx::Color b, f64 t) {
     return linear2srgb(
         lerp(
             srgb2linear(a),
-            srgb2linear(b), t));
+            srgb2linear(b), t
+        )
+    );
 }
 
 } // namespace Mixbox

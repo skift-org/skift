@@ -228,7 +228,8 @@ extern "C" usize _sysDispatch(usize sp) {
             frame->r10,
             frame->r8,
             frame->r9,
-        });
+        }
+    );
 
     if (not result) {
         return (usize)result.none().code();
@@ -250,7 +251,8 @@ Hal::Vmm &globalVmm() {
         zeroFill(pml4Mem.mutBytes());
         _kpml4 = pml4Mem.as<x86_64::Pml<4>>();
         _vmm = x86_64::Vmm<Hal::UpperHalfMapper>{
-            Core::pmm(), _kpml4};
+            Core::pmm(), _kpml4
+        };
     }
 
     return *_vmm;

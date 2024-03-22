@@ -146,7 +146,8 @@ struct Reducer :
 template <typename Model>
 inline Child reducer(
     typename Model::State init,
-    Func<Child(typename Model::State const &)> build) {
+    Func<Child(typename Model::State const &)> build
+) {
 
     return makeStrong<Reducer<Model>>(init, std::move(build));
 }

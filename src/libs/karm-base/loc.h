@@ -14,7 +14,8 @@ struct Loc {
         Str file = __builtin_FILE(),
         Str func = __builtin_FUNCTION(),
         usize line = __builtin_LINE(),
-        usize column = __builtin_COLUMN()) {
+        usize column = __builtin_COLUMN()
+    ) {
         return {file, func, line, column};
     }
 };

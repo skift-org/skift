@@ -25,7 +25,8 @@ Res<Strong<Fd>> NullFd::dup() {
 Res<_Accepted> NullFd::accept() {
     return Ok<_Accepted>(
         makeStrong<NullFd>(),
-        Ip4::unspecified(0));
+        Ip4::unspecified(0)
+    );
 }
 
 Res<Stat> NullFd::stat() {

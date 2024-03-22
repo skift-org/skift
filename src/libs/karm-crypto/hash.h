@@ -149,7 +149,8 @@ struct AnyHash {
                 unreachable();
                 return Str{};
             },
-            FOR_EACH_HASH(ITER)});
+            FOR_EACH_HASH(ITER)
+        });
 
 #undef ITER
     }

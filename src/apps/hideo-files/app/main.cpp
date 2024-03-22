@@ -15,7 +15,8 @@ Ui::Child sidebar(State const &) {
         Hideo::sidenavTree(
             Mdi::BOOKMARK,
             "Bookmarks",
-            slot$(Ui::empty())),
+            slot$(Ui::empty())
+        ),
 
         Hideo::sidenavTree(
             Mdi::HOME,
@@ -26,7 +27,9 @@ Ui::Child sidebar(State const &) {
                 Hideo::sidenavItem(false, Model::bind<GoTo>("location://musics"_url), Mdi::MUSIC, "Music"),
                 Hideo::sidenavItem(false, Model::bind<GoTo>("location://videos"_url), Mdi::FILM, "Videos"),
                 Hideo::sidenavItem(false, Model::bind<GoTo>("location://downloads"_url), Mdi::DOWNLOAD, "Downloads"),
-                Hideo::sidenavItem(false, Model::bind<GoTo>("location://trash"_url), Mdi::TRASH_CAN, "Trash")))),
+                Hideo::sidenavItem(false, Model::bind<GoTo>("location://trash"_url), Mdi::TRASH_CAN, "Trash")
+            ))
+        ),
 
         Hideo::sidenavTree(
             Mdi::HARDDISK,
@@ -35,7 +38,9 @@ Ui::Child sidebar(State const &) {
                 Hideo::sidenavItem(false, Model::bind<GoTo>("file:/"_url), Mdi::LAPTOP, "This Device"),
                 Hideo::sidenavItem(false, Model::bind<GoTo>("device://usb"_url), Mdi::USB, "USB"),
                 Hideo::sidenavItem(false, Model::bind<GoTo>("device://sdcard"_url), Mdi::SD, "SD Card"),
-                Hideo::sidenavItem(false, Model::bind<GoTo>("device://cdrom"_url), Mdi::DISC, "CD-ROM")))),
+                Hideo::sidenavItem(false, Model::bind<GoTo>("device://cdrom"_url), Mdi::DISC, "CD-ROM")
+            ))
+        ),
     };
 
     return Hideo::sidenav(items);
@@ -49,7 +54,8 @@ Ui::Child pageContent(State const &state) {
                        : alert(
                              state,
                              "Can't access this location",
-                             dir.none().msg());
+                             dir.none().msg()
+                         );
 
     return listing | Ui::grow();
 }
@@ -62,7 +68,8 @@ Ui::Child app() {
             .startTools = slots$(
                 goBackTool(s),
                 goForwardTool(s),
-                goParentTool(s)),
+                goParentTool(s)
+            ),
             .midleTools = slots$(breadcrumb(s) | Ui::grow()),
             .endTools = slots$(refreshTool()),
             .sidebar = slot$(sidebar(s)),

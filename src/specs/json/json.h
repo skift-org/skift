@@ -140,7 +140,8 @@ struct Value {
                 [](bool b) {
                     return b ? "true" : "false";
                 },
-            });
+            }
+        );
     }
 
     isize asInt() const {
@@ -155,7 +156,8 @@ struct Value {
                 [](auto) {
                     return 0;
                 },
-            });
+            }
+        );
     }
 
 #ifdef __ck_freestanding__
@@ -171,7 +173,8 @@ struct Value {
                 [](auto) {
                     return (Number)0;
                 },
-            });
+            }
+        );
     }
 #endif
 
@@ -196,7 +199,8 @@ struct Value {
                 [](bool b) {
                     return b;
                 },
-            });
+            }
+        );
     }
 
     Value get(Str key) const {
@@ -234,7 +238,8 @@ struct Value {
                 [](bool) {
                     return 0;
                 },
-            });
+            }
+        );
 
         return 0;
     }
@@ -244,7 +249,9 @@ struct Value {
             Visitor{
                 [](auto &v) {
                     v = {};
-                }});
+                }
+            }
+        );
     }
 
     auto visit(auto visitor) const {

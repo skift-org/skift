@@ -33,7 +33,8 @@ static inline Demo STROKE_DEMO{
 
                 g.strokeStyle(Gfx::stroke(Gfx::GREEN).withWidth(64));
                 g.stroke();
-            });
+            }
+        );
     },
 };
 

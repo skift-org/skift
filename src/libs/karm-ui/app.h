@@ -25,39 +25,46 @@ Child inspector(Child child) {
                     Ui::shouldLayout(n);
                 },
                 ButtonStyle::subtle(),
-                Mdi::RULER_SQUARE),
+                Mdi::RULER_SQUARE
+            ),
             button(
                 [](auto &n) {
                     debugShowRepaintBounds = !debugShowRepaintBounds;
                     Ui::shouldLayout(n);
                 },
                 ButtonStyle::subtle(),
-                Mdi::BRUSH),
+                Mdi::BRUSH
+            ),
             button(
                 [](auto &n) {
                     debugShowEmptyBounds = !debugShowEmptyBounds;
                     Ui::shouldLayout(n);
                 },
                 ButtonStyle::subtle(),
-                Mdi::BORDER_NONE_VARIANT),
+                Mdi::BORDER_NONE_VARIANT
+            ),
             button(
                 [](auto &n) {
                     debugShowScrollBounds = !debugShowScrollBounds;
                     Ui::shouldLayout(n);
                 },
                 ButtonStyle::subtle(),
-                Mdi::ARROW_UP_DOWN),
+                Mdi::ARROW_UP_DOWN
+            ),
             button(
                 [](auto &n) {
                     debugShowPerfGraph = !debugShowPerfGraph;
                     Ui::shouldLayout(n);
                 },
                 ButtonStyle::subtle(),
-                Mdi::CHART_HISTOGRAM)) |
+                Mdi::CHART_HISTOGRAM
+            )
+        ) |
             Ui::spacing(4) |
             Ui::box({
                 .backgroundPaint = GRAY800,
-            }));
+            })
+    );
 }
 
 inline Res<> runApp(Sys::Ctx &ctx, Child root) {

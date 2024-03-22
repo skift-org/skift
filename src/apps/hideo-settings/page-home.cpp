@@ -9,12 +9,12 @@ namespace Hideo::Settings {
 Ui::Child tileButton(Ui::OnPress onPress, Mdi::Icon icon, String text) {
     return Ui::vflow(
                Ui::icon(icon, 36) | Ui::center() | Ui::grow(),
-               Ui::text(text) | Ui::center()) |
+               Ui::text(text) | Ui::center()
+           ) |
            Ui::spacing(8) |
            Ui::bound() |
            Ui::minSize({96, 72}) |
-           Ui::button(std::move(onPress),
-                      Ui::ButtonStyle::secondary());
+           Ui::button(std::move(onPress), Ui::ButtonStyle::secondary());
 }
 
 Ui::Child pageHome(State const &) {
@@ -40,9 +40,8 @@ Ui::Child pageHome(State const &) {
     auto grid = Ui::grid(gridLayout, items) |
                 Ui::spacing(8);
 
-    if (isMobile) {
+    if (isMobile)
         return grid;
-    }
 
     return grid | Ui::center() | Ui::bound() | Ui::grow();
 }

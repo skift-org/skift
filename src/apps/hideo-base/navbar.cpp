@@ -9,11 +9,13 @@ Ui::Child navbar(Ui::Children children) {
         Ui::separator(),
         Ui::hflow(
             4,
-            children) |
+            children
+        ) |
             Ui::box({
                 .padding = 8,
                 .backgroundPaint = Ui::GRAY900,
-            }));
+            })
+    );
 }
 
 Ui::Child navbarItem(Mdi::Icon icon, char const *text, bool selected, Ui::OnPress onPress) {
@@ -31,8 +33,10 @@ Ui::Child navbarItem(Mdi::Icon icon, char const *text, bool selected, Ui::OnPres
                    Layout::Align::CENTER,
                    Ui::icon(icon),
                    Ui::empty(4),
-                   Ui::labelMedium(text), indicator) |
-                   Ui::spacing({8, 10, 8, 6})) |
+                   Ui::labelMedium(text), indicator
+               ) |
+                   Ui::spacing({8, 10, 8, 6})
+           ) |
            Ui::grow();
 }
 

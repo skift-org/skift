@@ -55,7 +55,8 @@ struct Range {
     constexpr Range merge(Range other) const {
         return fromStartEnd(
             min(start, other.start),
-            max(end(), other.end()));
+            max(end(), other.end())
+        );
     }
 
     constexpr Range halfUnder(Range other) {

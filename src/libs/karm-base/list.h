@@ -150,7 +150,8 @@ struct Ll {
 
     void truncApply(
         usize len, auto &&f = [](T *) {
-        }) {
+        }
+    ) {
         while (_len > len)
             f(detach(_tail));
     }

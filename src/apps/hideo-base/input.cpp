@@ -12,7 +12,8 @@ Ui::Child slider(f64 value, Ui::OnChange<f64> onChange, Mdi::Icon icon) {
                    Ui::center() |
                    Ui::aspectRatio(1) |
                    Ui::bound() |
-                   Ui::dragRegion()) |
+                   Ui::dragRegion()
+           ) |
            Ui::box({
                .borderRadius = 6,
                .backgroundPaint = Ui::ACCENT600,

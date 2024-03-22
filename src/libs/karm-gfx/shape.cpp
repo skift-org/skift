@@ -5,7 +5,4 @@
 
 namespace Karm::Gfx {
 
-
-
-
 } // namespace Karm::Gfx

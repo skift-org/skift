@@ -19,7 +19,9 @@ Ui::Child alert(State const &state, String title, String body) {
                Ui::hflow(
                    16,
                    Ui::button(Model::bindIf<GoBack>(state.canGoBack()), "Go Back"),
-                   Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::primary(), "Retry"))) |
+                   Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::primary(), "Retry")
+               )
+           ) |
            Ui::center();
 }
 
@@ -47,7 +49,8 @@ Ui::Child directorEntry(Sys::DirEntry const &entry, bool odd) {
         Model::bind<Navigate>(entry.name),
         itemStyle(odd),
         entry.isDir ? Mdi::FOLDER : Mdi::FILE,
-        entry.name);
+        entry.name
+    );
 }
 
 Ui::Child directoryListing(State const &, Sys::Dir const &dir) {
@@ -72,9 +75,8 @@ Ui::Child breadcrumbItem(Str text, isize index) {
         0,
         Layout::Align::CENTER,
         Ui::icon(Mdi::CHEVRON_RIGHT),
-        Ui::button(Model::bind<GoParent>(index),
-                   Ui::ButtonStyle::text().withPadding({2, 0}),
-                   Ui::text(text)));
+        Ui::button(Model::bind<GoParent>(index), Ui::ButtonStyle::text().withPadding({2, 0}), Ui::text(text))
+    );
 }
 
 Mdi::Icon iconForLocation(Str loc) {
@@ -111,7 +113,8 @@ Ui::Child breadcrumbRoot(Mime::Url url) {
             Model::bind<GoRoot>(),
             Ui::ButtonStyle::subtle(),
             iconForLocation(url.host),
-            Io::toTitleCase(url.host).unwrap());
+            Io::toTitleCase(url.host).unwrap()
+        );
     }
 
     if (url.scheme == "device") {
@@ -119,7 +122,8 @@ Ui::Child breadcrumbRoot(Mime::Url url) {
             Model::bind<GoRoot>(),
             Ui::ButtonStyle::subtle(),
             Mdi::HARDDISK,
-            url.host);
+            url.host
+        );
     }
 
     return Ui::button(
@@ -129,7 +133,9 @@ Ui::Child breadcrumbRoot(Mime::Url url) {
             8,
             Layout::Align::CENTER,
             Ui::icon(Mdi::LAPTOP),
-            Ui::text("This Device")));
+            Ui::text("This Device")
+        )
+    );
 }
 
 Ui::Child breadcrumb(State const &state) {
@@ -152,35 +158,41 @@ Ui::Child breadcrumb(State const &state) {
                           .collect<Ui::Children>()) |
                 Ui::hscroll() |
                 Ui::grow(),
-            Ui::button(Model::bind<AddBookmark>(), Ui::ButtonStyle::subtle(), Mdi::BOOKMARK)));
+            Ui::button(Model::bind<AddBookmark>(), Ui::ButtonStyle::subtle(), Mdi::BOOKMARK)
+        )
+    );
 }
 
 Ui::Child goBackTool(State const &state) {
     return Ui::button(
         Model::bindIf<GoBack>(state.canGoBack()),
         Ui::ButtonStyle::subtle(),
-        Mdi::ARROW_LEFT);
+        Mdi::ARROW_LEFT
+    );
 }
 
 Ui::Child goForwardTool(State const &state) {
     return Ui::button(
         Model::bindIf<GoForward>(state.canGoForward()),
         Ui::ButtonStyle::subtle(),
-        Mdi::ARROW_RIGHT);
+        Mdi::ARROW_RIGHT
+    );
 }
 
 Ui::Child goParentTool(State const &state) {
     return Ui::button(
         Model::bindIf<GoParent>(state.canGoParent(), 1),
         Ui::ButtonStyle::subtle(),
-        Mdi::ARROW_UP);
+        Mdi::ARROW_UP
+    );
 }
 
 Ui::Child refreshTool() {
     return Ui::button(
         Model::bind<Refresh>(),
         Ui::ButtonStyle::subtle(),
-        Mdi::REFRESH);
+        Mdi::REFRESH
+    );
 }
 
 Ui::Child toolbar(State const &state) {
@@ -189,7 +201,8 @@ Ui::Child toolbar(State const &state) {
         Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
         Ui::button(Model::bindIf<GoParent>(state.canGoParent(), 1), Ui::ButtonStyle::subtle(), Mdi::ARROW_UP),
         Ui::grow(breadcrumb(state)),
-        Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH));
+        Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH)
+    );
 }
 
 /* ---  Dialogs  ------------------------------------------------------------ */
@@ -210,11 +223,13 @@ Ui::Child openFileDialog() {
 
             auto openBtn = Ui::button(
                 Ui::closeDialog,
-                Ui::ButtonStyle::primary(), "Open");
+                Ui::ButtonStyle::primary(), "Open"
+            );
 
             auto cancelBtn = Ui::button(
                 Ui::closeDialog,
-                Ui::ButtonStyle::subtle(), "Cancel");
+                Ui::ButtonStyle::subtle(), "Cancel"
+            );
 
             auto controls = Ui::spacing(
                 16,
@@ -222,7 +237,9 @@ Ui::Child openFileDialog() {
                     8,
                     Ui::grow(NONE),
                     cancelBtn,
-                    openBtn));
+                    openBtn
+                )
+            );
 
             return Ui::dialogScafold(
                 Layout::Align::FILL,
@@ -236,10 +253,16 @@ Ui::Child openFileDialog() {
                                 : alert(
                                       d,
                                       "Can't access location",
-                                      maybeDir.none().msg()),
-                            Ui::separator())),
-                    controls));
-        });
+                                      maybeDir.none().msg()
+                                  ),
+                            Ui::separator()
+                        )
+                    ),
+                    controls
+                )
+            );
+        }
+    );
 }
 
 } // namespace Hideo::Files

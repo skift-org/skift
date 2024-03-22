@@ -8,7 +8,8 @@ void reduce(State &s, Action a) {
             [&](ToggleShift) {
                 s.shift = !s.shift;
             },
-        });
+        }
+    );
 }
 
 } // namespace Hideo::Keyboard

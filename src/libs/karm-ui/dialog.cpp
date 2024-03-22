@@ -237,7 +237,8 @@ Child dialogScafold(Layout::Align a, Child content, Children actions) {
         vflow(
             8,
             content | grow(),
-            hflow(8, actions)) |
+            hflow(8, actions)
+        ) |
         spacing(16);
 
     return dialogScafold(a, layout);
@@ -247,7 +248,8 @@ Child dialogCloseButton() {
     return button(
         closeDialog,
         ButtonStyle::primary(),
-        "Close");
+        "Close"
+    );
 }
 
 /* --- Dialogs -------------------------------------------------------------- */
@@ -281,8 +283,13 @@ Ui::Child licenseDialog() {
         Ui::vflow(
             8,
             Ui::titleLarge("License"),
-            Ui::bodySmall(LICENSE) | Ui::vscroll() | Ui::maxSize({480, Ui::UNCONSTRAINED}) | Ui::grow()),
-        {Ui::grow(NONE), Ui::dialogCloseButton()});
+            Ui::bodySmall(LICENSE) |
+                Ui::vscroll() |
+                Ui::maxSize({480, Ui::UNCONSTRAINED}) |
+                Ui::grow()
+        ),
+        {Ui::grow(NONE), Ui::dialogCloseButton()}
+    );
 }
 
 Child aboutDialog(Mdi::Icon i, String name) {
@@ -292,20 +299,24 @@ Child aboutDialog(Mdi::Icon i, String name) {
             Layout::Align::CENTER,
             spacing(8, icon(i, 56)),
             titleLarge(name),
-            versionBadge()),
+            versionBadge()
+        ),
         text(
             Ui::TextStyles::bodySmall()
                 .withAlign(Gfx::TextAlign::CENTER)
                 .withColor(Ui::GRAY400),
-            "Copyright © 2018-2024\nThe skiftOS Developers\nAll rights reserved.") |
-            Ui::spacing(16));
+            "Copyright © 2018-2024\nThe skiftOS Developers\nAll rights reserved."
+        ) |
+            Ui::spacing(16)
+    );
 
     Children actions = {
         button(
             [](auto &n) {
                 showDialog(n, licenseDialog());
             },
-            ButtonStyle::subtle(), Mdi::LICENSE, "License"),
+            ButtonStyle::subtle(), Mdi::LICENSE, "License"
+        ),
         grow(NONE),
         dialogCloseButton(),
     };
@@ -313,7 +324,8 @@ Child aboutDialog(Mdi::Icon i, String name) {
     return dialogScafold(
         Layout::Align::CENTER | Layout::Align::CLAMP,
         content | minSize({280, Ui::UNCONSTRAINED}),
-        actions);
+        actions
+    );
 }
 
 void showAboutDialog(Node &n, Mdi::Icon icon, String name) {
@@ -327,13 +339,15 @@ Child msgDialog(String title, String msg) {
         grow(NONE),
         button(
             closeDialog,
-            ButtonStyle::primary(), "Ok"),
+            ButtonStyle::primary(), "Ok"
+        ),
     };
 
     return dialogScafold(
         Layout::Align::CENTER,
         vflow(16, titleLbl, msgLbl),
-        actions);
+        actions
+    );
 }
 
 void showMsgDialog(Node &n, String title, String msg) {

@@ -35,7 +35,8 @@ struct Union {
             _index, other._buf,
             [this]<typename T>(T const &ptr) {
                 new (_buf) T(ptr);
-            });
+            }
+        );
     }
 
     always_inline Union(Union &&other)

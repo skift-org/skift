@@ -36,7 +36,8 @@ struct HsvPicker : public Ui::View<HsvPicker> {
     Math::Vec2i coordinates(Gfx::Hsv hsv) {
         return Math::Vec2i(
             bound().x + (hsv.saturation * bound().width),
-            bound().y + ((1 - hsv.value) * bound().height));
+            bound().y + ((1 - hsv.value) * bound().height)
+        );
     }
 
     void paint(Gfx::Context &g, Math::Recti) override {
@@ -118,7 +119,8 @@ Ui::Child valueSlider(State const &state) {
         Gfx::Gradient::hlinear()
             .withColors(
                 Gfx::hsvToRgb(hsv.withValue(0)),
-                Gfx::hsvToRgb(hsv.withValue(1)))
+                Gfx::hsvToRgb(hsv.withValue(1))
+            )
             .bake();
 
     return sliderThumb(Gfx::hsvToRgb(hsv)) |
@@ -144,11 +146,14 @@ Ui::Child saturationSlider(State const &state) {
                 Gfx::hsvToRgb(
                     hsv
                         .withValue(1)
-                        .withSaturation(0)),
+                        .withSaturation(0)
+                ),
                 Gfx::hsvToRgb(
                     hsv
                         .withValue(1)
-                        .withSaturation(1)))
+                        .withSaturation(1)
+                )
+            )
             .bake();
 
     return sliderThumb(Gfx::hsvToRgb(hsv.withValue(1))) |
@@ -189,7 +194,8 @@ Ui::Child hsvSliders(State const &state) {
         8,
         hueSlider(state),
         saturationSlider(state),
-        valueSlider(state));
+        valueSlider(state)
+    );
 }
 
 Gfx::Color pickColor(Gfx::Color c) {
@@ -218,7 +224,8 @@ Ui::Child colorCell(State const &state, Gfx::Color c) {
         style,
         state.hsv == hsv
             ? Ui::icon(Mdi::CHECK, 32, foreground) | Ui::center() | Ui::bound()
-            : Ui::empty(32));
+            : Ui::empty(32)
+    );
 }
 
 Ui::Child colorRamp(State const &state, Gfx::ColorRamp ramp) {
@@ -228,7 +235,8 @@ Ui::Child colorRamp(State const &state, Gfx::ColorRamp ramp) {
             .map([=](Gfx::Color c) {
                 return colorCell(state, c) | Ui::grow();
             })
-            .collect<Ui::Children>());
+            .collect<Ui::Children>()
+    );
 }
 
 Ui::Child colorRamps(State const &state) {
@@ -238,7 +246,8 @@ Ui::Child colorRamps(State const &state) {
                    .map([=](auto ramp) {
                        return colorRamp(state, ramp);
                    })
-                   .collect<Ui::Children>()) |
+                   .collect<Ui::Children>()
+           ) |
            Ui::spacing({0, 0, 0, 8}) |
            Ui::vscroll() |
            Ui::maxSize({Ui::UNCONSTRAINED, 256});
@@ -267,16 +276,20 @@ Ui::Child app() {
                 Ui::button(
                     Ui::NOP,
                     Ui::ButtonStyle::subtle(),
-                    Mdi::CONTENT_COPY),
+                    Mdi::CONTENT_COPY
+                ),
                 Ui::grow(NONE),
                 Ui::button(
                     Model::bind(UpdatePage{Page::HSV}),
                     (state.page == Page::HSV) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
-                    Mdi::TUNE_VARIANT),
+                    Mdi::TUNE_VARIANT
+                ),
                 Ui::button(
                     Model::bind(UpdatePage{Page::PALLETE}),
                     (state.page == Page::PALLETE) ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
-                    Mdi::PALETTE_SWATCH));
+                    Mdi::PALETTE_SWATCH
+                )
+            );
 
             return Ui::vflow(
                        8,
@@ -285,9 +298,11 @@ Ui::Child app() {
                        Ui::titleMedium("Values") | Ui::spacing({2, 8, 0, 0}),
                        hsvSliders(state),
                        Ui::titleMedium("Palettes") | Ui::spacing({2, 8, 0, 0}),
-                       colorRamps(state) | Ui::grow()) |
+                       colorRamps(state) | Ui::grow()
+                   ) |
                    Ui::spacing({8, 8, 8, 0}) | Ui::grow();
-        });
+        }
+    );
 }
 
 } // namespace Hideo::Colors

@@ -28,7 +28,10 @@ static inline Child errorScope(Str what, auto callback) {
             vflow(
                 4,
                 text(TextStyles::titleMedium().withColor(Gfx::WHITE), "Can't display {}", what),
-                text(Io::toSentenceCase(child.none().msg()).unwrap()))));
+                text(Io::toSentenceCase(child.none().msg()).unwrap())
+            )
+        )
+    );
 }
 
 } // namespace Karm::Ui

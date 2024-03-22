@@ -60,7 +60,8 @@ MAKE_COLOR_RAMP(ROSE, 0xfff1f2, 0xffe4e6, 0xfecdd3, 0xfda4af, 0xfb7185, 0xf43f5e
     YELLOW_RAMP, LIME_RAMP, GREEN_RAMP, EMERALD_RAMP,
     TEAL_RAMP, CYAN_RAMP, SKY_RAMP, BLUE_RAMP,
     INDIGO_RAMP, VIOLET_RAMP, PURPLE_RAMP, FUCHSIA_RAMP,
-    PINK_RAMP, ROSE_RAMP};
+    PINK_RAMP, ROSE_RAMP
+};
 
 [[gnu::used]] static constexpr Array<Color, 22> COLORS = {
     SLATE, GRAY, ZINC, NEUTRAL,
@@ -68,7 +69,8 @@ MAKE_COLOR_RAMP(ROSE, 0xfff1f2, 0xffe4e6, 0xfecdd3, 0xfda4af, 0xfb7185, 0xf43f5e
     YELLOW, LIME, GREEN, EMERALD,
     TEAL, CYAN, SKY, BLUE,
     INDIGO, VIOLET, PURPLE, FUCHSIA,
-    PINK, ROSE};
+    PINK, ROSE
+};
 
 inline Color randomColor(Math::Rand &rand) {
     return COLORS[rand.nextInt(COLORS.len())];

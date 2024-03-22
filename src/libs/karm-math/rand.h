@@ -82,8 +82,10 @@ struct Rand {
 
     template <typename T>
     Vec2<T> nextVec2(Rect<T> bound) {
-        return Vec2<T>(nextDouble(bound.start(), bound.end()),
-                       nextDouble(bound.top(), bound.bottom()));
+        return Vec2<T>(
+            nextDouble(bound.start(), bound.end()),
+            nextDouble(bound.top(), bound.bottom())
+        );
     }
 
     template <typename T>

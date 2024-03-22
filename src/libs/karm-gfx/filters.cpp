@@ -149,7 +149,8 @@ void ContrastFilter::apply(MutPixels p) const {
                 clamp(factor * (color.red - 128) + 128, 0, 255),
                 clamp(factor * (color.green - 128) + 128, 0, 255),
                 clamp(factor * (color.blue - 128) + 128, 0, 255),
-                color.alpha);
+                color.alpha
+            );
 
             p.store({b.x + x, b.y + y}, color);
         }
@@ -167,7 +168,8 @@ void BrightnessFilter::apply(MutPixels p) const {
                 min(color.red * amount, 255),
                 min(color.green * amount, 255),
                 min(color.blue * amount, 255),
-                color.alpha);
+                color.alpha
+            );
 
             p.store({b.x + x, b.y + y}, color);
         }
@@ -185,7 +187,8 @@ void NoiseFilter::apply(MutPixels p) const {
 
             p.blend(
                 {b.x + x, b.y + y},
-                Color::fromRgba(noise, noise, noise, alpha));
+                Color::fromRgba(noise, noise, noise, alpha)
+            );
         }
     }
 }
@@ -201,7 +204,8 @@ void SepiaFilter::apply(MutPixels p) const {
                 min((color.red * 0.393) + (color.green * 0.769) + (color.blue * 0.189), 255u),
                 min((color.red * 0.349) + (color.green * 0.686) + (color.blue * 0.168), 255u),
                 min((color.red * 0.272) + (color.green * 0.534) + (color.blue * 0.131), 255u),
-                color.alpha);
+                color.alpha
+            );
 
             p.store({b.x + x, b.y + y}, color.lerpWith(sepiaColor, amount));
         }
@@ -219,7 +223,8 @@ void TintFilter::apply(MutPixels p) const {
                 (color.red * amount.red) / 255,
                 (color.green * amount.green) / 255,
                 (color.blue * amount.blue) / 255,
-                (color.alpha * amount.alpha) / 255);
+                (color.alpha * amount.alpha) / 255
+            );
 
             p.store({b.x + x, b.y + y}, tintColor);
         }
@@ -233,7 +238,8 @@ void OverlayFilter::apply(MutPixels p) const {
         for (isize x = 0; x < b.width; x++) {
             p.blend(
                 {b.x + x, b.y + y},
-                amount);
+                amount
+            );
         }
     }
 }

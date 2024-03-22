@@ -25,7 +25,8 @@ static inline Demo SVG_DEMO{
 
                 g.strokeStyle(Gfx::stroke(Gfx::BLUE).withWidth(1).withAlign(Gfx::OUTSIDE_ALIGN));
                 g.stroke();
-            });
+            }
+        );
     },
 };
 

@@ -13,7 +13,8 @@ Ui::Child card(Ui::Child child) {
             .borderRadius = 4,
             .backgroundPaint = Ui::GRAY900,
         },
-        child);
+        child
+    );
 }
 
 Ui::Child card(Ui::Children children) {
@@ -39,7 +40,8 @@ Ui::Child row(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui
                  ? Ui::vflow(
                        8,
                        Ui::labelLarge(title),
-                       Ui::labelMedium(*subtitle))
+                       Ui::labelMedium(*subtitle)
+                   )
                  : Ui::labelLarge(title);
 
     auto trail = trailing
@@ -58,7 +60,10 @@ Ui::Child row(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui
                 Layout::Align::VCENTER | Layout::Align::HFILL,
                 lead,
                 t | Ui::grow(),
-                trail)));
+                trail
+            )
+        )
+    );
 }
 
 Ui::Child titleRow(String t) {
@@ -74,7 +79,9 @@ Ui::Child pressableRow(Ui::OnPress onPress, Opt<Ui::Child> leading, String title
             leading,
             title,
             subtitle,
-            trailing));
+            trailing
+        )
+    );
 }
 
 Ui::Child buttonRow(Ui::OnPress onPress, Mdi::Icon i, String title, String subtitle) {
@@ -85,7 +92,9 @@ Ui::Child buttonRow(Ui::OnPress onPress, Mdi::Icon i, String title, String subti
             Ui::icon(i, 24),
             title,
             subtitle,
-            NONE));
+            NONE
+        )
+    );
 }
 
 Ui::Child buttonRow(Ui::OnPress onPress, String title, String text) {
@@ -93,7 +102,8 @@ Ui::Child buttonRow(Ui::OnPress onPress, String title, String text) {
         NONE,
         title,
         NONE,
-        button(std::move(onPress), Ui::ButtonStyle::primary(), text));
+        button(std::move(onPress), Ui::ButtonStyle::primary(), text)
+    );
 }
 
 Ui::Child toggleRow(bool value, Ui::OnChange<bool> onChange, String title) {
@@ -101,7 +111,8 @@ Ui::Child toggleRow(bool value, Ui::OnChange<bool> onChange, String title) {
         NONE,
         title,
         NONE,
-        toggle(value, std::move(onChange)));
+        toggle(value, std::move(onChange))
+    );
 }
 
 Ui::Child checkboxRow(bool value, Ui::OnChange<bool> onChange, String title) {
@@ -109,7 +120,8 @@ Ui::Child checkboxRow(bool value, Ui::OnChange<bool> onChange, String title) {
         NONE,
         title,
         NONE,
-        checkbox(value, std::move(onChange)));
+        checkbox(value, std::move(onChange))
+    );
 }
 
 Ui::Child radioRow(bool value, Ui::OnChange<bool> onChange, String title) {
@@ -117,7 +129,8 @@ Ui::Child radioRow(bool value, Ui::OnChange<bool> onChange, String title) {
         radio(value, std::move(onChange)),
         title,
         NONE,
-        NONE);
+        NONE
+    );
 }
 
 Ui::Child sliderRow(f64 value, Ui::OnChange<f64> onChange, String title) {
@@ -125,7 +138,8 @@ Ui::Child sliderRow(f64 value, Ui::OnChange<f64> onChange, String title) {
         NONE,
         title,
         NONE,
-        Hideo::slider(value, std::move(onChange), Mdi::DRAG_VERTICAL_VARIANT) | Ui::minSize({128, Ui::UNCONSTRAINED}));
+        Hideo::slider(value, std::move(onChange), Mdi::DRAG_VERTICAL_VARIANT) | Ui::minSize({128, Ui::UNCONSTRAINED})
+    );
 }
 
 Ui::Child colorRow(Gfx::Color c, Ui::OnChange<Gfx::Color> onChange, String title) {
@@ -133,7 +147,8 @@ Ui::Child colorRow(Gfx::Color c, Ui::OnChange<Gfx::Color> onChange, String title
         NONE,
         title,
         NONE,
-        color(c, std::move(onChange)));
+        color(c, std::move(onChange))
+    );
 }
 
 Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui::Slot child) {
@@ -145,12 +160,15 @@ Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui:
                 leading(),
                 title,
                 subtitle,
-                Ui::icon(state ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 24)),
+                Ui::icon(state ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 24)
+            ),
             state ? spacing(
                         {38, 0, 0, 0},
-                        child()) |
+                        child()
+                    ) |
                         slideIn(Ui::SlideFrom::TOP)
-                  : Ui::empty());
+                  : Ui::empty()
+        );
     });
 }
 

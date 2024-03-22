@@ -31,7 +31,8 @@ Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
             record.name(),
             record.start,
             record.end(),
-            record.size / 1024);
+            record.size / 1024
+        );
 
         if (record.tag == Handover::FREE) {
             totalFree += record.size;
@@ -140,7 +141,8 @@ Res<> init(u64 magic, Handover::Payload &payload) {
 HandoverRequests$(
     Handover::requestStack(),
     Handover::requestFb(),
-    Handover::requestFiles());
+    Handover::requestFiles()
+);
 
 void __panicHandler(PanicKind kind, char const *buf) {
     if (kind == PanicKind::PANIC) {

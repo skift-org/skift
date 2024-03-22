@@ -16,7 +16,8 @@ static Ui::Child toolbar() {
                    }) |
                    Ui::center() |
                    Ui::grow(),
-               Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::COG_OUTLINE)) |
+               Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::COG_OUTLINE)
+           ) |
            Ui::dragRegion();
 }
 
@@ -36,7 +37,8 @@ static Ui::Child keyboard(State const &k) {
         key(k.shift ? "U" : "u"),
         key(k.shift ? "I" : "i"),
         key(k.shift ? "O" : "o"),
-        key(k.shift ? "P" : "p"));
+        key(k.shift ? "P" : "p")
+    );
 
     auto secondRow = Ui::hflow(
         8,
@@ -50,7 +52,8 @@ static Ui::Child keyboard(State const &k) {
         key(k.shift ? "J" : "j"),
         key(k.shift ? "K" : "k"),
         key(k.shift ? "L" : "l"),
-        Ui::grow(NONE));
+        Ui::grow(NONE)
+    );
 
     auto thirdRow = Ui::hflow(
         8,
@@ -62,7 +65,8 @@ static Ui::Child keyboard(State const &k) {
         key(k.shift ? "B" : "b"),
         key(k.shift ? "N" : "n"),
         key(k.shift ? "M" : "m"),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::secondary(), Mdi::BACKSPACE_OUTLINE) | Ui::grow());
+        Ui::button(Ui::NOP, Ui::ButtonStyle::secondary(), Mdi::BACKSPACE_OUTLINE) | Ui::grow()
+    );
 
     auto fourthRow = Ui::hflow(
                          8,
@@ -70,7 +74,8 @@ static Ui::Child keyboard(State const &k) {
                          key(","),
                          Ui::button(Ui::NOP, Ui::empty()) | Ui::grow(6),
                          key("."),
-                         Ui::button(Ui::NOP, Ui::ButtonStyle::primary(), Mdi::KEYBOARD_RETURN) | Ui::grow(2)) |
+                         Ui::button(Ui::NOP, Ui::ButtonStyle::primary(), Mdi::KEYBOARD_RETURN) | Ui::grow(2)
+                     ) |
                      Ui::grow();
 
     return Ui::vflow(
@@ -78,7 +83,8 @@ static Ui::Child keyboard(State const &k) {
         firstRow | Ui::hcenterFill() | Ui::grow(),
         secondRow | Ui::grow(),
         thirdRow | Ui::grow(),
-        fourthRow | Ui::grow());
+        fourthRow | Ui::grow()
+    );
 }
 
 Ui::Child flyout() {
@@ -88,19 +94,22 @@ Ui::Child flyout() {
                    Ui::vflow(
                        8,
                        toolbar(),
-                       keyboard(k) | Ui::grow()) |
+                       keyboard(k) | Ui::grow()
+                   ) |
                        Ui::hcenterFill() |
                        Ui::minSize({Ui::UNCONSTRAINED, 280}) |
                        Ui::box({
                            .padding = 8,
                            .backgroundPaint = Ui::GRAY950,
-                       })) |
+                       })
+               ) |
                Ui::align(Layout::Align::HSTRETCH | Layout::Align::BOTTOM) |
                Ui::slideIn(Ui::SlideFrom::BOTTOM) |
                Ui::dismisable(
                    Ui::closeDialog,
                    Ui::DismisDir::DOWN,
-                   0.15);
+                   0.15
+               );
     });
 }
 

@@ -77,7 +77,8 @@ Res<Sys::_Accepted> Fd::accept() {
 
     return Ok<Sys::_Accepted>(
         makeStrong<Fd>(fd),
-        Posix::fromSockAddr(addr_));
+        Posix::fromSockAddr(addr_)
+    );
 }
 
 Res<Sys::Stat> Fd::stat() {
@@ -112,7 +113,8 @@ Res<Sys::_Received> Fd::recv(MutBytes bytes, MutSlice<Sys::Handle>) {
     return Ok<Sys::_Received>(
         static_cast<usize>(result),
         0,
-        Posix::fromSockAddr(addr_));
+        Posix::fromSockAddr(addr_)
+    );
 }
 
 } // namespace Posix

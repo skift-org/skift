@@ -345,27 +345,35 @@ void Path::rect(Math::Rectf rect, BorderRadius radius) {
 
         // Top edge
         lineTo({rect.x + rect.width - radius.topRight, rect.y});
-        cubicTo({rect.x + rect.width - cpTopRight, rect.y},
-                {rect.x + rect.width, rect.y + cpTopRight},
-                {rect.x + rect.width, rect.y + radius.topRight});
+        cubicTo(
+            {rect.x + rect.width - cpTopRight, rect.y},
+            {rect.x + rect.width, rect.y + cpTopRight},
+            {rect.x + rect.width, rect.y + radius.topRight}
+        );
 
         // Right edge
         lineTo({rect.x + rect.width, rect.y + rect.height - radius.bottomRight});
-        cubicTo({rect.x + rect.width, rect.y + rect.height - cpBottomRight},
-                {rect.x + rect.width - cpBottomRight, rect.y + rect.height},
-                {rect.x + rect.width - radius.bottomRight, rect.y + rect.height});
+        cubicTo(
+            {rect.x + rect.width, rect.y + rect.height - cpBottomRight},
+            {rect.x + rect.width - cpBottomRight, rect.y + rect.height},
+            {rect.x + rect.width - radius.bottomRight, rect.y + rect.height}
+        );
 
         // Bottom edge
         lineTo({rect.x + radius.bottomLeft, rect.y + rect.height});
-        cubicTo({rect.x + cpBottomLeft, rect.y + rect.height},
-                {rect.x, rect.y + rect.height - cpBottomLeft},
-                {rect.x, rect.y + rect.height - radius.bottomLeft});
+        cubicTo(
+            {rect.x + cpBottomLeft, rect.y + rect.height},
+            {rect.x, rect.y + rect.height - cpBottomLeft},
+            {rect.x, rect.y + rect.height - radius.bottomLeft}
+        );
 
         // Left edge
         lineTo({rect.x, rect.y + radius.topLeft});
-        cubicTo({rect.x, rect.y + cpTopLeft},
-                {rect.x + cpTopLeft, rect.y},
-                {rect.x + radius.topLeft, rect.y});
+        cubicTo(
+            {rect.x, rect.y + cpTopLeft},
+            {rect.x + cpTopLeft, rect.y},
+            {rect.x + radius.topLeft, rect.y}
+        );
 
         close();
     }

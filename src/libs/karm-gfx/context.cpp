@@ -171,8 +171,10 @@ void Context::clear(Math::Recti rect, Color color) {
 
 /* --- Blitting ------------------------------------------------------------- */
 
-[[gnu::flatten]] void Context::_blit(Pixels src, Math::Recti srcRect, auto srcFmt,
-                                     MutPixels dest, Math::Recti destRect, auto destFmt) {
+[[gnu::flatten]] void Context::_blit(
+    Pixels src, Math::Recti srcRect, auto srcFmt,
+    MutPixels dest, Math::Recti destRect, auto destFmt
+) {
 
     destRect = applyOrigin(destRect);
     auto clipDest = applyClip(destRect);

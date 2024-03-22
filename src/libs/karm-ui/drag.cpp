@@ -85,12 +85,14 @@ struct Dismisable :
                 d.x = clamp(
                     d.x,
                     (bool)(_dir & DismisDir::LEFT) ? -bound().width : 0,
-                    (bool)(_dir & DismisDir::RIGHT) ? bound().width : 0);
+                    (bool)(_dir & DismisDir::RIGHT) ? bound().width : 0
+                );
 
                 d.y = clamp(
                     d.y,
                     (bool)(_dir & DismisDir::TOP) ? -bound().height : 0,
-                    (bool)(_dir & DismisDir::DOWN) ? bound().height : 0);
+                    (bool)(_dir & DismisDir::DOWN) ? bound().height : 0
+                );
 
                 _drag.set(*this, d);
             } else if (de->type == DragEvent::END) {

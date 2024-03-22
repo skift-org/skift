@@ -34,7 +34,9 @@ Ui::Child keypad(State const &state) {
                     Ui::button(Model::bindIf<MemRecallAction>(state.hasMem), Ui::ButtonStyle::subtle(), "MR"),
                     Ui::button(Model::bind<MemAddAction>(), Ui::ButtonStyle::subtle(), "M+"),
                     Ui::button(Model::bind<MemSubAction>(), Ui::ButtonStyle::subtle(), "M-"),
-                    Ui::button(Model::bind<MemStoreAction>(), Ui::ButtonStyle::subtle(), "MS"))),
+                    Ui::button(Model::bind<MemStoreAction>(), Ui::ButtonStyle::subtle(), "MS")
+                )
+            ),
 
             textButton(Model::bind<ClearAllAction>(), Ui::ButtonStyle::secondary(), "CE"),
             textButton(Model::bind<ClearAction>(), Ui::ButtonStyle::secondary(), "C"),
@@ -64,7 +66,9 @@ Ui::Child keypad(State const &state) {
             textButton(Model::bind(Operator::INVERT_SIGN), "+/-"),
             textButton(Model::bind<Number>(0), "0"),
             Ui::button(Model::bind<EnterDecimalAction>(), Mdi::CIRCLE_SMALL),
-            Ui::button(Model::bind<EqualAction>(), Ui::ButtonStyle::primary(), Mdi::EQUAL)));
+            Ui::button(Model::bind<EqualAction>(), Ui::ButtonStyle::primary(), Mdi::EQUAL)
+        )
+    );
 }
 
 Ui::Child screen(State const &state) {
@@ -90,7 +94,8 @@ Ui::Child app() {
             .titlebar = Ui::TitlebarStyle::DIALOG,
             .body = slot$(Ui::vflow(
                 screen(state) | Ui::dragRegion(),
-                keypad(state) | Ui::grow())),
+                keypad(state) | Ui::grow()
+            )),
             .size = {300, 332},
         });
     });

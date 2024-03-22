@@ -13,19 +13,22 @@ Ui::Child app() {
         .titlebar = Ui::TitlebarStyle::DIALOG,
         .body = [] {
             auto titleText = Ui::headlineMedium(
-                "skiftOS");
+                "skiftOS"
+            );
 
             auto bodyText = Ui::bodySmall(
                 "Copyright © 2018-2024\n"
                 "The skiftOS Developers\n"
-                "All rights reserved.");
+                "All rights reserved."
+            );
 
             auto inspireMe = Ui::state(Sys::now().val(), [](auto v, auto bind) {
                 auto body = Ui::hflow(
                     8,
                     Layout::Align::CENTER,
                     Ui::image(Media::loadImage("bundle://hideo-about/pride.qoi"_url).unwrap(), 4),
-                    Ui::bodySmall(wholesome(v)));
+                    Ui::bodySmall(wholesome(v))
+                );
 
                 return body |
                        Ui::spacing({12, 6, 16, 6}) |
@@ -39,21 +42,25 @@ Ui::Child app() {
                 },
                 Ui::ButtonStyle::outline(),
                 Mdi::LICENSE,
-                "License");
+                "License"
+            );
 
             return Ui::vflow(
                        8,
                        Ui::hflow(
                            8,
                            titleText,
-                           Ui::versionBadge() | Ui::center()),
+                           Ui::versionBadge() | Ui::center()
+                       ),
                        Ui::empty(),
                        bodyText,
                        Ui::grow(NONE),
                        Ui::hflow(
                            8,
                            inspireMe | Ui::vcenter() | Ui::grow(),
-                           licenseBtn)) |
+                           licenseBtn
+                       )
+                   ) |
                    Ui::spacing(16);
         },
         .size = {460, 320},

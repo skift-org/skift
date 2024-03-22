@@ -49,7 +49,8 @@ struct SlideIn : public ProxyNode<SlideIn> {
         if (_slide.needRepaint(*this, e)) {
             auto repaintBound =
                 bound().clipTo(
-                    child().bound().offset(translation()));
+                    child().bound().offset(translation())
+                );
 
             Ui::shouldRepaint(*this, repaintBound);
         }

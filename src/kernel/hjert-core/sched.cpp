@@ -52,8 +52,7 @@ void Sched::schedule(TimeSpan span) {
         if (state == State::EXITED) {
             logInfo("{}: exited", *t);
             _tasks.removeAt(i--);
-        } else if (state == State::RUNNABLE and
-                   t->_sliceEnd <= next->_sliceEnd) {
+        } else if (state == State::RUNNABLE and t->_sliceEnd <= next->_sliceEnd) {
             next = t;
         }
     }

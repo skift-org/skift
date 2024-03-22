@@ -72,7 +72,8 @@ Res<> stringify(Io::Emit &emit, Value const &v) {
                 emit(b ? "true" : "false");
                 return Ok();
             },
-        });
+        }
+    );
 }
 
 Res<String> stringify(Value const &v) {

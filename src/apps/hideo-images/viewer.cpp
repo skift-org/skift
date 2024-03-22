@@ -10,7 +10,8 @@ Ui::Child viewer(State const &state) {
     return Ui::vflow(
         viewerToolbar(state),
         viewerPreview(state) | Ui::grow(),
-        viewerControls(state));
+        viewerControls(state)
+    );
 }
 
 Ui::Child viewerPreview(State const &state) {
@@ -37,13 +38,16 @@ Ui::Child viewerToolbar(State const &state) {
             Model::bindIf<ToggleEditor>(state.image.has()),
             Ui::ButtonStyle::subtle(),
             Mdi::Icon::PENCIL,
-            "Edit"));
+            "Edit"
+        )
+    );
 }
 
 Ui::Child viewerControls(State const &) {
     return Ui::hflow(
                Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::Icon::ARROW_LEFT),
-               Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::Icon::ARROW_RIGHT)) |
+               Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::Icon::ARROW_RIGHT)
+           ) |
            Ui::spacing({0, 0, 0, 8}) |
            Ui::center();
 }

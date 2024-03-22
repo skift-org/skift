@@ -11,7 +11,8 @@ void reduce(State &s, Action a) {
         },
         [&](TimeTick) {
             s.dateTime = Sys::dateTime();
-        }});
+        }
+    });
 }
 
 } // namespace Hideo::Clock

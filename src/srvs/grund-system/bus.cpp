@@ -82,12 +82,14 @@ Res<Strong<Unit>> Unit::load(Sys::Ctx &ctx, Mime::Url url) {
             handoverVrange.start,
             inCap.slot(),
             outCap.slot(),
-        }));
+        }
+    ));
 
     return Ok(makeStrong<Unit>(
         std::move(task),
         std::move(in),
-        std::move(out)));
+        std::move(out)
+    ));
 }
 
 } // namespace Grund::System

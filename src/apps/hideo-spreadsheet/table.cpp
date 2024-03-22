@@ -61,8 +61,7 @@ struct Table : public Ui::View<Table> {
                     if (cell) {
                         Model::bubble(*this, UpdateSelection{Range{*cell}});
                     }
-                } else if (m.type == Events::MouseEvent::MOVE and
-                           (m.buttons & Events::Button::LEFT) == Events::Button::LEFT) {
+                } else if (m.type == Events::MouseEvent::MOVE and (m.buttons & Events::Button::LEFT) == Events::Button::LEFT) {
                     auto cell = sheet().cellAt(pos - Math::Vec2i{CELL_WIDTH, CELL_HEIGHT});
                     if (cell) {
                         auto sel = *_state->selection;

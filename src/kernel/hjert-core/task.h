@@ -37,14 +37,17 @@ struct Task :
     static Res<Strong<Task>> create(
         Mode mode,
         Opt<Strong<Space>> space = NONE,
-        Opt<Strong<Domain>> domain = NONE);
+        Opt<Strong<Domain>> domain = NONE
+    );
 
     static Task &self();
 
-    Task(Mode mode,
-         Stack stack,
-         Opt<Strong<Space>> space,
-         Opt<Strong<Domain>> domain);
+    Task(
+        Mode mode,
+        Stack stack,
+        Opt<Strong<Space>> space,
+        Opt<Strong<Domain>> domain
+    );
 
     Stack &stack() { return _stack; }
 

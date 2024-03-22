@@ -13,7 +13,8 @@ Ui::Child editor(State const &state) {
     return Ui::vflow(
         editorToolbar(state),
         editorPreview(state) | Ui::grow(),
-        editorControls(state));
+        editorControls(state)
+    );
 }
 
 Ui::Child editorPreview(State const &state) {
@@ -31,19 +32,23 @@ Ui::Child editorToolbar(State const &) {
             Model::bind<ToggleEditor>(),
             Ui::ButtonStyle::subtle(),
             Mdi::Icon::CANCEL,
-            "Cancel"),
+            "Cancel"
+        ),
 
         Ui::button(
             Model::bind<SaveImage>(),
             Ui::ButtonStyle::primary(),
             Mdi::Icon::FLOPPY,
-            "Save Changes"));
+            "Save Changes"
+        )
+    );
 }
 
 Ui::Child editorFilterTile(Ui::OnPress onPress, Ui::ButtonStyle style, Mdi::Icon icon, String text) {
     return Ui::vflow(
                Ui::icon(icon, 36) | Ui::center() | Ui::grow(),
-               Ui::text(text) | Ui::center()) |
+               Ui::text(text) | Ui::center()
+           ) |
            Ui::spacing(8) |
            Ui::bound() |
            Ui::minSize({96, 72}) |
@@ -112,8 +117,10 @@ Ui::Child editorFilterControls(Gfx::Filter const &filter) {
                 [](auto &n, auto v) {
                     Model::bubble(n, SetFilter{T{v}});
                 },
-                Mdi::DRAG_VERTICAL_VARIANT);
-        }});
+                Mdi::DRAG_VERTICAL_VARIANT
+            );
+        }
+    });
 }
 
 Ui::Child editorFilters(State const &s) {
@@ -126,7 +133,9 @@ Ui::Child editorFilters(State const &s) {
                 },
                 s.filter.is<T>() ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
                 editorFilterIcon<T>(),
-                Io::toTitleCase(T::NAME).unwrap()));
+                Io::toTitleCase(T::NAME).unwrap()
+            )
+        );
     });
 
     return Ui::hflow(8, tiles);
@@ -138,7 +147,8 @@ Ui::Child editorControls(State const &state) {
                editorFilterControls(state.filter),
                editorFilters(state) |
                    Ui::spacing({8, 0, 8, 8}) |
-                   Ui::hscroll()) |
+                   Ui::hscroll()
+           ) |
            Ui::slideIn(Ui::SlideFrom::BOTTOM);
 }
 

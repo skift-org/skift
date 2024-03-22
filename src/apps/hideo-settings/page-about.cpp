@@ -17,8 +17,10 @@ Ui::Child userInfos() {
             return Ok(Ui::vflow(
                 Hideo::row(NONE, "Username", NONE, Ui::text(userinfo.name)),
                 Hideo::row(NONE, "Home", NONE, Ui::text(userinfo.home.str())),
-                Hideo::row(NONE, "Shell", NONE, Ui::text(userinfo.shell.str()))));
-        })));
+                Hideo::row(NONE, "Shell", NONE, Ui::text(userinfo.shell.str()))
+            ));
+        }))
+    );
 }
 
 Ui::Child sysInfos() {
@@ -32,8 +34,10 @@ Ui::Child sysInfos() {
                 Hideo::row(NONE, "System", NONE, Ui::text(sysinfo.sysName)),
                 Hideo::row(NONE, "System Version", NONE, Ui::text(sysinfo.sysVersion)),
                 Hideo::row(NONE, "Kernel", NONE, Ui::text(sysinfo.kernelName)),
-                Hideo::row(NONE, "Kernel Version", NONE, Ui::text(sysinfo.kernelVersion))));
-        })));
+                Hideo::row(NONE, "Kernel Version", NONE, Ui::text(sysinfo.kernelVersion))
+            ));
+        }))
+    );
 }
 
 Ui::Child memInfos() {
@@ -45,8 +49,10 @@ Ui::Child memInfos() {
             auto meminfo = try$(Sys::meminfo());
             return Ok(vflow(
                 Hideo::row(NONE, "Physical", NONE, Ui::text("{}bytes", meminfo.physicalUsed)),
-                Hideo::row(NONE, "Swap", NONE, Ui::text("{}bytes", meminfo.swapUsed))));
-        })));
+                Hideo::row(NONE, "Swap", NONE, Ui::text("{}bytes", meminfo.swapUsed))
+            ));
+        }))
+    );
 }
 
 Ui::Child cpuInfos() {
@@ -64,11 +70,13 @@ Ui::Child cpuInfos() {
                     NONE,
                     "CPU",
                     NONE,
-                    Ui::text("{} {} {} MHz", cpu.name, cpu.brand, cpu.freq)));
+                    Ui::text("{} {} {} MHz", cpu.name, cpu.brand, cpu.freq)
+                ));
             }
 
             return Ok(Ui::vflow(children));
-        })));
+        }))
+    );
 }
 
 Ui::Child pageAbout(State const &) {
@@ -78,7 +86,8 @@ Ui::Child pageAbout(State const &) {
                userInfos() | Hideo::card(),
                sysInfos() | Hideo::card(),
                memInfos() | Hideo::card(),
-               cpuInfos() | Hideo::card()) |
+               cpuInfos() | Hideo::card()
+           ) |
            pageScafold;
 }
 

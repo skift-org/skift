@@ -37,7 +37,8 @@ Res<Hj::Msg> Parcel::toMsg(Domain &dom) {
                     msg.storeCap(i, try$(dom.add(Hj::ROOT, obj)));
                     return Ok();
                 },
-            }));
+            }
+        ));
     }
 
     return Ok(msg);
@@ -74,7 +75,8 @@ Res<> Channel::_ensureOpen() {
 void Channel::_updateSignalsUnlock() {
     _signalUnlock(
         _closed ? Hj::Sigs::CLOSED : Hj::Sigs::NONE,
-        _closed ? Hj::Sigs::NONE : Hj::Sigs::CLOSED);
+        _closed ? Hj::Sigs::NONE : Hj::Sigs::CLOSED
+    );
 }
 
 Res<> Channel::send(Domain &dom, Hj::Msg msg) {

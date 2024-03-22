@@ -18,7 +18,8 @@ void reduce(State &s, Action a) {
             [&](auto &) {
                 debug("Unhandled action");
             },
-        });
+        }
+    );
 
     s.activeSheet().recompute();
 }

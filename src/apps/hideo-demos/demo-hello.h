@@ -16,7 +16,8 @@ static inline Demo HELLO_DEMO{
                    16,
                    Layout::Align::CENTER,
                    Ui::icon(Mdi::Icon::EMOTICON_HAPPY_OUTLINE, 64),
-                   Ui::titleLarge("Hello, world!")) |
+                   Ui::titleLarge("Hello, world!")
+               ) |
                Ui::spacing(16);
     },
 };

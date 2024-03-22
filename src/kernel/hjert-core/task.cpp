@@ -10,7 +10,8 @@ namespace Hjert::Core {
 Res<Strong<Task>> Task::create(
     Mode mode,
     Opt<Strong<Space>> space,
-    Opt<Strong<Domain>> domain) {
+    Opt<Strong<Domain>> domain
+) {
 
     logInfo("task: creating task...");
     auto stack = try$(Stack::create());
@@ -22,10 +23,12 @@ Task &Task::self() {
     return *Sched::instance()._curr;
 }
 
-Task::Task(Mode mode,
-           Stack stack,
-           Opt<Strong<Space>> space,
-           Opt<Strong<Domain>> domain)
+Task::Task(
+    Mode mode,
+    Stack stack,
+    Opt<Strong<Space>> space,
+    Opt<Strong<Domain>> domain
+)
     : _mode(mode),
       _stack(std::move(stack)),
       _space(space),
@@ -68,8 +71,10 @@ Res<> Task::block(Blocker blocker) {
 
 void Task::crash() {
     logError("{}: crashed", *this);
-    signal(Hj::Sigs::EXITED | Hj::Sigs::CRASHED,
-           Hj::Sigs::NONE);
+    signal(
+        Hj::Sigs::EXITED | Hj::Sigs::CRASHED,
+        Hj::Sigs::NONE
+    );
 }
 
 State Task::eval(TimeStamp now) {

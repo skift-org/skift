@@ -22,7 +22,8 @@ static inline Demo INPUTS_DEMO{
     [] {
         auto button = Hideo::buttonRow(
             willShowMessage,
-            "Cool duck app", "Install");
+            "Cool duck app", "Install"
+        );
 
         auto title = Hideo::titleRow("Some Settings");
 
@@ -34,23 +35,18 @@ static inline Demo INPUTS_DEMO{
                 slots$(
                     Hideo::toggleRow(true, NONE, "Some property"),
                     Hideo::toggleRow(true, NONE, "Some property"),
-                    Hideo::toggleRow(true, NONE, "Some property"))),
+                    Hideo::toggleRow(true, NONE, "Some property")
+                )
+            ),
 
             Ui::separator(),
-            Hideo::treeRow(slot$(Ui::icon(Mdi::CHECKBOX_MARKED)), "Checkboxs", NONE,
-                           slots$(
-                               Hideo::checkboxRow(true, NONE, "Some property"),
-                               Hideo::checkboxRow(false, NONE, "Some property"),
-                               Hideo::checkboxRow(false, NONE, "Some property"))),
+            Hideo::treeRow(slot$(Ui::icon(Mdi::CHECKBOX_MARKED)), "Checkboxs", NONE, slots$(Hideo::checkboxRow(true, NONE, "Some property"), Hideo::checkboxRow(false, NONE, "Some property"), Hideo::checkboxRow(false, NONE, "Some property"))),
 
             Ui::separator(),
-            Hideo::treeRow(slot$(Ui::icon(Mdi::RADIOBOX_MARKED)), "Radios", NONE,
-                           slots$(
-                               Hideo::radioRow(true, NONE, "Some property"),
-                               Hideo::radioRow(false, NONE, "Some property"),
-                               Hideo::radioRow(false, NONE, "Some property"))),
+            Hideo::treeRow(slot$(Ui::icon(Mdi::RADIOBOX_MARKED)), "Radios", NONE, slots$(Hideo::radioRow(true, NONE, "Some property"), Hideo::radioRow(false, NONE, "Some property"), Hideo::radioRow(false, NONE, "Some property"))),
             Ui::separator(),
-            Hideo::sliderRow(0.5, NONE, "Some property"));
+            Hideo::sliderRow(0.5, NONE, "Some property")
+        );
 
         return Ui::vflow(8, title, list) |
                Ui::maxSize({420, Ui::UNCONSTRAINED}) |

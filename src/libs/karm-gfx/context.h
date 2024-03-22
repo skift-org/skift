@@ -84,7 +84,8 @@ struct Context {
         auto old = mutPixels();
         auto layer = Media::Image::alloc(
             pixels().size(),
-            pixels().fmt());
+            pixels().fmt()
+        );
 
         _pixels = layer.mutPixels();
         inner(*this);
@@ -185,7 +186,8 @@ struct Context {
 
         MutPixels dest,
         Math::Recti destRect,
-        auto destFmt);
+        auto destFmt
+    );
 
     // Blit the given pixels to the current pixels
     // using the given source and destination rectangles.

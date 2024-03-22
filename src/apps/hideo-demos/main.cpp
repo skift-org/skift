@@ -48,7 +48,8 @@ void reduce(State &s, Action action) {
     action.visit(
         [&](SwitchAction action) {
             s.current = action.index;
-        });
+        }
+    );
 }
 
 using Model = Ui::Model<State, Action, reduce>;
@@ -66,9 +67,11 @@ Ui::Child app() {
                                 index == s.current,
                                 Model::bind<SwitchAction>(index),
                                 demo->icon,
-                                demo->name);
+                                demo->name
+                            );
                         })
-                        .collect<Ui::Children>());
+                        .collect<Ui::Children>()
+                );
             },
             .body = [&] {
                 return DEMOS[s.current]->build();

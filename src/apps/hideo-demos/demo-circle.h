@@ -27,10 +27,12 @@ static inline Demo CIRCLE_DEMO{
 
                     g.strokeStyle(
                         Gfx::stroke(Gfx::randomColor(rand))
-                            .withWidth(rand.nextInt(2, s)));
+                            .withWidth(rand.nextInt(2, s))
+                    );
                     g.stroke();
                 }
-            });
+            }
+        );
     },
 };
 

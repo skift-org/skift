@@ -13,7 +13,8 @@ Ui::Child alert(String title, String body) {
                Layout::Align::CENTER,
                Ui::icon(Mdi::ALERT_DECAGRAM, 48),
                Ui::titleLarge(title),
-               Ui::bodyMedium(body)) |
+               Ui::bodyMedium(body)
+           ) |
            Ui::box({
                .foregroundPaint = Ui::GRAY500,
            }) |

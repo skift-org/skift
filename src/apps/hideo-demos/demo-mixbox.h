@@ -22,7 +22,8 @@ static inline Demo MIXBOX_DEMO{
                     grad.withStop(Mixbox::lerpColor(Web::Css::YELLOW, Web::Css::RED, i / 100.0), i / 100.0);
                 g.fillStyle(grad.bake());
                 g.fill(bound);
-            });
+            }
+        );
     },
 };
 

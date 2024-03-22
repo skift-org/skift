@@ -88,7 +88,8 @@ struct PerfGraph {
 
             g.plot(
                 Math::Recti{i, 0, 1, (isize)e.duration().toMSecs() * 2},
-                e.color());
+                e.color()
+            );
         }
 
         auto text = Io::format("FPS: {}", (isize)fps()).take();

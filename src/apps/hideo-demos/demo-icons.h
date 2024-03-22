@@ -24,9 +24,11 @@ static inline Demo ICONS_DEMO{
                            return Ui::button(
                                Ui::NOP,
                                Ui::ButtonStyle::subtle(),
-                               Ui::icon((Mdi::Icon)codepoint, 32) | Ui::spacing(10) | Ui::center());
+                               Ui::icon((Mdi::Icon)codepoint, 32) | Ui::spacing(10) | Ui::center()
+                           );
                        })
-                       .collect<Ui::Children>()) |
+                       .collect<Ui::Children>()
+               ) |
                Ui::vscroll();
     },
 };

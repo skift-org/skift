@@ -10,10 +10,12 @@ namespace Qoi {
 struct Image : public Io::BChunk {
     // magic "qoif"
     static constexpr Array<u8, 4> MAGIC = {
-        0x71, 0x6F, 0x69, 0x66};
+        0x71, 0x6F, 0x69, 0x66
+    };
 
     static constexpr Array<u8, 8> END = {
-        0, 0, 0, 0, 0, 0, 0, 1};
+        0, 0, 0, 0, 0, 0, 0, 1
+    };
 
     using Width = Io::BField<i32be, 4>;
     using Height = Io::BField<i32be, 8>;

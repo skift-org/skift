@@ -18,11 +18,14 @@ struct QuickSettingProps {
 };
 
 Ui::Child quickSetting(QuickSettingProps props) {
-    auto style = (props.state
-                      ? Ui::ButtonStyle::primary()
-                      : Ui::ButtonStyle::secondary());
+    auto style = props.state
+                     ? Ui::ButtonStyle::primary()
+                     : Ui::ButtonStyle::secondary();
 
-    auto primaryStyle = props.more ? style.withRadius({4, 0, 0, 4}) : style;
+    auto primaryStyle = props.more
+                            ? style.withRadius({4, 0, 0, 4})
+                            : style;
+
     auto secondaryStyle = style.withRadius({0, 4, 4, 0});
 
     auto primary = [&] {
@@ -35,7 +38,8 @@ Ui::Child quickSetting(QuickSettingProps props) {
         return Ui::hflow(
             primary | Ui::grow(),
             Ui::separator(),
-            Ui::button(std::move(props.more), secondaryStyle, Mdi::CHEVRON_RIGHT));
+            Ui::button(std::move(props.more), secondaryStyle, Mdi::CHEVRON_RIGHT)
+        );
     }
 
     return primary;
@@ -46,7 +50,8 @@ Ui::Child dateAndTime(State const &state) {
 
     return Ui::vflow(
                Ui::labelLarge("{02}:{03}", time.hour, time.minute),
-               Ui::labelMedium("Fri, Jul 28")) |
+               Ui::labelMedium("Fri, Jul 28")
+           ) |
            Ui::center() |
            Ui::bound() |
            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle().withPadding({12, 0}));
@@ -61,7 +66,9 @@ Ui::Child quickheader(State const &state) {
             Ui::ButtonStyle::secondary(),
             state.isSysPanelColapsed
                 ? Mdi::CHEVRON_DOWN
-                : Mdi::CHEVRON_UP));
+                : Mdi::CHEVRON_UP
+        )
+    );
 }
 
 Ui::Child quickTools(State const &) {
@@ -70,13 +77,15 @@ Ui::Child quickTools(State const &) {
         Ui::button(
             Model::bind<Lock>(),
             Ui::ButtonStyle::secondary(),
-            Mdi::LOCK),
+            Mdi::LOCK
+        ),
         Ui::button(
             [](auto &n) {
                 Model::bubble(n, Activate{Panel::NIL});
                 Ui::showDialog(n, powerDialog());
             },
-            Ui::ButtonStyle::secondary(), Mdi::POWER),
+            Ui::ButtonStyle::secondary(), Mdi::POWER
+        ),
         Ui::grow(NONE),
         Ui::button(
             [](auto &n) {
@@ -84,11 +93,14 @@ Ui::Child quickTools(State const &) {
                 Ui::showDialog(n, Ui::aboutDialog(Mdi::SHIP_WHEEL, "Shell"));
             },
             Ui::ButtonStyle::secondary(),
-            Mdi::INFORMATION),
+            Mdi::INFORMATION
+        ),
         Ui::button(
             Model::bind<ToggleSysPanel>(),
             Ui::ButtonStyle::secondary(),
-            Mdi::COG));
+            Mdi::COG
+        )
+    );
 }
 
 Ui::Child colapsedQuickSettings(State const &) {
@@ -120,7 +132,8 @@ Ui::Child colapsedQuickSettings(State const &) {
             .icon = Mdi::FLASHLIGHT,
             .name = "Flashlight",
             .press = Ui::NOP,
-        }));
+        })
+    );
 
     return settings;
 }
@@ -170,14 +183,16 @@ Ui::Child expendedQuickSettings(State const &state) {
             .icon = Mdi::CIRCLE_HALF_FULL,
             .name = "Dark Mode",
             .press = Ui::NOP,
-        }));
+        })
+    );
 
     return Ui::vflow(
         8,
         Hideo::slider(0.5, NONE, Mdi::BRIGHTNESS_6),
         Hideo::slider(0.5, NONE, Mdi::VOLUME_HIGH),
         settings | Ui::grow(),
-        quickTools(state));
+        quickTools(state)
+    );
 }
 
 Ui::Child quickSettings(State const &state) {
@@ -193,11 +208,14 @@ Ui::Child noti(Noti const &noti, usize i) {
                Ui::hflow(
                    4,
                    Ui::icon(entry.icon.icon, 12) | Ui::box({.foregroundPaint = entry.icon.colors[4]}),
-                   Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), entry.name)),
+                   Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), entry.name)
+               ),
                Ui::vflow(
                    6,
                    Ui::labelLarge(noti.title),
-                   Ui::labelMedium(noti.body))) |
+                   Ui::labelMedium(noti.body)
+               )
+           ) |
            Ui::box({
                .padding = 12,
                .borderRadius = 4,
@@ -207,7 +225,8 @@ Ui::Child noti(Noti const &noti, usize i) {
            Ui::dismisable(
                Model::bind<DimisNoti>(i),
                Ui::DismisDir::HORIZONTAL,
-               0.3) |
+               0.3
+           ) |
            Ui::key(noti.id);
 }
 
@@ -222,7 +241,8 @@ Ui::Child notifications(State const &state) {
         8,
         iter(state.noti)
             .mapi(noti)
-            .collect<Ui::Children>());
+            .collect<Ui::Children>()
+    );
 }
 
 Ui::Child sysPanel(State const &state) {
@@ -235,7 +255,8 @@ Ui::Child notiPanel(State const &state) {
                8,
                Ui::labelMedium("Notifications") |
                    Ui::spacing({12, 6, 0, 0}),
-               notifications(state)) |
+               notifications(state)
+           ) |
            panel({500, 400});
 }
 
@@ -266,7 +287,8 @@ Ui::Child sysFlyout(State const &state) {
            Ui::dismisable(
                Model::bind<Activate>(Panel::NIL),
                Ui::DismisDir::TOP,
-               0.3) |
+               0.3
+           ) |
            Ui::slideIn(Ui::SlideFrom::TOP);
 }
 

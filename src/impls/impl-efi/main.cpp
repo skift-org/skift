@@ -42,7 +42,8 @@ void __panicHandler(Karm::PanicKind kind, char const *msg) {
             Efi::ResetType::RESET_SHUTDOWN,
             Efi::ERR_UNSUPPORTED,
             0,
-            nullptr);
+            nullptr
+        );
 
         while (1)
             ;

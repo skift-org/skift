@@ -31,14 +31,16 @@ static inline Demo CAROUSEL_DEMO{
                     Ui::button(
                         bind(clamp(state - 1, 0, 4)),
                         Ui::ButtonStyle::subtle(),
-                        Mdi::ARROW_LEFT) |
+                        Mdi::ARROW_LEFT
+                    ) |
                     Ui::spacing(8) | Ui::center();
 
                 auto nextBtn =
                     Ui::button(
                         bind(clamp(state + 1, 0, 4)),
                         Ui::ButtonStyle::subtle(),
-                        Mdi::ARROW_RIGHT) |
+                        Mdi::ARROW_RIGHT
+                    ) |
                     Ui::spacing(8) | Ui::center();
 
                 return Ui::stack(
@@ -50,13 +52,17 @@ static inline Demo CAROUSEL_DEMO{
                             page(Gfx::BLUE, "3"),
                             page(Gfx::YELLOW, "4"),
                             page(Gfx::CYAN, "5"),
-                        }),
+                        }
+                    ),
 
                     Ui::hflow(
                         prevBtn,
                         Ui::grow(NONE),
-                        nextBtn));
-            });
+                        nextBtn
+                    )
+                );
+            }
+        );
     },
 };
 

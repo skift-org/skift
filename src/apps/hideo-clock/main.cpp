@@ -59,22 +59,27 @@ Ui::Child app() {
                             Mdi::ALARM,
                             "Alarm",
                             s.page == Page::ALARM,
-                            Model::bind(Page::ALARM)),
+                            Model::bind(Page::ALARM)
+                        ),
                         Hideo::navbarItem(
                             Mdi::CLOCK_OUTLINE,
                             "Clock",
                             s.page == Page::CLOCK,
-                            Model::bind(Page::CLOCK)),
+                            Model::bind(Page::CLOCK)
+                        ),
                         Hideo::navbarItem(
                             Mdi::TIMER_SAND,
                             "Timer",
                             s.page == Page::TIMER,
-                            Model::bind(Page::TIMER)),
+                            Model::bind(Page::TIMER)
+                        ),
                         Hideo::navbarItem(
                             Mdi::TIMER_OUTLINE,
                             "Stopwatch",
                             s.page == Page::STOPWATCH,
-                            Model::bind(Page::STOPWATCH)));
+                            Model::bind(Page::STOPWATCH)
+                        )
+                    );
 
                     auto body = Ui::carousel(
                         (usize)s.page,
@@ -83,17 +88,21 @@ Ui::Child app() {
                             makeStrong<Clock>(Sys::dateTime().time),
                             Ui::labelLarge("Timer"),
                             Ui::labelLarge("Stopwatch"),
-                        });
+                        }
+                    );
 
                     return Ui::vflow(
                         Ui::vflow(
                             Ui::titleLarge(toStr(s.page)) | Ui::hcenter(),
-                            body | Ui::grow()) |
+                            body | Ui::grow()
+                        ) |
                             Ui::spacing({8, 24, 8, 0}) | Ui::grow(),
-                        navbar);
+                        navbar
+                    );
                 },
             });
-        });
+        }
+    );
 }
 
 Async::Task<> timerTask(Ui::Child app) {

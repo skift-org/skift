@@ -142,11 +142,13 @@ Res<> init(Handover::Payload &payload) {
 
     logInfo("mem: pmm bitmap range: {x}-{x}", pmmBits.start, pmmBits.end());
 
-    _pmm.emplace(usableRange,
-                 MutSlice{
-                     reinterpret_cast<u8 *>(pmmBits.start + Hal::UPPER_HALF),
-                     pmmBits.size,
-                 });
+    _pmm.emplace(
+        usableRange,
+        MutSlice{
+            reinterpret_cast<u8 *>(pmmBits.start + Hal::UPPER_HALF),
+            pmmBits.size,
+        }
+    );
 
     _kmm.emplace(_pmm.unwrap());
 
@@ -172,7 +174,8 @@ Res<> init(Handover::Payload &payload) {
             Hal::PAGE_SIZE,
             gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
         },
-        Hal::Vmm::READ | Hal::Vmm::WRITE));
+        Hal::Vmm::READ | Hal::Vmm::WRITE
+    ));
 
     logInfo("mem: mapping upper half...");
     try$(Arch::globalVmm().mapRange(
@@ -184,7 +187,8 @@ Res<> init(Handover::Payload &payload) {
             Hal::PAGE_SIZE,
             gib(4) - Hal::PAGE_SIZE,
         },
-        Hal::Vmm::READ | Hal::Vmm::WRITE));
+        Hal::Vmm::READ | Hal::Vmm::WRITE
+    ));
 
     Arch::globalVmm().activate();
 

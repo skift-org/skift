@@ -314,7 +314,8 @@ Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
         Efi::AllocateType::ANY_PAGES,
         Efi::MemoryType::LOADER_DATA,
         Hal::pageAlignUp(options.size) / Hal::PAGE_SIZE,
-        &vaddr));
+        &vaddr
+    ));
 
     // Memory is identity mapped, so we can just return the virtual address as paddr
     return Ok(Sys::MmapResult{vaddr, vaddr, options.size});
@@ -327,7 +328,8 @@ Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> fd) 
     try$(Efi::bs()->allocatePages(
         Efi::AllocateType::ANY_PAGES,
         Efi::MemoryType::LOADER_DATA,
-        Hal::pageAlignUp(fileSize) / Hal::PAGE_SIZE, &vaddr));
+        Hal::pageAlignUp(fileSize) / Hal::PAGE_SIZE, &vaddr
+    ));
 
     MutBytes bytes = {(Byte *)vaddr, fileSize};
     Io::BufWriter writer{bytes};
@@ -397,7 +399,8 @@ Res<> exit(i32) {
             Efi::ResetType::RESET_SHUTDOWN,
             Efi::ERR_ABORTED,
             0,
-            nullptr)
+            nullptr
+        )
         .unwrap();
 
     while (1)

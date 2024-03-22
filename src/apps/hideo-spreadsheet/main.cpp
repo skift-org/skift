@@ -20,7 +20,9 @@ Ui::Child formula() {
         },
         Ui::hflow(
             Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FUNCTION),
-            Ui::grow(NONE)));
+            Ui::grow(NONE)
+        )
+    );
 }
 
 Ui::Child toolbar(State const &state) {
@@ -41,7 +43,8 @@ Ui::Child toolbar(State const &state) {
         Ui::empty(4),
         formula() | Ui::grow(),
         Ui::empty(4),
-        Ui::button(Model::bind<ToggleProperties>(), state.propertiesVisible ? Ui::ButtonStyle::regular() : Ui::ButtonStyle::subtle(), Mdi::BRUSH_VARIANT));
+        Ui::button(Model::bind<ToggleProperties>(), state.propertiesVisible ? Ui::ButtonStyle::regular() : Ui::ButtonStyle::subtle(), Mdi::BRUSH_VARIANT)
+    );
 }
 
 Ui::Child properties() {
@@ -60,7 +63,9 @@ Ui::Child properties() {
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_BOLD),
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_ITALIC),
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_UNDERLINE),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_STRIKETHROUGH))),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_STRIKETHROUGH)
+                )
+            ),
 
             Hideo::row(
                 NONE,
@@ -69,7 +74,9 @@ Ui::Child properties() {
                 Ui::hflow(
                     4,
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::WRAP),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::WRAP_DISABLED))),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::WRAP_DISABLED)
+                )
+            ),
 
             Hideo::row(
                 NONE,
@@ -79,7 +86,9 @@ Ui::Child properties() {
                     4,
                     Ui::button(Model::bind<UpdateStyleHalign>(Align::START), Ui::ButtonStyle::subtle(), Mdi::ALIGN_HORIZONTAL_LEFT),
                     Ui::button(Model::bind<UpdateStyleHalign>(Align::CENTER), Ui::ButtonStyle::subtle(), Mdi::ALIGN_HORIZONTAL_CENTER),
-                    Ui::button(Model::bind<UpdateStyleHalign>(Align::END), Ui::ButtonStyle::subtle(), Mdi::ALIGN_HORIZONTAL_RIGHT))),
+                    Ui::button(Model::bind<UpdateStyleHalign>(Align::END), Ui::ButtonStyle::subtle(), Mdi::ALIGN_HORIZONTAL_RIGHT)
+                )
+            ),
 
             Hideo::row(
                 NONE,
@@ -89,7 +98,9 @@ Ui::Child properties() {
                     4,
                     Ui::button(Model::bind<UpdateStyleValign>(Align::START), Ui::ButtonStyle::subtle(), Mdi::ALIGN_VERTICAL_TOP),
                     Ui::button(Model::bind<UpdateStyleValign>(Align::CENTER), Ui::ButtonStyle::subtle(), Mdi::ALIGN_VERTICAL_CENTER),
-                    Ui::button(Model::bind<UpdateStyleValign>(Align::END), Ui::ButtonStyle::subtle(), Mdi::ALIGN_VERTICAL_BOTTOM))),
+                    Ui::button(Model::bind<UpdateStyleValign>(Align::END), Ui::ButtonStyle::subtle(), Mdi::ALIGN_VERTICAL_BOTTOM)
+                )
+            ),
 
             Ui::separator(),
 
@@ -106,7 +117,9 @@ Ui::Child properties() {
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_ALL),
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_NONE),
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_VERTICAL),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_HORIZONTAL))),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_HORIZONTAL)
+                )
+            ),
 
             Hideo::row(
                 NONE,
@@ -117,13 +130,17 @@ Ui::Child properties() {
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_TOP),
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_BOTTOM),
                     Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_LEFT),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_RIGHT))),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_RIGHT)
+                )
+            ),
 
             Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::TABLE_MERGE_CELLS, "Merge Cells"),
 
             Ui::separator(),
 
-            Hideo::titleRow("Sheet Properties")));
+            Hideo::titleRow("Sheet Properties")
+        )
+    );
 }
 
 Ui::Child tabItem(State const &state, Sheet const &sheet, usize index) {
@@ -132,7 +149,8 @@ Ui::Child tabItem(State const &state, Sheet const &sheet, usize index) {
         state.active == index
             ? Ui::ButtonStyle::secondary()
             : Ui::ButtonStyle::subtle(),
-        sheet.name);
+        sheet.name
+    );
 }
 
 Ui::Child tabs(State const &state) {
@@ -143,12 +161,15 @@ Ui::Child tabs(State const &state) {
                 .mapi([&](auto const &s, usize i) {
                     return tabItem(state, s, i);
                 })
-                .collect<Ui::Children>()),
+                .collect<Ui::Children>()
+        ),
 
         Ui::button(
             Ui::NOP,
             Ui::ButtonStyle::subtle(),
-            Mdi::PLUS));
+            Mdi::PLUS
+        )
+    );
 }
 
 Ui::Child app() {
@@ -162,7 +183,8 @@ Ui::Child app() {
         return Ui::vflow(
                    tb,
                    toolbar(s),
-                   body | Ui::grow()) |
+                   body | Ui::grow()
+               ) |
                Ui::pinSize({800, 600}) | Ui::dialogLayer();
     });
 }

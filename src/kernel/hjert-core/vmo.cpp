@@ -32,7 +32,8 @@ Hal::PmmRange Vmo::range() {
             [](Hal::DmaRange const &range) {
                 return range.as<Hal::PmmRange>();
             },
-        });
+        }
+    );
 }
 
 } // namespace Hjert::Core

@@ -124,14 +124,17 @@ struct Align : public ProxyNode<Align> {
 
     void layout(Math::Recti bound) override {
         auto childSize = child().size(
-            bound.size(), _child.is<Grow>() ? Layout::Hint::MAX
-                                            : Layout::Hint::MIN);
+            bound.size(), _child.is<Grow>()
+                              ? Layout::Hint::MAX
+                              : Layout::Hint::MIN
+        );
 
         child()
             .layout(_align.apply<isize>(
                 Layout::Flow::LEFT_TO_RIGHT,
                 childSize,
-                bound));
+                bound
+            ));
     };
 
     Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
@@ -363,7 +366,8 @@ Child grow(Opt<Child> child) {
         child,
         [] {
             return empty();
-        }));
+        }
+    ));
 }
 
 Child grow(isize grow, Opt<Child> child) {
@@ -373,7 +377,9 @@ Child grow(isize grow, Opt<Child> child) {
             child,
             [] {
                 return empty();
-            }));
+            }
+        )
+    );
 }
 
 struct FlowLayout : public GroupNode<FlowLayout> {

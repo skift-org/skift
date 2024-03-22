@@ -28,8 +28,11 @@ Res<> Driver::runAll() {
     Sys::errln("Running {} tests...\n", _tests.len());
 
     for (auto *test : _tests) {
-        Sys::err("Running {}: {}... ",
-                 test->_loc.file, Io::toNoCase(test->_name).unwrap());
+        Sys::err(
+            "Running {}: {}... ",
+            test->_loc.file,
+            Io::toNoCase(test->_name).unwrap()
+        );
 
         auto result = test->run(*this);
 
@@ -45,19 +48,26 @@ Res<> Driver::runAll() {
     Sys::errln("");
 
     if (failed) {
-        Sys::errln(" ❌ {} failled - {}",
-                   Cli::styled(failed, RED),
-                   Cli::styled(witty(Sys::now().val()), NOTE));
-        Sys::errln("    {} passed\n",
-                   Cli::styled(passed, GREEN));
+        Sys::errln(
+            " ❌ {} failled - {}",
+            Cli::styled(failed, RED),
+            Cli::styled(witty(Sys::now().val()), NOTE)
+        );
+        Sys::errln(
+            "    {} passed\n",
+            Cli::styled(passed, GREEN)
+        );
 
         return Error::other("test failed");
-    } else {
-        Sys::errln(" 🤘 {} passed - {}\n",
-                   Cli::styled(passed, GREEN),
-                   Cli::styled(nice(Sys::now().val()), NOTE));
-        return Ok();
     }
+
+    Sys::errln(
+        " 🤘 {} passed - {}\n",
+        Cli::styled(passed, GREEN),
+        Cli::styled(nice(Sys::now().val()), NOTE)
+    );
+
+    return Ok();
 }
 
 Driver &driver() {

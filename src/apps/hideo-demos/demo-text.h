@@ -20,27 +20,37 @@ static inline Demo TEXT_DEMO{
                        slots$(
                            Ui::displayLarge("Display Large"),
                            Ui::displayMedium("Display Medium"),
-                           Ui::displaySmall("Display Small"))),
+                           Ui::displaySmall("Display Small")
+                       )
+                   ),
 
                    Hideo::treeRow(
                        slot$(Ui::icon(Mdi::TEXT)), "Headlines", NONE,
-                       slots$(Ui::headlineLarge("Headline Large"),
-                              Ui::headlineMedium("Headline Medium"),
-                              Ui::headlineSmall("Headline Small"))),
+                       slots$(
+                           Ui::headlineLarge("Headline Large"),
+                           Ui::headlineMedium("Headline Medium"),
+                           Ui::headlineSmall("Headline Small")
+                       )
+                   ),
 
                    Hideo::treeRow(
                        slot$(Ui::icon(Mdi::TEXT)), "Titles", NONE,
                        slots$(
                            Ui::titleLarge("Title Large"),
                            Ui::titleMedium("Title Medium"),
-                           Ui::titleSmall("Title Small"))),
+                           Ui::titleSmall("Title Small")
+                       )
+                   ),
 
                    Hideo::treeRow(
                        slot$(Ui::icon(Mdi::TEXT)), "Body", NONE,
                        slots$(
                            Ui::bodyLarge("Body Large"),
                            Ui::bodyMedium("Body Medium"),
-                           Ui::bodySmall("Body Small")))) |
+                           Ui::bodySmall("Body Small")
+                       )
+                   )
+               ) |
                Ui::vscroll();
     },
 };

@@ -20,7 +20,8 @@ Ui::Child app(State initial) {
             return Ui::vflow(titlebar, content | Ui::grow()) |
                    Ui::pinSize({800, 600}) |
                    Ui::dialogLayer();
-        });
+        }
+    );
 }
 
 } // namespace Hideo::Images

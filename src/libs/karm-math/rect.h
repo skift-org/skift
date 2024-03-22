@@ -157,7 +157,8 @@ union Rect {
             max(x, r.x),
             max(y, r.y),
             min(x + width, r.x + r.width) - max(x, r.x),
-            min(y + height, r.y + r.height) - max(y, r.y)};
+            min(y + height, r.y + r.height) - max(y, r.y)
+        };
     }
 
     always_inline constexpr Rect<T> mergeWith(Rect<T> r) const {
@@ -169,7 +170,8 @@ union Rect {
             {
                 max(end(), r.end()),
                 max(bottom(), r.bottom()),
-            });
+            }
+        );
     }
 
     always_inline constexpr T operator[](isize i) {
@@ -199,7 +201,8 @@ union Rect {
             {
                 Math::ceil(end()),
                 Math::ceil(bottom()),
-            });
+            }
+        );
     }
 
     always_inline Rect<T> floor() {
@@ -211,7 +214,8 @@ union Rect {
             {
                 Math::floor(end()),
                 Math::floor(bottom()),
-            });
+            }
+        );
     }
 
     always_inline bool hasNan() const {

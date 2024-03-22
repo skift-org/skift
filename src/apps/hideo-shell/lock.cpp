@@ -11,7 +11,8 @@ Ui::Child lock(State const &state) {
                         "{}. {} {}",
                         date.month.abbr(),
                         date.dayOfMonth() + 1,
-                        date.year.val())
+                        date.year.val()
+    )
                         .unwrap();
 
     auto clock = Ui::vflow(
@@ -23,14 +24,19 @@ Ui::Child lock(State const &state) {
                 "{}. {} {}",
                 Io::toCapitalCase(date.dayOfWeek().abbr()),
                 date.dayOfMonth() + 1,
-                Io::toCapitalCase(date.month.str()))));
+                Io::toCapitalCase(date.month.str())
+            )
+        )
+    );
 
     auto hintText = Ui::vflow(
         Ui::center(Ui::icon(Mdi::CHEVRON_UP, 48)),
         Ui::center(Ui::labelLarge(
             state.isMobile
                 ? "Swipe up to unlock"
-                : "Swipe up or press any key to unlock")));
+                : "Swipe up or press any key to unlock"
+        ))
+    );
 
     return Ui::stack(
         background(state),
@@ -38,7 +44,8 @@ Ui::Child lock(State const &state) {
             Ui::spacing(state.isMobile ? 64 : 128) |
             Ui::dragRegion() |
             Ui::dismisable(Model::bind<Unlock>(), Ui::DismisDir::TOP, 0.3) |
-            Ui::align(Layout::Align::VFILL | Layout::Align::HCENTER));
+            Ui::align(Layout::Align::VFILL | Layout::Align::HCENTER)
+    );
 }
 
 } // namespace Hideo::Shell

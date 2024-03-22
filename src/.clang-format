@@ -16,6 +16,7 @@ IndentPPDirectives: AfterHash
 ForEachMacros: ["__dummy_foreach"]
 SpaceBeforeParens: ControlStatementsExceptForEachMacros
 QualifierAlignment: Right
+AlignAfterOpenBracket: BlockIndent
 
 IncludeBlocks: Regroup
 IncludeCategories:

@@ -15,7 +15,8 @@ Ui::Child searchInput() {
                0,
                Layout::Align::VCENTER | Layout::Align::START,
                Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), "Search…") | Ui::grow(),
-               Ui::icon(Mdi::MAGNIFY, 24)) |
+               Ui::icon(Mdi::MAGNIFY, 24)
+           ) |
            Ui::spacing({12, 8}) |
            Ui::box({
                .borderRadius = 4,
@@ -44,7 +45,8 @@ Ui::Child appRow(MenuEntry const &entry, usize i) {
                12,
                Layout::Align::START | Layout::Align::VCENTER,
                appIcon(entry.icon),
-               Ui::labelLarge(entry.name)) |
+               Ui::labelLarge(entry.name)
+           ) |
                Ui::spacing(6) | Ui::button(Model::bind<StartApp>(i), Ui::ButtonStyle::subtle());
 }
 
@@ -52,17 +54,20 @@ Ui::Child appsList(State const &state) {
     return Ui::vflow(
         iter(state.entries)
             .mapi(appRow)
-            .collect<Ui::Children>());
+            .collect<Ui::Children>()
+    );
 }
 
 Ui::Child appTile(MenuEntry const &entry, usize i) {
     return Ui::vflow(
                26,
                appIcon(entry.icon, 26),
-               Ui::labelLarge(entry.name)) |
+               Ui::labelLarge(entry.name)
+           ) |
            Ui::button(
                Model::bind<StartApp>(i),
-               Ui::ButtonStyle::subtle());
+               Ui::ButtonStyle::subtle()
+           );
 }
 
 Ui::Child appsGrid(State const &state) {
@@ -70,7 +75,8 @@ Ui::Child appsGrid(State const &state) {
         Ui::GridStyle::simpleFixed({8, 64}, {4, 64}),
         iter(state.entries)
             .mapi(appTile)
-            .collect<Ui::Children>());
+            .collect<Ui::Children>()
+    );
 }
 
 Ui::Child runningApp(Surface const &surface, usize i) {
@@ -80,7 +86,8 @@ Ui::Child runningApp(Surface const &surface, usize i) {
                    Ui::button(Model::bind<FocusApp>(i)),
                Ui::button(Model::bind<CloseApp>(i), Ui::ButtonStyle::secondary(), Mdi::CLOSE) |
                    Ui::align(Layout::Align::TOP_END) |
-                   Ui::spacing({0, 6, 6, 0})) |
+                   Ui::spacing({0, 6, 6, 0})
+           ) |
            Ui::pinSize({120, 192});
 }
 
@@ -91,7 +98,8 @@ Ui::Child runningApps(State const &state) {
                8,
                iter(state.surfaces)
                    .mapi(runningApp)
-                   .collect<Ui::Children>()) |
+                   .collect<Ui::Children>()
+           ) |
            Ui::center() | Ui::spacing({0, 64, 0, 16});
 }
 
@@ -105,19 +113,23 @@ Ui::Child apps(State const &state) {
                 state.isAppPanelThumbnails
                     ? Ui::ButtonStyle::secondary()
                     : Ui::ButtonStyle::subtle(),
-                Mdi::VIEW_GRID),
+                Mdi::VIEW_GRID
+            ),
 
             Ui::button(
                 Model::bind<ToggleAppThumbnail>(false),
                 state.isAppPanelThumbnails
                     ? Ui::ButtonStyle::subtle()
                     : Ui::ButtonStyle::secondary(),
-                Mdi::FORMAT_LIST_BULLETED_SQUARE)),
+                Mdi::FORMAT_LIST_BULLETED_SQUARE
+            )
+        ),
 
         (state.isAppPanelThumbnails
              ? appsGrid(state)
              : appsList(state)) |
-            Ui::spacing({0, 12}) | Ui::vscroll() | Ui::grow());
+            Ui::spacing({0, 12}) | Ui::vscroll() | Ui::grow()
+    );
 }
 
 Ui::Child appsPanel(State const &state) {
@@ -129,7 +141,8 @@ Ui::Child appsFlyout(State const &state) {
         runningApps(state),
         Ui::vflow(
             Ui::dragHandle(),
-            apps(state) | Ui::grow()) |
+            apps(state) | Ui::grow()
+        ) |
             Ui::box({
                 .margin = {8, 8, 8, 8},
                 .padding = {12, 0},
@@ -142,8 +155,10 @@ Ui::Child appsFlyout(State const &state) {
             Ui::dismisable(
                 Model::bind<Activate>(Panel::NIL),
                 Ui::DismisDir::DOWN,
-                0.3) |
-            Ui::slideIn(Ui::SlideFrom::BOTTOM) | Ui::grow());
+                0.3
+            ) |
+            Ui::slideIn(Ui::SlideFrom::BOTTOM) | Ui::grow()
+    );
 }
 
 } // namespace Hideo::Shell

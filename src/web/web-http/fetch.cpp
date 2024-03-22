@@ -34,7 +34,8 @@ Async::Task<usize> _fetch(Mime::Url const &url, Sys::_Connection &conn, Io::Writ
         "User-Agent: Karm Web/" stringify$(__ck_version_value) "\r\n"
                                                                "\r\n",
         url.path,
-        url.host));
+        url.host
+    ));
     co_try$(conn.write(req.bytes()));
 
     // Read response

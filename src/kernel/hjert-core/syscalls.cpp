@@ -93,7 +93,8 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
             [&](Hj::ListenerProps &) -> Res<Strong<Object>> {
                 return Ok(try$(Listener::create()));
             },
-        }));
+        }
+    ));
 
     return out.store(self.space(), try$(self.domain().add(dest, obj)));
 }

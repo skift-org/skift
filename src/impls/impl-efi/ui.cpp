@@ -15,7 +15,8 @@ struct EfiHost :
         Ui::Child root,
         Efi::SimpleTextInputProtocol *stip,
         Gfx::MutPixels front,
-        Media::Image back)
+        Media::Image back
+    )
         : Ui::Host(root),
           _stip(stip),
           _front(front),

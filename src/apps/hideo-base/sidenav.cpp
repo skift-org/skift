@@ -27,14 +27,16 @@ Ui::Child sidenavTree(Mdi::Icon icon, String title, Ui::Slot child) {
                     Ui::labelMedium(title) |
                         Ui::vcenter() |
                         Ui::grow(),
-                    Ui::icon(state ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 18)) |
-                    Ui::spacing({0, 8, 12, 8})),
+                    Ui::icon(state ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 18)
+                ) | Ui::spacing({0, 8, 12, 8})
+            ),
 
             state
                 ? child() |
                       Ui::spacing({32, 0, 0, 0}) |
                       Ui::slideIn(Ui::SlideFrom::TOP)
-                : Ui::empty());
+                : Ui::empty()
+        );
     });
 }
 
@@ -62,7 +64,10 @@ Ui::Child sidenavItem(bool selected, Ui::OnPress onPress, Mdi::Icon icon, String
                 Ui::empty(8),
                 Ui::icon(icon, 18),
                 Ui::empty(12),
-                Ui::labelMedium(title) | Ui::center())));
+                Ui::labelMedium(title) | Ui::center()
+            )
+        )
+    );
 }
 
 } // namespace Hideo

@@ -58,7 +58,8 @@ Ui::Child icon(Entry const &e) {
         },
         [&](None) {
             return Ui::empty();
-        }});
+        }
+    });
 }
 
 Ui::Child entry(State const &s, Entry const &e, usize i) {
@@ -71,7 +72,8 @@ Ui::Child entry(State const &s, Entry const &e, usize i) {
         12,
         Layout::Align::CENTER,
         icon(e),
-        Ui::titleMedium(e.name));
+        Ui::titleMedium(e.name)
+    );
 
     return tile |
            Ui::center() |
@@ -97,7 +99,8 @@ Ui::Child alert(String title, String subtitle) {
                16,
                Layout::Align::CENTER,
                Hideo::alert(title, subtitle) | Ui::grow(),
-               Ui::bodyMedium("Press [ENTER] to continue.")) |
+               Ui::bodyMedium("Press [ENTER] to continue.")
+           ) |
            Ui::spacing(64);
 }
 
@@ -133,10 +136,12 @@ Ui::Child menu(Configs const &c) {
                        Ui::titleLarge(Ui::GRAY400, s.configs.subtitle ? *s.configs.subtitle : "Select an operating system"),
                        list(s) | Ui::grow(4),
                        Ui::labelMedium("Use the [ARROW KEYS] to navigate, and press [ENTER] to select an entry."),
-                       Ui::labelSmall(Ui::GRAY500, "Powered by Opstart ►")) |
+                       Ui::labelSmall(Ui::GRAY500, "Powered by Opstart ►")
+                   ) |
                    Ui::spacing(64) |
                    Ui::intent(intent);
-        });
+        }
+    );
 }
 
 Res<> showMenu(Sys::Ctx &ctx, Configs const &c) {

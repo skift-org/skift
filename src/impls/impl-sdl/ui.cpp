@@ -93,7 +93,8 @@ struct SdlHost :
                     .pos = _lastMousePos,
                     .delta = screenPos - _lastScreenMousePos,
                     .buttons = buttons,
-                });
+                }
+            );
 
             _lastScreenMousePos = screenPos.cast<isize>();
 
@@ -126,7 +127,8 @@ struct SdlHost :
                     .pos = _lastMousePos,
                     .buttons = buttons,
                     .button = button,
-                });
+                }
+            );
             break;
         }
 
@@ -156,7 +158,8 @@ struct SdlHost :
                     .pos = _lastMousePos,
                     .buttons = buttons,
                     .button = button,
-                });
+                }
+            );
             break;
         }
 
@@ -179,7 +182,8 @@ struct SdlHost :
                         (f64)sdlEvent.wheel.y,
 #endif
                     },
-                });
+                }
+            );
 
             break;
         }
@@ -243,7 +247,8 @@ Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
         SDL_WINDOWPOS_UNDEFINED,
         size.width,
         size.height,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS);
+        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS
+    );
 
     if (not window)
         return Error::other(SDL_GetError());

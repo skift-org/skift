@@ -105,13 +105,15 @@ Res<> loadEntry(Entry const &entry) {
     try$(vmm->mapRange(
         {Handover::KERNEL_BASE + Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         {Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
-        Hal::Vmm::READ | Hal::Vmm::WRITE));
+        Hal::Vmm::READ | Hal::Vmm::WRITE
+    ));
 
     logInfo("loader: mapping upper half...");
     try$(vmm->mapRange(
         {Handover::UPPER_HALF + Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
         {Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
-        Hal::Vmm::READ | Hal::Vmm::WRITE));
+        Hal::Vmm::READ | Hal::Vmm::WRITE
+    ));
 
     logInfo("loader: mapping loader image...");
     auto loaderImage = Fw::imageRange();
@@ -119,7 +121,8 @@ Res<> loadEntry(Entry const &entry) {
     try$(vmm->mapRange(
         Hal::identityMapped(loaderImage),
         loaderImage,
-        Hal::Vmm::READ | Hal::Vmm::WRITE));
+        Hal::Vmm::READ | Hal::Vmm::WRITE
+    ));
 
     logInfo("loader: finalizing and entering kernel, see you on the other side...");
 

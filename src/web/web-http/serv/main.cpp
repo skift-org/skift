@@ -58,7 +58,8 @@ Async::Task<> respondFile(Sys::_Connection &conn, Mime::Url const &url, Http::Co
         (usize)code,
         Http::toStr(code),
         ct,
-        stat.size));
+        stat.size
+    ));
 
     co_try$(conn.write(header.bytes()));
     co_try$(Io::copy(file, conn));
@@ -79,7 +80,8 @@ Async::Task<> respond404(Sys::_Connection &conn) {
         "Content-Length: 9\r\n"
         "X-Powered-By: Karm Web\r\n"
         "\r\n"
-        "Not Found"));
+        "Not Found"
+    ));
 
     co_trya$(conn.writeAsync(header.bytes()));
     co_return Ok();

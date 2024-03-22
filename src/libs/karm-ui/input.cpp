@@ -304,7 +304,8 @@ struct Input : public View<Input> {
                     bound().topStart() + m.baseline.cast<isize>(),
                     bound().topEnd() + m.baseline.cast<isize>(),
                 },
-                Gfx::PINK);
+                Gfx::PINK
+            );
             g.plot(bound(), Gfx::CYAN);
         }
 
@@ -572,7 +573,8 @@ Child color(Gfx::Color color, OnChange<Gfx::Color>) {
                 .borderPaint = Gfx::GRAY50.withOpacity(0.1),
                 .backgroundPaint = color,
             }) |
-            Ui::center() | Ui::bound());
+            Ui::center() | Ui::bound()
+    );
 }
 
 /* --- Intent --------------------------------------------------------------- */

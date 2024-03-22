@@ -59,6 +59,4 @@ struct Shape {
     }
 };
 
-
-
 } // namespace Karm::Gfx

@@ -9,7 +9,10 @@ static auto const COMPONENT = Re::chain(
     Re::zeroOrMore(
         Re::either(
             Re::alnum(),
-            Re::single('+', '.', '-'))));
+            Re::single('+', '.', '-')
+        )
+    )
+);
 
 Url Url::parse(Io::SScan &s) {
     Url url;

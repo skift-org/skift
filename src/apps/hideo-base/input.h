@@ -13,7 +13,8 @@ static inline Ui::Child slider(T value, Range<T> range, Ui::OnChange<T> onChange
         [=](Ui::Node &n, f64 v) {
             onChange(n, range.start + v * (range.end() - range.start));
         },
-        icon);
+        icon
+    );
 }
 
 } // namespace Hideo

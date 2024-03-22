@@ -25,7 +25,8 @@ void reduce(State &s, Action a) {
                 0,
                 s.entries[start.index],
                 Math::Recti{0, 0, 400, 300},
-                Gfx::randomColor());
+                Gfx::randomColor()
+            );
         },
         [&](MoveApp move) {
             logInfo("{}", move.off);

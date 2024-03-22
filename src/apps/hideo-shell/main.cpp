@@ -28,7 +28,8 @@ Ui::Child statusbar(State const &state) {
                indicator(Mdi::WIFI_STRENGTH_4),
                indicator(Mdi::NETWORK_STRENGTH_4),
                indicator(Mdi::BATTERY),
-               Ui::labelLarge("100%") | Ui::center()) |
+               Ui::labelLarge("100%") | Ui::center()
+           ) |
            Ui::minSize({
                Ui::UNCONSTRAINED,
                36,
@@ -42,14 +43,16 @@ Ui::Child statusbar(State const &state) {
 Ui::Child statusbarButton(State const &state) {
     return Ui::button(
         Model::bind<Activate>(Panel::SYS),
-        statusbar(state));
+        statusbar(state)
+    );
 }
 
 /* --- Navigation Bar ------------------------------------------------------- */
 
 Ui::Child navbar(State const &) {
     return Ui::buttonHandle(
-               Model::bind<Activate>(Panel::APPS)) |
+               Model::bind<Activate>(Panel::APPS)
+           ) |
            Ui::slideIn(Ui::SlideFrom::BOTTOM);
 }
 
@@ -59,7 +62,8 @@ Ui::Child taskbar(State const &state) {
     auto appsButton = Ui::button(
         Model::bind<Activate>(Panel::APPS),
         Ui::ButtonStyle::subtle(),
-        Mdi::APPS, "Applications");
+        Mdi::APPS, "Applications"
+    );
 
     auto [date, time] = state.dateTime;
     auto dateTime = Io::format(
@@ -68,13 +72,15 @@ Ui::Child taskbar(State const &state) {
                         date.dayOfMonth() + 1,
                         date.year.val(),
                         time.hour,
-                        time.minute)
+                        time.minute
+    )
                         .unwrap();
     auto calButton = Ui::button(
         Model::bind<Activate>(Panel::NOTIS),
         Ui::ButtonStyle::subtle(),
         Mdi::CALENDAR,
-        dateTime);
+        dateTime
+    );
 
     auto trayButton = Ui::button(
         Model::bind<Activate>(Panel::SYS),
@@ -85,11 +91,13 @@ Ui::Child taskbar(State const &state) {
             Ui::icon(Mdi::WIFI_STRENGTH_4),
             Ui::icon(Mdi::VOLUME_HIGH),
             Ui::icon(Mdi::BATTERY),
-            Ui::labelMedium("100%")) |
+            Ui::labelMedium("100%")
+        ) |
 
             Ui::center() |
             Ui::spacing({12, 6}) |
-            Ui::bound());
+            Ui::bound()
+    );
 
     return Ui::vflow(
         Ui::hflow(
@@ -101,13 +109,16 @@ Ui::Child taskbar(State const &state) {
             Ui::button(
                 Keyboard::show,
                 Ui::ButtonStyle::subtle(),
-                Mdi::KEYBOARD),
-            trayButton) |
+                Mdi::KEYBOARD
+            ),
+            trayButton
+        ) |
             Ui::box({
                 .padding = 6,
                 .backgroundPaint = Ui::GRAY950.withOpacity(0.8),
             }),
-        Ui::separator());
+        Ui::separator()
+    );
 }
 
 /* --- Shells --------------------------------------------------------------- */
@@ -125,7 +136,8 @@ Ui::Child tabletPanels(State const &state) {
             : Ui::empty(),
         state.activePanel == Panel::SYS
             ? sysFlyout(state)
-            : Ui::empty());
+            : Ui::empty()
+    );
 }
 
 Ui::Child appHost(State const &state) {
@@ -145,10 +157,13 @@ Ui::Child tablet(State const &state) {
         Ui::vflow(
             Ui::vflow(
                 statusbarButton(state),
-                Ui::separator()) |
+                Ui::separator()
+            ) |
                 Ui::slideIn(Ui::SlideFrom::TOP),
             appHost(state) | Ui::grow(),
-            navbar(state)));
+            navbar(state)
+        )
+    );
 }
 
 Ui::Child appStack(State const &state) {
@@ -170,7 +185,8 @@ Ui::Child appStack(State const &state) {
                     e.accept();
                     Model::bubble<MoveApp>(n, {index, m->delta});
                 }
-            }));
+            })
+        );
         index++;
     }
 
@@ -193,7 +209,8 @@ Ui::Child desktopPanels(State const &state) {
                    ? sysPanel(state) |
                          Ui::align(Layout::Align::END | Layout::Align::TOP) |
                          Ui::slideIn(Ui::SlideFrom::TOP)
-                   : Ui::empty()) |
+                   : Ui::empty()
+           ) |
            Ui::spacing({8, 38});
 }
 
@@ -202,7 +219,9 @@ Ui::Child desktop(State const &state) {
         background(state),
         Ui::vflow(
             taskbar(state) | Ui::slideIn(Ui::SlideFrom::TOP),
-            appStack(state) | Ui::grow()));
+            appStack(state) | Ui::grow()
+        )
+    );
 }
 
 Ui::Child app(bool isMobile) {
@@ -305,13 +324,16 @@ Ui::Child app(bool isMobile) {
 
                        state.isMobile
                            ? tabletPanels(state)
-                           : desktopPanels(state)) |
+                           : desktopPanels(state)
+                   ) |
 
                    Ui::dialogLayer() |
                    Ui::pinSize(
                        state.isMobile ? Math::Vec2i{411, 731}
-                                      : Math::Vec2i{1280, 720});
-        });
+                                      : Math::Vec2i{1280, 720}
+                   );
+        }
+    );
 }
 
 } // namespace Hideo::Shell

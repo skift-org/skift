@@ -42,12 +42,7 @@ Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
     try$(fbVmo.label("framebuffer"));
     static auto fbRange = try$(Hj::map(fbVmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
 
-    logInfo("fb: {x}-{x} {}x{}, {} stride",
-            fbRange.range().start,
-            fbRange.range().end(),
-            fb->fb.width,
-            fb->fb.height,
-            fb->fb.pitch);
+    logInfo("fb: {x}-{x} {}x{}, {} stride", fbRange.range().start, fbRange.range().end(), fb->fb.width, fb->fb.height, fb->fb.pitch);
 
     Gfx::MutPixels front = {
         fbRange.mutBytes().buf(),
@@ -57,7 +52,8 @@ Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
     };
 
     auto back = Media::Image::alloc(
-        front.size(), Gfx::BGRA8888);
+        front.size(), Gfx::BGRA8888
+    );
 
     return Ok(makeStrong<Host>(std::move(root), front, back));
 }

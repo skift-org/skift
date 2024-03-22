@@ -13,8 +13,10 @@ Ui::Child powerDialog() {
             Ui::button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::SLEEP, "Sleep"),
             Ui::button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::RESTART, "Restart"),
             Ui::button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::POWER_STANDBY, "Shutdown"),
-            Ui::button(Ui::closeDialog, Ui::ButtonStyle::primary(), "Cancel")) |
-            Ui::spacing(6) | Ui::minSize({320, Ui::UNCONSTRAINED}));
+            Ui::button(Ui::closeDialog, Ui::ButtonStyle::primary(), "Cancel")
+        ) |
+            Ui::spacing(6) | Ui::minSize({320, Ui::UNCONSTRAINED})
+    );
 }
 
 } // namespace Hideo::Shell

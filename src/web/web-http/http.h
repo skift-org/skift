@@ -184,7 +184,8 @@ struct Header {
                 Re::separator(':'),
                 Re::token(value, Re::until(Re::chain(Re::zeroOrMore(Re::single(' ')), Re::word("\r\n")))),
                 Re::zeroOrMore(Re::single(' ')),
-                Re::word("\r\n"));
+                Re::word("\r\n")
+            );
 
             if (not s.skip(expr))
                 return Error::invalidData("Expected header");

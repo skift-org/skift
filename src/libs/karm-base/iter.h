@@ -175,7 +175,8 @@ struct Iter {
                     return Item{v};
 
                 return next();
-            }};
+            }
+        };
     }
 
     constexpr auto append(auto v) {
@@ -189,7 +190,8 @@ struct Iter {
                 }
 
                 return result;
-            }};
+            }
+        };
     }
 
     constexpr auto at(usize n) {

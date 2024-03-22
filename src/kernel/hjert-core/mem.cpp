@@ -140,7 +140,7 @@ Res<> init(Handover::Payload &payload) {
         return Error::outOfMemory("no usable memory for pmm");
     }
 
-    logInfo("mem: pmm bitmap range: {x}-{x}", pmmBits.start, pmmBits.end());
+    logInfo("mem: pmm bitmap range: {p}-{p}", pmmBits.start, pmmBits.end());
 
     _pmm.emplace(
         usableRange,
@@ -155,7 +155,7 @@ Res<> init(Handover::Payload &payload) {
     logInfo("mem: marking free memory as free...");
     for (auto &record : payload) {
         if (record.tag == Handover::Tag::FREE) {
-            logInfo("mem: free memory at {x} {x} ({}kib)", record.start, record.start + record.size, record.size / kib(1));
+            logInfo("mem: free memory at {p} {p} ({}kib)", record.start, record.start + record.size, record.size / kib(1));
             try$(pmm().free({record.start, record.size}));
         }
     }

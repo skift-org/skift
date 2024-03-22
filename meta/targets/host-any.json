@@ -7,6 +7,7 @@
         "arch": "{shell.uname().machine}",
         "sys": "{shell.uname().sysname}",
         "abi": "unknown",
+        "bits": "unknown",
         "freestanding": false,
         "host": true,
         "version": "{jexpr.include('./meta/scripts/version.json')}",

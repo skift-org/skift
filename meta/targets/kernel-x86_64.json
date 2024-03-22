@@ -7,6 +7,7 @@
         "arch": "x86_64",
         "sys": "hjert",
         "abi": "sysv",
+        "bits": "64",
         "freestanding": true,
         "host": false,
         "version": "{jexpr.include('./meta/scripts/version.json')}",

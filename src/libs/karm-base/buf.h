@@ -109,7 +109,7 @@ struct Buf {
             return;
         }
 
-        usize newCap = max(_cap * 1.5, desired);
+        usize newCap = max(_cap * 2, desired);
 
         Inert<T> *tmp = new Inert<T>[newCap];
         for (usize i = 0; i < _len; i++) {

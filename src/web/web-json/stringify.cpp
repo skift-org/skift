@@ -68,10 +68,12 @@ Res<> stringify(Io::Emit &emit, Value const &v) {
                 emit("{}", i);
                 return Ok();
             },
+#ifndef __ck_freestanding__
             [&](Number d) -> Res<> {
                 emit("{}", d);
                 return Ok();
             },
+#endif
             [&](bool b) -> Res<> {
                 emit(b ? "true" : "false");
                 return Ok();

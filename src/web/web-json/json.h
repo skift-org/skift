@@ -29,7 +29,9 @@ using _Store = Union<
     Object,
     String,
     Integer,
+#ifndef __ck_freestanding__
     Number,
+#endif
     bool>;
 
 struct Value {
@@ -53,8 +55,10 @@ struct Value {
     Value(Integer d)
         : _store(d) {}
 
+#ifndef __ck_freestanding__
     Value(Number d)
         : _store(d) {}
+#endif
 
     Value(bool b)
         : _store(b) {}
@@ -116,9 +120,11 @@ struct Value {
         return _store.is<Integer>();
     }
 
+#ifndef __ck_freestanding__
     bool isFloat() const {
         return _store.is<Number>();
     }
+#endif
 
     bool isBool() const {
         return _store.is<bool>();
@@ -176,9 +182,12 @@ struct Value {
                 [](Integer i) {
                     return i;
                 },
+
+#ifndef __ck_freestanding__
                 [](Number d) {
                     return (isize)d;
                 },
+#endif
 
                 [](bool b) {
                     return b ? 1 : 0;

@@ -14,7 +14,7 @@ struct Mime {
         Io::SScan s(_buf);
 
         s.begin();
-        s.skip(Re::until(Re::single('/')));
+        s.skip(Re::until('/'_re));
         return s.end();
     }
 
@@ -25,7 +25,7 @@ struct Mime {
         s.skip('/');
 
         s.begin();
-        s.skip(Re::until(Re::single(';')));
+        s.skip(Re::until(';'_re));
         return s.end();
     }
 

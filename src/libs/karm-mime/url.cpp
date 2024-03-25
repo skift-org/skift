@@ -4,25 +4,24 @@
 
 namespace Karm::Mime {
 
-static auto const COMPONENT =
+static auto const RE_COMPONENT =
     Re::alpha() &
     Re::zeroOrMore(
-        Re::alnum() |
-        Re::single('+', '.', '-')
+        Re::alnum() | '+'_re | '-'_re | '.'_re
     );
 
 Url Url::parse(Io::SScan &s) {
     Url url;
 
-    url.scheme = s.token(COMPONENT);
+    url.scheme = s.token(RE_COMPONENT);
     s.skip(':');
 
     if (s.skip("//")) {
-        auto maybeHost = s.token(COMPONENT);
+        auto maybeHost = s.token(RE_COMPONENT);
 
         if (s.skip('@')) {
             url.authority = maybeHost;
-            maybeHost = s.token(COMPONENT);
+            maybeHost = s.token(RE_COMPONENT);
         }
 
         url.host = maybeHost;
@@ -35,7 +34,7 @@ Url Url::parse(Io::SScan &s) {
     url.path = Path::parse(s, true);
 
     if (s.skip('?'))
-        url.query = s.token(Re::until(Re::single('#')));
+        url.query = s.token(Re::until('#'_re));
 
     if (s.skip('#'))
         url.fragment = s.token(Re::until(Re::eof()));
@@ -51,7 +50,7 @@ Url Url::parse(Str str) {
 bool Url::isUrl(Str str) {
     Io::SScan s{str};
 
-    return s.skip(COMPONENT) and
+    return s.skip(RE_COMPONENT) and
            s.skip(':');
 }
 

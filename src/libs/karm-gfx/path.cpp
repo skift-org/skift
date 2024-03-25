@@ -402,7 +402,7 @@ Opt<Path::Op> Path::parseOp(Io::SScan &scan, Rune opcode) {
     opcode = toAsciiLower(opcode);
 
     auto nextSep = [&] {
-        scan.skip(Re::optSeparator(','));
+        scan.skip(Re::optSeparator(','_re));
     };
 
     auto nextCoord = [&] -> Opt<f64> {

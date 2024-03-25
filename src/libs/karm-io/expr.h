@@ -259,39 +259,29 @@ inline auto blank() {
 /* --- Utils ---------------------------------------------------------------- */
 
 /// Match a separator and consume it.
-/// A separator is a rune surrounded by spaces.
-inline auto separator(Rune r) {
+/// A separator is a expr surrounded by spaces.
+inline auto separator(Expr auto expr) {
     return zeroOrMore(space()) &
-           single(r) &
-           zeroOrMore(space());
-}
-
-/// Match a separator and consume it.
-/// A separator is a word surrounded by spaces.
-inline auto separator(Str w) {
-    return zeroOrMore(space()) &
-           word(w) &
+           expr &
            zeroOrMore(space());
 }
 
 /// Match an optional separator and consume it.
-/// A separator is a rune surrounded by spaces.
+/// A separator is an expression surrounded by spaces.
 /// If the separator is not found, the expression still matches.
 /// And whitespaces are consumed.
-inline auto optSeparator(Rune r) {
+inline auto optSeparator(Expr auto expr) {
     return zeroOrMore(space()) &
-           zeroOrOne(single(r)) &
-           zeroOrMore(space());
-}
-
-/// Match an optional separator and consume it.
-/// A separator is a word surrounded by spaces.
-/// If the separator is not found, the expression still matches.
-/// And whitespaces are consumed.
-inline auto optSeparator(Str w) {
-    return zeroOrMore(space()) &
-           zeroOrOne(word(w)) &
+           zeroOrOne(expr) &
            zeroOrMore(space());
 }
 
 } // namespace Karm::Re
+
+inline auto operator""_re(char const *str, usize len) {
+    return Karm::Re::word(Str{str, len});
+}
+
+inline auto operator""_re(char c) {
+    return Karm::Re::single(c);
+}

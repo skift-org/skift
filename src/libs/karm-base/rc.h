@@ -7,6 +7,7 @@
 
 namespace Karm {
 
+/// A reference-counted object heap cell.
 struct _Cell {
     static constexpr u64 MAGIC = 0xCAFEBABECAFEBABE;
 
@@ -19,7 +20,9 @@ struct _Cell {
     virtual ~_Cell() = default;
 
     virtual void *_unwrap() = 0;
+
     virtual void clear() = 0;
+
     virtual Meta::Type<> inspect() = 0;
 
     void collectAndRelease() {
@@ -87,12 +90,29 @@ struct Cell : public _Cell {
     Inert<T> _buf{};
 
     template <typename... Args>
-    Cell(Args &&...args) { _buf.ctor(std::forward<Args>(args)...); }
-    void *_unwrap() override { return &_buf.unwrap(); }
-    Meta::Type<> inspect() override { return Meta::typeOf<T>(); }
-    void clear() override { _buf.dtor(); }
+    Cell(Args &&...args) {
+        _buf.ctor(std::forward<Args>(args)...);
+    }
+
+    void *_unwrap() override {
+        return &_buf.unwrap();
+    }
+
+    Meta::Type<> inspect() override {
+        return Meta::typeOf<T>();
+    }
+
+    void clear() override {
+        _buf.dtor();
+    }
 };
 
+/// A strong reference to an object of type  `T`.
+///
+/// A strong reference keeps the object alive as long as the
+/// reference is in scope. When the reference goes out of scope
+/// the object is deallocated if there are no other strong
+/// references to it.
 template <typename T>
 struct Strong {
     _Cell *_cell{};
@@ -245,6 +265,10 @@ struct Strong {
     }
 };
 
+/// A weak reference to a an object of type `T`.
+///
+/// A weak reference does not keep the object alive, but can be
+/// upgraded to a strong reference if the object is still alive.
 template <typename T>
 struct Weak {
     _Cell *_cell;
@@ -290,6 +314,9 @@ struct Weak {
         }
     }
 
+    /// Upgrades the weak reference to a strong reference.
+    ///
+    /// Returns `NONE` if the object has been deallocated.
     Opt<Strong<T>> upgrade() const {
         if (not _cell or _cell->_clear)
             return NONE;
@@ -297,6 +324,8 @@ struct Weak {
     }
 };
 
+/// Allocates an object of type `T` on the heap and returns
+/// a strong reference to it.
 template <typename T, typename... Args>
 constexpr static Strong<T> makeStrong(Args &&...args) {
     return {MOVE, new Cell<T>(std::forward<Args>(args)...)};

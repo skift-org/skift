@@ -7,6 +7,10 @@
 
 namespace Web::Css {
 
+// 4.2.3. ‘transparent’ color keyword
+
+inline constexpr Gfx::Color TRANSPARENT = Gfx::Color::fromRgba(0, 0, 0, 0);
+
 #define COLOR(NAME, _, VALUE) \
     inline constexpr Gfx::Color NAME = Gfx::Color::fromHex(VALUE);
 #include "defs/colors.inc"

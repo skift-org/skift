@@ -1,6 +1,3 @@
-// 4.2.3. ‘transparent’ color keyword
-COLOR(TRANSPARENT, transparent, 0x00000000)
-
 // 4.3. Extended color keywords
 
 COLOR(ALICEBLUE, aliceblue, 0xF0F8FF)

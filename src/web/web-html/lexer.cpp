@@ -25,8 +25,8 @@ void Lexer::_raise(Str msg) {
     logError("{}: {}", toStr(_state), msg);
 }
 
-Slice<Token> Lexer::consume(Rune rune, bool isEof) {
-    // logDebug("Consuming '{c}' {#x} in {}", rune, rune, toStr(_state));
+void Lexer::consume(Rune rune, bool isEof) {
+    logDebug("Lexing '{#c}' {#x} in {}", rune, rune, toStr(_state));
 
     switch (_state) {
 
@@ -1661,8 +1661,7 @@ Slice<Token> Lexer::consume(Rune rune, bool isEof) {
         // U+0060 GRAVE ACCENT (`)
         // This is an unexpected-character-in-unquoted-attribute-value parse
         // error. Treat it as per the "anything else" entry below.
-        else if (rune == '"' or rune == '\'' or rune == '<' or rune == '=' or
-                 rune == '`') {
+        else if (rune == '"' or rune == '\'' or rune == '<' or rune == '=' or rune == '`') {
             _raise("unexpected-character-in-unquoted-attribute-value");
             _builder.append(rune);
         }
@@ -3475,9 +3474,7 @@ Slice<Token> Lexer::consume(Rune rune, bool isEof) {
 
         // If the number is a noncharacter, then this is a
         // noncharacter-character-reference parse error.
-        else if ((0xFDD0 <= _currChar and _currChar <= 0xFDEF) or
-                 (_currChar & 0xFFFF) == 0xFFFE or
-                 (_currChar & 0xFFFF) == 0xFFFF) {
+        else if ((0xFDD0 <= _currChar and _currChar <= 0xFDEF) or (_currChar & 0xFFFF) == 0xFFFE or (_currChar & 0xFFFF) == 0xFFFF) {
             _raise("noncharacter-character-reference");
         }
 
@@ -3574,8 +3571,6 @@ Slice<Token> Lexer::consume(Rune rune, bool isEof) {
         panic("unknown-state");
         break;
     }
-
-    return sub(_sink);
 }
 
 } // namespace Web::Html

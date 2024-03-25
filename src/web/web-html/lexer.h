@@ -54,12 +54,14 @@ struct Lexer {
 #undef STATE
     };
 
+    using enum State;
+
     State _state = State::DATA;
     State _returnState = State::NIL;
 
     Opt<Token> _token;
     Opt<Token> _last;
-    Vec<Token> _sink;
+    Sink *_sink = nullptr;
 
     Rune _currChar = 0;
     StringBuilder _builder;
@@ -85,7 +87,9 @@ struct Lexer {
     }
 
     void _emit() {
-        _sink.pushBack(_ensure());
+        if (not _sink)
+            panic("no sink");
+        _sink->accept(_ensure());
         _last = std::move(_token);
     }
 
@@ -126,15 +130,13 @@ struct Lexer {
         debug("flushing code points consumed as a character reference");
     }
 
-    Slice<Token> consume(Rune rune, bool isEof = false);
-
-    Slice<Token> tokens() {
-        return _sink;
+    void bind(Sink &sink) {
+        if (_sink)
+            panic("sink already bound");
+        _sink = &sink;
     }
 
-    void flush() {
-        _sink.clear();
-    }
+    void consume(Rune rune, bool isEof = false);
 };
 
 static inline Str toStr(Token::Type type) {

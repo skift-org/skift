@@ -33,82 +33,55 @@ namespace Web::Html {
     MODE(AFTER_AFTER_BODY)           \
     MODE(AFTER_AFTER_FRAMESET)
 
-struct Builder {
-    // 13.2.6 Tree construction
-    // https://html.spec.whatwg.org/multipage/parsing.html#tree-construction
-
+struct Parser : public Sink {
     enum struct Mode {
 #define ITER(NAME) NAME,
         FOREACH_INSERTION_MODE(ITER)
 #undef ITER
     };
 
-    Mode _mode = Mode::INITIAL;
+    bool _scriptingEnabled = false;
+
+    Mode _insertionMode = Mode::INITIAL;
+    Mode _originalInsertionMode = Mode::INITIAL;
+
     Lexer _lexer;
     Strong<Dom::Document> _document;
     Vec<Strong<Dom::Element>> _openElements;
     Opt<Strong<Dom::Element>> _headElement;
     Opt<Strong<Dom::Element>> _formElement;
 
-    Builder(Strong<Dom::Document> document)
+    Parser(Strong<Dom::Document> document)
         : _document(document) {
+        _lexer.bind(*this);
     }
-
-    // 13.2.2 Parse errors
-    // https://html.spec.whatwg.org/multipage/parsing.html#parse-errors
 
     void _raise(Str msg = "parse-error");
 
-    // 13.2.6.1 Creating and inserting nodes
-    // https://html.spec.whatwg.org/multipage/parsing.html#creating-and-inserting-nodes
+    void _handleInitialMode(Token const &t);
 
-    void _apropriatePlaceForInsertingANode();
+    void _handleBeforeHtml(Token const &t);
 
-    Strong<Dom::Element> _createElementFor(Token const &t);
+    void _handleBeforeHead(Token const &t);
 
-    void _insertAnElementAtTheAdjustedInsertionLocation();
-
-    void _insertAForeignElement(Token const &t);
-
-    void _insertAnHtmlElement(Strong<Dom::Element>);
-
-    void _insertACharacter();
-
-    void _insertAComment();
-
-    //////////////////////////////////////////
+    void _handleInHead(Token const &t);
 
     void _switchTo(Mode mode);
 
-    // 13.2.6.4 The rules for parsing tokens in HTML content
-
-    // 13.2.6.4.1 The "initial" insertion mode
-    // https://html.spec.whatwg.org/multipage/parsing.html#the-initial-insertion-mode
-    Dom::QuirkMode _whichQuirkMode(Token const &);
-
-    void _handleInitialMode(Token const &t);
-
-    // 13.2.6.4.2 The "before html" insertion mode
-    // https://html.spec.whatwg.org/multipage/parsing.html#the-before-html-insertion-mode
-    void _handleBeforeHtml(Token const &t);
-
-    // 13.2.6.4.3 The "before head" insertion mode
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-beforehead
-    void _handleBeforeHead(Token const &t);
-
-    // 13.2.6.4.4 The "in head" insertion mode
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inhead
-    void _acceptInHead(Token const &t);
-
     void _acceptIn(Mode mode, Token const &t);
 
-    void accept(Token const &t);
+    void accept(Token const &t) override;
+
+    void write(Str str) {
+        for (auto r : iterRunes(str))
+            _lexer.consume(r);
+    }
 };
 
-static inline Str toStr(Builder::Mode mode) {
+static inline Str toStr(Parser::Mode mode) {
     switch (mode) {
-#define ITER(NAME)            \
-    case Builder::Mode::NAME: \
+#define ITER(NAME)           \
+    case Parser::Mode::NAME: \
         return #NAME;
         FOREACH_INSERTION_MODE(ITER)
 #undef ITER

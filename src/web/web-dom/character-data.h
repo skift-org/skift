@@ -10,6 +10,24 @@ struct CharacterData : public Dom::Node {
     CharacterData(String data)
         : data(data) {
     }
+
+    void appendData(String const &data) {
+        // HACK: This is not efficient and pretty slow,
+        //       but it's good enough for now.
+        StringBuilder sb;
+        sb.append(this->data);
+        sb.append(data);
+        this->data = sb.take();
+    }
+
+    void appendData(Rune rune) {
+        // HACK: This is not efficient and pretty slow,
+        //       but it's good enough for now.
+        StringBuilder sb;
+        sb.append(this->data);
+        sb.append(rune);
+        this->data = sb.take();
+    }
 };
 
 } // namespace Web::Dom

@@ -1,4 +1,5 @@
 
+#include <karm-base/defer.h>
 #include <karm-cli/style.h>
 #include <karm-logger/logger.h>
 
@@ -22,14 +23,8 @@ Res<> doNow(Task &self, User<TimeStamp> ts) {
 Res<> doLog(Task &self, UserSlice<char const> msg) {
     try$(self.ensure(Hj::Pledge::LOG));
     return msg.with<Str>(self.space(), [&](Str str) -> Res<> {
-        struct LoggerScope {
-            LoggerScope() {
                 Logger::_Embed::loggerLock();
-            }
-            ~LoggerScope() {
-                Logger::_Embed::loggerUnlock();
-            }
-        } scope;
+        defer$(Logger::_Embed::loggerUnlock());
         auto styledLabel = Cli::styled(self.label(), Cli::style(Cli::random(self.id())));
         try$(Io::format(Hjert::Arch::globalOut(), "{} | ", Io::aligned(styledLabel, Io::Align::LEFT, 26)));
         try$(Hjert::Arch::globalOut().writeStr(str));

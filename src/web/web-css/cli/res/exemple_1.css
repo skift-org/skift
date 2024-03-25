@@ -1,0 +1,31 @@
+html {
+    --bg: #313338;
+}
+
+@font-face {
+    font-family: "Open Sans";
+    src: url("fonts/OpenSans-VariableFont_wdth,wght.ttf");
+    font-weight: 125 950;
+    font-stretch: 75% 125%;
+    font-style: normal;
+}
+
+body {
+    display: flex;
+    height: 100svh;
+    margin: 2px;
+    font-family: 'Open Sans', sans-serif;
+    overflow: hidden;
+    background: var(--bg);
+}
+
+/* A COMMENT */
+
+.bg {
+    background: var(--bg);
+    color: red
+}
+
+#incredible-id {
+    padding: 20%;
+}

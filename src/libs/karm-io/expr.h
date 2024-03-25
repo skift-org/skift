@@ -142,6 +142,17 @@ inline auto zeroOrOne(Expr auto expr) {
     };
 }
 
+inline auto atMost(usize n, auto expr) {
+    return [=](auto &scan) {
+        for (usize i = 0; i < n; ++i) {
+            if (not expr(scan)) {
+                return true;
+            }
+        }
+        return true;
+    };
+}
+
 /// Returns true if the expression matches exactly one time and saves the result.
 inline auto token(Str &out, Expr auto expr) {
     return [=, &out](auto &scan) {
@@ -151,6 +162,18 @@ inline auto token(Str &out, Expr auto expr) {
             return true;
         }
         return false;
+    };
+}
+
+inline auto trap(auto expr, auto cb) {
+    return [=](auto &scan) {
+        auto saved = scan;
+        if (expr(scan)) {
+            scan = saved;
+            cb(saved);
+            return false;
+        }
+        return true;
     };
 }
 

@@ -1,8 +1,8 @@
 #pragma once
 
+#include <karm-panic/panic.h>
+
 #include "inert.h"
-#include "iter.h"
-#include "opt.h"
 
 namespace Karm {
 
@@ -22,28 +22,22 @@ struct Ring {
 
     Ring(Ring const &other) {
         _cap = other._cap;
-        _len = other._len;
-        _head = other._head;
-        _tail = other._tail;
         _buf = new Inert<T>[_cap];
-        for (usize i = 0; i < _len; i++) {
-            _buf[i].ctor(other.peek(i));
-        }
+        for (usize i = 0; i < other._len; i++)
+            pushBack(other.peek(i));
     }
 
-    Ring(Ring &&other) {
-        std::swap(_buf, other._buf);
-        std::swap(_cap, other._cap);
-        std::swap(_len, other._len);
-        std::swap(_head, other._head);
-        std::swap(_tail, other._tail);
+    Ring(Ring &&other)
+        : _buf(std::exchange(other._buf, nullptr)),
+          _cap(std::exchange(other._cap, 0)),
+          _len(std::exchange(other._len, 0)),
+          _head(std::exchange(other._head, 0)),
+          _tail(std::exchange(other._tail, 0)) {
     }
 
     ~Ring() {
-        for (usize i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++)
             _buf[(_tail + i) % _cap].dtor();
-        }
-
         delete[] _buf;
     }
 
@@ -82,7 +76,7 @@ struct Ring {
         return value;
     }
 
-    T dequeue() {
+    T popFront() {
         if (_len == 0) {
             panic("dequeue on empty ring");
         }
@@ -94,9 +88,8 @@ struct Ring {
     }
 
     void clear() {
-        for (usize i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++)
             _buf[(_tail + i) % _cap].dtor();
-        }
 
         _head = 0;
         _tail = 0;
@@ -119,48 +112,12 @@ struct Ring {
         return _buf[(_tail + index) % _cap].unwrap();
     }
 
-    usize len() const { return _len; }
-
-    constexpr auto iter() {
-        return Iter([&, i = 0uz] mutable -> T * {
-            if (i >= _len) {
-                return nullptr;
-            }
-
-            return &_buf[(_tail + i) % _cap].unwrap();
-        });
+    usize len() const {
+        return _len;
     }
 
-    constexpr auto iter() const {
-        return Iter([&, i = 0uz] mutable -> T const * {
-            if (i >= _len) {
-                return nullptr;
-            }
-
-            return &_buf[(_tail + i) % _cap].unwrap();
-        });
-    }
-
-    constexpr auto iterRev() {
-        return Iter([&, i = _len] mutable -> T * {
-            if (i == 0) {
-                return nullptr;
-            }
-
-            i--;
-            return &_buf[(_tail + i) % _cap].unwrap();
-        });
-    }
-
-    constexpr auto iterRev() const {
-        return Iter([&, i = _len] mutable -> T const * {
-            if (i == 0) {
-                return nullptr;
-            }
-
-            i--;
-            return &_buf[(_tail + i) % _cap].unwrap();
-        });
+    usize rem() const {
+        return _cap - _len;
     }
 };
 

@@ -2,10 +2,7 @@
 
 #include <karm-meta/traits.h>
 
-#include "clamp.h"
-#include "iter.h"
 #include "slice.h"
-#include "std.h"
 
 namespace Karm {
 

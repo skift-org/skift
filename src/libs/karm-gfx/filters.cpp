@@ -46,7 +46,7 @@ struct StackBlur {
 
     Math::Vec4u dequeue() {
         auto res = _sum / denominator();
-        _queue.dequeue();
+        _queue.popFront();
         return res;
     }
 

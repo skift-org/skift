@@ -2,7 +2,7 @@
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "hideo-shell",
     "type": "exe",
-    "description": "Graphical user interface for desktop and mobile devices.",
+    "description": "Graphical user interface for desktop and mobile devices",
     "requires": [
         "hideo-keyboard-base",
         "hideo-base",

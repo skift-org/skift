@@ -180,15 +180,17 @@ struct Header {
             Str key, value;
 
             auto RE_ENDLINE =
-                Re::zeroOrMore(Re::single(' ')) &
-                Re::word("\r\n");
+                Re::zeroOrMore(' '_re) & "\r\n"_re;
+
+            auto RE_SEPARATOR =
+                Re::separator(':'_re);
 
             auto RE_KEY_VALUE =
                 Re::token(
                     key,
-                    Re::until(Re::separator(':'))
+                    Re::until(RE_SEPARATOR)
                 ) &
-                Re::separator(':') &
+                RE_SEPARATOR &
                 Re::token(
                     value,
                     Re::until(RE_ENDLINE)
@@ -257,7 +259,7 @@ struct Response : public Header {
         if (not s.skip(' '))
             return Error::invalidData("Expected space");
 
-        s.skip(Re::untilAndConsume(Re::word("\r\n")));
+        s.skip(Re::untilAndConsume("\r\n"_re));
 
         try$(res._parse(s));
 

@@ -122,7 +122,7 @@ Res<Array> parseArray(Io::SScan &s) {
     }
 }
 
-static auto const RE_NUMBER_START = Re::single('-') | Re::digit();
+static auto const RE_NUMBER_START = '-'_re | Re::digit();
 
 Res<usize> parseDigits(Io::SScan &s) {
     if (s.ended())

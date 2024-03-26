@@ -2,7 +2,6 @@
 
 #include "buf.h"
 #include "opt.h"
-#include "ref.h"
 #include "std.h"
 
 namespace Karm {

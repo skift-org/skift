@@ -5,8 +5,16 @@
 
 namespace Handover {
 
+#ifdef __ck_bits_64__
+
 inline usize KERNEL_BASE = 0xffffffff80000000;
 inline usize UPPER_HALF = 0xffff800000000000;
+#else
+
+inline usize KERNEL_BASE = 0xc0000000;
+inline usize UPPER_HALF = 0xc0000000;
+
+#endif
 
 static constexpr u32 COOLBOOT = 0xc001b001;
 

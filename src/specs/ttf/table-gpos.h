@@ -66,9 +66,8 @@ struct Gpos : public Io::BChunk {
             }
         }
 
-        if (!kernFeatureTable) {
+        if (!kernFeatureTable)
             return Ok(Pair<ValueRecord>{});
-        }
 
         // 5. If a Feature Variation table is present, evaluate conditions in
         //    the Feature Variation table to determine if any of the initially-
@@ -85,9 +84,8 @@ struct Gpos : public Io::BChunk {
             auto lookupTable = lookupList().at(lookupIndex);
 
             // FIXME: We only support pair adjustment lookups.
-            if (lookupTable.lookupType() != (u16)GposLookupType::PAIR_ADJUSTMENT) {
+            if (lookupTable.lookupType() != (u16)GposLookupType::PAIR_ADJUSTMENT)
                 continue;
-            }
 
             for (auto lookupSubtable : lookupTable.iter()) {
                 if (auto *glyphPair = lookupSubtable.is<GlyphPairAdjustment>()) {

@@ -80,6 +80,10 @@ struct Map {
         return ::iter(_els);
     }
 
+    V at(usize index) const {
+        return _els[index].cdr;
+    }
+
     usize len() const {
         return _els.len();
     }

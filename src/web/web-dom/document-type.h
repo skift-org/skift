@@ -4,6 +4,7 @@
 
 namespace Web::Dom {
 
+// https://dom.spec.whatwg.org/#interface-documenttype
 struct DocumentType : public Node {
     String name;
     String publicId;
@@ -13,11 +14,11 @@ struct DocumentType : public Node {
         : name(name), publicId(publicId), systemId(systemId) {
     }
 
-    NodeType nodeType() override {
+    NodeType nodeType() const override {
         return NodeType::DOCUMENT_TYPE;
     }
 
-    void _dump(Io::Emit &e) override {
+    void _dump(Io::Emit &e) const override {
         e(" name={#} publicId={#} systemId={#}", this->name, this->publicId, this->systemId);
     }
 };

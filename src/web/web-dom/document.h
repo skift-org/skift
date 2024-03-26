@@ -10,10 +10,11 @@ enum struct QuirkMode {
     YES
 };
 
+// https://dom.spec.whatwg.org/#interface-document
 struct Document : public Node {
     QuirkMode quirkMode{QuirkMode::NO};
 
-    NodeType nodeType() override {
+    NodeType nodeType() const override {
         return NodeType::DOCUMENT;
     }
 };

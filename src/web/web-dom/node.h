@@ -35,6 +35,7 @@ static inline Str toStr(NodeType type) {
     panic("unreachable");
 }
 
+// https://dom.spec.whatwg.org/#interface-node
 struct Node : public Meta::Static {
     Node *_parent = nullptr;
     LlItem<Node> _siblings;
@@ -42,7 +43,7 @@ struct Node : public Meta::Static {
 
     virtual ~Node() = default;
 
-    virtual NodeType nodeType() = 0;
+    virtual NodeType nodeType() const = 0;
 
     /* --- Parent --- */
 
@@ -105,7 +106,7 @@ struct Node : public Meta::Static {
         return parentNode()._children[index + 1];
     }
 
-    void _dumpChildren(Io::Emit &e) {
+    void _dumpChildren(Io::Emit &e) const {
         if (_children.len() > 0) {
             e.indentNewline();
             for (auto &child : _children) {
@@ -115,9 +116,9 @@ struct Node : public Meta::Static {
         }
     }
 
-    virtual void _dump(Io::Emit &) {}
+    virtual void _dump(Io::Emit &) const {}
 
-    void dump(Io::Emit &e) {
+    void dump(Io::Emit &e) const {
         e("({}", Io::toParamCase(toStr(nodeType())));
         _dump(e);
         _dumpChildren(e);

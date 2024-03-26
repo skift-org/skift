@@ -4,6 +4,7 @@
 
 namespace Web::Dom {
 
+// https://dom.spec.whatwg.org/#interface-characterdata
 struct CharacterData : public Dom::Node {
     String data;
 
@@ -29,7 +30,7 @@ struct CharacterData : public Dom::Node {
         this->data = sb.take();
     }
 
-    void _dump(Io::Emit &e) override {
+    void _dump(Io::Emit &e) const override {
         e(" data={#}", this->data);
     }
 };

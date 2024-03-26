@@ -4,10 +4,11 @@
 
 namespace Web::Dom {
 
+// https://dom.spec.whatwg.org/#text
 struct Text : public CharacterData {
     using CharacterData::CharacterData;
 
-    NodeType nodeType() override {
+    NodeType nodeType() const override {
         return NodeType::TEXT;
     }
 };

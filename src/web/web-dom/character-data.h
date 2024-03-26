@@ -28,6 +28,10 @@ struct CharacterData : public Dom::Node {
         sb.append(rune);
         this->data = sb.take();
     }
+
+    void _dump(Io::Emit &e) override {
+        e(" data={#}", this->data);
+    }
 };
 
 } // namespace Web::Dom

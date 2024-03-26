@@ -11,8 +11,12 @@ struct Element : public Node {
         : tagName(tagName) {
     }
 
-    virtual NodeType nodeType() override {
+    NodeType nodeType() override {
         return NodeType::ELEMENT;
+    }
+
+    void _dump(Io::Emit &e) override {
+        e(" tagName={#}", this->tagName);
     }
 };
 

@@ -13,6 +13,14 @@ void Parser::_raise(Str msg) {
     logError("{}: {}", toStr(_insertionMode), msg);
 }
 
+// 13.2.5 Tokenization
+// https://html.spec.whatwg.org/multipage/parsing.html#tokenization
+
+// https://html.spec.whatwg.org/multipage/parsing.html#acknowledge-self-closing-flag
+void acknowledgeSelfClosingFlag(Token const &) {
+    logTodo();
+}
+
 // 13.2.6 Tree construction
 // https://html.spec.whatwg.org/multipage/parsing.html#tree-construction
 

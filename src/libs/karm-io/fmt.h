@@ -649,18 +649,54 @@ struct Formatter<T> {
 
 /* --- Format String -------------------------------------------------------- */
 
-template <>
-struct Formatter<Str> {
+struct StringFormatter {
+    bool prefix = false;
+
+    void parse(Io::SScan &scan) {
+        if (scan.skip('#'))
+            prefix = true;
+    }
+
     Res<usize> format(Io::TextWriter &writer, Str text) {
-        return writer.writeStr(text);
+        if (not prefix)
+            return writer.writeStr(text);
+
+        usize written = 0;
+        written += try$(writer.writeRune('"'));
+        for (Rune c : text) {
+            if (c == '"')
+                written += try$(writer.writeStr("\\\""));
+            else if (c == '\\')
+                written += try$(writer.writeStr("\\\\"));
+            else if (c == '\a')
+                written += try$(writer.writeStr("\\a"));
+            else if (c == '\b')
+                written += try$(writer.writeStr("\\b"));
+            else if (c == '\f')
+                written += try$(writer.writeStr("\\f"));
+            else if (c == '\n')
+                written += try$(writer.writeStr("\\n"));
+            else if (c == '\r')
+                written += try$(writer.writeStr("\\r"));
+            else if (c == '\t')
+                written += try$(writer.writeStr("\\t"));
+            else if (c == '\v')
+                written += try$(writer.writeStr("\\v"));
+            else if (not isAsciiPrint(c))
+                written += try$(Io::format(writer, "\\u{x}", c));
+            else
+                written += try$(writer.writeRune(c));
+        }
+        written += try$(writer.writeRune('"'));
+        return Ok(written);
     }
 };
 
 template <>
-struct Formatter<String> {
-    Res<usize> format(Io::TextWriter &writer, String const &text) {
-        return writer.writeStr(text);
-    }
+struct Formatter<Str> : public StringFormatter {};
+
+template <>
+struct Formatter<String> : public StringFormatter {
 };
 
 template <>

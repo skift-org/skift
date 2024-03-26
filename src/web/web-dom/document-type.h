@@ -13,8 +13,12 @@ struct DocumentType : public Node {
         : name(name), publicId(publicId), systemId(systemId) {
     }
 
-    virtual NodeType nodeType() override {
+    NodeType nodeType() override {
         return NodeType::DOCUMENT_TYPE;
+    }
+
+    void _dump(Io::Emit &e) override {
+        e(" name={#} publicId={#} systemId={#}", this->name, this->publicId, this->systemId);
     }
 };
 

@@ -13,7 +13,7 @@ enum struct QuirkMode {
 struct Document : public Node {
     QuirkMode quirkMode{QuirkMode::NO};
 
-    virtual NodeType nodeType() override {
+    NodeType nodeType() override {
         return NodeType::DOCUMENT;
     }
 };

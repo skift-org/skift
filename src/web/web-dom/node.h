@@ -105,9 +105,7 @@ struct Node : public Meta::Static {
         return parentNode()._children[index + 1];
     }
 
-    void dump(Io::Emit &e) {
-        e("({}", Io::toParamCase(toStr(nodeType())));
-
+    void _dumpChildren(Io::Emit &e) {
         if (_children.len() > 0) {
             e.indentNewline();
             for (auto &child : _children) {
@@ -115,6 +113,14 @@ struct Node : public Meta::Static {
             }
             e.deindent();
         }
+    }
+
+    virtual void _dump(Io::Emit &) {}
+
+    void dump(Io::Emit &e) {
+        e("({}", Io::toParamCase(toStr(nodeType())));
+        _dump(e);
+        _dumpChildren(e);
         e(")\n");
     }
 

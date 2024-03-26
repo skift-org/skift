@@ -98,7 +98,6 @@ AdjustedInsertionLocation apropriatePlaceForInsertingANode(Parser &b, Opt<Strong
 
 // https://html.spec.whatwg.org/multipage/parsing.html#create-an-element-for-the-token
 Strong<Dom::Element> createElementFor(Token const &t, Namespace) {
-    auto el = makeStrong<Dom::Element>(t.name.unwrap());
     // NOSPEC: Keep it simple for the POC
 
     // 1. If the active speculative HTML parser is not null, then return the
@@ -142,8 +141,12 @@ Strong<Dom::Element> createElementFor(Token const &t, Namespace) {
     //    localName, given namespace, null, and is. If will execute script
     //    is true, set the synchronous custom elements flag; otherwise,
     //    leave it unset.
+    auto el = makeStrong<Dom::Element>(t.name.unwrap());
 
     // 10. Append each attribute in the given token to element.
+    for (auto &[name, value] : t.attrs) {
+        el->setAttribute(tryOr(name, ""), tryOr(value, ""));
+    }
 
     // 11. If will execute script is true, then:
     if (willExecuteScript) {

@@ -23,10 +23,20 @@ struct Element : public Node {
 
     void _dump(Io::Emit &e) const override {
         e(" tagName={#}", this->tagName);
-        for (auto const &[name, attr] : this->attributes.iter()) {
-            e(" attr={#}", name);
-            attr->_dump(e);
+        if (this->attributes.len()) {
+            e.indentNewline();
+            for (auto const &[name, attr] : this->attributes.iter()) {
+                attr->dump(e);
+            }
+            e.deindent();
         }
+    }
+
+    void setAttribute(String name, String value) {
+        auto attr = makeStrong<Attr>();
+        attr->localName = name;
+        attr->value = value;
+        this->attributes.put(name, attr);
     }
 };
 

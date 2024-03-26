@@ -51,9 +51,8 @@ Res<String> parseStr(Io::SScan &s) {
             }
         }
 
-        if (s.next()) {
+        if (s.next())
             continue;
-        }
 
         return Error::invalidData("invalid string");
     }
@@ -76,9 +75,8 @@ Res<Object> parseObject(Io::SScan &s) {
         auto key = try$(parseStr(s));
 
         s.eat(Re::space());
-        if (not s.skip(':')) {
+        if (not s.skip(':'))
             return Error::invalidData("expected ':'");
-        }
 
         s.eat(Re::space());
 
@@ -87,24 +85,22 @@ Res<Object> parseObject(Io::SScan &s) {
 
         s.eat(Re::space());
 
-        if (s.skip('}')) {
+        if (s.skip('}'))
             return Ok(m);
-        }
-        if (not s.skip(',')) {
+
+        if (not s.skip(','))
             return Error::invalidData("expected ','");
-        }
     }
 }
 
 Res<Array> parseArray(Io::SScan &s) {
     Array v;
-    if (not s.skip('[')) {
+    if (not s.skip('['))
         return Error::invalidData("expected '['");
-    }
 
-    if (s.skip(']')) {
+    if (s.skip(']'))
         return Ok(v);
-    }
+
     while (true) {
         s.eat(Re::space());
 
@@ -113,12 +109,11 @@ Res<Array> parseArray(Io::SScan &s) {
 
         s.eat(Re::space());
 
-        if (s.skip(']')) {
+        if (s.skip(']'))
             return Ok(v);
-        }
-        if (not s.skip(',')) {
+
+        if (not s.skip(','))
             return Error::invalidData("expected ','");
-        }
     }
 }
 
@@ -136,6 +131,7 @@ Res<usize> parseDigits(Io::SScan &s) {
         s.next();
         ++digits;
     }
+
     return Ok(digits);
 }
 
@@ -152,6 +148,7 @@ Res<f64> parseDecimal(Io::SScan &s) {
         fpart += parseAsciiDecDigit(s.next()) * multiplier;
         multiplier /= 10;
     }
+
     return Ok(fpart);
 }
 
@@ -174,15 +171,15 @@ Res<isize> parseInteger(Io::SScan &s) {
     while (s.match(Re::digit()) != Match::NO) {
         ipart = ipart * 10 + parseAsciiDecDigit(s.next());
     }
+
     return Ok(sign ? -ipart : ipart);
 }
 
 Res<Value> parseNumber(Io::SScan &s) {
     isize ipart = try$(parseInteger(s));
 
-    if (s.match(Re::single('.', 'e', 'E')) == Match::NO) {
+    if (s.match(Re::single('.', 'e', 'E')) == Match::NO)
         return Ok<Value>(ipart);
-    }
 
 // NOTE: Floating point numbers are not supported in freestanding environments.
 #ifdef __ck_freestanding__

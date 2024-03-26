@@ -66,6 +66,8 @@ struct Parser : public Sink {
 
     void _handleInHead(Token const &t);
 
+    void _handleInHeadNoScript(Token const &t);
+
     void _switchTo(Mode mode);
 
     void _acceptIn(Mode mode, Token const &t);

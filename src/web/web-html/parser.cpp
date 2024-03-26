@@ -406,6 +406,7 @@ void Parser::_handleBeforeHead(Token const &t) {
     // A start tag whose tag name is "head"
     else if (t.type == Token::START_TAG and t.name == "head") {
         _headElement = insertHtmlElement(*this, t);
+        _switchTo(Mode::IN_HEAD);
     }
 
     // Anything else
@@ -428,6 +429,12 @@ void Parser::_handleBeforeHead(Token const &t) {
 
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inhead
 void Parser::_handleInHead(Token const &t) {
+    auto anythingElse = [&] {
+        _openElements.popBack();
+        _switchTo(Mode::AFTER_HEAD);
+        accept(t);
+    };
+
     // A character token that is one of U+0009 CHARACTER TABULATION,
     // U+000A LINE FEED (LF), U+000C FORM FEED (FF),
     // U+000D CARRIAGE RETURN (CR), or U+0020 SPACE
@@ -520,6 +527,82 @@ void Parser::_handleInHead(Token const &t) {
 
         // 10. Switch the insertion mode to "text".
         _switchTo(Mode::TEXT);
+    } else if (t.type == Token::END_TAG and (t.name == "head")) {
+        _openElements.popBack();
+        _switchTo(Mode::AFTER_HEAD);
+    } else if (t.type == Token::END_TAG and (t.name == "body" or t.name == "html" or t.name == "br")) {
+        anythingElse();
+    } else if (t.type == Token::START_TAG and (t.name == "template")) {
+        // NOSPEC: We don't support templates
+    } else if (t.type == Token::END_TAG and (t.name == "template")) {
+        // NOSPEC: We don't support templates
+    } else if ((t.type == Token::START_TAG and (t.name == "head")) or t.type == Token::END_TAG) {
+        // ignore
+        _raise();
+    } else {
+        anythingElse();
+    }
+}
+
+// https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inheadnoscript
+void Parser::_handleInHeadNoScript(Token const &t) {
+    auto anythingElse = [&] {
+        _raise();
+        _openElements.popBack();
+        _switchTo(Mode::IN_HEAD);
+        accept(t);
+    };
+
+    // A DOCTYPE token
+    if (t.type == Token::DOCTYPE) {
+        _raise();
+    }
+
+    // A start tag whose tag name is "html"
+    else if (t.type == Token::START_TAG and (t.name == "html")) {
+        _acceptIn(Mode::IN_BODY, t);
+    }
+
+    // An end tag whose tag name is "noscript"
+    else if (t.type == Token::END_TAG and (t.name == "noscript")) {
+        _openElements.popBack();
+        _switchTo(Mode::IN_HEAD);
+    }
+
+    // A character token that is one of
+    //   - U+0009 CHARACTER TABULATION,
+    //   - U+000A LINE FEED (LF),
+    //   - U+000C FORM FEED (FF),
+    //   - U+000D CARRIAGE RETURN (CR),
+    //   - or U+0020 SPACE
+    // A comment token
+    // A start tag whose tag name is one of: "basefont", "bgsound", "link", "meta", "noframes", "style"
+    else if (
+        (t.type == Token::CHARACTER and (t.rune == '\t' or t.rune == '\n' or t.rune == '\f' or t.rune == ' ')) or
+        t.type == Token::COMMENT or
+        (t.type == Token::START_TAG and (t.name == "basefont" or t.name == "bgsound" or t.name == "link" or t.name == "meta" or t.name == "noframes" or t.name == "style"))
+    ) {
+        _acceptIn(Mode::IN_HEAD, t);
+    }
+
+    // An end tag whose tag name is "br"
+    else if (t.type == Token::END_TAG and (t.name == "br")) {
+        anythingElse();
+    }
+
+    // A start tag whose tag name is one of: "head", "noscript"
+    // Any other end tag
+    else if (
+        (t.type == Token::START_TAG and (t.name == "head" or t.name == "noscript")) or
+        t.type == Token::END_TAG
+    ) {
+        // ignore
+        _raise();
+    }
+
+    // Anything else
+    else {
+        anythingElse();
     }
 }
 
@@ -548,10 +631,9 @@ void Parser::_acceptIn(Mode mode, Token const &t) {
         _handleInHead(t);
         break;
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inheadnoscript
-    case Mode::IN_HEAD_NOSCRIPT: {
+    case Mode::IN_HEAD_NOSCRIPT:
+        _handleInHeadNoScript(t);
         break;
-    }
 
     // https://html.spec.whatwg.org/multipage/parsing.html#the-after-head-insertion-mode
     case Mode::AFTER_HEAD: {

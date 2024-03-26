@@ -26,7 +26,7 @@ void Lexer::_raise(Str msg) {
 }
 
 void Lexer::consume(Rune rune, bool isEof) {
-    logDebug("Lexing '{#c}' {#x} in {}", rune, rune, toStr(_state));
+    // logDebug("Lexing '{#c}' {#x} in {}", rune, rune, toStr(_state));
 
     switch (_state) {
 

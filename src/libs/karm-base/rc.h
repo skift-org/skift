@@ -34,9 +34,9 @@ struct _Cell {
         if (_strong == 0 and _weak == 0) {
             _lock.release();
             delete this;
+        } else {
+            _lock.release();
         }
-
-        _lock.release();
     }
 
     _Cell *refStrong() {

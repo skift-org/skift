@@ -4,6 +4,11 @@
 
 namespace Karm {
 
+template <typename T>
+concept CType = requires(T c, Rune r) {
+    { c(r) } -> Meta::Same<bool>;
+};
+
 /* --- Check Identity ------------------------------------------------------- */
 
 constexpr bool isAscii(Rune rune) {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/ctype.h>
 #include <karm-base/string.h>
 
 #include "sscan.h"
@@ -188,6 +189,17 @@ inline auto single(auto... c) {
     };
 }
 
+/// Match a single character against a ctype function and consume it.
+inline auto ctype(CType auto ctype) {
+    return [=](auto &scan) {
+        if (ctype(scan.curr())) {
+            scan.next();
+            return true;
+        }
+        return false;
+    };
+}
+
 /// Match a character range and consume it if it lies within the range.
 inline auto range(Rune start, Rune end) {
     return [=](auto &scan) {
@@ -201,14 +213,19 @@ inline auto range(Rune start, Rune end) {
 
 /* --- Posix Classes -------------------------------------------------------- */
 
+/// Match an ASCII Character and consume it.
+inline auto ascii() {
+    return ctype(isAscii);
+}
+
 /// Match an ASCII upper case letter and consume it.
 inline auto upper() {
-    return range('A', 'Z');
+    return ctype(isAsciiUpper);
 }
 
 /// Match an ASCII lower case letter and consume it.
 inline auto lower() {
-    return range('a', 'z');
+    return ctype(isAsciiLower);
 }
 
 /// Match an ASCII letter and consume it.
@@ -218,17 +235,17 @@ inline auto alpha() {
 
 /// Match an ASCII digit and consume it.
 inline auto digit() {
-    return range('0', '9');
+    return ctype(isDecDigit);
 }
 
 /// Match an ASCII hexadecimal digit and consume it.
 inline auto xdigit() {
-    return digit() | range('a', 'f') | range('A', 'F');
+    return ctype(isHexDigit);
 }
 
 /// Match an ASCII alphanumeric character and consume it.
 inline auto alnum() {
-    return alpha() | digit();
+    return ctype(isAsciiAlphaNum);
 }
 
 /// Match a work made of ASCII letters and underscores and consume it.

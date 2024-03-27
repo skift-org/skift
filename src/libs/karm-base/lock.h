@@ -9,7 +9,7 @@
 
 namespace Karm {
 
-struct CriticalScope :
+struct [[nodiscard]] CriticalScope :
     Meta::Static {
 
     CriticalScope() {
@@ -75,7 +75,7 @@ concept Lockable =
         lockable.release();
     };
 
-struct LockScope :
+struct [[nodiscard]] LockScope :
     Meta::Static {
     Lock &_lock;
 
@@ -176,7 +176,7 @@ struct RwLock : Meta::Static {
     }
 };
 
-struct ReadLockScope : Meta::Static {
+struct [[nodiscard]] ReadLockScope : Meta::Static {
     RwLock &_lock;
 
     ReadLockScope(RwLock &lock)
@@ -189,7 +189,7 @@ struct ReadLockScope : Meta::Static {
     }
 };
 
-struct WriteLockScope : Meta::Static {
+struct [[nodiscard]] WriteLockScope : Meta::Static {
     RwLock &_lock;
 
     WriteLockScope(RwLock &lock)

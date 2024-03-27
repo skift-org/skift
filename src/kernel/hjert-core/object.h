@@ -46,7 +46,7 @@ struct BaseObject : public Object {
     }
 };
 
-struct ObjectLockScope : public LockScope {
+struct [[nodiscard]] ObjectLockScope : public LockScope {
     ObjectLockScope(Object &obj)
         : LockScope(obj._lock) {
     }

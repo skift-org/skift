@@ -1805,7 +1805,7 @@ void Lexer::consume(Rune rune, bool isEof) {
         // Two U+002D HYPHEN-MINUS characters (-)
         // Consume those two characters, create a comment token whose data
         // is the empty string, and switch to the comment start state.
-        if (auto r = startWith(Str{"--"}, _temp.str()); r != Match::NO) {
+        if (auto r = startWith("--"_str, _temp.str()); r != Match::NO) {
             if (r == Match::PARTIAL)
                 break;
 
@@ -1817,7 +1817,7 @@ void Lexer::consume(Rune rune, bool isEof) {
         // ASCII case-insensitive match for the word "DOCTYPE"
         // Consume those characters and switch to the DOCTYPE state.
 
-        else if (auto r = startWith(Str{"DOCTYPE"}, _temp.str()); r != Match::NO) {
+        else if (auto r = startWith("DOCTYPE"_str, _temp.str()); r != Match::NO) {
             if (r == Match::PARTIAL)
                 break;
 
@@ -1833,7 +1833,7 @@ void Lexer::consume(Rune rune, bool isEof) {
         // error. Create a comment token whose data is the "[CDATA[" string.
         // Switch to the bogus comment state.
 
-        else if (auto r = startWith(Str{"[CDATA["}, _temp.str()); r != Match::NO) {
+        else if (auto r = startWith("[CDATA["_str, _temp.str()); r != Match::NO) {
             if (r == Match::PARTIAL)
                 break;
 

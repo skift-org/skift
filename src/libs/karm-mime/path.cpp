@@ -58,7 +58,7 @@ void Path::normalize() {
 
 Str Path::basename() const {
     if (not _parts.len())
-        return Str{};
+        return {};
 
     return last(_parts);
 }

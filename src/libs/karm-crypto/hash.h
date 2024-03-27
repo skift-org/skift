@@ -139,15 +139,15 @@ struct AnyHash {
     }
 
     Str name() const {
-#define ITER(NAME, TYPE)   \
-    [&](TYPE) {            \
-        return Str{#NAME}; \
+#define ITER(NAME, TYPE)     \
+    [&](TYPE) {              \
+        return #NAME ""_str; \
     },
 
         return _h.visit(Visitor{
             [&](None) {
                 unreachable();
-                return Str{};
+                return ""_str;
             },
             FOR_EACH_HASH(ITER)
         });
@@ -158,7 +158,7 @@ struct AnyHash {
 
 static inline Res<AnyHash> fromName(Str name) {
 #define ITER(NAME, TYPE)            \
-    if (eqCi(name, Str{#NAME})) {   \
+    if (eqCi(name, #NAME ""_str)) { \
         return Ok(AnyHash{TYPE{}}); \
     }
     FOR_EACH_HASH(ITER)
@@ -170,7 +170,7 @@ static inline Res<AnyHash> fromName(Str name) {
 static inline Str name(HashType type) {
 #define ITER(NAME, TYPE)          \
     if (type == HashType::NAME) { \
-        return Str{#NAME};        \
+        return #NAME ""_str;      \
     }
     FOR_EACH_HASH(ITER)
 #undef ITER

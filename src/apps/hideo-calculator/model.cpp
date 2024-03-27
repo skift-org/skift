@@ -25,7 +25,7 @@ void doOperator(State &s, Operator op) {
 
     case Operator::DIV:
         if (s.rhs == 0) {
-            s.error = Str{"division by zero"};
+            s.error = "division by zero"_str;
             break;
         }
         s.lhs = s.lhs / s.rhs;

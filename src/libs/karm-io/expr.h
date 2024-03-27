@@ -52,7 +52,15 @@ auto operator&(Expr auto a, Expr auto b) {
 /// Inverts the result of the expression.
 inline auto negate(Expr auto expr) {
     return [=](auto &scan) {
-        return not expr(scan);
+        auto saved = scan;
+        if (not expr(scan)) {
+            if (scan.ended())
+                return false;
+            scan.next();
+            return true;
+        }
+        scan = saved;
+        return false;
     };
 }
 

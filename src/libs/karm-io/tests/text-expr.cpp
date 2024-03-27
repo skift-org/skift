@@ -24,4 +24,14 @@ test$(exprSingle) {
     return Ok();
 }
 
+test$(exprNegate) {
+    expect$(Re::match(~'a'_re, "") == Match::NO);
+    expect$(Re::match(~'a'_re, "b") == Match::YES);
+    expect$(Re::match(~'a'_re, "a") == Match::NO);
+    expect$(Re::match((~'a'_re) & 'a'_re, "ba") == Match::YES);
+    expect$(Re::match((~'a'_re) & 'a'_re, "aa") == Match::NO);
+
+    return Ok();
+}
+
 } // namespace Karm::Io::Tests

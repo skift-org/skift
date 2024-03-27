@@ -5,3 +5,5 @@ __pycache__/
 .python-version
 book/
 *.code-workspace
+.idea/
+skift.iml

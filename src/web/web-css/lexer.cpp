@@ -1,9 +1,8 @@
 #include <karm-base/array.h>
 #include <karm-base/cons.h>
 #include <karm-io/expr.h>
+#include <karm-logger/logger.h>
 
-#include "karm-io/sscan.h"
-#include "karm-logger/logger.h"
 #include "lexer.h"
 
 namespace Web::Css {
@@ -82,6 +81,17 @@ static auto const RE_DIGIT = Re::oneOrMore(Re::digit());
 static auto const RE_OPERATOR = Re::either(Re::single('-', '+'), Re::nothing());
 static auto const RE_AT_KEYWORD = Re::chain('@'_re, RE_IDENTIFIER);
 
+static auto const RE_FUNCTION = RE_IDENTIFIER & RE_PARENTHESIS_OPEN;
+
+// non printable token https://www.w3.org/TR/css-syntax-3/#non-printable-code-point
+static auto const RE_URL = Re::chain(
+    Re::zeroOrOne(RE_WHITESPACE_TOKEN),
+    Re::zeroOrMore(
+        Re::either(RE_ESCAPE, Re::negate(Re::single('"', '\'', '(', ')', '\\', 0x007F, 0x000B) | RE_WHITESPACE | Re::range(0x0000, 0x0008) | Re::range(0x000E, 0x001F)))
+    ),
+    Re::zeroOrOne(RE_WHITESPACE_TOKEN),
+    RE_PARENTHESIS_CLOSE
+);
 static auto const RE_HASH = Re::chain(
     Re::single('#'),
     Re::oneOrMore(
@@ -153,18 +163,9 @@ void Lexer::_raise(Str msg) {
     logError("{}: ", msg);
 }
 
-void Lexer::consume(Rune rune, bool isEof) {
-    logDebug("Lexing '{#c}' {#x} in {}", rune, rune, isEof);
-
-    if (isEof) {
-        _begin(Token::END_OF_FILE);
-        _emit();
-    }
-}
-
-Res<Token>
-nextToken(Io::SScan &s) {
+Res<Token> nextToken(Io::SScan &s) {
     if (s.ended()) {
+        // NO SPEC
         return Ok(Token{Token::Type::END_OF_FILE, s.end()});
     }
 
@@ -214,7 +215,7 @@ nextToken(Io::SScan &s) {
         return Ok(Token{Token::Type::HASH, s.end()});
     }
 
-    // comments
+    // https://www.w3.org/TR/css-syntax-3/#consume-numeric-token
     if (s.skip("/*")) {
         s.skip(Re::untilAndConsume(Re::word("*/")));
 
@@ -240,6 +241,16 @@ nextToken(Io::SScan &s) {
         return Ok(Token{Token::Type::NUMBER, s.end()});
     }
 
+    if (s.skip(RE_FUNCTION)) {
+        if (s.end() == "url(" and s.skip(RE_URL)) {
+            // unclear spec
+            return Ok(Token{Token::Type::URL, s.end()});
+        }
+
+        return Ok(Token{Token::Type::FUNCTION, s.end()});
+    }
+
+    // https://www.w3.org/TR/css-syntax-3/#consume-name
     if (s.skip(RE_IDENTIFIER)) {
         return Ok(Token{Token::Type::IDENT, s.end()});
     }
@@ -248,6 +259,7 @@ nextToken(Io::SScan &s) {
         return Ok(Token{Token::Type::AT_KEYWORD, s.end()});
     }
 
+    // https://www.w3.org/TR/css-syntax-3/#consume-string-token
     if (s.skip(RE_STRING)) {
         return Ok(Token{Token::Type::STRING, s.end()});
     }
@@ -257,6 +269,7 @@ nextToken(Io::SScan &s) {
     }
 
     logDebug("error at {#}", s.curr());
+    // NO SPEC BUT SHOULD BE UNREACHABLE
     return Ok(Token{Token::Type::OTHER, s.end()});
 }
 

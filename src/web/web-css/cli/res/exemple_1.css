@@ -5,6 +5,7 @@ html {
 @font-face {
     font-family: "Open Sans";
     src: url("fonts/OpenSans-VariableFont_wdth,wght.ttf");
+    src: url(https://fonts.com/);
     font-weight: 125 950;
     font-stretch: 75% 125%;
     font-style: normal;

@@ -2,7 +2,6 @@
 
 #include <web-dom/document.h>
 
-#include "karm-base/slice.h"
 #include "karm-logger/logger.h"
 #include "lexer.h"
 
@@ -23,9 +22,9 @@ struct Parser : public Sink {
     void write(Str str) {
         auto s = Io::SScan(str);
         while (true) {
-            auto t = nextToken(s);
-            logDebug("{#}", t);
-            if (t.unwrap().type == Token::Type::END_OF_FILE || t.unwrap().data == "") {
+            auto token = nextToken(s).unwrap();
+            logDebug("{#}", token);
+            if (token.type == Token::Type::END_OF_FILE || token.data == "") {
                 return;
             }
         }

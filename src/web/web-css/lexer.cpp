@@ -19,6 +19,7 @@ static auto const RE_SQUARE_BRACKET_CLOSE = Re::single(']');
 static auto const RE_SEMICOLON = Re::single(';');
 static auto const RE_COLON = Re::single(':');
 static auto const RE_COMMA = Re::single(',');
+static auto const RE_DELIM = '.'_re | '+'_re | '-'_re | '#'_re | '~'_re | '!'_re; // NO SPEC
 
 static auto const RE_NEWLINE = Re::either(Re::single('\n', '\r', '\f'), Re::word("\r\n"));
 static auto const RE_ASCII = Re::range(0x00, 0x7f);
@@ -26,7 +27,22 @@ static auto const RE_WHITESPACE = Re::either(Re::space(), Re::single('\t'), RE_N
 static auto const RE_WHITESPACE_TOKEN = Re::oneOrMore(Re::either(Re::space(), Re::single('\t'), RE_NEWLINE));
 
 static auto const RE_ESCAPE = Re::chain(
-    Re::single('\\'), Re::either(Re::oneOrMore(Re::negate(Re::either(Re::xdigit(), RE_NEWLINE))), Re::chain(Re::xdigit(), Re::atMost(5, Re::xdigit()), Re::zeroOrOne(RE_WHITESPACE)))
+    '\\'_re,
+    Re::either(
+        Re::oneOrMore(
+            Re::negate(
+                Re::either(
+                    Re::xdigit(),
+                    RE_NEWLINE
+                )
+            )
+        ),
+        Re::chain(
+            Re::xdigit(),
+            Re::atMost(5, Re::xdigit()),
+            Re::zeroOrOne(RE_WHITESPACE)
+        )
+    )
 );
 
 static auto const RE_UNICODE = Re::chain(Re::single('U', 'u'), Re::oneOrMore(Re::xdigit()));
@@ -53,7 +69,7 @@ static auto const RE_IDENTIFIER = Re::chain(
             Re::either(
                 RE_ESCAPE,
                 Re::either(
-                    Re::alpha(),
+                    Re::alnum(),
                     Re::single('_', '-'),
                     Re::negate(RE_ASCII)
                 )
@@ -99,25 +115,39 @@ static auto const RE_NUMBER = Re::chain(
 // string token description
 
 void _stringFailed(Io::SScan const &) {
-    debug("coucou");
+    logDebug("coucou");
 };
 
-static auto const RE_STRING = Re::trap(
-    Re::chain(
-        '"'_re,
-        Re::zeroOrMore(
-            Re::either(
-                RE_ESCAPE,
-                Re::negate(
-                    '\\'_re | RE_NEWLINE
-                ),
-                '\\'_re & RE_NEWLINE
-            )
+static auto const RE_STRING =
+    Re::either(
+        Re::chain(
+            '"'_re,
+            Re::zeroOrMore(
+                Re::either(
+                    RE_ESCAPE,
+                    Re::negate(
+                        '\\'_re | RE_NEWLINE | '\"'_re
+                    ),
+                    '\\'_re & RE_NEWLINE
+                )
+            ),
+            '"'_re
         ),
-        '"'_re
-    ),
-    _stringFailed
-);
+        Re::chain(
+            '\''_re,
+            Re::zeroOrMore(
+                Re::either(
+                    RE_ESCAPE,
+                    Re::negate(
+                        '\\'_re | RE_NEWLINE | '\''_re
+                    ),
+                    '\\'_re & RE_NEWLINE
+                )
+            ),
+            '\''_re
+        )
+
+    );
 
 void Lexer::_raise(Str msg) {
     logError("{}: ", msg);
@@ -194,12 +224,11 @@ nextToken(Io::SScan &s) {
             return Error::invalidInput("unterminated comment");
         }
 
-        return Ok(Token{Token::Type::OTHER, data});
+        return Ok(Token{Token::Type::COMMENT, data});
     }
 
     // https://www.w3.org/TR/css-syntax-3/#consume-numeric-token
     if (s.skip(RE_NUMBER)) {
-        logDebug("number {}", s.end());
         if (s.skip(RE_IDENTIFIER)) {
             return Ok(Token{Token::Type::DIMENSION, s.end()});
         }
@@ -223,7 +252,11 @@ nextToken(Io::SScan &s) {
         return Ok(Token{Token::Type::STRING, s.end()});
     }
 
-    logDebug("error at {}", s.curr());
+    if (s.skip(RE_DELIM)) {
+        return Ok(Token{Token::Type::DELIM, s.end()});
+    }
+
+    logDebug("error at {#}", s.curr());
     return Ok(Token{Token::Type::OTHER, s.end()});
 }
 

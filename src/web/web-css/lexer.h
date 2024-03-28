@@ -35,6 +35,7 @@ namespace Web::Css {
     TOKEN(RIGHT_SQUARE_BRACKET) \
     TOKEN(LEFT_PARENTHESIS)     \
     TOKEN(RIGHT_PARENTHESIS)    \
+    TOKEN(COMMENT)              \
     TOKEN(END_OF_FILE)          \
     TOKEN(OTHER)
 

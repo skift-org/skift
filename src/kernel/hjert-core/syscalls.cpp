@@ -23,7 +23,7 @@ Res<> doNow(Task &self, User<TimeStamp> ts) {
 Res<> doLog(Task &self, UserSlice<char const> msg) {
     try$(self.ensure(Hj::Pledge::LOG));
     return msg.with<Str>(self.space(), [&](Str str) -> Res<> {
-                Logger::_Embed::loggerLock();
+        Logger::_Embed::loggerLock();
         defer$(Logger::_Embed::loggerUnlock());
         auto styledLabel = Cli::styled(self.label(), Cli::style(Cli::random(self.id())));
         try$(Io::format(Hjert::Arch::globalOut(), "{} | ", Io::aligned(styledLabel, Io::Align::LEFT, 26)));

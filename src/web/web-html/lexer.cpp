@@ -3329,7 +3329,7 @@ void Lexer::consume(Rune rune, bool isEof) {
 
         // ASCII hex digit
         // Reconsume in the hexadecimal character reference state.
-        if (isHexDigit(rune)) {
+        if (isAsciiHexDigit(rune)) {
             _reconsumeIn(State::HEXADECIMAL_CHARACTER_REFERENCE, rune);
         }
 

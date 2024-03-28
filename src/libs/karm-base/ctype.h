@@ -35,20 +35,20 @@ constexpr bool isAsciiAlphaNum(Rune rune) {
     return isAsciiAlpha(rune) or isAsciiDigit(rune);
 }
 
-constexpr bool isBinDigit(Rune rune) {
+constexpr bool isAsciiBinDigit(Rune rune) {
     return rune == '0' or rune == '1';
 }
 
-constexpr bool isOctDigit(Rune rune) {
+constexpr bool isAsciiOctDigit(Rune rune) {
     return rune >= '0' and rune <= '7';
 }
 
-constexpr bool isDecDigit(Rune rune) {
+constexpr bool isAsciiDecDigit(Rune rune) {
     return rune >= '0' and rune <= '9';
 }
 
-constexpr bool isHexDigit(Rune rune) {
-    return isDecDigit(rune) or (rune >= 'a' and rune <= 'f') or (rune >= 'A' and rune <= 'F');
+constexpr bool isAsciiHexDigit(Rune rune) {
+    return isAsciiDecDigit(rune) or (rune >= 'a' and rune <= 'f') or (rune >= 'A' and rune <= 'F');
 }
 
 constexpr bool isAsciiBlank(Rune rune) {
@@ -122,7 +122,7 @@ constexpr Rune toAsciiUpper(Rune rune) {
 /* --- Rune Parsing --------------------------------------------------------- */
 
 constexpr Rune parseAsciiDecDigit(Rune rune) {
-    if (isDecDigit(rune))
+    if (isAsciiDecDigit(rune))
         return rune - '0';
 
     panic("invalid decimal digit");
@@ -131,7 +131,7 @@ constexpr Rune parseAsciiDecDigit(Rune rune) {
 constexpr Rune parseAsciiHexDigit(Rune rune) {
     rune = toAsciiLower(rune);
 
-    if (isDecDigit(rune))
+    if (isAsciiDecDigit(rune))
         return rune - '0';
 
     if (rune >= 'a' and rune <= 'f')

@@ -4,32 +4,40 @@
 namespace Karm::Io::Tests {
 
 test$(exprEither) {
-    auto RE_EITHER_A_B = 'a'_re | 'b'_re;
-
-    expect$(Re::match(RE_EITHER_A_B, "a") == Match::YES);
-    expect$(Re::match(RE_EITHER_A_B, "b") == Match::YES);
-    expect$(Re::match(RE_EITHER_A_B, "c") == Match::NO);
-    expect$(Re::match(RE_EITHER_A_B, "ab") == Match::PARTIAL);
+    expect$(Re::match('a'_re | 'b'_re, ""_str) == Match::NO);
+    expect$(Re::match('a'_re | 'b'_re, "a"_str) == Match::YES);
+    expect$(Re::match('a'_re | 'b'_re, "b"_str) == Match::YES);
+    expect$(Re::match('a'_re | 'b'_re, "c"_str) == Match::NO);
+    expect$(Re::match('a'_re | 'b'_re, "ab"_str) == Match::PARTIAL);
 
     return Ok();
 }
 
-test$(exprSingle) {
-    auto RE_SINGLE_A = 'a'_re;
-
-    expect$(Re::match(RE_SINGLE_A, "a") == Match::YES);
-    expect$(Re::match(RE_SINGLE_A, "b") == Match::NO);
-    expect$(Re::match(RE_SINGLE_A, "aa") == Match::PARTIAL);
+test$(exprChain) {
+    expect$(Re::match('a'_re & 'b'_re, ""_str) == Match::NO);
+    expect$(Re::match('a'_re & 'b'_re, "ba"_str) == Match::NO);
+    expect$(Re::match('a'_re & 'b'_re, "ab"_str) == Match::YES);
+    expect$(Re::match('a'_re & 'b'_re, "abc"_str) == Match::PARTIAL);
 
     return Ok();
 }
 
 test$(exprNegate) {
-    expect$(Re::match(~'a'_re, "") == Match::NO);
-    expect$(Re::match(~'a'_re, "b") == Match::YES);
-    expect$(Re::match(~'a'_re, "a") == Match::NO);
-    expect$(Re::match((~'a'_re) & 'a'_re, "ba") == Match::YES);
-    expect$(Re::match((~'a'_re) & 'a'_re, "aa") == Match::NO);
+    expect$(Re::match(~'a'_re, ""_str) == Match::NO);
+    expect$(Re::match(~'a'_re, "b"_str) == Match::YES);
+    expect$(Re::match(~'a'_re, "a"_str) == Match::NO);
+    expect$(Re::match((~'a'_re) & 'a'_re, "ba"_str) == Match::YES);
+    expect$(Re::match((~'a'_re) & 'a'_re, "aa"_str) == Match::NO);
+
+    return Ok();
+}
+
+test$(exprSingle) {
+
+    expect$(Re::match('a'_re, ""_str) == Match::NO);
+    expect$(Re::match('a'_re, "a"_str) == Match::YES);
+    expect$(Re::match('a'_re, "b"_str) == Match::NO);
+    expect$(Re::match('a'_re, "aa"_str) == Match::PARTIAL);
 
     return Ok();
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/checked.h>
 #include <karm-base/ctype.h>
 #include <karm-base/string.h>
 
@@ -12,30 +13,39 @@ concept Expr = requires(T expr, Io::SScan &scan) {
     { expr(scan) } -> Meta::Same<bool>;
 };
 
-Match match(Re::Expr auto expr, Str input) {
-    Io::SScan scan(input);
+/// Match a string against an Expr
+///
+/// Returns
+///  - Match::YES : If the Expr match the whole string
+///  - Match::NO : If the Expr doesn't match the string
+///  - Match::PARTIAL : If the Expr matches but the end of string is not reached
+template <StaticEncoding E>
+Match match(Re::Expr auto expr, _Str<E> input) {
+    Io::_SScan<E> scan(input);
     if (not expr(scan))
         return Match::NO;
-    return scan.ended() ? Match::YES : Match::PARTIAL;
+    return scan.ended()
+               ? Match::YES
+               : Match::PARTIAL;
 }
 
 /* --- Combinators ---------------------------------------------------------- */
 
-/// Returns true if any of the expressions match.
-inline auto either(Expr auto... exprs) {
+/// Returns true if either of the expressions match pass as parameters
+inline Expr auto either(Expr auto... exprs) {
     return [=](auto &scan) {
         return (exprs(scan) or ...);
     };
 }
 
-auto operator|(Expr auto a, Expr auto b) {
+inline Expr auto operator|(Expr auto a, Expr auto b) {
     return either(a, b);
 }
 
 /// Returns true if all of the expressions match.
 /// The expressions are evaluated in order.
 /// If any expression fails, the scanner is rewound to the state before the first expression.
-inline auto chain(Expr auto... exprs) {
+inline Expr auto chain(Expr auto... exprs) {
     return [=](auto &scan) {
         auto saved = scan;
         if ((exprs(scan) and ...))
@@ -45,12 +55,12 @@ inline auto chain(Expr auto... exprs) {
     };
 }
 
-auto operator&(Expr auto a, Expr auto b) {
+inline Expr auto operator&(Expr auto a, Expr auto b) {
     return chain(a, b);
 }
 
 /// Inverts the result of the expression.
-inline auto negate(Expr auto expr) {
+inline Expr auto negate(Expr auto expr) {
     return [=](auto &scan) {
         auto saved = scan;
         if (not expr(scan)) {
@@ -64,13 +74,13 @@ inline auto negate(Expr auto expr) {
     };
 }
 
-auto operator~(Expr auto expr) {
+inline Expr auto operator~(Expr auto expr) {
     return negate(expr);
 }
 
 /// Consumes until the expression matches or the end of the input is reached.
 /// scanner is rewound to the last unmatched rune.
-inline auto until(Expr auto expr) {
+inline Expr auto until(Expr auto expr) {
     return [=](auto &scan) {
         auto saved = scan;
         while (not expr(scan) and not scan.ended()) {
@@ -83,7 +93,7 @@ inline auto until(Expr auto expr) {
 }
 
 /// Consumes until the expression matches or the end of the input is reached.
-inline auto untilAndConsume(Expr auto expr) {
+inline Expr auto untilAndConsume(Expr auto expr) {
     return [=](auto &scan) {
         while (not expr(scan) and not scan.ended())
             scan.next();
@@ -93,76 +103,65 @@ inline auto untilAndConsume(Expr auto expr) {
 
 /* --- Quantifiers ---------------------------------------------------------- */
 
-/// Returns true if the expression matches exactly n times.
-inline auto exactly(usize n, Expr auto expr) {
+/// Try to match an expression `atLeast` times and and stops when `atMost` times
+/// is reached, return true if atLeast is reached otherwise rewind the scanner.
+inline Expr auto nOrN(usize atLeast, usize atMost, Expr auto expr) {
     return [=](auto &scan) {
+        usize count = 0;
         auto saved = scan;
-        for (usize i = 0; i < n; ++i) {
-            if (not expr(scan)) {
-                scan = saved;
-                return false;
-            }
+        saved = scan;
+        while (expr(scan)) {
+            count++;
+            saved = scan;
+            if (count == atMost)
+                break;
         }
-        return true;
+        if (count >= atLeast) {
+            scan = saved;
+            return true;
+        }
+        return false;
     };
+}
+
+/// Returns true if the expression matches exactly n times.
+inline Expr auto exactly(usize n, Expr auto expr) {
+    return nOrN(n, n, expr);
 }
 
 /// Returns true if the expression matches at least n times.
-inline auto atLeast(usize n, Expr auto expr) {
-    return [=](auto &scan) {
-        auto saved = scan;
-        for (usize i = 0; i < n; ++i) {
-            if (not expr(scan)) {
-                scan = saved;
-                return false;
-            }
-        }
-        return zeroOrMore(expr)(scan);
-    };
+inline Expr auto atLeast(usize n, Expr auto expr) {
+    return nOrN(n, MAX<usize>, expr);
+}
+
+/// Returns true if the expression matches at most n times.
+inline Expr auto atMost(usize n, Expr auto expr) {
+    return nOrN(0, n, expr);
 }
 
 /// Returns true if the expression matches zero or more times.
-inline auto zeroOrMore(Expr auto expr) {
-    return [=](auto &scan) {
-        while (expr(scan))
-            ;
-        return true;
-    };
+inline Expr auto zeroOrMore(Expr auto expr) {
+    return nOrN(0, MAX<usize>, expr);
 }
 
 /// Returns true if the expression matches one or more times.
-inline auto oneOrMore(Expr auto expr) {
-    return [=](auto &scan) {
-        auto saved = scan;
-        if (not expr(scan)) {
-            scan = saved;
-            return false;
-        }
-        return zeroOrMore(expr)(scan);
-    };
+inline Expr auto oneOrMore(Expr auto expr) {
+    return nOrN(1, MAX<usize>, expr);
 }
 
 /// Returns true if the expression matches zero or one times.
-inline auto zeroOrOne(Expr auto expr) {
-    return [=](auto &scan) {
-        expr(scan);
-        return true;
-    };
+inline Expr auto zeroOrOne(Expr auto expr) {
+    return nOrN(0, 1, expr);
 }
 
-inline auto atMost(usize n, auto expr) {
-    return [=](auto &scan) {
-        for (usize i = 0; i < n; ++i) {
-            if (not expr(scan)) {
-                return true;
-            }
-        }
-        return true;
-    };
+// Returns true if the expression matches at most n times.
+// If the expression matches more than n times, the scanner is rewound to the start of the first match.
+inline Expr auto atMost(usize n, auto expr) {
+    return nOrN(0, n, expr);
 }
 
 /// Returns true if the expression matches exactly one time and saves the result.
-inline auto token(Str &out, Expr auto expr) {
+inline Expr auto token(Str &out, Expr auto expr) {
     return [=, &out](auto &scan) {
         scan.begin();
         if (expr(scan)) {
@@ -173,7 +172,9 @@ inline auto token(Str &out, Expr auto expr) {
     };
 }
 
-inline auto trap(auto expr, auto cb) {
+/// If the expression matches, the callback is called with the matching scanner.
+/// The scanner is rewound to the state before the expression was matched.
+inline Expr auto trap(Expr auto expr, auto cb) {
     return [=](auto &scan) {
         auto saved = scan;
         if (expr(scan)) {
@@ -188,21 +189,28 @@ inline auto trap(auto expr, auto cb) {
 /* --- Tokens --------------------------------------------------------------- */
 
 /// Match nothing and return true.
-inline auto nothing() {
+inline Expr auto nothing() {
     return [](auto &) {
         return true;
     };
 }
 
+inline Expr auto any() {
+    return [](auto &scan) {
+        scan.next();
+        return true;
+    };
+}
+
 /// Match the end of the input.
-inline auto eof() {
+inline Expr auto eof() {
     return [](auto &scan) {
         return scan.ended();
     };
 }
 
 /// Match a word and consume it.
-inline auto word(Str word) {
+inline Expr auto word(Str word) {
     return [=](auto &scan) {
         return scan.skip(word);
     };
@@ -210,7 +218,7 @@ inline auto word(Str word) {
 
 /// Match a single character and consume it.
 /// Multiple characters can be passed to match any of them.
-inline auto single(auto... c) {
+inline Expr auto single(auto... c) {
     return [=](auto &scan) {
         if (((scan.curr() == (Rune)c) or ...)) {
             scan.next();
@@ -221,7 +229,7 @@ inline auto single(auto... c) {
 }
 
 /// Match a single character against a ctype function and consume it.
-inline auto ctype(CType auto ctype) {
+inline Expr auto ctype(CType auto ctype) {
     return [=](auto &scan) {
         if (ctype(scan.curr())) {
             scan.next();
@@ -232,7 +240,7 @@ inline auto ctype(CType auto ctype) {
 }
 
 /// Match a character range and consume it if it lies within the range.
-inline auto range(Rune start, Rune end) {
+inline Expr auto range(Rune start, Rune end) {
     return [=](auto &scan) {
         if (scan.curr() >= start and scan.curr() <= end) {
             scan.next();
@@ -245,47 +253,47 @@ inline auto range(Rune start, Rune end) {
 /* --- Posix Classes -------------------------------------------------------- */
 
 /// Match an ASCII Character and consume it.
-inline auto ascii() {
+inline Expr auto ascii() {
     return ctype(isAscii);
 }
 
 /// Match an ASCII upper case letter and consume it.
-inline auto upper() {
+inline Expr auto upper() {
     return ctype(isAsciiUpper);
 }
 
 /// Match an ASCII lower case letter and consume it.
-inline auto lower() {
+inline Expr auto lower() {
     return ctype(isAsciiLower);
 }
 
 /// Match an ASCII letter and consume it.
-inline auto alpha() {
+inline Expr auto alpha() {
     return upper() | lower();
 }
 
 /// Match an ASCII digit and consume it.
-inline auto digit() {
-    return ctype(isDecDigit);
+inline Expr auto digit() {
+    return ctype(isAsciiDecDigit);
 }
 
 /// Match an ASCII hexadecimal digit and consume it.
-inline auto xdigit() {
-    return ctype(isHexDigit);
+inline Expr auto xdigit() {
+    return ctype(isAsciiHexDigit);
 }
 
 /// Match an ASCII alphanumeric character and consume it.
-inline auto alnum() {
+inline Expr auto alnum() {
     return ctype(isAsciiAlphaNum);
 }
 
 /// Match a work made of ASCII letters and underscores and consume it.
-inline auto word() {
+inline Expr auto word() {
     return alnum() | single('_');
 }
 
 /// Match punctuation and consume it.
-inline auto punct() {
+inline Expr auto punct() {
     return single(
         '!', '"', '#', '$', '%', '&', '\'', '(',
         ')', '*', '+', ',', '-', '.', '/', ':',
@@ -295,12 +303,12 @@ inline auto punct() {
 }
 
 /// Match ascii whitespace and consume it.
-inline auto space() {
+inline Expr auto space() {
     return single(' ', '\t', '\n', '\r');
 }
 
 /// Match a blank space and consume it.
-inline auto blank() {
+inline Expr auto blank() {
     return single(' ', '\t');
 }
 
@@ -308,7 +316,7 @@ inline auto blank() {
 
 /// Match a separator and consume it.
 /// A separator is a expr surrounded by spaces.
-inline auto separator(Expr auto expr) {
+inline Expr auto separator(Expr auto expr) {
     return zeroOrMore(space()) &
            expr &
            zeroOrMore(space());
@@ -318,7 +326,7 @@ inline auto separator(Expr auto expr) {
 /// A separator is an expression surrounded by spaces.
 /// If the separator is not found, the expression still matches.
 /// And whitespaces are consumed.
-inline auto optSeparator(Expr auto expr) {
+inline Expr auto optSeparator(Expr auto expr) {
     return zeroOrMore(space()) &
            zeroOrOne(expr) &
            zeroOrMore(space());
@@ -326,10 +334,10 @@ inline auto optSeparator(Expr auto expr) {
 
 } // namespace Karm::Re
 
-inline auto operator""_re(char const *str, usize len) {
+inline Karm::Re::Expr auto operator""_re(char const *str, usize len) {
     return Karm::Re::word(Str{str, len});
 }
 
-inline auto operator""_re(char c) {
+inline Karm::Re::Expr auto operator""_re(char c) {
     return Karm::Re::single(c);
 }

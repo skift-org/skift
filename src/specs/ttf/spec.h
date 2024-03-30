@@ -90,6 +90,11 @@ struct Font {
         return Ok(*bestCmap);
     }
 
+    static bool isTtf(Bytes slice) {
+        return slice.len() >= 4 and slice[0] == 0x00 and slice[1] == 0x01 and
+               slice[2] == 0x00 and slice[3] == 0x00;
+    }
+
     static Res<Font> load(Bytes slice) {
         Font font{slice};
 

@@ -55,6 +55,18 @@ Res<Mime::Path> resolve(Mime::Url const &url) {
                        .join(url.host)
                        .join("__res__")
                        .join(path);
+    } else if (url.scheme == "location") {
+        auto *maybeHome = getenv("HOME");
+        if (not maybeHome)
+            return Error::notFound("HOME not set");
+
+        auto path = url.path;
+        path.rooted = false;
+
+        if (url.host == "home")
+            resolved = Mime::Path::parse(maybeHome).join(path);
+        else
+            resolved = Mime::Path::parse(maybeHome).join(Io::toPascalCase(url.host).unwrap()).join(path);
     } else {
         return Error::notFound("unknown url scheme");
     }

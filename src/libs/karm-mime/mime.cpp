@@ -1,6 +1,5 @@
 #include <bmp/spec.h>
 #include <jpeg/spec.h>
-#include <pdf/spec.h>
 #include <png/spec.h>
 #include <qoi/spec.h>
 #include <ttf/spec.h>
@@ -10,9 +9,6 @@
 namespace Karm::Mime {
 
 Opt<Mime> sniffBytes(Bytes bytes) {
-    if (Pdf::Document::isPdf(bytes))
-        return "application/pdf"_mime;
-
     if (Jpeg::Image::isJpeg(bytes))
         return "image/jpeg"_mime;
 
@@ -100,7 +96,7 @@ struct {
     {"application", "bz2", Mdi::ZIP_BOX},
     {"application", "7z-compressed", Mdi::ZIP_BOX},
     {"application", "rar", Mdi::ZIP_BOX},
-    {"application", "xz", Mdi::ZIP_BOX},
+    {"application", "x-xz", Mdi::ZIP_BOX},
     {"application", "x-msdownload", Mdi::COG_BOX},
 };
 

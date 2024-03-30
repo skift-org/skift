@@ -238,7 +238,7 @@ struct [[nodiscard]] Opt {
         if constexpr (Meta::Equatable<T>)
             if (_present and other._present)
                 return _value == other._value;
-        return false;
+        return not _present and not other._present;
     }
 };
 

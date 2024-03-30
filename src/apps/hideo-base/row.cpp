@@ -165,8 +165,7 @@ Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui:
             state ? spacing(
                         {38, 0, 0, 0},
                         child()
-                    ) |
-                        slideIn(Ui::SlideFrom::TOP)
+                    ) | slideIn(Ui::SlideFrom::TOP)
                   : Ui::empty()
         );
     });

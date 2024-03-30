@@ -8,7 +8,7 @@
 
 namespace Karm::Io {
 
-template <typename E>
+template <StaticEncoding E>
 struct _SScan {
     using Encoding = E;
     using Unit = typename E::Unit;
@@ -89,11 +89,11 @@ struct _SScan {
         return true;
     }
 
-    bool skip(auto predicate)
-        requires Meta::Callable<decltype(predicate), decltype(*this)>
+    bool skip(auto expr)
+        requires Meta::Callable<decltype(expr), decltype(*this)>
     {
         auto save = _cursor;
-        if (predicate(*this)) {
+        if (expr(*this)) {
             return true;
         }
         _cursor = save;
@@ -108,9 +108,9 @@ struct _SScan {
         return result;
     }
 
-    bool eat(auto predicate) {
+    bool eat(auto expr) {
         bool result = false;
-        while (skip(predicate)) {
+        while (skip(expr)) {
             result = true;
         }
         return result;
@@ -190,9 +190,8 @@ struct _SScan {
 
         while (not ended()) {
             auto maybeDigit = nextDigit(base);
-            if (not maybeDigit) {
+            if (not maybeDigit)
                 break;
-            }
             isNum = true;
             result = result * base + maybeDigit.unwrap();
         }
@@ -257,16 +256,14 @@ struct _SScan {
 
         if (skip('e') or skip('E')) {
             auto maybeExp = nextInt(base);
-            if (maybeExp) {
+            if (maybeExp)
                 exp = maybeExp.unwrap();
-            }
         }
 
         if (ipart < 0) {
             return ipart - fpart * pow(base, exp);
-        } else {
-            return ipart + fpart * pow(base, exp);
         }
+        return ipart + fpart * pow(base, exp);
     }
 
 #endif

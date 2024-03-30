@@ -74,6 +74,14 @@ Url Url::parent(usize n) const {
     return url;
 }
 
+bool Url::isParentOf(Url const &other) const {
+    bool same = scheme == other.scheme and
+                host == other.host and
+                port == other.port;
+
+    return same and path.isParentOf(other.path);
+}
+
 Res<usize> Url::write(Io::TextWriter &writer) const {
     usize written = 0;
 

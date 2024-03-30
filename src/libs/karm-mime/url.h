@@ -43,6 +43,8 @@ struct Url {
 
     Url parent(usize n = 0) const;
 
+    bool isParentOf(Url const &other) const;
+
     Res<usize> write(Io::TextWriter &writer) const;
 
     String str() const;

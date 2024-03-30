@@ -87,6 +87,18 @@ Path Path::parent(usize n) const {
     return path;
 }
 
+bool Path::isParentOf(Path const &other) const {
+    if (len() > other.len())
+        return false;
+
+    for (usize i = 0; i < len(); i++) {
+        if (_parts[i] != other._parts[i])
+            return false;
+    }
+
+    return true;
+}
+
 Res<usize> Path::write(Io::TextWriter &writer) const {
     usize written = 0;
 

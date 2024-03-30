@@ -12,6 +12,13 @@ namespace Karm::Mime {
 
 /* --- Path ----------------------------------------------------------------- */
 
+static inline Str suffixOf(Str str) {
+    auto dotIndex = lastIndexOf(str, '.');
+    if (not dotIndex.has())
+        return "";
+    return next(str, *dotIndex + 1);
+}
+
 struct Path {
     static constexpr auto SEP = '/';
 
@@ -36,6 +43,8 @@ struct Path {
 
     Path parent(usize n = 0) const;
 
+    bool isParentOf(Path const &other) const;
+
     Res<usize> write(Io::TextWriter &writer) const;
 
     String str() const;
@@ -54,7 +63,7 @@ struct Path {
 
     auto operator<=>(Path const &) const = default;
 
-    Str sufix() const {
+    Str suffix() const {
         if (not _parts.len())
             return "";
         auto dotIndex = lastIndexOf(last(_parts), '.');

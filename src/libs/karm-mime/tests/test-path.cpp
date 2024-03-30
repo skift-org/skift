@@ -27,4 +27,16 @@ test$(pathUpDown) {
     return Ok();
 }
 
+test$(pathParentOf) {
+    expect$(""_path.isParentOf(""_path));
+    expect$("/a"_path.isParentOf("/a"_path));
+    expect$("/a"_path.isParentOf("/a/b"_path));
+    expect$("/a"_path.isParentOf("/a/b/c"_path));
+    expect$("/a/b"_path.isParentOf("/a/b/c"_path));
+    expectNot$("/a/c"_path.isParentOf("/a/b/c"_path));
+    expect$("."_path.isParentOf("."_path));
+
+    return Ok();
+}
+
 } // namespace Karm::Mime::Tests

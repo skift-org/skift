@@ -2,15 +2,17 @@
 
 #include <karm-io/expr.h>
 #include <karm-io/sscan.h>
+#include <mdi/spec.h>
 
 namespace Karm::Mime {
 
 struct Mime {
     String _buf;
 
-    Mime(Str buf) : _buf(buf) {}
+    Mime(Str buf)
+        : _buf(buf) {}
 
-    Str type() {
+    Str type() const {
         Io::SScan s(_buf);
 
         s.begin();
@@ -18,7 +20,7 @@ struct Mime {
         return s.end();
     }
 
-    Str subtype() {
+    Str subtype() const {
         Io::SScan s(_buf);
 
         s.skip(type());
@@ -29,10 +31,19 @@ struct Mime {
         return s.end();
     }
 
-    Str str() {
+    Str str() const {
         return _buf;
     }
 };
+
+/// Try to sniff the mime type of a given byte array.
+Opt<Mime> sniffBytes(Bytes byes);
+
+/// Try to sniff the mime type from a file extension.
+Opt<Mime> sniffSuffix(Str suffix);
+
+/// Guess an icon for a given mime type.
+Mdi::Icon iconFor(Mime const &mime);
 
 } // namespace Karm::Mime
 

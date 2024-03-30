@@ -1,4 +1,5 @@
 #include <hideo-base/alert.h>
+#include <karm-mime/mime.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
 #include <karm-ui/scafold.h>
@@ -48,14 +49,14 @@ Ui::Child directorEntry(Sys::DirEntry const &entry, bool odd) {
     return Ui::button(
         Model::bind<Navigate>(entry.name),
         itemStyle(odd),
-        entry.isDir ? Mdi::FOLDER : Mdi::FILE,
+        entry.isDir ? Mdi::FOLDER : Mime::iconFor(tryOr(Mime::sniffSuffix(Mime::suffixOf(entry.name)), "file"_str)),
         entry.name
     );
 }
 
 Ui::Child directoryListing(State const &, Sys::Dir const &dir) {
     if (dir.entries().len() == 0)
-        return Ui::bodyMedium(Ui::GRAY600, "This directory is empty.") | Ui::center();
+        return Ui::bodyMedium(Ui::GRAY500, "This directory is empty.") | Ui::center();
 
     Ui::Children children;
     bool odd = true;
@@ -80,60 +81,53 @@ Ui::Child breadcrumbItem(Str text, isize index) {
 }
 
 Mdi::Icon iconForLocation(Str loc) {
-    if (loc == "documents") {
+    if (eqCi(loc, "documents"_str))
         return Mdi::FILE_DOCUMENT;
-    }
 
-    if (loc == "images") {
+    if (eqCi(loc, "pictures"_str))
         return Mdi::IMAGE;
-    }
 
-    if (loc == "musics") {
+    if (eqCi(loc, "music"_str))
         return Mdi::MUSIC;
-    }
 
-    if (loc == "videos") {
+    if (eqCi(loc, "videos"_str))
         return Mdi::FILM;
-    }
 
-    if (loc == "downloads") {
+    if (eqCi(loc, "downloads"_str))
         return Mdi::DOWNLOAD;
-    }
-
-    if (loc == "trash") {
-        return Mdi::TRASH_CAN;
-    }
 
     return Mdi::FOLDER;
 }
 
-Ui::Child breadcrumbRoot(Mime::Url url) {
-    if (url.scheme == "location") {
-        return Ui::button(
-            Model::bind<GoRoot>(),
-            Ui::ButtonStyle::subtle(),
-            iconForLocation(url.host),
-            Io::toTitleCase(url.host).unwrap()
-        );
-    }
+Mdi::Icon iconForUrl(Mime::Url const &url) {
+    if (url.scheme == "location")
+        return iconForLocation(url.host);
 
-    if (url.scheme == "device") {
-        return Ui::button(
-            Model::bind<GoRoot>(),
-            Ui::ButtonStyle::subtle(),
-            Mdi::HARDDISK,
-            url.host
-        );
-    }
+    if (url.scheme == "device")
+        return Mdi::HARDDISK;
 
+    return Mdi::LAPTOP;
+}
+
+String textForUrl(Mime::Url const &url) {
+    if (url.scheme == "location")
+        return Io::toTitleCase(url.host).unwrap();
+
+    if (url.scheme == "device")
+        return url.host;
+
+    return "This Device";
+}
+
+Ui::Child breadcrumbRoot(Mime::Url const &url) {
     return Ui::button(
         Model::bind<GoRoot>(),
         Ui::ButtonStyle::text(),
         Ui::hflow(
             8,
             Layout::Align::CENTER,
-            Ui::icon(Mdi::LAPTOP),
-            Ui::text("This Device")
+            Ui::icon(iconForUrl(url)),
+            Ui::text(textForUrl(url))
         )
     );
 }

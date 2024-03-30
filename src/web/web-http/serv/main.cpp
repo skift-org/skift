@@ -1,5 +1,6 @@
 #include <karm-io/funcs.h>
 #include <karm-logger/logger.h>
+#include <karm-mime/mime.h>
 #include <karm-sys/entry-async.h>
 #include <karm-sys/file.h>
 #include <karm-sys/socket.h>
@@ -8,41 +9,8 @@
 
 namespace Web::Server {
 
-Str contentType(Mime::Path const &path) {
-    auto sufix = path.sufix();
-    if (sufix == "html")
-        return "text/html; charset=UTF-8";
-    if (sufix == "css")
-        return "text/css; charset=UTF-8";
-    if (sufix == "js")
-        return "application/javascript; charset=UTF-8";
-    if (sufix == "png")
-        return "image/png";
-    if (sufix == "jpg")
-        return "image/jpeg";
-    if (sufix == "ico")
-        return "image/x-icon";
-    if (sufix == "svg")
-        return "image/svg+xml";
-    if (sufix == "woff")
-        return "font/woff";
-    if (sufix == "woff2")
-        return "font/woff2";
-    if (sufix == "ttf")
-        return "font/ttf";
-    if (sufix == "eot")
-        return "application/vnd.ms-fontobject";
-    if (sufix == "otf")
-        return "font/otf";
-    if (sufix == "json")
-        return "application/json";
-    if (sufix == "txt")
-        return "text/plain; charset=UTF-8";
-    return "application/octet-stream";
-}
-
 Async::Task<> respondFile(Sys::_Connection &conn, Mime::Url const &url, Http::Code code = Http::Code::OK) {
-    auto ct = contentType(url.path);
+    auto ct = tryOr(Mime::sniffSuffix(url.path.suffix()), "application/octet-stream"_mime);
     auto file = co_try$(Sys::File::open(url));
     auto stat = co_try$(file.stat());
 

@@ -81,6 +81,14 @@ test$(fmtSignedNumber) {
     return Ok();
 }
 
+/* --- Boolean Formatting --------------------------------------------------- */
+
+test$(fmtBool) {
+    try$(testCase("True", true));
+    try$(testCase("False", false));
+    return Ok();
+}
+
 /* --- Format Optionals ----------------------------------------------------- */
 
 test$(fmtOptionals) {

@@ -489,6 +489,13 @@ struct Formatter<None> {
     }
 };
 
+template <>
+struct Formatter<bool> {
+    Res<usize> format(Io::TextWriter &writer, bool val) {
+        return writer.writeStr(val ? "True" : "False");
+    }
+};
+
 template <typename T>
 struct Formatter<Opt<T>> {
     Formatter<T> formatter;

@@ -9,9 +9,27 @@
 
 > **⚠ Warning**<br> skiftOS is currently in the early stages of development and is not yet ready for daily use. Please do not use it in production environments. Here be dragons! 🐉
 
-**skiftOS** is a hobby operating system built from scratch for ARM, x86, and RISC-V architectures. It is designed to be simple, modern, and modular, featuring a modern C++ core library, reactive UI, and a capability-based microkernel. skiftOS values simplicity, modernity, and modularity, and has several notable features such as multi-architecture support and easy hackability. It is free and open-source under the MIT license.
+**SkiftOS** is a hobbyist operating system built from the ground up with a focus on modularity, simplicity, and modern design principles.  Driven by a dissatisfaction with the fragmented user experiences prevalent in contemporary operating systems, SkiftOS strives for deep integration and a cohesive aesthetic. This project is a labor of love—an artistic pursuit rather than a commercial product.
 
-For an overview of the project, please refer to the [doc/roadmap](https://docs.skiftos.org/roadmap.html). For more information about the project, please refer to the [doc](https://docs.skiftos.org/).
+
+## Key Features
+
+- **Karm**: A modern C++ core library providing foundational building blocks.
+- **KarmUI**: A reactive UI framework for building elegant user interfaces.
+- **Hideo**: A beautiful desktop environment prioritizing intuitive design.
+- **Hjert**: A capability-based microkernel ensuring security and system stability.
+- **CuteKit**: A versatile build system and package manager designed for cross-compilation and complex project management.
+- **Veav**: A performant browser engine built for speed, accuracy, and simplicity.
+
+## Core Philosophy
+
+- **Modularity**: Components are designed to be as self-contained as possible, encouraging customization and experimentation.
+- **Simplicity**: Skift favors clear solutions over complexity, aiming for a system that is understandable and maintainable.
+- **Modernity**: Skift leverages cutting-edge C++ practices and technologies for efficiency and security.
+
+## Target Audience
+
+SkiftOS is intended for developers and those interested in the exploration of niche, hobby operating systems.
 
 ## Building
 

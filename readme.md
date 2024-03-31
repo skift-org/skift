@@ -1,20 +1,15 @@
-<img src="doc/logo-light.svg#gh-light-mode-only" height="36" />
-<img src="doc/logo-dark.svg#gh-dark-mode-only" height="36" />
-<p>
-  <a href="https://skiftos.org/">Website</a> -
-  <a href="https://discord.skiftos.org">Discord</a> -
-  <a href="https://docs.skiftos.org">Documentation</a>
-</p>
+![skiftOS Screenshot](doc/assets/bento.png)
 
 ## About
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/3ad24f7f90be4c969de7444377906c1c)](https://app.codacy.com/gh/skift-org/skift/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/3ad24f7f90be4c969de7444377906c1c)](https://app.codacy.com/gh/skift-org/skift/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade) -
+<a href="https://skiftos.org/">Website</a> -
+<a href="https://discord.skiftos.org">Discord</a> -
+<a href="https://docs.skiftos.org">Documentation</a>
 
 > **⚠ Warning**<br> skiftOS is currently in the early stages of development and is not yet ready for daily use. Please do not use it in production environments. Here be dragons! 🐉
 
 **skiftOS** is a hobby operating system built from scratch for ARM, x86, and RISC-V architectures. It is designed to be simple, modern, and modular, featuring a modern C++ core library, reactive UI, and a capability-based microkernel. skiftOS values simplicity, modernity, and modularity, and has several notable features such as multi-architecture support and easy hackability. It is free and open-source under the MIT license.
-
-![skiftOS Screenshot](doc/screenshots/2023-06-06.png)
 
 For an overview of the project, please refer to the [doc/roadmap](https://docs.skiftos.org/roadmap.html). For more information about the project, please refer to the [doc](https://docs.skiftos.org/).
 

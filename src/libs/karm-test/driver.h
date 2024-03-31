@@ -15,8 +15,8 @@ struct Driver {
 
     Res<> runAll();
 
-    Res<> unexpect(auto const &__lhs, auto const &__rhs, Str op, Loc = Loc::current()) {
-        Sys::errln("unexpected: '{}' {} '{}'", __lhs, op, __rhs);
+    Res<> unexpect(auto const &lhs, auto const &rhs, Str op, Loc = Loc::current()) {
+        Sys::errln("unexpected: {#} {} {#}", lhs, op, rhs);
         return Error::other("unexpected");
     }
 };

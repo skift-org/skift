@@ -82,6 +82,9 @@ Ui::Child breadcrumbItem(Str text, isize index) {
 }
 
 Mdi::Icon iconForLocation(Str loc) {
+    if (eqCi(loc, "home"_str))
+        return Mdi::HOME;
+
     if (eqCi(loc, "documents"_str))
         return Mdi::FILE_DOCUMENT;
 

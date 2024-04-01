@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-io/expr.h>
+#include <karm-io/fmt.h>
 #include <karm-io/sscan.h>
 #include <mdi/spec.h>
 
@@ -47,3 +48,10 @@ Mdi::Icon iconFor(Mime const &mime);
 inline auto operator""_mime(char const *buf, usize len) {
     return Karm::Mime::Mime(Str(buf, len));
 }
+
+template <>
+struct Karm::Io::Formatter<Karm::Mime::Mime> {
+    Res<usize> format(Io::TextWriter &writer, Karm::Mime::Mime const &mime) {
+        return writer.writeStr(mime.str());
+    }
+};

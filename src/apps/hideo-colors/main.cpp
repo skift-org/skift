@@ -1,7 +1,7 @@
+#include <hideo-base/scafold.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/drag.h>
-#include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 
 #include "model.h"

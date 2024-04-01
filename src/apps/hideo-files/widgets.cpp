@@ -1,8 +1,9 @@
 #include <hideo-base/alert.h>
+#include <hideo-base/dialogs.h>
+#include <hideo-base/scafold.h>
 #include <karm-mime/mime.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
-#include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 
 #include "model.h"
@@ -190,7 +191,7 @@ Ui::Child refreshTool() {
 }
 
 Ui::Child toolbar(State const &state) {
-    return Ui::toolbar(
+    return Hideo::toolbar(
         Ui::button(Model::bindIf<GoBack>(state.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
         Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
         Ui::button(Model::bindIf<GoParent>(state.canGoParent(), 1), Ui::ButtonStyle::subtle(), Mdi::ARROW_UP),
@@ -235,7 +236,7 @@ Ui::Child openFileDialog() {
                 )
             );
 
-            return Ui::dialogScafold(
+            return dialogScafold(
                 Layout::Align::FILL,
                 Ui::vflow(
                     Ui::grow(

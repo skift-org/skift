@@ -1,7 +1,7 @@
 #include <hideo-base/input.h>
+#include <hideo-base/scafold.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/input.h>
-#include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
@@ -25,7 +25,7 @@ Ui::Child editorPreview(State const &state) {
 }
 
 Ui::Child editorToolbar(State const &) {
-    return Ui::toolbar(
+    return Hideo::toolbar(
         Ui::grow(NONE),
 
         Ui::button(

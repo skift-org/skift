@@ -1,7 +1,7 @@
 #include <hideo-base/alert.h>
+#include <hideo-base/scafold.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
-#include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 
 namespace Hideo::Fonts {
@@ -27,7 +27,7 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
 }
 
 Ui::Child app(Res<Strong<Media::Fontface>> fontface) {
-    return Ui::scafold({
+    return scafold({
         .icon = Mdi::FORMAT_FONT,
         .title = "Fonts",
         .body = [fontface] {

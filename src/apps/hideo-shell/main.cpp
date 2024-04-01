@@ -1,3 +1,4 @@
+#include <hideo-base/scafold.h>
 #include <hideo-keyboard/views.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
@@ -5,7 +6,6 @@
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
-#include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 
 #include "app.h"

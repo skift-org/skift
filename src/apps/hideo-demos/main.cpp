@@ -1,10 +1,10 @@
+#include <hideo-base/scafold.h>
 #include <hideo-base/sidenav.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
-#include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
@@ -56,7 +56,7 @@ using Model = Ui::Model<State, Action, reduce>;
 
 Ui::Child app() {
     return Ui::reducer<Model>([](State const &s) {
-        return Ui::scafold({
+        return scafold({
             .icon = Mdi::DUCK,
             .title = "Demos",
             .sidebar = [&] {

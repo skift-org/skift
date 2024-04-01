@@ -1,11 +1,11 @@
-#include <karm-ui/dialog.h>
+#include <hideo-base/dialogs.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 
 namespace Hideo::Shell {
 
 Ui::Child powerDialog() {
-    return Ui::dialogScafold(
+    return dialogScafold(
         Layout::Align::CENTER | Layout::Align::CLAMP,
         Ui::vflow(
             4,

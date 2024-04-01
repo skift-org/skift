@@ -1,16 +1,16 @@
+#include <hideo-base/dialogs.h>
+#include <hideo-base/scafold.h>
 #include <karm-base/witty.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
-#include <karm-ui/scafold.h>
-#include <karm-ui/scroll.h>
 
 namespace Hideo::About {
 
 Ui::Child app() {
-    return Ui::scafold({
+    return scafold({
         .icon = Mdi::INFORMATION,
         .title = "About",
-        .titlebar = Ui::TitlebarStyle::DIALOG,
+        .titlebar = TitlebarStyle::DIALOG,
         .body = [] {
             auto titleText = Ui::headlineMedium(
                 "skiftOS"
@@ -38,7 +38,7 @@ Ui::Child app() {
 
             auto licenseBtn = Ui::button(
                 [](auto &n) {
-                    Ui::showDialog(n, Ui::licenseDialog());
+                    Ui::showDialog(n, licenseDialog());
                 },
                 Ui::ButtonStyle::outline(),
                 Mdi::LICENSE,
@@ -50,7 +50,7 @@ Ui::Child app() {
                        Ui::hflow(
                            8,
                            titleText,
-                           Ui::versionBadge() | Ui::center()
+                           versionBadge() | Ui::center()
                        ),
                        Ui::empty(),
                        bodyText,

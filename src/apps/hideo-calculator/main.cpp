@@ -1,8 +1,8 @@
+#include <hideo-base/scafold.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/layout.h>
-#include <karm-ui/scafold.h>
 
 #include "model.h"
 
@@ -88,10 +88,10 @@ Ui::Child screen(State const &state) {
 
 Ui::Child app() {
     return Ui::reducer<Model>([](State const &state) {
-        return Ui::scafold({
+        return scafold({
             .icon = Mdi::CALCULATOR,
             .title = "Calculator",
-            .titlebar = Ui::TitlebarStyle::DIALOG,
+            .titlebar = TitlebarStyle::DIALOG,
             .body = slot$(Ui::vflow(
                 screen(state) | Ui::dragRegion(),
                 keypad(state) | Ui::grow()

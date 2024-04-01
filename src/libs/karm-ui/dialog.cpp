@@ -1,17 +1,9 @@
 #include "dialog.h"
 
 #include "anim.h"
-#include "box.h"
-#include "drag.h"
 #include "funcs.h"
-#include "input.h"
-#include "layout.h"
-#include "scroll.h"
-#include "view.h"
 
 namespace Karm::Ui {
-
-/* ---  Dialog Base  -------------------------------------------------------- */
 
 struct ShowDialogEvent {
     Child child;
@@ -213,149 +205,6 @@ struct DialogLayer : public LeafNode<DialogLayer> {
 
 Child dialogLayer(Child child) {
     return makeStrong<DialogLayer>(child);
-}
-
-/* --- Dialogs Scaffolding -------------------------------------------------- */
-
-Child dialogScafold(Layout::Align a, Child inner) {
-    BoxStyle const boxStyle = {
-        .borderRadius = 4,
-        .borderWidth = 1,
-        .borderPaint = GRAY800,
-        .backgroundPaint = GRAY900,
-    };
-
-    return inner |
-           box(boxStyle) |
-           dragRegion() |
-           align(a) |
-           spacing(16);
-}
-
-Child dialogScafold(Layout::Align a, Child content, Children actions) {
-    auto layout =
-        vflow(
-            8,
-            content | grow(),
-            hflow(8, actions)
-        ) |
-        spacing(16);
-
-    return dialogScafold(a, layout);
-}
-
-Child dialogCloseButton() {
-    return button(
-        closeDialog,
-        ButtonStyle::primary(),
-        "Close"
-    );
-}
-
-/* --- Dialogs -------------------------------------------------------------- */
-
-Child versionBadge() {
-    Children badges = {};
-    badges.pushBack(badge(BadgeStyle::INFO, stringify$(__ck_version_value)));
-#ifdef __ck_branch_nightly__
-    badges.pushBack(badge(Gfx::INDIGO400, "Nightly"));
-#elif defined(__ck_branch_stable__)
-    // No badge for stable
-#else
-    badges.pushBack(badge(Gfx::EMERALD, "Dev"));
-#endif
-    return hflow(4, badges);
-}
-
-static constexpr Str LICENSE = R"(Copyright © 2018-2024, the skiftOS Developers
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.)";
-
-Ui::Child licenseDialog() {
-    return Ui::dialogScafold(
-        Layout::Align::CLAMP |
-            Layout::Align::CENTER |
-            Layout::Align::TOP_START,
-        Ui::vflow(
-            8,
-            Ui::titleLarge("License"),
-            Ui::bodySmall(LICENSE) |
-                Ui::vscroll() |
-                Ui::maxSize({480, Ui::UNCONSTRAINED}) |
-                Ui::grow()
-        ),
-        {Ui::grow(NONE), Ui::dialogCloseButton()}
-    );
-}
-
-Child aboutDialog(Mdi::Icon i, String name) {
-    auto content = vflow(
-        vflow(
-            8,
-            Layout::Align::CENTER,
-            spacing(8, icon(i, 56)),
-            titleLarge(name),
-            versionBadge()
-        ),
-        text(
-            Ui::TextStyles::bodySmall()
-                .withAlign(Gfx::TextAlign::CENTER)
-                .withColor(Ui::GRAY400),
-            "Copyright © 2018-2024\nThe skiftOS Developers\nAll rights reserved."
-        ) |
-            Ui::spacing(16)
-    );
-
-    Children actions = {
-        button(
-            [](auto &n) {
-                showDialog(n, licenseDialog());
-            },
-            ButtonStyle::subtle(), Mdi::LICENSE, "License"
-        ),
-        grow(NONE),
-        dialogCloseButton(),
-    };
-
-    return dialogScafold(
-        Layout::Align::CENTER | Layout::Align::CLAMP,
-        content | minSize({280, Ui::UNCONSTRAINED}),
-        actions
-    );
-}
-
-void showAboutDialog(Node &n, Mdi::Icon icon, String name) {
-    showDialog(n, aboutDialog(icon, name));
-}
-
-Child msgDialog(String title, String msg) {
-    auto titleLbl = titleMedium(title);
-    auto msgLbl = text(msg);
-    Children actions = {
-        grow(NONE),
-        button(
-            closeDialog,
-            ButtonStyle::primary(), "Ok"
-        ),
-    };
-
-    return dialogScafold(
-        Layout::Align::CENTER,
-        vflow(16, titleLbl, msgLbl),
-        actions
-    );
-}
-
-void showMsgDialog(Node &n, String title, String msg) {
-    showDialog(n, msgDialog(title, msg));
-}
-
-void showMsgDialog(Node &n, String msg) {
-    showDialog(n, msgDialog("Message", msg));
 }
 
 } // namespace Karm::Ui

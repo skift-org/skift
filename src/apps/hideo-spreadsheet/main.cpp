@@ -1,9 +1,9 @@
 #include <hideo-base/row.h>
+#include <hideo-base/scafold.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
-#include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
@@ -26,7 +26,7 @@ Ui::Child formula() {
 }
 
 Ui::Child toolbar(State const &state) {
-    return Ui::toolbar(
+    return Hideo::toolbar(
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FILE),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FOLDER),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE),
@@ -174,7 +174,7 @@ Ui::Child tabs(State const &state) {
 
 Ui::Child app() {
     return Ui::reducer<Model>({}, [](auto const &s) {
-        auto tb = Ui::titlebar(Mdi::TABLE, "Spreadsheet", tabs(s));
+        auto tb = titlebar(Mdi::TABLE, "Spreadsheet", tabs(s));
         auto body = table(s) | Ui::grow();
         if (s.propertiesVisible) {
             body = hflow(body, Ui::separator(), properties());

@@ -1,11 +1,11 @@
+#include <hideo-base/scafold.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
-#include <karm-ui/scafold.h>
 
 namespace Hideo::Console {
 
 Ui::Child app() {
-    return Ui::scafold({
+    return scafold({
         .icon = Mdi::CONSOLE_LINE,
         .title = "Console",
         .body = [] {

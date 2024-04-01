@@ -1,6 +1,6 @@
+#include <hideo-base/scafold.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
-#include <karm-ui/scafold.h>
 
 #include "model.h"
 
@@ -8,10 +8,10 @@ namespace Hideo::Counter {
 
 Ui::Child app() {
     return Ui::reducer<Model>([](State const &s) {
-        return Ui::scafold({
+        return scafold({
             .icon = Mdi::COUNTER,
             .title = "Counter",
-            .titlebar = Ui::TitlebarStyle::DIALOG,
+            .titlebar = TitlebarStyle::DIALOG,
             .body = [&] {
                 auto decBtn = Ui::button(
                     Model::bind<DecrementAction>(),

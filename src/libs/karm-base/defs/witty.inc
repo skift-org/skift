@@ -10,7 +10,7 @@
 "At least it didn't triple fault",
 "Bad command or file name",
 "Beam me up, Scotty. Something's seriously wrong here.",
-"BRB, calculating how long it'll take to walk to Mars instead"
+"BRB, calculating how long it'll take to walk to Mars instead",
 "But it works on my machine",
 "Calm down!",
 "Crewwmate, there is an impostor among us",

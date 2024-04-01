@@ -1,12 +1,12 @@
+#include <hideo-base/scafold.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
-#include <karm-ui/scafold.h>
 #include <web-view/view.h>
 
 namespace Hideo::Browser {
 
 Ui::Child app() {
-    return Ui::scafold({
+    return Hideo::scafold({
         .icon = Mdi::WEB,
         .title = "Browser",
         .startTools = slots$(

@@ -1,9 +1,10 @@
 #pragma once
 
+#include <hideo-base/dialogs.h>
 #include <hideo-base/row.h>
+#include <hideo-base/scafold.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
-#include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
@@ -12,7 +13,7 @@
 namespace Hideo::Demos {
 
 static void willShowMessage(Ui::Node &n) {
-    Ui::showMsgDialog(n, "Button pressed");
+    showMsgDialog(n, "Button pressed");
 }
 
 static inline Demo INPUTS_DEMO{

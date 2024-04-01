@@ -1,9 +1,9 @@
 #include <hideo-base/alert.h>
+#include <hideo-base/scafold.h>
 #include <karm-io/funcs.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-ui/app.h>
-#include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 
 namespace Hideo::Text {
@@ -16,7 +16,7 @@ Ui::Child editor(Str text) {
 }
 
 Ui::Child app(Res<String> text) {
-    return Ui::scafold({
+    return scafold({
         .icon = Mdi::TEXT,
         .title = "Text",
         .startTools = slots$(

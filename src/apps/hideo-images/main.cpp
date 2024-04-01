@@ -1,7 +1,7 @@
+#include <hideo-base/scafold.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
-#include <karm-ui/scafold.h>
 
 #include "app.h"
 
@@ -11,7 +11,7 @@ Ui::Child app(State initial) {
     return Ui::reducer<Model>(
         initial,
         [](auto const &state) {
-            auto titlebar = Ui::titlebar(Mdi::IMAGE, "Images");
+            auto titlebar = Hideo::titlebar(Mdi::IMAGE, "Images");
 
             auto content = state.isEditor
                                ? editor(state)

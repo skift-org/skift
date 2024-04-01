@@ -1,6 +1,6 @@
 #include <hideo-base/alert.h>
+#include <hideo-base/scafold.h>
 #include <karm-ui/input.h>
-#include <karm-ui/scafold.h>
 
 #include "app.h"
 
@@ -29,7 +29,7 @@ Ui::Child viewerPreview(State const &state) {
 }
 
 Ui::Child viewerToolbar(State const &state) {
-    return Ui::toolbar(
+    return toolbar(
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::Icon::MAGNIFY_PLUS),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::Icon::MAGNIFY_MINUS),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::Icon::FULLSCREEN),

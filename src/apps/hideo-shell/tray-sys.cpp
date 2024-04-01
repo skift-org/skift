@@ -1,6 +1,6 @@
+#include <hideo-base/dialogs.h>
 #include <hideo-base/input.h>
 #include <karm-ui/box.h>
-#include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/view.h>
@@ -90,7 +90,7 @@ Ui::Child quickTools(State const &) {
         Ui::button(
             [](auto &n) {
                 Model::bubble(n, Activate{Panel::NIL});
-                Ui::showDialog(n, Ui::aboutDialog(Mdi::SHIP_WHEEL, "Shell"));
+                Ui::showDialog(n, aboutDialog(Mdi::SHIP_WHEEL, "Shell"));
             },
             Ui::ButtonStyle::secondary(),
             Mdi::INFORMATION

@@ -1,3 +1,4 @@
+#include <hideo-base/scafold.h>
 #include <hideo-base/sidenav.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/anim.h>
@@ -5,7 +6,6 @@
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
-#include <karm-ui/scafold.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
@@ -53,7 +53,7 @@ Ui::Child pageContent(State const &state) {
 
 Ui::Child app() {
     return Ui::reducer<Model>({}, [](State const &s) {
-        return Ui::scafold({
+        return scafold({
             .icon = Mdi::COG,
             .title = "Settings",
             .startTools = slots$(

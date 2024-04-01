@@ -1,8 +1,8 @@
 #include <hideo-base/navbar.h>
+#include <hideo-base/scafold.h>
 #include <karm-sys/entry-async.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/app.h>
-#include <karm-ui/scafold.h>
 
 #include "model.h"
 
@@ -49,10 +49,10 @@ struct Clock : public Ui::View<Clock> {
 Ui::Child app() {
     return Ui::reducer<Model>(
         [](State const &s) {
-            return Ui::scafold({
+            return scafold({
                 .icon = Mdi::CLOCK,
                 .title = "Clock",
-                .titlebar = Ui::TitlebarStyle::DIALOG,
+                .titlebar = TitlebarStyle::DIALOG,
                 .body = [&] {
                     auto navbar = Hideo::navbar(
                         Hideo::navbarItem(

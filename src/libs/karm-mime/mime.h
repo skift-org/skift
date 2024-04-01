@@ -36,9 +36,6 @@ struct Mime {
     }
 };
 
-/// Try to sniff the mime type of a given byte array.
-Opt<Mime> sniffBytes(Bytes byes);
-
 /// Try to sniff the mime type from a file extension.
 Opt<Mime> sniffSuffix(Str suffix);
 

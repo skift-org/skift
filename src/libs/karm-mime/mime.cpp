@@ -1,31 +1,6 @@
-#include <bmp/spec.h>
-#include <jpeg/spec.h>
-#include <png/spec.h>
-#include <qoi/spec.h>
-#include <ttf/spec.h>
-
 #include "mime.h"
 
 namespace Karm::Mime {
-
-Opt<Mime> sniffBytes(Bytes bytes) {
-    if (Jpeg::Image::isJpeg(bytes))
-        return "image/jpeg"_mime;
-
-    if (Png::Image::isPng(bytes))
-        return "image/png"_mime;
-
-    if (Ttf::Font::isTtf(bytes))
-        return "font/ttf"_mime;
-
-    if (Bmp::Image::isBmp(bytes))
-        return "image/bmp"_mime;
-
-    if (Qoi::Image::isQoi(bytes))
-        return "image/qoi"_mime;
-
-    return NONE;
-}
 
 struct Suffix2Mime {
     Str suffix;

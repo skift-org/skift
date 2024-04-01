@@ -69,12 +69,17 @@ Child bound(Child child) {
     return makeStrong<Bound>(child);
 }
 
-struct Placed : public ProxyNode<Bound> {
+struct Placed : public ProxyNode<Placed> {
     Math::Recti _bound;
     Math::Recti _place;
 
     Placed(Math::Recti place, Child child)
         : ProxyNode(child), _place(place) {}
+
+    void reconcile(Placed &o) override {
+        _place = o._place;
+        ProxyNode<Placed>::reconcile(o);
+    }
 
     Math::Recti bound() override {
         return _bound;

@@ -182,6 +182,7 @@ Ui::Child appStack(State const &state) {
             Ui::placed(s.bound) |
             Ui::intent([=](Ui::Node &n, Sys::Event &e) {
                 if (auto *m = e.is<Ui::DragEvent>(Sys::Propagation::UP)) {
+                    logInfo("{}", m->delta);
                     e.accept();
                     Model::bubble<MoveApp>(n, {index, m->delta});
                 }

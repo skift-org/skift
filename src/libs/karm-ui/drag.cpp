@@ -130,11 +130,6 @@ struct DragRegion : public ProxyNode<DragRegion> {
 
     using ProxyNode::ProxyNode;
 
-    void reconcile(DragRegion &o) override {
-        _grabbed = o._grabbed;
-        ProxyNode<DragRegion>::reconcile(o);
-    }
-
     void event(Sys::Event &e) override {
         if (not _grabbed)
             _child->event(e);

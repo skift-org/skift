@@ -4,6 +4,7 @@
     "type": "exe",
     "description": "Graphical user interface for wearable devices",
     "requires": [
-        "hideo-base"
+        "hideo-base",
+        "skift-wallpapers"
     ]
 }

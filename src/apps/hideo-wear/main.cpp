@@ -4,13 +4,13 @@
 namespace Hideo::Wear {
 
 Ui::Child app() {
-    auto [date, time] = DateTime{};
+    auto [date, time] = DateTime{.date = {1, Month::APRIL, 2024}, .time = {56, 34, 12}};
     auto dateTime = Io::format(
         // Mon. 28 Jul
         "{}. {} {}",
-        date.month.abbr(),
+        Io::toCapitalCase(date.dayOfWeek().abbr()),
         date.dayOfMonth() + 1,
-        date.year.val()
+        Io::toCapitalCase(date.month.str())
     );
 
     auto clock = Ui::vflow(

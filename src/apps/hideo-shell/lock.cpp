@@ -10,16 +10,16 @@ Ui::Child lock(State const &state) {
     auto dateTime = Io::format(
         // Mon. 28 Jul
         "{}. {} {}",
-        date.month.abbr(),
+        Io::toCapitalCase(date.dayOfWeek().abbr()),
         date.dayOfMonth() + 1,
-        date.year.val()
+        Io::toCapitalCase(date.month.str())
     );
 
     auto clock = Ui::vflow(
         16,
-        Layout::Align::HCENTER,
-        Ui::displayMedium("{02}:{02}", time.hour, time.minute) | Ui::center(),
-        Ui::titleMedium(dateTime.unwrap()) | Ui::center()
+        Layout::Align::CENTER,
+        Ui::displayMedium("{02}:{02}", time.hour, time.minute),
+        Ui::titleMedium(dateTime.unwrap())
     );
 
     auto hintText = Ui::vflow(

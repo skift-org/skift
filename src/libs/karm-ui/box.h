@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-gfx/shadow.h>
 #include <karm-layout/spacing.h>
 
 #include "node.h"
@@ -16,7 +17,7 @@ struct BoxStyle {
     Opt<Gfx::Paint> borderPaint{Gfx::ALPHA};
     Opt<Gfx::Paint> backgroundPaint{};
     Gfx::Paint foregroundPaint{GRAY50};
-    Opt<Gfx::ShadowStyle> shadowStyle{};
+    Opt<Gfx::BoxShadow> shadowStyle{};
 
     BoxStyle withMargin(Layout::Spacingi margin) const {
         auto copy = *this;
@@ -60,7 +61,7 @@ struct BoxStyle {
         return copy;
     }
 
-    BoxStyle withShadowStyle(Gfx::ShadowStyle shadowStyle) const {
+    BoxStyle withShadowStyle(Gfx::BoxShadow shadowStyle) const {
         auto copy = *this;
         copy.shadowStyle = shadowStyle;
         return copy;
@@ -70,21 +71,16 @@ struct BoxStyle {
         bound = padding.grow(Layout::Flow::LEFT_TO_RIGHT, bound);
 
         g.save();
+        if (shadowStyle)
+            shadowStyle->paint(g, bound);
+
         if (backgroundPaint) {
-            if (shadowStyle) {
-                g.begin();
-                g.rect(bound.cast<f64>(), borderRadius);
-                g.shadow(*shadowStyle);
-                g.fill(*backgroundPaint);
-            } else {
-                g.fillStyle(*backgroundPaint);
-                g.fill(bound, borderRadius);
-            }
+            g.fillStyle(*backgroundPaint);
+            g.fill(bound, borderRadius);
         }
 
         g.fillStyle(foregroundPaint);
         inner();
-        g.restore();
 
         if (borderWidth and borderPaint) {
             g.strokeStyle(Gfx::stroke(*borderPaint)
@@ -92,6 +88,8 @@ struct BoxStyle {
                               .withAlign(Gfx::INSIDE_ALIGN));
             g.stroke(bound, borderRadius);
         }
+
+        g.restore();
     }
 
     void paint(Gfx::Context &g, Math::Recti bound) {

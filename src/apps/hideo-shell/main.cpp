@@ -168,27 +168,33 @@ Ui::Child tablet(State const &state) {
 
 Ui::Child appStack(State const &state) {
     Ui::Children apps;
-    usize index = 0;
-    for (auto &s : state.surfaces) {
+    usize index = state.surfaces.len() - 1;
+    for (auto &s : iterRev(state.surfaces)) {
         apps.pushBack(
-            Ui::empty() |
+            scafold(Scafold{
+                .icon = s.entry.icon.icon,
+                .title = s.entry.name,
+                .body = slot$(Ui::empty()),
+            }) |
             Ui::box({
-                .borderRadius = 8,
+                .borderRadius = 6,
                 .borderWidth = 1,
                 .borderPaint = Ui::GRAY800,
-                .backgroundPaint = Ui::GRAY950,
+                .backgroundPaint = Gfx::GRAY950,
+                .shadowStyle = Gfx::BoxShadow::elevated(index ? 4 : 16),
             }) |
-            Ui::dragRegion() |
             Ui::placed(s.bound) |
             Ui::intent([=](Ui::Node &n, Sys::Event &e) {
                 if (auto *m = e.is<Ui::DragEvent>(Sys::Propagation::UP)) {
-                    logInfo("{}", m->delta);
                     e.accept();
                     Model::bubble<MoveApp>(n, {index, m->delta});
+                } else if (auto *c = e.is<Events::RequestExitEvent>(Sys::Propagation::UP)) {
+                    e.accept();
+                    Model::bubble<CloseApp>(n, {index});
                 }
             })
         );
-        index++;
+        index--;
     }
 
     return Ui::stack(apps);
@@ -230,7 +236,7 @@ Ui::Child app(bool isMobile) {
         {
             .isMobile = isMobile,
             .dateTime = Sys::dateTime(),
-            .background = Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap(),
+            .background = Media::loadImageOrFallback("bundle://skift-wallpapers/images/brutal.qoi"_url).unwrap(),
             .noti = {
                 {
                     1,

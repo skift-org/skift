@@ -87,39 +87,4 @@ inline StrokeStyle stroke(auto... args) {
     return {args...};
 }
 
-/* --- Shadow Style --------------------------------------------------------- */
-
-struct ShadowStyle {
-    Paint paint = Gfx::BLACK;
-    f64 radius{8};
-    Math::Vec2i offset{};
-
-    static ShadowStyle elevated(f64 v) {
-        return {
-            Gfx::BLACK.withOpacity(0.7),
-            v * 2,
-            {0, (int)v},
-        };
-    }
-
-    auto &withPaint(Paint p) {
-        paint = p;
-        return *this;
-    }
-
-    auto &withRadius(f64 r) {
-        radius = r;
-        return *this;
-    }
-
-    auto &withOffset(Math::Vec2i o) {
-        offset = o;
-        return *this;
-    }
-};
-
-inline ShadowStyle shadow(auto... args) {
-    return ShadowStyle(args...);
-}
-
 } // namespace Karm::Gfx

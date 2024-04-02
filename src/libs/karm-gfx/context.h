@@ -26,7 +26,6 @@ struct Context {
         Paint paint = Gfx::WHITE;
         StrokeStyle strokeStyle{};
         Media::Font textFont = Media::Font::fallback();
-        ShadowStyle shadowStyle{};
 
         Math::Vec2i origin{};
         Math::Recti clip{};
@@ -154,9 +153,6 @@ struct Context {
     // Get the current text font.
     Media::Font &textFont();
 
-    // Get the current shadow style.
-    ShadowStyle const &shadowStyle();
-
     // Set the current fill style.
     Context &fillStyle(Paint style);
 
@@ -165,9 +161,6 @@ struct Context {
 
     // Set the current text font.
     Context &textFont(Media::Font style);
-
-    // Set the current shadow style.
-    Context &shadowStyle(ShadowStyle style);
 
     /* --- Drawing ---------------------------------------------------------- */
 
@@ -321,12 +314,6 @@ struct Context {
 
     // Stroke the current path with the given style.
     void stroke(StrokeStyle style);
-
-    // Draw a drop shadow for the current path.
-    void shadow();
-
-    // Draw a drop shadow for the current path with the given style.
-    void shadow(ShadowStyle style);
 
     /* --- Filters ---------------------------------------------------------- */
 

@@ -29,7 +29,6 @@ void reduce(State &s, Action a) {
             );
         },
         [&](MoveApp move) {
-            logInfo("{}", move.off);
             s.activePanel = Panel::NIL;
             auto bound = s.surfaces[move.index].bound;
             bound.xy = bound.xy + move.off;

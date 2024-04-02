@@ -107,6 +107,27 @@ struct Gradient {
     Gradient(Type type, Math::Vec2f start, Math::Vec2f end, Strong<Buf> buf)
         : _type(type), _start(start), _end(end), _buf(buf) {}
 
+    Gradient &withType(Type type) {
+        _type = type;
+        return *this;
+    }
+
+    Gradient &withStart(Math::Vec2f start) {
+        _start = start;
+        return *this;
+    }
+
+    Gradient &withEnd(Math::Vec2f end) {
+        _end = end;
+        return *this;
+    }
+
+    Gradient &withPoints(Math::Vec2f start, Math::Vec2f end) {
+        _start = start;
+        _end = end;
+        return *this;
+    }
+
     always_inline f64 transform(Math::Vec2f pos) const {
         pos = pos - _start;
         pos = pos.rotate(-(_end - _start).angle());

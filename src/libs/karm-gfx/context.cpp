@@ -134,10 +134,6 @@ Media::Font &Context::textFont() {
     return current().textFont;
 }
 
-ShadowStyle const &Context::shadowStyle() {
-    return current().shadowStyle;
-}
-
 Context &Context::fillStyle(Paint paint) {
     current().paint = paint;
     return *this;
@@ -150,11 +146,6 @@ Context &Context::strokeStyle(StrokeStyle style) {
 
 Context &Context::textFont(Media::Font font) {
     current().textFont = font;
-    return *this;
-}
-
-Context &Context::shadowStyle(ShadowStyle style) {
-    current().shadowStyle = style;
     return *this;
 }
 
@@ -532,17 +523,6 @@ void Context::stroke(StrokeStyle style) {
     _rast.clear();
     createStroke(_rast.shape(), _path, style);
     _fill(style.paint);
-}
-
-void Context::shadow() {
-    shadow(shadowStyle());
-}
-
-void Context::shadow(ShadowStyle style) {
-    layer(style.offset, [&](Context &ctx) {
-        ctx.fill(style.paint);
-        ctx.apply(BlurFilter{(isize)style.radius});
-    });
 }
 
 /* --- Effects -------------------------------------------------------------- */

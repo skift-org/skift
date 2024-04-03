@@ -613,8 +613,18 @@ struct Formatter<Weak<T>> {
 
 template <Reflectable T>
 struct Formatter<T> {
+    bool prefix = false;
+
+    void parse(Io::SScan &scan) {
+        if (scan.skip('#'))
+            prefix = true;
+    }
+
     Res<usize> format(Io::TextWriter &writer, T const &val) {
-        usize written = try$(Io::format(writer, "{}(", nameOf<T>()));
+        usize written = 0;
+        if (prefix)
+            written += try$(writer.writeStr(nameOf<T>()));
+        written += try$(writer.writeRune('{'));
 
         bool first = true;
         try$(iterFields(val, [&](Str name, auto const &v) -> Res<usize> {
@@ -624,7 +634,8 @@ struct Formatter<T> {
             written += try$(Io::format(writer, "{}={}", name, v));
             return Ok(written);
         }));
-        written += try$(writer.writeRune(')'));
+        written += try$(writer.writeRune('}'));
+
         return Ok(written);
     }
 };

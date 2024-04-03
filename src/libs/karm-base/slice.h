@@ -7,7 +7,7 @@ namespace Karm {
 
 using Byte = u8;
 
-inline constexpr Byte operator"" _byte(unsigned long long arg) noexcept {
+inline constexpr Byte operator""_byte(unsigned long long arg) noexcept {
     return static_cast<Byte>(arg);
 }
 

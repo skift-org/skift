@@ -143,11 +143,11 @@ test$(fmtReferences) {
 /* --- Format Reflectable --------------------------------------------------- */
 
 test$(fmtReflectable) {
-    auto fooStr = try$(Io::format("{}", Foo{1, 2}));
-    expectEq$(fooStr, "Foo(bar=1, baz=2)");
+    auto fooStr = try$(Io::format("{#}", Foo{1, 2}));
+    expectEq$(fooStr, "Foo{bar=1, baz=2}");
 
-    auto bazStr = try$(Io::format("{}", Baz{{1, 2}, 3}));
-    expectEq$(bazStr, "Baz(foo=Foo(bar=1, baz=2), qux=3)");
+    auto bazStr = try$(Io::format("{#}", Baz{{1, 2}, 3}));
+    expectEq$(bazStr, "Baz{foo={bar=1, baz=2}, qux=3}");
 
     return Ok();
 }

@@ -13,6 +13,13 @@ void Parser::_raise(Str msg) {
     logError("{}: {}", toStr(_insertionMode), msg);
 }
 
+// 13.2.4.3 The list of active formatting elements
+// https://html.spec.whatwg.org/multipage/parsing.html#list-of-active-formatting-elements
+
+void reconstructTheActiveFormattingElements(Parser &) {
+    // TODO
+}
+
 // 13.2.5 Tokenization
 // https://html.spec.whatwg.org/multipage/parsing.html#tokenization
 
@@ -577,13 +584,15 @@ void Parser::_handleInHeadNoScript(Token const &t) {
     //   - U+000A LINE FEED (LF),
     //   - U+000C FORM FEED (FF),
     //   - U+000D CARRIAGE RETURN (CR),
-    //   - or U+0020 SPACE
+    //   - U+0020 SPACE
     // A comment token
     // A start tag whose tag name is one of: "basefont", "bgsound", "link", "meta", "noframes", "style"
     else if (
-        (t.type == Token::CHARACTER and (t.rune == '\t' or t.rune == '\n' or t.rune == '\f' or t.rune == ' ')) or
+        (t.type == Token::CHARACTER and
+         (t.rune == '\t' or t.rune == '\n' or t.rune == '\f' or t.rune == ' ')) or
         t.type == Token::COMMENT or
-        (t.type == Token::START_TAG and (t.name == "basefont" or t.name == "bgsound" or t.name == "link" or t.name == "meta" or t.name == "noframes" or t.name == "style"))
+        (t.type == Token::START_TAG and
+         (t.name == "basefont" or t.name == "bgsound" or t.name == "link" or t.name == "meta" or t.name == "noframes" or t.name == "style"))
     ) {
         _acceptIn(Mode::IN_HEAD, t);
     }
@@ -607,6 +616,166 @@ void Parser::_handleInHeadNoScript(Token const &t) {
     else {
         anythingElse();
     }
+}
+
+// https://html.spec.whatwg.org/multipage/parsing.html#the-after-head-insertion-mode
+void Parser::_handleAfterHead(Token const &t) {
+    auto anythingElse = [&] {
+        Token bodyToken;
+        bodyToken.type = Token::START_TAG;
+        bodyToken.name = String{"body"};
+        insertHtmlElement(*this, bodyToken);
+        _switchTo(Mode::IN_BODY);
+        accept(t);
+    };
+
+    // A character token that is one of
+    //   - U+0009 CHARACTER TABULATION,
+    //   - U+000A LINE FEED (LF),
+    //   - U+000C FORM FEED (FF),
+    //   - U+000D CARRIAGE RETURN (CR)
+    //   - U+0020 SPACE
+    if (t.type == Token::CHARACTER and
+        (t.rune == '\t' or t.rune == '\n' or t.rune == '\f' or t.rune == '\r' or t.rune == ' ')) {
+        insertACharacter(*this, *t.rune);
+    }
+
+    // A comment token
+    else if (t.type == Token::COMMENT) {
+        insertAComment(*this, t);
+    }
+
+    // A DOCTYPE token
+    else if (t.type == Token::DOCTYPE) {
+        _raise();
+    }
+
+    // A start tag whose tag name is "html"
+    else if (t.type == Token::START_TAG and (t.name == "html")) {
+        _acceptIn(Mode::IN_BODY, t);
+    }
+
+    // A start tag whose tag name is "body"
+    else if (t.type == Token::START_TAG and (t.name == "body")) {
+        insertHtmlElement(*this, t);
+        _framesetOk = false;
+        _switchTo(Mode::IN_BODY);
+    }
+
+    // A start tag whose tag name is "frameset"
+    else if (t.type == Token::START_TAG and (t.name == "frameset")) {
+        insertHtmlElement(*this, t);
+        _switchTo(Mode::IN_FRAMESET);
+    }
+
+    // A start tag whose tag name is one of:
+    //   "base", "basefont", "bgsound", "link", "meta",
+    //   "noframes", "script", "style", "template", "title"
+    else if (
+        t.type == Token::START_TAG and
+        (t.name == "base" or t.name == "basefont" or
+         t.name == "bgsound" or t.name == "link" or
+         t.name == "meta" or t.name == "noframes" or
+         t.name == "script" or t.name == "style" or
+         t.name == "template" or t.name == "title")
+    ) {
+        _raise();
+        _openElements.pushBack(*_headElement);
+        _acceptIn(Mode::IN_HEAD, t);
+        _openElements.removeAll(*_headElement);
+    }
+
+    // An end tag whose tag name is "template"
+    else if (t.type == Token::END_TAG and (t.name == "template")) {
+        _acceptIn(Mode::IN_HEAD, t);
+    }
+
+    // An end tag whose tag name is one of: "body", "html", "br"
+    else if (t.type == Token::END_TAG and (t.name == "body" or t.name == "html" or t.name == "br")) {
+        anythingElse();
+    }
+
+    // A start tag whose tag name is "head"
+    else if (t.type == Token::END_TAG or (t.type == Token::START_TAG and t.name == "head")) {
+        // ignore
+        _raise();
+    }
+
+    // Anything else
+    else {
+        anythingElse();
+    }
+}
+
+// https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inbody
+void Parser::_handleInBody(Token const &t) {
+    // A character token that is U+0000 NULL
+    if (t.type == Token::CHARACTER and t.rune == '\0') {
+        _raise();
+    }
+
+    // A character token that is one of
+    //   - U+0009 CHARACTER TABULATION
+    //   - U+000A LINE FEED (LF)
+    //   - U+000C FORM FEED (FF)
+    //   - U+000D CARRIAGE RETURN (CR)
+    //   - U+0020 SPACE
+    else if (t.type == Token::CHARACTER and (t.rune == '\t' or t.rune == '\n' or t.rune == '\f' or t.rune == '\r' or t.rune == ' ')) {
+        reconstructTheActiveFormattingElements(*this);
+        insertACharacter(*this, t);
+    }
+
+    // Any other character token
+    else if (t.type == Token::CHARACTER) {
+        reconstructTheActiveFormattingElements(*this);
+        insertACharacter(*this, t);
+        _framesetOk = false;
+    }
+
+    // A comment token
+    else if (t.type == Token::COMMENT) {
+        insertAComment(*this, t);
+    }
+
+    // A DOCTYPE token
+    else if (t.type == Token::DOCTYPE) {
+        _raise();
+    }
+}
+
+// https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intext
+void Parser::_handleText(Token const &t) {
+    // A character token
+    if (t.type == Token::CHARACTER) {
+        insertACharacter(
+            *this,
+            t.rune == '\0'
+                ? 0xFFFD
+                : t.rune.unwrap()
+        );
+    }
+
+    else if (t.type == Token::END_OF_FILE) {
+        _raise();
+
+        // TODO: If the current node is a script element, then set its already started to true.
+
+        _openElements.popBack();
+        _switchTo(_originalInsertionMode);
+    }
+
+    // An end tag whose tag name is "script"
+    // else if (t.type == Token::END_TAG and t.name == "script") {
+    // }
+    // NOSPEC: We handle script end tags like any other end tag
+
+    // Any other end tag
+    else if (t.type == Token::END_TAG) {
+        this->_openElements.popBack();
+        _switchTo(_originalInsertionMode);
+    }
+
+    // FIXME: Implement the rest of the rules
 }
 
 void Parser::_switchTo(Mode mode) {
@@ -638,20 +807,17 @@ void Parser::_acceptIn(Mode mode, Token const &t) {
         _handleInHeadNoScript(t);
         break;
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#the-after-head-insertion-mode
-    case Mode::AFTER_HEAD: {
+    case Mode::AFTER_HEAD:
+        _handleAfterHead(t);
         break;
-    }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inbody
-    case Mode::IN_BODY: {
+    case Mode::IN_BODY:
+        _handleInBody(t);
         break;
-    }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intext
-    case Mode::TEXT: {
+    case Mode::TEXT:
+        _handleText(t);
         break;
-    }
 
     // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intable
     case Mode::IN_TABLE: {

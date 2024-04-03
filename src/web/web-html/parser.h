@@ -41,6 +41,7 @@ struct Parser : public Sink {
     };
 
     bool _scriptingEnabled = false;
+    bool _framesetOk = true;
 
     Mode _insertionMode = Mode::INITIAL;
     Mode _originalInsertionMode = Mode::INITIAL;
@@ -67,6 +68,12 @@ struct Parser : public Sink {
     void _handleInHead(Token const &t);
 
     void _handleInHeadNoScript(Token const &t);
+
+    void _handleAfterHead(Token const &t);
+
+    void _handleInBody(Token const &t);
+
+    void _handleText(Token const &t);
 
     void _switchTo(Mode mode);
 

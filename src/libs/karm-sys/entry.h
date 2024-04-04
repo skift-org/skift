@@ -11,11 +11,11 @@
 
 #if defined(__ck_sys_linux__) || defined(__ck_sys_darwin__)
 #    define EMBED_POSIX_MAIN_IMPL
-#    include <impl-posix/main.h>
+#    include <impl-posix/entry.h>
 #elif defined(__ck_sys_skift__)
 // Nothing to do, skift uses entryPoint by default
 #elif defined(__ck_sys_efi__)
-#    include <impl-efi/main.h>
+#    include <impl-efi/entry.h>
 #else
 #    error "Unknown system"
 #endif

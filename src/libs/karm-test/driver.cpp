@@ -28,19 +28,18 @@ Res<> Driver::runAll() {
     Sys::errln("Running {} tests...\n", _tests.len());
 
     for (auto *test : _tests) {
-        Sys::err(
-            "Running {}: {}... ",
-            test->_loc.file,
-            Io::toNoCase(test->_name).unwrap()
-        );
 
         auto result = test->run(*this);
 
         if (not result) {
             failed++;
+            Sys::err(
+                "Running {}: {}... ",
+                test->_loc.file,
+                Io::toNoCase(test->_name).unwrap()
+            );
             Sys::errln("{}", Cli::styled(result.none(), Cli::style(Cli::RED).bold()));
         } else {
-            Sys::errln("{}", Cli::styled("PASS", Cli::style(Cli::GREEN).bold()));
             passed++;
         }
     }
@@ -49,7 +48,8 @@ Res<> Driver::runAll() {
 
     if (failed) {
         Sys::errln(
-            " ❌ {} failled - {}",
+            " {} {} failled - {}",
+            badEmoji(Sys::now().val()),
             Cli::styled(failed, RED),
             Cli::styled(witty(Sys::now().val()), NOTE)
         );

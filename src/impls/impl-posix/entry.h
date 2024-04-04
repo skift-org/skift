@@ -11,12 +11,9 @@ int main(int argc, char const **argv) {
     auto &ctx = Sys::globalCtx();
     ctx.add<Sys::ArgsHook>(argc, argv);
     Res<> code = entryPoint(ctx);
-
     if (not code) {
-        ::Karm::Error error = code.none();
-        (void)::Karm::Io::format(::Karm::Sys::err(), "{}: {}\n", argv[0], error.msg());
+        Karm::Sys::errln("{}: {}", argv[0], code);
         return 1;
     }
-
     return 0;
 }

@@ -741,6 +741,113 @@ void Parser::_handleInBody(Token const &t) {
     else if (t.type == Token::DOCTYPE) {
         _raise();
     }
+
+    // TODO: A start tag whose tag name is "html"
+
+    // TODO: A start tag whose tag name is one of: "base", "basefont", "bgsound", "link", "meta", "noframes", "script", "style", "template", "title"
+    // An end tag whose tag name is "template"
+
+    // TODO: A start tag whose tag name is "body"
+
+    // TODO: A start tag whose tag name is "frameset"
+
+    // TODO: An end-of-file token
+
+    // TODO: An end tag whose tag name is "body"
+
+    // TODO: An end tag whose tag name is "html"
+
+    // TODO: A start tag whose tag name is one of:
+    // "address", "article", "aside", "blockquote", "center",
+    // "details", "dialog", "dir", "div", "dl", "fieldset",
+    // "figcaption", "figure", "footer", "header", "hgroup",
+    // "main", "menu", "nav", "ol", "p", "search", "section",
+    // "summary", "ul"
+
+    // TODO: A start tag whose tag name is one of: "h1", "h2", "h3", "h4", "h5", "h6"
+
+    // TODO: A start tag whose tag name is one of: "pre", "listing"
+
+    // TODO: A start tag whose tag name is "form"
+
+    // TODO: A start tag whose tag name is "li"
+
+    // TODO: A start tag whose tag name is one of: "dd", "dt"
+
+    // TODO: A start tag whose tag name is "plaintext"
+
+    // TODO: A start tag whose tag name is "button"
+
+    // TODO: An end tag whose tag name is one of: "address", "article", "aside", "blockquote", "button", "center", "details", "dialog", "dir", "div", "dl", "fieldset", "figcaption", "figure", "footer", "header", "hgroup", "listing", "main", "menu", "nav", "ol", "pre", "search", "section", "summary", "ul"
+
+    // TODO: An end tag whose tag name is "form"
+
+    // TODO: An end tag whose tag name is "p"
+
+    // TODO: An end tag whose tag name is "li"
+
+    // TODO: An end tag whose tag name is one of: "dd", "dt"
+
+    // TODO: An end tag whose tag name is one of: "h1", "h2", "h3", "h4", "h5", "h6"
+
+    // TODO: An end tag whose tag name is "sarcasm"
+
+    // TODO: A start tag whose tag name is "a"
+
+    // TODO: A start tag whose tag name is one of: "b", "big", "code", "em", "font", "i", "s", "small", "strike", "strong", "tt", "u"
+
+    // TODO: A start tag whose tag name is "nobr"
+
+    // TODO: An end tag whose tag name is one of: "a", "b", "big", "code", "em", "font", "i", "nobr", "s", "small", "strike", "strong", "tt", "u"
+
+    // TODO: A start tag whose tag name is one of: "applet", "marquee", "object"
+
+    // TODO: An end tag token whose tag name is one of: "applet", "marquee", "object"
+
+    // TODO: A start tag whose tag name is "table"
+
+    // TODO: An end tag whose tag name is "br"
+
+    // TODO: A start tag whose tag name is one of: "area", "br", "embed", "img", "keygen", "wbr"
+
+    // TODO: A start tag whose tag name is "input"
+
+    // TODO: A start tag whose tag name is one of: "param", "source", "track"
+
+    // TODO: A start tag whose tag name is "hr"
+
+    // TODO: A start tag whose tag name is "image"
+
+    // TODO: A start tag whose tag name is "textarea"
+
+    // TODO: A start tag whose tag name is "xmp"
+
+    // TODO: A start tag whose tag name is "iframe"
+
+    // TODO: A start tag whose tag name is "noembed"
+    // A start tag whose tag name is "noscript", if the scripting flag is enabled
+
+    // TODO: A start tag whose tag name is "select"
+
+    // TODO: A start tag whose tag name is one of: "optgroup", "option"
+
+    // TODO: A start tag whose tag name is one of: "rb", "rtc"
+
+    // TODO: A start tag whose tag name is one of: "rp", "rt"
+
+    // TODO: A start tag whose tag name is "math"
+
+    // TODO: A start tag whose tag name is "svg"
+
+    // TODO: A start tag whose tag name is one of: "caption", "col", "colgroup", "frame", "head", "tbody", "td", "tfoot", "th", "thead", "tr"
+
+    // TODO: Any other start tag
+    else if (t.type == Token::START_TAG) {
+    }
+
+    // TODO: Any other end tag
+    else if (t.type == Token::END_TAG) {
+    }
 }
 
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intext

@@ -450,7 +450,7 @@ usize transcodeLen(Cursor<typename Source::Unit> input) {
 
     while (input.rem()) {
         Rune r;
-        if (Source::decode(r, input)) {
+        if (Source::decodeUnit(r, input)) {
             result += 1;
         }
     }

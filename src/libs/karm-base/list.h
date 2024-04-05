@@ -271,7 +271,7 @@ struct List {
         return peek(i);
     }
 
-    /* -- Front Access --- */
+    /* --- Front Access --- */
 
     void pushFront(T const &value) {
         pushFront(T{value});

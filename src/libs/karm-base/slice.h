@@ -413,6 +413,11 @@ always_inline constexpr Opt<usize> indexOf(T const &slice, U const &needle) {
 }
 
 template <Sliceable T, typename U = T::Inner>
+always_inline constexpr bool contains(T const &slice, U const &needle) {
+    return indexOf(slice, needle).has();
+}
+
+template <Sliceable T, typename U = T::Inner>
 always_inline constexpr Opt<usize> lastIndexOf(T const &slice, U const &needle) {
     for (usize i = slice.len(); i > 0; i--)
         if (slice[i - 1] == needle)

@@ -260,6 +260,6 @@ using StringBuilder = _StringBuilder<Utf8>;
 
 } // namespace Karm
 
-inline Karm::Str operator""_str(char const *buf, usize len) {
+inline constexpr Karm::Str operator""_str(char const *buf, usize len) {
     return {buf, len};
 }

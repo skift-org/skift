@@ -12,7 +12,7 @@ bool _matchGroupe(SScan &glob, Rune curr) {
         Rune rs = glob.next();
         Rune re = rs;
 
-        if (glob.peek() == '-' && glob.peek(1) != ']') {
+        if (glob.peek() == '-' and glob.peek(1) != ']') {
             re = glob.peek(1);
             glob.next(2);
         }
@@ -20,7 +20,7 @@ bool _matchGroupe(SScan &glob, Rune curr) {
         if (re < rs)
             std::swap(rs, re);
 
-        if (rs <= curr && curr <= re) {
+        if (rs <= curr and curr <= re) {
             while (!glob.ended() &&
                    !glob.skip(']')) {
                 glob.next();
@@ -48,7 +48,7 @@ bool _matchWildCard(SScan &glob, SScan &in) {
 }
 
 bool matchGlob(SScan &glob, SScan &in) {
-    while (!glob.ended() && !in.ended()) {
+    while (!glob.ended() and !in.ended()) {
         auto op = glob.next();
 
         switch (op) {
@@ -88,7 +88,7 @@ bool matchGlob(SScan &glob, SScan &in) {
         }
     }
 
-    return glob.ended() && in.ended();
+    return glob.ended() and in.ended();
 }
 
 bool matchGlob(Str glob, Str str) {

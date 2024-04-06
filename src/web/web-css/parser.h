@@ -24,7 +24,7 @@ struct Parser : public Sink {
         while (true) {
             auto token = nextToken(s).unwrap();
             logDebug("{#}", token);
-            if (token.type == Token::Type::END_OF_FILE || token.data == "") {
+            if (token.type == Token::Type::END_OF_FILE or token.data == "") {
                 return;
             }
         }

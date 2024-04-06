@@ -236,7 +236,7 @@ Ui::Child app(bool isMobile) {
         {
             .isMobile = isMobile,
             .dateTime = Sys::dateTime(),
-            .background = Media::loadImageOrFallback("bundle://skift-wallpapers/images/brutal.qoi"_url).unwrap(),
+            .background = Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap(),
             .noti = {
                 {
                     1,

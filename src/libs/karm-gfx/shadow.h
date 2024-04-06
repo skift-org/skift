@@ -50,9 +50,9 @@ struct BoxShadow {
     f64 spread;
     Math::Vec2i offset;
 
-    static BoxShadow elevated(f64 v) {
+    static BoxShadow elevated(f64 v, Gfx::Color fill = Gfx::BLACK) {
         return {
-            Gfx::BLACK.withOpacity(0.5),
+            fill.withOpacity(0.5),
             v * 2,
             -v,
             {0, (int)v},

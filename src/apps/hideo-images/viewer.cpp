@@ -21,8 +21,10 @@ Ui::Child viewerPreview(State const &state) {
 
     return Ui::image(state.image.unwrap()) |
            Ui::box({
+               .borderRadius = 8,
                .borderWidth = 1,
                .borderPaint = Ui::GRAY50.withOpacity(0.1),
+               .shadowStyle = Gfx::BoxShadow::elevated(8),
            }) |
            Ui::spacing(8) |
            Ui::fit();

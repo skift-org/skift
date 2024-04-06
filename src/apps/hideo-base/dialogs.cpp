@@ -15,6 +15,7 @@ Ui::Child dialogScafold(Layout::Align a, Ui::Child inner) {
         .borderWidth = 1,
         .borderPaint = Ui::GRAY800,
         .backgroundPaint = Ui::GRAY900,
+        .shadowStyle = Gfx::BoxShadow::elevated(16)
     };
 
     return inner |

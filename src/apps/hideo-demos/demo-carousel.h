@@ -19,12 +19,17 @@ static inline Demo CAROUSEL_DEMO{
             0,
             [](isize state, auto bind) {
                 auto page = [](Gfx::Color color, Str text) {
-                    return Ui::box({
-                                       .margin = 32,
-                                       .borderRadius = 8,
-                                       .backgroundPaint = color,
-                                   },
-                                   Ui::displayLarge(text) | Ui::center() | Ui::bound());
+                    return Ui::box(
+                        {
+                            .margin = 32,
+                            .borderRadius = 8,
+                            .borderWidth = 1,
+                            .borderPaint = Gfx::WHITE.withOpacity(0.1),
+                            .backgroundPaint = color,
+                            .shadowStyle = Gfx::BoxShadow::elevated(24, color.withOpacity(0.5)),
+                        },
+                        Ui::displayLarge(text) | Ui::center() | Ui::bound()
+                    );
                 };
 
                 auto prevBtn =

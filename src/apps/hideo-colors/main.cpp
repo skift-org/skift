@@ -261,13 +261,15 @@ Ui::Child app() {
         [](auto const &state) {
             auto c = Gfx::hsvToRgb(state.hsv);
 
-            auto preview = Ui::empty(128) |
-                           Ui::box({
-                               .borderRadius = 6,
-                               .borderWidth = 1,
-                               .borderPaint = Ui::GRAY100.withOpacity(0.1),
-                               .backgroundPaint = Gfx::hsvToRgb(state.hsv),
-                           });
+            auto preview =
+                Ui::empty(128) |
+                Ui::box({
+                    .borderRadius = 6,
+                    .borderWidth = 1,
+                    .borderPaint = Ui::GRAY100.withOpacity(0.1),
+                    .backgroundPaint = Gfx::hsvToRgb(state.hsv),
+                    .shadowStyle = Gfx::BoxShadow::elevated(16, Gfx::hsvToRgb(state.hsv).withOpacity(0.5)),
+                });
 
             auto toolbar = Ui::hflow(
                 4,

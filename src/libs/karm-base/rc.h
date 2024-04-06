@@ -248,7 +248,7 @@ struct Strong {
         return unwrap() <=> other.unwrap();
     }
 
-    auto operator==(Strong const &other) const
+    bool operator==(Strong const &other) const
         requires Meta::Equatable<T>
     {
         if (_cell == other._cell)
@@ -260,7 +260,7 @@ struct Strong {
         return unwrap() <=> other;
     }
 
-    auto operator==(T const &other) const {
+    bool operator==(T const &other) const {
         return unwrap() == other;
     }
 };

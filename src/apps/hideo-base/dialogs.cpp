@@ -49,15 +49,18 @@ Ui::Child dialogCloseButton() {
 
 Ui::Child versionBadge() {
     Ui::Children badges = {};
-    badges.pushBack(badge(Ui::BadgeStyle::INFO, stringify$(__ck_version_value)));
+    badges.pushBack(Ui::badge(
+        Ui::BadgeStyle::INFO,
+        stringify$(__ck_version_value)
+    ));
 #ifdef __ck_branch_nightly__
-    badges.pushBack(badge(Gfx::INDIGO400, "Nightly"));
+    badges.pushBack(Ui::badge(Gfx::INDIGO400, "Nightly"));
 #elif defined(__ck_branch_stable__)
     // No badge for stable
 #else
     badges.pushBack(Ui::badge(Gfx::EMERALD, "Dev"));
 #endif
-    return hflow(4, badges);
+    return Ui::hflow(4, badges);
 }
 
 static constexpr Str LICENSE = R"(Copyright © 2018-2024, the skiftOS Developers

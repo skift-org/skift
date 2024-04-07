@@ -33,7 +33,7 @@ union Trans2 {
         : _els{xx, xy, yx, yy, ox, oy} {}
 
     static constexpr Trans2 identity() {
-        return Trans2(1, 0, 0, 1, 0, 0);
+        return {1, 0, 0, 1, 0, 0};
     }
 
     static constexpr Trans2 rotate(T angle) {
@@ -70,14 +70,26 @@ union Trans2 {
     }
 
     constexpr Trans2 multiply(Trans2 const &other) const {
-        return {
-            xx * other.xx + xy * other.yx,
-            xx * other.xy + xy * other.yy,
-            yx * other.xx + yy * other.yx,
-            yx * other.xy + yy * other.yy,
-            ox * other.xx + oy * other.yx + other.ox,
-            ox * other.xy + oy * other.yy + other.oy,
+        Trans2 res = {
+            xx * other.xx,
+            0.0,
+            0.0,
+            yy * other.yy,
+            ox * other.xx + other.ox,
+            oy * other.yy + other.oy,
         };
+
+        if (xy != 0.0 || yx != 0.0 ||
+            other.xy != 0.0 || other.yx != 0.0) {
+            res.xx += xy * other.yx;
+            res.xy += xx * other.xy + xy * other.yy;
+            res.yx += yx * other.xx + yy * other.yx;
+            res.yy += yx * other.xy;
+            res.ox += oy * other.yx;
+            res.oy += ox * other.xy;
+        }
+
+        return res;
     }
 
     constexpr Trans2 rotated(T angle) {

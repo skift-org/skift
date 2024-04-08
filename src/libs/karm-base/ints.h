@@ -7,7 +7,8 @@
 
 namespace Karm {
 
-using Sym = uint8_t[];
+/// A linker symbol.
+using ExternSym = uint8_t[];
 
 /* --- Unsigned -------------------------------------------------------- */
 

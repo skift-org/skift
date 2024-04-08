@@ -113,7 +113,7 @@ usize legacyPutChar(char c) {
     return ecall(0x1, 0, c).err;
 }
 
-usize leacyPuts(Str str) {
+usize legacyPuts(Str str) {
     for (auto c : str) {
         if (legacyPutChar(c) != 0)
             return 1;

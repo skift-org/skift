@@ -6,6 +6,7 @@
 #include <karm-base/time.h>
 #include <karm-base/tuple.h>
 #include <karm-base/vec.h>
+#include <karm-io/aton.h>
 #include <karm-io/impls.h>
 #include <karm-io/sscan.h>
 #include <karm-io/traits.h>
@@ -299,6 +300,11 @@ struct NumberFormater {
         return "";
     }
 
+    void parse(Str str) {
+        Io::SScan scan{str};
+        parse(scan);
+    }
+
     void parse(Io::SScan &scan) {
         if (scan.skip('#'))
             prefix = true;
@@ -306,7 +312,7 @@ struct NumberFormater {
         if (scan.skip('0'))
             fillChar = '0';
 
-        width = tryOr(scan.nextInt(), 0);
+        width = tryOr(atoi(scan), 0);
 
         if (scan.ended())
             return;
@@ -477,6 +483,47 @@ template <typename T>
 struct Formatter<Le<T>> : public Formatter<T> {
     Res<usize> format(Io::TextWriter &writer, Le<T> const &val) {
         return Formatter<T>::format(writer, val.value());
+    }
+};
+
+/* --- Format Pointers ------------------------------------------------------ */
+
+template <typename T>
+struct Formatter<T *> {
+    bool prefix = false;
+
+    void parse(Io::SScan &scan) {
+        prefix = scan.skip('#');
+    }
+
+    Res<usize> format(Io::TextWriter &writer, T *val) {
+        usize written = 0;
+
+        if (prefix) {
+            written += try$(writer.writeRune('('));
+            written += try$(writer.writeStr(nameOf<T>()));
+            written += try$(writer.writeStr(" *)"));
+        }
+
+        if (val) {
+            NumberFormater fmt;
+            fmt.base = 16;
+            fmt.fillChar = '0';
+            fmt.width = sizeof(T *) * 2;
+            fmt.prefix = true;
+            written += try$(fmt.formatUnsigned(writer, (usize)val));
+        } else {
+            written += try$(writer.writeStr("nullptr"));
+        }
+
+        return Ok(written);
+    }
+};
+
+template <>
+struct Formatter<std::nullptr_t> {
+    Res<usize> format(Io::TextWriter &writer, std::nullptr_t) {
+        return writer.writeStr("nullptr");
     }
 };
 

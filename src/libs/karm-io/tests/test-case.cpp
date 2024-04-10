@@ -31,11 +31,11 @@ struct {
     {Case::SWAP, "Hello World", "hELLO wORLD"},
     {Case::LOWER, "HELLO WORLD", "hello world"},
     {Case::LOWER_FIRST, "HELLO WORLD", "hELLO WORLD"},
-    {Case::UPPER, "helloWorld", "HELLOWORLD"},
+    {Case::UPPER, "helloWorld", "HELLO WORLD"},
     {Case::UPPER, "hello world", "HELLO WORLD"},
     {Case::UPPER_FIRST, "hello world", "Hello world"},
-    {Case::SPONGE, "hello world", "HeLlO WoRlD"},
-    {Case::SPONGE, "NFTs are the future of the web", "NfTs aRe tHe fUtUrE Of tHe wEb"},
+    {Case::SPONGE, "hello world", "HeLlO wOrLd"},
+    {Case::SPONGE, "NFTs are the future of the web", "NfTs ArE tHe FuTuRe Of ThE wEb"},
 };
 
 test$(changeChase) {

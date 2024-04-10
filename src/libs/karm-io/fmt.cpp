@@ -1,260 +1,245 @@
 #include <karm-io/expr.h>
 
+#include "emit.h"
 #include "fmt.h"
 
 namespace Karm::Io {
+
+static auto const RE_SEP =
+    Re::single(' ', '\t', '.', '_', '/', '-');
+
+using CaseFn = auto(Rune, usize, usize) -> Rune;
+
+Res<usize> _changeCase(SScan &s, Io::TextWriter &w, CaseFn fn) {
+    bool wasLower = false;
+
+    usize si = 0, wi = 0;
+    usize written = 0;
+
+    s.eat(RE_SEP);
+
+    while (not s.ended()) {
+        if (s.eat(RE_SEP)) {
+            auto sep = fn(' ', si, wi);
+            if (sep)
+                written += try$(w.writeRune(sep));
+            wi = 0;
+            wasLower = false;
+        } else {
+            if (wasLower and isAsciiUpper(s.curr())) {
+                auto sep = fn(' ', si, wi);
+                if (sep)
+                    written += try$(w.writeRune(sep));
+                wi = 0;
+            }
+
+            wasLower = isAsciiLower(s.curr()) and isAsciiAlpha(s.curr());
+            written += try$(w.writeRune(fn(s.next(), si, wi)));
+            si++;
+            wi++;
+        }
+    }
+
+    return Ok(written);
+}
+
+Res<String> _changeCase(Str str, CaseFn fn) {
+    Io::StringWriter writer;
+    Io::SScan scan{str};
+    try$(_changeCase(scan, writer, fn));
+    return Ok(writer.take());
+}
+
+/* --- Case functions ------------------------------------------------------- */
+
+// si: string index
+// wi: word index
+
+Rune _toNoCase(Rune rune, usize, usize) {
+    return toAsciiLower(rune);
+}
+
+Rune _toPascalCase(Rune rune, usize, usize wi) {
+    if (rune == ' ')
+        return '\0';
+
+    if (wi == 0)
+        return toAsciiUpper(rune);
+
+    return toAsciiLower(rune);
+}
+
+Rune _toCamelCase(Rune rune, usize si, usize wi) {
+    if (si == 0)
+        return toAsciiLower(rune);
+
+    return _toPascalCase(rune, si, wi);
+}
+
+Rune _toTitleCase(Rune rune, usize, usize wi) {
+    if (wi == 0)
+        return toAsciiUpper(rune);
+    return toAsciiLower(rune);
+}
+
+Rune _toConstantCase(Rune rune, usize, usize) {
+    if (rune == ' ')
+        return '_';
+    return toAsciiUpper(rune);
+}
+
+Rune _toDotCase(Rune rune, usize, usize) {
+    if (rune == ' ')
+        return '.';
+    return rune;
+}
+
+Rune _toHeaderCase(Rune rune, usize, usize wi) {
+    if (rune == ' ')
+        return '-';
+    if (wi == 0)
+        return toAsciiUpper(rune);
+    return toAsciiLower(rune);
+}
+
+Rune _toParamCase(Rune rune, usize, usize) {
+    if (rune == ' ')
+        return '-';
+    return toAsciiLower(rune);
+}
+
+Rune _toPathCase(Rune rune, usize, usize) {
+    if (rune == ' ')
+        return '/';
+    return rune;
+}
+
+Rune _toSentenceCase(Rune rune, usize si, usize) {
+    if (si == 0)
+        return toAsciiUpper(rune);
+    return toAsciiLower(rune);
+}
+
+Rune _toSnakeCase(Rune rune, usize, usize) {
+    if (rune == ' ')
+        return '_';
+    return toAsciiLower(rune);
+}
+
+Rune _toSwapCase(Rune rune, usize, usize) {
+    if (isAsciiLower(rune))
+        return toAsciiUpper(rune);
+    if (isAsciiUpper(rune))
+        return toAsciiLower(rune);
+    return rune;
+}
+
+Rune _toLowerCase(Rune rune, usize, usize) {
+    return toAsciiLower(rune);
+}
+
+Rune _toLowerFirstCase(Rune rune, usize si, usize) {
+    if (si == 0)
+        return toAsciiLower(rune);
+
+    return rune;
+}
+
+Rune _toUpperCase(Rune rune, usize, usize) {
+    return toAsciiUpper(rune);
+}
+
+Rune _toUpperFirstCase(Rune rune, usize si, usize) {
+    if (si == 0)
+        return toAsciiUpper(rune);
+    return rune;
+}
+
+Rune _toSpongeCase(Rune rune, usize si, usize) {
+    if (si % 2 == 0)
+        return toAsciiUpper(rune);
+    return toAsciiLower(rune);
+}
+
+/* --- Public API ----------------------------------------------------------- */
 
 Res<String> toDefaultCase(Str str) {
     return Ok(str);
 }
 
 Res<String> toCamelCase(Str str) {
-    auto s = try$(toPascalCase(str));
-
-    if (s.len() > 0) {
-        s[0] = toAsciiLower(s[0]);
-    }
-
-    return Ok(s);
+    return _changeCase(str, _toCamelCase);
 }
 
 Res<String> toCapitalCase(Str str) {
-    return toTitleCase(str);
+    return _changeCase(str, _toTitleCase);
 }
 
 Res<String> toConstantCase(Str str) {
-    auto s = try$(toNoCase(str));
-
-    for (auto &c : s) {
-        if (c == ' ') {
-            c = '_';
-        } else {
-            c = toAsciiUpper(c);
-        }
-    }
-
-    return Ok(s);
+    return _changeCase(str, _toConstantCase);
 }
 
 Res<String> toDotCase(Str str) {
-    auto s = try$(toNoCase(str));
-
-    for (auto &c : s) {
-        if (c == ' ') {
-            c = '.';
-        }
-    }
-
-    return Ok(s);
+    return _changeCase(str, _toDotCase);
 }
 
 Res<String> toHeaderCase(Str str) {
-    auto s = try$(toTitleCase(str));
-
-    for (auto &c : s) {
-        if (c == ' ') {
-            c = '-';
-        }
-    }
-
-    return Ok(s);
+    return _changeCase(str, _toHeaderCase);
 }
 
-static auto const RE_SEP =
-    Re::blank() | Re::single('.', '_', '/', '-');
-
 Res<String> toNoCase(Str str) {
-    Io::StringWriter writer;
-    Io::SScan scan{str};
-    bool wasLower = false;
-
-    scan.eat(RE_SEP);
-
-    while (not scan.ended()) {
-        if (scan.skip(RE_SEP)) {
-            try$(writer.writeRune(' '));
-            wasLower = false;
-        } else {
-            if (wasLower and isAsciiUpper(scan.curr())) {
-                try$(writer.writeRune(' '));
-            }
-
-            wasLower = isAsciiLower(scan.curr()) and isAsciiAlpha(scan.curr());
-            try$(writer.writeRune(toAsciiLower(scan.next())));
-        }
-    }
-
-    return Ok(writer.take());
+    return _changeCase(str, _toNoCase);
 }
 
 Res<String> toParamCase(Str str) {
-    auto s = try$(toNoCase(str));
-
-    for (auto &c : s) {
-        if (c == ' ') {
-            c = '-';
-        }
-    }
-
-    return Ok(s);
+    return _changeCase(str, _toParamCase);
 }
 
 Res<String> toPascalCase(Str str) {
-    bool first = true;
-    Io::StringWriter writer;
-    Io::SScan scan{str};
-
-    scan.eat(RE_SEP);
-
-    while (not scan.ended()) {
-        if (scan.skip(RE_SEP)) {
-            first = true;
-        } else {
-            if (first) {
-                try$(writer.writeRune(toAsciiUpper(scan.next())));
-                first = false;
-            } else {
-                try$(writer.writeRune(toAsciiLower(scan.next())));
-            }
-        }
-    }
-
-    return Ok(writer.take());
+    return _changeCase(str, _toPascalCase);
 }
 
 Res<String> toPathCase(Str str) {
-    auto s = try$(toNoCase(str));
-
-    for (auto &c : s) {
-        if (c == ' ') {
-            c = '/';
-        }
-    }
-
-    return Ok(s);
+    return _changeCase(str, _toPathCase);
 }
 
 Res<String> toSentenceCase(Str str) {
-    auto s = try$(toNoCase(str));
-
-    if (s.len() > 0) {
-        s[0] = toAsciiUpper(s[0]);
-    }
-
-    return Ok(s);
+    return _changeCase(str, _toSentenceCase);
 }
 
 Res<String> toSnakeCase(Str str) {
-    auto s = try$(toNoCase(str));
-
-    for (auto &c : s) {
-        if (c == ' ') {
-            c = '_';
-        }
-    }
-
-    return Ok(s);
+    return _changeCase(str, _toSnakeCase);
 }
 
 Res<String> toTitleCase(Str str) {
-    auto s = try$(toNoCase(str));
-
-    for (usize i = 0; i < s.len(); i++) {
-        if (i == 0 or s[i - 1] == ' ') {
-            s[i] = toAsciiUpper(s[i]);
-        }
-    }
-
-    return Ok(s);
+    return _changeCase(str, _toTitleCase);
 }
 
 Res<String> toSwapCase(Str str) {
-    Io::StringWriter writer;
-    Io::SScan scan{str};
-
-    while (not scan.ended()) {
-        auto c = scan.next();
-
-        if (isAsciiLower(c)) {
-            try$(writer.writeRune(toAsciiUpper(c)));
-        } else if (isAsciiUpper(c)) {
-            try$(writer.writeRune(toAsciiLower(c)));
-        } else {
-            try$(writer.writeRune(c));
-        }
-    }
-
-    return Ok(writer.take());
+    return _changeCase(str, _toSwapCase);
 }
 
 Res<String> toLowerCase(Str str) {
-    Io::StringWriter writer;
-    Io::SScan scan{str};
-
-    while (not scan.ended()) {
-        auto c = scan.next();
-
-        if (isAsciiUpper(c)) {
-            try$(writer.writeRune(toAsciiLower(c)));
-        } else {
-            try$(writer.writeRune(c));
-        }
-    }
-
-    return Ok(writer.take());
+    return _changeCase(str, _toLowerCase);
 }
 
 Res<String> toLowerFirstCase(Str str) {
-    String s = str;
-
-    if (s.len() > 0) {
-        s[0] = toAsciiLower(s[0]);
-    }
-
-    return Ok(s);
+    return _changeCase(str, _toLowerFirstCase);
 }
 
 Res<String> toUpperCase(Str str) {
-    Io::StringWriter writer;
-    Io::SScan scan{str};
-
-    while (not scan.ended()) {
-        auto c = scan.next();
-
-        if (isAsciiLower(c)) {
-            try$(writer.writeRune(toAsciiUpper(c)));
-        } else {
-            try$(writer.writeRune(c));
-        }
-    }
-
-    return Ok(writer.take());
+    return _changeCase(str, _toUpperCase);
 }
 
 Res<String> toUpperFirstCase(Str str) {
-    String s = str;
-
-    if (s.len() > 0) {
-        s[0] = toAsciiUpper(s[0]);
-    }
-
-    return Ok(s);
+    return _changeCase(str, _toUpperFirstCase);
 }
 
 Res<String> toSpongeCase(Str str) {
-    String s = str;
-    for (usize i = 0; i < s.len(); i++) {
-        if (i % 2 == 0) {
-            s[i] = toAsciiUpper(s[i]);
-        } else {
-            s[i] = toAsciiLower(s[i]);
-        }
-    }
-    return Ok(s);
+    return _changeCase(str, _toSpongeCase);
 }
 
 Res<String> changeCase(Str str, Case toCase) {
-
     switch (toCase) {
     case Case::CAMEL:
         return toCamelCase(str);

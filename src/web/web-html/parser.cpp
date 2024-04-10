@@ -1,26 +1,42 @@
-#include <web-base/namespaces.h>
 #include <web-dom/comment.h>
 #include <web-dom/document-type.h>
+#include <web-mathml/tags.h>
+#include <web-svg/tags.h>
 
 #include "parser.h"
+#include "tags.h"
 
 namespace Web::Html {
 
-// 13.2.2 Parse errors
+// 13.2.2 MARK: Parse errors
 // https://html.spec.whatwg.org/multipage/parsing.html#parse-errors
 
 void Parser::_raise(Str msg) {
     logError("{}: {}", toStr(_insertionMode), msg);
 }
 
-// 13.2.4.3 The list of active formatting elements
+// 13.2.4.2 MARK: The stack of open elements
+// https://html.spec.whatwg.org/multipage/parsing.html#the-stack-of-open-elements
+
+// https://html.spec.whatwg.org/multipage/parsing.html#special
+bool isSpecial(TagName const &tag) {
+    static constexpr Array SPECIAL{
+#define SPECIAL(NAME) NAME,
+#include "defs/special.inc"
+#undef SPECIAL
+    };
+
+    return contains(SPECIAL, tag);
+}
+
+// 13.2.4.3 MARK: The list of active formatting elements
 // https://html.spec.whatwg.org/multipage/parsing.html#list-of-active-formatting-elements
 
-void reconstructTheActiveFormattingElements(Parser &) {
+void reconstructActiveFormattingElements(Parser &) {
     // TODO
 }
 
-// 13.2.5 Tokenization
+// 13.2.5 MARK: Tokenization
 // https://html.spec.whatwg.org/multipage/parsing.html#tokenization
 
 // https://html.spec.whatwg.org/multipage/parsing.html#acknowledge-self-closing-flag
@@ -28,10 +44,10 @@ void acknowledgeSelfClosingFlag(Token const &) {
     logTodo();
 }
 
-// 13.2.6 Tree construction
+// 13.2.6 MARK: Tree construction
 // https://html.spec.whatwg.org/multipage/parsing.html#tree-construction
 
-// 13.2.6.1 Creating and inserting nodes
+// 13.2.6.1 MARK: Creating and inserting nodes
 // https://html.spec.whatwg.org/multipage/parsing.html#creating-and-inserting-nodes
 
 struct AdjustedInsertionLocation {
@@ -104,7 +120,7 @@ AdjustedInsertionLocation apropriatePlaceForInsertingANode(Parser &b, Opt<Strong
 }
 
 // https://html.spec.whatwg.org/multipage/parsing.html#create-an-element-for-the-token
-Strong<Dom::Element> createElementFor(Token const &t, Namespace) {
+Strong<Dom::Element> createElementFor(Token const &t, Ns ns) {
     // NOSPEC: Keep it simple for the POC
 
     // 1. If the active speculative HTML parser is not null, then return the
@@ -148,11 +164,11 @@ Strong<Dom::Element> createElementFor(Token const &t, Namespace) {
     //    localName, given namespace, null, and is. If will execute script
     //    is true, set the synchronous custom elements flag; otherwise,
     //    leave it unset.
-    auto el = makeStrong<Dom::Element>(t.name.unwrap());
+    auto el = makeStrong<Dom::Element>(TagName::make(t.name, ns));
 
     // 10. Append each attribute in the given token to element.
     for (auto &[name, value] : t.attrs) {
-        el->setAttribute(tryOr(name, ""), tryOr(value, ""));
+        el->setAttribute(AttrName::make(name, ns), value);
     }
 
     // 11. If will execute script is true, then:
@@ -190,7 +206,7 @@ Strong<Dom::Element> createElementFor(Token const &t, Namespace) {
 
 // https://html.spec.whatwg.org/multipage/parsing.html#insert-a-foreign-element
 
-static Strong<Dom::Element> insertAForeignElement(Parser &b, Token const &t, Namespace ns, bool onlyAddToElementStack = false) {
+static Strong<Dom::Element> insertAForeignElement(Parser &b, Token const &t, Ns ns, bool onlyAddToElementStack = false) {
     // 1. Let the adjusted insertion location be the appropriate place for inserting a node.
     auto location = apropriatePlaceForInsertingANode(b);
 
@@ -213,7 +229,7 @@ static Strong<Dom::Element> insertAForeignElement(Parser &b, Token const &t, Nam
 
 // https://html.spec.whatwg.org/multipage/parsing.html#insert-an-html-element
 static Strong<Dom::Element> insertHtmlElement(Parser &b, Token const &t) {
-    return insertAForeignElement(b, t, Namespace::HTML, false);
+    return insertAForeignElement(b, t, Web::HTML, false);
 }
 
 // https://html.spec.whatwg.org/multipage/parsing.html#insert-a-character
@@ -238,7 +254,7 @@ static void insertACharacter(Parser &b, Rune c) {
     //            adjusted insertion location finds itself, and insert the
     //            newly created node at the adjusted insertion location.
     else {
-        auto text = makeStrong<Dom::Text>("");
+        auto text = makeStrong<Dom::Text>(""s);
         text->appendData(c);
 
         location.insert(text);
@@ -247,7 +263,7 @@ static void insertACharacter(Parser &b, Rune c) {
 
 static void insertACharacter(Parser &b, Token const &t) {
     // 1. Let data be the characters passed to the algorithm, or, if no characters were explicitly specified, the character of the character token being processed.
-    insertACharacter(b, t.rune.unwrap());
+    insertACharacter(b, t.rune);
 }
 
 // https://html.spec.whatwg.org/multipage/parsing.html#insert-a-comment
@@ -264,13 +280,13 @@ static void insertAComment(Parser &b, Token const &t) {
     // 3. Create a Comment node whose data attribute is set to data and
     //    whose node document is the same as that of the node in which
     //    the adjusted insertion location finds itself.
-    auto comment = makeStrong<Dom::Comment>(t.data.unwrap());
+    auto comment = makeStrong<Dom::Comment>(t.data);
 
     // 4. Insert the newly created node at the adjusted insertion location.
     location.insert(comment);
 }
 
-// 13.2.6.2 Parsing elements that contain only text
+// 13.2.6.2 MARK: Parsing elements that contain only text
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-elements-that-contain-only-text
 
 static void parseRawTextElement(Parser &b, Token const &t) {
@@ -287,9 +303,22 @@ static void parseRcDataElement(Parser &b, Token const &t) {
     b._switchTo(Parser::Mode::TEXT);
 }
 
-// 13.2.6.4 The rules for parsing tokens in HTML content
+// 13.2.6.3 MARK: Closing elements that have implied end tags
+// https://html.spec.whatwg.org/multipage/parsing.html#generate-implied-end-tags
+static constexpr Array IMPLIED_END_TAGS = {
+    Html::DD, Html::DT, Html::LI, Html::OPTION, Html::OPTGROUP, Html::P, Html::RB, Html::RP, Html::RT, Html::RTC
+};
 
-// 13.2.6.4.1 The "initial" insertion mode
+static void generateImpliedEndTags(Parser &b, Str except = ""s) {
+    while (contains(IMPLIED_END_TAGS, last(b._openElements)->tagName) and
+           last(b._openElements)->tagName.name() != except) {
+        b._openElements.popBack();
+    }
+}
+
+// 13.2.6.4 MARK: The rules for parsing tokens in HTML content
+
+// 13.2.6.4.1 MARK: The "initial" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#the-initial-insertion-mode
 
 static Dom::QuirkMode _whichQuirkMode(Token const &) {
@@ -311,15 +340,15 @@ void Parser::_handleInitialMode(Token const &t) {
 
     // A comment token
     else if (t.type == Token::COMMENT) {
-        _document->appendChild(makeStrong<Dom::Comment>(t.data.unwrap()));
+        _document->appendChild(makeStrong<Dom::Comment>(t.data));
     }
 
     // A DOCTYPE token
     else if (t.type == Token::DOCTYPE) {
         _document->appendChild(makeStrong<Dom::DocumentType>(
-            tryOr(t.name, ""),
-            tryOr(t.publicIdent, ""),
-            tryOr(t.systemIdent, "")
+            t.name,
+            t.publicIdent,
+            t.systemIdent
         ));
         _document->quirkMode = _whichQuirkMode(t);
         _switchTo(Mode::BEFORE_HTML);
@@ -333,6 +362,7 @@ void Parser::_handleInitialMode(Token const &t) {
     }
 }
 
+// 13.2.6.4.2 MARK: The "before html" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#the-before-html-insertion-mode
 void Parser::_handleBeforeHtml(Token const &t) {
     // A DOCTYPE token
@@ -343,7 +373,7 @@ void Parser::_handleBeforeHtml(Token const &t) {
 
     // A comment token
     else if (t.type == Token::COMMENT) {
-        _document->appendChild(makeStrong<Dom::Comment>(t.data.unwrap()));
+        _document->appendChild(makeStrong<Dom::Comment>(t.data));
     }
 
     // A character token that is one of U+0009 CHARACTER TABULATION,
@@ -359,7 +389,7 @@ void Parser::_handleBeforeHtml(Token const &t) {
 
     // A start tag whose tag name is "html"
     else if (t.type == Token::START_TAG and t.name == "html") {
-        auto el = createElementFor(t, Namespace::HTML);
+        auto el = createElementFor(t, Web::HTML);
         _document->appendChild(el);
         _openElements.pushBack(el);
         _switchTo(Mode::BEFORE_HEAD);
@@ -374,7 +404,7 @@ void Parser::_handleBeforeHtml(Token const &t) {
     // An end tag whose tag name is one of: "head", "body", "html", "br"
     // Anything else
     else {
-        auto el = makeStrong<Dom::Element>("html");
+        auto el = makeStrong<Dom::Element>(Html::HTML);
         _document->appendChild(el);
         _openElements.pushBack(el);
         _switchTo(Mode::BEFORE_HEAD);
@@ -382,6 +412,7 @@ void Parser::_handleBeforeHtml(Token const &t) {
     }
 }
 
+// 13.2.6.4.3 MARK: The "before head" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#the-before-head-insertion-mode
 void Parser::_handleBeforeHead(Token const &t) {
     // A character token that is one of U+0009 CHARACTER TABULATION,
@@ -437,6 +468,7 @@ void Parser::_handleBeforeHead(Token const &t) {
     }
 }
 
+// 13.2.6.4.4 MARK: The "in head" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inhead
 void Parser::_handleInHead(Token const &t) {
     auto anythingElse = [&] {
@@ -509,18 +541,36 @@ void Parser::_handleInHead(Token const &t) {
         // 1. Let the adjusted insertion location be the appropriate place for inserting a node.
         auto localtion = apropriatePlaceForInsertingANode(*this);
 
-        // 2. Create an element for the token in the HTML namespace, with the intended parent being the element in which the adjusted insertion location finds itself.
-        auto el = createElementFor(t, Namespace::HTML);
+        // 2. Create an element for the token in the HTML namespace, with
+        //    the intended parent being the element in which the adjusted
+        //    insertion location finds itself.
+        auto el = createElementFor(t, Web::HTML);
 
-        // 3. Set the element's parser document to the Document, and set the element's force async to false.
+        // 3. Set the element's parser document to the Document, and set
+        //    the element's force async to false.
+
         // NOSPEC: We don't support async scripts
 
-        // NOTE: This ensures that, if the script is external, any document.write() calls in the script will execute in-line, instead of blowing the document away, as would happen in most other cases. It also prevents the script from executing until the end tag is seen.
+        // NOTE: This ensures that, if the script is external,
+        //       any document.write() calls in the script will execute
+        //       in-line, instead of blowing the document away, as would
+        //       happen in most other cases. It also prevents the script
+        //       from executing until the end tag is seen.
 
-        // 4. If the parser was created as part of the HTML fragment parsing algorithm, then set the script element's already started to true. (fragment case)
+        // 4. If the parser was created as part of the HTML fragment
+        //    parsing algorithm, then set the script element's already
+        //    started to true. (fragment case)
+
         // NOSPEC: We don't support fragments
 
-        // 5. If the parser was invoked via the document.write() or document.writeln() methods, then optionally set the script element's already started to true. (For example, the user agent might use this clause to prevent execution of cross-origin scripts inserted via document.write() under slow network conditions, or when the page has already taken a long time to load.)
+        // 5. If the parser was invoked via the document.write() or
+        //    document.writeln() methods, then optionally set the script
+        //    element's already started to true. (For example, the user
+        //    agent might use this clause to prevent execution of
+        //    cross-origin scripts inserted via document.write() under
+        //    slow network conditions, or when the page has already taken
+        //    a long time to load.)
+
         // NOSPEC: We don't support document.write()
 
         // 6. Insert the newly created element at the adjusted insertion location.
@@ -554,6 +604,7 @@ void Parser::_handleInHead(Token const &t) {
     }
 }
 
+// 13.2.6.4.5 MARK: The "in head noscript" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inheadnoscript
 void Parser::_handleInHeadNoScript(Token const &t) {
     auto anythingElse = [&] {
@@ -618,6 +669,7 @@ void Parser::_handleInHeadNoScript(Token const &t) {
     }
 }
 
+// 13.2.6.4.6 MARK: The "after head" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#the-after-head-insertion-mode
 void Parser::_handleAfterHead(Token const &t) {
     auto anythingElse = [&] {
@@ -637,7 +689,7 @@ void Parser::_handleAfterHead(Token const &t) {
     //   - U+0020 SPACE
     if (t.type == Token::CHARACTER and
         (t.rune == '\t' or t.rune == '\n' or t.rune == '\f' or t.rune == '\r' or t.rune == ' ')) {
-        insertACharacter(*this, *t.rune);
+        insertACharacter(*this, t.rune);
     }
 
     // A comment token
@@ -707,6 +759,7 @@ void Parser::_handleAfterHead(Token const &t) {
     }
 }
 
+// 13.2.6.4.7 MARK: The "in body" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inbody
 void Parser::_handleInBody(Token const &t) {
     // A character token that is U+0000 NULL
@@ -721,13 +774,13 @@ void Parser::_handleInBody(Token const &t) {
     //   - U+000D CARRIAGE RETURN (CR)
     //   - U+0020 SPACE
     else if (t.type == Token::CHARACTER and (t.rune == '\t' or t.rune == '\n' or t.rune == '\f' or t.rune == '\r' or t.rune == ' ')) {
-        reconstructTheActiveFormattingElements(*this);
+        reconstructActiveFormattingElements(*this);
         insertACharacter(*this, t);
     }
 
     // Any other character token
     else if (t.type == Token::CHARACTER) {
-        reconstructTheActiveFormattingElements(*this);
+        reconstructActiveFormattingElements(*this);
         insertACharacter(*this, t);
         _framesetOk = false;
     }
@@ -791,6 +844,8 @@ void Parser::_handleInBody(Token const &t) {
     // TODO: An end tag whose tag name is one of: "h1", "h2", "h3", "h4", "h5", "h6"
 
     // TODO: An end tag whose tag name is "sarcasm"
+    //       This state machine is not equipped to handle sarcasm
+    //       So we just ignore it
 
     // TODO: A start tag whose tag name is "a"
 
@@ -841,16 +896,48 @@ void Parser::_handleInBody(Token const &t) {
 
     // TODO: A start tag whose tag name is one of: "caption", "col", "colgroup", "frame", "head", "tbody", "td", "tfoot", "th", "thead", "tr"
 
-    // TODO: Any other start tag
     else if (t.type == Token::START_TAG) {
+        reconstructActiveFormattingElements(*this);
+        insertHtmlElement(*this, t);
     }
 
     // TODO: Any other end tag
     else if (t.type == Token::END_TAG) {
+        // loop:
+        while (true) {
+            // 1. Initialize node to be the current node (the bottommost node of the stack).
+            auto node = last(_openElements);
+
+            // 2. Loop: If node is an HTML element with the same tag name as the token, then:
+            if (node->tagName.name() == t.name) {
+                // 1. Generate implied end tags, except for HTML elements with the same tag name as the token.
+                generateImpliedEndTags(*this, t.name);
+
+                // 2. If node is not the current node, then this is a parse error.
+                if (node != last(_openElements)) {
+                    _raise();
+                }
+
+                // 3. Pop all the nodes from the current node up to node, including node, then stop these steps
+                while (last(_openElements) != node) {
+                    _openElements.popBack();
+                }
+                _openElements.popBack();
+                break;
+            }
+
+            // 3. Otherwise, if node is in the special category,
+            //    then this is a parse error; ignore the token, and return.
+
+            // 4. Set node to the previous entry in the stack of open elements.
+
+            // 5. Return to the step labeled loop.
+        }
     }
 }
 
-// https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intext
+// 13.2.6.4.8 MARK: The "text" insertion mode
+// https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incdata
 void Parser::_handleText(Token const &t) {
     // A character token
     if (t.type == Token::CHARACTER) {
@@ -858,7 +945,7 @@ void Parser::_handleText(Token const &t) {
             *this,
             t.rune == '\0'
                 ? 0xFFFD
-                : t.rune.unwrap()
+                : t.rune
         );
     }
 
@@ -926,77 +1013,77 @@ void Parser::_acceptIn(Mode mode, Token const &t) {
         _handleText(t);
         break;
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intable
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intable
     case Mode::IN_TABLE: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intabletext
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intabletext
     case Mode::IN_TABLE_TEXT: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incaption
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incaption
     case Mode::IN_CAPTION: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incolumngroup
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incolumngroup
     case Mode::IN_COLUMN_GROUP: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intablebody
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intablebody
     case Mode::IN_TABLE_BODY: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inrow
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inrow
     case Mode::IN_ROW: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incell
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incell
     case Mode::IN_CELL: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inselect
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inselect
     case Mode::IN_SELECT: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inselectintable
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inselectintable
     case Mode::IN_SELECT_IN_TABLE: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intemplate
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intemplate
     case Mode::IN_TEMPLATE: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#the-after-body-insertion-mode
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#the-after-body-insertion-mode
     case Mode::AFTER_BODY: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#the-in-frameset-insertion-mode
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#the-in-frameset-insertion-mode
     case Mode::IN_FRAMESET: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#the-after-frameset-insertion-mode
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#the-after-frameset-insertion-mode
     case Mode::AFTER_FRAMESET: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#the-after-after-body-insertion-mode
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#the-after-after-body-insertion-mode
     case Mode::AFTER_AFTER_BODY: {
         break;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#the-after-after-frameset-insertion-mode
+    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#the-after-after-frameset-insertion-mode
     case Mode::AFTER_AFTER_FRAMESET: {
         break;
     }

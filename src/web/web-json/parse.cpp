@@ -1,3 +1,4 @@
+#include <karm-io/aton.h>
 #include <karm-io/funcs.h>
 
 #include "json.h"
@@ -45,7 +46,7 @@ Res<String> parseStr(Io::SScan &s) {
                 continue;
             }
             if (s.skip('u')) {
-                if (s.nextUint(16)) {
+                if (Io::atou(s, {.base = 16})) {
                     continue;
                 }
             }

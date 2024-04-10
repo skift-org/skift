@@ -27,16 +27,16 @@ struct Token {
     };
 
     struct Attr {
-        Opt<String> name;
-        Opt<String> value;
+        String name{};
+        String value{};
     };
 
     Type type = NIL;
-    Opt<String> name = NONE;
-    Opt<Rune> rune = NONE;
-    Opt<String> data = NONE;
-    Opt<String> publicIdent = NONE;
-    Opt<String> systemIdent = NONE;
+    String name;
+    Rune rune = '\0';
+    String data;
+    String publicIdent;
+    String systemIdent;
     Vec<Attr> attrs;
     bool forceQuirks{false};
     bool selfClosing{false};
@@ -172,19 +172,19 @@ struct Karm::Io::Formatter<Web::Html::Token> {
         written += try$(writer.writeStr(try$(Io::toParamCase(Web::Html::toStr(val.type)))));
 
         if (val.name)
-            written += try$(Io::format(writer, " name={}", val.name.unwrap()));
+            written += try$(Io::format(writer, " name={}", val.name));
 
         if (val.rune)
-            written += try$(Io::format(writer, " rune={}", val.rune.unwrap()));
+            written += try$(Io::format(writer, " rune={}", val.rune));
 
         if (val.data)
-            written += try$(Io::format(writer, " data='{}'", val.data.unwrap()));
+            written += try$(Io::format(writer, " data='{}'", val.data));
 
         if (val.publicIdent)
-            written += try$(Io::format(writer, " publicIdent='{}'", val.publicIdent.unwrap()));
+            written += try$(Io::format(writer, " publicIdent='{}'", val.publicIdent));
 
         if (val.systemIdent)
-            written += try$(Io::format(writer, " systemIdent='{}'", val.systemIdent.unwrap()));
+            written += try$(Io::format(writer, " systemIdent='{}'", val.systemIdent));
 
         if (val.attrs.len() > 0)
             for (auto &attr : val.attrs) {

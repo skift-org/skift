@@ -5,6 +5,8 @@
     "description": "Implementation of the HTML standard (https://html.spec.whatwg.org/multipage/)",
     "requires": [
         "karm-logger",
-        "web-base"
+        "web-base",
+        "web-svg",
+        "web-mathml"
     ]
 }

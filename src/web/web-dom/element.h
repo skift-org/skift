@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/map.h>
+#include <web-base/tags.h>
 
 #include "attr.h"
 #include "node.h"
@@ -9,11 +10,11 @@ namespace Web::Dom {
 
 // https://dom.spec.whatwg.org/#interface-element
 struct Element : public Node {
-    String tagName;
+    TagName tagName;
     // NOSPEC: Should be a NamedNodeMap
-    Map<String, Strong<Attr>> attributes;
+    Map<AttrName, Strong<Attr>> attributes;
 
-    Element(String tagName)
+    Element(TagName tagName)
         : tagName(tagName) {
     }
 
@@ -32,10 +33,8 @@ struct Element : public Node {
         }
     }
 
-    void setAttribute(String name, String value) {
-        auto attr = makeStrong<Attr>();
-        attr->localName = name;
-        attr->value = value;
+    void setAttribute(AttrName name, String value) {
+        auto attr = makeStrong<Attr>(name, value);
         this->attributes.put(name, attr);
     }
 };

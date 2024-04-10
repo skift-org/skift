@@ -149,28 +149,28 @@ struct Value {
     String asStr() const {
         return _store.visit(
             Visitor{
-                [](None) {
-                    return "null";
+                [](None) -> String {
+                    return "null"s;
                 },
-                [](Vec<Value>) {
-                    return "<array>";
+                [](Vec<Value>) -> String {
+                    return "<array>"s;
                 },
-                [](Map<String, Value>) {
-                    return "<object>";
+                [](Map<String, Value>) -> String {
+                    return "<object>"s;
                 },
-                [](String s) {
+                [](String s) -> String {
                     return s;
                 },
-                [](Integer i) {
+                [](Integer i) -> String {
                     return Io::format("{}", i).unwrap();
                 },
 #ifndef __ck_freestanding__
-                [](Number d) {
+                [](Number d) -> String {
                     return Io::format("{}", d).unwrap();
                 },
 #endif
-                [](bool b) {
-                    return b ? "true" : "false";
+                [](bool b) -> String {
+                    return b ? "true"s : "false"s;
                 },
             }
         );

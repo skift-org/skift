@@ -31,7 +31,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     switch (_state) {
 
     case State::DATA: {
-        // 13.2.5.1 Data state
+        // 13.2.5.1 MARK: Data state
         // Consume the next input character:
 
         // U+0026 AMPERSAND (&)
@@ -73,7 +73,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::RCDATA: {
-        // 13.2.5.2 RCDATA state
+        // 13.2.5.2 MARK: RCDATA state
         // Consume the next input character:
 
         // U+0026 AMPERSAND (&)
@@ -114,7 +114,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::RAWTEXT: {
-        // 13.2.5.3 RAWTEXT state
+        // 13.2.5.3 MARK: RAWTEXT state
         // Consume the next input character:
 
         // U+003C LESS-THAN SIGN (<)
@@ -148,7 +148,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA: {
-        // 13.2.5.4 Script data state
+        // 13.2.5.4 MARK: Script data state
         // Consume the next input character:
 
         // U+003C LESS-THAN SIGN (<)
@@ -182,7 +182,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::PLAINTEXT: {
-        // 13.2.5.5 PLAINTEXT state
+        // 13.2.5.5 MARK: PLAINTEXT state
         // Consume the next input character:
 
         // U+0000 NULL
@@ -210,7 +210,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::TAG_OPEN: {
-        // 13.2.5.6 Tag open state
+        // 13.2.5.6 MARK: Tag open state
         // Consume the next input character:
 
         // U+0021 EXCLAMATION MARK (!)
@@ -267,7 +267,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::END_TAG_OPEN: {
-        // 13.2.5.7 End tag open state
+        // 13.2.5.7 MARK: End tag open state
         // Consume the next input character:
 
         // ASCII alpha
@@ -312,7 +312,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::TAG_NAME: {
-        // 13.2.5.8 Tag name state
+        // 13.2.5.8 MARK: Tag name state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -376,7 +376,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::RCDATA_LESS_THAN_SIGN: {
-        // 13.2.5.9 RCDATA less-than sign state
+        // 13.2.5.9 MARK: RCDATA less-than sign state
         // Consume the next input character:
 
         // U+002F SOLIDUS (/)
@@ -399,7 +399,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::RCDATA_END_TAG_OPEN: {
-        // 13.2.5.10 RCDATA end tag open state
+        // 13.2.5.10 MARK: RCDATA end tag open state
         // Consume the next input character:
 
         // ASCII alpha
@@ -423,7 +423,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::RCDATA_END_TAG_NAME: {
-        // 13.2.5.11 RCDATA end tag name state
+        // 13.2.5.11 MARK: RCDATA end tag name state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -491,7 +491,7 @@ void Lexer::consume(Rune rune, bool isEof) {
         break;
     }
     case State::RAWTEXT_LESS_THAN_SIGN: {
-        // 13.2.5.12 RAWTEXT less-than sign state
+        // 13.2.5.12 MARK: RAWTEXT less-than sign state
         // Consume the next input character:
 
         // U+002F SOLIDUS (/)
@@ -514,7 +514,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::RAWTEXT_END_TAG_OPEN: {
-        // 13.2.5.13 RAWTEXT end tag open state
+        // 13.2.5.13 MARK: RAWTEXT end tag open state
         // Consume the next input character:
 
         // ASCII alpha
@@ -538,7 +538,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::RAWTEXT_END_TAG_NAME: {
-        // 13.2.5.14 RAWTEXT end tag name state
+        // 13.2.5.14 MARK: RAWTEXT end tag name state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -605,7 +605,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_LESS_THAN_SIGN: {
-        // 13.2.5.15 Script data less-than sign state
+        // 13.2.5.15 MARK: Script data less-than sign state
         // Consume the next input character:
 
         // U+002F SOLIDUS (/)
@@ -637,7 +637,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_END_TAG_OPEN: {
-        // 13.2.5.16 Script data end tag open state
+        // 13.2.5.16 MARK: Script data end tag open state
         // Consume the next input character:
 
         // ASCII alpha
@@ -661,7 +661,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_END_TAG_NAME: {
-        // 13.2.5.17 Script data end tag name state
+        // 13.2.5.17 MARK: Script data end tag name state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -731,7 +731,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_ESCAPE_START: {
-        // 13.2.5.18 Script data escape start state
+        // 13.2.5.18 MARK: Script data escape start state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -752,7 +752,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_ESCAPE_START_DASH: {
-        // 13.2.5.19 Script data escape start dash state
+        // 13.2.5.19 MARK: Script data escape start dash state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -773,7 +773,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_ESCAPED: {
-        // 13.2.5.20 Script data escaped state
+        // 13.2.5.20 MARK: Script data escaped state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -817,7 +817,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_ESCAPED_DASH: {
-        // 13.2.5.21 Script data escaped dash state
+        // 13.2.5.21 MARK: Script data escaped dash state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -865,7 +865,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_ESCAPED_DASH_DASH: {
-        // 13.2.5.22 Script data escaped dash dash state
+        // 13.2.5.22 MARK: Script data escaped dash dash state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -919,7 +919,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN: {
-        // 13.2.5.23 Script data escaped less-than sign state
+        // 13.2.5.23 MARK: Script data escaped less-than sign state
         // Consume the next input character:
 
         // U+002F SOLIDUS (/)
@@ -952,7 +952,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_ESCAPED_END_TAG_OPEN: {
-        // 13.2.5.24 Script data escaped end tag open state
+        // 13.2.5.24 MARK: Script data escaped end tag open state
         // Consume the next input character:
 
         // ASCII alpha
@@ -976,7 +976,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_ESCAPED_END_TAG_NAME: {
-        // 13.2.5.25 Script data escaped end tag name state
+        // 13.2.5.25 MARK: Script data escaped end tag name state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -1043,7 +1043,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_DOUBLE_ESCAPE_START: {
-        // 13.2.5.26 Script data double escape start state
+        // 13.2.5.26 MARK: Script data double escape start state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -1093,7 +1093,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_DOUBLE_ESCAPED: {
-        // 13.2.5.27 Script data double escaped state
+        // 13.2.5.27 MARK: Script data double escaped state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -1139,7 +1139,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_DOUBLE_ESCAPED_DASH: {
-        // 13.2.5.28 Script data double escaped dash state
+        // 13.2.5.28 MARK: Script data double escaped dash state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -1189,7 +1189,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH: {
-        // 13.2.5.29 Script data double escaped dash dash state
+        // 13.2.5.29 MARK: Script data double escaped dash dash state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -1245,7 +1245,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN: {
-        // 13.2.5.30 Script data double escaped less-than sign state
+        // 13.2.5.30 MARK: Script data double escaped less-than sign state
         // Consume the next input character:
 
         // U+002F SOLIDUS (/)
@@ -1268,7 +1268,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SCRIPT_DATA_DOUBLE_ESCAPE_END: {
-        // 13.2.5.31 Script data double escape end state
+        // 13.2.5.31 MARK: Script data double escape end state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -1317,7 +1317,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::BEFORE_ATTRIBUTE_NAME: {
-        // 13.2.5.32 Before attribute name state
+        // 13.2.5.32 MARK: Before attribute name state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -1362,7 +1362,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::ATTRIBUTE_NAME: {
-        // 13.2.5.33 Attribute name state
+        // 13.2.5.33 MARK: Attribute name state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -1433,7 +1433,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::AFTER_ATTRIBUTE_NAME: {
-        // 13.2.5.34 After attribute name state
+        // 13.2.5.34 MARK: After attribute name state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -1485,7 +1485,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::BEFORE_ATTRIBUTE_VALUE: {
-        // 13.2.5.35 Before attribute value state
+        // 13.2.5.35 MARK: Before attribute value state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -1528,7 +1528,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::ATTRIBUTE_VALUE_DOUBLE_QUOTED: {
-        // 13.2.5.36 Attribute value (double-quoted) state
+        // 13.2.5.36 MARK: Attribute value (double-quoted) state
         // Consume the next input character:
 
         // U+0022 QUOTATION MARK (")
@@ -1573,7 +1573,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::ATTRIBUTE_VALUE_SINGLE_QUOTED: {
-        // 13.2.5.37 Attribute value (single-quoted) state
+        // 13.2.5.37 MARK: Attribute value (single-quoted) state
         // Consume the next input character:
 
         // U+0027 APOSTROPHE (')
@@ -1617,7 +1617,7 @@ void Lexer::consume(Rune rune, bool isEof) {
         break;
     }
     case State::ATTRIBUTE_VALUE_UNQUOTED: {
-        // 13.2.5.38 Attribute value (unquoted) state
+        // 13.2.5.38 MARK: Attribute value (unquoted) state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -1685,7 +1685,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::AFTER_ATTRIBUTE_VALUE_QUOTED: {
-        // 13.2.5.39 After attribute value (quoted) state
+        // 13.2.5.39 MARK: After attribute value (quoted) state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -1730,7 +1730,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::SELF_CLOSING_START_TAG: {
-        // 13.2.5.40 Self-closing start tag state
+        // 13.2.5.40 MARK: Self-closing start tag state
         // Consume the next input character:
 
         // U+003E GREATER-THAN SIGN (>)
@@ -1761,7 +1761,7 @@ void Lexer::consume(Rune rune, bool isEof) {
         break;
     }
     case State::BOGUS_COMMENT: {
-        // 13.2.5.41 Bogus comment state
+        // 13.2.5.41 MARK: Bogus comment state
         // Consume the next input character:
 
         // U+003E GREATER-THAN SIGN (>)
@@ -1798,14 +1798,14 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::MARKUP_DECLARATION_OPEN: {
-        // 13.2.5.42 Markup declaration open state
+        // 13.2.5.42 MARK: Markup declaration open state
         // If the next few characters are:
 
         _temp.append(rune);
         // Two U+002D HYPHEN-MINUS characters (-)
         // Consume those two characters, create a comment token whose data
         // is the empty string, and switch to the comment start state.
-        if (auto r = startWith("--"_str, _temp.str()); r != Match::NO) {
+        if (auto r = startWith("--"s, _temp.str()); r != Match::NO) {
             if (r == Match::PARTIAL)
                 break;
 
@@ -1817,7 +1817,7 @@ void Lexer::consume(Rune rune, bool isEof) {
         // ASCII case-insensitive match for the word "DOCTYPE"
         // Consume those characters and switch to the DOCTYPE state.
 
-        else if (auto r = startWith("DOCTYPE"_str, _temp.str()); r != Match::NO) {
+        else if (auto r = startWith("DOCTYPE"s, _temp.str()); r != Match::NO) {
             if (r == Match::PARTIAL)
                 break;
 
@@ -1833,7 +1833,7 @@ void Lexer::consume(Rune rune, bool isEof) {
         // error. Create a comment token whose data is the "[CDATA[" string.
         // Switch to the bogus comment state.
 
-        else if (auto r = startWith("[CDATA["_str, _temp.str()); r != Match::NO) {
+        else if (auto r = startWith("[CDATA["s, _temp.str()); r != Match::NO) {
             if (r == Match::PARTIAL)
                 break;
 
@@ -1856,7 +1856,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::COMMENT_START: {
-        // 13.2.5.43 Comment start state
+        // 13.2.5.43 MARK: Comment start state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -1884,7 +1884,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::COMMENT_START_DASH: {
-        // 13.2.5.44 Comment start dash state
+        // 13.2.5.44 MARK: Comment start dash state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -1924,7 +1924,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::COMMENT: {
-        // 13.2.5.45 Comment state
+        // 13.2.5.45 MARK: Comment state
         // Consume the next input character:
 
         // U+003C LESS-THAN SIGN (<)
@@ -1970,7 +1970,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::COMMENT_LESS_THAN_SIGN: {
-        // 13.2.5.46 Comment less-than sign state
+        // 13.2.5.46 MARK: Comment less-than sign state
         // Consume the next input character:
 
         // U+0021 EXCLAMATION MARK (!)
@@ -1997,7 +1997,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::COMMENT_LESS_THAN_SIGN_BANG: {
-        // 13.2.5.47 Comment less-than sign bang state
+        // 13.2.5.47 MARK: Comment less-than sign bang state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -2016,7 +2016,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::COMMENT_LESS_THAN_SIGN_BANG_DASH: {
-        // 13.2.5.48 Comment less-than sign bang dash state
+        // 13.2.5.48 MARK: Comment less-than sign bang dash state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -2035,7 +2035,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::COMMENT_LESS_THAN_SIGN_BANG_DASH_DASH: {
-        // 13.2.5.49 Comment less-than sign bang dash dash state
+        // 13.2.5.49 MARK: Comment less-than sign bang dash dash state
         // Consume the next input character:
 
         // U+003E GREATER-THAN SIGN (>)
@@ -2057,7 +2057,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::COMMENT_END_DASH: {
-        // 13.2.5.50 Comment end dash state
+        // 13.2.5.50 MARK: Comment end dash state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -2088,7 +2088,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::COMMENT_END: {
-        // 13.2.5.51 Comment end state
+        // 13.2.5.51 MARK: Comment end state
         // Consume the next input character:
 
         // U+003E GREATER-THAN SIGN (>)
@@ -2134,7 +2134,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::COMMENT_END_BANG: {
-        // 13.2.5.52 Comment end bang state
+        // 13.2.5.52 MARK: Comment end bang state
         // Consume the next input character:
 
         // U+002D HYPHEN-MINUS (-)
@@ -2182,7 +2182,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::DOCTYPE: {
-        // 13.2.5.53 DOCTYPE state
+        // 13.2.5.53 MARK: DOCTYPE state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -2225,7 +2225,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::BEFORE_DOCTYPE_NAME: {
-        // 13.2.5.54 Before DOCTYPE name state
+        // 13.2.5.54 MARK: Before DOCTYPE name state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -2296,7 +2296,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::DOCTYPE_NAME: {
-        // 13.2.5.55 DOCTYPE name state
+        // 13.2.5.55 MARK: DOCTYPE name state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -2357,7 +2357,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::AFTER_DOCTYPE_NAME: {
-        // 13.2.5.56 After DOCTYPE name state
+        // 13.2.5.56 MARK: After DOCTYPE name state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -2419,7 +2419,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::AFTER_DOCTYPE_PUBLIC_KEYWORD: {
-        // 13.2.5.57 After DOCTYPE public keyword state
+        // 13.2.5.57 MARK: After DOCTYPE public keyword state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -2488,7 +2488,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::BEFORE_DOCTYPE_PUBLIC_IDENTIFIER: {
-        // 13.2.5.58 Before DOCTYPE public identifier state
+        // 13.2.5.58 MARK: Before DOCTYPE public identifier state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -2553,7 +2553,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED: {
-        // 13.2.5.59 DOCTYPE public identifier (double-quoted) state
+        // 13.2.5.59 MARK: DOCTYPE public identifier (double-quoted) state
         // Consume the next input character:
 
         // U+0022 QUOTATION MARK (")
@@ -2607,7 +2607,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED: {
-        // 13.2.5.60 DOCTYPE public identifier (single-quoted) state
+        // 13.2.5.60 MARK: DOCTYPE public identifier (single-quoted) state
         // Consume the next input character:
 
         // U+0027 APOSTROPHE (')
@@ -2660,7 +2660,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::AFTER_DOCTYPE_PUBLIC_IDENTIFIER: {
-        // 13.2.5.61 After DOCTYPE public identifier state
+        // 13.2.5.61 MARK: After DOCTYPE public identifier state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -2728,7 +2728,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS: {
-        // 13.2.5.62 Between DOCTYPE public and system identifiers state
+        // 13.2.5.62 MARK: Between DOCTYPE public and system identifiers state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -2789,7 +2789,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::AFTER_DOCTYPE_SYSTEM_KEYWORD: {
-        // 13.2.5.63 After DOCTYPE system keyword state
+        // 13.2.5.63 MARK: After DOCTYPE system keyword state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -2858,7 +2858,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::BEFORE_DOCTYPE_SYSTEM_IDENTIFIER: {
-        // 13.2.5.64 Before DOCTYPE system identifier state
+        // 13.2.5.64 MARK: Before DOCTYPE system identifier state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -2923,7 +2923,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED: {
-        // 13.2.5.65 DOCTYPE system identifier (double-quoted) state
+        // 13.2.5.65 MARK: DOCTYPE system identifier (double-quoted) state
         // Consume the next input character:
 
         // U+0022 QUOTATION MARK (")
@@ -2975,7 +2975,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED: {
-        // 13.2.5.66 DOCTYPE system identifier (single-quoted) state
+        // 13.2.5.66 MARK: DOCTYPE system identifier (single-quoted) state
         // Consume the next input character:
 
         // U+0027 APOSTROPHE (')
@@ -3027,7 +3027,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::AFTER_DOCTYPE_SYSTEM_IDENTIFIER: {
-        // 13.2.5.67 After DOCTYPE system identifier state
+        // 13.2.5.67 MARK: After DOCTYPE system identifier state
         // Consume the next input character:
 
         // U+0009 CHARACTER TABULATION (tab)
@@ -3071,7 +3071,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::BOGUS_DOCTYPE: {
-        // 13.2.5.68 Bogus DOCTYPE state
+        // 13.2.5.68 MARK: Bogus DOCTYPE state
         // Consume the next input character:
 
         // U+003E GREATER-THAN SIGN (>)
@@ -3107,7 +3107,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::CDATA_SECTION: {
-        // 13.2.5.69 CDATA section state
+        // 13.2.5.69 MARK: CDATA section state
         // Consume the next input character:
 
         // U+005D RIGHT SQUARE BRACKET (])
@@ -3137,7 +3137,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::CDATA_SECTION_BRACKET: {
-        // 13.2.5.70 CDATA section bracket state
+        // 13.2.5.70 MARK: CDATA section bracket state
         // Consume the next input character:
 
         // U+005D RIGHT SQUARE BRACKET (])
@@ -3158,7 +3158,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::CDATA_SECTION_END: {
-        // 13.2.5.71 CDATA section end state
+        // 13.2.5.71 MARK: CDATA section end state
         // Consume the next input character:
 
         // U+005D RIGHT SQUARE BRACKET (])
@@ -3186,7 +3186,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::CHARACTER_REFERENCE: {
-        // 13.2.5.72 Character reference state
+        // 13.2.5.72 MARK: Character reference state
         // Set the temporary buffer to the empty string. Append a U+0026
 
         // AMPERSAND (&) character to the temporary buffer. Consume the next
@@ -3222,7 +3222,7 @@ void Lexer::consume(Rune rune, bool isEof) {
 
     case State::NAMED_CHARACTER_REFERENCE: {
         notImplemented();
-        // 13.2.5.73 Named character reference state
+        // 13.2.5.73 MARK: Named character reference state
 
         // Consume the maximum number of characters possible, where the
         // consumed characters are one of the identifiers in the first
@@ -3265,7 +3265,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::AMBIGUOUS_AMPERSAND: {
-        // 13.2.5.74 Ambiguous ampersand state
+        // 13.2.5.74 MARK: Ambiguous ampersand state
         // Consume the next input character:
 
         // ASCII alphanumeric
@@ -3301,7 +3301,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::NUMERIC_CHARACTER_REFERENCE: {
-        // 13.2.5.75 Numeric character reference state
+        // 13.2.5.75 MARK: Numeric character reference state
         // Set the character reference code to zero (0).
 
         // Consume the next input character:
@@ -3324,7 +3324,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::HEXADECIMAL_CHARACTER_REFERENCE_START: {
-        // 13.2.5.76 Hexadecimal character reference start state
+        // 13.2.5.76 MARK: Hexadecimal character reference start state
         // Consume the next input character:
 
         // ASCII hex digit
@@ -3347,7 +3347,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::DECIMAL_CHARACTER_REFERENCE_START: {
-        // 13.2.5.77 Decimal character reference start state
+        // 13.2.5.77 MARK: Decimal character reference start state
         // Consume the next input character:
 
         // ASCII digit
@@ -3370,7 +3370,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::HEXADECIMAL_CHARACTER_REFERENCE: {
-        // 13.2.5.78 Hexadecimal character reference state
+        // 13.2.5.78 MARK: Hexadecimal character reference state
         // Consume the next input character:
 
         // ASCII digit
@@ -3417,7 +3417,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::DECIMAL_CHARACTER_REFERENCE: {
-        // 13.2.5.79 Decimal character reference state
+        // 13.2.5.79 MARK: Decimal character reference state
         // Consume the next input character:
 
         // ASCII digit
@@ -3446,7 +3446,7 @@ void Lexer::consume(Rune rune, bool isEof) {
     }
 
     case State::NUMERIC_CHARACTER_REFERENCE_END: {
-        // 13.2.5.80 Numeric character reference end state
+        // 13.2.5.80 MARK: Numeric character reference end state
         // Check the character reference code:
 
         // If the number is 0x00, then this is a null-character-reference

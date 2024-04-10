@@ -36,7 +36,9 @@ static inline Str toStr(NodeType type) {
 }
 
 // https://dom.spec.whatwg.org/#interface-node
-struct Node : public Meta::Static {
+struct Node :
+    Meta::Static {
+
     Node *_parent = nullptr;
     LlItem<Node> _siblings;
     Vec<Strong<Node>> _children;

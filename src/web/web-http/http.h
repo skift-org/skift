@@ -97,7 +97,7 @@ static inline CodeClass codeClass(Code code) {
 }
 
 static inline Res<Code> parseCode(Io::SScan &s) {
-    auto code = try$(s.nextUint());
+    auto code = try$(atou(s));
     switch (code) {
 #define ITER(CODE, NAME) \
     case CODE:           \
@@ -165,9 +165,9 @@ struct Version {
         if (not s.skip("HTTP/"))
             return Error::invalidData("Expected \"HTTP/\"");
         Version v;
-        v.major = try$(s.nextUint());
+        v.major = try$(atou(s));
         s.skip('.');
-        v.minor = try$(s.nextUint());
+        v.minor = try$(atou(s));
         return Ok(v);
     }
 };

@@ -78,7 +78,18 @@ struct TextWriter :
     public Flusher {
     using Writer::write;
 
-    virtual Res<usize> writeStr(Str str) = 0;
+    template <StaticEncoding E>
+    Res<usize> _writeStr(_Str<E> str) {
+        usize written = 0;
+        for (auto rune : iterRunes(str)) {
+            written += try$(writeRune(rune));
+        }
+        return Ok(written);
+    }
+
+    Res<usize> writeStr(Str str) {
+        return _writeStr(str);
+    }
 
     virtual Res<usize> writeRune(Rune rune) = 0;
 
@@ -90,14 +101,6 @@ struct TextWriterBase :
     public TextWriter {
 
     using Writer::write;
-
-    Res<usize> writeStr(Str str) override {
-        usize written = 0;
-        for (auto rune : iterRunes(str)) {
-            written += try$(writeRune(rune));
-        }
-        return Ok(written);
-    }
 
     Res<usize> writeRune(Rune rune) override {
         typename E::One one;

@@ -141,7 +141,7 @@ struct Karm::Io::Formatter<Karm::Cli::Style> {
         usize written = 0;
 
         if (style._reset) {
-            written += try$(writer.writeStr("\x1b[0m"));
+            written += try$(writer.writeStr("\x1b[0m"s));
         }
 
         if (style._fg != Karm::Cli::_COLOR_UNDEF) {
@@ -153,23 +153,23 @@ struct Karm::Io::Formatter<Karm::Cli::Style> {
         }
 
         if (style._bold) {
-            written += try$(writer.writeStr("\x1b[1m"));
+            written += try$(writer.writeStr("\x1b[1m"s));
         }
 
         if (style._underline) {
-            written += try$(writer.writeStr("\x1b[4m"));
+            written += try$(writer.writeStr("\x1b[4m"s));
         }
 
         if (style._blink) {
-            written += try$(writer.writeStr("\x1b[5m"));
+            written += try$(writer.writeStr("\x1b[5m"s));
         }
 
         if (style._reverse) {
-            written += try$(writer.writeStr("\x1b[7m"));
+            written += try$(writer.writeStr("\x1b[7m"s));
         }
 
         if (style._invisible) {
-            written += try$(writer.writeStr("\x1b[8m"));
+            written += try$(writer.writeStr("\x1b[8m"s));
         }
 
         return Ok(written);
@@ -199,7 +199,7 @@ struct Karm::Io::Formatter<Karm::Cli::Styled<T>> {
         return Ok(
             try$(_styleFmt.format(writer, val._color)) +
             try$(_innerFmt.format(writer, val._inner)) +
-            try$(writer.writeStr("\x1b[0m"))
+            try$(writer.writeStr("\x1b[0m"s))
         );
 #else
         return _innerFmt.format(writer, val._inner);

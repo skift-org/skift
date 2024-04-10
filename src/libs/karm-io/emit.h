@@ -62,7 +62,7 @@ struct Emit : public Io::TextWriterBase<> {
         usize written = try$(_writer.writeRune('\n'));
         _newline = false;
         for (usize i = 0; i < _ident; i++)
-            written += try$(_writer.writeStr("    "));
+            written += try$(_writer.writeStr("    "s));
         return Ok(written);
     }
 

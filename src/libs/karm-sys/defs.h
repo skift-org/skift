@@ -31,7 +31,7 @@ constexpr char const *LINE_ENDING = "\r\n";
 #ifdef __ck_karm_sys_path_separator_slash__
 constexpr char const *PATH_SEPARATOR = "/";
 #    define EMBED_SYS_PATH_SEPARATOR "/"
-#    define EMBED_SYS_PATH_SEPARATOR_L "/"
+#    define EMBED_SYS_PATH_SEPARATOR_L L"/"
 #elifdef __ck_karm_sys_path_separator_backslash__
 constexpr char const *PATH_SEPARATOR = "\\";
 #    define EMBED_SYS_PATH_SEPARATOR "\\"

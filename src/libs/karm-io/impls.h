@@ -214,14 +214,6 @@ struct _StringWriter :
         panic("can't write raw bytes to a string");
     }
 
-    Res<usize> writeStr(Str str) override {
-        usize written = 0;
-        for (auto rune : iterRunes(str))
-            written += try$(writeRune(rune));
-
-        return Ok(written);
-    }
-
     Res<usize> writeRune(Rune rune) override {
         _StringBuilder<E>::append(rune);
         return Ok(1uz);

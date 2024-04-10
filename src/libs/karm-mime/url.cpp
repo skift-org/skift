@@ -89,7 +89,7 @@ Res<usize> Url::write(Io::TextWriter &writer) const {
         written += try$(Io::format(writer, "{}:", scheme));
 
     if (authority.len() > 0 or host.len() > 0)
-        written += try$(writer.writeStr("//"));
+        written += try$(writer.writeStr("//"s));
 
     if (authority.len() > 0)
         written += try$(Io::format(writer, "{}@", authority));

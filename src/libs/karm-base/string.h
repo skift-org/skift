@@ -260,7 +260,7 @@ struct _StringBuilder {
     }
 
     _String<E> take() {
-        usize len = _buf.size();
+        usize len = _buf.len();
         _buf.insert(len, 0);
         return {MOVE, _buf.take(), len};
     }

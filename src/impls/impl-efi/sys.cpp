@@ -281,12 +281,13 @@ Res<Strong<Sys::Fd>> openFile(Mime::Url const &url) {
     }
 
     Efi::FileProtocol *file = nullptr;
-    auto resolved = try$(resolve(url));
+    auto resolved = try$(resolve(url)).str();
 
     _StringBuilder<Utf16> b;
     b.ensure(resolved.len());
+
     // NOTE: Convert '/' to '\' as EFI uses '\' as path separator
-    for (auto &u : iterRunes(resolved.str())) {
+    for (Rune u : iterRunes(resolved)) {
         if (u == '/') {
             u = '\\';
         }

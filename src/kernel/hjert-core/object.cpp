@@ -10,7 +10,9 @@ void Object::label(Str label) {
 }
 
 String Object::label() const {
-    return _label ? *_label : "<no label>";
+    if (not _label)
+        return "<unlabeled>"s;
+    return *_label;
 }
 
 void Object::_signalUnlock(Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {

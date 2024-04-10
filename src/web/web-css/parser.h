@@ -7,17 +7,16 @@
 
 namespace Web::Css {
 
-struct Parser : public Sink {
+struct Parser {
 
     Lexer _lexer;
 
     Parser() {
-        _lexer.bind(*this);
     }
 
     void _raise(Str msg = "parse-error");
 
-    void accept(Token const &t) override;
+    void accept(Token const &t);
 
     void write(Str str) {
         auto s = Io::SScan(str);

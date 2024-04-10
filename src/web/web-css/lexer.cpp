@@ -14,7 +14,7 @@ static auto const RE_BRACKET_CLOSE = Re::single('}');
 static auto const RE_PARENTHESIS_OPEN = Re::single('(');
 static auto const RE_PARENTHESIS_CLOSE = Re::single(')');
 static auto const RE_SQUARE_BRACKET_OPEN = Re::single('[');
-static auto const RE_SQUARE_BRACKET_CLOSE = Re::single(']');
+[[maybe_unused]] static auto const RE_SQUARE_BRACKET_CLOSE = Re::single(']');
 static auto const RE_SEMICOLON = Re::single(';');
 static auto const RE_COLON = Re::single(':');
 static auto const RE_COMMA = Re::single(',');
@@ -44,7 +44,7 @@ static auto const RE_ESCAPE = Re::chain(
     )
 );
 
-static auto const RE_UNICODE = Re::chain(Re::single('U', 'u'), Re::oneOrMore(Re::xdigit()));
+[[maybe_unused]] static auto const RE_UNICODE = Re::chain(Re::single('U', 'u'), Re::oneOrMore(Re::xdigit()));
 
 static auto const RE_IDENTIFIER = Re::chain(
     Re::either(

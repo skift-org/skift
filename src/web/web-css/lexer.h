@@ -47,21 +47,12 @@ struct Token {
     };
 
     Type type;
-    String data;
-    Opt<Rune> rune = NONE;
-};
-
-struct Sink {
-    virtual ~Sink() = default;
-    virtual void accept(Token const &token) = 0;
+    Str data;
 };
 
 struct Lexer {
 
     Opt<Token> _token;
-    Sink *_sink = nullptr;
-
-    Rune _currChar = 0;
 
     Token &_begin(Token::Type type) {
         _token = Token{};
@@ -82,24 +73,7 @@ struct Lexer {
         return token;
     }
 
-    void _emit() {
-        if (not _sink)
-            panic("no sink");
-        _sink->accept(_ensure());
-    }
-
-    void _emit(Rune rune) {
-        _begin(Token::OTHER).rune = rune;
-        _emit();
-    }
-
     void _raise(Str msg);
-
-    void bind(Sink &sink) {
-        if (_sink)
-            panic("sink already bound");
-        _sink = &sink;
-    }
 
     void consume(Rune rune, bool isEof = false);
 };
@@ -125,9 +99,6 @@ struct Karm::Io::Formatter<Web::Css::Token> {
     Res<usize> format(Io::TextWriter &writer, Web::Css::Token const &val) {
         usize written = try$(writer.writeRune('('));
         written += try$(writer.writeStr(try$(Io::toParamCase(Web::Css::toStr(val.type)))));
-
-        if (val.rune)
-            written += try$(Io::format(writer, " rune={}", val.rune.unwrap()));
 
         written += try$(Io::format(writer, " data={#}", val.data));
 

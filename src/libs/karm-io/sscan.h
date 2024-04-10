@@ -2,6 +2,7 @@
 
 #include <karm-base/ctype.h>
 #include <karm-base/cursor.h>
+#include <karm-base/defer.h>
 #include <karm-base/rune.h>
 #include <karm-base/string.h>
 #include <karm-meta/callable.h>
@@ -16,31 +17,39 @@ struct _SScan {
     Cursor<Unit> _cursor;
     Cursor<Unit> _begin;
 
-    _SScan(Str str) : _cursor(str) {}
+    _SScan(_Str<E> str)
+        : _cursor(str) {}
 
+    /// Check if the scanner has reached the end of the input.
+    /// This is equivalent to `rem() == 0`.
     bool ended() {
         return _cursor.ended();
     }
 
+    /// Returns the number of runes remaining in the input.
     usize rem() {
         auto curr = _cursor;
         return transcodeLen<E>(curr);
     }
 
+    /// Returns the remaining input as a string.
     _Str<E> remStr() {
-        return {::begin(_cursor), ::end(_cursor)};
+        return {
+            ::begin(_cursor),
+            ::end(_cursor),
+        };
     }
 
+    /// Returns the current rune.
     Rune curr() {
-        if (ended()) {
+        if (ended())
             return '\0';
-        }
-
         Rune r;
         auto curr = _cursor;
         return E::decodeUnit(r, curr) ? r : U'�';
     }
 
+    /// Peek the next rune without advancing the cursor.
     Rune peek(usize count = 0) {
         auto save = _cursor;
         next(count);
@@ -49,94 +58,20 @@ struct _SScan {
         return r;
     }
 
+    /// Return the current rune and advance the cursor.
     Rune next() {
-        if (ended()) {
+        if (ended())
             return '\0';
-        }
-
         Rune r;
         return E::decodeUnit(r, _cursor) ? r : U'�';
     }
 
+    /// Advance the cursor by `count` runes.
     Rune next(usize count) {
         Rune r = '\0';
-
-        for (usize i = 0; i < count; i++) {
+        for (usize i = 0; i < count; i++)
             r = next();
-        }
         return r;
-    }
-
-    bool skip(Rune c) {
-        if (curr() == c) {
-            next();
-            return true;
-        }
-
-        return false;
-    }
-
-    bool skip(Str str) {
-        auto save = _cursor;
-
-        for (auto r : iterRunes(str)) {
-            if (next() != r) {
-                _cursor = save;
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    bool skip(auto expr)
-        requires Meta::Callable<decltype(expr), decltype(*this)>
-    {
-        auto save = _cursor;
-        if (expr(*this)) {
-            return true;
-        }
-        _cursor = save;
-        return false;
-    }
-
-    bool eat(Rune c) {
-        bool result = false;
-        while (skip(c)) {
-            result = true;
-        }
-        return result;
-    }
-
-    bool eat(auto expr) {
-        bool result = false;
-        while (skip(expr)) {
-            result = true;
-        }
-        return result;
-    }
-
-    bool eval(auto expr) {
-        return expr(*this);
-    }
-
-    /// Check if the expression matches or not.
-    /// The cursor is restored to the original position.
-    Match match(auto expr) {
-        auto save = _cursor;
-        if (expr(*this)) {
-            Match result = _cursor == save
-                               ? Match::YES
-                               : Match::PARTIAL;
-            _cursor = save;
-            return result;
-        }
-        _cursor = save;
-        return Match::NO;
-    }
-
-    bool operator()(auto expr) {
-        return expr(*this);
     }
 
     void begin() {
@@ -147,147 +82,100 @@ struct _SScan {
         return {_begin, _cursor};
     }
 
-    _Str<E> token(auto predicate) {
-        _begin = _cursor;
-        if (not skip(predicate)) {
-            _cursor = _begin;
+    /// If the current rune is `c`, advance the cursor.
+    bool skip(Rune c) {
+        if (curr() == c) {
+            next();
+            return true;
         }
+        return false;
+    }
+
+    /// If the current runes are `str`, advance the cursor.
+    bool skip(Str str) {
+        auto rollback = rollbackPoint();
+        for (auto r : iterRunes(str))
+            if (next() != r)
+                return false;
+        rollback.disarm();
+        return true;
+    }
+
+    /// If the expression matches, advance the cursor.
+    bool skip(auto expr)
+        requires Meta::Callable<decltype(expr), decltype(*this)>
+    {
+        auto rollback = rollbackPoint();
+        if (not expr(*this))
+            return false;
+        rollback.disarm();
+        return true;
+    }
+
+    /// Keep advancing the cursor while the current rune is `c`.
+    bool eat(Rune c) {
+        bool result = false;
+        if (skip(c)) {
+            result = true;
+            while (skip(c))
+                ;
+        }
+        return result;
+    }
+
+    /// Keep advancing the cursor while the current runes are `str`.
+    bool eat(Str str) {
+        bool result = false;
+        if (skip(str)) {
+            result = true;
+            while (skip(str))
+                ;
+        }
+        return result;
+    }
+
+    /// Keep advancing the cursor while the expression matches.
+    bool eat(auto expr) {
+        bool result = false;
+        if (skip(expr)) {
+            result = true;
+            while (skip(expr))
+                ;
+        }
+        return result;
+    }
+
+    /// Check if the expression matches or not.
+    /// The cursor is restored to the original position.
+    Match match(auto expr) {
+        auto rollback = rollbackPoint();
+        if (expr(*this)) {
+            Match result =
+                ended()
+                    ? Match::YES
+                    : Match::PARTIAL;
+            return result;
+        }
+        return Match::NO;
+    }
+
+    _Str<E> token(auto expr) {
+        _begin = _cursor;
+        if (not skip(expr))
+            _cursor = _begin;
         return {_begin, _cursor};
     }
 
-    /* --- Number parsing --------------------------------------------------- */
-
-    Opt<u8> _parseDigit(Rune rune, usize base = 10) {
-        rune = toAsciiLower(rune);
-        u8 result = 255;
-
-        if (isAsciiAlpha(rune))
-            result = rune - 'a' + 10;
-        else if (isAsciiDigit(rune))
-            result = rune - '0';
-
-        if (result >= base)
-            return NONE;
-
-        return result;
+    /// Creates a rollback point for the scanner. If not manually disarmed,
+    /// the scanner's state will be restored to its position at the time of
+    /// this rollback point's creation when it goes out of scope.
+    auto rollbackPoint() {
+        return ArmedDefer{[&, saved = *this] {
+            *this = saved;
+        }};
     }
-
-    Opt<u8> nextDigit(usize base = 10) {
-        if (ended())
-            return NONE;
-
-        auto d = _parseDigit(peek(), base);
-
-        if (d)
-            next();
-
-        return d;
-    }
-
-    Opt<usize> nextUint(usize base = 10) {
-        bool isNum = false;
-        usize result = 0;
-
-        while (not ended()) {
-            auto maybeDigit = nextDigit(base);
-            if (not maybeDigit)
-                break;
-            isNum = true;
-            result = result * base + maybeDigit.unwrap();
-        }
-
-        if (not isNum)
-            return NONE;
-
-        return result;
-    }
-
-    Opt<isize> nextInt(usize base = 10) {
-        bool isNeg = false;
-        bool isNum = false;
-        isize result = 0;
-
-        if (peek(0) == '-' and _parseDigit(peek(1), base)) {
-            isNeg = true;
-            isNum = true;
-            next();
-        }
-
-        while (not ended()) {
-            auto maybeDigit = nextDigit(base);
-            if (not maybeDigit) {
-                break;
-            }
-            isNum = true;
-            result = result * base + maybeDigit.unwrap();
-        }
-
-        if (not isNum)
-            return NONE;
-
-        if (isNeg)
-            result = -result;
-
-        return result;
-    }
-
-#ifndef __ck_freestanding__
-
-    Opt<f64> nextFloat(usize base = 10) {
-        i64 ipart = 0.0;
-        f64 fpart = 0.0;
-        i64 exp = 0;
-
-        if (peek(0) != '.' or not _parseDigit(peek(1), base)) {
-            ipart = try$(nextInt(base));
-        }
-
-        if (skip('.')) {
-            f64 multiplier = (1.0 / base);
-            while (not ended()) {
-                auto maybeDigit = nextDigit(base);
-                if (not maybeDigit) {
-                    break;
-                }
-                fpart += maybeDigit.unwrap() * multiplier;
-                multiplier /= base;
-            }
-        }
-
-        if (skip('e') or skip('E')) {
-            auto maybeExp = nextInt(base);
-            if (maybeExp)
-                exp = maybeExp.unwrap();
-        }
-
-        if (ipart < 0) {
-            return ipart - fpart * pow(base, exp);
-        }
-        return ipart + fpart * pow(base, exp);
-    }
-
-#endif
 };
 
 using SScan = _SScan<Utf8>;
-
-static inline Opt<usize> parseUint(Str str) {
-    auto s = SScan(str);
-    return s.nextUint();
-}
-
-static inline Opt<isize> parseInt(Str str) {
-    auto s = SScan(str);
-    return s.nextInt();
-}
-
-#ifndef __ck_freestanding__
-
-static inline Opt<f64> parseFloat(Str str) {
-    auto s = SScan(str);
-    return s.nextFloat();
-}
-
-#endif
 
 } // namespace Karm::Io

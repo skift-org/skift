@@ -67,11 +67,10 @@ static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, M
     _createArc(shape, corner, curr.end, next.start, startAngle, delta, radius);
 }
 
-[[maybe_unused]] static void _createJoin(Shape &shape, StrokeStyle stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
+static void _createJoin(Shape &shape, StrokeStyle stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
     // Make sure that the edge is not degenerate
-    if (Math::Edgef{curr.end, next.start}.degenerated()) {
+    if (Math::Edgef{curr.end, next.start}.degenerated())
         return;
-    }
 
     switch (stroke.join) {
     case BEVEL_JOIN:
@@ -123,7 +122,7 @@ static void _createCapRound(Shape &shape, Cap cap, f64 width) {
     _createArc(shape, cap.center, cap.start, cap.end, startAngle, delta, width / 2);
 }
 
-[[maybe_unused]] static void _createCap(Shape &shape, StrokeStyle stroke, Cap cap) {
+static void _createCap(Shape &shape, StrokeStyle stroke, Cap cap) {
     switch (stroke.cap) {
     case BUTT_CAP:
         _createCapButt(shape, cap);

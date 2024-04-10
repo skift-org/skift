@@ -143,8 +143,8 @@ struct Parser {
         auto [action, toState] = _transition(_state, b);
 
         if (toState != State::NONE) {
-            [[maybe_unused]] auto [onEntry, _] = _transition(toState, ON_ENTRY);
-            [[maybe_unused]] auto [onExit, _] = _transition(_state, ON_EXIT);
+            auto [onEntry, _] = _transition(toState, ON_ENTRY);
+            auto [onExit, _] = _transition(_state, ON_EXIT);
 
             if (onExit != Action::NONE)
                 _doAction(onExit, 0, sink);

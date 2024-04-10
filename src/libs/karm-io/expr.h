@@ -8,11 +8,6 @@
 
 namespace Karm::Re {
 
-template <typename T>
-concept Expr = requires(T expr, Io::SScan &scan) {
-    { expr(scan) } -> Meta::Same<bool>;
-};
-
 /// Match a string against an Expr
 ///
 /// Returns
@@ -20,7 +15,7 @@ concept Expr = requires(T expr, Io::SScan &scan) {
 ///  - Match::NO : If the Expr doesn't match the string
 ///  - Match::PARTIAL : If the Expr matches but the end of string is not reached
 template <StaticEncoding E>
-Match match(Re::Expr auto expr, _Str<E> input) {
+Match match(Expr auto expr, _Str<E> input) {
     Io::_SScan<E> scan(input);
     if (not expr(scan))
         return Match::NO;

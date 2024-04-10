@@ -7,6 +7,23 @@
 #include <karm-base/string.h>
 #include <karm-meta/callable.h>
 
+namespace Karm {
+
+namespace Io {
+template <StaticEncoding E>
+struct _SScan;
+} // namespace Io
+
+namespace Re {
+template <typename T>
+concept Expr = requires(T expr, Io::_SScan<Utf8> &scan) {
+    { expr(scan) } -> Meta::Same<bool>;
+};
+
+} // namespace Re
+
+} // namespace Karm
+
 namespace Karm::Io {
 
 template <StaticEncoding E>
@@ -102,7 +119,7 @@ struct _SScan {
     }
 
     /// If the expression matches, advance the cursor.
-    bool skip(auto expr)
+    bool skip(Re::Expr auto expr)
         requires Meta::Callable<decltype(expr), decltype(*this)>
     {
         auto rollback = rollbackPoint();
@@ -135,7 +152,7 @@ struct _SScan {
     }
 
     /// Keep advancing the cursor while the expression matches.
-    bool eat(auto expr) {
+    bool eat(Re::Expr auto expr) {
         bool result = false;
         if (skip(expr)) {
             result = true;
@@ -145,9 +162,31 @@ struct _SScan {
         return result;
     }
 
+    /// Check if a rune is ahead or not.
+    bool ahead(Rune c) {
+        return peek() == c;
+    }
+
+    /// Check if a string is ahead or not.
+    bool ahead(Str str) {
+        auto rollback = rollbackPoint();
+        for (auto r : iterRunes(str))
+            if (next() != r)
+                return false;
+        return true;
+    }
+
+    /// Check if the expression is ahead or not.
+    bool ahead(Re::Expr auto expr) {
+        auto rollback = rollbackPoint();
+        if (not expr(*this))
+            return false;
+        return true;
+    }
+
     /// Check if the expression matches or not.
     /// The cursor is restored to the original position.
-    Match match(auto expr) {
+    Match match(Re::Expr auto expr) {
         auto rollback = rollbackPoint();
         if (expr(*this)) {
             Match result =
@@ -159,7 +198,7 @@ struct _SScan {
         return Match::NO;
     }
 
-    _Str<E> token(auto expr) {
+    _Str<E> token(Re::Expr auto expr) {
         _begin = _cursor;
         if (not skip(expr))
             _cursor = _begin;

@@ -7,7 +7,7 @@ namespace Hideo::Console {
 Ui::Child app() {
     return scafold({
         .icon = Mdi::CONSOLE_LINE,
-        .title = "Console",
+        .title = "Console"s,
         .body = [] {
             return Ui::codeMedium(" $ ls");
         },

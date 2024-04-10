@@ -233,92 +233,104 @@ Ui::Child desktop(State const &state) {
 
 Ui::Child app(bool isMobile) {
     return Ui::reducer<Model>(
-        {
+        Shell::State{
             .isMobile = isMobile,
             .dateTime = Sys::dateTime(),
             .background = Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap(),
             .noti = {
                 {
                     1,
-                    {{Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP}, "About"},
-                    "Hello",
-                    "Hello, world!",
+                    {
+                        {Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP},
+                        "About"s,
+                    },
+                    "Hello"s,
+                    "Hello, world!"s,
                 },
                 {
                     2,
-                    {{Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP}, "About"},
-                    "Hello",
-                    "Hello, world!",
+                    {
+                        {Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP},
+                        "About"s,
+                    },
+                    "Hello"s,
+                    "Hello, world!"s,
                 },
                 {
                     3,
-                    {{Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP}, "About"},
-                    "Hello",
-                    "Hello, world!",
+                    {
+                        {Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP},
+                        "About"s,
+                    },
+                    "Hello"s,
+                    "Hello, world!"s,
                 },
                 {
                     4,
-                    {{Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP}, "About"},
-                    "Hello",
-                    "Hello, world!",
+                    {
+                        {Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP},
+                        "About"s,
+                    },
+                    "Hello"s,
+                    "Hello, world!"s,
                 },
             },
             .entries = {
                 {
                     {Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP},
-                    "About",
+                    "About"s,
                 },
                 {
                     {Mdi::CALCULATOR, Gfx::ORANGE_RAMP},
-                    "Calculator",
+                    "Calculator"s,
                 },
                 {
                     {Mdi::PALETTE_SWATCH, Gfx::RED_RAMP},
-                    "Color Picker",
+                    "Color Picker"s,
                 },
                 {
                     {Mdi::COUNTER, Gfx::GREEN_RAMP},
-                    "Counter",
+                    "Counter"s,
                 },
                 {
                     {Mdi::DUCK, Gfx::YELLOW_RAMP},
-                    "Demos",
+                    "Demos"s,
                 },
                 {
                     {Mdi::FILE, Gfx::ORANGE_RAMP},
-                    "Files",
+                    "Files"s,
                 },
                 {
                     {Mdi::FORMAT_FONT, Gfx::BLUE_RAMP},
-                    "Fonts",
+                    "Fonts"s,
                 },
                 {
                     {Mdi::EMOTICON, Gfx::RED_RAMP},
-                    "Hello World",
+                    "Hello World"s,
                 },
                 {
                     {Mdi::IMAGE, Gfx::GREEN_RAMP},
-                    "Icons",
+                    "Icons"s,
                 },
                 {
                     {Mdi::IMAGE, Gfx::YELLOW_RAMP},
-                    "Image Viewer",
+                    "Image Viewer"s,
                 },
                 {
                     {Mdi::CUBE, Gfx::BLUE_RAMP},
-                    "Ray Tracer",
+                    "Ray Tracer"s,
                 },
                 {
                     {Mdi::COG, Gfx::ZINC_RAMP},
-                    "Settings",
+                    "Settings"s,
                 },
                 {
                     {Mdi::TABLE, Gfx::GREEN_RAMP},
-                    "Spreadsheet",
+                    "Spreadsheet"s,
                 },
                 {
                     {Mdi::WIDGETS, Gfx::BLUE_RAMP},
-                    "Widget Gallery",
+                    "Widget Gallery"s,
                 },
             },
         },

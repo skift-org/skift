@@ -60,6 +60,13 @@ struct Slice {
         return {buf, len};
     }
 
+    static constexpr Slice fromNullterminated(T const *buf, usize maxLen) {
+        usize len = 0;
+        while (buf[len] and len < maxLen)
+            len++;
+        return {buf, len};
+    }
+
     constexpr Slice() = default;
 
     constexpr Slice(T const *buf, usize len)
@@ -87,6 +94,10 @@ struct Slice {
     constexpr Slice<U> cast() const {
         static_assert(sizeof(T) == sizeof(U));
         return Slice<U>{(U const *)_buf, _len};
+    }
+
+    constexpr explicit operator bool() const {
+        return _len > 0;
     }
 };
 
@@ -137,6 +148,10 @@ struct MutSlice {
     constexpr MutSlice<U> cast() const {
         static_assert(sizeof(T) == sizeof(U));
         return MutSlice<U>{(U *)_buf, _len};
+    }
+
+    constexpr explicit operator bool() const {
+        return _len > 0;
     }
 };
 
@@ -277,6 +292,10 @@ constexpr auto iterSplit(S &slice, typename S::Inner const &sep) {
 
 constexpr bool isEmpty(Sliceable auto &slice) {
     return slice.len() == 0;
+}
+
+constexpr bool any(Sliceable auto const &slice) {
+    return slice.len() > 0;
 }
 
 constexpr auto const *begin(Sliceable auto const &slice) {

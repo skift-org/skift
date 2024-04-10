@@ -8,7 +8,7 @@
 
 namespace Hjert::Core {
 
-struct Object : public Meta::Static {
+struct Object : Meta::Static {
     static Atomic<usize> _counter;
 
     Lock _lock;

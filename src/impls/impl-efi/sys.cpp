@@ -282,16 +282,19 @@ Res<Strong<Sys::Fd>> openFile(Mime::Url const &url) {
 
     Efi::FileProtocol *file = nullptr;
     auto resolved = try$(resolve(url));
-    _String<Utf16> pathStr = transcode<Utf16, Utf8>(resolved.str());
 
+    _StringBuilder<Utf16> b;
+    b.ensure(resolved.len());
     // NOTE: Convert '/' to '\' as EFI uses '\' as path separator
-    for (auto &u : pathStr) {
+    for (auto &u : iterRunes(resolved.str())) {
         if (u == '/') {
             u = '\\';
         }
+        b.append(u);
     }
+    auto utf16str = b.take();
 
-    try$(rootDir->open(rootDir, &file, pathStr.buf(), EFI_FILE_MODE_READ, 0));
+    try$(rootDir->open(rootDir, &file, utf16str.buf(), EFI_FILE_MODE_READ, 0));
     return Ok(makeStrong<FileProto>(file));
 }
 

@@ -51,7 +51,7 @@ Ui::Child app() {
         [](State const &s) {
             return scafold({
                 .icon = Mdi::CLOCK,
-                .title = "Clock",
+                .title = "Clock"s,
                 .titlebar = TitlebarStyle::DIALOG,
                 .body = [&] {
                     auto navbar = Hideo::navbar(

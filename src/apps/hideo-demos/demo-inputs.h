@@ -13,7 +13,7 @@
 namespace Hideo::Demos {
 
 static void willShowMessage(Ui::Node &n) {
-    showMsgDialog(n, "Button pressed");
+    showMsgDialog(n, "Button pressed"s);
 }
 
 static inline Demo INPUTS_DEMO{
@@ -23,30 +23,53 @@ static inline Demo INPUTS_DEMO{
     [] {
         auto button = Hideo::buttonRow(
             willShowMessage,
-            "Cool duck app", "Install"
+            "Cool duck app"s,
+            "Install"s
         );
 
-        auto title = Hideo::titleRow("Some Settings");
+        auto title = Hideo::titleRow("Some Settings"s);
 
         auto list = Hideo::card(
             button,
             Ui::separator(),
             Hideo::treeRow(
-                slot$(Ui::icon(Mdi::TOGGLE_SWITCH)), "Switches", NONE,
+                slot$(Ui::icon(Mdi::TOGGLE_SWITCH)), "Switches"s, NONE,
                 slots$(
-                    Hideo::toggleRow(true, NONE, "Some property"),
-                    Hideo::toggleRow(true, NONE, "Some property"),
-                    Hideo::toggleRow(true, NONE, "Some property")
+                    Hideo::toggleRow(true, NONE, "Some property"s),
+                    Hideo::toggleRow(true, NONE, "Some property"s),
+                    Hideo::toggleRow(true, NONE, "Some property"s)
                 )
             ),
 
             Ui::separator(),
-            Hideo::treeRow(slot$(Ui::icon(Mdi::CHECKBOX_MARKED)), "Checkboxs", NONE, slots$(Hideo::checkboxRow(true, NONE, "Some property"), Hideo::checkboxRow(false, NONE, "Some property"), Hideo::checkboxRow(false, NONE, "Some property"))),
+            Hideo::treeRow(
+                slot$(Ui::icon(Mdi::CHECKBOX_MARKED)),
+                "Checkboxs"s,
+                NONE,
+                slots$(
+                    Hideo::checkboxRow(true, NONE, "Some property"s),
+                    Hideo::checkboxRow(false, NONE, "Some property"s),
+                    Hideo::checkboxRow(false, NONE, "Some property"s)
+                )
+            ),
 
             Ui::separator(),
-            Hideo::treeRow(slot$(Ui::icon(Mdi::RADIOBOX_MARKED)), "Radios", NONE, slots$(Hideo::radioRow(true, NONE, "Some property"), Hideo::radioRow(false, NONE, "Some property"), Hideo::radioRow(false, NONE, "Some property"))),
+            Hideo::treeRow(
+                slot$(Ui::icon(Mdi::RADIOBOX_MARKED)),
+                "Radios"s,
+                NONE,
+                slots$(
+                    Hideo::radioRow(true, NONE, "Some property"s),
+                    Hideo::radioRow(false, NONE, "Some property"s),
+                    Hideo::radioRow(false, NONE, "Some property"s)
+                )
+            ),
             Ui::separator(),
-            Hideo::sliderRow(0.5, NONE, "Some property")
+            Hideo::sliderRow(
+                0.5,
+                NONE,
+                "Some property"s
+            )
         );
 
         return Ui::vflow(8, title, list) |

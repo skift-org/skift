@@ -50,13 +50,13 @@ Ui::Child toolbar(State const &state) {
 Ui::Child properties() {
     return Ui::vscroll(
         Ui::vflow(
-            Hideo::titleRow("Text Properties"),
+            Hideo::titleRow("Text Properties"s),
 
-            Hideo::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Color"),
+            Hideo::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Color"s),
 
             Hideo::row(
                 NONE,
-                "Format",
+                "Format"s,
                 NONE,
                 Ui::hflow(
                     4,
@@ -69,7 +69,7 @@ Ui::Child properties() {
 
             Hideo::row(
                 NONE,
-                "Wrapping",
+                "Wrapping"s,
                 NONE,
                 Ui::hflow(
                     4,
@@ -80,7 +80,7 @@ Ui::Child properties() {
 
             Hideo::row(
                 NONE,
-                "Horizontal Align",
+                "Horizontal Align"s,
                 NONE,
                 Ui::hflow(
                     4,
@@ -92,7 +92,7 @@ Ui::Child properties() {
 
             Hideo::row(
                 NONE,
-                "Vertical Align",
+                "Vertical Align"s,
                 NONE,
                 Ui::hflow(
                     4,
@@ -104,13 +104,13 @@ Ui::Child properties() {
 
             Ui::separator(),
 
-            Hideo::titleRow("Cell Properties"),
-            Hideo::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Background Color"),
-            Hideo::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Border Color"),
+            Hideo::titleRow("Cell Properties"s),
+            Hideo::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Background Color"s),
+            Hideo::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Border Color"s),
 
             Hideo::row(
                 NONE,
-                "Borders",
+                "Borders"s,
                 NONE,
                 Ui::hflow(
                     4,
@@ -123,7 +123,7 @@ Ui::Child properties() {
 
             Hideo::row(
                 NONE,
-                "",
+                ""s,
                 NONE,
                 Ui::hflow(
                     4,
@@ -138,7 +138,7 @@ Ui::Child properties() {
 
             Ui::separator(),
 
-            Hideo::titleRow("Sheet Properties")
+            Hideo::titleRow("Sheet Properties"s)
         )
     );
 }
@@ -174,7 +174,7 @@ Ui::Child tabs(State const &state) {
 
 Ui::Child app() {
     return Ui::reducer<Model>({}, [](auto const &s) {
-        auto tb = titlebar(Mdi::TABLE, "Spreadsheet", tabs(s));
+        auto tb = titlebar(Mdi::TABLE, "Spreadsheet"s, tabs(s));
         auto body = table(s) | Ui::grow();
         if (s.propertiesVisible) {
             body = hflow(body, Ui::separator(), properties());

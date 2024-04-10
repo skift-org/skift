@@ -10,7 +10,9 @@ struct IrqEvent {
     usize irq;
 };
 
-struct Node : public Meta::Static {
+struct Node :
+    Meta::Static {
+
     usize _id = 0;
     Node *_parent = nullptr;
     Vec<Strong<Node>> _children = {};

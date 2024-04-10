@@ -51,14 +51,14 @@ Ui::Child versionBadge() {
     Ui::Children badges = {};
     badges.pushBack(Ui::badge(
         Ui::BadgeStyle::INFO,
-        stringify$(__ck_version_value)
+        stringify$(__ck_version_value) ""s
     ));
 #ifdef __ck_branch_nightly__
-    badges.pushBack(Ui::badge(Gfx::INDIGO400, "Nightly"));
+    badges.pushBack(Ui::badge(Gfx::INDIGO400, "Nightly"s));
 #elif defined(__ck_branch_stable__)
     // No badge for stable
 #else
-    badges.pushBack(Ui::badge(Gfx::EMERALD, "Dev"));
+    badges.pushBack(Ui::badge(Gfx::EMERALD, "Dev"s));
 #endif
     return Ui::hflow(4, badges);
 }
@@ -111,7 +111,8 @@ Ui::Child aboutDialog(Mdi::Icon i, String name) {
             [](auto &n) {
                 showDialog(n, licenseDialog());
             },
-            Ui::ButtonStyle::subtle(), Mdi::LICENSE, "License"
+            Ui::ButtonStyle::subtle(), Mdi::LICENSE,
+            "License"
         ),
         Ui::grow(NONE),
         dialogCloseButton(),
@@ -135,7 +136,8 @@ Ui::Child msgDialog(String title, String msg) {
         Ui::grow(NONE),
         button(
             Ui::closeDialog,
-            Ui::ButtonStyle::primary(), "Ok"
+            Ui::ButtonStyle::primary(),
+            "Ok"
         ),
     };
 
@@ -151,7 +153,7 @@ void showMsgDialog(Ui::Node &n, String title, String msg) {
 }
 
 void showMsgDialog(Ui::Node &n, String msg) {
-    showDialog(n, msgDialog("Message", msg));
+    showDialog(n, msgDialog("Message"s, msg));
 }
 
 } // namespace Hideo

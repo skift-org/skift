@@ -11,15 +11,15 @@ Ui::Child app(State initial) {
     return Ui::reducer<Model>(
         initial,
         [](auto const &state) {
-            auto titlebar = Hideo::titlebar(Mdi::IMAGE, "Images");
-
-            auto content = state.isEditor
-                               ? editor(state)
-                               : viewer(state);
-
-            return Ui::vflow(titlebar, content | Ui::grow()) |
-                   Ui::pinSize({800, 600}) |
-                   Ui::dialogLayer();
+            return scafold({
+                .icon = Mdi::IMAGE,
+                .title = "Images"s,
+                .body = slot$(
+                    state.isEditor
+                        ? editor(state)
+                        : viewer(state)
+                ),
+            });
         }
     );
 }

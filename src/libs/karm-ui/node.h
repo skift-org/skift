@@ -40,7 +40,9 @@ inline bool match(Key lhs, Key rhs) {
     return false;
 }
 
-struct Node : public Meta::Static {
+struct Node :
+    Meta::Static {
+
     Key _key = NONE;
     bool _consumed = false;
 

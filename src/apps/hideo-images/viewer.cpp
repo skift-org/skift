@@ -16,7 +16,10 @@ Ui::Child viewer(State const &state) {
 
 Ui::Child viewerPreview(State const &state) {
     if (not state.image) {
-        return Hideo::alert("Unable to display this image", state.image.none().msg());
+        return Hideo::alert(
+            "Unable to display this image"s,
+            Io::toStr(state.image.none()).unwrap()
+        );
     }
 
     return Ui::image(state.image.unwrap()) |

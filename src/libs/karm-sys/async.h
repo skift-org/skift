@@ -115,7 +115,7 @@ Box<Event> makeEvent(Propagation propagation, Args &&...args) {
 /* --- Scheduler ------------------------------------------------------------ */
 
 struct Sched :
-    public Meta::Static {
+    Meta::Static {
 
     Opt<Res<>> _ret;
 

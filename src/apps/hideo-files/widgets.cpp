@@ -50,7 +50,7 @@ Ui::Child directorEntry(Sys::DirEntry const &entry, bool odd) {
     return Ui::button(
         Model::bind<Navigate>(entry.name),
         itemStyle(odd),
-        entry.isDir ? Mdi::FOLDER : Mime::iconFor(tryOr(Mime::sniffSuffix(Mime::suffixOf(entry.name)), "file"_str)),
+        entry.isDir ? Mdi::FOLDER : Mime::iconFor(tryOr(Mime::sniffSuffix(Mime::suffixOf(entry.name)), "file"s)),
         entry.name
     );
 }
@@ -82,22 +82,22 @@ Ui::Child breadcrumbItem(Str text, isize index) {
 }
 
 Mdi::Icon iconForLocation(Str loc) {
-    if (eqCi(loc, "home"_str))
+    if (eqCi(loc, "home"s))
         return Mdi::HOME;
 
-    if (eqCi(loc, "documents"_str))
+    if (eqCi(loc, "documents"s))
         return Mdi::FILE_DOCUMENT;
 
-    if (eqCi(loc, "pictures"_str))
+    if (eqCi(loc, "pictures"s))
         return Mdi::IMAGE;
 
-    if (eqCi(loc, "music"_str))
+    if (eqCi(loc, "music"s))
         return Mdi::MUSIC;
 
-    if (eqCi(loc, "videos"_str))
+    if (eqCi(loc, "videos"s))
         return Mdi::FILM;
 
-    if (eqCi(loc, "downloads"_str))
+    if (eqCi(loc, "downloads"s))
         return Mdi::DOWNLOAD;
 
     return Mdi::FOLDER;
@@ -120,7 +120,7 @@ String textForUrl(Mime::Url const &url) {
     if (url.scheme == "device")
         return url.host;
 
-    return "This Device";
+    return "This Device"s;
 }
 
 Ui::Child breadcrumbRoot(Mime::Url const &url) {
@@ -250,8 +250,8 @@ Ui::Child openFileDialog() {
                                 ? directoryListing(d, maybeDir.unwrap())
                                 : alert(
                                       d,
-                                      "Can't access location",
-                                      maybeDir.none().msg()
+                                      "Can't access location"s,
+                                      Io::toStr(maybeDir.none()).unwrap()
                                   ),
                             Ui::separator()
                         )

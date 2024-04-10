@@ -178,9 +178,9 @@ struct Range {
 struct Book {
     String name;
     Vec<Sheet> sheets = {
-        {"Sheet 1"},
-        {"Sheet 2"},
-        {"Sheet 3"},
+        {"Sheet 1"s},
+        {"Sheet 2"s},
+        {"Sheet 3"s},
     };
 };
 

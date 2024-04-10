@@ -8,7 +8,7 @@ namespace Hideo::Browser {
 Ui::Child app() {
     return Hideo::scafold({
         .icon = Mdi::WEB,
-        .title = "Browser",
+        .title = "Browser"s,
         .startTools = slots$(
             Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
             Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),

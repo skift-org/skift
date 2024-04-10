@@ -12,6 +12,8 @@ struct _Str : public Slice<U> {
     using Encoding = E;
     using Unit = U;
 
+    static constexpr Array<Unit, 1> NIL = {0};
+
     constexpr _Str() = default;
 
     constexpr _Str(U const *cstr)
@@ -38,6 +40,10 @@ struct _Str : public Slice<U> {
     {
         return *this == _Str<E>(cstr);
     }
+
+    constexpr explicit operator bool() const {
+        return this->_len > 0;
+    }
 };
 
 template <StaticEncoding E>
@@ -46,11 +52,12 @@ struct _String {
     using Unit = typename E::Unit;
     using Inner = Unit;
 
-    Unit *_buf;
-    usize _len;
+    static constexpr Array<Unit, 1> NIL = {0};
 
-    _String()
-        : _String("", 0) {}
+    Unit *_buf = nullptr;
+    usize _len = 0;
+
+    constexpr _String() = default;
 
     _String(Move, Unit *buf, usize len)
         : _buf(buf),
@@ -59,17 +66,21 @@ struct _String {
 
     _String(Unit const *buf, usize len)
         : _len(len) {
+        if (len == 0) {
+            // Allow initializing the string using "" and not allocating memory.
+            _buf = nullptr;
+            return;
+        }
         _buf = new Unit[len + 1];
         _buf[len] = 0;
         memcpy(_buf, buf, len * sizeof(Unit));
     }
 
-    _String(Unit const *cstr)
-        requires(Meta::Same<Unit, char>)
-        : _String(cstr, cstrLen(cstr)) {}
-
     _String(_Str<E> str)
         : _String(str.buf(), str.len()) {}
+
+    _String(Sliceable<Unit> auto const &other)
+        : _String(other.buf(), other.len()) {}
 
     _String(_String const &other)
         : _String(other._buf, other._len) {
@@ -82,7 +93,8 @@ struct _String {
 
     ~_String() {
         if (_buf) {
-            delete[] _buf;
+            _len = 0;
+            delete[] std::exchange(_buf, nullptr);
         }
     }
 
@@ -94,36 +106,32 @@ struct _String {
     _String &operator=(_String &&other) {
         std::swap(_buf, other._buf);
         std::swap(_len, other._len);
-
         return *this;
     }
 
-    _Str<E> str() const { return {_buf, _len}; }
-
-    Slice<Unit> units() const {
-        return {_buf, _len};
+    always_inline _Str<E> str() const { return {buf(), len()}; }
+    always_inline Unit const &operator[](usize i) const {
+        if (i >= _len)
+            panic("index out of bounds");
+        return buf()[i];
     }
+    always_inline Unit const *buf() const { return _len ? _buf : NIL.buf(); }
+    always_inline usize len() const { return _len; }
 
-    MutSlice<Unit> mutUnits() {
-        return {_buf, _len};
-    }
-
-    Unit const &operator[](usize i) const { return _buf[i]; }
-    Unit &operator[](usize i) { return _buf[i]; }
-    Unit const *buf() const { return _buf; }
-    Unit *buf() { return _buf; }
-    usize len() const { return _len; }
-
-    auto operator<=>(Unit const *cstr) const
+    always_inline auto operator<=>(Unit const *cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return str() <=> _Str<E>(cstr);
     }
 
-    auto operator==(Unit const *cstr) const
+    always_inline auto operator==(Unit const *cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return str() == _Str<E>(cstr);
+    }
+
+    constexpr explicit operator bool() const {
+        return _len > 0;
     }
 };
 
@@ -212,7 +220,9 @@ struct _StringBuilder {
         : _buf(cap) {}
 
     void ensure(usize cap) {
-        _buf.ensure(cap);
+        // NOTE: This way client code don't have to take
+        //       the null-terminator into account
+        _buf.ensure(cap + 1);
     }
 
     void append(Rune rune) {
@@ -260,6 +270,11 @@ using StringBuilder = _StringBuilder<Utf8>;
 
 } // namespace Karm
 
-inline constexpr Karm::Str operator""_str(char const *buf, usize len) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wuser-defined-literals"
+
+inline constexpr Karm::Str operator""s(char const *buf, usize len) {
     return {buf, len};
 }
+
+#pragma clang diagnostic pop

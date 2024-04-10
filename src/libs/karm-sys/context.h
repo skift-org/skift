@@ -11,7 +11,7 @@ struct Service {
 };
 
 struct Ctx :
-    public Meta::Static {
+    Meta::Static {
     Vec<Strong<Service>> _srvs;
 
     template <typename T>

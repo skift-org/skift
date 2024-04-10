@@ -7,22 +7,22 @@ test$(pathUpDown) {
     auto path = "/a/b/c/d/e/f"_path;
 
     auto up1 = path.parent(1);
-    expectEq$(up1.str(), "/a/b/c/d/e"_str);
+    expectEq$(up1.str(), "/a/b/c/d/e"s);
 
     auto up2 = path.parent(2);
-    expectEq$(up2.str(), "/a/b/c/d"_str);
+    expectEq$(up2.str(), "/a/b/c/d"s);
 
     auto up3 = path.parent(3);
-    expectEq$(up3.str(), "/a/b/c"_str);
+    expectEq$(up3.str(), "/a/b/c"s);
 
     auto up4 = path.parent(4);
-    expectEq$(up4.str(), "/a/b"_str);
+    expectEq$(up4.str(), "/a/b"s);
 
     auto up5 = path.parent(5);
-    expectEq$(up5.str(), "/a"_str);
+    expectEq$(up5.str(), "/a"s);
 
     auto up6 = path.parent(6);
-    expectEq$(up6.str(), "/"_str);
+    expectEq$(up6.str(), "/"s);
 
     return Ok();
 }

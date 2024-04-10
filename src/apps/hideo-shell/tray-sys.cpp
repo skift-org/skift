@@ -90,7 +90,7 @@ Ui::Child quickTools(State const &) {
         Ui::button(
             [](auto &n) {
                 Model::bubble(n, Activate{Panel::NIL});
-                Ui::showDialog(n, aboutDialog(Mdi::SHIP_WHEEL, "Shell"));
+                Ui::showDialog(n, aboutDialog(Mdi::SHIP_WHEEL, "Shell"s));
             },
             Ui::ButtonStyle::secondary(),
             Mdi::INFORMATION

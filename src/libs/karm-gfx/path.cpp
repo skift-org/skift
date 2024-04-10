@@ -389,25 +389,25 @@ void Path::ellipse(Math::Ellipsef ellipse) {
 
 /* --- Svg -------------------------------------------------------------- */
 
-Opt<Math::Vec2f> _nextVec2f(Io::SScan &scan) {
+Opt<Math::Vec2f> _nextVec2f(Io::SScan &s) {
     return Math::Vec2f{
-        try$(scan.nextFloat()),
-        try$(scan.nextFloat()),
+        try$(Io::atof(s)),
+        try$(Io::atof(s)),
     };
 }
 
-Opt<Path::Op> Path::parseOp(Io::SScan &scan, Rune opcode) {
+Opt<Path::Op> Path::parseOp(Io::SScan &s, Rune opcode) {
     Flags flags{};
     flags |= isAsciiLower(opcode) ? RELATIVE : DEFAULT;
     opcode = toAsciiLower(opcode);
 
     auto nextSep = [&] {
-        scan.skip(Re::optSeparator(','_re));
+        s.skip(Re::optSeparator(','_re));
     };
 
     auto nextCoord = [&] -> Opt<f64> {
         nextSep();
-        return try$(scan.nextFloat());
+        return try$(Io::atof(s));
     };
 
     auto nextCoordPair = [&] -> Opt<Math::Vec2f> {
@@ -450,10 +450,10 @@ Opt<Path::Op> Path::parseOp(Io::SScan &scan, Rune opcode) {
         auto angle = try$(nextCoord());
 
         nextSep();
-        flags |= scan.next() == '1' ? LARGE : DEFAULT;
+        flags |= s.next() == '1' ? LARGE : DEFAULT;
 
         nextSep();
-        flags |= scan.next() == '1' ? SWEEP : DEFAULT;
+        flags |= s.next() == '1' ? SWEEP : DEFAULT;
 
         auto p = try$(nextCoordPair());
         return Op{ARC_TO, radius, angle, p, flags};
@@ -465,25 +465,25 @@ Opt<Path::Op> Path::parseOp(Io::SScan &scan, Rune opcode) {
 }
 
 bool Path::evalSvg(Str svg) {
-    Io::SScan scan{svg};
+    Io::SScan s{svg};
 
     Rune opcode{};
-    while ((opcode = scan.next())) {
-        scan.skip(Re::zeroOrMore(Re::space()));
+    while ((opcode = s.next())) {
+        s.skip(Re::zeroOrMore(Re::space()));
 
         do {
-            auto maybeOp = parseOp(scan, opcode);
+            auto maybeOp = parseOp(s, opcode);
 
             if (not maybeOp) {
                 return false;
             }
 
             evalOp(maybeOp.unwrap());
-            scan.skip(Re::zeroOrMore(Re::space()));
+            s.skip(Re::zeroOrMore(Re::space()));
 
             opcode = opcode == 'M' ? 'L' : opcode;
             opcode = opcode == 'm' ? 'l' : opcode;
-        } while (not scan.ended() and not isAsciiAlpha(scan.curr()));
+        } while (not s.ended() and not isAsciiAlpha(s.curr()));
     }
 
     return true;

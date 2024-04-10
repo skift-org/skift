@@ -121,19 +121,34 @@ void intent(Ui::Node &n, Sys::Event &e) {
 
 Ui::Child menu(Configs const &c) {
     if (c.entries.len() == 0)
-        return alert("No entries found.", "Please add an entry to the configuration file.");
+        return alert(
+            "No entries found."s,
+            "Please add an entry to the configuration file."s
+        );
 
     return Ui::reducer<Model>(
         {c},
         [](State const &s) {
             if (s.error)
-                return alert("System startup failed.", s.error.unwrap());
+                return alert(
+                    "System startup failed."s,
+                    s.error.unwrap()
+                );
 
             return Ui::vflow(
                        16,
                        Layout::Align::CENTER,
-                       Ui::headlineLarge(s.configs.title ? *s.configs.title : "Welcome!"),
-                       Ui::titleLarge(Ui::GRAY400, s.configs.subtitle ? *s.configs.subtitle : "Select an operating system"),
+                       Ui::headlineLarge(
+                           s.configs.title
+                               ? *s.configs.title
+                               : String{"Welcome!"}
+                       ),
+                       Ui::titleLarge(
+                           Ui::GRAY400,
+                           s.configs.subtitle
+                               ? *s.configs.subtitle
+                               : String{"Select an operating system"}
+                       ),
                        list(s) | Ui::grow(4),
                        Ui::labelMedium("Use the [ARROW KEYS] to navigate, and press [ENTER] to select an entry."),
                        Ui::labelSmall(Ui::GRAY500, "Powered by Opstart ►")

@@ -9,7 +9,7 @@ namespace Hideo::About {
 Ui::Child app() {
     return scafold({
         .icon = Mdi::INFORMATION,
-        .title = "About",
+        .title = "About"s,
         .titlebar = TitlebarStyle::DIALOG,
         .body = [] {
             auto titleText = Ui::headlineMedium(

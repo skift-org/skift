@@ -2,6 +2,7 @@
 
 #include <karm-base/array.h>
 #include <karm-base/endian.h>
+#include <karm-io/aton.h>
 #include <karm-io/fmt.h>
 
 namespace Karm::Sys {
@@ -38,7 +39,7 @@ union Ip4 {
         auto addr = unspecified();
 
         for (auto i = 0; i < 4; ++i) {
-            auto n = s.nextUint(10);
+            auto n = atou(s);
             if (not n)
                 return Error::invalidInput("invalid ip address");
 
@@ -101,7 +102,7 @@ union Ip6 {
         auto addr = unspecified();
 
         for (auto i = 0; i < 8; i++) {
-            addr.words[i] = try$(s.nextUint(16));
+            addr.words[i] = try$(atou(s, {.base = 16}));
 
             if (i < 7) {
                 if (not s.skip(':')) {
@@ -166,7 +167,7 @@ struct SocketAddr {
             return Error::invalidInput("invalid socket address");
         }
 
-        auto port = try$(s.nextUint(10));
+        auto port = try$(atou(s));
 
         if (port > 65535) {
             return Error::invalidInput("invalid socket address");

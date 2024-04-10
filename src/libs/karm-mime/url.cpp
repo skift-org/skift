@@ -27,7 +27,7 @@ Url Url::parse(Io::SScan &s) {
         url.host = maybeHost;
 
         if (s.skip(':')) {
-            url.port = s.nextUint();
+            url.port = atou(s);
         }
     }
 
@@ -123,7 +123,7 @@ Res<Url> parseUrlOrPath(Str str) {
     }
 
     Url url;
-    url.scheme = "file";
+    url.scheme = "file"s;
     url.path = Path::parse(str);
     return Ok(url);
 }

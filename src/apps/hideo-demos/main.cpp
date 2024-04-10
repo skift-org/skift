@@ -58,7 +58,7 @@ Ui::Child app() {
     return Ui::reducer<Model>([](State const &s) {
         return scafold({
             .icon = Mdi::DUCK,
-            .title = "Demos",
+            .title = "Demos"s,
             .sidebar = [&] {
                 return Hideo::sidenav(
                     iter(DEMOS)

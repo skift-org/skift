@@ -16,7 +16,7 @@ static inline Demo TEXT_DEMO{
     [] {
         return Ui::vflow(
                    Hideo::treeRow(
-                       slot$(Ui::icon(Mdi::TEXT)), "Display", NONE,
+                       slot$(Ui::icon(Mdi::TEXT)), "Display"s, NONE,
                        slots$(
                            Ui::displayLarge("Display Large"),
                            Ui::displayMedium("Display Medium"),
@@ -25,7 +25,7 @@ static inline Demo TEXT_DEMO{
                    ),
 
                    Hideo::treeRow(
-                       slot$(Ui::icon(Mdi::TEXT)), "Headlines", NONE,
+                       slot$(Ui::icon(Mdi::TEXT)), "Headlines"s, NONE,
                        slots$(
                            Ui::headlineLarge("Headline Large"),
                            Ui::headlineMedium("Headline Medium"),
@@ -34,7 +34,7 @@ static inline Demo TEXT_DEMO{
                    ),
 
                    Hideo::treeRow(
-                       slot$(Ui::icon(Mdi::TEXT)), "Titles", NONE,
+                       slot$(Ui::icon(Mdi::TEXT)), "Titles"s, NONE,
                        slots$(
                            Ui::titleLarge("Title Large"),
                            Ui::titleMedium("Title Medium"),
@@ -43,7 +43,7 @@ static inline Demo TEXT_DEMO{
                    ),
 
                    Hideo::treeRow(
-                       slot$(Ui::icon(Mdi::TEXT)), "Body", NONE,
+                       slot$(Ui::icon(Mdi::TEXT)), "Body"s, NONE,
                        slots$(
                            Ui::bodyLarge("Body Large"),
                            Ui::bodyMedium("Body Medium"),

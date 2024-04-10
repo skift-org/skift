@@ -29,11 +29,14 @@ Ui::Child pangrams(Strong<Media::Fontface> fontface) {
 Ui::Child app(Res<Strong<Media::Fontface>> fontface) {
     return scafold({
         .icon = Mdi::FORMAT_FONT,
-        .title = "Fonts",
+        .title = "Fonts"s,
         .body = [fontface] {
             return fontface
                        ? pangrams(fontface.unwrap())
-                       : alert("Unable to load font", fontface.none().msg());
+                       : alert(
+                             "Unable to load font"s,
+                             Io::toStr(fontface.none()).unwrap()
+                         );
         },
     });
 }

@@ -156,7 +156,10 @@ Res<Vec<Sys::DirEntry>> readDir(Mime::Url const &url) {
             continue;
         }
 
-        entries.pushBack(Sys::DirEntry{entry->d_name, entry->d_type == DT_DIR});
+        entries.pushBack(Sys::DirEntry{
+            Str::fromNullterminated(entry->d_name),
+            entry->d_type == DT_DIR,
+        });
     }
 
     if (::closedir(dir) < 0)
@@ -325,13 +328,13 @@ Res<> populate(Sys::SysInfo &infos) {
     if (uname(&uts) < 0)
         return Posix::fromLastErrno();
 
-    infos.sysName = "Posix";
+    infos.sysName = "Posix"s;
     infos.sysVersion = try$(Io::format("{}", _POSIX_VERSION));
 
-    infos.kernelName = uts.sysname;
-    infos.kernelVersion = uts.release;
+    infos.kernelName = Str::fromNullterminated(uts.sysname, sizeof(uts.sysname));
+    infos.kernelVersion = Str::fromNullterminated(uts.release, sizeof(uts.release));
 
-    infos.hostname = uts.nodename;
+    infos.hostname = Str::fromNullterminated(uts.nodename, sizeof(uts.nodename));
 
     return Ok();
 }
@@ -345,11 +348,11 @@ Res<> populate(Vec<Sys::CpuInfo> &) {
 }
 
 Res<> populate(Sys::UserInfo &infos) {
-    infos.name = getenv("USER");
-    infos.home.scheme = "file";
+    infos.name = Str::fromNullterminated(getenv("USER"));
+    infos.home.scheme = "file"s;
     infos.home.path = Mime::Path::parse(getenv("HOME"));
 
-    infos.shell.scheme = "file";
+    infos.shell.scheme = "file"s;
     infos.shell.path = Mime::Path::parse(getenv("SHELL"));
 
     return Ok();

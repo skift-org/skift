@@ -17,17 +17,17 @@ Ui::Child sidenavItem(State const &s, Mdi::Icon icon, String title, Mime::Url ur
 
 Ui::Child sidebar(State const &s) {
     return Hideo::sidenav({
-        sidenavItem(s, Mdi::HOME, "Home", "location://home"_url),
-        sidenavItem(s, Mdi::FILE_DOCUMENT, "Documents", "location://documents"_url),
-        sidenavItem(s, Mdi::IMAGE, "Pictures", "location://pictures"_url),
-        sidenavItem(s, Mdi::MUSIC, "Music", "location://music"_url),
-        sidenavItem(s, Mdi::FILM, "Videos", "location://videos"_url),
-        sidenavItem(s, Mdi::DOWNLOAD, "Downloads", "location://downloads"_url),
+        sidenavItem(s, Mdi::HOME, "Home"s, "location://home"_url),
+        sidenavItem(s, Mdi::FILE_DOCUMENT, "Documents"s, "location://documents"_url),
+        sidenavItem(s, Mdi::IMAGE, "Pictures"s, "location://pictures"_url),
+        sidenavItem(s, Mdi::MUSIC, "Music"s, "location://music"_url),
+        sidenavItem(s, Mdi::FILM, "Videos"s, "location://videos"_url),
+        sidenavItem(s, Mdi::DOWNLOAD, "Downloads"s, "location://downloads"_url),
         Ui::separator(),
-        sidenavItem(s, Mdi::LAPTOP, "This Device", "file:/"_url),
-        sidenavItem(s, Mdi::USB, "USB", "device://usb"_url),
-        sidenavItem(s, Mdi::SD, "SD Card", "device://sdcard"_url),
-        sidenavItem(s, Mdi::DISC, "CD-ROM", "device://cdrom"_url),
+        sidenavItem(s, Mdi::LAPTOP, "This Device"s, "file:/"_url),
+        sidenavItem(s, Mdi::USB, "USB"s, "device://usb"_url),
+        sidenavItem(s, Mdi::SD, "SD Card"s, "device://sdcard"_url),
+        sidenavItem(s, Mdi::DISC, "CD-ROM"s, "device://cdrom"_url),
     });
 }
 
@@ -38,8 +38,8 @@ Ui::Child pageContent(State const &state) {
                        ? directoryListing(state, dir.unwrap())
                        : alert(
                              state,
-                             "Can't access this location",
-                             dir.none().msg()
+                             "Can't access this location"s,
+                             Io::toStr(dir.none()).unwrap()
                          );
 
     return listing | Ui::grow();
@@ -49,7 +49,7 @@ Ui::Child app() {
     return Ui::reducer<Model>("location://home"_url, [](State const &s) {
         return scafold({
             .icon = Mdi::FOLDER,
-            .title = "Files",
+            .title = "Files"s,
             .startTools = slots$(
                 goBackTool(s),
                 goForwardTool(s),

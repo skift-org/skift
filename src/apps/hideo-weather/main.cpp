@@ -8,7 +8,7 @@ namespace Hideo::Weather {
 Ui::Child app() {
     return scafold({
         .icon = Mdi::WEATHER_PARTLY_CLOUDY,
-        .title = "Weather",
+        .title = "Weather"s,
         .body = slot$(Ui::image(Media::loadImage("bundle://hideo-weather/images/weather-few-clouds.jpg"_url).unwrap()) | Ui::cover()),
         .size = {460, 320},
     });

@@ -83,8 +83,8 @@ struct Continuation : public Resumable {
 template <Sender S>
 struct [[nodiscard]] Awaiter :
     public Continuation<typename S::Inner>,
-    public Meta::Static,
-    public Meta::NoCopy {
+    Meta::Static,
+    Meta::NoCopy {
 
     using Continuation<typename S::Inner>::value;
 

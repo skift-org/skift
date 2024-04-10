@@ -38,33 +38,33 @@ Ui::Child keypad(State const &state) {
                 )
             ),
 
-            textButton(Model::bind<ClearAllAction>(), Ui::ButtonStyle::secondary(), "CE"),
-            textButton(Model::bind<ClearAction>(), Ui::ButtonStyle::secondary(), "C"),
+            textButton(Model::bind<ClearAllAction>(), Ui::ButtonStyle::secondary(), "CE"s),
+            textButton(Model::bind<ClearAction>(), Ui::ButtonStyle::secondary(), "C"s),
             Ui::button(Model::bind(Operator::TO_PERCENT), Ui::ButtonStyle::secondary(), Mdi::PERCENT),
             Ui::button(Model::bind<BackspaceAction>(), Ui::ButtonStyle::secondary(), Mdi::BACKSPACE_OUTLINE),
 
-            textButton(Model::bind(Operator::RESIPROCAL), Ui::ButtonStyle::secondary(), "1/x"),
-            textButton(Model::bind(Operator::SQUARE), Ui::ButtonStyle::secondary(), "x²"),
-            textButton(Model::bind(Operator::SQRT), Ui::ButtonStyle::secondary(), "√x"),
+            textButton(Model::bind(Operator::RESIPROCAL), Ui::ButtonStyle::secondary(), "1/x"s),
+            textButton(Model::bind(Operator::SQUARE), Ui::ButtonStyle::secondary(), "x²"s),
+            textButton(Model::bind(Operator::SQRT), Ui::ButtonStyle::secondary(), "√x"s),
             Ui::button(Model::bind(Operator::DIV), Ui::ButtonStyle::secondary(), Mdi::DIVISION),
 
-            textButton(Model::bind<Number>(7), "7"),
-            textButton(Model::bind<Number>(8), "8"),
-            textButton(Model::bind<Number>(9), "9"),
+            textButton(Model::bind<Number>(7), "7"s),
+            textButton(Model::bind<Number>(8), "8"s),
+            textButton(Model::bind<Number>(9), "9"s),
             Ui::button(Model::bind(Operator::MULT), Ui::ButtonStyle::secondary(), Mdi::MULTIPLICATION),
 
-            textButton(Model::bind<Number>(4), "4"),
-            textButton(Model::bind<Number>(5), "5"),
-            textButton(Model::bind<Number>(6), "6"),
+            textButton(Model::bind<Number>(4), "4"s),
+            textButton(Model::bind<Number>(5), "5"s),
+            textButton(Model::bind<Number>(6), "6"s),
             Ui::button(Model::bind(Operator::SUB), Ui::ButtonStyle::secondary(), Mdi::MINUS),
 
-            textButton(Model::bind<Number>(1), "1"),
-            textButton(Model::bind<Number>(2), "2"),
-            textButton(Model::bind<Number>(3), "3"),
+            textButton(Model::bind<Number>(1), "1"s),
+            textButton(Model::bind<Number>(2), "2"s),
+            textButton(Model::bind<Number>(3), "3"s),
             Ui::button(Model::bind(Operator::ADD), Ui::ButtonStyle::secondary(), Mdi::PLUS),
 
-            textButton(Model::bind(Operator::INVERT_SIGN), "+/-"),
-            textButton(Model::bind<Number>(0), "0"),
+            textButton(Model::bind(Operator::INVERT_SIGN), "+/-"s),
+            textButton(Model::bind<Number>(0), "0"s),
             Ui::button(Model::bind<EnterDecimalAction>(), Mdi::CIRCLE_SMALL),
             Ui::button(Model::bind<EqualAction>(), Ui::ButtonStyle::primary(), Mdi::EQUAL)
         )
@@ -90,7 +90,7 @@ Ui::Child app() {
     return Ui::reducer<Model>([](State const &state) {
         return scafold({
             .icon = Mdi::CALCULATOR,
-            .title = "Calculator",
+            .title = "Calculator"s,
             .titlebar = TitlebarStyle::DIALOG,
             .body = slot$(Ui::vflow(
                 screen(state) | Ui::dragRegion(),

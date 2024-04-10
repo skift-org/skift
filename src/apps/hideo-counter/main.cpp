@@ -10,7 +10,7 @@ Ui::Child app() {
     return Ui::reducer<Model>([](State const &s) {
         return scafold({
             .icon = Mdi::COUNTER,
-            .title = "Counter",
+            .title = "Counter"s,
             .titlebar = TitlebarStyle::DIALOG,
             .body = [&] {
                 auto decBtn = Ui::button(

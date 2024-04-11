@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "web-xml",
+    "type": "lib",
+    "description": "Implementation of the XML standard (https://www.w3.org/TR/xml)",
+    "requires": [
+        "karm-base",
+        "web-dom"
+    ]
+}

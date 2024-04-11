@@ -47,6 +47,10 @@ struct ArmedDefer : Meta::NoCopy {
     void disarm() {
         _armed = false;
     }
+
+    void arm() {
+        _armed = true;
+    }
 };
 
 template <typename F>

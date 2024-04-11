@@ -282,29 +282,24 @@ inline constexpr Expr auto alnum() {
     return ctype(isAsciiAlphaNum);
 }
 
-/// Match a work made of ASCII letters and underscores and consume it.
+/// Match a word made of ASCII letters and underscores and consume it.
 inline constexpr Expr auto word() {
     return alnum() | single('_');
 }
 
 /// Match punctuation and consume it.
 inline constexpr Expr auto punct() {
-    return single(
-        '!', '"', '#', '$', '%', '&', '\'', '(',
-        ')', '*', '+', ',', '-', '.', '/', ':',
-        ';', '<', '=', '>', '?', '@', '[', '\\',
-        ']', '^', '_', '`', '{', '|', '}', '~'
-    );
+    return ctype(isAsciiPunct);
 }
 
 /// Match ascii whitespace and consume it.
 inline constexpr Expr auto space() {
-    return single(' ', '\t', '\n', '\r');
+    return ctype(isAsciiSpace);
 }
 
 /// Match a blank space and consume it.
 inline constexpr Expr auto blank() {
-    return single(' ', '\t');
+    return ctype(isAsciiBlank);
 }
 
 /* --- Utils ---------------------------------------------------------------- */

@@ -26,4 +26,6 @@ constexpr inline auto CURRENT_COLOR = CurrentColor{};
 
 using Color = Union<CurrentColor, Gfx::Color>;
 
+Opt<Color> parseNamedColor(Str name);
+
 } // namespace Web::Css

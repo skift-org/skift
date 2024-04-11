@@ -7,10 +7,10 @@
 
 namespace Karm::Test {
 
-#define test$(ID)                                                                   \
-    static ::Karm::Res<> var$(ID)([[maybe_unused]] ::Karm::Test::Driver & _driver); \
-    static ::Karm::Test::Test var$(_test){#ID, var$(ID)};                           \
-    static ::Karm::Res<> var$(ID)([[maybe_unused]] ::Karm::Test::Driver & _driver)
+#define test$(ID)                                                                     \
+    static ::Karm::Res<> var$(func)([[maybe_unused]] ::Karm::Test::Driver & _driver); \
+    static ::Karm::Test::Test var$(test){#ID, var$(func)};                            \
+    static ::Karm::Res<> var$(func)([[maybe_unused]] ::Karm::Test::Driver & _driver)
 
 #define __expect$(LHS, RHS, OP)                         \
     ({                                                  \

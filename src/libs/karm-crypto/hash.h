@@ -139,20 +139,18 @@ struct AnyHash {
     }
 
     Str name() const {
-#define ITER(NAME, TYPE)  \
-    [&](TYPE) {           \
-        return #NAME ""s; \
-    },
-
         return _h.visit(Visitor{
             [&](None) {
                 unreachable();
                 return ""s;
             },
+#define ITER(NAME, TYPE)  \
+    [&](TYPE) {           \
+        return #NAME ""s; \
+    },
             FOR_EACH_HASH(ITER)
-        });
-
 #undef ITER
+        });
     }
 };
 

@@ -134,7 +134,7 @@ struct _SScan {
         bool result = false;
         if (skip(c)) {
             result = true;
-            while (skip(c))
+            while (skip(c) and not ended())
                 ;
         }
         return result;
@@ -145,7 +145,7 @@ struct _SScan {
         bool result = false;
         if (skip(str)) {
             result = true;
-            while (skip(str))
+            while (skip(str) and not ended())
                 ;
         }
         return result;
@@ -156,7 +156,7 @@ struct _SScan {
         bool result = false;
         if (skip(expr)) {
             result = true;
-            while (skip(expr))
+            while (skip(expr) and not ended())
                 ;
         }
         return result;

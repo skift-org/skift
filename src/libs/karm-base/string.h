@@ -1,5 +1,6 @@
 #pragma once
 
+#include "checked.h"
 #include "cstr.h"
 #include "ctype.h"
 #include "rune.h"
@@ -12,110 +13,73 @@ struct _Str : public Slice<U> {
     using Encoding = E;
     using Unit = U;
 
-    static constexpr Array<Unit, 1> NIL = {0};
+    always_inline constexpr _Str() = default;
 
-    constexpr _Str() = default;
-
-    constexpr _Str(U const *cstr)
+    always_inline constexpr _Str(U const *cstr)
         requires(Meta::Same<U, char>)
         : Slice<U>(cstr, cstrLen(cstr)) {}
 
-    constexpr _Str(U const *buf, usize len)
+    always_inline constexpr _Str(U const *buf, usize len)
         : Slice<U>(buf, len) {}
 
-    constexpr _Str(U const *begin, U const *end)
+    always_inline constexpr _Str(U const *begin, U const *end)
         : Slice<U>(begin, end - begin) {}
 
-    constexpr _Str(Sliceable<U> auto const &other)
+    always_inline constexpr _Str(Sliceable<U> auto const &other)
         : Slice<U>(other.buf(), other.len()) {}
 
-    auto operator<=>(Unit const *cstr) const
+    always_inline constexpr auto operator<=>(Unit const *cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return *this <=> _Str<E>(cstr);
     }
 
-    auto operator==(Unit const *cstr) const
+    always_inline constexpr auto operator==(Unit const *cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return *this == _Str<E>(cstr);
     }
 
-    constexpr explicit operator bool() const {
+    always_inline constexpr explicit operator bool() const {
         return this->_len > 0;
     }
 };
 
-template <StaticEncoding E>
-struct _String {
+template <StaticEncoding E, usize N>
+struct _InlineString {
     using Encoding = E;
     using Unit = typename E::Unit;
     using Inner = Unit;
 
-    static constexpr Array<Unit, 1> NIL = {0};
+    Array<Unit, N> _buf;
+    u8 _len = 0;
+    static_assert(N <= MAX<u8>);
 
-    Unit *_buf = nullptr;
-    usize _len = 0;
+    constexpr _InlineString() = default;
 
-    constexpr _String() = default;
-
-    _String(Move, Unit *buf, usize len)
-        : _buf(buf),
-          _len(len) {
-    }
-
-    _String(Unit const *buf, usize len)
-        : _len(len) {
-        if (len == 0) {
-            // Allow initializing the string using "" and not allocating memory.
-            _buf = nullptr;
-            return;
-        }
-        _buf = new Unit[len + 1];
-        _buf[len] = 0;
-        memcpy(_buf, buf, len * sizeof(Unit));
-    }
-
-    _String(_Str<E> str)
-        : _String(str.buf(), str.len()) {}
-
-    _String(Sliceable<Unit> auto const &other)
-        : _String(other.buf(), other.len()) {}
-
-    _String(_String const &other)
-        : _String(other._buf, other._len) {
-    }
-
-    _String(_String &&other)
-        : _buf(std::exchange(other._buf, nullptr)),
-          _len(std::exchange(other._len, 0)) {
-    }
-
-    ~_String() {
-        if (_buf) {
-            _len = 0;
-            delete[] std::exchange(_buf, nullptr);
+    _InlineString(Unit const *buf, usize len) {
+        if (len > N)
+            panic("len too large");
+        _len = min(len, N);
+        for (usize i = 0; i < _len; i++) {
+            _buf[i] = buf[i];
         }
     }
 
-    _String &operator=(_String const &other) {
-        *this = _String(other);
-        return *this;
-    }
+    always_inline _InlineString(_Str<E> str)
+        : _InlineString(str.buf(), str.len()) {}
 
-    _String &operator=(_String &&other) {
-        std::swap(_buf, other._buf);
-        std::swap(_len, other._len);
-        return *this;
-    }
+    always_inline _InlineString(Sliceable<Unit> auto const &other)
+        : _InlineString(other.buf(), other.len()) {}
 
-    always_inline _Str<E> str() const { return {buf(), len()}; }
+    always_inline _Str<E> str() const { return *this; }
+
     always_inline Unit const &operator[](usize i) const {
-        if (i >= _len)
-            panic("index out of bounds");
-        return buf()[i];
+        return _buf[i];
     }
-    always_inline Unit const *buf() const { return _len ? _buf : NIL.buf(); }
+
+    always_inline Unit const *buf() const { return _buf.buf(); }
+
     always_inline usize len() const { return _len; }
 
     always_inline auto operator<=>(Unit const *cstr) const
@@ -130,7 +94,100 @@ struct _String {
         return str() == _Str<E>(cstr);
     }
 
-    constexpr explicit operator bool() const {
+    always_inline constexpr explicit operator bool() const {
+        return _len > 0;
+    }
+};
+
+template <usize N>
+using InlineString = _InlineString<Utf8, N>;
+
+template <StaticEncoding E>
+struct _String {
+    using Encoding = E;
+    using Unit = typename E::Unit;
+    using Inner = Unit;
+
+    static constexpr Array<Unit, 1> _EMPTY = {0};
+
+    Unit *_buf = nullptr;
+    usize _len = 0;
+
+    constexpr _String() = default;
+
+    always_inline _String(Move, Unit *buf, usize len)
+        : _buf(buf),
+          _len(len) {
+    }
+
+    _String(Unit const *buf, usize len)
+        : _len(len) {
+        if (len == 0)
+            // Allow initializing the string using "" and not allocating memory.
+            return;
+        _buf = new Unit[len + 1];
+        _buf[len] = 0;
+        memcpy(_buf, buf, len * sizeof(Unit));
+    }
+
+    always_inline _String(_Str<E> str)
+        : _String(str.buf(), str.len()) {}
+
+    always_inline _String(Sliceable<Unit> auto const &other)
+        : _String(other.buf(), other.len()) {}
+
+    always_inline _String(_String const &other)
+        : _String(other._buf, other._len) {
+    }
+
+    always_inline _String(_String &&other)
+        : _buf(std::exchange(other._buf, nullptr)),
+          _len(std::exchange(other._len, 0)) {
+    }
+
+    ~_String() {
+        if (_buf) {
+            _len = 0;
+            delete[] std::exchange(_buf, nullptr);
+        }
+    }
+
+    always_inline _String &operator=(_String const &other) {
+        *this = _String(other);
+        return *this;
+    }
+
+    always_inline _String &operator=(_String &&other) {
+        std::swap(_buf, other._buf);
+        std::swap(_len, other._len);
+        return *this;
+    }
+
+    always_inline _Str<E> str() const { return *this; }
+
+    always_inline Unit const &operator[](usize i) const {
+        if (i >= _len)
+            panic("index out of bounds");
+        return buf()[i];
+    }
+
+    always_inline Unit const *buf() const { return _len ? _buf : _EMPTY.buf(); }
+
+    always_inline usize len() const { return _len; }
+
+    always_inline auto operator<=>(Unit const *cstr) const
+        requires(Meta::Same<Unit, char>)
+    {
+        return str() <=> _Str<E>(cstr);
+    }
+
+    always_inline auto operator==(Unit const *cstr) const
+        requires(Meta::Same<Unit, char>)
+    {
+        return str() == _Str<E>(cstr);
+    }
+
+    always_inline constexpr explicit operator bool() const {
         return _len > 0;
     }
 };
@@ -156,24 +213,21 @@ bool eqCi(_Str<E> a, _Str<E> b) {
     if (a.len() != b.len())
         return false;
 
-    Cursor<typename E::Unit> aCursor(a);
-    Cursor<typename E::Unit> bCursor(b);
+    Cursor<typename E::Unit> aCursor{a};
+    Cursor<typename E::Unit> bCursor{b};
 
     while (not aCursor.ended()) {
         Rune aRune;
         Rune bRune;
 
-        if (not E::decodeUnit(aRune, aCursor)) {
+        if (not E::decodeUnit(aRune, aCursor))
             return false;
-        }
 
-        if (not E::decodeUnit(bRune, bCursor)) {
+        if (not E::decodeUnit(bRune, bCursor))
             return false;
-        }
 
-        if (aRune != bRune and toAsciiLower(aRune) != toAsciiLower(bRune)) {
+        if (aRune != bRune and toAsciiLower(aRune) != toAsciiLower(bRune))
             return false;
-        }
     }
 
     return true;

@@ -3,6 +3,24 @@
 
 namespace Karm::Base::Tests {
 
+test$(defaultConstructedInlineString) {
+    InlineString<16> str;
+
+    expectEq$(str.len(), 0uz);
+    expectEq$(str, ""s);
+
+    return Ok();
+}
+
+test$(valueConstructedInlineString) {
+    InlineString<16> str("Hello, World!");
+
+    expectEq$(str.len(), 13uz);
+    expectEq$(str, "Hello, World!");
+
+    return Ok();
+}
+
 test$(defaultConstructedString) {
     String str;
     expectEq$(str.len(), 0uz);
@@ -11,6 +29,15 @@ test$(defaultConstructedString) {
     // constructed String, buf() will lie to us and return ""
     // but internally it is nullptr and no buffer has been allocated.
     expectEq$(str._buf, nullptr);
+
+    return Ok();
+}
+
+test$(valueConstructedString) {
+    String str("Hello, World!");
+
+    expectEq$(str.len(), 13uz);
+    expectEq$(str, "Hello, World!");
 
     return Ok();
 }

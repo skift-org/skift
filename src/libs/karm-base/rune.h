@@ -12,6 +12,8 @@ namespace Karm {
 
 using Rune = u32;
 
+static constexpr Rune REPLACEMENT = U'�';
+
 template <typename T>
 concept StaticEncoding = requires(T t, Rune &r, typename T::Unit u, Cursor<typename T::Unit> &c, MutCursor<typename T::Unit> &m) {
     { T::unitLen(u) } -> Meta::Same<usize>;
@@ -49,7 +51,8 @@ struct _Single {
 
     _Single() = default;
 
-    _Single(Unit u) : _buf(u) {}
+    _Single(Unit u)
+        : _buf(u) {}
 
     void put(Unit u) {
         _buf = u;

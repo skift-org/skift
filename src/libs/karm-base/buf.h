@@ -303,49 +303,43 @@ struct InlineBuf {
     constexpr InlineBuf() = default;
 
     InlineBuf(usize cap) {
-        if (cap > N) {
+        if (cap > N)
             panic("cap too large");
-        }
     }
 
-    InlineBuf(std::initializer_list<T> other) {
-        _len = other.size();
-        if (_len > N) {
-            panic("cap too large");
-        }
-        for (usize i = 0; i < _len; i++) {
-            _buf[i].ctor(std::move(other.begin()[i]));
-        }
+    InlineBuf(T const *buf, usize len) {
+        if (len > N)
+            panic("len too large");
+        _len = len;
+        for (usize i = 0; i < _len; i++)
+            _buf[i].ctor(buf[i]);
     }
 
-    InlineBuf(Sliceable<T> auto const &other) {
-        _len = other.len();
-
-        if (_len > N) {
-            panic("cap too large");
-        }
-
-        for (usize i = 0; i < _len; i++) {
-            _buf[i].ctor(other[i]);
-        }
+    InlineBuf(std::initializer_list<T> other)
+        : InlineBuf(other.begin(), other.size()) {
     }
 
-    InlineBuf(InlineBuf const &other) {
-        _len = other._len;
-        if (_len > N) {
-            panic("cap too large");
-        }
-        for (usize i = 0; i < _len; i++) {
-            _buf[i].ctor(other[i]);
-        }
+    InlineBuf(Sliceable<T> auto const &other)
+        : InlineBuf(other.buf(), other.len()) {
+    }
+
+    InlineBuf(InlineBuf const &other)
+        : InlineBuf(other.buf(), other.len()) {
     }
 
     InlineBuf(InlineBuf &&other) {
-        std::swap(_buf, other._buf);
-        std::swap(_len, other._len);
+        for (usize i = 0; i < N; i++) {
+            _buf[i].ctor(std::move(other._buf[i].take()));
+        }
+        _len = other._len;
     }
 
-    ~InlineBuf() = default;
+    ~InlineBuf() {
+        for (usize i = 0; i < _len; i++) {
+            _buf[i].dtor();
+        }
+        _len = 0;
+    }
 
     InlineBuf &operator=(InlineBuf const &other) {
         *this = InlineBuf(other);
@@ -353,19 +347,32 @@ struct InlineBuf {
     }
 
     InlineBuf &operator=(InlineBuf &&other) {
-        std::swap(_buf, other._buf);
-        std::swap(_len, other._len);
+        // Move comme
+        for (size_t i = 0; i < min(_len, other._len); i++)
+            buf()[i] = std::move(other.buf()[i]);
+
+        for (size_t i = _len; i < other._len; i++)
+            _buf[i].ctor(std::move(other._buf[i].take()));
+
+        for (size_t i = other._len; i < _len; i++)
+            _buf[i].dtor();
+
+        _len = other._len;
+
         return *this;
     }
 
-    constexpr T &operator[](usize i) { return _buf[i].unwrap(); }
+    constexpr T &operator[](usize i) {
+        return _buf[i].unwrap();
+    }
 
-    constexpr T const &operator[](usize i) const { return _buf[i].unwrap(); }
+    constexpr T const &operator[](usize i) const {
+        return _buf[i].unwrap();
+    }
 
     void ensure(usize len) {
-        if (len > N) {
+        if (len > N)
             panic("cap too large");
-        }
     }
 
     void fit() {

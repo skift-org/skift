@@ -12,11 +12,13 @@ static constexpr Array SUFFIXES2MIME = {
     Suffix2Mime{"css", "text/css; charset=UTF-8"},
     Suffix2Mime{"js", "application/javascript; charset=UTF-8"},
     Suffix2Mime{"pdf", "application/pdf"},
+
     Suffix2Mime{"png", "image/png"},
     Suffix2Mime{"jpg", "image/jpeg"},
     Suffix2Mime{"jpeg", "image/jpeg"},
     Suffix2Mime{"ico", "image/x-icon"},
     Suffix2Mime{"svg", "image/svg+xml"},
+
     Suffix2Mime{"woff", "font/woff"},
     Suffix2Mime{"woff2", "font/woff2"},
     Suffix2Mime{"ttf", "font/ttf"},
@@ -24,6 +26,7 @@ static constexpr Array SUFFIXES2MIME = {
     Suffix2Mime{"otf", "font/otf"},
     Suffix2Mime{"json", "application/json"},
     Suffix2Mime{"txt", "text/plain; charset=UTF-8"},
+    Suffix2Mime{"xml", "text/xml; charset=UTF-8"},
     Suffix2Mime{"mov", "video/quicktime"},
     Suffix2Mime{"mp4", "video/mp4"},
     Suffix2Mime{"webm", "video/webm"},

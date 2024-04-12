@@ -17,7 +17,7 @@ using OnChange = Meta::Cond<
 template <typename T>
 [[gnu::used]] static auto IGNORE(Ui::Node &, T) {}
 
-/* --- Button --------------------------------------------------------------- */
+// MARK: Button ----------------------------------------------------------------
 
 struct MouseListener {
     enum MouseState {
@@ -160,25 +160,25 @@ Child button(OnPress onPress, Mdi::Icon i);
 
 Child button(OnPress onPress, Mdi::Icon i, Str t);
 
-/* --- Input ---------------------------------------------------------------- */
+// MARK: Input -----------------------------------------------------------------
 
 Child input(Strong<Textbox::Model> text, OnChange<> onChange, Gfx::TextStyle style);
 
 Child input(Strong<Textbox::Model> text, OnChange<> onChange);
 
-/* --- Toggle --------------------------------------------------------------- */
+// MARK: Toggle ----------------------------------------------------------------
 
 Child toggle(bool value, OnChange<bool> onChange);
 
-/* --- Checkbox ------------------------------------------------------------- */
+// MARK: Checkbox --------------------------------------------------------------
 
 Child checkbox(bool value, OnChange<bool> onChange);
 
-/* --- Radio ---------------------------------------------------------------- */
+// MARK: Radio -----------------------------------------------------------------
 
 Child radio(bool value, OnChange<bool> onChange);
 
-/* --- Slider --------------------------------------------------------------- */
+// MARK: Slider ----------------------------------------------------------------
 
 Child slider(f64 value, OnChange<f64> onChange, Child child);
 
@@ -188,13 +188,13 @@ static inline auto slider(f64 value, OnChange<f64> onChange) {
     };
 }
 
-/* --- Select --------------------------------------------------------------- */
+// MARK: Select ----------------------------------------------------------------
 
-/* --- Color ---------------------------------------------------------------- */
+// MARK: Color -----------------------------------------------------------------
 
 Child color(Gfx::Color color, OnChange<Gfx::Color> onChange);
 
-/* --- Intent --------------------------------------------------------------- */
+// MARK: Intent ----------------------------------------------------------------
 
 using Filter = Func<void(Node &, Sys::Event &e)>;
 

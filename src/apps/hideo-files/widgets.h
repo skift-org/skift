@@ -7,7 +7,7 @@
 
 namespace Hideo::Files {
 
-/* --- Common Widgets ------------------------------------------------------- */
+// MARK: Common Widgets --------------------------------------------------------
 
 Ui::Child directoryListing(State const &, Sys::Dir const &);
 
@@ -25,7 +25,7 @@ Ui::Child toolbar(State const &);
 
 Ui::Child alert(State const &state, String title, String body);
 
-/* ---  Dialogs  ------------------------------------------------------------ */
+// MARK:  Dialogs  -------------------------------------------------------------
 
 Ui::Child openFileDialog();
 

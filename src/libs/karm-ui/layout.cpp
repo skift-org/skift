@@ -6,7 +6,7 @@ namespace Karm::Ui {
 
 struct Grow;
 
-/* --- Empty ---------------------------------------------------------------- */
+// MARK: Empty -----------------------------------------------------------------
 
 struct Empty : public View<Empty> {
     Math::Vec2i _size;
@@ -43,7 +43,7 @@ Child cond(bool cond, Child child) {
     return empty();
 }
 
-/* --- Bound ---------------------------------------------------------------- */
+// MARK: Bound -----------------------------------------------------------------
 
 struct Bound : public ProxyNode<Bound> {
     Math::Recti _bound;
@@ -101,7 +101,7 @@ Child placed(Math::Recti place, Child child) {
     return makeStrong<Placed>(place, child);
 }
 
-/* --- Separator ------------------------------------------------------------ */
+// MARK: Separator -------------------------------------------------------------
 
 struct Separator : public View<Separator> {
     Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
@@ -120,7 +120,7 @@ Child separator() {
     return makeStrong<Separator>();
 }
 
-/* --- Align ---------------------------------------------------------------- */
+// MARK: Align -----------------------------------------------------------------
 
 struct Align : public ProxyNode<Align> {
     Layout::Align _align;
@@ -187,7 +187,7 @@ Child vcenterFill(Child child) {
     return align(Layout::Align::VCENTER | Layout::Align::HFILL, child);
 }
 
-/* --- Sizing --------------------------------------------------------------- */
+// MARK: Sizing ----------------------------------------------------------------
 
 struct Sizing : public ProxyNode<Sizing> {
     Math::Vec2i _min;
@@ -257,7 +257,7 @@ Child pinSize(isize size, Child child) {
     return minSize(Math::Vec2i{size}, child);
 }
 
-/* --- Spacing -------------------------------------------------------------- */
+// MARK: Spacing ---------------------------------------------------------------
 
 struct Spacing : public ProxyNode<Spacing> {
     Layout::Spacingi _spacing;
@@ -294,7 +294,7 @@ Child spacing(Layout::Spacingi s, Child child) {
     return makeStrong<Spacing>(s, child);
 }
 
-/* --- Aspect Ratio --------------------------------------------------------- */
+// MARK: Aspect Ratio ----------------------------------------------------------
 
 struct AspectRatio : public ProxyNode<AspectRatio> {
     f64 _ratio;
@@ -329,7 +329,7 @@ Child aspectRatio(f64 ratio, Child child) {
     return makeStrong<AspectRatio>(ratio, child);
 }
 
-/* --- Stack ---------------------------------------------------------------- */
+// MARK: Stack -----------------------------------------------------------------
 
 struct StackLayout : public GroupNode<StackLayout> {
     using GroupNode::GroupNode;
@@ -350,7 +350,7 @@ Child stack(Children children) {
     return makeStrong<StackLayout>(children);
 }
 
-/* --- Flow ----------------------------------------------------------------- */
+// MARK: Flow ------------------------------------------------------------------
 
 struct Grow : public ProxyNode<Grow> {
     isize _grow;
@@ -471,7 +471,7 @@ Child flow(FlowStyle style, Children children) {
     return makeStrong<FlowLayout>(style, children);
 }
 
-/* --- Grid ----------------------------------------------------------------- */
+// MARK: Grid ------------------------------------------------------------------
 
 struct Cell : public ProxyNode<Cell> {
     Math::Vec2i _start{};

@@ -5,7 +5,7 @@
 
 namespace Karm::Events {
 
-/* --- Mouse -------------------------------------------- */
+// MARK: Mouse ---------------------------------------------
 
 enum struct Button : u8 {
     NONE = 0,
@@ -19,7 +19,7 @@ enum struct Button : u8 {
 
 FlagsEnum$(Button);
 
-/* --- Keyboard ----------------------------------------- */
+// MARK: Keyboard ------------------------------------------
 
 enum struct Mod : u8 {
     NONE = 0,

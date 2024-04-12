@@ -16,7 +16,7 @@ struct Device : public Node {
     Device(Cmos &cmos) : _cmos(cmos) {}
 };
 
-/* --- CMOS ----------------------------------------------------------------- */
+// MARK: CMOS ------------------------------------------------------------------
 
 struct Cmos : public Node {
     using AddrReg = Hal::Reg<u8, 0x0>;
@@ -48,7 +48,7 @@ struct Cmos : public Node {
     Res<> waitUpdate();
 };
 
-/* --- RTC ------------------------------------------------------------------ */
+// MARK: RTC -------------------------------------------------------------------
 
 struct Rtc : public Device {
     using Device::Device;

@@ -21,7 +21,7 @@ struct Addr {
 struct Device : public Node {
 };
 
-/* --- Group, Bus, Slot, Func ----------------------------------------------- */
+// MARK: Group, Bus, Slot, Func ------------------------------------------------
 
 struct Group : public Device {
 };

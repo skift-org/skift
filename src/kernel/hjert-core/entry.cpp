@@ -136,7 +136,7 @@ Res<> init(u64 magic, Handover::Payload &payload) {
 
 } // namespace Hjert::Core
 
-/* --- Handover Entry Point ------ ------------------------------------------ */
+// MARK: Handover Entry Point ------ -------------------------------------------
 
 HandoverRequests$(
     Handover::requestStack(),

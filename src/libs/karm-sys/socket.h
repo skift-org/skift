@@ -6,7 +6,7 @@
 
 namespace Karm::Sys {
 
-/* --- Abstract Socket ------------------------------------------------------ */
+// MARK: Abstract Socket -------------------------------------------------------
 
 struct _Connection :
     public Io::Reader,
@@ -82,7 +82,7 @@ struct _Listener :
     Strong<Fd> fd() { return _fd; }
 };
 
-/* --- Udp Socket ----------------------------------------------------------- */
+// MARK: Udp Socket ------------------------------------------------------------
 
 struct UdpConnection :
     Meta::NoCopy {
@@ -114,7 +114,7 @@ struct UdpConnection :
     }
 };
 
-/* --- Tcp Socket ----------------------------------------------------------- */
+// MARK: Tcp Socket ------------------------------------------------------------
 
 struct TcpConnection :
     public Connection {
@@ -146,7 +146,7 @@ struct TcpListener :
     }
 };
 
-/* --- Ipc Socket ---------------------------------------------------------- */
+// MARK: Ipc Socket -----------------------------------------------------------
 
 struct IpcConnection {
     Strong<Sys::Fd> _fd;

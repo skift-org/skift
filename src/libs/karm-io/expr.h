@@ -24,7 +24,7 @@ Match match(Expr auto expr, _Str<E> input) {
                : Match::PARTIAL;
 }
 
-/* --- Combinators ---------------------------------------------------------- */
+// MARK: Combinators -----------------------------------------------------------
 
 /// Returns true if either of the expressions match pass as parameters
 inline constexpr Expr auto either(Expr auto... exprs) {
@@ -96,7 +96,7 @@ inline constexpr Expr auto untilAndConsume(Expr auto expr) {
     };
 }
 
-/* --- Quantifiers ---------------------------------------------------------- */
+// MARK: Quantifiers -----------------------------------------------------------
 
 /// Try to match an expression `atLeast` times and and stops when `atMost` times
 /// is reached, return true if atLeast is reached otherwise rewind the scanner.
@@ -181,7 +181,7 @@ inline Expr auto trap(Expr auto expr, auto cb) {
     };
 }
 
-/* --- Tokens --------------------------------------------------------------- */
+// MARK: Tokens ----------------------------------------------------------------
 
 /// Match nothing and return true.
 inline constexpr Expr auto nothing() {
@@ -245,7 +245,7 @@ inline constexpr Expr auto range(Rune start, Rune end) {
     };
 }
 
-/* --- Posix Classes -------------------------------------------------------- */
+// MARK: Posix Classes ---------------------------------------------------------
 
 /// Match an ASCII Character and consume it.
 inline constexpr Expr auto ascii() {
@@ -302,7 +302,7 @@ inline constexpr Expr auto blank() {
     return ctype(isAsciiBlank);
 }
 
-/* --- Utils ---------------------------------------------------------------- */
+// MARK: Utils -----------------------------------------------------------------
 
 /// Match a separator and consume it.
 /// A separator is a expr surrounded by spaces.

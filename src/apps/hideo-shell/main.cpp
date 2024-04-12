@@ -12,7 +12,7 @@
 
 namespace Hideo::Shell {
 
-/* --- Status Bar ----------------------------------------------------------- */
+// MARK: Status Bar ------------------------------------------------------------
 
 Ui::Child indicator(Media::Icon icon) {
     return Ui::icon(icon) |
@@ -47,7 +47,7 @@ Ui::Child statusbarButton(State const &state) {
     );
 }
 
-/* --- Navigation Bar ------------------------------------------------------- */
+// MARK: Navigation Bar --------------------------------------------------------
 
 Ui::Child navbar(State const &) {
     return Ui::buttonHandle(
@@ -56,7 +56,7 @@ Ui::Child navbar(State const &) {
            Ui::slideIn(Ui::SlideFrom::BOTTOM);
 }
 
-/* --- Taskbar -------------------------------------------------------------- */
+// MARK: Taskbar ---------------------------------------------------------------
 
 Ui::Child taskbar(State const &state) {
     auto appsButton = Ui::button(
@@ -121,7 +121,7 @@ Ui::Child taskbar(State const &state) {
     );
 }
 
-/* --- Shells --------------------------------------------------------------- */
+// MARK: Shells ----------------------------------------------------------------
 
 Ui::Child background(State const &state) {
     return Ui::image(state.background) |

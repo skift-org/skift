@@ -2,7 +2,7 @@
 
 namespace Karm::Ui {
 
-/* --- Dismisable ----------------------------------------------------------- */
+// MARK: Dismisable ------------------------------------------------------------
 
 struct Dismisable :
     public ProxyNode<Dismisable> {
@@ -123,7 +123,7 @@ Child dismisable(OnDismis onDismis, DismisDir dir, f64 threshold, Ui::Child chil
     return makeStrong<Dismisable>(std::move(onDismis), dir, threshold, std::move(child));
 }
 
-/* --- Drag Region ---------------------------------------------------------- */
+// MARK: Drag Region -----------------------------------------------------------
 
 struct DragRegion : public ProxyNode<DragRegion> {
     bool _grabbed{};
@@ -170,7 +170,7 @@ Child dragRegion(Child child) {
     return makeStrong<DragRegion>(child);
 }
 
-/* --- Handle --------------------------------------------------------------- */
+// MARK: Handle ----------------------------------------------------------------
 
 Child handle() {
     return empty({128, 4}) |

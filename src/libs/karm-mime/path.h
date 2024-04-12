@@ -10,7 +10,7 @@
 
 namespace Karm::Mime {
 
-/* --- Path ----------------------------------------------------------------- */
+// MARK: Path ------------------------------------------------------------------
 
 static inline Str suffixOf(Str str) {
     auto dotIndex = lastIndexOf(str, '.');

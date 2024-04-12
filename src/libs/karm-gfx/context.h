@@ -43,7 +43,7 @@ struct Context {
     LcdLayout _lcdLayout = RGB;
     bool _useSpaa = false;
 
-    /* --- Scope ------------------------------------------------------------ */
+    // MARK: Scope -------------------------------------------------------------
 
     // Begin drawing operations on the given pixels.
     void begin(MutPixels p);
@@ -92,7 +92,7 @@ struct Context {
         blit(offset - origin(), layer.pixels());
     }
 
-    /* --- Origin & Clipping ------------------------------------------------ */
+    // MARK: Origin & Clipping -------------------------------------------------
 
     // Get the current clipping rectangle.
     Math::Recti clip() const;
@@ -118,7 +118,7 @@ struct Context {
     // Set the current origin.
     void origin(Math::Vec2i pos);
 
-    /* --- Transform -------------------------------------------------------- */
+    // MARK: Transform ---------------------------------------------------------
 
     void _updateTransform() {
         _path.transform(current().transWithOrigin());
@@ -142,7 +142,7 @@ struct Context {
     // Reset the transformation matrix to the identity matrix.
     void identity();
 
-    /* --- Fill & Stroke ---------------------------------------------------- */
+    // MARK: Fill & Stroke -----------------------------------------------------
 
     // Get the current fill style.
     Paint const &fillStyle();
@@ -162,7 +162,7 @@ struct Context {
     // Set the current text font.
     Context &textFont(Media::Font style);
 
-    /* --- Drawing ---------------------------------------------------------- */
+    // MARK: Drawing -----------------------------------------------------------
 
     // Clear all pixels with respect to the current origin and clip.
     void clear(Color color = BLACK);
@@ -170,7 +170,7 @@ struct Context {
     // Clear the given rectangle with respect to the current origin and clip.
     void clear(Math::Recti rect, Color color = BLACK);
 
-    /* --- Blitting --------------------------------------------------------- */
+    // MARK: Blitting ----------------------------------------------------------
 
     void _blit(
         Pixels src,
@@ -193,7 +193,7 @@ struct Context {
     // Blit the given pixels to the current pixels at the given position.
     void blit(Math::Vec2i dest, Pixels pixels);
 
-    /* --- Shapes ----------------------------------------------------------- */
+    // MARK: Shapes ------------------------------------------------------------
 
     // Stroke a line
     void stroke(Math::Edgei edge);
@@ -240,7 +240,7 @@ struct Context {
     // Fill a text string
     void fill(Math::Vec2f baseline, Str str);
 
-    /* --- Debug ------------------------------------------------------------ */
+    // MARK: Debug -------------------------------------------------------------
     // These functions are mostly for debugging purposes. They let you draw
     // non-antialiased shapes and lines.
 
@@ -256,7 +256,7 @@ struct Context {
     // Draw the current path as a polygon.
     void plot(Gfx::Color color);
 
-    /* --- Paths ------------------------------------------------------------ */
+    // MARK: Paths -------------------------------------------------------------
 
     // (internal) Fill the current shape with the given paint.
     // NOTE: The shape must be flattened before calling this function.
@@ -315,7 +315,7 @@ struct Context {
     // Stroke the current path with the given style.
     void stroke(StrokeStyle style);
 
-    /* --- Filters ---------------------------------------------------------- */
+    // MARK: Filters -----------------------------------------------------------
 
     // Apply the given filter to the current pixels.
     void apply(Filter filter);

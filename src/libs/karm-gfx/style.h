@@ -7,7 +7,7 @@
 
 namespace Karm::Gfx {
 
-/* --- Border Style -------------------------------------------------------- */
+// MARK: Border Style ---------------------------------------------------------
 
 struct BorderRadius {
     f64 topLeft{};
@@ -28,7 +28,7 @@ struct BorderRadius {
         : topLeft(topLeft), topRight(topRight), bottomRight(bottomRight), bottomLeft(bottomLeft) {}
 };
 
-/* --- Stroke Style --------------------------------------------------------- */
+// MARK: Stroke Style ----------------------------------------------------------
 
 enum StrokeAlign {
     CENTER_ALIGN,

@@ -20,7 +20,7 @@ static constexpr T unpack(BScan &s) {
     return Packer<T>::unpack(s);
 }
 
-/* --- Trivialy Copyable ---------------------------------------------------- */
+// MARK: Trivialy Copyable -----------------------------------------------------
 
 template <Meta::TrivialyCopyable T>
 struct Packer<T> {
@@ -35,7 +35,7 @@ struct Packer<T> {
     }
 };
 
-/* --- Optionals ------------------------------------------------------------ */
+// MARK: Optionals -------------------------------------------------------------
 
 template <>
 struct Packer<None> {
@@ -100,7 +100,7 @@ struct Packer<Res<T, E>> {
     }
 };
 
-/* --- Reflectable --------------------------------------------------------- */
+// MARK: Reflectable ----------------------------------------------------------
 
 template <Reflectable T>
 struct Packer<T> {
@@ -119,7 +119,7 @@ struct Packer<T> {
     }
 };
 
-/* --- Sliceable -------------------------------------------------------------- */
+// MARK: Sliceable ---------------------------------------------------------------
 
 template <typename T>
 struct Packer<Vec<T>> {
@@ -141,7 +141,7 @@ struct Packer<Vec<T>> {
     }
 };
 
-/* --- Strings -------------------------------------------------------------- */
+// MARK: Strings ---------------------------------------------------------------
 
 template <StaticEncoding E>
 struct Packer<_String<E>> {
@@ -159,7 +159,7 @@ struct Packer<_String<E>> {
     }
 };
 
-/* --- Tuple ---------------------------------------------------------------- */
+// MARK: Tuple -----------------------------------------------------------------
 
 template <typename Car, typename Cdr>
 struct Packer<Cons<Car, Cdr>> {

@@ -176,7 +176,7 @@ Res<Stat> stat(Mime::Url const &url) {
     return Ok(Posix::fromStat(buf));
 }
 
-/* --- Sockets -------------------------------------------------------------- */
+// MARK: Sockets ---------------------------------------------------------------
 
 Res<Strong<Sys::Fd>> listenUdp(SocketAddr addr) {
     int fd = ::socket(AF_INET, SOCK_DGRAM, 0);
@@ -244,7 +244,7 @@ Res<Strong<Sys::Fd>> listenIpc(Mime::Url url) {
     return Ok(makeStrong<Posix::Fd>(fd));
 }
 
-/* --- Time ----------------------------------------------------------------- */
+// MARK: Time ------------------------------------------------------------------
 
 TimeSpan fromTimeSpec(struct timespec const &ts) {
     auto usecs = (u64)ts.tv_sec * 1000000 + (u64)ts.tv_nsec / 1000;
@@ -263,7 +263,7 @@ TimeSpan uptime() {
     return fromTimeSpec(ts);
 }
 
-/* --- Memory Managment ----------------------------------------------------- */
+// MARK: Memory Managment ------------------------------------------------------
 
 isize mmapOptionsToProt(Sys::MmapOptions const &options) {
     isize prot = 0;
@@ -365,7 +365,7 @@ Res<> populate(Vec<Sys::UserInfo> &infos) {
     return Ok();
 }
 
-/* --- Process Managment ---------------------------------------------------- */
+// MARK: Process Managment -----------------------------------------------------
 
 Res<> sleep(TimeSpan span) {
     struct timespec ts;

@@ -24,7 +24,7 @@ using HashSum = decltype(Meta::declval<T>().sum());
 template <usize bits, typename TAG>
 struct Digest : public Array<u8, alignUp(bits, 8) / 8> {
 };
-/* --- Utilities ------------------------------------------------------------ */
+// MARK: Utilities -------------------------------------------------------------
 
 template <HashFunc H>
 struct SummerReader : public Io::Reader {

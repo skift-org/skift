@@ -78,7 +78,7 @@ struct I8042 : public Node {
 
     Res<> flush();
 
-    /* --- Data and Status --- */
+    // MARK: Data and Status
 
     Res<Flags<Status>> readStatus();
 
@@ -92,7 +92,7 @@ struct I8042 : public Node {
 
     Res<> writeCmd(Cmd cmd);
 
-    /* --- Configs --- */
+    // MARK: Configs
 
     Res<> writeConfig(Flags<Configs> cfg);
 

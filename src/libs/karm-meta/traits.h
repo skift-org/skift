@@ -8,7 +8,7 @@ struct Bool;
 
 namespace Karm::Meta {
 
-/* --- Primary type categories ---------------------------------------------- */
+// MARK: Primary type categories -----------------------------------------------
 
 template <typename T>
 concept Void = __is_void(T);
@@ -52,7 +52,7 @@ concept Struct = __is_class(T);
 template <typename T>
 concept Integral = __is_integral(T);
 
-/* --- Type properties ------------------------------------------------------ */
+// MARK: Type properties -------------------------------------------------------
 
 template <typename T>
 concept Trivial = __is_trivial(T);
@@ -81,7 +81,7 @@ concept UnsignedIntegral = Integral<T> and Unsigned<T>;
 template <typename T>
 using UnderlyingType = __underlying_type(T);
 
-/* --- Type relationships --------------------------------------------------- */
+// MARK: Type relationships ----------------------------------------------------
 
 template <typename Derived, typename Base>
 concept Derive = __is_base_of(Base, Derived);

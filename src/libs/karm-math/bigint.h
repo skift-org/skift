@@ -6,7 +6,7 @@
 
 namespace Karm::Math {
 
-/* --- Unsigned Big Integer ------------------------------------------------- */
+// MARK: Unsigned Big Integer --------------------------------------------------
 // aka natural number
 
 struct UBig;
@@ -283,7 +283,7 @@ struct UBig {
     }
 };
 
-/* --- Signed Big Integer --------------------------------------------------- */
+// MARK: Signed Big Integer ----------------------------------------------------
 // aka integer number
 
 struct IBig;
@@ -527,7 +527,7 @@ struct IBig {
     }
 };
 
-/* --- Fractional Number ---------------------------------------------------- */
+// MARK: Fractional Number -----------------------------------------------------
 // aka rational number
 
 struct Frac;

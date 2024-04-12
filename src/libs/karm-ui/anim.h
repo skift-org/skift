@@ -164,7 +164,7 @@ using Eased2i = Eased2<isize>;
 
 using Eased2f = Eased2<f64>;
 
-/* --- Slide In ------------------------------------------------------------- */
+// MARK: Slide In --------------------------------------------------------------
 
 enum struct SlideFrom {
     START,
@@ -181,7 +181,7 @@ inline auto slideIn(SlideFrom from) {
     };
 }
 
-/* --- Carousel ------------------------------------------------------------- */
+// MARK: Carousel --------------------------------------------------------------
 
 Child carousel(usize selected, Children children, Layout::Flow flow = Layout::Flow::LEFT_TO_RIGHT);
 

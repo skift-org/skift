@@ -8,7 +8,7 @@
 
 namespace Loader {
 
-/* --- Model ---------------------------------------------------------------- */
+// MARK: Model -----------------------------------------------------------------
 
 struct State {
     Configs configs;
@@ -46,7 +46,7 @@ void reduce(State &s, Action a) {
 
 using Model = Ui::Model<State, Action, reduce>;
 
-/* --- Views ---------------------------------------------------------------- */
+// MARK: Views -----------------------------------------------------------------
 
 Ui::Child icon(Entry const &e) {
     return e.icon.visit(Visitor{

@@ -118,7 +118,7 @@ using DummyFunction = void *;
 
 static_assert(sizeof(Method<>) == sizeof(void *), "Method must be packed");
 
-/* --- 4 System Table ------------------------------------------------------- */
+// MARK: 4 System Table --------------------------------------------------------
 
 struct TableHeader {
     u64 signature;
@@ -132,7 +132,7 @@ struct Table {
     TableHeader header;
 };
 
-/* --- 4.3 System Table ----------------------------------------------------- */
+// MARK: 4.3 System Table ------------------------------------------------------
 
 struct SimpleTextInputProtocol;
 struct SimpleTextOutputProtocol;
@@ -177,7 +177,7 @@ struct SystemTable : public Table {
     }
 };
 
-/* --- 7 Boot Services ------------------------------------------------------ */
+// MARK: 7 Boot Services -------------------------------------------------------
 
 enum struct AllocateType : u32 {
     ANY_PAGES,
@@ -288,7 +288,7 @@ struct BootService : public Table {
     DummyFunction createEventEx;
 };
 
-/* --- 8 Runtime Services --------------------------------------------------- */
+// MARK: 8 Runtime Services ----------------------------------------------------
 
 enum struct ResetType {
     RESET_COLD,
@@ -325,7 +325,7 @@ struct RuntimeService : public Table {
     DummyFunction queryVariableInfo;
 };
 
-/* --- 9.1 Load Image Protocol ---------------------------------------------- */
+// MARK: 9.1 Load Image Protocol -----------------------------------------------
 
 struct DevicePathProtocol;
 
@@ -353,7 +353,7 @@ struct LoadedImageProtocol {
     Function<Handle> unload;
 };
 
-/* --- 10 Device Path Protocol ---------------------------------------------- */
+// MARK: 10 Device Path Protocol -----------------------------------------------
 
 struct DevicePathProtocol {
     static constexpr Guid GUID = Guid{0x09576e91, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
@@ -363,7 +363,7 @@ struct DevicePathProtocol {
     u8 length[2];
 };
 
-/* --- 12.3 Simple Text Input Protocol -------------------------------------- */
+// MARK: 12.3 Simple Text Input Protocol ---------------------------------------
 
 enum ScanCode : u16 {
     NONE = 0x00,
@@ -508,7 +508,7 @@ struct SimpleTextInputProtocol {
     Event waitForKey;
 };
 
-/* --- 12.4 Simple Text Output Protocol ------------------------------------- */
+// MARK: 12.4 Simple Text Output Protocol --------------------------------------
 
 #define EFI_BLACK 0x00
 #define EFI_BLUE 0x01
@@ -556,7 +556,7 @@ struct SimpleTextOutputProtocol {
     SimpleTextOutputMode *mode;
 };
 
-/* --- 12.9 Graphics Output Protocol ---------------------------------------- */
+// MARK: 12.9 Graphics Output Protocol -----------------------------------------
 
 struct PixelBitmask {
     u32 redMask;
@@ -600,7 +600,7 @@ struct GraphicsOutputProtocol {
     GraphicsOutputProtocolMode *mode;
 };
 
-/* --- 13.4 Simple File System Protocol ------------------------------------- */
+// MARK: 13.4 Simple File System Protocol --------------------------------------
 
 struct FileProtocol;
 
@@ -611,7 +611,7 @@ struct SimpleFileSystemProtocol {
     Method<FileProtocol **> openVolume;
 };
 
-/* --- 13.5 File Protocol --------------------------------------------------- */
+// MARK: 13.5 File Protocol ----------------------------------------------------
 
 struct FileInfo {
     static constexpr Guid GUID = Guid{0x09576e92, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};

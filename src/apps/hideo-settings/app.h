@@ -4,7 +4,7 @@
 
 namespace Hideo::Settings {
 
-/* --- Model ---------------------------------------------------------------- */
+// MARK: Model -----------------------------------------------------------------
 
 enum struct Page {
     HOME,
@@ -49,7 +49,7 @@ void reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 
-/* --- Views ---------------------------------------------------------------- */
+// MARK: Views -----------------------------------------------------------------
 
 Ui::Child pageScafold(Ui::Child inner);
 

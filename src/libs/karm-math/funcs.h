@@ -6,7 +6,7 @@
 
 namespace Karm::Math {
 
-/* --- Other ---------------------------------------------------------------- */
+// MARK: Other -----------------------------------------------------------------
 
 constexpr auto abs(auto value) {
     return value < 0 ? -value : value;
@@ -21,7 +21,7 @@ constexpr bool epsilonEq(T lhs, T rhs, T epsilon) {
     return abs(lhs - rhs) < epsilon;
 }
 
-/* --- Floats --------------------------------------------------------------- */
+// MARK: Floats ----------------------------------------------------------------
 
 static constexpr bool isNan(f64 x) {
     return __builtin_isnan(x);
@@ -35,7 +35,7 @@ static constexpr bool isNegInf(f64 x) {
     return __builtin_isinf_sign(x) < 0;
 }
 
-/* --- Rounding + Remainder ------------------------------------------------- */
+// MARK: Rounding + Remainder --------------------------------------------------
 
 template <typename T>
 constexpr T floor(T x) {
@@ -57,7 +57,7 @@ constexpr isize round(f64 x) {
     return (isize)(x + 0.5);
 }
 
-/* --- Trigonometry --------------------------------------------------------- */
+// MARK: Trigonometry ----------------------------------------------------------
 
 enum Precision {
     PRECISE,
@@ -118,7 +118,7 @@ constexpr T cot(T x) noexcept {
     return T(1.) / tan<T, P>(x);
 }
 
-/* --- Exponentials --------------------------------------------------------- */
+// MARK: Exponentials ----------------------------------------------------------
 
 template <typename T>
 T exp(T x) {
@@ -149,7 +149,7 @@ T exp(T x) {
     return (result);
 }
 
-/* --- Power ---------------------------------------------------------------- */
+// MARK: Power -----------------------------------------------------------------
 
 template <typename T>
 constexpr T pow2(T x) {

@@ -8,7 +8,7 @@
 
 namespace Karm::Sys {
 
-/* --- Event ---------------------------------------------------------------- */
+// MARK: Event -----------------------------------------------------------------
 
 enum struct Propagation {
     NONE, //< Don't propagate futher than the target sink
@@ -112,7 +112,7 @@ Box<Event> makeEvent(Propagation propagation, Args &&...args) {
     return makeBox<_Event<T>>(propagation, std::forward<Args>(args)...);
 }
 
-/* --- Scheduler ------------------------------------------------------------ */
+// MARK: Scheduler -------------------------------------------------------------
 
 struct Sched :
     Meta::Static {

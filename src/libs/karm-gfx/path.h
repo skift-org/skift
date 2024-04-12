@@ -128,7 +128,7 @@ struct Path {
         });
     }
 
-    /* --- Flattening ------------------------------------------------------- */
+    // MARK: Flattening --------------------------------------------------------
 
     void _flattenClose();
 
@@ -144,7 +144,7 @@ struct Path {
 
     void _flattenArcTo(Math::Vec2f start, Math::Vec2f radius, f64 angle, Flags flags, Math::Vec2f point);
 
-    /* --- Transform -------------------------------------------------------- */
+    // MARK: Transform ---------------------------------------------------------
 
     void transform(Math::Trans2f trans) {
         _trans = trans;
@@ -154,7 +154,7 @@ struct Path {
         return _trans;
     }
 
-    /* --- Operations ------------------------------------------------------- */
+    // MARK: Operations --------------------------------------------------------
 
     void evalOp(Op op);
 
@@ -180,7 +180,7 @@ struct Path {
 
     void arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Flags flags = DEFAULT);
 
-    /* --- Shapes ----------------------------------------------------------- */
+    // MARK: Shapes ------------------------------------------------------------
 
     void line(Math::Edgef edge);
 
@@ -188,7 +188,7 @@ struct Path {
 
     void ellipse(Math::Ellipsef ellipse);
 
-    /* --- Svg -------------------------------------------------------------- */
+    // MARK: Svg ---------------------------------------------------------------
 
     Opt<Math::Vec2f> _nextVec2f(Io::SScan &scan);
 

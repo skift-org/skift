@@ -57,7 +57,7 @@ void Context::restore() {
     _updateTransform();
 }
 
-/* --- Origin & Clipping ---------------------------------------------------- */
+// MARK: Origin & Clipping -----------------------------------------------------
 
 Math::Recti Context::clip() const {
     return current().clip;
@@ -92,7 +92,7 @@ void Context::origin(Math::Vec2i pos) {
     _updateTransform();
 }
 
-/* --- Transform ------------------------------------------------------------ */
+// MARK: Transform -------------------------------------------------------------
 
 void Context::transform(Math::Trans2f trans) {
     auto &t = current().trans;
@@ -120,7 +120,7 @@ void Context::identity() {
     current().trans = Math::Trans2f::identity();
 }
 
-/* --- Fill & Stroke -------------------------------------------------------- */
+// MARK: Fill & Stroke ---------------------------------------------------------
 
 Paint const &Context::fillStyle() {
     return current().paint;
@@ -149,7 +149,7 @@ Context &Context::textFont(Media::Font font) {
     return *this;
 }
 
-/* --- Drawing -------------------------------------------------------------- */
+// MARK: Drawing ---------------------------------------------------------------
 
 void Context::clear(Color color) { clear(pixels().bound(), color); }
 
@@ -160,7 +160,7 @@ void Context::clear(Math::Recti rect, Color color) {
         .clear(color);
 }
 
-/* --- Blitting ------------------------------------------------------------- */
+// MARK: Blitting --------------------------------------------------------------
 
 [[gnu::flatten]] void Context::_blit(
     Pixels src, Math::Recti srcRect, auto srcFmt,
@@ -211,7 +211,7 @@ void Context::blit(Math::Vec2i dest, Pixels pixels) {
     blit(pixels.bound(), {dest, pixels.bound().wh}, pixels);
 }
 
-/* --- Shapes --------------------------------------------------------------- */
+// MARK: Shapes ----------------------------------------------------------------
 
 void Context::stroke(Math::Edgei edge) {
     begin();
@@ -363,7 +363,7 @@ void Context::fill(Math::Vec2f baseline, Str str) {
     }
 }
 
-/* --- Debug ---------------------------------------------------------------- */
+// MARK: Debug -----------------------------------------------------------------
 
 void Context::plot(Math::Vec2i point, Color color) {
     point = applyOrigin(point);
@@ -411,7 +411,7 @@ void Context::plot(Gfx::Color color) {
     }
 }
 
-/* --- Paths ---------------------------------------------------------------- */
+// MARK: Paths -----------------------------------------------------------------
 
 [[gnu::flatten]] void Context::_fillImpl(auto paint, auto format, FillRule fillRule) {
     _rast.fill(clip(), fillRule, [&](Rast::Frag frag) {
@@ -525,7 +525,7 @@ void Context::stroke(StrokeStyle style) {
     _fill(style.paint);
 }
 
-/* --- Effects -------------------------------------------------------------- */
+// MARK: Effects ---------------------------------------------------------------
 
 void Context::apply(Filter filter) {
     apply(filter, pixels().bound());

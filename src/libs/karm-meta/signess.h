@@ -2,7 +2,7 @@
 
 namespace Karm::Meta {
 
-/* --- Signed --------------------------------------------------------------- */
+// MARK: Signed ----------------------------------------------------------------
 
 template <typename T>
 struct _MakeSigned {
@@ -62,7 +62,7 @@ struct _MakeSigned<unsigned long long> {
 template <typename T>
 using MakeSigned = typename _MakeSigned<T>::Type;
 
-/* ---- Unsigned ------------------------------------------------------------ */
+// MARK:- Unsigned -------------------------------------------------------------
 
 template <typename T>
 struct _MakeUnsigned {

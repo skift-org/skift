@@ -12,7 +12,7 @@
 
 namespace Karm::Sys::_Embed {
 
-/* --- File I/O ------------------------------------------------------------- */
+// MARK: File I/O --------------------------------------------------------------
 
 Res<Strong<Sys::Fd>> openFile(Mime::Url const &url);
 
@@ -32,7 +32,7 @@ Res<Vec<Sys::DirEntry>> readDir(Mime::Url const &url);
 
 Res<Stat> stat(Mime::Url const &url);
 
-/* --- Sockets -------------------------------------------------------------- */
+// MARK: Sockets ---------------------------------------------------------------
 
 Res<Strong<Sys::Fd>> listenUdp(SocketAddr addr);
 
@@ -42,13 +42,13 @@ Res<Strong<Sys::Fd>> listenTcp(SocketAddr addr);
 
 Res<Strong<Sys::Fd>> listenIpc(Mime::Url url);
 
-/* --- Time ----------------------------------------------------------------- */
+// MARK: Time ------------------------------------------------------------------
 
 TimeStamp now();
 
 TimeSpan uptime();
 
-/* --- Memory Managment ----------------------------------------------------- */
+// MARK: Memory Managment ------------------------------------------------------
 
 Res<Sys::MmapResult> memMap(Sys::MmapOptions const &options);
 
@@ -58,7 +58,7 @@ Res<> memUnmap(void const *buf, usize len);
 
 Res<> memFlush(void *flush, usize len);
 
-/* --- System Informations -------------------------------------------------- */
+// MARK: System Informations ---------------------------------------------------
 
 Res<> populate(Sys::SysInfo &);
 
@@ -70,13 +70,13 @@ Res<> populate(Sys::UserInfo &);
 
 Res<> populate(Vec<Sys::UserInfo> &);
 
-/* --- Process Managment ---------------------------------------------------- */
+// MARK: Process Managment -----------------------------------------------------
 
 Res<> sleep(TimeSpan);
 
 Res<> exit(i32);
 
-/* --- Asynchronous I/O ----------------------------------------------------- */
+// MARK: Asynchronous I/O ------------------------------------------------------
 
 Sched &globalSched();
 

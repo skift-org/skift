@@ -7,7 +7,7 @@
 
 namespace Karm::Media {
 
-/* --- Font loading --------------------------------------------------------- */
+// MARK: Font loading ----------------------------------------------------------
 
 Res<Strong<Fontface>> loadFontface(Sys::Mmap &&map);
 
@@ -19,7 +19,7 @@ Res<Font> loadFont(f64 size, Mime::Url url);
 
 Res<Font> loadFontOrFallback(f64 size, Mime::Url url);
 
-/* --- Image loading -------------------------------------------------------- */
+// MARK: Image loading ---------------------------------------------------------
 
 Res<Image> loadImage(Sys::Mmap &&map);
 

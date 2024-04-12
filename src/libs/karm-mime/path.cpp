@@ -4,7 +4,7 @@
 
 namespace Karm::Mime {
 
-/* --- Path ----------------------------------------------------------------- */
+// MARK: Path ------------------------------------------------------------------
 
 Path Path::parse(Io::SScan &s, bool inUrl, bool stopAtWhitespace) {
     Path path;

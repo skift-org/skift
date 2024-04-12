@@ -2,7 +2,7 @@
 
 namespace Karm::Gfx {
 
-/* --- Common --------------------------------------------------------------- */
+// MARK: Common ----------------------------------------------------------------
 
 static void _createArc(Shape &shape, Math::Vec2f center, Math::Vec2f start, Math::Vec2f end, f64 startAngle, f64 delta, f64 radius) {
     isize divs = 32; // FIXME: determine this procedurally
@@ -18,7 +18,7 @@ static void _createArc(Shape &shape, Math::Vec2f center, Math::Vec2f start, Math
     }
 }
 
-/* --- Line Join ------------------------------------------------------------ */
+// MARK: Line Join -------------------------------------------------------------
 
 static void _createJoinBevel(Shape &shape, Math::Edgef curr, Math::Edgef next) {
     shape.add({curr.end, next.start});
@@ -90,7 +90,7 @@ static void _createJoin(Shape &shape, StrokeStyle stroke, Math::Edgef curr, Math
     }
 }
 
-/* --- Line Cap ------------------------------------------------------------- */
+// MARK: Line Cap --------------------------------------------------------------
 
 struct Cap {
     Math::Vec2f start;
@@ -138,7 +138,7 @@ static void _createCap(Shape &shape, StrokeStyle stroke, Cap cap) {
     }
 }
 
-/* --- Public Api ----------------------------------------------------------- */
+// MARK: Public Api ------------------------------------------------------------
 
 [[gnu::flatten]] void createStroke(Shape &shape, Path const &path, StrokeStyle stroke) {
     f64 outerDist = 0;

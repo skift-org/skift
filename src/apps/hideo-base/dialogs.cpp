@@ -7,7 +7,7 @@
 
 namespace Hideo {
 
-/* --- Dialogs Scaffolding -------------------------------------------------- */
+// MARK: Dialogs Scaffolding ---------------------------------------------------
 
 Ui::Child dialogScafold(Layout::Align a, Ui::Child inner) {
     Ui::BoxStyle const boxStyle = {
@@ -45,7 +45,7 @@ Ui::Child dialogCloseButton() {
     );
 }
 
-/* --- Dialogs -------------------------------------------------------------- */
+// MARK: Dialogs ---------------------------------------------------------------
 
 Ui::Child versionBadge() {
     Ui::Children badges = {};

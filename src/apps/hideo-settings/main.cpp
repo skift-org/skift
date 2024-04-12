@@ -30,7 +30,7 @@ Ui::Child sidebar(State const &state) {
     return Hideo::sidenav(items);
 }
 
-/* --- Pages ---------------------------------------------------------------- */
+// MARK: Pages -----------------------------------------------------------------
 
 Ui::Child pageContent(State const &state) {
     switch (state.page()) {
@@ -49,7 +49,7 @@ Ui::Child pageContent(State const &state) {
     }
 }
 
-/* --- Body ----------------------------------------------------------------- */
+// MARK: Body ------------------------------------------------------------------
 
 Ui::Child app() {
     return Ui::reducer<Model>({}, [](State const &s) {

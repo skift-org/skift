@@ -192,7 +192,7 @@ Res<Strong<Sys::Fd>> createErr() {
     return Ok(makeStrong<ConOut>(Efi::st()->stdErr));
 }
 
-/* --- Sockets -------------------------------------------------------------- */
+// MARK: Sockets ---------------------------------------------------------------
 
 Res<Strong<Sys::Fd>> connectTcp(SocketAddr) {
     notImplemented();
@@ -210,7 +210,7 @@ Res<Strong<Sys::Fd>> listenIpc(Mime::Url) {
     notImplemented();
 }
 
-/* --- Files ---------------------------------------------------------------- */
+// MARK: Files -----------------------------------------------------------------
 
 static Opt<Web::Json::Value> _index = NONE;
 

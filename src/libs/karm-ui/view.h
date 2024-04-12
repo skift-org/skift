@@ -6,7 +6,7 @@
 
 namespace Karm::Ui {
 
-/* --- Base ----------------------------------------------------------------- */
+// MARK: Base ------------------------------------------------------------------
 
 template <typename Crtp>
 struct View : public LeafNode<Crtp> {
@@ -21,7 +21,7 @@ struct View : public LeafNode<Crtp> {
     }
 };
 
-/* --- Text ----------------------------------------------------------------- */
+// MARK: Text ------------------------------------------------------------------
 
 struct TextStyles {
 private:
@@ -100,7 +100,7 @@ DEF_STYLE(codeSmall)
 
 #undef DEF_STYLE
 
-/* --- Badge ---------------------------------------------------------------- */
+// MARK: Badge -----------------------------------------------------------------
 
 enum struct BadgeStyle {
     INFO,
@@ -115,25 +115,25 @@ Child badge(Gfx::Color color, String text);
 
 Child badge(BadgeStyle style, String text);
 
-/* --- Icon ----------------------------------------------------------------- */
+// MARK: Icon ------------------------------------------------------------------
 
 Child icon(Media::Icon icon, Opt<Gfx::Color> color = NONE);
 
 Child icon(Mdi::Icon icon, f64 size, Opt<Gfx::Color> color = NONE);
 
-/* --- Image ---------------------------------------------------------------- */
+// MARK: Image -----------------------------------------------------------------
 
 Child image(Media::Image image);
 
 Child image(Media::Image image, Gfx::BorderRadius radius);
 
-/* --- Canvas --------------------------------------------------------------- */
+// MARK: Canvas ----------------------------------------------------------------
 
 using OnPaint = Func<void(Gfx::Context &g, Math::Vec2i size)>;
 
 Child canvas(OnPaint onPaint);
 
-/* --- Blur ----------------------------------------------------------------- */
+// MARK: Blur ------------------------------------------------------------------
 
 Child backgroundFilter(Gfx::Filter f, Child child);
 

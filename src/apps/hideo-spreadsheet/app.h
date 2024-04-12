@@ -12,7 +12,7 @@
 
 namespace Hideo::Spreadsheet {
 
-/* --- Reducer -------------------------------------------------------------- */
+// MARK: Reducer ---------------------------------------------------------------
 
 using Value = Union<None, String, f64, bool>;
 
@@ -203,7 +203,7 @@ struct State {
     }
 };
 
-/* --- Actions -------------------------------------------------------------- */
+// MARK: Actions ---------------------------------------------------------------
 
 struct UpdateSelection {
     Opt<Range> range;
@@ -270,7 +270,7 @@ Res<> save(Model const &model, Io::Writer &writer);
 
 Res<Model> load(Io::Reader &reader);
 
-/* --- Views ---------------------------------------------------------------- */
+// MARK: Views -----------------------------------------------------------------
 
 Ui::Child table(State const &s);
 

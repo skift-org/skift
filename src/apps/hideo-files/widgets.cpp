@@ -11,7 +11,7 @@
 
 namespace Hideo::Files {
 
-/* --- Common Widgets ------------------------------------------------------- */
+// MARK: Common Widgets --------------------------------------------------------
 
 Ui::Child alert(State const &state, String title, String body) {
     return Ui::vflow(
@@ -203,7 +203,7 @@ Ui::Child toolbar(State const &state) {
     );
 }
 
-/* ---  Dialogs  ------------------------------------------------------------ */
+// MARK:  Dialogs  -------------------------------------------------------------
 
 Ui::Child openFileDialog() {
     return Ui::reducer<Model>(

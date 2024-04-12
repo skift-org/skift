@@ -71,7 +71,7 @@ void stop() {
     }
 }
 
-/* --- Cpu ------------------------------------------------------------------ */
+// MARK: Cpu -------------------------------------------------------------------
 
 struct Cpu : public Core::Cpu {
     void enableInterrupts() override {
@@ -93,7 +93,7 @@ Core::Cpu &globalCpu() {
     return _cpu;
 }
 
-/* --- Interrupts ----------------------------------------------------------- */
+// MARK: Interrupts ------------------------------------------------------------
 
 static char const *_faultMsg[32] = {
     "division-by-zero",
@@ -214,7 +214,7 @@ void yield() {
     asm volatile("int $100");
 }
 
-/* --- Syscalls ------------------------------------------------------------- */
+// MARK: Syscalls --------------------------------------------------------------
 
 extern "C" usize _sysDispatch(usize sp) {
     auto *frame = reinterpret_cast<Frame *>(sp);
@@ -238,7 +238,7 @@ extern "C" usize _sysDispatch(usize sp) {
     return (usize)Error::_OK;
 }
 
-/* --- Vmm ------------------------------------------------------------------ */
+// MARK: Vmm -------------------------------------------------------------------
 
 static x86_64::Pml<4> *_kpml4 = nullptr;
 static Opt<x86_64::Vmm<Hal::UpperHalfMapper>> _vmm = NONE;
@@ -287,7 +287,7 @@ Res<Strong<Hal::Vmm>> createVmm() {
     return Ok(makeStrong<UserVmm>(pml4));
 }
 
-/* --- Tasking -------------------------------------------------------------- */
+// MARK: Tasking ---------------------------------------------------------------
 
 struct Ctx : public Core::Ctx {
     usize _ksp;

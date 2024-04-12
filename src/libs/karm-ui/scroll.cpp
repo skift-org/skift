@@ -2,7 +2,7 @@
 
 namespace Karm::Ui {
 
-/* --- Scroll --------------------------------------------------------------- */
+// MARK: Scroll ----------------------------------------------------------------
 
 struct Scroll : public ProxyNode<Scroll> {
     bool _mouseIn = false;

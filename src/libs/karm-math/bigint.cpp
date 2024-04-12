@@ -2,7 +2,7 @@
 
 namespace Karm::Math {
 
-/* --- Unsigned Big Integer ------------------------------------------------- */
+// MARK: Unsigned Big Integer --------------------------------------------------
 
 void _add(UBig &lhs, usize rhs) {
     auto lhsLen = lhs._len();
@@ -250,7 +250,7 @@ void _pow(UBig const &base, UBig const &exp, UBig &res) {
     }
 }
 
-/* --- Signed Big Integer --------------------------------------------------- */
+// MARK: Signed Big Integer ----------------------------------------------------
 
 void _add(IBig &lhs, IBig const &rhs) {
     if (lhs._sign == rhs._sign) {
@@ -321,7 +321,7 @@ void _pow(IBig const &base, UBig const &exp, IBig &res) {
     }
 }
 
-/* --- Fractional Numbers --------------------------------------------------- */
+// MARK: Fractional Numbers ----------------------------------------------------
 
 void _fromF64(Frac &frac, f64 value) {
     IBig const TEN = 10_ibig;

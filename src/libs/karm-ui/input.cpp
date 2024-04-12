@@ -7,7 +7,7 @@
 
 namespace Karm::Ui {
 
-/* --- Button ---------------------------------------------------------------- */
+// MARK: Button -----------------------------------------------------------------
 
 ButtonStyle ButtonStyle::none() {
     return {};
@@ -260,7 +260,7 @@ Child button(OnPress onPress, Mdi::Icon i, Str t) {
     return button(std::move(onPress), ButtonStyle::regular(), i, t);
 }
 
-/* --- Input ---------------------------------------------------------------- */
+// MARK: Input -----------------------------------------------------------------
 
 struct Input : public View<Input> {
     Gfx::TextStyle _style;
@@ -325,7 +325,7 @@ Child input(Strong<Textbox::Model> text, OnChange<> onChange) {
     return makeStrong<Input>(TextStyles::bodyMedium(), text, std::move(onChange));
 }
 
-/* --- Toggle --------------------------------------------------------------- */
+// MARK: Toggle ----------------------------------------------------------------
 
 struct Toggle : public View<Toggle> {
     bool _value = false;
@@ -389,7 +389,7 @@ Child toggle(bool value, OnChange<bool> onChange) {
     return makeStrong<Toggle>(value, std::move(onChange));
 }
 
-/* --- Checkbox ------------------------------------------------------------- */
+// MARK: Checkbox --------------------------------------------------------------
 
 struct Checkbox : public View<Checkbox> {
     bool _value = false;
@@ -448,7 +448,7 @@ Child checkbox(bool value, OnChange<bool> onChange) {
     return makeStrong<Checkbox>(value, std::move(onChange));
 }
 
-/* --- Radio ----------------------------------------------------------------- */
+// MARK: Radio ------------------------------------------------------------------
 
 struct Radio : public View<Radio> {
     bool _value = false;
@@ -505,7 +505,7 @@ Child radio(bool value, OnChange<bool> onChange) {
     return makeStrong<Radio>(value, std::move(onChange));
 }
 
-/* --- Slider ---------------------------------------------------------------- */
+// MARK: Slider -----------------------------------------------------------------
 
 struct Slider : public ProxyNode<Slider> {
     f64 _value = 0.0f;
@@ -559,7 +559,7 @@ Child slider(f64 value, OnChange<f64> onChange, Child child) {
     return makeStrong<Slider>(value, std::move(onChange), std::move(child));
 }
 
-/* --- Color ---------------------------------------------------------------- */
+// MARK: Color -----------------------------------------------------------------
 
 Child color(Gfx::Color color, OnChange<Gfx::Color>) {
     return button(
@@ -577,7 +577,7 @@ Child color(Gfx::Color color, OnChange<Gfx::Color>) {
     );
 }
 
-/* --- Intent --------------------------------------------------------------- */
+// MARK: Intent ----------------------------------------------------------------
 
 struct Intent : public ProxyNode<Intent> {
     Func<void(Node &, Sys::Event &e)> _map;

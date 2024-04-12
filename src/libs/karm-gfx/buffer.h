@@ -85,7 +85,7 @@ struct _Pixels {
         return {_buf, _size, _stride, _fmt};
     }
 
-    /* --- Geometry --------------------------------------------------------- */
+    // MARK: Geometry ----------------------------------------------------------
 
     always_inline Math::Recti bound() const {
         return {0, 0, _size.x, _size.y};
@@ -107,7 +107,7 @@ struct _Pixels {
         return _stride;
     }
 
-    /* --- Buffer Access ---------------------------------------------------- */
+    // MARK: Buffer Access -----------------------------------------------------
 
     always_inline Fmt fmt() const {
         return _fmt;
@@ -167,7 +167,7 @@ struct _Pixels {
         };
     }
 
-    /* --- Load/Store ------------------------------------------------------- */
+    // MARK: Load/Store --------------------------------------------------------
 
     always_inline Color loadUnsafe(Math::Vec2i pos) const {
         return _fmt.load(pixelUnsafe(pos));

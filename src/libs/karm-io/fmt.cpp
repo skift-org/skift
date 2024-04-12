@@ -50,7 +50,7 @@ Res<String> _changeCase(Str str, CaseFn fn) {
     return Ok(writer.take());
 }
 
-/* --- Case functions ------------------------------------------------------- */
+// MARK: Case functions --------------------------------------------------------
 
 // si: string index
 // wi: word index
@@ -161,7 +161,7 @@ Rune _toSpongeCase(Rune rune, usize si, usize) {
     return toAsciiLower(rune);
 }
 
-/* --- Public API ----------------------------------------------------------- */
+// MARK: Public API ------------------------------------------------------------
 
 Res<String> toDefaultCase(Str str) {
     return Ok(str);

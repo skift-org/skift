@@ -119,7 +119,7 @@ struct Font {
 
     Font(Bytes slice) : _slice(slice) {}
 
-    /* --- Parsing Api ------------------------------------------------------ */
+    // MARK: Parsing Api -------------------------------------------------------
 
     Io::BScan begin() const {
         return _slice;

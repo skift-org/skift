@@ -120,7 +120,7 @@ inline Res<String> toStr(T const &t, Str format = "") {
     return Ok(writer.take());
 }
 
-/* --- Align Formatting ----------------------------------------------------- */
+// MARK: Align Formatting ------------------------------------------------------
 
 enum struct Align {
     LEFT,
@@ -186,7 +186,7 @@ struct Formatter<Aligned<T>> {
     }
 };
 
-/* --- Case Formatting ------------------------------------------------------ */
+// MARK: Case Formatting -------------------------------------------------------
 
 enum struct Case {
     DEFAULT,
@@ -278,7 +278,7 @@ struct Formatter<Cased<T>> {
     }
 };
 
-/* --- Number Formatting ---------------------------------------------------- */
+// MARK: Number Formatting -----------------------------------------------------
 
 struct NumberFormatter {
     bool prefix = false;
@@ -489,7 +489,7 @@ struct Formatter<Le<T>> : public Formatter<T> {
     }
 };
 
-/* --- Format Pointers ------------------------------------------------------ */
+// MARK: Format Pointers -------------------------------------------------------
 
 template <typename T>
 struct Formatter<T *> {
@@ -530,7 +530,7 @@ struct Formatter<std::nullptr_t> {
     }
 };
 
-/* --- Format Optionals ----------------------------------------------------- */
+// MARK: Format Optionals ------------------------------------------------------
 
 template <>
 struct Formatter<None> {
@@ -621,7 +621,7 @@ struct Formatter<Res<T, E>> {
     }
 };
 
-/* --- Format References ---------------------------------------------------- */
+// MARK: Format References -----------------------------------------------------
 
 template <typename T>
 struct Formatter<Strong<T>> {
@@ -660,7 +660,7 @@ struct Formatter<Weak<T>> {
     }
 };
 
-/* --- Format Reflectable --------------------------------------------------- */
+// MARK: Format Reflectable ----------------------------------------------------
 
 template <Reflectable T>
 struct Formatter<T> {
@@ -691,7 +691,7 @@ struct Formatter<T> {
     }
 };
 
-/* --- Format Sliceable ----------------------------------------------------- */
+// MARK: Format Sliceable ------------------------------------------------------
 
 template <Sliceable T>
 struct Formatter<T> {
@@ -716,7 +716,7 @@ struct Formatter<T> {
     }
 };
 
-/* --- Format String -------------------------------------------------------- */
+// MARK: Format String ---------------------------------------------------------
 template <StaticEncoding E>
 struct StringFormatter {
     bool prefix = false;
@@ -779,7 +779,7 @@ struct Formatter<char const *> : public StringFormatter<Utf8> {
     }
 };
 
-/* --- Format Time ---------------------------------------------------------- */
+// MARK: Format Time -----------------------------------------------------------
 
 template <>
 struct Formatter<TimeSpan> {
@@ -816,7 +816,7 @@ struct Formatter<DateTime> {
     }
 };
 
-/* --- Format Tuple --------------------------------------------------------- */
+// MARK: Format Tuple ----------------------------------------------------------
 
 template <typename Car, typename Cdr>
 struct Formatter<Cons<Car, Cdr>> {

@@ -4,7 +4,7 @@
 
 namespace Karm::Meta {
 
-/* --- Const ---------------------------------------------------------------- */
+// MARK: Const -----------------------------------------------------------------
 
 template <typename T>
 inline constexpr bool _Const = false;
@@ -31,7 +31,7 @@ using RemoveConst = typename _RemoveConst<T>::Type;
 template <typename Src, typename Dest>
 using CopyConst = Cond<Const<Src>, Dest const, RemoveConst<Dest>>;
 
-/* --- Volatile ------------------------------------------------------------- */
+// MARK: Volatile --------------------------------------------------------------
 
 template <typename T>
 inline constexpr bool _Volatile = false;
@@ -61,7 +61,7 @@ using CopyVolatile = Cond<Volatile<Src>, Dest volatile, RemoveVolatile<Dest>>;
 template <typename T>
 using RemoveConstVolatile = RemoveConst<RemoveVolatile<T>>;
 
-/* --- Ref -------------------------------------------------------------------*/
+// MARK: Ref -------------------------------------------------------------------*/
 
 template <typename>
 inline constexpr bool _LvalueRef = false;
@@ -105,7 +105,7 @@ using RemoveRef = typename _RemoveRef<T>::Type;
 template <typename T>
 using RemoveConstVolatileRef = RemoveConstVolatile<RemoveRef<T>>;
 
-/* --- Pointer -------------------------------------------------------------- */
+// MARK: Pointer ---------------------------------------------------------------
 
 template <typename>
 inline constexpr bool _Ptr = false;

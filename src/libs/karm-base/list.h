@@ -205,7 +205,7 @@ struct List {
 
     ~List() { clear(); }
 
-    /* --- Indexing --- */
+    // MARK: Indexing
 
     void insert(usize i, T el) {
         auto *node = new Item{el};
@@ -253,7 +253,7 @@ struct List {
         });
     }
 
-    /* --- Random Access --- */
+    // MARK: Random Access
 
     T &peek(usize i) {
         return _ll.peek(i)->value;
@@ -271,7 +271,7 @@ struct List {
         return peek(i);
     }
 
-    /* --- Front Access --- */
+    // MARK: Front Access
 
     void pushFront(T const &value) {
         pushFront(T{value});
@@ -301,7 +301,7 @@ struct List {
         return _ll.head()->value;
     }
 
-    /* --- Back Access --- */
+    // MARK: Back Access
 
     void pushBack(T const &value) {
         pushBack(T{value});
@@ -327,13 +327,13 @@ struct List {
         return _ll.tail()->value;
     }
 
-    /* --- Queue --- */
+    // MARK: Queue
 
     bool requeue() {
         return _ll.requeue();
     }
 
-    /* --- Iteration --- */
+    // MARK: Iteration
 
     template <typename Self>
     static auto _iter(Self *self) {
@@ -375,7 +375,7 @@ struct List {
         return _iterRev(this);
     }
 
-    /* --- Len --- */
+    // MARK: Len
 
     usize len() const {
         return _ll.len();

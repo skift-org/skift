@@ -4,7 +4,7 @@
 
 namespace Hideo::Images {
 
-/* --- Reducer -------------------------------------------------------------- */
+// MARK: Reducer ---------------------------------------------------------------
 
 struct State {
     bool isEditor = false;
@@ -37,7 +37,7 @@ void reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 
-/* --- Views ---------------------------------------------------------------- */
+// MARK: Views -----------------------------------------------------------------
 
 // Viewer
 

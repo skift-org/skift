@@ -4,7 +4,7 @@
 
 namespace Karm::Ui {
 
-/* --- Utilities ------------------------------------------------------------ */
+// MARK: Utilities -------------------------------------------------------------
 
 template <typename E, typename... Args>
 inline void event(Node &n, Args &&...args) {
@@ -46,7 +46,7 @@ inline Opt<Func<void(Node &)>> bindBubbleIf(bool cond, Args &&...args) {
     return bindBubble<E>(args...);
 }
 
-/* --- Helpers -------------------------------------------------------------- */
+// MARK: Helpers ---------------------------------------------------------------
 
 inline void shouldRepaint(Node &n) {
     bubble<Node::PaintEvent>(n, n.bound());

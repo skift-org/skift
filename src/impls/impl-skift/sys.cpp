@@ -6,7 +6,7 @@
 
 namespace Karm::Sys::_Embed {
 
-/* --- File I/O ------------------------------------------------------------- */
+// MARK: File I/O --------------------------------------------------------------
 
 struct VmoFd : public Sys::Fd {
     Hj::Vmo _vmo;
@@ -98,7 +98,7 @@ Res<Vec<Sys::DirEntry>> readDir(Mime::Url const &) {
     notImplemented();
 }
 
-/* --- Sockets -------------------------------------------------------------- */
+// MARK: Sockets ---------------------------------------------------------------
 
 Res<Strong<Sys::Fd>> connectTcp(SocketAddr) {
     notImplemented();
@@ -116,7 +116,7 @@ Res<Strong<Sys::Fd>> listenIpc(Mime::Url) {
     notImplemented();
 }
 
-/* --- Time ----------------------------------------------------------------- */
+// MARK: Time ------------------------------------------------------------------
 
 TimeStamp now() {
     return Hj::now().unwrap();
@@ -126,7 +126,7 @@ TimeSpan uptime() {
     notImplemented();
 }
 
-/* --- Memory Managment ----------------------------------------------------- */
+// MARK: Memory Managment ------------------------------------------------------
 
 Res<Sys::MmapResult> memMap(Sys::MmapOptions const &) {
     notImplemented();
@@ -155,7 +155,7 @@ Res<> memFlush(void *, usize) {
     notImplemented();
 }
 
-/* --- System Informations -------------------------------------------------- */
+// MARK: System Informations ---------------------------------------------------
 
 Res<> populate(Sys::SysInfo &) {
     notImplemented();
@@ -177,7 +177,7 @@ Res<> populate(Vec<Sys::UserInfo> &) {
     notImplemented();
 }
 
-/* --- Process Managment ---------------------------------------------------- */
+// MARK: Process Managment -----------------------------------------------------
 
 Res<> sleep(TimeSpan) {
     notImplemented();

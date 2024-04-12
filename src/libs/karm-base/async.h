@@ -9,7 +9,7 @@
 
 namespace Karm::Async {
 
-/* --- Concepts ------------------------------------------------------------- */
+// MARK: Concepts --------------------------------------------------------------
 
 struct Inline {};
 static constexpr Inline INLINE;
@@ -68,7 +68,7 @@ struct One {
 template <Sender S, Receiver<typename S::Inner> R>
 using OperationOf = decltype(Meta::declval<S>().connect(Meta::declval<R>()));
 
-/* --- Basics --------------------------------------------------------------- */
+// MARK: Basics ----------------------------------------------------------------
 
 struct Resumable {
     virtual void resume() = 0;
@@ -202,7 +202,7 @@ static inline void detach(S s) {
     });
 }
 
-/* --- Promise -------------------------------------------------------------- */
+// MARK: Promise ---------------------------------------------------------------
 
 template <typename T>
 struct State {
@@ -309,7 +309,7 @@ struct _Promise : public Meta::NoCopy {
 template <typename V = None, typename E = Error>
 using Promise = _Promise<Res<V, E>>;
 
-/* --- Task ----------------------------------------------------------------- */
+// MARK: Task ------------------------------------------------------------------
 
 enum struct Cfp {
     INDETERMINATE,

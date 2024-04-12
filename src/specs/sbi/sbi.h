@@ -45,7 +45,7 @@ Ret ecall(usize eid, usize fid = 0, usize arg0 = 0, usize arg1 = 0, usize arg2 =
     return {a0, a1};
 }
 
-/* --- Base Extension ------------------------------------------------------- */
+// MARK: Base Extension --------------------------------------------------------
 
 static constexpr usize BASE = 0x10;
 
@@ -107,7 +107,7 @@ Ret getMimpid() {
     return ecall(BASE, 6);
 }
 
-/* --- Legacy Extension ----------------------------------------------------- */
+// MARK: Legacy Extension ------------------------------------------------------
 
 usize legacyPutChar(char c) {
     return ecall(0x1, 0, c).err;
@@ -125,7 +125,7 @@ usize legacyGetChar() {
     return ecall(0x2, 0).val;
 }
 
-/* --- System Reset Extension ----------------------------------------------- */
+// MARK: System Reset Extension ------------------------------------------------
 
 static constexpr usize SYSTEM_RESET = 0x10;
 
@@ -145,7 +145,7 @@ Ret systemReset(ResetType type, ResetReason reason) {
     return ecall(SYSTEM_RESET, 0, (usize)type, (usize)reason);
 }
 
-/* --- Debug Console Extension ---------------------------------------------- */
+// MARK: Debug Console Extension -----------------------------------------------
 
 static constexpr usize DEBUG_CONSOLE = 0x4442434E;
 

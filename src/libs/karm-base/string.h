@@ -264,7 +264,7 @@ struct StrLit {
     constexpr operator char const *() const { return _buf; }
 };
 
-/* --- String Conversion ---------------------------------------------------- */
+// MARK: String Conversion -----------------------------------------------------
 
 template <StaticEncoding E>
 struct _StringBuilder {

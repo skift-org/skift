@@ -55,7 +55,7 @@ struct Model {
             _buf.pushBack(r);
     }
 
-    /* --- Operations --- */
+    // MARK: Operations
 
     void _do(Record &r) {
         switch (r.op) {
@@ -146,7 +146,7 @@ struct Model {
         _group++;
     }
 
-    /* --- Movements --- */
+    // MARK: Movements
 
     usize _prev(usize pos) const {
         if (pos == 0)
@@ -222,7 +222,7 @@ struct Model {
         return _buf.len();
     }
 
-    /* --- Commands --- */
+    // MARK: Commands
 
     void insert(Rune rune) {
         _checkpoint();

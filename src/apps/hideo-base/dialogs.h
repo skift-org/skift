@@ -20,7 +20,7 @@ enum struct DialogButton {
 
 FlagsEnum$(DialogButton);
 
-/* --- Dialogs Scaffolding -------------------------------------------------- */
+// MARK: Dialogs Scaffolding ---------------------------------------------------
 
 Ui::Child dialogScafold(Layout::Align a, Ui::Child inner);
 
@@ -44,7 +44,7 @@ Ui::Child dialogButtons(DialogButton buttons, DialogButton primary);
 
 Ui::Child dialogCloseButton();
 
-/* --- Dialogs -------------------------------------------------------------- */
+// MARK: Dialogs ---------------------------------------------------------------
 
 Ui::Child licenseDialog();
 

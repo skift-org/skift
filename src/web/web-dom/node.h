@@ -47,7 +47,7 @@ struct Node :
 
     virtual NodeType nodeType() const = 0;
 
-    /* --- Parent --- */
+    // MARK: Parent
 
     Node &parentNode() {
         if (not _parent)
@@ -66,7 +66,7 @@ struct Node :
         }
     }
 
-    /* --- Children --- */
+    // MARK: Children
 
     bool hasChildren() {
         return _children.len() > 0;
@@ -96,7 +96,7 @@ struct Node :
         child->_detachParent();
     }
 
-    /* --- Siblings --- */
+    // MARK: Siblings
 
     Strong<Node> previousSibling() {
         usize index = _parentIndex();
@@ -127,7 +127,7 @@ struct Node :
         e(")\n");
     }
 
-    /* --- Operators --- */
+    // MARK: Operators
 
     bool operator==(Node const &other) const {
         return this == &other;

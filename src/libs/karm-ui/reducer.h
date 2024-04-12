@@ -4,7 +4,7 @@
 
 namespace Karm::Ui {
 
-/* --- Reducer -------------------------------------------------------------- */
+// MARK: Reducer ---------------------------------------------------------------
 
 template <typename S, typename A, void (*R)(S &, A)>
 struct Model {
@@ -67,7 +67,7 @@ struct Reducer :
             (*_child)->detach(this);
     }
 
-    /* --- Build ------------------------------------------------------------ */
+    // MARK: Build -------------------------------------------------------------
 
     void rebuild() {
         if (_child) {
@@ -90,7 +90,7 @@ struct Reducer :
         }
     }
 
-    /* --- Node ------------------------------------------------------------- */
+    // MARK: Node --------------------------------------------------------------
 
     void reconcile(Reducer &o) override {
         _build = std::move(o._build);
@@ -157,7 +157,7 @@ inline Child reducer(Func<Child(typename Model::State const &)> build) {
     return makeStrong<Reducer<Model>>(typename Model::State{}, std::move(build));
 }
 
-/* --- State ---------------------------------------------------------------- */
+// MARK: State -----------------------------------------------------------------
 
 template <typename T>
 inline Child state(T init, auto build) {

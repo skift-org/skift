@@ -10,7 +10,7 @@ namespace Karm {
 /// A linker symbol.
 using ExternSym = uint8_t[];
 
-/* --- Unsigned -------------------------------------------------------- */
+// MARK: Unsigned ---------------------------------------------------------
 
 using usize = size_t;
 
@@ -84,7 +84,7 @@ always_inline constexpr auto rotr(auto x, auto n) {
     return (x >> n) | (x << (sizeof(x) * 8 - n));
 }
 
-/* --- Signed ---------------------------------------------------------- */
+// MARK: Signed -----------------------------------------------------------
 
 using isize = ptrdiff_t;
 
@@ -97,7 +97,7 @@ using i64 = int64_t;
 using i128 = __int128_t;
 #endif
 
-/* --- Floating point -------------------------------------------------- */
+// MARK: Floating point ---------------------------------------------------
 
 using f16 = __fp16;
 using f32 = float;

@@ -4,7 +4,7 @@
 
 namespace Karm::Ui {
 
-/* --- Text ----------------------------------------------------------------- */
+// MARK: Text ------------------------------------------------------------------
 
 static Opt<Strong<Media::Fontface>> _regularFontface = NONE;
 Strong<Media::Fontface> regularFontface() {
@@ -255,7 +255,7 @@ Child text(Str text) {
     return makeStrong<Text>(TextStyles::labelMedium(), text);
 }
 
-/* --- Badge ---------------------------------------------------------------- */
+// MARK: Badge -----------------------------------------------------------------
 
 Child badge(Gfx::Color color, String t) {
     BoxStyle boxStyle = {
@@ -279,7 +279,7 @@ Child badge(BadgeStyle style, String t) {
     return badge(COLORS[static_cast<u8>(style)], t);
 }
 
-/* --- Icon ----------------------------------------------------------------- */
+// MARK: Icon ------------------------------------------------------------------
 
 struct Icon : public View<Icon> {
     Media::Icon _icon;
@@ -316,7 +316,7 @@ Child icon(Mdi::Icon i, f64 size, Opt<Gfx::Color> color) {
     return icon(Media::Icon{i, size}, color);
 }
 
-/* --- Image ---------------------------------------------------------------- */
+// MARK: Image -----------------------------------------------------------------
 
 struct Image : public View<Image> {
     Media::Image _image;
@@ -355,7 +355,7 @@ Child image(Media::Image image, Gfx::BorderRadius radius) {
     return makeStrong<Image>(image, radius);
 }
 
-/* --- Canvas --------------------------------------------------------------- */
+// MARK: Canvas ----------------------------------------------------------------
 
 struct Canvas : public View<Canvas> {
     OnPaint _onPaint;
@@ -389,7 +389,7 @@ Child canvas(OnPaint onPaint) {
     return makeStrong<Canvas>(std::move(onPaint));
 }
 
-/* --- Filter --------------------------------------------------------------- */
+// MARK: Filter ----------------------------------------------------------------
 
 struct BackgroundFilter : public ProxyNode<BackgroundFilter> {
     Gfx::Filter _filter;

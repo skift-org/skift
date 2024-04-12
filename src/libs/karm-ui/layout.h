@@ -9,7 +9,7 @@ namespace Karm::Ui {
 
 inline constexpr auto UNCONSTRAINED = -1;
 
-/* --- Empty ---------------------------------------------------------------- */
+// MARK: Empty -----------------------------------------------------------------
 
 Child empty(Math::Vec2i size = {});
 
@@ -21,7 +21,7 @@ inline auto cond(bool c) {
     };
 }
 
-/* --- Bound ---------------------------------------------------------------- */
+// MARK: Bound -----------------------------------------------------------------
 
 Child bound(Child child);
 
@@ -39,11 +39,11 @@ inline auto placed(Math::Recti bound) {
     };
 }
 
-/* --- Separator ------------------------------------------------------------ */
+// MARK: Separator -------------------------------------------------------------
 
 Child separator();
 
-/* --- Grow ----------------------------------------------------------------- */
+// MARK: Grow ------------------------------------------------------------------
 
 Child grow(Opt<Child> child);
 
@@ -61,7 +61,7 @@ inline auto grow(isize g) {
     };
 }
 
-/* --- Align ---------------------------------------------------------------- */
+// MARK: Align -----------------------------------------------------------------
 
 Child align(Layout::Align align, Child child);
 
@@ -143,7 +143,7 @@ inline auto vcenterFill() {
     };
 }
 
-/* --- Sizing --------------------------------------------------------------- */
+// MARK: Sizing ----------------------------------------------------------------
 
 Child sizing(Math::Vec2i min, Math::Vec2i max, Child child);
 
@@ -201,7 +201,7 @@ inline auto pinSize(isize size) {
     };
 }
 
-/* --- Spacing -------------------------------------------------------------- */
+// MARK: Spacing ---------------------------------------------------------------
 
 Child spacing(Layout::Spacingi s, Child child);
 
@@ -211,7 +211,7 @@ inline auto spacing(Layout::Spacingi s) {
     };
 }
 
-/* --- Aspect Ratio --------------------------------------------------------- */
+// MARK: Aspect Ratio ----------------------------------------------------------
 
 Child aspectRatio(f64 ratio, Child child);
 
@@ -221,7 +221,7 @@ inline auto aspectRatio(f64 ratio) {
     };
 }
 
-/* --- Stack ---------------------------------------------------------------- */
+// MARK: Stack -----------------------------------------------------------------
 
 Child stack(Children children);
 
@@ -229,7 +229,7 @@ inline Child stack(auto... children) {
     return stack(Children{children...});
 }
 
-/* --- Flow ----------------------------------------------------------------- */
+// MARK: Flow ------------------------------------------------------------------
 
 struct FlowStyle {
     Layout::Flow flow = Layout::Flow::LEFT_TO_RIGHT;
@@ -295,7 +295,7 @@ inline Child vflow(isize gaps, Layout::Align align, Children children) {
     return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, children);
 }
 
-/* --- Grid ----------------------------------------------------------------- */
+// MARK: Grid ------------------------------------------------------------------
 
 struct GridUnit {
     enum _Unit {

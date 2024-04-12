@@ -12,7 +12,7 @@
 
 namespace Karm::Media {
 
-/* --- Font loading --------------------------------------------------------- */
+// MARK: Font loading ----------------------------------------------------------
 
 Res<Strong<Fontface>> loadFontface(Sys::Mmap &&map) {
     return Ok(try$(TtfFontface::load(std::move(map))));
@@ -48,7 +48,7 @@ Res<Font> loadFontOrFallback(f64 size, Mime::Url url) {
     return Ok(Font::fallback());
 }
 
-/* --- Image loading -------------------------------------------------------- */
+// MARK: Image loading ---------------------------------------------------------
 
 static Res<Image> loadBmp(Bytes bytes) {
     auto bmp = try$(Bmp::Image::load(bytes));

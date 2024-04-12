@@ -5,7 +5,7 @@
 
 namespace Grund::Device::Ps2 {
 
-/* --- Controller ----------------------------------------------------------- */
+// MARK: Controller ------------------------------------------------------------
 
 Res<> I8042::init() {
     logInfo("ps2: i8042 initializing...");
@@ -25,7 +25,7 @@ Res<> I8042::flush() {
     return Ok();
 }
 
-/* --- Data and Status --- */
+// MARK: Data and Status
 
 Res<Flags<Status>> I8042::readStatus() {
     auto status = try$(io().read<StatusReg>());
@@ -70,7 +70,7 @@ Res<> I8042::writeCmd(Cmd cmd) {
     return Ok();
 }
 
-/* --- Configs --- */
+// MARK: Configs
 
 Res<> I8042::writeConfig(Flags<Configs> cfg) {
     try$(writeCmd(Cmd::WRITE_CONFIG));
@@ -84,7 +84,7 @@ Res<Flags<Configs>> I8042::readConfig() {
     return Ok(static_cast<Configs>(cfg));
 }
 
-/* --- Keyboard ------------------------------------------------------------- */
+// MARK: Keyboard --------------------------------------------------------------
 
 Res<> Keyboard::init() {
     logInfo("ps2: keyboard initializing...");
@@ -125,7 +125,7 @@ Res<> Keyboard::event(Sys::Event &e) {
     return Device::event(e);
 }
 
-/* --- Mouse ---------------------------------------------------------------- */
+// MARK: Mouse -----------------------------------------------------------------
 
 Res<> Mouse::init() {
     logInfo("ps2: mouse initializing...");

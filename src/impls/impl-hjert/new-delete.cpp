@@ -3,7 +3,7 @@
 #include <karm-base/lock.h>
 #include <karm-logger/logger.h>
 
-/* --- Kmm Implementation -------------------------------------------------- */
+// MARK: Kmm Implementation ---------------------------------------------------
 
 static Lock _heapLock;
 static Heap _heapImpl = {
@@ -25,7 +25,7 @@ static Heap _heapImpl = {
     },
 };
 
-/* --- New/Delete Implementation -------------------------------------------- */
+// MARK: New/Delete Implementation ---------------------------------------------
 
 void *operator new(usize size) {
     LockScope scope(_heapLock);

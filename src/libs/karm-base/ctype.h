@@ -9,7 +9,7 @@ concept CType = requires(T c, Rune r) {
     { c(r) } -> Meta::Same<bool>;
 };
 
-/* --- Check Identity ------------------------------------------------------- */
+// MARK: Check Identity --------------------------------------------------------
 
 constexpr bool isAscii(Rune rune) {
     return rune <= 0x7F;
@@ -103,7 +103,7 @@ constexpr bool isUnicodeNonCharacter(Rune rune) {
             ((rune & 0xFFFF) == 0xFFFF));
 }
 
-/* --- Rune Conversion ------------------------------------------------------ */
+// MARK: Rune Conversion -------------------------------------------------------
 
 constexpr Rune toAsciiLower(Rune rune) {
     if (isAsciiUpper(rune))
@@ -119,7 +119,7 @@ constexpr Rune toAsciiUpper(Rune rune) {
     return rune;
 }
 
-/* --- Rune Parsing --------------------------------------------------------- */
+// MARK: Rune Parsing ----------------------------------------------------------
 
 constexpr Rune parseAsciiDecDigit(Rune rune) {
     if (isAsciiDecDigit(rune))

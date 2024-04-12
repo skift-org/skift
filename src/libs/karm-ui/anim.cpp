@@ -2,7 +2,7 @@
 
 namespace Karm::Ui {
 
-/* --- Slide In ------------------------------------------------------------- */
+// MARK: Slide In --------------------------------------------------------------
 
 struct SlideIn : public ProxyNode<SlideIn> {
     SlideFrom _from;
@@ -68,7 +68,7 @@ Child slideIn(SlideFrom from, Ui::Child child) {
     return makeStrong<SlideIn>(from, std::move(child));
 }
 
-/* --- Carousel ------------------------------------------------------------- */
+// MARK: Carousel --------------------------------------------------------------
 
 struct Carousel : public GroupNode<Carousel> {
     usize _selected;

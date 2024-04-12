@@ -117,7 +117,7 @@ template <typename T>
 struct Strong {
     _Cell *_cell{};
 
-    /* --- Rule of Five ----------------------------------------------------- */
+    // MARK: Rule of Five ------------------------------------------------------
 
     constexpr Strong() = delete;
 
@@ -160,7 +160,7 @@ struct Strong {
         return *this;
     }
 
-    /* --- Operators -------------------------------------------------------- */
+    // MARK: Operators ---------------------------------------------------------
 
     constexpr T const *operator->() const {
         return &unwrap();
@@ -178,7 +178,7 @@ struct Strong {
         return unwrap();
     }
 
-    /* --- Methods ---------------------------------------------------------- */
+    // MARK: Methods -----------------------------------------------------------
 
     constexpr void ensure() const {
         if (not _cell) {

@@ -5,7 +5,7 @@
 
 namespace Karm {
 
-/* --- TimeSpan and TimeStamp ----------------------------------------------- */
+// MARK: TimeSpan and TimeStamp ------------------------------------------------
 
 struct TimeSpan {
     usize _value; // microseconds (us) aka 1/1,000,000th of a second
@@ -222,7 +222,7 @@ struct TimeStamp {
     auto operator<=>(TimeStamp const &) const = default;
 };
 
-/* --- Time ----------------------------------------------------------------- */
+// MARK: Time ------------------------------------------------------------------
 
 struct Time {
     u8 second;
@@ -378,7 +378,7 @@ struct Year {
     auto operator<=>(Year const &) const = default;
 };
 
-/* --- Date ----------------------------------------------------------------- */
+// MARK: Date ------------------------------------------------------------------
 
 #define FOREACH_DAY_OF_WEEK(DOW) \
     DOW(MONDAY, MON)             \
@@ -498,7 +498,7 @@ struct Date {
     auto operator<=>(Date const &) const = default;
 };
 
-/* --- DateTime ------------------------------------------------------------- */
+// MARK: DateTime --------------------------------------------------------------
 
 struct DateTime {
     Date date;

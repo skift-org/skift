@@ -7,7 +7,7 @@
 
 namespace Karm::Ui {
 
-/* --- Drag Event ----------------------------------------------------------- */
+// MARK: Drag Event ------------------------------------------------------------
 
 struct DragEvent {
     enum {
@@ -18,7 +18,7 @@ struct DragEvent {
     Math::Vec2i delta{};
 };
 
-/* --- Dismisable ----------------------------------------------------------- */
+// MARK: Dismisable ------------------------------------------------------------
 
 enum struct DismisDir {
     LEFT = 1 << 0,
@@ -42,7 +42,7 @@ inline auto dismisable(OnDismis onDismis, DismisDir dir, f64 threshold) {
     };
 }
 
-/* --- Drag Region ---------------------------------------------------------- */
+// MARK: Drag Region -----------------------------------------------------------
 
 Child dragRegion(Child child);
 
@@ -52,7 +52,7 @@ inline auto dragRegion() {
     };
 }
 
-/* --- Handle --------------------------------------------------------------- */
+// MARK: Handle ----------------------------------------------------------------
 
 Child handle();
 

@@ -81,7 +81,7 @@ concept DecodeInput = requires(T t, U u) {
     { t.rem() };
 };
 
-/* --- Utf8 ----------------------------------------------------------------- */
+// MARK: Utf8 ------------------------------------------------------------------
 
 struct Utf8 {
     using Unit = char;
@@ -171,7 +171,7 @@ struct Utf8 {
 
 static_assert(StaticEncoding<Utf8>);
 
-/* --- Utf16 ---------------------------------------------------------------- */
+// MARK: Utf16 -----------------------------------------------------------------
 
 struct Utf16 {
     using Unit = u16;
@@ -236,7 +236,7 @@ struct Utf16 {
 
 static_assert(StaticEncoding<Utf16>);
 
-/* --- Utf32 ---------------------------------------------------------------- */
+// MARK: Utf32 -----------------------------------------------------------------
 
 struct Utf32 {
     using Unit = char32_t;
@@ -265,7 +265,7 @@ struct Utf32 {
 
 static_assert(StaticEncoding<Utf32>);
 
-/* --- Pure ----------------------------------------------------------------- */
+// MARK: Pure ------------------------------------------------------------------
 
 struct Pure {
     using Unit = Rune;
@@ -294,7 +294,7 @@ struct Pure {
 
 static_assert(StaticEncoding<Pure>);
 
-/* --- Ascii ---------------------------------------------------------------- */
+// MARK: Ascii -----------------------------------------------------------------
 
 struct Ascii {
     using Unit = char;
@@ -334,7 +334,7 @@ struct Ascii {
 
 static_assert(StaticEncoding<Ascii>);
 
-/* --- Extended Ascii ------------------------------------------------------- */
+// MARK: Extended Ascii --------------------------------------------------------
 
 template <typename Mapper>
 struct EAscii {
@@ -368,7 +368,7 @@ struct EAscii {
     }
 };
 
-/* --- Ibm437 --------------------------------------------------------------- */
+// MARK: Ibm437 ----------------------------------------------------------------
 
 // clang-format off
 
@@ -419,7 +419,7 @@ using Ibm437 = EAscii<Ibm437Mapper>;
 
 static_assert(StaticEncoding<Ibm437>);
 
-/* --- Latin1 --------------------------------------------------------------- */
+// MARK: Latin1 ----------------------------------------------------------------
 
 using Latin1Mapper = decltype([](u8 c) {
     // HACK: """"Unicode is a "superset" of Latin1""" (please note the quotes)
@@ -432,7 +432,7 @@ using Latin1 = EAscii<Latin1Mapper>;
 
 static_assert(StaticEncoding<Latin1>);
 
-/* --- Utilities ------------------------------------------------------------ */
+// MARK: Utilities -------------------------------------------------------------
 
 template <StaticEncoding Source, StaticEncoding Target>
 usize transcodeLen(Cursor<typename Source::Unit> input) {

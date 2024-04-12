@@ -26,7 +26,7 @@ using Child = Strong<Node>;
 using Children = Vec<Child>;
 using Visitor = Func<void(Node &)>;
 
-/* --- Node ----------------------------------------------------------------- */
+// MARK: Node ------------------------------------------------------------------
 
 using Key = Opt<Hash>;
 
@@ -116,7 +116,7 @@ always_inline auto operator|(Decorator auto decorator, Decorator auto decorator2
     };
 }
 
-/* --- LeafNode ------------------------------------------------------------- */
+// MARK: LeafNode --------------------------------------------------------------
 
 template <typename Crtp>
 struct LeafNode : public Node {
@@ -162,7 +162,7 @@ struct LeafNode : public Node {
     }
 };
 
-/* --- GroupNode ------------------------------------------------------------ */
+// MARK: GroupNode -------------------------------------------------------------
 
 template <typename Crtp>
 struct GroupNode : public LeafNode<Crtp> {
@@ -240,7 +240,7 @@ struct GroupNode : public LeafNode<Crtp> {
     }
 };
 
-/* --- ProxyNode ------------------------------------------------------------ */
+// MARK: ProxyNode -------------------------------------------------------------
 
 template <typename Crtp>
 struct ProxyNode : public LeafNode<Crtp> {

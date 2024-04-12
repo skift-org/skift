@@ -22,7 +22,7 @@ struct _Vec {
 
     _Vec(S storage) : _buf(storage) {}
 
-    /* --- Collection --- */
+    // MARK: Collection
 
     void add(T const &val) {
         pushBack(val);
@@ -56,7 +56,7 @@ struct _Vec {
         return changed;
     }
 
-    /* --- Capacity --- */
+    // MARK: Capacity
 
     void ensure(usize cap) { _buf.ensure(cap); }
 
@@ -70,7 +70,7 @@ struct _Vec {
 
     usize cap() const { return _buf.cap(); }
 
-    /* --- Random Access --- */
+    // MARK: Random Access
 
     void insert(usize index, T const &value) { _buf.insert(index, T(value)); }
 
@@ -90,7 +90,7 @@ struct _Vec {
 
     void removeRange(usize index, usize count) { _buf.removeRange(index, count); }
 
-    /* --- Front Access --- */
+    // MARK: Front Access
 
     void pushFront(T const &value) { _buf.insert(0, T(value)); }
 
@@ -108,7 +108,7 @@ struct _Vec {
 
     T popFront() { return _buf.removeAt(0); }
 
-    /* --- Back Access --- */
+    // MARK: Back Access
 
     void pushBack(T const &value) { insert(len(), value); }
 
@@ -128,7 +128,7 @@ struct _Vec {
         return removeAt(len() - 1);
     }
 
-    /* --- MutSliceable --- */
+    // MARK: MutSliceable
 
     constexpr usize len() const { return _buf.len(); }
 

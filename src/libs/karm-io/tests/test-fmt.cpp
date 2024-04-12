@@ -27,7 +27,7 @@ Res<> testCase(Str expected, T const &value, Str format = "") {
     return Ok();
 }
 
-/* --- Number Formatting ---------------------------------------------------- */
+// MARK: Number Formatting -----------------------------------------------------
 
 test$(fmtUnsignedNumber) {
     // Unsigned
@@ -81,7 +81,7 @@ test$(fmtSignedNumber) {
     return Ok();
 }
 
-/* --- Boolean Formatting --------------------------------------------------- */
+// MARK: Boolean Formatting ----------------------------------------------------
 
 test$(fmtBool) {
     try$(testCase("True", true));
@@ -89,7 +89,7 @@ test$(fmtBool) {
     return Ok();
 }
 
-/* --- Format Optionals ----------------------------------------------------- */
+// MARK: Format Optionals ------------------------------------------------------
 
 test$(fmtOptionals) {
     try$(testCase("None", NONE));
@@ -122,7 +122,7 @@ test$(fmtResult) {
     return Ok();
 }
 
-/* --- Format References ---------------------------------------------------- */
+// MARK: Format References -----------------------------------------------------
 
 test$(fmtReferences) {
     auto number = makeStrong<int>(123);
@@ -140,7 +140,7 @@ test$(fmtReferences) {
     return Ok();
 }
 
-/* --- Format Reflectable --------------------------------------------------- */
+// MARK: Format Reflectable ----------------------------------------------------
 
 test$(fmtReflectable) {
     auto fooStr = try$(Io::format("{#}", Foo{1, 2}));
@@ -152,7 +152,7 @@ test$(fmtReflectable) {
     return Ok();
 }
 
-/* --- Format Sliceable ----------------------------------------------------- */
+// MARK: Format Sliceable ------------------------------------------------------
 
 test$(fmtSliceable) {
     Array arr{1, 2, 3};
@@ -160,16 +160,16 @@ test$(fmtSliceable) {
     return Ok();
 }
 
-/* --- Format String -------------------------------------------------------- */
+// MARK: Format String ---------------------------------------------------------
 
 test$(fmtString) {
     try$(testCase("test", Str("test")));
     return Ok();
 }
 
-/* --- Format Time ---------------------------------------------------------- */
+// MARK: Format Time -----------------------------------------------------------
 
-/* --- Format Tuple --------------------------------------------------------- */
+// MARK: Format Tuple ----------------------------------------------------------
 
 test$(fmtCons) {
     try$(testCase("{1, 2}", Cons{1, 2}));

@@ -21,7 +21,7 @@ struct Table : public Ui::View<Table> {
         return _state->activeSheet();
     }
 
-    /* --- Geometry --- */
+    // MARK: Geometry ----------------------------------------------------------
 
     Math::Recti colHeaderBound(usize col) {
         return {
@@ -50,7 +50,7 @@ struct Table : public Ui::View<Table> {
         };
     }
 
-    /* --- Events --- */
+    // MARK: Events ------------------------------------------------------------
 
     void event(Sys::Event &e) override {
         e.handle<Events::MouseEvent>([&](Events::MouseEvent const &m) {
@@ -80,7 +80,7 @@ struct Table : public Ui::View<Table> {
         });
     }
 
-    /* --- Painting --- */
+    // MARK: Painting ----------------------------------------------------------
 
     void paintCell(Gfx::Context &g, Cell const &, Math::Recti bound) {
         g.rect(bound.cast<f64>());

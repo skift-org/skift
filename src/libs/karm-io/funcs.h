@@ -9,7 +9,7 @@
 
 namespace Karm::Io {
 
-/* --- Read ----------------------------------------------------------------- */
+// MARK: Read ------------------------------------------------------------------
 
 inline Res<usize> pread(Readable auto &reader, MutBytes bytes, Seek seek) {
     auto result = try$(reader.seek(seek));
@@ -35,7 +35,7 @@ inline Res<String> readAllUtf8(Readable auto &reader) {
     return Ok(writer.take());
 }
 
-/* --- Write ---------------------------------------------------------------- */
+// MARK: Write -----------------------------------------------------------------
 
 inline Res<usize> pwrite(Writable auto &writer, Bytes bytes, Seek seek) {
     auto result = try$(writer.seek(seek));
@@ -46,7 +46,7 @@ inline Res<usize> putByte(Writable auto &writer, Byte byte) {
     return writer.write({&byte, 1});
 }
 
-/* --- Seek ----------------------------------------------------------------- */
+// MARK: Seek ------------------------------------------------------------------
 
 inline Res<usize> tell(Seekable auto &seeker) {
     return seeker.seek(Seek::fromCurrent(0));
@@ -68,7 +68,7 @@ inline Res<usize> skip(Readable auto &reader, usize n) {
     return copy(reader, sink, n);
 }
 
-/* --- Copy ----------------------------------------------------------------- */
+// MARK: Copy ------------------------------------------------------------------
 
 inline Res<usize> copy(Readable auto &reader, MutBytes bytes) {
     usize readed = 0;

@@ -3,7 +3,7 @@
 #include <karm-base/lock.h>
 #include <karm-logger/logger.h>
 
-/* --- Heap Implementation -------------------------------------------------- */
+// MARK: Heap Implementation ---------------------------------------------------
 
 static constinit Lock _heapLock;
 static constinit Heap _heapImpl = {
@@ -24,7 +24,7 @@ static constinit Heap _heapImpl = {
     },
 };
 
-/* --- New/Delete Implementation -------------------------------------------- */
+// MARK: New/Delete Implementation ---------------------------------------------
 
 void *operator new(usize size) {
     LockScope scope(_heapLock);

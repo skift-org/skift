@@ -17,7 +17,7 @@
 
 namespace Jpeg {
 
-/* --- Constantes ----------------------------------------------------------- */
+// MARK: Constantes ------------------------------------------------------------
 
 enum Marker : Byte {
     NIL = 0x00,
@@ -120,7 +120,7 @@ inline constexpr Array<usize, 64> ZIGZAG = {
     53, 60, 61, 54, 47, 55, 62, 63
 };
 
-/* --- Bit Stream ----------------------------------------------------------- */
+// MARK: Bit Stream ------------------------------------------------------------
 
 struct BitStream {
     Io::BScan &s;
@@ -181,7 +181,7 @@ struct BitStream {
     }
 };
 
-/* --- Decoder -------------------------------------------------------------- */
+// MARK: Decoder ---------------------------------------------------------------
 
 struct Image {
     static bool isJpeg(Bytes slice) {
@@ -260,7 +260,7 @@ struct Image {
         s.skip(len - 2);
     }
 
-    /* --- Quantization Tables ---------------------------------------------- */
+    // MARK: Quantization Tables -----------------------------------------------
 
     using Quant = Array<usize, 64>;
     Array<Opt<Quant>, 4> _quant;
@@ -295,7 +295,7 @@ struct Image {
         return Ok();
     }
 
-    /* --- Start of frame --------------------------------------------------- */
+    // MARK: Start of frame ----------------------------------------------------
 
     isize _width = 8;
     isize _height = 8;
@@ -373,7 +373,7 @@ struct Image {
         return Ok();
     }
 
-    /* --- Restart interval ------------------------------------------------- */
+    // MARK: Restart interval --------------------------------------------------
 
     usize _restartInterval = 0;
 
@@ -393,7 +393,7 @@ struct Image {
         return Ok();
     }
 
-    /* --- Huffman Tables --------------------------------------------------- */
+    // MARK: Huffman Tables ----------------------------------------------------
 
     struct HuffmanTable {
         Array<u8, 17> offs = {};
@@ -471,7 +471,7 @@ struct Image {
         return Ok();
     }
 
-    /* --- Start of scan ---------------------------------------------------- */
+    // MARK: Start of scan -----------------------------------------------------
 
     struct ScanComponent {
         u8 dcHuffId;
@@ -564,7 +564,7 @@ struct Image {
         return Ok();
     }
 
-    /* --- Huffman Data ----------------------------------------------------- */
+    // MARK: Huffman Data ------------------------------------------------------
 
     using Mcu = Array<i16, 64>;
 
@@ -671,7 +671,7 @@ struct Image {
         return Ok();
     }
 
-    /* --- Decoding --------------------------------------------------------- */
+    // MARK: Decoding ----------------------------------------------------------
 
     void idct(Array<short, 64> &mcu) {
         f32 m0 = 2.0 * Math::cos(1.0 / 16.0 * 2.0 * Math::PI);
@@ -864,7 +864,7 @@ struct Image {
         return Ok();
     }
 
-    /* --- Dumping ---------------------------------------------------------- */
+    // MARK: Dumping -----------------------------------------------------------
 
     void dump(Io::Emit &e) {
         e("JPEG image");

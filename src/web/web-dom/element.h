@@ -37,6 +37,17 @@ struct Element : public Node {
         auto attr = makeStrong<Attr>(name, value);
         this->attributes.put(name, attr);
     }
+
+    bool hasAttribute(AttrName name) const {
+        return this->attributes.get(name) != NONE;
+    }
+
+    String getAttribute(AttrName name) const {
+        auto attr = this->attributes.get(name);
+        if (attr == NONE)
+            return ""s;
+        return (*attr)->value;
+    }
 };
 
 } // namespace Web::Dom

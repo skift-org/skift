@@ -22,4 +22,22 @@ test$("parse-simple-document") {
     return Ok();
 }
 
+test$("parse-empty-tag") {
+    auto s = Io::SScan("<html/>");
+    auto p = Parser();
+    try$(p.parse(s, Web::HTML));
+    return Ok();
+}
+
+test$("parse-attr") {
+    auto s = Io::SScan("<html lang=\"en\"/>");
+    auto p = Parser();
+    auto doc = try$(p.parse(s, Web::HTML));
+    auto first = doc->firstChild();
+    auto el = try$(first.cast<Dom::Element>());
+    expect$(el->hasAttribute(Html::LANG_ATTR));
+    expect$(el->getAttribute(Html::LANG_ATTR) == "en");
+    return Ok();
+}
+
 } // namespace Web::Xml::Tests

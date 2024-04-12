@@ -21,4 +21,9 @@ enum struct AttrId : u16 {
 #include "defs/tag-names.inc"
 #undef TAG
 
+#define ATTR(IDENT, _) \
+    inline constexpr AttrName IDENT##_ATTR = AttrId::IDENT;
+#include "defs/attr-names.inc"
+#undef ATTR
+
 } // namespace Web::Html

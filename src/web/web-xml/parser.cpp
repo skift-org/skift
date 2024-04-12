@@ -14,9 +14,9 @@ Res<Strong<Dom::Document>> Parser::parse(Io::SScan &s, Ns ns) {
     logDebug("Parsing XML document");
 
     auto doc = makeStrong<Dom::Document>();
-    try$(_parseProlog(s));
+    try$(_parseProlog(s, *doc));
     doc->appendChild(try$(_parseElement(s, ns)));
-    while (_parseMisc(s))
+    while (_parseMisc(s, *doc))
         ;
 
     return Ok(doc);
@@ -215,16 +215,17 @@ Res<> Parser::_parseXmlDecl(Io::SScan &s) {
     return Ok();
 }
 
-Res<> Parser::_parseMisc(Io::SScan &s) {
+Res<> Parser::_parseMisc(Io::SScan &s, Dom::Node &parent) {
     // Misc ::= Comment | PI | S
 
     logDebug("Parsing miscellaneous");
 
     auto rollback = s.rollbackPoint();
 
-    if (s.match(RE_COMMENT_START) != Match::NO)
-        try$(_parseComment(s));
-    else if (s.match(RE_PI_START) != Match::NO)
+    if (s.match(RE_COMMENT_START) != Match::NO) {
+        auto c = try$(_parseComment(s));
+        parent.appendChild(c);
+    } else if (s.match(RE_PI_START) != Match::NO)
         try$(_parsePi(s));
     else if (s.match(RE_S) != Match::NO)
         try$(_parseS(s));
@@ -236,7 +237,7 @@ Res<> Parser::_parseMisc(Io::SScan &s) {
     return Ok();
 }
 
-Res<> Parser::_parseProlog(Io::SScan &s) {
+Res<> Parser::_parseProlog(Io::SScan &s, Dom::Node &parent) {
     // prolog ::= XMLDecl? Misc* (doctypedecl Misc*)?
     auto rollback = s.rollbackPoint();
 
@@ -245,7 +246,7 @@ Res<> Parser::_parseProlog(Io::SScan &s) {
     if (s.match(RE_XML_DECL_START) != Match::NO)
         try$(Parser::_parseXmlDecl(s));
 
-    while (_parseMisc(s) and not s.ended())
+    while (_parseMisc(s, parent) and not s.ended())
         ;
 
     // TODO: Parse doctype declaration
@@ -398,6 +399,7 @@ Res<> Parser::_parseContentItem(Io::SScan &s, Ns ns, Dom::Element &el) {
     } else if (auto r = _parsePi(s)) {
         return Ok();
     } else if (auto r = _parseComment(s)) {
+        el.appendChild(r.unwrap());
         return Ok();
     } else {
         return Error::invalidData("expected content item");

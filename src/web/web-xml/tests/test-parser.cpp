@@ -11,7 +11,7 @@ test$("parse-empty-document") {
     return Ok();
 }
 
-test$("parse-simple-document") {
+test$("parse-open-close-tag") {
     auto s = Io::SScan("<html></html>");
     auto p = Parser();
     auto doc = try$(p.parse(s, Web::HTML));
@@ -37,6 +37,35 @@ test$("parse-attr") {
     auto el = try$(first.cast<Dom::Element>());
     expect$(el->hasAttribute(Html::LANG_ATTR));
     expect$(el->getAttribute(Html::LANG_ATTR) == "en");
+    return Ok();
+}
+
+test$("parse-nested-tags") {
+    auto s = Io::SScan("<html><head></head><body></body></html>");
+    auto p = Parser();
+    auto doc = try$(p.parse(s, Web::HTML));
+    auto first = doc->firstChild();
+    auto el = try$(first.cast<Dom::Element>());
+    expect$(el->hasChildren());
+    auto head = el->firstChild();
+    expect$(head->nodeType() == Dom::NodeType::ELEMENT);
+    expect$(try$(head.cast<Dom::Element>())->tagName == Html::HEAD);
+    auto body = head->nextSibling();
+    expect$(body->nodeType() == Dom::NodeType::ELEMENT);
+    expect$(try$(body.cast<Dom::Element>())->tagName == Html::BODY);
+    return Ok();
+}
+
+test$("parse-comment") {
+    auto s = Io::SScan("<html><!-- comment --></html>");
+    auto p = Parser();
+    auto doc = try$(p.parse(s, Web::HTML));
+    auto first = doc->firstChild();
+    auto el = try$(first.cast<Dom::Element>());
+    expect$(el->hasChildren());
+    auto comment = el->firstChild();
+    expect$(comment->nodeType() == Dom::NodeType::COMMENT);
+    expect$(try$(comment.cast<Dom::Comment>())->data == " comment ");
     return Ok();
 }
 

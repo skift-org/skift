@@ -39,9 +39,9 @@ struct Parser {
 
     Res<> _parseXmlDecl(Io::SScan &s);
 
-    Res<> _parseMisc(Io::SScan &s);
+    Res<> _parseMisc(Io::SScan &s, Dom::Node &parent);
 
-    Res<> _parseProlog(Io::SScan &s);
+    Res<> _parseProlog(Io::SScan &s, Dom::Node &parent);
 
     Res<Strong<Dom::Element>> _parseElement(Io::SScan &s, Ns ns);
 

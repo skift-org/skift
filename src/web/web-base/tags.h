@@ -228,13 +228,13 @@ struct Karm::Io::Formatter<Web::Ns> {
 template <>
 struct Karm::Io::Formatter<Web::TagName> {
     Res<usize> format(Io::TextWriter &writer, Web::TagName const &val) {
-        return Io::format(writer, "{}:{}", val.name());
+        return Io::format(writer, "{}:{}", val.ns, val.name());
     }
 };
 
 template <>
 struct Karm::Io::Formatter<Web::AttrName> {
     Res<usize> format(Io::TextWriter &writer, Web::AttrName const &val) {
-        return Io::format(writer, "{}:{}", val.name());
+        return Io::format(writer, "{}:{}", val.ns, val.name());
     }
 };

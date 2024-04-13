@@ -42,6 +42,8 @@
 "It's grub fault",
 "It's loader fault",
 "It's not a good surprise...",
+"It's over",
+"It's so over",
 "Keyboard not found! Please press any key to continue...",
 "Les erreurs au fond, ce n'est qu'une construction social",
 "Let me interject for a moment, what you call errors are in fact skift/errors",

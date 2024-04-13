@@ -1,3 +1,4 @@
+
 "*hug you real hard*",
 "*hug*",
 "Add that to the highlight reel",
@@ -51,6 +52,8 @@
 "This text is random",
 "Today is a good day to celebrate with cake. (Or ice cream, or your favorite treat!)",
 "VICTORY ROYALE",
+"We are back",
+"We are so back",
 "We love to see it",
 "We stan a legend",
 "Welcome to the cool kids club",

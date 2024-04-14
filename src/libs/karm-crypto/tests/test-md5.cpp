@@ -3,7 +3,7 @@
 
 namespace Karm::Crypto::Tests {
 
-test$(md5Hash) {
+test$("md5-hash") {
     return Ok(); // FIXME: disabled until we have a proper implementation
 
     Md5 md5;

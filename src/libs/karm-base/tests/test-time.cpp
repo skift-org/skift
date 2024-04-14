@@ -3,7 +3,7 @@
 
 namespace Karm::Base::Tests {
 
-test$(timespan) {
+test$("timespan-builders") {
     auto ts = TimeSpan::fromUSecs(2);
     expectEq$(ts._value, 2uz);
 
@@ -34,7 +34,7 @@ test$(timespan) {
     return Ok();
 }
 
-test$(timestamp) {
+test$("timestamp") {
     TimeStamp tst = TimeStamp::epoch();
     expectEq$(tst._value, 0uz);
 

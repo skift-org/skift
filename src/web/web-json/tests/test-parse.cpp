@@ -4,13 +4,13 @@
 
 namespace Web::Json::Tests {
 
-test$(jsonNull) {
+test$("json-parse-null") {
     auto val = "null"_json;
     expect$(val.isNull());
     return Ok();
 }
 
-test$(jsonArray) {
+test$("json-parse-array") {
     auto val = "[1, 2, 3]"_json;
 
     expect$(val.isArray());
@@ -22,7 +22,7 @@ test$(jsonArray) {
     return Ok();
 }
 
-test$(jsonObject) {
+test$("json-parse-object") {
     auto val = R"({"a": 1, "b": 2, "c": 3})"_json;
 
     expect$(val.isObject());
@@ -34,14 +34,14 @@ test$(jsonObject) {
     return Ok();
 }
 
-test$(jsonString) {
+test$("json-parse-string") {
     auto val = R"("hello")"_json;
     expect$(val.isStr());
     expectEq$(val.asStr(), "hello");
     return Ok();
 }
 
-test$(jsonInteger) {
+test$("json-parse-integer") {
     auto val = "42"_json;
     expect$(val.isInt());
     expectEq$(val.asInt(), 42);
@@ -49,7 +49,7 @@ test$(jsonInteger) {
     return Ok();
 }
 
-test$(jsonFloat) {
+test$("json-parse-float") {
     auto val = "3.14"_json;
     expect$(val.isFloat());
     expect$(Math::epsilonEq(val.asFloat(), 3.14, 0.0001));
@@ -57,7 +57,7 @@ test$(jsonFloat) {
     return Ok();
 }
 
-test$(jsonBool) {
+test$("json-parse-bool") {
     auto val = "true"_json;
     expect$(val.isBool());
     expectEq$(val.asBool(), true);

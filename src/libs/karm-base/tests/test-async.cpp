@@ -3,7 +3,7 @@
 
 namespace Karm::Base::Tests {
 
-test$(testSenderOne) {
+test$("sender-one") {
     auto sender = Async::One<int>{10};
     auto res = Async::run(sender);
     expectEq$(res, 10);
@@ -14,7 +14,7 @@ Async::_Task<int> taskValue() {
     co_return 42;
 }
 
-test$(testTaskValue) {
+test$("task-value") {
     auto res = Async::run(taskValue());
     expectEq$(res, 42);
     return Ok();
@@ -24,13 +24,13 @@ Async::_Task<int> taskOuter() {
     co_return co_await taskValue();
 }
 
-test$(testTaskOuter) {
+test$("task-outer") {
     auto res = Async::run(taskOuter());
     expectEq$(res, 42);
     return Ok();
 }
 
-test$(testTaskDetach) {
+test$("task-detach") {
     int res = 0xdead;
     Async::detach(taskValue(), [&](int r) {
         res = r;
@@ -39,7 +39,7 @@ test$(testTaskDetach) {
     return Ok();
 }
 
-test$(testPromiseOneFuture) {
+test$("promise-one-future") {
     Opt<Async::_Future<int>> future;
     {
         Async::_Promise<int> promise;
@@ -51,7 +51,7 @@ test$(testPromiseOneFuture) {
     return Ok();
 }
 
-test$(testPromiseMultipleFutures) {
+test$("promise-multiple-futures") {
     Opt<Async::_Future<int>> f1, f2, f3;
     {
         Async::_Promise<int> promise;

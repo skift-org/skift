@@ -4,7 +4,7 @@
 
 namespace Karm::Mime::Tests {
 
-test$(urlParentOf) {
+test$("url-parent-of") {
     expect$("http://example.com/"_url.isParentOf("http://example.com/"_url));
     expect$("http://example.com"_url.isParentOf("http://example.com/a"_url));
     expect$("http://example.com"_url.isParentOf("http://example.com/a/b"_url));

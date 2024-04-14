@@ -3,7 +3,7 @@
 
 namespace Karm::Base::Tests {
 
-test$(lruAccess) {
+test$("lru-access") {
     Lru<int, int> cache{10};
 
     for (int i = 0; i < 10; i++) {
@@ -20,7 +20,7 @@ test$(lruAccess) {
     return Ok();
 }
 
-test$(lruContains) {
+test$("lru-contains") {
     Lru<int, int> cache{10};
     expect$(not cache.contains(0));
     (void)cache.access(0, [&] {
@@ -30,7 +30,7 @@ test$(lruContains) {
     return Ok();
 }
 
-test$(lruLen) {
+test$("lru-len") {
     Lru<int, int> cache{10};
     expectEq$(cache.len(), 0uz);
     (void)cache.access(0, [&] {
@@ -48,7 +48,7 @@ test$(lruLen) {
     return Ok();
 }
 
-test$(lruEvict) {
+test$("lru-evict") {
     Lru<int, int> cache{10};
 
     for (int i = 0; i < 10; i++) {

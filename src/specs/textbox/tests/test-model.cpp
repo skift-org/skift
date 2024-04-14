@@ -1,9 +1,9 @@
 #include <karm-test/macros.h>
 #include <textbox/model.h>
 
-namespace Textbox {
+namespace Textbox::Tests {
 
-test$(modelMoves) {
+test$("model-moves") {
     Model mdl{"foo bar baz"};
 
     mdl.moveNext();
@@ -21,4 +21,4 @@ test$(modelMoves) {
     return Ok();
 }
 
-} // namespace Textbox
+} // namespace Textbox::Tests

@@ -3,7 +3,7 @@
 
 namespace Karm::Base::Tests {
 
-test$(listPushAndPop) {
+test$("list-push-and-pop") {
     List<int> list;
 
     list.pushBack(1);
@@ -23,7 +23,7 @@ test$(listPushAndPop) {
     return Ok();
 }
 
-test$(listRequeue) {
+test$("list-requeue") {
     List<int> list;
 
     list.pushBack(1);
@@ -45,7 +45,7 @@ test$(listRequeue) {
     return Ok();
 }
 
-test$(listTrunc) {
+test$("list-trunc") {
     List<int> list;
 
     list.pushBack(1);
@@ -66,7 +66,7 @@ test$(listTrunc) {
     return Ok();
 }
 
-test$(listClear) {
+test$("list-clear") {
     List<int> list;
 
     list.pushBack(1);
@@ -86,7 +86,7 @@ test$(listClear) {
     return Ok();
 }
 
-test$(listInsert) {
+test$("list-insert") {
     List<int> list;
 
     list.pushBack(1);
@@ -111,7 +111,7 @@ test$(listInsert) {
     return Ok();
 }
 
-test$(listRemove) {
+test$("list-remove") {
     List<int> list;
 
     list.pushBack(1);
@@ -134,7 +134,7 @@ test$(listRemove) {
     return Ok();
 }
 
-test$(listRemoveAt) {
+test$("list-remove-at") {
     List<int> list;
 
     list.pushBack(1);
@@ -157,7 +157,7 @@ test$(listRemoveAt) {
     return Ok();
 }
 
-test$(listIter) {
+test$("list-iter") {
     List<int> list;
 
     list.pushBack(1);
@@ -179,7 +179,7 @@ test$(listIter) {
     return Ok();
 }
 
-test$(listIterRev) {
+test$("list-iter-rev") {
     List<int> list;
 
     list.pushBack(1);

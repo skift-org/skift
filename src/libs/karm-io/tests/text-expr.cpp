@@ -3,7 +3,7 @@
 
 namespace Karm::Io::Tests {
 
-test$(exprEither) {
+test$("expr-either") {
     expect$(Re::match('a'_re | 'b'_re, ""s) == Match::NO);
     expect$(Re::match('a'_re | 'b'_re, "a"s) == Match::YES);
     expect$(Re::match('a'_re | 'b'_re, "b"s) == Match::YES);
@@ -13,7 +13,7 @@ test$(exprEither) {
     return Ok();
 }
 
-test$(exprChain) {
+test$("expr-chain") {
     expect$(Re::match('a'_re & 'b'_re, ""s) == Match::NO);
     expect$(Re::match('a'_re & 'b'_re, "ba"s) == Match::NO);
     expect$(Re::match('a'_re & 'b'_re, "ab"s) == Match::YES);
@@ -22,7 +22,7 @@ test$(exprChain) {
     return Ok();
 }
 
-test$(exprNegate) {
+test$("expr-negate") {
     expect$(Re::match(~'a'_re, ""s) == Match::NO);
     expect$(Re::match(~'a'_re, "b"s) == Match::YES);
     expect$(Re::match(~'a'_re, "a"s) == Match::NO);
@@ -32,7 +32,7 @@ test$(exprNegate) {
     return Ok();
 }
 
-test$(exprSingle) {
+test$("expr-single") {
 
     expect$(Re::match('a'_re, ""s) == Match::NO);
     expect$(Re::match('a'_re, "a"s) == Match::YES);

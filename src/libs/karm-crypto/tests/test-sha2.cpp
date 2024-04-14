@@ -3,7 +3,7 @@
 
 namespace Karm::Crypto::Tests {
 
-test$(sha256Hash) {
+test$("sha256-hash") {
     return Ok(); // FIXME: disabled until we have a proper implementation
 
     Sha256 sha256;

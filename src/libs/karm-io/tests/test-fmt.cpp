@@ -29,7 +29,7 @@ Res<> testCase(Str expected, T const &value, Str format = "") {
 
 // MARK: Number Formatting -----------------------------------------------------
 
-test$(fmtUnsignedNumber) {
+test$("fmt-unsigned-number") {
     // Unsigned
     try$(testCase("0", 0u));
     try$(testCase("1", 1u));
@@ -52,7 +52,7 @@ test$(fmtUnsignedNumber) {
     return Ok();
 }
 
-test$(fmtSignedNumber) {
+test$("fmt-signed-number") {
     // Signed
     try$(testCase("0", 0));
     try$(testCase("1", 1));
@@ -83,7 +83,7 @@ test$(fmtSignedNumber) {
 
 // MARK: Boolean Formatting ----------------------------------------------------
 
-test$(fmtBool) {
+test$("fmt-bool") {
     try$(testCase("True", true));
     try$(testCase("False", false));
     return Ok();
@@ -91,7 +91,7 @@ test$(fmtBool) {
 
 // MARK: Format Optionals ------------------------------------------------------
 
-test$(fmtOptionals) {
+test$("fmt-optionals") {
     try$(testCase("None", NONE));
 
     try$(testCase("Ok", Ok()));
@@ -108,13 +108,13 @@ test$(fmtOptionals) {
     return Ok();
 }
 
-test$(fmtError) {
+test$("fmt-error") {
     try$(testCase("test", Error::invalidData("test")));
 
     return Ok();
 }
 
-test$(fmtResult) {
+test$("fmt-result") {
     try$(testCase("Ok", Ok()));
     try$(testCase("1", Ok(1)));
     try$(testCase("test", Error::invalidData("test")));
@@ -124,7 +124,7 @@ test$(fmtResult) {
 
 // MARK: Format References -----------------------------------------------------
 
-test$(fmtReferences) {
+test$("fmt-references") {
     auto number = makeStrong<int>(123);
     try$(testCase("123", number));
 
@@ -142,7 +142,7 @@ test$(fmtReferences) {
 
 // MARK: Format Reflectable ----------------------------------------------------
 
-test$(fmtReflectable) {
+test$("fmt-reflectable") {
     auto fooStr = try$(Io::format("{#}", Foo{1, 2}));
     expectEq$(fooStr, "Foo{bar=1, baz=2}");
 
@@ -154,7 +154,7 @@ test$(fmtReflectable) {
 
 // MARK: Format Sliceable ------------------------------------------------------
 
-test$(fmtSliceable) {
+test$("fmt-sliceable") {
     Array arr{1, 2, 3};
     try$(testCase("{1, 2, 3}", arr));
     return Ok();
@@ -162,7 +162,7 @@ test$(fmtSliceable) {
 
 // MARK: Format String ---------------------------------------------------------
 
-test$(fmtString) {
+test$("fmt-string") {
     try$(testCase("test", Str("test")));
     return Ok();
 }
@@ -171,12 +171,12 @@ test$(fmtString) {
 
 // MARK: Format Tuple ----------------------------------------------------------
 
-test$(fmtCons) {
+test$("fmt-cons") {
     try$(testCase("{1, 2}", Cons{1, 2}));
     return Ok();
 }
 
-test$(fmtTuple) {
+test$("fmt-tuple") {
     try$(testCase("{1}", Tuple{1}));
     try$(testCase("{1, 2}", Tuple{1, 2}));
     try$(testCase("{1, 2, 3}", Tuple{1, 2, 3}));

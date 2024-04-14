@@ -3,7 +3,7 @@
 
 namespace Karm::Base::Tests {
 
-test$(defaultConstructedVec) {
+test$("vec-default-constructed") {
     Vec<int> vec;
     expectEq$(vec.len(), 0uz);
     expectEq$(vec.cap(), 0uz);

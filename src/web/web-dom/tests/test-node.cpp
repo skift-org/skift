@@ -3,7 +3,7 @@
 
 namespace Web::Dom::Tests {
 
-test$(domTree) {
+test$("dom-tree") {
     auto doc = makeStrong<Document>();
     return Ok();
 }

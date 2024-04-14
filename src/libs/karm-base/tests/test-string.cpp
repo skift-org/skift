@@ -3,7 +3,7 @@
 
 namespace Karm::Base::Tests {
 
-test$(defaultConstructedInlineString) {
+test$("string-default-constructed-inline") {
     InlineString<16> str;
 
     expectEq$(str.len(), 0uz);
@@ -12,7 +12,7 @@ test$(defaultConstructedInlineString) {
     return Ok();
 }
 
-test$(valueConstructedInlineString) {
+test$("string-value-constructed-inline") {
     InlineString<16> str("Hello, World!");
 
     expectEq$(str.len(), 13uz);
@@ -21,7 +21,7 @@ test$(valueConstructedInlineString) {
     return Ok();
 }
 
-test$(defaultConstructedString) {
+test$("string-default-constructed") {
     String str;
     expectEq$(str.len(), 0uz);
     expectEq$(str, ""s);
@@ -33,7 +33,7 @@ test$(defaultConstructedString) {
     return Ok();
 }
 
-test$(valueConstructedString) {
+test$("string-value-constructed") {
     String str("Hello, World!");
 
     expectEq$(str.len(), 13uz);

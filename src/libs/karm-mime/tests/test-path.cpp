@@ -3,7 +3,7 @@
 
 namespace Karm::Mime::Tests {
 
-test$(pathUpDown) {
+test$("path-up-down") {
     auto path = "/a/b/c/d/e/f"_path;
 
     auto up1 = path.parent(1);
@@ -27,7 +27,7 @@ test$(pathUpDown) {
     return Ok();
 }
 
-test$(pathParentOf) {
+test$("path-parent-of") {
     expect$(""_path.isParentOf(""_path));
     expect$("/a"_path.isParentOf("/a"_path));
     expect$("/a"_path.isParentOf("/a/b"_path));

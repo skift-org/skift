@@ -3,7 +3,7 @@
 
 namespace Karm::Io::Tests {
 
-test$(sscanEnded) {
+test$("sscan-ended") {
     SScan s{""s};
     expect$(s.ended());
 
@@ -13,7 +13,7 @@ test$(sscanEnded) {
     return Ok();
 }
 
-test$(sscanRem) {
+test$("sscan-rem") {
     SScan s{"abc"};
     expect$(s.rem() == 3);
 
@@ -28,7 +28,7 @@ test$(sscanRem) {
     return Ok();
 }
 
-test$(sscanRemStr) {
+test$("sscan-rem-str") {
     SScan s{"abc"};
     expect$(s.remStr() == "abc");
 
@@ -43,7 +43,7 @@ test$(sscanRemStr) {
     return Ok();
 }
 
-test$(sscanCurr) {
+test$("sscan-curr") {
     SScan s{"abc"};
     expect$(s.curr() == 'a');
 
@@ -58,7 +58,7 @@ test$(sscanCurr) {
     return Ok();
 }
 
-test$(sscanPeek) {
+test$("sscan-peek") {
     SScan s{"abc"};
 
     expect$(s.peek() == 'a');
@@ -70,7 +70,7 @@ test$(sscanPeek) {
     return Ok();
 }
 
-test$(sscanNext) {
+test$("sscan-next") {
     SScan s{"abc"};
 
     expect$(s.next() == 'a');
@@ -82,7 +82,7 @@ test$(sscanNext) {
     return Ok();
 }
 
-test$(sscanSkip) {
+test$("sscan-skip") {
     SScan s{"abc"};
 
     expect$(s.skip('a'));
@@ -106,7 +106,7 @@ test$(sscanSkip) {
     return Ok();
 }
 
-test$(sscanEat) {
+test$("sscan-eat") {
     SScan s{"abc"};
 
     expect$(s.eat('a'));
@@ -126,7 +126,7 @@ test$(sscanEat) {
     return Ok();
 }
 
-test$(sscanAhead) {
+test$("sscan-ahead") {
     SScan s{"abc"};
 
     expect$(s.ahead('a'));

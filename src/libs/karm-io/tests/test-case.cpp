@@ -38,7 +38,7 @@ struct {
     {Case::SPONGE, "NFTs are the future of the web", "NfTs ArE tHe FuTuRe Of ThE wEb"},
 };
 
-test$(changeChase) {
+test$("case-change") {
     for (auto [c, input, expected] : CASES) {
         auto result = try$(changeCase(input, c));
         expectEq$(result, expected);

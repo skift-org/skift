@@ -20,7 +20,7 @@ Async::Task<> sleepyBoy() {
     co_return Ok();
 }
 
-test$(sleepAsync) {
+test$("async-sleep") {
     return Sys::run(sleepyBoy());
 }
 

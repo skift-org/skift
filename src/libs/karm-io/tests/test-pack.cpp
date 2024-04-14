@@ -3,7 +3,7 @@
 
 namespace Karm::Io::Tests {
 
-test$(packUnpack) {
+test$("pack-unpack") {
     auto testCase = [&]<typename T>(T const &input) -> Res<> {
         Io::BufferWriter buf;
         Io::BEmit e{buf};

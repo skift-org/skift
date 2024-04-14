@@ -10,7 +10,7 @@ Reflectable$(Foo, bar, baz);
 
 namespace Karm::Base::Tests {
 
-test$(reflect) {
+test$("reflect") {
     using R = Reflect<Foo>;
 
     expectEq$(R::NAME, "Foo");

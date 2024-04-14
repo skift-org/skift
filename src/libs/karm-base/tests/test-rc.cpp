@@ -3,7 +3,7 @@
 
 namespace Karm::Base::Tests {
 
-test$(strongRc) {
+test$("strong-rc") {
     struct S {
         int x = 0;
     };

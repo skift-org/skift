@@ -3,7 +3,7 @@
 
 namespace Karm::Base::Tests {
 
-test$(sieveAccess) {
+test$("sieve-access") {
     Sieve<int, int> cache{10};
 
     for (int i = 0; i < 10; i++) {
@@ -20,7 +20,7 @@ test$(sieveAccess) {
     return Ok();
 }
 
-test$(sieveContains) {
+test$("sieve-contains") {
     Sieve<int, int> cache{10};
     expect$(not cache.contains(0));
     (void)cache.access(0, [&] {
@@ -30,7 +30,7 @@ test$(sieveContains) {
     return Ok();
 }
 
-test$(sieveLen) {
+test$("sieve-len") {
     Sieve<int, int> cache{10};
     expectEq$(cache.len(), 0uz);
     (void)cache.access(0, [&] {
@@ -48,7 +48,7 @@ test$(sieveLen) {
     return Ok();
 }
 
-test$(seiveEvict) {
+test$("seive-evict") {
     Sieve<int, int> cache{10};
 
     for (int i = 0; i < 10; i++) {

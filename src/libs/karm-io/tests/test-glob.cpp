@@ -3,7 +3,7 @@
 
 namespace Karm::Io::Tests {
 
-test$(globMatch) {
+test$("glob-match") {
     expect$(matchGlob("", ""));
     expect$(matchGlob("a", "a"));
     expect$(not matchGlob("a", ""));

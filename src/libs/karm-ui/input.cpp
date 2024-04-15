@@ -264,64 +264,70 @@ Child button(OnPress onPress, Mdi::Icon i, Str t) {
 
 struct Input : public View<Input> {
     Gfx::TextStyle _style;
-    Strong<Textbox::Model> _text;
-    OnChange<> _onChange;
-    usize _cursor = 0;
-    Opt<Media::FontMeasure> _measure;
 
-    Input(Gfx::TextStyle style, Strong<Textbox::Model> text, OnChange<> onChange)
-        : _style(style), _text(text), _onChange(std::move(onChange)) {}
+    Strong<Textbox::Model> _model;
+    OnChange<Textbox::Action> _onChange;
+
+    Opt<Gfx::Text> _text;
+
+    Input(Gfx::TextStyle style, Strong<Textbox::Model> model, OnChange<Textbox::Action> onChange)
+        : _style(style), _model(model), _onChange(std::move(onChange)) {}
 
     void reconcile(Input &o) override {
-        _text = o._text;
-        _measure = NONE;
+        _style = o._style;
+        _model = o._model;
+        _onChange = std::move(o._onChange);
+
+        // NOTE: The model might have changed,
+        //       so we need to invalidate the presentation.
+        _text = NONE;
     }
 
-    Media::FontMeasure measure() {
-        if (_measure) {
-            return *_measure;
+    Gfx::Text &_ensureText() {
+        if (not _text) {
+            _text = Gfx::Text(_style);
+            _text->append(_model->runes());
         }
-        //_measure = _style.font.measureStr(_text);
-        return *_measure;
+        return *_text;
     }
 
     void paint(Gfx::Context &g, Math::Recti) override {
         g.save();
+        g.clip(bound());
+        g.origin(bound().xy);
 
-        auto m = measure();
-        // auto baseline = bound().topStart() + m.baseline;
-
-        if (_style.color) {
-            g.fillStyle(*_style.color);
-        }
-
-        g.textFont(_style.font);
-        // g.fill(baseline, _text);
-
-        if (debugShowLayoutBounds) {
-            g.plot(
-                Math::Edgei{
-                    bound().topStart() + m.baseline.cast<isize>(),
-                    bound().topEnd() + m.baseline.cast<isize>(),
-                },
-                Gfx::PINK
-            );
-            g.plot(bound(), Gfx::CYAN);
-        }
+        auto &text = _ensureText();
+        text.paint(g);
 
         g.restore();
+        if (debugShowLayoutBounds)
+            g.plot(bound(), Gfx::CYAN);
     }
 
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
-        return measure().linebound.size().cast<isize>();
+    void event(Sys::Event &e) override {
+        auto a = Textbox::Action::fromEvent(e);
+        if (a) {
+            e.accept();
+            _onChange(*this, *a);
+        }
+    }
+
+    void layout(Math::Recti bound) override {
+        _ensureText().layout(bound.width);
+        View<Input>::layout(bound);
+    }
+
+    Math::Vec2i size(Math::Vec2i s, Layout::Hint) override {
+        auto size = _ensureText().layout(s.width);
+        return size.ceil().cast<isize>();
     }
 };
 
-Child input(Gfx::TextStyle style, Strong<Textbox::Model> text, OnChange<> onChange) {
+Child input(Gfx::TextStyle style, Strong<Textbox::Model> text, OnChange<Textbox::Action> onChange) {
     return makeStrong<Input>(style, text, std::move(onChange));
 }
 
-Child input(Strong<Textbox::Model> text, OnChange<> onChange) {
+Child input(Strong<Textbox::Model> text, OnChange<Textbox::Action> onChange) {
     return makeStrong<Input>(TextStyles::bodyMedium(), text, std::move(onChange));
 }
 
@@ -344,7 +350,11 @@ struct Toggle : public View<Toggle> {
     void paint(Gfx::Context &g, Math::Recti) override {
         g.save();
 
-        auto thumb = bound().hsplit(26).get(_value).shrink(_value ? 4 : 6);
+        auto thumb =
+            bound()
+                .hsplit(26)
+                .get(_value)
+                .shrink(_value ? 4 : 6);
 
         if (_value) {
             g.fillStyle(_mouseListener.isHover() ? ACCENT600 : ACCENT700);
@@ -354,7 +364,9 @@ struct Toggle : public View<Toggle> {
             g.fill(thumb, 999);
 
             if (_mouseListener.isPress()) {
-                g.strokeStyle(Gfx::stroke(ACCENT600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.strokeStyle(Gfx::stroke(ACCENT600)
+                                  .withWidth(1)
+                                  .withAlign(Gfx::INSIDE_ALIGN));
                 g.stroke(bound(), 999);
             }
         } else {
@@ -365,7 +377,9 @@ struct Toggle : public View<Toggle> {
             g.fill(thumb, 999);
 
             if (_mouseListener.isPress()) {
-                g.strokeStyle(Gfx::stroke(GRAY600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
+                g.strokeStyle(Gfx::stroke(GRAY600)
+                                  .withWidth(1)
+                                  .withAlign(Gfx::INSIDE_ALIGN));
                 g.stroke(bound(), 999);
             }
         }

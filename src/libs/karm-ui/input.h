@@ -162,9 +162,9 @@ Child button(OnPress onPress, Mdi::Icon i, Str t);
 
 // MARK: Input -----------------------------------------------------------------
 
-Child input(Strong<Textbox::Model> text, OnChange<> onChange, Gfx::TextStyle style);
+Child input(Gfx::TextStyle style, Strong<Textbox::Model> text, OnChange<Textbox::Action> onChange);
 
-Child input(Strong<Textbox::Model> text, OnChange<> onChange);
+Child input(Strong<Textbox::Model> text, OnChange<Textbox::Action> onChange);
 
 // MARK: Toggle ----------------------------------------------------------------
 

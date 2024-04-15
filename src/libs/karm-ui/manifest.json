@@ -4,6 +4,7 @@
     "type": "lib",
     "description": "A graphical user interface library",
     "requires": [
+        "textbox-spec",
         "karm-ui-impl",
         "karm-gfx",
         "karm-events",

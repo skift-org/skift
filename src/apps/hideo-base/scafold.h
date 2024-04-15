@@ -59,7 +59,6 @@ struct Scafold : public Meta::NoCopy {
         a.visit(::Visitor{
             [&](ToggleSidebar) {
                 s.sidebarOpen = !s.sidebarOpen;
-                return s;
             },
         });
     }

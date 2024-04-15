@@ -321,7 +321,6 @@ struct SdlHost :
         case SDL_TEXTINPUT: {
             Str text = sdlEvent.text.text;
             for (Rune r : iterRunes(text)) {
-                logInfo("typed: {#c}", r);
                 event<Events::TypedEvent>(*this, r);
             }
             break;

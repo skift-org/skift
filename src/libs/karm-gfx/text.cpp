@@ -18,7 +18,7 @@ void Text::_beginBlock() {
     });
 }
 
-void Text::_appendRune(Rune rune) {
+void Text::append(Rune rune) {
     if (last(_blocks).newline)
         _beginBlock();
 
@@ -53,7 +53,7 @@ void Text::clear() {
 
 void Text::append(Slice<Rune> runes) {
     for (auto rune : runes) {
-        _appendRune(rune);
+        append(rune);
     }
 }
 

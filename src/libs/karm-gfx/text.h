@@ -106,14 +106,14 @@ struct Text {
 
     void _beginBlock();
 
-    void _appendRune(Rune rune);
+    void append(Rune rune);
 
     void clear();
 
     template <typename E>
     void append(_Str<E> str) {
         for (auto rune : iterRunes(str))
-            _appendRune(rune);
+            append(rune);
     }
 
     void append(Slice<Rune> runes);

@@ -103,14 +103,14 @@ struct [[nodiscard]] Res {
     template <typename U>
     always_inline constexpr Res<U, E> mapValue(auto f) {
         if (_inner.template is<Ok<V>>())
-            return f(_inner.template unwrap<Ok<V>>().inner);
+            return Ok(f(_inner.template unwrap<Ok<V>>().inner));
         return _inner.template unwrap<E>();
     }
 
     template <typename U>
     always_inline constexpr Res<U, E> mapValue() {
         if (_inner.template is<Ok<V>>())
-            return _inner.template unwrap<Ok<V>>().inner;
+            return Ok(_inner.template unwrap<Ok<V>>().inner);
         return _inner.template unwrap<E>();
     }
 

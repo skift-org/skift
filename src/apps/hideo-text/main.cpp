@@ -8,36 +8,127 @@
 
 namespace Hideo::Text {
 
-Ui::Child editor(Str text) {
-    return Ui::bodyMedium(text) |
-           Ui::spacing(6) |
-           Ui::grow() |
-           Ui::vscroll();
-}
+struct State {
+    Opt<Mime::Url> url;
+    Opt<Error> error;
+    Strong<Textbox::Model> text;
+};
 
-Ui::Child app(Res<String> text) {
-    return scafold({
-        .icon = Mdi::TEXT,
-        .title = "Text"s,
-        .startTools = slots$(
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FILE),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FOLDER),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE_PLUS)
-        ),
-        .endTools = slots$(
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::UNDO),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::REDO)
-        ),
-        .body = [=] {
-            return text
-                       ? editor(text.unwrap())
-                       : alert(
-                             "Unable to load text"s,
-                             Io::toStr(text.none()).unwrap()
-                         );
+struct New {
+};
+
+struct Save {
+    bool prompt = false;
+};
+
+using Action = Union<Textbox::Action, New, Save>;
+
+void reduce(State &s, Action a) {
+    a.visit(::Visitor{
+        [&](Textbox::Action &t) {
+            s.text->reduce(t);
+        },
+        [&](New &) {
+            s.url = NONE;
+            s.error = NONE;
+            s.text = makeStrong<Textbox::Model>();
+        },
+        [&](Save &) {
+
         },
     });
+}
+
+using Model = Ui::Model<State, Action, reduce>;
+
+Ui::Child editor(Strong<Textbox::Model> text) {
+    return Ui::input(text, [](Ui::Node &n, Action a) {
+               Model::bubble(n, a);
+           }) |
+           Ui::spacing(16) | Ui::vscroll() | Ui::grow();
+}
+
+Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
+    auto text = makeStrong<Textbox::Model>();
+    Opt<Error> error = NONE;
+
+    if (str) {
+        text->load(str.unwrap());
+    } else {
+        error = str.none();
+    }
+
+    return Ui::reducer<Model>(
+        State{
+            url,
+            error,
+            text,
+        },
+        [](State const &s) {
+            if (s.error) {
+                return scafold({
+                    .icon = Mdi::TEXT,
+                    .title = "Text"s,
+                    .body = [=] {
+                        return alert("Unable to load text"s, Io::toStr(s.error).unwrap());
+                    },
+                });
+            }
+
+            return scafold({
+                .icon = Mdi::TEXT,
+                .title = "Text"s,
+                .startTools = slots$(
+                    Ui::button(Model::bind<New>(), Ui::ButtonStyle::subtle(), Mdi::FILE),
+                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FOLDER),
+                    Ui::button(Model::bindIf(s.text->dirty(), Save{}), Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE),
+                    Ui::button(Model::bindIf(s.text->dirty(), Save{true}), Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE_PLUS)
+                ),
+                .endTools = slots$(
+                    Ui::button(
+                        Model::bindIf<Textbox::Action>(s.text->canUndo(), Textbox::Action::UNDO),
+                        Ui::ButtonStyle::subtle(),
+                        Mdi::UNDO
+                    ),
+                    Ui::button(
+                        Model::bindIf<Textbox::Action>(s.text->canRedo(), Textbox::Action::REDO),
+                        Ui::ButtonStyle::subtle(), Mdi::REDO
+                    )
+                ),
+                .body = [=] {
+                    return Ui::vflow(
+                        Ui::hflow(
+                            0,
+                            Layout::Align::CENTER,
+                            Ui::labelSmall("{}{}", s.url ? s.url->basename() : "Untitled", s.text->dirty() ? "*" : ""),
+                            Ui::icon(Mdi::CIRCLE_SMALL, Ui::GRAY700) | Ui::spacing({-3, 0}),
+                            Ui::text(Ui::TextStyles::labelSmall().withColor(Ui::GRAY500), "{}", s.url)
+                        ) | Ui::box({
+                                .padding = {16, 6},
+                            }),
+                        Ui::separator(),
+
+                        editor(s.text),
+                        Ui::separator(),
+                        Ui::hflow(
+                            6,
+                            Layout::Align::CENTER,
+                            Ui::labelSmall("{}", s.text->dirty() ? "Edited" : ""),
+                            Ui::grow(NONE),
+                            Ui::labelSmall("Ln {}, Col {}", 0, 0),
+                            Ui::separator(),
+                            Ui::labelSmall("UTF-8"),
+                            Ui::separator(),
+                            Ui::labelSmall("LF")
+                        ) | Ui::box({
+                                .padding = {12, 6},
+                                .backgroundPaint = Ui::GRAY900,
+                            })
+                    );
+                },
+            });
+        }
+    );
 }
 
 Res<String> readAllUtf8(Mime::Url const &url) {
@@ -49,9 +140,11 @@ Res<String> readAllUtf8(Mime::Url const &url) {
 
 Res<> entryPoint(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
-    Res<String> text = Error::invalidInput("No text provided");
-    auto url = try$(Mime::parseUrlOrPath(args[0]));
-    if (args.len())
-        text = Hideo::Text::readAllUtf8(url);
-    return Ui::runApp(ctx, Hideo::Text::app(text));
+    Opt<Mime::Url> url;
+    Res<String> text = Ok<String>();
+    if (args.len()) {
+        url = try$(Mime::parseUrlOrPath(args[0]));
+        text = Hideo::Text::readAllUtf8(*url);
+    }
+    return Ui::runApp(ctx, Hideo::Text::app(url, text));
 }

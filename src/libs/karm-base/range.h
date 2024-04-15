@@ -123,6 +123,10 @@ struct Range {
     bool operator==(Range const &other) const {
         return start == other.start and size == other.size;
     }
+
+    explicit operator bool() const {
+        return any();
+    }
 };
 
 using I8Range = Range<i8>;

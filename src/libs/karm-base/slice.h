@@ -444,18 +444,15 @@ always_inline constexpr Opt<usize> lastIndexOf(T const &slice, U const &needle) 
     return NONE;
 }
 
-always_inline Opt<usize> search(Sliceable auto const &slice, auto cmp) {
-    if (slice.len() == 0) {
+always_inline Opt<usize> search(Sliceable auto const &slice, auto const &cmp) {
+    if (slice.len() == 0)
         return NONE;
-    }
 
-    if (cmp(slice[0]) > 0) {
+    if (cmp(slice[0]) > 0)
         return NONE;
-    }
 
-    if (cmp(slice[slice.len() - 1]) < 0) {
+    if (cmp(slice[slice.len() - 1]) < 0)
         return NONE;
-    }
 
     usize left = 0;
     usize right = slice.len() - 1;
@@ -465,9 +462,8 @@ always_inline Opt<usize> search(Sliceable auto const &slice, auto cmp) {
 
         auto result = cmp(slice[mid]);
 
-        if (result == 0) {
+        if (result == 0)
             return mid;
-        }
 
         if (result < 0) {
             left = mid + 1;
@@ -477,6 +473,68 @@ always_inline Opt<usize> search(Sliceable auto const &slice, auto cmp) {
     }
 
     return NONE;
+}
+
+always_inline Opt<usize> searchLowerBound(Sliceable auto const &slice, auto const &cmp) {
+    if (slice.len() == 0)
+        return NONE;
+
+    if (cmp(slice[0]) > 0)
+        return NONE;
+
+    if (cmp(slice[slice.len() - 1]) < 0)
+        return slice.len() - 1;
+
+    usize left = 0;
+    usize right = slice.len() - 1;
+
+    while (left <= right) {
+        usize mid = (left + right) / 2;
+
+        auto result = cmp(slice[mid]);
+
+        if (result == 0)
+            return mid;
+
+        if (result < 0) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return left - 1;
+}
+
+always_inline Opt<usize> searchUpperBound(Sliceable auto const &slice, auto const &cmp) {
+    if (slice.len() == 0)
+        return NONE;
+
+    if (cmp(slice[0]) >= 0)
+        return 0;
+
+    if (cmp(slice[slice.len() - 1]) < 0)
+        return NONE;
+
+    usize left = 0;
+    usize right = slice.len() - 1;
+
+    while (left <= right) {
+        usize mid = (left + right) / 2;
+
+        auto result = cmp(slice[mid]);
+
+        if (result == 0)
+            return mid;
+
+        if (result <= 0) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return left;
 }
 
 /// Enumerates the possible results of a match.

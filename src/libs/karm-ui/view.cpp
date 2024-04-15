@@ -216,14 +216,12 @@ Gfx::TextStyle TextStyles::codeSmall() {
 
 struct Text : public View<Text> {
     Gfx::Text _text;
-    Opt<Media::FontMeasure> _measure;
 
     Text(Gfx::TextStyle style, Str text)
         : _text(style, text) {}
 
     void reconcile(Text &o) override {
         _text = o._text;
-        _measure = NONE;
     }
 
     void paint(Gfx::Context &g, Math::Recti) override {

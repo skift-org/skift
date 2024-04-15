@@ -35,7 +35,15 @@ struct KeyboardEvent {
         PRESS,
         RELEASE,
     } type;
+
+    /// The code of the key that was pressed or released
+    /// This value takes the current keyboard layout into account
     Key key;
+
+    /// The scancode of the key that was pressed or released
+    /// This value is independent of the current keyboard layout
+    Key code;
+
     Mod mods = Mod::NONE;
 };
 

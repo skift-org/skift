@@ -21,21 +21,27 @@ FlagsEnum$(Button);
 
 // MARK: Keyboard ------------------------------------------
 
-enum struct Mod : u8 {
+enum struct Mod : u16 {
     NONE = 0,
 
     LSHIFT = 1 << 0,
     RSHIFT = 1 << 1,
-    ANY_SHIFT = LSHIFT | RSHIFT,
-
     LCTRL = 1 << 2,
     RCTRL = 1 << 3,
-    ANY_CTR = LCTRL | RCTRL,
+    LALT = 1 << 4,
+    RALT = 1 << 5,
+    LSUPER = 1 << 6,
+    RSUPER = 1 << 7,
 
-    ALT = 1 << 4,
-    ALTGR = 1 << 5,
+    NUM = 1 << 8,
+    CAPS = 1 << 9,
+    MODE = 1 << 10,
+    SCROLL = 1 << 11,
 
-    SUPER = 1 << 6,
+    SHIFT = LSHIFT | RSHIFT,
+    CTRL = LCTRL | RCTRL,
+    ALT = LALT | RALT,
+    SUPER = LSUPER | RSUPER,
 };
 
 FlagsEnum$(Mod);

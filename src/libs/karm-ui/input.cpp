@@ -286,7 +286,25 @@ struct Input : public View<Input> {
     Gfx::Text &_ensureText() {
         if (not _text) {
             _text = Gfx::Text(_style);
-            _text->append(_model->runes());
+            auto runes = _model->runes();
+            auto cur = _model->_cur;
+
+            for (usize i = 0; i < runes.len(); i++) {
+                if (not cur.open() and i == cur.head) {
+                    _text->append('|');
+                } else if (cur.open() and i == min(cur.tail, cur.head)) {
+                    _text->append('[');
+                } else if (cur.open() and i == max(cur.tail, cur.head)) {
+                    _text->append(']');
+                }
+                _text->append(runes[i]);
+            }
+
+            if (not cur.open() and cur.head == runes.len()) {
+                _text->append('|');
+            } else if (cur.open() and max(cur.tail, cur.head) == runes.len()) {
+                _text->append(']');
+            }
         }
         return *_text;
     }

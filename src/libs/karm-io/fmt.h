@@ -621,6 +621,50 @@ struct Formatter<Res<T, E>> {
     }
 };
 
+// MARK: Format Ordering -------------------------------------------------------
+
+template <>
+struct Formatter<std::strong_ordering> {
+    Res<usize> format(Io::TextWriter &writer, std::strong_ordering val) {
+        if (val == std::strong_ordering::less)
+            return writer.writeStr("Less"s);
+
+        if (val == std::strong_ordering::greater)
+            return writer.writeStr("Greater"s);
+
+        return writer.writeStr("Equal"s);
+    }
+};
+
+template <>
+struct Formatter<std::weak_ordering> {
+    Res<usize> format(Io::TextWriter &writer, std::weak_ordering val) {
+        if (val == std::weak_ordering::less)
+            return writer.writeStr("Less"s);
+
+        if (val == std::weak_ordering::greater)
+            return writer.writeStr("Greater"s);
+
+        return writer.writeStr("Equivalent"s);
+    }
+};
+
+template <>
+struct Formatter<std::partial_ordering> {
+    Res<usize> format(Io::TextWriter &writer, std::partial_ordering val) {
+        if (val == std::partial_ordering::equivalent)
+            return writer.writeStr("Equivalent"s);
+
+        if (val == std::partial_ordering::less)
+            return writer.writeStr("Less"s);
+
+        if (val == std::partial_ordering::greater)
+            return writer.writeStr("Greater"s);
+
+        return writer.writeStr("Unordered"s);
+    }
+};
+
 // MARK: Format References -----------------------------------------------------
 
 template <typename T>

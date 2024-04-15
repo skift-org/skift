@@ -8,10 +8,6 @@ static bool _isWord(Rune r) {
     return isAsciiAlphaNum(r) or r == '_';
 }
 
-static bool _isSeparator(Rune r) {
-    return not _isWord(r);
-}
-
 // MARK: Actions ---------------------------------------------------------------
 
 Opt<Action> Action::fromEvent(Sys::Event &e) {
@@ -27,34 +23,17 @@ Opt<Action> Action::fromEvent(Sys::Event &e) {
         bool nomod = not(shift or ctrl or alt);
         bool optionalyShift = (nomod or shift);
 
-        if (ke->key == Events::Key::BKSPC and optionalyShift)
-            return BACKSPACE;
-        else if (ke->key == Events::Key::DELETE and optionalyShift)
-            return DELETE;
-        else if (ke->key == Events::Key::BKSPC and ctrl)
-            return DELETE_PREV_WORD;
-        else if (ke->key == Events::Key::DELETE and ctrl)
-            return DELETE_NEXT_WORD;
-        else if (ke->key == Events::Key::LEFT and nomod)
-            return MOVE_PREV;
-        else if (ke->key == Events::Key::RIGHT and nomod)
-            return MOVE_NEXT;
-        else if (ke->key == Events::Key::UP and nomod)
-            return MOVE_UP;
-        else if (ke->key == Events::Key::DOWN and nomod)
-            return MOVE_DOWN;
-        else if (ke->key == Events::Key::LEFT and ctrl)
-            return MOVE_PREV_WORD;
-        else if (ke->key == Events::Key::RIGHT and ctrl)
-            return MOVE_NEXT_WORD;
-        else if (ke->key == Events::Key::HOME and nomod)
-            return MOVE_LINE_START;
-        else if (ke->key == Events::Key::END and nomod)
-            return MOVE_LINE_END;
-        else if (ke->key == Events::Key::HOME and ctrl)
-            return MOVE_START;
-        else if (ke->key == Events::Key::END and ctrl)
-            return MOVE_END;
+        if (ke->key == Events::Key::HOME and ctrl and shift)
+            return SELECT_START;
+        else if (ke->key == Events::Key::END and ctrl and shift)
+            return SELECT_END;
+        else if (ke->key == Events::Key::LEFT and ctrl and shift)
+            return SELECT_PREV_WORD;
+        else if (ke->key == Events::Key::RIGHT and ctrl and shift)
+            return SELECT_NEXT_WORD;
+        else if (ke->key == Events::Key::Z and ctrl and shift)
+            return REDO;
+
         else if (ke->key == Events::Key::LEFT and shift)
             return SELECT_PREV;
         else if (ke->key == Events::Key::RIGHT and shift)
@@ -63,18 +42,23 @@ Opt<Action> Action::fromEvent(Sys::Event &e) {
             return SELECT_UP;
         else if (ke->key == Events::Key::DOWN and shift)
             return SELECT_DOWN;
-        else if (ke->key == Events::Key::LEFT and ctrl and shift)
-            return SELECT_PREV_WORD;
-        else if (ke->key == Events::Key::RIGHT and ctrl and shift)
-            return SELECT_NEXT_WORD;
         else if (ke->key == Events::Key::HOME and shift)
             return SELECT_LINE_START;
         else if (ke->key == Events::Key::END and shift)
             return SELECT_LINE_END;
-        else if (ke->key == Events::Key::HOME and ctrl and shift)
-            return SELECT_START;
-        else if (ke->key == Events::Key::END and ctrl and shift)
-            return SELECT_END;
+
+        else if (ke->key == Events::Key::BKSPC and ctrl)
+            return DELETE_PREV_WORD;
+        else if (ke->key == Events::Key::DELETE and ctrl)
+            return DELETE_NEXT_WORD;
+        else if (ke->key == Events::Key::LEFT and ctrl)
+            return MOVE_PREV_WORD;
+        else if (ke->key == Events::Key::RIGHT and ctrl)
+            return MOVE_NEXT_WORD;
+        else if (ke->key == Events::Key::HOME and ctrl)
+            return MOVE_START;
+        else if (ke->key == Events::Key::END and ctrl)
+            return MOVE_END;
         else if (ke->key == Events::Key::A and ctrl)
             return SELECT_ALL;
         else if (ke->key == Events::Key::C and ctrl)
@@ -85,10 +69,26 @@ Opt<Action> Action::fromEvent(Sys::Event &e) {
             return PASTE;
         else if (ke->key == Events::Key::Z and ctrl)
             return UNDO;
-        else if (ke->key == Events::Key::Z and ctrl and shift)
-            return REDO;
+
+        else if (ke->key == Events::Key::LEFT and nomod)
+            return MOVE_PREV;
+        else if (ke->key == Events::Key::RIGHT and nomod)
+            return MOVE_NEXT;
+        else if (ke->key == Events::Key::UP and nomod)
+            return MOVE_UP;
+        else if (ke->key == Events::Key::DOWN and nomod)
+            return MOVE_DOWN;
+        else if (ke->key == Events::Key::HOME and nomod)
+            return MOVE_LINE_START;
+        else if (ke->key == Events::Key::END and nomod)
+            return MOVE_LINE_END;
         else if (ke->key == Events::Key::ENTER and nomod)
             return NEWLINE;
+
+        else if (ke->key == Events::Key::BKSPC and optionalyShift)
+            return BACKSPACE;
+        else if (ke->key == Events::Key::DELETE and optionalyShift)
+            return DELETE;
     }
 
     return NONE;
@@ -108,7 +108,7 @@ void Model::_do(Record &r) {
         break;
 
     case SELECT:
-        _cur.tail = r.pos;
+        _cur.head = r.pos;
         break;
 
     case DELETE:
@@ -116,6 +116,7 @@ void Model::_do(Record &r) {
         auto end = max(_cur.head, r.pos);
         auto slice = sub(_buf, start, end);
         r.buf = slice;
+        r.pos = start;
 
         _cur.head = start;
         _cur.tail = start;
@@ -218,20 +219,28 @@ usize Model::_down(usize pos) const {
 }
 
 usize Model::_prevWord(usize pos) const {
-    auto startedFromWord = pos != _buf.len() and _isWord(_buf[pos]);
-    while (pos != 0 and (startedFromWord ? _isWord : _isSeparator)(_buf[pos - 1]))
+    auto startedFromWord = pos != 0 and _isWord(_buf[pos - 1]);
+
+    if (not startedFromWord)
+        while (pos != 0 and not _isWord(_buf[pos - 1]))
+            pos--;
+
+    while (pos != 0 and _isWord(_buf[pos - 1]))
         pos--;
-    while (pos != 0 and (startedFromWord ? _isSeparator : _isWord)(_buf[pos - 1]))
-        pos--;
+
     return pos;
 }
 
 usize Model::_nextWord(usize pos) const {
     auto startedFromWord = pos != _buf.len() and _isWord(_buf[pos]);
-    while (pos != _buf.len() and (startedFromWord ? _isWord : _isSeparator)(_buf[pos]))
+
+    if (not startedFromWord)
+        while (pos != _buf.len() and not _isWord(_buf[pos]))
+            pos++;
+
+    while (pos != _buf.len() and _isWord(_buf[pos]))
         pos++;
-    while (pos != _buf.len() and (startedFromWord ? _isSeparator : _isWord)(_buf[pos]))
-        pos++;
+
     return pos;
 }
 
@@ -303,11 +312,17 @@ void Model::deleteNextWord() {
 }
 
 void Model::movePrev() {
-    _moveTo(_prev(_cur.head));
+    if (_cur.open())
+        _moveTo(_cur.head);
+    else
+        _moveTo(_prev(_cur.head));
 }
 
 void Model::moveNext() {
-    _moveTo(_next(_cur.head));
+    if (_cur.open())
+        _moveTo(_cur.head);
+    else
+        _moveTo(_next(_cur.head));
 }
 
 void Model::moveUp() {
@@ -343,48 +358,48 @@ void Model::moveEnd() {
 }
 
 void Model::selectPrev() {
-    _selectTo(_prev(_cur.tail));
+    _selectTo(_prev(_cur.head));
 }
 
 void Model::selectNext() {
-    _selectTo(_next(_cur.tail));
+    _selectTo(_next(_cur.head));
 }
 
 void Model::selectUp() {
-    _selectTo(_up(_cur.tail));
+    _selectTo(_up(_cur.head));
 }
 
 void Model::selectDown() {
-    _selectTo(_down(_cur.tail));
+    _selectTo(_down(_cur.head));
 }
 
 void Model::selectPrevWord() {
-    _selectTo(_prevWord(_cur.tail));
+    _selectTo(_prevWord(_cur.head));
 }
 
 void Model::selectNextWord() {
-    _selectTo(_nextWord(_cur.tail));
+    _selectTo(_nextWord(_cur.head));
 }
 
 void Model::selectLineStart() {
-    _selectTo(_lineStart(_cur.tail));
+    _selectTo(_lineStart(_cur.head));
 }
 
 void Model::selectLineEnd() {
-    _selectTo(_lineEnd(_cur.tail));
+    _selectTo(_lineEnd(_cur.head));
 }
 
 void Model::selectStart() {
-    _selectTo(_textStart(_cur.tail));
+    _selectTo(_textStart(_cur.head));
 }
 
 void Model::selectEnd() {
-    _selectTo(_textEnd(_cur.tail));
+    _selectTo(_textEnd(_cur.head));
 }
 
 void Model::selectAll() {
+    _moveTo(_textStart(_cur.head));
     _selectTo(_textEnd(_cur.head));
-    _selectTo(_textStart(_cur.head));
 }
 
 String Model::copy() {

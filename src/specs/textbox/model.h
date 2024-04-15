@@ -102,6 +102,11 @@ struct Model {
         return _buf;
     }
 
+    void load(Str text) {
+        for (auto r : iterRunes(text))
+            _buf.pushBack(r);
+    }
+
     // MARK: Operations
 
     void _do(Record &r);
@@ -212,15 +217,23 @@ struct Model {
 
     void undo();
 
-    bool canUndo() const;
+    bool canUndo() const { return _index > 0; }
 
     void redo();
 
-    bool canRedo() const;
+    bool canRedo() const { return _index < _records.len(); }
 
     void flush();
 
     void reduce(Action const &a);
+
+    bool dirty() const {
+        for (auto &r : _records) {
+            if (r.op == INSERT || r.op == DELETE)
+                return true;
+        }
+        return false;
+    }
 };
 
 } // namespace Textbox

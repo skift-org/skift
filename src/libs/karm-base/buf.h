@@ -347,14 +347,13 @@ struct InlineBuf {
     }
 
     InlineBuf &operator=(InlineBuf &&other) {
-        // Move comme
-        for (size_t i = 0; i < min(_len, other._len); i++)
+        for (usize i = 0; i < min(_len, other._len); i++)
             buf()[i] = std::move(other.buf()[i]);
 
-        for (size_t i = _len; i < other._len; i++)
+        for (usize i = _len; i < other._len; i++)
             _buf[i].ctor(std::move(other._buf[i].take()));
 
-        for (size_t i = other._len; i < _len; i++)
+        for (usize i = other._len; i < _len; i++)
             _buf[i].dtor();
 
         _len = other._len;

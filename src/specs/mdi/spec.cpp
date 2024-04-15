@@ -22,7 +22,7 @@ Slice<Rune> codepoints() {
 }
 
 Res<Icon> byName(Str query) {
-    for (size_t i = 0; i < sizeof(_names) / sizeof(_names[0]); ++i) {
+    for (usize i = 0; i < sizeof(_names) / sizeof(_names[0]); ++i) {
         if (Str{_names[i]} == query)
             return Res<Icon>{Icon(_codepoints[i])};
     }
@@ -30,7 +30,7 @@ Res<Icon> byName(Str query) {
 }
 
 Str name(Icon icon) {
-    for (size_t i = 0; i < sizeof(_codepoints) / sizeof(_codepoints[0]); ++i) {
+    for (usize i = 0; i < sizeof(_codepoints) / sizeof(_codepoints[0]); ++i) {
         if (_codepoints[i] == (Rune)icon)
             return Str{_names[i]};
     }

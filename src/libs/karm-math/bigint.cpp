@@ -37,7 +37,7 @@ void _add(UBig &lhs, UBig const &rhs) {
     auto rhsLen = rhs._len();
 
     usize carry = 0;
-    for (size_t i = 0; i < rhsLen; ++i) {
+    for (usize i = 0; i < rhsLen; ++i) {
         usize curr = 0;
         if (willAddOverflow(rhs._value[i], lhs._value[i]))
             curr = 1;
@@ -68,7 +68,7 @@ void _add(UBig &lhs, UBig const &rhs) {
 
 SubResult _sub(UBig &lhs, usize rhs) {
     u8 borrow = 0;
-    for (size_t i = 0; i < lhs._len(); i++) {
+    for (usize i = 0; i < lhs._len(); i++) {
         usize rhsV = i < 1 ? rhs : 0;
 
         usize lhsV = lhs._value[i];
@@ -103,7 +103,7 @@ SubResult _sub(UBig &lhs, usize rhs) {
 
 SubResult _sub(UBig &lhs, UBig const &rhs) {
     u8 borrow = 0;
-    for (size_t i = 0; i < lhs._len(); i++) {
+    for (usize i = 0; i < lhs._len(); i++) {
         usize rhsV = i < rhs._len()
                          ? rhs._value[i]
                          : 0;
@@ -212,7 +212,7 @@ void _div(UBig const &numerator, UBig const &denominator, UBig &quotient, UBig &
 
     for (int wi = numerator._len() - 1; wi >= 0; wi--) {
         for (int bi = BITS<usize> - 1; bi >= 0; bi--) {
-            size_t shift = wi * BITS<usize> + bi;
+            usize shift = wi * BITS<usize> + bi;
             UBig shifted = denominator;
             _shl(shifted, shift);
             auto tmp = remainder;

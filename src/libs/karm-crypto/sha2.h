@@ -69,8 +69,8 @@ struct Sha256 {
 
         Array<u32, BLOCK_SIZE> m{};
 
-        size_t i = 0;
-        for (size_t j = 0; i < 16; ++i, j += 4) {
+        usize i = 0;
+        for (usize j = 0; i < 16; ++i, j += 4) {
             m[i] = (_buf[j] << 24) | (_buf[j + 1] << 16) | (_buf[j + 2] << 8) | _buf[j + 3];
         }
 

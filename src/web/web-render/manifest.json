@@ -1,0 +1,13 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "web-render",
+    "type": "lib",
+    "description": "Implementation of the CSS Visual Formatting Model (https://www.w3.org/TR/CSS22/visuren.html)",
+    "requires": [
+        "karm-math",
+        "karm-layout",
+        "karm-gfx",
+        "web-dom",
+        "web-css"
+    ]
+}

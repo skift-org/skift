@@ -2,8 +2,9 @@
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "web-view",
     "type": "lib",
-    "description": "",
+    "description": "Web Content Host",
     "requires": [
-        "karm-ui"
+        "karm-ui",
+        "web-render"
     ]
 }

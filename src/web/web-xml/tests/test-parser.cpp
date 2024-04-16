@@ -40,6 +40,19 @@ test$("parse-attr") {
     return Ok();
 }
 
+test$("parse-text") {
+    auto s = Io::SScan("<html>text</html>");
+    auto p = Parser();
+    auto doc = try$(p.parse(s, Web::HTML));
+    auto first = doc->firstChild();
+    auto el = try$(first.cast<Dom::Element>());
+    expect$(el->hasChildren());
+    auto text = el->firstChild();
+    expect$(text->nodeType() == Dom::NodeType::TEXT);
+    expect$(try$(text.cast<Dom::Text>())->data == "text");
+    return Ok();
+}
+
 test$("parse-nested-tags") {
     auto s = Io::SScan("<html><head></head><body></body></html>");
     auto p = Parser();

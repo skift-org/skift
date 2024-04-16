@@ -79,8 +79,9 @@ Res<> Parser::_parseCharData(Io::SScan &s) {
     logDebug("Parsing character data");
 
     while (
-        s.match(RE_CHARDATA) == Match::YES and
-        s.match("]]>"_re) == Match::NO and not s.ended()
+        s.ahead(RE_CHARDATA) and
+        not s.ahead("]]>"_re) and
+        not s.ended()
     )
         _append(s.next());
 
@@ -229,9 +230,8 @@ Res<> Parser::_parseMisc(Io::SScan &s, Dom::Node &parent) {
         try$(_parsePi(s));
     else if (s.match(RE_S) != Match::NO)
         try$(_parseS(s));
-    else {
+    else
         return Error::invalidData("unexpected character");
-    }
 
     rollback.disarm();
     return Ok();
@@ -277,6 +277,10 @@ Res<Strong<Dom::Element>> Parser::_parseElement(Io::SScan &s, Ns ns) {
         auto el = r.unwrap();
         try$(_parseContent(s, ns, *el));
         try$(_parseEndTag(s, *el));
+        auto te = _flush();
+        if (te.len())
+            el->appendChild(makeStrong<Dom::Text>(te));
+
         rollback.disarm();
         return Ok(el);
     }
@@ -337,6 +341,8 @@ Res<String> Parser::_parseAttValue(Io::SScan &s) {
 
     logDebug("Parsing attribute value");
 
+    StringBuilder sb;
+
     auto rollback = s.rollbackPoint();
 
     auto quote = s.next();
@@ -345,9 +351,9 @@ Res<String> Parser::_parseAttValue(Io::SScan &s) {
 
     while (s.curr() != quote and not s.ended()) {
         if (auto r = _parseReference(s))
-            _append(r.unwrap());
+            sb.append(r.unwrap());
         else
-            _append(s.next());
+            sb.append(s.next());
     }
 
     if (s.curr() != quote)
@@ -357,7 +363,7 @@ Res<String> Parser::_parseAttValue(Io::SScan &s) {
 
     rollback.disarm();
 
-    return Ok(_flush());
+    return Ok(sb.take());
 }
 
 Res<> Parser::_parseEndTag(Io::SScan &s, Dom::Element &el) {
@@ -392,6 +398,9 @@ Res<> Parser::_parseContentItem(Io::SScan &s, Ns ns, Dom::Element &el) {
         el.appendChild(r.unwrap());
         return Ok();
     } else if (auto r = _parseReference(s)) {
+        auto te = _flush();
+        if (te.len())
+            el.appendChild(makeStrong<Dom::Text>(te));
         _append(r.unwrap());
         return Ok();
     } else if (auto r = _parseCDSect(s)) {
@@ -399,6 +408,9 @@ Res<> Parser::_parseContentItem(Io::SScan &s, Ns ns, Dom::Element &el) {
     } else if (auto r = _parsePi(s)) {
         return Ok();
     } else if (auto r = _parseComment(s)) {
+        auto te = _flush();
+        if (te.len())
+            el.appendChild(makeStrong<Dom::Text>(te));
         el.appendChild(r.unwrap());
         return Ok();
     } else {

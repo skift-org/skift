@@ -3,6 +3,7 @@
 #include <web-dom/comment.h>
 #include <web-dom/document.h>
 #include <web-dom/element.h>
+#include <web-dom/text.h>
 
 namespace Web::Xml {
 

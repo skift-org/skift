@@ -75,14 +75,14 @@ struct UBig {
     }
 
     void _setBit(usize bit) {
-        if (bit >= _value.len() * BITS<usize>)
-            _value.resize(bit / BITS<usize> + 1);
-        _value[bit / BITS<usize>] |= 1 << (bit % BITS<usize>);
+        if (bit >= _value.len() * Limits<usize>::BITS)
+            _value.resize(bit / Limits<usize>::BITS + 1);
+        _value[bit / Limits<usize>::BITS] |= 1 << (bit % Limits<usize>::BITS);
     }
 
     bool _getBit(usize bit) const {
-        return bit < _value.len() * BITS<usize> and
-               (_value[bit / BITS<usize>] & (1 << (bit % BITS<usize>))) != 0;
+        return bit < _value.len() * Limits<usize>::BITS and
+               (_value[bit / Limits<usize>::BITS] & (1 << (bit % Limits<usize>::BITS))) != 0;
     }
 
     UBig operator~() {
@@ -248,7 +248,7 @@ struct UBig {
     explicit operator f64() const {
         f64 res = 0;
         for (usize i = _len(); i-- > 0;) {
-            res *= ::pow(2.0, BITS<usize>);
+            res *= ::pow(2.0, Limits<usize>::BITS);
             res += _value[i];
         }
         return res;
@@ -527,28 +527,28 @@ struct IBig {
     }
 };
 
-// MARK: Fractional Number -----------------------------------------------------
+// MARK: Big Fractional Number -------------------------------------------------
 // aka rational number
 
-struct Frac;
+struct BigFrac;
 
-void _fromF64(Frac &frac, f64 value);
+void _fromF64(BigFrac &frac, f64 value);
 
-void _add(Frac &lhs, Frac const &rhs);
+void _add(BigFrac &lhs, BigFrac const &rhs);
 
-void _sub(Frac &lhs, Frac const &rhs);
+void _sub(BigFrac &lhs, BigFrac const &rhs);
 
-void _mul(Frac &lhs, Frac const &rhs);
+void _mul(BigFrac &lhs, BigFrac const &rhs);
 
-void _div(Frac &lhs, Frac const &rhs);
+void _div(BigFrac &lhs, BigFrac const &rhs);
 
-void _mod(Frac &lhs, Frac const &rhs);
+void _mod(BigFrac &lhs, BigFrac const &rhs);
 
-struct Frac {
+struct BigFrac {
     IBig _num;
     UBig _den;
 
-    Frac() = default;
+    BigFrac() = default;
 
     void _reduce() {
         UBig gcd;
@@ -565,35 +565,35 @@ struct Frac {
         _den = 1uz;
     }
 
-    explicit Frac(usize value)
+    explicit BigFrac(usize value)
         : _num(value), _den(1uz) {}
 
-    Frac &operator=(usize value) {
+    BigFrac &operator=(usize value) {
         _num = value;
         _den = 1uz;
         return *this;
     }
 
-    explicit Frac(isize value)
+    explicit BigFrac(isize value)
         : _num(value), _den(1uz) {}
 
-    Frac &operator=(isize value) {
+    BigFrac &operator=(isize value) {
         _num = value;
         _den = 1uz;
         return *this;
     }
 
-    explicit Frac(isize num, usize den)
+    explicit BigFrac(isize num, usize den)
         : _num(num), _den(den) {}
 
-    explicit Frac(IBig const &num, UBig const &den)
+    explicit BigFrac(IBig const &num, UBig const &den)
         : _num(num), _den(den) {}
 
-    explicit Frac(f64 value) {
+    explicit BigFrac(f64 value) {
         _fromF64(*this, value);
     }
 
-    Frac &operator=(f64 value) {
+    BigFrac &operator=(f64 value) {
         _fromF64(*this, value);
         return *this;
     }
@@ -614,63 +614,63 @@ struct Frac {
         return _den;
     }
 
-    Frac operator-() const {
-        return Frac{-_num, _den};
+    BigFrac operator-() const {
+        return BigFrac{-_num, _den};
     }
 
-    Frac operator+(Frac const &rhs) const {
-        Frac res = *this;
+    BigFrac operator+(BigFrac const &rhs) const {
+        BigFrac res = *this;
         _add(res, rhs);
         res._reduce();
         return res;
     }
 
-    Frac operator-(Frac const &rhs) const {
-        Frac res = *this;
+    BigFrac operator-(BigFrac const &rhs) const {
+        BigFrac res = *this;
         _sub(res, rhs);
         res._reduce();
         return res;
     }
 
-    Frac operator*(Frac const &rhs) const {
-        Frac res = *this;
+    BigFrac operator*(BigFrac const &rhs) const {
+        BigFrac res = *this;
         _mul(res, rhs);
         res._reduce();
         return res;
     }
 
-    Frac operator/(Frac const &rhs) const {
-        Frac res = *this;
+    BigFrac operator/(BigFrac const &rhs) const {
+        BigFrac res = *this;
         _div(res, rhs);
         res._reduce();
         return res;
     }
 
-    Frac &operator+=(Frac const &rhs) {
+    BigFrac &operator+=(BigFrac const &rhs) {
         _add(*this, rhs);
         _reduce();
         return *this;
     }
 
-    Frac &operator-=(Frac const &rhs) {
+    BigFrac &operator-=(BigFrac const &rhs) {
         _sub(*this, rhs);
         _reduce();
         return *this;
     }
 
-    Frac &operator*=(Frac const &rhs) {
+    BigFrac &operator*=(BigFrac const &rhs) {
         _mul(*this, rhs);
         _reduce();
         return *this;
     }
 
-    Frac &operator/=(Frac const &rhs) {
+    BigFrac &operator/=(BigFrac const &rhs) {
         _div(*this, rhs);
         _reduce();
         return *this;
     }
 
-    std::strong_ordering operator<=>(Frac const &rhs) const {
+    std::strong_ordering operator<=>(BigFrac const &rhs) const {
         auto cmp = *this - rhs;
         if (cmp._num == 0uz)
             return std::strong_ordering::equal;
@@ -681,7 +681,7 @@ struct Frac {
         return std::strong_ordering::greater;
     }
 
-    bool operator==(Frac const &rhs) const {
+    bool operator==(BigFrac const &rhs) const {
         return _num == rhs._num and _den == rhs._den;
     }
 };
@@ -696,10 +696,10 @@ static inline Math::IBig operator""_ibig(unsigned long long value) {
     return Math::IBig{static_cast<usize>(value)};
 }
 
-static inline Math::Frac operator""_frac(unsigned long long value) {
-    return Math::Frac{static_cast<usize>(value)};
+static inline Math::BigFrac operator""_bigfrac(unsigned long long value) {
+    return Math::BigFrac{static_cast<usize>(value)};
 }
 
-static inline Math::Frac operator""_frac(long double value) {
-    return Math::Frac{static_cast<f64>(value)};
+static inline Math::BigFrac operator""_bigfrac(long double value) {
+    return Math::BigFrac{static_cast<f64>(value)};
 }

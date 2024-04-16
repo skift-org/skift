@@ -76,7 +76,7 @@ SubResult _sub(UBig &lhs, usize rhs) {
         // apply the borrow
         if (borrow) {
             if (lhsV == 0) {
-                lhsV = MAX<usize>;
+                lhsV = Limits<usize>::MAX;
                 borrow = 1;
             } else {
                 lhsV--;
@@ -87,7 +87,7 @@ SubResult _sub(UBig &lhs, usize rhs) {
         // do we need to borrow?
         if (lhsV < rhsV) {
             rhsV -= lhsV;
-            lhsV = (MAX<usize> - rhsV) + 1;
+            lhsV = (Limits<usize>::MAX - rhsV) + 1;
             borrow = 1;
         }
 
@@ -113,7 +113,7 @@ SubResult _sub(UBig &lhs, UBig const &rhs) {
         // apply the borrow
         if (borrow) {
             if (lhsV == 0) {
-                lhsV = MAX<usize>;
+                lhsV = Limits<usize>::MAX;
                 borrow = 1;
             } else {
                 lhsV--;
@@ -124,7 +124,7 @@ SubResult _sub(UBig &lhs, UBig const &rhs) {
         // do we need to borrow?
         if (lhsV < rhsV) {
             rhsV -= lhsV;
-            lhsV = (MAX<usize> - rhsV) + 1;
+            lhsV = (Limits<usize>::MAX - rhsV) + 1;
             borrow = 1;
         }
 
@@ -147,7 +147,7 @@ void _shl(UBig &lhs, usize bits) {
     for (usize i = 0; i < lhs._len(); ++i) {
         usize value = lhs._value[i];
         lhs._value[i] = (value << bits) | carry;
-        carry = value >> (BITS<usize> - bits);
+        carry = value >> (Limits<usize>::BITS - bits);
     }
 
     if (carry)
@@ -163,7 +163,7 @@ void _shr(UBig &lhs, usize bits) {
     for (usize i = lhs._len(); i-- > 0;) {
         usize value = lhs._value[i];
         lhs._value[i] = (value >> bits) | carry;
-        carry = value << (BITS<usize> - bits);
+        carry = value << (Limits<usize>::BITS - bits);
     }
 }
 
@@ -196,7 +196,7 @@ void _binXor(UBig &lhs, UBig const &rhs) {
 void _mul(UBig &lhs, UBig const &rhs) {
     UBig shifted = lhs;
     for (usize wi = 0; wi < rhs._len(); wi++) {
-        for (usize bi = 0; bi < BITS<usize>; bi++) {
+        for (usize bi = 0; bi < Limits<usize>::BITS; bi++) {
             auto bit = (rhs._value[wi] >> bi) & 1;
             _shl(shifted, 1);
             if (not bit)
@@ -211,8 +211,8 @@ void _div(UBig const &numerator, UBig const &denominator, UBig &quotient, UBig &
     remainder = numerator;
 
     for (int wi = numerator._len() - 1; wi >= 0; wi--) {
-        for (int bi = BITS<usize> - 1; bi >= 0; bi--) {
-            usize shift = wi * BITS<usize> + bi;
+        for (int bi = Limits<usize>::BITS - 1; bi >= 0; bi--) {
+            usize shift = wi * Limits<usize>::BITS + bi;
             UBig shifted = denominator;
             _shl(shifted, shift);
             auto tmp = remainder;
@@ -321,9 +321,9 @@ void _pow(IBig const &base, UBig const &exp, IBig &res) {
     }
 }
 
-// MARK: Fractional Numbers ----------------------------------------------------
+// MARK: Big Fractional Numbers ------------------------------------------------
 
-void _fromF64(Frac &frac, f64 value) {
+void _fromF64(BigFrac &frac, f64 value) {
     IBig const TEN = 10_ibig;
 
     frac.clear();
@@ -356,7 +356,7 @@ void _fromF64(Frac &frac, f64 value) {
     frac._num = neg ? -frac._num : frac._num;
 }
 
-void _add(Frac &lhs, Frac const &rhs) {
+void _add(BigFrac &lhs, BigFrac const &rhs) {
     if (rhs._num == 0uz)
         return;
 
@@ -368,16 +368,16 @@ void _add(Frac &lhs, Frac const &rhs) {
     _mul(lhs._den, rhs._den);
 }
 
-void _sub(Frac &lhs, Frac const &rhs) {
+void _sub(BigFrac &lhs, BigFrac const &rhs) {
     _add(lhs, -rhs);
 }
 
-void _mul(Frac &lhs, Frac const &rhs) {
+void _mul(BigFrac &lhs, BigFrac const &rhs) {
     _mul(lhs._num, rhs._num);
     _mul(lhs._den, rhs._den);
 }
 
-void _div(Frac &lhs, Frac const &rhs) {
+void _div(BigFrac &lhs, BigFrac const &rhs) {
     _mul(lhs._num.value(), rhs._den);
     _mul(lhs._den, rhs._num.value());
 }

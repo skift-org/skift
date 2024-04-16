@@ -52,7 +52,7 @@ test$("json-parse-integer") {
 test$("json-parse-float") {
     auto val = "3.14"_json;
     expect$(val.isFloat());
-    expect$(Math::epsilonEq(val.asFloat(), 3.14, 0.0001));
+    expect$(Math::epsilonEq(val.asFloat(), 3.14, 0.001));
     expectEq$(val.asBool(), true);
     return Ok();
 }

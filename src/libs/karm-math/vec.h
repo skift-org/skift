@@ -191,7 +191,7 @@ using Vec2u = Vec2<usize>;
 using Vec2f = Vec2<f64>;
 
 template <typename T>
-bool epsilonEq(Vec2<T> const &lhs, Vec2<T> const &rhs, T epsilon) {
+bool epsilonEq(Vec2<T> const &lhs, Vec2<T> const &rhs, T epsilon = Limits<T>::EPSILON) {
     return epsilonEq(lhs.x, rhs.x, epsilon) and
            epsilonEq(lhs.y, rhs.y, epsilon);
 }

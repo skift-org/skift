@@ -78,7 +78,7 @@ struct Col {
 };
 
 struct Sheet {
-    static constexpr usize MAX_ROWS = MAX<u16>;
+    static constexpr usize MAX_ROWS = Limits<u16>::MAX;
     static constexpr usize MAX_COLS = 26;
 
     String name;

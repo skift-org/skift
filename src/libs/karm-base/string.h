@@ -1,10 +1,8 @@
 #pragma once
 
-#include "checked.h"
 #include "cstr.h"
 #include "ctype.h"
 #include "rune.h"
-#include "std.h"
 
 namespace Karm {
 
@@ -53,7 +51,7 @@ struct _InlineString {
 
     Array<Unit, N> _buf;
     u8 _len = 0;
-    static_assert(N <= MAX<u8>);
+    static_assert(N <= Limits<u8>::MAX, "N too large");
 
     constexpr _InlineString() = default;
 
@@ -61,9 +59,8 @@ struct _InlineString {
         if (len > N)
             panic("len too large");
         _len = min(len, N);
-        for (usize i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++)
             _buf[i] = buf[i];
-        }
     }
 
     always_inline _InlineString(_Str<E> str)

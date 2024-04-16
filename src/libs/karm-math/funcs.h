@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/clamp.h>
+#include <karm-base/limits.h>
 
 #include "const.h"
 
@@ -17,7 +18,7 @@ constexpr auto lerp(auto a, auto b, auto p) {
 }
 
 template <typename T>
-constexpr bool epsilonEq(T lhs, T rhs, T epsilon) {
+constexpr bool epsilonEq(T lhs, T rhs, T epsilon = Limits<T>::EPSILON) {
     return abs(lhs - rhs) < epsilon;
 }
 

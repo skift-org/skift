@@ -126,7 +126,7 @@ inline constexpr Expr auto exactly(usize n, Expr auto expr) {
 
 /// Returns true if the expression matches at least n times.
 inline constexpr Expr auto atLeast(usize n, Expr auto expr) {
-    return nOrN(n, MAX<usize>, expr);
+    return nOrN(n, Limits<usize>::MAX, expr);
 }
 
 /// Returns true if the expression matches at most n times.
@@ -136,12 +136,12 @@ inline constexpr Expr auto atMost(usize n, Expr auto expr) {
 
 /// Returns true if the expression matches zero or more times.
 inline constexpr Expr auto zeroOrMore(Expr auto expr) {
-    return nOrN(0, MAX<usize>, expr);
+    return nOrN(0, Limits<usize>::MAX, expr);
 }
 
 /// Returns true if the expression matches one or more times.
 inline constexpr Expr auto oneOrMore(Expr auto expr) {
-    return nOrN(1, MAX<usize>, expr);
+    return nOrN(1, Limits<usize>::MAX, expr);
 }
 
 /// Returns true if the expression matches zero or one times.

@@ -179,9 +179,4 @@ static inline Color yCbCrToRgb(YCbCr yCbCr) {
 
 } // namespace Karm::Gfx
 
-template <>
-struct Karm::Io::Formatter<Gfx::Color> {
-    Res<usize> format(Io::TextWriter &writer, Gfx::Color color) {
-        return Io::format(writer, "Color({}, {}, {}, {})", color.red, color.green, color.blue, color.alpha);
-    }
-};
+Reflectable$(Gfx::Color, red, green, blue, alpha);

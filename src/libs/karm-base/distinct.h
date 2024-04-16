@@ -1,5 +1,7 @@
 #pragma once
 
+#include <compare>
+
 namespace Karm {
 
 template <typename T, typename TAG>
@@ -12,29 +14,9 @@ struct Distinct {
 
     constexpr T value() const { return _value; }
 
-    constexpr bool operator==(Distinct<T, TAG> other) const {
-        return _value == other._value;
-    }
+    constexpr bool operator==(Distinct<T, TAG> const &other) const = default;
 
-    constexpr bool operator!=(Distinct<T, TAG> other) const {
-        return _value != other._value;
-    }
-
-    constexpr bool operator<(Distinct<T, TAG> other) const {
-        return _value < other._value;
-    }
-
-    constexpr bool operator>(Distinct<T, TAG> other) const {
-        return _value > other._value;
-    }
-
-    constexpr bool operator<=(Distinct<T, TAG> other) const {
-        return _value <= other._value;
-    }
-
-    constexpr bool operator>=(Distinct<T, TAG> other) const {
-        return _value >= other._value;
-    }
+    constexpr auto operator<=>(Distinct<T, TAG> const &other) const = default;
 
     constexpr Distinct<T, TAG> operator+(Distinct<T, TAG> other) const {
         return Distinct<T, TAG>(_value + other._value);

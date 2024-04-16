@@ -3,19 +3,18 @@
 
 #include "view.h"
 
-namespace Web {
+namespace Web::View {
 
 struct View : public Ui::View<View> {
     void paint(Gfx::Context &g, Math::Recti) override {
         g.save();
-        g.clip(bound());
-        g.clear(Css::WHITE);
+        g.clear(bound(), Css::WHITE);
         g.restore();
     }
 };
 
-Ui::Child view() {
+Ui::Child view(Strong<Dom::Document>) {
     return makeStrong<View>();
 }
 
-} // namespace Web
+} // namespace Web::View

@@ -5,6 +5,6 @@
 
 namespace Web::View {
 
-Ui::Child view(Strong<Dom::Document> dom);
+Ui::Child inspect(Strong<Dom::Document> dom);
 
 } // namespace Web::View

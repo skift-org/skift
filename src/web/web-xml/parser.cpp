@@ -249,10 +249,42 @@ Res<> Parser::_parseProlog(Io::SScan &s, Dom::Node &parent) {
     while (_parseMisc(s, parent) and not s.ended())
         ;
 
-    // TODO: Parse doctype declaration
+    if (auto doctype = _parseDoctype(s)) {
+        parent.appendChild(doctype.unwrap());
+        while (_parseMisc(s, parent) and not s.ended())
+            ;
+    }
 
     rollback.disarm();
     return Ok();
+}
+
+static constexpr auto RE_DOCTYPE_START = "<!DOCTYPE"_re;
+
+Res<Strong<Dom::DocumentType>> Parser::_parseDoctype(Io::SScan &s) {
+    // doctypedecl ::= '<!DOCTYPE' S Name (S ExternalID)? S? ('[' intSubset ']' S?)? '>'
+    auto rollback = s.rollbackPoint();
+
+    logDebug("Parsing doctype declaration");
+
+    if (not s.skip(RE_DOCTYPE_START))
+        return Error::invalidData("expected '<!DOCTYPE'");
+
+    auto docType = makeStrong<Dom::DocumentType>();
+
+    try$(_parseS(s));
+
+    docType->name = try$(_parseName(s));
+
+    try$(_parseS(s));
+    (void)_parseExternalId(s, *docType);
+
+    try$(_parseS(s));
+    if (not s.skip('>'))
+        return Error::invalidData("expected '>'");
+
+    rollback.disarm();
+    return Ok(docType);
 }
 
 // 2.9 MARK: Standalone Document Declaration
@@ -528,6 +560,34 @@ Res<Rune> Parser::_parseReference(Io::SScan &s) {
         return r;
     else
         return Error::invalidData("expected reference");
+}
+
+// 4.2 MARK: Entity Declarations
+// https://www.w3.org/TR/xml/#sec-entity-decl
+
+Res<> Parser::_parseExternalId(Io::SScan &s, Dom::DocumentType &docType) {
+    // ExternalID ::= 'SYSTEM' S SystemLiteral | 'PUBLIC' S PubidLiteral S SystemLiteral
+    logDebug("Parsing external ID");
+
+    auto rollback = s.rollbackPoint();
+
+    if (s.skip("SYSTEM"_re)) {
+        try$(_parseS(s));
+        // NOSPEC: We are parsing the system literal as att value
+        docType.systemId = try$(_parseAttValue(s));
+        rollback.disarm();
+        return Ok();
+    } else if (s.skip("PUBLIC"_re)) {
+        // NOSPEC: We are parsing the public and system literals as att values
+        try$(_parseS(s));
+        docType.publicId = try$(_parseAttValue(s));
+        try$(_parseS(s));
+        docType.systemId = try$(_parseAttValue(s));
+        rollback.disarm();
+        return Ok();
+    } else {
+        return Error::invalidData("expected 'SYSTEM' or 'PUBLIC'");
+    }
 }
 
 } // namespace Web::Xml

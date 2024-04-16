@@ -82,4 +82,14 @@ test$("parse-comment") {
     return Ok();
 }
 
+test$("parse-doctype") {
+    auto s = Io::SScan("<!DOCTYPE html><html></html>");
+    auto p = Parser();
+    auto doc = try$(p.parse(s, Web::HTML));
+    auto first = doc->firstChild();
+    auto doctype = try$(first.cast<Dom::DocumentType>());
+    expect$(doctype->name == "html");
+    return Ok();
+}
+
 } // namespace Web::Xml::Tests

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <web-dom/comment.h>
+#include <web-dom/document-type.h>
 #include <web-dom/document.h>
 #include <web-dom/element.h>
 #include <web-dom/text.h>
@@ -44,6 +45,8 @@ struct Parser {
 
     Res<> _parseProlog(Io::SScan &s, Dom::Node &parent);
 
+    Res<Strong<Dom::DocumentType>> _parseDoctype(Io::SScan &s);
+
     Res<Strong<Dom::Element>> _parseElement(Io::SScan &s, Ns ns);
 
     Res<Strong<Dom::Element>> _parseStartTag(Io::SScan &s, Ns ns);
@@ -65,6 +68,8 @@ struct Parser {
     Res<Rune> _parseEntityRef(Io::SScan &s);
 
     Res<Rune> _parseReference(Io::SScan &s);
+
+    Res<> _parseExternalId(Io::SScan &s, Dom::DocumentType &docType);
 };
 
 } // namespace Web::Xml

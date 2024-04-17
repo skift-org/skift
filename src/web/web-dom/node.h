@@ -68,7 +68,7 @@ struct Node :
 
     // MARK: Children
 
-    bool hasChildren() {
+    bool hasChildren() const {
         return _children.len() > 0;
     }
 

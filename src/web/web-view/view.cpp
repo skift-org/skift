@@ -11,6 +11,10 @@ struct View : public Ui::View<View> {
         g.clear(bound(), Css::WHITE);
         g.restore();
     }
+
+    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+        return {};
+    }
 };
 
 Ui::Child view(Strong<Dom::Document>) {

@@ -53,6 +53,80 @@ test$("parse-text") {
     return Ok();
 }
 
+test$("parse-text-before-tag") {
+    auto s = Io::SScan("<html>text<div/></html>");
+    auto p = Parser();
+    auto doc = try$(p.parse(s, Web::HTML));
+    auto first = doc->firstChild();
+    auto el = try$(first.cast<Dom::Element>());
+    expect$(el->hasChildren());
+    auto text = el->firstChild();
+    expect$(text->nodeType() == Dom::NodeType::TEXT);
+    expect$(try$(text.cast<Dom::Text>())->data == "text");
+    auto div = text->nextSibling();
+    expect$(div->nodeType() == Dom::NodeType::ELEMENT);
+    expect$(try$(div.cast<Dom::Element>())->tagName == Html::DIV);
+    return Ok();
+}
+
+test$("parse-text-after-tag") {
+    auto s = Io::SScan("<html><div/>text</html>");
+    auto p = Parser();
+    auto doc = try$(p.parse(s, Web::HTML));
+    auto first = doc->firstChild();
+    auto el = try$(first.cast<Dom::Element>());
+    expect$(el->hasChildren());
+    auto div = el->firstChild();
+    expect$(div->nodeType() == Dom::NodeType::ELEMENT);
+    expect$(try$(div.cast<Dom::Element>())->tagName == Html::DIV);
+    auto text = div->nextSibling();
+    expect$(text->nodeType() == Dom::NodeType::TEXT);
+    expect$(try$(text.cast<Dom::Text>())->data == "text");
+    return Ok();
+}
+
+test$("parse-text-between-tags") {
+    auto s = Io::SScan("<html><div/>text<div/></html>");
+    auto p = Parser();
+    auto doc = try$(p.parse(s, Web::HTML));
+    auto first = doc->firstChild();
+    auto el = try$(first.cast<Dom::Element>());
+    expect$(el->hasChildren());
+    auto div1 = el->firstChild();
+    expect$(div1->nodeType() == Dom::NodeType::ELEMENT);
+    expect$(try$(div1.cast<Dom::Element>())->tagName == Html::DIV);
+    auto text = div1->nextSibling();
+    expect$(text->nodeType() == Dom::NodeType::TEXT);
+    expect$(try$(text.cast<Dom::Text>())->data == "text");
+    auto div2 = text->nextSibling();
+    expect$(div2->nodeType() == Dom::NodeType::ELEMENT);
+    expect$(try$(div2.cast<Dom::Element>())->tagName == Html::DIV);
+    return Ok();
+}
+
+test$("parse-text-between-tags-and-before") {
+    auto s = Io::SScan("<html>test2<div>text</div></html>");
+    auto p = Parser();
+    auto doc = try$(p.parse(s, Web::HTML));
+    auto first = doc->firstChild();
+    auto el = try$(first.cast<Dom::Element>());
+    expect$(el->hasChildren());
+
+    auto text1 = el->firstChild();
+    expect$(text1->nodeType() == Dom::NodeType::TEXT);
+    expectEq$(try$(text1.cast<Dom::Text>())->data, "test2");
+
+    auto div = text1->nextSibling();
+    expect$(div->nodeType() == Dom::NodeType::ELEMENT);
+    expect$(try$(div.cast<Dom::Element>())->tagName == Html::DIV);
+
+    auto text2 = div->firstChild();
+    expect$(text2->nodeType() == Dom::NodeType::TEXT);
+    expectEq$(try$(text2.cast<Dom::Text>())->data, "text");
+
+    return Ok();
+}
+
 test$("parse-nested-tags") {
     auto s = Io::SScan("<html><head></head><body></body></html>");
     auto p = Parser();

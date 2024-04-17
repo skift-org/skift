@@ -73,17 +73,24 @@ Res<Str> Parser::_parseName(Io::SScan &s) {
 
 static constexpr auto RE_CHARDATA = Re::negate(Re::single('<', '&'));
 
-Res<> Parser::_parseCharData(Io::SScan &s) {
+Res<> Parser::_parseCharData(Io::SScan &s, StringBuilder &sb) {
     // CharData ::= [^<&]* - ([^<&]* ']]>' [^<&]*)
 
     logDebug("Parsing character data");
+
+    bool any = false;
 
     while (
         s.ahead(RE_CHARDATA) and
         not s.ahead("]]>"_re) and
         not s.ended()
-    )
-        _append(s.next());
+    ) {
+        sb.append(s.next());
+        any = true;
+    }
+
+    if (not any)
+        return Error::invalidData("expected character data");
 
     return Ok();
 }
@@ -163,7 +170,7 @@ Res<> Parser::_parsePiTarget(Io::SScan &s) {
 // 2.7 MARK: CDATA Sections
 // https://www.w3.org/TR/xml/#sec-cdata-sect
 
-Res<> Parser::_parseCDSect(Io::SScan &s) {
+Res<> Parser::_parseCDSect(Io::SScan &s, StringBuilder &sb) {
     // CDStart ::= '<![CDATA['
     // CData ::= (Char* - (Char* ']]>' Char*))
     // CDEnd ::= ']]>'
@@ -176,7 +183,7 @@ Res<> Parser::_parseCDSect(Io::SScan &s) {
         return Error::invalidData("expected '<![CDATA['");
 
     while (s.match("]]>"_re) == Match::NO and not s.ended())
-        _append(s.next());
+        sb.append(s.next());
 
     if (not s.skip("]]>"_re))
         return Error::invalidData("expected ']]>'");
@@ -309,9 +316,6 @@ Res<Strong<Dom::Element>> Parser::_parseElement(Io::SScan &s, Ns ns) {
         auto el = r.unwrap();
         try$(_parseContent(s, ns, *el));
         try$(_parseEndTag(s, *el));
-        auto te = _flush();
-        if (te.len())
-            el->appendChild(makeStrong<Dom::Text>(te));
 
         rollback.disarm();
         return Ok(el);
@@ -429,20 +433,10 @@ Res<> Parser::_parseContentItem(Io::SScan &s, Ns ns, Dom::Element &el) {
     if (auto r = _parseElement(s, ns)) {
         el.appendChild(r.unwrap());
         return Ok();
-    } else if (auto r = _parseReference(s)) {
-        auto te = _flush();
-        if (te.len())
-            el.appendChild(makeStrong<Dom::Text>(te));
-        _append(r.unwrap());
-        return Ok();
-    } else if (auto r = _parseCDSect(s)) {
-        return Ok();
     } else if (auto r = _parsePi(s)) {
+        logWarn("ignoring processing instruction");
         return Ok();
     } else if (auto r = _parseComment(s)) {
-        auto te = _flush();
-        if (te.len())
-            el.appendChild(makeStrong<Dom::Text>(te));
         el.appendChild(r.unwrap());
         return Ok();
     } else {
@@ -455,9 +449,34 @@ Res<> Parser::_parseContent(Io::SScan &s, Ns ns, Dom::Element &el) {
 
     logDebug("Parsing content");
 
-    try$(_parseCharData(s));
+    try$(_parseText(s, el));
     while (_parseContentItem(s, ns, el))
-        try$(_parseCharData(s));
+        try$(_parseText(s, el));
+
+    return Ok();
+}
+
+Res<> Parser::_parseTextItem(Io::SScan &s, StringBuilder &sb) {
+    if (_parseCharData(s, sb)) {
+        return Ok();
+    } else if (_parseCDSect(s, sb)) {
+        return Ok();
+    } else if (auto r = _parseReference(s)) {
+        sb.append(r.unwrap());
+        return Ok();
+    } else {
+        return Error::invalidData("expected text item");
+    }
+}
+
+Res<> Parser::_parseText(Io::SScan &s, Dom::Element &el) {
+    StringBuilder sb;
+    while (_parseTextItem(s, sb))
+        ;
+
+    auto te = sb.take();
+    if (te)
+        el.appendChild(makeStrong<Dom::Text>(te));
 
     return Ok();
 }

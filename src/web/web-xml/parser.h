@@ -9,25 +9,13 @@
 namespace Web::Xml {
 
 struct Parser {
-    StringBuilder _sb;
-
-    void _append(Rune r) {
-        _sb.append(r);
-    }
-
-    String _flush() {
-        if (not _sb.len())
-            return ""s;
-        return _sb.take();
-    }
-
     Res<Strong<Dom::Document>> parse(Io::SScan &s, Ns ns);
 
     Res<> _parseS(Io::SScan &s);
 
     Res<Str> _parseName(Io::SScan &s);
 
-    Res<> _parseCharData(Io::SScan &s);
+    Res<> _parseCharData(Io::SScan &s, StringBuilder &sb);
 
     Res<Strong<Dom::Comment>> _parseComment(Io::SScan &s);
 
@@ -35,7 +23,7 @@ struct Parser {
 
     Res<> _parsePiTarget(Io::SScan &s);
 
-    Res<> _parseCDSect(Io::SScan &s);
+    Res<> _parseCDSect(Io::SScan &s, StringBuilder &sb);
 
     Res<> _parseVersionInfo(Io::SScan &s);
 
@@ -60,6 +48,10 @@ struct Parser {
     Res<> _parseContentItem(Io::SScan &s, Ns ns, Dom::Element &el);
 
     Res<> _parseContent(Io::SScan &s, Ns ns, Dom::Element &el);
+
+    Res<> _parseTextItem(Io::SScan &s, StringBuilder &sb);
+
+    Res<> _parseText(Io::SScan &s, Dom::Element &el);
 
     Res<Strong<Dom::Element>> _parseEmptyElementTag(Io::SScan &s, Ns ns);
 

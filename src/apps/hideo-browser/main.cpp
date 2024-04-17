@@ -10,23 +10,62 @@
 
 namespace Hideo::Browser {
 
-Ui::Child app(Strong<Web::Dom::Document> dom) {
-    return Hideo::scafold({
-        .icon = Mdi::WEB,
-        .title = "Browser"s,
-        .startTools = slots$(
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::REFRESH),
-        ),
-        .body = [=] {
-            return Ui::hflow(
-                Web::View::view(dom) | Ui::grow(),
-                Ui::separator(),
-                Web::View::inspect(dom)
-            );
+struct State {
+    Mime::Url url;
+    Strong<Web::Dom::Document> dom;
+    Opt<Error> err;
+
+    bool canGoBack() const {
+        return false;
+    }
+
+    bool canGoForward() const {
+        return false;
+    }
+};
+
+struct Reload {};
+
+struct GoBack {};
+
+struct GoForward {};
+
+using Action = Union<Reload, GoBack, GoForward>;
+
+void reduce(State &, Action a) {
+    a.visit(Visitor{
+        [&](Reload) {
+        },
+        [&](GoBack) {
+        },
+        [&](GoForward) {
         },
     });
+}
+
+using Model = Ui::Model<State, Action, reduce>;
+
+Ui::Child app(Mime::Url url, Strong<Web::Dom::Document> dom, Opt<Error> err) {
+    return Ui::reducer<Model>(
+        {
+            url,
+            dom,
+            err,
+        },
+        [](State const &s) {
+            return Hideo::scafold({
+                .icon = Mdi::WEB,
+                .title = "Browser"s,
+                .startTools = slots$(
+                    Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
+                    Ui::button(Model::bindIf<GoForward>(s.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
+                    Ui::button(Model::bind<Reload>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH)
+                ),
+                .sidebar = slot$(Web::View::inspect(s.dom)),
+                .body = slot$(Web::View::view(s.dom)),
+            });
+        }
+    );
 }
 
 } // namespace Hideo::Browser
@@ -36,9 +75,11 @@ Res<Strong<Web::Dom::Document>> fetch(Mime::Url url) {
 
     if (url.scheme == "about") {
         if (url.path.str() == "./blank")
-            return Ok(makeStrong<Web::Dom::Document>());
+            return fetch("bundle://hideo-browser/blank.xhtml"_url);
+
         if (url.path.str() == "./start")
-            return fetch("bundle://hideo-browser/start-page.html"_url);
+            return fetch("bundle://hideo-browser/start-page.xhtml"_url);
+
         return Error::invalidInput("unsupported about page");
     }
 
@@ -78,6 +119,6 @@ Res<> entryPoint(Sys::Ctx &ctx) {
 
     return Ui::runApp(
         ctx,
-        Hideo::Browser::app(dom)
+        Hideo::Browser::app(url, dom, NONE)
     );
 }

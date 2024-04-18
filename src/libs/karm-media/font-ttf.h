@@ -14,6 +14,7 @@ struct TtfFontface : public Fontface {
     Ttf::Font _ttf;
     Map<Rune, Media::Glyph> _cachedEntries;
     Map<Media::Glyph, f64> _cachedAdvances;
+    Map<Cons<Media::Glyph>, f64> _cachedKerns;
 
     static Res<Strong<TtfFontface>> load(Sys::Mmap &&mmap) {
         auto ttf = try$(Ttf::Font::load(mmap.bytes()));
@@ -53,8 +54,14 @@ struct TtfFontface : public Fontface {
         return a;
     }
 
-    f64 kern(Glyph prev, Glyph curr) const override {
-        return _ttf.glyphKern(prev, curr);
+    f64 kern(Glyph prev, Glyph curr) override {
+        auto kern = _cachedKerns.get({prev, curr});
+        if (kern.has())
+            return kern.unwrap();
+
+        auto k = _ttf.glyphKern(prev, curr);
+        _cachedKerns.put({prev, curr}, k);
+        return k;
     }
 
     void contour(Gfx::Context &g, Glyph glyph) const override {

@@ -92,7 +92,7 @@ struct Fontface {
 
     virtual f64 advance(Glyph glyph) = 0;
 
-    virtual f64 kern(Glyph prev, Glyph curr) const = 0;
+    virtual f64 kern(Glyph prev, Glyph curr) = 0;
 
     virtual void contour(Gfx::Context &g, Glyph glyph) const = 0;
 
@@ -114,7 +114,7 @@ struct Font {
 
     f64 advance(Glyph glyph);
 
-    f64 kern(Glyph prev, Glyph curr) const;
+    f64 kern(Glyph prev, Glyph curr);
 
     FontMeasure measure(Glyph glyph);
 };

@@ -43,7 +43,7 @@ f64 Font::advance(Glyph glyph) {
     return fontface->advance(glyph) * scale();
 }
 
-f64 Font::kern(Glyph prev, Glyph curr) const {
+f64 Font::kern(Glyph prev, Glyph curr) {
     return fontface->kern(prev, curr) * scale();
 }
 

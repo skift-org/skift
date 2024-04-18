@@ -35,7 +35,7 @@ struct VgaFontface : public Fontface {
         return 8;
     }
 
-    f64 kern(Glyph, Glyph) const override {
+    f64 kern(Glyph, Glyph) override {
         return 0;
     }
 

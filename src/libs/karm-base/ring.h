@@ -56,9 +56,8 @@ struct Ring {
     }
 
     void pushBack(T value) {
-        if (_len == _cap) {
+        if (_len == _cap) [[unlikely]]
             panic("push on full ring");
-        }
 
         _buf[_head].ctor(value);
         _head = (_head + 1) % _cap;
@@ -66,9 +65,8 @@ struct Ring {
     }
 
     T popBack() {
-        if (_len == 0) {
+        if (_len == 0) [[unlikely]]
             panic("pop on empty ring");
-        }
 
         T value = _buf[_head].take();
         _head = (_head - 1) % _cap;
@@ -77,9 +75,8 @@ struct Ring {
     }
 
     T popFront() {
-        if (_len == 0) {
+        if (_len == 0) [[unlikely]]
             panic("dequeue on empty ring");
-        }
 
         T value = _buf[_tail].take();
         _tail = (_tail + 1) % _cap;
@@ -97,17 +94,15 @@ struct Ring {
     }
 
     T &peek(usize index) {
-        if (index >= _len) {
+        if (index >= _len) [[unlikely]]
             panic("peek out of bounds");
-        }
 
         return _buf[(_tail + index) % _cap].unwrap();
     }
 
     T const &peek(usize index) const {
-        if (index >= _len) {
+        if (index >= _len) [[unlikely]]
             panic("peek out of bounds");
-        }
 
         return _buf[(_tail + index) % _cap].unwrap();
     }

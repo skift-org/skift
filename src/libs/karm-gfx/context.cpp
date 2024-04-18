@@ -16,9 +16,8 @@ void Context::begin(MutPixels p) {
 }
 
 void Context::end() {
-    if (_stack.len() != 1) {
+    if (_stack.len() != 1) [[unlikely]]
         panic("save/restore mismatch");
-    }
 
     _stack.popBack();
     _pixels = NONE;
@@ -42,16 +41,15 @@ Context::Scope const &Context::current() const {
 }
 
 void Context::save() {
-    if (_stack.len() > 100) {
+    if (_stack.len() > 100) [[unlikely]]
         panic("save/restore stack overflow");
-    }
+
     _stack.pushBack(current());
 }
 
 void Context::restore() {
-    if (_stack.len() == 1) {
+    if (_stack.len() == 1) [[unlikely]]
         panic("restore without save");
-    }
 
     _stack.popBack();
     _updateTransform();

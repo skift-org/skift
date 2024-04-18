@@ -42,11 +42,13 @@ struct _Cell {
     _Cell *refStrong() {
         LockScope scope(_lock);
 
-        if (_clear)
+        if (_clear) [[unlikely]]
             panic("refStrong() called on cleared cell");
+
         _strong++;
-        if (_strong < 0)
+        if (_strong < 0) [[unlikely]]
             panic("refStrong() overflow");
+
         return this;
     }
 
@@ -54,8 +56,9 @@ struct _Cell {
         _lock.acquire();
 
         _strong--;
-        if (_strong < 0)
+        if (_strong < 0) [[unlikely]]
             panic("derefStrong() underflow");
+
         collectAndRelease();
     }
 
@@ -63,8 +66,9 @@ struct _Cell {
         LockScope scope(_lock);
 
         _weak++;
-        if (_weak < 0)
+        if (_weak < 0) [[unlikely]]
             panic("refWeak() overflow");
+
         return this;
     }
 
@@ -72,15 +76,17 @@ struct _Cell {
         _lock.acquire();
 
         _weak--;
-        if (_weak < 0)
+        if (_weak < 0) [[unlikely]]
             panic("derefWeak() underflow");
+
         collectAndRelease();
     }
 
     template <typename T>
     T &unwrap() {
-        if (_clear)
+        if (_clear) [[unlikely]]
             panic("unwrap() called on cleared cell");
+
         return *static_cast<T *>(_unwrap());
     }
 };
@@ -181,9 +187,8 @@ struct Strong {
     // MARK: Methods -----------------------------------------------------------
 
     constexpr void ensure() const {
-        if (not _cell) {
+        if (not _cell) [[unlikely]]
             panic("null dereference");
-        }
     }
 
     constexpr T const &unwrap() const {
@@ -199,18 +204,18 @@ struct Strong {
     template <Meta::Derive<T> U>
     constexpr U const &unwrap() const {
         ensure();
-        if (not is<U>()) {
+        if (not is<U>()) [[unlikely]]
             panic("unwrapping T as U");
-        }
+
         return _cell->unwrap<U>();
     }
 
     template <Meta::Derive<T> U>
     constexpr U &unwrap() {
         ensure();
-        if (not is<U>()) {
+        if (not is<U>()) [[unlikely]]
             panic("unwrapping T as U");
-        }
+
         return _cell->unwrap<U>();
     }
 

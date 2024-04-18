@@ -56,8 +56,9 @@ struct _InlineString {
     constexpr _InlineString() = default;
 
     _InlineString(Unit const *buf, usize len) {
-        if (len > N)
+        if (len > N) [[unlikely]]
             panic("len too large");
+
         _len = min(len, N);
         for (usize i = 0; i < _len; i++)
             _buf[i] = buf[i];
@@ -163,7 +164,7 @@ struct _String {
     always_inline _Str<E> str() const { return *this; }
 
     always_inline Unit const &operator[](usize i) const {
-        if (i >= _len)
+        if (i >= _len) [[unlikely]]
             panic("index out of bounds");
         return buf()[i];
     }

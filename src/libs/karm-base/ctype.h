@@ -122,10 +122,10 @@ constexpr Rune toAsciiUpper(Rune rune) {
 // MARK: Rune Parsing ----------------------------------------------------------
 
 constexpr Rune parseAsciiDecDigit(Rune rune) {
-    if (isAsciiDecDigit(rune))
-        return rune - '0';
+    if (not isAsciiDecDigit(rune)) [[unlikely]]
+        panic("invalid decimal digit");
 
-    panic("invalid decimal digit");
+    return rune - '0';
 }
 
 constexpr Rune parseAsciiHexDigit(Rune rune) {

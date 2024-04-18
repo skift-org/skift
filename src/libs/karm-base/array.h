@@ -13,16 +13,16 @@ struct Array {
     T _buf[N];
 
     constexpr T &operator[](usize i) {
-        if (i >= N) {
+        if (i >= N) [[unlikely]]
             panic("index out of range");
-        }
+
         return _buf[i];
     }
 
     constexpr T const &operator[](usize i) const {
-        if (i >= N) {
+        if (i >= N) [[unlikely]]
             panic("index out of range");
-        }
+
         return _buf[i];
     }
 

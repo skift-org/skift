@@ -225,7 +225,7 @@ void _div(UBig const &numerator, UBig const &denominator, UBig &quotient, UBig &
 }
 
 void _gcd(UBig const &lhs, UBig const &rhs, UBig &gcd) {
-    if (lhs == 0 or rhs == 0)
+    if (lhs == 0 or rhs == 0) [[unlikely]]
         panic("gcd of zero");
 
     gcd = lhs;
@@ -270,26 +270,26 @@ void _sub(IBig &lhs, IBig const &rhs) {
     } else if (lhs.positive()) {
         if (lhs._value < rhs._value) {
             IBig res = rhs;
-            if (_sub(res._value, lhs._value) == SubResult::UNDERFLOW)
+            if (_sub(res._value, lhs._value) == SubResult::UNDERFLOW) [[unlikely]]
                 panic("unexpected underflow");
 
             lhs = std::move(res);
             lhs._sign = Sign::NEGATIVE;
         } else {
-            if (_sub(lhs._value, rhs._value) == SubResult::UNDERFLOW)
+            if (_sub(lhs._value, rhs._value) == SubResult::UNDERFLOW) [[unlikely]]
                 panic("unexpected underflow");
 
             lhs._sign = Sign::POSITIVE;
         }
     } else {
         if (lhs._value > rhs._value) {
-            if (_sub(lhs._value, rhs._value) == SubResult::UNDERFLOW)
+            if (_sub(lhs._value, rhs._value) == SubResult::UNDERFLOW) [[unlikely]]
                 panic("unexpected underflow");
 
             lhs._sign = Sign::NEGATIVE;
         } else {
             IBig res = rhs;
-            if (_sub(res._value, lhs._value) == SubResult::UNDERFLOW)
+            if (_sub(res._value, lhs._value) == SubResult::UNDERFLOW) [[unlikely]]
                 panic("unexpected underflow");
 
             lhs = res;

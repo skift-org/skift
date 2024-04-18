@@ -62,7 +62,7 @@ struct Ll {
     usize len() const { return _len; }
 
     T *detach(T *value) {
-        if (not value)
+        if (not value) [[unlikely]]
             panic("value connot be null");
 
         if (prev(value))
@@ -85,10 +85,10 @@ struct Ll {
     }
 
     T *append(T *value, T *after) {
-        if (not value)
+        if (not value) [[unlikely]]
             panic("value connot be null");
 
-        if (value == after)
+        if (value == after) [[unlikely]]
             panic("cannot append a node to itself");
 
         if (after) {
@@ -163,7 +163,7 @@ struct Ll {
     }
 
     T *peek(usize i) {
-        if (i >= _len)
+        if (i >= _len) [[unlikely]]
             panic("index out of bound");
 
         auto *node = _head;
@@ -173,7 +173,7 @@ struct Ll {
     }
 
     T const *peek(usize i) const {
-        if (i >= _len)
+        if (i >= _len) [[unlikely]]
             panic("index out of bound");
 
         auto *node = _head;

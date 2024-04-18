@@ -25,9 +25,8 @@ union Cpuid {
                      : "a"(leaf & 0x80000000)
                      : "rbx", "rcx", "rdx");
 
-        if (leaf > maxLeaf) {
+        if (leaf > maxLeaf) [[unlikely]] 
             panic("cpuid leaf out of range");
-        }
 
         Cpuid result{};
 

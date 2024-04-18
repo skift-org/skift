@@ -1,8 +1,7 @@
 #pragma once
 
 #include <karm-meta/id.h>
-
-#include "panic.h"
+#include <karm-panic/panic.h>
 
 namespace Karm {
 
@@ -98,14 +97,14 @@ struct Any {
 
     template <typename T>
     T &unwrap() {
-        if (_type != Meta::idOf<T>())
+        if (_type != Meta::idOf<T>()) [[unlikely]]
             panic("unwrapping wrong type");
         return *static_cast<T *>(_buf);
     }
 
     template <typename T>
     T const &unwrap() const {
-        if (_type != Meta::idOf<T>())
+        if (_type != Meta::idOf<T>()) [[unlikely]]
             panic("unwrapping wrong type");
         return *static_cast<T *>(_buf);
     }

@@ -63,26 +63,30 @@ struct [[nodiscard]] Res {
     }
 
     always_inline constexpr E const &none() const {
-        if (not _inner.template is<E>())
+        if (not _inner.template is<E>()) [[unlikely]]
             panic("none() called on an ok");
+
         return _inner.template unwrap<E>();
     }
 
     always_inline constexpr V &unwrap(char const *msg = "unwraping an error") {
-        if (not _inner.template is<Ok<V>>())
+        if (not _inner.template is<Ok<V>>()) [[unlikely]]
             panic(msg);
+
         return _inner.template unwrap<Ok<V>>().inner;
     }
 
     always_inline constexpr V const &unwrap(char const *msg = "unwraping an error") const {
-        if (not _inner.template is<Ok<V>>())
+        if (not _inner.template is<Ok<V>>()) [[unlikely]]
             panic(msg);
+
         return _inner.template unwrap<Ok<V>>().inner;
     }
 
     always_inline constexpr V take() {
-        if (not _inner.template is<Ok<V>>())
+        if (not _inner.template is<Ok<V>>()) [[unlikely]]
             panic("take() called on an error");
+
         return _inner.template unwrap<Ok<V>>().take();
     }
 

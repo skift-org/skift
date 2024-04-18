@@ -42,9 +42,9 @@ struct Emit : public Io::TextWriterBase<> {
     }
 
     void deindent() {
-        if (_ident == 0) {
+        if (_ident == 0) [[unlikely]]
             panic("deident() underflow");
-        }
+
         _ident--;
     }
 

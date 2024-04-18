@@ -142,7 +142,7 @@ struct Utf8 {
     }
 
     static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
-        if (unitLen(c) > out.rem())
+        if (unitLen(c) > out.rem()) [[unlikely]]
             panic("bad");
 
         if (c <= 0x7f) {

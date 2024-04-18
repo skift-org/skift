@@ -34,23 +34,25 @@ struct Cursor {
     }
 
     always_inline constexpr T curr() const {
-        if (not ended()) {
+        if (not ended()) [[unlikely]]
             panic("curr() called on ended cursor");
-        }
+
         return *_begin;
     }
 
     always_inline constexpr T next() {
-        if (ended())
+        if (ended()) [[unlikely]]
             panic("next() called on ended cursor");
+
         T r = *_begin;
         _begin++;
         return r;
     }
 
     always_inline constexpr Slice<T> next(usize n) {
-        if (n > rem())
+        if (n > rem()) [[unlikely]]
             panic("next() called on ended cursor");
+
         auto slice = Slice<T>{_begin, n};
         _begin += n;
         return slice;
@@ -109,14 +111,16 @@ struct MutCursor {
     }
 
     always_inline constexpr T next() {
-        if (ended())
+        if (ended()) [[unlikely]]
             panic("next() called on ended cursor");
+
         return *_begin++;
     }
 
     always_inline constexpr MutSlice<T> next(usize n) {
-        if (n > rem())
+        if (n > rem()) [[unlikely]]
             panic("next() called on ended cursor");
+
         auto slice = MutSlice<T>{_begin, n};
         _begin += n;
         return slice;

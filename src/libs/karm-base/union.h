@@ -91,18 +91,16 @@ struct Union {
 
     template <Meta::Contains<Ts...> T>
     always_inline T &unwrap() {
-        if (_index != Meta::indexOf<T, Ts...>()) {
+        if (_index != Meta::indexOf<T, Ts...>()) [[unlikely]]
             panic("unwrapping wrong type");
-        }
 
         return *reinterpret_cast<T *>(_buf);
     }
 
     template <Meta::Contains<Ts...> T>
     always_inline T const &unwrap() const {
-        if (_index != Meta::indexOf<T, Ts...>()) {
+        if (_index != Meta::indexOf<T, Ts...>()) [[unlikely]]
             panic("unwrapping wrong type");
-        }
 
         return *reinterpret_cast<T const *>(_buf);
     }

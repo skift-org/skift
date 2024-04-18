@@ -96,30 +96,30 @@ struct [[nodiscard]] Opt {
     }
 
     always_inline constexpr T *operator->() {
-        if (not _present) {
+        if (not _present) [[unlikely]]
             panic("unwrapping None");
-        }
+
         return &_value;
     }
 
     always_inline constexpr T &operator*() {
-        if (not _present) {
+        if (not _present) [[unlikely]]
             panic("unwrapping None");
-        }
+
         return _value;
     }
 
     always_inline constexpr T const *operator->() const {
-        if (not _present) {
+        if (not _present) [[unlikely]]
             panic("unwrapping None");
-        }
+
         return &_value;
     }
 
     always_inline constexpr T const &operator*() const {
-        if (not _present) {
+        if (not _present) [[unlikely]]
             panic("unwrapping None");
-        }
+
         return _value;
     }
 
@@ -143,19 +143,19 @@ struct [[nodiscard]] Opt {
     }
 
     always_inline constexpr T &unwrap(char const *msg = "unwraping none") {
-        if (not _present)
+        if (not _present) [[unlikely]]
             panic(msg);
         return _value;
     }
 
     always_inline constexpr T const &unwrap(char const *msg = "unwraping none") const {
-        if (not _present)
+        if (not _present) [[unlikely]]
             panic(msg);
         return _value;
     }
 
     always_inline constexpr T take(char const *msg = "unwraping none") {
-        if (not _present)
+        if (not _present) [[unlikely]]
             panic(msg);
         T v = std::move(_value);
         clear();

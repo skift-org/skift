@@ -198,9 +198,8 @@ struct Buf {
     }
 
     T removeAt(usize index) {
-        if (index >= _len) {
+        if (index >= _len) [[unlikely]]
             panic("index out of bounds");
-        }
 
         T ret = _buf[index].take();
         for (usize i = index; i < _len - 1; i++) {
@@ -211,17 +210,14 @@ struct Buf {
     }
 
     void removeRange(usize index, usize count) {
-        if (index > _len) {
+        if (index > _len) [[unlikely]]
             panic("index out of bounds");
-        }
 
-        if (index + count > _len) {
+        if (index + count > _len) [[unlikely]]
             panic("index + count out of bounds");
-        }
 
-        for (usize i = index; i < _len - count; i++) {
+        for (usize i = index; i < _len - count; i++)
             _buf[i].ctor(_buf[i + count].take());
-        }
 
         _len -= count;
     }
@@ -303,13 +299,14 @@ struct InlineBuf {
     constexpr InlineBuf() = default;
 
     InlineBuf(usize cap) {
-        if (cap > N)
+        if (cap > N) [[unlikely]]
             panic("cap too large");
     }
 
     InlineBuf(T const *buf, usize len) {
-        if (len > N)
+        if (len > N) [[unlikely]]
             panic("len too large");
+
         _len = len;
         for (usize i = 0; i < _len; i++)
             _buf[i].ctor(buf[i]);
@@ -370,7 +367,7 @@ struct InlineBuf {
     }
 
     void ensure(usize len) {
-        if (len > N)
+        if (len > N) [[unlikely]]
             panic("cap too large");
     }
 
@@ -380,9 +377,8 @@ struct InlineBuf {
 
     template <typename... Args>
     void emplace(usize index, Args &&...args) {
-        if (_len == N) {
+        if (_len == N) [[unlikely]]
             panic("cap too large");
-        }
 
         for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
@@ -393,9 +389,8 @@ struct InlineBuf {
     }
 
     void insert(usize index, T &&value) {
-        if (_len == N) {
+        if (_len == N) [[unlikely]]
             panic("cap too large");
-        }
 
         for (usize i = _len; i > index; i--) {
             _buf[i].ctor(_buf[i - 1].take());
@@ -406,9 +401,8 @@ struct InlineBuf {
     }
 
     void insert(Copy, usize index, T *first, usize count) {
-        if (_len + count > N) {
+        if (_len + count > N) [[unlikely]]
             panic("cap too large");
-        }
 
         for (usize i = _len; i > index; i--) {
             _buf[i] = _buf[i - count];
@@ -422,9 +416,8 @@ struct InlineBuf {
     }
 
     void insert(Move, usize index, T *first, usize count) {
-        if (_len + count > N) {
+        if (_len + count > N) [[unlikely]]
             panic("cap too large");
-        }
 
         for (usize i = _len; i > index; i--) {
             _buf[i] = std::move<T>(_buf[i - count]);
@@ -538,10 +531,8 @@ struct ViewBuf {
     }
 
     void ensure(usize cap) {
-        if (cap <= _cap)
-            return;
-
-        panic("cap too large");
+        if (cap > _cap) [[unlikely]]
+            panic("cap too large");
     }
 
     void fit() {
@@ -608,9 +599,8 @@ struct ViewBuf {
     }
 
     T removeAt(usize index) {
-        if (index >= _len) {
+        if (index >= _len) [[unlikely]]
             panic("index out of bounds");
-        }
 
         T ret = _buf[index].take();
         for (usize i = index; i < _len - 1; i++) {
@@ -621,17 +611,14 @@ struct ViewBuf {
     }
 
     void removeRange(usize index, usize count) {
-        if (index > _len) {
+        if (index > _len) [[unlikely]]
             panic("index out of bounds");
-        }
 
-        if (index + count > _len) {
+        if (index + count > _len) [[unlikely]]
             panic("index + count out of bounds");
-        }
 
-        for (usize i = index; i < _len - count; i++) {
+        for (usize i = index; i < _len - count; i++)
             _buf[i].ctor(_buf[i + count].take());
-        }
 
         _len -= count;
     }

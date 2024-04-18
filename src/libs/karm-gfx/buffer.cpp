@@ -3,7 +3,7 @@
 namespace Karm::Gfx {
 
 [[gnu::flatten]] void blitUnsafe(MutPixels dst, Pixels src) {
-    if (dst.width() != src.width() or dst.height() != src.height())
+    if (dst.width() != src.width() or dst.height() != src.height()) [[unlikely]]
         panic("blitUnsafe() called with buffers of different sizes");
 
     dst._fmt.visit([&](auto fd) {

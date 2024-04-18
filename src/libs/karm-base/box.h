@@ -41,28 +41,28 @@ struct Box {
     }
 
     constexpr T *operator->() {
-        if (not _ptr)
+        if (not _ptr) [[unlikely]]
             panic("deferencing moved from Box<T>");
 
         return _ptr;
     }
 
     constexpr T &operator*() {
-        if (not _ptr)
+        if (not _ptr) [[unlikely]]
             panic("deferencing moved from Box<T>");
 
         return *_ptr;
     }
 
     constexpr T const *operator->() const {
-        if (not _ptr)
+        if (not _ptr) [[unlikely]]
             panic("deferencing moved from Box<T>");
 
         return _ptr;
     }
 
     constexpr T const &operator*() const {
-        if (not _ptr)
+        if (not _ptr) [[unlikely]]
             panic("deferencing moved from Box<T>");
 
         return *_ptr;

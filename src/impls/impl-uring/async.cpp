@@ -61,7 +61,7 @@ struct UringSched : public Sys::Sched {
     void submit(Strong<_Job> job) {
         auto id = _id++;
         auto *sqe = io_uring_get_sqe(&_ring);
-        if (not sqe)
+        if (not sqe) [[unlikely]]
             panic("failed to get sqe");
         sqe->user_data = id;
         _jobs.put(id, job);
@@ -344,7 +344,7 @@ Sched &globalSched() {
     static UringSched sched = [] {
         io_uring ring{};
         auto res = io_uring_queue_init(UringSched::NCQES, &ring, 0);
-        if (res < 0)
+        if (res < 0) [[unlikely]]
             panic("failed to initialize io_uring");
         return UringSched(ring);
     }();

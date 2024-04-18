@@ -153,9 +153,9 @@ static inline typename S::Inner run(S s) {
         void recv(InlineOrLater, typename S::Inner r) { _ret = r; }
     };
     auto op = s.connect(Receiver{ret});
-    if (op.start())
-        return ret.take();
-    panic("run() called on pending operation without a wait function");
+    if (not op.start()) [[unlikely]]
+        panic("run() called on pending operation without a wait function");
+    return ret.take();
 }
 
 template <Sender S, typename Cb>
@@ -214,7 +214,7 @@ struct State {
     Ll<Listener> _queue;
 
     void set(T value) {
-        if (_value.has())
+        if (_value.has()) [[unlikely]]
             panic("promise already resolved");
         _value = std::move(value);
         wake();
@@ -232,7 +232,7 @@ struct State {
     }
 
     T &unwrap() {
-        if (not _value.has())
+        if (not _value.has()) [[unlikely]]
             panic("promise not resolved");
         return _value.unwrap();
     }
@@ -296,7 +296,7 @@ struct _Promise : public Meta::NoCopy {
     _Promise() : _state{makeStrong<State<T>>()} {}
 
     void resolve(T value) {
-        if (not _state.has())
+        if (not _state.has()) [[unlikely]]
             panic("promise already resolved");
         _state.take()->set(std::move(value));
     }

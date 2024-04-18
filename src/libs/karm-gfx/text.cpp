@@ -188,24 +188,36 @@ Math::Vec2f Text::layout(f64 width) {
 
 void Text::paint(Context &ctx) const {
     auto m = _style.font.metrics();
-    auto baseline = m.ascend + m.linegap / 2;
 
     ctx.save();
     ctx.textFont(_style.font);
     if (_style.color)
         ctx.fillStyle(*_style.color);
 
-    for (auto const &line : _lines) {
+    auto clip = ctx.clip();
+    auto origin = ctx.origin();
+
+    auto si =
+        tryOr(searchLowerBound(_lines, [&](auto &line) {
+                  return line.baseline + origin.y <=> clip.top() - m.ascend;
+              }),
+              0);
+
+    auto ei = tryOr(searchUpperBound(_lines, [&](auto &line) {
+                        return line.baseline + origin.y <=> clip.bottom() + m.lineheight();
+                    }),
+                    _lines.len());
+
+    for (usize i = si; i < ei; i++) {
+        auto const &line = _lines[i];
         for (usize b = line.blocks.start; b < line.blocks.end(); b++) {
             auto const &block = _blocks[b];
 
             for (usize c = block.cells.start; c < block.cells.end(); c++) {
                 auto const &cell = _cells[c];
-                ctx.fill({block.pos + cell.pos, baseline}, cell.glyph);
+                ctx.fill({block.pos + cell.pos, line.baseline}, cell.glyph);
             }
         }
-
-        baseline += m.linegap + m.descend + m.ascend;
     }
 
     ctx.restore();

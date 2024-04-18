@@ -67,6 +67,10 @@ struct FontMetrics {
     f64 descend;
     f64 linegap;
     f64 advance;
+
+    f64 lineheight() {
+        return ascend + descend + linegap;
+    }
 };
 
 struct FontMeasure {

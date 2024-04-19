@@ -8,7 +8,7 @@
 namespace Karm {
 
 template <typename T>
-union Inert {
+struct Inert {
     alignas(alignof(T)) char _inner[sizeof(T)];
 
     template <typename... Args>

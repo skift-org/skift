@@ -77,7 +77,7 @@ struct Sieve {
         return NONE;
     }
 
-    bool contains(K const &key) {
+    bool has(K const &key) {
         return _lookup(key) != nullptr;
     }
 

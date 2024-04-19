@@ -27,11 +27,10 @@ struct Buf {
         return buf;
     }
 
-    Buf() = default;
-
-    Buf(usize cap)
+    Buf(usize cap = 0)
         : _cap(cap) {
-        _buf = new Inert<T>[cap];
+        if (cap)
+            _buf = new Inert<T>[cap];
     }
 
     Buf(std::initializer_list<T> other) {

@@ -1,21 +1,11 @@
 #pragma once
 
-#include <karm-base/checked.h>
-#include <karm-base/slice.h>
+#include "checked.h"
+#include "slice.h"
 
 namespace Karm {
 
-struct Hash {
-    usize _value;
-
-    constexpr explicit operator usize() const {
-        return _value;
-    }
-    constexpr auto operator<=>(Hash const &) const = default;
-    constexpr auto operator+(Hash const &o) const {
-        return Hash(_value + o._value + 0x9e3779b9 + (_value << 6) + (_value >> 2));
-    }
-};
+using Hash = usize;
 
 template <typename T>
 struct Hasher;
@@ -30,11 +20,11 @@ struct Hasher<Hash> {
 template <>
 struct Hasher<Bytes> {
     static constexpr Hash hash(Bytes bytes) {
-        usize hash = 0;
+        Hash hash = 0;
         for (auto &b : bytes)
             hash = (1000003 * hash) ^ b;
         hash ^= bytes.len();
-        return {hash};
+        return hash;
     }
 };
 

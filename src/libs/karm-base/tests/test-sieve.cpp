@@ -22,11 +22,11 @@ test$("sieve-access") {
 
 test$("sieve-contains") {
     Sieve<int, int> cache{10};
-    expect$(not cache.contains(0));
+    expect$(not cache.has(0));
     (void)cache.access(0, [&] {
         return 0;
     });
-    expect$(cache.contains(0));
+    expect$(cache.has(0));
     return Ok();
 }
 
@@ -66,7 +66,7 @@ test$("seive-evict") {
         return 10 * 10;
     });
 
-    expect$(not cache.contains(0));
+    expect$(not cache.has(0));
     expectEq$(cache.len(), 10uz);
 
     return Ok();

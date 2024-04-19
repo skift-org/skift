@@ -1,4 +1,4 @@
-#include <karm-panic/panic.h>
+#include <karm-base/panic.h>
 #include <stdio.h>
 #include <stdlib.h>
 

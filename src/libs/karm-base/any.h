@@ -1,7 +1,8 @@
 #pragma once
 
 #include <karm-meta/id.h>
-#include <karm-panic/panic.h>
+
+#include "panic.h"
 
 namespace Karm {
 

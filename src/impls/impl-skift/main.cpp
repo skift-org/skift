@@ -1,8 +1,8 @@
 #include <abi-sysv/abi.h>
 #include <handover/hook.h>
 #include <hjert-api/api.h>
+#include <karm-base/panic.h>
 #include <karm-logger/logger.h>
-#include <karm-panic/panic.h>
 #include <karm-sys/context.h>
 
 #include "hooks.h"

@@ -5,7 +5,6 @@
     "description": "Base data types and functions",
     "requires": [
         "karm-meta",
-        "karm-panic",
         "stdc-math",
         "stdc-ansi",
         "stdcpp"

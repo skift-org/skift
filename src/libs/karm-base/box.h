@@ -16,27 +16,27 @@ struct Box {
     constexpr Box(T *ptr)
         : _ptr(ptr) {}
 
-    constexpr Box(Box const &) = delete;
+    constexpr Box(Box const &other)
+        : _ptr(new T(*other._ptr)) {}
 
     template <Meta::Derive<T> U>
-    constexpr Box(Box<U> &&other) {
-        delete _ptr;
-        _ptr = other._ptr;
-        other._ptr = nullptr;
-    }
+    constexpr Box(Box<U> &&other)
+        : _ptr(std::exchange(other._ptr, nullptr)) {}
 
     constexpr ~Box() {
         if (_ptr)
             delete _ptr;
+        _ptr = nullptr;
     }
 
-    constexpr Box &operator=(Box const &) = delete;
+    constexpr Box &operator=(Box const &other) {
+        *this = Box(other);
+        return *this;
+    }
 
     template <Meta::Derive<T> U>
     constexpr Box &operator=(Box<U> &&other) {
-        delete _ptr;
-        _ptr = other._ptr;
-        other._ptr = nullptr;
+        std::swap(_ptr, other._ptr);
         return *this;
     }
 

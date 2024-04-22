@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "web-media",
+    "type": "lib",
+    "description": "Implementation of CSS Media Queries Level 4 (https://drafts.csswg.org/mediaqueries)",
+    "requires": [
+        "karm-logger",
+        "web-css"
+    ]
+}

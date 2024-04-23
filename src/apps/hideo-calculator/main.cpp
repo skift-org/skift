@@ -76,12 +76,12 @@ Ui::Child screen(State const &state) {
 
     auto currExpr =
         (state.op == Operator::NONE ? Ui::text("") : Ui::text(toFmt(state.op), state.lhs)) |
-        Ui::align(Layout::Align::VCENTER | Layout::Align::END);
+        Ui::align(Math::Align::VCENTER | Math::Align::END);
 
     auto result =
         (state.error ? Ui::headlineMedium(*state.error)
                      : Ui::headlineMedium("{}", state.hasRhs ? state.rhs : state.lhs)) |
-        Ui::align(Layout::Align::VCENTER | Layout::Align::END);
+        Ui::align(Math::Align::VCENTER | Math::Align::END);
 
     return Ui::vflow(8, /* debugExpr, */ currExpr, result) | Ui::spacing({16, 8});
 }

@@ -19,7 +19,7 @@ Ui::Child app() {
 
     auto clock = Ui::vflow(
         16,
-        Layout::Align::CENTER,
+        Math::Align::CENTER,
         Ui::displayMedium("{02}:{02}", time.hour, time.minute),
         Ui::titleMedium(dateTime.unwrap())
     );

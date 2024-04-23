@@ -30,7 +30,7 @@ Ui::Child navbarItem(Mdi::Icon icon, char const *text, bool selected, Ui::OnPres
                selected ? Ui::ButtonStyle::regular() : Ui::ButtonStyle::subtle(),
                Ui::vflow(
                    0,
-                   Layout::Align::CENTER,
+                   Math::Align::CENTER,
                    Ui::icon(icon),
                    Ui::empty(4),
                    Ui::labelMedium(text), indicator

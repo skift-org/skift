@@ -132,7 +132,7 @@ struct Reducer :
         (*_child)->layout(r);
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
         ensureBuild();
         return (*_child)->size(s, hint);
     }

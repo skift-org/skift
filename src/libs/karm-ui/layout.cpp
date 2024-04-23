@@ -18,7 +18,7 @@ struct Empty : public View<Empty> {
         _size = o._size;
     }
 
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i, Hint) override {
         return _size;
     }
 
@@ -37,9 +37,8 @@ Child empty(Math::Vec2i size) {
 }
 
 Child cond(bool cond, Child child) {
-    if (cond) {
+    if (cond)
         return child;
-    }
     return empty();
 }
 
@@ -60,7 +59,7 @@ struct Bound : public ProxyNode<Bound> {
         child().layout(bound);
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
         return child().size(s, hint);
     }
 };
@@ -92,7 +91,7 @@ struct Placed : public ProxyNode<Placed> {
         child().layout(place);
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint) override {
         return s;
     }
 };
@@ -104,7 +103,7 @@ Child placed(Math::Recti place, Child child) {
 // MARK: Separator -------------------------------------------------------------
 
 struct Separator : public View<Separator> {
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i, Hint) override {
         return {1};
     }
 
@@ -123,68 +122,70 @@ Child separator() {
 // MARK: Align -----------------------------------------------------------------
 
 struct Align : public ProxyNode<Align> {
-    Layout::Align _align;
+    Math::Align _align;
 
-    Align(Layout::Align align, Child child) : ProxyNode(child), _align(align) {}
+    Align(Math::Align align, Child child) : ProxyNode(child), _align(align) {}
 
     void layout(Math::Recti bound) override {
         auto childSize = child().size(
             bound.size(), _child.is<Grow>()
-                              ? Layout::Hint::MAX
-                              : Layout::Hint::MIN
+                              ? Hint::MAX
+                              : Hint::MIN
         );
 
         child()
             .layout(_align.apply<isize>(
-                Layout::Flow::LEFT_TO_RIGHT,
+                Math::Flow::LEFT_TO_RIGHT,
                 childSize,
                 bound
             ));
     };
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
-        return _align.size(child().size(s, hint), s, hint);
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
+        if (hint == Hint::MAX)
+            return _align.maxSize(child().size(s, hint), s);
+        return _align.minSize(child().size(s, hint));
     }
 };
 
-Child align(Layout::Align align, Child child) {
+Child align(Math::Align align, Child child) {
     return makeStrong<Align>(align, child);
 }
 
 Child center(Child child) {
-    return align(Layout::Align::CENTER, child);
+    return align(Math::Align::CENTER, child);
 }
 
 Child start(Child child) {
-    return align(Layout::Align::START | Layout::Align::VFILL, child);
+    return align(Math::Align::START | Math::Align::VFILL, child);
 }
 
 Child end(Child child) {
-    return align(Layout::Align::END | Layout::Align::VFILL, child);
+    return align(Math::Align::END | Math::Align::VFILL, child);
 }
 
 Child fit(Child child) {
-    return align(Layout::Align::FIT, child);
+    return align(Math::Align::FIT, child);
 }
 
 Child cover(Child child) {
-    return align(Layout::Align::COVER, child);
+    return align(Math::Align::COVER, child);
 }
 
 Child hcenter(Child child) {
-    return align(Layout::Align::HCENTER | Layout::Align::TOP, child);
+    return align(Math::Align::HCENTER | Math::Align::TOP, child);
 }
 
 Child vcenter(Child child) {
-    return align(Layout::Align::VCENTER | Layout::Align::START, child);
+    return align(Math::Align::VCENTER | Math::Align::START, child);
 }
 
 Child hcenterFill(Child child) {
-    return align(Layout::Align::HCENTER | Layout::Align::VFILL, child);
+    return align(Math::Align::HCENTER | Math::Align::VFILL, child);
 }
 
 Child vcenterFill(Child child) {
-    return align(Layout::Align::VCENTER | Layout::Align::HFILL, child);
+    return align(Math::Align::VCENTER | Math::Align::HFILL, child);
 }
 
 // MARK: Sizing ----------------------------------------------------------------
@@ -206,7 +207,7 @@ struct Sizing : public ProxyNode<Sizing> {
         child().layout(bound);
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
         if (_max.x != UNCONSTRAINED) {
             s.x = min(s.x, _max.x);
         }
@@ -260,9 +261,9 @@ Child pinSize(isize size, Child child) {
 // MARK: Spacing ---------------------------------------------------------------
 
 struct Spacing : public ProxyNode<Spacing> {
-    Layout::Spacingi _spacing;
+    Math::Spacingi _spacing;
 
-    Spacing(Layout::Spacingi spacing, Child child)
+    Spacing(Math::Spacingi spacing, Child child)
         : ProxyNode(child), _spacing(spacing) {}
 
     void reconcile(Spacing &o) override {
@@ -278,19 +279,19 @@ struct Spacing : public ProxyNode<Spacing> {
     }
 
     void layout(Math::Recti rect) override {
-        child().layout(_spacing.shrink(Layout::Flow::LEFT_TO_RIGHT, rect));
+        child().layout(_spacing.shrink(Math::Flow::LEFT_TO_RIGHT, rect));
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
         return child().size(s - _spacing.all(), hint) + _spacing.all();
     }
 
     Math::Recti bound() override {
-        return _spacing.grow(Layout::Flow::LEFT_TO_RIGHT, child().bound());
+        return _spacing.grow(Math::Flow::LEFT_TO_RIGHT, child().bound());
     }
 };
 
-Child spacing(Layout::Spacingi s, Child child) {
+Child spacing(Math::Spacingi s, Child child) {
     return makeStrong<Spacing>(s, child);
 }
 
@@ -313,7 +314,7 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
             g.plot(child().bound(), Gfx::INDIGO);
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint) override {
         if (s.x < s.y)
             return {s.x, (isize)(s.x * _ratio)};
 
@@ -408,7 +409,7 @@ struct FlowLayout : public GroupNode<FlowLayout> {
             if (child.is<Grow>()) {
                 grows += child.unwrap<Grow>().grow();
             } else {
-                total += _style.flow.getX(child->size(r.size(), Layout::Hint::MIN));
+                total += _style.flow.getX(child->size(r.size(), Hint::MIN));
             }
         }
 
@@ -425,7 +426,7 @@ struct FlowLayout : public GroupNode<FlowLayout> {
 
         for (auto &child : children()) {
             Math::Recti inner = {};
-            auto childSize = child->size(r.size(), Layout::Hint::MIN);
+            auto childSize = child->size(r.size(), Hint::MIN);
 
             inner = _style.flow.setStart(inner, (isize)start);
             if (child.is<Grow>()) {
@@ -442,26 +443,26 @@ struct FlowLayout : public GroupNode<FlowLayout> {
         }
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
         isize w{};
-        isize h{hint == Layout::Hint::MAX ? _style.flow.getY(s) : 0};
+        isize h{hint == Hint::MAX ? _style.flow.getY(s) : 0};
         bool grow = false;
 
         for (auto &child : children()) {
             if (child.is<Grow>())
                 grow = true;
 
-            auto childSize = child->size(s, Layout::Hint::MIN);
+            auto childSize = child->size(s, Hint::MIN);
             w += _style.flow.getX(childSize);
             h = max(h, _style.flow.getY(childSize));
         }
 
         w += _style.gaps * (max(1uz, children().len()) - 1);
-        if (grow and hint == Layout::Hint::MAX) {
+        if (grow and hint == Hint::MAX) {
             w = max(_style.flow.getX(s), w);
         }
 
-        return _style.flow.orien() == Layout::Orien::HORIZONTAL
+        return _style.flow.orien() == Math::Orien::HORIZONTAL
                    ? Math::Vec2i{w, h}
                    : Math::Vec2i{h, w};
     }
@@ -631,7 +632,7 @@ struct GridLayout : public GroupNode<GridLayout> {
         }
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
         isize row = 0;
         bool rowGrow = false;
         isize growUnitRows = computeGrowUnitRows(Math::Recti{0, s});
@@ -646,7 +647,7 @@ struct GridLayout : public GroupNode<GridLayout> {
 
         row += computeGapsRows();
 
-        if (rowGrow and hint == Layout::Hint::MAX) {
+        if (rowGrow and hint == Hint::MAX) {
             row = max(_style.flow.getY(s), row);
         }
 
@@ -664,7 +665,7 @@ struct GridLayout : public GroupNode<GridLayout> {
 
         column += computeGapsColumns();
 
-        if (columnGrow and hint == Layout::Hint::MAX) {
+        if (columnGrow and hint == Hint::MAX) {
             column = max(_style.flow.getX(s), column);
         }
 

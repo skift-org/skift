@@ -1,10 +1,9 @@
 #pragma once
 
-#include <karm-math/rect.h>
-
 #include "flow.h"
+#include "rect.h"
 
-namespace Karm::Layout {
+namespace Karm::Math {
 
 template <typename T>
 struct Spacing {
@@ -64,4 +63,4 @@ struct Spacing {
 using Spacingi = Spacing<isize>;
 using Spacingf = Spacing<f64>;
 
-} // namespace Karm::Layout
+} // namespace Karm::Math

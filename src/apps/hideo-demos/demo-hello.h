@@ -14,7 +14,7 @@ static inline Demo HELLO_DEMO{
     [] {
         return Ui::vflow(
                    16,
-                   Layout::Align::CENTER,
+                   Math::Align::CENTER,
                    Ui::icon(Mdi::Icon::EMOTICON_HAPPY_OUTLINE, 64),
                    Ui::titleLarge("Hello, world!")
                ) |

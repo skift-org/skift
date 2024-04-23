@@ -103,7 +103,7 @@ Ui::Child flyout() {
                            .backgroundPaint = Ui::GRAY950,
                        })
                ) |
-               Ui::align(Layout::Align::HSTRETCH | Layout::Align::BOTTOM) |
+               Ui::align(Math::Align::HSTRETCH | Math::Align::BOTTOM) |
                Ui::slideIn(Ui::SlideFrom::BOTTOM) |
                Ui::dismisable(
                    Ui::closeDialog,

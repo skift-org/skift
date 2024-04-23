@@ -9,7 +9,7 @@ namespace Hideo {
 
 // MARK: Dialogs Scaffolding ---------------------------------------------------
 
-Ui::Child dialogScafold(Layout::Align a, Ui::Child inner) {
+Ui::Child dialogScafold(Math::Align a, Ui::Child inner) {
     Ui::BoxStyle const boxStyle = {
         .borderRadius = 4,
         .borderWidth = 1,
@@ -25,7 +25,7 @@ Ui::Child dialogScafold(Layout::Align a, Ui::Child inner) {
            Ui::spacing(16);
 }
 
-Ui::Child dialogScafold(Layout::Align a, Ui::Child content, Ui::Children actions) {
+Ui::Child dialogScafold(Math::Align a, Ui::Child content, Ui::Children actions) {
     auto layout =
         Ui::vflow(
             8,
@@ -73,9 +73,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Ui::Child licenseDialog() {
     return dialogScafold(
-        Layout::Align::CLAMP |
-            Layout::Align::CENTER |
-            Layout::Align::TOP_START,
+        Math::Align::CLAMP |
+            Math::Align::CENTER |
+            Math::Align::TOP_START,
         Ui::vflow(
             8,
             Ui::titleLarge("License"),
@@ -92,7 +92,7 @@ Ui::Child aboutDialog(Mdi::Icon i, String name) {
     auto content = Ui::vflow(
         Ui::vflow(
             8,
-            Layout::Align::CENTER,
+            Math::Align::CENTER,
             spacing(8, Ui::icon(i, 56)),
             Ui::titleLarge(name),
             versionBadge()
@@ -119,7 +119,7 @@ Ui::Child aboutDialog(Mdi::Icon i, String name) {
     };
 
     return dialogScafold(
-        Layout::Align::CENTER | Layout::Align::CLAMP,
+        Math::Align::CENTER | Math::Align::CLAMP,
         content | Ui::minSize({280, Ui::UNCONSTRAINED}),
         actions
     );
@@ -142,7 +142,7 @@ Ui::Child msgDialog(String title, String msg) {
     };
 
     return dialogScafold(
-        Layout::Align::CENTER,
+        Math::Align::CENTER,
         vflow(16, titleLbl, msgLbl),
         actions
     );

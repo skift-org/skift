@@ -16,7 +16,7 @@ namespace Hideo::Files {
 Ui::Child alert(State const &state, String title, String body) {
     return Ui::vflow(
                16,
-               Layout::Align::CENTER,
+               Math::Align::CENTER,
                Hideo::alert(title, body),
                Ui::hflow(
                    16,
@@ -67,7 +67,7 @@ Ui::Child directoryListing(State const &, Sys::Dir const &dir) {
     }
 
     return Ui::vflow(children) |
-           Ui::align(Layout::Align::TOP | Layout::Align::HFILL) |
+           Ui::align(Math::Align::TOP | Math::Align::HFILL) |
            Ui::vscroll() |
            Ui::grow();
 }
@@ -75,7 +75,7 @@ Ui::Child directoryListing(State const &, Sys::Dir const &dir) {
 Ui::Child breadcrumbItem(Str text, isize index) {
     return Ui::hflow(
         0,
-        Layout::Align::CENTER,
+        Math::Align::CENTER,
         Ui::icon(Mdi::CHEVRON_RIGHT),
         Ui::button(Model::bind<GoParent>(index), Ui::ButtonStyle::text().withPadding({2, 0}), Ui::text(text))
     );
@@ -129,7 +129,7 @@ Ui::Child breadcrumbRoot(Mime::Url const &url) {
         Ui::ButtonStyle::text(),
         Ui::hflow(
             8,
-            Layout::Align::CENTER,
+            Math::Align::CENTER,
             Ui::icon(iconForUrl(url)),
             Ui::text(textForUrl(url))
         )
@@ -240,7 +240,7 @@ Ui::Child openFileDialog() {
             );
 
             return dialogScafold(
-                Layout::Align::FILL,
+                Math::Align::FILL,
                 Ui::vflow(
                     Ui::grow(
                         Ui::vflow(

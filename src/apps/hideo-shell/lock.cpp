@@ -17,7 +17,7 @@ Ui::Child lock(State const &state) {
 
     auto clock = Ui::vflow(
         16,
-        Layout::Align::CENTER,
+        Math::Align::CENTER,
         Ui::displayMedium("{02}:{02}", time.hour, time.minute),
         Ui::titleMedium(dateTime.unwrap())
     );
@@ -37,7 +37,7 @@ Ui::Child lock(State const &state) {
             Ui::spacing(state.isMobile ? 64 : 128) |
             Ui::dragRegion() |
             Ui::dismisable(Model::bind<Unlock>(), Ui::DismisDir::TOP, 0.3) |
-            Ui::align(Layout::Align::VFILL | Layout::Align::HCENTER)
+            Ui::align(Math::Align::VFILL | Math::Align::HCENTER)
     );
 }
 

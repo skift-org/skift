@@ -1,15 +1,15 @@
 #pragma once
 
 #include <karm-gfx/shadow.h>
-#include <karm-layout/spacing.h>
+#include <karm-math/spacing.h>
 
 #include "node.h"
 
 namespace Karm::Ui {
 
 struct BoxStyle {
-    Layout::Spacingi margin{};
-    Layout::Spacingi padding{};
+    Math::Spacingi margin{};
+    Math::Spacingi padding{};
 
     Gfx::BorderRadius borderRadius{};
     f64 borderWidth{};
@@ -19,13 +19,13 @@ struct BoxStyle {
     Gfx::Paint foregroundPaint{GRAY50};
     Opt<Gfx::BoxShadow> shadowStyle{};
 
-    BoxStyle withMargin(Layout::Spacingi margin) const {
+    BoxStyle withMargin(Math::Spacingi margin) const {
         auto copy = *this;
         copy.margin = margin;
         return copy;
     }
 
-    BoxStyle withPadding(Layout::Spacingi padding) const {
+    BoxStyle withPadding(Math::Spacingi padding) const {
         auto copy = *this;
         copy.padding = padding;
         return copy;
@@ -68,7 +68,7 @@ struct BoxStyle {
     }
 
     void paint(Gfx::Context &g, Math::Recti bound, auto inner) {
-        bound = padding.grow(Layout::Flow::LEFT_TO_RIGHT, bound);
+        bound = padding.grow(Math::Flow::LEFT_TO_RIGHT, bound);
 
         g.save();
         if (shadowStyle)
@@ -112,13 +112,13 @@ struct _Box : public ProxyNode<Crtp> {
     }
 
     void layout(Math::Recti rect) override {
-        rect = boxStyle().margin.shrink(Layout::Flow::LEFT_TO_RIGHT, rect);
-        rect = boxStyle().padding.shrink(Layout::Flow::LEFT_TO_RIGHT, rect);
+        rect = boxStyle().margin.shrink(Math::Flow::LEFT_TO_RIGHT, rect);
+        rect = boxStyle().padding.shrink(Math::Flow::LEFT_TO_RIGHT, rect);
 
         ProxyNode<Crtp>::child().layout(rect);
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
         s = s - boxStyle().margin.all();
         s = s - boxStyle().padding.all();
 
@@ -131,7 +131,7 @@ struct _Box : public ProxyNode<Crtp> {
     }
 
     Math::Recti bound() override {
-        return boxStyle().padding.grow(Layout::Flow::LEFT_TO_RIGHT, ProxyNode<Crtp>::child().bound());
+        return boxStyle().padding.grow(Math::Flow::LEFT_TO_RIGHT, ProxyNode<Crtp>::child().bound());
     }
 };
 

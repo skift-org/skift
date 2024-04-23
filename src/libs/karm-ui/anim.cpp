@@ -72,10 +72,10 @@ Child slideIn(SlideFrom from, Ui::Child child) {
 
 struct Carousel : public GroupNode<Carousel> {
     usize _selected;
-    Layout::Flow _flow;
+    Math::Flow _flow;
     Easedf _slide{};
 
-    Carousel(usize selected, Children children, Layout::Flow flow)
+    Carousel(usize selected, Children children, Math::Flow flow)
         : GroupNode(children), _selected(selected), _flow(flow) {
     }
 
@@ -122,7 +122,7 @@ struct Carousel : public GroupNode<Carousel> {
     }
 };
 
-Child carousel(usize selected, Children children, Layout::Flow flow) {
+Child carousel(usize selected, Children children, Math::Flow flow) {
     return makeStrong<Carousel>(selected, std::move(children), flow);
 }
 

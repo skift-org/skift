@@ -70,7 +70,7 @@ Ui::Child entry(State const &s, Entry const &e, usize i) {
 
     auto tile = Ui::vflow(
         12,
-        Layout::Align::CENTER,
+        Math::Align::CENTER,
         icon(e),
         Ui::titleMedium(e.name)
     );
@@ -97,7 +97,7 @@ Ui::Child list(State const &s) {
 Ui::Child alert(String title, String subtitle) {
     return Ui::vflow(
                16,
-               Layout::Align::CENTER,
+               Math::Align::CENTER,
                Hideo::alert(title, subtitle) | Ui::grow(),
                Ui::bodyMedium("Press [ENTER] to continue.")
            ) |
@@ -137,7 +137,7 @@ Ui::Child menu(Configs const &c) {
 
             return Ui::vflow(
                        16,
-                       Layout::Align::CENTER,
+                       Math::Align::CENTER,
                        Ui::headlineLarge(
                            s.configs.title
                                ? *s.configs.title

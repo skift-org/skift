@@ -1,7 +1,7 @@
 #pragma once
 
-#include <karm-layout/align.h>
-#include <karm-layout/spacing.h>
+#include <karm-math/align.h>
+#include <karm-math/spacing.h>
 
 #include "node.h"
 
@@ -63,9 +63,9 @@ inline auto grow(isize g) {
 
 // MARK: Align -----------------------------------------------------------------
 
-Child align(Layout::Align align, Child child);
+Child align(Math::Align align, Child child);
 
-inline auto align(Layout::Align a) {
+inline auto align(Math::Align a) {
     return [a](Child child) {
         return align(a, child);
     };
@@ -203,9 +203,9 @@ inline auto pinSize(isize size) {
 
 // MARK: Spacing ---------------------------------------------------------------
 
-Child spacing(Layout::Spacingi s, Child child);
+Child spacing(Math::Spacingi s, Child child);
 
-inline auto spacing(Layout::Spacingi s) {
+inline auto spacing(Math::Spacingi s) {
     return [s](Child child) {
         return spacing(s, child);
     };
@@ -232,67 +232,67 @@ inline Child stack(auto... children) {
 // MARK: Flow ------------------------------------------------------------------
 
 struct FlowStyle {
-    Layout::Flow flow = Layout::Flow::LEFT_TO_RIGHT;
-    Layout::Align align = Layout::Align::FILL;
+    Math::Flow flow = Math::Flow::LEFT_TO_RIGHT;
+    Math::Align align = Math::Align::FILL;
     isize gaps{};
 
-    static FlowStyle horizontal(isize gaps = 0, Layout::Align align = Layout::Align::FILL) {
-        return FlowStyle{Layout::Flow::LEFT_TO_RIGHT, align, gaps};
+    static FlowStyle horizontal(isize gaps = 0, Math::Align align = Math::Align::FILL) {
+        return FlowStyle{Math::Flow::LEFT_TO_RIGHT, align, gaps};
     }
 
-    static FlowStyle vertical(isize gaps = 0, Layout::Align align = Layout::Align::FILL) {
-        return FlowStyle{Layout::Flow::TOP_TO_BOTTOM, align, gaps};
+    static FlowStyle vertical(isize gaps = 0, Math::Align align = Math::Align::FILL) {
+        return FlowStyle{Math::Flow::TOP_TO_BOTTOM, align, gaps};
     }
 };
 
 Child flow(FlowStyle style, Children children);
 
 inline Child hflow(Meta::Same<Child> auto... children) {
-    return flow({.flow = Layout::Flow::LEFT_TO_RIGHT}, {children...});
+    return flow({.flow = Math::Flow::LEFT_TO_RIGHT}, {children...});
 }
 
 inline Child hflow(isize gaps, Meta::Same<Child> auto... children) {
-    return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .gaps = gaps}, {children...});
+    return flow({.flow = Math::Flow::LEFT_TO_RIGHT, .gaps = gaps}, {children...});
 }
 
-inline Child hflow(isize gaps, Layout::Align align, Meta::Same<Child> auto... children) {
-    return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, {children...});
+inline Child hflow(isize gaps, Math::Align align, Meta::Same<Child> auto... children) {
+    return flow({.flow = Math::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, {children...});
 }
 
 inline Child hflow(Children children) {
-    return flow({.flow = Layout::Flow::LEFT_TO_RIGHT}, children);
+    return flow({.flow = Math::Flow::LEFT_TO_RIGHT}, children);
 }
 
 inline Child hflow(isize gaps, Children children) {
-    return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .gaps = gaps}, children);
+    return flow({.flow = Math::Flow::LEFT_TO_RIGHT, .gaps = gaps}, children);
 }
 
-inline Child hflow(isize gaps, Layout::Align align, Children children) {
-    return flow({.flow = Layout::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, children);
+inline Child hflow(isize gaps, Math::Align align, Children children) {
+    return flow({.flow = Math::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, children);
 }
 
 inline Child vflow(Meta::Same<Child> auto... children) {
-    return flow({.flow = Layout::Flow::TOP_TO_BOTTOM}, {children...});
+    return flow({.flow = Math::Flow::TOP_TO_BOTTOM}, {children...});
 }
 
 inline Child vflow(isize gaps, Meta::Same<Child> auto... children) {
-    return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .gaps = gaps}, {children...});
+    return flow({.flow = Math::Flow::TOP_TO_BOTTOM, .gaps = gaps}, {children...});
 }
 
-inline Child vflow(isize gaps, Layout::Align align, Meta::Same<Child> auto... children) {
-    return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, {children...});
+inline Child vflow(isize gaps, Math::Align align, Meta::Same<Child> auto... children) {
+    return flow({.flow = Math::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, {children...});
 }
 
 inline Child vflow(Children children) {
-    return flow({.flow = Layout::Flow::TOP_TO_BOTTOM}, children);
+    return flow({.flow = Math::Flow::TOP_TO_BOTTOM}, children);
 }
 
 inline Child vflow(isize gaps, Children children) {
-    return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .gaps = gaps}, children);
+    return flow({.flow = Math::Flow::TOP_TO_BOTTOM, .gaps = gaps}, children);
 }
 
-inline Child vflow(isize gaps, Layout::Align align, Children children) {
-    return flow({.flow = Layout::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, children);
+inline Child vflow(isize gaps, Math::Align align, Children children) {
+    return flow({.flow = Math::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, children);
 }
 
 // MARK: Grid ------------------------------------------------------------------
@@ -334,16 +334,16 @@ struct GridStyle {
     Vec<GridUnit> columns;
 
     Math::Vec2i gaps;
-    Layout::Flow flow = Layout::Flow::LEFT_TO_RIGHT;
-    Layout::Align align = Layout::Align::FILL;
+    Math::Flow flow = Math::Flow::LEFT_TO_RIGHT;
+    Math::Align align = Math::Align::FILL;
 
     static GridStyle simpleGrow(isize rows, isize columns, Math::Vec2i gaps = 0) {
         return GridStyle{
             GridUnit::grow().repeated(rows),
             GridUnit::grow().repeated(columns),
             gaps,
-            Layout::Flow::LEFT_TO_RIGHT,
-            Layout::Align::FILL,
+            Math::Flow::LEFT_TO_RIGHT,
+            Math::Align::FILL,
         };
     }
 
@@ -352,8 +352,8 @@ struct GridStyle {
             GridUnit::fixed(rows.cdr).repeated(rows.car),
             GridUnit::fixed(columns.cdr).repeated(columns.car),
             gaps,
-            Layout::Flow::LEFT_TO_RIGHT,
-            Layout::Align::FILL,
+            Math::Flow::LEFT_TO_RIGHT,
+            Math::Align::FILL,
         };
     }
 
@@ -362,8 +362,8 @@ struct GridStyle {
             GridUnit::auto_().repeated(rows),
             GridUnit::auto_().repeated(columns),
             gaps,
-            Layout::Flow::LEFT_TO_RIGHT,
-            Layout::Align::FILL,
+            Math::Flow::LEFT_TO_RIGHT,
+            Math::Align::FILL,
         };
     }
 };

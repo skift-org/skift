@@ -79,8 +79,8 @@ union Trans2 {
             oy * other.yy + other.oy,
         };
 
-        if (xy != 0.0 || yx != 0.0 ||
-            other.xy != 0.0 || other.yx != 0.0) {
+        if (xy != 0.0 or yx != 0.0 ||
+            other.xy != 0.0 or other.yx != 0.0) {
             res.xx += xy * other.yx;
             res.xy += xx * other.xy + xy * other.yy;
             res.yx += yx * other.xx + yy * other.yx;

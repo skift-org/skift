@@ -57,7 +57,7 @@ Ui::Child row(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui
             {12, 0},
             hflow(
                 0,
-                Layout::Align::VCENTER | Layout::Align::HFILL,
+                Math::Align::VCENTER | Math::Align::HFILL,
                 lead,
                 t | Ui::grow(),
                 trail

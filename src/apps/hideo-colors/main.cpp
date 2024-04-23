@@ -79,7 +79,7 @@ struct HsvPicker : public Ui::View<HsvPicker> {
         }
     }
 
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i, Ui::Hint) override {
         return {256, 256};
     }
 };

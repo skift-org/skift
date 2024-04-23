@@ -12,7 +12,7 @@ struct View : public Ui::View<View> {
         g.restore();
     }
 
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i, Ui::Hint) override {
         return {};
     }
 };

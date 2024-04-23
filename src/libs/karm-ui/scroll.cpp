@@ -7,12 +7,12 @@ namespace Karm::Ui {
 struct Scroll : public ProxyNode<Scroll> {
     bool _mouseIn = false;
     bool _animated = false;
-    Layout::Orien _orient{};
+    Math::Orien _orient{};
     Math::Recti _bound{};
     Math::Vec2f _scroll{};
     Math::Vec2f _targetScroll{};
 
-    Scroll(Child child, Layout::Orien orient)
+    Scroll(Child child, Math::Orien orient)
         : ProxyNode(child), _orient(orient) {}
 
     void scroll(Math::Vec2i s) {
@@ -85,10 +85,10 @@ struct Scroll : public ProxyNode<Scroll> {
 
     void layout(Math::Recti r) override {
         _bound = r;
-        auto childSize = child().size(_bound.size(), Layout::Hint::MAX);
-        if (_orient == Layout::Orien::HORIZONTAL) {
+        auto childSize = child().size(_bound.size(), Hint::MAX);
+        if (_orient == Math::Orien::HORIZONTAL) {
             childSize.height = r.height;
-        } else if (_orient == Layout::Orien::VERTICAL) {
+        } else if (_orient == Math::Orien::VERTICAL) {
             childSize.width = r.width;
         }
         r.wh = childSize;
@@ -96,13 +96,13 @@ struct Scroll : public ProxyNode<Scroll> {
         scroll(_scroll.cast<isize>());
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
         auto childSize = child().size(s, hint);
 
-        if (hint == Layout::Hint::MIN) {
-            if (_orient == Layout::Orien::HORIZONTAL) {
+        if (hint == Hint::MIN) {
+            if (_orient == Math::Orien::HORIZONTAL) {
                 childSize.x = min(childSize.x, s.x);
-            } else if (_orient == Layout::Orien::VERTICAL) {
+            } else if (_orient == Math::Orien::VERTICAL) {
                 childSize.y = min(childSize.y, s.y);
             } else {
                 childSize = childSize.min(s);
@@ -118,15 +118,15 @@ struct Scroll : public ProxyNode<Scroll> {
 };
 
 Child vhscroll(Child child) {
-    return makeStrong<Scroll>(child, Layout::Orien::BOTH);
+    return makeStrong<Scroll>(child, Math::Orien::BOTH);
 }
 
 Child hscroll(Child child) {
-    return makeStrong<Scroll>(child, Layout::Orien::HORIZONTAL);
+    return makeStrong<Scroll>(child, Math::Orien::HORIZONTAL);
 }
 
 Child vscroll(Child child) {
-    return makeStrong<Scroll>(child, Layout::Orien::VERTICAL);
+    return makeStrong<Scroll>(child, Math::Orien::VERTICAL);
 }
 
 } // namespace Karm::Ui

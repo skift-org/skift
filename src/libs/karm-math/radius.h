@@ -2,7 +2,7 @@
 
 #include <karm-base/std.h>
 
-namespace Karm::Layout {
+namespace Karm::Math {
 
 template <typename T>
 struct Radius {
@@ -48,4 +48,4 @@ using Radiusi = Radius<isize>;
 
 using Radiusf = Radius<f64>;
 
-} // namespace Karm::Layout
+} // namespace Karm::Math

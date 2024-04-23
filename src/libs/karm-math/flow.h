@@ -3,7 +3,7 @@
 #include <karm-math/rect.h>
 #include <karm-math/vec.h>
 
-namespace Karm::Layout {
+namespace Karm::Math {
 
 enum struct Orien {
     NONE,
@@ -61,7 +61,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Vec2<T> vec() const {
+    Vec2<T> vec() const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -79,7 +79,7 @@ struct Flow {
     }
 
     template <typename T>
-    T getStart(Math::Rect<T> rect) const {
+    T getStart(Rect<T> rect) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -97,7 +97,7 @@ struct Flow {
     }
 
     template <typename T>
-    T getX(Math::Vec2<T> vec) const {
+    T getX(Vec2<T> vec) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -111,7 +111,7 @@ struct Flow {
     }
 
     template <typename T>
-    T getEnd(Math::Rect<T> rect) const {
+    T getEnd(Rect<T> rect) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -129,7 +129,7 @@ struct Flow {
     }
 
     template <typename T>
-    T getTop(Math::Rect<T> rect) const {
+    T getTop(Rect<T> rect) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -143,7 +143,7 @@ struct Flow {
     }
 
     template <typename T>
-    T getY(Math::Vec2<T> vec) const {
+    T getY(Vec2<T> vec) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -157,7 +157,7 @@ struct Flow {
     }
 
     template <typename T>
-    T getBottom(Math::Rect<T> rect) const {
+    T getBottom(Rect<T> rect) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -171,7 +171,7 @@ struct Flow {
     }
 
     template <typename T>
-    T getWidth(Math::Rect<T> rect) const {
+    T getWidth(Rect<T> rect) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -185,7 +185,7 @@ struct Flow {
     }
 
     template <typename T>
-    T getHeight(Math::Rect<T> rect) const {
+    T getHeight(Rect<T> rect) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -199,22 +199,22 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Vec2<T> getOrigin(Math::Rect<T> rect) const {
+    Vec2<T> getOrigin(Rect<T> rect) const {
         return {getStart(rect), getTop(rect)};
     }
 
     template <typename T>
-    T getHcenter(Math::Rect<T> rect) const {
+    T getHcenter(Rect<T> rect) const {
         return (getStart(rect) + getEnd(rect)) / 2;
     }
 
     template <typename T>
-    T getVcenter(Math::Rect<T> rect) const {
+    T getVcenter(Rect<T> rect) const {
         return (getTop(rect) + getBottom(rect)) / 2;
     }
 
     template <typename T>
-    Math::Rect<T> setStart(Math::Rect<T> rect, T value) const {
+    Rect<T> setStart(Rect<T> rect, T value) const {
         T d = value - getStart(rect);
 
         switch (_flow) {
@@ -240,7 +240,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setX(Math::Rect<T> rect, T value) const {
+    Rect<T> setX(Rect<T> rect, T value) const {
         T d = value - getStart(rect);
 
         switch (_flow) {
@@ -258,7 +258,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setEnd(Math::Rect<T> rect, T value) const {
+    Rect<T> setEnd(Rect<T> rect, T value) const {
         T d = value - getEnd(rect);
 
         switch (_flow) {
@@ -282,7 +282,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setTop(Math::Rect<T> rect, T value) const {
+    Rect<T> setTop(Rect<T> rect, T value) const {
         T d = value - getTop(rect);
 
         switch (_flow) {
@@ -302,7 +302,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setY(Math::Rect<T> rect, T value) const {
+    Rect<T> setY(Rect<T> rect, T value) const {
         T d = value - getTop(rect);
 
         switch (_flow) {
@@ -320,7 +320,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setBottom(Math::Rect<T> rect, T value) const {
+    Rect<T> setBottom(Rect<T> rect, T value) const {
         T d = value - getBottom(rect);
 
         switch (_flow) {
@@ -338,14 +338,14 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setOrigin(Math::Rect<T> rect, Math::Vec2<T> value) const {
+    Rect<T> setOrigin(Rect<T> rect, Vec2<T> value) const {
         rect = setX(rect, value.x);
         rect = setY(rect, value.y);
         return rect;
     }
 
     template <typename T>
-    Math::Rect<T> setWidth(Math::Rect<T> rect, T value) const {
+    Rect<T> setWidth(Rect<T> rect, T value) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -361,7 +361,7 @@ struct Flow {
     }
 
     template <typename T>
-    Math::Rect<T> setHeight(Math::Rect<T> rect, T value) const {
+    Rect<T> setHeight(Rect<T> rect, T value) const {
         switch (_flow) {
         default:
         case LEFT_TO_RIGHT:
@@ -377,4 +377,4 @@ struct Flow {
     }
 };
 
-} // namespace Karm::Layout
+} // namespace Karm::Math

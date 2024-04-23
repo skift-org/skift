@@ -239,7 +239,7 @@ struct Text : public View<Text> {
         View<Text>::layout(bound);
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint) override {
         auto size = _text.layout(s.width);
         return size.ceil().cast<isize>();
     }
@@ -301,7 +301,7 @@ struct Icon : public View<Icon> {
         g.restore();
     }
 
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i, Hint) override {
         return _icon.bound().size().cast<isize>();
     }
 };
@@ -340,7 +340,7 @@ struct Image : public View<Image> {
         g.restore();
     }
 
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i, Hint) override {
         return _image.bound().size().cast<isize>();
     }
 };
@@ -374,8 +374,8 @@ struct Canvas : public View<Canvas> {
         g.restore();
     }
 
-    Math::Vec2i size(Math::Vec2i, Layout::Hint hint) override {
-        if (hint == Layout::Hint::MIN) {
+    Math::Vec2i size(Math::Vec2i, Hint hint) override {
+        if (hint == Hint::MIN) {
             return 0;
         }
 

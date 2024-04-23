@@ -33,7 +33,7 @@ Ui::Child app() {
 
                 return Ui::vflow(
                            32,
-                           Layout::Align::CENTER,
+                           Math::Align::CENTER,
                            Ui::text(
                                Ui::TextStyles::codeLarge()
                                    .withSize(48),

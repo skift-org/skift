@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-layout/flow.h>
+#include <karm-math/flow.h>
 
 #include "funcs.h"
 #include "node.h"

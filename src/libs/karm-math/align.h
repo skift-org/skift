@@ -1,9 +1,9 @@
 #pragma once
 
 #include "flow.h"
-#include "size.h"
+#include "rect.h"
 
-namespace Karm::Layout {
+namespace Karm::Math {
 
 struct Align {
     static constexpr u16 NONE = (0);
@@ -38,7 +38,7 @@ struct Align {
     Align(u16 value = 0) : _value(value) {}
 
     template <typename T>
-    Math::Rect<T> apply(Flow flow, Math::Rect<T> inner, Math::Rect<T> outer) {
+    Rect<T> apply(Flow flow, Rect<T> inner, Rect<T> outer) {
         if (_value == NONE)
             return outer;
 
@@ -82,22 +82,22 @@ struct Align {
     }
 
     template <typename T>
-    Math::Vec2<T> size(Math::Vec2<T> inner, Math::Vec2<T> outer, Layout::Hint hint) {
-        if (_value & COVER) {
-            if (hint == Layout::Hint::MIN)
-                inner = {};
-            else
-                inner = outer;
-        }
-
-        if (_value & HSTRETCH and hint == Layout::Hint::MAX)
+    Vec2<T> maxSize(Vec2<T> inner, Vec2<T> outer) {
+        if (_value & COVER)
+            inner = outer;
+        if (_value & HSTRETCH)
             inner.x = outer.x;
-
-        if (_value & VSTRETCH and hint == Layout::Hint::MAX)
+        if (_value & VSTRETCH)
             inner.y = outer.y;
+        return inner;
+    }
 
+    template <typename T>
+    Vec2<T> minSize(Vec2<T> inner) {
+        if (_value & COVER)
+            inner = {};
         return inner;
     }
 };
 
-} // namespace Karm::Layout
+} // namespace Karm::Math

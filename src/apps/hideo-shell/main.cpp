@@ -87,7 +87,7 @@ Ui::Child taskbar(State const &state) {
         Ui::ButtonStyle::subtle(),
         Ui::hflow(
             6,
-            Layout::Align::CENTER,
+            Math::Align::CENTER,
             Ui::icon(Mdi::WIFI_STRENGTH_4),
             Ui::icon(Mdi::VOLUME_HIGH),
             Ui::icon(Mdi::BATTERY),
@@ -204,17 +204,17 @@ Ui::Child desktopPanels(State const &state) {
     return Ui::stack(
                state.activePanel == Panel::APPS
                    ? appsPanel(state) |
-                         Ui::align(Layout::Align::START | Layout::Align::TOP) |
+                         Ui::align(Math::Align::START | Math::Align::TOP) |
                          Ui::slideIn(Ui::SlideFrom::TOP)
                    : Ui::empty(),
                state.activePanel == Panel::NOTIS
                    ? notiPanel(state) |
-                         Ui::align(Layout::Align::HCENTER | Layout::Align::TOP) |
+                         Ui::align(Math::Align::HCENTER | Math::Align::TOP) |
                          Ui::slideIn(Ui::SlideFrom::TOP)
                    : Ui::empty(),
                state.activePanel == Panel::SYS
                    ? sysPanel(state) |
-                         Ui::align(Layout::Align::END | Layout::Align::TOP) |
+                         Ui::align(Math::Align::END | Math::Align::TOP) |
                          Ui::slideIn(Ui::SlideFrom::TOP)
                    : Ui::empty()
            ) |

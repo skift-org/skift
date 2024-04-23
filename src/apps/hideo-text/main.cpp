@@ -99,7 +99,7 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                     return Ui::vflow(
                         Ui::hflow(
                             0,
-                            Layout::Align::CENTER,
+                            Math::Align::CENTER,
                             Ui::labelSmall("{}{}", s.url ? s.url->basename() : "Untitled", s.text->dirty() ? "*" : ""),
                             Ui::icon(Mdi::CIRCLE_SMALL, Ui::GRAY700) | Ui::spacing({-3, 0}),
                             Ui::text(Ui::TextStyles::labelSmall().withColor(Ui::GRAY500), "{}", s.url)
@@ -112,7 +112,7 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                         Ui::separator(),
                         Ui::hflow(
                             6,
-                            Layout::Align::CENTER,
+                            Math::Align::CENTER,
                             Ui::labelSmall("{}", s.text->dirty() ? "Edited" : ""),
                             Ui::grow(NONE),
                             Ui::labelSmall("Ln {}, Col {}", 0, 0),

@@ -13,7 +13,7 @@ namespace Hideo::Shell {
 Ui::Child searchInput() {
     return Ui::hflow(
                0,
-               Layout::Align::VCENTER | Layout::Align::START,
+               Math::Align::VCENTER | Math::Align::START,
                Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), "Search…") | Ui::grow(),
                Ui::icon(Mdi::MAGNIFY, 24)
            ) |
@@ -43,7 +43,7 @@ Ui::Child appRow(MenuEntry const &entry, usize i) {
     return Ui::ButtonStyle::subtle(),
            Ui::hflow(
                12,
-               Layout::Align::START | Layout::Align::VCENTER,
+               Math::Align::START | Math::Align::VCENTER,
                appIcon(entry.icon),
                Ui::labelLarge(entry.name)
            ) |
@@ -85,7 +85,7 @@ Ui::Child runningApp(Surface const &surface, usize i) {
                    Ui::bound() |
                    Ui::button(Model::bind<FocusApp>(i)),
                Ui::button(Model::bind<CloseApp>(i), Ui::ButtonStyle::secondary(), Mdi::CLOSE) |
-                   Ui::align(Layout::Align::TOP_END) |
+                   Ui::align(Math::Align::TOP_END) |
                    Ui::spacing({0, 6, 6, 0})
            ) |
            Ui::pinSize({120, 192});

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-layout/align.h>
+#include <karm-math/align.h>
 
 #include "node.h"
 

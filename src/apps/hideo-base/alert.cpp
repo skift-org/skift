@@ -10,7 +10,7 @@ namespace Hideo {
 Ui::Child alert(String title, String body) {
     return Ui::vflow(
                0,
-               Layout::Align::CENTER,
+               Math::Align::CENTER,
                Ui::icon(Mdi::ALERT_DECAGRAM, 48),
                Ui::titleLarge(title),
                Ui::bodyMedium(body)

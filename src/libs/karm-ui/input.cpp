@@ -160,7 +160,7 @@ ButtonStyle ButtonStyle::withForegroundPaint(Gfx::Paint paint) const {
     };
 }
 
-ButtonStyle ButtonStyle::withPadding(Layout::Spacingi spacing) const {
+ButtonStyle ButtonStyle::withPadding(Math::Spacingi spacing) const {
     return {
         idleStyle.withPadding(spacing),
         hoverStyle.withPadding(spacing),
@@ -168,7 +168,7 @@ ButtonStyle ButtonStyle::withPadding(Layout::Spacingi spacing) const {
     };
 }
 
-ButtonStyle ButtonStyle::withMargin(Layout::Spacingi spacing) const {
+ButtonStyle ButtonStyle::withMargin(Math::Spacingi spacing) const {
     return {
         idleStyle.withMargin(spacing),
         hoverStyle.withMargin(spacing),
@@ -238,7 +238,7 @@ Child button(OnPress onPress, ButtonStyle style, Media::Icon i) {
 }
 
 Child button(OnPress onPress, ButtonStyle style, Media::Icon i, Str t) {
-    return hflow(8, Layout::Align::CENTER, icon(i), text(t)) |
+    return hflow(8, Math::Align::CENTER, icon(i), text(t)) |
            spacing({12, 6, 16, 6}) |
            minSize({UNCONSTRAINED, 36}) |
            button(std::move(onPress), style);
@@ -335,7 +335,7 @@ struct Input : public View<Input> {
         View<Input>::layout(bound);
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint) override {
         auto size = _ensureText().layout(s.width);
         return size.ceil().cast<isize>();
     }
@@ -412,7 +412,7 @@ struct Toggle : public View<Toggle> {
         }
     }
 
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i, Hint) override {
         return {52, 26};
     }
 };
@@ -471,7 +471,7 @@ struct Checkbox : public View<Checkbox> {
         }
     }
 
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i, Hint) override {
         return {26, 26};
     }
 };
@@ -528,7 +528,7 @@ struct Radio : public View<Radio> {
         }
     }
 
-    Math::Vec2i size(Math::Vec2i, Layout::Hint) override {
+    Math::Vec2i size(Math::Vec2i, Hint) override {
         return {26, 26};
     }
 };

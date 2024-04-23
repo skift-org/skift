@@ -25,7 +25,7 @@ Ui::Child app() {
             auto inspireMe = Ui::state(Sys::now().val(), [](auto v, auto bind) {
                 auto body = Ui::hflow(
                     8,
-                    Layout::Align::CENTER,
+                    Math::Align::CENTER,
                     Ui::image(Media::loadImage("bundle://hideo-about/pride.qoi"_url).unwrap(), 4),
                     Ui::bodySmall(wholesome(v))
                 );

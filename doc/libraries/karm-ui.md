@@ -85,8 +85,8 @@ auto app = Ui::hflow(
 
 A flow layout arranges its child nodes in a single row or column.
 
-- `Ui::vflow(isize gaps, Layout::Align align, auto... children)` : A vertical flow layout
-- `Ui::hflow(isize gaps, Layout::Align align, auto... children)` : A horizontal flow layout
+- `Ui::vflow(isize gaps, Math::Align align, auto... children)` : A vertical flow layout
+- `Ui::hflow(isize gaps, Math::Align align, auto... children)` : A horizontal flow layout
 - `<node> | Ui::grow(float factor)` : Expand the node to fill the available space, with a given factor.
 
 **Grid Layouts**
@@ -122,7 +122,7 @@ Here is a non exaustive list of decorators
 
 **Alignment**
 
- - `<node> | Ui::align(Layout::Align)` : Align the node in the host.
+ - `<node> | Ui::align(Math::Align)` : Align the node in the host.
  - `<node> | Ui::center()` : Center the node in the host.
  - `<node> | Ui::start()` : Align the node to the start of the host.
  - `<node> | Ui::end()` : Align the node to the end of the host.

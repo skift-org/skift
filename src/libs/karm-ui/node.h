@@ -5,13 +5,18 @@
 #include <karm-base/hash.h>
 #include <karm-events/events.h>
 #include <karm-gfx/context.h>
-#include <karm-layout/size.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/async.h>
 
 #include "theme.h"
 
 namespace Karm::Ui {
+
+enum struct Hint {
+    MIN,
+    PREFERRED,
+    MAX,
+};
 
 extern bool debugShowLayoutBounds;
 extern bool debugShowRepaintBounds;
@@ -79,7 +84,7 @@ struct Node :
 
     virtual void layout(Math::Recti) {}
 
-    virtual Math::Vec2i size(Math::Vec2i s, Layout::Hint) { return s; }
+    virtual Math::Vec2i size(Math::Vec2i s, Hint) { return s; }
 
     virtual Math::Recti bound() { return {}; }
 
@@ -283,7 +288,7 @@ struct ProxyNode : public LeafNode<Crtp> {
         child().layout(r);
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
         return child().size(s, hint);
     }
 

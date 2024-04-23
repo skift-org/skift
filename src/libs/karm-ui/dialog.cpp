@@ -189,12 +189,12 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         }
 
         if (popoverVisible()) {
-            auto popoverSize = (*_popover)->size(r.size(), Layout::Hint::MIN);
+            auto popoverSize = (*_popover)->size(r.size(), Hint::MIN);
             (*_popover)->layout({_popoverAt, popoverSize});
         }
     }
 
-    Math::Vec2i size(Math::Vec2i s, Layout::Hint hint) override {
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
         return child().size(s, hint);
     }
 

@@ -2,7 +2,6 @@
 
 #include <karm-base/clamp.h>
 #include <karm-base/cons.h>
-#include <karm-io/fmt.h>
 
 #include "vec.h"
 

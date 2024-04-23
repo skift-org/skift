@@ -6,7 +6,7 @@ namespace Hideo::Shell {
 
 Ui::Child powerDialog() {
     return dialogScafold(
-        Layout::Align::CENTER | Layout::Align::CLAMP,
+        Math::Align::CENTER | Math::Align::CLAMP,
         Ui::vflow(
             4,
             Ui::button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::LOGOUT, "Logout"),

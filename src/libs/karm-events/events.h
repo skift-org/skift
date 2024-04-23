@@ -16,9 +16,9 @@ struct MouseEvent {
         SCROLL,
         MOVE,
     } type;
-    Math::Vec2i pos;
-    Math::Vec2f scroll;
-    Math::Vec2i delta;
+    Math::Vec2i pos{};
+    Math::Vec2f scroll{};
+    Math::Vec2i delta{};
     Button buttons{};
     Mod mods{};
     Button button{};

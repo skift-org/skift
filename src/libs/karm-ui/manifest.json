@@ -9,7 +9,6 @@
         "karm-gfx",
         "karm-events",
         "fira-code-font",
-        "inter-font",
-        "karm-layout"
+        "inter-font"
     ]
 }

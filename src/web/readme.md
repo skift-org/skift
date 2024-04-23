@@ -1,3 +1,15 @@
-# The Veav Browser Engine
+# The Vaev Browser Engine
 
-Veav is a developer-focused browser engine built for speed, accuracy, and simplicity.  It adheres closely to W3C standards, optimizes for static documents, and offers easy customization to fit your workflow. Whether you're a developer or a power user, Veav is the lean way to turn your HTML into polished PDFs.
+Vaev aim to be lightning-fast, lightweight, and secure HTML/CSS engine
+built for effortless document generation and streamlined web browsing.
+
+## Features
+
+ - CSS parser
+ - XHTML parser
+ - HTML parser
+
+## Architecture
+
+An architecture diagram is available next to this file. It's in the tldraw format.
+

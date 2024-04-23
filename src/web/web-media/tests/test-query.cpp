@@ -5,8 +5,8 @@ namespace Web::Media::Tests {
 
 static Media const TEST_MEDIA = {
     .type = Type::SCREEN,
-    .width = Css::Px::fromInt(1920),
-    .height = Css::Px::fromInt(1080),
+    .width = Css::Px(1920),
+    .height = Css::Px(1080),
     .aspectRatio = 16.0 / 9.0,
     .orientation = Orientation::LANDSCAPE,
 
@@ -37,7 +37,6 @@ test$("logical-and") {
 
     return Ok();
 }
-/*
 
 test$("logical-or") {
     auto query = Query::combineOr(
@@ -66,5 +65,4 @@ test$("logical-only") {
     return Ok();
 }
 
-*/
 } // namespace Web::Media::Tests

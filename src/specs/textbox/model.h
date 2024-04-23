@@ -228,10 +228,9 @@ struct Model {
     void reduce(Action const &a);
 
     bool dirty() const {
-        for (auto &r : _records) {
-            if (r.op == INSERT || r.op == DELETE)
+        for (auto &r : _records)
+            if (r.op == INSERT or r.op == DELETE)
                 return true;
-        }
         return false;
     }
 };

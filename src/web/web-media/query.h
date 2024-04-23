@@ -20,9 +20,9 @@ struct Query {
         bool match(Media const &media) const {
             switch (type) {
             case Type::AND:
-                return lhs->match(media) && rhs->match(media);
+                return lhs->match(media) and rhs->match(media);
             case Type::OR:
-                return lhs->match(media) || rhs->match(media);
+                return lhs->match(media) or rhs->match(media);
             default:
                 return false;
             }
@@ -41,7 +41,7 @@ struct Query {
         bool match(Media const &media) const {
             switch (type) {
             case Type::NOT:
-                return !query->match(media);
+                return not query->match(media);
             case Type::ONLY:
                 return query->match(media);
             default:

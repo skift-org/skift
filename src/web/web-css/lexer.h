@@ -40,42 +40,30 @@ namespace Web::Css {
     TOKEN(OTHER)
 
 struct Token {
-    enum Type {
+    enum struct Type {
 #define ITER(NAME) NAME,
         FOREACH_TOKEN(ITER)
 #undef ITER
     };
 
+    using enum Type;
+
     Type type;
     Str data;
+
+    Token(Type type, Str data = "")
+        : type(type), data(data) {}
 };
 
 struct Lexer {
+    Io::SScan &_scan;
+    Token _token;
 
-    Opt<Token> _token;
+    Token curr();
 
-    Token &_begin(Token::Type type) {
-        _token = Token{};
-        _token->type = type;
-        return *_token;
-    }
+    Token next();
 
-    Token &_ensure() {
-        if (not _token)
-            panic("unexpected-token");
-        return *_token;
-    }
-
-    Token &_ensure(Token::Type type) {
-        auto &token = _ensure();
-        if (token.type != type)
-            panic("unexpected-token");
-        return token;
-    }
-
-    void _raise(Str msg);
-
-    void consume(Rune rune, bool isEof = false);
+    Res<Token> expect(Token::Type);
 };
 
 static inline Str toStr(Token::Type type) {
@@ -97,12 +85,12 @@ Res<Token> nextToken(Io::SScan &s);
 template <>
 struct Karm::Io::Formatter<Web::Css::Token> {
     Res<usize> format(Io::TextWriter &writer, Web::Css::Token const &val) {
-        usize written = try$(writer.writeRune('('));
+        usize written = try$(writer.writeRune('{'));
         written += try$(writer.writeStr(try$(Io::toParamCase(Web::Css::toStr(val.type)))));
 
         written += try$(Io::format(writer, " data={#}", val.data));
 
-        written += try$(writer.writeRune(')'));
+        written += try$(writer.writeRune('}'));
         return Ok(written);
     }
 };

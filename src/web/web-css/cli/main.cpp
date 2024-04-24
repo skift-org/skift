@@ -6,16 +6,8 @@
 #include <web-css/parser.h>
 
 Res<> entryPoint(Sys::Ctx &) {
-    auto file = try$(Sys::File::open("bundle://web-css-cli/exemple_1.css"_url));
-
-    auto buf = try$(Io::readAllUtf8(file));
-
-    Sys::println("Orginal Source:");
-    Sys::println("{}", buf);
-
     Sys::println("Parsing:");
-    Web::Css::Parser parser{};
-    parser.write(buf);
+    try$(Web::Css::parseStylesheet("bundle://web-css-cli/exemple_2.css"));
 
     Sys::println("Result:");
     Io::Emit emit{Sys::out()};

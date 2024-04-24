@@ -159,10 +159,6 @@ static auto const RE_STRING =
 
     );
 
-void Lexer::_raise(Str msg) {
-    logError("{}: ", msg);
-}
-
 Res<Token> nextToken(Io::SScan &s) {
     if (s.ended()) {
         // NO SPEC

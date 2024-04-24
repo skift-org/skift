@@ -133,6 +133,7 @@ struct Length {
         case Unit::LH:
         case Unit::RLH:
             return true;
+
         default:
             return false;
         }

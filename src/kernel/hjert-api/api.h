@@ -141,25 +141,25 @@ struct Space : public Object {
         return create<Space>(dest);
     }
 
-    Res<USizeRange> map(usize virt, Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+    Res<urange> map(usize virt, Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
         try$(_map(_cap, &virt, vmo, off, &len, flags));
-        return Ok(USizeRange{virt, len});
+        return Ok(urange{virt, len});
     }
 
-    Res<USizeRange> map(Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+    Res<urange> map(Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
         usize virt = 0;
         try$(_map(_cap, &virt, vmo, off, &len, flags));
-        return Ok(USizeRange{virt, len});
+        return Ok(urange{virt, len});
     }
 
-    Res<USizeRange> map(Vmo &vmo, MapFlags flags = MapFlags::NONE) {
+    Res<urange> map(Vmo &vmo, MapFlags flags = MapFlags::NONE) {
         usize virt = 0;
         usize len = 0;
         try$(_map(_cap, &virt, vmo, 0, &len, flags));
-        return Ok(USizeRange{virt, len});
+        return Ok(urange{virt, len});
     }
 
-    Res<> unmap(USizeRange range) {
+    Res<> unmap(urange range) {
         return _unmap(_cap, range.start, range.size);
     }
 };
@@ -183,7 +183,7 @@ struct Mapped {
             Space::self().unmap(range()).unwrap();
     }
 
-    USizeRange range() const { return {_addr, _len}; }
+    urange range() const { return {_addr, _len}; }
 
     MutBytes mutBytes() { return {reinterpret_cast<u8 *>(_addr), _len}; }
 

@@ -29,14 +29,14 @@ struct Rast {
 
     Shape _shape{};
     Vec<Active> _active{};
-    Vec<ISizeRange> _ranges;
+    Vec<irange> _ranges;
     Vec<f64> _scanline{};
 
     Shape &shape() {
         return _shape;
     }
 
-    void _appendRange(ISizeRange range) {
+    void _appendRange(irange range) {
         usize i = 0;
         for (auto &r : _ranges) {
             if (r.overlaps(range)) {
@@ -121,7 +121,7 @@ struct Rast {
                     isize cx1 = Math::ceil(x1), fx1 = Math::floor(x1);
                     isize cx2 = Math::ceil(x2), fx2 = Math::floor(x2);
 
-                    _appendRange(ISizeRange::fromStartEnd(fx1, cx2));
+                    _appendRange(irange::fromStartEnd(fx1, cx2));
 
                     // Are x1 and x2 on the same pixel?
                     if (fx1 == fx2) {

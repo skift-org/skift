@@ -16,12 +16,16 @@ struct Range {
 
     constexpr Range() = default;
 
-    constexpr Range(T start, T size)
+    constexpr Range(T start, T size = 0)
         : start(start), size(size) {
     }
 
     constexpr T end() const {
         return start + size;
+    }
+
+    constexpr void end(T value) {
+        size = value - start;
     }
 
     constexpr bool empty() const {
@@ -129,26 +133,8 @@ struct Range {
     }
 };
 
-using I8Range = Range<i8>;
-using I16Range = Range<i16>;
-using I32Range = Range<i32>;
-using I64Range = Range<i64>;
-#ifdef __SIZEOF_INT128__
-using I128Range = Range<i128>;
-#endif
-using ISizeRange = Range<isize>;
-
-using U8Range = Range<u8>;
-using U16Range = Range<u16>;
-using U32Range = Range<u32>;
-using U64Range = Range<u64>;
-#ifdef __SIZEOF_INT128__
-using U128Range = Range<u128>;
-#endif
-using USizeRange = Range<usize>;
-
-using F32Range = Range<f32>;
-using F64Range = Range<f64>;
-using F128Range = Range<f128>;
+using irange = Range<isize>;
+using urange = Range<usize>;
+using frange = Range<f64>;
 
 } // namespace Karm

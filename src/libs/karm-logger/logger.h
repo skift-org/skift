@@ -35,11 +35,6 @@ static constexpr Level ERROR = {3, "error", Cli::RED};
 static constexpr Level FATAL = {4, "fatal", Cli::style(Cli::RED).bold()};
 
 inline void _log(Level level, Format fmt, Io::_Args &args) {
-#ifndef __ck_debug__
-    if (level.value == 0)
-        return;
-#endif
-
     Logger::_Embed::loggerLock();
 
     if (level.value != -1) {

@@ -137,11 +137,11 @@ struct MutMmap :
         return _paddr;
     }
 
-    USizeRange vrange() const {
+    urange vrange() const {
         return {(usize)_buf, _size};
     }
 
-    USizeRange prange() const {
+    urange prange() const {
         return {_paddr, _size};
     }
 

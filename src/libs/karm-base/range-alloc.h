@@ -6,7 +6,7 @@
 
 namespace Karm {
 
-template <typename R = USizeRange>
+template <typename R = urange>
 struct RangeAlloc {
     Vec<R> _r;
 

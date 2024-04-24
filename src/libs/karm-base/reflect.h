@@ -1,8 +1,8 @@
 #pragma once
 
-#include <karm-base/macros.h>
-#include <karm-base/string.h>
-#include <karm-base/tuple.h>
+#include "macros.h"
+#include "string.h"
+#include "tuple.h"
 
 namespace Karm {
 
@@ -72,3 +72,6 @@ auto iterFields(T &v, auto f) {
 
 #define ReflectableTemplate$(T, ...) \
     __reflectableType(T __VA_OPT__(, ) __VA_ARGS__)
+
+template <typename T>
+ReflectableTemplate$(Karm::Range<T>, start, size);

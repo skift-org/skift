@@ -1,7 +1,7 @@
 #pragma once
 
-#include <karm-layout/spacing.h>
 #include <karm-math/rect.h>
+#include <karm-math/spacing.h>
 #include <web-css/computed-values.h>
 #include <web-dom/element.h>
 
@@ -15,9 +15,9 @@ struct Box {
     Strong<Css::ComputedValues> _style;
 
     Math::Rectf _bound{};
-    Layout::Spacingf _margin{};
-    Layout::Spacingf _padding{};
-    Layout::Spacingf _border{};
+    Math::Spacingf _margin{};
+    Math::Spacingf _padding{};
+    Math::Spacingf _border{};
 
     Box(Strong<Dom::Element> el, Strong<Css::ComputedValues> style)
         : _el(el), _style(style) {

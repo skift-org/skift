@@ -17,7 +17,7 @@ struct Unfiltered {
 
 struct BlurFilter {
     static constexpr auto NAME = "blur";
-    static constexpr ISizeRange RANGE = ISizeRange::fromStartEnd(0, 32);
+    static constexpr irange RANGE = irange::fromStartEnd(0, 32);
     static constexpr f64 DEFAULT = 16;
 
     isize amount = DEFAULT;
@@ -26,7 +26,7 @@ struct BlurFilter {
 
 struct SaturationFilter {
     static constexpr auto NAME = "saturation";
-    static constexpr F64Range RANGE = F64Range::fromStartEnd(0, 1);
+    static constexpr frange RANGE = frange::fromStartEnd(0, 1);
     static constexpr f64 DEFAULT = 1;
 
     f64 amount = DEFAULT;
@@ -40,7 +40,7 @@ struct GrayscaleFilter {
 
 struct ContrastFilter {
     static constexpr auto NAME = "contrast";
-    static constexpr F64Range RANGE = F64Range::fromStartEnd(-0.5, 0.5);
+    static constexpr frange RANGE = frange::fromStartEnd(-0.5, 0.5);
     static constexpr f64 DEFAULT = 0;
 
     f64 amount = DEFAULT;
@@ -49,7 +49,7 @@ struct ContrastFilter {
 
 struct BrightnessFilter {
     static constexpr auto NAME = "brightness";
-    static constexpr F64Range RANGE = {0, 2};
+    static constexpr frange RANGE = {0, 2};
     static constexpr f64 DEFAULT = 1;
 
     f64 amount = DEFAULT;
@@ -58,7 +58,7 @@ struct BrightnessFilter {
 
 struct NoiseFilter {
     static constexpr auto NAME = "noise";
-    static constexpr F64Range RANGE = F64Range::fromStartEnd(0, 1);
+    static constexpr frange RANGE = frange::fromStartEnd(0, 1);
     static constexpr f64 DEFAULT = 0.5;
 
     f64 amount = DEFAULT;
@@ -67,7 +67,7 @@ struct NoiseFilter {
 
 struct SepiaFilter {
     static constexpr auto NAME = "sepia";
-    static constexpr F64Range RANGE = F64Range::fromStartEnd(0, 1);
+    static constexpr frange RANGE = frange::fromStartEnd(0, 1);
     static constexpr f64 DEFAULT = 0.5;
 
     f64 amount = DEFAULT;

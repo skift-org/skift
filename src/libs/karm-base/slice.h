@@ -168,6 +168,11 @@ constexpr Slice<T> sub(S const &slice, usize start, usize end) {
 }
 
 template <Sliceable S, typename T = typename S::Inner>
+constexpr Slice<T> sub(S const &slice, Range<usize> range) {
+    return sub(slice, range.start, range.end());
+}
+
+template <Sliceable S, typename T = typename S::Inner>
 constexpr Slice<T> sub(S const &slice) {
     return {
         slice.buf(),
@@ -186,6 +191,11 @@ MutSlice<T> mutSub(S &slice, usize start, usize end) {
         slice.buf() + start,
         clamp(end, start, slice.len()) - start,
     };
+}
+
+template <MutSliceable S, typename T = typename S::Inner>
+MutSlice<T> mutSub(S &slice, urange range) {
+    return mutSub(slice, range.start, range.end());
 }
 
 template <MutSliceable S, typename T = typename S::Inner>
@@ -290,7 +300,7 @@ constexpr auto iterSplit(S &slice, typename S::Inner const &sep) {
     });
 }
 
-constexpr bool isEmpty(Sliceable auto &slice) {
+constexpr bool isEmpty(Sliceable auto const &slice) {
     return slice.len() == 0;
 }
 
@@ -315,18 +325,26 @@ constexpr auto *end(MutSliceable auto &slice) {
 }
 
 constexpr auto const &first(Sliceable auto const &slice) {
+    if (isEmpty(slice)) [[unlikely]]
+        panic("empty slice");
     return slice.buf()[0];
 }
 
 constexpr auto &first(MutSliceable auto &slice) {
+    if (isEmpty(slice)) [[unlikely]]
+        panic("empty slice");
     return slice.buf()[0];
 }
 
 constexpr auto const &last(Sliceable auto const &slice) {
+    if (isEmpty(slice)) [[unlikely]]
+        panic("empty slice");
     return slice.buf()[slice.len() - 1];
 }
 
 constexpr auto &last(MutSliceable auto &slice) {
+    if (isEmpty(slice)) [[unlikely]]
+        panic("empty slice");
     return slice.buf()[slice.len() - 1];
 }
 
@@ -354,7 +372,7 @@ constexpr usize copy(Slice<T> src, MutSlice<T> dest) {
 }
 
 template <typename T>
-constexpr usize copyWithin(MutSlice<T> slice, USizeRange src, usize dst) {
+constexpr usize copyWithin(MutSlice<T> slice, urange src, usize dst) {
     usize copied = 0;
 
     for (usize i = src.start; i < src.end(); i++) {

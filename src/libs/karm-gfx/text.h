@@ -59,38 +59,84 @@ struct TextStyle {
 
 struct Text {
     struct Cell {
+        urange runeRange;
         Media::Glyph glyph;
         f64 pos = 0; //< Position of the glyph within the block
+
+        MutSlice<Rune> runes(Text &t) {
+            return mutSub(t._runes, runeRange);
+        }
+
+        Slice<Rune> runes(Text const &t) const {
+            return sub(t._runes, runeRange);
+        }
+
+        bool newline(Text const &t) const {
+            auto r = runes(t);
+            if (not r)
+                return false;
+            return last(r) == '\n';
+        }
+
+        bool space(Text const &t) const {
+            auto r = runes(t);
+            if (not r)
+                return false;
+            return last(r) == '\n' or isAsciiSpace(last(r));
+        }
     };
 
     struct Block {
-        USizeRange cells;
-        usize spaces = 0;
-        bool newline = false;
+        urange runeRange;
+        urange cellRange;
 
         f64 pos = 0; // Position of the block within the line
         f64 width = 0;
 
+        MutSlice<Cell> cells(Text &t) {
+            return mutSub(t._cells, cellRange);
+        }
+
+        Slice<Cell> cells(Text const &t) const {
+            return sub(t._cells, cellRange);
+        }
+
         bool empty() const {
-            return cells.empty() and not spaces and not newline;
+            return cellRange.empty();
         }
 
-        f64 fullWidth(Text const &text) const {
-            return width + spaces * text._spaceWidth;
+        bool
+        spaces(Text const &t) const {
+            if (empty())
+                return false;
+            return last(cells(t)).space(t);
         }
 
-        bool hasWhitespace() const {
-            return spaces > 0 or newline;
+        bool newline(Text const &t) const {
+            if (empty())
+                return false;
+            return last(cells(t)).newline(t);
         }
     };
 
     struct Line {
-        USizeRange blocks;
+        urange runeRange;
+        urange blockRange;
         f64 baseline = 0; // Baseline of the line within the text
         f64 width = 0;
+
+        Slice<Block> blocks(Text const &t) const {
+            return sub(t._blocks, blockRange);
+        }
+
+        MutSlice<Block> blocks(Text &t) {
+            return mutSub(t._blocks, blockRange);
+        }
     };
 
     TextStyle _style;
+
+    Vec<Rune> _runes;
     Vec<Cell> _cells;
     Vec<Block> _blocks;
     Vec<Line> _lines;
@@ -132,7 +178,77 @@ struct Text {
 
     // MARK: Paint -------------------------------------------------------------
 
-    void paint(Context &ctx) const;
+    void paint(Context &g) const;
+
+    void paintCaret(Context &g, usize runeIndex, Gfx::Color color) const {
+        auto m = _style.font.metrics();
+        auto baseline = queryPosition(runeIndex).cast<isize>();
+        auto cs = baseline - Math::Vec2i{0, (isize)m.ascend};
+        auto ce = baseline + Math::Vec2i{0, (isize)m.descend};
+
+        g.plot(Math::Edgei{cs, ce}, color);
+    }
+
+    struct Lbc {
+        usize li, bi, ci;
+    };
+
+    Lbc lbcAt(usize runeIndex) const {
+        auto li = searchLowerBound(
+            _lines, [&](Line const &l) {
+                return l.runeRange.start <=> runeIndex;
+            }
+        );
+
+        if (not li)
+            return {};
+
+        auto &line = _lines[*li];
+
+        auto bi = searchLowerBound(
+            line.blocks(*this), [&](Block const &b) {
+                return b.runeRange.start <=> runeIndex;
+            }
+        );
+
+        if (not bi)
+            return {li.unwrap(), 0, 0};
+
+        auto &block = line.blocks(*this)[*bi];
+
+        auto ci = searchLowerBound(
+            block.cells(*this), [&](Cell const &c) {
+                return c.runeRange.start <=> runeIndex;
+            }
+        );
+
+        return {
+            li.unwrap(),
+            bi.unwrap(),
+            tryOr(ci, 0),
+        };
+    }
+
+    Math::Vec2f queryPosition(usize runeIndex) const {
+        auto [li, bi, ci] = lbcAt(runeIndex);
+
+        if (isEmpty(_lines))
+            return {};
+
+        auto &line = _lines[li];
+
+        if (isEmpty(line.blocks(*this)))
+            return {};
+
+        auto &block = line.blocks(*this)[bi];
+
+        if (isEmpty(block.cells(*this)))
+            return {};
+
+        auto &cell = block.cells(*this)[ci];
+
+        return {block.pos + cell.pos, line.baseline};
+    }
 };
 
 } // namespace Karm::Gfx

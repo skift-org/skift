@@ -14,36 +14,32 @@ Text::Text(TextStyle style, Str str) : _style(style) {
 
 void Text::_beginBlock() {
     _blocks.pushBack({
-        .cells = {_cells.len(), 0},
+        .runeRange = _runes.len(),
+        .cellRange = _cells.len(),
     });
 }
 
 void Text::append(Rune rune) {
-    if (last(_blocks).newline)
+    if (any(_blocks) and last(_blocks).newline(*this))
         _beginBlock();
 
-    if (rune == ' ') {
-        last(_blocks).spaces++;
-    } else if (rune == '\t') {
-        // HACK: tab width is 4 spaces
-        last(_blocks).spaces += 4;
-    } else if (rune == '\n') {
-        last(_blocks).newline = true;
-    } else if (not isAsciiPrint(rune)) {
-        // ignore
-    } else {
-        if (last(_blocks).hasWhitespace())
-            _beginBlock();
+    if (any(_blocks) and last(_blocks).spaces(*this))
+        _beginBlock();
 
-        auto glyph = _style.font.glyph(rune);
-        _cells.pushBack({
-            .glyph = glyph,
-        });
-        last(_blocks).cells.size++;
-    }
+    auto glyph = _style.font.glyph(rune == '\n' ? ' ' : rune);
+
+    _cells.pushBack({
+        .runeRange = {_runes.len(), 1},
+        .glyph = glyph,
+    });
+
+    _runes.pushBack(rune);
+    last(_blocks).cellRange.size++;
+    last(_blocks).runeRange.end(_runes.len());
 }
 
 void Text::clear() {
+    _runes.clear();
     _cells.clear();
     _blocks.clear();
     _blocksMeasured = false;
@@ -52,6 +48,7 @@ void Text::clear() {
 }
 
 void Text::append(Slice<Rune> runes) {
+    _runes.ensure(_runes.len() + runes.len());
     for (auto rune : runes) {
         append(rune);
     }
@@ -64,8 +61,7 @@ void Text::_measureBlocks() {
         auto adv = 0.0f;
         bool first = true;
         Media::Glyph prev{0};
-        for (usize i = block.cells.start; i < block.cells.end(); i++) {
-            auto &cell = _cells[i];
+        for (auto &cell : block.cells(*this)) {
             if (not first)
                 adv += _style.font.kern(prev, cell.glyph);
             else
@@ -82,31 +78,31 @@ void Text::_measureBlocks() {
 void Text::_wrapLines(f64 width) {
     _lines.clear();
 
-    Line line{{0, 0}};
+    Line line{{}, {}};
     bool first = true;
     f64 adv = 0;
     for (usize i = 0; i < _blocks.len(); i++) {
         auto &block = _blocks[i];
-        auto fullWidth = block.fullWidth(_style);
         if (adv + block.width > width and _style.wordwrap and _style.multiline and not first) {
             _lines.pushBack(line);
-            line = {{i, 1}};
-            adv = fullWidth;
+            line = {block.runeRange, {i, 1}};
+            adv = block.width;
 
-            if (block.newline) {
+            if (block.newline(*this)) {
                 _lines.pushBack(line);
-                line = {{i + 1, 0}};
+                line = {block.runeRange.end(), {i + 1, 0}};
                 adv = 0;
             }
         } else {
-            line.blocks.size++;
+            line.blockRange.size++;
+            line.runeRange.end(block.runeRange.end());
 
-            if (block.newline and _style.multiline) {
+            if (block.newline(*this) and _style.multiline) {
                 _lines.pushBack(line);
-                line = {{i + 1, 0}};
+                line = {block.runeRange.end(), {i + 1, 0}};
                 adv = 0;
             } else {
-                adv += fullWidth;
+                adv += block.width;
             }
         }
         first = false;
@@ -129,17 +125,16 @@ f64 Text::_layoutVerticaly() {
 f64 Text::_layoutHorizontaly(f64 width) {
     f64 maxWidth = 0;
     for (auto &line : _lines) {
-        if (not line.blocks.any())
+        if (not line.blockRange.any())
             continue;
 
         f64 pos = 0;
-        for (usize i = line.blocks.start; i < line.blocks.end(); i++) {
-            auto &block = _blocks[i];
+        for (auto &block : line.blocks(*this)) {
             block.pos = pos;
-            pos += block.fullWidth(*this);
+            pos += block.width;
         }
 
-        auto lastBlock = _blocks[line.blocks.end() - 1];
+        auto lastBlock = _blocks[line.blockRange.end() - 1];
         line.width = lastBlock.pos + lastBlock.width;
         maxWidth = max(maxWidth, line.width);
         auto free = width - line.width;
@@ -149,17 +144,13 @@ f64 Text::_layoutHorizontaly(f64 width) {
             break;
 
         case TextAlign::CENTER:
-            for (usize i = line.blocks.start; i < line.blocks.end(); i++) {
-                auto &block = _blocks[i];
+            for (auto &block : line.blocks(*this))
                 block.pos += free / 2;
-            }
             break;
 
         case TextAlign::RIGHT:
-            for (usize i = line.blocks.start; i < line.blocks.end(); i++) {
-                auto &block = _blocks[i];
+            for (auto &block : line.blocks(*this))
                 block.pos += free;
-            }
             break;
         }
     }
@@ -197,24 +188,23 @@ void Text::paint(Context &ctx) const {
     auto clip = ctx.clip();
     auto origin = ctx.origin();
 
-    auto si =
-        tryOr(searchLowerBound(_lines, [&](auto &line) {
-                  return line.baseline + origin.y <=> clip.top() - m.ascend;
-              }),
-              0);
+    auto si = tryOr(
+        searchLowerBound(_lines, [&](auto &line) {
+            return line.baseline + origin.y <=> clip.top() - m.ascend;
+        }),
+        0
+    );
 
-    auto ei = tryOr(searchUpperBound(_lines, [&](auto &line) {
-                        return line.baseline + origin.y <=> clip.bottom() + m.lineheight();
-                    }),
-                    _lines.len());
+    auto ei = tryOr(
+        searchUpperBound(_lines, [&](auto &line) {
+            return line.baseline + origin.y <=> clip.bottom() + m.lineheight();
+        }),
+        _lines.len()
+    );
 
-    for (usize i = si; i < ei; i++) {
-        auto const &line = _lines[i];
-        for (usize b = line.blocks.start; b < line.blocks.end(); b++) {
-            auto const &block = _blocks[b];
-
-            for (usize c = block.cells.start; c < block.cells.end(); c++) {
-                auto const &cell = _cells[c];
+    for (auto const &line : sub(_lines, si, ei)) {
+        for (auto &block : line.blocks(*this)) {
+            for (auto &cell : block.cells(*this)) {
                 ctx.fill({block.pos + cell.pos, line.baseline}, cell.glyph);
             }
         }
@@ -222,7 +212,5 @@ void Text::paint(Context &ctx) const {
 
     ctx.restore();
 }
-
-// MARK: Query -------------------------------------------------------------
 
 } // namespace Karm::Gfx

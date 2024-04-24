@@ -286,25 +286,7 @@ struct Input : public View<Input> {
     Gfx::Text &_ensureText() {
         if (not _text) {
             _text = Gfx::Text(_style);
-            auto runes = _model->runes();
-            auto cur = _model->_cur;
-
-            for (usize i = 0; i < runes.len(); i++) {
-                if (not cur.open() and i == cur.head) {
-                    _text->append('|');
-                } else if (cur.open() and i == min(cur.tail, cur.head)) {
-                    _text->append('[');
-                } else if (cur.open() and i == max(cur.tail, cur.head)) {
-                    _text->append(']');
-                }
-                _text->append(runes[i]);
-            }
-
-            if (not cur.open() and cur.head == runes.len()) {
-                _text->append('|');
-            } else if (cur.open() and max(cur.tail, cur.head) == runes.len()) {
-                _text->append(']');
-            }
+            _text->append(_model->runes());
         }
         return *_text;
     }
@@ -315,7 +297,9 @@ struct Input : public View<Input> {
         g.origin(bound().xy);
 
         auto &text = _ensureText();
-        text.paint(g);
+
+        text.paint(g); 
+        text.paintCaret(g, _model->_cur.head, Ui::GRAY50);
 
         g.restore();
         if (debugShowLayoutBounds)

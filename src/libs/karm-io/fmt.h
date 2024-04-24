@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/box.h>
 #include <karm-base/endian.h>
 #include <karm-base/rc.h>
 #include <karm-base/reflect.h>
@@ -704,6 +705,23 @@ struct Formatter<Weak<T>> {
     }
 };
 
+template <typename T>
+struct Formatter<Box<T>> {
+    Formatter<T> formatter;
+
+    void parse(Io::SScan &scan) {
+        if constexpr (requires() {
+                          formatter.parse(scan);
+                      }) {
+            formatter.parse(scan);
+        }
+    }
+
+    Res<usize> format(Io::TextWriter &writer, Box<T> const &val) {
+        return formatter.format(writer, *val);
+    }
+};
+
 // MARK: Format Reflectable ----------------------------------------------------
 
 template <Reflectable T>
@@ -750,13 +768,13 @@ struct Formatter<T> {
     }
 
     Res<usize> format(Io::TextWriter &writer, T const &val) {
-        auto written = try$(writer.writeStr("{"s));
+        auto written = try$(writer.writeStr("["s));
         for (usize i = 0; i < val.len(); i++) {
             if (i != 0)
                 written += try$(writer.writeStr(", "s));
             written += try$(inner.format(writer, val[i]));
         }
-        return Ok(written + try$(writer.writeStr("}"s)));
+        return Ok(written + try$(writer.writeStr("]"s)));
     }
 };
 

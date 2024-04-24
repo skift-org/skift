@@ -156,7 +156,7 @@ test$("fmt-reflectable") {
 
 test$("fmt-sliceable") {
     Array arr{1, 2, 3};
-    try$(testCase("{1, 2, 3}", arr));
+    try$(testCase("[1, 2, 3]", arr));
     return Ok();
 }
 

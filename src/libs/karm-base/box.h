@@ -13,8 +13,14 @@ struct Box {
 
     constexpr Box() = delete;
 
-    constexpr Box(T *ptr)
+    constexpr Box(Move, T *ptr)
         : _ptr(ptr) {}
+
+    constexpr Box(T const &v)
+        : _ptr(new T(v)) {}
+
+    constexpr Box(T &&v)
+        : _ptr(new T(std::move(v))) {}
 
     constexpr Box(Box const &other)
         : _ptr(new T(*other._ptr)) {}
@@ -71,7 +77,7 @@ struct Box {
 
 template <typename T, typename... Args>
 constexpr static Box<T> makeBox(Args... args) {
-    return {new T(std::forward<Args>(args)...)};
+    return {MOVE, new T(std::forward<Args>(args)...)};
 }
 
 } // namespace Karm

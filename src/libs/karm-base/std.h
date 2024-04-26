@@ -15,6 +15,7 @@
 #ifdef __ck_sys_darwin__
 // Darwin is poluting the global namespace with unwanted macros.
 #undef UNDERFLOW
+#undef DOMAIN
 #endif
 
 #include <stddef.h>

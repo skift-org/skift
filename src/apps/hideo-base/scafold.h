@@ -38,10 +38,10 @@ struct Scafold : public Meta::NoCopy {
     String title;
     TitlebarStyle titlebar = TitlebarStyle::DEFAULT;
 
-    Opt<Ui::Slots> startTools;
-    Opt<Ui::Slots> midleTools;
-    Opt<Ui::Slots> endTools;
-    Opt<Ui::Slot> sidebar;
+    Opt<Ui::Slots> startTools = NONE;
+    Opt<Ui::Slots> midleTools = NONE;
+    Opt<Ui::Slots> endTools = NONE;
+    Opt<Ui::Slot> sidebar = NONE;
     Ui::Slot body;
 
     Math::Vec2i size = {800, 600};

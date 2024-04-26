@@ -28,8 +28,7 @@
             "cmd": "{shell.latest('clang++')}"
         },
         "ld": {
-            "cmd": "{shell.latest('clang++')}",
-            "rule": "-o $out $objs -Wl,--whole-archive $wholeLibs -Wl,--no-whole-archive $libs $flags"
+            "cmd": "{shell.latest('clang++')}"
         },
         "ar": {
             "cmd": "{shell.latest('llvm-ar')}",

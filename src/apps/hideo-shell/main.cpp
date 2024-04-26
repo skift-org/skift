@@ -171,7 +171,7 @@ Ui::Child appStack(State const &state) {
     usize index = state.surfaces.len() - 1;
     for (auto &s : iterRev(state.surfaces)) {
         apps.pushBack(
-            scafold(Scafold{
+            scafold({
                 .icon = s.entry.icon.icon,
                 .title = s.entry.name,
                 .body = slot$(Ui::empty()),

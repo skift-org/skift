@@ -1,0 +1,27 @@
+name: Checks (Darwin)
+
+on: [push, pull_request]
+
+jobs:
+  build-all:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+            python-version: '3.11'
+
+      - name: Set up the build environment
+        run: ./skift.sh tools setup && ./skift.sh tools doctor
+
+      - name: Build Userspace (Host)
+        run: ./skift.sh builder build
+
+      - name: Test Userspace (Host)
+        run: ./skift.sh builder test

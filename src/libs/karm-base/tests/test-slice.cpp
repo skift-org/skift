@@ -4,7 +4,6 @@ namespace Karm::Base {
 
 auto needle(isize value) {
     return [value](auto x) {
-        logDebug("{} <=> {} : {}", x, value, x <=> value);
         return x <=> value;
     };
 }

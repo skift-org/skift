@@ -48,7 +48,7 @@ struct State {
     Media::Image background;
     Vec<Noti> noti;
     Vec<MenuEntry> entries;
-    Vec<Surface> surfaces;
+    Vec<Surface> surfaces{};
 };
 
 struct ToggleTablet {};

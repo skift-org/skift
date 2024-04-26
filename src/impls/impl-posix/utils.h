@@ -22,4 +22,8 @@ Sys::SocketAddr fromSockAddr(struct sockaddr_in sockaddr);
 
 Sys::Stat fromStat(struct stat const &buf);
 
+struct timespec toTimespec(TimeStamp ts);
+
+struct timespec toTimespec(TimeSpan ts);
+
 } // namespace Posix

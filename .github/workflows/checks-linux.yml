@@ -1,4 +1,4 @@
-name: Checks
+name: Checks (Ubuntu)
 
 on: [push, pull_request]
 

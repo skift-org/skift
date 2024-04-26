@@ -28,19 +28,20 @@ Res<> Driver::runAll() {
     Sys::errln("Running {} tests...\n", _tests.len());
 
     for (auto *test : _tests) {
+        Sys::err(
+            "Running {}: {}... ",
+            test->_loc.file,
+            Io::toNoCase(test->_name).unwrap()
+        );
 
         auto result = test->run(*this);
 
         if (not result) {
             failed++;
-            Sys::err(
-                "Running {}: {}... ",
-                test->_loc.file,
-                Io::toNoCase(test->_name).unwrap()
-            );
             Sys::errln("{}", Cli::styled(result.none(), Cli::style(Cli::RED).bold()));
         } else {
             passed++;
+            Sys::errln("{}", Cli::styled("PASS"s, Cli::style(Cli::GREEN).bold()));
         }
     }
 

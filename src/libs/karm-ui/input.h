@@ -96,9 +96,9 @@ struct MouseListener {
 struct ButtonStyle {
     static constexpr isize RADIUS = 4;
 
-    BoxStyle idleStyle;
-    BoxStyle hoverStyle;
-    BoxStyle pressStyle;
+    BoxStyle idleStyle{};
+    BoxStyle hoverStyle{};
+    BoxStyle pressStyle{};
     BoxStyle disabledStyle = {
         .foregroundPaint = GRAY600,
     };

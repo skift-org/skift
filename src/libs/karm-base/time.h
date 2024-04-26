@@ -162,7 +162,7 @@ inline TimeSpan operator""_y(unsigned long long value) {
 }
 
 struct TimeStamp {
-    usize _value{};
+    usize _value{}; // microseconds (us) aka 1/1,000,000th of a second
 
     static constexpr usize END_OF_TIME = ~0uz;
 

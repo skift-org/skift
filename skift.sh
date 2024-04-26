@@ -10,6 +10,13 @@ function is_ubuntu() {
     return 1
 }
 
+function is_darwin() {
+    if [ "$(uname)" == "Darwin" ]; then
+        return 0
+    fi
+    return 1
+}
+
 if [ "$EUID" -eq 0 ]; then
     echo "Please do not run this script as root."
 
@@ -28,7 +35,7 @@ if [ "$CUTEKIT_NOVENV" == "1" ]; then
 fi
 
 if [ "$1" == "tools" -a "$2" == "nuke" ]; then
-    rm -rf .cutekit/tools .cutekit/venv
+    rm -rf .cutekit/tools .cutekit/venv .cutekit/tools-ready
     exit 0
 fi
 
@@ -50,6 +57,9 @@ if [ ! -f .cutekit/tools-ready ]; then
     if is_ubuntu; then
         echo "Detected Ubuntu, installing dependencies automatically..."
         sudo ./meta/scripts/setup-ubuntu.sh
+    elif is_darwin; then
+        echo "Detected macOS, installing dependencies automatically..."
+        ./meta/scripts/setup-darwin.sh
     fi
 
     mkdir -p .cutekit
@@ -64,11 +74,16 @@ if [ ! -f .cutekit/tools-ready ]; then
 
     touch .cutekit/tools-ready
     echo "Done!"
+    exit 0
 fi
 
 if [ "$1" == "tools" -a "$2" == "setup" ]; then
     echo "Tools already installed."
     exit 0
+fi
+
+if is_darwin; then
+    source ./meta/scripts/env-darwin.sh
 fi
 
 source .cutekit/venv/bin/activate

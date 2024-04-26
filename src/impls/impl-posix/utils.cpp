@@ -214,4 +214,30 @@ Sys::Stat fromStat(struct stat const &buf) {
     return stat;
 }
 
+struct timespec toTimespec(TimeStamp ts) {
+    struct timespec pts;
+    if (ts.isEndOfTime()) {
+        pts.tv_sec = LONG_MAX;
+        pts.tv_nsec = 0;
+        return pts;
+    } else {
+        pts.tv_sec = ts.val() / 1000000;
+        pts.tv_nsec = (ts.val() % 1000000) * 1000;
+    }
+    return pts;
+}
+
+struct timespec toTimespec(TimeSpan ts) {
+    struct timespec pts;
+    if (ts.isInfinite()) {
+        pts.tv_sec = LONG_MAX;
+        pts.tv_nsec = 0;
+        return pts;
+    } else {
+        pts.tv_sec = ts.val() / 1000000;
+        pts.tv_nsec = (ts.val() % 1000000) * 1000;
+    }
+    return pts;
+}
+
 } // namespace Posix

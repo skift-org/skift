@@ -12,9 +12,9 @@ namespace Hideo::Shell {
 struct QuickSettingProps {
     Mdi::Icon icon;
     Opt<String> name;
-    bool state;
-    Ui::OnPress press;
-    Ui::OnPress more;
+    bool state = false;
+    Ui::OnPress press = NONE;
+    Ui::OnPress more = NONE;
 };
 
 Ui::Child quickSetting(QuickSettingProps props) {

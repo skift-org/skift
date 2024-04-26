@@ -17,18 +17,30 @@ struct Map {
     void put(K const &key, V value) {
         for (auto &i : ::mutIter(_els)) {
             if (i.car == key) {
-                i.cdr = value;
+                i.cdr = std::move(value);
                 return;
             }
         }
 
-        _els.pushBack(Cons<K, V>{key, value});
+        _els.pushBack(Cons<K, V>{key, std::move(value)});
     }
 
     Opt<V> get(K const &key) const {
         for (auto &i : _els) {
             if (i.car == key) {
                 return i.cdr;
+            }
+        }
+
+        return NONE;
+    }
+
+    Opt<V> take(K const &key) {
+        for (usize i = 0; i < _els.len(); i++) {
+            if (_els[i].car == key) {
+                V value = std::move(_els[i].cdr);
+                _els.removeAt(i);
+                return value;
             }
         }
 

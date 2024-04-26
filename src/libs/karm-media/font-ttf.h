@@ -33,6 +33,7 @@ struct TtfFontface : public Fontface {
             .captop = m.ascend,
             .descend = m.descend,
             .linegap = m.linegap,
+            .advance = 0
         };
     }
 

@@ -6,7 +6,6 @@
 //
 #include <impl-posix/fd.h>
 #include <impl-posix/utils.h>
-#include <karm-logger/logger.h>
 #include <karm-sys/async.h>
 #include <karm-sys/time.h>
 
@@ -141,8 +140,6 @@ struct DarwinSched :
     Async::Task<> sleepAsync(TimeStamp until) override {
         struct timespec ts = _computeTimeout(until);
 
-        logDebug("sleepAsync: {}s {}ns", ts.tv_sec, ts.tv_nsec);
-
         co_trya$(waitFor({
             .ident = 0,
             .filter = EVFILT_TIMER,
@@ -178,7 +175,6 @@ struct DarwinSched :
         if (n == 0)
             return Ok();
 
-        logDebug("got event: {}", ev.filter);
 
         usize id = ev.udata;
         auto promise =

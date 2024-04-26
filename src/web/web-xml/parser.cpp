@@ -11,8 +11,6 @@ namespace Web::Xml {
 Res<Strong<Dom::Document>> Parser::parse(Io::SScan &s, Ns ns) {
     // document :: = prolog element Misc *
 
-    logDebug("Parsing XML document");
-
     auto doc = makeStrong<Dom::Document>();
     try$(_parseProlog(s, *doc));
     doc->appendChild(try$(_parseElement(s, ns)));
@@ -51,7 +49,6 @@ static constexpr auto RE_NAME = RE_NAME_START_CHAR & Re::zeroOrMore(RE_NAME_CHAR
 Res<> Parser::_parseS(Io::SScan &s) {
     // S ::= (#x20 | #x9 | #xD | #xA)+
 
-    logDebug("Parsing whitespace");
     s.eat(Re::oneOrMore(RE_S));
 
     return Ok();
@@ -59,8 +56,6 @@ Res<> Parser::_parseS(Io::SScan &s) {
 
 Res<Str> Parser::_parseName(Io::SScan &s) {
     // Name ::= NameStartChar (NameChar)*
-
-    logDebug("Parsing name");
 
     auto name = s.token(RE_NAME);
     if (isEmpty(name))
@@ -75,8 +70,6 @@ static constexpr auto RE_CHARDATA = Re::negate(Re::single('<', '&'));
 
 Res<> Parser::_parseCharData(Io::SScan &s, StringBuilder &sb) {
     // CharData ::= [^<&]* - ([^<&]* ']]>' [^<&]*)
-
-    logDebug("Parsing character data");
 
     bool any = false;
 
@@ -103,8 +96,6 @@ static constexpr auto RE_COMMENT_END = "-->"_re;
 
 Res<Strong<Dom::Comment>> Parser::_parseComment(Io::SScan &s) {
     // 	Comment ::= '<!--' ((Char - '-') | ('-' (Char - '-')))* '-->'
-
-    logDebug("Parsing comment");
 
     auto rollback = s.rollbackPoint();
 
@@ -135,8 +126,6 @@ static constexpr auto RE_PI_END = "?>"_re;
 Res<> Parser::_parsePi(Io::SScan &s) {
     // PI ::= '<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>
 
-    logDebug("Parsing processing instruction");
-
     auto rollback = s.rollbackPoint();
 
     if (not s.skip(RE_PI_START))
@@ -159,8 +148,6 @@ Res<> Parser::_parsePi(Io::SScan &s) {
 Res<> Parser::_parsePiTarget(Io::SScan &s) {
     // PITarget ::= Name - (('X' | 'x') ('M' | 'm') ('L' | 'l'))
 
-    logDebug("Parsing processing instruction target");
-
     auto name = try$(_parseName(s));
     if (eqCi(name, "xml"s))
         return Error::invalidData("expected name to not be 'xml'");
@@ -174,8 +161,6 @@ Res<> Parser::_parseCDSect(Io::SScan &s, StringBuilder &sb) {
     // CDStart ::= '<![CDATA['
     // CData ::= (Char* - (Char* ']]>' Char*))
     // CDEnd ::= ']]>'
-
-    logDebug("Parsing CDATA section");
 
     auto rollback = s.rollbackPoint();
 
@@ -200,8 +185,6 @@ static constexpr auto RE_XML_DECL_START = "<?xml"_re;
 Res<> Parser::_parseVersionInfo(Io::SScan &s) {
     // versionInfo ::= S 'version' Eq ("'" VersionNum "'" | '"' VersionNum '"')
 
-    logDebug("Parsing version info");
-
     try$(_parseS(s));
 
     if (not s.skip("version"_re))
@@ -213,8 +196,6 @@ Res<> Parser::_parseVersionInfo(Io::SScan &s) {
 Res<> Parser::_parseXmlDecl(Io::SScan &s) {
     // XMLDecl ::= '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
 
-    logDebug("Parsing XML declaration");
-
     if (not s.skip(RE_XML_DECL_START))
         return Error::invalidData("expected '<?xml'");
 
@@ -225,8 +206,6 @@ Res<> Parser::_parseXmlDecl(Io::SScan &s) {
 
 Res<> Parser::_parseMisc(Io::SScan &s, Dom::Node &parent) {
     // Misc ::= Comment | PI | S
-
-    logDebug("Parsing miscellaneous");
 
     auto rollback = s.rollbackPoint();
 
@@ -247,8 +226,6 @@ Res<> Parser::_parseMisc(Io::SScan &s, Dom::Node &parent) {
 Res<> Parser::_parseProlog(Io::SScan &s, Dom::Node &parent) {
     // prolog ::= XMLDecl? Misc* (doctypedecl Misc*)?
     auto rollback = s.rollbackPoint();
-
-    logDebug("Parsing prolog");
 
     if (s.match(RE_XML_DECL_START) != Match::NO)
         try$(Parser::_parseXmlDecl(s));
@@ -271,8 +248,6 @@ static constexpr auto RE_DOCTYPE_START = "<!DOCTYPE"_re;
 Res<Strong<Dom::DocumentType>> Parser::_parseDoctype(Io::SScan &s) {
     // doctypedecl ::= '<!DOCTYPE' S Name (S ExternalID)? S? ('[' intSubset ']' S?)? '>'
     auto rollback = s.rollbackPoint();
-
-    logDebug("Parsing doctype declaration");
 
     if (not s.skip(RE_DOCTYPE_START))
         return Error::invalidData("expected '<!DOCTYPE'");
@@ -303,8 +278,6 @@ Res<Strong<Dom::DocumentType>> Parser::_parseDoctype(Io::SScan &s) {
 Res<Strong<Dom::Element>> Parser::_parseElement(Io::SScan &s, Ns ns) {
     // element ::= EmptyElemTag | STag content ETag
 
-    logDebug("Parsing element");
-
     auto rollback = s.rollbackPoint();
 
     if (auto r = _parseEmptyElementTag(s, ns)) {
@@ -330,8 +303,6 @@ Res<Strong<Dom::Element>> Parser::_parseElement(Io::SScan &s, Ns ns) {
 Res<Strong<Dom::Element>> Parser::_parseStartTag(Io::SScan &s, Ns ns) {
     // STag ::= '<' Name (S Attribute)* S? '>'
 
-    logDebug("Parsing start tag");
-
     auto rollback = s.rollbackPoint();
     if (not s.skip('<'))
         return Error::invalidData("expected '<'");
@@ -354,8 +325,6 @@ Res<Strong<Dom::Element>> Parser::_parseStartTag(Io::SScan &s, Ns ns) {
 Res<> Parser::_parseAttribute(Io::SScan &s, Ns ns, Dom::Element &el) {
     // Attribute ::= Name Eq AttValue
 
-    logDebug("Parsing attribute");
-
     auto rollback = s.rollbackPoint();
 
     auto name = try$(_parseName(s));
@@ -374,8 +343,6 @@ Res<> Parser::_parseAttribute(Io::SScan &s, Ns ns, Dom::Element &el) {
 Res<String> Parser::_parseAttValue(Io::SScan &s) {
     // AttValue ::= '"' ([^<&"] | Reference)* '"'
     //              |  "'" ([^<&'] | Reference)* "'"
-
-    logDebug("Parsing attribute value");
 
     StringBuilder sb;
 
@@ -405,8 +372,6 @@ Res<String> Parser::_parseAttValue(Io::SScan &s) {
 Res<> Parser::_parseEndTag(Io::SScan &s, Dom::Element &el) {
     // '</' Name S? '>'
 
-    logDebug("Parsing end tag");
-
     auto rollback = s.rollbackPoint();
 
     if (not s.skip("</"_re))
@@ -428,8 +393,6 @@ Res<> Parser::_parseEndTag(Io::SScan &s, Dom::Element &el) {
 Res<> Parser::_parseContentItem(Io::SScan &s, Ns ns, Dom::Element &el) {
     // (element | Reference | CDSect | PI | Comment)
 
-    logDebug("Parsing content item");
-
     if (auto r = _parseElement(s, ns)) {
         el.appendChild(r.unwrap());
         return Ok();
@@ -446,8 +409,6 @@ Res<> Parser::_parseContentItem(Io::SScan &s, Ns ns, Dom::Element &el) {
 
 Res<> Parser::_parseContent(Io::SScan &s, Ns ns, Dom::Element &el) {
     // content ::= CharData? ((element | Reference | CDSect | PI | Comment) CharData?)*
-
-    logDebug("Parsing content");
 
     try$(_parseText(s, el));
     while (_parseContentItem(s, ns, el))
@@ -484,8 +445,6 @@ Res<> Parser::_parseText(Io::SScan &s, Dom::Element &el) {
 Res<Strong<Dom::Element>> Parser::_parseEmptyElementTag(Io::SScan &s, Ns ns) {
     // EmptyElemTag ::= '<' Name (S Attribute)* S? '/>'
 
-    logDebug("Parsing empty element tag");
-
     auto rollback = s.rollbackPoint();
     if (not s.skip('<'))
         return Error::invalidData("expected '<'");
@@ -508,8 +467,6 @@ Res<Strong<Dom::Element>> Parser::_parseEmptyElementTag(Io::SScan &s, Ns ns) {
 
 Res<Rune> Parser::_parseCharRef(Io::SScan &s) {
     // CharRef ::= '&#' [0-9]+ ';' | '&#x' [0-9a-fA-F]+ ';'
-
-    logDebug("Parsing character reference");
 
     auto rollback = s.rollbackPoint();
 
@@ -540,8 +497,6 @@ Res<Rune> Parser::_parseCharRef(Io::SScan &s) {
 Res<Rune> Parser::_parseEntityRef(Io::SScan &s) {
     // EntityRef ::= '&' Name ';'
 
-    logDebug("Parsing entity reference");
-
     auto rollback = s.rollbackPoint();
 
     if (not s.skip('&'))
@@ -571,8 +526,6 @@ Res<Rune> Parser::_parseEntityRef(Io::SScan &s) {
 Res<Rune> Parser::_parseReference(Io::SScan &s) {
     // Reference ::= EntityRef | CharRef
 
-    logDebug("Parsing reference");
-
     if (auto r = _parseCharRef(s))
         return r;
     else if (auto r = _parseEntityRef(s))
@@ -586,7 +539,6 @@ Res<Rune> Parser::_parseReference(Io::SScan &s) {
 
 Res<> Parser::_parseExternalId(Io::SScan &s, Dom::DocumentType &docType) {
     // ExternalID ::= 'SYSTEM' S SystemLiteral | 'PUBLIC' S PubidLiteral S SystemLiteral
-    logDebug("Parsing external ID");
 
     auto rollback = s.rollbackPoint();
 

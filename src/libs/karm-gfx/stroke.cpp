@@ -4,7 +4,7 @@ namespace Karm::Gfx {
 
 // MARK: Common ----------------------------------------------------------------
 
-static void _createArc(Shape &shape, Math::Vec2f center, Math::Vec2f start, Math::Vec2f end, f64 startAngle, f64 delta, f64 radius) {
+static void _createArc(Math::Shapef &shape, Math::Vec2f center, Math::Vec2f start, Math::Vec2f end, f64 startAngle, f64 delta, f64 radius) {
     isize divs = 32; // FIXME: determine this procedurally
     f64 step = delta / divs;
     for (isize i = 0; i < divs; i++) {
@@ -20,11 +20,11 @@ static void _createArc(Shape &shape, Math::Vec2f center, Math::Vec2f start, Math
 
 // MARK: Line Join -------------------------------------------------------------
 
-static void _createJoinBevel(Shape &shape, Math::Edgef curr, Math::Edgef next) {
+static void _createJoinBevel(Math::Shapef &shape, Math::Edgef curr, Math::Edgef next) {
     shape.add({curr.end, next.start});
 }
 
-static void _createJoinMiter(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 width) {
+static void _createJoinMiter(Math::Shapef &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 width) {
     auto currVec = curr.dir();
     auto nextVec = next.invDir();
     auto diffVec = next.start - curr.end;
@@ -49,7 +49,7 @@ static void _createJoinMiter(Shape &shape, Math::Edgef curr, Math::Edgef next, M
     shape.add({v, next.start});
 }
 
-static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
+static void _createJoinRound(Math::Shapef &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
     f64 startAngle = (curr.end - corner).angle();
     f64 endAngle = (next.start - corner).angle();
 
@@ -67,7 +67,7 @@ static void _createJoinRound(Shape &shape, Math::Edgef curr, Math::Edgef next, M
     _createArc(shape, corner, curr.end, next.start, startAngle, delta, radius);
 }
 
-static void _createJoin(Shape &shape, StrokeStyle stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
+static void _createJoin(Math::Shapef &shape, StrokeStyle stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
     // Make sure that the edge is not degenerate
     if (Math::Edgef{curr.end, next.start}.degenerated())
         return;
@@ -98,18 +98,18 @@ struct Cap {
     Math::Vec2f center;
 };
 
-static void _createCapButt(Shape &shape, Cap cap) {
+static void _createCapButt(Math::Shapef &shape, Cap cap) {
     shape.add({cap.start, cap.end});
 }
 
-static void _createCapSquare(Shape &shape, Cap cap, f64 width) {
+static void _createCapSquare(Math::Shapef &shape, Cap cap, f64 width) {
     auto e = Math::Edgef{cap.start, cap.end}.parallel(-width / 2);
     shape.add({cap.start, e.start});
     shape.add(e);
     shape.add({e.end, cap.end});
 }
 
-static void _createCapRound(Shape &shape, Cap cap, f64 width) {
+static void _createCapRound(Math::Shapef &shape, Cap cap, f64 width) {
     f64 startAngle = (cap.start - cap.center).angle();
     f64 endAngle = (cap.end - cap.center).angle();
 
@@ -122,7 +122,7 @@ static void _createCapRound(Shape &shape, Cap cap, f64 width) {
     _createArc(shape, cap.center, cap.start, cap.end, startAngle, delta, width / 2);
 }
 
-static void _createCap(Shape &shape, StrokeStyle stroke, Cap cap) {
+static void _createCap(Math::Shapef &shape, StrokeStyle stroke, Cap cap) {
     switch (stroke.cap) {
     case BUTT_CAP:
         _createCapButt(shape, cap);
@@ -140,7 +140,7 @@ static void _createCap(Shape &shape, StrokeStyle stroke, Cap cap) {
 
 // MARK: Public Api ------------------------------------------------------------
 
-[[gnu::flatten]] void createStroke(Shape &shape, Path const &path, StrokeStyle stroke) {
+[[gnu::flatten]] void createStroke(Math::Shapef &shape, Path const &path, StrokeStyle stroke) {
     f64 outerDist = 0;
 
     if (stroke.align == CENTER_ALIGN) {
@@ -201,7 +201,7 @@ static void _createCap(Shape &shape, StrokeStyle stroke, Cap cap) {
     }
 }
 
-void createSolid(Shape &shape, Path &path) {
+void createSolid(Math::Shapef &shape, Path &path) {
     for (auto seg : path.iterSegs()) {
         for (usize i = 0; i < seg.len(); i++) {
             Math::Edgef e = {seg[i], seg[(i + 1) % seg.len()]};

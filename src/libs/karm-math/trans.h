@@ -69,6 +69,10 @@ union Trans2 {
         return {apply(e.start), apply(e.end)};
     }
 
+    constexpr Rect<T> apply(Rect<T> r) const {
+        return Rect<T>::fromTwoPoint(apply(r.topStart()), apply(r.bottomEnd()));
+    }
+
     constexpr Trans2 multiply(Trans2 const &other) const {
         Trans2 res = {
             xx * other.xx,

@@ -1,11 +1,13 @@
 #pragma once
 
-#include "shape.h"
+#include <karm-math/shape.h>
+
+#include "path.h"
 
 namespace Karm::Gfx {
 
-void createStroke(Shape &shape, Path const &path, StrokeStyle stroke);
+void createStroke(Math::Shapef &shape, Path const &path, StrokeStyle stroke);
 
-void createSolid(Shape &shape, Path &path);
+void createSolid(Math::Shapef &shape, Path &path);
 
 } // namespace Karm::Gfx

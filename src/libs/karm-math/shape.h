@@ -1,17 +1,18 @@
 #pragma once
 
-#include "path.h"
-#include "style.h"
+#include "edge.h"
+#include "vec.h"
 
-namespace Karm::Gfx {
+namespace Karm::Math {
 
+template <typename T>
 struct Shape {
-    Vec<Math::Edgef> _edges{};
+    Vec<Edge<T>> _edges{};
 
     Shape() = default;
 
-    Math::Rectf bound() const {
-        Opt<Math::Rectf> bound{};
+    Rect<T> bound() const {
+        Opt<Rect<T>> bound{};
         for (auto const &edge : *this) {
             if (bound) {
                 bound = bound->mergeWith(edge.bound());
@@ -22,11 +23,11 @@ struct Shape {
         return tryOr(bound, {});
     }
 
-    Math::Edgef const &operator[](usize i) const {
+    Edgef const &operator[](usize i) const {
         return _edges[i];
     }
 
-    Math::Edgef const *buf() const {
+    Edgef const *buf() const {
         return _edges.buf();
     }
 
@@ -34,21 +35,21 @@ struct Shape {
         return _edges.len();
     }
 
-    Math::Edgef const *begin() const {
+    Edge<T> const *begin() const {
         return buf();
     }
 
-    Math::Edgef const *end() const {
+    Edge<T> const *end() const {
         return buf() + len();
     }
 
-    void add(Math::Edgef const &edge) {
+    void add(Edge<T> edge) {
         if (edge.hasNan()) [[unlikely]]
             panic("nan in edge");
         _edges.add(edge);
     }
 
-    void offset(Math::Vec2f off) {
+    void offset(Vec2<T> off) {
         for (auto &e : _edges) {
             e = e + off;
         }
@@ -59,4 +60,8 @@ struct Shape {
     }
 };
 
-} // namespace Karm::Gfx
+using Shapef = Shape<f64>;
+using Shapei = Shape<isize>;
+using Shapeu = Shape<usize>;
+
+} // namespace Karm::Math

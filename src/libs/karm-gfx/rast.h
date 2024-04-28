@@ -1,8 +1,7 @@
 #pragma once
 
 #include <karm-base/range.h>
-
-#include "shape.h"
+#include <karm-math/shape.h>
 
 namespace Karm::Gfx {
 
@@ -27,12 +26,12 @@ struct Rast {
         f64 a;
     };
 
-    Shape _shape{};
+    Math::Shapef _shape{};
     Vec<Active> _active{};
     Vec<irange> _ranges;
     Vec<f64> _scanline{};
 
-    Shape &shape() {
+    Math::Shapef &shape() {
         return _shape;
     }
 

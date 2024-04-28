@@ -22,6 +22,16 @@ struct SdlHost :
         SDL_Quit();
     }
 
+    Math::Recti bound() override {
+        i32 w, h;
+        SDL_GetWindowSize(_window, &w, &h);
+        return {w, h};
+    }
+
+    double dpi() {
+        return pixels().width() / bound().width;
+    }
+
     Gfx::MutPixels mutPixels() override {
         SDL_Surface *s = SDL_GetWindowSurface(_window);
 
@@ -327,19 +337,21 @@ struct SdlHost :
         }
 
         case SDL_MOUSEMOTION: {
-            if (sdlEvent.motion.which == SDL_TOUCH_MOUSEID) {
+            if (sdlEvent.motion.which == SDL_TOUCH_MOUSEID)
                 return;
-            }
 
             Math::Vec2<i32> screenPos = {};
             SDL_GetGlobalMouseState(&screenPos.x, &screenPos.y);
 
-            Events::Button buttons = Events::Button::NONE;
+            auto buttons = Events::Button::NONE;
             buttons |= (sdlEvent.motion.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
             buttons |= (sdlEvent.motion.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
             buttons |= (sdlEvent.motion.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
 
-            _lastMousePos = {sdlEvent.motion.x, sdlEvent.motion.y};
+            _lastMousePos = {
+                sdlEvent.motion.x,
+                sdlEvent.motion.y,
+            };
 
             event<Events::MouseEvent>(
                 *this,
@@ -419,9 +431,8 @@ struct SdlHost :
         }
 
         case SDL_MOUSEWHEEL: {
-            if (sdlEvent.wheel.which == SDL_TOUCH_MOUSEID) {
+            if (sdlEvent.wheel.which == SDL_TOUCH_MOUSEID)
                 return;
-            }
 
             event<Events::MouseEvent>(
                 *this,
@@ -451,6 +462,11 @@ struct SdlHost :
         default:
             break;
         }
+    }
+
+    void paint(Gfx::Context &g, Math::Recti r) override {
+        g.scale(dpi());
+        Ui::Host::paint(g, r);
     }
 
     Res<> wait(TimeStamp ts) override {

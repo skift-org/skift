@@ -328,6 +328,7 @@ struct Image : public View<Image> {
 
     void paint(Gfx::Context &g, Math::Recti) override {
         g.save();
+
         if (_radius) {
             g.fillStyle(_image);
             g.fill(bound(), *_radius);

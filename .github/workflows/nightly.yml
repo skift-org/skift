@@ -46,7 +46,7 @@ jobs:
         run: ./skift.sh model install
 
       - name: Build System Image (efi-x86_64)
-        run: ./skift.sh image build --format=hdd --prop:branch=nightly --dist
+        run: ./skift.sh image build --format=hdd --props:branch=nightly --dist
 
       - name: Read release.md and use it as a body of new release
         id: read_release

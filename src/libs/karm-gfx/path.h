@@ -16,56 +16,28 @@
 
 namespace Karm::Gfx {
 
-namespace _Impl {
-
-#define FOREACH_PATHOPCODE(OPCODE) \
-    OPCODE(NOP)                    \
-    OPCODE(CLEAR)                  \
-    OPCODE(CLOSE)                  \
-    OPCODE(MOVE_TO)                \
-    OPCODE(LINE_TO)                \
-    OPCODE(HLINE_TO)               \
-    OPCODE(VLINE_TO)               \
-    OPCODE(CUBIC_TO)               \
-    OPCODE(QUAD_TO)                \
-    OPCODE(ARC_TO)
-
-enum PathOpCode {
-#define ITER(OPCODE) OPCODE,
-    FOREACH_PATHOPCODE(ITER)
-#undef ITER
-};
-
-inline Str opCodeName(PathOpCode opCode) {
-    switch (opCode) {
-#define ITER(OPCODE) \
-    case OPCODE:     \
-        return #OPCODE;
-        FOREACH_PATHOPCODE(ITER)
-#undef ITER
-    }
-    return "";
-}
-
-enum PathOpFlags {
-    DEFAULT = 0,
-
-    LARGE = 1 << 1,
-    SWEEP = 1 << 2,
-    SMOOTH = 1 << 3,
-    RELATIVE = 1 << 4,
-};
-
-FlagsEnum$(PathOpFlags);
-
-} // namespace _Impl
-
 struct Path {
-    using Code = _Impl::PathOpCode;
-    using Flags = _Impl::PathOpFlags;
+    enum Code {
+        NOP,
+        CLEAR,
+        CLOSE,
+        MOVE_TO,
+        LINE_TO,
+        HLINE_TO,
+        VLINE_TO,
+        CUBIC_TO,
+        QUAD_TO,
+        ARC_TO,
+    };
 
-    using enum _Impl::PathOpCode;
-    using enum _Impl::PathOpFlags;
+    enum Flags {
+        DEFAULT = 0,
+
+        LARGE = 1 << 1,
+        SWEEP = 1 << 2,
+        SMOOTH = 1 << 3,
+        RELATIVE = 1 << 4,
+    };
 
     struct Op {
         Code code{};
@@ -198,5 +170,7 @@ struct Path {
 
     static Path fromSvg(Str svg);
 };
+
+FlagsEnum$(Path::Flags);
 
 } // namespace Karm::Gfx

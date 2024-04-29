@@ -4,7 +4,7 @@
 
 namespace Karm::Gfx {
 
-// MARK: Flattening --------------------------------------------------------
+// MARK: Flattening ------------------------------------------------------------
 
 void Path::_flattenClose() {
     auto end = _verts[last(_segs).end - 1];
@@ -314,7 +314,7 @@ void Path::arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Flags flags) {
     evalOp({ARC_TO, radius, angle, p, flags});
 }
 
-// MARK: Shapes ------------------------------------------------------------
+// MARK: Shapes ----------------------------------------------------------------
 
 void Path::line(Math::Edgef edge) {
     moveTo(edge.start);
@@ -387,7 +387,7 @@ void Path::ellipse(Math::Ellipsef ellipse) {
     close();
 }
 
-// MARK: Svg ---------------------------------------------------------------
+// MARK: Svg -------------------------------------------------------------------
 
 Opt<Math::Vec2f> _nextVec2f(Io::SScan &s) {
     return Math::Vec2f{

@@ -68,7 +68,8 @@ void Text::_measureBlocks() {
                 first = false;
 
             cell.pos = adv;
-            adv += _style.font.advance(cell.glyph);
+            cell.adv = _style.font.advance(cell.glyph);
+            adv += cell.adv;
             prev = cell.glyph;
         }
         block.width = adv;
@@ -205,7 +206,17 @@ void Text::paint(Context &ctx) const {
     for (auto const &line : sub(_lines, si, ei)) {
         for (auto &block : line.blocks(*this)) {
             for (auto &cell : block.cells(*this)) {
-                ctx.fill({block.pos + cell.pos, line.baseline}, cell.glyph);
+                auto glyph = cell.glyph;
+
+                if (glyph == Media::Glyph::TOFU) {
+                    ctx.rect(Math::Rectf::fromTwoPoint(
+                        {block.pos + cell.pos, line.baseline - m.ascend},
+                        {block.pos + cell.pos + cell.adv, line.baseline + m.descend}
+                    ));
+                    ctx.stroke();
+                } else {
+                    ctx.fill({block.pos + cell.pos, line.baseline}, cell.glyph);
+                }
             }
         }
     }

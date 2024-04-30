@@ -298,8 +298,8 @@ struct Input : public View<Input> {
 
         auto &text = _ensureText();
 
-        text.paint(g); 
-        text.paintCaret(g, _model->_cur.head, Ui::GRAY50);
+        text.paintCaret(g, _model->_cur.head, Ui::ACCENT500);
+        text.paint(g);
 
         g.restore();
         if (debugShowLayoutBounds)

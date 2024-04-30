@@ -62,6 +62,7 @@ struct Text {
         urange runeRange;
         Media::Glyph glyph;
         f64 pos = 0; //< Position of the glyph within the block
+        f64 adv = 0; //< Advance of the glyph
 
         MutSlice<Rune> runes(Text &t) {
             return mutSub(t._runes, runeRange);
@@ -182,11 +183,13 @@ struct Text {
 
     void paintCaret(Context &g, usize runeIndex, Gfx::Color color) const {
         auto m = _style.font.metrics();
-        auto baseline = queryPosition(runeIndex).cast<isize>();
-        auto cs = baseline - Math::Vec2i{0, (isize)m.ascend};
-        auto ce = baseline + Math::Vec2i{0, (isize)m.descend};
+        auto baseline = queryPosition(runeIndex);
+        auto cs = baseline - Math::Vec2f{0, m.ascend};
+        auto ce = baseline + Math::Vec2f{0, m.descend};
 
-        g.plot(Math::Edgei{cs, ce}, color);
+        g.moveTo(cs);
+        g.lineTo(ce);
+        g.stroke(Gfx::stroke(color).withAlign(Gfx::CENTER_ALIGN).withWidth(2));
     }
 
     struct Lbc {
@@ -194,39 +197,51 @@ struct Text {
     };
 
     Lbc lbcAt(usize runeIndex) const {
-        auto li = searchLowerBound(
+        auto maybeLi = searchLowerBound(
             _lines, [&](Line const &l) {
                 return l.runeRange.start <=> runeIndex;
             }
         );
 
-        if (not li)
-            return {};
+        if (not maybeLi)
+            return {0, 0, 0};
 
-        auto &line = _lines[*li];
+        auto li = *maybeLi;
 
-        auto bi = searchLowerBound(
+        auto &line = _lines[li];
+
+        auto maybeBi = searchLowerBound(
             line.blocks(*this), [&](Block const &b) {
                 return b.runeRange.start <=> runeIndex;
             }
         );
 
-        if (not bi)
-            return {li.unwrap(), 0, 0};
+        if (not maybeBi)
+            return {li, 0, 0};
 
-        auto &block = line.blocks(*this)[*bi];
+        auto bi = *maybeBi;
 
-        auto ci = searchLowerBound(
+        auto &block = line.blocks(*this)[bi];
+
+        auto maybeCi = searchLowerBound(
             block.cells(*this), [&](Cell const &c) {
                 return c.runeRange.start <=> runeIndex;
             }
         );
 
-        return {
-            li.unwrap(),
-            bi.unwrap(),
-            tryOr(ci, 0),
-        };
+        if (not maybeCi)
+            return {li, bi, 0};
+
+        auto ci = *maybeCi;
+
+        auto cell = block.cells(*this)[ci];
+
+        if (cell.runeRange.end() == runeIndex) {
+            // Handle the case where the rune is the last of the text
+            ci++;
+        }
+
+        return {li, bi, ci};
     }
 
     Math::Vec2f queryPosition(usize runeIndex) const {
@@ -238,12 +253,18 @@ struct Text {
         auto &line = _lines[li];
 
         if (isEmpty(line.blocks(*this)))
-            return {};
+            return {0, line.baseline};
 
         auto &block = line.blocks(*this)[bi];
 
         if (isEmpty(block.cells(*this)))
-            return {};
+            return {block.pos, line.baseline};
+
+        if (ci >= block.cells(*this).len()) {
+            // Handle the case where the rune is the last of the text
+            auto &cell = last(block.cells(*this));
+            return {block.pos + cell.pos + cell.adv, line.baseline};
+        }
 
         auto &cell = block.cells(*this)[ci];
 

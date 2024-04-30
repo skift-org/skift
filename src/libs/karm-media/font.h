@@ -79,7 +79,13 @@ struct FontMeasure {
     Math::Vec2f baseline;
 };
 
-using Glyph = Distinct<usize, struct _GlyphTag>;
+struct Glyph : public Distinct<usize, struct _GlyphTag> {
+    using Distinct<usize, struct _GlyphTag>::Distinct;
+
+    static Glyph const TOFU;
+};
+
+constexpr Glyph Glyph::TOFU{Limits<usize>::MIN};
 
 struct Fontface {
     static Strong<Fontface> fallback();

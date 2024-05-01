@@ -28,8 +28,8 @@ struct SdlHost :
         return {w, h};
     }
 
-    double dpi() {
-        return pixels().width() / bound().width;
+    f64 dpi() {
+        return pixels().width() / (f64)bound().width;
     }
 
     Gfx::MutPixels mutPixels() override {
@@ -364,7 +364,6 @@ struct SdlHost :
             );
 
             _lastScreenMousePos = screenPos.cast<isize>();
-
             break;
         }
 

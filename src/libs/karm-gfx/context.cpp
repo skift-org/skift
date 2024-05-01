@@ -404,7 +404,7 @@ void Context::plot(Math::Recti rect, Color color) {
 }
 
 void Context::plot(Gfx::Color color) {
-    for (auto edge : _rast.shape()) {
+    for (auto edge : _rast.poly()) {
         plot(edge.cast<isize>(), color);
     }
 }
@@ -424,7 +424,7 @@ void Context::plot(Gfx::Color color) {
 [[gnu::flatten]] void Context::_FillSmoothImpl(auto paint, auto format, FillRule fillRule) {
     Math::Vec2f last = {0, 0};
     auto fillComponent = [&](auto comp, Math::Vec2f pos) {
-        _rast.shape().offset(pos - last);
+        _rast.poly().offset(pos - last);
         last = pos;
         _rast.fill(clip(), fillRule, [&](Rast::Frag frag) {
             u8 *pixel = static_cast<u8 *>(mutPixels().pixelUnsafe(frag.xy));
@@ -509,7 +509,7 @@ void Context::fill(FillRule rule) {
 
 void Context::fill(Paint paint, FillRule rule) {
     _rast.clear();
-    createSolid(_rast.shape(), _path);
+    createSolid(_rast.poly(), _path);
     _fill(paint, rule);
 }
 
@@ -519,7 +519,7 @@ void Context::stroke() {
 
 void Context::stroke(StrokeStyle style) {
     _rast.clear();
-    createStroke(_rast.shape(), _path, style);
+    createStroke(_rast.poly(), _path, style);
     _fill(style.paint);
 }
 

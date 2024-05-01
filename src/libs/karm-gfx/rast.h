@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/range.h>
-#include <karm-math/shape.h>
+#include <karm-math/poly.h>
 
 namespace Karm::Gfx {
 
@@ -26,13 +26,13 @@ struct Rast {
         f64 a;
     };
 
-    Math::Shapef _shape{};
+    Math::Polyf _poly{};
     Vec<Active> _active{};
     Vec<irange> _ranges;
     Vec<f64> _scanline{};
 
-    Math::Shapef &shape() {
-        return _shape;
+    Math::Polyf &poly() {
+        return _poly;
     }
 
     void _appendRange(irange range) {
@@ -57,26 +57,26 @@ struct Rast {
     }
 
     void clear() {
-        _shape.clear();
+        _poly.clear();
     }
 
     void fill(Math::Recti clip, FillRule fillRule, auto cb) {
-        auto shapeBound = _shape.bound().grow(UNIT);
-        auto rect = shapeBound
-                        .ceil()
-                        .cast<isize>()
-                        .clipTo(clip);
+        auto polyBound = _poly.bound().grow(UNIT);
+        auto clipBound = polyBound
+                             .ceil()
+                             .cast<isize>()
+                             .clipTo(clip);
 
-        _scanline.resize(rect.width + 1);
+        _scanline.resize(clipBound.width + 1);
 
-        for (isize y = rect.top(); y < rect.bottom(); y++) {
-            zeroFill<f64>(mutSub(_scanline, 0, rect.width + 1));
+        for (isize y = clipBound.top(); y < clipBound.bottom(); y++) {
+            zeroFill<f64>(mutSub(_scanline, 0, clipBound.width + 1));
             _ranges.clear();
 
             for (f64 yy = y; yy < y + 1.0; yy += UNIT) {
                 _active.clear();
 
-                for (auto &edge : _shape) {
+                for (auto &edge : _poly) {
                     auto sample = yy + HALF_UNIT;
 
                     if (edge.bound().top() <= sample and sample < edge.bound().bottom()) {
@@ -110,8 +110,8 @@ struct Rast {
                     }
 
                     // Clip the range to the clip rect
-                    f64 x1 = max(_active[i].x, rect.start());
-                    f64 x2 = min(_active[i + 1].x, rect.end());
+                    f64 x1 = max(_active[i].x, clipBound.start());
+                    f64 x2 = min(_active[i + 1].x, clipBound.end());
 
                     // Skip if the range is empty
                     if (x1 >= x2)
@@ -124,17 +124,17 @@ struct Rast {
 
                     // Are x1 and x2 on the same pixel?
                     if (fx1 == fx2) {
-                        _scanline[fx1 - rect.x] += (x2 - x1) * UNIT;
+                        _scanline[fx1 - clipBound.x] += (x2 - x1) * UNIT;
                         continue;
                     }
 
                     // Compute the coverage for the first and last pixel
-                    _scanline[x1 - rect.x] += (cx1 - x1) * UNIT;
-                    _scanline[x2 - rect.x] += (x2 - fx2) * UNIT;
+                    _scanline[x1 - clipBound.x] += (cx1 - x1) * UNIT;
+                    _scanline[x2 - clipBound.x] += (x2 - fx2) * UNIT;
 
                     // Fill the pixels in between
                     for (isize x = cx1; x < fx2; x++)
-                        _scanline[x - rect.x] += UNIT;
+                        _scanline[x - clipBound.x] += UNIT;
                 }
             }
 
@@ -143,11 +143,11 @@ struct Rast {
                     auto xy = Math::Vec2i{x, y};
 
                     auto uv = Math::Vec2f{
-                        (x - shapeBound.start()) / shapeBound.width,
-                        (y - shapeBound.top()) / shapeBound.height,
+                        (x - polyBound.start()) / polyBound.width,
+                        (y - polyBound.top()) / polyBound.height,
                     };
 
-                    cb(Frag{xy, uv, clamp01(_scanline[x - rect.x])});
+                    cb(Frag{xy, uv, clamp01(_scanline[x - clipBound.x])});
                 }
             }
         }

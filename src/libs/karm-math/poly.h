@@ -6,10 +6,10 @@
 namespace Karm::Math {
 
 template <typename T>
-struct Shape {
+struct Poly {
     Vec<Edge<T>> _edges{};
 
-    Shape() = default;
+    Poly() = default;
 
     Rect<T> bound() const {
         Opt<Rect<T>> bound{};
@@ -60,8 +60,8 @@ struct Shape {
     }
 };
 
-using Shapef = Shape<f64>;
-using Shapei = Shape<isize>;
-using Shapeu = Shape<usize>;
+using Polyf = Poly<f64>;
+using Polyi = Poly<isize>;
+using Polyu = Poly<usize>;
 
 } // namespace Karm::Math

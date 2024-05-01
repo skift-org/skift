@@ -65,37 +65,36 @@ struct Path {
             : code(code), flags(flags), radius(radius), angle(angle), p(p) {}
     };
 
-    struct _Seg {
+    struct Contour {
         usize start{};
         usize end{};
         bool close{};
     };
 
-    struct Seg : public Slice<Math::Vec2f> {
-        bool close;
-
-        Seg(Slice<Math::Vec2f> slice, bool close)
-            : Slice<Math::Vec2f>(slice), close(close) {}
-    };
-
-    Vec<_Seg> _segs{};
+    Vec<Contour> _contours{};
     Vec<Math::Vec2f> _verts{};
 
     Math::Vec2f _lastCp;
     Math::Vec2f _lastP;
     Math::Trans2f _trans = Math::Trans2f::identity();
 
-    auto iterSegs() const {
-        return Iter([&, i = 0uz] mutable -> Opt<Seg> {
-            if (i >= _segs.len()) {
+    auto iterContours() const {
+        struct _Contour : public Slice<Math::Vec2f> {
+            bool close;
+            _Contour(Slice<Math::Vec2f> slice, bool close)
+                : Slice<Math::Vec2f>(slice), close(close) {}
+        };
+
+        return Iter([&, i = 0uz] mutable -> Opt<_Contour> {
+            if (i >= _contours.len()) {
                 return NONE;
             }
 
             i++;
 
-            return Seg{
-                sub(_verts, _segs[i - 1].start, _segs[i - 1].end),
-                _segs[i - 1].close,
+            return _Contour{
+                sub(_verts, _contours[i - 1].start, _contours[i - 1].end),
+                _contours[i - 1].close,
             };
         });
     }

@@ -4,7 +4,7 @@ namespace Karm::Gfx {
 
 // MARK: Common ----------------------------------------------------------------
 
-static void _createArc(Math::Shapef &shape, Math::Vec2f center, Math::Vec2f start, Math::Vec2f end, f64 startAngle, f64 delta, f64 radius) {
+static void _createArc(Math::Polyf &poly, Math::Vec2f center, Math::Vec2f start, Math::Vec2f end, f64 startAngle, f64 delta, f64 radius) {
     isize divs = 32; // FIXME: determine this procedurally
     f64 step = delta / divs;
     for (isize i = 0; i < divs; i++) {
@@ -14,17 +14,17 @@ static void _createArc(Math::Shapef &shape, Math::Vec2f center, Math::Vec2f star
         auto sp = i == 0 ? start : center + Math::Vec2f{radius * Math::cos(sa), radius * Math::sin(sa)};
         auto ep = i + 1 == divs ? end : center + Math::Vec2f{radius * Math::cos(ea), radius * Math::sin(ea)};
 
-        shape.add({sp, ep});
+        poly.add({sp, ep});
     }
 }
 
 // MARK: Line Join -------------------------------------------------------------
 
-static void _createJoinBevel(Math::Shapef &shape, Math::Edgef curr, Math::Edgef next) {
-    shape.add({curr.end, next.start});
+static void _createJoinBevel(Math::Polyf &poly, Math::Edgef curr, Math::Edgef next) {
+    poly.add({curr.end, next.start});
 }
 
-static void _createJoinMiter(Math::Shapef &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 width) {
+static void _createJoinMiter(Math::Polyf &poly, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 width) {
     auto currVec = curr.dir();
     auto nextVec = next.invDir();
     auto diffVec = next.start - curr.end;
@@ -41,15 +41,15 @@ static void _createJoinMiter(Math::Shapef &shape, Math::Edgef curr, Math::Edgef 
     auto v = curr.end + (currVec * j);
 
     if (j < 0 or (corner - v).lenSq() > mitterLimit * mitterLimit) {
-        _createJoinBevel(shape, curr, next);
+        _createJoinBevel(poly, curr, next);
         return;
     }
 
-    shape.add({curr.end, v});
-    shape.add({v, next.start});
+    poly.add({curr.end, v});
+    poly.add({v, next.start});
 }
 
-static void _createJoinRound(Math::Shapef &shape, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
+static void _createJoinRound(Math::Polyf &poly, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
     f64 startAngle = (curr.end - corner).angle();
     f64 endAngle = (next.start - corner).angle();
 
@@ -60,29 +60,29 @@ static void _createJoinRound(Math::Shapef &shape, Math::Edgef curr, Math::Edgef 
     f64 delta = endAngle - startAngle;
 
     if (delta > Math::PI) {
-        _createJoinBevel(shape, curr, next);
+        _createJoinBevel(poly, curr, next);
         return;
     }
 
-    _createArc(shape, corner, curr.end, next.start, startAngle, delta, radius);
+    _createArc(poly, corner, curr.end, next.start, startAngle, delta, radius);
 }
 
-static void _createJoin(Math::Shapef &shape, StrokeStyle stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
+static void _createJoin(Math::Polyf &poly, StrokeStyle stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
     // Make sure that the edge is not degenerate
     if (Math::Edgef{curr.end, next.start}.degenerated())
         return;
 
     switch (stroke.join) {
     case BEVEL_JOIN:
-        _createJoinBevel(shape, curr, next);
+        _createJoinBevel(poly, curr, next);
         break;
 
     case MITER_JOIN:
-        _createJoinMiter(shape, curr, next, corner, stroke.width);
+        _createJoinMiter(poly, curr, next, corner, stroke.width);
         break;
 
     case ROUND_JOIN:
-        _createJoinRound(shape, curr, next, corner, radius);
+        _createJoinRound(poly, curr, next, corner, radius);
         break;
 
     default:
@@ -98,18 +98,18 @@ struct Cap {
     Math::Vec2f center;
 };
 
-static void _createCapButt(Math::Shapef &shape, Cap cap) {
-    shape.add({cap.start, cap.end});
+static void _createCapButt(Math::Polyf &poly, Cap cap) {
+    poly.add({cap.start, cap.end});
 }
 
-static void _createCapSquare(Math::Shapef &shape, Cap cap, f64 width) {
+static void _createCapSquare(Math::Polyf &poly, Cap cap, f64 width) {
     auto e = Math::Edgef{cap.start, cap.end}.parallel(-width / 2);
-    shape.add({cap.start, e.start});
-    shape.add(e);
-    shape.add({e.end, cap.end});
+    poly.add({cap.start, e.start});
+    poly.add(e);
+    poly.add({e.end, cap.end});
 }
 
-static void _createCapRound(Math::Shapef &shape, Cap cap, f64 width) {
+static void _createCapRound(Math::Polyf &poly, Cap cap, f64 width) {
     f64 startAngle = (cap.start - cap.center).angle();
     f64 endAngle = (cap.end - cap.center).angle();
 
@@ -119,19 +119,19 @@ static void _createCapRound(Math::Shapef &shape, Cap cap, f64 width) {
 
     f64 delta = endAngle - startAngle;
 
-    _createArc(shape, cap.center, cap.start, cap.end, startAngle, delta, width / 2);
+    _createArc(poly, cap.center, cap.start, cap.end, startAngle, delta, width / 2);
 }
 
-static void _createCap(Math::Shapef &shape, StrokeStyle stroke, Cap cap) {
+static void _createCap(Math::Polyf &poly, StrokeStyle stroke, Cap cap) {
     switch (stroke.cap) {
     case BUTT_CAP:
-        _createCapButt(shape, cap);
+        _createCapButt(poly, cap);
         break;
     case SQUARE_CAP:
-        _createCapSquare(shape, cap, stroke.width);
+        _createCapSquare(poly, cap, stroke.width);
         break;
     case ROUND_CAP:
-        _createCapRound(shape, cap, stroke.width);
+        _createCapRound(poly, cap, stroke.width);
         break;
     default:
         panic("unknown cap type");
@@ -140,7 +140,7 @@ static void _createCap(Math::Shapef &shape, StrokeStyle stroke, Cap cap) {
 
 // MARK: Public Api ------------------------------------------------------------
 
-[[gnu::flatten]] void createStroke(Math::Shapef &shape, Path const &path, StrokeStyle stroke) {
+[[gnu::flatten]] void createStroke(Math::Polyf &poly, Path const &path, StrokeStyle stroke) {
     f64 outerDist = 0;
 
     if (stroke.align == CENTER_ALIGN) {
@@ -151,11 +151,11 @@ static void _createCap(Math::Shapef &shape, StrokeStyle stroke, Cap cap) {
 
     f64 innerDist = outerDist + stroke.width;
 
-    for (auto seg : path.iterSegs()) {
-        auto l = seg.close ? seg.len() : seg.len() - 1;
+    for (auto contour : path.iterContours()) {
+        auto l = contour.close ? contour.len() : contour.len() - 1;
 
         for (usize i = 0; i < l; i++) {
-            Math::Edgef curr = {seg[i], seg[(i + 1) % seg.len()]};
+            Math::Edgef curr = {contour[i], contour[(i + 1) % contour.len()]};
 
             if (curr.degenerated()) {
                 continue;
@@ -164,23 +164,23 @@ static void _createCap(Math::Shapef &shape, StrokeStyle stroke, Cap cap) {
             auto outerCurr = curr.parallel(outerDist);
             auto innerCurr = curr.parallel(innerDist).swap();
 
-            shape.add(outerCurr);
-            shape.add(innerCurr);
+            poly.add(outerCurr);
+            poly.add(innerCurr);
 
-            if (i == 0 and not seg.close) {
+            if (i == 0 and not contour.close) {
                 auto center = (innerCurr.end + outerCurr.start) / 2;
-                _createCap(shape, stroke, {innerCurr.end, outerCurr.start, center});
+                _createCap(poly, stroke, {innerCurr.end, outerCurr.start, center});
             }
 
-            if (i + 1 == l and not seg.close) {
+            if (i + 1 == l and not contour.close) {
                 auto center = (outerCurr.end + innerCurr.start) / 2;
-                _createCap(shape, stroke, {outerCurr.end, innerCurr.start, center});
+                _createCap(poly, stroke, {outerCurr.end, innerCurr.start, center});
             }
 
-            if (seg.close or i + 1 != l) {
+            if (contour.close or i + 1 != l) {
                 Math::Edgef next = {
-                    seg[(i + 1) % seg.len()],
-                    seg[(i + 2) % seg.len()],
+                    contour[(i + 1) % contour.len()],
+                    contour[(i + 2) % contour.len()],
                 };
 
                 // Make sure that the edge is not degenerate
@@ -192,20 +192,20 @@ static void _createCap(Math::Shapef &shape, StrokeStyle stroke, Cap cap) {
                 auto innerNext = innerDist < 0.001 ? next.swap() : next.parallel(innerDist).swap();
 
                 if (outerDist < -0.001)
-                    _createJoin(shape, stroke, outerCurr, outerNext, curr.end, Math::abs(outerDist));
+                    _createJoin(poly, stroke, outerCurr, outerNext, curr.end, Math::abs(outerDist));
 
                 if (innerDist > 0.001)
-                    _createJoin(shape, stroke, innerNext, innerCurr, curr.end, Math::abs(innerDist));
+                    _createJoin(poly, stroke, innerNext, innerCurr, curr.end, Math::abs(innerDist));
             }
         }
     }
 }
 
-void createSolid(Math::Shapef &shape, Path &path) {
-    for (auto seg : path.iterSegs()) {
-        for (usize i = 0; i < seg.len(); i++) {
-            Math::Edgef e = {seg[i], seg[(i + 1) % seg.len()]};
-            shape.add(e);
+void createSolid(Math::Polyf &poly, Path &path) {
+    for (auto contour : path.iterContours()) {
+        for (usize i = 0; i < contour.len(); i++) {
+            Math::Edgef e = {contour[i], contour[(i + 1) % contour.len()]};
+            poly.add(e);
         }
     }
 }

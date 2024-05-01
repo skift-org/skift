@@ -7,15 +7,15 @@ namespace Karm::Gfx {
 // MARK: Flattening ------------------------------------------------------------
 
 void Path::_flattenClose() {
-    auto end = _verts[last(_segs).end - 1];
-    auto start = _verts[last(_segs).start];
+    auto end = _verts[last(_contours).end - 1];
+    auto start = _verts[last(_contours).start];
 
     if (Math::epsilonEq(start, end, 0.001)) {
         _verts.popBack();
-        last(_segs).end--;
+        last(_contours).end--;
     }
 
-    last(_segs).close = true;
+    last(_contours).close = true;
 }
 
 [[gnu::flatten]] void Path::_flattenLineTo(Math::Vec2f p) {
@@ -24,18 +24,18 @@ void Path::_flattenClose() {
 }
 
 void Path::_flattenLineToNoTrans(Math::Vec2f p) {
-    if (not _segs.len()) {
+    if (not _contours.len()) {
         logError("path: move to must be called before line to");
         return;
     }
 
-    if (last(_segs).start != last(_segs).end and
+    if (last(_contours).start != last(_contours).end and
         Math::epsilonEq(last(_verts), p, 0.001)) {
         return;
     }
 
     _verts.pushBack(p);
-    last(_segs).end++;
+    last(_contours).end++;
 }
 
 [[gnu::flatten]] void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d) {
@@ -194,8 +194,8 @@ void Path::_flattenCubicToNoTrans(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, M
 // MARK: Operations --------------------------------------------------------
 
 void Path::evalOp(Op op) {
-    if (_segs.len() > 0 and
-        last(_segs).close and
+    if (_contours.len() > 0 and
+        last(_contours).close and
         op.code != MOVE_TO and
         op.code != CLEAR) {
         logError("path: can't evalOp on closed path");
@@ -213,7 +213,7 @@ void Path::evalOp(Op op) {
     case CLEAR:
         _lastCp = {};
         _lastP = {};
-        _segs.clear();
+        _contours.clear();
         _verts.clear();
         break;
 
@@ -222,7 +222,7 @@ void Path::evalOp(Op op) {
         break;
 
     case MOVE_TO:
-        _segs.pushBack({_verts.len(), _verts.len(), false});
+        _contours.pushBack({_verts.len(), _verts.len(), false});
         _flattenLineTo(op.p);
         break;
 

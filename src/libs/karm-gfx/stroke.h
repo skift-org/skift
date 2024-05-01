@@ -3,6 +3,7 @@
 #include <karm-math/shape.h>
 
 #include "path.h"
+#include "style.h"
 
 namespace Karm::Gfx {
 

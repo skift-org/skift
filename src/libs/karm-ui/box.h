@@ -11,7 +11,7 @@ struct BoxStyle {
     Math::Spacingi margin{};
     Math::Spacingi padding{};
 
-    Gfx::BorderRadius borderRadius{};
+    Math::Radiusf borderRadius{};
     f64 borderWidth{};
 
     Opt<Gfx::Paint> borderPaint{Gfx::ALPHA};
@@ -31,7 +31,7 @@ struct BoxStyle {
         return copy;
     }
 
-    BoxStyle withRadius(Gfx::BorderRadius borderRadius) const {
+    BoxStyle withRadius(Math::Radiusf borderRadius) const {
         auto copy = *this;
         copy.borderRadius = borderRadius;
         return copy;

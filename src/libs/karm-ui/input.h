@@ -119,7 +119,7 @@ struct ButtonStyle {
 
     static ButtonStyle destructive();
 
-    ButtonStyle withRadius(Gfx::BorderRadius radius) const;
+    ButtonStyle withRadius(Math::Radiusf radius) const;
 
     ButtonStyle withForegroundPaint(Gfx::Paint paint) const;
 

@@ -125,7 +125,7 @@ Child icon(Mdi::Icon icon, f64 size, Opt<Gfx::Color> color = NONE);
 
 Child image(Media::Image image);
 
-Child image(Media::Image image, Gfx::BorderRadius radius);
+Child image(Media::Image image, Math::Radiusf radius);
 
 // MARK: Canvas ----------------------------------------------------------------
 

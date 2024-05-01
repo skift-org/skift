@@ -225,7 +225,7 @@ void Context::fill(Math::Edgei edge, f64 thickness) {
     stroke(StrokeStyle().withWidth(thickness));
 }
 
-void Context::stroke(Math::Recti r, BorderRadius radius) {
+void Context::stroke(Math::Recti r, Math::Radiusf radius) {
     begin();
     rect(r.cast<f64>(), radius);
     stroke();
@@ -249,7 +249,7 @@ void Context::stroke(Math::Recti r, BorderRadius radius) {
     }
 }
 
-void Context::fill(Math::Recti r, BorderRadius radius) {
+void Context::fill(Math::Recti r, Math::Radiusf radius) {
     begin();
     rect(r.cast<f64>(), radius);
 
@@ -495,7 +495,7 @@ void Context::line(Math::Edgef line) {
     _path.line(line);
 }
 
-void Context::rect(Math::Rectf rect, BorderRadius radius) {
+void Context::rect(Math::Rectf rect, Math::Radiusf radius) {
     _path.rect(rect, radius);
 }
 

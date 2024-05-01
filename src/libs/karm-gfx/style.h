@@ -1,32 +1,12 @@
 #pragma once
 
+#include <karm-math/radius.h>
 #include <karm-math/vec.h>
 #include <karm-media/font.h>
 
 #include "paint.h"
 
 namespace Karm::Gfx {
-
-// MARK: Border Style ---------------------------------------------------------
-
-struct BorderRadius {
-    f64 topLeft{};
-    f64 topRight{};
-    f64 bottomRight{};
-    f64 bottomLeft{};
-
-    bool zero() const {
-        return topLeft == 0 and topRight == 0 and bottomRight == 0 and bottomLeft == 0;
-    }
-
-    BorderRadius() = default;
-
-    BorderRadius(f64 radius)
-        : topLeft(radius), topRight(radius), bottomRight(radius), bottomLeft(radius) {}
-
-    BorderRadius(f64 topLeft, f64 topRight, f64 bottomRight, f64 bottomLeft)
-        : topLeft(topLeft), topRight(topRight), bottomRight(bottomRight), bottomLeft(bottomLeft) {}
-};
 
 // MARK: Stroke Style ----------------------------------------------------------
 

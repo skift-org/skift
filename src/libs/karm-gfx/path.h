@@ -3,7 +3,6 @@
 #include <karm-base/enum.h>
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
-#include <karm-gfx/style.h>
 #include <karm-io/expr.h>
 #include <karm-io/sscan.h>
 #include <karm-math/const.h>
@@ -11,7 +10,6 @@
 #include <karm-math/ellipse.h>
 #include <karm-math/funcs.h>
 #include <karm-math/rect.h>
-#include <karm-math/trans.h>
 #include <karm-math/vec.h>
 
 namespace Karm::Gfx {
@@ -66,8 +64,7 @@ struct Path {
     };
 
     struct _Seg {
-        usize start{};
-        usize end{};
+        urange points;
         bool close{};
     };
 
@@ -83,18 +80,16 @@ struct Path {
 
     Math::Vec2f _lastCp;
     Math::Vec2f _lastP;
-    Math::Trans2f _trans = Math::Trans2f::identity();
 
     auto iterSegs() const {
         return Iter([&, i = 0uz] mutable -> Opt<Seg> {
-            if (i >= _segs.len()) {
+            if (i >= _segs.len())
                 return NONE;
-            }
 
             i++;
 
             return Seg{
-                sub(_verts, _segs[i - 1].start, _segs[i - 1].end),
+                sub(_verts, _segs[i - 1].points),
                 _segs[i - 1].close,
             };
         });
@@ -115,16 +110,6 @@ struct Path {
     void _flattenQuadraticTo(Math::Vec2f start, Math::Vec2f cp, Math::Vec2f point);
 
     void _flattenArcTo(Math::Vec2f start, Math::Vec2f radius, f64 angle, Flags flags, Math::Vec2f point);
-
-    // MARK: Transform ---------------------------------------------------------
-
-    void transform(Math::Trans2f trans) {
-        _trans = trans;
-    }
-
-    Math::Trans2f transform() {
-        return _trans;
-    }
 
     // MARK: Operations --------------------------------------------------------
 
@@ -156,7 +141,7 @@ struct Path {
 
     void line(Math::Edgef edge);
 
-    void rect(Math::Rectf rect, BorderRadius radius = 0);
+    void rect(Math::Rectf rect, Math::Radiusf radius = 0);
 
     void ellipse(Math::Ellipsef ellipse);
 

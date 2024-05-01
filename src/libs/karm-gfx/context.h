@@ -202,13 +202,13 @@ struct Context {
     void fill(Math::Edgei edge, f64 thickness = 1.0f);
 
     // Stroke a rectangle.
-    void stroke(Math::Recti rect, BorderRadius radius = 0);
+    void stroke(Math::Recti rect, Math::Radiusf radius = 0);
 
     // Fast path for filling simple rectangles without a border radius.
     void _fillRect(Math::Recti r, Gfx::Color color);
 
     // Fill a rectangle.
-    void fill(Math::Recti rect, BorderRadius radius = 0);
+    void fill(Math::Recti rect, Math::Radiusf radius = 0);
 
     // Stroke an ellipse.
     void stroke(Math::Ellipsei e);
@@ -298,7 +298,7 @@ struct Context {
     void line(Math::Edgef line);
 
     // Add a rectangle to the current path.
-    void rect(Math::Rectf rect, BorderRadius radius = 0);
+    void rect(Math::Rectf rect, Math::Radiusf radius = 0);
 
     // Add an ellipse to the current path.
     void ellipse(Math::Ellipsef ellipse);

@@ -34,6 +34,10 @@ struct Radius {
           bottomStart(bottomStart),
           bottomEnd(bottomEnd) {}
 
+    bool zero() const {
+        return topLeft == 0 and topRight == 0 and bottomRight == 0 and bottomLeft == 0;
+    }
+
     Radius clamp(T min, T max) const {
         return {
             clamp(topStart, min, max),

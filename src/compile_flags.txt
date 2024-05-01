@@ -30,3 +30,5 @@
 -D_THREAD_SAFE
 -I/usr/include/SDL2
 -I/opt/homebrew/include/SDL2
+-I/opt/homebrew/include
+-I/opt/homebrew/include/SDL2

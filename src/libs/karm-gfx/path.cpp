@@ -321,7 +321,7 @@ void Path::line(Math::Edgef edge) {
     lineTo(edge.end);
 }
 
-void Path::rect(Math::Rectf rect, BorderRadius radius) {
+void Path::rect(Math::Rectf rect, Math::Radiusf radius) {
     if (radius.zero()) {
         moveTo(rect.topStart());
         lineTo(rect.topEnd());

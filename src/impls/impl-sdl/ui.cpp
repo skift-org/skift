@@ -28,8 +28,8 @@ struct SdlHost :
         return {w, h};
     }
 
-    double dpi() {
-        return pixels().width() / bound().width;
+    f64 dpi() {
+        return pixels().width() / (f64)bound().width;
     }
 
     Gfx::MutPixels mutPixels() override {
@@ -364,7 +364,6 @@ struct SdlHost :
             );
 
             _lastScreenMousePos = screenPos.cast<isize>();
-
             break;
         }
 
@@ -518,7 +517,7 @@ Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
         SDL_WINDOWPOS_UNDEFINED,
         size.width,
         size.height,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS
+        SDL_WINDOW_SHOWN  | SDL_WINDOW_ALLOW_HIGHDPI  | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS
     );
 
     if (not window)

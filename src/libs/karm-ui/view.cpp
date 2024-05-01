@@ -318,12 +318,12 @@ Child icon(Mdi::Icon i, f64 size, Opt<Gfx::Color> color) {
 
 struct Image : public View<Image> {
     Media::Image _image;
-    Opt<Gfx::BorderRadius> _radius;
+    Opt<Math::Radiusf> _radius;
 
     Image(Media::Image image)
         : _image(image) {}
 
-    Image(Media::Image image, Gfx::BorderRadius radius)
+    Image(Media::Image image, Math::Radiusf radius)
         : _image(image), _radius(radius) {}
 
     void paint(Gfx::Context &g, Math::Recti) override {
@@ -350,7 +350,7 @@ Child image(Media::Image image) {
     return makeStrong<Image>(image);
 }
 
-Child image(Media::Image image, Gfx::BorderRadius radius) {
+Child image(Media::Image image, Math::Radiusf radius) {
     return makeStrong<Image>(image, radius);
 }
 

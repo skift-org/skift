@@ -144,7 +144,7 @@ ButtonStyle ButtonStyle::destructive() {
     };
 }
 
-ButtonStyle ButtonStyle::withRadius(Gfx::BorderRadius radius) const {
+ButtonStyle ButtonStyle::withRadius(Math::Radiusf radius) const {
     return {
         idleStyle.withRadius(radius),
         hoverStyle.withRadius(radius),

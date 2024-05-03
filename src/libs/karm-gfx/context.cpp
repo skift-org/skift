@@ -267,7 +267,7 @@ void Context::fill(Math::Vec2i pos, Media::Icon icon) {
 }
 
 void Context::stroke(Math::Vec2f baseline, Media::Glyph glyph) {
-    auto &f = textFont();
+    auto f = textFont();
 
     _useSpaa = true;
     save();
@@ -281,7 +281,7 @@ void Context::stroke(Math::Vec2f baseline, Media::Glyph glyph) {
 }
 
 void Context::fill(Math::Vec2f baseline, Media::Glyph glyph) {
-    auto &f = textFont();
+    auto f = textFont();
 
     _useSpaa = true;
     save();
@@ -303,7 +303,7 @@ void Context::fill(Math::Vec2f baseline, Rune rune) {
 }
 
 void Context::stroke(Math::Vec2f baseline, Str str) {
-    auto &f = textFont();
+    auto f = textFont();
 
     bool first = true;
     Media::Glyph prev{0};
@@ -321,7 +321,7 @@ void Context::stroke(Math::Vec2f baseline, Str str) {
 }
 
 void Context::fill(Math::Vec2f baseline, Str str) {
-    auto &f = textFont();
+    auto f = textFont();
 
     bool first = true;
     Media::Glyph prev{0};

@@ -464,8 +464,10 @@ struct SdlHost :
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
+        g.save();
         g.scale(dpi());
         Ui::Host::paint(g, r);
+        g.restore();
     }
 
     Res<> wait(TimeStamp ts) override {

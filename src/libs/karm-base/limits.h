@@ -119,9 +119,9 @@ struct Limits<unsigned long long> {
 #ifndef __ck_freestanding__
 template <>
 struct Limits<float> {
-    static constexpr float LOWEST = -__FLT_MAX__;
-    static constexpr float MIN_NORMAL = __FLT_MIN__;
-    static constexpr float MIN_DENORMAL = __FLT_DENORM_MIN__;
+    static constexpr float MIN = -__FLT_MAX__;
+    static constexpr float SMALLEST_NORMAL = __FLT_MIN__;
+    static constexpr float SMALLEST_DENORMAL = __FLT_DENORM_MIN__;
     static constexpr float MAX = __FLT_MAX__;
     static constexpr float EPSILON = __FLT_EPSILON__;
     static constexpr bool SIGNED = true;
@@ -130,9 +130,9 @@ struct Limits<float> {
 
 template <>
 struct Limits<double> {
-    static constexpr double LOWEST = -__DBL_MAX__;
-    static constexpr double MIN_NORMAL = __DBL_MIN__;
-    static constexpr double MIN_DENORMAL = __DBL_DENORM_MIN__;
+    static constexpr double MIN = -__DBL_MAX__;
+    static constexpr double SMALLEST_NORMAL = __DBL_MIN__;
+    static constexpr double SMALLEST_DENORMAL = __DBL_DENORM_MIN__;
     static constexpr double MAX = __DBL_MAX__;
     static constexpr double EPSILON = __DBL_EPSILON__;
     static constexpr bool SIGNED = true;
@@ -141,9 +141,9 @@ struct Limits<double> {
 
 template <>
 struct Limits<long double> {
-    static constexpr long double LOWEST = -__LDBL_MAX__;
-    static constexpr long double MIN_NORMAL = __LDBL_MIN__;
-    static constexpr long double MIN_DENORMAL = __LDBL_DENORM_MIN__;
+    static constexpr long double MIN = -__LDBL_MAX__;
+    static constexpr long double SMALLEST_NORMAL = __LDBL_MIN__;
+    static constexpr long double SMALLEST_DENORMAL = __LDBL_DENORM_MIN__;
     static constexpr long double MAX = __LDBL_MAX__;
     static constexpr long double EPSILON = __LDBL_EPSILON__;
     static constexpr bool SIGNED = true;

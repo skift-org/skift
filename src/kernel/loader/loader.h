@@ -19,6 +19,7 @@ struct Blob {
         if (json.isStr())
             return Ok(Blob{
                 .url = Mime::Url::parse(json.asStr()),
+                .props = NONE,
             });
 
         if (not json.isObject())

@@ -70,9 +70,9 @@ enum struct PixelFormat : u16 {
 
 struct Record {
     Tag tag;
-    u32 flags;
-    u64 start;
-    u64 size;
+    u32 flags = 0;
+    u64 start = 0;
+    u64 size = 0;
 
     char const *name() const {
         return tagName(tag);

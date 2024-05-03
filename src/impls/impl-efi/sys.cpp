@@ -12,6 +12,17 @@
 
 namespace Karm::Sys::_Embed {
 
+static TimeStamp fromEfi(Efi::Time time) {
+    DateTime dt;
+    dt.date.year = time.year;
+    dt.date.month = time.month;
+    dt.date.day = time.day;
+    dt.time.hour = time.hour;
+    dt.time.minute = time.minute;
+    dt.time.second = time.second;
+    return dt.toTimeStamp();
+}
+
 struct ConOut : public Sys::Fd {
     Efi::SimpleTextOutputProtocol *_proto;
 
@@ -168,6 +179,9 @@ struct FileProto : public Sys::Fd {
         return Ok<Stat>(Stat{
             .type = info->attribute & EFI_FILE_DIRECTORY ? Stat::DIR : Stat::FILE,
             .size = info->fileSize,
+            .accessTime = fromEfi(info->lastAccessTime),
+            .modifyTime = fromEfi(info->modificationTime),
+            .changeTime = fromEfi(info->createTime),
         });
     }
 

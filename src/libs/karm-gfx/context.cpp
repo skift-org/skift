@@ -57,53 +57,28 @@ void Context::restore() {
 
 // MARK: Origin & Clipping -----------------------------------------------------
 
-Math::Recti Context::clip() const {
-    return current().clip;
-}
-
-Math::Vec2i Context::origin() const {
-    return current().origin;
-}
-
-Math::Recti Context::applyOrigin(Math::Recti rect) const {
-    return {rect.xy + origin(), rect.wh};
-}
-
-Math::Vec2i Context::applyOrigin(Math::Vec2i pos) const {
-    return pos + origin();
-}
-
-Math::Recti Context::applyClip(Math::Recti rect) const {
-    return rect.clipTo(clip());
-}
-
-Math::Recti Context::applyAll(Math::Recti rect) const {
-    return applyClip(applyOrigin(rect));
-}
-
 void Context::clip(Math::Recti rect) {
-    current().clip = applyAll(rect);
+    current().clip = current().trans.apply(rect.cast<f64>()).cast<isize>().clipTo(current().clip);
 }
 
 void Context::origin(Math::Vec2i pos) {
-    current().origin = applyOrigin(pos);
-    _updateTransform();
+    translate(pos.cast<f64>());
 }
 
 // MARK: Transform -------------------------------------------------------------
 
 void Context::transform(Math::Trans2f trans) {
     auto &t = current().trans;
-    t = t.multiply(trans);
+    t = trans.multiply(t);
     _updateTransform();
 }
 
 void Context::translate(Math::Vec2f pos) {
-    transform(Math::Trans2f::translate(pos.x, pos.y));
+    transform(Math::Trans2f::translate(pos));
 }
 
 void Context::scale(Math::Vec2f pos) {
-    transform(Math::Trans2f::scale(pos.x, pos.y));
+    transform(Math::Trans2f::scale(pos));
 }
 
 void Context::rotate(f64 angle) {
@@ -111,7 +86,7 @@ void Context::rotate(f64 angle) {
 }
 
 void Context::skew(Math::Vec2f pos) {
-    transform(Math::Trans2f::skew(pos.x, pos.y));
+    transform(Math::Trans2f::skew(pos));
 }
 
 void Context::identity() {
@@ -152,7 +127,7 @@ Context &Context::textFont(Media::Font font) {
 void Context::clear(Color color) { clear(pixels().bound(), color); }
 
 void Context::clear(Math::Recti rect, Color color) {
-    rect = applyAll(rect);
+    rect = current().trans.apply(rect.cast<f64>()).cast<isize>(),
     mutPixels()
         .clip(rect)
         .clear(color);
@@ -165,8 +140,8 @@ void Context::clear(Math::Recti rect, Color color) {
     MutPixels dest, Math::Recti destRect, auto destFmt
 ) {
 
-    destRect = applyOrigin(destRect);
-    auto clipDest = applyClip(destRect);
+    destRect = current().trans.apply(destRect.cast<f64>()).cast<isize>();
+    auto clipDest = current().clip.clipTo(destRect);
 
     auto hratio = srcRect.height / (f64)destRect.height;
     auto wratio = srcRect.width / (f64)destRect.width;
@@ -232,7 +207,9 @@ void Context::stroke(Math::Recti r, Math::Radiusf radius) {
 }
 
 [[gnu::flatten]] void Context::_fillRect(Math::Recti r, Gfx::Color color) {
-    r = applyAll(r);
+    r = current().trans.apply(r.cast<f64>()).cast<isize>();
+    r = current().clip.clipTo(r);
+
     if (color.alpha == 255) {
         mutPixels()
             .clip(r)
@@ -295,8 +272,8 @@ void Context::stroke(Math::Vec2f baseline, Media::Glyph glyph) {
     _useSpaa = true;
     save();
     begin();
-    scale(f.scale());
     translate(baseline);
+    scale(f.scale());
     f.fontface->contour(*this, glyph);
     stroke();
     restore();
@@ -309,8 +286,8 @@ void Context::fill(Math::Vec2f baseline, Media::Glyph glyph) {
     _useSpaa = true;
     save();
     begin();
-    scale(f.scale());
     translate(baseline);
+    scale(f.scale());
     f.fontface->contour(*this, glyph);
     fill();
     restore();
@@ -364,8 +341,8 @@ void Context::fill(Math::Vec2f baseline, Str str) {
 // MARK: Debug -----------------------------------------------------------------
 
 void Context::plot(Math::Vec2i point, Color color) {
-    point = applyOrigin(point);
-    if (clip().contains(point)) {
+    point = current().trans.apply(point.cast<f64>()).cast<isize>();
+    if (current().clip.contains(point)) {
         mutPixels().blend(point, color);
     }
 }
@@ -404,7 +381,7 @@ void Context::plot(Math::Recti rect, Color color) {
 }
 
 void Context::plot(Gfx::Color color) {
-    for (auto edge : _rast.poly()) {
+    for (auto edge : _poly) {
         plot(edge.cast<isize>(), color);
     }
 }
@@ -412,7 +389,7 @@ void Context::plot(Gfx::Color color) {
 // MARK: Paths -----------------------------------------------------------------
 
 [[gnu::flatten]] void Context::_fillImpl(auto paint, auto format, FillRule fillRule) {
-    _rast.fill(clip(), fillRule, [&](Rast::Frag frag) {
+    _rast.fill(_poly, current().clip, fillRule, [&](Rast::Frag frag) {
         u8 *pixel = static_cast<u8 *>(mutPixels().pixelUnsafe(frag.xy));
         auto color = paint.sample(frag.uv);
         auto c = format.load(pixel);
@@ -424,9 +401,10 @@ void Context::plot(Gfx::Color color) {
 [[gnu::flatten]] void Context::_FillSmoothImpl(auto paint, auto format, FillRule fillRule) {
     Math::Vec2f last = {0, 0};
     auto fillComponent = [&](auto comp, Math::Vec2f pos) {
-        _rast.poly().offset(pos - last);
+        _poly.offset(pos - last);
         last = pos;
-        _rast.fill(clip(), fillRule, [&](Rast::Frag frag) {
+
+        _rast.fill(_poly, current().clip, fillRule, [&](Rast::Frag frag) {
             u8 *pixel = static_cast<u8 *>(mutPixels().pixelUnsafe(frag.xy));
             auto color = paint.sample(frag.uv);
             auto c = format.load(pixel);
@@ -508,8 +486,8 @@ void Context::fill(FillRule rule) {
 }
 
 void Context::fill(Paint paint, FillRule rule) {
-    _rast.clear();
-    createSolid(_rast.poly(), _path);
+    _poly.clear();
+    createSolid(_poly, _path);
     _fill(paint, rule);
 }
 
@@ -518,8 +496,8 @@ void Context::stroke() {
 }
 
 void Context::stroke(StrokeStyle style) {
-    _rast.clear();
-    createStroke(_rast.poly(), _path, style);
+    _poly.clear();
+    createStroke(_poly, _path, style);
     _fill(style.paint);
 }
 
@@ -530,7 +508,10 @@ void Context::apply(Filter filter) {
 }
 
 void Context::apply(Filter filter, Math::Recti r) {
-    filter.apply(mutPixels().clip(applyAll(r)));
+    r = current().trans.apply(r.cast<f64>()).cast<isize>();
+    r = current().clip.clipTo(r);
+
+    filter.apply(mutPixels().clip(r));
 }
 
 } // namespace Karm::Gfx

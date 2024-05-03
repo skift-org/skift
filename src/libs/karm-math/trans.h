@@ -29,29 +29,96 @@ union Trans2 {
 
     Array<T, 6> _els{};
 
+    bool rotated() const {
+        return xx * yy - xy * yx < 0;
+    }
+
+    bool skewed() const {
+        return xx * yy - xy * yx != 1;
+    }
+
+    bool scaled() const {
+        return xx != 1 or yy != 1;
+    }
+
+    bool translated() const {
+        return ox != 0 or oy != 0;
+    }
+
+    bool simple() const {
+        return not rotated() and not skewed();
+    }
+
+    constexpr Trans2()
+        : _els{
+              1, 0,
+              0, 1,
+              0, 0
+          } {}
+
     constexpr Trans2(T xx, T xy, T yx, T yy, T ox, T oy)
         : _els{xx, xy, yx, yy, ox, oy} {}
 
     static constexpr Trans2 identity() {
-        return {1, 0, 0, 1, 0, 0};
+        return {
+            1, 0,
+            0, 1,
+            0, 0
+        };
     }
 
     static constexpr Trans2 rotate(T angle) {
         T c = cos(angle);
         T s = sin(angle);
-        return {c, -s, s, c, 0, 0};
+        return {
+            c, -s,
+            s, c,
+            0, 0
+        };
     }
 
     static constexpr Trans2 skew(T x, T y) {
-        return {1, x, y, 1, 0, 0};
+        return {
+            1, x,
+            y, 1,
+            0, 0
+        };
+    }
+
+    static constexpr Trans2 skew(Vec2<T> v) {
+        return skew(v.x, v.y);
     }
 
     static constexpr Trans2 scale(T x, T y) {
-        return {x, 0, 0, y, 0, 0};
+        return {
+            x, 0,
+            0, y,
+            0, 0
+        };
+    }
+
+    static constexpr Trans2 scale(T s) {
+        return scale(s, s);
+    }
+
+    static constexpr Trans2 scale(Vec2<T> v) {
+        return scale(v.x, v.y);
     }
 
     static constexpr Trans2 translate(T x, T y) {
-        return {1, 0, 0, 1, x, y};
+        return {
+            1, 0,
+            0, 1,
+            x, y
+        };
+    }
+
+    static constexpr Trans2 translate(Vec2<T> v) {
+        return {
+            1, 0,
+            0, 1,
+            v.x, v.y
+        };
     }
 
     constexpr Vec2<T> applyVector(Vec2<T> v) const {
@@ -70,7 +137,10 @@ union Trans2 {
     }
 
     constexpr Rect<T> apply(Rect<T> r) const {
-        return Rect<T>::fromTwoPoint(apply(r.topStart()), apply(r.bottomEnd()));
+        return Rect<T>::fromTwoPoint(
+            apply(r.topStart()),
+            apply(r.bottomEnd())
+        );
     }
 
     constexpr Trans2 multiply(Trans2 const &other) const {
@@ -119,12 +189,10 @@ union Trans2 {
     constexpr Trans2 inverse() const {
         T det = xx * yy - xy * yx;
         return {
-            yy / det,
-            -xy / det,
-            -yx / det,
-            xx / det,
+            yy / det, -xy / det,
+            -yx / det, xx / det,
             (oy * yy - ox * yx) / det,
-            (ox * xy - oy * xx) / det,
+            (ox * xy - oy * xx) / det
         };
     }
 

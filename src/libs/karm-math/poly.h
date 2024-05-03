@@ -8,19 +8,22 @@ namespace Karm::Math {
 template <typename T>
 struct Poly {
     Vec<Edge<T>> _edges{};
+    Opt<Rect<T>> _bound;
 
     Poly() = default;
 
-    Rect<T> bound() const {
-        Opt<Rect<T>> bound{};
-        for (auto const &edge : *this) {
-            if (bound) {
-                bound = bound->mergeWith(edge.bound());
-            } else {
-                bound = edge.bound();
-            }
-        }
-        return tryOr(bound, {});
+    Rect<T> bound() {
+        if (len() == 0)
+            return {};
+
+        if (_bound)
+            return *_bound;
+
+        Rect<T> res = _edges[0].bound();
+        for (auto const &edge : *this)
+            res = res.mergeWith(edge.bound());
+        _bound = res;
+        return *_bound;
     }
 
     Edgef const &operator[](usize i) const {
@@ -46,10 +49,12 @@ struct Poly {
     void add(Edge<T> edge) {
         if (edge.hasNan()) [[unlikely]]
             panic("nan in edge");
+        _bound = NONE;
         _edges.add(edge);
     }
 
     void offset(Vec2<T> off) {
+        _bound = NONE;
         for (auto &e : _edges) {
             e = e + off;
         }
@@ -57,6 +62,7 @@ struct Poly {
 
     void clear() {
         _edges.clear();
+        _bound = NONE;
     }
 };
 

@@ -20,6 +20,12 @@ union Rect {
 
     Array<T, 4> _els;
 
+    static Rect const ZERO;
+
+    static Rect const ONE;
+
+    static Rect const MAX;
+
     always_inline constexpr Rect()
         : x(0), y(0), width(0), height(0) {
     }
@@ -241,6 +247,15 @@ union Rect {
         return {x + v.x, y + v.y, width, height};
     }
 };
+
+template <typename T>
+constexpr Rect<T> const Rect<T>::ZERO = {};
+
+template <typename T>
+constexpr Rect<T> const Rect<T>::ONE = {1, 1};
+
+template <typename T>
+constexpr Rect<T> const Rect<T>::MAX = {Limits<T>::MAX, Limits<T>::MAX};
 
 using Recti = Rect<isize>;
 

@@ -27,18 +27,14 @@ struct Context {
         StrokeStyle strokeStyle{};
         Media::Font textFont = Media::Font::fallback();
 
-        Math::Vec2i origin{};
         Math::Recti clip{};
         Math::Trans2f trans = Math::Trans2f::identity();
-
-        Math::Trans2f transWithOrigin() {
-            return trans.translated(origin.x, origin.y);
-        }
     };
 
     Opt<MutPixels> _pixels{};
     Vec<Scope> _stack{};
     Path _path{};
+    Math::Polyf _poly;
     Rast _rast{};
     LcdLayout _lcdLayout = RGB;
     bool _useSpaa = false;
@@ -89,28 +85,10 @@ struct Context {
         _pixels = layer.mutPixels();
         inner(*this);
         _pixels = old;
-        blit(offset - origin(), layer.pixels());
+        blit(offset, layer.pixels());
     }
 
     // MARK: Origin & Clipping -------------------------------------------------
-
-    // Get the current clipping rectangle.
-    Math::Recti clip() const;
-
-    // Get the current origin.
-    Math::Vec2i origin() const;
-
-    // Apply the current origin to a rectangle.
-    Math::Recti applyOrigin(Math::Recti rect) const;
-
-    // Apply the current origin to a point.
-    Math::Vec2i applyOrigin(Math::Vec2i pos) const;
-
-    // Apply the current clipping rectangle to a rectangle.
-    Math::Recti applyClip(Math::Recti rect) const;
-
-    // Apply the current origin and clipping rectangle to a rectangle.
-    Math::Recti applyAll(Math::Recti rect) const;
 
     // Set the current clipping rectangle.
     void clip(Math::Recti rect);
@@ -121,7 +99,7 @@ struct Context {
     // MARK: Transform ---------------------------------------------------------
 
     void _updateTransform() {
-        _path.transform(current().transWithOrigin());
+        _path.transform(current().trans);
     }
 
     // Transform subsequent drawing operations using the given matrix.

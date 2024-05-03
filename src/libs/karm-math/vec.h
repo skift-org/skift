@@ -19,6 +19,12 @@ union Vec2 {
         T width, height;
     };
 
+    static Vec2 const ZERO;
+
+    static Vec2 const ONE;
+
+    static Vec2 const MAX;
+
     Array<T, 2> _els;
 
     constexpr Vec2()
@@ -183,6 +189,15 @@ template <typename T>
 Vec2<T> operator/(T const &lhs, Vec2<T> const &rhs) {
     return rhs / lhs;
 }
+
+template <typename T>
+constexpr Vec2<T> const Vec2<T>::ZERO = {};
+
+template <typename T>
+constexpr Vec2<T> const Vec2<T>::ONE = {1};
+
+template <typename T>
+constexpr Vec2<T> const Vec2<T>::MAX = {Limits<T>::MAX};
 
 using Vec2i = Vec2<isize>;
 

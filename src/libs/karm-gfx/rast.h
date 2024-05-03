@@ -26,14 +26,9 @@ struct Rast {
         f64 a;
     };
 
-    Math::Polyf _poly{};
     Vec<Active> _active{};
     Vec<irange> _ranges;
     Vec<f64> _scanline{};
-
-    Math::Polyf &poly() {
-        return _poly;
-    }
 
     void _appendRange(irange range) {
         usize i = 0;
@@ -56,12 +51,8 @@ struct Rast {
         _ranges.pushBack(range);
     }
 
-    void clear() {
-        _poly.clear();
-    }
-
-    void fill(Math::Recti clip, FillRule fillRule, auto cb) {
-        auto polyBound = _poly.bound().grow(UNIT);
+    void fill(Math::Polyf &poly, Math::Recti clip, FillRule fillRule, auto cb) {
+        auto polyBound = poly.bound().grow(UNIT);
         auto clipBound = polyBound
                              .ceil()
                              .cast<isize>()
@@ -76,7 +67,7 @@ struct Rast {
             for (f64 yy = y; yy < y + 1.0; yy += UNIT) {
                 _active.clear();
 
-                for (auto &edge : _poly) {
+                for (auto &edge : poly) {
                     auto sample = yy + HALF_UNIT;
 
                     if (edge.bound().top() <= sample and sample < edge.bound().bottom()) {

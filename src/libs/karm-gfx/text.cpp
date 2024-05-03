@@ -186,19 +186,18 @@ void Text::paint(Context &ctx) const {
     if (_style.color)
         ctx.fillStyle(*_style.color);
 
-    auto clip = ctx.clip();
-    auto origin = ctx.origin();
+    auto clip = ctx.current().clip;
 
     auto si = tryOr(
         searchLowerBound(_lines, [&](auto &line) {
-            return line.baseline + origin.y <=> clip.top() - m.ascend;
+            return line.baseline + clip.top() <=> clip.top() - m.ascend;
         }),
         0
     );
 
     auto ei = tryOr(
         searchUpperBound(_lines, [&](auto &line) {
-            return line.baseline + origin.y <=> clip.bottom() + m.lineheight();
+            return line.baseline + clip.top() <=> clip.bottom() + m.lineheight();
         }),
         _lines.len()
     );

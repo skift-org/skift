@@ -11,7 +11,7 @@ Res<Strong<Space>> Space::create() {
 }
 
 Space::Space(Strong<Hal::Vmm> vmm) : _vmm(vmm) {
-    _alloc.unused({Hal::PAGE_SIZE, 0x800000000000});
+    _ranges.add({Hal::PAGE_SIZE, 0x800000000000});
 }
 
 Space::~Space() {
@@ -69,10 +69,10 @@ Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<Vmo> vmo, usize off, 
     }
 
     if (vrange.start == 0) {
-        vrange = try$(_alloc.alloc(vrange.size));
+        vrange = try$(_ranges.take(vrange.size));
     } else {
         try$(_ensureNotMapped(vrange));
-        _alloc.used(vrange);
+        _ranges.remove(vrange);
     }
 
     Map map = {vrange, off, std::move(vmo)};
@@ -97,7 +97,7 @@ Res<> Space::unmap(Hal::VmmRange vrange) {
     try$(_vmm->free(map.vrange));
     try$(_vmm->flush(map.vrange));
 
-    _alloc.unused(map.vrange);
+    _ranges.add(map.vrange);
     _maps.removeAt(id);
     return Ok();
 }

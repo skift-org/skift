@@ -7,10 +7,18 @@
 namespace Karm {
 
 template <typename R = urange>
-struct RangeAlloc {
+struct Ranges {
     Vec<R> _r;
 
-    void used(R range) {
+    Slice<R> ranges() {
+        return _r;
+    }
+
+    void clear() {
+        _r.clear();
+    }
+
+    void remove(R range) {
         for (usize i = 0; i < _r.len(); i++) {
             R curr = _r[i];
 
@@ -36,7 +44,7 @@ struct RangeAlloc {
         }
     }
 
-    Res<R> alloc(usize size) {
+    Res<R> take(usize size) {
         for (usize i = 0; i < _r.len(); i++) {
             if (_r[i].size == size) {
                 R result = _r[i];
@@ -55,23 +63,23 @@ struct RangeAlloc {
         return Error::outOfMemory();
     }
 
-    void compress(usize start) {
-        while (start + 1 < _r.len() and _r[start].contigous(_r[start + 1])) {
-            _r[start] = _r[start].merge(_r[start + 1]);
-            _r.removeAt(start + 1);
+    void _compress(usize i) {
+        while (i + 1 < _r.len() and _r[i].contigous(_r[i + 1])) {
+            _r[i] = _r[i].merge(_r[i + 1]);
+            _r.removeAt(i + 1);
         }
 
-        while (start > 0 and _r[start].contigous(_r[start - 1])) {
-            _r[start] = _r[start].merge(_r[start - 1]);
-            _r.removeAt(start - 1);
+        while (i > 0 and _r[i].contigous(_r[i - 1])) {
+            _r[i] = _r[i].merge(_r[i - 1]);
+            _r.removeAt(i - 1);
         }
     }
 
-    void unused(R range) {
+    void add(R range) {
         for (usize i = 0; i < _r.len(); i++) {
             if (_r[i].contigous(range)) {
                 _r[i] = _r[i].merge(range);
-                compress(i);
+                _compress(i);
                 return;
             }
 

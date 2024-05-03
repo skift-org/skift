@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/range-alloc.h>
+#include <karm-base/ranges.h>
 
 #include "object.h"
 #include "vmo.h"
@@ -19,7 +19,7 @@ struct Space : public BaseObject<Space, Hj::Type::SPACE> {
     };
 
     Strong<Hal::Vmm> _vmm;
-    RangeAlloc<Hal::VmmRange> _alloc;
+    Ranges<Hal::VmmRange> _ranges;
     Vec<Map> _maps;
 
     static Res<Strong<Space>> create();

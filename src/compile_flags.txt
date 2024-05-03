@@ -1,5 +1,4 @@
 -xc++
--O3
 -std=gnu++2b
 -fno-exceptions
 -fno-rtti
@@ -28,5 +27,7 @@
 -D__ck_karm_cli_backend_ansi__
 
 -D_THREAD_SAFE
+-I/opt/homebrew/include/SDL2
+-I/opt/homebrew/include
 -I/usr/include/SDL2
 -I/opt/homebrew/include/SDL2

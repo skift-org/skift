@@ -5,10 +5,14 @@
 
 namespace Mdi {
 
-enum struct Icon {
-#define ICON(id, name, code) id = code,
-#include "defs/icons.inc"
-#undef ICON
+enum struct Icon : Rune {
+
+// NOTE: Clangd choke on this enum definition
+#ifndef __clangd__
+#    define ICON(id, name, code) id = code,
+#    include "defs/icons.inc"
+#    undef ICON
+#endif
 };
 
 using enum Icon;

@@ -9,9 +9,21 @@ namespace Hideo {
 
 // MARK: Dialogs Scaffolding ---------------------------------------------------
 
+Ui::Child dialogTitle(String title) {
+    return Ui::vflow(
+        Ui::hflow(
+            Ui::titleSmall(title) | Ui::vcenter(),
+            Ui::grow(NONE),
+            button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::CLOSE)
+        ) |
+            Ui::spacing({16, 4, 4, 4}),
+        Ui::separator()
+    );
+}
+
 Ui::Child dialogScafold(Math::Align a, Ui::Child inner) {
     Ui::BoxStyle const boxStyle = {
-        .borderRadius = 4,
+        .borderRadius = 8,
         .borderWidth = 1,
         .borderPaint = Ui::GRAY800,
         .backgroundPaint = Ui::GRAY900,
@@ -28,11 +40,9 @@ Ui::Child dialogScafold(Math::Align a, Ui::Child inner) {
 Ui::Child dialogScafold(Math::Align a, Ui::Child content, Ui::Children actions) {
     auto layout =
         Ui::vflow(
-            8,
             content | Ui::grow(),
-            hflow(8, actions)
-        ) |
-        Ui::spacing(16);
+            hflow(8, actions) | Ui::spacing(8)
+        );
 
     return dialogScafold(a, layout);
 }
@@ -77,34 +87,35 @@ Ui::Child licenseDialog() {
             Math::Align::CENTER |
             Math::Align::TOP_START,
         Ui::vflow(
-            8,
-            Ui::titleLarge("License"),
+            dialogTitle("License"s),
             Ui::bodySmall(LICENSE) |
+                Ui::spacing(16) |
                 Ui::vscroll() |
                 Ui::maxSize({480, Ui::UNCONSTRAINED}) |
                 Ui::grow()
-        ),
-        {Ui::grow(NONE), dialogCloseButton()}
+        )
     );
 }
 
 Ui::Child aboutDialog(Mdi::Icon i, String name) {
-    auto content = Ui::vflow(
+    auto content =
         Ui::vflow(
-            8,
-            Math::Align::CENTER,
-            spacing(8, Ui::icon(i, 56)),
-            Ui::titleLarge(name),
-            versionBadge()
-        ),
-        Ui::text(
-            Ui::TextStyles::bodySmall()
-                .withAlign(Gfx::TextAlign::CENTER)
-                .withColor(Ui::GRAY400),
-            "Copyright © 2018-2024\nThe skiftOS Developers\nAll rights reserved."
+            16,
+            Ui::vflow(
+                8,
+                Math::Align::CENTER,
+                Ui::icon(i, 56) | Ui::spacing(8),
+                Ui::titleLarge(name),
+                versionBadge()
+            ),
+            Ui::text(
+                Ui::TextStyles::bodySmall()
+                    .withAlign(Gfx::TextAlign::CENTER)
+                    .withColor(Ui::GRAY400),
+                "Copyright © 2018-2024\nThe skiftOS Developers\nAll rights reserved."
+            )
         ) |
-            Ui::spacing(16)
-    );
+        Ui::spacing(16);
 
     Ui::Children actions = {
         button(

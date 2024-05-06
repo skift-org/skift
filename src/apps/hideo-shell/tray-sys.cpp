@@ -3,6 +3,7 @@
 #include <karm-ui/box.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/layout.h>
+#include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
 #include "app.h"
@@ -23,10 +24,10 @@ Ui::Child quickSetting(QuickSettingProps props) {
                      : Ui::ButtonStyle::secondary();
 
     auto primaryStyle = props.more
-                            ? style.withRadius({4, 0, 0, 4})
+                            ? style.withRadius({4, 0, 4, 0})
                             : style;
 
-    auto secondaryStyle = style.withRadius({0, 4, 4, 0});
+    auto secondaryStyle = style.withRadius({0, 4, 0, 4});
 
     auto primary = [&] {
         if (props.name)
@@ -233,16 +234,16 @@ Ui::Child noti(Noti const &noti, usize i) {
 Ui::Child notifications(State const &state) {
     if (not state.noti.len()) {
         return Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), "No notifications") |
-               Ui::center() |
-               Ui::grow();
+               Ui::center();
     }
 
     return Ui::vflow(
-        8,
-        iter(state.noti)
-            .mapi(noti)
-            .collect<Ui::Children>()
-    );
+               8,
+               iter(state.noti)
+                   .mapi(noti)
+                   .collect<Ui::Children>()
+           ) |
+           Ui::vscroll();
 }
 
 Ui::Child sysPanel(State const &state) {
@@ -255,7 +256,7 @@ Ui::Child notiPanel(State const &state) {
                8,
                Ui::labelMedium("Notifications") |
                    Ui::spacing({12, 6, 0, 0}),
-               notifications(state)
+               notifications(state) | Ui::grow()
            ) |
            panel({500, 400});
 }

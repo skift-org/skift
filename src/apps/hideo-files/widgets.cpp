@@ -68,8 +68,7 @@ Ui::Child directoryListing(State const &, Sys::Dir const &dir) {
 
     return Ui::vflow(children) |
            Ui::align(Math::Align::TOP | Math::Align::HFILL) |
-           Ui::vscroll() |
-           Ui::grow();
+           Ui::vscroll();
 }
 
 Ui::Child breadcrumbItem(Str text, isize index) {
@@ -208,56 +207,36 @@ Ui::Child toolbar(State const &state) {
 Ui::Child openFileDialog() {
     return Ui::reducer<Model>(
         {"file:/"_url},
-        [](auto d) {
+        [](auto const &d) {
             auto maybeDir = Sys::Dir::open(d.currentUrl());
 
-            auto titleLbl = Ui::titleLarge("Open File");
-
             auto msgLbl = Ui::titleMedium("Select a file to open.");
-
-            auto titleBar =
-                Ui::vflow(8, titleLbl, msgLbl) |
-                Ui::spacing(16);
 
             auto openBtn = Ui::button(
                 Ui::closeDialog,
                 Ui::ButtonStyle::primary(), "Open"
             );
 
-            auto cancelBtn = Ui::button(
-                Ui::closeDialog,
-                Ui::ButtonStyle::subtle(), "Cancel"
-            );
-
-            auto controls = Ui::spacing(
-                16,
-                Ui::hflow(
-                    8,
-                    Ui::grow(NONE),
-                    cancelBtn,
-                    openBtn
-                )
-            );
-
             return dialogScafold(
                 Math::Align::FILL,
                 Ui::vflow(
-                    Ui::grow(
-                        Ui::vflow(
-                            titleBar,
-                            toolbar(d),
-                            maybeDir
-                                ? directoryListing(d, maybeDir.unwrap())
-                                : alert(
-                                      d,
-                                      "Can't access location"s,
-                                      Io::toStr(maybeDir.none()).unwrap()
-                                  ),
-                            Ui::separator()
-                        )
-                    ),
-                    controls
-                )
+                    dialogTitle("Open file…"s),
+                    toolbar(d),
+                    maybeDir
+                        ? directoryListing(d, maybeDir.unwrap()) |
+                              Ui::grow()
+                        : alert(
+                              d,
+                              "Can't access this location"s,
+                              Io::toStr(maybeDir.none()).unwrap()
+                          ) |
+                              Ui::grow(),
+                    Ui::separator()
+                ),
+                {
+                    Ui::grow(NONE),
+                    openBtn,
+                }
             );
         }
     );

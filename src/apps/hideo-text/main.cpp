@@ -1,5 +1,6 @@
 #include <hideo-base/alert.h>
 #include <hideo-base/scafold.h>
+#include <hideo-files/widgets.h>
 #include <karm-io/funcs.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
@@ -80,21 +81,13 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                 .title = "Text"s,
                 .startTools = slots$(
                     Ui::button(Model::bind<New>(), Ui::ButtonStyle::subtle(), Mdi::FILE),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FOLDER),
-                    Ui::button(Model::bindIf(s.text->dirty(), Save{}), Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE),
-                    Ui::button(Model::bindIf(s.text->dirty(), Save{true}), Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE_PLUS)
+                    Ui::button([](auto &n) {
+                        Ui::showDialog(n, Files::openFileDialog());
+                    },
+                               Ui::ButtonStyle::subtle(), Mdi::FOLDER),
+                    Ui::button(Model::bindIf(s.text->dirty(), Save{}), Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE), Ui::button(Model::bindIf(s.text->dirty(), Save{true}), Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE_PLUS)
                 ),
-                .endTools = slots$(
-                    Ui::button(
-                        Model::bindIf<Textbox::Action>(s.text->canUndo(), Textbox::Action::UNDO),
-                        Ui::ButtonStyle::subtle(),
-                        Mdi::UNDO
-                    ),
-                    Ui::button(
-                        Model::bindIf<Textbox::Action>(s.text->canRedo(), Textbox::Action::REDO),
-                        Ui::ButtonStyle::subtle(), Mdi::REDO
-                    )
-                ),
+                .endTools = slots$(Ui::button(Model::bindIf<Textbox::Action>(s.text->canUndo(), Textbox::Action::UNDO), Ui::ButtonStyle::subtle(), Mdi::UNDO), Ui::button(Model::bindIf<Textbox::Action>(s.text->canRedo(), Textbox::Action::REDO), Ui::ButtonStyle::subtle(), Mdi::REDO)),
                 .body = [=] {
                     return Ui::vflow(
                         Ui::hflow(

@@ -97,6 +97,15 @@ union Rect {
     always_inline constexpr Vec2<T> startCenter() const { return {x, y + height / 2}; }
     always_inline constexpr Vec2<T> endCenter() const { return {x + width, y + height / 2}; }
 
+    always_inline constexpr Array<Vec2<T>, 4> vertices() const {
+        return {
+            topStart(),
+            topEnd(),
+            bottomEnd(),
+            bottomStart(),
+        };
+    }
+
     always_inline constexpr Vec2<T> size() const { return {width, height}; }
 
     always_inline constexpr Vec2<T> xw() const { return {x, x + width}; }
@@ -245,6 +254,10 @@ union Rect {
 
     always_inline Rect offset(Vec2<T> v) const {
         return {x + v.x, y + v.y, width, height};
+    }
+
+    always_inline T area() const {
+        return width * height;
     }
 };
 

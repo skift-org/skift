@@ -58,7 +58,8 @@ void Context::restore() {
 // MARK: Origin & Clipping -----------------------------------------------------
 
 void Context::clip(Math::Recti rect) {
-    current().clip = current().trans.apply(rect.cast<f64>()).cast<isize>().clipTo(current().clip);
+    rect = current().trans.apply(rect.cast<f64>()).cast<isize>();
+    current().clip = rect.clipTo(current().clip);
 }
 
 void Context::origin(Math::Vec2i pos) {
@@ -390,7 +391,8 @@ void Context::plot(Gfx::Color color) {
 
 [[gnu::flatten]] void Context::_fillImpl(auto paint, auto format, FillRule fillRule) {
     _rast.fill(_poly, current().clip, fillRule, [&](Rast::Frag frag) {
-        u8 *pixel = static_cast<u8 *>(mutPixels().pixelUnsafe(frag.xy));
+        auto pixels = mutPixels();
+        auto *pixel = pixels.pixelUnsafe(frag.xy);
         auto color = paint.sample(frag.uv);
         auto c = format.load(pixel);
         c = color.withOpacity(frag.a).blendOver(c);

@@ -186,23 +186,7 @@ void Text::paint(Context &ctx) const {
     if (_style.color)
         ctx.fillStyle(*_style.color);
 
-    auto clip = ctx.current().clip;
-
-    auto si = tryOr(
-        searchLowerBound(_lines, [&](auto &line) {
-            return line.baseline + clip.top() <=> clip.top() - m.ascend;
-        }),
-        0
-    );
-
-    auto ei = tryOr(
-        searchUpperBound(_lines, [&](auto &line) {
-            return line.baseline + clip.top() <=> clip.bottom() + m.lineheight();
-        }),
-        _lines.len()
-    );
-
-    for (auto const &line : sub(_lines, si, ei)) {
+    for (auto const &line : _lines) {
         for (auto &block : line.blocks(*this)) {
             for (auto &cell : block.cells(*this)) {
                 auto glyph = cell.glyph;

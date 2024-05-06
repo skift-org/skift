@@ -101,15 +101,20 @@ struct Rast {
                     }
 
                     // Clip the range to the clip rect
+                    // NOTE: The following looks a bit verbose but it's necessary to avoid
+                    //       floating point errors when converting to integer coordinates.
                     f64 x1 = max(_active[i].x, clipBound.start());
+
+                    isize cx1 = max(Math::ceili(_active[i].x), clipBound.start());
+                    isize fx1 = max(Math::floori(_active[i].x), clipBound.start());
+
                     f64 x2 = min(_active[i + 1].x, clipBound.end());
+                    isize cx2 = min(Math::ceili(_active[i + 1].x), clipBound.end());
+                    isize fx2 = min(Math::floori(_active[i + 1].x), clipBound.end());
 
                     // Skip if the range is empty
                     if (x1 >= x2)
                         continue;
-
-                    isize cx1 = Math::ceil(x1), fx1 = Math::floor(x1);
-                    isize cx2 = Math::ceil(x2), fx2 = Math::floor(x2);
 
                     _appendRange(irange::fromStartEnd(fx1, cx2));
 

@@ -341,7 +341,7 @@ void Path::rect(Math::Rectf rect, Math::Radiusf radius) {
 
         moveTo({rect.x + radius.topStart, rect.y});
 
-        // Top edge
+        // Top end edge
         lineTo({rect.x + rect.width - radius.topEnd, rect.y});
         cubicTo(
             {rect.x + rect.width - cpTopEnd, rect.y},
@@ -349,7 +349,7 @@ void Path::rect(Math::Rectf rect, Math::Radiusf radius) {
             {rect.x + rect.width, rect.y + radius.topEnd}
         );
 
-        // Right edge
+        // Bottom end edge
         lineTo({rect.x + rect.width, rect.y + rect.height - radius.bottomEnd});
         cubicTo(
             {rect.x + rect.width, rect.y + rect.height - cpBottomEnd},
@@ -357,7 +357,7 @@ void Path::rect(Math::Rectf rect, Math::Radiusf radius) {
             {rect.x + rect.width - radius.bottomEnd, rect.y + rect.height}
         );
 
-        // Bottom edge
+        // Bottom start edge
         lineTo({rect.x + radius.bottomStart, rect.y + rect.height});
         cubicTo(
             {rect.x + cpBottomStart, rect.y + rect.height},
@@ -365,7 +365,7 @@ void Path::rect(Math::Rectf rect, Math::Radiusf radius) {
             {rect.x, rect.y + rect.height - radius.bottomStart}
         );
 
-        // Left edge
+        // Top start edge
         lineTo({rect.x, rect.y + radius.topStart});
         cubicTo(
             {rect.x, rect.y + cpTopStart},

@@ -226,7 +226,6 @@ struct Text : public View<Text> {
 
     void paint(Gfx::Context &g, Math::Recti) override {
         g.save();
-        g.clip(bound());
         g.origin(bound().xy);
         _text.paint(g);
         g.restore();

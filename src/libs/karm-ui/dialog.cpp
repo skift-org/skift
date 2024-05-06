@@ -35,7 +35,7 @@ void closePopover(Node &n) {
 }
 
 struct DialogLayer : public LeafNode<DialogLayer> {
-    Easedf _opacity{};
+    Easedf _visibility{};
     Child _child;
 
     Opt<Child> _dialog;
@@ -95,19 +95,29 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     void paint(Gfx::Context &g, Math::Recti r) override {
         child().paint(g, r);
 
-        if (_opacity.value() > 0.001) {
+        if (_visibility.value() > 0.001) {
             g.save();
-            g.fillStyle(Ui::GRAY950.withOpacity(0.75 * _opacity.value()));
+            g.fillStyle(Ui::GRAY950.withOpacity(0.8 * _visibility.value()));
             g.fill(bound());
             g.restore();
         }
 
-        if (dialogVisible())
+        if (dialogVisible()) {
+
+            g.save();
+            // change the orgin to the center of the screen
+            g.translate(bound().center().cast<f64>());
+            g.scale(Math::lerp(0.9, 1, _visibility.value()));
+            g.translate(-bound().center().cast<f64>());
+
             dialog().paint(g, r);
+
+            g.restore();
+        }
     }
 
     void event(Sys::Event &e) override {
-        if (_opacity.needRepaint(*this, e))
+        if (_visibility.needRepaint(*this, e))
             Ui::shouldRepaint(*this);
 
         if (popoverVisible()) {
@@ -127,7 +137,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
             _shouldShow = s.child;
             mouseLeave(*_child);
             shouldLayout(*this);
-            _opacity.animate(*this, 1, 0.1);
+            _visibility.animate(*this, 1, 0.3, Math::Easing::exponentialOut);
         } else if (e.is<ShowPopoverEvent>()) {
             // We need to defer showing the popover until the next frame,
             // otherwise replacing the popover might cause some use after free down the tree
@@ -141,7 +151,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
             // otherwise we might cause some use after free down the tree
             _shouldDialogClose = true;
             shouldLayout(*this);
-            _opacity.animate(*this, 0, 0.1);
+            _visibility.animate(*this, 0, 0.1);
         } else if (parent()) {
             parent()->bubble(e);
         }

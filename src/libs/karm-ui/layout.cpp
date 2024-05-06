@@ -255,7 +255,7 @@ Child pinSize(Math::Vec2i size, Child child) {
 }
 
 Child pinSize(isize size, Child child) {
-    return minSize(Math::Vec2i{size}, child);
+    return pinSize(Math::Vec2i{size}, child);
 }
 
 // MARK: Spacing ---------------------------------------------------------------

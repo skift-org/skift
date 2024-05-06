@@ -125,10 +125,13 @@ Context &Context::textFont(Media::Font font) {
 
 // MARK: Drawing ---------------------------------------------------------------
 
-void Context::clear(Color color) { clear(pixels().bound(), color); }
+void Context::clear(Color color) {
+    clear(current().clip, color);
+}
 
 void Context::clear(Math::Recti rect, Color color) {
-    rect = current().trans.apply(rect.cast<f64>()).cast<isize>(),
+    rect = current().trans.apply(rect.cast<f64>()).cast<isize>();
+    rect = current().clip.clipTo(rect);
     mutPixels()
         .clip(rect)
         .clear(color);

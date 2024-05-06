@@ -39,6 +39,27 @@ static constexpr bool isNegInf(f64 x) {
 // MARK: Rounding + Remainder --------------------------------------------------
 
 template <typename T>
+constexpr isize floori(T x) {
+    if (x < 0)
+        return (long)(x - 1);
+
+    return (long)x;
+}
+
+template <typename T>
+constexpr isize ceili(T x) {
+    if (x < 0)
+        return (long)x;
+
+    return (long)(x + 1);
+}
+
+template <typename T>
+constexpr isize roundi(T x) {
+    return (long)(x + 0.5);
+}
+
+template <typename T>
 constexpr T floor(T x) {
     if (x < 0)
         return (T)(long)(x - 1);
@@ -54,8 +75,9 @@ constexpr T ceil(T x) {
     return (T)(long)(x + 1);
 }
 
-constexpr isize round(f64 x) {
-    return (isize)(x + 0.5);
+template <typename T>
+constexpr T round(T x) {
+    return (T)(long)(x + 0.5);
 }
 
 // MARK: Trigonometry ----------------------------------------------------------

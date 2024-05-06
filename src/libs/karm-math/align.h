@@ -94,7 +94,7 @@ struct Align {
 
     template <typename T>
     Vec2<T> minSize(Vec2<T> inner) {
-        if (_value & COVER)
+        if (_value & COVER or _value & FIT)
             inner = {};
         return inner;
     }

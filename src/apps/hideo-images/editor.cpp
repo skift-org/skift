@@ -1,4 +1,5 @@
 #include <hideo-base/input.h>
+#include <hideo-base/row.h>
 #include <hideo-base/scafold.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/input.h>
@@ -9,9 +10,45 @@
 
 namespace Hideo::Images {
 
+Ui::Child histogram(Hist const &hist) {
+    return Ui::canvas([hist](Gfx::Context &g, Math::Vec2i size) {
+        f64 xunit = size.x / ((f64)hist.len() - 1);
+
+        auto point = [&](usize i, usize c) {
+            return Math::Vec2f{i * xunit, (f64)size.y - hist[i]._els[c] * size.y};
+        };
+
+        auto plotComponent = [&](usize c, Gfx::Color stroke, Gfx::Color fill) {
+            g.begin();
+            g.moveTo(point(0, c));
+            for (usize i = 0; i < hist.len() - 1; i++) {
+                auto p0 = point(i, c);
+                auto p1 = point(i + 1, c);
+
+                g.cubicTo(
+                    p0 + Math::Vec2f{xunit / 4, 0},
+                    p1 - Math::Vec2f{xunit / 4, 0},
+                    p1
+                );
+            }
+            g.stroke(Gfx::stroke(stroke));
+
+            g.lineTo({0, (f64)size.y});
+            g.close();
+
+            g.fill(fill.withOpacity(0.25));
+        };
+
+        plotComponent(0, Gfx::RED, Gfx::RED800);
+        plotComponent(1, Gfx::GREEN, Gfx::GREEN800);
+        plotComponent(2, Gfx::BLUE, Gfx::BLUE800);
+    });
+}
+
 Ui::Child editor(State const &state) {
     return Ui::vflow(
         editorToolbar(state),
+        histogram(state.hist) | Ui::pinSize(64),
         editorPreview(state) | Ui::grow(),
         editorControls(state)
     );
@@ -20,10 +57,8 @@ Ui::Child editor(State const &state) {
 Ui::Child editorPreview(State const &state) {
     return Ui::image(state.image.unwrap()) |
            Ui::box({
-               .borderRadius = 8,
                .borderWidth = 1,
                .borderPaint = Ui::GRAY50.withOpacity(0.1),
-               .shadowStyle = Gfx::BoxShadow::elevated(8),
            }) |
            Ui::foregroundFilter(state.filter) |
            Ui::spacing(8) |

@@ -18,6 +18,10 @@ void reduce(State &s, Action a) {
         [&](SaveImage) {
         },
     });
+
+    if (s.isEditor and s.image) {
+        computeHistogram(s.hist, s.image.unwrap());
+    }
 }
 
 } // namespace Hideo::Images

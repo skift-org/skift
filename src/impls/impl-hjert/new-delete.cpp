@@ -7,6 +7,7 @@
 
 static Lock _heapLock;
 static Heap _heapImpl = {
+    .ctx = nullptr,
     .alloc = [](void *, usize size) -> void * {
         usize start = Hjert::Core::kmm()
                           .allocRange(size)
@@ -23,6 +24,8 @@ static Heap _heapImpl = {
         if (type == HEAP_ERROR)
             logError("heap: {}", msg);
     },
+    .root = nullptr,
+    .best = nullptr,
 };
 
 // MARK: New/Delete Implementation ---------------------------------------------

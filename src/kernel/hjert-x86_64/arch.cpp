@@ -315,15 +315,29 @@ struct Ctx : public Core::Ctx {
 
 Res<Box<Core::Ctx>> createCtx(Core::Mode mode, usize ip, usize sp, usize ksp, Hj::Args args) {
     Frame frame{
+        .r15 = 0,
+        .r14 = 0,
+        .r13 = 0,
+        .r12 = 0,
+        .r11 = 0,
+        .r10 = 0,
+        .r9 = args[5],
         .r8 = args[4],
+        .rbp = 0,
         .rdi = args[0],
         .rsi = args[1],
         .rdx = args[2],
         .rcx = args[3],
+        .rbx = 0,
+        .rax = 0,
+        .intNo = 0,
+        .errNo = 0,
 
         .rip = ip,
+        .cs = 0,
         .rflags = 0x202,
         .rsp = sp,
+        .ss = 0,
     };
 
     if (mode == Core::Mode::USER) {

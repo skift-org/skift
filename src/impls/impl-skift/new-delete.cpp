@@ -7,6 +7,7 @@
 
 static constinit Lock _heapLock;
 static constinit Heap _heapImpl = {
+    .ctx = nullptr,
     .alloc = [](void *, usize size) -> void * {
         auto vmo = Hj::Vmo::create(Hj::ROOT, 0, size).take();
         vmo.label("heap").unwrap();
@@ -22,6 +23,8 @@ static constinit Heap _heapImpl = {
         if (type == HEAP_ERROR)
             logError("heap: {}", msg);
     },
+    .root = nullptr,
+    .best = nullptr,
 };
 
 // MARK: New/Delete Implementation ---------------------------------------------

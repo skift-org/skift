@@ -35,7 +35,7 @@ struct Ranges {
                     _r[i] = lh;
 
                     if (uh.size != 0) {
-                        unused(uh);
+                        add(uh);
                     }
                 } else if (uh.size != 0) {
                     _r[i] = uh;

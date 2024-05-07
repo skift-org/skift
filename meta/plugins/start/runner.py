@@ -40,7 +40,9 @@ class Qemu(Machine):
                 "https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd"
             )
 
-        supportsSDL = 'sdl' in str(subprocess.check_output(["qemu-system-x86_64", "-display", "help"]))
+        supportsSDL = "sdl" in str(
+            subprocess.check_output(["qemu-system-x86_64", "-display", "help"])
+        )
 
         qemuCmd: list[str] = [
             "qemu-system-x86_64",
@@ -59,10 +61,11 @@ class Qemu(Machine):
             "-smp",
             "4",
             "-drive",
-            f"file=fat:rw:{image.finalize()},media=disk,format=raw"
+            f"file=fat:rw:{image.finalize()},media=disk,format=raw",
         ]
 
-        qemuCmd += ["-display", "sdl" if supportsSDL else "gtk"]
+        if supportsSDL:
+            qemuCmd += ["-display", "sdl"]
 
         if self.logError:
             qemuCmd += ["-d", "int,guest_errors,cpu_reset"]

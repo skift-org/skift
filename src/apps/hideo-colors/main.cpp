@@ -129,13 +129,13 @@ Ui::Child valueSlider(State const &state) {
                Model::bubble(n, UpdateHsv{hsv.withValue(v)});
            }) |
            Ui::box({
-               .padding = 3,
+               .padding = 1,
                .borderRadius = 99,
                .borderWidth = 1,
                .borderPaint = Ui::GRAY100.withOpacity(0.2),
                .backgroundPaint = background,
            }) |
-           Ui::maxSize({Ui::UNCONSTRAINED, 26});
+           Ui::maxSize({Ui::UNCONSTRAINED, 18});
 }
 
 Ui::Child saturationSlider(State const &state) {
@@ -162,13 +162,13 @@ Ui::Child saturationSlider(State const &state) {
                Model::bubble(n, UpdateHsv{hsv.withSaturation(v)});
            }) |
            Ui::box({
-               .padding = 3,
+               .padding = 1,
                .borderRadius = 99,
                .borderWidth = 1,
                .borderPaint = Ui::GRAY100.withOpacity(0.2),
                .backgroundPaint = background,
            }) |
-           Ui::maxSize({Ui::UNCONSTRAINED, 26});
+           Ui::maxSize({Ui::UNCONSTRAINED, 18});
 }
 
 Ui::Child hueSlider(State const &state) {
@@ -180,13 +180,13 @@ Ui::Child hueSlider(State const &state) {
                Model::bubble(n, UpdateHsv{hsv.withHue(v * 360)});
            }) |
            Ui::box({
-               .padding = 3,
+               .padding = 1,
                .borderRadius = 99,
                .borderWidth = 1,
                .borderPaint = Ui::GRAY100.withOpacity(0.2),
                .backgroundPaint = Gfx::Gradient::hsv().bake(),
            }) |
-           Ui::maxSize({Ui::UNCONSTRAINED, 26});
+           Ui::maxSize({Ui::UNCONSTRAINED, 18});
 }
 
 Ui::Child hsvSliders(State const &state) {
@@ -223,8 +223,8 @@ Ui::Child colorCell(State const &state, Gfx::Color c) {
         Model::bind<UpdateHsv>(hsv),
         style,
         state.hsv == hsv
-            ? Ui::icon(Mdi::CHECK, 32, foreground) | Ui::center() | Ui::bound()
-            : Ui::empty(32)
+            ? Ui::icon(Mdi::CHECK, 24, foreground) | Ui::center() | Ui::bound()
+            : Ui::empty(24)
     );
 }
 
@@ -262,7 +262,7 @@ Ui::Child app() {
             auto c = Gfx::hsvToRgb(state.hsv);
 
             auto preview =
-                Ui::empty(128) |
+                Ui::empty(96) |
                 Ui::box({
                     .borderRadius = 6,
                     .borderWidth = 1,
@@ -274,7 +274,7 @@ Ui::Child app() {
             auto toolbar = Ui::hflow(
                 4,
                 Ui::empty(4),
-                Ui::codeLarge("#{:02x}{:02x}{:02x}", c.red, c.green, c.blue) | Ui::vcenter(),
+                Ui::codeMedium("#{:02x}{:02x}{:02x}", c.red, c.green, c.blue) | Ui::vcenter(),
                 Ui::button(
                     Ui::NOP,
                     Ui::ButtonStyle::subtle(),
@@ -297,12 +297,12 @@ Ui::Child app() {
                        8,
                        preview,
                        toolbar,
-                       Ui::titleMedium("Values") | Ui::spacing({2, 8, 0, 0}),
+                       Ui::titleSmall("Values") | Ui::spacing({2, 8, 0, 0}),
                        hsvSliders(state),
-                       Ui::titleMedium("Palettes") | Ui::spacing({2, 8, 0, 0}),
+                       Ui::titleSmall("Palettes") | Ui::spacing({2, 8, 0, 0}),
                        colorRamps(state) | Ui::grow()
                    ) |
-                   Ui::spacing({8, 8, 8, 0}) | Ui::grow();
+                   Ui::spacing({6, 6, 6, 0}) | Ui::grow();
         }
     );
 }
@@ -310,5 +310,5 @@ Ui::Child app() {
 } // namespace Hideo::Colors
 
 Res<> entryPoint(Sys::Ctx &ctx) {
-    return Ui::runApp(ctx, Hideo::Colors::app() | Ui::pinSize({410, 520}));
+    return Ui::runApp(ctx, Hideo::Colors::app() | Ui::pinSize({320, 200}));
 }

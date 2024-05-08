@@ -42,10 +42,10 @@ struct Element : public Node {
         return this->attributes.get(name) != NONE;
     }
 
-    String getAttribute(AttrName name) const {
+    Opt<String> getAttribute(AttrName name) const {
         auto attr = this->attributes.get(name);
         if (attr == NONE)
-            return ""s;
+            return NONE;
         return (*attr)->value;
     }
 };

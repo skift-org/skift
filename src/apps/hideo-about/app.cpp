@@ -1,8 +1,9 @@
 #include <hideo-base/dialogs.h>
 #include <hideo-base/scafold.h>
 #include <karm-base/witty.h>
-#include <karm-sys/entry.h>
-#include <karm-ui/app.h>
+#include <karm-sys/time.h>
+#include <karm-ui/input.h>
+#include <karm-ui/view.h>
 
 namespace Hideo::About {
 
@@ -68,7 +69,3 @@ Ui::Child app() {
 }
 
 } // namespace Hideo::About
-
-Res<> entryPoint(Sys::Ctx &ctx) {
-    return Ui::runApp(ctx, Hideo::About::app());
-}

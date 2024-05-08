@@ -1,3 +1,5 @@
+#pragma once
+
 #include <karm-io/funcs.h>
 
 #include "lexer.h"

@@ -211,7 +211,7 @@ Res<Token> nextToken(Io::SScan &s) {
         return Ok(Token{Token::Type::HASH, s.end()});
     }
 
-    // https://www.w3.org/TR/css-syntax-3/#consume-numeric-token
+    // https://www.w3.org/TR/css-syntax-3/#consume-comment
     if (s.skip("/*")) {
         s.skip(Re::untilAndConsume(Re::word("*/")));
 

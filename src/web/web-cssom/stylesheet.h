@@ -3,7 +3,6 @@
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
 #include <karm-logger/logger.h>
-
 #include <web-css/lexer.h>
 
 // SPEC COMPLIANCE : everything related to parent/scope is nospec as well as everything concerning dynamic modification
@@ -14,6 +13,10 @@ namespace Web::CSSOM {
 struct CSSStyleDeclaration {
     Css::Token propertyName;
     Vec<Css::Token> value;
+
+    CSSStyleDeclaration(Css::Token name)
+        : propertyName(name) {
+    }
 
     CSSStyleDeclaration(Css::Token name, Vec<Css::Token> val)
         : propertyName(name), value(val) {
@@ -80,3 +83,6 @@ struct Karm::Io::Formatter<Web::CSSOM::StyleSheet> {
         return Ok(written);
     }
 };
+
+Reflectable$(Web::CSSOM::CSSStyleDeclaration, propertyName, value);
+Reflectable$(Web::CSSOM::CSSStyleRule, selector, declarations);

@@ -6,6 +6,10 @@
 namespace Web::View {
 
 struct View : public Ui::View<View> {
+    Strong<Dom::Document> _dom;
+
+    View(Strong<Dom::Document> dom) : _dom(dom) {}
+
     void paint(Gfx::Context &g, Math::Recti) override {
         g.save();
         g.clear(bound(), Css::WHITE);
@@ -17,8 +21,8 @@ struct View : public Ui::View<View> {
     }
 };
 
-Ui::Child view(Strong<Dom::Document>) {
-    return makeStrong<View>();
+Ui::Child view(Strong<Dom::Document> dom) {
+    return makeStrong<View>(dom);
 }
 
 } // namespace Web::View

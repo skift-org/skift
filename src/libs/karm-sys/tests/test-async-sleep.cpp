@@ -4,7 +4,6 @@
 #include <karm-test/macros.h>
 
 namespace Karm::Sys::Tests {
-
 Async::Task<> sleepyBoy() {
 #ifdef __ck_sys_darwin__
     logInfo("Skipping test on macOS");

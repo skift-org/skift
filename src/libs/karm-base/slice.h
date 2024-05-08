@@ -277,11 +277,10 @@ constexpr auto mutIterRev(S &slice) {
 }
 
 template <Sliceable S>
-constexpr auto iterSplit(S &slice, typename S::Inner const &sep) {
+constexpr auto iterSplit(S const &slice, typename S::Inner const &sep) {
     return Iter([&slice, sep, i = 0uz] mutable -> Opt<Slice<typename S::Inner>> {
-        if (i >= slice.len()) {
+        if (i >= slice.len())
             return NONE;
-        }
 
         usize start = i;
         while (i < slice.len() and slice.buf()[i] != sep) {

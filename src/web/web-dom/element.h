@@ -1,7 +1,10 @@
 #pragma once
 
 #include <karm-base/map.h>
+#include <karm-base/slice.h>
 #include <web-base/tags.h>
+#include <web-dom/token-list.h>
+#include <web-html/tags.h>
 
 #include "attr.h"
 #include "node.h"
@@ -13,6 +16,7 @@ struct Element : public Node {
     TagName tagName;
     // NOSPEC: Should be a NamedNodeMap
     Map<AttrName, Strong<Attr>> attributes;
+    TokenList classList;
 
     Element(TagName tagName)
         : tagName(tagName) {
@@ -34,6 +38,12 @@ struct Element : public Node {
     }
 
     void setAttribute(AttrName name, String value) {
+        if (name == Html::CLASS_ATTR) {
+            for (auto class_ : iterSplit(value, ' ')) {
+                this->classList.add(class_);
+            }
+            return;
+        }
         auto attr = makeStrong<Attr>(name, value);
         this->attributes.put(name, attr);
     }

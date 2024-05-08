@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "karm-crypto:cli",
+    "id": "karm-crypto.cli",
     "type": "exe",
     "description": "Compute checksums and hashes of files",
     "requires": [

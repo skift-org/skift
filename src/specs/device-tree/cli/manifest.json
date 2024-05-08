@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "device-tree:cli",
+    "id": "device-tree.cli",
     "type": "exe",
     "description": "Dump a device tree blob",
     "requires": [

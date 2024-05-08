@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "web-jsons:tests",
+    "id": "web-jsons.tests",
     "type": "lib",
     "props": {
         "cpp-excluded": true

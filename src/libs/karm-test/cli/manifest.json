@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "karm-tests:cli",
+    "id": "karm-tests.cli",
     "type": "exe",
     "description": "Test runner",
     "requires": [

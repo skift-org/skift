@@ -19,27 +19,29 @@ void reduce(State &s, Action a) {
         [&](DimisNoti dismis) {
             s.noti.removeAt(dismis.index);
         },
-        [&](StartApp start) {
-            s.activePanel = Panel::NIL;
-            s.surfaces.emplaceFront(
+        [&](StartInstance start) {
+            auto instance = makeStrong<Instance>(
                 0,
-                s.entries[start.index],
                 Math::Recti{0, 0, 400, 300},
-                Gfx::randomColor()
+                Gfx::randomColor(),
+                s.manifests[start.index]
             );
-        },
-        [&](MoveApp move) {
+
             s.activePanel = Panel::NIL;
-            auto bound = s.surfaces[move.index].bound;
+            s.instances.emplaceFront(instance);
+        },
+        [&](MoveInstance move) {
+            s.activePanel = Panel::NIL;
+            auto bound = s.instances[move.index]->bound;
             bound.xy = bound.xy + move.off;
-            s.surfaces[move.index].bound = bound;
+            s.instances[move.index]->bound = bound;
         },
-        [&](CloseApp close) {
-            s.surfaces.removeAt(close.index);
+        [&](CloseInstance close) {
+            s.instances.removeAt(close.index);
         },
-        [&](FocusApp focus) {
-            auto surface = s.surfaces.removeAt(focus.index);
-            s.surfaces.pushFront(surface);
+        [&](FocusInstance focus) {
+            auto surface = s.instances.removeAt(focus.index);
+            s.instances.pushFront(surface);
             s.activePanel = Panel::NIL;
         },
         [&](Activate panel) {

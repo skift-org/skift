@@ -35,4 +35,6 @@ Ui::Child sysFlyout(State const &state);
 
 Ui::Child powerDialog();
 
+Ui::Child app(State state);
+
 } // namespace Hideo::Shell

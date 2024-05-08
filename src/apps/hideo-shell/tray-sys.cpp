@@ -203,13 +203,13 @@ Ui::Child quickSettings(State const &state) {
 }
 
 Ui::Child noti(Noti const &noti, usize i) {
-    auto const &entry = noti.entry;
+    auto const &manifest = *noti.manifest;
     return Ui::vflow(
                8,
                Ui::hflow(
                    4,
-                   Ui::icon(entry.icon.icon, 12) | Ui::box({.foregroundPaint = entry.icon.colors[4]}),
-                   Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), entry.name)
+                   Ui::icon(manifest.icon, 12) | Ui::box({.foregroundPaint = manifest.ramp[4]}),
+                   Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), manifest.name)
                ),
                Ui::vflow(
                    6,

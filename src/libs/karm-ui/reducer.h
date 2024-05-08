@@ -60,7 +60,7 @@ struct Reducer :
     Opt<Child> _child;
 
     Reducer(State state, Func<Child(State const &)> build)
-        : _state(state), _build(std::move(build)) {}
+        : _state(std::move(state)), _build(std::move(build)) {}
 
     ~Reducer() {
         if (_child)
@@ -149,7 +149,7 @@ inline Child reducer(
     Func<Child(typename Model::State const &)> build
 ) {
 
-    return makeStrong<Reducer<Model>>(init, std::move(build));
+    return makeStrong<Reducer<Model>>(std::move(init), std::move(build));
 }
 
 template <typename Model>

@@ -26,46 +26,49 @@ Ui::Child searchInput() {
            Ui::button(Keyboard::show);
 }
 
-Ui::Child appIcon(MenuIcon const &icon, isize size = 22) {
-    return Ui::icon(icon.icon, size) |
+Ui::Child appIcon(Mdi::Icon const &icon, Gfx::ColorRamp ramp, isize size = 22) {
+    return Ui::icon(icon, size) |
            Ui::spacing(size / 2.75) |
            Ui::center() |
            Ui::box({
                .borderRadius = size * 0.25,
                .borderWidth = 1,
-               .borderPaint = icon.colors[5],
-               .backgroundPaint = icon.colors[6],
-               .foregroundPaint = icon.colors[1],
+               .borderPaint = ramp[5],
+               .backgroundPaint = ramp[6],
+               .foregroundPaint = ramp[1],
            });
 }
 
-Ui::Child appRow(MenuEntry const &entry, usize i) {
+Ui::Child appRow(Manifest const &manifest, usize i) {
     return Ui::ButtonStyle::subtle(),
            Ui::hflow(
                12,
                Math::Align::START | Math::Align::VCENTER,
-               appIcon(entry.icon),
-               Ui::labelLarge(entry.name)
+               appIcon(manifest.icon, manifest.ramp),
+               Ui::labelLarge(manifest.name)
            ) |
-               Ui::spacing(6) | Ui::button(Model::bind<StartApp>(i), Ui::ButtonStyle::subtle());
+               Ui::spacing(6) |
+               Ui::button(Model::bind<StartInstance>(i), Ui::ButtonStyle::subtle());
 }
 
 Ui::Child appsList(State const &state) {
     return Ui::vflow(
-        iter(state.entries)
-            .mapi(appRow)
+        iter(state.manifests)
+            .mapi([](auto &man, usize i) {
+                return appRow(*man, i);
+            })
             .collect<Ui::Children>()
     );
 }
 
-Ui::Child appTile(MenuEntry const &entry, usize i) {
+Ui::Child appTile(Manifest const &manifest, usize i) {
     return Ui::vflow(
                26,
-               appIcon(entry.icon, 26),
-               Ui::labelLarge(entry.name)
+               appIcon(manifest.icon, manifest.ramp, 26),
+               Ui::labelLarge(manifest.name)
            ) |
            Ui::button(
-               Model::bind<StartApp>(i),
+               Model::bind<StartInstance>(i),
                Ui::ButtonStyle::subtle()
            );
 }
@@ -73,18 +76,20 @@ Ui::Child appTile(MenuEntry const &entry, usize i) {
 Ui::Child appsGrid(State const &state) {
     return Ui::grid(
         Ui::GridStyle::simpleFixed({8, 64}, {4, 64}),
-        iter(state.entries)
-            .mapi(appTile)
+        iter(state.manifests)
+            .mapi([](auto &man, usize i) {
+                return appTile(*man, i);
+            })
             .collect<Ui::Children>()
     );
 }
 
-Ui::Child runningApp(Surface const &surface, usize i) {
+Ui::Child runningApp(Instance const &, usize i) {
     return Ui::stack(
-               appIcon(surface.entry.icon) |
+               Ui::empty() |
                    Ui::bound() |
-                   Ui::button(Model::bind<FocusApp>(i)),
-               Ui::button(Model::bind<CloseApp>(i), Ui::ButtonStyle::secondary(), Mdi::CLOSE) |
+                   Ui::button(Model::bind<FocusInstance>(i)),
+               Ui::button(Model::bind<CloseInstance>(i), Ui::ButtonStyle::secondary(), Mdi::CLOSE) |
                    Ui::align(Math::Align::TOP_END) |
                    Ui::spacing({0, 6, 6, 0})
            ) |
@@ -92,12 +97,14 @@ Ui::Child runningApp(Surface const &surface, usize i) {
 }
 
 Ui::Child runningApps(State const &state) {
-    if (state.surfaces.len() == 0)
+    if (state.instances.len() == 0)
         return Ui::empty(64);
     return Ui::hflow(
                8,
-               iter(state.surfaces)
-                   .mapi(runningApp)
+               iter(state.instances)
+                   .mapi([](auto &instance, usize i) {
+                       return runningApp(*instance, i);
+                   })
                    .collect<Ui::Children>()
            ) |
            Ui::center() | Ui::spacing({0, 64, 0, 16});

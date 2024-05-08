@@ -1,7 +1,5 @@
 #include <hideo-base/scafold.h>
 #include <hideo-keyboard/views.h>
-#include <karm-sys/entry.h>
-#include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
@@ -141,17 +139,17 @@ Ui::Child tabletPanels(State const &state) {
 }
 
 Ui::Child appHost(State const &state) {
-    if (state.surfaces.len() == 0)
+    if (state.instances.len() == 0)
         return Ui::grow(NONE);
 
-    auto &surface = state.surfaces[0];
+    auto surface = state.instances[0];
     return Ui::empty() |
-           Ui::box({.backgroundPaint = surface.color});
+           Ui::box({.backgroundPaint = surface->color});
 }
 
 Ui::Child tablet(State const &state) {
     return Ui::stack(
-        state.surfaces.len() == 0
+        state.instances.len() == 0
             ? background(state)
             : Ui::empty(),
         Ui::vflow(
@@ -168,29 +166,29 @@ Ui::Child tablet(State const &state) {
 
 Ui::Child appStack(State const &state) {
     Ui::Children apps;
-    usize index = state.surfaces.len() - 1;
-    for (auto &s : iterRev(state.surfaces)) {
+    usize index = state.instances.len() - 1;
+    for (auto &s : iterRev(state.instances)) {
         apps.pushBack(
             scafold({
-                .icon = s.entry.icon.icon,
-                .title = s.entry.name,
+                .icon = s->manifest->icon,
+                .title = s->manifest->name,
                 .body = slot$(Ui::empty()),
             }) |
             Ui::box({
                 .borderRadius = 6,
                 .borderWidth = 1,
                 .borderPaint = Ui::GRAY800,
-                .backgroundPaint = Gfx::GRAY950,
+                .backgroundPaint = Ui::GRAY900,
                 .shadowStyle = Gfx::BoxShadow::elevated(index ? 4 : 16),
             }) |
-            Ui::placed(s.bound) |
+            Ui::placed(s->bound) |
             Ui::intent([=](Ui::Node &n, Sys::Event &e) {
                 if (auto *m = e.is<Ui::DragEvent>(Sys::Propagation::UP)) {
                     e.accept();
-                    Model::bubble<MoveApp>(n, {index, m->delta});
+                    Model::bubble<MoveInstance>(n, {index, m->delta});
                 } else if (auto *c = e.is<Events::RequestExitEvent>(Sys::Propagation::UP)) {
                     e.accept();
-                    Model::bubble<CloseApp>(n, {index});
+                    Model::bubble<CloseInstance>(n, {index});
                 }
             })
         );
@@ -231,110 +229,10 @@ Ui::Child desktop(State const &state) {
     );
 }
 
-Ui::Child app(bool isMobile) {
+Ui::Child app(State state) {
     return Ui::reducer<Model>(
-        Shell::State{
-            .isMobile = isMobile,
-            .dateTime = Sys::dateTime(),
-            .background = Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap(),
-            .noti = {
-                {
-                    1,
-                    {
-                        {Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP},
-                        "About"s,
-                    },
-                    "Hello"s,
-                    "Hello, world!"s,
-                },
-                {
-                    2,
-                    {
-                        {Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP},
-                        "About"s,
-                    },
-                    "Hello"s,
-                    "Hello, world!"s,
-                },
-                {
-                    3,
-                    {
-                        {Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP},
-                        "About"s,
-                    },
-                    "Hello"s,
-                    "Hello, world!"s,
-                },
-                {
-                    4,
-                    {
-                        {Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP},
-                        "About"s,
-                    },
-                    "Hello"s,
-                    "Hello, world!"s,
-                },
-            },
-            .entries = {
-                {
-                    {Mdi::INFORMATION_OUTLINE, Gfx::BLUE_RAMP},
-                    "About"s,
-                },
-                {
-                    {Mdi::CALCULATOR, Gfx::ORANGE_RAMP},
-                    "Calculator"s,
-                },
-                {
-                    {Mdi::PALETTE_SWATCH, Gfx::RED_RAMP},
-                    "Color Picker"s,
-                },
-                {
-                    {Mdi::COUNTER, Gfx::GREEN_RAMP},
-                    "Counter"s,
-                },
-                {
-                    {Mdi::DUCK, Gfx::YELLOW_RAMP},
-                    "Demos"s,
-                },
-                {
-                    {Mdi::FILE, Gfx::ORANGE_RAMP},
-                    "Files"s,
-                },
-                {
-                    {Mdi::FORMAT_FONT, Gfx::BLUE_RAMP},
-                    "Fonts"s,
-                },
-                {
-                    {Mdi::EMOTICON, Gfx::RED_RAMP},
-                    "Hello World"s,
-                },
-                {
-                    {Mdi::IMAGE, Gfx::GREEN_RAMP},
-                    "Icons"s,
-                },
-                {
-                    {Mdi::IMAGE, Gfx::YELLOW_RAMP},
-                    "Image Viewer"s,
-                },
-                {
-                    {Mdi::CUBE, Gfx::BLUE_RAMP},
-                    "Ray Tracer"s,
-                },
-                {
-                    {Mdi::COG, Gfx::ZINC_RAMP},
-                    "Settings"s,
-                },
-                {
-                    {Mdi::TABLE, Gfx::GREEN_RAMP},
-                    "Spreadsheet"s,
-                },
-                {
-                    {Mdi::WIDGETS, Gfx::BLUE_RAMP},
-                    "Widget Gallery"s,
-                },
-            },
-        },
-        [](auto state) {
+        std::move(state),
+        [](auto const &state) {
             return Ui::stack(
                        state.locked
                            ? lock(state)
@@ -356,9 +254,3 @@ Ui::Child app(bool isMobile) {
 }
 
 } // namespace Hideo::Shell
-
-Res<> entryPoint(Sys::Ctx &ctx) {
-    auto args = useArgs(ctx);
-    bool isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
-    return Ui::runApp(ctx, Hideo::Shell::app(isMobile));
-}

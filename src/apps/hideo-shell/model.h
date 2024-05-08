@@ -2,24 +2,16 @@
 
 #include <karm-ui/reducer.h>
 
+#include "instance.h"
+
 namespace Hideo::Shell {
-
-struct MenuIcon {
-    Mdi::Icon icon;
-    Gfx::ColorRamp colors;
-};
-
-struct MenuEntry {
-    MenuIcon icon;
-    String name;
-};
 
 struct Noti {
     usize id;
-    MenuEntry entry;
     String title;
     String body;
     Vec<String> actions{};
+    Strong<Manifest> manifest;
 };
 
 enum struct Panel {
@@ -29,14 +21,7 @@ enum struct Panel {
     SYS,
 };
 
-struct Surface {
-    usize id;
-    MenuEntry entry;
-    Math::Recti bound;
-    Gfx::Color color;
-};
-
-struct State {
+struct State : Meta::NoCopy {
     bool locked = true;
     bool isMobile = true;
     Panel activePanel = Panel::NIL;
@@ -47,8 +32,8 @@ struct State {
 
     Media::Image background;
     Vec<Noti> noti;
-    Vec<MenuEntry> entries;
-    Vec<Surface> surfaces{};
+    Vec<Strong<Manifest>> manifests;
+    Vec<Strong<Instance>> instances;
 };
 
 struct ToggleTablet {};
@@ -61,20 +46,20 @@ struct DimisNoti {
     usize index;
 };
 
-struct StartApp {
+struct StartInstance {
     usize index;
 };
 
-struct MoveApp {
+struct MoveInstance {
     usize index;
     Math::Vec2i off;
 };
 
-struct CloseApp {
+struct CloseInstance {
     usize index;
 };
 
-struct FocusApp {
+struct FocusInstance {
     usize index;
 };
 
@@ -93,10 +78,10 @@ using Action = Union<
     Lock,
     Unlock,
     DimisNoti,
-    StartApp,
-    MoveApp,
-    CloseApp,
-    FocusApp,
+    StartInstance,
+    MoveInstance,
+    CloseInstance,
+    FocusInstance,
     Activate,
     ToggleSysPanel,
     ToggleAppThumbnail>;

@@ -490,6 +490,15 @@ struct Formatter<Le<T>> : public Formatter<T> {
     }
 };
 
+// MARK: Format Enums ----------------------------------------------------------
+
+template <Meta::Enum T>
+struct Formatter<T> {
+    Res<usize> format(Io::TextWriter &writer, T val) {
+        return Formatter<Meta::UnderlyingType<T>>().format(writer, toUnderlyingType(val));
+    }
+};
+
 // MARK: Format Pointers -------------------------------------------------------
 
 template <typename T>
@@ -779,6 +788,7 @@ struct Formatter<T> {
 };
 
 // MARK: Format String ---------------------------------------------------------
+
 template <StaticEncoding E>
 struct StringFormatter {
     bool prefix = false;

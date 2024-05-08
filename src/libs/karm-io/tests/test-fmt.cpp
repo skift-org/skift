@@ -1,3 +1,4 @@
+#include <karm-base/enum.h>
 #include <karm-io/fmt.h>
 #include <karm-logger/logger.h>
 #include <karm-test/macros.h>
@@ -77,6 +78,18 @@ test$("fmt-signed-number") {
     try$(testCase("-7b", -123, "x"));
     try$(testCase("499602d2", 1234567890, "x"));
     try$(testCase("-499602d2", -1234567890, "x"));
+
+    return Ok();
+}
+
+enum struct MyEnum {
+    BAR,
+    BAZ,
+};
+
+test$("fmt-enum") {
+    try$(testCase("0", MyEnum::BAR));
+    try$(testCase("1", MyEnum::BAZ));
 
     return Ok();
 }

@@ -55,6 +55,12 @@ struct Node :
         return *_parent;
     }
 
+    Node const &parentNode() const {
+        if (not _parent)
+            panic("node has no parent");
+        return *_parent;
+    }
+
     usize _parentIndex() {
         return indexOf(parentNode()._children, *this).unwrap();
     }

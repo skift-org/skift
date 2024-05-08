@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "ttf-cli",
+    "id": "ttf:cli",
     "type": "exe",
     "description": "Dump a TrueType font file to stdout",
     "requires": [

@@ -33,11 +33,19 @@ struct Cursor {
         return _end - _begin;
     }
 
-    always_inline constexpr T curr() const {
+    always_inline constexpr T const &curr() const {
         if (not ended()) [[unlikely]]
             panic("curr() called on ended cursor");
 
         return *_begin;
+    }
+
+    always_inline constexpr T const &operator*() const {
+        return curr();
+    }
+
+    always_inline constexpr T const *operator->() const {
+        return &curr();
     }
 
     always_inline constexpr T next() {
@@ -107,7 +115,25 @@ struct MutCursor {
     }
 
     always_inline constexpr T curr() const {
+        if (ended()) [[unlikely]]
+            panic("curr() called on ended cursor");
         return *_begin;
+    }
+
+    always_inline constexpr T &operator*() {
+        return curr();
+    }
+
+    always_inline constexpr T *operator->() {
+        return &curr();
+    }
+
+    always_inline constexpr T const &operator*() const {
+        return curr();
+    }
+
+    always_inline constexpr T const *operator->() const {
+        return &curr();
     }
 
     always_inline constexpr T next() {

@@ -71,8 +71,12 @@ Spec const Spec::C = {0, 0, 1};
 
 struct Selector;
 
+struct UniversalSelector {};
+
+static constexpr UniversalSelector UNIVERSAL = {};
+
 struct Combinator {
-    enum struct _Type {
+    enum struct Type {
         LIST,
         DESCENDANT,
         CHILD,
@@ -84,16 +88,14 @@ struct Combinator {
         WHERE,
     };
 
-    using enum _Type;
-    _Type type;
-    Vec<Selector> inners;
+    using enum Type;
+    Type type;
+    Box<Selector> lhs;
+    Box<Selector> rhs;
 };
 
 struct TypeSelector {
     TagName type;
-};
-
-struct UniversalSelector {
 };
 
 struct IdSelector {
@@ -153,6 +155,7 @@ struct AttributeSelector {
 using _Selector = Union<
     Combinator,
     TypeSelector,
+    UniversalSelector,
     IdSelector,
     ClassSelector,
     PseudoClass,
@@ -178,6 +181,6 @@ struct Karm::Io::Formatter<Web::Select::Spec> {
 template <>
 struct Karm::Io::Formatter<Web::Select::AnB> {
     Res<usize> format(Io::TextWriter &writer, Web::Select::AnB const &val) {
-        return Io::format(writer, "{}n{}{}", val.a, val.b < 0 ? "-" : "+", val.b);
+        return Io::format(writer, "{}n{}{}", val.a, val.b < 0 ? "-"s : "+"s, val.b);
     }
 };

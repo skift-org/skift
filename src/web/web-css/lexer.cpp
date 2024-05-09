@@ -162,53 +162,53 @@ static auto const RE_STRING =
 Res<Token> nextToken(Io::SScan &s) {
     if (s.ended()) {
         // NO SPEC
-        return Ok(Token{Token::Type::END_OF_FILE, s.end()});
+        return Ok(Token{Token::END_OF_FILE, s.end()});
     }
 
     s.begin();
 
     if (s.skip(RE_WHITESPACE_TOKEN)) {
-        return Ok(Token{Token::Type::WHITESPACE, s.end()});
+        return Ok(Token{Token::WHITESPACE, s.end()});
     }
 
     if (s.skip(RE_BRACKET_OPEN)) {
-        return Ok(Token{Token::Type::LEFT_CURLY_BRACKET, s.end()});
+        return Ok(Token{Token::LEFT_CURLY_BRACKET, s.end()});
     }
 
     if (s.skip(RE_BRACKET_CLOSE)) {
-        return Ok(Token{Token::Type::RIGHT_CURLY_BRACKET, s.end()});
+        return Ok(Token{Token::RIGHT_CURLY_BRACKET, s.end()});
     }
 
     if (s.skip(RE_SQUARE_BRACKET_OPEN)) {
-        return Ok(Token{Token::Type::LEFT_SQUARE_BRACKET, s.end()});
+        return Ok(Token{Token::LEFT_SQUARE_BRACKET, s.end()});
     }
 
-    if (s.skip(RE_SQUARE_BRACKET_OPEN)) {
-        return Ok(Token{Token::Type::RIGHT_SQUARE_BRACKET, s.end()});
+    if (s.skip(RE_SQUARE_BRACKET_CLOSE)) {
+        return Ok(Token{Token::RIGHT_SQUARE_BRACKET, s.end()});
     }
 
     if (s.skip(RE_PARENTHESIS_OPEN)) {
-        return Ok(Token{Token::Type::LEFT_PARENTHESIS, s.end()});
+        return Ok(Token{Token::LEFT_PARENTHESIS, s.end()});
     }
 
     if (s.skip(RE_PARENTHESIS_CLOSE)) {
-        return Ok(Token{Token::Type::RIGHT_PARENTHESIS, s.end()});
+        return Ok(Token{Token::RIGHT_PARENTHESIS, s.end()});
     }
 
     if (s.skip(RE_SEMICOLON)) {
-        return Ok(Token{Token::Type::SEMICOLON, s.end()});
+        return Ok(Token{Token::SEMICOLON, s.end()});
     }
 
     if (s.skip(RE_COLON)) {
-        return Ok(Token{Token::Type::COLON, s.end()});
+        return Ok(Token{Token::COLON, s.end()});
     }
 
     if (s.skip(RE_COMMA)) {
-        return Ok(Token{Token::Type::COMMA, s.end()});
+        return Ok(Token{Token::COMMA, s.end()});
     }
 
     if (s.skip(RE_HASH)) {
-        return Ok(Token{Token::Type::HASH, s.end()});
+        return Ok(Token{Token::HASH, s.end()});
     }
 
     // https://www.w3.org/TR/css-syntax-3/#consume-comment
@@ -221,52 +221,52 @@ Res<Token> nextToken(Io::SScan &s) {
             return Error::invalidInput("unterminated comment");
         }
 
-        return Ok(Token{Token::Type::COMMENT, data});
+        return Ok(Token{Token::COMMENT, data});
     }
 
     // https://www.w3.org/TR/css-syntax-3/#consume-numeric-token
     if (s.skip(RE_NUMBER)) {
         if (s.skip(RE_IDENTIFIER)) {
-            return Ok(Token{Token::Type::DIMENSION, s.end()});
+            return Ok(Token{Token::DIMENSION, s.end()});
         }
 
         if (s.skip(Re::single('%'))) {
-            return Ok(Token{Token::Type::PERCENTAGE, s.end()});
+            return Ok(Token{Token::PERCENTAGE, s.end()});
         }
 
-        return Ok(Token{Token::Type::NUMBER, s.end()});
+        return Ok(Token{Token::NUMBER, s.end()});
     }
 
     if (s.skip(RE_FUNCTION)) {
         if (s.end() == "url(" and s.skip(RE_URL)) {
             // unclear spec
-            return Ok(Token{Token::Type::URL, s.end()});
+            return Ok(Token{Token::URL, s.end()});
         }
 
-        return Ok(Token{Token::Type::FUNCTION, s.end()});
+        return Ok(Token{Token::FUNCTION, s.end()});
     }
 
     // https://www.w3.org/TR/css-syntax-3/#consume-name
     if (s.skip(RE_IDENTIFIER)) {
-        return Ok(Token{Token::Type::IDENT, s.end()});
+        return Ok(Token{Token::IDENT, s.end()});
     }
 
     if (s.skip(RE_AT_KEYWORD)) {
-        return Ok(Token{Token::Type::AT_KEYWORD, s.end()});
+        return Ok(Token{Token::AT_KEYWORD, s.end()});
     }
 
     // https://www.w3.org/TR/css-syntax-3/#consume-string-token
     if (s.skip(RE_STRING)) {
-        return Ok(Token{Token::Type::STRING, s.end()});
+        return Ok(Token{Token::STRING, s.end()});
     }
 
     if (s.skip(RE_DELIM)) {
-        return Ok(Token{Token::Type::DELIM, s.end()});
+        return Ok(Token{Token::DELIM, s.end()});
     }
 
     logDebug("error at {#}", s.curr());
     // NO SPEC BUT SHOULD BE UNREACHABLE
-    return Ok(Token{Token::Type::OTHER, s.end()});
+    return Ok(Token{Token::OTHER, s.end()});
 }
 
 } // namespace Web::Css

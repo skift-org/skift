@@ -10,6 +10,7 @@
 #include "lexer.h"
 
 namespace Web::Css {
+
 Res<Ast> _consumeComponentValue(Io::SScan &s, Token token);
 
 // https://www.w3.org/TR/css-syntax-3/#consume-a-simple-block
@@ -46,8 +47,8 @@ Res<Ast> _consumeFunc(Io::SScan &s) {
         switch (token.type) {
         case Token::RIGHT_PARENTHESIS:
             return Ok(std::move(fn));
-        case Token::Type::END_OF_FILE:
-            // this is a parse error
+        case Token::END_OF_FILE:
+            logError("unexpected end of file");
             return Ok(std::move(fn));
         default:
             fn.content.emplaceBack(try$(_consumeComponentValue(s, token)));
@@ -58,16 +59,16 @@ Res<Ast> _consumeFunc(Io::SScan &s) {
 // https://www.w3.org/TR/css-syntax-3/#consume-component-value
 Res<Ast> _consumeComponentValue(Io::SScan &s, Token token) {
     switch (token.type) {
-    case Token::Type::LEFT_SQUARE_BRACKET:
-        return (_consumeBlock(s, Token::Type::RIGHT_SQUARE_BRACKET));
+    case Token::LEFT_SQUARE_BRACKET:
+        return _consumeBlock(s, Token::RIGHT_SQUARE_BRACKET);
 
-    case Token::Type::LEFT_CURLY_BRACKET:
-        return (_consumeBlock(s, Token::Type::RIGHT_CURLY_BRACKET));
+    case Token::LEFT_CURLY_BRACKET:
+        return _consumeBlock(s, Token::RIGHT_CURLY_BRACKET);
 
-    case Token::Type::LEFT_PARENTHESIS:
-        return (_consumeBlock(s, Token::Type::RIGHT_PARENTHESIS));
+    case Token::LEFT_PARENTHESIS:
+        return _consumeBlock(s, Token::RIGHT_PARENTHESIS);
 
-    case Token::Type::FUNCTION:
+    case Token::FUNCTION:
         return _consumeFunc(s);
 
     default:

@@ -40,6 +40,7 @@ struct CSSStyleDeclaration {
 
 // https://www.w3.org/TR/cssom-1/#the-cssrule-interface
 struct CSSRule {
+    virtual ~CSSRule() = default;
 };
 
 // https://www.w3.org/TR/cssom-1/#the-cssstylerule-interface
@@ -65,7 +66,7 @@ struct StyleSheet {
 
     void deleteRule(unsigned long index) {
         logDebug("{}", index);
-        // TODO remove rule at index in cssRules
+        // TODO: remove rule at index in cssRules
     };
 };
 

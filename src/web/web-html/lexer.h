@@ -141,8 +141,8 @@ struct Lexer {
 
 static inline Str toStr(Token::Type type) {
     switch (type) {
-#define ITER(NAME)          \
-    case Token::Type::NAME: \
+#define ITER(NAME)    \
+    case Token::NAME: \
         return #NAME;
         FOREACH_TOKEN(ITER)
 #undef ITER

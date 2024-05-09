@@ -24,7 +24,6 @@ struct Ast {
         FOREACH_AST(ITER)
 #undef ITER
     };
-
     using enum _Type;
 
     _Type type;

@@ -62,6 +62,15 @@ struct Ns {
 
     _Id _id;
 
+    static Opt<Ns> fromUrl(Str url) {
+#define NAMESPACE(IDENT, URL) \
+    if (url == URL)           \
+        return _Id::IDENT;
+#include "defs/namespaces.inc"
+#undef NAMESPACE
+        return NONE;
+    }
+
     constexpr Ns(_Id id)
         : _id(id) {}
 

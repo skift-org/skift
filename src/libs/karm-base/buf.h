@@ -18,47 +18,40 @@ struct Buf {
 
     static Buf init(usize len, T fill = {}) {
         Buf buf;
-        buf._cap = len;
+        buf.ensure(len);
+
         buf._len = len;
-        buf._buf = new Inert<T>[len];
-        for (usize i = 0; i < len; i++) {
+        for (usize i = 0; i < len; i++)
             buf._buf[i].ctor(fill);
-        }
         return buf;
     }
 
-    Buf(usize cap = 0)
-        : _cap(cap) {
-        if (cap)
-            _buf = new Inert<T>[cap];
+    Buf(usize cap = 0) {
+        ensure(cap);
     }
 
     Buf(std::initializer_list<T> other) {
-        _cap = other.size();
+        ensure(other.size());
+
         _len = other.size();
-        _buf = new Inert<T>[_cap];
-        for (usize i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++)
             _buf[i].ctor(std::move(other.begin()[i]));
-        }
     }
 
     Buf(Sliceable<T> auto const &other) {
-        _cap = other.len();
+        ensure(other.len());
+
         _len = other.len();
-        _buf = new Inert<T>[_cap];
-        for (usize i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++)
             _buf[i].ctor(other[i]);
-        }
     }
 
     Buf(Buf const &other) {
-        _cap = other._cap;
-        _len = other._len;
-        _buf = new Inert<T>[_cap];
+        ensure(other._len);
 
-        for (usize i = 0; i < _len; i++) {
+        _len = other._len;
+        for (usize i = 0; i < _len; i++)
             _buf[i].ctor(other[i]);
-        }
     }
 
     Buf(Buf &&other) {
@@ -70,11 +63,8 @@ struct Buf {
     ~Buf() {
         if (not _buf)
             return;
-
-        for (usize i = 0; i < _len; i++) {
+        for (usize i = 0; i < _len; i++)
             _buf[i].dtor();
-        }
-
         delete[] _buf;
     }
 
@@ -124,9 +114,12 @@ struct Buf {
         if (_len == _cap)
             return;
 
-        Inert<T> *tmp = new Inert<T>[_len];
-        for (usize i = 0; i < _len; i++) {
-            tmp[i].ctor(_buf[i].take());
+        Inert<T> *tmp = nullptr;
+
+        if (_len) {
+            tmp = new Inert<T>[_len];
+            for (usize i = 0; i < _len; i++)
+                tmp[i].ctor(_buf[i].take());
         }
 
         delete[] _buf;

@@ -22,6 +22,12 @@ def kvmAvailable() -> bool:
     return False
 
 
+def sdlAvailable() -> bool:
+    return "sdl" in str(
+        subprocess.check_output(["qemu-system-x86_64", "-display", "help"])
+    )
+
+
 class Qemu(Machine):
     logError = False
     debugger = False
@@ -39,10 +45,6 @@ class Qemu(Machine):
             ovmf = shell.wget(
                 "https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd"
             )
-
-        supportsSDL = "sdl" in str(
-            subprocess.check_output(["qemu-system-x86_64", "-display", "help"])
-        )
 
         qemuCmd: list[str] = [
             "qemu-system-x86_64",
@@ -64,7 +66,7 @@ class Qemu(Machine):
             f"file=fat:rw:{image.finalize()},media=disk,format=raw",
         ]
 
-        if supportsSDL:
+        if sdlAvailable():
             qemuCmd += ["-display", "sdl"]
 
         if self.logError:
@@ -73,10 +75,10 @@ class Qemu(Machine):
         if self.debugger:
             qemuCmd += ["-s", "-S"]
 
-        if kvmAvailable():
-            if not self.logError:
+        if not self.logError:
+            if kvmAvailable():
                 qemuCmd += ["-enable-kvm"]
-        else:
-            print("KVM not available, using QEMU-TCG")
+            else:
+                print("KVM not available, using QEMU-TCG")
 
         shell.exec(*qemuCmd)

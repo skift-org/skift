@@ -14,7 +14,7 @@ Res<> entryPoint(Sys::Ctx &ctx) {
     auto deviceUnit = try$(Unit::load(ctx, "bundle://grund-device/_bin"_url));
     try$(bus.attach(deviceUnit));
 
-    auto shellUnit = try$(Unit::load(ctx, "bundle://hideo-shell/_bin"_url));
+    auto shellUnit = try$(Unit::load(ctx, "bundle://hideo-shell.main/_bin"_url));
     try$(bus.attach(shellUnit));
 
     return bus.run();

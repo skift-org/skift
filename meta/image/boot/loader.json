@@ -9,7 +9,7 @@
                 "bundle://grund-system/_bin",
                 "bundle://grund-device/_bin",
                 {
-                    "url": "bundle://hideo-shell/_bin",
+                    "url": "bundle://hideo-shell.main/_bin",
                     "props": {
                         "form-factor": "mobile"
                     }

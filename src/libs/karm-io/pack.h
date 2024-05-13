@@ -2,21 +2,56 @@
 
 #include <karm-base/reflect.h>
 #include <karm-base/vec.h>
+#include <karm-meta/nocopy.h>
+
+#include <karm-sys/_handle.h>
 
 #include "bscan.h"
+#include "impls.h"
 
 namespace Karm::Io {
+
+struct PackEmit : public BEmit {
+    Vec<Sys::Handle> _handles;
+
+    using BEmit::BEmit;
+
+    void give(Sys::Handle hnd) {
+        _handles.emplaceBack(hnd);
+    }
+
+    Slice<Sys::Handle> handles() const {
+        return _handles;
+    }
+
+    void clear() {
+        _handles.clear();
+    }
+};
+
+struct PackScan : public BScan {
+    Cursor<Sys::Handle> _handles;
+
+    PackScan(Bytes bytes, Slice<Sys::Handle> handles)
+        : BScan(bytes), _handles(handles) {}
+
+    Sys::Handle take() {
+        if (_handles.ended())
+            return Sys::INVALID;
+        return _handles.next();
+    }
+};
 
 template <typename T>
 struct Packer;
 
 template <typename T>
-static constexpr void pack(BEmit &e, T const &val) {
-    Packer<T>::pack(e, val);
+static Res<> pack(PackEmit &e, T const &val) {
+    return Packer<T>::pack(e, val);
 }
 
 template <typename T>
-static constexpr T unpack(BScan &s) {
+static Res<T> unpack(PackScan &s) {
     return Packer<T>::unpack(s);
 }
 
@@ -24,14 +59,15 @@ static constexpr T unpack(BScan &s) {
 
 template <Meta::TrivialyCopyable T>
 struct Packer<T> {
-    static void pack(BEmit &e, T const &val) {
+    static Res<> pack(PackEmit &e, T const &val) {
         e.writeFrom(val);
+        return Ok();
     }
 
-    static T unpack(BScan &s) {
+    static Res<T> unpack(PackScan &s) {
         T res;
         s.readTo(&res);
-        return res;
+        return Ok(res);
     }
 };
 
@@ -39,64 +75,68 @@ struct Packer<T> {
 
 template <>
 struct Packer<None> {
-    static void pack(BEmit &, None const &) {
+    static Res<> pack(BEmit &, None const &) {
+        return Ok();
     }
 
-    static None unpack(BScan &) {
+    static Res<None> unpack(BScan &) {
         return NONE;
     }
 };
 
 template <typename T>
 struct Packer<Opt<T>> {
-    static void pack(BEmit &e, Opt<T> const &val) {
+    static Res<> pack(PackEmit &e, Opt<T> const &val) {
         e.writeU8le(val.has());
         if (val.has())
-            pack(e, val.unwrap());
+            try$(pack(e, val.unwrap()));
+        return Ok();
     }
 
-    static Opt<T> unpack(BScan &s) {
+    static Res<Opt<T>> unpack(PackScan &s) {
         bool has = s.nextU8le();
         if (not has)
-            return NONE;
-        return unpack<T>();
+            return Ok<Opt<T>>(NONE);
+        return Ok(unpack<T>());
     }
 };
 
 template <>
 struct Packer<Error> {
-    // TODO: Because the message message in the error is a non owning string
-    //       we can't send it over the wire because their will be no one
-    //       to own it at the other and.
+    // TODO: Because the message in the error is a non owning string
+    //       we can't send it over the wire because they will be no one
+    //       to own it at the other end.
     //
     //       This should be fine from a technical standpoint since the code
-    //       don't care about the message, but the user does thougt.
+    //       don't care about the message, but the user does though.
 
-    static void pack(BEmit &e, Error const &val) {
-        Io::pack(e, (u32)val.code());
+    static Res<> pack(PackEmit &e, Error const &val) {
+        return Io::pack(e, (u32)val.code());
     }
 
-    static Error unpack(BScan &s) {
-        return {(Error::Code)Io::unpack<u32>(s), nullptr};
+    static Res<Error> unpack(PackScan &s) {
+        auto code = (Error::Code)try$(Io::unpack<u32>(s));
+        return Ok(Error{code, nullptr});
     }
 };
 
 template <typename T, typename E>
 struct Packer<Res<T, E>> {
-    static void pack(BEmit &e, Res<T, E> const &val) {
+    static Res<> pack(PackEmit &e, Res<T, E> const &val) {
         e.writeU8le(val.has());
         if (val.has())
-            Io::pack(e, val.unwrap());
-        else
-            Io::pack(e, val.none());
+            return Io::pack(e, val.unwrap());
+        return Io::pack(e, val.none());
     }
 
-    static Res<T, E> unpack(BScan &s) {
+    static Res<Res<T, E>> unpack(PackScan &s) {
         bool has = s.nextU8le();
         if (has) {
-            return Ok(Io::unpack<T>(s));
+            auto res = Ok<T>(try$(Io::unpack<T>(s)));
+            return Ok(res);
         }
-        return Io::unpack<E>(s);
+        auto err = try$(Io::unpack<E>(s));
+        return Ok(err);
     }
 };
 
@@ -104,18 +144,18 @@ struct Packer<Res<T, E>> {
 
 template <Reflectable T>
 struct Packer<T> {
-    static void pack(BEmit &e, T const &val) {
-        iterFields(val, [&](auto, auto const &v) {
-            Io::pack(e, v);
+    static Res<> pack(PackEmit &e, T const &val) {
+        return iterFields(val, [&](auto, auto const &v) {
+            return Io::pack(e, v);
         });
     }
 
-    static T unpack(BScan &s) {
+    static Res<T> unpack(PackScan &s) {
         T res;
-        iterFields(res, [&](auto, auto const &v) {
-            Io::unpack(s, v);
-        });
-        return res;
+        try$(iterFields(res, [&](auto, auto const &v) {
+            return Io::unpack(s, v);
+        }));
+        return Ok(res);
     }
 };
 
@@ -123,21 +163,22 @@ struct Packer<T> {
 
 template <typename T>
 struct Packer<Vec<T>> {
-    static void pack(BEmit &e, Vec<T> const &val) {
+    static Res<> pack(PackEmit &e, Vec<T> const &val) {
         e.writeU64le(val.len());
         for (auto &i : val) {
-            Io::pack(e, i);
+            try$(Io::pack(e, i));
         }
+        return Ok();
     }
 
-    static void unpack(BScan &s) {
+    static Res<Vec<T>> unpack(PackScan &s) {
         auto len = s.nextU64le();
         Vec<T> res;
         res.ensure(len);
         for (usize i = 0; i < len; i++) {
-            res.emplaceBack(Io::unpack<T>(s));
+            res.emplaceBack(try$(Io::unpack<T>(s)));
         }
-        return res;
+        return Ok(res);
     }
 };
 
@@ -145,17 +186,18 @@ struct Packer<Vec<T>> {
 
 template <StaticEncoding E>
 struct Packer<_String<E>> {
-    static void pack(BEmit &e, _String<E> const &val) {
+    static Res<> pack(PackEmit &e, _String<E> const &val) {
         e.writeU64le(val.len());
         e.writeStr(val);
+        return Ok();
     }
 
-    static String unpack(BScan &s) {
+    static Res<String> unpack(PackScan &s) {
         StringBuilder b;
         auto len = s.nextU64le();
         b.ensure(len);
         b.append(s.nextStr(len));
-        return b.take();
+        return Ok(b.take());
     }
 };
 
@@ -163,35 +205,37 @@ struct Packer<_String<E>> {
 
 template <typename Car, typename Cdr>
 struct Packer<Cons<Car, Cdr>> {
-    static void pack(BEmit &e, Cons<Car, Cdr> const &val) {
-        pack(e, val.car);
-        pack(e, val.cdr);
+    static Res<> pack(PackEmit &e, Cons<Car, Cdr> const &val) {
+        Io::pack(e, val.car);
+        Io::pack(e, val.cdr);
+        return Ok();
     }
 
-    static Cons<Car, Cdr> unpack(BScan &s) {
-        return {
-            Io::unpack<Car>(s),
-            Io::unpack<Cdr>(s),
+    static Res<Cons<Car, Cdr>> unpack(PackScan &s) {
+        Cons res = {
+            try$(Io::unpack<Car>(s)),
+            try$(Io::unpack<Cdr>(s)),
         };
+        return Ok(res);
     }
 };
 
 template <typename... Ts>
 struct Packer<Tuple<Ts...>> {
-    static void pack(BEmit &e, Tuple<Ts...> const &val) {
+    static Res<> pack(PackEmit &e, Tuple<Ts...> const &val) {
         val.visit([&](auto const &f) {
-            Io::pack(e, f);
-            return true;
+            return Io::pack(e, f);
         });
+        return Ok();
     }
 
-    static Tuple<Ts...> unpack(BScan &s) {
+    static Res<Tuple<Ts...>> unpack(PackScan &s) {
         Tuple<Ts...> res;
-        res.visit([&]<typename T>(T &f) {
-            f = Io::unpack<T>(s);
-            return true;
-        });
-        return res;
+        try$(res.visit([&]<typename T>(T &f) -> Res<> {
+            f = try$(Io::unpack<T>(s));
+            return Ok();
+        }));
+        return Ok(res);
     }
 };
 

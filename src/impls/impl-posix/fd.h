@@ -6,7 +6,7 @@ namespace Posix {
 
 struct Fd : public Sys::Fd {
     isize _raw;
-    bool _leak = false;
+    bool _leak = false; //< Do not close on destruction
 
     Fd(isize raw);
 
@@ -31,6 +31,8 @@ struct Fd : public Sys::Fd {
     Res<Sys::_Sent> send(Bytes, Slice<Sys::Handle>, Sys::SocketAddr) override;
 
     Res<Sys::_Received> recv(MutBytes, MutSlice<Sys::Handle>) override;
+
+    Res<> pack(Io::PackEmit &e) override;
 };
 
 } // namespace Posix

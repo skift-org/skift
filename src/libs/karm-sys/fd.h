@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/rc.h>
+#include <karm-io/pack.h>
 #include <karm-io/types.h>
 #include <karm-meta/nocopy.h>
 #include <karm-meta/traits.h>
@@ -40,6 +41,10 @@ struct Fd : Meta::NoCopy {
     virtual Res<_Sent> send(Bytes, Slice<Handle>, SocketAddr) = 0;
 
     virtual Res<_Received> recv(MutBytes, MutSlice<Handle>) = 0;
+
+    virtual Res<> pack(Io::PackEmit &e) = 0;
+
+    static Res<Strong<Fd>> unpack(Io::PackScan &s);
 };
 
 struct NullFd : public Fd {
@@ -62,6 +67,8 @@ struct NullFd : public Fd {
     Res<_Sent> send(Bytes, Slice<Handle>, SocketAddr) override;
 
     Res<_Received> recv(MutBytes, MutSlice<Handle>) override;
+
+    Res<> pack(Io::PackEmit &e) override;
 };
 
 template <typename T>

@@ -118,4 +118,9 @@ Res<Sys::_Received> Fd::recv(MutBytes bytes, MutSlice<Sys::Handle>) {
     );
 }
 
+Res<> Fd::pack(Io::PackEmit &e) {
+    e.give(handle());
+    return Ok();
+}
+
 } // namespace Posix

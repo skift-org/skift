@@ -12,6 +12,10 @@
 
 namespace Karm::Sys::_Embed {
 
+// MARK: Fd --------------------------------------------------------------------
+
+Res<Strong<Sys::Fd>> unpackFd(Io::PackScan &);
+
 // MARK: File I/O --------------------------------------------------------------
 
 Res<Strong<Sys::Fd>> openFile(Mime::Url const &url);

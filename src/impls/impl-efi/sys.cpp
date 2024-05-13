@@ -88,6 +88,10 @@ struct ConOut : public Sys::Fd {
     Res<_Received> recv(MutBytes, MutSlice<Handle>) override {
         notImplemented();
     }
+
+    Res<> pack(Io::PackEmit &) override {
+        notImplemented();
+    }
 };
 
 struct FileProto : public Sys::Fd {
@@ -192,7 +196,15 @@ struct FileProto : public Sys::Fd {
     Res<_Received> recv(MutBytes, MutSlice<Handle>) override {
         notImplemented();
     }
+
+    Res<> pack(Io::PackEmit &) override {
+        notImplemented();
+    }
 };
+
+Res<Strong<Sys::Fd>> unpackFd(Io::PackScan &) {
+    notImplemented();
+}
 
 Res<Strong<Sys::Fd>> createIn() {
     return Ok(makeStrong<Sys::NullFd>());

@@ -74,8 +74,7 @@ struct Mmap :
     }
 
     void leak() {
-        _buf = nullptr;
-        _size = 0;
+        _owned = false;
     }
 };
 

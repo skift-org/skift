@@ -74,6 +74,17 @@ Res<Mime::Path> resolve(Mime::Url const &url) {
     return Ok(resolved);
 }
 
+// MARK: Fd --------------------------------------------------------------------
+
+Res<Strong<Sys::Fd>> unpackFd(Io::PackScan &s) {
+    auto handle = s.take();
+    if (handle == Sys::INVALID)
+        return Error::invalidHandle();
+    return Ok(makeStrong<Posix::Fd>(handle.value()));
+}
+
+// MARK: File I/O --------------------------------------------------------------
+
 Res<Strong<Sys::Fd>> openFile(Mime::Url const &url) {
     String str = try$(resolve(url)).str();
 

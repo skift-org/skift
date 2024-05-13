@@ -169,6 +169,10 @@ struct BufferWriter : public Writer, public Flusher {
     Buf<Byte> take() {
         return std::move(_buf);
     }
+
+    void clear() {
+        _buf.trunc(0);
+    }
 };
 
 struct BitReader {

@@ -4,6 +4,8 @@
 #include <karm-base/enum.h>
 #include <karm-base/std.h>
 
+#include "_handle.h"
+
 namespace Karm::Sys {
 
 enum MmapFlags : u64 {
@@ -33,9 +35,5 @@ struct MmapResult {
     usize vaddr;
     usize size;
 };
-
-using Handle = Distinct<usize, struct _HandleTag>;
-
-static constexpr Handle INVALID = Handle(-1);
 
 } // namespace Karm::Sys

@@ -1,6 +1,12 @@
 #include "fd.h"
 
+#include "_embed.h"
+
 namespace Karm::Sys {
+
+Res<Strong<Fd>> Fd::unpack(Io::PackScan &s) {
+    return _Embed::unpackFd(s);
+}
 
 Res<usize> NullFd::read(MutBytes) {
     return Ok(0uz);
@@ -39,6 +45,10 @@ Res<_Sent> NullFd::send(Bytes, Slice<Handle>, SocketAddr) {
 
 Res<_Received> NullFd::recv(MutBytes, MutSlice<Handle>) {
     return Ok<_Received>(0uz, 0uz, Ip4::unspecified(0));
+}
+
+Res<> NullFd::pack(Io::PackEmit &e) {
+    return Io::pack(e, INVALID);
 }
 
 } // namespace Karm::Sys

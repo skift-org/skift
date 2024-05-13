@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/string.h>
+#include <karm-io/pack.h>
 
 #include "syscalls.h"
 
@@ -78,6 +79,8 @@ struct Object {
 struct Domain : public Object {
     using Props = DomainProps;
 
+    using Object::Object;
+
     static Domain self() {
         return Domain{ROOT};
     }
@@ -100,6 +103,8 @@ struct Domain : public Object {
 
 struct Task : public Object {
     using Props = TaskProps;
+
+    using Object::Object;
 
     static Task self() {
         return Task{ROOT};
@@ -125,6 +130,8 @@ struct Task : public Object {
 struct Vmo : public Object {
     using Props = VmoProps;
 
+    using Object::Object;
+
     static Res<Vmo> create(Cap dest, usize phys, usize len, VmoFlags flags = VmoFlags::NONE) {
         return create<Vmo>(dest, phys, len, flags);
     }
@@ -132,6 +139,8 @@ struct Vmo : public Object {
 
 struct Space : public Object {
     using Props = SpaceProps;
+
+    using Object::Object;
 
     static Space self() {
         return Space{ROOT};
@@ -211,6 +220,8 @@ static inline Res<Mapped> map(Vmo &vmo, MapFlags flags = MapFlags::NONE) {
 struct Io : public Object {
     using Props = IopProps;
 
+    using Object::Object;
+
     static Res<Io> create(Cap dest, usize base, usize len) {
         return create<Io>(dest, base, len);
     }
@@ -228,6 +239,8 @@ struct Io : public Object {
 
 struct Channel : public Object {
     using Props = ChannelProps;
+
+    using Object::Object;
 
     static Res<Channel> create(Cap dest, usize bufLen, usize capLen) {
         return create<Channel>(dest, bufLen, capLen);
@@ -249,6 +262,8 @@ struct Channel : public Object {
 struct Irq : public Object {
     using Props = IrqProps;
 
+    using Object::Object;
+
     static Res<Irq> create(Cap dest, usize irq) {
         return create<Irq>(dest, irq);
     }
@@ -256,6 +271,8 @@ struct Irq : public Object {
 
 struct Listener : public Object {
     using Props = ListenerProps;
+
+    using Object::Object;
 
     Buf<Event> _evs = {};
     usize _len = {};
@@ -290,3 +307,16 @@ struct Listener : public Object {
 };
 
 } // namespace Hj
+
+template <Meta::Derive<Hj::Object> T>
+struct Karm::Io::Packer<T> {
+    static Res<> pack(PackEmit &e, T const &val) {
+        e.give(Sys::Handle{val.raw()});
+        return Ok();
+    }
+
+    static Res<T> unpack(PackScan &s) {
+        auto cap = s.take();
+        return Ok(T{Hj::Cap{cap.value()}});
+    }
+};

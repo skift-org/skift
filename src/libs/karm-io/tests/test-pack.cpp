@@ -6,10 +6,12 @@ namespace Karm::Io::Tests {
 test$("pack-unpack") {
     auto testCase = [&]<typename T>(T const &input) -> Res<> {
         Io::BufferWriter buf;
-        Io::BEmit e{buf};
-        Io::pack(e, input);
-        Io::BScan s{buf.bytes()};
-        auto output = Io::unpack<T>(s);
+        Io::PackEmit e{buf};
+
+        try$(Io::pack(e, input));
+
+        Io::PackScan s{buf.bytes(), {}};
+        auto output = try$(Io::unpack<T>(s));
         expectEq$(input, output);
         return Ok();
     };

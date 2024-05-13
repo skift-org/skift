@@ -146,7 +146,7 @@ struct MutSlice {
 
     template <typename U>
     constexpr MutSlice<U> cast() const {
-        static_assert(sizeof(T) == sizeof(U));
+        static_assert(sizeof(T) == sizeof(U) and alignof(T) == alignof(U));
         return MutSlice<U>{(U *)_buf, _len};
     }
 

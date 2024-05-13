@@ -4,95 +4,101 @@
 
 namespace Hjert::Core {
 
-Res<Parcel> Parcel::fromMsg(Domain &dom, Hj::Msg msg) {
-    Parcel parcel;
-    parcel._label = msg.label;
-    parcel._flags = msg.flags;
-
-    for (usize i = 0; i < 6; i++) {
-        if (msg.isCap(i)) {
-            parcel._slots[i] = try$(dom.get(try$(msg.loadCap(i))));
-        } else {
-            parcel._slots[i] = try$(msg.loadArg(i));
-        }
-    }
-
-    return Ok(Parcel{});
+Res<Strong<Channel>> Channel::create(usize bufCap, usize capsCap) {
+    return Ok(makeStrong<Channel>(bufCap, capsCap));
 }
 
-Res<Hj::Msg> Parcel::toMsg(Domain &dom) {
-    Hj::Msg msg{_label};
-
-    for (usize i = 0; i < 6; i++) {
-        try$(_slots[i].visit(
-            Visitor{
-                [&](None) -> Res<> {
-                    return Ok();
-                },
-                [&](Hj::Arg arg) -> Res<> {
-                    msg.storeArg(i, arg);
-                    return Ok();
-                },
-                [&](Strong<Object> obj) -> Res<> {
-                    msg.storeCap(i, try$(dom.add(Hj::ROOT, obj)));
-                    return Ok();
-                },
-            }
-        ));
-    }
-
-    return Ok(msg);
-}
-
-Res<Strong<Channel>> Channel::create(usize cap) {
-    return Ok(makeStrong<Channel>(cap));
-}
-
-Channel::Channel(usize cap) : _cap(cap) {
-}
-
-Res<> Channel::_ensureNoEmpty() {
-    if (_ring.len() == 0) {
-        return Error::wouldBlock("channel empty");
-    }
-    return Ok();
-}
-
-Res<> Channel::_ensureNoFull() {
-    if (_ring.len() == _cap) {
-        return Error::wouldBlock("channel full");
-    }
-    return Ok();
+Channel::Channel(usize bufCap, usize capsCap)
+    : _sr(max(bufCap / 16, 16uz)),
+      _bytes(bufCap),
+      _caps(capsCap) {
 }
 
 Res<> Channel::_ensureOpen() {
-    if (_closed) {
+    if (_closed)
         return Error::brokenPipe("channel closed");
-    }
     return Ok();
 }
 
 void Channel::_updateSignalsUnlock() {
     _signalUnlock(
-        _closed ? Hj::Sigs::CLOSED : Hj::Sigs::NONE,
-        _closed ? Hj::Sigs::NONE : Hj::Sigs::CLOSED
+        (_sr.len() > 0 ? Hj::Sigs::READABLE : Hj::Sigs::NONE) |
+            (_sr.rem() > 0 ? Hj::Sigs::WRITABLE : Hj::Sigs::NONE) |
+            (_closed ? Hj::Sigs::CLOSED : Hj::Sigs::NONE),
+
+        (_sr.len() > 0 ? Hj::Sigs::READABLE : Hj::Sigs::NONE) |
+            (_sr.rem() > 0 ? Hj::Sigs::WRITABLE : Hj::Sigs::NONE) |
+            (_closed ? Hj::Sigs::NONE : Hj::Sigs::CLOSED)
     );
 }
 
-Res<> Channel::send(Domain &dom, Hj::Msg msg) {
+Res<Hj::SentRecv> Channel::send(Domain &dom, Bytes bytes, Slice<Hj::Cap> caps) {
     ObjectLockScope scope{*this};
     try$(_ensureOpen());
-    try$(_ensureNoFull());
-    _ring.pushBack(try$(Parcel::fromMsg(dom, msg)));
-    return Ok();
+
+    // Make sure everything is ready for the message
+    if (_sr.rem() < 1)
+        return Error::invalidInput("not enough space for message");
+
+    if (_bytes.rem() < bytes.len())
+        return Error::invalidInput("not enough space for bytes");
+
+    if (_caps.rem() < caps.len())
+        return Error::invalidInput("not enough space for caps");
+
+    // Everything is ready, let's send the message
+    auto save = _caps.len();
+    for (auto cap : caps) {
+        auto res = dom.get(cap);
+        if (not res) {
+            // Uh oh, we need to rollback
+            _caps.trunc(save);
+            return res.none();
+        }
+        _caps.pushBack(try$(dom.get(cap)));
+    }
+
+    for (usize i = 0; i < bytes.len(); i++)
+        _bytes.pushBack(bytes[i]);
+
+    _sr.pushBack({bytes.len(), caps.len()});
+
+    _updateSignalsUnlock();
+    return Ok<Hj::SentRecv>(bytes.len(), caps.len());
 }
 
-Res<Hj::Msg> Channel::recv(Domain &dom) {
+Res<Hj::SentRecv> Channel::recv(Domain &dom, MutBytes bytes, MutSlice<Hj::Cap> caps) {
     ObjectLockScope scope{*this};
     try$(_ensureOpen());
-    try$(_ensureNoEmpty());
-    auto parcel = _ring.popBack();
-    return parcel.toMsg(dom);
+
+    ObjectLockScope domScope{dom};
+
+    // Make sure everything is ready for the message
+    if (_sr.len() == 0)
+        return Error::wouldBlock("no messages available");
+
+    auto &[expectedBytes, expectedCaps] = _sr.peek(0);
+    if (bytes.len() < expectedBytes)
+        return Error::invalidInput("not enough space for bytes");
+
+    if (caps.len() < expectedCaps)
+        return Error::invalidInput("not enough space for caps");
+
+    if (caps.len() > dom._availableUnlocked())
+        return Error::invalidInput("not enough space in domain");
+
+    // Everything is ready, let's receive the message
+    _sr.popFront();
+
+    for (usize i = 0; i < expectedBytes; i++)
+        bytes[i] = _bytes.popFront();
+
+    for (usize i = 0; i < expectedCaps; i++)
+        // NOTE: We unwrap here because we know that the domain has enough space
+        caps[i] = dom.add(Hj::ROOT, _caps.popFront()).unwrap("domain full");
+
+    _updateSignalsUnlock();
+    return Ok<Hj::SentRecv>(expectedBytes, expectedCaps);
 }
 
 Res<> Channel::close() {

@@ -116,12 +116,12 @@ Res<> _out(Cap cap, IoLen len, usize port, Arg val) {
     return _syscall(Syscall::OUT, cap.raw(), (Arg)len, port, val);
 }
 
-Res<> _send(Cap cap, Msg const *msg, Cap from) {
-    return _syscall(Syscall::SEND, cap.raw(), (Arg)msg, from.raw());
+Res<> _send(Cap cap, Byte const *buf, usize bufLen, Cap const *caps, usize capLen) {
+    return _syscall(Syscall::SEND, cap.raw(), (Arg)buf, bufLen, (usize)caps, capLen);
 }
 
-Res<> _recv(Cap cap, Msg *msg, Cap to) {
-    return _syscall(Syscall::RECV, cap.raw(), (Arg)msg, to.raw());
+Res<> _recv(Cap cap, Byte *buf, usize *bufLen, Cap *caps, usize *capLen) {
+    return _syscall(Syscall::RECV, cap.raw(), (Arg)buf, (Arg)bufLen, (Arg)caps, (Arg)capLen);
 }
 
 Res<> _close(Cap cap) {

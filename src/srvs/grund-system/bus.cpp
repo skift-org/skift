@@ -65,12 +65,12 @@ Res<Strong<Unit>> Unit::load(Sys::Ctx &ctx, Mime::Url url) {
 
     logInfo("system: creating communication channels...");
     logInfo("system: in...");
-    auto in = try$(Hj::Channel::create(Hj::Domain::self(), 512));
+    auto in = try$(Hj::Channel::create(Hj::Domain::self(), 4096, 16));
     try$(in.label("in"));
     auto inCap = try$(domain.attach(in));
 
     logInfo("system: out...");
-    auto out = try$(Hj::Channel::create(Hj::Domain::self(), 512));
+    auto out = try$(Hj::Channel::create(Hj::Domain::self(), 512, 16));
     try$(out.label("out"));
     auto outCap = try$(domain.attach(out));
 

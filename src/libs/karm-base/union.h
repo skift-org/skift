@@ -13,6 +13,9 @@ struct Union {
     static_assert(sizeof...(Ts) <= 255, "Union can only hold up to 255 types");
 
     alignas(max(alignof(Ts)...)) char _buf[max(sizeof(Ts)...)];
+
+    /// Values outside of [0, sizeof...(Ts)) are valid but undefined
+    /// they are used as a niche value to indicate that the union is empty
     u8 _index;
 
     always_inline Union() = delete;
@@ -159,6 +162,8 @@ struct Union {
     }
 
     always_inline usize index() const { return _index; }
+
+    always_inline bool valid() const { return _index < sizeof...(Ts); }
 
     template <Meta::Contains<Ts...> T>
     std::partial_ordering operator<=>(T const &other) const {

@@ -11,6 +11,8 @@ struct Domain : public BaseObject<Domain, Hj::Type::DOMAIN> {
 
     static Res<Strong<Domain>> create();
 
+    Res<Hj::Cap> _addUnlock(Hj::Cap dest, Strong<Object> obj);
+
     Res<Hj::Cap> add(Hj::Cap dest, Strong<Object> obj);
 
     Res<Strong<Object>> _getUnlock(Hj::Cap cap);
@@ -32,6 +34,8 @@ struct Domain : public BaseObject<Domain, Hj::Type::DOMAIN> {
     }
 
     Res<> drop(Hj::Cap cap);
+
+    usize _availableUnlocked() const;
 };
 
 } // namespace Hjert::Core

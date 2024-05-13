@@ -19,55 +19,73 @@ struct User {
     }
 
     Res<T> load(Space &space) {
-        if (_addr == 0)
-            return Error::invalidInput("null pointer");
-
         ObjectLockScope scope(space);
-        try$(space._validate(vrange()));
-        return Ok(*reinterpret_cast<T *>(_addr));
+        auto &v = *try$(_acquire(space));
+        return Ok(v);
     }
 
     Res<> store(Space &space, T const &val) {
+        ObjectLockScope scope(space);
+        auto &v = *try$(_acquire(space));
+        v = val;
+        return Ok();
+    }
+
+    Res<T *> _acquire(Space &space) {
         if (_addr == 0)
             return Error::invalidInput("null pointer");
-
-        ObjectLockScope scope(space);
         try$(space._validate(vrange()));
-        *reinterpret_cast<T *>(_addr) = val;
-        return Ok();
+        return Ok(reinterpret_cast<T *>(_addr));
     }
 };
 
 // A wrapper an userspace provided array.
 // This is used to load and store values from userspace safely.
-template <typename T>
+template <typename Slice>
 struct UserSlice {
+    using Inner = typename Slice::Inner;
+
     usize _addr;
     usize _len;
 
-    UserSlice(Hj::Arg addr, usize len)
+    UserSlice(usize addr, usize len)
         : _addr(addr),
           _len(len) {
     }
 
     Hal::VmmRange vrange() const {
-        return Hal::VmmRange{_addr, sizeof(T) * _len};
+        return Hal::VmmRange{_addr, sizeof(Inner) * _len};
     }
 
     usize len() const {
         return _len;
     }
 
-    template <typename R>
     Res<> with(Space &space, auto f) {
-        if (_addr == 0) {
-            return Error::invalidInput("null pointer");
-        }
-
         ObjectLockScope scope(space);
+        return f(try$(_acquire(space)));
+    }
+
+    Res<Slice> _acquire(Space &space) {
+        if (_addr == 0)
+            return Error::invalidInput("null pointer");
+
         try$(space._validate(vrange()));
-        return f(R{reinterpret_cast<T *>(_addr), _len});
+        return Ok(Slice{reinterpret_cast<Inner *>(_addr), _len});
     }
 };
+
+template <typename... Args>
+static inline Res<> with(Space &space, auto f, Args &&...args) {
+    ObjectLockScope scope(space);
+    Tuple acquired{args._acquire(space)...};
+    try$(acquired.visit([](auto &a) -> Res<> {
+        try$(a);
+        return Ok();
+    }));
+    return acquired.apply([&](auto &...args) {
+        return f(args.unwrap()...);
+    });
+}
 
 } // namespace Hjert::Core

@@ -25,7 +25,7 @@ inline Res<usize> log(Bytes bytes) {
 template <typename O, typename... Args>
 inline Res<O> create(Cap dest, Args &&...args) {
     Cap c;
-    typename O::PROPS props{std::forward<Args>(args)...};
+    typename O::Props props{std::forward<Args>(args)...};
     Props p = props;
     try$(_create(dest, &c, &p));
     return Ok(O{c});
@@ -76,7 +76,7 @@ struct Object {
 };
 
 struct Domain : public Object {
-    using PROPS = DomainProps;
+    using Props = DomainProps;
 
     static Domain self() {
         return Domain{ROOT};
@@ -99,7 +99,7 @@ struct Domain : public Object {
 };
 
 struct Task : public Object {
-    using PROPS = TaskProps;
+    using Props = TaskProps;
 
     static Task self() {
         return Task{ROOT};
@@ -123,7 +123,7 @@ struct Task : public Object {
 };
 
 struct Vmo : public Object {
-    using PROPS = VmoProps;
+    using Props = VmoProps;
 
     static Res<Vmo> create(Cap dest, usize phys, usize len, VmoFlags flags = VmoFlags::NONE) {
         return create<Vmo>(dest, phys, len, flags);
@@ -131,7 +131,7 @@ struct Vmo : public Object {
 };
 
 struct Space : public Object {
-    using PROPS = SpaceProps;
+    using Props = SpaceProps;
 
     static Space self() {
         return Space{ROOT};
@@ -209,7 +209,7 @@ static inline Res<Mapped> map(Vmo &vmo, MapFlags flags = MapFlags::NONE) {
 }
 
 struct Io : public Object {
-    using PROPS = IopProps;
+    using Props = IopProps;
 
     static Res<Io> create(Cap dest, usize base, usize len) {
         return create<Io>(dest, base, len);
@@ -227,23 +227,27 @@ struct Io : public Object {
 };
 
 struct Channel : public Object {
-    using PROPS = ChannelProps;
+    using Props = ChannelProps;
 
-    static Res<Channel> create(Cap dest, usize len) {
-        return create<Channel>(dest, len);
+    static Res<Channel> create(Cap dest, usize bufLen, usize capLen) {
+        return create<Channel>(dest, bufLen, capLen);
     }
 
-    Res<> send(Msg const &msg, Domain &from) {
-        return _send(_cap, &msg, from);
+    Res<SentRecv> send(Bytes buf, Slice<Cap> caps) {
+        try$(_send(_cap, buf.buf(), buf.len(), caps.buf(), caps.len()));
+        return Ok<SentRecv>(buf.len(), caps.len());
     }
 
-    Res<> recv(Msg &msg, Domain &to) {
-        return _recv(_cap, &msg, to);
+    Res<SentRecv> recv(MutBytes buf, MutSlice<Cap> caps) {
+        usize bufLen = buf.len();
+        usize capLen = caps.len();
+        try$(_recv(_cap, buf.buf(), &bufLen, caps.buf(), &capLen));
+        return Ok<SentRecv>(bufLen, capLen);
     }
 };
 
 struct Irq : public Object {
-    using PROPS = IrqProps;
+    using Props = IrqProps;
 
     static Res<Irq> create(Cap dest, usize irq) {
         return create<Irq>(dest, irq);
@@ -251,7 +255,7 @@ struct Irq : public Object {
 };
 
 struct Listener : public Object {
-    using PROPS = ListenerProps;
+    using Props = ListenerProps;
 
     Buf<Event> _evs = {};
     usize _len = {};
@@ -270,6 +274,7 @@ struct Listener : public Object {
 
     Res<> poll(TimeStamp deadline) {
         _evs.resize(256);
+        _len = 0;
         return _poll(_cap, _evs.buf(), _evs.len(), &_len, deadline);
     }
 

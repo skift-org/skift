@@ -15,7 +15,8 @@ struct Ring {
 
     constexpr Ring() = default;
 
-    Ring(usize cap) : _cap(cap) {
+    Ring(usize cap)
+        : _cap(cap) {
         _buf = new Inert<T>[cap];
     }
 
@@ -106,8 +107,30 @@ struct Ring {
         return _buf[(_tail + index) % _cap].unwrap();
     }
 
+    void trunc(usize newLen) {
+        if (newLen > _len) [[unlikely]]
+            panic("trunc to longer length");
+
+        for (usize i = newLen; i < _len; i++)
+            _buf[(_tail + i) % _cap].dtor();
+
+        _len = newLen;
+    }
+
+    usize head() const {
+        return _head;
+    }
+
+    usize tail() const {
+        return _tail;
+    }
+
     usize len() const {
         return _len;
+    }
+
+    usize cap() const {
+        return _cap;
     }
 
     usize rem() const {

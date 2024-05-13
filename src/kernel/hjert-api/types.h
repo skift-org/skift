@@ -159,58 +159,6 @@ struct Cap {
 
 inline constexpr Cap ROOT = {};
 
-enum struct MsgFlags : Arg {
-    NONE = 0,
-
-    CAP0 = 1 << 0,
-    CAP1 = 1 << 1,
-    CAP2 = 1 << 2,
-    CAP3 = 1 << 3,
-    CAP4 = 1 << 4,
-    CAP5 = 1 << 5,
-};
-
-FlagsEnum$(MsgFlags);
-
-struct Msg {
-    Arg label{};
-    Arg flags{};
-    Args args{};
-
-    constexpr Msg() = default;
-
-    constexpr Msg(Arg label)
-        : label(label) {}
-
-    void storeArg(usize idx, Arg arg) {
-        flags &= ~(1 << idx);
-        args[idx] = arg;
-    }
-
-    Res<Arg> loadArg(usize idx) const {
-        if (not(flags & (1 << idx))) {
-            return Ok(args[idx]);
-        }
-        return Error::invalidData("not-a-value");
-    }
-
-    void storeCap(usize idx, Cap cap) {
-        flags |= 1 << idx;
-        args[idx] = cap.raw();
-    }
-
-    Res<Cap> loadCap(usize idx) const {
-        if (flags & (1 << idx)) {
-            return Ok(Cap(args[idx]));
-        }
-        return Error::invalidData("not-a-capability");
-    }
-
-    bool isCap(usize idx) const {
-        return flags & (1 << idx);
-    }
-};
-
 enum struct Sigs : u32 {
     NONE = 0,
 
@@ -306,9 +254,15 @@ struct IopProps {
     usize len;
 };
 
+struct SentRecv {
+    usize bytes;
+    usize caps;
+};
+
 struct ChannelProps {
     static constexpr Type TYPE = Type::CHANNEL;
-    usize cap;
+    usize bufCap;  //< The capacity of the data buffer (in bytes, must be >= 1)
+    usize capsCap; //< The capacity of the caps buffer (in caps, 0 zero means the channel can't carry caps)
 };
 
 struct IrqProps {

@@ -6,9 +6,7 @@ Res<Strong<Domain>> Domain::create() {
     return Ok(makeStrong<Domain>());
 }
 
-Res<Hj::Cap> Domain::add(Hj::Cap dest, Strong<Object> obj) {
-    ObjectLockScope scope(*this);
-
+Res<Hj::Cap> Domain::_addUnlock(Hj::Cap dest, Strong<Object> obj) {
     auto c = dest.raw();
 
     if (c != 0) {
@@ -25,6 +23,11 @@ Res<Hj::Cap> Domain::add(Hj::Cap dest, Strong<Object> obj) {
     }
 
     return Error::invalidHandle("no free slots");
+}
+
+Res<Hj::Cap> Domain::add(Hj::Cap dest, Strong<Object> obj) {
+    ObjectLockScope scope(*this);
+    return _addUnlock(dest, obj);
 }
 
 Res<Strong<Object>> Domain::_getUnlock(Hj::Cap cap) {
@@ -61,6 +64,17 @@ Res<> Domain::drop(Hj::Cap cap) {
 
     _slots[c] = NONE;
     return Ok();
+}
+
+usize Domain::_availableUnlocked() const {
+    usize count = 0;
+
+    for (usize i = 1; i < _slots.len(); i++) {
+        if (_slots[i])
+            count++;
+    }
+
+    return count;
 }
 
 } // namespace Hjert::Core

@@ -20,9 +20,9 @@ Res<> doNow(Task &self, User<TimeStamp> ts) {
     return ts.store(self.space(), Sched::instance()._stamp);
 }
 
-Res<> doLog(Task &self, UserSlice<char const> msg) {
+Res<> doLog(Task &self, UserSlice<Str> msg) {
     try$(self.ensure(Hj::Pledge::LOG));
-    return msg.with<Str>(self.space(), [&](Str str) -> Res<> {
+    return msg.with(self.space(), [&](Str str) -> Res<> {
         Logger::_Embed::loggerLock();
         defer$(Logger::_Embed::loggerUnlock());
         auto styledLabel = Cli::styled(self.label(), Cli::style(Cli::random(self.id())));
@@ -34,6 +34,11 @@ Res<> doLog(Task &self, UserSlice<char const> msg) {
 
 Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
     auto props = try$(p.load(self.space()));
+
+    // Ensure that the index of the union is valid
+    if (not props.valid())
+        return Error::invalidInput("invalid props");
+
     auto obj = try$(props.visit(
         Visitor{
             [&](Hj::DomainProps &) -> Res<Strong<Object>> {
@@ -72,6 +77,11 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
                     return Ok(try$(Vmo::makeDma({props.phys, props.len})));
                 }
 
+                if (props.len > gib(2)) {
+                    logError("Vmo size too large: {}", props.len);
+                    return Error::invalidInput("Vmo size too large");
+                }
+
                 return Ok(try$(Vmo::alloc(props.len, props.flags)));
             },
             [&](Hj::IopProps &props) -> Res<Strong<Object>> {
@@ -79,7 +89,7 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
                 return Ok(try$(Iop::create({props.base, props.len})));
             },
             [&](Hj::ChannelProps &props) -> Res<Strong<Object>> {
-                return Ok(try$(Channel::create(props.cap)));
+                return Ok(try$(Channel::create(props.bufCap, props.capsCap)));
             },
             [&](Hj::IrqProps &props) -> Res<Strong<Object>> {
                 try$(self.ensure(Hj::Pledge::HW));
@@ -94,8 +104,8 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
     return out.store(self.space(), try$(self.domain().add(dest, obj)));
 }
 
-Res<> doLabel(Task &self, Hj::Cap cap, UserSlice<char const> label) {
-    return label.with<Str>(self.space(), [&](Str str) -> Res<> {
+Res<> doLabel(Task &self, Hj::Cap cap, UserSlice<Str> label) {
+    return label.with(self.space(), [&](Str str) -> Res<> {
         if (cap.isRoot())
             self.label(str);
         else
@@ -171,16 +181,31 @@ Res<> doOut(Task &self, Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg val) {
     return obj->out(port, Hj::ioLen2Bytes(len), val);
 }
 
-Res<> doSend(Task &self, Hj::Cap cap, User<Hj::Msg> msg, Hj::Cap from) {
-    auto obj = try$(self.domain().get<Channel>(cap));
-    auto dom = try$(self.domain().get<Domain>(from));
-    return obj->send(*dom, try$(msg.load(self.space())));
+Res<> doSend(Task &self, Hj::Cap cap, UserSlice<Bytes> buf, UserSlice<Slice<Hj::Cap>> caps) {
+    return try$(with(
+        self.space(),
+        [&](auto buf, auto caps) -> Res<> {
+            auto obj = try$(self.domain().get<Channel>(cap));
+            try$(obj->send(self.domain(), buf, caps));
+            return Ok();
+        },
+        buf, caps
+    ));
 }
 
-Res<> doRecv(Task &self, Hj::Cap cap, User<Hj::Msg> msg, Hj::Cap to) {
-    auto obj = try$(self.domain().get<Channel>(cap));
-    auto dom = try$(self.domain().get<Domain>(to));
-    return msg.store(self.space(), try$(obj->recv(*dom)));
+Res<> doRecv(Task &self, Hj::Cap cap, UserSlice<MutBytes> buf, User<Hj::Arg> bufLen, UserSlice<MutSlice<Hj::Cap>> caps, User<Hj::Arg> capLen) {
+    return try$(with(
+        self.space(),
+        [&](auto buf, auto bufLen, auto caps, auto capLen) -> Res<> {
+            auto obj = try$(self.domain().get<Channel>(cap));
+            auto msg = try$(obj->recv(self.domain(), buf, caps));
+
+            *bufLen = msg.bytes;
+            *capLen = msg.caps;
+            return Ok();
+        },
+        buf, bufLen, caps, capLen
+    ));
 }
 
 Res<> doClose(Task &self, Hj::Cap cap) {
@@ -205,7 +230,7 @@ Res<> doListen(Task &self, Hj::Cap cap, Hj::Cap target, Flags<Hj::Sigs> set, Fla
     return obj->listen(target, targetObj, set, unset);
 }
 
-Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<Hj::Event> events, User<usize> evLen, TimeStamp deadline) {
+Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<MutSlice<Hj::Event>> events, User<usize> evLen, TimeStamp deadline) {
     auto obj = try$(self.domain().get<Listener>(cap));
 
     try$(self.block([&] {
@@ -218,7 +243,7 @@ Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<Hj::Event> events, User<usize> e
     ObjectLockScope lock{*obj};
     auto l = min(events.len(), obj->events().len());
     try$(evLen.store(self.space(), l));
-    try$(events.with<MutSlice<Hj::Event>>(self.space(), [&](auto events) {
+    try$(events.with(self.space(), [&](auto events) {
         for (usize i = 0; i < l; ++i) {
             events[i] = obj->events()[i];
         }
@@ -268,10 +293,20 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
         return doOut(self, Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], args[3]);
 
     case Hj::Syscall::SEND:
-        return doSend(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]});
+        return doSend(self, Hj::Cap{args[0]}, {args[1], args[2]}, {args[3], args[4]});
 
-    case Hj::Syscall::RECV:
-        return doRecv(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]});
+    case Hj::Syscall::RECV: {
+        User<Hj::Arg> bufLen = args[2];
+        User<Hj::Arg> capLen = args[4];
+
+        return doRecv(
+            self,
+            Hj::Cap{args[0]},
+
+            {args[1], try$(bufLen.load(self.space()))}, args[2],
+            {args[3], try$(capLen.load(self.space()))}, args[4]
+        );
+    }
 
     case Hj::Syscall::CLOSE:
         return doClose(self, Hj::Cap{args[0]});
@@ -290,15 +325,12 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
     }
 }
 
-Res<> doSyscall(Hj::Syscall id, Hj::Args args) {
+Res<> doSyscall(Hj::Syscall syscall, Hj::Args args) {
     auto &self = Task::self();
     self.enter(Mode::SUPER);
-    auto res = dispatchSyscall(self, id, args);
-    if (not res) {
-        logError("Syscall {}({}) failed: {}", Hj::toStr(id), (Hj::Arg)id, res.none().msg());
-        for (auto i = 0; i < 6; ++i)
-            logDebug("    arg{}: {p} {}", i, (usize)args[i], (isize)args[i]);
-    }
+    auto res = dispatchSyscall(self, syscall, args);
+    if (not res)
+        logError("Syscall {}({}) with params {} failed: {}", Hj::toStr(syscall), (Hj::Arg)syscall, args, res.none().msg());
     self.leave();
     return res;
 }

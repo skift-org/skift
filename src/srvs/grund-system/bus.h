@@ -46,25 +46,12 @@ struct Bus {
         return Ok();
     }
 
-    Res<> broadcast(Hj::Cap from, Hj::Msg const &msg) {
-        for (auto &unit : _units)
-            if (unit->_out.cap() != from)
-                try$(unit->_in.send(msg, _domain));
-
-        return Ok();
-    }
-
     Res<> run() {
         while (true) {
             try$(_listener.poll(TimeStamp::endOfTime()));
             auto ev = _listener.next();
             while (ev) {
-                try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::READABLE));
-                Hj::Msg msg;
-                try$(Hj::_recv(ev->cap, &msg, _domain));
-                if (msg.label == IBus::broadcast_UID) {
-                    try$(broadcast(ev->cap, msg));
-                }
+                // ignore
                 ev = _listener.next();
             }
         }

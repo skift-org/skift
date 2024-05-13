@@ -17,15 +17,15 @@
 - **Karm**: A modern C++ core library providing foundational building blocks.
 - **KarmUI**: A reactive UI framework for building elegant user interfaces.
 - **Hideo**: A beautiful desktop environment prioritizing intuitive design.
-- **Hjert**: A capability-based microkernel ensuring security and system stability.
+- **Hjert**: A capability-based "Pragmatic" microkernel.
 - **CuteKit**: A versatile build system and package manager designed for cross-compilation and complex project management.
-- **Veav**: A performant browser engine built for speed, accuracy, and simplicity.
+- **Vaev**: A browser engine built for speed, accuracy, and simplicity.
 
 ## Core Philosophy
 
 - **Modularity**: Components are designed to be as self-contained as possible, encouraging customization and experimentation.
 - **Simplicity**: Skift favors clear solutions over complexity, aiming for a system that is understandable and maintainable.
-- **Modernity**: Skift leverages cutting-edge C++ practices and technologies for efficiency and security.
+- **Modernity**: Skift leverages cutting-edge C++ practices and technologies for safety, readability, and efficiency.
 
 ## Target Audience
 

@@ -11,11 +11,11 @@
 
 namespace Web::Css {
 
-Res<Ast> _consumeComponentValue(Io::SScan &s, Token token);
+Res<Sst> _consumeComponentValue(Io::SScan &s, Token token);
 
 // https://www.w3.org/TR/css-syntax-3/#consume-a-simple-block
-Res<Ast> _consumeBlock(Io::SScan &s, Token::Type term) {
-    Ast block = Ast::BLOCK;
+Res<Sst> _consumeBlock(Io::SScan &s, Token::Type term) {
+    Sst block = Sst::BLOCK;
 
     while (true) {
         auto token = nextToken(s).unwrap();
@@ -38,8 +38,11 @@ Res<Ast> _consumeBlock(Io::SScan &s, Token::Type term) {
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-function
-Res<Ast> _consumeFunc(Io::SScan &s) {
-    Ast fn = Ast::FUNC;
+Res<Sst> _consumeFunc(Io::SScan &s, Token token) {
+    Sst fn = Sst::FUNC;
+    Sst ast = Sst::TOKEN;
+    ast.token = token;
+    fn.prefix = Box{ast};
 
     while (true) {
         auto token = nextToken(s).unwrap();
@@ -57,7 +60,7 @@ Res<Ast> _consumeFunc(Io::SScan &s) {
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-component-value
-Res<Ast> _consumeComponentValue(Io::SScan &s, Token token) {
+Res<Sst> _consumeComponentValue(Io::SScan &s, Token token) {
     switch (token.type) {
     case Token::LEFT_SQUARE_BRACKET:
         return _consumeBlock(s, Token::RIGHT_SQUARE_BRACKET);
@@ -69,19 +72,19 @@ Res<Ast> _consumeComponentValue(Io::SScan &s, Token token) {
         return _consumeBlock(s, Token::RIGHT_PARENTHESIS);
 
     case Token::FUNCTION:
-        return _consumeFunc(s);
+        return _consumeFunc(s, token);
 
     default:
-        Ast tok = Ast::TOKEN;
+        Sst tok = Sst::TOKEN;
         tok.token = token;
         return Ok(std::move(tok));
     }
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-qualified-rule
-Res<Ast> _consumeQualifiedRule(Io::SScan &s, Token token) {
-    Ast ast{Ast::QUALIFIED_RULE};
-    Ast pre{Ast::LIST};
+Res<Sst> _consumeQualifiedRule(Io::SScan &s, Token token) {
+    Sst ast{Sst::QUALIFIED_RULE};
+    Sst pre{Sst::LIST};
 
     while (true) {
         switch (token.type) {
@@ -103,9 +106,9 @@ Res<Ast> _consumeQualifiedRule(Io::SScan &s, Token token) {
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-list-of-rules
-Res<Ast> _consumeRuleList(Str str) {
+Res<Sst> _consumeRuleList(Str str) {
     auto s = Io::SScan(str);
-    Ast ast = Ast::LIST;
+    Sst ast = Sst::LIST;
 
     while (true) {
         auto token = try$(nextToken(s));
@@ -127,19 +130,19 @@ Res<> parseStylesheet(Str source) {
     CSSOM::StyleSheet stylesheet = CSSOM::StyleSheet(source);
     auto file = try$(Sys::File::open(Mime::parseUrlOrPath(source).unwrap()));
     auto buf = try$(Io::readAllUtf8(file));
-    Ast ast = try$(_consumeRuleList(buf));
+    Sst ast = try$(_consumeRuleList(buf));
     logDebug("AST : {#}", ast);
-    stylesheet.cssRules = parseAST(ast);
+    stylesheet.cssRules = parseSST(ast);
     logDebug("RULES : {#}", stylesheet.cssRules);
     return Ok();
 }
 
-static inline Str toStr(Ast::_Type type) {
+static inline Str toStr(Sst::_Type type) {
     switch (type) {
 #define ITER(NAME)  \
-    case Ast::NAME: \
+    case Sst::NAME: \
         return #NAME;
-        FOREACH_AST(ITER)
+        FOREACH_SST(ITER)
 #undef ITER
     default:
         panic("invalid ast type");
@@ -148,11 +151,11 @@ static inline Str toStr(Ast::_Type type) {
 
 } // namespace Web::Css
 
-Reflectable$(Web::Css::Ast, type, token, prefix, content);
+Reflectable$(Web::Css::Sst, type, token, prefix, content);
 
 template <>
-struct Karm::Io::Formatter<Web::Css::Ast::_Type> {
-    Res<usize> format(Io::TextWriter &writer, Web::Css::Ast::_Type val) {
+struct Karm::Io::Formatter<Web::Css::Sst::_Type> {
+    Res<usize> format(Io::TextWriter &writer, Web::Css::Sst::_Type val) {
         return (writer.writeStr(try$(Io::toParamCase(toStr(val)))));
     }
 };

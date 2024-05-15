@@ -1,5 +1,6 @@
 #include <karm-base/box.h>
 #include <karm-base/vec.h>
+#include <karm-logger/logger.h>
 #include <web-dom/element.h>
 #include <web-html/tags.h>
 
@@ -11,7 +12,7 @@ struct Spec {
     // a: The number of ID selectors in the selector.
     // b: The number of class selectors, attributes selectors, and pseudo-classes in the selector.
     // c: The number of type selectors and pseudo-elements in the selector.
-    isize a{}, b{}, c{};
+    isize a, b, c;
 
     static Spec const NOMATCH;
     static Spec const ZERO, A, B, C;
@@ -60,7 +61,9 @@ Spec const Spec::C = {0, 0, 1};
 
 struct Selector;
 
-struct UniversalSelector {};
+struct UniversalSelector {
+    int __dummy__ = 0; // FIXME: Reflectable doesn't like that we don't have filds
+};
 
 static constexpr UniversalSelector UNIVERSAL = {};
 
@@ -253,5 +256,30 @@ template <>
 struct Karm::Io::Formatter<Web::Select::AnB> {
     Res<usize> format(Io::TextWriter &writer, Web::Select::AnB const &val) {
         return Io::format(writer, "{}n{}{}", val.a, val.b < 0 ? "-"s : "+"s, val.b);
+    }
+};
+
+Reflectable$(Web::Select::UniversalSelector, __dummy__);
+
+Reflectable$(Web::Select::Infix, type, lhs, rhs);
+
+Reflectable$(Web::Select::Nfix, type, inners);
+
+Reflectable$(Web::Select::TypeSelector, type);
+
+Reflectable$(Web::Select::IdSelector, id);
+
+Reflectable$(Web::Select::ClassSelector, class_);
+
+Reflectable$(Web::Select::PseudoClass, type, extra);
+
+Reflectable$(Web::Select::AttributeSelector, name, value);
+
+template <>
+struct Karm::Io::Formatter<Web::Select::Selector> {
+    Res<usize> format(Io::TextWriter &writer, Web::Select::Selector const &val) {
+        return val.visit([&](auto const &v) -> Res<usize> {
+            return Io::format(writer, "{}", v);
+        });
     }
 };

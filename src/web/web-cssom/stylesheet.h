@@ -4,8 +4,12 @@
 #include <karm-base/vec.h>
 #include <karm-logger/logger.h>
 #include <web-css/lexer.h>
+#include <web-media/query.h>
+#include <web-select/select.h>
 
-// SPEC COMPLIANCE : everything related to parent/scope is nospec as well as everything concerning dynamic modification
+#include "web-css/sst.h"
+
+// SPEC COMPLIANCE : everything related to parent/scope is unsupported as well as everything concerning dynamic modification
 
 namespace Web::CSSOM {
 
@@ -38,23 +42,47 @@ struct CSSStyleDeclaration {
     };
 };
 
-// https://www.w3.org/TR/cssom-1/#the-cssrule-interface
-struct CSSRule {
-    virtual ~CSSRule() = default;
+// https://www.w3.org/TR/cssom-1/#the-cssstylerule-interface
+struct CSSStyleRule {
+    Select::Selector selector;
+    // Vec<Css::Sst> selector;
+
+    Vec<CSSStyleDeclaration> declarations;
 };
 
-// https://www.w3.org/TR/cssom-1/#the-cssstylerule-interface
-struct CSSStyleRule : public CSSRule {
+// https://www.w3.org/TR/cssom-1/#the-cssimportrule-interface
+struct CSSImportRule {
+    Vec<CSSStyleDeclaration> declarations;
+};
+
+// https://www.w3.org/TR/css-conditional-3/#the-cssmediarule-interface
+struct CSSMediaRule {
+    Media::Query media;
+};
+
+// https://www.w3.org/TR/css-fonts-4/#cssfontfacerule
+struct CSSFontFaceRule {
     Vec<Css::Token> selector;
     Vec<CSSStyleDeclaration> declarations;
 };
+
+// https://www.w3.org/TR/css-conditional-3/#the-csssupportsrule-interface
+struct CSSSupportsRule {
+    Vec<Css::Token> selector;
+    Vec<CSSStyleDeclaration> declarations;
+};
+
+// TODO GROUPING RULE
+
+// https://www.w3.org/TR/cssom-1/#the-cssrule-interface
+using CSSRule = Union<CSSStyleRule, CSSFontFaceRule, CSSSupportsRule>;
 
 // https:// www.w3.org/TR/cssom-1/#css-style-sheets
 struct StyleSheet {
     Str type = "text/css";
     Str href;
     Str title = "";
-    Vec<CSSStyleRule> cssRules;
+    Vec<CSSRule> cssRules;
 
     StyleSheet(Str location) {
         href = location;
@@ -87,3 +115,6 @@ struct Karm::Io::Formatter<Web::CSSOM::StyleSheet> {
 
 Reflectable$(Web::CSSOM::CSSStyleDeclaration, propertyName, value);
 Reflectable$(Web::CSSOM::CSSStyleRule, selector, declarations);
+Reflectable$(Web::CSSOM::CSSFontFaceRule, selector, declarations);
+Reflectable$(Web::CSSOM::CSSImportRule, declarations);
+Reflectable$(Web::CSSOM::CSSSupportsRule, declarations);

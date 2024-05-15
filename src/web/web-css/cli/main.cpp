@@ -7,7 +7,7 @@
 
 Res<> entryPoint(Sys::Ctx &) {
     Sys::println("Parsing:");
-    try$(Web::Css::parseStylesheet("bundle://web-css-cli/exemple_1.css"));
+    try$(Web::Css::parseStylesheet("bundle://web-css.cli/exemple_1.css"));
 
     Sys::println("Result:");
     Io::Emit emit{Sys::out()};

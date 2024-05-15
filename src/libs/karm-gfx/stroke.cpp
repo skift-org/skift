@@ -103,7 +103,7 @@ static void _createCapButt(Math::Polyf &poly, Cap cap) {
 }
 
 static void _createCapSquare(Math::Polyf &poly, Cap cap, f64 width) {
-    auto e = Math::Edgef{cap.start, cap.end}.parallel(-width / 2);
+    auto e = Math::Edgef{cap.start, cap.end}.offset(-width / 2);
     poly.add({cap.start, e.start});
     poly.add(e);
     poly.add({e.end, cap.end});
@@ -161,8 +161,8 @@ static void _createCap(Math::Polyf &poly, StrokeStyle stroke, Cap cap) {
                 continue;
             }
 
-            auto outerCurr = curr.parallel(outerDist);
-            auto innerCurr = curr.parallel(innerDist).swap();
+            auto outerCurr = curr.offset(outerDist);
+            auto innerCurr = curr.offset(innerDist).swap();
 
             poly.add(outerCurr);
             poly.add(innerCurr);
@@ -188,8 +188,8 @@ static void _createCap(Math::Polyf &poly, StrokeStyle stroke, Cap cap) {
                     continue;
                 }
 
-                auto outerNext = outerDist > -0.001 ? next : next.parallel(outerDist);
-                auto innerNext = innerDist < 0.001 ? next.swap() : next.parallel(innerDist).swap();
+                auto outerNext = outerDist > -0.001 ? next : next.offset(outerDist);
+                auto innerNext = innerDist < 0.001 ? next.swap() : next.offset(innerDist).swap();
 
                 if (outerDist < -0.001)
                     _createJoin(poly, stroke, outerCurr, outerNext, curr.end, Math::abs(outerDist));

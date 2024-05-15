@@ -55,6 +55,15 @@ union Rect {
         };
     }
 
+    always_inline static constexpr Rect<T> fromCenter(Vec2<T> center, Vec2<T> size) {
+        return {
+            center.x - size.x / 2,
+            center.y - size.y / 2,
+            size.x,
+            size.y,
+        };
+    }
+
     always_inline constexpr T start() const { return x; }
 
     always_inline constexpr void start(T value) {

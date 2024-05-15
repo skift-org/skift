@@ -8,6 +8,7 @@
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 
+#include "demo-bezier.h"
 #include "demo-carousel.h"
 #include "demo-circle.h"
 #include "demo-gradient.h"
@@ -22,6 +23,7 @@
 namespace Hideo::Demos {
 
 static Array DEMOS = {
+    &BEZIER_DEMO,
     &CIRCLE_DEMO,
     &GRADIENT_DEMO,
     &MIXBOX_DEMO,

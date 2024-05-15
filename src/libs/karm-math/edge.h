@@ -30,7 +30,7 @@ union Edge {
         return Rect<T>::fromTwoPoint(start, end);
     }
 
-    constexpr Edge<T> parallel(T offset) {
+    constexpr Edge<T> offset(T offset) {
         auto d = end - start;
         f64 scale = offset / d.len();
         Vec2<T> o = {-d.y * scale, d.x * scale};

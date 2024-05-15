@@ -440,10 +440,10 @@ struct SdlHost :
                     .pos = _lastMousePos,
                     .scroll = {
 #if SDL_VERSION_ATLEAST(2, 0, 18)
-                        sdlEvent.wheel.preciseX,
+                        -sdlEvent.wheel.preciseX,
                         sdlEvent.wheel.preciseY,
 #else
-                        (f64)sdlEvent.wheel.x,
+                        -(f64)sdlEvent.wheel.x,
                         (f64)sdlEvent.wheel.y,
 #endif
                     },

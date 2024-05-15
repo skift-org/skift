@@ -575,6 +575,8 @@ struct Formatter<Opt<T>> {
     }
 };
 
+// MARK: Format Results --------------------------------------------------------
+
 template <typename T>
 struct Formatter<Ok<T>> {
     Formatter<T> formatter;
@@ -628,6 +630,18 @@ struct Formatter<Res<T, E>> {
         if (val)
             return _fmtOk.format(writer, val.unwrap());
         return _fmtErr.format(writer, val.none());
+    }
+};
+
+// MARK: Format Unions ---------------------------------------------------------
+
+template <typename... Ts>
+struct Formatter<Union<Ts...>> {
+
+    Res<usize> format(Io::TextWriter &writer, Union<Ts...> const &val) {
+        return val.visit([&](auto const &v) -> Res<usize> {
+            return Io::format(writer, "{}", v);
+        });
     }
 };
 

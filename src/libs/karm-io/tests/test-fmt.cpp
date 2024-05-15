@@ -121,6 +121,8 @@ test$("fmt-optionals") {
     return Ok();
 }
 
+// MARK: Format Results --------------------------------------------------------
+
 test$("fmt-error") {
     try$(testCase("test", Error::invalidData("test")));
 
@@ -131,6 +133,17 @@ test$("fmt-result") {
     try$(testCase("Ok", Ok()));
     try$(testCase("1", Ok(1)));
     try$(testCase("test", Error::invalidData("test")));
+
+    return Ok();
+}
+
+// MARK: Format Union ----------------------------------------------------------
+
+test$("fmt-union") {
+    using U = Union<int, Str>;
+
+    try$(testCase("1", U{1}));
+    try$(testCase("test", U{"test"s}));
 
     return Ok();
 }

@@ -188,9 +188,9 @@ struct Length {
 
 struct FontMetrics {
     Px fontSize;
-    Px xHeight;
+    Px xHeight; //< height of the lowercase 'x'.
     Px capHeight;
-    Px zeroAdvance;
+    Px zeroAdvance; //< width of the '0' character.
     Px lineHeight;
 };
 

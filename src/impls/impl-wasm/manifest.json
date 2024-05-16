@@ -1,0 +1,19 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "impl-wasm",
+    "type": "lib",
+    "description": "Karm platform embedding layer for WASM.",
+    "enableIf": {
+        "sys": [
+            "wasm"
+        ]
+    },
+    "requires": [
+        "libheap"
+    ],
+    "provides": [
+        "karm-logger-impl",
+        "karm-sys-async-impl",
+        "karm-sys-impl"
+    ]
+}

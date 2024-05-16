@@ -16,6 +16,8 @@
 // Nothing to do, skift uses entryPoint by default
 #elif defined(__ck_sys_efi__)
 #    include <impl-efi/entry.h>
+#elif defined(__ck_sys_wasm__)
+#    include <impl-wasm/entry.h>
 #else
 #    error "Unknown system"
 #endif

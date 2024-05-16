@@ -15,9 +15,6 @@ const importObject = {
             const out = new TextDecoder("utf-8").decode(buf);
             console.error(out);
         },
-        embedAlloc: (size) => {
-            new WebAssembly.Memory({initial: size});
-        }
     }
 };
 
@@ -33,7 +30,6 @@ const importObject = {
 
     const wasmRaw = await fetch(bundle['ref'].replace('file:/', '')).then((response) => response.arrayBuffer());
     wasmObj = await WebAssembly.instantiate(wasmRaw, importObject);
+    wasmObj.instance.exports.memory.grow(4096);
     wasmObj.instance.exports.wasm_main();
 })();
-
-281474976710661

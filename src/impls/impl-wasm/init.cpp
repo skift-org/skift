@@ -1,12 +1,10 @@
 #include <karm-base/std.h>
 
-extern "C" void  __wasm_call_ctors();
-
+extern "C" void __wasm_call_ctors();
 
 namespace Abi::Wasm {
 
-__attribute__((export_name("_initialize")))
-void init() {
+__attribute__((export_name("_initialize"))) void init() {
     __wasm_call_ctors();
 }
 

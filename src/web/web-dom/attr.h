@@ -12,8 +12,7 @@ struct Attr : public Node {
     String value;
 
     Attr(AttrName name, String value)
-        : name(name)
-        , value(value) {
+        : name(name), value(value) {
     }
 
     NodeType nodeType() const override {

@@ -33,6 +33,14 @@ struct Out : public Io::TextWriterBase<> {
     Res<usize> write(Bytes bytes) override {
         return _fd->write(bytes);
     }
+
+    Strong<Fd> fd() {
+        return _fd;
+    }
+
+    Res<usize> flush() override {
+        return _fd->flush();
+    }
 };
 
 struct Err : public Io::TextWriterBase<> {
@@ -47,6 +55,10 @@ struct Err : public Io::TextWriterBase<> {
 
     Strong<Fd> fd() {
         return _fd;
+    }
+
+    Res<usize> flush() override {
+        return _fd->flush();
     }
 };
 
@@ -67,11 +79,13 @@ inline void err(Str str, auto &&...args) {
 inline void println(Str str, auto &&...args) {
     (void)Io::format(out(), str, std::forward<decltype(args)>(args)...);
     (void)out().writeStr(Sys::LINE_ENDING);
+    (void)out().flush();
 }
 
 inline void errln(Str str, auto &&...args) {
     (void)Io::format(err(), str, std::forward<decltype(args)>(args)...);
-    (void)out().writeStr(Sys::LINE_ENDING);
+    (void)err().writeStr(Sys::LINE_ENDING);
+    (void)err().flush();
 }
 
 } // namespace Karm::Sys

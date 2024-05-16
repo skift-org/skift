@@ -6,5 +6,5 @@
 
 void __panicHandler(Karm::PanicKind kind, char const *msg) {
     embedConsoleError(kind == Karm::PanicKind::PANIC ? (u8 const *)"PANIC: " : (u8 const *)"DEBUG: ", 7);
-    embedConsoleError((const u8 *)msg, cstrLen(msg));
+    embedConsoleError((u8 const *)msg, cstrLen(msg));
 }

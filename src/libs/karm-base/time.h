@@ -5,10 +5,12 @@
 
 namespace Karm {
 
+using _TimeVal = u64;
+
 // MARK: TimeSpan and TimeStamp ------------------------------------------------
 
 struct TimeSpan {
-    usize _value; // microseconds (us) aka 1/1,000,000th of a second
+    _TimeVal _value; // microseconds (us) aka 1/1,000,000th of a second
 
     static constexpr TimeSpan zero() {
         return TimeSpan{0};
@@ -18,85 +20,85 @@ struct TimeSpan {
         return TimeSpan{~0uz};
     }
 
-    static constexpr TimeSpan fromUSecs(usize value) {
+    static constexpr TimeSpan fromUSecs(_TimeVal value) {
         return {value};
     }
 
-    static constexpr auto fromMSecs(usize value) {
+    static constexpr auto fromMSecs(_TimeVal value) {
         return fromUSecs(value * 1000);
     }
 
-    static constexpr auto fromSecs(usize value) {
+    static constexpr auto fromSecs(_TimeVal value) {
         return fromMSecs(value * 1000);
     }
 
-    static constexpr auto fromMinutes(usize value) {
+    static constexpr auto fromMinutes(_TimeVal value) {
         return fromSecs(value * 60);
     }
 
-    static constexpr auto fromHours(usize value) {
+    static constexpr auto fromHours(_TimeVal value) {
         return fromMinutes(value * 60);
     }
 
-    static constexpr auto fromDays(usize value) {
+    static constexpr auto fromDays(_TimeVal value) {
         return fromHours(value * 24);
     }
 
-    static constexpr auto fromWeeks(usize value) {
+    static constexpr auto fromWeeks(_TimeVal value) {
         return fromDays(value * 7);
     }
 
-    static constexpr auto fromMonths(usize value) {
+    static constexpr auto fromMonths(_TimeVal value) {
         return fromWeeks(value * 4);
     }
 
-    static constexpr auto fromYears(usize value) {
+    static constexpr auto fromYears(_TimeVal value) {
         return fromMonths(value * 12);
     }
 
     constexpr TimeSpan()
         : _value(0) {}
 
-    constexpr TimeSpan(usize value)
+    constexpr TimeSpan(_TimeVal value)
         : _value(value) {}
 
     constexpr bool isInfinite() const {
         return _value == ~0uz;
     }
 
-    constexpr usize toUSecs() const {
+    constexpr _TimeVal toUSecs() const {
         return _value;
     }
 
-    constexpr usize toMSecs() const {
+    constexpr _TimeVal toMSecs() const {
         return toUSecs() / 1000;
     }
 
-    constexpr usize toSecs() const {
+    constexpr _TimeVal toSecs() const {
         return toMSecs() / 1000;
     }
 
-    constexpr usize toMinutes() const {
+    constexpr _TimeVal toMinutes() const {
         return toSecs() / 60;
     }
 
-    constexpr usize toHours() const {
+    constexpr _TimeVal toHours() const {
         return toMinutes() / 60;
     }
 
-    constexpr usize toDays() const {
+    constexpr _TimeVal toDays() const {
         return toHours() / 24;
     }
 
-    constexpr usize toWeeks() const {
+    constexpr _TimeVal toWeeks() const {
         return toDays() / 7;
     }
 
-    constexpr usize toMonths() const {
+    constexpr _TimeVal toMonths() const {
         return toWeeks() / 4;
     }
 
-    constexpr usize toYears() const {
+    constexpr _TimeVal toYears() const {
         return toMonths() / 12;
     }
 
@@ -118,7 +120,7 @@ struct TimeSpan {
         return _value - other._value;
     }
 
-    constexpr auto val() const {
+    constexpr _TimeVal val() const {
         return _value;
     }
 
@@ -162,9 +164,9 @@ inline TimeSpan operator""_y(unsigned long long value) {
 }
 
 struct TimeStamp {
-    usize _value{}; // microseconds (us) aka 1/1,000,000th of a second
+    _TimeVal _value{}; // microseconds (us) aka 1/1,000,000th of a second
 
-    static constexpr usize END_OF_TIME = ~0uz;
+    static constexpr _TimeVal END_OF_TIME = ~0uz;
 
     static constexpr TimeStamp epoch() {
         return {0};
@@ -174,7 +176,7 @@ struct TimeStamp {
         return {END_OF_TIME};
     }
 
-    constexpr TimeStamp(usize value = 0)
+    constexpr TimeStamp(_TimeVal value = 0)
         : _value(value) {}
 
     constexpr bool isEndOfTime() const {

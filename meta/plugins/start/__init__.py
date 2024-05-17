@@ -1,6 +1,5 @@
 from http import server
 from pathlib import Path
-from typing import override
 from . import image, store, runner
 from cutekit import cli, model, shell, const
 
@@ -121,13 +120,11 @@ class WasmArgs:
 class WasmServer(server.SimpleHTTPRequestHandler):
     protocol_version = "HTTP/1.0"
 
-    @override
     def end_headers(self) -> None:
         self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
         self.send_header("Pragma", "no-cache")
         self.send_header("Expires", "0")
         super().end_headers()
-
 
 
 @cli.command("w", "image/wasm", "Start a WASM component")

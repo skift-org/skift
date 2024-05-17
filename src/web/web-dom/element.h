@@ -13,6 +13,10 @@ namespace Web::Dom {
 
 // https://dom.spec.whatwg.org/#interface-element
 struct Element : public Node {
+    Opt<String> id() const {
+        return this->getAttribute(Html::ID_ATTR);
+    }
+
     TagName tagName;
     // NOSPEC: Should be a NamedNodeMap
     Map<AttrName, Strong<Attr>> attributes;

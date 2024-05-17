@@ -83,6 +83,10 @@ struct Eased {
         return shouldRepaint;
     }
 
+    void update(Node &n, Sys::Event &e) {
+        needRepaint(n, e);
+    }
+
     bool reached() const {
         return not _animated;
     }

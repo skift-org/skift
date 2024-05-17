@@ -53,8 +53,12 @@ static inline Demo BEZIER_DEMO{
                     g.begin();
                     g.moveTo(s.a);
                     g.lineTo(s.b);
+                    g.strokeStyle(Gfx::stroke(Gfx::WHITE).withWidth(0.5).withAlign(Gfx::CENTER_ALIGN));
+                    g.stroke();
+
+                    g.begin();
+                    g.moveTo(s.d);
                     g.lineTo(s.c);
-                    g.lineTo(s.d);
                     g.strokeStyle(Gfx::stroke(Gfx::WHITE).withWidth(0.5).withAlign(Gfx::CENTER_ALIGN));
                     g.stroke();
                 }
@@ -69,7 +73,7 @@ static inline Demo BEZIER_DEMO{
                        Ui::center() |
                        Ui::bound() |
                        Ui::dragRegion() |
-                       Ui::placed(Math::Recti::fromCenter(pos.cast<isize>(), {12, 12})) |
+                       Ui::placed(Math::Recti::fromCenter(pos.cast<isize>(), {24, 24})) |
                        Ui::intent([=](Ui::Node &n, Sys::Event &e) {
                            if (auto *m = e.is<Ui::DragEvent>(Sys::Propagation::UP)) {
                                e.accept();

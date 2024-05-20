@@ -17,7 +17,7 @@ static constexpr Str nameOf() {
 template <typename T>
 struct Reflect {
     using Type = T;
-    static constexpr Str NAME = Karm::nameOf<T>();
+    static constexpr Str NAME = nameOf<T>();
 };
 
 template <typename T, typename FT, StrLit N, FT T::*P>
@@ -54,15 +54,15 @@ auto iterFields(T &v, auto f) {
 } // namespace Karm
 
 #define __reflectableField(F) \
-    Karm::_Field<Type, decltype(Meta::declval<Type>().F), #F, &Type::F>
+    ::Karm::_Field<Type, decltype(Meta::declval<Type>().F), #F, &Type::F>
 
 #define __reflectableFields(...) \
-    Karm::Tuple<mapList$(__reflectableField, __VA_ARGS__)>
+    ::Karm::Tuple<mapList$(__reflectableField, __VA_ARGS__)>
 
 #define __reflectableType(T, ...)                        \
-    struct Karm::Reflect<T> {                            \
+    struct ::Karm::Reflect<T> {                            \
         using Type = T;                                  \
-        static constexpr Str NAME = Karm::nameOf<T>();   \
+        static constexpr Str NAME = ::Karm::nameOf<T>();   \
         using Fields = __reflectableFields(__VA_ARGS__); \
     }
 

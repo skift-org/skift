@@ -182,7 +182,7 @@ struct _Mmap {
     using enum MmapFlags;
 
     MmapOptions _options{};
-    Opt<Strong<Fd>> _fd = Karm::NONE;
+    Opt<Strong<Fd>> _fd;
 
     _Mmap &read() {
         _options.flags |= READ;

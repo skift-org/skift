@@ -2,15 +2,16 @@
 #include <hjert-api/api.h>
 
 #include <karm-ui/_embed.h>
+
 namespace Karm::Ui::_Embed {
 
-struct Host :
-    public Ui::Host {
+struct SkiftHost :
+    public Host {
     Gfx::MutPixels _front;
     Media::Image _back;
 
-    Host(Ui::Child root, Gfx::MutPixels front, Media::Image back)
-        : Ui::Host(root),
+    SkiftHost(Child root, Gfx::MutPixels front, Media::Image back)
+        : Host(root),
           _front(front),
           _back(back) {
     }
@@ -30,11 +31,11 @@ struct Host :
     }
 
     void bubble(Sys::Event &e) override {
-        Ui::Host::bubble(e);
+        Host::bubble(e);
     }
 };
 
-Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
+Res<Strong<Host>> makeHost(Child root) {
     auto &handover = useHandover();
 
     auto *fb = handover.findTag(Handover::Tag::FB);
@@ -55,7 +56,7 @@ Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
         front.size(), Gfx::BGRA8888
     );
 
-    return Ok(makeStrong<Host>(std::move(root), front, back));
+    return Ok(makeStrong<SkiftHost>(std::move(root), front, back));
 }
 
 } // namespace Karm::Ui::_Embed

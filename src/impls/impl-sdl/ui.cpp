@@ -6,14 +6,14 @@
 namespace Karm::Ui::_Embed {
 
 struct SdlHost :
-    public Ui::Host {
+    public Host {
     SDL_Window *_window{};
 
     Math::Vec2i _lastMousePos{};
     Math::Vec2i _lastScreenMousePos{};
 
-    SdlHost(Ui::Child root, SDL_Window *window)
-        : Ui::Host(root), _window(window) {
+    SdlHost(Child root, SDL_Window *window)
+        : Host(root), _window(window) {
     }
 
     ~SdlHost() {
@@ -466,7 +466,7 @@ struct SdlHost :
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
         g.scale(dpi());
-        Ui::Host::paint(g, r);
+        Host::paint(g, r);
         g.restore();
     }
 
@@ -490,13 +490,13 @@ struct SdlHost :
     }
 
     void bubble(Sys::Event &e) override {
-        if (e.is<Ui::DragEvent>()) {
-            auto &dragEvent = e.unwrap<Ui::DragEvent>();
-            if (dragEvent.type == Ui::DragEvent::START) {
+        if (e.is<DragEvent>()) {
+            auto &dragEvent = e.unwrap<DragEvent>();
+            if (dragEvent.type == DragEvent::START) {
                 SDL_CaptureMouse(SDL_TRUE);
-            } else if (dragEvent.type == Ui::DragEvent::END) {
+            } else if (dragEvent.type == DragEvent::END) {
                 SDL_CaptureMouse(SDL_FALSE);
-            } else if (dragEvent.type == Ui::DragEvent::DRAG) {
+            } else if (dragEvent.type == DragEvent::DRAG) {
                 Math::Vec2<i32> pos{};
                 SDL_GetWindowPosition(_window, &pos.x, &pos.y);
                 pos = pos + dragEvent.delta.cast<i32>();
@@ -504,11 +504,11 @@ struct SdlHost :
             }
         }
 
-        Ui::Host::bubble(e);
+        Host::bubble(e);
     }
 };
 
-Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
+Res<Strong<Host>> makeHost(Child root) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
     auto size = root->size({700, 500}, Hint::MIN);
@@ -528,4 +528,4 @@ Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
     return Ok(makeStrong<SdlHost>(root, window));
 }
 
-} // namespace Karm::Ui::_Embed
+} // namespace Karm::_Embed

@@ -37,19 +37,19 @@ union Vec2 {
         : _els{value, value} {}
 
     constexpr T min() const {
-        return Karm::min(x, y);
+        return ::min(x, y);
     }
 
     constexpr T max() const {
-        return Karm::max(x, y);
+        return ::max(x, y);
     }
 
     constexpr Vec2 min(Vec2 other) const {
-        return {Karm::min(x, other.x), Karm::min(y, other.y)};
+        return {::min(x, other.x), ::min(y, other.y)};
     }
 
     constexpr Vec2 max(Vec2 other) const {
-        return {Karm::max(x, other.x), Karm::max(y, other.y)};
+        return {::max(x, other.x), ::max(y, other.y)};
     }
 
     constexpr T dot(Vec2 other) const {
@@ -245,11 +245,11 @@ union Vec3 {
     }
 
     constexpr T min() const {
-        return Karm::min(x, y, z);
+        return ::min(x, y, z);
     }
 
     constexpr T max() const {
-        return Karm::max(x, y, z);
+        return ::max(x, y, z);
     }
 
     constexpr Vec3 min(Vec3 const &other) {

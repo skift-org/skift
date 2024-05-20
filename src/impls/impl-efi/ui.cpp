@@ -6,18 +6,18 @@
 namespace Karm::Ui::_Embed {
 
 struct EfiHost :
-    public Ui::Host {
+    public Host {
     Efi::SimpleTextInputProtocol *_stip = nullptr;
     Gfx::MutPixels _front;
     Media::Image _back;
 
     EfiHost(
-        Ui::Child root,
+        Child root,
         Efi::SimpleTextInputProtocol *stip,
         Gfx::MutPixels front,
         Media::Image back
     )
-        : Ui::Host(root),
+        : Host(root),
           _stip(stip),
           _front(front),
           _back(back) {
@@ -44,11 +44,11 @@ struct EfiHost :
     }
 
     void bubble(Sys::Event &e) override {
-        Ui::Host::bubble(e);
+        Host::bubble(e);
     }
 };
 
-Res<Strong<Karm::Ui::Host>> makeHost(Ui::Child root) {
+Res<Strong<Host>> makeHost(Child root) {
     auto *stip = try$(Efi::locateProtocol<Efi::SimpleTextInputProtocol>());
     auto *gop = try$(Efi::locateProtocol<Efi::GraphicsOutputProtocol>());
     auto *mode = gop->mode;

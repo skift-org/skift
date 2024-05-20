@@ -23,12 +23,12 @@ static TimeStamp fromEfi(Efi::Time time) {
     return dt.toTimeStamp();
 }
 
-struct ConOut : public Sys::Fd {
+struct ConOut : public Fd {
     Efi::SimpleTextOutputProtocol *_proto;
 
     ConOut(Efi::SimpleTextOutputProtocol *proto) : _proto(proto) {}
 
-    Sys::Handle handle() const override {
+    Handle handle() const override {
         return Handle{(usize)_proto};
     }
 
@@ -94,7 +94,7 @@ struct ConOut : public Sys::Fd {
     }
 };
 
-struct FileProto : public Sys::Fd {
+struct FileProto : public Fd {
     Efi::FileProtocol *_proto = nullptr;
 
     FileProto(Efi::FileProtocol *proto) : _proto(proto) {}
@@ -202,37 +202,37 @@ struct FileProto : public Sys::Fd {
     }
 };
 
-Res<Strong<Sys::Fd>> unpackFd(Io::PackScan &) {
+Res<Strong<Fd>> unpackFd(Io::PackScan &) {
     notImplemented();
 }
 
-Res<Strong<Sys::Fd>> createIn() {
-    return Ok(makeStrong<Sys::NullFd>());
+Res<Strong<Fd>> createIn() {
+    return Ok(makeStrong<NullFd>());
 }
 
-Res<Strong<Sys::Fd>> createOut() {
+Res<Strong<Fd>> createOut() {
     return Ok(makeStrong<ConOut>(Efi::st()->conOut));
 }
 
-Res<Strong<Sys::Fd>> createErr() {
+Res<Strong<Fd>> createErr() {
     return Ok(makeStrong<ConOut>(Efi::st()->stdErr));
 }
 
 // MARK: Sockets ---------------------------------------------------------------
 
-Res<Strong<Sys::Fd>> connectTcp(SocketAddr) {
+Res<Strong<Fd>> connectTcp(SocketAddr) {
     notImplemented();
 }
 
-Res<Strong<Sys::Fd>> listenTcp(SocketAddr) {
+Res<Strong<Fd>> listenTcp(SocketAddr) {
     notImplemented();
 }
 
-Res<Strong<Sys::Fd>> listenUdp(SocketAddr) {
+Res<Strong<Fd>> listenUdp(SocketAddr) {
     notImplemented();
 }
 
-Res<Strong<Sys::Fd>> listenIpc(Mime::Url) {
+Res<Strong<Fd>> listenIpc(Mime::Url) {
     notImplemented();
 }
 
@@ -250,7 +250,7 @@ static Res<Mime::Path> resolve(Mime::Url url) {
         if (not _index) {
             logInfo("no index, loading");
 
-            auto indexFile = try$(Sys::File::open("file:/bundles/_index.json"_url));
+            auto indexFile = try$(File::open("file:/bundles/_index.json"_url));
             auto indexStr = try$(Io::readAllUtf8(indexFile));
             auto indexJson = try$(Web::Json::parse(indexStr));
 
@@ -295,7 +295,7 @@ static Res<Mime::Path> resolve(Mime::Url url) {
     }
 }
 
-Res<Strong<Sys::Fd>> openFile(Mime::Url const &url) {
+Res<Strong<Fd>> openFile(Mime::Url const &url) {
     static Efi::SimpleFileSystemProtocol *fileSystem = nullptr;
     if (not fileSystem) {
         fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(Efi::li()->deviceHandle));
@@ -325,19 +325,19 @@ Res<Strong<Sys::Fd>> openFile(Mime::Url const &url) {
     return Ok(makeStrong<FileProto>(file));
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Mime::Url const &) {
+Res<Vec<DirEntry>> readDir(Mime::Url const &) {
     return Error::notImplemented();
 }
 
-Res<Strong<Sys::Fd>> createFile(Mime::Url const &) {
+Res<Strong<Fd>> createFile(Mime::Url const &) {
     return Error::notImplemented();
 }
 
-Res<Strong<Sys::Fd>> openOrCreateFile(Mime::Url const &) {
+Res<Strong<Fd>> openOrCreateFile(Mime::Url const &) {
     return Error::notImplemented();
 }
 
-Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
+Res<MmapResult> memMap(MmapOptions const &options) {
     usize vaddr = 0;
 
     try$(Efi::bs()->allocatePages(
@@ -348,10 +348,10 @@ Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &options) {
     ));
 
     // Memory is identity mapped, so we can just return the virtual address as paddr
-    return Ok(Sys::MmapResult{vaddr, vaddr, options.size});
+    return Ok(MmapResult{vaddr, vaddr, options.size});
 }
 
-Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> fd) {
+Res<MmapResult> memMap(MmapOptions const &, Strong<Fd> fd) {
     usize vaddr = 0;
     usize fileSize = try$(Io::size(*fd));
 
@@ -366,7 +366,7 @@ Res<Sys::MmapResult> memMap(Karm::Sys::MmapOptions const &, Strong<Sys::Fd> fd) 
     try$(Io::copy(*fd, writer));
 
     // Memory is identity mapped, so we can just return the virtual address as paddr
-    return Ok(Sys::MmapResult{vaddr, vaddr, Hal::pageAlignUp(fileSize)});
+    return Ok(MmapResult{vaddr, vaddr, Hal::pageAlignUp(fileSize)});
 }
 
 Res<> memUnmap(void const *buf, usize size) {
@@ -378,23 +378,23 @@ Res<> memFlush(void *, usize) {
     return Ok();
 }
 
-Res<> populate(Sys::SysInfo &) {
+Res<> populate(SysInfo &) {
     return Error::notImplemented();
 }
 
-Res<> populate(Sys::MemInfo &) {
+Res<> populate(MemInfo &) {
     return Error::notImplemented();
 }
 
-Res<> populate(Vec<Sys::CpuInfo> &) {
+Res<> populate(Vec<CpuInfo> &) {
     return Error::notImplemented();
 }
 
-Res<> populate(Sys::UserInfo &) {
+Res<> populate(UserInfo &) {
     return Error::notImplemented();
 }
 
-Res<> populate(Vec<Sys::UserInfo> &) {
+Res<> populate(Vec<UserInfo> &) {
     return Error::notImplemented();
 }
 
@@ -408,7 +408,7 @@ TimeStamp now() {
         t.year,
     };
 
-    Karm::Time time = {
+    Time time = {
         t.hour,
         t.minute,
         t.second,

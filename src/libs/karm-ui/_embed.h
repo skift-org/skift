@@ -4,6 +4,6 @@
 
 namespace Karm::Ui::_Embed {
 
-Res<Strong<Karm::Ui::Host>> makeHost(Karm::Ui::Child root);
+Res<Strong<Host>> makeHost(Child root);
 
 } // namespace Karm::Ui::_Embed

@@ -26,7 +26,7 @@ static inline Demo BEZIER_DEMO{
     "Curve editor",
     [] {
         using Model = Ui::Model<Math::Curvef, Edit, reduce>;
-        return Ui::reducer<Model>(Math::Curvef::linear(0, 200), [](Math::Curvef const &s) {
+        return Ui::reducer<Model>(Math::Curvef::linear(100, 300), [](Math::Curvef const &s) {
             auto canvas = Ui::canvas(
                 [=](Gfx::Context &g, Math::Vec2i) {
                     g.begin();

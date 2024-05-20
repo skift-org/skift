@@ -8,20 +8,16 @@ namespace Web::Select {
 // 17. Calculating a selector’s specificity
 // https://www.w3.org/TR/selectors-4/#specificity-rules
 struct Spec {
-    bool match;
     // a: The number of ID selectors in the selector.
     // b: The number of class selectors, attributes selectors, and pseudo-classes in the selector.
     // c: The number of type selectors and pseudo-elements in the selector.
-    isize a, b, c;
+    isize a{}, b{}, c{};
 
     static Spec const NOMATCH;
     static Spec const ZERO, A, B, C;
 
-    Spec(None)
-        : match(false), a(0), b(0), c(0) {}
-
     Spec(isize a, isize b, isize c)
-        : match(true), a(a), b(b), c(c) {}
+        : a(a), b(b), c(c) {}
 
     Spec operator+(Spec const &other) const {
         return {
@@ -32,8 +28,6 @@ struct Spec {
     }
 
     Spec operator and(Spec const &other) const {
-        if (!match or !other.match)
-            return Spec::NOMATCH;
         return {
             a + other.a,
             b + other.b,
@@ -55,15 +49,10 @@ struct Spec {
         };
     }
 
-    explicit operator bool() const {
-        return match;
-    }
-
     bool operator==(Spec const &other) const = default;
     auto operator<=>(Spec const &other) const = default;
 };
 
-Spec const Spec::NOMATCH = NONE;
 Spec const Spec::ZERO = {0, 0, 0};
 Spec const Spec::A = {1, 0, 0};
 Spec const Spec::B = {0, 1, 0};
@@ -75,23 +64,33 @@ struct UniversalSelector {};
 
 static constexpr UniversalSelector UNIVERSAL = {};
 
-struct Combinator {
+struct Infix {
     enum struct Type {
-        LIST,
         DESCENDANT,
         CHILD,
         ADJACENT,
         SUBSEQUENT,
         COLUMN,
-        IS,
-        NOT,
-        WHERE,
     };
 
     using enum Type;
     Type type;
     Box<Selector> lhs;
     Box<Selector> rhs;
+};
+
+struct Nfix {
+    enum struct Type {
+        AND, // ''
+        OR,  // :is(), ', '
+        NOT,
+        WHERE,
+    };
+
+    using enum Type;
+
+    Type type;
+    Vec<Selector> inners;
 };
 
 struct TypeSelector {
@@ -116,18 +115,17 @@ enum struct Dir {
 };
 
 struct PseudoClass {
-    enum struct _Type {
+    enum struct Type {
 #define PSEUDO_CLASS(ID, ...) ID,
 #include "defs/pseudo-class.def"
 #undef PSEUDO_CLASS
     };
 
-    using enum _Type;
+    using enum Type;
+    using Extra = Union<None, String, AnB, Dir>;
 
-    _Type type;
-    Union<None, String, AnB, Dir> extra = NONE;
-    PseudoClass(_Type type)
-        : type(type) {}
+    Type type;
+    Extra extra = NONE;
 };
 
 struct AttributeSelector {
@@ -153,7 +151,8 @@ struct AttributeSelector {
 };
 
 using _Selector = Union<
-    Combinator,
+    Nfix,
+    Infix,
     TypeSelector,
     UniversalSelector,
     IdSelector,
@@ -163,17 +162,89 @@ using _Selector = Union<
 
 struct Selector : public _Selector {
     using _Selector::_Selector;
+
+    static Selector universal() {
+        return UNIVERSAL;
+    }
+
+    static Selector and_(Vec<Selector> selectors) {
+        return Nfix{
+            Nfix::AND,
+            std::move(selectors),
+        };
+    }
+
+    static Selector or_(Vec<Selector> selectors) {
+        return Nfix{
+            Nfix::OR,
+            std::move(selectors),
+        };
+    }
+
+    static Selector not_(Selector selector) {
+        return Nfix{
+            Nfix::NOT,
+            {std::move(selector)},
+        };
+    }
+
+    static Selector where(Selector selector) {
+        return Nfix{
+            Nfix::WHERE,
+            {std::move(selector)},
+        };
+    }
+
+    static Selector descendant(Selector lhs, Selector rhs) {
+        return Infix{
+            Infix::DESCENDANT,
+            makeBox<Selector>(std::move(lhs)),
+            makeBox<Selector>(std::move(rhs)),
+        };
+    }
+
+    static Selector child(Selector lhs, Selector rhs) {
+        return Infix{
+            Infix::CHILD,
+            makeBox<Selector>(std::move(lhs)),
+            makeBox<Selector>(std::move(rhs)),
+        };
+    }
+
+    static Selector adjacent(Selector lhs, Selector rhs) {
+        return Infix{
+            Infix::ADJACENT,
+            makeBox<Selector>(std::move(lhs)),
+            makeBox<Selector>(std::move(rhs)),
+        };
+    }
+
+    static Selector subsequent(Selector lhs, Selector rhs) {
+        return Infix{
+            Infix::SUBSEQUENT,
+            makeBox<Selector>(std::move(lhs)),
+            makeBox<Selector>(std::move(rhs)),
+        };
+    }
+
+    static Selector column(Selector lhs, Selector rhs) {
+        return Infix{
+            Infix::COLUMN,
+            makeBox<Selector>(std::move(lhs)),
+            makeBox<Selector>(std::move(rhs)),
+        };
+    }
 };
 
-Spec match(Selector const &sel, Dom::Element &el);
+Spec spec(Selector const &sel);
+
+bool match(Selector const &sel, Dom::Element &el);
 
 } // namespace Web::Select
 
 template <>
 struct Karm::Io::Formatter<Web::Select::Spec> {
     Res<usize> format(Io::TextWriter &writer, Web::Select::Spec const &val) {
-        if (!val.match)
-            return Io::format(writer, "NOMATCH");
         return Io::format(writer, "{}-{}-{}", val.a, val.b, val.c);
     }
 };

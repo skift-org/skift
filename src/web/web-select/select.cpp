@@ -2,47 +2,39 @@
 
 namespace Web::Select {
 
-Spec match(Selector const &sel, Dom::Element &el);
+bool match(Selector const &sel, Dom::Element &el);
 
-Spec match(Combinator const &s, Dom::Element &el) {
+bool match(Infix const &s, Dom::Element &) {
     switch (s.type) {
+    default:
+        notImplemented();
+    }
+}
+
+bool match(Nfix const &s, Dom::Element &el) {
+    switch (s.type) {
+    case Nfix::AND:
+        for (auto &inner : s.inners)
+            if (not match(inner, el))
+                return false;
+        return true;
+
     // 4.1. Selector Lists
     // https://www.w3.org/TR/selectors-4/#grouping
-    case Combinator::LIST: {
-        Spec result = Spec::NOMATCH;
-        for (auto &inner : s.inners)
-            result = result or match(inner, el);
-        return result;
-    }
-
+    // and
     // 4.2. The Matches-Any Pseudo-class: :is()
-    // https://www.w3.org/TR/selectors-4/#matches
-    case Combinator::IS: {
-        Spec result = Spec::NOMATCH;
-        for (auto &inner : s.inners) {
-            if (auto sel = match(inner, el); sel > result)
-                result = sel;
-        }
-        return result + Spec::B;
-    }
-
-    // 4.3. The Negation (Matches-None) Pseudo-class: :not()
-    // https://www.w3.org/TR/selectors-4/#negation
-    case Combinator::NOT: {
-        Spec result = {0, 0, 0};
+    // https://www.w3.org/TR/selectors-4/#matchess
+    case Nfix::OR:
         for (auto &inner : s.inners)
-            result = result and not match(inner, el);
-        return result + Spec::B;
-    }
+            if (match(inner, el))
+                return true;
+        return false;
 
-    // 4.4. The Specificity-adjustment Pseudo-class: :where()
-    // https://www.w3.org/TR/selectors-4/#zero-matches
-    case Combinator::WHERE: {
-        Spec result = Spec::NOMATCH;
-        for (auto &inner : s.inners)
-            result = result or match(inner, el);
-        return result ? Spec::ZERO : Spec::NOMATCH;
-    }
+    case Nfix::NOT:
+        return not match(s.inners[0], el);
+
+    case Nfix::WHERE:
+        return match(s.inners[0], el);
 
     default:
         notImplemented();
@@ -51,30 +43,36 @@ Spec match(Combinator const &s, Dom::Element &el) {
 
 // 5.1. Type (tag name) selector
 // https://www.w3.org/TR/selectors-4/#type
-Spec match(TypeSelector const &s, Dom::Element &el) {
-    if (el.tagName == s.type)
-        return Spec::C;
-    return Spec::NOMATCH;
+bool match(TypeSelector const &s, Dom::Element &el) {
+    return el.tagName == s.type;
+}
+
+bool match(IdSelector const &s, Dom::Element &el) {
+    return el.id() == s.id;
+}
+
+bool match(ClassSelector const &s, Dom::Element &el) {
+    return el.classList.contains(s.class_);
 }
 
 // 5.2. Universal selector
 // https://www.w3.org/TR/selectors-4/#the-universal-selector
-Spec match(UniversalSelector const &, Dom::Element &) {
-    return Spec::ZERO;
+bool match(UniversalSelector const &, Dom::Element &) {
+    return true;
 }
 
-Spec match(Selector const &sel, Dom::Element &el) {
+bool match(Selector const &sel, Dom::Element &el) {
     return sel.visit(Visitor{
-        [&](Combinator const &s) -> Spec {
+        [&](Infix const &s) {
             return match(s, el);
         },
-        [&](TypeSelector const &s) -> Spec {
+        [&](TypeSelector const &s) {
             return match(s, el);
         },
-        [&](UniversalSelector const &s) -> Spec {
+        [&](UniversalSelector const &s) {
             return match(s, el);
         },
-        [&](auto &) -> Spec {
+        [&](auto &) -> bool {
             notImplemented();
         }
     });

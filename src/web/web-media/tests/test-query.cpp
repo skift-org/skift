@@ -5,12 +5,12 @@ namespace Web::Media::Tests {
 
 static Media const TEST_MEDIA = {
     .type = Type::SCREEN,
-    .width = Css::Px(1920),
-    .height = Css::Px(1080),
+    .width = Unit::Px(1920),
+    .height = Unit::Px(1080),
     .aspectRatio = 16.0 / 9.0,
     .orientation = Orientation::LANDSCAPE,
 
-    .resolution = Css::Resolution::fromDpi(96),
+    .resolution = Unit::Resolution::fromDpi(96),
     .scan = Scan::PROGRESSIVE,
     .grid = false,
     .update = Update::NONE,
@@ -30,7 +30,7 @@ static Media const TEST_MEDIA = {
 test$("logical-and") {
     auto query = Query::combineAnd(
         TypeFeature{Type::SCREEN},
-        WidthFeature::min(Css::Px{1920})
+        WidthFeature::min(Unit::Px{1920})
     );
 
     expect$(query.match(TEST_MEDIA));
@@ -41,7 +41,7 @@ test$("logical-and") {
 test$("logical-or") {
     auto query = Query::combineOr(
         TypeFeature{Type::SCREEN},
-        WidthFeature::min(Css::Px{1920})
+        WidthFeature::min(Unit::Px{1920})
     );
 
     expect$(query.match(TEST_MEDIA));

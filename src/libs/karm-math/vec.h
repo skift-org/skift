@@ -72,7 +72,7 @@ union Vec2 {
         return (*this - other).len();
     }
 
-    constexpr Vec2 norm() const {
+    constexpr Vec2 unit() const {
         return Vec2{x, y} / len();
     }
 
@@ -86,8 +86,12 @@ union Vec2 {
         return {x * c - y * s, x * s + y * c};
     }
 
+    constexpr Vec2 normal() const {
+        return {-y, x};
+    }
+
     constexpr T angleWith(Vec2 other) const {
-        auto r = norm().dot(other.norm());
+        auto r = unit().dot(other.unit());
         auto sign = (x * other.y < y * other.x) ? -1.0 : 1.0;
         return sign * acos(r);
     }
@@ -284,7 +288,7 @@ union Vec3 {
         return (*this - other).len();
     }
 
-    constexpr Vec3 norm() const {
+    constexpr Vec3 unit() const {
         T l = len();
         return {x / l, y / l, z / l};
     }
@@ -471,7 +475,7 @@ union Vec4 {
         return (*this - other).len();
     }
 
-    constexpr Vec4 norm() const {
+    constexpr Vec4 unit() const {
         T l = len();
         return {x / l, y / l, z / l, w / l};
     }

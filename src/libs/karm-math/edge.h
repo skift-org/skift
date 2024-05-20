@@ -26,6 +26,10 @@ union Edge {
     constexpr Edge(T x1, T y1, T x2, T y2)
         : start(x1, y1), end(x2, y2) {}
 
+    constexpr Vec<T> delta() const {
+        return {end.x - start.x, end.y - start.y};
+    }
+
     constexpr Rect<T> bound() const {
         return Rect<T>::fromTwoPoint(start, end);
     }

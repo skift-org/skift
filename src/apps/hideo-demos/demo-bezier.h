@@ -35,8 +35,8 @@ static inline Demo BEZIER_DEMO{
                     g.strokeStyle(Gfx::stroke(Gfx::WHITE).withWidth(2).withAlign(Gfx::CENTER_ALIGN));
                     g.stroke();
 
-                    auto minusOffset = s.offset(-50);
-                    auto plusOffset = s.offset(50);
+                    auto minusOffset = s.offset2(-50);
+                    auto plusOffset = s.offset(-50);
 
                     g.begin();
                     g.moveTo(minusOffset.a);
@@ -45,9 +45,25 @@ static inline Demo BEZIER_DEMO{
                     g.stroke();
 
                     g.begin();
+                    g.moveTo(minusOffset.a);
+                    g.lineTo(minusOffset.b);
+                    g.lineTo(minusOffset.c);
+                    g.lineTo(minusOffset.d);
+                    g.strokeStyle(Gfx::stroke(Gfx::RED).withWidth(0.5).withAlign(Gfx::CENTER_ALIGN));
+                    g.stroke();
+
+                    g.begin();
                     g.moveTo(plusOffset.a);
                     g.cubicTo(plusOffset.b, plusOffset.c, plusOffset.d);
                     g.strokeStyle(Gfx::stroke(Gfx::GREEN).withWidth(1).withAlign(Gfx::CENTER_ALIGN));
+                    g.stroke();
+
+                    g.begin();
+                    g.moveTo(plusOffset.a);
+                    g.lineTo(plusOffset.b);
+                    g.lineTo(plusOffset.c);
+                    g.lineTo(plusOffset.d);
+                    g.strokeStyle(Gfx::stroke(Gfx::GREEN).withWidth(0.5).withAlign(Gfx::CENTER_ALIGN));
                     g.stroke();
 
                     g.begin();

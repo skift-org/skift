@@ -154,7 +154,8 @@ struct Scroll : public ProxyNode<Scroll> {
             } else {
                 _scroll = _scroll + _momentum * e.unwrap<Node::AnimateEvent>().dt;
                 // NOTE: We have to tell our parent to repaint us instead of
-                //       just calling shouldRepaint() because
+                //       just calling shouldRepaint() because bubble() will
+                //       offset the paint event by the scroll position
                 shouldRepaint(*parent(), bound);
                 shouldAnimate(*this);
             }

@@ -2,6 +2,8 @@ from http import server
 from pathlib import Path
 from . import image, store, runner
 from cutekit import cli, model, shell, const
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
 
 def generateSystem(img: image.Image) -> None:
@@ -115,6 +117,7 @@ class WasmArgs:
     debug: bool = cli.arg(None, "debug", "Build the image in debug mode")
     port: int = cli.arg(None, "port", "The port to serve the wasm on", default=8080)
     component: str = cli.operand("component", "Component to build", default="__main__")
+    open_wasm: bool = cli.arg(None, "open", "Open the wasm in the browser")
 
 
 class WasmServer(server.SimpleHTTPRequestHandler):
@@ -141,6 +144,35 @@ def _(args: WasmArgs):
 
     def finish_request(self, request, client_address):
         self.RequestHandlerClass(request, client_address, self, directory=s.finalize())
+
+    def rebuild(event):
+        img._finalized = None
+        modified = Path(event.src_path)
+        if (
+            Path(const.META_DIR) / "image" / "wasm"
+        ) in modified.parents or modified == Path(const.META_DIR) / "image" / "wasm":
+            img.cpTree("meta/image/wasm", ".")
+        else:
+            img.install(args.component, "wasm")
+        img.finalize()
+
+    handler = FileSystemEventHandler()
+    handler.on_modified = rebuild
+
+    observer = Observer()
+    for m in img._registry.manifests.values():
+        if isinstance(m, model.Component):
+            observer.schedule(handler, str(Path(m.path).parent), recursive=True)
+    observer.schedule(
+        handler, str(Path(const.META_DIR) / "image" / "wasm"), recursive=True
+    )
+    observer.start()
+
+    if args.open_wasm:
+        shell.popen(
+            "xdg-open",
+            f"http://localhost:{args.port}?uri=bundle://{args.component}/_bin",
+        )
 
     server.ThreadingHTTPServer.finish_request = finish_request
     with server.ThreadingHTTPServer(("", args.port), WasmServer) as httpd:

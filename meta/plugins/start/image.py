@@ -59,8 +59,8 @@ class Image:
             if dep is None:
                 raise Exception(f"Component {depId} not found")
 
-            for res in builder.listRes(component):
-                rel = Path(res).relative_to(component.subpath("res"))
+            for res in builder.listRes(dep):
+                rel = Path(res).relative_to(dep.subpath("res"))
                 self.cpRef("_index", res, f"{depId}/{rel}")
                 self.cpRef(componentSpec, res, f"{depId}/{rel}")
 
@@ -84,6 +84,6 @@ class Image:
     def finalize(self) -> str:
         if not self._finalized:
             for k, v in self._paks.items():
-                self._store.write(json.dumps(v).encode("utf-8"), f"bundles/{k}.json")
+                self._store.write(json.dumps(v, indent=4).encode("utf-8"), f"bundles/{k}.json")
             self._finalized = self._store.finalize()
         return self._finalized

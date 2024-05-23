@@ -7,3 +7,4 @@ book/
 *.code-workspace
 .idea/
 skift.iml
+compile_commands.json

@@ -5,6 +5,6 @@
     "description": "Web Content Host",
     "requires": [
         "karm-ui",
-        "web-render"
+        "web-layout"
     ]
 }

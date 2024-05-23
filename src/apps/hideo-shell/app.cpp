@@ -98,25 +98,26 @@ Ui::Child taskbar(State const &state) {
     );
 
     return Ui::vflow(
-        Ui::hflow(
-            6,
-            appsButton,
-            calButton |
-                Ui::center() |
-                Ui::grow(),
-            Ui::button(
-                Keyboard::show,
-                Ui::ButtonStyle::subtle(),
-                Mdi::KEYBOARD
-            ),
-            trayButton
-        ) |
-            Ui::box({
-                .padding = 6,
-                .backgroundPaint = Ui::GRAY950.withOpacity(0.8),
-            }),
-        Ui::separator()
-    );
+               Ui::hflow(
+                   6,
+                   appsButton,
+                   calButton |
+                       Ui::center() |
+                       Ui::grow(),
+                   Ui::button(
+                       Keyboard::show,
+                       Ui::ButtonStyle::subtle(),
+                       Mdi::KEYBOARD
+                   ),
+                   trayButton
+               ) |
+                   Ui::box({
+                       .padding = 6,
+                       .backgroundPaint = Ui::GRAY950.withOpacity(0.8),
+                   }),
+               Ui::separator()
+           ) |
+           Ui::backgroundFilter(Gfx::BlurFilter{16});
 }
 
 // MARK: Shells ----------------------------------------------------------------

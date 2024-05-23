@@ -175,7 +175,6 @@ struct DarwinSched :
         if (n == 0)
             return Ok();
 
-
         usize id = ev.udata;
         auto promise =
             _promises

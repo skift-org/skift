@@ -17,18 +17,18 @@ struct Resolution {
 
     using enum Unit;
 
-    double _val;
+    f64 _val;
     Unit _unit;
 
-    static Resolution fromDpi(double val) {
+    static Resolution fromDpi(f64 val) {
         return {val, Unit::DPI};
     }
 
-    static Resolution fromDpcm(double val) {
+    static Resolution fromDpcm(f64 val) {
         return {val, Unit::DPCM};
     }
 
-    static Resolution fromDppx(double val) {
+    static Resolution fromDppx(f64 val) {
         return {val, Unit::DPPX};
     }
 
@@ -36,7 +36,7 @@ struct Resolution {
         return {0.0, Unit::INFINITE};
     }
 
-    double val() const {
+    f64 val() const {
         return _val;
     }
 
@@ -44,7 +44,7 @@ struct Resolution {
         return _unit;
     }
 
-    double toDpi() const {
+    f64 toDpi() const {
         switch (_unit) {
         case Unit::DPI:
             return _val;
@@ -57,7 +57,7 @@ struct Resolution {
         }
     }
 
-    double toDpcm() const {
+    f64 toDpcm() const {
         switch (_unit) {
         case Unit::DPI:
             return _val / 2.54;
@@ -70,7 +70,7 @@ struct Resolution {
         }
     }
 
-    double toDppx() const {
+    f64 toDppx() const {
         switch (_unit) {
         case Unit::DPI:
             return _val / 96.0;

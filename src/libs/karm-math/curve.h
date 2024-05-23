@@ -120,8 +120,8 @@ union Curve {
 
         Vec2<T> bxby = (8.0 / 3.0) * (p - (0.5 * (p0 + p3)));
 
-        double a = bxby.cross(d2) / div;
-        double b = d1.cross(bxby) / div;
+        auto a = bxby.cross(d2) / div;
+        auto b = d1.cross(bxby) / div;
 
         Vec2<T> p1(p0.x + a * d1.x, p0.y + a * d1.y);
         Vec2<T> p2(p3.x + b * d2.x, p3.y + b * d2.y);

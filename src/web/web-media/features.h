@@ -95,7 +95,7 @@ using HeightFeature = RangeFeature<Unit::Length, &Media::height>;
 
 /// 4.3. Device Width: the device-width feature
 /// https://drafts.csswg.org/mediaqueries/#aspect-ratio
-using AspectRatioFeature = RangeFeature<double, &Media::aspectRatio>;
+using AspectRatioFeature = RangeFeature<f64, &Media::aspectRatio>;
 
 /// 4.4. Device Height: the device-height feature
 /// https://drafts.csswg.org/mediaqueries/#orientation

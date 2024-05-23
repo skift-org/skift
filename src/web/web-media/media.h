@@ -24,7 +24,7 @@ struct Media {
 
     /// 4.3. Device Width: the device-width feature
     /// https://drafts.csswg.org/mediaqueries/#aspect-ratio
-    double aspectRatio;
+    f64 aspectRatio;
 
     /// 4.4. Device Height: the device-height feature
     /// https://drafts.csswg.org/mediaqueries/#orientation

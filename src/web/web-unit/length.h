@@ -3,6 +3,7 @@
 #include <karm-base/distinct.h>
 #include <karm-math/fixed.h>
 #include <karm-math/rect.h>
+#include <karm-math/spacing.h>
 
 namespace Web::Unit {
 
@@ -11,6 +12,10 @@ using PhysicalPixel = Distinct<i32, struct _PhysicalPixel>;
 
 /// Represents a logical pixel in the CSS coordinate system.
 using Px = Math::i24f8;
+
+using RectPx = Math::Rect<Px>;
+
+using SpacingPx = Math::Spacing<Px>;
 
 // 6. MARK: Distance Units: the <length> type
 // https://drafts.csswg.org/css-values/#lengths

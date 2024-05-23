@@ -15,26 +15,26 @@ struct Angle {
         TURN,
     };
 
-    double _val;
+    f64 _val;
     Unit _unit;
 
-    static Angle fromDegree(double val) {
+    static Angle fromDegree(f64 val) {
         return {val, Unit::DEGREE};
     }
 
-    static Angle fromRadian(double val) {
+    static Angle fromRadian(f64 val) {
         return {val, Unit::RADIAN};
     }
 
-    static Angle fromGrad(double val) {
+    static Angle fromGrad(f64 val) {
         return {val, Unit::GRAD};
     }
 
-    static Angle fromTurn(double val) {
+    static Angle fromTurn(f64 val) {
         return {val, Unit::TURN};
     }
 
-    double val() const {
+    f64 val() const {
         return _val;
     }
 
@@ -42,7 +42,7 @@ struct Angle {
         return _unit;
     }
 
-    double toDegree() const {
+    f64 toDegree() const {
         switch (_unit) {
         case Unit::DEGREE:
             return _val;
@@ -55,7 +55,7 @@ struct Angle {
         }
     }
 
-    double toRadian() const {
+    f64 toRadian() const {
         switch (_unit) {
         case Unit::DEGREE:
             return _val * Math::PI / 180.0;

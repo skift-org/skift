@@ -15,6 +15,8 @@ using Px = Math::i24f8;
 
 using RectPx = Math::Rect<Px>;
 
+using Vec2Px = Math::Vec2<Px>;
+
 using SpacingPx = Math::Spacing<Px>;
 
 // 6. MARK: Distance Units: the <length> type

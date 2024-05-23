@@ -39,9 +39,9 @@ struct Border {
 
 struct Borders {
     Border top = {};
-    Border right = {};
+    Border end = {};
     Border bottom = {};
-    Border left = {};
+    Border start = {};
 };
 
 enum struct Align {

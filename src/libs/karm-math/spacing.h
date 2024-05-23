@@ -12,7 +12,10 @@ struct Spacing {
     T end;
     T bottom;
 
-    constexpr Spacing(T all = 0)
+    constexpr Spacing()
+        : start(), top(), end(), bottom() {}
+
+    constexpr Spacing(T all)
         : start(all), top(all), end(all), bottom(all) {}
 
     constexpr Spacing(T horizontal, T vertical)

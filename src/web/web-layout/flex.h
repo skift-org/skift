@@ -16,8 +16,17 @@ struct FlexFlow : public Flow {
     Vec<Item> _items;
     Vec<Line> _lines;
 
+    using Flow::Flow;
+
     Type type() const override {
         return TYPE;
+    }
+
+    void layout(Unit::RectPx) override {
+    }
+
+    Unit::Vec2Px size() override {
+        return {};
     }
 };
 

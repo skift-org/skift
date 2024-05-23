@@ -9,8 +9,17 @@ struct InlineFlow : public Flow {
 
     struct Line {};
 
+    using Flow::Flow;
+
     Type type() const override {
         return TYPE;
+    }
+
+    void layout(Unit::RectPx) override {
+    }
+
+    Unit::Vec2Px size() override {
+        return {};
     }
 };
 

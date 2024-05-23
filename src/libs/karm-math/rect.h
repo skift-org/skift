@@ -27,11 +27,11 @@ union Rect {
     static Rect const MAX;
 
     always_inline constexpr Rect()
-        : x(0), y(0), width(0), height(0) {
+        : x(), y(), width(), height() {
     }
 
     always_inline constexpr Rect(T width, T height)
-        : x(0), y(0), width(width), height(height) {
+        : x(), y(), width(width), height(height) {
     }
 
     always_inline constexpr Rect(T x, T y, T width, T height)
@@ -43,7 +43,7 @@ union Rect {
     }
 
     always_inline constexpr Rect(Vec2<T> wh)
-        : xy(0), wh(wh) {
+        : xy(), wh(wh) {
     }
 
     always_inline static constexpr Rect<T> fromTwoPoint(Vec2<T> a, Vec2<T> b) {

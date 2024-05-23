@@ -29,13 +29,13 @@ void build(Vec<Strong<Dom::Node>> const &children, Vec<Strong<Frag>> &out) {
 
 void build(Dom::Element const &n, Vec<Strong<Frag>> &out) {
     if (n.tagName == Html::IMG)
-        out.pushBack(makeStrong<ImageFrag>());
+        out.pushBack(makeStrong<ImageFrag>(makeStrong<Css::ComputedValues>(), Media::Image::fallback()));
     else if (contains(BLOCKS, n.tagName)) {
-        auto frag = makeStrong<BlockFlow>();
+        auto frag = makeStrong<BlockFlow>(makeStrong<Css::ComputedValues>());
         build(n.children(), frag->children);
         out.pushBack(frag);
     } else {
-        auto frag = makeStrong<InlineFlow>();
+        auto frag = makeStrong<InlineFlow>(makeStrong<Css::ComputedValues>());
         build(n.children(), frag->children);
         out.pushBack(frag);
     }
@@ -45,7 +45,7 @@ void build(Dom::Node const &n, Vec<Strong<Frag>> &out) {
     if (auto *el = n.is<Dom::Element>()) {
         build(*el, out);
     } else if (auto *text = n.is<Dom::Text>()) {
-        out.pushBack(makeStrong<TextFrag>(text->data));
+        out.pushBack(makeStrong<TextFrag>(makeStrong<Css::ComputedValues>(), text->data));
     }
 }
 

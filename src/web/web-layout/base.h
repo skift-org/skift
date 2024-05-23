@@ -20,15 +20,21 @@ struct Frag {
 
     using enum Type;
 
-    Unit::RectPx borderBox;
-    Unit::SpacingPx BorderPadding;
-    Unit::SpacingPx margin;
-    Strong<Css::ComputedValues> computedValues;
+    Strong<Css::ComputedValues> _style;
+
+    Unit::RectPx _borderBox;
+    Unit::SpacingPx _BorderPadding;
+    Unit::SpacingPx _margin;
+
+    Frag(Strong<Css::ComputedValues> style)
+        : _style(style) {
+    }
 
     virtual ~Frag() = default;
     virtual Type type() const = 0;
-    virtual void layout() = 0;
-    virtual void size() = 0;
+
+    virtual void layout(Unit::RectPx) = 0;
+    virtual Unit::Vec2Px size() = 0;
 
     template <typename T>
     T *is() {
@@ -43,6 +49,8 @@ struct Frag {
 
 struct Flow : public Frag {
     Vec<Strong<Frag>> children;
+
+    using Frag::Frag;
 };
 
 } // namespace Web::Layout

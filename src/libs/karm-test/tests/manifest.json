@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-tests.tests",
+    "description": "Yo dawg, I heard you like tests, so I put tests in your tests so you can test while you test.",
+    "type": "lib",
+    "props": {
+        "cpp-excluded": true
+    },
+    "requires": [
+        "karm-test"
+    ],
+    "injects": [
+        "__tests__"
+    ]
+}

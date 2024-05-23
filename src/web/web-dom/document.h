@@ -12,10 +12,12 @@ enum struct QuirkMode {
 
 // https://dom.spec.whatwg.org/#interface-document
 struct Document : public Node {
+    static constexpr auto TYPE = NodeType::DOCUMENT;
+
     QuirkMode quirkMode{QuirkMode::NO};
 
     NodeType nodeType() const override {
-        return NodeType::DOCUMENT;
+        return TYPE;
     }
 };
 

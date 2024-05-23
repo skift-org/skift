@@ -4,8 +4,8 @@
 
 namespace Web::Layout {
 
-struct GridFlow : public Flow {
-    static constexpr auto TYPE = GRID;
+struct ImageFrag : public Frag {
+    static constexpr auto TYPE = IMAGE;
 
     Type type() const override {
         return TYPE;

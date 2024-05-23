@@ -13,6 +13,8 @@ namespace Web::Dom {
 
 // https://dom.spec.whatwg.org/#interface-element
 struct Element : public Node {
+    static constexpr auto TYPE = NodeType::ELEMENT;
+
     Opt<String> id() const {
         return this->getAttribute(Html::ID_ATTR);
     }
@@ -27,7 +29,7 @@ struct Element : public Node {
     }
 
     NodeType nodeType() const override {
-        return NodeType::ELEMENT;
+        return TYPE;
     }
 
     void _dump(Io::Emit &e) const override {

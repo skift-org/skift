@@ -8,8 +8,10 @@ namespace Web::Dom {
 struct Comment : public CharacterData {
     using CharacterData::CharacterData;
 
+    static constexpr auto TYPE = NodeType::COMMENT;
+
     NodeType nodeType() const override {
-        return NodeType::COMMENT;
+        return TYPE;
     }
 };
 

@@ -4,7 +4,12 @@
 
 namespace Web::Layout {
 
-struct Text : public Frag {
+struct TextFrag : public Frag {
+    static constexpr auto TYPE = TEXT;
+
+    Type type() const override {
+        return TYPE;
+    }
 };
 
 } // namespace Web::Layout

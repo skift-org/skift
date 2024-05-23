@@ -6,6 +6,8 @@ namespace Web::Dom {
 
 // https://dom.spec.whatwg.org/#interface-documenttype
 struct DocumentType : public Node {
+    static constexpr auto TYPE = NodeType::DOCUMENT_TYPE;
+
     String name;
     String publicId;
     String systemId;
@@ -17,7 +19,7 @@ struct DocumentType : public Node {
     }
 
     NodeType nodeType() const override {
-        return NodeType::DOCUMENT_TYPE;
+        return TYPE;
     }
 
     void _dump(Io::Emit &e) const override {

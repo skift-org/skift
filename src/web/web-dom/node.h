@@ -47,6 +47,16 @@ struct Node :
 
     virtual NodeType nodeType() const = 0;
 
+    template <typename T>
+    T *is() {
+        return nodeType() == T::TYPE ? static_cast<T *>(this) : nullptr;
+    }
+
+    template <typename T>
+    T const *is() const {
+        return nodeType() == T::TYPE ? static_cast<T const *>(this) : nullptr;
+    }
+
     // MARK: Parent
 
     Node &parentNode() {
@@ -61,7 +71,7 @@ struct Node :
         return *_parent;
     }
 
-    usize _parentIndex() {
+    usize _parentIndex() const {
         return indexOf(parentNode()._children, *this).unwrap();
     }
 
@@ -100,6 +110,10 @@ struct Node :
         if (child->_parent != this)
             panic("node is not a child");
         child->_detachParent();
+    }
+
+    Slice<Strong<Node>> children() const {
+        return _children;
     }
 
     // MARK: Siblings

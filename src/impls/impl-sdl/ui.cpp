@@ -528,4 +528,4 @@ Res<Strong<Host>> makeHost(Child root) {
     return Ok(makeStrong<SdlHost>(root, window));
 }
 
-} // namespace Karm::_Embed
+} // namespace Karm::Ui::_Embed

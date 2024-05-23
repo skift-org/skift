@@ -125,6 +125,8 @@ class WasmServer(server.SimpleHTTPRequestHandler):
 
     def end_headers(self) -> None:
         self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.send_header("Cross-Origin-Opener-Policy", "same-origin")
+        self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
         self.send_header("Pragma", "no-cache")
         self.send_header("Expires", "0")
         super().end_headers()
@@ -139,6 +141,7 @@ def _(args: WasmArgs):
     s = store.Dir("image-wasm")
     img = image.Image(registry, s)
     img.install(args.component, "wasm")
+    img.install("inter-font", "wasm")
     img.cpTree("meta/image/wasm", ".")
     img.finalize()
 
@@ -153,7 +156,11 @@ def _(args: WasmArgs):
         ) in modified.parents or modified == Path(const.META_DIR) / "image" / "wasm":
             img.cpTree("meta/image/wasm", ".")
         else:
-            img.install(args.component, "wasm")
+            try:
+                img.install(args.component, "wasm")
+            except shell.ShellException as e:
+                print(e)
+                return
         img.finalize()
 
     handler = FileSystemEventHandler()

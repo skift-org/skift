@@ -15,3 +15,12 @@ extern "C" u64 wasm_import(embedGetTimeStamp)();
 extern "C" void wasm_import(embedConsoleLog)(u8 const *str, usize len);
 extern "C" void wasm_import(embedConsoleError)(u8 const *str, usize len);
 extern "C" void *wasm_import(embedAlloc)(usize size);
+extern "C" u32 wasm_import(embedGetCanvasWidth)();
+extern "C" u32 wasm_import(embedGetCanvasHeight)();
+extern "C" void wasm_import(embedFlipCanvas)(uintptr_t ptr);
+extern "C" u32 wasm_import(embedCheckAsync)(u64 id, u8 *buf, usize len);
+extern "C" u64 wasm_import(embedOpenFile)(u8 const *uri, usize len);
+extern "C" u32 wasm_import(embedGetEstimedFileSize)(u8 const *uri, usize len);
+
+void wasm_export(free)(void *ptr);
+void *wasm_export(malloc)(usize size);

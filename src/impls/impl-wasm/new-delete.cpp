@@ -36,6 +36,14 @@ static Heap *_ensureHeap() {
     return &_heapImpl;
 }
 
+void wasm_export(free)(void *ptr) {
+    heap_free(_ensureHeap(), ptr);
+}
+
+void *wasm_export(malloc)(usize size) {
+    return heap_calloc(_ensureHeap(), size, 1);
+}
+
 // MARK: New/Delete Implementation ---------------------------------------------
 
 void *operator new(usize size) {

@@ -9,11 +9,13 @@
         ]
     },
     "requires": [
-        "libheap"
+        "libheap",
+        "web-json"
     ],
     "provides": [
         "karm-logger-impl",
         "karm-sys-async-impl",
-        "karm-sys-impl"
+        "karm-sys-impl",
+        "karm-ui-impl"
     ]
 }

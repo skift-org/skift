@@ -60,9 +60,9 @@ auto iterFields(T &v, auto f) {
     ::Karm::Tuple<mapList$(__reflectableField, __VA_ARGS__)>
 
 #define __reflectableType(T, ...)                        \
-    struct ::Karm::Reflect<T> {                            \
+    struct ::Karm::Reflect<T> {                          \
         using Type = T;                                  \
-        static constexpr Str NAME = ::Karm::nameOf<T>();   \
+        static constexpr Str NAME = ::Karm::nameOf<T>(); \
         using Fields = __reflectableFields(__VA_ARGS__); \
     }
 

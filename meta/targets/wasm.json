@@ -14,8 +14,7 @@
         "karm-sys-encoding": "utf8",
         "karm-sys-line-ending": "lf",
         "karm-sys-path-separator": "slash",
-        "karm-cli-backend": "ansi",
-        "karm-ui-backend": "sdl"
+        "karm-cli-backend": "ansi"
     },
     "tools": {
         "cc": {

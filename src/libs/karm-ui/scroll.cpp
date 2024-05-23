@@ -207,6 +207,10 @@ struct Scroll : public ProxyNode<Scroll> {
     Math::Recti bound() override {
         return _bound;
     }
+
+    Math::Recti overflow() override {
+        return _bound;
+    }
 };
 
 Child vhscroll(Child child) {

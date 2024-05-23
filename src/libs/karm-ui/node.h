@@ -86,7 +86,9 @@ struct Node :
 
     virtual Math::Vec2i size(Math::Vec2i s, Hint) { return s; }
 
-    virtual Math::Recti bound() { return {}; }
+    virtual Math::Recti bound() { panic("bound() not implemented"); }
+
+    virtual Math::Recti overflow() { panic("overflow() not implemented"); }
 
     virtual Node *parent() { return nullptr; }
 
@@ -243,6 +245,19 @@ struct GroupNode : public LeafNode<Crtp> {
     Math::Recti bound() override {
         return _bound;
     }
+
+    Math::Recti overflow() override {
+        if (_children.len() == 0)
+            return bound();
+
+        return iter(_children)
+            .reduce(
+                first(_children)->bound(),
+                [](auto &a, auto &b) {
+                    return a.mergeWith(b->bound());
+                }
+            );
+    }
 };
 
 // MARK: ProxyNode -------------------------------------------------------------
@@ -294,6 +309,10 @@ struct ProxyNode : public LeafNode<Crtp> {
 
     Math::Recti bound() override {
         return _child->bound();
+    }
+
+    Math::Recti overflow() override {
+        return _child->overflow();
     }
 };
 

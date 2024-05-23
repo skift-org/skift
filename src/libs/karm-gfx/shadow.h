@@ -35,7 +35,7 @@ struct DropShadow {
     void paint(Gfx::Context &g) {
         g.layer(offset, [&](Context &ctx) {
             ctx.fill(fill);
-            ctx.apply(BlurFilter{(isize)radius});
+            ctx.apply(BlurFilter{radius});
         });
     }
 };

@@ -17,10 +17,10 @@ struct Unfiltered {
 
 struct BlurFilter {
     static constexpr auto NAME = "blur";
-    static constexpr irange RANGE = irange::fromStartEnd(0, 32);
+    static constexpr frange RANGE = frange::fromStartEnd(0, 32);
     static constexpr f64 DEFAULT = 16;
 
-    isize amount = DEFAULT;
+    f64 amount = DEFAULT;
     void apply(MutPixels) const;
 };
 

@@ -60,23 +60,22 @@ struct StackBlur {
 };
 
 [[gnu::flatten]] void BlurFilter::apply(MutPixels p) const {
-    if (amount == 0) {
+    if (amount == 0)
         return;
-    }
 
-    StackBlur stack{amount};
+    StackBlur stack{(isize)amount};
     auto b = p.bound();
 
     for (isize y = b.top(); y < b.bottom(); y++) {
         for (isize i = 0; i < stack.width(); i++) {
-            auto x = b.start() + i - amount;
+            auto x = b.start() + i - (isize)amount;
             stack.dequeue();
             stack.enqueue(p.load({x, y}));
         }
 
         for (isize x = b.start(); x < b.end(); x++) {
             p.store({x, y}, stack.dequeue());
-            stack.enqueue(p.load({x + amount + 1, y}));
+            stack.enqueue(p.load({x + (isize)amount + 1, y}));
         }
 
         stack.clear();
@@ -84,14 +83,14 @@ struct StackBlur {
 
     for (isize x = b.start(); x < b.end(); x++) {
         for (isize i = 0; i < stack.width(); i++) {
-            isize const y = b.top() + i - amount;
+            isize const y = b.top() + i - (isize)amount;
             stack.dequeue();
             stack.enqueue(p.load({x, y}));
         }
 
         for (isize y = b.top(); y < b.bottom(); y++) {
             p.store({x, y}, stack.dequeue());
-            stack.enqueue(p.load({x, y + amount + 1}));
+            stack.enqueue(p.load({x, y + (isize)amount + 1}));
         }
 
         stack.clear();

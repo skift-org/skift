@@ -28,9 +28,7 @@ constexpr inline auto WRAP = Wrap{};
 struct None {
     constexpr None() {}
 
-    explicit operator bool() const {
-        return false;
-    }
+    explicit operator bool() const { return false; }
 };
 
 constexpr inline auto NONE = None{};

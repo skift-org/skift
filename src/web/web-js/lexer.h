@@ -56,7 +56,7 @@ namespace Web::Js {
     TOKEN(DOUBLE_QUESTION_MARK_EQUALS, OPERATOR)    \
     TOKEN(ELSE, CONTROL_KEYWORD)                    \
     TOKEN(ENUM, KEYWORD)                            \
-    TOKEN(EOF, INVALID)                             \
+    TOKEN(END_OF_FILE, INVALID)                     \
     TOKEN(EQUALS, OPERATOR)                         \
     TOKEN(EQUALS_EQUALS, OPERATOR)                  \
     TOKEN(EQUALS_EQUALS_EQUALS, OPERATOR)           \

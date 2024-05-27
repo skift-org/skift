@@ -124,7 +124,7 @@ static constexpr Array _keywordTokens = {
 
 Token nextToken(Io::SScan &s) {
     if (s.ended())
-        return Token::EOF;
+        return Token::END_OF_FILE;
 
     s.begin();
 

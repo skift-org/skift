@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "web-js",
+    "type": "lib",
+    "description": "JavaScript library & runtime",
+    "requires": [
+        "karm-io"
+    ]
+}

@@ -1,14 +1,17 @@
-# This is a hackish plugin for geneating header file from chatty interface
-# definition. This should be replaced by a proper generator in the future when
-# CuteKit supports more advanced rules.
-
-from cutekit import shell, utils
+from pathlib import Path
+from cutekit import shell, utils, builder, const
 
 
-idlFiles = shell.find("src/", ["*.idl"])
+@builder.hook("generate-idl-headers")
+def _genIdlHook(scope: builder.TargetScope):
+    for c in scope.components:
+        idls = c.wilcard("*.idl")
 
-for idlFile in idlFiles:
-    headerFile = idlFile.replace(".idl", ".h")
-    if utils.isNewer(idlFile, headerFile):
-        shell.exec("cute-engineering-chatty", idlFile, headerFile)
-        shell.exec("clang-format", "-i", headerFile)
+        for idl in idls:
+            relpath = Path(idl).relative_to(c.component.dirname())
+            dirpath = Path(const.GENERATED_DIR) / c.component.id
+            destpath = dirpath / relpath.with_suffix(".h")
+            if utils.isNewer(idl, destpath):
+                shell.mkdir(str(dirpath))
+                shell.exec("cute-engineering-chatty", idl, destpath)
+                shell.exec("clang-format", "-i", destpath)

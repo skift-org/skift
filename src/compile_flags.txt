@@ -17,6 +17,8 @@
 -I./srvs
 -I./web
 -I../.cutekit/extern/cute-engineering
+-I../.cutekit/genereated
+-I../.cutekit/genereated/__aliases__
 
 -D__clangd__
 -D__ck_sys_linux__

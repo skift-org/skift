@@ -27,24 +27,24 @@ void build(Vec<Strong<Dom::Node>> const &children, Vec<Strong<Frag>> &out) {
     }
 }
 
-void build(Dom::Element const &n, Vec<Strong<Frag>> &out) {
-    if (n.tagName == Html::IMG)
+void build(Dom::Element const &el, Vec<Strong<Frag>> &out) {
+    if (el.tagName == Html::IMG)
         out.pushBack(makeStrong<ImageFrag>(makeStrong<Css::ComputedValues>(), Media::Image::fallback()));
-    else if (contains(BLOCKS, n.tagName)) {
+    else if (contains(BLOCKS, el.tagName)) {
         auto frag = makeStrong<BlockFlow>(makeStrong<Css::ComputedValues>());
-        build(n.children(), frag->children);
+        build(el.children(), frag->_frags);
         out.pushBack(frag);
     } else {
         auto frag = makeStrong<InlineFlow>(makeStrong<Css::ComputedValues>());
-        build(n.children(), frag->children);
+        build(el.children(), frag->_frags);
         out.pushBack(frag);
     }
 }
 
-void build(Dom::Node const &n, Vec<Strong<Frag>> &out) {
-    if (auto *el = n.is<Dom::Element>()) {
+void build(Dom::Node const &node, Vec<Strong<Frag>> &out) {
+    if (auto *el = node.is<Dom::Element>()) {
         build(*el, out);
-    } else if (auto *text = n.is<Dom::Text>()) {
+    } else if (auto *text = node.is<Dom::Text>()) {
         out.pushBack(makeStrong<TextFrag>(makeStrong<Css::ComputedValues>(), text->data));
     }
 }

@@ -7,9 +7,17 @@ namespace Web::Layout {
 struct InlineFlow : public Flow {
     static constexpr auto TYPE = INLINE;
 
-    struct Line {};
-
     using Flow::Flow;
+
+    struct Item {
+        usize frag;
+    };
+
+    struct Line {
+    };
+
+    Vec<Item> _items;
+    Vec<Line> _lines;
 
     Type type() const override {
         return TYPE;

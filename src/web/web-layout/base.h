@@ -36,6 +36,10 @@ struct Frag {
     virtual void layout(Unit::RectPx) = 0;
     virtual Unit::Vec2Px size() = 0;
 
+    Css::ComputedValues const &style() const {
+        return *_style;
+    }
+
     template <typename T>
     T *is() {
         return type() == T::TYPE ? static_cast<T *>(this) : nullptr;
@@ -48,9 +52,21 @@ struct Frag {
 };
 
 struct Flow : public Frag {
-    Vec<Strong<Frag>> children;
-
     using Frag::Frag;
+
+    Vec<Strong<Frag>> _frags;
+
+    Frag &frag(usize frag) {
+        return *_frags[frag];
+    }
+
+    Frag const &frag(usize frag) const {
+        return *_frags[frag];
+    }
+
+    Css::ComputedValues const &style(usize frag) const {
+        return _frags[frag]->style();
+    }
 };
 
 } // namespace Web::Layout

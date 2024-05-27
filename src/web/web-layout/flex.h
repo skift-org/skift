@@ -8,9 +8,11 @@ struct FlexFlow : public Flow {
     static constexpr auto TYPE = FLEX;
 
     struct Item {
+        usize frag;
     };
 
     struct Line {
+        urange items;
     };
 
     Vec<Item> _items;
@@ -23,6 +25,10 @@ struct FlexFlow : public Flow {
     }
 
     void layout(Unit::RectPx) override {
+        // sort cells by order
+        stableSort(_items, [&](auto a, auto b) {
+            return style(a.frag).order < style(b.frag).order;
+        });
     }
 
     Unit::Vec2Px size() override {

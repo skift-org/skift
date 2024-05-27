@@ -9,6 +9,13 @@ struct TableFlow : public Flow {
 
     using Flow::Flow;
 
+    struct Dim {
+        usize frag;
+    };
+
+    Vec<Dim> _rows;
+    Vec<Dim> _cols;
+
     Type type() const override {
         return TYPE;
     }

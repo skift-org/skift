@@ -403,9 +403,8 @@ constexpr usize zeroFill(MutSlice<T> slice) {
 }
 
 always_inline constexpr void sort(MutSliceable auto &slice, auto cmp) {
-    if (slice.len() <= 1) {
+    if (slice.len() <= 1)
         return;
-    }
 
     auto pivot = slice[slice.len() / 2];
     auto left = 0uz;
@@ -436,6 +435,26 @@ always_inline constexpr void sort(MutSliceable auto &slice, auto cmp) {
 
 always_inline constexpr void sort(MutSliceable auto &slice) {
     sort(slice, [](auto const &a, auto const &b) {
+        return a <=> b;
+    });
+}
+
+always_inline constexpr void stableSort(MutSliceable auto &slice, auto cmp) {
+    for (usize i = 1; i < slice.len(); i++) {
+        auto key = slice[i];
+        usize j = i - 1;
+
+        while (j >= 0 and cmp(slice[j], key) > 0) {
+            slice[j + 1] = slice[j];
+            j--;
+        }
+
+        slice[j + 1] = key;
+    }
+}
+
+always_inline constexpr void stableSort(MutSliceable auto &slice) {
+    stableSort(slice, [](auto const &a, auto const &b) {
         return a <=> b;
     });
 }

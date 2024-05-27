@@ -6,7 +6,7 @@ namespace Karm {
 
 using CStr = char const *;
 
-inline constexpr usize cstrLen(CStr s) {
+always_inline constexpr usize cstrLen(CStr s) {
     usize len = 0;
     while (*s++) {
         len++;
@@ -14,7 +14,7 @@ inline constexpr usize cstrLen(CStr s) {
     return len;
 }
 
-inline bool cstrEq(char const *str1, char const *str2) {
+always_inline constexpr bool cstrEq(char const *str1, char const *str2) {
     while (*str1 and *str2) {
         if (*str1++ != *str2++)
             return false;

@@ -30,9 +30,8 @@ struct Lock :
         bool result = _lock.cmpxchg(false, true);
         memoryBarier();
 
-        if (not result) {
+        if (not result)
             _Embed::leaveCritical();
-        }
 
         return result;
     }
@@ -45,9 +44,8 @@ struct Lock :
     void acquire() {
         _Embed::enterCritical();
 
-        while (not _tryAcquire()) {
+        while (not _tryAcquire())
             _Embed::relaxe();
-        }
     }
 
     void release() {
@@ -75,11 +73,12 @@ concept Lockable =
         lockable.release();
     };
 
+template <Lockable L = Lock>
 struct [[nodiscard]] LockScope :
     Meta::Static {
-    Lock &_lock;
+    L &_lock;
 
-    LockScope(Lock &lock)
+    LockScope(L &lock)
         : _lock(lock) {
         _lock.acquire();
     }
@@ -89,9 +88,12 @@ struct [[nodiscard]] LockScope :
     }
 };
 
-template <typename T>
+template <Lockable L>
+LockScope(L &) -> LockScope<L>;
+
+template <typename T, Lockable L = Lock>
 struct LockProtected {
-    Lock _lock;
+    L _lock;
     T _value;
 
     LockProtected() = default;
@@ -105,6 +107,9 @@ struct LockProtected {
         return f(_value);
     }
 };
+
+template <typename T, Lockable L = Lock>
+LockProtected(T, L &) -> LockProtected<T, L>;
 
 struct RwLock : Meta::Static {
     Lock _lock;

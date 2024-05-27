@@ -12,23 +12,27 @@ struct Cons {
     Car car;
     Cdr cdr;
 
-    auto operator<=>(Cons const &) const
-        requires Meta::Comparable<Car> and Meta::Comparable<Cdr>
-    = default;
-
-    constexpr auto const &get(bool cond) const {
+    always_inline constexpr auto const &get(bool cond) const {
         return cond ? cdr : car;
     }
 
-    constexpr void visit(auto f) {
+    always_inline constexpr void visit(auto f) {
         f(car);
         f(cdr);
     }
 
-    constexpr void visit(auto f) const {
+    always_inline constexpr void visit(auto f) const {
         f(car);
         f(cdr);
     }
+
+    always_inline bool operator==(Cons const &) const
+        requires Meta::Equatable<Car, Cdr>
+    = default;
+
+    always_inline auto operator<=>(Cons const &) const
+        requires Meta::Comparable<Car> and Meta::Comparable<Cdr>
+    = default;
 };
 
 template <typename TCar, typename TCdr>

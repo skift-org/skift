@@ -45,7 +45,7 @@ always_inline constexpr auto clamp01(auto value) {
 
 /// Rounds a floating point value to the nearest integral value.
 template <Meta::Integral I, Meta::Float P>
-always_inline I roundTo(P value) {
+always_inline constexpr I roundTo(P value) {
     if constexpr (Meta::Same<P, long double>)
         return static_cast<I>(__builtin_llrintl(value));
     if constexpr (Meta::Same<P, double>)
@@ -58,7 +58,7 @@ always_inline I roundTo(P value) {
 
 /// Clamps a value to the range of a given type.
 template <typename T>
-constexpr T clampTo(auto val) {
+always_inline constexpr T clampTo(auto val) {
     if (val >= Limits<T>::MAX)
         return Limits<T>::MAX;
     if (val <= Limits<T>::MIN)

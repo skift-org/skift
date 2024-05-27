@@ -20,8 +20,8 @@ template <typename F>
 struct Defer : Meta::Static {
     F _f;
 
-    Defer(F f) : _f(f) {}
-    ~Defer() {
+    always_inline Defer(F f) : _f(f) {}
+    always_inline ~Defer() {
         _f();
     }
 };
@@ -37,18 +37,18 @@ struct ArmedDefer : Meta::NoCopy {
     F _f;
     bool _armed = true;
 
-    ArmedDefer(F f) : _f(f) {}
+    always_inline ArmedDefer(F f) : _f(f) {}
 
-    ~ArmedDefer() {
+    always_inline ~ArmedDefer() {
         if (_armed)
             _f();
     }
 
-    void disarm() {
+    always_inline void disarm() {
         _armed = false;
     }
 
-    void arm() {
+    always_inline void arm() {
         _armed = true;
     }
 };

@@ -9,7 +9,7 @@ namespace Karm {
 // ex: 8 with align = 8 -> 8
 // ex: 9 with align = 8 -> 8
 // ex: 7 with align = 8 -> 0
-inline constexpr usize alignDown(usize addr, usize align) {
+always_inline constexpr usize alignDown(usize addr, usize align) {
     return addr & ~(align - 1);
 }
 
@@ -17,19 +17,17 @@ inline constexpr usize alignDown(usize addr, usize align) {
 // ex: 8 with align = 8 -> 8
 // ex: 9 with align = 8 -> 16
 // ex: 7 with align = 8 -> 8
-inline constexpr usize alignUp(usize addr, usize align) {
+always_inline constexpr usize alignUp(usize addr, usize align) {
     return (addr + align - 1) & ~(align - 1);
 }
 
-inline constexpr bool isAlign(usize addr, usize align) {
+always_inline constexpr bool isAlign(usize addr, usize align) {
     return alignDown(addr, align) == addr;
 }
 
-static inline Res<> ensureAlign(usize addr, usize align) {
-    if (not isAlign(addr, align)) {
+always_inline inline Res<> ensureAlign(usize addr, usize align) {
+    if (not isAlign(addr, align))
         return Error::invalidInput("not aligned");
-    }
-
     return Ok();
 }
 

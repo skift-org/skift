@@ -3,7 +3,6 @@
 #include <karm-base/map.h>
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
-#include <karm-io/bscan.h>
 #include <karm-math/rect.h>
 
 namespace Pdf {
@@ -88,14 +87,14 @@ struct Page {
     Math::Rectf cropBox;
 };
 
-struct Document {
-    Map<usize, Page> pages;
+struct Header {
+    u8 major;
+    u8 minor;
 };
 
-// MARK: Parsing & Emitting ----------------------------------------------------
-
-Res<> parse(Io::BScan &s, Document &doc);
-
-Res<> emit(Io::BEmit &e, Document const &doc);
+struct Document {
+    Header header;
+    Map<usize, Page> pages;
+};
 
 } // namespace Pdf

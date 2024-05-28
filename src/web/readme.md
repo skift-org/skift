@@ -2,9 +2,8 @@
 <br/>
 <br/>
 <p align="center">
-    <img src="../../doc/assets/vaev.webp" width="200">
+    <img src="../../doc/assets/vaev.png" width="320">
 </p>
-<h1 align="center">Vaev</h1>
 <p align="center">
     The *kool* browser engine
 </p>

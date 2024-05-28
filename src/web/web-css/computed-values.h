@@ -1,6 +1,7 @@
 #pragma once
 
 #include <web-unit/display.h>
+#include <web-unit/flex.h>
 #include <web-unit/visibility.h>
 
 namespace Web::Css {
@@ -11,6 +12,15 @@ struct ComputedValues {
     Unit::Display display = {Unit::Display::FLOW, Unit::Display::INLINE};
     isize order = 0;
     Unit::Visibility visibility = Unit::Visibility::VISIBLE;
+
+    // CSS Flexible Box Layout Module Level 1
+    // https://www.w3.org/TR/css-flexbox-1
+    Unit::FlexDirection flexDirection = Unit::FlexDirection::ROW;
+    Unit::FlexWrap flexWrap = Unit::FlexWrap::NOWRAP;
+    f64 flexGrow = 0;
+    f64 flexShrink = 1;
 };
+
+
 
 } // namespace Web::Css

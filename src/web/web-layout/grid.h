@@ -24,11 +24,27 @@ struct GridFlow : public Flow {
         return TYPE;
     }
 
-    void layout(Unit::RectPx) override {
-        // sort cells by order
+    void _clear() {
+        _cells.clear();
+        _rows.clear();
+        _cols.clear();
+    }
+
+    void _createCells() {
+        for (usize i = 0; i < _frags.len(); i++)
+            _cells.pushBack({i});
+    }
+
+    void _sortByOrder() {
         stableSort(_cells, [&](auto a, auto b) {
             return style(a.frag).order < style(b.frag).order;
         });
+    }
+
+    void layout(Unit::RectPx) override {
+        _clear();
+        _createCells();
+        _sortByOrder();
     }
 
     Unit::Vec2Px size() override {

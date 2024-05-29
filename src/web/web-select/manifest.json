@@ -4,7 +4,9 @@
     "type": "lib",
     "description": "Implementation of the SVG standard (https://www.w3.org/TR/SVG2)",
     "requires": [
-        "karm-dom",
-        "web-html"
+        "web-dom",
+        "web-html",
+        "web-svg",
+        "web-mathml"
     ]
 }

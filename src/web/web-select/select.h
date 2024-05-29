@@ -54,10 +54,10 @@ struct Spec {
     auto operator<=>(Spec const &other) const = default;
 };
 
-Spec const Spec::ZERO = {0, 0, 0};
-Spec const Spec::A = {1, 0, 0};
-Spec const Spec::B = {0, 1, 0};
-Spec const Spec::C = {0, 0, 1};
+inline Spec const Spec::ZERO = {0, 0, 0};
+inline Spec const Spec::A = {1, 0, 0};
+inline Spec const Spec::B = {0, 1, 0};
+inline Spec const Spec::C = {0, 0, 1};
 
 struct Selector;
 

@@ -5,10 +5,9 @@ namespace Web::Select::Tests {
 
 test$("select-class-spec") {
     Selector sel = ClassSelector{"foo"s};
-    auto el = makeStrong<Dom::Element>();
+    auto el = makeStrong<Dom::Element>(Html::DIV);
     el->classList.add("foo");
-    auto spec = match(sel, *el);
-    expectEq$(spec, Spec::C);
+    expect$(match(sel, *el));
     return Ok();
 }
 

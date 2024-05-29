@@ -2,6 +2,7 @@
 
 #include <karm-base/box.h>
 #include <karm-base/endian.h>
+#include <karm-base/enum.h>
 #include <karm-base/rc.h>
 #include <karm-base/reflect.h>
 #include <karm-base/time.h>

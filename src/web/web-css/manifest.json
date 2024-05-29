@@ -4,7 +4,7 @@
     "type": "lib",
     "description": "Implementation of CSS Snapshot 2022 (https://www.w3.org/TR/css-2022/)",
     "requires": [
-        "karm-logger",
-        "web-base"
+        "web-base",
+        "web-select"
     ]
 }

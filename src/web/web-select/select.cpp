@@ -72,6 +72,12 @@ bool match(Selector const &sel, Dom::Element &el) {
         [&](UniversalSelector const &s) {
             return match(s, el);
         },
+        [&](ClassSelector const &s) {
+            return match(s, el);
+        },
+        [&](IdSelector const &s) {
+            return match(s, el);
+        },
         [&](auto &) -> bool {
             notImplemented();
         }

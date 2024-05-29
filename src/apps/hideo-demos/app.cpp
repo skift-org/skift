@@ -1,7 +1,5 @@
 #include <hideo-base/scafold.h>
 #include <hideo-base/sidenav.h>
-#include <karm-sys/entry.h>
-#include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
@@ -83,7 +81,3 @@ Ui::Child app() {
 }
 
 } // namespace Hideo::Demos
-
-Res<> entryPoint(Sys::Ctx &ctx) {
-    return Ui::runApp(ctx, Hideo::Demos::app());
-}

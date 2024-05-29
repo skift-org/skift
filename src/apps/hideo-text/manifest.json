@@ -4,7 +4,7 @@
     "type": "exe",
     "description": "View and edit text files",
     "requires": [
-        "hideo-files-base",
+        "hideo-files",
         "hideo-base"
     ]
 }

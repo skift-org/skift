@@ -1,8 +1,7 @@
 #include <hideo-base/scafold.h>
 #include <karm-mime/mime.h>
-#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
-#include <karm-ui/app.h>
+#include <karm-ui/input.h>
 #include <web-html/parser.h>
 #include <web-view/inspect.h>
 #include <web-view/view.h>
@@ -68,8 +67,6 @@ Ui::Child app(Mime::Url url, Strong<Web::Dom::Document> dom, Opt<Error> err) {
     );
 }
 
-} // namespace Hideo::Browser
-
 Res<Strong<Web::Dom::Document>> fetch(Mime::Url url) {
     logInfo("fetching: {}", url);
 
@@ -109,16 +106,4 @@ Res<Strong<Web::Dom::Document>> fetch(Mime::Url url) {
     }
 }
 
-Res<> entryPoint(Sys::Ctx &ctx) {
-    auto args = Sys::useArgs(ctx);
-    auto url = args.len()
-                   ? try$(Mime::parseUrlOrPath(args[0]))
-                   : "about:start"_url;
-
-    auto dom = try$(fetch(url));
-
-    return Ui::runApp(
-        ctx,
-        Hideo::Browser::app(url, dom, NONE)
-    );
-}
+} // namespace Hideo::Browser

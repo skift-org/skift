@@ -1,6 +1,4 @@
 #include <hideo-base/scafold.h>
-#include <karm-sys/entry.h>
-#include <karm-ui/app.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/layout.h>
 
@@ -102,7 +100,3 @@ Ui::Child app() {
 }
 
 } // namespace Hideo::Calculator
-
-Res<> entryPoint(Sys::Ctx &ctx) {
-    return Ui::runApp(ctx, Hideo::Calculator::app());
-}

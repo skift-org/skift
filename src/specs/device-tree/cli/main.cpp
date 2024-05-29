@@ -1,23 +1,23 @@
 #include <device-tree/blob.h>
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 
-Res<> entryPoint(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
 
     if (args.len() == 0) {
-        return Error::invalidInput("Usage: dtb-dump <dtb-file>");
+        co_return Error::invalidInput("Usage: dtb-dump <dtb-file>");
     }
 
-    auto url = try$(Mime::parseUrlOrPath(args[0]));
-    auto dtbFile = try$(Sys::File::open(url));
-    auto dtbMem = try$(Sys::mmap().read().map(dtbFile));
-    auto dtb = try$(DeviceTree::Blob::load(dtbMem.bytes()));
+    auto url = co_try$(Mime::parseUrlOrPath(args[0]));
+    auto dtbFile = co_try$(Sys::File::open(url));
+    auto dtbMem = co_try$(Sys::mmap().read().map(dtbFile));
+    auto dtb = co_try$(DeviceTree::Blob::load(dtbMem.bytes()));
 
     if (not dtb.valid())
-        return Error::invalidData("dtb is not a valid device tree");
+        co_return Error::invalidData("dtb is not a valid device tree");
 
     Sys::println("dtb is valid");
-    return Ok();
+    co_return Ok();
 }

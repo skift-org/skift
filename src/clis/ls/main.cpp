@@ -1,10 +1,10 @@
 #include <karm-sys/dir.h>
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 
-Res<> entryPoint(Sys::Ctx &) {
-    auto url = try$(Mime::parseUrlOrPath("."));
-    auto dir = try$(Sys::Dir::open(url));
+Async::Task<> entryPointAsync(Sys::Ctx &) {
+    auto url = co_try$(Mime::parseUrlOrPath("."));
+    auto dir = co_try$(Sys::Dir::open(url));
     for (auto const &entry : dir.entries())
         Sys::println(entry.name);
-    return Ok();
+    co_return Ok();
 }

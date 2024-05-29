@@ -1,18 +1,18 @@
 #include <karm-io/emit.h>
 #include <karm-io/funcs.h>
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 #include <karm-sys/file.h>
 #include <web-css/lexer.h>
 #include <web-css/parser.h>
 
-Res<> entryPoint(Sys::Ctx &) {
+Async::Task<> entryPointAsync(Sys::Ctx &) {
     Sys::println("Parsing:");
-    try$(Web::Css::parseStylesheet("bundle://web-css.cli/exemple_1.css"));
+    co_try$(Web::Css::parseStylesheet("bundle://web-css.cli/exemple_1.css"));
 
     Sys::println("Result:");
     Io::Emit emit{Sys::out()};
-    try$(emit.flush());
+    co_try$(emit.flush());
     emit("\n");
 
-    return Ok();
+    co_return Ok();
 }

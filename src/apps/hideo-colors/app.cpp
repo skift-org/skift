@@ -1,6 +1,4 @@
 #include <hideo-base/scafold.h>
-#include <karm-sys/entry.h>
-#include <karm-ui/app.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/scroll.h>
 
@@ -308,7 +306,3 @@ Ui::Child app() {
 }
 
 } // namespace Hideo::Colors
-
-Res<> entryPoint(Sys::Ctx &ctx) {
-    return Ui::runApp(ctx, Hideo::Colors::app() | Ui::pinSize({320, 200}));
-}

@@ -1,8 +1,7 @@
 #include <hideo-base/navbar.h>
 #include <hideo-base/scafold.h>
-#include <karm-sys/entry-async.h>
+#include <karm-sys/time.h>
 #include <karm-ui/anim.h>
-#include <karm-ui/app.h>
 
 #include "model.h"
 
@@ -114,9 +113,3 @@ Async::Task<> timerTask(Ui::Child app) {
 }
 
 } // namespace Hideo::Clock
-
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
-    auto app = Hideo::Clock::app();
-    Async::detach(Hideo::Clock::timerTask(app));
-    co_return Ui::runApp(ctx, app);
-}

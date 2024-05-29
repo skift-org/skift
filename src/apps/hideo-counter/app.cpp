@@ -1,6 +1,5 @@
 #include <hideo-base/scafold.h>
-#include <karm-sys/entry.h>
-#include <karm-ui/app.h>
+#include <karm-ui/input.h>
 
 #include "model.h"
 
@@ -38,8 +37,7 @@ Ui::Child app() {
                                Ui::TextStyles::codeLarge()
                                    .withSize(48),
                                "{}", s.counter
-                           ) |
-                               Ui::grow(),
+                           ) | Ui::grow(),
                            Ui::hflow(16, decBtn, incBtn),
                            resetBtn
                        ) |
@@ -51,7 +49,3 @@ Ui::Child app() {
 }
 
 } // namespace Hideo::Counter
-
-Res<> entryPoint(Sys::Ctx &ctx) {
-    return Ui::runApp(ctx, Hideo::Counter::app());
-}

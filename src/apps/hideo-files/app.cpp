@@ -1,12 +1,10 @@
 #include <hideo-base/scafold.h>
 #include <hideo-base/sidenav.h>
-#include <karm-sys/entry.h>
 #include <karm-ui/anim.h>
-#include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 
-#include "../model.h"
-#include "../widgets.h"
+#include "model.h"
+#include "widgets.h"
 
 namespace Hideo::Files {
 
@@ -64,7 +62,3 @@ Ui::Child app() {
 }
 
 } // namespace Hideo::Files
-
-Res<> entryPoint(Sys::Ctx &ctx) {
-    return Ui::runApp(ctx, Hideo::Files::app());
-}

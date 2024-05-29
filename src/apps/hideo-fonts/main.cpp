@@ -1,6 +1,6 @@
 #include <hideo-base/alert.h>
 #include <hideo-base/scafold.h>
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scroll.h>
 
@@ -43,14 +43,14 @@ Ui::Child app(Res<Strong<Media::Fontface>> fontface) {
 
 } // namespace Hideo::Fonts
 
-Res<> entryPoint(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
     Res<Strong<Media::Fontface>> fontface = Error::invalidInput("No font provided");
 
     if (args.len()) {
-        auto url = try$(Mime::parseUrlOrPath(args[0]));
+        auto url = co_try$(Mime::parseUrlOrPath(args[0]));
         fontface = Media::loadFontface(url);
     }
 
-    return Ui::runApp(ctx, Hideo::Fonts::app(fontface));
+    co_return Ui::runApp(ctx, Hideo::Fonts::app(fontface));
 }

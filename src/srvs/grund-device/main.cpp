@@ -1,7 +1,7 @@
 #include <hjert-api/api.h>
 #include <karm-base/map.h>
 #include <karm-logger/logger.h>
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 
 #include "cmos.h"
 #include "io.h"
@@ -22,40 +22,39 @@ struct IsaRootBus : public Node {
 };
 
 } // namespace Grund::Device
-
-Res<> entryPoint(Sys::Ctx &) {
+Async::Task<> entryPointAsync(Sys::Ctx &) {
     logInfo("devices: building device tree...");
     auto root = makeStrong<Grund::Device::IsaRootBus>();
-    try$(root->init());
+    co_try$(root->init());
 
     logInfo("devices: binding IRQs...");
-    auto listener = try$(Hj::Listener::create(Hj::ROOT));
+    auto listener = co_try$(Hj::Listener::create(Hj::ROOT));
 
     Map<Hj::Cap, usize> cap2irq = {};
     Vec<Hj::Irq> irqs = {};
 
     for (usize i = 0; i < 16; i++) {
-        auto irq = try$(Hj::Irq::create(Hj::ROOT, i));
-        try$(listener.listen(irq, Hj::Sigs::TRIGGERED, Hj::Sigs::NONE));
+        auto irq = co_try$(Hj::Irq::create(Hj::ROOT, i));
+        co_try$(listener.listen(irq, Hj::Sigs::TRIGGERED, Hj::Sigs::NONE));
         cap2irq.put(irq.cap(), i);
         irqs.pushBack(std::move(irq));
     }
 
     while (true) {
-        try$(listener.poll(TimeStamp::endOfTime()));
+        co_try$(listener.poll(TimeStamp::endOfTime()));
 
         auto ev = listener.next();
         while (ev) {
-            try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::TRIGGERED));
+            co_try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::TRIGGERED));
 
             auto irq = cap2irq.get(ev->cap);
             if (irq) {
                 auto e = Sys::makeEvent<Grund::Device::IrqEvent>(Sys::Propagation::UP, *irq);
-                try$(root->event(*e));
+                co_try$(root->event(*e));
             }
             ev = listener.next();
         }
     }
 
-    return Ok();
+    co_return Ok();
 }

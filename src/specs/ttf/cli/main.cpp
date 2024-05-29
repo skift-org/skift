@@ -1,4 +1,4 @@
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 #include <ttf/spec.h>
@@ -36,20 +36,20 @@ void dumpGpos(Ttf::Gpos const &gpos) {
     Sys::println("  LookupList (len:{})", gpos.lookupList().len());
 }
 
-Res<> entryPoint(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
 
     if (args.len() == 0) {
-        return Error::invalidInput("Usage: dtb-dump <dtb-file>");
+        co_return Error::invalidInput("Usage: dtb-dump <dtb-file>");
     }
 
-    auto url = try$(Mime::parseUrlOrPath(args[0]));
-    auto file = try$(Sys::File::open(url));
-    auto map = try$(Sys::mmap().map(file));
-    auto ttf = try$(Ttf::Font::load(map.bytes()));
+    auto url = co_try$(Mime::parseUrlOrPath(args[0]));
+    auto file = co_try$(Sys::File::open(url));
+    auto map = co_try$(Sys::mmap().map(file));
+    auto ttf = co_try$(Ttf::Font::load(map.bytes()));
 
     Sys::println("ttf is valid");
     dumpGpos(ttf._gpos);
 
-    return Ok();
+    co_return Ok();
 }

@@ -1,13 +1,13 @@
 #include <karm-io/funcs.h>
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 #include <karm-sys/file.h>
 #include <web-html/lexer.h>
 #include <web-html/parser.h>
 
-Res<> entryPoint(Sys::Ctx &) {
-    auto file = try$(Sys::File::open("bundle://web-html-cli/exemple.html"_url));
+Async::Task<> entryPointAsync(Sys::Ctx &) {
+    auto file = co_try$(Sys::File::open("bundle://web-html-cli/exemple.html"_url));
 
-    auto buf = try$(Io::readAllUtf8(file));
+    auto buf = co_try$(Io::readAllUtf8(file));
 
     Sys::println("Orginal Source:");
     Sys::println("{}", buf);
@@ -20,8 +20,8 @@ Res<> entryPoint(Sys::Ctx &) {
     Sys::println("Result:");
     Io::Emit emit{Sys::out()};
     doc->dump(emit);
-    try$(emit.flush());
+    co_try$(emit.flush());
     emit("\n");
 
-    return Ok();
+    co_return Ok();
 }

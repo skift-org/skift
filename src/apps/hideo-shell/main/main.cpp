@@ -1,16 +1,16 @@
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 #include <karm-ui/app.h>
 
 #include "../app.h"
 
-Res<> entryPoint(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
     auto args = useArgs(ctx);
     bool isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
 
     Hideo::Shell::State state = {
         .isMobile = isMobile,
         .dateTime = Sys::dateTime(),
-        .background = try$(Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url)),
+        .background = co_try$(Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url)),
         .noti = {},
         .manifests = {
             makeStrong<Hideo::Shell::Manifest>(Mdi::INFORMATION_OUTLINE, "About"s, Gfx::BLUE_RAMP),
@@ -31,5 +31,5 @@ Res<> entryPoint(Sys::Ctx &ctx) {
         .instances = {}
     };
 
-    return Ui::runApp(ctx, Hideo::Shell::app(std::move(state)));
+    co_return Ui::runApp(ctx, Hideo::Shell::app(std::move(state)));
 }

@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "hideo-calculator",
-    "type": "exe",
+    "type": "lib",
     "description": "Evaluate mathematical expressions",
     "requires": [
         "hideo-base"

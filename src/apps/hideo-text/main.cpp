@@ -2,7 +2,7 @@
 #include <hideo-base/scafold.h>
 #include <hideo-files/widgets.h>
 #include <karm-io/funcs.h>
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 #include <karm-sys/file.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scroll.h>
@@ -131,13 +131,13 @@ Res<String> readAllUtf8(Mime::Url const &url) {
 
 } // namespace Hideo::Text
 
-Res<> entryPoint(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
     auto &args = useArgs(ctx);
     Opt<Mime::Url> url;
     Res<String> text = Ok<String>();
     if (args.len()) {
-        url = try$(Mime::parseUrlOrPath(args[0]));
+        url = co_try$(Mime::parseUrlOrPath(args[0]));
         text = Hideo::Text::readAllUtf8(*url);
     }
-    return Ui::runApp(ctx, Hideo::Text::app(url, text));
+    co_return Ui::runApp(ctx, Hideo::Text::app(url, text));
 }

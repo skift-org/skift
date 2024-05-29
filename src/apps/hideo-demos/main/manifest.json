@@ -1,9 +1,11 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "hideo-files",
+    "id": "hideo-demos.main",
+    "props": {
+        "cpp-excluded": true
+    },
     "type": "exe",
-    "description": "Manage files and folders",
     "requires": [
-        "hideo-files-base"
+        "hideo-demos"
     ]
 }

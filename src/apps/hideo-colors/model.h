@@ -24,16 +24,7 @@ struct UpdateHsv {
 
 using Action = Union<UpdatePage, UpdateHsv>;
 
-inline void reduce(State &s, Action action) {
-    action.visit(Visitor{
-        [&](UpdatePage update) {
-            s.page = update.page;
-        },
-        [&](UpdateHsv update) {
-            s.hsv = update.hsv;
-        },
-    });
-}
+void reduce(State &s, Action action);
 
 using Model = Ui::Model<State, Action, reduce>;
 

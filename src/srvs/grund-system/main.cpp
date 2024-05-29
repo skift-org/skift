@@ -1,21 +1,21 @@
 #include <hjert-api/api.h>
 #include <karm-logger/logger.h>
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 
 #include "bus.h"
 
 using namespace Grund::System;
 
-Res<> entryPoint(Sys::Ctx &ctx) {
-    try$(Hj::Task::self().label("grund-system"));
+Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+    co_try$(Hj::Task::self().label("grund-system"));
 
-    auto bus = try$(Bus::create());
+    auto bus = co_try$(Bus::create());
 
-    auto deviceUnit = try$(Unit::load(ctx, "bundle://grund-device/_bin"_url));
-    try$(bus.attach(deviceUnit));
+    auto deviceUnit = co_try$(Unit::load(ctx, "bundle://grund-device/_bin"_url));
+    co_try$(bus.attach(deviceUnit));
 
-    auto shellUnit = try$(Unit::load(ctx, "bundle://hideo-shell.main/_bin"_url));
-    try$(bus.attach(shellUnit));
+    auto shellUnit = co_try$(Unit::load(ctx, "bundle://hideo-shell.main/_bin"_url));
+    co_try$(bus.attach(shellUnit));
 
-    return bus.run();
+    co_return bus.run();
 }

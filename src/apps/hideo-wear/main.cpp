@@ -1,4 +1,4 @@
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 #include <karm-ui/app.h>
 
 namespace Hideo::Wear {
@@ -33,8 +33,8 @@ Ui::Child app() {
 
 } // namespace Hideo::Wear
 
-Res<> entryPoint(Sys::Ctx &ctx) {
-    return Ui::runApp(
+Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+    co_return Ui::runApp(
         ctx,
         Hideo::Wear::app()
     );

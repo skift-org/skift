@@ -1,7 +1,7 @@
 #include <karm-base/witty.h>
 #include <karm-cli/cursor.h>
 #include <karm-cli/style.h>
-#include <karm-sys/entry.h>
+#include <karm-sys/entry-async.h>
 #include <karm-sys/info.h>
 #include <karm-sys/time.h>
 
@@ -89,7 +89,7 @@ Res<> dumpKindness() {
 
 } // namespace Sysfetch
 
-Res<> entryPoint(Sys::Ctx &) {
+Async::Task<> entryPointAsync(Sys::Ctx &) {
     Res<> res = Ok();
 
     Sys::println("{}", Cli::styled(ART, Cli::BLUE));
@@ -119,5 +119,5 @@ Res<> entryPoint(Sys::Ctx &) {
     res = Sysfetch::testAnsi();
     Sys::println("");
 
-    return res;
+    co_return res;
 }

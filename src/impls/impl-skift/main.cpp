@@ -26,7 +26,7 @@ extern "C" void __entryPoint(usize rawHandover, usize rawIn, usize rawOut) {
     ctx.add<HandoverHook>((Handover::Payload *)rawHandover);
     ctx.add<ChannelsHook>(Hj::Cap{rawIn}, Hj::Cap{rawOut});
 
-    auto res = entryPoint(ctx);
+    auto res = Async::run(entryPointAsync(ctx));
 
     auto self = Hj::Task::self();
 

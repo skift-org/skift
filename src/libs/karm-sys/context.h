@@ -4,6 +4,8 @@
 #include <karm-base/res.h>
 #include <karm-base/vec.h>
 
+#include "async.h"
+
 namespace Karm::Sys {
 
 struct Service {
@@ -80,4 +82,4 @@ inline FormFactor useFormFactor(Ctx &ctx = globalCtx()) {
 
 } // namespace Karm::Sys
 
-Res<> entryPoint(Sys::Ctx &ctx);
+Async::Task<> entryPointAsync(Sys::Ctx &);

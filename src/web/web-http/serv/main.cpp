@@ -1,7 +1,7 @@
 #include <karm-io/funcs.h>
 #include <karm-logger/logger.h>
 #include <karm-mime/mime.h>
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-sys/socket.h>
 #include <web-http/http.h>

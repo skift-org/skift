@@ -1,5 +1,5 @@
 #include <karm-io/funcs.h>
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <web-html/lexer.h>
 #include <web-html/parser.h>

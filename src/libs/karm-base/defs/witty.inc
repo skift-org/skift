@@ -133,3 +133,5 @@
 "You've been pwned",
 "You've been terminated",
 "Your are a cringe fellow",
+"Nuh Uh",
+"Huh"

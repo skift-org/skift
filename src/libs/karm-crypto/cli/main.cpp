@@ -1,6 +1,6 @@
 #include <karm-base/iter.h>
 #include <karm-crypto/hash.h>
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 
 Async::Task<> entryPointAsync(Sys::Ctx &ctx) {

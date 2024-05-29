@@ -15,7 +15,7 @@ extern "C" int wasm_export(wasm_main)(void) {
     char const *self = "wasm-app";
     char const *argv[] = {self, nullptr};
     Sys::globalCtx().add<Sys::ArgsHook>(1, argv);
-    Res<> code = entryPoint(Sys::globalCtx());
+    Res<> code = Sys::run(entryPointAsync(Sys::globalCtx()));
 
     if (not code) {
         Karm::Sys::errln("{}", code);

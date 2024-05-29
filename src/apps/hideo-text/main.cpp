@@ -2,7 +2,7 @@
 #include <hideo-base/scafold.h>
 #include <hideo-files/widgets.h>
 #include <karm-io/funcs.h>
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scroll.h>

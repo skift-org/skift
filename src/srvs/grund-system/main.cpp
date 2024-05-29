@@ -1,6 +1,6 @@
 #include <hjert-api/api.h>
 #include <karm-logger/logger.h>
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 
 #include "bus.h"
 

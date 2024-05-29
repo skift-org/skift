@@ -10,7 +10,7 @@ int main(int argc, char const **argv) {
 
     auto &ctx = Sys::globalCtx();
     ctx.add<Sys::ArgsHook>(argc, argv);
-    Res<> code = entryPoint(ctx);
+    Res<> code = Sys::run(entryPointAsync(ctx));
     if (not code) {
         Karm::Sys::errln("{}: {}", argv[0], code);
         return 1;

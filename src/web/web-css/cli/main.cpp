@@ -1,6 +1,6 @@
 #include <karm-io/emit.h>
 #include <karm-io/funcs.h>
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <web-css/lexer.h>
 #include <web-css/parser.h>

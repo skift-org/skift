@@ -1,17 +1,17 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "impl-sdl",
+    "id": "hal-arm64",
     "type": "lib",
-    "description": "Karm UI platform embedding layer for SDL.",
+    "description": "Definitions for arm architecture",
     "enableIf": {
-        "karm-ui-backend": [
-            "sdl"
+        "arch": [
+            "arm64"
         ]
     },
     "requires": [
-        "sdl2"
+        "karm-io"
     ],
     "provides": [
-        "karm-ui-impl"
+        "hal-impl"
     ]
 }

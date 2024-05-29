@@ -149,7 +149,7 @@ struct Md5 {
         _pad();
 
         // Add the length
-        auto len = _len * 8;
+        u64 len = _len * 8;
         auto block = Block{};
         auto blockBytes = block.mutBytes();
         blockBytes[14] = len >> 32;

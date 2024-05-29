@@ -19,8 +19,8 @@ struct Clock : public Ui::View<Clock> {
     void _drawHand(Gfx::Context &g, f64 angle, f64 length, Gfx::Color color, f64 width) {
         g.save();
         g.begin();
-        g.rotate(angle);
         g.translate(bound().center().cast<f64>());
+        g.rotate(angle);
         g.line({0, {0, -length}});
         g.stroke(Gfx::stroke(color).withWidth(width).withCap(Gfx::ROUND_CAP).withAlign(Gfx::CENTER_ALIGN));
         g.restore();
@@ -104,10 +104,10 @@ Ui::Child app() {
     );
 }
 
-Async::Task<> timerTask(Ui::Child app) {
-    while (not Sys::globalSched().exited()) {
-        co_trya$(Sys::globalSched().sleepAsync(Sys::now() + TimeSpan::fromSecs(1)));
+Async::Task<> timerTask(Ui::Child app, Async::Cancelation::Token ct) {
+    while (not ct.canceled()) {
         Model::event<TimeTick>(*app);
+        co_trya$(Sys::globalSched().sleepAsync(Sys::now() + TimeSpan::fromSecs(1)));
     }
     co_return Ok();
 }

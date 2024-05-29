@@ -11,6 +11,7 @@ void reduce(State &s, Action a) {
         },
         [&](TimeTick) {
             s.dateTime = Sys::dateTime();
+            logDebug("update {}", s.dateTime);
         }
     });
 }

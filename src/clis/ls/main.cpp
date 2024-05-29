@@ -1,5 +1,5 @@
 #include <karm-sys/dir.h>
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 
 Async::Task<> entryPointAsync(Sys::Ctx &) {
     auto url = co_try$(Mime::parseUrlOrPath("."));

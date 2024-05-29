@@ -2,5 +2,11 @@
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "hjert-api",
     "type": "lib",
+    "enableIf": {
+        "sys": [
+            "skift",
+            "hjert"
+        ]
+    },
     "description": "The Hjert micro-kernel APIs"
 }

@@ -202,6 +202,39 @@ static inline void detach(S s) {
     });
 }
 
+// MARK: Cancelation -----------------------------------------------------------
+
+struct Cancelation : public Meta::Static {
+    struct Token {
+        Cancelation *_c = nullptr;
+
+        Token() = default;
+        Token(Cancelation &c) : _c{&c} {}
+
+        bool canceled() const {
+            return _c and _c->canceled();
+        }
+    };
+
+    bool _canceled = false;
+
+    void cancel() {
+        _canceled = true;
+    }
+
+    void reset() {
+        _canceled = false;
+    }
+
+    bool canceled() const {
+        return _canceled;
+    }
+
+    Token token() {
+        return Token{*this};
+    }
+};
+
 // MARK: Promise ---------------------------------------------------------------
 
 template <typename T>

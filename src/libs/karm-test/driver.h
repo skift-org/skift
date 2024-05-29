@@ -14,7 +14,7 @@ struct Driver {
 
     void add(Test *test);
 
-    Res<> runAll();
+    Async::Task<> runAllAsync();
 
     Res<> unexpect(auto const &lhs, auto const &rhs, Str op, Loc loc = Loc::current()) {
         logError({"unexpected: {#} {} {#}", loc}, lhs, op, rhs);

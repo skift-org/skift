@@ -1,6 +1,6 @@
 #include <elf/image.h>
 #include <handover/spec.h>
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 

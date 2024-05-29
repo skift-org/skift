@@ -1,7 +1,7 @@
 #include <hjert-api/api.h>
 #include <karm-base/map.h>
 #include <karm-logger/logger.h>
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 
 #include "cmos.h"
 #include "io.h"
@@ -22,6 +22,7 @@ struct IsaRootBus : public Node {
 };
 
 } // namespace Grund::Device
+
 Async::Task<> entryPointAsync(Sys::Ctx &) {
     logInfo("devices: building device tree...");
     auto root = makeStrong<Grund::Device::IsaRootBus>();

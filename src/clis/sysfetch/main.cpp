@@ -1,7 +1,7 @@
 #include <karm-base/witty.h>
 #include <karm-cli/cursor.h>
 #include <karm-cli/style.h>
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 #include <karm-sys/info.h>
 #include <karm-sys/time.h>
 

@@ -1,4 +1,4 @@
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 #include <web-dns/dns.h>
 
 Async::Task<> entryPointAsync(Sys::Ctx &ctx) {

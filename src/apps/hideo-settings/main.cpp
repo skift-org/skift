@@ -1,6 +1,6 @@
 #include <hideo-base/scafold.h>
 #include <hideo-base/sidenav.h>
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>

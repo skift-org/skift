@@ -62,6 +62,7 @@
 "What a chad",
 "What if we kissy during the test succeeding?",
 "Wholesome level over 9000",
+"yes.",
 "You are a genius",
 "You are a hero",
 "You are a real hacker",
@@ -78,3 +79,4 @@
 "You're the best",
 "Your are a legend",
 "Your rizz is rizzing",
+"Yuh huh"

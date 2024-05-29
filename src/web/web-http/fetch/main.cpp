@@ -1,4 +1,4 @@
-#include <karm-sys/entry-async.h>
+#include <karm-sys/entry.h>
 #include <web-http/fetch.h>
 
 Async::Task<> entryPointAsync(Sys::Ctx &) {

@@ -22,7 +22,7 @@ void Driver::add(Test *test) {
     _tests.pushBack(test);
 }
 
-Res<> Driver::runAll() {
+Async::Task<> Driver::runAllAsync() {
     usize passed = 0, failed = 0;
 
     Sys::errln("Running {} tests...\n", _tests.len());
@@ -34,7 +34,7 @@ Res<> Driver::runAll() {
             Io::toNoCase(test->_name).unwrap()
         );
 
-        auto result = test->run(*this);
+        auto result = co_await test->runAsync(*this);
 
         if (not result) {
             failed++;
@@ -59,7 +59,7 @@ Res<> Driver::runAll() {
             Cli::styled(passed, GREEN)
         );
 
-        return Error::other("test failed");
+        co_return Error::other("test failed");
     }
 
     Sys::errln(
@@ -69,7 +69,7 @@ Res<> Driver::runAll() {
         Cli::styled(nice(Sys::now().val()), NOTE)
     );
 
-    return Ok();
+    co_return Ok();
 }
 
 Driver &driver() {

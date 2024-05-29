@@ -124,10 +124,6 @@ static auto const RE_NUMBER = Re::chain(
 
 // string token description
 
-void _stringFailed(Io::SScan const &) {
-    logDebug("coucou");
-};
-
 static auto const RE_STRING =
     Re::either(
         Re::chain(

@@ -242,7 +242,6 @@ Res<Strong<Fd>> listenIpc(Mime::Url url) {
     struct sockaddr_un addr = {};
     addr.sun_family = AF_UNIX;
     String path = try$(resolve(url)).str();
-    logDebug("Listening on {}", path);
     auto sunPath = MutSlice(addr.sun_path, sizeof(addr.sun_path) - 1);
     copy(sub(path), sunPath);
 

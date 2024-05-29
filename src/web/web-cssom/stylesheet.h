@@ -28,9 +28,8 @@ struct CSSStyleDeclaration {
 
     void getPropertyValue(Str property) {
         logDebug("{}", property);
-        //
-        // return "";
     };
+
     void getPropertyPriority(Str property) {
         logDebug("{}", property);
     };

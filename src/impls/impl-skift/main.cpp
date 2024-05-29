@@ -16,7 +16,7 @@ void __panicHandler(Karm::PanicKind kind, char const *msg) {
     }
 }
 
-extern "C" void __entryPoint(usize rawHandover, usize rawIn, usize rawOut) {
+extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize rawOut) {
     Abi::SysV::init();
     Karm::registerPanicHandler(__panicHandler);
 

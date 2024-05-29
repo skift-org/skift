@@ -13,7 +13,7 @@ class Image:
     _store: Storage
     _logger: logging.Logger
     _paks: dict[str, dict[str, Any]]
-    _finalized: str | None
+    _finalized: Path | None
 
     def __init__(self, registry: model.Registry, store: Storage):
         self._registry = registry
@@ -27,10 +27,10 @@ class Image:
             self._paks[id] = {"id": id, "objects": {}}
         return self._paks[id]
 
-    def cpRef(self, pak: str, src: str, id: str) -> str:
+    def cpRef(self, pak: str, src: Path, id: str) -> Path:
         ref = f"bundle://{id}"
         sha256 = shell.sha256sum(src)
-        dest = f"objects/{sha256}"
+        dest = Path("objects") / sha256
         mime = magic.from_file(src, mime=True)
         self.ensurePak(pak)["objects"][ref] = {
             "mime": mime,
@@ -39,9 +39,12 @@ class Image:
         self._store.store(src, dest)
         return dest
 
-    def installTo(self, componentSpec: str, targetSpec: str, dest: str):
+    def installTo(self, componentSpec: str, targetSpec: str, dest: Path | str):
+        if isinstance(dest, str):
+            dest = Path(*dest.split("/"))
+
         product = self.install(componentSpec, targetSpec)
-        self.cp(str(product.path), dest=dest)
+        self.cp(product.path, dest=dest)
 
     def install(self, componentSpec: str, targetSpec: str) -> builder.ProductScope:
         self._logger.info(f"Installing {componentSpec}...")
@@ -60,30 +63,37 @@ class Image:
                 raise Exception(f"Component {depId} not found")
 
             for res in builder.listRes(dep):
-                rel = Path(res).relative_to(dep.subpath("res"))
+                rel = res.relative_to(dep.path.parent / "res")
                 self.cpRef("_index", res, f"{depId}/{rel}")
                 self.cpRef(componentSpec, res, f"{depId}/{rel}")
 
-        self.cpRef("_index", str(product.path), f"{componentSpec}/_bin")
-        self.cpRef(componentSpec, str(product.path), f"{componentSpec}/_bin")
+        self.cpRef("_index", product.path, f"{componentSpec}/_bin")
+        self.cpRef(componentSpec, product.path, f"{componentSpec}/_bin")
 
         return product
 
-    def cp(self, src: str, dest: str):
+    def cp(self, src: Path, dest: Path):
         self._logger.info(f"Copying {src} to {dest}...")
         self._store.store(src, dest)
 
-    def cpTree(self, src: str, dest: str):
+    def cpTree(self, src: Path | str, dest: Path | str):
+        if isinstance(src, str):
+            src = Path(*src.split("/"))
         self._logger.info(f"Copying {src} to {dest}...")
         self._store.store(src, dest)
 
-    def mkdir(self, path: str):
+    def mkdir(self, path: Path | str):
+        if isinstance(path, str):
+            path = Path(*path.split("/"))
         self._logger.info(f"Creating directory {path}...")
         self._store.mkdir(path)
 
-    def finalize(self) -> str:
+    def finalize(self) -> Path:
         if not self._finalized:
             for k, v in self._paks.items():
-                self._store.write(json.dumps(v, indent=4).encode("utf-8"), f"bundles/{k}.json")
+                self._store.write(
+                    json.dumps(v, indent=4).encode("utf-8"),
+                    Path("bundles") / f"{k}.json",
+                )
             self._finalized = self._store.finalize()
         return self._finalized

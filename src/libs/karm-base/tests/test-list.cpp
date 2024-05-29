@@ -201,8 +201,4 @@ test$("list-iter-rev") {
     return Ok();
 }
 
-test$("wow") {
-    return Error::arithmetic("wow");
-}
-
 } // namespace Karm::Base::Tests

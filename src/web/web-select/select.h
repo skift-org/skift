@@ -62,7 +62,6 @@ inline Spec const Spec::C = {0, 0, 1};
 struct Selector;
 
 struct UniversalSelector {
-    int __dummy__ = 0; // FIXME: Reflectable doesn't like that we don't have filds
 };
 
 static constexpr UniversalSelector UNIVERSAL = {};
@@ -255,11 +254,16 @@ struct Karm::Io::Formatter<Web::Select::Spec> {
 template <>
 struct Karm::Io::Formatter<Web::Select::AnB> {
     Res<usize> format(Io::TextWriter &writer, Web::Select::AnB const &val) {
-        return Io::format(writer, "{}n{}{}", val.a, val.b < 0 ? "-"s : "+"s, val.b);
+        return Io::format(writer, "rhs{}n{}{}", val.a, val.b < 0 ? "-"s : "+"s, val.b);
     }
 };
 
-Reflectable$(Web::Select::UniversalSelector, __dummy__);
+template <>
+struct Karm::Io::Formatter<Web::Select::UniversalSelector> {
+    Res<usize> format(Io::TextWriter &writer, Web::Select::UniversalSelector const &) {
+        return Io::format(writer, "*");
+    }
+};
 
 Reflectable$(Web::Select::Infix, type, lhs, rhs);
 

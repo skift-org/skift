@@ -104,3 +104,7 @@ struct Query {
 };
 
 } // namespace Web::Media
+
+Reflectable$(Web::Media::Query::_Infix, type, lhs, rhs);
+Reflectable$(Web::Media::Query::_Prefix, type, query);
+Reflectable$(Web::Media::Query, _store);

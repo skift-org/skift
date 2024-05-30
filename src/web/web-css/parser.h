@@ -148,6 +148,26 @@ static inline Str toStr(Sst::_Type type) {
     }
 }
 
+// NOSPEC, used to try the lexer independently
+Res<> testLexer(Str source) {
+    auto file = try$(Sys::File::open(Mime::parseUrlOrPath(source).unwrap()));
+    auto buf = try$(Io::readAllUtf8(file));
+    auto s = Io::SScan(buf);
+    while (true) {
+        auto token = try$(nextToken(s));
+        logDebug("token found {#}", token);
+        switch (token.type) {
+        case Token::END_OF_FILE:
+            return Ok();
+        case Token::OTHER:
+            return Error();
+        default:
+            break;
+        }
+    }
+    return Error();
+}
+
 } // namespace Web::Css
 
 Reflectable$(Web::Css::Sst, type, token, prefix, content);

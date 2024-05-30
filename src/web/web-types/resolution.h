@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-io/fmt.h>
 #include <karm-math/const.h>
 
 namespace Web::Types {
@@ -93,3 +94,11 @@ struct Resolution {
 };
 
 } // namespace Web::Types
+
+template <>
+struct Karm::Io::Formatter<Web::Types::Resolution> {
+    Res<usize> format(Io::TextWriter &writer, Web::Types::Resolution const &val) {
+        usize written = try$(Io::format(writer, " {#}{#}", val.val(), val.unit()));
+        return Ok(written);
+    }
+};

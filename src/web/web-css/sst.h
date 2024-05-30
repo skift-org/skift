@@ -32,7 +32,7 @@ struct Sst {
     using enum _Type;
 
     _Type type;
-    Opt<Token> token{};
+    Token token = Token(Token::NIL);
     Opt<Box<Sst>> prefix{};
     Content content{};
 

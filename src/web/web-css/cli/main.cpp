@@ -8,11 +8,5 @@
 Async::Task<> entryPointAsync(Sys::Ctx &) {
     Sys::println("Parsing:");
     co_try$(Web::Css::parseStylesheet("bundle://web-css.cli/exemple_1.css"));
-
-    Sys::println("Result:");
-    Io::Emit emit{Sys::out()};
-    co_try$(emit.flush());
-    emit("\n");
-
     co_return Ok();
 }

@@ -7,8 +7,6 @@
 
 namespace Web::Css {
 
-//--------------------DEFINING ALL USEFULL RE-EXPRESSIONS---------------------------
-
 static auto const RE_BRACKET_OPEN = Re::single('{');
 static auto const RE_BRACKET_CLOSE = Re::single('}');
 static auto const RE_PARENTHESIS_OPEN = Re::single('(');
@@ -18,7 +16,11 @@ static auto const RE_SQUARE_BRACKET_OPEN = Re::single('[');
 static auto const RE_SEMICOLON = Re::single(';');
 static auto const RE_COLON = Re::single(':');
 static auto const RE_COMMA = Re::single(',');
-static auto const RE_DELIM = '.'_re | '+'_re | '-'_re | '#'_re | '~'_re | '!'_re; // NO SPEC
+
+// NOSPEC: In the spec the fallback is delim
+// since DELIM has a semantic meaning and could catch a really unexpected content
+// we chose to use OTHER as a fallback and delim is a determined set of characters
+static auto const RE_DELIM = '.'_re | '+'_re | '-'_re | '#'_re | '~'_re | '!'_re | '*'_re;
 
 static auto const RE_NEWLINE = Re::either(Re::single('\n', '\r', '\f'), Re::word("\r\n"));
 static auto const RE_ASCII = Re::range(0x00, 0x7f);
@@ -262,6 +264,7 @@ Res<Token> nextToken(Io::SScan &s) {
 
     logDebug("error at {#}", s.curr());
     // NO SPEC BUT SHOULD BE UNREACHABLE
+    s.next();
     return Ok(Token{Token::OTHER, s.end()});
 }
 

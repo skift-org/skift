@@ -203,3 +203,33 @@ struct Feature : public _Feature {
 };
 
 } // namespace Web::Media
+
+template <typename T>
+struct Karm::Io::Formatter<Web::Media::RangeBound<T>> {
+    Res<usize> format(Io::TextWriter &writer, Web::Media::RangeBound<T> const &v) {
+        return Io::format(writer, "{} {}", v.value, v.type == Web::Media::RangeBound<T>::INCLUSIVE ? "inclusive"s : "exclusive"s);
+    }
+};
+
+template <typename T, auto Web::Media::Media::*F>
+struct Karm::Io::Formatter<Web::Media::RangeFeature<T, F>> {
+    Res<usize> format(Io::TextWriter &writer, Web::Media::RangeFeature<T, F> const &v) {
+        return Io::format(writer, "{} - {}", v.lower, v.upper);
+    }
+};
+
+template <typename T, auto Web::Media::Media::*F>
+struct Karm::Io::Formatter<Web::Media::DiscreteFeature<T, F>> {
+    Res<usize> format(Io::TextWriter &writer, Web::Media::DiscreteFeature<T, F> const &v) {
+        return Io::format(writer, "{}", v.value);
+    }
+};
+
+template <>
+struct Karm::Io::Formatter<Web::Media::Feature> {
+    Res<usize> format(Io::TextWriter &writer, Web::Media::Feature const &val) {
+        return val.visit([&](auto const &v) -> Res<usize> {
+            return Io::format(writer, "{}", v);
+        });
+    }
+};

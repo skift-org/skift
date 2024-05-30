@@ -30,3 +30,16 @@ body {
 #incredible-id {
     padding: 20%;
 }
+
+#incredible-id div {
+    border: 1px solid rgba(276, 16, 95, 0.8)
+}
+
+*,
+h3 {
+    --size: calc(2rem - 3px),
+}
+
+body.bg {
+    color: chartreuse;
+}

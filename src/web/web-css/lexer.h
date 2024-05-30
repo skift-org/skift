@@ -10,33 +10,34 @@
 
 namespace Web::Css {
 
-#define FOREACH_TOKEN(TOKEN)                   \
-    TOKEN(IDENT)                /* foo */      \
-    TOKEN(FUNCTION)             /* calc( */    \
-    TOKEN(AT_KEYWORD)           /* @import */  \
-    TOKEN(HASH)                 /* #foo */     \
-    TOKEN(STRING)               /* "foo" */    \
-    TOKEN(BAD_STRING)           /* "foo */     \
-    TOKEN(URL)                  /* url(foo) */ \
-    TOKEN(BAD_URL)              /* url(foo */  \
-    TOKEN(DELIM)                /* !, +, - */  \
-    TOKEN(NUMBER)               /* 123 */      \
-    TOKEN(PERCENTAGE)           /* 123% */     \
-    TOKEN(DIMENSION)            /* 123px */    \
-    TOKEN(WHITESPACE)           /* ' ' */      \
-    TOKEN(CDO)                  /* <!-- */     \
-    TOKEN(CDC)                  /* --> */      \
-    TOKEN(COLON)                /* : */        \
-    TOKEN(SEMICOLON)            /* ; */        \
-    TOKEN(COMMA)                /* , */        \
-    TOKEN(LEFT_CURLY_BRACKET)   /* { */        \
-    TOKEN(RIGHT_CURLY_BRACKET)  /* } */        \
-    TOKEN(LEFT_SQUARE_BRACKET)  /* [ */        \
-    TOKEN(RIGHT_SQUARE_BRACKET) /* ] */        \
-    TOKEN(LEFT_PARENTHESIS)     /* ( */        \
-    TOKEN(RIGHT_PARENTHESIS)    /* ) */        \
-    TOKEN(COMMENT)              /* */          \
-    TOKEN(END_OF_FILE)          /* EOF */      \
+#define FOREACH_TOKEN(TOKEN)                     \
+    TOKEN(NIL)                  /* no a token */ \
+    TOKEN(IDENT)                /* foo */        \
+    TOKEN(FUNCTION)             /* calc( */      \
+    TOKEN(AT_KEYWORD)           /* @import */    \
+    TOKEN(HASH)                 /* #foo */       \
+    TOKEN(STRING)               /* "foo" */      \
+    TOKEN(BAD_STRING)           /* "foo */       \
+    TOKEN(URL)                  /* url(foo) */   \
+    TOKEN(BAD_URL)              /* url(foo */    \
+    TOKEN(DELIM)                /* !, +, - */    \
+    TOKEN(NUMBER)               /* 123 */        \
+    TOKEN(PERCENTAGE)           /* 123% */       \
+    TOKEN(DIMENSION)            /* 123px */      \
+    TOKEN(WHITESPACE)           /* ' ' */        \
+    TOKEN(CDO)                  /* <!-- */       \
+    TOKEN(CDC)                  /* --> */        \
+    TOKEN(COLON)                /* : */          \
+    TOKEN(SEMICOLON)            /* ; */          \
+    TOKEN(COMMA)                /* , */          \
+    TOKEN(LEFT_CURLY_BRACKET)   /* { */          \
+    TOKEN(RIGHT_CURLY_BRACKET)  /* } */          \
+    TOKEN(LEFT_SQUARE_BRACKET)  /* [ */          \
+    TOKEN(RIGHT_SQUARE_BRACKET) /* ] */          \
+    TOKEN(LEFT_PARENTHESIS)     /* ( */          \
+    TOKEN(RIGHT_PARENTHESIS)    /* ) */          \
+    TOKEN(COMMENT)              /* */            \
+    TOKEN(END_OF_FILE)          /* EOF */        \
     TOKEN(OTHER)                /* anything else */
 
 struct Token {
@@ -51,8 +52,14 @@ struct Token {
     Type type;
     Str data;
 
+    Token() : type(NIL) {}
+
     Token(Type type, Str data = "")
         : type(type), data(data) {}
+
+    explicit operator bool() const {
+        return type != NIL;
+    }
 };
 
 struct Lexer {

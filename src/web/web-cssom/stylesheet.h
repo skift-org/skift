@@ -57,6 +57,7 @@ struct CSSImportRule {
 // https://www.w3.org/TR/css-conditional-3/#the-cssmediarule-interface
 struct CSSMediaRule {
     Media::Query media;
+    Vec<CSSStyleDeclaration> declarations;
 };
 
 // https://www.w3.org/TR/css-fonts-4/#cssfontfacerule
@@ -74,7 +75,7 @@ struct CSSSupportsRule {
 // TODO GROUPING RULE
 
 // https://www.w3.org/TR/cssom-1/#the-cssrule-interface
-using CSSRule = Union<CSSStyleRule, CSSFontFaceRule, CSSSupportsRule>;
+using CSSRule = Union<CSSStyleRule, CSSFontFaceRule, CSSSupportsRule, CSSMediaRule, CSSImportRule>;
 
 // https:// www.w3.org/TR/cssom-1/#css-style-sheets
 struct StyleSheet {
@@ -113,7 +114,9 @@ struct Karm::Io::Formatter<Web::CSSOM::StyleSheet> {
 };
 
 Reflectable$(Web::CSSOM::CSSStyleDeclaration, propertyName, value);
+
 Reflectable$(Web::CSSOM::CSSStyleRule, selector, declarations);
 Reflectable$(Web::CSSOM::CSSFontFaceRule, selector, declarations);
 Reflectable$(Web::CSSOM::CSSImportRule, declarations);
+Reflectable$(Web::CSSOM::CSSMediaRule, media, declarations);
 Reflectable$(Web::CSSOM::CSSSupportsRule, declarations);

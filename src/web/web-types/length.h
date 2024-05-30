@@ -420,3 +420,11 @@ struct LengthContext {
 };
 
 } // namespace Web::Types
+
+template <>
+struct Karm::Io::Formatter<Web::Types::Length> {
+    Res<usize> format(Io::TextWriter &writer, Web::Types::Length const &val) {
+        usize written = try$(Io::format(writer, " {#}{#}", val.val(), val.unit()));
+        return Ok(written);
+    }
+};

@@ -37,5 +37,5 @@ extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize
 
     Abi::SysV::fini();
     self.ret().unwrap();
-    __builtin_unreachable();
+    unreachable();
 }

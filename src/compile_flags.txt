@@ -17,11 +17,12 @@
 -I./srvs
 -I./web
 -I../.cutekit/extern/cute-engineering
--I../.cutekit/genereated
--I../.cutekit/genereated/__aliases__
+-I../.cutekit/generated
+-I../.cutekit/generated/__aliases__
 
 -D__clangd__
 -D__ck_sys_linux__
+-D__ck_sys_darwin__
 -D__ck_arch_x86_64__
 -D__ck_karm_sys_encoding_utf8__
 -D__ck_karm_sys_line_ending_lf__

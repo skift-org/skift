@@ -20,10 +20,13 @@ struct TableFlow : public Flow {
         return TYPE;
     }
 
-    void layout(Unit::RectPx) override {
+    void layout(Unit::RectPx bound) override {
+        for (auto &c : _frags) {
+            c->layout(bound);
+        }
     }
 
-    Unit::Vec2Px size() override {
+    Unit::Vec2Px size(Unit::Vec2Px) override {
         return {};
     }
 };

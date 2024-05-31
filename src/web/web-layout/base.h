@@ -15,7 +15,7 @@ struct Frag {
         IMAGE,
         INLINE,
         TABLE,
-        TEXT
+        RUN
     };
 
     using enum Type;
@@ -34,7 +34,7 @@ struct Frag {
     virtual Type type() const = 0;
 
     virtual void layout(Unit::RectPx) = 0;
-    virtual Unit::Vec2Px size() = 0;
+    virtual Unit::Vec2Px size(Unit::Vec2Px) = 0;
 
     Css::ComputedValues const &style() const {
         return *_style;

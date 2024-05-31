@@ -40,13 +40,17 @@ struct FlexFlow : public Flow {
         });
     }
 
-    void layout(Unit::RectPx) override {
+    void layout(Unit::RectPx bound) override {
         _clear();
         _createItems();
         _sortByOrder();
+
+        for (auto &c : _frags) {
+            c->layout(bound);
+        }
     }
 
-    Unit::Vec2Px size() override {
+    Unit::Vec2Px size(Unit::Vec2Px) override {
         return {};
     }
 };

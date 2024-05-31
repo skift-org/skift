@@ -5,7 +5,7 @@
 #include "image.h"
 #include "inline.h"
 #include "mod.h"
-#include "text.h"
+#include "run.h"
 
 namespace Web::Layout {
 
@@ -45,7 +45,7 @@ void build(Dom::Node const &node, Vec<Strong<Frag>> &out) {
     if (auto *el = node.is<Dom::Element>()) {
         build(*el, out);
     } else if (auto *text = node.is<Dom::Text>()) {
-        out.pushBack(makeStrong<TextFrag>(makeStrong<Css::ComputedValues>(), text->data));
+        out.pushBack(makeStrong<Run>(makeStrong<Css::ComputedValues>(), text->data));
     }
 }
 

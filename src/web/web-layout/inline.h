@@ -26,7 +26,7 @@ struct InlineFlow : public Flow {
     void layout(Unit::RectPx) override {
     }
 
-    Unit::Vec2Px size() override {
+    Unit::Vec2Px size(Unit::Vec2Px) override {
         return {};
     }
 };

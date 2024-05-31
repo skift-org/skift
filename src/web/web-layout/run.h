@@ -1,15 +1,16 @@
 #pragma once
 
+#include <karm-media/font.h>
+
 #include "base.h"
 
 namespace Web::Layout {
 
-struct TextFrag : public Frag {
-    static constexpr auto TYPE = TEXT;
-    String _text;
+struct Run : public Frag {
+    static constexpr auto TYPE = RUN;
 
-    TextFrag(Strong<Css::ComputedValues> style, String text)
-        : Frag(style), _text(text) {
+    Run(Strong<Css::ComputedValues> style, String)
+        : Frag(style) {
     }
 
     Type type() const override {
@@ -19,7 +20,7 @@ struct TextFrag : public Frag {
     void layout(Unit::RectPx) override {
     }
 
-    Unit::Vec2Px size() override {
+    Unit::Vec2Px size(Unit::Vec2Px) override {
         return {};
     }
 };

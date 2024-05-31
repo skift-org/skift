@@ -181,7 +181,7 @@ constexpr Slice<T> sub(S const &slice) {
 }
 
 template <Sliceable S, typename T = typename S::Inner>
-Slice<T> next(S const &slice, usize start) {
+Slice<T> next(S const &slice, usize start = 1) {
     return sub(slice, start, slice.len());
 }
 
@@ -207,7 +207,7 @@ MutSlice<T> mutSub(S &slice) {
 }
 
 template <MutSliceable S, typename T = typename S::Inner>
-MutSlice<T> mutNext(S &slice, usize start) {
+MutSlice<T> mutNext(S &slice, usize start = 1) {
     return mutSub(slice, start, slice.len());
 }
 

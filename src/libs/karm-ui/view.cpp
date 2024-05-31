@@ -8,7 +8,7 @@ namespace Karm::Ui {
 
 static Opt<Strong<Media::Fontface>> _regularFontface = NONE;
 Strong<Media::Fontface> regularFontface() {
-    if (!_regularFontface) {
+    if (not _regularFontface) {
         _regularFontface = Media::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Regular.ttf"_url).unwrap();
     }
     return *_regularFontface;
@@ -16,7 +16,7 @@ Strong<Media::Fontface> regularFontface() {
 
 static Opt<Strong<Media::Fontface>> _mediumFontface = NONE;
 Strong<Media::Fontface> mediumFontface() {
-    if (!_mediumFontface) {
+    if (not _mediumFontface) {
         _mediumFontface = Media::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Medium.ttf"_url).unwrap();
     }
     return *_mediumFontface;
@@ -24,7 +24,7 @@ Strong<Media::Fontface> mediumFontface() {
 
 static Opt<Strong<Media::Fontface>> _boldFontface = NONE;
 Strong<Media::Fontface> boldFontface() {
-    if (!_boldFontface) {
+    if (not _boldFontface) {
         _boldFontface = Media::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Bold.ttf"_url).unwrap();
     }
     return *_boldFontface;
@@ -32,7 +32,7 @@ Strong<Media::Fontface> boldFontface() {
 
 static Opt<Strong<Media::Fontface>> _italicFontface = NONE;
 Strong<Media::Fontface> italicFontface() {
-    if (!_italicFontface) {
+    if (not _italicFontface) {
         _italicFontface = Media::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Italic.ttf"_url).unwrap();
     }
     return *_italicFontface;
@@ -40,7 +40,7 @@ Strong<Media::Fontface> italicFontface() {
 
 static Opt<Strong<Media::Fontface>> _codeFontface = NONE;
 Strong<Media::Fontface> codeFontface() {
-    if (!_codeFontface) {
+    if (not _codeFontface) {
         _codeFontface = Media::loadFontfaceOrFallback("bundle://fira-code-font/fonts/FiraCode-Regular.ttf"_url).unwrap();
     }
     return *_codeFontface;

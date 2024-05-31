@@ -66,7 +66,7 @@ struct Gpos : public Io::BChunk {
             }
         }
 
-        if (!kernFeatureTable)
+        if (not kernFeatureTable)
             return Ok(Pair<ValueRecord>{});
 
         // 5. If a Feature Variation table is present, evaluate conditions in

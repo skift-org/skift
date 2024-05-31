@@ -92,7 +92,7 @@ static Res<CSSOM::CSSRule> parseQualifiedRule(Sst rule) {
         case Sst::BLOCK:
             break;
         case Sst::TOKEN:
-            if (!parsingContent) {
+            if (not parsingContent) {
                 if (block[i].token->type != Token::WHITESPACE) {
                     if (block[i].token->type != Token::COLON) {
                         parsed.visit([&](auto &p) {

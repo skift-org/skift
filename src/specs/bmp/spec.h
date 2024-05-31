@@ -26,7 +26,7 @@ struct Image {
     }
 
     static Res<Image> load(Bytes slice) {
-        if (!isBmp(slice)) {
+        if (not isBmp(slice)) {
             return Error::invalidData("invalid signature");
         }
 

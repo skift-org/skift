@@ -6,7 +6,7 @@ namespace Karm::Media {
 
 static Opt<Strong<Fontface>> _fontface = NONE;
 Strong<Fontface> Icon::fontface() {
-    if (!_fontface) {
+    if (not _fontface) {
         _fontface = Media::loadFontfaceOrFallback("bundle://mdi-font/Material-Design-Icons.ttf"_url).unwrap();
     }
     return *_fontface;

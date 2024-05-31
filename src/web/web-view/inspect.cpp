@@ -71,7 +71,7 @@ Ui::Child elementBody(Strong<Dom::Element> el, bool expanded) {
 Ui::Child element(Strong<Dom::Element> el) {
     return Ui::state<bool>(false, [el](auto expanded, auto bind) {
         return Ui::hflow(
-            Ui::button(bind(!expanded), Ui::ButtonStyle::subtle(), Ui::icon(expanded ? Mdi::CHEVRON_DOWN : Mdi::CHEVRON_RIGHT, 18)),
+            Ui::button(bind(not expanded), Ui::ButtonStyle::subtle(), Ui::icon(expanded ? Mdi::CHEVRON_DOWN : Mdi::CHEVRON_RIGHT, 18)),
             elementBody(el, expanded)
         );
     });

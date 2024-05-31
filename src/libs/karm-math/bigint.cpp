@@ -242,7 +242,7 @@ void _pow(UBig const &base, UBig const &exp, UBig &res) {
     UBig b{base}, e{exp};
     res = 1_ubig;
 
-    while (!(e < 1_ubig)) {
+    while (not(e < 1_ubig)) {
         if (e._value[0] % 2 == 1)
             _mul(res, b);
         _shr(e, 1);
@@ -313,7 +313,7 @@ void _pow(IBig const &base, UBig const &exp, IBig &res) {
     IBig b{base}, e{exp};
     res = 1_ibig;
 
-    while (!(e < 1_ibig)) {
+    while (not(e < 1_ibig)) {
         if (e._value._value[0] % 2 == 1)
             _mul(res, b);
         _shr(e._value, 1);

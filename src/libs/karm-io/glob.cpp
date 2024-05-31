@@ -7,8 +7,8 @@ bool _matchWildCard(SScan &glob, SScan &in);
 bool _matchGroupe(SScan &glob, Rune curr) {
     bool neg = glob.skip('^');
 
-    while (!glob.ended() &&
-           !glob.skip(']')) {
+    while (not glob.ended() and
+           not glob.skip(']')) {
         Rune rs = glob.next();
         Rune re = rs;
 
@@ -21,8 +21,8 @@ bool _matchGroupe(SScan &glob, Rune curr) {
             std::swap(rs, re);
 
         if (rs <= curr and curr <= re) {
-            while (!glob.ended() &&
-                   !glob.skip(']')) {
+            while (not glob.ended() &&
+                   not glob.skip(']')) {
                 glob.next();
             }
 
@@ -48,7 +48,7 @@ bool _matchWildCard(SScan &glob, SScan &in) {
 }
 
 bool matchGlob(SScan &glob, SScan &in) {
-    while (!glob.ended() and !in.ended()) {
+    while (not glob.ended() and !in.ended()) {
         auto op = glob.next();
 
         switch (op) {
@@ -59,12 +59,12 @@ bool matchGlob(SScan &glob, SScan &in) {
             break;
 
         case '[':
-            if (!_matchGroupe(glob, in.next()))
+            if (not _matchGroupe(glob, in.next()))
                 return false;
             break;
 
         case '*':
-            if (!_matchWildCard(glob, in))
+            if (not _matchWildCard(glob, in))
                 return false;
             break;
 

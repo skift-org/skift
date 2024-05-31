@@ -46,7 +46,7 @@ struct _Fixed {
     template <Meta::Float F>
     static _Fixed fromFloatNearest(F val) {
         T raw = 0;
-        if (!isnan(val))
+        if (not isnan(val))
             raw = clampTo<T>(val * DENO);
         return fromRaw(raw);
     }
@@ -54,7 +54,7 @@ struct _Fixed {
     template <Meta::Float F>
     static _Fixed fromFloatFloor(F val) {
         T raw = 0;
-        if (!isnan(val))
+        if (not isnan(val))
             raw = clampTo<T>(floor(val * DENO));
         return fromRaw(raw);
     }
@@ -62,7 +62,7 @@ struct _Fixed {
     template <Meta::Float F>
     static _Fixed fromFloatCeil(F val) {
         T raw = 0;
-        if (!isnan(val))
+        if (not isnan(val))
             raw = clampTo<T>(ceil(val * DENO));
         return fromRaw(raw);
     }

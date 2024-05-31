@@ -189,7 +189,7 @@ struct Image {
     }
 
     static Res<Image> load(Bytes slice) {
-        if (!isJpeg(slice)) {
+        if (not isJpeg(slice)) {
             logError("jpeg: not a JPEG image");
             return Error::invalidData("not a JPEG image");
         }

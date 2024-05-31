@@ -2,6 +2,7 @@
 
 #include <web-unit/display.h>
 #include <web-unit/flex.h>
+#include <web-unit/float.h>
 #include <web-unit/visibility.h>
 
 namespace Web::Css {
@@ -19,8 +20,9 @@ struct ComputedValues {
     Unit::FlexWrap flexWrap = Unit::FlexWrap::NOWRAP;
     f64 flexGrow = 0;
     f64 flexShrink = 1;
+
+    Unit::Float float_ = Unit::Float::NONE;
+    Unit::Clear clear = Unit::Clear::NONE;
 };
-
-
 
 } // namespace Web::Css

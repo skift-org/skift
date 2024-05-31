@@ -13,17 +13,21 @@ struct Cursor {
 
     constexpr Cursor() = default;
 
-    always_inline constexpr Cursor(Sliceable<T> auto const &slice)
-        : _begin(begin(slice)), _end(end(slice)) {}
-
     always_inline constexpr Cursor(T const *begin, T const *end)
         : _begin(begin), _end(end) {}
 
+    always_inline constexpr Cursor(Sliceable<T> auto const &slice)
+        : Cursor{begin(slice), end(slice)} {}
+
     always_inline constexpr T const &operator[](usize i) const {
+        if (i >= len()) [[unlikely]]
+            panic("index out of bounds");
         return _begin[i];
     }
 
-    always_inline constexpr operator T const *() const { return _begin; }
+    always_inline constexpr operator T const *() const {
+        return _begin;
+    }
 
     always_inline constexpr bool ended() const {
         return _begin >= _end;
@@ -88,17 +92,23 @@ struct MutCursor {
     T *_begin = nullptr;
     T *_end = nullptr;
 
-    always_inline constexpr MutCursor(MutSliceable<T> auto &slice)
-        : _begin(begin(slice)), _end(end(slice)) {}
+    constexpr MutCursor() = default;
 
     always_inline constexpr MutCursor(T *begin, T *end)
         : _begin(begin), _end(end) {}
 
+    always_inline constexpr MutCursor(MutSliceable<T> auto &slice)
+        : MutCursor{begin(slice), end(slice)} {}
+
     always_inline constexpr T &operator[](usize i) {
+        if (i >= len()) [[unlikely]]
+            panic("index out of bounds");
         return _begin[i];
     }
 
     always_inline constexpr T const &operator[](usize i) const {
+        if (i >= len()) [[unlikely]]
+            panic("index out of bounds");
         return _begin[i];
     }
 

@@ -2,10 +2,11 @@
 #include <handover/hook.h>
 #include <hjert-api/api.h>
 #include <karm-base/panic.h>
+#include <karm-ipc/hook.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/context.h>
 
-#include "hooks.h"
+#include "fd.h"
 
 void __panicHandler(Karm::PanicKind kind, char const *msg) {
     Hj::log(msg).unwrap();
@@ -24,7 +25,8 @@ extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize
     char const *argv[] = {"service", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>((Handover::Payload *)rawHandover);
-    ctx.add<ChannelsHook>(Hj::Cap{rawIn}, Hj::Cap{rawOut});
+    auto fd = makeStrong<Skift::IpcFd>(Hj::Cap{rawIn}, Hj::Cap{rawOut});
+    ctx.add<ChannelHook>(Sys::IpcConnection{fd, ""_url});
 
     auto res = Async::run(entryPointAsync(ctx));
 

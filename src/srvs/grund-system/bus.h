@@ -2,6 +2,7 @@
 
 #include <grund-system/api.h>
 #include <hjert-api/api.h>
+#include <karm-logger/logger.h>
 #include <karm-mime/url.h>
 #include <karm-sys/context.h>
 
@@ -50,6 +51,7 @@ struct Bus {
             try$(_listener.poll(TimeStamp::endOfTime()));
             auto ev = _listener.next();
             while (ev) {
+                logInfo("handling system event");
                 // ignore
                 ev = _listener.next();
             }

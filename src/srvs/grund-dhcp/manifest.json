@@ -1,0 +1,14 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "grund-dhcp",
+    "type": "exe",
+    "description": "Skift's DHCP client",
+    "enableIf": {
+        "sys": [
+            "skift"
+        ]
+    },
+    "requires": [
+        "karm-sys"
+    ]
+}

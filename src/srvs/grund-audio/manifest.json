@@ -1,0 +1,14 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "grund-audio",
+    "type": "exe",
+    "description": "Skift's audio subsystem",
+    "enableIf": {
+        "sys": [
+            "skift"
+        ]
+    },
+    "requires": [
+        "karm-sys"
+    ]
+}

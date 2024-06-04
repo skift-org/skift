@@ -74,6 +74,7 @@ Ui::Child versionBadge() {
 }
 
 static constexpr Str LICENSE = R"(Copyright © 2018-2024, the skiftOS Developers
+Copyright © 2024, Odoo S.A.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -112,7 +113,10 @@ Ui::Child aboutDialog(Mdi::Icon i, String name) {
                 Ui::TextStyles::bodySmall()
                     .withAlign(Gfx::TextAlign::CENTER)
                     .withColor(Ui::GRAY400),
-                "Copyright © 2018-2024\nThe skiftOS Developers\nAll rights reserved."
+                "Copyright © 2018-2024\n"
+                "The skiftOS Developers & Odoo S.A.\n"
+                "\n"
+                "All rights reserved.\n"
             )
         ) |
         Ui::spacing(16);

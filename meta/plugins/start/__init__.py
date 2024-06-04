@@ -16,6 +16,7 @@ def generateSystem(img: image.Image) -> None:
 
     img.install("grund-system", "skift-x86_64")
     img.install("grund-device", "skift-x86_64")
+    img.install("grund-echo", "skift-x86_64")
     img.install("hideo-shell.main", "skift-x86_64")
     img.install("skift-branding", "skift-x86_64")
     img.install("skift-wallpapers", "skift-x86_64")

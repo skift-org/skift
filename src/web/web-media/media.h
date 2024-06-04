@@ -1,7 +1,7 @@
 #pragma once
 
-#include <web-unit/length.h>
-#include <web-unit/resolution.h>
+#include <web-types/length.h>
+#include <web-types/resolution.h>
 
 #include "types.h"
 
@@ -16,11 +16,11 @@ struct Media {
 
     /// 4.1. Width: the width feature
     /// https://drafts.csswg.org/mediaqueries/#width
-    Unit::Length width;
+    Types::Length width;
 
     /// 4.2. Height: the height feature
     /// https://drafts.csswg.org/mediaqueries/#height
-    Unit::Length height;
+    Types::Length height;
 
     /// 4.3. Device Width: the device-width feature
     /// https://drafts.csswg.org/mediaqueries/#aspect-ratio
@@ -34,7 +34,7 @@ struct Media {
 
     /// 5.1. Resolution: the resolution feature
     /// https://drafts.csswg.org/mediaqueries/#resolution
-    Unit::Resolution resolution;
+    Types::Resolution resolution;
 
     /// 5.2. Scan: the scan feature
     /// https://drafts.csswg.org/mediaqueries/#scan

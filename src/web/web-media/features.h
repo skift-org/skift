@@ -87,11 +87,11 @@ using TypeFeature = DiscreteFeature<Type, &Media::type>;
 
 /// 4.1. Width: the width feature
 /// https://drafts.csswg.org/mediaqueries/#width
-using WidthFeature = RangeFeature<Unit::Length, &Media::width>;
+using WidthFeature = RangeFeature<Types::Length, &Media::width>;
 
 /// 4.2. Height: the height feature
 /// https://drafts.csswg.org/mediaqueries/#height
-using HeightFeature = RangeFeature<Unit::Length, &Media::height>;
+using HeightFeature = RangeFeature<Types::Length, &Media::height>;
 
 /// 4.3. Device Width: the device-width feature
 /// https://drafts.csswg.org/mediaqueries/#aspect-ratio
@@ -105,7 +105,7 @@ using OrientationFeature = DiscreteFeature<Orientation, &Media::orientation>;
 
 /// 5.1. Resolution: the resolution feature
 /// https://drafts.csswg.org/mediaqueries/#resolution
-using ResolutionFeature = RangeFeature<Unit::Resolution, &Media::resolution>;
+using ResolutionFeature = RangeFeature<Types::Resolution, &Media::resolution>;
 
 /// 5.2. Scan: the scan feature
 /// https://drafts.csswg.org/mediaqueries/#scan
@@ -197,7 +197,7 @@ struct Feature : public _Feature {
         return TypeFeature{value};
     }
 
-    static Feature width(RangeFeature<Unit::Length, &Media::width> value) {
+    static Feature width(RangeFeature<Types::Length, &Media::width> value) {
         return value;
     }
 };

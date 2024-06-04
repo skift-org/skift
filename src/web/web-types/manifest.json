@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "web-unit",
+    "id": "web-types",
     "type": "lib",
     "description": "Implementation of web units (https://drafts.csswg.org/css-values)",
     "requires": [

@@ -5,12 +5,12 @@ namespace Web::Media::Tests {
 
 static Media const TEST_MEDIA = {
     .type = Type::SCREEN,
-    .width = Unit::Px{1920},
-    .height = Unit::Px{1080},
+    .width = Types::Px{1920},
+    .height = Types::Px{1080},
     .aspectRatio = 16.0 / 9.0,
     .orientation = Orientation::LANDSCAPE,
 
-    .resolution = Unit::Resolution::fromDpi(96),
+    .resolution = Types::Resolution::fromDpi(96),
     .scan = Scan::PROGRESSIVE,
     .grid = false,
     .update = Update::NONE,
@@ -35,26 +35,26 @@ test$("feature-type") {
 }
 
 test$("feature-width") {
-    expect$(WidthFeature::min(Unit::Px{1000})
+    expect$(WidthFeature::min(Types::Px{1000})
                 .match(TEST_MEDIA));
 
-    expect$(WidthFeature::max(Unit::Px{2000})
+    expect$(WidthFeature::max(Types::Px{2000})
                 .match(TEST_MEDIA));
 
-    expect$(WidthFeature::exact(Unit::Px{1920})
+    expect$(WidthFeature::exact(Types::Px{1920})
                 .match(TEST_MEDIA));
 
     return Ok();
 }
 
 test$("feature-height") {
-    expect$(HeightFeature::min(Unit::Px{1000})
+    expect$(HeightFeature::min(Types::Px{1000})
                 .match(TEST_MEDIA));
 
-    expect$(HeightFeature::max(Unit::Px{2000})
+    expect$(HeightFeature::max(Types::Px{2000})
                 .match(TEST_MEDIA));
 
-    expect$(HeightFeature::exact(Unit::Px{1080})
+    expect$(HeightFeature::exact(Types::Px{1080})
                 .match(TEST_MEDIA));
 
     return Ok();
@@ -81,13 +81,13 @@ test$("feature-orientation") {
 }
 
 test$("feature-resolution") {
-    expect$(ResolutionFeature::min(Unit::Resolution::fromDpi(96))
+    expect$(ResolutionFeature::min(Types::Resolution::fromDpi(96))
                 .match(TEST_MEDIA));
 
-    expect$(ResolutionFeature::max(Unit::Resolution::fromDpi(96))
+    expect$(ResolutionFeature::max(Types::Resolution::fromDpi(96))
                 .match(TEST_MEDIA));
 
-    expect$(ResolutionFeature::exact(Unit::Resolution::fromDpi(96))
+    expect$(ResolutionFeature::exact(Types::Resolution::fromDpi(96))
                 .match(TEST_MEDIA));
 
     return Ok();

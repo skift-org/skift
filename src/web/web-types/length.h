@@ -5,7 +5,7 @@
 #include <karm-math/rect.h>
 #include <karm-math/spacing.h>
 
-namespace Web::Unit {
+namespace Web::Types {
 
 /// Represents a physical pixel on the actual device screen.
 using PhysicalPixel = Distinct<i32, struct _PhysicalPixel>;
@@ -419,4 +419,4 @@ struct LengthContext {
     }
 };
 
-} // namespace Web::Unit
+} // namespace Web::Types

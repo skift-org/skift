@@ -3,7 +3,7 @@
 #include "length.h"
 #include "percent.h"
 
-namespace Web::Unit {
+namespace Web::Types {
 
 enum struct FlexDirection {
     ROW,
@@ -18,4 +18,4 @@ enum struct FlexWrap {
     WRAP_REVERSE,
 };
 
-} // namespace Web::Unit
+} // namespace Web::Types

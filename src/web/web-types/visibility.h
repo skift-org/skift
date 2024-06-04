@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Web::Unit {
+namespace Web::Types {
 
 enum struct Visibility {
     VISIBLE,
@@ -8,4 +8,4 @@ enum struct Visibility {
     COLLAPSE,
 };
 
-} // namespace Web::Unit
+} // namespace Web::Types

@@ -2,8 +2,8 @@
 
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
-#include <web-css/computed-values.h>
-#include <web-unit/length.h>
+#include <web-cssom/style.h>
+#include <web-types/length.h>
 
 namespace Web::Layout {
 
@@ -20,23 +20,23 @@ struct Frag {
 
     using enum Type;
 
-    Strong<Css::ComputedValues> _style;
+    Strong<Cssom::Style> _style;
 
-    Unit::RectPx _borderBox;
-    Unit::SpacingPx _BorderPadding;
-    Unit::SpacingPx _margin;
+    Types::RectPx _borderBox;
+    Types::SpacingPx _BorderPadding;
+    Types::SpacingPx _margin;
 
-    Frag(Strong<Css::ComputedValues> style)
+    Frag(Strong<Cssom::Style> style)
         : _style(style) {
     }
 
     virtual ~Frag() = default;
     virtual Type type() const = 0;
 
-    virtual void layout(Unit::RectPx) = 0;
-    virtual Unit::Vec2Px size(Unit::Vec2Px) = 0;
+    virtual void layout(Types::RectPx) = 0;
+    virtual Types::Vec2Px size(Types::Vec2Px) = 0;
 
-    Css::ComputedValues const &style() const {
+    Cssom::Style const &style() const {
         return *_style;
     }
 
@@ -56,15 +56,15 @@ struct Flow : public Frag {
 
     Vec<Strong<Frag>> _frags;
 
-    Frag &frag(usize frag) {
+    Frag &fragAt(usize frag) {
         return *_frags[frag];
     }
 
-    Frag const &frag(usize frag) const {
+    Frag const &fragAt(usize frag) const {
         return *_frags[frag];
     }
 
-    Css::ComputedValues const &style(usize frag) const {
+    Cssom::Style const &styleAt(usize frag) const {
         return _frags[frag]->style();
     }
 };

@@ -2,7 +2,7 @@
 
 #include <karm-math/const.h>
 
-namespace Web::Unit {
+namespace Web::Types {
 
 // 7.4. MARK: Resolution Units: the <resolution> type and dpi, dpcm, dppx units
 // https://drafts.csswg.org/css-values/#resolution
@@ -92,4 +92,4 @@ struct Resolution {
     }
 };
 
-} // namespace Web::Unit
+} // namespace Web::Types

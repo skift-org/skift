@@ -37,11 +37,11 @@ struct GridFlow : public Flow {
 
     void _sortByOrder() {
         stableSort(_cells, [&](auto a, auto b) {
-            return style(a.frag).order < style(b.frag).order;
+            return styleAt(a.frag).order < styleAt(b.frag).order;
         });
     }
 
-    void layout(Unit::RectPx bound) override {
+    void layout(Types::RectPx bound) override {
         _clear();
         _createCells();
         _sortByOrder();
@@ -51,7 +51,7 @@ struct GridFlow : public Flow {
         }
     }
 
-    Unit::Vec2Px size(Unit::Vec2Px) override {
+    Types::Vec2Px size(Types::Vec2Px) override {
         return {};
     }
 };

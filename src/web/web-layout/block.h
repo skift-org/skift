@@ -13,10 +13,10 @@ struct BlockFlow : public Flow {
         return TYPE;
     }
 
-    void layout(Unit::RectPx) override {
+    void layout(Types::RectPx) override {
     }
 
-    Unit::Vec2Px size(Unit::Vec2Px) override {
+    Types::Vec2Px size(Types::Vec2Px) override {
         return {};
     }
 };

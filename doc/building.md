@@ -84,7 +84,7 @@ This guide provides instructions for building skiftOS from source.
 
     - In simulator:
         ```sh
-        ./skift.sh builder run --mixins=release hideo-shell
+        ./skift.sh builder run --mixins=release hideo-shell.main
         ```
 
         > **🛈 Note**<br> The `--mixins=release` flag is optional and can be omitted for a debug build.

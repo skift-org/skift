@@ -14,14 +14,14 @@ static void _createArc(Math::Polyf &poly, Math::Vec2f center, Math::Vec2f start,
         auto sp = i == 0 ? start : center + Math::Vec2f{radius * Math::cos(sa), radius * Math::sin(sa)};
         auto ep = i + 1 == divs ? end : center + Math::Vec2f{radius * Math::cos(ea), radius * Math::sin(ea)};
 
-        poly.add({sp, ep});
+        poly.pushBack({sp, ep});
     }
 }
 
 // MARK: Line Join -------------------------------------------------------------
 
 static void _createJoinBevel(Math::Polyf &poly, Math::Edgef curr, Math::Edgef next) {
-    poly.add({curr.end, next.start});
+    poly.pushBack({curr.end, next.start});
 }
 
 static void _createJoinMiter(Math::Polyf &poly, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 width) {
@@ -45,8 +45,8 @@ static void _createJoinMiter(Math::Polyf &poly, Math::Edgef curr, Math::Edgef ne
         return;
     }
 
-    poly.add({curr.end, v});
-    poly.add({v, next.start});
+    poly.pushBack({curr.end, v});
+    poly.pushBack({v, next.start});
 }
 
 static void _createJoinRound(Math::Polyf &poly, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
@@ -99,14 +99,14 @@ struct Cap {
 };
 
 static void _createCapButt(Math::Polyf &poly, Cap cap) {
-    poly.add({cap.start, cap.end});
+    poly.pushBack({cap.start, cap.end});
 }
 
 static void _createCapSquare(Math::Polyf &poly, Cap cap, f64 width) {
     auto e = Math::Edgef{cap.start, cap.end}.offset(-width / 2);
-    poly.add({cap.start, e.start});
-    poly.add(e);
-    poly.add({e.end, cap.end});
+    poly.pushBack({cap.start, e.start});
+    poly.pushBack(e);
+    poly.pushBack({e.end, cap.end});
 }
 
 static void _createCapRound(Math::Polyf &poly, Cap cap, f64 width) {
@@ -164,8 +164,8 @@ static void _createCap(Math::Polyf &poly, StrokeStyle stroke, Cap cap) {
             auto outerCurr = curr.offset(outerDist);
             auto innerCurr = curr.offset(innerDist).swap();
 
-            poly.add(outerCurr);
-            poly.add(innerCurr);
+            poly.pushBack(outerCurr);
+            poly.pushBack(innerCurr);
 
             if (i == 0 and not contour.close) {
                 auto center = (innerCurr.end + outerCurr.start) / 2;
@@ -205,7 +205,7 @@ void createSolid(Math::Polyf &poly, Path &path) {
     for (auto contour : path.iterContours()) {
         for (usize i = 0; i < contour.len(); i++) {
             Math::Edgef e = {contour[i], contour[(i + 1) % contour.len()]};
-            poly.add(e);
+            poly.pushBack(e);
         }
     }
 }

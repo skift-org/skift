@@ -46,11 +46,11 @@ struct Poly {
         return buf() + len();
     }
 
-    void add(Edge<T> edge) {
+    void pushBack(Edge<T> edge) {
         if (edge.hasNan()) [[unlikely]]
             panic("nan in edge");
         _bound = NONE;
-        _edges.add(edge);
+        _edges.pushBack(edge);
     }
 
     void offset(Vec2<T> off) {

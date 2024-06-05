@@ -119,7 +119,7 @@ static Res<CSSOM::CSSRule> parseQualifiedRule(Sst rule) {
                 if (block[i].token.type != Token::WHITESPACE) {
                     if (block[i].token.type != Token::COLON) {
                         parsed.visit([&](auto &p) {
-                            p.declarations.add(CSSOM::CSSStyleDeclaration(block[i].token));
+                            p.declarations.pushBack(CSSOM::CSSStyleDeclaration(block[i].token));
                         });
                     } else {
                         parsingContent = true;
@@ -128,7 +128,7 @@ static Res<CSSOM::CSSRule> parseQualifiedRule(Sst rule) {
             } else {
                 if (block[i].token.type != Token::SEMICOLON) {
                     parsed.visit([&](auto &p) {
-                        last(p.declarations).value.add(block[i].token);
+                        last(p.declarations).value.pushBack(block[i].token);
                     });
                 } else {
                     parsingContent = false;
@@ -149,7 +149,7 @@ Vec<CSSOM::CSSRule> parseSST(Sst sst) {
         switch (sst.content[i].type) {
 
         case Sst::_Type::QUALIFIED_RULE:
-            rules.add(parseQualifiedRule(sst.content[i]).unwrap());
+            rules.pushBack(parseQualifiedRule(sst.content[i]).unwrap());
             break;
         case Sst::_Type::FUNC:
         case Sst::_Type::DECL:

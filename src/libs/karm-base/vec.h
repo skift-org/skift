@@ -24,14 +24,6 @@ struct _Vec {
 
     // MARK: Collection
 
-    void add(T const &val) {
-        pushBack(val);
-    }
-
-    void add(T &&val) {
-        pushBack(std::move(val));
-    }
-
     bool contains(T const &val) const {
         for (auto const &v : *this) {
             if (v == val) {

@@ -9,6 +9,8 @@
 
 namespace Web::Cssom {
 
+// Please keep the props in alphabetical order
+
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-attachment
 struct BackgroundAttachementProp {
     Types::BackgroundAttachment value;

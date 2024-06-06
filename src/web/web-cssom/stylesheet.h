@@ -3,6 +3,8 @@
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
 #include <karm-logger/logger.h>
+#include <karm-mime/mime.h>
+#include <karm-mime/url.h>
 #include <web-css/lexer.h>
 #include <web-media/query.h>
 #include <web-select/select.h>
@@ -79,23 +81,10 @@ using CSSRule = Union<CSSStyleRule, CSSFontFaceRule, CSSSupportsRule, CSSMediaRu
 
 // https:// www.w3.org/TR/cssom-1/#css-style-sheets
 struct StyleSheet {
-    Str type = "text/css";
-    Str href;
+    Mime::Mime mime = "text/css"_mime;
+    Mime::Url href = ""_url;
     Str title = "";
     Vec<CSSRule> cssRules;
-
-    StyleSheet(Str location) {
-        href = location;
-    }
-
-    void insertRule(Str rule, unsigned long index = 0) {
-        logDebug("{} : {}", rule, index);
-    };
-
-    void deleteRule(unsigned long index) {
-        logDebug("{}", index);
-        // TODO: remove rule at index in cssRules
-    };
 };
 
 } // namespace Web::CSSOM

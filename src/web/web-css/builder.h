@@ -143,7 +143,7 @@ static Res<CSSOM::CSSRule> parseQualifiedRule(Sst rule) {
 }
 
 // No spec, we take the SST we built and convert it to a usable list of rules
-Vec<CSSOM::CSSRule> parseSST(Sst sst) {
+static inline Vec<CSSOM::CSSRule> parseSST(Sst sst) {
     Vec<CSSOM::CSSRule> rules;
     for (usize i = 0; i < sst.content.len(); i++) {
         switch (sst.content[i].type) {

@@ -38,4 +38,26 @@ struct Sst {
 
     Sst(_Type type) : type(type) {}
 };
+
+static inline Str toStr(Sst::_Type type) {
+    switch (type) {
+#define ITER(NAME)  \
+    case Sst::NAME: \
+        return #NAME;
+        FOREACH_SST(ITER)
+#undef ITER
+    default:
+        panic("invalid ast type");
+    }
+}
+
 } // namespace Web::Css
+
+Reflectable$(Web::Css::Sst, type, token, prefix, content);
+
+template <>
+struct Karm::Io::Formatter<Web::Css::Sst::_Type> {
+    Res<usize> format(Io::TextWriter &writer, Web::Css::Sst::_Type val) {
+        return (writer.writeStr(try$(Io::toParamCase(toStr(val)))));
+    }
+};

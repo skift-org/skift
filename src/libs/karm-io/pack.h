@@ -101,6 +101,23 @@ struct Packer<Opt<T>> {
     }
 };
 
+template <typename... Ts>
+struct Packer<Union<Ts...>> {
+    static Res<> pack(PackEmit &e, Union<Ts...> const &val) {
+        try$(Io::pack<u8>(e, val.index()));
+        return val.visit([&]<typename T>(T const &v) {
+            try$(Io::pack<T>(e, v));
+        });
+    }
+
+    static Res<Union<Ts...>> unpack(PackScan &s) {
+        auto index = try$(Io::unpack<u8>(s));
+        return Meta::indexCast<Ts...>(index, nullptr, [&]<typename T>(T *) -> Res<Union<Ts...>> {
+            return Io::unpack<T>(s);
+        });
+    }
+};
+
 template <>
 struct Packer<Error> {
     // TODO: Because the message in the error is a non owning string
@@ -133,10 +150,10 @@ struct Packer<Res<T, E>> {
         bool has = s.nextU8le();
         if (has) {
             auto res = Ok<T>(try$(Io::unpack<T>(s)));
-            return Ok(res);
+            return Ok<Res<T, E>>(std::move(res));
         }
         auto err = try$(Io::unpack<E>(s));
-        return Ok(err);
+        return Ok<Res<T, E>>(err);
     }
 };
 
@@ -223,10 +240,9 @@ struct Packer<Cons<Car, Cdr>> {
 template <typename... Ts>
 struct Packer<Tuple<Ts...>> {
     static Res<> pack(PackEmit &e, Tuple<Ts...> const &val) {
-        val.visit([&](auto const &f) {
+        return val.visit([&](auto const &f) {
             return Io::pack(e, f);
         });
-        return Ok();
     }
 
     static Res<Tuple<Ts...>> unpack(PackScan &s) {

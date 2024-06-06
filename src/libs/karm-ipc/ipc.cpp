@@ -17,6 +17,14 @@ void Server::detach(_Object &obj) {
     _objects.del(obj._oid);
 }
 
+void Server::attach(_Pending &p) {
+    _pending.put(p.seq, &p);
+}
+
+void Server::detach(_Pending &p) {
+    _pending.del(p.seq);
+}
+
 Async::Task<> Server::runAsync() {
     Array<u8, 4096> reqBuf;
     Array<Sys::Handle, 16> hnds;
@@ -30,13 +38,28 @@ Async::Task<> Server::runAsync() {
             sub(hnds, 0, hndsLen),
         };
 
-        Io::BufferWriter respBuf;
-        Io::PackEmit resp{respBuf};
-
         Header header = co_try$(Io::unpack<Header>(req));
-        auto object = co_try$(_objects.get(header.oid));
-        co_trya$(object->handleRequest(header, req, resp));
-        co_trya$(_con.sendAsync(respBuf.bytes(), resp.handles()));
+        auto maybeObject = _objects.get(header.oid);
+
+        if (maybeObject) {
+            auto *object = *maybeObject;
+
+            Io::BufferWriter respBuf;
+            Io::PackEmit resp{respBuf};
+            co_trya$(object->handleRequest(header, req, resp));
+            co_trya$(_con.sendAsync(respBuf.bytes(), resp.handles()));
+            continue;
+        }
+
+        auto maybePending = _pending.get(header.seq);
+        if (maybePending) {
+            auto *pending = *maybePending;
+            pending->complete(req);
+            detach(*pending);
+            continue;
+        }
+
+        logWarn("dropping message");
     }
 }
 
@@ -53,5 +76,9 @@ _Object::_Object(Server &server)
 _Object::~_Object() {
     _server.detach(*this);
 }
+
+// MARK: Client ----------------------------------------------------------------
+
+usize Transport::_seq = 0;
 
 } // namespace Karm::Ipc

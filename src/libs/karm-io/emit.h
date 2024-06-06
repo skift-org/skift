@@ -111,23 +111,35 @@ struct Emit : public Io::TextWriterBase<> {
     }
 
     Res<usize> flush() override {
+        try$(_error);
         if (_newline)
-            return _writer.writeRune('\n');
-        return Ok(0uz);
-    }
-
-    Res<> raiseIfError() {
-        return _error;
+            _tryWrapper(_writer.writeRune('\n'));
+        return Ok(_total);
     }
 };
+
+template <ReprMethod T>
+struct Repr<T> {
+    static void repr(Io::Emit &emit, T const &val) {
+        val.repr(emit);
+    }
+};
+
+template <Reprable T>
+void repr(Io::Emit &emit, T const &val) {
+    if constexpr (ReprMethod<T>) {
+        val.repr(emit);
+    } else {
+        Repr<T>::repr(emit, val);
+    }
+}
 
 template <Reprable T>
 struct Formatter<T> {
     Res<usize> format(Io::TextWriter &writer, T const &val) {
         Io::Emit emit{writer};
-        val.repr(emit);
-        try$(emit.raiseIfError());
-        return Ok(emit.total());
+        repr(emit, val);
+        return emit.flush();
     }
 };
 

@@ -22,7 +22,7 @@ struct DocumentType : public Node {
         return TYPE;
     }
 
-    void _dump(Io::Emit &e) const override {
+    void _repr(Io::Emit &e) const override {
         e(" name={#} publicId={#} systemId={#}", this->name, this->publicId, this->systemId);
     }
 };

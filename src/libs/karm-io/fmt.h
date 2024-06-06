@@ -751,8 +751,16 @@ struct Formatter<Box<T>> {
 struct Emit;
 
 template <typename T>
-concept Reprable = requires(T t, Emit &emit) {
+struct Repr;
+
+template <typename T>
+concept ReprMethod = requires(T t, Emit &emit) {
     t.repr(emit);
+};
+
+template <typename T>
+concept Reprable = ReprMethod<T> or requires(T t, Emit &emit) {
+    Repr<T>::repr(t, emit);
 };
 
 template <Reflectable T>

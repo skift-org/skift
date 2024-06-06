@@ -196,7 +196,7 @@ struct Image {
 
     // MARK: Dumping -----------------------------------------------------------
 
-    void dump(Io::Emit &e) {
+    void repr(Io::Emit &e) {
         e("BMP image");
         e.indentNewline();
 

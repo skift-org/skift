@@ -866,7 +866,7 @@ struct Image {
 
     // MARK: Dumping -----------------------------------------------------------
 
-    void dump(Io::Emit &e) {
+    void repr(Io::Emit &e) {
         e("JPEG image");
         e.indentNewline();
         e.ln("width: {}", width());

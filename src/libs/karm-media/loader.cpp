@@ -52,11 +52,8 @@ Res<Font> loadFontOrFallback(f64 size, Mime::Url url) {
 
 static Res<Image> loadBmp(Bytes bytes) {
     auto bmp = try$(Bmp::Image::load(bytes));
-    Io::Emit e{Sys::out()};
-    bmp.dump(e);
     auto img = Image::alloc({bmp.width(), bmp.height()});
     try$(bmp.decode(img));
-
     return Ok(img);
 }
 

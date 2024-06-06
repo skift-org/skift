@@ -19,7 +19,7 @@ struct Attr : public Node {
         return NodeType::ATTRIBUTE;
     }
 
-    void _dump(Io::Emit &e) const override {
+    void _repr(Io::Emit &e) const override {
         e(" namespaceURI={#}", name.ns.url());
         e(" prefix={#}", name.ns.name());
         e(" localName={#} value={#}", name.name(), value);

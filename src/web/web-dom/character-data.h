@@ -30,7 +30,7 @@ struct CharacterData : public Dom::Node {
         this->data = sb.take();
     }
 
-    void _dump(Io::Emit &e) const override {
+    void _repr(Io::Emit &e) const override {
         e(" data={#}", this->data);
     }
 };

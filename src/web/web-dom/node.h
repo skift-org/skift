@@ -128,22 +128,18 @@ struct Node :
         return parentNode()._children[index + 1];
     }
 
-    void _dumpChildren(Io::Emit &e) const {
+    virtual void _repr(Io::Emit &) const {}
+
+    void repr(Io::Emit &e) const {
+        e("({}", Io::toParamCase(toStr(nodeType())));
+        _repr(e);
         if (_children.len() > 0) {
             e.indentNewline();
             for (auto &child : _children) {
-                child->dump(e);
+                child->repr(e);
             }
             e.deindent();
         }
-    }
-
-    virtual void _dump(Io::Emit &) const {}
-
-    void dump(Io::Emit &e) const {
-        e("({}", Io::toParamCase(toStr(nodeType())));
-        _dump(e);
-        _dumpChildren(e);
         e(")\n");
     }
 

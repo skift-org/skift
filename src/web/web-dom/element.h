@@ -32,12 +32,12 @@ struct Element : public Node {
         return TYPE;
     }
 
-    void _dump(Io::Emit &e) const override {
+    void _repr(Io::Emit &e) const override {
         e(" tagName={#}", this->tagName);
         if (this->attributes.len()) {
             e.indentNewline();
             for (auto const &[name, attr] : this->attributes.iter()) {
-                attr->dump(e);
+                attr->repr(e);
             }
             e.deindent();
         }

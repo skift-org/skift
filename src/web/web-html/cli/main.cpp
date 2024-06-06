@@ -4,24 +4,54 @@
 #include <web-html/lexer.h>
 #include <web-html/parser.h>
 
-Async::Task<> entryPointAsync(Sys::Ctx &) {
-    auto file = co_try$(Sys::File::open("bundle://web-html-cli/exemple.html"_url));
+Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+    auto args = Sys::useArgs(ctx);
 
-    auto buf = co_try$(Io::readAllUtf8(file));
+    if (args.len() != 2) {
+        Sys::errln("usage: web-html.cli <verb> <url>\n");
+        co_return Error::invalidInput();
+    }
 
-    Sys::println("Orginal Source:");
-    Sys::println("{}", buf);
+    auto verb = args[0];
+    auto url = co_try$(Mime::parseUrlOrPath(args[1]));
 
-    Sys::println("Parsing:");
-    auto doc = makeStrong<Web::Dom::Document>();
-    Web::Html::Parser parser{doc};
-    parser.write(buf);
+    if (verb == "dump-dom") {
+        auto file = co_try$(Sys::File::open(url));
+        auto buf = co_try$(Io::readAllUtf8(file));
+        auto doc = makeStrong<Web::Dom::Document>();
+        Web::Html::Parser parser{doc};
+        parser.write(buf);
+        Sys::println("{}", doc);
 
-    Sys::println("Result:");
-    Io::Emit emit{Sys::out()};
-    doc->dump(emit);
-    co_try$(emit.flush());
-    emit("\n");
+        co_return Ok();
+    } else if (verb == "dump-token") {
+        auto file = co_try$(Sys::File::open(url));
+        auto buf = co_try$(Io::readAllUtf8(file));
 
-    co_return Ok();
+        Vec<Web::Html::Token> tokens;
+        struct VecSink : public Web::Html::Sink {
+            Vec<Web::Html::Token> &tokens;
+            VecSink(Vec<Web::Html::Token> &tokens)
+                : tokens(tokens) {
+            }
+            void accept(Web::Html::Token const &token) override {
+                tokens.pushBack(token);
+            }
+        };
+
+        VecSink sink{tokens};
+        Web::Html::Lexer lexer{};
+        lexer.bind(sink);
+
+        for (auto r : iterRunes(buf))
+            lexer.consume(r);
+
+        for (auto &t : tokens)
+            Sys::println("{}", t);
+
+        co_return Ok();
+    } else {
+        Sys::errln("unknown verb: {} (expected: dump-dom, dump-token)\n", verb);
+        co_return Error::invalidInput();
+    }
 }

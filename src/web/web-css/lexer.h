@@ -92,12 +92,14 @@ Res<Token> nextToken(Io::SScan &s);
 template <>
 struct Karm::Io::Formatter<Web::Css::Token> {
     Res<usize> format(Io::TextWriter &writer, Web::Css::Token const &val) {
-        usize written = try$(writer.writeRune('{'));
-        written += try$(writer.writeStr(try$(Io::toParamCase(Web::Css::toStr(val.type)))));
+        if (not val)
+            return Io::format(writer, "nil");
 
-        written += try$(Io::format(writer, " data={#}", val.data));
-
-        written += try$(writer.writeRune('}'));
-        return Ok(written);
+        return Io::format(
+            writer,
+            "({} {#})",
+            try$(Io::toParamCase(Web::Css::toStr(val.type))),
+            val.data
+        );
     }
 };

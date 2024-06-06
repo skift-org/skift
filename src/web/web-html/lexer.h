@@ -175,7 +175,7 @@ struct Karm::Io::Formatter<Web::Html::Token> {
             written += try$(Io::format(writer, " name={}", val.name));
 
         if (val.rune)
-            written += try$(Io::format(writer, " rune={}", val.rune));
+            written += try$(Io::format(writer, " rune='{#c}'", val.rune));
 
         if (val.data)
             written += try$(Io::format(writer, " data='{}'", val.data));

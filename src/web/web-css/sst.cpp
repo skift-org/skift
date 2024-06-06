@@ -3,6 +3,11 @@
 namespace Web::Css {
 
 void Sst::repr(Io::Emit &e) const {
+    if (type == TOKEN) {
+        e("{}\n", token);
+        return;
+    }
+
     e("({} ", Io::toParamCase(toStr(type)));
     e("token={}", token);
     e.indent();

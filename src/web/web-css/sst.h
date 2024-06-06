@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-io/funcs.h>
+#include <karm-io/emit.h>
 
 #include "lexer.h"
 
@@ -37,19 +37,11 @@ struct Sst {
     Content content{};
 
     Sst(_Type type) : type(type) {}
+
+    void repr(Io::Emit &e) const;
 };
 
-static inline Str toStr(Sst::_Type type) {
-    switch (type) {
-#define ITER(NAME)  \
-    case Sst::NAME: \
-        return #NAME;
-        FOREACH_SST(ITER)
-#undef ITER
-    default:
-        panic("invalid ast type");
-    }
-}
+Str toStr(Sst::_Type type);
 
 } // namespace Web::Css
 

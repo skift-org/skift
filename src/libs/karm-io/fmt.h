@@ -748,7 +748,15 @@ struct Formatter<Box<T>> {
 
 // MARK: Format Reflectable ----------------------------------------------------
 
+struct Emit;
+
+template <typename T>
+concept Reprable = requires(T t, Emit &emit) {
+    t.repr(emit);
+};
+
 template <Reflectable T>
+    requires(not Reprable<T>)
 struct Formatter<T> {
     bool prefix = false;
 

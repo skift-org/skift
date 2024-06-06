@@ -115,6 +115,20 @@ struct Emit : public Io::TextWriterBase<> {
             return _writer.writeRune('\n');
         return Ok(0uz);
     }
+
+    Res<> raiseIfError() {
+        return _error;
+    }
+};
+
+template <Reprable T>
+struct Formatter<T> {
+    Res<usize> format(Io::TextWriter &writer, T const &val) {
+        Io::Emit emit{writer};
+        val.repr(emit);
+        try$(emit.raiseIfError());
+        return Ok(emit.total());
+    }
 };
 
 } // namespace Karm::Io

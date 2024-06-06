@@ -141,6 +141,8 @@ struct _Vec {
 
         return _buf[i];
     }
+
+    constexpr explicit operator bool() const { return len(); }
 };
 
 template <typename T>

@@ -157,115 +157,66 @@ static auto const RE_STRING =
 
     );
 
-Res<Token> nextToken(Io::SScan &s) {
-    if (s.ended()) {
-        // NO SPEC
-        return Ok(Token{Token::END_OF_FILE, s.end()});
-    }
-
-    s.begin();
-
-    if (s.skip(RE_WHITESPACE_TOKEN)) {
-        return Ok(Token{Token::WHITESPACE, s.end()});
-    }
-
-    if (s.skip(RE_BRACKET_OPEN)) {
-        return Ok(Token{Token::LEFT_CURLY_BRACKET, s.end()});
-    }
-
-    if (s.skip(RE_BRACKET_CLOSE)) {
-        return Ok(Token{Token::RIGHT_CURLY_BRACKET, s.end()});
-    }
-
-    if (s.skip(RE_SQUARE_BRACKET_OPEN)) {
-        return Ok(Token{Token::LEFT_SQUARE_BRACKET, s.end()});
-    }
-
-    if (s.skip(RE_SQUARE_BRACKET_CLOSE)) {
-        return Ok(Token{Token::RIGHT_SQUARE_BRACKET, s.end()});
-    }
-
-    if (s.skip(RE_PARENTHESIS_OPEN)) {
-        return Ok(Token{Token::LEFT_PARENTHESIS, s.end()});
-    }
-
-    if (s.skip(RE_PARENTHESIS_CLOSE)) {
-        return Ok(Token{Token::RIGHT_PARENTHESIS, s.end()});
-    }
-
-    if (s.skip(RE_SEMICOLON)) {
-        return Ok(Token{Token::SEMICOLON, s.end()});
-    }
-
-    if (s.skip(RE_COLON)) {
-        return Ok(Token{Token::COLON, s.end()});
-    }
-
-    if (s.skip(RE_COMMA)) {
-        return Ok(Token{Token::COMMA, s.end()});
-    }
-
-    if (s.skip(RE_HASH)) {
-        return Ok(Token{Token::HASH, s.end()});
-    }
-
-    // https://www.w3.org/TR/css-syntax-3/#consume-comment
-    if (s.skip("/*")) {
-        s.skip(Re::untilAndConsume(Re::word("*/")));
-
-        Str data = s.end();
-
-        if (endWith(data, Str{"*/"}) == Match::NO) {
-            return Error::invalidInput("unterminated comment");
+Token Lexer::_next() {
+    _scan.begin();
+    if (_scan.ended()) {
+        return {Token::END_OF_FILE, _scan.end()};
+    } else if (_scan.skip(RE_WHITESPACE_TOKEN)) {
+        return {Token::WHITESPACE, _scan.end()};
+    } else if (_scan.skip(RE_BRACKET_OPEN)) {
+        return {Token::LEFT_CURLY_BRACKET, _scan.end()};
+    } else if (_scan.skip(RE_BRACKET_CLOSE)) {
+        return {Token::RIGHT_CURLY_BRACKET, _scan.end()};
+    } else if (_scan.skip(RE_SQUARE_BRACKET_OPEN)) {
+        return {Token::LEFT_SQUARE_BRACKET, _scan.end()};
+    } else if (_scan.skip(RE_SQUARE_BRACKET_CLOSE)) {
+        return {Token::RIGHT_SQUARE_BRACKET, _scan.end()};
+    } else if (_scan.skip(RE_PARENTHESIS_OPEN)) {
+        return {Token::LEFT_PARENTHESIS, _scan.end()};
+    } else if (_scan.skip(RE_PARENTHESIS_CLOSE)) {
+        return {Token::RIGHT_PARENTHESIS, _scan.end()};
+    } else if (_scan.skip(RE_SEMICOLON)) {
+        return {Token::SEMICOLON, _scan.end()};
+    } else if (_scan.skip(RE_COLON)) {
+        return {Token::COLON, _scan.end()};
+    } else if (_scan.skip(RE_COMMA)) {
+        return {Token::COMMA, _scan.end()};
+    } else if (_scan.skip(RE_HASH)) {
+        return {Token::HASH, _scan.end()};
+    } else if (_scan.skip("/*")) {
+        // https://www.w3.org/TR/css-syntax-3/#consume-comment
+        _scan.skip(Re::untilAndConsume(Re::word("*/")));
+        return {Token::COMMENT, _scan.end()};
+    } else if (_scan.skip(RE_NUMBER)) {
+        // https://www.w3.org/TR/css-syntax-3/#consume-numeric-token
+        if (_scan.skip(RE_IDENTIFIER)) {
+            return {Token::DIMENSION, _scan.end()};
+        } else if (_scan.skip(Re::single('%'))) {
+            return {Token::PERCENTAGE, _scan.end()};
+        } else {
+            return {Token::NUMBER, _scan.end()};
         }
-
-        return Ok(Token{Token::COMMENT, data});
-    }
-
-    // https://www.w3.org/TR/css-syntax-3/#consume-numeric-token
-    if (s.skip(RE_NUMBER)) {
-        if (s.skip(RE_IDENTIFIER)) {
-            return Ok(Token{Token::DIMENSION, s.end()});
-        }
-
-        if (s.skip(Re::single('%'))) {
-            return Ok(Token{Token::PERCENTAGE, s.end()});
-        }
-
-        return Ok(Token{Token::NUMBER, s.end()});
-    }
-
-    if (s.skip(RE_FUNCTION)) {
-        if (s.end() == "url(" and s.skip(RE_URL)) {
+    } else if (_scan.skip(RE_FUNCTION)) {
+        if (_scan.end() == "url(" and _scan.skip(RE_URL)) {
             // unclear spec
-            return Ok(Token{Token::URL, s.end()});
+            return {Token::URL, _scan.end()};
         }
-
-        return Ok(Token{Token::FUNCTION, s.end()});
+        return {Token::FUNCTION, _scan.end()};
+    } else if (_scan.skip(RE_IDENTIFIER)) {
+        // https://www.w3.org/TR/css-syntax-3/#consume-name
+        return {Token::IDENT, _scan.end()};
+    } else if (_scan.skip(RE_AT_KEYWORD)) {
+        return {Token::AT_KEYWORD, _scan.end()};
+    } else if (_scan.skip(RE_STRING)) {
+        // https://www.w3.org/TR/css-syntax-3/#consume-string-token
+        return {Token::STRING, _scan.end()};
+    } else if (_scan.skip(RE_DELIM)) {
+        return {Token::DELIM, _scan.end()};
+    } else {
+        logDebug("error at {#}", _scan.curr());
+        _scan.next();
+        return {Token::OTHER, _scan.end()};
     }
-
-    // https://www.w3.org/TR/css-syntax-3/#consume-name
-    if (s.skip(RE_IDENTIFIER)) {
-        return Ok(Token{Token::IDENT, s.end()});
-    }
-
-    if (s.skip(RE_AT_KEYWORD)) {
-        return Ok(Token{Token::AT_KEYWORD, s.end()});
-    }
-
-    // https://www.w3.org/TR/css-syntax-3/#consume-string-token
-    if (s.skip(RE_STRING)) {
-        return Ok(Token{Token::STRING, s.end()});
-    }
-
-    if (s.skip(RE_DELIM)) {
-        return Ok(Token{Token::DELIM, s.end()});
-    }
-
-    logDebug("error at {#}", s.curr());
-    // NO SPEC BUT SHOULD BE UNREACHABLE
-    s.next();
-    return Ok(Token{Token::OTHER, s.end()});
 }
 
 } // namespace Web::Css

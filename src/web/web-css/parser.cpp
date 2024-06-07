@@ -3,116 +3,118 @@
 namespace Web::Css {
 
 // https://www.w3.org/TR/css-syntax-3/#consume-a-simple-block
-Res<Sst> consumeBlock(Io::SScan &s, Token::Type term) {
+Sst consumeBlock(Lexer &lex, Token::Type term) {
     Sst block = Sst::BLOCK;
+    lex.next();
 
     while (true) {
-        auto token = nextToken(s).unwrap();
+        auto token = lex.curr();
 
         switch (token.type) {
         case Token::END_OF_FILE:
-            // this is a parse error
-            return Ok(block);
+            logError("unexpected end of file");
+            return block;
 
         default:
-            if (token.type == term) {
-                logDebug("closing the curent block");
-                return Ok(block);
-            } else {
-                auto a = try$(consumeComponentValue(s, token));
-                logDebug("adding {#} to the curent block", a);
-                block.content.emplaceBack(a);
-            }
+            if (token.type == term)
+                return block;
+
+            block.content.emplaceBack(consumeComponentValue(lex));
+            break;
         }
+
+        lex.next();
     }
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-function
-Res<Sst> consumeFunc(Io::SScan &s, Token token) {
+Sst consumeFunc(Lexer &lex) {
     Sst fn = Sst::FUNC;
-    Sst ast = Sst::TOKEN;
-    ast.token = token;
-    fn.prefix = Box{ast};
+    fn.prefix = Box<Sst>{lex.curr()};
+    lex.next();
 
     while (true) {
-        auto token = nextToken(s).unwrap();
-
-        switch (token.type) {
-        case Token::RIGHT_PARENTHESIS:
-            return Ok(std::move(fn));
-
+        switch (lex.curr().type) {
         case Token::END_OF_FILE:
             logError("unexpected end of file");
-            return Ok(std::move(fn));
+            return fn;
+
+        case Token::RIGHT_PARENTHESIS:
+            return fn;
 
         default:
-            fn.content.emplaceBack(try$(consumeComponentValue(s, token)));
+            fn.content.pushBack(consumeComponentValue(lex));
+            break;
         }
+
+        lex.next();
     }
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-component-value
-Res<Sst> consumeComponentValue(Io::SScan &s, Token token) {
-    switch (token.type) {
+Sst consumeComponentValue(Lexer &lex) {
+    switch (lex.curr().type) {
     case Token::LEFT_SQUARE_BRACKET:
-        return consumeBlock(s, Token::RIGHT_SQUARE_BRACKET);
+        return consumeBlock(lex, Token::RIGHT_SQUARE_BRACKET);
 
     case Token::LEFT_CURLY_BRACKET:
-        return consumeBlock(s, Token::RIGHT_CURLY_BRACKET);
+        return consumeBlock(lex, Token::RIGHT_CURLY_BRACKET);
 
     case Token::LEFT_PARENTHESIS:
-        return consumeBlock(s, Token::RIGHT_PARENTHESIS);
+        return consumeBlock(lex, Token::RIGHT_PARENTHESIS);
 
     case Token::FUNCTION:
-        return consumeFunc(s, token);
+        return consumeFunc(lex);
 
     default:
-        Sst tok = Sst::TOKEN;
-        tok.token = token;
-        return Ok(std::move(tok));
+        return lex.curr();
     }
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-qualified-rule
-Res<Sst> consumeQualifiedRule(Io::SScan &s, Token token) {
-    Sst ast{Sst::QUALIFIED_RULE};
+Sst consumeQualifiedRule(Lexer &lex) {
     Sst pre{Sst::LIST};
-
     while (true) {
-        switch (token.type) {
+        switch (lex.curr().type) {
         case Token::END_OF_FILE:
-            return Error();
-        case Token::LEFT_CURLY_BRACKET:
-            logDebug("creating a block for curent rule");
+            logError("unexpected end of file");
+            return pre;
+
+        case Token::LEFT_CURLY_BRACKET: {
+            Sst ast{Sst::QUALIFIED_RULE};
             ast.prefix = Box{pre};
-            ast.content.emplaceBack(try$(consumeBlock(s, Token::RIGHT_CURLY_BRACKET)));
-            return Ok(ast);
+            ast.content.emplaceBack(consumeBlock(lex, Token::RIGHT_CURLY_BRACKET));
+            return ast;
+        }
+
         default:
-            auto a = try$(consumeComponentValue(s, token));
-            logDebug("adding a new component value to the prefix {#}", a);
-            pre.content.pushBack(a);
+            pre.content.pushBack(consumeComponentValue(lex));
             break;
         }
-        token = nextToken(s).unwrap();
+
+        lex.next();
     }
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-list-of-rules
-Res<Sst> consumeRuleList(Io::SScan &s) {
+Sst consumeRuleList(Lexer &lex) {
     Sst ast = Sst::LIST;
 
     while (true) {
-        auto token = try$(nextToken(s));
-        switch (token.type) {
+        switch (lex.curr().type) {
         case Token::END_OF_FILE:
-            return Ok(ast);
+            return ast;
+
         case Token::COMMENT:
         case Token::WHITESPACE:
             break;
+
         default:
-            ast.content.pushBack(try$(consumeQualifiedRule(s, token)));
+            ast.content.pushBack(consumeQualifiedRule(lex));
             break;
         }
+
+        lex.next();
     }
 }
 

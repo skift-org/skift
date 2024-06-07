@@ -9,7 +9,8 @@ void Sst::repr(Io::Emit &e) const {
     }
 
     e("({} ", Io::toParamCase(toStr(type)));
-    e("token={}", token);
+    if (token)
+        e("token={}", token);
     e.indent();
 
     if (prefix) {

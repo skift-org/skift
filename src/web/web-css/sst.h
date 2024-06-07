@@ -38,6 +38,8 @@ struct Sst {
 
     Sst(_Type type) : type(type) {}
 
+    Sst(Token token) : type(TOKEN), token(token) {}
+
     void repr(Io::Emit &e) const;
 };
 

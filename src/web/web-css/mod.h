@@ -4,7 +4,7 @@
 
 namespace Web::Css {
 
-Res<CSSOM::StyleSheet> parseStylesheet(Io::SScan &s);
+CSSOM::StyleSheet parseStylesheet(Io::SScan &s);
 
 Res<CSSOM::StyleSheet> fetchStylesheet(Mime::Url url);
 

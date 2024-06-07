@@ -148,14 +148,14 @@ static inline Vec<CSSOM::CSSRule> parseSST(Sst sst) {
     for (usize i = 0; i < sst.content.len(); i++) {
         switch (sst.content[i].type) {
 
-        case Sst::_Type::QUALIFIED_RULE:
+        case Sst::QUALIFIED_RULE:
             rules.pushBack(parseQualifiedRule(sst.content[i]).unwrap());
             break;
-        case Sst::_Type::FUNC:
-        case Sst::_Type::DECL:
-        case Sst::_Type::LIST:
-        case Sst::_Type::TOKEN:
-        case Sst::_Type::BLOCK:
+        case Sst::FUNC:
+        case Sst::DECL:
+        case Sst::LIST:
+        case Sst::TOKEN:
+        case Sst::BLOCK:
             break;
         }
     }

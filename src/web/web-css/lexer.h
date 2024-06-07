@@ -64,13 +64,27 @@ struct Token {
 
 struct Lexer {
     Io::SScan &_scan;
-    Token _token;
+    Token _curr{};
 
-    Token curr();
+    Lexer(Io::SScan &scan)
+        : _scan(scan) {
+        _curr = _next();
+    }
 
-    Token next();
+    Token curr() {
+        return _curr;
+    }
 
-    Res<Token> expect(Token::Type);
+    Token _next();
+
+    Token next() {
+        _curr = _next();
+        return _curr;
+    }
+
+    bool ended() {
+        return _scan.ended();
+    }
 };
 
 static inline Str toStr(Token::Type type) {
@@ -84,8 +98,6 @@ static inline Str toStr(Token::Type type) {
         panic("invalid token type");
     }
 }
-
-Res<Token> nextToken(Io::SScan &s);
 
 } // namespace Web::Css
 

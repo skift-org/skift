@@ -10,14 +10,14 @@
 
 namespace Web::Css {
 
-Res<Sst> consumeBlock(Io::SScan &s, Token::Type term);
+Sst consumeBlock(Lexer &lex, Token::Type term);
 
-Res<Sst> consumeFunc(Io::SScan &s, Token token);
+Sst consumeFunc(Lexer &lex);
 
-Res<Sst> consumeComponentValue(Io::SScan &s, Token token);
+Sst consumeComponentValue(Lexer &lex);
 
-Res<Sst> consumeQualifiedRule(Io::SScan &s, Token token);
+Sst consumeQualifiedRule(Lexer &lex);
 
-Res<Sst> consumeRuleList(Io::SScan &s);
+Sst consumeRuleList(Lexer &lex);
 
 } // namespace Web::Css

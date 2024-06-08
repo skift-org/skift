@@ -5,6 +5,7 @@
 #include <karm-base/res.h>
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
+#include <karm-io/emit.h>
 #include <karm-io/fmt.h>
 #include <karm-logger/logger.h>
 
@@ -60,29 +61,29 @@ struct Token {
     explicit operator bool() const {
         return type != NIL;
     }
+
+    void repr(Io::Emit &e) const;
 };
 
 struct Lexer {
     Io::SScan &_scan;
-    Token _curr{};
 
     Lexer(Io::SScan &scan)
         : _scan(scan) {
-        _curr = _next();
     }
 
-    Token curr() {
-        return _curr;
+    Token peek() const {
+        auto scan = _scan;
+        return _next(scan);
     }
 
-    Token _next();
+    Token _next(Io::SScan &) const;
 
     Token next() {
-        _curr = _next();
-        return _curr;
+        return _next(_scan);
     }
 
-    bool ended() {
+    bool ended() const {
         return _scan.ended();
     }
 };
@@ -100,18 +101,3 @@ static inline Str toStr(Token::Type type) {
 }
 
 } // namespace Web::Css
-
-template <>
-struct Karm::Io::Formatter<Web::Css::Token> {
-    Res<usize> format(Io::TextWriter &writer, Web::Css::Token const &val) {
-        if (not val)
-            return Io::format(writer, "nil");
-
-        return Io::format(
-            writer,
-            "({} {#})",
-            try$(Io::toParamCase(Web::Css::toStr(val.type))),
-            val.data
-        );
-    }
-};

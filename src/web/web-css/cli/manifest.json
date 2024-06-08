@@ -2,7 +2,7 @@
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "web-css.cli",
     "type": "exe",
-    "description": "CSS CLI",
+    "description": "Css engine testing tool",
     "requires": [
         "karm-sys",
         "web-css"

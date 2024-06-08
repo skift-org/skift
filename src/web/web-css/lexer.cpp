@@ -7,6 +7,23 @@
 
 namespace Web::Css {
 
+// MARK: Token -----------------------------------------------------------------
+
+void Token::repr(Io::Emit &e) const {
+    if (not *this) {
+        e("nil");
+        return;
+    }
+
+    e(
+        "({} {#})",
+        Io::toParamCase(toStr(type)).unwrap(),
+        data
+    );
+}
+
+// MARK: Lexer -----------------------------------------------------------------
+
 static auto const RE_BRACKET_OPEN = Re::single('{');
 static auto const RE_BRACKET_CLOSE = Re::single('}');
 static auto const RE_PARENTHESIS_OPEN = Re::single('(');
@@ -157,65 +174,65 @@ static auto const RE_STRING =
 
     );
 
-Token Lexer::_next() {
-    _scan.begin();
-    if (_scan.ended()) {
-        return {Token::END_OF_FILE, _scan.end()};
-    } else if (_scan.skip(RE_WHITESPACE_TOKEN)) {
-        return {Token::WHITESPACE, _scan.end()};
-    } else if (_scan.skip(RE_BRACKET_OPEN)) {
-        return {Token::LEFT_CURLY_BRACKET, _scan.end()};
-    } else if (_scan.skip(RE_BRACKET_CLOSE)) {
-        return {Token::RIGHT_CURLY_BRACKET, _scan.end()};
-    } else if (_scan.skip(RE_SQUARE_BRACKET_OPEN)) {
-        return {Token::LEFT_SQUARE_BRACKET, _scan.end()};
-    } else if (_scan.skip(RE_SQUARE_BRACKET_CLOSE)) {
-        return {Token::RIGHT_SQUARE_BRACKET, _scan.end()};
-    } else if (_scan.skip(RE_PARENTHESIS_OPEN)) {
-        return {Token::LEFT_PARENTHESIS, _scan.end()};
-    } else if (_scan.skip(RE_PARENTHESIS_CLOSE)) {
-        return {Token::RIGHT_PARENTHESIS, _scan.end()};
-    } else if (_scan.skip(RE_SEMICOLON)) {
-        return {Token::SEMICOLON, _scan.end()};
-    } else if (_scan.skip(RE_COLON)) {
-        return {Token::COLON, _scan.end()};
-    } else if (_scan.skip(RE_COMMA)) {
-        return {Token::COMMA, _scan.end()};
-    } else if (_scan.skip(RE_HASH)) {
-        return {Token::HASH, _scan.end()};
-    } else if (_scan.skip("/*")) {
+Token Lexer::_next(Io::SScan &s) const {
+    s.begin();
+    if (s.ended()) {
+        return {Token::END_OF_FILE, s.end()};
+    } else if (s.skip(RE_WHITESPACE_TOKEN)) {
+        return {Token::WHITESPACE, s.end()};
+    } else if (s.skip(RE_BRACKET_OPEN)) {
+        return {Token::LEFT_CURLY_BRACKET, s.end()};
+    } else if (s.skip(RE_BRACKET_CLOSE)) {
+        return {Token::RIGHT_CURLY_BRACKET, s.end()};
+    } else if (s.skip(RE_SQUARE_BRACKET_OPEN)) {
+        return {Token::LEFT_SQUARE_BRACKET, s.end()};
+    } else if (s.skip(RE_SQUARE_BRACKET_CLOSE)) {
+        return {Token::RIGHT_SQUARE_BRACKET, s.end()};
+    } else if (s.skip(RE_PARENTHESIS_OPEN)) {
+        return {Token::LEFT_PARENTHESIS, s.end()};
+    } else if (s.skip(RE_PARENTHESIS_CLOSE)) {
+        return {Token::RIGHT_PARENTHESIS, s.end()};
+    } else if (s.skip(RE_SEMICOLON)) {
+        return {Token::SEMICOLON, s.end()};
+    } else if (s.skip(RE_COLON)) {
+        return {Token::COLON, s.end()};
+    } else if (s.skip(RE_COMMA)) {
+        return {Token::COMMA, s.end()};
+    } else if (s.skip(RE_HASH)) {
+        return {Token::HASH, s.end()};
+    } else if (s.skip("/*")) {
         // https://www.w3.org/TR/css-syntax-3/#consume-comment
-        _scan.skip(Re::untilAndConsume(Re::word("*/")));
-        return {Token::COMMENT, _scan.end()};
-    } else if (_scan.skip(RE_NUMBER)) {
+        s.skip(Re::untilAndConsume(Re::word("*/")));
+        return {Token::COMMENT, s.end()};
+    } else if (s.skip(RE_NUMBER)) {
         // https://www.w3.org/TR/css-syntax-3/#consume-numeric-token
-        if (_scan.skip(RE_IDENTIFIER)) {
-            return {Token::DIMENSION, _scan.end()};
-        } else if (_scan.skip(Re::single('%'))) {
-            return {Token::PERCENTAGE, _scan.end()};
+        if (s.skip(RE_IDENTIFIER)) {
+            return {Token::DIMENSION, s.end()};
+        } else if (s.skip(Re::single('%'))) {
+            return {Token::PERCENTAGE, s.end()};
         } else {
-            return {Token::NUMBER, _scan.end()};
+            return {Token::NUMBER, s.end()};
         }
-    } else if (_scan.skip(RE_FUNCTION)) {
-        if (_scan.end() == "url(" and _scan.skip(RE_URL)) {
+    } else if (s.skip(RE_FUNCTION)) {
+        if (s.end() == "url(" and s.skip(RE_URL)) {
             // unclear spec
-            return {Token::URL, _scan.end()};
+            return {Token::URL, s.end()};
         }
-        return {Token::FUNCTION, _scan.end()};
-    } else if (_scan.skip(RE_IDENTIFIER)) {
+        return {Token::FUNCTION, s.end()};
+    } else if (s.skip(RE_IDENTIFIER)) {
         // https://www.w3.org/TR/css-syntax-3/#consume-name
-        return {Token::IDENT, _scan.end()};
-    } else if (_scan.skip(RE_AT_KEYWORD)) {
-        return {Token::AT_KEYWORD, _scan.end()};
-    } else if (_scan.skip(RE_STRING)) {
+        return {Token::IDENT, s.end()};
+    } else if (s.skip(RE_AT_KEYWORD)) {
+        return {Token::AT_KEYWORD, s.end()};
+    } else if (s.skip(RE_STRING)) {
         // https://www.w3.org/TR/css-syntax-3/#consume-string-token
-        return {Token::STRING, _scan.end()};
-    } else if (_scan.skip(RE_DELIM)) {
-        return {Token::DELIM, _scan.end()};
+        return {Token::STRING, s.end()};
+    } else if (s.skip(RE_DELIM)) {
+        return {Token::DELIM, s.end()};
     } else {
-        logDebug("error at {#}", _scan.curr());
-        _scan.next();
-        return {Token::OTHER, _scan.end()};
+        logDebug("error at {#}", s.curr());
+        s.next();
+        return {Token::OTHER, s.end()};
     }
 }
 

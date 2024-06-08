@@ -6,7 +6,7 @@
 namespace Web::Css::Tests {
 
 Token nextToken(Io::SScan &s) {
-    return Lexer{s}.curr();
+    return Lexer{s}.peek();
 }
 
 test$(comments) {

@@ -8,7 +8,7 @@ Sst consumeBlock(Lexer &lex, Token::Type term) {
     lex.next();
 
     while (true) {
-        auto token = lex.curr();
+        auto token = lex.peek();
 
         switch (token.type) {
         case Token::END_OF_FILE:
@@ -30,11 +30,11 @@ Sst consumeBlock(Lexer &lex, Token::Type term) {
 // https://www.w3.org/TR/css-syntax-3/#consume-function
 Sst consumeFunc(Lexer &lex) {
     Sst fn = Sst::FUNC;
-    fn.prefix = Box<Sst>{lex.curr()};
+    fn.prefix = Box<Sst>{lex.peek()};
     lex.next();
 
     while (true) {
-        switch (lex.curr().type) {
+        switch (lex.peek().type) {
         case Token::END_OF_FILE:
             logError("unexpected end of file");
             return fn;
@@ -53,7 +53,7 @@ Sst consumeFunc(Lexer &lex) {
 
 // https://www.w3.org/TR/css-syntax-3/#consume-component-value
 Sst consumeComponentValue(Lexer &lex) {
-    switch (lex.curr().type) {
+    switch (lex.peek().type) {
     case Token::LEFT_SQUARE_BRACKET:
         return consumeBlock(lex, Token::RIGHT_SQUARE_BRACKET);
 
@@ -67,7 +67,7 @@ Sst consumeComponentValue(Lexer &lex) {
         return consumeFunc(lex);
 
     default:
-        return lex.curr();
+        return lex.peek();
     }
 }
 
@@ -75,7 +75,7 @@ Sst consumeComponentValue(Lexer &lex) {
 Sst consumeQualifiedRule(Lexer &lex) {
     Sst pre{Sst::LIST};
     while (true) {
-        switch (lex.curr().type) {
+        switch (lex.peek().type) {
         case Token::END_OF_FILE:
             logError("unexpected end of file");
             return pre;
@@ -101,7 +101,7 @@ Sst consumeRuleList(Lexer &lex) {
     Sst ast = Sst::LIST;
 
     while (true) {
-        switch (lex.curr().type) {
+        switch (lex.peek().type) {
         case Token::END_OF_FILE:
             return ast;
 

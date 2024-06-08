@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-io/emit.h>
 #include <karm-io/sscan.h>
 
 namespace Web::Js {
@@ -155,8 +156,10 @@ struct Token {
 
     using enum Type;
 
-    Type type;
+    Type type = INVALID;
     Str data = "";
+
+    Token() = default;
 
     Token(Type type, Str data = "")
         : type(type), data(data) {}
@@ -172,6 +175,8 @@ struct Token {
             panic("invalid token type");
         }
     }
+
+    void repr(Io::Emit &e) const;
 };
 
 static inline Str toStr(Token::Category category) {
@@ -197,5 +202,28 @@ static inline Str toStr(Token::Type type) {
         panic("invalid token type");
     }
 }
+
+struct Lexer {
+    Io::SScan &_scan;
+
+    Lexer(Io::SScan &scan)
+        : _scan(scan) {
+    }
+
+    Token _next(Io::SScan &scan) const;
+
+    Token next() {
+        return _next(_scan);
+    }
+
+    Token peek() const {
+        auto scan = _scan;
+        return _next(scan);
+    }
+
+    bool ended() const {
+        return _scan.ended();
+    }
+};
 
 } // namespace Web::Js

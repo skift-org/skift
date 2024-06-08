@@ -4,6 +4,19 @@
 
 namespace Web::Js {
 
+// MARK: Token -----------------------------------------------------------------
+
+void Token::repr(Io::Emit &e) const {
+    e(
+        "({}::{} {#})",
+        Io::toParamCase(toStr(category())).unwrap(),
+        Io::toParamCase(toStr(type)).unwrap(),
+        data
+    );
+}
+
+// MARK: Lexer -----------------------------------------------------------------
+
 using Str2Token = Cons<Str, Token::Type>;
 
 static constexpr auto _singleCharTokens = [] {
@@ -34,8 +47,6 @@ static constexpr auto _singleCharTokens = [] {
     res['>'] = Token::GREATER_THAN;
     return res;
 }();
-
-// 25 22 10 1 49
 
 static constexpr Array _twoCharTokens = {
     Str2Token{"=>", Token::ARROW},
@@ -122,7 +133,7 @@ static constexpr Array _keywordTokens = {
     Str2Token{"yield", Token::YIELD},
 };
 
-Token nextToken(Io::SScan &s) {
+Token Lexer::_next(Io::SScan &s) const {
     if (s.ended())
         return Token::END_OF_FILE;
 
@@ -168,7 +179,8 @@ Token nextToken(Io::SScan &s) {
         }
     }
 
-    return Token::INVALID;
+    s.next();
+    return {Token::INVALID, s.end()};
 }
 
 } // namespace Web::Js

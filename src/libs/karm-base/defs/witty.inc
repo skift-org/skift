@@ -33,6 +33,7 @@
 "Huh",
 "I blame Cyp",
 "I blame Monax. ",
+"I swear I'm a professional..."
 "I'm not feeling so good...",
 "I'm sorry, Dave",
 "I'm tired of this ;_;",
@@ -96,6 +97,7 @@
 "This error is sponsored by Surfshark",
 "This error message looks sus",
 "This is a feature",
+"This is fine. everything is on fire",
 "This text is random",
 "Time for another coffee-fueled descent into madness",
 "Time to put on the black stripped programming socks",

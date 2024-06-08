@@ -49,13 +49,13 @@ Async::Task<> Driver::runAllAsync() {
 
     if (failed) {
         Sys::errln(
-            " {} {} failled - {}",
-            badEmoji(Sys::now().val()),
+            " {5} failled - {} {}",
             Cli::styled(failed, RED),
-            Cli::styled(witty(Sys::now().val()), NOTE)
+            Cli::styled(witty(Sys::now().val()), NOTE),
+            badEmoji(Sys::now().val())
         );
         Sys::errln(
-            "    {} passed\n",
+            " {5} passed\n",
             Cli::styled(passed, GREEN)
         );
 
@@ -63,10 +63,10 @@ Async::Task<> Driver::runAllAsync() {
     }
 
     Sys::errln(
-        " {} {} passed - {}\n",
-        goodEmoji(Sys::now().val()),
+        "{5} passed - {} {}\n",
         Cli::styled(passed, GREEN),
-        Cli::styled(nice(Sys::now().val()), NOTE)
+        Cli::styled(nice(Sys::now().val()), NOTE),
+        goodEmoji(Sys::now().val())
     );
 
     co_return Ok();

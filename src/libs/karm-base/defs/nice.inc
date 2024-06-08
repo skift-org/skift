@@ -60,6 +60,7 @@
 "We love to see it",
 "We making galvanised steel buildings with this one",
 "We stan a legend",
+"We're barack",
 "Welcome to the cool kids club",
 "Welcome to the server",
 "Well hello friends :^)",

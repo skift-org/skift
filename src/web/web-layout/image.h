@@ -11,7 +11,7 @@ struct ImageFrag : public Frag {
 
     Media::Image _image;
 
-    ImageFrag(Strong<Cssom::Style> style, Media::Image image)
+    ImageFrag(Strong<CSSOM::Computed> style, Media::Image image)
         : Frag(style), _image(image) {
     }
 

@@ -9,10 +9,6 @@
 #include <web-media/query.h>
 #include <web-select/select.h>
 
-#include "web-css/sst.h"
-
-// SPEC COMPLIANCE : everything related to parent/scope is unsupported as well as everything concerning dynamic modification
-
 namespace Web::CSSOM {
 
 // https://www.w3.org/TR/cssom-1/#the-cssstyledeclaration-interface
@@ -46,7 +42,6 @@ struct CSSStyleDeclaration {
 // https://www.w3.org/TR/cssom-1/#the-cssstylerule-interface
 struct CSSStyleRule {
     Select::Selector selector;
-    // Vec<Css::Sst> selector;
 
     Vec<CSSStyleDeclaration> declarations;
 };
@@ -77,14 +72,23 @@ struct CSSSupportsRule {
 // TODO GROUPING RULE
 
 // https://www.w3.org/TR/cssom-1/#the-cssrule-interface
-using CSSRule = Union<CSSStyleRule, CSSFontFaceRule, CSSSupportsRule, CSSMediaRule, CSSImportRule>;
+using CSSRule = Union<
+    CSSStyleRule,
+    CSSFontFaceRule,
+    CSSSupportsRule,
+    CSSMediaRule,
+    CSSImportRule>;
 
 // https:// www.w3.org/TR/cssom-1/#css-style-sheets
 struct StyleSheet {
     Mime::Mime mime = "text/css"_mime;
     Mime::Url href = ""_url;
     Str title = "";
-    Vec<CSSRule> cssRules;
+    Vec<CSSRule> rules;
+};
+
+struct StyleBook {
+    Vec<StyleSheet> styleSheets;
 };
 
 } // namespace Web::CSSOM
@@ -93,7 +97,7 @@ template <>
 struct Karm::Io::Formatter<Web::CSSOM::StyleSheet> {
     Res<usize> format(Io::TextWriter &writer, Web::CSSOM::StyleSheet const &val) {
         usize written = try$(writer.writeRune('{'));
-        for (usize i = 0; i < val.cssRules.len(); i++) {
+        for (usize i = 0; i < val.rules.len(); i++) {
             // written += try$(Io::format(writer, " {#},", val.cssRules[i]));
         }
         written += try$(writer.writeRune('}'));

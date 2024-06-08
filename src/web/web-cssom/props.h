@@ -3,16 +3,16 @@
 #include <karm-mime/url.h>
 #include <web-css/colors.h>
 
-#include "style.h"
+#include "computed.h"
 
 // https://www.w3.org/TR/CSS22/propidx.html
 
-namespace Web::Cssom {
+namespace Web::CSSOM {
 
 // Please keep the props in alphabetical order
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-attachment
-struct BackgroundAttachementProp {
+struct BackgroundAttachmentProp {
     Types::BackgroundAttachment value;
 
     static Str name() { return "background-attachment"; }
@@ -21,7 +21,7 @@ struct BackgroundAttachementProp {
         return Types::BackgroundAttachment::SCROLL;
     }
 
-    void apply(Style &) const {
+    void apply(Computed &) const {
         // TODO
     }
 };
@@ -36,7 +36,7 @@ struct BackgroundColorProp {
         return Css::TRANSPARENT;
     }
 
-    void apply(Style &) const {
+    void apply(Computed &) const {
         // TODO
     }
 };
@@ -51,7 +51,7 @@ struct BackgroundImageProp {
         return NONE;
     }
 
-    void apply(Style &) const {
+    void apply(Computed &) const {
         // computed.backgroundImage = value;
     }
 };
@@ -66,7 +66,7 @@ struct BackgroundPositionProp {
         return {Types::Percent{0}, Types::Percent{0}};
     }
 
-    void apply(Style &) const {
+    void apply(Computed &) const {
         // computed.backgroundPosition = value;
     }
 };
@@ -81,7 +81,7 @@ struct BackgroundRepeatProp {
         return Types::BackgroundRepeat::REPEAT;
     }
 
-    void apply(Style &) const {
+    void apply(Computed &) const {
         // computed.backgroundRepeat = value;
     }
 };
@@ -93,7 +93,7 @@ struct BackgroundShortand {
 
     static Str name() { return "background"; }
 
-    void apply(Style &) const {
+    void apply(Computed &) const {
         // TODO
     }
 };
@@ -108,7 +108,7 @@ struct BorderCollapseProp {
         return Types::BorderCollapse::SEPARATE;
     }
 
-    void apply(Style &) const {
+    void apply(Computed &) const {
         // TODO
     }
 };
@@ -123,7 +123,7 @@ struct BorderColorProp {
         return Css::BLACK;
     }
 
-    void apply(Style &) const {
+    void apply(Computed &) const {
         // TODO
     }
 };
@@ -137,13 +137,13 @@ struct DisplayProps {
         return {Types::Display::FLOW, Types::Display::INLINE};
     }
 
-    void apply(Style &s) const {
+    void apply(Computed &s) const {
         s.display = value;
     }
 };
 
 using _Prop = Union<
-    BackgroundAttachementProp,
+    BackgroundAttachmentProp,
     BackgroundColorProp,
     BackgroundImageProp,
     BackgroundPositionProp,
@@ -163,4 +163,4 @@ struct Prop : public _Prop {
     Important important = Important::NO;
 };
 
-} // namespace Web::Cssom
+} // namespace Web::CSSOM

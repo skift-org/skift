@@ -9,7 +9,7 @@ namespace Web::Layout {
 struct Run : public Frag {
     static constexpr auto TYPE = RUN;
 
-    Run(Strong<Cssom::Style> style, String)
+    Run(Strong<CSSOM::Computed> style, String)
         : Frag(style) {
     }
 

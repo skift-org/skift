@@ -8,9 +8,9 @@
 #include <web-types/float.h>
 #include <web-types/visibility.h>
 
-namespace Web::Cssom {
+namespace Web::CSSOM {
 
-struct Style {
+struct Computed {
     Vec<Types::Background> backgrounds;
     Types::Borders borders;
 
@@ -40,4 +40,4 @@ struct Style {
     Types::Clear clear = Types::Clear::NONE;
 };
 
-} // namespace Web::Cssom
+} // namespace Web::CSSOM

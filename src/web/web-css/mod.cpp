@@ -9,7 +9,7 @@ namespace Web::Css {
 CSSOM::StyleSheet parseStylesheet(Io::SScan &s) {
     Lexer lex{s};
     Sst sst = consumeRuleList(lex);
-    return CSSOM::StyleSheet{.cssRules = parseSST(sst)};
+    return CSSOM::StyleSheet{.rules = parseSST(sst)};
 }
 
 Res<CSSOM::StyleSheet> fetchStylesheet(Mime::Url url) {

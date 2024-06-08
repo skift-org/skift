@@ -31,9 +31,8 @@ struct Pmm : public Hal::Pmm {
     }
 
     Res<> used(Hal::PmmRange prange, Hal::PmmFlags) override {
-        if (not prange.overlaps(_usable)) {
+        if (not prange.overlaps(_usable))
             return Error::invalidInput("range is not in usable memory");
-        }
 
         LockScope scope(_lock);
         try$(prange.ensureAligned(Hal::PAGE_SIZE));
@@ -121,6 +120,21 @@ static Opt<Kmm> _kmm = NONE;
 
 namespace Mem {
 
+Hal::PmmRange _findBitmapSpace(Handover::Payload &payload, usize bitmapSize) {
+    for (auto &record : payload) {
+        if (record.tag != Handover::Tag::FREE)
+            continue;
+
+        if (record.start == 0 and (record.size >= bitmapSize + Hal::PAGE_SIZE))
+            return {record.start + Hal::PAGE_SIZE, bitmapSize};
+
+        if (record.size >= bitmapSize)
+            return {record.start, bitmapSize};
+    }
+
+    logFatal("mem: no usable memory for bitmap");
+}
+
 Res<> init(Handover::Payload &payload) {
     auto usableRange = payload.usableRange<Hal::PmmRange>();
 
@@ -131,9 +145,9 @@ Res<> init(Handover::Payload &payload) {
 
     logInfo("mem: usable range: {x}-{x}", usableRange.start, usableRange.end());
 
-    usize bitsSize = usableRange.size / Hal::PAGE_SIZE / 8;
+    usize bitsSize = Hal::pageAlignUp(usableRange.size / Hal::PAGE_SIZE / 8);
 
-    auto pmmBits = payload.find(bitsSize);
+    auto pmmBits = _findBitmapSpace(payload, bitsSize);
 
     if (pmmBits.empty()) {
         logError("mem: no usable memory for pmm");
@@ -160,7 +174,14 @@ Res<> init(Handover::Payload &payload) {
         }
     }
 
-    try$(_pmm->used({pmmBits.start, pmmBits.size}, Hal::PmmFlags::NONE));
+    Hal::PmmRange firstPage = {0, Hal::PAGE_SIZE};
+
+    if (firstPage.overlaps(usableRange)) {
+        logInfo("mem: marking first page as used...");
+        try$(pmm().used(firstPage, Hal::PmmFlags::NONE));
+    }
+
+    try$(pmm().used({pmmBits.start, pmmBits.size}, Hal::PmmFlags::NONE));
 
     _pmm->dump();
 
@@ -198,16 +219,14 @@ Res<> init(Handover::Payload &payload) {
 } // namespace Mem
 
 Hal::Pmm &pmm() {
-    if (not _pmm) {
+    if (not _pmm)
         logFatal("mem: pmm not initialized yet");
-    }
     return *_pmm;
 }
 
 Hal::Kmm &kmm() {
-    if (not _kmm) {
+    if (not _kmm)
         logFatal("mem: heap not initialized yet");
-    }
     return *_kmm;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/cstr.h>
+#include <karm-base/limits.h>
 #include <karm-base/std.h>
 
 namespace Handover {
@@ -187,12 +188,14 @@ struct Payload {
 
     template <typename R>
     R usableRange() const {
+        bool first = true;
         usize start = 0, end = 0;
 
         for (auto const &r : *this) {
             if (r.tag == Tag::FREE) {
-                if (r.start < start or start == 0) {
+                if (r.start < start or first) {
                     start = r.start;
+                    first = false;
                 }
                 if (r.end() > end) {
                     end = r.end();

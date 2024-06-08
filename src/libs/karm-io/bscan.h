@@ -130,7 +130,7 @@ struct BScan {
 
     always_inline constexpr usize nextBitsbe(usize n) {
         usize r = 0;
-        for (usize i = 0; i < n; i++) {
+        for (usize i = n - 1; i < n; i--) {
             r |= nextBitbe() << i;
         }
         return r;

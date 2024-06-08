@@ -78,7 +78,12 @@ struct Image {
     usize _numsColors;
 
     Res<> readInfoHeader(Io::BScan &s) {
-        s.skip(4); // header size
+        auto start = s.tell();
+        auto size = s.nextU32le(); // header size
+        if (size < 40) {
+            return Error::invalidData("invalid header size");
+        }
+
         _width = s.nextI32le();
         _height = s.nextI32le();
 
@@ -104,6 +109,7 @@ struct Image {
         }
 
         s.skip(4); // important colors
+        s.skip(size - (s.tell() - start));
 
         return Ok();
     }
@@ -119,6 +125,7 @@ struct Image {
             auto r = s.nextU8le();
             s.skip(1); // reserved
 
+            logDebug("palette[{}]: r: {}, g: {}, b: {}", i, r, g, b);
             _palette.pushBack(Gfx::Color{r, g, b});
         }
 
@@ -145,7 +152,14 @@ struct Image {
                 auto color = Gfx::Color{};
                 if (_bpp == 1) {
                     auto bit = s.nextBitbe();
+                    if (bit >= _palette.len())
+                        return Error::invalidData("invalid palette index");
                     color = _palette[bit];
+                } else if (_bpp == 4) {
+                    auto index = s.nextBitsbe(4);
+                    if (index >= _palette.len())
+                        return Error::invalidData("invalid palette index");
+                    color = _palette[index];
                 } else if (_bpp == 8) {
                     auto index = s.nextU8le();
                     if (index >= _palette.len()) {

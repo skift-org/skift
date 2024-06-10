@@ -1,0 +1,7 @@
+{
+    "id": "hideo-shell",
+    "consumes": [
+        "Grund::Bus"
+    ],
+    "provides": []
+}

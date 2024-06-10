@@ -1,0 +1,7 @@
+{
+    "id": "grund-fs",
+    "consumes": [
+        "Grund::Bus"
+    ],
+    "provides": []
+}

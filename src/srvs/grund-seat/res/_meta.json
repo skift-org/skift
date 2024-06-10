@@ -1,0 +1,7 @@
+{
+    "id": "grund-seat",
+    "consumes": [
+        "Grund::Bus"
+    ],
+    "provides": []
+}

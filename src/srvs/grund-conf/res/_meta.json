@@ -1,0 +1,7 @@
+{
+    "id": "grund-conf",
+    "consumes": [
+        "Grund::Bus"
+    ],
+    "provides": []
+}

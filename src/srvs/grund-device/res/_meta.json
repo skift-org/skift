@@ -1,0 +1,7 @@
+{
+    "id": "grund-device",
+    "consumes": [
+        "Grund::Bus"
+    ],
+    "provides": []
+}

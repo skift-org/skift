@@ -1,0 +1,7 @@
+{
+    "id": "grund-dhcp",
+    "consumes": [
+        "Grund::Bus"
+    ],
+    "provides": []
+}

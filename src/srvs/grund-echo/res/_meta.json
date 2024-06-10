@@ -1,0 +1,7 @@
+{
+    "id": "grund-echo",
+    "consumes": [
+        "Grund::Bus"
+    ],
+    "provides": []
+}

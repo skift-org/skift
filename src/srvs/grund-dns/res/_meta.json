@@ -1,0 +1,7 @@
+{
+    "id": "grund-dns",
+    "consumes": [
+        "Grund::Bus"
+    ],
+    "provides": []
+}

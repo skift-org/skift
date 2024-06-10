@@ -1,0 +1,7 @@
+{
+    "id": "grund-net",
+    "consumes": [
+        "Grund::Bus"
+    ],
+    "provides": []
+}

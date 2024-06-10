@@ -1,0 +1,7 @@
+{
+    "id": "grund-audio",
+    "consumes": [
+        "Grund::Bus"
+    ],
+    "provides": []
+}

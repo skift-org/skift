@@ -64,7 +64,7 @@ static Res<Style::Selector> parseSelector(auto prefix) {
     return Ok(currentSelector);
 }
 
-Res<Style::CSSRule> getRuleObject(auto prefix) {
+Res<Style::Rule> getRuleObject(auto prefix) {
     switch (prefix[0].type) {
     case Sst::QUALIFIED_RULE:
     case Sst::FUNC:
@@ -77,22 +77,19 @@ Res<Style::CSSRule> getRuleObject(auto prefix) {
         switch (tok.type) {
         case Token::AT_KEYWORD: {
             if (tok.data == "@font-face") {
-                Style::CSSFontFaceRule parsed;
-                return Ok(parsed);
-            } else if (tok.data == "@suports") {
-                Style::CSSSupportsRule parsed;
+                Style::FontFaceRule parsed;
                 return Ok(parsed);
             } else if (tok.data == "@media") {
                 Style::Query query = Style::Query::combineOr(
                     Style::TypeFeature{Style::Type::SCREEN},
                     Style::WidthFeature::min(Px{1920})
                 );
-                Style::CSSMediaRule parsed(query);
+                Style::MediaRule parsed(query);
                 return Ok(parsed);
             }
         }
         default: {
-            Style::CSSStyleRule parsed = Style::CSSStyleRule(try$(parseSelector(prefix)));
+            Style::StyleRule parsed = Style::StyleRule(try$(parseSelector(prefix)));
             // parsed.selector = try$(parseSelector());
             return Ok(parsed);
         }
@@ -100,7 +97,7 @@ Res<Style::CSSRule> getRuleObject(auto prefix) {
     }
 }
 
-static Res<Style::CSSRule> parseQualifiedRule(Sst rule) {
+static Res<Style::Rule> parseQualifiedRule(Sst rule) {
     auto &prefix = rule.prefix.unwrap()->content;
 
     auto parsed = try$(getRuleObject(prefix));
@@ -118,18 +115,14 @@ static Res<Style::CSSRule> parseQualifiedRule(Sst rule) {
             if (not parsingContent) {
                 if (block[i].token.type != Token::WHITESPACE) {
                     if (block[i].token.type != Token::COLON) {
-                        parsed.visit([&](auto &p) {
-                            p.declarations.pushBack(Style::CSSStyleDeclaration(block[i].token));
-                        });
+                        // ignore
                     } else {
                         parsingContent = true;
                     }
                 }
             } else {
                 if (block[i].token.type != Token::SEMICOLON) {
-                    parsed.visit([&](auto &p) {
-                        last(p.declarations).value.pushBack(block[i].token);
-                    });
+                    // ignore
                 } else {
                     parsingContent = false;
                 }
@@ -143,8 +136,8 @@ static Res<Style::CSSRule> parseQualifiedRule(Sst rule) {
 }
 
 // No spec, we take the SST we built and convert it to a usable list of rules
-static inline Vec<Style::CSSRule> parseSST(Sst sst) {
-    Vec<Style::CSSRule> rules;
+static inline Vec<Style::Rule> parseSST(Sst sst) {
+    Vec<Style::Rule> rules;
     for (usize i = 0; i < sst.content.len(); i++) {
         switch (sst.content[i].type) {
 

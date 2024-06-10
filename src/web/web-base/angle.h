@@ -69,11 +69,19 @@ struct Angle {
     }
 
     bool operator==(Angle const &other) const {
-        return _val == other._val and _unit == other._unit;
+        return toRadian() == other.toRadian();
     }
 
     std::partial_ordering operator<=>(Angle const &other) const {
         return toRadian() <=> other.toRadian();
+    }
+
+    Angle operator+(Angle other) const {
+        return fromRadian(toRadian() + other.toRadian());
+    }
+
+    Angle operator-(Angle other) const {
+        return fromRadian(toRadian() - other.toRadian());
     }
 };
 

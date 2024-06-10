@@ -4,12 +4,22 @@
 #include <web-css/colors.h>
 
 #include "computed.h"
+#include "font-face.h"
 
 // https://www.w3.org/TR/CSS22/propidx.html
 
 namespace Web::Style {
 
-// Please keep the props in alphabetical order
+// https://drafts.csswg.org/css-fonts/#font-metrics-override-desc
+
+struct AscentOverrideProp {
+    Opt<Percent> value;
+    static Str name() { return "ascent-override"; }
+    static auto initial() { return NONE; }
+    void apply(FontFace &f) {
+        f.ascentOverride = value;
+    }
+};
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-attachment
 struct BackgroundAttachmentProp {
@@ -86,18 +96,6 @@ struct BackgroundRepeatProp {
     }
 };
 
-// https://www.w3.org/TR/CSS22/colors.html#propdef-background
-struct BackgroundShortand {
-    // NOTE: We box the value to avoid bloating the Prop union
-    Box<Background> value;
-
-    static Str name() { return "background"; }
-
-    void apply(Computed &) const {
-        // TODO
-    }
-};
-
 // https://www.w3.org/TR/CSS22/tables.html#propdef-border-collapse
 struct BorderCollapseProp {
     BorderCollapse value;
@@ -128,7 +126,19 @@ struct BorderColorProp {
     }
 };
 
-struct DisplayProps {
+// https://drafts.csswg.org/css-fonts/#font-metrics-override-desc
+
+struct DescentOverrideProp {
+    Opt<Percent> value;
+    static Str name() { return "descent-override"; }
+    static auto initial() { return NONE; }
+    void apply(FontFace &f) {
+        f.descentOverride = value;
+    }
+};
+
+// https://www.w3.org/TR/CSS22/visuren.html#propdef-display
+struct DisplayProp {
     Display value;
 
     static Str name() { return "display"; }
@@ -142,15 +152,191 @@ struct DisplayProps {
     }
 };
 
+// https://drafts.csswg.org/css-fonts/#font-display-desc
+struct FontDisplayProp {
+    FontDisplay value;
+
+    static Str name() { return "font-display"; }
+
+    static auto initial() {
+        return FontDisplay::AUTO;
+    }
+
+    void apply(FontFace &f) {
+        f.display = value;
+    }
+};
+
+// https://drafts.csswg.org/css-fonts/#font-family-desc
+struct FontFamilyProp {
+    Vec<Str> value;
+
+    static Str name() { return "font-family"; }
+
+    static auto initial() {
+        return Vec<Str>{"serif"};
+    }
+
+    void apply(FontFace &f) {
+        if (isEmpty(value))
+            return;
+        f.family = value[0];
+    }
+};
+
+// https://drafts.csswg.org/css-fonts/#font-size-desc
+struct FontStretchProp {
+    FontStretch value;
+
+    static Str name() { return "font-stretch"; }
+
+    static auto initial() {
+        return FontStretch::NORMAL;
+    }
+
+    void apply(FontFace &f) {
+        f.stretch = value;
+    }
+};
+
+// https://drafts.csswg.org/css-fonts/#font-style-desc
+struct FontStyleProp {
+    FontStyle value;
+
+    static Str name() { return "font-style"; }
+
+    static auto initial() {
+        return FontStyle::NORMAL;
+    }
+
+    void apply(FontFace &f) {
+        f.style = value;
+    }
+};
+
+// https://drafts.csswg.org/css-fonts/#font-weight-desc
+struct FontWeightProp {
+    FontWeight value;
+
+    static Str name() { return "font-weight"; }
+
+    static auto initial() {
+        return FontWeight::NORMAL;
+    }
+
+    void apply(FontFace &f) {
+        f.weight = value;
+    }
+};
+
+// https://drafts.csswg.org/css-fonts/#font-feature-settings-prop
+struct FontFeatureSettingsProp {
+    Vec<FontFeature> value;
+
+    static Str name() { return "font-feature-settings"; }
+
+    static auto initial() {
+        return Vec<FontFeature>{};
+    }
+
+    void apply(FontFace &f) {
+        f.features = value;
+    }
+};
+
+// https://drafts.csswg.org/css-fonts/#font-variation-settings-prop
+struct FontVariationSettingsProp {
+    Vec<FontVariation> value;
+
+    static Str name() { return "font-variation-settings"; }
+
+    static auto initial() {
+        return Vec<FontVariation>{};
+    }
+
+    void apply(FontFace &f) {
+        f.variations = value;
+    }
+};
+
+// https://drafts.csswg.org/css-fonts/#font-metrics-override-desc
+struct LineGapOverrideProp {
+    Opt<Percent> value;
+    static Str name() { return "line-gap-override"; }
+    static auto initial() { return NONE; }
+    void apply(FontFace &f) {
+        f.lineGapOverride = value;
+    }
+};
+
+// https://drafts.csswg.org/css-fonts-5/#size-adjust-desc
+struct SizeAdjustProp {
+    Opt<Percent> value;
+
+    static Str name() { return "size-adjust"; }
+
+    static auto initial() {
+        return NONE;
+    }
+
+    void apply(FontFace &f) const {
+        f.sizeAdjust = value;
+    }
+};
+
+// https://drafts.csswg.org/css-fonts/#src-desc
+struct SrcProp {
+    Vec<FontSource> value;
+
+    static Str name() { return "src"; }
+
+    static auto initial() {
+        return Vec<FontSource>{};
+    }
+
+    void apply(FontFace &f) const {
+        f.sources = value;
+    }
+};
+
+// https://drafts.csswg.org/css-fonts/#unicode-range-desc
+struct UnicodeRangeProp {
+    Vec<Range<Rune>> value;
+
+    static Str name() { return "unicode-range"; }
+
+    static auto initial() {
+        return Vec<Range<Rune>>{};
+    }
+
+    void apply(FontFace &f) const {
+        f.unicodeRange = value;
+    }
+};
+
 using _Prop = Union<
+    AscentOverrideProp,
     BackgroundAttachmentProp,
     BackgroundColorProp,
     BackgroundImageProp,
     BackgroundPositionProp,
     BackgroundRepeatProp,
-    BackgroundShortand,
+    DisplayProp,
+    DescentOverrideProp,
+    FontDisplayProp,
+    FontFamilyProp,
+    FontStretchProp,
+    FontStyleProp,
+    FontWeightProp,
+    FontFeatureSettingsProp,
+    FontVariationSettingsProp,
+    LineGapOverrideProp,
+    SizeAdjustProp,
+    SrcProp,
+    UnicodeRangeProp
 
-    DisplayProps>;
+    /**/
+    >;
 
 enum struct Important {
     NO,

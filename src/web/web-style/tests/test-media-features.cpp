@@ -1,16 +1,16 @@
 #include <karm-test/macros.h>
-#include <web-media/features.h>
+#include <web-style/media.h>
 
-namespace Web::Media::Tests {
+namespace Web::Style::Tests {
 
 static Media const TEST_MEDIA = {
     .type = Type::SCREEN,
-    .width = Types::Px{1920},
-    .height = Types::Px{1080},
+    .width = Px{1920},
+    .height = Px{1080},
     .aspectRatio = 16.0 / 9.0,
     .orientation = Orientation::LANDSCAPE,
 
-    .resolution = Types::Resolution::fromDpi(96),
+    .resolution = Resolution::fromDpi(96),
     .scan = Scan::PROGRESSIVE,
     .grid = false,
     .update = Update::NONE,
@@ -35,26 +35,26 @@ test$("feature-type") {
 }
 
 test$("feature-width") {
-    expect$(WidthFeature::min(Types::Px{1000})
+    expect$(WidthFeature::min(Px{1000})
                 .match(TEST_MEDIA));
 
-    expect$(WidthFeature::max(Types::Px{2000})
+    expect$(WidthFeature::max(Px{2000})
                 .match(TEST_MEDIA));
 
-    expect$(WidthFeature::exact(Types::Px{1920})
+    expect$(WidthFeature::exact(Px{1920})
                 .match(TEST_MEDIA));
 
     return Ok();
 }
 
 test$("feature-height") {
-    expect$(HeightFeature::min(Types::Px{1000})
+    expect$(HeightFeature::min(Px{1000})
                 .match(TEST_MEDIA));
 
-    expect$(HeightFeature::max(Types::Px{2000})
+    expect$(HeightFeature::max(Px{2000})
                 .match(TEST_MEDIA));
 
-    expect$(HeightFeature::exact(Types::Px{1080})
+    expect$(HeightFeature::exact(Px{1080})
                 .match(TEST_MEDIA));
 
     return Ok();
@@ -81,13 +81,13 @@ test$("feature-orientation") {
 }
 
 test$("feature-resolution") {
-    expect$(ResolutionFeature::min(Types::Resolution::fromDpi(96))
+    expect$(ResolutionFeature::min(Resolution::fromDpi(96))
                 .match(TEST_MEDIA));
 
-    expect$(ResolutionFeature::max(Types::Resolution::fromDpi(96))
+    expect$(ResolutionFeature::max(Resolution::fromDpi(96))
                 .match(TEST_MEDIA));
 
-    expect$(ResolutionFeature::exact(Types::Resolution::fromDpi(96))
+    expect$(ResolutionFeature::exact(Resolution::fromDpi(96))
                 .match(TEST_MEDIA));
 
     return Ok();
@@ -202,4 +202,4 @@ test$("feature-any-hover") {
     return Ok();
 }
 
-} // namespace Web::Media::Tests
+} // namespace Web::Style::Tests

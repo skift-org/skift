@@ -11,7 +11,7 @@ struct ImageFrag : public Frag {
 
     Media::Image _image;
 
-    ImageFrag(Strong<CSSOM::Computed> style, Media::Image image)
+    ImageFrag(Strong<Style::Computed> style, Media::Image image)
         : Frag(style), _image(image) {
     }
 
@@ -19,10 +19,10 @@ struct ImageFrag : public Frag {
         return TYPE;
     }
 
-    void layout(Types::RectPx) override {
+    void layout(RectPx) override {
     }
 
-    Types::Vec2Px size(Types::Vec2Px) override {
+    Vec2Px size(Vec2Px) override {
         return {};
     }
 };

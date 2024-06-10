@@ -5,7 +5,7 @@
 #include <karm-math/rect.h>
 #include <karm-math/spacing.h>
 
-namespace Web::Types {
+namespace Web {
 
 /// Represents a physical pixel on the actual device screen.
 using PhysicalPixel = Distinct<i32, struct _PhysicalPixel>;
@@ -419,11 +419,11 @@ struct LengthContext {
     }
 };
 
-} // namespace Web::Types
+} // namespace Web
 
 template <>
-struct Karm::Io::Formatter<Web::Types::Length> {
-    Res<usize> format(Io::TextWriter &writer, Web::Types::Length const &val) {
+struct Karm::Io::Formatter<Web::Length> {
+    Res<usize> format(Io::TextWriter &writer, Web::Length const &val) {
         usize written = try$(Io::format(writer, " {#}{#}", val.val(), val.unit()));
         return Ok(written);
     }

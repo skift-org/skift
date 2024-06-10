@@ -2,8 +2,8 @@
 
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
-#include <web-cssom/computed.h>
-#include <web-types/length.h>
+#include <web-style/computed.h>
+#include <web-base/length.h>
 
 namespace Web::Layout {
 
@@ -20,23 +20,23 @@ struct Frag {
 
     using enum Type;
 
-    Strong<CSSOM::Computed> _style;
+    Strong<Style::Computed> _style;
 
-    Types::RectPx _borderBox;
-    Types::SpacingPx _BorderPadding;
-    Types::SpacingPx _margin;
+    RectPx _borderBox;
+    SpacingPx _BorderPadding;
+    SpacingPx _margin;
 
-    Frag(Strong<CSSOM::Computed> style)
+    Frag(Strong<Style::Computed> style)
         : _style(style) {
     }
 
     virtual ~Frag() = default;
     virtual Type type() const = 0;
 
-    virtual void layout(Types::RectPx) = 0;
-    virtual Types::Vec2Px size(Types::Vec2Px) = 0;
+    virtual void layout(RectPx) = 0;
+    virtual Vec2Px size(Vec2Px) = 0;
 
-    CSSOM::Computed const &style() const {
+    Style::Computed const &style() const {
         return *_style;
     }
 
@@ -64,7 +64,7 @@ struct Flow : public Frag {
         return *_frags[frag];
     }
 
-    CSSOM::Computed const &styleAt(usize frag) const {
+    Style::Computed const &styleAt(usize frag) const {
         return _frags[frag]->style();
     }
 };

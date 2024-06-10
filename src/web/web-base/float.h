@@ -2,7 +2,7 @@
 
 #include "length.h"
 
-namespace Web::Types {
+namespace Web {
 
 enum struct Clear {
     NONE,
@@ -23,4 +23,4 @@ enum struct Float {
     RIGHT,
 };
 
-} // namespace Web::Types
+} // namespace Web

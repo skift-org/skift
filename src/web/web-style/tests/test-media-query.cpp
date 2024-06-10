@@ -1,16 +1,16 @@
 #include <karm-test/macros.h>
-#include <web-media/query.h>
+#include <web-style/media.h>
 
-namespace Web::Media::Tests {
+namespace Web::Style::Tests {
 
 static Media const TEST_MEDIA = {
     .type = Type::SCREEN,
-    .width = Types::Px(1920),
-    .height = Types::Px(1080),
+    .width = Px(1920),
+    .height = Px(1080),
     .aspectRatio = 16.0 / 9.0,
     .orientation = Orientation::LANDSCAPE,
 
-    .resolution = Types::Resolution::fromDpi(96),
+    .resolution = Resolution::fromDpi(96),
     .scan = Scan::PROGRESSIVE,
     .grid = false,
     .update = Update::NONE,
@@ -30,7 +30,7 @@ static Media const TEST_MEDIA = {
 test$("logical-and") {
     auto query = Query::combineAnd(
         TypeFeature{Type::SCREEN},
-        WidthFeature::min(Types::Px{1920})
+        WidthFeature::min(Px{1920})
     );
 
     expect$(query.match(TEST_MEDIA));
@@ -41,7 +41,7 @@ test$("logical-and") {
 test$("logical-or") {
     auto query = Query::combineOr(
         TypeFeature{Type::SCREEN},
-        WidthFeature::min(Types::Px{1920})
+        WidthFeature::min(Px{1920})
     );
 
     expect$(query.match(TEST_MEDIA));
@@ -65,4 +65,4 @@ test$("logical-only") {
     return Ok();
 }
 
-} // namespace Web::Media::Tests
+} // namespace Web::Style::Tests

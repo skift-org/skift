@@ -3,7 +3,7 @@
 #include <karm-base/distinct.h>
 #include <karm-base/std.h>
 
-namespace Web::Types {
+namespace Web {
 
 using Percent = Distinct<f64, struct _PercentTag>;
 
@@ -22,4 +22,4 @@ struct PercentOr {
     }
 };
 
-} // namespace Web::Types
+} // namespace Web

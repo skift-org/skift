@@ -3,7 +3,7 @@
 #include <karm-io/emit.h>
 #include <karm-io/funcs.h>
 #include <karm-sys/file.h>
-#include <web-cssom/stylesheet.h>
+#include <web-style/stylesheet.h>
 
 #include "builder.h"
 #include "lexer.h"

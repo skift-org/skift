@@ -1,6 +1,6 @@
 #include "select.h"
 
-namespace Web::Select {
+namespace Web::Style {
 
 bool match(Selector const &sel, Dom::Element &el);
 
@@ -84,4 +84,4 @@ bool match(Selector const &sel, Dom::Element &el) {
     });
 }
 
-} // namespace Web::Select
+} // namespace Web::Style

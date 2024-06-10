@@ -1,19 +1,19 @@
 #pragma once
 
-#include <web-cssom/stylesheet.h>
+#include <web-style/stylesheet.h>
 
 #include "sst.h"
 
 namespace Web::Css {
 
-static Res<Select::Selector> getSelectorElement(Vec<Sst> const &prefix, usize &i) {
+static Res<Style::Selector> getSelectorElement(Vec<Sst> const &prefix, usize &i) {
     logDebug("new selector found {}", prefix[i].token);
 
     switch (prefix[i].token.type) {
     case Token::HASH:
-        return Ok(Select::IdSelector{next(prefix[i].token.data, 1)});
+        return Ok(Style::IdSelector{next(prefix[i].token.data, 1)});
     case Token::IDENT:
-        return Ok(Select::TypeSelector{TagName::make(prefix[i].token.data, Web::HTML)});
+        return Ok(Style::TypeSelector{TagName::make(prefix[i].token.data, Web::HTML)});
     case Token::DELIM:
         if (prefix[i].token.data == ".") {
             if (i >= prefix.len()) {
@@ -21,29 +21,29 @@ static Res<Select::Selector> getSelectorElement(Vec<Sst> const &prefix, usize &i
             }
             i++;
             logDebug("new selector found {}", prefix[i].token);
-            return Ok(Select::ClassSelector{prefix[i].token.data});
+            return Ok(Style::ClassSelector{prefix[i].token.data});
         } else if (prefix[i].token.data == "*") {
-            return Ok(Select::UniversalSelector{});
+            return Ok(Style::UniversalSelector{});
         }
 
     default:
-        return Ok(Select::ClassSelector{prefix[i].token.data});
+        return Ok(Style::ClassSelector{prefix[i].token.data});
     }
 }
 
-static Res<Select::Selector> composeSelectors(Select::Selector sel1, Select::Selector sel2) {
+static Res<Style::Selector> composeSelectors(Style::Selector sel1, Style::Selector sel2) {
     logDebug("composing {} and {}", sel1, sel2);
-    if (!sel1.is<Select::Infix>()) {
-        return Ok(Select::Selector::and_(Vec<Select::Selector>{sel1, sel2}));
+    if (!sel1.is<Style::Infix>()) {
+        return Ok(Style::Selector::and_(Vec<Style::Selector>{sel1, sel2}));
     }
 
     return Ok(sel1);
 }
 
-static Res<Select::Selector> parseSelector(auto prefix) {
+static Res<Style::Selector> parseSelector(auto prefix) {
     bool ignoreWhitespace = true;
     usize i = 0;
-    Select::Selector currentSelector = try$(getSelectorElement(prefix, i));
+    Style::Selector currentSelector = try$(getSelectorElement(prefix, i));
     i++;
     while (i < prefix.len()) {
         if (prefix[i].type == Sst::TOKEN) {
@@ -64,7 +64,7 @@ static Res<Select::Selector> parseSelector(auto prefix) {
     return Ok(currentSelector);
 }
 
-Res<CSSOM::CSSRule> getRuleObject(auto prefix) {
+Res<Style::CSSRule> getRuleObject(auto prefix) {
     switch (prefix[0].type) {
     case Sst::QUALIFIED_RULE:
     case Sst::FUNC:
@@ -77,22 +77,22 @@ Res<CSSOM::CSSRule> getRuleObject(auto prefix) {
         switch (tok.type) {
         case Token::AT_KEYWORD: {
             if (tok.data == "@font-face") {
-                CSSOM::CSSFontFaceRule parsed;
+                Style::CSSFontFaceRule parsed;
                 return Ok(parsed);
             } else if (tok.data == "@suports") {
-                CSSOM::CSSSupportsRule parsed;
+                Style::CSSSupportsRule parsed;
                 return Ok(parsed);
             } else if (tok.data == "@media") {
-                Media::Query query = Media::Query::combineOr(
-                    Media::TypeFeature{Media::Type::SCREEN},
-                    Media::WidthFeature::min(Types::Px{1920})
+                Style::Query query = Style::Query::combineOr(
+                    Style::TypeFeature{Style::Type::SCREEN},
+                    Style::WidthFeature::min(Px{1920})
                 );
-                CSSOM::CSSMediaRule parsed(query);
+                Style::CSSMediaRule parsed(query);
                 return Ok(parsed);
             }
         }
         default: {
-            CSSOM::CSSStyleRule parsed = CSSOM::CSSStyleRule(try$(parseSelector(prefix)));
+            Style::CSSStyleRule parsed = Style::CSSStyleRule(try$(parseSelector(prefix)));
             // parsed.selector = try$(parseSelector());
             return Ok(parsed);
         }
@@ -100,7 +100,7 @@ Res<CSSOM::CSSRule> getRuleObject(auto prefix) {
     }
 }
 
-static Res<CSSOM::CSSRule> parseQualifiedRule(Sst rule) {
+static Res<Style::CSSRule> parseQualifiedRule(Sst rule) {
     auto &prefix = rule.prefix.unwrap()->content;
 
     auto parsed = try$(getRuleObject(prefix));
@@ -119,7 +119,7 @@ static Res<CSSOM::CSSRule> parseQualifiedRule(Sst rule) {
                 if (block[i].token.type != Token::WHITESPACE) {
                     if (block[i].token.type != Token::COLON) {
                         parsed.visit([&](auto &p) {
-                            p.declarations.pushBack(CSSOM::CSSStyleDeclaration(block[i].token));
+                            p.declarations.pushBack(Style::CSSStyleDeclaration(block[i].token));
                         });
                     } else {
                         parsingContent = true;
@@ -143,8 +143,8 @@ static Res<CSSOM::CSSRule> parseQualifiedRule(Sst rule) {
 }
 
 // No spec, we take the SST we built and convert it to a usable list of rules
-static inline Vec<CSSOM::CSSRule> parseSST(Sst sst) {
-    Vec<CSSOM::CSSRule> rules;
+static inline Vec<Style::CSSRule> parseSST(Sst sst) {
+    Vec<Style::CSSRule> rules;
     for (usize i = 0; i < sst.content.len(); i++) {
         switch (sst.content[i].type) {
 

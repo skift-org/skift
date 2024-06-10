@@ -40,7 +40,7 @@ struct FlexFlow : public Flow {
         });
     }
 
-    void layout(Types::RectPx bound) override {
+    void layout(RectPx bound) override {
         _clear();
         _createItems();
         _sortByOrder();
@@ -50,7 +50,7 @@ struct FlexFlow : public Flow {
         }
     }
 
-    Types::Vec2Px size(Types::Vec2Px) override {
+    Vec2Px size(Vec2Px) override {
         return {};
     }
 };

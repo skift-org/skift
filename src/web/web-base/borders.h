@@ -2,7 +2,7 @@
 
 #include <karm-gfx/paint.h>
 
-namespace Web::Types {
+namespace Web {
 
 enum struct BorderEdge {
     ALL,
@@ -53,4 +53,4 @@ struct Borders {
     }
 };
 
-} // namespace Web::Types
+} // namespace Web

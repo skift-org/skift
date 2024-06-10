@@ -4,7 +4,7 @@
 #include <web-dom/element.h>
 #include <web-html/tags.h>
 
-namespace Web::Select {
+namespace Web::Style {
 
 // 17. Calculating a selector’s specificity
 // https://www.w3.org/TR/selectors-4/#specificity-rules
@@ -242,46 +242,46 @@ Spec spec(Selector const &sel);
 
 bool match(Selector const &sel, Dom::Element &el);
 
-} // namespace Web::Select
+} // namespace Web::Style
 
 template <>
-struct Karm::Io::Formatter<Web::Select::Spec> {
-    Res<usize> format(Io::TextWriter &writer, Web::Select::Spec const &val) {
+struct Karm::Io::Formatter<Web::Style::Spec> {
+    Res<usize> format(Io::TextWriter &writer, Web::Style::Spec const &val) {
         return Io::format(writer, "{}-{}-{}", val.a, val.b, val.c);
     }
 };
 
 template <>
-struct Karm::Io::Formatter<Web::Select::AnB> {
-    Res<usize> format(Io::TextWriter &writer, Web::Select::AnB const &val) {
+struct Karm::Io::Formatter<Web::Style::AnB> {
+    Res<usize> format(Io::TextWriter &writer, Web::Style::AnB const &val) {
         return Io::format(writer, "rhs{}n{}{}", val.a, val.b < 0 ? "-"s : "+"s, val.b);
     }
 };
 
 template <>
-struct Karm::Io::Formatter<Web::Select::UniversalSelector> {
-    Res<usize> format(Io::TextWriter &writer, Web::Select::UniversalSelector const &) {
+struct Karm::Io::Formatter<Web::Style::UniversalSelector> {
+    Res<usize> format(Io::TextWriter &writer, Web::Style::UniversalSelector const &) {
         return Io::format(writer, "*");
     }
 };
 
-Reflectable$(Web::Select::Infix, type, lhs, rhs);
+Reflectable$(Web::Style::Infix, type, lhs, rhs);
 
-Reflectable$(Web::Select::Nfix, type, inners);
+Reflectable$(Web::Style::Nfix, type, inners);
 
-Reflectable$(Web::Select::TypeSelector, type);
+Reflectable$(Web::Style::TypeSelector, type);
 
-Reflectable$(Web::Select::IdSelector, id);
+Reflectable$(Web::Style::IdSelector, id);
 
-Reflectable$(Web::Select::ClassSelector, class_);
+Reflectable$(Web::Style::ClassSelector, class_);
 
-Reflectable$(Web::Select::PseudoClass, type, extra);
+Reflectable$(Web::Style::PseudoClass, type, extra);
 
-Reflectable$(Web::Select::AttributeSelector, name, value);
+Reflectable$(Web::Style::AttributeSelector, name, value);
 
 template <>
-struct Karm::Io::Formatter<Web::Select::Selector> {
-    Res<usize> format(Io::TextWriter &writer, Web::Select::Selector const &val) {
+struct Karm::Io::Formatter<Web::Style::Selector> {
+    Res<usize> format(Io::TextWriter &writer, Web::Style::Selector const &val) {
         return val.visit([&](auto const &v) -> Res<usize> {
             return Io::format(writer, "{}", v);
         });

@@ -1,12 +1,12 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "web-select.tests",
+    "id": "web-style.tests",
     "type": "lib",
     "props": {
         "cpp-excluded": true
     },
     "requires": [
-        "web-select",
+        "web-style",
         "karm-test"
     ],
     "injects": [

@@ -1,10 +1,13 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "web-types",
+    "id": "web-style",
     "type": "lib",
-    "description": "Implementation of web units (https://drafts.csswg.org/css-values)",
+    "description": "The Stylish CSS styling engine",
     "requires": [
         "karm-logger",
-        "web-base"
+        "web-base",
+        "web-html",
+        "web-svg",
+        "web-mathml"
     ]
 }

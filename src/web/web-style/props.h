@@ -7,18 +7,18 @@
 
 // https://www.w3.org/TR/CSS22/propidx.html
 
-namespace Web::CSSOM {
+namespace Web::Style {
 
 // Please keep the props in alphabetical order
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-attachment
 struct BackgroundAttachmentProp {
-    Types::BackgroundAttachment value;
+    BackgroundAttachment value;
 
     static Str name() { return "background-attachment"; }
 
     static auto initial() {
-        return Types::BackgroundAttachment::SCROLL;
+        return BackgroundAttachment::SCROLL;
     }
 
     void apply(Computed &) const {
@@ -58,12 +58,12 @@ struct BackgroundImageProp {
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-position
 struct BackgroundPositionProp {
-    Types::BackgroundPosition value;
+    BackgroundPosition value;
 
     static Str name() { return "background-position"; }
 
-    static Types::BackgroundPosition initial() {
-        return {Types::Percent{0}, Types::Percent{0}};
+    static BackgroundPosition initial() {
+        return {Percent{0}, Percent{0}};
     }
 
     void apply(Computed &) const {
@@ -73,12 +73,12 @@ struct BackgroundPositionProp {
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-repeat
 struct BackgroundRepeatProp {
-    Types::BackgroundRepeat value;
+    BackgroundRepeat value;
 
     static Str name() { return "background-repeat"; }
 
-    static Types::BackgroundRepeat initial() {
-        return Types::BackgroundRepeat::REPEAT;
+    static BackgroundRepeat initial() {
+        return BackgroundRepeat::REPEAT;
     }
 
     void apply(Computed &) const {
@@ -89,7 +89,7 @@ struct BackgroundRepeatProp {
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background
 struct BackgroundShortand {
     // NOTE: We box the value to avoid bloating the Prop union
-    Box<Types::Background> value;
+    Box<Background> value;
 
     static Str name() { return "background"; }
 
@@ -100,12 +100,12 @@ struct BackgroundShortand {
 
 // https://www.w3.org/TR/CSS22/tables.html#propdef-border-collapse
 struct BorderCollapseProp {
-    Types::BorderCollapse value;
+    BorderCollapse value;
 
     static Str name() { return "border-collapse"; }
 
     static auto initial() {
-        return Types::BorderCollapse::SEPARATE;
+        return BorderCollapse::SEPARATE;
     }
 
     void apply(Computed &) const {
@@ -129,12 +129,12 @@ struct BorderColorProp {
 };
 
 struct DisplayProps {
-    Types::Display value;
+    Display value;
 
     static Str name() { return "display"; }
 
-    static Types::Display initial() {
-        return {Types::Display::FLOW, Types::Display::INLINE};
+    static Display initial() {
+        return {Display::FLOW, Display::INLINE};
     }
 
     void apply(Computed &s) const {
@@ -163,4 +163,4 @@ struct Prop : public _Prop {
     Important important = Important::NO;
 };
 
-} // namespace Web::CSSOM
+} // namespace Web::Style

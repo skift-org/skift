@@ -2,7 +2,7 @@
 
 #include <karm-math/const.h>
 
-namespace Web::Types {
+namespace Web {
 
 // 7.1. MARK: Angle Units: the <angle> type and deg, grad, rad, turn units
 // https://drafts.csswg.org/css-values/#angles
@@ -77,4 +77,4 @@ struct Angle {
     }
 };
 
-} // namespace Web::Types
+} // namespace Web

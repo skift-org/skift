@@ -23,10 +23,10 @@ struct InlineFlow : public Flow {
         return TYPE;
     }
 
-    void layout(Types::RectPx) override {
+    void layout(RectPx) override {
     }
 
-    Types::Vec2Px size(Types::Vec2Px) override {
+    Vec2Px size(Vec2Px) override {
         return {};
     }
 };

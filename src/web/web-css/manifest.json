@@ -6,6 +6,6 @@
     "requires": [
         "karm-sys",
         "web-base",
-        "web-select"
+        "web-style"
     ]
 }

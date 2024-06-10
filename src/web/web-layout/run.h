@@ -9,7 +9,7 @@ namespace Web::Layout {
 struct Run : public Frag {
     static constexpr auto TYPE = RUN;
 
-    Run(Strong<CSSOM::Computed> style, String)
+    Run(Strong<Style::Computed> style, String)
         : Frag(style) {
     }
 
@@ -17,10 +17,10 @@ struct Run : public Frag {
         return TYPE;
     }
 
-    void layout(Types::RectPx) override {
+    void layout(RectPx) override {
     }
 
-    Types::Vec2Px size(Types::Vec2Px) override {
+    Vec2Px size(Vec2Px) override {
         return {};
     }
 };

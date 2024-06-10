@@ -1,7 +1,7 @@
 #include <karm-test/macros.h>
-#include <web-select/select.h>
+#include <web-style/select.h>
 
-namespace Web::Select::Tests {
+namespace Web::Style::Tests {
 
 test$("select-class-spec") {
     Selector sel = ClassSelector{"foo"s};
@@ -11,4 +11,4 @@ test$("select-class-spec") {
     return Ok();
 }
 
-} // namespace Web::Select::Tests
+} // namespace Web::Style::Tests

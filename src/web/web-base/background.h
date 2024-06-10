@@ -6,7 +6,7 @@
 #include "length.h"
 #include "percent.h"
 
-namespace Web::Types {
+namespace Web {
 
 enum struct BackgroundAttachment {
     SCROLL,
@@ -63,4 +63,4 @@ struct Background {
     BackgroundRepeat repeat;
 };
 
-} // namespace Web::Types
+} // namespace Web

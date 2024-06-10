@@ -2,7 +2,7 @@
 
 #include <karm-math/const.h>
 
-namespace Web::Types {
+namespace Web {
 
 // 7.2. MARK: Duration Units: the <time> type and s, ms units
 // https://drafts.csswg.org/css-values/#time
@@ -61,4 +61,4 @@ struct Time {
     }
 };
 
-} // namespace Web::Types
+} // namespace Web

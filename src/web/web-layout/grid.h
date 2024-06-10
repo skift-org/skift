@@ -41,7 +41,7 @@ struct GridFlow : public Flow {
         });
     }
 
-    void layout(Types::RectPx bound) override {
+    void layout(RectPx bound) override {
         _clear();
         _createCells();
         _sortByOrder();
@@ -51,7 +51,7 @@ struct GridFlow : public Flow {
         }
     }
 
-    Types::Vec2Px size(Types::Vec2Px) override {
+    Vec2Px size(Vec2Px) override {
         return {};
     }
 };

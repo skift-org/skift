@@ -6,10 +6,11 @@
 #include <karm-mime/mime.h>
 #include <karm-mime/url.h>
 #include <web-css/lexer.h>
-#include <web-media/query.h>
-#include <web-select/select.h>
 
-namespace Web::CSSOM {
+#include "media.h"
+#include "select.h"
+
+namespace Web::Style {
 
 // https://www.w3.org/TR/cssom-1/#the-cssstyledeclaration-interface
 struct CSSStyleDeclaration {
@@ -41,7 +42,7 @@ struct CSSStyleDeclaration {
 
 // https://www.w3.org/TR/cssom-1/#the-cssstylerule-interface
 struct CSSStyleRule {
-    Select::Selector selector;
+    Selector selector;
 
     Vec<CSSStyleDeclaration> declarations;
 };
@@ -53,7 +54,7 @@ struct CSSImportRule {
 
 // https://www.w3.org/TR/css-conditional-3/#the-cssmediarule-interface
 struct CSSMediaRule {
-    Media::Query media;
+    Query media;
     Vec<CSSStyleDeclaration> declarations;
 };
 
@@ -91,11 +92,11 @@ struct StyleBook {
     Vec<StyleSheet> styleSheets;
 };
 
-} // namespace Web::CSSOM
+} // namespace Web::Style
 
 template <>
-struct Karm::Io::Formatter<Web::CSSOM::StyleSheet> {
-    Res<usize> format(Io::TextWriter &writer, Web::CSSOM::StyleSheet const &val) {
+struct Karm::Io::Formatter<Web::Style::StyleSheet> {
+    Res<usize> format(Io::TextWriter &writer, Web::Style::StyleSheet const &val) {
         usize written = try$(writer.writeRune('{'));
         for (usize i = 0; i < val.rules.len(); i++) {
             // written += try$(Io::format(writer, " {#},", val.cssRules[i]));
@@ -106,10 +107,10 @@ struct Karm::Io::Formatter<Web::CSSOM::StyleSheet> {
     }
 };
 
-Reflectable$(Web::CSSOM::CSSStyleDeclaration, propertyName, value);
+Reflectable$(Web::Style::CSSStyleDeclaration, propertyName, value);
 
-Reflectable$(Web::CSSOM::CSSStyleRule, selector, declarations);
-Reflectable$(Web::CSSOM::CSSFontFaceRule, selector, declarations);
-Reflectable$(Web::CSSOM::CSSImportRule, declarations);
-Reflectable$(Web::CSSOM::CSSMediaRule, media, declarations);
-Reflectable$(Web::CSSOM::CSSSupportsRule, declarations);
+Reflectable$(Web::Style::CSSStyleRule, selector, declarations);
+Reflectable$(Web::Style::CSSFontFaceRule, selector, declarations);
+Reflectable$(Web::Style::CSSImportRule, declarations);
+Reflectable$(Web::Style::CSSMediaRule, media, declarations);
+Reflectable$(Web::Style::CSSSupportsRule, declarations);

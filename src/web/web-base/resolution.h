@@ -3,7 +3,7 @@
 #include <karm-io/fmt.h>
 #include <karm-math/const.h>
 
-namespace Web::Types {
+namespace Web {
 
 // 7.4. MARK: Resolution Units: the <resolution> type and dpi, dpcm, dppx units
 // https://drafts.csswg.org/css-values/#resolution
@@ -93,11 +93,11 @@ struct Resolution {
     }
 };
 
-} // namespace Web::Types
+} // namespace Web
 
 template <>
-struct Karm::Io::Formatter<Web::Types::Resolution> {
-    Res<usize> format(Io::TextWriter &writer, Web::Types::Resolution const &val) {
+struct Karm::Io::Formatter<Web::Resolution> {
+    Res<usize> format(Io::TextWriter &writer, Web::Resolution const &val) {
         usize written = try$(Io::format(writer, " {#}{#}", val.val(), val.unit()));
         return Ok(written);
     }

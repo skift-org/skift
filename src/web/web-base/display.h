@@ -3,7 +3,7 @@
 #include <karm-base/panic.h>
 #include <karm-base/std.h>
 
-namespace Web::Types {
+namespace Web {
 
 // 2. MARK: Box Layout Modes: the display property
 // https://www.w3.org/TR/css-display-3/#the-display-properties
@@ -149,4 +149,4 @@ struct Display {
     }
 };
 
-} // namespace Web::Types
+} // namespace Web

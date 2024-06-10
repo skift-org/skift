@@ -1,11 +1,11 @@
 #pragma once
 
-#include <web-cssom/stylesheet.h>
+#include <web-style/stylesheet.h>
 
 namespace Web::Css {
 
-CSSOM::StyleSheet parseStylesheet(Io::SScan &s);
+Style::StyleSheet parseStylesheet(Io::SScan &s);
 
-Res<CSSOM::StyleSheet> fetchStylesheet(Mime::Url url);
+Res<Style::StyleSheet> fetchStylesheet(Mime::Url url);
 
 } // namespace Web::Css

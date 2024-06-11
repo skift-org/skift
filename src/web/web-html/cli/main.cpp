@@ -24,7 +24,7 @@ Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
         Sys::println("{}", doc);
 
         co_return Ok();
-    } else if (verb == "dump-token") {
+    } else if (verb == "dump-tokens") {
         auto file = co_try$(Sys::File::open(url));
         auto buf = co_try$(Io::readAllUtf8(file));
 
@@ -51,7 +51,7 @@ Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
 
         co_return Ok();
     } else {
-        Sys::errln("unknown verb: {} (expected: dump-dom, dump-token)\n", verb);
+        Sys::errln("unknown verb: {} (expected: dump-dom, dump-tokens)\n", verb);
         co_return Error::invalidInput();
     }
 }

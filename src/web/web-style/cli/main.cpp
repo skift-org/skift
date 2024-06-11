@@ -20,7 +20,7 @@ Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
         });
         co_return Ok();
     } else {
-        Sys::errln("unknown verb: {} (expected: dump-stylesheet, dump-sst, dump-token)\n", verb);
+        Sys::errln("unknown verb: {} (expected: list-props)\n", verb);
         co_return Error::invalidInput();
     }
 }

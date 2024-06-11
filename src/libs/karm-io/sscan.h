@@ -179,9 +179,7 @@ struct _SScan {
     /// Check if the expression is ahead or not.
     bool ahead(Re::Expr auto expr) {
         auto rollback = rollbackPoint();
-        if (not expr(*this))
-            return false;
-        return true;
+        return expr(*this);
     }
 
     /// Check if the expression matches or not.

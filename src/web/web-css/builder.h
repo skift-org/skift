@@ -66,7 +66,7 @@ static Res<Style::Selector> parseSelector(auto prefix) {
 
 Res<Style::Rule> getRuleObject(auto prefix) {
     switch (prefix[0].type) {
-    case Sst::QUALIFIED_RULE:
+    case Sst::RULE:
     case Sst::FUNC:
     case Sst::DECL:
     case Sst::LIST:
@@ -106,7 +106,7 @@ static Res<Style::Rule> parseQualifiedRule(Sst rule) {
     bool parsingContent = false;
     for (usize i = 0; i < block.len(); i++) {
         switch (block[i].type) {
-        case Sst::QUALIFIED_RULE:
+        case Sst::RULE:
         case Sst::DECL:
         case Sst::LIST:
         case Sst::BLOCK:
@@ -141,7 +141,7 @@ static inline Vec<Style::Rule> parseSST(Sst sst) {
     for (usize i = 0; i < sst.content.len(); i++) {
         switch (sst.content[i].type) {
 
-        case Sst::QUALIFIED_RULE:
+        case Sst::RULE:
             rules.pushBack(parseQualifiedRule(sst.content[i]).unwrap());
             break;
         case Sst::FUNC:

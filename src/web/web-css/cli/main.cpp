@@ -27,7 +27,7 @@ Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
         auto buf = co_try$(Io::readAllUtf8(file));
         Io::SScan s{buf};
         Web::Css::Lexer lex{s};
-        Web::Css::Sst sst = Web::Css::consumeRuleList(lex);
+        Web::Css::Sst sst = Web::Css::consumeRuleList(lex, true);
         Sys::println("{}", sst);
         co_return Ok();
     } else if (verb == "dump-tokens") {

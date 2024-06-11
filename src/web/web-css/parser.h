@@ -1,23 +1,26 @@
 #pragma once
 
-#include <karm-io/emit.h>
-#include <karm-io/funcs.h>
-#include <karm-sys/file.h>
-#include <web-style/stylesheet.h>
-
-#include "builder.h"
 #include "lexer.h"
+#include "sst.h"
 
 namespace Web::Css {
+
+Content consumeRuleList(Lexer &lex, bool topLevel);
+
+Sst consumeAtRule(Lexer &lex);
+
+Opt<Sst> consumeQualifiedRule(Lexer &lex);
+
+Content consumeStyleBlock(Lexer &lex);
+
+Sst consumeDeclarations(Lexer &lex);
+
+Opt<Sst> consumeDeclaration(Lexer &lex);
+
+Sst consumeComponentValue(Lexer &lex);
 
 Sst consumeBlock(Lexer &lex, Token::Type term);
 
 Sst consumeFunc(Lexer &lex);
-
-Sst consumeComponentValue(Lexer &lex);
-
-Sst consumeQualifiedRule(Lexer &lex);
-
-Sst consumeRuleList(Lexer &lex);
 
 } // namespace Web::Css

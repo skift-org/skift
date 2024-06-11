@@ -16,7 +16,7 @@ struct Sst;
 using Content = Vec<Sst>;
 
 #define FOREACH_SST(SST) \
-    SST(QUALIFIED_RULE)  \
+    SST(RULE)            \
     SST(FUNC)            \
     SST(DECL)            \
     SST(LIST)            \
@@ -39,6 +39,8 @@ struct Sst {
     Sst(_Type type) : type(type) {}
 
     Sst(Token token) : type(TOKEN), token(token) {}
+
+    Sst(Content content) : type(LIST), content(content) {}
 
     void repr(Io::Emit &e) const;
 };

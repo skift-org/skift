@@ -63,6 +63,10 @@ struct Token {
     }
 
     void repr(Io::Emit &e) const;
+
+    bool operator==(Type type) const {
+        return this->type == type;
+    }
 };
 
 struct Lexer {

@@ -1,5 +1,7 @@
-#include "mod.h"
+#include <karm-sys/file.h>
 
+#include "builder.h"
+#include "mod.h"
 #include "parser.h"
 
 namespace Web::Css {
@@ -8,7 +10,7 @@ namespace Web::Css {
 
 Style::StyleSheet parseStylesheet(Io::SScan &s) {
     Lexer lex{s};
-    Sst sst = consumeRuleList(lex);
+    Sst sst = consumeRuleList(lex, true);
     return Style::StyleSheet{.rules = parseSST(sst)};
 }
 

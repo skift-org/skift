@@ -40,7 +40,9 @@ Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
 
         if (record.tag == Handover::FILE) {
             auto const *name = payload.stringAt(record.file.name);
-            logInfo("   - file: '{}'", name);
+            auto const *props = payload.stringAt(record.file.meta);
+            logInfo("   - file: {:#}", name);
+            logInfo("   - props: {:#}", props);
         }
     }
 

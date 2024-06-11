@@ -65,18 +65,15 @@ Res<> loadEntry(Entry const &entry) {
         auto blobFile = try$(Sys::File::open(blob.url));
         auto blobMem = try$(Sys::mmap().map(blobFile));
         auto blobRange = blobMem.prange();
-
-        auto strId = payload.add(blob.url.str());
         auto propStr = try$(Web::Json::stringify(blob.props));
-        auto propsId = payload.add(propStr);
 
         payload.add({
             .tag = Handover::FILE,
             .start = blobRange.start,
             .size = blobRange.size,
             .file = {
-                .name = (u32)strId,
-                .meta = (u32)propsId,
+                .name = (u32)payload.add(blob.url.str()),
+                .meta = (u32)payload.add(propStr),
             },
         });
 

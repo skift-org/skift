@@ -7,11 +7,11 @@
 
 namespace Grund::System {
 
-Res<Strong<Unit>> Unit::load(Sys::Ctx &ctx, Mime::Url url) {
-    logInfo("system: loading service '{}'...", url);
+Res<Strong<Unit>> Unit::load(Sys::Ctx &ctx, Str id) {
+    logInfo("system: loading service '{}'...", id);
 
     auto &handover = useHandover(ctx);
-    auto urlStr = url.str();
+    auto urlStr = try$(Io::format("bundle://{}/_bin", id));
     auto *elf = handover.fileByName(urlStr.buf());
     if (not elf)
         return Error::invalidFilename("service not found");
@@ -55,7 +55,7 @@ Res<Strong<Unit>> Unit::load(Sys::Ctx &ctx, Mime::Url url) {
     logInfo("system: creating the task...");
     auto domain = try$(Hj::Domain::create(Hj::ROOT));
     auto task = try$(Hj::Task::create(Hj::ROOT, domain, elfSpace));
-    try$(task.label(url.host));
+    try$(task.label(id));
 
     logInfo("system: mapping handover...");
     auto const *handoverRecord = handover.findTag(Handover::Tag::SELF);

@@ -13,7 +13,7 @@ struct Unit {
     Hj::Channel _in;
     Hj::Channel _out;
 
-    static Res<Strong<Unit>> load(Sys::Ctx &ctx, Mime::Url url);
+    static Res<Strong<Unit>> load(Sys::Ctx &ctx, Str id);
 };
 
 struct Object {
@@ -28,19 +28,26 @@ struct Object {
 };
 
 struct Bus {
+    Sys::Ctx &context;
     Hj::Listener _listener;
     Hj::Domain _domain;
 
     Vec<Strong<Unit>> _units{};
     Vec<Strong<Object>> _objs{};
 
-    static Res<Bus> create() {
+    static Res<Bus> create(Sys::Ctx &ctx) {
         auto domain = try$(Hj::Domain::create(Hj::ROOT));
         auto listener = try$(Hj::Listener::create(Hj::ROOT));
-        return Ok(Bus{std::move(listener), std::move(domain)});
+        return Ok(Bus{ctx, std::move(listener), std::move(domain)});
     }
 
-    Res<> attach(Strong<Unit> unit) {
+    Res<> target(Str id) {
+        auto deviceUnit = try$(Unit::load(context, id));
+        try$(_attach(deviceUnit));
+        return Ok();
+    }
+
+    Res<> _attach(Strong<Unit> unit) {
         try$(_listener.listen(unit->_out, Hj::Sigs::READABLE, Hj::Sigs::NONE));
         _units.pushBack(std::move(unit));
         return Ok();

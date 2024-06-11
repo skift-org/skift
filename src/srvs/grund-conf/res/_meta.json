@@ -1,7 +1,9 @@
 {
     "id": "grund-conf",
-    "consumes": [
-        "Grund::Bus"
-    ],
-    "provides": []
+    "props": {
+        "unit.consumes": [
+            "Grund::Bus"
+        ],
+        "unit.provides": []
+    }
 }

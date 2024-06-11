@@ -11,13 +11,9 @@ using namespace Grund::System;
 Res<> entryPoint(Sys::Ctx &ctx) {
     try$(Hj::Task::self().label("grund-system"));
 
-    auto bus = try$(Bus::create());
-
-    auto deviceUnit = try$(Unit::load(ctx, "bundle://grund-device/_bin"_url));
-    try$(bus.attach(deviceUnit));
-
-    auto shellUnit = try$(Unit::load(ctx, "bundle://hideo-shell.main/_bin"_url));
-    try$(bus.attach(shellUnit));
+    auto bus = try$(Bus::create(ctx));
+    try$(bus.target("grund-device"s));
+    try$(bus.target("hideo-shell.main"s));
 
     return bus.run();
 }

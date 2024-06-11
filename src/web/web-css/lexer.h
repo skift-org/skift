@@ -77,6 +77,8 @@ struct Lexer {
         return _next(scan);
     }
 
+    Token _nextIdent(Io::SScan &) const;
+
     Token _next(Io::SScan &) const;
 
     Token next() {

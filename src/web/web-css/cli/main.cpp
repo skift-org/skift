@@ -30,7 +30,7 @@ Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
         Web::Css::Sst sst = Web::Css::consumeRuleList(lex);
         Sys::println("{}", sst);
         co_return Ok();
-    } else if (verb == "dump-token") {
+    } else if (verb == "dump-tokens") {
         auto file = co_try$(Sys::File::open(url));
         auto buf = co_try$(Io::readAllUtf8(file));
         Io::SScan s{buf};
@@ -39,7 +39,7 @@ Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
             Sys::println("{}", lex.next());
         co_return Ok();
     } else {
-        Sys::errln("unknown verb: {} (expected: dump-stylesheet, dump-sst, dump-token)\n", verb);
+        Sys::errln("unknown verb: {} (expected: dump-stylesheet, dump-sst, dump-tokens)\n", verb);
         co_return Error::invalidInput();
     }
 }

@@ -33,6 +33,7 @@ static auto const RE_SQUARE_BRACKET_OPEN = Re::single('[');
 static auto const RE_SEMICOLON = Re::single(';');
 static auto const RE_COLON = Re::single(':');
 static auto const RE_COMMA = Re::single(',');
+static auto const RE_QUOTES = Re::single('"', '\'');
 
 // NOSPEC: In the spec the fallback is delim
 // since DELIM has a semantic meaning and could catch a really unexpected content
@@ -100,17 +101,23 @@ static auto const RE_DIGIT = Re::oneOrMore(Re::digit());
 static auto const RE_OPERATOR = Re::either(Re::single('-', '+'), Re::nothing());
 static auto const RE_AT_KEYWORD = Re::chain('@'_re, RE_IDENTIFIER);
 
-static auto const RE_FUNCTION = RE_IDENTIFIER & RE_PARENTHESIS_OPEN;
-
 // non printable token https://www.w3.org/TR/css-syntax-3/#non-printable-code-point
 static auto const RE_URL = Re::chain(
     Re::zeroOrOne(RE_WHITESPACE_TOKEN),
     Re::zeroOrMore(
-        Re::either(RE_ESCAPE, Re::negate(Re::single('"', '\'', '(', ')', '\\', 0x007F, 0x000B) | RE_WHITESPACE | Re::range(0x0000, 0x0008) | Re::range(0x000E, 0x001F)))
+        Re::either(
+            RE_ESCAPE,
+            Re::negate(
+                Re::single('"', '\'', '(', ')', '\\', 0x007F, 0x000B) |
+                RE_WHITESPACE | Re::range(0x0000, 0x0008) |
+                Re::range(0x000E, 0x001F)
+            )
+        )
     ),
     Re::zeroOrOne(RE_WHITESPACE_TOKEN),
     RE_PARENTHESIS_CLOSE
 );
+
 static auto const RE_HASH = Re::chain(
     Re::single('#'),
     Re::oneOrMore(
@@ -142,7 +149,6 @@ static auto const RE_NUMBER = Re::chain(
 );
 
 // string token description
-
 static auto const RE_STRING =
     Re::either(
         Re::chain(
@@ -174,6 +180,21 @@ static auto const RE_STRING =
 
     );
 
+Token Lexer::_nextIdent(Io::SScan &s) const {
+    if (not s.skip('('))
+        return {Token::IDENT, s.end()};
+
+    if (eqCi(s.end(), "url("s)) {
+        if (s.ahead(Re::zeroOrMore(RE_WHITESPACE) & RE_QUOTES)) {
+            return {Token::FUNCTION, s.end()};
+        }
+        s.skip(RE_URL);
+        return {Token::URL, s.end()};
+    }
+
+    return {Token::FUNCTION, s.end()};
+}
+
 Token Lexer::_next(Io::SScan &s) const {
     s.begin();
     if (s.ended()) {
@@ -200,6 +221,10 @@ Token Lexer::_next(Io::SScan &s) const {
         return {Token::COMMA, s.end()};
     } else if (s.skip(RE_HASH)) {
         return {Token::HASH, s.end()};
+    } else if (s.skip("<!--")) {
+        return {Token::CDO, s.end()};
+    } else if (s.skip("-->")) {
+        return {Token::CDC, s.end()};
     } else if (s.skip("/*")) {
         // https://www.w3.org/TR/css-syntax-3/#consume-comment
         s.skip(Re::untilAndConsume(Re::word("*/")));
@@ -213,15 +238,8 @@ Token Lexer::_next(Io::SScan &s) const {
         } else {
             return {Token::NUMBER, s.end()};
         }
-    } else if (s.skip(RE_FUNCTION)) {
-        if (s.end() == "url(" and s.skip(RE_URL)) {
-            // unclear spec
-            return {Token::URL, s.end()};
-        }
-        return {Token::FUNCTION, s.end()};
     } else if (s.skip(RE_IDENTIFIER)) {
-        // https://www.w3.org/TR/css-syntax-3/#consume-name
-        return {Token::IDENT, s.end()};
+        return _nextIdent(s);
     } else if (s.skip(RE_AT_KEYWORD)) {
         return {Token::AT_KEYWORD, s.end()};
     } else if (s.skip(RE_STRING)) {

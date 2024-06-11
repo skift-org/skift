@@ -14,8 +14,11 @@ namespace Web::Style {
 
 struct AscentOverrideProp {
     Opt<Percent> value;
+
     static Str name() { return "ascent-override"; }
+
     static auto initial() { return NONE; }
+
     void apply(FontFace &f) {
         f.ascentOverride = value;
     }
@@ -23,43 +26,41 @@ struct AscentOverrideProp {
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-attachment
 struct BackgroundAttachmentProp {
-    BackgroundAttachment value;
+    Vec<BackgroundAttachment> value;
 
     static Str name() { return "background-attachment"; }
 
-    static auto initial() {
-        return BackgroundAttachment::SCROLL;
-    }
+    static auto initial() { return BackgroundAttachment::SCROLL; }
 
-    void apply(Computed &) const {
-        // TODO
+    void apply(Computed &c) const {
+        c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
+        for (usize i = 0; i < value.len(); ++i)
+            c.backgrounds[i].attachment = value[i];
     }
 };
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-color
 struct BackgroundColorProp {
-    Gfx::Color value;
+    Vec<Gfx::Color> value;
 
     static Str name() { return "background-color"; }
 
-    static auto initial() {
-        return Css::TRANSPARENT;
-    }
+    static auto initial() { return Css::TRANSPARENT; }
 
-    void apply(Computed &) const {
-        // TODO
+    void apply(Computed &c) const {
+        c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
+        for (usize i = 0; i < value.len(); ++i)
+            c.backgrounds[i].paint = value[i];
     }
 };
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-image
 struct BackgroundImageProp {
-    Opt<Mime::Url> value;
+    Vec<Opt<Mime::Url>> value;
 
     static Str name() { return "background-image"; }
 
-    static auto initial() {
-        return NONE;
-    }
+    static auto initial() { return NONE; }
 
     void apply(Computed &) const {
         // computed.backgroundImage = value;
@@ -68,31 +69,31 @@ struct BackgroundImageProp {
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-position
 struct BackgroundPositionProp {
-    BackgroundPosition value;
+    Vec<BackgroundPosition> value;
 
     static Str name() { return "background-position"; }
 
-    static BackgroundPosition initial() {
-        return {Percent{0}, Percent{0}};
-    }
+    static BackgroundPosition initial() { return {Percent{0}, Percent{0}}; }
 
-    void apply(Computed &) const {
-        // computed.backgroundPosition = value;
+    void apply(Computed &c) const {
+        c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
+        for (usize i = 0; i < value.len(); ++i)
+            c.backgrounds[i].position = value[i];
     }
 };
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-repeat
 struct BackgroundRepeatProp {
-    BackgroundRepeat value;
+    Vec<BackgroundRepeat> value;
 
     static Str name() { return "background-repeat"; }
 
-    static BackgroundRepeat initial() {
-        return BackgroundRepeat::REPEAT;
-    }
+    static BackgroundRepeat initial() { return BackgroundRepeat::REPEAT; }
 
-    void apply(Computed &) const {
-        // computed.backgroundRepeat = value;
+    void apply(Computed &c) const {
+        c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
+        for (usize i = 0; i < value.len(); ++i)
+            c.backgrounds[i].repeat = value[i];
     }
 };
 
@@ -102,9 +103,7 @@ struct BorderCollapseProp {
 
     static Str name() { return "border-collapse"; }
 
-    static auto initial() {
-        return BorderCollapse::SEPARATE;
-    }
+    static auto initial() { return BorderCollapse::SEPARATE; }
 
     void apply(Computed &) const {
         // TODO
@@ -117,9 +116,7 @@ struct BorderColorProp {
 
     static Str name() { return "border-color"; }
 
-    static auto initial() {
-        return Css::BLACK;
-    }
+    static auto initial() { return Css::BLACK; }
 
     void apply(Computed &) const {
         // TODO
@@ -130,8 +127,11 @@ struct BorderColorProp {
 
 struct DescentOverrideProp {
     Opt<Percent> value;
+
     static Str name() { return "descent-override"; }
+
     static auto initial() { return NONE; }
+
     void apply(FontFace &f) {
         f.descentOverride = value;
     }
@@ -143,9 +143,7 @@ struct DisplayProp {
 
     static Str name() { return "display"; }
 
-    static Display initial() {
-        return {Display::FLOW, Display::INLINE};
-    }
+    static Display initial() { return {Display::FLOW, Display::INLINE}; }
 
     void apply(Computed &s) const {
         s.display = value;
@@ -158,9 +156,7 @@ struct FontDisplayProp {
 
     static Str name() { return "font-display"; }
 
-    static auto initial() {
-        return FontDisplay::AUTO;
-    }
+    static auto initial() { return FontDisplay::AUTO; }
 
     void apply(FontFace &f) {
         f.display = value;
@@ -173,9 +169,7 @@ struct FontFamilyProp {
 
     static Str name() { return "font-family"; }
 
-    static auto initial() {
-        return Vec<Str>{"serif"};
-    }
+    static auto initial() { return Vec<Str>{"serif"}; }
 
     void apply(FontFace &f) {
         if (isEmpty(value))
@@ -190,9 +184,7 @@ struct FontStretchProp {
 
     static Str name() { return "font-stretch"; }
 
-    static auto initial() {
-        return FontStretch::NORMAL;
-    }
+    static auto initial() { return FontStretch::NORMAL; }
 
     void apply(FontFace &f) {
         f.stretch = value;
@@ -205,9 +197,7 @@ struct FontStyleProp {
 
     static Str name() { return "font-style"; }
 
-    static auto initial() {
-        return FontStyle::NORMAL;
-    }
+    static auto initial() { return FontStyle::NORMAL; }
 
     void apply(FontFace &f) {
         f.style = value;
@@ -220,9 +210,7 @@ struct FontWeightProp {
 
     static Str name() { return "font-weight"; }
 
-    static auto initial() {
-        return FontWeight::NORMAL;
-    }
+    static auto initial() { return FontWeight::NORMAL; }
 
     void apply(FontFace &f) {
         f.weight = value;
@@ -235,9 +223,7 @@ struct FontFeatureSettingsProp {
 
     static Str name() { return "font-feature-settings"; }
 
-    static auto initial() {
-        return Vec<FontFeature>{};
-    }
+    static Vec<FontFeature> initial() { return {}; }
 
     void apply(FontFace &f) {
         f.features = value;
@@ -250,9 +236,7 @@ struct FontVariationSettingsProp {
 
     static Str name() { return "font-variation-settings"; }
 
-    static auto initial() {
-        return Vec<FontVariation>{};
-    }
+    static Vec<FontVariation> initial() { return {}; }
 
     void apply(FontFace &f) {
         f.variations = value;
@@ -262,8 +246,11 @@ struct FontVariationSettingsProp {
 // https://drafts.csswg.org/css-fonts/#font-metrics-override-desc
 struct LineGapOverrideProp {
     Opt<Percent> value;
+
     static Str name() { return "line-gap-override"; }
+
     static auto initial() { return NONE; }
+
     void apply(FontFace &f) {
         f.lineGapOverride = value;
     }

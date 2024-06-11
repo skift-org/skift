@@ -4,7 +4,6 @@
     "type": "lib",
     "description": "The Stylish CSS styling engine",
     "requires": [
-        "karm-logger",
         "web-base",
         "web-html",
         "web-svg",

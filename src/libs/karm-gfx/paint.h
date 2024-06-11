@@ -163,6 +163,8 @@ using _Paints = Union<
 struct Paint : public _Paints {
     using _Paints::_Paints;
 
+    Paint(Color color = ALPHA) : _Paints(color) {}
+
     always_inline Color sample(Math::Vec2f pos) const {
         return visit([&](auto const &p) {
             return p.sample(pos);

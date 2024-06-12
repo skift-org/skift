@@ -115,12 +115,12 @@ template <typename T, typename U>
 concept Same = _Same<T, U>;
 
 template <typename T, typename U = T>
-concept Comparable = requires(T const &a, T const &b) {
+concept Comparable = requires(T const &a, U const &b) {
     { a <=> b } -> Same<decltype(a <=> b)>;
 };
 
 template <typename T, typename U = T>
-concept Equatable = requires(T const &a, T const &b) {
+concept Equatable = requires(T const &a, U const &b) {
     { a == b } -> Same<decltype(a == b)>;
 };
 

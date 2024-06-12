@@ -39,7 +39,7 @@ struct _SScan {
 
     /// Check if the scanner has reached the end of the input.
     /// This is equivalent to `rem() == 0`.
-    bool ended() {
+    bool ended() const {
         return _cursor.ended();
     }
 

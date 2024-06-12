@@ -83,10 +83,6 @@ struct [[nodiscard]] Opt {
         return *this;
     }
 
-    always_inline constexpr bool operator==(None) const {
-        return not _present;
-    }
-
     always_inline constexpr explicit operator bool() const {
         return _present;
     }
@@ -227,10 +223,23 @@ struct [[nodiscard]] Opt {
         return {NONE};
     }
 
-    always_inline constexpr std::partial_ordering operator<=>(Opt const &other) const {
-        if constexpr (Meta::Comparable<T>)
-            if (_present and other._present)
-                return _value <=> other._value;
+    always_inline constexpr bool operator==(None) const {
+        return not _present;
+    }
+
+    template <typename U>
+        requires Meta::Equatable<T, U>
+    always_inline constexpr bool operator==(U const &other) const {
+        if (_present)
+            return _value == other;
+        return false;
+    }
+
+    template <typename U>
+        requires Meta::Comparable<T, U>
+    always_inline constexpr std::partial_ordering operator<=>(U const &other) const {
+        if (_present)
+            return _value <=> other;
         return std::partial_ordering::unordered;
     }
 
@@ -239,6 +248,13 @@ struct [[nodiscard]] Opt {
             if (_present and other._present)
                 return _value == other._value;
         return not _present and not other._present;
+    }
+
+    always_inline constexpr std::partial_ordering operator<=>(Opt const &other) const {
+        if constexpr (Meta::Comparable<T>)
+            if (_present and other._present)
+                return _value <=> other._value;
+        return std::partial_ordering::unordered;
     }
 };
 

@@ -46,31 +46,57 @@ struct Box {
         return *this;
     }
 
-    constexpr T *operator->() {
-        if (not _ptr) [[unlikely]]
-            panic("deferencing moved from Box<T>");
+    template <typename U>
+        requires Meta::Equatable<T, U>
+    constexpr bool operator==(U const &other) const {
+        return unwrap() == other;
+    }
 
-        return _ptr;
+    template <typename U>
+        requires Meta::Comparable<T, U>
+    constexpr auto operator<=>(U const &other) const {
+        return unwrap() <=> other;
+    }
+
+    template <typename U>
+        requires Meta::Equatable<T, U>
+    constexpr bool operator==(Box<U> const &other) const {
+        if (_ptr == other._ptr)
+            return true;
+        return unwrap() == other.unwrap();
+    }
+
+    template <typename U>
+        requires Meta::Comparable<T, U>
+    constexpr auto operator<=>(Box<U> const &other) const {
+        return unwrap() <=> other.unwrap();
+    }
+
+    constexpr T *operator->() {
+        return &unwrap();
     }
 
     constexpr T &operator*() {
-        if (not _ptr) [[unlikely]]
-            panic("deferencing moved from Box<T>");
-
-        return *_ptr;
+        return unwrap();
     }
 
     constexpr T const *operator->() const {
-        if (not _ptr) [[unlikely]]
-            panic("deferencing moved from Box<T>");
-
-        return _ptr;
+        return &unwrap();
     }
 
     constexpr T const &operator*() const {
+        return unwrap();
+    }
+
+    constexpr T const &unwrap() const {
         if (not _ptr) [[unlikely]]
             panic("deferencing moved from Box<T>");
+        return *_ptr;
+    }
 
+    constexpr T &unwrap() {
+        if (not _ptr) [[unlikely]]
+            panic("deferencing moved from Box<T>");
         return *_ptr;
     }
 };

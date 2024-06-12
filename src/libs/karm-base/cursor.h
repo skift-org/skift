@@ -37,19 +37,18 @@ struct Cursor {
         return _end - _begin;
     }
 
-    always_inline constexpr T const &curr() const {
-        if (not ended()) [[unlikely]]
-            panic("curr() called on ended cursor");
-
-        return *_begin;
+    always_inline constexpr T const &peek(usize i = 0) const {
+        if (i >= len()) [[unlikely]]
+            panic("index out of bounds");
+        return _begin[i];
     }
 
     always_inline constexpr T const &operator*() const {
-        return curr();
+        return peek();
     }
 
     always_inline constexpr T const *operator->() const {
-        return &curr();
+        return &peek();
     }
 
     always_inline constexpr T next() {

@@ -80,8 +80,8 @@ Res<Style::Rule> getRuleObject(auto prefix) {
                 Style::FontFaceRule parsed;
                 return Ok(parsed);
             } else if (tok.data == "@media") {
-                Style::Query query = Style::Query::combineOr(
-                    Style::TypeFeature{Style::Type::SCREEN},
+                auto query = Style::MediaQuery::combineOr(
+                    Style::TypeFeature{MediaType::SCREEN},
                     Style::WidthFeature::min(Px{1920})
                 );
                 Style::MediaRule parsed(query);

@@ -4,7 +4,7 @@
 namespace Web::Style::Tests {
 
 static Media const TEST_MEDIA = {
-    .type = Type::SCREEN,
+    .type = MediaType::SCREEN,
     .width = Px(1920),
     .height = Px(1080),
     .aspectRatio = 16.0 / 9.0,
@@ -28,8 +28,8 @@ static Media const TEST_MEDIA = {
 };
 
 test$("logical-and") {
-    auto query = Query::combineAnd(
-        TypeFeature{Type::SCREEN},
+    auto query = MediaQuery::combineAnd(
+        TypeFeature{MediaType::SCREEN},
         WidthFeature::min(Px{1920})
     );
 
@@ -39,8 +39,8 @@ test$("logical-and") {
 }
 
 test$("logical-or") {
-    auto query = Query::combineOr(
-        TypeFeature{Type::SCREEN},
+    auto query = MediaQuery::combineOr(
+        TypeFeature{MediaType::SCREEN},
         WidthFeature::min(Px{1920})
     );
 
@@ -50,7 +50,7 @@ test$("logical-or") {
 }
 
 test$("logical-not") {
-    auto query = Query::negate(TypeFeature{Type::PRINT});
+    auto query = MediaQuery::negate(TypeFeature{MediaType::PRINT});
 
     expect$(query.match(TEST_MEDIA));
 
@@ -58,7 +58,7 @@ test$("logical-not") {
 }
 
 test$("logical-only") {
-    auto query = Query::only(TypeFeature{Type::SCREEN});
+    auto query = MediaQuery::only(TypeFeature{MediaType::SCREEN});
 
     expect$(query.match(TEST_MEDIA));
 

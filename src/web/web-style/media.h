@@ -2,69 +2,17 @@
 
 #include <karm-base/box.h>
 #include <web-base/length.h>
+#include <web-base/media.h>
 #include <web-base/resolution.h>
 
 namespace Web::Style {
-
-// MARK: Media Types -----------------------------------------------------------
-// https://drafts.csswg.org/mediaqueries/#media-types
-
-enum struct Type {
-    ALL,
-    PRINT,
-    SCREEN,
-};
-
-enum struct Orientation {
-    PORTRAIT,
-    LANDSCAPE,
-};
-
-enum struct Scan {
-    INTERLACE,
-    PROGRESSIVE,
-};
-
-enum struct Update {
-    NONE,
-    SLOW,
-    FAST,
-};
-
-enum struct OverflowBlock {
-    NONE,
-    PAGED,
-    CONTINUOUS,
-};
-
-enum struct OverflowInline {
-    NONE,
-    SCROLL,
-};
-
-enum struct ColorGamut {
-    SRGB,
-    DISPLAY_P3,
-    REC2020,
-};
-
-enum struct Pointer {
-    NONE,
-    COARSE,
-    FINE,
-};
-
-enum struct Hover {
-    NONE,
-    HOVER,
-};
 
 // MARK: Media -----------------------------------------------------------------
 
 struct Media {
     /// 2.3. Media Types
     /// https://drafts.csswg.org/mediaqueries/#media-types
-    Type type;
+    MediaType type;
 
     // 4. MARK: Viewport/Page Dimensions Media Features
 
@@ -225,9 +173,9 @@ struct DiscreteFeature {
 
 /// 2.3. Media Types
 /// https://drafts.csswg.org/mediaqueries/#media-types
-using TypeFeature = DiscreteFeature<Type, &Media::type>;
+using TypeFeature = DiscreteFeature<MediaType, &Media::type>;
 
-// 4. MARK: Viewport/Page Dimensions Media Features
+// 4. MARK: Viewport/Page Dimensions Media Features ----------------------------
 
 /// 4.1. Width: the width feature
 /// https://drafts.csswg.org/mediaqueries/#width
@@ -271,7 +219,7 @@ using OverflowBlockFeature = DiscreteFeature<OverflowBlock, &Media::overflowBloc
 /// https://drafts.csswg.org/mediaqueries/#overflow-inline
 using OverflowInlineFeature = DiscreteFeature<OverflowInline, &Media::overflowInline>;
 
-//  6. MARK: Color Media Features
+//  6. MARK: Color Media Features ----------------------------------------------
 
 // 6.1. Color: the color feature
 /// https://drafts.csswg.org/mediaqueries/#color
@@ -337,7 +285,7 @@ struct Feature : public _Feature {
         });
     }
 
-    static Feature type(Type value) {
+    static Feature type(MediaType value) {
         return TypeFeature{value};
     }
 
@@ -348,7 +296,7 @@ struct Feature : public _Feature {
 
 // MARK: Media Queries ---------------------------------------------------------
 
-struct Query {
+struct MediaQuery {
     struct _Infix {
         enum struct Type {
             AND,
@@ -356,8 +304,8 @@ struct Query {
         };
 
         Type type;
-        Box<Query> lhs;
-        Box<Query> rhs;
+        Box<MediaQuery> lhs;
+        Box<MediaQuery> rhs;
 
         bool match(Media const &media) const {
             switch (type) {
@@ -378,7 +326,7 @@ struct Query {
         };
 
         Type type;
-        Box<Query> query;
+        Box<MediaQuery> query;
 
         bool match(Media const &media) const {
             switch (type) {
@@ -402,40 +350,40 @@ struct Query {
 
     _Store _store;
 
-    Query(Feature feature) : _store(feature) {}
+    MediaQuery(Feature feature) : _store(feature) {}
 
-    Query(Meta::Convertible<Feature> auto &&feature)
+    MediaQuery(Meta::Convertible<Feature> auto &&feature)
         : _store(Feature{
               std::forward<decltype(feature)>(feature),
           }) {}
 
-    Query(_Prefix::Type type, Query query)
+    MediaQuery(_Prefix::Type type, MediaQuery query)
         : _store(_Prefix{
               type,
-              makeBox<Query>(query),
+              makeBox<MediaQuery>(query),
           }) {}
 
-    Query(_Infix::Type type, Query lhs, Query rhs)
+    MediaQuery(_Infix::Type type, MediaQuery lhs, MediaQuery rhs)
         : _store(_Infix{
               type,
-              makeBox<Query>(lhs),
-              makeBox<Query>(rhs),
+              makeBox<MediaQuery>(lhs),
+              makeBox<MediaQuery>(rhs),
           }) {}
 
-    static Query negate(Query query) {
-        return Query{NOT, query};
+    static MediaQuery negate(MediaQuery query) {
+        return MediaQuery{NOT, query};
     }
 
-    static Query only(Query query) {
-        return Query{ONLY, query};
+    static MediaQuery only(MediaQuery query) {
+        return MediaQuery{ONLY, query};
     }
 
-    static Query combineAnd(Query lhs, Query rhs) {
-        return Query{AND, lhs, rhs};
+    static MediaQuery combineAnd(MediaQuery lhs, MediaQuery rhs) {
+        return MediaQuery{AND, lhs, rhs};
     }
 
-    static Query combineOr(Query lhs, Query rhs) {
-        return Query{OR, lhs, rhs};
+    static MediaQuery combineOr(MediaQuery lhs, MediaQuery rhs) {
+        return MediaQuery{OR, lhs, rhs};
     }
 
     bool match(Media const &media) const {
@@ -477,6 +425,6 @@ struct Karm::Io::Formatter<Web::Style::Feature> {
     }
 };
 
-Reflectable$(Web::Style::Query::_Infix, type, lhs, rhs);
-Reflectable$(Web::Style::Query::_Prefix, type, query);
-Reflectable$(Web::Style::Query, _store);
+Reflectable$(Web::Style::MediaQuery::_Infix, type, lhs, rhs);
+Reflectable$(Web::Style::MediaQuery::_Prefix, type, query);
+Reflectable$(Web::Style::MediaQuery, _store);

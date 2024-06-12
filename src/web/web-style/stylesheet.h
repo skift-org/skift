@@ -28,7 +28,7 @@ struct ImportRule {
 
 // https://www.w3.org/TR/css-conditional-3/#the-cssmediarule-interface
 struct MediaRule {
-    Query media;
+    MediaQuery media;
     Vec<Rule> rules;
 };
 

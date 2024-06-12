@@ -4,7 +4,7 @@
 namespace Web::Style::Tests {
 
 static Media const TEST_MEDIA = {
-    .type = Type::SCREEN,
+    .type = MediaType::SCREEN,
     .width = Px{1920},
     .height = Px{1080},
     .aspectRatio = 16.0 / 9.0,
@@ -28,7 +28,7 @@ static Media const TEST_MEDIA = {
 };
 
 test$("feature-type") {
-    expect$(TypeFeature{Type::SCREEN}
+    expect$(TypeFeature{MediaType::SCREEN}
                 .match(TEST_MEDIA));
 
     return Ok();

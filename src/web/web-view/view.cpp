@@ -1,5 +1,5 @@
 #include <karm-ui/view.h>
-#include <web-css/colors.h>
+#include <web-base/color.h>
 
 #include "view.h"
 
@@ -12,7 +12,7 @@ struct View : public Ui::View<View> {
 
     void paint(Gfx::Context &g, Math::Recti) override {
         g.save();
-        g.clear(bound(), Css::WHITE);
+        g.clear(bound(), WHITE);
         g.restore();
     }
 

@@ -1,13 +1,13 @@
-#include "colors.h"
+#include "color.h"
 
-namespace Web::Css {
+namespace Web {
 
 Opt<Color> parseNamedColor(Str name) {
     if (name == "transparent")
         return TRANSPARENT;
 
     if (name == "currentColor")
-        return CURRENT_COLOR;
+        return Color::CURRENT;
 
 #define COLOR(NAME, _, VALUE) \
     if (name == #NAME)        \
@@ -18,4 +18,4 @@ Opt<Color> parseNamedColor(Str name) {
     return NONE;
 }
 
-} // namespace Web::Css
+} // namespace Web

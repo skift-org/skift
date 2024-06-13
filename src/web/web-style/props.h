@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-mime/url.h>
-#include <web-css/colors.h>
+#include <web-base/color.h>
 
 #include "computed.h"
 #include "font-face.h"
@@ -13,7 +13,6 @@ namespace Web::Style {
 // NOTE: This list should be kept alphabetically sorted.
 
 // https://drafts.csswg.org/css-fonts/#font-metrics-override-desc
-
 struct AscentOverrideProp {
     Opt<Percent> value;
 
@@ -47,7 +46,7 @@ struct BackgroundColorProp {
 
     static Str name() { return "background-color"; }
 
-    static auto initial() { return Css::TRANSPARENT; }
+    static auto initial() { return TRANSPARENT; }
 
     void apply(Computed &c) const {
         c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
@@ -118,7 +117,7 @@ struct BorderColorProp {
 
     static Str name() { return "border-color"; }
 
-    static auto initial() { return Css::BLACK; }
+    static auto initial() { return BLACK; }
 
     void apply(Computed &) const {
         // TODO

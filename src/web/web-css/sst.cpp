@@ -37,7 +37,7 @@ void Sst::repr(Io::Emit &e) const {
     e(")\n");
 }
 
-Str toStr(Sst::_Type type) {
+Str toStr(Sst::Type type) {
     switch (type) {
 #define ITER(NAME)  \
     case Sst::NAME: \

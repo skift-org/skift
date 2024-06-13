@@ -13,7 +13,7 @@ Opt<Sst> consumeQualifiedRule(Lexer &lex);
 
 Content consumeStyleBlock(Lexer &lex);
 
-Sst consumeDeclarations(Lexer &lex);
+Sst consumeDeclarationList(Lexer &lex);
 
 Opt<Sst> consumeDeclaration(Lexer &lex);
 

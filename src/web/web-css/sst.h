@@ -24,36 +24,45 @@ using Content = Vec<Sst>;
     SST(BLOCK)
 
 struct Sst {
-    enum struct _Type {
+    enum struct Type {
 #define ITER(NAME) NAME,
         FOREACH_SST(ITER)
 #undef ITER
     };
-    using enum _Type;
+    using enum Type;
 
-    _Type type;
+    Type type;
     Token token = Token(Token::NIL);
     Opt<Box<Sst>> prefix{};
     Content content{};
 
-    Sst(_Type type) : type(type) {}
+    Sst(Type type) : type(type) {}
 
     Sst(Token token) : type(TOKEN), token(token) {}
 
     Sst(Content content) : type(LIST), content(content) {}
 
     void repr(Io::Emit &e) const;
+
+    bool operator==(Type type) const {
+        return this->type == type;
+    }
+
+    bool operator==(Token::Type const &type) const {
+        return this->type == TOKEN and
+               token.type == type;
+    }
 };
 
-Str toStr(Sst::_Type type);
+Str toStr(Sst::Type type);
 
 } // namespace Web::Css
 
 Reflectable$(Web::Css::Sst, type, token, prefix, content);
 
 template <>
-struct Karm::Io::Formatter<Web::Css::Sst::_Type> {
-    Res<usize> format(Io::TextWriter &writer, Web::Css::Sst::_Type val) {
+struct Karm::Io::Formatter<Web::Css::Sst::Type> {
+    Res<usize> format(Io::TextWriter &writer, Web::Css::Sst::Type val) {
         return (writer.writeStr(try$(Io::toParamCase(toStr(val)))));
     }
 };

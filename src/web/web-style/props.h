@@ -10,6 +10,8 @@
 
 namespace Web::Style {
 
+// NOTE: This list should be kept alphabetically sorted.
+
 // https://drafts.csswg.org/css-fonts/#font-metrics-override-desc
 
 struct AscentOverrideProp {

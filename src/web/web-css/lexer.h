@@ -70,9 +70,13 @@ struct Token {
 };
 
 struct Lexer {
-    Io::SScan &_scan;
+    Io::SScan _scan;
 
-    Lexer(Io::SScan &scan)
+    Lexer(Str text)
+        : _scan(text) {
+    }
+
+    Lexer(Io::SScan const &scan)
         : _scan(scan) {
     }
 

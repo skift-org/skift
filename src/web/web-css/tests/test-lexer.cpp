@@ -4,8 +4,7 @@
 namespace Web::Css::Tests {
 
 Token lex(Str input) {
-    auto s = Io::SScan(input);
-    return Lexer{s}.peek();
+    return Lexer{input}.peek();
 }
 
 test$("web-css-lex-ident") {

@@ -142,7 +142,7 @@ Content consumeStyleBlock(Lexer &lex) {
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-list-of-declarations
-Sst consumeDeclarations(Lexer &lex) {
+Sst consumeDeclarationList(Lexer &lex) {
     Content list;
     lex.next();
 
@@ -268,14 +268,13 @@ Sst consumeFunc(Lexer &lex) {
             return fn;
 
         case Token::RIGHT_PARENTHESIS:
+            lex.next();
             return fn;
 
         default:
             fn.content.pushBack(consumeComponentValue(lex));
             break;
         }
-
-        lex.next();
     }
 }
 

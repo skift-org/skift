@@ -341,6 +341,7 @@ struct MediaQuery {
     };
 
     using _Store = Union<
+        None,
         _Infix,
         _Prefix,
         Feature>;
@@ -348,7 +349,11 @@ struct MediaQuery {
     using enum _Infix::Type;
     using enum _Prefix::Type;
 
-    _Store _store;
+    _Store _store = NONE;
+
+    MediaQuery() = default;
+
+    MediaQuery(None) : _store(None{}) {}
 
     MediaQuery(Feature feature) : _store(feature) {}
 
@@ -387,8 +392,13 @@ struct MediaQuery {
     }
 
     bool match(Media const &media) const {
-        return _store.visit([&](auto const &value) {
-            return value.match(media);
+        return _store.visit(Visitor{
+            [&](auto const &value) {
+                return value.match(media);
+            },
+            [](None) {
+                return true;
+            }
         });
     }
 };

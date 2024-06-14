@@ -165,6 +165,8 @@ using _Selector = Union<
 struct Selector : public _Selector {
     using _Selector::_Selector;
 
+    Selector() : _Selector{UniversalSelector{}} {}
+
     static Selector universal() {
         return UNIVERSAL;
     }

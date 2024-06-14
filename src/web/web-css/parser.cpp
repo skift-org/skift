@@ -2,6 +2,54 @@
 
 namespace Web::Css {
 
+// MARK: Sst -------------------------------------------------------------------
+
+void Sst::repr(Io::Emit &e) const {
+    if (type == TOKEN) {
+        e("{}\n", token);
+        return;
+    }
+
+    e("({} ", Io::toParamCase(toStr(type)));
+    if (token)
+        e("token={}", token);
+    e.indent();
+
+    if (prefix) {
+        e.newline();
+        e("prefix=");
+        (*prefix)->repr(e);
+    }
+
+    if (content) {
+        e.newline();
+        e("content=[");
+        e.indentNewline();
+        for (auto &child : content) {
+            child.repr(e);
+        }
+        e.deindent();
+        e("]");
+        e.newline();
+    }
+    e.deindent();
+    e(")\n");
+}
+
+Str toStr(Sst::Type type) {
+    switch (type) {
+#define ITER(NAME)  \
+    case Sst::NAME: \
+        return #NAME;
+        FOREACH_SST(ITER)
+#undef ITER
+    default:
+        panic("invalid ast type");
+    }
+}
+
+// MARK: Parser ----------------------------------------------------------------
+
 // https://www.w3.org/TR/css-syntax-3/#consume-list-of-rules
 Content consumeRuleList(Lexer &lex, bool topLevel) {
     Content list{};

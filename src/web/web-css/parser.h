@@ -1,7 +1,6 @@
 #pragma once
 
 #include "lexer.h"
-#include "sst.h"
 
 namespace Web::Css {
 

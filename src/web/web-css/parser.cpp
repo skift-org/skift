@@ -20,7 +20,7 @@ Content consumeRuleList(Lexer &lex, bool topLevel) {
         case Token::CDC:
         case Token::CDO: {
             if (not topLevel) {
-                auto rule = consumeQualifiedRule(lex);
+                auto rule = consumeRule(lex);
                 if (rule)
                     list.pushBack(*rule);
             }
@@ -33,7 +33,7 @@ Content consumeRuleList(Lexer &lex, bool topLevel) {
         }
 
         default: {
-            auto rule = consumeQualifiedRule(lex);
+            auto rule = consumeRule(lex);
             if (rule)
                 list.pushBack(*rule);
             break;
@@ -45,7 +45,7 @@ Content consumeRuleList(Lexer &lex, bool topLevel) {
 // https://www.w3.org/TR/css-syntax-3/#consume-at-rule
 Sst consumeAtRule(Lexer &lex) {
     Sst atRule{Sst::RULE};
-    atRule.token = lex.peek();
+    atRule.token = lex.next();
     Content prefix;
 
     while (true) {
@@ -63,8 +63,8 @@ Sst consumeAtRule(Lexer &lex) {
             return atRule;
 
         case Token::LEFT_CURLY_BRACKET:
-            atRule.content = consumeStyleBlock(lex);
-            atRule.prefix = prefix;
+            atRule.prefix = std::move(prefix);
+            atRule.content = consumeDeclarationBlock(lex);
             return atRule;
 
         default:
@@ -75,7 +75,7 @@ Sst consumeAtRule(Lexer &lex) {
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-qualified-rule
-Opt<Sst> consumeQualifiedRule(Lexer &lex) {
+Opt<Sst> consumeRule(Lexer &lex) {
     Sst rule{Sst::RULE};
     Content prefix;
 
@@ -88,7 +88,7 @@ Opt<Sst> consumeQualifiedRule(Lexer &lex) {
 
         case Token::LEFT_CURLY_BRACKET: {
             rule.prefix = std::move(prefix);
-            rule.content.emplaceBack(consumeBlock(lex, Token::RIGHT_CURLY_BRACKET));
+            rule.content = consumeDeclarationBlock(lex);
             return rule;
         }
 
@@ -100,9 +100,12 @@ Opt<Sst> consumeQualifiedRule(Lexer &lex) {
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-style-block
-Content consumeStyleBlock(Lexer &lex) {
+// https://www.w3.org/TR/css-syntax-3/#consume-list-of-declarations
+// NOSPEC: We unified the two functions into one for simplicity
+//         and added a check for the right curly bracket
+//         to avoid aving to parsing the input multiple times
+Content consumeDeclarationList(Lexer &lex) {
     Content block;
-    lex.next();
 
     while (true) {
         switch (lex.peek().type) {
@@ -122,60 +125,48 @@ Content consumeStyleBlock(Lexer &lex) {
 
         case Token::IDENT:
             if (lex.peek().data == "&") {
-                auto rule = consumeQualifiedRule(lex);
+                auto rule = consumeRule(lex);
                 if (rule)
                     block.pushBack(*rule);
-            } else {
+            } else if (declarationAhead(lex)) {
                 auto decl = consumeDeclaration(lex);
                 if (decl)
                     block.pushBack(*decl);
+            } else {
+                auto rule = consumeRule(lex);
+                if (rule)
+                    block.pushBack(*rule);
             }
             break;
 
+        case Token::RIGHT_CURLY_BRACKET:
+            return block;
+
         default:
-            logError("unexpected token");
-            if (not(lex.peek() == Token::SEMICOLON or lex.peek() == Token::END_OF_FILE))
-                consumeComponentValue(lex);
+            auto rule = consumeRule(lex);
+            if (rule)
+                block.pushBack(*rule);
             break;
         }
     }
 }
 
-// https://www.w3.org/TR/css-syntax-3/#consume-list-of-declarations
-Sst consumeDeclarationList(Lexer &lex) {
-    Content list;
+Content consumeDeclarationBlock(Lexer &lex) {
+    lex.next(); // consume left curly bracket
+    auto res = consumeDeclarationList(lex);
+    if (lex.peek() != Token::RIGHT_CURLY_BRACKET)
+        logError("expected right curly bracket");
+    else
+        lex.next(); // consume right curly bracket
+    return res;
+}
+
+bool declarationAhead(Lexer lex) {
+    bool res = lex.peek() == Token::IDENT;
     lex.next();
-
-    while (true) {
-        switch (lex.peek().type) {
-        case Token::WHITESPACE:
-        case Token::SEMICOLON:
-            lex.next();
-            break;
-
-        case Token::END_OF_FILE:
-            logError("unexpected end of file");
-            lex.next();
-            return list;
-
-        case Token::AT_KEYWORD:
-            list.pushBack(consumeAtRule(lex));
-            break;
-
-        case Token::IDENT: {
-            auto decl = consumeDeclaration(lex);
-            if (decl)
-                list.pushBack(*decl);
-            break;
-        }
-
-        default:
-            logError("unexpected token");
-            if (not(lex.peek() == Token::SEMICOLON or lex.peek() == Token::END_OF_FILE))
-                consumeComponentValue(lex);
-            break;
-        }
-    }
+    while (lex.peek() == Token::WHITESPACE)
+        lex.next();
+    return res and lex.peek() == Token::COLON;
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-declaration
@@ -202,7 +193,7 @@ Opt<Sst> consumeDeclaration(Lexer &lex) {
 
     // 4. As long as the next input token is anything other than an <EOF-token>,
     //    consume a component value and append it to the declaration’s value.
-    while ((lex.peek() != Token::END_OF_FILE and lex.peek() != Token::SEMICOLON)) {
+    while ((lex.peek() != Token::END_OF_FILE and lex.peek() != Token::SEMICOLON and lex.peek() != Token::RIGHT_CURLY_BRACKET)) {
         decl.content.pushBack(consumeComponentValue(lex));
         while (lex.peek() == Token::WHITESPACE)
             lex.next();
@@ -245,14 +236,14 @@ Sst consumeBlock(Lexer &lex, Token::Type term) {
             return block;
 
         default:
-            if (token.type == term)
+            if (token.type == term) {
+                lex.next();
                 return block;
+            }
 
             block.content.emplaceBack(consumeComponentValue(lex));
             break;
         }
-
-        lex.next();
     }
 }
 

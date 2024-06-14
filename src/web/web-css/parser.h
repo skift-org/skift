@@ -9,11 +9,13 @@ Content consumeRuleList(Lexer &lex, bool topLevel);
 
 Sst consumeAtRule(Lexer &lex);
 
-Opt<Sst> consumeQualifiedRule(Lexer &lex);
+Opt<Sst> consumeRule(Lexer &lex);
 
-Content consumeStyleBlock(Lexer &lex);
+Content consumeDeclarationList(Lexer &lex);
 
-Sst consumeDeclarationList(Lexer &lex);
+Content consumeDeclarationBlock(Lexer &lex);
+
+bool declarationAhead(Lexer lex);
 
 Opt<Sst> consumeDeclaration(Lexer &lex);
 

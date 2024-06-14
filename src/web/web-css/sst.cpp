@@ -15,11 +15,8 @@ void Sst::repr(Io::Emit &e) const {
 
     if (prefix) {
         e.newline();
-        e("prefix=[");
-        e.indentNewline();
+        e("prefix=");
         (*prefix)->repr(e);
-        e.deindent();
-        e("]");
     }
 
     if (content) {

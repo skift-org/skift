@@ -71,9 +71,11 @@ struct Token {
 
 struct Lexer {
     Io::SScan _scan;
+    Token _curr;
 
     Lexer(Str text)
         : _scan(text) {
+        _curr = next();
     }
 
     Lexer(Io::SScan const &scan)
@@ -81,8 +83,7 @@ struct Lexer {
     }
 
     Token peek() const {
-        auto scan = _scan;
-        return _next(scan);
+        return _curr;
     }
 
     Token _nextIdent(Io::SScan &) const;
@@ -90,7 +91,9 @@ struct Lexer {
     Token _next(Io::SScan &) const;
 
     Token next() {
-        return _next(_scan);
+        auto res = _curr;
+        _curr = _next(_scan);
+        return res;
     }
 
     bool ended() const {

@@ -18,4 +18,14 @@ Opt<Color> parseNamedColor(Str name) {
     return NONE;
 }
 
+Opt<SystemColor> parseSystemColor(Str name) {
+#define COLOR(ID, NAME, ...) \
+    if (name == #NAME)       \
+        return SystemColor::ID;
+#include "defs/system-colors.inc"
+#undef SYSTEM_COLOR
+
+    return NONE;
+}
+
 } // namespace Web

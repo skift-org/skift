@@ -27,6 +27,9 @@ struct Color {
         SystemColor system;
     };
 
+    Color()
+        : type(Type::SRGB), srgb(Gfx::ALPHA) {}
+
     Color(Type type)
         : type(type) {}
 
@@ -45,5 +48,7 @@ inline constexpr Gfx::Color TRANSPARENT = Gfx::Color::fromRgba(0, 0, 0, 0);
 #undef COLOR
 
 Opt<Color> parseNamedColor(Str name);
+
+Opt<SystemColor> parseSystemColor(Str name);
 
 } // namespace Web

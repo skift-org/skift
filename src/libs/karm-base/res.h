@@ -14,7 +14,9 @@ struct Ok {
     always_inline constexpr Ok(Args &&...args)
         : inner(std::forward<Args>(args)...) {}
 
-    operator bool() const = delete;
+    always_inline explicit operator bool() const {
+        return true;
+    }
 
     always_inline auto operator<=>(Ok const &) const
         requires Meta::Comparable<T>

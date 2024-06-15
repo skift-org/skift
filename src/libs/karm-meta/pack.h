@@ -58,14 +58,22 @@ struct _ForEach;
 
 template <typename T>
 struct _ForEach<T> {
-    always_inline static void eval(auto func) {
-        func(Type<T>{});
+    always_inline static auto eval(auto func) {
+        return func(Type<T>{});
     }
 };
 
 template <typename T, typename... Ts>
 struct _ForEach<T, Ts...> {
-    always_inline static void eval(auto func) {
+    always_inline static auto eval(auto func)
+        requires(not Meta::Same<decltype(func(Type<T>{})), void>)
+    {
+        return func(Type<T>{}) ?: _ForEach<Ts...>::eval(func);
+    }
+
+    always_inline static auto eval(auto func)
+        requires(Meta::Same<decltype(func(Type<T>{})), void>)
+    {
         func(Type<T>{});
         _ForEach<Ts...>::eval(func);
     }

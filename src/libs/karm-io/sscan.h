@@ -91,12 +91,19 @@ struct _SScan {
         return r;
     }
 
-    void begin() {
+    auto &begin() {
         _begin = _cursor;
+        return *this;
     }
 
     _Str<E> end() {
         return {_begin, _cursor};
+    }
+
+    _Str<E> slice(usize n) {
+        auto begin = _cursor;
+        next(n);
+        return {begin, _cursor};
     }
 
     /// If the current rune is `c`, advance the cursor.

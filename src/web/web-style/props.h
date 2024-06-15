@@ -124,6 +124,19 @@ struct BorderColorProp {
     }
 };
 
+// https://www.w3.org/TR/CSS22/colors.html#propdef-color
+struct ColorProp {
+    Gfx::Color value;
+
+    static Str name() { return "color"; }
+
+    static auto initial() { return BLACK; }
+
+    void apply(Computed &c) const {
+        c.color = value;
+    }
+};
+
 // https://drafts.csswg.org/css-fonts/#font-metrics-override-desc
 
 struct DescentOverrideProp {
@@ -309,6 +322,7 @@ using _Prop = Union<
     BackgroundImageProp,
     BackgroundPositionProp,
     BackgroundRepeatProp,
+    ColorProp,
     DisplayProp,
     DescentOverrideProp,
     FontDisplayProp,

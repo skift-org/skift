@@ -3,6 +3,7 @@
 #include <karm-gfx/color.h>
 #include <web-base/background.h>
 #include <web-base/borders.h>
+#include <web-base/color.h>
 #include <web-base/display.h>
 #include <web-base/flex.h>
 #include <web-base/float.h>
@@ -11,6 +12,8 @@
 namespace Web::Style {
 
 struct Computed {
+    Color color;
+
     Vec<Background> backgrounds;
     Borders borders;
 

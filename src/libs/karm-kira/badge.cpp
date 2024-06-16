@@ -2,7 +2,7 @@
 
 #include "badge.h"
 
-namespace Karm::Kr {
+namespace Karm::Kira {
 
 Ui::Child badge(Gfx::Color color, String t) {
     Ui::BoxStyle boxStyle = {
@@ -26,4 +26,4 @@ Ui::Child badge(BadgeStyle style, String t) {
     return badge(COLORS[static_cast<u8>(style)], t);
 }
 
-} // namespace Karm::Kr
+} // namespace Karm::Kira

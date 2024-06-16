@@ -1,8 +1,8 @@
+#include <karm-kira/slider.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
 
-#include "input.h"
 #include "row.h"
 
 namespace Hideo {
@@ -138,7 +138,7 @@ Ui::Child sliderRow(f64 value, Ui::OnChange<f64> onChange, String title) {
         NONE,
         title,
         NONE,
-        Hideo::slider(value, std::move(onChange), Mdi::DRAG_VERTICAL_VARIANT) | Ui::minSize({128, Ui::UNCONSTRAINED})
+        Kr::slider(value, std::move(onChange), Mdi::DRAG_VERTICAL_VARIANT) | Ui::minSize({128, Ui::UNCONSTRAINED})
     );
 }
 

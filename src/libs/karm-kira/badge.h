@@ -2,7 +2,9 @@
 
 #include <karm-ui/view.h>
 
-namespace Karm::Kr {
+#include "_prelude.h"
+
+namespace Karm::Kira {
 
 enum struct BadgeStyle {
     INFO,
@@ -17,4 +19,4 @@ Ui::Child badge(Gfx::Color color, String text);
 
 Ui::Child badge(BadgeStyle style, String text);
 
-} // namespace Karm::Kr
+} // namespace Karm::Kira

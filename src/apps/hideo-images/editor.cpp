@@ -1,6 +1,6 @@
-#include <hideo-base/input.h>
 #include <hideo-base/row.h>
 #include <hideo-base/scafold.h>
+#include <karm-kira/slider.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/input.h>
 #include <karm-ui/scroll.h>
@@ -152,7 +152,7 @@ Ui::Child editorFilterControls(Gfx::Filter const &filter) {
             return Ui::empty();
         },
         []<typename T>(T const &f) {
-            return Hideo::slider<decltype(f.amount)>(
+            return Kr::slider<decltype(f.amount)>(
                 f.amount,
                 T::RANGE,
                 [](auto &n, auto v) {

@@ -3,7 +3,7 @@
 
 #include "avatar.h"
 
-namespace Karm::Kr {
+namespace Karm::Kira {
 
 Ui::Child avatar(String t) {
     Ui::BoxStyle boxStyle = {
@@ -18,4 +18,4 @@ Ui::Child avatar(String t) {
            Ui::box(boxStyle);
 }
 
-} // namespace Karm::Kr
+} // namespace Karm::Kira

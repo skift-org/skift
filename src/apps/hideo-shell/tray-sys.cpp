@@ -1,5 +1,5 @@
 #include <hideo-base/dialogs.h>
-#include <hideo-base/input.h>
+#include <karm-kira/slider.h>
 #include <karm-ui/box.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/layout.h>
@@ -189,8 +189,8 @@ Ui::Child expendedQuickSettings(State const &state) {
 
     return Ui::vflow(
         8,
-        Hideo::slider(0.5, NONE, Mdi::BRIGHTNESS_6),
-        Hideo::slider(0.5, NONE, Mdi::VOLUME_HIGH),
+        Kr::slider(0.5, NONE, Mdi::BRIGHTNESS_6),
+        Kr::slider(0.5, NONE, Mdi::VOLUME_HIGH),
         settings | Ui::grow(),
         quickTools(state)
     );

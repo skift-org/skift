@@ -4,6 +4,7 @@
     "type": "lib",
     "description": "Base component for Hideo",
     "requires": [
-        "karm-ui"
+        "karm-ui",
+        "karm-kira"
     ]
 }

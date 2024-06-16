@@ -2,8 +2,10 @@
 
 #include <karm-ui/view.h>
 
-namespace Karm::Kr {
+#include "_prelude.h"
+
+namespace Karm::Kira {
 
 Ui::Child avatar(String t);
 
-} // namespace Karm::Kr
+} // namespace Karm::Kira

@@ -2,7 +2,9 @@
 
 #include <karm-ui/input.h>
 
-namespace Hideo {
+#include "_prelude.h"
+
+namespace Karm::Kira {
 
 Ui::Child slider(f64 value, Ui::OnChange<f64> onChange, Mdi::Icon icon);
 
@@ -17,4 +19,4 @@ static inline Ui::Child slider(T value, Range<T> range, Ui::OnChange<T> onChange
     );
 }
 
-} // namespace Hideo
+} // namespace Karm::Kira

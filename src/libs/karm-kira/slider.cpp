@@ -1,9 +1,9 @@
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
 
-#include "input.h"
+#include "slider.h"
 
-namespace Hideo {
+namespace Karm::Kira {
 
 Ui::Child slider(f64 value, Ui::OnChange<f64> onChange, Mdi::Icon icon) {
     return Ui::hflow(
@@ -26,4 +26,4 @@ Ui::Child slider(f64 value, Ui::OnChange<f64> onChange, Mdi::Icon icon) {
            Ui::maxSize({Ui::UNCONSTRAINED, 36});
 }
 
-} // namespace Hideo
+} // namespace Karm::Kira

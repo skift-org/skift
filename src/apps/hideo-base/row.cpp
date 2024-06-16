@@ -1,4 +1,7 @@
+#include <karm-kira/checkbox.h>
+#include <karm-kira/radio.h>
 #include <karm-kira/slider.h>
+#include <karm-kira/toggle.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
@@ -111,7 +114,7 @@ Ui::Child toggleRow(bool value, Ui::OnChange<bool> onChange, String title) {
         NONE,
         title,
         NONE,
-        toggle(value, std::move(onChange))
+        Kr::toggle(value, std::move(onChange))
     );
 }
 
@@ -120,13 +123,13 @@ Ui::Child checkboxRow(bool value, Ui::OnChange<bool> onChange, String title) {
         NONE,
         title,
         NONE,
-        checkbox(value, std::move(onChange))
+        Kr::checkbox(value, std::move(onChange))
     );
 }
 
 Ui::Child radioRow(bool value, Ui::OnChange<bool> onChange, String title) {
     return row(
-        radio(value, std::move(onChange)),
+        Kr::radio(value, std::move(onChange)),
         title,
         NONE,
         NONE

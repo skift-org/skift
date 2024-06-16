@@ -8,7 +8,7 @@
 namespace Hideo::Zoo {
 
 static inline Page PAGE_SLIDER{
-    Mdi::CARD,
+    Mdi::TUNE_VARIANT,
     "Slider",
     "An input where the user selects a value from within a given range.",
     [] {

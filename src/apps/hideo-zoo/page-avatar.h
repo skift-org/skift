@@ -8,7 +8,7 @@
 namespace Hideo::Zoo {
 
 static inline Page PAGE_AVATAR{
-    Mdi::CARD,
+    Mdi::ACCOUNT_CIRCLE,
     "Avatar",
     "An image element with a fallback for representing the user.",
     [] {

@@ -166,18 +166,6 @@ Child input(Gfx::TextStyle style, Strong<Textbox::Model> text, OnChange<Textbox:
 
 Child input(Strong<Textbox::Model> text, OnChange<Textbox::Action> onChange);
 
-// MARK: Toggle ----------------------------------------------------------------
-
-Child toggle(bool value, OnChange<bool> onChange);
-
-// MARK: Checkbox --------------------------------------------------------------
-
-Child checkbox(bool value, OnChange<bool> onChange);
-
-// MARK: Radio -----------------------------------------------------------------
-
-Child radio(bool value, OnChange<bool> onChange);
-
 // MARK: Slider ----------------------------------------------------------------
 
 Child slider(f64 value, OnChange<f64> onChange, Child child);

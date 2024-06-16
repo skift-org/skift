@@ -7,14 +7,20 @@
 // Pages
 #include "page-avatar.h"
 #include "page-badge.h"
+#include "page-checkbox.h"
+#include "page-radio.h"
 #include "page-slider.h"
+#include "page-toggle.h"
 
 namespace Hideo::Zoo {
 
 static Array PAGES = {
     &PAGE_AVATAR,
     &PAGE_BADGE,
+    &PAGE_CHECKBOX,
     &PAGE_SLIDER,
+    &PAGE_RADIO,
+    &PAGE_TOGGLE,
 };
 
 Ui::Child app() {

@@ -18,7 +18,8 @@ static inline Page PAGE_BADGE{
             Kr::badge(Kr::BadgeStyle::INFO, "Info"s),
             Kr::badge(Kr::BadgeStyle::SUCCESS, "Success"s),
             Kr::badge(Kr::BadgeStyle::WARNING, "Warning"s),
-            Kr::badge(Kr::BadgeStyle::ERROR, "Error"s)
+            Kr::badge(Kr::BadgeStyle::ERROR, "Error"s),
+            Kr::badge(Gfx::GREEN, "New"s)
         );
     },
 };

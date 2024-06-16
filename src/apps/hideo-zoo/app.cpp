@@ -3,11 +3,15 @@
 
 #include "app.h"
 #include "model.h"
+
+// Pages
+#include "page-avatar.h"
 #include "page-badge.h"
 
 namespace Hideo::Zoo {
 
 static Array PAGES = {
+    &PAGE_AVATAR,
     &PAGE_BADGE
 };
 
@@ -33,10 +37,20 @@ Ui::Child app() {
             .body = [&] {
                 auto &page = PAGES[s.page];
                 return Ui::vflow(
-                    Ui::titleLarge(page->name),
-                    Ui::bodyMedium(page->description),
-                    page->build()
-                );
+                           Ui::titleLarge(page->name),
+                           Ui::empty(4),
+                           Ui::bodyMedium(page->description),
+                           Ui::empty(16),
+                           page->build() |
+                               Ui::center() |
+                               Ui::minSize({Ui::UNCONSTRAINED, 320}) |
+                               Ui::box({
+                                   .borderRadius = 8,
+                                   .borderWidth = 1,
+                                   .borderPaint = Ui::GRAY800,
+                               })
+                       ) |
+                       Ui::spacing({16, 24});
             },
         });
     });

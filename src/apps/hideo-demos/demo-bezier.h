@@ -11,11 +11,6 @@
 
 namespace Hideo::Demos {
 
-struct Edit {
-    usize index;
-    Math::Vec2f pos;
-};
-
 static void reduce(Math::Curvef &curve, Edit e) {
     curve._pts[e.index] = e.pos;
 }

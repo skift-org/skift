@@ -13,6 +13,7 @@
 #include "demo-hello.h"
 #include "demo-icons.h"
 #include "demo-inputs.h"
+#include "demo-mesh.h"
 #include "demo-mixbox.h"
 #include "demo-stroke.h"
 #include "demo-svg.h"
@@ -22,13 +23,14 @@ namespace Hideo::Demos {
 
 static Array DEMOS = {
     &BEZIER_DEMO,
+    &CAROUSEL_DEMO,
     &CIRCLE_DEMO,
     &GRADIENT_DEMO,
-    &MIXBOX_DEMO,
     &HELLO_DEMO,
     &ICONS_DEMO,
     &INPUTS_DEMO,
-    &CAROUSEL_DEMO,
+    &MESH_DEMO,
+    &MIXBOX_DEMO,
     &STROKE_DEMO,
     &SVG_DEMO,
     &TEXT_DEMO,

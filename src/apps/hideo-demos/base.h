@@ -11,4 +11,9 @@ struct Demo {
     Func<Ui::Child()> build;
 };
 
+struct Edit {
+    usize index;
+    Math::Vec2f pos;
+};
+
 } // namespace Hideo::Demos

@@ -104,21 +104,6 @@ DEF_STYLE(codeSmall)
 
 #undef DEF_STYLE
 
-// MARK: Badge -----------------------------------------------------------------
-
-enum struct BadgeStyle {
-    INFO,
-    SUCCESS,
-    WARNING,
-    ERROR,
-
-    _LEN
-};
-
-Child badge(Gfx::Color color, String text);
-
-Child badge(BadgeStyle style, String text);
-
 // MARK: Icon ------------------------------------------------------------------
 
 Child icon(Media::Icon icon, Opt<Gfx::Color> color = NONE);

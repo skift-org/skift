@@ -1,3 +1,4 @@
+#include <karm-kira/badge.h>
 #include <karm-ui/box.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
@@ -59,16 +60,16 @@ Ui::Child dialogCloseButton() {
 
 Ui::Child versionBadge() {
     Ui::Children badges = {};
-    badges.pushBack(Ui::badge(
-        Ui::BadgeStyle::INFO,
+    badges.pushBack(Kr::badge(
+        Kr::BadgeStyle::INFO,
         stringify$(__ck_version_value) ""s
     ));
 #ifdef __ck_branch_nightly__
-    badges.pushBack(Ui::badge(Gfx::INDIGO400, "Nightly"s));
+    badges.pushBack(Kr::badge(Gfx::INDIGO400, "Nightly"s));
 #elif defined(__ck_branch_stable__)
     // No badge for stable
 #else
-    badges.pushBack(Ui::badge(Gfx::EMERALD, "Dev"s));
+    badges.pushBack(Kr::badge(Gfx::EMERALD, "Dev"s));
 #endif
     return Ui::hflow(4, badges);
 }
@@ -116,7 +117,7 @@ Ui::Child aboutDialog(Mdi::Icon i, String name) {
                 "Copyright © 2018-2024\n"
                 "The skiftOS Developers & Odoo S.A.\n"
                 "\n"
-                "All rights reserved.\n"
+                "All rights reserved."
             )
         ) |
         Ui::spacing(16);
